@@ -2,6 +2,10 @@
                         Kern Sibbald
 
 General:
+24Dec04
+- Apply Carl Lindberg <lindberg@clindberg.org>'s patch
+  for apcaction.c to fix the network management card
+  shutdown.
 28Nov04
 - Fix typo in targets.mak that prevents uninstall from working.
 13Nov04

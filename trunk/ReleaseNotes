@@ -1,8 +1,17 @@
 
-          Release Notes for Apcupsd 3.10.16
+          Release Notes for Apcupsd 3.10.17
 
 NOTE: The non-pthreaded version should work in this release, but
       will be removed in the next version.
+
+Release 3.10.17 xxx
+- Fix typo in targets.mak that prevents uninstall from working.
+- Change name of thread_terminate to apc_thread_terminate to avoid
+  conflict on AIX.
+- Put configure found SHUTDOWN in apccontrol.in
+- Figured out how to scale the pdf images, so re-did them.
+- Some minor updates to the manual, particularly the title
+  page.
 
 Release 3.10.16 04Nov04
 - Adam has fixed the killpower problem for USB so that the
