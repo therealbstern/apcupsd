@@ -128,6 +128,10 @@ const struct s_known_info known_info[] = {
     { CI_APCBattCapBeforeStartup, 0xFF860019, P_ANY,  T_CAPACITY},  /* APCBattCapBeforeStartup */
     { CI_APCDelayBeforeStartup,   0xFF86007E, P_ANY,  T_UNITS   },  /* APCDelayBeforeStartup */
     { CI_APCDelayBeforeShutdown,  0xFF86007D, P_ANY,  T_UNITS   },  /* APCDelayBeforeShutdown */
+    { CI_BUPBattCapBeforeStartup, 0x00860012, P_ANY,  T_NONE    },  /* BUPBattCapBeforeStartup */
+    { CI_BUPDelayBeforeStartup,   0x00860076, P_ANY,  T_NONE    },  /* BUPDelayBeforeStartup */
+    { CI_BUPSelfTest,             0x00860010, P_ANY,  T_NONE    },  /* BUPSelfTest */
+    { CI_BUPHibernate,            0x00850058, P_ANY,  T_NONE    },  /* BUPHibernate */
     { CI_NONE,                    0x00000000, P_ANY,  T_NONE    }   /* END OF TABLE */
 };
 
@@ -538,9 +542,10 @@ int usb_ups_kill_power(UPSINFO *ups)
 {
     char *func;
     int shutdown = 0;
+    int val;
 
     Dmsg0(200, "Enter usb_ups_kill_power\n");
-    
+
     /*
      * We try various different ways to shutdown the UPS (i.e. killpower).
      * Some of these commands are not supported on all UPSes, but that
@@ -559,6 +564,39 @@ int usb_ups_kill_power(UPSINFO *ups)
     }
 
     /*
+     * BackUPS Pro uses an enumerated setting (reads percent in ASCII). The value
+     * advances to the next higher setting by writing a '1' and to the next lower
+     * setting when writing a '2'. The value wraps around when advanced past the
+     * max or min setting.
+     *
+     * We walk the setting down to the minimum of 0.
+     *
+     * Credit goes to John Zielinski <grim@undead.cc> for figuring this out.
+     */
+    if (UPS_HAS_CAP(CI_BUPBattCapBeforeStartup)) {
+        if (pusb_read_int_from_ups(ups, CI_BUPBattCapBeforeStartup, &val)) {
+            func = "CI_BUPBattCapBeforeStartup";
+            switch(val) {
+                case 0x3930: /* 90% */
+                    pusb_write_int_to_ups(ups, CI_BUPBattCapBeforeStartup, 2, func);
+                    /* Falls thru... */
+                case 0x3630: /* 60% */
+                    pusb_write_int_to_ups(ups, CI_BUPBattCapBeforeStartup, 2, func);
+                    /* Falls thru... */
+                case 0x3135: /* 15% */
+                    pusb_write_int_to_ups(ups, CI_BUPBattCapBeforeStartup, 2, func);
+                    /* Falls thru... */
+                case 0x3030: /* 00% */
+                    break;
+                    
+                default:
+                    Dmsg1(100, "Unknown BUPBattCapBeforeStartup value (%04x)\n", val);
+                    break;
+            }
+        }
+    }
+
+    /*
      * Second, set the length of time to wait after power returns before starting
      * up. We set it to something pretty low, but it seems the UPS rounds this
      * value up to the nearest multiple of 60 seconds. Not all UPSes have this
@@ -568,6 +606,39 @@ int usb_ups_kill_power(UPSINFO *ups)
     func = "CI_APCDelayBeforeStartup";
     if (!usb_write_int_to_ups(ups, CI_APCDelayBeforeStartup, 10, func)) {
        Dmsg1(100, "Unable to set %s (not an error)\n", func);
+    }
+
+    /*
+     * BackUPS Pro uses an enumerated setting (reads seconds in ASCII). The value
+     * advances to the next higher setting by writing a '1' and to the next lower
+     * setting when writing a '2'. The value wraps around when advanced past the
+     * max or min setting.
+     *
+     * We walk the setting down to the minimum of 60.
+     *
+     * Credit goes to John Zielinski <grim@undead.cc> for figuring this out.
+     */
+    if (UPS_HAS_CAP(CI_BUPDelayBeforeStartup)) {
+        if (pusb_read_int_from_ups(ups, CI_BUPDelayBeforeStartup, &val)) {
+            func = "CI_BUPDelayBeforeStartup";
+            switch(val) {
+                case 0x363030: /* 600 sec */
+                    pusb_write_int_to_ups(ups, CI_BUPDelayBeforeStartup, 2, func);
+                    /* Falls thru... */
+                case 0x333030: /* 300 sec */
+                    pusb_write_int_to_ups(ups, CI_BUPDelayBeforeStartup, 2, func);
+                    /* Falls thru... */
+                case 0x313830: /* 180 sec */
+                    pusb_write_int_to_ups(ups, CI_BUPDelayBeforeStartup, 2, func);
+                    /* Falls thru... */
+                case 0x3630:   /* 60 sec */
+                    break;
+
+                default:
+                    Dmsg1(100, "Unknown CI_BUPDelayBeforeStartup value (%04x)\n", val);
+                    break;
+            }
+        }
     }
 
     /*
@@ -610,6 +681,34 @@ int usb_ups_kill_power(UPSINFO *ups)
         }
         else {
             shutdown = 1;
+        }
+    }
+
+    /*
+     * BackUPS Pro shutdown
+     *
+     * Here we see the BackUPS Pro further distinguish itself as having the
+     * most broken firmware of any APC product yet. We have to trigger two magic
+     * boolean flags using APC custom usages. First we hit BUPHibernate and 
+     * follow that with a write to BUPSelfTest (!).
+     *
+     * Credit goes to John Zielinski <grim@undead.cc> for figuring this out.
+     */
+    if (!shutdown && UPS_HAS_CAP(CI_BUPHibernate) && UPS_HAS_CAP(CI_BUPSelfTest)) {
+        Dmsg0(000, "UPS appears to support BackUPS Pro style shutdown.\n");   
+        func = "CI_BUPHibernate";
+        if (!pusb_write_int_to_ups(ups, CI_BUPHibernate, 1, func)) {
+           Dmsg1(000, "Kill power function \"%s\" failed.\n", func);   
+        }
+        else {
+            func = "CI_BUPSelfTest";
+            if (!pusb_write_int_to_ups(ups, CI_BUPSelfTest, 1, func)) {
+               Dmsg1(000, "Kill power function \"%s\" failed.\n", func);
+               pusb_write_int_to_ups(ups, CI_BUPHibernate, 0, "CI_BUPHibernate");
+            }
+            else {
+                shutdown = 1;
+            }
         }
     }
 
