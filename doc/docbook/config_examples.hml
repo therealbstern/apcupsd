@@ -10,14 +10,14 @@ following:</para>
 ## apcupsd.conf v1.1 ##
 UPSCABLE usb
 UPSTYPE usb
-#DEVICE
+DEVICE
 LOCKFILE /var/lock
 UPSCLASS standalone
 UPSMODE disable
 </programlisting>
 
 <para>Notice that we have not specified a device. In doing so, apcupsd
-will try all the well know USB ports.</para>
+will try all the well known USB ports.</para>
 
 <para>
 If you have more than one device,
@@ -30,8 +30,9 @@ you may want a DEVICE specification as follows:
 DEVICE /dev/usb/hiddev[0-15]
 </programlisting>
 
-<para>If you have used the make-hiddev that is in the examples directory
-of the source, you will want to specify a DEVICE as follows:</para>
+<para>If you have used the <b>make-hiddev</b> that is in the
+<b>examples</b> directory of the source, you will want to specify
+a DEVICE as follows:</para>
 
 <programlisting>
 DEVICE /dev/usb/hid/hiddev[0-15]
@@ -41,13 +42,19 @@ DEVICE /dev/usb/hid/hiddev[0-15]
 your know exactly what you are doing. In general, it is much easier
 to let <application>apcupsd</application> find the device itself.</para>
 <para>
-Note that you should enter &quot;/dev/usb/hiddev[0-15]&quot; literally as shown.
-The &quot;[0-15]&quot; expression tells apcupsd to search all hiddev devices until
-it finds a UPS. You can restrict the search to a subset of devices by
-using something like &quot;[0-4]&quot;, but keep in mind this will limit apcupsd's
-ability to locate the UPS if the kernel relocates it to a
-differentdevice node.
+You should enter <b>/dev/usb/hiddev[0-15]</b>
+literally as shown.  The &quot;[0-15]&quot; expression tells
+apcupsd to search all hiddev devices until it finds a UPS. You
+can restrict the search to a subset of devices by using something
+like &quot;[0-4]&quot;, but keep in mind this will limit
+apcupsd's ability to locate the UPS if the kernel relocates it to
+a differentdevice node.
 </para>
+
+<para>
+On Debian systems, the <b>hiddev</b> devices are not automatically defined.   
+As a consequence, you will need to run the <b>make-hiddev</b> script in
+the <b>examples</b> directory of the source.</para>
 
 </sect1>
 
@@ -79,7 +86,17 @@ the minimum required.</para>
 <para>If you have a simple signaling or dumb UPS such as a BackUPS, you 
 will need to know exactly what cable you have and specify it on the
 UPSCABLE directive. Please see the list of UPSes versus cables in the
-beginning of this document for more information.
+beginning of this document for more information. The cable number
+is normally stamped in the plastic at one end of the cable.
+If you specify the
+wrong cable, it is very likely that at the first power failure, your
+computer will be immediately shutdown. This is an unfortunate consequence
+of the dumb signaling mode.  To avoid this, first replace
+<b>/etc/apcupsd/apccontrol</b> with <b>safe.apccontrol</b> found in
+the examples directory, then test until everything works correctly.
+Once you have the correct cable, be sure to remember to reinstall
+the correct apccontrol file and test that your computer is correctly
+shutdown during a power failure. 
 </para>
 <programlisting>
 ## apcupsd.conf v1.1 ##
@@ -90,6 +107,11 @@ LOCKFILE /var/lock
 UPSCLASS standalone
 UPSMODE disable
 </programlisting>
+
+<para>If your cable does not have low battery detection, as is the
+case with some older models, you will also need to define
+<b>TIMEOUT nnn</b> where you set <b>nn</b> to be the number of
+seconds on a power failure after which a shutdown is effected.</para>
 
 <para>Normally you would have many more configuration directives to
 completely customize your installation, but this example shows you
@@ -189,6 +211,7 @@ LOCKFILE /var/lock
 DEVICE server-network-address:3551
 UPSCLASS standalone
 UPSMODE disable
+NETTIME 10
 </programlisting>
 
 <para>where on the <emphasis role="bold">DEVICE</emphasis> directive
@@ -205,10 +228,25 @@ setup, but much simpler (the master does not know about the
 slaves), and any NIS server, even a slave, can act as a server to a
 slave that listens to it.</para>
 
+<para>The <b>NETTIME</b> directive defines the time interval       
+that the slave uses to poll the master. If you set this too large,
+your slave may not see the change in state of the master before
+the master has shutdown. Normally, you have at least 30 seconds
+of grace time between the time the master decides to shutdown and
+the time it no longer responds. Your slave must poll during this
+interval.</para>
+
 <para>This mode works principally by reading the STATFLAG record that
 is sent by the NIS (present in the output of apcaccess). The low 16
 bits are the standard APC status flag, and the upper 16 bits
 represent the internal state of apcupsd, so the slave can see when
 the power fails and know when to shutdown.</para>
+<para>As with the Master/Slave configuration, any slave run using
+the Net driver will shutdown when its own timers expire or when
+the master shuts down, whichever occurs first. This means that
+if you want the slave to shutdown before the master, you need only
+set BATTERYLEVEL, or any of the other values on the slave for 
+a faster shutdown than the values defined on the master.</para>
+
 </sect1>
 </chapter>

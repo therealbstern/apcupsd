@@ -38,6 +38,14 @@ UPSmanagement.</para>
 </listitem>
 </varlistentry>
 
+<varlistentry>
+<term>CGI and HTML fixer:</term>
+<listitem>
+    <para>William King (wrking at dadaboom dot com)</para>
+</listitem>
+</varlistentry>
+
+
 
 
 

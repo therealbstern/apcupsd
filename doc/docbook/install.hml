@@ -21,7 +21,7 @@ system</link>.</para></step>
 type</link>.  If you have just one UPS and one computer, this is easy.
 If you have more than one machine being served by the same UPS, or
 more than one UPS supplying power to computers that are on the same
-local network, you have more choices to make,</para></step>
+local network, you have more choices to make.</para></step>
 
 <step><para>Third, figure out if you have one of the easy setups.
 If you have a USB UPS, and a USB-capable recent Linux such as Red Hat
@@ -128,16 +128,6 @@ the kind of protocol it uses to talk with its computer.</para>
 
 <variablelist>
 <varlistentry>
-<term>dumb</term>
-<listitem>
-<para>A dumb or voltage-signaling UPS and its computer communicate
-through the signal lines on an RS232C serial connection.  Not much can
-actually be conveyed this way other than an order to shut down.
-Voltage-signaling UPSes are obsolete; you are unlikely to encounter
-one other than as legacy hardware.</para>
-</listitem>
-</varlistentry>
-<varlistentry>
 <term>apcsmart</term>
 <listitem>
 <para>An apcsmart UPS and its computer also communicate through an
@@ -153,22 +143,27 @@ rapidly being replaced in APC's product line by USB UPSes.</para>
 <varlistentry>
 <term>usb</term>
 <listitem>
-<para>A USB UPS speaks a universal well defined control language over a USB wire.  
-Most of APC's lineup now uses this method as of late 2003, and it
-seems likely to completely take over in their low- and middle range.
-Other manufacturers (Belkin, Tripp-Lite, etc.) are moving the same
-way, though with a different control protocol for each manufacturer.
-As long as USB hardware can be mass-produced more cheaply than an
-Ethernet card, most UPSes are likely to go this design route.</para>
+<para>A USB UPS speaks a universal well defined control language
+over a USB wire.  Most of APC's lineup now uses this method as of
+late 2003, and it seems likely to completely take over in their
+low- and middle range.  Other manufacturers (Belkin, Tripp-Lite,
+etc.) are moving the same way, though with a different control
+protocol for each manufacturer.  As long as USB hardware can be
+mass-produced more cheaply than an Ethernet card, most UPSes are
+likely to go this design route. Please note that even if you have
+a USB UPS, if you use a serial cable with it (as can be supplied
+by APC), you will need to configure your UPS as <b>apcsmart</b>
+rather than <b>usb</b>.</para>
 </listitem>
 </varlistentry>
 <varlistentry>
 <term>net</term>
 <listitem>
-<para>Some higher-end APC models can declare an IP address and speak 
-Ethernet.  These use a different command format than apcsmart,
-token-oriented and looking a bit more like a classical Internet
-protocol.</para>
+<para>This is the keyword to specify if you are using your
+UPS in Slave mode (i.e. the machine is not directly connected
+to the UPS, but to another machine which is),
+and it is connected to the Master via an ethernet connection.
+</para>
 </listitem>
 </varlistentry>
 <varlistentry>
@@ -178,8 +173,29 @@ protocol.</para>
 speaks Simple Network Management Protocol.</para>
 </listitem>
 </varlistentry>
+<varlistentry>
+<term>dumb</term>
+<listitem>
+<para>A dumb or voltage-signaling UPS and its computer communicate
+through the signal lines on an RS232C serial connection.  Not much can
+actually be conveyed this way other than an order to shut down.
+Voltage-signaling UPSes are obsolete; you are unlikely to encounter
+one other than as legacy hardware.</para>
+</listitem>
+</varlistentry>
 </variablelist>
-
+<para>
+The table shown below lists the APC model supported, and the possible
+kewords that you would use in the configuration with the listed cables.
+Some of the models, particularly USB enabled models, can be run in
+multiple modes, so they may appear more than once in the table. APC is 
+putting out new models at a furious rate, and so it is very likely that
+your model is not listed in the table. If it is USB enabled, it will 
+probably work in USB mode. Please note that some of these new models
+are extremely inexpensive, so they are stripped down versions of more
+expensive units, and as such they do not offer as many features, so
+some of the example output you see elsewhere in this manual may
+not be available with your unit.</para>
 <informaltable id='type_table'>
 <tgroup cols="4">
 <colspec colnum="1" colname="col1"/>
@@ -195,33 +211,6 @@ speaks Simple Network Management Protocol.</para>
 </row>
 </thead>
 <tbody>
-<row>
-  <entry>BackUPS</entry>
-  <entry>dumb</entry>
-  <entry>simple (note: using Simple-Custom<footnote id='custom_cable'><para>This cable is
-  not an APC product.  You have to build it yourself using the
-  instructions in <xref linkend='cables'/>.</para></footnote>),
-  940-0020B, 940-0020C, 940-0119A, 940-0023A</entry>
-  <entry>Supported</entry>
-</row>
-<row>
-  <entry>BackUPS Office, BackUPS ES</entry>
-  <entry>dumb</entry>
-  <entry>940-0119A</entry>
-  <entry>Supported</entry>
-</row>
-<row>
-  <entry>BackUPS CS and possibly ES models (serial mode)</entry>
-  <entry>dumb</entry>
-  <entry>940-0128A</entry>
-  <entry>Supported</entry>
-</row>
-<row>
-  <entry>ShareUPS Basic Port</entry>
-  <entry>dumb</entry>
-  <entry>940-0020B, 940-0020C, 940-0023A</entry>
-  <entry>Supported</entry>
-</row>
 <row>
   <entry>BackUPS CS/ES (serial mode)</entry>
   <entry>apcsmart</entry>
@@ -258,7 +247,34 @@ speaks Simple Network Management Protocol.</para>
 <row>
   <entry>All SNMP-capable models</entry>
   <entry>snmp</entry>
-  <entry>Ethernet</entry>
+  <entry>ether</entry>
+  <entry>Supported</entry>
+</row>
+<row>
+  <entry>BackUPS</entry>
+  <entry>dumb</entry>
+  <entry>simple (note: using Simple-Custom<footnote id='custom_cable'><para>This cable is
+  not an APC product.  You have to build it yourself using the
+  instructions in <xref linkend='cables'/>.</para></footnote>),
+  940-0020B, 940-0020C, 940-0119A, 940-0023A</entry>
+  <entry>Supported</entry>
+</row>
+<row>
+  <entry>BackUPS Office, BackUPS ES</entry>
+  <entry>dumb</entry>
+  <entry>940-0119A</entry>
+  <entry>Supported</entry>
+</row>
+<row>
+  <entry>BackUPS CS and possibly ES models (serial mode)</entry>
+  <entry>dumb</entry>
+  <entry>940-0128A</entry>
+  <entry>Supported</entry>
+</row>
+<row>
+  <entry>ShareUPS Basic Port</entry>
+  <entry>dumb</entry>
+  <entry>940-0020B, 940-0020C, 940-0023A</entry>
   <entry>Supported</entry>
 </row>
 </tbody>
