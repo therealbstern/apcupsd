@@ -5,7 +5,10 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
-----> Release apcupsd-3.10.6 (08 July 2003)
+----> Release apcupsd-3.10.6 (10 July 2003)
+12Jul03
+- Modify snmp driver to use upsPhaseOutputPercentPower instead of
+  upsAdvOutputLoad as requested by ivac@gnjilux.srk.fer.hr.
 08Jul03
 - Added Sergey Vlasov's second USB kernel patch to the examples
   directory.  The two patches can be found in:
