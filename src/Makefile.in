@@ -74,6 +74,8 @@ install-binary: $(allexe)
 	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(sbindir)
 	@$(INSTALL_PROGRAM) -s -m 700 apcupsd@EXEEXT@ \
 		$(DESTDIR)$(sbindir)/apcupsd@EXEEXT@
+	@$(INSTALL_PROGRAM) -s -m 700 apctest@EXEEXT@ \
+		$(DESTDIR)$(sbindir)/apctest@EXEEXT@
 	@$(MAKE) DESTDIR=$(DESTDIR) install-@APCNISD@
 	@$(MAKE) DESTDIR=$(DESTDIR) install-@APCACCESS@
 	@$(MAKE) DESTDIR=$(DESTDIR) install-@SMTP@

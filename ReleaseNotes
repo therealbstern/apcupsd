@@ -2,13 +2,27 @@
           Release Notes for Apcupsd 3.10.8
 
 General:
-
+28Dec03
+- Move wall in killpower of apccontrol to after killpower to avoid 
+  errors stopping script.
+- Install apctest along with apcupsd.
+19Dec03
+- Added patch by Adam Kropelin that ignores invalid samples. This 
+  eliminates the need for the wait, and seems to calm the system. Apparently, 
+  even though apcupsd did not use the bad samples, it would break from the
+  wait loop, and request an update, which gave even more bad samples. With
+  Adam's patch the samples are simply dropped and we continue waiting (if 
+  appropriate).  Thanks Adam.
+18Dec03
+- Add Slackware updated patch submitted by Andrei Mamontov
+- Corrected the missing library dependencies in src/Makefile.in
+  Thanks to Reg. Clemens for pushing me a bit on this.
 24Nov03
 - Added a ONBATTERYDELAY to the conf file. This is the time in
   seconds that apcupsd will wait after detecting a power failure
   until it sets the onbattery state.  If you do not want to be
   annoyed by short power outages (usually less than 10 seconds),
-  set the ONBATTRYDELAY appropriately and comment out the
+  set the ONBATTERYDELAY appropriately and comment out the
   powerout) "echo ...|wall" statement.
 - I finally got the no driver configured error. It turns out that the
   Makefile detection of changes is all botched up. Since I don't understand

@@ -1,10 +1,15 @@
              Technical notes on version 3.10.8
-                      18 December 2003
+                      28 December 2003
                         Kern Sibbald
 
 General:
 
 Changes submitted this submission:
+28Dec03
+- Move wall in killpower of apccontrol to after killpower to avoid 
+  errors stopping script.
+- Install apctest along with apcupsd.
+- Fix DISTVER for RH Enterprise
 19Dec03
 - Added patch by Adam Kropelin that ignores invalid samples. This 
   eliminates the need for the wait, and seems to calm the system. Apparently, 
@@ -18,7 +23,7 @@ Changes submitted this submission:
   Thanks to Reg. Clemens for pushing me a bit on this.
 06Dec03
 - Added usleep(10000) provided by Reg. Clemens, which resolves the
-  apcuspd USB problems on 2.6 kernels.
+  apcuspd USB problems on 2.6 kernels. Now removed by 19Dec03 patch.
 24Nov03
 - Added a ONBATTERYDELAY to the conf file. This is the time in
   seconds that apcupsd will wait after detecting a power failure
