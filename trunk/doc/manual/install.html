@@ -400,6 +400,15 @@ runs as a single process, and thus is less efficient (consumes
 more CPU time) than the forking version of <b>apcupsd</b>.
 We hope to rectify this in a future version by using the
 FreeBSD LinuxThreads implementation of pthreads.
+<p>On the FreeBSD OS, there is no known way for a user program
+to get control when all the disks are synced. This is needed
+for <b>apcupsd</b> to be able to issue the killpower command
+to the UPS so that the UPS shuts off the power.  To accomplish
+the same thing on FreeBSD systems, make sure you have a SmartUPS
+and that your UPS shutdown grace period is set sufficiently
+long so that you system will power down (usually 2 minutes),
+the use the <>--kill-on-powerfail</b> option on the 
+<b>apcupsd</b> command line.
 
 <h2><a name="HPUX"></a>HPUX</h2>
 <p>We have no reports of testing this yet on version 3.8.4,
