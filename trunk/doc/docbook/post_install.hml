@@ -14,7 +14,7 @@ configuration you should only need to check (and possibly fix) the
 first three items listed below.</para>
 
 <para>Your UPSTYPE should be the UPS's protocol type: dumb, apcsmart,
-usb, net, or snmp.  Your UPSCABLE should be the type of cable you are
+usb, net, snmp, or ether.  Your UPSCABLE should be the type of cable you are
 using.  You should have gotten both from the <link
 linkend='type_table'>table of types</link>; usually they will both
 be the string "usb".</para>
@@ -37,7 +37,8 @@ as shown.  The &quot;[0-15]&quot; expression tells apcupsd to search all
 hiddev devices until it finds a UPS. You can restrict the search to a
 subset of devices by using something like &quot;[0-4]&quot;, but keep in
 mind this will limit apcupsd's ability to locate the UPS if the kernel
-relocates it to a differentdevice node.
+relocates it to a different device node, which happens occasionally during
+short power failures.
 </para>
 <para>
 If the first time you execute <application>apcupsd</application>, you get

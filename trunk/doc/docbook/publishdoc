@@ -1,11 +1,9 @@
 #!/bin/sh
 echo "Copying manual to www/apcupsd"
-rm -f /mnt/matou/home/www/apcupsd/public/docs/3.10.x-manual/*
-cp -afup /home/kern/apcupsd/k/doc/docbook/apcupsd.pdf /mnt/matou/home/www/apcupsd/public/docs/3.10.x-manual/apcupsd.pdf
-cp -afup /home/kern/apcupsd/k/doc/docbook/manual.html /mnt/matou/home/www/apcupsd/public/docs/3.10.x-manual/manual.html
-cp -afup /home/kern/apcupsd/k/doc/docbook/manual.css /mnt/matou/home/www/apcupsd/public/docs/3.10.x-manual/manual.css 
-cp -afup /home/kern/apcupsd/k/doc/docbook/html/* /mnt/matou/home/www/apcupsd/public/docs/3.10.x-manual
-cd /mnt/matou/home/www/apcupsd
+sudo rm -f /mnt/matou/home/www/apcupsd/public/docs/3.10.x-manual/*
+sudo cp -afup /home/kern/apcupsd/k/doc/docbook/apcupsd.pdf /mnt/matou/home/www/apcupsd/public/docs/3.10.x-manual/apcupsd.pdf
+sudo cp -afup /home/kern/apcupsd/k/doc/docbook/manual.html /mnt/matou/home/www/apcupsd/public/docs/3.10.x-manual/manual.html
+sudo cp -afup /home/kern/apcupsd/k/doc/docbook/manual.css /mnt/matou/home/www/apcupsd/public/docs/3.10.x-manual/manual.css 
+sudo cp -afup /home/kern/apcupsd/k/doc/docbook/html/* /mnt/matou/home/www/apcupsd/public/docs/3.10.x-manual
 echo "Setting correct permissions"
-./public-permissions
-cd $OLDPWD
+sudo ./set_permissions
