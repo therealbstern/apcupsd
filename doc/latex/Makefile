@@ -67,6 +67,13 @@ web:
 	rm -f apcupsd/*.old
 	rm -f *.eps *.png apcupsd/*.eps
 
+dvipdf:
+	@echo "Making dvi to pdf"
+	@cp -fp ${IMAGES}/hires/*.eps .
+	dvipdf apcupsd.dvi apcupsd.pdf
+	@rm -f *.eps
+
+
 h2l:
 	@echo "Making html2latex"
 	@(for i in ${MANUAL}; do \
@@ -89,7 +96,6 @@ clean:
 
 
 distclean:  clean
-
 
 
 
