@@ -64,7 +64,7 @@ web:
 	cp ${IMAGES}/*.eps .
 	cp ${IMAGES}/*.eps apcupsd/
 	@rm -f next.*
-	latex2html -split 4 -local_icons -t "Apcupsd User's Guide" -long_titles 4 \
+	latex2html -split 5 -local_icons -t "Apcupsd User's Guide" -long_titles 4 \
 		-toc_stars -contents_in_nav -white -notransparent apcupsd >/dev/null
 	./translate_images.pl apcupsd/Apcupsd_Users_Guide.html
 	cp apcupsd/Apcupsd_Users_Guide.html apcupsd/index.html
