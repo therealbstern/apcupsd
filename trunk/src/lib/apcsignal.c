@@ -69,8 +69,13 @@
  */
 void child_handler(int sig)
 {
-    /* Supposedly this will cause an infinite loop on Irix */
+#if !defined(HAVE_AIX_OS) && !defined(HAVE_SGI_OS)
+    /*
+     * This will cause an infinite loop on AIX and supposedly on 
+     * Irix as well.
+     */
     signal(SIGCHLD, child_handler);
+#endif
 }
 
 /*********************************************************************/
