@@ -1184,7 +1184,17 @@ int usb_ups_read_volatile_data(UPSINFO *ups)
     return 1;
 }
 
-static bool write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
+bool read_int_from_ups(UPSINFO *ups, int ci, int* value)
+{
+    USB_INFO info;
+    if (!get_value(ups, ci, &info))
+    	return false;
+    	
+    *value = info.iValue;
+    return true;
+}
+
+bool write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
 {
     struct hiddev_report_info rinfo;
     struct hiddev_field_info finfo;
@@ -1251,7 +1261,7 @@ logical_max=%d exponent=%d unit=0x%x\n",
 	    return false;
 	}
 	new_value = info->uref.value;
-        Dmsg3(000, "Kill power function %s ci=%d value=%d OK.\n", name, ci, value);
+        Dmsg3(100, "function %s ci=%d value=%d OK.\n", name, ci, value);
         Dmsg4(100, "%s before=%d set=%d after=%d\n", name, old_value, value, new_value);
 	return true;
     }
