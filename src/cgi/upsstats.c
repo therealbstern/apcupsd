@@ -45,10 +45,10 @@
 #endif
 
 static char   monhost[MAXHOSTNAMELEN] = "127.0.0.1";
-static char   img1s[16] = "";;
-static char   img2s[16] = "";;
-static char   img3s[16] = "";;
-static char   temps[16] = "";;
+static int    img1 = 1;
+static int    img2 = 6;
+static int    img3 = 5;
+static char   temps[16] = "C";
 static int    refresh = DEFAULT_REFRESH;
 
 void parsearg(const char *var, const char *value) 
@@ -58,16 +58,22 @@ void parsearg(const char *var, const char *value)
 	monhost[sizeof(monhost) - 1] = '\0';
 
     } else if (strcmp(var, "img1") == 0) {
-	strncpy (img1s, value, sizeof(img1s));
-	img1s[sizeof(img1s) - 1] = '\0';
+	img1 = atoi(value);
+        if ((img1 <= 0) || (img1 > 6)) {
+            img1 = 1;
+        }
 
     } else if (strcmp(var, "img2") == 0) {
-	strncpy (img2s, value, sizeof(img2s));
-	img2s[sizeof(img2s) - 1] = '\0';
+	img2 = atoi(value);
+        if ((img2 <= 0) || (img2 > 6)) {
+            img2 = 6;
+        }
 
     } else if (strcmp(var, "img3") == 0) {
-	strncpy (img3s, value, sizeof(img3s));
-	img3s[sizeof(img3s) - 1] = '\0';
+	img3 = atoi(value);
+        if ((img3 <= 0) || (img3 > 6)) {
+            img3 = 5;
+        }
 
     } else if (strcmp(var, "temp") == 0) {
 	strncpy (temps, value, sizeof(temps));
@@ -87,62 +93,56 @@ void send_values(int report, int defrpt)
 
     if (report < 1 || report > 6)
 	   report = defrpt;
+
     switch ( report ) {
     case 1:
         getupsvar (monhost, "battcap", answer, sizeof(answer));  
         getupsvar (monhost, "mbattchg", answer2, sizeof(answer2));
-        printf ("battcap&value=%s&value2=%s\",\" WIDTH=150 HEIGHT=350 ALT=\\\"Battery Capacity\\\"\"",answer, answer2);
+        printf ("battcap&value=%s&value2=%s\",\" width=\\\"150\\\" height=\\\"350\\\" alt=\\\"Battery Capacity\\\"\"",answer, answer2);
 	break;
     case 2: 
         getupsvar (monhost, "battvolt", answer, sizeof(answer));  
         getupsvar (monhost, "nombattv", answer2, sizeof(answer2));
-        printf ("battvolt&value=%s&value2=%s\",\" WIDTH=150 HEIGHT=350 ALT=\\\"Battery Voltage\\\"\"",answer, answer2);
+        printf ("battvolt&value=%s&value2=%s\",\" width=\\\"150\\\" height=\\\"350\\\" alt=\\\"Battery Voltage\\\"\"",answer, answer2);
 	break;
     case 3: 
         getupsvar (monhost, "utility", answer, sizeof(answer));  
         getupsvar (monhost, "lowxfer", answer2, sizeof(answer2));
         getupsvar (monhost, "highxfer", answer3, sizeof(answer3));
-        printf ("utility&value=%s&value2=%s&value3=%s\",\" WIDTH=150 HEIGHT=350 ALT=\\\"Utility Voltage\\\"\"",answer,answer2,answer3);
+        printf ("utility&value=%s&value2=%s&value3=%s\",\" width=\\\"150\\\" height=\\\"350\\\" alt=\\\"Utility Voltage\\\"\"",answer,answer2,answer3);
 	break;
     case 4: 
         getupsvar (monhost, "outputv", answer, sizeof(answer));  
-        printf ("outputv&value=%s\",\" WIDTH=150 HEIGHT=350 ALT=\\\"Output Voltage\\\"\"",answer);
+        printf ("outputv&value=%s\",\" width=\\\"150\\\" height=\\\"350\\\" alt=\\\"Output Voltage\\\"\"",answer);
 	break;
     case 5: 
         getupsvar (monhost, "upsload", answer, sizeof(answer));  
-        printf ("upsload&value=%s\",\" WIDTH=150 HEIGHT=350 ALT=\\\"UPS Load\\\"\"",answer);
+        printf ("upsload&value=%s\",\" width=\\\"150\\\" height=\\\"350\\\" alt=\\\"UPS Load\\\"\"",answer);
 	break;
     case 6:
         getupsvar (monhost, "runtime", answer, sizeof(answer));  
         getupsvar (monhost, "mintimel", answer2, sizeof(answer2));
-        printf ("runtime&value=%s&value2=%s\",\" WIDTH=150 HEIGHT=350 ALT=\\\"Run time remaining\\\"\"",answer, answer2);
+        printf ("runtime&value=%s&value2=%s\",\" width=\\\"150\\\" height=\\\"350\\\" alt=\\\"Run time remaining\\\"\"",answer, answer2);
 	break;
     }
 }
 
 int main(int argc, char **argv) 
 {
-    int     status,img1,img2,img3;
+    int     status;
     double  tempf;
     char *p;
     char   answer[256];
 
     (void) extractcgiargs();
 
-    printf ("Content-type: text/html\n");
-    printf ("Pragma: no-cache\n\n");
+    puts ("Content-type: text/html");
+    puts ("Pragma: no-cache\n");
 
-    printf ("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
-    printf ("<html>\n");
-
-    img1 = atoi(img1s);
-    img2 = atoi(img2s);
-    img3 = atoi(img3s);
+    puts ("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01//EN\"");
+    puts ("    \"http://www.w3.org/TR/html4/strict.dtd\">");
+    puts ("<html>");
     
-    if (img1 <= 0) img1 = 1;
-    if (img2 <= 0) img2 = 6;
-    if (img3 <= 0) img3 = 5;
-
     p = strchr(monhost, '%');
     if (p && *(p+1) == '3') {
        *p++ = ':';                    /* set colon */
@@ -150,7 +150,7 @@ int main(int argc, char **argv)
     }
 
     if (!checkhost(monhost)) {
-        printf("<head></head><body>\n");
+        puts ("<head></head><body>");
         printf ("<p>Access to %s host is not authorized.</p>\n", monhost);
 	html_finish();
 	exit (0);
@@ -158,42 +158,50 @@ int main(int argc, char **argv)
     
     /* check if host is available */
     if (getupsvar(monhost, "date", answer, sizeof(answer)) <= 0) {
-           printf("<head></head><body>\n");
+           puts ("<head></head><body>");
            printf ("<p>Unable to communicate with the UPS on %s</p>\n", monhost);
 	   html_finish();
 	   exit (0);
     }
 
      printf ("<head>\n<title>%s on %s</title>\n", answer, monhost);
-     printf ("  <meta http-equiv=\"Pragma\" content=\"no-cache\">\n");
+     puts ("  <meta http-equiv=\"Pragma\" content=\"no-cache\">");
      if (refresh != 0) {
          printf ("  <meta http-equiv=\"Refresh\" content=\"%d\">\n", refresh);
      }
 
-     printf ("<script type=\"text/javascript\">\n");
-     printf ("var now = new Date()\n");
-     printf ("var seed = now.getTime() %% (0xffffffff)\n");
+     puts ("<style type=\"text/css\">");
+     puts ("  body {color: black; background: white}");
+     puts ("  div.center {text-align: center}");
+     puts ("  pre {text-align: left}");
+     puts ("</style>");
 
-     printf ("function rand(n) {\n");
-     printf ("seed = (0x015a4e35 * seed) %% (0x7fffffff);\n");
-     printf ("return ((seed >> 16) %% (n));\n");
-     printf ("}\n");
+     puts ("<script type=\"text/javascript\">");
+     puts ("var now = new Date();");
+     puts ("var seed = now.getTime() % (0xffffffff);");
 
-     printf ("function rimg(url,extra,n) {\n");
-     printf ("return \"<img src=\\\"\" + url + \"&rand=\" + rand(n) + \"\\\" \" + extra + \">\" \n");
-     printf ("}\n");
+     puts ("function rand(n) {");
+     puts ("seed = (0x015a4e35 * seed) % (0x7fffffff);");
+     puts ("return ((seed >> 16) % (n));");
+     puts ("}");
 
-     printf ("\n//-->\n</script>\n");
+     puts ("function rimg(url,extra,n) {");
+     puts ("return \"<img src=\\\"\" + url + \"&rand=\" + rand(n) + \"\\\" \" + extra + \">\" ");
+     puts ("}");
 
-     printf ("</head>\n");
+     puts ("</script>");
+     puts ("</head>");
 
-     printf ("<body>\n");
-     printf ("<center>\n<table border cellspacing=\"10\" cellpadding=\"5\">\n");
+     puts ("<body><div class=\"center\">");
+     puts ("<table border cellspacing=\"10\" cellpadding=\"5\">");
+
      getupsvar(monhost, "date", answer, sizeof(answer));
-     printf ("<tr><th>%s</th>\n", answer);
+     fputs ("<tr><th>", stdout);
+     html_puts(answer);
+     puts ("</th>");
 
      printf ("<th>\n");
-     printf ("       <form method=\"get\" action=\"upsstats.cgi\" name=\"form1\">\n");
+     printf ("       <form method=\"get\" action=\"upsstats.cgi\" name=\"form1\"><div>\n");
      printf ("       <input type=\"hidden\" name=\"host\" value=\"%s\">\n", monhost);
      printf ("       <select onChange=\"document.form1.submit();return true\" name=\"img1\">\n");
 
@@ -205,16 +213,17 @@ int main(int argc, char **argv)
      printf ("               <option "); if (img1 == 6) printf ("selected "); printf ("value=\"6\">Run Time Remaining\n");
 
      printf ("       </select>\n");
-     printf ("       <input type=\"hidden\" name=\"img2\" value=\"%s\">\n",img2s);
-     printf ("       <input type=\"hidden\" name=\"img3\" value=\"%s\">\n",img3s);
+     printf ("       <input type=\"hidden\" name=\"img2\" value=\"%d\">\n",img2);
+     printf ("       <input type=\"hidden\" name=\"img3\" value=\"%d\">\n",img3);
      printf ("       <input type=\"hidden\" name=\"temp\" value=\"%s\">\n",temps);
-     printf ("       </form>\n");
+     printf ("       <input type=\"hidden\" name=\"refresh\" value=\"%d\">\n",refresh);
+     printf ("       </div></form>\n");
      printf ("</th>\n");
 
      printf ("<th>\n");
-     printf ("       <form method=\"get\" action=\"upsstats.cgi\" name=\"form2\">\n");
+     printf ("       <form method=\"get\" action=\"upsstats.cgi\" name=\"form2\"><div>\n");
      printf ("       <input type=\"hidden\" name=\"host\" value=\"%s\">\n", monhost);
-     printf ("       <input type=\"hidden\" name=\"img1\" value=\"%s\">\n",img1s);
+     printf ("       <input type=\"hidden\" name=\"img1\" value=\"%d\">\n",img1);
      printf ("       <select onChange=\"document.form2.submit();return true\" name=\"img2\">\n");
 
      printf ("               <option "); if (img2 == 1) printf ("selected "); printf ("value=\"1\">Battery Capacity\n");
@@ -224,16 +233,17 @@ int main(int argc, char **argv)
      printf ("               <option "); if (img2 == 5) printf ("selected "); printf ("value=\"5\">UPS Load\n");
      printf ("               <option "); if (img2 == 6) printf ("selected "); printf ("value=\"6\">Run Time Remaining\n");
      printf ("       </select>\n");
-     printf ("       <input type=\"hidden\" name=\"img3\" value=\"%s\">\n",img3s);
+     printf ("       <input type=\"hidden\" name=\"img3\" value=\"%d\">\n",img3);
      printf ("       <input type=\"hidden\" name=\"temp\" value=\"%s\">\n",temps);
-     printf ("       </form>\n");
+     printf ("       <input type=\"hidden\" name=\"refresh\" value=\"%d\">\n",refresh);
+     printf ("       </div></form>\n");
      printf ("</th>\n");
 
      printf ("<th>\n");
-     printf ("       <form method=\"get\" action=\"upsstats.cgi\" name=\"form3\">\n");
+     printf ("       <form method=\"get\" action=\"upsstats.cgi\" name=\"form3\"><div>\n");
      printf ("       <input type=\"hidden\" name=\"host\" value=\"%s\">\n", monhost);
-     printf ("       <input type=\"hidden\" name=\"img1\" value=\"%s\">\n",img1s);
-     printf ("       <input type=\"hidden\" name=\"img2\" value=\"%s\">\n",img2s);
+     printf ("       <input type=\"hidden\" name=\"img1\" value=\"%d\">\n",img1);
+     printf ("       <input type=\"hidden\" name=\"img2\" value=\"%d\">\n",img2);
      printf ("       <select onChange=\"document.form3.submit();return true\" name=\"img3\">\n");
 
      printf ("               <option "); if (img3 == 1) printf ("selected "); printf ("value=\"1\">Battery Capacity\n");
@@ -245,78 +255,89 @@ int main(int argc, char **argv)
 
      printf ("       </select>\n");
      printf ("       <input type=\"hidden\" name=\"temp\" value=\"%s\">\n",temps);
-     printf ("       </form>\n");
+     printf ("       <input type=\"hidden\" name=\"refresh\" value=\"%d\">\n",refresh);
+     printf ("       </div></form>\n");
      printf ("</th>\n");
 
      printf ("</tr>\n");
 
-     printf ("<tr><td BGCOLOR=\"#FFFFFF\">\n<pre>\n");
-     getupsvar (monhost, "hostname", answer, sizeof(answer));
-     printf ("Monitoring: %s\n", answer);
-     getupsvar (monhost, "model", answer, sizeof(answer));  
-     printf (" UPS Model: %s\n", answer);
-     getupsvar (monhost, "upsname", answer, sizeof(answer));
-     printf ("  UPS Name: %s\n", answer);
-     getupsvar (monhost, "release", answer, sizeof(answer));
-     printf ("   APCUPSD: Version %s\n", answer);
+     printf ("<tr><td>\n<pre>\n");
 
-     printf ("    Status: ");
+     getupsvar (monhost, "hostname", answer, sizeof(answer));
+     fputs ("Monitoring: ", stdout);
+     html_puts (answer);
+     fputs ("\n", stdout);
+
+     getupsvar (monhost, "model", answer, sizeof(answer));  
+     fputs (" UPS Model: ", stdout);
+     html_puts (answer);
+     fputs ("\n", stdout);
+
+     getupsvar (monhost, "upsname", answer, sizeof(answer));
+     fputs ("  UPS Name: ", stdout);
+     html_puts (answer);
+     fputs ("\n", stdout);
+
+     getupsvar (monhost, "release", answer, sizeof(answer));
+     fputs ("   APCUPSD: Version ", stdout);
+     html_puts (answer);
+     fputs ("\n", stdout);
+
+     fputs ("    Status: ", stdout);
 
      if (getupsvar (monhost, "status", answer, sizeof(answer)) <= 0) {
-             printf ("Not available\n");
+             puts ("Not available");
      } else {
 	 status = strtol(answer, 0, 16);
 	 if (status & UPS_CALIBRATION) 
-             printf ("CALIBRATION "); 
+             fputs ("CALIBRATION ", stdout); 
 	 if (status & UPS_SMARTTRIM)
-             printf ("SMART TRIM ");
+             fputs ("SMART TRIM ", stdout);
 	 if (status & UPS_SMARTBOOST)
-             printf ("SMART BOOST ");
+             fputs ("SMART BOOST ", stdout);
 	 if (status & UPS_ONLINE)
-             printf ("ONLINE "); 
+             fputs ("ONLINE ", stdout); 
 	 if (status & UPS_ONBATT) 
-             printf ("ON BATTERY "); 
+             fputs ("ON BATTERY ", stdout); 
 	 if (status & UPS_OVERLOAD)
-             printf ("OVERLOADED ");
+             fputs ("OVERLOADED ", stdout);
 	 if (status & UPS_BATTLOW) 
-             printf ("BATTERY LOW "); 
+             fputs ("BATTERY LOW ", stdout); 
 	 if (status & UPS_REPLACEBATT)
-             printf ("REPLACE BATTERY ");
+             fputs ("REPLACE BATTERY ", stdout);
 	 if (status & UPS_COMMLOST)
-             printf("COMM LOST "); 
+             fputs("COMM LOST ", stdout); 
 	 if (status & UPS_SHUTDOWN)
-             printf("SHUTDOWN ");
+             fputs("SHUTDOWN ", stdout);
 	 if (status & UPS_SLAVE)
-             printf("SLAVE ");
-         printf ("\n"); 
+             fputs("SLAVE ", stdout);
+         fputs ("\n", stdout); 
      }
 
-     printf ("</pre>\n</td>\n");
+     puts ("</pre></td>");
 
-     printf ("<td rowspan=\"3\"><script type=\"text/javascript\">\n");
-     printf ("document.write(rimg(\"upsimage.cgi?host=%s&display=", monhost);
+     puts ("<td rowspan=\"3\"><script type=\"text/javascript\">");
+     fputs ("document.write(rimg(\"upsimage.cgi?display=", stdout);
      send_values(img1, 1);
+     puts (", 1000))</script></td>");
 
-     printf (",1000))</script>");
-     printf ("</td>\n");
+     puts ("<td rowspan=\"3\"><script type=\"text/javascript\">");
+     fputs ("document.write(rimg(\"upsimage.cgi?display=", stdout);
+     send_values(img2, 6);
+     puts (", 1000))</script></td>");
 
-     printf ("<td rowspan=\"3\"><script type=\"text/javascript\">\n");
-     printf ("document.write(rimg(\"upsimage.cgi?host=%s&display=", monhost);
-     send_values(img2, 3);
-
-     printf (",1000))</script>");
-     printf ("</td>\n");
-
-     printf ("<td rowspan=\"3\"><script type=\"text/javascript\">\n");
-     printf ("document.write(rimg(\"upsimage.cgi?host=%s&display=", monhost);
+     puts ("<td rowspan=\"3\"><script type=\"text/javascript\">");
+     fputs ("document.write(rimg(\"upsimage.cgi?display=", stdout);
      send_values(img3, 5);
+     puts (", 1000))</script></td>");
 
-     printf (",1000))</script>");
-     printf ("</td>\n</tr>\n");
+     printf ("<tr>\n<td>\n<pre>\n");
 
-     printf ("<tr>\n<td BGCOLOR=\"#FFFFFF\">\n<pre>\n");
      getupsvar (monhost, "selftest", answer, sizeof(answer));
-     printf ("Last UPS Self Test: %s\n", answer);
+     fputs ("Last UPS Self Test: ", stdout);
+     html_puts (answer);
+     fputs ("\n", stdout);
+
      getupsvar(monhost, "laststest", answer, sizeof(answer));
      /* To reduce the length of the output, we drop the 
       * seconds and the trailing year.
@@ -325,40 +346,54 @@ int main(int argc, char **argv)
      if (*p == ':')
 	p++;
      for ( ; *p && *p != ':'; p++) ;
-     *p = 0;
-     printf ("Last Test Date: %s\n", answer);
-     printf ("</pre>\n</td>\n</tr>\n");
+     *p = '\0';
+     fputs ("Last Test Date: ", stdout);
+     html_puts (answer);
+     fputs ("\n", stdout);
 
-     printf ("<tr>\n<td BGCOLOR=\"#FFFFFF\">\n<pre>\n");
+     puts ("</pre></td></tr>");
+
+     printf ("<tr>\n<td>\n<pre>\n");
+
      getupsvar (monhost, "utility", answer, sizeof(answer));
-     printf ("Utility Voltage: %s VAC\n", answer);
+     fputs ("Utility Voltage: ", stdout);
+     html_puts (answer);
+     fputs (" VAC\n", stdout);
 
      getupsvar (monhost, "linemin", answer, sizeof(answer));
-     printf ("   Line Minimum: %s VAC\n", answer);
+     fputs ("   Line Minimum: ", stdout);
+     html_puts (answer);
+     fputs (" VAC\n", stdout);
 
      getupsvar (monhost, "linemax", answer, sizeof(answer));
-     printf ("   Line Maximum: %s VAC\n", answer);
+     fputs ("   Line Maximum: ", stdout);
+     html_puts (answer);
+     fputs (" VAC\n", stdout);
 
      getupsvar (monhost, "outputfreq", answer, sizeof(answer));
-     printf ("    Output Freq: %s Hz\n", answer);
+     fputs ("    Output Freq: ", stdout);
+     html_puts (answer);
+     fputs (" Hz\n", stdout);
 
      if (getupsvar(monhost, "ambtemp", answer, sizeof(answer)) > 0) {
-         if (strcmp(answer, "Not found" )) {
-             if (!strcmp(temps,"F")) {
+         if (strcmp(answer, "Not found" ) != 0) {
+             if (strcmp(temps,"F") == 0) {
 		tempf = (strtod (answer, 0) * 1.8) + 32;
-                printf ("     Amb. Temp.: %.1f &deg;F\n", tempf);
-             } else if (!strcmp(temps,"K")) {
+                printf ("     Amb. Temp.: %.1f&deg; F\n", tempf);
+             } else if (strcmp(temps,"K") == 0) {
 		tempf = (strtod (answer, 0)) + 273;
-                printf ("     Amb. Temp.: %.1f &deg;K\n", tempf);
+                printf ("     Amb. Temp.: %.1f&deg; K\n", tempf);
 	     } else {
-                printf ("     Amb. Temp.: %s &deg;C\n", answer);
+                printf ("     Amb. Temp.: %s&deg; C\n", answer);
 	     } 
 	 }
      }
 
      if ( getupsvar (monhost, "humidity", answer, sizeof(answer)) > 0) {
-         if (strcmp( answer, "Not found" )) {
-              printf ("  Amb. Humidity: %s %%\n", answer);
+         if (strcmp(answer, "Not found") != 0) {
+              fputs ("  Amb. Humidity: ", stdout);
+              html_puts (answer);
+              puts (" %");
 	 }
      }
 
@@ -368,59 +403,61 @@ int main(int argc, char **argv)
          if (strcmp(temps,"F") == 0) {
 	      tempf = (strtod (answer, 0) * 1.8) + 32;
               printf ("       UPS Temp: %.1f \n</pre>\n</td>\n<td>\n", tempf); 
-              printf ("       <form method=\"get\" action=\"upsstats.cgi\" name=\"form4\">\n");
+              printf ("       <form method=\"get\" action=\"upsstats.cgi\" name=\"form4\"><div>\n");
               printf ("       <input type=\"hidden\" name=\"host\" value=\"%s\">\n",monhost);
-              printf ("       <input type=\"hidden\" name=\"img1\" value=\"%s\">\n",img1s);
-              printf ("       <input type=\"hidden\" name=\"img2\" value=\"%s\">\n",img2s);
-              printf ("       <input type=\"hidden\" name=\"img3\" value=\"%s\">\n",img3s);
+              printf ("       <input type=\"hidden\" name=\"img1\" value=\"%d\">\n",img1);
+              printf ("       <input type=\"hidden\" name=\"img2\" value=\"%d\">\n",img2);
+              printf ("       <input type=\"hidden\" name=\"img3\" value=\"%d\">\n",img3);
+              printf ("       <input type=\"hidden\" name=\"refresh\" value=\"%d\">\n",refresh);
               printf ("       <select onChange=\"document.form4.submit();return true\" name=\"temp\">\n");
-              printf ("              <option value=\"C\">&deg;C\n");
-              printf ("               <option selected value=\"F\">&deg;F\n");
-              printf ("               <option value=\"K\">&deg;K\n");
+              printf ("          <option value=\"C\">&deg; C\n");
+              printf ("          <option selected value=\"F\">&deg; F\n");
+              printf ("          <option value=\"K\">&deg; K\n");
 
 	  } else if (strcmp(temps,"K") == 0) {
 	       tempf = (strtod (answer, 0)) + 273;
                printf ("       UPS Temp: %.1f \n</pre>\n</td>\n<td>\n", tempf); 
-               printf ("       <form method=\"get\" action=\"upsstats.cgi\" name=\"form4\">\n");
+               printf ("       <form method=\"get\" action=\"upsstats.cgi\" name=\"form4\"><div>\n");
                printf ("       <input type=\"hidden\" name=\"host\" value=\"%s\">\n",monhost);
-               printf ("       <input type=\"hidden\" name=\"img1\" value=\"%s\">\n",img1s);
-               printf ("       <input type=\"hidden\" name=\"img2\" value=\"%s\">\n",img2s);
-               printf ("       <input type=\"hidden\" name=\"img3\" value=\"%s\">\n",img3s);
+               printf ("       <input type=\"hidden\" name=\"img1\" value=\"%d\">\n",img1);
+               printf ("       <input type=\"hidden\" name=\"img2\" value=\"%d\">\n",img2);
+               printf ("       <input type=\"hidden\" name=\"img3\" value=\"%d\">\n",img3);
+               printf ("       <input type=\"hidden\" name=\"refresh\" value=\"%d\">\n",refresh);
                printf ("       <select onChange=\"document.form4.submit();return true\" name=\"temp\">\n");
-               printf ("              <option value=\"C\">&deg;C\n");
-               printf ("               <option value=\"F\">&deg;F\n");
-               printf ("               <option selected value=\"K\">&deg;K\n");
+               printf ("         <option value=\"C\">&deg; C\n");
+               printf ("         <option value=\"F\">&deg; F\n");
+               printf ("         <option selected value=\"K\">&deg; K\n");
 
 	 } else {
                printf ("       UPS Temp: %s \n</pre>\n</td>\n<td>\n", answer);
-               printf ("       <form method=\"get\" action=\"upsstats.cgi\" name=\"form4\">\n");
+               printf ("       <form method=\"get\" action=\"upsstats.cgi\" name=\"form4\"><div>\n");
                printf ("       <input type=\"hidden\" name=\"host\" value=\"%s\">\n",monhost);
-               printf ("       <input type=\"hidden\" name=\"img1\" value=\"%s\">\n",img1s);
-               printf ("       <input type=\"hidden\" name=\"img2\" value=\"%s\">\n",img2s);
-               printf ("       <input type=\"hidden\" name=\"img3\" value=\"%s\">\n",img3s);
+               printf ("       <input type=\"hidden\" name=\"img1\" value=\"%d\">\n",img1);
+               printf ("       <input type=\"hidden\" name=\"img2\" value=\"%d\">\n",img2);
+               printf ("       <input type=\"hidden\" name=\"img3\" value=\"%d\">\n",img3);
+               printf ("       <input type=\"hidden\" name=\"refresh\" value=\"%d\">\n",refresh);
                printf ("       <select onChange=\"document.form4.submit();return true\" name=\"temp\">\n");
-               printf ("              <option selected value=\"C\">&deg;C\n");
-               printf ("               <option value=\"F\">&deg;F\n");
-               printf ("               <option value=\"K\">&deg;K\n");
+               printf ("         <option selected value=\"C\">&deg; C\n");
+               printf ("         <option value=\"F\">&deg; F\n");
+               printf ("         <option value=\"K\">&deg; K\n");
 	 }
     }
 
-     printf ("       </select>\n");
-     printf ("       </form>\n");
-     printf ("</td></tr></table>\n");   
-     printf ("</tr>\n");
+     puts ("       </select>");
+     puts ("       </div></form>");
+     puts ("</td></tr></table>");   
+     puts ("</tr>");
 
-     printf ("<tr><td colspan=\"4\">Most recent events:<br>\n");
-     printf ("<textarea rows=\"5\" cols=\"95\">\n");
+     puts ("<tr><td colspan=\"4\"><b>Recent Events</b><br>");
+     puts ("<textarea rows=\"5\" cols=\"95\">");
 
      fetch_events(monhost);
      html_puts (statbuf);
 
-     printf ("</textarea>\n");
-     printf ("</td></tr>");
+     puts ("</textarea>");
+     puts ("</td></tr>");
 
-     printf ("</table>\n");
-     printf ("</center>\n");
+     puts ("</table></div>");
 
      html_finish();
      return 0;
