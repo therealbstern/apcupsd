@@ -15,7 +15,7 @@
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static char rcsid[] = "$Id: inet_pton.c,v 1.1 2002-07-03 21:10:52 rfacchetti Exp $";
+static char rcsid[] = "$Id: inet_pton.c,v 1.2 2002-07-05 18:03:25 rfacchetti Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 #include <sys/param.h>
@@ -26,6 +26,8 @@ static char rcsid[] = "$Id: inet_pton.c,v 1.1 2002-07-03 21:10:52 rfacchetti Exp
 #include <arpa/nameser.h>
 #include <string.h>
 #include <errno.h>
+
+#include "apc.h"
 
 /*
  * WARNING: Don't even consider trying to compile this on a system where

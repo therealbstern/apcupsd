@@ -19,7 +19,7 @@ all-subdirs:
 	@if test ! -z "$(subdirs)"; then \
 		for file in . ${subdirs}; \
 		do \
-			(cd $$file && if test "$$file" != "."; then make all; fi); \
+			(cd $$file && if test "$$file" != "."; then $(MAKE) all; fi); \
 			if test "$$?" != "0"; then \
 				break; \
 			fi; \
@@ -55,49 +55,49 @@ dummy:
 
 # Library targets
 $(topdir)/src/lib/libapc.a: $(topdir)/src/lib/*.[ch]
-	@(cd $(topdir)/src/lib && make)
+	@(cd $(topdir)/src/lib && $(MAKE))
 
 $(topdir)/src/drivers/libdrivers.a: $(topdir)/src/drivers/*.[ch]
-	@(cd $(topdir)/src/drivers && make)
+	@(cd $(topdir)/src/drivers && $(MAKE))
 
 $(topdir)/src/drivers/apcsmart/libapcsmart.a: $(topdir)/src/drivers/apcsmart/*.[ch]
-	@(cd $(topdir)/src/drivers/apcsmart && make)
+	@(cd $(topdir)/src/drivers/apcsmart && $(MAKE))
 
 $(topdir)/src/drivers/dumb/libdumb.a: $(topdir)/src/drivers/dumb/*.[ch]
-	@(cd $(topdir)/src/drivers/dumb && make)
+	@(cd $(topdir)/src/drivers/dumb && $(MAKE))
 
 $(topdir)/src/drivers/net/libnet.a: $(topdir)/src/drivers/net/*.[ch]
-	@(cd $(topdir)/src/drivers/net && make)
+	@(cd $(topdir)/src/drivers/net && $(MAKE))
 
 $(topdir)/src/drivers/usb/libusb.a: $(topdir)/src/drivers/usb/*.[ch]
-	@(cd $(topdir)/src/drivers/usb && make)
+	@(cd $(topdir)/src/drivers/usb && $(MAKE))
 
 $(topdir)/src/drivers/snmp/libdumb.a: $(topdir)/src/drivers/snmp/*.[ch]
-	@(cd $(topdir)/src/drivers/snmp && make)
+	@(cd $(topdir)/src/drivers/snmp && $(MAKE))
 
 $(topdir)/src/drivers/dumb/libtest.a: $(topdir)/src/drivers/test/*.[ch]
-	@(cd $(topdir)/src/drivers/test && make)
+	@(cd $(topdir)/src/drivers/test && $(MAKE))
 
 $(topdir)/src/intl/libintl.a: $(topdir)/src/intl/*.[ch]
-	@(cd $(topdir)/src/intl && make)
+	@(cd $(topdir)/src/intl && $(MAKE))
 
 $(topdir)/src/gd1.2/libgd.a: $(topdir)/src/gd1.2/*.[ch]
-	@(cd $(topdir)/src/gd1.2 && make)
+	@(cd $(topdir)/src/gd1.2 && $(MAKE))
 
 $(topdir)/src/win32/winmain.o: $(topdir)/src/win32/winmain.cpp \
 								$(topdir)/src/win32/winups.h
-	@(cd $(topdir)/src/win32 && make winmain.o)
+	@(cd $(topdir)/src/win32 && $(MAKE) winmain.o)
 
 $(topdir)/src/win32/winlib.a: $(topdir)/src/win32/*.[ch] \
 								$(topdir)/src/win32/*.cpp
-	@(cd $(topdir)/src/win32 && make winlib.a)
+	@(cd $(topdir)/src/win32 && $(MAKE) winlib.a)
 
 $(topdir)/src/win32/winres.res: $(topdir)/src/win32/winres.rc \
 								$(topdir)/src/win32/apcupsd.ico \
 								$(topdir)/src/win32/winres.h \
 								$(topdir)/src/win32/online.ico \
 								$(topdir)/src/win32/onbatt.ico
-	@(cd $(topdir)/src/win32 && make winres.res)
+	@(cd $(topdir)/src/win32 && $(MAKE) winres.res)
 
 # Makefile subsystem targets
 $(topdir)/autoconf/variables.mak: $(topdir)/autoconf/variables.mak.in
@@ -114,7 +114,7 @@ Makefile: $(srcdir)/Makefile.in $(topdir)/config.status \
 			$(topdir)/autoconf/variables.mak $(topdir)/autoconf/targets.mak
 	@$(abssrcdir)/autoconf/rebuild-makefile.sh $(abssrcdir)
 	@echo "You can ignore any makedepend error messages"
-	@make single-depend
+	@$(MAKE) single-depend
 
 # Configuration targets
 
@@ -146,7 +146,7 @@ clean-subdirs:
 	@if test ! -z "$(subdirs)"; then \
 		for file in . ${subdirs}; \
 		do \
-			(cd $$file && if test "$$file" != "."; then make clean; fi); \
+			(cd $$file && if test "$$file" != "."; then $(MAKE) clean; fi); \
 		done; \
 	fi
 
@@ -154,7 +154,7 @@ distclean-subdirs:
 	@if test ! -z "$(subdirs)"; then \
 		for file in . ${subdirs}; \
 		do \
-			(cd $$file && if test "$$file" != "."; then make distclean; fi); \
+			(cd $$file && if test "$$file" != "."; then $(MAKE) distclean; fi); \
 		done; \
 	fi
 
@@ -177,12 +177,12 @@ depend:
 	@if test "`$(topdir)/autoconf/has-c-files.sh`" = "no"; then \
 		$(ECHO) "Nothing to do for depend."; \
 	else \
-		make real-depend; \
+		$(MAKE) real-depend; \
 	fi
 	@if test ! -z "$(subdirs)"; then \
 		for file in . ${subdirs}; \
 		do \
-			(cd $$file && if test "$$file" != "."; then make depend; fi); \
+			(cd $$file && if test "$$file" != "."; then $(MAKE) depend; fi); \
 		done; \
 	fi
 
@@ -190,7 +190,7 @@ single-depend:
 	@if test "`$(topdir)/autoconf/has-c-files.sh`" = "no"; then \
 		$(ECHO) "Nothing to do for depend."; \
 	else \
-		make real-depend; \
+		$(MAKE) real-depend; \
 	fi
 
 real-depend:
@@ -214,7 +214,7 @@ install-subdirs:
 	@if test ! -z "$(subdirs)"; then \
 		for file in . ${subdirs}; \
 		do \
-			(cd $$file && if test "$$file" != "."; then make install; fi); \
+			(cd $$file && if test "$$file" != "."; then $(MAKE) install; fi); \
 		done; \
 	fi
 
@@ -222,7 +222,7 @@ uninstall-subdirs:
 	@if test ! -z "$(subdirs)"; then \
 		for file in . ${subdirs}; \
 		do \
-			(cd $$file && if test "$$file" != "."; then make uninstall; fi); \
+			(cd $$file && if test "$$file" != "."; then $(MAKE) uninstall; fi); \
 		done; \
 	fi
 
