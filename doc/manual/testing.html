@@ -516,6 +516,13 @@ take care to either wait or manually power off your UPS. To determine
 what grace period is programmed into your UPS EEPROM, run <b>apcaccess
 eprom</b> and look at the &quot;Shutdown grace delay&quot;.
 
+<h2>Automatic Reboot of your Computer after a Power Shutdown</h2>
+If you have succeeded in getting <b>apcupsd</b> to power down the
+UPS as described above, you will most likely want your computer
+to automatically reboot when the power returns. Please see the
+<a href="shutdown.html#AutoReboot">Automatic Reboot</a> section
+of the Shutdown Chapter of this manual for the details.
+
 <h2><a name="ShutdownSequence"></a>Shutdown Sequence</h2>
 If you experienced so problems with the above testing procedures,
 or if you are porting <b>apcupsd</b> to another system, or you

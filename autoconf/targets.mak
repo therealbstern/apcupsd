@@ -19,7 +19,7 @@ all-subdirs:
 	@if test ! x"$(subdirs)" = x; then \
 		for file in . ${subdirs}; \
 		do \
-			(cd $$file && if test "$$file" != "."; then $(MAKE) all; fi); \
+			(cd $$file && if test "$$file" != "."; then $(MAKE) DESTDIR=$(DESTDIR) all; fi); \
 			if test "$$?" != "0"; then \
 				break; \
 			fi; \
@@ -39,7 +39,7 @@ dummy:
 	$(CC) -c $(WCFLAGS) $(CFLAGS) $(DEFS) $<
 
 .po.pox:
-	$(MAKE) $(PACKAGE).pot
+	$(MAKE) DESTDIR=$(DESTDIR) $(PACKAGE).pot
 	$(MSGMERGE) $< $(srcdir)/$(PACKAGE).pot -o $*.pox
  
 .po.mo:
@@ -85,18 +85,18 @@ $(topdir)/src/gd1.2/libgd.a: $(topdir)/src/gd1.2/*.[ch]
 	@(cd $(topdir)/src/gd1.2 && $(MAKE))
 
 $(topdir)/src/win32/winmain.o: $(topdir)/src/win32/winmain.cpp \
-								$(topdir)/src/win32/winups.h
-	@(cd $(topdir)/src/win32 && $(MAKE) winmain.o)
+	     $(topdir)/src/win32/winups.h
+	@(cd $(topdir)/src/win32 && $(MAKE) DESTDIR=$(DESTDIR) winmain.o)
 
 $(topdir)/src/win32/winlib.a: $(topdir)/src/win32/*.[ch] \
-								$(topdir)/src/win32/*.cpp
-	@(cd $(topdir)/src/win32 && $(MAKE) winlib.a)
+	     $(topdir)/src/win32/*.cpp
+	@(cd $(topdir)/src/win32 && $(MAKE) DESTDIR=$(DESTDIR) winlib.a)
 
 $(topdir)/src/win32/winres.res: $(topdir)/src/win32/winres.rc \
-								$(topdir)/src/win32/apcupsd.ico \
-								$(topdir)/src/win32/winres.h \
-								$(topdir)/src/win32/online.ico \
-								$(topdir)/src/win32/onbatt.ico
+	     $(topdir)/src/win32/apcupsd.ico \
+	     $(topdir)/src/win32/winres.h \
+	     $(topdir)/src/win32/online.ico \
+	     $(topdir)/src/win32/onbatt.ico
 	@(cd $(topdir)/src/win32 && $(MAKE) winres.res)
 
 # Makefile subsystem targets
@@ -114,7 +114,7 @@ Makefile: $(srcdir)/Makefile.in $(topdir)/config.status \
 			$(topdir)/autoconf/variables.mak $(topdir)/autoconf/targets.mak
 	@$(abssrcdir)/autoconf/rebuild-makefile.sh $(abssrcdir)
 	@echo "You can ignore any makedepend error messages"
-	@$(MAKE) single-depend
+	@$(MAKE) DESTDIR=$(DESTDIR) single-depend
 
 # Configuration targets
 
@@ -212,18 +212,18 @@ real-depend:
 
 install-subdirs:
 	@if test ! x"$(subdirs)" = x; then \
-		for file in . ${subdirs}; \
-		do \
-			(cd $$file && if test "$$file" != "."; then $(MAKE) install; fi); \
-		done; \
+	   for file in . ${subdirs}; \
+	   do \
+	       (cd $$file && if test "$$file" != "."; then $(MAKE) DESTDIR=$(DESTDIR) install; fi); \
+	   done; \
 	fi
 
 uninstall-subdirs:
 	@if test ! x"$(subdirs)" = x; then \
-		for file in . ${subdirs}; \
-		do \
-			(cd $$file && if test "$$file" != "."; then $(MAKE) uninstall; fi); \
-		done; \
+	   for file in . ${subdirs}; \
+	   do \
+	      (cd $$file && if test "$$file" != "."; then $(MAKE) DESTDIR=$(DESTDIR)uninstall; fi); \
+	   done; \
 	fi
 
 indent:

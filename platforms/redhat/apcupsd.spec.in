@@ -1,10 +1,41 @@
 
+# 
+# You must build the package with at least one define
+#  e.g.  rpmbuild -ba --define "build_rh7 1" apcupsd.spec
+#
+# If you want the usb version, use:
+#        rpmbuild -ba --define "build_usb 1" --define "build_rh7 1" apcupsd.spec
+#
+
+%define rh7 0
+%{?build_rh7:%define rh7 1}
+
+%define rh8 0
+%{?build_rh8:%define rh8 1}
+
+%define rh9 0
+%{?build_rh9:%define rh9 1}
+
+%define usb 0
+%{?build_usb:%define usb 1}
+
+
+%if %{rh7}
+%define rh_version rh7
+%endif
+%if %{rh8}
+%define rh_version rh8
+%endif
+%if %{rh9}
+%define rh_version rh9
+%endif
+
 %define initdir /etc/rc.d/init.d
 
 Summary:      APC UPS Power Control Daemon for Linux
 Name:         apcupsd
 Version:      @VERSION@
-Release:      1_rh8_usb
+Release:      1
 Vendor:       APC UPS Daemon Team
 Distribution: The apcupsd Team
 Packager:     D. Scott Barninger <barninger@fairfieldcomputers.com>
@@ -25,6 +56,36 @@ rates.  If the power is restored before one of the above shutdown
 conditions is met, apcupsd will inform users about this fact.
 Some features depend on what UPS model you have (simple or smart).
 
+%if %{usb}
+%package usb-%{rh_version}
+%else
+%package std-%{rh_version}
+%endif
+
+Summary:      APC UPS Power Control Daemon for Linux
+Group:        System Environment/Daemons
+
+%if %{usb}
+%description usb-%{rh_version}
+%else
+%description std-%{rh_version}
+%endif
+
+Apcupsd can be used for controlling most APC UPSes. During a
+power failure, apcupsd will inform the users about the power
+failure and that a shutdown may occur.  If power is not restored,
+a system shutdown will follow when the battery is exausted, a
+timeout (seconds) expires, or the battery runtime expires based
+on internal APC calculations determined by power consumption
+rates.  If the power is restored before one of the above shutdown
+conditions is met, apcupsd will inform users about this fact.
+Some features depend on what UPS model you have (simple or smart).
+
+%if %{usb}
+This package is built with USB support.
+%else
+This package is built with standard serial port support.
+%endif
 
 %prep
 
@@ -39,10 +100,12 @@ Some features depend on what UPS model you have (simple or smart).
         --with-cgi-bin=%{_sysconfdir}/apcupsd/cgi \
         --enable-cgi \
         --enable-pthreads \
-        --with-serial-dev=/dev/usb/hiddev[0-15] \
+%if %{usb}
+        --with-serial-dev=/dev/usb/hid/hiddev[0-9] \
         --with-upstype=usb \
         --with-upscable=usb \
         --enable-usb
+%endif
 
 make
 
@@ -63,13 +126,14 @@ install -m744 platforms/apccontrol \
               $RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/apccontrol
 install -m755 platforms/redhat/apcupsd $RPM_BUILD_ROOT%{initdir}
 
-
 %clean
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 
-%files
+%if %{usb)
+
+%files usb-${rh_version}
 %defattr(-,root,root)
-%doc COPYING ChangeLog INSTALL TODO doc/* examples
+%doc COPYING ChangeLog INSTALL doc/* examples
 %dir /etc/apcupsd
 %dir /etc/apcupsd/cgi
 %{initdir}/apcupsd
@@ -84,13 +148,15 @@ install -m755 platforms/redhat/apcupsd $RPM_BUILD_ROOT%{initdir}
 %config(noreplace) /etc/apcupsd/multimon.conf
 %config(noreplace) /etc/apcupsd/masterconnect
 %config(noreplace) /etc/apcupsd/mastertimeout
+/etc/apcupsd/make-hiddev
+/etc/apcupsd/hid-ups
 /etc/apcupsd/cgi/*
 /sbin/*
 %attr(-,root,man) %{_mandir}/*/*
 
-%pre
+%pre usb-${rh_version}
 
-%post
+%post usb-${rh_version}
 # get rid of any 3.6.2 stuff
 rm -f /etc/rc.d/rc[0-6].d/[KS]20apcups
 rm -f /etc/rc.d/init.d/apcups
@@ -129,7 +195,7 @@ chmod 744 /etc/rc.d/init.d/halt
 
 # Undo things a bit
 
-%preun
+%preun usb-${rh_version}
 if [ $1 = 0 ] ; then
         # stop running version (if any)                  
         # I have removed the following because it sometimes produces
@@ -156,19 +222,118 @@ if [ $1 = 0 ] ; then
         chmod 744 /etc/rc.d/init.d/halt
 fi
 
-%postun
+%postun usb-${rh_version}
 if [ "$1" -ge "1" ]; then
         :
         # /sbin/service apcupsd condrestart >/dev/null 2>&1 || :
 fi
 
+%else
+
+%files std-%{rh_version}
+%defattr(-,root,root)
+%doc COPYING ChangeLog INSTALL doc/* examples
+%dir /etc/apcupsd
+%dir /etc/apcupsd/cgi
+%{initdir}/apcupsd
+%config(noreplace) /etc/apcupsd/apccontrol
+%config(noreplace) /etc/apcupsd/changeme
+%config(noreplace) /etc/apcupsd/commfailure
+%config(noreplace) /etc/apcupsd/commok
+%config(noreplace) /etc/apcupsd/onbattery
+%config(noreplace) /etc/apcupsd/mainsback
+%config(noreplace) /etc/apcupsd/apcupsd.conf
+%config(noreplace) /etc/apcupsd/hosts.conf
+%config(noreplace) /etc/apcupsd/multimon.conf
+%config(noreplace) /etc/apcupsd/masterconnect
+%config(noreplace) /etc/apcupsd/mastertimeout
+/etc/apcupsd/cgi/*
+/sbin/*
+%attr(-,root,man) %{_mandir}/*/*
+
+%pre std-%{rh_version}
+
+%post std-%{rh_version}
+# get rid of any 3.6.2 stuff
+rm -f /etc/rc.d/rc[0-6].d/[KS]20apcups
+rm -f /etc/rc.d/init.d/apcups
+
+# delete then add our links
+/sbin/chkconfig --del apcupsd
+/sbin/chkconfig --add apcupsd
+
+cp -f /etc/rc.d/init.d/halt /etc/rc.d/init.d/halt.old
+awk '# Stuff left over from a previous apcupsd, remove it
+/^# See if this is a powerfail situation\./ {
+   do {
+      getline
+   }  while (length($0) != 0)
+   getline
+}
+# We insert the new apcupsd code just before the following line
+/^# Now halt or reboot\./ {
+    print "# See if this is a powerfail situation.                               # ***apcupsd***"
+    print "if [ -f @PWRFAILDIR@/powerfail ]; then                                # ***apcupsd***"
+    print "   echo                                                               # ***apcupsd***"
+    print "   echo \"APCUPSD will now power off the UPS\"                          # ***apcupsd***"
+    print "   echo                                                               # ***apcupsd***"
+    print "   /etc/apcupsd/apccontrol killpower                                  # ***apcupsd***"
+    print "   echo                                                               # ***apcupsd***"
+    print "   echo \"Please ensure that the UPS has powered off before rebooting\" # ***apcupsd***"
+    print "   echo \"Otherwise, the UPS may cut the power during the reboot!!!\"   # ***apcupsd***"
+    print "   echo                                                               # ***apcupsd***"
+    print "fi                                                                    # ***apcupsd***"
+    print ""
+}
+# Everything else is duplicated 
+{ print } ' /etc/rc.d/init.d/halt.old > /etc/rc.d/init.d/halt
+
+chmod 744 /etc/rc.d/init.d/halt
+
+# Undo things a bit
+
+%preun std-%{rh_version}
+if [ $1 = 0 ] ; then
+        # stop running version (if any)                  
+        # I have removed the following because it sometimes produces
+        # an error message which may confuse someone.
+        #/sbin/service apcupsd stop
+
+        # remove startup links
+        /sbin/chkconfig --del apcupsd
+
+        # restore old halt script (hopefully)
+        #   mv -f /etc/rc.d/init.d/halt.old /etc/rc.d/init.d/halt
+
+        cp -f /etc/rc.d/init.d/halt /etc/rc.d/init.d/halt.old
+        awk '# Stuff added by apcupsd, remove it
+        /^# See if this is a powerfail situation\./ {
+           do {
+          getline
+           }  while (length($0) != 0)
+           getline
+        }
+        # Everything else is duplicated 
+        { print } ' /etc/rc.d/init.d/halt.old > /etc/rc.d/init.d/halt
+
+        chmod 744 /etc/rc.d/init.d/halt
+fi
+
+%postun std-%{rh_version}
+if [ "$1" -ge "1" ]; then
+        :
+        # /sbin/service apcupsd condrestart >/dev/null 2>&1 || :
+fi
+
+%endif
+
 %changelog
+* Mon May 11 2003 Scott at fairfieldcomputers dot com
+- combined layout for usb/serial builds
 * Thu Jan 16 2003 Scott at fairfieldcomputers dot com
 - Update spec to new source layout
-- Added usb options to configure section
 - Added masterconnect and mastertimout to files section
 - Changed make install-apcupsd and make install-cgi to make install
-- Added logrotate
 * Wed Sep 05 2001 kern at sibbald dot com
 - Applied very nice patch to this spec by Giulio Orsero <giulioo@pobox.com>
 * Thu Sep 14 2000 kern at sibbald dot com
