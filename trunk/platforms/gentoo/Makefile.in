@@ -28,4 +28,5 @@ uninstall:
 clean:
 
 distclean:
-	@$(RMF) apcupsd Makefile 
+	@$(RMF) apcupsd Makefile
+	@rm -rf CVS

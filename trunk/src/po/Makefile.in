@@ -86,7 +86,7 @@ install-data-yes: all
 	  cat=`basename $$cat`; \
 	  case "$$cat" in \
 	    *.gmo) destdir=$(DESTDIR)$(gnulocaledir);; \
-	    *)     destdir=$(DESTDIR)$(localedir);; \
+	    *)	   destdir=$(DESTDIR)$(localedir);; \
 	  esac; \
 	  lang=`echo $$cat | sed 's/\$(CATOBJEXT)$$//'`; \
 	  dir=$$destdir/$$lang/LC_MESSAGES; \
@@ -149,7 +149,7 @@ clean: targetclean
 
 distclean: targetdistclean
 	$(RMF) *.gmo *.mo *.msg *.cat *.cat.m POTFILES
-	$(RMF) Makefile
+	$(RMF) Makefile CVS
 
 maintainer-clean: distclean
 	@echo "This command is intended for maintainers to use;"
@@ -190,7 +190,7 @@ POTFILES: POTFILES.in
 	    posrcprefix="../"; \
 	  fi; \
 	  $(RMF) $@-t $@ \
-	    && (sed -e '/^#/d' -e '/^[ 	]*$$/d' \
+	    && (sed -e '/^#/d' -e '/^[	]*$$/d' \
 		    -e "s@.*@	$$posrcprefix& \\\\@" < $(srcdir)/$@.in \
 		| sed -e '$$s/\\$$//') > $@-t \
 	    && chmod a-w $@-t \

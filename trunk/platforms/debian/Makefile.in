@@ -68,3 +68,4 @@ clean:
 
 distclean:
 	@rm -f Makefile apccontrol.sh apcupsd ups-monitor 
+	@rm -rf CVS

@@ -38,6 +38,7 @@ distclean: targetdistclean
 	$(RMF) apcupsd.conf changeme commfailure commok mainsback onbattery
 	$(RMF) masterconnect mastertimeout
 	$(RMF) Makefile
+	@rm -rf CVS
 
 # -----------------------------------------------------------------------
 # DO NOT DELETE THIS LINE -- make depend depends on it.

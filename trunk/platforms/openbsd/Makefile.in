@@ -83,3 +83,4 @@ clean:
 
 distclean:
 	@rm -f apccontrol.sh apcupsd apcupsd.conf Makefile
+	@rm -rf CVS

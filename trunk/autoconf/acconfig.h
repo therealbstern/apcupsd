@@ -195,6 +195,9 @@
 #undef SYS_IMGFMT_GIF
 #undef IMGFMT_GIF
 
+/* Set if have arps/nameser.h */
+#undef HAVE_NAMESER_H
+
 /* Define to `int' if <sys/socket.h> doesn't define.  */
 #undef socklen_t
 

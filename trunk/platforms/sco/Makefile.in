@@ -30,3 +30,4 @@ clean:
 
 distclean:
 	@rm -f apcupsd Makefile
+	@rm -rf CVS

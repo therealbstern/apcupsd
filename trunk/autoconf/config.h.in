@@ -222,6 +222,9 @@
 #undef SYS_IMGFMT_GIF
 #undef IMGFMT_GIF
 
+/* Set if have arps/nameser.h */
+#undef HAVE_NAMESER_H
+
 /* Define to `int' if <sys/socket.h> doesn't define.  */
 #undef socklen_t
 
@@ -341,6 +344,9 @@
 
 /* Define if you have the <arpa/inet.h> header file.  */
 #undef HAVE_ARPA_INET_H
+
+/* Define if you have the <arpa/nameser.h> header file.  */
+#undef HAVE_ARPA_NAMESER_H
 
 /* Define if you have the <ctype.h> header file.  */
 #undef HAVE_CTYPE_H

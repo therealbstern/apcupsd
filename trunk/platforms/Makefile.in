@@ -49,6 +49,7 @@ clean: targetclean
 distclean: targetdistclean
 	$(RMF) Makefile
 	$(RMF) apccontrol
+	@rm -rf CVS cygwin/CVS cygwin/bin/CVS
 
 # -----------------------------------------------------------------------
 # DO NOT DELETE THIS LINE -- make depend depends on it.

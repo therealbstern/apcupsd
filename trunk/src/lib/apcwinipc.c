@@ -63,6 +63,7 @@
 #ifdef HAVE_CYGWIN
 #include <windows.h>
 
+#ifndef HAVE_PTHREADS
 static int mapsize;
 static SECURITY_ATTRIBUTES atts = {
    sizeof(SECURITY_ATTRIBUTES),
@@ -70,7 +71,9 @@ static SECURITY_ATTRIBUTES atts = {
    1				      /* inherit */
  };
 static HANDLE hMyMappedFile;
+#endif
 
+extern UPSINFO *core_ups;
 
 /*
  * Normally, when this routine is called,
@@ -87,7 +90,7 @@ static HANDLE hMyMappedFile;
  */
 void syslog (int type, const char *fmt, ...)
 {
-   UPSINFO *ups = &myUPS;
+   UPSINFO *ups = core_ups;
    va_list  arg_ptr;
    char msg[2*MAXSTRING];
    char datetime[MAXSTRING];
@@ -207,7 +210,7 @@ int shmdt ( const void *shmaddr)
 struct tm *localtime_r(const time_t *timep, struct tm *tm)
 {
     static pthread_mutex_t mutex;
-    static first = 1;
+    static int first = 1;
     struct tm *ltm;
 
     if (first) {
@@ -228,6 +231,8 @@ void WinMessageBox(char *msg)
 {
    MessageBox(NULL, msg, "apcupsd message", MB_OK);
 }
+
+HANDLE get_osfhandle(int fd);
 
 /*
  * Implement a very simple form of serial port
@@ -250,7 +255,7 @@ int winioctl(int fd, int func, int *addr)
    int lb = 0;
 
    /* Get Windows Handle from CYGWIN */
-   hComm = (HANDLE)get_osfhandle(fd);
+   hComm = get_osfhandle(fd);
    if (hComm == 0)
       return EBADF;
    switch (func) {

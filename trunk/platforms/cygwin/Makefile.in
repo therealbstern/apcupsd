@@ -32,4 +32,5 @@ uninstall:
 clean: targetclean
 
 distclean: targetdistclean
-	$(RMF) apccontrol apcupsd Makefile
+	$(RMF) apccontrol apcupsd Makefile 
+	@rm -rf CVS bin/CVS examples/CVS

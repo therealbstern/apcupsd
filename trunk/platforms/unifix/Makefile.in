@@ -30,3 +30,4 @@ clean:
 
 distclean:
 	@rm -f Makefile
+	@rm -rf CVS

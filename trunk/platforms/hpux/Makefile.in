@@ -32,3 +32,4 @@ clean:
 
 distclean:
 	@rm -f apccontrol.sh apcupsd Makefile
+	@rm -rf CVS
