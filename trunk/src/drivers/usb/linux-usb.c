@@ -1024,13 +1024,18 @@ static int write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
 	rinfo.report_type = info->uref.report_type;
 	rinfo.report_id = info->uref.report_id;
 	if (ioctl(my_data->fd, HIDIOCGREPORTINFO, &rinfo) < 0) {  /* get Report */
-            Dmsg2(000, "HIDIOCGREPORT for shutdown function %s failed. ERR=%s\n", 
+            Dmsg2(000, "HIDIOCGREPORTINFO for shutdown function %s failed. ERR=%s\n", 
 		  name, strerror(errno));
 	    return 0;
 	}
         Dmsg1(100, "REPORTINFO num_fields=%d\n", rinfo.num_fields);
 	finfo.report_type = info->uref.report_type;
 	finfo.report_id = info->uref.report_id;
+        Dmsg7(100, "before FIELDINFO call: type=%d id=%d index=%d logical_min=%d \n\
+logical_max=%d exponent=%d unit=0x%x\n",
+	    finfo.report_type, finfo.report_id, finfo.field_index,
+	    finfo.logical_minimum, finfo.logical_maximum, 
+	    finfo.unit_exponent, finfo.unit);
 	if (ioctl(my_data->fd, HIDIOCGFIELDINFO, &finfo) < 0) {  /* Get field info */
             Dmsg2(000, "HIDIOCGFIELDINFO for shutdown function %s failed. ERR=%s\n", 
 		  name, strerror(errno));
