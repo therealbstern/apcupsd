@@ -21,11 +21,14 @@ driversobjs = drivers.o
 
 all-targets: $(driverslib)
 
-$(driverslib): $(driversobjs) @APCSMART_DRIVER@_stamp @DUMB_DRIVER@_stamp @NET_DRIVER@_stamp @USB_DRIVER@_stamp @SNMP_DRIVER@_stamp @TEST_DRIVER@_stamp
-	ar cru $(driverslib) $(driversobjs)
-	@RANLIB@ $(driverslib)
+$(driverslib): $(driversobjs) @APCSMART_DRIVER@_stamp @DUMB_DRIVER@_stamp @NET_DRIVER@_stamp @USB_DRIVER@_stamp @SNMP_DRIVER@_stamp @TEST_DRIVER@_stamp drivers_stamp
 
 _stamp:
+
+drivers_stamp: drivers.c
+	ar cru $(driverslib) $(driversobjs)
+	@RANLIB@ $(driverslib)
+	touch drivers_stamp
 
 apcsmart_stamp: apcsmart/libapcsmart.a
 	ar cru libdrivers.a apcsmart/*.o
