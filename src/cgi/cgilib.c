@@ -156,17 +156,24 @@ void html_begin(const char *title, int refresh)
     if (refresh != 0) {
         printf ("<meta http-equiv=\"Refresh\" content=\"%d\" />\n", refresh);
     }
+
     puts ("<style type=\"text/css\" id=\"internalStyle\">");
     puts ("  body {color: black; background: white}");
     puts ("  div.Center {text-align: center}");
+    puts ("  img {border-style: none}");
     puts ("  pre {text-align: left}");
-    puts ("  td.Empty {color: black; background: aqua}");
-    puts ("  td.Fault {color: black; background: red}");
-    puts ("  td.Label {color: black; background: aqua}");
-    puts ("  td.Normal {color: black; background: lime}");
-    puts ("  td.Warning {color: black; background: yellow}");
     puts ("  strong {color: red}");
+    puts ("  table.Outer {color: black; background: #60a0a0; empty-cells: show; border: solid #60a0a0}");
+    puts ("  th.Outer {color: black; background: #60b0b0}");
+    puts ("  .Title { font-size: 18pt; }");
+    puts ("  .SubTitle { font-size: 12pt; }");
+    puts ("  .Empty {color: black; background: lime}");
+    puts ("  .Fault {color: black; background: red}");
+    puts ("  .Label {color: black; background: aqua}");
+    puts ("  .Normal {color: black; background: lime}");
+    puts ("  .Warning {color: black; background: yellow}");
     puts ("</style>");
+
     puts ("</head>");
     puts ("<body>");
 }
