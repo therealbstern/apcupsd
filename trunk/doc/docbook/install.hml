@@ -335,6 +335,60 @@ configurations, see the <link linkend='advanced'>Advanced Topics</link>
 section for details.</para>
 
 </sect1>
+
+<sect1 id='known_usb_issues'><title>Apcupsd Known USB Issues</title>
+
+<p>
+ - <b>Problem:</b> USB is only supported on Linux systems (there is now an
+    experimental FreeBSD USB version). Although the configuration script
+    allows the usb driver to be enabled on other platforms, it will only compile
+    and run on Linux.</p>
+    <p>
+ - <b>Workaround:</b> Try using UPS in serial mode instead of USB.
+    </p>
+
+<p>
+ - <b>Problem:</b>
+  Linux 2.4 series kernels older than 2.4.22 do not bind the USB device to
+  the proper driver. This is evidenced by /proc/bus/usb/devices listing the
+  UPS correctly but it will have "driver=(none)" instead of "driver=(hid)".
+  This affects RHEL3, among others.
+  </p>
+  <p>
+ - <b>Workaround:</b> Upgrade linux kernel to 2.4.22 or higher.
+  </p>
+
+  <p>
+ - <b>Problem:</b> Mandrake 10.0 and 10.1 systems with high security mode enabled (running
+  kernel-secure kernel) use static device nodes but still assign USB minor
+  numbers dynamically. This is evidenced by <b>hiddev0: USB HID v1.10 Device
+  [...]</b> instead of <b>hiddev96: ...</b> in dmesg log.
+  </p>
+  <p>
+ - <b>Workaround:</b> Boot standard kernel instead of kernel-secure or disable
+  CONFIG_USB_DYNAMIC_MINORS and rebuild kernel-secure.
+  </p>
+
+  <p>
+ - <b>Problem:</b> USB driver linux-usb.c fails to compile, reporting errors about
+  <b>HID_MAX_USAGES undefined</b>. This is due to a defect in the linux kernel
+  hiddev.h header file on 2.6.5 and higher kernels.
+  </p>
+  <p>
+ - <b>Workaround:</b> Workaround: Upgrade to apcupsd-3.10.14 or higher. These versions
+        contain a workaround for the defect.
+  </p>
+ <p>
+ - <b>Problem:</b> On some systems such as Slackware 10.0, no USB devices will
+   showup (see the next section).</p>
+ <p>
+ - <b>Workaround:</b> add the following to rc.local
+ <pre>
+ mount -t usbdevfs none /proc/bus/usb
+ </pre>
+ </p>
+</sect1>
+
 <sect1 id='check_usb'><title>Checking Out Your USB Subsystem</title>
 
 <para>You can skip this section if your UPS has an Ethernet or RS232-C 

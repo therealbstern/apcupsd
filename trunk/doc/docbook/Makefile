@@ -72,8 +72,8 @@ OBJ = \
 	@echo "s%</p>%</para>%g" >> ${out}
 	@echo "s%<ol>%<orderedlist>%g" >> ${out}
 	@echo "s%</ol>%</orderedlist>%g" >> ${out}
-	@echo "s%<li>%<listitem>%g" >> ${out}
-	@echo "s%</li>%</listitem>%g" >> ${out}
+	@echo "s%<li>%<listitem><para>%g" >> ${out}
+	@echo "s%</li>%</para></listitem>%g" >> ${out}
 	@echo "s%<pre>%<programlisting>%g" >> ${out}
 	@echo "s%</pre>%</programlisting>%g" >> ${out}
 	sed -f ${out} $< >$@
@@ -117,6 +117,7 @@ pdf:	manual.html
 	@rm -f broken_manual.html ${out}
 	@echo "html manual sanitized for pdf production"
 	  
+xml:	manual.xsl $(OBJ)
 
 main_configs:
 	pic2graph -density 100 <main_configs.pic >main_configs.png

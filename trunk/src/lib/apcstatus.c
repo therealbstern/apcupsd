@@ -298,6 +298,9 @@ int output_status(UPSINFO *ups, int sockfd,
             case 'R':
                 s_write(ups, "LASTXFER : Unacceptable line voltage changes\n");
 		break;
+            case 'K':
+                s_write(ups, "LASTXFER : Software command or UPS's test control\n");
+		break;
 	    default :
                 s_write(ups, "LASTXFER : UNKNOWN EVENT %s\n", ups->G);
 		break;

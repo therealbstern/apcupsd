@@ -2,6 +2,8 @@
                         Kern Sibbald
 
 General:
+28Oct04
+- Converted manual from docbook to texinfo format.
 22Oct04
 - Apply patch to fix aastr... supplied by Manfred Schwarb.
 14Oct04
@@ -12,7 +14,8 @@ General:
   the 4 platform specific apccontrol files (some were missing).
 - Apply fix from user to correct one of the shutdown
   sequences for the Smart UPS. During the conversion to drivers
-  this was apparently mangled.
+  this was apparently mangled. Thanks to Alexander Naumov for the
+  fix.
 09Sep04
 - Added code to close all file descriptors before becoming
   daemon unless debug turned on.

@@ -86,10 +86,10 @@ one or messages indicating the nature of the problem.</para>
 
 <para>Once you have established that the proper processes are running,
 do a tail of the system log file, normally
-<filename>/etc/var/messages</filename>:</para>
+<filename>/var/log/messages</filename>:</para>
 
 <programlisting>
-tail /etc/var/messages
+tail /var/log/messages
 </programlisting>
 
 <para>You should see output that looks similar to the following:</para>
@@ -109,7 +109,9 @@ startup succeeded
 
 <para>These messages should also appear in the temporary file
 (<filename>/etc/apcupsd/apcupsd.events</filename>) if you are using
-the default configuration file.</para>
+the default configuration file. If you have installed the RPM, they
+will probably be in <filename>/var/log/apcupsd.events</filename>.
+</para>
 
 </sect1>
 <sect1><title>apcaccess Test</title>
@@ -313,7 +315,7 @@ message:</para>
 <para>If these messages are logged but not broadcast, either you have
 your <application>mesg</application> permission set to
 <emphasis>no</emphasis> (see <emphasis role="bold">man
-wall</emphasis>) or there is a problem with
+wall</emphasis> or <b>man mesg</b>), or there is a problem with
 <application>apccontrol</application>. If you are running a window
 manager such as GNOME and don't have a console window open, you may
 not receive the <command>wall</command> messages. However, you should
@@ -326,6 +328,11 @@ a</para>
 <programlisting>
 tail -f /etc/apcupsd/apcupsd.events
 </programlisting>
+
+<para>Note, if you have installed from the RPM, the proper events
+file may be <filename>/var/log/apcupsd.events</filename>. You can 
+find the actual filename by checking your <filename>apcupsd.conf</filename>
+file.</para>
 
 <para>before running the test.</para>
 
