@@ -82,6 +82,10 @@
 # define WIFEXITED(stat_val) (((stat_val) & 255) == 0)
 #endif
 
+#ifndef HAVE_SOCKLEN_T
+#define socklen_t unsigned int
+#endif
+
 /* Alpha Tru64 */
 #ifdef HAVE_OSF1_OS
 #define int32_t int
@@ -114,7 +118,6 @@
 
 #ifdef HAVE_OPENSERVER_OS
 #define int32_t         int
-#define socklen_t       unsigned int
 #define _SEM_SEMUN_UNDEFINED 1
 #endif
 
