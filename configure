@@ -7877,7 +7877,7 @@ if test "${ac_cv_lib_menu_new_menu+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lmenu  $LIBS"
+LIBS="-lmenu -lncurses $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 #line 7882 "configure"
 #include "confdefs.h"
@@ -7921,7 +7921,7 @@ fi
 echo "$as_me:7921: result: $ac_cv_lib_menu_new_menu" >&5
 echo "${ECHO_T}$ac_cv_lib_menu_new_menu" >&6
 if test $ac_cv_lib_menu_new_menu = yes; then
-  PL="$PL -lmenu"
+  PL="-lmenu $PL"
 else
   echo '  disabling powerflute.'; POWERFLUTE_ENABLE="no"
 fi
@@ -7932,7 +7932,7 @@ if test "${ac_cv_lib_form_new_form+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lform  $LIBS"
+LIBS="-lform -lncurses $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 #line 7937 "configure"
 #include "confdefs.h"
@@ -7976,7 +7976,7 @@ fi
 echo "$as_me:7976: result: $ac_cv_lib_form_new_form" >&5
 echo "${ECHO_T}$ac_cv_lib_form_new_form" >&6
 if test $ac_cv_lib_form_new_form = yes; then
-  PL="$PL -lform"
+  PL="-lform $PL"
 else
   echo '  disabling powerflute.'; POWERFLUTE_ENABLE="no"
 fi
@@ -7987,7 +7987,7 @@ if test "${ac_cv_lib_panel_new_panel+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lpanel  $LIBS"
+LIBS="-lpanel -lncurses $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 #line 7992 "configure"
 #include "confdefs.h"
@@ -8031,7 +8031,7 @@ fi
 echo "$as_me:8031: result: $ac_cv_lib_panel_new_panel" >&5
 echo "${ECHO_T}$ac_cv_lib_panel_new_panel" >&6
 if test $ac_cv_lib_panel_new_panel = yes; then
-  PL="$PL -lpanel"
+  PL="-lpanel $PL"
 else
   echo '  disabling powerflute.'; POWERFLUTE_ENABLE="no"
 fi
@@ -10483,6 +10483,9 @@ then
 elif test -f /etc/slackware-version
 then
 	DISTNAME=slackware
+elif test -f /etc/gentoo-version
+then
+	DISTNAME=gentoo
 elif test -f /etc/engarde-version
 then
 	DISTNAME=engarde
@@ -10618,6 +10621,15 @@ freebsd)
 		platforms/freebsd/Makefile \
 		platforms/freebsd/apcupsd \
 		platforms/freebsd/apccontrol \
+		"
+  ;;
+gentoo)
+	DISTVER=`uname -r`
+	DFILES="\
+		platforms/apccontrol \
+		platforms/gentoo/Makefile \
+		platforms/gentoo/apcupsd \
+		platforms/gentoo/halt \
 		"
   ;;
 hpux)
@@ -11065,7 +11077,7 @@ DEFS=-DHAVE_CONFIG_H
 : ${CONFIG_STATUS=./config.status}
 ac_clean_files_save=$ac_clean_files
 ac_clean_files="$ac_clean_files $CONFIG_STATUS"
-{ echo "$as_me:11068: creating $CONFIG_STATUS" >&5
+{ echo "$as_me:11080: creating $CONFIG_STATUS" >&5
 echo "$as_me: creating $CONFIG_STATUS" >&6;}
 cat >$CONFIG_STATUS <<_ACEOF
 #! $SHELL
@@ -11244,7 +11256,7 @@ cat >>$CONFIG_STATUS <<\EOF
     echo "$ac_cs_version"; exit 0 ;;
   --he | --h)
     # Conflict between --help and --header
-    { { echo "$as_me:11247: error: ambiguous option: $1
+    { { echo "$as_me:11259: error: ambiguous option: $1
 Try \`$0 --help' for more information." >&5
 echo "$as_me: error: ambiguous option: $1
 Try \`$0 --help' for more information." >&2;}
@@ -11263,7 +11275,7 @@ Try \`$0 --help' for more information." >&2;}
     ac_need_defaults=false;;
 
   # This is an error.
-  -*) { { echo "$as_me:11266: error: unrecognized option: $1
+  -*) { { echo "$as_me:11278: error: unrecognized option: $1
 Try \`$0 --help' for more information." >&5
 echo "$as_me: error: unrecognized option: $1
 Try \`$0 --help' for more information." >&2;}
@@ -11310,7 +11322,7 @@ do
   "default-1" ) CONFIG_COMMANDS="$CONFIG_COMMANDS default-1" ;;
   "default" ) CONFIG_COMMANDS="$CONFIG_COMMANDS default" ;;
   "include/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS include/config.h:autoconf/config.h.in" ;;
-  *) { { echo "$as_me:11313: error: invalid argument: $ac_config_target" >&5
+  *) { { echo "$as_me:11325: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
    { (exit 1); exit 1; }; };;
   esac
@@ -11655,7 +11667,7 @@ done; }
   esac
 
   if test x"$ac_file" != x-; then
-    { echo "$as_me:11658: creating $ac_file" >&5
+    { echo "$as_me:11670: creating $ac_file" >&5
 echo "$as_me: creating $ac_file" >&6;}
     rm -f "$ac_file"
   fi
@@ -11673,7 +11685,7 @@ echo "$as_me: creating $ac_file" >&6;}
       -) echo $tmp/stdin ;;
       [\\/$]*)
          # Absolute (can't be DOS-style, as IFS=:)
-         test -f "$f" || { { echo "$as_me:11676: error: cannot find input file: $f" >&5
+         test -f "$f" || { { echo "$as_me:11688: error: cannot find input file: $f" >&5
 echo "$as_me: error: cannot find input file: $f" >&2;}
    { (exit 1); exit 1; }; }
          echo $f;;
@@ -11686,7 +11698,7 @@ echo "$as_me: error: cannot find input file: $f" >&2;}
            echo $srcdir/$f
          else
            # /dev/null tree
-           { { echo "$as_me:11689: error: cannot find input file: $f" >&5
+           { { echo "$as_me:11701: error: cannot find input file: $f" >&5
 echo "$as_me: error: cannot find input file: $f" >&2;}
    { (exit 1); exit 1; }; }
          fi;;
@@ -11747,7 +11759,7 @@ for ac_file in : $CONFIG_HEADERS; do test "x$ac_file" = x: && continue
   * )   ac_file_in=$ac_file.in ;;
   esac
 
-  test x"$ac_file" != x- && { echo "$as_me:11750: creating $ac_file" >&5
+  test x"$ac_file" != x- && { echo "$as_me:11762: creating $ac_file" >&5
 echo "$as_me: creating $ac_file" >&6;}
 
   # First look for the input files in the build tree, otherwise in the
@@ -11758,7 +11770,7 @@ echo "$as_me: creating $ac_file" >&6;}
       -) echo $tmp/stdin ;;
       [\\/$]*)
          # Absolute (can't be DOS-style, as IFS=:)
-         test -f "$f" || { { echo "$as_me:11761: error: cannot find input file: $f" >&5
+         test -f "$f" || { { echo "$as_me:11773: error: cannot find input file: $f" >&5
 echo "$as_me: error: cannot find input file: $f" >&2;}
    { (exit 1); exit 1; }; }
          echo $f;;
@@ -11771,7 +11783,7 @@ echo "$as_me: error: cannot find input file: $f" >&2;}
            echo $srcdir/$f
          else
            # /dev/null tree
-           { { echo "$as_me:11774: error: cannot find input file: $f" >&5
+           { { echo "$as_me:11786: error: cannot find input file: $f" >&5
 echo "$as_me: error: cannot find input file: $f" >&2;}
    { (exit 1); exit 1; }; }
          fi;;
@@ -11888,7 +11900,7 @@ cat >>$CONFIG_STATUS <<\EOF
   rm -f $tmp/in
   if test x"$ac_file" != x-; then
     if cmp -s $ac_file $tmp/config.h 2>/dev/null; then
-      { echo "$as_me:11891: $ac_file is unchanged" >&5
+      { echo "$as_me:11903: $ac_file is unchanged" >&5
 echo "$as_me: $ac_file is unchanged" >&6;}
     else
       ac_dir=`$as_expr X"$ac_file" : 'X\(.*[^/]\)//*[^/][^/]*/*$' \| \
@@ -11939,11 +11951,11 @@ for ac_file in : $CONFIG_LINKS; do test "x$ac_file" = x: && continue
   ac_dest=`echo "$ac_file" | sed 's,:.*,,'`
   ac_source=`echo "$ac_file" | sed 's,[^:]*:,,'`
 
-  { echo "$as_me:11942: linking $srcdir/$ac_source to $ac_dest" >&5
+  { echo "$as_me:11954: linking $srcdir/$ac_source to $ac_dest" >&5
 echo "$as_me: linking $srcdir/$ac_source to $ac_dest" >&6;}
 
   if test ! -r $srcdir/$ac_source; then
-    { { echo "$as_me:11946: error: $srcdir/$ac_source: File not found" >&5
+    { { echo "$as_me:11958: error: $srcdir/$ac_source: File not found" >&5
 echo "$as_me: error: $srcdir/$ac_source: File not found" >&2;}
    { (exit 1); exit 1; }; }
   fi
@@ -11993,7 +12005,7 @@ done; }
   # Make a symlink if possible; otherwise try a hard link.
   ln -s $ac_rel_source $ac_dest 2>/dev/null ||
     ln $srcdir/$ac_source $ac_dest ||
-    { { echo "$as_me:11996: error: cannot link $ac_dest to $srcdir/$ac_source" >&5
+    { { echo "$as_me:12008: error: cannot link $ac_dest to $srcdir/$ac_source" >&5
 echo "$as_me: error: cannot link $ac_dest to $srcdir/$ac_source" >&2;}
    { (exit 1); exit 1; }; }
 done

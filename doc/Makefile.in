@@ -20,12 +20,12 @@ install: install-man
 
 install-man: apcupsd.man
 	@$(ECHO) "Installing manual pages..."
-	@$(SHELL) $(MKINSTALLDIRS) $(mandir)
-	@$(INSTALL_DATA) apcupsd.man $(mandir)/apcupsd.$(manext)
+	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(mandir)
+	@$(INSTALL_DATA) apcupsd.man $(DESTDIR)$(mandir)/apcupsd.$(manext)
 
 uninstall:
 	@$(ECHO) "Removing manual page ..."
-	@$(RM) -f $(mandir)/apcupsd.$(manext)
+	@$(RM) -f $(DESTDIR)$(mandir)/apcupsd.$(manext)
 
 clean: targetclean
 

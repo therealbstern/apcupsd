@@ -61,34 +61,40 @@ install-:
 
 install-binary: $(allexe)
 	@$(ECHO) "Installing daemons ..."
-	@$(SHELL) $(MKINSTALLDIRS) $(sbindir)
-	@$(INSTALL_PROGRAM) -s -m 700 apcupsd@EXEEXT@ $(sbindir)/apcupsd@EXEEXT@
+	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(sbindir)
+	@$(INSTALL_PROGRAM) -s -m 700 apcupsd@EXEEXT@ \
+		$(DESTDIR)$(sbindir)/apcupsd@EXEEXT@
 	@$(MAKE) install-@APCNISD@
 	@$(MAKE) install-@APCACCESS@
 	@$(MAKE) install-@SMTP@
 	@$(MAKE) install-@POWERFLUTE@
+	@$(MAKE) install-@CGI@
 
 install-apcaccess:
 	@$(INSTALL_PROGRAM) -s -m 755 apcaccess@EXEEXT@ \
-									$(sbindir)/apcaccess@EXEEXT@
+		$(DESTDIR)$(sbindir)/apcaccess@EXEEXT@
 
 install-smtp:
-	@$(INSTALL_PROGRAM) -s -m 755 smtp@EXEEXT@ $(sbindir)/smtp@EXEEXT@
+	@$(INSTALL_PROGRAM) -s -m 755 smtp@EXEEXT@ \
+		$(DESTDIR)$(sbindir)/smtp@EXEEXT@
 
 install-apcnisd:
-	@$(INSTALL_PROGRAM) -s -m 700 apcnisd@EXEEXT@ $(sbindir)/apcnisd@EXEEXT@
+	@$(INSTALL_PROGRAM) -s -m 700 apcnisd@EXEEXT@ \
+		$(DESTDIR)$(sbindir)/apcnisd@EXEEXT@
 
 install-powerflute:
 	@$(INSTALL_PROGRAM) -s -m 755 powerflute@EXEEXT@ \
-									$(sbindir)/powerflute@EXEEXT@
+		$(DESTDIR)$(sbindir)/powerflute@EXEEXT@
+install-cgi:
+	(cd cgi/; make install)
 
 uninstall:
 	@$(ECHO) "Removing daemons ..."
-	@$(RM) -f $(sbindir)/apcupsd@EXEEXT@
-	@$(RM) -f $(sbindir)/apcnisd@EXEEXT@
-	@$(RM) -f $(sbindir)/apcaccess@EXEEXT@
-	@$(RM) -f $(sbindir)/apctest@EXEEXT@
-	@$(RM) -f $(sbindir)/powerflute@EXEEXT@
+	@$(RMF) $(DESTDIR)$(sbindir)/apcupsd@EXEEXT@
+	@$(RMF) $(DESTDIR)$(sbindir)/apcnisd@EXEEXT@
+	@$(RMF) $(DESTDIR)$(sbindir)/apcaccess@EXEEXT@
+	@$(RMF) $(DESTDIR)$(sbindir)/apctest@EXEEXT@
+	@$(RMF) $(DESTDIR)$(sbindir)/powerflute@EXEEXT@
 
 clean: targetclean
 	$(RM) -f devicedbg

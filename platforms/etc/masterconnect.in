@@ -12,8 +12,10 @@ HOSTNAME=`hostname`
 MSG="slave $HOSTNAME received connection from master"
 #
 (
+   echo "Subject: $MSG"
+   echo " "
    echo "$MSG"
    echo " "
    @sbindir@/apcaccess status
-) | $MAIL -s "$MSG" $SYSADMIN
+) | $MAIL $SYSADMIN
 exit 0

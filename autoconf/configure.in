@@ -919,14 +919,14 @@ AC_ARG_ENABLE(powerflute,
 	[PL="-lncurses"],
 	[echo '  disabling powerflute.'; POWERFLUTE_ENABLE="no"])
 	    AC_CHECK_LIB(menu, new_menu,
-	[PL="$PL -lmenu"],
-	[echo '  disabling powerflute.'; POWERFLUTE_ENABLE="no"])
+	[PL="-lmenu $PL"],
+	[echo '  disabling powerflute.'; POWERFLUTE_ENABLE="no"], -lncurses)
 	    AC_CHECK_LIB(form, new_form,
-	[PL="$PL -lform"],
-	[echo '  disabling powerflute.'; POWERFLUTE_ENABLE="no"])
+	[PL="-lform $PL"],
+	[echo '  disabling powerflute.'; POWERFLUTE_ENABLE="no"], -lncurses)
 	    AC_CHECK_LIB(panel, new_panel,
-	[PL="$PL -lpanel"],
-	[echo '  disabling powerflute.'; POWERFLUTE_ENABLE="no"])
+	[PL="-lpanel $PL"],
+	[echo '  disabling powerflute.'; POWERFLUTE_ENABLE="no"], -lncurses)
 	  fi])
 
 if test "$POWERFLUTE_ENABLE" = "yes"; then
@@ -1153,6 +1153,9 @@ then
 elif test -f /etc/slackware-version
 then
 	DISTNAME=slackware
+elif test -f /etc/gentoo-version
+then
+	DISTNAME=gentoo
 elif test -f /etc/engarde-version
 then
 	DISTNAME=engarde
@@ -1301,6 +1304,15 @@ dnl
 		platforms/freebsd/Makefile \
 		platforms/freebsd/apcupsd \
 		platforms/freebsd/apccontrol \
+		"
+  ;;
+gentoo)
+	DISTVER=`uname -r`
+	DFILES="\
+		platforms/apccontrol \
+		platforms/gentoo/Makefile \
+		platforms/gentoo/apcupsd \
+		platforms/gentoo/halt \
 		"
   ;;
 hpux)

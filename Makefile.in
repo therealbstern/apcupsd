@@ -24,31 +24,31 @@ all-targets: Makefile
 install: install-directories install-subdirs
 
 install-directories: install-dir@CGI@
-	@if [ ! -d /tmp ] ; then \
-		$(SHELL) $(MKINSTALLDIRS) /tmp \
-		chmod 777 /tmp; \
+	@if [ ! -d $(DESTDIR)/tmp ] ; then \
+		$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)/tmp \
+		chmod 777 $(DESTDIR)/tmp; \
 	fi
-	@if [ ! -d $(prefix) ] ; then \
-		$(SHELL) $(MKINSTALLDIRS) $(prefix) \
-		chmod 755 $(prefix); \
+	@if [ ! -d $(DESTDIR)$(prefix) ] ; then \
+		$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(prefix) \
+		chmod 755 $(DESTDIR)$(prefix); \
 	fi
-	@if [ ! -d $(prefix) ] ; then \
-		$(SHELL) $(MKINSTALLDIRS) $(prefix) \
-		chmod 755 $(prefix); \
+	@if [ ! -d $(DESTDIR)$(exec_prefix) ] ; then \
+		$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(exec_prefix) \
+		chmod 755 $(DESTDIR)$(exec_prefix); \
 	fi
-	@if [ ! -d $(sbindir) ] ; then \
-		$(SHELL) $(MKINSTALLDIRS) $(sbindir) \
-		chmod 755 $(sbindir); \
+	@if [ ! -d $(DESTDIR)$(sbindir) ] ; then \
+		$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(sbindir) \
+		chmod 755 $(DESTDIR)$(sbindir); \
 	fi
-	@if [ ! -d $(sysconfdir) ] ; then \
-		$(SHELL) $(MKINSTALLDIRS) $(sysconfdir) \
-		chmod 755 $(sysconfdir); \
+	@if [ ! -d $(DESTDIR)$(sysconfdir) ] ; then \
+		$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(sysconfdir) \
+		chmod 755 $(DESTDIR)$(sysconfdir); \
 	fi
 
 install-dir: dummy
 
 install-dircgi:
-	@$(SHELL) $(MKINSTALLDIRS)  $(cgibin)
+	@$(SHELL) $(MKINSTALLDIRS)  $(DESTDIR)$(cgibin)
 
 uninstall: uninstall-subdirs
 

@@ -6,6 +6,13 @@
 /*               ftp://ftp.apcupsd.com                                     */
 /***************************************************************************/
 
+    - Fixed autoconf check and dependances of -lpanel,etc with -lncurses.
+    - Made more portable the apccontrol external scripts when calling the
+      mailer (subject is now in the echo lines instead of relying on the
+      presence of a -s switch on the mailer).
+    - Added gentoo platform.
+    - Added DESTDIR variable for platform packaging.
+    - Fixed a off-by-one problem in events table.
     - Conditional compilation of old and new network code. Old network code
       disabled by default while new network code enabled by default.
     - Removed old src/apcnet.c.old, old implementation of old networking.
