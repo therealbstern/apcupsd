@@ -56,6 +56,7 @@ web:
 	latex2html -split 4 -local_icons -t "Apcupsd User's Guide" -long_titles 4 \
 		-toc_stars -contents_in_nav -white -notransparent apcupsd >/dev/null
 	cp apcupsd/Apcupsd_Users_Guide.html apcupsd/index.html
+	rm -f apcupsd/*.old
 
 h2l:
 	@echo "Making html2latex"
@@ -69,6 +70,9 @@ h2l:
 texcheck:
 # Does checking for the tex file, and possibly fixes things.
 	./check_tex.pl --change apcupsd.tex
+
+apcupsd.eps: apcupsd.png
+	pngtopnm apcupsd.png | pnmtops -scale=0.65 -noturn -nosetpage >apcupsd.eps
 
 clean:
 	@rm -f 1 2 3
