@@ -59,6 +59,8 @@
  */
 
 #include "apc.h"
+#undef UCD_COMPATIBLE
+#define UCD_COMPATIBLE 1
 #include "snmp.h"
 #include "snmp_private.h"
 
@@ -146,9 +148,11 @@ int powernet_snmp_kill_ups_power(UPSINFO *ups) {
 }
 
 int powernet_snmp_ups_get_capabilities(UPSINFO *ups) {
-    struct snmp_ups_internal_data *Sid = ups->driver_internal_data;
-    struct snmp_session *s = &Sid->session;
-    powernet_mib_t *data = Sid->MIB;
+/*
+ *  struct snmp_ups_internal_data *Sid = ups->driver_internal_data;
+ *  struct snmp_session *s = &Sid->session;
+ *  powernet_mib_t *data = Sid->MIB;
+ */
     int i = 0;
 
     /*
