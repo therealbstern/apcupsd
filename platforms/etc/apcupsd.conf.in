@@ -36,14 +36,15 @@ UPSTYPE @UPSTYPE@
 # name of your UPS device
 #
 # Here a table of the possible devices related with the UPS drivers.
+#
 #   NOTE!!! for USB devices, please use a form indicated below 
-#      including the [0-9] as written!
+#      including the [0-15] as written!
 #
 # Driver   Device                    Description
 # dumb     /dev/tty**                Serial character device
 # apcsmart /dev/tty**                Serial character device
-# usb      /dev/usb/hid/hiddev[0-9]  If you follow our naming scheme
-# usb      /dev/usb/hiddev[0-9]      On some systems
+# usb      /dev/usb/hid/hiddev[0-15] If you follow our naming scheme
+# usb      /dev/usb/hiddev[0-15]      On some systems
 # net      hostname:port             Network link to a master apcupsd
 #                                    through NIS
 # snmp     hostname:port:vendor:community
