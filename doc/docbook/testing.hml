@@ -27,7 +27,13 @@ similar to the following output.</para>
 </programlisting>
 
 <para>This indicates that <application>apcupsd</application> is up and
-running and has started the two (default) child processes.</para>
+running and has started the two (default) child processes.
+If you are running with the pthreaded version, now the default, and
+2.4.x kernels, you will still see the three processes (see
+below).  However, under 2.6.x kernels, the threads do not have
+independent process ids so everything will be compressed into a
+single <b>ps</b> line.
+</para>
 
 <variablelist>
   <varlistentry>
@@ -67,7 +73,8 @@ names of the processes and will appear more like the following:</para>
 
 <para>If you see only one instance of
 <application>apcupsd</application> running, don't worry about it
-unless the communication test fails.</para>
+as this is normal on most non-Linux systems, and on Linux 2.6.x
+kernels. </para>
 <para>If you do not find that <application>apcupsd</application> is        
 in the above list, the most likely problem is a configuration file glitch.
 If no messages were printed, you should check your system log 
