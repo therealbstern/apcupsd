@@ -409,7 +409,7 @@ static void daemon_start(void)
    int i, fd;
    pid_t cpid;
    mode_t oldmask;
-   int low_fd = 0;
+   int low_fd = -1;
 
    if ( (cpid = fork() ) < 0) {
        Error_abort0("Cannot fork to become daemon\n");
@@ -423,8 +423,8 @@ static void daemon_start(void)
    /* Call closelog() to close syslog file descriptor */
    closelog();
 
-   /* In the PRODUCTION system, we close ALL
-    * file descriptors except stdin, stdout, and stderr.
+   /* In the PRODUCTION system, we close ALL file descriptors unless
+    *  debugging is on then we laeve stdin, stdout, and stderr open.
     */
    if (debug_level > 0) {
       low_fd = 2;                     /* don't close debug output */
