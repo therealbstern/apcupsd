@@ -29,6 +29,9 @@
 %define su9 0
 %{?build_su9:%define su9 1}
 
+%define mdk 0
+%{?build_mdk:%define mdk 1}
+
 %define usb 0
 %{?build_usb:%define usb 1}
 
@@ -46,8 +49,8 @@ Vendor:       APC UPS Daemon Team
 Distribution: The apcupsd Team
 Packager:     D. Scott Barninger <barninger@fairfieldcomputers.com>
 URL:          http://www.sibbald.com/apcupsd/
-Source0:       http://www.sibbald.com/apcupsd/%{name}-%{version}.tar.gz
-Source1: Release_Notes-%{version}-%{release}.tar.gz
+Source0:      http://www.sibbald.com/apcupsd/%{name}-%{version}.tar.gz
+Source1:      Release_Notes-%{version}-%{release}.tar.gz
 Group:        System Environment/Daemons
 Copyright:    GPL v2
 BuildRoot:    %{_tmppath}/%{name}-root
@@ -78,7 +81,7 @@ Some features depend on what UPS model you have (simple or smart).
 Provides: apcupsd
 
 Requires: perl
-%if %{fc1} || %{su9}
+%if %{fc1} || %{su9} || %{mdk}
 Requires: gd >= 2.0
 %else
 Requires: gd < 2.0
@@ -169,15 +172,20 @@ make \
 install -m744 platforms/apccontrol \
               $RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/apccontrol
 	      
-%if ! %{su9}	      
+%if ! %{su9} && ! %{mdk}	      
 install -m755 platforms/redhat/apcupsd $RPM_BUILD_ROOT%{initdir}
 %endif
 %if %{su9}
 install -m755 platforms/suse/apcupsd $RPM_BUILD_ROOT%{initdir}
 %endif
+%if %{mdk}
+install -m755 platforms/mandrake/apcupsd $RPM_BUILD_ROOT%{initdir}
+%endif
 
+%if ! %{mdk}
 rm $RPM_BUILD_ROOT%{initdir}/halt
 rm $RPM_BUILD_ROOT%{initdir}/halt.old
+%endif
 
 %if %{usb}
 install -m744 examples/hid-ups \
@@ -227,6 +235,7 @@ if [ "$1" -ge 1 ] ; then
 /sbin/chkconfig --add apcupsd
 fi
 
+%if ! %{mdk}
 cp -f %{initdir}/halt %{initdir}/halt.old
 awk '# Stuff left over from a previous apcupsd, remove it
 /^# See if this is a powerfail situation\./ {
@@ -254,6 +263,7 @@ awk '# Stuff left over from a previous apcupsd, remove it
 { print } ' %{initdir}/halt.old > %{initdir}/halt
 
 chmod 744 %{initdir}/halt
+%endif
 
 # Undo things a bit
 
@@ -266,7 +276,8 @@ if [ $1 = 0 ] ; then
 
         # remove startup links
         /sbin/chkconfig --del apcupsd
-
+	
+	%if ! %{mdk}
         # restore old halt script (hopefully)
         #   mv -f /etc/rc.d/init.d/halt.old /etc/rc.d/init.d/halt
 
@@ -282,6 +293,7 @@ if [ $1 = 0 ] ; then
         { print } ' %{initdir}/halt.old > %{initdir}/halt
 
         chmod 744 %{initdir}/halt
+	%endif
 fi
 
 %postun usb
@@ -326,6 +338,7 @@ if [ "$1" -ge 1 ] ; then
 /sbin/chkconfig --add apcupsd
 fi
 
+%if ! %{mdk}
 cp -f %{initdir}/halt %{initdir}/halt.old
 awk '# Stuff left over from a previous apcupsd, remove it
 /^# See if this is a powerfail situation\./ {
@@ -353,6 +366,7 @@ awk '# Stuff left over from a previous apcupsd, remove it
 { print } ' %{initdir}/halt.old > %{initdir}/halt
 
 chmod 744 %{initdir}/halt
+%endif
 
 # Undo things a bit
 
@@ -366,6 +380,7 @@ if [ $1 = 0 ] ; then
         # remove startup links
         /sbin/chkconfig --del apcupsd
 
+	%if ! %{mdk}
         # restore old halt script (hopefully)
         #   mv -f /etc/rc.d/init.d/halt.old /etc/rc.d/init.d/halt
 
@@ -381,6 +396,7 @@ if [ $1 = 0 ] ; then
         { print } ' %{initdir}/halt.old > %{initdir}/halt
 
         chmod 744 %{initdir}/halt
+	%endif
 fi
 
 %postun std
@@ -392,6 +408,8 @@ fi
 %endif
 
 %changelog
+* Sun Oct 31 2004 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- add Mandrake support
 * Wed Aug 04 2004 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - changed location of apcupsd.css to /etc/apcupsd from /etc/apcupsd/cgi
 - corrected typo introduced in SuSE configuration for initdir definition
