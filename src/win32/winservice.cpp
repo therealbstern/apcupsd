@@ -102,7 +102,7 @@ upsService::CurrentUser(char *buffer, UINT size)
           // Return "" as the name...
           if (strlen("") >= size)
                   return FALSE;
-          strcpy(buffer, "");
+          astrncpy(buffer, "", size);
 
           return TRUE;
        }
@@ -113,7 +113,7 @@ upsService::CurrentUser(char *buffer, UINT size)
           // Return "" as the name...
           if (strlen("") >= size)
                   return FALSE;
-          strcpy(buffer, "");
+          astrncpy(buffer, "", size);
           return TRUE;
        }
     }
@@ -136,7 +136,7 @@ upsService::CurrentUser(char *buffer, UINT size)
                        // No user logged on
                        if (strlen("") >= size)
                                return FALSE;
-                       strcpy(buffer, "");
+                       astrncpy(buffer, "", size);
                        return TRUE;
                } else {
                        // Genuine error...
@@ -547,7 +547,7 @@ upsService::InstallService()
 
         // Append the service-start flag to the end of the path:
         if ((int)strlen(path) + 20 + (int)strlen(ApcupsdRunService) < pathlength) {
-            sprintf(servicecmd, "\"%s\" %s", path, ApcupsdRunService);
+            asnprintf(servicecmd, sizeof(servicecmd), "\"%s\" %s", path, ApcupsdRunService);
         } else {
             MessageBox(NULL, "Apcupsd path too long to register service", "Service error", MB_OK);
             return 0;
@@ -638,7 +638,7 @@ upsService::InstallService()
 
               // Append the service-helper-start flag to the end of the path:
               if ((int)strlen(path) + 4 + (int)strlen(ApcupsdRunServiceHelper) < pathlength) {
-                 sprintf(servicehelpercmd, "\"%s\" %s", path, ApcupsdRunServiceHelper);
+                 asnprintf(servicehelpercmd, sizeof(servicehelpercmd), "\"%s\" %s", path, ApcupsdRunServiceHelper);
               } else {
                  MessageBox(NULL, "WARNING: Unable to install the ServiceHelper path too long", 
                     szAppName, MB_ICONEXCLAMATION | MB_OK);
@@ -875,7 +875,7 @@ void LogErrorMsg(char *message, int eventID)
     // Use event logging to log the error
     heventsrc = RegisterEventSource(NULL, UPS_SERVICENAME);
 
-    sprintf(msgbuff, "%s error: %ld", UPS_SERVICENAME, g_error);
+    asnprintf(msgbuff, sizeof(msgbuff), "%s error: %ld", UPS_SERVICENAME, g_error);
     strings[0] = msgbuff;
     strings[1] = message;
     strings[2] = msg;

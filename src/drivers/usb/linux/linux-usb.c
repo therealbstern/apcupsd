@@ -204,7 +204,7 @@ auto_detect:
     for (i=0; i<10; i++) {	      /* try 10 times */
        for (j=0; hiddev[j]; j++) {    /* loop over known device names */
 	   for (k=0; k<16; k++) {     /* loop over devices */
-              sprintf(devname, "%s%d", hiddev[j], k);
+              asnprintf(devname, sizeof(devname), "%s%d", hiddev[j], k);
 	      /* Open the device port */
 	      if ((my_data->fd = open(devname, O_RDWR | O_NOCTTY)) < 0) {
 		 continue;

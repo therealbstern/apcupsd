@@ -448,7 +448,7 @@ char *ups_status(int stat)
 
     if (!shm_OK) {
        battstat = 0;
-       strcpy(buf, "not initialized");
+       astrncpy(buf, "not initialized", sizeof(buf));
        return buf;
     }
       
@@ -462,7 +462,7 @@ char *ups_status(int stat)
        battstat = 100;
     else
        battstat = 0;
-    strcpy(buf, "Status not available");
+    astrncpy(buf, "Status not available", sizeof(buf));
     switch(ups->mode.type) {
     case BK:
     case SHAREBASIC:
@@ -470,9 +470,9 @@ char *ups_status(int stat)
     case BKPRO:
     case VS:
 	if (!is_ups_set(UPS_ONBATT)) {
-            strcpy(buf, "ONLINE");
+            astrncpy(buf, "ONLINE", sizeof(buf));
 	} else {
-            strcpy(buf, "ON BATTERY");
+            astrncpy(buf, "ON BATTERY", sizeof(buf));
 	}
 	break;
     case NBKPRO:
