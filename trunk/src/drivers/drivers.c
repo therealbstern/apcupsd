@@ -193,7 +193,7 @@ static UPSDRIVER *helper_attach_driver(UPSINFO *ups, char *drvname)
     ups->driver = NULL;
     for (i=0; drivers[i].driver_name; i++) {
         Dmsg1(99, "Driver %s is configured.\n", drivers[i].driver_name);
-	if (strcasecmp(drivers[i].driver_name, drvname) != 0) {
+	if (strcasecmp(drivers[i].driver_name, drvname) == 0) {
 	    ups->driver = &drivers[i];
             Dmsg1(20, "Driver %s found and attached.\n", drivers[i].driver_name);
 	    break;

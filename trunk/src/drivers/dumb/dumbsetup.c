@@ -86,11 +86,6 @@ int dumb_ups_open(UPSINFO *ups) {
 		ups->device, strerror(errno));
     }
 
-    if ((ups->fd = open(ups->device, O_RDWR | O_NOCTTY | O_NDELAY)) < 0) {
-        Error_abort2(_("Cannot open UPS port %s: %s\n"),
-		ups->device, strerror(errno));
-    }
-
     /* Cancel the no delay we just set */
     cmd = fcntl(ups->fd, F_GETFL, 0);
     fcntl(ups->fd, F_SETFL, cmd & ~O_NDELAY);
