@@ -31,7 +31,7 @@
 
 #include "apc.h"
 #include "hidutils.h"
-#include "usb_common.h"
+#include "../usb_common.h"
 #include <dev/usb/usb.h>
 #include <dev/usb/usbhid.h>
 
