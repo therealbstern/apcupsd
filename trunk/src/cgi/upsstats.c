@@ -345,12 +345,12 @@ int main()
          if (strcmp(answer, "Not found" )) {
              if (!strcmp(temps,"F")) {
 		tempf = (strtod (answer, 0) * 1.8) + 32;
-                printf ("     Amb. Temp.: %.1f F\n", tempf);
+                printf ("     Amb. Temp.: %.1f &deg;F\n", tempf);
              } else if (!strcmp(temps,"K")) {
 		tempf = (strtod (answer, 0)) + 273;
-                printf ("     Amb. Temp.: %.1f K\n", tempf);
+                printf ("     Amb. Temp.: %.1f &deg;K\n", tempf);
 	     } else {
-                printf ("     Amb. Temp.: %s C\n", answer);
+                printf ("     Amb. Temp.: %s &deg;C\n", answer);
 	     } 
 	 }
      }
@@ -373,9 +373,9 @@ int main()
               printf ("       <input type=hidden name=img2 value=%s>\n",img2s);
               printf ("       <input type=hidden name=img3 value=%s>\n",img3s);
               printf ("       <select onChange=\"document.form4.submit();return true\" name=temp>\n");
-              printf ("              <option value=\"C\">°C\n");
-              printf ("               <option selected value=\"F\">°F\n");
-              printf ("               <option value=\"K\">°K\n");
+              printf ("              <option value=\"C\">&deg;C\n");
+              printf ("               <option selected value=\"F\">&deg;F\n");
+              printf ("               <option value=\"K\">&deg;K\n");
 	  }
           if (!strcmp(temps,"K")) {
 	       tempf = (strtod (answer, 0)) + 273;
@@ -386,9 +386,9 @@ int main()
                printf ("       <input type=hidden name=img2 value=%s>\n",img2s);
                printf ("       <input type=hidden name=img3 value=%s>\n",img3s);
                printf ("       <select onChange=\"document.form4.submit();return true\" name=temp>\n");
-               printf ("              <option value=\"C\">°C\n");
-               printf ("               <option value=\"F\">°F\n");
-               printf ("               <option selected value=\"K\">°K\n");
+               printf ("              <option value=\"C\">&deg;C\n");
+               printf ("               <option value=\"F\">&deg;F\n");
+               printf ("               <option selected value=\"K\">&deg;K\n");
 	 }
          if ( ( !strcmp(temps,"F") || !strcmp(temps,"K") ) == 0) {
                printf ("       UPS Temp: %s \n</PRE>\n</TD>\n<TD>\n", answer);
@@ -398,9 +398,9 @@ int main()
                printf ("       <input type=hidden name=img2 value=%s>\n",img2s);
                printf ("       <input type=hidden name=img3 value=%s>\n",img3s);
                printf ("       <select onChange=\"document.form4.submit();return true\" name=temp>\n");
-               printf ("              <option selected value=\"C\">°C\n");
-               printf ("               <option value=\"F\">°F\n");
-               printf ("               <option value=\"K\">°K\n");
+               printf ("              <option selected value=\"C\">&deg;C\n");
+               printf ("               <option value=\"F\">&deg;F\n");
+               printf ("               <option value=\"K\">&deg;K\n");
 	 }
     }
 

@@ -163,10 +163,10 @@ void do_upstemp(char *monhost, char *suffix)
 
     if (getupsvar (monhost, "upstemp", upstemp, sizeof(upstemp)) > 0) {
 	if (use_celsius)
-            printf ("<TD BGCOLOR=\"#00FF00\">%s °C</TD>\n", upstemp); 
+            printf ("<TD BGCOLOR=\"#00FF00\">%s &deg;C</TD>\n", upstemp); 
 	else {
 	    tempf = (strtod(upstemp, 0) * 1.8) + 32;
-            printf ("<TD BGCOLOR=\"#00FF00\">%.1f °F</TD>\n", tempf); 
+            printf ("<TD BGCOLOR=\"#00FF00\">%.1f &deg;F</TD>\n", tempf); 
 	}
     } else {
         printf ("<TD CLASS=\"Empty\">-</TD>\n");
@@ -179,7 +179,7 @@ void do_upstempc(char *monhost, char *suffix)
     char    upstemp[64];
 
     if (getupsvar(monhost, "upstemp", upstemp, sizeof(upstemp)) > 0)
-        printf ("<TD BGCOLOR=\"#00FF00\">%s °C</TD>\n", upstemp); 
+        printf ("<TD BGCOLOR=\"#00FF00\">%s &deg;C</TD>\n", upstemp); 
     else
         printf ("<TD CLASS=\"Empty\">-</TD>\n");
 }
@@ -192,7 +192,7 @@ void do_upstempf(char *monhost, char *suffix)
 
     if (getupsvar(monhost, "upstemp", upstemp, sizeof(upstemp)) > 0) {
 	tempf = (strtod (upstemp, 0) * 1.8) + 32;
-        printf ("<TD BGCOLOR=\"#00FF00\">%.1f °F</TD>\n", tempf); 
+        printf ("<TD BGCOLOR=\"#00FF00\">%.1f &deg;F</TD>\n", tempf); 
     } else {
         printf ("<TD CLASS=\"Empty\">-</TD>\n");
     }
