@@ -403,7 +403,7 @@ this manual for more details.
         In this case, we recommend that you disable this timer by setting 
         <b>MINUTES -1</b> in your apcupsd.conf file.
         </dd>
-  < dt><a name="TIMEOUT"></a>TIMEOUT &nbsp;&nbsp; &lt;time in seconds&gt; 
+  <dt><a name="TIMEOUT"></a>TIMEOUT &nbsp;&nbsp; &lt;time in seconds&gt; 
         </dt><DD STYLE="margin-bottom: 0.2in">
         After a power failure, <b>apcupsd</b> will halt the system when TIMEOUT seconds
         have expired. A value of zero disables this timer.
@@ -501,7 +501,7 @@ One machine, the master, will have a serial port connection to the UPS, and
 the other machines, the slaves, will obtain their information via the network
 from the master.
 <p>
-<b>Note, as of version 3.10.x, the old master/slave code is by default turned off
+Note, as of version 3.10.x, the old master/slave code is by default turned off
 in the configuration. You must explicitly enable it by including a 
 <b>--enable-master-slave</b> option on your <b>./configure</b> command 
 before building the source.
