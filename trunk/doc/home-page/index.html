@@ -1,0 +1,234 @@
+<html>
+<head>
+<title>Apcupsd, a daemon for controlling APC UPSes</title>
+<meta name="Description" content="Bacula a network backup and restore program">
+<meta name="Keywords" content="Bacula, backup, restore, file backup">
+<meta name="Copyright" content="Copyright (C) 2000-2002 Kern Sibbald and John Walker">
+<meta name="Trademark" content="Bacula (R) is a registered trademark of Kern Sibbald and John Walker">
+</head>
+<body bgcolor="#ffffff" text="#000000" link="#333399" alink="#9999ff" vlink="#000066">
+<blockquote>
+<div align="center">
+ <img src="apcupsd.gif" ALT="Apcupsd" height="64" width="584">
+</div>
+<table width="100%" height="100%" border="0" cellspacing="0" cellpading="4" summary="">
+<tr> <td width="12%" bgcolor="#ffffff" valign="top">
+<font color="#0000ff" size="+2"><b>General</b></font><br>
+<a href="index.html">Apcupsd Home</a><br>
+<a href="manual/apcupsd.html">What is Apcupsd?</a><br>
+<a href="manual/configure.html#ConfigGeneral">Models and Cables</a><br>
+<a href="systems.html">Systems Supported</a><br>
+<a href="license.html">License</a><br>
+&nbsp;<br>
+<font color="#0000ff" size="+2"><b>Documentation</b></font><br>
+<a href="manual/index.html">Online Manual</a><br>
+<a href="manual/apcupsd.pdf">PDF Manual</a><br>
+&nbsp;<br>
+<font color="#0000ff" size="+2"><b>Support</b></font><br>
+<a href="lists.html">Email Lists</a><br>
+<a href="support.html">Support</a><br>
+<a href="bugs.html">Bug Reporting</a><br>
+&nbsp;<br>
+<font color="#0000ff" size="+2"><b>SourceForge</b></font><br>
+<a href="http://sourceforge.net/projects/apcupsd">Project Page</a><br>
+<a href="http://sourceforge.net/project/showfiles.php?group_id=54413">Download</a><br>
+<a href="http://sourceforge.net/cvs/?group_id=54413">CVS</a><br>
+</td>
+<td bgcolor="#ffffff"><font size="1">&nbsp;&nbsp;&nbsp;&nbsp;</font></td>
+<td bgcolor="#ffffff" valign="top">
+<H1>Apcupsd a daemon for controlling APC UPSes</H1>
+<P><B>Apcupsd </B>can be used for power mangement and controlling most
+of APC's UPS models on Unix and Windows machines. Apcupsd works with
+most of APC's Smart-UPS models as well as most simple signalling models
+such a Back-UPS, and BackUPS-Office. During a power failure,
+<B>apcupsd</B> will inform the users about the power failure and that a
+shutdown may occur. If power is not restored, a system shutdown will
+follow when the battery is exhausted, a timeout (seconds) expires, or
+runtime expires based on internal APC calculations determined by power
+consumption rates. Apcupsd is licensed under the GPL version 2.
+<p>
+<h2><a href="http://sourceforge.net/projects/apcupsd">
+Apcupsd Hosted on Source Forge</a></h2>
+<b>Apcupsd</b> is slowly moving to Source Forge for several
+reasons: 1. Lack of manpower to maintain several sites, 2. The
+excellent Open Software Development services offered by
+Source Forge. In addition to hosting all our new releases,
+the Source Forge site has a CVS repository where you can find
+the very latest development software. Please visit it and
+become familiar with how it works.
+<h2><a href="3.8manual/new_features_3_8_5.html">
+What is new in Apcupsd version 3.8.5</a></h2>
+<b>Apcupsd</b> version 3.8.5 includes a
+Battery Runtime Calibration command as part of
+apctest as well as a fix if you get a broken
+TCP connection.
+<h2><a href="3.8manual/index.html" target="_top">Online 3.8.5 Manual</a> or a
+<a href="3.8manual/apcupsd.pdf" target="_top">PDF Version of the Manual</a> </h2>
+If you want the very latest version of the manual, we recommend that you
+see the Online 3.10 manual below.
+If you want to learn a bit more about <b>apcupsd</b>, you can browse the
+<a href="3.8manual/index.html" target="_top">manual online</a>.
+If you have any corrections/comments to the manual, please send them to me at:
+kern at sibbald dot com. For bug reports and
+developer contact, please see below.
+If you want a pdf copy of the manual, you can find it
+<a href="3.8manual/apcupsd.pdf" target="_top">here</a>.
+<h2><a href="manual/index.html" target="_top">Online 3.10 Manual</a> or
+<a href="manual/apcupsd.pdf" target="_top">PDF Version of the Manual</a> </h2>
+This is the most current version of our manual, and it applies to our
+<a href="download/betaversions/" target="_top">
+beta software currently under development.</a>
+Generally the 3.8 Manual
+is no longer being updated, so if you want the very latest details, see
+this manual, but please be aware that a few of the features may not be
+applicable to release version 3.8.5.
+<h2><a href="/cgi-bin/multimon.cgi" target="_top">Apcupsd Network Information</a></h2>
+To see my Linux/Windows APC UPSes running with
+<b>apcupsd</b> in real-time, just
+<a href="/cgi-bin/multimon.cgi" target="_top">click here</a>.
+<h2><a href="3.8manual/bugs.html" target="_top">List of Bugs</a></h2>
+All known bugs have been corrected for version 3.8.5.
+<p>
+Although, you can always email me directly, it is much better to address
+bug reports and questions to the full developer's mailing list, which
+is at: <A href="mailto:apcupsd-devel@apcupsd.com">Apcupsd Mailing List</a>.
+In addition to a problem description, please include the following
+with any bug report you send: the
+apcupsd version that you are using; your operating system (uname -a); and if
+it involves configuration issues, your apcupsd.conf and apcupsd.events files.
+<h2>Release Notification and Developer Email List</h2>
+<p>If you want to be notified by email when new releases are available, please
+sign up for the apcupsd-announce mailing list. This is easily accomplished by
+following the instructions at:
+<a href="http://www.apcupsd.com/mailman/listinfo/apcupsd-announce">
+http://www.apcupsd.com/mailman/listinfo/apcupsd-announce</a>.
+<p>If you would like to receive the developer email, please visit the
+following site and follow the instructions:
+<a href="http://www.apcupsd.com/mailman/listinfo/apcupsd-devel">
+http://www.apcupsd.com/mailman/listinfo/apcupsd-devel</a>.
+<h2><a href="download" target="_top">Downloads Available Here</a></h2>
+<p>Version 3.8.5 of <b>apcupsd</b> is the current officially
+released version.
+<p class="indent">
+<table cellspacing="1" cellpadding="4" border="1" bgcolor="#FBFBFB" summary="">
+<tr align="center"> <td>Date</td> <td>Size</td> <td>Type</td> <td align="left">Release</td> <td align="left">Comments</td></tr>
+<tr><td>5-Jan-02</td> <td>1,979,485</td>  <td>HTTP</td> <td><a href="download/apcupsd-3.8.5.tar.gz">apcupsd-3.8.5.tar.gz</a></td>
+     <td>Official source release version 3.8.5</td></tr>
+<tr><td>5-Jan-02</td> <td>940,621</td>  <td>HTTP</td> <td><a href="download/apcupsd-3.8.5-1.i386.RH6.2.rpm">apcupsd-3.8.5-1.i386.RH6.2.rpm</a></td>
+     <td>RPM binaries for RedHat 6.2, should work on 6.0, 6.1, and 7.0</td></tr>
+<tr><td>5-Jan-02</td> <td>1,958,804</td>  <td>HTTP</td> <td><a href="download/apcupsd-3.8.5-1.src.RH6.2.rpm">apcupsd-3.8.5-1.src.RH6.2.rpm</a></td>
+     <td>RPM source for apcupsd-3.8.5 for RedHat 6.2 </td></tr>
+<tr><td>5-Jan-02</td> <td>945,510</td>  <td>HTTP</td> <td><a href="download/apcupsd-3.8.5-1.i386.RH7.1.rpm">apcupsd-3.8.5-1.i386.RH7.1.rpm</a></td>
+     <td>RPM binaries for RedHat 7.1 and probably 7.2 </td></tr>
+<tr><td>5-Jan-02</td> <td>1,980,201</td>  <td>HTTP</td> <td><a href="download/apcupsd-3.8.5-1.src.RH7.1.rpm">apcupsd-3.8.5-1.src.RH7.1.rpm</a></td>
+     <td>RPM source for apcupsd-3.8.5 for RedHat 7.1</td></tr>
+<tr><td>5-Jan-02</td> <td>1,218,736</td>  <td>HTTP</td> <td><a href="download/winapcupsd-3.8.5.tar.gz">winapcupsd-3.8.5.tar.gz</a></td>
+     <td>Zip binary release for Win32 systems (Win95/98/Me/NT/2000)</td></tr>
+<tr><td>various</td><td>various</td><td>HTTP</td><td><a href="download" target="_top">Download Directory</a><td>All available releases</td></tr>
+</table></p>
+<h3>MD5 Checksums</h3>
+<pre>
+     eb288ca039c7a55a15ba59deabd9b765  apcupsd-3.8.5-1.i386.RH6.2.rpm
+     2024c6b396c26c1c4f58e87a37f36318  apcupsd-3.8.5-1.i386.RH7.1.rpm
+     cca6ec1d52f7d9248d9c1ef6297514cc  apcupsd-3.8.5-1.src.RH6.2.rpm
+     ea8dc98cce39478d5e3532b9674cea12  apcupsd-3.8.5-1.src.RH7.1.rpm
+     0fc2fd41899d80ce8e482e3defa49bb2  apcupsd-3.8.5.tar.gz
+     09e76e0feef430dc313a4998c2b47d61  winapcupsd-3.8.5.tar.gz
+</pre>
+<h2>Official Stable Download Site</h2>
+<p>Version 3.8.5 of <b>apcupsd</b> is now released, and you can find the
+the source code at the official download site:
+<p class="indent">
+<table border="1" cellspacing="1" cellpadding="4" bgcolor="#FBFBFB" summary="">
+<tr align="center">
+    <td>Date</td>
+    <td>Size</td>
+        <td>Type</td>
+    <td align="left">Release</td><td align="left">Comments</td>
+</tr>
+<tr>
+    <td>4 Jan 02</td>
+    <td>1,979,485</td>
+        <td>FTP</td>
+    <td><a href="ftp://ftp.apcupsd.com/pub/apcupsd/stable/tar/apcupsd-3.8.5.tar.gz">
+                apcupsd-3.8.5.tar.gz</a></td><td>Current Official Release</td>
+</tr>
+<tr>
+    <td>various</td>
+    <td>various</td>
+        <td>FTP</td>
+    <td><a href="ftp://ftp.apcupsd.com/pub/apcupsd/">
+                ftp://ftp.apcupsd.com/pub/apcupsd/</a></td><td>Starting point for other releases</td>
+</tr>
+</table></p>
+<h2>Debian Users Stable Download</h2>
+The Debian packages for <b>apcupsd</b> may be obtained directly
+from the Debian site at:
+<p>
+<a href="http://packages.debian.org/stable/admin/apcupsd.html">
+http://packages.debian.org/stable/admin/apcupsd.html</a>
+<br>
+<a href="http://packages.debian.org/testing/admin/apcupsd.html">
+http://packages.debian.org/testing/admin/apcupsd.html</a>
+<br>
+<a href="http://packages.debian.org/unstable/admin/apcupsd.html">
+http://packages.debian.org/unstable/admin/apcupsd.html</a>
+<br>
+<h2><a href="download/betaversions" target="_top">Apcupsd Beta Versions</a></h2>
+Version 3.10.4 is available for testing. Please see the
+<a href="manual/index.html" target="_top">3.10 Online Manual</a> for more
+details.
+<h3>Beta MD5 Checksums</h3>
+<pre>
+     d8a6b89c049414cf2f7329eecea3129b  3.9.8-01Apr02.tar.gz
+     ce88b4aab76c596454308f7d88136634  apcupsd-3.9.1.tar.gz
+     1a1e016b63821335a4a408971c7f8e49  apcupsd-3.9.2.tar.gz
+     c21449b3eaed4ad4fcda8cb0cc361702  apcupsd-3.9.3.tar.gz
+     aff603f23edcce1748504a1ea2be7d7c  apcupsd-3.9.4.tar.gz
+     40ede3d9982927708f5cc8d9b125a321  apcupsd-3.9.8.tar.gz
+     e59b08e3950e33a0043a36625723f41e  apcupsd-3.9.9.tar.gz
+     28cdd54f6696e035ed6df7fcd4b03aa7  winapcupsd-3.9.8.tar.gz
+     9357c2cb7a029c87d9a39e5b4150a5a8  apcupsd-3.10.1.tar.gz
+     92cc35e74840fc809161db3c23f236d7  apcupsd-3.10.2.tar.gz
+     a346e4043fcac13911ab1c53031c9ae6  apcupsd-3.10.3.tar.gz
+     de7c2a9627c9b93d2dd52fa3968de2cb  apcupsd-3.10.4.tar.gz
+     7a297f0988345a21b0ee5a93cc15743a  winapcupsd-3.10.4.tar.gz
+</pre>
+<h2><a href="http://sourceforge.net/cvs/?group_id=54413">
+Testers/Developers CVS Repository</a></h2>
+This is where you can find the very latest
+source code at the official development
+CVS repository hosted by Source Forge.
+<p>
+<h2>Other Software for Apcupsd</h2>
+David Ranch has developed some very interesting graphing support for APC
+UPSes, which works with <b>apcupsd</b>. Using <b>apcupsd's</b> logging
+capabilities, David provides setup instructions and scripts to produce
+high quality, daily PDF graphs of all the important UPS power conditions.
+To learn more about this, please visit <a
+target="_top"
+href="http://www.ecst.csuchico.edu/~dranch/LINUX/TrinityOS/cHTML/TrinityOS-c-36.html">
+his site</a>.
+<p><p>
+<b>apcupsd</b> does not run on Macs, but
+if you have a Mac that derives power from a UPS being controlled by
+<b>apcupsd</b>, you can protect your Mac in the event of a power
+failure by using a commercial software package called APC Tracker. The
+software is available for a 30 day free trial. For more information,
+please see <a target="_top"
+href="http://www.apctracker.com">www.apctracker.com</a>.
+<h2>APC</h2>
+If you want to know more about APC products for protecting your computer,
+you can find it at the <a href="http://www.apc.com">APC Home Site</a>.
+        <p title="" align="LEFT" style="font-size: xx-small;">
+    Home: <A href="http://www.sibbald.com" target="_top">www.sibbald.com</a><br>
+    Contact: kern at sibbald dot com<br>
+        Last Update: <script language="JavaScript" src="/scripts/LastUpdate.js">
+        </script>
+   </p>
+</BODY>
+</HTML>
+</td>
+</blockquote>
+</body>
+</html>
