@@ -296,6 +296,7 @@ int snmp_ups_read_volatile_data(UPSINFO *ups)
 
     write_lock(ups);
 
+    ups->poll_time = time(NULL);	/* save time stamp */
     if (!strcmp(Sid->DeviceVendor, "APC")) {
 	ret = powernet_snmp_ups_read_volatile_data(ups);
     }

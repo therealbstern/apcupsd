@@ -225,7 +225,7 @@ static int open_usb_device(UPSINFO *ups)
     char devname[MAXSTRING];
     USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
     const char *hiddev[] = {"/dev/usb/hiddev", "/dev/usb/hid/hiddev", NULL};
-    int i, j;
+    int i, j, k;
 
     /*
      * If no device locating specified, we go autodetect it
@@ -271,23 +271,26 @@ static int open_usb_device(UPSINFO *ups)
      *	Internally, we use the fd in our own private space   
      */
     ups->fd = 1;
-    for ( ; start <= end; start++) {
-	sprintf(devname, name, start);
+    for (i=0; i<10; i++) {
+       for ( ; start <= end; start++) {
+	   sprintf(devname, name, start);
     
-	/* Open the device port */
-	if ((my_data->fd = open(devname, O_RDWR | O_NOCTTY)) < 0) {
-	   continue;
-	}
-	if (!find_usb_application(ups)) {
-	   close(my_data->fd);
-	   my_data->fd = -1;
-	   continue;
-	}
-	break;
-    }
-    if (my_data->fd >= 0) {
-       strcpy(ups->device, devname);
-       return 1;
+	   /* Open the device port */
+	   if ((my_data->fd = open(devname, O_RDWR | O_NOCTTY)) < 0) {
+	      continue;
+	   }
+	   if (!find_usb_application(ups)) {
+	      close(my_data->fd);
+	      my_data->fd = -1;
+	      continue;
+	   }
+	   break;
+       }
+       if (my_data->fd >= 0) {
+	  strcpy(ups->device, devname);
+	  return 1;
+       }
+       sleep(1);
     }
     /* If the above device specified by the user fails,
      *	fall through here and look in predefined places
@@ -302,21 +305,23 @@ static int open_usb_device(UPSINFO *ups)
  *
  */
 auto_detect:
-
-    for (i=0; hiddev[i]; i++) {
-	for (j=0; j<16; j++) {
-           sprintf(devname, "%s%d", hiddev[i], j);
-	   /* Open the device port */
-	   if ((my_data->fd = open(devname, O_RDWR | O_NOCTTY)) < 0) {
-	      continue;
+    for (i=0; i<10; i++) {	      /* try 10 times */
+       for (j=0; hiddev[j]; j++) {    /* loop over known device names */
+	   for (k=0; k<16; k++) {     /* loop over devices */
+              sprintf(devname, "%s%d", hiddev[j], k);
+	      /* Open the device port */
+	      if ((my_data->fd = open(devname, O_RDWR | O_NOCTTY)) < 0) {
+		 continue;
+	      }
+	      if (!find_usb_application(ups)) {
+		 close(my_data->fd);
+		 my_data->fd = -1;
+		 continue;
+	       }
+	       goto auto_opened;
 	   }
-	   if (!find_usb_application(ups)) {
-	      close(my_data->fd);
-	      my_data->fd = -1;
-	      continue;
-	    }
-	    goto auto_opened;
-	}
+       }
+       sleep(1);		      /* wait a bit */
     }
 
 auto_opened:

@@ -40,11 +40,11 @@ The simplest way to compile this package is:
 
   4. Type `make install' to install the programs and any data files and
      documentation. If you have a previously installed version of this
-	 package, it is advisable to issue a `make uninstall' before doing
-	 the installation. This will clean the halt.local script for suse
-	 and any other old halt script for other distributions. We can not
-	 guarantee a good behaviour of the software if you install a new
-	 version over an older one without prior uninstall the older one.
+         package, it is advisable to issue a `make uninstall' before doing
+         the installation. This will clean the halt.local script for suse
+         and any other old halt script for other distributions. We can not
+         guarantee a good behaviour of the software if you install a new
+         version over an older one without prior uninstall the older one.
 
   5. You can remove the program binaries and object files from the
      source code directory by typing `make clean'.  
@@ -208,8 +208,11 @@ For RedHat 6.0 users, some useful configure options are:
       --disable-nls --enable-threads --enable-http
 
 
-Customization of apcupsd actions
+Customization of apcupsd events 
 ================================
+
+Note, this is somewhat out of date, please check the installed
+apccontrol script for exact details of these events.
 
 When apcupsd detects anomalies from your UPS device, it will make some
 decisions that usually result in one or more calls to the script located
@@ -227,13 +230,14 @@ can recognize are:
 ============  ==============================================================
 `powerout'     `wall' a message telling `There are power problems'.
 `onbattery'    `wall' a message telling `System is on battery'.
+`offbattery'   None  
+`mainsback'    Attempt to cancel a running `shutdown' sequence.
 `failing'      `wall' a message telling `Battery power is failing'.
 `timeout'      `wall' a message telling `Timeout on Battery reached'.
 `loadlimit'    `wall' a message telling `Battery load limit reached'.
 `runlimit'     `wall' a message telling `Battery runtime limit reached'.
 `doreboot'     Begins the `shutdown -r' sequence.
 `doshutdown'   Begins the `shutdown -h' sequence.
-`mainsback'    Attempt to cancel a running `shutdown' sequence.
 `annoyme'      `wall' a message telling `Power problems, logoff now'.
 `emergency'    Begins an emercengy `shutdown' sequence.
 `changeme'     `wall' a message telling `Battery failed, change them now'.
