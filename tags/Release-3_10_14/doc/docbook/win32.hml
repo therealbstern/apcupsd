@@ -1,0 +1,666 @@
+<chapter><title>The Windows Version of <application>apcupsd</application></title>
+
+<para>The Windows version of <application>apcupsd</application> has
+been tested on Win95, Win98, WinMe, WinNT, WinXP, and Win2000
+systems. This version of <application>apcupsd</application> has been
+built to run under the CYGWIN environment, which provides many of the
+features of Unix on Windows systems. It also permitted a rapid port
+with very few source code changes, which means that the Windows
+version is for the most part running code that has long proved stable
+on Unix systems. Even though the Win32 version of
+<application>apcupsd</application> is a port that relies on many Unix
+features, it is just the same a true Windows program. When running, it
+is perfectly integrated with Windows and displays its icon in the
+system icon tray, and provides a system tray menu to obtain additional
+information on how <application>apcupsd</application> is running
+(status and events dialogue boxes). If so desired, it can also be
+stopped by using the system tray menu, though this should normally
+never be necessary.</para>
+
+<para>Once installed <application>apcupsd</application> normally runs
+as a system service.  This means that it is immediately started by the
+operating system when the system is booted, and runs in the background
+even if there is no user logged into the system.</para>
+
+<sect1><title>Installation</title>
+
+<para>Normally, you will install the Windows version of
+<application>apcupsd</application> from the binaries. This install is
+somewhat Unix like since you do many parts of the installation by
+hand. To install the binaries, you need <emphasis
+role="bold">WinZip</emphasis>.</para>
+
+<itemizedlist>
+<listitem>
+  <para>Simply double click on the
+  <filename>winapcupsd-3.8.5.tar.gz</filename> icon.  The actual name
+  of the icon will vary from one release version to another.</para>
+
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="wininstall3.png" depth="299" width="254"/>
+      </imageobject>
+    </mediaobject>
+  </listitem>
+  <listitem>
+    
+  <para>When Zip says that it has one file and asks if it should unpack
+  it into a temporary file, respond with <emphasis
+  role="bold">Yes</emphasis>.</para>
+
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="wininstall4.png" depth="152" width="374"/>
+      </imageobject>
+    </mediaobject>
+  </listitem>
+  <listitem>
+    
+  <para>Ensure that you extract all files and that the extraction will
+  go into <filename>C:\</filename></para>
+
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="wininstall5.png" depth="246" width="486"/>
+      </imageobject>
+    </mediaobject>
+  </listitem>
+</itemizedlist>
+
+<para>If you wish to install the package elsewhere, please note that you
+will need to proceed with a manual installation, which is not
+particularly easy as you must rebuild the source and change the
+configuration file as well.</para>
+
+<para>This installation assumes that you do <emphasis
+role="bold">not</emphasis> have CYGWIN installed on your computer. If
+you do, and you use mount points, you may need to do a special manual
+installation.</para>
+
+<para>Once you have unzipped the binaries, open a window pointing to
+the binary installation folder (normally
+<filename>c:\apcupsd</filename>). This folder should contain folders
+with the name bin, etc, examples, and manual. If and when you no
+longer need them, the examples and manual sub-folders of the
+<filename>c:\apcupsd</filename> directory may be removed.</para>
+
+<para>Continuing the installation process:</para>
+<itemizedlist>
+  <listitem>
+    <para>Open the directory <filename>c:\apcupsd\etc\apcupsd</filename>
+    in the Windows Explorer by Clicking on the apcupsd folder then on the
+    <filename>etc</filename> folder, then on the apcupsd folder. Finally
+    double click on the file <filename>apcupsd.conf</filename> and edit it
+    to contain the values appropriate for your site. In most cases, no
+    changes will be needed, but if you are not using COM1 for your serial
+    port, you will need to set the <emphasis role="bold">DEVICE</emphasis>
+    configuration directive to the correct serial port. Note, if you are
+    using WinNT or Win2000, the operating system may probe the port
+    attempting to attach a serial mouse. This will cause
+    <application>apcupsd</application> to be unable to communicate with
+    the serial port. If this happens, or out of precaution, you can edit
+    the <filename>c:\boot.ini</filename> file. Find the line that looks
+    something like the following:</para>
+
+    <para>multi(0)disk(0)rdisk(0)partition(1)\WINNT=&quot;Windows NT
+    Workstation Version 4.00&quot;</para>
+
+    <para>and add the following to the end of the line: /NoSerialMice:COM1
+    (or COM2 depending on what you want to use). The new line should
+    look similar to:</para>
+
+    <para>multi(0)disk(0)rdisk(0)partition(1)\WINNT=&quot;Windows NT
+    Workstation Version 4.00&quot; /NoSerialMice:COM1</para>
+
+    <para>where the only thing you have changed is to append to the end of
+    the line. This addition will prevent the operating system from
+    interferring with <application>apcupsd</application></para>
+  </listitem>
+  <listitem> 
+    <para>Then return to <filename>c:\apcupsd</filename> and open on the
+    <filename>bin</filename> folder so that you see its contents.</para>
+  </listitem>
+  <listitem>
+    <para>To do the final step of installation, double click on the
+    <filename>setup.bat</filename> program. This script will setup the
+    appropriate mount points for the directories that
+    <application>apcupsd</application> uses, it will install
+    <application>apcupsd</application> in the system registry, and on
+    Windows 98, it will start <application>apcupsd</application>
+    running.</para>
+
+    <para>If everything went well, you will get something similar to the
+    following output in a DOS shell window:</para>
+
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="wininstall1.png" depth="359" width="652"/>
+      </imageobject>
+    </mediaobject>
+
+    <para>What is important to verify in the DOS window is that the root
+    directory <filename>\</filename> is mounted on device
+    <filename>c:\</filename>.</para>
+
+    <para>The DOS window will be followed immediately by a Windows
+    dialogue box as follows:</para>
+
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="wininstall2.png" depth="139" width="324"/>
+      </imageobject>
+    </mediaobject>
+  </listitem>
+  <listitem>
+    <para>On Windows 98, to actually start the service, either reboot the
+    machine, which is not necessary, or open a DOS shell window, and
+    type the following commands:</para>
+
+    <programlisting>
+    cd c:\apcupsd\bin
+    apcupsd /service
+    </programlisting>
+
+    <para>Alternatively, you can go to the
+    <filename>c:\apcupsd\bin</filename> folder with the Explorer and
+    double click on the <emphasis role="bold">Start</emphasis>
+    icon.</para>
+  </listitem>
+  <listitem>
+    <para>On Windows NT, to start the service, either reboot the machine,
+    which is not necessary, or go to the Control Panel, open the Services
+    folder and start the <application>apcupsd</application> daemon program
+    by selecting the <application>apcupsd</application> UPS Server and
+    then clicking on the Start button as shown below:</para>
+    <mediaobject>
+      <imageobject>
+        <imagedata fileref="wininstall6.png" depth="339" width="672"/>
+      </imageobject>
+    </mediaobject>
+    <para>If the Services dialog reports a problem, it is normally
+    because your DEVICE statement does not contain the correct serial
+    port name.</para>
+  </listitem>
+</itemizedlist>
+
+<para>You probably should also click on the <emphasis
+role="bold">Startup...</emphasis> button to ensure that the correct
+defaults are set. The dialogue box that appears should have <emphasis
+role="bold">Startup Type</emphasis> set to <emphasis
+role="bold">Automatic</emphasis> and <emphasis
+role="bold">Logon</emphasis> should be set to <emphasis
+role="bold">System Account</emphasis> with <emphasis role="bold">Allow
+Service to Interact with Desktop</emphasis> checked. If these values
+are not set correctly by default, please change them otherwise
+<application>apcupsd</application> will not work.</para>
+
+<para>For WinXP systems (and probably Win2K), the dialogs are a bit
+different from those shown here for WinNT, but he concept is the
+same. You get to the Services dialog by clicking on: <emphasis
+role="bold">Control Panel -&gt; Administrative Tools -&gt; Component
+Services</emphasis>. The <application>apcupsd</application> service
+should appear in the right hand window when you click on <emphasis
+role="bold">Services (Local)</emphasis> in the left hand menu
+window.</para>
+
+<para>That should complete the installation process. When the system
+tray icon turns from a battery
+<inlinemediaobject><imageobject><imagedata fileref="onbatt.png"
+depth="16" width="16"/></imageobject></inlinemediaobject> into a plug
+<inlinemediaobject><imageobject><imagedata fileref="online.png"
+depth="16" width="16"/></imageobject></inlinemediaobject>, right click
+on it and a menu will appear. Select the <emphasis
+role="bold">Events</emphasis> item, and the Events dialogue box should
+appear. There should be no error messages. By right clicking again on
+the system tray plug and selecting the <emphasis
+role="bold">Status</emphasis> item, you can verify that all the values
+for your UPS are correct.</para>
+
+<para>When the UPS switches to the battery, the battery icon will
+reappear in the system tray. While the UPS is online, if the battery
+is not at least 99% charged, the plug icon will become a plug with a
+lightning bolt in the middle
+<inlinemediaobject><imageobject><imagedata fileref="charging.png"
+depth="16" width="16"/></imageobject></inlinemediaobject> to indicate
+that the battery is charging.</para> 
+
+</sect1>
+<sect1><title>Installation Directory</title>
+
+<para>The Win32 version of <application>apcupsd</application> must
+reside in the <filename>c:\apcupsd\</filename> directory, and there
+must be a <filename>c:\tmp</filename> directory on your machine. The
+installation will do this automatically, and we recommend that you do
+not attempt to place <application>apcupsd</application> in another
+directory. If you do so, you are on your own, and you will need to do
+a rebuild of the source.</para> </sect1>
+<sect1><title>Testing</title>
+
+<para>It would be hard to overemphasize the need to do a full testing
+of your installation of <application>apcupsd</application> as there
+are a number of reasons why it may not behave properly in a real power
+failure situation.</para>
+
+<para>Please read <xref linkend="testing"/> of
+this document for general instructions on testing the Win32
+version. However, on Win32 systems, there is no Unix system log
+file, so if something goes wrong, look in the file
+<filename>c:\apcupsd\etc\apcupsd\apcupsd.events</filename> where apcupsd
+normally logs its events, and you will generally find more detailed
+information on why the program is not working. The most common
+cause of problems is either improper configuration of the cable
+type, or an incorrect address for the serial port.</para>
+
+</sect1>
+<sect1><title>Upgrading</title>
+
+<para>On Win98 and Win95 systems, to upgrade to a new release, simply
+stop <application>apcupsd</application> by using the tray icon and
+selecting the <emphasis role="bold">Close
+<application>apcupsd</application></emphasis> menu item, or by double
+clicking on the <emphasis role="bold">Stop</emphasis> icon located in
+the <filename>c:\apcupsd\bin</filename> directory, then apply the
+upgrade and restart <application>apcupsd</application>.</para>
+
+<para>On WinNT systems (and Win2000 systems), you may stop
+<application>apcupsd</application> as indicated abover or
+alternatively you may stop <application>apcupsd</application> by using
+the <emphasis role="bold">Services</emphasis> item in the <emphasis
+role="bold">Control Panel</emphasis>. In addition, at least on my
+system, there seems to be a WinNT bug that causes the system to
+prevent <emphasis role="bold">apcupsd.exe</emphasis> from being
+overwritten even though the file is no longer being used.  This is
+manifested by an error message when attempting load a new version and
+overwrite the old <application>apcupsd.exe</application> (the extract
+part of WinZip as described above). To circumvent this problem (if it
+happens to you), after shutting down the running version of
+<application>apcupsd</application>, through the <emphasis
+role="bold">Services</emphasis> dialogue in the <emphasis
+role="bold">Control Panel</emphasis>, first click on the <emphasis
+role="bold">Stop button</emphasis>:</para>
+
+<mediaobject>
+  <imageobject>
+    <imagedata fileref="wininstall6.png" depth="339" width="672"/>
+  </imageobject>
+</mediaobject>
+
+<para>then click on the <emphasis role="bold">Startup ...</emphasis>
+button, and in the Startup dialogue select the <emphasis
+role="bold">Disabled</emphasis> button to disable
+<application>apcupsd</application>:</para>
+
+<mediaobject>
+  <imageobject>
+    <imagedata fileref="wininstall7.png" depth="405" width="382"/>
+  </imageobject>
+</mediaobject>
+
+<para>After closing the dialogues, reboot the system, typical of
+Microsoft :-(. When the system comes back up,
+<application>apcupsd</application> will not be automatically launched
+as a service, and you can install the new version. To reinstate
+<application>apcupsd</application> as an automatic service, using the
+<emphasis role="bold">Control Panel</emphasis>: reset
+<application>apcupsd</application> to <emphasis
+role="bold">Automatic</emphasis> startup in the Startup dialogue, then
+restart <application>apcupsd</application> in the <emphasis
+role="bold">Services</emphasis> dialogue as shown above in the
+installation instructions. Frequently after an upgrade, you will click
+on the <emphasis role="bold">Start</emphasis> button and after a few
+seconds, the system reports that it failed to start. The cause of this
+problem is unknown, but the solution is simply to click again on the
+<emphasis role="bold">Start</emphasis> button.</para> </sect1>
+<sect1><title>Post
+Installation</title>
+
+<para>After installing <application>apcupsd</application> and before
+running it, you should check the contents of two files to ensure that
+it is configured properly for your system. The first is
+<filename>c:\apcupsd\etc\apcupsd\apcupsd.conf</filename>. You will
+probably need to change your UPSCABLE directive, your UPSTYPE and
+possibly your DEVICE directives. Please refer to the configuration
+section of this manual for more details.</para>
+
+<para>The second file that you should examine is
+<filename>c:\apcupsd\etc\apcupsd\apccontrol</filename>. This file is
+called by <application>apcupsd</application> when events (power loss,
+etc) are generated. It permits the user to program handling the
+event. In particular, it permits the user to be notified of the
+events. For the Win32 version, each event is programmed to display a
+Windows popup dialogue box. If your machine is mostly unattended, you
+may want to comment out some of these popup dialogue boxes by putting
+a pound sign (#) in column one of the appropriate line.</para>
+
+</sect1>
+<sect1><title>Problem Areas</title>
+
+<para>In addition to possible problems of reinstallation or upgrade on
+WinNT systems, as noted above, we have discovered the following
+problem: On some Windows systems, the domain resolution does not seem
+to work if you have not configured a DNS server in the Network section
+of the Control Panel. This problem should be apparent only when
+running a master or a slave configuration. In this case, when you
+specify the name of the master or the slave machine(s) in your
+<filename>apcupsd.conf</filename> file, apcupsd will be unable to
+resolve the name to a valid IP address. To circumvent this problem,
+simply enter all machine addresses as an IP address rather than a
+domain name, or alternatively, ensure that you have a valid DNS server
+configured on your system (often not the case on Win32 systems).  For
+example, instead of using the directive &quot;MASTER
+my.master.com&quot; use something like &quot;MASTER 192.168.1.54&quot;
+where you replace the IP address with your actual IP address.</para>
+
+<para>Also, on WinNT systems, the PIF files in
+<filename>/apcupsd/bin</filename> used for starting and stopping
+<application>apcupsd</application> do not work. Use the services
+control panel instead.</para>
+
+<para>On Win95 systems, there are reports that the PIF files do not
+work. If you find that to be the case, the simplest solution is to use
+the batch files that we have supplied in the
+<filename>c:/apcupsd/bin</filename> directory. Also, on Win95 systems,
+we have an unconfirmed report that indicates that
+<application>apcupsd</application> does not start automatically as a
+service even though the Registry has been properly updated. If you
+experience this problem, a work around is to put a shortcut to
+<application>apcupsd</application> in the StartUp folder.</para>
+
+<para>As noted above, after an upgrade, you may need to start
+<application>apcupsd</application> several times before it will
+actually run.</para>
+
+<para>On WinNT, WinXP, and Win2K systems, you can examine the System
+Applications log to which <application>apcupsd</application> writes
+Windows error messages during startup.</para>
+
+<para>Regardless of which Windows system you are running,
+<application>apcupsd</application> logs most error messages to
+<filename>c:\apcupsd\etc\apcupsd\apcupsd.events</filename>. This type
+error messages such as configuration file not found, etc are written
+to this file.</para>
+
+</sect1>
+<sect1><title>Utility Functions</title>
+
+<para>The directory <filename>c:\apcupsd\bin</filename> contains six
+utility routines (actually .pif files) that you may find useful. They
+are:</para>
+
+<programlisting>
+Start
+Stop
+Install
+Uninstall
+ups-events
+ups-status
+</programlisting>
+
+<para>Any of these utilities may be used on any system, with the
+exception of the Start utility, which cannot be used on WinNT and
+Win2000 systems. On those systems, the apcupsd service must always be
+started through the <emphasis role="bold">Services</emphasis>
+sub-dialogue of the <emphasis role="bold">Control
+Panel</emphasis>.</para>
+
+<para>The <emphasis role="bold">Install</emphasis> and <emphasis
+role="bold">Uninstall</emphasis> utilities install and uninstall
+apcupsd from the system registry only. All other pieces (files) of
+apcupsd remain intact. It is not absolutely necessary for apcupsd to
+be installed in the registry as it can run as a regular
+program. However, if it is not installed in the registry, it cannot be
+run as a service.</para>
+
+<para>The functions of <emphasis role="bold">Stop</emphasis>,
+<emphasis role="bold">ups-events</emphasis>, and <emphasis
+role="bold">ups-status</emphasis> can be more easily invoked by right
+clicking on the apcupsd icon in the system tray and selecting the
+desired function from the popup menu.</para>
+
+</sect1>
+<sect1><title>Disclaimer</title>
+
+<para>Some of the features such as EEPROM programming have not been
+exhaustively tested on Win32 systems. If at all possible, we
+recommend not to use it as a network master on Win95, Win98, and
+WinMe due to the instability of those operating systems.</para>
+
+<para>Some items to note:</para>
+
+<itemizedlist>
+  <listitem>    
+    <para>This version of apcupsd will not attempt to shut off the
+    UPS power when the battery is exhausted. Thus if the power returns
+    before the UPS completely shuts down, your computer may not reboot
+    automatically. This is because we do not know how to regain control
+    after the disks have been synced in order to shut off the UPS
+    power.</para>
+
+    <para>Nevertheless, it is possible to use the
+    <option>--kill-on-powerfail</option> option on the apcupsd command
+    line, but the use of this option could cause the power to be cut
+    off while your machine is still running. See <xref
+    linkend="shutdown"/> of this document for a more complete
+    discussion of this subject. If you are still interested in trying
+    to get this to work, please look at the code that is commented out
+    in <filename>c:\apcupsd\etc\apcupsd\apccontrol</filename> under
+    the <emphasis role="bold">doshutdown</emphasis> case.</para>
+
+    <para>An alternative to the <option>--kill-on-powerfail</option>
+    option is to use the <link linkend="KILLDELAY">KILLDELAY</link>
+    configuration directive.</para>
+
+    <para>This configuration directive is appropriate on Windows machines
+    where apcupsd continues to run even when the machine is
+    halted (as is the case on most NT machines).</para>
+  </listitem>
+  <listitem>
+    <para>When apcupsd detects important events, it calls
+    <filename>c:\apcupsd\etc\apcupsd\apccontrol</filename>, which is a
+    Unix shell script. You may modify this script to suit your
+    particular needs.  Currently, it puts a Windows dialogue on the
+    screen with a brief explanation of the event. If these dialogues
+    annoy you, you can remove or comment out the calls to <emphasis
+    role="bold">popup</emphasis> from this file.</para>
+  </listitem>
+</itemizedlist>
+
+</sect1>
+<sect1><title>Email Notification of Events</title>
+
+<para>On Win95/98 systems, it is possible to receive notification of
+apcupsd events that are passed to
+<application>apccontrol</application>. This is possible using a simple
+email program that unfortunately is not functioning 100% correctly. In
+addition, I (Kern) was not able to make this program work on WinNT
+while apcupsd is running as a service under the system account (it
+works fine with any user account).</para>
+
+<para>If you wish to try this program on Win95/98 systems, look at the
+files named <emphasis role="bold">changeme, commfailure, commok,
+onbattery, and mainsback</emphasis> in the directory
+<filename>c:\apcupsd\examples</filename>. To use them, you must modify
+the SYSADMIN variable to have a valid email address, then copy the
+files into the directory
+<filename>c:\apcupsd\etc\apcupsd</filename>.</para>
+
+</sect1>
+<sect1><title>Killpower under Windows</title>
+
+<para>If your batteries become exhausted during a power failure and
+you want your machine to automatically reboot when the power comes
+back, it is useful to implement the
+<application>killpower</application> feature of the UPS where apcupsd
+sends the UPS the command to shut off the power.  In doing so, the
+power will be cut to your PC and if your BIOS is properly setup, the
+machine will automatically reboot when the power comes back. This is
+important for servers.</para>
+
+<para>This feature is implemented on Unix systems by first requesting
+a system shutdown. As a part of the shutdown, apcupsd is terminated
+by the system, but the shutdown process executes a script where
+apcupsd is recalled after the disks are synced and the machine is
+idle. Bacula then requests the UPS to shut off the power
+(killpower).</para>
+
+<para>Unfortunately on Windows, there is no such shutdown script that
+we are aware of and no way for apcupsd to get control after the
+machine is idled. If this feature is important to you, it is
+possible to do it by telling apcupsd to immediately issue the
+killpower command after issuing the shutdown request. The danger in
+doing so is that if the machine is not sufficiently idled when the
+killpower takes place, the disks will need to be rescanned (and
+there is a possibility of lost data however small). Generally,
+UPSes have a shutdown grace period which gives sufficient time for
+the OS to shutdown before the power is cut.</para>
+
+<para>To implement this feature, you need to add the
+<option>-p</option> option to the apcupsd command line that is
+executed by the system.  Currently the procedure is manual. You do so
+by editing the registry and changing the line:</para>
+
+<programlisting>
+c:\apcupsd\apcupsd.exe /service
+</programlisting>
+
+<para>found under the key:</para>
+
+<programlisting>
+HKEY_LOCAL_MACHINE Software\Microsoft\Windows\CurrentVersion\RunServices
+</programlisting>
+
+<para>to</para>
+
+<programlisting>
+c:\apcupsd\apcupsd.exe /service -p
+</programlisting>
+
+<para>If you have a Smart UPS, you can configure the kill power grace
+period, and you might want to set it to 3 minutes. If you have a
+dumb UPS, there is no grace period and you should not use this
+procedure. If you have a Back-UPS CS or ES, these UPSes generally
+have a fixed grace period of 2 minutes, which is probably
+sufficient.</para>
+
+</sect1>
+<sect1><title>Power Down During Shutdown</title>
+
+<para>Our philosophy is to shutdown a computer but not to power it down
+itself (as opposed to having the UPS cut the power as described
+above). That is we prefer to idle a computer but leave it running.
+This has the advantage that in a power fail situation, if the
+killpower function described above does not work, the computer will
+continue to draw down the batteries and the UPS will hopefully
+shutoff before the power is restore thus permitting an automatic
+reboot. </para>
+
+<para>Nevertheless some people prefer to do a full power down. To do
+so, you might want to get a copy of PsShutdown, which does have a
+power down option. You can find it and a lot more useful software at:
+<ulink
+url="http://www.sysinternals.com/ntw2k/freeware/pstools.shtml">http://www.sysinternals.com/ntw2k/freeware/pstools.shtml</ulink>.
+to use their shutdown program rather than the apcupsd supplied
+version, you simply edit:</para>
+
+<programlisting>
+c:\apcupsd\etc\apcupsd\apccontrol
+</programlisting>
+
+<para>with any text editor and change our calls to shutdown to
+psshutdown.</para>
+</sect1>
+<sect1><title>Command Line Options Specific to the Windows Version</title>
+
+<para>These options are not normally seen or used by the user, and are
+documented here only for information purposes. At the current time,
+to change the default options, you must either manually run
+apcupsd or you must manually edit the system registry and
+modify the appropriate entries.</para>
+
+<para>In order to avoid option clashes between the options necessary
+for apcupsd to run on Windows and the standard
+apcupsd options, all Windows specific options are signaled
+with a forward slash character (/), while as usual, the standard
+apcupsd options are signaled with a minus (-), or a minus
+minus (--). All the standard apcupsd options can be used on
+the Windows version. In addition, the following Windows only
+options are implemented:</para>
+
+<variablelist>
+  <varlistentry>
+    <term>/servicehelper</term>
+    <listitem>
+      <para>Run the service helper application</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>/service</term>
+    <listitem>
+      <para>Start apcupsdas a service</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>/run</term>
+    <listitem>
+      <para>Run the apcupsd application</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>/install</term>
+    <listitem>
+      <para>Install apcupsd as a service in the system registry</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>/remove</term>
+    <listitem>
+      <para>Uninstall apcupsd from the system registry</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>/about</term>
+    <listitem>
+      <para>Show the apcupsd about dialogue box</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>/status</term>
+    <listitem>
+      <para>Show the apcupsd status dialogue box</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>/events</term>
+    <listitem>
+      <para>Show the apcupsd events dialogue box</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>/kill</term>
+    <listitem>
+      <para>Stop any running apcupsd</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>/help</term>
+    <listitem>
+      <para>Show the apcupsd help dialogue box</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+
+<para>It is important to note that under normal circumstances the user
+should never need to use these options as they are normally handled
+by the system automatically once apcupsd is installed.
+However, you may note these options in some of the .pif files that
+have been created for your use.</para>
+
+</sect1>
+<sect1><title>Building the Win32 Version from the Source</title>
+
+<para>If you have the source code, follow the standard procedures for
+building <application>apcupsd</application> on Unix in <xref
+linkend='build_install'/> of this manual. Please don't forget to look
+at the system specifics for CYGWIN.</para>
+</sect1>
+</chapter>
