@@ -69,11 +69,11 @@ install-binary: $(allexe)
 	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(sbindir)
 	@$(INSTALL_PROGRAM) -s -m 700 apcupsd@EXEEXT@ \
 		$(DESTDIR)$(sbindir)/apcupsd@EXEEXT@
-	@$(MAKE) install-@APCNISD@
-	@$(MAKE) install-@APCACCESS@
-	@$(MAKE) install-@SMTP@
-	@$(MAKE) install-@POWERFLUTE@
-	@$(MAKE) install-@CGI@
+	@$(MAKE) DESTDIR=$(DESTDIR) install-@APCNISD@
+	@$(MAKE) DESTDIR=$(DESTDIR) install-@APCACCESS@
+	@$(MAKE) DESTDIR=$(DESTDIR) install-@SMTP@
+	@$(MAKE) DESTDIR=$(DESTDIR) install-@POWERFLUTE@
+	@$(MAKE) DESTDIR=$(DESTDIR) install-@CGI@
 
 install-apcaccess:
 	@$(INSTALL_PROGRAM) -s -m 755 apcaccess@EXEEXT@ \
@@ -91,7 +91,7 @@ install-powerflute:
 	@$(INSTALL_PROGRAM) -s -m 755 powerflute@EXEEXT@ \
 		$(DESTDIR)$(sbindir)/powerflute@EXEEXT@
 install-cgi:
-	(cd cgi/; $(MAKE) install)
+	(cd cgi/; $(MAKE) DESTDIR=$(DESTDIR) install)
 
 uninstall:
 	@$(ECHO) "Removing daemons ..."

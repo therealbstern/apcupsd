@@ -165,7 +165,7 @@ you run the risk of having the computer power cut before the system
 has shutdown. Even if the grace period is rather long, if something
 goes wrong in the shutdown, well, it is up to you to decide.
 
-<h2>Automatic Reboot of your Computer after a Power Shutdown</h2>
+<h2><a name="AutoReboot"></a>Automatic Reboot of your Computer after a Power Shutdown</h2>
 If <b>apcupsd</b> has successfully shutdown your computer and powered off the
 UPS during a power outage, you can control whether or not your computer
 is automatically rebooted when the power returns. 
@@ -206,6 +206,18 @@ Although <b>Last State</b> should normally work, I set my computers to
 on.  The only way to shut them off is to pull the plug or to have a
 special program that powers them off (<b>/sbin/poweroff</b> on Linux
 systems).
+<p>If after making all the changes suggested above, you cannot get your
+computer to automatically reboot, you might examine your 
+halt script (<b>/etc/rc.d/init.d/halt</b> in the case of RedHat Linux) 
+and see if the final line that performs the halt or reboot contains
+the <b>-p</b> option for powering down the computer. It should not
+with the logic used by <b>apcupsd</b>, but if it does, the <b>-p</b>
+option could cause your computer to power off while the UPS is
+still suppling power (i.e. before the UPS kills the power). Depending
+on the setting of your BIOS, it may prevent your computer from
+restarting when the power returns.  As already mentioned, this
+*should* not apply, but in case of problems it is worth a try.
+    
 
 <h2>Shutdown Problems</h2>
 Obviously if your halt script is not properly modified,

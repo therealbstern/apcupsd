@@ -9398,3 +9398,4 @@ WARNING! You have /usr/ucb on your path. We STRONGLY recommend
 	 apcupsd may be unable to shutdown your system.
 
   "
+fi
