@@ -65,7 +65,9 @@ All known bugs have been corrected for version 3.8.6.
 <p>
 Although, you can always email me directly, it is much better to address
 bug reports and questions to the full developer's mailing list, which 
-is at: <A href="mailto:apcupsd-users@lists.sourceforge.net">Apcupsd Mailing List</a>.
+is at: <A href="mailto:apcupsd-users at lists.sourceforge.net">Apcupsd Mailing List</a>.
+The previous address was modified to prevent easy use by spammers. To use it,
+you must replace the <b>at</b> with an @ symbol. 
 In addition to a problem description, please include the following 
 with any bug report you send: the 
 apcupsd version that you are using; your operating system (uname -a); and if

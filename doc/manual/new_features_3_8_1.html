@@ -26,7 +26,7 @@ welcome. &middot;
 </P>
 <P>What to do if you find bugs :</P>
 <P STYLE="margin-left: 0.29in">send an email to 
-<a href="mailto:apcupsd-devel@apcupsd.org">apcupsd-devel@apcupsd.org</a> 
+<a href="mailto:apcupsd-devel at apcupsd.org">apcupsd-devel at apcupsd.org</a> 
 (Developers mailing list) or go to one of the following sites:
 <pre>
 <a href="http://www.apcupsd.org">http://www.apcupsd.org</a>
@@ -40,7 +40,7 @@ welcome. &middot;
 <PRE>
 /***************************************************************************/
 /*                     ChangeLog of apcupsd                                */
-/*               Riccardo Facchetti <riccardo@master.oasi.gpa.it>          */
+/*               Riccardo Facchetti <riccardo at master.oasi.gpa.it>          */
 /*               http://www.apcupsd.org                                    */
 /*               http://www.sibbald.com/apcupsd                            */
 /*               ftp://ftp.apcupsd.org                                     */
@@ -603,7 +603,7 @@ UTEMP    : 49.5 C Internal
 ALARM    : Low Batt + 30
 DIPSW    : 0x0000
 
-root@Orion% cat apcupsd.status
+root at Orion% cat apcupsd.status
 APC      : Mar 20 01:27:31
 CABLE    : APC Cable 940-0024B
 UPSMODEL : SmartUPS
@@ -656,7 +656,7 @@ Now binaries only...........
 Fixed "for (killcount=0;killcount>3;killcount++)" bug
                                  ^ killcount<3;
 
-Found by Piotr Kasprzyk <kwadrat@zeus.polsl.gliwice.pl>.
+Found by Piotr Kasprzyk <kwadrat at zeus.polsl.gliwice.pl>.
 
 ----> apcupsd-2.9.8 62158 Nov 25 15:13 apcupsd.c
 
@@ -682,7 +682,7 @@ split source files...........
 5924 Nov 10 19:54 apcflute.c.src    :: powerflute interface to apcupsd
 5264 Nov 10 12:43 powerflute.c.src  :: powerflute tcp management of apcupsd
 
-Brian Schau <bsc@fleggaard.dk> added lockfiles for serial ports.
+Brian Schau <bsc at fleggaard.dk> added lockfiles for serial ports.
 
 NetUPS or EtherUPS now works.
 Needs more security likely, you can set your own TCP port number.
@@ -699,7 +699,7 @@ Reformat subroutines to get apcupsd to handle networks.
 
 Smart V/S is in the same class as a BackUPS Pro.
 
-Riccardo Facchetti <riccardo@master.oasi.gpa.it> has been volunteered to solve the
+Riccardo Facchetti <riccardo at master.oasi.gpa.it> has been volunteered to solve the
 network part for the project. YEAH!!!!!!!!!!!!
 
 Hello Andre,
@@ -750,7 +750,7 @@ Please send me comments about it.
 Ciao,
         Riccardo.
 --
-Riccardo Facchetti          | e-mail: riccardo@master.oasi.gpa.it
+Riccardo Facchetti          | e-mail: riccardo at master.oasi.gpa.it
 
 
 The TCP patch is not there but my hack job is present.
@@ -763,7 +763,7 @@ Forgot to add this function for ShareUPS.
 
 int fillShareUPS(int sharefd, UPSINFO *ups);
 
-Brian Schau <bsc@fleggaard.dk> with needed install changes in Makefile
+Brian Schau <bsc at fleggaard.dk> with needed install changes in Makefile
 for UNIFIX.
 
 ----> apcupsd-2.9.2 67410 Oct 22 19:34 apcupsd.c
@@ -813,7 +813,7 @@ If main power returns during a shutdown series, "apcupsd" will now reboot.
 
 ----> <----
 
-Pavel Alex <pavel@petrolbank.mldnet.com>
+Pavel Alex <pavel at petrolbank.mldnet.com>
 Better fix and support for #940-0023A cable, but still broke, drat.
 
 ----> <----
@@ -823,8 +823,8 @@ Default is 300 seconds or 5 minutes
 
 DELAY_ANNOY=60
 
-Fixed @222  Soft shutdown and suspend for SmartUPS Only.
-            by Werner Panocha, wpanocha@t-online.de
+Fixed  at 222  Soft shutdown and suspend for SmartUPS Only.
+            by Werner Panocha, wpanocha at t-online.de
             UPS will go back in 22 hours and 12 minutes!!
             This is a suspend command, and every digit
             counts for 1/10 hour (6 minutes)
@@ -852,7 +852,7 @@ More UNIFIX additions
 
 ----> <----
 
-Brian Schau <bsc@fleggaard.dk>
+Brian Schau <bsc at fleggaard.dk>
 Adds new code for UNIFIX Linux
 
 ----> apcupsd-2.7.1 35902 Sep  3 21:38 apcupsd.c
@@ -976,14 +976,14 @@ New logging features.
 ----> apcupsd-2.5.pre
 
 RedHat Support and Back UPS Pro Support via third party.
-Christopher J. Reimer <reimer@doe.carleton.ca>
+Christopher J. Reimer <reimer at doe.carleton.ca>
 
 ----> apcupsd-2.4 24409 May 19 14:17 apcupsd.c
 
 Back UPS Pro BETA Support
 
-Karsten Wiborg <4wiborg@informatik.uni-hamburg.de>
-Christopher J. Reimer <reimer@doe.carleton.ca>
+Karsten Wiborg <4wiborg at informatik.uni-hamburg.de>
+Christopher J. Reimer <reimer at doe.carleton.ca>
 
 ----> apcupsd-2.3 21278 May 13 10:11 apcupsd.c
 
@@ -994,7 +994,7 @@ other things.
 
 Anyway, here it is.
 --
-Chris Adams - cadams@ro.com
+Chris Adams - cadams at ro.com
 
 not public release, yet.
 
@@ -1051,7 +1051,7 @@ Name change to help sunsite.unc.edu "keeper" daemon.
 
 ----> Enhanced_APC_UPS v1.9 Apr 14 15:02 apc_upsd.c
 
-bug found by Tom Kunicki <kunicki@surgery.wisc.edu>
+bug found by Tom Kunicki <kunicki at surgery.wisc.edu>
 "I still can cause the UPS to shutoff with a power disturbance by
  typing 'apc_upsd /dev/apc_ups killpower' before the disturbance." ... "
  Maybe you could disable the 'killpower' switch except for when the UPS
@@ -1115,9 +1115,9 @@ Not publically released at sunsite.unc.edu
 ----> Enhanced_APC_UPS v1.5 Mar 31 12:07 apc_upsd.c
 
 Fixed a possible bug on the SmartUPS side of the daemon.
-Retested cable design for "Andreas vasquez Mack" <mack@sofo.uni-stuttgart.de>
-Soon to test "black APC cable" for "Kofi N. Agyemang" <kna@safenet.net> and
-                                   "Pete Rylko" <petese@inwave.com>
+Retested cable design for "Andreas vasquez Mack" <mack at sofo.uni-stuttgart.de>
+Soon to test "black APC cable" for "Kofi N. Agyemang" <kna at safenet.net> and
+                                   "Pete Rylko" <petese at inwave.com>
 APC Black Cable Support soon v1.6?
 
 ----> Enhanced_APC_UPS v1.4 Mar  1 17:18 apc_upsd.c
@@ -1162,7 +1162,7 @@ Your filesystem will say "!@#$%#$*&#$@" and much more to you.
 
 Thanks for the support and use of this daemon.
 
-hedrick@astro.dyer.vanderbilt.edu
+hedrick at astro.dyer.vanderbilt.edu
 Andre Hedrick
 
 http://www.brisse.dk/site/apcupsd/

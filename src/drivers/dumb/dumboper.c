@@ -210,7 +210,7 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
 	case APC_940_0128A:
 	case APC_940_0020B:
 	case APC_940_0020C:
-	    if (my_data->sp_flags & TIOCM_CTS) {
+	if (my_data->sp_flags & TIOCM_CTS) {
 	    UPS_CLEAR_ONLINE();
 	} else {
 	    UPS_SET_ONLINE();
