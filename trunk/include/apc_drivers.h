@@ -102,9 +102,10 @@
  *   This function always returns.
  *   This function must lock the UPSINFO structure.
  *
- * ups_program_eeprom()
+ * ups_program_eeprom(ups, command, data)
  *   Commit changes to the internal UPS eeprom.
- *   This function exits or not but is not really clear.
+ *   This function performs the eeprom change command (using data),
+ *     then returns.
  *
  * ups_generic_entry_point()
  *  This is a generic entry point into the drivers for specific driver
@@ -136,7 +137,7 @@ typedef struct upsdriver {
     int (*read_ups_volatile_data)(UPSINFO *ups);
     int (*get_ups_capabilities)(UPSINFO *ups);
     int (*check_ups_state)(UPSINFO *ups);
-    int (*ups_program_eeprom)(UPSINFO *ups);
+    int (*ups_program_eeprom)(UPSINFO *ups, int command, char *data);
     int (*ups_entry_point)(UPSINFO *ups, int command, void *data);
 } UPSDRIVER;
 
@@ -159,8 +160,8 @@ typedef struct upsdriver {
     if (ups->driver) ups->driver->get_ups_capabilities(ups)
 #define device_check_state(ups) \
     if (ups->driver) ups->driver->check_ups_state(ups)
-#define device_program_eeprom(ups) \
-    if (ups->driver) ups->driver->ups_program_eeprom(ups)
+#define device_program_eeprom(ups, command, data) \
+    if (ups->driver) ups->driver->ups_program_eeprom(ups, command, data)
 #define device_entry_point(ups, command, data) \
     if (ups->driver) ups->driver->ups_entry_point(ups, command, data)
 

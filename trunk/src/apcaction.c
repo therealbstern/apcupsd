@@ -563,8 +563,9 @@ void do_action(UPSINFO *ups)
 	    generate_event(ups, CMDMAINSBACK);
 	}
 
-	if (ups->nologin_file) 
+	if (ups->nologin_file) {
             log_event(ups, LOG_ALERT, _("Allowing logins"));
+	}
 	logonfail(1);
 	ups->nologin_file = FALSE;
 	requested_logoff = FALSE;

@@ -2,19 +2,19 @@
  *  usb.h  -- public header file for this driver
  *
  *  apcupsd.c -- Simple Daemon to catch power failure signals from a
- *		 BackUPS, BackUPS Pro, or SmartUPS (from APCC).
- *	      -- Now SmartMode support for SmartUPS and BackUPS Pro.
+ *               BackUPS, BackUPS Pro, or SmartUPS (from APCC).
+ *            -- Now SmartMode support for SmartUPS and BackUPS Pro.
  *
  *  All rights reserved.
  *
  */
 
 /*
- *		       GNU GENERAL PUBLIC LICENSE
- *			  Version 2, June 1991
+ *                     GNU GENERAL PUBLIC LICENSE
+ *                        Version 2, June 1991
  *
  *  Copyright (C) 1989, 1991 Free Software Foundation, Inc.
- *			     675 Mass Ave, Cambridge, MA 02139, USA
+ *                           675 Mass Ave, Cambridge, MA 02139, USA
  *  Everyone is permitted to copy and distribute verbatim copies
  *  of this license document, but changing it is not allowed.
  *
@@ -59,7 +59,7 @@
 #define _USB_H
 
 /*********************************************************************/
-/* Function ProtoTypes						     */
+/* Function ProtoTypes                                               */
 /*********************************************************************/
 
 extern int usb_ups_get_capabilities(UPSINFO *ups);
@@ -70,7 +70,7 @@ extern int usb_ups_check_state(UPSINFO *ups);
 extern int usb_ups_open(UPSINFO *ups);
 extern int usb_ups_close(UPSINFO *ups);
 extern int usb_ups_setup(UPSINFO *ups);
-extern int usb_ups_program_eeprom(UPSINFO *ups);
+extern int usb_ups_program_eeprom(UPSINFO *ups, int command, char *data);
 extern int usb_ups_entry_point(UPSINFO *ups, int command, void *data);
 
 #endif /* _USB_H */

@@ -37,7 +37,7 @@
 // Application specific messages
 
 // Message used for system tray notifications
-#define WM_TRAYNOTIFY                           WM_USER+1
+#define WM_TRAYNOTIFY                   WM_USER+1
 
 // Messages used for the server object to notify windows of things
 #define WM_SRV_CLIENT_CONNECT           WM_USER+2
@@ -50,7 +50,7 @@ extern const char       *szAppName;
 extern DWORD            mainthreadId;
 
 // Main UPS server routine
-extern int ApcupsdAppMain();
+extern int ApcupsdAppMain(int service);
 
 // Standard command-line flag definitions
 const char ApcupsdRunService[]            = "/service";

@@ -380,7 +380,7 @@ int net_ups_get_capabilities(UPSINFO *ups)
     return 1;
 }
 
-int net_ups_program_eeprom(UPSINFO *ups) 
+int net_ups_program_eeprom(UPSINFO *ups, int command, char *data)
 {
     return 0;
 }

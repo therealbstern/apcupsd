@@ -63,7 +63,7 @@ static void guess();
 static void do_smart_testing();
 static void smart_test1();
 static void smart_calibration();
-static void monitor_calibration_progress();
+static void monitor_calibration_progress(int monitor);
 static void terminate_calibration(int ask);
 
 static void do_usb_testing();
@@ -75,7 +75,7 @@ static void strip_trailing_junk(char *cmd);
 static char *get_cmd(char *prompt);
 static int write_file(char *buf);
 static void parse_eeprom_cmds(char *eprom, char locale);
-int apcsmart_ups_program_eeprom(UPSINFO *ups);
+int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data);
 static void print_valid_eeprom_values(UPSINFO *ups);
 
 
@@ -921,7 +921,7 @@ Please select the function you want to perform.\n");
 	       terminate_calibration(1);
 	       break;
 	    case 4:
-	       monitor_calibration_progress();
+	       monitor_calibration_progress(0);
 	       break;
 	    case 5:
 	       program_smart_eeprom();
@@ -941,11 +941,14 @@ Please select the function you want to perform.\n");
    pmsg("End apctest.\n");
 }
 
+/*
+ * Do runtime battery calibration
+ */
 static void smart_calibration()
 {
    char *ans, cmd;
    char answer[2000];
-   int stat;
+   int stat, monitor;
 
    pmsg("First ensure that we have a good link and \n\
 that the UPS is functionning normally.\n");
@@ -990,11 +993,23 @@ Giving up.\n");
       pmsg("Battery level %s insufficient to run test.\n", ans);
       return;
    }
-   pmsg("\nSending Battery Calibration command. The calibration\n\
-should automatically end when the battery level\n\
-drops below 35-25 depending on your UPS. In any\n\
-case, I will stop the calibration if it reaches\n\
-20. If you wish to stop the calibration, enter a return.\n\n");
+
+   pmsg("\nThe battery calibration should automatically end\n"
+        "when the battery level drops below about 25, depending\n"
+        "on your UPS. I can also optionally monitor the progress\n"
+        "and stop the calibration if it goes below 10. However,\n"
+        "in the case of a new battery this may prematurely end the\n"
+        "calibration loosing the effect.\n\n");
+
+   ans = get_cmd(
+    "Do you me to stop the calibration if the battery level goes too low? (y/n): ");
+   if (*ans == 'Y' || *ans == 'y') {
+      monitor = 1;
+   } else {
+      monitor = 0;
+   }
+      
+   pmsg("\nSending Battery Calibration command. ...\n");
 
    ans = smart_poll('D', ups);
    if (*ans == '!' || strcmp(ans, "OK") == 0) {
@@ -1003,7 +1018,7 @@ case, I will stop the calibration if it reaches\n\
       pmsg("Unexpected response from UPS: %s\n", ans);
       return;
    }
-   monitor_calibration_progress();
+   monitor_calibration_progress(monitor);
 }
 
 static void terminate_calibration(int ask)
@@ -1036,10 +1051,10 @@ is already doing a calibration.\n");
 }
 
 
-static void monitor_calibration_progress()
+static void monitor_calibration_progress(int monitor)
 {
    char *ans;
-   int count = 0;
+   int count = 10;
    int max_count = 10;
    char period = '.';
 
@@ -1066,7 +1081,7 @@ To stop the calibration, enter a return.\n");
 	    percent = (int)strtod(ans, NULL);
             pmsg("\nBattery charge %d\n", percent);
 	    if (percent > 0) {
-	       if (percent <= 20) {
+	       if (monitor && percent <= 10) {
 		  terminate_calibration(0);
 		  return;
 	       }
@@ -1078,7 +1093,7 @@ To stop the calibration, enter a return.\n");
             if (*ans >= '0' && *ans <= '9') {
 	       int rt = atoi(ans);
                pmsg("Remaining runtime is %d minutes\n", rt);
-	       if (rt > 0 && rt < 4) {
+	       if (monitor && rt > 0 && rt < 4) {
 		  terminate_calibration(0);
 		  return;
 	       }
@@ -1095,6 +1110,7 @@ To stop the calibration, enter a return.\n");
       default:
 	 break;
       }
+      /* *ANY* user input aborts the calibration */
       if (FD_ISSET(STDIN_FILENO, &rfds)) {
 	 read(STDIN_FILENO, &cmd, 1);
 	 terminate_calibration(0);
@@ -1103,7 +1119,7 @@ To stop the calibration, enter a return.\n");
       if (FD_ISSET(ups->fd, &rfds)) {
 	 read(ups->fd, &cmd, 1);
          if (cmd == '$') {
-            pmsg("Battery Runtime Calibration terminated.\n");
+            pmsg("Battery Runtime Calibration terminated by UPS.\n");
             pmsg("Checking estimated runtime ...\n");
             ans = smart_poll('j', ups);
             if (*ans >= '0' && *ans <= '9') {
@@ -1130,11 +1146,21 @@ Please select the function you want to perform.\n");
 
    while (!quit) {
       pmsg( "\n\
-1) Print EEPROM values\n\
-2) Change Battery date\n\
-3) Change UPS name\n\
-4) Change Other EEPROM item\n\
-5) Quit\n\n");
+ 1) Print EEPROM values\n\
+ 2) Change Battery date\n\
+ 3) Change UPS name\n\
+ 4) Change sensitivity\n\
+ 5) Change alarm delay\n\
+ 6) Change low battery warning delay\n\
+ 7) Change wakeup delay\n\
+ 8) Change shutdown delay\n\
+ 9) Change low transfer voltage\n\
+10) Change high transfer voltage\n\
+11) Change battery return threshold percent\n\
+12) Change output voltage when on batteries\n\
+13) Change the self test interval\n\
+14) Set EEPROM with conf file values\n\
+15) Quit\n\n");
 
       cmd = get_cmd("Select function number: ");
       if (cmd) {
@@ -1149,11 +1175,7 @@ Please select the function you want to perform.\n");
                   pmsg("Date must be exactly DD/MM/YY\n");
 		  break;
 	       }
-	       update_battery_date = 1;
-	       configure_ups = 0;
-	       rename_ups = 0;
-	       strcpy(ups->battdat, cmd);
-	       apcsmart_ups_program_eeprom(ups);
+	       apcsmart_ups_program_eeprom(ups, CI_BATTDAT, cmd);
 	       break;
 	    case 3:
                cmd = get_cmd("Enter new UPS name -- max 8 chars: ");
@@ -1161,13 +1183,51 @@ Please select the function you want to perform.\n");
                   pmsg("Name must be between 1 and 8 characters long.\n");
 		  break;
 	       }
-	       update_battery_date = 0;
-	       configure_ups = 0;
-	       rename_ups = 1;
-	       strcpy(ups->upsname, cmd);
-	       apcsmart_ups_program_eeprom(ups);
+	       apcsmart_ups_program_eeprom(ups, CI_IDEN, cmd);
 	       break;
-	    case 4:
+	   case 4:
+               cmd = get_cmd("Enter new sensitivity: ");
+	       apcsmart_ups_program_eeprom(ups, CI_SENS, cmd);
+	       break;
+	   case 5:
+               cmd = get_cmd("Enter new alarm delay: ");
+	       apcsmart_ups_program_eeprom(ups, CI_DALARM, cmd);
+	       break;
+
+	   case 6:
+               cmd = get_cmd("Enter new low battery delay: ");
+	       apcsmart_ups_program_eeprom(ups, CI_DLBATT, cmd);
+	       break;
+	   case 7:
+               cmd = get_cmd("Enter new wakeup delay: ");
+	       apcsmart_ups_program_eeprom(ups, CI_DWAKE, cmd);
+	       break;
+	   case 8:
+               cmd = get_cmd("Enter new shutdown delay: ");
+	       apcsmart_ups_program_eeprom(ups, CI_DSHUTD, cmd);
+	       break;
+	   case 9:
+               cmd = get_cmd("Enter new low transfer voltage: ");
+	       apcsmart_ups_program_eeprom(ups, CI_LTRANS, cmd);
+	       break;
+	   case 10:
+               cmd = get_cmd("Enter new high transfer voltage: ");
+	       apcsmart_ups_program_eeprom(ups, CI_HTRANS, cmd);
+	       break;
+	   case 11:
+               cmd = get_cmd("Enter new battery return level: ");
+	       apcsmart_ups_program_eeprom(ups, CI_RETPCT, cmd);
+	       break;
+	   case 12:
+               cmd = get_cmd("Enter new output voltage on batteries: ");
+	       apcsmart_ups_program_eeprom(ups, CI_NOMOUTV, cmd);
+	       break;
+	   case 13:
+               cmd = get_cmd("Enter new self test interval: ");
+	       apcsmart_ups_program_eeprom(ups, CI_STESTI, cmd);
+	       break;
+
+	    case 14:
                pmsg("The EEPROM values to be changed will be taken from\n"
                     "the configuration directives in your apcupsd.conf file.\n");
                cmd = get_cmd("Do you want to continue? (Y/N): ");
@@ -1175,21 +1235,17 @@ Please select the function you want to perform.\n");
                   pmsg("EEPROM changes NOT made.\n");
 		  break;
 	       }
-	       update_battery_date = 0;
-	       configure_ups = 1;
-	       rename_ups = 0;
-	       strcpy(ups->upsname, cmd);
-	       apcsmart_ups_program_eeprom(ups);
+	       apcsmart_ups_program_eeprom(ups, -1, NULL);
 	       break;
-	    case 5:
+	    case 15:
 	       quit = TRUE;
 	       break;
 	    default:
-               pmsg("Illegal response. Please enter 1-5\n");
+               pmsg("Illegal response. Please enter 1-7\n");
 	       break;
 	 }
       } else {
-         pmsg("Illegal response. Please enter 1-5\n");
+         pmsg("Illegal response. Please enter 1-7\n");
       }
    }
    ptime();

@@ -6,60 +6,193 @@
 #include "apc.h"
 #include "apcsmart.h"
 
-static void change_ups_battery_date(UPSINFO *ups);
-static void change_ups_name(UPSINFO *ups);
+static void change_ups_battery_date(UPSINFO *ups, char *newdate);
+static void change_ups_name(UPSINFO *ups, char *newname);
 static void change_extended(UPSINFO *ups);
+static int change_ups_eeprom_item(UPSINFO *ups, char *title, char cmd, char *setting);
 
 
 /*********************************************************************/
 /*  apcsmart_ups_program_eeprom()					      */
 /*********************************************************************/
 
-int apcsmart_ups_program_eeprom(UPSINFO *ups)
+int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
 {
-    if (update_battery_date) {
-        printf(_("Attempting to update UPS battery date ...\n"));
-	setup_device(ups);
-	apcsmart_ups_get_capabilities(ups);
+    char setting[20];
+    setup_device(ups);
+    apcsmart_ups_get_capabilities(ups);
+    switch (command) {
+    case CI_BATTDAT:		      /* change battery date */
 	if (ups->UPS_Cap[CI_BATTDAT]) {
-	    change_ups_battery_date(ups);
+            printf(_("Attempting to update UPS battery date ...\n"));
+	    change_ups_battery_date(ups, data);
+	} else {
+           printf(_("UPS battery date configuration not supported by this UPS.\n"));
+	   return 0;
 	}
-	device_close(ups);
-    }
+	break;
 
-    if (configure_ups) {
+    case CI_IDEN:
+	if (ups->UPS_Cap[CI_IDEN]) {
+            printf(_("Attempting to rename UPS ...\n"));
+	    change_ups_name(ups, data);
+	} else {
+           printf(_("UPS name configuration not supported by this UPS.\n"));
+	   return 0;
+	}
+	break;
+
+    /* SENSITIVITY */
+    case CI_SENS:
+	if (ups->UPS_Cap[CI_SENS]) {
+            sprintf(setting, "%.1s", data);
+            change_ups_eeprom_item(ups, "sensitivity", ups->UPS_Cmd[CI_SENS], setting);
+	} else {
+           printf(_("UPS sensitivity configuration not supported by this UPS.\n"));
+	   return 0;
+	}
+	break;
+
+    /* ALARM_STATUS */
+    case CI_DALARM:
+	if (ups->UPS_Cap[CI_DALARM]) {
+            sprintf(setting, "%.1s", data);
+            change_ups_eeprom_item(ups, "alarm status", ups->UPS_Cmd[CI_DALARM], setting);
+	} else {
+           printf(_("UPS alarm status configuration not supported by this UPS.\n"));
+	   return 0;
+	}
+	break;
+
+    /* LOWBATT_SHUTDOWN_LEVEL */
+    case CI_DLBATT:
+	if (ups->UPS_Cap[CI_DLBATT]) {
+            sprintf(setting, "%02d", (int)atoi(data));
+            change_ups_eeprom_item(ups, "low battery warning delay",
+		   ups->UPS_Cmd[CI_DLBATT], setting);
+	} else {
+           printf(_("UPS low battery warning configuration not supported by this UPS.\n"));
+	   return 0;
+	}
+	break;
+
+    /* WAKEUP_DELAY */
+    case CI_DWAKE:
+	if (ups->UPS_Cap[CI_DWAKE]) {
+            sprintf(setting, "%03d", (int)atoi(data));
+            change_ups_eeprom_item(ups, "wakeup delay", ups->UPS_Cmd[CI_DWAKE], setting);
+	} else {
+           printf(_("UPS wakeup delay configuration not supported by this UPS.\n"));
+	   return 0;
+	}
+	break;
+
+       
+    /* SLEEP_DELAY */
+    case CI_DSHUTD:
+	if (ups->UPS_Cap[CI_DSHUTD]) {
+            sprintf(setting, "%03d", (int)atoi(data));
+            change_ups_eeprom_item(ups, "shutdown delay", ups->UPS_Cmd[CI_DSHUTD], setting);
+	} else {
+           printf(_("UPS shutdown delay configuration not supported by this UPS.\n"));
+	   return 0;
+	}
+	break;
+
+    /* LOW_TRANSFER_LEVEL */
+    case CI_LTRANS:
+	if (ups->UPS_Cap[CI_LTRANS]) {
+            sprintf(setting, "%03d", (int)atoi(data));
+            change_ups_eeprom_item(ups, "lower transfer voltage",
+		   ups->UPS_Cmd[CI_LTRANS], setting);
+	} else {
+           printf(_("UPS low transfer voltage configuration not supported by this UPS.\n"));
+	   return 0;
+	}
+	break;
+
+    /* HIGH_TRANSFER_LEVEL */
+    case CI_HTRANS:
+	if (ups->UPS_Cap[CI_HTRANS]) {
+            sprintf(setting, "%03d", (int)atoi(data));
+            change_ups_eeprom_item(ups, "high transfer voltage",
+		   ups->UPS_Cmd[CI_HTRANS], setting);
+	} else {
+           printf(_("UPS high transfer voltage configuration not supported by this UPS.\n"));
+	   return 0;
+	}
+	break;
+
+    /* UPS_BATT_CAP_RETURN */
+    case CI_RETPCT:
+	if (ups->UPS_Cap[CI_RETPCT]) {
+            sprintf(setting, "%02d", (int)atoi(data));
+            change_ups_eeprom_item(ups, "return threshold percent",
+		   ups->UPS_Cmd[CI_RETPCT], setting);
+	} else {
+           printf(_("UPS return threshold configuration not supported by this UPS.\n"));
+	   return 0;
+	}
+	break;
+
+    /* UPS_SELFTEST */
+    case CI_STESTI:
+	if (ups->UPS_Cap[CI_STESTI]) {
+            sprintf(setting, "%.3s", data);
+            /* Make sure "ON" is 3 characters */
+	    if (setting[2] == 0) {
+                setting[2] = ' ';
+		setting[3] = 0;
+	    }
+            change_ups_eeprom_item(ups, "self test interval", ups->UPS_Cmd[CI_STESTI], setting);
+	} else {
+           printf(_("UPS self test interval configuration not supported by this UPS.\n"));
+	   return 0;
+	}
+	break;
+
+    /* OUTPUT_VOLTAGE */
+    case CI_NOMOUTV:
+	if (ups->UPS_Cap[CI_NOMOUTV]) {
+            sprintf(setting, "%03d", (int)atoi(data));
+            change_ups_eeprom_item(ups, "output voltage on batteries",
+		   ups->UPS_Cmd[CI_NOMOUTV], setting);
+	} else {
+           printf(_("UPS output voltage on batteries configuration not supported by this UPS.\n"));
+	   return 0;
+	}
+	break;
+
+
+    case -1:			      /* old style from .conf file */
+
         printf(_("Attempting to configure UPS ...\n"));
-	setup_device(ups);
 	change_extended(ups);	      /* set new values in UPS */
         printf("\nReading updated UPS configuration ...\n\n");
 	device_read_volatile_data(ups);
 	device_read_static_data(ups);
 	/* Print report of status */
 	output_status(ups, 0, stat_open, stat_print, stat_close);
-    }
+	break;
 
-    if (rename_ups) {
-        printf(_("Attempting to rename UPS ...\n"));
-	setup_device(ups);
-	apcsmart_ups_get_capabilities(ups);
-	if (ups->UPS_Cap[CI_IDEN]) {
-	    change_ups_name(ups);
-	}
+    default:
+        printf(_("Ignoring unknown config request command=%d\n"), command);
+	return 0;
+	break;
     }
-
     return 1;
 }
 
 /*********************************************************************/
-static void change_ups_name(UPSINFO *ups)
+static void change_ups_name(UPSINFO *ups, char *newname)
 {
     char *n;
     char response[32];
-    char name[9];
+    char name[10];
     char a = ups->UPS_Cmd[CI_CYCLE_EPROM];
     char c = ups->UPS_Cmd[CI_IDEN];
     int i;
-    int j = strlen(ups->upsname);
+    int j = strlen(newname);
     name[0] = '\0';
 
     if (j == 0) {
@@ -69,7 +202,7 @@ static void change_ups_name(UPSINFO *ups)
 	j = 8;			    /* maximum size */
     }
 
-    strncpy(name, ups->upsname, j);
+    strncpy(name, newname, 9);
     /* blank fill to 8 chars */
     while (j < 8) {
         name[j] = ' ';
@@ -108,7 +241,7 @@ static void change_ups_name(UPSINFO *ups)
 /********************************************************************* 
  * update date battery replaced
  */
-static void change_ups_battery_date(UPSINFO *ups)
+static void change_ups_battery_date(UPSINFO *ups, char *newdate)
 {
     char *n;
     char response[32];
@@ -116,7 +249,7 @@ static void change_ups_battery_date(UPSINFO *ups)
     char a = ups->UPS_Cmd[CI_CYCLE_EPROM];
     char c = ups->UPS_Cmd[CI_BATTDAT];
     int i;
-    int j = strlen(ups->battdat);
+    int j = strlen(newdate);
 
     battdat[0] = '\0';
 
@@ -125,7 +258,7 @@ static void change_ups_battery_date(UPSINFO *ups)
 	return;
     }
 
-    strcpy(battdat, ups->battdat);
+    strcpy(battdat, newdate);
 
     /* Ask for battdat */
     write(ups->fd, &c, 1);  /* c = 'x' */
@@ -145,8 +278,9 @@ static void change_ups_battery_date(UPSINFO *ups)
     /* Expect OK after successful battdat change */
     *response = 0;
     getline(response, sizeof(response), ups);
-    if (strcmp(response, "OK") != 0)
+    if (strcmp(response, "OK") != 0) {
         fprintf(stderr, "\nError changing UPS battery date\n");
+    }
 
     ups->battdat[0] = '\0';
     smart_poll(ups->UPS_Cmd[CI_BATTDAT], ups);
@@ -156,7 +290,7 @@ static void change_ups_battery_date(UPSINFO *ups)
 }
 
 /*********************************************************************/
-int setup_ups_item(UPSINFO *ups, char *title, char cmd, char *setting)
+static int change_ups_eeprom_item(UPSINFO *ups, char *title, char cmd, char *setting)
 {
     char response[32];
     char response1[32];
@@ -269,54 +403,54 @@ static void change_extended(UPSINFO *ups)
     /* SENSITIVITY */
     if (ups->UPS_Cap[CI_SENS] && strcmp(ups->sensitivity, "-1") != 0) {
         sprintf(setting, "%.1s", ups->sensitivity);
-        setup_ups_item(ups, "sensitivity", ups->UPS_Cmd[CI_SENS], setting);
+        change_ups_eeprom_item(ups, "sensitivity", ups->UPS_Cmd[CI_SENS], setting);
     }
      
     /* WAKEUP_DELAY */
     if (ups->UPS_Cap[CI_DWAKE] && ups->dwake != -1) {
         sprintf(setting, "%03d", (int)ups->dwake);
-        setup_ups_item(ups, "wakeup delay", ups->UPS_Cmd[CI_DWAKE], setting);
+        change_ups_eeprom_item(ups, "wakeup delay", ups->UPS_Cmd[CI_DWAKE], setting);
     }
 
    
     /* SLEEP_DELAY */
     if (ups->UPS_Cap[CI_DSHUTD] && ups->dshutd != -1) {
         sprintf(setting, "%03d", (int)ups->dshutd);
-        setup_ups_item(ups, "shutdown delay", ups->UPS_Cmd[CI_DSHUTD], setting);
+        change_ups_eeprom_item(ups, "shutdown delay", ups->UPS_Cmd[CI_DSHUTD], setting);
     }
 
     /* LOW_TRANSFER_LEVEL */
     if (ups->UPS_Cap[CI_LTRANS] && ups->lotrans != -1) {
         sprintf(setting, "%03d", (int)ups->lotrans);
-        setup_ups_item(ups, "lower transfer voltage",
+        change_ups_eeprom_item(ups, "lower transfer voltage",
 	       ups->UPS_Cmd[CI_LTRANS], setting);
     }
 
     /* HIGH_TRANSFER_LEVEL */
     if (ups->UPS_Cap[CI_HTRANS] && ups->hitrans != -1) {
         sprintf(setting, "%03d", (int)ups->hitrans);
-        setup_ups_item(ups, "upper transfer voltage",
+        change_ups_eeprom_item(ups, "upper transfer voltage",
 	       ups->UPS_Cmd[CI_HTRANS], setting);
     }
 
     /* UPS_BATT_CAP_RETURN */
     if (ups->UPS_Cap[CI_RETPCT] && ups->rtnpct != -1) {
         sprintf(setting, "%02d", (int)ups->rtnpct);
-        setup_ups_item(ups, "return threshold percent",
+        change_ups_eeprom_item(ups, "return threshold percent",
 	       ups->UPS_Cmd[CI_RETPCT], setting);
     }
 
     /* ALARM_STATUS */
     if (ups->UPS_Cap[CI_DALARM] && strcmp(ups->beepstate, "-1") != 0) {
         sprintf(setting, "%.1s", ups->beepstate);
-        setup_ups_item(ups, "alarm delay",
+        change_ups_eeprom_item(ups, "alarm delay",
 	       ups->UPS_Cmd[CI_DALARM], setting);
     }
 
     /* LOWBATT_SHUTDOWN_LEVEL */
     if (ups->UPS_Cap[CI_DLBATT] && ups->dlowbatt != -1) {
         sprintf(setting, "%02d", (int)ups->dlowbatt);
-        setup_ups_item(ups, "low battery warning delay",
+        change_ups_eeprom_item(ups, "low battery warning delay",
 	       ups->UPS_Cmd[CI_DLBATT], setting);
     }
 
@@ -328,13 +462,13 @@ static void change_extended(UPSINFO *ups)
             setting[2] = ' ';
 	    setting[3] = 0;
 	}
-        setup_ups_item(ups, "self test interval", ups->UPS_Cmd[CI_STESTI], setting);
+        change_ups_eeprom_item(ups, "self test interval", ups->UPS_Cmd[CI_STESTI], setting);
     }
 
     /* OUTPUT_VOLTAGE */
     if (ups->UPS_Cap[CI_NOMOUTV] && ups->NomOutputVoltage != -1) {
         sprintf(setting, "%03d", (int)ups->NomOutputVoltage);
-        setup_ups_item(ups, "output voltage on batteries",
+        change_ups_eeprom_item(ups, "output voltage on batteries",
 	       ups->UPS_Cmd[CI_NOMOUTV], setting);
     }
 }
