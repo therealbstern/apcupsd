@@ -201,11 +201,24 @@ additional features. These options are:
      Enable the use of libwrap. When set to yes enables libwrap
      system library. When set to [DIR] enables libwrap in DIR.
 
-For RedHat 6.0 users, some useful configure options are:
+For RedHat Linux 9 users, some useful configure options are:
 =========================================================
 
-./configure -prefix=/usr -sbindir=/sbin --enable-powerflute \
-      --disable-nls --enable-threads --enable-http
+ ./configure --enable-threads --enable-cgi --with-cgi-bin=/var/www/cgi-bin
+
+Adjust --with-cgi-bin argument to reflect the location of your web server
+pages.
+
+Prior to running configure, make sure the following to packages are installed
+on your system.
+
+	gd-1.8.4-11
+	gd-devel-1.8.4-11
+
+These packages are on the RedHat 9 distribution disks. If these packages
+are installed, the cgi code will use these libraries for generation of png
+images. If these are not installed, the version included with apcupsd will
+be used instead.
 
 
 Customization of apcupsd events 
