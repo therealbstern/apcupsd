@@ -150,9 +150,11 @@ is ignored for UPSCABLE ether).
                         <th><p align=center><b>Cables Supported</b></p></th>
             <th><P ALIGN=CENTER><b>Status</b></p>
           </tr>
-          <tr><td>backups</td><td>BackUPS</td><td>Simple</td><td>Simple-Custom, 940-0020B, 940-0020C, 940-0119A, 940-0023A</td><td>Supported</td></tr>
+          <tr><td>backups</td><td>BackUPS</td><td>Simple</td><td>*Simple-Custom, 940-0020B, 940-0020C, 940-0119A, 940-0023A</td><td>Supported</td></tr>
           <tr><td>backups</td><td>BackUPS Office</td><td>Simple</td><td>940-0119A</td><td>Supported</td></tr>
           <tr><td>backups</td><td>BackUPS ES</td><td>Simple</td><td>940-0119A</td><td>Supported (apparently identical to the BackUPS Office)</td></tr>
+          <tr><td>smartups</td><td>BackUPS CS (serial mode)</td><td>SubSmart</td><td>Smart (*Custom RJ45)</td><td>Supported using the Custom RJ45 cable</td></tr>
+          <tr><td>usb</td><td>BackUPS CS USB, BackUPS Pro USB</td><td>SubSmart</td><td>USB (using APC cable 940-0127A)</td><td>Supported in apcupsd version 3.9.4 and later</td></tr>
           <tr><td>backups</td><td>BackUPS CS (serial mode)</td><td>Simple</td><td>940-0128A</td><td>Supported</td></tr>
           <tr><td>sharebasic</td><td>ShareUPS Basic Port</td><td>Simple</td><td>940-0020B, 940-0020C, 940-0023A</td><td>Supported</td></tr>
           <tr><td>dumb</td><td>All models listed abovet</td><td>Simple</td><td>Cables listed above</td><td>Supported</td></tr>
@@ -160,14 +162,18 @@ is ignored for UPSCABLE ether).
           <tr><td>smartvsups</td><td>SmartUPS VS</td><td>SubSmart</td><td>940-0095A??</td><td>Supported</td></tr>
           <tr><td>newbackupspro</td><td>Smarter BackUPS Pro</td><td>SubSmart</td><td>940-0095A</td><td>Supported</td></tr>
           <tr><td>backupspropnp</td><td>Smarter BackUPS Pro</td><td>SubSmart</td><td>940-0095A</td><td>Supported</td></tr>
-          <tr><td>smartups</td><td>SmartUPS, PowerStack 450<td><td>Smart</td><td>Smart-Custom, 940-0024C</td><td>Supported</td></tr>
-          <tr><td>apcsmart</td><td>SmartUPS</td><td>Smart</td><td>Smart-Custom, 940-0024C</td><td>Supported</td></tr>
-          <tr><td>matrixups</td><td>MatrixUPS</td><td>Smart</td><td>Smart-Custom, 940-0024C</td><td>Supported</td></tr>
-          <tr><td>sharesmart</td><td>ShareUPS Advanced Port</td><td>Smart</td><td>Smart-Custom, 940-0024C</td><td>Unknown status</td></tr>
-          <tr><td>usb</td><td>BackUPS CS USB, BackUPS Pro USB</td><td>SubSmart</td><td>USB (using APC cable 940-0127A)</td><td>Supported in apcupsd version 3.9.4 and later</td></tr>
+          <tr><td>smartups</td><td>SmartUPS, PowerStack 450<td><td>Smart</td><td>*Smart-Custom, 940-0024C</td><td>Supported</td></tr>
+          <tr><td>apcsmart</td><td>SmartUPS</td><td>Smart</td><td>*Smart-Custom, 940-0024C</td><td>Supported</td></tr>
+          <tr><td>matrixups</td><td>MatrixUPS</td><td>Smart</td><td>*Smart-Custom, 940-0024C</td><td>Supported</td></tr>
+          <tr><td>sharesmart</td><td>ShareUPS Advanced Port</td><td>Smart</td><td>*Smart-Custom, 940-0024C</td><td>Unknown status</td></tr>
           <tr><td>usb</td><td>SmartUPS USB</td><td>Smart</td><td>USB (using APC cable)</td><td>Supported in apcupsd version 3.9.8 and later</td></tr>
-        </table></dd>
+        </table>
         
+        <p>
+        * => see the <a href="cables.html">Cables</a> chapter of this manual for
+        instructions on how to build this cable (Simple-Custom, Smart-Custom, or
+        Smart-RJ45).
+        </dd>
                     
          <dt><a name="UPSCABLE"></a>UPSCABLE &nbsp;&nbsp; &lt;type of cable you are using&gt;&gt; </dt>
                                         <dd>
@@ -177,7 +183,10 @@ is ignored for UPSCABLE ether).
         <p>If you have a Smart or a SubSmart UPS (see table above), and you
         build your own cable, build a <b>Smart-Custom</b> cable (see the
         <a href="cables.html">Cables Chapter</a>  of this manual).  If you
-        have a <b>Simple</b> UPS, build a <b>Simple-Custom</b> cable.</p>
+        have a <b>Simple</b> UPS, build a <b>Simple-Custom</b> cable.
+        If you have a BackUPS CS with a RJ45 connector, you can buld your own
+        <b>Custom-RJ45</b> cable.
+       <p>
         The <b>--with-upscable=</b> option can be used on the <p>./configure</p> program
         to set this directive during the installation.
         </dd>
