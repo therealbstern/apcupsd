@@ -20,7 +20,7 @@ exec_prefix=@exec_prefix@
 
 APCPID=@PIDDIR@/apcupsd.pid
 APCUPSD=@sbindir@/apcupsd
-SHUTDOWN=/sbin/shutdown
+SHUTDOWN=@SHUTDOWN@
 SCRIPTSHELL=@SCRIPTSHELL@
 SCRIPTDIR=@sysconfdir@
 WALL=wall

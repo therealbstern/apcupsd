@@ -87,9 +87,9 @@ void init_thread_signals(void)
     /*
      * Set up signals.
      */
-    signal(SIGHUP, thread_terminate);
-    signal(SIGINT, thread_terminate);
-    signal(SIGTERM, thread_terminate);
+    signal(SIGHUP, apc_thread_terminate);
+    signal(SIGINT, apc_thread_terminate);
+    signal(SIGTERM, apc_thread_terminate);
     signal(SIGPIPE, SIG_IGN);
 
     /* Children reaped by waitpid() */
@@ -99,7 +99,7 @@ void init_thread_signals(void)
      * I think this is not effective
      * -RF
      */
-    signal(SIGKILL, thread_terminate);
+    signal(SIGKILL, apc_thread_terminate);
 #endif /* !HAVE_PTHREADS */
 }
 

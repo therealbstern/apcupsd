@@ -155,10 +155,10 @@ int start_thread(UPSINFO *ups, void (*action)(UPSINFO *ups),
 }
 
 /**********************************************************************
- * the thread_terminate function and trapping signals allows threads
+ * the apc_thread_terminate function and trapping signals allows threads
  * to cleanly exit.
  *********************************************************************/
-void thread_terminate(int sig)
+void apc_thread_terminate(int sig)
 {
     UPSINFO *ups;
 
