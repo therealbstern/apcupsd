@@ -533,4 +533,13 @@ void d_msg(char *file, int line, int level, char *fmt,...);
 
 #endif
 
+/*
+ * Send terminate signal to itself.
+ */
+#define sendsig_terminate() \
+    { \
+        kill(getpid(), SIGTERM); \
+        exit(0); \
+    }
+
 #endif /* _APC_DEFINES_H */

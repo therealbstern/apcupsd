@@ -190,7 +190,13 @@ void powerfail (int ok)
     if (ok == 2) {
 	clear_files();
 	if (terminate_on_powerfail)
-	    terminate(0);
+        /*
+         * This sends a SIGTERM signal to itself.
+         * The SIGTERM is bound to apcupsd_ or apctest_terminate(),
+         * depending on which program is running this code, so it will
+         * do in anyway the right thing.
+         */
+	    sendsig_terminate();
     }
 
     /*
@@ -201,7 +207,7 @@ void powerfail (int ok)
      */
 
     if (ok == 3)
-	terminate(0);
+	sendsig_terminate();
 }
 	
 /********************************************************************* 

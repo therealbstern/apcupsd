@@ -66,6 +66,9 @@ extern UPSINFO myUPS;
 extern UPSINFO *core_ups;
 extern UPSDRIVER drivers[];
 extern char argvalue[MAXSTRING];
+extern void (*error_out)(char *file, int line, char *fmt,...);
+extern void (*error_exit)(char *fmt,...);
+extern void (*error_cleanup)(void);
 
 /*
  * Serial bits
@@ -122,14 +125,12 @@ extern int parse_options(int argc, char *argv[]);
 /*
  * In apcupsd.c
  */
-extern void error_out(char *file, int line, char *fmt,...);
-extern void error_exit(char *fmt,...);
 extern void powerfail (int ok);
 extern void logonfail (int ok);
 
 extern void thread_terminate (int sig);
 extern void clean_threads(void);
-extern void terminate (int sig);
+extern void apcupsd_terminate (int sig);
 extern void clear_files (void);
 extern void make_pid (void);
 
@@ -338,7 +339,7 @@ extern UPSINFO *getUpsByname(char *name);
 /*
  * In apcerror.c
  */
-extern void error_out(char *file, int line, char *fmt, ...);
-extern void error_exit(char *fmt, ...);
+extern void generic_error_out(char *file, int line, char *fmt, ...);
+extern void generic_error_exit(char *fmt, ...);
 
 #endif /* _APC_EXTERN_H */

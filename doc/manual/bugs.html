@@ -392,7 +392,7 @@ this:
                 echo "$MSG"
                 echo " "
                 /sbin/apcaccess status
-        ) | $MAIL -s "$MSG" $SYSADMIN
+        ) | $APCUPSD_MAIL -s "$MSG" $SYSADMIN
 </pre>
 </blockquote>
 

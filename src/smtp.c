@@ -32,7 +32,6 @@
 #define my_name_is(x)
 #define bstrdup(x) strdup(x)
 UPSINFO myUPS;
-void error_cleanup(char *buf) {}
 
 #ifndef MAXSTRING
 #define MAXSTRING 254

@@ -87,10 +87,10 @@ void setup_device(UPSINFO *ups)
         Error_abort0(_("Unable to create UPS lock file.\n"));
     }
 
-    signal(SIGHUP, terminate);
-    signal(SIGINT, terminate);
-    signal(SIGTERM, terminate);
-    signal(SIGPIPE, SIG_IGN);
+    /*
+     * No need to init_signals here as it was inited by main().
+     */
+    /* init_signals(terminate); */
 
     device_setup(ups);
 

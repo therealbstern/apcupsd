@@ -2531,8 +2531,8 @@ fi
 
 if test "$CFG_CYGWIN" = "yes"
 then
-    echo 'Hardcoding MAIL to /apcupsd/bin/smtp'
-    MAIL='/apcupsd/bin/smtp'
+    echo 'Hardcoding APCUPSD_MAIL to /apcupsd/bin/smtp'
+    APCUPSD_MAIL='/apcupsd/bin/smtp'
 else
     for ac_prog in mail
 do
@@ -2540,12 +2540,12 @@ do
 set dummy $ac_prog; ac_word=$2
 echo "$as_me:2541: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
-if test "${ac_cv_path_MAIL+set}" = set; then
+if test "${ac_cv_path_APCUPSD_MAIL+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  case $MAIL in
+  case $APCUPSD_MAIL in
   [\\/]* | ?:[\\/]*)
-  ac_cv_path_MAIL="$MAIL" # Let the user override the test with a path.
+  ac_cv_path_APCUPSD_MAIL="$APCUPSD_MAIL" # Let the user override the test with a path.
   ;;
   *)
   ac_save_IFS=$IFS; IFS=$ac_path_separator
@@ -2554,7 +2554,7 @@ for ac_dir in $ac_dummy; do
   IFS=$ac_save_IFS
   test -z "$ac_dir" && ac_dir=.
   if $as_executable_p "$ac_dir/$ac_word"; then
-   ac_cv_path_MAIL="$ac_dir/$ac_word"
+   ac_cv_path_APCUPSD_MAIL="$ac_dir/$ac_word"
    echo "$as_me:2558: found $ac_dir/$ac_word" >&5
    break
 fi
@@ -2563,21 +2563,21 @@ done
   ;;
 esac
 fi
-MAIL=$ac_cv_path_MAIL
+APCUPSD_MAIL=$ac_cv_path_APCUPSD_MAIL
 
-if test -n "$MAIL"; then
-  echo "$as_me:2569: result: $MAIL" >&5
-echo "${ECHO_T}$MAIL" >&6
+if test -n "$APCUPSD_MAIL"; then
+  echo "$as_me:2569: result: $APCUPSD_MAIL" >&5
+echo "${ECHO_T}$APCUPSD_MAIL" >&6
 else
   echo "$as_me:2572: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 
-  test -n "$MAIL" && break
+  test -n "$APCUPSD_MAIL" && break
 done
-test -n "$MAIL" || MAIL="no"
+test -n "$APCUPSD_MAIL" || APCUPSD_MAIL="no"
 
-    if test "$MAIL" = "no"
+    if test "$APCUPSD_MAIL" = "no"
     then
         echo 'WARNING: mail program not found !'
     fi
@@ -11441,7 +11441,7 @@ s,@APCACCESS@,$APCACCESS,;t t
 s,@SMTP@,$SMTP,;t t
 s,@APCTEST@,$APCTEST,;t t
 s,@SHUTDOWN@,$SHUTDOWN,;t t
-s,@MAIL@,$MAIL,;t t
+s,@APCUPSD_MAIL@,$APCUPSD_MAIL,;t t
 s,@WALL@,$WALL,;t t
 s,@SCRIPTSHELL@,$SCRIPTSHELL,;t t
 s,@MAKE@,$MAKE,;t t

@@ -6,7 +6,7 @@
 # We send an email message to root to notify him.
 #
 SYSADMIN=root
-MAIL="@MAIL@"
+APCUPSD_MAIL="@APCUPSD_MAIL@"
 
 HOSTNAME=`hostname`
 MSG="$HOSTNAME Serial port communications with UPS restored"
@@ -17,5 +17,5 @@ MSG="$HOSTNAME Serial port communications with UPS restored"
    echo "$MSG"
    echo " "
    @sbindir@/apcaccess status
-) | $MAIL $SYSADMIN
+) | $APCUPSD_MAIL $SYSADMIN
 exit 0

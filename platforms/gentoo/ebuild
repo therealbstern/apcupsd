@@ -1,6 +1,6 @@
 # Copyright 1999-2002 Gentoo Technologies, Inc.
 # Distributed under the terms of the GNU General Public License, v2 or later
-# $Header: /home/adk0212/src/cvs2svn/cvsrepo/apcupsd/platforms/gentoo/ebuild,v 1.1 2002-09-14 12:03:18 rfacchetti Exp $
+# $Header: /home/adk0212/src/cvs2svn/cvsrepo/apcupsd/platforms/gentoo/ebuild,v 1.2 2002-09-23 21:34:53 rfacchetti Exp $
 
 S=${WORKDIR}/${P}
 DESCRIPTION="APC UPS daemon with integrated tcp/ip remote shutdown (*ALPHA*)"
@@ -35,7 +35,7 @@ src_unpack() {
 src_compile() {
 	# patch touches configure.in, so we must regenerate configure
 	WANT_AUTOCONF_2_5=1 autoconf/autoregen.sh
-	MAIL=/usr/sbin/ssmtp ./configure \
+	APCUPSD_MAIL=/usr/sbin/ssmtp ./configure \
 		--prefix=/usr \
 		--sbindir=/usr/sbin \
 		--sysconfdir=${XSYSCONFDIR} \

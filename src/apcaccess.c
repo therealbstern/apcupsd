@@ -96,38 +96,6 @@ void reconfig_data (CONFIGINFO *config);
 void do_main_menu (void);
 void do_config_menu (void);
 
-/*********************************************************************
- * subroutine normally called by macro Error_abort() to print
- *  FATAL ERROR message and supplied error message
- *
- */
-void error_out(char *file, int line, char *fmt,...)
-{
-    char      buf[256];
-    va_list   arg_ptr;
-    int       i;
-
-    sprintf(buf, _("APCACCESS FATAL ERROR in %s at line %d\n"), file, line);
-    i = strlen(buf);
-    va_start(arg_ptr, fmt);
-    vsprintf((char *)&buf[i], (char *) fmt, arg_ptr);
-    va_end(arg_ptr);
-    fprintf(stderr, buf);
-    exit(1);
-}
-     
-/* simply print the message and exit */
-void error_exit(char *fmt,...)
-{
-    char      buf[256];
-    va_list   arg_ptr;
-    va_start(arg_ptr, fmt);
-    vsprintf(buf, (char *) fmt, arg_ptr);
-    va_end(arg_ptr);
-    fprintf(stderr, buf);
-    exit(1);
-}
-
 /* EPROM commands and their values as parsed from the
  * ^Z eprom string returned by the UPS.
  */

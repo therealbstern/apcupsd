@@ -579,9 +579,8 @@ void display_h_menu(pos) {
 int do_horiz_menu(void) {
 	int pos = 0;
 	int oldpos = 0;
-	int true = 1;
 
-	while (true) {
+	while (1) {
 
 		display_h_menu(pos);
 
@@ -683,11 +682,22 @@ out_err:
 	return FAILURE;
 }
 
+void powerflute_error_cleanup(void)
+{
+    detach_ups(sharedups);
+    close_curses();
+    exit(1);
+}
+
 int main(int argc, char **argv)
 {
 	int status;
 	int flag;
 
+    /*
+     * Set generic cleanup handler.
+     */
+    error_cleanup = powerflute_error_cleanup;
     ups = malloc(sizeof(UPSINFO));
 
     if (!ups) {
@@ -770,12 +780,4 @@ out:
 	return status;
 }
 
-
-/* Fixup missing error_cleanup() */
-void error_cleanup(UPSINFO *ups)
-{
-    detach_ups(sharedups);
-    close_curses();
-    exit(1);
-}
 #endif /* HAVE_POWERFLUTE */

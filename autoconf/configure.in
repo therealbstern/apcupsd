@@ -223,11 +223,11 @@ fi
 
 if test "$CFG_CYGWIN" = "yes"
 then
-    echo 'Hardcoding MAIL to /apcupsd/bin/smtp'
-    MAIL='/apcupsd/bin/smtp'
+    echo 'Hardcoding APCUPSD_MAIL to /apcupsd/bin/smtp'
+    APCUPSD_MAIL='/apcupsd/bin/smtp'
 else
-    AC_PATH_PROGS(MAIL, mail, no)
-    if test "$MAIL" = "no"
+    AC_PATH_PROGS(APCUPSD_MAIL, mail, no)
+    if test "$APCUPSD_MAIL" = "no"
     then
         echo 'WARNING: mail program not found !'
     fi

@@ -112,6 +112,17 @@ static int initialize_device_data(UPSINFO *ups) {
     }
     *cp = '\0';
 
+    /*
+     * Convert DeviceVendor to upper case.
+     * Reuse cp and in the end of while() it will point to the end
+     * of Sid->DeviceVendor in anyway.
+     */
+    cp = Sid->DeviceVendor;
+    while(*cp != '\0') {
+        *cp = toupper(*cp);
+        cp++;
+    }
+
     Sid->community = cp + 1;
 
     return 1;
