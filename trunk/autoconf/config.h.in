@@ -167,8 +167,14 @@
 /* Set if you want dumb support */
 #undef HAVE_DUMB_DRIVER
 
-/* Set if you want NET support */
+/* Set if you want NIS server support */
+#undef HAVE_NISSERVER
+
+/* Set if you want NIS client support */
 #undef HAVE_NET_DRIVER
+
+/* Set by configure if one of the two above are set */
+#undef HAVE_NISLIB
 
 /* Set if you want USB support */
 #undef HAVE_USB_DRIVER
@@ -178,6 +184,9 @@
 
 /* Set if you want TEST driver */
 #undef HAVE_TEST_DRIVER
+
+/* Set if you want the old master/slave network code */
+#undef HAVE_OLDNET
 
 /* Set if you want to compile powerflute */
 #undef HAVE_POWERFLUTE

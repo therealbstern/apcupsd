@@ -427,7 +427,7 @@ static UPSINFO *create_shmarea(int shmperm)
 {
     int i;
     int found = FALSE;
-    UPSINFO *ups;
+    UPSINFO *ups = NULL;
     int idshmUPS = -1;
 
     for (i=0; i<MAX_TRIES; i++) {
@@ -481,7 +481,7 @@ static UPSINFO *create_shmarea(int shmperm)
 static UPSINFO *attach_shmarea(int shm_id, int shmperm)
 {
     int idshmUPS;
-    UPSINFO *ups;
+    UPSINFO *ups = NULL;
 
     if ((idshmUPS = shmget(shm_id, sizeof(UPSINFO), 0)) == -1) {
         log_event(ups, LOG_ERR, _("attach_shmarea: cannot get shm area. ERR=%s\n"),

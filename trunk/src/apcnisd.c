@@ -62,11 +62,6 @@
 
 
 #include "apc.h"
-#include "apc_nis.h"
-
-#ifdef HAVE_LIBWRAP
-#include <tcpd.h>
-#endif
 
 #define NETD_VERSION "1.0"
 

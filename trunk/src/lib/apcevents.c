@@ -144,6 +144,8 @@ trim_done:
     return status;
 }
 
+#ifdef HAVE_NISSERVER
+
 /*
  * Send the last events.
  * Returns:
@@ -194,6 +196,8 @@ goodout:
 	    free(le[i]);
     return stat;
 }
+
+#endif /* HAVE_NISSERVER */
 
 #ifdef HAVE_CYGWIN
 

@@ -50,11 +50,8 @@
 
 
 #include "apc.h"
-#include "apc_nis.h"
 
-#ifdef HAVE_LIBWRAP
-#include <tcpd.h>
-#endif
+#ifdef HAVE_NISSERVER
 
 #ifdef HAVE_PTHREADS
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
@@ -71,36 +68,6 @@ struct s_arg {
    UPSINFO *ups;
    int newsockfd;
 };
-
-#ifdef HAVE_LIBWRAP
-int allow_severity = LOG_INFO;
-int deny_severity = LOG_WARNING;
-
-int check_wrappers(char *av, int newsock)
-{
-    struct request_info req;
-    char *av0;
-
-    if (strchr(av, '/'))
-        av0 = strrchr(av, '/');
-    else
-	av0 = av;
-
-    request_init(&req, RQ_DAEMON, av0, RQ_FILE, newsock, NULL);
-    fromhost(&req);
-    if (!hosts_access(&req)) {
-	log_event(core_ups, LOG_WARNING,
-            _("Connection from %.500s refused by tcp_wrappers."),
-	    eval_client(&req));
-	return FAILURE;
-    }
-#ifdef I_WANT_LOTS_OF_LOGGING
-    log_event(core_ups, LOG_NOTICE, "connect from %.500s", eval_client(&req));
-#endif
-    return SUCCESS;
-}
-
-#endif /* HAVE_LIBWRAP */
 
 
 /* forward referenced subroutines */
@@ -439,3 +406,47 @@ void *handle_client_request(void *arg)
     detach_ups(ups);
     return NULL;
 }
+
+#else /* HAVE_NISSERVER */
+
+void do_server(UPSINFO *ups) {
+    log_event(ups, LOG_ERR, "apcserver: code not enabled in config.\n");
+    exit(1);
+}
+
+#endif HAVE_NISSERVER
+
+
+#ifdef HAVE_LIBWRAP
+/*
+ * Unfortunately this function is also used by the old network code
+ * so for now compile it in anyway.
+ */
+int allow_severity = LOG_INFO;
+int deny_severity = LOG_WARNING;
+
+int check_wrappers(char *av, int newsock)
+{
+    struct request_info req;
+    char *av0;
+
+    if (strchr(av, '/'))
+        av0 = strrchr(av, '/');
+    else
+	av0 = av;
+
+    request_init(&req, RQ_DAEMON, av0, RQ_FILE, newsock, NULL);
+    fromhost(&req);
+    if (!hosts_access(&req)) {
+	log_event(core_ups, LOG_WARNING,
+            _("Connection from %.500s refused by tcp_wrappers."),
+	    eval_client(&req));
+	return FAILURE;
+    }
+#ifdef I_WANT_LOTS_OF_LOGGING
+    log_event(core_ups, LOG_NOTICE, "connect from %.500s", eval_client(&req));
+#endif
+    return SUCCESS;
+}
+
+#endif /* HAVE_LIBWRAP */

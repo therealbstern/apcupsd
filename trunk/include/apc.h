@@ -170,7 +170,7 @@
 
 #include <netinet/in.h>
 #include <arpa/inet.h>
-           
+
 
 /* Include apcupsd stuff */
 
@@ -181,6 +181,12 @@
 #include "apc_defines.h"
 #include "apc_struct.h"
 #include "apc_drivers.h"
+#include "apc_nis.h"
 #include "apc_extern.h"
+
+/* System includes conditionally included */
+#ifdef HAVE_LIBWRAP
+# include <tcpd.h>
+#endif
 
 #endif

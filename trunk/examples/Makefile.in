@@ -25,20 +25,20 @@ hid-set: hid-set.c
 
 
 client:  client.c $(APCLIBS)
-	$(CC) client.c $(APCLIBS) -o client
+	$(CC) $(CFLAGS) client.c $(APCLIBS) -o client
 	$(CP) client@EXEEXT@ gui/
 
 megaclient:  megaclient.c $(APCLIBS)
-	$(CC) megaclient.c $(APCLIBS) -o megaclient
+	$(CC) $(CFLAGS) megaclient.c $(APCLIBS) -o megaclient
 
 readfifo:  readfifo.c
 	$(CC) readfifo.c -o readfifo
 
 newslave: newslave.c $(APCLIBS)
-	$(CC) newslave.c $(APCLIBS) -o newslave
+	$(CC) $(CFLAGS) newslave.c $(APCLIBS) -o newslave
 
 upsapm: upsapm.c $(APCLIBS)
-	$(CC) upsapm.c $(APCLIBS) -o upsapm
+	$(CC) $(CFLAGS) upsapm.c $(APCLIBS) -o upsapm
 
 install:
 

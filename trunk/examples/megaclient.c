@@ -28,16 +28,12 @@
 
 #define ITERATIONS 80000
 
-#include <stdio.h>
-#include <string.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <netdb.h>
+#include "apc.h"
+
+#ifdef HAVE_NISLIB
 
 /* Default values, can be changed on command line */
-#define SERV_TCP_PORT 7000
+#define SERV_TCP_PORT 3551
 #define SERV_HOST_ADDR "127.0.0.1"
 
 #define MAXLINE 5000
@@ -146,3 +142,12 @@ int main(int argc, char *argv[])
    printf("Total time = %d secs.\n", done - now);
    exit(0);
 }   
+
+#else /* HAVE_NISLIB */
+
+int main(int argc, char *argv[]) {
+    printf("Sorry, NIS code is not compiled in apcupsd.\n");
+    return 1;
+}
+
+#endif /* HAVE_NISLIB */
