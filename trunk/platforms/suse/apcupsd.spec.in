@@ -235,7 +235,9 @@ if [ "$1" -ge 1 ] ; then
 /sbin/chkconfig --add apcupsd
 fi
 
-%if ! %{mdk}
+# are we Mandrake?
+# Mandrake already handles apcupsd
+if [ ! -s /etc/mandrake-release ]; then
 cp -f %{initdir}/halt %{initdir}/halt.old
 awk '# Stuff left over from a previous apcupsd, remove it
 /^# See if this is a powerfail situation\./ {
@@ -263,7 +265,7 @@ awk '# Stuff left over from a previous apcupsd, remove it
 { print } ' %{initdir}/halt.old > %{initdir}/halt
 
 chmod 744 %{initdir}/halt
-%endif
+fi
 
 # Undo things a bit
 
@@ -277,7 +279,9 @@ if [ $1 = 0 ] ; then
         # remove startup links
         /sbin/chkconfig --del apcupsd
 	
-	%if ! %{mdk}
+	# are we Mandrake?
+	# Mandrake already handles apcupsd
+	if [ ! -s /etc/mandrake-release ]; then
         # restore old halt script (hopefully)
         #   mv -f /etc/rc.d/init.d/halt.old /etc/rc.d/init.d/halt
 
@@ -293,7 +297,7 @@ if [ $1 = 0 ] ; then
         { print } ' %{initdir}/halt.old > %{initdir}/halt
 
         chmod 744 %{initdir}/halt
-	%endif
+	fi
 fi
 
 %postun usb
@@ -338,7 +342,9 @@ if [ "$1" -ge 1 ] ; then
 /sbin/chkconfig --add apcupsd
 fi
 
-%if ! %{mdk}
+# are we Mandrake?
+# Mandrake already handles apcupsd
+if [ ! -s /etc/mandrake-release ]; then
 cp -f %{initdir}/halt %{initdir}/halt.old
 awk '# Stuff left over from a previous apcupsd, remove it
 /^# See if this is a powerfail situation\./ {
@@ -366,7 +372,7 @@ awk '# Stuff left over from a previous apcupsd, remove it
 { print } ' %{initdir}/halt.old > %{initdir}/halt
 
 chmod 744 %{initdir}/halt
-%endif
+fi
 
 # Undo things a bit
 
@@ -380,7 +386,9 @@ if [ $1 = 0 ] ; then
         # remove startup links
         /sbin/chkconfig --del apcupsd
 
-	%if ! %{mdk}
+	# are we Mandrake?
+	# Mandrake already handles apcupsd
+	if [ ! -s /etc/mandrake-release ]; then
         # restore old halt script (hopefully)
         #   mv -f /etc/rc.d/init.d/halt.old /etc/rc.d/init.d/halt
 
@@ -396,7 +404,7 @@ if [ $1 = 0 ] ; then
         { print } ' %{initdir}/halt.old > %{initdir}/halt
 
         chmod 744 %{initdir}/halt
-	%endif
+	fi
 fi
 
 %postun std
@@ -408,6 +416,8 @@ fi
 %endif
 
 %changelog
+* Fri Nov 05 2004 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- change Mandrake logic in preun and post scriptlets to if;then;fi
 * Sun Oct 31 2004 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - add Mandrake support
 * Wed Aug 04 2004 D. Scott Barninger <barninger at fairfieldcomputers.com>
