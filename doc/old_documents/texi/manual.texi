@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: manual.texi,v 1.9 2005-03-13 22:21:47 kerns Exp $
+@comment $Id: manual.texi,v 1.1 2005-04-05 07:22:17 kerns Exp $
 @c %***start of header
 @setfilename manual.info
 @finalout
