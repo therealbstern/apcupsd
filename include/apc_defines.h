@@ -147,7 +147,7 @@
 #define UPS_PLUGGED       0x01000000  /* Set if computer is plugged into UPS */
 #define UPS_DEV_SETUP     0x02000000  /* Set if UPS's driver did the setup() */
 
-#define UPS_LOCAL_BITS (UPS_COMMLOST|UPS_SLAVE|UPS_SLAVEDOWN|UPS_PREV_ONBATT| \
+#define UPS_LOCAL_BITS (UPS_COMMLOST|UPS_SHUTDOWN|UPS_SLAVE|UPS_SLAVEDOWN|UPS_PREV_ONBATT| \
             UPS_PREV_BATTLOW|UPS_ONBATT_MSG|UPS_FASTPOLL|UPS_PLUGGED|UPS_DEV_SETUP)
 
 /* Macro to set/clear/test bit values in ups->Status */
