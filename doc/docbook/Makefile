@@ -5,12 +5,12 @@
 
 first_rule: all
 
-out="/tmp/db_tmp"
+out=/tmp/db_tmp
 
 .SUFFIXES:     .xml .kml
 .PHONY:
 
-install.xml: install.kml
+.kml.xml:
 	@echo "s%<b>%<emphasis role=\"bold\">%g" >${out}
 	@echo "s%</b>%</emphasis>%g" >> ${out}
 	@echo "s%<p>%<para>%g" >> ${out}
@@ -21,6 +21,8 @@ install.xml: install.kml
 	@echo "s%</li>%</listitem>%g" >> ${out}
 	sed -f ${out} $< >$@
 	@rm -f ${out}
+
+install.xml: install.kml
 
 all:	manual.html web pdf
 
@@ -37,11 +39,22 @@ web:	install.xml manual.xsl manual.xml
 	   echo "Error building web manual"; \
 	fi
 	@rm -f install.xml
+	@echo "s%Â% %g" >${out}
+	@echo "s% % %g" >>${out}
+	@(cd html; for i in *.html; do \
+	    cp -f $$i 1; \
+	    sed -f ${out} 1 >$$i; \
+	  done )
+	@rm -f html/1
+	@echo "html manual sanitized for web use"
+
+	   
 
 pdf:	manual.html
 	@echo "s%<a id=\"%<a name=\"%g" >${out}
 	@echo "s%href=\"#%href=\"manual.html#%g" >>${out}
 	@echo "s%Â%\&nspb;%g" >>${out}
+	@echo "s% %\&nspb;%g" >>${out}
 	@cp -f manual.html broken_manual.html
 	sed -f ${out} broken_manual.html >manual.html
 	@rm -f broken_manual.html ${out}

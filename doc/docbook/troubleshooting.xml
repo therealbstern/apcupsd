@@ -2,6 +2,23 @@
 
 <sect1><title>Known Problems with USB UPSes</title>
 
+<sect2><title>Some Cheaper Models Do Not Have Battery Charge</title>
+
+<para>
+Unfortunately, some cheaper USB models do not seem to report
+BCHARGE in the apcaccess output listing, which means with a
+standard conf file, your system will be immediately shutdown.
+To correct this, set the BATTERYLEVEL directive in your apcupsd.conf
+file to -1.
+</para>
+<para>
+Some of these cheaper USB UPSes also do not report the Voltage. This
+is annoying but does not cause the unit to malfunction.
+</para>
+
+</sect2>
+
+
 <sect2><title>Reconnection does not clean up the lockfile</title>
 
 <para>If either you disconnect the UPS or it disconnects because of
