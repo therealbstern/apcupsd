@@ -517,6 +517,12 @@ static int match_str(UPSINFO *ups, int offset,
     char x[MAXSTRING];
     long size = (long)gen;
 
+    /*
+     * Needed if string is empty or all whitespace; sscanf will return EOF 
+     * without modifying the destination buffer.
+     */
+    x[0] = '\0';
+
     if (!sscanf(v, "%s", x))
 	return FAILURE;
 
