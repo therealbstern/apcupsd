@@ -492,7 +492,7 @@ static void readconf(void)
     FILE    *conf;
     char    buf[512], fn[MAXPATHLEN];
 
-    snprintf (fn, sizeof(fn), "%s/multimon.conf", CONFPATH);
+    snprintf (fn, sizeof(fn), "%s/multimon.conf", SYSCONFDIR);
     conf = fopen (fn, "r");
 
     /* the config file is not required */
@@ -564,7 +564,7 @@ int main(int argc, char **argv)
     (void) puts ("</tr>"); 
 
     /* ups status */
-    snprintf (fn, sizeof(fn), "%s/hosts.conf", CONFPATH);
+    snprintf (fn, sizeof(fn), "%s/hosts.conf", SYSCONFDIR);
     conf = fopen (fn, "r");
     if (conf == NULL) {
         printf ("<tr><td colspan=\"%d\" class=\"Fault\">Error: Cannot open hosts file</td></tr>\n",

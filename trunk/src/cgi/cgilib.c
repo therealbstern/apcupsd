@@ -78,7 +78,7 @@ int checkhost(const char *check)
     FILE    *hostlist;
     char    fn[256], buf[256], addr[256];
 
-    snprintf(fn, sizeof(fn), "%s/hosts.conf", CONFPATH);
+    snprintf(fn, sizeof(fn), "%s/hosts.conf", SYSCONFDIR);
     hostlist = fopen(fn, "r");
 
     if (hostlist == NULL)

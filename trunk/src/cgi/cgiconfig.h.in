@@ -67,5 +67,3 @@
 #include "gdfontl.h"
 #endif
 
-/* path where configuration files get installed by default */
-#define CONFPATH "@sysconfdir@"
