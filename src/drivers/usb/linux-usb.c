@@ -74,7 +74,7 @@ static bool linkcheck = false;
  *   Entries in the table with ci == CI_NONE are not used, for the
  *   moment, they are retained just so they are not forgotten.
  */
-struct s_known_info {
+static const struct s_known_info {
     int ci;			      /* command index */
     unsigned usage_code;	      /* usage code */
     unsigned physical;		      /* physical usage */
