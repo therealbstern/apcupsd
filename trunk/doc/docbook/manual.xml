@@ -329,12 +329,15 @@ file, and unfortunately not in much detail.</para>
 
 <preface><title>How To Use This Manual</title>
 
-<para>This is the manual for <application>apcupsd</application>, a 
+<para>This is the manual for <application>apcupsd</application>, a
 daemon for communicating with UPSes (Uninterruptible Power Supplies)
 made by American Power Corporation (APC).  If you have an APC-made
-UPS, whether sold under the APC nameplate or OEMed, and you want
-you get it working with a computer running Linux, Unix, or Windows
-NT, you are reading the right document.</para>
+UPS, whether sold under the APC nameplate or OEMed<footnote><para>The
+HP PowerTrust 2997A UPS has been tested as a "smartups" with cable
+Hewlett Packard part number 5061-2575 equivalent to a custom-smart
+cable"</para></footnote>, and you want you get it working with a
+computer running Linux, Unix, or Windows NT, you are reading the right
+document.</para>
 
 <para>This manual is divided into parts which increase in technical
 depth as they go.  If you have just bought a state-of-the-art smart
