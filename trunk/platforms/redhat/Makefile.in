@@ -21,7 +21,7 @@ top_builddir = $(topdir)
 all-targets: Makefile
 
 install:
-	@if test x$(DISTDIR) == x ; then \
+	@if test x$(DESTDIR) == x ; then \
 	   if test -f /etc/rc.d/init.d/apcupsd; then \
 	       /sbin/chkconfig --del apcupsd; \
 	   fi; \
@@ -42,7 +42,7 @@ install:
 	@awk -f awkhaltprog /etc/rc.d/init.d/halt.old >$(DESTDIR)/etc/rc.d/init.d/halt
 	@chmod 744 $(DESTDIR)/etc/rc.d/init.d/halt
 	# link new halt script for startup and shutdown
-	@if test x$(DISTDIR) == x ; then \
+	@if test x$(DESTDIR) == x ; then \
 	   /sbin/chkconfig --add apcupsd; \
 	fi
 	@echo "================================================="
@@ -65,7 +65,7 @@ install:
 
 uninstall:
 	@echo "Removing symlinks..."
-	@if test x$(DISTDIR) == x ; then \
+	@if test x$(DESTDIR) == x ; then \
 	   /sbin/chkconfig --del apcupsd ; \
 	fi
 	@echo "Removing boot script..."
