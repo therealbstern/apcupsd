@@ -46,4 +46,8 @@ extern int usb_ups_setup(UPSINFO *ups);
 extern int usb_ups_program_eeprom(UPSINFO *ups, int command, char *data);
 extern int usb_ups_entry_point(UPSINFO *ups, int command, void *data);
 
+/* Extra functions exported for use by apctest */
+extern int usb_write_int_to_ups(UPSINFO *ups, int ci, int value, char *name);
+extern int usb_read_int_from_ups(UPSINFO *ups, int ci, int* value);
+
 #endif /* _USB_H */
