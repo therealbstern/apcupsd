@@ -50,25 +50,6 @@ dnl
   if test x$sbindir = x'${exec_prefix}/sbin' ; then
      sbindir='/etc/opt/apcupsd/sbin'
   fi
-elif test $HAVE_UNAME=yes -a x`uname -s` = xSCO_SV
-then
-dnl ----------------------------------------
-dnl  SCO OpenServer defaults
-dnl ----------------------------------------
-  AC_PREFIX_DEFAULT(/etc)
-dnl
-dnl If the user has not set -sysconfdir, we set our default as
-dnl /usr/lib/apcupsd
-dnl
-  if test x$sysconfdir = x'${prefix}/etc' ; then
-     sysconfdir='/usr/lib/apcupsd'
-  fi
-dnl
-dnl If the user has not set -sbindir, we set our default as /etc
-dnl
-  if test x$sbindir = x'${exec_prefix}/sbin' ; then
-     sbindir='/etc'
-  fi
 else
 dnl -------------------------------------------
 dnl  non Sun defaults (i.e. all other platforms  
@@ -299,10 +280,6 @@ AC_CHECK_FUNCS(
 
 AC_CHECK_FUNCS(snprintf vsnprintf)
 
-dnl ----------------------------------------
-dnl SCO OpenServer defines a macro for syslog() that uses std_syslog().
-dnl Custom check needed.
-dnl ----------------------------------------
 AC_MSG_CHECKING([for syslog])
 
 AC_TRY_LINK(
@@ -346,8 +323,6 @@ AC_CHECK_FUNC(socket,
     AC_CHECK_LIB(socket,socket)
     AC_CHECK_LIB(inet,socket))
 
-# SCO OpenServer needs to look into -lsocket for this one (leave other libs
-# as well).
 AC_CHECK_FUNC(gethostname,
     AC_MSG_RESULT(using libc's gethostname),
     AC_CHECK_LIB(socket,gethostname)
@@ -558,14 +533,6 @@ then
 	AC_DEFINE(HAVE_OPENBSD_OS)
 else
 	AM_CONDITIONAL(HAVE_OPENBSD_OS, $FALSEPRG)
-fi
-
-if test $HAVE_UNAME=yes -a x`uname -s` = xSCO_SV
-then
-	AM_CONDITIONAL(HAVE_OPENSERVER_OS, $TRUEPRG)
-	AC_DEFINE(HAVE_OPENSERVER_OS)
-else
-	AM_CONDITIONAL(HAVE_OPENSERVER_OS, $FALSEPRG)
 fi
 
 if test $HAVE_UNAME=yes -a x`uname -s` = xBSD/OS
@@ -1163,9 +1130,6 @@ then
 elif test $HAVE_UNAME=yes -a x`uname -s` = xOpenBSD
 then
 	DISTNAME=openbsd
-elif test $HAVE_UNAME=yes -a x`uname -s` = xSCO_SV
-then
-	DISTNAME=openserver
 elif test $HAVE_UNAME=yes -a x`uname -s` = xBSD/OS
 then
 	DISTNAME=bsdi
@@ -1178,9 +1142,6 @@ then
 elif test -d /etc/SuSEconfig
 then
 	DISTNAME=suse5
-elif test -d /usr/src/OpenLinux
-then
-	DISTNAME=caldera
 elif test -f /etc/mandrake-release
 then
     DISTNAME=mandrake
@@ -1289,12 +1250,6 @@ alpha)
   ;;
 bsdi)
 	DISTVER=`uname -a |awk '{print $3}'`
-  ;;
-caldera)
-	DISTVER=`cat /etc/.issue | grep Version | cut -f 2 -d ' '`
-	DFILES="\
-		platforms/caldera/Makefile \
-		platforms/caldera/apcupsd"
   ;;
 cygwin)
 	DISTVER=cygwin
@@ -1801,4 +1756,3 @@ WARNING! You have /usr/ucb on your path. We STRONGLY recommend
 	 apcupsd may be unable to shutdown your system.
 
   "
-fi
