@@ -4,13 +4,164 @@
 prior 3.10.x versions, and is intended to be the official release.
 See the ChangeLog below for more details.</para>
 
-<sect1><title>New Features in in 3.10.6</title>
+<sect1><title>New Features</title>
 
 <para>This release contains a good number of cleanups and bug fixes to
 prior 3.10.x versions, and is intended to be the official release. See
 the ChangeLog below for more details.</para>
 
-<para>Change Log</para>
+<para>Change Log for current version</para>
+<programlisting>
+--- Release apcupsd-3.10.12 (xx February 2004)
+- Minor updates to the documentation from user input.
+- Fix a Makefile find that removes zero length files, which fails                 
+  on some systems.
+- Web site update.
+- Apply patch from Adam that fixes OpenBSD and FreeBSD pthreads 
+  library bugs.
+- Add poll time to SNMP driver, and correct header file prototyping.
+- Make usb driver sleep for 1 second then retry up to 10 times
+  if the device cannot be opened. There are two such loops so in
+  the event of failure, it will occur 20 seconds later. This
+  allows time for the hotplug program to initialize the USB devices
+  after a boot.
+</programlisting>
+
+
+<para>Change Log for versions 3.10.7-3.10.11</para>
+<programlisting>
+--- Release apcupsd-3.10.11 (26 January 2004)
+- Correct apccontrol script to remove extra ;; that I inadvertantly
+  left the last release -- apparently that prevented proper shutdown.
+- Updates to manual as requested by Adam and other users.
+- Fix localtime_r in configure.in as reported with patch by Adam.
+- Fixed bad html in multimoncss.c reported by an anonymous user.
+- Added new Mandrake apcupsd.spec.in submitted by David Walser.
+- Revert to using the old master/slave networking code bu default.
+
+--- Release apcupsd-3.10.10 (16 January 2004)
+- This version has an additional fix to the USB driver based on
+  work by Adam Kropelin -- it limits the rate at which apcupsd will
+  poll the UPS for the volatile data, which in turn reduces the possiblity
+  of flooding the kernel with control messages (hide-core.c: control
+  queue full ...".
+15Jan04
+- I added a new "offbattery" event that is only executed if the 
+  "onbattery" event was executed. This should allow users to easily
+  control what messages they get and by using the ONBATTERYDELAY the
+  time on batteries before the onbattery event is notified.
+
+--- Release apcupsd-3.10.9 (31 December 2003)
+31Dec03
+- Bartlomiej Krol found an unexpected interaction between the 6 second
+  "debounce" code and the new ONBATTERY delay time that caused the
+  USB and apcsmart drivers to sleep for a long time.
+
+--- Release apcupsd-3.10.8 (28 December 2003)
+28Dec03
+- Added upsBaiscOntrolConverveBattery change to smtp requested by
+  Kastus Shchuka (kastus@list.sourceforge.net) 
+- Move wall in killpower of apccontrol to after killpower to avoid 
+  errors stopping script.
+- Install apctest along with apcupsd.
+- Fix DISTVER for RH Enterprise
+19Dec03
+- Added patch by Adam Kropelin that ignores invalid samples. This 
+  eliminates the need for the wait, and seems to calm the system. Apparently, 
+  even though apcupsd did not use the bad samples, it would break from the
+  wait loop, and request an update, which gave even more bad samples. With
+  Adam's patch the samples are simply dropped and we continue waiting (if 
+  appropriate).  Thanks Adam.
+18Dec03
+- Add Slackware updated patch submitted by Andrei Mamontov
+- Corrected the missing library dependencies in src/Makefile.in
+  Thanks to Reg. Clemens for pushing me a bit on this.
+06Dec03
+- Added usleep(10000) provided by Reg. Clemens, which resolves the
+  apcuspd USB problems on 2.6 kernels. Now removed by 19Dec03 patch.
+24Nov03
+- Added a ONBATTERYDELAY to the conf file. This is the time in
+  seconds that apcupsd will wait after detecting a power failure
+  until it sets the onbattery state.  If you do not want to be
+  annoyed by short power outages (usually less than 10 seconds),
+  set the ONBATTERYDELAY appropriately and comment out the
+  powerout) "echo ...|wall" statement.
+- I finally got the no driver configured error. It turns out that the
+  Makefile detection of changes is all botched up. Since I don't understand
+  how the author expected it to work, I used the sledgehammer approach and
+  do a "make clean" on every ./configure.
+- Replaced apcnet.c with Howard Wilkinson's new master/slave code. If
+  anyone *really* needs the old driver, it is in src/apcnet.c.old
+- Upgraded to Cygwin 1.5.5
+
+--- Release apcupsd-3.10.7 (xx November 2003)
+08Nov03
+- Do automatic UPS detection in the USB code if no device is specified
+  or if the specified device cannot be opened.
+- Include patch provided by Howard Wilkinson, but put the new apcnet.c
+  in apcnet.c.new until I have a chance to examine it in detail.
+
+  His notes:
+  I attach a complete rewrite of the Master side of the mast/slave code
+  to support asynchronous connections to slaves.  I needed to do this as
+  our network has a number of machines that tend to be powered off for
+  long periods and the connect() calls were hanging around for more than
+  nettime.
+  I also, added a small patch for a new command line flag
+  '-P|--pid-file' so that I can easily run multiple daemons on one
+   machine.  I needed this as I have a machine that acts as a multiple
+   master while getting its power from another UPS managed by another
+   machine.
+07Nov03
+- Lib wrappers was not building correctly on FreeBSD due to the 
+  library -lnls, so I copied over the Bacula code for configure.
+  Thanks to Lars Koeller for reporting this and for his patches.
+- Attempt to get mkinstalldirs called by an absolute path rather
+  than relative.
+- Apply Lars' fixes to platforms/Makefile.in and platforms/etc/Makefile.in
+  Install scripts with $(INSTALL_SCRIPT) instead of $(INSTALL_PROGRAM)
+- Close all file descriptors except stdin/out/err.
+- If there are no stdin/out/err (Windows), then create them and point them
+  to /dev/null.  This prevents the serial port from suddenly getting
+  debug output sent to it -- chaos.
+- It seems that since the beginning of 3.10.x, the APCSMART_UPS never
+  reported the proper status. This is because it was not in the case
+  statement. Incredible since it is now the "standard" driver! Thanks
+  to the user that brought this to my attention.
+- Fix a segfault in linux-usb.c due to reference one beyond the command
+  table. This happens only on newer USB UPSes. Thanks to the user who
+  pointed this out.
+
+--- Release apcupsd-3.10.6a (30 October 2003)
+30Oct03
+- Integrated Alexander Schremmer's stdout fix for Windows --
+  keeps debug printout from being sent to the serial port.
+28Oct03
+- Bob Kuo found a bug that caused a seg fault for newer USB
+  UPSes. The error was that my code walked off the end of a 
+  table in linux-usb.c if the USB code was not in the
+  table.
+
+--- Release apcupsd-3.10.6 (10 October 2003)
+11Oct03
+- Release 3.10.6 10Oct03 as offical stable version.
+03Oct03
+- Move the old manual to old_documents and commit the
+  new docbook manual to the CVS. Don't include the web
+  html directory.
+28Sep03
+- Test net slave mode. It works fine.
+- Add MASTER name to status output if device is a slave.
+- Display last master update if device is a net slave.
+- Add 10 sec delay before calling apcupsd --killpower it is
+  needed for USB killpower to work right. Why????
+- Save old apccontrol when installing a new one.
+- Replace old UPS_SET() with set_ups() in a number of places.
+27Sep03
+- Implement autodetect of USB port if no DEVICE given.
+</programlisting>
+
+<para>Change Log for version 3.10.6</para>
 
 <programlisting>
 - Lots of updates to the document.
@@ -78,213 +229,5 @@ the ChangeLog below for more details.</para>
 
 </programlisting>
 </sect1>
-<sect1><title>New Features in 3.10.5</title>
 
-<para>This release is primarily version 3.10.4 but including a fix
-that closes a root exploit of slave machines. In addition, it makes
-the <option>--enable-master-slave</option> ./configure option work and
-has a few updates to the Mandrake release. See the ChangeLog below for
-more details.</para>
-
-<para>Change Log</para>
-<programlisting>
-----&gt; Release apcupsd-3.10.5 (03 Feb 2003)
-  03Feb03
-  - Added an avsnprinf() routine.          
-  - Replaced all vsprintf() calls with avsnprintf() to close a
-    master/slave exploit that was published.
-  - Remove awk processing of halt script for Mandrake as suggested by
-    David Walser.
-  02Feb03
-  - Corrected --enable-oldnet to be --enable-master-slave as I
-    had intended. Thanks to David Walser for pointing this out.
-  - Added David Walser's apcupsd.spec.in for Mandrake and his
-    changes to configure.in.
-
-</programlisting>
-</sect1>
-<sect1><title>New Features in 3.10.4</title>
-
-<para>See the list below for the detailed change log. Note, a number
-of the details of the changes are only documented in the apcupsd.conf
-file, and unfortunately not in much detail.</para>
-
-<para>The main new features are:</para>
-
-<itemizedlist>
-<listitem><para>Support for USB UPSes on Linux. The killpower feature does
-    not work though (most likely a kernel "bug").</para>
-</listitem>
-<listitem><para>Support for additional models and cables.</para>
-</listitem>
-<listitem><para>New cable for running BackUPS CS in Smart mode (possibly
-    also the BackUPS ES).</para>
-</listitem>
-<listitem><para>The old master/slave code must be explicitly enabled with
-    <option>--enable-master-slave</option> option on the 
-    <command>./configure</command> line.</para>
-</listitem>
-<listitem><para>Different models are now handled by drivers.</para>
-</listitem>
-<listitem><para>NIS code, master/slave code, and the drivers can be
-    individually configured giving a much smaller memory foot
-    print.</para>
-</listitem>
-<listitem><para>A host of new configuration options to support
-    enabling/disabling drivers and features.</para>
-</listitem>
-<listitem><para>Support for limiting what subnets the NIS code will listen
-    to using the new NISIP configuration directive.</para>
-</listitem>
-<listitem><para>SNMP support.</para>
-</listitem>
-<listitem><para>Support for system provided gd libraries.</para>
-</listitem>
-<listitem><para>Source tree reorganization.</para>
-</listitem>
-</itemizedlist>
-
-
-<para>Change Log:</para>
-<programlisting>
-----&gt; Release apcupsd-3.10.4 (21 Jan 2003)
-  - Added error messages if old master/slave code called.
-  - Reworked the messages for ./configure --help to be aligned and
-    clearer for networking and master/slave
-  - A number of important patches all supplied by Mirko Doelle.
-  - Moved technotes for 2001 and 2002 into respective directories.
-  - Created a new kes-3.10.4 file to which I will append if there
-    are additional changes to 3.10.4. This will reduce the number
-    of release note files.
-
-  19Jan03
-  - Fixed hangs in usb driver startup when could not open port by
-    releasing the ups structure lock before the Error_abort calls.
-    Thanks to Mirko Doelle for reporting this.
-  - Fixed the default path for mkinstalldirs from $(topdir) to
-    $(topdir)/autoconf.  Reported by Mirko.
-  - Fixed configure.in to always create platform/apccontrol. Previously
-    it was not being created for Debian. Reported by Mirko.
-  - Removed Debian specific installation of apccontrol. Reported by
-    Mirko.
-  - Implemented code to display the apcupsd events with the most recent
-    first. Code sent by Mirko, but I modified it slightly.
-
-----&gt; Release apcupsd-3.10.3 (12 Dec 2002)
-  - Tried to correct problems with Makefiles
-  - Thanks to David Walser who pointed out where on the Sun, the make
-    install was doing terrible things -- I found that there was
-    a missing semicolon in the new Makefile.  Before my previous cleanup,
-    there were actually 4 missing semicolons.  Hopefully this
-    will correct the problem.
-  - For a second time, David Walser came to the rescue finding the
-    CGI install problem reported by lots of people.  The new code
-    used &quot;make&quot; instead of $(MAKE) to call the CGI make.  Fixed.
-
-  - Removed Makefile code that creates and sets permission bits on
-    /tmp $(prefix) and $(exec-prefix)
-  - Removed all occurrences of -z in the Makefiles (at least that I
-    found) and replaced them with a more conservative formulation.
-  - Removed the install-symlinks script that caused some problems
-    on distributions with blanks in the DISTVER name.
-  - Added install-symlinks to the suse Makefile.in. This is the
-    only platform that currently uses it.
-
-
-----&gt; Release apcupsd-3.10.2 (08 Nov 2002)
-  - New cable design for BackUPS CS models to run it
-    in Smart serial mode.
-  - Corrected a major bug in the smart and net code where the
-    status word was getting clobbered.
-
-  - A few days ago, slither_man sent me an email with some 
-    information on how to run a BackUPS CS in smart mode with
-    a serial cable.  He found the information by assuming that
-    the UPS supported Smart mode and through trial and error.
-    Well, it works!!!!!!! Amazing!!!! Thanks slither_man.
-  - Documentation for new CUSTOM-RJ54 cable that can be constructed
-    from the end of an ethernet cable and a DB9F connector.
-
-  - Changed all the MAIL instances in shell scripts into APCUPSD_MAIL.
-    This helps keep separated the apcupsd specific shell variables from
-    the generic $MAIL shell variable that points to the user's mailbox:
-
-      riccardo at ao:~&gt; echo $MAIL
-      /var/spool/mail/riccardo
-      riccardo at ao:~&gt;
-
-    An user reported that ./configure script transformed internal $MAIL
-    executable program into her mailbox path. This may happen if the
-    configure suite is broken (thing that I don't want to check further).
-    That said, APCUPSD_MAIL now should always correctly point to the
-    system default mail client program.
-  - Made so that error_cleanup is a generic function called by the
-    generic error handlers. Now if you want specific error_cleanup
-    you don't need to write also specific error handlers, provided
-    that error_cleanup don't accept parameters (i.e.
-    specific_error_cleanup(void)) but if you want to have a specific
-    error_cleanup with parameters you _must_ also write specific
-    error_exit and error_out into which you will call the specific
-    error_cleanup with parameters.
-  - Made so that error_exit and error_out are generic handlers that
-    can be assigned, if needed, to specific handlers by the main() of
-    each program. If not, the Error* routines will use the generic
-    versions in apclib.a.
-  - Fixed wrong &quot;true&quot; usage in powerflute.
-  - Cleaned up the terminate() functions.
-  - Made DeviceVendor part of snmp DEVICE case insensitive.
-
-----&gt; Release apcupsd-3.10.1 (16 Sep 2002)
-  - Fixed a filling error with USB status dword.
-  - Fixed autoconf check and dependances of -lpanel,etc with -lncurses.
-  - Made more portable the apccontrol external scripts when calling the
-    mailer (subject is now in the echo lines instead of relying on the
-    presence of a -s switch on the mailer).
-  - Added gentoo platform.
-  - Added DESTDIR variable for platform packaging.
-  - Fixed a off-by-one problem in events table.
-  - Conditional compilation of old and new network code. Old network code
-    disabled by default while new network code enabled by default.
-  - Removed old src/apcnet.c.old, old implementation of old networking.
-
-----&gt; Release apcupsd-3.10.0 (28 Jul 2002)
-  - Added documentation for SNMP UPSes. Documented the use of
-    --kill-on-powerfail switch during shutdown.
-  - SUSE 8.0 is now supported.
-  - Added forward declaration of inet_pton and localtime_r when they
-    are extraobj.
-  - Added inet_pton function. Implementation from Internet Software
-    Consortium.
-  - Made sp_flags private to the dumb driver.
-  - Can't SET/CLEAR multiple flags: do them one by one. Fixed this
-    bug in SNMP driver.
-  - Added 127A and 128A cables support for dumb UPSes.
-  - Implemented killpower for PowerNet MIB.
-  - Implemented the SNMP driver for APC's PowerNet MIB.
-  - Restructured UPSINFO so that now all the flags are contained
-    into the Status bitmap.
-  - *BSD should compile cleanly again.
-  - Source tree is now under CVS revision control.
-  - Added support for listening on specific IP addresses/subnets in
-    NIS server, from Troy.
-  - Doc updates, from Kern.
-
-----&gt; Release apcupsd-3.9.9 (18 May 2002)
-  - Applied final Kern's patch.
-  - Added a little program 'devicedbg' to help in debugging device
-    drivers with gdb. To compile, 'make devicedbg' in src/.
-  - Cygwin platform added (reorganized old cygwin files).
-  - Darwin platform added.
-  - compile line is 'gcc -c -g -O2   -I../include  apcaction.c'.
-  - reviewed all the platform makefiles.
-  - use system libgd, searching for include files in system include dirs.
-  - in case system does not have libgd, uses provided libgd.
-  - put gd1.2 into master's contrib directory and a message if gd1.2
-    is not present into src/gd1.2 (like default distribution will not)
-    is issued at configure time to get gd1.2 from contrib and extract it
-    into the src/ directory. Re-run config and all will be good and happy.
-  - Sources reorganization.
-  - Mandrake platform added.
-</programlisting>
-</sect1>
 </preface>

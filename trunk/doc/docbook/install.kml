@@ -380,9 +380,10 @@ E:  Ad=83(I) Atr=02(Bulk) MxPS=  64 Ivl=  0ms
 role="bold">serial</emphasis> driver (the I: line) while the Back-UPS
 350 is using the <emphasis role="bold">hid</emphasis> driver.</para>
 
-<para>In general, if you see your UPS model in the S field, 
+<para>In general, if you see your UPS model in the S field, which
+means <b>Manufacturer=</b>, <b>Product=</b>, and <b>SerialNumber=</b>,
 and you see <b>hid</b> in the I field (or <b>serial</b> if you
-are using an IOGear connection,    you're
+are using an IOGear connection), you're
 done.  You can skip the rest of this section and go straight to
 building and installing.</para>
 
