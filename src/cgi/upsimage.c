@@ -132,9 +132,9 @@ void parsearg(const char *var, const char *value)
 static void imgheader (void)
 {
 #ifdef SYS_IMGFMT_PNG
-    puts ("Content-type: image/png");
+    puts ("Content-Type: image/png");
 #else
-    puts ("Content-type: image/gif");
+    puts ("Content-Type: image/gif");
 #endif
     /*
      * Since this image is generated based on the parameters passed in
@@ -445,7 +445,7 @@ int main (int argc, char **argv)
 
     } else {
         puts("Status: 400 Bad request");
-        puts("Content-type: text/plain\n");
+        puts("Content-Type: text/plain; charset=utf-8\n");
         puts("400 Bad request");
         exit(EXIT_FAILURE);
     }
