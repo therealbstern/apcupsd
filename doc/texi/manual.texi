@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: manual.texi,v 1.8 2005-03-13 21:43:40 kerns Exp $
+@comment $Id: manual.texi,v 1.9 2005-03-13 22:21:47 kerns Exp $
 @c %***start of header
 @setfilename manual.info
 @finalout
@@ -912,8 +912,8 @@ UPS. On a Linux system this is easy, just do this from a shell
 prompt (please see below for 2.6 kernel considerations):
 
 Most of this section applies to Linux. However, toward the end, there
-is a list of known issues with the BSD USB driver and the associated
-kernels. 
+is critical information about the BSD USB driver, including a list of
+known issues and kernel configuration requirements.
 
 @example
 
