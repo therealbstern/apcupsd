@@ -196,7 +196,7 @@ int powernet_snmp_ups_read_static_data(UPSINFO *ups) {
                 astrncpy(ups->beepstate, "0 Seconds",
 			sizeof(ups->beepstate));
 	    } else {
-                aastrncpy(ups->beepstate, "Timed",
+                astrncpy(ups->beepstate, "Timed",
 			sizeof(ups->beepstate));
 	    }
 	    break;

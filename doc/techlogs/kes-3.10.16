@@ -2,6 +2,11 @@
                         Kern Sibbald
 
 General:
+22Oct04
+- Apply patch to fix aastr... supplied by Manfred Schwarb.
+14Oct04
+- Changed Solaris to use mailx by default at the suggestion of
+  Neil Brookins.
 06Oct04
 - Add proper platform code so that configure will create
   the 4 platform specific apccontrol files (some were missing).
