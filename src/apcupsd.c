@@ -397,6 +397,8 @@ int main(int argc, char *argv[]) {
     return 0;				/* to keep compiler happy */
 }
 
+extern int debug_level;
+
 /*
  * Initialize a daemon process completely detaching us from
  * any terminal processes.
@@ -404,39 +406,60 @@ int main(int argc, char *argv[]) {
 static void daemon_start(void)
 {
 #ifndef HAVE_CYGWIN
-    int i;
-    pid_t cpid;
-    mode_t oldmask;
+   int i, fd;
+   pid_t cpid;
+   mode_t oldmask;
+   int low_fd = 0;
 
-    if ( (cpid = fork() ) < 0) {
-        Error_abort0("Cannot fork to become daemon\n");
-    } else if (cpid > 0) {
-	exit(0);		  /* parent exits */
-    }
+   if ( (cpid = fork() ) < 0) {
+       Error_abort0("Cannot fork to become daemon\n");
+   } else if (cpid > 0) {
+       exit(0); 		 /* parent exits */
+   }
 
-    /* Child continues */
-    setsid();			       /* become session leader */
+   /* Child continues */
+   setsid();			      /* become session leader */
 
-    /* Call closelog() to close syslog file descriptor */
-    closelog();
+   /* Call closelog() to close syslog file descriptor */
+   closelog();
 
-    /* In the PRODUCTION system, we close ALL
-     * file descriptors except stdin, stdout, and stderr.
-     */
-    for (i=sysconf(_SC_OPEN_MAX)-1; i > 2; i--) {
-       close(i);
-    }
+   /* In the PRODUCTION system, we close ALL
+    * file descriptors except stdin, stdout, and stderr.
+    */
+   if (debug_level > 0) {
+      low_fd = 2;                     /* don't close debug output */
+   }
+   for (i=sysconf(_SC_OPEN_MAX)-1; i > 2; i--) {
+      close(i);
+   }
 
-    /* move to root directory */
-    chdir("/");
-   
-    /* 
-     * Avoid creating files 0666 but don't override a
-     * more restrictive umask set by the caller.
-     */
-    oldmask = umask(022);
-    oldmask |= 022;
-    umask(oldmask);
+   /* move to root directory */
+   chdir("/");
+  
+   /* 
+    * Avoid creating files 0666 but don't override a
+    * more restrictive umask set by the caller.
+    */
+   oldmask = umask(022);
+   oldmask |= 022;
+   umask(oldmask);
+
+   /*
+    * Make sure we have fd's 0, 1, 2 open
+    *  If we don't do this one of our sockets may open
+    *  there and if we then use stdout, it could
+    *  send total garbage to our socket.
+    *
+    */
+   fd = open("/dev/null", O_RDONLY, 0644);
+   if (fd > 2) {
+      close(fd);
+   } else {
+      for(i=1; fd + i <= 2; i++) {
+	 dup2(fd, fd+i);
+      }
+   }
+
 
 #endif /* HAVE_CYGWIN */
 }
