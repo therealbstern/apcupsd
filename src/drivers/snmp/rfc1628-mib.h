@@ -4,17 +4,11 @@
  *
  * This header is derived from the UPS-MIB module.
  *
- * $Id: rfc1628-mib.h,v 1.2 2004-03-04 09:50:42 kerns Exp $
+ * $Id: rfc1628-mib.h,v 1.3 2004-04-16 13:18:44 kerns Exp $
  */
 
 #ifndef _UPS_MIB_H_
 #define _UPS_MIB_H_
-
-#include <stdlib.h>
-
-#ifdef HAVE_STDINT_H
-#include <stdint.h>
-#endif
 
 /*
  * C type definitions for UPS-MIB::upsIdent.

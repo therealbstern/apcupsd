@@ -62,23 +62,27 @@ static void test6(void);
 static void guess(void);
 
 static void do_smart_testing(void);
+#ifdef HAVE_APCSMART_DRIVER
 static void smart_test1(void);
 static void smart_calibration(void);
 static void monitor_calibration_progress(int monitor);
 static void terminate_calibration(int ask);
-
-static void do_usb_testing(void);
-static void usb_kill_power_test(void);
 static void program_smart_eeprom(void);
 static void print_eeprom_values(UPSINFO *ups);
 static void smart_ttymode(void);
+static void parse_eeprom_cmds(char *eprom, char locale);
+int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data);
+static void print_valid_eeprom_values(UPSINFO *ups);
+#endif
+
+static void do_usb_testing(void);
+#ifdef HAVE_USB_DRIVER
+static void usb_kill_power_test(void);
+#endif
 
 static void strip_trailing_junk(char *cmd);
 static char *get_cmd(char *prompt);
 static int write_file(char *buf);
-static void parse_eeprom_cmds(char *eprom, char locale);
-int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data);
-static void print_valid_eeprom_values(UPSINFO *ups);
 
 
 /* Static variables */
@@ -468,25 +472,25 @@ int main (int argc, char *argv[]) {
 	break;
     case NET:
 	switch(ups->upsclass.type) {
-	    case NO_CLASS:
-	    case STANDALONE:
-	    case SHARESLAVE:
-	    case SHAREMASTER:
-	    case SHARENETMASTER:
-		break;
-	    case NETSLAVE:
-		if (kill_ups_power)
-                    Error_abort0(_("Ignoring killpower for slave\n"));
-		if (prepare_slave(ups)) 
-                    Error_abort0(_("Error setting up slave\n"));
-		break;
-	    case NETMASTER:
-		setup_device(ups);
-		if ((kill_ups_power == 0) && (prepare_master(ups)))
-                    Error_abort0("Error setting up master\n");
-		break;
-	    default:
-                Error_abort1(_("NET Class Error %s\n\a"), strerror(errno));
+	case NO_CLASS:
+	case STANDALONE:
+	case SHARESLAVE:
+	case SHAREMASTER:
+	case SHARENETMASTER:
+	    break;
+	case NETSLAVE:
+	    if (kill_ups_power)
+                Error_abort0(_("Ignoring killpower for slave\n"));
+	    if (prepare_slave(ups)) 
+                Error_abort0(_("Error setting up slave\n"));
+	    break;
+	case NETMASTER:
+	    setup_device(ups);
+	    if ((kill_ups_power == 0) && (prepare_master(ups)))
+                Error_abort0("Error setting up master\n");
+	    break;
+	default:
+            Error_abort1(_("NET Class Error %s\n\a"), strerror(errno));
 	}
 	break;
     case SHARENET:
@@ -890,6 +894,7 @@ static void guess(void)
 
 static void do_smart_testing(void)
 {
+#ifdef HAVE_APCSMART_DRIVER
    char *cmd;
    int quit = FALSE;
 
@@ -942,8 +947,12 @@ Please select the function you want to perform.\n");
    }
    ptime();
    pmsg("End apctest.\n");
+#else
+   pmsg("APC Smart Driver not configured.\n");
+#endif
 }
 
+#ifdef HAVE_APCSMART_DRIVER
 static void smart_ttymode(void)
 {
    char ch;
@@ -1506,9 +1515,11 @@ NA  indicates that the feature is Not Available\n\n");
    pmsg("\nThat is all for now.\n");
    return;
 }
+#endif
 
 static void do_usb_testing(void)
 {
+#ifdef HAVE_USB_DRIVER
    char *cmd;
    int quit = FALSE;
 
@@ -1541,8 +1552,12 @@ Please select the function you want to perform.\n");
    }
    ptime();
    pmsg("End apctest.\n");
+#else
+   pmsg("USB Driver not configured.\n");
+#endif
 }
 
+#ifdef HAVE_USB_DRIVER
 
 static void usb_kill_power_test(void)
 {
@@ -1562,6 +1577,7 @@ Please enter any character when ready to continue: ");
    pmsg("returned from kill_power function.\n");
 }
 
+#endif
 
 /*
  * Gen next input command from the terminal
@@ -1589,6 +1605,8 @@ static void strip_trailing_junk(char *cmd)
    while ((p >= cmd) && (*p == '\n' || *p == '\r' || *p == ' '))
       *p-- = 0;
 }
+
+#ifdef HAVE_APCSMART_DRIVER
 
 /* EPROM commands and their values as parsed from the
  * ^Z eprom string returned by the UPS.
@@ -1748,3 +1766,4 @@ static void print_eeprom_values(UPSINFO *ups)
     parse_eeprom_cmds(ups->eprom, locale);
     print_valid_eeprom_values(ups);
 }
+#endif

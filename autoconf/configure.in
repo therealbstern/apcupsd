@@ -171,7 +171,7 @@ else
     WIN32=
     WINLIBS=
     APCACCESS=apcaccess
-    SMTP=
+    SMTP=smtp
     APCTEST=apctest
 fi
 AC_SUBST(WIN32)
@@ -801,9 +801,33 @@ AC_ARG_ENABLE(snmp, [
 
 if test "$SNMP_DRIVER_ENABLED" = "yes"; then
   AC_DEFINE(HAVE_SNMP_DRIVER)
+  AC_DEFINE(HAVE_UCD_SNMP)
   SNMP_DRIVER="snmp"
   AC_SUBST(SNMP_DRIVER)
 fi
+
+NET_SNMP_DRIVER_ENABLED="no"
+AC_ARG_ENABLE(net-snmp, [
+  --enable-net-snmp	       Compile NET-SNMP UPS code
+  --disable-net-snmp	       No NET-SNMP UPS code (default)],
+	[ if test "$enableval" = "yes" ; then
+		NET_SNMP_DRIVER_ENABLED="yes"
+		AC_CHECK_LIB(crypto, EVP_DigestInit,
+		  [echo '  including crypto library for snmp.'; LIBS="$LIBS -lcrypto"],
+		  [], [])
+	    AC_CHECK_LIB(netsnmp, snmp_open,
+	  [LIBS="$LIBS -lnetsnmp"],
+	  [echo '  disabling NET-SNMP driver.'; NET_SNMP_DRIVER_ENABLED="no"])
+	fi],
+    [])
+
+if test "$NET_SNMP_DRIVER_ENABLED" = "yes"; then
+  AC_DEFINE(HAVE_SNMP_DRIVER)
+  AC_DEFINE(HAVE_NET_SNMP)
+  SNMP_DRIVER="snmp"
+  AC_SUBST(SNMP_DRIVER)
+fi
+
 
 AC_ARG_ENABLE(test, [
   --enable-test 	   Compile TEST driver code
@@ -838,7 +862,7 @@ AC_SUBST(APCNISD)
 dnl Allow setting of NISIP value
 NISIP="0.0.0.0"
 AC_ARG_WITH(nisip,
-	[  --with-nisis=IP-ADDRESS Specify the IP address to bind to],
+	[  --with-nisip=IP-ADDRESS Specify the IP address to bind to],
 	[
 	   NISIP="$withval";
 	]
@@ -1204,228 +1228,228 @@ NETPORT=6666
 #
 case "$DISTNAME" in
 alpha)
-	if test "$with_pthreads" != no; then
-	    PTHREAD_LFLAGS="-lpthread -lexc"
-	fi
+    if test "$with_pthreads" != no; then
+	PTHREAD_LFLAGS="-lpthread -lexc"
+    fi
 
-	DISTVER=`uname -r`
-	SERIALDEV=/dev/tty01
-	LOCKDIR=/var/spool/locks
-	LOGDIR=/etc/apcupsd
-	DFILES="\
-		platforms/alpha/apcupsd \
-		platforms/alpha/awkhaltprog \
-		platforms/alpha/Makefile"
+    DISTVER=`uname -r`
+    SERIALDEV=/dev/tty01
+    LOCKDIR=/var/spool/locks
+    LOGDIR=/etc/apcupsd
+    DFILES="\
+	platforms/alpha/apcupsd \
+	platforms/alpha/awkhaltprog \
+	platforms/alpha/Makefile"
   ;;
 bsdi)
-	DISTVER=`uname -a |awk '{print $3}'`
+    DISTVER=`uname -a |awk '{print $3}'`
   ;;
 cygwin)
-	DISTVER=cygwin
-	LOCKDIR=/apcupsd/etc/apcupsd
-	SERIALDEV=/dev/com1
-	LOGDIR=/apcupsd/etc/apcupsd
-	nologdir=/apcupsd/etc
-	WCFLAGS="-mwindows"
-	WLDFLAGS="-mwindows"
-	PWRFAILDIR=/apcupsd/etc        
-	PIDDIR=/apcupsd/etc/apcupsd
-	PTHREAD_CFLAGS=""
-	PTHREAD_LFLAGS=""
-	DFILES="\
-		src/win32/Makefile \
-		platforms/cygwin/Makefile \
-		platforms/cygwin/apcupsd \
-		platforms/cygwin/apccontrol \
-		"
+    DISTVER=cygwin
+    LOCKDIR=/apcupsd/etc/apcupsd
+    SERIALDEV=/dev/com1
+    LOGDIR=/apcupsd/etc/apcupsd
+    nologdir=/apcupsd/etc
+    WCFLAGS="-mwindows"
+    WLDFLAGS="-mwindows"
+    PWRFAILDIR=/apcupsd/etc	   
+    PIDDIR=/apcupsd/etc/apcupsd
+    PTHREAD_CFLAGS=""
+    PTHREAD_LFLAGS=""
+    DFILES="\
+	src/win32/Makefile \
+	platforms/cygwin/Makefile \
+	platforms/cygwin/apcupsd \
+	platforms/cygwin/apccontrol \
+	"
   ;;
 debian)
-	DISTVER=`cat /etc/debian_version`
-	NISPORT=6543
-	NETPORT=6544
-	DFILES="\
-		platforms/debian/Makefile \
-		platforms/debian/apcupsd \
-		platforms/debian/ups-monitor \
-		"
+    DISTVER=`cat /etc/debian_version`
+    NISPORT=6543
+    NETPORT=6544
+    DFILES="\
+	platforms/debian/Makefile \
+	platforms/debian/apcupsd \
+	platforms/debian/ups-monitor \
+	"
   ;;
 freebsd)
-	DISTVER=`uname -a |awk '{print $3}'`
-	SERIALDEV=/dev/cuaa0
-	nologdir=/var/run
-	PWRFAILDIR=/var/run
-	LOCKDIR=/var/spool/lock
-	if test "$with_pthreads" != no; then
-	    PTHREAD_CFLAGS="-pthread"
-	    PTHREAD_LFLAGS=""
-	    LDFLAGS="$LDFLAGS -pthread"
-	fi
+    DISTVER=`uname -a |awk '{print $3}'`
+    SERIALDEV=/dev/cuaa0
+    nologdir=/var/run
+    PWRFAILDIR=/var/run
+    LOCKDIR=/var/spool/lock
+    if test "$with_pthreads" != no; then
+	PTHREAD_CFLAGS="-pthread"
+	PTHREAD_LFLAGS=""
+	LDFLAGS="$LDFLAGS -pthread"
+    fi
 dnl
 dnl	For FreeBSD, system man pages are in /usr/share/man, not /usr/man.
 dnl
-	if test x$prefix = xNONE -a x$mandir = x'${prefix}/man' ; then
-		mandir=/usr/share/man
-	fi
-	DFILES="\
-		platforms/freebsd/Makefile \
-		platforms/freebsd/apcupsd \
-		"
+    if test x$prefix = xNONE -a x$mandir = x'${prefix}/man' ; then
+	mandir=/usr/share/man
+    fi
+    DFILES="\
+	platforms/freebsd/Makefile \
+	platforms/freebsd/apcupsd \
+	"
   ;;
 gentoo)
-	DISTVER=`awk '/version / {print $5}' < /etc/gentoo-release`
-	DFILES="\
-		platforms/gentoo/Makefile \
-		platforms/gentoo/apcupsd \
-		platforms/gentoo/halt \
-		"
+    DISTVER=`awk '/version / {print $5}' < /etc/gentoo-release`
+    DFILES="\
+	platforms/gentoo/Makefile \
+	platforms/gentoo/apcupsd \
+	platforms/gentoo/halt \
+	"
   ;;
 hpux)
-	DISTVER=`uname -r`
-	DFILES="\
-		platforms/hpux/Makefile \
-		platforms/hpux/apcupsd \
-		platforms/hpux/halt"
+    DISTVER=`uname -r`
+    DFILES="\
+	platforms/hpux/Makefile \
+	platforms/hpux/apcupsd \
+	platforms/hpux/halt"
   ;;
 netbsd)
-	DISTVER=`uname -a |awk '{print $3}'`
-	SERIALDEV=/dev/cua01
-	if test "$with_pthreads" != no; then
-	    PTHREAD_CFLAGS="-pthread"
-	    PTHREAD_LFLAGS=""
-	    LDFLAGS="$LDFLAGS -pthread"
-	fi
-	DFILES="\
-		platforms/netbsd/Makefile \
-		platforms/netbsd/apcupsd \
-		"
+    DISTVER=`uname -a |awk '{print $3}'`
+    SERIALDEV=/dev/cua01
+    if test "$with_pthreads" != no; then
+	PTHREAD_CFLAGS="-pthread"
+	PTHREAD_LFLAGS=""
+	LDFLAGS="$LDFLAGS -pthread"
+    fi
+    DFILES="\
+	platforms/netbsd/Makefile \
+	platforms/netbsd/apcupsd \
+	"
   ;;
 openbsd)
-	DISTVER=`uname -a |awk '{print $3}'`
-	SERIALDEV=/dev/cua01
-	LOCKDIR=/var/spool/lock
-	if test "$with_pthreads" != no; then
-	    PTHREAD_CFLAGS="-pthread"
-	    PTHREAD_LFLAGS=""
-	    LDFLAGS="$LDFLAGS -pthread"
-	fi
+    DISTVER=`uname -a |awk '{print $3}'`
+    SERIALDEV=/dev/cua01
+    LOCKDIR=/var/spool/lock
+    if test "$with_pthreads" != no; then
+	PTHREAD_CFLAGS="-pthread"
+	PTHREAD_LFLAGS=""
+	LDFLAGS="$LDFLAGS -pthread"
+    fi
 dnl
 dnl	For OpenBSD, system man pages are in /usr/share/man, not /usr/man.
 dnl
-	if test x$prefix = xNONE -a x$mandir = x'${prefix}/man' ; then
-		mandir=/usr/share/man
-	fi
+    if test x$prefix = xNONE -a x$mandir = x'${prefix}/man' ; then
+	mandir=/usr/share/man
+    fi
 
-	DFILES="\
-		platforms/openbsd/Makefile \
-		platforms/openbsd/apcupsd \
-		"
+    DFILES="\
+	platforms/openbsd/Makefile \
+	platforms/openbsd/apcupsd \
+	"
   ;;
 openserver)
-	DISTVER=`uname -X | awk '/Release/{print $3}'`
-	SCRIPTSHELL=/bin/ksh
-	SERIALDEV=/dev/ups
-	PWRFAILDIR=/etc
-	PIDDIR=/etc
-	LOCKDIR=/usr/spool/locks
-	LOGDIR=/usr/adm
-	if test x$prefix = xNONE -a x$mandir = x'${prefix}/man' ; then
-		mandir=/usr/man
-	fi
-	DFILES="\
-		platforms/openserver/Makefile \
-		platforms/openserver/apcupsd \
-		platforms/openserver/rc0.openserver"
+    DISTVER=`uname -X | awk '/Release/{print $3}'`
+    SCRIPTSHELL=/bin/ksh
+    SERIALDEV=/dev/ups
+    PWRFAILDIR=/etc
+    PIDDIR=/etc
+    LOCKDIR=/usr/spool/locks
+    LOGDIR=/usr/adm
+    if test x$prefix = xNONE -a x$mandir = x'${prefix}/man' ; then
+	mandir=/usr/man
+    fi
+    DFILES="\
+	platforms/openserver/Makefile \
+	platforms/openserver/apcupsd \
+	platforms/openserver/rc0.openserver"
   ;;
 mandrake)
-	DISTVER=`cat /etc/mandrake-release | grep release |\
+    DISTVER=`cat /etc/mandrake-release | grep release |\
 		 cut -f 5 -d ' '`
-	DFILES="\
-		platforms/mandrake/Makefile \
-		platforms/mandrake/apcupsd \
-		platforms/mandrake/apcupsd.spec \
-		platforms/mandrake/awkhaltprog"
+    DFILES="\
+	platforms/mandrake/Makefile \
+	platforms/mandrake/apcupsd \
+	platforms/mandrake/apcupsd.spec \
+	platforms/mandrake/awkhaltprog"
   ;;
 redhat)
-	if test `cat /etc/redhat-release | grep release |\
-		   cut -f 3 -d ' '`x = "Enterprise"x ; then
-	   DISTVER="Enterprise "`cat /etc/redhat-release | grep release |\
-		    cut -f 6 -d ' '`
-	else
-	    DISTVER=`cat /etc/redhat-release | grep release |\
-		     cut -f 5 -d ' '`
-	fi
-	DFILES="\
-		platforms/redhat/Makefile \
-		platforms/redhat/apcupsd \
-		platforms/redhat/apcupsd.spec \
-		platforms/redhat/awkhaltprog"
+   if test `cat /etc/redhat-release | grep release |\
+	cut -f 3 -d ' '`x = "Enterprise"x ; then
+      DISTVER="Enterprise "`cat /etc/redhat-release | grep release |\
+	cut -f 6 -d ' '`
+   else
+       DISTVER=`cat /etc/redhat-release | grep release |\
+	cut -f 5 -d ' '`
+   fi
+   DFILES="\
+       platforms/redhat/Makefile \
+       platforms/redhat/apcupsd \
+       platforms/redhat/apcupsd.spec \
+       platforms/redhat/awkhaltprog"
   ;;
- yellowdog)
-       if test `cat /etc/yellowdog-release | grep release |\
-		  cut -f 3 -d ' '`x = "Enterprise"x ; then
-	  DISTVER="Enterprise "`cat /etc/yellowdog-release | grep release |\
-		   cut -f 6 -d ' '`
-       else
-	   DISTVER=`cat /etc/yellowdog-release | grep release |\
-		    cut -f 5 -d ' '`
-       fi
-       DFILES="\
-	       platforms/yellowdog/Makefile \
-	       platforms/yellowdog/apcupsd \
-	       platforms/yellowdog/apcupsd.spec \
-	       platforms/yellowdog/awkhaltprog"
+yellowdog)
+   if test `cat /etc/yellowdog-release | grep release |\
+	      cut -f 3 -d ' '`x = "Enterprise"x ; then
+      DISTVER="Enterprise "`cat /etc/yellowdog-release | grep release |\
+	       cut -f 6 -d ' '`
+   else
+       DISTVER=`cat /etc/yellowdog-release | grep release |\
+		cut -f 5 -d ' '`
+   fi
+   DFILES="\
+       platforms/yellowdog/Makefile \
+       platforms/yellowdog/apcupsd \
+       platforms/yellowdog/apcupsd.spec \
+       platforms/yellowdog/awkhaltprog"
    ;;
 engarde)
-	DISTVER=`cat /etc/engarde-release | grep ersion |\
-		 cut -f 5 -d ' '`
-	DFILES="\
-		platforms/engarde/Makefile \
-		platforms/engarde/apcupsd \
-		platforms/engarde/apcupsd.spec \
-		platforms/engarde/awkhaltprog"
+    DISTVER=`cat /etc/engarde-release | grep ersion |\
+	     cut -f 5 -d ' '`
+    DFILES="\
+	platforms/engarde/Makefile \
+	platforms/engarde/apcupsd \
+	platforms/engarde/apcupsd.spec \
+	platforms/engarde/awkhaltprog"
   ;;
 slackware)
-	DISTVER=`cat /etc/slackware-version`
-	DFILES="\
-		platforms/slackware/Makefile \
-		platforms/slackware/apcupsd \
-		platforms/slackware/rc6.patch" 
+    DISTVER=`cat /etc/slackware-version`
+    DFILES="\
+	platforms/slackware/Makefile \
+	platforms/slackware/apcupsd \
+	platforms/slackware/rc6.patch" 
   ;;
 sun)
-	DISTVER=Solaris
-	SERIALDEV=/dev/ttya
-	PWRFAILDIR=/etc
-	PIDDIR=/var/run
-	LOCKDIR=/var/spool/locks
-	LOGDIR=${sysconfdir}
+    DISTVER=Solaris
+    SERIALDEV=/dev/ttya
+    PWRFAILDIR=/etc
+    PIDDIR=/var/run
+    LOCKDIR=/var/spool/locks
+    LOGDIR=${sysconfdir}
 dnl
 dnl	For SunOS, system man pages are in /usr/share/man, not /usr/man.
 dnl
-	if test x$prefix = xNONE -a x$mandir = x'${prefix}/man' ; then
-		mandir=/usr/share/man
-	fi
-	DFILES="\
-		platforms/sun/Makefile \
-		platforms/sun/apcupsd \
-		platforms/sun/rc0.solaris"
+   if test x$prefix = xNONE -a x$mandir = x'${prefix}/man' ; then
+       mandir=/usr/share/man
+   fi
+   DFILES="\
+       platforms/sun/Makefile \
+       platforms/sun/apcupsd \
+       platforms/sun/rc0.solaris"
   ;;
 suse)
-	DISTVER=`cat /etc/SuSE-release |grep VERSION|\
-				cut -f 3 -d ' '`
-	DFILES="\
-		platforms/suse/Makefile \
-		platforms/suse/apcupsd \
-		platforms/suse/halt-setup.sh \
-		platforms/suse/halt"
+    DISTVER=`cat /etc/SuSE-release |grep VERSION|\
+			    cut -f 3 -d ' '`
+    DFILES="\
+	platforms/suse/Makefile \
+	platforms/suse/apcupsd \
+	platforms/suse/halt-setup.sh \
+	platforms/suse/halt"
    ;;
 suse5)
-	DISTNAME=suse
-	DISTVER=5.x
-	DFILES="\
-		platforms/suse/Makefile \
-		platforms/suse/apcupsd \
-		platforms/suse/halt-setup.sh \
-		platforms/suse/halt"
+    DISTNAME=suse
+    DISTVER=5.x
+    DFILES="\
+	platforms/suse/Makefile \
+	platforms/suse/apcupsd \
+	platforms/suse/halt-setup.sh \
+	platforms/suse/halt"
   ;;
 darwin)
     DISTVER=`uname -r`
@@ -1437,12 +1461,12 @@ darwin)
 	platforms/darwin/apcupsd"
   ;;
 unknown)
-	DISTVER=unknown
-	DFILES="\
-		platforms/unknown/Makefile \
-		platforms/unknown/apcupsd \
-		platforms/unknown/halt \
-		"
+    DISTVER=unknown
+    DFILES="\
+	platforms/unknown/Makefile \
+	platforms/unknown/apcupsd \
+	platforms/unknown/halt \
+	"
   ;;
 *)
   echo " === Something went wrong. Unknown DISTNAME $DISTNAME ==="
@@ -1453,79 +1477,87 @@ dnl
 dnl Allow user to set nologdir
 dnl
 AC_ARG_WITH(nologin,
-	[  --with-nologin=DIR	   Specify nologin file directory (default /etc)],
-	[ nologdir="$withval"; ]
+    [  --with-nologin=DIR      Specify nologin file directory (default /etc)],
+    [ nologdir="$withval"; ]
 )
 
 # now allow the user to specify the PID directory
 AC_ARG_WITH(pid-dir,
-	[  --with-pid-dir=DIR	   Specify PIDDIR directory (default is OS dependent)],
-	[
-		PIDDIR="$withval";
-	]
+    [  --with-pid-dir=DIR      Specify PIDDIR directory (default is OS dependent)],
+    [
+	PIDDIR="$withval";
+    ]
 )
 # now allow user to specify LOGDIR
 AC_ARG_WITH(log-dir,
-	[  --with-log-dir=DIR	   Specify EVENTS and STATUS directory (default is OS dependent)],
-	[
-		LOGDIR="$withval";
-	]
+    [  --with-log-dir=DIR      Specify EVENTS and STATUS directory (default is OS dependent)],
+    [
+	LOGDIR="$withval";
+    ]
 )
 # now allow user to specify LOCKDIR
 AC_ARG_WITH(lock-dir,
-	[  --with-lock-dir=DIR	   Specify serial port lock directory (default is OS dependent)],
-	[
-		LOCKDIR="$withval";
-	]
+    [  --with-lock-dir=DIR     Specify serial port lock directory (default is OS dependent)],
+    [
+	LOCKDIR="$withval";
+    ]
 )
 # now allow user to specify PWRFAILDIR
 AC_ARG_WITH(pwrfail-dir,
-	[  --with-pwrfail-dir=DIR   Specify power failure file directory (default is OS dependent)],
-	[
-		PWRFAILDIR="$withval";
-	]
+    [  --with-pwrfail-dir=DIR	Specify power failure file directory (default is OS dependent)],
+    [
+	PWRFAILDIR="$withval";
+    ]
 )
 
 
 # now allow user to specify SERIALDEV
 AC_ARG_WITH(serial-dev,
-	[  --with-serial-dev=DEV    Specify serial port device],
-	[
-		SERIALDEV="$withval";
-	]
+    [  --with-serial-dev=DEV	Specify serial port device],
+    [
+	SERIALDEV="$withval";
+    ]
 )
+
+AC_ARG_WITH(dev,
+    [  --with-dev=DEV	 Specify port or device],
+    [
+	SERIALDEV="$withval";
+    ]
+)
+
 
 # now allow user to specify NISPORT
 AC_ARG_WITH(nis-port,
-	[  --with-nis-port=PORT     Specify NIS (CGI) port (default 3551 except Debian)],
-	[
-		NISPORT="$withval";
-	]
+    [  --with-nis-port=PORT	Specify NIS (CGI) port (default 3551 except Debian)],
+    [
+	NISPORT="$withval";
+    ]
 )
 
 # now allow user to specify NETPORT
 AC_ARG_WITH(net-port,
-	[  --with-net-port=PORT     Specify Master/slave port (default 6666 except Debian)],
-	[
-		NETPORT="$withval";
-	]
+    [  --with-net-port=PORT	Specify Master/slave port (default 6666 except Debian)],
+    [
+	NETPORT="$withval";
+    ]
 )
 
 
 # now allow user to specify UPSTYPE
 AC_ARG_WITH(upstype,
-	[  --with-upstype=TYPE	   Specify the UPS type],
-	[
-		UPSTYPE="$withval";
-	]
+    [  --with-upstype=TYPE     Specify the UPS type],
+    [
+	UPSTYPE="$withval";
+    ]
 )
 
 # now allow user to specify UPSCABLE
 AC_ARG_WITH(upscable,
-	[  --with-upscable=CABLE    Specify the UPS cable],
-	[
-		UPSCABLE="$withval";
-	]
+    [  --with-upscable=CABLE	Specify the UPS cable],
+    [
+	UPSCABLE="$withval";
+    ]
 )
 
 
@@ -1564,40 +1596,40 @@ gccinclude="."
 
 if test "$CC" = "gcc"
 then
-	rm -f $srcdir/gcc.v
-	$CC -v 2> $srcdir/gcc.v
-	gccinclude=`cat $srcdir/gcc.v|grep specs|awk '{print $4}'| \
-		    sed -e 's|specs|include|g'`
-	echo "gcc private include directory found."
-	rm -f $srcdir/gcc.v
+    rm -f $srcdir/gcc.v
+    $CC -v 2> $srcdir/gcc.v
+    gccinclude=`cat $srcdir/gcc.v|grep specs|awk '{print $4}'| \
+		sed -e 's|specs|include|g'`
+    echo "gcc private include directory found."
+    rm -f $srcdir/gcc.v
 fi
 
 dnl
 dnl First entry must always be "variables.mak"
 dnl
 GENERATE_FILES="\
-	autoconf/variables.mak \
-	autoconf/Makefile \
-	doc/Makefile \
-	include/Makefile \
-	src/Makefile \
-	src/lib/Makefile \
-	src/drivers/Makefile \
-	platforms/Makefile \
-	platforms/apccontrol \
-	platforms/etc/changeme \
-	platforms/etc/commfailure \
-	platforms/etc/commok \
-	platforms/etc/mainsback 
-	platforms/etc/masterconnect \
-	platforms/etc/mastertimeout \
-	platforms/etc/onbattery \
-	platforms/etc/Makefile \
-	platforms/etc/apcupsd.conf \
-	examples/Makefile \
-	examples/safe.apccontrol \
-	Makefile \
-	$DFILES"
+    autoconf/variables.mak \
+    autoconf/Makefile \
+    doc/Makefile \
+    include/Makefile \
+    src/Makefile \
+    src/lib/Makefile \
+    src/drivers/Makefile \
+    platforms/Makefile \
+    platforms/apccontrol \
+    platforms/etc/changeme \
+    platforms/etc/commfailure \
+    platforms/etc/commok \
+    platforms/etc/mainsback 
+    platforms/etc/masterconnect \
+    platforms/etc/mastertimeout \
+    platforms/etc/onbattery \
+    platforms/etc/Makefile \
+    platforms/etc/apcupsd.conf \
+    examples/Makefile \
+    examples/safe.apccontrol \
+    Makefile \
+    $DFILES"
 
 if test "$APCSMART_DRIVER"x != ""x
 then
@@ -1631,17 +1663,17 @@ fi
 
 if test "$USE_INCLUDED_LIBINTL" = "yes"
 then
-	GENERATE_FILES="$GENERATE_FILES src/intl/Makefile"
+    GENERATE_FILES="$GENERATE_FILES src/intl/Makefile"
 fi
 
 if test "$USE_NLS" = "yes"
 then
-	GENERATE_FILES="$GENERATE_FILES src/po/Makefile"
+    GENERATE_FILES="$GENERATE_FILES src/po/Makefile"
 fi
 
 if test "$ENABLE_CGI" = "yes"
 then
-	GENERATE_FILES="$GENERATE_FILES src/cgi/Makefile src/cgi/cgiconfig.h"
+    GENERATE_FILES="$GENERATE_FILES src/cgi/Makefile src/cgi/cgiconfig.h"
 fi
 
 if test "$LIBGD"x != ""x

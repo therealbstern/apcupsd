@@ -204,7 +204,8 @@ void apcupsd_error_out(char *file, int line, char *fmt,...)
     va_list   arg_ptr;
     int       i;
 
-    sprintf(buf, _("apcupsd FATAL ERROR in %s at line %d\n"), file, line);
+    asnprintf(buf, sizeof(buf), _("apcupsd FATAL ERROR in %s at line %d\n"), 
+	      file, line);
     i = strlen(buf);
     va_start(arg_ptr, fmt);
     avsnprintf((char *)&buf[i], sizeof(buf)-i, (char *) fmt, arg_ptr);

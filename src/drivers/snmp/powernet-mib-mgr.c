@@ -4,22 +4,11 @@
  *
  * This C file is derived from the PowerNet-MIB module.
  *
- * $Id: powernet-mib-mgr.c,v 1.5 2004-02-12 19:42:56 kerns Exp $
+ * $Id: powernet-mib-mgr.c,v 1.6 2004-04-16 13:18:44 kerns Exp $
  */
 
 #include "apc.h"
-
-#include <stdlib.h>
-
-#undef UCD_COMPATIBLE
-#define UCD_COMPATIBLE 1
-
-#include <ucd-snmp/asn1.h>
-#include <ucd-snmp/snmp.h>
-#include <ucd-snmp/snmp_api.h>
-#include <ucd-snmp/snmp_client.h>
-
-#include "powernet-mib.h"
+#include "snmp.h"
 
 static oid upsBasicIdentModel[] = {1, 3, 6, 1, 4, 1, 318, 1, 1, 1, 1, 1, 1};
 static oid upsBasicIdentName[] = {1, 3, 6, 1, 4, 1, 318, 1, 1, 1, 1, 1, 2};

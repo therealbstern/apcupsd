@@ -12,49 +12,23 @@
  */
 
 /*
- *			 GNU GENERAL PUBLIC LICENSE
- *			    Version 2, June 1991
- *
- *  Copyright (C) 1989, 1991 Free Software Foundation, Inc.
- *			       675 Mass Ave, Cambridge, MA 02139, USA
- *  Everyone is permitted to copy and distribute verbatim copies
- *  of this license document, but changing it is not allowed.
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- */
+   Copyright (C) 2000-2004 Kern Sibbald
 
-/*
- *  IN NO EVENT SHALL ANY AND ALL PERSONS INVOLVED IN THE DEVELOPMENT OF THIS
- *  PACKAGE, NOW REFERRED TO AS "APCUPSD-Team" BE LIABLE TO ANY PARTY FOR
- *  DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING
- *  OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF ANY OR ALL
- *  OF THE "APCUPSD-Team" HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  THE "APCUPSD-Team" SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING,
- *  BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
- *  ON AN "AS IS" BASIS, AND THE "APCUPSD-Team" HAS NO OBLIGATION TO PROVIDE
- *  MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
- *
- *  THE "APCUPSD-Team" HAS ABSOLUTELY NO CONNECTION WITH THE COMPANY
- *  AMERICAN POWER CONVERSION, "APCC".  THE "APCUPSD-Team" DID NOT AND
- *  HAS NOT SIGNED ANY NON-DISCLOSURE AGREEMENTS WITH "APCC".  ANY AND ALL
- *  OF THE LOOK-A-LIKE ( UPSlink(tm) Language ) WAS DERIVED FROM THE
- *  SOURCES LISTED BELOW.
- *
+   This program is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 2 of
+   the License, or (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public
+   License along with this program; if not, write to the Free
+   Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+   MA 02111-1307, USA.
+
  */
 
 #include "apc.h"
@@ -68,7 +42,7 @@ static void do_shutdown(UPSINFO *ups, int cmdtype);
  * include/apc_defines.h
  */
 
-UPSCOMMANDS cmd[] = {
+UPSCOMMANDS ups_event[] = {
     {"powerout",      0},             /* CMDPOWEROUT */
     {"onbattery",     0},             /* CMDONBATTERY */
     {"failing",       0},             /* CMDFAILING */
@@ -96,7 +70,7 @@ UPSCOMMANDS cmd[] = {
  * These messages must be kept in sync with the above array
  * and the defines in include/apc_defines.h 
  */
-UPSCMDMSG cmd_msg[] = {
+UPSCMDMSG event_msg[] = {
     {LOG_CRIT,    N_("Power failure.")},
     {LOG_CRIT,    N_("Running on UPS batteries.")},
     {LOG_ALERT,   N_("Battery power exhausted.")},
@@ -122,9 +96,9 @@ UPSCMDMSG cmd_msg[] = {
 void generate_event(UPSINFO *ups, int event)
 {
     /* Log message and execute script for this event */
-    log_event(ups, cmd_msg[event].level, _(cmd_msg[event].msg));
-    Dmsg2(80, "calling execute_cmd %s event=%d\n", cmd[event], event);
-    execute_command(ups, cmd[event]);
+    log_event(ups, event_msg[event].level, _(event_msg[event].msg));
+    Dmsg2(80, "calling execute_ups_event %s event=%d\n", ups_event[event], event);
+    execute_command(ups, ups_event[event]);
 
     /*
      * Additional possible actions. For certain, we now do a
@@ -142,7 +116,7 @@ void generate_event(UPSINFO *ups, int event)
     case CMDLOADLIMIT:
     case CMDEMERGENCY:
     case CMDREMOTEDOWN:
-       log_event(ups, cmd_msg[CMDDOSHUTDOWN].level, _(cmd_msg[CMDDOSHUTDOWN].msg));
+       log_event(ups, event_msg[CMDDOSHUTDOWN].level, _(event_msg[CMDDOSHUTDOWN].msg));
        do_shutdown(ups, CMDDOSHUTDOWN);
        break;
 
@@ -267,7 +241,7 @@ static void do_shutdown(UPSINFO *ups, int cmdtype)
     } 
 
     /* Now execute the shutdown command */
-    execute_command(ups, cmd[cmdtype]);
+    execute_command(ups, ups_event[cmdtype]);
 
     /* On some systems we may stop on the previous
      * line if a SIGTERM signal is sent to us.	      
@@ -503,7 +477,7 @@ void do_action(UPSINFO *ups)
 			generate_event(ups, CMDANNOYME);
 		    } else {
 			/* but execute script every time */
-			execute_command(ups, cmd[CMDANNOYME]);
+			execute_command(ups, ups_event[CMDANNOYME]);
 		    }
 		    time(&ups->last_time_annoy);
 		    requested_logoff = TRUE;
@@ -567,7 +541,7 @@ void do_action(UPSINFO *ups)
 	    device_entry_point(ups, DEVICE_CMD_GET_SELFTEST_MSG, NULL);
             log_event(ups, LOG_ALERT, _("UPS Self Test completed: %s"),
 		ups->selftestmsg);
-	    execute_command(ups, cmd[CMDENDSELFTEST]);
+	    execute_command(ups, ups_event[CMDENDSELFTEST]);
 	} else {
 	    generate_event(ups, CMDMAINSBACK);
 	}

@@ -96,7 +96,7 @@ void make_pid_file(void)
 
     unlink(pidfile);
     if ((pfd = open(pidfile, O_CREAT | O_TRUNC | O_WRONLY, 0644)) >= 0) {
-        len = sprintf(buf, "%ld\n", (long)pid);
+        len = asnprintf(buf, sizeof(buf), "%ld\n", (long)pid);
 	write(pfd, buf, len);
 	close(pfd);
     }

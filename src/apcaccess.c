@@ -152,9 +152,9 @@ void print_valid_eprom_values(UPSINFO *ups)
        for (j=0; cmd_table[j].cmd; j++) {
 	  if (cmd[i].cmd == cmd_table[j].cmd) {
              if (cmd_table[j].type == 'c') 
-                sprintf(val, "%s", (char *)cmd_table[j].data);
+                asnprintf(val, sizeof(val), "%s", (char *)cmd_table[j].data);
 	     else
-                sprintf(val, "%d", *cmd_table[j].data);
+                asnprintf(val, sizeof(val), "%d", *cmd_table[j].data);
              printf("%-24s %-12s  %-6s   ", cmd_table[j].descript, 
 		     cmd_table[j].config_directive, val);
 	     p = cmd[i].cmdvals;
@@ -350,10 +350,11 @@ int main(int argc, char **argv)
 {
     int mode = 0;
     UPSINFO *ups = NULL;
+    char *cfgfile = APCCONF;
+    struct stat cfgstat;
 
 
-    strncpy(argvalue, argv[0], sizeof(argvalue)-1);
-    argvalue[sizeof(argvalue)-1] = 0;
+    astrncpy(argvalue, argv[0], sizeof(argvalue)-1);
 
     ups = attach_ups(ups, SHM_RDONLY);
     if (!ups) {
@@ -413,14 +414,28 @@ int main(int argc, char **argv)
 	    port = atoi(p);
 	}
     }
+    else {
+      /* check configuration so local NISIP and NISPORT variables can be used as defaults */ 
+      if (!stat(cfgfile, &cfgstat)) {
+	check_for_config(ups, cfgfile);
+	if (ups) {
+	  if (ups->nisip && ups->nisip[0]) {
+	    host = ups->nisip;
+	  }
+	  if (ups->statusport) {
+	    port = ups->statusport;
+	  }
+	}
+      }
+    }
 
 /*
     while (m_char != '~')
 	do_main_menu();
 */
 
-    strcpy(myDATA.apcmagic, APC_MAGIC);
-    strcpy(myDATA.accessmagic, ACCESS_MAGIC);
+    astrncpy(myDATA.apcmagic, APC_MAGIC, sizeof(myDATA.apcmagic));
+    astrncpy(myDATA.accessmagic, ACCESS_MAGIC, sizeof(myDATA.accessmagic));
 
     switch (mode) {
     case 1:

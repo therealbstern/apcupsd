@@ -246,7 +246,7 @@ int create_lockfile(UPSINFO *ups)
 	return LCKERROR;
     }
 
-    if (sprintf(pidbuffer, "%010ld", (long)getpid()) <= 0) {
+    if (asnprintf(pidbuffer, sizeof(pidbuffer), "%010ld", (long)getpid()) <= 0) {
 	/*
 	 * Problems with sprintf
 	 */

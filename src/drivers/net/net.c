@@ -9,51 +9,24 @@
  *  All rights reserved.
  *
  */
-
 /*
- *			   GNU GENERAL PUBLIC LICENSE
- *			      Version 2, June 1991
- *
- *  Copyright (C) 1989, 1991 Free Software Foundation, Inc.
- *				 675 Mass Ave, Cambridge, MA 02139, USA
- *  Everyone is permitted to copy and distribute verbatim copies
- *  of this license document, but changing it is not allowed.
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- */
+   Copyright (C) 2001-2004 Kern Sibbald
 
-/*
- *  IN NO EVENT SHALL ANY AND ALL PERSONS INVOLVED IN THE DEVELOPMENT OF THIS
- *  PACKAGE, NOW REFERRED TO AS "APCUPSD-Team" BE LIABLE TO ANY PARTY FOR
- *  DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING
- *  OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF ANY OR ALL
- *  OF THE "APCUPSD-Team" HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  THE "APCUPSD-Team" SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING,
- *  BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
- *  ON AN "AS IS" BASIS, AND THE "APCUPSD-Team" HAS NO OBLIGATION TO PROVIDE
- *  MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
- *
- *  THE "APCUPSD-Team" HAS ABSOLUTELY NO CONNECTION WITH THE COMPANY
- *  AMERICAN POWER CONVERSION, "APCC".  THE "APCUPSD-Team" DID NOT AND
- *  HAS NOT SIGNED ANY NON-DISCLOSURE AGREEMENTS WITH "APCC".  ANY AND ALL
- *  OF THE LOOK-A-LIKE ( UPSlink(tm) Language ) WAS DERIVED FROM THE
- *  SOURCES LISTED BELOW.
- *
+   This program is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 2 of
+   the License, or (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public
+   License along with this program; if not, write to the Free
+   Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+   MA 02111-1307, USA.
+
  */
 
 #include "apc.h"
@@ -124,8 +97,9 @@ static int initialize_device_data(UPSINFO *ups) {
     struct driver_data *nid = (struct driver_data *)ups->driver_internal_data;
     char *cp;
 
-    strcpy(nid->device, ups->device);
-    strcpy(ups->master_name, ups->device);
+    astrncpy(nid->device, ups->device, sizeof(nid->device));
+    astrncpy(ups->master_name, ups->device, sizeof(ups->master_name));
+    astrncpy(ups->upsclass.long_name, "Net Slave", sizeof(ups->upsclass.long_name));  
 
     /*
      * Now split the device.
@@ -141,11 +115,14 @@ static int initialize_device_data(UPSINFO *ups) {
 	nid->port = ups->statusport;  /* use NIS port as default */
     }
 
-    nid->statbuf[0] = '\0';
-    nid->statlen = BIGBUF;
+    nid->statbuf[0] = 0;
+    nid->statlen = 0;
 
+    Dmsg0(90, "Exit initialize_device_data\n");
     return SUCCESS;
 }
+
+
 
 /*
  * Returns 1 if var found
@@ -189,72 +166,106 @@ static int getupsvar(UPSINFO *ups, char *request, char *answer, int anslen)
 	     return 1;
 	}
     } else {
-       Dmsg1(100, "HEY!!! No match in getupsvar for %s!\n", request);
+       Dmsg1(100, "No match in getupsvar for %s!\n", request);
     }
 
     strcpy(answer, "Not found");
     return 0;
 }
 
-/*
- * Fill buffer with data from UPS network daemon   
- * Returns 0 on error
- * Returns 1 if OK
- */
-static int fill_status_buffer(UPSINFO *ups) 
+static int poll_ups(UPSINFO *ups)
 {
     struct driver_data *nid = (struct driver_data *)ups->driver_internal_data;
     int n, stat = 1;
     char buf[1000];
-    static time_t last_fill_time = 0;
-    time_t now;
-
-    /* Poll or fill the buffer maximum one time per second */
-    now = time(NULL);
-    if (now - last_fill_time < 2) {
-       return 1;
-    }
-    last_fill_time = now;
 
     nid->statbuf[0] = 0;
     nid->statlen = 0;
-    Dmsg2(20, "Opening connection to %s:%d\n",
-	    nid->hostname, nid->port);
+    Dmsg2(20, "Opening connection to %s:%d\n", nid->hostname, nid->port);
     if ((nid->sockfd = net_open(nid->hostname, NULL, nid->port)) < 0) {
         log_event(ups, LOG_ERR, "fetch_data: tcp_open failed for %s port %d",
 		nid->hostname, nid->port);
-	set_ups(UPS_COMMLOST);
+        Dmsg0(90, "Exit poll_ups 0 comm lost\n");
 	return 0;
     }
 
     if (net_send(nid->sockfd, "status", 6) != 6) {
         log_event(ups, LOG_ERR, "fill_buffer: write error on socket.");
-	set_ups(UPS_COMMLOST);
+	net_close(nid->sockfd);
+        Dmsg0(90, "Exit poll_ups 0 no status flag\n");
 	return 0;
     }
 
     Dmsg0(99, "===============\n");
     while ((n = net_recv(nid->sockfd, buf, sizeof(buf)-1)) > 0) {
 	buf[n] = 0;
-	strcat(nid->statbuf, buf);
+	astrncat(nid->statbuf, buf, sizeof(nid->statbuf));
         Dmsg3(99, "Partial buf (%d, %d):\n%s",n,strlen(nid->statbuf), buf);
     }
     Dmsg0(99, "===============\n");
 
     if (n < 0) {
 	stat = 0;
-	set_ups(UPS_COMMLOST);
-        Dmsg0(100, "UPS_COMMLOST\n");
-    } else {
-	clear_ups(UPS_COMMLOST);
+        Dmsg0(90, "Exit poll_ups 0 bad stat net_recv\n");
     }
-
     net_close(nid->sockfd);
 
     Dmsg1(99, "Buffer:\n%s\n", nid->statbuf);
-
     nid->statlen = strlen(nid->statbuf);
+    Dmsg1(90, "Exit poll_ups, stat=%d\n", stat);
     return stat;
+}
+
+
+/*
+ * Fill buffer with data from UPS network daemon   
+ * Returns 0 on error
+ * Returns 1 if OK
+ */
+#define SLEEP_TIME 2
+static int fill_status_buffer(UPSINFO *ups) 
+{
+    struct driver_data *nid = (struct driver_data *)ups->driver_internal_data;
+    time_t now;
+    int tlog;
+    int comm_err = FALSE;
+
+    /* Poll or fill the buffer maximum one time per second */
+    now = time(NULL);
+    if ((now - nid->last_fill_time) < 2) {
+        Dmsg0(90, "Exit fill_status_buffer OK less than 2 sec\n");
+       return 1;
+    }
+
+    for (tlog=0; !poll_ups(ups); tlog -= SLEEP_TIME) {
+	if (tlog <= 0) {
+	    tlog = 10 * 60;	      /* log every 10 minutes */
+	    log_event(ups, event_msg[CMDCOMMFAILURE].level,
+		      event_msg[CMDCOMMFAILURE].msg);
+	    if (!comm_err)	      /* generate event once */
+		execute_command(ups, ups_event[CMDCOMMFAILURE]);
+
+	}
+	sleep(SLEEP_TIME);
+	comm_err = TRUE;
+	set_ups(UPS_COMMLOST);
+    }
+
+    if (comm_err) {
+	generate_event(ups, CMDCOMMOK);
+	nid->last_fill_time = time(NULL);
+    } else {
+	nid->last_fill_time = now;
+    }
+    clear_ups(UPS_COMMLOST);
+    if (!nid->got_caps) {
+       net_ups_get_capabilities(ups);	      
+    }
+    if (!nid->got_static_data) {
+	net_ups_read_static_data(ups);
+    }
+
+    return 1;
 }
 
 static int get_ups_status_flag(UPSINFO *ups, int fill)
@@ -287,10 +298,18 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
 	 *		UPS_FASTPOLL|UPS_PLUGGED|UPS_DEV_SETUP
 	 *
 	 */
+	/* First transfer set or not set all non-local bits */
 	masterStatus = strtol(answer, NULL, 0);
 	newStatus = masterStatus & ~UPS_LOCAL_BITS;   /* clear local bits */
 	ups->Status &= UPS_LOCAL_BITS;	  /* clear non-local bits */
 	ups->Status |= newStatus;	  /* set new non-local bits */
+
+	/* Now set any special bits, note this is set only, we do
+	 * not clear these bits, but let our own core code clear them
+	 */
+	newStatus = masterStatus & (UPS_COMMLOST | UPS_FASTPOLL);
+	ups->Status |= newStatus;
+
     }
     Dmsg2(100, "Got Status = %s 0x%x\n", answer, ups->Status);
 
@@ -299,7 +318,6 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
         log_event(ups, LOG_ERR, "Shutdown because NIS master is shutting down.");
         Dmsg0(100, "Set SHUT_REMOTE because of master status.\n");
     }
-
 
     /* If we lost connection with master and we
      * are running on batteries, shutdown on the fourth
@@ -326,6 +344,7 @@ int net_ups_open(UPSINFO *ups)
     struct driver_data *nid;
 
     nid = (struct driver_data *)malloc(sizeof(struct driver_data));
+
     if (nid == NULL) {
         log_event(ups, LOG_ERR, "Out of memory.");
 	exit(1);
@@ -364,49 +383,52 @@ int net_ups_setup(UPSINFO *ups)
 
 int net_ups_get_capabilities(UPSINFO *ups) 
 {
+    struct driver_data *nid = (struct driver_data *)ups->driver_internal_data;
     char answer[200];
 
     write_lock(ups);
 
-    fill_status_buffer(ups);   
-
-    ups->UPS_Cap[CI_VLINE] = getupsvar(ups, "utility", answer, sizeof(answer));
-    ups->UPS_Cap[CI_LOAD] = getupsvar(ups, "loadpct", answer, sizeof(answer));
-    ups->UPS_Cap[CI_BATTLEV] =
-        getupsvar(ups, "battcap", answer, sizeof(answer));
-    ups->UPS_Cap[CI_RUNTIM] =
-        getupsvar(ups, "runtime", answer, sizeof(answer));
-    ups->UPS_Cap[CI_VMAX] = getupsvar(ups, "linemax", answer, sizeof(answer));
-    ups->UPS_Cap[CI_VMIN] = getupsvar(ups, "linemin", answer, sizeof(answer));
-    ups->UPS_Cap[CI_VOUT] = getupsvar(ups, "outputv", answer, sizeof(answer));
-    ups->UPS_Cap[CI_SENS] = getupsvar(ups, "sense", answer, sizeof(answer));
-    ups->UPS_Cap[CI_DLBATT] =
-        getupsvar(ups, "lowbatt", answer, sizeof(answer));
-    ups->UPS_Cap[CI_LTRANS] =
-        getupsvar(ups, "lowxfer", answer, sizeof(answer));
-    ups->UPS_Cap[CI_HTRANS] =
-        getupsvar(ups, "highxfer", answer, sizeof(answer));
-    ups->UPS_Cap[CI_RETPCT] =
-        getupsvar(ups, "retpct", answer, sizeof(answer));
-    ups->UPS_Cap[CI_ITEMP] =
-        getupsvar(ups, "upstemp", answer, sizeof(answer));
-    ups->UPS_Cap[CI_VBATT] =
-        getupsvar(ups, "battvolt", answer, sizeof(answer));
-    ups->UPS_Cap[CI_FREQ] =
-        getupsvar(ups, "outputfreq", answer, sizeof(answer));
-    ups->UPS_Cap[CI_WHY_BATT] =
-        getupsvar(ups, "lastxfer", answer, sizeof(answer));
-    ups->UPS_Cap[CI_ST_STAT] =
-        getupsvar(ups, "selftest", answer, sizeof(answer));
-    ups->UPS_Cap[CI_SERNO] =
-        getupsvar(ups, "serialno", answer, sizeof(answer));
-    ups->UPS_Cap[CI_BATTDAT] =
-        getupsvar(ups, "battdate", answer, sizeof(answer));
-    ups->UPS_Cap[CI_NOMBATTV] =
-        getupsvar(ups, "nombattv", answer, sizeof(answer));
-    ups->UPS_Cap[CI_REVNO] =
-        getupsvar(ups, "firmware", answer, sizeof(answer));
-       
+    if (poll_ups(ups)) {
+       ups->UPS_Cap[CI_VLINE] = getupsvar(ups, "utility", answer, sizeof(answer));
+       ups->UPS_Cap[CI_LOAD] = getupsvar(ups, "loadpct", answer, sizeof(answer));
+       ups->UPS_Cap[CI_BATTLEV] =
+           getupsvar(ups, "battcap", answer, sizeof(answer));
+       ups->UPS_Cap[CI_RUNTIM] =
+           getupsvar(ups, "runtime", answer, sizeof(answer));
+       ups->UPS_Cap[CI_VMAX] = getupsvar(ups, "linemax", answer, sizeof(answer));
+       ups->UPS_Cap[CI_VMIN] = getupsvar(ups, "linemin", answer, sizeof(answer));
+       ups->UPS_Cap[CI_VOUT] = getupsvar(ups, "outputv", answer, sizeof(answer));
+       ups->UPS_Cap[CI_SENS] = getupsvar(ups, "sense", answer, sizeof(answer));
+       ups->UPS_Cap[CI_DLBATT] =
+           getupsvar(ups, "lowbatt", answer, sizeof(answer));
+       ups->UPS_Cap[CI_LTRANS] =
+           getupsvar(ups, "lowxfer", answer, sizeof(answer));
+       ups->UPS_Cap[CI_HTRANS] =
+           getupsvar(ups, "highxfer", answer, sizeof(answer));
+       ups->UPS_Cap[CI_RETPCT] =
+           getupsvar(ups, "retpct", answer, sizeof(answer));
+       ups->UPS_Cap[CI_ITEMP] =
+           getupsvar(ups, "upstemp", answer, sizeof(answer));
+       ups->UPS_Cap[CI_VBATT] =
+           getupsvar(ups, "battvolt", answer, sizeof(answer));
+       ups->UPS_Cap[CI_FREQ] =
+           getupsvar(ups, "outputfreq", answer, sizeof(answer));
+       ups->UPS_Cap[CI_WHY_BATT] =
+           getupsvar(ups, "lastxfer", answer, sizeof(answer));
+       ups->UPS_Cap[CI_ST_STAT] =
+           getupsvar(ups, "selftest", answer, sizeof(answer));
+       ups->UPS_Cap[CI_SERNO] =
+           getupsvar(ups, "serialno", answer, sizeof(answer));
+       ups->UPS_Cap[CI_BATTDAT] =
+           getupsvar(ups, "battdate", answer, sizeof(answer));
+       ups->UPS_Cap[CI_NOMBATTV] =
+           getupsvar(ups, "nombattv", answer, sizeof(answer));
+       ups->UPS_Cap[CI_REVNO] =
+           getupsvar(ups, "firmware", answer, sizeof(answer));
+       nid->got_caps = TRUE;
+    } else {
+       nid->got_caps = FALSE;
+    }
     write_unlock(ups);
     return 1;
 }
@@ -511,8 +533,8 @@ int net_ups_read_volatile_data(UPSINFO *ups)
 	ups->LineFreq = atof(answer);
     }
 
-    if (ups->UPS_Cap[CI_VBATT] && 
-          getupsvar(ups, "battvolt", answer, sizeof(answer))) {
+    if (ups->UPS_Cap[CI_LTRANS] && 
+          getupsvar(ups, "lastxfer", answer, sizeof(answer))) {
         if (!strcmp(answer, "No transfers since turnon"))
             ups->G[0] = 'O';
         if (!strcmp(answer, "Automatic or explicit self test"))
@@ -541,35 +563,35 @@ int net_ups_read_volatile_data(UPSINFO *ups)
 
 int net_ups_read_static_data(UPSINFO *ups) 
 {
+    struct driver_data *nid = (struct driver_data *)ups->driver_internal_data;
     char answer[200];
 
     write_lock(ups);
 
-    fill_status_buffer(ups);
-
-    if (!getupsvar(ups, "model", ups->mode.long_name,
-		sizeof(ups->mode.long_name))) {
-        log_event(ups, LOG_ERR, "getupsvar: failed for \"model\".");
-    }
-    if (!getupsvar(ups, "upsmode", ups->upsclass.long_name,
-		sizeof(ups->upsclass.long_name))) {
-        log_event(ups, LOG_ERR, "getupsvar: failed for \"upsmode\".");
-    }
-    if (ups->UPS_Cap[CI_SERNO] &&
-            getupsvar(ups, "serialno", answer, sizeof(answer))) {
-	strcpy(ups->serial, answer);
-    }
-    if (ups->UPS_Cap[CI_BATTDAT] &&
-            getupsvar(ups, "battdate", answer, sizeof(answer))) {
-	strcpy(ups->battdat, answer);
-    }
-    if (ups->UPS_Cap[CI_NOMBATTV] &&
-            getupsvar(ups, "nombattv", answer, sizeof(answer))) {
-	ups->nombattv = atof(answer);
-    }
-    if (ups->UPS_Cap[CI_REVNO] &&
-            getupsvar(ups, "firmware", answer, sizeof(answer))) {
-	strcpy(ups->firmrev, answer);
+    if (poll_ups(ups)) {
+        if (!getupsvar(ups, "model", ups->mode.long_name,
+		    sizeof(ups->mode.long_name))) {
+            log_event(ups, LOG_ERR, "getupsvar: failed for \"model\".");
+	}
+	if (ups->UPS_Cap[CI_SERNO] &&
+                getupsvar(ups, "serialno", answer, sizeof(answer))) {
+	    strcpy(ups->serial, answer);
+	}
+	if (ups->UPS_Cap[CI_BATTDAT] &&
+                getupsvar(ups, "battdate", answer, sizeof(answer))) {
+	    strcpy(ups->battdat, answer);
+	}
+	if (ups->UPS_Cap[CI_NOMBATTV] &&
+                getupsvar(ups, "nombattv", answer, sizeof(answer))) {
+	    ups->nombattv = atof(answer);
+	}
+	if (ups->UPS_Cap[CI_REVNO] &&
+                getupsvar(ups, "firmware", answer, sizeof(answer))) {
+	    strcpy(ups->firmrev, answer);
+	}
+       nid->got_static_data = TRUE;
+    } else {
+       nid->got_static_data = FALSE;
     }
 
     write_unlock(ups);

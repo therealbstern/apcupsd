@@ -4,17 +4,11 @@
  *
  * This header is derived from the PowerNet-MIB module.
  *
- * $Id: powernet-mib.h,v 1.4 2004-03-04 09:50:42 kerns Exp $
+ * $Id: powernet-mib.h,v 1.5 2004-04-16 13:18:44 kerns Exp $
  */
 
 #ifndef _POWERNET_MIB_H_
 #define _POWERNET_MIB_H_
-
-#include <stdlib.h>
-
-#ifdef HAVE_STDINT_H
-#include <stdint.h>
-#endif
 
 /*
  * C type definitions for PowerNet-MIB::upsBasicIdent.

@@ -217,7 +217,7 @@ void prep_device(UPSINFO *ups)
     if (ups->upsname[0] == 0) {       /* no name given */
 	gethostname(ups->upsname, sizeof(ups->upsname)-1);
 	if (ups->upsname[0] == 0) {   /* error */
-            strcpy(ups->upsname, "default");
+            astrncpy(ups->upsname, "default", sizeof(ups->upsname));
 	}
     }
 }
