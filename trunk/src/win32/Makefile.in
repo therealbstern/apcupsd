@@ -72,12 +72,13 @@ binary-release:
 	@mkdir -p wr/$(prefix) wr/$(sbindir) wr/$(sysconfdir) wr/tmp
 	@echo "Copying system binary files ..."
 	@cp $(topdir)/platforms/cygwin/bin/* wr/$(sbindir)
-	@strip $(topdir)/src/apcupsd.exe
+	@strip $(topdir)/src/*.exe
 	@strip *.exe
 	@echo "Copying executables ..."
 	@cp -f $(topdir)/src/apcupsd.exe wr/$(sbindir)/apcupsd.exe 
 	@cp -f $(topdir)/src/smtp.exe wr/$(sbindir)/smtp.exe
 	@cp -f $(topdir)/src/apcaccess.exe wr/$(sbindir)/apcaccess.exe
+	@cp -f $(topdir)/src/apctest.exe wr/$(sbindir)/apctest.exe
 	@cp -f popup.exe wr/$(sbindir)/popup.exe
 	@cp -f shutdown.exe wr/$(sbindir)/shutdown.exe
 	@cp -f email.exe wr/$(sbindir)/email.exe
