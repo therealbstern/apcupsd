@@ -886,7 +886,7 @@ Optional Packages:
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-libwrap=DIR     Compile in libwrap (tcp_wrappers) support
   --with-nisip=IP-ADDRESS Specify the IP address to bind to
-  --with-cgi-bin=DIR	   Specify cgi-bin directory (default=/etc/apcupsd/cgi)
+  --with-cgi-bin=DIR	   Specify cgi-bin directory (default=/etc/apcupsd)
   --with-included-gettext use the GNU gettext library included here
   --with-catgets          use catgets functions if available
   --with-distname=NAME     Specify DISTNAME
@@ -8706,7 +8706,7 @@ if test $ac_cv_lib_gd_gdImagePng = yes; then
 #define SYS_IMGFMT_PNG 1
 _ACEOF
 
-	 LIBS="$LIBS -lgd"
+	 LIBGDOBJ="-lgd"
 	 SYS_GD_FOUND=yes
 
 fi
@@ -8774,7 +8774,7 @@ if test $ac_cv_lib_gd_gdImageGif = yes; then
 #define SYS_IMGFMT_GIF 1
 _ACEOF
 
-	   LIBS="$LIBS -lgd"
+	   LIBGDOBJ="-lgd"
 	   SYS_GD_FOUND=yes
 
 fi
@@ -8848,7 +8848,7 @@ if test $ac_cv_lib_gd_gdImagePng = yes; then
 #define SYS_IMGFMT_PNG 1
 _ACEOF
 
-	   LIBS="$LIBS -lgd"
+	   LIBGDOBJ="-lgd"
 	   SYS_GD_FOUND=yes
 
 fi
@@ -8918,7 +8918,7 @@ if test $ac_cv_lib_gd_gdImageGif = yes; then
 #define SYS_IMGFMT_GIF 1
 _ACEOF
 
-	   LIBS="$LIBS -lgd"
+	   LIBGDOBJ="-lgd"
 	   SYS_GD_FOUND=yes
 
 fi
