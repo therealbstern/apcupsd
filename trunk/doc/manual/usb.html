@@ -9,7 +9,7 @@
 <h1>Apcupsd's Support for USB UPSes</h1>
 <h2>General</h2>
 Apcupsd version 3.9.8 or later (development version to be released as
-3.10.0) provides direct support for USB UPSes on Linux systems.
+3.10.0) provides direct support for USB UPSes on <b>Linux systems only</b>.
 To run <b>apcupsd</b> with a USB UPS, you need the following
 things:
 <ul>
@@ -28,6 +28,11 @@ things:
      in RedHat 7.2. Other vendors provide USB ready kernels
      as well.</li>
 </ul>
+At the current time (August 2002), <b>apcupsd</b> supports USB on Linux
+systems only. This is because there is no standard
+USB programming interface and USB on the majority of 
+machines other than Windows and Linux is currently
+under development and not stable.
 <h2>Connecting a Serial port UPS to a USB port</h2>
 If you would like to free up your serial port and
 connect your existing serial port UPS to a USB port,
