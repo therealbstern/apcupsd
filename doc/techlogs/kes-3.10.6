@@ -1,10 +1,15 @@
              Technical notes on version 3.10.6
-                       06 March 2003
+                       10 March 2003
                         Kern Sibbald
 
 General:
 
 Changes submitted this submission:
+10Mar03
+- Modify init script to use daemon so that STDIN/OUT, ... are   
+  detached from the terminal and pointed to the log file. This
+  prevents remotely logged in users who start apcupsd from being
+  unable to log out.
 06Mar03
 - Made some mindor modifications to configure.in and aclocal.m4 to
   make consistent use of double quotes in test statements in

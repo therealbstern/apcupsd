@@ -18,13 +18,10 @@ case "$1" in
        rm -f @PWRFAILDIR@/powerfail
        rm -f @nologdir@/nologin
        echo -n "Starting UPS monitoring:" 
-       if [ "${DISTVER}" = "5.2" ] ; then
-	  @sbindir@/apcupsd -f @sysconfdir@/apcupsd.conf
-       else
-	  @sbindir@/apcupsd -f @sysconfdir@/apcupsd.conf && success || failure
-       fi
+       daemon @sbindir@/apcupsd -f @sysconfdir@/apcupsd.conf
+       RETVAL=$?
        echo
-       touch @LOCKDIR@/subsys/apcupsd
+       [ $RETVAL -eq 0 ] && touch @LOCKDIR@/subsys/apcupsd
        ;;
     stop)
        echo -n "Shutting down UPS monitoring:"
