@@ -1,0 +1,7 @@
+             Technical notes on version 3.10.13
+                        Kern Sibbald
+
+General:
+09Mar04
+- Added asys.c imported from Bacula, which contains a number of 
+  simple system routines such as astrncpy(), ...
