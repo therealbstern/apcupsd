@@ -102,6 +102,7 @@
 
 # include <pthread.h>
 # ifdef HAVE_SUN_OS
+#  include <thread.h>
 #  define set_thread_concurrency() thr_setconcurrency(4)
 # else
 #  define set_thread_concurrency()

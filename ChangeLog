@@ -5,6 +5,23 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+
+----> Release apcupsd-3.10.8 (24 November 2003)
+24Nov03
+- Added a ONBATTERYDELAY to the conf file. This is the time in
+  seconds that apcupsd will wait after detecting a power failure
+  until it sets the onbattery state.  If you do not want to be
+  annoyed by short power outages (usually less than 10 seconds),
+  set the ONBATTRYDELAY appropriately and comment out the
+  powerout) "echo ...|wall" statement.
+- I finally got the no driver configured error. It turns out that the
+  Makefile detection of changes is all botched up. Since I don't understand
+  how the author expected it to work, I used the sledgehammer approach and
+  do a "make clean" on every ./configure.
+- Replaced apcnet.c with Howard Wilkinson's new master/slave code. If
+  anyone *really* needs the old driver, it is in src/apcnet.c.old
+- Upgraded to Cygwin 1.5.5
+
 ----> Release apcupsd-3.10.7 (xx November 2003)
 08Nov03
 - Do automatic UPS detection in the USB code if no device is specified

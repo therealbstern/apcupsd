@@ -133,7 +133,7 @@ void kill_power(UPSINFO *ups)
     if ((((pwdf = fopen(PWRFAIL, "r" )) == NULL) &&
 	    (ups->mode.type != BK)) ||
             (((pwdf = fopen(PWRFAIL, "r" )) == NULL) &&
-	    (UPS_ISSET(UPS_ONBATT)) && (ups->mode.type == BK))) {
+	    (is_ups_set(UPS_ONBATT)) && (ups->mode.type == BK))) {
 	/*						    
 	 * At this point, we really should not be attempting
 	 * a kill power since either the powerfail file is
@@ -249,7 +249,7 @@ void do_device(UPSINFO *ups)
 	ups->wait_time = device_wait_time(ups); /* compute appropriate wait time */
 
         Dmsg2(70, "Before device_check_state: 0x%x (OB:%d).\n", ups->Status,
-	    UPS_ISSET(UPS_ONBATT));
+	    is_ups_set(UPS_ONBATT));
 	/*
 	 * Check the UPS to see if has changed state.
 	 * This routine waits a reasonable time to prevent
@@ -259,18 +259,18 @@ void do_device(UPSINFO *ups)
 	ups->wait_time = device_wait_time(ups); /* compute appropriate wait time */
 
         Dmsg2(70, "Before do_action: 0x%x (OB:%d).\n", ups->Status,
-	    UPS_ISSET(UPS_ONBATT));
+	    is_ups_set(UPS_ONBATT));
 
 	do_action(ups);    /* take event actions */
 	
         Dmsg2(70, "Before fillUPS: 0x%x (OB:%d).\n", ups->Status,
-	    UPS_ISSET(UPS_ONBATT));
+	    is_ups_set(UPS_ONBATT));
 
 	/* Get all info available from UPS by asking it questions */
 	fillUPS(ups);
 
         Dmsg2(70, "Before do_reports: 0x%x (OB:%d).\n", ups->Status,
-	    UPS_ISSET(UPS_ONBATT));
+	    is_ups_set(UPS_ONBATT));
 
 	do_reports(ups);
     }
@@ -289,7 +289,7 @@ static int device_wait_time(UPSINFO *ups)
 {
     int wait_time;
 
-    if (UPS_ISSET(UPS_FASTPOLL)) {
+    if (is_ups_set(UPS_FASTPOLL)) {
 	 wait_time = TIMER_FAST;
      } else {
 	 wait_time = TIMER_SELECT;     /* normally 60 seconds */

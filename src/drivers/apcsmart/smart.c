@@ -282,10 +282,10 @@ int getline(char *s, int len, UPSINFO *ups)
         case UPS_ON_BATT:        /* UPS_ON_BATT = '!'   */
 	    if (s == NULL)
 		write_lock(ups);
-	    if (!UPS_ISSET(UPS_ONBATT)) {
+	    if (!is_ups_set(UPS_ONBATT)) {
 	       my_data->debounce = time(NULL);
 	    }
-	    UPS_CLEAR_ONLINE();
+	    clear_ups_online();
             Dmsg0(80, "Got UPS ON BATT.\n");
 	    if (s == NULL) {
 		write_unlock(ups);
@@ -295,7 +295,7 @@ int getline(char *s, int len, UPSINFO *ups)
         case UPS_REPLACE_BATTERY: /* UPS_REPLACE_BATTERY = '#'   */
 	    if (s == NULL)
 		write_lock(ups);
-	    UPS_SET(UPS_REPLACEBATT);
+	    set_ups(UPS_REPLACEBATT);
 	    if (s == NULL) {
 		write_unlock(ups);
 		ending = 1;
@@ -304,7 +304,7 @@ int getline(char *s, int len, UPSINFO *ups)
         case UPS_ON_LINE:        /* UPS_ON_LINE = '$'   */
 	    if (s == NULL)
 		write_lock(ups);
-	UPS_SET_ONLINE();
+	    set_ups_online();
             Dmsg0(80, "Got UPS ON LINE.\n");
 	    if (s == NULL) {
 		write_unlock(ups);
@@ -314,7 +314,7 @@ int getline(char *s, int len, UPSINFO *ups)
         case BATT_LOW:           /* BATT_LOW    = '%'   */
 	    if (s == NULL)
 		write_lock(ups);
-	    UPS_SET(UPS_BATTLOW);
+	    set_ups(UPS_BATTLOW);
 	    if (s == NULL) {
 		write_unlock(ups);
 		ending = 1;
@@ -323,7 +323,7 @@ int getline(char *s, int len, UPSINFO *ups)
         case BATT_OK:            /* BATT_OK     = '+'   */
 	    if (s == NULL)
 		write_lock(ups);
-	    UPS_CLEAR(UPS_BATTLOW);
+	    clear_ups(UPS_BATTLOW);
 	    if (s == NULL) {
 		write_unlock(ups);
 		ending = 1;
@@ -377,10 +377,10 @@ void UPSlinkCheck(UPSINFO *ups)
     tcflush(ups->fd, TCIOFLUSH);
     if (strcmp((a=smart_poll('Y', ups)), "SM") == 0) {
 	linkcheck = FALSE;
-    UPS_CLEAR(UPS_COMMLOST);
+	clear_ups(UPS_COMMLOST);
 	return;
     }
-    UPS_SET(UPS_COMMLOST);
+    set_ups(UPS_COMMLOST);
     tcflush(ups->fd, TCIOFLUSH);
 
     for (tlog=0; strcmp((a=smart_poll('Y', ups)), "SM") != 0; tlog -= (1+TIMER_SELECT)) {
@@ -406,7 +406,7 @@ void UPSlinkCheck(UPSINFO *ups)
 	tcflush(ups->fd, TCIOFLUSH);
 	generate_event(ups, CMDCOMMOK);
     }
-    UPS_CLEAR(UPS_COMMLOST);
+    clear_ups(UPS_COMMLOST);
     linkcheck = FALSE;
 }
 

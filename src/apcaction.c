@@ -420,7 +420,8 @@ void do_action(UPSINFO *ups)
 	/*
 	 *  Did the second test verify the power is failing?
 	 */
-	if (!is_ups_set(UPS_ONBATT_MSG)) {
+	if (!is_ups_set(UPS_ONBATT_MSG) &&
+	     time(NULL) - ups->last_time_on_line >= ups->onbattdelay) {
 	    set_ups(UPS_ONBATT_MSG);   /* it is confirmed, we are on batteries */
 	    generate_event(ups, CMDONBATTERY);
 	    ups->last_time_nologon = ups->last_time_annoy = now;

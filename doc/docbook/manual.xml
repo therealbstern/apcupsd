@@ -644,7 +644,11 @@ controls the UPS is called the master, and the other computers are
 called slaves. The master copy of <application>apcupsd</application>
 communicates with and controls the slaves via an Ethernet connection.
 This type of configuration may be appropriate for a small cluster
-of machines.</para>
+of machines. Some example configuration files for the master and the
+slave machines can be found in the <application>examples</application> 
+directory of the source distribution. The more recent examples are in
+<application>master.apcupsd.conf</application> and 
+<application>slave.apcupsd.conf</application>. </para>
 
 <para>The third configuration (new with version 3.8.3), is where
 a single computer controls multiple UPSes. In this case, there are
@@ -1841,7 +1845,7 @@ well.</para>
 <sect2 id="Win32"><title>Windows Systems with CYGWIN Installed</title>
 
 <para>If you wish to build from the source, and if you have CYGWIN
-version 1.3.20 and GCC 2.95.3-5 installed, it is possible to build the
+version 1.5.5 and GCC 2.95.3-5 installed, it is possible to build the
 Win32 version of <application>apcupsd</application>. Please don't try
 any other versions of CYGWIN as there were known problems.</para>
 

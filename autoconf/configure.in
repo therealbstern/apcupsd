@@ -1660,7 +1660,7 @@ AC_OUTPUT([ ${GENERATE_FILES} ],
 )
 
 chmod 755 examples/safe.apccontrol
-
+make clean
 
 #
 # A whole lot of hand springs to get the compiler version.

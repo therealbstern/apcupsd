@@ -1,8 +1,10 @@
-
-          Release Notes for Apcupsd 3.10.8
+             Technical notes on version 3.10.8
+                      24 November 2003
+                        Kern Sibbald
 
 General:
 
+Changes submitted this submission:
 24Nov03
 - Added a ONBATTERYDELAY to the conf file. This is the time in
   seconds that apcupsd will wait after detecting a power failure
@@ -14,11 +16,12 @@ General:
   Makefile detection of changes is all botched up. Since I don't understand
   how the author expected it to work, I used the sledgehammer approach and
   do a "make clean" on every ./configure.
-- Replaced apcnet.c with Howard Wilkinson's new master/slave code. If
+- Replaced apcnet.c with Howard Wilkinson's new master/slave code. If 
   anyone *really* needs the old driver, it is in src/apcnet.c.old
 - Upgraded to Cygwin 1.5.5
 
-Changes since apcupsd 3.10.6
+Everything below this was done in 3.10.7
+08Nov03
 - Do automatic UPS detection in the USB code if no device is specified
   or if the specified device cannot be opened.
 - Include patch provided by Howard Wilkinson, but put the new apcnet.c
@@ -35,6 +38,8 @@ Changes since apcupsd 3.10.6
    machine.  I needed this as I have a machine that acts as a multiple
    master while getting its power from another UPS managed by another
    machine.
+
+07Nov03
 - Lib wrappers was not building correctly on FreeBSD due to the 
   library -lnls, so I copied over the Bacula code for configure.
   Thanks to Lars Köller for reporting this and for his patches.
@@ -53,11 +58,3 @@ Changes since apcupsd 3.10.6
 - Fix a segfault in linux-usb.c due to reference one beyond the command
   table. This happens only on newer USB UPSes. Thanks to the user who
   pointed this out.
-
-Other Changes this Release:
-
-
-
-Items to note:  !!!!!
-- The default NIS port has changed from 7000 to 3551. Port 3551 has been
-  officially assigned to apcupsd by IANA.

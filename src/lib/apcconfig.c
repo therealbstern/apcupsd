@@ -199,6 +199,8 @@ static PAIRS table[] = {
             "Time in seconds between messages requesting users to logoff"  },
     { "ANNOYDELAY",   match_int, WHERE(annoydelay), 0,
             "Initial delay in seconds before telling users to get off the system" },
+    { "ONBATTERYDELAY",  match_int, WHERE(onbattdelay), 0,
+            "Initial delay in seconds before reacting to a power failure" },
     { "TIMEOUT",      match_int, WHERE(maxtime),    0,
             "Max. time in seconds to run on batteries"     },
     { "NOLOGON",    match_range, WHERE(nologin),       logins,
@@ -733,6 +735,7 @@ void init_ups_struct(UPSINFO *ups)
 
     ups->annoy		       = 5 * 60;  /* annoy every 5 mins */
     ups->annoydelay	       = 60;	  /* must be > than annoy to work, why???? */
+    ups->onbattdelay	       = 6;
     ups->maxtime	       = 0;
     ups->nologin_time	       = 0;
     ups->nologin_file	       = FALSE;
@@ -768,11 +771,11 @@ void init_ups_struct(UPSINFO *ups)
 
     ups->lockfile	       = -1;
 
-    UPS_CLEAR(UPS_SHUT_LOAD);
-    UPS_CLEAR(UPS_SHUT_BTIME);
-    UPS_CLEAR(UPS_SHUT_LTIME);
-    UPS_CLEAR(UPS_SHUT_EMERG);
-    UPS_CLEAR(UPS_SHUT_REMOTE);
+    clear_ups(UPS_SHUT_LOAD);
+    clear_ups(UPS_SHUT_BTIME);
+    clear_ups(UPS_SHUT_LTIME);
+    clear_ups(UPS_SHUT_EMERG);
+    clear_ups(UPS_SHUT_REMOTE);
     ups->remote_state	       = TRUE;
 
     ups->sysfac 	       = LOG_DAEMON;
@@ -995,7 +998,7 @@ jump_into_the_loop:
     if (ups->PoweredByUPS) {
 	UPS_SET(UPS_PLUGGED);
     } else {
-	UPS_CLEAR(UPS_PLUGGED);
+	clear_ups(UPS_PLUGGED);
     }
 
 bail_out:
