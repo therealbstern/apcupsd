@@ -1519,7 +1519,7 @@ Please select the function you want to perform.\n");
 
    while (!quit) {
       pmsg( "\n\
-1) Test 1 - kill UPS power (not yet working!)\n\
+1) Test 1 - kill UPS power\n\
 2) Quit\n\n");
 
       cmd = get_cmd("Select function number: ");

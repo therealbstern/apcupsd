@@ -168,7 +168,7 @@ void generate_event(UPSINFO *ups, int event)
 }
 
 /*********************************************************************/
-void powerfail (int ok)
+void powerfail(int ok)
 {
     /*	      If apcupsd terminates here, it will never get a chance to
      *	      report the event of returning mains-power.
@@ -190,14 +190,15 @@ void powerfail (int ok)
 
     if (ok == 2) {
 	clear_files();
-	if (terminate_on_powerfail)
-	/*
-	 * This sends a SIGTERM signal to itself.
-	 * The SIGTERM is bound to apcupsd_ or apctest_terminate(),
-	 * depending on which program is running this code, so it will
-	 * do in anyway the right thing.
-	 */
+	if (terminate_on_powerfail) {
+	    /*
+	     * This sends a SIGTERM signal to itself.
+	     * The SIGTERM is bound to apcupsd_ or apctest_terminate(),
+	     * depending on which program is running this code, so it will
+	     * do in anyway the right thing.
+	     */
 	    sendsig_terminate();
+	}
     }
 
     /*
