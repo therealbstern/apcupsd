@@ -56,6 +56,9 @@ sub do_cmd_gt { join('',"\&gt;",$_[0]); }
 #  the character before .html would resolve the collision, but we
 #  add the integer anyway. The first integer that resolves the 
 #  collision is used.
+# If a filename is desired that is 'index.html' or any case 
+#  variation of that, it is changed to index_page.html, 
+#  index_page1.html, etc.
 
 #RRM  Extended to allow customised filenames, set $CUSTOM_TITLES
 #     or long title from the section-name, set $LONG_TITLES
@@ -90,6 +93,10 @@ sub make_name {
 		$final_name = join("",($packed_curr_sec_id ?
 			"${PREFIX}$NODE_NAME". ++$OUT_NODE : $sec_name), $EXTN);
 	}
+
+	# Change the name from index to index_page to avoid conflicts with
+	#  index.html.
+	$final_name =~ s/^(index)\.html$/$1_Page.html/i;
 
 	# If the $final_name is already used, put an integer before the
 	#     #  .html to make it unique.
