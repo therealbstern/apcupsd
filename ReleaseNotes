@@ -5,6 +5,13 @@ NOTE: The non-pthreaded version should work in this release, but
       will be removed in the next version.
 
 Release 3.10.17 xxx
+- Commit kernstodo
+- Added an anonymous patch to powerflute.c and to the slack-apcupsd.in file.
+- Add Whitebox to detected systems.
+- Minor tweak to RedHat spec.in
+- Apply Carl Lindberg <lindberg@clindberg.org>'s patch
+  for apcaction.c to fix the network management card
+  shutdown.
 - Fix typo in targets.mak that prevents uninstall from working.
 - Change name of thread_terminate to apc_thread_terminate to avoid
   conflict on AIX.
