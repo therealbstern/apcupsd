@@ -5,6 +5,22 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+----> Release 3.10.17 xxMar05
+- Commit kernstodo
+- Added an anonymous patch to powerflute.c and to the slack-apcupsd.in file.
+- Add Whitebox to detected systems.
+- Minor tweak to RedHat spec.in
+- Apply Carl Lindberg <lindberg@clindberg.org>'s patch
+  for apcaction.c to fix the network management card
+  shutdown.
+- Fix typo in targets.mak that prevents uninstall from working.
+- Change name of thread_terminate to apc_thread_terminate to avoid
+  conflict on AIX.
+- Put configure found SHUTDOWN in apccontrol.in
+- Figured out how to scale the pdf images, so re-did them.
+- Some minor updates to the manual, particularly the title
+  page.
+
 
 ----> Release 3.10.16 04Nov04
 - Adam has fixed the killpower problem for USB so that the
