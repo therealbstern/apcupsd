@@ -104,42 +104,44 @@ but that the code key transmitted with the most recent message from
 the master does not correspond to what the slave expects. This problem
 is probably due to a network error or some other user or machine
 contacting the slave on the network port.
+
 <h2>Master/Slave Connection Not Working</h2>
 Master/slave problems are usually related to one of 
 the following items:
 <ol type="1">
         <li>Improper apcupsd.conf files. A good starting point are the
         master/slave example files in the examples subdirectory of the
-        source.
+        source.</li>
         <li>Master or slave IP address or name incorrect. Try ping'ing
         each machine from the other using the names or addresses that
-        you have put in the respective apcupsd.conf files.
+        you have put in the respective apcupsd.conf files.</li>
         <li>Make sure no other program is using socket number 6666 or
-        change the NETPORT directive in both apcupsd.conf files.
+        change the NETPORT directive in both apcupsd.conf files.</li>
         <li>Make sure you are using the same version of apcupsd on
-        both the master and slave machines.
+        both the master and slave machines.</li>
 </ol>
+
 <h2>CGI Programs Do Not Work</h2>
 Try checking the following:
 <ol type="1">
         <li>Did you successfully compile and link the cgi programs without
         errors?  If not sure, cd to the cgi directory, do a &quot;make clean&quot;
-        followed by a &quot;make&quot;
+        followed by a &quot;make&quot;</li>
         <li>Did you move or copy all the .cgi programs in the cgi directory
-        to your Web server cgi-bin directory on the SAME machine?
+        to your Web server cgi-bin directory on the SAME machine?</li>
         <li>Did you verify that the cgi programs located in the cgi-bin all have
-        execute permission?
-        <li>Have you tried any other cgi programs and proven that they work?
+        execute permission?</li>
+        <li>Have you tried any other cgi programs and proven that they work?</li>
         <li>Have you verified that the Network Information Server process
-        of <b>apcupsd</b> is running as described in this manual?
+        of <b>apcupsd</b> is running as described in this manual?</li>
         <li>Have you verified that your <b>apcupsd.conf</b> file is properly
         configured for the Network Information Server and that the port is
-        defined as 7000? I.e. &quot;NETSERVER on&quot; and &quot;SERVERPORT 7000&quot;
+        defined as 7000? I.e. &quot;NETSERVER on&quot; and &quot;SERVERPORT 7000&quot;</li>
         <li>If one or more machines does not show up in the multimon output, it is
         most likely due to a configuration error in the <b>hosts.conf</b> file
-        in your <b>/etc/apcupsd</b> directory.
-
+        in your <b>/etc/apcupsd</b> directory.</li>
 </ol>
+
 <h2>Battery Problems</h2>
 Please see the <a href="batteries.html">Battery Chapter</a> of
 this document for more details.

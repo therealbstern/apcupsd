@@ -219,6 +219,8 @@ is ignored for UPSCABLE ether).
                 
 <H3><A NAME="ConfigInfoServer"></A>Configuration Directives Used by the Network Information Server</H3>
 None of these directives are required for proper operation of <b>apcupsd</b>.
+For the Network Information Server to work, it must be enabled in the
+configuration (default) with <b>--enable-nis</b>.
 <a name="NETSERVER"></a><dl>
   <dt>NETSERVER [on | off] 
         </dt><dd>
@@ -230,6 +232,14 @@ None of these directives are required for proper operation of <b>apcupsd</b>.
         security, you may want to invoke a separate information server
         daemon from the inetd daemon.  In that case, <b>NETSERVER</b>
         should be <b>off</b>.  </dd>
+   <dt>NISIP &lt;IP-address&gt;</dt><dd>
+        This directive specifies an
+        IP address on which NIS server will listen for incoming connections.
+        Default value is 0.0.0.0 that means any incoming request will be
+        serviced but if you want it to listen to a single subnet you can
+        set it up to that subnet address, for example 192.168.10.0
+        Additionally you can listen for a single IP like 192.168.10.1</dd>
+
    <dt><a name="SERVERPORT"></a>
         SERVERPORT &lt;port&gt; 
         </dt><dd>
@@ -483,6 +493,28 @@ The following directives apply to the master/slave networking mode of
 One machine, the master, will have a serial port connection to the UPS, and
 the other machines, the slaves, will obtain their information via the network
 from the master.
+<p>
+<b>Note, as of version 3.10.x, the old master/slave code is by default turned off
+in the configuration. You must explicitly enable it by including a 
+<b>--enable-master-slave</b> option on your <b>./configure</b> command 
+before building the source.
+<p>
+In addition to the old master/slave code, there is now a new network driver
+enabled with <b>--enable-net</b> (default disabled) that can be used to
+control a slave from any version of apcupsd running NIS. This is a much
+more flexible system of controlling slaves because a slave machine that
+also has NIS turned on can thus act as a master for another slave with
+<b>--enable-net</b> turned on. With this mode turned on, the slave
+obtains the address of the master from the <b>DEVICE</b> directive,
+which takes the form <b>hostname[:port]</b> as a consequence, none of
+the directives apply for this form of networking.  In addition, for this
+mode to work, you must specify <b>UPSTYPE net</b> so that the proper
+driver is loaded.
+<p>
+The remainder of this section presents directives that apply
+to the old master/slave code that must be enabled by
+the <b>enable-master-slave</b> configuration option.
+<p>
 <a name="UPSCLASS"></a>
 <DL>
    <dt>UPSCLASS&nbsp;&nbsp; &lt;class of operation&gt;</dt>

@@ -454,7 +454,7 @@ static int get_data_from_master(UPSINFO *ups)
 	struct timeval tv;
 
 	if (newsocketfd == -1) {
-        UPS_SET(UPS_COMMLOST);
+	UPS_SET(UPS_COMMLOST);
 	    masterlen = sizeof(master_adr);
 	    FD_ZERO(&rfds);
 	    FD_SET(socketfd, &rfds);
@@ -524,7 +524,7 @@ static int get_data_from_master(UPSINFO *ups)
 	    shutdown(newsocketfd, SHUT_RDWR);
 	    close(newsocketfd);
 	    newsocketfd = -1;
-        UPS_SET(UPS_COMMLOST);
+	UPS_SET(UPS_COMMLOST);
 	    return 6;		      /* master not responding */
 	default:
 	    break;
@@ -535,7 +535,7 @@ static int get_data_from_master(UPSINFO *ups)
 	    shutdown(newsocketfd, SHUT_RDWR);
 	    close(newsocketfd);
 	    newsocketfd = -1;
-        UPS_SET(UPS_COMMLOST);
+	UPS_SET(UPS_COMMLOST);
 	    return 3;		      /* read error */
 	}
 	break;
@@ -564,64 +564,64 @@ static int get_data_from_master(UPSINFO *ups)
     }
 
     if (strcmp(ups->usermagic, get_data.usermagic) == 0) {
-        if (ntohl(get_data.OnBatt)) {
-            UPS_CLEAR_ONLINE();
-        } else {
-            UPS_SET_ONLINE();
-        }
-        if (ntohl(get_data.BattLow)) {
-            UPS_SET(UPS_BATTLOW);
-        } else {
-            UPS_CLEAR(UPS_BATTLOW);
-        }
-        ups->BattChg	   = ntohl(get_data.BattChg);
-        ShutDown	   = ntohl(get_data.ShutDown);
-        ups->nettime	   = ntohl(get_data.nettime);
-        ups->TimeLeft	   = ntohl(get_data.TimeLeft);
+	if (ntohl(get_data.OnBatt)) {
+	    UPS_CLEAR_ONLINE();
+	} else {
+	    UPS_SET_ONLINE();
+	}
+	if (ntohl(get_data.BattLow)) {
+	    UPS_SET(UPS_BATTLOW);
+	} else {
+	    UPS_CLEAR(UPS_BATTLOW);
+	}
+	ups->BattChg	   = ntohl(get_data.BattChg);
+	ShutDown	   = ntohl(get_data.ShutDown);
+	ups->nettime	   = ntohl(get_data.nettime);
+	ups->TimeLeft	   = ntohl(get_data.TimeLeft);
 /*
  * Setting ChangeBatt triggers false alarms if the master goes
  * down and comes back up, so remove it for now.  KES 27Feb01
  *
- *      if (ntohl(get_data.ChangeBatt)) {
- *          UPS_SET(UPS_REPLACEBATT);
- *      } else {
- *          UPS_CLEAR(UPS_REPLACEBATT);
- *      }
+ *	if (ntohl(get_data.ChangeBatt)) {
+ *	    UPS_SET(UPS_REPLACEBATT);
+ *	} else {
+ *	    UPS_CLEAR(UPS_REPLACEBATT);
+ *	}
  */
-        if (ntohl(get_data.load)) {
-            UPS_SET(UPS_SHUT_LOAD);
-        } else {
-            UPS_CLEAR(UPS_SHUT_LOAD);
-        }
-        if (ntohl(get_data.timedout)) {
-            UPS_SET(UPS_SHUT_BTIME);
-        } else {
-            UPS_CLEAR(UPS_SHUT_BTIME);
-        }
-        if (ntohl(get_data.timelout)) {
-            UPS_SET(UPS_SHUT_LTIME);
-        } else {
-            UPS_CLEAR(UPS_SHUT_LTIME);
-        }
-        if (ntohl(get_data.emergencydown)) {
-            UPS_SET(UPS_SHUT_EMERG);
-        } else {
-            UPS_CLEAR(UPS_SHUT_EMERG);
-        }
-        ups->remote_state  = ntohl(get_data.remote_state);
-        ups->UPS_Cap[CI_BATTLEV] = ntohl(get_data.cap_battlev);
-        ups->UPS_Cap[CI_RUNTIM] = ntohl(get_data.cap_runtim);
+	if (ntohl(get_data.load)) {
+	    UPS_SET(UPS_SHUT_LOAD);
+	} else {
+	    UPS_CLEAR(UPS_SHUT_LOAD);
+	}
+	if (ntohl(get_data.timedout)) {
+	    UPS_SET(UPS_SHUT_BTIME);
+	} else {
+	    UPS_CLEAR(UPS_SHUT_BTIME);
+	}
+	if (ntohl(get_data.timelout)) {
+	    UPS_SET(UPS_SHUT_LTIME);
+	} else {
+	    UPS_CLEAR(UPS_SHUT_LTIME);
+	}
+	if (ntohl(get_data.emergencydown)) {
+	    UPS_SET(UPS_SHUT_EMERG);
+	} else {
+	    UPS_CLEAR(UPS_SHUT_EMERG);
+	}
+	ups->remote_state  = ntohl(get_data.remote_state);
+	ups->UPS_Cap[CI_BATTLEV] = ntohl(get_data.cap_battlev);
+	ups->UPS_Cap[CI_RUNTIM] = ntohl(get_data.cap_runtim);
     } else {
-        slaves[0].remote_state = RMT_ERROR;
-        shutdown(newsocketfd, SHUT_RDWR);
-        close(newsocketfd);
-        newsocketfd = -1;
-        UPS_SET(UPS_COMMLOST);
-        return 5;
+	slaves[0].remote_state = RMT_ERROR;
+	shutdown(newsocketfd, SHUT_RDWR);
+	close(newsocketfd);
+	newsocketfd = -1;
+	UPS_SET(UPS_COMMLOST);
+	return 5;
     }
 
     if (ShutDown)		    /* if master has shutdown */
-        UPS_SET(UPS_SHUT_REMOTE); /* we go down too */
+	UPS_SET(UPS_SHUT_REMOTE); /* we go down too */
 	 
 #ifdef old_disconnecting_code
     close(newsocketfd);
@@ -635,9 +635,9 @@ static int get_data_from_master(UPSINFO *ups)
      */
     if (UPS_ISSET(UPS_COMMLOST)) {
         log_event(ups, LOG_WARNING, "Connect from master %s succeeded",
-                slaves[0].name);
-        execute_command(ups, cmd[CMDMASTERCONN]);
-        UPS_CLEAR(UPS_COMMLOST);
+		slaves[0].name);
+	execute_command(ups, cmd[CMDMASTERCONN]);
+	UPS_CLEAR(UPS_COMMLOST);
     } 
     slaves[0].remote_state = RMT_CONNECTED;
     time(&ups->last_master_connect_time);
@@ -728,7 +728,7 @@ void do_net(UPSINFO *ups)
 {
     init_thread_signals();
 
-    UPS_SET(UPS_SLAVE);	      /* We are networking not connected */
+    UPS_SET(UPS_SLAVE);       /* We are networking not connected */
 
     while (1) {
 	/* Note, we do not lock shm so that apcaccess can
@@ -776,9 +776,9 @@ void do_slaves(UPSINFO *ups)
 	    if (slave_stat != slave_disconnected) {
 		write_lock(ups);
 		if (slave_disconnected) {
-            UPS_SET(UPS_SLAVEDOWN);
+	    UPS_SET(UPS_SLAVEDOWN);
 		} else {
-            UPS_CLEAR(UPS_SLAVEDOWN);
+	    UPS_CLEAR(UPS_SLAVEDOWN);
 		}
 		write_unlock(ups);
 	    }
@@ -794,26 +794,31 @@ void do_slaves(UPSINFO *ups)
 #else /* HAVE_OLDNET */
 
 int prepare_master(UPSINFO *ups) {
-    log_event(ups, LOG_ERR,"Old network code is disabled");
+    log_event(ups, LOG_ERR, _("Old network code disabled. Use --enable-oldnet to enable"));
+    Dmsg0(000, _("Old network code disabled. Use --enable-oldnet to enable.\n"));
     return 1; /* Not OK */
 }
 
 int prepare_slave(UPSINFO *ups) {
-    log_event(ups, LOG_ERR,"Old network code is disabled");
+    log_event(ups, LOG_ERR, _("Old network code disabled. Use --enable-oldnet to enable"));
+    Dmsg0(000, _("Old network code disabled. Use --enable-oldnet to enable.\n"));
     return 1; /* Not OK */
 }
 
 void kill_net(UPSINFO *ups) {
-    log_event(ups, LOG_ERR,"Old network code is disabled");
+    log_event(ups, LOG_ERR, _("Old network code disabled. Use --enable-oldnet to enable"));
+    Dmsg0(000, _("Old network code disabled. Use --enable-oldnet to enable.\n"));
 }
 
 void do_slaves(UPSINFO *ups) {
-    log_event(ups, LOG_ERR,"Old network code is disabled");
+    log_event(ups, LOG_ERR, _("Old network code disabled. Use --enable-oldnet to enable"));
+    Dmsg0(000, _("Old network code disabled. Use --enable-oldnet to enable.\n"));
     exit(1);
 }
 
 void do_net(UPSINFO *ups) {
-    log_event(ups, LOG_ERR,"Old network code is disabled");
+    log_event(ups, LOG_ERR, _("Old network code disabled. Use --enable-oldnet to enable"));
+    Dmsg0(000, _("Old network code disabled. Use --enable-oldnet to enable.\n"));
     exit(1);
 }
 
