@@ -533,7 +533,14 @@ int usb_ups_check_state(UPSINFO *ups)
 	    break;
 	}
 
-
+	/*
+	 *  The usleep() is a workaround for the Linux 2.6 kernel flooding
+         *    the syslog bug. If for some strange reason it doesn't work for
+	 *    you, try slightly larger values.	I recommend not more than
+	 *    1 million (i.e. 1 second).   
+	 *  This workaround was found by Reg. Clemens <reg at dwf dot com>.
+	 */
+	usleep(100000);
 	do {
 	   retval = read(my_data->fd, &ev, sizeof(ev));
 	} while (retval == -1 && (errno == EAGAIN || errno == EINTR));
