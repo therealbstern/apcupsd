@@ -17,18 +17,16 @@
    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.		  
  */
 
-#include <unistd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
-#include <sys/time.h>
 
 #include "multimon.h"
 #include "upsfetch.h"
 #include "cgiconfig.h"
-#include "status.h"
+#include "cgilib.h"
 
+#include "status.h"
 #include "apc_nis.h"
 
 
@@ -43,9 +41,14 @@ static	ftype	*firstfield = NULL;
 static	int	numfields = 0, use_celsius;
 static	char	*desc;
 
+void parsearg(const char *var, const char *value)
+{
+}
+
 void report_error(char *str) 
 {
-    printf("%s</BODY></HTML>\n", str);
+    printf("<p>%s</p>\n", str);
+    html_finish();
     exit(1);
 }
 
@@ -218,10 +221,10 @@ void do_ambtemp(char *monhost, char *suffix)
 
     if (getupsvar (monhost, "ambtemp", ambtemp, sizeof(ambtemp)) > 0) {
 	if (use_celsius) 
-            printf ("<TD BGCOLOR=\"#00FF00\">%s °C</TD>\n", ambtemp); 
+            printf ("<TD BGCOLOR=\"#00FF00\">%s &deg;C</TD>\n", ambtemp); 
 	else {
 	    tempf = (strtod (ambtemp, 0) * 1.8) + 32;
-            printf ("<TD BGCOLOR=\"#00FF00\">%.1f °F</TD>\n", tempf); 
+            printf ("<TD BGCOLOR=\"#00FF00\">%.1f &deg;F</TD>\n", tempf); 
 	}
     } 
     else {
@@ -235,7 +238,7 @@ void do_ambtempc(char *monhost, char *suffix)
 	char	ambtemp[64];
 
     if (getupsvar (monhost, "ambtemp", ambtemp, sizeof(ambtemp)) > 0)
-        printf ("<TD BGCOLOR=\"#00FF00\">%s °C</TD>\n", ambtemp); 
+        printf ("<TD BGCOLOR=\"#00FF00\">%s &deg;C</TD>\n", ambtemp); 
     else
         printf ("<TD CLASS=\"Empty\">-</TD>\n");
 }
@@ -248,7 +251,7 @@ void do_ambtempf (char *monhost, char *suffix)
 
     if (getupsvar (monhost, "ambtemp", ambtemp, sizeof(ambtemp)) > 0) {
 	tempf = (strtod (ambtemp, 0) * 1.8) + 32;
-        printf ("<TD BGCOLOR=\"#00FF00\">%.1f °F</TD>\n", tempf); 
+        printf ("<TD BGCOLOR=\"#00FF00\">%.1f &deg;F</TD>\n", tempf); 
     }
     else
         printf ("<TD CLASS=\"Empty\">-</TD>\n");
@@ -484,14 +487,12 @@ int main(int argc, char **argv)
     printf ("Content-type: text/html\n");
     printf ("\n");
 
-    printf ("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\"\n");
-    printf ("       \"http://www.w3.org/TR/REC-html40/loose.dtd\">\n");
-
-    printf ("<HTML>\n");
-    printf ("<HEAD><TITLE>Multimon: UPS Status Page</TITLE>\n");
-    printf ("<META HTTP-EQUIV=\"Pragma\" CONTENT=\"no-cache\">\n");
-    printf ("</HEAD>\n");
-    printf ("<BODY BGCOLOR=\"#FFFFFF\">\n");
+    printf ("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
+    printf ("<html>\n");
+    printf ("<head><title>Multimon: UPS Status Page</title>\n");
+    printf ("<meta http-equiv=\"Pragma\" content=\"no-cache\">\n");
+    printf ("</head>\n");
+    printf ("<body BGCOLOR=\"#FFFFFF\">\n");
 
     readconf();
 
@@ -540,7 +541,8 @@ int main(int argc, char **argv)
     
     printf ("</TABLE>\n"); 
     printf ("</TD></TR>\n"); 
-    printf ("</TABLE></BODY></HTML>\n");
+    printf ("</TABLE>\n");
 
+    html_finish();
     exit(0);
 }

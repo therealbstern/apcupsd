@@ -16,9 +16,9 @@ allexe = upsstats.cgi upsfstats.cgi upsimage.cgi \
 @TARGETS@
 
 # Multimon objects
-MOBJS = multimon.o upsfetch.o
+MOBJS = multimon.o upsfetch.o cgilib.o
 
-MCSSOBJS = multimoncss.o upsfetch.o
+MCSSOBJS = multimoncss.o upsfetch.o cgilib.o
 
 # upssstats objects
 SOBJS = upsstats.o upsfetch.o cgilib.o
