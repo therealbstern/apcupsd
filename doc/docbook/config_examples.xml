@@ -40,7 +40,14 @@ DEVICE /dev/usb/hid/hiddev[0-15]
 <para>Please use the explicit specifications of a device only if
 your know exactly what you are doing. In general, it is much easier
 to let <application>apcupsd</application> find the device itself.</para>
-
+<para>
+Note that you should enter &quot;/dev/usb/hiddev[0-15]&quot; literally as shown.
+The &quot;[0-15]&quot; expression tells apcupsd to search all hiddev devices until
+it finds a UPS. You can restrict the search to a subset of devices by
+using something like &quot;[0-4]&quot;, but keep in mind this will limit apcupsd's
+ability to locate the UPS if the kernel relocates it to a
+differentdevice node.
+</para>
 
 </sect1>
 

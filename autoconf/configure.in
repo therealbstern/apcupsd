@@ -1126,6 +1126,9 @@ then
 elif test -f /etc/redhat-release
 then
 	DISTNAME=redhat
+elif test -f /etc/yellowdog-release
+then
+	DISTNAME=yellowdog
 elif test -f /etc/debian_version
 then
 	DISTNAME=debian
@@ -1369,6 +1372,21 @@ redhat)
 		platforms/redhat/apcupsd.spec \
 		platforms/redhat/awkhaltprog"
   ;;
+ yellowdog)
+       if test `cat /etc/yellowdog-release | grep release |\
+		  cut -f 3 -d ' '`x = "Enterprise"x ; then
+	  DISTVER="Enterprise "`cat /etc/yellowdog-release | grep release |\
+		   cut -f 6 -d ' '`
+       else
+	   DISTVER=`cat /etc/yellowdog-release | grep release |\
+		    cut -f 5 -d ' '`
+       fi
+       DFILES="\
+	       platforms/yellowdog/Makefile \
+	       platforms/yellowdog/apcupsd \
+	       platforms/yellowdog/apcupsd.spec \
+	       platforms/yellowdog/awkhaltprog"
+   ;;
 engarde)
 	DISTVER=`cat /etc/engarde-release | grep ersion |\
 		 cut -f 5 -d ' '`

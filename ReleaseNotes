@@ -2,6 +2,7 @@
           Release Notes for Apcupsd 3.10.12
 
 Release 3.10.12 xxFeb04:
+- Integrated Joseph Sacco's yellowdog patch -- some done by hand.
 - Minor updates to the documentation from user input.
 - Fix a Makefile find that removes zero length files, which fails                 
   on some systems.
