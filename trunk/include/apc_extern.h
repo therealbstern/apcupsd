@@ -38,7 +38,6 @@
 
 extern UPSINFO myUPS;
 extern UPSINFO *core_ups;
-extern UPSDRIVER drivers[];
 extern char argvalue[MAXSTRING];
 extern void (*error_out)(const char *file, int line, const char *fmt,...);
 extern void (*error_exit)(const char *fmt,...);

@@ -183,6 +183,6 @@ typedef struct upsdriver {
 /*
  * Support routines.
  */
-UPSDRIVER *attach_driver(UPSINFO *ups);
+const UPSDRIVER *attach_driver(UPSINFO *ups);
 
 #endif /*_APC_DRIVERS_H */
