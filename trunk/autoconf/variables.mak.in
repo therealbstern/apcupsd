@@ -67,7 +67,7 @@ abssrcdir = @ABSSRCDIR@
 sbindir = @sbindir@
 
 # Directory for pid files.
-piddir = @piddir@
+piddir = @PIDDIR@
 
 # Manual extension
 manext = 8

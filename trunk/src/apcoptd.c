@@ -1,5 +1,5 @@
 /*
- *  apcopt.c -- command line options parsing routine for apcupsd.
+ *  apcoptd.c -- command line options parsing routine for apcupsd.
  *
  *  Copyright (C) 1999-2000 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
  *
