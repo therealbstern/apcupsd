@@ -5,7 +5,20 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
-----> Release apcupsd-3.10.6 (01 May 2003)
+----> Release apcupsd-3.10.6 (20 May 2003)
+    20May03
+    - Fixed a typo error (mine) that prevented Scott from building
+      rpms. Strange, it worked for me????
+    19May03
+    - More DESTDIR cleanup for building non-root rpms.
+    18May03
+    - Add DESTDIR everywhere so we can build rpms non-root
+    - Additional documentation
+    - Add Scott's new apcupsd.spec
+    06May03
+    - On Hilary Jones suggestion, I fixed the ./configure message that
+      is printed when no libgd is found to direct the user to the
+      main source.01May03
     01May03
     - Add Sergey Vlasov's kernel patch to the examples directory,
       and it replaces the previous patch.
