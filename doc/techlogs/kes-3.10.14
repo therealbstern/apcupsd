@@ -3,6 +3,10 @@
 
 General:
 17Jul04
+- Fiddle with apcconfig.c to correct astrncpy() problem noted by
+  Adam.
+- #ifdef code in apcaccess that tries to write in the shared memory
+  buffer.
 - Applied Adam's patch for fixing the pthreads dependencies in asys.c
 - Tweak the patch a bit hopefully so that OpenBSD will work.
 09Jul04

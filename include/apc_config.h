@@ -198,7 +198,7 @@
  * For HP-UX the definition of FILENAME_MAX seems not conformant with
  * POSIX standard. To avoid any problem we are forced to define a
  * private macro. This accounts also for other possible problematic OSes.
- * If noone of the standard macros is defined, fall back to 256.
+ * If none of the standard macros is defined, fall back to 256.
  */
 #if defined(FILENAME_MAX) && FILENAME_MAX > 255
 # define APC_FILENAME_MAX FILENAME_MAX

@@ -265,9 +265,10 @@ int main(int argc, char **argv)
 {
     int mode = 0;
     UPSINFO *ups = NULL;
+#ifdef HAVE_PTHREADS
     char *cfgfile = APCCONF;
     struct stat cfgstat;
-
+#endif
 
     astrncpy(argvalue, argv[0], sizeof(argvalue)-1);
 
@@ -329,6 +330,15 @@ int main(int argc, char **argv)
 	    port = atoi(p);
 	}
     } else {
+#ifdef HAVE_PTHREADS
+      /* 
+       * Note, this is turned off if pthreads are not
+       *  turned on because check_for_config() will want to
+       *  write into the ups structure, which we cannot
+       *  do because it is shared memory mapped read-only
+       *  for us.
+       */
+
       /* check configuration so local NISIP and NISPORT variables can be used as defaults */ 
       if (!stat(cfgfile, &cfgstat)) {
 	check_for_config(ups, cfgfile);
@@ -341,6 +351,7 @@ int main(int argc, char **argv)
 	  }
 	}
       }
+#endif
     }
 
     astrncpy(myDATA.apcmagic, APC_MAGIC, sizeof(myDATA.apcmagic));
