@@ -1,0 +1,24 @@
+             Technical notes on version 3.10.4
+                       19 January 2003
+                        Kern Sibbald
+
+General:
+- A number of important patches all supplied by Mirko Doelle.
+- Moved technotes for 2001 and 2002 into respective directories.
+- Created a new kes-3.10.4 file to which I will append if there
+  are additional changes to 3.10.4. This will reduce the number
+  of release note files.
+
+Changes submitted this submission:
+19Jan03
+- Fixed hangs in usb driver startup when could not open port by
+  releasing the ups structure lock before the Error_abort calls.
+  Thanks to Mirko Doelle for reporting this.
+- Fixed the default path for mkinstalldirs from $(topdir) to
+  $(topdir)/autoconf.  Reported by Mirko.
+- Fixed configure.in to always create platform/apccontrol. Previously
+  it was not being created for Debian. Reported by Mirko.
+- Removed Debian specific installation of apccontrol. Reported by
+  Mirko.
+- Implemented code to display the apcupsd events with the most recent
+  first. Code sent by Mirko, but I modified it slightly.
