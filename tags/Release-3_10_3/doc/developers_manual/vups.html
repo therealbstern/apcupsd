@@ -1,0 +1,810 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.4.3 i586) [Netscape]">
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+
+<h2>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+The Virtual Uninterruptible Power Source</h2>
+
+<p><br><br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+(C) 2000 Riccardo Facchetti<br>
+<br>
+a. Revisions<br>
+<br>
+Fri Jan 28 23:12:53 CET 2000 - Added 2.1.3.1 send_dumb_command().<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Added chapter 5, considerations on dumb ups.<br>
+Fri Jan 21 23:54:04 CET 2000 - Initial writing.<br>
+<br>
+<br>
+b. Introduction<br>
+<br>
+This document is published for free usage.<br>
+If you cite this document in bibliography or for reference I ask you to<br>
+recognize the authorship of the original. You may distribuite freely this<br>
+document as long as the original title, author name and copyright is kept<br>
+intact. You may use portions of this document as long as you recognize<br>
+clearly into your document the source of your quote. You may use this<br>
+document as a basis for the implementation of a generic ups monitoring<br>
+program as long as you recognize the ideas herein contained, citing the
+name<br>
+of the author and the title and revision of this document.<br>
+<br>
+This document is intended to be a clarification for writing real code in<br>
+apcupsd. The use of this document for apcupsd, and for apcupsd only, is<br>
+totally free and don't need any aknowledgment.<br>
+<br>
+<br>
+c. Glossary<br>
+<br>
+VUPS:&nbsp;&nbsp; the Virtual UPS driver<br>
+UPS:&nbsp;&nbsp;&nbsp; the ups driver<br>
+ups:&nbsp;&nbsp;&nbsp; the ups hardware<br>
+dumb:&nbsp;&nbsp; a simple electrical communication protocol<br>
+smart:&nbsp; a well defined character-based communication protocol with
+which<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the program send a command and
+get a response from ups.<br>
+server: a computer with an attached and monitored UPS which is servicing<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; the UPS over the network.<br>
+client: a computer attached to the same power line backed by the server's
+UPS<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; but not to the ups serial line.
+To monitor the ups status it has to<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; connect to the server and ask
+it for ups status.<br>
+<br>
+<br>
+1 What is VUPS<br>
+<br>
+The VUPS layer is a mid-layer between apcupsd operations and real hardware.<br>
+To visualize the relations between apcupsd, VUPS and UPS here a scheme:<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+------------------------<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+PC |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp; ------------&nbsp;&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp; | apc upsd |&nbsp;&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp; ------------&nbsp;&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp; | VUPS API |&nbsp;&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp; --------------&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp; | VUPS layer |&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp; --------------&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp; | UPS&nbsp; API |&nbsp;&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp; --------------&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp; | UPS driver |&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp; --------------&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp; | Serial drv |&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp; --------------&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+------------------------<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+| Serial cable<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-------<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+| UPS |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-------<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+| Power cord<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Main power<br>
+<br>
+<br>
+2 The UPS driver<br>
+<br>
+As you can see, the main power is monitored by UPS that is attached to
+the PC<br>
+with a serial cable. The serial driver will manage I/O over the serial
+line.<br>
+On top of it there will be, in user space, the UPS driver.<br>
+The UPS driver will know anything of the UPS it is driving.<br>
+It will have knowledge of:<br>
+<br>
+a) If the UPS is dumb or smart<br>
+b) In case the UPS is dumb will know which electrical signals on serial
+ports<br>
+&nbsp;&nbsp; do or mean what.<br>
+c) In case the UPS is smart will know all the smart commands to<br>
+&nbsp;&nbsp; query/configure/manage the UPS.<br>
+<br>
+The UPS driver will translate b) and c) information using the UPS API that<br>
+will be mainly a "translation API" that will allow UPS to pass information
+on<br>
+up-layers.<br>
+<br>
+The advantage of this scheme is that this way we will be able to drive
+any<br>
+kind of UPS, regardless of which protocol, smart or dumb, is using and
+which<br>
+signals or which serial protocol is used to communicate UPS events and
+status<br>
+or to reprogram UPS internal eprom.<br>
+<br>
+<br>
+2.1<br>
+<br>
+Every UPS driver will have some lowlevel functions, described below.<br>
+<br>
+<br>
+2.1.1 int open(char *path)<br>
+<br>
+This function will be needed to open the UPS line.<br>
+<br>
+INPUT:<br>
+&nbsp;&nbsp;&nbsp; char *path<br>
+<br>
+&nbsp;&nbsp;&nbsp; path can be one of these three:<br>
+<br>
+&nbsp;&nbsp;&nbsp; a) A path that point to a serial device<br>
+&nbsp;&nbsp;&nbsp; b) A path that point to an USB device<br>
+&nbsp;&nbsp;&nbsp; c) A network IP address<br>
+<br>
+&nbsp;&nbsp;&nbsp; a) and b) are obvious. We will have a path that point
+to a device.<br>
+<br>
+&nbsp;&nbsp;&nbsp; c) is less obvious. Since apcupsd can work in network
+and since the UPS<br>
+&nbsp;&nbsp;&nbsp; driver is a hardware device but is not needed to be
+local, we may want to<br>
+&nbsp;&nbsp;&nbsp; open an UPS device even from remote. The syntax of path
+for this case is<br>
+&nbsp;&nbsp;&nbsp; very different. It will contain an hostname, or IP address,
+and,<br>
+&nbsp;&nbsp;&nbsp; optionally, the port to which connect separated by hostname
+with a colon:<br>
+<br>
+&nbsp;&nbsp;&nbsp; "212.131.136.20"<br>
+&nbsp;&nbsp;&nbsp; "212.131.136.20:3254"<br>
+&nbsp;&nbsp;&nbsp; "master.oasi.gpa.it"<br>
+&nbsp;&nbsp;&nbsp; "master.oasi.gpa.it:7832"<br>
+<br>
+&nbsp;&nbsp;&nbsp; On the other end of connection we will find the UPS
+driver of apcupsd.<br>
+&nbsp;&nbsp;&nbsp; The two UPS drivers, the remote attached directly to
+the real UPS and the<br>
+&nbsp;&nbsp;&nbsp; local one attached to the remote, will communicate through
+TCP/IP to<br>
+&nbsp;&nbsp;&nbsp; exchange UPS information/commands.<br>
+<br>
+OUTPUT:<br>
+&nbsp;&nbsp;&nbsp;&nbsp;<br>
+&nbsp;&nbsp;&nbsp; A file descriptor of the opened device, or the network
+connection.<br>
+&nbsp;&nbsp;&nbsp; In case of error -1 will be returned and errno will
+be set.<br>
+<br>
+As you can see until now I have not made particular hypotesis about the<br>
+internals of open(). This is because what we only need is that it return
+a<br>
+file descriptor over which communicate with the real hardware, being it<br>
+local or remote.<br>
+<br>
+<br>
+2.1.2 int close(int fd)<br>
+<br>
+This function will close the communication between computer and UPS.<br>
+<br>
+INPUT:<br>
+<br>
+&nbsp;&nbsp;&nbsp; fd is the file descriptor to be closed.<br>
+<br>
+OUTPUT:<br>
+<br>
+&nbsp;&nbsp;&nbsp; zero on success, -1 on failure and errno will be set.<br>
+<br>
+As you can notice, even for close() I have not made any particular<br>
+hypotesis of its inner workings. We are not interested in what is doing
+to<br>
+close the file descriptor. Only it need to stop gracefully the<br>
+communications between the UPS driver and the ups hardware.<br>
+<br>
+<br>
+2.1.3 int get_dumb_status(int fd)<br>
+<br>
+This function gather the status of a dumb ups. It will return an integer<br>
+containing the read status of the ups.<br>
+<br>
+INPUT:<br>
+<br>
+&nbsp;&nbsp;&nbsp; fd is the file descriptor of the dumb UPS to poll.<br>
+<br>
+OUTPUT:<br>
+<br>
+&nbsp;&nbsp;&nbsp; The integer returned will contain any information that
+can be gathered<br>
+&nbsp;&nbsp;&nbsp; from the UPS in dumb mode or -1 on error and errno set.<br>
+<br>
+The returned integer will have to contain space for any possible meaning<br>
+of dumb signals transmitted electrically over the serial cable. This means<br>
+that will be a bitmap with or-ed bit values.<br>
+<br>
+E.g.<br>
+<br>
+#define DUMB_UPS_OK&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0x00<br>
+#define DUMB_UPS_ON_BATTERY&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0x01<br>
+#define DUMB_UPS_BATTERY_FAILING&nbsp;&nbsp;&nbsp; 0x02<br>
+<br>
+so that the returned integer may have the value:<br>
+<br>
+(DUMB_UPS_ON_BATTERY|DUMB_UPS_BATTERY_FAILING)<br>
+<br>
+Since this function is already very generic (of course being tailored to
+the<br>
+particular ups is driving), it is not needed to be wrapped with a translator<br>
+for upper layers: it can be called from upper layers.<br>
+<br>
+2.1.3.1 int send_dumb_command(int fd, int command)<br>
+<br>
+The dumb upses accept from the computer simple commands as status changes
+on<br>
+serial lines. The only command I know of dumb upses is the "shutdown ups"<br>
+command.<br>
+<br>
+INPUT:<br>
+&nbsp;&nbsp;&nbsp; fd is the file descriptor of the smart UPS.<br>
+<br>
+&nbsp;&nbsp;&nbsp; command is an integer that contain a command to be sent
+to the ups.<br>
+<br>
+OUTPUT:<br>
+&nbsp;&nbsp;&nbsp; an integer that will be zero on success or -1 on error
+and errno will be<br>
+&nbsp;&nbsp;&nbsp; set.<br>
+<br>
+Note that I suppose we don't get acks from upses when we send commands.<br>
+<br>
+<br>
+2.1.4 static int write_command(int fd, char *command)<br>
+<br>
+This function is intended to be used with smart upses that communicate
+over<br>
+the serial line with a well defined protocol.<br>
+<br>
+INPUT:<br>
+&nbsp;&nbsp;&nbsp; fd is the file descriptor of the smart UPS.<br>
+<br>
+&nbsp;&nbsp;&nbsp; command is a string that contain a command to be sent
+to the ups.<br>
+<br>
+OUTPUT:<br>
+&nbsp;&nbsp;&nbsp; an integer that will be zero on success or -1 on error
+and errno will be<br>
+&nbsp;&nbsp;&nbsp; set.<br>
+<br>
+The command can be NULL and this will allow us to poll for ups status even
+if<br>
+we don't want to send it a particular command if it is not needed (see
+APC<br>
+upses behaviour on status change).<br>
+<br>
+Note that I have not made any hypotesis on how the function will work<br>
+internally because it will be dependent on the ups firmware. In fact the<br>
+string sent to the ups for example will be ended with a CR, a CR+LF or<br>
+anything else that will be dependent on the particular ups.<br>
+<br>
+Note that write_command is a function that is not called by upper layer<br>
+functions. It is internal to UPS.<br>
+<br>
+<br>
+2.1.5 static struct ups_string *read_command(int fd)<br>
+<br>
+This function is intended to be used with smart upses that communicate
+over<br>
+the serial line with a well defined protocol.<br>
+<br>
+INPUT:<br>
+&nbsp;&nbsp;&nbsp; fd is the file descriptor of the smart UPS layer.<br>
+<br>
+OUTPUT:<br>
+&nbsp;&nbsp;&nbsp; A structure containing the string returned by the ups
+after a<br>
+&nbsp;&nbsp;&nbsp; write_command() is sent or some alert that has occurred
+since the last<br>
+&nbsp;&nbsp;&nbsp; read_string operation. NULL in case of error and errno
+will be set.<br>
+<br>
+Note that ups_string is a static structure internal to read_command()<br>
+<br>
+The ups_string will be:<br>
+<br>
+struct ups_string {<br>
+&nbsp;&nbsp;&nbsp; char *response;<br>
+#define STATUS_NONE&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+0<br>
+#define STATUS_ONBATTERY&nbsp;&nbsp;&nbsp; 1<br>
+#define STATUS_POWERFAIL&nbsp;&nbsp;&nbsp; 2<br>
+#define STATUS_POWERRETURN&nbsp;&nbsp;&nbsp; 3<br>
+#define any needed status<br>
+&nbsp;&nbsp;&nbsp; int status;<br>
+};<br>
+<br>
+The response member can be NULL when the ups have nothing to say us.<br>
+The status member can be one of the defined statuses.<br>
+<br>
+The function calling read_command will be in charge to examine both response<br>
+and status members and to translate them to communicate information to
+the<br>
+upper layers. This means that read_string() function will not be used by
+any<br>
+upper layer function: it is internal to UPS layer.<br>
+<br>
+<br>
+2.1.6 char *talk_to_ups(int fd, int command)<br>
+<br>
+This command is the interface between write/read_command() and the upper<br>
+layers. It is intended to send the ups a command, get the response, translate<br>
+it to a string recognizable by upper layers and return this string.<br>
+<br>
+INPUT:<br>
+&nbsp;&nbsp;&nbsp; fd is the file descriptor of the smart UPS.<br>
+<br>
+&nbsp;&nbsp;&nbsp; command is an integer that contain a command to be sent
+to the ups.<br>
+&nbsp;&nbsp;&nbsp; This integer is a generic UPS command that this function
+will translate<br>
+&nbsp;&nbsp;&nbsp; into a specific ups command string to pass to write_command()<br>
+<br>
+OUTPUT:<br>
+&nbsp;&nbsp;&nbsp; A char pointer that contain the translated answer of
+the ups. This string<br>
+&nbsp;&nbsp;&nbsp; will be recognizable by the UPS layer.<br>
+&nbsp;&nbsp;&nbsp; To account for response and status [see 2.1.5.] the
+returned string will<br>
+&nbsp;&nbsp;&nbsp; be structured. This structure will be something like:<br>
+<br>
+&nbsp;&nbsp;&nbsp; "string containing translated response:string containing
+translated status"<br>
+<br>
+&nbsp;&nbsp;&nbsp; In this way no information will be lost passing to the
+upper layers.<br>
+<br>
+Note that this function will be the main interface between VUPS and UPS.<br>
+<br>
+2.1.7 struct UPS<br>
+<br>
+This data structure will be responsible of exporting to the upper layers
+all<br>
+the functions implemented for the particular UPS driver.<br>
+<br>
+struct UPS {<br>
+&nbsp;&nbsp;&nbsp; int (*open)(char *path);<br>
+&nbsp;&nbsp;&nbsp; int (*close)(int fd);<br>
+&nbsp;&nbsp;&nbsp; int *(*get_dumb_status)(int fd);<br>
+&nbsp;&nbsp;&nbsp; char *(*talk_to_ups)(int fd, int command);<br>
+};<br>
+<br>
+Note that more than one UPS can be istantiated and opened and monitored
+by the<br>
+upper layers. Every UPS driver can be loaded, more than one time. This
+way we<br>
+open at installation with UPS monitoring fully centralized on a single<br>
+monitoring computer. For now we have still not identified the single UPS<br>
+because we are at a so low level that it makes no sense in being able to<br>
+distinguish between an UPS and another. This will be work for the upper<br>
+VUPS layer.<br>
+<br>
+Note that for dumb upses, the talk_to_ups member will be NULL while for
+smart<br>
+upses the get_dumb_status will be NULL. This will tell the upper layers
+at<br>
+which kind of ups is referring the UPS without need to tell explicitly:
+it<br>
+will be done automatically at initialization.<br>
+<br>
+<br>
+3 The VUPS driver<br>
+<br>
+Ths is the intermediate driver that will act as bridge between the UPS
+and the<br>
+apcupsd and its services.<br>
+This driver will interface to the UPS and to the apcupsd.<br>
+<br>
+3.1 VUPS &lt;-> UPS interface<br>
+<br>
+Every UPS will be interfaced with the VUPS by the same VUPS that will register<br>
+any UPS that need to be loaded, at run time.<br>
+<br>
+3.1.1 UPS is ready to be registered at run time<br>
+<br>
+The UPS structure will be part of an UPS database that will be built at<br>
+compilation time:<br>
+<br>
+typedef struct UPSdb {<br>
+&nbsp;&nbsp;&nbsp; struct UPS *lowlevel;<br>
+&nbsp;&nbsp;&nbsp; char *name;<br>
+} UPSdb;<br>
+<br>
+UPSdb[] = {<br>
+&nbsp;&nbsp;&nbsp; { &amp;smartupsvs, "smartupsvs" },<br>
+&nbsp;&nbsp;&nbsp; { &amp;smartups, "smartups" },<br>
+&nbsp;&nbsp;&nbsp; { &amp;backups, "backups" }<br>
+&nbsp;&nbsp;&nbsp; { NULL, NULL }<br>
+};<br>
+<br>
+In this way apcupsd can parse the configuration file that will contain
+all the<br>
+UPSes that need to be monitored and find in the UPS database the right<br>
+`struct UPS' only knowing the name of the UPS driver.<br>
+<br>
+for (i=0;UPSdb[i] != NULL;i++)<br>
+&nbsp;&nbsp;&nbsp; if (!strcmp(cfg->upsname, UPSdb[i].name)<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; attach_ups(cfg, UPSdb[i].lowlevel);<br>
+<br>
+Note that with this scheme of run time registration we mantain opened the
+very<br>
+interesting idea to compile the UPS drivers as shared libraries and dlopen()<br>
+them at runtime, load and attach. This way we will not need to make a single<br>
+monster-executable but instead we can link apcupsd+VUPS and at run time
+link<br>
+only the UPSes drivers that we really need.<br>
+<br>
+3.1.2 int attach_ups(UPScfg *cfg, struct UPS *lowlevel)<br>
+<br>
+This function is meant to be used to attach to the VUPS all the UPS drivers.<br>
+The VUPS will have slots to contain any UPS that need to be attached.<br>
+A slot for every UPS.<br>
+There will be a linked list or a dynamic array of UPS structure pointers
+that<br>
+will be built by attach_ups().<br>
+<br>
+INPUT:<br>
+&nbsp;&nbsp;&nbsp; cfg is a pointer to an ups configuration. This is a
+full ups configuration<br>
+&nbsp;&nbsp;&nbsp; in the config file. This configuration will be closed
+in brackets into the<br>
+&nbsp;&nbsp;&nbsp; config file to allow multi-upses to be configured.<br>
+<br>
+&nbsp;&nbsp;&nbsp; E.g. a simplified configuration file could be:<br>
+<br>
+&nbsp;&nbsp;&nbsp; # Simple cfg file for multi-upses<br>
+&nbsp;&nbsp;&nbsp; #<br>
+&nbsp;&nbsp;&nbsp; UPS {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; name = smartups # name of the
+driver<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; nick = ups1 # nick of the ups
+for network operations and logging<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; device = /dev/ttyS0 # device<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; poweringlocalhost = true # is
+this computer powered by this ups ?<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; #<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # The latter is very important
+because will decide which ups<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # that powerfails and go timeout,
+will force a shutdown of the local<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; # computer<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+<br>
+&nbsp;&nbsp;&nbsp; UPS {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; name = backups<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; nick = ups2<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; device = /dev/ttuS1<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; poweringlocalhost = false<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+&nbsp;&nbsp;&nbsp; UPS {<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; name = smartupsvs<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; nick = ups3<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; device = /dev/ttyS2<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; poweringlocalhost = false<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; }<br>
+<br>
+&nbsp;&nbsp;&nbsp; lowlevel is the UPS driver corresponding to the configured
+ups.<br>
+&nbsp;&nbsp;&nbsp; In our example we will attach the smartups, smartupsvs
+and backups<br>
+&nbsp;&nbsp;&nbsp; drivers to the linked list of UPS structures of the
+upses to monitor.<br>
+<br>
+OUTPUT:<br>
+&nbsp;&nbsp;&nbsp; zero on success, -1 on error and errno will be set.<br>
+<br>
+3.1.3 int add_ups(struct VUPS *newvups)<br>
+<br>
+This will be for simplicity a dynamic array.<br>
+This function will create new VUPSes structures needed to interface UPSes
+to<br>
+apcupsd.<br>
+<br>
+INPUT:<br>
+&nbsp;&nbsp;&nbsp; struct VUPS to be added to the array of VUPSes<br>
+<br>
+OUTOUT:<br>
+&nbsp;&nbsp;&nbsp; zero on success, -1 on error and errno will be set<br>
+<br>
+After all the UPSes are attached, the VUPS array will contain enough<br>
+information to monitor all the UPSes and tell apcupsd what is going on<br>
+with every UPS.<br>
+<br>
+<br>
+3.1.4 The struct VUPS<br>
+<br>
+This structure will contain any information relevant to talk with both<br>
+UPS and apcupsd.<br>
+<br>
+struct VUPS {<br>
+&nbsp;&nbsp;&nbsp; struct UPScfg *cfg;&nbsp;&nbsp;&nbsp; /* apcupsd configuration
+*/<br>
+&nbsp;&nbsp;&nbsp; struct UPS *lowlevel;&nbsp; /* UPS lowlevel functions
+*/<br>
+};<br>
+<br>
+3.1.5 apcupsd &lt;-> VUPS interface<br>
+<br>
+The apcupsd will use VUPS->lowlevel->[function](...) to talk with the<br>
+UPS driver layer. This way it only need to know all the VUPSes present
+on the<br>
+system and will talk to any UPS through the VUPS interface that will<br>
+be the same for every VUPS. Don't miss this point because it is the major<br>
+advantage of this scheme.<br>
+<br>
+<br>
+4 The apcupsd daemon<br>
+<br>
+The apcupsd daemon will be a general pourpose monitoring daemon. It will<br>
+monitor anything that is configured into the configuration file and defined
+in<br>
+the lower level drivers.<br>
+<br>
+<br>
+4.1 The apcupsd structure<br>
+<br>
+The apcupsd daemon will have the current scheme:<br>
+<br>
+a) monitor all the UPSes through the VUPS<br>
+b) sys-log all the events recorded<br>
+c) do actions on events if the UPS failing is local to the computer. Note
+that<br>
+&nbsp;&nbsp; here, referring to the UPS, I'm referring even to remote,
+served, upses<br>
+&nbsp;&nbsp; because the apcupsd or VUPS don't know absolutely if a particular
+UPS is<br>
+&nbsp;&nbsp; local to the computer or remote through a network connection:
+this is<br>
+&nbsp;&nbsp; hidden in the UPS lowlevel layer.<br>
+d) serve local UPSes to the network for clients that are residing on the
+same<br>
+&nbsp;&nbsp; power supply line of the local UPSes but not attached to the
+serial line.<br>
+&nbsp;&nbsp; This means that apcupsd will serve the information gathered
+by VUPS on a<br>
+&nbsp;&nbsp; particular UPS through the network. Will wait for clients.
+Clients will<br>
+&nbsp;&nbsp; talk with the VUPS through the network and will get any info
+they need<br>
+&nbsp;&nbsp; about the status of UPS they have attached.<br>
+<br>
+4.1.1 Monitoring<br>
+<br>
+apcupsd will do every I/O on the upses using the VUPS interface.<br>
+The VUPS will be a single well defined interface so that apcupsd will talk<br>
+transparently with any kind of ups, as long as there is an UPS lowlevel
+driver<br>
+that can drive that particular ups.<br>
+Once the information are passed from the lower level UPS through VUPS to
+the<br>
+apcupsd, they will be written into the shared memory structure.<br>
+<br>
+4.1.2 Sys-logging<br>
+Every event occurred at lower levels will be logged as soon as possible,
+in<br>
+the monitoring process. This operation is not much time consuming and using<br>
+the syslog() interface is even non-blocking so there isn't any issue against<br>
+doing it in the monitoring loop.<br>
+<br>
+<br>
+4.1.3 Actions on events<br>
+<br>
+The actions that apcupsd will need to do in response to UPS events are
+all<br>
+local to the computer. Telling the users something is happening, shutdown
+the<br>
+computer if batteries are low or timeout is reached are all actions done<br>
+locally. These actions are done fork-exec'ing shell scripts that can be<br>
+modified by system administrators. To avoid blocking operations due to
+wrong<br>
+shell script, this part of the daemon will be a dedicated thread. The<br>
+information to decide actions will be gathered (read-only) from the shared<br>
+memory structure.<br>
+<br>
+<br>
+4.1.4 Servicing local UPSes to network<br>
+<br>
+Note that Network server will be, for the network clients, exactly like
+a real<br>
+UPS. This means that the net server will act as a bridge between the VUPS
+and<br>
+the remote network daemon. This also means that the remote has to choose
+which<br>
+UPS it want to monitor because more UPSes can be istantiated on a single<br>
+computer.<br>
+<br>
+The server will listen/accept on network sockets, then it will fork to
+start<br>
+servicing. This means that all the informations to serve to remote clients<br>
+will be read from the shared memory area. The remote client can read<br>
+information to know the status of ups write commands to the ups to ask
+for<br>
+particular actions. To do this, the shared memory will be partitioned in
+two<br>
+parts:<br>
+<br>
+a) local part that will contain information updated by the server that
+will<br>
+&nbsp;&nbsp; be read-only for the client<br>
+b) remote part that will contain information (commands) sent by the client
+to<br>
+&nbsp;&nbsp; the server and that will be read-only for the server.<br>
+<br>
+In this way we can have a two way communication, through VUPS, even between<br>
+network server and client. This means that the client can ask the server
+to<br>
+initiate an ups self test. This explanation somewhat explain what for the<br>
+client will be transparent. The client will see an UPS and will talk to
+an UPS<br>
+even if this UPS will be a network client attached to a server. The server<br>
+will manage this connection as if there will be an additional apcupsd running<br>
+on the same UPS. With a good locking scheme this will be easy to do and
+very<br>
+powerful.<br>
+To help visualize better the scheme, here some ASCII to explain it:<br>
+<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ------------------------&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+------------------------<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Network client&nbsp; PC 1 |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+| Network server&nbsp; PC 2 |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp; ------------&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp; ------------&nbsp;&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp; | apc upsd |&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -------+---->| apc upsd |&nbsp;&nbsp;&nbsp;&nbsp;
+|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp; ------------&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp; N|T&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;
+------------&nbsp;&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp; | VUPS API |&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp; e|C&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;
+| VUPS API |&nbsp;&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; --------------&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp; t|P&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;
+--------------&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; | VUPS layer |&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp; w|/&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;
+| VUPS layer |&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; --------------&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp; o|I&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;
+--------------&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp; | UPS&nbsp; API
+|&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp; r|P&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp; | UPS&nbsp; API |&nbsp;&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; --------------&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp; k|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;
+--------------&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; | UPS driver |&lt;---+-------&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp; | UPS driver |&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp; --------------&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp; --------------&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |-+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp; | Serial drv |&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |8|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|-+&nbsp; --------------&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; ------------------------&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|8|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+------------------------<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; | Serial cable<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Backed up line&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; -------<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; |-------------------------------------------|
+UPS |<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+-------<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+| Power cord<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|<br>
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+Main power<br>
+<br>
+<br>
+<br>
+4.1.4.1 The Network protocol<br>
+<br>
+The network protocol will be the protocol that translate between VUPS statuses<br>
+to network UPS statuses. Since we are the designers, this protocol will
+be<br>
+developed with the VUPS and will be able to send the entire VUPS through
+the<br>
+network. On the client side, the network UPS will only have to get the
+remote<br>
+VUPS information and send it to the upper layers.<br>
+<br>
+The protocol will be ASCII strings. There are a couple of reasons that
+led me<br>
+to decide to use ASCII strings.<br>
+<br>
+4.1.4.2 Chosing the UPS to attach<br>
+<br>
+The network server at startup will listen to a socket.<br>
+The network client will connect to the server socket.<br>
+This is not enough to make the client connected to an UPS because on the<br>
+server can exist more than one UPS.<br>
+The client will have to choose which one. The server will have to allow
+the<br>
+client to attach to the chosen UPS.<br>
+<br>
+a) client attach to server<br>
+b) server fork/exec<br>
+c) client write on the network fd which UPS want to monitor<br>
+&nbsp;&nbsp; E.g.<br>
+<br>
+&nbsp;&nbsp; client: "CONNECT ups1"<br>
+&nbsp;&nbsp; server: "CONNECTED ups1"<br>
+&nbsp;&nbsp; or<br>
+&nbsp;&nbsp; server: "DENIED ups1"<br>
+<br>
+d) client start monitoring this ups through the network UPS driver.<br>
+<br>
+5 The dumb UPS<br>
+<br>
+Since we can not know in advance the seral electric "protocol" of a dumb
+ups,<br>
+we can write a generic support that can be used for all the dumb upses.<br>
+A serial line have a finite number of wires so a dumb ups can accept only
+a<br>
+finite number of commands and send only a finite number of states.<br>
+This means that we can write a generic UPS dumb driver and then when attaching<br>
+the generic UPS dumb driver to the VUPS layer, we simply tell the UPS how
+to<br>
+deal with the serial wires. This way we can write only one driver that
+is in<br>
+principle able to drive any kind of dumb ups.<br>
+<br>
+<BR>
+</body>
+</html>
