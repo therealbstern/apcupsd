@@ -193,9 +193,10 @@ static UPSDRIVER *helper_attach_driver(UPSINFO *ups, char *drvname)
     ups->driver = NULL;
     for (i=0; drivers[i].driver_name; i++) {
         Dmsg1(99, "Driver %s is configured.\n", drivers[i].driver_name);
-	if (!strcmp(drivers[i].driver_name, drvname)) {
+	if (strcasecmp(drivers[i].driver_name, drvname) != 0) {
 	    ups->driver = &drivers[i];
-            Dmsg1(20, "Driver %s found and attached.\n", drvname);
+            Dmsg1(20, "Driver %s found and attached.\n", drivers[i].driver_name);
+	    break;
 	}
     }
     if (!ups->driver) {
@@ -218,45 +219,44 @@ UPSDRIVER *attach_driver(UPSINFO *ups) {
      * Attach the correct driver.
      */
     switch(ups->mode.type) {
+    case BK:
+    case SHAREBASIC:
+    case NETUPS:
+    case DUMB_UPS:
+        driver_name = "dumb";
+	break;
 
-	case BK:
-	case SHAREBASIC:
-	case NETUPS:
-	case DUMB_UPS:
-            driver_name = "dumb";
-	    break;
+    case BKPRO:
+    case VS:
+    case NBKPRO:
+    case SMART:
+    case MATRIX:
+    case SHARESMART:
+    case APCSMART_UPS:
+        driver_name = "apcsmart";
+	break;
 
-	case BKPRO:
-	case VS:
-	case NBKPRO:
-	case SMART:
-	case MATRIX:
-	case SHARESMART:
-	case APCSMART_UPS:
-            driver_name = "apcsmart";
-	    break;
+    case USB_UPS:
+        driver_name = "usb";
+	break;
 
-	case USB_UPS:
-            driver_name = "usb";
-	    break;
+    case SNMP_UPS:
+        driver_name = "snmp";
+	break;
 
-	case SNMP_UPS:
-            driver_name = "snmp";
-	    break;
+    case TEST_UPS:
+        driver_name = "test";
+	break;
 
-	case TEST_UPS:
-            driver_name = "test";
-	    break;
+    case NETWORK_UPS:
+        driver_name = "net";
+	break;
 
-	case NETWORK_UPS:
-            driver_name = "net";
-	    break;
-
-	default:
-	case NO_UPS:
-            Dmsg1(000, "Warning: no UPS driver found (ups->mode.type=%d).\n",
-			ups->mode.type);
-	    break;
+    default:
+    case NO_UPS:
+        Dmsg1(000, "Warning: no UPS driver found (ups->mode.type=%d).\n",
+		    ups->mode.type);
+	break;
     }
     return driver_name ? helper_attach_driver(ups, driver_name) : NULL;
 }

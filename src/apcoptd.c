@@ -60,7 +60,7 @@
 
 #include "apc.h"
 
-static char *shortoptions = "b?RtVcf:ud:npk";
+static char *shortoptions = "b?RtVcf:ud:npP:k";
 
 enum {
     OPT_NOARG,
@@ -74,20 +74,22 @@ enum {
     OPT_KILLPWR,
     OPT_TERMONPWRFAIL,
     OPT_KILLONPWRFAIL,
+    OPT_PIDFILE,
 };
 
 static struct option longoptions[] = {
-    { "help",                       no_argument,            NULL,   OPT_HELP        },
-    { "version",                    no_argument,            NULL,   OPT_VERSION     },
-    { "config-file",                required_argument,      NULL,   OPT_CFGFILE     },
-    { "configure",                  no_argument,            NULL,   OPT_CONFIG      },
-    { "update-battery-date",        no_argument,            NULL,   OPT_BATTERY     },
-    { "debug",                      required_argument,      NULL,   OPT_DEBUG       },
-    { "rename-ups",                 no_argument,            NULL,   OPT_RENAME      },
-    { "killpower",                  no_argument,            NULL,   OPT_KILLPWR     },
+    { "help",                       no_argument,            NULL,   OPT_HELP          },
+    { "version",                    no_argument,            NULL,   OPT_VERSION       },
+    { "config-file",                required_argument,      NULL,   OPT_CFGFILE       },
+    { "configure",                  no_argument,            NULL,   OPT_CONFIG        },
+    { "update-battery-date",        no_argument,            NULL,   OPT_BATTERY       },
+    { "debug",                      required_argument,      NULL,   OPT_DEBUG         },
+    { "rename-ups",                 no_argument,            NULL,   OPT_RENAME        },
+    { "killpower",                  no_argument,            NULL,   OPT_KILLPWR       },
     { "term-on-powerfail",          no_argument,            NULL,   OPT_TERMONPWRFAIL },
     { "kill-on-powerfail",          no_argument,            NULL,   OPT_KILLONPWRFAIL },
-    { 0,			    no_argument,	    NULL,   OPT_NOARG	    }
+    { "pid-file",                   required_argument,       NULL,   OPT_PIDFILE       },
+    { 0,			    no_argument,	    NULL,   OPT_NOARG	      }
 };
 
 /*
@@ -103,6 +105,7 @@ int kill_on_powerfail = FALSE;
 int kill_ups_power = FALSE;
 int dumb_mode_test = FALSE;		/* for testing dumb mode */
 int go_background = TRUE;
+char *pidfile = APCPID;
 
 extern int debug_level;
 
@@ -187,6 +190,18 @@ int parse_options(int argc, char *argv[]) {
 	     */
 	    options--;
 	    cfgfile = optarg;
+	    break;
+	case 'P':
+	case OPT_PIDFILE:
+	    if (optarg[0] == '-') {
+	        /*
+		 * Following option: no argument set for -P
+		 */
+	        errflag++;
+		break;
+	    }
+	    options--;
+	    pidfile = optarg;
 	    break;
         case 'u':
 	case OPT_BATTERY:

@@ -240,6 +240,7 @@ int main(int argc, char *argv[]) {
     int serial_pid = 0;
 #endif
     UPSINFO  *ups;
+    int tmp_fd, i;
 
     /*
      * Set specific error_* handlers.
@@ -253,6 +254,19 @@ int main(int argc, char *argv[]) {
      */
     cfgfile = APCCONF;
 
+    /*
+     * Create fake stdout in order to circumvent problems
+     * which occur if apcupsd doesn't have a valid stdout
+     * Fix by Alexander Schremmer <alex at alexanderweb dot de>
+     */
+    tmp_fd = open("/dev/null", O_RDONLY, 644);
+    if (tmp_fd > 2) {
+	close(tmp_fd);
+    } else {
+	for (i=1; tmp_fd+i <= 2; i++) {
+	    dup2(tmp_fd, tmp_fd+i);
+	}
+    }
     /*
      * If NLS is compiled in, enable NLS messages translation.
      */
@@ -458,6 +472,7 @@ int main(int argc, char *argv[]) {
 static void daemon_start()
 {
 #ifndef HAVE_CYGWIN
+    int i;
     pid_t cpid;
     mode_t oldmask;
 
@@ -470,15 +485,13 @@ static void daemon_start()
     /* Child continues */
     setsid();			       /* become session leader */
 
-    /* Should close open file descriptors here, but since  
-       we have a lot of them open including the serial
-       port, we close only the standard descriptors */
-    close(STDIN_FILENO);
-#ifndef DEBUG
-    close(STDOUT_FILENO);
-    close(STDERR_FILENO);
-#endif
-
+    /* In the PRODUCTION system, we close ALL
+     * file descriptors except stdin, stdout, and stderr.
+     */
+    for (i=sysconf(_SC_OPEN_MAX)-1; i > 2; i--) {
+       close(i);
+    }
+											
     /* move to root directory */
     chdir("/");
    

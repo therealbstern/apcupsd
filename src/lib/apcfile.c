@@ -89,12 +89,13 @@ int make_file(UPSINFO *ups, const char *path)
 void make_pid_file(void)
 {
 #ifndef HAVE_CYGWIN
+    extern char *pidfile;
     pid_t pid = getpid();
     int pfd, len;
     char buf[100];
 
-    unlink(APCPID);
-    if ((pfd = open(APCPID, O_CREAT | O_TRUNC | O_WRONLY, 0644)) >= 0) {
+    unlink(pidfile);
+    if ((pfd = open(pidfile, O_CREAT | O_TRUNC | O_WRONLY, 0644)) >= 0) {
         len = sprintf(buf, "%ld\n", (long)pid);
 	write(pfd, buf, len);
 	close(pfd);

@@ -152,6 +152,7 @@ d_msg(char *file, int line, int level, char *fmt,...)
        va_end(arg_ptr);
 
        fprintf(stdout, buf);
+       fflush(stdout);
     }
 #endif
 }

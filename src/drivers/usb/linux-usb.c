@@ -731,7 +731,7 @@ int usb_ups_get_capabilities(UPSINFO *ups)
 		     * know_info table and see if we have a match.
 		     * If so, allocate a new entry for it.
 		     */
-		    for (k=0; k <= (int)KNOWN_INFO_SZ; k++) {
+		    for (k=0; k < (int)KNOWN_INFO_SZ; k++) {
 			USB_INFO *info;
 			int ci = known_info[k].ci;
 

@@ -8,13 +8,13 @@ dnl
 
 AC_INIT(Developers)		dnl A distinctive file to look for in srcdir. 
 AC_CONFIG_HEADER(include/config.h:autoconf/config.h.in) dnl Config header file.
-AC_CONFIG_AUX_DIR(autoconf)
+topdir=`pwd`
+AC_CONFIG_AUX_DIR(${topdir}/autoconf)
 
 dnl
 dnl Absolute srcdir
 ABSSRCDIR=`pwd`
 AC_SUBST(ABSSRCDIR)
-topdir=`pwd`
 AC_SUBST(topdir)
 
 dnl
@@ -550,52 +550,45 @@ dnl
 dnl	Check for enable particular features.
 
 #--------------------------------------------------------------------
-# Check for TCP wrapper support
+# Check for TCP wrapper support, code taken from Bacula KES-7Nov03
 #--------------------------------------------------------------------
 
 AC_ARG_WITH(libwrap,
-[  --with-libwrap[=DIR]     Compile in libwrap (tcp_wrappers) support],[
-  case "$withval" in
-  no) : ;;
-  yes|*)
-    _cppflags=${CPPFLAGS}
-    _ldflags=${LDFLAGS}
-    _libs=${LIBS}
-
-    if test "$withval" = "yes"; then
-      withval="/usr"
-    else
-      CPPFLAGS="${CPPFLAGS} -I${withval}/include"
-      LDFLAGS="${LDFLAGS} -L$withval/lib"
-    fi
-
-    LIBS="${LIBS} -lwrap -lnsl"
-
-    AC_CHECK_HEADER(tcpd.h,
-      AC_MSG_CHECKING(for TCP wrappers library -lwrap)
-      AC_TRY_LINK([
-	#include <tcpd.h>
-	int allow_severity = 0;
-	int deny_severity  = 0;
-	struct request_info *req;
-      ],[
-	hosts_access (req)],
-
+  [  --with-libwrap[=DIR]     Compile in libwrap (tcp_wrappers) support],
+  [
+    if test "x$withval" != "xno" ; then
+       saved_LIBS="$LIBS"
+       LIBS="$saved_LIBS -lwrap"
+       AC_MSG_CHECKING(for libwrap)
+       AC_TRY_LINK(
+	  [ #include <tcpd.h>
+	     int deny_severity = 0;
+	     int allow_severity = 0;
+	     struct request_info *req; ],
+	  [ hosts_access(req); ],
+	  [
 	    AC_MSG_RESULT(yes)
 	    AC_DEFINE(HAVE_LIBWRAP)
-	    USE_LIBWRAP="yes",
-
-	    AC_MSG_RESULT(no)
-	    CPPFLAGS=${_cppflags}
-	LDFLAGS=${_ldflags}
-	LIBS=${_libs}),
-
-	CPPFLAGS=${_cppflags}
-	LDFLAGS=${_ldflags}
-	LIBS=${_libs})
-    ;;
-  esac
-])
+	    TCPW_MSG="yes" 
+	  ], [
+	    LIBS="$saved_LIBS -lwrap -lnsl"
+	    AC_TRY_LINK(
+	      [ #include <tcpd.h>
+		 int deny_severity = 0;
+		 int allow_severity = 0;
+		 struct request_info *req; ],
+	      [ hosts_access(req); ],
+	      [
+		 AC_MSG_RESULT(yes)
+		 AC_DEFINE(HAVE_LIBWRAP)
+		 TCPW_MSG="yes" 
+	      ],
+	      [AC_MSG_ERROR([*** libwrap missing]) ] ]
+	    )
+       )
+    fi
+  ]
+)
 
 
 dnl	
