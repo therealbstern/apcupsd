@@ -198,8 +198,8 @@
 /* Set if have arps/nameser.h */
 #undef HAVE_NAMESER_H
 
-/* Define to `int' if <sys/socket.h> doesn't define.  */
-#undef socklen_t
+/* Set if socklen_t defined */
+#undef HAVE_SOCKLEN_T
 
 
 /* Leave that blank line there!!  Autoheader needs it.
