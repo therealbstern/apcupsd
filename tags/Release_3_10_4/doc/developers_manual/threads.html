@@ -1,0 +1,75 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="Author" content="Riccardo Facchetti">
+   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.4.3 i586) [Netscape]">
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+
+<h2>
+APCUPSD threads</h2>
+
+<p><br>APCUPSD now is using threads (processes) and IPC shared memory for
+all its operations. On blocking operations, we make use of timed select()
+to ensure short thread execution. There is one chunk of shared memory that
+is an UPSINFO structure and this is the way all threads communicate one
+to the other. The area must be locked before modifying it and can be unlocked
+only at the end of an handler. The area can be leaved unlocked only if
+the routine involved don't want to modify myUPS.
+<p>Graph of operations:
+<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
++- net thread ---+
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+\
+<br>apcupsd ------+- serial thread -[ UPSINFO shared structure]
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+|&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+/
+<br>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
++- client thread -+
+<br>&nbsp;
+<p>If a thread must write to shared structure we _have_ to lock it. Imagine
+serial and net that need to write:
+<br>&nbsp;
+<ul>
+<li>
+do_serial wait for unlock then read shared data and unlock</li>
+
+<li>
+do_net wait for unlock then read shared data and unlock</li>
+
+<li>
+do_serial wait for unlock then write shared data and unlock</li>
+
+<li>
+do_net wait for unlock then write shared data and unlock but this data
+is just been updated by serial so the shared data now contain thrashed
+data.</li>
+</ul>
+
+<p><br>We have to lock the data until the thread is ended:
+<br>&nbsp;
+<ul>
+<li>
+do_serial wait for unlock then read shared data (don't unlock)</li>
+
+<li>
+do_net wait for unlock</li>
+
+<li>
+do_serial write shared data and unlock</li>
+
+<li>
+do_net waiting for unlock can read shared data</li>
+
+<li>
+do_net write shared data and unlock</li>
+</ul>
+
+<p><br>This is called serialization. For read-only threads we just wait
+for unlock then read shared data and unlock and that's all.
+<br>&nbsp;
+</body>
+</html>
