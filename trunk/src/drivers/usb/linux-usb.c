@@ -1078,6 +1078,10 @@ int usb_ups_kill_power(UPSINFO *ups)
        return 0;
     }
 
+    /* We try various different ways to shutdown the UPS (i.e. killpower).
+     *	 Some of these commands are not supported on all UPSes, but that
+     *	 should cause no harm.
+     */
     write_int_to_ups(ups, CI_DelayBeforeShutdown, 20, "CI_DelayBeforeShutdown");
 
     write_int_to_ups(ups, CI_ShutdownRequested, 1, "CI_ShutdownRequested");
@@ -1086,13 +1090,7 @@ int usb_ups_kill_power(UPSINFO *ups)
 
     write_int_to_ups(ups, CI_APCForceShutdown, 1, "CI_APCForceShutdown");
 
-  /******* DEBUG testing */
-    write_int_to_ups(ups, CI_WarningCapacityLimit, 40, "CIWarningCapacityLimit");
-    write_int_to_ups(ups, CI_RemCapLimit, 20, "CI_RemCapLibmit");
-   
-
     Dmsg0(200, "Leave usb_ups_kill_power\n");
-    Dmsg0(000, "Kill power does not yet work. Please ignore the debug output.\n");
     return 1;
 }
 
