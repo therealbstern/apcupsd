@@ -4,6 +4,20 @@
 /*               http://www.apcupsd.com/                                   */
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
+----> Release apcupsd-3.10.12 (xx February 2004)
+- Minor updates to the documentation from user input.
+- Fix a Makefile find that removes zero length files, which fails                 
+  on some systems.
+- Web site update.
+- Apply patch from Adam that fixes OpenBSD and FreeBSD pthreads 
+  library bugs.
+- Add poll time to SNMP driver, and correct header file prototyping.
+- Make usb driver sleep for 1 second then retry up to 10 times
+  if the device cannot be opened. There are two such loops so in
+  the event of failure, it will occur 20 seconds later. This
+  allows time for the hotplug program to initialize the USB devices
+  after a boot.
+
 ----> Release apcupsd-3.10.11 (26 January 2004)
 - Correct apccontrol script to remove extra ;; that I inadvertantly
   left the last release -- apparently that prevented proper shutdown.

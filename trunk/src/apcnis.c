@@ -197,7 +197,6 @@ void do_server(UPSINFO *ups)
    int newsockfd, sockfd, childpid;
    struct sockaddr_in cli_addr;       /* client's address */
    struct sockaddr_in serv_addr;      /* our address */
-   socklen_t clilen;
    int tlog;
    int turnon = 1;
    struct s_arg *arg;
@@ -269,11 +268,7 @@ void do_server(UPSINFO *ups)
       /* 
        * Wait for a connection from a client process.
        */
-       clilen = sizeof(cli_addr);
-       for (tlog=0; (newsockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &clilen)) < 0; tlog -= 5*60 ) {
-	  if (errno == EINTR) {
-	     continue;
-	  }
+       for (tlog=0; (newsockfd = net_accept(sockfd, &cli_addr)) < 0; tlog -= 5*60 ) {
 	  if (tlog <= 0) {
 	     tlog = 60*60; 
              log_event(ups, LOG_ERR,  "apcserver: accept error. ERR=%s",

@@ -42,7 +42,7 @@ example_clean:
 	(cd examples; $(MAKE) clean)
 
 clean: example_clean targetclean
-	$(RMF) `find . -type f -size 0 -print`
+	find . -type f -size 0 -exec $(RMF) {} \;
 
 example_distclean: example_clean
 	(cd examples; $(MAKE) distclean)

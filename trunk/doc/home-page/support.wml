@@ -6,32 +6,20 @@ Please keep in mind that we are not getting paid for this.
 Nevertheless, our desire is to see as many people using
 <b>apcupsd</b> as possible.           
 
-<p>As with bug reporting, there two ways of asking for
-support.
-<p>The simplest way is to send an email to the 
+<p>If you send and email to the 
 <a href="mailto:apcupsd-devel at apcupsd.com">
-apcupsd-devel at apcupsd.com</a> email list.
+apcupsd-devel at apcupsd.com</a> email list, and your support
+request is well defined, most likely some kind user will 
+help you.
 The previous address was modified to prevent easy use by spammers. To use it,
 you must replace the <b>at</b> with an @ symbol. 
 Please see <b>Information Needed</b> below for what to
 include in your support request.
-p>I get a number of &quot;off-list&quot; emails sent
+<p>I (Kern) get a number of &quot;off-list&quot; emails sent
 directly to me. Please always copy the appropriate list, if you
 do not copy the list, I may not answer you, or I will answer by copying
 the list. If you <em>really</em> have something confidential,
 please clearly indicate it.
-
-<p>The second way is to use the support tracking tool on SourceForge at
-<a href="http://sourceforge.net/tracker/?group_id=54413&func=browse">
-http://sourceforge.net/tracker/?group_id=54413&func=browse</a>.<br>This
-second method is less convenient for the the developers as it requires
-us to login to SourceForge to respond.  However, this method
-is preferrable if you are submitting a bug or if you want your
-request tracked.  You do not need to have a login to SourceForge
-to use either the mailing list or any of the reporting/tracking
-tools.
-<p>
-Which ever method you use, please follow the instructions below.
 
 <h2>Information Needed</h2>
 For us to respond to a support request, we normally need the following

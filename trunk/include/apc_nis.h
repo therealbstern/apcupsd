@@ -40,4 +40,6 @@ int net_open(char *host, char *service, int port);
 /* Close the network connection */
 void net_close(int sockfd);
 
-extern int  upserror, syserrno;
+/* Wait for and accept a new TCP connection */
+int net_accept(int fd, struct sockaddr_in *cli_addr);
+
