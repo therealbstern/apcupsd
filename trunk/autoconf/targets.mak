@@ -222,7 +222,7 @@ uninstall-subdirs:
 	@if test ! x"$(subdirs)" = x; then \
 	   for file in . ${subdirs}; \
 	   do \
-	      (cd $$file && if test "$$file" != "."; then $(MAKE) DESTDIR=$(DESTDIR)uninstall; fi); \
+	      (cd $$file && if test "$$file" != "."; then $(MAKE) DESTDIR=$(DESTDIR) uninstall; fi); \
 	   done; \
 	fi
 
