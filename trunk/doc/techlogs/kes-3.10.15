@@ -2,6 +2,9 @@
                         Kern Sibbald
 
 General:
+09Sep04
+- Added code to close all file descriptors before becoming
+  daemon unless debug turned on.
 26Aug04
 - Add APCBATTCapBeforeRestore found by Adam to hid-ups.c
 - Update copyright in apc_struct.h
