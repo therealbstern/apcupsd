@@ -32,8 +32,7 @@ static int fill_buffer(int sockfd);
 char statbuf[4096];
 size_t  statlen = 0;
 
-static int nis_port;
-static char last_host[256];
+static char last_host[256] = "";
 static char errmsg[200];
 
 /* List of variables that can be read by getupsvar()   
@@ -97,6 +96,7 @@ static const struct {
  */
 static int fetch_data(const char *host)
 {
+   int nis_port = NISPORT;
    int sockfd;
    int stat;
    char *p;
@@ -107,7 +107,6 @@ static int fetch_data(const char *host)
    strncpy(last_host, host, sizeof(last_host)); 
    last_host[sizeof(last_host) - 1] = '\0';
    statlen = 0;
-   nis_port = NISPORT;
    strncpy(lhost, host, sizeof(lhost)-1);
    lhost[sizeof(lhost)-1] = '\0';
    p = strchr(lhost, ':');
@@ -138,6 +137,7 @@ static int fetch_data(const char *host)
  */
 int fetch_events(const char *host)
 {
+   int nis_port = NISPORT;
    char buf[500];
    int sockfd;
    int n, stat = 1;
@@ -147,7 +147,6 @@ int fetch_events(const char *host)
 
    statlen = 0;
    statbuf[0] = '\0';
-   nis_port = NISPORT;
    strncpy(lhost, host, sizeof(lhost)-1);
    lhost[sizeof(lhost)-1] = '\0';
    p = strchr(lhost, ':');
@@ -280,5 +279,4 @@ static int fill_buffer(int sockfd)
 
    statlen = strlen(statbuf);
    return stat;
-
 }
