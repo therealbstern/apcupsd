@@ -707,7 +707,7 @@ LINEFAIL : OnlineStatus
 .br
 BATTSTAT : BatteryStatus
 .br
-LINEVOLT : LineVoltageState
+MAINS    : LineVoltageState
 .br
 LASTEVNT : LastEventObserved
 .LP

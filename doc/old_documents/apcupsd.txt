@@ -49,43 +49,43 @@ The default file is /sbin/powersc.
 UPSCABLE -- <cable model> for Master machine.
 
 The following are valid types:
-	[ simple | smart | 940-0020B ]
-	[ 940-0023A ] broken code....
-	[ 940-0024B | 940-0024C | 940-0095A ]
-	[ 940-0095C | ether ]
+        [ simple | smart | 940-0020B ]
+        [ 940-0023A ] broken code....
+        [ 940-0024B | 940-0024C | 940-0095A ]
+        [ 940-0095C | ether ]
 
 
 UPSTYPE -- <Type of APCC UPS> for Master machine.
 
 The following are valid types:
-	[ backups | sharebasic | netups ]
-	[ backupspro | smartvsups | newbackupspro ]
-	[smartups | matrixups | sharesmart ]
+        [ backups | sharebasic | netups ]
+        [ backupspro | smartvsups | newbackupspro ]
+        [smartups | matrixups | sharesmart ]
 
 These are known and tested models.
-	[ backups | netups ]
-	[ backupspro | smartvsups ]
-	[ newbackupspro | smartups ]
+        [ backups | netups ]
+        [ backupspro | smartvsups ]
+        [ newbackupspro | smartups ]
 
 These models are being tested.
-	[ sharebasic | sharesmart ]
+        [ sharebasic | sharesmart ]
 
 This model is unknown but should work as a smartups.
-	[ matrixups ]
+        [ matrixups ]
 
 
 UPSCLASS -- <class of operation> for All machines.
 
 The following are valid types:
-	[ standalone ]
-	[ shareslave | sharemaster ]
-	[ netslave | netmaster ]
+        [ standalone ]
+        [ shareslave | sharemaster ]
+        [ netslave | netmaster ]
 
 This is the only known and tested class.
-	[ standalone | netslave | netmaster ]
+        [ standalone | netslave | netmaster ]
 
 These classes are being tested.
-	[ shareslave | sharemaster ]
+        [ shareslave | sharemaster ]
 
 Default for all machines is standalone.
 
@@ -101,13 +101,13 @@ and connected to an UPS of any kind with other Linux Boxes.
 UPSMODE -- <mode of extended operation> for All machines.
 
 The following are valid types:
-	[ disable | share | net | sharenet ]
+        [ disable | share | net | sharenet ]
 
 This is the only known and tested class.
-	[ disable | net ]
+        [ disable | net ]
 
 This class is being tested.
-	[ share | sharenet ]
+        [ share | sharenet ]
 
 BETA [ share ] For two or seven (2/7) additional simple signal
 ports on a SmartAccessories(tm) (internal/external box) for SmartUPSes.
@@ -243,11 +243,11 @@ NETPORT -- <TCP|UDP port number> for All machines.
 
 This number must be set in the /etc/services file as follows:
 
-	tab	tab(spacejunk)	tab	tab
-name		(stuff)/xxp		#
+        tab     tab(spacejunk)  tab     tab
+name            (stuff)/xxp             #
 
-apcupsd		NETPORT/tcp		#
-apcupsd		NETPORT/udp		#
+apcupsd         NETPORT/tcp             #
+apcupsd         NETPORT/udp             #
 
 
 MASTER -- <name of master> for Slave machine.
@@ -274,8 +274,8 @@ SMARTUPS
 
 If you start getting the follow message:
 
-	Emergency, Batteries Have Failed!!!!
-	Change Them NOW!!!
+        Emergency, Batteries Have Failed!!!!
+        Change Them NOW!!!
 
 Act upon it quickly. It means what it says.
 Also, not all SmartUPS models are eqaully smart. A non-NET or old class
@@ -301,10 +301,10 @@ the PowerChute (TM) software or you can make your own cable connected as
 follows:
 
         SMART-CUSTOM
-	PC (9 pin)	APC (9 pin)
-	2 RxD		2
-	3 TxD		1
-	5 GND		9
+        PC (9 pin)      APC (9 pin)
+        2 RxD           2
+        3 TxD           1
+        5 GND           9
 
         SIMPLE-CUSTOM
  DB9/25F PC Side                DB9M UPS Side
@@ -318,13 +318,13 @@ follows:
 
 List if componets one needs to make this CABLE:
 
-	1) One (1) DB9 use solder type connector only.
-	2) One (1) DB9/25F use solder type connector only.
-	3) two (2) 4.7K ohm 1/4 watt %5 resistors.
-	4) one (1) foot of 3/32" (inch) shrink wrap/boot.
-	5) rosin core solder.
-	6) three (3) to five (5) feet of 22AWG multi-stranded five
-	   (5) conductor cable.
+        1) One (1) DB9 use solder type connector only.
+        2) One (1) DB9/25F use solder type connector only.
+        3) two (2) 4.7K ohm 1/4 watt %5 resistors.
+        4) one (1) foot of 3/32" (inch) shrink wrap/boot.
+        5) rosin core solder.
+        6) three (3) to five (5) feet of 22AWG multi-stranded five
+           (5) conductor cable.
 
 First solder both of the resistors into pin# (4) DB9 or (20) DB25 the DTR. 
 This will be used as the Vcc pull-up voltage for testing the outputs on 
@@ -338,19 +338,19 @@ the CTS (aka battery low signal) and the other to (2) DB9 or (3) DB25 the
 RxD (aka another line fail signal). This line is not currently used, but 
 it will be in the near future.
 
-	(*) 8/5 is also wire to pin# 5 on UPS cable side.
-	(*) 2/3 is also wire to pin# 3 on UPS cable side.
-	(*) we use the DTR as our +5 volts power for the circuit.
+        (*) 8/5 is also wire to pin# 5 on UPS cable side.
+        (*) 2/3 is also wire to pin# 3 on UPS cable side.
+        (*) we use the DTR as our +5 volts power for the circuit.
 
 The rest of the wire connections are listed above.
 
 If you have one of the following cables supplied by APCC, "apcupsd"
 will support off the shelf cables.
 
-	940-0020B	Simple Signal Only, all models.
-	940-0024[B/C]	SmartMode Only, SU and BKPro only.
-	940-0095[A/C]	PnP (Plug and Play), all models.
-	940-0023A	Simple Signal UNIX, [BROKEN STILL].
+        940-0020B       Simple Signal Only, all models.
+        940-0024[B/C]   SmartMode Only, SU and BKPro only.
+        940-0095[A/C]   PnP (Plug and Play), all models.
+        940-0023A       Simple Signal UNIX, [BROKEN STILL].
 
 FILES
 
@@ -358,67 +358,67 @@ FILES
 
 /etc/apcupsd.status -- psuedo procfs-type file.
 
-	APC      : time and date of last update
-	CABLE    : cable type used
-	UPSMODEL : ups type or signal method
-	UPSMODE  : tells apcupsd what to check
-	SHARE    : if ShareUPS is used, this determines what
+        APC      : time and date of last update
+        CABLE    : cable type used
+        UPSMODEL : ups type or signal method
+        UPSMODE  : tells apcupsd what to check
+        SHARE    : if ShareUPS is used, this determines what
 
 SmartUPS MatrixUPS Smart Signals:
 
-	ULINE    : Current (observed) Input Line Voltage
-	MLINE    : Max (observed) Input Line Voltage
-	NLINE    : Min (observed) Input Line Voltage
-	FLINE    : Line Freq (cycles)
-	VOUTP    : UPS Output Voltage
-	LOUTP    : Percent Load of UPS Capacity
-	BOUTP    : Current Charge Voltage of Batteries
-	BCHAR    : Batteries Current Charge Percent of Capacity
-	BFAIL    : UNSIGNED INT CODE (ups state)
-	UTEMP    : Current UPS Temp. in Degrees Cel.
-	DIPSW    : Current DIP switch settings for UPS.
+        ULINE    : Current (observed) Input Line Voltage
+        MLINE    : Max (observed) Input Line Voltage
+        NLINE    : Min (observed) Input Line Voltage
+        FLINE    : Line Freq (cycles)
+        VOUTP    : UPS Output Voltage
+        LOUTP    : Percent Load of UPS Capacity
+        BOUTP    : Current Charge Voltage of Batteries
+        BCHAR    : Batteries Current Charge Percent of Capacity
+        BFAIL    : UNSIGNED INT CODE (ups state)
+        UTEMP    : Current UPS Temp. in Degrees Cel.
+        DIPSW    : Current DIP switch settings for UPS.
 
 Newer BackUPS Pro Smart Signals:
 
-	ULINE    : Current (observed) Input Line Voltage
-	MLINE    : Max (observed) Input Line Voltage
-	NLINE    : Min (observed) Input Line Voltage
-	FLINE    : Line Freq (cycles)
-	VOUTP    : UPS Output Voltage
-	LOUTP    : Percent Load of UPS Capacity
-	BOUTP    : Current Charge Voltage of Batteries
-	BCHAR    : Batteries Current Charge Percent of Capacity
-	BFAIL    : UNSIGNED INT CODE (ups state)
-	UTEMP    : Current UPS Temp. in Degrees Cel.
+        ULINE    : Current (observed) Input Line Voltage
+        MLINE    : Max (observed) Input Line Voltage
+        NLINE    : Min (observed) Input Line Voltage
+        FLINE    : Line Freq (cycles)
+        VOUTP    : UPS Output Voltage
+        LOUTP    : Percent Load of UPS Capacity
+        BOUTP    : Current Charge Voltage of Batteries
+        BCHAR    : Batteries Current Charge Percent of Capacity
+        BFAIL    : UNSIGNED INT CODE (ups state)
+        UTEMP    : Current UPS Temp. in Degrees Cel.
 
 BackUPS Pro and SmartUPS v/s Smart Signals:
 
-	LINEFAIL : OnlineStatus
-	BATTSTAT : BatteryStatus
-	LINEVOLT : LineVoltageState
-	LASTEVNT : LastEventObserved
+        LINEFAIL : OnlineStatus
+        BATTSTAT : BatteryStatus
+        MAINS    : LineVoltageState
+        LASTEVNT : LastEventObserved
 
 BackUPS and NetUPS Simple Signals:
 
-	LINEFAIL : OnlineStatus
-	BATTSTAT : BatteryStatus
+        LINEFAIL : OnlineStatus
+        BATTSTAT : BatteryStatus
 
 /var/log/apcupsd.log -- the UPS status is logged.
 
 
 SmartUPS MatrixUPS Smart Signals:
-	LineVoltage LineMax LineMin LineFreq OutputVoltage UPSLoad
-	BattVoltage BatteryLoad UPSLoad UPSTemp
+        LineVoltage LineMax LineMin LineFreq OutputVoltage UPSLoad
+        BattVoltage BatteryLoad UPSLoad UPSTemp
 
 Newer BackUPS Pro Smart Signals:
-	LineVoltage LineMax LineMin LineFreq OutputVoltage UPSLoad
-	BattVoltage BatteryLoad UPSLoad
+        LineVoltage LineMax LineMin LineFreq OutputVoltage UPSLoad
+        BattVoltage BatteryLoad UPSLoad
 
 BackUPS Pro and SmartUPS v/s Smart Signals:
-	OnlineStatus BatteryStatus LineVoltageState LastEventObserved
+        OnlineStatus BatteryStatus LineVoltageState LastEventObserved
 
 BackUPS and NetUPS Simple Signals:
-	OnlineStatus BatteryStatus
+        OnlineStatus BatteryStatus
 
 
 FILE FORMAT
@@ -474,4 +474,3 @@ file. There are some known problems and limitations. There can be a
 problem with the newest types of APC Smart UPS add-ons. Any and All
 Network Modes is not supported, yet. No bugs in standard stuff. I
 am sure, well pretty sure. Possible bugs in all ShareUPS mode types.
-
