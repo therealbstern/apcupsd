@@ -198,7 +198,7 @@ void apcupsd_error_cleanup(UPSINFO *ups)
  *  and exits. It is normally called from the Error_abort
  *  define, which inserts the file and line number.
  */
-void apcupsd_error_out(char *file, int line, char *fmt,...)
+void apcupsd_error_out(const char *file, int line, const char *fmt,...)
 {
     char      buf[256];
     va_list   arg_ptr;
@@ -218,7 +218,7 @@ void apcupsd_error_out(char *file, int line, char *fmt,...)
 /* subroutine error_exit simply prints the supplied error
  * message, cleans up, and exits
  */
-void apcupsd_error_exit(char *fmt,...)
+void apcupsd_error_exit(const char *fmt,...)
 {
     char      buf[256];
     va_list   arg_ptr;

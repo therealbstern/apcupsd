@@ -40,8 +40,8 @@ extern UPSINFO myUPS;
 extern UPSINFO *core_ups;
 extern UPSDRIVER drivers[];
 extern char argvalue[MAXSTRING];
-extern void (*error_out)(char *file, int line, char *fmt,...);
-extern void (*error_exit)(char *fmt,...);
+extern void (*error_out)(const char *file, int line, const char *fmt,...);
+extern void (*error_exit)(const char *fmt,...);
 extern void (*error_cleanup)(void);
 
 extern UPSCOMMANDS ups_event[];
@@ -314,8 +314,8 @@ extern UPSINFO *getUpsByname(char *name);
 /*
  * In apcerror.c
  */
-extern void generic_error_out(char *file, int line, char *fmt, ...);
-extern void generic_error_exit(char *fmt, ...);
+extern void generic_error_out(const char *file, int line, const char *fmt, ...);
+extern void generic_error_exit(const char *fmt, ...);
 
 /*  
  * In asys.c 

@@ -64,7 +64,7 @@
  *  FATAL ERROR message and supplied error message
  *
  */
-void generic_error_out(char *file, int line, char *fmt, ...)
+void generic_error_out(const char *file, int line, const char *fmt, ...)
 {
     char buf[256];
     va_list arg_ptr;
@@ -84,7 +84,7 @@ void generic_error_out(char *file, int line, char *fmt, ...)
 }
 
 /* simply print the message and exit */
-void generic_error_exit(char *fmt, ...)
+void generic_error_exit(const char *fmt, ...)
 {
     va_list arg_ptr;
     char buf[256];
@@ -100,6 +100,6 @@ void generic_error_exit(char *fmt, ...)
     exit(1);
 }
 
-void (*error_out)(char *file, int line, char *fmt,...) = generic_error_out;
-void (*error_exit)(char *fmt,...) = generic_error_exit;
+void (*error_out)(const char *file, int line, const char *fmt,...) = generic_error_out;
+void (*error_exit)(const char *fmt,...) = generic_error_exit;
 void (*error_cleanup)(void) = NULL;
