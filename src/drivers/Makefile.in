@@ -10,7 +10,7 @@ topdir = @topdir@
 top_builddir = $(topdir)
 
 subdirs = @APCSMART_DRIVER@ @DUMB_DRIVER@ @NET_DRIVER@ \
-			@USB_DRIVER@ @SNMP_DRIVER@ @TEST_DRIVER@
+          @USB_DRIVER@ @SNMP_DRIVER@ @TEST_DRIVER@
 
 # Include the default make targets: to be put before the all-targets: rule.
 @TARGETS@
@@ -46,7 +46,7 @@ net_stamp: net/libnet.a
 	touch net_stamp
 
 usb_stamp: usb/libusb.a
-	ar cru libdrivers.a usb/*.o
+	ar cru libdrivers.a usb/*.o usb/@USB_TYPE@/*.o
 	@RANLIB@ $(driverslib)
 	touch usb_stamp
 
