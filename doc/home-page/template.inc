@@ -32,4 +32,5 @@
 <td bgcolor="#ffffff" valign="top">
 {#BODY#}
 </td>
+</table>
 {#BODY#:
