@@ -849,8 +849,7 @@ Optional Features:
   --enable-pthreads       Enable pthreads (default)
   --disable-pthreads      No pthreads
   --enable-cgi            Compile CGI programs
-  --enable-install-distdir
-                          Install distribution
+  --enable-install-distdirInstall distribution
 
   --enable-apcsmart       Compile APC Smart UPS driver (default)
   --disable-apcsmart      No APC Smart UPS driver
@@ -9353,7 +9352,8 @@ _ACEOF
 		USB_TYPE="linux"
 
 
-	elif test $HAVE_UNAME=yes -a x`uname -s` = xFreeBSD ; then
+	elif test $HAVE_UNAME=yes -a x`uname -s` = xFreeBSD -o \
+		  $HAVE_UNAME=yes -a x`uname -s` = xOpenBSD ; then
 		cat >>confdefs.h <<\_ACEOF
 #define HAVE_USB_DRIVER 1
 _ACEOF
