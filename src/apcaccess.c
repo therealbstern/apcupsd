@@ -115,12 +115,12 @@ UPSINFO *core_ups = &eeprom_ups;
 /* Table of the UPS command, the apcupsd configuration directive,
  *  and an explanation of what the command sets in the EPROM.
  */
-static struct {
- char cmd;
- char *config_directive;
- char *descript;
- char type;
- int *data;
+static const struct {
+ const char cmd;
+ const char *config_directive;
+ const char *descript;
+ const char type;
+ const int *data;
 } cmd_table[] = {
   {'u', "HITRANSFER",    "Upper transfer voltage", 'i', &eeprom_ups.hitrans},
   {'l', "LOTRANSFER",    "Lower transfer voltage", 'i', &eeprom_ups.lotrans},
@@ -133,7 +133,7 @@ static struct {
   {'r', "WAKEUP",        "Wakeup delay", 'i', &eeprom_ups.dwake},
   {'E', "SELFTEST",      "Self test interval", 'c', (int *)eeprom_ups.selftest},
   {0, NULL, NULL}	/* Last entry */
-  };
+};
 
 void print_valid_eprom_values(UPSINFO *ups)
 {
