@@ -25,3 +25,9 @@ int extractcgiargs(void);
 
 /* see if a host is allowed per the hosts.conf */
 int checkhost(char *check);
+
+/*
+ * Output a string taking care to assure that any html meta characters
+ * are output properly.
+ */
+void html_puts(const unsigned char *s);

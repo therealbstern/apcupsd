@@ -409,8 +409,8 @@ int main(int argc, char **argv)
      printf ("<form method=post>\n<textarea rows=5 cols=95>\n");
 
      fetch_events(monhost);
-     printf (statbuf);
-     printf ("</textarea> \n</form>\n");
+     html_puts (statbuf);
+     printf ("</textarea>\n</form>\n");
      printf ("</td></tr>");
 
      printf ("</TABLE>\n");

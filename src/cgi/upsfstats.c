@@ -78,7 +78,7 @@ int main(int argc, char **argv)
     }
     printf ("<blockquote><pre>");
 
-    printf (statbuf);
+    html_puts (statbuf);
 
     printf ("</pre></blockquote>\n");
     finish();
