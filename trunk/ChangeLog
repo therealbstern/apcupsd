@@ -6,6 +6,37 @@
 /*               ftp://ftp.apcupsd.com                                     */
 /***************************************************************************/
 
+    - Changed all the MAIL instances in shell scripts into APCUPSD_MAIL.
+      This helps keep separated the apcupsd specific shell variables from
+      the generic $MAIL shell variable that points to the user's mailbox:
+
+        riccardo@ao:~> echo $MAIL
+        /var/spool/mail/riccardo
+        riccardo@ao:~>
+
+      An user reported that ./configure script transformed internal $MAIL
+      executable program into her mailbox path. This may happen if the
+      configure suite is broken (thing that I don't want to check further).
+      That said, APCUPSD_MAIL now should always correctly point to the
+      system default mail client program.
+    - Made so that error_cleanup is a generic function called by the
+      generic error handlers. Now if you want specific error_cleanup
+      you don't need to write also specific error handlers, provided
+      that error_cleanup don't accept parameters (i.e.
+      specific_error_cleanup(void)) but if you want to have a specific
+      error_cleanup with parameters you _must_ also write specific
+      error_exit and error_out into which you will call the specific
+      error_cleanup with parameters.
+    - Made so that error_exit and error_out are generic handlers that
+      can be assigned, if needed, to specific handlers by the main() of
+      each program. If not, the Error* routines will use the generic
+      versions in apclib.a.
+    - Fixed wrong "true" usage in powerflute.
+    - Cleaned up the terminate() functions.
+    - Made DeviceVendor part of snmp DEVICE case insensitive.
+
+----> Release apcupsd-3.10.1 (16 Sep 2002)
+    - Fixed a filling error with USB status dword.
     - Fixed autoconf check and dependances of -lpanel,etc with -lncurses.
     - Made more portable the apccontrol external scripts when calling the
       mailer (subject is now in the echo lines instead of relying on the

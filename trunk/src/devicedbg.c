@@ -74,8 +74,6 @@ char argvalue[MAXSTRING];
  *
  * -RF
  */
-void error_cleanup(UPSINFO *ups) { /* dummy */ }
-void terminate(int sig) { /* dummy */ }
 void clear_files(void) { /* dummy */ }
 void kill_power(UPSINFO *ups) { /* dummy */ }
 
@@ -121,5 +119,7 @@ int main (int argc, char *argv[]) {
     output_status(ups, 0, stat_open, stat_print, stat_close);
 
     device_close(ups);
+
+    exit(0);
 }
 

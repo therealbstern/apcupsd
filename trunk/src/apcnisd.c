@@ -71,19 +71,20 @@ static char largebuf[4096];
 static int  stat_recs;
 static int  logstats = 0;
 char argvalue[MAXSTRING];
+UPSINFO *ups = NULL;
 
 /* forward referenced subroutines */
 void handle_client_request();
 int do_daemon(int argc, char *argv[]); 
 int do_inetd(int argc, char *argv[]);
 
-void error_cleanup(UPSINFO *ups)
+void apcnisd_error_cleanup(void)
 {
-    destroy_ups(ups);
+    if (ups)
+        destroy_ups(ups);
     closelog();
     exit(1);
 }
-
 
 /*
  * This routine is called by the main process to
@@ -187,6 +188,12 @@ static void status_write(UPSINFO *ups, char *fmt, ...)
  */
 int main(int argc, char *argv[])
 {
+
+    /*
+     * Set specific cleanup handler.
+     */
+    error_cleanup = apcnisd_error_cleanup;
+
     strncpy(argvalue, argv[0], sizeof(argvalue)-1);
     argvalue[sizeof(argvalue)-1] = 0;
 
@@ -358,7 +365,6 @@ void handle_client_request(int nsockfd)
     char errmsg[]   = "Invalid command\n";
     char notavail[] = "Not available\n";
     char notrun[]   = "Apcupsd not running\n";
-    UPSINFO *ups = NULL;
 
 
     ups = attach_ups(ups, SHM_RDONLY);
@@ -402,5 +408,9 @@ void handle_client_request(int nsockfd)
        }
     }
     detach_ups(ups);
+    /*
+     * Don't forget to set ups structure = NULL (cleanup handler).
+     */
+    ups = NULL;
     return;
 }

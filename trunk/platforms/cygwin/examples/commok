@@ -6,10 +6,10 @@
 # We send an email message to root to notify him.
 #
 SYSADMIN=you@somewhere.com
-MAIL="/apcupsd/bin/email"
+APCUPSD_MAIL="/apcupsd/bin/email"
 
 HOSTNAME=`hostname`
 MSG="$HOSTNAME Serial port communications with UPS restored"
 #
-$MAIL -s "$MSG" $SYSADMIN -m "$MSG"
+$APCUPSD_MAIL -s "$MSG" $SYSADMIN -m "$MSG"
 exit 0

@@ -132,7 +132,7 @@ static void ptime()
 
 
 /**********************************************************************
- * the terminate function and trapping signals allows apcupsd
+ * the terminate function and trapping signals allows apctest
  * to exit and cleanly close logfiles, and reset the tty back
  * to its original settings. You may want to add this
  * to all configurations.  Of course, the file descriptors
@@ -140,7 +140,7 @@ static void ptime()
  * NULL initially to allow terminate to determine whether
  * it should close them.
  *********************************************************************/
-void terminate (int sig)
+void apctest_terminate(int sig)
 {
 
     restore_signals();
@@ -165,7 +165,7 @@ void terminate (int sig)
     _exit(0);
 }
 
-void error_cleanup(UPSINFO *ups)
+void apctest_error_cleanup(UPSINFO *ups)
 {
     device_close(ups);
     delete_lockfile(ups);
@@ -182,7 +182,7 @@ void error_cleanup(UPSINFO *ups)
  *  and exits. It is normally called from the Error_abort
  *  define, which inserts the file and line number.
  */
-void error_out(char *file, int line, char *fmt,...)
+void apctest_error_out(char *file, int line, char *fmt,...)
 {
     char      buf[256];
     va_list   arg_ptr;
@@ -195,13 +195,13 @@ void error_out(char *file, int line, char *fmt,...)
     va_end(arg_ptr);
     fprintf(stderr, buf);
     pmsg(buf);
-    error_cleanup(core_ups);		  /* finish the work */
+    apctest_error_cleanup(core_ups);		  /* finish the work */
 }
 
 /* subroutine error_exit simply prints the supplied error
  * message, cleans up, and exits
  */
-void error_exit(char *fmt,...)
+void apctest_error_exit(char *fmt,...)
 {
     char      buf[256];
     va_list   arg_ptr;
@@ -210,7 +210,7 @@ void error_exit(char *fmt,...)
     vsprintf(buf, (char *) fmt, arg_ptr);
     va_end(arg_ptr);
     pmsg(buf);
-    error_cleanup(core_ups);		  /* finish the work */
+    apctest_error_cleanup(core_ups);		  /* finish the work */
 }
 	    
 
@@ -231,6 +231,12 @@ void error_exit(char *fmt,...)
 static int mode = M_DUMB;
 
 int main (int argc, char *argv[]) {
+
+    /*
+     * Set specific error_* handlers.
+     */
+    error_out = apctest_error_out;
+    error_exit = apctest_error_exit;
 
     /*
      * Default config file. If we set a config file in startup switches, it
@@ -317,11 +323,11 @@ int main (int argc, char *argv[]) {
 	case SHARENET:
             pmsg("sharenet.type = SHARENET\n");
             pmsg("I cannot handle sharenet.type = SHARENET\n");
-	    terminate(1);
+	    apctest_terminate(1);
 	default:
             pmsg("sharenet.type = DEFAULT\n");
             pmsg("I cannot handle sharenet.type = DEFAULT\n");
-	    terminate(1);
+	    apctest_terminate(1);
     }
 
     switch (ups->cable.type) {
@@ -491,7 +497,7 @@ int main (int argc, char *argv[]) {
 
     if (kill_ups_power) {
         pmsg("apctest: bad option, I cannot do a killpower\n");
-	terminate(0);
+	apctest_terminate(0);
     }
 
     /*
@@ -508,7 +514,7 @@ int main (int argc, char *argv[]) {
         Error_abort1(_("failed to reacquire serial port lock file on device %s\n"), ups->device);
     }
 
-    init_signals(terminate);
+    init_signals(apctest_terminate);
 
     if (ups->fd != -1) {
 	if (mode == M_DUMB) {
@@ -546,7 +552,7 @@ int main (int argc, char *argv[]) {
        pmsg("apctest: there is a problem here.  We have no serial port.\n");
     }
 
-    terminate(0);
+    apctest_terminate(0);
     return -1;			    /* to keep compiler happy */
 }
 

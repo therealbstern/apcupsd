@@ -158,7 +158,7 @@ int shm_OK = 0;
  * NULL initially to allow terminate to determine whether
  * it should close them.
  *********************************************************************/
-void terminate(int sig)
+void apcupsd_terminate(int sig)
 {
     UPSINFO *ups = core_ups;
 
@@ -181,7 +181,7 @@ void terminate(int sig)
     _exit(0);
 }
 
-void error_cleanup(UPSINFO *ups)
+void apcupsd_error_cleanup(UPSINFO *ups)
 {
     device_close(ups);
     delete_lockfile(ups);
@@ -198,7 +198,7 @@ void error_cleanup(UPSINFO *ups)
  *  and exits. It is normally called from the Error_abort
  *  define, which inserts the file and line number.
  */
-void error_out(char *file, int line, char *fmt,...)
+void apcupsd_error_out(char *file, int line, char *fmt,...)
 {
     char      buf[256];
     va_list   arg_ptr;
@@ -211,13 +211,13 @@ void error_out(char *file, int line, char *fmt,...)
     va_end(arg_ptr);
     fprintf(stderr, buf);
     log_event(core_ups, LOG_ERR, buf);
-    error_cleanup(core_ups);		    /* finish the work */
+    apcupsd_error_cleanup(core_ups);		    /* finish the work */
 }
 
 /* subroutine error_exit simply prints the supplied error
  * message, cleans up, and exits
  */
-void error_exit(char *fmt,...)
+void apcupsd_error_exit(char *fmt,...)
 {
     char      buf[256];
     va_list   arg_ptr;
@@ -227,7 +227,7 @@ void error_exit(char *fmt,...)
     va_end(arg_ptr);
     fprintf(stderr, buf);
     log_event(core_ups, LOG_ERR, buf);
-    error_cleanup(core_ups);		    /* finish the work */
+    apcupsd_error_cleanup(core_ups);		    /* finish the work */
 }
 
 
@@ -240,6 +240,12 @@ int main(int argc, char *argv[]) {
     int serial_pid = 0;
 #endif
     UPSINFO  *ups;
+
+    /*
+     * Set specific error_* handlers.
+     */
+    error_out = apcupsd_error_out;
+    error_exit = apcupsd_error_exit;
 
     /*
      * Default config file. If we set a config file in startup switches, it
@@ -365,7 +371,7 @@ int main(int argc, char *argv[]) {
         } else {
             kill_net(ups);
         }
-        terminate(0);
+        apcupsd_terminate(0);
     }
 
     /*
@@ -387,7 +393,7 @@ int main(int argc, char *argv[]) {
         Error_abort1(_("failed to reacquire serial port lock file on device %s\n"), ups->device);
     }
 
-    init_signals(terminate);
+    init_signals(apcupsd_terminate);
 
     if (!UPS_ISSET(UPS_SLAVE)) {
         prep_device(ups);
@@ -446,7 +452,7 @@ int main(int argc, char *argv[]) {
     wait_for_termination(serial_pid);  /* wait for child processes to terminate */
 #endif
 
-    terminate(0);
+    apcupsd_terminate(0);
     return -1;				/* to keep compiler happy */
 }
 

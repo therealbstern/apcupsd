@@ -72,8 +72,6 @@
 int slave_count = 0;
 SLAVEINFO slaves[MAXSLAVES];	     /* Slaves description */
 
-extern void error_out(char *file, int line, char *fmt,...);
-
 /* ---------------------------------------------------------------------- */
 
 static HANDLER match_int, match_range, match_slave, match_str,

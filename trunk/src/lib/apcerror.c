@@ -59,14 +59,12 @@
 
 #include "apc.h"
 
-void error_cleanup(char *buf);
-
 /*********************************************************************
  * subroutine normally called by macro error_abort() to print
  *  FATAL ERROR message and supplied error message
  *
  */
-void error_out(char *file, int line, char *fmt, ...)
+void generic_error_out(char *file, int line, char *fmt, ...)
 {
     char buf[256];
     va_list arg_ptr;
@@ -79,12 +77,14 @@ void error_out(char *file, int line, char *fmt, ...)
     va_end(arg_ptr);
     fprintf(stdout, buf);
 
-    error_cleanup(buf);
+    if (error_cleanup)
+        error_cleanup();
+
     exit(1);
 }
 
 /* simply print the message and exit */
-void error_exit(char *fmt, ...)
+void generic_error_exit(char *fmt, ...)
 {
     va_list arg_ptr;
     char buf[256];
@@ -94,6 +94,12 @@ void error_exit(char *fmt, ...)
     va_end(arg_ptr);
     fprintf(stdout, buf);
 
-    error_cleanup(buf);
+    if (error_cleanup)
+        error_cleanup();
+
     exit(1);
 }
+
+void (*error_out)(char *file, int line, char *fmt,...) = generic_error_out;
+void (*error_exit)(char *fmt,...) = generic_error_exit;
+void (*error_cleanup)(void) = NULL;

@@ -6,7 +6,7 @@
 # We send an email message to root to notify him.
 #
 SYSADMIN=root
-MAIL="@MAIL@"
+APCUPSD_MAIL="@APCUPSD_MAIL@"
 
 HOSTNAME=`hostname`
 MSG="$HOSTNAME UPS battery needs changing NOW."
@@ -17,5 +17,5 @@ MSG="$HOSTNAME UPS battery needs changing NOW."
    echo "$MSG"
    echo " "
    @sbindir@/apcaccess status
-) | $MAIL $SYSADMIN
+) | $APCUPSD_MAIL $SYSADMIN
 exit 0
