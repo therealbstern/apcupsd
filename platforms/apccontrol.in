@@ -85,7 +85,6 @@ case "$1" in
 	if [ -f @PWRFAILDIR@/powerfail ] ; then
 	   printf "Continuing with shutdown."  | wall
 	fi
-	;;
     ;;
     failing)
 	echo "Battery power exhaused on UPS ${2}. Doing shutdown." | wall

@@ -264,6 +264,7 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
     int32_t newStatus;		      /* this really should be uint32_t! */
     int32_t masterStatus;	      /* status from master */
     static int comm_loss = 0;
+    struct driver_data *nid = (struct driver_data *)ups->driver_internal_data;
 
     write_lock(ups);
 
@@ -272,32 +273,41 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
     }
 
     answer[0] = 0;
-    if (!getupsvar(ups, "status", answer, sizeof(answer))) {
-        log_event(ups, LOG_ERR, "getupsvar: failed for ""status"".");
-        Dmsg0(100, "HEY!!! Couldn't get status flag.\n");
-	stat = 0;
-	masterStatus = 0;
-    } else {
-	/*
-         * Make sure we don't override local bits, and that
-	 * all non-local bits are set/cleared correctly.
-	 *
-	 * local bits = UPS_COMMLOST|UPS_SHUTDOWN|UPS_SLAVE|UPS_SLAVEDOWN|
-	 *		UPS_PREV_ONBATT|UPS_PREV_BATTLOW|UPS_ONBATT_MSG|
-	 *		UPS_FASTPOLL|UPS_PLUGGED|UPS_DEV_SETUP
-	 *
-	 */
-	masterStatus = strtol(answer, NULL, 0);
-	newStatus = masterStatus & ~UPS_LOCAL_BITS;   /* clear local bits */
-	ups->Status &= UPS_LOCAL_BITS;	  /* clear non-local bits */
-	ups->Status |= newStatus;	  /* set new non-local bits */
-    }
-    Dmsg2(100, "Got Status = %s 0x%x\n", answer, ups->Status);
+    if (stat == 1) {
+	if (!nid->caps_read) {
+	    net_ups_get_capabilities(ups);
+	}
+	if (!nid->static_data_read) {
+	    net_ups_read_static_data(ups);	   
+	}
+	    
+        if (!getupsvar(ups, "status", answer, sizeof(answer))) {
+            log_event(ups, LOG_ERR, "getupsvar: failed for ""status"".");
+            Dmsg0(100, "HEY!!! Couldn't get status flag.\n");
+	    stat = 0;
+	    masterStatus = 0;
+	} else {
+	    /*
+             * Make sure we don't override local bits, and that
+	     * all non-local bits are set/cleared correctly.
+	     *
+	     * local bits = UPS_COMMLOST|UPS_SHUTDOWN|UPS_SLAVE|UPS_SLAVEDOWN|
+	     *		    UPS_PREV_ONBATT|UPS_PREV_BATTLOW|UPS_ONBATT_MSG|
+	     *		    UPS_FASTPOLL|UPS_PLUGGED|UPS_DEV_SETUP
+	     *
+	     */
+	    masterStatus = strtol(answer, NULL, 0);
+	    newStatus = masterStatus & ~UPS_LOCAL_BITS;   /* clear local bits */
+	    ups->Status &= UPS_LOCAL_BITS;    /* clear non-local bits */
+	    ups->Status |= newStatus;	      /* set new non-local bits */
+	}
+        Dmsg2(100, "Got Status = %s 0x%x\n", answer, ups->Status);
 
-    if (masterStatus & (UPS_SHUTDOWN|UPS_SHUTDOWNIMM|UPS_BELOWCAPLIMIT|UPS_REMTIMELIMIT)) {
-	set_ups(UPS_SHUT_REMOTE);  /* if master is shutting down so do we */
-        log_event(ups, LOG_ERR, "Shutdown because NIS master is shutting down.");
-        Dmsg0(100, "Set SHUT_REMOTE because of master status.\n");
+	if (masterStatus & (UPS_SHUTDOWN|UPS_SHUTDOWNIMM|UPS_BELOWCAPLIMIT|UPS_REMTIMELIMIT)) {
+	    set_ups(UPS_SHUT_REMOTE);  /* if master is shutting down so do we */
+            log_event(ups, LOG_ERR, "Shutdown because NIS master is shutting down.");
+            Dmsg0(100, "Set SHUT_REMOTE because of master status.\n");
+	}
     }
 
 
@@ -365,50 +375,53 @@ int net_ups_setup(UPSINFO *ups)
 int net_ups_get_capabilities(UPSINFO *ups) 
 {
     char answer[200];
+    int stat;
+    struct driver_data *nid = (struct driver_data *)ups->driver_internal_data;
 
     write_lock(ups);
 
-    fill_status_buffer(ups);   
-
-    ups->UPS_Cap[CI_VLINE] = getupsvar(ups, "utility", answer, sizeof(answer));
-    ups->UPS_Cap[CI_LOAD] = getupsvar(ups, "loadpct", answer, sizeof(answer));
-    ups->UPS_Cap[CI_BATTLEV] =
-        getupsvar(ups, "battcap", answer, sizeof(answer));
-    ups->UPS_Cap[CI_RUNTIM] =
-        getupsvar(ups, "runtime", answer, sizeof(answer));
-    ups->UPS_Cap[CI_VMAX] = getupsvar(ups, "linemax", answer, sizeof(answer));
-    ups->UPS_Cap[CI_VMIN] = getupsvar(ups, "linemin", answer, sizeof(answer));
-    ups->UPS_Cap[CI_VOUT] = getupsvar(ups, "outputv", answer, sizeof(answer));
-    ups->UPS_Cap[CI_SENS] = getupsvar(ups, "sense", answer, sizeof(answer));
-    ups->UPS_Cap[CI_DLBATT] =
-        getupsvar(ups, "lowbatt", answer, sizeof(answer));
-    ups->UPS_Cap[CI_LTRANS] =
-        getupsvar(ups, "lowxfer", answer, sizeof(answer));
-    ups->UPS_Cap[CI_HTRANS] =
-        getupsvar(ups, "highxfer", answer, sizeof(answer));
-    ups->UPS_Cap[CI_RETPCT] =
-        getupsvar(ups, "retpct", answer, sizeof(answer));
-    ups->UPS_Cap[CI_ITEMP] =
-        getupsvar(ups, "upstemp", answer, sizeof(answer));
-    ups->UPS_Cap[CI_VBATT] =
-        getupsvar(ups, "battvolt", answer, sizeof(answer));
-    ups->UPS_Cap[CI_FREQ] =
-        getupsvar(ups, "outputfreq", answer, sizeof(answer));
-    ups->UPS_Cap[CI_WHY_BATT] =
-        getupsvar(ups, "lastxfer", answer, sizeof(answer));
-    ups->UPS_Cap[CI_ST_STAT] =
-        getupsvar(ups, "selftest", answer, sizeof(answer));
-    ups->UPS_Cap[CI_SERNO] =
-        getupsvar(ups, "serialno", answer, sizeof(answer));
-    ups->UPS_Cap[CI_BATTDAT] =
-        getupsvar(ups, "battdate", answer, sizeof(answer));
-    ups->UPS_Cap[CI_NOMBATTV] =
-        getupsvar(ups, "nombattv", answer, sizeof(answer));
-    ups->UPS_Cap[CI_REVNO] =
-        getupsvar(ups, "firmware", answer, sizeof(answer));
+    if ((stat=fill_status_buffer(ups))) {
+        ups->UPS_Cap[CI_VLINE] = getupsvar(ups, "utility", answer, sizeof(answer));
+        ups->UPS_Cap[CI_LOAD] = getupsvar(ups, "loadpct", answer, sizeof(answer));
+	ups->UPS_Cap[CI_BATTLEV] =
+            getupsvar(ups, "battcap", answer, sizeof(answer));
+	ups->UPS_Cap[CI_RUNTIM] =
+            getupsvar(ups, "runtime", answer, sizeof(answer));
+        ups->UPS_Cap[CI_VMAX] = getupsvar(ups, "linemax", answer, sizeof(answer));
+        ups->UPS_Cap[CI_VMIN] = getupsvar(ups, "linemin", answer, sizeof(answer));
+        ups->UPS_Cap[CI_VOUT] = getupsvar(ups, "outputv", answer, sizeof(answer));
+        ups->UPS_Cap[CI_SENS] = getupsvar(ups, "sense", answer, sizeof(answer));
+	ups->UPS_Cap[CI_DLBATT] =
+            getupsvar(ups, "lowbatt", answer, sizeof(answer));
+	ups->UPS_Cap[CI_LTRANS] =
+            getupsvar(ups, "lowxfer", answer, sizeof(answer));
+	ups->UPS_Cap[CI_HTRANS] =
+            getupsvar(ups, "highxfer", answer, sizeof(answer));
+	ups->UPS_Cap[CI_RETPCT] =
+            getupsvar(ups, "retpct", answer, sizeof(answer));
+	ups->UPS_Cap[CI_ITEMP] =
+            getupsvar(ups, "upstemp", answer, sizeof(answer));
+	ups->UPS_Cap[CI_VBATT] =
+            getupsvar(ups, "battvolt", answer, sizeof(answer));
+	ups->UPS_Cap[CI_FREQ] =
+            getupsvar(ups, "outputfreq", answer, sizeof(answer));
+	ups->UPS_Cap[CI_WHY_BATT] =
+            getupsvar(ups, "lastxfer", answer, sizeof(answer));
+	ups->UPS_Cap[CI_ST_STAT] =
+            getupsvar(ups, "selftest", answer, sizeof(answer));
+	ups->UPS_Cap[CI_SERNO] =
+            getupsvar(ups, "serialno", answer, sizeof(answer));
+	ups->UPS_Cap[CI_BATTDAT] =
+            getupsvar(ups, "battdate", answer, sizeof(answer));
+	ups->UPS_Cap[CI_NOMBATTV] =
+            getupsvar(ups, "nombattv", answer, sizeof(answer));
+	ups->UPS_Cap[CI_REVNO] =
+            getupsvar(ups, "firmware", answer, sizeof(answer));
+	nid->caps_read = 1;
+    }
        
     write_unlock(ups);
-    return 1;
+    return stat;
 }
 
 int net_ups_program_eeprom(UPSINFO *ups, int command, char *data)
@@ -445,10 +458,13 @@ int net_ups_read_volatile_data(UPSINFO *ups)
     write_lock(ups);
     set_ups(UPS_SLAVE);   
 
+    if (!fill_status_buffer(ups)) {
+       write_unlock(ups);
+       return 0;
+    }
     /* ***FIXME**** poll time needs to be scanned */
     ups->poll_time = time(NULL);
     ups->last_master_connect_time = ups->poll_time;
-    fill_status_buffer(ups);
 
     if (ups->UPS_Cap[CI_VLINE] && 
           getupsvar(ups, "utility", answer, sizeof(answer))) {
@@ -542,10 +558,14 @@ int net_ups_read_volatile_data(UPSINFO *ups)
 int net_ups_read_static_data(UPSINFO *ups) 
 {
     char answer[200];
+    struct driver_data *nid = (struct driver_data *)ups->driver_internal_data;
 
     write_lock(ups);
 
-    fill_status_buffer(ups);
+    if (!fill_status_buffer(ups)) {
+       write_unlock(ups);
+       return 0;
+    }
 
     if (!getupsvar(ups, "model", ups->mode.long_name,
 		sizeof(ups->mode.long_name))) {
@@ -571,6 +591,7 @@ int net_ups_read_static_data(UPSINFO *ups)
             getupsvar(ups, "firmware", answer, sizeof(answer))) {
 	strcpy(ups->firmrev, answer);
     }
+    nid->static_data_read = 1;
 
     write_unlock(ups);
     return 1;

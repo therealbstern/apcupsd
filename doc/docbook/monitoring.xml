@@ -44,6 +44,18 @@ in your <emphasis role="bold">apcupsd.conf</emphasis> file.</para>
 
 
 <sect2><title>apcaccess status</title>
+<para>
+As mentioned above, the full form of the command is:
+</para>
+<programlisting>
+apcaccess status localhost:3551 
+</programlisting>
+<para>
+where only <application>apcaccess status</application> should normally
+be needed. localhost may be replaced by any machine name, fully qualified 
+domain name, or IP address, which means that <application>apcaccess</application>
+can access any UPS on the network running the Network Information Server.
+</para>
 
 <para>The <emphasis role="bold">status</emphasis> command line option
 of <application>apcaccess</application> will produce a full printout
@@ -135,6 +147,16 @@ FIRMWARE : 60.11.I
 APCMODEL : IWI
 END APC  : Fri Dec 03 12:34:33 CET 1999
 </programlisting>
+
+<para>
+For the various smaller, cheaper APC USB UPSes, such as the CS, ES, ..., you 
+will get much of the information that is presented above, but not all of
+it. For example, you will not get MAXLINEV, MINLINEV, LINEFREQ, ...
+and in particular, the LOADPCT will be zero when you are running on mains.
+LOADPCT will display when the UPS is on batteries.  You must remember that the     
+non-SmartUPSes are much simpler (and less expensive) and therefore produce 
+less information.</para>
+
 </sect2>
 
 <sect2><title>apcaccess eprom</title>

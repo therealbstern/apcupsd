@@ -77,8 +77,10 @@ arguments as:</para>
   <varlistentry>
     <term>powered</term>
     <listitem>
-      <para>is 1 if <application>apcupsd</application> is powered by
-      the UPS and 0 if not. In version 3.8.2, this value is always 1.</para>
+      <para>is 1 if the computer on which
+      <application>apcupsd</application> is running is powered by the
+      UPS and 0 if not.  At the moment, this value is unimplemented and
+       always 0.</para> 
     </listitem>
   </varlistentry>
 </variablelist>

@@ -25,7 +25,7 @@ local network, you have more choices to make,</para></step>
 
 <step><para>Third, figure out if you have one of the easy setups.
 If you have a USB UPS, and a USB-capable recent Linux such as Red Hat
-or Suse at version 8.0, and you want to use one UPS with one computer,
+or SUSE at version 8.0, and you want to use one UPS with one computer,
 that's an easy setup.  APC supplies the cable needed to talk with 
 that UPS along with the UPS. All you need to do is <link
 linkend='check_usb'>check that your USB subsystem is working</link>;
@@ -92,7 +92,7 @@ url='maintaining'>maintaining</ulink> your UPS.</para></step>
 <sect1 id='supported'><title>Supported Operating Systems, UPSes and Cables</title>
 
 <para>The <application>apcupsd</application> maintainers develop it
-under Red Hat and SuSe Linux; those ports are, accordingly, the most
+under Red Hat and SUSE Linux; those ports are, accordingly, the most
 up to date and best tested.  There are enough Debian Linux users that
 that port is also generally pretty fresh.  Slackware Linux is also
 fully supported.</para>
@@ -313,9 +313,10 @@ section for details.</para>
 <sect1 id='check_usb'><title>Checking Out Your USB Subsystem</title>
 
 <para>You can skip this section if your UPS has an Ethernet or RS232-C 
-interface.  If it has a USB interface, you need to make sure that
-your USB subsystem can see the UPS.  On a Linux system this is easy,
-just do this from a shell prompt:</para>
+interface or you are not running on a Linux kernel.  If it has a USB
+interface, you need to make sure that your USB subsystem can see the
+UPS. On a Linux system this is easy, just do this from a shell
+prompt:</para>
 
 <screen>
 cat /proc/bus/usb/devices
@@ -427,7 +428,7 @@ UPS, exist.  On other Linuxes the layout will be slightly different;
 the hiddev devices will usually live in a
 <filename>/dev/usb/hid/</filename> subdirectory. If these devices
 don't exist, you may need to run
-<filename>&lt;apcupsd-src&gt;/examples/make-hiddev</filename> to
+<filename>&lt;apcupsd-source&gt;/examples/make-hiddev</filename> to
 create them.</para>
 
 <para>Now build and run the <application>hid-ups</application> test
@@ -436,7 +437,7 @@ program. You do not have to configure and build the rest of
 <application>hid-ups</application> enter:</para>
 
 <programlisting>
-cd &lt;apcupsd-src&gt;/examples
+cd &lt;apcupsd-source&gt;/examples
 make hid-ups
 </programlisting>
 
@@ -452,7 +453,7 @@ obtained from your UPS. CAUTION! if you have a 2.4.x Linux kernel
 do  not run two copies of this program
 at the same time, or your kernel will freeze. The report that is
 printed should look very similar to the report in
-<filename>&lt;src&gt;/hid-ups.rpt</filename>. If the program reports
+<filename>&lt;apcupsd-source&gt;/examples/hid-ups.rpt</filename>. If the program reports
 that the device was not found ensure that all the appropriate modules
 are loaded (as described earlier), then unplug your UPS and plug it
 back in. This should permit the kernel to recognize the UPS.</para>
@@ -467,7 +468,29 @@ continuing.</para>
 <para>If all there things check out and you still can't see the UPS,
 something is more seriously wrong than this manual can cover &mdash;
 find expert help.  If you are unable to list USB devices or drivers,
-you kernel may not be USB-capable and that needs to be fixed. </para>
+you kernel may not be USB-capable and that needs to be fixed.
+Please check if your kernel has the three patches listed in
+the <filename>&lt;apcupsd-source&gt;/examples</filename> directory.
+Each of the files ends with the name <filename>.patch</filename>, and at the
+current writing they are:</para>
+
+<programlisting>
+linux-2.4.20-killpower.patch
+linux-2.4.20-USB-reject.patch
+linux-2.6.0-USB-queue-overflow.patch
+</programlisting>
+
+<para>
+For example, RedHat 9 and/or pre-2.4.22 kernels are known to need the
+linux-2.4.20-USB-reject.patch
+for APC SmartUPS XL series devices.
+</para>
+
+<para>
+There are also a few email files that you can consult in the <filename>examples</filename>
+directory for additional information and details.
+</para>
+
 
 </sect1>
 </chapter>
@@ -670,7 +693,7 @@ specified above assume the default installation locations.</para>
 
 <para>As a final check that the <command>make install</command> went
 well, you should check your halt script (in
-<filename>/etc/rc.d</filename> on SuSE systems, and in
+<filename>/etc/rc.d</filename> on SUSE systems, and in
 <filename>/etc/rc.d/init.d</filename> on Red Hat systems) to see that
 the appropriate lines have been inserted in the correct
 place. Modification of the halt script is important so that at the end
@@ -1090,7 +1113,7 @@ setenv LDFLAGS -O
 </sect1>
 <sect1 id='OS_Specifics'><title>Operating System Specifics</title>
 
-<para>With the exception of Linux SuSe and Linux Red Hat systems used
+<para>With the exception of Linux SUSE and Linux Red Hat systems used
 by the developers, we rely on users to help create installation
 scripts and instructions as well as to test that
 <application>apcupsd</application> runs correctly on their system. As
@@ -1112,7 +1135,7 @@ have received installation files:</para>
 <listitem><para><link linkend="OpenBSD">OpenBSD</link></para></listitem>
 <listitem><para><link linkend="RedHat">Red Hat</link></para></listitem>
 <listitem><para><link linkend="Slackware">Slackware</link></para></listitem>
-<listitem><para><link linkend="SuSE">SuSE</link></para></listitem>
+<listitem><para><link linkend="SUSE">SUSE</link></para></listitem>
 <listitem><para><link linkend="Solaris">Solaris</link></para></listitem>
 <listitem><para><link linkend="unknown">unknown</link></para></listitem>
 <listitem><para><link linkend="Win32">Win32</link></para></listitem>
@@ -1231,9 +1254,9 @@ standard installation instructions given above, you should experience
 few or no problems.</para>
 
 </sect2>
-<sect2 id="SuSE"><title>SuSE</title>
+<sect2 id="SUSE"><title>SUSE</title>
 
-<para>SuSE systems are fully supported, and by following the
+<para>SUSE systems are fully supported, and by following the
 standard installation instructions given above, you should experience
 few or no problems.</para>
 
