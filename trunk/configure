@@ -846,61 +846,65 @@ Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
 
-  --enable-pthreads	   Enable pthreads (default)
-  --disable-pthreads	   No pthreads
-  --enable-cgi		   Compile CGI programs
-  --enable-install-distdir Install distribution
+  --enable-pthreads       Enable pthreads (default)
+  --disable-pthreads      No pthreads
+  --enable-cgi            Compile CGI programs
+  --enable-install-distdir
+                          Install distribution
 
-  --enable-apcsmart	   Compile APC Smart UPS driver (default)
-  --disable-apcsmart	   No APC Smart UPS driver
+  --enable-apcsmart       Compile APC Smart UPS driver (default)
+  --disable-apcsmart      No APC Smart UPS driver
 
-  --enable-dumb 	   Compile dumb UPS driver (default)
-  --disable-dumb	   No dumb UPS driver
+  --enable-dumb           Compile dumb UPS driver (default)
+  --disable-dumb          No dumb UPS driver
 
-  --enable-usb		   Compile USB UPS code
-  --disable-usb 	   No USB UPS code (default)
+  --enable-usb            Compile USB UPS code
+  --disable-usb           No USB UPS code (default)
 
-  --enable-net		   Compile new networking driver for slaves
-  --disable-net 	   No new network driver for slaves (default)
+  --enable-net            Compile new networking driver for slaves
+  --disable-net           No new network driver for slaves (default)
 
-  --enable-snmp 	   Compile SNMP UPS code
-  --disable-snmp	   No SNMP UPS code (default)
+  --enable-snmp           Compile SNMP UPS code
+  --disable-snmp          No SNMP UPS code (default)
 
-  --enable-net-snmp	       Compile NET-SNMP UPS code
-  --disable-net-snmp	       No NET-SNMP UPS code (default)
+  --enable-net-snmp       Compile NET-SNMP UPS code
+  --disable-net-snmp      No NET-SNMP UPS code (default)
 
-  --enable-test 	   Compile TEST driver code
-  --disable-test	   No TEST driver (default)
+  --enable-test           Compile TEST driver code
+  --disable-test          No TEST driver (default)
 
-  --enable-nis		   Compile NIS server (default)
-  --disable-nis 	   No NIS server
+  --enable-nis            Compile NIS server (default)
+  --disable-nis           No NIS server
 
-  --enable-master-slave    Compile old network master/server code
-  --disable-master-slave   No old network master/server (default)
-
-  --enable-powerflute	   Compile powerflute program
-  --enable-nls             enable Native Language Support
+  --enable-master-slave   Compile old network master/server code
+  --disable-master-slave  No old network master/server (default)
+  --enable-powerflute     Compile powerflute program
+  --enable-nls            enable Native Language Support
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
-  --with-libwrap=DIR     Compile in libwrap (tcp_wrappers) support
+  --with-libwrap=DIR      Compile in libwrap (tcp_wrappers) support
   --with-nisip=IP-ADDRESS Specify the IP address to bind to
-  --with-cgi-bin=DIR	   Specify cgi-bin directory (default=/etc/apcupsd)
+  --with-cgi-bin=DIR      Specify cgi-bin directory (default=/etc/apcupsd)
   --with-included-gettext use the GNU gettext library included here
   --with-catgets          use catgets functions if available
-  --with-distname=NAME     Specify DISTNAME
+  --with-distname=NAME    Specify DISTNAME
   --with-nologin=DIR      Specify nologin file directory (default /etc)
   --with-pid-dir=DIR      Specify PIDDIR directory (default is OS dependent)
-  --with-log-dir=DIR      Specify EVENTS and STATUS directory (default is OS dependent)
-  --with-lock-dir=DIR     Specify serial port lock directory (default is OS dependent)
-  --with-pwrfail-dir=DIR	Specify power failure file directory (default is OS dependent)
-  --with-serial-dev=DEV	Specify serial port device
-  --with-dev=DEV	 Specify port or device
-  --with-nis-port=PORT	Specify NIS (CGI) port (default 3551 except Debian)
-  --with-net-port=PORT	Specify Master/slave port (default 6666 except Debian)
+  --with-log-dir=DIR      Specify EVENTS and STATUS directory (default is OS
+                          dependent)
+  --with-lock-dir=DIR     Specify serial port lock directory (default is OS
+                          dependent)
+  --with-pwrfail-dir=DIR  Specify power failure file directory (default is OS
+                          dependent)
+  --with-serial-dev=DEV   Specify serial port device
+  --with-dev=DEV          Specify port or device
+  --with-nis-port=PORT    Specify NIS (CGI) port (default 3551 except Debian)
+  --with-net-port=PORT    Specify Master/slave port (default 6666 except
+                          Debian)
   --with-upstype=TYPE     Specify the UPS type
-  --with-upscable=CABLE	Specify the UPS cable
+  --with-upscable=CABLE   Specify the UPS cable
 
 Some influential environment variables:
   CC          C compiler command
