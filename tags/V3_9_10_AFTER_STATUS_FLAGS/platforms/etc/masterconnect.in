@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# This shell script if placed in /etc/apcupsd
+# will be called by /etc/apcupsd/apccontrol when the master
+# connects to the slave.
+# We send an email message to root to notify him.
+#
+SYSADMIN=root
+MAIL="@MAIL@"
+
+HOSTNAME=`hostname`
+MSG="slave $HOSTNAME received connection from master"
+#
+(
+   echo "$MSG"
+   echo " "
+   @sbindir@/apcaccess status
+) | $MAIL -s "$MSG" $SYSADMIN
+exit 0

@@ -1,0 +1,365 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="Author" content="Riccardo Facchetti">
+   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.4.3 i586) [Netscape]">
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+
+<h2>
+Dumb UPSes</h2>
+&nbsp;
+<p>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+<h3>
+<a NAME="APC Interface Expander"></a>APC Interface Expander</h3>
+
+<p><br>I tried out some things with the multimeter:
+<p>Pin2 on the ups has -11V and changes to +11V on Linefail. Couldnt test
+the Pin3, 5 &amp; 1 actions. But i think it should work. Any suggestions?
+<br>I tried two different machines, different serial cards. Btw. with the
+smart cable on the advanced port, everything is fine.
+<br>Im getting alwais the error message: Serial communication with UPS
+lost (but how can the software determinate if there is a connection, on
+a simple cable???).
+<br>So the last question remains. How does the software communicate via
+the dumb cable with the ups? Imho there is no "serial communication", so
+how can the software determinate if there is a communication with the ups?
+<br>The following port description is from the apc interface expander manual:
+<p>------------------------> 3 Normal Open, Line Fail Signal
+<p>|
+<p>| ----------------->5 Normal Open, Low Bat Signal
+<p>| |
+<p>| | ---------->6 Normal Closed, Line Fail Signal
+<p>| | |
+<p>\ \ \
+<p>\ &lt; \&lt; |>
+<p>\ \ |
+<p>| | |
+<p>+-- --+------+---+------>4 Common
+<p>|
+<p>-----------&lt;1 UPS Shut Down RS232 Input (Hi-4.5 sec)
+<p>|
+<p>----------->2 Line Fail RS232 Output
+<p>|
+<p>+----> 9 Chassis
+<p>|
+<p>---
+<p>So on pin 3,5,6 and 2 the ups status is only signaled via hi or low
+signals, but there is no communication at all. And pin 1 is only used to
+shut down the ups (if there is a hi signal for 4.5 seconds).
+<br>&nbsp;
+<h3>
+<a NAME="APC Powercell Network"></a>APC Powercell Network</h3>
+
+<p><br>After reading your thoughts, here's a couple followup details to
+clarify things: my APC Powercell Network (circa 1995) UPS does *not* appear
+to be a "smart" UPS. The DB9 port wiring diagram, as described in the user
+guide, indicates simple voltage levels as such:
+<p>UPS Pin Direction Purpose
+<p>1 &lt;--- Accepts pulse input to shutdown UPS
+<br>2 ---> Line fail output (+5 when true, +0 when false)
+<br>3 ---> Line fail output (ground when true, open when false)
+<br>4 ---> Chassis Ground
+<br>5 ---> Low Batt output (ground when true, open when false)
+<br>6 ---> Line fail output (open when true, ground when false)
+<br>7 ---> n/c
+<br>8 ---> n/c
+<br>9 ---> Chassis Ground
+<br>&nbsp;
+<br>&nbsp;
+<p>I am focusing on pin 5, "Low Batt output" which goes to ground when
+true. The (skimpy) APC User's Manual doesn't describe this in detail, but
+says, "...if the utility power is not restored to normal, the PowerCell
+will eventually sound a loud tone to alert you that less than two minutes
+remain before the UPS shuts down and ceases to power your equipment. This
+is called a LOW BATTERY CONDITION which means that the PowerCell's usable
+battery capacity is nearly spent." I suspect, but have not (yet) tested,
+that the "Low Batt output" goes TRUE at this two-minute mark. I also suspect
+that the "two minute" measurement is based upon full [400W] load, and would
+be MUCH longer on a very light load [25W] like mine.
+<br>&nbsp;
+<h3>
+<a NAME="ShareUPS"></a>ShareUPS</h3>
+
+<p><br>/***************************************************************************/
+<p>/* README.Share-UPS Users of apcupsd */
+<br>/* BY: "Andre M. Hedrick" &lt;hedrick@astro.dyer.vanderbilt.edu> */
+<br>/***************************************************************************/
+<br>&nbsp;
+<br>&nbsp;
+<p>TO COME....... BETA RELEASE DOCS>>>>>>>
+<p>Beginning Project:
+<p>Information by : "Ralf Gutensohn" &lt;rgutenso@tap.de>
+<p>>From the manual:
+<p>Basic ports
+<br>&nbsp;
+<br>&nbsp;
+<p>The funtionality of a Share-UPS Basic port is shown below. The following
+limitations and capabilities apply the the basic port interface:
+<br>&nbsp;
+<ul>
+<li>
+pins 3, 5 and 6 are open collector outputs which must be pulled up to a
+common referenced supply no greater than +40Vdc. The transistors are capable
+of a maximun non-inductive oad of 25mAdc. Use only Pin 4 as the common.</li>
+
+<li>
+The output at Pin 2 generate a Lo-to-HI RS232 level what the device is
+signaling On-Battery. The pin is normally at a LO RS-232 level.</li>
+
+<li>
+The Share-Ups may be signaled to shutdown the UPS by applying a HI RS-232
+level to Pin 1 for 4.5 seconds. Shutdown is also dependent on the UPS~s
+state and the Share-UPS~s shutdown mode.</li>
+</ul>
+
+<p><br>BASIC PORT
+<p>DB-9S pinout
+<p>&nbsp; 6 7 8 9
+<br>&nbsp; o o o o
+<br>o o o o o
+<br>1 2 3 4 5
+<p>--------------
+<p>My translation of this part of the email message.....
+<p>BASIC UPS I/O of BackUPS Dumb
+<br>One needs to use APC cable #940-0020B or my CUSTOM cable.
+<p>--------------
+<p>Do you can help us ????
+<br>You know anyone tried to use the ShareUPS with Linuxsystems ?
+<p>Thanks for any help :)
+<br>Regards
+<br>Ralf Gutensohn
+<br>rgutenso@tap.de
+<p>/***************************************************************************/
+<p>The layout of ShareUPS pins is as follow:
+<center>
+<p><img SRC="sv3353362.jpg" ALT="ShareUPS layout image 1/2" height=550 width=445>
+<p><img SRC="sv3353364.jpg" ALT="ShareUps layout image 2/2" height=550 width=458></center>
+
+<h3>
+<a NAME="BackUPS"></a>BackUPS</h3>
+
+<p><br>The RTS serial port signal is used to shut down the UPS. The UPS
+will shut down only if it operates from its battery. The manual says that
+the shutdown signal must be high for at least 0.5s. But few milliseconds
+is enough, at least for my APC Back-UPS 600.
+<p>Using RTS to shut down the UPS can be dangerous, because the RTS goes
+high when the serial device is opened. The backupsd program then turns
+RTS off, but it is on (high) for a moment. This kills the power when backupsd
+is first started and there is a power failure at this time. This can happen
+for example when the UPS is shut down, unattended, and the power comes
+back for a while.
+<p>Either start backupsd before mounting any filesystems for read-write,
+or (better) use TX (pin 3) instead of RTS (pin 7) to shut down the UPS
+(pin numbers are for 9-pin plug). Use ioctl(fd, TCSBRKP, 10); to make TX
+high for one second, for example. Using TX should be safe. Maybe I will
+post the diffs if time permits...
+<br>&nbsp;
+<h3>
+<a NAME="Dumb Cable"></a>Dumb Cable</h3>
+
+<p><br>/***************************************************************************/
+<br>/* README.cables for apcupsd */
+<br>/* BY: "Andre M. Hedrick" &lt;hedrick@astro.dyer.vanderbilt.edu> */
+<br>/***************************************************************************/
+<p>----> apcupsd v3.7.0
+<p>Added cable 940-0095B: seem to behave like 940-0095C and looking at
+the code even like 940-0095A.
+<p>----> apcupsd v3.4.4
+<p>Hewlett Packard partno. 5061-2575 for HP PowerTrust 2997A UPS.
+<br>Treat as a CUSTOM-SMART and SmartUPS.
+<p>----> apcupsd v3.0.0
+<p>Support for 940-0095A and 940-0095C cables.
+<br>These are dual purpose cables for both smart and simple signals.
+<p>----> apcupsd v2.9
+<p>CUSTOM-SMART Cable
+<p>Firstly, the cable:
+<br>You will need a simple 3 wires cable connected as follows:
+<p>PC (9 pin) APC
+<br>2 RxD 2
+<br>3 TxD 1
+<br>5 GND 9
+<p>----> apcupsd v2.8 Sept 15, 1997
+<p>Date: Sun, 14 Sep 1997 01:12:02 -0700
+<br>From: "Daniel M. Crowl" &lt;dancrowl@artcommerce.com>
+<br>To: hedrick@astro.dyer.vanderbilt.edu
+<br>Subject: APC cable question..
+<p>I admit that after reading your README's and the stuff at APC I am thoroughly
+confused about which cable to buy/make -- I have an APC Smart-UPS 600 running
+a 586 RH 4.1 Linux box. I don't see a listing for #940-024(B/C) at the
+APC site -- just 940-020, with no character designators (B/C/anythingElse...)
+<p>I guess my question is: To incorporate SmartUPS "Smart Mode" support
+do I buy a #940-020B, -024(B/C) or make the cable illustrated in your Sept
+<p>20, 1996 comment?
+<p>SMART MODE CABLES: #940-0024B and #940-0024C
+<br>UPS SUPPORT: SmartUPS SU and BackUPS Pro
+<p>DUMB MODE CABLES: #940-0020B and CUSTOM Design Below.
+<br>UPS SUPPORT: SmartUPS SU and BackUPS
+<p>STUPID MODE CABLE: #940-0023A
+<br>UPS SUPPORT: BackUPS
+<p>UKNOWN MODE CABLES: #940-0095A and #940-0095C
+<br>UPS SUPPORT: ???????????????
+<p>----> apcupsd v2.5pre?
+<p>From cph@martigny.ai.mit.edu Tue May 27 14:43:53 1997
+<br>Date: Tue, 27 May 1997 00:28:55 -0400 (EDT)
+<br>From: Chris Hanson &lt;cph@martigny.ai.mit.edu>
+<br>To: hedrick@astro.dyer.vanderbilt.edu
+<br>Subject: APC #940-0095A cable
+<p>Hi,
+<p>I have been messing around trying to get my APC Back-UPS Pro PNP to
+work under Linux. In the process of trying to figure out how the included
+cable is built (#940-0095A), I fried the cable. I took this as an opportunity
+to dissect the cable and find out what is really inside. After a lot of
+work with an X-acto knife, I figured it out.
+<p>Since you're maintaining apcupsd, and you state that this cable is "insupportable",
+I thought you might be interested in this information. Perhaps it will
+help you to support the cable, and thus help other people with this UPS.
+<p>----------------------------------------------------------------------
+<p>Construction and operation of the APC #940-0095A cable. This cable is
+included with the APC Back-UPS Pro PNP series.
+<p>UPS end Computer end
+<p>------- ------------
+<p>47k 47k
+<p>BATTERY-LOW (5) >----R1----*----R2----*----&lt; DTR,DSR,CTS (4,6,8)
+<p>| |
+<p>| |
+<p>| / E
+<p>| |/
+<p>| B |
+<p>*--------| 2N3906 PNP
+<p>|
+<p>|\
+<p>\ C
+<p>|
+<p>|
+<p>*----&lt; DCD (1)
+<p>|
+<p>|
+<p>R 4.7k
+<p>3
+<p>|
+<p>4.7k |
+<p>SHUTDOWN (1) >----------*----R4-----*----&lt; TxD (3)
+<p>|
+<p>| 1N4148
+<p>*----K|---------&lt; RTS (7)
+<br>&nbsp;
+<br>&nbsp;
+<p>POWER-FAIL (2) >--------------------------&lt; RxD,RI (2,9)
+<br>&nbsp;
+<br>&nbsp;
+<p>GROUND (4,9) >--------------------------&lt; GND (5)
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+<br>&nbsp;
+<p>Operation:
+<p>* DTR is "cable power" and must be held at SPACE. DSR or CTS may be
+used as a loopback input to determine if the cable is plugged in.
+<p>* DCD is the "battery low" signal to the computer. A SPACE on this line
+means the battery is low. This is signalled by BATTERY-LOW being pulled
+down (it is probably open circuit normally).
+<p>Normally, the transistor is turned off, and DCD is held at the MARK
+voltage by TxD. When BATTERY-LOW is pulled down, the voltage divider R2/R1
+biases the transistor so that it is turned on, causing DCD to be pulled
+up to the SPACE voltage.
+<p>* TxD must be held at MARK; this is the default state when no data is
+being transmitted. This sets the default bias for both DCD and SHUTDOWN.
+If this line is an open circuit, then when BATTERY-LOW is signalled, SHUTDOWN
+will be automatically signalled; this would be true if the cable were plugged
+in to the UPS and not the computer, or if the computer were turned off.
+<p>* RTS is the "shutdown" signal from the computer. A SPACE on this line
+tells the UPS to shut down.
+<p>* RxD and RI are both the "power-fail" signals to the computer. A MARK
+on this line means the power has failed.
+<p>* SPACE is a positive voltage, typically +12V. MARK is a negative voltage,
+typically -12V. The RS-232 hardware translates SPACE to a 0 and MARK to
+a 1.
+<p>----> apcupsd v2.5pre?
+<p>* APC940-0095A non-infinite resistance values:
+<br>*
+<br>* CPU UPS
+<br>* DCD (1) Pin 1 -- 4 kohms, Pin 5 -- 50 kohms
+<br>* RX (2) Pin 2 -- 0 kohms
+<br>* TX (3) Pin 1 -- 0 kohms, Pin 5 -- 50 kohms
+<br>* DTR (4) Pin 5 -- 50 kohms
+<br>* Gnd (5) Pin 4 -- 0 kohms, Pin 9 -- 50 kohms
+<br>* DSR (6) Pin 5 -- 50 kohms
+<br>* RTS (7) Pin 1 -- 4 kohms, pin 5 -- 110 kohms
+<br>* CS (8) Pin 5 -- 50 kohms
+<br>* RI (9) Pin 2 -- 0 kohms
+<br>*
+<br>* NOTE: line-fail signal is on the RD line at the CPU end of the cable
+<p>----> apcupsd v2.4 May 19 1997
+<p>BackUPS Pro BETA TEST ONLY use #940-0024(B/C) cables.
+<p>Karsten Wiborg &lt;4wiborg@informatik.uni-hamburg.de>
+<br>Christopher J. Reimer &lt;reimer@doe.carleton.ca>
+<p>----> apcupsd v2.1 May 6 1997
+<p>#940-0024(B/C) is smart mode signaling only. BackUPS Pro must use smart
+mode signaling to use #940-0024(B/C) cables.
+<p>----> apcupsd v2.0 May 4 1997
+<p>#940-0024B Now Supported
+<br>#940-0024C Now Supported
+<p>There is NOW SmartUPS "Smart Mode" support!!!!!!!!!
+<p>BackUPS Pro "Smart Mode" support unknown???????????
+<p>USE_SMART=(yes/no) depending on UPS type.
+<p>BackUPS Pro "Smart Mode" may be able to use USE_SMART=yes
+<p>----> Enhanced_APC_UPS v1.9 Apr 14 1997
+<p>----> Enhanced_APC_UPS v1.8 Apr 7 1997
+<p>-D_SMARTUPS can no longer be define if you select USE_APC=yes There
+is no SmartUPS "Smart Mode" support, it has never been available. I am
+waiting to hear from APC about pinouts for the following cables #940-0023A
+their Unix OS cable and #940-0095A their Win95OS cable. If you want to
+use and APC cable, you must have cable #940-0020B ONLY....
+<p>----> Sept 20 1996:
+<p>One may choose to use the include files ( inittab, rc.6, and rc.inet2
+)
+<p>You may use this cable with both the Back-UPS and Smart-UPS from APC.
+<br>YES, I did state the above line, but you must set in the CONFIG file
+<br>Both cables for the Back-UPS from APC only have been tested and are
+in use on three different Linux-Boxes.
+<p>Cable for a smarter Back-UPS from APC only.
+<p>Computer Side | Description of Cable | UPS Side
+<br>DB9f | DB25f | | DB9m
+<br>4 | 20 | DTR (5vcc) *below | n/c
+<br>8 | 5 | CTS (low-batt) *below | 5
+<br>2 | 3 | RxD (other line-fail) *below | 3
+<br>5 | 7 | Ground (Signal) | 4
+<br>1 | 8 | CD (line-fail from ups) | 2
+<br>7 | 4 | RTS (shutdown ups) | 1
+<br>n/c | 1 | Frame/Case Gnd (optional) | 9
+<br>&nbsp;
+<p>*BELOW*
+<p>List if componets one needs to make this CABLE:
+<p>1) One (1) male DB9 connector.
+<br>2) One (1) female DB25 or DB9 connector. solder type not crimp DB connectors
+with standard hoods.
+<br>3) two (2) 4.7K ohm 1/4 watt %5 resistors.
+<br>4) one (1) foot of 3/32" (inch).
+<br>5) shrink wrap/boot.
+<br>6) rosin core solder.
+<br>7) three (3) to five (5) feet of 22AWG multi-stranded five (5) conductor
+cable.
+<p>First solder both of the resistors into pin# (4) DB9 or (20) DB25 the
+DTR. This will be used as the Vcc pull-up voltage for testing the outputs
+on you "BackUPS by APC" !!!! ONLY !!!!, all others at your own RISK!!!!!!
+<p>Next bend each of the resistors so that one connects to (8) DB9 or (5)
+DB25 the CTS (aka battery low signal) and the other to (2) DB9 or (3) DB25
+the RxD (aka another line fail signal). This line is not currently used,
+but it will be in the near future.
+<p>Note: 8/5 is also wire to pin# 5 on the UPS side of the cable.
+<br>Note: 2/3 is also wire to pin# 3 on the UPS side of the cable.
+<br>Note: we use the DTR as our +5 volts power for the circuit.
+<p>The rest of the wire connections are listed above.
+<p>I use this cable and daemon on my server that controls an APC BackUPS-600VA
+that has one Cisco 1005 ISDN/Enet router, one 24-port HP-Enet Hub, and
+one server (AMD-5x86-P75) w/o monitor. Enjoy the power security of UPS
+control.
+<br>&nbsp;
+</body>
+</html>
