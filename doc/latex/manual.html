@@ -467,6 +467,8 @@ not be available with your unit.
 
 <p class="noindent"><a name="type_005ftable"></a>
 <a name="index-UPSTYPE_002c-table-12"></a>
+<!-- tablename="Supported UPS Models" -->
+<!-- tcolumnwidths=1in,1in,1in,2in -->
   <p><table summary=""><tr align="left"><td valign="top" width="25%"><strong>APC Model</strong></td><td valign="top" width="25%"><em>UPSTYPE Keyword</em></td><td valign="top" width="25%"><em>UPSCABLE keywords for Cables Supported</em></td><td valign="top" width="25%"><em>Status</em>
 <br></td></tr><tr align="left"><td valign="top" width="25%">BackUPS CS/ES (serial mode)</td><td valign="top" width="25%">apcsmart</td><td valign="top" width="25%">smart (note: using Smart Custom RJ45) the
 new Back-UPS RS 500 models are reported NOT to work with this cable.</td><td valign="top" width="25%">Supported
@@ -531,6 +533,7 @@ and diagnostics
   <pre class="sp">
 
 </pre>
+<!-- imagename="Configuration Types" -->
 <pre class="example">     <img src="main_configs.png" alt="main_configs.png">
 </pre>
   <pre class="sp">
@@ -3597,6 +3600,7 @@ This program monitors multiple UPSes at the same time. A typical
 output of multimon.cgi as displayed in your
 Web browser might look like the following:
 
+<!-- imagename="Multimon Main Page" -->
   <div class="block-image"><img src="multimon.png" alt="multimon.png"></div>
 
   <p>The machines monitored as well as the values and their column
@@ -3615,6 +3619,7 @@ invoke upsstats.cgi for the specified
 system, which will produce a bar graph display of three of the
 monitored values. For example,
 
+<!-- imagename="Multimon Statistics Display" -->
   <div class="block-image"><img src="status.png" alt="status.png"></div>
 
   <p>You can display different bar graphs by selecting different
@@ -5905,6 +5910,7 @@ of the icon will vary from one release version to another.
      
      </pre>
      
+<!-- imagename="Windows Install - Explorer Window" -->
 <img src="wininstall3.png" alt="wininstall3.png">
 
      <pre class="sp">
@@ -5917,6 +5923,7 @@ it into a temporary file, respond with <strong>Yes</strong>.
      
      </pre>
      
+<!-- imagename="Windows Install - Winzip Unpack" -->
 <img src="wininstall4.png" alt="wininstall4.png">
 
      <pre class="sp">
@@ -5929,6 +5936,7 @@ go into <span class="file">C:\</span>
      
      </pre>
      
+<!-- imagename="Windows Install - Winzip Extract Window" -->
 <img src="wininstall5.png" alt="wininstall5.png">
 
      <pre class="sp">
@@ -6001,6 +6009,7 @@ following output in a DOS shell window:
      <pre class="sp">
      
      </pre>
+<!-- imagename="Windows Install - Setup Complete" -->
      <img src="wininstall1.png" alt="wininstall1.png">
      <pre class="sp">
      
@@ -6014,6 +6023,7 @@ dialogue box as follows:
      <pre class="sp">
      
      </pre>
+<!-- imagename="Windows Install - Success" -->
      <img src="wininstall2.png" alt="wininstall2.png">
      <pre class="sp">
      
@@ -6040,6 +6050,7 @@ then clicking on the Start button as shown below:
      <pre class="sp">
      
      </pre>
+<!-- imagename="Windows NT - Start Service" -->
      <img src="wininstall6.png" alt="wininstall6.png">
      <pre class="sp">
      
@@ -6125,7 +6136,7 @@ the <span class="file">c:\apcupsd\bin</span> directory, then apply the
 upgrade and restart apcupsd.
 
   <p>On WinNT systems (and Win2000 systems), you may stop
-apcupsd as indicated abover or
+apcupsd as indicated above or
 alternatively you may stop apcupsd by using
 the <strong>Services</strong> item in the <strong>Control Panel</strong>. In addition, at least on my
 system, there seems to be a WinNT bug that causes the system to
@@ -6137,12 +6148,14 @@ part of WinZip as described above). To circumvent this problem (if it
 happens to you), after shutting down the running version of
 apcupsd, through the <strong>Services</strong> dialogue in the <strong>Control Panel</strong>, first click on the <strong>Stop button</strong>:
 
+<!-- imagename="Windows NT - Stopping the Service" -->
   <div class="block-image"><img src="wininstall6.png" alt="wininstall6.png"></div>
 
   <p>then click on the <strong>Startup ...</strong>
 button, and in the Startup dialogue select the <strong>Disabled</strong> button to disable
 apcupsd:
 
+<!-- imagename="Windows NT - Disabling the Service" -->
   <div class="block-image"><img src="wininstall7.png" alt="wininstall7.png"></div>
 
   <p>After closing the dialogues, reboot the system, typical of
@@ -6851,6 +6864,8 @@ following off the shelf cables that are supplied by APC
 version of apcupsd (3.8.5 or later) for
 various cables running the UPS in voltage-signalling mode.
 
+<!-- tablename="Supported Features" -->
+<!-- tcolumnwidths=1.2in,0.8in,1.2in,0.8in,1.0in -->
   <p><table summary=""><tr align="left"><td valign="top" width="20%">Cable</td><td valign="top" width="20%">Power Loss</td><td valign="top" width="20%">Low Battery</td><td valign="top" width="20%">Kill Power</td><td valign="top" width="20%">Cable Disconnected
 <br></td></tr><tr align="left"><td valign="top" width="20%">940-0020B</td><td valign="top" width="20%">Yes</td><td valign="top" width="20%">No</td><td valign="top" width="20%">Yes</td><td valign="top" width="20%">No
 <br></td></tr><tr align="left"><td valign="top" width="20%">940-0020C</td><td valign="top" width="20%">Yes</td><td valign="top" width="20%">Yes</td><td valign="top" width="20%">Yes</td><td valign="top" width="20%">No
@@ -7415,6 +7430,7 @@ the 0023A cable are not implemented.
 <h3 class="section">21.11 RS232 Wiring and Signal Conventions</h3>
 
 <p><a name="index-Cables-216"></a>
+<!-- tablename="RS232 Wiring and Signal Conventions" -->
   <p><table summary=""><tr align="left"><td valign="top" width="25%">DB-25
 Pin #</td><td valign="top" width="25%">DB-9
 Pin #</td><td valign="top" width="25%">Name</td><td valign="top" width="25%">DTE-DCE Description
@@ -9334,6 +9350,8 @@ UPS, it will normally respond by "NA" for not available,
 otherwise the response is given in the "Typical results"
 column. &gt;
 
+<!-- tablename="Single Character Commands" -->
+<!-- tcolumnwidths=0.5in,2.25in,2.25in -->
   <p><table summary=""><tr align="left"><td valign="top" width="20%">Code</td><td valign="top" width="20%">Meaning</td><td valign="top" width="20%">Typical results</td><td valign="top" width="20%">
 <br></td></tr><tr align="left"><td valign="top" width="20%">^A</td><td valign="top" width="20%">Model string</td><td valign="top" width="20%">SMART-UPS 700</td><td valign="top" width="20%">
 <br></td></tr><tr align="left"><td valign="top" width="20%">^N</td><td valign="top" width="20%">Turn on UPS (send twice, with &gt; 1.5s delay between chars)
@@ -9461,6 +9479,8 @@ in battery (UPS shuts down "early")</td><td valign="top" width="20%">
 
 <h3 class="section">29.5 Dip switch info</h3>
 
+<!-- tablename="DIP Switch Info" -->
+<!-- tcolumnwidths=0.5in,0.5in,4in -->
 <p><table summary=""><tr align="left"><td valign="top" width="33%">Bit</td><td valign="top" width="33%">Switch</td><td valign="top" width="33%">Option when bit=1
 <br></td></tr><tr align="left"><td valign="top" width="33%">0</td><td valign="top" width="33%">4</td><td valign="top" width="33%">Low battery alarm changed from 2 to 5 mins. Autostartup
 disabled on SU370ci and 400
@@ -9488,6 +9508,8 @@ indicates the overall UPS status. Some common things you'll see:
      <li>SM = Status bit is still not available (retry reading)
 </ul>
 
+<!-- tablename="UPS Status Bits" -->
+<!-- tcolumnwidths=0.5in,0.5in,4in -->
   <p><table summary=""><tr align="left"><td valign="top" width="33%">Bit</td><td valign="top" width="33%">Hex Bit</td><td valign="top" width="33%">Meaning
 <br></td></tr><tr align="left"><td valign="top" width="33%">0</td><td valign="top" width="33%">0x01</td><td valign="top" width="33%">1 = Runtime calibration occurring
 Not reported by Smart UPS v/s and BackUPS Pro
@@ -9509,6 +9531,8 @@ Not reported by 1st and 2nd generation SmartUPS models
 is an Alert condition. All other responses indicated above are sent
 by the UPS only in response to a query or action command.
 
+<!-- tablename="Alert Messages" -->
+<!-- tcolumnwidths=0.7in,4.3in -->
   <p><table summary=""><tr align="left"><td valign="top" width="50%">Character</td><td valign="top" width="50%">Description
 <br></td></tr><tr align="left"><td valign="top" width="50%">!</td><td valign="top" width="50%">Line Fail - sent when the UPS goes on-battery, repeated every
 30 seconds until low battery condition reached. Sometimes occurs
@@ -9551,6 +9575,8 @@ SmartUPS models.
 <p>All bits are valid on the Matrix UPS. SmartUPS models only support
 bits 6 and 7. Other models do not respond.
 
+<!-- tablename="Register 1 Layout" -->
+<!-- tcolumnwidths=0.3in,0.5in,4.2in -->
   <p><table summary=""><tr align="left"><td valign="top" width="33%">Bit</td><td valign="top" width="33%">Hex Bit</td><td valign="top" width="33%">Meaning
 <br></td></tr><tr align="left"><td valign="top" width="33%">0</td><td valign="top" width="33%">0x01</td><td valign="top" width="33%">In wakeup mode (typically lasts &lt; 2s)
 <br></td></tr><tr align="left"><td valign="top" width="33%">1</td><td valign="top" width="33%">0x02</td><td valign="top" width="33%">In bypass mode due to internal fault - see register 2 or 3
@@ -9571,6 +9597,8 @@ power
 bits 4 and 6. SmartUPS v/s and BackUPS Pro report bits 4, 6, 7. 
 Unused bits are set to 0. Other models do not respond.
 
+<!-- tablename="Register 2 Layout" -->
+<!-- tcolumnwidths=0.3in,4.7in -->
   <p><table summary=""><tr align="left"><td valign="top" width="50%">Bit</td><td valign="top" width="50%">Meaning
 <br></td></tr><tr align="left"><td valign="top" width="50%">0</td><td valign="top" width="50%">Fan failure in electronics, UPS in bypass
 <br></td></tr><tr align="left"><td valign="top" width="50%">1</td><td valign="top" width="50%">Fan failure in isolation unit
@@ -9592,6 +9620,8 @@ models. SmartUPS v/s and BackUPS Pro models report bits 0-5. All
 others report 0-4. State change of bits 1,2,5,6,7 are reported
 asynchronously with ? and = messages.
 
+<!-- tablename="Register 3 Layout" -->
+<!-- tcolumnwidths=0.3in,4.7in -->
   <p><table summary=""><tr align="left"><td valign="top" width="50%">Bit</td><td valign="top" width="50%">Meaning
 <br></td></tr><tr align="left"><td valign="top" width="50%">0</td><td valign="top" width="50%">Output unpowered due to shutdown by low battery
 <br></td></tr><tr align="left"><td valign="top" width="50%">1</td><td valign="top" width="50%">Unable to transfer to battery due to overload
@@ -9759,6 +9789,8 @@ reason.
 <p>There are at this time a maximum of 12 different values that can be
 programmed into the UPS EEPROM. They are:
 
+<!-- tablename="Programming the UPS EEPROM" -->
+<!-- tcolumnwidths=0.7in,1in,3.3in -->
   <p><table summary=""><tr align="left"><td valign="top" width="33%">Item</td><td valign="top" width="33%">Command</td><td valign="top" width="33%">Meaning
 <br></td></tr><tr align="left"><td valign="top" width="33%">1.</td><td valign="top" width="33%">c</td><td valign="top" width="33%">The UPS Id or name
 <br></td></tr><tr align="left"><td valign="top" width="33%">2.</td><td valign="top" width="33%">x</td><td valign="top" width="33%">The last date the batteries were replaced
@@ -9892,8 +9924,9 @@ the file if it already exists) and add the following line:
 
 <p><a name="Credits-_003c1_003e"></a>
 
-<h2 class="appendix">Appendix A Credits</h2>
+<h2 classme="Filename Table Layout" -->="appendix">Appendix A Credits</h2>
 
+<!-- imagename="Thanks" -->
 <div class="block-image"><img src="thanks.png" alt="thanks.png"></div>
 
   <p>The success of apcupsd is due to the many
