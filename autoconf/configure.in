@@ -115,7 +115,7 @@ AC_PROG_INSTALL 		dnl Determine a BSD install program.
 AC_PROG_AWK
 AC_ISC_POSIX
 
-if test x$CC = xgcc
+if test x$GCC = xyes
 then
 	AM_CONDITIONAL(HAVE_GCC, $TRUEPRG)
 	AC_DEFINE(HAVE_GCC)
@@ -127,13 +127,16 @@ dnl
 dnl Supply default CFLAGS, if not specified by `CFLAGS=flags ./configure'
 dnl   but only gcc has -Wall in general
 dnl
-if test x$CC = xgcc
+if test x$GCC = xyes
 then
-   CFLAGS=${CFLAGS-"-O2 -Wall"}
+  CFLAGS=${CFLAGS-"-g -O2"}
+  CFLAGS="${CFLAGS} -Wall"
+  LDFLAGS=${LDFLAGS-"-g -O"}
 else
-   CFLAGS=${CFLAGS--O2}
+  CFLAGS=${CFLAGS--O2}
+  LDFLAGS=${LDFLAGS--O}
 fi
-LDFLAGS=${LDFLAGS--O}
+
 
 CPPFLAGS="$CPPFLAGS"
 AC_SUBST(DEBUG)
@@ -583,11 +586,11 @@ AC_ARG_WITH(libwrap,
     _libs=${LIBS}
 
     if test "$withval" = "yes"; then
-	withval="/usr"
+      withval="/usr"
+    else
+      CPPFLAGS="${CPPFLAGS} -I${withval}/include"
+      LDFLAGS="${LDFLAGS} -L$withval/lib"
     fi
-
-    CPPFLAGS="${CPPFLAGS} -I${withval}/include"
-    LDFLAGS="${LDFLAGS} -L$withval/lib"
 
     LIBS="${LIBS} -lwrap -lnsl"
 
@@ -627,87 +630,108 @@ GDINCLUDE=
 LIBGD=
 LIBGDOBJ=
 CGI_IMGFMT=
+SYS_GD_FOUND=no
 AC_ARG_ENABLE(cgi,
   [  --enable-cgi 	       Compile CGI programs],
   [
    if test "$enableval" = "yes"
    then
-    ENABLE_CGI="yes"
-	CGI=cgi
+     ENABLE_CGI="yes"
+	 CGI=cgi
 dnl
 dnl First search for system library that defines gdImagePng
-    AC_CHECK_LIB(gd, gdImagePng,
-      [echo '  using PNG file format.'
-    AC_DEFINE(SYS_IMGFMT_PNG)
-    LIBS="$LIBS -lgd"],
-    [
+     AC_CHECK_LIB(gd, gdImagePng,
+       [
+         echo '  using PNG file format (/usr/lib).'
+         AC_DEFINE(SYS_IMGFMT_PNG)
+         LIBS="$LIBS -lgd"
+         SYS_GD_FOUND=yes
+       ], [], [])
 dnl
 dnl Second search for system library that defines gdImageGif
-      AC_CHECK_LIB(gd, gdImageGif,
-        [echo '  using GIF file format.'
-      AC_DEFINE(SYS_IMGFMT_GIF)
-      LIBS="$LIBS -lgd"],
-      [
+     if test "${SYS_GD_FOUND}" = "no"
+     then
+       AC_CHECK_LIB(gd, gdImageGif,
+         [
+           echo '  using GIF file format (/usr/lib).'
+           AC_DEFINE(SYS_IMGFMT_GIF)
+           LIBS="$LIBS -lgd"
+           SYS_GD_FOUND=yes
+         ], [], [])
+     fi
 dnl
 dnl Third in /usr/local search for system library that defines gdImagePng
-        _cppflags=${CPPFLAGS}
-        _ldflags=${LDFLAGS}
-        CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
-        LDFLAGS="${LDFLAGS} -L/usr/local/lib"
-        AC_CHECK_LIB(gd, gdImagePng,
-          [echo '  using PNG file format.'
-        AC_DEFINE(SYS_IMGFMT_PNG)
-        LIBS="$LIBS -lgd"],
-        [
+     if test "${SYS_GD_FOUND}" = "no"
+     then
+       _cppflags=${CPPFLAGS}
+       _ldflags=${LDFLAGS}
+       CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
+       LDFLAGS="${LDFLAGS} -L/usr/local/lib"
+dnl Destroy cached value
+       unset ac_cv_lib_gd_gdImagePng
+       AC_CHECK_LIB(gd, gdImagePng,
+         [
+           echo '  using PNG file format (/usr/local/lib).'
+           AC_DEFINE(SYS_IMGFMT_PNG)
+           LIBS="$LIBS -lgd"
+           SYS_GD_FOUND=yes
+         ], [], [])
+     fi
 dnl
 dnl Fourth in /usr/local search for system library that defines gdImageGif
-          AC_CHECK_LIB(gd, gdImageGif,
-            [echo '  using GIF file format.'
-          AC_DEFINE(SYS_IMGFMT_GIF)
-          LIBS="$LIBS -lgd"],
-          [
+     if test "${SYS_GD_FOUND}" = "no"
+     then
+dnl Destroy cached value
+       unset ac_cv_lib_gd_gdImageGif
+       AC_CHECK_LIB(gd, gdImageGif,
+         [
+           echo '  using GIF file format (/usr/local/lib).'
+           AC_DEFINE(SYS_IMGFMT_GIF)
+           LIBS="$LIBS -lgd"
+           SYS_GD_FOUND=yes
+         ], [], [])
+     fi
 dnl
 dnl As last resort, use provided GD library v1.2
-            if test -d src/gd1.2
-            then
-              CPPFLAGS=${_cppflags}
-              LDFLAGS=${_ldflags}
-              GDINCLUDE='-I$(topdir)/src/gd1.2'
-              LIBGD=gd1.2
-              LIBGDOBJ='$(topdir)/src/gd1.2/libgd.a'
-              AC_DEFINE(IMGFMT_GIF)
-            else
-              echo 'Your system lacks the GD library for compiling CGI'
-              echo 'programs. Please download this library from'
-              echo
-              echo 'ftp://ftp.apcupsd.com/pub/apcupsd/contrib/gd1.2.tar.gz'
-              echo
-              echo 'Untar the file inside the src/ directory so that'
-              echo 'the library is in src/gd1.2/ then you can succesfully'
-              echo 're-run the ./configure script.'
-              echo
-              echo 'Alternatively you can disable the CGI support.'
-              exit 1
-            fi
-          ], [])
-        ], [])
-      ], [])
-    ], [])
-	if test x"$GDINCLUDE" = x
-	then
-	  AC_CHECK_HEADER(gd.h, [ GDHEAD= ],
-	    [
-	      AC_CHECK_HEADER(gd/gd.h, [ GDHEAD="gd/" ],
-          [
-            echo 'Found system GD library but no header file.'
-            echo 'Please find the file gd.h in your system'
-            echo 'include directories and report its position'
-            echo 'to apcupsd-devel@apcupsd.com'
-            exit 1
-          ])
-        ])
-      AC_SUBST(GDHEAD)
-	fi
+     if test "${SYS_GD_FOUND}" = "no"
+     then
+       if test -d src/gd1.2
+       then
+         CPPFLAGS=${_cppflags}
+         LDFLAGS=${_ldflags}
+         GDINCLUDE='-I$(topdir)/src/gd1.2'
+         LIBGD=gd1.2
+         LIBGDOBJ='$(topdir)/src/gd1.2/libgd.a'
+         AC_DEFINE(IMGFMT_GIF)
+       else
+         echo 'Your system lacks the GD library for compiling CGI'
+         echo 'programs. Please download this library from'
+         echo
+         echo 'ftp://ftp.apcupsd.com/pub/apcupsd/contrib/gd1.2.tar.gz'
+         echo
+         echo 'Untar the file inside the src/ directory so that'
+         echo 'the library is in src/gd1.2/ then you can succesfully'
+         echo 're-run the ./configure script.'
+         echo
+         echo 'Alternatively you can disable the CGI support.'
+         exit 1
+       fi
+     fi
+	 if test x"$GDINCLUDE" = x
+	 then
+	   AC_CHECK_HEADER(gd.h, [ GDHEAD= ],
+	     [
+	       AC_CHECK_HEADER(gd/gd.h, [ GDHEAD="gd/" ],
+           [
+             echo 'Found system GD library but no header file.'
+             echo 'Please find the file gd.h in your system'
+             echo 'include directories and report its position'
+             echo 'to apcupsd-devel@apcupsd.com'
+             exit 1
+           ])
+         ])
+       AC_SUBST(GDHEAD)
+	 fi
    fi
   ])
 
