@@ -1390,7 +1390,7 @@ redhat)
       DISTVER="Enterprise "`cat $f | grep release |\
 	cut -f 6 -d ' '`
    else
-       DISTVER=`cat /etc/redhat-release | grep release |\
+      DISTVER=`cat /etc/redhat-release | grep release |\
 	cut -f 5 -d ' '`
    fi
    DFILES="\
