@@ -5874,7 +5874,7 @@ fi
 
 
 
-NISIP=0.0.0.0
+NISIP="0.0.0.0"
 # Check whether --with-nisip or --without-nisip was given.
 if test "${with_nisip+set}" = set; then
   withval="$with_nisip"
