@@ -33,7 +33,7 @@
 
 /*
  * The following is a work around for a problem in 2.6 kernel
- *  linux/hiddev.h file that should be fixed in 2.6.8
+ *  linux/hiddev.h file that is fixed in 2.6.9
  */
 #define HID_MAX_USAGES 1024
 
@@ -352,11 +352,6 @@ bool pusb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
 	    break;
 	case 0x0101001:
             val.UnitName = "AmpSecs";
-	    if (exponent == 0) {
-	       val.dValue = info->uref.value;
-	    } else {
-	       val.dValue = ((double)info->uref.value) * pow_ten(exponent);
-	    }
 	    break;
 	default:
             val.UnitName = "";
