@@ -13,10 +13,9 @@
 >
 
 <head>
-<meta name="Description" content="Bacula a network backup and restore program">
-<meta name="Keywords" content="Bacula, backup, restore, file backup">
+<meta name="Description" content="Apcupsd a monitoring daemon for APC UPSes">
+<meta name="Keywords" content="Apcupsd, APC, UPS, UNIX, monitor">
 <meta name="Copyright" content="Copyright (C) 2000-2002 Kern Sibbald and John Walker">
-<meta name="Trademark" content="Bacula (R) is a registered trademark of Kern Sibbald and John Walker">
 ##<link rel="stylesheet" href="bacula-styles.css" type="text/css">
 </head>
 
@@ -24,7 +23,7 @@
  <img src="apcupsd.gif" ALT="Apcupsd" height="64" width="584">
 </div>
 
-<table width=100% height=100% border="0" cellspacing="0" cellpading="4">
+<table height=100% border="0" cellspacing="0" cellpading="4">
 <tr> <td width=12% bgcolor="#ffffff" valign="top">
 #include "menu.inc"
 </td>
@@ -32,5 +31,6 @@
 <td bgcolor="#ffffff" valign="top">
 {#BODY#}
 </td>
+</tr>
 </table>
 {#BODY#:
