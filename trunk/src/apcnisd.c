@@ -318,6 +318,9 @@ int do_daemon(int argc, char *argv[])
 	 clilen = sizeof(cli_addr);
 	 newsockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &clilen);
 	 if (newsockfd < 0) {
+	     if (errno == EINTR) {
+		continue;	      /* try again */
+	     }
              Error_abort1("server: accept error. ERR=%s\n", strerror(errno));
 	 }
 

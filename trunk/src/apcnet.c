@@ -470,8 +470,12 @@ static int get_data_from_master(UPSINFO *ups)
 	    default:
 		break;
 	    }
+accept_again:
 	    if ((newsocketfd = accept(socketfd, (struct sockaddr *) &master_adr,
 				  &masterlen)) < 0) {
+		if (errno == EINTR) {
+		   goto accept_again;
+		}
 		slaves[0].remote_state = RMT_DOWN;
 		slaves[0].down_time = time(NULL);
 		slaves[0].ms_errno = errno;
