@@ -1,0 +1,51 @@
+<chapter><title>Overview of Serial-Interface UPSes</title>
+
+<para>If you have a UPS that communicates via serial port, you need to
+do two things before you can even think about configuring the
+software. First, you need to figure out whether it's a dumb
+(voltage-signalling) UPS or speaks the apcsmart protocol (see <link
+linkend='upstypes'>this discussion</link>).  Second, if you have an
+interface cable from APC, you need to figure out what kind it is.  If
+you don't have such a cable, you need to build one.  A
+straight-through serial cable <link linkend='crazy'>won't
+work</link>.</para>
+
+</chapter>
+<chapter><title>Connecting a Serial-Line UPS to a USB Port</title>
+
+<para>By using a special adaptor, you can connect your serial-line UPS
+to a USB port. If you would like to free up your serial port and
+connect your existing serial port UPS to a USB port, it is possible if
+you have one of the later kernels. You simply get a serial to USB
+adapter that is supported by the kernel, plug it in and make one minor
+change to your <filename>apcupsd.conf</filename> file and away you
+go. (Kern adds: Thanks to Joe Acosta for this out to
+me.)</para>
+
+<para>The device that Joe Acosta and Kern are using is IOgear guc232a USB 2
+serial adapter. There may be other adapters that work equally well.
+If you know of one, please let us know.</para>
+
+<para>At Kern's site, running Red Hat 7.1 with kernel 2.4.9-12, he
+simply changed his <filename>/etc/apcupsd/apcupsd.conf</filename>
+configuration line to be:</para>
+
+<programlisting>
+DEVICE /dev/ttyUSB0
+</programlisting>
+
+<para>Depending on whether or not you have <emphasis
+role="bold">hotplug</emphasis> working, you may need to explicitly
+load the kernel modules <emphasis role="bold">usbserial</emphasis> and
+<emphasis role="bold">pl2303</emphasis>. In Kern's case, this was not
+necessary.</para>
+
+<para>In fact, it turns out the protocol adaptor isn't necessary if
+you have the right cable.  The ports on APC USB UPSes not only speak
+USB, but also serial apcsmart and dumb voltage-signalling as well!
+This is something that one of our users discovered by accident. With the
+Custom RJ45 cable described below plugged into the APC UPS USB socket at
+one end and the other end plugged into a serial port on your PC, any
+APPC USB UPS will act as a serial-line device.</para>
+
+</chapter>
