@@ -880,8 +880,8 @@ int usb_ups_read_volatile_data(UPSINFO *ups)
 {
     USB_INFO uinfo;
 
+    Dmsg0(200, "Enter usb_ups_read_volatile_data\n");
     time(&ups->poll_time);	  /* save time stamp */
-
     write_lock(ups);
 
     /* UPS_STATUS -- this is the most important status for apcupsd */
@@ -898,15 +898,15 @@ int usb_ups_read_volatile_data(UPSINFO *ups)
 	    UPS_CLEAR_ONLINE();
 	}
 	if (get_value(ups, CI_BelowRemCapLimit, &uinfo) && uinfo.uref.value) {
-	UPS_SET(UPS_BATTLOW);
+	    UPS_SET(UPS_BATTLOW);
             Dmsg1(200, "BelowRemCapLimit=%d\n", uinfo.uref.value);
 	}
 	if (get_value(ups, CI_RemTimeLimitExpired, &uinfo) && uinfo.uref.value) {
-	UPS_SET(UPS_BATTLOW);
+	    UPS_SET(UPS_BATTLOW);
             Dmsg0(200, "RemTimeLimitExpired\n");
 	}
 	if (get_value(ups, CI_ShutdownImminent, &uinfo) && uinfo.uref.value) {
-	UPS_SET(UPS_BATTLOW);
+	    UPS_SET(UPS_BATTLOW);
             Dmsg0(200, "ShutdownImminent\n");
 	}
 	if (get_value(ups, CI_Boost, &uinfo) && uinfo.uref.value) {
@@ -926,26 +926,31 @@ int usb_ups_read_volatile_data(UPSINFO *ups)
     /* LINE_VOLTAGE */
     if (get_value(ups, CI_VLINE, &uinfo)) {
 	ups->LineVoltage = uinfo.dValue;
+        Dmsg1(200, "LineVoltage = %d\n", (int)ups->LineVoltage);
     }
 
     /* OUTPUT_VOLTAGE */
     if (get_value(ups, CI_VOUT, &uinfo)) {
 	ups->OutputVoltage = uinfo.dValue;
+        Dmsg1(200, "OutputVoltage = %d\n", (int)ups->OutputVoltage);
     }
 
     /* BATT_FULL Battery level percentage */
     if (get_value(ups, CI_BATTLEV, &uinfo)) {
 	ups->BattChg = uinfo.dValue;
+        Dmsg1(200, "BattCharge = %d\n", (int)ups->BattChg);
     }
 
     /* BATT_VOLTAGE */
     if (get_value(ups, CI_VBATT, &uinfo)) {
 	ups->BattVoltage = uinfo.dValue;
+        Dmsg1(200, "BattVoltage = %d\n", (int)ups->BattVoltage);
     }
 
     /* UPS_LOAD */
     if (get_value(ups, CI_LOAD, &uinfo)) {
 	ups->UPSLoad = uinfo.dValue;
+        Dmsg1(200, "UPSLoad = %d\n", (int)ups->UPSLoad);
     }
 
     /* LINE_FREQ */
@@ -956,6 +961,7 @@ int usb_ups_read_volatile_data(UPSINFO *ups)
     /* UPS_RUNTIME_LEFT */
     if (get_value(ups, CI_RUNTIM, &uinfo)) {
 	ups->TimeLeft = uinfo.dValue / 60;   /* convert to minutes */
+        Dmsg1(200, "TimeLeft = %d\n", (int)ups->TimeLeft);
     }
 
     /* UPS_TEMP */
