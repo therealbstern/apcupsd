@@ -1,10 +1,6 @@
 
 <font color="#0000ff" size=+2><b>General</b></font><br>
 <a href="index.html">Apcupsd Home</a><br>
-<a href="3.10.x-manual/pr02.html">What is Apcupsd?</a><br>
-<a href="3.10.x-manual/supported.html">Models and Cables</a><br>
-<a href="systems.html">Systems Supported</a><br>
-<a href="license.html">License</a><br>
 <a href="cusage/index.html">Site Visits</a><br>
 
 &nbsp;<br>
