@@ -243,13 +243,13 @@ static int send_to_slave(UPSINFO *ups, int who)
     send_data.OnBatt	    = htonl(l);
     l = (UPS_ISSET(UPS_BATTLOW) ? 1 : 0);
     send_data.BattLow	    = htonl(l);
-    l = ups->BattChg;
+    l = (long)ups->BattChg;
     send_data.BattChg	    = htonl(l);
     l = ups->ShutDown;
     send_data.ShutDown	    = htonl(l);
     l = ups->nettime;
     send_data.nettime	    = htonl(l);
-    l = ups->TimeLeft;
+    l = (long)ups->TimeLeft;
     send_data.TimeLeft	    = htonl(l);
     l = (UPS_ISSET(UPS_REPLACEBATT) ? 1 : 0);
     send_data.ChangeBatt    = htonl(l);

@@ -88,7 +88,7 @@ extern UPSINFO *core_ups;
  * Actually WinNT does have a system log, but we don't use it
  * here.
  */
-void syslog (int type, const char *fmt, ...)
+void syslog(int type, const char *fmt, ...)
 {
    UPSINFO *ups = core_ups;
    va_list  arg_ptr;
@@ -100,12 +100,14 @@ void syslog (int type, const char *fmt, ...)
    avsnprintf(msg, sizeof(msg), fmt, arg_ptr);
    va_end(arg_ptr);
       
+#ifdef needed
    printf("syslog: %s\n", msg);
    fflush(stdout);
+#endif
 
    /* Write out to our temp file. LOG_INFO is DATA logging, so
       do not write it to our temp events file. */
-   if (ups->event_fd < 0) {
+   if (ups == NULL || ups->event_fd < 0) {
        int lm;
        time_t nowtime;
        int tmp_fd;
@@ -121,8 +123,9 @@ void syslog (int type, const char *fmt, ...)
           strftime(datetime, 100, "%a %b %d %X %Z %Y  ", &tm);
 	  write(tmp_fd, datetime, strlen(datetime));
 	  lm = strlen(msg);
-          if (msg[lm-1] != '\n') 
+          if (msg[lm-1] != '\n') {
              msg[lm++] = '\n';
+	  }
 	  write(tmp_fd, msg, lm);
 	  close(tmp_fd);
        }

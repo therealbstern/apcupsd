@@ -89,7 +89,7 @@ int trim_eventfile(UPSINFO *ups)
        return 0;	       /* file is not yet too large - nothing to do */
 
     maxb = (maxb*80)/100;      /* file is too large - reduce to 80% of max */
-    buf = malloc(maxb);
+    buf = (unsigned char *)malloc(maxb);
     if ( !buf )
 	return -1;
 
@@ -162,7 +162,7 @@ int output_events(int sockfd, FILE *events_file)
     for (i=0; i<NLE; i++)
 	le[i] = NULL;
     for (i=0; i<NLE; i++)
-	if ((le[i] = malloc(MAXSTRING)) == NULL)
+	if ((le[i] = (char *)malloc(MAXSTRING)) == NULL)
 	    goto bailout;
     i = 0;
     while (fgets(le[i], MAXSTRING, events_file) != NULL) {

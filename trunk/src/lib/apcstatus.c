@@ -93,7 +93,7 @@ int output_status(UPSINFO *ups, int sockfd,
         s_write(ups, "UPSNAME  : %s\n", ups->upsname);
     s_write(ups, "CABLE    : %s\n", ups->cable.long_name);
     s_write(ups, "MODEL    : %s\n", ups->mode.long_name);
-    s_write(ups, "UPSMODE  : %s\n", ups->class.long_name);
+    s_write(ups, "UPSMODE  : %s\n", ups->upsclass.long_name);
     localtime_r(&ups->start_time, &tm);
     strftime(datetime, 100, "%a %b %d %X %Z %Y", &tm);
     s_write(ups, "STARTTIME: %s\n", datetime);

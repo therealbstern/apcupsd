@@ -294,30 +294,30 @@ int main (int argc, char *argv[]) {
 	case NET:
             pmsg("sharenet.type = NET\n");
 
-	    switch(ups->class.type) {
+	    switch(ups->upsclass.type) {
 		case NO_CLASS:
-                    pmsg("class.type = NO_CLASS\n");
+                    pmsg("upsclass.type = NO_CLASS\n");
 		    break;
 		case STANDALONE:
-                    pmsg("class.type = STANDALONE\n");
+                    pmsg("upsclass.type = STANDALONE\n");
 		    break;
 		case SHARESLAVE:
-                    pmsg("class.type = SHARESLAVE\n");
+                    pmsg("upsclass.type = SHARESLAVE\n");
 		    break;
 		case SHAREMASTER:
-                    pmsg("class.type = SHAREMASTER\n");
+                    pmsg("upsclass.type = SHAREMASTER\n");
 		    break;
 		case SHARENETMASTER:
-                    pmsg("class.type = SHARENETMASTER\n");
+                    pmsg("upsclass.type = SHARENETMASTER\n");
 		    break;
 		case NETSLAVE:
-                    pmsg("class.type = NETSLAVE\n");
+                    pmsg("upsclass.type = NETSLAVE\n");
 		    break;
 		case NETMASTER:
-                    pmsg("class.type = NETMASTER\n");
+                    pmsg("upsclass.type = NETMASTER\n");
 		    break;
 		default:
-                    pmsg("class.type = DEFAULT\n");
+                    pmsg("upsclass.type = DEFAULT\n");
 		    break;
 
 		}
@@ -466,7 +466,7 @@ int main (int argc, char *argv[]) {
 	    setup_device(ups);
 	    break;
 	case NET:
-	    switch(ups->class.type) {
+	    switch(ups->upsclass.type) {
 		case NO_CLASS:
 		case STANDALONE:
 		case SHARESLAVE:
@@ -1227,7 +1227,7 @@ Giving up.\n");
       pmsg("Bad response from write: %d %s\n", stat, strerror(errno));
    }
    *answer = 0;
-   for (i=0; i < sizeof(answer); i++) {
+   for (i=0; i < (int)sizeof(answer); i++) {
       stat = read(ups->fd, &cmd, 1);
       if (stat < 0) {
          pmsg("Bad response from read: %s\n", strerror(errno));

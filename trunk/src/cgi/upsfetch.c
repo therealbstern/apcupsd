@@ -199,13 +199,13 @@ int fetch_events(char *host)
     */
    while ((n = net_recv(sockfd, buf, sizeof(buf)-1)) > 0) {
       /* terminate string for strlen()-calls in next lines */
-      if (n >= sizeof(buf)) {
-	 n = sizeof(buf)-1;
+      if (n >= (int)sizeof(buf)) {
+	 n = (int)sizeof(buf)-1;
       }
       buf[n] = 0;			 /* ensure string terminated */
       len = strlen(buf);
       /* if message is bigger than the buffer, truncate it */
-      if (len < sizeof(statbuf)) {
+      if (len < (int)sizeof(statbuf)) {
 	 /* move previous messages to the end of the buffer */
 	 memmove(statbuf+len, statbuf, sizeof(statbuf)-len);
 	 /* copy new message */

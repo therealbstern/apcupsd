@@ -172,25 +172,25 @@ code of hid-dev.c to have the correct device address.
 <h2>Building and Installing apcupsd</h2>
 If you have gotten this far successfully, the last step should
 go fairly easily. You need a beta version 3.9.4 or later of
-apcupsd. We recommend version 3.9.8.
+apcupsd. We recommend version 3.10.5 or later.
 Follow the instructions in the <a href="install.html">Installation Chapter</a>
 of this manual, being sure to include the following options (in addition
 to any others you need) on the <b>./configure</b> line:
 <pre>
   ./configure \
-  --with-serial-dev=/dev/usb/hid/hiddev[0-9] \
+  --with-serial-dev=/dev/usb/hid/hiddev[0-15] \
   --with-upstype=usb \
   --with-upscable=usb \
   --enable-pthreads \
   --enable-usb
 </pre>
 Please note, it is IMPORTANT to include the 
-<b>--with-serial-dev=/dev/usb/hid/hiddev[0-9] \</b>
+<b>--with-serial-dev=/dev/usb/hid/hiddev[0-15] \</b>
 line. This will cause the <b>apcupsd.conf</b> file to contain:
 <pre>
-DEVICE /dev/usb/hid/hiddev[0-9]
+DEVICE /dev/usb/hid/hiddev[0-15]
 </pre>
-The <b>[0-9]</b> is not a typo, but should be entered exactly
+The <b>[0-15]</b> is not a typo, but should be entered exactly
 as shown. This is because the UPS can change device numbers
 while it is running. Every time there is a blip or slowdown
 on the USB line, the kernel will invalidate the UPS connection,

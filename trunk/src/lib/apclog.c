@@ -72,10 +72,11 @@ void log_event(UPSINFO *ups, int level, char *fmt, ...)
      *
      *	  VERSION 4.0 stupidities
      */
-     if (ups == (UPSINFO *)&gcfg)
+     if (ups == (UPSINFO *)&gcfg) {
 	 event_fd = gcfg.event_fd;
-     else
+     } else {
 	 event_fd = ups->event_fd; /* on version 3 this is true */
+     }
 #else
     event_fd = ups->event_fd;
 #endif

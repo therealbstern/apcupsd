@@ -15,7 +15,7 @@
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static char rcsid[] = "$Id: inet_pton.c,v 1.3 2003-01-29 14:01:35 kerns Exp $";
+static char rcsid[] = "$Id: inet_pton.c,v 1.4 2003-03-21 09:03:36 kerns Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 #include "apc.h"
@@ -218,10 +218,7 @@ inet_pton6(src, dst)
 }
 #else
 int
-inet_pton(af, src, dst)
-	int af;
-	const char *src;
-	void *dst;
+inet_pton(int af, const char *src, void *dst)
 {
    return -1;			      /* not implemented */
 }
