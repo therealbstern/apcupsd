@@ -352,6 +352,7 @@ int main(int argc, char *argv[]) {
 	    if (kill_ups_power) {
                 Error_abort0(_("Ignoring killpower for slave\n"));
 	    }
+	    setup_device(ups);
 	    if (prepare_slave(ups)) {
                 Error_abort0(_("Error setting up slave\n"));
 	    }

@@ -5,7 +5,7 @@
    <meta name="Author" content="Kern Sibbald">
                 <link rel=stylesheet href="apcupsd-styles.css" type="text/css">
 </head>
-<BODY>
+<body>
 <H1>Building and Installing Apcupsd</H1>
 <P>The installation can be made several different ways
 depending on what system you are running. The basic
@@ -21,26 +21,26 @@ below for more details of the
 Windows install.
 <p>
 The basic installation from a tar source file is rather simple: 
-</P>
-<OL>
-        <LI style="margin-bottom: 0.1in">Detar the source code.</li>
-        <LI style="margin-bottom: 0.1in"><B>cd</B> to the directory containing the source code.</li>
-        <LI style="margin-bottom: 0.1in">./configure (with appropriate options as described below)</li>
-        <LI style="margin-bottom: 0.1in">make</li>
-                <li style="margin-bottom: 0.1in">su (i.e. become root)</li>
-                <li style="margin-bottom: 0.1in">Stop any running apcupsd<br>
-                                                 &lt;system-dependent-path&gt;/apcupsd stop</li>
-        <li style="margin-bottom: 0.1in">uninstall any old <b>apcupsd</b><br>
-                                                 This is important since the default install locations
-                                                                                 may have changed.</li>
-        <LI style="margin-bottom: 0.1in">make install</li>
-                <LI style="margin-bottom: 0.1in">edit your /etc/apcupsd/apcupsd.conf file if necessary</li>
-                <LI style="margin-bottom: 0.1in">ensure that your halt script is properly updated</li>
-                <li style="margin-bottom: 0.1in">Start the new <b>apcupsd</b> with:<br>
-                &lt;system-dependent-path&gt;/apcupsd start</li>
-                <LI style="margin-bottom: 0.1in">IMPORTANT! Test the installation as outlined in the
-                   <a href="testing.html">Testing Chapter</a> of this document.</li>
-</OL>
+</p>
+<ol>
+   <li style="margin-bottom: 0.1in">Detar the source code.</li>
+   <li style="margin-bottom: 0.1in"><B>cd</B> to the directory containing the source code.</li>
+   <li style="margin-bottom: 0.1in">./configure (with appropriate options as described below)</li>
+   <li style="margin-bottom: 0.1in">make</li>
+   <li style="margin-bottom: 0.1in">su (i.e. become root)</li>
+   <li style="margin-bottom: 0.1in">Stop any running apcupsd<br>
+          &lt;system-dependent-path&gt;/apcupsd stop</li>
+   <li style="margin-bottom: 0.1in">uninstall any old <b>apcupsd</b><br>
+        This is important since the default install locations
+        may have changed.</li>
+   <li style="margin-bottom: 0.1in">make install</li>
+   <li style="margin-bottom: 0.1in">edit your /etc/apcupsd/apcupsd.conf file if necessary</li>
+   <li style="margin-bottom: 0.1in">ensure that your halt script is properly updated</li>
+   <li style="margin-bottom: 0.1in">Start the new <b>apcupsd</b> with:<br>
+          &lt;system-dependent-path&gt;/apcupsd start</li>
+   <li style="margin-bottom: 0.1in">IMPORTANT! Test the installation as outlined in the
+              <a href="testing.html">Testing Chapter</a> of this document.</li>
+</ol>
 <P>If all goes well, the <B>./configure</B> will correctly determine
 which operating system you are running and configure the source code
 appropriately. <B>configure</B> currently recognizes the systems
@@ -63,7 +63,7 @@ For systems other than those mentioned above, you may need to do some tweaking.
 built and that everything is placed into the correct directories. 
 <p>On RedHat, I use the following:
 <pre>
-CFLAGS="-g -Wall" LDFLAGS="-g -Wall" ./configure \
+CFLAGS="-g -O2" LDFLAGS="-g" ./configure \
   --prefix=/usr \
   --sbindir=/sbin \
   --with-cgi-bin=/home/www/sibbald/new/cgi-bin \
@@ -183,117 +183,141 @@ of this document. In addition, you will find some schematic diagrams of the poss
 configurations in the <a href="configure.html">Configuration Chapter</a>.</p>
 <p>The following command line options are available for <b>configure</b> to customize your
 installation.</p>
-<DL>
-  <DT>--prefix=&lt;path&gt;</DT><DD>
+<dl>
+  <dt>--prefix=&lt;path&gt;</dt><dd>
         This defines the directory for the non-executable files such as the
-        manuals. The default is <B>/usr</B>.</DD>
-                <DD STYLE="font-weight: medium"></DD>
-  <DT>--sbindir=&lt;path&gt; </DT><DD>
+        manuals. The default is <B>/usr</B>.</dd>
+        <dd STYLE="font-weight: medium"></dd>
+  <dt>--sbindir=&lt;path&gt; </dt><dd>
         This defines the directory for the executable files such as <B>apcupsd</B>.
         The default is <B>/sbin</B>. You may be tempted to place the 
-                executable files in /usr/sbin or /usr/local/sbin. Please use caution
-                here as these directories may be unmounted during a shutdown and thus
-                may prevent the <b>halt</b> script from calling <b>apcupsd</b> to
-                turn off the UPS power. Though your data will be protected, in this case, your system
-                will probably not be automatically rebooted when the power returns.</DD>
-  <DT>--enable-powerflute</DT><DD>
+        executable files in /usr/sbin or /usr/local/sbin. Please use caution
+        here as these directories may be unmounted during a shutdown and thus
+        may prevent the <b>halt</b> script from calling <b>apcupsd</b> to
+        turn off the UPS power. Though your data will be protected, in this case, your system
+        will probably not be automatically rebooted when the power returns.</dd>
+  <dt>--enable-powerflute</dt><dd>
         This option enables the building of the <B>powerflute</B>
         executable, which is a ncurses based program to monitor the UPS. This
-                program is not necessary for the proper execution of <b>apcupsd</b>.
-        </DD>
-  <DT>--enable-cgi</DT><DD>
+        program is not necessary for the proper execution of <b>apcupsd</b>.
+        </dd>
+  <dt>--enable-cgi</dt><dd>
         This enables the building of the CGI programs that permit Web
         browser access to <B>apcupsd</B> data. This option is not necessary for
-                the proper execution of <b>apcupsd</b>.
-        </DD>
-  <DT>--with-cgi-bin=&lt;path&gt;</DT><DD STYLE="margin-bottom: 0.2in">
+        the proper execution of <b>apcupsd</b>.
+        </dd>
+  <dt>--with-cgi-bin=&lt;path&gt;</dt><dd STYLE="margin-bottom: 0.2in">
         The with-cgi-bin configuration option allows you to define the
         directory where the cgi programs will be installed. The default
-                is /etc/apcupsd, which is not necessarily what you want.
-        </DD>
+        is /etc/apcupsd, which is not necessarily what you want.
+        </dd>
   <dt>--with-css-dir=&lt;path&gt;</dt><dd>
         This option allows you to specify where you want <b>apcupsd</b>
-                to put the Cascading Style Sheet that goes with the <b>multimoncss.cgi</b>
-                CGI program.</dd>
+        to put the Cascading Style Sheet that goes with the <b>multimoncss.cgi</b>
+        CGI program.</dd>
+  <dt>--enable-master-slave</dt><dd>Turns on the master/slave networking code
+        (default). This is sometimes referred to as the old master/slave code</dd>
+  <dt>--enable-apcsmart</dt><dd>Turns on generation of the APC Smart driver 
+        (default).</dd>
+  <dt>--enable-dumb</dt><dd>Turns on generation of the dumb signaling driver
+        code (default).</dd>
+  <dt>--enable-usb</dt><dd>Turns on generation of the Linux (only) USB driver
+        code. By default this is disabled.</dd>
+  <dt>--enable-net</dt><dd>Turns on generation of the NIS network driver for
+        slaves. This is an alternative to master/slave code. For the master,
+        this code should be disabled. For each slave, this is the only driver
+        needed.  This driver works by reading the information from the the
+        configured master using the NIS (Network Information Services) interface.
+        </dd>
+  <dt>--enable-snmp</dt><dd>Turns on generation of the SNMP driver. This driver
+        will control the computer by reading the UPS information over the
+        network assuming you are running SNMP. By default this is disabled. </dd>
+  <dt>--enable-test</dt><dd>This turns on a test driver that is used only for
+        debugging. By default it is disabled.</dd>
+  <dt>--enable-nis</dt><dd>Turns on the Network Information Server (NIS) code
+        within apcupsd. This is enabled by default. If you do not want to
+        access the status of the UPS from the network and you are not controlling
+        any slaves via NIS (enable-net), this can be disabled. </dd>
   <dt>--enable-pthreads</dt><dd>
         This option enables pthreads support causing <b>apcupsd</b> to be
-                built as a threaded program rather than forking to create separate 
-                processes. <b>apcupsd</b> built in this fashion is more efficient
-                that the standard version being one third the data size and 
-                less overhead locking and coping shared memory. This option is
-                <b>highly</b> recommended for Windows builds.</dd>
+        built as a threaded program rather than forking to create separate 
+        processes. <b>apcupsd</b> built in this fashion is more efficient
+        that the standard version being one third the data size and 
+        less overhead locking and coping shared memory. This option is
+        <b>highly</b> recommended for Windows builds.</dd>
   <dt>--with-libwrap=&lt;path&gt;</dt><dd>
         This option when enabled causes <b>apcupsd</b> to be built with
-                the TCP WRAPPER library for enhanced security.</dd> In most cases,
-                the &lt;path&gt; is optional since configure will determine where the
-                libraries are on most systems.
+        the TCP WRAPPER library for enhanced security.</dd> In most cases,
+        the &lt;path&gt; is optional since configure will determine where the
+        libraries are on most systems.
   <dt>--with-nologin=&lt;path&gt;</dt><dd>
         This option allows you to specify where <b>apcupsd</b> will create
-                the nologin file when logins are prohibited. The default is
-                <b>/etc</b></dd>
+        the nologin file when logins are prohibited. The default is
+         <b>/etc</b></dd>
   <dt>--with-pid-dir=&lt;path&gt;</dt><dd>
         This option allows you to specify where <b>apcupsd</b> will create
-                the process id (PID) file to prevent multiple copies from
-                running. The default is system dependent but usually <b>/var/run</b>.
-                </dd>
+        the process id (PID) file to prevent multiple copies from
+        running. The default is system dependent but usually <b>/var/run</b>.
+        </dd>
   <dt>--with-log-dir=&lt;path&gt;</dt><dd>
         This option allows you to specify where <b>apcupsd</b> will create
-                the EVENTS and STATUS log files. The default is <b>/etc/apcupsd</b>.
-                This option simply sets the appropriate path in the <b>apcupsd.conf</b>
-                file, which can be changed at any later time.</dd>
+        the EVENTS and STATUS log files. The default is <b>/etc/apcupsd</b>.
+        This option simply sets the appropriate path in the <b>apcupsd.conf</b>
+        file, which can be changed at any later time.</dd>
   <dt>--with-lock-dir=&lt;path&gt;</dt><dd>
         This option allows you to specify where <b>apcupsd</b> will create
-                create the serial port lock file. The default is system dependent
-                but usually <b>/var/lock</b>.
-                This option simply sets the appropriate path in the <b>apcupsd.conf</b>
-                file, which can be changed at any later time.</dd>
+        create the serial port lock file. The default is system dependent
+        but usually <b>/var/lock</b>.
+        This option simply sets the appropriate path in the <b>apcupsd.conf</b>
+        file, which can be changed at any later time.</dd>
   <dt>--with-pwrfail-dir=&lt;path&gt;</dt><dd>
         This option allows you to specify where <b>apcupsd</b> will create
-                the <b>powerfail</b> file when a power failure occurs. The default
-                is system dependent but usually <b>/etc</b>.</dd>
+        the <b>powerfail</b> file when a power failure occurs. The default
+        is system dependent but usually <b>/etc</b>.</dd>
   <dt>--with-serial-dev=&lt;device-name&gt;</dt><dd>
         This option allows you to specify where <b>apcupsd</b> will look
-                for the serial device. The default is system dependent, but often
-                <b>/dev/ttyS0</b>.
-                This option simply sets the appropriate device name in the <b>apcupsd.conf</b>
-                file, which can be changed at any later time.</dd>
+        for the serial device. The default is system dependent, but often
+        <b>/dev/ttyS0</b>.
+        This option simply sets the appropriate device name in the <b>apcupsd.conf</b>
+        file, which can be changed at any later time.</dd>
   <dt>--with-nis-port=&lt;port&gt;</dt><dd>
         This option allows you to specify what port <b>apcupsd</b> will use
-                for the Network Information Server (the CGI programs). The default
-                is system dependent but usually 7000.
-                This option simply sets the appropriate port in the <b>apcupsd.conf</b>
-                file, which can be changed at any later time.</dd>
+        for the Network Information Server (the CGI programs). The default
+        is system dependent but usually 3551 because that port has
+        been officially assigned to <b>apcupsd</b> by the IANA.
+        This option simply sets the appropriate port in the <b>apcupsd.conf</b>
+        file, which can be changed at any later time.</dd>
   <dt>--with-nisip=&lt;IP-Address&gt;</dt><dd>
         This option allows you to specify the value that will be placed
-                 on then NISIP directive in the configuration file. The 
-                 default is 0.0.0.0. No checking is done on the value entered,
-                 so you must ensure that it is a valid IP address.</dd>
+        on then NISIP directive in the configuration file. The 
+        default is 0.0.0.0. No checking is done on the value entered,
+        so you must ensure that it is a valid IP address.</dd>
   <dt>--with-net-port=&lt;port&gt;</dt><dd>
         This option allows you to specify what port <b>apcupsd</b> will use
-                for the Master and Slave communications. The default is system dependent
-                but usually 6666.
-                This option simply sets the appropriate port in the <b>apcupsd.conf</b>
-                file, which can be changed at any later time.</dd>
+        for the Master and Slave communications. The default is system dependent
+        but usually 6666.
+        This option simply sets the appropriate port in the <b>apcupsd.conf</b>
+        file, which can be changed at any later time.</dd>
   <dt>--with-upstype=&lt;type&gt;</dt><dd>
         This option allows you to specify the type of UPS that will be 
-                connected to your computer. The default is: <b>smartups</b>.
-                This option simply sets the appropriate UPS type in the <b>apcupsd.conf</b>
-                file, which can be changed at any later time.</dd>
+        connected to your computer. The default is: <b>smartups</b>.
+        This option simply sets the appropriate UPS type in the <b>apcupsd.conf</b>
+        file, which can be changed at any later time.</dd>
   <dt>--with-upscable=&lt;path&gt;</dt><dd>
         This option allows you to specify what cable you are using to
-                connect to the UPS. The default is: <b>smart</b>.
-                This option simply sets the appropriate UPS cable in the <b>apcupsd.conf</b>
-                file, which can be changed at any later time.</dd>
+        connect to the UPS. The default is: <b>smart</b>.
+        This option simply sets the appropriate UPS cable in the <b>apcupsd.conf</b>
+        file, which can be changed at any later time.</dd>
   <dt>--disable-install-distdir</dt><dd>
         This option modifies the <b>apcupsd</b> Makefiles disable installation
-                of the distribution (platform) directory. Generally, this used to
-                do a full installation of <b>apcupsd</b> except the final modification
-                of the operating system files (normally /etc/rc.d/halt, etc.). This is
-                useful if your operating system is not directly supported by <b>apcupsd</b>
-                or if you want to run two copies of <b>apcupsd</b> on the same system.
-                This option can also be used by those of you who prefer to manually
-                reboot your system after a power failure or who do not want to
-                modify your system halt files. </dd>
+        of the distribution (platform) directory. Generally, this used to
+        do a full installation of <b>apcupsd</b> except the final modification
+        of the operating system files (normally /etc/rc.d/halt, etc.). This is
+        useful if your operating system is not directly supported by <b>apcupsd</b>
+        or if you want to run two copies of <b>apcupsd</b> on the same system.
+        This option can also be used by those of you who prefer to manually
+        reboot your system after a power failure or who do not want to
+        modify your system halt files. </dd>
 
 </DL>
 <H2>Recommended Options for most Systems</H2>
@@ -317,7 +341,7 @@ this:
 Or on systems that have the <b>env</b> program, you can do it like this:
 <p class=tty>env CPPFLAGS=-I/usr/local/include LDFLAGS=-s ./configure</p>
 <p>Or for example on the Sun Solaris system, you can use:
-<p class=tty>setenv CFLAGS -xO2
+<p class=tty>setenv CFLAGS -O2
 <p class=tty>setenv LDFLAGS -O
 <p class=tty>./configure
 
@@ -335,7 +359,6 @@ automatic).
 <p>Below, you will find a list of Operating Systems for
 which we have received installation files:</p>
 <a href="install.html#Alpha">Alpha</a><br>
-<a href="install.html#Caldera">Caldera</a><br>
 <a href="install.html#Debian">Debian</a><br>
 <a href="install.html#FreeBSD">FreeBSD</a><br>
 <a href="install.html#HPUX">HPUX</a><br>
@@ -367,9 +390,6 @@ check that this file has been correctly updated.
 <pre>
 /sbin/init.d/apcupsd
 </pre>
-<h2><a name="Caldera"></a>Caldera</h2>
-This port appears to be complete, but we have had
-no feedback from users. 
  
 <h2><a name="Debian"></a>Debian</h2>
 This port is complete and is operation by several
@@ -565,7 +585,7 @@ detailed below, then exit from the su'ed shell.
 In order to support unattended operation and shutdown during a power
 failure, it's important that the UPS remove power after the shutdown
 completes. This allows the unattended UPS to reboot the system when 
-power returns by repowering the system. Of course, you need autoboot
+power returns by re-powering the system. Of course, you need autoboot
 enabled for your system to do this, but all Solaris systems have this
 by default. If you have disabled this on your system, please re-enable
 it. 
@@ -701,17 +721,12 @@ If you have a binary release of the <b>Win32 apcupsd</b>, please
 see the instructions in the <a href="win32.html">Win32 section</a>
 of this manual.
 <p>If you wish to build from the source, and 
-if you have CYGWIN version 1.3.2 and GCC 2.95.3-5 installed, it
+if you have CYGWIN version 1.3.20 and GCC 2.95.3-5 installed, it
 is possible to build the Win32 version of <b>apcupsd</b>.
-Note, <b>apcupsd</b> version 3.8.0 as distributed was built with CYGWIN
-version 1.1.2 but works fine when built and run with CYGWIN
-1.1.5. Version 3.8.2 was built with CYGWIN version 1.3.1-1, and
-versions 3.8.3 and 3.8.4 of <b>apcupsd</b> are
-built with CYGWIN version 1.3.2.
 Please don't try any other versions of CYGWIN as there
 were known problems.  
 <p>To date, the Win32 version has only been build on a Win98
-SR2 system with the above CYGWIN environment and all the 
+SR2 and a WinXP system with the above CYGWIN environment and all the 
 available CYGWIN tools loaded. In addition, the builds were
 done running under the <b>bash</b> shell. As time permits,
 we will experiment with other environments, and if any of you
@@ -739,14 +754,6 @@ make
 And to install <b>apcupsd</b>, do:
 <p></p>
 <pre>make install</pre>
-<p>
-During linking of <b>popup.exe</b> and <b>apcupsd.exe</b>, the following warning
-message is printed:
-<pre>
-/USR/BIN/ld: warning: cannot find entry symbol _WinMainCRTStartup; defaulting to 00401000
-</pre>
-This warning causes no harm. If there is some CYGWIN guru out there who knows how to
-eliminate this error, please contact us at: apcupsd-devel at apcupsd.org 
 <p>
 Finally, you should follow the installation instructions in
 the <a href="win32.html">Win32 Installation</a> section of

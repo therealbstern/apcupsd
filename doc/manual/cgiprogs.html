@@ -60,13 +60,13 @@ MONITOR polymatou:7001 &quot;APC USB UPS&quot;
 </pre>
 where the USB copy of <b>apcupsd</b> has been configured to use
 port 7001 (with --with-nis-port=7001 on the ./configure or by
-modifying apcupsd.conf). Note, the default NIS port is 7000 on
+modifying apcupsd.conf). Note, the default NIS port is 3551 on
 most platforms.
 
 <p>To test multimon.cgi, you can execute it as non-root directly
 from the source cgi build directory.  To do so, enter at a shell prompt:
 <p class="tty">./multimon.cgi</p>
-If everything is setup correctly, it will print a bunch of html
+If everything is setup correctly, it will print a bunch of HTML
 with the values of the machines that you have put in the <b>hosts.conf</b>
 file. It should look something like the following (note, only a small
 portion of the output is reproduced here):
@@ -102,7 +102,7 @@ readable.
 
 <p>To invoke <b>multimon</b> in your Web browser, enter:
 <p class="tty">http://&lt;your-site&gt;/cgi-bin/multimon.cgi</p>
-You should get something similar to the screenshot shown below.
+You should get something similar to the screen shot shown below.
 </P>
 <p>If you wish additional control over the colors, type faces, and sizes
 of the multimon output, you might wish to use <b>multimoncss.cgi</b> in
@@ -240,7 +240,7 @@ is not a valid command.  The control-D
 terminates the <b>client</b> program.  
 <h2>A Tip from Carl Erhorn for Sun Systems</h2>
 It is possible to run the CGI code to monitor
-your UPS using the answerbook http server that runs on Solaris.
+your UPS using the answerbook HTTP server that runs on Solaris.
 As long as your server has the Answerbook2 web server installed and running, 
 you can insert the cgi scripts into the cgi directory of the web server, 
 and access the cgi using something like:

@@ -109,38 +109,46 @@ contacting the slave on the network port.
 Master/slave problems are usually related to one of 
 the following items:
 <ol type="1">
-        <li>Improper apcupsd.conf files. A good starting point are the
-        master/slave example files in the examples subdirectory of the
-        source.</li>
-        <li>Master or slave IP address or name incorrect. Try ping'ing
-        each machine from the other using the names or addresses that
-        you have put in the respective apcupsd.conf files.</li>
-        <li>Make sure no other program is using socket number 6666 or
-        change the NETPORT directive in both apcupsd.conf files.</li>
-        <li>Make sure you are using the same version of apcupsd on
-        both the master and slave machines.</li>
+  <li>Improper apcupsd.conf files. A good starting point are the
+  master/slave example files in the examples subdirectory of the
+  source.</li>
+  <li>Master or slave IP address or name incorrect. Try ping'ing
+  each machine from the other using the names or addresses that
+  you have put in the respective apcupsd.conf files.</li>
+  <li>Make sure no other program is using socket number 6666 or
+  change the NETPORT directive in both apcupsd.conf files.</li>
+  <li>Make sure you are using the same version of apcupsd on
+  both the master and slave machines.</li>
 </ol>
 
 <h2>CGI Programs Do Not Work</h2>
 Try checking the following:
 <ol type="1">
-        <li>Did you successfully compile and link the cgi programs without
-        errors?  If not sure, cd to the cgi directory, do a &quot;make clean&quot;
-        followed by a &quot;make&quot;</li>
-        <li>Did you move or copy all the .cgi programs in the cgi directory
-        to your Web server cgi-bin directory on the SAME machine?</li>
-        <li>Did you verify that the cgi programs located in the cgi-bin all have
-        execute permission?</li>
-        <li>Have you tried any other cgi programs and proven that they work?</li>
-        <li>Have you verified that the Network Information Server process
-        of <b>apcupsd</b> is running as described in this manual?</li>
-        <li>Have you verified that your <b>apcupsd.conf</b> file is properly
-        configured for the Network Information Server and that the port is
-        defined as 7000? I.e. &quot;NETSERVER on&quot; and &quot;SERVERPORT 7000&quot;</li>
-        <li>If one or more machines does not show up in the multimon output, it is
-        most likely due to a configuration error in the <b>hosts.conf</b> file
-        in your <b>/etc/apcupsd</b> directory.</li>
+  <li>Did you successfully compile and link the cgi programs without
+  errors?  If not sure, cd to the cgi directory, do a &quot;make clean&quot;
+  followed by a &quot;make&quot;</li>
+  <li>Did you move or copy all the .cgi programs in the cgi directory
+  to your Web server cgi-bin directory on the SAME machine?</li>
+  <li>Did you verify that the cgi programs located in the cgi-bin all have
+  execute permission?</li>
+  <li>Have you tried any other cgi programs and proven that they work?</li>
+  <li>Have you verified that the Network Information Server process
+  of <b>apcupsd</b> is running as described in this manual?</li>
+  <li>Have you verified that your <b>apcupsd.conf</b> file is properly
+  configured for the Network Information Server and that the port is
+  defined as 3551? I.e. &quot;NETSERVER on&quot; and &quot;NISPORT 3551&quot;
+  Please note that in releases prior to 3.10.6, the default NISPORT was
+  7000. It is far preferable to use port 3551 since it was specifically
+  assigned to apcupsd by IANA. </li>
+  <li>If one or more machines does not show up in the multimon output, it is
+  most likely due to a configuration error in the <b>hosts.conf</b> file
+  in your <b>/etc/apcupsd</b> directory.</li>
 </ol>
+
+<h2>apcaccess Does Not Work</h2>
+Please check that the Network Information Server is running.        
+apcaccess uses TCP/IP to the NIS server to get the necessary
+information if pthreads is turned on.
 
 <h2>Battery Problems</h2>
 Please see the <a href="batteries.html">Battery Chapter</a> of

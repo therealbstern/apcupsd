@@ -1,10 +1,14 @@
              Technical notes on version 3.10.6
-                        30 May 2003
+                        07 July 2003
                         Kern Sibbald
 
 General:
 
 Changes submitted this submission:
+07Jul03
+- Lots of updates to the document.
+- Fixed a slave crash in master/slave mode. It was a missing setup_device,
+  and was diagnosed and reported by Christian Schacht -- many thanks.
 30May03
 - Made non-existent header files non-fatal and added #ifdef 
   around sys/socket.h so it will compile on IRIX.

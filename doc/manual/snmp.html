@@ -70,7 +70,7 @@ informative enough to run safely your UPS.
 <h3>Power Off (killpower) of SNMP UPS needs special handling</h3>
 <p></p>Currently (as of 3.10.0) the code to power off the UPS needs special
 configuration. The killpower command for SNMP UPSes can not be
-issued during shutdown as tipically at some time during shutdown
+issued during shutdown as typically at some time during shutdown
 operations the network stack is stopped. To overcome this problem
 it is needed to modify the /etc/rc.d/apcupsd system control script to
 tell <b>apcupsd</b> to issue the power down command (killpower) to the
