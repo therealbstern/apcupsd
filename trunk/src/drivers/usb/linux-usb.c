@@ -1031,6 +1031,7 @@ static int write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
         Dmsg1(100, "REPORTINFO num_fields=%d\n", rinfo.num_fields);
 	finfo.report_type = info->uref.report_type;
 	finfo.report_id = info->uref.report_id;
+	finfo.field_index = info->uref.field_index;
         Dmsg7(100, "before FIELDINFO call: type=%d id=%d index=%d logical_min=%d \n\
 logical_max=%d exponent=%d unit=0x%x\n",
 	    finfo.report_type, finfo.report_id, finfo.field_index,
@@ -1049,7 +1050,7 @@ logical_max=%d exponent=%d unit=0x%x\n",
         Dmsg3(100, "GUSAGE type=%d id=%d index=%d\n", info->uref.report_type,
 	   info->uref.report_id, info->uref.field_index);
 	if (ioctl(my_data->fd, HIDIOCGUSAGE, &info->uref) < 0) {  /* get UPS value */
-            Dmsg2(000, "HIDIOCSUSAGE for shutdown function %s failed. ERR=%s\n", 
+            Dmsg2(000, "HIDIOGSUSAGE for shutdown function %s failed. ERR=%s\n", 
 		  name, strerror(errno));
 	    return 0;
 	}
