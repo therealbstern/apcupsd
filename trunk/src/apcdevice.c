@@ -78,7 +78,11 @@ void setup_device(UPSINFO *ups)
     }
 
     device_setup(ups);
-    device_get_capabilities(ups);
+
+    /* Must not be called on slaves */
+    if (!is_ups_set(UPS_SLAVE)) {
+        device_get_capabilities(ups);
+    }
 
     return;
 }
