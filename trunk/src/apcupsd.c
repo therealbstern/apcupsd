@@ -498,19 +498,6 @@ static void daemon_start(void)
        close(i);
     }
 
-    /*
-     * Create NULL stdout so that a UPS connection doesn't end up on
-     *	stdin, stdout, or stderr
-     */
-    fd = open("/dev/null", O_RDONLY, 644);
-    if (fd > 2) {
-	close(tmp_fd);
-    } else {
-	for (i=1; fd+i <= 2; i++) {
-	   dup2(fd, fd+i);
-	}
-    }
-											
     /* move to root directory */
     chdir("/");
    
