@@ -4,7 +4,10 @@
 /*               http://www.apcupsd.com/                                   */
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
-----> Release apcupsd-3.10.12 (xx February 2004)
+----> Release apcupsd-3.10.12 (04 March 2004)
+- Thanks to Joseph Sacco, we have Yellow dog support -- and he
+  has tested and validated it!
+- Integrated Joseph Sacco's yellowdog patch -- some done by hand.
 - Minor updates to the documentation from user input.
 - Fix a Makefile find that removes zero length files, which fails                 
   on some systems.

@@ -1,7 +1,9 @@
 
           Release Notes for Apcupsd 3.10.12
 
-Release 3.10.12 xxFeb04:
+Release 3.10.12 04Mar04:
+- Thanks to Joseph Sacco, we have Yellow dog support -- and he
+  has tested and validated it!
 - Integrated Joseph Sacco's yellowdog patch -- some done by hand.
 - Minor updates to the documentation from user input.
 - Fix a Makefile find that removes zero length files, which fails                 
@@ -25,7 +27,7 @@ Release 3.10.11 26Jan04:
 - Added new Mandrake apcupsd.spec.in submitted by David Walser.
 - Revert to using the old master/slave networking code bu default.
 
-Changes since 3.10.9:
+Release 3.10.10
 - This version has an additional fix to the USB driver based on
   work by Adam Kropelin -- it limits the rate at which apcupsd will
   poll the UPS for the volatile data, which in turn reduces the possiblity
