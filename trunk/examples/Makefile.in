@@ -52,7 +52,7 @@ distclean: targetdistclean
 	$(RMF) safe.apccontrol
 	$(RMF) gui/client@EXEEXT@
 	$(RMF) Makefile
-	@rm -rf CVS
+	@rm -rf CVS gui/CVS
 
 # -----------------------------------------------------------------------
 # DO NOT DELETE THIS LINE -- make depend depends on it.

@@ -30,7 +30,8 @@ uninstall:
 clean: targetclean
 
 distclean: targetdistclean
-	$(RMF) Makefile CVS techlogs/CVS manual/CVS
+	$(RMF) Makefile 
+	@rm -rf CVS techlogs/CVS manual/CVS
 
 # -----------------------------------------------------------------------
 # DO NOT DELETE THIS LINE -- make depend depends on it.
