@@ -38,6 +38,7 @@
 
 ////////////////////////////
 // System headers
+#include <unistd.h>
 #include "winhdrs.h"
 #include <lmcons.h>
 #include <ctype.h>
