@@ -169,7 +169,6 @@ AC_SUBST(PTHREAD_LFLAGS)
 
 
 AC_CYGWIN			dnl Check for cygwin, WINXX port.
-AC_DEFINE(HAVE_CYGWIN)
 if test "$CYGWIN" = "yes"
 then
     WIN32=win32
@@ -178,6 +177,7 @@ then
     APCACCESS=apcaccess
     SMTP=smtp
     APCTEST=apctest
+    AC_DEFINE(HAVE_CYGWIN)
 else
     WIN32=
     WINLIBS=

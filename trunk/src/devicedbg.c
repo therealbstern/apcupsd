@@ -58,7 +58,7 @@ char argvalue[MAXSTRING];
  *
  * But it's much less understandable that to link
  *
- * main() { /* dummy */ }
+ * main() {  dummy  }
  * 
  * against libapc.a and libdrivers.a I need to define the following dummy
  * functions.
