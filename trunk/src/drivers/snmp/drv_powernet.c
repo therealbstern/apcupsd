@@ -72,7 +72,7 @@ static int powernet_check_comm_lost(UPSINFO *ups) {
      * Check the Ethernet COMMLOST first, then check the
      * Web/SNMP->UPS serial COMMLOST.
      */
-    if (powernet_mib_mgr_get_upsComm(s, &(data->upsComm)) == -1) {
+    if (powernet_mib_mgr_get_upsComm(s, &(data->upsComm)) < 0) {
         UPS_SET(UPS_COMMLOST);
         ret = 0;
         goto out;
@@ -156,6 +156,11 @@ int powernet_snmp_ups_get_capabilities(UPSINFO *ups) {
     for (i = 0; i <= CI_MAX_CAPS; i++) {
         ups->UPS_Cap[i] = TRUE;
     }
+
+    if (powernet_check_comm_lost(ups) == 0) {
+        return 0;
+    }
+
     return 1;
 }
 
