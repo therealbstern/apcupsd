@@ -3,7 +3,7 @@
 # apcupsd      This shell script takes care of starting and stopping
 #	       the apcupsd UPS monitoring daemon.
 #
-# chkconfig: 2345 20 99
+# chkconfig: 2345 60 99
 # description: apcupsd monitors power and takes action if necessary
 #
 APCPID=@PIDDIR@/apcupsd.pid

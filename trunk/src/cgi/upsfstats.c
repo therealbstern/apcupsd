@@ -43,10 +43,7 @@ int main()
     printf ("Content-type: text/html\n");
     printf ("\n");
 
-    printf ("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 3.2 Final//EN\">\n");
-    printf ("<html version=\"-//W3C//DTD HTML 3.2 Final//EN\">\n");
-
-
+    printf ("<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0 Transitional//EN\">\n");
     printf ("<HTML>\n");
     printf ("<HEAD><TITLE>APCUPSD STATUS Output Page</TITLE></HEAD>\n");
     printf ("<BODY BGCOLOR=\"#FFFFFF\">\n");
@@ -70,7 +67,17 @@ int main()
 
     printf (statbuf);
 
-    printf ("</pre></blockquote></BODY></HTML>\n");
+    printf ("</pre></blockquote>\n");
+
+#ifdef VALIDATE_HTML
+    printf ("<div><small>\n");
+    printf ("<a href=\"http://jigsaw.w3.org/css-validator/check/referer\">\n");
+    printf ("<img style=\"float:right\" src=\"/icons/vcss\" alt=\"Valid CSS!\" height=\"31\" width=\"88\"/></a>\n");
+    printf("<a href=\"http://validator.w3.org/check/referer\">\n");
+    printf("<img style=\"float:right\" src=\"/icons/valid-xhtml10\" alt=\"Valid XHTML 1.0!\" height=\"31\" width=\"88\"/></a>\n");
+    printf ("</small></div>\n");
+#endif
+    printf ("</BODY></HTML>\n");
 
     exit(0);
 }

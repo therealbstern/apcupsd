@@ -1,8 +1,12 @@
              Technical notes on version 3.10.12
-                       12 February 2004
+                       23 February 2004
                         Kern Sibbald
 
 General:
+- Apply patch by William King to upsfstats.c to bring html up to
+  xhtml standards.
+- Changed start level from 20 to 60 to ensure that DNS is started. 
+  Reported by David Walser.
 - Remove some unused code in the snmp directory.
 - Cleanup some compile errors in the snmp directory.
 - Move install.xml to install.kml and implement simpler html directives in

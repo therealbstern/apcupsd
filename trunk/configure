@@ -13345,7 +13345,7 @@ sun)
 	DISTVER=Solaris
 	SERIALDEV=/dev/ttya
 	PWRFAILDIR=/etc
-	PIDDIR=/var/run/apcupsd
+	PIDDIR=/var/run
 	LOCKDIR=/var/spool/locks
 	LOGDIR=${sysconfdir}
 	if test x$prefix = xNONE -a x$mandir = x'${prefix}/man' ; then
