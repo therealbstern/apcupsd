@@ -526,7 +526,7 @@
 #define Dmsg7(lvl, msg, a1, a2, a3, a4, a5, a6, a7) d_msg(__FILE__, __LINE__, lvl, msg, a1, a2, a3, a4, a5, a6, a7)
 #define Dmsg8(lvl, msg, a1, a2, a3, a4, a5, a6, a7, a8) d_msg(__FILE__, __LINE__, lvl, msg, a1, a2, a3, a4, a5, a6, a7, a8)
 #define Dmsg11(lvl,msg,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11) d_msg(__FILE__,__LINE__,lvl,msg,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11)
-void d_msg(char *file, int line, int level, char *fmt,...);
+void d_msg(const char *file, int line, int level, const char *fmt,...);
 #else
 #define Dmsg0(lvl, msg)
 #define Dmsg1(lvl, msg, a1)

@@ -286,7 +286,7 @@ extern void wait_for_termination (int serial_pid);
 /*
  * In apclog.c
  */
-extern void log_event (UPSINFO *ups, int level, char *fmt, ...);
+extern void log_event (const UPSINFO *ups, int level, const char *fmt, ...);
 
 /*
  * In apcproctitle.c

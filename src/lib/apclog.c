@@ -58,28 +58,14 @@
 
 #include "apc.h"
 
-void log_event(UPSINFO *ups, int level, char *fmt, ...)
+void log_event(const UPSINFO *ups, int level, const char *fmt, ...)
 {
     va_list  arg_ptr;
     char msg[2*MAXSTRING];
     char datetime[MAXSTRING];
     int event_fd = ups->event_fd;
 
-#if AVERSION==4 
-    /*
-     * If this is a generic message, not belonging to
-     * any UPS, use the generic log file.
-     *
-     *	  VERSION 4.0 stupidities
-     */
-     if (ups == (UPSINFO *)&gcfg) {
-	 event_fd = gcfg.event_fd;
-     } else {
-	 event_fd = ups->event_fd; /* on version 3 this is true */
-     }
-#else
     event_fd = ups->event_fd;
-#endif
 
     va_start(arg_ptr, fmt);
     avsnprintf(msg, sizeof(msg), fmt, arg_ptr);
@@ -122,7 +108,7 @@ int debug_level = 0;
 
 #define FULL_LOCATION 1
 void 
-d_msg(char *file, int line, int level, char *fmt,...)
+d_msg(const char *file, int line, int level, const char *fmt,...)
 {
 #ifdef DEBUG
     char      buf[4096];
