@@ -19,17 +19,14 @@
        Adapted for Cascading Style Sheets by Chris Evanco, Feb 2001
  */
 
-#include <unistd.h>
 #include <stdio.h>
-#include <syslog.h>
 #include <stdlib.h>
 #include <string.h>
-#include <time.h>
-#include <sys/time.h>
 
 #include "multimon.h"
 #include "upsfetch.h"
 #include "cgiconfig.h"
+#include "cgilib.h"
 #include "status.h"
 #include "apc_nis.h"
 
@@ -48,9 +45,14 @@ static	ftype	*firstfield = NULL;
 static	int	numfields = 0, use_celsius;
 static	char	*desc;
 
+void parsearg(const char *var, const char *value)
+{
+}
+
 void report_error(char *str)
 {
-    printf("  %s\n </BODY>\n</HTML>\n", str);
+    printf("<p>%s</p>\n", str);
+    html_finish();
     exit(1);
 }
 
@@ -558,8 +560,7 @@ int main(int argc, char **argv)
         printf ("    </TD>\n");
         printf ("   </TR>\n");
         printf ("  </TABLE>\n");
-        printf (" </BODY>\n");
-        printf ("</HTML>\n");
 
+	html_finish();
 	exit(0);
 }

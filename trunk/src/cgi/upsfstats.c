@@ -24,20 +24,6 @@ void parsearg(const char *var, const char *value)
     }
 }
 
-static void finish(void)
-{
-#ifdef VALIDATE_HTML
-    printf ("<hr /><div><small>\n");
-    printf ("<a href=\"http://jigsaw.w3.org/css-validator/check/referer\">\n");
-    printf ("<img style=\"float:right\" src=\"http://jigsaw.w3.org/css-validator/images/vcss\" alt=\"Valid CSS!\" height=\"31\" width=\"88\"/></a>\n");
-    printf("<a href=\"http://validator.w3.org/check/referer\">\n");
-    printf("<img style=\"float:right\" src=\"http://www.w3.org/Icons/valid-xhtml10\" alt=\"Valid XHTML 1.0!\" height=\"31\" width=\"88\"/></a>\n");
-    printf ("</small></div>\n");
-#endif
-    printf ("</body></html>\n");
-    exit(0);
-}
-
 int main(int argc, char **argv) 
 {
     char   answer[256];
@@ -61,24 +47,27 @@ int main(int argc, char **argv)
 
     if (!extractcgiargs()) {
         printf("<p>Unable to extract cgi arguments!</p>\n");
-	finish();
+	html_finish();
+	exit (0);
     }
 
     if (!checkhost(monhost)) {
         printf ("<p>Access to %s host is not authorized.</p>\n", monhost);
-	finish();
+	html_finish();
+	exit (0);
     }
 
     /* check if host is available */
-    if (getupsvar (monhost, "date", answer, sizeof(answer)) <= 0)  {
-        printf ("<p>Host %s is not available.</p>\n", monhost);
-	finish();
+    if (getupsvar (monhost, "date", answer, sizeof(answer)) <= -1)  {
+        printf ("<p>Unable to communicate with the UPS on %s.</p>\n", monhost);
+	html_finish();
+	exit (0);
     }
     printf ("<blockquote><pre>");
 
     html_puts (statbuf);
 
     printf ("</pre></blockquote>\n");
-    finish();
+    html_finish();
     exit(0);
 }

@@ -38,45 +38,41 @@
 #include "cgiconfig.h"
 #include "cgilib.h"
 #include "upsfetch.h"
-#include "status.h"
 
 static char   monhost[256];
 static char   img1s[16];
 static char   img2s[16];
 static char   img3s[16];
 static char   temps[16];
-static char   answer[256];
-static char   answer2[256];
-static char   answer3[256];
 
 void parsearg(const char *var, const char *value) 
 {
-    if (!strcmp(var, "host")) {
+    if (strcmp(var, "host") == 0) {
 	strncpy (monhost, value, sizeof(monhost));
-    }
-    if (!strcmp(var, "img1")) {
+	monhost[sizeof(monhost) - 1] = '\0';
+
+    } else if (strcmp(var, "img1") == 0) {
 	strncpy (img1s, value, sizeof(img1s));
-    }
-    if (!strcmp(var, "img2")) {
+	img1s[sizeof(img1s) - 1] = '\0';
+
+    } else if (strcmp(var, "img2") == 0) {
 	strncpy (img2s, value, sizeof(img2s));
-    }
-    if (!strcmp(var, "img3")) {
+	img2s[sizeof(img2s) - 1] = '\0';
+
+    } else if (strcmp(var, "img3") == 0) {
 	strncpy (img3s, value, sizeof(img3s));
-    }
-    if (!strcmp(var, "temp")) {
+	img3s[sizeof(img3s) - 1] = '\0';
+
+    } else if (strcmp(var, "temp") == 0) {
 	strncpy (temps, value, sizeof(temps));
+	temps[sizeof(temps) - 1] = '\0';
     }
-}
-
-
-void nocomm(char *monhost)
-{
-    printf ("upsstats.c: Unable to communicate with the UPS on %s\n", monhost);
-    exit (0);
 }
 
 void send_values(int report, int defrpt)
 {
+    char   answer[256], answer2[256], answer3[256];
+
     if (report < 1 || report > 6)
 	   report = defrpt;
     switch ( report ) {
@@ -117,6 +113,7 @@ int main(int argc, char **argv)
     int     status,img1,img2,img3;
     double  tempf;
     char *p;
+    char   answer[256];
 
     strcpy (monhost, MONHOST);	    /* default host */
 
@@ -129,7 +126,7 @@ int main(int argc, char **argv)
     if (!extractcgiargs()) {
        printf("<head></head><body>\n");
        printf("<p>Unable to extract cgi arguments.</p>\n");
-       printf ("</body></html>\n");
+       html_finish();
        exit(0);
     }
 
@@ -150,13 +147,17 @@ int main(int argc, char **argv)
     if (!checkhost(monhost)) {
         printf("<head></head><body>\n");
         printf ("<p>Access to %s host is not authorized.</p>\n", monhost);
-	printf ("</body></html>\n");
+	html_finish();
 	exit (0);
     }
     
     /* check if host is available */
-    if (getupsvar(monhost, "date", answer, sizeof(answer)) <= 0) 
-	   nocomm(monhost);
+    if (getupsvar(monhost, "date", answer, sizeof(answer)) <= 0) {
+           printf("<head></head><body>\n");
+           printf ("<p>Unable to communicate with the UPS on %s</p>\n", monhost);
+	   html_finish();
+	   exit (0);
+    }
 
      printf ("<head>\n<title>%s on %s</title>\n", answer, monhost);
      printf ("  <meta http-equiv=\"Pragma\" content=\"no-cache\">\n");
@@ -354,10 +355,10 @@ int main(int argc, char **argv)
 	 }
      }
 
-     printf ("</pre>\n<table BORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"0\">\n<TR>\n<TD colspan=\"2\">\n<PRE>\n");
+     printf ("</pre>\n<table BORDER=\"0\" CELLSPACING=\"0\" CELLPADDING=\"0\">\n<tr>\n<td colspan=\"2\">\n<pre>\n");
 
     if (getupsvar (monhost, "upstemp", answer, sizeof(answer)) > 0) {
-         if (!strcmp(temps,"F")) {
+         if (strcmp(temps,"F") == 0) {
 	      tempf = (strtod (answer, 0) * 1.8) + 32;
               printf ("       UPS Temp: %.1f \n</pre>\n</td>\n<td>\n", tempf); 
               printf ("       <form method=\"get\" action=\"upsstats.cgi\" name=\"form4\">\n");
@@ -365,32 +366,32 @@ int main(int argc, char **argv)
               printf ("       <input type=\"hidden\" name=\"img1\" value=\"%s\">\n",img1s);
               printf ("       <input type=\"hidden\" name=\"img2\" value=\"%s\">\n",img2s);
               printf ("       <input type=\"hidden\" name=\"img3\" value=\"%s\">\n",img3s);
-              printf ("       <select onChange=\"document.form4.submit();return true\" name=temp>\n");
+              printf ("       <select onChange=\"document.form4.submit();return true\" name=\"temp\">\n");
               printf ("              <option value=\"C\">&deg;C\n");
               printf ("               <option selected value=\"F\">&deg;F\n");
               printf ("               <option value=\"K\">&deg;K\n");
-	  }
-          if (!strcmp(temps,"K")) {
+
+	  } else if (strcmp(temps,"K") == 0) {
 	       tempf = (strtod (answer, 0)) + 273;
-               printf ("       UPS Temp: %.1f \n</PRE>\n</TD>\n<TD>\n", tempf); 
+               printf ("       UPS Temp: %.1f \n</pre>\n</td>\n<td>\n", tempf); 
                printf ("       <form method=\"get\" action=\"upsstats.cgi\" name=\"form4\">\n");
                printf ("       <input type=\"hidden\" name=\"host\" value=\"%s\">\n",monhost);
                printf ("       <input type=\"hidden\" name=\"img1\" value=\"%s\">\n",img1s);
                printf ("       <input type=\"hidden\" name=\"img2\" value=\"%s\">\n",img2s);
                printf ("       <input type=\"hidden\" name=\"img3\" value=\"%s\">\n",img3s);
-               printf ("       <select onChange=\"document.form4.submit();return true\" name=temp>\n");
+               printf ("       <select onChange=\"document.form4.submit();return true\" name=\"temp\">\n");
                printf ("              <option value=\"C\">&deg;C\n");
                printf ("               <option value=\"F\">&deg;F\n");
                printf ("               <option selected value=\"K\">&deg;K\n");
-	 }
-         if ( ( !strcmp(temps,"F") || !strcmp(temps,"K") ) == 0) {
-               printf ("       UPS Temp: %s \n</PRE>\n</TD>\n<TD>\n", answer);
+
+	 } else {
+               printf ("       UPS Temp: %s \n</pre>\n</td>\n<td>\n", answer);
                printf ("       <form method=\"get\" action=\"upsstats.cgi\" name=\"form4\">\n");
                printf ("       <input type=\"hidden\" name=\"host\" value=\"%s\">\n",monhost);
                printf ("       <input type=\"hidden\" name=\"img1\" value=\"%s\">\n",img1s);
                printf ("       <input type=\"hidden\" name=\"img2\" value=\"%s\">\n",img2s);
                printf ("       <input type=\"hidden\" name=\"img3\" value=\"%s\">\n",img3s);
-               printf ("       <select onChange=\"document.form4.submit();return true\" name=temp>\n");
+               printf ("       <select onChange=\"document.form4.submit();return true\" name=\"temp\">\n");
                printf ("              <option selected value=\"C\">&deg;C\n");
                printf ("               <option value=\"F\">&deg;F\n");
                printf ("               <option value=\"K\">&deg;K\n");
@@ -413,14 +414,7 @@ int main(int argc, char **argv)
 
      printf ("</table>\n");
      printf ("</center>\n");
-#ifdef VALIDATE_HTML
-      printf ("<hr /><div><small>\n");
-      printf ("<a href=\"http://jigsaw.w3.org/css-validator/check/referer\">\n");
-      printf ("<img style=\"float:right\" src=\"http://jigsaw.w3.org/css-validator/images/vcss\" alt=\"Valid CSS!\" height=\"31\" width=\"88\"/></a>\n");
-      printf("<a href=\"http://validator.w3.org/check/referer\">\n");
-      printf("<img style=\"float:right\" src=\"http://www.w3.org/Icons/valid-xhtml10\" alt=\"Valid XHTML 1.0!\" height=\"31\" width=\"88\"/></a>\n");
-      printf ("</small></div>\n");
-#endif
-     printf ("</body></html>\n");
+
+     html_finish();
      return 0;
 }
