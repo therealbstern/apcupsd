@@ -177,10 +177,10 @@ int main(int argc, char **argv)
 
     (void) extractcgiargs();
 
-    p = strchr(monhost, '%');
-    if (p && *(p+1) == '3') {
-       *p++ = ':';                    /* set colon */
-       strcpy(p, p+2);		      /* get rid of hex 3A */
+    p = strstr(monhost, "%3");
+    if (p) {
+       *p++ = ':';                                     /* set colon */
+       memmove(p, p+2, sizeof(monhost)-(p-monhost));   /* get rid of hex 3A */
     }
 
     snprintf(answer, sizeof(answer), "%s UPS Status", monhost);

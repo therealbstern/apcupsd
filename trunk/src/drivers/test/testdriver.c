@@ -87,10 +87,10 @@ int test_ups_read_static_data(UPSINFO *ups)
     /* UPS_NAME */
 
     /* model, firmware */
-    strcpy(ups->upsmodel, "Test Driver");
-    strcpy(ups->firmrev, "Rev 1.0");
-    strcpy(ups->selftestmsg, "Test Battery OK");
-    strcpy(ups->selftest, "336");
+    astrncpy(ups->upsmodel, "Test Driver", sizeof(ups->upsmodel));
+    astrncpy(ups->firmrev, "Rev 1.0", sizeof(ups->firmrev));
+    astrncpy(ups->selftestmsg, "Test Battery OK", sizeof(ups->selftestmsg));
+    astrncpy(ups->selftest, "336", sizeof(ups->selftest));
 
     /* WAKEUP_DELAY */
     ups->dwake = 2 * 60;
@@ -111,13 +111,13 @@ int test_ups_read_static_data(UPSINFO *ups)
     ups->dlowbatt = 2;
 
     /* UPS_MANUFACTURE_DATE */
-    strcpy(ups->birth, "2001-09-21");
+    astrncpy(ups->birth, "2001-09-21", sizeof(ups->birth));
 
     /* Last UPS_BATTERY_REPLACE */
-    strcpy(ups->battdat, "2001-09-21");
+    astrncpy(ups->battdat, "2001-09-21", sizeof(ups->battdat));
  
     /* UPS_SERIAL_NUMBER */
-    strcpy(ups->serial, "NO-123456");
+    astrncpy(ups->serial, "NO-123456", sizeof(ups->serial));
 
     /* Nominal output voltage when on batteries */
     ups->NomOutputVoltage = 230;
@@ -181,7 +181,7 @@ int test_ups_read_volatile_data(UPSINFO *ups)
     ups->ambtemp = 22.5;
 
     /* Self test results */
-    strcpy(ups->X, "OK");
+    astrncpy(ups->X, "OK", sizeof(ups->X));
     write_unlock(ups);
 
     return 1;

@@ -365,7 +365,7 @@ upsProperties::Load(BOOL usersettings)
 
         // If there is no user logged on them default to SYSTEM
         if (strcmp(username, "") == 0)
-                strcpy((char *)&username, "SYSTEM");
+                astrncpy((char *)&username, "SYSTEM", sizeof(username));
 
         // Try to get the machine registry key for Apcupsd
         if (RegCreateKeyEx(HKEY_LOCAL_MACHINE,
