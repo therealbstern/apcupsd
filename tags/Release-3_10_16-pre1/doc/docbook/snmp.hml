@@ -1,0 +1,113 @@
+<chapter id='snmp'><title>Support for SNMP UPSes</title>
+
+<para><ulink url='snmp'>snmp</ulink>
+To run <application>apcupsd</application> with an SNMP UPS, you need the
+following things:</para>
+
+<itemizedlist>
+  <listitem>
+    <para>An SNMP UPS, for example a Web/SNMP card installed into the 
+          SmartSlot.</para>
+  </listitem>
+  <listitem>
+    <para><application>apcupsd</application> version 3.10.0 or higher</para>
+  </listitem>
+  <listitem>
+    <para><ulink url="http://www.net-snmp.org/">Net-SNMP</ulink> library
+    (previously known as ucd-snmp) installed</para>
+  </listitem>
+</itemizedlist>
+
+<sect1><title>Connecting an SNMP UPS</title>
+
+<para>The Simple Network Management Protocol provides an interface to
+connect to remote devices through the
+network. <application>apcupsd</application> is now capable of using
+the SNMP interface of an SNMP-enabled UPS to communicate with an
+UPS. Currently <application>apcupsd</application> supports only APC's
+PowerNet MIB. To enable the SNMP support it is enough to configure the
+correct device in your apcupsd.conf configuration file. The directive
+needed for this configuration is:</para>
+
+<programlisting>
+DEVICE 192.168.100.2:161:APC:private
+</programlisting>
+
+<para>where the directive is made by four parts:</para>
+<itemizedlist>
+  <listitem>
+    <para>IP address of the remote UPS</para>
+  </listitem>
+  <listitem>
+    <para>Remote SNMP port</para>
+  </listitem>
+  <listitem>
+    <para>Kind of remote SNMP agent, currently can only be &quot;APC&quot; for
+    APC's powernet MIB</para>
+  </listitem>
+  <listitem>
+    <para>The read-write community string, usually it is
+    &quot;private&quot; for read-write access.</para>
+  </listitem>
+</itemizedlist>
+
+</sect1>
+<sect1><title>Building and Installing <application>apcupsd</application></title> 
+
+<para>Follow the instructions in <xref linkend="build_install"/>l,
+being sure to include the following options (in addition to any others
+you need) on the <emphasis role="bold">./configure</emphasis>
+line:</para>
+
+<programlisting>
+./configure \
+--with-serial-dev=&lt;your-SNMP-device&gt; \
+--with-upstype=snmp \
+--with-upscable=smart \
+--enable-pthreads \
+--enable-snmp
+</programlisting>
+
+</sect1>
+<sect1><title>SNMP Specific Information</title>
+
+<para>The SNMP connection gives less information compared to a serial
+smart cable. This is not a problem as the most useful information
+is given, together with a number of secondary parameters that are
+informative enough to run safely your UPS.</para>
+
+</sect1>
+<sect1><title>Known Problems</title>
+
+<para>Currently (as of 3.10.0) the code to power off the UPS needs
+special configuration. The killpower command for SNMP UPSes can not be
+issued during shutdown as typically at some time during shutdown
+operations the network stack is stopped. To overcome this problem it
+is needed to modify the <filename>/etc/rc.d/apcupsd</filename> system
+control script to tell <application>apcupsd</application> to issue the
+power down command (killpower) to the UPS immediately before apcupsd
+initiates the system shutdown. For this reason it is paramount to set
+your UPS grace time to a value greater than 120 seconds to allow for
+clean shutdown operations before the UPS removes the power from its
+plugs. To enable correct shutdown operation during powerdown do the
+following:</para>
+
+<itemizedlist>
+  <listitem>
+    <para>Connect to your Web/SNMP card using your favorite web browser,
+     go to the UPS configuration menu and change the &quot;Shutdown Delay&quot;
+     parameter to 180 seconds or more, depending on how much time your
+     system shutdown requires to umount all the filesystems.</para>
+  </listitem>
+  <listitem>
+    <para>Change /etc/rc.d/apcupsd script adding the
+'--kill-on-powerfail' to the apcupsd invocation.</para>
+  </listitem>
+  <listitem>
+    <para>Restart your <application>apcupsd</application></para>
+  </listitem>
+</itemizedlist>
+
+<para>With this setup your UPS operations should be safe.</para>
+</sect1>
+</chapter>

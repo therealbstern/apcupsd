@@ -1,0 +1,83 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="Author" content="Riccardo Facchetti">
+   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.4.3 i586) [Netscape]">
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+
+<h3>
+APC Documents</h3>
+
+<h3>
+<a NAME="Meanings of G command"></a>Meanings of G command</h3>
+
+<p><br>I received the inquiry below, which warrants a response to the whole
+list:
+<p>"Once every 14 days the UPS does an automatic self test. apcupsd thinks
+there has been a power failure because it detects a switch to batteries.
+PowerChute seems to know that a power test is underway. Question: how can
+I tell when the UPS is doing an automatic power test rather than in a power
+fail condition ?"
+<p>The G command gives the cause of the most recent transfer to battery.
+Responses to this command are:
+<p>R - Transfer to battery due to rate of line voltage change
+<br>H - Transfer to battery due to high line voltage
+<br>L - Transfer to battery due to low line voltage
+<br>T - Transfer to battery due to detection of line notch or spike
+<br>O - No transfers have occurred yet
+<br>S - The UPS was commanded to do a self-test by the front panel or serial
+port
+<p>After detecting that the UPS has transferred to battery, send the G,
+then interpret the response. If the response is S, then the transfer was
+due to a self test.
+<p>Don Hagist
+<br>APC Software Development
+<br>&nbsp;
+<h3>
+<a NAME="APC Statement"></a>APC Statement</h3>
+
+<p><br>************************************
+<p>Subject:
+<br>re: apcupsd (Linux etc.)
+<br>Date: Wed, 14 Oct 1998 17:07:13 -0400
+<br>From: EKaufman@apcc.com
+<br>To: redhat-list@redhat.com
+<p>Dear valued Linux customers,
+<p>APC recognizes the large size and growth of the Linux market and the
+<br>importance of supporting Linux users. With this in mind, APC has never
+<br>threatened legal action against any third party Linux software
+<br>developers.
+<p>It is not our policy to comment on products under development, however
+APC
+<br>is very interested in providing UPS management software for Linux users.
+<p>In the interim, please let us know how we can help you.
+<p>If you have any questions or concerns, please send them to apcinfo@apcc.com.
+<p>Sincerely,
+<br>Eric Kaufman
+<br>APC software product manager
+<p>************************************
+<p>http://www.apcc.com/english/about/finan/10K10Q/123193K.HTM
+<p>Intellectual Property
+<p>Although the Company believes that its processes and equipment are proprietary,
+the Company has not sought patent protection for its technology. There
+can be no assurance that the Company's processes and equipment provide
+it with a competitive advantage or that others will not independently develop
+equivalent or superior products or technology. In not seeking patent protection,
+the Company has instead relied on the complexity of its technology, trade
+secrecy laws and employee confidentiality agreements. One reason for not
+seeking patent protection is to avoid the public disclosure of information
+required for patent protection. The risk of not seeking patent protection
+is that other companies may acquire information or technology which the
+Company considers to be proprietary in design and manufacturing. The Company
+believes that companies in its industry do not primarily rely on patents
+to protect their proprietary rights. This belief is based upon certain
+advertising and product literature that has come to the Company's attention.
+This does not imply that the Company or any of its competitors will not
+seek patent protection as future technology evolves.
+<br>&nbsp;
+<p>************************************
+<br>&nbsp;
+</body>
+</html>
