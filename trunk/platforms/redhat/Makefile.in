@@ -21,8 +21,10 @@ top_builddir = $(topdir)
 all-targets: Makefile
 
 install:
-	@if test -f /etc/rc.d/init.d/apcupsd; then \
-	    /sbin/chkconfig --del apcupsd; \
+	@if test x$(DISTDIR) == x ; then \
+	   if test -f /etc/rc.d/init.d/apcupsd; then \
+	       /sbin/chkconfig --del apcupsd; \
+	   fi; \
 	fi
 	# remove old 3.6.2 stuff
 	@rm -f $(DESTDIR)/etc/rc.d/rc0.d/K20apcups
@@ -40,7 +42,9 @@ install:
 	@awk -f awkhaltprog /etc/rc.d/init.d/halt.old >$(DESTDIR)/etc/rc.d/init.d/halt
 	@chmod 744 $(DESTDIR)/etc/rc.d/init.d/halt
 	# link new halt script for startup and shutdown
-	@/sbin/chkconfig --add apcupsd
+	@if test x$(DISTDIR) == x ; then \
+	   /sbin/chkconfig --add apcupsd; \
+	fi
 	@echo "================================================="
 	@echo " "
 	@echo "apcupsd script installation for RedHat $(DISTVER) complete." 
@@ -61,7 +65,9 @@ install:
 
 uninstall:
 	@echo "Removing symlinks..."
-	@/sbin/chkconfig --del apcupsd
+	@if test x$(DISTDIR) == x ; then \
+	   /sbin/chkconfig --del apcupsd ; \
+	fi
 	@echo "Removing boot script..."
 	@rm -f $(DESTDIR)/etc/rc.d/init.d/apcupsd
 	@echo "Restoring old halt script"
