@@ -11,7 +11,7 @@
 # Default variables
 @VARIABLES@
 # TOP source directory.
-topdir = @top_srcdir@
+topdir = @topdir@
 top_builddir = $(topdir)
 
 # Include the default make targets: to be put before the all-targets: rule.

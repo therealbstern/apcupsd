@@ -1,10 +1,17 @@
              Technical notes on version 3.10.6
-                        10 September 2003
+                        14 September 2003
                         Kern Sibbald
 
 General:
 
 Changes submitted this submission:
+14Sep03
+- After the upgrade to RH9 with the new autoconf, quite a
+  few things broke. As far as I can tell, it is because autoconf
+  set top_srcdir to ., and since apcupsd exects top_srcdir to be
+  absolute, lots of things broke.  Fixed by editing all the
+  Makefiles and switching to topdir.
+- Had to disable autoheader since it wipes out config.h.in
 10Sep03
 - Made pthreads default -- lots of problems converting to new
   autoconf -- it deleted my config.h.in file!

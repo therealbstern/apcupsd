@@ -6,7 +6,7 @@
 # Default variables
 @VARIABLES@
 # TOP source directory.
-topdir = @top_srcdir@
+topdir = @topdir@
 top_builddir = $(topdir)
 
 subdirs = lib drivers @WIN32@ @INTLSUB@ @POSUB@ @LIBGD@ @CGI@
