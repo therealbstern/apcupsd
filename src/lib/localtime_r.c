@@ -70,7 +70,7 @@
 struct tm *localtime_r(const time_t *timep, struct tm *tm)
 {
     static pthread_mutex_t mutex;
-    static first = 1;
+    static int first = 1;
     struct tm *ltm;
 
     if (first) {

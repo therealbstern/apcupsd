@@ -6,6 +6,10 @@
 /*               ftp://ftp.apcupsd.com                                     */
 /***************************************************************************/
 
+    - Added forward declaration of inet_pton and localtime_r when they
+      are extraobj.
+    - Added inet_pton function. Implementation from Internet Software
+      Consortium.
     - Made sp_flags private to the dumb driver.
     - Can't SET/CLEAR multiple flags: do them one by one. Fixed this
       bug in SNMP driver.

@@ -63,6 +63,9 @@
 /* Define if you have localtime_r */
 #undef HAVE_LOCALTIME_R
 
+/* Define if you have inet_pton */
+#undef HAVE_INETPTON
+
 /* Define if you have vsyslog */
 #undef HAVE_VSYSLOG
 

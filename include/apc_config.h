@@ -228,4 +228,18 @@
 # define SHM_RDONLY O_RDONLY
 #endif
 
+/*
+ * If no system localtime_r(), forward declaration of our internal substitute.
+ */
+#if !defined(HAVE_LOCALTIME_R)
+extern struct tm *localtime_r(const time_t *timep, struct tm *tm);
+#endif
+
+/*
+ * If no system inet_pton(), forward declaration of our internal substitute.
+ */
+#if !defined(HAVE_INETPTON)
+extern int inet_pton(int af, const char *src, void *dst);
+#endif
+
 #endif /* _APC_CONFIG */
