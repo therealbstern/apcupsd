@@ -5,6 +5,13 @@
 General:
 
 Changes submitted this submission:
+19Dec03
+- Added patch by Adam Kropelin that ignores invalid samples. This 
+  eliminates the need for the wait, and seems to calm the system. Apparently, 
+  even though apcupsd did not use the bad samples, it would break from the
+  wait loop, and request an update, which gave even more bad samples. With
+  Adam's patch the samples are simply dropped and we continue waiting (if 
+  appropriate).  Thanks Adam.
 18Dec03
 - Add Slackware updated patch submitted by Andrei Mamontov
 - Corrected the missing library dependencies in src/Makefile.in
