@@ -2,6 +2,8 @@
                         Kern Sibbald
 
 General:
+07Aug04
+- Document Mandrake USB kernel problems.
 04Aug04
 - Fix HID_MAX_USAGES in the examples directory
 03Aug04

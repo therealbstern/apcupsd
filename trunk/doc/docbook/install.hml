@@ -396,7 +396,7 @@ E:  Ad=81(I) Atr=03(Int.) MxPS=   8 Ivl= 10ms
 </programlisting>
 
 <para>The second features an IOgear USB-to-serial adapter that runs my
-serial SmartUPS 1000 :</para>
+serial SmartUPS 1000:</para>
 
 <programlisting>
 T:  Bus=01 Lev=01 Prnt=01 Port=01 Cnt=02 Dev#=  4 Spd=12  MxCh= 0
@@ -483,6 +483,43 @@ etc.).
 If CONFIG_USB is set as M, CONFIG_USB_HID must be M (if enabled
 at all). If CONFIG_USB is set as Y, CONFIG_USB_HID can be M or
 Y. hiddev, in turn, will be built however HID is.</para>
+<p>
+Some kernels ship, such as Mandrake 10, ship with 
+CONFIG_USB_DYNAMIC_MINORS turned on. This is not ideal for
+running with apcupsd, and the easiest solution is to 
+turn CONFIG_USB_DYNAMIC_MINORS off and rebuild your
+kernel, or find a pre-built kernel with it off.
+For a kernel with CONFIG_USB_DYNAMIC_MINORS turned on to
+work with apcupsd, you must enable <b>devfs</b>. The following
+will tell you if devfs is enabled:
+</p>
+<pre>
+$ ps ax | grep devs
+</pre>
+<p>
+which should give something like the following:
+</p>
+<pre>
+533 ?        S      0:00 devfsd /dev
+</pre>
+<p>
+What complicates the situation much more on Mandrake kernels is
+their security level since CONFIG_DYNAMIC_USB_MINORS is turned
+on, but on higher security levels devfs is turned off. The net
+result, is that in those situations hiddev is hosed (to use
+Adam's terms) so apcupsd will not work.
+So, in these cases, the choices are:
+</p>
+<pre>
+(a) Reduce the security level setting of the system 
+    (not sure if this is possible after the initial install).
+(b) Custom build a high security kernel with devfs enabled 
+    and make sure devfs is mounted and devfsd is running.
+(c) Custom build a high security kernel with dynamic 
+    minors disabled
+(d) Use udev
+</pre>
+
 <para>
 For a typical USB section of a kernel .config file, please
 see the end of this section.

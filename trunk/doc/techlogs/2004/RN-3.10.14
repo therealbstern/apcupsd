@@ -1,25 +1,15 @@
 
-          Release Notes for Apcupsd 3.10.15
+          Release Notes for Apcupsd 3.10.14
 
 NOTE: The non-pthreaded version should work in this release, but
       will be removed in the next version.
 
 Main Points:
-- Mandrake 10 USB users, please note, you must either use devfs
-  to access the USB or reconfigure your kernel and turn
-  CONFIG_USB_DYNAMIC_MINORS off.                        
 - The NIS slave server code (net driver) should be much more 
   efficient and robust than previous versions.
 - The code as a whole is much more resistant to buffer overflows
   since most all string copies are now protected.
    
-Release 3.10.16 07Jul04
-- Document Mandrake USB kernel problems.
-- Fix HID_MAX_USAGES in the examples directory
-- Apply David Walser's patch for missing colors in multimon.  Reads
-  the apcupsd.css file from the sysconf directory.
-- Add EEPROM fix from Giuseppe Ghibo passed on by David Walser
-
 Release 3.10.14 28Jul04
 - Add workaround from Adam for linux/hiddev.h missing define.
 - Bill King has made numerous changes to improve the code such as adding

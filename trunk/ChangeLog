@@ -5,6 +5,13 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+----> Release 3.10.16 07Aug04
+- Document Mandrake USB kernel problems.
+- Fix HID_MAX_USAGES in the examples directory
+- Apply David Walser's patch for missing colors in multimon.  Reads
+  the apcupsd.css file from the sysconf directory.
+- Add EEPROM fix from Giuseppe Ghibo passed on by David Walser
+
 ----> Release 3.10.14 28Jul04
 - Add workaround from Adam for linux/hiddev.h missing define.
 - Updates to manual.
