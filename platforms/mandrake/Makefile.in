@@ -74,5 +74,5 @@ uninstall:
 clean:
 
 distclean:
-	@rm -f apccontrol.sh apcupsd awkhaltprog Makefile
+	@rm -f apccontrol.sh apcupsd awkhaltprog Makefile apcupsd.spec
 	@rm -rf CVS

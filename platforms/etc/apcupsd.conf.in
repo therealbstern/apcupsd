@@ -131,7 +131,7 @@ NETSERVER on
 #  Additionally you can listen for a single IP like 192.168.10.1
 NISIP @NISIP@
 #
-# NISPORT <port> default is 7000
+# NISPORT <port> default is 3551 as registered with the IANA
 #  port to use for sending STATUS and EVENTS data over the network.
 #  It is not used unless NETSERVER is on. If you change this port,
 #  you will need to change the corresponding value in the cgi directory

@@ -39,7 +39,7 @@ install-stamp: build-stamp
        dh_installdirs
 
        # Install the package into debian/tmp.
-       make prefix=`pwd`/debian/tmp/usr cgibin=`pwd`/debian/tmp/usr/lib/cgi-bin/apcupsd sysconfdir=`pwd`/debian/tmp/etc/apcupsd sbindir=`pwd`/debian/tmp/sbin mandir=`pwd`/debian/tmp/usr/share/man/man8 install
+       make prefix=`pwd`/debian/tmp/usr cgibin=`pwd`/debian/tmp/usr/lib/cgi-bin/apcupsd sysconfdir=`pwd`/debian/tmp/etc/apcupsd sbindir=`pwd`/debian/tmp/sbin mandir=`pwd`/debian/tmp/usr/share/man install
        install -m 0644 -g root -o root debian/apcupsd.conf `pwd`/debian/tmp/etc/apcupsd
        install -m 0755 -g root -o root debian/apccontrol `pwd`/debian/tmp/etc/apcupsd
     

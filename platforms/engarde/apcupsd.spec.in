@@ -52,7 +52,7 @@ make \
         sbindir=$RPM_BUILD_ROOT/sbin \
         sysconfdir=$RPM_BUILD_ROOT%{_sysconfdir}/apcupsd \
         cgibin=$RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/cgi \
-        mandir=$RPM_BUILD_ROOT%{_mandir}/man8 \
+        mandir=$RPM_BUILD_ROOT%{_mandir} \
         install-apcupsd install-cgi
 
 install -m744 distributions/redhat/apccontrol.sh \

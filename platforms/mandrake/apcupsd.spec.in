@@ -9,7 +9,7 @@ Summary: Power management software for APC UPS hardware
 Name: %{name}
 Version: %{version}
 Release: %{release}
-Source0: http://prdownloads.sourceforge.net/apcupsd/%{name}-%{version}.tar.bz2
+Source0: http://prdownloads.sourceforge.net/apcupsd/%{name}-%{version}.tar.gz
 License: GPL
 URL: http://sourceforge.net/projects/apcupsd/
 Group: System/Servers
@@ -33,7 +33,7 @@ extended power failure.
 
 %serverbuild
 
-%configure --enable-usb --enable-net --enable-master-slave --enable-powerflute --enable-pthreads --enable-cgi --with-cgi-bin=%{_cgibin} --enable-nls
+%configure --enable-usb --enable-net --enable-master-slave --enable-powerflute --enable-pthreads --enable-cgi --with-cgi-bin=%{_cgibin} --enable-nls --with-nisip=127.0.0.1
 %make
 
 
@@ -70,6 +70,11 @@ perl -pi -e 's|\@/sbin/chkconfig|\#\@/sbin/chkconfig|' platforms/mandrake/Makefi
 %doc COPYING ChangeLog INSTALL doc/ examples/
 
 %changelog
+* Tue Feb 04 2003 David Walser <luigiwalser@yahoo.com> 3.10.5-1mdk
+- 3.10.5
+- only listen on localhost by default (Network Information Server)
+- use gz instead of bz2 for apcupsd project version of spec file
+
 * Sun Feb 01 2003 David Walser <luigiwalser@yahoo.com> 3.10.4-1mdk
 - 3.10.4
 - updated URLs

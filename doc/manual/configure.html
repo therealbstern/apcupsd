@@ -243,18 +243,19 @@ configuration (default) with <b>--enable-nis</b>.
         <b>./configure</b> program to set this directive during
         the configuration phase. </dd>
 
-   <dt><a name="SERVERPORT"></a>
-        SERVERPORT &lt;port&gt; 
+   <dt><a name="NISPORT"></a>
+        NISPORT &lt;port&gt; 
         </dt><dd>
         This configuration directive specifies the port to be used by the
         <b>apcupsd</b> Network Information Server.  The default is
-        platform dependent, but typically 7000.  If you change this
-        port, you must manually change the #define SERV_TCP_PORT in
-        cgi/upsfetch.c and rebuild the CGI programs.  An alternative is
-        to use the <b>--with-nis-port=</b> option on the
-        <b>./configure</b> program during installation.  In this case,
-        all the appropriate locations will be automatically changed.
-        </dd>
+        platform dependent, but typically 3551, which we have received
+        from IANA as the official <b>apcupsd</b> networking port.  If
+        you change this port, you must manually change the #define
+        SERV_TCP_PORT in cgi/upsfetch.c and rebuild the CGI programs.
+        An alternative is to use the <b>--with-nis-port=</b> option on
+        the <b>./configure</b> program during installation.  In this
+        case, all the appropriate locations will be automatically
+        changed.  </dd>
    <dt><a name="EVENTSFILE"></a>
         EVENTSFILE &lt;filename&gt; 
         </dt><DD STYLE="margin-bottom: 0.2in">
