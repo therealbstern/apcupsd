@@ -4,7 +4,7 @@
  *   library routines. 
  * 
  *
- *   Version $Id: asys.c,v 1.3 2004-07-17 16:48:53 adk0212 Exp $
+ *   Version $Id: asys.c,v 1.4 2004-07-17 17:57:47 adk0212 Exp $
  */
 /*
    Copyright (C) 2004 Kern Sibbald
@@ -261,7 +261,7 @@ int amicrosleep(time_t sec, long usec)
 #endif
 
 #ifdef HAVE_USLEEP
-   usleep(usec + sec * 1000);
+   usleep(usec + sec * 1000000);
    return 0;
 #endif
 
