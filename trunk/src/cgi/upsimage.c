@@ -122,10 +122,10 @@ void parsearg(char var[255], char value[255])
 	  strncpy (upsval, value, sizeof(upsval));
 
     if (!strcmp(var, "value2"))
-	  strncpy (upsval2, value, sizeof(upsval));
+	  strncpy (upsval2, value, sizeof(upsval2));
 
     if (!strcmp(var, "value3"))
-	  strncpy (upsval3, value, sizeof(upsval));
+	  strncpy (upsval3, value, sizeof(upsval3));
 }
 
 
