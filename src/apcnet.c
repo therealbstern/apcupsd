@@ -425,9 +425,9 @@ int prepare_slave(UPSINFO *ups)
    }
 
     /*
-     * Receive notification when connection dies.
+     * Turn on keep alive code 
      */
-    if (setsockopt(newsocketfd, SOL_SOCKET, SO_KEEPALIVE, &turnon, sizeof(turnon)) < 0) {
+    if (setsockopt(socketfd, SOL_SOCKET, SO_KEEPALIVE, &turnon, sizeof(turnon)) < 0) {
         log_event(ups, LOG_WARNING, "Cannot set SO_KEEPALIVE on socket: %s\n" , strerror(errno));
     }
 
@@ -440,7 +440,7 @@ int prepare_slave(UPSINFO *ups)
     bound = FALSE;
     for (i=0; i<30; i++) {	  /* retry every 30 seconds for 15 minutes */
 	if (bind(socketfd, (struct sockaddr *) &my_adr, sizeof(my_adr)) < 0) {
-            log_event(ups, LOG_WARNING, "Cannot bind port %d, retrying ...", ups->NetUpsPort);
+            log_event(ups, LOG_WARNING, "Cannot bind to port %d, retrying ...", ups->NetUpsPort);
 	    sleep(30);
 	} else {
 	    bound = TRUE;
