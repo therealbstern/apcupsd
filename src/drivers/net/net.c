@@ -125,7 +125,7 @@ static void test_status_bits(UPSINFO *ups)
     /*
      * Here we change UPSINFO values so lock the area.
      */
-    read_andlock_shmarea(ups);
+    write_lock(ups);
 
     if (ups->Status & UPS_ONBATT)
 	ups->OnBatt = 1;	      /* On battery power */
@@ -150,7 +150,7 @@ static void test_status_bits(UPSINFO *ups)
     if (ups->Status & UPS_SHUTDOWN) {
        ups->remotedown = 1;	      /* if master is shutting down so do we */
     }
-    write_andunlock_shmarea(ups);
+    write_unlock(ups);
 }
 
 /*
@@ -295,7 +295,7 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
     char answer[200];
     int stat = 1;
 
-    read_andlock_shmarea(ups);
+    write_lock(ups);
 
     if (fill) {
        fill_status_buffer(ups);
@@ -311,14 +311,17 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
     }
     Dmsg2(100, "Got Status = %s %03x\n", answer, ups->Status);
 
-    write_andunlock_shmarea(ups);
+    write_unlock(ups);
 
     test_status_bits(ups);
+
     /* If we lost connection with master and we
      * are running on batteries, shutdown now
      */
     if (stat == 0 && ups->OnBatt) {
+       write_lock(ups);
        ups->remotedown = TRUE;
+       write_unlock(ups);
     }
     return stat;
 }
@@ -369,7 +372,7 @@ int net_ups_get_capabilities(UPSINFO *ups)
 {
     char answer[200];
 
-    read_andlock_shmarea(ups);
+    write_lock(ups);
 
     fill_status_buffer(ups);   
 
@@ -410,7 +413,7 @@ int net_ups_get_capabilities(UPSINFO *ups)
     ups->UPS_Cap[CI_REVNO] =
         getupsvar(ups, "firmware", answer, sizeof(answer));
        
-    write_andunlock_shmarea(ups);
+    write_unlock(ups);
     return 1;
 }
 
@@ -444,7 +447,7 @@ int net_ups_read_volatile_data(UPSINFO *ups)
 {
     char answer[200];
 
-    read_andlock_shmarea(ups);
+    write_lock(ups);
 
     /* ***FIXME**** poll time needs to be scanned */
     ups->poll_time = time(NULL);
@@ -533,7 +536,7 @@ int net_ups_read_volatile_data(UPSINFO *ups)
 	strcpy(ups->X, answer);
     }
 
-    write_andunlock_shmarea(ups);
+    write_unlock(ups);
 
     get_ups_status_flag(ups, 0);
 
@@ -544,7 +547,7 @@ int net_ups_read_static_data(UPSINFO *ups)
 {
     char answer[200];
 
-    read_andlock_shmarea(ups);
+    write_lock(ups);
 
     fill_status_buffer(ups);
 
@@ -573,7 +576,7 @@ int net_ups_read_static_data(UPSINFO *ups)
 	strcpy(ups->firmrev, answer);
     }
 
-    write_andunlock_shmarea(ups);
+    write_unlock(ups);
     return 1;
 }
 

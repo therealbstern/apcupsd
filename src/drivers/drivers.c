@@ -1,9 +1,9 @@
 /*
  *  apcdrivers.c -- UPS drivers middle (link) layer.
  *
- *  apcupsd.c        -- Simple Daemon to catch power failure signals from a
- *                   BackUPS, BackUPS Pro, or SmartUPS (from APCC).
- *                -- Now SmartMode support for SmartUPS and BackUPS Pro.
+ *  apcupsd.c	     -- Simple Daemon to catch power failure signals from a
+ *		     BackUPS, BackUPS Pro, or SmartUPS (from APCC).
+ *		  -- Now SmartMode support for SmartUPS and BackUPS Pro.
  *
  *  Copyright (C) 1996-99 Andre M. Hedrick <andre@suse.com>
  *  Copyright (C) 1999-2001 Riccardo Facchetti <riccardo@apcupsd.org>
@@ -12,11 +12,11 @@
  */
 
 /*
- *                       GNU GENERAL PUBLIC LICENSE
- *                          Version 2, June 1991
+ *			 GNU GENERAL PUBLIC LICENSE
+ *			    Version 2, June 1991
  *
  *  Copyright (C) 1989, 1991 Free Software Foundation, Inc.
- *                             675 Mass Ave, Cambridge, MA 02139, USA
+ *			       675 Mass Ave, Cambridge, MA 02139, USA
  *  Everyone is permitted to copy and distribute verbatim copies
  *  of this license document, but changing it is not allowed.
  *
@@ -181,22 +181,27 @@ static UPSDRIVER *helper_attach_driver(UPSINFO *ups, char *drvname)
 {
     int i;
 
+    write_lock(ups);
+
     ups->driver = NULL;
     for (i=0; drivers[i].driver_name; i++) {
         Dmsg1(99, "Driver %s is configured.\n", drivers[i].driver_name);
-        if (!strcmp(drivers[i].driver_name, drvname)) {
-            ups->driver = &drivers[i];
+	if (!strcmp(drivers[i].driver_name, drvname)) {
+	    ups->driver = &drivers[i];
             Dmsg1(20, "Driver %s found and attached.\n", drvname);
-        }
+	}
     }
     if (!ups->driver) {
         printf("\nDriver %s not found.\nThe available drivers are:\n", drvname);
-        for (i=0; drivers[i].driver_name; i++) {
+	for (i=0; drivers[i].driver_name; i++) {
             printf("%s\n", drivers[i].driver_name);
-        }
+	}
         printf("\n");
     }
 
+    write_unlock(ups);
+
+    Dmsg1(99, "Driver ptr=0x%x\n", ups->driver);
     return ups->driver;
 }
 
@@ -207,44 +212,44 @@ UPSDRIVER *attach_driver(UPSINFO *ups) {
      */
     switch(ups->mode.type) {
 
-        case BK:
-        case SHAREBASIC:
-        case NETUPS:
-        case DUMB_UPS:
+	case BK:
+	case SHAREBASIC:
+	case NETUPS:
+	case DUMB_UPS:
             driver_name = "dumb";
-            break;
+	    break;
 
-        case BKPRO:
-        case VS:
-        case NBKPRO:
-        case SMART:
-        case MATRIX:
-        case SHARESMART:
-        case APCSMART_UPS:
+	case BKPRO:
+	case VS:
+	case NBKPRO:
+	case SMART:
+	case MATRIX:
+	case SHARESMART:
+	case APCSMART_UPS:
             driver_name = "apcsmart";
-            break;
+	    break;
 
-        case USB_UPS:
+	case USB_UPS:
             driver_name = "usb";
-            break;
+	    break;
 
-        case SNMP_UPS:
+	case SNMP_UPS:
             driver_name = "snmp";
-            break;
+	    break;
 
-        case TEST_UPS:
+	case TEST_UPS:
             driver_name = "test";
-            break;
+	    break;
 
-        case NETWORK_UPS:
+	case NETWORK_UPS:
             driver_name = "net";
-            break;
+	    break;
 
-        default:
-        case NO_UPS:
+	default:
+	case NO_UPS:
             Dmsg1(10, "Warning: no UPS driver found (ups->mode.type=%d).\n",
-                        ups->mode.type);
-            break;
+			ups->mode.type);
+	    break;
     }
     return driver_name ? helper_attach_driver(ups, driver_name) : NULL;
 }

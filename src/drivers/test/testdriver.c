@@ -37,11 +37,13 @@ int test_ups_check_state(UPSINFO *ups)
  */
 int test_ups_open(UPSINFO *ups)
 {
+    write_lock(ups);
     if (!open_test_device(ups)) {
         Error_abort1(_("Cannot open UPS device %s\n"),
 			ups->device);
     }
     ups->ups_connected = 1;
+    write_unlock(ups);
     return 1;
 }
 
@@ -52,11 +54,14 @@ int test_ups_setup(UPSINFO *ups) {
     return 1;
 }
 
-int test_ups_close(UPSINFO *ups) {
+int test_ups_close(UPSINFO *ups) 
+{
+    write_lock(ups);
     /*
      * Seems that there is nothing to do.
      */
     ups->fd = -1;
+    write_unlock(ups);
     return 1;
 }
 
@@ -68,9 +73,11 @@ int test_ups_get_capabilities(UPSINFO *ups)
     int k;
 
 
+    write_lock(ups);
     for (k=0; k <= CI_MAX_CAPS; k++) {
        ups->UPS_Cap[k] = TRUE;
     }
+    write_unlock(ups);
     return 1;
 }
 
@@ -82,6 +89,7 @@ int test_ups_get_capabilities(UPSINFO *ups)
  */
 int test_ups_read_static_data(UPSINFO *ups)
 {
+    write_lock(ups);
     /* UPS_NAME */
 
     /* model, firmware */
@@ -122,6 +130,7 @@ int test_ups_read_static_data(UPSINFO *ups)
 
     /* Nominal battery voltage */
     ups->nombattv = (double)12;
+    write_unlock(ups);
     return 1;
 }
 
@@ -136,7 +145,7 @@ int test_ups_read_volatile_data(UPSINFO *ups)
 
     time(&ups->poll_time);	  /* save time stamp */
 
-    read_andlock_shmarea(ups);
+    write_lock(ups);
 
     /* UPS_STATUS -- this is the most important status for apcupsd */
 
@@ -178,7 +187,7 @@ int test_ups_read_volatile_data(UPSINFO *ups)
 
     /* Self test results */
     strcpy(ups->X, "OK");
-    write_andunlock_shmarea(ups);
+    write_unlock(ups);
 
     return 1;
 }

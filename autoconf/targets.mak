@@ -53,7 +53,7 @@ dummy:
  
 .po.cat:
 	sed -f $(topdir)/src/intl/po2msg.sed < $< > $*.msg \
-	  && rm -f $@ && $(GENCAT) $@ $*.msg                                        
+	  && rm -f $@ && $(GENCAT) $@ $*.msg					    
 
 # Library targets
 $(topdir)/src/lib/libapc.a: $(topdir)/src/lib/*.[ch]
@@ -126,7 +126,7 @@ Makefile: $(srcdir)/Makefile.in $(topdir)/config.status \
 configure:  $(topdir)/autoconf/configure.in $(topdir)/autoconf/aclocal.m4 \
 			$(topdir)/autoconf/acconfig.h $(topdir)/autoconf/config.h.in
 	cd $(topdir);
-	$(RMF) config.cache config.log config.status include/config.h
+	$(RMF) config.cache config.log config.out config.status include/config.h
 	autoconf --localdir=$(topdir)/autoconf \
 	autoconf/configure.in > configure
 	chmod 755 configure
@@ -230,4 +230,3 @@ TAGS:
 	(cd $(topdir) && $(ETAGS) `find . \( -name \*.c -o -name \*.h \)`)
 tags:
 	(cd $(topdir) && $(CTAGS) `find . \( -name \*.c -o -name \*.h \)`)
-

@@ -522,7 +522,7 @@ int usb_ups_check_state(UPSINFO *ups)
 	   sleep(6 - (time(NULL) - private->debounce));
 	   private->debounce = 0;
 	}
-	read_andlock_shmarea(ups);
+	write_lock(ups);
 	for (i=0; i < (retval/sizeof(ev[0])); i++) {
 	    if (ev[i].hid == ups->UPS_Cmd[CI_Discharging]) {
 		/* If first time on batteries, debounce */
@@ -578,7 +578,7 @@ int usb_ups_check_state(UPSINFO *ups)
 	    }
             Dmsg1(200, "Status=%d\n", ups->Status);
 	}
-	write_andunlock_shmarea(ups);
+	write_unlock(ups);
 	break;
     }
     return 1;
@@ -593,6 +593,7 @@ int usb_ups_open(UPSINFO *ups)
 {
     USB_DATA *private = ups->driver_internal_data;
 
+    write_lock(ups);
     if (private == NULL) {
        private = malloc(sizeof(USB_DATA));
        if (private == NULL) {
@@ -611,6 +612,7 @@ int usb_ups_open(UPSINFO *ups)
         Error_abort1(_("Cannot open UPS device %s\n"), ups->device);
     }
     ups->ups_connected = 1;
+    write_unlock(ups);
     return 1;
 }
 
@@ -626,10 +628,12 @@ int usb_ups_setup(UPSINFO *ups) {
      */
 int usb_ups_close(UPSINFO *ups)
 {
+    write_lock(ups);
     if (ups->driver_internal_data) {
 	free(ups->driver_internal_data);
 	ups->driver_internal_data = NULL;
     }
+    write_unlock(ups);
     return 1;
 }
 
@@ -645,6 +649,7 @@ int usb_ups_get_capabilities(UPSINFO *ups)
     struct hiddev_usage_ref uref;
     int i, j, k, n;
 
+    write_lock(ups);
     if (ioctl(private->fd, HIDIOCINITREPORT, 0) < 0) {
        Error_abort1("Cannot init USB HID report. ERR=%s\n", strerror(errno));
     }
@@ -715,6 +720,7 @@ int usb_ups_get_capabilities(UPSINFO *ups)
 	}
     }
     ups->UPS_Cap[CI_STATUS] = TRUE;   /* we have status flag */
+    write_unlock(ups);
     return 1;
 }
 
@@ -730,6 +736,8 @@ int usb_ups_read_static_data(UPSINFO *ups)
     struct hiddev_devinfo dinfo;
     int v, yy, mm, dd;
     USB_DATA *private = ups->driver_internal_data;
+
+    write_lock(ups);
 
     if (ioctl(private->fd, HIDIOCGDEVINFO, &dinfo) >= 0) {
        private->vendor = dinfo.vendor;
@@ -853,6 +861,7 @@ int usb_ups_read_static_data(UPSINFO *ups)
     if (get_value(ups, CI_NOMBATTV, &uinfo)) {
 	ups->nombattv = uinfo.dValue;
     }
+    write_unlock(ups);
     return 1;
 }
 
@@ -868,7 +877,7 @@ int usb_ups_read_volatile_data(UPSINFO *ups)
 
     time(&ups->poll_time);	  /* save time stamp */
 
-    read_andlock_shmarea(ups);
+    write_lock(ups);
 
     /* UPS_STATUS -- this is the most important status for apcupsd */
 
@@ -983,7 +992,7 @@ int usb_ups_read_volatile_data(UPSINFO *ups)
 	}
     }
 
-    write_andunlock_shmarea(ups);
+    write_unlock(ups);
 
     return 1;
 }

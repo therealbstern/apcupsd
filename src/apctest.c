@@ -31,14 +31,8 @@
 
 #include "apc.h"
 
-/*
- * myUPS is a structure that need to be defined in _all_ the forked processes.
- * The syncronization of data into this structure is done with the shared
- * memory area so this is made reentrant by the shm mechanics.
- */
-UPSINFO myUPS;
-UPSINFO *core_ups = &myUPS; /* To understand the real need for it. */
-UPSINFO *ups = &myUPS;	 /* Added for clearness */
+UPSINFO *core_ups;
+UPSINFO *ups;
 
 char argvalue[MAXSTRING];
 
@@ -160,10 +154,10 @@ void terminate (int sig)
 
     clean_threads();
 
-    destroy_ipc(ups);
 
     pmsg("apctest shutdown succeeded\n");
     closelog();
+    destroy_ups(ups);
     _exit(0);
 }
 
@@ -172,9 +166,9 @@ void error_cleanup(UPSINFO *ups)
     device_close(ups);
     delete_lockfile(ups);
     clean_threads();
-    destroy_ipc(ups);
     pmsg("apctest error shutdown completed\n");
     closelog();
+    destroy_ups(ups);
     exit(1);
 }
 
@@ -247,7 +241,14 @@ int main (int argc, char *argv[]) {
      */
     init_proctitle(argv[0]);
 #endif
+
+    ups = new_ups();		      /* get new ups */
+    if (!ups) {
+        Error_abort1(_("%s: init_ipc failed.\n"), argv[0]);
+    }
+
     init_ups_struct(ups);
+    core_ups = ups;		      /* this is our core ups structure */
 
     /*
      * parse_options is self messaging on errors, so we need only to exit()
@@ -260,7 +261,7 @@ int main (int argc, char *argv[]) {
     pmsg("apctest " APCUPSD_RELEASE " (" DATE ") " APCUPSD_HOST"\n");
 
     pmsg("Checking configuration ...\n");
-    check_for_config(&myUPS, cfgfile);
+    check_for_config(ups, cfgfile);
     
     attach_driver(ups);
 	 
@@ -271,7 +272,7 @@ int main (int argc, char *argv[]) {
     pmsg("Attached to driver: %s\n", ups->driver->driver_name);        
 
     /* Print configuration */
-    switch(myUPS.sharenet.type) {
+    switch(ups->sharenet.type) {
 	case DISABLE:
             pmsg("sharenet.type = DISABLE\n");
 	    break;
@@ -281,7 +282,7 @@ int main (int argc, char *argv[]) {
 	case NET:
             pmsg("sharenet.type = NET\n");
 
-	    switch(myUPS.class.type) {
+	    switch(ups->class.type) {
 		case NO_CLASS:
                     pmsg("class.type = NO_CLASS\n");
 		    break;
@@ -319,7 +320,7 @@ int main (int argc, char *argv[]) {
 	    terminate(1);
     }
 
-    switch (myUPS.cable.type) {
+    switch (ups->cable.type) {
        case NO_CABLE:
           pmsg("cable.type = NO_CABLE\n");
 	  break;
@@ -375,19 +376,19 @@ int main (int argc, char *argv[]) {
           pmsg("cable.type = APC_940_00XXX (unknown)\n");
 	  break;
        default:
-          pmsg("Unknown cable type: %d\n", myUPS.cable.type);
+          pmsg("Unknown cable type: %d\n", ups->cable.type);
 	  break;
 
     }
-    if (myUPS.cable.type == USB_CABLE) {
+    if (ups->cable.type == USB_CABLE) {
        pmsg("\nYou are using a USB cable type, so I'm entering USB test mode\n");
        mode = M_USB;
-    } else if (myUPS.cable.type >= CUSTOM_SMART) {
+    } else if (ups->cable.type >= CUSTOM_SMART) {
        pmsg("\nYou are using a SMART cable type, so I'm entering SMART test mode\n");
        mode = M_SMART;
     }
 
-    switch (myUPS.mode.type) {
+    switch (ups->mode.type) {
        case NO_UPS:
           pmsg("mode.type = NO_UPS\n");
 	  break;
@@ -425,26 +426,26 @@ int main (int argc, char *argv[]) {
           pmsg("mode.type = NETWORK_UPS\n");
 	  break;
        default:
-          pmsg("Unknown mode.type: %d\n", myUPS.mode.type);
+          pmsg("Unknown mode.type: %d\n", ups->mode.type);
     }
-    if (myUPS.mode.type > SHAREBASIC) {
+    if (ups->mode.type > SHAREBASIC) {
        if (mode != M_SMART) {
           pmsg("You specified a DUMB mode cable, but a SMART UPS. I give up.\n");
        }
     }
 
 
-    delete_lockfile(&myUPS);
+    delete_lockfile(ups);
 
 
-    switch(myUPS.sharenet.type) {
+    switch(ups->sharenet.type) {
 	case DISABLE:
 	case SHARE:
             pmsg("Setting up serial port ...\n");
-	    setup_device(&myUPS);
+	    setup_device(ups);
 	    break;
 	case NET:
-	    switch(myUPS.class.type) {
+	    switch(ups->class.type) {
 		case NO_CLASS:
 		case STANDALONE:
 		case SHARESLAVE:
@@ -454,12 +455,12 @@ int main (int argc, char *argv[]) {
 		case NETSLAVE:
 		    if (kill_ups_power)
                         Error_abort0(_("Ignoring killpower for slave\n"));
-		    if (prepare_slave(&myUPS)) 
+		    if (prepare_slave(ups)) 
                         Error_abort0(_("Error setting up slave\n"));
 		    break;
 		case NETMASTER:
-		    setup_device(&myUPS);
-		    if ((kill_ups_power == 0) && (prepare_master(&myUPS)))
+		    setup_device(ups);
+		    if ((kill_ups_power == 0) && (prepare_master(ups)))
                         Error_abort0("Error setting up master\n");
 		    break;
 		default:
@@ -467,8 +468,8 @@ int main (int argc, char *argv[]) {
 	    }
 	    break;
 	case SHARENET:
-	    setup_device(&myUPS);
-	    if ((kill_ups_power == 0) && (prepare_master(&myUPS)))
+	    setup_device(ups);
+	    if ((kill_ups_power == 0) && (prepare_master(ups)))
                 Error_abort0("Error setting up master.\n");
 	    break;
 	default:
@@ -480,30 +481,26 @@ int main (int argc, char *argv[]) {
 	terminate(0);
     }
 
-    if (init_ipc(&myUPS) == FAILURE) {
-        Error_abort1(_("%s: init_ipc failed.\n"), argv[0]);
-    }
-
     /*
      * Delete the lockfile just before fork. We will reacquire it just
      * after.
      */
 
-    delete_lockfile(&myUPS);
+    delete_lockfile(ups);
 
     make_pid_file();
 
     pmsg("Creating serial port lock file ...\n");
-    if (create_lockfile(&myUPS) == LCKERROR) {
-        Error_abort1(_("failed to reacquire serial port lock file on device %s\n"), myUPS.device);
+    if (create_lockfile(ups) == LCKERROR) {
+        Error_abort1(_("failed to reacquire serial port lock file on device %s\n"), ups->device);
     }
 
     init_signals(terminate);
 
-    if (myUPS.fd != -1) {
+    if (ups->fd != -1) {
 	if (mode == M_DUMB) {
            pmsg("Doing prep_device() ...\n");
-	   prep_device(&myUPS);
+	   prep_device(ups);
 	}
         /* This isn't a documented option but can be used
 	 * for testing dumb mode on a SmartUPS if you have
@@ -511,23 +508,17 @@ int main (int argc, char *argv[]) {
 	 */
 	if (dumb_mode_test) {
 	    char ans[20];
-            write(myUPS.fd, "R", 1);  /* enter dumb mode */
+            write(ups->fd, "R", 1);  /* enter dumb mode */
 	    *ans = 0;
-	    getline(ans, sizeof(ans), &myUPS);
+	    getline(ans, sizeof(ans), ups);
             pmsg("Going dumb: %s\n", ans);
 	    mode = M_DUMB; /* run in dumb mode */
 	}
     }
 
-
-
-    /*
-     * Now update the shared area with myUPS data.
-     */
-    write_shmarea(&myUPS);
     shm_OK = 1;
 
-    if (myUPS.fd != -1) {
+    if (ups->fd != -1) {
        if (mode == M_DUMB) {
 	  do_dumb_testing();
        } else if (mode == M_SMART) {
@@ -652,7 +643,7 @@ static int test_bits(int inbits)
    int bits = inbits;
 
    for (i=0; i < 10; i++) {
-      if (ioctl(myUPS.fd, TIOCMGET, &nbits) < 0) {
+      if (ioctl(ups->fd, TIOCMGET, &nbits) < 0) {
          pmsg("ioctl error, big problem: %s\n", strerror(errno));
 	 return 0;
       }
@@ -741,7 +732,7 @@ Please enter any character when ready to continue: ");
 
    /* Spin until we get a state change */
    for (i=0; ; i++) {
-      if (ioctl(myUPS.fd, TIOCMGET, &bits) < 0) {
+      if (ioctl(ups->fd, TIOCMGET, &bits) < 0) {
          pmsg("ioctl error, big problem: %s\n", strerror(errno));
 	 return;
       }
@@ -782,7 +773,7 @@ Please enter any character when ready to continue: ");
 
    /* Spin until we get a state change */
    for (i=0; ; i++) {
-      if (ioctl(myUPS.fd, TIOCMGET, &bits) < 0) {
+      if (ioctl(ups->fd, TIOCMGET, &bits) < 0) {
          pmsg("ioctl error, big problem: %s\n", strerror(errno));
 	 return;
       }
@@ -814,7 +805,7 @@ Please enter any character when ready to continue: ");
    fgetc(stdin);
    pmsg("\n");
    make_file(ups, PWRFAIL);
-   kill_power(&myUPS);
+   kill_power(ups);
    unlink(PWRFAIL);
    ptime();
    pmsg("Kill_power function called.\n");
@@ -1265,21 +1256,21 @@ NA  indicates that the feature is Not Available\n\n");
 #ifdef working
    pmsg("get_UPS_capabilities() simulation done. Now running it.\n\n");
 
-   get_UPS_capabilities(&myUPS);
-   fillUPS(&myUPS);
+   get_UPS_capabilities(ups);
+   fillUPS(ups);
 
    pmsg("Analysis of EEPROM settings\n");
 
-   if (!myUPS.UPS_Cap[CI_EPROM]) {
+   if (!ups->UPS_Cap[CI_EPROM]) {
       pmsg("Sorry, your model does not support EPROM programming.\n");
       return;
    }
-   if (myUPS.UPS_Cap[CI_REVNO])
-      locale1 = *(myUPS.firmrev + strlen(myUPS.firmrev) - 1);
+   if (ups->UPS_Cap[CI_REVNO])
+      locale1 = *(ups->firmrev + strlen(ups->firmrev) - 1);
    else  
       locale1 = 0;
-   if (myUPS.UPS_Cap[CI_UPSMODEL])
-      locale2 = *(myUPS.upsmodel + strlen(myUPS.upsmodel) - 1);
+   if (ups->UPS_Cap[CI_UPSMODEL])
+      locale2 = *(ups->upsmodel + strlen(ups->upsmodel) - 1);
    else
       locale2 = 0;
    if (locale1 == locale2 && locale1 == 0) {
@@ -1292,8 +1283,8 @@ NA  indicates that the feature is Not Available\n\n");
        locale = locale2;
    else 
        locale = locale1;
-   parse_eprom_cmds(myUPS.eprom, locale);
-   print_valid_eprom_values(myUPS.mode.long_name);
+   parse_eprom_cmds(ups->eprom, locale);
+   print_valid_eprom_values(ups->mode.long_name);
 #endif
        
    pmsg("\nThat is all for now.\n");
@@ -1313,6 +1304,8 @@ static struct {
 /* Total number of EPROM commands */
 static int ncmd = 0;
 
+static UPSINFO eeprom_ups;
+
 /* Table of the UPS command, the apcupsd configuration directive,
  *  and an explanation of what the command sets in the EPROM.
  */
@@ -1323,16 +1316,16 @@ static struct {
  char type;
  int *data;
 } cmd_table[] = {
-  {'u', "HITRANSFER",    "Upper transfer voltage", 'i', &myUPS.hitrans},
-  {'l', "LOTRANSFER",    "Lower transfer voltage", 'i', &myUPS.lotrans},
-  {'e', "RETURNCHARGE",  "Return threshold", 'i', &myUPS.rtnpct},
-  {'o', "OUTPUTVOLTS",   "Output voltage on batts", 'i', &myUPS.NomOutputVoltage},
-  {'s', "SENSITIVITY",   "Sensitivity", 'c', (int *)myUPS.sensitivity},
-  {'q', "LOWBATT",       "Low battery warning", 'i', &myUPS.dlowbatt},
-  {'p', "SLEEP",         "Shutdown grace delay", 'i', &myUPS.dshutd},
-  {'k', "BEEPSTATE",     "Alarm delay", 'c', (int *)myUPS.beepstate},
-  {'r', "WAKEUP",        "Wakeup delay", 'i', &myUPS.dwake},
-  {'E', "SELFTEST",      "Self test interval", 'c', (int *)myUPS.selftest},
+  {'u', "HITRANSFER",    "Upper transfer voltage", 'i', &eeprom_ups.hitrans},
+  {'l', "LOTRANSFER",    "Lower transfer voltage", 'i', &eeprom_ups.lotrans},
+  {'e', "RETURNCHARGE",  "Return threshold", 'i', &eeprom_ups.rtnpct},
+  {'o', "OUTPUTVOLTS",   "Output voltage on batts", 'i', &eeprom_ups.NomOutputVoltage},
+  {'s', "SENSITIVITY",   "Sensitivity", 'c', (int *)eeprom_ups.sensitivity},
+  {'q', "LOWBATT",       "Low battery warning", 'i', &eeprom_ups.dlowbatt},
+  {'p', "SLEEP",         "Shutdown grace delay", 'i', &eeprom_ups.dshutd},
+  {'k', "BEEPSTATE",     "Alarm delay", 'c', (int *)eeprom_ups.beepstate},
+  {'r', "WAKEUP",        "Wakeup delay", 'i', &eeprom_ups.dwake},
+  {'E', "SELFTEST",      "Self test interval", 'c', (int *)eeprom_ups.selftest},
   {0, NULL, NULL}	 /* Last entry */
   };
 

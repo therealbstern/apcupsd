@@ -217,7 +217,7 @@ void thread_terminate(int sig)
 	 */
 	if (!strcmp(ups->upsname, CORENAME))
 	    continue;
-	detach_ipc(ups);
+	detach_ups(ups);
     }
 
     /*

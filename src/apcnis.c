@@ -62,6 +62,8 @@ static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
 #define P(x)
 #define V(x)
 #endif
+
+
 static char largebuf[4096];
 static int stat_recs;
 
@@ -225,16 +227,7 @@ void do_server(UPSINFO *ups)
 
    init_thread_signals();
 
-	local_ip.s_addr = INADDR_ANY;
-	if (ups->nisip) {
-		if (inet_pton(AF_INET, ups->nisip, &local_ip) != 1) {
-			log_event(ups, LOG_WARNING, "Invalid IP: '%s'", ups->nisip);
-			local_ip.s_addr = INADDR_ANY;
-		}
-	}
-
-
-   for (tlog=0; attach_ipc(ups, SHM_RDONLY) != SUCCESS; tlog -= 5*60 ) {
+   for (tlog=0; (ups=attach_ups(ups, SHM_RDONLY)) == NULL; tlog -= 5*60 ) {
       if (tlog <= 0) {
 	 tlog = 60*60; 
          log_event(ups, LOG_ERR, "apcserver: Cannot attach SYSV IPC.\n");
@@ -242,12 +235,12 @@ void do_server(UPSINFO *ups)
       sleep(5*60);
    }
 
-   for (tlog=0; read_shmarea(ups, 0) != SUCCESS; tlog -= 5*60 ) {
-      if (tlog <= 0) {
-	 tlog = 60*60; 
-         log_event(ups, LOG_ERR, "apcserver: Cannot read shm data area.\n");
+   local_ip.s_addr = INADDR_ANY;
+   if (ups->nisip[0]) {
+      if (inet_pton(AF_INET, ups->nisip, &local_ip) != 1) {
+         log_event(ups, LOG_WARNING, "Invalid NISIP specified: '%s'", ups->nisip);
+	 local_ip.s_addr = INADDR_ANY;
       }
-      sleep(5*60);
    }
 
    /*
@@ -377,7 +370,7 @@ void *handle_client_request(void *arg)
 #ifdef HAVE_PTHREADS
     pthread_detach(pthread_self());
 #endif
-    if (attach_ipc(ups, SHM_RDONLY) != SUCCESS) {
+    if ((ups=attach_ups(ups, SHM_RDONLY)) == NULL) {
 	net_send(nsockfd, notrun, sizeof(notrun));
 	net_send(nsockfd, NULL, 0);
 	free(arg);
@@ -388,13 +381,6 @@ void *handle_client_request(void *arg)
 	/* Read command */
 	if (net_recv(nsockfd, line, MAXSTRING) <= 0) {
 	    break;			 /* connection terminated */
-	}
-
-	if (read_shmarea(ups, 0) != SUCCESS) {
-	    net_send(nsockfd, notavail, sizeof(notavail));
-	    net_send(nsockfd, NULL, 0);
-            log_event(ups, LOG_ERR, "apcserver: Cannot read shm data area.\n");
-	    break; 
 	}
 
         if (strncmp("status", line, 6) == 0) {
@@ -445,11 +431,11 @@ void *handle_client_request(void *arg)
 	    }
 	}
     }
-    detach_ipc(ups);
 #ifdef HAVE_PTHREADS
     shutdown(nsockfd, 2);
     close(nsockfd);
 #endif
     free(arg);
+    detach_ups(ups);
     return NULL;
 }

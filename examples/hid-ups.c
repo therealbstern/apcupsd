@@ -1,5 +1,5 @@
 /*
- * $Id: hid-ups.c,v 1.1.1.1 2002-05-28 13:34:19 kerns Exp $
+ * $Id: hid-ups.c,v 1.2 2002-06-02 09:12:56 kerns Exp $
  *
  *  Copyright (c) 2001 Vojtech Pavlik <vojtech@ucw.cz>
  *  Copyright (c) 2001 Paul Stewart <hiddev@wetlogic.net>
@@ -29,8 +29,6 @@
  * e-mail - mail your message to <vojtech@ucw.cz>, or by paper mail:
  * Vojtech Pavlik, Simunkova 1492, Prague 8, 182 00 Czech Republic
  */
-
-#ifdef HAVE_USB_DRIVER
 
 #define DEBUG 1 		      /* if set prints full reports */
 #define TESTING 1		      /* if set disables actual operation */
@@ -639,12 +637,3 @@ int main (int argc, char **argv) {
 	fflush(stdout);
     }
 }
-
-#else
-
-int main (int argc, char **argv) {
-    printf("Please, configure the package with the USB driver.\n");
-    return 0;
-}
-
-#endif /* HAVE_USB_DRIVER */

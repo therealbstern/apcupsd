@@ -229,7 +229,7 @@ typedef struct netdata {
  * risk to have users reading the shared memory with an old
  * nonvalid upsinfo structure. 
  */
-#define UPSINFO_VERSION 10
+#define UPSINFO_VERSION 11
 /*
  * There is no need to change the following, but you can if
  * you want, but it must be at least 4 characters to match
@@ -356,7 +356,7 @@ typedef struct upsinfo {
     int nettime;                     /* Time interval for master to send to slaves */
     int percent;                     /* shutdown when batt % less than this */
     int runtime;                     /* shutdown when runtime less than this */
-    char nisip[64];          			 /* IP for NIS */
+    char nisip[64];                  /* IP for NIS */
     int statusport;                  /* TCP port for STATUS */
     int netstats;                    /* turn on/off network status */
     int logstats;                    /* turn on/off logging of status info */
@@ -401,13 +401,11 @@ typedef struct upsinfo {
      * Don't use shmUPS directly: call ipc functions to get it or
      * unpredictable results may happen.
      */
-    struct upsinfo *shmUPS;     /* Pointer to shared IPC UPSINFO structure */
     int sem_id;                 /* Semaphore ID */
     int shm_id;                 /* Shared memory ID */
     struct sembuf semUPS[NUM_SEM_OPER]; /* Semaphore operators */
     int idshmUPS;               /* key of shared memory area */
     int idsemUPS;               /* key of semphores */
-    int shm_OK;                 /* shm area updated */
 #endif
 
     /*
@@ -417,6 +415,7 @@ typedef struct upsinfo {
     struct upsinfo *next;
 #ifdef HAVE_PTHREADS
     pthread_mutex_t mutex;
+    int refcnt;                       /* thread attach count */
 #endif
 
     struct upsdriver *driver;       /* UPS driver for this UPSINFO */

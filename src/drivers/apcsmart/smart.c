@@ -270,7 +270,7 @@ int getline(char *s, int len, UPSINFO *ups)
 	 *     already held the shm lock so no need to hold it
 	 *     another time. Simply update the UPS structure
 	 *     fields and the shm will be updated when
-	 *     write_andunlock_shmarea is called by the calling
+	 *     write_unlock is called by the calling
 	 *     routine.
 	 *
 	 * If something changes on the UPS, a special character is
@@ -281,53 +281,53 @@ int getline(char *s, int len, UPSINFO *ups)
 	 */
         case UPS_ON_BATT:        /* UPS_ON_BATT = '!'   */
 	    if (s == NULL)
-		read_andlock_shmarea(ups);
+		write_lock(ups);
 	    if (!ups->OnBatt) {
 	       private->debounce = time(NULL);
 	    }
 	    ups->OnBatt = 1;
             Dmsg0(80, "Got UPS ON BATT.\n");
 	    if (s == NULL) {
-		write_andunlock_shmarea(ups);
+		write_unlock(ups);
 		ending = 1;
 	    }
 	    break;
         case UPS_REPLACE_BATTERY: /* UPS_REPLACE_BATTERY = '#'   */
 	    if (s == NULL)
-		read_andlock_shmarea(ups);
+		write_lock(ups);
 	    if (!ups->ChangeBatt) {   /* set if not already set */
 	       ups->ChangeBatt = 1;
 	    }
 	    if (s == NULL) {
-		write_andunlock_shmarea(ups);
+		write_unlock(ups);
 		ending = 1;
 	    }
 	    break;
         case UPS_ON_LINE:        /* UPS_ON_LINE = '$'   */
 	    if (s == NULL)
-		read_andlock_shmarea(ups);
+		write_lock(ups);
 	    ups->OnBatt = 0;
             Dmsg0(80, "Got UPS ON LINE.\n");
 	    if (s == NULL) {
-		write_andunlock_shmarea(ups);
+		write_unlock(ups);
 		ending = 1;
 	    }
 	    break;
         case BATT_LOW:           /* BATT_LOW    = '%'   */
 	    if (s == NULL)
-		read_andlock_shmarea(ups);
+		write_lock(ups);
 	    ups->BattLow = 1;
 	    if (s == NULL) {
-		write_andunlock_shmarea(ups);
+		write_unlock(ups);
 		ending = 1;
 	    }
 	    break;
         case BATT_OK:            /* BATT_OK     = '+'   */
 	    if (s == NULL)
-		read_andlock_shmarea(ups);
+		write_lock(ups);
 	    ups->BattLow = 0;
 	    if (s == NULL) {
-		write_andunlock_shmarea(ups);
+		write_unlock(ups);
 		ending = 1;
 	    }
 	    break;
@@ -427,7 +427,7 @@ int apcsmart_ups_read_volatile_data(UPSINFO *ups)
      */
     time(&now);
 
-    read_andlock_shmarea(ups);
+    write_lock(ups);
 
     UPSlinkCheck(ups);			/* make sure serial port is working */
 
@@ -559,7 +559,7 @@ again:
     if (ups->UPS_Cap[CI_ST_TIME])
 	ups->LastSTTime = atof(smart_poll(ups->UPS_Cmd[CI_ST_TIME], ups));
 
-    write_andunlock_shmarea(ups);
+    write_unlock(ups);
 
     apc_enable(ups); /* reenable APC serial UPS */
 

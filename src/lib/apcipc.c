@@ -72,108 +72,87 @@
 
 #ifdef HAVE_PTHREADS
 
-int init_ipc(UPSINFO *ups)
+
+
+UPSINFO *new_ups()	 
 {
     int stat;
+    UPSINFO *ups;
 
+    ups = (UPSINFO *)malloc(sizeof(UPSINFO));
+    if (!ups) {
+       Error_abort0(_("Could not allocate ups memory\n"));
+    }
+    memset(ups, 0, sizeof(UPSINFO));
     if ((stat = pthread_mutex_init(&ups->mutex, NULL)) != 0) {
         Error_abort1("Could not create pthread mutex. ERR=%s\n",
 	   strerror(stat));
-	return FAILURE;
+	free(ups);
+	return NULL;
+    }
+    ups->refcnt = 1;
+    return ups;
+}
+
+/*
+ * Attach to ups structure 
+ */
+UPSINFO *attach_ups(UPSINFO *ups, int shmperm)
+{
+    if (!ups) {
+       return new_ups();
+    }
+    P(ups->mutex);
+    ups->refcnt++;
+    V(ups->mutex);
+    return ups; 
+}
+
+int detach_ups(UPSINFO *ups)
+{
+    ups->refcnt--;
+    if (ups->refcnt == 0) {
+       return destroy_ups(ups);
     }
     return SUCCESS;
 }
 
-int attach_ipc(UPSINFO *ups, int shmperm)
-{
-    return SUCCESS;
-}
-
-int detach_ipc(UPSINFO *ups)
-{
-    return SUCCESS;
-}
-
-int destroy_ipc(UPSINFO *ups)
+int destroy_ups(UPSINFO *ups)
 {
     pthread_mutex_destroy(&ups->mutex);
+    if (ups->refcnt == 0) {
+       free(ups);
+    }
     return SUCCESS;
 }
 
-int read_lock(UPSINFO *ups)
+int _read_lock(char *file, int line, UPSINFO *ups)
 {
+    Dmsg2(100, "read_lock at %s:%d\n", file, line);
     P(ups->mutex);
     return SUCCESS;
 }
 
-int read_unlock(UPSINFO *ups)
+int _read_unlock(char *file, int line, UPSINFO *ups)
 {
+    Dmsg2(100, "read_unlock at %s:%d\n", file, line);
     V(ups->mutex);
     return SUCCESS;
 }
 
-int write_lock(UPSINFO *ups)
+int _write_lock(char *file, int line, UPSINFO *ups)
 {
+    Dmsg2(100, "write_lock at %s:%d\n", file, line);
     P(ups->mutex);
     return SUCCESS;
 }
 
-int write_unlock(UPSINFO *ups)
+int _write_unlock(char *file, int line, UPSINFO *ups)
 {
+    Dmsg2(100, "write_unlock at %s:%d\n", file, line);
     V(ups->mutex);
     return SUCCESS;
 }
-
-int read_shmarea(UPSINFO *ups, int lock)
-{
-    return SUCCESS;
-}
-
-int write_shmarea(UPSINFO *ups)
-{
-    return SUCCESS;
-}
-
-
-/*
- * To do at the very start of a thread, to sync data from the common data
- * structure.
- */
-int read_andlock_shmarea(UPSINFO *ups)
-{
-    if (write_lock(ups) == FAILURE)
-	return FAILURE;
-    return SUCCESS;
-}
-
-/*
- * To do at the very end of a thread, to sync data to the common data
- * structure.
- */
-int write_andunlock_shmarea(UPSINFO *ups)
-{
-    return write_unlock(ups);
-}
-
-/*
- * For read-only requests.  No copying is done.
- * Danger! Use with caution:
- *
- * 1) Don't modify anything in the shmUPS-structure while holding this lock.
- * 2) Don't hold the lock for too long.
- */
-UPSINFO *lock_shmups(UPSINFO *ups)
-{
-    if (read_lock(ups) == FAILURE)
-	return NULL;
-    return ups;
-}
-
-void unlock_shmups(UPSINFO *ups)
-{
-    read_unlock(ups);
-}
-
 
 #else
 
@@ -184,54 +163,60 @@ void unlock_shmups(UPSINFO *ups)
 
 
 /* Forward referenced subroutines */
-static int create_shmarea(UPSINFO *ups, int shmperm);
-static int attach_shmarea(UPSINFO *ups, int shmperm);
+static UPSINFO *create_shmarea(int shmperm);
+static UPSINFO *attach_shmarea(int shm_id, int shmperm);
+static int attach_semaphore(UPSINFO *ups);
+static int create_semaphore(UPSINFO *ups);
+static int destroy_semaphore(UPSINFO *ups);
 static int detach_shmarea(UPSINFO *ups);
 static int destroy_shmarea(UPSINFO *ups);
 
-/*
- * Dealing with shm we cannot simply memcpy because we would overwrite
- * the shmUPS pointer. We have to save it and restore after the copy.
- */
-static void shmcpyUPS(UPSINFO *dst, UPSINFO *src)
-{
-    UPSINFO *ptr;
 
-    ptr = dst->shmUPS;
-    memcpy(dst, src, sizeof(UPSINFO));
-    dst->shmUPS = ptr;
-}
+static int sem_id = SEM_ID;	   /* Semaphore ID */
+static int shm_id = SHM_ID;	   /* Shared memory ID */
 
-int init_ipc(UPSINFO *ups)
+
+UPSINFO *new_ups()
 {
+    UPSINFO *ups;
     /*
      * If we fail initializing IPC structures it is better destroy any
      * semi-initialized IPC.
      */
-    if (create_shmarea(ups, 0644) == FAILURE)
-	return FAILURE;
+    ups = create_shmarea(0644);
+    if (!ups) {
+	return NULL;
+    }
 
     if (create_semaphore(ups) == FAILURE) {
 	destroy_shmarea(ups);
-	return FAILURE;
+	return NULL;
     }
-    return SUCCESS;
+
+    return ups;
 }
 
-int attach_ipc(UPSINFO *ups, int shmperm)
+/*
+ * Another process can attach to our ups structure
+ */
+UPSINFO *attach_ups(UPSINFO *ups, int shmperm)
 {
     /*
      * If we fail attaching IPC structures, the problem is local so return
      * failure but don't touch already initialized IPC structures.
      */
-    if (attach_shmarea(ups, shmperm) == FAILURE)
-	return FAILURE;
+    ups = attach_shmarea(shm_id, shmperm);
+    if (!ups) {
+       return NULL;
+    }
+    Dmsg4(100, "ups=%x shm_id=%x sem_id=%x idshmUPS=%d\n", 
+	ups, ups->shm_id, ups->sem_id, ups->idshmUPS);
     if (attach_semaphore(ups) == FAILURE)
-	return FAILURE;
-    return SUCCESS;
+	return NULL;
+    return ups;
 }
 
-int detach_ipc(UPSINFO *ups)
+int detach_ups(UPSINFO *ups)
 {
     if (detach_shmarea(ups) == FAILURE) {
 	return FAILURE;
@@ -239,7 +224,7 @@ int detach_ipc(UPSINFO *ups)
     return SUCCESS;
 }
 
-int destroy_ipc(UPSINFO *ups)
+int destroy_ups(UPSINFO *ups)
 {
     if (destroy_shmarea(ups) == FAILURE) {
 	return FAILURE;
@@ -250,8 +235,9 @@ int destroy_ipc(UPSINFO *ups)
     return SUCCESS;
 }
 
-int read_lock(UPSINFO *ups)
+int _read_lock(char *file, int line, UPSINFO *ups)
 {
+    Dmsg2(100, "read_lock at %s:%d\n", file, line);
     /*
      * Acquire writer lock to be sure no other write is in progress.
      */
@@ -282,8 +268,9 @@ int read_lock(UPSINFO *ups)
     return SUCCESS;
 }
 
-int read_unlock(UPSINFO *ups)
+int _read_unlock(char *file, int line, UPSINFO *ups)
 {
+    Dmsg2(100, "read_unlock at %s:%d\n", file, line);
     /*
      * Reader counter must be decremented
      */
@@ -299,8 +286,9 @@ int read_unlock(UPSINFO *ups)
     return SUCCESS;
 }
 
-int write_lock(UPSINFO *ups)
+int _write_lock(char *file, int line, UPSINFO *ups)
 {
+    Dmsg2(100, "write_lock at %s:%d\n", file, line);
     /*
      * Acquire writer lock to be sure no other write is in progress.
      */
@@ -338,8 +326,9 @@ int write_lock(UPSINFO *ups)
     return SUCCESS;
 }
 
-int write_unlock(UPSINFO *ups)
+int _write_unlock(char *file, int line, UPSINFO *ups)
 {
+    Dmsg2(100, "write_unlock at %s:%d\n", file, line);
     /*
      * Release writer lock.
      */
@@ -355,7 +344,7 @@ int write_unlock(UPSINFO *ups)
     return SUCCESS;
 }
 
-int create_semaphore(UPSINFO *ups)
+static int create_semaphore(UPSINFO *ups)
 {
     union semun apcsun;
     unsigned short int vals[NUM_SEM];
@@ -370,10 +359,10 @@ int create_semaphore(UPSINFO *ups)
      */
     for (i=0; i<MAX_TRIES; i++) {
 	if ((ups->idsemUPS =
-		semget(ups->sem_id, NUM_SEM, IPC_CREAT | 0644)) == -1) {
+		semget(sem_id, NUM_SEM, IPC_CREAT | 0644)) == -1) {
             log_event(ups, LOG_WARNING, _("Cannot create semaphore for key=%x, retrying... ERR=%s\n"),
-		ups->sem_id, strerror(errno));
-	    ups->sem_id++;		/* try another one */
+		sem_id, strerror(errno));
+	    sem_id++;		   /* try another one */
 	    continue;
 	}
 	found = TRUE;
@@ -381,7 +370,7 @@ int create_semaphore(UPSINFO *ups)
     }
     if (!found) {
         log_event(ups, LOG_ERR, _("Unable to create semaphore. ERR=%s\n"),
-	      ups->sem_id, strerror(errno));
+	      sem_id, strerror(errno));
 	return FAILURE;
     }
 
@@ -394,13 +383,14 @@ int create_semaphore(UPSINFO *ups)
 	    strerror(errno));
 	return FAILURE;
     }
-
+    ups->sem_id = sem_id;
+    Dmsg2(100, "ups=%x sem_id=%x\n", ups, ups->sem_id);
     return SUCCESS;
 }
 
-int attach_semaphore(UPSINFO *ups)
+static int attach_semaphore(UPSINFO *ups)
 {
-    if ((ups->idsemUPS = semget(ups->sem_id, NUM_SEM, 0)) == -1) {
+    if (semget(ups->sem_id, NUM_SEM, 0) == -1) {
         log_event(ups, LOG_ERR, _("attach_semaphore: cannot attach sem. ERR=%s\n"),
 	    strerror(errno));
 	return FAILURE;
@@ -408,7 +398,7 @@ int attach_semaphore(UPSINFO *ups)
     return SUCCESS;
 }
 
-int destroy_semaphore(UPSINFO *ups)
+static int destroy_semaphore(UPSINFO *ups)
 {
     union semun arg;
 
@@ -433,19 +423,24 @@ int destroy_semaphore(UPSINFO *ups)
  * that no other thread may read from that area until the write is done.
  * Multiple read lock is permitted.
  */
-static int create_shmarea(UPSINFO *ups, int shmperm)
+static UPSINFO *create_shmarea(int shmperm)
 {
     int i;
     int found = FALSE;
+    UPSINFO *ups;
+    int idshmUPS = -1;
 
     for (i=0; i<MAX_TRIES; i++) {
-	if ((ups->idshmUPS = shmget(ups->shm_id, sizeof(UPSINFO),
-		    IPC_CREAT | shmperm)) == -1) {
+	if ((idshmUPS = shmget(shm_id, sizeof(UPSINFO), 
+				     IPC_CREAT | shmperm)) == -1) {
 	    log_event(ups, LOG_WARNING,
                _("Cannot create shared memory area for key=%x, retrying... ERR=%s\n"),
-		  ups->shm_id, strerror(errno));
-	    ups->shm_id++;		/* try another id */
-	    ups->sem_id++;		/* increment semaphore id too */
+		  shm_id, strerror(errno));
+	    Dmsg2(99, 
+               _("Cannot create shared memory area for key=%x, retrying... ERR=%s\n"),
+		  shm_id, strerror(errno));
+	    shm_id++;		   /* try another id */
+	    sem_id++;		   /* increment semaphore id too */
 	    continue;
 	}
 	found = TRUE;
@@ -455,54 +450,73 @@ static int create_shmarea(UPSINFO *ups, int shmperm)
        log_event(ups, LOG_WARNING, 
            _("Unable to create shared memory area. ERR=%s\n"),
 	      strerror(errno));
-       return FAILURE;
+       return NULL;
     }
 
-    if ((ups->shmUPS = (UPSINFO *)shmat(ups->idshmUPS, 0, 0))
-	== (UPSINFO *)-1) {
+
+    if ((ups = (UPSINFO *)shmat(idshmUPS, 0, 0)) == (UPSINFO *)-1) {
         log_event(ups, LOG_ERR, _("create_shmarea: cannot attach shm area. ERR=%s\n"),
 	    strerror(errno));
+        Dmsg1(99, _("create_shmarea: cannot attach shm area. ERR=%s\n"),
+	    strerror(errno));
 	destroy_shmarea(ups);
-	return FAILURE;
+	return NULL;
     }
 
-    return SUCCESS;
+    memset(ups, 0, sizeof(UPSINFO));
+    ups->shm_id = shm_id;
+    ups->sem_id = sem_id;
+    ups->idshmUPS = idshmUPS;
+    ups->idsemUPS = -1;
+    Dmsg4(100, "ups=%x shm_id=%x sem_id=%x idshmUPS=%d\n", 
+	ups, ups->shm_id, ups->sem_id, ups->idshmUPS);
+
+    return ups;
 }
 
 /*
  * This routine is used by any other program or thread to attach to
  * the shared memory.
  */
-static int attach_shmarea(UPSINFO *ups, int shmperm)
+static UPSINFO *attach_shmarea(int shm_id, int shmperm)
 {
-    if ((ups->idshmUPS = shmget(ups->shm_id, sizeof(UPSINFO), 0)) == -1) {
+    int idshmUPS;
+    UPSINFO *ups;
+
+    if ((idshmUPS = shmget(shm_id, sizeof(UPSINFO), 0)) == -1) {
         log_event(ups, LOG_ERR, _("attach_shmarea: cannot get shm area. ERR=%s\n"),
 	    strerror(errno));
-	return FAILURE;
+        Dmsg2(99, _("attach_shmarea: cannot get shm area id=%x. ERR=%s\n"),
+	    shm_id, strerror(errno));
+
+	return NULL;
     }
-    if ((ups->shmUPS = (UPSINFO *)shmat(ups->idshmUPS, 0, shmperm))
+    if ((ups = (UPSINFO *)shmat(idshmUPS, 0, shmperm))
 	== (UPSINFO *)-1) {
         log_event(ups, LOG_ERR, _("attach_shmarea: cannot attach shm area. ERR=%s\n"),
 	    strerror(errno));
-	return FAILURE;
+        Dmsg1(99, _("attach_shmarea: cannot attach shm area. ERR=%s\n"),
+	    strerror(errno));
+
+	return NULL;
     }
     /*
      * Make sure that our layout of the shared memory is the
      * * same as that to which we attached.
      */
-    if (strncmp(ups->shmUPS->id, UPSINFO_ID, sizeof(ups->shmUPS->id)) != 0
-	|| ups->shmUPS->version != UPSINFO_VERSION
-	|| ups->shmUPS->size != sizeof(UPSINFO)) {
+    if (strncmp(ups->id, UPSINFO_ID, sizeof(ups->id)) != 0
+	|| ups->version != UPSINFO_VERSION
+	|| ups->size != sizeof(UPSINFO)) {
         Error_abort0(_("attach_shmarea: shared memory version mismatch "
                 "(or UPS not yet ready to report)\n"));
     }
 
-    return SUCCESS;
+    return ups;
 }
 
 static int detach_shmarea(UPSINFO *ups)
 {
-    if (shmdt((char *)ups->shmUPS) != 0)
+    if (shmdt((char *)ups) != 0)
 	return FAILURE;
     return SUCCESS;
 }
@@ -518,75 +532,6 @@ static int destroy_shmarea(UPSINFO *ups)
     }
     ups->idshmUPS = -1;
     return SUCCESS;
-}
-
-/* Set lock TRUE if you want the area locked before read
- * otherwise it is not locked. Not locking, permits
- * non-root programs to read the shared memory area.
- */
-int read_shmarea(UPSINFO *ups, int lock)
-{
-    if (lock) {
-	if (read_lock(ups) == FAILURE)
-	    return FAILURE;
-    }
-    shmcpyUPS(ups, ups->shmUPS);
-    if (lock)
-	return read_unlock(ups);
-    return SUCCESS;
-}
-
-int write_shmarea(UPSINFO *ups)
-{
-    if (write_lock(ups) == FAILURE)
-	return FAILURE;
-    shmcpyUPS(ups->shmUPS, ups);
-    return write_unlock(ups);
-}
-
-/*
- * To do at the very start of a thread, to sync data from the common data
- * structure.
- */
-int read_andlock_shmarea(UPSINFO *ups)
-{
-    if (write_lock(ups) == FAILURE)
-	return FAILURE;
-    Dmsg1(80, "RLS1 OB:%d\n", ups->OnBatt);
-    shmcpyUPS(ups, ups->shmUPS);
-    Dmsg1(80, "RLS2 OB:%d\n", ups->OnBatt);
-    return SUCCESS;
-}
-
-/*
- * To do at the very end of a thread, to sync data to the common data
- * structure.
- */
-int write_andunlock_shmarea(UPSINFO *ups)
-{
-    Dmsg1(80, "RUS1 OB:%d\n", ups->OnBatt);
-    shmcpyUPS(ups->shmUPS, ups);
-    Dmsg1(80, "RUS2 OB:%d\n", ups->OnBatt);
-    return write_unlock(ups);
-}
-
-/*
- * For read-only requests.  No copying is done.
- * Danger! Use with caution:
- *
- * 1) Don't modify anything in the shmUPS-structure while holding this lock.
- * 2) Don't hold the lock for too long.
- */
-UPSINFO *lock_shmups(UPSINFO *ups)
-{
-    if (read_lock(ups) == FAILURE)
-	return NULL;
-    return ups->shmUPS;
-}
-
-void unlock_shmups(UPSINFO *ups)
-{
-    read_unlock(ups);
 }
 
 #endif
