@@ -86,6 +86,7 @@ static bool linkcheck = false;
 #define P_OUTPUT  0x84001c	     /* output values */
 #define P_BATTERY 0x840012	     /* battery values */
 #define P_INPUT   0x84001a	     /* input values */
+#define P_PWSUM   0x840024           /* power summary */
 
 /* No Command Index, don't save this value */
 #define CI_NONE -1
@@ -140,6 +141,7 @@ static const struct s_known_info {
     { CI_Manufacturer,	      0x8400fd, P_ANY,	  T_INDEX   },	/* iManufacturer */
     { CI_UPSMODEL,	      0x8400fe, P_ANY,	  T_INDEX   },	/* iProduct */
     { CI_SERNO, 	      0x8400ff, P_ANY,	  T_INDEX   },	/* iSerialNumber */
+    { CI_MANDAT,	      0x850085, P_PWSUM,  T_DATE    },	/* ManufactureDate */
 
     /*	Page 0x85 is the Battery System Page */
     { CI_RemCapLimit,	      0x850029, P_ANY,	  T_CAPACITY},	/* RemCapLimit */
@@ -156,7 +158,7 @@ static const struct s_known_info {
     { CI_CycleCount,	      0x85006b, P_ANY,	  T_NONE    },
     { CI_BattPackLevel,       0x850080, P_ANY,	  T_NONE    },	/* BattPackLevel */
     { CI_NONE,		      0x850083, P_ANY,	  T_CAPACITY},	/* DesignCapacity */
-    { CI_MANDAT,	      0x850085, P_ANY,	  T_DATE    },	/* ManufactureDate */
+    { CI_BATTDAT,	      0x850085, P_BATTERY,T_DATE    },	/* ManufactureDate */
     { CI_IDEN,		      0x850088, P_ANY,	  T_INDEX   },	/* iDeviceName */
     { CI_NONE,		      0x850089, P_ANY,	  T_INDEX   },	/* iDeviceChemistry */
     { CI_NONE,		      0x85008b, P_ANY,	  T_NONE    },	/* Rechargeable */
