@@ -362,15 +362,15 @@ int prepare_slave(UPSINFO *ups)
     int i, bound;
     struct hostent *mastent;
     int turnon = 1;
-	struct in_addr local_ip;
+    struct in_addr local_ip;
 
-	local_ip.s_addr = INADDR_ANY;
-   if (ups->nisip) {
-      if (inet_pton(AF_INET, ups->nisip, &local_ip) != 1) {
-         log_event(ups, LOG_WARNING, "Invalid IP: '%s'", ups->nisip);
-         local_ip.s_addr = INADDR_ANY;
-      }  
-   }  
+    local_ip.s_addr = INADDR_ANY;
+    if (ups->nisip[0]) {
+	if (inet_pton(AF_INET, ups->nisip, &local_ip) != 1) {
+            log_event(ups, LOG_WARNING, "Invalid NISIP specified: '%s'", ups->nisip);
+	    local_ip.s_addr = INADDR_ANY;
+	}  
+    }  
 
     strcpy(ups->mode.long_name, "Network Slave"); /* don't know model */
     slaves[0].remote_state = RMT_DOWN;
@@ -699,18 +699,12 @@ void do_net(UPSINFO *ups)
 
     ups->ups_connected = 0;	      /* We are networking not connected */
 
-#ifdef HAVE_CYGWIN     /* needed for NT */
-    attach_ipc(ups, 0);
-#endif
-
     while (1) {
 	/* Note, we do not lock shm so that apcaccess can
 	 * read it.  We are the only one allowed to update 
 	 * it.
 	 */
-	read_shmarea(ups, 0);
 	update_from_master(ups);
-	write_shmarea(ups);
 	do_action(ups);
 	do_reports(ups);
     }
@@ -731,15 +725,10 @@ void do_slaves(UPSINFO *ups)
       
     init_thread_signals();
 
-#ifdef HAVE_CYGWIN     /* needed for NT */
-    attach_ipc(ups, 0);
-#endif
-
     while (1) {
 	time(&now);
 
         /* This read is necessary to update "ups" */
-	read_shmarea(ups, 0);
 
 	/* Send info to slaves if nettime expired (set by apcupsd.conf)
 	 * or in power fail situation (FastPoll) or some slave is 
@@ -754,13 +743,13 @@ void do_slaves(UPSINFO *ups)
 	     * If change in slave status, update Status
 	     */
 	    if (slave_stat != slave_disconnected) {
-		read_andlock_shmarea(ups);
+		write_lock(ups);
 		if (slave_disconnected) {
 		    ups->Status |= UPS_SLAVEDOWN;
 		} else {
 		    ups->Status &= ~UPS_SLAVEDOWN;
 		}
-		write_andunlock_shmarea(ups);
+		write_unlock(ups);
 	    }
 	}
 	if (ups->FastPoll) {

@@ -1,9 +1,9 @@
 /*
  *  apcaction.c -- Actions taken when something is happen to UPS.
  *
- *  apcupsd.c        -- Simple Daemon to catch power failure signals from a
- *                   BackUPS, BackUPS Pro, or SmartUPS (from APCC).
- *                -- Now SmartMode support for SmartUPS and BackUPS Pro.
+ *  apcupsd.c	     -- Simple Daemon to catch power failure signals from a
+ *		     BackUPS, BackUPS Pro, or SmartUPS (from APCC).
+ *		  -- Now SmartMode support for SmartUPS and BackUPS Pro.
  *
  *  Copyright (C) 1996-99 Andre M. Hedrick <andre@suse.com>
  *  Copyright (C) 1999-2000 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
@@ -12,11 +12,11 @@
  */
 
 /*
- *                       GNU GENERAL PUBLIC LICENSE
- *                          Version 2, June 1991
+ *			 GNU GENERAL PUBLIC LICENSE
+ *			    Version 2, June 1991
  *
  *  Copyright (C) 1989, 1991 Free Software Foundation, Inc.
- *                             675 Mass Ave, Cambridge, MA 02139, USA
+ *			       675 Mass Ave, Cambridge, MA 02139, USA
  *  Everyone is permitted to copy and distribute verbatim copies
  *  of this license document, but changing it is not allowed.
  *
@@ -164,7 +164,7 @@ void generate_event(UPSINFO *ups, int event)
     case CMDMASTERTIMEOUT:
     case CMDMASTERCONN:
     default:
-        break;
+	break;
 
    }
 }
@@ -172,41 +172,41 @@ void generate_event(UPSINFO *ups, int event)
 /*********************************************************************/
 void powerfail (int ok)
 {
-    /*        If apcupsd terminates here, it will never get a chance to
-     *        report the event of returning mains-power.
-     *        I think apcupsd has no need to force terminate() by itself.
-     *        It will receive a SIGTERM from init, when system goes down.
+    /*	      If apcupsd terminates here, it will never get a chance to
+     *	      report the event of returning mains-power.
+     *	      I think apcupsd has no need to force terminate() by itself.
+     *	      It will receive a SIGTERM from init, when system goes down.
      *  This signal is trapped and will trigger apcupsd's terminate()
-     *        function.
-     *        (Was already reported/fixed in my 2.7.1 diff,)
-     *        (so I do it again now) w.p.
+     *	      function.
+     *	      (Was already reported/fixed in my 2.7.1 diff,)
+     *	      (so I do it again now) w.p.
      *
-     *             if (ok == 2) terminate(0);
+     *		   if (ok == 2) terminate(0);
      *
-     *        Closes procfile and logfile to preserve information.
+     *	      Closes procfile and logfile to preserve information.
      *
-     *         ok = 1  => power is back
-     *         ok = 2  => power failure
-     *         ok = 3  => remote shutdown
+     *	       ok = 1  => power is back
+     *	       ok = 2  => power failure
+     *	       ok = 3  => remote shutdown
      */
 
     if (ok == 2) {
-        clear_files();
-        if (terminate_on_powerfail)
-            terminate(0);
+	clear_files();
+	if (terminate_on_powerfail)
+	    terminate(0);
     }
 
     /*
-     *        The network slaves apcupsd needs to terminate here for now.
-     *        This sloppy, but it works. If you are networked, then the
-     *        master must fall also. This is required so that the UPS
-     *        can reboot the slaves.
+     *	      The network slaves apcupsd needs to terminate here for now.
+     *	      This sloppy, but it works. If you are networked, then the
+     *	      master must fall also. This is required so that the UPS
+     *	      can reboot the slaves.
      */
 
     if (ok == 3)
-        terminate(0);
+	terminate(0);
 }
-        
+	
 /********************************************************************* 
  * if called with zero, prevent users from logging in. 
  * if called with 1   , allow users to login.
@@ -217,15 +217,15 @@ void logonfail(int ok)
 
     unlink(NOLOGIN);
     if (ok == 0 && ((lgnfd = open(NOLOGIN, O_CREAT|O_WRONLY, 0644)) >= 0)) {
-        write(lgnfd, POWERFAIL, strlen(POWERFAIL));
-        close(lgnfd);
+	write(lgnfd, POWERFAIL, strlen(POWERFAIL));
+	close(lgnfd);
     }
 }
 
 static void prohibit_logins(UPSINFO *ups)
 {
     if (ups->nologin_file)
-        return;                       /* already done */
+	return; 		      /* already done */
     make_file(ups, NOLOGIN);
     ups->nologin_file = TRUE;
     logonfail(0);
@@ -235,38 +235,38 @@ static void prohibit_logins(UPSINFO *ups)
 static void do_shutdown(UPSINFO *ups, int cmdtype)
 {
     if (ups->ShutDown) {
-        return;                       /* already done */
+	return; 		      /* already done */
     }
     ups->ShutDown = time(NULL);
     delete_lockfile(ups);
-    ups->FastPoll = TRUE;              /* speed up polling */
+    ups->FastPoll = TRUE;	       /* speed up polling */
     make_file(ups, PWRFAIL);
     prohibit_logins(ups);
 
     if (ups->fd != -1) {
-        /*
-         * Note, try avoid using this option if at all possible
-         * as it will shutoff the UPS power, and you cannot
-         * be guaranteed that the shutdown command will have
-         * succeeded. This PROBABLY should be executed AFTER
-         * the shutdown command is given (the execute_command below).
-         */
-        if (kill_on_powerfail) {
-            kill_power(ups);
-        }
+	/*
+	 * Note, try avoid using this option if at all possible
+	 * as it will shutoff the UPS power, and you cannot
+	 * be guaranteed that the shutdown command will have
+	 * succeeded. This PROBABLY should be executed AFTER
+	 * the shutdown command is given (the execute_command below).
+	 */
+	if (kill_on_powerfail) {
+	    kill_power(ups);
+	}
     } 
 
     /* Now execute the shutdown command */
     execute_command(ups, cmd[cmdtype]);
 
     /* On some systems we may stop on the previous
-     * line if a SIGTERM signal is sent to us.        
+     * line if a SIGTERM signal is sent to us.	      
      */
 
     if (cmdtype == CMDREMOTEDOWN) 
-        powerfail(3);
+	powerfail(3);
     else
-        powerfail(2);
+	powerfail(2);
 }
 
 /*
@@ -290,21 +290,21 @@ static enum a_state get_state(UPSINFO *ups, time_t now)
     enum a_state state;
 
     if (ups->OnBatt) {
-        if (ups->OldOnBatt) {              /* if already detected on battery */
-           if (ups->SelfTest) {       /* see if UPS is doing self test */
-              state = st_SelfTest;    /*   yes */
-           } else {
-              state = st_OnBattery;   /* No, this must be real power failure */
-           }
-        } else {
-           state = st_PowerFailure;   /* Power failure just detected */
-        }
+	if (ups->OldOnBatt) {		   /* if already detected on battery */
+	   if (ups->SelfTest) {       /* see if UPS is doing self test */
+	      state = st_SelfTest;    /*   yes */
+	   } else {
+	      state = st_OnBattery;   /* No, this must be real power failure */
+	   }
+	} else {
+	   state = st_PowerFailure;   /* Power failure just detected */
+	}
     } else {
-        if (ups->OldOnBatt) {              /* if we were on batteries */
-            state = st_MainsBack;     /* then we just got power back */
-        } else {
-            state = st_OnMains;       /* Solid on mains, normal condition */
-        }
+	if (ups->OldOnBatt) {		   /* if we were on batteries */
+	    state = st_MainsBack;     /* then we just got power back */
+	} else {
+	    state = st_OnMains;       /* Solid on mains, normal condition */
+	}
     }
     return state;
 }
@@ -317,272 +317,272 @@ void do_action(UPSINFO *ups)
     static int first = 1;
     enum a_state state;
 
-    time(&now);                   /* get current time */
-    if (first) {
-        ups->last_time_nologon = ups->last_time_annoy = now;
-        ups->last_time_on_line = now;
-        ups->OldOnBatt = 0;
-        ups->OldBattLow = 0;
-        first = 0;
-    }
-
-    if (read_andlock_shmarea(ups)) {
-        /*
-         * If failed to acquire shm lock, return and try again later.
-         */
+    if (write_lock(ups)) {
+	/*
+	 * If failed to acquire shm lock, return and try again later.
+	 */
         log_event(ups, LOG_CRIT, _("Failed to acquire shm lock in do_action."));
-        return;
+	return;
     }
 
-    if (ups->ChangeBatt) {                      /* Replace battery */
-        /* Complain every 9 hours, this causes the complaint to
-         * cycle around the clock and hopefully be more noticable
-         * without being too annoying.        Also, ignore all change battery
-         * indications for the first 10 minutes of running time to
-         * prevent false alerts.
-         * Finally, issue the event 5 times, then clear the counter
-         * to silence false alarms. If the battery is really dead, the
-         * counter will be reset in apcsmart.c
-         */
-        if (now - ups->start_time < 60 * 10 || ups->ChangeBatt > 5) {
-            ups->ChangeBatt = 0;
-        } else if (now - ups->last_time_changeme > 60 * 60 * 9) {
-            generate_event(ups, CMDCHANGEME);
-            ups->last_time_changeme = now;
-            ups->ChangeBatt++;
-        }
+    time(&now); 		  /* get current time */
+    if (first) {
+	ups->last_time_nologon = ups->last_time_annoy = now;
+	ups->last_time_on_line = now;
+	ups->OldOnBatt = 0;
+	ups->OldBattLow = 0;
+	first = 0;
+    }
+
+    if (ups->ChangeBatt) {			/* Replace battery */
+	/* Complain every 9 hours, this causes the complaint to
+	 * cycle around the clock and hopefully be more noticable
+	 * without being too annoying.	      Also, ignore all change battery
+	 * indications for the first 10 minutes of running time to
+	 * prevent false alerts.
+	 * Finally, issue the event 5 times, then clear the counter
+	 * to silence false alarms. If the battery is really dead, the
+	 * counter will be reset in apcsmart.c
+	 */
+	if (now - ups->start_time < 60 * 10 || ups->ChangeBatt > 5) {
+	    ups->ChangeBatt = 0;
+	} else if (now - ups->last_time_changeme > 60 * 60 * 9) {
+	    generate_event(ups, CMDCHANGEME);
+	    ups->last_time_changeme = now;
+	    ups->ChangeBatt++;
+	}
     }
 
     if (ups->RestartDaemon) {
-        generate_event(ups, CMDRESTARTME);
+	generate_event(ups, CMDRESTARTME);
     }
 
     /*
-     *        Must SHUTDOWN Remote System Calls
+     *	      Must SHUTDOWN Remote System Calls
      */
     if (ups->remotedown) {
-        ups->BatteryUp = 0;
-        generate_event(ups, CMDREMOTEDOWN);
-        return;
+	ups->BatteryUp = 0;
+	generate_event(ups, CMDREMOTEDOWN);
+	return;
     }
 
     state = get_state(ups, now);
     switch (state) {
     case st_OnMains:
-        /*
-         * If power is good, update the timers.
-         */
-        ups->last_time_nologon = ups->last_time_annoy = now;
-        ups->last_time_on_line = now;
-        ups->FastPoll = FALSE;                                               
-        break;
+	/*
+	 * If power is good, update the timers.
+	 */
+	ups->last_time_nologon = ups->last_time_annoy = now;
+	ups->last_time_on_line = now;
+	ups->FastPoll = FALSE;						     
+	break;
 
     case st_PowerFailure:
        /*
-        *  This is our first indication of a power problem
-        */
-        ups->FastPoll = TRUE;              /* speed up polling */
-        /* Check if selftest */
+	*  This is our first indication of a power problem
+	*/
+	ups->FastPoll = TRUE;		   /* speed up polling */
+	/* Check if selftest */
         Dmsg0(80, "Power failure detected.\n");
 	device_entry_point(ups, DEVICE_CMD_CHECK_SELFTEST, NULL);
-        if (ups->SelfTest) {
-            generate_event(ups, CMDSTARTSELFTEST);
-        } else {
-            generate_event(ups, CMDPOWEROUT);
-        }
-        ups->last_time_nologon = ups->last_time_annoy = now;
-        ups->last_time_on_line = now;
-        ups->last_onbatt_time = now;
-        ups->num_xfers++;
-        /*
-         * Enable DTR on dumb UPSes with CUSTOM_SIMPLE cable.
-         */
-        device_entry_point(ups, DEVICE_CMD_DTR_ENABLE, NULL);
-        break;
+	if (ups->SelfTest) {
+	    generate_event(ups, CMDSTARTSELFTEST);
+	} else {
+	    generate_event(ups, CMDPOWEROUT);
+	}
+	ups->last_time_nologon = ups->last_time_annoy = now;
+	ups->last_time_on_line = now;
+	ups->last_onbatt_time = now;
+	ups->num_xfers++;
+	/*
+	 * Enable DTR on dumb UPSes with CUSTOM_SIMPLE cable.
+	 */
+	device_entry_point(ups, DEVICE_CMD_DTR_ENABLE, NULL);
+	break;
 
     case st_SelfTest:
        /* allow 12 seconds max for selftest */
        if (now - ups->SelfTest < 12 && !ups->BattLow)
-           break;
+	   break;
        /* Cancel self test, announce power failure */
        ups->SelfTest = 0;
        Dmsg0(80, "UPS Self Test cancelled, fall-thru to On Battery.\n");
        /* FALL-THRU to st_OnBattery */
     case st_OnBattery:
-        /*
-         *  Did the second test verify the power is failing?
-         */
-        if (!ups->BatteryUp) {
-            ups->BatteryUp = 1;   /* it is confirmed, we are on batteries */
-            generate_event(ups, CMDONBATTERY);
-            ups->last_time_nologon = ups->last_time_annoy = now;
-            ups->last_time_on_line = now;
-            break;
-        } 
+	/*
+	 *  Did the second test verify the power is failing?
+	 */
+	if (!ups->BatteryUp) {
+	    ups->BatteryUp = 1;   /* it is confirmed, we are on batteries */
+	    generate_event(ups, CMDONBATTERY);
+	    ups->last_time_nologon = ups->last_time_annoy = now;
+	    ups->last_time_on_line = now;
+	    break;
+	} 
 
-        if (ups->ShutDown) {    /* shutdown requested but still running */
-           if (ups->killdelay && now - ups->ShutDown >= ups->killdelay) {
-               if (ups->ups_connected)
-                   kill_power(ups);
-               ups->ShutDown = now;   /* wait a bit before doing again */
-           }
-        } else {                /* not shutdown yet */
-            /*
-             * Did BattLow bit go high? Then the battery power is failing.
-             * Normal Power down during Power Failure
-             */
-            if (!ups->OldBattLow && ups->BattLow) {
-               ups->BatteryUp = 0;
-               generate_event(ups, CMDFAILING);
-               break;
-            }
+	if (ups->ShutDown) {	/* shutdown requested but still running */
+	   if (ups->killdelay && now - ups->ShutDown >= ups->killdelay) {
+	       if (ups->ups_connected)
+		   kill_power(ups);
+	       ups->ShutDown = now;   /* wait a bit before doing again */
+	   }
+	} else {		/* not shutdown yet */
+	    /*
+	     * Did BattLow bit go high? Then the battery power is failing.
+	     * Normal Power down during Power Failure
+	     */
+	    if (!ups->OldBattLow && ups->BattLow) {
+	       ups->BatteryUp = 0;
+	       generate_event(ups, CMDFAILING);
+	       break;
+	    }
 
-            /*
-             * Did MaxTimeOnBattery Expire?  (TIMEOUT in apcupsd.conf)
-             * Normal Power down during Power Failure
-             */
-            if ((ups->maxtime > 0) && 
-                ((now - ups->last_time_on_line) > ups->maxtime)) {
-                ups->timedout = TRUE;
-                generate_event(ups, CMDTIMEOUT);
-                break;
-            }
-            /*
-             *        Did Battery Charge or Runtime go below percent cutoff?
-             *        Normal Power down during Power Failure
-             */
-            if (ups->UPS_Cap[CI_BATTLEV] && ups->BattChg <= ups->percent) {
-                ups->load = TRUE;
-                generate_event(ups, CMDLOADLIMIT);
-                break;
-            } else if (ups->UPS_Cap[CI_RUNTIM] && ups->TimeLeft <= ups->runtime) {
-                ups->timelout = TRUE;
-                generate_event(ups, CMDRUNLIMIT);
-                break;
-            }
+	    /*
+	     * Did MaxTimeOnBattery Expire?  (TIMEOUT in apcupsd.conf)
+	     * Normal Power down during Power Failure
+	     */
+	    if ((ups->maxtime > 0) && 
+		((now - ups->last_time_on_line) > ups->maxtime)) {
+		ups->timedout = TRUE;
+		generate_event(ups, CMDTIMEOUT);
+		break;
+	    }
+	    /*
+	     *	      Did Battery Charge or Runtime go below percent cutoff?
+	     *	      Normal Power down during Power Failure
+	     */
+	    if (ups->UPS_Cap[CI_BATTLEV] && ups->BattChg <= ups->percent) {
+		ups->load = TRUE;
+		generate_event(ups, CMDLOADLIMIT);
+		break;
+	    } else if (ups->UPS_Cap[CI_RUNTIM] && ups->TimeLeft <= ups->runtime) {
+		ups->timelout = TRUE;
+		generate_event(ups, CMDRUNLIMIT);
+		break;
+	    }
 
-            /*
-             * We are on batteries, the battery is low, and the power is not
-             * down ==> the battery is dead.  KES Sept 2000
-             *
-             * Then the battery has failed!!!
-             * Must do Emergency Shutdown NOW
-             *
-             * Or of the UPS says he is going to shutdown, do it NOW!
-             */
-            if (ups->ShutdownImminent || (ups->BattLow && !ups->LineDown)) {
-                ups->BatteryUp = 0;
-                ups->emergencydown = TRUE;
-                generate_event(ups, CMDEMERGENCY);
-            }
+	    /*
+	     * We are on batteries, the battery is low, and the power is not
+	     * down ==> the battery is dead.  KES Sept 2000
+	     *
+	     * Then the battery has failed!!!
+	     * Must do Emergency Shutdown NOW
+	     *
+	     * Or of the UPS says he is going to shutdown, do it NOW!
+	     */
+	    if (ups->ShutdownImminent || (ups->BattLow && !ups->LineDown)) {
+		ups->BatteryUp = 0;
+		ups->emergencydown = TRUE;
+		generate_event(ups, CMDEMERGENCY);
+	    }
 
-            /*
-             *        Announce to LogOff, with initial delay ....
-             */
-            if (((now - ups->last_time_on_line) > ups->annoydelay) &&
-                ((now - ups->last_time_annoy) > ups->annoy) &&
-                  ups->nologin_file) {
-                    if (!requested_logoff) {
-                        /* generate log message once */
-                        generate_event(ups, CMDANNOYME);
-                    } else {
-                        /* but execute script every time */
-                        execute_command(ups, cmd[CMDANNOYME]);
-                    }
-                    time(&ups->last_time_annoy);
-                    requested_logoff = TRUE;
-            }
-            /*
-             *        Delay NoLogons....
-             */
-            if (!ups->nologin_file) {
-                switch(ups->nologin.type) {
-                case NEVER:
-                    break;
-                case TIMEOUT:
-                    if ((now - ups->last_time_nologon) > ups->nologin_time) {
-                        prohibit_logins(ups);
-                    }
-                    break;
-                case PERCENT:
-                    if (ups->UPS_Cap[CI_BATTLEV] && ups->nologin_time >= ups->BattChg) {
-                        prohibit_logins(ups);
-                    }
-                    break;
-                case MINUTES:
-                    if (ups->UPS_Cap[CI_RUNTIM] && ups->nologin_time >= ups->TimeLeft) {
-                        prohibit_logins(ups);
-                    }
-                    break;
-                case ALWAYS:
-                default:
-                    prohibit_logins(ups);
-                    break;
-                }
-            }
-        }      
-        break;
+	    /*
+	     *	      Announce to LogOff, with initial delay ....
+	     */
+	    if (((now - ups->last_time_on_line) > ups->annoydelay) &&
+		((now - ups->last_time_annoy) > ups->annoy) &&
+		  ups->nologin_file) {
+		    if (!requested_logoff) {
+			/* generate log message once */
+			generate_event(ups, CMDANNOYME);
+		    } else {
+			/* but execute script every time */
+			execute_command(ups, cmd[CMDANNOYME]);
+		    }
+		    time(&ups->last_time_annoy);
+		    requested_logoff = TRUE;
+	    }
+	    /*
+	     *	      Delay NoLogons....
+	     */
+	    if (!ups->nologin_file) {
+		switch(ups->nologin.type) {
+		case NEVER:
+		    break;
+		case TIMEOUT:
+		    if ((now - ups->last_time_nologon) > ups->nologin_time) {
+			prohibit_logins(ups);
+		    }
+		    break;
+		case PERCENT:
+		    if (ups->UPS_Cap[CI_BATTLEV] && ups->nologin_time >= ups->BattChg) {
+			prohibit_logins(ups);
+		    }
+		    break;
+		case MINUTES:
+		    if (ups->UPS_Cap[CI_RUNTIM] && ups->nologin_time >= ups->TimeLeft) {
+			prohibit_logins(ups);
+		    }
+		    break;
+		case ALWAYS:
+		default:
+		    prohibit_logins(ups);
+		    break;
+		}
+	    }
+	}      
+	break;
 
     case st_MainsBack:
-        /*
-         *  The the power is back after a power failure or a self test         
-         */
-        ups->BatteryUp = 0;
-        if (ups->ShutDown) {
-            /*
-             * If we have a shutdown to cancel, do it now.
-             */
-            ups->ShutDown = 0;
-            powerfail(1);
-            unlink(PWRFAIL);
+	/*
+	 *  The the power is back after a power failure or a self test	       
+	 */
+	ups->BatteryUp = 0;
+	if (ups->ShutDown) {
+	    /*
+	     * If we have a shutdown to cancel, do it now.
+	     */
+	    ups->ShutDown = 0;
+	    powerfail(1);
+	    unlink(PWRFAIL);
             log_event(ups, LOG_ALERT, _("Cancelling shutdown"));
-        }
+	}
 
-        if (ups->SelfTest) {
-            ups->LastSelfTest = ups->SelfTest;
-            ups->SelfTest = 0;
-            /*
-             * Get last selftest results, only for smart UPSes.
-             */
-            device_entry_point(ups, DEVICE_CMD_GET_SELFTEST_MSG, NULL);
+	if (ups->SelfTest) {
+	    ups->LastSelfTest = ups->SelfTest;
+	    ups->SelfTest = 0;
+	    /*
+	     * Get last selftest results, only for smart UPSes.
+	     */
+	    device_entry_point(ups, DEVICE_CMD_GET_SELFTEST_MSG, NULL);
             log_event(ups, LOG_ALERT, _("UPS Self Test completed: %s"),
-                ups->selftestmsg);
-            execute_command(ups, cmd[CMDENDSELFTEST]);
-        } else {
-            generate_event(ups, CMDMAINSBACK);
-        }
+		ups->selftestmsg);
+	    execute_command(ups, cmd[CMDENDSELFTEST]);
+	} else {
+	    generate_event(ups, CMDMAINSBACK);
+	}
 
-        if (ups->nologin_file) 
+	if (ups->nologin_file) 
             log_event(ups, LOG_ALERT, _("Allowing logins"));
-        logonfail(1);
-        ups->nologin_file = FALSE;
-        requested_logoff = FALSE;
-        device_entry_point(ups, DEVICE_CMD_DTR_ST_DISABLE, NULL);
-        ups->last_offbatt_time = now;
-        /* Sanity check. Sometimes only first power problem trips    
-         * thus last_onbatt_time is not set when we get here */
-        if (ups->last_onbatt_time <= 0)
-           ups->last_onbatt_time = ups->last_offbatt_time;
-        ups->cum_time_on_batt += (ups->last_offbatt_time - ups->last_onbatt_time);
-        break;
+	logonfail(1);
+	ups->nologin_file = FALSE;
+	requested_logoff = FALSE;
+	device_entry_point(ups, DEVICE_CMD_DTR_ST_DISABLE, NULL);
+	ups->last_offbatt_time = now;
+	/* Sanity check. Sometimes only first power problem trips    
+	 * thus last_onbatt_time is not set when we get here */
+	if (ups->last_onbatt_time <= 0)
+	   ups->last_onbatt_time = ups->last_offbatt_time;
+	ups->cum_time_on_batt += (ups->last_offbatt_time - ups->last_onbatt_time);
+	break;
 
     default:
-        break;
+	break;
     }
 
     /* Do a non-blocking wait on any exec()ed children */
     if (ups->num_execed_children > 0) {
-        while (waitpid(-1, NULL, WNOHANG) > 0) {
-            ups->num_execed_children--;
-        }
+	while (waitpid(-1, NULL, WNOHANG) > 0) {
+	    ups->num_execed_children--;
+	}
     }
 
     /*
-     *        Remember status
+     *	      Remember status
      */
 
     ups->OldOnBatt = ups->OnBatt;
     ups->OldBattLow = ups->BattLow;
 
-    write_andunlock_shmarea(ups);
+    write_unlock(ups);
 }

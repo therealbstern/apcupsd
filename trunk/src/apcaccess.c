@@ -73,7 +73,6 @@ char msg[100];
 time_t nowtime;
 char m_char;
 
-UPSINFO myUPS;
 char argvalue[MAXSTRING];
 
 /* Default values for contacting daemon */
@@ -96,7 +95,6 @@ CONFIGINFO myCONFIG;
 void reconfig_data (CONFIGINFO *config);
 void do_main_menu (void);
 void do_config_menu (void);
-static void get_raw_upsinfo(UPSINFO *ups, char *host, int port);
 
 /*********************************************************************
  * subroutine normally called by macro Error_abort() to print
@@ -143,6 +141,8 @@ static struct {
 /* Total number of EPROM commands */
 static int ncmd = 0;
 
+UPSINFO eeprom_ups;
+
 /* Table of the UPS command, the apcupsd configuration directive,
  *  and an explanation of what the command sets in the EPROM.
  */
@@ -153,26 +153,28 @@ static struct {
  char type;
  int *data;
 } cmd_table[] = {
-  {'u', "HITRANSFER",    "Upper transfer voltage", 'i', &myUPS.hitrans},
-  {'l', "LOTRANSFER",    "Lower transfer voltage", 'i', &myUPS.lotrans},
-  {'e', "RETURNCHARGE",  "Return threshold", 'i', &myUPS.rtnpct},
-  {'o', "OUTPUTVOLTS",   "Output voltage on batts", 'i', &myUPS.NomOutputVoltage},
-  {'s', "SENSITIVITY",   "Sensitivity", 'c', (int *)myUPS.sensitivity},
-  {'q', "LOWBATT",       "Low battery warning", 'i', &myUPS.dlowbatt},
-  {'p', "SLEEP",         "Shutdown grace delay", 'i', &myUPS.dshutd},
-  {'k', "BEEPSTATE",     "Alarm delay", 'c', (int *)myUPS.beepstate},
-  {'r', "WAKEUP",        "Wakeup delay", 'i', &myUPS.dwake},
-  {'E', "SELFTEST",      "Self test interval", 'c', (int *)myUPS.selftest},
+  {'u', "HITRANSFER",    "Upper transfer voltage", 'i', &eeprom_ups.hitrans},
+  {'l', "LOTRANSFER",    "Lower transfer voltage", 'i', &eeprom_ups.lotrans},
+  {'e', "RETURNCHARGE",  "Return threshold", 'i', &eeprom_ups.rtnpct},
+  {'o', "OUTPUTVOLTS",   "Output voltage on batts", 'i', &eeprom_ups.NomOutputVoltage},
+  {'s', "SENSITIVITY",   "Sensitivity", 'c', (int *)eeprom_ups.sensitivity},
+  {'q', "LOWBATT",       "Low battery warning", 'i', &eeprom_ups.dlowbatt},
+  {'p', "SLEEP",         "Shutdown grace delay", 'i', &eeprom_ups.dshutd},
+  {'k', "BEEPSTATE",     "Alarm delay", 'c', (int *)eeprom_ups.beepstate},
+  {'r', "WAKEUP",        "Wakeup delay", 'i', &eeprom_ups.dwake},
+  {'E', "SELFTEST",      "Self test interval", 'c', (int *)eeprom_ups.selftest},
   {0, NULL, NULL}	/* Last entry */
   };
 
-void print_valid_eprom_values(char *model)
+void print_valid_eprom_values(UPSINFO *ups)
 {
     int i, j, k, l;
     char *p;
     char val[10];
 
-    printf("\nValid EPROM values for the %s\n\n", model);
+    printf("\nValid EPROM values for the %s\n\n", ups->mode.long_name);
+
+    memcpy(&eeprom_ups, ups, sizeof(UPSINFO));
 
     printf("%-24s %-12s  %-6s  %s\n", "           ", "Config",   "Current", "Permitted");
     printf("%-24s %-12s  %-6s  %s\n", "Description", "Directive","Value  ", "Values");
@@ -237,7 +239,9 @@ void parse_eprom_cmds(char *eprom, char locale)
 #endif
 }
 
-
+#ifdef HAVE_PTHREADS
+static void get_raw_upsinfo(UPSINFO *ups, char *host, int port);
+#endif
 
 /*********************************************************************/
 void do_eprom(UPSINFO *ups)
@@ -246,12 +250,6 @@ void do_eprom(UPSINFO *ups)
 
 #ifdef HAVE_PTHREADS
     get_raw_upsinfo(ups, host, port);
-#else
-    if (attach_ipc(ups, SHM_RDONLY) != SUCCESS)
-            Error_abort0(_("Cannot attach SYSV IPC.\n"));
-    if (read_shmarea(ups, 0) != SUCCESS)
-            Error_abort0(_("Cannot read shm data area.\n"));
-    detach_ipc(ups);
 #endif
 
     if (!ups->UPS_Cap[CI_EPROM])
@@ -274,7 +272,7 @@ void do_eprom(UPSINFO *ups)
     else 
 	locale = locale1;
     parse_eprom_cmds(ups->eprom, locale);
-    print_valid_eprom_values(ups->mode.long_name);
+    print_valid_eprom_values(ups);
 }
 
 
@@ -382,12 +380,16 @@ void do_config_menu (void)
 int main(int argc, char **argv)
 {
     int mode = 0;
-    UPSINFO *ups = &myUPS;
+    UPSINFO *ups = NULL;
+
 
     strncpy(argvalue, argv[0], sizeof(argvalue)-1);
     argvalue[sizeof(argvalue)-1] = 0;
 
-    init_ups_struct(ups);
+    ups = attach_ups(ups, SHM_RDONLY);
+    if (!ups) {
+        Error_abort0(_("Cannot attach SYSV IPC.\n"));
+    }
 
     if (argc < 2) {
         /* Assume user wants "status" */
@@ -458,34 +460,13 @@ int main(int argc, char **argv)
 #ifdef HAVE_PTHREADS
 	do_pthreads_status(ups, host, port);
 #else
-	if (attach_ipc(ups, SHM_RDONLY) != SUCCESS) {
-            Error_abort0(_("Cannot attach SYSV IPC.\n"));
-	}
-
-	if (read_shmarea(ups, 0) != SUCCESS) {
-            Error_abort0(_("Cannot read shm data area.\n"));
-	}
 	output_status(ups, 0, stat_open, stat_print, stat_close);
-	detach_ipc(ups);
 #endif
 	break;
     case 3:
        break;
     case 4: /* shutdown */
-#ifdef HAVE_PTHREADS
         Error_abort0(_("shutdown not implemented.\n"));
-#else
-	if (attach_ipc(ups, 0) != SUCCESS) {
-            Error_abort0(_("Cannot attach SYSV IPC.\n"));
-	}
-	/* VERY BAD -- a write without a read ??? */
-	if (write_shmarea(ups) != SUCCESS) {
-	    detach_ipc(ups);
-            Error_abort0(_("Cannot write shm data area.\n"));
-	}
-
-	detach_ipc(ups);
-#endif
 	break;
     case 5:
        do_eprom(ups);
@@ -493,5 +474,6 @@ int main(int argc, char **argv)
     default:
        Error_abort0(_("Strange mode\n"));
     }
+    detach_ups(ups);
     return(0);
 }

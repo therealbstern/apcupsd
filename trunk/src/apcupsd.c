@@ -142,8 +142,7 @@
  * The syncronization of data into this structure is done with the shared
  * memory area so this is made reentrant by the shm mechanics.
  */
-UPSINFO myUPS;
-UPSINFO *core_ups = &myUPS;
+UPSINFO *core_ups;
 char argvalue[MAXSTRING];
 
 static void daemon_start();
@@ -161,7 +160,7 @@ int shm_OK = 0;
  *********************************************************************/
 void terminate(int sig)
 {
-    UPSINFO *ups = &myUPS;
+    UPSINFO *ups = core_ups;
 
     restore_signals();
 
@@ -176,8 +175,8 @@ void terminate(int sig)
     delete_lockfile(ups);
 
     clean_threads();
-    destroy_ipc(ups);
     log_event(ups, LOG_WARNING, _("apcupsd shutdown succeeded"));
+    destroy_ups(ups);
     closelog();
     _exit(0);
 }
@@ -187,8 +186,8 @@ void error_cleanup(UPSINFO *ups)
     device_close(ups);
     delete_lockfile(ups);
     clean_threads();
-    destroy_ipc(ups);
     log_event(ups, LOG_ERR, _("apcupsd error shutdown completed"));
+    destroy_ups(ups);
     closelog();
     exit(1);
 }
@@ -240,7 +239,7 @@ int main(int argc, char *argv[]) {
 #ifndef HAVE_PTHREADS
     int serial_pid = 0;
 #endif
-    UPSINFO  *ups = &myUPS;
+    UPSINFO  *ups;
 
     /*
      * Default config file. If we set a config file in startup switches, it
@@ -259,7 +258,13 @@ int main(int argc, char *argv[]) {
     init_proctitle(argv[0]);
     strncpy(argvalue, argv[0], sizeof(argvalue)-1);
     argvalue[sizeof(argvalue)-1] = 0;
+      
+    ups = new_ups();		      /* get new ups */
+    if (!ups) {
+        Error_abort1(_("%s: init_ipc failed.\n"), argv[0]);
+    }
     init_ups_struct(ups);
+    core_ups = ups;		      /* this is our core ups structure */
 
     /*
      * parse_options is self messaging on errors, so we need only to exit()
@@ -362,10 +367,6 @@ int main(int argc, char *argv[]) {
 	terminate(0);
     }
 
-    if (init_ipc(ups) == FAILURE) {
-        Error_abort1(_("%s: init_ipc failed.\n"), argv[0]);
-    }
-
     /*
      * Delete the lockfile just before fork. We will reacquire it just
      * after.
@@ -398,12 +399,6 @@ int main(int argc, char *argv[]) {
 	}
     }
 
-
-
-    /*
-     * Now update the shared area with ups data.
-     */
-    write_shmarea(ups);
     shm_OK = 1;
 
     /*

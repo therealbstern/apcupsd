@@ -149,7 +149,7 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
     }
     sleep(ups->wait_time);
 
-    read_andlock_shmarea(ups);
+    write_lock(ups);
 
     ioctl(ups->fd, TIOCMGET, &ups->sp_flags);
     switch(ups->mode.type) {
@@ -222,7 +222,7 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
 	(ups->BattLow ? UPS_BATTLOW : 0) |
 	(ups->ChangeBatt ? UPS_REPLACEBATT : 0);
 
-    write_andunlock_shmarea(ups);
+    write_unlock(ups);
 
     return stat;
 }

@@ -72,7 +72,6 @@
 
 char *pname;
 
-UPSINFO myUPS;
 static char largebuf[4096];
 static int  stat_recs;
 static int  logstats = 0;
@@ -85,7 +84,7 @@ int do_inetd(int argc, char *argv[]);
 
 void error_cleanup(UPSINFO *ups)
 {
-    destroy_ipc(ups);
+    destroy_ups(ups);
     closelog();
     exit(1);
 }
@@ -199,7 +198,7 @@ int main(int argc, char *argv[])
 	if (argc == 1 || argc == 3) {
 	do_daemon(argc, argv);
 	} 
-	else if ((argc == 2) && (strcmp(argv[1], "-i") == 0)) {
+        else if ((argc == 2) && (strcmp(argv[1], "-i") == 0)) {
 	do_inetd(argc, argv);
 	} 
 	else {
@@ -247,12 +246,12 @@ int do_daemon(int argc, char *argv[])
     struct sockaddr_in cli_addr;       /* client's address */
     struct sockaddr_in serv_addr;      /* our address */
     int turnon = 1;
-	struct in_addr local_ip;
+    struct in_addr local_ip;
 
    local_ip.s_addr = INADDR_ANY;
-	if ((argc == 3) && (strcmp(argv[1], "-a") == 0)) {
+   if ((argc == 3) && (strcmp(argv[1], "-a") == 0)) {
       if (inet_pton(AF_INET, argv[2], &local_ip) != 1) {
-         error_exit("Invalid IP: '%s'", argv[2]);
+         error_exit("Invalid NISIP specified: '%s'", argv[2]);
       }
    }
 
@@ -364,10 +363,11 @@ void handle_client_request(int nsockfd)
     char errmsg[]   = "Invalid command\n";
     char notavail[] = "Not available\n";
     char notrun[]   = "Apcupsd not running\n";
-    UPSINFO *ups = &myUPS;
+    UPSINFO *ups = NULL;
 
 
-    if (attach_ipc(ups, SHM_RDONLY) != SUCCESS) {
+    ups = attach_ups(ups, SHM_RDONLY);
+    if (!ups) {
 	net_send(nsockfd, notrun, sizeof(notrun));
 	net_send(nsockfd, NULL, 0);
         Error_abort0("Cannot attach SYSV IPC.\n");
@@ -377,13 +377,6 @@ void handle_client_request(int nsockfd)
 	/* Read command */
        if ((net_recv(nsockfd, line, MAXSTRING)) <= 0) {
 	   break;			/* connection terminated */
-       }
-
-       if (read_shmarea(ups, 0) != SUCCESS) {
-	   net_send(nsockfd, notavail, sizeof(notavail));
-	   net_send(nsockfd, NULL, 0);
-           syslog(LOG_ERR, "Cannot read shm data area.\n");
-	   break;
        }
 
        if (strncmp("status", line, 6) == 0) {
@@ -413,6 +406,6 @@ void handle_client_request(int nsockfd)
 	       break;
        }
     }
-    detach_ipc(ups);
+    detach_ups(ups);
     return;
 }

@@ -93,7 +93,7 @@ int trim_eventfile(UPSINFO *ups)
     if ( !buf )
 	return -1;
 
-    if (read_andlock_shmarea(ups)) {
+    if (write_lock(ups)) {
 	log_event(ups, LOG_CRIT,
                _("Failed to acquire shm lock in trim_eventfile."));
        goto trim_done;
@@ -137,7 +137,7 @@ int trim_eventfile(UPSINFO *ups)
     status = 1;
 
 trim_done:
-    write_andunlock_shmarea(ups);
+    write_unlock(ups);
     free( buf );
     if ( rwerror )
        log_event(ups, LOG_CRIT, _("read/write failed in trim_eventfile."));
@@ -199,7 +199,7 @@ goodout:
 
 #include <windows.h>
 
-extern UPSINFO myUPS;
+extern UPSINFO *core_ups;
 extern int shm_OK;
 
 /*  
@@ -212,8 +212,8 @@ void FillEventsBox(HWND hwnd, int id_list)
     int len;
     FILE *events_file;
     
-    if (!shm_OK || myUPS.eventfile[0] == 0 ||
-        (events_file = fopen(myUPS.eventfile, "r")) == NULL) {
+    if (!shm_OK || core_ups->eventfile[0] == 0 ||
+        (events_file = fopen(core_ups->eventfile, "r")) == NULL) {
 	SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0, 
            (LONG)"Events not available");
 	return;

@@ -71,7 +71,7 @@ static void test_status_bits(UPSINFO *ups)
     /*
      * Here we change UPSINFO values so lock the area.
      */
-    read_andlock_shmarea(ups);
+    write_lock(ups);
 
     if (ups->Status & UPS_ONBATT)
 	ups->OnBatt = 1;	      /* On battery power */
@@ -93,7 +93,7 @@ static void test_status_bits(UPSINFO *ups)
 	   ups->ChangeBatt = 1;       /* setting it */
 	}
     }
-    write_andunlock_shmarea(ups);
+    write_unlock(ups);
 }
 
 /*********************************************************************/
@@ -279,10 +279,6 @@ int fillUPS(UPSINFO *ups)
 void do_device(UPSINFO *ups)
 {
     init_thread_signals();   
-
-#ifdef HAVE_CYGWIN     /* needed for NT */
-    attach_ipc(ups, 0);
-#endif
 
     fillUPS(ups);		       /* get all data so apcaccess is happy */
 

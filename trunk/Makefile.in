@@ -57,7 +57,7 @@ clean: targetclean
 
 distclean: targetdistclean
 	$(RMF) TAGS tags
-	$(RMF) config.cache config.status config.log stamp-config
+	$(RMF) config.cache config.status config.log config.out stamp-config
 	$(RMF) Makefile
 
 # -----------------------------------------------------------------------

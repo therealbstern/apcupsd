@@ -283,21 +283,21 @@ extern void sleep_forever(void);
 /*
  * In apcipc.c
  */
-extern int init_ipc(UPSINFO *ups);
-extern int attach_ipc(UPSINFO *ups, int shmperm);
-extern int detach_ipc(UPSINFO *ups);
-extern int destroy_ipc(UPSINFO *ups);
+extern UPSINFO *new_ups();
+extern UPSINFO *attach_ups(UPSINFO *ups, int shmperm);
+extern int detach_ups(UPSINFO *ups);
+extern int destroy_ups(UPSINFO *ups);
 
-extern int create_semaphore(UPSINFO *ups);
-extern int attach_semaphore(UPSINFO *ups);
-extern int destroy_semaphore(UPSINFO *ups);
+#define read_lock(ups) _read_lock(__FILE__, __LINE__, (ups))
+#define read_unlock(ups) _read_unlock(__FILE__, __LINE__, (ups))
+#define write_lock(ups) _write_lock(__FILE__, __LINE__, (ups))
+#define write_unlock(ups) _write_unlock(__FILE__, __LINE__, (ups))
+#define read_lock(ups) _read_lock(__FILE__, __LINE__, (ups))
 
-extern int read_shmarea(UPSINFO *ups, int lock);
-extern int write_shmarea(UPSINFO *ups);
-extern int read_andlock_shmarea(UPSINFO *ups);
-extern int write_andunlock_shmarea(UPSINFO *ups);
-extern UPSINFO *lock_shmups(UPSINFO *ups);
-extern void unlock_shmups(UPSINFO *ups);
+extern int _read_lock(char *file, int line, UPSINFO *ups);
+extern int _read_unlock(char *file, int line, UPSINFO *ups);
+extern int _write_lock(char *file, int line, UPSINFO *ups);
+extern int _write_unlock(char *file, int line, UPSINFO *ups);
 
 /*
  * In apcexec.c

@@ -18,7 +18,7 @@ allexe = client readfifo megaclient newslave upsapm
 all-targets: $(allexe)
 
 hid-ups: hid-ups.c
-	$(CC)  hid-ups.c -o hid-ups
+	$(CC) -g  hid-ups.c -o hid-ups
 
 client:  client.c $(APCLIBS)
 	$(CC) client.c $(APCLIBS) -o client
@@ -37,8 +37,6 @@ upsapm: upsapm.c $(APCLIBS)
 	$(CC) upsapm.c $(APCLIBS) -o upsapm
 
 install:
-	@echo "Installing examples ..."
-	@$(CP) -rp $(topdir)/examples $(sysconfdir)
 
 uninstall:
 

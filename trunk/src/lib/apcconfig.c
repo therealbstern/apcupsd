@@ -360,7 +360,7 @@ static int start_ups(UPSINFO *ups, size_t offset,
     /*
      * Here start the definition of a new UPS to add to the linked list.
      */
-    ups = (UPSINFO *)malloc(sizeof(UPSINFO));
+    ups = new_ups();
 
     if (ups == NULL) {
         Error_abort1(_("%s: not enough memory.\n"), argvalue);
@@ -369,13 +369,6 @@ static int start_ups(UPSINFO *ups, size_t offset,
 
     init_ups_struct(ups);
  
-    /*
-     * Every UPS must have different IPC IDs.
-     */
-#ifndef HAVE_PTHREADS
-    ups->sem_id += 1;
-    ups->shm_id += 1;
-#endif
 
     strncpy((char *)AT(ups, offset), x, (int)size);
 
@@ -706,9 +699,14 @@ static int ParseConfig(UPSINFO *ups, char *line) {
 
 #define BUF_SIZE 1000
 
+/*
+ * Setup general defaults for the ups structure.
+ *  N.B. Do not zero the structure because it already has
+ *	 pthreads sturctures or shared memory/semaphore
+ *	 structures initialized.
+ */
 void init_ups_struct(UPSINFO *ups) 
 {
-    memset(ups, 0, sizeof(UPSINFO));
 
     ups->buf = malloc(BUF_SIZE);
     if (ups->buf) {
@@ -722,17 +720,7 @@ void init_ups_struct(UPSINFO *ups)
     strcpy(ups->release, APCUPSD_RELEASE);
 
     ups->fd		       = -1;
-    ups->PoweredByUPS		 = TRUE;
-
-    /*
-     * These are updated in insertUPS()
-     */
-#ifndef HAVE_PTHREADS
-    ups->idsemUPS = -1;
-    ups->idshmUPS = -1;
-    ups->sem_id = SEM_ID;
-    ups->shm_id = SHM_ID;
-#endif
+    ups->PoweredByUPS	       = TRUE;
 
     strcpy(ups->enable_access.name, accesses[0].name);
     strcpy(ups->enable_access.long_name, accesses[0].long_name);
@@ -740,56 +728,56 @@ void init_ups_struct(UPSINFO *ups)
 
     strcpy(ups->nologin.name, logins[0].name);
     strcpy(ups->nologin.long_name, logins[0].long_name);
-    ups->nologin.type		 = logins[0].type;
+    ups->nologin.type	       = logins[0].type;
 
-    ups->annoy			  = 5 * 60;  /* annoy every 5 mins */
+    ups->annoy		       = 5 * 60;  /* annoy every 5 mins */
     ups->annoydelay	       = 60;	  /* must be > than annoy to work, why???? */
-    ups->maxtime	    = 0;
-    ups->nologin_time		 = 0;
-    ups->nologin_file		 = FALSE;
+    ups->maxtime	       = 0;
+    ups->nologin_time	       = 0;
+    ups->nologin_file	       = FALSE;
 
-    ups->stattime	     = 0;
-    ups->datatime	     = 0;
-    ups->reports	    = FALSE;
-    ups->nettime	    = 60;
-    ups->percent	    = 10;
-    ups->runtime	    = 5;
-    ups->netstats	     = TRUE;
+    ups->stattime	       = 0;
+    ups->datatime	       = 0;
+    ups->reports	       = FALSE;
+    ups->nettime	       = 60;
+    ups->percent	       = 10;
+    ups->runtime	       = 5;
+    ups->netstats	       = TRUE;
     ups->statusport	       = 7000;
-    ups->upsmodel[0]		= 0;	/* end of string */
+    ups->upsmodel[0]	       = 0;    /* end of string */
 
 
     /* EPROM values that can be changed with config directives */
 
     strcpy(ups->sensitivity, "-1"); /* no value */
-    ups->dwake			  = -1;
-    ups->dshutd 	    = -1;
-    strcpy(ups->selftest,    "-1"); /* no value */
-    ups->lotrans	    = -1;
-    ups->hitrans	    = -1;
-    ups->rtnpct 	    = -1;
-    ups->dlowbatt	     = -1;
-    ups->NomOutputVoltage   = -1;
-    strcpy(ups->beepstate,   "-1"); /* no value */
+    ups->dwake		       = -1;
+    ups->dshutd 	       = -1;
+    strcpy(ups->selftest, "-1"); /* no value */
+    ups->lotrans	       = -1;
+    ups->hitrans	       = -1;
+    ups->rtnpct 	       = -1;
+    ups->dlowbatt	       = -1;
+    ups->NomOutputVoltage      = -1;
+    strcpy(ups->beepstate,  "-1"); /* no value */
 
 
 
     ups->nisip[0] = 0;	    /* no nis IP file as default */
     ups->NetUpsPort	       = 0;
 
-    ups->lockfile	     = -1;
+    ups->lockfile	       = -1;
 
-    ups->load			 = FALSE;
-    ups->timedout	     = FALSE;
-    ups->timelout	     = FALSE;
-    ups->emergencydown		  = FALSE;
+    ups->load		       = FALSE;
+    ups->timedout	       = FALSE;
+    ups->timelout	       = FALSE;
+    ups->emergencydown	       = FALSE;
     ups->remotedown	       = FALSE;
-    ups->remote_state		 = TRUE;
+    ups->remote_state	       = TRUE;
 
-    ups->sysfac 	    = LOG_DAEMON;
+    ups->sysfac 	       = LOG_DAEMON;
 
-    ups->statfile[0] = 0;	   /* no stats file default */
-    ups->eventfile[0] = 0;	    /* no events file as default */
+    ups->statfile[0] = 0;	  /* no stats file default */
+    ups->eventfile[0] = 0;	  /* no events file as default */
     ups->eventfilemax = 10;	  /* trim the events file at 10K as default */
     ups->event_fd = -1; 	  /* no file open */
 
