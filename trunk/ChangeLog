@@ -5,7 +5,8 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
-----> Release 3.10.17 xxMar05
+----> Release 3.10.17 18Mar05
+- Fix termination of empty directives in .conf file.
 - Move docbook directory to old_documents
 - Modify Win32 Makefile to pull apcupsd.html from texi directory.
   It was still using the old docbook directory.

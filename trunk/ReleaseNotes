@@ -4,7 +4,8 @@
 NOTE: The non-pthreaded version should work in this release, but
       will be removed in the next version.
 
-Release 3.10.17 xxx
+Release 3.10.17 18Mar05
+- Fix termination of empty directives in .conf file.
 - Update default apcupsd.conf to recommend a blank DEVICE setting for USB
   driver.
 - Add /dev/hiddev? to Linux USB driver device node search path.

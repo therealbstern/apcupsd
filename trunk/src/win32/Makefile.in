@@ -88,6 +88,7 @@ binary-release:
 	@cp -f $(topdir)/platforms/etc/apcupsd.conf wr/$(sysconfdir)/apcupsd.conf
 	@echo "Copying manual ..."
 	@cp -p $(topdir)/doc/texi/manual.html wr/$(prefix)
+	@cp -p $(topdir)/doc/texi/*.png wr/$(prefix)
 	@echo "Copying examples ..."
 	@cp -rp $(topdir)/examples wr/$(prefix)
 	@cp -f $(topdir)/platforms/cygwin/examples/* wr/$(prefix)/examples
