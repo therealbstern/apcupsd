@@ -5,6 +5,25 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+----> Release apcupsd-3.10.6 (05 August 2003)
+05Aug03
+- Because of the complaints about the master/slave code, I finally
+  got around to testing it, and it was seriously broken in more
+  than one way.  It seems to be working now.
+- Started adding new set_ups() instead of UPS_SET().
+- Adding the SIGCHLD broke quite a lot of calls in the master/slave
+  code. This will probably also show up elsewhere.
+04Aug03
+- Tested the net driver, it seems to work perfectly fine. I
+  did add a grace period of 4 seconds with comm loss on batteries
+  before the shutdown is done.
+- A number of changes to the manual.
+- Clean up the net driver to be compatible with C++ for building
+  on Windows.
+- Ensure that we don't get stuck in a waitpid loop after calling
+  apccontrol. Hopefully this will fix the 100% CPU usage on Win32
+  after a power condition.
+
 ----> Release apcupsd-3.10.6 (18 July 2003)
 18Jul03
 - Reissue accept() immediately if interrupted rather than waiting.
