@@ -5873,9 +5873,9 @@ fi
 
 
 OLDNET_ENABLED=no
-# Check whether --enable-oldnet or --disable-oldnet was given.
-if test "${enable_oldnet+set}" = set; then
-  enableval="$enable_oldnet"
+# Check whether --enable-master-slave or --disable-master-slave was given.
+if test "${enable_master_slave+set}" = set; then
+  enableval="$enable_master_slave"
    if test "$enableval" = "yes" ; then
 	   cat >> confdefs.h <<\EOF
 #define HAVE_OLDNET 1
@@ -8436,16 +8436,17 @@ openserver)
 		platforms/openserver/rc0.openserver"
   ;;
 mandrake)
-    DISTVER=`cat /etc/mandrake-release | grep release |\
-		cut -f 5 -d ' '`
-    DFILES="\
-	platforms/mandrake/Makefile \
-	platforms/mandrake/apcupsd \
-	platforms/mandrake/awkhaltprog"
+	DISTVER=`cat /etc/mandrake-release | grep release |\
+		 cut -f 5 -d ' '`
+	DFILES="\
+		platforms/mandrake/Makefile \
+		platforms/mandrake/apcupsd \
+		platforms/mandrake/apcupsd.spec \
+		platforms/mandrake/awkhaltprog"
   ;;
 redhat)
 	DISTVER=`cat /etc/redhat-release | grep release |\
-				cut -f 5 -d ' '`
+		 cut -f 5 -d ' '`
 	DFILES="\
 		platforms/redhat/Makefile \
 		platforms/redhat/apcupsd \
@@ -8454,7 +8455,7 @@ redhat)
   ;;
 engarde)
 	DISTVER=`cat /etc/engarde-release | grep ersion |\
-				cut -f 5 -d ' '`
+		 cut -f 5 -d ' '`
 	DFILES="\
 		platforms/engarde/Makefile \
 		platforms/engarde/apcupsd \
@@ -9351,7 +9352,7 @@ Configuration on `date`:
 
   drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${USB_DRIVER:-no-usb} ${SNMP_DRIVER:-no-snmp} ${TEST_DRIVER:-no-test}
 
-  enable-oldnet:	      ${OLDNET_ENABLED}
+  enable-master-slave:	      ${OLDNET_ENABLED}
   enable-nis:		      ${NISSRV_ENABLED}
   enable-cgi:		      ${ENABLE_CGI}
   with-cgi-bin: 	      ${CGIBIN}
