@@ -142,7 +142,7 @@
  * The syncronization of data into this structure is done with the shared
  * memory area so this is made reentrant by the shm mechanics.
  */
-UPSINFO *core_ups;
+UPSINFO *core_ups = NULL;
 char argvalue[MAXSTRING];
 
 static void daemon_start();

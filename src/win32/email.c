@@ -17,7 +17,6 @@ void WinMainCRTStartup() { mainCRTStartup(); }
 
 int main(int argc, char **argv)
 {
-   char *usage;
    int i;
    ULONG err;
    MapiRecipDesc recip;
@@ -55,7 +54,7 @@ int main(int argc, char **argv)
 
    if (err != SUCCESS_SUCCESS) {
       char buf[100];
-      sprintf(buf, "MAPI error code = %d", err);
+      sprintf(buf, "MAPI error code = %d", (int)err);
 
 // Note, if we put up a dialogue box, this may stall the
 // calling script, not a good thing.

@@ -43,6 +43,7 @@
 #include <lmcons.h>
 #include <ctype.h>
 #include <signal.h>
+#include <pthread.h>
 
 extern int ApcupsdMain(int argc, char **argv);
 extern int terminate(int sig);
@@ -73,6 +74,7 @@ extern DWORD    g_servicethread;
 static char *command_args[MAX_COMMAND_ARGS] = {"apcupsd", NULL};
 static int num_command_args = 1;
 static pid_t main_pid;
+static pthread_t main_tid;
 
 // WinMain parses the command line and either calls the main App
 // routine or, under NT, the main service routine.
@@ -88,6 +90,7 @@ PSTR CmdLine, int iCmdShow)
         mainthreadId = GetCurrentThreadId();
 
         main_pid = getpid();
+        main_tid = pthread_self();
 
         // Funny things happen with the command line if the
         // execution comes from c:/Program Files/apcupsd/apcupsd.exe
@@ -300,9 +303,12 @@ PSTR CmdLine, int iCmdShow)
 // Called as a thread from ApcupsdAppMain()
 // Here we handle the Windows messages
 //
-DWORD WINAPI Main_Msg_Loop(LPVOID lpwThreadParam)
+//DWORD WINAPI Main_Msg_Loop(LPVOID lpwThreadParam)
+void *Main_Msg_Loop(LPVOID lpwThreadParam)
 {
         DWORD old_servicethread = g_servicethread;
+
+        pthread_detach(pthread_self());
  
         /* Since we are the only thread with a message loop
          * mark ourselves as the service thread so that
@@ -334,6 +340,8 @@ DWORD WINAPI Main_Msg_Loop(LPVOID lpwThreadParam)
            // Tell the service manager that we've stopped.
            ReportStatus(SERVICE_STOPPED, g_error, 0);
         }   
+        pthread_kill(main_tid, SIGTERM);
+        sleep(1);
         kill(main_pid, SIGTERM);      /* ask main thread to terminate */
         _exit(0);
 }
@@ -346,7 +354,8 @@ DWORD WINAPI Main_Msg_Loop(LPVOID lpwThreadParam)
 
 int ApcupsdAppMain()
 {
-        DWORD dwThreadID;
+//        DWORD dwThreadID;
+        pthread_t tid;
 
         // Set this process to be the last application to be shut down.
         SetProcessShutdownParameters(0x100, 0);
@@ -359,7 +368,8 @@ int ApcupsdAppMain()
         }
 
         // Create a thread to handle the Windows messages
-        (void)CreateThread(NULL, 0, Main_Msg_Loop, NULL, 0, &dwThreadID);
+//        (void)CreateThread(NULL, 0, Main_Msg_Loop, NULL, 0, &dwThreadID);
+        pthread_create(&tid, NULL, Main_Msg_Loop, (void *)0);
 
         // Call the "real" apcupsd
         ApcupsdMain(num_command_args, command_args);

@@ -1689,6 +1689,14 @@ then
     GENERATE_FILES="$GENERATE_FILES src/gd1.2/Makefile"
 fi
 
+case $host_os in
+    *cygwin* ) CC=g++
+	;;
+    * )
+	;;
+esac
+
+
 dnl
 dnl Insert Makefile(s) fragments.
 VARIABLES=$srcdir/autoconf/variables.mak

@@ -63,132 +63,132 @@ extern int battstat;
 
 upsMenu::upsMenu()
 {
+    // Create a dummy window to handle tray icon messages
+    WNDCLASSEX wndclass;
 
-        // Create a dummy window to handle tray icon messages
-        WNDCLASSEX wndclass;
+    wndclass.cbSize         = sizeof(wndclass);
+    wndclass.style          = 0;
+    wndclass.lpfnWndProc    = upsMenu::WndProc;
+    wndclass.cbClsExtra     = 0;
+    wndclass.cbWndExtra     = 0;
+    wndclass.hInstance      = hAppInstance;
+    wndclass.hIcon          = LoadIcon(NULL, IDI_APPLICATION);
+    wndclass.hCursor        = LoadCursor(NULL, IDC_ARROW);
+    wndclass.hbrBackground  = (HBRUSH) GetStockObject(WHITE_BRUSH);
+    wndclass.lpszMenuName   = (const char *) NULL;
+    wndclass.lpszClassName  = MENU_CLASS_NAME;
+    wndclass.hIconSm        = LoadIcon(NULL, IDI_APPLICATION);
 
-        wndclass.cbSize                 = sizeof(wndclass);
-        wndclass.style                  = 0;
-        wndclass.lpfnWndProc    = upsMenu::WndProc;
-        wndclass.cbClsExtra             = 0;
-        wndclass.cbWndExtra             = 0;
-        wndclass.hInstance              = hAppInstance;
-        wndclass.hIcon                  = LoadIcon(NULL, IDI_APPLICATION);
-        wndclass.hCursor                = LoadCursor(NULL, IDC_ARROW);
-        wndclass.hbrBackground  = (HBRUSH) GetStockObject(WHITE_BRUSH);
-        wndclass.lpszMenuName   = (const char *) NULL;
-        wndclass.lpszClassName  = MENU_CLASS_NAME;
-        wndclass.hIconSm                = LoadIcon(NULL, IDI_APPLICATION);
+    RegisterClassEx(&wndclass);
 
-        RegisterClassEx(&wndclass);
+    /* Create System Tray menu Window */
+    m_hwnd = CreateWindow(MENU_CLASS_NAME,
+                            MENU_CLASS_NAME,
+                            WS_OVERLAPPEDWINDOW,
+                            CW_USEDEFAULT,
+                            CW_USEDEFAULT,
+                            200, 200,
+                            NULL,
+                            NULL,
+                            hAppInstance,
+                            NULL);
+    if (m_hwnd == NULL) {
+       PostQuitMessage(0);
+       return;
+    }
 
-        m_hwnd = CreateWindow(MENU_CLASS_NAME,
-                                MENU_CLASS_NAME,
-                                WS_OVERLAPPEDWINDOW,
-                                CW_USEDEFAULT,
-                                CW_USEDEFAULT,
-                                200, 200,
-                                NULL,
-                                NULL,
-                                hAppInstance,
-                                NULL);
-        if (m_hwnd == NULL) {
-           PostQuitMessage(0);
-           return;
-        }
+    // record which client created this window
+    SetWindowLong(m_hwnd, GWL_USERDATA, (LONG)this);
 
-        // record which client created this window
-        SetWindowLong(m_hwnd, GWL_USERDATA, (LONG) this);
+    // Timer to trigger icon updating
+    SetTimer(m_hwnd, 1, 5000, NULL);
 
-        // Timer to trigger icon updating
-        SetTimer(m_hwnd, 1, 5000, NULL);
+    // Load the icons for the tray
+    m_online_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_ONLINE));
+    m_onbatt_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_ONBATT));
+    m_charging_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_CHARGING));
 
-        // Load the icons for the tray
-        m_online_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_ONLINE));
-        m_onbatt_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_ONBATT));
-        m_charging_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_CHARGING));
+    // Load the popup menu
+    m_hmenu = LoadMenu(hAppInstance, MAKEINTRESOURCE(IDR_TRAYMENU));
 
-        // Load the popup menu
-        m_hmenu = LoadMenu(hAppInstance, MAKEINTRESOURCE(IDR_TRAYMENU));
-
-        // Install the tray icon!
-        AddTrayIcon();
+    // Install the tray icon!
+    AddTrayIcon();
 }
 
 upsMenu::~upsMenu()
 {
-        // Remove the tray icon
-        SendTrayMsg(NIM_DELETE, 0);
+    // Remove the tray icon
+    SendTrayMsg(NIM_DELETE, 0);
         
-        // Destroy the loaded menu
-        if (m_hmenu != NULL)
-           DestroyMenu(m_hmenu);
+    // Destroy the loaded menu
+    if (m_hmenu != NULL)
+        DestroyMenu(m_hmenu);
 }
 
 void
 upsMenu::AddTrayIcon()
 {
-        SendTrayMsg(NIM_ADD, battstat);
+    SendTrayMsg(NIM_ADD, battstat);
 }
 
 void
 upsMenu::DelTrayIcon()
 {
-        SendTrayMsg(NIM_DELETE, 0);
+    SendTrayMsg(NIM_DELETE, 0);
 }
 
 
 void
 upsMenu::UpdateTrayIcon(int battstat)
 {
-        (void *)ups_status(0);
-        SendTrayMsg(NIM_MODIFY, battstat);
+    (void *)ups_status(0);
+    SendTrayMsg(NIM_MODIFY, battstat);
 }
 
 void
 upsMenu::SendTrayMsg(DWORD msg, int battstat)
 {
-        // Create the tray icon message
-        m_nid.hWnd = m_hwnd;
-        m_nid.cbSize = sizeof(m_nid);
-        m_nid.uID = IDI_APCUPSD;                 // never changes after construction
-        /* If battstat == 0 we are on batteries, otherwise we are online
-         * and the value of battstat is the percent charge.
-         */
-        if (battstat == 0)
-           m_nid.hIcon = m_onbatt_icon;
-        else if (battstat >= 99)
-           m_nid.hIcon = m_online_icon;
-        else
-           m_nid.hIcon = m_charging_icon;
+    // Create the tray icon message
+    m_nid.hWnd = m_hwnd;
+    m_nid.cbSize = sizeof(m_nid);
+    m_nid.uID = IDI_APCUPSD;                 // never changes after construction
+    /* If battstat == 0 we are on batteries, otherwise we are online
+     * and the value of battstat is the percent charge.
+     */
+    if (battstat == 0)
+       m_nid.hIcon = m_onbatt_icon;
+    else if (battstat >= 99)
+       m_nid.hIcon = m_online_icon;
+    else
+       m_nid.hIcon = m_charging_icon;
 
-        m_nid.uFlags = NIF_ICON | NIF_MESSAGE;
-        m_nid.uCallbackMessage = WM_TRAYNOTIFY;
+    m_nid.uFlags = NIF_ICON | NIF_MESSAGE;
+    m_nid.uCallbackMessage = WM_TRAYNOTIFY;
 
 
-        // Use resource string as tip if there is one
-        if (LoadString(hAppInstance, IDI_APCUPSD, m_nid.szTip, sizeof(m_nid.szTip))) {
-            m_nid.uFlags |= NIF_TIP;
-        }
-        
-        // Try to add the UPS's status to the tip string, if possible
-        if (m_nid.uFlags & NIF_TIP) {
-            strncat(m_nid.szTip, " - ", (sizeof(m_nid.szTip)-1)-strlen(m_nid.szTip));
-            strncat(m_nid.szTip, ups_status(0), (sizeof(m_nid.szTip)-1)-strlen(m_nid.szTip));
-        }
+    // Use resource string as tip if there is one
+    if (LoadString(hAppInstance, IDI_APCUPSD, m_nid.szTip, sizeof(m_nid.szTip))) {
+        m_nid.uFlags |= NIF_TIP;
+    }
+    
+    // Try to add the UPS's status to the tip string, if possible
+    if (m_nid.uFlags & NIF_TIP) {
+        strncat(m_nid.szTip, " - ", (sizeof(m_nid.szTip)-1)-strlen(m_nid.szTip));
+        strncat(m_nid.szTip, ups_status(0), (sizeof(m_nid.szTip)-1)-strlen(m_nid.szTip));
+    }
 
-        // Send the message
-        if (Shell_NotifyIcon(msg, &m_nid)) {
-           EnableMenuItem(m_hmenu, ID_CLOSE, MF_ENABLED);
-        } else {
-           if (!upsService::RunningAsService()) {
-              if (msg == NIM_ADD) {
-                 // The tray icon couldn't be created, so use the Properties dialog
-                 // as the main program window
-                 PostQuitMessage(0);
-              }
-           }
-        }
+    // Send the message
+    if (Shell_NotifyIcon(msg, &m_nid)) {
+       EnableMenuItem(m_hmenu, ID_CLOSE, MF_ENABLED);
+    } else {
+       if (!upsService::RunningAsService()) {
+          if (msg == NIM_ADD) {
+             // The tray icon couldn't be created, so use the Properties dialog
+             // as the main program window
+             PostQuitMessage(0);
+          }
+       }
+    }
 }
 
 // Process window messages

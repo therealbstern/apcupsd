@@ -25,7 +25,7 @@
 // by Kern E. Sibbald.  Many thanks to ATT and James Weatherall,
 // the original author, for providing an excellent template.
 //
-// Copyright (2000) Kern E. Sibbald
+// Copyright (2000-2003) Kern E. Sibbald
 //
 
 
@@ -44,7 +44,7 @@ extern void FillStatusBox(HWND hwnd, int id_list);
 // Constructor/destructor
 upsStatus::upsStatus()
 {
-        m_dlgvisible = FALSE;
+    m_dlgvisible = FALSE;
 }
 
 upsStatus::~upsStatus()
@@ -55,65 +55,65 @@ upsStatus::~upsStatus()
 BOOL
 upsStatus::Init()
 {
-        return TRUE;
+    return TRUE;
 }
 
 // Dialog box handling functions
 void
 upsStatus::Show(BOOL show)
 {
-        if (show) {
-                if (!m_dlgvisible) {
-                        DialogBoxParam(hAppInstance,
-                                MAKEINTRESOURCE(IDD_STATUS),
-                                NULL,
-                                (DLGPROC) DialogProc,
-                                (LONG) this);
-                }
+    if (show) {
+        if (!m_dlgvisible) {
+            DialogBoxParam(hAppInstance,
+                        MAKEINTRESOURCE(IDD_STATUS),
+                        NULL,
+                        (DLGPROC)DialogProc,
+                        (LONG)this);
         }
+    }
 }
 
 BOOL CALLBACK
 upsStatus::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-        // We use the dialog-box's USERDATA to store a _this pointer
-        // This is set only once WM_INITDIALOG has been recieved, though!
-        upsStatus *_this = (upsStatus *) GetWindowLong(hwnd, GWL_USERDATA);
+    // We use the dialog-box's USERDATA to store a _this pointer
+    // This is set only once WM_INITDIALOG has been recieved, though!
+    upsStatus *_this = (upsStatus *)GetWindowLong(hwnd, GWL_USERDATA);
 
-        switch (uMsg) {
-        case WM_INITDIALOG:
-                // Retrieve the Dialog box parameter and use it as a pointer
-                // to the calling vncProperties object
-                SetWindowLong(hwnd, GWL_USERDATA, lParam);
-                _this = (upsStatus *) lParam;
+    switch (uMsg) {
+    case WM_INITDIALOG:
+        // Retrieve the Dialog box parameter and use it as a pointer
+        // to the calling vncProperties object
+        SetWindowLong(hwnd, GWL_USERDATA, lParam);
+        _this = (upsStatus *)lParam;
 
-                // Show the dialog
-                SetForegroundWindow(hwnd);
+        // Show the dialog
+        SetForegroundWindow(hwnd);
 
-                _this->m_dlgvisible = TRUE;
+        _this->m_dlgvisible = TRUE;
 
-                FillStatusBox(hwnd, IDC_LIST);
+        FillStatusBox(hwnd, IDC_LIST);
 
-                return TRUE;
+        return TRUE;
 
-        case WM_COMMAND:
-                switch (LOWORD(wParam)) {
-                case IDCANCEL:
-                case IDOK:
-                        // Close the dialog
-                        EndDialog(hwnd, TRUE);
+    case WM_COMMAND:
+        switch (LOWORD(wParam)) {
+        case IDCANCEL:
+        case IDOK:
+            // Close the dialog
+            EndDialog(hwnd, TRUE);
 
-                        _this->m_dlgvisible = FALSE;
+            _this->m_dlgvisible = FALSE;
 
-                        return TRUE;
-                }
-
-                break;
-
-        case WM_DESTROY:
-                EndDialog(hwnd, FALSE);
-                _this->m_dlgvisible = FALSE;
-                return TRUE;
+            return TRUE;
         }
-        return 0;
+
+        break;
+
+    case WM_DESTROY:
+        EndDialog(hwnd, FALSE);
+        _this->m_dlgvisible = FALSE;
+        return TRUE;
+    }
+    return 0;
 }

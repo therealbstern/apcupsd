@@ -235,7 +235,7 @@ void WinMessageBox(char *msg)
    MessageBox(NULL, msg, "apcupsd message", MB_OK);
 }
 
-HANDLE get_osfhandle(int fd);
+extern "C" HANDLE get_osfhandle(int fd);
 
 /*
  * Implement a very simple form of serial port

@@ -29,8 +29,11 @@ winlib.a: $(UPSOBJS) winres.res
 	ar rc $@ $(UPSOBJS)
 	$(RANLIB) $@
 
+shutdown.o: shutdown.c
+	gcc -c $(CFLAGS) $<
+
 shutdown.exe:	 ${OBJS} 
-	$(CC) ${CFLAGS} -o shutdown ${OBJS} -luser32 -lgdi32
+	gcc ${CFLAGS} -o shutdown ${OBJS} -luser32 -lgdi32
 
 winres.res: winres.rc apcupsd.ico winres.h online.ico onbatt.ico
 	windres $< -O coff -o $@
@@ -42,10 +45,10 @@ popup.exe: popup.o
 	$(CC) ${CFLAGS} -o popup popup.o -luser32 -lgdi32
 
 email.o: email.c
-	$(CC) -c ${CFLAGS} $<
+	gcc -c ${CFLAGS} $<
 
 email.exe: email.o libmymapi32.a
-	$(CC) ${CFLAGS} -L. -o email email.o -luser32 -lgdi32 -lmymapi32
+	gcc ${CFLAGS} -L. -o email email.o -luser32 -lgdi32 -lmymapi32
 
 libmymapi32.a: mymapi32.def
 	dlltool --as=as -k --output-lib $@ --def $<
