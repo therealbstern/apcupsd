@@ -148,12 +148,13 @@ make \
         DESTDIR=$RPM_BUILD_ROOT \
         install
 
+# This should no longer be necessary - see Jan 17 2004 changelog note below
 # RedHat 7 put usb hid devices in /dev/usd/hid directory rather than /dev/usb
 # which follows usb standard. This was corrected with RedHat 8 so we patch the
 # apcupsd.conf file as created by our configure statement above for rh7 builds.
-%if %{usb} && %{rh7}
-patch $RPM_BUILD_ROOT/etc/apcupsd/apcupsd.conf platforms/redhat/apcupsd.conf.patch
-%endif
+#%if %{usb} && %{rh7}
+#patch $RPM_BUILD_ROOT/etc/apcupsd/apcupsd.conf platforms/redhat/apcupsd.conf.patch
+#%endif
 
 install -m744 platforms/apccontrol \
               $RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/apccontrol
@@ -373,6 +374,7 @@ fi
 * Sat Jan 17 2004 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - added build of net driver to configure
 - moved usb driver build into both packages
+- set --with-serial-dev= to blank so will find any device and removed rh7 patch
 * Sat Jan 10 2004 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - added build tags for rh8 rh9 fc1 and wb3
 - cleaned up dependancies and Requires by platform
