@@ -91,8 +91,16 @@ url='maintaining'>maintaining</ulink> your UPS.</para></step>
 
 <sect1 id='supported'><title>Supported Operating Systems, UPSes and Cables</title>
 
+<p>Please note that due to the lack of Unix USB API standards,
+the USB code in apcupsd works only on Linux.  Drivers for other
+OSes can be written, but it requires someone with a knowledge of
+the OS and the USB to do so.  (This lack of a Unix USB API
+interface is one of the big failings of Unix.  It occurs in other
+areas such as the GUI. Many people tout the diversity as an
+advantage, but it is in fact a weakness.)</p>
+
 <para>The <application>apcupsd</application> maintainers develop it
-under Red Hat and SUSE Linux; those ports are, accordingly, the most
+under Red Hat; that port is, accordingly, the most
 up to date and best tested.  There are enough Debian Linux users that
 that port is also generally pretty fresh.  Slackware Linux is also
 fully supported.</para>
@@ -215,9 +223,10 @@ speaks Simple Network Management Protocol.</para>
   <entry>Supported</entry>
 </row>
 <row>
-  <entry>BackUPS CS (serial mode)</entry>
+  <entry>BackUPS CS/ES (serial mode)</entry>
   <entry>apcsmart</entry>
-  <entry>smart (note: using Smart Custom RJ45<footnoteref linkend='custom_cable'/>)</entry>
+  <entry>smart (note: using Smart Custom RJ45<footnoteref linkend='custom_cable'/>) the
+                new Back-UPS RS 500 models are reported NOT to work with this cable.</entry>
   <entry>Supported</entry>
 </row>
 <row>
@@ -230,18 +239,18 @@ speaks Simple Network Management Protocol.</para>
   <entry>SmartUPS, SmartUPS VS<footnote><para>It has not been confirmed that the
   cable shipped with the VS is a 940-0095.</para></footnote>, PowerStack 450, Matrix UPS, ShareUPS Advanced Port</entry>
   <entry>apcsmart</entry>
-  <entry>smart (note: using Smart-Custom<footnoteref linkend='custom_cable'/>), 940-0024C</entry>
+  <entry>smart (note: using Smart-Custom<footnoteref linkend='custom_cable'/>), 940-0024C </entry>
   <entry>Supported</entry>
 </row>
 <row>
-  <entry>BackUPS CS USB, Pro USB, and ES USB models including RS/XS 1000
-and RS/XS 1500.</entry>
+  <entry>BackUPS CS USB, Pro USB, ES USB, RS/XS 1000, RS/XS 1500, and probably
+         other USB models</entry>
   <entry>usb</entry>
-  <entry>usb (note: using APC cables 940-0127A/B)</entry>
-  <entry>Supported in version >=3.9.4</entry>
+  <entry>usb (note: using APC cables 940-0127A/B/C)</entry>
+  <entry>Supported in version >=3.9.8</entry>
 </row>
 <row>
-  <entry>SmartUPS USB</entry>
+  <entry>SmartUPS USB, BackUPS Office USB, and any other USB UPS</entry>
   <entry>usb</entry>
   <entry>usb (note: using APC cable, no number)</entry>
   <entry>Supported, version >=3.9.8</entry>
@@ -343,9 +352,14 @@ I:  If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=00 Prot=00 Driver=hid
 </screen>
 
 <p>Note, if on the last line, <b>Driver</b> is listed as 
-<b>Driver=none</b> then you do not have the HID driver loaded. Please 
-read further for instructions how to correct it.</p>
-     
+<b>Driver=none</b> then you do not have the HID driver loaded or      
+the driver did not attach to the UPS. One common cause is
+having a Linux kernel older than 2.4.22 (such as a 
+stock RedHat 9 kernel). If this is the case for your system,
+please upgrade to at least kernel version 2.4.22 and try
+again.  Otherwise, please
+read further for instructions for other possible courses
+of action.</p>
 
 <para>Here are two more ample entries from Kern Sibbald.  The first
 features a  Back-UPS 350 direct connected USB device:</para>

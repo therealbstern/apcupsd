@@ -177,6 +177,7 @@ static int send_to_slave(UPSINFO *ups, int who)
     struct netdata send_data;
     int turnon = 1;
     int stat = 0;
+    int wstat;	
     long l;
 
     Dmsg1(100, "Enter send_to_slave %d\n", who);
@@ -274,17 +275,17 @@ static int send_to_slave(UPSINFO *ups, int who)
     strcpy(send_data.apcmagic, APC_MAGIC);
     strcpy(send_data.usermagic, slaves[who].usermagic);
 
-    Dmsg3(100, "Write %d bytes to slaves magic=%s usrmagic=%s\n",   
-       sizeof(send_data),
-       send_data.apcmagic, send_data.usermagic);
     /* Send our data to Slave */
     do {
-	stat = write(slaves[who].socket, &send_data, sizeof(send_data));
-    } while (stat < 0 && errno == EINTR);
-    if (stat != sizeof(send_data)) {
-	if (slaves[who].remote_state == RMT_CONNECTED)
-	    slaves[who].remote_state = RMT_RECONNECT;
+	wstat = write(slaves[who].socket, &send_data, sizeof(send_data));
 	slaves[who].ms_errno = errno;
+    } while (wstat < 0 && errno == EINTR);
+    Dmsg3(100, "Wrote %d bytes stat=%d rmt_state=%d\n", sizeof(send_data),
+       wstat, slaves[who].remote_state);
+    if (wstat != sizeof(send_data)) {
+	if (slaves[who].remote_state == RMT_CONNECTED) {
+	    slaves[who].remote_state = RMT_RECONNECT;
+	}
 	stat = 4;	      /* write error */
 
     /*
@@ -304,6 +305,7 @@ select_again1:
 	FD_SET(slaves[who].socket, &rfds);
 	tv.tv_sec = 10; 	      /* wait 10 seconds for response */
 	tv.tv_usec = 0;
+        Dmsg0(100, "Wait on select for slave response\n");
 	switch (select(slaves[who].socket+1, &rfds, NULL, NULL, &tv)) {
 	case 0: 	     /* No chars available in 10 seconds. */
 	    slaves[who].ms_errno = ETIME;
@@ -355,7 +357,9 @@ select_again1:
 	if (stat == 0) {
             log_event(ups, LOG_WARNING,"Connect to slave %s succeeded", slaves[who].name);
 	    slaves[who].remote_state = RMT_CONNECTED;
-	} 
+	} else {
+           Dmsg1(100, "Stat after read from slave=%d\n", stat);
+	}
     }
     if (slaves[who].remote_state != RMT_CONNECTED || 
 	  slaves[who].disconnecting_slave) {
@@ -510,7 +514,7 @@ select_again2:
 	   newsocketfd = accept(socketfd, (struct sockaddr *) &master_adr, 
 				&masterlen);
 	} while (newsocketfd < 0 && errno == EINTR);
-        Dmsg1(100, "Accept returned %d\n", newsocketfd);
+        Dmsg1(100, "Accept returned netsocketfd=%d\n", newsocketfd);
 	if (newsocketfd < 0) {
 	    slaves[0].remote_state = RMT_DOWN;
 	    slaves[0].down_time = time(NULL);
@@ -627,6 +631,7 @@ select_again3:
 	   stat = write(newsocketfd, &get_data, sizeof(get_data));
 	} while (stat < 0 && errno == EINTR);
     }
+    Dmsg2(100, "Write to master %d bytes, stat=%d\n", sizeof(get_data), stat);
 
     if (strcmp(ups->usermagic, get_data.usermagic) == 0) {
         Dmsg0(100, "Got good data\n");
@@ -691,6 +696,7 @@ select_again3:
     }
 
     if (ShutDown) {		    /* if master has shutdown */
+        Dmsg0(100, "Call shutdown\n");
 	set_ups(UPS_SHUT_REMOTE); /* we go down too */
     }
 	 
@@ -708,7 +714,7 @@ select_again3:
     } 
     slaves[0].remote_state = RMT_CONNECTED;
     ups->last_master_connect_time = time(NULL);
-    Dmsg0(100, "Exit get_from_master\n");
+    Dmsg0(100, "Exit get_from_master connected\n");
     return 0;
 }
 
@@ -739,6 +745,7 @@ static int update_from_master(UPSINFO *ups)
        case 3:
           log_event(ups, LOG_ERR, "Read failure from socket. ERR=%s\n",
 	      strerror(slaves[0].ms_errno));
+	  generate_event(ups, CMDMASTERTIMEOUT);
 	  break;
        case 4:
           log_event(ups, LOG_ERR, "Bad APC magic from master: %s", get_data.apcmagic);

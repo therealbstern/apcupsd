@@ -60,7 +60,7 @@ xmlto -m manual.xsl xhtml-nochunks manual.xml
    </revision>
    <revision>
       <revnumber>3.0</revnumber>
-      <date>05 Mar 2004</date>
+      <date>22 Mar 2004</date>
       <authorinitials>KES</authorinitials>
        <revremark>
           Last time Book changed.

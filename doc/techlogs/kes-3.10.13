@@ -2,6 +2,10 @@
                         Kern Sibbald
 
 General:
+30Mar04
+- I finally took a careful look at the old master/slave networking
+  code as well as ran it here, and it was sadly broken. Hopefully
+  this commit fixes the problems.    
 09Mar04
 - Fix a few string functions using the new routines.
 - Added asys.c imported from Bacula, which contains a number of 
