@@ -140,6 +140,14 @@ be set to <b>System Account</b> with <b>Allow Service to Interact with
 Desktop</b> checked.  If these values are not set correctly by default,
 please change them otherwise <b>apcupsd</b> will not work.
 <p>
+For WinXP systems (and probably Win2K), the dialogs are a bit different
+from those shown here for WinNT, but he concept is the same. You get 
+to the Services dialog by clicking on: <b>Control Panel -> Administrative
+Tools -> Component Services</b>. The apcupsd service should appear in the
+right hand window when you click on <b>Services (Local)</b> in the
+left hand menu window.
+
+<p>
 That should complete the installation process. When the system tray icon
 turns from a battery <img src="onbatt.gif" width="16" height="16" border="0" alt=""> into a 
 plug <img src="online.gif" width="16" height="16" border="0" alt="">, right click on it
@@ -260,6 +268,14 @@ experience this problem, a work around is to put a shortcut to
 <b>apcupsd</b> in the StartUp folder.
 <p>As noted above, after an upgrade, you may need to start apcupsd
 several times before it will actually run.
+<p>
+On WinNT, WinXP, and Win2K systems, you can examine the System Applications
+log to which <b>apcupsd</b> writes Windows error messages during startup.
+<p>
+Regardless of which Windows system you are running, <b>apcupsd</b> logs
+most error messages to <b>c:\apcupsd\etc\apcupsd\apcupsd.events</b>. This
+type error messages such as configuration file not found, etc are written
+to this file.
 
 <h3>Utility Functions</h3>
 The directory <b>c:\apcupsd\bin</b> contains six utility routines (actually
