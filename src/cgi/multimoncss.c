@@ -278,7 +278,7 @@ void do_utility (char *monhost, char *suffix)
         if (getupsvar (monhost, "highxfer", highxfer, sizeof(highxfer)) > 0)
 		highx = atoi(highxfer);
 
-        printf ("<       TD CLASS=\"");
+        printf ("       <TD CLASS=\"");
 
 	/* only do this if we got both values */
 	if ((lowx != 0) && (highx != 0)) {

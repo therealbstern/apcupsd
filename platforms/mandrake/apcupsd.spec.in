@@ -33,8 +33,9 @@ extended power failure.
 
 %serverbuild
 
-%configure --enable-usb --enable-net --enable-master-slave --enable-powerflute --enable-pthreads --enable-cgi --with-cgi-bin=%{_cgibin} --enable-nls --with-nisip=127.0.0.1
-%make
+%configure --enable-usb --enable-net --enable-master-slave --enable-powerflute --enable-pthreads --enable-cgi --with-cgi-bin=%{_cgibin} --enable-nls --with-serial-dev= --with-upstype=usb --with-upscable=usb --with-nisip=127.0.0.1
+# %%make doesn't work
+make
 
 
 %install
@@ -70,6 +71,16 @@ perl -pi -e 's|\@/sbin/chkconfig|\#\@/sbin/chkconfig|' platforms/mandrake/Makefi
 %doc COPYING ChangeLog INSTALL doc/ examples/
 
 %changelog
+* Mon Jan 19 2004 David Walser <luigiwalser@yahoo.com> 3.10.10-1mdk
+- 3.10.10
+- use USB by default
+
+* Thu Jan 01 2004 David Walser <luigiwalser@yahoo.com> 3.10.9-1mdk
+- 3.10.9
+
+* Fri Nov 21 2003 Erwan Velu <erwan@mandrakesoft.com> 3.10.7-1mdk
+- New release
+
 * Tue Feb 04 2003 David Walser <luigiwalser@yahoo.com> 3.10.5-1mdk
 - 3.10.5
 - only listen on localhost by default (Network Information Server)
