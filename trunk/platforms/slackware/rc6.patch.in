@@ -6,15 +6,35 @@
  
 +  # This block was from the original Slackware distribution:
    # See if this is a powerfail situation.
--  if [ -f /etc/power_is_failing ]; then
--    echo "Turning off UPS, bye."
--    /sbin/powerd -q
--    exit 1
-+  #if [ -f /etc/power_is_failing ]; then
-+  #  echo "Turning off UPS, bye."
-+  #  /sbin/powerd -q
-+  #  exit 1
-+  #fi
+-  if [ -x /sbin/genpowerd ]; then
+- # See if this is a powerfail situation:
+-   if grep FAIL /etc/upsstatus 1> /dev/null 2> /dev/null ; then
+- # Signal UPS to shut off the inverter:
+-     /sbin/genpowerd -k /dev/UPS apc-linux
+-     if [ ! $? = 0 ]; then
+-       echo
+-       echo "There was an error signaling the UPS."
+-       echo "Perhaps you need to edit /etc/rc.d/rc.6 to configure"
+-       echo "the serial line and UPS type."
+-         # Wasting 15 seconds of precious power:
+-       sleep 15
+-     fi
+-   fi
++  # if [ -x /sbin/genpowerd ]; then
++  #  # See if this is a powerfail situation:
++  #  if grep FAIL /etc/upsstatus 1> /dev/null 2> /dev/null ; then
++  #  # Signal UPS to shut off the inverter:
++  #    /sbin/genpowerd -k /dev/UPS apc-linux
++  #    if [ ! $? = 0 ]; then
++  #      echo
++  #      echo "There was an error signaling the UPS."
++  #      echo "Perhaps you need to edit /etc/rc.d/rc.6 to configure"
++  #      echo "the serial line and UPS type."
++  #  # Wasting 15 seconds of precious power:
++  #      sleep 15
++  #    fi
++  #  fi
++  # fi
 +
 +  # This block was added in by the apcupsd installation process.  This
 +  # will cause the UPS to kill the power supply after a configurable number
