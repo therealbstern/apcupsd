@@ -2,6 +2,15 @@
                         Kern Sibbald
 
 General:
+26Aug04
+- Add APCBATTCapBeforeRestore found by Adam to hid-ups.c
+- Update copyright in apc_struct.h
+- Take Adam's new apc_defines.h with minor modification.
+- Correct a bug reported by a user (he also had the fix) to
+  the snmp driver where Sensitivity was incorrectly reported.
+- Add astrncpy() to snmp driver.
+- Fix apcstatus.c to report Unknown for the sensitivity rather than
+  High if the sense word cannot be read or is incorrect.
 07Aug04
 - Document Mandrake USB kernel problems.
 04Aug04

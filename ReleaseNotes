@@ -13,7 +13,7 @@ Main Points:
 - The code as a whole is much more resistant to buffer overflows
   since most all string copies are now protected.
    
-Release 3.10.16 07Jul04
+Release 3.10.15 07Jul04
 - Document Mandrake USB kernel problems.
 - Fix HID_MAX_USAGES in the examples directory
 - Apply David Walser's patch for missing colors in multimon.  Reads

@@ -5,7 +5,7 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
-----> Release 3.10.16 07Aug04
+----> Release 3.10.15 07Aug04
 - Document Mandrake USB kernel problems.
 - Fix HID_MAX_USAGES in the examples directory
 - Apply David Walser's patch for missing colors in multimon.  Reads
