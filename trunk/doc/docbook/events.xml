@@ -97,9 +97,9 @@ command line options:</para>
       <para>When a shutdown is scheduled, and the time 
       specified on the ANNOYME directive in the apcupsd.conf file
       expires, this event is generated.</para>
-      <para>Default -- does a &#xA0;&#xA0;<command>printf
+      <para>Default -- does a <command>printf
       &quot;Power problems please logoff.&quot; | wall</command>
-      &#xA0;&#xA0; then exits.</para>
+       then exits.</para>
     </listitem>
   </varlistentry>
   <varlistentry>
@@ -108,9 +108,9 @@ command line options:</para>
       <para>When apcupsd detects that the mains are on, but the 
       battery is not functioning correctly, this event is generated.
       It is repeated every x hours.</para>
-      <para>Default -- does a &#xA0;&#xA0; <command>printf
+      <para>Default -- does a  <command>printf
       &quot;Emergency! UPS batteries have failed\nChange them NOW&quot; |
-      wall</command> &#xA0;&#xA0; then exits.</para>
+      wall</command>  then exits.</para>
     </listitem>
   </varlistentry>
   <varlistentry>
@@ -119,9 +119,9 @@ command line options:</para>
       <para>This event is generated each time the communications line
       with the computer is severed. This event is not detected on
       dumb signaling UPSes.</para>
-      <para>Default -does a &#xA0;&#xA0;<command>printf
+      <para>Default -does a <command>printf
       &quot;Warning serial port communications with UPS lost.&quot; |
-      wall</command> &#xA0;&#xA0; then exits.</para>
+      wall</command>  then exits.</para>
     </listitem>
   </varlistentry>
   <varlistentry>
@@ -130,16 +130,16 @@ command line options:</para>
       <para>After a commfailure event is issued, when the communications
       to the computer is re-established, this event will be generated.
       </para>
-      <para>Default -- does a &#xA0;&#xA0;<command>printf
+      <para>Default -- does a <command>printf
       &quot;Serial communications with UPS restored.&quot; | wall</command>
-      &#xA0;&#xA0;then exits.</para>
+      then exits.</para>
     </listitem>
   </varlistentry>
   <varlistentry>
     <term>doreboot</term>
     <listitem>
       <para>This event is depreciated and should not be used.</para>
-      <para>Default - does a reboot of the system by calling &#xA0;&#xA0;
+      <para>Default - does a reboot of the system by calling 
       <command>shutdown -h now</command></para>
     </listitem>
   </varlistentry>
@@ -149,14 +149,14 @@ command line options:</para>
       <para>When the UPS is running on batteries and one of the limits
       expires (time, run, load), this event is generated to cause
       the machine to shutdown.</para>
-      <para>Default does a shutdown of the system by calling&#xA0;&#xA0;
+      <para>Default does a shutdown of the system by calling
       <command>shutdown -h now</command></para>
     </listitem>
   </varlistentry>
   <varlistentry>
     <term>emergency</term>
     <listitem>
-      <para>Does an emergency shutdown of the system by calling&#xA0;&#xA0;
+      <para>Does an emergency shutdown of the system by calling
       <command>shutdown -h now</command></para>
     </listitem>
   </varlistentry>
@@ -166,8 +166,8 @@ command line options:</para>
       <para>This event is generated when the UPS is running on
       batteries and the battery power is exhausted. The event following
       this one will be a shutdown.</para>
-      <para>Default -- does a&#xA0;&#xA0;<command>printf &quot;UPS battery power
-      exhausted. Doing shutdown.\n&quot; | wall</command> &#xA0;&#xA0;then
+      <para>Default -- does a <command>printf &quot;UPS battery power
+      exhausted. Doing shutdown.\n&quot; | wall</command> then
       exits.</para>
     </listitem>
   </varlistentry>
@@ -176,11 +176,11 @@ command line options:</para>
     <listitem>
       <para>This event is generated when the battery charge is 
       below the low limit specified in the apcupsd.conf file.</para>
-      <para>Default -- does a &#xA0;&#xA0; <command>printf &quot;UPS battery
+      <para>Default -- does a  <command>printf &quot;UPS battery
       discharge limit reached. Doing shutdown.\n&quot; | wall</command>
-      &#xA0;&#xA0; then exits.  After completing this event,
+       then exits.  After completing this event,
       <application>apcupsd</application> will immediately initiate a
-      &#xA0;&#xA0; <command>doshutdown</command> event.</para>
+       <command>doshutdown</command> event.</para>
     </listitem>
   </varlistentry>
   <varlistentry>
@@ -193,7 +193,7 @@ command line options:</para>
       A cancel of a shutdown should never be attempted as it
       is very unlikely to succeed and will almost surely leave
       your machine in a indeterminate state.</para>
-      <para>Default -- attempts to cancel the shutdown with a &#xA0;&#xA0;
+      <para>Default -- attempts to cancel the shutdown with a 
       <command>shutdown -c</command> (not sure about that!!!!)</para>
     </listitem>
   </varlistentry>
@@ -205,9 +205,9 @@ command line options:</para>
       considers the UPS to be on batteries. The onset of this
       event can be delayed by the ONBATTERYDELAY apcupsd.conf 
       configuration directive.</para>
-      <para>Default -- does a &#xA0;&#xA0;<command>printf &quot;Power
+      <para>Default -- does a <command>printf &quot;Power
       failure. Running on UPS batteries.&quot; | wall</command>
-      &#xA0;&#xA0;then exits.</para>
+      then exits.</para>
     </listitem>
   </varlistentry>
   <varlistentry>
@@ -227,8 +227,8 @@ command line options:</para>
       a longer powerfailure. In many cases, you may want to 
       inhibit the normal message sent/emailed by this event to 
       avoid being annoyed by short power failures.</para>
-      <para>Default -- does a &#xA0;&#xA0;<command>printf &quot;Warning power
-      loss detected.&quot; | wall</command>&#xA0;&#xA0; then exits.</para>
+      <para>Default -- does a <command>printf &quot;Warning power
+      loss detected.&quot; | wall</command> then exits.</para>
     </listitem>
   </varlistentry>
   <varlistentry>
@@ -239,7 +239,7 @@ command line options:</para>
       exists and the communications line has been severed.
       Despite the name, you should never reboot the machine -- instead
       always shut it down.</para>
-      <para>Does a &#xA0;&#xA0; <command>shutdown -h now</command></para>
+      <para>Does a  <command>shutdown -h now</command></para>
     </listitem>
   </varlistentry>
   <varlistentry>
@@ -258,9 +258,9 @@ command line options:</para>
       The MINUTES is the remaining runtime as internally calculated
       by the UPS and monitored by apcuspd.
       </para>
-      <para>Does a &#xA0;&#xA0;<command>printf &quot;UPS battery
+      <para>Does a <command>printf &quot;UPS battery
       runtime percent reached. Doing shutdown.\n&quot; |
-      wall</command> &#xA0;&#xA0; then exits.  After completing this
+      wall</command>  then exits.  After completing this
       event, <application>apcupsd</application> will immediately
       initiate a <command>doshutdown</command> event.</para>
     </listitem>
@@ -276,9 +276,9 @@ command line options:</para>
       on the remaining runtime (MINUTES) or the battery level
       (BATTERYLEVEL) values specified in the conf file.
       </para>
-      <para>Does a &#xA0;&#xA0;<command>printf &quot;UPS battery
+      <para>Does a <command>printf &quot;UPS battery
       runtime limit exceeded. Doing shutdown.\n&quot; | wall</command>
-      &#xA0;&#xA0; then exits. After completing this event,
+       then exits. After completing this event,
       <application>apcupsd</application> will immediately initiate a
       <command>doshutdown</command> event.</para>
     </listitem>

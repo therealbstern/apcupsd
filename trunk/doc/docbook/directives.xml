@@ -1,0 +1,825 @@
+<chapter id='directive_reference'><title>Configuration Directive
+Reference</title>
+
+<para>Configuration directives in 
+<filename>/etc/apcupsd/apcupsd.conf</filename> control the behavior
+of the <application>apcupsd</application> daemon.  For most installations
+it is only necessary to set a handful of general directives. The rest
+can be left at their defaults unless you have an exotic configuration.</para>
+
+<sect1><title>General Configuration Directives</title>
+
+<para>In general, each of these directives is required (ecept that the DEVICE
+directive is ignored for UPSCABLE ether).</para>
+
+<variablelist>
+  <varlistentry>
+    <term> UPSTYPE &lt;type of APC UPS you have&gt;</term>
+
+    <listitem>
+      <para>The name of a driver.  Should be one of
+      <literal>dumb</literal>, <literal>apcsmart</literal>,
+      <literal>net</literal>, <literal>usb</literal>,
+      <literal>snmp</literal>, or <literal>test</literal>. This
+      describes your interface type.</para>
+
+      <para>The UPSTYPE directive can be defined during
+      installation by using the <option>--with-upstype=</option> option of
+      the <command>./configure</command> program.</para>
+    </listitem>
+  </varlistentry>
+
+  <varlistentry>
+    <term>UPSCABLE  &lt;type of cable you are using&gt;&gt;</term>
+    <listitem>
+<literallayout>
+      [ simple | 940-0020B | 940-0023A ]
+      [ smart | 940-0024B | 940-0024C ]
+      [ 940-1524C | 940-0024G | 940-0095A | 940-0095B | 940-0095C | 940-0119A]
+      [ ether | usb ] 
+</literallayout>
+
+      <para>The <option>--with-upscable=</option> option of 
+      <command>./configure</command> can be used to set a default for 
+      this directive during the your build.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>DEVICE &lt;name of device&gt;</term>
+    <listitem>
+       <para>Specify which device is used for UPS communications
+       (normally a USB or serial port. The default is platform-dependent,
+       and is usually something like <filename>/dev/ttyS0</filename>. For
+       USB ports, you may leave the name of the device blank (no
+       specification) and <application>apcupsd</application> will
+       automatically search the standard locations for the UPS.
+       You may also specify a port range specification of the form
+       <filename>/dev/usb/hid/hiddev[0-15]</filename>, .</para>
+
+       <para>Normally, the <command>./configure</command> program will
+       set an appropriate default value.  You may also specify the 
+       <option>--with-serial-dev=</option> option of the
+       <command>./configure</command> program to set this directive 
+       at build time.</para>
+
+       <para>If you have specified 
+       <emphasis role="bold">UPSTYPE net</emphasis>, then the device name
+       to be specified consists of 
+       <emphasis role="bold">hostname:port</emphasis> where the hostname
+       is the fully qualified name or IP address of the host (NIS server)
+       and the port (optional) is the port to use to contact the
+       server.</para>
+
+       <para>If you specified <emphasis role="bold">UPSTYPE snmp</emphasis>,
+       then the device name becomes 
+       <emphasis role="bold">hostname:vendor:community</emphasis>. Please 
+       see the <link linkend='snmp'>SNMP chapter</link> in this manual 
+       for more details.</para>
+     </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term> LOCKFILE  &lt;path to lockfile&gt;</term>
+    <listitem>
+      <para>This option tells <application>apcupsd</application>
+      where to create a lockfile for the USB or serial port in the
+      specified directory. This is important to keep two programs from
+      reading or writing the port at the same time. Please note
+      that although the directive name is LOCKFILE, you are actually
+      specifying the lock file path. <application>apcupsd</application> 
+      automatically appends the name of the device when creating the file.
+      On most systems, this directive is automatically set by the
+      <command>./configure</command> program.  You may also explicitly
+      set it during the build process by using the 
+      <option>--with-lock-dir=</option> option of the 
+      <command>./configure</command> program.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+
+</sect1>
+<sect1 id="ConfigInfoServer"><title>Configuration Directives Used by the Network Information Server</title>
+
+<para>None of these directives are required for proper operation of
+<application>apcupsd</application>. For the Network Information Server
+to work, it must be enabled in the configuration (default) with
+<option>--enable-nis</option></para>
+
+<variablelist>
+  <varlistentry>
+    <term>NETSERVER [on | off]</term>
+    <listitem>
+      <para>This configuration directive turns the network information
+      server on or off. If it is on, <application>apcupsd</application>
+      will spawn a child process that serves STATUS and EVENTS information
+      over the network. This information is currently used by the Web-based
+      CGI programs. The default is on. In some cases, for added security,
+      you may want to invoke a separate information server daemon from the
+      inetd daemon. In that case, <emphasis>NETSERVER</emphasis> should be 
+      <emphasis>off</emphasis>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>NISIP &lt;IP-address&gt;</term>
+    <listitem>
+      <para>This directive specifies an IP address on which NIS server will
+      listen for incoming connections. Default value is 0.0.0.0 that
+      means any incoming request will be serviced but if you want it to
+      listen to a single subnet you can set it up to that subnet address,
+      for example 192.168.10.0. Additionally you can listen for a single
+      IP like 192.168.10.1. You may also use the <option>--with-nisip=</option>
+      option of the <command>./configure</command> program to set this 
+      directive during the build.</para> 
+
+      <para>This directive does not work on Win32 machines because
+      inet_ipton() is not implemented there.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term> NISPORT &lt;port&gt;</term>
+    <listitem>
+      <para>This configuration directive specifies the port to be used by
+      the <application>apcupsd</application> Network Information Server.
+      The default is platform dependent, but typically 3551, which we have
+      received from IANA as the official <application>apcupsd</application>
+      networking port. If you change this port, you must manually change the
+      #define SERV_TCP_PORT in cgi/upsfetch.c and rebuild the CGI programs.
+      An alternative is to use the <option>--with-nis-port=</option> option
+      of the <command>./configure</command> program during the build. 
+      In this case, all the appropriate locations will be automatically
+      changed.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term> EVENTSFILE &lt;filename&gt;</term>
+    <listitem>
+      <para>If you want the <application>apcupsd</application>
+      network information server to provide the last 10 events via the
+      network, you must specify a file where <application>apcupsd</application>
+      will save these events. The default is: 
+      <filename>/etc/apcupsd/apcupsd.events</filename>.
+      Currently, <application>apcupsd</application> will save at most the 
+      last 50 events. Periodically (once an hour by default), 
+      <application>apcupsd</application> will check the size of this file.
+      When more than 50 events are recorded, <application>apcupsd</application>
+      will truncate the file to the most recent 10 events. Consequently this
+      file will not grow indefinitely. Although we do not recommend it, 
+      you may change these values by editing apcevents.c and changing the
+      appropriate defines. Be aware that if you set these values to very 
+      large numbers, <application>apcupsd</application> may make excessive
+      memory demands on the system during the data access and file truncation 
+      operations.</para>
+
+      <para>This filename may also be specified at build time by
+      using the <option>--with-log-dir=</option> option of the 
+      <command>./configure</command> program.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+
+</sect1>
+<sect1 id="ConfigPowerFail"><title>Configuration Directives used during Power Failures</title>
+
+<para>In general, none of these directives are required. However, if
+you have a voltage-signalling (dumb) UPS with a cable that does not
+support the Low Battery signal, you must set the TIMEOUT directive to
+force a shutdown. Please see the <link linkend='cables'>Cables</link>
+section of this manual for more details. </para>
+
+<variablelist>
+  <varlistentry>
+    <term>ANNOY  &lt;time in seconds&gt;</term>
+    <listitem>
+      <para>Specify the time in seconds between messages requesting logged
+      in users to get off the system during a power failure. This timer
+      starts only when the UPS is running on batteries. The default is
+      300 seconds (5 minutes). <application>apcupsd</application> sends
+      the annoy messages by invoking the <application>apccontrol</application>
+      script with the <command>annoyme</command> argument. The default is
+      to send a <application>wall</application> message on Unix
+      systems and a popup message in Windows.</para>
+
+      <para>The value of <emphasis role="bold">ANNOYDELAY</emphasis> must be 
+      greater than the value of <emphasis role="bold">ANNOY</emphasis> in
+      order to receive annoy messages (this doesn't make sense, and means
+      that the default values do not generate annoy messages: KES).</para>
+
+      <para>Note that if <emphasis role="bold">NOLOGON</emphasis> 
+      is set to <emphasis role="bold">disable</emphasis> the annoy messages
+      will also be disabled.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>ANNOYDELAY &lt;time in seconds&gt;</term>
+    <listitem>
+      <para>Specify delay time in seconds before 
+      <application>apcupsd</application> begins requesting logged in users 
+      to get off the system during a power failure. This timer starts only
+      after the UPS is running on batteries. This timer is reset when the
+      power returns. The default is 60 seconds. Thus, the first warning to 
+      log off the system occurs after 60 seconds on batteries, assuming
+      that <emphasis role="bold">NOLOGON</emphasis> is not set to 
+      <emphasis role="bold">disable</emphasis>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>NOLOGON
+&lt;specifies when <application>apcupsd</application> should prevent user
+logins&gt;</term>
+    <listitem>
+      <para>[ disable | timeout | percent | minutes | always ] are valid types.</para>
+
+      <para>The type specified allows you define the point when
+      <application>apcupsd</application> will create the 
+      <filename>/etc/nologin</filename> file and thus when user
+      logins are prohibited. Once the <filename>/etc/nologin</filename> file
+      is created, normal users are prevented from logging in. Control of
+      when this file is created is important for allowing systems with
+      big UPSes to run as normally until the system administrator
+      determines the need for preventing user logins. The feature also
+      allows the system administrator to hold the "ANNOY" factor until
+      the <filename>/etc/nologin</filename> file is created. The default is
+      always if no NOLOGON directive is specified.</para>
+
+      <para>As far as I can tell, the only useful types are disable
+      and always since the difference in the time when the logout
+      warning is given and shutdown occurs for the other types is very
+      short (KES).</para>
+
+      <variablelist>
+      <varlistentry>
+      <term>disable</term>
+      <listitem>
+        <para>prevents <application>apcupsd</application> from creating
+        the nologin file.  Consequently, any user can login during a
+        power failure condition.  Also, the ANNOY feature is disabled so
+        users will not be warned to logoff the system.</para>
+        </listitem>
+      </varlistentry>
+      <varlistentry>
+      <term>timeout</term>
+      <listitem>
+        <para>specifies that <application>apcupsd</application> should
+        prohibit logins after the UPS is on batteries for 90% of the
+        time specified on the <emphasis role='bold'>TIMEOUT</emphasis>
+        configuration directive. Note! Normally you don't want to
+        specify a TIMEOUT value, so this option is probably not too
+        useful (KES).</para>
+      </listitem>
+      </varlistentry>
+      <varlistentry>
+      <term>percent</term>
+      <listitem>
+        <para>specifies that <application>apcupsd</application> should
+        prohibit logins when the remaining battery charge percentage
+        reaches 110% or less than the value specified on the <emphasis
+        role='bold'>BATTERYLEVEL</emphasis> configuration directive.
+        Thus if the <emphasis role='bold'>BATTERYLEVEL</emphasis> is
+        specified as 15, <application>apcupsd</application> will
+        prohibit logins when the battery charge drops below 16% (15% X
+        110% = 16%).</para>
+      </listitem>
+      </varlistentry>
+      <varlistentry>
+      <term>minutes</term>
+      <listitem>
+        <para>specifies that <application>apcupsd</application> should
+        prohibit logins when the remaining runtime in minutes reaches
+        110% or less than the value specified on the <emphasis
+        role='bold'>MINUTES</emphasis> configuration directive. Thus if
+        <emphasis role='bold'>MINUTES</emphasis> is set to 3,
+        <application>apcupsd</application> will prohibit logins when the
+        remaining runtime is less than 3 minutes (3 X 110% = 3).</para>
+      </listitem>
+      </varlistentry>
+      <varlistentry>
+      <term>always</term>
+      <listitem>
+        <para>causes <application>apcupsd</application> to immediately
+        prohibit logins when a power failure occurs. This will also
+        enable the ANNOY feature.</para>
+      </listitem>
+      </varlistentry>
+      </variablelist>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>BATTERYLEVEL  &lt;percent of battery&gt;</term>
+    <listitem>
+      <para>If BATTERYLEVEL is specified, during a power failure,
+      <application>apcupsd</application> will halt the system when the 
+      remaining battery charge falls below the specified percentage. 
+      The default is 5 percent. This directive is ignored for dumb 
+      (voltage-signalling) UPSes. To totally disable this counter, set 
+      <emphasis role="bold">BATTERYLEVEL -1</emphasis> in your
+      <filename>apcupsd.conf</filename> file.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>MINUTES  &lt;battery runtime in minutes&gt;</term>
+    <listitem>
+      <para>If MINUTES is specified, during a power failure,
+      <application>apcupsd</application> will shutdown the system when
+      the remaining runtime on batteries as internally calculated by
+      the UPS falls below the time specified. The default is 3. This
+      directive is ignored for dumb (voltage-signalling) UPSes. It
+      should be noted that some UPSes report an incorrect value for
+      remaining runtime when the battery is fully charged. This can be
+      checked by examining the <emphasis
+      role="bold">TIMELEFT</emphasis> value as printed in the output
+      of an <command>apcaccess status</command> command. If the value
+      is zero or otherwise unreasonable, your UPS is probably broken.
+      In this case, we recommend that you disable this timer by
+      setting <emphasis role="bold">MINUTES -1</emphasis> in your
+      <filename>apcupsd.conf</filename> file.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>TIMEOUT  &lt;time in seconds&gt;</term>
+    <listitem>
+      <para>After a power failure, <application>apcupsd</application>
+      will halt the system when TIMEOUT seconds have expired. A value
+      of zero disables this timer. Normally for all Smart UPS models
+      and dumb UPSes with cables that support low battery detection,
+      this should be zero so that the shutdown time will be determined
+      by the battery level and/or remaining runtime (see above) or in
+      the case of a voltage-signalling UPS, when the battery is
+      exhausted. This command is required for dumb UPSes that do not
+      provide a battery exhausted signal (only testing can determine
+      this point). For more information, see the <link
+      linkend='testing'>Testing</link> section of this manual. This
+      timer can also be useful if you want some slave machines to
+      shutdown before other machines to conserve battery power. It is
+      also useful for testing <application>apcupsd</application>
+      because you can force a rapid shutdown by setting a small value
+      (e.g. 60) and pulling the plug to the UPS.</para>
+
+      <para>When apcupsd is running in master mode (UPSCLASS
+      netmaster), and a shutdown condition is determined,
+      <application>apcupsd</application> will notify each of the
+      slaves to perform a shutdown then apcupsd will sleep for 30
+      seconds before issuing the shutdown of its own computer. If you
+      need the master to wait additional time before shutting down (to
+      allow for shutdown of slower slaves or of slaves running
+      software that requires more time to shutdown &mdash; e.g. databases),
+      you can do so by adding additional sleep() commands to
+      <filename>/etc/apcupsd/apccontrol</filename> in each case that 
+      causes a shutdown.</para>
+
+      <para><emphasis role='bold'>TIMEOUT</emphasis>, <emphasis
+      role='bold'>BATTERYLEVEL</emphasis>, and <emphasis
+      role='bold'>MINUTES</emphasis> can be set together without
+      problems. apcupsd will react to the first case or test that is
+      valid. Normally SmartUPS users will set <emphasis
+      role='bold'>TIMEOUT</emphasis> to zero so that the system is
+      shutdown depending on the percentage battery charge remaining
+      (<emphasis role='bold'>BATTERYLEVEL</emphasis>) or the remaining
+      battery runtime (<emphasis role='bold'>MINUTES</emphasis>).</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry id="KILLDELAY">
+    <term> KILLDELAY  &lt;time in seconds&gt;</term>
+    <listitem>
+      <para>If killdelay is set, <application>apcupsd</application> will 
+      continue running after a shutdown has been requested, and after the 
+      specified time in seconds, <application>apcupsd</application> will 
+      attempt to shut off the UPS the power. This directive should
+      normally be disabled by setting the value to zero, but on some
+      systems such as Win32 systems <application>apcupsd</application> 
+      cannot regain control after a shutdown to force the UPS to shut 
+      off the power. In this case, with proper consideration for the timing,
+      the <emphasis role="bold">KILLDELAY</emphasis> directive can be useful.
+      Please be aware, if you cause <application>apcupsd</application> to 
+      kill the power to your computer too early, the system and the disks 
+      may not have been properly prepared. In addition, 
+      <application>apcupsd</application> must continue running after the 
+      shutdown is requested, and on Unix systems, this is not normally the 
+      case as the system will terminate all processes during the 
+      shutdown.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+
+</sect1>
+<sect1 id="ConfigLogging"><title>Configuration
+Directives used to Control System Logging</title>
+
+<variablelist>
+  <varlistentry>
+    <term>STATTIME&lt;time&gt;</term>
+    <listitem>
+      <para>This directive supplies the time interval between writes to the
+      STATUS file. If set to zero, the STATUS file will not be written.
+      Please note that in a future version of 
+      <application>apcupsd</application> the STATUS
+      file code will disappear since its functionality has been replaced
+      by the Network Information Server and by 
+      <emphasis role="bold">apcaccess status</emphasis>, as a consequence, 
+      it is normally disabled by setting it to zero.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>STATFILE &lt;file&gt;</term>
+    <listitem>
+      <para>This directive specifies the file to be used when writing the
+      STATUS information. The default is 
+      <filename>/etc/apcupsd/apcupsd.status</filename>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>DATATIME&lt;time&gt;</term>
+    <listitem>
+      <para>This directives supplies the time interval between writes
+      of PowerChute&amp;tm; like data information to the log file. See
+      the <link linkend='datalogging'>Data</link> section of this
+      manual for additional details.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>FACILITY&lt;log-facility&gt;</term>
+    <listitem>
+      <para>The facility directive can be used to change the system logging 
+      class or facility. The default is 
+      <emphasis role="bold">DAEMON</emphasis>. This parameter can be useful 
+      if you wish to direct the <application>apcupsd</application> system 
+      logging information to other than your system default files. See 
+      the Logging section of this manual for additional <!-- FIXME -->
+      details.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+
+</sect1>
+<sect1 id="UPS_Sharing"><title>Configuration Directives for Sharing 
+a UPS</title>
+
+<para>The following directives apply to the master/slave networking
+mode of <application>apcupsd</application> where multiple machines can
+be powered by the same UPS. One machine, the master, will have a
+serial port connection to the UPS, and the other machines, the slaves,
+will obtain their information via the network from the master.</para>
+
+<para>Note, as of version 3.10.x, the old master/slave code is by
+default turned off in the configuration. You must explicitly enable
+it by including a <option>--enable-master-slave</option> option on your
+<command>./configure</command> command before building the source.</para>
+
+<para>In addition to the old master/slave code, there is now a new
+network driver enabled with <option>--enable-net</option> (default
+disabled) that can be used to control a slave from any version of
+apcupsd running NIS. This is a much more flexible system of
+controlling slaves because a slave machine that also has NIS turned on
+can thus act as a master for another slave with
+<option>--enable-net</option> turned on. With this mode turned on, the
+slave obtains the address of the master from the <emphasis
+role="bold">DEVICE</emphasis> directive, which takes the form
+<emphasis role="bold">hostname[:port]</emphasis> as a consequence,
+none of the directives apply for this form of networking. In addition,
+for this mode to work, you must specify <emphasis role="bold">UPSTYPE
+net</emphasis> so that the proper driver is loaded.</para>
+
+<para>The remainder of this section presents directives that apply to
+the old master/slave code that must be enabled by the <emphasis
+role="bold">enable-master-slave</emphasis> configuration
+option.</para>
+
+<variablelist>
+  <varlistentry>
+    <term>UPSCLASS &lt;class of operation&gt;</term>
+    <listitem>
+      <para>[ standalone | shareslave | sharemaster ] and
+      [ netslave | netmaster ] are valid types.
+      [ standalone | netslave | netmaster ] are tested classes.
+      [ shareslave | sharemaster ] classes are being tested.</para>
+
+      <para>The default is <emphasis role='bold'>standalone</emphasis>
+      and should be used for all machines powered by the UPS and having a
+      serial port connection to the UPS, but where there are no other
+      computers dependent on power from the same UPS. This is the
+      normal case.</para>
+
+      <para>Use <emphasis role='bold'>netmaster</emphasis>, if and only
+      if you have a serial port connection to the UPS and there are other
+      machines deriving power from the same UPS. This is required in all
+      master configuration files.</para>
+
+      <para>Use <emphasis role='bold'>netslave</emphasis> if and only if
+      you have no serial port connection to the UPS, but you derive power
+      from it. This is required in all slave configuration files, and in
+      this case, you will also have UPSCABLE set to ether.</para>
+
+      <para>Use <emphasis role='bold'>shareslave</emphasis> if and only
+      if you are using a ShareUPS and connected to a BASIC Port with
+      Simple Signal. This code is not fully tested.</para>
+
+      <para>Use <emphasis role='bold'>sharemaster</emphasis>, if and only 
+      if you are using a ShareUPS and connected to the ADVANCED Port Smart 
+      Signal control. This code is not fully tested.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>UPSMODE  [disable | share | net | sharenet ] are valid types.</term>
+    <listitem>
+      <para>[ disable | net ] are the only known and tested classes.</para>
+
+      <para>[ share | sharenet ] classes are being tested.</para>
+
+      <para>For normal standalone operations, you will set UPSMODE to
+      disable to indicate that you are disabling the master/slave
+      networking.</para>
+
+      <para>However, if you are using a single UPS to power several
+      computers and you have configured master and slave computers, then
+      set this value to net.</para>
+
+      <para>Use share for two or seven (2/7) additional simple signal ports
+      on a SmartAccessories(tm) (internal/external box) for SmartUPSes.
+      The share and sharenet code is not fully tested.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>NETTIME  &lt;time in seconds&gt;</term>
+    <listitem>
+      <para>The interval in seconds that the master uses to send
+      information to slave machines. This rate is automatically set to 1
+      second if the UPS goes on batteries and reset to your specified
+      value when the mains power returns. A typical value might be 60
+      seconds.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>NETPORT  &lt;IP port number&gt;</term>
+    <listitem>
+      <para>This port number is used for communications in 
+      the master/slave networking code. Note that the master and each slave 
+      must have the same port number specified on the NETPORT directive in 
+      the configuration file. This port may also be specified during 
+      installation by using the <option>--with-net-port=</option> option of 
+      the <command>./configure</command> program.</para>
+
+      <para>The NETPORT should not be confused with the port number for the
+      Network Information Server which is specified with the
+      <emphasis role="bold">SERVERPORT</emphasis> configuration 
+      directive.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>MASTER &lt;name of the master&gt; for slave machines.</term>
+    <listitem>
+       <para>Used in slave configuration files, this is the network name of
+      the master which is authorized to send commands to this slave. In
+      all cases (of which I am aware), when you specify a 
+      <emphasis role="bold">MASTER</emphasis> directive, you will also specify 
+      <emphasis role="bold">UPSCABLE ether</emphasis> since your
+      information about the UPS will come via the network from a master.</para>
+
+      <para>The slave machine will be shutdown whichever occurs first:
+      either at the request of the master when it does a shutdown or when
+      the values you have specified for TIMEOUT, BATTERYLEVEL, or MINUTES
+      expire (these should work but have not been fully tested).
+      Consequently, if you want the slaves to begin shutting down before
+      the master, you can do so by adjusting the values in the
+      configuration file. If you want the slave to remain up until the
+      master shuts down, you should set TIMEOUT, BATTERYLEVEL, and
+      MINUTES all to zero.</para>
+
+      <para>For proper functioning of the slave, you must specify the same
+      <emphasis role="bold">UPSTYPE</emphasis> in the slave configuration 
+      file as is in the master configuration file.</para>
+
+      <para>It should be noted that the master and slaves continue to
+      communicate over the network even after the master has issued a
+      shutdown command to the slaves. This is because the master 
+      <application>apcupsd</application> continues to run until it receives 
+      the shutdown signal from the system. This is important to ensure that 
+      all the slaves have been properly notified of the shutdown.</para>
+
+      <para>We recommend that the machine names used on the 
+      <emphasis role="bold">MASTER</emphasis> and 
+      <emphasis role="bold">SLAVE</emphasis> directives be put in your 
+      <filename>/etc/hosts</filename> file so that 
+      <application>apcupsd</application> will be able to resolve the machine 
+      name during startup and shutdown even if DNS is not running.
+      Alternatively, you can use IP addresses on the 
+      <emphasis role="bold">MASTER</emphasis> and
+      <emphasis role="bold">SLAVE</emphasis> directives, but this is 
+      less flexible.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>SLAVE &lt;name of slave(s)&gt; used only in MASTER 
+    configuration files.</term>
+    <listitem>
+      <para>Used in master configuration files, this is the name of a slave
+      machine that depends on this master. There can be a maximum of 20
+      slaves attached to one master. Thus you can specify multiple SLAVE
+      directives in a master configuration file. Only one slave name can
+      be specified per SLAVE directive, thus for multiple slaves, specify
+      multiple SLAVE directives.</para>
+
+      <para>As noted above the master and slaves continue to communicate
+      over the network even after the master has issued a shutdown
+      command to the slaves. This is because the master 
+      <application>apcupsd</application> continues to run until it receives 
+      the shutdown signal from the
+      system. This is important to ensure that all the slaves have been
+      properly notified of the shutdown.</para>
+
+      <para>We recommend that the machine names used on the 
+      <emphasis role="bold">MASTER</emphasis> and 
+      <emphasis role="bold">SLAVE</emphasis> directives be put in your 
+      <filename>/etc/hosts</filename> file
+      so that <application>apcupsd</application> will be able to resolve
+      the machine name during startup and shutdown even if DNS is not running.
+      Alternatively, you can use IP addresses on the 
+      <emphasis role="bold">MASTER</emphasis> and
+      <emphasis role="bold">SLAVE</emphasis> directives, but this is less 
+      flexible.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>USERMAGIC &lt; user defined magic&gt; used only in 
+    SLAVE configuration files.</term>
+    <listitem>
+      <para>The USERMAGIC directive is a sort of password that gives a second 
+      level of identification security in a slave configuration file. It is a 
+      character string up to 17 characters in length. It should be unique for 
+      each slave. When the slave makes initial contact with the master, this 
+      string is passed to the master. Then on each transmission from the 
+      master to the slave, the string is passed back to the slave, which 
+      checks that it is the correct string before accepting the master's 
+      information. This string should be different for each and every slave 
+      on the network. This directive is not required.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+
+</sect1>
+<sect1 id="eprom"><title>Configuration Directives Used to Set the 
+UPS EPROM</title>
+
+<para>The values specified with the following directives are only used
+if the <option>--configure</option> option is specified on the 
+<application>apcupsd</application> command line, and the UPS is capable of 
+internal EPROM programming.  In that case, <application>apcupsd</application> 
+attempts to set the values into the UPSes EPROM.</para>
+
+<para>Under normal operations, the values for these parameters
+specified in the configuration file are not used. Instead, they are
+read from the UPS EPROM by <application>apcupsd</application>.  See
+<xref linkend="eprom"/> of this manual for further details
+before attempting to reprogram your EEPROM.</para>
+
+<variablelist>
+  <varlistentry>
+    <term>SENSITIVITY  &lt;sets sensitivity level&gt;</term>
+    <listitem>
+      <para>(H)igh, (M)edium, (L)ow</para>
+
+      <para>This value determine how sensitive
+      the UPS is to the mains quality and voltage fluctuations. The more
+      sensitive it is, the quicker the UPS will switch to battery power
+      when the mains line quality is bad. Normally, this should be set to
+      H, but if you find your UPS switching to batteries frequently, you
+      might want to try a less sensitive setting, providing that your
+      computer equipment tolerates the poor quality mains. This value is
+      written to the UPS EPROM when the  configure option is
+      specified.</para>
+
+      <para>Under normal apcupsd operations (no <option>--configure</option>
+      option), <application>apcupsd</application> will read the value 
+      stored in the UPS and display it in the STATUS output.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry id='WAKEUP'>
+    <term>WAKEUP &lt;set wakeup delay&gt;</term>
+    <listitem>
+      <para>The UPS power restart delay value in [0,60,180,300] in seconds
+      after the UPS has shut down during a power failure. This is to
+      prevent the power from coming back on too quickly after a power
+      down, and is important for those who have high rpm drives that need
+      to spin down before powering them up again. Some older SCSI models
+      are very sensitive to this problem. Default is zero. This value is
+      written to the UPS EPROM when the <option>--configure</option> option is
+      specified.</para>
+
+      <para>Under normal apcupsd operations (no 
+      <option>--configure</option> option), 
+      <application>apcupsd</application> will read the value stored in the 
+      UPS and display it in the STATUS output.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry id='SLEEP'>
+    <term>SLEEP &lt;set sleep delay&gt;</term>
+    <listitem>
+      <para>The UPS delay or grace period in [20,180,300,600] seconds
+      before the UPS cuts the power to your equipment. The default is 20
+      seconds. This value is written to the UPS EPROM when the
+      <option>--configure</option> option is specified.</para>
+
+      <para>Under normal 
+      <application>apcupsd</application>operations (no 
+      <option>--configure</option> option), <application>apcupsd</application>
+      will read the value stored in the UPS and display it in the STATUS
+      output.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>LOTRANSFER &lt;lower limit of ups batt. transfer&gt;</term>
+    <listitem>
+      <para>This sets the low line voltage point at which to switch over to 
+      batteries. Different values are permitted based on the UPS model, 
+      classification, and manufacture date. Use <command>apcaccess 
+      eeprom</command> to show you which values are permitted. This value is 
+      written to the UPS EPROM when the <option>--configure</option> option 
+      is specified.</para>
+
+      <para>Under normal 
+      <application>apcupsd</application>operations (no 
+      <option>--configure</option> option), <application>apcupsd</application>
+      will read the value stored in the UPS and display it in the STATUS
+      output.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>HITRANSFER  &lt;upper limit of ups batt. transfer&gt;</term>
+    <listitem>
+      <para>This sets the high line voltage point to switch over to batteries.
+      Different values are permitted based on the UPS model, 
+      classification, and manufacture date. Use <command>apcaccess 
+      eeprom</command> to show you which values are permitted. This value is 
+      written to the UPS EPROM when the <option>--configure</option> option 
+      is specified.</para>
+
+      <para>Under normal 
+      <application>apcupsd</application>operations (no 
+      <option>--configure</option> option), <application>apcupsd</application>
+      will read the value stored in the UPS and display it in the STATUS
+      output.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry id='RETURNCHARGE'>
+    <term>RETURNCHARGE  &lt;min. batt. charge level&gt;</term>
+    <listitem>
+      <para>This parameter specifies what
+      battery percentage charge is necessary before the UPS will supply
+      power to your equipment after a power down. Different values are
+      permitted based on the UPS model, classification, and manufacture
+      date. Use <command>apcaccess eeprom</command> to show you which 
+      values are permitted. This value is written to the UPS EPROM when the
+      <option>--configure</option> option is specified.</para>
+
+      <para>Under normal 
+      <application>apcupsd</application>operations (no 
+      <option>--configure</option> option), <application>apcupsd</application>
+      will read the value stored in the UPS and display it in the STATUS
+      output.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>BEEPSTATE &lt;alarm beep state&gt;</term>
+    <listitem>
+      <para>This parameter tells the UPS when it can sound its audio alarm.
+      These settings are based on discrete events related to the
+      remaining capacity of the UPS.</para>
+
+      <variablelist>
+        <varlistentry>
+        <term>0</term>
+        <listitem><para>immediately upon power failure</para></listitem>
+        </varlistentry>
+
+        <varlistentry>
+        <term>T</term>
+        <listitem><para>power failure + 30 seconds</para></listitem>
+        </varlistentry>
+
+        <varlistentry>
+        <term>L</term>
+        <listitem><para>low battery power</para></listitem>
+        </varlistentry>
+
+        <varlistentry>
+        <term>N</term>
+        <listitem><para>never</para></listitem>
+        </varlistentry>
+      </variablelist>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>UPSNAME 
+&lt;string&gt;</term>
+    <listitem>
+      <para>This is an eight character string. 
+      This is the UPS name that will be stored in the UPS EPROM.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>BATTDATE  &lt;string&gt;</term>
+    <listitem>
+      <para>This is an eight character string that is the last date the 
+      batteries were changed.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+</sect1>
+</chapter>

@@ -21,7 +21,7 @@ with a RJ45 connector, you can build your own
 
 <sect1 id='custom_smart'><title>Smart-Custom Cable for SmartUPSes</title>
 
-<literallayout>
+<programlisting>
   SMART-CUSTOM CABLE
 
 Signal Computer                  UPS
@@ -29,7 +29,7 @@ Signal Computer                  UPS
  RxD    2   --------------------  2  TxD  Send
  TxD    3   --------------------  1  RxD  Receive
  GND    5   --------------------  9  Ground
-</literallayout>
+</programlisting>
 
 <para>When using this cable with <application>apcupsd</application>
 specify the following in <filename>apcupsd.conf</filename>:</para>
@@ -46,7 +46,7 @@ DEVICE /dev/ttyS0 (or whatever your serial port is)
 <para>
 If you wish to build the standard cable furnished by
 APC (940-0024C), use the following diagram. </para>
-<literallayout>
+<programlisting>
   APC Smart Cable 940-0024C
 
 Signal Computer                  UPS
@@ -61,7 +61,7 @@ Signal Computer                  UPS
               |
  CTS    8   --*
 
-</literallayout>
+</programlisting>
 </sect1>
 
 <sect1><title>Smart Signalling Cable for BackUPS CS Models</title>
@@ -82,7 +82,7 @@ connector.</para>
 
 <para>Below, you will find a diagram for the CUSTOM-RJ45 cable:</para>
 
-<literallayout>
+<programlisting>
   CUSTOM-RJ45 CABLE
 
 Signal Computer              UPS     UPS
@@ -109,7 +109,7 @@ _______________________
 -----------------------
        |____|
 
-</literallayout>
+</programlisting>
 
 <para>For the serial port DB9F connector, the pin numbers are stamped
 in the plastic near each pin. In addition, there is a diagram near the
@@ -138,7 +138,7 @@ PRODUCT.</emphasis></para>
 build your own cable, we recommend to make the cable designed by
 the <application>apcupsd</application> team as follows:</para>
 
-<literallayout>
+<programlisting>
        SIMPLE-CUSTOM CABLE
 
 Signal Computer                  UPS
@@ -150,7 +150,7 @@ Signal Computer                  UPS
  DCD    1   --------------------  2  On Battery
  RTS    7   --------------------  1  Kill UPS Power
 
-</literallayout>
+</programlisting>
 
 <para>List of components one needs to make the Simple cable:</para>
 
@@ -199,7 +199,7 @@ simpler. To have a better idea of what is going on inside
 <application>apcupsd</application> reads three signals and sets
 three:</para>
 
-<literallayout>
+<programlisting>
 Reads:
 CD, which apcupsd uses for the On Battery signal when high.
 
@@ -219,14 +219,14 @@ TxD (ST), which apcupsd clears when it detects that the CD signal
 
 RTS, which apcupsd sets for the killpower signal -- to cause the UPS
      to shut off the power.
-</literallayout>
+</programlisting>
 
 <para>Please note that these actions apply only to the SIMPLE cable,
 the signals used on the other cables are different.</para>
 <para>Finally, here is another way of looking at the CUSTOM-SIMPLE
 cable:</para> 
 
-<literallayout>
+<programlisting>
 APCUPSD SIMPLE-CUSTOM CABLE
 
 Computer Side  |  Description of Cable           |     UPS Side  
@@ -249,7 +249,7 @@ that are not used.
                       |
  RxD    2   ----------*---------  3  Not used by Apcupsd
 
-</literallayout>
+</programlisting>
 
 <para>When using this cable with <application>apcupsd</application>
 specify the following in <filename>apcupsd.conf</filename>:</para>
@@ -391,7 +391,7 @@ This is to be verified.</para>
 <para>The signals presented or accepted by the UPS on its DB9
 connector using the numbering scheme listed above is:</para>
 
-<literallayout>
+<programlisting>
 UPS Pin         Signal meaning
  1     &lt;-     Shutdown when set by computer for 1-5 seconds.
  2     -&gt;     On battery power (this signal is normally low but
@@ -409,7 +409,7 @@ UPS Pin         Signal meaning
 
  Note 2: the same as note 1 except that the line is normally closed,
      and opens when the line voltage fails.
-</literallayout>
+</programlisting>
 
 </sect1>
 <sect1><title>The Back-UPS Office 500 signals</title>
@@ -417,7 +417,7 @@ UPS Pin         Signal meaning
 <para>The Back-UPS Office UPS has a telephone type jack as output,
 which looks like the following:</para>
 
-<literallayout>
+<programlisting>
 Looking at the end of the connector:
 
    6 5 4 3 2 1
@@ -427,11 +427,11 @@ Looking at the end of the connector:
  |  |----------|
  |__|
 
-</literallayout>
+</programlisting>
 
 <para>It appears that the signals work as follows:</para>
 
-<literallayout>
+<programlisting>
   UPS            Signal meaning
 1 (brown)    &lt;-   Shutdown when set by computer for 1-5 seconds.
 2 (black)    -&gt;   On battery power
@@ -439,7 +439,7 @@ Looking at the end of the connector:
 4 (red)           Signal ground 
 5 (yellow)   &lt;-   Begin signalling on other pins
 6 (none)          none
-</literallayout>
+</programlisting>
 
 </sect1>
 <sect1><title>Analyses of APC Cables</title>
@@ -457,7 +457,7 @@ evidence (Lazar's analysis) indicates that this cable under the right
 conditions may provide the Low Battery signal. This is to be
 confirmed.</para>
 
-<literallayout>
+<programlisting>
 APC Part# - 940-0020B
 
 Signal Computer                  UPS
@@ -471,7 +471,7 @@ Signal Computer                  UPS
                |\\\|
  RTS    7  ----|///| (probably a
                 ---   semi-conductor)
-</literallayout>
+</programlisting>
 
 <para>Thanks to Lazar M. Fleysher.</para>
 
@@ -487,7 +487,7 @@ prior, please set your UPSCABLE to 940-0020B. In version 3.8.3 and
 later, you may specify the cable as 940-0020C. Please note that this
 diagram may not be accurate.</para>
 
-<literallayout>
+<programlisting>
 APC Part# - 940-0020C
 
 Signal Computer                  UPS
@@ -499,7 +499,7 @@ Signal Computer                  UPS
                            *----  9  Common
  RTS    7 -----[ 93.5K ohm ]----- 5  Low Battery
                or semi-conductor
-</literallayout>
+</programlisting>
 
 </sect2>
 <sect2><title>940-0023A Cable Wiring</title>
@@ -512,7 +512,7 @@ cable is pretty much useless, and we recommend that you find a better
 cable because all APC UPSes support more than just On Battery. Please
 note that we are not sure the following diagram is correct.</para>
 
-<literallayout>
+<programlisting>
 APC Part# - 940-0023A
 
 Signal Computer                  UPS
@@ -527,7 +527,7 @@ Signal Computer                  UPS
                            |
                            *----  9  Common
 
-</literallayout>
+</programlisting>
 
 </sect2>
 <sect2><title>940-0095A Cable Wiring</title>
@@ -537,7 +537,7 @@ submitted by Chris Hanson &lt;cph at zurich.ai.mit.edu&gt;, who
 disassembled the original cable, destroying it in the process. He then
 built one from his diagram and it works perfectly.</para>
 
-<literallayout>
+<programlisting>
 Construction and operation of the APC #940-0095A cable.
 This cable is included with the APC Back-UPS Pro PNP series.
 
@@ -604,7 +604,7 @@ MARK on this line means the power has failed.
 * SPACE is a positive voltage, typically +12V.  MARK is a negative
 voltage, typically -12V.  Linux appears to translate SPACE to a 1
 and MARK to a 0.
-</literallayout>
+</programlisting>
 
 </sect2>
 <sect2><title>940-0095B Cable Wiring</title>
@@ -612,7 +612,7 @@ and MARK to a 0.
 <para>This diagram is for informational purposes and may not be complete,
 we don't recommend that use it to build one yourself.</para>
 
-<literallayout>
+<programlisting>
 APC Part# - 940-0095B
 
 Signal Computer                  UPS
@@ -629,7 +629,7 @@ Signal Computer                  UPS
  RxD    2   ----*---------------  2  On Battery
  TxD    3   ----------[####]----  1  Kill UPS Power
                       4.7K ohm
-</literallayout>
+</programlisting>
 
 </sect2>
 <sect2><title>940-0119A Cable Wiring</title>
@@ -638,7 +638,7 @@ Signal Computer                  UPS
 we don't recommend that use it to build you build one yourself.
 This cable is used with the BackUPS Office UPSes.</para>
 
-<literallayout>
+<programlisting>
 APC Part# - 940-0119A
 
   UPS      Computer
@@ -650,7 +650,7 @@ APC Part# - 940-0119A
 5 (yellow)    7       RTS         &lt;-   Begin signalling on other pins 
 6 (none)     none
 
-</literallayout>
+</programlisting>
 
 </sect2>
 <sect2><title>BackOffice ES</title>
@@ -664,7 +664,7 @@ role="bold">UPSTYPE backups</emphasis>.  The equivalent of cable
 for supplying us with the information about the straight through
 cable, the PCB, and the following diagram:</para>
 
-<literallayout>
+<programlisting>
 computer           ----------- BackUPS-ES -----------------
 DB9-M              DB-9F
 pin    signal      pin
@@ -689,7 +689,7 @@ pin    signal      pin
 
  3      TxD         3 nc
 
-</literallayout>
+</programlisting>
 
 </sect2>
 <sect2><title>BackUPS ES and CS in Serial mode with Cable 940-0128A</title>
@@ -723,7 +723,7 @@ than use the 940-0128A cable.</para>
 provided information on the cable wiring, our best guess for the
 cable schematic is the following:</para>
 
-<literallayout>
+<programlisting>
 computer      --------- Inside the Connector---------  UPS
 DB9-F         |                                     |  RJ45
 pin - signal  |                                     |  Pin - Color
@@ -762,7 +762,7 @@ _______________________
 -----------------------
        |____|
 
-</literallayout>
+</programlisting>
 
 </sect2>
 </sect1>
@@ -779,7 +779,7 @@ the 0023A cable are not implemented.</para>
 </sect1>
 <sect1><title>Internal Apcupsd Actions for Simple Cables</title>
 
-<literallayout>
+<programlisting>
 This section describes how apcupsd 3.8.5 (March 2002)
 treats the serial port line signals for simple cables.
 
@@ -851,7 +851,7 @@ apcserial.c
  cable = 0020B, 020C, 0119A, 0127A, 0128A
  action = ioctl(TIOMCBIS, DTR)      set DTR (kills power)
 
-</literallayout>
+</programlisting>
 
 </sect1>
 <sect1><title>RS232 Wiring and Signal Conventions</title>
@@ -1031,7 +1031,7 @@ Pin #</entry>
 <sect1><title>Pin Assignment for the Serial Port (RS-232C), 25-pin and 9-pin,
 Female End</title>
 
-<literallayout>
+<programlisting>
    13                         1         5         1
  _______________________________      _______________
  \  . . . . . . . . . . . . .  /      \  . . . . .  /    RS232-connectors
@@ -1052,12 +1052,12 @@ male end is the same, but looking from inside the cable.
  CTS : DCE agrees on RTS
  RI  : DCE signals the DTE that an establishment of a connection is attempted
  DCD : DCE announces that a connection is established
-</literallayout>
+</programlisting>
 
 </sect1>
 <sect1><title id="ioctl">Ioctl to RS232 Correspondence</title>
 
-<literallayout>
+<programlisting>
 #define TIOCM_LE        0x001
 #define TIOCM_DTR       0x002
 #define TIOCM_RTS       0x004
@@ -1071,6 +1071,6 @@ male end is the same, but looking from inside the cable.
 #define TIOCM_RI        TIOCM_RNG
 #define TIOCM_OUT1      0x2000
 #define TIOCM_OUT2      0x4000
-</literallayout>
+</programlisting>
 </sect1>
 </chapter>

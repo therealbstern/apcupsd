@@ -20,7 +20,7 @@ Guide</link>. </para>
 
 <para>If your operating system is older, or if you have an
 old-fashioned serial-line UPS, you'll have to read about <link
-linkend='legacy'>legacy installation</link>.  If you need
+linkend='legacy'>serial installation</link>.  If you need
 more details about administration for unusual situations (such as a
 master/slave or multi-UPS setup) you'll need to read the section on
 <link linkend='advanced'>advanced topics</link>.  Finally, there

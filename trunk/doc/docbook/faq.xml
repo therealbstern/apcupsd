@@ -69,7 +69,7 @@ meeting.)</para>
   <question><para>I don't have a cable, which one should I build?</para></question>
   <answer>
     <para>First you must know if you have an apcsmart UPS or a
-    voltage-signalling UPS &#x2014; See the <link
+    voltage-signalling UPS. See the <link
     linkend='type_table'>table of supported UPSes</link>. If you
     have a apcsmart UPS, we recommend building a <link
     linkend='custom_smart'>Custom Smart</link> cable. If you have a
@@ -284,7 +284,7 @@ DEVICE /dev/com2
     imagine it is the same for Win2000, I am not sure.</para>
 
     <para>The second most common problem is bad placement of the
-    files &#x2014; i.e. you did not install them in c:\apcupsd
+    files i.e. you did not install them in c:\apcupsd
     Unfortunately for the current release, this path is &quot;hard
     coded&quot; into the binaries.</para>
 
@@ -293,7 +293,7 @@ DEVICE /dev/com2
     files. This is necessary to install apcupsd as a service.</para>
 
     <para>If all the above fails, try starting apcupsd by hand
-    inside a CYGWIN <application>rxvt</application> window &#x2014;
+    inside a CYGWIN <application>rxvt</application> window
     if you use an rxvt window rather than a DOS window, you will see
     many more of the error messages.</para>
 
