@@ -10,7 +10,7 @@ to different UPS architechtures.
 
 Major Changes since version 3.8.6 this Release:
 
-- The manual has been totally reorganized by
+- The manual has been totally rewritten/reorganized by
   Eric S. Raymond. Thanks.
 - Support for USB UPSes.
 - Full kill power for USB UPSes is supported if you have
@@ -21,7 +21,7 @@ Major Changes since version 3.8.6 this Release:
   drivers and parts of the code. See the new ./configure options.
 - There is a new networking driver (net) that uses the NIS interface
   rather than the older master/slave networking. It is very
-  simple to setup, has certain disadvantages -- for details 
+  simple to setup, but has certain disadvantages -- for details 
   see the manual
 - Win32 daemons work much better with a new version of cygwin.
 - Using a special cable (easy to build), you can run your APC
