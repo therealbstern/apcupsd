@@ -413,7 +413,6 @@ int main(int argc, char **argv)
 
      printf ("</table>\n");
      printf ("</center>\n");
-#define VALIDATE_HTML
 #ifdef VALIDATE_HTML
       printf ("<hr /><div><small>\n");
       printf ("<a href=\"http://jigsaw.w3.org/css-validator/check/referer\">\n");
