@@ -177,11 +177,21 @@ clobber: distclean
 # Semi-automatic generation of dependencies:
 # Use gcc if possible because X11 `makedepend' doesn't work on all systems
 # and it also includes system headers.
-# Also test for the presence of source files, if not do nothing.
+# Also test for the presence of source files: if not present, do nothing.
 depend:
-ifeq ("$(wildcard *.c)","")
-	@$(ECHO) "Nothing to do for depend."
-else
+	@if test "`$(topdir)/autoconf/has-c-files.sh`" = "no"; then \
+		$(ECHO) "Nothing to do for depend."; \
+	else \
+		make real-depend; \
+	fi
+	@if test ! -z "$(subdirs)"; then \
+		for file in . ${subdirs}; \
+		do \
+			(cd $$file && if test "$$file" != "."; then make depend; fi); \
+		done; \
+	fi
+
+real-depend:
 	@$(RMF) Makefile.bak
 	@if test "$(CC)" = "gcc" ; then \
 	   $(MV) Makefile Makefile.bak; \
@@ -196,13 +206,6 @@ else
 	else \
 	   $(MV) Makefile.bak Makefile; \
 	   echo -e "Something went wrong with the make depend!\n\a\a\a\a"; \
-	fi
-endif
-	@if test ! -z "$(subdirs)"; then \
-		for file in . ${subdirs}; \
-		do \
-			(cd $$file && if test "$$file" != "."; then make depend; fi); \
-		done; \
 	fi
 
 install-subdirs:
