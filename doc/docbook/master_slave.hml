@@ -1,0 +1,294 @@
+<chapter><title>Master/Slave Configurations</title>
+
+<para>If you have two or more computers that are powered by the same UPS
+and they are connected by a network, you can configure
+<application>apcupsd</application> so that the computer that controls the UPS
+(connected by the serial port or USB port), which is called the
+master, can provide information to other machines powered by the
+UPS, called slaves. When the master detects a power failure, it
+will notify all the slaves (maximum of twenty). If the master
+detects that the battery is low, it will also notify the slave so
+that the slave may perform a shutdown. </para>
+
+<para>In addition, in cases where you wish to keep the master up
+longer than the slave, you can configure the slave to shut down in a
+predetermined time after the UPS goes on batteries.</para>
+
+<para>If a picture is worth a thousand words for you, please see
+<xref linkend="configtypes"/>.</para>
+
+<sect1><title>Configuration Directives</title>
+
+<para>If you are setting up a master/slave configuration, you will be
+required to make some modifications to the
+<filename>apcupsd.conf</filename> files after the build is
+done.</para>
+
+<para>The minimum set of configuration directive changes needed to
+create a proper master and slave configuration files is described in
+the <xref linkend="config-examples"/> section of this
+manual.</para>
+
+<para>The details of these directives are explained in the <xref
+linkend="UPS_Sharing"/> section of the Configuration chapter of this
+document.</para>
+
+<para>In addition, sample master and slave configuration files can be
+found in the <filename>&lt;src&gt;/examples</filename> directory
+(<filename>apcupsd.master.conf</filename> and
+<filename>apcupsd.slave.conf</filename>).</para>
+
+</sect1>
+<sect1><title>Master/Slave Problems</title>
+
+<sect2><title>Master/Slave Shutdown</title>
+
+<para>For additional details of shutting down a master/slave
+configuration, please see the Master/Slave Shutdown
+section of the <link linkend='shutdown'>Shutdown chapter</link> of 
+the Technical Reference.</para>
+
+</sect2>
+<sect2><title>Master/Slave Networking using NIS and the NET Driver</title>
+
+<para>It is also possible to implement a network of master/slave
+apcupsds using the new 3.10.x code and the <emphasis
+role="bold">net</emphasis> driver. This mode of master/slave
+networking is considerably different from the old method described at
+the beginning of this chapter. In the old code, there is a lot of
+configuration on both the master and slave side, and the master polls
+or sends info to the slave. Using the <emphasis
+role="bold">net</emphasis> driver is much simpler. However, you should
+carefully check that the slave does a proper shutdown. In the
+master/slave code, the master ensures the best it can that the slave
+is shutdown or notified before it shuts down itself. On the other
+hand, using the net driver, the master knows nothing about the slaves
+that may be listening and thus takes no special precautions to ensure
+that the slaves receive the shutdown signal. Since the slave reads the
+master's data once per second there should be no shutdown problems,
+and our experience confirms this.  This question can only  be answered
+by carefully testing the shutdown.</para>
+
+<para>In this master/slave mode, the master is a standard stand alone
+configuration except that it must have <emphasis role="bold">NETSERVER
+on</emphasis> in the configuration file and have an <emphasis
+role="bold">NISPORT nnn</emphasis> defined. Thus any
+<application>apcupsd</application> running in this mode then becomes
+the master.</para>
+
+<para>The slave then uses the net driver to connect to the master's
+NIS output. In this mode, the slave decides how often to poll the
+master for the NIS information. The slave copy of apcupsd, have
+<emphasis role="bold">UPSTYPE net</emphasis>, which will invoke the
+&quot;network&quot; driver. By setting this machine's <emphasis
+role="bold">DEVICE</emphasis> to be <emphasis
+role="bold">master-ip:master-NIS-port</emphasis> it will automatically
+connect to the master and use the master's signals to shutdown the
+computer.  In the example net slave configuration file below, the
+slave uses the NIS information provided by the computer <emphasis
+role="bold">tibs</emphasis> on port <emphasis
+role="bold">3551</emphasis>.</para>
+
+<programlisting>
+## apcupsd.conf v1.1 ##
+UPSCABLE ether
+UPSTYPE net
+# Specify the server name:port where NIS is running
+DEVICE tibs:3551
+LOCKFILE /var/lock
+BATTERYLEVEL 5
+MINUTES 3
+TIMEOUT 0
+ANNOY 300
+ANNOYDELAY 60
+NOLOGON disable
+EVENTSFILE /etc/apcupsd/apcupsd.events
+UPSCLASS standalone
+UPSMODE disable
+#
+# Use this to control the poll time.
+#  the default is 60 or 1 minute
+#
+NETTIME 30
+</programlisting>
+</sect2>
+</sect1>
+<sect1><title>Network Problems with Master/Slave Configurations</title>
+
+<para>When working with a master/slave configuration (one UPS powering
+more than one computer), the master and slave communicate via the
+network. In many configurations, <application>apcupsd</application> is
+started before the network is initialized. In this case, it is
+possible that the master will be unable to contact the slave. On
+<application>apcupsd</application> versions prior to 3.8.0, this could
+cause <application>apcupsd</application> to error off. The solution to
+this problem is to either force <application>apcupsd</application> to
+be started after the network and the DNS (fiddle the symbolic links in
+/etc/rc.d), or put the names of the slave machines in your
+<filename>/etc/hosts</filename> file, or even more preferable, use IP
+addresses rather than machine names. On some configurations, you may
+need to use fully qualified names (host.domain.xxx) rather than simple
+host names.</para>
+
+<sect2><title>Error Messages from a Master Configuration</title>
+
+<para>In a master/slave configuration, you can get the following error
+messages from a master. The error message is followed by a possible
+explanation:</para>
+
+<sect3><title>Cannot resolve slave name <replaceable>XXX</replaceable></title>
+
+<para>To contact the slave, the slave name given in the configuration
+file must be resolved to an IP address. In this case,
+<application>apcupsd</application> could not get the IP
+address. Either the slave name is incorrect, your DNS may not be
+working, or you have started <application>apcupsd</application> during
+the boot process before the network is operational.</para>
+
+</sect3>
+<sect3><title>Got slave shutdown from <replaceable>SSS</replaceable></title>
+
+<para>This message should not be printed as it is not yet used.</para>
+
+</sect3>
+<sect3><title>Cannot write to slave <replaceable>SSS</replaceable></title>
+
+<para>This message occurs when the master attempts to send a message
+to the slave SSS and gets an error. It indicates that either the slave
+machine is not responding (<application>apcupsd</application> died,
+the system crashed, ...) or that the network is down.</para>
+
+</sect3>
+<sect3><title>Cannot read magic from slave <replaceable>SSS</replaceable></title>
+
+<para>This message indicates that the master attempted to read the
+code key from the slave SSS and it did not match the value expected. A
+common cause of this problem is that the master and slave versions of
+<application>apcupsd</application> are not the same. Please be sure
+you are running the same version of <application>apcupsd</application>
+on all your master and slave machines.</para>
+
+</sect3>
+<sect3><title>Connect to slave SSS failed</title>
+
+<para>This message is logged when the master attempts to connect to
+slave SSS and no connection is accepted. The most common cause of this
+problem is that the slave copy of <application>apcuspd</application>
+is not yet ready to accept connections or is not running. Generally,
+<application>apcupsd</application> will retry the connection a bit
+later. If the problem is persistent, it can indicate a network problem
+or the slave name on the SLAVE directive of the master's configuration
+file is incorrect.</para>
+
+</sect3>
+<sect3><title>Cannot open stream socket</title>
+
+<para>This indicates a fundamental networking problem on your system &mdash;
+either a lack of sufficient resources or you have not configured
+TCP/IP operations.</para>
+</sect3>
+</sect2>
+<sect2><title>Error Messages from a Slave Configuration</title>
+
+<para>In a master/slave configuration, you can get the following error
+messages from a slave. The error message is followed by a possible
+explanation:</para>
+
+<sect3><title>Can't resolve master name <replaceable>MMM</replaceable></title>
+
+<para>This message is logged when the slave attempts to resolve the
+name given on the MASTER configuration directive to an IP address. It
+probably means that the master name MMM is not defined, your DNS is
+not properly working, or you have started
+<application>apcupsd</application> in the boot process before the
+network is initialized. Check the name MMM, or use an explicit IP
+address on the MASTER configuration directive in the slave's
+configuration file.</para>
+
+</sect3>
+<sect3><title>Cannot bind local address, probably already in use</title>
+
+<para>This means that the slave has attempted to bind the port number
+so that it can listen for messages from the master. This can occur if
+already have a copy of <application>apcupsd</application> running, or
+you have previously run <application>apcupsd</application> in the past
+5 or 10 minutes, because occasionally the operating system will not
+shutdown a port correctly for 5 to 10 minutes after a program
+exits. In this case, you can either wait a few minutes for the problem
+to go away, or use a different port in both your master and slave
+configuration files.</para>
+
+</sect3>
+<sect3><title>Socket accept error</title>
+
+<para>The slave got an error waiting on the accept() system call. This is
+probably due to a fundamental networking problem.</para>
+
+</sect3>
+<sect3><title>Unauthorized attempt from master <replaceable>MMM</replaceable></title>
+
+<para>The master named MMM (probably an IP address) contacted the slave
+but MMM is not the master that was listed on the MASTER
+configuration directive in /etc/apcupsd.conf, and consequently, it
+is not authorized to communicate with the slave. Please check that
+your MASTER and SLAVE names in your slave and master configuration
+files respectively are correct.</para>
+
+</sect3>
+<sect3><title>Read failure from socket</title>
+
+<para>The slave got an error reading the socket open to the master. This
+indicates a fundamental networking problem.</para>
+
+</sect3>
+<sect3><title>Bad APC magic from master: <replaceable>MMM</replaceable></title>
+
+<para>The slave received a code key from the master that does not
+correspond to the one expected by the slave. The most common cause of
+this problem is that you are running a different version of
+<application>apcupsd</application> on the master and the slave. Please
+ensure that you are running the same version of
+<application>apcupsd</application> on all your master and
+slaves.</para>
+
+</sect3>
+<sect3><title>Bad user magic from master: <replaceable>MMM</replaceable></title>
+
+<para>This message indicates that the master and slave have previously
+communicated, but that the code key transmitted with the most
+recent message from the master does not correspond to what the
+slave expects. This problem is probably due to a network error or
+some other user or machine contacting the slave on the network
+port.</para>
+</sect3>
+
+</sect2>
+<sect2><title>Master/Slave Connection Not Working</title>
+
+<para>Master/slave problems are usually related to one of the following
+items:</para>
+
+<orderedlist>
+  <listitem>
+    <para>Improper apcupsd.conf files. A good starting point are the
+    master/slave example files in the examples subdirectory of the
+    source.</para>
+  </listitem>
+  <listitem>
+    <para>Master or slave IP address or name incorrect. Try ping'ing each
+    machine from the other using the names or addresses that you have
+    put in the respective apcupsd.conf files.</para>
+  </listitem>
+  <listitem>
+    <para>Make sure no other program is using socket number 6666 or
+    change the NETPORT directive in both apcupsd.conf files.</para>
+  </listitem>
+  <listitem>
+    <para>Make sure you are using the same version of apcupsd on both the
+    master and slave machines.</para>
+  </listitem>
+</orderedlist>
+
+</sect2>
+</sect1>
+</chapter>

@@ -1,0 +1,1256 @@
+<?xml version="1.0" encoding="ISO-8859-1"?>
+<!DOCTYPE book PUBLIC 
+    "-//OASIS//DTD DocBook XML V4.1.2//EN" 
+    "docbook/docbookxx.dtd"
+ [<!ENTITY release_notes   SYSTEM "release_notes.xml"> 
+  <!ENTITY usage           SYSTEM "usage.xml"> 
+  <!ENTITY install         SYSTEM "install.xml"> 
+  <!ENTITY post_install    SYSTEM "post_install.xml"> 
+  <!ENTITY config_examples SYSTEM "config_examples.xml"> 
+  <!ENTITY testing         SYSTEM "testing.xml"> 
+  <!ENTITY troubleshooting SYSTEM "troubleshooting.xml"> 
+  <!ENTITY monitoring      SYSTEM "monitoring.xml"> 
+  <!ENTITY maintaining     SYSTEM "maintaining.xml"> 
+  <!ENTITY faq             SYSTEM "faq.xml"> 
+  <!ENTITY master_slave    SYSTEM "master_slave.xml"> 
+  <!ENTITY snmp            SYSTEM "snmp.xml"> 
+  <!ENTITY multiple_upses  SYSTEM "multiple_upses.xml"> 
+  <!ENTITY events          SYSTEM "events.xml"> 
+  <!ENTITY cables          SYSTEM "cables.xml"> 
+  <!ENTITY appendix        SYSTEM "appendix.xml">
+  <!ENTITY nis             SYSTEM "nis.xml">
+  <!ENTITY logging         SYSTEM "logging.xml">
+  <!ENTITY win32           SYSTEM "win32.xml">
+  <!ENTITY serial          SYSTEM "serial.xml">
+  <!ENTITY directives      SYSTEM "directives.xml">
+  <!ENTITY shutdown        SYSTEM "shutdown.xml">
+  <!ENTITY bible           SYSTEM "bible.xml">
+ ]>
+
+<!--
+Rebuild the HTML with:
+xmlto -m manual.xsl xhtml-nochunks manual.xml
+-->
+
+<book>
+<title><application>apcupsd</application> User's Manual</title>
+<bookinfo>
+
+<editor>
+  <firstname>Eric</firstname>
+  <othername>Steven</othername>
+  <surname>Raymond</surname>
+  <affiliation>
+    <orgname><ulink url="http://www.catb.org/~esr/">
+    Thyrsus Enterprises</ulink></orgname> 
+    <address>
+    <email>esr@thyrsus.com</email>
+    </address>
+  </affiliation>
+</editor>
+
+<revhistory id="history">
+   <revision>
+      <revnumber>2.0</revnumber>
+      <date>20 Sept 2003</date>
+      <authorinitials>esr</authorinitials>
+       <revremark>
+          First XML-DocBook version.
+       </revremark>
+   </revision>
+   <revision>
+      <revnumber>3.0</revnumber>
+      <date>22 Mar 2004</date>
+      <authorinitials>KES</authorinitials>
+       <revremark>
+          Last time Book changed.
+       </revremark>
+   </revision>
+</revhistory>
+</bookinfo>
+
+
+&release_notes;
+
+&usage;
+
+<part id='basics'><title>Basic User's Guide</title>
+
+&install;
+
+&post_install;
+
+&config_examples;
+
+&testing;
+
+&troubleshooting;
+
+&monitoring;
+
+&maintaining;
+
+&faq;
+
+<chapter><title>Apcupsd Bugs</title>
+
+<para>Unfortunately, it seems that every program has some bugs. We do
+our best to keep the bugs to a minimum by extensive testing. However,
+because of our inherent nature to occasionally overlook things and the
+fact that we don't have all the UPS models nor the APC documentation
+on those models, <application>apcupsd</application> will have
+some bugs.</para>
+
+<para>As the bugs become known to us, we will post them on
+the bug tracking system at SourceForge.</para>
+
+</chapter>
+
+</part>
+
+<part id='advanced'><title>Advanced topics</title>
+
+&events;
+
+&master_slave;
+
+&multiple_upses;
+
+&snmp;
+
+&nis;
+&logging;
+
+</part>
+<part id='win32'><title>Installation: Windows</title>
+
+&win32;
+
+</part>
+<part id='legacy'><title>Installation: Serial-Line UPSes</title>
+
+&serial;
+
+&cables;
+
+<chapter id='dumb_testing'><title>Testing Serial-Line UPSes</title>
+
+<para>If you have a serial-line UPS, there are some tests you should
+run before the general ones described in the <link
+linkend='testing'>Testing</link> section.</para>
+
+<para>To test your computer's connection with a serial-line UPS, you first
+need to establish that the serial line is functioning, and then that the
+UPS is responding to commands.  This can be a bit tricky, especially
+with a dumb voltage-signalling interface, because it is completely
+quiescent when there are no commands being passed, and the command 
+repertoire doesn't include any self-tests.</para>
+
+<para>Because it is easy to configure a serial cable incorrectly in
+such a way as to cause premature shutdowns of the UPS power, we
+<emphasis>strongly</emphasis> recommend, especially for voltage-
+signaling (dumb) UPSes, that you do most of the initial testing with
+your computer plugged into the wall rather than your UPS. Thus if the
+UPS power is suddenly shut off, your computer will continue to run. We
+also recommend using <application>safe-apccontrol</application> as
+described below, until you are sure that the signaling is
+correct.</para>
+
+<para>Also note that if you launch the execution of
+<application>apcupsd</application> while your voltage-signaling UPS is
+on battery power, it is very likely that your UPS will immediately
+shut off the power. This is due to the initialization of the serial
+port line signals, which often looks to the UPS like a shutdown
+command.</para>
+
+<para>Finally, double-check the state of your cabling and UPS
+indicator lights frequently during testing.  For voltage-signaling
+UPSes, <application>apcupsd</application> is not currently able to
+detect whether or not the serial cable is connected. In addition, some
+simple signaling UPSes with certain cable combinations are not able to
+detect the low battery condition.  For more details please see
+<xref linkend="CableModes"/>.</para>
+
+<sect1><title id="SerialPort">Establishing Serial Port Connection</title>
+
+<para>Once you have compiled, installed, and invoked
+<application>apcupsd</application>, you should wait to allow
+<application>apcupsd</application> to configure itself and establish
+contact with the UPS.</para>
+
+<para>If you see the following message about 30 seconds after starting
+<application>apcupsd</application>:</para>
+
+<programlisting>
+apcupsd FATAL ERROR in apcserial.c at line 156
+PANIC! Cannot communicate with UPS via serial port.
+</programlisting>
+
+<para>it means that <application>apcupsd</application> tried for about
+30 seconds to establish contact with the UPS via the serial port, but
+was unable to do so. Before continuing, you must correct this
+problem. Some of the possible sources of the problem are:</para>
+
+<itemizedlist>
+  <listitem>
+    <para>You have not configured the correct serial port name on the 
+    DEVICE directive in your <filename>apcupsd</filename> configuration 
+    file.</para>
+  </listitem>
+  <listitem>
+    <para>The serial port that you have chosen has logins enabled. You must 
+    disable logins on that port, otherwise, the system prevents 
+    <application>apcupsd</application> from using it.
+    Normally, the file <filename>/etc/inittab</filename> specifies the
+    ports for which a <application>getty</application> process is started 
+    (on Sun machines, the serial port program equivalent to 
+    <application>getty</application> is called 
+    <application>ttymon</application>). You must disable this for the port
+    that you wish to use.</para>
+  </listitem>
+  <listitem>
+    <para>Make sure you are doing your testing as 
+    <emphasis role="bold">root</emphasis> otherwise, you may have permissions
+    problems accessing the serial port.</para>
+  </listitem>
+  <listitem>
+    <para>You may have cabling problems, either with an incorrect cable, or the
+    incorrect cable specification directive in the configuration file.</para>
+  </listitem>
+  <listitem>
+    <para>You may have a problem with the 
+    <filename>/etc/apcupsd/acpupsd.conf</filename> file. For example, check 
+    that you have specified the correct type of UPS and the correct networking
+    directives.  For more details, see the 
+    <xref linkend="after_installation"/>.</para>
+  </listitem>
+  <listitem>
+    <para>If you have a SmartUPS 5000 RM 15U or similar model, that comes 
+    with a &quot;Web/SNMP management card&quot; in one of the &quot;Smart
+    Slots&quot;, this card may interfere with the serial port operation. 
+    If you are having problems, please remove this card and try again. 
+    Supposedly V3.0 of the card firmware has been corrected to properly
+    release the serial port.</para>
+  </listitem>
+  <listitem>
+    <para>Ensure that you have no other programs that are using the serial 
+    port. One user reported that he had problems because the serial port
+    mouse (gpm) was using the same port as <application>apcupsd</application>.
+    This causes intermittent seemingly random problems.</para>
+  </listitem>
+  <listitem>
+    <para>If you are using a WinNT or Win2000 machine, the OS is probably
+    attempting to attach a serial mouse to the port you are using (COM1 or 
+    COM2). To prevent this, edit your <filename>c:\boot.ini</filename> file, 
+    and you will find a line that looks something like the following:
+
+<programlisting>
+multi(0)disk(0)rdisk(0)partition(1)\WINNT=&quot;Windows NT Workstation Version 4.00&quot;
+</programlisting>
+
+    Add the following to the end of the line: 
+    <filename>/NoSerialMice:COM1</filename> (or COM2) so that the new line
+    looks like:</para>
+
+<programlisting>
+multi(0)disk(0)rdisk(0)partition(1)\WINNT=&quot;Windows NT Workstation Version 4.00&quot; /NoSerialMice:COM1
+</programlisting>
+    </listitem>
+    <listitem>
+    <para>If you are using a WinNT or Win2000 machine, try connecting 
+    <application>apcupsd</application> to COM2 rather than COM1 (be sure to 
+    change your <filename>c:\apcupsd\etc\apcupsd\apcupsd.conf</filename> to
+    reflect the change).</para>
+  </listitem>
+  <listitem>
+    <para>If you are using a Solaris machine, you may have similar problems 
+    as described above for the WinNT machine. A possible fix is documented
+    in the Sun section of the Configuration chapter of this manual.</para>
+  </listitem>
+  <listitem>
+    <para>Try connecting your UPS to another machine. If it works, then you
+    probably have a bad serial port card. As unlikely as this may sound, at
+    least two of our users have had to replace bad serial port cards.</para>
+  </listitem>
+  <listitem>
+    <para>Try doing an <command>lsof /dev/ttyS0</command> where you replace
+    the <emphasis role="bold">/dev/ttyS0</emphasis> with your serial port
+    name. If you get no output, the port is free (or there is no physical
+    port). If you get output, then another program is using the port, and
+    you should see which one.</para>
+  </listitem>
+  <listitem>
+    <para>Try doing a <command>dmesg | grep tty</command>. This may show 
+    you if a program has grabbed the port. (Thanks to Joe Acosta for the 
+    suggestion.)</para>
+  </listitem>
+  <listitem>
+    <para>If all else fails, make sure your system is configured for serial 
+    port support.</para>
+  </listitem>
+  <listitem>
+    <para>If you are running Linux, check your <filename>/proc</filename> 
+    file system. For example: <command>cat /proc/devices</command> should 
+    print something like <emphasis>4 ttyS</emphasis> if you have a serial
+    port. If your serial port is working, a <command>cat 
+    /proc/interrupts</command> should show the serial port usage (e.g. 
+    <emphasis role="bold">4: 294553 XT-PIC serial</emphasis>) Also, 
+    <command>cat /proc/ioports</command> should show up something like 
+    <emphasis role="bold">03f8-03ff : serial(auto)</emphasis>. Or, 
+    <command>cat /proc/tty</command> should print a line like 
+    <emphasis role="bold">serial /dev/ttyS 4 64-127 serial</emphasis>. 
+    Finally, a <command>cat /proc/tty/driver/serial</command> should
+    print something like the following:</para>
+
+<programlisting>
+serinfo:1.0 driver:5.05c revision:2001-07-08 
+0: uart:16550A port:3F8 irq:4 baud:9600 tx:1503168 rx:1461721 fe:8
+</programlisting>
+</listitem>
+</itemizedlist>
+
+<para>The first thing to do is to look at your log file, usually
+<filename>/var/log/messages</filename> because
+<application>apcupsd</application> writes more detailed information to
+the log file whenever there is an error.</para>
+
+<para>If you have a UPS that uses apcsmart protcol (see <link
+linkend="type_table">table of types</link> for a list of the UPSes
+using these protocols), you can manually test the serial
+communications with the UPS by starting a serial port communications
+program (such as <application>minicom</application>,
+<application>tip</application>, or <application>cu</application>) with
+the settings 2400 8N1 (2400 baud, 8 bits, no parity, 1 stop bit). Be
+extremely careful what you send to your UPS as certain characters may
+cause it to power down or may even cause damage to the UPS. Try
+sending an upper case Y to the UPS (without a return at the end). It
+should respond with SM. If this is not the case, review the possible
+problems listed above. If you fat finger the Y and enter y instead, no
+cause for alarm, you will simply get the APC copyright notice.</para>
+<para>Once you are sure that serial port communications is working,
+proceed to the next test.</para>
+
+</sect1>
+
+<sect1 id='serial_apctest'><title>Using <application>apctest</application> on
+Serial-Line UPSses</title>
+
+<para>On an apcsmart serial-line UPS, <application>apctest</application>
+will give you access to the battery of low-level tests we described in
+<xref linkend='usb_apctest'/>.  If you have a voltage-signalling UPS,
+it enables a different test repertoire which is described here,  Among
+other things, if you are uncertain about what kind of cable you have, 
+you may be able to use <application>apctest</application> to figure
+that out.</para>
+
+<para>Shutdown <application>apcupsd</application> if it is running.
+Make sure your <filename>/etc/apcupsd/apcupsd.conf</filename> file has
+<emphasis role="bold">UPSTYPE backups</emphasis> and <emphasis
+role="bold">UPSCABLE simple</emphasis> Normally
+<application>apctest</application> will have been built and installed
+by default, otherwise, you can explicitly build it on Unix
+with:</para>
+
+<programlisting>
+cd &lt;apcupsd-source-directory&gt;
+make apctest
+./apctest
+</programlisting>
+
+<para>on Win32 systems, use:</para>
+
+<programlisting>
+make apctestwin32
+./apctest
+</programlisting>
+
+<para>It will present you with the following output</para>
+
+<programlisting>
+2001-02-07 04:08:26 apctest 3.8.5 (3 January 2002) redhat
+Checking configuration ...
+sharenet.type = DISABLE
+cable.type = CUSTOM_SIMPLE
+mode.type = BK
+Setting up serial port ...
+Creating serial port lock file ...
+Doing prep_serial() ...
+Hello, this is the apcupsd Cable Test program.
+This part of apctest is for testing dumb UPSes (ones that uses signaling rather than commands.
+Most tests enter a loop polling every second for 10 seconds.
+</programlisting>
+
+<para>Then it will present you with the following list of choices: </para>
+
+<programlisting>
+1) Test 1 - normal mode
+2) Test 2 - no cable
+3) Test 3 - no power
+4) Test 4 - low battery (requires test 3 first)
+5) Test 5 - battery exhausted
+6) Test 6 - kill UPS power
+7) Test 7 - run tests 1 through 5
+8) Guess which is the appropriate cable
+9) quit
+
+Select test number: 
+</programlisting>
+
+<para>Run tests 1, 2, and 3. Note, none of the currently supported cables
+will indicate a change for test 2. You can then run test 8 to see
+what cable it thinks you should be using. Finally run test 4.</para>
+
+<para>apctest can also be run for Smart UPSes.</para>
+
+<para>The print out of your testing will be written to the file
+<filename>apctest.output</filename>. If you are unable to solve your
+problem, you can try posting that file to the development mailing
+list, and perhaps we can help you. In this case, please also include
+information on your operating system, which version of
+<application>apcupsd</application> you are using, your UPS model, and
+also your <filename>apcupsd.conf</filename> file.</para>
+
+<sect2><title>Expected <application>apctest</application> Signals for a UPS</title>
+
+<para>If you have configured your UPS as:</para>
+<programlisting>
+UPSTYPE backups
+UPSCABLE APC_940_0119A
+    or APC_940_0127A
+    or APC_940_0128A
+    or APC_940_0020B
+    or APC_940_0020C
+</programlisting>
+
+<para>here are typical signals you would expect to see in the output from
+the various tests of apctest:</para>
+
+<programlisting>
+<emphasis role="bold">Test 1</emphasis> normal:              RTS for cables (0119A 0127A 0128A)
+<emphasis role="bold">Test 2</emphasis> no serial cable:     not important
+<emphasis role="bold">Test 3</emphasis> no AC power:         <emphasis role="bold">CTS</emphasis> for all cables
+<emphasis role="bold">Test 4</emphasis> batteries exhausted: <emphasis role="bold">CTS</emphasis> and <emphasis role="bold">CD</emphasis> for all cables
+</programlisting>
+
+<para>Note: <emphasis role="bold">RTS</emphasis> if set in Test 1 will
+probably also be set in all the other tests. This is not important,
+what counts is the appearance of <emphasis role="bold">CTS</emphasis>
+when the power fails and additionally <emphasis
+role="bold">CD</emphasis> when the batteries are low.</para>
+
+</sect2>
+<sect2><title>Expected apctest Signals for a BackUPS Pro</title>
+
+<para>If you have configured your UPS as:</para>
+
+<programlisting>
+UPSTYPE backupspro
+UPSCABLE APC_940_0095A
+    or APC_940_0095C
+</programlisting>
+
+<para>here are the typical signals you would expect to see in the output
+from the various tests of apctest:</para>
+
+<programlisting>
+<emphasis role="bold">Test 1</emphasis> normal:              RTS not set
+<emphasis role="bold">Test 2</emphasis> no serial cable:     not important
+<emphasis role="bold">Test 3</emphasis> no AC power:         <emphasis
+role="bold">RNG</emphasis>
+<emphasis role="bold">Test 4</emphasis> batteries exhausted: <emphasis role="bold">RNG</emphasis> and <emphasis role="bold">CD</emphasis></programlisting>
+
+<para>Note: <emphasis role="bold">RTS</emphasis> should never be set
+in any of the tests as it is the killpower signal. What is important
+is the appearance of <emphasis role="bold">RNG</emphasis> when the
+power fails and additionally <emphasis role="bold">CD</emphasis> when
+the batteries are low.</para> 
+
+</sect2>
+</sect1>
+</chapter>
+<chapter><title>Troubleshooting Serial Line communications</title>
+
+<sect1><title>Determining Which Voltage-Signaling Cable You Have</title>
+
+<para><emphasis>The most frequently encountered problem with
+voltage-signalling UPSes (e.g. BackUPS 650) is that you have
+incorrectly specified which cable is being used.</emphasis> All cables
+furnished by APC have the cable number stamped on the side of the
+computer connector end of the cable. Using this number with
+<application>apcupsd</application> will normally work fine. If you do
+not know what cable you have, you can use the
+<application>apctest</application> program to determine the type of
+the cable.</para>
+
+<para>For simple signaling UPSes, you should <emphasis>not</emphasis>
+use <emphasis role="bold">simple</emphasis> in the cable specification
+(i.e. <emphasis role="bold">UPSCABLE simple</emphasis>) unless you
+have made the cable yourself according to the wiring diagram given in
+the cables chapter of this manual.</para>
+
+</sect1>
+<sect1><title>Once you have established serial communications</title>
+
+<para>Once you have established that
+<application>apcupsd</application> can talk to the UPS over the serial
+part, go do the series of functional tests described in the main
+<link linkend='testing'>Testing</link> section.</para>
+
+<para>One additional note applies:</para>
+
+<sect2><title>Bizarre Intermittent Behavior</title>
+
+<para>In one case, a user reported that he received random incorrect
+values from the UPS in the status output. It turned out that
+<application>gpm</application>, the mouse control program for command
+windows, was using the serial port without using the standard Unix
+locking mechanism. As a consequence, both
+<application>apcupsd</application> and <application>gpm</application>
+were reading the serial port. Please ensure that if you are running
+<application>gpm</application> that it is not configured with a serial
+port mouse on the same serial port.</para>
+</sect2>
+
+</sect1>
+</chapter>
+<chapter><title>Recalibrating the UPS Runtime</title>
+
+<para>Note: In a future release of <application>apcupsd</application>
+this procedure will be replaced by a daemon operation that can be
+performed on all types of UPS.</para>
+
+<para>This section does not apply to voltage-signalling or dumb UPSes
+such as the older BackUPS models.</para>
+
+<para>Smart UPSes internally compute the remaining runtime, and
+<application>apcupsd</application> uses the value supplied by the
+UPS. As the batteries age (after say two or three years), the runtime
+computation may no longer be accurate since the batteries no longer
+hold the same charge. As a consequence, in the event of a power
+failure, the UPS and thus <application>apcupsd</application> can
+report a runtime of 5 minutes remaining when in fact only one minute
+remains. This can lead to a shutdown before you might expect it,
+because regardless of the runtime remaining that is reported, the UPS
+will always correctly detect low batteries and report it, thus causing
+<application>apcupsd</application> to correctly shutdown your
+computer.</para>
+
+<para>If you wish to have the UPS recalibrate the remaining runtime
+calculations, you can do so manually as the current version of
+<application>apcupsd</application> does not support this feature. To
+do so,</para>
+
+<itemizedlist>
+  <listitem>
+    <para>Shutdown <application>apcupsd</application></para>
+  </listitem>
+  <listitem>
+    <para>contact your UPS directly using some terminal program such as
+    <application>minicom</application>, <application>tip</application>, or <application>cu</application> with the settings 2400 8N1 (2400 baud, 8 bits,
+no parity, 1 stop bit). Be extremely careful what you send to your
+UPS as certain characters may cause it to power down or may even
+cause damage to the UPS. Try sending an upper case Y to the UPS
+(without a return at the end). It should respond with SM. If this
+is not the case, read the chapter on testing. If you fat finger the
+Y and enter y instead, no cause for alarm, you will simply get the
+APC copyright notice.</para>
+  </listitem>
+  <listitem>
+    <para>when you are sure you are properly connected send an upper case
+D (no cr). This will put the UPS into calibration mode, and it will
+drain the battery down to 25% capacity (35% for a Matrix) at which
+point it will go back on the mains. In doing so, it will recompute
+the runtime calibration.</para>
+  </listitem>
+  <listitem>
+    <para>If you wish to abort the calibration, enter a second D command.</para>
+  </listitem>
+  <listitem>
+    <para>When you are done, restart <application>apcupsd</application>.</para>
+  </listitem>
+</itemizedlist>
+
+<para>In principle, you should be able to do this with the computer
+powered by the UPS, but if you wish to be completely safe, you should
+plug your computer into the wall prior to performing the runtime
+calibration. In that case, you will need to artificially load the UPS
+with light bulbs or other means. You should supply a load of about 30
+to 35% but not more than 50%. You can determine the load by looking at
+the output of the <command>apcaccess status</command> command while
+<application>apcupsd</application> is running.</para>
+
+<para>You should not run the recalibration command more than once or
+twice per year as discharging these kinds of batteries tends to
+shorten their life span.</para>
+
+<sect1><title>Status Logging On Serial-Line UPSes</title>
+
+<para>Serial-line UPSes that speak the apcsmart protocol log all of
+the events described in the <link linkend='statusformat'>Status
+Format</link> section of the Technical Reference.  Voltage-signalling
+UPSes, on the other hand, have a much narrower data channel.  They
+can only report a small handful of conditions.</para>
+
+<para>The following summarizes (rather sketchily, sorry) the 
+data you can expect to get from this obsolete hardware.  All
+corrections and additions will be welcome.</para>
+
+<para>From BackUPS Pro and SmartUPS v/s:</para>
+
+<programlisting>
+LINEFAIL : OnlineStatus
+BATTSTAT : BatteryStatus
+MAINS    : LineVoltageState
+LASTEVNT : LastEventObserved
+</programlisting>
+
+<para>BackUPS and NetUPS Simple Signals</para>
+
+<programlisting>
+LINEFAIL : OnlineStatus
+BATTSTAT : BatteryStatus
+</programlisting>
+
+</sect1>
+</chapter>
+
+<chapter id='datalogging'><title>DATA Logging</title>
+
+<para>This feature is somewhat outdated and not often used.</para>
+
+<para>Data logging consists of periodically logging important data
+concerning the operation of the UPS. For the definitive definition
+of the format, see log_data() in apcreports.c. The format varies
+according to the UPS model and the information available from the
+UPS.</para>
+
+<para>For UPS models, NBKPRO, SMART, SHARESMART, and MATRIX, the
+output is written in a format very similar to what PowerChute
+writes. That is:</para>
+
+<para>MinLineVoltage, MaxLineVoltage, OutputVoltage, BatteryVoltage,
+LineFrequency, LoadPercent,
+UPSTemperature,AmbientTemperature,Humidity,LineVoltage,
+BatteryCharge,toggle</para>
+
+<para>Any value that is not supported by your UPS such as
+AmbientTemperature and Humidity will be blank or possibly as 0.0.
+In any case the commas before and after that field will still be
+output. The toggle value alternates from 0 to 1 on each line. This
+was added at user request so that no two adjacent samples are
+identical.</para>
+
+<para>An actual example from the log file is:</para>
+
+<programlisting>
+Nov  2 12:43:05 matou apcupsd[23439]: 224.9,227.5,226.2,27.74,50.00,100.0,30.6,,,226.2,50.0,1
+</programlisting>
+</chapter>
+</part>
+
+<part id='arcana'><title>Technical Reference</title>
+
+&directives;
+
+
+<chapter id='statusformat'><title><application>apcupsd</application> Status Logging</title>
+
+<para>There is a good deal of information available about the UPS and
+<application>apcupsd</application>'s status. This document describes
+the format of that information.  Normally you will get at it via
+<application>apcaccess</application>, but there are other ways as
+well.</para>
+
+<sect1><title>Status report format</title>
+
+<para>The STATUS output is in ASCII format with a single data value or
+piece of information on each line output. Because not all UPSes supply
+the same information, the output varies based on the type of UPS that
+you are using. In general, if the information is not available for
+your UPS, the data portion of the output record will contain an
+<emphasis role="bold">N/A</emphasis> indicating that the information
+is not available.</para>
+
+<para>Status logging consists of periodically logging ALL available
+information concerning the UPS. Since the volume of data is rather
+large (over 1000 bytes per status), the STATUS data is not
+automatically sent to the system log file, instead, it is written
+as a series of data records to a specific file (normally
+<filename>/etc/apcupsd/apcupsd.status</filename>).</para>
+
+<para>After each write, the file is rewound so that the size of the
+file remains constant. At the current time, this file is 1135
+bytes. The format of this file is very similar to the old
+<application>apcupsd</application> procfs file. The STATUS file is
+kept for backward compatibility and will be eliminated in a future
+version of <application>apcupsd</application>. The preferred method
+for obtaining this information is from
+<application>apcaccess</application> or by using the <link
+linkend='cgiprogs'>CGI interface</link>.</para>
+
+<para>To make reading the status data reliable via a named pipe, the
+first record written contains a version number, the number of
+records that follow the first record, and the total number of bytes
+in those subsequent records. An actual example of such a status
+file (/etc/apcupsd/apcupsd.status) is:</para>
+
+<para>Consequently, the first record always consists of 24 bytes (23
+characters followed by a newline). This record starts with APC and
+as indicated in the example above is followed by 28 records
+consisting of 675 bytes. The last record begins with END APC and
+contains the date and time matching the DATE record.</para>
+
+<para>Documentation of each record needs to be written. In the coming
+weeks, I plan to add additional records and possibly change the
+names of some of the fields.</para>
+
+<para>When this data is written to a file, it is written as two
+records, the first record, and all the other records together. In
+reading the file, it can be either be read a record at a time, or
+in one big read.</para>
+
+<para>When this data is written to syslog(), it is written a record at
+a time. The first record is the first 24 bytes. By having the
+number of records and the size in the first record, the complete
+status can be reliably reassembled.</para>
+
+</sect1>
+<sect1><title>Status Report Example</title>
+
+<para>An example of output from an international SmartUPS 1000
+follows:</para>
+
+<programlisting>
+DATE     : Wed Sep 27 17:30:23 CEST 2000
+HOSTNAME : polymatou.sibbald.com
+RELEASE  : 3.7.3-20000925
+CABLE    : Custom Cable Smart
+MODEL    : SMART-UPS 1000
+UPSMODE  : Stand Alone
+STARTTIME: Wed Sep 27 10:39:23 CEST 2000
+UPSNAME  : UPS_IDEN
+STATUS   : ONLINE 
+LINEV    : 235.3 Volts
+LOADPCT  :   9.3 Percent Load Capacity
+BCHARGE  : 100.0 Percent
+TIMELEFT : 130.0 Minutes
+MBATTCHG : 5 Percent
+MINTIMEL : 3 Minutes
+MAXTIME  : 0 Seconds
+MAXLINEV : 239.2 Volts
+MINLINEV : 234.0 Volts
+OUTPUTV  : 236.6 Volts
+SENSE    : High
+DWAKE    : 000 Seconds
+DSHUTD   : 020 Seconds
+DLOWBATT : 02 Minutes
+LOTRANS  : 196.0 Volts
+HITRANS  : 253.0 Volts
+RETPCT   : 000.0 Percent
+ITEMP    : 32.8 C Internal
+ALARMDEL : 5 seconds
+BATTV    : 27.9 Volts
+LINEFREQ : 50.0 Hz
+LASTXFER : Line voltage notch or spike
+NUMXFERS : 0
+XONBATT  : N/A
+TONBATT  : 0 seconds
+CUMONBATT: 0 seconds
+XOFFBATT : N/A
+SELFTEST : NO
+STESTI   : 336
+STATFLAG : 0x08 Status Flag
+DIPSW    : 0x00 Dip Switch
+REG1     : 0x00 Register 1
+REG2     : 0x00 Register 2
+REG3     : 0x00 Register 3
+MANDATE  : 07/31/99
+SERIALNO : QS9931125245
+BATTDATE : 07/31/99
+NOMOUTV  : 230
+NOMBATTV :  24.0
+HUMIDITY : N/A
+AMBTEMP  : N/A
+EXTBATTS : 0
+BADBATTS : N/A
+FIRMWARE : 60.11.I
+APCMODEL : IWI
+END APC  : Wed Sep 27 17:30:31 CEST 2000
+</programlisting>
+
+</sect1>
+<sect1><title>Status Report Fields</title>
+
+<para>The meaning of the above variables are:</para>
+
+<variablelist>
+  <varlistentry>
+    <term>APC</term>
+    <listitem>
+      <para>is the header record indicating the STATUS format revision
+level, the number of records that follow the APC statement, and the
+number of bytes that follow the record.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>DATE</term>
+    <listitem>
+      <para>is the date and time that the information was last obtained
+from the UPS.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>HOSTNAME</term>
+    <listitem>
+      <para>is the name of the machine that collected the UPS data.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>RELEASE</term>
+    <listitem>
+      <para>is the <application>apcupsd</application> release number.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>CABLE</term>
+    <listitem>
+      <para>is the cable as specified in the configuration file.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>MODEL</term>
+    <listitem>
+      <para>is the UPS model as derived from information from the UPS.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>UPSMODE</term>
+    <listitem>
+      <para>is the mode in which <application>apcupsd</application> is operating.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>STARTTIME</term>
+    <listitem>
+      <para>is the time/date that <application>apcupsd</application> was started.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>UPSNAME</term>
+    <listitem>
+      <para>is the name of the UPS as stored in the EEPROM.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>STATUS</term>
+    <listitem>
+      <para>is the current status of the UPS (ONLINE, CHARGING,
+ONBATT,...)</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>MASTERUPD</term>
+    <listitem>
+      <para>is the last time the master sent an update to the slave. This
+value is present only in slave configurations.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>LINEV</term>
+    <listitem>
+      <para>is the current line voltage as returned by the UPS.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>LOADPCT</term>
+    <listitem>
+      <para>is the percentage of load capacity as estimated by the
+UPS.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>BCHARGE</term>
+    <listitem>
+      <para>is the percentage charge on the batteries.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>TIMELEFT</term>
+    <listitem>
+      <para>is the remaining runtime left on batteries as estimated by the
+UPS.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>MBATTCHG</term>
+    <listitem>
+      <para>if the battery charge percentage (BCHARGE) drops below this
+value, <application>apcupsd</application> will shutdown your system.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>MINTIMEL</term>
+    <listitem>
+      <para><application>apcupsd</application> will shutdown your system if the remaining
+runtime equals or is below this point.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>MAXTIME</term>
+    <listitem>
+      <para><application>apcupsd</application> will shutdown your system if the time on
+batteries exceeds this value. A value of zero disables the
+feature.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>MAXLINEV</term>
+    <listitem>
+      <para>is the maximum line voltage since the last STATUS as returned
+by the UPS.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>MINLINEV</term>
+    <listitem>
+      <para>is the minimum line voltage since the last STATUS as returned
+by the UPS.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>OUTPUTV</term>
+    <listitem>
+      <para>is the voltage the UPS is supplying to your equipment.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>SENSE</term>
+    <listitem>
+      <para>is the sensitivity level of the UPS to line voltage
+fluctuations.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>DWAKE</term>
+    <listitem>
+      <para>is the amount of time the UPS will wait after a power off
+condition when the power is restored.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>DSHUTD</term>
+    <listitem>
+      <para>is the grace delay that the UPS gives after receiving a power
+down command from <application>apcupsd</application> before it powers off your
+equipment.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>DLOWBATT</term>
+    <listitem>
+      <para>is the remaining runtime below which the UPS sends the low
+battery signal. At this point <application>apcupsd</application> will force an
+immediate emergency shutdown.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>LOTRANS</term>
+    <listitem>
+      <para>is the line voltage below which the UPS will switch to
+batteries.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>HITRANS</term>
+    <listitem>
+      <para>is the line voltage above which the UPS will switch to
+batteries.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>RETPCT</term>
+    <listitem>
+      <para>is the percentage charge that the batteries must have after a
+power off condition before the UPS will restore power to your
+equipment.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>STATFLAG</term>
+    <listitem>
+      <para>is a status flag indicating the UPS status. See STATUS.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>ITEMP</term>
+    <listitem>
+      <para>is the internal UPS temperature as supplied by the UPS.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>ALARMDEL</term>
+    <listitem>
+      <para>is the delay period for the UPS alarm.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>BATTV</term>
+    <listitem>
+      <para>is the battery voltage as supplied by the UPS.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>LINEFREQ</term>
+    <listitem>
+      <para>is the line frequency in Hertz as given by the UPS.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>LASTXFER</term>
+    <listitem>
+      <para>is the reason for the last transfer to batteries.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>NUMXFERS</term>
+    <listitem>
+      <para>the number of transfers to batteries since <application>apcupsd</application>
+startup.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>XONBATT</term>
+    <listitem>
+      <para>time and date of last transfer to batteries, or N/A.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>TONBATT</term>
+    <listitem>
+      <para>time in seconds currently on batteries, or 0.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>CUMONBATT</term>
+    <listitem>
+      <para>total (cumulative) time on batteries in seconds since
+<application>apcupsd</application> startup.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>XOFFBATT</term>
+    <listitem>
+      <para>time and date of last transfer from batteries, or N/A.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>SELFTEST</term>
+    <listitem>
+      <para>is the results of the last self test, and may have the
+following values:
+OK - self test indicates good battery
+BT - self test failed due to insufficient battery capacity
+NG - self test failed due to overload
+NO - No results (i.e. no self test performed in the last 5
+minutes).</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>STESTI</term>
+    <listitem>
+      <para>is the interval in hours between automatic self tests.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>STATFLAG</term>
+    <listitem>
+      <para>status flag. English version is given by STATUS.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>DIPSW</term>
+    <listitem>
+      <para>is the dip switch settings.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>REG1</term>
+    <listitem>
+      <para>is the value from the UPS fault register 1.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>REG2</term>
+    <listitem>
+      <para>is the value from the UPS fault register 2.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>REG3</term>
+    <listitem>
+      <para>is the value from the UPS fault register 3.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>MANDATE</term>
+    <listitem>
+      <para>is the date the UPS was manufactured.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>SERIALNO</term>
+    <listitem>
+      <para>is the UPS serial number.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>BATTDATE</term>
+    <listitem>
+      <para>is the date that batteries were last replaced.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>NOMOUTV</term>
+    <listitem>
+      <para>is the output voltage that the UPS will attempt to supply when
+on battery power.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>NOMBATTV</term>
+    <listitem>
+      <para>is the nominal battery voltage.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>HUMIDITY</term>
+    <listitem>
+      <para>is the humidity as measured by the UPS.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>AMBTEMP</term>
+    <listitem>
+      <para>is the ambient temperature as measured by the UPS.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>EXTBATTS</term>
+    <listitem>
+      <para>is the number of external batteries as defined by the user. A
+correct number here helps the UPS compute the remaining runtime
+more accurately.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>BADBATTS</term>
+    <listitem>
+      <para>is the number of bad battery packs.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>FIRMWARE</term>
+    <listitem>
+      <para>is the firmware revision number.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>APCMODEL</term>
+    <listitem>
+      <para>is the old APC model identification code.</para>
+
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>END APC</term>
+    <listitem>
+      <para>is the time and date that the STATUS record was written.</para>
+
+    </listitem>
+  </varlistentry>
+</variablelist>
+
+</sect1>
+<sect1><title>Logging the STATUS Information</title>
+
+<para>If specified in the configuration file, the STATUS data will also
+be written to the system log file. Please note, that it would not
+normally be wise to write this data to a normal system log file as
+there is no mechanism in syslog() to rewind the file and hence the
+log file would quickly become enormous. However, in two cases, it
+can be very useful to use syslog() to write this information.</para>
+
+<para>The first case is to set up your
+<filename>syslog.conf</filename> file so that the data is written to a
+named pipe. In this case, normally not more than about 8192 bytes of
+data will be kept before it is discarded by the system.</para>
+
+<para>The second case is to setup your syslog.conf file so that the
+status data is sent to another machine, which presumably then
+writes it to a named pipe. Consequently, with this mechanism,
+provides a simple means of networking apcupsd STATUS
+information.</para>
+
+<para>Although we mention system logging of STATUS information, we
+strongly recommend that you use  <application>apcaccess</application>
+or the CGI interface to get this information.</para>
+
+</sect1>
+</chapter>
+
+&shutdown;
+&bible;
+
+</part>
+
+&appendix;
+
+</book>
