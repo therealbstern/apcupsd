@@ -235,7 +235,7 @@ supplied by APC:
 <br>
 940-1524C     SmartMode Only
 <br>
-940-0127A     USB Cable
+940-0127A/B   USB Cables
 <br>
 940-0128A     Simple Signal Only, Back-UPS CS in serial mode.
 
@@ -673,7 +673,7 @@ apcserial.c:
    action = ioctl(TIOMBIC, DTR)       clear DTR (power bit?)
    action = ioctl(TIOMBIC, RTS)       clear RTS (killpower)
 
-   cable = 0020B, 0020C, 0119A, 0127A, 0127A
+   cable = 0020B, 0020C, 0119A, 0127A, 0128A
    action = ioctl(TIOMBIC, DTR)       clear DTR (killpower)
 
    cable = 0095A, 0095B, 0095C
