@@ -1,10 +1,17 @@
              Technical notes on version 3.10.6
-                       05 April 2003
+                       11 April 2003
                         Kern Sibbald
 
 General:
 
 Changes submitted this submission:
+11Apr03
+- I received a kernel patch from Sergey Vlasov that fixes
+  the killpower problem on CS UPSes. apcupsd can now shutdown
+  these devices! I've removed some debug code that was in
+  the killpower routine and is not needed or used.
+  I have put the kernel patch in:
+    <apcupsd-source>/examples/linux-2.4.20-alt-hidups.patch
 05Apr03
 - When the Win32 version starts as a service, delete the
   NOLOGIN and PWRFAIL files to prevent later confusion.

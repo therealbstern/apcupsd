@@ -1,0 +1,22 @@
+--- linux-2.4.20/drivers/usb/hid-core.c.alt-hidups	Tue Mar 18 17:09:28 2003
++++ linux-2.4.20/drivers/usb/hid-core.c	Thu Apr  3 18:40:11 2003
+@@ -1016,10 +1033,16 @@
+ 
+ void hid_write_report(struct hid_device *hid, struct hid_report *report)
+ {
+-	hid_output_report(report, hid->out[hid->outhead].buffer);
++	if (report->id) {
++		hid->out[hid->outhead].buffer[0] = report->id;
++		hid_output_report(report, hid->out[hid->outhead].buffer + 1);
++		hid->out[hid->outhead].dr.wLength = cpu_to_le16(((report->size + 7) >> 3) + 1);
++	} else {
++		hid_output_report(report, hid->out[hid->outhead].buffer);
++		hid->out[hid->outhead].dr.wLength = cpu_to_le16((report->size + 7) >> 3);
++	}
+ 
+-	hid->out[hid->outhead].dr.wValue = cpu_to_le16(0x200 | report->id);
+-	hid->out[hid->outhead].dr.wLength = cpu_to_le16((report->size + 7) >> 3);
++	hid->out[hid->outhead].dr.wValue = cpu_to_le16(((report->type + 1) << 8) | report->id);
+ 
+ 	hid->outhead = (hid->outhead + 1) & (HID_CONTROL_FIFO_SIZE - 1);
+ 
