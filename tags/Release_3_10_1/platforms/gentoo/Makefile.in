@@ -1,0 +1,31 @@
+# Makefile template
+#
+# Copyright (C) 1999-2002 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
+#
+
+# Default variables
+@VARIABLES@
+# TOP source directory.
+topdir = @top_srcdir@
+top_builddir = $(topdir)
+
+# Include the default make targets: to be put before the all-targets: rule.
+@TARGETS@
+
+all-targets: Makefile
+
+install:
+	@echo "Installing apcupsd boot scripts..."
+	$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)/etc/init.d; \
+	$(INSTALL_PROGRAM) apcupsd $(DESTDIR)/etc/init.d/apcupsd
+	$(INSTALL_PROGRAM) halt $(DESTDIR)/etc/init.d/halt
+
+uninstall:
+	@echo "Removing boot scripts..."
+	@$(RMF) $(DESTDIR)/etc/init.d/apcupsd
+#	@$(RMF) $(DESTDIR)/etc/init.d/halt
+
+clean:
+
+distclean:
+	@$(RMF) apcupsd Makefile 
