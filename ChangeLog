@@ -6,6 +6,7 @@
 /*               ftp://ftp.apcupsd.com                                     */
 /***************************************************************************/
 
+    - SuSE 8.0 is now supported.
     - Added forward declaration of inet_pton and localtime_r when they
       are extraobj.
     - Added inet_pton function. Implementation from Internet Software

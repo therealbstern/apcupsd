@@ -1,10 +1,21 @@
 #! /bin/sh
 # Copyright (c) 1996 S.u.S.E. Gmbh Fuerth, Germany.  All rights reserved.
+# Copyright (C) 1996-99 Andre M. Hedrick <andre@suse.com>
+# Copyright (C) 1999-02 Riccardo Facchetti <riccardo@inetcosmos.org>
 #
-# Author: Andre Hedrick <hedrick@astro.dyer.vanderbilt.edu>
+# Author: Andre Hedrick <hedrick@astro.dyer.vanderbilt.edu> 1996-99
+#         Riccardo Facchetti <riccardo@inetcosmos.org> 1999-02
 #
-# apcupsd startup script
+# /etc/init.d/apcupsd
 #
+### BEGIN INIT INFO
+# Provides: apcupsd
+# Required-Start: $network $syslog
+# Required-Stop:  $network $syslog
+# Default-Start:  2 3 5
+# Default-Stop:
+# Description:    Start the apcupsd daemon
+### END INIT INFO
 
 . /etc/rc.config
 

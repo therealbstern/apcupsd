@@ -19,6 +19,7 @@
 
 action=$1
 dist=$2
+ver=$3
 
 if [ -z "$action" -o -z "$dist" ]
 then
@@ -31,27 +32,33 @@ case $action in
     echo "Generic symlinks installation..."
     case $dist in
       suse)
+        case $ver in
+          [8-9]*)
+            /sbin/insserv apcupsd
+            ;;
+          *)
+            if [ -d /etc/rc.d ]
+            then
+                initrcd="/etc/rc.d"
+            elif [ -d /sbin/init.d ]
+            then
+                initrcd="/sbin/init.d"
+            else
+                echo "Can not detect init scripts directory."
+                exit 1
+            fi
 
-        if [ -d /etc/rc.d ]
-        then
-          initrcd="/etc/rc.d"
-        elif [ -d /sbin/init.d ]
-        then
-          initrcd="/sbin/init.d"
-        else
-          echo "Can not detect init scripts directory."
-          exit 1
-        fi
-
-        for runlevel in 1 2 3 4 5
-        do
-          if [ -L $initrcd/rc$runlevel.d/S*syslog ]
-          then
-            echo "  Installing runlevel $runlevel..."
-            ln -sf $initrcd/apcupsd $initrcd/rc$runlevel.d/K20apcupsd
-            ln -sf $initrcd/apcupsd $initrcd/rc$runlevel.d/S20apcupsd
-          fi
-        done
+            for runlevel in 1 2 3 4 5
+            do
+                if [ -L $initrcd/rc$runlevel.d/S*syslog ]
+                then
+                    echo "  Installing runlevel $runlevel..."
+                    ln -sf $initrcd/apcupsd $initrcd/rc$runlevel.d/K20apcupsd
+                    ln -sf $initrcd/apcupsd $initrcd/rc$runlevel.d/S20apcupsd
+                fi
+            done
+          ;;
+        esac
         ;;
       *)
         echo "  relying on $dist-specific Makefile for symlink installation"
@@ -62,28 +69,35 @@ case $action in
     echo "Genering symlinks uninstallation..."
     case $dist in
       suse)
+        case $ver in
+          [8-9]*)
+            /sbin/insserv -r apcupsd
+            ;;
+          *)
 
-        if [ -d /etc/rc.d ]
-        then
-          initrcd="/etc/rc.d"
-        elif [ -d /sbin/init.d ]
-        then
-          initrcd="/sbin/init.d"
-        else
-          echo "Can not detect init scripts directory."
-          exit 1
-        fi
+            if [ -d /etc/rc.d ]
+            then
+                initrcd="/etc/rc.d"
+            elif [ -d /sbin/init.d ]
+            then
+                initrcd="/sbin/init.d"
+            else
+                echo "Can not detect init scripts directory."
+                exit 1
+            fi
 
-        for runlevel in 1 2 3 4 5
-        do
-          if [ -L $initrcd/rc$runlevel.d/S20apcupsd ]
-          then
-            echo "  Removing runlevel $runlevel..."
-            rm -f $initrcd/rc$runlevel.d/K20apcupsd
-            rm -f $initrcd/rc$runlevel.d/S20apcupsd
-          fi
-        done
-        ;;
+            for runlevel in 1 2 3 4 5
+            do
+                if [ -L $initrcd/rc$runlevel.d/S20apcupsd ]
+                then
+                    echo "  Removing runlevel $runlevel..."
+                    rm -f $initrcd/rc$runlevel.d/K20apcupsd
+                    rm -f $initrcd/rc$runlevel.d/S20apcupsd
+                fi
+            done
+            ;;
+          esac
+          ;;
       *)
         echo "  relying on $dist-specific Makefile for symlink uninstallation"
         ;;
