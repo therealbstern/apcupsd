@@ -1282,11 +1282,6 @@ int usb_ups_kill_power(UPSINFO *ups)
 
     Dmsg0(200, "Enter usb_ups_kill_power\n");
     
-    if (!usb_ups_get_capabilities(ups)) {
-       Dmsg0(000, "Cannot do kill power because cannot get UPS capabilities.\n");
-       return 0;
-    }
-
     /*
      * We try various different ways to shutdown the UPS (i.e. killpower).
      * Some of these commands are not supported on all UPSes, but that
