@@ -184,7 +184,7 @@ is ignored for UPSCABLE ether).
         build your own cable, build a <b>Smart-Custom</b> cable (see the
         <a href="cables.html">Cables Chapter</a>  of this manual).  If you
         have a <b>Simple</b> UPS, build a <b>Simple-Custom</b> cable.
-        If you have a BackUPS CS with a RJ45 connector, you can buld your own
+        If you have a BackUPS CS with a RJ45 connector, you can build your own
         <b>Custom-RJ45</b> cable.
        <p>
         The <b>--with-upscable=</b> option can be used on the <p>./configure</p> program
@@ -197,7 +197,7 @@ is ignored for UPSCABLE ether).
                 a serial port or a USB port. The
                 default is platform dependent, and is usually something like /dev/ttyS0. 
                 For USB ports, you may specify a port range specification of the
-                form <b>/dev/usb/hid/hidev[-0-9]</b>.
+                form <b>/dev/usb/hid/hiddev[-0-9]</b>.
                 Normally, the ./configure program will set an appropriate default value,
                 otherwise, you may also specify the <b>--with-serial-dev=</b> option on the
                 <b>./configure</b> program to set this directive during the installation.
@@ -284,7 +284,7 @@ configuration (default) with <b>--enable-nis</b>.
 <H3><a name="ConfigPowerFail"></a>Configuration Directives used during Power Failures</H3>
 In general, none of these directives are required. However, if you have a simple 
 signaling (dumb) UPS with a cable that does not support the Low Battery signal,
-you must set the TIMOUT directive to force a shutdown. Please see the
+you must set the TIMEOUT directive to force a shutdown. Please see the
 <a href="cables.html#CableModes">Simple Signaling features Supported</a> section of
 this manual for more details.
 <a name="ANNOY"></a><DL> 
@@ -334,7 +334,7 @@ this manual for more details.
            <b>NOLOGON</b> directive is specified.
            <p>
            As far as I can tell, the only useful types are
-           <b>disable</b> and <b>always</b> since the diffence in the
+           <b>disable</b> and <b>always</b> since the difference in the
            time when the logout warning is given and shutdown occurs
            for the other types is very short (KES).              
            

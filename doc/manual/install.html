@@ -224,7 +224,7 @@ installation.</p>
                 <b>highly</b> recommended for Windows builds.</dd>
   <dt>--with-libwrap=&lt;path&gt;</dt><dd>
         This option when enabled causes <b>apcupsd</b> to be built with
-                the TCP WRAPPER libarary for enhanced security.</dd> In most cases,
+                the TCP WRAPPER library for enhanced security.</dd> In most cases,
                 the &lt;path&gt; is optional since configure will determine where the
                 libraries are on most systems.
   <dt>--with-nologin=&lt;path&gt;</dt><dd>
@@ -326,7 +326,7 @@ With the exception of Linux SuSe and Linux RedHat systems used
 by the developers, we rely on users to help create installation
 scripts and instructions as well as to test that <b>apcupsd</b>
 runs correctly on their system. As you can imagine, most of these
-people are system adminstrators rather than developers so they
+people are system administrators rather than developers so they
 are very busy and don't always have time to test the latest 
 releases. With that in mind, we believe that you will find
 that a lot of very valuable work has been already done to 
@@ -378,7 +378,7 @@ somewhat particular, we have put the extra Debian
 information into the following two subdirectories:
 <b>&lt;src&gt;/distributions/debian/examples/  and
 &lt;src&gt;/distributions/debian/packageinfo</b>
-<p>You can also find the offical Debian packages
+<p>You can also find the official Debian packages
 on the Debian site at: 
 <p> 
 <a href="http://packages.debian.org/stable/admin/apcupsd.html">
@@ -423,7 +423,7 @@ FreeBSD section above as they may apply equally to OpenBSD.
 <h2><a name="OpenBSD"></a>OpenBSD</h2>
 Ensure that you read the distributions/openbsd/README file before
 running apcupsd.  There are some critical differences in how the OpenBSD
-implemenation operates when the UPS batteries are exhausted.  Failure
+implementation operates when the UPS batteries are exhausted.  Failure
 to take this into account may result in the system not being fully 
 halted when power is lost.<br>
 Please read the comments on the pthreads implementation in the
@@ -647,7 +647,7 @@ KDE.
 <h3>Solaris EEPROM Changes</h3>
 Solaris probes the serial ports during boot, and during this process, 
 it toggles some handshaking lines used by the UPS.  
-As a result, particularly for simple signalling &quot;dumb&quot;
+As a result, particularly for simple signaling &quot;dumb&quot;
 UPSes it seems to kick it into a mode that makes the UPS think 
 it's either in a calibration run, or some self-test mode. 
 Since at this point we are really not communicating with the UPS, 
