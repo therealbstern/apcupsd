@@ -33,7 +33,9 @@ extern UPSCMDMSG cmd_msg[];
 #define Vendor_MGE 0x463
 
 static int linkcheck = FALSE;
-#define LINK_RETRY_INTERVAL 5	     /* retry every 5 seconds */
+#define LINK_RETRY_INTERVAL 5	      /* retry every 5 seconds */
+
+#define MAX_VOLATILE_POLL_RATE 5      /* max rate to update volatile data */
 
 /* Various known USB codes */
 #define UPS_USAGE   0x840000
@@ -958,7 +960,8 @@ int usb_ups_read_volatile_data(UPSINFO *ups)
      *	5 seconds. This prevents flailing around too much if the
      *	UPS state is rapidly changing while on mains.
      */
-    if (!is_ups_set(UPS_ONBATT) && last_poll && (now - last_poll < 5)) {
+    if (is_ups_set(UPS_ONBATT) && last_poll && 
+	(now - last_poll < MAX_VOLATILE_POLL_RATE)) {
        return 1;
     }
     write_lock(ups);
