@@ -250,7 +250,7 @@ AC_DEFUN(AM_WITH_NLS,
 
     # If this is used in GNU gettext we have to set USE_NLS to `yes'
     # because some of the sources are only built for this goal.
-    if test "$PACKAGE" = gettext; then
+    if test "$PACKAGE" = "gettext" ; then
       USE_NLS=yes
       USE_INCLUDED_LIBINTL=yes
     fi
@@ -373,7 +373,7 @@ strdup __argz_count __argz_stringify __argz_next])
    if test -n "$ac_aux_dir"; then
      MKINSTALLDIRS="$ac_aux_dir/mkinstalldirs"
    fi
-   if test x"$MKINSTALLDIRS" = x ; then
+   if test x$MKINSTALLDIRS = x ; then
      MKINSTALLDIRS="\$(top_srcdir)/autoconf/mkinstalldirs"
    fi
    AC_SUBST(MKINSTALLDIRS)
