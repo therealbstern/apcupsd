@@ -140,6 +140,7 @@ cd ../
 %endif
 
 %install
+[ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 
 mkdir -p $RPM_BUILD_ROOT%{initdir}
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/cgi
@@ -149,6 +150,7 @@ make \
         install
 
 # This should no longer be necessary - see Jan 17 2004 changelog note below
+
 # RedHat 7 put usb hid devices in /dev/usd/hid directory rather than /dev/usb
 # which follows usb standard. This was corrected with RedHat 8 so we patch the
 # apcupsd.conf file as created by our configure statement above for rh7 builds.
@@ -204,9 +206,10 @@ install -m744 examples/make-hiddev \
 rm -f /etc/rc.d/rc[0-6].d/[KS]20apcups
 rm -f /etc/rc.d/init.d/apcups
 
-# delete then add our links
-/sbin/chkconfig --del apcupsd
+# add our links
+if [ "$1" -ge 1 ] ; then
 /sbin/chkconfig --add apcupsd
+fi
 
 cp -f /etc/rc.d/init.d/halt /etc/rc.d/init.d/halt.old
 awk '# Stuff left over from a previous apcupsd, remove it
@@ -301,9 +304,10 @@ fi
 rm -f /etc/rc.d/rc[0-6].d/[KS]20apcups
 rm -f /etc/rc.d/init.d/apcups
 
-# delete then add our links
-/sbin/chkconfig --del apcupsd
+# add our links
+if [ "$1" -ge 1 ] ; then
 /sbin/chkconfig --add apcupsd
+fi
 
 cp -f /etc/rc.d/init.d/halt /etc/rc.d/init.d/halt.old
 awk '# Stuff left over from a previous apcupsd, remove it
@@ -371,6 +375,9 @@ fi
 %endif
 
 %changelog
+* Mon Mar 08 2004 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- added additional clean of buildroot to beginning of install section
+- corrected post install routines for nicer chkconfig
 * Sat Jan 17 2004 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - added build of net driver to configure
 - moved usb driver build into both packages
@@ -381,7 +388,7 @@ fi
 * Thu Jan 1 2004 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - removed rh_version from package names
 - added platform build configuration section to beginning of file
-* Sat Nov 08 2003 Scott at fairfieldcomputersdot com
+* Sat Nov 08 2003 Scott at fairfieldcomputers dot com
 - expanded usb devices from 0-9 to 0-15
 * Fri Nov 07 2003 Scott at fairfieldcomputers dot com
 - corrected device path for usb devices to /dev/usb and added patch for
