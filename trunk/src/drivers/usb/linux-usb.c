@@ -444,8 +444,8 @@ static int get_value(UPSINFO *ups, int ci, USB_INFO *uinfo)
 	} else {
 	   info->dValue = ((double)info->uref.value) * pow_ten(exponent);
 	}
-        Dmsg3(200, "Def val=%d exp=%d dVal=%f\n", info->uref.value,
-	      exponent, info->dValue);
+        Dmsg4(200, "Def val=%d exp=%d dVal=%f ci=%d\n", info->uref.value,
+	      exponent, info->dValue, ci);
     }
     memcpy(uinfo, info, sizeof(USB_INFO));
     return 1;
