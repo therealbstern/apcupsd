@@ -30,9 +30,7 @@
 #include "multimon.h"
 #include "upsfetch.h"
 #include "cgiconfig.h"
-/* #include "version.h" */
 #include "status.h"
-
 #include "apc_nis.h"
 
 #ifndef CSS_DIR

@@ -19,7 +19,6 @@
 
 #include <unistd.h>
 #include <stdio.h>
-#include <syslog.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
@@ -28,7 +27,6 @@
 #include "multimon.h"
 #include "upsfetch.h"
 #include "cgiconfig.h"
-/* #include "version.h" */
 #include "status.h"
 
 #include "apc_nis.h"
