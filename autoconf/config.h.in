@@ -1,4 +1,4 @@
-/* autoconf/config.h.in.  Generated automatically from autoconf/configure.in by autoheader.  */
+/* autoconf/config.h.in.  Generated from autoconf/configure.in by autoheader.  */
 /* acconfig.h
    This file is in the public domain.
 
@@ -198,295 +198,311 @@
    */
 #undef CRAY_STACKSEG_END
 
-/* Define if using `alloca.c'. */
+/* Define to 1 if using `alloca.c'. */
 #undef C_ALLOCA
 
 /* Define to the type of elements in the array set by `getgroups'. Usually
    this is either `int' or `gid_t'. */
 #undef GETGROUPS_T
 
-/* Define if you have the `abort' function. */
+/* Define to 1 if you have the `abort' function. */
 #undef HAVE_ABORT
 
-/* Define if you have the `alarm' function. */
+/* Define to 1 if you have the `alarm' function. */
 #undef HAVE_ALARM
 
-/* Define if you have `alloca', as a function or macro. */
+/* Define to 1 if you have `alloca', as a function or macro. */
 #undef HAVE_ALLOCA
 
-/* Define if you have <alloca.h> and it should be used (not on Ultrix). */
+/* Define to 1 if you have <alloca.h> and it should be used (not on Ultrix).
+   */
 #undef HAVE_ALLOCA_H
 
-/* Define if you have the <argz.h> header file. */
+/* Define to 1 if you have the <argz.h> header file. */
 #undef HAVE_ARGZ_H
 
-/* Define if you have the <arpa/inet.h> header file. */
+/* Define to 1 if you have the <arpa/inet.h> header file. */
 #undef HAVE_ARPA_INET_H
 
-/* Define if you have the `calloc' function. */
+/* Define to 1 if you have the `calloc' function. */
 #undef HAVE_CALLOC
 
-/* Define if you have the <ctype.h> header file. */
+/* Define to 1 if you have the <ctype.h> header file. */
 #undef HAVE_CTYPE_H
 
-/* Define if you have the <curses.h> header file. */
+/* Define to 1 if you have the <curses.h> header file. */
 #undef HAVE_CURSES_H
 
-/* Define if you have the `dcgettext' function. */
+/* Define to 1 if you have the `dcgettext' function. */
 #undef HAVE_DCGETTEXT
 
-/* Define if you have the <errno.h> header file. */
+/* Define to 1 if you have the <errno.h> header file. */
 #undef HAVE_ERRNO_H
 
-/* Define if you have the <fcntl.h> header file. */
+/* Define to 1 if you have the <fcntl.h> header file. */
 #undef HAVE_FCNTL_H
 
-/* Define if you have the `fork' function. */
+/* Define to 1 if you have the `fork' function. */
 #undef HAVE_FORK
 
-/* Define if you have the `getcwd' function. */
+/* Define to 1 if you have the `getcwd' function. */
 #undef HAVE_GETCWD
 
-/* Define if you have the `getpagesize' function. */
+/* Define to 1 if you have the `getpagesize' function. */
 #undef HAVE_GETPAGESIZE
 
-/* Define if you have the `getpid' function. */
+/* Define to 1 if you have the `getpid' function. */
 #undef HAVE_GETPID
 
-/* Define if you have the <inttypes.h> header file. */
+/* Define to 1 if you have the <inttypes.h> header file. */
 #undef HAVE_INTTYPES_H
 
-/* Define if you have the `ioctl' function. */
+/* Define to 1 if you have the `ioctl' function. */
 #undef HAVE_IOCTL
 
-/* Define if you have the `kill' function. */
+/* Define to 1 if you have the `kill' function. */
 #undef HAVE_KILL
 
-/* Define if you have the `i' library (-li). */
+/* Define to 1 if you have the `i' library (-li). */
 #undef HAVE_LIBI
 
-/* Define if you have the `inet' library (-linet). */
+/* Define to 1 if you have the `inet' library (-linet). */
 #undef HAVE_LIBINET
 
-/* Define if you have the `intl' library (-lintl). */
+/* Define to 1 if you have the `intl' library (-lintl). */
 #undef HAVE_LIBINTL
 
-/* Define if you have the `nsl' library (-lnsl). */
+/* Define to 1 if you have the `nsl' library (-lnsl). */
 #undef HAVE_LIBNSL
 
-/* Define if you have the `resolv' library (-lresolv). */
+/* Define to 1 if you have the `resolv' library (-lresolv). */
 #undef HAVE_LIBRESOLV
 
-/* Define if you have the `socket' library (-lsocket). */
+/* Define to 1 if you have the `socket' library (-lsocket). */
 #undef HAVE_LIBSOCKET
 
-/* Define if you have the `xnet' library (-lxnet). */
+/* Define to 1 if you have the `xnet' library (-lxnet). */
 #undef HAVE_LIBXNET
 
-/* Define if you have the <limits.h> header file. */
+/* Define to 1 if you have the <limits.h> header file. */
 #undef HAVE_LIMITS_H
 
-/* Define if you have the <locale.h> header file. */
+/* Define to 1 if you have the <locale.h> header file. */
 #undef HAVE_LOCALE_H
 
-/* Define if you have the <malloc.h> header file. */
+/* Define to 1 if you have the <malloc.h> header file. */
 #undef HAVE_MALLOC_H
 
-/* Define if you have the <memory.h> header file. */
+/* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
-/* Define if you have the <menu.h> header file. */
+/* Define to 1 if you have the <menu.h> header file. */
 #undef HAVE_MENU_H
 
-/* Define if you have a working `mmap' system call. */
+/* Define to 1 if you have a working `mmap' system call. */
 #undef HAVE_MMAP
 
-/* Define if you have the `munmap' function. */
+/* Define to 1 if you have the `munmap' function. */
 #undef HAVE_MUNMAP
 
-/* Define if you have the <ncurses/curses.h> header file. */
+/* Define to 1 if you have the <ncurses/curses.h> header file. */
 #undef HAVE_NCURSES_CURSES_H
 
-/* Define if you have the <ncurses/menu.h> header file. */
+/* Define to 1 if you have the <ncurses/menu.h> header file. */
 #undef HAVE_NCURSES_MENU_H
 
-/* Define if you have the <ncurses/panel.h> header file. */
+/* Define to 1 if you have the <ncurses/panel.h> header file. */
 #undef HAVE_NCURSES_PANEL_H
 
-/* Define if you have the <netdb.h> header file. */
+/* Define to 1 if you have the <netdb.h> header file. */
 #undef HAVE_NETDB_H
 
-/* Define if you have the <netinet/in.h> header file. */
+/* Define to 1 if you have the <netinet/in.h> header file. */
 #undef HAVE_NETINET_IN_H
 
-/* Define if you have the <nl_types.h> header file. */
+/* Define to 1 if you have the <nl_types.h> header file. */
 #undef HAVE_NL_TYPES_H
 
-/* Define if you have the <panel.h> header file. */
+/* Define to 1 if you have the <panel.h> header file. */
 #undef HAVE_PANEL_H
 
-/* Define if you have the `putenv' function. */
+/* Define to 1 if you have the `putenv' function. */
 #undef HAVE_PUTENV
 
-/* Define if you have the <pwd.h> header file. */
+/* Define to 1 if you have the <pwd.h> header file. */
 #undef HAVE_PWD_H
 
-/* Define if you have the `rewind' function. */
+/* Define to 1 if you have the `rewind' function. */
 #undef HAVE_REWIND
 
-/* Define if you have the `select' function. */
+/* Define to 1 if you have the `select' function. */
 #undef HAVE_SELECT
 
-/* Define if you have the `setenv' function. */
+/* Define to 1 if you have the `setenv' function. */
 #undef HAVE_SETENV
 
-/* Define if you have the `setlocale' function. */
+/* Define to 1 if you have the `setlocale' function. */
 #undef HAVE_SETLOCALE
 
-/* Define if you have the `setpgrp' function. */
+/* Define to 1 if you have the `setpgrp' function. */
 #undef HAVE_SETPGRP
 
-/* Define if you have the `setsid' function. */
+/* Define to 1 if you have the `setsid' function. */
 #undef HAVE_SETSID
 
-/* Define if you have the `shmctl' function. */
+/* Define to 1 if you have the `shmctl' function. */
 #undef HAVE_SHMCTL
 
-/* Define if you have the `signal' function. */
+/* Define to 1 if you have the `signal' function. */
 #undef HAVE_SIGNAL
 
-/* Define if you have the <signal.h> header file. */
+/* Define to 1 if you have the <signal.h> header file. */
 #undef HAVE_SIGNAL_H
 
-/* Define if you have the `snprintf' function. */
+/* Define to 1 if you have the `snprintf' function. */
 #undef HAVE_SNPRINTF
 
-/* Define if you have the <stdarg.h> header file. */
+/* Define to 1 if you have the <stdarg.h> header file. */
 #undef HAVE_STDARG_H
 
-/* Define if you have the <stdint.h> header file. */
+/* Define to 1 if you have the <stdint.h> header file. */
 #undef HAVE_STDINT_H
 
-/* Define if you have the <stdio.h> header file. */
+/* Define to 1 if you have the <stdio.h> header file. */
 #undef HAVE_STDIO_H
 
-/* Define if you have the <stdlib.h> header file. */
+/* Define to 1 if you have the <stdlib.h> header file. */
 #undef HAVE_STDLIB_H
 
-/* Define if you have the `stpcpy' function. */
+/* Define to 1 if you have the `stpcpy' function. */
 #undef HAVE_STPCPY
 
-/* Define if you have the `strcasecmp' function. */
+/* Define to 1 if you have the `strcasecmp' function. */
 #undef HAVE_STRCASECMP
 
-/* Define if you have the `strchr' function. */
+/* Define to 1 if you have the `strchr' function. */
 #undef HAVE_STRCHR
 
-/* Define if you have the `strdup' function. */
+/* Define to 1 if you have the `strdup' function. */
 #undef HAVE_STRDUP
 
-/* Define if you have the `strerror' function. */
+/* Define to 1 if you have the `strerror' function. */
 #undef HAVE_STRERROR
 
-/* Define if you have the `strftime' function. */
+/* Define to 1 if you have the `strftime' function. */
 #undef HAVE_STRFTIME
 
-/* Define if cpp supports the ANSI # stringizing operator. */
+/* Define to 1 if cpp supports the ANSI # stringizing operator. */
 #undef HAVE_STRINGIZE
 
-/* Define if you have the <strings.h> header file. */
+/* Define to 1 if you have the <strings.h> header file. */
 #undef HAVE_STRINGS_H
 
-/* Define if you have the <string.h> header file. */
+/* Define to 1 if you have the <string.h> header file. */
 #undef HAVE_STRING_H
 
-/* Define if you have the `strncmp' function. */
+/* Define to 1 if you have the `strncmp' function. */
 #undef HAVE_STRNCMP
 
-/* Define if you have the `strncpy' function. */
+/* Define to 1 if you have the `strncpy' function. */
 #undef HAVE_STRNCPY
 
-/* Define if `tm_zone' is member of `struct tm'. */
+/* Define to 1 if `tm_zone' is member of `struct tm'. */
 #undef HAVE_STRUCT_TM_TM_ZONE
 
-/* Define if you have the <syslog.h> header file. */
+/* Define to 1 if you have the <syslog.h> header file. */
 #undef HAVE_SYSLOG_H
 
-/* Define if you have the <sys/ioctl.h> header file. */
+/* Define to 1 if you have the <sys/ioctl.h> header file. */
 #undef HAVE_SYS_IOCTL_H
 
-/* Define if you have the <sys/ipc.h> header file. */
+/* Define to 1 if you have the <sys/ipc.h> header file. */
 #undef HAVE_SYS_IPC_H
 
-/* Define if you have the <sys/param.h> header file. */
+/* Define to 1 if you have the <sys/param.h> header file. */
 #undef HAVE_SYS_PARAM_H
 
-/* Define if you have the <sys/sem.h> header file. */
+/* Define to 1 if you have the <sys/sem.h> header file. */
 #undef HAVE_SYS_SEM_H
 
-/* Define if you have the <sys/shm.h> header file. */
+/* Define to 1 if you have the <sys/shm.h> header file. */
 #undef HAVE_SYS_SHM_H
 
-/* Define if you have the <sys/socket.h> header file. */
+/* Define to 1 if you have the <sys/socket.h> header file. */
 #undef HAVE_SYS_SOCKET_H
 
-/* Define if you have the <sys/stat.h> header file. */
+/* Define to 1 if you have the <sys/stat.h> header file. */
 #undef HAVE_SYS_STAT_H
 
-/* Define if you have the <sys/types.h> header file. */
+/* Define to 1 if you have the <sys/types.h> header file. */
 #undef HAVE_SYS_TYPES_H
 
-/* Define if you have <sys/wait.h> that is POSIX.1 compatible. */
+/* Define to 1 if you have <sys/wait.h> that is POSIX.1 compatible. */
 #undef HAVE_SYS_WAIT_H
 
-/* Define if you have the `tcgetattr' function. */
+/* Define to 1 if you have the `tcgetattr' function. */
 #undef HAVE_TCGETATTR
 
-/* Define if you have the <termios.h> header file. */
+/* Define to 1 if you have the <termios.h> header file. */
 #undef HAVE_TERMIOS_H
 
-/* Define if your `struct tm' has `tm_zone'. Deprecated, use
+/* Define to 1 if your `struct tm' has `tm_zone'. Deprecated, use
    `HAVE_STRUCT_TM_TM_ZONE' instead. */
 #undef HAVE_TM_ZONE
 
-/* Define if you don't have `tm_zone' but do have the external array `tzname'.
-   */
+/* Define to 1 if you don't have `tm_zone' but do have the external array
+   `tzname'. */
 #undef HAVE_TZNAME
 
-/* Define if you have the <unistd.h> header file. */
+/* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
 
-/* Define if you have the `vfprintf' function. */
+/* Define to 1 if you have the `vfprintf' function. */
 #undef HAVE_VFPRINTF
 
-/* Define if you have the `vsnprintf' function. */
+/* Define to 1 if you have the `vsnprintf' function. */
 #undef HAVE_VSNPRINTF
 
-/* Define if you have the `wait' function. */
+/* Define to 1 if you have the `wait' function. */
 #undef HAVE_WAIT
 
-/* Define if you have the `wait3' function. */
+/* Define to 1 if you have the `wait3' function. */
 #undef HAVE_WAIT3
 
-/* Define if you have the `waitpid' function. */
+/* Define to 1 if you have the `waitpid' function. */
 #undef HAVE_WAITPID
 
-/* Define if you have the `__argz_count' function. */
+/* Define to 1 if you have the `__argz_count' function. */
 #undef HAVE___ARGZ_COUNT
 
-/* Define if you have the `__argz_next' function. */
+/* Define to 1 if you have the `__argz_next' function. */
 #undef HAVE___ARGZ_NEXT
 
-/* Define if you have the `__argz_stringify' function. */
+/* Define to 1 if you have the `__argz_stringify' function. */
 #undef HAVE___ARGZ_STRINGIFY
 
-/* Define if your C compiler doesn't accept -c and -o together. */
+/* Define to 1 if your C compiler doesn't accept -c and -o together. */
 #undef NO_MINUS_C_MINUS_O
+
+/* Define to the address where bug reports for this package should be sent. */
+#undef PACKAGE_BUGREPORT
+
+/* Define to the full name of this package. */
+#undef PACKAGE_NAME
+
+/* Define to the full name and version of this package. */
+#undef PACKAGE_STRING
+
+/* Define to the one symbol short name of this package. */
+#undef PACKAGE_TARNAME
+
+/* Define to the version of this package. */
+#undef PACKAGE_VERSION
 
 /* Define as the return type of signal handlers (`int' or `void'). */
 #undef RETSIGTYPE
 
-/* Define if the `setpgrp' function takes no argument. */
+/* Define to 1 if the `setpgrp' function takes no argument. */
 #undef SETPGRP_VOID
 
 /* If using the C implementation of alloca, define if you know the
@@ -497,20 +513,17 @@
         STACK_DIRECTION = 0 => direction of growth unknown */
 #undef STACK_DIRECTION
 
-/* Define if the `S_IS*' macros in <sys/stat.h> do not work properly. */
+/* Define to 1 if the `S_IS*' macros in <sys/stat.h> do not work properly. */
 #undef STAT_MACROS_BROKEN
 
-/* Define if you have the ANSI C header files. */
+/* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
 
-/* Define if you can safely include both <sys/time.h> and <time.h>. */
+/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
 #undef TIME_WITH_SYS_TIME
 
-/* Define if your <sys/time.h> declares `struct tm'. */
+/* Define to 1 if your <sys/time.h> declares `struct tm'. */
 #undef TM_IN_SYS_TIME
-
-/* Define if you need to in order for stat and other things to work. */
-#undef _POSIX_SOURCE
 
 /* Define to empty if `const' does not conform to ANSI C. */
 #undef const

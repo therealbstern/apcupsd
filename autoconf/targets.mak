@@ -8,10 +8,8 @@
 # Tell versions [3.59,3.63) of GNU make not to export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
-
-.SUFFIXES:
 .SUFFIXES: .o .lo .c .cpp .h .po .gmo .mo .cat .msg .pox
-
+.MAIN: all
 .PHONY: all install uninstall install- install-apcupsd install-powerflute \
 		install-cgi clean realclean distclean mostlyclean clobber
 

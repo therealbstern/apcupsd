@@ -9,8 +9,6 @@
 
 #include "apc.h"
 
-#include <asm/types.h>
-
 extern UPSCOMMANDS cmd[];
 extern UPSCMDMSG cmd_msg[];
 

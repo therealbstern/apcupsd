@@ -148,7 +148,9 @@ AC_SUBST(LDFLAGS)
 AC_SUBST(LIBS)
 
 
-dnl Initialize pthreads inclusion
+dnl Initialize pthreads inclusion: warn PTHREAD_LFLAGS must contain only
+dnl the pthreads libraries, if needed. For linker flags, add them to
+dnl LDFLAGS.
 PTHREAD_CFLAGS=""
 PTHREAD_LFLAGS=""
 with_pthreads=no
@@ -790,9 +792,14 @@ AC_ARG_ENABLE(usb, [
   --enable-usb	       Compile USB UPS code
   --disable-usb 	       No USB UPS code (default)],
 	[ if test "$enableval" = "yes" ; then
-	    AC_DEFINE(HAVE_USB_DRIVER)
-	USB_DRIVER="usb"
-	AC_SUBST(USB_DRIVER)
+	if test "$host_os" = "linux-gnu"
+	then
+		AC_DEFINE(HAVE_USB_DRIVER)
+		USB_DRIVER="usb"
+		AC_SUBST(USB_DRIVER)
+	else
+		echo "Can't build USB driver on this OS, disabled."
+	fi
 	fi],
     [])
 
@@ -1243,7 +1250,8 @@ freebsd)
 	LOCKDIR=/var/spool/lock
 	if test "$with_pthreads" != no; then
 	    PTHREAD_CFLAGS="-pthread"
-	    PTHREAD_LFLAGS="-pthread"
+	    PTHREAD_LFLAGS=""
+	    LDFLAGS="$LDFLAGS -pthread"
 	fi
 dnl
 dnl	For FreeBSD, system man pages are in /usr/share/man, not /usr/man.
@@ -1270,7 +1278,8 @@ netbsd)
 	SERIALDEV=/dev/cua01
 	if test "$with_pthreads" != no; then
 	    PTHREAD_CFLAGS="-pthread"
-	    PTHREAD_LFLAGS="-pthread"
+	    PTHREAD_LFLAGS=""
+	    LDFLAGS="$LDFLAGS -pthread"
 	fi
 	DFILES="\
 		platforms/apccontrol \
@@ -1284,7 +1293,8 @@ openbsd)
 	LOCKDIR=/var/spool/lock
 	if test "$with_pthreads" != no; then
 	    PTHREAD_CFLAGS="-pthread"
-	    PTHREAD_LFLAGS="-pthread"
+	    PTHREAD_LFLAGS=""
+	    LDFLAGS="$LDFLAGS -pthread"
 	fi
 dnl
 dnl	For OpenBSD, system man pages are in /usr/share/man, not /usr/man.
@@ -1659,7 +1669,7 @@ Configuration on `date`:
   Power Fail dir	      ${PWRFAILDIR}
   Compiler:		      ${CC}
   Compiler flags:	      ${CFLAGS} ${PTHREAD_FLAGS}
-  Loader flags: 	      ${LDFLAGS} ${PTHREAD_LFLAGS}
+  Loader flags: 	      ${LDFLAGS}
   Host and version:	      ${DISTNAME} ${DISTVER}
   Shutdown Program:	      ${SHUTDOWN}
   Serial device:	      ${SERIALDEV}
