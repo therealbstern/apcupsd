@@ -72,7 +72,14 @@ static void print_valid_eeprom_values(UPSINFO *ups);
 
 static void do_usb_testing(void);
 #ifdef HAVE_USB_DRIVER
+/* From linux-usb.c */
+bool write_int_to_ups(UPSINFO *ups, int ci, int value, char *name);
+bool read_int_from_ups(UPSINFO *ups, int ci, int* value);
+int usb_ups_get_capabilities(UPSINFO *ups);
+/* Our own test functions */
 static void usb_kill_power_test(void);
+static void usb_get_self_test_result(void);
+static void usb_run_self_test(void);
 #endif
 
 static void strip_trailing_junk(char *cmd);
@@ -103,6 +110,7 @@ static void pmsg(char *fmt,...)
     avsnprintf(buf, sizeof(buf), (char *) fmt, arg_ptr);
     va_end(arg_ptr);
     printf("%s", buf);
+    fflush(stdout);
     write_file(buf);
 }
 
@@ -1519,28 +1527,43 @@ static void do_usb_testing(void)
    int quit = FALSE;
 
    pmsg("Hello, this is the apcupsd Cable Test program.\n\
-This part of apctest is for testing USB UPSes.\n\
-Please select the function you want to perform.\n");
+This part of apctest is for testing USB UPSes.\n");
+
+   pmsg("\nGetting UPS capabilities...");
+   if (!usb_ups_get_capabilities(ups))
+      pmsg("FAILED\nSome or all tests may not work!\n");
+   else
+      pmsg("SUCCESS\n");
+
+   pmsg("\nPlease select the function you want to perform.\n");
 
    while (!quit) {
       pmsg( "\n\
-1) Test 1 - kill UPS power\n\
-2) Quit\n\n");
+1) Test kill UPS power\n\
+2) Perform self-test\n\
+3) Read last self-test result\n\
+4) Quit\n\n");
 
       cmd = get_cmd("Select function number: ");
       if (cmd) {
-	 int item = atoi(cmd);
-	 switch (item) {
-	 case 1:
-	    usb_kill_power_test();
-	    break;
-	 case 2:
-	    quit = TRUE;
-	    break;
-	 default:
+         int item = atoi(cmd);
+         switch (item) {
+         case 1:
+            usb_kill_power_test();
+            break;
+          case 2:
+            usb_run_self_test();
+            break;
+          case 3:
+            usb_get_self_test_result();
+            break;
+          case 4:
+            quit = TRUE;
+            break;
+          default:
             pmsg("Illegal response. Please enter 1-2\n");
-	    break;
-	 }
+            break;
+         }
       } else {
          pmsg("Illegal response. Please enter 1-2\n");
       }
@@ -1572,6 +1595,125 @@ Please enter any character when ready to continue: ");
    pmsg("returned from kill_power function.\n");
 }
 
+static void usb_get_self_test_result(void)
+{
+   int result;
+   if (!read_int_from_ups(ups, CI_ST_STAT, &result))
+   {
+	pmsg("\nI don't know how to run a self test on your UPS\n\
+or your UPS does not support self test.\n");
+	return;
+   }
+   
+   pmsg("\nResult of last self test: ");
+   switch(result)
+   {
+      case 1:
+         pmsg("PASSED\n");
+         break;
+      case 2:
+         pmsg("WARNING\n");
+         break;
+      case 3:
+         pmsg("ERROR\n");
+         break;
+      case 4:
+         pmsg("ABORTED\n");
+         break;
+      case 5:
+         pmsg("IN PROGRESS\n");
+         break;
+      case 6:
+         pmsg("NO TEST PERFORMED\n");
+      break;
+      default:
+         pmsg("UNKNOWN (%02x)\n", result);
+         break;
+   }
+}
+
+static void usb_run_self_test(void)
+{
+   int result;
+   int timeout;
+   
+   pmsg("\nThis test instructs the UPS to perform a self-test\n\
+operation and reports the result when the test completes.");
+
+   if (!read_int_from_ups(ups, CI_ST_STAT, &result))
+   {
+      pmsg("\nI don't know how to run a self test on your UPS\n\
+or your UPS does not support self test.\n");
+      return;
+   }
+   
+   pmsg("\nClearing previous self test result...");
+   if (!write_int_to_ups(ups, CI_ST_STAT, 0, "SelftestStatus"))
+   {
+      pmsg("FAILED\n");
+      return;
+   }
+   
+   for (timeout=0; timeout<10; timeout++)
+   {
+      if (!read_int_from_ups(ups, CI_ST_STAT, &result))
+      {
+         pmsg("FAILED\n");
+         return;
+	   }
+	
+      if (result == 6)
+      {
+         pmsg( "CLEARED\n");
+         break;
+      }
+
+      sleep(1);
+   }
+   
+   if (timeout == 10)
+   {
+      pmsg("FAILED\n");
+      return;
+   }
+
+   pmsg("Initiating self test...");
+   if (!write_int_to_ups(ups, CI_ST_STAT, 1, "SelftestStatus"))
+   {
+      pmsg("FAILED\n");
+      return;
+   }
+
+   pmsg("INITIATED\n");
+   
+   pmsg("Waiting for test to complete...");
+   
+   for (timeout=0; timeout<20; timeout++)
+   {
+      if (!read_int_from_ups(ups, CI_ST_STAT, &result))
+      {
+         pmsg("ERROR READING STATUS\n");
+         write_int_to_ups(ups, CI_ST_STAT, 3, "SelftestStatus");
+         return;
+      }
+   
+      if (result != 6)
+      {
+         pmsg( "COMPLETED\n");
+         break;
+      }
+      sleep(1);
+   }
+   
+   if (timeout == 20)
+   {
+      pmsg("TEST DID NOT COMPLETE\n");
+      write_int_to_ups(ups, CI_ST_STAT, 3, "SelftestStatus");
+      return;
+   }
+
+   usb_get_self_test_result();
+}
 #endif
 
 /*
