@@ -1,13 +1,13 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: manual.texi,v 1.8 2005-03-13 21:43:40 kerns Exp $
+@comment $Id: oldmanual.texi.save,v 1.1 2005-03-13 21:43:23 kerns Exp $
 @c %***start of header
 @setfilename manual.info
 @finalout
 @settitle apcupsd User's Manual
 @c %***end of header
 
-@set VERSION 3.10.17
-@set UPDATED 14 March 2005
+@set VERSION 3.10.16
+@set UPDATED 02 January 2005
 
 @ifnottex
 @documentdescription
@@ -19,6 +19,7 @@ Apcupsd UPS User's Manual
 @direntry
 * apcupsd User's Manual: (apcupsd_user's_manual).
 @end direntry
+
                                                                                      
 @paragraphindent 2
 
@@ -317,7 +318,6 @@ Credits
 @end detailmenu
 @end menu
 
-
 @node Release Notes, How To Use This Manual, Top, Top
 @unnumbered Release Notes
 @cindex Release Notes
@@ -327,19 +327,14 @@ prior 3.10.x versions, and is intended to be the official release.
 See the ChangeLog below for more details.
 
 @menu
-* New Features::                
+* New Features::
 @end menu
 
 @node New Features,,,Release Notes
 @section New Features
 @cindex New Features
-
 @example
-- Implement USB on all *BSD systems. Note, the kernel
-  drivers on most of these systems are still fragile.
-  There are known problems, for example, on FreeBSD.
 - Fix killpower on USB UPSes to properly turn off UPS.
-- More killpower fixes for BackUPS Pros.
 - Fix killpower sequence for serial UPSes.
 @end example
 
@@ -347,62 +342,15 @@ See the ChangeLog below for more details.
 Change Log for current version
 
 @example
-----> Release 3.10.17 xxMar05
-- Update default apcupsd.conf to recommend a blank DEVICE setting for USB
-  driver.
-- Add /dev/hiddev? to Linux USB driver device node search path.
-- Add Mac OS X startup script
-- Add new *BSD USB driver to support USB UPSes on FreeBSD, OpenBSD, and NetBSD.
-  THIS DRIVER IS BETA SOFTWARE AND HAS A KNOWN LOCKUP ISSUE ON FREEBSD. Please
-  keep this in mind when deciding whether or not to deploy it. PLEASE READ THE
-  "CHECKING OUT YOUR USB SUBSYSTEM (BSD)" SECTION OF THE MANUAL as it contains
-  crucial details on how to configure your system for the new driver.
-- Add BackUPS Pro shutdown code to USB driver
-- Prefer BackUPS style shutdown over SmartUPS in USB driver to resolve shutdown
-  issues on BackUPS CS models
-- Restructure USB driver to share common code
-- Fix slave mode segfault bug introduced by --killpower fixes in 3.10.16.
-- Commit kernstodo
-- Added an anonymous patch to powerflute.c and to the slack-apcupsd.in file.
-- Add Whitebox to detected systems.
-- Minor tweak to RedHat spec.in
-- Apply Carl Lindbergs patch
-  for apcaction.c to fix the network management card
-  shutdown.
-- Fix typo in targets.mak that prevents uninstall from working.
-- Change name of thread_terminate to apc_thread_terminate to avoid
-  conflict on AIX.
-- Put configure found SHUTDOWN in apccontrol.in
-- Figured out how to scale the pdf images, so re-did them.
-- Some minor updates to the manual, particularly the title
-  page.
-
-@end example
-
-Change Log for older versions
-
-@example
-----> Release 3.10.16 04Nov04
-- Adam has fixed the killpower problem for USB so that the
-  USB now properly turns off the power. Nice job.
-- Converted manual from docbook to texinfo format. There is some
-  cleanup to be done, but we get an index.
-- Thanks to Adam for converting the .png images to .pdf
 - Apply patch to fix aastr... supplied by Manfred Schwarb.
 - Changed Solaris to use mailx by default at the suggestion of
   Neil Brookins.
-- Added Adam's snoopdecode.c to examples that allows viewing
-  USB events.
-- A number of typos fixed in apccontrol files.
-- Adam fixed a race condition in killpower with --kill-on-powerfail.
-- --kill-on-powerfail disallowed for dumb UPSes since the      
-  kill power will always occur before the system has been halted.
-- Lots of doc updates.
 - Add proper platform code so that configure will create
   the 4 platform specific apccontrol files (some were missing).
 - Apply fix from user to correct one of the shutdown
   sequences for the Smart UPS. During the conversion to drivers
-  this was apparently mangled.
+  this was apparently mangled. Thanks to Alexander Naumov for the
+  fix.
 - Added code to close all file descriptors before becoming
   daemon unless debug turned on.
 - Add APCBATTCapBeforeRestore found by Adam to hid-ups.c
@@ -413,73 +361,81 @@ Change Log for older versions
 - Add astrncpy() to snmp driver.
 - Fix apcstatus.c to report Unknown for the sensitivity rather than
   High if the sense word cannot be read or is incorrect.
+- Fix killpower on USB UPSes to properly turn off UPS.
+@end example
 
-----> Release 3.10.15 07Aug04
-- Document Mandrake USB kernel problems.
-- Fix HID_MAX_USAGES in the examples directory
-- Apply David Walser's patch for missing colors in multimon.  Reads
-  the apcupsd.css file from the sysconf directory.
-- Add EEPROM fix from Giuseppe Ghibo passed on by David Walser
+Change Log for older versions
 
-----> Release 3.10.14 28Jul04
-- Add workaround from Adam for linux/hiddev.h missing define.
-- Updates to manual.
-- Integrate patch for Mandrake apcupsd.in forwarded by David Walser.
-- Found another store into the ups buffer so ifdefed it. Cannot
-  store into the ups buffer on non-pthreads systems.
-- Fiddle with apcconfig.c to correct astrncpy() problem noted by
-  Adam.
-- ifdef code in apcaccess that tries to write in the shared memory
-  buffer.
-- Applied Adam's patch for fixing the pthreads dependencies in asys.c
-- Tweak the patch a bit hopefully so that OpenBSD will work.
-- Made a sweep through quite a few files updating the copyright, 
-  eliminating the disclaimer (now in DISCLAIMER), and adding as many
-  astrncpy() and astrncat()s as I could find. There still remain some
-  drivers and the cgi code to do.
-- Implemented true/false and bool. Started implementing it in many of
-  the files I touched.
-- Updated the net driver and did a fairly good testing of it.
-- Made apcupsd remain in the foreground when doing a kill power.
-- Eliminated some of the error messages during kill power by not
-  doing useless things.
-- Added back code to print what is happening during kill power
-  in the USB code.
-- Corrected a few of the USB error messages that could have been
-  missleading or confusing.
-- Eliminated some inappropriate usages of size_t.
-- Integrated a number of updates into the manual, particularly from
-  Adam.
-- If the IP address is 0.0.0.0 force it to localhost in apcaccess.
-- Integrat Thomas Habets' changes to keep connect() from blocking
-  in apcnet.c so that apcupsd can service more slaves.
-- Ensure that stdin/out/err are allocated in daemon_start() of apcuspd.c
-- Update snmp.c with bug fix from Bacula.
-- Bill has made numerous changes to improve the code such as adding
-  consts where appropriate.
+@example
 
-----> Release 3.10.13 20Apr04
-- Added code to support net snmp configured with --enable-net-snmp
-  based on patch sent by Sander Siemonsma.
-- Build smtp on Unix systems.
-- Update to most current smtp and make it easier to configure
-  for apcupsd or Bacula
-- Start implementing native Win32 version.
-- Rename cmd - ups_event and cmd_msg - event_msg
-- Add user supplied code to make apcaccess read the conf file and
-  self configure to proper port. Thanks to Martin Flack for this
-  patch.
-- Start simplifying the Copyright and making the dates current.
-- Rework the net driver. It was really in poor shape.
-- Replace sprintf with asnprint. Replace strcpy with astrncpy
-- Apply a fix supplied by Jim Pick where syslog releases the
-  usb port and then re-attaches it to /dev/log.
-- I finally took a careful look at the old master/slave networking
-  code as well as ran it here, and it was sadly broken. Hopefully
-  this commit fixes the problems.    
-- Fix a few string functions using the new routines.
-- Added asys.c imported from Bacula, which contains a number of 
-  simple system routines such as astrncpy(), ...
+--- Release apcupsd-3.10.12 (xx February 2004)
+- Minor updates to the documentation from user input.
+- Fix a Makefile find that removes zero length files, which fails                 
+  on some systems.
+- Web site update.
+- Apply patch from Adam that fixes OpenBSD and FreeBSD pthreads 
+  library bugs.
+- Add poll time to SNMP driver, and correct header file prototyping.
+- Make usb driver sleep for 1 second then retry up to 10 times
+  if the device cannot be opened. There are two such loops so in
+  the event of failure, it will occur 20 seconds later. This
+  allows time for the hotplug program to initialize the USB devices
+  after a boot.
+
+--- Release apcupsd-3.10.11 (26 January 2004)
+- Correct apccontrol script to remove extra ;; that I inadvertantly
+  left the last release -- apparently that prevented proper shutdown.
+- Updates to manual as requested by Adam and other users.
+- Fix localtime_r in configure.in as reported with patch by Adam.
+- Fixed bad html in multimoncss.c reported by an anonymous user.
+- Added new Mandrake apcupsd.spec.in submitted by David Walser.
+- Revert to using the old master/slave networking code by default.
+
+--- Release apcupsd-3.10.10 (16 January 2004)
+- This version has an additional fix to the USB driver based on
+  work by Adam Kropelin -- it limits the rate at which apcupsd will
+  poll the UPS for the volatile data, which in turn reduces the possiblity
+  of flooding the kernel with control messages (hide-core.c: control
+  queue full ...".
+- I added a new "offbattery" event that is only executed if the 
+  "onbattery" event was executed. This should allow users to easily
+  control what messages they get and by using the ONBATTERYDELAY the
+  time on batteries before the onbattery event is notified.
+
+--- Release apcupsd-3.10.9 (31 December 2003)
+- Bartlomiej Krol found an unexpected interaction between the 6 second
+  "debounce" code and the new ONBATTERY delay time that caused the
+  USB and apcsmart drivers to sleep for a long time.
+
+--- Release apcupsd-3.10.8 (28 December 2003)
+- Added upsBaiscOntrolConverveBattery change to smtp requested by
+  Kastus Shchuka (kastus@@list.sourceforge.net) 
+- Move wall in killpower of apccontrol to after killpower to avoid 
+  errors stopping script.
+- Install apctest along with apcupsd.
+- Fix DISTVER for RH Enterprise
+- Added patch by Adam Kropelin that ignores invalid samples. This 
+  eliminates the need for the wait, and seems to calm the system. Apparently, 
+  even though apcupsd did not use the bad samples, it would break from the
+  wait loop, and request an update, which gave even more bad samples. With
+  Adam's patch the samples are simply dropped and we continue waiting (if 
+  appropriate).  Thanks Adam.
+- Add Slackware updated patch submitted by Andrei Mamontov
+- Corrected the missing library dependencies in src/Makefile.in
+  Thanks to Reg. Clemens for pushing me a bit on this.
+- Added usleep(10000) provided by Reg. Clemens, which resolves the
+  apcuspd USB problems on 2.6 kernels. Now removed by 19Dec03 patch.
+- Added a ONBATTERYDELAY to the conf file. This is the time in
+  seconds that apcupsd will wait after detecting a power failure
+  until it sets the onbattery state.  If you do not want to be
+  annoyed by short power outages (usually less than 10 seconds),
+  set the ONBATTERYDELAY appropriately and comment out the
+  powerout) "echo ...|wall" statement.
+- I finally got the no driver configured error. It turns out that the
+  Makefile detection of changes is all botched up. Since I don't understand
+  how the author expected it to work, I used the sledgehammer approach and
+  do a "make clean" on every ./configure.
+- Upgraded to Cygwin 1.5.5
 
 @end example
 
@@ -540,11 +496,11 @@ Start (@pxref{Quick Start for Beginners}) instructions.
 @cindex Installation, Planning
 
 @menu
-* Quick Start for Beginners::   
-* Supported Operating Systems, UPSes and Cables: Supported Operating Systems; UPSes and Cables.  
+* Quick Start for Beginners::
+* Supported Operating Systems, UPSes and Cables: Supported Operating Systems; UPSes and Cables.
 * Choosing a Configuration Type::
-* Apcupsd Known USB Issues::    
-* Checking Out Your USB Subsystem::  
+* Apcupsd Known USB Issues::
+* Checking Out Your USB Subsystem::
 @end menu
 
 @node Quick Start for Beginners, Supported Operating Systems; UPSes and Cables, , Planning Your Installation
@@ -567,21 +523,18 @@ system (@pxref{Supported Operating Systems; UPSes and Cables}).
 
 @item
 Second, plan your configuration
-type (@pxref{Choosing a Configuration Type}).  If you have just
-one UPS and one computer, this is easy.  If you have more than
-one machine being served by the same UPS, or more than one UPS
-supplying power to computers that are on the same local network,
-you have more choices to make.
+type (@pxref{Choosing a Configuration Type}).  If you have just one UPS and one computer, this is easy.
+If you have more than one machine being served by the same UPS, or
+more than one UPS supplying power to computers that are on the same
+local network, you have more choices to make.
 
 @item
-Third, figure out if you have one of the easy setups.  If you
-have a USB UPS, and a USB-capable recent Linux such as Red Hat or
-SuSE at version 8.0, and you want to use one UPS with one
-computer, that's an easy setup.  APC supplies the cable needed to
-talk with that UPS along with the UPS. All you need to do is
-check that your USB subsystem is working 
-(@pxref{Checking Out Your USB Subsystem}); if so, you can go to the 
-build and install step.
+Third, figure out if you have one of the easy setups.
+If you have a USB UPS, and a USB-capable recent Linux such as Red Hat
+or SuSE at version 8.0, and you want to use one UPS with one computer,
+that's an easy setup.  APC supplies the cable needed to talk with 
+that UPS along with the UPS. All you need to do is check that your USB subsystem is working (@pxref{Checking Out Your USB Subsystem});
+if so, you can go to the build and install step.
 
 @item
 If you have a UPS designed to communicate via SNMP
@@ -591,9 +544,8 @@ it's an unusual situation.
 
 @item
 If you have a UPS that communicates via an
-RS232C serial interface and it is a SmartUPS, then
-things are relatively simple, otherwise, your life
-is about to get interesting.
+old-fashioned RS232C serial interface, your life may be about 
+to get interesting.
 
 @enumerate 
 
@@ -612,10 +564,9 @@ iron!
 @end enumerate
 
 @item
-Now you are ready to read the Building and Installing
-(@pxref{Building and Installing apcupsd}) section of the manual
-and follow those directions.  If you are installing from an RPM
-or some other form of binary package, this step will probably
+Now you are ready to read the Building and Installing (@pxref{Building and Installing apcupsd}) section of
+the manual and follow those directions.  If you are installing from
+an RPM or some other form of binary package, this step will probably
 consist of executing a single command.
 
 @item
@@ -655,10 +606,7 @@ Read the manual sections on @uref{monitoring,monitoring} and
 @cindex OSes Supported
 
 Please note that due to the lack of Unix USB API standards,
-the USB code in apcupsd works only on Linux and *BSD systems. 
-In addition, at the current release (3.10.17) the USB support 
-for *BSD systems can at best be considered BETA due to fragile
-kernel drivers. Drivers for other
+the USB code in apcupsd works only on Linux.  Drivers for other
 OSes can be written, but it requires someone with a knowledge of
 the OS and the USB to do so.  (This lack of a Unix USB API
 interface is one of the big failings of Unix.  It occurs in other
@@ -666,15 +614,16 @@ areas such as the GUI. Many people tout the diversity as an
 advantage, but it is in fact a weakness.)
 
 The apcupsd maintainers develop it
-under Fedora (Red Hat); that port is, accordingly, the most
+under Red Hat; that port is, accordingly, the most
 up to date and best tested.  There are enough Debian Linux users that
 that port is also generally pretty fresh.  Slackware Linux is also
 fully supported.
 
-apcupsd has also been ported to FreeBSD, NetBSD, OpenBSD, HP/UX,
-Solaris, Alpha Unix and the Cygwin Unix emulation under Windows.
-It is quite likely to work on those systems, though the port may
-occasionally get stale and require minor tweaking.
+apcupsd has also been ported to
+FreeBSD, NetBSD, OpenBSD, HP/UX, Solaris, Alpha Unix and the Cygwin
+Unix emulation under Windows. It is quite likely to work on those
+systems, though the port may occasionally get stale and require minor
+tweaking.
 
 In @ref{Operating System Specifics} you'll find
 operating-system-specific tips for building and configuring
@@ -697,7 +646,7 @@ the kind of protocol it uses to talk with its computer.
 @table @asis
 
 @item apcsmart
-An APCSmart UPS and its computer also communicate through an
+An apcsmart UPS and its computer also communicate through an
 RS232C serial connection, but they actually use it as a character
 channel (2400bps, 8 data bits, 1 stop bit, no parity) and pass
 commands back and forth in a primitive language (@pxref{APC smart
@@ -738,9 +687,7 @@ A dumb or voltage-signaling UPS and its computer communicate
 through the signal lines on an RS232C serial connection.  Not much can
 actually be conveyed this way other than an order to shut down.
 Voltage-signaling UPSes are obsolete; you are unlikely to encounter
-one other than as legacy hardware. If you have a choice, we recommend
-you avoid simple signalling UPSes.
-
+one other than as legacy hardware.
 @end table
 
 The table shown below lists the APC model supported, and the possible
@@ -790,7 +737,7 @@ BackUPS CS and possibly ES models (serial mode)@tab dumb@tab 940-0128A@tab Suppo
 ShareUPS Basic Port@tab dumb@tab 940-0020B, 940-0020C, 940-0023A@tab Supported
 @end multitable
 
-@node  Choosing a Configuration Type, Apcupsd Known USB Issues, Supported Operating Systems; UPSes and Cables, Planning Your Installation
+@node Choosing a Configuration Type, Apcupsd Known USB Issues, Supported Operating Systems; UPSes and Cables, Planning Your Installation
 @cindex Choosing a Configuration Type
 @cindex Configuration Type
 
@@ -849,11 +796,10 @@ section for details.
 @cindex USB problems
 @cindex Problems, USB
 
-- @strong{Problem:} USB is only supported on Linux and *BSD systems (though
-the *BSD is still BETA). 
-Although the configuration script allows the usb driver to be
-enabled on other platforms, it will only compile and run on Linux
-and *BSD systems.
+- @strong{Problem:} USB is only supported on Linux systems (there is now an
+experimental FreeBSD USB version). Although the configuration script
+allows the usb driver to be enabled on other platforms, it will only compile
+and run on Linux.
 
 - @strong{Workaround:} Try using UPS in serial mode instead of USB.
 
@@ -877,8 +823,8 @@ CONFIG_USB_DYNAMIC_MINORS and rebuild kernel-secure.
 @strong{HID_MAX_USAGES undefined}. This is due to a defect in the linux kernel
 hiddev.h header file on 2.6.5 and higher kernels.
 
-- @strong{Workaround:} Workaround: Upgrade to apcupsd-3.10.14 or
-higher.  These versions contain a workaround for the defect.
+- @strong{Workaround:} Workaround: Upgrade to apcupsd-3.10.14 or higher. These versions
+contain a workaround for the defect.
 
 - @strong{Problem:} On some systems such as Slackware 10.0, no USB devices will
 showup (see the next section).
@@ -891,18 +837,7 @@ showup (see the next section).
  
 @end example
 
-- @strong{Problem:} 2.6 kernels use udev and does not autmatically
-create /dev/usb/hiddev?? as it should, causing apcupsd to 
-
-- @strong{Workaround:} Edit the file /etc/udev/rules.d/50-udev.rules, and
-add the following:
-@example
-KERNEL="hiddev*", NAME="usb/hiddev%n"
-@end example
-More details are provided in the following section ...
-
-
-@node Checking Out Your USB Subsystem,  , Apcupsd Known USB Issues, Planning Your Installation
+@node Checking Out Your USB Subsystem, , Apcupsd Known USB Issues, Planning Your Installation
 @section Checking Out Your USB Subsystem
 
 You can skip this section if your UPS has an Ethernet or RS232-C 
@@ -910,10 +845,6 @@ interface or you are not running on a Linux kernel.  If it has a USB
 interface, you need to make sure that your USB subsystem can see the
 UPS. On a Linux system this is easy, just do this from a shell
 prompt (please see below for 2.6 kernel considerations):
-
-Most of this section applies to Linux. However, toward the end, there
-is a list of known issues with the BSD USB driver and the associated
-kernels. 
 
 @example
 
@@ -1257,162 +1188,27 @@ Finally, check your Kernel Config. You will find more information
 about it at: @ref{Kernel Config}.
 
 
-KNOWN ISSUES WITH BSD USB
-
-The BSD USB driver for apcupsd is BETA software and has some known issues.
-
-- FreeBSD lockups: Some users have experienced lockups (apcupsd stops
-  responding) on FreeBSD systems. In at least one case this problem was worked
-  around by disabling pthreads (--disable-pthreads flag to configure). The 
-  problem seems to be caused by a FreeBSD kernel bug.
-  
-- FreeBSD kernel panics if USB cable is unplugged while apcupsd is running. 
-  This is another kernel bug and is most easily worked around by not hot-
-  unplugging the UPS while apcupsd is running.
-
-
-PLATFORMS & VERSIONS
-
-The new (beta) FreeBSD USB driver supports FreeBSD, OpenBSD and NetBSD. (Thanks
-go to the *BSD developers who kept a nearly identical interface across all
-three platforms.)
-
-The driver has been tested with the following platform versions:
-
-@example
-FreeBSD-5.3     (Primary development platform)
-FreeBSD-4.11
-NetBSD-2.0
-NetBSD-1.6.2
-OpenBSD-3.6
-@end example
-
-FreeBSD-5.3 has had the most testing since it is the primary platform on which
-the driver is developed. The other platforms and versions have had somewhat 
-less testing. The only architecture tested so far (on any platform) is i386, 
-althought there is no reason to think it will not work on other archs. If you
-run the driver on a new platform version or architecture, please report your
-experience to the apcupsd-users mailing list.
-
-
-KERNEL CONFIGURATION
-
-You will need to rebuild your kernel in order to disable the uhid driver. uhid
-is not sufficient for apcupsd at this time and we need to prevent it from
-grabbing the UPS device. You should disable the following devices in your
-kernel config file (comment them out):
-
-FreeBSD (you WILL NOT lose use of USB keyboard and mouse):
-    uhid
-
-NetBSD (you WILL lose use of USB keyboard and mouse):
-    uhidev, ums, wsmouse, ukbd, wskbd, uhid
-
-OpenBSD (you WILL lose use of USB keyboard and mouse):
-    uhidev, ums, wsmouse, ukbd, wskbd, uhid
-
-
-For detailed information on rebuilding your kernel, consult these references:
-
-@example
-FreeBSD:
-http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/kernelconfig.html
-
-NetBSD:
-http://www.netbsd.org/guide/en/chap-kernel.html
-
-OpenBSD:
-http://www.openbsd.org/faq/faq5.html#Building
-@end example
-
-
-CHECKING UPS IS RECOGNIZED BY THE KERNEL
-
-After building a properly configured kernel, reboot into that kernel and plug in
-your UPS USB cable. You should see a dmesg log message like the following:
-
-ugen0: American Power Conversion Back-UPS RS 1500 FW:8.g6 .D USB FW:g6, rev 1.10/1.06, addr 2
-
-Note that the "ugen" driver is called out. If you see "uhid" instead, it 
-probably means you did not properly disable the uhid driver when you compiled 
-your kernel or perhaps you're not running the new kernel.
-
-You can also check with 'usbdevs -d' to get a list of USB devices recognized by
-the system as well as the drivers they are associated with. For example:
-
-@example
-# usbdevs -d
-addr 1: UHCI root hub, VIA
-  uhub0
- addr 2: Back-UPS RS 1500 FW:8.g6 .D USB FW:g6, American Power Conversion
-   ugen0
-@end example
-
-
-MAKING DEVICE NODES
-
-Apcupsd communicates with the UPS through the USB generic device, ugen.
-You may or may not need to manually make ugen device nodes in /dev, depending
-on what OS you are using.
-
-FreeBSD: No manual intervention needed. FreeBSD automatically creates the ugen
-nodes on demand.
-
-NetBSD: By default, NetBSD only creates nodes for the first ugen device, ugen0.
-Check 'usbdevs -d' to see which device your UPS was bound to and then create
-the appropriate nodes by running 'cd /dev ; ./MAKEDEV ugenN', where ugenN is
-the ugen device name shown by usbdevs. It is probably a good idea to create
-several sets of ugen nodes in case you add more USB devices.
-
-OpenBSD: Similar to NetBSD, OpenBSD creates nodes for ugen0 and ugen1. Check
-'usbdevs -d' to see which device your UPS was bound to and then create the
-appropriate nodes by running 'cd /dev ; ./MAKEDEV ugenN', where ugenN is the
-ugen device name shown by usbdevs. It is probably a good idea to create several
-sets of ugen nodes in case you add more USB devices.
-
-
-APCUPSD CONFIGURATION
-
-Apcupsd must be built with USB support, which is accomplished via the
---enable-usb switch to configure.
-
-Your apcupsd.conf file needs the following hardware-related settings:
-
-@example
-UPSCABLE usb
-UPSTYPE usb
-DEVICE
-@end example
-
-The DEVICE setting is blank on purpose; apcupsd will automatically locate your
-UPS.
-
-The  delay-, timeout-, and NIS-related settings should be configured as per
-your usual preference.
-
-
-
 @node Building and Installing apcupsd, After Installation, Planning Your Installation, Basic User's Guide
 @chapter Building and Installing apcupsd
 @cindex Building
 @cindex Installing
 
 @menu
-* Installation from Binary Packages::  
-* Installation from Source::    
-* Verifying a Source Installation::  
-* Configure Options::           
-* Recommended Options for most Systems::  
-* Compilers and Options::       
-* Operating System Specifics::  
+* Installation from Binary Packages::
+* Installation from Source::
+* Verifying a Source Installation::
+* Configure Options::
+* Recommended Options for most Systems::
+* Compilers and Options::
+* Operating System Specifics::
 @end menu
 
 @node Installation from Binary Packages, Installation from Source, , Building and Installing apcupsd
 @section Installation from Binary Packages
 
 @menu
-* Red Hat Linux::               
-* Microsoft Windows::           
+* Red Hat Linux::
+* Microsoft Windows::
 @end menu
 
 @node Red Hat Linux, Microsoft Windows, , Installation from Binary Packages
@@ -1444,7 +1240,7 @@ actually use them, you must copy or move them to your actual cgi-bin
 directory, which on many systems is located in
 @file{/home/httpd/cgi-bin}.
 
-@node Microsoft Windows,  , Red Hat Linux, Installation from Binary Packages
+@node Microsoft Windows, , Red Hat Linux, Installation from Binary Packages
 @subsection Microsoft Windows
 @cindex Installing, Microsoft
 
@@ -1543,6 +1339,7 @@ look like the following:
 
 CFLAGS="-g -O2" LDFLAGS="-g" ./configure \
   --enable-usb \
+  --with-serial-dev=/dev/usb/hiddev[0-15] \
   --with-upstype=usb \
   --with-upscable=usb \
   --prefix=/usr \
@@ -1554,6 +1351,17 @@ CFLAGS="-g -O2" LDFLAGS="-g" ./configure \
   --enable-pthreads \
   --enable-powerflute
 @end example
+
+On other Linux systems, the @code{--with-serial-dev}
+may need to be @file{/dev/usb/hid/hiddev[0-15]}.
+The @strong{[0-15]} is not a typo, but should
+be entered exactly as shown. This is because the UPS can change device
+numbers while it is running. Every time there is a blip or slowdown on
+the USB line, the kernel will invalidate the UPS connection, then a
+few moments later, it will reconnect but with a different device
+number. Not very Unix-like, but that is what happens. This bizarre
+syntax allows apcupsd to try a range of
+devices until it finds or re-finds the UPS device.
 
 By default, @code{make install} will install the
 executable files in @file{/sbin}, the manuals in
@@ -1958,7 +1766,7 @@ You can get a listing of all available options by doing:
 
 or simply see the previous section of this manual.
 
-@node Operating System Specifics,  , Compilers and Options, Building and Installing apcupsd
+@node Operating System Specifics, , Compilers and Options, Building and Installing apcupsd
 @section Operating System Specifics
 @cindex OSes
 
@@ -2015,18 +1823,18 @@ Win32 (@pxref{Windows Systems with CYGWIN Installed})
 @end itemize
 
 @menu
-* Alpha::                       
-* Debian::                      
-* FreeBSD::                     
-* HPUX::                        
-* NetBSD::                      
-* OpenBSD::                     
-* Red Hat Systems::             
-* Slackware::                   
-* SUSE::                        
-* Sun Solaris::                 
-* Unknown System::              
-* Windows Systems with CYGWIN Installed::  
+* Alpha::
+* Debian::
+* FreeBSD::
+* HPUX::
+* NetBSD::
+* OpenBSD::
+* Red Hat Systems::
+* Slackware::
+* SUSE::
+* Sun Solaris::
+* Unknown System::
+* Windows Systems with CYGWIN Installed::
 @end menu
 
 @node Alpha, Debian, , Operating System Specifics
@@ -2458,7 +2266,7 @@ contains a hint file for @emph{Linux From
 Scratch}, which could be helpful for other systems as
 well.
 
-@node Windows Systems with CYGWIN Installed,  , Unknown System, Operating System Specifics
+@node Windows Systems with CYGWIN Installed, , Unknown System, Operating System Specifics
 @subsection Windows Systems with CYGWIN Installed
 @cindex Windows
 @cindex OS, Windows
@@ -2515,9 +2323,9 @@ part that describes unZipping the binary release.
 @cindex Installation, After installing
 
 @menu
-* Checking Your Configuration File::  
-* Arranging for Reboot on Power-Up::  
-* Making sure apcupsd Is Running::  
+* Checking Your Configuration File::
+* Arranging for Reboot on Power-Up::
+* Making sure apcupsd Is Running::
 @end menu
 
 @node Checking Your Configuration File, Arranging for Reboot on Power-Up, , After Installation
@@ -2550,7 +2358,7 @@ will search all the standard locations for the UPS. You
 may also explicitly specify the device location as
 either @file{/dev/usb/hid/hiddev[0-15]} (on non-Red-Hat
 systems) or @file{/dev/usb/hiddev[0-15]} (on Red Hat
-systems), but this is not recommended.
+systems).
 
 Note that you should enter "/dev/usb/hiddev[0-15]" literally
 as shown.  The "[0-15]" expression tells apcupsd to search all
@@ -2558,8 +2366,7 @@ hiddev devices until it finds a UPS. You can restrict the search to a
 subset of devices by using something like "[0-4]", but keep in
 mind this will limit apcupsd's ability to locate the UPS if the kernel
 relocates it to a different device node, which happens occasionally during
-short power failures. Again, it is highly recommended to leave the
-DEVICE directive blank and let apcupsd find your device automatically.
+short power failures.
 
 If the first time you execute apcupsd, you get
 a message to the effect that the Apcupsd USB driver is missing, it means
@@ -2623,7 +2430,7 @@ computer from restarting when the power returns. As already mentioned,
 this should not apply, but in case of problems it is worth a
 try.
 
-@node Making sure apcupsd Is Running,  , Arranging for Reboot on Power-Up, After Installation
+@node Making sure apcupsd Is Running, , Arranging for Reboot on Power-Up, After Installation
 @section Making sure apcupsd Is Running
 @cindex Checking running
 
@@ -2709,13 +2516,13 @@ properly.
 @cindex Examples, Configuration
 
 @menu
-* A Simple USB Configuration::  
-* A Simple Configuration for a SmartUPS::  
-* A Simple Configuration for a Simple Signaling or Dumb::  
-* A Simple Master Configuration::  
-* A Simple Slave Configuration::  
-* Variation on the Master/Slave Configuration::  
-* A Sample NIS Slave Configuration Using the Net Driver::  
+* A Simple USB Configuration::
+* A Simple Configuration for a SmartUPS::
+* A Simple Configuration for a Simple Signaling or Dumb::
+* A Simple Master Configuration::
+* A Simple Slave Configuration::
+* Variation on the Master/Slave Configuration::
+* A Sample NIS Slave Configuration Using the Net Driver::
 @end menu
 
 @node A Simple USB Configuration, A Simple Configuration for a SmartUPS, , Configuration Examples
@@ -2740,36 +2547,38 @@ UPSMODE disable
 @end example
 
 Notice that we have not specified a device. In doing so, apcupsd
-will try all the well known USB ports. We strongly recommend
-you use this (empty device address) form unless you have
-a good reason to do otherwise.
-
-An alternate way of specifying the device is to specify
-a range of device addressess as follows:
-@example
-DEVICE /dev/usb/hid/hiddev[0-15]
-@end example
+will try all the well known USB ports.
 
 If you have more than one device,
-you may need to specify each device individually using
-absolute device paths. This is not, however, recommended.
+you will need to specify each one individually. If you have a
+RedHat system, and know what you are doing,
+you may want a DEVICE specification as follows:
 
 @example
-DEVICE /dev/usb/hiddev0
+
+DEVICE /dev/usb/hiddev[0-15]
+@end example
+
+If you have used the @strong{make-hiddev} that is in the
+@strong{examples} directory of the source, you will want to specify
+a DEVICE as follows:
+
+@example
+
+DEVICE /dev/usb/hid/hiddev[0-15]
 @end example
 
 Please use the explicit specifications of a device only if
 your know exactly what you are doing. In general, it is much easier
 to let apcupsd find the device itself.
 
-If you use the range specification, 
-you should enter @strong{/dev/usb/hiddev[0-15]}
+You should enter @strong{/dev/usb/hiddev[0-15]}
 literally as shown.  The "[0-15]" expression tells
 apcupsd to search all hiddev devices until it finds a UPS. You
 can restrict the search to a subset of devices by using something
 like "[0-4]", but keep in mind this will limit
 apcupsd's ability to locate the UPS if the kernel relocates it to
-a different device node.
+a differentdevice node.
 
 On Debian systems, the @strong{hiddev} devices are not automatically defined.   
 As a consequence, you will need to run the @strong{make-hiddev} script in
@@ -2937,7 +2746,7 @@ configuration files shown above.  The only difference is where
 the slave actually receives its power.  In effect, apcupsd does
 not know or care where the power really comes from.
 
-@node A Sample NIS Slave Configuration Using the Net Driver,  , Variation on the Master/Slave Configuration, Configuration Examples
+@node A Sample NIS Slave Configuration Using the Net Driver, , Variation on the Master/Slave Configuration, Configuration Examples
 @section A Sample NIS Slave Configuration Using the Net Driver
 @cindex Example, NIS slave
 @cindex NIS slave conf
@@ -3056,15 +2865,15 @@ different, and you should see the section on Testing Serial UPSes
 (@pxref{Testing Serial-Line UPSes}).
 
 @menu
-* Process-Status Test::         
-* Logging Test::                
-* apcaccess Test::              
-* Communications Test::         
-* Simulated Power Fail Test::   
-* System Shutdown Test::        
-* Full Power Down Test::        
-* Shutdown Sequence::           
-* apctest::                     
+* Process-Status Test::
+* Logging Test::
+* apcaccess Test::
+* Communications Test::
+* Simulated Power Fail Test::
+* System Shutdown Test::
+* Full Power Down Test::
+* Shutdown Sequence::
+* apctest::
 @end menu
 
 @node Process-Status Test, Logging Test, , Testing Apcupsd
@@ -3615,7 +3424,7 @@ exactly what is going on during the shutdown process. If so, please
 see the Shutdown Sequence (@pxref{Shutdown Sequence <1>}) section of
 this manual.
 
-@node apctest,  , Shutdown Sequence, Testing Apcupsd
+@node apctest, , Shutdown Sequence, Testing Apcupsd
 @section apctest
 @cindex apctest
 
@@ -3730,18 +3539,18 @@ Item 7 will terminate apctest.
 @cindex Problems
 
 @menu
-* Known Problems with USB UPSes::  
+* Known Problems with USB UPSes::
 @end menu
 
-@node Known Problems with USB UPSes,  , , Troubleshooting Your Installation
+@node Known Problems with USB UPSes, , , Troubleshooting Your Installation
 @section Known Problems with USB UPSes
 @cindex Problems, USB
 
 @menu
-* Some Cheaper Models Do Not Have Battery Charge::  
-* Reconnection does not clean up the lockfile::  
-* Power Off (killpower) of UPS Does Not Work: Power Off [killpower] of UPS Does Not Work.  
-* apcupsd Cannot Reconnect After a Reboot::  
+* Some Cheaper Models Do Not Have Battery Charge::
+* Reconnection does not clean up the lockfile::
+* Power Off (killpower) of UPS Does Not Work: Power Off [killpower] of UPS Does Not Work.
+* apcupsd Cannot Reconnect After a Reboot::
 @end menu
 
 @node Some Cheaper Models Do Not Have Battery Charge, Reconnection does not clean up the lockfile, , Known Problems with USB UPSes
@@ -3778,7 +3587,7 @@ only if you have a Linux kernel version 2.4.22 or greater, or
 you have applied the patches in the examples directory to your
 kernel.
 
-@node apcupsd Cannot Reconnect After a Reboot,  , Power Off [killpower] of UPS Does Not Work, Known Problems with USB UPSes
+@node apcupsd Cannot Reconnect After a Reboot, , Power Off [killpower] of UPS Does Not Work, Known Problems with USB UPSes
 @subsection apcupsd Cannot Reconnect After a Reboot
 @cindex Problems, reconnect
 
@@ -3835,12 +3644,12 @@ apctest to tune some parameters of the UPS
 itself.
 
 @menu
-* apcaccess::                   
-* Apcupsd Notification and Events::  
-* hid-ups and USB Specific Information::  
-* apcupsd Network Monitoring (CGI) Programs: apcupsd Network Monitoring [CGI] Programs.  
-* Setting up and Testing the CGI Programs::  
-* Configuring Your EEPROM::     
+* apcaccess::
+* Apcupsd Notification and Events::
+* hid-ups and USB Specific Information::
+* apcupsd Network Monitoring (CGI) Programs: apcupsd Network Monitoring [CGI] Programs.
+* Setting up and Testing the CGI Programs::
+* Configuring Your EEPROM::
 @end menu
 
 @node apcaccess, Apcupsd Notification and Events, , Monitoring and Tuning your UPS
@@ -3880,8 +3689,8 @@ NISPORT 3551
 in your @strong{apcupsd.conf} file.
 
 @menu
-* apcaccess status::            
-* apcaccess eprom::             
+* apcaccess status::
+* apcaccess eprom::
 @end menu
 
 @node apcaccess status, apcaccess eprom, , apcaccess
@@ -4003,7 +3812,7 @@ LOADPCT will display when the UPS is on batteries.  You must remember that the
 non-SmartUPSes are much simpler (and less expensive) and therefore produce 
 less information.
 
-@node apcaccess eprom,  , apcaccess status, apcaccess
+@node apcaccess eprom, , apcaccess status, apcaccess
 @subsection apcaccess eprom
 @cindex apcaccess eeprom
 @cindex eeprom, apcaccess
@@ -4118,16 +3927,16 @@ produce the bar charts.
 @cindex Testing CGI programs
 
 @menu
-* Network Information Server (NIS): Network Information Server [NIS].  
-* multimon.cgi: multimon_cgi.   
-* upsstats.cgi: upsstats_cgi.   
-* ./upsstats.cgi: _/upsstats_cgi.  
-* upsfstatus.cgi: upsfstatus_cgi.  
-* Working Example::             
-* Client Test Program::         
-* A Tip from Carl Erhorn for Sun Systems::  
-* Credits::                     
-* Security Issues::             
+* Network Information Server (NIS): Network Information Server [NIS].
+* multimon.cgi: multimon_cgi.
+* upsstats.cgi: upsstats_cgi.
+* ./upsstats.cgi: _/upsstats_cgi.
+* upsfstatus.cgi: upsfstatus_cgi.
+* Working Example::
+* Client Test Program::
+* A Tip from Carl Erhorn for Sun Systems::
+* Credits::
+* Security Issues::
 @end menu
 
 @node Network Information Server [NIS], multimon_cgi, , Setting up and Testing the CGI Programs
@@ -4456,7 +4265,7 @@ program to work with apcupsd.
 We have enhanced the bar graph program and hope that our changes
 can be useful to the original author in his project.
 
-@node Security Issues,  , Credits, Setting up and Testing the CGI Programs
+@node Security Issues, , Credits, Setting up and Testing the CGI Programs
 @subsection Security Issues
 
 @itemize 
@@ -4490,10 +4299,10 @@ configuration file.
 @end itemize
 
 @menu
-* TCP Wrappers::                
+* TCP Wrappers::
 @end menu
 
-@node TCP Wrappers,  , , Security Issues
+@node TCP Wrappers, , , Security Issues
 @subsubsection TCP Wrappers
 @cindex Wrappers, TCP
 @cindex TCP wrappers
@@ -4507,7 +4316,7 @@ code). This control is done by modifying the file:
 @file{/etc/hosts.allow}. This code is implemented but
 untested. If you use it, please send us some feedback.
 
-@node Configuring Your EEPROM,  , Setting up and Testing the CGI Programs, Monitoring and Tuning your UPS
+@node Configuring Your EEPROM, , Setting up and Testing the CGI Programs, Monitoring and Tuning your UPS
 @section Configuring Your EEPROM
 @cindex eeprom, configuring
 @cindex Configuring, eeprom
@@ -4528,8 +4337,8 @@ recommend connecting your UPS to a Windows or NT machine running
 PowerChute and making the changes.
 
 @menu
-* apcupsd No Longer Configures EEPROM::  
-* Using apctest to Configure Your EEPROM::  
+* apcupsd No Longer Configures EEPROM::
+* Using apctest to Configure Your EEPROM::
 @end menu
 
 @node apcupsd No Longer Configures EEPROM, Using apctest to Configure Your EEPROM, , Configuring Your EEPROM
@@ -4580,7 +4389,7 @@ Self test interval       SELFTEST      336      336 168 ON  OFF
 where the Current Value will depend on how your UPS is configured,
 and the Permitted Values will depend on what UPS model you have.
 
-@node Using apctest to Configure Your EEPROM,  , apcupsd No Longer Configures EEPROM, Configuring Your EEPROM
+@node Using apctest to Configure Your EEPROM, , apcupsd No Longer Configures EEPROM, Configuring Your EEPROM
 @subsection Using apctest to Configure Your EEPROM
 @cindex eeprom, apctest
 @cindex apctest setting eeprom
@@ -4733,8 +4542,8 @@ is accurate.  Take care not to discharge your battery too much as it
 tends to shorten the battery life.
 
 @menu
-* What Various People Have to Say about Batteries::  
-* Where Carl Suggests You Get Batteries::  
+* What Various People Have to Say about Batteries::
+* Where Carl Suggests You Get Batteries::
 @end menu
 
 @node What Various People Have to Say about Batteries, Where Carl Suggests You Get Batteries, , Maintaining Your UPS
@@ -5034,7 +4843,7 @@ Regards,
 --Carl
 @end quotation
 
-@node Where Carl Suggests You Get Batteries,  , What Various People Have to Say about Batteries, Maintaining Your UPS
+@node Where Carl Suggests You Get Batteries, , What Various People Have to Say about Batteries, Maintaining Your UPS
 @section Where Carl Suggests You Get Batteries
 @cindex Batteries
 
@@ -5570,10 +5379,10 @@ always 0.
 @end table
 
 @menu
-* apccontrol Command Line Options::  
+* apccontrol Command Line Options::
 @end menu
 
-@node apccontrol Command Line Options,  , , Customizing Event Handling
+@node apccontrol Command Line Options, , , Customizing Event Handling
 @section apccontrol Command Line Options
 
 apccontrol accepts the following
@@ -5808,9 +5617,9 @@ If a picture is worth a thousand words for you, please see
 @ref{Configuration types_,,Configuration types.}.
 
 @menu
-* Configuration Directives::    
-* Master/Slave Problems::       
-* Network Problems with Master/Slave or Server/Slave Configurations::  
+* Configuration Directives::
+* Master/Slave Problems::
+* Network Problems with Master/Slave or Server/Slave Configurations::
 @end menu
 
 @node Configuration Directives, Master/Slave Problems, , Master/Slave Configurations
@@ -5842,8 +5651,8 @@ found in the @file{<src>/examples} directory
 @cindex Problems, Master/slave
 
 @menu
-* Master/Slave Shutdown::       
-* Server/Slave Networking using NIS and the NET Driver::  
+* Master/Slave Shutdown::
+* Server/Slave Networking using NIS and the NET Driver::
 @end menu
 
 @node Master/Slave Shutdown, Server/Slave Networking using NIS and the NET Driver, , Master/Slave Problems
@@ -5854,7 +5663,7 @@ configuration, please see the Master/Slave Shutdown
 section of the Shutdown chapter (@pxref{Shutdown Sequence <1>}) of 
 the Technical Reference.
 
-@node Server/Slave Networking using NIS and the NET Driver,  , Master/Slave Shutdown, Master/Slave Problems
+@node Server/Slave Networking using NIS and the NET Driver, , Master/Slave Shutdown, Master/Slave Problems
 @subsection Server/Slave Networking using NIS and the NET Driver
 @cindex NIS networking
 @cindex Net driver
@@ -5914,7 +5723,7 @@ UPSMODE disable
 NETTIME 30
 @end example
 
-@node Network Problems with Master/Slave or Server/Slave Configurations,  , Master/Slave Problems, Master/Slave Configurations
+@node Network Problems with Master/Slave or Server/Slave Configurations, , Master/Slave Problems, Master/Slave Configurations
 @section Network Problems with Master/Slave or Server/Slave Configurations
 @cindex Problems, Master/Slave
 @cindex Problems, networking
@@ -5935,9 +5744,9 @@ need to use fully qualified names (host.domain.xxx) rather than simple
 host names.
 
 @menu
-* Error Messages from a Master Configuration::  
-* Error Messages from a Slave Configuration::  
-* Master/Slave Connection Not Working::  
+* Error Messages from a Master Configuration::
+* Error Messages from a Slave Configuration::
+* Master/Slave Connection Not Working::
 @end menu
 
 @node Error Messages from a Master Configuration, Error Messages from a Slave Configuration, , Network Problems with Master/Slave or Server/Slave Configurations
@@ -5948,12 +5757,12 @@ messages from a master. The error message is followed by a possible
 explanation:
 
 @menu
-* Cannot resolve slave name XXX::  
-* Got slave shutdown from SSS::  
-* Cannot write to slave SSS::   
-* Cannot read magic from slave SSS::  
-* Connect to slave SSS failed::  
-* Cannot open stream socket::   
+* Cannot resolve slave name XXX::
+* Got slave shutdown from SSS::
+* Cannot write to slave SSS::
+* Cannot read magic from slave SSS::
+* Connect to slave SSS failed::
+* Cannot open stream socket::
 @end menu
 
 @node Cannot resolve slave name XXX, Got slave shutdown from SSS, , Error Messages from a Master Configuration
@@ -6001,7 +5810,7 @@ later. If the problem is persistent, it can indicate a network problem
 or the slave name on the SLAVE directive of the master's configuration
 file is incorrect.
 
-@node Cannot open stream socket,  , Connect to slave SSS failed, Error Messages from a Master Configuration
+@node Cannot open stream socket, , Connect to slave SSS failed, Error Messages from a Master Configuration
 @subsubsection Cannot open stream socket
 
 This indicates a fundamental networking problem on your system ---
@@ -6016,13 +5825,13 @@ messages from a slave. The error message is followed by a possible
 explanation:
 
 @menu
-* Cannot resolve master name MMM::  
-* Cannot bind local address, probably already in use: Cannot bind local address; probably already in use.  
-* Socket accept error::         
-* Unauthorized attempt from master MMM::  
-* Read failure from socket::    
-* Bad APC magic from master; MMM::  
-* Bad user magic from master; MMM::  
+* Cannot resolve master name MMM::
+* Cannot bind local address, probably already in use: Cannot bind local address; probably already in use.
+* Socket accept error::
+* Unauthorized attempt from master MMM::
+* Read failure from socket::
+* Bad APC magic from master; MMM::
+* Bad user magic from master; MMM::
 @end menu
 
 @node Cannot resolve master name MMM, Cannot bind local address; probably already in use, , Error Messages from a Slave Configuration
@@ -6083,7 +5892,7 @@ ensure that you are running the same version of
 apcupsd on all your master and
 slaves.
 
-@node Bad user magic from master; MMM,  , Bad APC magic from master; MMM, Error Messages from a Slave Configuration
+@node Bad user magic from master; MMM, , Bad APC magic from master; MMM, Error Messages from a Slave Configuration
 @subsubsection Bad user magic from master: MMM
 
 This message indicates that the master and slave have previously
@@ -6093,7 +5902,7 @@ slave expects. This problem is probably due to a network error or
 some other user or machine contacting the slave on the network
 port.
 
-@node Master/Slave Connection Not Working,  , Error Messages from a Slave Configuration, Network Problems with Master/Slave or Server/Slave Configurations
+@node Master/Slave Connection Not Working, , Error Messages from a Slave Configuration, Network Problems with Master/Slave or Server/Slave Configurations
 @subsection Master/Slave Connection Not Working
 
 Master/slave problems are usually related to one of the following
@@ -6129,10 +5938,10 @@ apcupsd for each UPS to be
 controlled (recall the @ref{Configuration types_,,Configuration types.}).
 
 @menu
-* Configuration::               
+* Configuration::
 @end menu
 
-@node Configuration,  , , Controlling Multiple UPSes on one Machine
+@node Configuration, , , Controlling Multiple UPSes on one Machine
 @section Configuration
 
 The way to accomplish the above is to ensure that none of the
@@ -6141,9 +5950,9 @@ apcupsd are the same. By using suitable
 configuration options, this is possible.
 
 @menu
-* The First Copy of apcupsd::   
-* The Second Copy of apcupsd::  
-* Important Steps after Installation of the Second Copy::  
+* The First Copy of apcupsd::
+* The Second Copy of apcupsd::
+* Important Steps after Installation of the Second Copy::
 @end menu
 
 @node The First Copy of apcupsd, The Second Copy of apcupsd, , Configuration
@@ -6210,7 +6019,7 @@ prevents @code{make install} from doing the final system
 installation (i.e. the modification of the halt script) since this
 was previously done.
 
-@node Important Steps after Installation of the Second Copy,  , The Second Copy of apcupsd, Configuration
+@node Important Steps after Installation of the Second Copy, , The Second Copy of apcupsd, Configuration
 @subsection Important Steps after Installation of the Second Copy
 
 After the @code{make install} of the second copy of
@@ -6268,10 +6077,10 @@ apcupsd version 3.10.0 or higher
 @end itemize
 
 @menu
-* Connecting an SNMP UPS::      
-* Building and Installing apcupsd: Building and Installing apcupsd <1>.  
-* SNMP Specific Information::   
-* Known Problems::              
+* Connecting an SNMP UPS::
+* Building and Installing apcupsd: Building and Installing apcupsd <1>.
+* SNMP Specific Information::
+* Known Problems::
 @end menu
 
 @node Connecting an SNMP UPS, Building and Installing apcupsd <1>, , Support for SNMP UPSes
@@ -6338,7 +6147,7 @@ smart cable. This is not a problem as the most useful information
 is given, together with a number of secondary parameters that are
 informative enough to run safely your UPS.
 
-@node Known Problems,  , SNMP Specific Information, Support for SNMP UPSes
+@node Known Problems, , SNMP Specific Information, Support for SNMP UPSes
 @section Known Problems
 
 Currently (as of 3.10.0) the code to power off the UPS needs
@@ -6400,9 +6209,9 @@ recommend option 3 unless you have specific reasons to do
 otherwise. Option 3 is what is configured in by default.
 
 @menu
-* Running the server as a child of apcupsd::  
-* Running apcnisd from INETD::  
-* Running apcnisd Standalome::  
+* Running the server as a child of apcupsd::
+* Running apcnisd from INETD::
+* Running apcnisd Standalome::
 @end menu
 
 @node Running the server as a child of apcupsd, Running apcnisd from INETD, , Alternate Ways To Run The Network Information Server
@@ -6514,7 +6323,7 @@ At this point, when a client attempts to make a connection on
 port 3551, INETD will automatically invoke
 apcnisd.
 
-@node Running apcnisd Standalome,  , Running apcnisd from INETD, Alternate Ways To Run The Network Information Server
+@node Running apcnisd Standalome, , Running apcnisd from INETD, Alternate Ways To Run The Network Information Server
 @section Running apcnisd Standalome
 
 This is probably the least desirable of the three ways to run an
@@ -6559,9 +6368,9 @@ with prior versions is still done to a file, and @strong{EVENTS} logging can be 
 information server.
 
 @menu
-* Logging Types::               
-* Implementation Details::      
-* Developers Notes::            
+* Logging Types::
+* Implementation Details::
+* Developers Notes::
 @end menu
 
 @node Logging Types, Implementation Details, , apcupsd System Logging
@@ -6692,7 +6501,7 @@ local0.warn                            /var/log/apcupsd.events
 local0.warn                            /var/log/messages
 @end example
 
-@node Developers Notes,  , Implementation Details, apcupsd System Logging
+@node Developers Notes, , Implementation Details, apcupsd System Logging
 @section Developers Notes
 @cindex Developers Notes
 
@@ -6741,19 +6550,19 @@ operating system when the system is booted, and runs in the background
 even if there is no user logged into the system.
 
 @menu
-* Installation::                
-* Installation Directory::      
-* Testing::                     
-* Upgrading::                   
-* Post Installation::           
-* Problem Areas::               
-* Utility Functions::           
-* Disclaimer::                  
-* Email Notification of Events::  
-* Killpower under Windows::     
-* Power Down During Shutdown::  
-* Command Line Options Specific to the Windows Version::  
-* Building the Win32 Version from the Source::  
+* Installation::
+* Installation Directory::
+* Testing::
+* Upgrading::
+* Post Installation::
+* Problem Areas::
+* Utility Functions::
+* Disclaimer::
+* Email Notification of Events::
+* Killpower under Windows::
+* Power Down During Shutdown::
+* Command Line Options Specific to the Windows Version::
+* Building the Win32 Version from the Source::
 @end menu
 
 @node Installation, Installation Directory, , The Windows Version of apcupsd
@@ -7338,7 +7147,7 @@ by the system automatically once apcupsd is installed.
 However, you may note these options in some of the .pif files that
 have been created for your use.
 
-@node Building the Win32 Version from the Source,  , Command Line Options Specific to the Windows Version, The Windows Version of apcupsd
+@node Building the Win32 Version from the Source, , Command Line Options Specific to the Windows Version, The Windows Version of apcupsd
 @section Building the Win32 Version from the Source
 @cindex Windows, Building
 @cindex Building, Windows
@@ -7453,19 +7262,19 @@ with a RJ45 connector, you can build your own
 @emph{Custom-RJ45} cable.
 
 @menu
-* Smart-Custom Cable for SmartUPSes::  
-* Smart Signalling Cable for BackUPS CS Models::  
-* Voltage-Signalling Cable for "dumb" UPSes::  
-* Other APC Cables that apcupsd Supports::  
-* Voltage Signalling Features Supported by Apcupsd for Various Cables::  
-* Voltage Signalling::          
-* The Back-UPS Office 500 signals::  
-* Analyses of APC Cables::      
-* Win32 Implementation Restrictions for Simple UPSes::  
-* Internal Apcupsd Actions for Simple Cables::  
-* RS232 Wiring and Signal Conventions::  
-* Pin Assignment for the Serial Port (RS-232C), 25-pin and 9-pin, Female End: Pin Assignment for the Serial Port [RS-232C]; 25-pin and 9-pin; Female End.  
-* Ioctl to RS232 Correspondence::  
+* Smart-Custom Cable for SmartUPSes::
+* Smart Signalling Cable for BackUPS CS Models::
+* Voltage-Signalling Cable for "dumb" UPSes::
+* Other APC Cables that apcupsd Supports::
+* Voltage Signalling Features Supported by Apcupsd for Various Cables::
+* Voltage Signalling::
+* The Back-UPS Office 500 signals::
+* Analyses of APC Cables::
+* Win32 Implementation Restrictions for Simple UPSes::
+* Internal Apcupsd Actions for Simple Cables::
+* RS232 Wiring and Signal Conventions::
+* Pin Assignment for the Serial Port (RS-232C), 25-pin and 9-pin, Female End: Pin Assignment for the Serial Port [RS-232C]; 25-pin and 9-pin; Female End.
+* Ioctl to RS232 Correspondence::
 @end menu
 
 @node Smart-Custom Cable for SmartUPSes, Smart Signalling Cable for BackUPS CS Models, , Cables
@@ -7879,14 +7688,14 @@ It appears that the signals work as follows:
 @cindex Cables
 
 @menu
-* 940-0020B Cable Wiring::      
-* 940-0020C Cable Wiring::      
-* 940-0023A Cable Wiring::      
-* 940-0095A Cable Wiring::      
-* 940-0095B Cable Wiring::      
-* 940-0119A Cable Wiring::      
-* BackOffice ES::               
-* BackUPS ES and CS in Serial mode with Cable 940-0128A::  
+* 940-0020B Cable Wiring::
+* 940-0020C Cable Wiring::
+* 940-0023A Cable Wiring::
+* 940-0095A Cable Wiring::
+* 940-0095B Cable Wiring::
+* 940-0119A Cable Wiring::
+* BackOffice ES::
+* BackUPS ES and CS in Serial mode with Cable 940-0128A::
 @end menu
 
 @node 940-0020B Cable Wiring, 940-0020C Cable Wiring, , Analyses of APC Cables
@@ -8150,7 +7959,7 @@ pin    signal      pin
 
 @end example
 
-@node BackUPS ES and CS in Serial mode with Cable 940-0128A,  , BackOffice ES, Analyses of APC Cables
+@node BackUPS ES and CS in Serial mode with Cable 940-0128A, , BackOffice ES, Analyses of APC Cables
 @subsection BackUPS ES and CS in Serial mode with Cable 940-0128A
 @cindex BackUPS ES
 @cindex Cables
@@ -8470,7 +8279,7 @@ male end is the same, but looking from inside the cable.
  DCD : DCE announces that a connection is established
 @end example
 
-@node Ioctl to RS232 Correspondence,  , Pin Assignment for the Serial Port [RS-232C]; 25-pin and 9-pin; Female End, Cables
+@node Ioctl to RS232 Correspondence, , Pin Assignment for the Serial Port [RS-232C]; 25-pin and 9-pin; Female End, Cables
 @section Ioctl to RS232 Correspondence
 @cindex Cables
 
@@ -8532,8 +8341,8 @@ detect the low battery condition.  For more details please see
 @ref{Voltage Signalling Features Supported by Apcupsd for Various Cables}.
 
 @menu
-* Establishing Serial Port Connection::  
-* Using apctest on Serial-Line UPSses::  
+* Establishing Serial Port Connection::
+* Using apctest on Serial-Line UPSses::
 @end menu
 
 @node Establishing Serial Port Connection, Using apctest on Serial-Line UPSses, , Testing Serial-Line UPSes
@@ -8702,7 +8511,7 @@ cause for alarm, you will simply get the APC copyright notice.
 Once you are sure that serial port communications is working,
 proceed to the next test.
 
-@node Using apctest on Serial-Line UPSses,  , Establishing Serial Port Connection, Testing Serial-Line UPSes
+@node Using apctest on Serial-Line UPSses, , Establishing Serial Port Connection, Testing Serial-Line UPSes
 @section Using apctest on Serial-Line UPSses
 @cindex apctest
 @cindex Testing, with apctest
@@ -8786,11 +8595,11 @@ apcupsd you are using, your UPS model, and
 also your @file{apcupsd.conf} file.
 
 @menu
-* Expected apctest Signals for a UPS::  
-* Expected apctest Signals for a BackUPS Pro::  
+* Expected apctest Signals for a UPS::
+* Expected apctest Signals for a BackUPS Pro::
 @end menu
 
-@node Expected apctest Signals for a UPS, Expected apctest Signals for a BackUPS Pro, Using apctest on Serial-Line UPSses, Using apctest on Serial-Line UPSses
+@node Expected apctest Signals for a UPS, Expected apctest Signals for a BackUPS Pro, , Using apctest on Serial-Line UPSses
 @subsection Expected apctest Signals for a UPS
 @cindex Testing
 @cindex apctest
@@ -8823,7 +8632,7 @@ probably also be set in all the other tests. This is not important,
 what counts is the appearance of @strong{CTS}
 when the power fails and additionally @strong{CD} when the batteries are low.
 
-@node Expected apctest Signals for a BackUPS Pro,  , Expected apctest Signals for a UPS, Using apctest on Serial-Line UPSses
+@node Expected apctest Signals for a BackUPS Pro, , Expected apctest Signals for a UPS, Using apctest on Serial-Line UPSses
 @subsection Expected apctest Signals for a BackUPS Pro
 @cindex Testing
 @cindex apctest
@@ -8854,17 +8663,17 @@ is the appearance of @strong{RNG} when the
 power fails and additionally @strong{CD} when
 the batteries are low.
 
-@node Troubleshooting Serial Line communications, Recalibrating the UPS Runtime, Testing Serial-Line UPSes, Top
+@node Troubleshooting Serial Line communications, Recalibrating the UPS Runtime, Testing Serial-Line UPSes, Installation on Serial-Line UPSes
 @chapter Troubleshooting Serial Line communications
 @cindex Problems, Serial
 @cindex Serial Problems
 
 @menu
-* Determining Which Voltage-Signaling Cable You Have::  
-* Once you have established serial communications::  
+* Determining Which Voltage-Signaling Cable You Have::
+* Once you have established serial communications::
 @end menu
 
-@node Determining Which Voltage-Signaling Cable You Have, Once you have established serial communications, Troubleshooting Serial Line communications, Troubleshooting Serial Line communications
+@node Determining Which Voltage-Signaling Cable You Have, Once you have established serial communications, , Troubleshooting Serial Line communications
 @section Determining Which Voltage-Signaling Cable You Have
 
 @emph{The most frequently encountered problem with
@@ -8883,7 +8692,7 @@ use @strong{simple} in the cable specification
 have made the cable yourself according to the wiring diagram given in
 the cables chapter of this manual.
 
-@node Once you have established serial communications,  , Determining Which Voltage-Signaling Cable You Have, Troubleshooting Serial Line communications
+@node Once you have established serial communications, , Determining Which Voltage-Signaling Cable You Have, Troubleshooting Serial Line communications
 @section Once you have established serial communications
 @cindex Testing
 
@@ -8895,10 +8704,10 @@ Testing (@pxref{Testing Apcupsd}) section.
 One additional note applies:
 
 @menu
-* Bizarre Intermittent Behavior::  
+* Bizarre Intermittent Behavior::
 @end menu
 
-@node Bizarre Intermittent Behavior,  , Once you have established serial communications, Once you have established serial communications
+@node Bizarre Intermittent Behavior, , , Once you have established serial communications
 @subsection Bizarre Intermittent Behavior
 
 In one case, a user reported that he received random incorrect
@@ -8911,7 +8720,7 @@ were reading the serial port. Please ensure that if you are running
 gpm that it is not configured with a serial
 port mouse on the same serial port.
 
-@node Recalibrating the UPS Runtime, DATA Logging, Troubleshooting Serial Line communications, Top
+@node Recalibrating the UPS Runtime, DATA Logging, Troubleshooting Serial Line communications, Installation on Serial-Line UPSes
 @chapter Recalibrating the UPS Runtime
 @cindex Runtime recalibration
 @cindex Recalibration Runtime
@@ -8985,10 +8794,10 @@ twice per year as discharging these kinds of batteries tends to
 shorten their life span.
 
 @menu
-* Status Logging On Serial-Line UPSes::  
+* Status Logging On Serial-Line UPSes::
 @end menu
 
-@node Status Logging On Serial-Line UPSes,  , Recalibrating the UPS Runtime, Recalibrating the UPS Runtime
+@node Status Logging On Serial-Line UPSes, , , Recalibrating the UPS Runtime
 @section Status Logging On Serial-Line UPSes
 
 Serial-line UPSes that speak the apcsmart protocol log all of
@@ -9080,12 +8889,12 @@ it is only necessary to set a handful of general directives. The rest
 can be left at their defaults unless you have an exotic configuration.
 
 @menu
-* General Configuration Directives::  
-* Configuration Directives Used by the Network Information Server::  
-* Configuration Directives used during Power Failures::  
-* Configuration Directives used to Control System Logging::  
-* Configuration Directives for Sharing a UPS::  
-* Configuration Directives Used to Set the UPS EPROM::  
+* General Configuration Directives::
+* Configuration Directives Used by the Network Information Server::
+* Configuration Directives used during Power Failures::
+* Configuration Directives used to Control System Logging::
+* Configuration Directives for Sharing a UPS::
+* Configuration Directives Used to Set the UPS EPROM::
 @end menu
 
 @node General Configuration Directives, Configuration Directives Used by the Network Information Server, , Configuration Directive Reference
@@ -9123,12 +8932,22 @@ The @code{--with-upscable=} option of
 this directive during the your build.
 
 @item DEVICE <name of device>
-Specify which device is used for UPS communications.
-For serial ports, it is usually something like @file{/dev/ttyS0}.
-For USB ports, you may leave the name of the device blank (no
+Specify which device is used for UPS communications
+(normally a USB or serial port. The default is platform-dependent,
+and is usually something like @file{/dev/ttyS0}. For
+USB ports, you may leave the name of the device blank (no
 specification) and apcupsd will
 automatically search the standard locations for the UPS.
+You may also specify a port range specification of the form
+@file{/dev/usb/hid/hiddev[0-15]}, .
 
+Note that you should enter "/dev/usb/hiddev[0-15]"
+literally as shown.  The "[0-15]" expression tells
+apcupsd to search all hiddev devices until it finds a UPS. You
+can restrict the search to a subset of devices by using something
+like "[0-4]", but keep in mind this will limit
+apcupsd's ability to locate the UPS if the kernel relocates it to
+a differentdevice node.  
 
 Normally, the @code{./configure} program will
 set an appropriate default value.  You may also specify the 
@@ -9629,7 +9448,7 @@ information. This string should be different for each and every slave
 on the network. This directive is not required.
 @end table
 
-@node Configuration Directives Used to Set the UPS EPROM,  , Configuration Directives for Sharing a UPS, Configuration Directive Reference
+@node Configuration Directives Used to Set the UPS EPROM, , Configuration Directives for Sharing a UPS, Configuration Directive Reference
 @section Configuration Directives Used to Set the  UPS EPROM
 @cindex Directives EEPROM
 @cindex EEPROM directives
@@ -9767,7 +9586,7 @@ This is an eight character string that is the last date the
 batteries were changed.
 @end table
 
-@node apcupsd Status Logging, The Shutown Sequence and its Discontents, Configuration Directive Reference, Top
+@node apcupsd Status Logging, The Shutown Sequence and its Discontents, Configuration Directive Reference, Technical Reference
 @chapter apcupsd Status Logging
 @cindex Logging, Status
 @cindex Status logging
@@ -9779,13 +9598,13 @@ apcaccess, but there are other ways as
 well.
 
 @menu
-* Status report format::        
-* Status Report Example::       
-* Status Report Fields::        
-* Logging the STATUS Information::  
+* Status report format::
+* Status Report Example::
+* Status Report Fields::
+* Logging the STATUS Information::
 @end menu
 
-@node Status report format, Status Report Example, apcupsd Status Logging, apcupsd Status Logging
+@node Status report format, Status Report Example, , apcupsd Status Logging
 @section Status report format
 @cindex Status Report
 @cindex Report, Status
@@ -10124,7 +9943,7 @@ is the old APC model identification code.
 is the time and date that the STATUS record was written.
 @end table
 
-@node Logging the STATUS Information,  , Status Report Fields, apcupsd Status Logging
+@node Logging the STATUS Information, , Status Report Fields, apcupsd Status Logging
 @section Logging the STATUS Information
 @cindex Logging Status
 @cindex Status, Logging
@@ -10151,19 +9970,19 @@ Although we mention system logging of STATUS information, we
 strongly recommend that you use  apcaccess
 or the CGI interface to get this information.
 
-@node The Shutown Sequence and its Discontents, APC smart protocol, apcupsd Status Logging, Top
+@node The Shutown Sequence and its Discontents, APC smart protocol, apcupsd Status Logging, Technical Reference
 @chapter The Shutown Sequence and its Discontents
 @cindex Shutdown Sequence
 
 @menu
-* Shutdown Sequence: Shutdown Sequence <1>.  
-* Shutdown Problems::           
-* Master/Slave Shutdown: Master/Slave Shutdown <1>.  
-* Startup::                     
-* Windows Considerations::      
+* Shutdown Sequence: Shutdown Sequence <1>.
+* Shutdown Problems::
+* Master/Slave Shutdown: Master/Slave Shutdown <1>.
+* Startup::
+* Windows Considerations::
 @end menu
 
-@node Shutdown Sequence <1>, Shutdown Problems, The Shutown Sequence and its Discontents, The Shutown Sequence and its Discontents
+@node Shutdown Sequence <1>, Shutdown Problems, , The Shutown Sequence and its Discontents
 @section Shutdown Sequence
 
 If you experienced so problems with the testing procedures, or
@@ -10457,7 +10276,7 @@ script:
 <path>/apcupsd stop
 @end example
 
-@node Windows Considerations,  , Startup, The Shutown Sequence and its Discontents
+@node Windows Considerations, , Startup, The Shutown Sequence and its Discontents
 @section Windows Considerations
 @cindex Windows Considerations
 
@@ -10465,7 +10284,7 @@ Please see the end of Windows chapter (@pxref{Installation on
 Windows}) of this manual for conderations pertaining to shutdown
 and killpower on Windows.
 
-@node APC smart protocol, Apcupsd -- RPM Packaging FAQ, The Shutown Sequence and its Discontents, Top
+@node APC smart protocol, Apcupsd -- RPM Packaging FAQ, The Shutown Sequence and its Discontents, Technical Reference
 @chapter APC smart protocol
 @cindex Smart protocol
 @cindex Protocol Smart
@@ -10488,24 +10307,24 @@ author and his @uref{http://www.exploits.org/nut,programming project}, and maybe
 apcupsd project and the @strong{NUT} project can join forces.
 
 @menu
-* Description::                 
-* RS-232 differences::          
-* Diagram for cable hackers::   
-* The Smart Protocol::          
-* Dip switch info::             
-* Status bits::                 
-* Alert messages::              
-* Register 1::                  
-* Register 2::                  
-* Register 3::                  
-* Interpretation of the Old Firmware Revision::  
-* Interpretation of the New Firmware Revision::  
-* EEPROM Values::               
-* Programming the UPS EEPROM::  
-* Acknowledgements::            
+* Description::
+* RS-232 differences::
+* Diagram for cable hackers::
+* The Smart Protocol::
+* Dip switch info::
+* Status bits::
+* Alert messages::
+* Register 1::
+* Register 2::
+* Register 3::
+* Interpretation of the Old Firmware Revision::
+* Interpretation of the New Firmware Revision::
+* EEPROM Values::
+* Programming the UPS EEPROM::
+* Acknowledgements::
 @end menu
 
-@node Description, RS-232 differences, APC smart protocol, APC smart protocol
+@node Description, RS-232 differences, , APC smart protocol
 @section Description
 
 Here's the information on the elusive APC smart signaling protocol
@@ -11182,7 +11001,7 @@ enter.
 The UPS will respond by "OK" and approximately 5 seconds later
 by a vertical bar (|) to indicate that the EEPROM was changed.
 
-@node Acknowledgements,  , Programming the UPS EEPROM, APC smart protocol
+@node Acknowledgements, , Programming the UPS EEPROM, APC smart protocol
 @section Acknowledgements
 
 The apcupsd has a rather long and tormented history. Many thanks to
@@ -11203,7 +11022,7 @@ additions by:
 @chapter  Apcupsd -- RPM Packaging FAQ
 
 @menu
-* Answers::                     
+* Answers::
 @end menu
 
 @node Answers, , , Apcupsd -- RPM Packaging FAQ
@@ -11321,8 +11140,8 @@ APCUPSDone of the best piece of software for
 UPSmanagement.
 
 @menu
-* Contributors::                
-* Disclaimer; NO WARRANTY::     
+* Contributors::
+* Disclaimer; NO WARRANTY::
 @end menu
 
 @node Contributors, Disclaimer; NO WARRANTY, , Credits <1>
@@ -12392,7 +12211,7 @@ PC:  Dev# 1, root hub, 2 ports, 12 Mbps
 @end example
 
 
-@node Index,  , Kernel Config, Top
+@node Index,,Kernel Config, Top
 @unnumbered Index
 @printindex cp
 
