@@ -452,13 +452,12 @@
 #define CMDEMERGENCY     10
 #define CMDCHANGEME      11
 #define CMDREMOTEDOWN    12
-#define CMDRESTARTME     13
-#define CMDCOMMFAILURE   14
-#define CMDCOMMOK        15
-#define CMDSTARTSELFTEST 16
-#define CMDENDSELFTEST   17
-#define CMDMASTERTIMEOUT 18           /* Master timed out */
-#define CMDMASTERCONN    19           /* Connect to master */
+#define CMDCOMMFAILURE   13
+#define CMDCOMMOK        14
+#define CMDSTARTSELFTEST 15
+#define CMDENDSELFTEST   16
+#define CMDMASTERTIMEOUT 17           /* Master timed out */
+#define CMDMASTERCONN    18           /* Connect to master */
 
 /*
  * NetCodes for numeric chatting.
