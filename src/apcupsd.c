@@ -275,8 +275,9 @@ int main(int argc, char *argv[]) {
     /*
      * parse_options is self messaging on errors, so we need only to exit()
      */
-    if (parse_options(argc, argv))
+    if (parse_options(argc, argv)) {
 	exit(1);
+    }
     Dmsg0(10, "Options parsed.\n");
 
     if (show_version) {
@@ -294,8 +295,9 @@ int main(int argc, char *argv[]) {
     openlog("apcupsd", LOG_CONS|LOG_PID, ups->sysfac);   
 
 #ifndef DEBUG
-    if ((getuid() != 0) && (geteuid() != 0))
+    if ((getuid() != 0) && (geteuid() != 0)) {
         Error_abort0(_("Needs super user privileges to run.\n"));
+    }
 #endif
 
     check_for_config(ups, cfgfile);
