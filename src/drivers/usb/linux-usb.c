@@ -1096,7 +1096,7 @@ int usb_ups_kill_power(UPSINFO *ups)
     return 1;
 }
 
-int usb_ups_program_eeprom(UPSINFO *ups) 
+int usb_ups_program_eeprom(UPSINFO *ups, int command, char *data)
 {
 #if 0
     printf(_("This model cannot be configured.\n"));

@@ -1,10 +1,14 @@
              Technical notes on version 3.10.6
-                       29 March 2003
+                       05 April 2003
                         Kern Sibbald
 
 General:
 
 Changes submitted this submission:
+05Apr03
+- When the Win32 version starts as a service, delete the
+  NOLOGIN and PWRFAIL files to prevent later confusion.
+  Thanks to Allen Crawford for pointing this out.
 29Mar03
 - Modify all Win32 program so that only windowed programs
   (apcupsd, popup) have the -mwindows flags. The others do not.

@@ -48,6 +48,7 @@
 
 // Error message logging
 void LogErrorMsg(char *message, int eventID);
+extern void logonfail(int ok);
 
 // OS-SPECIFIC ROUTINES
 
@@ -76,81 +77,77 @@ upsService::upsService()
 BOOL
 upsService::CurrentUser(char *buffer, UINT size)
 {
-        // How to obtain the name of the current user depends upon the OS being used
-        if ((g_platform_id == VER_PLATFORM_WIN32_NT) && upsService::RunningAsService()) {
-           // Windows NT, service-mode
+    // How to obtain the name of the current user depends upon the OS being used
+    if ((g_platform_id == VER_PLATFORM_WIN32_NT) && upsService::RunningAsService()) {
+       // Windows NT, service-mode
 
-           // -=- FIRSTLY - verify that a user is logged on
+       // -=- FIRSTLY - verify that a user is logged on
 
-           // Get the current Window station
-           HWINSTA station = GetProcessWindowStation();
-           if (station == NULL)
-                   return FALSE;
+       // Get the current Window station
+       HWINSTA station = GetProcessWindowStation();
+       if (station == NULL)
+               return FALSE;
 
-           // Get the current user SID size
-           DWORD usersize;
-           GetUserObjectInformation(station,
-                   UOI_USER_SID, NULL, 0, &usersize);
+       // Get the current user SID size
+       DWORD usersize;
+       GetUserObjectInformation(station,
+               UOI_USER_SID, NULL, 0, &usersize);
 
-           // Check the required buffer size isn't zero
-           if (usersize == 0) {
-              // No user is logged in - ensure we're not impersonating anyone
-              RevertToSelf();
-              g_impersonating_user = FALSE;
+       // Check the required buffer size isn't zero
+       if (usersize == 0) {
+          // No user is logged in - ensure we're not impersonating anyone
+          RevertToSelf();
+          g_impersonating_user = FALSE;
 
-              // Return "" as the name...
-              if (strlen("") >= size)
-                      return FALSE;
-              strcpy(buffer, "");
+          // Return "" as the name...
+          if (strlen("") >= size)
+                  return FALSE;
+          strcpy(buffer, "");
 
-              return TRUE;
-           }
+          return TRUE;
+       }
 
-           // -=- SECONDLY - a user is logged on but if we're not impersonating
-           //     them then we can't continue!
-           if (!g_impersonating_user) {
-              // Return "" as the name...
-              if (strlen("") >= size)
-                      return FALSE;
-              strcpy(buffer, "");
-              return TRUE;
-           }
-        }
-                
-        // -=- When we reach here, we're either running under Win9x, or we're running
-        //     under NT as an application or as a service impersonating a user
-        // Either way, we should find a suitable user name.
+       // -=- SECONDLY - a user is logged on but if we're not impersonating
+       //     them then we can't continue!
+       if (!g_impersonating_user) {
+          // Return "" as the name...
+          if (strlen("") >= size)
+                  return FALSE;
+          strcpy(buffer, "");
+          return TRUE;
+       }
+    }
+            
+    // -=- When we reach here, we're either running under Win9x, or we're running
+    //     under NT as an application or as a service impersonating a user
+    // Either way, we should find a suitable user name.
 
-        switch (g_platform_id) {
+    switch (g_platform_id) {
 
-        case VER_PLATFORM_WIN32_WINDOWS:
-        case VER_PLATFORM_WIN32_NT:
-           // Just call GetCurrentUser
-           DWORD length = size;
+    case VER_PLATFORM_WIN32_WINDOWS:
+    case VER_PLATFORM_WIN32_NT:
+       // Just call GetCurrentUser
+       DWORD length = size;
 
-           if (GetUserName(buffer, &length) == 0)
-           {
-                   UINT error = GetLastError();
+       if (GetUserName(buffer, &length) == 0) {
+               UINT error = GetLastError();
 
-                   if (error == ERROR_NOT_LOGGED_ON)
-                   {
-                           // No user logged on
-                           if (strlen("") >= size)
-                                   return FALSE;
-                           strcpy(buffer, "");
-                           return TRUE;
-                   }
-                   else
-                   {
-                           // Genuine error...
-                           return FALSE;
-                   }
-           }
-           return TRUE;
-        }
+               if (error == ERROR_NOT_LOGGED_ON) {
+                       // No user logged on
+                       if (strlen("") >= size)
+                               return FALSE;
+                       strcpy(buffer, "");
+                       return TRUE;
+               } else {
+                       // Genuine error...
+                       return FALSE;
+               }
+       }
+       return TRUE;
+    }
 
-        // OS was not recognised!
-        return FALSE;
+    // OS was not recognised!
+    return FALSE;
 }
 
 // IsWin95 - returns a BOOL indicating whether the current OS is Win95
@@ -173,15 +170,15 @@ upsService::IsWinNT()
 BOOL
 PostToApcupsd(UINT message, WPARAM wParam, LPARAM lParam)
 {
-        // Locate the hidden Apcupsd menu window
-        HWND hservwnd = FindWindow(MENU_CLASS_NAME, NULL);
-        if (hservwnd == NULL) {
-            return FALSE;
-        }
+    // Locate the hidden Apcupsd menu window
+    HWND hservwnd = FindWindow(MENU_CLASS_NAME, NULL);
+    if (hservwnd == NULL) {
+        return FALSE;
+    }
 
-        // Post the message to Apcupsd
-        PostMessage(hservwnd, message, wParam, lParam);
-        return TRUE;
+    // Post the message to Apcupsd
+    PostMessage(hservwnd, message, wParam, lParam);
+    return TRUE;
 }
 
 
@@ -208,14 +205,14 @@ BOOL
 upsService::ShowDefaultProperties()
 {
 #ifdef properties_implemented
-        // Post to the Apcupsd menu window
-        if (!PostToApcupsd(MENU_DEFAULT_PROPERTIES_SHOW, 0, 0)) {
-           MessageBox(NULL, "No existing instance of Apcupsd could be contacted", szAppName, MB_ICONEXCLAMATION | MB_OK);
-           return FALSE;
-        }
+    // Post to the Apcupsd menu window
+    if (!PostToApcupsd(MENU_DEFAULT_PROPERTIES_SHOW, 0, 0)) {
+       MessageBox(NULL, "No existing instance of Apcupsd could be contacted", szAppName, MB_ICONEXCLAMATION | MB_OK);
+       return FALSE;
+    }
 
 #endif
-        return TRUE;
+    return TRUE;
 }
 
 // Static routine to show the About dialog for a currently-running
@@ -318,15 +315,15 @@ BOOL    g_servicemode = FALSE;
 BOOL
 upsService::RunningAsService()
 {
-        return g_servicemode;
+    return g_servicemode;
 }
 
 BOOL
 upsService::KillRunningCopy()
 {
-        while (PostToApcupsd(WM_CLOSE, 0, 0)) 
-           {   }
-        return TRUE;
+    while (PostToApcupsd(WM_CLOSE, 0, 0)) 
+       {   }
+    return TRUE;
 }
 
 
@@ -336,63 +333,63 @@ upsService::KillRunningCopy()
 BOOL
 upsService::PostUserHelperMessage()
 {
-        // - Check the platform type
-        if (!IsWinNT()) {
-            return TRUE;
-        }
-
-        // - Get the current process ID
-        DWORD processId = GetCurrentProcessId();
-
-        // - Post it to the existing Apcupsd
-        if (!PostToApcupsd(MENU_SERVICEHELPER_MSG, 0, (LPARAM)processId)) {
-            return FALSE;
-        }
-
-        // - Wait until it's been used
+    // - Check the platform type
+    if (!IsWinNT()) {
         return TRUE;
+    }
+
+    // - Get the current process ID
+    DWORD processId = GetCurrentProcessId();
+
+    // - Post it to the existing Apcupsd
+    if (!PostToApcupsd(MENU_SERVICEHELPER_MSG, 0, (LPARAM)processId)) {
+        return FALSE;
+    }
+
+    // - Wait until it's been used
+    return TRUE;
 }
 
 // ROUTINE TO PROCESS AN INCOMING INSTANCE OF THE ABOVE MESSAGE
 BOOL
 upsService::ProcessUserHelperMessage(WPARAM wParam, LPARAM lParam) {
-        // - Check the platform type
-        if (!IsWinNT() || !upsService::RunningAsService())
-                return TRUE;
+    // - Check the platform type
+    if (!IsWinNT() || !upsService::RunningAsService())
+            return TRUE;
 
-        // - Close the HKEY_CURRENT_USER key, to force NT to reload it for the new user
-        // NB: Note that this is _really_ dodgy if ANY other thread is accessing the key!
-        if (RegCloseKey(HKEY_CURRENT_USER) != ERROR_SUCCESS) {
+    // - Close the HKEY_CURRENT_USER key, to force NT to reload it for the new user
+    // NB: Note that this is _really_ dodgy if ANY other thread is accessing the key!
+    if (RegCloseKey(HKEY_CURRENT_USER) != ERROR_SUCCESS) {
+        return FALSE;
+    }
+
+    // - Revert to our own identity
+    RevertToSelf();
+    g_impersonating_user = FALSE;
+
+    // - Open the specified process
+    HANDLE processHandle = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, (DWORD)lParam);
+    if (processHandle == NULL) {
             return FALSE;
-        }
+    }
 
-        // - Revert to our own identity
-        RevertToSelf();
-        g_impersonating_user = FALSE;
-
-        // - Open the specified process
-        HANDLE processHandle = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, (DWORD)lParam);
-        if (processHandle == NULL) {
-                return FALSE;
-        }
-
-        // - Get the token for the given process
-        HANDLE userToken = NULL;
-        if (!OpenProcessToken(processHandle, TOKEN_QUERY | TOKEN_DUPLICATE | TOKEN_IMPERSONATE, &userToken)) {
-            CloseHandle(processHandle);
-            return FALSE;
-        }
+    // - Get the token for the given process
+    HANDLE userToken = NULL;
+    if (!OpenProcessToken(processHandle, TOKEN_QUERY | TOKEN_DUPLICATE | TOKEN_IMPERSONATE, &userToken)) {
         CloseHandle(processHandle);
+        return FALSE;
+    }
+    CloseHandle(processHandle);
 
-        // - Set this thread to impersonate them
-        if (!ImpersonateLoggedOnUser(userToken)) {
-            CloseHandle(userToken);
-            return FALSE;
-        }
+    // - Set this thread to impersonate them
+    if (!ImpersonateLoggedOnUser(userToken)) {
         CloseHandle(userToken);
+        return FALSE;
+    }
+    CloseHandle(userToken);
 
-        g_impersonating_user = TRUE;
-        return TRUE;
+    g_impersonating_user = TRUE;
+    return TRUE;
 }
 
 // SERVICE MAIN ROUTINE
@@ -406,8 +403,7 @@ upsService::ApcupsdServiceMain()
     switch (g_platform_id) {
 
     // Windows 95/98
-    case VER_PLATFORM_WIN32_WINDOWS:
-    {
+    case VER_PLATFORM_WIN32_WINDOWS: {
        // Obtain a handle to the kernel library
        HINSTANCE kerneldll = LoadLibrary("KERNEL32.DLL");
        if (kerneldll == NULL) {
@@ -432,7 +428,7 @@ upsService::ApcupsdServiceMain()
        RegisterService(0, 1);
 
        // Run the service itself
-       ApcupsdAppMain();
+       ApcupsdAppMain(1);
 
        // Then remove the service from the system service table
        RegisterService(0, 0);
@@ -442,8 +438,7 @@ upsService::ApcupsdServiceMain()
        break;
     }
     // Windows NT
-    case VER_PLATFORM_WIN32_NT:
-       {
+    case VER_PLATFORM_WIN32_NT: {
        // Create a service entry table
        SERVICE_TABLE_ENTRY dispatchTable[] = {
                {UPS_SERVICENAME, (LPSERVICE_MAIN_FUNCTION)ServiceMain},
@@ -455,7 +450,7 @@ upsService::ApcupsdServiceMain()
            MessageBox(NULL, "StartServiceCtrlDispatcher error", "Apcupsd", MB_OK);
        }
        break;
-       } /* end case */
+    } /* end case */
     } /* end switch */
     return 0;
 }
@@ -515,10 +510,12 @@ DWORD WINAPI ServiceWorkThread(LPVOID lpwThreadParam)
        return 0;
     }
 
-    // RUN!
-   ApcupsdAppMain();
+   
 
-   // Mark that we're no longer running
+    // RUN!
+    ApcupsdAppMain(1);
+
+    // Mark that we're no longer running
     g_servicethread = 0;
 
     // Tell the service manager that we've stopped.

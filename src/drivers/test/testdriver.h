@@ -70,7 +70,7 @@ extern int test_ups_check_state(UPSINFO *ups);
 extern int test_ups_open(UPSINFO *ups);
 extern int test_ups_close(UPSINFO *ups);
 extern int test_ups_setup(UPSINFO *ups);
-extern int test_ups_program_eeprom(UPSINFO *ups);
+extern int test_ups_program_eeprom(UPSINFO *ups, int command, char *data);
 extern int test_ups_entry_point(UPSINFO *ups, int command, void *data);
 
 #endif /* _TEST_DRIVER_H */

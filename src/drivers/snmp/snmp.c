@@ -69,7 +69,7 @@ static int initialize_device_data(UPSINFO *ups) {
 
     if (ups->device == NULL || *ups->device == '\0') {
         log_event(ups, LOG_ERR, "Wrong device for SNMP driver.");
-        exit(1);
+	exit(1);
     }
 
     strcpy(Sid->device, ups->device);
@@ -89,7 +89,7 @@ static int initialize_device_data(UPSINFO *ups) {
     cp = strchr(Sid->device, ':');
     if (cp == NULL) {
         log_event(ups, LOG_ERR, "Wrong port for SNMP driver.");
-        exit(1);
+	exit(1);
     }
     *cp = '\0';
 
@@ -98,7 +98,7 @@ static int initialize_device_data(UPSINFO *ups) {
     cp = strchr(port_num, ':');
     if (cp == NULL) {
         log_event(ups, LOG_ERR, "Wrong vendor for SNMP driver.");
-        exit(1);
+	exit(1);
     }
     *cp = '\0';
     Sid->remote_port = atoi(port_num);
@@ -108,7 +108,7 @@ static int initialize_device_data(UPSINFO *ups) {
     cp = strchr(Sid->DeviceVendor, ':');
     if (cp == NULL) {
         log_event(ups, LOG_ERR, "Wrong community for SNMP driver.");
-        exit(1);
+	exit(1);
     }
     *cp = '\0';
 
@@ -119,8 +119,8 @@ static int initialize_device_data(UPSINFO *ups) {
      */
     cp = Sid->DeviceVendor;
     while(*cp != '\0') {
-        *cp = toupper(*cp);
-        cp++;
+	*cp = toupper(*cp);
+	cp++;
     }
 
     Sid->community = cp + 1;
@@ -137,7 +137,7 @@ int snmp_ups_open(UPSINFO *ups) {
     Sid = malloc(sizeof(struct snmp_ups_internal_data));
     if (Sid == NULL) {
         log_event(ups, LOG_ERR, "Out of memory.");
-        exit(1);
+	exit(1);
     }
     memset(Sid, 0, sizeof(struct snmp_ups_internal_data));
 
@@ -169,37 +169,37 @@ int snmp_ups_open(UPSINFO *ups) {
     Sid->session.authenticator = NULL;
 
     if (!strcmp(Sid->DeviceVendor, "APC")) {
-        Sid->MIB = malloc(sizeof(powernet_mib_t));
-        if (Sid->MIB == NULL) {
+	Sid->MIB = malloc(sizeof(powernet_mib_t));
+	if (Sid->MIB == NULL) {
             log_event(ups, LOG_ERR, "Out of memory.");
-            exit(1);
-        }
-        memset(Sid->MIB, 0, sizeof(powernet_mib_t));
-        if (snmp_ups_get_capabilities(ups) == 0) { /* Check Comm */
+	    exit(1);
+	}
+	memset(Sid->MIB, 0, sizeof(powernet_mib_t));
+	if (snmp_ups_get_capabilities(ups) == 0) { /* Check Comm */
             Error_abort0(_("PANIC! Cannot communicate with UPS via SNMP.\n\n"
                 "Please make sure the port specified on the DEVICE directive\n"
                 "is correct, that your able UPSCABLE is smart and the\n"
                 "remote SNMP UPS is running and reachable.\n"));
-            return 0;
-        }
-        return 1;
+	    return 0;
+	}
+	return 1;
     }
 
     if (!strcmp(Sid->DeviceVendor, "RFC")) {
-        Sid->MIB = malloc(sizeof(ups_mib_t));
-        if (Sid->MIB == NULL) {
+	Sid->MIB = malloc(sizeof(ups_mib_t));
+	if (Sid->MIB == NULL) {
             log_event(ups, LOG_ERR, "Out of memory.");
-            exit(1);
-        }
-        memset(Sid->MIB, 0, sizeof(ups_mib_t));
-        if (snmp_ups_get_capabilities(ups) == 0) { /* Check Comm */
+	    exit(1);
+	}
+	memset(Sid->MIB, 0, sizeof(ups_mib_t));
+	if (snmp_ups_get_capabilities(ups) == 0) { /* Check Comm */
             Error_abort0(_("PANIC! Cannot communicate with UPS via SNMP.\n\n"
                 "Please make sure the port specified on the DEVICE directive\n"
                 "is correct, that your able UPSCABLE is smart and the\n"
                 "remote SNMP UPS is running and reachable.\n"));
-            return 0;
-        }
-        return 1;
+	    return 0;
+	}
+	return 1;
     }
 
     /*
@@ -233,11 +233,11 @@ int snmp_ups_get_capabilities(UPSINFO *ups)
     write_lock(ups);
 
     if (!strcmp(Sid->DeviceVendor, "APC")) {
-        ret = powernet_snmp_ups_get_capabilities(ups);
+	ret = powernet_snmp_ups_get_capabilities(ups);
     }
 
     if (!strcmp(Sid->DeviceVendor, "RFC")) {
-        ret = rfc1628_snmp_ups_get_capabilities(ups);
+	ret = rfc1628_snmp_ups_get_capabilities(ups);
     }
 
     write_unlock(ups);
@@ -245,7 +245,7 @@ int snmp_ups_get_capabilities(UPSINFO *ups)
     return ret;
 }
 
-int snmp_ups_program_eeprom(UPSINFO *ups)
+int snmp_ups_program_eeprom(UPSINFO *ups, int command, char *data)
 {
     return 0;
 }
@@ -255,11 +255,11 @@ int snmp_ups_kill_power(UPSINFO *ups) {
     int ret = 0;
 
     if (!strcmp(Sid->DeviceVendor, "APC")) {
-        ret = powernet_snmp_kill_ups_power(ups);
+	ret = powernet_snmp_kill_ups_power(ups);
     }
 
     if (!strcmp(Sid->DeviceVendor, "RFC")) {
-        ret = rfc1628_snmp_kill_ups_power(ups);
+	ret = rfc1628_snmp_kill_ups_power(ups);
     }
 
     return ret;
@@ -277,11 +277,11 @@ int snmp_ups_check_state(UPSINFO *ups) {
     write_lock(ups);
 
     if (!strcmp(Sid->DeviceVendor, "APC")) {
-        ret = powernet_snmp_ups_check_state(ups);
+	ret = powernet_snmp_ups_check_state(ups);
     }
 
     if (!strcmp(Sid->DeviceVendor, "RFC")) {
-        ret = rfc1628_snmp_ups_check_state(ups);
+	ret = rfc1628_snmp_ups_check_state(ups);
     }
 
     write_unlock(ups);
@@ -297,11 +297,11 @@ int snmp_ups_read_volatile_data(UPSINFO *ups)
     write_lock(ups);
 
     if (!strcmp(Sid->DeviceVendor, "APC")) {
-        ret = powernet_snmp_ups_read_volatile_data(ups);
+	ret = powernet_snmp_ups_read_volatile_data(ups);
     }
 
     if (!strcmp(Sid->DeviceVendor, "RFC")) {
-        ret = rfc1628_snmp_ups_read_volatile_data(ups);
+	ret = rfc1628_snmp_ups_read_volatile_data(ups);
     }
 
     write_unlock(ups);
@@ -317,11 +317,11 @@ int snmp_ups_read_static_data(UPSINFO *ups)
     write_lock(ups);
 
     if (!strcmp(Sid->DeviceVendor, "APC")) {
-        ret = powernet_snmp_ups_read_static_data(ups);
+	ret = powernet_snmp_ups_read_static_data(ups);
     }
 
     if (!strcmp(Sid->DeviceVendor, "RFC")) {
-        ret = rfc1628_snmp_ups_read_static_data(ups);
+	ret = rfc1628_snmp_ups_read_static_data(ups);
     }
 
     write_unlock(ups);

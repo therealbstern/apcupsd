@@ -294,7 +294,7 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
     return stat;
 }
 
-int dumb_ups_program_eeprom(UPSINFO *ups) 
+int dumb_ups_program_eeprom(UPSINFO *ups, int command, char *data) 
 {
 #if 0
     printf(_("This model cannot be configured.\n"));
