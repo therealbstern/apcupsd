@@ -121,7 +121,7 @@ static struct {
  *
  */
 static int initialize_device_data(UPSINFO *ups) {
-    struct net_ups_internal_data *nid = ups->driver_internal_data;
+    struct driver_data *nid = (struct driver_data *)ups->driver_internal_data;
     char *cp;
 
     strcpy(nid->device, ups->device);
@@ -158,7 +158,7 @@ static int initialize_device_data(UPSINFO *ups) {
  */
 static int getupsvar(UPSINFO *ups, char *request, char *answer, int anslen)
 {
-    struct net_ups_internal_data *nid = ups->driver_internal_data;
+    struct driver_data *nid = (struct driver_data *)ups->driver_internal_data;
     int i;
     char *stat_match = NULL;
     char *find;
@@ -202,7 +202,7 @@ static int getupsvar(UPSINFO *ups, char *request, char *answer, int anslen)
  */
 static int fill_status_buffer(UPSINFO *ups) 
 {
-    struct net_ups_internal_data *nid = ups->driver_internal_data;
+    struct driver_data *nid = (struct driver_data *)ups->driver_internal_data;
     int n, stat = 1;
     char buf[1000];
     static time_t last_fill_time = 0;
@@ -243,6 +243,7 @@ static int fill_status_buffer(UPSINFO *ups)
     if (n < 0) {
 	stat = 0;
 	set_ups(UPS_COMMLOST);
+        Dmsg0(100, "UPS_COMMLOST\n");
     } else {
 	clear_ups(UPS_COMMLOST);
     }
@@ -261,6 +262,7 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
     int stat = 1;
     int32_t newStatus;		      /* this really should be uint32_t! */
     int32_t masterStatus;	      /* status from master */
+    static int comm_loss = 0;
 
     write_lock(ups);
 
@@ -288,14 +290,24 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
 
     if (masterStatus & (UPS_SHUTDOWN|UPS_SHUTDOWNIMM|UPS_BELOWCAPLIMIT|UPS_REMTIMELIMIT)) {
 	set_ups(UPS_SHUT_REMOTE);  /* if master is shutting down so do we */
+        log_event(ups, LOG_ERR, "Shutdown because NIS master is shutting down.");
+        Dmsg0(100, "Set SHUT_REMOTE because of master status.\n");
     }
 
 
     /* If we lost connection with master and we
-     * are running on batteries, shutdown now
+     * are running on batteries, shutdown on the fourth
+     * consequtive pass here.  While on batteries, this code
+     * is called once per second.
      */
     if (stat == 0 && is_ups_set(UPS_ONBATT)) {
-	set_ups(UPS_SHUT_REMOTE);
+	if (comm_loss++ == 4) {
+	   set_ups(UPS_SHUT_REMOTE);
+           log_event(ups, LOG_ERR, "Shutdown because loss of comm with NIS master while on batteries.");
+           Dmsg0(100, "Set SHUT_REMOTE because of loss of comm on batteries.\n");
+	}
+    } else {
+       comm_loss = 0;
     }
 
     write_unlock(ups);
@@ -305,14 +317,14 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
 
 int net_ups_open(UPSINFO *ups) 
 {
-    struct net_ups_internal_data *nid;
+    struct driver_data *nid;
 
-    nid = malloc(sizeof(struct net_ups_internal_data));
+    nid = (struct driver_data *)malloc(sizeof(struct driver_data));
     if (nid == NULL) {
         log_event(ups, LOG_ERR, "Out of memory.");
 	exit(1);
     }
-    memset(nid, 0, sizeof(struct net_ups_internal_data));
+    memset(nid, 0, sizeof(struct driver_data));
 
     ups->driver_internal_data = nid;
 
@@ -412,6 +424,7 @@ int net_ups_check_state(UPSINFO *ups)
     if (ups->nettime && ups->nettime < ups->wait_time) {
        sleep_time = ups->nettime;
     }
+    Dmsg1(100, "Sleep %d secs.\n", sleep_time);
     sleep(sleep_time);
 
     get_ups_status_flag(ups, 1);
@@ -464,19 +477,19 @@ int net_ups_read_volatile_data(UPSINFO *ups)
     }
     if (ups->UPS_Cap[CI_DLBATT] && 
           getupsvar(ups, "lowbatt", answer, sizeof(answer))) {
-	ups->dlowbatt = atof(answer);
+	ups->dlowbatt = (int)atof(answer);
     }
     if (ups->UPS_Cap[CI_LTRANS] && 
           getupsvar(ups, "lowxfer", answer, sizeof(answer))) {
-	ups->lotrans = atof(answer);
+	ups->lotrans = (int)atof(answer);
     }
     if (ups->UPS_Cap[CI_HTRANS] && 
           getupsvar(ups, "highxfer", answer, sizeof(answer))) {
-	ups->hitrans = atof(answer);
+	ups->hitrans = (int)atof(answer);
     }
     if (ups->UPS_Cap[CI_RETPCT] && 
           getupsvar(ups, "retpct", answer, sizeof(answer))) {
-	ups->rtnpct = atof(answer);
+	ups->rtnpct = (int)atof(answer);
     }
     if (ups->UPS_Cap[CI_ITEMP] && 
           getupsvar(ups, "upstemp", answer, sizeof(answer))) {

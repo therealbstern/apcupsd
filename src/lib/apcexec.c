@@ -342,7 +342,7 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
 	} else {
 	    ups->num_execed_children++;
 	}
-	while (waitpid(-1, NULL, WNOHANG) > 0) {
+	while (ups->num_execed_children > 0 && waitpid(-1, NULL, WNOHANG) > 0) {
 	    ups->num_execed_children--;
 	}
 	break;

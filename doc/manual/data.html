@@ -18,13 +18,18 @@ NBKPRO, SMART, SHARESMART, and MATRIX, the output is
 written in a format very similar to what PowerChute writes. That is:
 <p>
 MinLineVoltage, MaxLineVoltage, OutputVoltage, BatteryVoltage, 
-LineFrequency, UPSTemperature,AmbientTemperature,Humidity,LineVoltage
+LineFrequency, LoadPercent, UPSTemperature,AmbientTemperature,Humidity,LineVoltage,
+BatteryCharge,toggle
 <p>
 Any value that is not supported by your UPS such as
-AmbientTemperature and Humidity will be blank; the commas before
+AmbientTemperature and Humidity will be blank or possibly as 0.0.
+In any case the commas before
 and after that field will still be output. 
+The toggle value alternates from 0 to 1 on each line. This was added
+at user request so that no two adjacent samples are 
+identical.
 <p>An actual example from the log file is:
-<pre> Nov  2 12:43:05 matou apcupsd[23439]: 224.9,227.5,226.2,27.74,50.00,100.0,30.6,,,226.2
+<pre> Nov  2 12:43:05 matou apcupsd[23439]: 224.9,227.5,226.2,27.74,50.00,100.0,30.6,,,226.2,50.0,1
 </pre>
 <hr>
 

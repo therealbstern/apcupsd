@@ -214,7 +214,7 @@ DATATIME 0
 #          If not specified, it defaults to "daemon". This is useful 
 #          if you want to separate the data logged by apcupsd from other
 #          programs.
-#FACILITY local0
+#FACILITY DAEMON
 #
 #
 #

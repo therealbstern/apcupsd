@@ -51,20 +51,28 @@ this manual for more details.
 syslog() can be directed to different files, I have assigned syslog()
 levels to each of our four types of data as follows: 
 </P>
-<P>1. DEBUG logging has level LOG_DEBUG 3. STATUS logging has level
-LOG_NOTICE <BR>4. EVENTS logging has levels LOG_WARNING, LOG_ERR,
+<P>1. DEBUG logging has level LOG_DEBUG 
+<p>2. DATA logging has level LOG_INFO
+<p>3. STATUS logging has level LOG_NOTICE 
+<p>4. EVENTS logging has levels LOG_WARNING, LOG_ERR,
 LOG_CRIT, and LOG_ALERT 
 </P>
 <P>It should be noted that more work needs to be done on the precise
 definitions of each of the levels for EVENTS logging. Currently, it
 is roughly broken down as follows: 
 </P>
-<P>LOG_WARNING general information such as startup, etc. <BR>LOG_ERR
-an error condition detected, e.g. communications problem with the
-UPS. <BR>LOG_CRIT a serious problem has occurred such as power
-failure, running on UPS batteries, ... <BR>LOG_ALERT a condition that
+<P>LOG_WARNING general information such as startup, etc. 
+<p>LOG_ERR an error condition detected, e.g. communications problem with the
+UPS. 
+<p>LOG_CRIT a serious problem has occurred such as power
+failure, running on UPS batteries, ... 
+<p>LOG_ALERT a condition that
 needs immediate attention such as pending system shutdown, ... 
 </P>
+The default Facility for syslog() logging is DAEMON, although
+this can be changed with the FACILITY directive in apcupsd.conf.
+In the following example, we should the facility as local0.
+
 <P>More work needs to be done to the code to ensure that it
 corresponds to the above levels. 
 </P>

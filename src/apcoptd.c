@@ -131,13 +131,14 @@ static void print_usage(char *argv[]) {
             "\n"
             "  [*] Only one parameter of this kind and apcupsd must not already be running.\n"
             "\n"
+            "Copyright (C) 1999-2003 Kern Sibbald\n"
             "Copyright (C) 1996-1999 Andre Hedrick\n"
             "Copyright (C) 1999-2001 Riccardo Facchetti\n"
             "apcupsd is free software and comes with ABSOLUTELY NO WARRANTY\n"
             "under the terms of the GNU General Public License\n"
             "\n"
             "Report bugs to apcupsd Support Center:\n"
-            "  apcupsd-devel@apcupsd.org\n"));
+            "  apcupsd-users@lists.sourceforge.net\n"));
 }
 
 int parse_options(int argc, char *argv[]) {
