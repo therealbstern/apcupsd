@@ -80,6 +80,9 @@ int usb_ups_get_capabilities(UPSINFO *ups);
 static void usb_kill_power_test(void);
 static void usb_get_self_test_result(void);
 static void usb_run_self_test(void);
+static int usb_get_battery_date(void);
+static void usb_set_battery_date(void);
+static void usb_get_manf_date(void);
 #endif
 
 static void strip_trailing_junk(char *cmd);
@@ -1542,7 +1545,10 @@ This part of apctest is for testing USB UPSes.\n");
 1) Test kill UPS power\n\
 2) Perform self-test\n\
 3) Read last self-test result\n\
-4) Quit\n\n");
+4) Change battery date\n\
+5) View battery date\n\
+6) View manufacturing date\n\
+7) Quit\n\n");
 
       cmd = get_cmd("Select function number: ");
       if (cmd) {
@@ -1558,14 +1564,23 @@ This part of apctest is for testing USB UPSes.\n");
             usb_get_self_test_result();
             break;
           case 4:
+            usb_set_battery_date();
+            break;
+          case 5:
+            usb_get_battery_date();
+            break;
+          case 6:
+            usb_get_manf_date();
+            break;
+          case 7:
             quit = TRUE;
             break;
           default:
-            pmsg("Illegal response. Please enter 1-2\n");
+            pmsg("Illegal response. Please enter 1-7\n");
             break;
          }
       } else {
-         pmsg("Illegal response. Please enter 1-2\n");
+         pmsg("Illegal response. Please enter 1-7\n");
       }
    }
    ptime();
@@ -1600,12 +1615,12 @@ static void usb_get_self_test_result(void)
    int result;
    if (!read_int_from_ups(ups, CI_ST_STAT, &result))
    {
-	pmsg("\nI don't know how to run a self test on your UPS\n\
+      pmsg("\nI don't know how to run a self test on your UPS\n\
 or your UPS does not support self test.\n");
-	return;
+      return;
    }
    
-   pmsg("\nResult of last self test: ");
+   pmsg("Result of last self test: ");
    switch(result)
    {
       case 1:
@@ -1638,7 +1653,7 @@ static void usb_run_self_test(void)
    int timeout;
    
    pmsg("\nThis test instructs the UPS to perform a self-test\n\
-operation and reports the result when the test completes.");
+operation and reports the result when the test completes.\n");
 
    if (!read_int_from_ups(ups, CI_ST_STAT, &result))
    {
@@ -1714,6 +1729,109 @@ or your UPS does not support self test.\n");
 
    usb_get_self_test_result();
 }
+
+static int usb_get_battery_date(void)
+{
+   int result;
+   if (!read_int_from_ups(ups, CI_BATTDAT, &result))
+   {
+      pmsg("\nI don't know how to access the battery date on your UPS\n\
+or your UPS does not support the battery date feature.\n");
+      return 0;
+   }
+   
+   /*
+    * Date format is:
+    *   YYYY|YYYM|MMMD|DDDD
+    *   bit  0-4:  Day
+    *        5-8:  Month
+    *        9-15: Year-1980
+    */
+   pmsg("Current battery date: %02u/%02u/%04u\n",
+      (result & 0x1e0) >> 5,
+      result & 0x1f,
+      1980 + ((result & 0xfe00) >> 9));
+
+   return result;
+}
+
+static void usb_set_battery_date(void)
+{
+   char* cmd;
+   int result, day, month, year, temp, max;
+   if (!(result = usb_get_battery_date()))
+      return;
+   
+   cmd = get_cmd("Enter new battery date (MM/DD/YYYY): ");
+   if (!isdigit(cmd[0]) || !isdigit(cmd[1]) || cmd[2] != '/' ||
+       !isdigit(cmd[3]) || !isdigit(cmd[4]) || cmd[5] != '/' ||
+       !isdigit(cmd[6]) || !isdigit(cmd[7]) || !isdigit(cmd[8]) ||
+       !isdigit(cmd[9]) || cmd[10] != '\0' ||
+       ((month = strtoul(cmd, NULL, 10)) > 12) || (month < 1) ||
+       ((day = strtoul(cmd+3, NULL, 10)) > 31) || (day < 1) ||
+       ((year = strtoul(cmd+6, NULL, 10)) < 1980) )
+   {
+       pmsg("Invalid format.\n");
+       return;
+   }
+
+   result = ((year-1980) << 9) | (month << 5) | day;
+
+   pmsg("Writing new date...");
+   if (!write_int_to_ups(ups, CI_BATTDAT, result, "ManufactureDate"))
+   {
+      pmsg("FAILED\n");
+      return;
+   }
+      
+   pmsg("SUCCESS\n");
+
+   pmsg("Waiting for change to take effect...");
+   for (max=0; max<10; max++)
+   {
+      if (!read_int_from_ups(ups, CI_BATTDAT, &temp))
+      {
+         pmsg("ERROR\n");
+         return;
+      }
+
+      if (temp == result)
+         break;
+
+      sleep(1);
+   }
+
+   if (max == 10)
+      pmsg("TIMEOUT\n");
+   else
+      pmsg("SUCCESS\n");
+
+   usb_get_battery_date();
+}
+
+static void usb_get_manf_date(void)
+{
+   int result;
+   if (!read_int_from_ups(ups, CI_MANDAT, &result))
+   {
+      pmsg("\nI don't know how to access the manufacturing date on your UPS\n\
+or your UPS does not support the manufacturing date feature.\n");
+      return;
+   }
+
+   /*
+    * Date format is:
+    *   YYYY|YYYM|MMMD|DDDD
+    *   bit  0-4:  Day
+    *        5-8:  Month
+    *        9-15: Year-1980
+    */
+   pmsg("Manufacturing date: %02u/%02u/%04u\n",
+      (result & 0x1e0) >> 5,
+      result & 0x1f,
+      1980 + ((result & 0xfe00) >> 9));
+}
+
 #endif
 
 /*
