@@ -447,10 +447,12 @@ int check_wrappers(char *av, int newsock)
     struct request_info req;
     char *av0;
 
-    if (strchr(av, '/'))
-        av0 = strrchr(av, '/');
-    else
+    av0 = strrchr(av, '/');
+    if (av0) {
+	av0++;			      /* strip everything before and including / */
+    } else {
 	av0 = av;
+    }
 
     request_init(&req, RQ_DAEMON, av0, RQ_FILE, newsock, NULL);
     fromhost(&req);
