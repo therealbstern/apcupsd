@@ -129,7 +129,7 @@ NETSERVER on
 #  serviced but if you want it to listen to a single subnet you can
 #  set it up to that subnet address, for example 192.168.10.0
 #  Additionally you can listen for a single IP like 192.168.10.1
-NISIP 0.0.0.0
+NISIP @NISIP@
 #
 # NISPORT <port> default is 7000
 #  port to use for sending STATUS and EVENTS data over the network.

@@ -263,6 +263,11 @@ installation.</p>
                 is system dependent but usually 7000.
                 This option simply sets the appropriate port in the <b>apcupsd.conf</b>
                 file, which can be changed at any later time.</dd>
+  <dt>--with-nisip=&lt;IP-Address&gt;</dt><dd>
+        This option allows you to specify the value that will be placed
+                 on then NISIP directive in the configuration file. The 
+                 default is 0.0.0.0. No checking is done on the value entered,
+                 so you must ensure that it is a valid IP address.</dd>
   <dt>--with-net-port=&lt;port&gt;</dt><dd>
         This option allows you to specify what port <b>apcupsd</b> will use
                 for the Master and Slave communications. The default is system dependent
