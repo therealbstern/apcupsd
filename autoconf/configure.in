@@ -90,9 +90,18 @@ dnl
 fi
 
 dnl
-dnl Check for local host architecture.
+dnl Sets `host_cpu', `host_vendor', and `host_os' to the current host type.
 dnl
-dnl AC_CANONICAL_HOST		    dnl Check for host type.
+AC_CANONICAL_HOST		    dnl Check for host type.
+
+dnl Now detect if this is a cygwin environment: don't touch $CYGWIN because
+dnl it have special meaning.
+case $host_os in
+    *cygwin* ) CFG_CYGWIN=yes;;
+    * ) CFG_CYGWIN=no;;
+esac
+
+
 dnl
 dnl
 dnl	Check for programs.
@@ -136,9 +145,12 @@ AC_SUBST(LDFLAGS)
 AC_SUBST(LIBS)
 
 
+dnl Initialize pthreads inclusion
 PTHREAD_CFLAGS=""
 PTHREAD_LFLAGS=""
+with_pthreads=no
 
+dnl force pthreads when needed
 if test $HAVE_UNAME=yes
   then case x`uname -s` in
       xSunOS|xDarwin) with_pthreads=yes ;;
@@ -146,6 +158,11 @@ if test $HAVE_UNAME=yes
   esac
 else
   with_pthreads=no
+fi
+
+if test "$CFG_CYGWIN" = "yes"
+then
+    with_pthreads=yes
 fi
 
 AC_MSG_CHECKING(for pthreads)
@@ -167,9 +184,7 @@ fi
 AC_SUBST(PTHREAD_CFLAGS)
 AC_SUBST(PTHREAD_LFLAGS)
 
-
-AC_CYGWIN			dnl Check for cygwin, WINXX port.
-if test "$CYGWIN" = "yes"
+if test "$CFG_CYGWIN" = "yes"
 then
     WIN32=win32
     WINLIBS="-luser32 -lgdi32"
@@ -197,28 +212,29 @@ dnl Now check for programs
 AC_PATH_PROGS(SHUTDOWN, shutdown shutdown.bsd, no)
 if test "$SHUTDOWN" = "no"
 then
-	if test "$CYGWIN" = "no"
+	if test "$CFG_CYGWIN" = "no"
 	then
 	   echo 'ERROR: shutdown program not found !'
 	   exit 1
 	fi
 fi
 
-AC_PATH_PROGS(MAIL, mail, no)
-if test "$MAIL" = "no"
+if test "$CFG_CYGWIN" = "yes"
 then
-    echo 'WARNING: mail program not found !'
-    if test "$CYGWIN" = "yes"
+    echo 'Hardcoding MAIL to /apcupsd/bin/smtp'
+    MAIL='/apcupsd/bin/smtp'
+else
+    AC_PATH_PROGS(MAIL, mail, no)
+    if test "$MAIL" = "no"
     then
-	echo 'Hardcoding MAIL to /bin/mail'
-	MAIL='/bin/mail'
+        echo 'WARNING: mail program not found !'
     fi
 fi
 
 AC_PATH_PROGS(WALL, wall, no)
 if test "$WALL" = "no"
 then
-	if test "$CYGWIN" = "no"
+	if test "$CFG_CYGWIN" = "no"
 	then
 	   echo 'ERROR: wall program not found !'
 	   exit 1
@@ -297,7 +313,7 @@ AC_FUNC_STRFTIME		dnl check for strftime.
 AC_FUNC_SETPGRP 		dnl check for BSD setpgrp.
 
 dnl shmctl doesn't exist on cygwin so don't check for it there
-if test "$CYGWIN" = "no" -a "$with_pthreads" = "no"; then
+if test "$CFG_CYGWIN" = "no" -a "$with_pthreads" = "no"; then
 AC_CHECK_FUNCS(
 		shmctl,,
 		[echo 'configure: cannot find needed function.'; exit 1]
@@ -395,7 +411,7 @@ AC_CHECK_HEADERS(
 		)		dnl Check for _all_ included headers.
 
 dnl ipc.h, sem.h and shm.h do not exist on cygwin so don't check for them
-if test "$CYGWIN" = "no" -a "$with_pthreads" = "no"; then
+if test "$CFG_CYGWIN" = "no" -a "$with_pthreads" = "no"; then
 AC_CHECK_HEADERS(
 		sys/ipc.h sys/sem.h sys/shm.h
 		,,[echo 'configure: some header files are missing.'; exit 1]
@@ -1046,7 +1062,7 @@ then
 elif test -f /etc/engarde-version
 then
 	DISTNAME=engarde
-elif test "$CYGWIN" = "yes"
+elif test "$CFG_CYGWIN" = "yes"
 then
 	DISTNAME=cygwin
 else
