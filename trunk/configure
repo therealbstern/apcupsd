@@ -8018,7 +8018,7 @@ LSMDATE=`sed -n -e 's/^.*LSMDATE.*"\(.*\)"$/\1/p' ${srcdir}/include/version.h`
 #
 # Warning: here we must list all and only the languages we have a
 #	   translation for.
-ALL_LINGUAS="it"
+ALL_LINGUAS="fr it et_EE"
 
 for ac_prog in msgfmt
 do
