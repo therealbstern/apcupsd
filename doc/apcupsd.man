@@ -51,7 +51,8 @@ the UPS after a delay time.
 The apcupsd daemon now supports two networking modes that function
 independently, but if desired they can both run at the same time.
 
-Most users will probably enable the first network mode (NIS), which
+Most users will probably enable the first network mode and
+simplest (NIS or Network Information Service), which
 permits apcupsd to serve status and event information 
 to clients over the network.
 
@@ -60,7 +61,11 @@ powered by the same UPS. In this mode, one machine is configured as a
 master with the UPS attached to the serial port.  The other machines
 (max.  20) powered by the same UPS are configured as slaves.  The master
 has a network connection with the slaves and sends them information
-about the UPS status.
+about the UPS status. This mode is significantly more complicated
+to setup than the NIS networking mode described above.
+
+For details and configurations on these networking modes please see
+the manual.
 
 .LP
 RedHat and SuSE versions of Linux have direct install support.  All
@@ -129,16 +134,15 @@ are:
 .br
 Please specify which device is used for UPS communication.
 The default is /dev/ttyS[0|1|2|3].  If you have a USB UPS,
-it is /dev/usb/hid/hiddev[0-9].  On some Red Hat versions
-you may need to specify /dev/usb/hiddev[0-9]
+you should leve the DEVICE directive blank and apcupsd
+will figure out where your device is located. If you have
+problems, please see the manual as it has more details.
 .LP
 .B  LOCKFILE
 -- <path to lockfile>
 .br
 By supplying this argument, "apcupsd" tries to create a lockfile
 for the serial or USB port in the specified directory.
-
-
 
 .LP
 .SS CONFIGURATION COMMANDS USED BY THE NETWORK INFORMATION SERVER
@@ -159,7 +163,7 @@ daemon. In this case, NETSTATUS should be off.
 <port>
 .br
 This configuration command specifies the port to be used by the
-apcupsd server. The default is 7000. If you change this port,
+apcupsd server. The default is 3550. If you change this port,
 you must manually change the #define SERV_TCP_PORT in 
 cgi/upsfetch.c and rebuild the CGI programs.
 
@@ -517,10 +521,9 @@ http://www.apcupsd.com
 Andre M. Hedrick
 .SS Retired Co-AUTHOR
 Christopher J. Reimer
-.SS Former programmer
-Riccardo Fachetti
-.SS Current maintainer
+.SS Current maintainers
 Kern Sibbald
+Adam Kropelin
 .SS Contributors
 An enormous list of past and former persons who have devoted
 their time and energy to this project -- thanks.

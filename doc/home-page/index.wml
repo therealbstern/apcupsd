@@ -23,16 +23,6 @@ Forge site has a CVS repository where you can find the very latest
 development software.  Please visit it and become familiar with how it
 works.
 
-<h2><a href="3.10.x-manual/pr01s01.html">
-What is new in Apcupsd version 3.10.10</a></h2>
-<b>Apcupsd</b> version 3.10.10 has a new
-offbattery event that will allow you to modify
-apccontrol to see only delayed transitions to battery
-as defined by ONBATTERYDELAY and transitions off battery.
-It also contains another
-a workaround for kernel 2.5 and 2.6 control queue overflows 
-thanks to Adam Kropelin.
-
 <h2><a href="3.10.x-manual/index.html" target="_top">Online
 3.10.x Manual</a> or a
 <a href="3.10.x-manual/apcupsd.pdf" target="_top">PDF Version of
