@@ -9334,12 +9334,13 @@ fi;
 
 
 SNMP_DRIVER_ENABLED="no"
+NET_SNMP_DRIVER_ENABLED="no"
 # Check whether --enable-snmp or --disable-snmp was given.
 if test "${enable_snmp+set}" = set; then
   enableval="$enable_snmp"
    if test "$enableval" = "yes" ; then
-		SNMP_DRIVER_ENABLED="yes"
-		echo "$as_me:$LINENO: checking for EVP_DigestInit in -lcrypto" >&5
+	    SNMP_DRIVER_ENABLED="yes"
+	    echo "$as_me:$LINENO: checking for EVP_DigestInit in -lcrypto" >&5
 echo $ECHO_N "checking for EVP_DigestInit in -lcrypto... $ECHO_C" >&6
 if test "${ac_cv_lib_crypto_EVP_DigestInit+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -9394,7 +9395,7 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_lib_crypto_EVP_DigestInit" >&5
 echo "${ECHO_T}$ac_cv_lib_crypto_EVP_DigestInit" >&6
 if test $ac_cv_lib_crypto_EVP_DigestInit = yes; then
-  echo '  including crypto library for snmp.'; LIBS="$LIBS -lcrypto"
+  echo '	including crypto library for snmp.'; LIBS="$LIBS -lcrypto"
 fi
 
 	    echo "$as_me:$LINENO: checking for snmp_open in -lsnmp" >&5
@@ -9454,7 +9455,71 @@ echo "${ECHO_T}$ac_cv_lib_snmp_snmp_open" >&6
 if test $ac_cv_lib_snmp_snmp_open = yes; then
   LIBS="$LIBS -lsnmp"
 else
-  echo '  disabling SNMP driver.'; SNMP_DRIVER_ENABLED="no"
+  echo "$as_me:$LINENO: checking for snmp_open in -lnetsnmp" >&5
+echo $ECHO_N "checking for snmp_open in -lnetsnmp... $ECHO_C" >&6
+if test "${ac_cv_lib_netsnmp_snmp_open+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lnetsnmp  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char snmp_open ();
+int
+main ()
+{
+snmp_open ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_netsnmp_snmp_open=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_netsnmp_snmp_open=no
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_netsnmp_snmp_open" >&5
+echo "${ECHO_T}$ac_cv_lib_netsnmp_snmp_open" >&6
+if test $ac_cv_lib_netsnmp_snmp_open = yes; then
+  LIBS="$LIBS -lnetsnmp"
+		 NET_SNMP_DRIVER_ENABLED="yes"
+else
+  echo " "
+		 echo "=======	snmp libraries not found, disabling SNMP driver. ======"
+		 echo " "
+		 SNMP_DRIVER_ENABLED="no"
+fi
+
+
 fi
 
 	fi
@@ -9465,15 +9530,23 @@ if test "$SNMP_DRIVER_ENABLED" = "yes"; then
 #define HAVE_SNMP_DRIVER 1
 _ACEOF
 
-  cat >>confdefs.h <<\_ACEOF
+  if test "$NET_SNMP_DRIVER_ENABLED" = "yes"; then
+     cat >>confdefs.h <<\_ACEOF
+#define HAVE_NET_SNMP 1
+_ACEOF
+
+     DISPLAY_SNMP_DRIVER="net-snmp"
+  else
+     cat >>confdefs.h <<\_ACEOF
 #define HAVE_UCD_SNMP 1
 _ACEOF
 
+     DISPLAY_SNMP_DRIVER="snmp"
+  fi
   SNMP_DRIVER="snmp"
 
 fi
 
-NET_SNMP_DRIVER_ENABLED="no"
 # Check whether --enable-net-snmp or --disable-net-snmp was given.
 if test "${enable_net_snmp+set}" = set; then
   enableval="$enable_net_snmp"
@@ -9609,6 +9682,7 @@ _ACEOF
 #define HAVE_NET_SNMP 1
 _ACEOF
 
+  DISPLAY_SNMP_DRIVER="net-snmp"
   SNMP_DRIVER="snmp"
 
 fi
@@ -15255,13 +15329,13 @@ Configuration on `date`:
   Loader flags: 	      ${WLDFLAGS} ${LDFLAGS}
   Host and version:	      ${DISTNAME} ${DISTVER}
   Shutdown Program:	      ${SHUTDOWN}
-  Serial device:	      ${SERIALDEV}
+  Port/Device:		      ${SERIALDEV}
   Network Info Port (CGI):    ${NISPORT}
   Master/slave Port:	      ${NETPORT}
   UPSTYPE		      ${UPSTYPE}
   UPSCABLE		      ${UPSCABLE}
 
-  drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${USB_DRIVER:-no-usb} ${SNMP_DRIVER:-no-snmp} ${TEST_DRIVER:-no-test}
+  drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${USB_DRIVER:-no-usb} ${DISPLAY_SNMP_DRIVER:-no-snmp} ${TEST_DRIVER:-no-test}
 
   enable-master-slave:	      ${OLDNET_ENABLED}
   enable-nis:		      ${NISSRV_ENABLED}
