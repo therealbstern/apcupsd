@@ -1,0 +1,166 @@
+<chapter id='after_installation'><title>After Installation</title>
+
+<sect1><title>Checking Your Configuration File</title>
+
+<para>Once you have installed <application>apcupsd</application>, either
+from a binary package or by building from source, your next step
+should be to inspect your <filename>/etc/apcupsd/apcupsd.conf</filename>
+file to make sure it is valid.</para>
+
+<para>You can read the complete <link
+linkend='directive_reference'>reference on configuration
+directives</link>, but if you are setting up a normal standalone 
+configuration you should only need to check (and possibly fix) the
+first three items listed below.</para>
+
+<para>Your UPSTYPE should be the UPS's protocol type: dumb, apcsmart,
+usb, net, or snmp.  Your UPSCABLE should be the type of cable you are
+using.  You should have gotten both from the <link
+linkend='type_table'>table of types</link>; usually they will both
+be the string "usb".</para>
+
+<para>If you have a USB device, it is better not to specify a
+DEVICE directive by commenting it out. <application>Apcupsd</application> will automatically 
+search for your device in the standard places.
+If you specify a DEVICE, it should be the name of the device (or device range)
+that <application>apcupsd</application> is to use to communicate with
+the UPS.  If you're using a USB UPS under Linux, you may leave
+the device name field blank and <application>apcupsd</application>
+will search all the standard locations for the UPS. You
+may also explicitly specify the device location as
+either <filename>/dev/usb/hid/hiddev[0-15]</filename> (on non-Red-Hat
+systems) or <filename>/dev/usb/hiddev[0-15]</filename> (on Red Hat
+systems). Note, please enter the device names <emphasis>exactly</emphasis>
+as written above brackets, numbers, dash and all.</para>
+
+<para>The <link linkend="config-examples">next chapter</link> of this
+manual provides you with the essential characteristics of each main type
+of configuration file.  After those elements are correct, apcupsd should
+run, and then it is only a matter of customization of your setup.</para>
+
+</sect1>
+
+
+<sect1 id='autoboot'><title>Arranging for Reboot on Power-Up</title>
+
+<para>The final consideration for a automatic reboot after a full
+power down is to ensure that your computer will automatically reboot
+when the power is restored.</para>
+
+<para>This is not the normal behavior of most computers as shipped
+from the factory. Normally after the power is cut and restored, you
+must explicitly press a button for the power to actually be turned
+on. You can test your computer by powering it down; shutting off the
+power (pull the plug); then plugging the cord back in. If your
+computer immediately starts up, good. There is nothing more to
+do.</para>
+
+<para>If your computer does not start up, manually turn on the
+power (by pressing the power on button) and enter your computer's
+SETUP program (often by pressing DEL during the power up sequence;
+sometimes by pressing F10). You must then find and change the
+appropriate configuration parameter to permit instant power
+on.</para>
+
+<para>Normally, this is located under the <emphasis
+role="bold">BOOT</emphasis> menu item, and will be called something
+such as <emphasis role="bold">Restore on AC/Power Loss</emphasis> or
+<emphasis role="bold">Full-On</emphasis>. The exact words will vary
+according to the ROM BIOS provider. Generally you will have three
+options: <emphasis role="bold">Last State</emphasis>, <emphasis
+role="bold">Power On</emphasis>, and <emphasis role="bold">Power
+Off</emphasis>. Although <emphasis role="bold">Last State</emphasis>
+should normally work, we recommend setting your computers to <emphasis
+role="bold">Power On</emphasis>. This means that whenever the power is
+applied they are on. The only way to shut them off is to pull the plug
+or to have a special program that powers them off
+(<filename>/sbin/poweroff</filename> on Linux systems).</para>
+
+<para>If after making all the changes suggested above, you cannot get
+your computer to automatically reboot, you might examine your halt
+script (<filename>/etc/rc.d/init.d/halt</filename> in the case of
+Red Hat Linux) and see if the final line that performs the halt or
+reboot contains the <option>-p</option> option for powering down the
+computer. It should not with the logic used by
+<application>apcupsd</application>, but if it does, the
+<option>-p</option> option could cause your computer to power off
+while the UPS is still suppling power (i.e. before the UPS kills the
+power).  Depending on the setting of your BIOS, it may prevent your
+computer from restarting when the power returns. As already mentioned,
+this should not apply, but in case of problems it is worth a
+try.</para>
+
+</sect1>
+<sect1><title>Making sure <application>apcupsd</application> Is Running</title>
+
+<para>The simplest way to invoke <application> apcupsd</application>
+is from the command line by entering:</para>
+
+<programlisting>
+/sbin/apcupsd
+</programlisting>
+
+<para>To do so, you must be root. However, normally, you will want
+<application>apcupsd</application> started automatically when your
+system boots. On some systems with installation support (e.g. SuSE
+and Red Hat), the installation procedure will create a script file that
+you will be automatically invoked when your system reboots. On other
+systems, you will have to invoke <application>apcupsd</application>
+from your <filename>rc.local</filename> script.</para>
+
+<para>On Red Hat systems, this script file that automatically invokes
+<application>apcupsd</application> on system start and stops is:
+<filename>/etc/rc.d/init.d/apcupsd</filename></para>
+
+<para>To start <application>apcupsd</application> manually (as you
+will probably do immediately following the installation), enter the
+following:</para>
+
+<programlisting>
+/etc/rc.d/init.d/apcupsd start
+</programlisting>
+
+<para>To understand how this file is automatically invoked at system
+startup and shutdown, see the man pages for <citerefentry>
+<refentrytitle>chkconfig</refentrytitle> <manvolnum>8</manvolnum>
+</citerefentry>.</para>
+
+<para>On SuSE systems, the script file that automatically invokes
+<application>apcupsd</application> on system start and stops is
+<filename>/etc/rc.d/apcupsd</filename></para>
+
+<para>To start <application>apcupsd</application> manually (as you
+will probably do immediately following the installation), enter the
+following:</para>
+
+<programlisting>
+/etc/rc.d/apcupsd start
+</programlisting>
+
+<para>Normally, when properly installed,
+<application>apcupsd</application> will be started and stopped
+automatically by your system. Unfortunately, the details are different
+for each system. Below, we give the commands for selected
+systems. Alternatively, there are simple
+<application>stopapcupsd</application> and
+<application>startapcupsd</application> scripts in the examples
+directory, or you can modify one of the scripts in the distributions
+directory to meet your needs.</para>
+
+<para>To stop <application>apcupsd</application> you can do the
+following:</para> 
+
+<para>On Red Hat systems:</para>
+
+<programlisting>
+/etc/rc.d/init.d/apcupsd stop
+</programlisting>
+
+<para>On SuSE systems:</para>
+
+<programlisting>
+/etc/rc.d/apcupsd stop
+</programlisting>
+
+</sect1>
+</chapter>
