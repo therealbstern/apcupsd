@@ -1,5 +1,5 @@
 /*
- * $Id: hid-ups.c,v 1.10 2004-08-26 09:20:06 kerns Exp $
+ * $Id: hid-ups.c,v 1.11 2005-03-05 22:41:14 adk0212 Exp $
  *
  *  Copyright (c) 2001 Vojtech Pavlik <vojtech@ucw.cz>
  *  Copyright (c) 2001 Paul Stewart <hiddev@wetlogic.net>
@@ -125,6 +125,7 @@ struct s_ups_info {
     { 0x840040, T_UNITS,   "ConfigVoltage" },
     { 0x840042, T_UNITS,   "ConfigFrequency" },
     { 0x840043, T_UNITS,   "ConfigApparentPower" },
+    { 0x840044, T_UNITS,   "ConfigActivePower" },
     { 0x840053, T_UNITS,   "LowVoltageTransfer" },
     { 0x840054, T_UNITS,   "HighVoltageTransfer" },
     { 0x840055, T_UNITS,   "DelayBeforeReboot" },
@@ -139,6 +140,8 @@ struct s_ups_info {
     { 0x840069, T_NONE,    "ShutdownImminent" },
     { 0x84006b, T_NONE,    "Switch On/Off" },
     { 0x84006c, T_NONE,    "Switchable" },
+    { 0x84006e, T_NONE,    "Boost" },
+    { 0x84006f, T_NONE,    "Trim" },
     { 0x840073, T_NONE,    "CommunicationLost" },
     { 0x8400fd, T_INDEX,   "iManufacturer" },
     { 0x8400fe, T_INDEX,   "iProduct" },
@@ -153,9 +156,12 @@ struct s_ups_info {
     { 0x850044, T_NONE,     "Charging" },
     { 0x850045, T_NONE,     "Discharging" },
     { 0x85004b, T_NONE,     "NeedReplacement" },
+    { 0x850058, T_NONE,     "BUPHibernate" },           /* APC proprietary */
     { 0x850066, T_CAPACITY, "RemainingCapacity" },
     { 0x850067, T_CAPACITY, "FullChargeCapacity" },
     { 0x850068, T_UNITS,    "RunTimeToEmpty" },
+    { 0x85006b, T_NONE,     "CycleCount" },
+    { 0x850080, T_NONE,     "BattPackLevel" },
     { 0x850083, T_CAPACITY, "DesignCapacity" },
     { 0x850085, T_DATE,     "ManufactureDate" },
     { 0x850088, T_INDEX,    "iDeviceName" },
@@ -168,11 +174,18 @@ struct s_ups_info {
     { 0x8500d0, T_NONE,     "ACPresent" },
     { 0x8500d1, T_NONE,     "BatteryPresent" },
     { 0x8500db, T_NONE,     "VoltageNotRegulated" },
+    /*
+     * Page 0x86 is reserved for Power Devices, but not defined in the HID
+     * standard. APC has defined a few usages on this page for themselves.
+     */
+    { 0x860010, T_NONE,     "BUPSelfTest" },             /* APC proprietary */
+    { 0x860012, T_NONE,     "BUPBattCapBeforeStartup" }, /* APC proprietary */
+    { 0x860076, T_NONE,     "BUPDelayBeforeStartup" },   /* APC proprietary */
     /* Pages 0xFF00 to 0xFFFF are vendor specific */
     { 0xFF860005, T_NONE,   "APCGeneralCollection" },
     { 0xFF860013, T_NONE,   "APC860013_SetMinReturn?" },
     { 0xFF860016, T_APCDATE,"APCBattReplacementDate" },
-    { 0xFF860019, T_UNITS,  "APCBattCapBeforeRestart" },
+    { 0xFF860019, T_UNITS,  "APCBattCapBeforeStartup" },
     { 0xFF860023, T_NONE,   "APC860023_??????" },
     { 0xFF860024, T_NONE,   "APC860024_??????" },
     { 0xFF860025, T_NONE,   "APC860025_??????" },
@@ -187,11 +200,12 @@ struct s_ups_info {
     { 0xFF860064, T_NONE,   "APC860064_SetLoTransV?" },
     { 0xFF860072, T_NONE,   "APCPanelTest" },
     { 0xFF860074, T_NONE,   "APC860074_SetSens?" },
-    { 0xFF860076, T_NONE,   "APCShutdownAfterDelay" },
+    { 0xFF860076, T_UNITS,  "APCShutdownAfterDelay" },
     { 0xFF860077, T_NONE,   "APC860077_SetWakeUpDelay?" },
     { 0xFF860079, T_NONE,   "APC_USB_FirmwareRevision" },
     { 0xFF86007C, T_NONE,   "APCForceShutdown" },
-    { 0xFF86007D, T_NONE,   "APC86007D_??????" },
+    { 0xFF86007D, T_UNITS,  "APCDelayBeforeShutdown" },
+    { 0xFF86007E, T_UNITS,  "APCDelayBeforeStartup" },
 
 };
 #define UPS_INFO_SZ (sizeof(ups_info)/sizeof(ups_info[0]))
