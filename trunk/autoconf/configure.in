@@ -1414,6 +1414,7 @@ sun)
     PIDDIR=/var/run
     LOCKDIR=/var/spool/locks
     LOGDIR=${sysconfdir}
+    APCUPSD_MAIL=/usr/bin/mailx
 dnl
 dnl	For SunOS, system man pages are in /usr/share/man, not /usr/man.
 dnl

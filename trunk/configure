@@ -13608,6 +13608,7 @@ sun)
     PIDDIR=/var/run
     LOCKDIR=/var/spool/locks
     LOGDIR=${sysconfdir}
+    APCUPSD_MAIL=/usr/bin/mailx
    if test x$prefix = xNONE -a x$mandir = x'${prefix}/man' ; then
        mandir=/usr/share/man
    fi
