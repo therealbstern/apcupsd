@@ -2,7 +2,11 @@
                         Kern Sibbald
 
 General:
-09Jan04
+03Mar05
+- Commit kernstodo
+24Feb05
+- Added an anonymous patch to powerflute.c and to the slack-apcupsd.in file.
+09Jan05
 - Add Whitebox to detected systems.
 24Dec04
 - Minor tweak to RedHat spec.in
