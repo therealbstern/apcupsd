@@ -731,10 +731,10 @@ dnl As last resort, use provided GD library v1.2
 	 echo 'Your system lacks the GD library for compiling CGI'
 	 echo 'programs. Please download this library from'
 	 echo
-	 echo 'ftp://ftp.apcupsd.com/pub/apcupsd/contrib/gd1.2.tar.gz'
+	 echo 'http://www.boutell.com/gd/'
 	 echo
-	 echo 'Untar the file inside the src/ directory so that'
-	 echo 'the library is in src/gd1.2/ then you can succesfully'
+	 echo 'After building it and installing it on your system'
+	 echo 'preferrably in /usr/lib or /usr/local/lib,'
 	 echo 're-run the ./configure script.'
 	 echo
 	 echo 'Alternatively you can disable the CGI support.'
