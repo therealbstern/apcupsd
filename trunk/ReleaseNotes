@@ -5,6 +5,20 @@ NOTE: The non-pthreaded version should work in this release, but
       will be removed in the next version.
 
 Release 3.10.17 xxx
+- Update default apcupsd.conf to recommend a blank DEVICE setting for USB
+  driver.
+- Add /dev/hiddev? to Linux USB driver device node search path.
+- Add Mac OS X startup script
+- Add new *BSD USB driver to support USB UPSes on FreeBSD, OpenBSD, and NetBSD.
+  THIS DRIVER IS BETA SOFTWARE AND HAS A KNOWN LOCKUP ISSUE ON FREEBSD. Please
+  keep this in mind when deciding whether or not to deploy it. PLEASE READ THE
+  "CHECKING OUT YOUR USB SUBSYSTEM (BSD)" SECTION OF THE MANUAL as it contains
+  crucial details on how to configure your system for the new driver.
+- Add BackUPS Pro shutdown code to USB driver
+- Prefer BackUPS style shutdown over SmartUPS in USB driver to resolve shutdown
+  issues on BackUPS CS models
+- Restructure USB driver to share common code
+- Fix slave mode segfault bug introduced by --killpower fixes in 3.10.16.
 - Commit kernstodo
 - Added an anonymous patch to powerflute.c and to the slack-apcupsd.in file.
 - Add Whitebox to detected systems.
