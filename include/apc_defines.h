@@ -147,9 +147,9 @@
 #define UPS_PLUGGED       0x01000000  /* Set if computer is plugged into UPS */
 #define UPS_DEV_SETUP     0x02000000  /* Set if UPS's driver did the setup() */
 /* Macro to set/clear/test bit values in ups->Status */
-#define UPS_ISSET(bit) ((ups->Status) & bit)
-#define UPS_SET(bit) ((ups->Status) |= bit)
-#define UPS_CLEAR(bit) ((ups->Status) &= ~bit)
+#define UPS_ISSET(bit) ((ups->Status) & (bit))
+#define UPS_SET(bit) ((ups->Status) |= (bit))
+#define UPS_CLEAR(bit) ((ups->Status) &= ~(bit))
 /*
  * Macro specific for UPS_ONLINE/UPS_ONBATT. It's a pity but
  * we can't do anything else as APC smart Status handles both.
