@@ -74,7 +74,7 @@ char argvalue[MAXSTRING];
 UPSINFO *ups = NULL;
 
 /* forward referenced subroutines */
-void handle_client_request();
+void handle_client_request(int nsockfd);
 int do_daemon(int argc, char *argv[]); 
 int do_inetd(int argc, char *argv[]);
 
@@ -147,7 +147,7 @@ static int status_close(UPSINFO *ups, int nsockfd)
     char *sptr, *eptr;
 
     i = strlen(largebuf);
-    if (i > sizeof(largebuf)-1) 
+    if (i > (int)sizeof(largebuf)-1) 
         Error_abort1("Status buffer overflow %d bytes\n", i-sizeof(largebuf));
     sprintf(buf, "APC      : %03d,%03d,%04d\n", STAT_REV, stat_recs, i);
     

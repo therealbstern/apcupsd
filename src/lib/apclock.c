@@ -67,10 +67,17 @@
 
 #include "apc.h"
 
+/* 
+ * For Windows, we do NOT create a lock file. Even if we did
+ *  no other program would respect it since this is not a
+ *  Unix system.    KES 21Mar03
+ */
+
 /* check to see if a serial port lockfile exists.
  * If so, and the process is no longer running,
  * blow away the lockfile.  
  */
+#ifndef HAVE_CYGWIN
 static int check_stale_lockfile(UPSINFO *ups)
 {
     char pidbuffer[12];
@@ -178,14 +185,24 @@ out:
     ups->lockfile = -1;
     return error;
 }
+#endif
 
 /* 
  * Create serial port lock file   
  */
 int create_lockfile(UPSINFO *ups)
 {
+#ifndef HAVE_CYGWIN
     char pidbuffer[12];
     int error;
+
+    /* If this is a powerkill execution, we are probably running
+     * with the filesystems read-only, so don't try to create
+     * the lock file. 
+     */
+    if (kill_ups_power) {
+	return LCKSUCCESS;
+    }
 
     switch (error = check_stale_lockfile(ups)) {
     case LCKNOLOCK:
@@ -211,14 +228,6 @@ int create_lockfile(UPSINFO *ups)
 	break;
     }
        
-    /* If this is a powerkill execution, we are probably running
-     * with the filesystems read-only, so don't try to create
-     * the lock file. 
-     */
-#if AVERSION==3
-    if (kill_ups_power)
-	return error;
-#endif
 
     /*
      * Now the file does not exist any more.
@@ -246,7 +255,7 @@ int create_lockfile(UPSINFO *ups)
 	goto out;
     }
 
-    if (write(ups->lockfile, pidbuffer, strlen(pidbuffer)+1) != strlen(pidbuffer)+1) {
+    if (write(ups->lockfile, pidbuffer, strlen(pidbuffer)+1) != (int)strlen(pidbuffer)+1) {
 	/*
 	 * Problems with write.
 	 */
@@ -265,10 +274,14 @@ out:
     close(ups->lockfile);
     ups->lockfile = -1;
     return error;
+#else
+    return LCKSUCCESS;
+#endif
 }
 
 void delete_lockfile(UPSINFO *ups)
 {
+#ifndef HAVE_CYGWIN
     if (ups->lockpath[0] != '\0') {
 	/*
 	 * If lockfile is ours, close it and delete it,
@@ -286,4 +299,5 @@ void delete_lockfile(UPSINFO *ups)
 	 * blank ups->lockfile too.
 	 */
     }
+#endif
 }

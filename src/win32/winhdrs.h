@@ -61,3 +61,6 @@
 
 // Macros for sticking in the current file name
 #define VNCLOG(s)       (__FILE__ " : " s)
+
+extern "C" void syslog(int type, const char *fmt, ...);
+

@@ -67,16 +67,16 @@
  */
 int dumb_ups_open(UPSINFO *ups) {
     int cmd;
-    SIMPLE_DATA *private = ups->driver_internal_data;
+    SIMPLE_DATA *my_data = (SIMPLE_DATA *)ups->driver_internal_data;
 
-    if (private == NULL) {
-       private = malloc(sizeof(SIMPLE_DATA));
-       if (private == NULL) {
+    if (my_data == NULL) {
+       my_data = (SIMPLE_DATA *)malloc(sizeof(SIMPLE_DATA));
+       if (my_data == NULL) {
           log_event(ups, LOG_ERR, "Out of memory.");
 	  exit(1);
        }
-       memset(private, 0, sizeof(SIMPLE_DATA));
-       ups->driver_internal_data = private;
+       memset(my_data, 0, sizeof(SIMPLE_DATA));
+       ups->driver_internal_data = my_data;
     } else {
        log_event(ups, LOG_ERR, "apcsmart_ups_open called twice. This shouldn't happen.");
     }
@@ -95,30 +95,30 @@ int dumb_ups_open(UPSINFO *ups) {
     cmd = fcntl(ups->fd, F_GETFL, 0);
     fcntl(ups->fd, F_SETFL, cmd & ~O_NDELAY);
 
-    tcgetattr(ups->fd, &private->oldtio); /* Save old settings */
+    tcgetattr(ups->fd, &my_data->oldtio); /* Save old settings */
 
-    private->newtio.c_cflag = DEFAULT_SPEED | CS8 | CLOCAL | CREAD;
-    private->newtio.c_iflag = IGNPAR;	      /* Ignore errors, raw input */
-    private->newtio.c_oflag = 0;	  /* Raw output */
-    private->newtio.c_lflag = 0;	  /* No local echo */
+    my_data->newtio.c_cflag = DEFAULT_SPEED | CS8 | CLOCAL | CREAD;
+    my_data->newtio.c_iflag = IGNPAR;	      /* Ignore errors, raw input */
+    my_data->newtio.c_oflag = 0;	  /* Raw output */
+    my_data->newtio.c_lflag = 0;	  /* No local echo */
 
 #if defined(HAVE_OPENBSD_OS) || \
 		defined(HAVE_FREEBSD_OS) || defined(HAVE_NETBSD_OS)
-    private->newtio.c_ispeed = DEFAULT_SPEED;	  /* Set input speed */
-    private->newtio.c_ospeed = DEFAULT_SPEED;	  /* Set output speed */
+    my_data->newtio.c_ispeed = DEFAULT_SPEED;	  /* Set input speed */
+    my_data->newtio.c_ospeed = DEFAULT_SPEED;	  /* Set output speed */
 #endif /* __openbsd__ || __freebsd__ || __netbsd__  */
 
  /* w.p. This makes a non.blocking read() with TIMER_READ (10) sec. timeout */ 
-    private->newtio.c_cc[VMIN] = 0;
-    private->newtio.c_cc[VTIME] = TIMER_READ * 10;
+    my_data->newtio.c_cc[VMIN] = 0;
+    my_data->newtio.c_cc[VTIME] = TIMER_READ * 10;
 
 #if defined(HAVE_CYGWIN) || defined(HAVE_OSF1_OS) || defined(HAVE_LINUX_OS)
-    cfsetospeed(&private->newtio, DEFAULT_SPEED);
-    cfsetispeed(&private->newtio, DEFAULT_SPEED);
+    cfsetospeed(&my_data->newtio, DEFAULT_SPEED);
+    cfsetispeed(&my_data->newtio, DEFAULT_SPEED);
 #endif /* do it the POSIX way */
 
     tcflush(ups->fd, TCIFLUSH);
-    tcsetattr(ups->fd, TCSANOW, &private->newtio);
+    tcsetattr(ups->fd, TCSANOW, &my_data->newtio);
     tcflush(ups->fd, TCIFLUSH);
 
     UPS_CLEAR(UPS_SLAVE);

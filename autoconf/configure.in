@@ -93,12 +93,12 @@ dnl
 dnl Sets `host_cpu', `host_vendor', and `host_os' to the current host type.
 dnl
 AC_CANONICAL_HOST		    dnl Check for host type.
-
-dnl Now detect if this is a cygwin environment: don't touch $CYGWIN because
-dnl it have special meaning.
+dnl Now detect if this is a cygwin environment.
 case $host_os in
-    *cygwin* ) CFG_CYGWIN=yes;;
-    * ) CFG_CYGWIN=no;;
+    *cygwin* ) CFG_CYGWIN=yes
+	;;
+    * ) CFG_CYGWIN=no
+	;;
 esac
 
 
@@ -122,6 +122,8 @@ then
 else
 	AM_CONDITIONAL(HAVE_GCC, $FALSEPRG)
 fi
+
+
 
 dnl
 dnl Supply default CFLAGS, if not specified by `CFLAGS=flags ./configure'
@@ -289,7 +291,7 @@ dnl The same for open and friends: checking only for open.
 dnl and for all the other function groups.
 dnl
 AC_CHECK_FUNCS(
-		abort alarm fork calloc getpid \
+		abort fork calloc getpid \
 		ioctl kill rewind select setsid signal strerror strncmp \
 		strncpy tcgetattr vfprintf setpgrp,,
 		[echo 'configure: cannot find needed function.'; exit 1]

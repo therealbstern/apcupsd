@@ -141,7 +141,7 @@ int dumb_ups_get_capabilities(UPSINFO *ups)
  */
 int dumb_ups_read_volatile_data(UPSINFO *ups) 
 {
-    SIMPLE_DATA *private = ups->driver_internal_data;
+    SIMPLE_DATA *my_data = (SIMPLE_DATA *)ups->driver_internal_data;
     int stat = 1;
     int BattFail = 0;
 
@@ -155,12 +155,12 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
 
     write_lock(ups);
 
-    ioctl(ups->fd, TIOCMGET, &private->sp_flags);
+    ioctl(ups->fd, TIOCMGET, &my_data->sp_flags);
     switch(ups->mode.type) {
     case BK:
     case SHAREBASIC: 
     case NETUPS:
-	if (private->sp_flags & TIOCM_DTR) {
+	if (my_data->sp_flags & TIOCM_DTR) {
 	    BattFail = 1;
 	} else {
 	    BattFail = 0;
@@ -175,7 +175,7 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
 	/*
 	 * This is the ONBATT signal sent by UPS.
 	 */
-	    if (private->sp_flags & TIOCM_CD) {
+	    if (my_data->sp_flags & TIOCM_CD) {
 	    UPS_SET(UPS_ONBATT);
 	} else {
 	    UPS_CLEAR(UPS_ONBATT);
@@ -188,7 +188,7 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
 	 * something wrong with battery or charger. Set also the
 	 * UPS_REPLACEBATT flag if needed.
 	 */
-	if (private->sp_flags & TIOCM_SR) {
+	if (my_data->sp_flags & TIOCM_SR) {
 	    UPS_CLEAR(UPS_ONLINE);
 	} else {
 	    UPS_SET(UPS_ONLINE);
@@ -198,7 +198,7 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
 	} else {
 	    BattFail = 0;
 	}
-	if (!(private->sp_flags & TIOCM_CTS)) {
+	if (!(my_data->sp_flags & TIOCM_CTS)) {
 	    UPS_SET(UPS_BATTLOW);
 	} else {
 	    UPS_CLEAR(UPS_BATTLOW);
@@ -210,12 +210,12 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
 	case APC_940_0128A:
 	case APC_940_0020B:
 	case APC_940_0020C:
-	    if (private->sp_flags & TIOCM_CTS) {
+	    if (my_data->sp_flags & TIOCM_CTS) {
 	    UPS_CLEAR_ONLINE();
 	} else {
 	    UPS_SET_ONLINE();
 	}
-	if (private->sp_flags & TIOCM_CD) {
+	if (my_data->sp_flags & TIOCM_CD) {
 	    UPS_SET(UPS_BATTLOW);
 	} else {
 	    UPS_CLEAR(UPS_BATTLOW);
@@ -223,7 +223,7 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
 	    break;
 
 	case APC_940_0023A:
-	    if (private->sp_flags & TIOCM_CD) {
+	    if (my_data->sp_flags & TIOCM_CD) {
 	    UPS_CLEAR_ONLINE();
 	} else {
 	    UPS_SET_ONLINE();
@@ -231,7 +231,7 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
 
 	    /* BOGUS STUFF MUST FIX IF POSSIBLE */
 
-	if (private->sp_flags & TIOCM_SR) {
+	if (my_data->sp_flags & TIOCM_SR) {
 	    UPS_SET(UPS_BATTLOW);
 	} else {
 	    UPS_CLEAR(UPS_BATTLOW);
@@ -240,12 +240,12 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
 
 	case APC_940_0095A:
 	case APC_940_0095C:
-	    if (private->sp_flags & TIOCM_RNG) {
+	    if (my_data->sp_flags & TIOCM_RNG) {
 	    UPS_CLEAR_ONLINE();
 	} else {
 	    UPS_SET_ONLINE();
 	}
-	if (private->sp_flags & TIOCM_CD) {
+	if (my_data->sp_flags & TIOCM_CD) {
 	    UPS_SET(UPS_BATTLOW);
 	} else {
 	    UPS_CLEAR(UPS_BATTLOW);
@@ -253,7 +253,7 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
 	    break;
 
 	case APC_940_0095B:
-	    if (private->sp_flags & TIOCM_RNG) {
+	    if (my_data->sp_flags & TIOCM_RNG) {
 	    UPS_CLEAR_ONLINE();
 	} else {
 	    UPS_SET_ONLINE();
@@ -261,12 +261,12 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
 	    break;
 
 	case MAM_CABLE:
-	if (!(private->sp_flags & TIOCM_CTS)) {
+	if (!(my_data->sp_flags & TIOCM_CTS)) {
 	    UPS_CLEAR_ONLINE();
 	} else {
 	    UPS_SET_ONLINE();
 	}
-	if (!(private->sp_flags & TIOCM_CD)) {
+	if (!(my_data->sp_flags & TIOCM_CD)) {
 	    UPS_SET(UPS_BATTLOW);
 	} else {
 	    UPS_CLEAR(UPS_BATTLOW);

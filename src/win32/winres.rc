@@ -64,7 +64,7 @@ BEGIN
             VALUE "FileDescription", "APC UPS daemon for Win32\0"
             VALUE "FileVersion", VERSION "\0"
             VALUE "InternalName", "Apcupsd\0"
-            VALUE "LegalCopyright", "Copyright Kern Sibbald, 2001\0"
+            VALUE "LegalCopyright", "Copyright Kern Sibbald, 1999-2003\0"
             VALUE "LegalTrademarks", "Licensed under GNU GPL 2.0\0"
             VALUE "OriginalFilename", "apcupsd.exe\0"
             VALUE "PrivateBuild", "\0"
@@ -133,15 +133,13 @@ BEGIN
     LTEXT           "      by Kern Sibbald",IDC_NAME,90,20,239,10
     LTEXT           "For more information, see:",
                     IDC_WWW,90,40,239,10
-    LTEXT           "         www.sibbald.com/apcupsd",
+    LTEXT           "         www.apcupsd.com",
                     IDC_WWW,90,50,239,10
-    LTEXT           "         www.oasi.gpa.it/riccardo/linux/apcupsd",
+    LTEXT           "         sourceforge.net/projects/apcupsd",
                     IDC_WWW,90,60,239,10
-    LTEXT           "         ftp.oasi.gpa.it/pub/apcupsd",
-                    IDC_WWW,90,70,239,10
-    LTEXT           "Copyright (C) 1999-2001, Kern Sibbald",
+    LTEXT           "Copyright (C) 1999-2003, Kern Sibbald",
                     IDC_COPYRIGHT,7,100,175,10
-    LTEXT           "Copyright (C) 1999-2001, Riccardo Facchetti",
+    LTEXT           "Copyright (C) 1999-2002, Riccardo Facchetti",
                     IDC_COPYRIGHT,7,110,175,10
     LTEXT           "Copyright (C) 1996-1999, André M. Hedrick",
                     IDC_COPYRIGHT,7,120,175,10

@@ -55,7 +55,7 @@ const UINT MENU_SERVICEHELPER_MSG = RegisterWindowMessage("Apcupsd.ServiceHelper
 const UINT MENU_ADD_CLIENT_MSG = RegisterWindowMessage("Apcupsd.AddClient.Message");
 const char *MENU_CLASS_NAME = "Apcupsd Tray Icon";
 
-extern "C" char *ups_status(int stat);
+extern char *ups_status(int stat);
 
 extern int battstat;
 

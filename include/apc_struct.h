@@ -259,7 +259,7 @@ typedef struct upsinfo {
     INTERNALGENINFO enable_access;
     INTERNALGENINFO nologin;
     INTERNALGENINFO mode;
-    INTERNALGENINFO class;
+    INTERNALGENINFO upsclass;
     INTERNALGENINFO sharenet;
 
     int num_execed_children;      /* children created in execute_command() */

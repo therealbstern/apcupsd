@@ -163,12 +163,12 @@ non-power fail condition or bug.\n Killpower request ignored at %s:%d\n"),
 	/*
 	 * We are on batteries, so do the kill_power 
 	 */
-	if ((ups->class.type == SHAREMASTER) ||
-	    (ups->class.type == SHARENETMASTER)) {
+	if ((ups->upsclass.type == SHAREMASTER) ||
+	    (ups->upsclass.type == SHARENETMASTER)) {
 	    log_event(ups, LOG_WARNING,
                           _("Waiting 30 seconds for slave(s) to shutdown."));
 		sleep(30);
-	} else if (ups->class.type == NETMASTER) {
+	} else if (ups->upsclass.type == NETMASTER) {
 	    log_event(ups, LOG_WARNING,
                           _("Waiting 30 seconds for slave(s) to shutdown"));
 	    sleep(30);

@@ -183,7 +183,7 @@ static void status_write(UPSINFO *ups, char *fmt, ...)
     avsnprintf(buf, sizeof(buf), fmt, ap);
     va_end(ap);
 
-    if ((i=(strlen(largebuf) + strlen(buf))) < (sizeof(largebuf)-1)) {
+    if ((i=(strlen(largebuf) + strlen(buf))) < (int)(sizeof(largebuf)-1)) {
 	strcat(largebuf, buf);
 	stat_recs++;
     } else
@@ -194,9 +194,10 @@ static void status_write(UPSINFO *ups, char *fmt, ...)
 
 void do_server(UPSINFO *ups)
 {
-   int newsockfd, sockfd, clilen, childpid;
+   int newsockfd, sockfd, childpid;
    struct sockaddr_in cli_addr;       /* client's address */
    struct sockaddr_in serv_addr;      /* our address */
+   socklen_t clilen;
    int tlog;
    int turnon = 1;
    struct s_arg *arg;
@@ -290,7 +291,7 @@ void do_server(UPSINFO *ups)
        }
 #endif
 
-       arg = malloc(sizeof(struct s_arg));
+       arg = (struct s_arg *)malloc(sizeof(struct s_arg));
        arg->newsockfd = newsockfd;
        arg->ups = ups;
        childpid = 0;

@@ -14,7 +14,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.		  
+   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.              
 */
 
 void do_model (char *monhost, char *suffix);
@@ -31,9 +31,9 @@ void do_ambtempf (char *monhost, char *suffix);
 void do_utility (char *monhost, char *suffix);
 
 struct {
-	char	*name;
-	void	(*func)(char *monhost, char *suffix);
-}	fields[] =
+        char    *name;
+        void    (*func)(char *monhost, char *suffix);
+}       fields[] =
 {
         { "MODEL",      do_model                },
         { "SYSTEM",     do_system               },
@@ -47,5 +47,5 @@ struct {
         { "AMBTEMPC",   do_ambtempc             },
         { "AMBTEMPF",   do_ambtempf             },
         { "UTILITY",    do_utility              },
-	{ NULL, 	(void(*)())(NULL)	}
+        { NULL,         (void(*)(char *, char *))(NULL)       }
 };

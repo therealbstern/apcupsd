@@ -72,7 +72,7 @@ int apcsmart_ups_kill_power(UPSINFO *ups) {
     a = ups->UPS_Cmd[CI_DSHUTD]; /* shutdown delay */
     write(ups->fd, &a, 1);
     getline(response, sizeof(response), ups);
-    shutdown_delay = atof(response);
+    shutdown_delay = (int)atof(response);
     a = 'S';      /* ask for soft shutdown */
     write(ups->fd, &a, 1);
     /*

@@ -518,8 +518,8 @@ int net_ups_read_static_data(UPSINFO *ups)
 		sizeof(ups->mode.long_name))) {
         log_event(ups, LOG_ERR, "getupsvar: failed for \"model\".");
     }
-    if (!getupsvar(ups, "upsmode", ups->class.long_name,
-		sizeof(ups->class.long_name))) {
+    if (!getupsvar(ups, "upsmode", ups->upsclass.long_name,
+		sizeof(ups->upsclass.long_name))) {
         log_event(ups, LOG_ERR, "getupsvar: failed for \"upsmode\".");
     }
     if (ups->UPS_Cap[CI_SERNO] &&

@@ -59,6 +59,13 @@
 
 #include "apc.h"
 
+/* 
+ * If this is a Windows machine, we do NOT create a pid file.
+ *   We prevent multiple copies of apcupsd from running by 
+ *   ensuring that there is only one system tray entry for
+ *   apcupsd.
+ */
+
 /*
  * Create a file in `path'.  Used for nologin and powerfail
  *   files.
@@ -81,6 +88,7 @@ int make_file(UPSINFO *ups, const char *path)
  */
 void make_pid_file(void)
 {
+#ifndef HAVE_CYGWIN
     pid_t pid = getpid();
     int pfd, len;
     char buf[100];
@@ -91,4 +99,5 @@ void make_pid_file(void)
 	write(pfd, buf, len);
 	close(pfd);
     }
+#endif
 }

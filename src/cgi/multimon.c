@@ -310,7 +310,7 @@ void getinfo(char *monhost)
     printf ("<TR ALIGN=CENTER>\n");
 
     /* process each field one by one */
-    for (tmp = firstfield; tmp != NULL; tmp = tmp->next) {
+    for (tmp = (ftype *)firstfield; tmp != NULL; tmp = (ftype *)tmp->next) {
 	found = 0;
 
 	/* search for a recognized special field name */
@@ -348,19 +348,20 @@ void addfield(char *var, char *name, char *suffix)
 
     while (tmp != NULL) {
 	last = tmp;
-	tmp = tmp->next;
+	tmp = (ftype *)tmp->next;
     }
 
-    tmp = malloc (sizeof (ftype));
+    tmp = (ftype *)malloc (sizeof (ftype));
     tmp->var = var;
     tmp->name = name;
     tmp->suffix = suffix;
     tmp->next = NULL;
 
-    if (last == NULL)
+    if (last == NULL) {
 	firstfield = tmp;
-    else
+    } else {
 	last->next = tmp;
+    }
 
     numfields++;
 }
@@ -371,7 +372,7 @@ void parsefield(char *buf)
     char *ptr, *var, *name = NULL, *suffix = NULL, *tmp;
     int i = 0, in_string = 0;
 
-    tmp = malloc(strlen(buf) + 1);
+    tmp = (char *)malloc(strlen(buf) + 1);
 
     /* <variable> "<field name>" "<field suffix>" */
 
@@ -515,7 +516,7 @@ int main()
     printf ("<TR BGCOLOR=\"#60B0B0\">\n");
 
     /* print column names */
-    for (tmp = firstfield; tmp != NULL; tmp = tmp->next)
+    for (tmp = (ftype *)firstfield; tmp != NULL; tmp = (ftype *)tmp->next)
         printf ("<TH COLSPAN=1>%s</TH>\n", tmp->name);
 
     printf ("</TR>\n"); 

@@ -207,21 +207,21 @@ int getline(char *s, int len, UPSINFO *ups)
     int ending = 0;
     char c;
     int retval;
-    SMART_DATA *private = ups->driver_internal_data;
+    SMART_DATA *my_data = (SMART_DATA *)ups->driver_internal_data;
 
     while (!ending) {
 #ifndef HAVE_CYGWIN
 	fd_set rfds;
 	struct timeval tv;
  
-	if (private->debounce) {
+	if (my_data->debounce) {
 	   /* Wait 6 seconds before returning next sample.
 	    * This eliminates the annoyance of detecting
 	    * transitions to battery that last less than
 	    * 6 seconds.
 	    */
-	   sleep(6 - (time(NULL) - private->debounce));
-	   private->debounce = 0;
+	   sleep(6 - (time(NULL) - my_data->debounce));
+	   my_data->debounce = 0;
 	}
   
 	FD_ZERO(&rfds);
@@ -283,7 +283,7 @@ int getline(char *s, int len, UPSINFO *ups)
 	    if (s == NULL)
 		write_lock(ups);
 	    if (!UPS_ISSET(UPS_ONBATT)) {
-	       private->debounce = time(NULL);
+	       my_data->debounce = time(NULL);
 	    }
 	UPS_CLEAR_ONLINE();
             Dmsg0(80, "Got UPS ON BATT.\n");
@@ -586,23 +586,23 @@ int apcsmart_ups_read_static_data(UPSINFO *ups)
 
     /* WAKEUP_DELAY */
     if (ups->UPS_Cap[CI_DWAKE])
-	ups->dwake = atof(smart_poll(ups->UPS_Cmd[CI_DWAKE], ups));
+	ups->dwake = (int)atof(smart_poll(ups->UPS_Cmd[CI_DWAKE], ups));
 
     /* SLEEP_DELAY */
     if (ups->UPS_Cap[CI_DSHUTD])
-	ups->dshutd = atof(smart_poll(ups->UPS_Cmd[CI_DSHUTD], ups));
+	ups->dshutd = (int)atof(smart_poll(ups->UPS_Cmd[CI_DSHUTD], ups));
 
     /* LOW_TRANSFER_LEVEL */
     if (ups->UPS_Cap[CI_LTRANS])
-	ups->lotrans = atof(smart_poll(ups->UPS_Cmd[CI_LTRANS], ups));
+	ups->lotrans = (int)atof(smart_poll(ups->UPS_Cmd[CI_LTRANS], ups));
 
     /* HIGH_TRANSFER_LEVEL */
     if (ups->UPS_Cap[CI_HTRANS])
-	ups->hitrans = atof(smart_poll(ups->UPS_Cmd[CI_HTRANS], ups));
+	ups->hitrans = (int)atof(smart_poll(ups->UPS_Cmd[CI_HTRANS], ups));
 
     /* UPS_BATT_CAP_RETURN */
     if (ups->UPS_Cap[CI_RETPCT])
-	ups->rtnpct = atof(smart_poll(ups->UPS_Cmd[CI_RETPCT], ups));
+	ups->rtnpct = (int)atof(smart_poll(ups->UPS_Cmd[CI_RETPCT], ups));
 
     /* ALARM_STATUS */
     if (ups->UPS_Cap[CI_DALARM])
@@ -611,7 +611,7 @@ int apcsmart_ups_read_static_data(UPSINFO *ups)
 
     /* LOWBATT_SHUTDOWN_LEVEL */
     if (ups->UPS_Cap[CI_DLBATT])
-	ups->dlowbatt = atof(smart_poll(ups->UPS_Cmd[CI_DLBATT], ups));
+	ups->dlowbatt = (int)atof(smart_poll(ups->UPS_Cmd[CI_DLBATT], ups));
 
     /* UPS_NAME */
     if (ups->upsname[0] == 0 && ups->UPS_Cap[CI_IDEN])

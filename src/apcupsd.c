@@ -318,7 +318,13 @@ int main(int argc, char *argv[]) {
     ups->start_time = time(NULL);
     delete_lockfile(ups);
 
-/*  device_program_eeprom(ups);     if requested do eeprom changes */
+    if (go_background) {
+       daemon_start();
+    }
+
+    setproctitle("apcmain");
+    make_pid_file();
+    init_signals(apcupsd_terminate);
 
     /* Create temp events file */
     if (ups->eventfile[0] != 0) {
@@ -329,14 +335,13 @@ int main(int argc, char *argv[]) {
 	}
     }
 
-
     switch(ups->sharenet.type) {
     case DISABLE:
     case SHARE:
 	setup_device(ups);
 	break;
     case NET:
-	switch(ups->class.type) {
+	switch(ups->upsclass.type) {
 	case NO_CLASS:
 	case STANDALONE:
 	case SHARESLAVE:
@@ -344,15 +349,18 @@ int main(int argc, char *argv[]) {
 	case SHARENETMASTER:
 	    break;
 	case NETSLAVE:
-	    if (kill_ups_power)
+	    if (kill_ups_power) {
                 Error_abort0(_("Ignoring killpower for slave\n"));
-	    if (prepare_slave(ups)) 
+	    }
+	    if (prepare_slave(ups)) {
                 Error_abort0(_("Error setting up slave\n"));
+	    }
 	    break;
 	case NETMASTER:
 	    setup_device(ups);
-	    if ((kill_ups_power == 0) && (prepare_master(ups)))
+	    if ((kill_ups_power == 0) && (prepare_master(ups))) {
                 Error_abort0("Error setting up master\n");
+	    }
 	    break;
 	default:
             Error_abort1(_("NET Class Error %s\n\a"), strerror(errno));
@@ -360,8 +368,9 @@ int main(int argc, char *argv[]) {
 	break;
     case SHARENET:
 	setup_device(ups);
-	if ((kill_ups_power == 0) && (prepare_master(ups)))
+	if ((kill_ups_power == 0) && (prepare_master(ups))) {
             Error_abort0("Error setting up master.\n");
+	}
 	break;
     default:
         Error_abort0(_("Unknown share net type\n"));
@@ -376,26 +385,9 @@ int main(int argc, char *argv[]) {
 	apcupsd_terminate(0);
     }
 
-    /*
-     * Delete the lockfile just before fork. We will reacquire it just
-     * after.
-     */
-
-    delete_lockfile(ups);
-
-    if (go_background) {
-       daemon_start();
-    }
-
-    setproctitle("apcmain");
-
-    make_pid_file();
-
     if (create_lockfile(ups) == LCKERROR) {
-        Error_abort1(_("failed to reacquire serial port lock file on device %s\n"), ups->device);
+        Error_abort1(_("Failed to reacquire serial port lock file on device %s\n"), ups->device);
     }
-
-    init_signals(apcupsd_terminate);
 
     if (!UPS_ISSET(UPS_SLAVE)) {
 	prep_device(ups);
@@ -415,7 +407,6 @@ int main(int argc, char *argv[]) {
      * No more unchecked writes to myUPS because the threads must rely
      * on write locks and up to date data in the shared structure.
      */
-
 
     if (slave_count) {
 	/* we are the netmaster */
@@ -455,7 +446,7 @@ int main(int argc, char *argv[]) {
 #endif
 
     apcupsd_terminate(0);
-    return -1;				/* to keep compiler happy */
+    return 0;				/* to keep compiler happy */
 }
 
 /*
@@ -468,10 +459,11 @@ static void daemon_start()
     pid_t cpid;
     mode_t oldmask;
 
-    if ( (cpid = fork() ) < 0)
-            Error_abort0("Cannot fork to become daemon\n");
-    else if (cpid > 0)
-	    exit(0);		      /* parent exits */
+    if ( (cpid = fork() ) < 0) {
+        Error_abort0("Cannot fork to become daemon\n");
+    } else if (cpid > 0) {
+	exit(0);		  /* parent exits */
+    }
 
     /* Child continues */
     setsid();			       /* become session leader */

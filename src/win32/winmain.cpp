@@ -44,12 +44,14 @@
 #include <ctype.h>
 #include <signal.h>
 
-extern "C" int ApcupsdMain(int argc, char **argv);
-extern "C" int terminate(int sig);
-extern "C" void clean_threads(void);
+extern int ApcupsdMain(int argc, char **argv);
+extern int terminate(int sig);
+extern void clean_threads(void);
 extern int kill_on_powerfail;
 extern DWORD g_error;
 extern BOOL ReportStatus(DWORD state, DWORD exitcode, DWORD waithint);
+
+extern void LogErrorMsg(char *msg, int eventID);
 
 
 ////////////////////////////

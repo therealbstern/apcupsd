@@ -225,8 +225,8 @@
 /* Set if have arps/nameser.h */
 #undef HAVE_NAMESER_H
 
-/* Define to `int' if <sys/socket.h> doesn't define.  */
-#undef socklen_t
+/* Set if socklen_t defined */
+#undef HAVE_SOCKLEN_T
 
 /* Define if you have the __argz_count function.  */
 #undef HAVE___ARGZ_COUNT
@@ -239,9 +239,6 @@
 
 /* Define if you have the abort function.  */
 #undef HAVE_ABORT
-
-/* Define if you have the alarm function.  */
-#undef HAVE_ALARM
 
 /* Define if you have the calloc function.  */
 #undef HAVE_CALLOC

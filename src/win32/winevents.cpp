@@ -39,12 +39,12 @@
 #include "winups.h"
 #include "winevents.h"
 
-extern "C" void FillEventsBox(HWND hwnd, int id_list);
+extern void FillEventsBox(HWND hwnd, int id_list);
 
 // Constructor/destructor
 upsEvents::upsEvents()
 {
-        m_dlgvisible = FALSE;
+    m_dlgvisible = FALSE;
 }
 
 upsEvents::~upsEvents()
@@ -55,7 +55,7 @@ upsEvents::~upsEvents()
 BOOL
 upsEvents::Init()
 {
-        return TRUE;
+    return TRUE;
 }
 
 // Dialog box handling functions
@@ -74,10 +74,7 @@ upsEvents::Show(BOOL show)
 }
 
 BOOL CALLBACK
-upsEvents::DialogProc(HWND hwnd,
-                      UINT uMsg,
-                      WPARAM wParam,
-                      LPARAM lParam )
+upsEvents::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
         // We use the dialog-box's USERDATA to store a _this pointer
         // This is set only once WM_INITDIALOG has been recieved, though!

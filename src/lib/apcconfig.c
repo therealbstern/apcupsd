@@ -118,7 +118,7 @@ static GENINFO cables[] = {
     { NULL,        "*invalid-cable*",     NO_CABLE  },
 };
 
-static GENINFO classes[] = {
+static GENINFO upsclasses[] = {
     { "standalone",     "Stand Alone",           STANDALONE },
     { "shareslave",     "ShareUPS Slave",        SHARESLAVE },
     { "sharemaster",    "ShareUPS Master",       SHAREMASTER },
@@ -276,7 +276,7 @@ static PAIRS table[] = {
             "Master network machine"                        },
     { "USERMAGIC",   match_str, WHERE(usermagic),   SIZE(usermagic),
             "Id string for network security"                },
-    { "UPSCLASS",   match_range, WHERE(class),         classes,
+    { "UPSCLASS",   match_range, WHERE(upsclass),     upsclasses,
             "UPS class"                                     },
     { "UPSMODE",    match_range, WHERE(sharenet),      modes,
             "UPS mode"                                      },
@@ -708,7 +708,7 @@ static int ParseConfig(UPSINFO *ups, char *line) {
 void init_ups_struct(UPSINFO *ups) 
 {
 
-    ups->buf = malloc(BUF_SIZE);
+    ups->buf = (char *)malloc(BUF_SIZE);
     if (ups->buf) {
        ups->buf_len = BUF_SIZE;
     }
@@ -902,7 +902,7 @@ jump_into_the_loop:
      * post-process the configuration stored in the ups structure
      */
 
-    if (ups->class.type != NETSLAVE)
+    if (ups->upsclass.type != NETSLAVE)
         ups->usermagic[0] = '\0';
 
     /*
@@ -993,9 +993,9 @@ jump_into_the_loop:
     }
 
     if (ups->PoweredByUPS) {
-        UPS_SET(UPS_PLUGGED);
+	UPS_SET(UPS_PLUGGED);
     } else {
-        UPS_CLEAR(UPS_PLUGGED);
+	UPS_CLEAR(UPS_PLUGGED);
     }
 
 bail_out:

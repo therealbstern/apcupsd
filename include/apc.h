@@ -82,7 +82,7 @@
 #endif
 
 #ifdef HAVE_OPENSERVER_OS
-# define _SVID3		/* OpenServer needs this to see TIOCM_ defn's */
+# define _SVID3         /* OpenServer needs this to see TIOCM_ defn's */
 #endif
 
 #ifdef HAVE_UNISTD_H
@@ -186,7 +186,8 @@
 
 /* System includes conditionally included */
 #ifdef HAVE_LIBWRAP
-# include <tcpd.h>
+/* Pull in our local copy because the library does not have correct protos */
+#include "tcpd.h"
 #endif
 
 #endif

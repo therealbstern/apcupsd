@@ -192,7 +192,7 @@ typedef struct s_usb_data {
 
 static void reinitialize_private_structure(UPSINFO *ups)
 {
-    USB_DATA *private = ups->driver_internal_data;
+    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
     int k;
     Dmsg0(200, "Reinitializing private structure.\n");
     /*
@@ -201,9 +201,9 @@ static void reinitialize_private_structure(UPSINFO *ups)
      */
     for (k=0; k <= CI_MAXCI; k++) {
 	ups->UPS_Cap[k] = FALSE;
-	if (private->info[k] != NULL) {
-	    free(private->info[k]);
-	    private->info[k] = NULL;
+	if (my_data->info[k] != NULL) {
+	    free(my_data->info[k]);
+	    my_data->info[k] = NULL;
 	}
     }
 }
@@ -220,12 +220,12 @@ static int open_usb_device(UPSINFO *ups)
     int start, end;
     char name[MAXSTRING];
     char devname[MAXSTRING];
-    USB_DATA *private = ups->driver_internal_data;
+    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
 
-    if (private->orig_device[0] == 0) {
-       strcpy(private->orig_device, ups->device);
+    if (my_data->orig_device[0] == 0) {
+       strcpy(my_data->orig_device, ups->device);
     }
-    strcpy(name, private->orig_device);
+    strcpy(name, my_data->orig_device);
     p = strchr(name, '[');
     if (p) {			      /* range specified */
        q = strchr(p+1, '-');
@@ -262,17 +262,17 @@ static int open_usb_device(UPSINFO *ups)
 	sprintf(devname, name, start);
     
 	/* Open the device port */
-	if ((private->fd = open(devname, O_RDWR | O_NOCTTY)) < 0) {
+	if ((my_data->fd = open(devname, O_RDWR | O_NOCTTY)) < 0) {
 	   continue;
 	}
 	if (!find_usb_application(ups)) {
-	   close(private->fd);
-	   private->fd = -1;
+	   close(my_data->fd);
+	   my_data->fd = -1;
 	   continue;
 	}
 	break;
     }
-    if (private->fd >= 0) {
+    if (my_data->fd >= 0) {
        strcpy(ups->device, devname);
        return 1;
     } else {
@@ -291,7 +291,7 @@ static int usb_link_check(UPSINFO *ups)
     int comm_err = TRUE;
     int tlog;
     int once = TRUE;
-    USB_DATA *private = ups->driver_internal_data;
+    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
 
     if (linkcheck) {
 	return 0;
@@ -314,9 +314,9 @@ static int usb_link_check(UPSINFO *ups)
 	}
 	/* Retry every LINK_RETRY_INTERVAL seconds */
 	sleep(LINK_RETRY_INTERVAL);
-	if (private->fd >= 0) {
-	   close(private->fd);
-	   private->fd = -1;
+	if (my_data->fd >= 0) {
+	   close(my_data->fd);
+	   my_data->fd = -1;
 	   reinitialize_private_structure(ups);
 	}
 	if (open_usb_device(ups) && usb_ups_get_capabilities(ups) &&
@@ -343,9 +343,9 @@ static int usb_link_check(UPSINFO *ups)
 static int find_usb_application(UPSINFO *ups)
 {
     int i, ret;
-    USB_DATA *private = ups->driver_internal_data;
+    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
 
-    for (i=0; (ret = ioctl(private->fd, HIDIOCAPPLICATION, i)) > 0; i++) {
+    for (i=0; (ret = ioctl(my_data->fd, HIDIOCAPPLICATION, i)) > 0; i++) {
        if ((ret & 0xffff000) == (UPS_USAGE & 0xffff0000)) {
 	  return 1;
        }
@@ -360,20 +360,20 @@ static int get_value(UPSINFO *ups, int ci, USB_INFO *uinfo)
 {
     struct hiddev_string_descriptor sdesc;
     struct hiddev_report_info rinfo;
-    USB_DATA *private = ups->driver_internal_data;
+    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
     USB_INFO *info;
     int exponent;
 
-    if (!ups->UPS_Cap[ci] || !private->info[ci]) {
+    if (!ups->UPS_Cap[ci] || !my_data->info[ci]) {
 	return 0;		      /* UPS does not have capability */
     }
-    info = private->info[ci];	      /* point to our info structure */
+    info = my_data->info[ci];	      /* point to our info structure */
     rinfo.report_type = info->uref.report_type;
     rinfo.report_id = info->uref.report_id;
-    if (ioctl(private->fd, HIDIOCGREPORT, &rinfo) < 0) {  /* update Report */
+    if (ioctl(my_data->fd, HIDIOCGREPORT, &rinfo) < 0) {  /* update Report */
        return 0;
     }
-    if (ioctl(private->fd, HIDIOCGUSAGE, &info->uref) < 0) {  /* update UPS value */
+    if (ioctl(my_data->fd, HIDIOCGUSAGE, &info->uref) < 0) {  /* update UPS value */
        return 0;
     }
     exponent = info->unit_exponent;
@@ -385,7 +385,7 @@ static int get_value(UPSINFO *ups, int ci, USB_INFO *uinfo)
 	   return 0;
 	}
 	sdesc.index = info->uref.value;
-	if (ioctl(private->fd, HIDIOCGSTRING, &sdesc) < 0) {
+	if (ioctl(my_data->fd, HIDIOCGSTRING, &sdesc) < 0) {
 	    return 0;
 	}
 	strncpy(ups->buf, sdesc.value, ups->buf_len);
@@ -458,7 +458,7 @@ int usb_ups_check_state(UPSINFO *ups)
     int i;
     int retval;
     struct hiddev_event ev[64];
-    USB_DATA *private = ups->driver_internal_data;
+    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
 
 
     for ( ;; ) {
@@ -466,12 +466,12 @@ int usb_ups_check_state(UPSINFO *ups)
 	struct timeval tv;
  
 	FD_ZERO(&rfds);
-	FD_SET(private->fd, &rfds);
+	FD_SET(my_data->fd, &rfds);
 	tv.tv_sec = ups->wait_time;
 	tv.tv_usec = 0;
 	   
 	errno = 0;
-	retval = select((private->fd)+1, &rfds, NULL, NULL, &tv);
+	retval = select((my_data->fd)+1, &rfds, NULL, NULL, &tv);
 
 	switch (retval) {
 	case 0: /* No chars available in TIMER seconds. */
@@ -489,7 +489,7 @@ int usb_ups_check_state(UPSINFO *ups)
 
 
 	do {
-	   retval = read(private->fd, &ev, sizeof(ev));
+	   retval = read(my_data->fd, &ev, sizeof(ev));
 	} while (retval == -1 && (errno == EAGAIN || errno == EINTR));
 
 	if (retval < 0) {	      /* error */
@@ -498,7 +498,7 @@ int usb_ups_check_state(UPSINFO *ups)
 	   return 0;
 	}
 
-	if (retval == 0 || retval < sizeof(ev[0])) {
+	if (retval == 0 || retval < (int)sizeof(ev[0])) {
 	   return 0;
 	}
 
@@ -516,21 +516,21 @@ int usb_ups_check_state(UPSINFO *ups)
 	 *   APCStatusFlag
 	 *   Charging
 	 */   
-	if (private->debounce) {
+	if (my_data->debounce) {
 	   /* Wait 6 seconds before returning next sample.
 	    * This eliminates the annoyance of detecting
 	    * transitions to battery that last less than
 	    * 6 seconds.
  */   
-	   sleep(6 - (time(NULL) - private->debounce));
-	   private->debounce = 0;
+	   sleep(6 - (time(NULL) - my_data->debounce));
+	   my_data->debounce = 0;
 	}
 	write_lock(ups);
-	for (i=0; i < (retval/sizeof(ev[0])); i++) {
+	for (i=0; i < (retval/(int)sizeof(ev[0])); i++) {
 	    if (ev[i].hid == ups->UPS_Cmd[CI_Discharging]) {
 		/* If first time on batteries, debounce */
 		if (!UPS_ISSET(UPS_ONBATT) && ev[i].value) {
-		   private->debounce = time(NULL);
+		   my_data->debounce = time(NULL);
 		}
 		if (ev[i].value) {
 	    UPS_CLEAR_ONLINE();
@@ -547,7 +547,7 @@ int usb_ups_check_state(UPSINFO *ups)
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_ACPresent]) {
 		/* If first time on batteries, debounce */
 		if (!UPS_ISSET(UPS_ONBATT) && !ev[i].value) {
-		   private->debounce = time(NULL);
+		   my_data->debounce = time(NULL);
 		}
 		if (!ev[i].value) {
 	    UPS_CLEAR_ONLINE();
@@ -557,7 +557,7 @@ int usb_ups_check_state(UPSINFO *ups)
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_RemainingCapacity]) {
 		ups->BattChg = ev[i].value;
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_RunTimeToEmpty]) {
-		if (private->vendor == Vendor_APC) {
+		if (my_data->vendor == Vendor_APC) {
 		    ups->TimeLeft = ((double)ev[i].value) / 60;  /* seconds */
 		} else {
 		    ups->TimeLeft = ev[i].value;  /* minutes */
@@ -591,23 +591,23 @@ int usb_ups_check_state(UPSINFO *ups)
  */
 int usb_ups_open(UPSINFO *ups)
 {
-    USB_DATA *private = ups->driver_internal_data;
+    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
 
     write_lock(ups);
-    if (private == NULL) {
-       private = malloc(sizeof(USB_DATA));
-       if (private == NULL) {
+    if (my_data == NULL) {
+       my_data = (USB_DATA *)malloc(sizeof(USB_DATA));
+       if (my_data == NULL) {
           log_event(ups, LOG_ERR, "Out of memory.");
 	  write_unlock(ups);
 	  exit(1);
        }
-       memset(private, 0, sizeof(USB_DATA));
-       ups->driver_internal_data = private;
+       memset(my_data, 0, sizeof(USB_DATA));
+       ups->driver_internal_data = my_data;
     } else {
        reinitialize_private_structure(ups);
     }
-    if (private->orig_device[0] == 0) {
-       strcpy(private->orig_device, ups->device);
+    if (my_data->orig_device[0] == 0) {
+       strcpy(my_data->orig_device, ups->device);
     }
     if (!open_usb_device(ups)) {
 	write_unlock(ups);
@@ -645,14 +645,14 @@ int usb_ups_close(UPSINFO *ups)
 int usb_ups_get_capabilities(UPSINFO *ups)
 {
     int rtype[2] = { HID_REPORT_TYPE_FEATURE, HID_REPORT_TYPE_INPUT};
-    USB_DATA *private = ups->driver_internal_data;
+    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
     struct hiddev_report_info rinfo;
     struct hiddev_field_info finfo;
     struct hiddev_usage_ref uref;
     int i, j, k, n;
 
     write_lock(ups);
-    if (ioctl(private->fd, HIDIOCINITREPORT, 0) < 0) {
+    if (ioctl(my_data->fd, HIDIOCINITREPORT, 0) < 0) {
        write_unlock(ups);
        Error_abort1("Cannot init USB HID report. ERR=%s\n", strerror(errno));
     }
@@ -661,35 +661,35 @@ int usb_ups_get_capabilities(UPSINFO *ups)
      * Walk through all available reports and determine
      * what information we can use.
      */
-    for (n=0; n < sizeof(rtype); n++) {
+    for (n=0; n < (int)sizeof(rtype); n++) {
 	rinfo.report_type = rtype[n];
 	rinfo.report_id = HID_REPORT_ID_FIRST;
-	while (ioctl(private->fd, HIDIOCGREPORTINFO, &rinfo) >= 0) {
-	    for (i = 0; i < rinfo.num_fields; i++) { 
+	while (ioctl(my_data->fd, HIDIOCGREPORTINFO, &rinfo) >= 0) {
+	    for (i = 0; i < (int)rinfo.num_fields; i++) { 
 
 		memset(&finfo, 0, sizeof(finfo));
 		finfo.report_type = rinfo.report_type;
 		finfo.report_id = rinfo.report_id;
 		finfo.field_index = i;
-		if (ioctl(private->fd, HIDIOCGFIELDINFO, &finfo) < 0) {
+		if (ioctl(my_data->fd, HIDIOCGFIELDINFO, &finfo) < 0) {
 		    continue;
 		}
 		memset(&uref, 0, sizeof(uref));
-		for (j = 0; j < finfo.maxusage; j++) {
+		for (j = 0; j < (int)finfo.maxusage; j++) {
 		    uref.report_type = finfo.report_type;
 		    uref.report_id = finfo.report_id;
 		    uref.field_index = i;
 		    uref.usage_index = j;
-		    if (ioctl(private->fd, HIDIOCGUCODE, &uref) < 0) {
+		    if (ioctl(my_data->fd, HIDIOCGUCODE, &uref) < 0) {
 		       continue;
 		    }
-		    ioctl(private->fd, HIDIOCGUSAGE, &uref);
+		    ioctl(my_data->fd, HIDIOCGUSAGE, &uref);
 		    /*
                      * We've got a UPS usage entry, now walk down our
 		     * know_info table and see if we have a match.
 		     * If so, allocate a new entry for it.
 		     */
-		    for (k=0; k <= KNOWN_INFO_SZ; k++) {
+		    for (k=0; k <= (int)KNOWN_INFO_SZ; k++) {
 			USB_INFO *info;
 			int ci = known_info[k].ci;
 
@@ -701,12 +701,12 @@ int usb_ups_get_capabilities(UPSINFO *ups)
 			    ups->UPS_Cap[ci] = TRUE;
 			    /* ***FIXME*** remove UPS_Cmd */
 			    ups->UPS_Cmd[ci] = uref.usage_code;
-			    info = malloc(sizeof(USB_INFO));
+			    info = (USB_INFO *)malloc(sizeof(USB_INFO));
 			    if (!info) {
 			       write_unlock(ups);
                                Error_abort0(_("Out of memory.\n"));
 			    }
-			    private->info[ci] = info;
+			    my_data->info[ci] = info;
 			    info->physical = finfo.physical;
 			    info->usage_code = uref.usage_code;
 			    info->unit_exponent = finfo.unit_exponent;
@@ -739,12 +739,12 @@ int usb_ups_read_static_data(UPSINFO *ups)
     USB_INFO uinfo;
     struct hiddev_devinfo dinfo;
     int v, yy, mm, dd;
-    USB_DATA *private = ups->driver_internal_data;
+    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
 
     write_lock(ups);
 
-    if (ioctl(private->fd, HIDIOCGDEVINFO, &dinfo) >= 0) {
-       private->vendor = dinfo.vendor;
+    if (ioctl(my_data->fd, HIDIOCGDEVINFO, &dinfo) >= 0) {
+       my_data->vendor = dinfo.vendor;
     }
     
 #ifdef xxxx
@@ -786,33 +786,33 @@ int usb_ups_read_static_data(UPSINFO *ups)
 
     /* WAKEUP_DELAY */
     if (get_value(ups, CI_DWAKE, &uinfo)) {
-	ups->dwake = uinfo.dValue;
+	ups->dwake = (int)uinfo.dValue;
     }
 
     /* SLEEP_DELAY */
     if (get_value(ups, CI_DSHUTD, &uinfo)) {
-	ups->dshutd = uinfo.dValue;
+	ups->dshutd = (int)uinfo.dValue;
     }
 
     /* LOW_TRANSFER_LEVEL */
     if (get_value(ups, CI_LTRANS, &uinfo)) {
-	ups->lotrans = uinfo.dValue;
+	ups->lotrans = (int)uinfo.dValue;
     }
 
     /* HIGH_TRANSFER_LEVEL */
     if (get_value(ups, CI_HTRANS, &uinfo)) {
-	ups->hitrans = uinfo.dValue;
+	ups->hitrans = (int)uinfo.dValue;
     }
 
     /* UPS_BATT_CAP_RETURN */
     if (get_value(ups, CI_RETPCT, &uinfo)) {
-	ups->rtnpct = uinfo.dValue;
+	ups->rtnpct = (int)uinfo.dValue;
     }
 
 
     /* LOWBATT_SHUTDOWN_LEVEL */
     if (get_value(ups, CI_DLBATT, &uinfo)) {
-	ups->dlowbatt = uinfo.dValue;
+	ups->dlowbatt = (int)uinfo.dValue;
     }
 
 
@@ -858,7 +858,7 @@ int usb_ups_read_static_data(UPSINFO *ups)
 
     /* Nominal output voltage when on batteries */
     if (get_value(ups, CI_NOMOUTV, &uinfo)) {
-	ups->NomOutputVoltage = uinfo.dValue;
+	ups->NomOutputVoltage = (int)uinfo.dValue;
     }
 
     /* Nominal battery voltage */
@@ -1005,30 +1005,30 @@ static int write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
 {
     struct hiddev_report_info rinfo;
     struct hiddev_field_info finfo;
-    USB_DATA *private = ups->driver_internal_data;
+    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
     USB_INFO *info;
     int old_value, new_value;
     int i;
 
     errno = 0; 
-    if (ups->UPS_Cap[ci] && private->info[ci]) {
-	info = private->info[ci];	  /* point to our info structure */
+    if (ups->UPS_Cap[ci] && my_data->info[ci]) {
+	info = my_data->info[ci];	  /* point to our info structure */
 	rinfo.report_type = info->uref.report_type;
 	rinfo.report_id = info->uref.report_id;
-	if (ioctl(private->fd, HIDIOCGREPORT, &rinfo) < 0) {  /* update Report */
+	if (ioctl(my_data->fd, HIDIOCGREPORT, &rinfo) < 0) {  /* update Report */
             Dmsg1(000, "HIDIOCGREPORT for shutdown failed. ERR=%s\n", strerror(errno));
 	    return 0;
 	}
 	rinfo.report_type = info->uref.report_type;
 	rinfo.report_id = info->uref.report_id;
-	if (ioctl(private->fd, HIDIOCGREPORTINFO, &rinfo) < 0) {  /* get Report */
+	if (ioctl(my_data->fd, HIDIOCGREPORTINFO, &rinfo) < 0) {  /* get Report */
             Dmsg1(000, "HIDIOCGREPORT for shutdown failed. ERR=%s\n", strerror(errno));
 	    return 0;
 	}
         Dmsg1(000, "REPORTINFO num_fields=%d\n", rinfo.num_fields);
 	finfo.report_type = info->uref.report_type;
 	finfo.report_id = info->uref.report_id;
-	if (ioctl(private->fd, HIDIOCGFIELDINFO, &finfo) < 0) {  /* Get field info */
+	if (ioctl(my_data->fd, HIDIOCGFIELDINFO, &finfo) < 0) {  /* Get field info */
             Dmsg1(000, "HIDIOCGFIELDINFO for shutdown failed. ERR=%s\n", strerror(errno));
 	    return 0;
 	}
@@ -1039,7 +1039,7 @@ logical_max=%d exponent=%d unit=0x%x\n",
 	    finfo.unit_exponent, finfo.unit);
         Dmsg3(000, "GUSAGE type=%d id=%d index=%d\n", info->uref.report_type,
 	   info->uref.report_id, info->uref.field_index);
-	if (ioctl(private->fd, HIDIOCGUSAGE, &info->uref) < 0) {  /* get UPS value */
+	if (ioctl(my_data->fd, HIDIOCGUSAGE, &info->uref) < 0) {  /* get UPS value */
             Dmsg1(000, "HIDIOCSUSAGE for shutdown failed. ERR=%s\n", strerror(errno));
 	    return 0;
 	}
@@ -1047,17 +1047,17 @@ logical_max=%d exponent=%d unit=0x%x\n",
 	info->uref.value = value;
         Dmsg3(000, "SUSAGE type=%d id=%d index=%d\n", info->uref.report_type,
 	   info->uref.report_id, info->uref.field_index);
-	if (ioctl(private->fd, HIDIOCSUSAGE, &info->uref) < 0) {  /* update UPS value */
+	if (ioctl(my_data->fd, HIDIOCSUSAGE, &info->uref) < 0) {  /* update UPS value */
             Dmsg1(000, "HIDIOCSUSAGE for shutdown failed. ERR=%s\n", strerror(errno));
 	    return 0;
 	}
 	for (i=0; i < 1; i++) {
-	   if (ioctl(private->fd, HIDIOCSREPORT, &rinfo) < 0) {  /* update Report */
+	   if (ioctl(my_data->fd, HIDIOCSREPORT, &rinfo) < 0) {  /* update Report */
                Dmsg1(000, "HIDIOCSREPORT for shutdown failed. ERR=%s\n", strerror(errno));
 	       return 0;
 	   }
 	}
-	if (ioctl(private->fd, HIDIOCGUSAGE, &info->uref) < 0) {  /* get UPS value */
+	if (ioctl(my_data->fd, HIDIOCGUSAGE, &info->uref) < 0) {  /* get UPS value */
             Dmsg1(000, "HIDIOCSUSAGE for shutdown failed. ERR=%s\n", strerror(errno));
 	    return 0;
 	}

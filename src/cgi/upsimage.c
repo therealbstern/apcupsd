@@ -79,22 +79,22 @@ static void DrawText(gdImagePtr im, int min, int step)
 
     next = min;
     sprintf(text, "%d", next);
-    gdImageString (im, gdFontLarge, 0, 295, text, black);
+    gdImageString(im, gdFontLarge, 0, 295, (unsigned char *)text, black);
     next += step;
     sprintf(text, "%d", next);
-    gdImageString (im, gdFontLarge, 0, 235, text, black);
+    gdImageString(im, gdFontLarge, 0, 235, (unsigned char *)text, black);
     next += step;
     sprintf(text, "%d", next);
-    gdImageString (im, gdFontLarge, 0, 175, text, black);
+    gdImageString(im, gdFontLarge, 0, 175, (unsigned char *)text, black);
     next += step;
     sprintf(text, "%d", next);
-    gdImageString (im, gdFontLarge, 0, 115, text, black);
+    gdImageString(im, gdFontLarge, 0, 115, (unsigned char *)text, black);
     next += step;
     sprintf(text, "%d", next);
-    gdImageString (im, gdFontLarge, 0, 55, text, black);
+    gdImageString(im, gdFontLarge, 0, 55, (unsigned char *)text, black);
     next += step;
     sprintf(text, "%d", next);
-    gdImageString (im, gdFontLarge, 0, 0, text, black);
+    gdImageString(im, gdFontLarge, 0, 0, (unsigned char *)text, black);
 }
 
 static gdImagePtr InitImage()
@@ -169,14 +169,14 @@ void drawbattcap(char *battcaps, char *minbchgs)
 
     DrawText(im, 0, 20);
 
-    minbchgpos = (300 - (minbchg * 3));
-    gdImageFilledRectangle (im, 50, minbchgpos, 150, 300, red);
+    minbchgpos = (int)(300 - (minbchg * 3));
+    gdImageFilledRectangle(im, 50, minbchgpos, 150, 300, red);
 
-    battpos = (300 - (battcap * 3));
-    gdImageFilledRectangle (im, 75, battpos, 125, 300, black);
+    battpos = (int)(300 - (battcap * 3));
+    gdImageFilledRectangle(im, 75, battpos, 125, 300, black);
 
-    sprintf (batttxt, "%.1f %%", battcap);
-    gdImageString (im, gdFontLarge, 70, 320, batttxt, black);
+    sprintf(batttxt, "%.1f %%", battcap);
+    gdImageString(im, gdFontLarge, 70, 320, (unsigned char *)batttxt, black);
 
     TermImage(im);
 }
@@ -221,7 +221,7 @@ void drawbattvolt(char *battvolts, char *nombattvs)
 	  break;
        default:
 	  minv = 0;
-	  maxv = (battvolt/10 + 1) * 10;
+	  maxv = (int)(battvolt/10 + 1) * 10;
 	  hip = battvolt + 5;
 	  lowp = battvolt - 5;
 	  break;
@@ -232,9 +232,9 @@ void drawbattvolt(char *battvolts, char *nombattvs)
 
 
     /* Do proper scaling of battery voltage and redline positions */
-    battpos = (300 - (((battvolt - minv) / deltav ) * 300));
-    hipos = ( 300 - (((hip - minv) / deltav) * 300) );
-    lowpos = ( 300 - (((lowp - minv) / deltav) * 300) );
+    battpos = (int)(300 - (((battvolt - minv) / deltav ) * 300));
+    hipos = (int)( 300 - (((hip - minv) / deltav) * 300) );
+    lowpos = (int)( 300 - (((lowp - minv) / deltav) * 300) );
 
     gdImageFilledRectangle (im, 50, 0, 150, hipos, red);
     gdImageFilledRectangle (im, 50, lowpos, 150, 300, red);
@@ -243,7 +243,7 @@ void drawbattvolt(char *battvolts, char *nombattvs)
     gdImageFilledRectangle (im, 75, battpos, 125, 300, black);
 
     sprintf (batttxt, "%.1f VDC", battvolt);
-    gdImageString (im, gdFontLarge, 70, 320, batttxt, black);
+    gdImageString(im, gdFontLarge, 70, 320, (unsigned char *)batttxt, black);
 
     TermImage(im);
 }
@@ -260,7 +260,7 @@ void noimage (void)
 
     gdImageFilledRectangle (im, 0, 0, 150, 300, grey);
 
-    gdImageString (im, gdFontLarge, 0, 0, "Data not available", black);
+    gdImageString (im, gdFontLarge, 0, 0, (unsigned char *)"Data not available", black);
 
     imgheader();
 #ifdef SYS_IMGFMT_PNG
@@ -287,11 +287,11 @@ void drawupsload(char *upsloads)
     gdImageFilledRectangle (im, 50, 0, 150, 60, red);
     gdImageFilledRectangle (im, 50, 60, 150, 300, green); 
 
-    loadpos = (300 - ((upsload / 125) * 300));
-    gdImageFilledRectangle (im, 75, loadpos, 125, 300, black);
+    loadpos = (int)(300 - ((upsload / 125) * 300));
+    gdImageFilledRectangle(im, 75, loadpos, 125, 300, black);
 
-    sprintf (loadtxt, "%.1f %%", upsload);
-    gdImageString (im, gdFontLarge, 70, 320, loadtxt, black);
+    sprintf(loadtxt, "%.1f %%", upsload);
+    gdImageString(im, gdFontLarge, 70, 320, (unsigned char *)loadtxt, black);
 
     TermImage(im);
 }
@@ -327,17 +327,17 @@ void drawutility (char *utilitys, char *translos, char *transhis)
     }
 
     DrawText(im, minv, deltav/5);
-    utilpos = (300 - (((utility - minv) / deltav) * 300) );
-    translopos = ( 300 - (((translo - minv) / deltav) * 300) );
-    transhipos = ( 300 - (((transhi - minv) / deltav) * 300) );
+    utilpos = (int)(300 - (((utility - minv) / deltav) * 300) );
+    translopos = (int)(300 - (((translo - minv) / deltav) * 300) );
+    transhipos = (int)(300 - (((transhi - minv) / deltav) * 300) );
 
-    gdImageFilledRectangle (im, 50, 0, 150, transhipos, red);
-    gdImageFilledRectangle (im, 50, translopos, 150, 300, red);
+    gdImageFilledRectangle(im, 50, 0, 150, transhipos, red);
+    gdImageFilledRectangle(im, 50, translopos, 150, 300, red);
 
     gdImageFilledRectangle (im, 75, utilpos, 125, 300, black);
 
     sprintf (utiltxt, "%.1f VAC", utility);
-    gdImageString (im, gdFontLarge, 65, 320, utiltxt, black); 
+    gdImageString (im, gdFontLarge, 65, 320, (unsigned char *)utiltxt, black); 
 
     TermImage(im);
 }
@@ -372,12 +372,12 @@ void drawupsout (char *upsouts)
     }
     
     DrawText(im, minv, deltav/5);
-    uoutpos = (300 - (((upsout - minv) / deltav) * 300) );
+    uoutpos = (int)(300 - (((upsout - minv) / deltav) * 300) );
 
-    gdImageFilledRectangle (im, 75, uoutpos, 125, 300, black);
+    gdImageFilledRectangle(im, 75, uoutpos, 125, 300, black);
 
-    sprintf (utiltxt, "%.1f VAC", upsout);
-    gdImageString (im, gdFontLarge, 65, 320, utiltxt, black); 
+    sprintf(utiltxt, "%.1f VAC", upsout);
+    gdImageString(im, gdFontLarge, 65, 320, (unsigned char *)utiltxt, black); 
 
     TermImage(im);
 }
@@ -396,21 +396,21 @@ void drawruntime (char *upsrunts, char *lowbatts)
 
     im = InitImage();
 
-    step = (upsrunt + 4) / 5;
+    step = (int)(upsrunt + 4) / 5;
     if (step <= 0)
        step = 1;		   /* make sure we have a positive step */
     DrawText(im, 0, step);
 
     maxt = step * 5;
-    uoutpos = 300 - (upsrunt * 300 ) / maxt;
-    lowbattpos = 300 - (lowbatt * 300) / maxt;
+    uoutpos = 300 - (int)(upsrunt * 300 ) / maxt;
+    lowbattpos = 300 - (int)(lowbatt * 300) / maxt;
 
-    gdImageFilledRectangle (im, 50, lowbattpos, 150, 300, red);
+    gdImageFilledRectangle(im, 50, lowbattpos, 150, 300, red);
 
-    gdImageFilledRectangle (im, 75, uoutpos, 125, 300, black);
+    gdImageFilledRectangle(im, 75, uoutpos, 125, 300, black);
 
-    sprintf (utiltxt, "%.1f mins", upsrunt);
-    gdImageString (im, gdFontLarge, 65, 320, utiltxt, black); 
+    sprintf(utiltxt, "%.1f mins", upsrunt);
+    gdImageString(im, gdFontLarge, 65, 320, (unsigned char *)utiltxt, black); 
  
     TermImage(im);
 }

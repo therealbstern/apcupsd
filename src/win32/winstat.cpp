@@ -39,7 +39,7 @@
 #include "winups.h"
 #include "winstat.h"
 
-extern "C" void FillStatusBox(HWND hwnd, int id_list);
+extern void FillStatusBox(HWND hwnd, int id_list);
 
 // Constructor/destructor
 upsStatus::upsStatus()
@@ -74,10 +74,7 @@ upsStatus::Show(BOOL show)
 }
 
 BOOL CALLBACK
-upsStatus::DialogProc(HWND hwnd,
-                      UINT uMsg,
-                      WPARAM wParam,
-                      LPARAM lParam )
+upsStatus::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
         // We use the dialog-box's USERDATA to store a _this pointer
         // This is set only once WM_INITDIALOG has been recieved, though!
