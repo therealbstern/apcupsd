@@ -2,6 +2,8 @@
                         Kern Sibbald
 
 General:
+09Jan04
+- Add Whitebox to detected systems.
 24Dec04
 - Minor tweak to RedHat spec.in
 - Apply Carl Lindberg <lindberg@clindberg.org>'s patch
