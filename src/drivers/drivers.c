@@ -77,7 +77,7 @@
 #include "test/testdriver.h"
 #endif
 
-UPSDRIVER drivers[] = {
+static const UPSDRIVER drivers[] = {
 #ifdef HAVE_DUMB_DRIVER
     { "dumb",
       dumb_ups_open,
@@ -183,7 +183,7 @@ UPSDRIVER drivers[] = {
  * It returns an UPSDRIVER pointer that may be null if something
  * went wrong.
  */
-static UPSDRIVER *helper_attach_driver(UPSINFO *ups, char *drvname)
+static const UPSDRIVER *helper_attach_driver(UPSINFO *ups, const char *drvname)
 {
     int i;
 
@@ -215,7 +215,7 @@ static UPSDRIVER *helper_attach_driver(UPSINFO *ups, char *drvname)
     return ups->driver;
 }
 
-UPSDRIVER *attach_driver(UPSINFO *ups) {
+const UPSDRIVER *attach_driver(UPSINFO *ups) {
     char *driver_name = NULL;
     /*
      * Attach the correct driver.

@@ -404,7 +404,7 @@ typedef struct upsinfo {
     int refcnt;                       /* thread attach count */
 #endif
 
-    struct upsdriver *driver;       /* UPS driver for this UPSINFO */
+    const struct upsdriver *driver; /* UPS driver for this UPSINFO */
     void *driver_internal_data;     /* Driver private data */
 } UPSINFO;
 
