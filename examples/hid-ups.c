@@ -1,5 +1,5 @@
 /*
- * $Id: hid-ups.c,v 1.6 2002-07-12 20:51:11 rfacchetti Exp $
+ * $Id: hid-ups.c,v 1.7 2002-08-20 12:29:53 kerns Exp $
  *
  *  Copyright (c) 2001 Vojtech Pavlik <vojtech@ucw.cz>
  *  Copyright (c) 2001 Paul Stewart <hiddev@wetlogic.net>
@@ -167,14 +167,29 @@ struct s_ups_info {
     { 0x8500d1, T_NONE,     "BatteryPresent" },
     { 0x8500db, T_NONE,     "VoltageNotRegulated" },
     /* Pages 0xFF00 to 0xFFFF are vendor specific */
-    { 0xFF860060, T_BITS,   "APCStatusFlag" },
-    { 0xFF860076, T_NONE,   "APCShutdownAfterDelay" },
     { 0xFF860005, T_NONE,   "APCGeneralCollection" },
-    { 0xFF86007C, T_NONE,   "APCForceShutdown" },
-    { 0xFF860072, T_NONE,   "APCPanelTest" },
+    { 0xFF860013, T_NONE,   "APC860013_SetMinReturn?" },
     { 0xFF860016, T_APCDATE,"APCBattReplacementDate" },
+    { 0xFF860023, T_NONE,   "APC860023_??????" },
+    { 0xFF860024, T_NONE,   "APC860024_??????" },
+    { 0xFF860025, T_NONE,   "APC860025_??????" },
+    { 0xFF860026, T_NONE,   "APC860026_??????" },
+    { 0xFF860029, T_NONE,   "APC860029_??????" },
+    { 0xFF86002A, T_NONE,   "APC86002A_??????" },
     { 0xFF860042, T_NONE,   "APC_UPS_FirmwareRevision" },
+    { 0xFF860052, T_NONE,   "APC860052_??????" },
+    { 0xFF860060, T_BITS,   "APCStatusFlag" },
+    { 0xFF860061, T_NONE,   "APC860061_??????" },
+    { 0xFF860062, T_NONE,   "APC860062_SetHiTransV?" }, 
+    { 0xFF860064, T_NONE,   "APC860064_SetLoTransV?" },
+    { 0xFF860072, T_NONE,   "APCPanelTest" },
+    { 0xFF860074, T_NONE,   "APC860074_SetSens?" },
+    { 0xFF860076, T_NONE,   "APCShutdownAfterDelay" },
+    { 0xFF860077, T_NONE,   "APC860077_SetWakeUpDelay?" },
     { 0xFF860079, T_NONE,   "APC_USB_FirmwareRevision" },
+    { 0xFF86007C, T_NONE,   "APCForceShutdown" },
+    { 0xFF86007D, T_NONE,   "APC86007D_??????" },
+
 };
 #define UPS_INFO_SZ (sizeof(ups_info)/sizeof(ups_info[0]))
 
