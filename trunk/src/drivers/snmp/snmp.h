@@ -58,6 +58,9 @@
 #ifndef _SNMP_H
 #define _SNMP_H
 
+#ifndef UCD_COMPATIBLE
+#define UCD_COMPATIBLE 1
+#endif
 #include <ucd-snmp/asn1.h>
 #include <ucd-snmp/snmp.h>
 #include <ucd-snmp/snmp_api.h>

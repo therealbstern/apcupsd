@@ -4,7 +4,7 @@
  *
  * This header is derived from the UPS-MIB module.
  *
- * $Id: rfc1628-mib.h,v 1.1 2002-06-22 12:21:44 rfacchetti Exp $
+ * $Id: rfc1628-mib.h,v 1.2 2004-03-04 09:50:42 kerns Exp $
  */
 
 #ifndef _UPS_MIB_H_
@@ -33,7 +33,7 @@ typedef struct upsIdent {
     size_t    _upsIdentNameLength;
     u_char    *upsIdentAttachedDevices;
     size_t    _upsIdentAttachedDevicesLength;
-    void      *_clientData;		/* pointer to client data structure */
+    void      *_clientData;             /* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -59,7 +59,7 @@ ups_mib_mgr_get_upsIdent(struct snmp_session *s, upsIdent_t **upsIdent);
 extern int
 ups_mib_agt_read_upsIdent(upsIdent_t *upsIdent);
 extern int
-ups_mib_agt_register_upsIdent();
+ups_mib_agt_register_upsIdent(void);
 
 /*
  * C type definitions for UPS-MIB::upsBattery.
@@ -73,7 +73,7 @@ typedef struct upsBattery {
     int32_t   *upsBatteryVoltage;
     int32_t   *upsBatteryCurrent;
     int32_t   *upsBatteryTemperature;
-    void      *_clientData;		/* pointer to client data structure */
+    void      *_clientData;             /* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -100,7 +100,7 @@ ups_mib_mgr_get_upsBattery(struct snmp_session *s, upsBattery_t **upsBattery);
 extern int
 ups_mib_agt_read_upsBattery(upsBattery_t *upsBattery);
 extern int
-ups_mib_agt_register_upsBattery();
+ups_mib_agt_register_upsBattery(void);
 
 /*
  * C type definitions for UPS-MIB::upsInput.
@@ -109,7 +109,7 @@ ups_mib_agt_register_upsBattery();
 typedef struct upsInput {
     uint32_t  *upsInputLineBads;
     int32_t   *upsInputNumLines;
-    void      *_clientData;		/* pointer to client data structure */
+    void      *_clientData;             /* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -131,7 +131,7 @@ ups_mib_mgr_get_upsInput(struct snmp_session *s, upsInput_t **upsInput);
 extern int
 ups_mib_agt_read_upsInput(upsInput_t *upsInput);
 extern int
-ups_mib_agt_register_upsInput();
+ups_mib_agt_register_upsInput(void);
 
 /*
  * C type definitions for UPS-MIB::upsInputEntry.
@@ -143,8 +143,8 @@ typedef struct upsInputEntry {
     int32_t   *upsInputVoltage;
     int32_t   *upsInputCurrent;
     int32_t   *upsInputTruePower;
-    void      *_clientData;		/* pointer to client data structure */
-    struct upsInputEntry *_nextPtr;	/* pointer to next table entry */
+    void      *_clientData;             /* pointer to client data structure */
+    struct upsInputEntry *_nextPtr;     /* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -169,7 +169,7 @@ ups_mib_mgr_get_upsInputEntry(struct snmp_session *s, upsInputEntry_t **upsInput
 extern int
 ups_mib_agt_read_upsInputEntry(upsInputEntry_t *upsInputEntry);
 extern int
-ups_mib_agt_register_upsInputEntry();
+ups_mib_agt_register_upsInputEntry(void);
 
 /*
  * C type definitions for UPS-MIB::upsOutput.
@@ -179,7 +179,7 @@ typedef struct upsOutput {
     int32_t   *upsOutputSource;
     int32_t   *upsOutputFrequency;
     int32_t   *upsOutputNumLines;
-    void      *_clientData;		/* pointer to client data structure */
+    void      *_clientData;             /* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -202,7 +202,7 @@ ups_mib_mgr_get_upsOutput(struct snmp_session *s, upsOutput_t **upsOutput);
 extern int
 ups_mib_agt_read_upsOutput(upsOutput_t *upsOutput);
 extern int
-ups_mib_agt_register_upsOutput();
+ups_mib_agt_register_upsOutput(void);
 
 /*
  * C type definitions for UPS-MIB::upsOutputEntry.
@@ -214,8 +214,8 @@ typedef struct upsOutputEntry {
     int32_t   *upsOutputCurrent;
     int32_t   *upsOutputPower;
     int32_t   *upsOutputPercentLoad;
-    void      *_clientData;		/* pointer to client data structure */
-    struct upsOutputEntry *_nextPtr;	/* pointer to next table entry */
+    void      *_clientData;             /* pointer to client data structure */
+    struct upsOutputEntry *_nextPtr;    /* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -240,7 +240,7 @@ ups_mib_mgr_get_upsOutputEntry(struct snmp_session *s, upsOutputEntry_t **upsOut
 extern int
 ups_mib_agt_read_upsOutputEntry(upsOutputEntry_t *upsOutputEntry);
 extern int
-ups_mib_agt_register_upsOutputEntry();
+ups_mib_agt_register_upsOutputEntry(void);
 
 /*
  * C type definitions for UPS-MIB::upsBypass.
@@ -249,7 +249,7 @@ ups_mib_agt_register_upsOutputEntry();
 typedef struct upsBypass {
     int32_t   *upsBypassFrequency;
     int32_t   *upsBypassNumLines;
-    void      *_clientData;		/* pointer to client data structure */
+    void      *_clientData;             /* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -271,7 +271,7 @@ ups_mib_mgr_get_upsBypass(struct snmp_session *s, upsBypass_t **upsBypass);
 extern int
 ups_mib_agt_read_upsBypass(upsBypass_t *upsBypass);
 extern int
-ups_mib_agt_register_upsBypass();
+ups_mib_agt_register_upsBypass(void);
 
 /*
  * C type definitions for UPS-MIB::upsBypassEntry.
@@ -282,8 +282,8 @@ typedef struct upsBypassEntry {
     int32_t   *upsBypassVoltage;
     int32_t   *upsBypassCurrent;
     int32_t   *upsBypassPower;
-    void      *_clientData;		/* pointer to client data structure */
-    struct upsBypassEntry *_nextPtr;	/* pointer to next table entry */
+    void      *_clientData;             /* pointer to client data structure */
+    struct upsBypassEntry *_nextPtr;    /* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -307,7 +307,7 @@ ups_mib_mgr_get_upsBypassEntry(struct snmp_session *s, upsBypassEntry_t **upsByp
 extern int
 ups_mib_agt_read_upsBypassEntry(upsBypassEntry_t *upsBypassEntry);
 extern int
-ups_mib_agt_register_upsBypassEntry();
+ups_mib_agt_register_upsBypassEntry(void);
 
 /*
  * C type definitions for UPS-MIB::upsAlarm.
@@ -315,7 +315,7 @@ ups_mib_agt_register_upsBypassEntry();
 
 typedef struct upsAlarm {
     uint32_t  *upsAlarmsPresent;
-    void      *_clientData;		/* pointer to client data structure */
+    void      *_clientData;             /* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -336,7 +336,7 @@ ups_mib_mgr_get_upsAlarm(struct snmp_session *s, upsAlarm_t **upsAlarm);
 extern int
 ups_mib_agt_read_upsAlarm(upsAlarm_t *upsAlarm);
 extern int
-ups_mib_agt_register_upsAlarm();
+ups_mib_agt_register_upsAlarm(void);
 
 /*
  * C type definitions for UPS-MIB::upsAlarmEntry.
@@ -347,8 +347,8 @@ typedef struct upsAlarmEntry {
     uint32_t  *upsAlarmDescr;
     size_t    _upsAlarmDescrLength;
     uint32_t  *upsAlarmTime;
-    void      *_clientData;		/* pointer to client data structure */
-    struct upsAlarmEntry *_nextPtr;	/* pointer to next table entry */
+    void      *_clientData;             /* pointer to client data structure */
+    struct upsAlarmEntry *_nextPtr;     /* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -371,7 +371,7 @@ ups_mib_mgr_get_upsAlarmEntry(struct snmp_session *s, upsAlarmEntry_t **upsAlarm
 extern int
 ups_mib_agt_read_upsAlarmEntry(upsAlarmEntry_t *upsAlarmEntry);
 extern int
-ups_mib_agt_register_upsAlarmEntry();
+ups_mib_agt_register_upsAlarmEntry(void);
 
 /*
  * C type definitions for UPS-MIB::upsTest.
@@ -386,7 +386,7 @@ typedef struct upsTest {
     size_t    _upsTestResultsDetailLength;
     uint32_t  *upsTestStartTime;
     int32_t   *upsTestElapsedTime;
-    void      *_clientData;		/* pointer to client data structure */
+    void      *_clientData;             /* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -412,7 +412,7 @@ ups_mib_mgr_get_upsTest(struct snmp_session *s, upsTest_t **upsTest);
 extern int
 ups_mib_agt_read_upsTest(upsTest_t *upsTest);
 extern int
-ups_mib_agt_register_upsTest();
+ups_mib_agt_register_upsTest(void);
 
 /*
  * C type definitions for UPS-MIB::upsControl.
@@ -424,7 +424,7 @@ typedef struct upsControl {
     int32_t   *upsStartupAfterDelay;
     int32_t   *upsRebootWithDuration;
     int32_t   *upsAutoRestart;
-    void      *_clientData;		/* pointer to client data structure */
+    void      *_clientData;             /* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -449,7 +449,7 @@ ups_mib_mgr_get_upsControl(struct snmp_session *s, upsControl_t **upsControl);
 extern int
 ups_mib_agt_read_upsControl(upsControl_t *upsControl);
 extern int
-ups_mib_agt_register_upsControl();
+ups_mib_agt_register_upsControl(void);
 
 /*
  * C type definitions for UPS-MIB::upsConfig.
@@ -466,7 +466,7 @@ typedef struct upsConfig {
     int32_t   *upsConfigAudibleStatus;
     int32_t   *upsConfigLowVoltageTransferPoint;
     int32_t   *upsConfigHighVoltageTransferPoint;
-    void      *_clientData;		/* pointer to client data structure */
+    void      *_clientData;             /* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -496,23 +496,23 @@ ups_mib_mgr_get_upsConfig(struct snmp_session *s, upsConfig_t **upsConfig);
 extern int
 ups_mib_agt_read_upsConfig(upsConfig_t *upsConfig);
 extern int
-ups_mib_agt_register_upsConfig();
+ups_mib_agt_register_upsConfig(void);
 
 
 typedef struct ups_mib {
-    upsIdent_t	*upsIdent;
-    upsBattery_t	*upsBattery;
-    upsInput_t	*upsInput;
-    upsInputEntry_t	*upsInputEntry;
-    upsOutput_t	*upsOutput;
-    upsOutputEntry_t	*upsOutputEntry;
-    upsBypass_t	*upsBypass;
-    upsBypassEntry_t	*upsBypassEntry;
-    upsAlarm_t	*upsAlarm;
-    upsAlarmEntry_t	*upsAlarmEntry;
-    upsTest_t	*upsTest;
-    upsControl_t	upsControl;
-    upsConfig_t	*upsConfig;
+    upsIdent_t  *upsIdent;
+    upsBattery_t        *upsBattery;
+    upsInput_t  *upsInput;
+    upsInputEntry_t     *upsInputEntry;
+    upsOutput_t *upsOutput;
+    upsOutputEntry_t    *upsOutputEntry;
+    upsBypass_t *upsBypass;
+    upsBypassEntry_t    *upsBypassEntry;
+    upsAlarm_t  *upsAlarm;
+    upsAlarmEntry_t     *upsAlarmEntry;
+    upsTest_t   *upsTest;
+    upsControl_t        upsControl;
+    upsConfig_t *upsConfig;
 } ups_mib_t;
 
 /*
