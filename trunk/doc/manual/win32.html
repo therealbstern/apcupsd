@@ -6,10 +6,10 @@
 <link rel=stylesheet href="apcupsd-styles.css" type="text/css">
 </head>
 <body>
-<h2>Windows 98 and Windows NT version of Apcupsd</h2>
+<h2>The Windows Version of Apcupsd</h2>
 <h3>General</h3>
 The Windows version of <b>apcupsd</b> has been tested on 
-Win95, Win98, WinMe, WinNT, and Win2000 systems.
+Win95, Win98, WinMe, WinNT, WinXP, and Win2000 systems.
 This version of <b>apcupsd</b> has been
 built to run under the CYGWIN environment, which provides many of
 the features of Unix on Windows systems. It also permitted a rapid port
@@ -26,6 +26,7 @@ menu, though this should normally never be necessary.
 means that it is immediately started by the operating system when the
 system is booted, and runs in the background even if there is no user
 logged into the system. 
+
 <h3>Installation</h3>
 Normally, you will install the Windows version of Apcupsd from the
 binaries.  This install is somewhat Unix like since you
@@ -33,7 +34,7 @@ do many parts of the installation by hand.
 To install the binaries, you need <b>WinZip</b>. 
 <ul>
 <li>Simply double click
-  on the <b>winapcupsd-3.8.4.tar.gz</b> icon. The actual name of
+  on the <b>winapcupsd-3.8.5.tar.gz</b> icon. The actual name of
   the icon will vary from one release version to another.
   <p><img src="wininstall3.gif" width="254" height="299" border="0" alt="">
   <br>&nbsp;<br></li>
@@ -197,7 +198,12 @@ be automatically launched as a service, and you can install the new version.
 To reinstate <b>apcupsd</b> as an automatic service, using the <b>Control Panel</b>: 
 reset <b>apcupsd</b> to <b>Automatic</b> startup
 in the Startup dialogue, then restart <b>apcupsd</b> in the <b>Services</b>
-dialogue as shown above in the installation instructions.
+dialogue as shown above in the installation instructions.  Frequently     
+after an upgrade, you will click on the <b>Start</b> button and after a
+few seconds, the system reports that it failed to start. The cause of
+this problem is unknown, but the solution is simply to click again
+on the <b>Start</b> button.
+
 
 <h3>Post Installation</h3>
 After installing <b>apcupsd</b> and before running it, you should check
@@ -233,7 +239,7 @@ Win32 systems).  For example, instead of using the directive:
 <p class="tty">MASTER my.master.com
 use something like:
 <p class="tty">MASTER 192.168.1.54
-where you replace the IP address with your actuall IP address.
+where you replace the IP address with your actual IP address.
 <p>Also, on WinNT systems, the PIF files in <b>/apcupsd/bin</b> used for
 starting and stopping <b>apcupsd</b> do not work. Use the services
 control panel instead.
@@ -245,6 +251,8 @@ report that indicates that <b>apcupsd</b> does not start automatically
 as a service even though the Registry has been properly updated.  If you
 experience this problem, a work around is to put a shortcut to
 <b>apcupsd</b> in the StartUp folder.
+<p>As noted above, after an upgrade, you may need to start apcupsd
+several times before it will actually run.
 
 <h3>Utility Functions</h3>
 The directory <b>c:\apcupsd\bin</b> contains six utility routines (actually
@@ -326,6 +334,76 @@ onbattery, and mainsback</b> in the directory <b>c:\apcupsd\examples</b>.
 To use them, you must modify the SYSADMIN variable to have a
 valid email address, then copy the files into the directory
 <b>c:\apcupsd\etc\apcupsd</b>.
+
+<h3>Killpower under Windows</h3>
+If your batteries become exhausted during a power failure and you
+want your machine to automatically reboot when the power comes
+back, it is useful to implement the <b>killpower</b> feature of
+the UPS where apcupsd sends the UPS the command to shut off the
+power. In doing so, the power will be cut to your PC and if your
+BIOS is properly setup, the machine will automatically reboot when
+the power comes back. This is important for servers.
+<p>This feature is implemented on Unix systems by first requesting
+a system shutdown. As a part of the shutdown, apcupsd is terminated
+by the system, but the shutdown process executes a script where
+apcupsd is recalled after the disks are synced and the machine is
+idle. Bacula then requests the UPS to shut off the power (killpower).
+<p>Unfortunately on Windows, there is no such shutdown script that
+we are aware of and no way for apcupsd to get control after the
+machine is idled. If this feature is important to you, it is possible
+to do it by telling apcupsd to immediately issue the killpower
+command after issuing the shutdown request. The danger in doing so
+is that if the machine is not sufficiently idled when the killpower
+takes place, the disks will need to be rescanned (and there is a
+possibility of lost data however small).  Generally, UPSes have
+a shutdown grace period which gives sufficient time for the OS to
+shutdown before the power is cut.
+<p>
+To implement this feature, you need to add the <b>-p</b> option to
+the apcupsd command line that is executed by the system. Currently
+the procedure is manual. You do so by editing the registry and
+changing the line:
+<pre>
+c:\apcupsd\apcupsd.exe /service
+</pre>
+found under the key:
+<pre>
+HKEY_LOCAL_MACHINE Software\Microsoft\Windows\CurrentVersion\RunServices
+</pre>
+to
+<pre>
+c:\apcupsd\apcupsd.exe /service -p
+</pre>
+If you have a Smart UPS, you can configure the kill power grace
+period, and you might want to set it to 3 minutes.  If you have a
+dumb UPS, there is no grace period and you should not use this
+procedure. If you have a Back-UPS CS or ES, these UPSes generally
+have a fixed grace period of 2 minutes, which is probably sufficient.
+
+<h3>Power Down During Shutdown</h3>
+Our phylosophy is to shutdown a computer but not to power it 
+down itself (as opposed to having the UPS cut the power as
+described above). That is we prefer to idle a computer but
+leave it running. This has the advantage that in a power fail
+situation, if the killpower function described above does not work,
+the computer will continue to draw down the batteries and the  
+UPS will hopefully shutoff before the power is restore thus
+permitting an automatic reboot. 
+<p>Nevertheless some people prefer to do a full power down. To do
+so, you might want to get a copy of PsShutdown, which does have
+a power down option. You can find it and a lot more useful
+software at:
+
+<a href="http://www.sysinternals.com/ntw2k/freeware/pstools.shtml">
+http://www.sysinternals.com/ntw2k/freeware/pstools.shtml</a>.
+
+to use their shutdown program rather than the apcupsd supplied
+version, you simply edit:
+<pre>
+c:\apcupsd\etc\apcupsd\apccontrol
+</pre>
+with any text editor and change our calls to shutdown to
+psshutdown.
 
 <h3>Command Line Options Specific to the Windows Version</h3> These
 options are not normally seen or used by the user, and are documented

@@ -3,7 +3,7 @@
 <head>
    <title>Testing Apcupsd</title>
    <meta name="Author" content="Kern Sibbald">
-                <link rel=stylesheet href="apcupsd-styles.css" type="text/css">
+   <link rel=stylesheet href="apcupsd-styles.css" type="text/css">
 </head>
 <body>
 <h1>Testing Apcupsd</h1>
@@ -80,7 +80,7 @@ problem.  Some of the possible sources of the problem are:
     configuration file.</li>
 <li style="margin-bottom: 0.1in">The serial port that you have chosen has logins enabled. You
     must disable logins on that port, otherwise, the system prevents
-    b>apcupsd</b> from using it. Normally, the file /etc/inittab 
+    <b>apcupsd</b> from using it. Normally, the file /etc/inittab 
     specifies the ports for which a <b>getty</b> process is started (on Sun
     machines, the serial port program equivalent to <b>getty</b> is called <b>ttymon</b>).
     You must disable this for the port that you wish to use.</li>
@@ -191,14 +191,14 @@ output.</p>
 <p>This indicates that <b>apcupsd</b> is up and running and has started the
 two (default) child processes.</p>
 <dl>
-        <dt>apcmain 
+        <dt>apcmain</dt>
         <dd>is the main program that waits until it receives a 
-  termination signal (SIGTERM) or one of the child processes dies. 
-        <dt>apcser 
+  termination signal (SIGTERM) or one of the child processes dies. </dd>
+        <dt>apcser</dt>
         <dd>is the process that manages the serial port and takes 
   any actions (generates events) that are necessary as a result of a change of 
-  state of the UPS. 
-        <dt>apcnis 
+  state of the UPS. </dd>
+        <dt>apcnis</dt>
         <dd>is the Network information server process that 
   provides EVENTS and STATUS information over the network. This
                 information is used by the CGI programs.
@@ -313,14 +313,14 @@ END APC  : Mon Feb 18 09:15:01 CST 2002
 is working.
 Assuming that the output looks reasonable, check the following variables:
 <dl>
-<dt>LINEV
+<dt>LINEV</dt>
 <dd>This is the line voltage and it should be a value that is appropriate for your
 equipment. In the USA, it is typically about 120 Volts while in Europe, it is about
-220 Volts.
-<dt>BATTV
+220 Volts.</dd>
+<dt>BATTV</dt>
 <dd>Unless you have additional battery packs, this should be near 24 Volts plus or
-minus 5 Volts.
-<dt>STATUS
+minus 5 Volts.</dd>
+<dt>STATUS</dt>
 <dd>This is the status of the UPS and it should normally be <b>ONLINE</b>.</dd>
 </dl>
 <p>
@@ -422,10 +422,10 @@ should print:
 situation before proceeding. The most likely cause of problems are:
 <ul>
 <li><b>apcupsd</b> doesn't recognize the power failure because
-the configuration directives are not correct. E.g. wrong cable.
+the configuration directives are not correct. E.g. wrong cable.</li>
 <p>
 <li>The file <b>/etc/apcupsd/apccontrol</b> doesn't exist or
-is not marked as executable.
+is not marked as executable.</li>
 </ul>
 <p>
 At this point, we recommend that you do a simulated power down of your system. 
@@ -572,7 +572,7 @@ to shorten their life span.
 <hr>
 
 <a href="stopping.html" target="_self"><img src="back.gif" border=0 alt="Back"></a>
-<a href="troubles.html" target="_self"><img src="next.gif" border=0 alt="Next"></a>
+<aahref="troubles.html" target="_self"><img src="next.gif" border=0 alt="Next"></a>
 <a href="index.html"><img src="home.gif" border=0 alt="Home"></a>
 </body>
 </html>
