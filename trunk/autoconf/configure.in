@@ -754,13 +754,14 @@ AC_ARG_ENABLE(usb, [
 AC_HELP_STRING([--enable-usb], [Compile USB UPS code])
 AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
 	[ if test "$enableval" = "yes" ; then
-	if test "$host_os" = "linux-gnu"
-	then
+	if test $HAVE_UNAME=yes -a x`uname -s` = xLinux ; then
 		AC_DEFINE(HAVE_USB_DRIVER)
 		USB_DRIVER="usb"
+		USB_TYPE="linux"
 		AC_SUBST(USB_DRIVER)
+		AC_SUBST(USB_TYPE)
 	else
-		AC_MSG_NOTICE([Can't build USB driver on this OS, disabled.])
+		AC_MSG_ERROR([Can't build USB driver on this OS ($host_os).])
 	fi
 	fi],
     [])
@@ -1638,7 +1639,9 @@ fi
 
 if test "$USB_DRIVER"x != ""x
 then
-    GENERATE_FILES="$GENERATE_FILES src/drivers/usb/Makefile"
+    GENERATE_FILES="$GENERATE_FILES \
+    src/drivers/usb/Makefile \
+    src/drivers/usb/$USB_TYPE/Makefile"
 fi
 
 if test "$NET_DRIVER"x != ""x

@@ -9,16 +9,18 @@
 topdir = @topdir@
 top_builddir = $(topdir)
 
+subdirs = @USB_TYPE@
+
 # Include the default make targets: to be put before the all-targets: rule.
 @TARGETS@
 
 apclib = libusb.a
 
-apclibobjs = linux-usb.o
+apclibobjs = usb.o
 
 all-targets: $(apclib)
 
-$(apclib): $(apclibobjs)
+$(apclib): $(apclibobjs) @USB_TYPE@/libpusb.a
 	ar rc $(apclib) $(apclibobjs)
 	@RANLIB@ $(apclib)
 
