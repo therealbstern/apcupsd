@@ -57,6 +57,7 @@
  *
  */
 
+#include "apc.h"
 
 #if defined(SYS_IMGFMT_PNG) || defined(SYS_IMGFMT_GIF)
 #include <@GDHEAD@gd.h>

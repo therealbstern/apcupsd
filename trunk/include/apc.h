@@ -72,48 +72,46 @@
  * KES 9/2000
  */            
 #ifdef HAVE_OSF1_OS
-#include <stdarg.h>
-#include <stdio.h>
-#include <stdlib.h>
+# include <stdarg.h>
+# include <stdio.h>
+# include <stdlib.h>
 #else
-#include <stdio.h>
-#include <stdlib.h>
-#include <stdarg.h>
+# include <stdio.h>
+# include <stdlib.h>
+# include <stdarg.h>
 #endif
 
 #ifdef HAVE_OPENSERVER_OS
-#define _SVID3		/* OpenServer needs this to see TIOCM_ defn's */
+# define _SVID3		/* OpenServer needs this to see TIOCM_ defn's */
 #endif
 
 #ifdef HAVE_UNISTD_H
-#include <unistd.h>
+# include <unistd.h>
 #endif
 
 #ifdef HAVE_GETOPTLONG
-#include <getopt.h>
+# include <getopt.h>
 #else
-#include <lib/getopt.h>
+# include "getopt.h"
 #endif
 
 #ifdef HAVE_PTHREADS
 
-#define _THREAD_SAFE 1
-#define _REENTRANT   1
+# define _THREAD_SAFE 1
+# define _REENTRANT   1
 
-#include <pthread.h>
-#ifdef HAVE_SUN_OS
-#define set_thread_concurrency() thr_setconcurrency(4)
-#else
-#define set_thread_concurrency()
-#endif
+# include <pthread.h>
+# ifdef HAVE_SUN_OS
+#  define set_thread_concurrency() thr_setconcurrency(4)
+# else
+#  define set_thread_concurrency()
+# endif
 /* setproctitle not used with pthreads */
-#undef  HAVE_SETPROCTITLE
-#define HAVE_SETPROCTITLE
-#define init_proctitle(x)
-#define setproctitle(x)
-
+# undef  HAVE_SETPROCTITLE
+# define HAVE_SETPROCTITLE
+# define init_proctitle(x)
+# define setproctitle(x)
 #endif
-
 
 #include <string.h>
 #include <strings.h>
@@ -163,7 +161,7 @@
 #endif
 
 #ifdef HAVE_SYS_WAIT_H
-#include <sys/wait.h>
+# include <sys/wait.h>
 #endif
 
 #ifdef HAVE_HPUX_OS

@@ -402,10 +402,14 @@ strdup __argz_count __argz_stringify __argz_next])
 AC_DEFUN(AC_TYPE_SOCKETLEN_T,
 [ dnl check for socklen_t (in Unix98)
   AC_MSG_CHECKING(for socklen_t)
-  AC_TRY_COMPILE([#include <sys/socket.h>
+  AC_TRY_COMPILE([
+  #include <sys/types.h>
+  #include <sys/socket.h>
   socklen_t x;
   ],[],[AC_MSG_RESULT(yes)],[
-  AC_TRY_COMPILE([#include <sys/socket.h>
+  AC_TRY_COMPILE([
+  #include <sys/types.h>
+  #include <sys/socket.h>
   int accept (int, struct sockaddr *, size_t *);
   ],[],[
   AC_MSG_RESULT(size_t)
