@@ -272,8 +272,8 @@ static int send_to_slave(UPSINFO *ups, int who)
     send_data.cap_runtim    = htonl(l);
 
     send_data.remote_state  = htonl(slaves[who].remote_state);
-    strcpy(send_data.apcmagic, APC_MAGIC);
-    strcpy(send_data.usermagic, slaves[who].usermagic);
+    astrncpy(send_data.apcmagic, APC_MAGIC, sizeof(send_data.apcmagic));
+    astrncpy(send_data.usermagic, slaves[who].usermagic, sizeof(send_data.usermagic));
 
     /* Send our data to Slave */
     do {
@@ -346,7 +346,8 @@ select_again1:
 	       slaves[who].name, slaves[who].disconnecting_slave,
 	       ntohl(read_data.ChangeBatt));
 	    if (slaves[who].remote_state == RMT_NOTCONNECTED) {
-		strcpy(slaves[who].usermagic, read_data.usermagic);
+		astrncpy(slaves[who].usermagic, read_data.usermagic, 
+			 sizeof(slaves[who].usermagic));
 	    } else {
 		if (strcmp(slaves[who].usermagic, read_data.usermagic) != 0)
 		    stat = 3;	    /* bad magic */
@@ -401,7 +402,7 @@ int prepare_slave(UPSINFO *ups)
 	}  
     }  
 
-    strcpy(ups->mode.long_name, "Network Slave"); /* don't know model */
+    astrncpy(ups->mode.long_name, "Network Slave", sizeof(ups->mode.long_name)); /* don't know model */
     slaves[0].remote_state = RMT_DOWN;
     slaves[0].down_time = time(NULL);
     if ((mastent = gethostbyname(ups->master_name)) == NULL) {
@@ -467,7 +468,7 @@ int prepare_slave(UPSINFO *ups)
 
     Dmsg1(100, "Slave listening on port %d\n", ups->NetUpsPort);
     slaves[0].remote_state = RMT_NOTCONNECTED;
-    strcpy(slaves[0].name, ups->master_name);
+    astrncpy(slaves[0].name, ups->master_name, sizeof(slaves[0].name));
     return 0;
 }
 
@@ -622,8 +623,8 @@ select_again3:
     stat = ntohl(get_data.remote_state);
     /* If not connected, send him our user magic */
     if (stat == RMT_NOTCONNECTED || stat == RMT_RECONNECT) {
-	strcpy(get_data.apcmagic, APC_MAGIC);
-	strcpy(get_data.usermagic, ups->usermagic);
+	astrncpy(get_data.apcmagic, APC_MAGIC, sizeof(get_data.apcmagic));
+	astrncpy(get_data.usermagic, ups->usermagic, sizeof(get_data.usermagic));
 	get_data.ChangeBatt = htonl(1000); /* flag to say we are non-disconnecting */
         Dmsg1(100, "Slave sending non-disconnecting flag = %d.\n",
 	   ntohl(get_data.ChangeBatt));

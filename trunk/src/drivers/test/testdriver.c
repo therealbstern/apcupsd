@@ -9,10 +9,6 @@
 
 #include "apc.h"
 
-extern UPSCOMMANDS cmd[];
-extern UPSCMDMSG cmd_msg[];
-
-
 /*
  */
 static int open_test_device(UPSINFO *ups)

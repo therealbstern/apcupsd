@@ -6,61 +6,31 @@
  *		   BackUPS, BackUPS Pro, or SmartUPS (from APCC).
  *		-- Now SmartMode support for SmartUPS and BackUPS Pro.
  *
- *  Copyright (C) 1996-99 Andre M. Hedrick <andre@suse.com>
- *  Copyright (C) 1999-2002 Riccardo Facchetti <riccardo@apcupsd.org>
  *  All rights reserved.
  *
  */
 
 /*
- *		       GNU GENERAL PUBLIC LICENSE
- *			  Version 2, June 1991
- *
- *  Copyright (C) 1989, 1991 Free Software Foundation, Inc.
- *			     675 Mass Ave, Cambridge, MA 02139, USA
- *  Everyone is permitted to copy and distribute verbatim copies
- *  of this license document, but changing it is not allowed.
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- */
+   Copyright (C) 2000-2004 Kern Sibbald
 
-/*
- *  IN NO EVENT SHALL ANY AND ALL PERSONS INVOLVED IN THE DEVELOPMENT OF THIS
- *  PACKAGE, NOW REFERRED TO AS "APCUPSD-Team" BE LIABLE TO ANY PARTY FOR
- *  DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING
- *  OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF ANY OR ALL
- *  OF THE "APCUPSD-Team" HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  THE "APCUPSD-Team" SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING,
- *  BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
- *  ON AN "AS IS" BASIS, AND THE "APCUPSD-Team" HAS NO OBLIGATION TO PROVIDE
- *  MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
- *
- *  THE "APCUPSD-Team" HAS ABSOLUTELY NO CONNECTION WITH THE COMPANY
- *  AMERICAN POWER CONVERSION, "APCC".  THE "APCUPSD-Team" DID NOT AND
- *  HAS NOT SIGNED ANY NON-DISCLOSURE AGREEMENTS WITH "APCC".  ANY AND ALL
- *  OF THE LOOK-A-LIKE ( UPSlink(tm) Language ) WAS DERIVED FROM THE
- *  SOURCES LISTED BELOW.
- *
+   This program is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 2 of
+   the License, or (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public
+   License along with this program; if not, write to the Free
+   Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+   MA 02111-1307, USA.
+
  */
 
 #include "apc.h"
-#undef UCD_COMPATIBLE
-#define UCD_COMPATIBLE 1
 #include "snmp.h"
 #include "snmp_private.h"
 
@@ -75,19 +45,19 @@ static int powernet_check_comm_lost(UPSINFO *ups) {
      * Web/SNMP->UPS serial COMMLOST.
      */
     if (powernet_mib_mgr_get_upsComm(s, &(data->upsComm)) < 0) {
-	UPS_SET(UPS_COMMLOST);
+	set_ups(UPS_COMMLOST);
 	ret = 0;
 	goto out;
     } else {
-	UPS_CLEAR(UPS_COMMLOST);
+	clear_ups(UPS_COMMLOST);
     }
     if (data->upsComm) {
 	if (data->upsComm->__upsCommStatus == 2) {
-	    UPS_SET(UPS_COMMLOST);
+	    set_ups(UPS_COMMLOST);
 	    ret = 0;
 	    goto out;
 	} else {
-	    UPS_CLEAR(UPS_COMMLOST);
+	    clear_ups(UPS_COMMLOST);
 	}
     }
 out:
@@ -336,13 +306,13 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups) {
     if (data->upsBasicBattery) {
 	switch(data->upsBasicBattery->__upsBasicBatteryStatus) {
 	    case 2:
-		UPS_CLEAR(UPS_BATTLOW);
+		clear_ups(UPS_BATTLOW);
 		break;
 	    case 3:
-		UPS_SET(UPS_BATTLOW);
+		set_ups(UPS_BATTLOW);
 		break;
 	    default: /* Unknown, assume battery is ok */
-		UPS_CLEAR(UPS_BATTLOW);
+		clear_ups(UPS_BATTLOW);
 		break;
 	}
 	free(data->upsBasicBattery);
@@ -356,9 +326,9 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups) {
 	ups->TimeLeft =
 	    data->upsAdvBattery->__upsAdvBatteryRunTimeRemaining/6000;
 	if (data->upsAdvBattery->__upsAdvBatteryReplaceIndicator == 2) {
-	    UPS_SET(UPS_REPLACEBATT);
+	    set_ups(UPS_REPLACEBATT);
 	} else {
-	    UPS_CLEAR(UPS_REPLACEBATT);
+	    clear_ups(UPS_REPLACEBATT);
 	}
 	free(data->upsAdvBattery);
     }
@@ -417,23 +387,23 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups) {
     if (data->upsBasicOutput) {
 	/* Clear the following flags: only one status will be TRUE */
         Dmsg1(99, "Status before clearing: %d\n", ups->Status);
-	UPS_CLEAR(UPS_ONLINE);
-	UPS_CLEAR(UPS_ONBATT);
-	UPS_CLEAR(UPS_SMARTBOOST);
-	UPS_CLEAR(UPS_SMARTTRIM);
+	clear_ups(UPS_ONLINE);
+	clear_ups(UPS_ONBATT);
+	clear_ups(UPS_SMARTBOOST);
+	clear_ups(UPS_SMARTTRIM);
         Dmsg1(99, "Status after clearing: %d\n", ups->Status);
 	switch(data->upsBasicOutput->__upsBasicOutputStatus) {
 	    case 2:
-		UPS_SET(UPS_ONLINE);
+		set_ups(UPS_ONLINE);
 		break;
 	    case 3:
-		UPS_SET(UPS_ONBATT);
+		set_ups(UPS_ONBATT);
 		break;
 	    case 4:
-		UPS_SET(UPS_SMARTBOOST);
+		set_ups(UPS_SMARTBOOST);
 		break;
 	    case 12:
-		UPS_SET(UPS_SMARTTRIM);
+		set_ups(UPS_SMARTTRIM);
 		break;
 	    case 1: /* unknown */
 	    case 5: /* timed sleeping */
@@ -491,9 +461,9 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups) {
 	/* Not implemented. Needs transform date(mm/dd/yy)->hours. */
 	// ups->LastSTTime = data->upsAdvTest->upsAdvTestLastDiagnosticsDate;
 	if (data->upsAdvTest->__upsAdvTestCalibrationResults == 3) {
-	    UPS_SET(UPS_CALIBRATION);
+	    set_ups(UPS_CALIBRATION);
 	} else {
-	    UPS_CLEAR(UPS_CALIBRATION);
+	    clear_ups(UPS_CALIBRATION);
 	}
 	free(data->upsAdvTest);
     }
@@ -514,13 +484,13 @@ int powernet_snmp_ups_check_state(UPSINFO *ups) {
     if (data->upsBasicBattery) {
 	switch(data->upsBasicBattery->__upsBasicBatteryStatus) {
 	    case 2:
-		UPS_CLEAR(UPS_BATTLOW);
+		clear_ups(UPS_BATTLOW);
 		break;
 	    case 3:
-		UPS_SET(UPS_BATTLOW);
+		set_ups(UPS_BATTLOW);
 		break;
 	    default: /* Unknown, assume battery is ok */
-		UPS_CLEAR(UPS_BATTLOW);
+		clear_ups(UPS_BATTLOW);
 		break;
 	}
 	free(data->upsBasicBattery);
@@ -529,9 +499,9 @@ int powernet_snmp_ups_check_state(UPSINFO *ups) {
     powernet_mib_mgr_get_upsAdvBattery(s, &(data->upsAdvBattery));
     if (data->upsAdvBattery) {
 	if (data->upsAdvBattery->__upsAdvBatteryReplaceIndicator == 2) {
-	    UPS_SET(UPS_REPLACEBATT);
+	    set_ups(UPS_REPLACEBATT);
 	} else {
-	    UPS_CLEAR(UPS_REPLACEBATT);
+	    clear_ups(UPS_REPLACEBATT);
 	}
 	free(data->upsAdvBattery);
     }
@@ -540,23 +510,23 @@ int powernet_snmp_ups_check_state(UPSINFO *ups) {
     if (data->upsBasicOutput) {
 	/* Clear the following flags: only one status will be TRUE */
         Dmsg1(99, "Status before clearing: %d\n", ups->Status);
-	UPS_CLEAR(UPS_ONLINE);
-	UPS_CLEAR(UPS_ONBATT);
-	UPS_CLEAR(UPS_SMARTBOOST);
-	UPS_CLEAR(UPS_SMARTTRIM);
+	clear_ups(UPS_ONLINE);
+	clear_ups(UPS_ONBATT);
+	clear_ups(UPS_SMARTBOOST);
+	clear_ups(UPS_SMARTTRIM);
         Dmsg1(99, "Status after clearing: %d\n", ups->Status);
 	switch(data->upsBasicOutput->__upsBasicOutputStatus) {
 	    case 2:
-		UPS_SET(UPS_ONLINE);
+		set_ups(UPS_ONLINE);
 		break;
 	    case 3:
-		UPS_SET(UPS_ONBATT);
+		set_ups(UPS_ONBATT);
 		break;
 	    case 4:
-		UPS_SET(UPS_SMARTBOOST);
+		set_ups(UPS_SMARTBOOST);
 		break;
 	    case 12:
-		UPS_SET(UPS_SMARTTRIM);
+		set_ups(UPS_SMARTTRIM);
 		break;
 	    case 1: /* unknown */
 	    case 5: /* timed sleeping */
@@ -575,9 +545,9 @@ int powernet_snmp_ups_check_state(UPSINFO *ups) {
     powernet_mib_mgr_get_upsAdvTest(s, &(data->upsAdvTest));
     if (data->upsAdvTest) {
 	if (data->upsAdvTest->__upsAdvTestCalibrationResults == 3) {
-	    UPS_SET(UPS_CALIBRATION);
+	    set_ups(UPS_CALIBRATION);
 	} else {
-	    UPS_CLEAR(UPS_CALIBRATION);
+	    clear_ups(UPS_CALIBRATION);
 	}
 	free(data->upsAdvTest);
     }

@@ -38,7 +38,7 @@
 #include "cgiconfig.h"
 #include "cgilib.h"
 
-static char    cmd[16] = "";
+static char    mycmd[16] = "";
 static char    upsval[16] = "";
 static char    upsval2[16] = "";
 static char    upsval3[16] = "";
@@ -111,20 +111,20 @@ static gdImagePtr InitImage(void)
 void parsearg(const char *var, const char *value) 
 {
     if (strcmp(var, "display") == 0) {
-	  strncpy (cmd, value, sizeof(cmd));
-	  cmd[sizeof(cmd) - 1] = '\0';
+	  strncpy (mycmd, value, sizeof(mycmd));
+          mycmd[sizeof(mycmd) - 1] = '\0';
 
     } else if (strcmp(var, "value") == 0) {
 	  strncpy (upsval, value, sizeof(upsval));
-	  upsval[sizeof(upsval) - 1] = '\0';
+          upsval[sizeof(upsval) - 1] = '\0';
 
     } else if (strcmp(var, "value2") == 0) {
 	  strncpy (upsval2, value, sizeof(upsval2));
-	  upsval2[sizeof(upsval2) - 1] = '\0';
+          upsval2[sizeof(upsval2) - 1] = '\0';
 
     } else if (strcmp(var, "value3") == 0) {
 	  strncpy (upsval3, value, sizeof(upsval3));
-	  upsval3[sizeof(upsval3) - 1] = '\0';
+          upsval3[sizeof(upsval3) - 1] = '\0';
     }
 }
 
@@ -425,29 +425,29 @@ int main (int argc, char **argv)
 {
     (void) extractcgiargs();
 
-    if (strcmp(cmd, "upsload") == 0) {
+    if (strcmp(mycmd, "upsload") == 0) {
 	drawupsload(upsval);
 
-    } else if (strcmp(cmd, "battcap") == 0) {
+    } else if (strcmp(mycmd, "battcap") == 0) {
 	drawbattcap(upsval, upsval2);
 
-    } else if (strcmp(cmd, "battvolt") == 0) {
+    } else if (strcmp(mycmd, "battvolt") == 0) {
 	drawbattvolt(upsval, upsval2);
 
-    } else if (strcmp(cmd, "utility") == 0) {
+    } else if (strcmp(mycmd, "utility") == 0) {
 	drawutility(upsval, upsval2, upsval3);
 
-    } else if (strcmp(cmd, "outputv") == 0) {
+    } else if (strcmp(mycmd, "outputv") == 0) {
 	drawupsout(upsval);
 
-    } else if (strcmp(cmd, "runtime") == 0) {
+    } else if (strcmp(mycmd, "runtime") == 0) {
 	drawruntime(upsval, upsval2);
 
     } else {
         puts("Status: 400 Bad request");
         puts("Content-Type: text/plain; charset=utf-8\n");
         puts("400 Bad request");
-        exit(EXIT_FAILURE);
+	exit(EXIT_FAILURE);
     }
     exit(EXIT_SUCCESS);
 }

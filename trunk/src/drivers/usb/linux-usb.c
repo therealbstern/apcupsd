@@ -25,7 +25,6 @@ static int find_usb_application(UPSINFO *ups);
 static double pow_ten(int exponent);
 
 extern UPSCOMMANDS cmd[];
-extern UPSCMDMSG cmd_msg[];
 
 
 /* USB Vendor ID's */
@@ -358,10 +357,10 @@ static int usb_link_check(UPSINFO *ups)
     for (tlog=LINK_RETRY_INTERVAL*2; comm_err; tlog -= (LINK_RETRY_INTERVAL)) {
 	if (tlog <= 0) {
 	    tlog = 10 * 60; /* notify every 10 minutes */
-	    log_event(ups, cmd_msg[CMDCOMMFAILURE].level,
-		      cmd_msg[CMDCOMMFAILURE].msg);
+	    log_event(ups, event_msg[CMDCOMMFAILURE].level,
+		      event_msg[CMDCOMMFAILURE].msg);
 	    if (once) {    /* execute script once */
-		execute_command(ups, cmd[CMDCOMMFAILURE]);
+		execute_command(ups, ups_event[CMDCOMMFAILURE]);
 		once = FALSE;
 	    }
 	}

@@ -4,22 +4,11 @@
  *
  * This C file is derived from the UPS-MIB module.
  *
- * $Id: rfc1628-mib-mgr.c,v 1.2 2004-02-12 19:42:57 kerns Exp $
+ * $Id: rfc1628-mib-mgr.c,v 1.3 2004-04-16 13:18:44 kerns Exp $
  */
 
 #include "apc.h"
-
-#include <stdlib.h>
- 
-#undef UCD_COMPATIBLE
-#define UCD_COMPATIBLE 1
-
-#include <ucd-snmp/asn1.h>
-#include <ucd-snmp/snmp.h>
-#include <ucd-snmp/snmp_api.h>
-#include <ucd-snmp/snmp_client.h>
-
-#include "rfc1628-mib.h"
+#include "snmp.h" 
 
 static oid upsIdentManufacturer[] = {1, 3, 6, 1, 2, 1, 33, 1, 1, 1};
 static oid upsIdentModel[] = {1, 3, 6, 1, 2, 1, 33, 1, 1, 2};

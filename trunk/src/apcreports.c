@@ -95,7 +95,7 @@ static int log_status_close(UPSINFO *ups, int fd)
         log_event(ups, LOG_ERR, _("Status buffer overflow %d bytes\n"), i-sizeof(largebuf));
 	return -1;
     }
-    sprintf(buf, "APC      : %03d,%03d,%04d\n", STAT_REV, stat_recs, i);
+    asnprintf(buf, sizeof(buf), "APC      : %03d,%03d,%04d\n", STAT_REV, stat_recs, i);
     fputs(buf, statusfile);
     fputs(largebuf, statusfile);
     fflush(statusfile);
@@ -221,7 +221,7 @@ static void log_data(UPSINFO *ups)
             ptr = "R-EVENT";
 	    break;
 	default :
-            sprintf(msg, "UNKNOWN EVENT %c %c", (*ups).G[0], (*ups).G[1]);
+            asnprintf(msg, sizeof(msg), "UNKNOWN EVENT %c %c", (*ups).G[0], (*ups).G[1]);
 	    ptr = msg;
 	    break;
 	}

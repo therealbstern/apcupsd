@@ -208,6 +208,9 @@
 /* Set if you want SNMP support */
 #undef HAVE_SNMP_DRIVER
 
+#undef HAVE_UCD_SNMP
+#undef HAVE_NET_SNMP
+
 /* Set if you want TEST driver */
 #undef HAVE_TEST_DRIVER
 

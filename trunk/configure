@@ -866,6 +866,9 @@ Optional Features:
   --enable-snmp 	   Compile SNMP UPS code
   --disable-snmp	   No SNMP UPS code (default)
 
+  --enable-net-snmp	       Compile NET-SNMP UPS code
+  --disable-net-snmp	       No NET-SNMP UPS code (default)
+
   --enable-test 	   Compile TEST driver code
   --disable-test	   No TEST driver (default)
 
@@ -882,21 +885,22 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-libwrap=DIR     Compile in libwrap (tcp_wrappers) support
-  --with-nisis=IP-ADDRESS Specify the IP address to bind to
+  --with-nisip=IP-ADDRESS Specify the IP address to bind to
   --with-cgi-bin=DIR	   Specify cgi-bin directory (default=/etc/apcupsd/cgi)
   --with-included-gettext use the GNU gettext library included here
   --with-catgets          use catgets functions if available
   --with-distname=NAME     Specify DISTNAME
-  --with-nologin=DIR	   Specify nologin file directory (default /etc)
-  --with-pid-dir=DIR	   Specify PIDDIR directory (default is OS dependent)
-  --with-log-dir=DIR	   Specify EVENTS and STATUS directory (default is OS dependent)
-  --with-lock-dir=DIR	   Specify serial port lock directory (default is OS dependent)
-  --with-pwrfail-dir=DIR   Specify power failure file directory (default is OS dependent)
-  --with-serial-dev=DEV    Specify serial port device
-  --with-nis-port=PORT     Specify NIS (CGI) port (default 3551 except Debian)
-  --with-net-port=PORT     Specify Master/slave port (default 6666 except Debian)
-  --with-upstype=TYPE	   Specify the UPS type
-  --with-upscable=CABLE    Specify the UPS cable
+  --with-nologin=DIR      Specify nologin file directory (default /etc)
+  --with-pid-dir=DIR      Specify PIDDIR directory (default is OS dependent)
+  --with-log-dir=DIR      Specify EVENTS and STATUS directory (default is OS dependent)
+  --with-lock-dir=DIR     Specify serial port lock directory (default is OS dependent)
+  --with-pwrfail-dir=DIR	Specify power failure file directory (default is OS dependent)
+  --with-serial-dev=DEV	Specify serial port device
+  --with-dev=DEV	 Specify port or device
+  --with-nis-port=PORT	Specify NIS (CGI) port (default 3551 except Debian)
+  --with-net-port=PORT	Specify Master/slave port (default 6666 except Debian)
+  --with-upstype=TYPE     Specify the UPS type
+  --with-upscable=CABLE	Specify the UPS cable
 
 Some influential environment variables:
   CC          C compiler command
@@ -3096,7 +3100,7 @@ else
     WIN32=
     WINLIBS=
     APCACCESS=apcaccess
-    SMTP=
+    SMTP=smtp
     APCTEST=apctest
 fi
 
@@ -9461,9 +9465,154 @@ if test "$SNMP_DRIVER_ENABLED" = "yes"; then
 #define HAVE_SNMP_DRIVER 1
 _ACEOF
 
+  cat >>confdefs.h <<\_ACEOF
+#define HAVE_UCD_SNMP 1
+_ACEOF
+
   SNMP_DRIVER="snmp"
 
 fi
+
+NET_SNMP_DRIVER_ENABLED="no"
+# Check whether --enable-net-snmp or --disable-net-snmp was given.
+if test "${enable_net_snmp+set}" = set; then
+  enableval="$enable_net_snmp"
+   if test "$enableval" = "yes" ; then
+		NET_SNMP_DRIVER_ENABLED="yes"
+		echo "$as_me:$LINENO: checking for EVP_DigestInit in -lcrypto" >&5
+echo $ECHO_N "checking for EVP_DigestInit in -lcrypto... $ECHO_C" >&6
+if test "${ac_cv_lib_crypto_EVP_DigestInit+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lcrypto  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char EVP_DigestInit ();
+int
+main ()
+{
+EVP_DigestInit ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_crypto_EVP_DigestInit=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_crypto_EVP_DigestInit=no
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_crypto_EVP_DigestInit" >&5
+echo "${ECHO_T}$ac_cv_lib_crypto_EVP_DigestInit" >&6
+if test $ac_cv_lib_crypto_EVP_DigestInit = yes; then
+  echo '  including crypto library for snmp.'; LIBS="$LIBS -lcrypto"
+fi
+
+	    echo "$as_me:$LINENO: checking for snmp_open in -lnetsnmp" >&5
+echo $ECHO_N "checking for snmp_open in -lnetsnmp... $ECHO_C" >&6
+if test "${ac_cv_lib_netsnmp_snmp_open+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lnetsnmp  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+#line $LINENO "configure"
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char snmp_open ();
+int
+main ()
+{
+snmp_open ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+         { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_netsnmp_snmp_open=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_netsnmp_snmp_open=no
+fi
+rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_netsnmp_snmp_open" >&5
+echo "${ECHO_T}$ac_cv_lib_netsnmp_snmp_open" >&6
+if test $ac_cv_lib_netsnmp_snmp_open = yes; then
+  LIBS="$LIBS -lnetsnmp"
+else
+  echo '  disabling NET-SNMP driver.'; NET_SNMP_DRIVER_ENABLED="no"
+fi
+
+	fi
+fi;
+
+if test "$NET_SNMP_DRIVER_ENABLED" = "yes"; then
+  cat >>confdefs.h <<\_ACEOF
+#define HAVE_SNMP_DRIVER 1
+_ACEOF
+
+  cat >>confdefs.h <<\_ACEOF
+#define HAVE_NET_SNMP 1
+_ACEOF
+
+  SNMP_DRIVER="snmp"
+
+fi
+
 
 # Check whether --enable-test or --disable-test was given.
 if test "${enable_test+set}" = set; then
@@ -13165,219 +13314,219 @@ NETPORT=6666
 #
 case "$DISTNAME" in
 alpha)
-	if test "$with_pthreads" != no; then
-	    PTHREAD_LFLAGS="-lpthread -lexc"
-	fi
+    if test "$with_pthreads" != no; then
+	PTHREAD_LFLAGS="-lpthread -lexc"
+    fi
 
-	DISTVER=`uname -r`
-	SERIALDEV=/dev/tty01
-	LOCKDIR=/var/spool/locks
-	LOGDIR=/etc/apcupsd
-	DFILES="\
-		platforms/alpha/apcupsd \
-		platforms/alpha/awkhaltprog \
-		platforms/alpha/Makefile"
+    DISTVER=`uname -r`
+    SERIALDEV=/dev/tty01
+    LOCKDIR=/var/spool/locks
+    LOGDIR=/etc/apcupsd
+    DFILES="\
+	platforms/alpha/apcupsd \
+	platforms/alpha/awkhaltprog \
+	platforms/alpha/Makefile"
   ;;
 bsdi)
-	DISTVER=`uname -a |awk '{print $3}'`
+    DISTVER=`uname -a |awk '{print $3}'`
   ;;
 cygwin)
-	DISTVER=cygwin
-	LOCKDIR=/apcupsd/etc/apcupsd
-	SERIALDEV=/dev/com1
-	LOGDIR=/apcupsd/etc/apcupsd
-	nologdir=/apcupsd/etc
-	WCFLAGS="-mwindows"
-	WLDFLAGS="-mwindows"
-	PWRFAILDIR=/apcupsd/etc
-	PIDDIR=/apcupsd/etc/apcupsd
-	PTHREAD_CFLAGS=""
-	PTHREAD_LFLAGS=""
-	DFILES="\
-		src/win32/Makefile \
-		platforms/cygwin/Makefile \
-		platforms/cygwin/apcupsd \
-		platforms/cygwin/apccontrol \
-		"
+    DISTVER=cygwin
+    LOCKDIR=/apcupsd/etc/apcupsd
+    SERIALDEV=/dev/com1
+    LOGDIR=/apcupsd/etc/apcupsd
+    nologdir=/apcupsd/etc
+    WCFLAGS="-mwindows"
+    WLDFLAGS="-mwindows"
+    PWRFAILDIR=/apcupsd/etc
+    PIDDIR=/apcupsd/etc/apcupsd
+    PTHREAD_CFLAGS=""
+    PTHREAD_LFLAGS=""
+    DFILES="\
+	src/win32/Makefile \
+	platforms/cygwin/Makefile \
+	platforms/cygwin/apcupsd \
+	platforms/cygwin/apccontrol \
+	"
   ;;
 debian)
-	DISTVER=`cat /etc/debian_version`
-	NISPORT=6543
-	NETPORT=6544
-	DFILES="\
-		platforms/debian/Makefile \
-		platforms/debian/apcupsd \
-		platforms/debian/ups-monitor \
-		"
+    DISTVER=`cat /etc/debian_version`
+    NISPORT=6543
+    NETPORT=6544
+    DFILES="\
+	platforms/debian/Makefile \
+	platforms/debian/apcupsd \
+	platforms/debian/ups-monitor \
+	"
   ;;
 freebsd)
-	DISTVER=`uname -a |awk '{print $3}'`
-	SERIALDEV=/dev/cuaa0
-	nologdir=/var/run
-	PWRFAILDIR=/var/run
-	LOCKDIR=/var/spool/lock
-	if test "$with_pthreads" != no; then
-	    PTHREAD_CFLAGS="-pthread"
-	    PTHREAD_LFLAGS=""
-	    LDFLAGS="$LDFLAGS -pthread"
-	fi
-	if test x$prefix = xNONE -a x$mandir = x'${prefix}/man' ; then
-		mandir=/usr/share/man
-	fi
-	DFILES="\
-		platforms/freebsd/Makefile \
-		platforms/freebsd/apcupsd \
-		"
+    DISTVER=`uname -a |awk '{print $3}'`
+    SERIALDEV=/dev/cuaa0
+    nologdir=/var/run
+    PWRFAILDIR=/var/run
+    LOCKDIR=/var/spool/lock
+    if test "$with_pthreads" != no; then
+	PTHREAD_CFLAGS="-pthread"
+	PTHREAD_LFLAGS=""
+	LDFLAGS="$LDFLAGS -pthread"
+    fi
+    if test x$prefix = xNONE -a x$mandir = x'${prefix}/man' ; then
+	mandir=/usr/share/man
+    fi
+    DFILES="\
+	platforms/freebsd/Makefile \
+	platforms/freebsd/apcupsd \
+	"
   ;;
 gentoo)
-	DISTVER=`awk '/version / {print $5}' < /etc/gentoo-release`
-	DFILES="\
-		platforms/gentoo/Makefile \
-		platforms/gentoo/apcupsd \
-		platforms/gentoo/halt \
-		"
+    DISTVER=`awk '/version / {print $5}' < /etc/gentoo-release`
+    DFILES="\
+	platforms/gentoo/Makefile \
+	platforms/gentoo/apcupsd \
+	platforms/gentoo/halt \
+	"
   ;;
 hpux)
-	DISTVER=`uname -r`
-	DFILES="\
-		platforms/hpux/Makefile \
-		platforms/hpux/apcupsd \
-		platforms/hpux/halt"
+    DISTVER=`uname -r`
+    DFILES="\
+	platforms/hpux/Makefile \
+	platforms/hpux/apcupsd \
+	platforms/hpux/halt"
   ;;
 netbsd)
-	DISTVER=`uname -a |awk '{print $3}'`
-	SERIALDEV=/dev/cua01
-	if test "$with_pthreads" != no; then
-	    PTHREAD_CFLAGS="-pthread"
-	    PTHREAD_LFLAGS=""
-	    LDFLAGS="$LDFLAGS -pthread"
-	fi
-	DFILES="\
-		platforms/netbsd/Makefile \
-		platforms/netbsd/apcupsd \
-		"
+    DISTVER=`uname -a |awk '{print $3}'`
+    SERIALDEV=/dev/cua01
+    if test "$with_pthreads" != no; then
+	PTHREAD_CFLAGS="-pthread"
+	PTHREAD_LFLAGS=""
+	LDFLAGS="$LDFLAGS -pthread"
+    fi
+    DFILES="\
+	platforms/netbsd/Makefile \
+	platforms/netbsd/apcupsd \
+	"
   ;;
 openbsd)
-	DISTVER=`uname -a |awk '{print $3}'`
-	SERIALDEV=/dev/cua01
-	LOCKDIR=/var/spool/lock
-	if test "$with_pthreads" != no; then
-	    PTHREAD_CFLAGS="-pthread"
-	    PTHREAD_LFLAGS=""
-	    LDFLAGS="$LDFLAGS -pthread"
-	fi
-	if test x$prefix = xNONE -a x$mandir = x'${prefix}/man' ; then
-		mandir=/usr/share/man
-	fi
+    DISTVER=`uname -a |awk '{print $3}'`
+    SERIALDEV=/dev/cua01
+    LOCKDIR=/var/spool/lock
+    if test "$with_pthreads" != no; then
+	PTHREAD_CFLAGS="-pthread"
+	PTHREAD_LFLAGS=""
+	LDFLAGS="$LDFLAGS -pthread"
+    fi
+    if test x$prefix = xNONE -a x$mandir = x'${prefix}/man' ; then
+	mandir=/usr/share/man
+    fi
 
-	DFILES="\
-		platforms/openbsd/Makefile \
-		platforms/openbsd/apcupsd \
-		"
+    DFILES="\
+	platforms/openbsd/Makefile \
+	platforms/openbsd/apcupsd \
+	"
   ;;
 openserver)
-	DISTVER=`uname -X | awk '/Release/{print $3}'`
-	SCRIPTSHELL=/bin/ksh
-	SERIALDEV=/dev/ups
-	PWRFAILDIR=/etc
-	PIDDIR=/etc
-	LOCKDIR=/usr/spool/locks
-	LOGDIR=/usr/adm
-	if test x$prefix = xNONE -a x$mandir = x'${prefix}/man' ; then
-		mandir=/usr/man
-	fi
-	DFILES="\
-		platforms/openserver/Makefile \
-		platforms/openserver/apcupsd \
-		platforms/openserver/rc0.openserver"
+    DISTVER=`uname -X | awk '/Release/{print $3}'`
+    SCRIPTSHELL=/bin/ksh
+    SERIALDEV=/dev/ups
+    PWRFAILDIR=/etc
+    PIDDIR=/etc
+    LOCKDIR=/usr/spool/locks
+    LOGDIR=/usr/adm
+    if test x$prefix = xNONE -a x$mandir = x'${prefix}/man' ; then
+	mandir=/usr/man
+    fi
+    DFILES="\
+	platforms/openserver/Makefile \
+	platforms/openserver/apcupsd \
+	platforms/openserver/rc0.openserver"
   ;;
 mandrake)
-	DISTVER=`cat /etc/mandrake-release | grep release |\
+    DISTVER=`cat /etc/mandrake-release | grep release |\
 		 cut -f 5 -d ' '`
-	DFILES="\
-		platforms/mandrake/Makefile \
-		platforms/mandrake/apcupsd \
-		platforms/mandrake/apcupsd.spec \
-		platforms/mandrake/awkhaltprog"
+    DFILES="\
+	platforms/mandrake/Makefile \
+	platforms/mandrake/apcupsd \
+	platforms/mandrake/apcupsd.spec \
+	platforms/mandrake/awkhaltprog"
   ;;
 redhat)
-	if test `cat /etc/redhat-release | grep release |\
-		   cut -f 3 -d ' '`x = "Enterprise"x ; then
-	   DISTVER="Enterprise "`cat /etc/redhat-release | grep release |\
-		    cut -f 6 -d ' '`
-	else
-	    DISTVER=`cat /etc/redhat-release | grep release |\
-		     cut -f 5 -d ' '`
-	fi
-	DFILES="\
-		platforms/redhat/Makefile \
-		platforms/redhat/apcupsd \
-		platforms/redhat/apcupsd.spec \
-		platforms/redhat/awkhaltprog"
+   if test `cat /etc/redhat-release | grep release |\
+	cut -f 3 -d ' '`x = "Enterprise"x ; then
+      DISTVER="Enterprise "`cat /etc/redhat-release | grep release |\
+	cut -f 6 -d ' '`
+   else
+       DISTVER=`cat /etc/redhat-release | grep release |\
+	cut -f 5 -d ' '`
+   fi
+   DFILES="\
+       platforms/redhat/Makefile \
+       platforms/redhat/apcupsd \
+       platforms/redhat/apcupsd.spec \
+       platforms/redhat/awkhaltprog"
   ;;
- yellowdog)
-       if test `cat /etc/yellowdog-release | grep release |\
-		  cut -f 3 -d ' '`x = "Enterprise"x ; then
-	  DISTVER="Enterprise "`cat /etc/yellowdog-release | grep release |\
-		   cut -f 6 -d ' '`
-       else
-	   DISTVER=`cat /etc/yellowdog-release | grep release |\
-		    cut -f 5 -d ' '`
-       fi
-       DFILES="\
-	       platforms/yellowdog/Makefile \
-	       platforms/yellowdog/apcupsd \
-	       platforms/yellowdog/apcupsd.spec \
-	       platforms/yellowdog/awkhaltprog"
+yellowdog)
+   if test `cat /etc/yellowdog-release | grep release |\
+	      cut -f 3 -d ' '`x = "Enterprise"x ; then
+      DISTVER="Enterprise "`cat /etc/yellowdog-release | grep release |\
+	       cut -f 6 -d ' '`
+   else
+       DISTVER=`cat /etc/yellowdog-release | grep release |\
+		cut -f 5 -d ' '`
+   fi
+   DFILES="\
+       platforms/yellowdog/Makefile \
+       platforms/yellowdog/apcupsd \
+       platforms/yellowdog/apcupsd.spec \
+       platforms/yellowdog/awkhaltprog"
    ;;
 engarde)
-	DISTVER=`cat /etc/engarde-release | grep ersion |\
-		 cut -f 5 -d ' '`
-	DFILES="\
-		platforms/engarde/Makefile \
-		platforms/engarde/apcupsd \
-		platforms/engarde/apcupsd.spec \
-		platforms/engarde/awkhaltprog"
+    DISTVER=`cat /etc/engarde-release | grep ersion |\
+	     cut -f 5 -d ' '`
+    DFILES="\
+	platforms/engarde/Makefile \
+	platforms/engarde/apcupsd \
+	platforms/engarde/apcupsd.spec \
+	platforms/engarde/awkhaltprog"
   ;;
 slackware)
-	DISTVER=`cat /etc/slackware-version`
-	DFILES="\
-		platforms/slackware/Makefile \
-		platforms/slackware/apcupsd \
-		platforms/slackware/rc6.patch"
+    DISTVER=`cat /etc/slackware-version`
+    DFILES="\
+	platforms/slackware/Makefile \
+	platforms/slackware/apcupsd \
+	platforms/slackware/rc6.patch"
   ;;
 sun)
-	DISTVER=Solaris
-	SERIALDEV=/dev/ttya
-	PWRFAILDIR=/etc
-	PIDDIR=/var/run
-	LOCKDIR=/var/spool/locks
-	LOGDIR=${sysconfdir}
-	if test x$prefix = xNONE -a x$mandir = x'${prefix}/man' ; then
-		mandir=/usr/share/man
-	fi
-	DFILES="\
-		platforms/sun/Makefile \
-		platforms/sun/apcupsd \
-		platforms/sun/rc0.solaris"
+    DISTVER=Solaris
+    SERIALDEV=/dev/ttya
+    PWRFAILDIR=/etc
+    PIDDIR=/var/run
+    LOCKDIR=/var/spool/locks
+    LOGDIR=${sysconfdir}
+   if test x$prefix = xNONE -a x$mandir = x'${prefix}/man' ; then
+       mandir=/usr/share/man
+   fi
+   DFILES="\
+       platforms/sun/Makefile \
+       platforms/sun/apcupsd \
+       platforms/sun/rc0.solaris"
   ;;
 suse)
-	DISTVER=`cat /etc/SuSE-release |grep VERSION|\
-				cut -f 3 -d ' '`
-	DFILES="\
-		platforms/suse/Makefile \
-		platforms/suse/apcupsd \
-		platforms/suse/halt-setup.sh \
-		platforms/suse/halt"
+    DISTVER=`cat /etc/SuSE-release |grep VERSION|\
+			    cut -f 3 -d ' '`
+    DFILES="\
+	platforms/suse/Makefile \
+	platforms/suse/apcupsd \
+	platforms/suse/halt-setup.sh \
+	platforms/suse/halt"
    ;;
 suse5)
-	DISTNAME=suse
-	DISTVER=5.x
-	DFILES="\
-		platforms/suse/Makefile \
-		platforms/suse/apcupsd \
-		platforms/suse/halt-setup.sh \
-		platforms/suse/halt"
+    DISTNAME=suse
+    DISTVER=5.x
+    DFILES="\
+	platforms/suse/Makefile \
+	platforms/suse/apcupsd \
+	platforms/suse/halt-setup.sh \
+	platforms/suse/halt"
   ;;
 darwin)
     DISTVER=`uname -r`
@@ -13389,12 +13538,12 @@ darwin)
 	platforms/darwin/apcupsd"
   ;;
 unknown)
-	DISTVER=unknown
-	DFILES="\
-		platforms/unknown/Makefile \
-		platforms/unknown/apcupsd \
-		platforms/unknown/halt \
-		"
+    DISTVER=unknown
+    DFILES="\
+	platforms/unknown/Makefile \
+	platforms/unknown/apcupsd \
+	platforms/unknown/halt \
+	"
   ;;
 *)
   echo " === Something went wrong. Unknown DISTNAME $DISTNAME ==="
@@ -13415,7 +13564,7 @@ fi;
 if test "${with_pid_dir+set}" = set; then
   withval="$with_pid_dir"
 
-		PIDDIR="$withval";
+	PIDDIR="$withval";
 
 
 fi;
@@ -13425,7 +13574,7 @@ fi;
 if test "${with_log_dir+set}" = set; then
   withval="$with_log_dir"
 
-		LOGDIR="$withval";
+	LOGDIR="$withval";
 
 
 fi;
@@ -13435,7 +13584,7 @@ fi;
 if test "${with_lock_dir+set}" = set; then
   withval="$with_lock_dir"
 
-		LOCKDIR="$withval";
+	LOCKDIR="$withval";
 
 
 fi;
@@ -13445,7 +13594,7 @@ fi;
 if test "${with_pwrfail_dir+set}" = set; then
   withval="$with_pwrfail_dir"
 
-		PWRFAILDIR="$withval";
+	PWRFAILDIR="$withval";
 
 
 fi;
@@ -13457,10 +13606,21 @@ fi;
 if test "${with_serial_dev+set}" = set; then
   withval="$with_serial_dev"
 
-		SERIALDEV="$withval";
+	SERIALDEV="$withval";
 
 
 fi;
+
+
+# Check whether --with-dev or --without-dev was given.
+if test "${with_dev+set}" = set; then
+  withval="$with_dev"
+
+	SERIALDEV="$withval";
+
+
+fi;
+
 
 # now allow user to specify NISPORT
 
@@ -13468,7 +13628,7 @@ fi;
 if test "${with_nis_port+set}" = set; then
   withval="$with_nis_port"
 
-		NISPORT="$withval";
+	NISPORT="$withval";
 
 
 fi;
@@ -13479,7 +13639,7 @@ fi;
 if test "${with_net_port+set}" = set; then
   withval="$with_net_port"
 
-		NETPORT="$withval";
+	NETPORT="$withval";
 
 
 fi;
@@ -13491,7 +13651,7 @@ fi;
 if test "${with_upstype+set}" = set; then
   withval="$with_upstype"
 
-		UPSTYPE="$withval";
+	UPSTYPE="$withval";
 
 
 fi;
@@ -13502,7 +13662,7 @@ fi;
 if test "${with_upscable+set}" = set; then
   withval="$with_upscable"
 
-		UPSCABLE="$withval";
+	UPSCABLE="$withval";
 
 
 fi;
@@ -13555,37 +13715,37 @@ gccinclude="."
 
 if test "$CC" = "gcc"
 then
-	rm -f $srcdir/gcc.v
-	$CC -v 2> $srcdir/gcc.v
-	gccinclude=`cat $srcdir/gcc.v|grep specs|awk '{print $4}'| \
-		    sed -e 's|specs|include|g'`
-	echo "gcc private include directory found."
-	rm -f $srcdir/gcc.v
+    rm -f $srcdir/gcc.v
+    $CC -v 2> $srcdir/gcc.v
+    gccinclude=`cat $srcdir/gcc.v|grep specs|awk '{print $4}'| \
+		sed -e 's|specs|include|g'`
+    echo "gcc private include directory found."
+    rm -f $srcdir/gcc.v
 fi
 
 GENERATE_FILES="\
-	autoconf/variables.mak \
-	autoconf/Makefile \
-	doc/Makefile \
-	include/Makefile \
-	src/Makefile \
-	src/lib/Makefile \
-	src/drivers/Makefile \
-	platforms/Makefile \
-	platforms/apccontrol \
-	platforms/etc/changeme \
-	platforms/etc/commfailure \
-	platforms/etc/commok \
-	platforms/etc/mainsback
-	platforms/etc/masterconnect \
-	platforms/etc/mastertimeout \
-	platforms/etc/onbattery \
-	platforms/etc/Makefile \
-	platforms/etc/apcupsd.conf \
-	examples/Makefile \
-	examples/safe.apccontrol \
-	Makefile \
-	$DFILES"
+    autoconf/variables.mak \
+    autoconf/Makefile \
+    doc/Makefile \
+    include/Makefile \
+    src/Makefile \
+    src/lib/Makefile \
+    src/drivers/Makefile \
+    platforms/Makefile \
+    platforms/apccontrol \
+    platforms/etc/changeme \
+    platforms/etc/commfailure \
+    platforms/etc/commok \
+    platforms/etc/mainsback
+    platforms/etc/masterconnect \
+    platforms/etc/mastertimeout \
+    platforms/etc/onbattery \
+    platforms/etc/Makefile \
+    platforms/etc/apcupsd.conf \
+    examples/Makefile \
+    examples/safe.apccontrol \
+    Makefile \
+    $DFILES"
 
 if test "$APCSMART_DRIVER"x != ""x
 then
@@ -13619,17 +13779,17 @@ fi
 
 if test "$USE_INCLUDED_LIBINTL" = "yes"
 then
-	GENERATE_FILES="$GENERATE_FILES src/intl/Makefile"
+    GENERATE_FILES="$GENERATE_FILES src/intl/Makefile"
 fi
 
 if test "$USE_NLS" = "yes"
 then
-	GENERATE_FILES="$GENERATE_FILES src/po/Makefile"
+    GENERATE_FILES="$GENERATE_FILES src/po/Makefile"
 fi
 
 if test "$ENABLE_CGI" = "yes"
 then
-	GENERATE_FILES="$GENERATE_FILES src/cgi/Makefile src/cgi/cgiconfig.h"
+    GENERATE_FILES="$GENERATE_FILES src/cgi/Makefile src/cgi/cgiconfig.h"
 fi
 
 if test "$LIBGD"x != ""x

@@ -149,8 +149,7 @@ static int status_close(UPSINFO *ups, int nsockfd)
     i = strlen(largebuf);
     if (i > (int)sizeof(largebuf)-1) 
         Error_abort1("Status buffer overflow %d bytes\n", i-sizeof(largebuf));
-    sprintf(buf, "APC      : %03d,%03d,%04d\n", STAT_REV, stat_recs, i);
-    
+    asnprintf(buf, sizeof(buf),  "APC      : %03d,%03d,%04d\n", STAT_REV, stat_recs, i);
     if (net_send(nsockfd, buf, strlen(buf)) <= 0)
 	return -1;
     sptr = eptr = largebuf;

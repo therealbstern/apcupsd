@@ -142,8 +142,8 @@ static int status_close(UPSINFO *ups, int nsockfd)
     char *sptr, *eptr;
 
     i = strlen(largebuf);
-    sprintf(buf, "APC      : %03d,%03d,%04d\n", STAT_REV, stat_recs, i);
-    
+    asnprintf(buf, sizeof(buf), "APC      : %03d,%03d,%04d\n", STAT_REV, 
+	      stat_recs, i);
     if (net_send(nsockfd, buf, strlen(buf)) <= 0) {
 	V(mutex);
 	return -1;

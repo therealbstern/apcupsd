@@ -279,8 +279,8 @@ int net_open(char *host, char *service, int port)
     fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFL));
 #endif
     if (connect(sockfd, (struct sockaddr *) &tcp_serv_addr, sizeof(tcp_serv_addr)) < 0) {
-        sprintf(net_errbuf, "tcp_open: cannot connect to server %s on port %d.\n\
-ERR=%s\n", host, port, strerror(errno));
+        asnprintf(net_errbuf, sizeof(net_errbuf), _("tcp_open: cannot connect to server %s on port %d.\n\
+ERR=%s\n"), host, port, strerror(errno));
 	net_errmsg = net_errbuf;
 	return -1;
     }
