@@ -1,0 +1,207 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+   <TITLE>New Features</TITLE>
+   <meta name="Author" content="Kern Sibbald">
+   <link rel=stylesheet href="apcupsd-styles.css" type="text/css">
+</HEAD>
+<BODY>
+<h2>New Features in Apcupsd 3.10.4</h2>
+See the list below for the detailed change log.  Note, a number of the
+details of the changes are only documented in the <b>apcupsd.conf</b>
+file, and unfortunately not in much detail.
+<p>
+The main new features are:
+<ul>
+  <li>Support for USB UPSes on Linux. The killpower feature does not work though
+      (most likely a kernel &quot;bug&quot;).</li>
+  <li>Support for additional models and cables.</li>
+  <li>New cable for running BackUPS CS in Smart mode (possibly also the
+      BackUPS ES).</li>
+  <li>The old master/slave code must be explicitly enabled with
+      <b>--enable-master-slave</b> option on the <b>./configure</b>
+      line.  </li>
+  <li>Different models are now handled by drivers.</li>
+  <li>NIS code, master/slave code, and the drivers can be individually configured
+      giving a much smaller memory foot print.</li>
+  <li>A host of new configuration options to support enabling/disabling drivers
+      and features.</li>
+  <li>Support for limiting what subnets the NIS code will listen to using
+      the new <b>NISIP</b> configuration directive.</li>
+  <li>SNMP support.</li>
+  <li>Support for system provided gd libraries.</li>
+  <li>Source tree reorganization.</li>
+</ul>
+
+
+<p></p>
+<P><b>apcupsd</b> is mainly developed under Linux and will compile cleanly 
+and work under most flavors of Unix as well as many other
+operating systems including Windows.
+</P>
+<P>What to do if you find bugs :</P>
+<P STYLE="margin-left: 0.29in">send an email to 
+<a href="mailto:apcupsd-devel@apcupsd.org">apcupsd-devel@apcupsd.org</a> 
+(Developers mailing list) or go to one of the following sites:
+<pre>
+<a href="http://www.apcupsd.org">http://www.apcupsd.org</a>
+<a href="http://www.sibbald.com/apcupsd">http://www.sibbald.com/apcupsd</a>
+</pre>
+Please be sure to include the version of <b>apcupsd</b> you are
+running, your operating system, and a detailed description of your
+problem.
+
+
+<P>Change Log
+<pre>
+----&gt; Release apcupsd-3.10.4 (21 Jan 2003) (not yet released)
+    - Added error messages if old master/slave code called.
+    - Reworked the messages for ./configure --help to be aligned and
+      clearer for networking and master/slave
+    - A number of important patches all supplied by Mirko Doelle.
+    - Moved technotes for 2001 and 2002 into respective directories.
+    - Created a new kes-3.10.4 file to which I will append if there
+      are additional changes to 3.10.4. This will reduce the number
+      of release note files.
+
+    Changes submitted this submission:
+    19Jan03
+    - Fixed hangs in usb driver startup when could not open port by
+      releasing the ups structure lock before the Error_abort calls.
+      Thanks to Mirko Doelle for reporting this.
+    - Fixed the default path for mkinstalldirs from $(topdir) to
+      $(topdir)/autoconf.  Reported by Mirko.
+    - Fixed configure.in to always create platform/apccontrol. Previously
+      it was not being created for Debian. Reported by Mirko.
+    - Removed Debian specific installation of apccontrol. Reported by
+      Mirko.
+    - Implemented code to display the apcupsd events with the most recent
+      first. Code sent by Mirko, but I modified it slightly.
+
+----&gt; Release apcupsd-3.10.3 (12 Dec 2002)
+    - Tried to correct problems with Makefiles
+    - Thanks to David Walser who pointed out where on the Sun, the make
+      install was doing terrible things -- I found that there was
+      a missing semicolon in the new Makefile.  Before my previous cleanup,
+      there were actually 4 missing semicolons.  Hopefully this
+      will correct the problem.
+    - For a second time, David Walser came to the rescue finding the
+      CGI install problem reported by lots of people.  The new code
+      used "make" instead of $(MAKE) to call the CGI make.  Fixed.
+
+    Changes submitted this submission:
+    - Removed Makefile code that creates and sets permission bits on
+      /tmp $(prefix) and $(exec-prefix)
+    - Removed all occurrences of -z in the Makefiles (at least that I
+      found) and replaced them with a more conservative formulation.
+    - Removed the install-symlinks script that caused some problems
+      on distributions with blanks in the DISTVER name.
+    - Added install-symlinks to the suse Makefile.in. This is the
+      only platform that currently uses it.
+
+
+----&gt; Release apcupsd-3.10.2 (08 Nov 2002)
+    - New cable design for BackUPS CS models to run it
+      in Smart serial mode.
+    - Corrected a major bug in the smart and net code where the
+      status word was getting clobbered.
+
+    Changes submitted this submission:
+    - A few days ago, slither_man sent me an email with some 
+      information on how to run a BackUPS CS in smart mode with
+      a serial cable.  He found the information by assuming that
+      the UPS supported Smart mode and through trial and error.
+      Well, it works!!!!!!! Amazing!!!! Thanks slither_man.
+    - Documentation for new CUSTOM-RJ54 cable that can be constructed
+      from the end of an ethernet cable and a DB9F connector.
+
+    - Changed all the MAIL instances in shell scripts into APCUPSD_MAIL.
+      This helps keep separated the apcupsd specific shell variables from
+      the generic $MAIL shell variable that points to the user's mailbox:
+
+        riccardo@ao:~&gt; echo $MAIL
+        /var/spool/mail/riccardo
+        riccardo@ao:~&gt;
+
+      An user reported that ./configure script transformed internal $MAIL
+      executable program into her mailbox path. This may happen if the
+      configure suite is broken (thing that I don't want to check further).
+      That said, APCUPSD_MAIL now should always correctly point to the
+      system default mail client program.
+    - Made so that error_cleanup is a generic function called by the
+      generic error handlers. Now if you want specific error_cleanup
+      you don't need to write also specific error handlers, provided
+      that error_cleanup don't accept parameters (i.e.
+      specific_error_cleanup(void)) but if you want to have a specific
+      error_cleanup with parameters you _must_ also write specific
+      error_exit and error_out into which you will call the specific
+      error_cleanup with parameters.
+    - Made so that error_exit and error_out are generic handlers that
+      can be assigned, if needed, to specific handlers by the main() of
+      each program. If not, the Error* routines will use the generic
+      versions in apclib.a.
+    - Fixed wrong "true" usage in powerflute.
+    - Cleaned up the terminate() functions.
+    - Made DeviceVendor part of snmp DEVICE case insensitive.
+
+----&gt; Release apcupsd-3.10.1 (16 Sep 2002)
+    - Fixed a filling error with USB status dword.
+    - Fixed autoconf check and dependances of -lpanel,etc with -lncurses.
+    - Made more portable the apccontrol external scripts when calling the
+      mailer (subject is now in the echo lines instead of relying on the
+      presence of a -s switch on the mailer).
+    - Added gentoo platform.
+    - Added DESTDIR variable for platform packaging.
+    - Fixed a off-by-one problem in events table.
+    - Conditional compilation of old and new network code. Old network code
+      disabled by default while new network code enabled by default.
+    - Removed old src/apcnet.c.old, old implementation of old networking.
+
+----&gt; Release apcupsd-3.10.0 (28 Jul 2002)
+    - Added documentation for SNMP UPSes. Documented the use of
+      --kill-on-powerfail switch during shutdown.
+    - SuSE 8.0 is now supported.
+    - Added forward declaration of inet_pton and localtime_r when they
+      are extraobj.
+    - Added inet_pton function. Implementation from Internet Software
+      Consortium.
+    - Made sp_flags private to the dumb driver.
+    - Can't SET/CLEAR multiple flags: do them one by one. Fixed this
+      bug in SNMP driver.
+    - Added 127A and 128A cables support for dumb UPSes.
+    - Implemented killpower for PowerNet MIB.
+    - Implemented the SNMP driver for APC's PowerNet MIB.
+    - Restructured UPSINFO so that now all the flags are contained
+      into the Status bitmap.
+    - *BSD should compile cleanly again.
+    - Source tree is now under CVS revision control.
+    - Added support for listening on specific IP addresses/subnets in
+      NIS server, from Troy.
+    - Doc updates, from Kern.
+
+----&gt; Release apcupsd-3.9.9 (18 May 2002)
+    - Applied final Kern's patch.
+    - Added a little program 'devicedbg' to help in debugging device
+      drivers with gdb. To compile, 'make devicedbg' in src/.
+    - Cygwin platform added (reorganized old cygwin files).
+    - Darwin platform added.
+    - compile line is 'gcc -c -g -O2   -I../include  apcaction.c'.
+    - reviewed all the platform makefiles.
+    - use system libgd, searching for include files in system include dirs.
+    - in case system does not have libgd, uses provided libgd.
+    - put gd1.2 into master's contrib directory and a message if gd1.2
+      is not present into src/gd1.2 (like default distribution will not)
+      is issued at configure time to get gd1.2 from contrib and extract it
+      into the src/ directory. Re-run config and all will be good and happy.
+    - Sources reorganization.
+    - Mandrake platform added.
+</pre>
+
+
+<hr>
+
+<a href="bugs.html" target="_self"><img src="back.gif" border=0 alt="Back"></a>
+<a href="oldversions.html" target="_self"><img src="next.gif" border=0 alt="Next"></a>
+<a href="index.html"><img src="home.gif" border=0 alt="Home"></a>
+</body>
+</html>
