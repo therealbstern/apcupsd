@@ -238,9 +238,6 @@ extern void do_reports (UPSINFO *ups);
  * In apcsmart.c
  */
 extern int apc_enable(UPSINFO *ups);
-extern int apc_write(char cmd, UPSINFO *ups);
-extern char *apc_read(UPSINFO *ups);
-extern char *apc_chat(char cmd, UPSINFO *ups);
 extern int getline (char *s, int len, UPSINFO *ups);
 extern void UPSlinkCheck (UPSINFO *ups);
 extern char *smart_poll (char cmd, UPSINFO *ups);

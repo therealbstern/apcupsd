@@ -60,7 +60,7 @@
 #include "apcsmart.h"
 
 /*********************************************************************/
-static char *get_apc_model_V_codes (char *s, UPSINFO *ups)
+static char *get_apc_model_V_codes (const char *s, UPSINFO *ups)
 {
 
     switch(s[0]) {
@@ -96,7 +96,7 @@ static char *get_apc_model_V_codes (char *s, UPSINFO *ups)
 }
 
 /*********************************************************************/
-static char *get_apc_model_b_codes(char *s, UPSINFO *ups)
+static char *get_apc_model_b_codes(const char *s, UPSINFO *ups)
 {
 /*
  *	  New Firmware revison and model ID String in NN.M.D is the format
@@ -178,7 +178,7 @@ int apcsmart_ups_get_capabilities(UPSINFO *ups)
     int i;
 
     /* Get UPS capabilities string */
-    strcpy(caps, apc_chat(ups->UPS_Cmd[CI_UPS_CAPS], ups));
+    strcpy(caps, smart_poll(ups->UPS_Cmd[CI_UPS_CAPS], ups));
     if (strlen(caps) && (strcmp(caps,"NA") != 0)) {
 	ups->UPS_Cap[CI_UPS_CAPS] = TRUE;
 	/* skip version */
@@ -204,7 +204,7 @@ int apcsmart_ups_get_capabilities(UPSINFO *ups)
      */
     for (i = 0; i <= CI_MAX_CAPS; i++) {
 	if (!cmds || strchr(cmds, ups->UPS_Cmd[i]) != NULL) {
-	    strcpy(answer, apc_chat(ups->UPS_Cmd[i], ups));
+	    strcpy(answer, smart_poll(ups->UPS_Cmd[i], ups));
             if (answer && *answer && (strcmp(answer, "NA") != 0)) {
 		ups->UPS_Cap[i] = TRUE;
 	    }
