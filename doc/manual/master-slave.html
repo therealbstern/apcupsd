@@ -48,6 +48,20 @@ of this manual for more details.
 For additional details of shutting down a master/slave configuration,
 please see the <a href="shutdown.html#MasterSlaveShutdown">Master/Slave
 Shutdown</a> section of the Shutdown chapter of this manual.
+
+<h2>Master/Slave Networking using NIS</h2>
+It is also possible to implement a network of master/slave
+apcupsds using the new 3.10.x code and the <b>net</b> driver.
+This mode of master/slave networking is considerably different
+from the old method described at the beginning of this chapter.
+In this master/slave mode, the master must have <b>NETSERVER on</b>
+in the configuration file and have an <b>NISPORT nnn</b> defined.
+The apcupsd running in this mode then becomes the master.  The
+slave copy of apcupsd, have <b>UPSTYPE net</b>, which will invoke
+the &quot;network&quot; driver. By setting this machine's <b>NISPORT nnn</b>
+to the same value as the master, it will automatically connect
+to the master and use the master's signals to shutdown the computer.
+This code is not yet well tested.
 <hr>
        
 <a href="logging.html" target="_self"><img src="back.gif" border=0 alt="Back"></a>
