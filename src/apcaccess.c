@@ -91,11 +91,6 @@ DATAINFO myDATA = {
 
 CONFIGINFO myCONFIG;
 
-/*********************************************************************/
-void reconfig_data (CONFIGINFO *config);
-void do_main_menu (void);
-void do_config_menu (void);
-
 /* EPROM commands and their values as parsed from the
  * ^Z eprom string returned by the UPS.
  */
@@ -290,56 +285,6 @@ static void do_pthreads_status(UPSINFO *ups, char *host, int port)
 
 #endif
 
-
-/*********************************************************************/
-void reconfig_data (CONFIGINFO *config)
-{
-    /* Run time reconfiguration. */
-}
-
-/*********************************************************************/
-void do_main_menu (void)
-{
-    char ch, temp_comment[256];
-    int comment_count = 0;
-
-    while ((ch = getchar()) != '\n')
-	    temp_comment[comment_count++] = ch;
-    temp_comment[comment_count] = '\0';
-    m_char = temp_comment[0];
-    printf("\n");
-
-    switch (m_char) {
-    case '~':
-        m_char = 'S';
-	break;
-    case 'R':
-    case 'r':
-	do_config_menu();
-	break;
-    case 'S':
-    case 's':
-	break;
-    case 'K':
-    case 'k':
-	break;
-    case 'E':
-    case 'e':
-        m_char = '~';
-	break;
-    default:
-	break;
-    }
-
-    system("clear");
-}
-	
-/*********************************************************************/
-void do_config_menu (void)
-{
-    system("clear");
-}
-
 /*********************************************************************/
 
 #ifdef HAVE_CYGWIN
@@ -428,11 +373,6 @@ int main(int argc, char **argv)
 	}
       }
     }
-
-/*
-    while (m_char != '~')
-	do_main_menu();
-*/
 
     astrncpy(myDATA.apcmagic, APC_MAGIC, sizeof(myDATA.apcmagic));
     astrncpy(myDATA.accessmagic, ACCESS_MAGIC, sizeof(myDATA.accessmagic));
