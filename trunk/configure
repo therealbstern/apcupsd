@@ -6282,7 +6282,6 @@ else
 fi
 
 
-if test "$with_pthreads" != no; then
 echo "$as_me:$LINENO: checking for localtime_r" >&5
 echo $ECHO_N "checking for localtime_r... $ECHO_C" >&6
 if test "${ac_cv_func_localtime_r+set}" = set; then
@@ -6365,8 +6364,6 @@ else
      EXTRAOBJ="$EXTRAOBJ lib/localtime_r.o"
 fi
 
-
-fi
 
 echo "$as_me:$LINENO: checking for ANSI C header files" >&5
 echo $ECHO_N "checking for ANSI C header files... $ECHO_C" >&6

@@ -250,7 +250,7 @@ file, and unfortunately not in much detail.</para>
 ----&gt; Release apcupsd-3.10.0 (28 Jul 2002)
   - Added documentation for SNMP UPSes. Documented the use of
     --kill-on-powerfail switch during shutdown.
-  - SuSE 8.0 is now supported.
+  - SUSE 8.0 is now supported.
   - Added forward declaration of inet_pton and localtime_r when they
     are extraobj.
   - Added inet_pton function. Implementation from Internet Software

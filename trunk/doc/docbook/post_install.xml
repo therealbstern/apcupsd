@@ -112,7 +112,7 @@ is from the command line by entering:</para>
 
 <para>To do so, you must be root. However, normally, you will want
 <application>apcupsd</application> started automatically when your
-system boots. On some systems with installation support (e.g. SuSE
+system boots. On some systems with installation support (e.g. SUSE
 and Red Hat), the installation procedure will create a script file that
 you will be automatically invoked when your system reboots. On other
 systems, you will have to invoke <application>apcupsd</application>
@@ -135,7 +135,7 @@ startup and shutdown, see the man pages for <citerefentry>
 <refentrytitle>chkconfig</refentrytitle> <manvolnum>8</manvolnum>
 </citerefentry>.</para>
 
-<para>On SuSE systems, the script file that automatically invokes
+<para>On SUSE systems, the script file that automatically invokes
 <application>apcupsd</application> on system start and stops is
 <filename>/etc/rc.d/apcupsd</filename></para>
 
@@ -166,7 +166,7 @@ following:</para>
 /etc/rc.d/init.d/apcupsd stop
 </programlisting>
 
-<para>On SuSE systems:</para>
+<para>On SUSE systems:</para>
 
 <programlisting>
 /etc/rc.d/apcupsd stop

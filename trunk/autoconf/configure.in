@@ -375,14 +375,11 @@ AC_CHECK_FUNC(inet_pton, AC_DEFINE(HAVE_INETPTON),
      EXTRAOBJ="$EXTRAOBJ lib/inet_pton.o"])
 
 dnl
-dnl If we are compiling with pthreads, check for presence of localtime_r
+dnl Check for presence of localtime_r
 dnl
-if test "$with_pthreads" != no; then
 AC_CHECK_FUNC(localtime_r, AC_DEFINE(HAVE_LOCALTIME_R),
     [LIBEXTRAOBJ="$LIBEXTRAOBJ localtime_r.o"
      EXTRAOBJ="$EXTRAOBJ lib/localtime_r.o"])
-
-fi
 
 dnl
 dnl	Check for header files.

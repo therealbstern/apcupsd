@@ -13,7 +13,7 @@ document.</para>
 <para>This manual is divided into parts which increase in technical
 depth as they go.  If you have just bought a state-of-the-art smart
 UPS with a USB or Ethernet interface, and you are running a current
-version of Red Hat or SuSe Linux (8.0 or later), then
+version of Red Hat or SUSE Linux (8.0 or later), then
 <application>apcupsd</application> is very nearly plug-and-play and
 you will have to read only the <link linkend='basics'>Basic User's
 Guide</link>. </para>
