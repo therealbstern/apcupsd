@@ -33,11 +33,15 @@ install:
 	@rm -f /etc/rc.d/rc6.d/K20apcups
 	@rm -f /etc/rc.d/init.d/apcups
 	@$(INSTALL_PROGRAM) -m 744 apcupsd /etc/rc.d/init.d/apcupsd
-	# save old halt script
-	@cp -f /etc/rc.d/init.d/halt /etc/rc.d/init.d/halt.old
-	# insert apcupsd script into halt
-	@awk -f awkhaltprog /etc/rc.d/init.d/halt.old >/etc/rc.d/init.d/halt
-	@chmod 744 /etc/rc.d/init.d/halt
+#
+# The following are commented out because the standard Mandrake
+# halt script already handles apcupsd
+#
+#	# save old halt script
+#	@cp -f /etc/rc.d/init.d/halt /etc/rc.d/init.d/halt.old
+#	# insert apcupsd script into halt
+#	@awk -f awkhaltprog /etc/rc.d/init.d/halt.old >/etc/rc.d/init.d/halt
+#	@chmod 744 /etc/rc.d/init.d/halt
 	# link new halt script for startup and shutdown
 	@/sbin/chkconfig --add apcupsd
 	@echo "================================================="
@@ -52,10 +56,10 @@ install:
 	@echo "thereafter when you reboot, it will be stopped and started"
 	@echo "automatically."
 	@echo " "
-	@echo "Please check that your halt script in:"
-	@echo "    /etc/rc.d/init.d/halt"
-	@echo "was properly updated (see installation section of manual)"
-	@echo " "
+#	@echo "Please check that your halt script in:"
+#	@echo "    /etc/rc.d/init.d/halt"
+#	@echo "was properly updated (see installation section of manual)"
+#	@echo " "
 	@echo "================================================="
 
 uninstall:
@@ -63,8 +67,9 @@ uninstall:
 	@/sbin/chkconfig --del apcupsd
 	@echo "Removing boot script..."
 	@rm -f /etc/rc.d/init.d/apcupsd
-	@echo "Restoring old halt script"
-	@cp -f /etc/rc.d/init.d/halt.old /etc/rc.d/init.d/halt
+# See note above in install
+#	@echo "Restoring old halt script"
+#	@cp -f /etc/rc.d/init.d/halt.old /etc/rc.d/init.d/halt
 
 clean:
 
