@@ -116,24 +116,24 @@ step 11 below.
 
 18. make modules
 
-19. make install
+19. make modules_install
 
-21. make modules_install
+20. make install
 
-22. If you boot from a SCSI, you will need to make a
+21. If you boot from a SCSI, you will need to make a
     new initrd image
 
-23. Update /etc/lilo.conf to include the new kernel.
+22. Update /etc/lilo.conf to include the new kernel.
     If you are using grub, edit the /boot/grub config
     file and skip steps 24 and 25.
 
-24. cd /etc  (skip this if you are using grub)
+23. cd /etc  (skip this if you are using grub)
 
-25. lilo -v  (skip this if you are using grub) 
+24. lilo -v  (skip this if you are using grub) 
 
-26. reboot
+25. reboot
 
-27. Ensure that uhci and hid are loaded by
+26. Ensure that uhci and hid are loaded by
     doing <b>cat /proc/modules</b>
         
         If not, load them by hand.
