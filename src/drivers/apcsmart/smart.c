@@ -282,10 +282,10 @@ int getline(char *s, int len, UPSINFO *ups)
         case UPS_ON_BATT:        /* UPS_ON_BATT = '!'   */
 	    if (s == NULL)
 		write_lock(ups);
-	    if (!ups->OnBatt) {
+	    if (!UPS_ISSET(UPS_ONBATT)) {
 	       private->debounce = time(NULL);
 	    }
-	    ups->OnBatt = 1;
+        UPS_CLEAR_ONLINE();
             Dmsg0(80, "Got UPS ON BATT.\n");
 	    if (s == NULL) {
 		write_unlock(ups);
@@ -295,9 +295,7 @@ int getline(char *s, int len, UPSINFO *ups)
         case UPS_REPLACE_BATTERY: /* UPS_REPLACE_BATTERY = '#'   */
 	    if (s == NULL)
 		write_lock(ups);
-	    if (!ups->ChangeBatt) {   /* set if not already set */
-	       ups->ChangeBatt = 1;
-	    }
+        UPS_SET(UPS_REPLACEBATT);
 	    if (s == NULL) {
 		write_unlock(ups);
 		ending = 1;
@@ -306,7 +304,7 @@ int getline(char *s, int len, UPSINFO *ups)
         case UPS_ON_LINE:        /* UPS_ON_LINE = '$'   */
 	    if (s == NULL)
 		write_lock(ups);
-	    ups->OnBatt = 0;
+        UPS_SET_ONLINE();
             Dmsg0(80, "Got UPS ON LINE.\n");
 	    if (s == NULL) {
 		write_unlock(ups);
@@ -316,7 +314,7 @@ int getline(char *s, int len, UPSINFO *ups)
         case BATT_LOW:           /* BATT_LOW    = '%'   */
 	    if (s == NULL)
 		write_lock(ups);
-	    ups->BattLow = 1;
+        UPS_SET(UPS_BATTLOW);
 	    if (s == NULL) {
 		write_unlock(ups);
 		ending = 1;
@@ -325,7 +323,7 @@ int getline(char *s, int len, UPSINFO *ups)
         case BATT_OK:            /* BATT_OK     = '+'   */
 	    if (s == NULL)
 		write_lock(ups);
-	    ups->BattLow = 0;
+        UPS_CLEAR(UPS_BATTLOW);
 	    if (s == NULL) {
 		write_unlock(ups);
 		ending = 1;
@@ -379,10 +377,10 @@ void UPSlinkCheck(UPSINFO *ups)
     tcflush(ups->fd, TCIOFLUSH);
     if (strcmp((a=smart_poll('Y', ups)), "SM") == 0) {
 	linkcheck = FALSE;
-	ups->CommLost = FALSE;
+    UPS_CLEAR(UPS_COMMLOST);
 	return;
     }
-    ups->CommLost = TRUE;
+    UPS_SET(UPS_COMMLOST);
     tcflush(ups->fd, TCIOFLUSH);
 
     for (tlog=0; strcmp((a=smart_poll('Y', ups)), "SM") != 0; tlog -= (1+TIMER_SELECT)) {
@@ -408,7 +406,7 @@ void UPSlinkCheck(UPSINFO *ups)
 	tcflush(ups->fd, TCIOFLUSH);
 	generate_event(ups, CMDCOMMOK);
     }
-    ups->CommLost = FALSE;
+    UPS_CLEAR(UPS_COMMLOST);
     linkcheck = FALSE;
 }
 

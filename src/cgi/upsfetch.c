@@ -28,6 +28,7 @@
 #include <errno.h>
 #include <unistd.h>
 
+#include "cgiconfig.h"
 #include "config.h"
 #include "apc_nis.h"
 

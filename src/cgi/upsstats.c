@@ -38,6 +38,7 @@
 #include <time.h>
 #include <string.h>
 #include <fcntl.h>
+#include "cgiconfig.h"
 #include "upsfetch.h"
 #include "status.h"
 

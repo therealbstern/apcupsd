@@ -61,52 +61,15 @@
 /* Forward referenced function */
 static int device_wait_time(UPSINFO *ups);
 
-
-/**********************************************************************
- * Set appropriate internal variables based on a Status word filled by
- * the UPS driver.
- *********************************************************************/
-static void test_status_bits(UPSINFO *ups)
-{
-    /*
-     * Here we change UPSINFO values so lock the area.
-     */
-    write_lock(ups);
-
-    if (ups->Status & UPS_ONBATT)
-	ups->OnBatt = 1;	      /* On battery power */
-    else
-	ups->OnBatt = 0;
-    if (ups->Status & UPS_BATTLOW)
-	ups->BattLow = 1;	       /* battery low */ 
-    else
-	ups->BattLow = 0;
-    if (ups->Status & UPS_SMARTBOOST)
-	ups->LineLevel = -1;		  /* LineVoltage Low */
-    else if (ups->Status & UPS_SMARTTRIM)
-	ups->LineLevel = 1;		 /* LineVoltage High */
-    else
-	ups->LineLevel = 0;		 /* LineVoltage Normal */
-
-    if (ups->Status & UPS_REPLACEBATT) { /* Replace Battery */
-	if (!ups->ChangeBatt) {       /* This is a counter, so check before */
-	   ups->ChangeBatt = 1;       /* setting it */
-	}
-    }
-    write_unlock(ups);
-}
-
 /*********************************************************************/
 void setup_device(UPSINFO *ups)
 {
-    static int has_done_setup = 0;
-    
-    if (!has_done_setup) {
+    if (!UPS_ISSET(UPS_DEV_SETUP)) {
 	/*
 	 * Marko Sakari Asplund <Marko.Asplund@cern.ch>
-	 *    prevents double init of serial port 9/25/98
+	 *    prevents double init of UPS device 9/25/98
 	 */
-	has_done_setup++;
+        UPS_SET(UPS_DEV_SETUP);
     } else {
         Error_abort0(_("Serial port already initialized.\n"));
     }
@@ -120,7 +83,7 @@ void setup_device(UPSINFO *ups)
      * -RF
      */ 		    
     if (create_lockfile(ups) == LCKERROR) {
-	device_close(ups);
+        device_close(ups);
         Error_abort0(_("Unable to create UPS lock file.\n"));
     }
 
@@ -144,14 +107,6 @@ void kill_power(UPSINFO *ups)
 	/* Make sure we are on battery !! */
 	for (killcount=0; killcount<3; killcount++) {
 	    device_read_volatile_data(ups);
-	    /*
-	     * XXX
-	     *
-	     * Use the info in the status bits (Only Smart UPSes)
-	     * but here we are only if DUMB UPS !!!!
-	    if (ups->mode.type > SHAREBASIC)
-		test_status_bits(ups);
-	     */
 	}
     }
     /*
@@ -160,12 +115,12 @@ void kill_power(UPSINFO *ups)
      *
      * We really need to find out if we are on batteries
      * and if not, delete the PWRFAIL file.  Note, the code
-     * above only tests OnBatt for dumb UPSes.
+     * above only tests UPS_ONBATT flag for dumb UPSes.
      */
     if ((((pwdf = fopen(PWRFAIL, "r" )) == NULL) &&
 	    (ups->mode.type != BK)) ||
             (((pwdf = fopen(PWRFAIL, "r" )) == NULL) &&
-	    (ups->OnBatt != 0) && (ups->mode.type == BK))) {
+	    (UPS_ISSET(UPS_ONBATT)) && (ups->mode.type == BK))) {
 	/*						    
 	 * At this point, we really should not be attempting
 	 * a kill power since either the powerfail file is
@@ -264,10 +219,6 @@ int fillUPS(UPSINFO *ups)
 {
     device_read_volatile_data(ups);
 
-    /* Use the info in the status bits (only smart UPSes) */
-    if (ups->mode.type > SHAREBASIC)
-	test_status_bits(ups);
-
     return 0;
 }
 
@@ -286,7 +237,7 @@ void do_device(UPSINFO *ups)
 	ups->wait_time = device_wait_time(ups); /* compute appropriate wait time */
 
         Dmsg2(70, "Before device_check_state: %d (OB:%d).\n", ups->Status,
-	    ups->OnBatt);
+	    UPS_ISSET(UPS_ONBATT));
 	/*
 	 * Check the UPS to see if has changed state.
 	 * This routine waits a reasonable time to prevent
@@ -295,18 +246,18 @@ void do_device(UPSINFO *ups)
 	device_check_state(ups);
 
         Dmsg2(70, "Before do_action: %d (OB:%d).\n", ups->Status,
-	    ups->OnBatt);
+	    UPS_ISSET(UPS_ONBATT));
 
 	do_action(ups);    /* take event actions */
 	
         Dmsg2(70, "Before fillUPS: %d (OB:%d).\n", ups->Status,
-	    ups->OnBatt);
+	    UPS_ISSET(UPS_ONBATT));
 
 	/* Get all info available from UPS by asking it questions */
 	fillUPS(ups);
 
         Dmsg2(70, "Before do_reports: %d (OB:%d).\n", ups->Status,
-	    ups->OnBatt);
+	    UPS_ISSET(UPS_ONBATT));
 
 	do_reports(ups);
     }
@@ -325,7 +276,7 @@ static int device_wait_time(UPSINFO *ups)
 {
     int wait_time;
 
-    if (ups->FastPoll) {
+    if (UPS_ISSET(UPS_FASTPOLL)) {
 	 wait_time = TIMER_FAST;
      } else {
 	 wait_time = TIMER_SELECT;     /* normally 60 seconds */

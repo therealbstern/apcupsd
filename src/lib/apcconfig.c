@@ -720,7 +720,8 @@ void init_ups_struct(UPSINFO *ups)
     strcpy(ups->release, APCUPSD_RELEASE);
 
     ups->fd		       = -1;
-    ups->PoweredByUPS	       = TRUE;
+
+    UPS_SET(UPS_PLUGGED);
 
     strcpy(ups->enable_access.name, accesses[0].name);
     strcpy(ups->enable_access.long_name, accesses[0].long_name);
@@ -767,11 +768,11 @@ void init_ups_struct(UPSINFO *ups)
 
     ups->lockfile	       = -1;
 
-    ups->load		       = FALSE;
-    ups->timedout	       = FALSE;
-    ups->timelout	       = FALSE;
-    ups->emergencydown	       = FALSE;
-    ups->remotedown	       = FALSE;
+    UPS_CLEAR(UPS_SHUT_LOAD);
+    UPS_CLEAR(UPS_SHUT_BTIME);
+    UPS_CLEAR(UPS_SHUT_LTIME);
+    UPS_CLEAR(UPS_SHUT_EMERG);
+    UPS_CLEAR(UPS_SHUT_REMOTE);
     ups->remote_state	       = TRUE;
 
     ups->sysfac 	       = LOG_DAEMON;
@@ -989,6 +990,12 @@ jump_into_the_loop:
 	break;
     default:
 	break;
+    }
+
+    if (ups->PoweredByUPS) {
+        UPS_SET(UPS_PLUGGED);
+    } else {
+        UPS_CLEAR(UPS_PLUGGED);
     }
 
 bail_out:

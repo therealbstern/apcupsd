@@ -40,7 +40,7 @@ int test_ups_open(UPSINFO *ups)
         Error_abort1(_("Cannot open UPS device %s\n"),
 			ups->device);
     }
-    ups->ups_connected = 1;
+    UPS_CLEAR(UPS_SLAVE);
     write_unlock(ups);
     return 1;
 }
@@ -149,7 +149,8 @@ int test_ups_read_volatile_data(UPSINFO *ups)
 
     /* No APC Status value, well, fabricate one */
     ups->Status = 0;
-    ups->Status |= UPS_ONLINE;
+
+    UPS_SET_ONLINE();
 
     /* LINE_VOLTAGE */
     ups->LineVoltage = 229.5;

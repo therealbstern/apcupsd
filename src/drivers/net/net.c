@@ -113,46 +113,6 @@ static struct {
    {NULL, NULL}
 };
 
-
-
-/**********************************************************************
- * Set appropriate internal variables based on a Status word filled by
- * the UPS driver.
- *********************************************************************/
- /* *****FIXME**** there should be only one global copy of this */
-static void test_status_bits(UPSINFO *ups)
-{
-    /*
-     * Here we change UPSINFO values so lock the area.
-     */
-    write_lock(ups);
-
-    if (ups->Status & UPS_ONBATT)
-	ups->OnBatt = 1;	      /* On battery power */
-    else
-	ups->OnBatt = 0;
-    if (ups->Status & UPS_BATTLOW)
-	ups->BattLow = 1;		/* battery low */ 
-    else
-	ups->BattLow = 0;
-    if (ups->Status & UPS_SMARTBOOST)
-	ups->LineLevel = -1;		      /* LineVoltage Low */
-    else if (ups->Status & UPS_SMARTTRIM)
-	ups->LineLevel = 1;		    /* LineVoltage High */
-    else
-	ups->LineLevel = 0;		    /* LineVoltage Normal */
-
-    if (ups->Status & UPS_REPLACEBATT) { /* Replace Battery */
-	if (!ups->ChangeBatt) {       /* This is a counter, so check before */
-	   ups->ChangeBatt = 1;       /* setting it */
-	}
-    }
-    if (ups->Status & UPS_SHUTDOWN) {
-       ups->remotedown = 1;	      /* if master is shutting down so do we */
-    }
-    write_unlock(ups);
-}
-
 /*
  * The remote server DEVICE entry in apcupsd.conf is
  * in the form:
@@ -311,17 +271,19 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
     }
     Dmsg2(100, "Got Status = %s %03x\n", answer, ups->Status);
 
-    write_unlock(ups);
+    if (UPS_ISSET(UPS_SHUTDOWN)) {
+        UPS_SET(UPS_SHUT_REMOTE);  /* if master is shutting down so do we */
+    }
 
-    test_status_bits(ups);
+    write_unlock(ups);
 
     /* If we lost connection with master and we
      * are running on batteries, shutdown now
      */
-    if (stat == 0 && ups->OnBatt) {
-       write_lock(ups);
-       ups->remotedown = TRUE;
-       write_unlock(ups);
+    if (stat == 0 && UPS_ISSET(UPS_ONBATT)) {
+        write_lock(ups);
+        UPS_SET(UPS_SHUT_REMOTE);
+        write_unlock(ups);
     }
     return stat;
 }

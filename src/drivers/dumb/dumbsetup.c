@@ -128,7 +128,7 @@ int dumb_ups_open(UPSINFO *ups) {
     tcsetattr(ups->fd, TCSANOW, &private->newtio);
     tcflush(ups->fd, TCIFLUSH);
 
-    ups->ups_connected = 1;
+    UPS_CLEAR(UPS_SLAVE);
 
     return 1;
 }
