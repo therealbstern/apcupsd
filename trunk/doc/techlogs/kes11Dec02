@@ -4,6 +4,11 @@
 
 General:
 - Tried to correct problems with Makefiles
+- Thanks to David Walser who pointed out where on the Sun, the make
+  install was doing terrible things -- I found that there was
+  a missing semicolon in the new Makefile.  Before my previous cleanup,
+  there were actually 4 missing semicolons.  Hopefully this
+  will correct the problem.
 
 Changes submitted this submission:
 - Removed Makefile code that creates and sets permission bits on
