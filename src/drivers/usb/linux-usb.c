@@ -568,12 +568,18 @@ int usb_ups_check_state(UPSINFO *ups)
 	 *   Charging
 	 */   
 	if (my_data->debounce) {
+	   int sleep_time;
 	   /* Wait 6 seconds before returning next sample.
 	    * This eliminates the annoyance of detecting
 	    * transitions to battery that last less than
-	    * 6 seconds.
+	    * 6 seconds.  Do sanity check on calculated
+	    * sleep time.
 	    */	 
-	   sleep(6 - (time(NULL) - my_data->debounce));
+	   sleep_time = 6 - (time(NULL) - my_data->debounce); 
+	   if (sleep_time < 0 || sleep_time > 6) {
+	      sleep_time = 6;
+	   }
+	   sleep(sleep_time);
 	   my_data->debounce = 0;
 	}
 	write_lock(ups);
