@@ -75,7 +75,7 @@ void generic_error_out(char *file, int line, char *fmt, ...)
     va_start(arg_ptr, fmt);
     avsnprintf((char *)&buf[i], sizeof(buf)-i, (char *)fmt, arg_ptr);
     va_end(arg_ptr);
-    fprintf(stdout, buf);
+    fprintf(stdout, "%s", buf);
 
     if (error_cleanup)
 	error_cleanup();
@@ -92,7 +92,7 @@ void generic_error_exit(char *fmt, ...)
     va_start(arg_ptr, fmt);
     avsnprintf(buf, sizeof(buf), (char *)fmt, arg_ptr);
     va_end(arg_ptr);
-    fprintf(stdout, buf);
+    fprintf(stdout, "%s", buf);
 
     if (error_cleanup)
 	error_cleanup();

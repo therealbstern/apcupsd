@@ -103,7 +103,7 @@ static void pmsg(char *fmt,...)
     va_start(arg_ptr, fmt);
     avsnprintf(buf, sizeof(buf), (char *) fmt, arg_ptr);
     va_end(arg_ptr);
-    printf(buf);
+    printf("%s", buf);
     write_file(buf);
 }
 
@@ -195,7 +195,7 @@ void apctest_error_out(char *file, int line, char *fmt,...)
     va_start(arg_ptr, fmt);
     avsnprintf((char *)&buf[i], sizeof(buf)-i, (char *) fmt, arg_ptr);
     va_end(arg_ptr);
-    fprintf(stderr, buf);
+    fprintf(stderr, "%s", buf);
     pmsg(buf);
     apctest_error_cleanup(core_ups);		  /* finish the work */
 }
