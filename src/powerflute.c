@@ -84,8 +84,6 @@
 #define TIMER_POWERFLUTE	5
 #define RESTORE_BUFFER		3
 
-extern char *net_errmsg;
-
 /*
  * This is needed for restart ncurses and all the circus.
  * ncurses or something other seems to have a bug that prevent it to
@@ -101,28 +99,28 @@ char mesgbuf[8][1024];
 /*
  * Menubar window and panel
  */
-WINDOW *menuwin;
-PANEL *menupan;
+static WINDOW *menuwin;
+static PANEL *menupan;
 /*
  * Status window and panel
  */
-WINDOW *statwin;
-PANEL *statpan;
+static WINDOW *statwin;
+static PANEL *statpan;
 /*
  * Monitoring window and panel
  */
-WINDOW *moniwin;
-PANEL *monipan;
+static WINDOW *moniwin;
+static PANEL *monipan;
 /*
  * Message window and panel
  */
-WINDOW *mesgwin;
-PANEL *mesgpan;
+static WINDOW *mesgwin;
+static PANEL *mesgpan;
 
-MENU *mu = NULL;
-WINDOW *mw = NULL;
-WINDOW *dmw = NULL;
-PANEL *mpan;
+static MENU *mu = NULL;
+static WINDOW *mw = NULL;
+static WINDOW *dmw = NULL;
+static PANEL *mpan;
 
 /*
  * UPS structure pointers for shared ptr and for local ptr.
@@ -163,8 +161,8 @@ static void get_raw_upsinfo(UPSINFO *ups, char *host, int port)
 
 int closing_curses = 0;
 
-extern void close_curses(void);
-extern void write_mesg(char *fmt, ...);
+static void close_curses(void);
+static void write_mesg(const char *fmt, ...);
 
 void load_events(void) {
 	FILE *fp;
@@ -272,7 +270,7 @@ void restore_mesg(void) {
 	update_all();
 }
 
-void write_mesg(char *fmt, ...) {
+static void write_mesg(const char *fmt, ...) {
 	va_list args;
 	static char buffer[1024];
 	int x, y;
@@ -402,7 +400,7 @@ void update_upsdata(int sig) {
 	alarm(TIMER_POWERFLUTE);
 }
 
-void close_curses(void) {
+static void close_curses(void) {
 	signal(SIGALRM, SIG_IGN);
 	closing_curses = 1;
 	del_panel(menupan);
@@ -552,7 +550,7 @@ void do_help_menu(int * pos) {
 	}
 }
 
-char *hm[] = {
+static const char *hm[] = {
         "File          ",
         "UPS           ",
         "Help          ",
@@ -560,7 +558,7 @@ char *hm[] = {
 };
 
 void display_h_menu(int pos) {
-	char **p=hm;
+	const char **p=hm;
 
         mvwprintw(menuwin, 1, 2, "%s", "");
 
