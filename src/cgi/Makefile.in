@@ -54,7 +54,8 @@ clean: targetclean
 
 distclean: targetdistclean
 	$(RMF) cgiconfig.h
-	$(RMF) Makefile CVS
+	$(RMF) Makefile
+	$(RMF) -r CVS
 
 install: all-targets
 	@for p in $(allexe) ; do \

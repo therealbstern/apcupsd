@@ -65,6 +65,7 @@ clean: targetclean
 
 distclean: targetdistclean
 	$(RMF) Makefile
+	$(RMF) -r CVS apcsmart/CVS dumb/CVS net/CVS snmp/CVS test/CVS usb/CVS
 
 # -----------------------------------------------------------------------
 # DO NOT DELETE THIS LINE -- make depend depends on it.

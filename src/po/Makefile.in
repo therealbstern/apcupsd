@@ -149,7 +149,8 @@ clean: targetclean
 
 distclean: targetdistclean
 	$(RMF) *.gmo *.mo *.msg *.cat *.cat.m POTFILES
-	$(RMF) Makefile CVS
+	$(RMF) Makefile 
+	$(RMF) -r CVS
 
 maintainer-clean: distclean
 	@echo "This command is intended for maintainers to use;"
