@@ -423,12 +423,32 @@
 /* 
  * These are the remote_state for networked master/slaves
  */
+
+/*
+ * The first 5 are from the original protocol. Later states apply to the
+ * master only and should be hidden from the slave to preserve
+ * backwards compatibility
+ */
 #define RMT_NOTCONNECTED        0
 #define RMT_CONNECTED           1
 #define RMT_RECONNECT           2
 #define RMT_ERROR               3
 #define RMT_DOWN                4
-
+/*
+ * Master only internal states
+ */
+    /*
+     * Convert these to RMT_NOTCONNECTED when sending to slave
+     */
+#define RMT_CONNECTING1         5
+#define RMT_CONNECTING2         6
+#define RMT_CONNECTING3         7
+    /*
+     * Convert these to RMT_RECONNECT when sending to slave
+     */
+#define RMT_RECONNECTING1       8
+#define RMT_RECONNECTING2       9
+#define RMT_RECONNECTING3      10
 
 #define MAX_THREADS             7
 

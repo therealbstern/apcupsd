@@ -12,22 +12,34 @@
 #   set the EEPROM.
 #UPSNAME
 #
-# UPSCABLE [ simple | smart |
-#            940-00(20B,20C,23A,24B,24C,24G,95A,95B,95C) |
-#            940-15(24C) |
-#            ether, usb ]
+# UPSCABLE [ simple    | smart     | ether     | usb |
+#            940-0119A | 940-0127A | 940-0128A | 940-0020B |
+#            940-0020C | 940-0023A | 940-0024B | 940-0024C |
+#            940-1524C | 940-0024G | 940-0095A | 940-0095B |
+#            940-0095C | M-04-02-2000 ]
+#
 # defines the type of cable that you have.
 UPSCABLE @UPSCABLE@
 #
-# Old types, still valid, are mapped to the new generic drives
-#   automatically
-# UPSTYPE [ backups | sharebasic | netups |
-#           backupspro | smartvsups |
-#           newbackupspro | backupspropnp |
-#           smartups | matrixups | sharesmart ]
+# Old types, still valid, are mapped to the new drivers
+# 
+#           keyword       driver used     
+# UPSTYPE [ backups        dumb
+#         | sharebasic     dumb
+#         | netups         dumb
+#         | backupspro     apcsmart
+#         | smartvsups     apcsmart
+#         | newbackupspro  apcsmart
+#         | backupspropnp  apcsmart
+#         | smartups       apcsmart
+#         | matrixups      apcsmart
+#         | sharesmart     apcsmart
 #
-# *** NEW TYPES FOR GENERIC DRIVERS ***
+# *** New driver names. They can be used directly 
+#       rather than using one of the above aliases.
+#
 # UPSTYPE [ dumb | apcsmart | net | usb | snmp | test]
+#
 # defines the type of UPS you have.
 UPSTYPE @UPSTYPE@
 #

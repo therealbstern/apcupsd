@@ -172,39 +172,40 @@ int output_status(UPSINFO *ups, int sockfd,
     case SMART:
     case SHARESMART:
     case MATRIX:
+    case APCSMART_UPS:
     case USB_UPS:
     case TEST_UPS:
     case DUMB_UPS:
     case NETWORK_UPS:
     case SNMP_UPS:
-	    status[0] = 0;
-	    /* Now output human readable form */
-	    if (is_ups_set(UPS_CALIBRATION))
-                strcat(status, "CAL ");
-	    if (is_ups_set(UPS_SMARTTRIM))
-                strcat(status, "TRIM ");
-	    if (is_ups_set(UPS_SMARTBOOST))
-                strcat(status, "BOOST ");
-	    if (is_ups_set(UPS_ONLINE))
-                strcat(status, "ONLINE ");
-	    if (is_ups_set(UPS_ONBATT))
-                strcat(status, "ONBATT ");
-	    if (is_ups_set(UPS_OVERLOAD))
-                strcat(status, "OVERLOAD ");
-	    if (is_ups_set(UPS_BATTLOW))
-                strcat(status, "LOWBATT ");
-	    if (is_ups_set(UPS_REPLACEBATT))
-                strcat(status, "REPLACEBATT ");
-	    if (is_ups_set(UPS_SLAVE))
-                strcat(status, "SLAVE ");
-	    if (is_ups_set(UPS_SLAVEDOWN))
-                strcat(status, "SLAVEDOWN");
-	    /* These override the above */
-	    if (is_ups_set(UPS_COMMLOST))
-                strcpy(status, "COMMLOST ");
-	    if (is_ups_set(UPS_SHUTDOWN))
-                strcpy(status, "SHUTTING DOWN");
-            s_write(ups, "STATUS   : %s\n", status);
+	status[0] = 0;
+	/* Now output human readable form */
+	if (is_ups_set(UPS_CALIBRATION))
+            strcat(status, "CAL ");
+	if (is_ups_set(UPS_SMARTTRIM))
+            strcat(status, "TRIM ");
+	if (is_ups_set(UPS_SMARTBOOST))
+            strcat(status, "BOOST ");
+	if (is_ups_set(UPS_ONLINE))
+            strcat(status, "ONLINE ");
+	if (is_ups_set(UPS_ONBATT))
+            strcat(status, "ONBATT ");
+	if (is_ups_set(UPS_OVERLOAD))
+            strcat(status, "OVERLOAD ");
+	if (is_ups_set(UPS_BATTLOW))
+            strcat(status, "LOWBATT ");
+	if (is_ups_set(UPS_REPLACEBATT))
+            strcat(status, "REPLACEBATT ");
+	if (is_ups_set(UPS_SLAVE))
+            strcat(status, "SLAVE ");
+	if (is_ups_set(UPS_SLAVEDOWN))
+            strcat(status, "SLAVEDOWN");
+	/* These override the above */
+	if (is_ups_set(UPS_COMMLOST))
+            strcpy(status, "COMMLOST ");
+	if (is_ups_set(UPS_SHUTDOWN))
+            strcpy(status, "SHUTTING DOWN");
+        s_write(ups, "STATUS   : %s\n", status);
 
 	if (ups->UPS_Cap[CI_VLINE]) {
             s_write(ups, "LINEV    : %05.1f Volts\n", ups->LineVoltage);
@@ -499,6 +500,7 @@ char *ups_status(int stat)
     case SMART:
     case SHARESMART:
     case MATRIX:
+    case APCSMART_UPS:
     case USB_UPS:
     case TEST_UPS:
     case DUMB_UPS:

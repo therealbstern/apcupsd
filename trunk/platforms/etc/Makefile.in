@@ -34,7 +34,7 @@ install:
 	       $(RMF) $(DESTDIR)$(sysconfdir)/$$src.orig; \
 	       mv $(DESTDIR)$(sysconfdir)/$$src $(DESTDIR)$(sysconfdir)/$$src.orig; \
 	   fi; \
-	   $(INSTALL_PROGRAM) $$src $(DESTDIR)$(sysconfdir)/$$src; \
+	   $(INSTALL_SCRIPT) $$src $(DESTDIR)$(sysconfdir)/$$src; \
 	done
 
 uninstall:
