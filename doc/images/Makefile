@@ -27,20 +27,6 @@ IMGLST=  \
 	back \
 	charging \
 	home \
-	img1 \
-	img10 \
-	img11 \
-	img12 \
-	img13 \
-	img14 \
-	img2 \
-	img3 \
-	img4 \
-	img5 \
-	img6 \
-	img7 \
-	img8 \
-	img9 \
 	main_configs \
 	multimon \
 	next \

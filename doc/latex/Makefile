@@ -60,14 +60,14 @@ web:
 	@echo "Making web"
 	@mkdir -p apcupsd
 	@rm -rf apcupsd/*
-	cp ${IMAGES}/*.eps ${IMAGES}/*.png .
-	cp ${IMAGES}/*.eps ${IMAGES}/*.png apcupsd/
+	cp ${IMAGES}/*.eps .
+	cp ${IMAGES}/*.eps apcupsd/
 	@rm -f next.*
 	latex2html -split 4 -local_icons -t "Apcupsd User's Guide" -long_titles 4 \
 		-toc_stars -contents_in_nav -white -notransparent apcupsd >/dev/null
 	cp apcupsd/Apcupsd_Users_Guide.html apcupsd/index.html
 	rm -f apcupsd/*.old
-	rm -f *.eps *.png apcupsd/*.eps
+	rm -f *.eps apcupsd/*.eps
 
 dvipdf:
 	@echo "Making dvi to pdf"
