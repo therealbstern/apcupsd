@@ -3,7 +3,7 @@
 <HEAD>
         <TITLE>Apcupsd EVENTS</TITLE>
    <meta name="Author" content="Kern Sibbald">
-		<link rel=stylesheet href="apcupsd-styles.css" type="text/css">
+                <link rel=stylesheet href="apcupsd-styles.css" type="text/css">
 </HEAD>
 <BODY>
 <H1>Apcupsd EVENTS</H1>
@@ -46,15 +46,15 @@ where:
 <dl> <dt>event</dt> <dd>is the event that occurred and it may be
         any one of the values described in the next section.</dd>
      <dt>ups-name</dt> <dd>is the name of the UPS as specified in
-	    the configuration file (not the name in the EEPROM). For
-	    version 3.8.2, this is always set to <b>Default</b></dd>
-	 <dt>connected</dt><dd>is 1 if <b>apcupsd</b> is connected to
-	    the UPS via a serial port (or a USB port). In most configurations,
-		this will be the case. In the case of a Slave machine where 
-		<b>apcupsd</b> is not directly connected to the UPS, this value
-		will be 0.</dd>
-	 <dt>powered</dt><dd></dd>is 1 if <b>apcupsd</b> is powered by the
-	    UPS and 0 if not. In version 3.8.2, this value is always 1.</dd>
+            the configuration file (not the name in the EEPROM). For
+            version 3.8.2, this is always set to <b>Default</b></dd>
+         <dt>connected</dt><dd>is 1 if <b>apcupsd</b> is connected to
+            the UPS via a serial port (or a USB port). In most configurations,
+                this will be the case. In the case of a Slave machine where 
+                <b>apcupsd</b> is not directly connected to the UPS, this value
+                will be 0.</dd>
+         <dt>powered</dt><dd></dd>is 1 if <b>apcupsd</b> is powered by the
+            UPS and 0 if not. In version 3.8.2, this value is always 1.</dd>
 </dl>
 <h2>apccontrol Command Line Options</h2>
 <P><B>apccontrol</B> accepts the following command line options: 
@@ -98,10 +98,10 @@ where:
              exceded. Doing shutdown.\n&quot; | wall</B> &nbsp;&nbsp; then exits.
              After completeting this event, <B>apcupsd</B> will immediately
              initiate a <B>doshutdown</B> event.</dd>
-	    <dt>startselftest</dt><dd>This is called when <b>apcupsd</b> detects that the
-		    UPS is doing a self test. No action is taken.</dd>
-		<dt>endselftest</dt><dd>This is called when <b>apcupsd</b> determines that
-		    a self test has been completed. No action is taken.</dd> 
+            <dt>startselftest</dt><dd>This is called when <b>apcupsd</b> detects that the
+                    UPS is doing a self test. No action is taken.</dd>
+                <dt>endselftest</dt><dd>This is called when <b>apcupsd</b> determines that
+                    a self test has been completed. No action is taken.</dd> 
 </DL>
 <P>
 To write your own routine for the <B>powerout</B> action, you create
@@ -118,5 +118,10 @@ shutdown of your machine if necessary.</P>
 found in the <b>examples</b> directory of the source code.
 <P><BR><BR>
 </P>
+<hr>
+
+<a href="eprom.html" target="_self"><img src="back.gif" border=0 alt="Back"></a>
+<a href="faq.html" target="_self"><img src="next.gif" border=0 alt="Next"></a>
+<a href="index.html"><img src="home.gif" border=0 alt="Home"></a>
 </BODY>
 </HTML>
