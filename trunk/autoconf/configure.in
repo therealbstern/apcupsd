@@ -115,7 +115,7 @@ dnl
 if test x$GCC = xyes
 then
   CFLAGS=${CFLAGS-"-g -O2"}
-  CFLAGS="${CFLAGS} -Wall"
+  CFLAGS="${CFLAGS} -Wall -Wstrict-prototypes"
   LDFLAGS=${LDFLAGS-"-g -O"}
 else
   CFLAGS=${CFLAGS--O2}

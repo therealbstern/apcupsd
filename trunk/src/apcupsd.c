@@ -145,7 +145,7 @@
 UPSINFO *core_ups = NULL;
 char argvalue[MAXSTRING];
 
-static void daemon_start();
+static void daemon_start(void);
 
 int shm_OK = 0;
 
@@ -469,7 +469,7 @@ int main(int argc, char *argv[]) {
  * Initialize a daemon process completely detaching us from
  * any terminal processes.
  */
-static void daemon_start()
+static void daemon_start(void)
 {
 #ifndef HAVE_CYGWIN
     int i;
