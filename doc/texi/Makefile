@@ -25,11 +25,14 @@ web:	manual.texi
 test:	test.texi
 	makeinfo --html --no-split test.texi
 
-	   
+#	   
+# As is typical of tex, this part of generating the
+#  manual produces a lot of debug and warning output.
+#
 pdf:	manual.texi
 	texi2dvi --pdf manual.texi
 	@rm -f manual.aux manual.cp manual.fn manual.ky manual.log manual.pg
-	@rm -f manual.toc manual.tp manual.vr
+	@rm -f manual.toc manual.tp manual.vr manual.cps
 	@echo "pdf manual built"
 	  
 main_configs:
