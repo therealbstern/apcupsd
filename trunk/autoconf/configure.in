@@ -253,7 +253,11 @@ then
 	exit 1
 fi
 
-AC_PATH_PROGS(MAKE, make gmake pmake, no)
+dnl
+dnl Find a suitable make command.
+dnl Search for GNU make 1st, then BSD make and finally for generic make.
+dnl
+AC_PATH_PROGS(MAKE, gmake pmake make, no)
 if test "$MAKE" = "no"
 then
 	echo 'ERROR: make program not found !'
