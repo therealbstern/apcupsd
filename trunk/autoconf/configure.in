@@ -1020,6 +1020,19 @@ fi
 
 # end i18n
 
+dnl If the AC_CONFIG_AUX_DIR macro for autoconf is used we will probably
+dnl find the mkinstalldirs script in another subdir than ($top_srcdir).
+dnl Try to locate it.
+MKINSTALLDIRS=
+if test -n "$ac_aux_dir"; then
+   MKINSTALLDIRS="$ac_aux_dir/mkinstalldirs"
+fi
+if test x$MKINSTALLDIRS = x ; then
+   MKINSTALLDIRS="\$(top_srcdir)/autoconf/mkinstalldirs"
+fi
+AC_SUBST(MKINSTALLDIRS)
+
+
 dnl AC_CHECK_FUNC calls that might hack the Makefile must precede
 dnl the following AC_SUBSTs
 
