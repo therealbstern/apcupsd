@@ -41,6 +41,68 @@ follows:
    GND    5   --------------------  9  Ground
 
 </pre>
+When using this cable with <b>apcupsd</b> specify the
+following in <b>apcupsd.conf</b>:
+<pre>
+  UPSCABLE smart
+  UPSTYPE smartups
+  DEVICE /dev/ttyS0 (or whatever your serial port is)
+</pre>
+
+<h3>Smart Signaling Cable for BackUPS CS Models</h3>
+If you have a BackUPS CS, you are probably either using
+it with the USB cable that is supplied or with the
+940-0128A supplied by APC, which permits running the 
+UPS in dumb mode. By building your own cable, you can now
+run the BackUPS CS models (and perhaps also the ES models)
+using Smart signaling and have all the same information that
+is available as running it in USB mode.
+<p>The jack in the UPS is actually a 10 pin RJ45.
+However, you can just as easily use a 8 pin RJ45
+connector, which is more standard (ethernet TX,
+and ISDN connector).
+>Below, you will find a diagram for the CUSTOM-RJ45
+cable:
+<pre>
+    CUSTOM-RJ45 CABLE
+
+ Signal Computer              UPS     UPS
+         DB9F                 RJ45-8  RJ45-10
+   RxD    2   ----------------  1      2     TxD  Send
+   TxD    3   ----------------  7      8     RxD  Receive
+   GND    5   ----------------  6      7     Ground
+
+The RJ45-8 pins are: looking at the end of the connector:
+
+   8 7 6 5 4 3 2 1
+ ___________________
+ | . . . . . . . . |
+ |                 |
+ -------------------
+         |____|
+
+The RJ45-10  pins are: looking at the end of the connector:
+
+  10 9 8 7 6 5 4 3 2 1
+ _______________________
+ | . . . . . . . . . . |
+ |                     |
+ -----------------------
+         |____|
+
+</pre>
+When using this cable with <b>apcupsd</b> specify the
+following in <b>apcupsd.conf</b>:
+<pre>
+  UPSCABLE smart
+  UPSTYPE smartups
+  DEVICE /dev/ttyS0 (or whatever your serial port is)
+</pre>
+<p>
+The information for constructing this cable was discovered
+and transmitted to us by slither_man.  Many thanks!
+
+
 <h3>Simple Signaling Cable for &quot;dumb&quot; UPSes</h3>
 <b>NOTE. YOU DO NOT HAVE THIS CABLE UNLESS YOU BUILT IT
 YOURSELF. THE SIMPLE-CUSTOM CABLE IS NOT AN APC PRODUCT.</b>
@@ -62,6 +124,7 @@ as follows:
    RTS    7   --------------------  1  Kill UPS Power
 
 </pre>
+
 List of components one needs to make the Simple cable:
 <ol>
    <li>One (1) male DB9 connector, use solder type connector only.
@@ -147,8 +210,13 @@ Note: the &lt;- and -&gt; indicate the signal direction.
    RxD    2   ----------*---------  3  Not used by Apcupsd
 
 </pre>
-You use <b>UPSCABLE simple</b> and <b>UPSTYPE backups</b> in your
-<b>apcupsd.conf</b> file if you have built this cable.
+When using this cable with <b>apcupsd</b> specify the
+following in <b>apcupsd.conf</b>:
+<pre>
+  UPSCABLE simple
+  UPSTYPE backups
+  DEVICE /dev/ttyS0 (or whatever your serial port is)
+</pre>
 
 
 <h2>Other APC Cables that Apcupsd Supports</h2>
@@ -506,6 +574,17 @@ is still chattering, press the power button
 and the chattering stops. After that the UPS
 should behave normally and power down 1-2 minutes
 after requested to do so.
+
+<p>An amazing discovery by slither_man allows one
+to build a CUSTOM-RJ45 cable (documented above) and
+run the BackUPS CS (and probably also the ES) in
+Smart mode. Running it this way provides all the
+same information that you would get by running it
+in USB mode. As a consequence, we recommend that you
+either purchase (where I don't know) or build your
+own CUSTOM-RJ45 cable rather than use the
+940-0128A cable.
+
 <p>Thanks to all the people who have helped test
 this and have provided information on the
 cable wiring, our best guess    
