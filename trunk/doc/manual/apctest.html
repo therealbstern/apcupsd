@@ -116,9 +116,12 @@ is the appearance of <b>RNG</b> when the power fails and additionally
 <p>
 Shutdown apcupsd if it is running.<br>
 Make sure your <b>/etc/apcupsd/apcupsd.conf</b> file
-has <b>UPSTYPE backups</b> and <b>UPSCABLE simple</b><br>
-Normally <b>apctest</b> will have been built and installed
-by default, otherwise, you can explicitly build it on
+has <b>UPSTYPE smart</b> and <b>UPSCABLE</b> has one
+of the smart cables that are supported.<p>
+Normally <b>apctest</b> will have been built but not
+installed, so you must execute it from
+the <b>&lt;bacula-source&gt;/src</b> directory.
+You can explicitly build it on
 Unix with: <br>
 <p>
 cd &lt;apcupsd-source-directory&gt;<br>
@@ -132,8 +135,9 @@ make apctestwin32<br>
 </p>
 It will present you with the following output
 <pre>
-2002-01-03 21:04:57 apctest 3.8.5 (3 January 2002) redhat
+2003-07-07 11:19:21 apctest 3.10.6 (07 July 2003) redhat
 Checking configuration ...
+Attached to driver: apcsmart
 sharenet.type = DISABLE
 cable.type = CUSTOM_SMART
 
@@ -149,11 +153,14 @@ Please select the function you want to perform.
 2) Perform a Battery Runtime Calibration
 3) Abort Battery Calibration
 4) Monitor Battery Calibration progress
-5) Quit
+5) Program EEPROM
+6) Enter TTY mode communicating with UPS
+7) Quit
 
-Select function number: 
+Select function number: 1
 
 </pre>
+
 <p>Item 1 will probe the UPS for all values known to 
 <b>apcupsd</b> and present them in rather raw format.
 This output can be useful for providing technical support
@@ -184,7 +191,20 @@ in progress, if you some how became disconnected.
 of a Battery Calibration if you should some how become
 disconnected during the test.
 <p>
-<p>Item 5 will terminate <b>apctest</b>.
+<p>Item 5 is used to program the EEPROM. Please see
+the <a href="eprom.html">EEPROM programming</a> chapter
+of this manual for the details.
+<p>
+<p>Item 6 will initiate a direct communication between your
+terminal and the UPS at which point, you can enter raw
+UPS commands. Please be aware that you should be careful
+what commands you enter because you can cause your UPS 
+to suddenly shutdown, or you can modify the EEPROM in
+a way to disable your UPS.  The details of the raw
+Smart mode UPS commands can be found in the   
+<a href="upsbible.html">UPS Programming Bible</a> 
+chapter of this manual.
+<p>Item 7 will terminate <b>apctest</b>.
 <hr>
 
 <a href="apcaccess.html" target="_self"><img src="back.gif" border=0 alt="Back"></a>

@@ -11,9 +11,9 @@
 will make some decisions that usually result in one or more calls to
 the script located in <B>/etc/apcupsd/apccontrol</B>. The <B>apccontrol</B>
 file is a shell script that acts on the first argument that <B>apcupsd</B>
-passes to it. These actions are set up by default to sane behaviour
+passes to it. These actions are set up by default to sane behavior
 for all possible situations <B>apcupsd</B> is likely to detect from
-the UPS. Nevertheless you can change the <B>apccontrol</B> behaviour
+the UPS. Nevertheless you can change the <B>apccontrol</B> behavior
 for every single action. To do so create a file with the same name as
 the action, which is passed as a command line argument. Put your
 script in the <B>/etc/apcupsd </B>directory. 
@@ -67,7 +67,7 @@ where:
         <DT>commfailure<DD>Does a &nbsp;&nbsp;<B>printf &quot;Warning serial port
             communications with UPS lost.&quot; | wall</B> &nbsp;&nbsp; then
             exits. 
-        <DT>commok<DD>Does a &nbsp;&nbsp;<B>printf &quot;Serial communciations with UPS
+        <DT>commok<DD>Does a &nbsp;&nbsp;<B>printf &quot;Serial communications with UPS
             restored.&quot; | wall</B> &nbsp;&nbsp;then exits. 
         <DT>doreboot<DD>Does a reboot of the system by calling &nbsp;&nbsp; <B>shutdown -r
              now</B> 
@@ -75,11 +75,11 @@ where:
             now</B> 
         <DT>emergency<DD>Does an emergency shutdown of the system by calling&nbsp;&nbsp;
             <B>shutdown -h now</B> 
-        <DT>failing<DD>Does a&nbsp;&nbsp;<B>printf &quot;UPS battery power exhaused. Doing
+        <DT>failing<DD>Does a&nbsp;&nbsp;<B>printf &quot;UPS battery power exhausted. Doing
             shutdown.\n&quot; | wall</B> &nbsp;&nbsp;then exits. 
         <DT>loadlimit<DD>Does a &nbsp;&nbsp;<B> printf &quot;UPS battery discharge limit
             reached. Doing shutdown.\n&quot; | wall</B> &nbsp;&nbsp; then exits.
-            After completeting this event, <B>apcupsd</B> will immediately
+            After completing this event, <B>apcupsd</B> will immediately
             initiate a &nbsp;&nbsp;<B> doshutdown </B>event. 
         <DT>mainsback<dd>Attempts to cancel the shutdown with a &nbsp;&nbsp;
             <B>shutdown -c</B> 
@@ -92,11 +92,11 @@ where:
             it.</dd> 
         <DT>runlimit<DD>Does a &nbsp;&nbsp;<B>printf &quot;UPS battery runtime percent
             reached. Doing shutdown.\n&quot; | wall</B> &nbsp;&nbsp; then exits.
-            After completeting this event, <B>apcupsd</B> will immediately
+            After completing this event, <B>apcupsd</B> will immediately
             initiate a <B>doshutdown</B> event.</dd> 
         <DT>timeout<DD STYLE="margin-bottom: 0.2in">Does a &nbsp;&nbsp;<B>printf &quot;UPS battery runtime limit
-             exceded. Doing shutdown.\n&quot; | wall</B> &nbsp;&nbsp; then exits.
-             After completeting this event, <B>apcupsd</B> will immediately
+             exceeded. Doing shutdown.\n&quot; | wall</B> &nbsp;&nbsp; then exits.
+             After completing this event, <B>apcupsd</B> will immediately
              initiate a <B>doshutdown</B> event.</dd>
             <dt>startselftest</dt><dd>This is called when <b>apcupsd</b> detects that the
                     UPS is doing a self test. No action is taken.</dd>

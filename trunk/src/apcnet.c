@@ -801,31 +801,26 @@ void do_slaves(UPSINFO *ups)
 #else /* HAVE_OLDNET */
 
 int prepare_master(UPSINFO *ups) {
-    log_event(ups, LOG_ERR, _("Old network code disabled. Use --enable-oldnet to enable"));
-    Dmsg0(000, _("Old network code disabled. Use --enable-oldnet to enable.\n"));
+    log_event(ups, LOG_ERR, _("Master/slave network code disabled. Use --enable-master-slave to enable"));
+    Dmsg0(000, _("Master/slave network code disabled. Use --enable-master-slave to enable.\n"));
     return 1; /* Not OK */
 }
 
 int prepare_slave(UPSINFO *ups) {
-    log_event(ups, LOG_ERR, _("Old network code disabled. Use --enable-oldnet to enable"));
-    Dmsg0(000, _("Old network code disabled. Use --enable-oldnet to enable.\n"));
-    return 1; /* Not OK */
+    return prepare_master(ups);
 }
 
 void kill_net(UPSINFO *ups) {
-    log_event(ups, LOG_ERR, _("Old network code disabled. Use --enable-oldnet to enable"));
-    Dmsg0(000, _("Old network code disabled. Use --enable-oldnet to enable.\n"));
+    prepare_master(ups);
 }
 
 void do_slaves(UPSINFO *ups) {
-    log_event(ups, LOG_ERR, _("Old network code disabled. Use --enable-oldnet to enable"));
-    Dmsg0(000, _("Old network code disabled. Use --enable-oldnet to enable.\n"));
+    prepare_master(ups);
     exit(1);
 }
 
 void do_net(UPSINFO *ups) {
-    log_event(ups, LOG_ERR, _("Old network code disabled. Use --enable-oldnet to enable"));
-    Dmsg0(000, _("Old network code disabled. Use --enable-oldnet to enable.\n"));
+    prepare_master(ups);
     exit(1);
 }
 

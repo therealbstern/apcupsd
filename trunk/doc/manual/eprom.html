@@ -20,52 +20,161 @@ not attempt to change this value.
 <p>If despite these warnings, you must change your EEEPROM,
 we recommend connecting your UPS to a Windows or NT machine
 running PowerChute and making the changes.
-<p>If you have no other choice, you may also change the EEPROM
-values with <b>apcupsd</b>.  Before doing so, please make
-a printed copy of your UPS as it is before any EEPROM changes so
+
+<h2>apcupsd No Longer Configures EEPROM</h2>
+Unlike version 3.8.6, apcupsd version 3.10.x no longer
+has code to program the EEPROM. Instead we have implemented
+interactive EEPROM modification code in the <b>apctest</b>
+program. EEPROM programming must be done with <b>apcupsd</b>
+stopped so that <b>apctest</b> can access the UPS. In addition,
+EEPROM programming is currently implemented only for UPSes
+using the Smart protocol running in serial mode. Perhaps at
+a later time when the appropriate kernel modifications are
+standard, we will extend EEPROM programming to USB models.
+
+<p>Before changing your EEPROM, you should make   
+a printed copy of the current state of your UPS
+before any EEPROM changes so
 that you can check the changes that you have made.
 Do so by printing a copy of the output from <b>apcaccess status</b>
 and also print a copy of the output from <b>apcaccess eprom</b>.
 <p>Once this is done, choose which values of the EEPROM you want 
-to change. Choose the new values from the list provided by 
-<b>apcaccess eprom</b>. For the battery date, and the UPS name,
-you can use any eight characters.
-<p>To make the EEPROM changes with <b>apcupsd</b> you must first
+to change.  Typical output from <b>apcacces</b> should look like 
+the following:
+<pre>
+apcaccess eeprom
+
+Valid EPROM values for the SMART-UPS 1000
+
+                         Config        Current  Permitted
+Description              Directive     Value    Values
+================================================================
+Upper transfer voltage   HITRANSFER    253      253 264 271 280 
+Lower transfer voltage   LOTRANSFER    196      196 188 208 204 
+Return threshold         RETURNCHARGE  0        00 15 50 90 
+Output voltage on batts  OUTPUTVOLTS   230      230 240 220 225 
+Sensitivity              SENSITIVITY   H        H M L L 
+Low battery warning      LOWBATT       2        02 05 07 10 
+Shutdown grace delay     SLEEP         20       020 180 300 600 
+Alarm delay              BEEPSTATE     0        0 T L N 
+Wakeup delay             WAKEUP        0        000 060 180 300 
+Self test interval       SELFTEST      336      336 168 ON  OFF 
+</pre>
+
+where the Current Value will depend on how your UPS is configured,
+and the Permitted Values will depend on what UPS model you have.
+
+
+<h2>Using apctest to Configure Your EEPROM</h2>
+<p>To make the EEPROM changes with <b>apctest</b> you must first
 stop the <b>apcupsd</b> daemon. See <a href="stopping.html">Stopping <b>Apcupsd</b></a>
 in the appropriate section of this manual.
-Then edit the appropriate configuration directive in <b>/etc/apcupsd/apcupsd.conf</b>.
 <p>
-NOTE: we recommend that you change one EEPROM value at a time, by defining only
-one configuration directive at a time. After each change, check that everything is
-OK before proceeding to the next value you wish to change.
+<b>apctest</b> is not installed during the installation process, so to use
+it you will need to do the following after having built <b>apcupsd</b>:
+<pre>
+cd &lt;apcupsd-source&gt;/src
+su           
+&lt;root-password&gt;
+./apctest
+</pre>
+At that point, you should get output similar to the following:
+<pre>
+2003-07-07 11:19:21 apctest 3.10.6 (07 July 2003) redhat
+Checking configuration ...
+Attached to driver: apcsmart
+sharenet.type = DISABLE
+cable.type = CUSTOM_SMART
+
+You are using a SMART cable type, so I'm entering SMART test mode
+mode.type = SMART
+Setting up serial port ...
+Creating serial port lock file ...
+Hello, this is the apcupsd Cable Test program.
+This part of apctest is for testing Smart UPSes.
+Please select the function you want to perform.
+
+1) Query the UPS for all known values
+2) Perform a Battery Runtime Calibration
+3) Abort Battery Calibration
+4) Monitor Battery Calibration progress
+5) Program EEPROM
+6) Enter TTY mode communicating with UPS
+7) Quit
+
+Select function number: 
+</pre>
+You might want to run option 1) just to ensure that <b>apctest</b> is properly
+talking to your UPS. It will produce quite about 70 lines of output.
 <p>
-To actually change the EEPROM, as <b>root</b> with the <b>apcupsd</b> daemon stopped,
-enter:
-<p class="indent"><b>apcupsd -c</b>
-<p>When it has completed the reprogramming of the EEPROM, it will print
-the new STATUS report. Check that you got the expected results before continuing.
-<p>The list of configuration directives and the permitted values for the
-SmartUPS follows:
-<p><pre>
+To program the EEPROM, select option 5), and you will get the EEPROM 
+menu as follows:
+<pre>
+This is the EEPROM programming section of apctest.
+Please select the function you want to perform.
+
+ 1) Print EEPROM values
+ 2) Change Battery date
+ 3) Change UPS name
+ 4) Change sensitivity
+ 5) Change alarm delay
+ 6) Change low battery warning delay
+ 7) Change wakeup delay
+ 8) Change shutdown delay
+ 9) Change low transfer voltage
+10) Change high transfer voltage
+11) Change battery return threshold percent
+12) Change output voltage when on batteries
+13) Change the self test interval
+14) Set EEPROM with conf file values
+15) Quit
+
+Select function number: 
+</pre>
+If you wish to use the old pre-3.10.x method of EEPROM programming with
+values specified in the <b>apcupsd.conf</b> file, select option 14). However,
+we recommend that you start with item 1) to see what EEPROM values <b>apctest</b>
+finds. This command can take a few minutes to run, so be patient. The 
+values printed should be the same as what you got using <b>apcaccess</b>, but
+in addition, the EEPROM battery date and UPS Name should be displayed.
+For example:
+<pre>
+Select function number: 1
+
+Doing prep_device() ...
+
 Valid EEPROM values for the SMART-UPS 1000
 
                          Config        Current  Permitted
 Description              Directive     Value    Values
 ===================================================================
 Upper transfer voltage   HITRANSFER    253      253 264 271 280 
-Lower transfer voltage   LOTRANSFER    204      196 188 208 204 
-Return threshold         RETURNCHARGE  15       00 15 50 90 
+Lower transfer voltage   LOTRANSFER    196      196 188 208 204 
+Return threshold         RETURNCHARGE  0        00 15 50 90 
 Output voltage on batts  OUTPUTVOLTS   230      230 240 220 225 
 Sensitivity              SENSITIVITY   H        H M L L 
 Low battery warning      LOWBATT       2        02 05 07 10 
-Shutdown grace delay     SLEEP         180      020 180 300 600 
-Alarm delay              BEEPSTATE     T        0 T L N 
-Wakeup delay             WAKEUP        60       000 060 180 300 
+Shutdown grace delay     SLEEP         20       020 180 300 600 
+Alarm delay              BEEPSTATE     0        0 T L N 
+Wakeup delay             WAKEUP        0        000 060 180 300 
 Self test interval       SELFTEST      336      336 168 ON  OFF 
+===================================================================
+Battery date: 07/31/99
+UPS Name    : UPS_IDEN
+
 </pre>
+At this point, you can select any item from 2) to 13) to modify the
+appropriate value. You will shown the existing value and prompted for
+the new values. 
 <p>
-<b>apcaccess eeprom</b> will produce the list that is appropriate for
-your UPS.
+We recommend that you change the EEPROM as little as is absolutely
+necessary since it is a somewhat delicate process that has occasionally
+produced problems (i.e. improper EEPROM values are displayed after the
+update). Fortunately this seems to be quite rare and was much more
+likely to occur with the old &quot;batch&quot; like process especially
+if incorrect values were supplied.
+
+
 <hr>
 
 <a href="data.html" target="_self"><img src="back.gif" border=0 alt="Back"></a>

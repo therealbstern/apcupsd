@@ -18,11 +18,11 @@ will use the Network Information Server to obtain the necessary information
 for the <b>status</b> and <b>eeprom</b> commands. This is because in the
 pthreaded version, there is no IPC shared memory. In this case (pthreads 
 enabled), you can specify a second optional argument to <b>apcaccess</b> in the
-form of host:port, where the :port is optional. The default is <b>localhost:7000</b>.
-In the current version (3.8.2) specifying host:port works only if the host
-specified is running the NIS server and an <b>apcupsd</b> identical (version,
-architecture, ...) to the localhost (i.e. this code is apcupsd version dependent
-as well as machine dependent).</p>
+form of host:port, where the :port is optional. The default is <b>localhost:3551</b>.
+Please note that in versions prior to 3.10.6, the default NIS port was
+7000, so if you are mixing versions, you will need to take a lot of care
+to ensure that all components are using the same port.
+
 <h2>apcaccess status</h2>
 <P>The <B>status</B> command line option of <b>apcaccess</b>
 will produce a full printout of all the <B>STATUS</B>

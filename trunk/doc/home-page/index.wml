@@ -15,13 +15,13 @@ consumption rates. Apcupsd is licensed under the GPL version 2.
 
 <h2><a href="http://sourceforge.net/projects/apcupsd">
 Apcupsd Hosted on Source Forge</a></h2>
-<b>Apcupsd</b> is slowly moving to Source Forge for several
-reasons: 1. Lack of manpower to maintain several sites, 2. The
-excellent Open Software Development services offered by 
-Source Forge. In addition to hosting all our new releases, 
-the Source Forge site has a CVS repository where you can find
-the very latest development software. Please visit it and
-become familiar with how it works.
+We have moved the release of source and binaries (downloads) to Source
+Forge for several reasons: 1.  Lack of manpower to maintain several
+sites, 2.  The excellent Open Software Development services offered by
+Source Forge.  In addition to hosting all our new releases, the Source
+Forge site has a CVS repository where you can find the very latest
+development software.  Please visit it and become familiar with how it
+works.
 
 <h2><a href="3.8manual/new_features_3_8_5.html">
 What is new in Apcupsd version 3.8.6</a></h2>
@@ -85,74 +85,6 @@ following site and follow the instructions:
 http://lists.sourceforge.net/lists/subscribe/apcupsd-users</a>.
 
 
-<h2><a href="download" target="_top">Downloads Available Here</a></h2>
-PLEASE NOTE! All downloads are now maintained as Source Forge. The
-link <b>Current Downloads</b> in the menu to the left will take you
-to the current downloads available. The link <b>All Downloads</b> will
-take you to a complete list of everything on Source Forge.
-<p>
-The downloads listed below will remain for a time for historic
-reasons, but you are urged to find the most recent releases on the
-Source Forge site.
-<p>PLEASE GET THE CURRENT VERSION FROM SOURCE FORGE.
-<p>Version 3.8.6 of <b>apcupsd</b> is the current officially
-released version. 
-<p class="indent">
-<table cellspacing="1" cellpadding="4" border="1" bgcolor="#FBFBFB">
-<tr align=center> <td>Date</td> <td>Size</td> <td>Type</td> <td align=left>Release</td> <td align=left>Comments</td></tr>
-<tr><td>5-Jan-02</td> <td>1,979,485</td>  <td>HTTP</td> <td><a href="download/apcupsd-3.8.5.tar.gz">apcupsd-3.8.5.tar.gz</a></td> 
-     <td>Official source release version 3.8.5</td></tr>
-<tr><td>5-Jan-02</td> <td>940,621</td>  <td>HTTP</td> <td><a href="download/apcupsd-3.8.5-1.i386.RH6.2.rpm">apcupsd-3.8.5-1.i386.RH6.2.rpm</a></td> 
-     <td>RPM binaries for RedHat 6.2, should work on 6.0, 6.1, and 7.0</td></tr>
-<tr><td>5-Jan-02</td> <td>1,958,804</td>  <td>HTTP</td> <td><a href="download/apcupsd-3.8.5-1.src.RH6.2.rpm">apcupsd-3.8.5-1.src.RH6.2.rpm</a></td> 
-     <td>RPM source for apcupsd-3.8.5 for RedHat 6.2 </td></tr>
-<tr><td>5-Jan-02</td> <td>945,510</td>  <td>HTTP</td> <td><a href="download/apcupsd-3.8.5-1.i386.RH7.1.rpm">apcupsd-3.8.5-1.i386.RH7.1.rpm</a></td> 
-     <td>RPM binaries for RedHat 7.1 and probably 7.2 </td></tr>
-<tr><td>5-Jan-02</td> <td>1,980,201</td>  <td>HTTP</td> <td><a href="download/apcupsd-3.8.5-1.src.RH7.1.rpm">apcupsd-3.8.5-1.src.RH7.1.rpm</a></td> 
-     <td>RPM source for apcupsd-3.8.5 for RedHat 7.1</td></tr>
-<tr><td>5-Jan-02</td> <td>1,218,736</td>  <td>HTTP</td> <td><a href="download/winapcupsd-3.8.5.tar.gz">winapcupsd-3.8.5.tar.gz</a></td> 
-     <td>Zip binary release for Win32 systems (Win95/98/Me/NT/2000)</td></tr>
-<tr><td>various</td><td>various</td><td>HTTP</td><td><a href="download" target="_top">Download Directory</a><td>All available releases</td></tr>
-</table></p>
-
-<h3>MD5 Checksums</h3>
-<pre>
-     eb288ca039c7a55a15ba59deabd9b765  apcupsd-3.8.5-1.i386.RH6.2.rpm
-     2024c6b396c26c1c4f58e87a37f36318  apcupsd-3.8.5-1.i386.RH7.1.rpm
-     cca6ec1d52f7d9248d9c1ef6297514cc  apcupsd-3.8.5-1.src.RH6.2.rpm
-     ea8dc98cce39478d5e3532b9674cea12  apcupsd-3.8.5-1.src.RH7.1.rpm
-     0fc2fd41899d80ce8e482e3defa49bb2  apcupsd-3.8.5.tar.gz
-     09e76e0feef430dc313a4998c2b47d61  winapcupsd-3.8.5.tar.gz
-</pre>
-
-
-<h2>Official Stable Download Site</h2>
-<p>PLEASE GET THE CURRENT VERSION FROM SOURCE FORGE.
-<p>Version 3.8.6 of <b>apcupsd</b> is now released, and you can find the 
-the source code at the official download site: 
-<p class="indent">
-<table border="1" cellspacing="1" cellpadding="4" bgcolor="#FBFBFB">
-<tr align=center>
-    <td>Date</td>
-    <td>Size</td>
-        <td>Type</td>
-    <td align=left>Release</td><td align=left>Comments</td>
-</tr>
-<tr>
-    <td>4 Jan 02</td>
-    <td>1,979,485</td>
-        <td>FTP</td>
-    <td><a href="ftp://ftp.apcupsd.com/pub/apcupsd/stable/tar/apcupsd-3.8.5.tar.gz"> 
-                apcupsd-3.8.5.tar.gz</a></td><td>Current Official Release</td>
-</tr>
-<tr>
-    <td>various</td>
-    <td>various</td>
-        <td>FTP</td>
-    <td><a href="ftp://ftp.apcupsd.com/pub/apcupsd/"> 
-                ftp://ftp.apcupsd.com/pub/apcupsd/</a></td><td>Starting point for other releases</td>
-</tr>
-</table></p>
 
 <h2>Debian Users Stable Download</h2>
 The Debian packages for <b>apcupsd</b> may be obtained directly
@@ -167,29 +99,6 @@ http://packages.debian.org/testing/admin/apcupsd.html</a>
 <a href="http://packages.debian.org/unstable/admin/apcupsd.html">
 http://packages.debian.org/unstable/admin/apcupsd.html</a>
 <br>
-
-
-<h2><a href="download/betaversions" target="_top">Apcupsd Beta Versions</a></h2>
-<p>PLEASE GET THE CURRENT VERSION FROM SOURCE FORGE.
-Version 3.10.5 is available for testing. Please see the
-<a href="manual/index.html" target="_top">3.10 Online Manual</a> for more
-details.                                                                
-<h3>Beta MD5 Checksums</h3>
-<pre>
-     d8a6b89c049414cf2f7329eecea3129b  3.9.8-01Apr02.tar.gz
-     ce88b4aab76c596454308f7d88136634  apcupsd-3.9.1.tar.gz
-     1a1e016b63821335a4a408971c7f8e49  apcupsd-3.9.2.tar.gz
-     c21449b3eaed4ad4fcda8cb0cc361702  apcupsd-3.9.3.tar.gz
-     aff603f23edcce1748504a1ea2be7d7c  apcupsd-3.9.4.tar.gz
-     40ede3d9982927708f5cc8d9b125a321  apcupsd-3.9.8.tar.gz
-     e59b08e3950e33a0043a36625723f41e  apcupsd-3.9.9.tar.gz
-     28cdd54f6696e035ed6df7fcd4b03aa7  winapcupsd-3.9.8.tar.gz
-     9357c2cb7a029c87d9a39e5b4150a5a8  apcupsd-3.10.1.tar.gz
-     92cc35e74840fc809161db3c23f236d7  apcupsd-3.10.2.tar.gz
-     a346e4043fcac13911ab1c53031c9ae6  apcupsd-3.10.3.tar.gz
-     de7c2a9627c9b93d2dd52fa3968de2cb  apcupsd-3.10.4.tar.gz
-     7a297f0988345a21b0ee5a93cc15743a  winapcupsd-3.10.4.tar.gz
-</pre>
 
    
 <h2><a href="http://sourceforge.net/cvs/?group_id=54413">
