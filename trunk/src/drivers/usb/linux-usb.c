@@ -286,14 +286,18 @@ static int open_usb_device(UPSINFO *ups)
     if (my_data->fd >= 0) {
        strcpy(ups->device, devname);
        return 1;
-    } else {
-       ups->device[0] = 0;
-       return 0;
     }
+    /* If the above device specified by the user fails,
+     *	fall through here and look in predefined places
+     *	for the device.
+     */
 
 /*
- * Come here if no device name is given.  We try
- *   to autodetect it in the standard places.
+ * Come here if no device name is given or we failed to open
+ *   the device specified.
+ *
+ * Here we try to autodetect the UPS in the standard places.
+ *
  */
 auto_detect:
 
