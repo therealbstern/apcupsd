@@ -1156,6 +1156,9 @@ then
 elif test -f /etc/mandrake-release
 then
     DISTNAME=mandrake
+elif test -f /etc/whitebox-release
+then
+	DISTNAME=redhat
 elif test -f /etc/redhat-release
 then
 	DISTNAME=redhat
@@ -1377,9 +1380,14 @@ mandrake)
 	platforms/mandrake/awkhaltprog"
   ;;
 redhat)
-   if test `cat /etc/redhat-release | grep release |\
+   if test -f /etc/whitebox-release ; then
+      f=/etc/whitebox-release
+   else
+      f=/etc/redhat-release
+   fi
+   if test `cat $f | grep release |\
 	cut -f 3 -d ' '`x = "Enterprise"x ; then
-      DISTVER="Enterprise "`cat /etc/redhat-release | grep release |\
+      DISTVER="Enterprise "`cat $f | grep release |\
 	cut -f 6 -d ' '`
    else
        DISTVER=`cat /etc/redhat-release | grep release |\
