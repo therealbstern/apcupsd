@@ -14,7 +14,8 @@ first_rule: all
 all:	html web pdf
 
 html:	manual.texi
-	makeinfo --html --no-split --no-headers --number-sections  manual.texi >manual.html
+#	makeinfo --html --no-split --no-headers --number-sections  manual.texi >manual.html
+	makeinfo --html --no-split --number-sections  manual.texi >manual.html
 	@echo "html manual built"
 
 web:	manual.texi
