@@ -961,8 +961,8 @@ int usb_ups_read_volatile_data(UPSINFO *ups)
     if (!is_ups_set(UPS_ONBATT) && last_poll && (now - last_poll < 5)) {
        return 1;
     }
-    ups->poll_time = now;	      /* save time stamp */
     write_lock(ups);
+    ups->poll_time = now;	      /* save time stamp */
 
     /* UPS_STATUS -- this is the most important status for apcupsd */
 
