@@ -1239,7 +1239,6 @@ alpha)
 	LOCKDIR=/var/spool/locks
 	LOGDIR=/etc/apcupsd
 	DFILES="\
-		platforms/apccontrol \
 		platforms/alpha/apcupsd \
 		platforms/alpha/awkhaltprog \
 		platforms/alpha/Makefile"
@@ -1251,8 +1250,7 @@ caldera)
 	DISTVER=`cat /etc/.issue | grep Version | cut -f 2 -d ' '`
 	DFILES="\
 		platforms/caldera/Makefile \
-		platforms/caldera/apcupsd \
-		platforms/apccontrol"
+		platforms/caldera/apcupsd"
   ;;
 cygwin)
 	DISTVER=cygwin
@@ -1270,7 +1268,6 @@ cygwin)
 		src/win32/Makefile \
 		platforms/cygwin/Makefile \
 		platforms/cygwin/apcupsd \
-		platforms/cygwin/apccontrol \
 		"
   ;;
 debian)
@@ -1303,13 +1300,11 @@ dnl
 	DFILES="\
 		platforms/freebsd/Makefile \
 		platforms/freebsd/apcupsd \
-		platforms/freebsd/apccontrol \
 		"
   ;;
 gentoo)
 	DISTVER=`uname -r`
 	DFILES="\
-		platforms/apccontrol \
 		platforms/gentoo/Makefile \
 		platforms/gentoo/apcupsd \
 		platforms/gentoo/halt \
@@ -1318,7 +1313,6 @@ gentoo)
 hpux)
 	DISTVER=`uname -r`
 	DFILES="\
-		platforms/apccontrol \
 		platforms/hpux/Makefile \
 		platforms/hpux/apcupsd \
 		platforms/hpux/halt"
@@ -1332,7 +1326,6 @@ netbsd)
 	    LDFLAGS="$LDFLAGS -pthread"
 	fi
 	DFILES="\
-		platforms/apccontrol \
 		platforms/netbsd/Makefile \
 		platforms/netbsd/apcupsd \
 		"
@@ -1356,7 +1349,6 @@ dnl
 	DFILES="\
 		platforms/openbsd/Makefile \
 		platforms/openbsd/apcupsd \
-		platforms/openbsd/apccontrol \
 		"
   ;;
 openserver)
@@ -1373,14 +1365,12 @@ openserver)
 	DFILES="\
 		platforms/openserver/Makefile \
 		platforms/openserver/apcupsd \
-		platforms/openserver/rc0.openserver \
-		platforms/openserver/apccontrol"
+		platforms/openserver/rc0.openserver"
   ;;
 mandrake)
     DISTVER=`cat /etc/mandrake-release | grep release |\
 		cut -f 5 -d ' '`
     DFILES="\
-	platforms/apccontrol \
 	platforms/mandrake/Makefile \
 	platforms/mandrake/apcupsd \
 	platforms/mandrake/awkhaltprog"
@@ -1389,7 +1379,6 @@ redhat)
 	DISTVER=`cat /etc/redhat-release | grep release |\
 				cut -f 5 -d ' '`
 	DFILES="\
-		platforms/apccontrol \
 		platforms/redhat/Makefile \
 		platforms/redhat/apcupsd \
 		platforms/redhat/apcupsd.spec \
@@ -1399,7 +1388,6 @@ engarde)
 	DISTVER=`cat /etc/engarde-release | grep ersion |\
 				cut -f 5 -d ' '`
 	DFILES="\
-		platforms/apccontrol \
 		platforms/engarde/Makefile \
 		platforms/engarde/apcupsd \
 		platforms/engarde/apcupsd.spec \
@@ -1408,7 +1396,6 @@ engarde)
 slackware)
 	DISTVER=`cat /etc/slackware-version`
 	DFILES="\
-		platforms/apccontrol \
 		platforms/slackware/Makefile \
 		platforms/slackware/apcupsd \
 		platforms/slackware/rc6.patch" 
@@ -1429,14 +1416,12 @@ dnl
 	DFILES="\
 		platforms/sun/Makefile \
 		platforms/sun/apcupsd \
-		platforms/sun/rc0.solaris \
-		platforms/sun/apccontrol"
+		platforms/sun/rc0.solaris"
   ;;
 suse)
 	DISTVER=`cat /etc/SuSE-release |grep VERSION|\
 				cut -f 3 -d ' '`
 	DFILES="\
-		platforms/apccontrol \
 		platforms/suse/Makefile \
 		platforms/suse/apcupsd \
 		platforms/suse/halt-setup.sh \
@@ -1446,7 +1431,6 @@ suse5)
 	DISTNAME=suse
 	DISTVER=5.x
 	DFILES="\
-		platforms/apccontrol \
 		platforms/suse/Makefile \
 		platforms/suse/apcupsd \
 		platforms/suse/halt-setup.sh \
@@ -1458,7 +1442,6 @@ darwin)
     PIDDIR=/var/run
     LOCKDIR=/var/tmp
     DFILES="\
-	platforms/apccontrol \
 	platforms/darwin/Makefile \
 	platforms/darwin/apcupsd"
     LDFLAGS="${LDFLAGS} -m"
@@ -1466,7 +1449,6 @@ darwin)
 unknown)
 	DISTVER=unknown
 	DFILES="\
-		platforms/apccontrol \
 		platforms/unknown/Makefile \
 		platforms/unknown/apcupsd \
 		platforms/unknown/halt \
@@ -1603,27 +1585,28 @@ dnl
 dnl First entry must always be "variables.mak"
 dnl
 GENERATE_FILES="\
+	Makefile \
 	autoconf/variables.mak \
-		Makefile \
-		autoconf/Makefile \
+	autoconf/Makefile \
+	doc/Makefile \
 	include/Makefile \
 	src/Makefile \
-		src/lib/Makefile \
+	src/lib/Makefile \
 	src/drivers/Makefile \
-		platforms/Makefile \
-	doc/Makefile \
-		platforms/etc/changeme \
-		platforms/etc/commfailure \
-		platforms/etc/commok \
-		platforms/etc/mainsback 
-		platforms/etc/masterconnect \
-		platforms/etc/mastertimeout \
-		platforms/etc/onbattery \
-		platforms/etc/Makefile \
-		platforms/etc/apcupsd.conf \
-		examples/Makefile \
-		examples/safe.apccontrol \
-		$DFILES"
+	platforms/Makefile \
+	platforms/apccontrol \
+	platforms/etc/changeme \
+	platforms/etc/commfailure \
+	platforms/etc/commok \
+	platforms/etc/mainsback 
+	platforms/etc/masterconnect \
+	platforms/etc/mastertimeout \
+	platforms/etc/onbattery \
+	platforms/etc/Makefile \
+	platforms/etc/apcupsd.conf \
+	examples/Makefile \
+	examples/safe.apccontrol \
+	$DFILES"
 
 if test "$APCSMART_DRIVER"x != ""x
 then

@@ -232,6 +232,8 @@ static int open_usb_device(UPSINFO *ups)
        if (q) {      
 	  *q++ = 0;		      /* terminate first number */
           r = strchr(q, ']');
+       } else {
+	  r = NULL;
        }
        if (!q || !r) {
           Error_abort0("Bad DEVICE configuration range specifed.\n");
@@ -596,6 +598,7 @@ int usb_ups_open(UPSINFO *ups)
        private = malloc(sizeof(USB_DATA));
        if (private == NULL) {
           log_event(ups, LOG_ERR, "Out of memory.");
+	  write_unlock(ups);
 	  exit(1);
        }
        memset(private, 0, sizeof(USB_DATA));
@@ -607,6 +610,7 @@ int usb_ups_open(UPSINFO *ups)
        strcpy(private->orig_device, ups->device);
     }
     if (!open_usb_device(ups)) {
+	write_unlock(ups);
         Error_abort1(_("Cannot open UPS device %s\n"), ups->device);
     }
     UPS_CLEAR(UPS_SLAVE);
@@ -649,6 +653,7 @@ int usb_ups_get_capabilities(UPSINFO *ups)
 
     write_lock(ups);
     if (ioctl(private->fd, HIDIOCINITREPORT, 0) < 0) {
+       write_unlock(ups);
        Error_abort1("Cannot init USB HID report. ERR=%s\n", strerror(errno));
     }
 
@@ -698,6 +703,7 @@ int usb_ups_get_capabilities(UPSINFO *ups)
 			    ups->UPS_Cmd[ci] = uref.usage_code;
 			    info = malloc(sizeof(USB_INFO));
 			    if (!info) {
+			       write_unlock(ups);
                                Error_abort0(_("Out of memory.\n"));
 			    }
 			    private->info[ci] = info;
