@@ -2,7 +2,9 @@
 #include "template.inc" name=support
 
 <h1>Support</h1>
-Please keep in mind that we are not getting paid for this.
+Please keep in mind that we are not getting paid for this,
+and since the project is rather mature, there is not any
+active development. It is, however, being maintained.
 Nevertheless, our desire is to see as many people using
 <b>apcupsd</b> as possible.           
 
@@ -21,13 +23,14 @@ resolving USB problems:
 http://www.apcupsd.com/3.10.x-manual/check_usb.html</a>
 
 <h2>Getting Help</h2>
-If you send and email to the 
-<a href="mailto:apcupsd-devel at apcupsd.com">
-apcupsd-devel at apcupsd.com</a> email list, and your support
+If you send an email to the 
+<a href="mailto:apcupsd-users (@) lists.sourceforge.net">
+apcupsd-users (@) sourceforge.net</a> email list, and your support
 request is well defined, most likely some kind user will 
-help you.
-The previous address was modified to prevent easy use by spammers. To use it,
-you must replace the <b>at</b> with an @ symbol. 
+help you. Regrettably, because of spam attacks,     
+we have had to require you to be subscribed in order
+to send email to it. 
+<p>
 Please see <b>Information Needed</b> below for what to
 include in your support request.
 <p>I (Kern) get a number of &quot;off-list&quot; emails sent

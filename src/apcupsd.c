@@ -9,93 +9,23 @@
  */
 
 /*
- *			 GNU GENERAL PUBLIC LICENSE
- *			    Version 2, June 1991
- *
- *  Copyright (C) 1989, 1991 Free Software Foundation, Inc.
- *			       675 Mass Ave, Cambridge, MA 02139, USA
- *  Everyone is permitted to copy and distribute verbatim copies
- *  of this license document, but changing it is not allowed.
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- */
+   Copyright (C) 1999-2004 Kern Sibbald
 
-/*
- *  IN NO EVENT SHALL ANY AND ALL PERSONS INVOLVED IN THE DEVELOPMENT OF THIS
- *  PACKAGE, NOW REFERRED TO AS "APCUPSD-Team" BE LIABLE TO ANY PARTY FOR
- *  DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING
- *  OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF ANY OR ALL
- *  OF THE "APCUPSD-Team" HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  THE "APCUPSD-Team" SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING,
- *  BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
- *  ON AN "AS IS" BASIS, AND THE "APCUPSD-Team" HAS NO OBLIGATION TO PROVIDE
- *  MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
- *
- *  THE "APCUPSD-Team" HAS ABSOLUTELY NO CONNECTION WITH THE COMPANY
- *  AMERICAN POWER CONVERSION, "APCC".  THE "APCUPSD-Team" DID NOT AND
- *  HAS NOT SIGNED ANY NON-DISCLOSURE AGREEMENTS WITH "APCC".  ANY AND ALL
- *  OF THE LOOK-A-LIKE ( UPSlink(tm) Language ) WAS DERIVED FROM THE
- *  SOURCES LISTED BELOW.
- *
- */
+   This program is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 2 of
+   the License, or (at your option) any later version.
 
-/*
- *  Parts of the code are from Miquel van Smoorenburg's powerd.c
- *  Other parts are original from Christian Holtje <docwhat@uiuc.edu>
- *  Smart-UPS code from Pavel Korensky's apcd.c, apcd.h, and upsnet.c.
- *  I believe that it is okay to say that this is Public Domain, just
- *  give credit, where credit is due.
- *
- *  Disclaimer:  We make NO claims to this software, and take no
- *               resposibility for it's use/misuse.
- *
- *  Cable for a smarter Back-UPS and SmartUPS from APC only.
- *
- *  Computer Side   |  Description of Cable		 |  UPS Side
- *  DB9f  |  DB25f  |					   |	DB9m
- *   4		|   20	  |  DTR (5vcc) 	     *below  |	  n/c
- *   8		|    5	  |  CTS (low-batt)		 *below  |     5
- *   2		|    3	  |  RxD (other line-fail)  *below  |	  3
- *   5		|    7	  |  Ground (Signal)			  |	4
- *   1		|    8	  |  CD (line-fail from ups)		  |	2
- *   7		|    4	  |  RTS (shutdown ups) 	     |	   1
- *  n/c   |    1    |  Frame/Case Gnd (optional)      |     9
- *
- *  The "*below" one needs solder type DB connectors with standard
- *  hoods, two (2) 4.7K ohm 1/4 watt %5, one (1) foot of 3/32" (inch)
- *  shrink wrap, rosin core solder, and three (3) to five (5) feet of
- *  22AWG multi-stranded five (5) conductor cable. 
- *
- *  9/20/96 2:00am
- *
- */
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+   General Public License for more details.
 
-/*
- * Add here an identifer that is unique for tracking changes
- * made by each person other than myself.
- *
- * Christopher J. Reimer <reimer@doe.carleton.ca>	 CJR
- * Werner Panocha <wpanocha@t-online.de>		w.p.
- * Brian Schau <bsc@fleggaard.dk>			 BSC
- * Marko Sakari Asplund <Marko.Asplund@cern.ch> 	MSA
- * Riccardo Facchetti <riccardo@master.oasi.gpa.it>			   -RF
- * Jonathan H N Chin <jc254@newton.cam.ac.uk>		     JHNC
- * Kern Sibbald <kern@sibbald.com>			  KES
+   You should have received a copy of the GNU General Public
+   License along with this program; if not, write to the Free
+   Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+   MA 02111-1307, USA.
+
  */
 
 /* The big overall flow of apcupsd is as follows
@@ -277,8 +207,7 @@ int main(int argc, char *argv[]) {
      * which requires initialization.
      */
     init_proctitle(argv[0]);
-    strncpy(argvalue, argv[0], sizeof(argvalue)-1);
-    argvalue[sizeof(argvalue)-1] = 0;
+    astrncpy(argvalue, argv[0], sizeof(argvalue));
       
     ups = new_ups();		      /* get new ups */
     if (!ups) {
@@ -333,7 +262,7 @@ int main(int argc, char *argv[]) {
     ups->start_time = time(NULL);
     delete_lockfile(ups);
 
-    if (go_background) {
+    if (!kill_ups_power && go_background) {
        daemon_start();
        /* Reopen log file, closed during becoming daemon */
        openlog("apcupsd", LOG_CONS|LOG_PID, ups->sysfac);   
@@ -343,8 +272,8 @@ int main(int argc, char *argv[]) {
     make_pid_file();
     init_signals(apcupsd_terminate);
 
-    /* Create temp events file */
-    if (ups->eventfile[0] != 0) {
+    /* Create temp events file if we are not doing a killpower */
+    if (!kill_ups_power && ups->eventfile[0] != 0) {
 	ups->event_fd = open(ups->eventfile, O_RDWR|O_CREAT|O_APPEND, 0644);
 	if (ups->event_fd < 0) {
             log_event(ups, LOG_WARNING, "Could not open events file %s: %s\n",
@@ -475,7 +404,7 @@ int main(int argc, char *argv[]) {
 static void daemon_start(void)
 {
 #ifndef HAVE_CYGWIN
-    int i, fd;
+    int i;
     pid_t cpid;
     mode_t oldmask;
 

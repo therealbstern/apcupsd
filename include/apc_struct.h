@@ -418,7 +418,7 @@ typedef struct datainfo {
     char accessmagic[ACCESS_MAGIC_SIZE];
 } DATAINFO;
 
-typedef int (HANDLER) (UPSINFO *, size_t, const GENINFO *, const char *);
+typedef int (HANDLER) (UPSINFO *, int, const GENINFO *, const char *);
 
 typedef struct {
     const char *key;
