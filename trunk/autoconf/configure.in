@@ -763,6 +763,7 @@ AC_ARG_ENABLE(dumb, [
 	AC_SUBST(DUMB_DRIVER)
 	])
 
+
 AC_ARG_ENABLE(usb, [
   --enable-usb		   Compile USB UPS code
   --disable-usb 	   No USB UPS code (default)],

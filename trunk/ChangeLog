@@ -6,8 +6,12 @@
 /***************************************************************************/
 
 ----> Release apcupsd-3.10.6 (28 September 2003)
+03Oct03
+- Move the old manual to old_documents and commit the
+  new docbook manual to the CVS. Don't include the web
+  html directory.
 28Sep03
-- Test net slave mode.
+- Test net slave mode. It works fine.
 - Add MASTER name to status output if device is a slave.
 - Display last master update if device is a net slave.
 - Add 10 sec delay before calling apcupsd --killpower it is
@@ -17,7 +21,7 @@
 27Sep03
 - Implement autodetect of USB port if no DEVICE given.
 
-----> Release apcupsd-3.10.6 (12 September 2003)
+----> Release apcupsd-3.10.6 (12 September 2003) Beta
 14Sep03
 - After the upgrade to RH9 with the new autoconf, quite a
   few things broke. As far as I can tell, it is because autoconf
@@ -46,7 +50,7 @@
 - Tried to clarify the difference between the net and
   the master/slave drivers in the doc.
 
-----> Release apcupsd-3.10.6 (05 August 2003)
+----> Release apcupsd-3.10.6 (05 August 2003) Beta
 05Aug03
 - Because of the complaints about the master/slave code, I finally
   got around to testing it, and it was seriously broken in more

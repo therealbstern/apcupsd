@@ -91,6 +91,7 @@ UPSDRIVER drivers[] = {
       dumb_ups_program_eeprom,
       dumb_ups_entry_point },
 #endif /* HAVE_DUMB_DRIVER */
+
 #ifdef HAVE_APCSMART_DRIVER
     { "apcsmart",
       apcsmart_ups_open,
@@ -104,6 +105,7 @@ UPSDRIVER drivers[] = {
       apcsmart_ups_program_eeprom,
       apcsmart_ups_entry_point },
 #endif /* HAVE_APCSMART_DRIVER */
+
 #ifdef HAVE_NET_DRIVER
     { "net",
       net_ups_open,
@@ -117,6 +119,7 @@ UPSDRIVER drivers[] = {
       net_ups_program_eeprom,
       net_ups_entry_point },
 #endif /* HAVE_NET_DRIVER */
+
 #ifdef HAVE_USB_DRIVER
     { "usb",
       usb_ups_open,
@@ -130,6 +133,7 @@ UPSDRIVER drivers[] = {
       usb_ups_program_eeprom,
       usb_ups_entry_point },
 #endif /* HAVE_USB_DRIVER */
+
 #ifdef HAVE_SNMP_DRIVER
     { "snmp",
       snmp_ups_open,
@@ -143,6 +147,7 @@ UPSDRIVER drivers[] = {
       snmp_ups_program_eeprom,
       snmp_ups_entry_point },
 #endif /* HAVE_SNMP_DRIVER */
+
 #ifdef HAVE_TEST_DRIVER
     { "test",
       test_ups_open,
@@ -156,6 +161,7 @@ UPSDRIVER drivers[] = {
       test_ups_program_eeprom,
       test_ups_entry_point },
 #endif /* HAVE_TEST_DRIVER */
+
     /*
      * The NULL driver: closes the drivers list.
      */
@@ -183,6 +189,7 @@ static UPSDRIVER *helper_attach_driver(UPSINFO *ups, char *drvname)
 
     write_lock(ups);
 
+    Dmsg1(99, "Looking for driver: %s\n", drvname);
     ups->driver = NULL;
     for (i=0; drivers[i].driver_name; i++) {
         Dmsg1(99, "Driver %s is configured.\n", drivers[i].driver_name);
