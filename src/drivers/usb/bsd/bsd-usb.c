@@ -416,8 +416,12 @@ bool pusb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
     char data[20];
     int exponent, len, value;
     const char* str;
-    
-    if (!UPS_HAS_CAP(ci))
+
+    /*
+     * Note we need to check info since CI_STATUS is always true
+     * even when the UPS doesn't directory support that CI.
+     */
+    if (!UPS_HAS_CAP(ci) || !info)
         return false;                 /* UPS does not have capability */
 
     /* Fetch the proper report */
