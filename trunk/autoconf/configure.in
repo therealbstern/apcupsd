@@ -1358,8 +1358,14 @@ mandrake)
 		platforms/mandrake/awkhaltprog"
   ;;
 redhat)
-	DISTVER=`cat /etc/redhat-release | grep release |\
-		 cut -f 5 -d ' '`
+	if test `cat /etc/redhat-release | grep release |\
+		   cut -f 3 -d ' '`x = "Enterprise"x ; then
+	   DISTVER="Enterprise "`cat /etc/redhat-release | grep release |\
+		    cut -f 6 -d ' '`
+	else
+	    DISTVER=`cat /etc/redhat-release | grep release |\
+		     cut -f 5 -d ' '`
+	fi
 	DFILES="\
 		platforms/redhat/Makefile \
 		platforms/redhat/apcupsd \
