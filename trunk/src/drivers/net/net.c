@@ -388,7 +388,12 @@ int net_ups_open(UPSINFO *ups)
 
 int net_ups_close(UPSINFO *ups) 
 {
+    if (ups->driver_internal_data == NULL)
+        return 1;
+
     free(ups->driver_internal_data);
+    ups->driver_internal_data = NULL;
+
     /*
      * Fake core code. Will go away when ups->fd will be cleaned up.
      */
