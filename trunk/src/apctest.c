@@ -265,8 +265,9 @@ int main (int argc, char *argv[]) {
     /*
      * parse_options is self messaging on errors, so we need only to exit()
      */
-    if (parse_options(argc, argv))
+    if (parse_options(argc, argv)) {
 	exit(1);
+    }
 
     pmsg("\n\n");
     ptime();
@@ -282,6 +283,9 @@ int main (int argc, char *argv[]) {
     }
 
     pmsg("Attached to driver: %s\n", ups->driver->driver_name);        
+
+    insertUps(ups);
+    ups->start_time = time(NULL);
 
     /* Print configuration */
     switch(ups->sharenet.type) {
@@ -455,9 +459,7 @@ int main (int argc, char *argv[]) {
        }
     }
 
-
     delete_lockfile(ups);
-
 
     switch(ups->sharenet.type) {
 	case DISABLE:
@@ -1159,12 +1161,25 @@ Please select the function you want to perform.\n");
                   pmsg("Name must be between 1 and 8 characters long.\n");
 		  break;
 	       }
-	       update_battery_date = 1;
+	       update_battery_date = 0;
 	       configure_ups = 0;
 	       rename_ups = 1;
+	       strcpy(ups->upsname, cmd);
 	       apcsmart_ups_program_eeprom(ups);
 	       break;
 	    case 4:
+               pmsg("The EEPROM values to be changed will be taken from\n"
+                    "the configuration directives in your apcupsd.conf file.\n");
+               cmd = get_cmd("Do you want to continue? (Y/N): ");
+               if (*cmd != 'y' && *cmd != 'Y') {
+                  pmsg("EEPROM changes NOT made.\n");
+		  break;
+	       }
+	       update_battery_date = 0;
+	       configure_ups = 1;
+	       rename_ups = 0;
+	       strcpy(ups->upsname, cmd);
+	       apcsmart_ups_program_eeprom(ups);
 	       break;
 	    case 5:
 	       quit = TRUE;
@@ -1489,36 +1504,45 @@ static void print_valid_eeprom_values(UPSINFO *ups)
 {
     int i, j, k, l;
     char *p;
-    char val[10];
+    char val[100];;
 
-    printf("\nValid EPROM values for the %s\n\n", ups->mode.long_name);
+    pmsg("\nValid EEPROM values for the %s\n\n", ups->mode.long_name);
 
     memcpy(&eeprom_ups, ups, sizeof(UPSINFO));
 
-    printf("%-24s %-12s  %-6s  %s\n", "           ", "Config",   "Current", "Permitted");
-    printf("%-24s %-12s  %-6s  %s\n", "Description", "Directive","Value  ", "Values");
-    printf("===================================================================\n");
+    pmsg("%-24s %-12s  %-6s  %s\n", "           ", "Config",   "Current", "Permitted");
+    pmsg("%-24s %-12s  %-6s  %s\n", "Description", "Directive","Value  ", "Values");
+    pmsg("===================================================================\n");
     for (i=0; i<ncmd; i++) {
        for (j=0; cmd_table[j].cmd; j++) {
 	  if (cmd[i].cmd == cmd_table[j].cmd) {
-             if (cmd_table[j].type == 'c') 
+             if (cmd_table[j].type == 'c') {
                 sprintf(val, "%s", (char *)cmd_table[j].data);
-	     else
+	     } else {
                 sprintf(val, "%d", *cmd_table[j].data);
-             printf("%-24s %-12s  %-6s   ", cmd_table[j].descript, 
+	     }
+             pmsg("%-24s %-12s  %-6s   ", cmd_table[j].descript, 
 		     cmd_table[j].config_directive, val);
 	     p = cmd[i].cmdvals;
 	     for (k=cmd[i].num; k; k--) {
-		for (l=cmd[i].size; l; l--)
-                   printf("%c", *p++);
-                printf(" ");
+		for (l=cmd[i].size; l; l--) {
+                   pmsg("%c", *p++);
+		}
+                pmsg(" ");
 	     }
-             printf("\n");
+             pmsg("\n");
 	     break;
 	  }
        }
     }
-    printf("\n");
+    pmsg("===================================================================\n");
+    tcflush(ups->fd, TCIOFLUSH);
+    smart_poll('Y', ups);
+    smart_poll('Y', ups);
+
+    pmsg("Battery date: %s\n", smart_poll(ups->UPS_Cmd[CI_BATTDAT], ups));
+    pmsg("UPS Name    : %s\n", smart_poll(ups->UPS_Cmd[CI_IDEN], ups));
+    pmsg("\n");
 }
 
 /*
@@ -1565,25 +1589,33 @@ static void print_eeprom_values(UPSINFO *ups)
 {
     char locale, locale1, locale2;
 
-    if (!ups->UPS_Cap[CI_EPROM])
+    pmsg("Doing prep_device() ...\n");
+    prep_device(ups);
+    if (!ups->UPS_Cap[CI_EPROM]) {
        Error_abort0("Your model does not support EPROM programming.\n");
-    if (ups->UPS_Cap[CI_REVNO])
+    }
+    if (ups->UPS_Cap[CI_REVNO]) {
        locale1 = *(ups->firmrev + strlen(ups->firmrev) - 1);
-    else  
+    } else {
        locale1 = 0;
-    if (ups->UPS_Cap[CI_UPSMODEL])
+    }
+    if (ups->UPS_Cap[CI_UPSMODEL]) {
        locale2 = *(ups->upsmodel + strlen(ups->upsmodel) - 1);
-    else
+    } else {
        locale2 = 0;
+    }
 
-    if (locale1 == locale2 && locale1 == 0)
+    if (locale1 == locale2 && locale1 == 0) {
        Error_abort0("Your model does not support EPROM programming.\n");
-    if (locale1 == locale2)
+    }
+    if (locale1 == locale2) {
 	locale = locale1;
-    if (locale1 == 0)
+    }
+    if (locale1 == 0) {
 	locale = locale2;
-    else 
+    } else {
 	locale = locale1;
+    }
     parse_eeprom_cmds(ups->eprom, locale);
     print_valid_eeprom_values(ups);
 }

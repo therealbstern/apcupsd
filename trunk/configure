@@ -8305,6 +8305,10 @@ do
 	fi
 done
 
+# set Windows (cygwin) build flags to null
+WCFLAGS=
+WLDFLAGS=
+
 # set the default PWRFAILDIR
 PWRFAILDIR=${sysconfdir}
 
@@ -8351,8 +8355,8 @@ cygwin)
 	SERIALDEV=/dev/com1
 	LOGDIR=/apcupsd/etc/apcupsd
 	nologdir=/apcupsd/etc
-	CFLAGS="${CFLAGS} -mwindows"
-	LDFLAGS="${LDFLAGS} -mwindows"
+	WCFLAGS="-mwindows"
+	WLDFLAGS="-mwindows"
 	PWRFAILDIR=/apcupsd/etc        
 	PIDDIR=/apcupsd/etc/apcupsd
 	PTHREAD_CFLAGS=""
@@ -8691,6 +8695,7 @@ cat >> confdefs.h <<EOF
 EOF
 
 
+   
 
 
 
@@ -9064,6 +9069,8 @@ s%@NISPORT@%$NISPORT%g
 s%@UPSTYPE@%$UPSTYPE%g
 s%@UPSCABLE@%$UPSCABLE%g
 s%@HOST@%$HOST%g
+s%@WCFLAGS@%$WCFLAGS%g
+s%@WLDFLAGS@%$WLDFLAGS%g
 /@VARIABLES@/r $VARIABLES
 s%@VARIABLES@%%g
 /@TARGETS@/r $TARGETS

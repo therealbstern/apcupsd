@@ -1,10 +1,15 @@
              Technical notes on version 3.10.6
-                       21 March 2003
+                       29 March 2003
                         Kern Sibbald
 
 General:
 
 Changes submitted this submission:
+29Mar03
+- Modify all Win32 program so that only windowed programs
+  (apcupsd, popup) have the -mwindows flags. The others do not.
+- Tweak apctest.c a bit -- add EEPROM programming (still a bit
+  kludgy), but at least it can be done.
 21Mar03
 - Lots of clean ups for Cygwin stuff. Events now work, and exit.
 - Clean up a few undefined symbols in building with everything on.

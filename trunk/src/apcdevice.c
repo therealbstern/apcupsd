@@ -83,15 +83,14 @@ static int device_wait_time(UPSINFO *ups);
 /*********************************************************************/
 void setup_device(UPSINFO *ups)
 {
-    if (!UPS_ISSET(UPS_DEV_SETUP)) {
-	/*
-	 * Marko Sakari Asplund <Marko.Asplund@cern.ch>
-	 *    prevents double init of UPS device 9/25/98
-	 */
-	UPS_SET(UPS_DEV_SETUP);
-    } else {
-        Error_abort0(_("Serial port already initialized.\n"));
+    /*
+     * Marko Sakari Asplund <Marko.Asplund@cern.ch>
+     *	  prevents double init of UPS device 9/25/98
+     */
+    if (UPS_ISSET(UPS_DEV_SETUP)) {
+	return;
     }
+    UPS_SET(UPS_DEV_SETUP);
 
     device_open(ups);
 
@@ -105,11 +104,6 @@ void setup_device(UPSINFO *ups)
 	device_close(ups);
         Error_abort0(_("Unable to create UPS lock file.\n"));
     }
-
-    /*
-     * No need to init_signals here as it was inited by main().
-     */
-    /* init_signals(terminate); */
 
     device_setup(ups);
 
