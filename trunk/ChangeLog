@@ -6,9 +6,15 @@
 /***************************************************************************/
 
 
-----> Release 3.10.16 xxOct04
+----> Release 3.10.16 04Nov04
 - Adam has fixed the killpower problem for USB so that the
   USB now properly turns off the power. Nice job!
+- Converted manual from docbook to texinfo format. There is some
+  cleanup to be done, but we get an index!
+- Thanks to Adam for converting the .png images to .pdf
+- Apply patch to fix aastr... supplied by Manfred Schwarb.
+- Changed Solaris to use mailx by default at the suggestion of
+  Neil Brookins.
 - Added Adam's snoopdecode.c to examples that allows viewing
   USB events.
 - A number of typos fixed in apccontrol files.
