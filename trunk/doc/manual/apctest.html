@@ -69,6 +69,49 @@ case, please also include information on your operating system,
 which version of <b>apcupsd</b> you are using, your UPS model,
 and also your <b>apcupsd.conf</b> file.
 
+<h2>Expected apctest Signals for a Dumb UPS</h2>
+If you have configured your UPS as:
+<pre>
+UPSTYPE backups
+UPSCABLE APC_940_0119A
+      or APC_940_0127A
+      or APC_940_0128A
+      or APC_940_0020B
+      or APC_940_0020C
+</pre>
+here are typical signals you would expect to see in the output
+from the various tests of apctest:
+<pre>
+<b>Test 1</b> normal:              RTS for cables (0119A 0127A 0128A)
+<b>Test 2</b> no serial cable:     not important
+<b>Test 3</b> no AC power:         <b>CTS</b> for all cables
+<b>Test 4</b> batteries exhausted: <b>CTS</b> and <b>CD</b> for all cables
+</pre>
+Note: <b>RTS</b> if set in Test 1 will probably also be set in
+all the other tests. This is not important, what counts
+is the appearance of <b>CTS</b> when the power fails and additionally
+<b>CD</b> when the batteries are low.
+
+<h2>Expected apctest Signals for a BackUPS Pro</h2>
+If you have configured your UPS as:
+<pre>
+UPSTYPE backupspro
+UPSCABLE APC_940_0095A
+      or APC_940_0095C
+</pre>
+here are the typical signals you would expect to see in
+the output from the various tests of apctest:
+<pre>
+<b>Test 1</b> normal:              RTS not set
+<b>Test 2</b> no serial cable:     not important
+<b>Test 3</b> no AC power:         <b>RNG</b> 
+<b>Test 4</b> batteries exhausted: <b>RNG</b> and <b>CD</b>
+</pre>
+Note: <b>RTS</b> should never be set in any of the tests as
+it is the killpower signal. What is important
+is the appearance of <b>RNG</b> when the power fails and additionally
+<b>CD</b> when the batteries are low.
+
 <h2>Running apctest for a Smart UPS</h2>
 <p>
 Shutdown apcupsd if it is running.<br>
