@@ -72,7 +72,7 @@ int output_status(UPSINFO *ups, int sockfd,
     time_t now = time(NULL);
     int time_on_batt;
     struct tm tm;
-    int StatFlag;
+    char status[100];
 
     s_open(ups);
 
@@ -102,7 +102,7 @@ int output_status(UPSINFO *ups, int sockfd,
     }
 
     /* If slave, send last update time/date from master */
-    if (ups->fd == -1) {	  /* we must be a slave */
+    if (UPS_ISSET(UPS_SLAVE)) {	  /* we must be a slave */
        if (ups->last_master_connect_time == 0) {
           s_write(ups, "MASTERUPD: No connection to Master\n");
        } else {
@@ -112,78 +112,60 @@ int output_status(UPSINFO *ups, int sockfd,
        }
     }
 
-    StatFlag = ups->Status;
-    if (ups->CommLost) {
-	StatFlag &= ~UPS_ONLINE;      /* clear online */
-	StatFlag |= UPS_COMMLOST;     /* set comm lost */
-    }
-    if (ups->ShutDown) {
-	StatFlag |= UPS_SHUTDOWN;
-    }
-    if (ups->fd == -1) {	      /* we are a slave */
-	/* Construct status flag */
-	StatFlag |= UPS_SLAVE;
-	if (ups->OnBatt) {
-	    StatFlag |= UPS_ONBATT;
-	} else {
-	    if (!ups->CommLost)
-		StatFlag |= UPS_ONLINE;
-	}
-	if (ups->BattLow) {
-	    StatFlag |= UPS_BATTLOW;
-	}
-	if (ups->ChangeBatt) {
-	   StatFlag |= UPS_REPLACEBATT;
-	}
-    }
     switch(ups->mode.type) {
     case BK:
     case SHAREBASIC:
     case NETUPS:
-	if (ups->ChangeBatt) {
-	    StatFlag |= UPS_REPLACEBATT;
-	}
-	if (!ups->OnBatt) {
+	if (!UPS_ISSET(UPS_ONBATT)) {
             s_write(ups, "LINEFAIL : OK\n");
             s_write(ups, "BATTSTAT : OK\n");
-	    StatFlag |= UPS_ONLINE;
 	} else {
             s_write(ups, "LINEFAIL : DOWN\n");
-	    if (!ups->BattLow) {
+	    if (!UPS_ISSET(UPS_BATTLOW)) {
                 s_write(ups, "BATTSTAT : RUNNING\n");
-		StatFlag |= UPS_ONBATT;
 	    } else {
                 s_write(ups, "BATTSTAT : FAILING\n");
-		StatFlag |= UPS_BATTLOW;
 	    }
 	}
 
-        s_write(ups, "STATFLAG : 0x%03X Status Flag\n", StatFlag);
+        s_write(ups, "STATFLAG : 0x%08X Status Flag\n", ups->Status);
 	break;
     case BKPRO:
     case VS:
-	if (ups->OnBatt == 0) {
+	if (!UPS_ISSET(UPS_ONBATT)) {
             s_write(ups, "LINEFAIL : OK\n");
             s_write(ups, "BATTSTAT : OK\n");
-	    StatFlag |= UPS_ONLINE;
-	    if (ups->LineLevel == -1) {
+	    if (UPS_ISSET(UPS_SMARTBOOST)) {
                 s_write(ups, "LINEVOLT : LOW\n");
-	    } else if (ups->LineLevel == 1) {
+	    } else if (UPS_ISSET(UPS_SMARTTRIM)) {
                 s_write(ups, "LINEVOLT : HIGH\n");
 	    } else {
                 s_write(ups, "LINEVOLT : OK\n");
 	    }
 	} else {
-            s_write(ups, "LINEFAIL : DOWN\n");
-	    if (ups->BattLow == 0) {
-                s_write(ups, "BATTSTAT : RUNNING\n");
-		StatFlag |= UPS_ONBATT;
-	    } else {
-                s_write(ups, "BATTSTAT : FAILING\n");
-		StatFlag |= UPS_BATTLOW;
+        s_write(ups, "LINEFAIL : DOWN\n");
+        if (!UPS_ISSET(UPS_BATTLOW)) {
+            s_write(ups, "BATTSTAT : RUNNING\n");
+        } else {
+            s_write(ups, "BATTSTAT : FAILING\n");
 	    }
 	}
-        s_write(ups, "STATFLAG : 0x%03X Status Flag\n", StatFlag);
+    /*
+     * If communication is lost the only valid flag at this point
+     * is UPS_COMMLOST and all the other flags are possibly wrong.
+     * For this reason the old code used to override UPS_ONLINE zeroing
+     * It for printing purposes.
+     * But this needs more careful checking and may be this is not what
+     * we want. After all when UPS_COMMLOST is asserted the other flags
+     * contain interesting information about the last known state of UPS
+     * and Kern's intention is to use them to infer the next action of
+     * a disconnected slave. Personally I think this can be true also
+     * when apcupsd loses communication over any other kind of transport
+     * like serial or usb or others.
+     *
+     * -RF
+     */
+        s_write(ups, "STATFLAG : 0x%08X Status Flag\n", ups->Status);
 	/* Note! Fall through is wanted */
     case NBKPRO:
     case SMART:
@@ -193,37 +175,34 @@ int output_status(UPSINFO *ups, int sockfd,
     case TEST_UPS:
     case DUMB_UPS:
     case NETWORK_UPS:
-	if (ups->UPS_Cap[CI_STATUS] || ups->fd == -1) {
-	    char status[100];
 	    status[0] = 0;
 	    /* Now output human readable form */
-	    if (StatFlag & UPS_CALIBRATION) 
+	    if (UPS_ISSET(UPS_CALIBRATION))
                 strcat(status, "CAL ");
-	    if (StatFlag & UPS_SMARTTRIM)
+	    if (UPS_ISSET(UPS_SMARTTRIM))
                 strcat(status, "TRIM ");
-	    if (StatFlag & UPS_SMARTBOOST)
+	    if (UPS_ISSET(UPS_SMARTBOOST))
                 strcat(status, "BOOST ");
-	    if (StatFlag & UPS_ONLINE)
+	    if (UPS_ISSET(UPS_ONLINE))
                 strcat(status, "ONLINE ");
-	    if (StatFlag & UPS_ONBATT) 
+	    if (UPS_ISSET(UPS_ONBATT))
                 strcat(status, "ONBATT ");
-	    if (StatFlag & UPS_OVERLOAD)
+	    if (UPS_ISSET(UPS_OVERLOAD))
                 strcat(status, "OVERLOAD ");
-	    if (StatFlag & UPS_BATTLOW) 
+	    if (UPS_ISSET(UPS_BATTLOW))
                 strcat(status, "LOWBATT ");
-	    if (StatFlag & UPS_REPLACEBATT)
+	    if (UPS_ISSET(UPS_REPLACEBATT))
                 strcat(status, "REPLACEBATT ");
-	    if (StatFlag & UPS_SLAVE)
+	    if (UPS_ISSET(UPS_SLAVE))
                 strcat(status, "SLAVE ");
-	    if (StatFlag & UPS_SLAVEDOWN)
+	    if (UPS_ISSET(UPS_SLAVEDOWN))
                 strcat(status, "SLAVEDOWN");
 	    /* These override the above */
-	    if (ups->CommLost)
+	    if (UPS_ISSET(UPS_COMMLOST))
                 strcpy(status, "COMMLOST ");
-	    if (ups->ShutDown)
+	    if (UPS_ISSET(UPS_SHUTDOWN))
                 strcpy(status, "SHUTTING DOWN");
             s_write(ups, "STATUS   : %s\n", status);
-	} 
 
 	if (ups->UPS_Cap[CI_VLINE]) {
             s_write(ups, "LINEV    : %05.1f Volts\n", ups->LineVoltage);
@@ -351,7 +330,7 @@ int output_status(UPSINFO *ups, int sockfd,
             strftime(datetime, 100, "%a %b %d %X %Z %Y", &tm);
             s_write(ups, "XONBATT  : %s\n", datetime);
 	}
-	if (ups->OnBatt && ups->last_onbatt_time > 0)
+	if (UPS_ISSET(UPS_ONBATT) && ups->last_onbatt_time > 0)
 	    time_on_batt = now - ups->last_onbatt_time;
 	else
 	    time_on_batt = 0;
@@ -380,7 +359,7 @@ int output_status(UPSINFO *ups, int sockfd,
             s_write(ups, "STESTI   : %s\n", ups->selftest);
 
 	/* output raw bits */
-        s_write(ups, "STATFLAG : 0x%03X Status Flag\n", StatFlag);
+        s_write(ups, "STATFLAG : 0x%08X Status Flag\n", ups->Status);
 
 	if (ups->UPS_Cap[CI_DIPSW])
             s_write(ups, "DIPSW    : 0x%02X Dip Switch\n", ups->dipsw);
@@ -495,7 +474,7 @@ char *ups_status(int stat)
          Error_abort0(_("Cannot read shm data area.\n"));
     }
 
-    if (ups->OnBatt == 0)
+    if (!UPS_ISSET(UPS_ONBATT))
        battstat = 100;
     else
        battstat = 0;
@@ -506,7 +485,7 @@ char *ups_status(int stat)
     case NETUPS:
     case BKPRO:
     case VS:
-	if (ups->OnBatt == 0) {
+	if (!UPS_ISSET(UPS_ONBATT)) {
             strcpy(buf, "ONLINE");
 	} else {
             strcpy(buf, "ON BATTERY");
@@ -520,34 +499,25 @@ char *ups_status(int stat)
     case TEST_UPS:
     case DUMB_UPS:
     case NETWORK_UPS:
-	if (ups->UPS_Cap[CI_STATUS] || ups->fd == -1) {
 	    buf[0] = 0;
 	    /* Now output human readable form */
-	    if (ups->Status & UPS_CALIBRATION) 
+	    if (UPS_ISSET(UPS_CALIBRATION))
                 strcat(buf, "CAL ");
-	    if (ups->Status & UPS_SMARTTRIM)
+	    if (UPS_ISSET(UPS_SMARTTRIM))
                 strcat(buf, "TRIM ");
-	    if (ups->Status & UPS_SMARTBOOST)
+	    if (UPS_ISSET(UPS_SMARTBOOST))
                 strcat(buf, "BOOST ");
-	    if (ups->Status & UPS_ONLINE)
+	    if (UPS_ISSET(UPS_ONLINE))
                 strcat(buf, "ONLINE ");
-	    if (ups->Status & UPS_ONBATT) 
+	    if (UPS_ISSET(UPS_ONBATT))
                 strcat(buf, "ON BATTERY ");
-	    if (ups->Status & UPS_OVERLOAD)
+	    if (UPS_ISSET(UPS_OVERLOAD))
                 strcat(buf, "OVERLOAD ");
-	    if (ups->Status & UPS_BATTLOW) 
+	    if (UPS_ISSET(UPS_BATTLOW))
                 strcat(buf, "LOWBATT ");
-	    if (ups->Status & UPS_REPLACEBATT)
+	    if (UPS_ISSET(UPS_REPLACEBATT))
                 strcat(buf, "REPLACEBATT ");
-
-	} else {      /* probably slave, just use OnBatt */
-	    if (ups->OnBatt == 0) {
-                strcpy(buf, "ONLINE");
-	    } else {
-                strcpy(buf, "ON BATTERY");
-	    }
-	}
-	if (ups->OnBatt == 0 && ups->UPS_Cap[CI_BATTLEV])
+	if (!UPS_ISSET(UPS_ONBATT) && ups->UPS_Cap[CI_BATTLEV])
 	    battstat = (int)ups->BattChg;
 	break;
     }

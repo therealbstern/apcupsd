@@ -6,6 +6,9 @@
 /*               ftp://ftp.apcupsd.com                                     */
 /***************************************************************************/
 
+    - Restructured UPSINFO so that now all the flags are contained
+      into the Status bitmap.
+    - *BSD should compile cleanly again.
     - Source tree is now under CVS revision control.
     - Added support for listening on specific IP addresses/subnets in
       NIS server, from Troy.

@@ -145,7 +145,7 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
      *	not have interrupts like the smarter devices
      */
     if (ups->wait_time > TIMER_DUMB) {
-       ups->wait_time = TIMER_DUMB;
+        ups->wait_time = TIMER_DUMB;
     }
     sleep(ups->wait_time);
 
@@ -156,57 +156,116 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
     case BK:
     case SHAREBASIC: 
     case NETUPS:
-       BattFail = !!(ups->sp_flags & TIOCM_DTR);
+        if (ups->sp_flags & TIOCM_DTR) {
+            BattFail = 1;
+        } else {
+            BattFail = 0;
+        }
        break;
     default:
        break;
     }
+
     switch(ups->cable.type) {
 	case CUSTOM_SIMPLE:
-	    ups->OnBatt   = !!(ups->sp_flags & TIOCM_CD);
-	    ups->BattLow  = !(ups->sp_flags & TIOCM_CTS);
-	    ups->LineDown = !!(ups->sp_flags & TIOCM_SR);
+        /*
+         * This is the ONBATT signal sent by UPS.
+         */
+	    if (ups->sp_flags & TIOCM_CD) {
+            UPS_SET(UPS_ONBATT);
+        } else {
+            UPS_CLEAR(UPS_ONBATT);
+        }
+        /*
+         * This is the ONLINE signal that is delivered
+         * by CUSTOM_SIMPLE cable. We use the UPS_ONLINE flag
+         * to report this condition to apcaction.
+         * If we are both ONBATT and ONLINE there is clearly
+         * something wrong with battery or charger. Set also the
+         * UPS_REPLACEBATT flag if needed.
+         */
+        if (ups->sp_flags & TIOCM_SR) {
+            UPS_CLEAR(UPS_ONLINE);
+        } else {
+            UPS_SET(UPS_ONLINE);
+        }
+        if (UPS_ISSET(UPS_ONLINE) && UPS_ISSET(UPS_ONBATT)) {
+            BattFail = 1;
+        } else {
+            BattFail = 0;
+        }
+        if (!(ups->sp_flags & TIOCM_CTS)) {
+            UPS_SET(UPS_BATTLOW);
+        } else {
+            UPS_CLEAR(UPS_BATTLOW);
+        }
 	    break;
 
 	case APC_940_0119A:
 	case APC_940_0020B:
 	case APC_940_0020C:
-	    ups->OnBatt   = !!(ups->sp_flags & TIOCM_CTS);
-	    ups->BattLow  = !!(ups->sp_flags & TIOCM_CD);
-	    ups->LineDown = 0;
+	    if (ups->sp_flags & TIOCM_CTS) {
+            UPS_CLEAR_ONLINE();
+        } else {
+            UPS_SET_ONLINE();
+        }
+        if (ups->sp_flags & TIOCM_CD) {
+            UPS_SET(UPS_BATTLOW);
+        } else {
+            UPS_CLEAR(UPS_BATTLOW);
+        }
 	    break;
 
 	case APC_940_0023A:
-	    ups->OnBatt   = !!(ups->sp_flags & TIOCM_CD);
+	    if (ups->sp_flags & TIOCM_CD) {
+            UPS_CLEAR_ONLINE();
+        } else {
+            UPS_SET_ONLINE();
+        }
 
 	    /* BOGUS STUFF MUST FIX IF POSSIBLE */
 
-	    ups->BattLow  = !!(ups->sp_flags & TIOCM_SR);
-
-	    /* BOGUS STUFF MUST FIX IF POSSIBLE */
-
-	    ups->LineDown = 0;
+        if (ups->sp_flags & TIOCM_SR) {
+            UPS_SET(UPS_BATTLOW);
+        } else {
+            UPS_CLEAR(UPS_BATTLOW);
+        }
 	    break;
 
 	case APC_940_0095A:
 	case APC_940_0095C:
-	    ups->OnBatt   = !!(ups->sp_flags & TIOCM_RNG);
-	    ups->BattLow  = !!(ups->sp_flags & TIOCM_CD);
-	    ups->LineDown = 0;
+	    if (ups->sp_flags & TIOCM_RNG) {
+            UPS_CLEAR_ONLINE();
+        } else {
+            UPS_SET_ONLINE();
+        }
+        if (ups->sp_flags & TIOCM_CD) {
+            UPS_SET(UPS_BATTLOW);
+        } else {
+            UPS_CLEAR(UPS_BATTLOW);
+        }
 	    break;
 
 	case APC_940_0095B:
-	    ups->OnBatt   = !!(ups->sp_flags & TIOCM_RNG);
-	    ups->LineDown = 0;
-	    ups->Status = (ups->OnBatt ? UPS_ONBATT : UPS_ONLINE) | 
-		(ups->BattLow ? UPS_BATTLOW : 0);
+	    if (ups->sp_flags & TIOCM_RNG) {
+            UPS_CLEAR_ONLINE();
+        } else {
+            UPS_SET_ONLINE();
+        }
 	    break;
 
 	case MAM_CABLE:
-	    ups->OnBatt  = !(ups->sp_flags & TIOCM_CTS);
-	    ups->BattLow = !(ups->sp_flags & TIOCM_CD);
-	    ups->LineDown = 0;
-	    break;
+        if (!(ups->sp_flags & TIOCM_CTS)) {
+            UPS_CLEAR_ONLINE();
+        } else {
+            UPS_SET_ONLINE();
+        }
+        if (!(ups->sp_flags & TIOCM_CD)) {
+            UPS_SET(UPS_BATTLOW);
+        } else {
+            UPS_CLEAR(UPS_BATTLOW);
+        }
+        break;
 
 	case CUSTOM_SMART:
 	case APC_940_0024B:
@@ -215,12 +274,14 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
 	case APC_940_0024G:
 	case APC_NET:
 	default:
-	    stat = 0;
+        stat = 0;
     }
-    ups->ChangeBatt = ups->OnBatt && BattFail;
-    ups->Status = (ups->OnBatt ? UPS_ONBATT : UPS_ONLINE) | 
-	(ups->BattLow ? UPS_BATTLOW : 0) |
-	(ups->ChangeBatt ? UPS_REPLACEBATT : 0);
+
+    if (UPS_ISSET(UPS_ONBATT) && BattFail) {
+        UPS_SET(UPS_REPLACEBATT);
+    } else {
+        UPS_CLEAR(UPS_REPLACEBATT);
+    }
 
     write_unlock(ups);
 
@@ -247,7 +308,7 @@ int dumb_ups_entry_point(UPSINFO *ups, int command, void *data)
 		 *
 		 * Now enable the DTR for the CUSTOM_SIMPLE cable
 		 * Note: this enables the the CTS bit, which allows
-		 * us to detect the BattLow condition!!!!
+		 * us to detect the UPS_BATTLOW condition!!!!
 		 */
 		serial_bits = TIOCM_DTR;
 		(void)ioctl(ups->fd, TIOCMBIS, &serial_bits);

@@ -360,11 +360,12 @@ int main(int argc, char *argv[]) {
     }
 
     if (kill_ups_power) {
-	if (ups->fd != -1)
-	    kill_power(ups);
-	else
-	    kill_net(ups);
-	terminate(0);
+        if (!UPS_ISSET(UPS_SLAVE)) {
+            kill_power(ups);
+        } else {
+            kill_net(ups);
+        }
+        terminate(0);
     }
 
     /*
@@ -388,15 +389,15 @@ int main(int argc, char *argv[]) {
 
     init_signals(terminate);
 
-    if (ups->fd != -1) {
-	prep_device(ups);
+    if (!UPS_ISSET(UPS_SLAVE)) {
+        prep_device(ups);
         /* This isn't a documented option but can be used
-	 * for testing dumb mode on a SmartUPS if you have
-	 * the proper cable.
-	 */
-	if (dumb_mode_test) {
-	    device_entry_point(ups, DEVICE_CMD_SET_DUMB_MODE, NULL);
-	}
+         * for testing dumb mode on a SmartUPS if you have
+         * the proper cable.
+         */
+        if (dumb_mode_test) {
+            device_entry_point(ups, DEVICE_CMD_SET_DUMB_MODE, NULL);
+        }
     }
 
     shm_OK = 1;
@@ -425,16 +426,16 @@ int main(int argc, char *argv[]) {
     /* If we have threads, we simply go there rather
      * than creating a thread.
      */
-    if (ups->fd != -1) {
-	/* serial port reading and report generation -- apcserial.c */
-	do_device(ups);
+    if (!UPS_ISSET(UPS_SLAVE)) {
+        /* serial port reading and report generation -- apcserial.c */
+        do_device(ups);
     } else {
         /* we are a slave -- thus the net is our "serial port" */
-	do_net(ups);
+        do_net(ups);
     }
 #else
-    if (ups->fd != -1) {
-	/* serial port reading and report generation -- apcserial.c */
+    if (!UPS_ISSET(UPS_SLAVE)) {
+        /* serial port reading and report generation -- apcserial.c */
         serial_pid = start_thread(ups, do_device, "apcdev", argv[0]); 
     } else {
         /* we are a slave -- thus the net is our "serial port" */

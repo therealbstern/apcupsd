@@ -229,7 +229,7 @@ typedef struct netdata {
  * risk to have users reading the shared memory with an old
  * nonvalid upsinfo structure. 
  */
-#define UPSINFO_VERSION 11
+#define UPSINFO_VERSION 12
 /*
  * There is no need to change the following, but you can if
  * you want, but it must be at least 4 characters to match
@@ -242,7 +242,6 @@ typedef struct upsinfo {
     int version;
     int size;
     char release[20];
-    int ups_connected;            /* Is this UPS physically connected ? */
 
     int fd;                       /* serial port file descriptor */
     int sp_flags;                 /* serial port flags on DUMB UPSes */
@@ -265,14 +264,6 @@ typedef struct upsinfo {
     int num_execed_children;      /* children created in execute_command() */
 
     /* Internal state flags set in response to UPS condition */
-    int OnBatt;                   /* set when UPS switches to battery power */
-    int BattLow;                  /* set if battery charge is low */
-    int LineDown;
-    int ChangeBatt;               /* set when UPS says battery should be changed */
-    int RestartDaemon;            /* set if more than 100 errors on serial port */
-    int BatteryUp;                /* set when Running on UPS message sent */
-    int CommLost;                 /* Connection to UPS lost */
-    int ShutdownImminent;         /* UPS says it is shutting down! */
     time_t ShutDown;              /* set when doing shutdown */
     time_t SelfTest;              /* start time of self test */
     time_t LastSelfTest;          /* time of last self test */
@@ -287,9 +278,6 @@ typedef struct upsinfo {
     time_t last_master_connect_time; /* last time master connected */
     int num_xfers;                /* number of times on batteries */
     int cum_time_on_batt;         /* total time on batteries since startup */
-    int OldOnBatt;
-    int OldBattLow;
-    int FastPoll;                 /* Poll UPS faster during power failure */
     int wait_time;                /* suggested wait time for drivers in 
                                    * device_check_state() 
                                    */
@@ -313,11 +301,11 @@ typedef struct upsinfo {
     double UPSTemp;               /* UPS internal temperature */
     double BattVoltage;           /* Actual Battery voltage -- about 24V */
     double LastSTTime;            /* hours since last self test -- not yet implemented */
-    unsigned int Status;          /* UPS status (Bitmapped) */
+    int32_t Status;               /* UPS status (Bitmapped) */
+    int PoweredByUPS;             /* The only bit left out from the bitmap */
     double TimeLeft;              /* Est. time UPS can run on batt. */
     double humidity;              /* Humidity */
     double ambtemp;               /* Ambient temperature */
-    int LineLevel;                /* -1=LineVoltage low; 0=normal; 1=High */
     char eprom[500];              /* Eprom values */
 
     /* Items reported by smart UPS */
@@ -345,15 +333,15 @@ typedef struct upsinfo {
     /* Items specified from config file */
     int annoy;
     int maxtime;
-    int annoydelay;                   /* delay before annoying users with logoff request */
-    int killdelay;                    /* delay after pwrfail before issuing UPS shutdown */
+    int annoydelay;      /* delay before annoying users with logoff request */
+    int killdelay;       /* delay after pwrfail before issuing UPS shutdown */
     int nologin_time;
     int nologin_file;
     int stattime;
     int datatime;
     int sysfac;
     int reports;
-    int nettime;                     /* Time interval for master to send to slaves */
+    int nettime;         /* Time interval for master to send to slaves */
     int percent;                     /* shutdown when batt % less than this */
     int runtime;                     /* shutdown when runtime less than this */
     char nisip[64];                  /* IP for NIS */
@@ -374,13 +362,7 @@ typedef struct upsinfo {
     int lockfile;                    /* BSC */
 
     char usermagic[APC_MAGIC_SIZE];  /* security id string */
-
-    /* reasons for shutdown */
-    int load;                        /* set when BatLoad <= percent */
-    int timedout;                    /* set when time on batts > maxtime */
-    int timelout;                    /* set when TimeLeft <= runtime */
-    int emergencydown;               /* battery power has failed */
-    int remotedown;                  /* remote shutdown */
+    int ChangeBattCounter;           /* For UPS_REPLACEBATT, see apcaction.c */
 
     int remote_state;                /**/
 
@@ -390,8 +372,6 @@ typedef struct upsinfo {
      * reserved and all the new variables are at the end of the structure.
      */
     char upsname[UPSNAMELEN];   /* UPS config name */
-    int PoweredByUPS;           /* Flag: is this UPS local or remote ?  */
-    int has_done_setup;         /* setup_serial already done */
 
 #ifndef HAVE_PTHREADS
     /*

@@ -13,6 +13,7 @@
 #include <string.h>
 #include <sys/time.h>
 
+#include "cgiconfig.h"
 #include "upsfetch.h"
 
 char   monhost[256];

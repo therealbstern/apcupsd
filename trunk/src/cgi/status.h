@@ -37,18 +37,3 @@ struct {
         { "SLAVE",      "SLAVE",                0       },
         { NULL,         NULL,                   0       }
 };
-
-
-/* bit values for APC UPS Status Byte (ups->Status) */
-#define UPS_CALIBRATION   0x001
-#define UPS_SMARTTRIM     0x002
-#define UPS_SMARTBOOST    0x004
-#define UPS_ONLINE        0x008
-#define UPS_ONBATT        0x010
-#define UPS_OVERLOAD      0x020
-#define UPS_BATTLOW       0x040
-#define UPS_REPLACEBATT   0x080
-/* Extended bit values added by apcupsd */
-#define UPS_COMMLOST      0x100          /* Communications lost */
-#define UPS_SHUTDOWN      0x200          /* Shutdown in progress */
-#define UPS_SLAVE         0x400          /* Slave */
