@@ -33,9 +33,6 @@ install:
 	@echo "Installing symlinks..."
 	/usr/sbin/update-rc.d apcupsd start 20 1 2 3 4 5 . stop 20 0 1 6 . 
 
-	@echo "Installing Debianized apccontrol..."
-	$(INSTALL_PROGRAM) -m 744 apccontrol.sh @sysconfdir@/apccontrol
-
 	@if test -e /etc/init.d/ups-monitor; then \
 		echo "Found a pre-existing copy of /etc/init.d/ups-monitor." ; \
 		echo "Saving as /etc/init.d/ups-monitor.old..." ; \

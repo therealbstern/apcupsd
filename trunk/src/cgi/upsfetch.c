@@ -168,6 +168,7 @@ int fetch_events(char *host)
    int n, stat = 1;
    char *p;
    char lhost[200];
+   int len;
 
    statlen = 0;
    statbuf[0] = 0;
@@ -192,14 +193,32 @@ int fetch_events(char *host)
       return 0;
    }
    /*
-    * Now read the events
+    * Now read the events and invert them for the list box,
+    * with most recend event at the beginning.	
+    * by dg2fer.  
     */
    while ((n = net_recv(sockfd, buf, sizeof(buf)-1)) > 0) {
-      buf[n] = 0;
-      strcat(statbuf, buf);
+      /* terminate string for strlen()-calls in next lines */
+      if (n >= sizeof(buf)) {
+	 n = sizeof(buf)-1;
+      }
+      buf[n] = 0;			 /* ensure string terminated */
+      len = strlen(buf);
+      /* if message is bigger than the buffer, truncate it */
+      if (len < sizeof(statbuf)) {
+	 /* move previous messages to the end of the buffer */
+	 memmove(statbuf+len, statbuf, sizeof(statbuf)-len);
+	 /* copy new message */
+	 memcpy(statbuf, buf, len);
+      } else {
+	 strncpy(statbuf, buf, sizeof(statbuf)-1);
+      }
+      statbuf[sizeof(statbuf)-1] = 0;
    }
-   if (n < 0)
+
+   if (n < 0) {
       stat = 0;
+   }
    *last_host = 0;
    net_close(sockfd);
    return stat;

@@ -374,7 +374,7 @@ strdup __argz_count __argz_stringify __argz_next])
      MKINSTALLDIRS="$ac_aux_dir/mkinstalldirs"
    fi
    if test x"$MKINSTALLDIRS" = x ; then
-     MKINSTALLDIRS="\$(top_srcdir)/mkinstalldirs"
+     MKINSTALLDIRS="\$(top_srcdir)/autoconf/mkinstalldirs"
    fi
    AC_SUBST(MKINSTALLDIRS)
 
