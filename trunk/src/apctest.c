@@ -72,10 +72,8 @@ static void print_valid_eeprom_values(UPSINFO *ups);
 
 static void do_usb_testing(void);
 #ifdef HAVE_USB_DRIVER
-/* From linux-usb.c */
-bool write_int_to_ups(UPSINFO *ups, int ci, int value, char *name);
-bool read_int_from_ups(UPSINFO *ups, int ci, int* value);
-int usb_ups_get_capabilities(UPSINFO *ups);
+/* USB driver functions */
+#include "drivers/usb/usb.h"
 /* Our own test functions */
 static void usb_kill_power_test(void);
 static void usb_get_self_test_result(void);
@@ -1613,7 +1611,7 @@ Please enter any character when ready to continue: ");
 static void usb_get_self_test_result(void)
 {
    int result;
-   if (!read_int_from_ups(ups, CI_ST_STAT, &result))
+   if (!usb_read_int_from_ups(ups, CI_ST_STAT, &result))
    {
       pmsg("\nI don't know how to run a self test on your UPS\n\
 or your UPS does not support self test.\n");
@@ -1655,7 +1653,7 @@ static void usb_run_self_test(void)
    pmsg("\nThis test instructs the UPS to perform a self-test\n\
 operation and reports the result when the test completes.\n");
 
-   if (!read_int_from_ups(ups, CI_ST_STAT, &result))
+   if (!usb_read_int_from_ups(ups, CI_ST_STAT, &result))
    {
       pmsg("\nI don't know how to run a self test on your UPS\n\
 or your UPS does not support self test.\n");
@@ -1663,7 +1661,7 @@ or your UPS does not support self test.\n");
    }
    
    pmsg("\nClearing previous self test result...");
-   if (!write_int_to_ups(ups, CI_ST_STAT, 0, "SelftestStatus"))
+   if (!usb_write_int_to_ups(ups, CI_ST_STAT, 0, "SelftestStatus"))
    {
       pmsg("FAILED\n");
       return;
@@ -1671,7 +1669,7 @@ or your UPS does not support self test.\n");
    
    for (timeout=0; timeout<10; timeout++)
    {
-      if (!read_int_from_ups(ups, CI_ST_STAT, &result))
+      if (!usb_read_int_from_ups(ups, CI_ST_STAT, &result))
       {
          pmsg("FAILED\n");
          return;
@@ -1693,7 +1691,7 @@ or your UPS does not support self test.\n");
    }
 
    pmsg("Initiating self test...");
-   if (!write_int_to_ups(ups, CI_ST_STAT, 1, "SelftestStatus"))
+   if (!usb_write_int_to_ups(ups, CI_ST_STAT, 1, "SelftestStatus"))
    {
       pmsg("FAILED\n");
       return;
@@ -1705,10 +1703,10 @@ or your UPS does not support self test.\n");
    
    for (timeout=0; timeout<20; timeout++)
    {
-      if (!read_int_from_ups(ups, CI_ST_STAT, &result))
+      if (!usb_read_int_from_ups(ups, CI_ST_STAT, &result))
       {
          pmsg("ERROR READING STATUS\n");
-         write_int_to_ups(ups, CI_ST_STAT, 3, "SelftestStatus");
+         usb_write_int_to_ups(ups, CI_ST_STAT, 3, "SelftestStatus");
          return;
       }
    
@@ -1723,7 +1721,7 @@ or your UPS does not support self test.\n");
    if (timeout == 20)
    {
       pmsg("TEST DID NOT COMPLETE\n");
-      write_int_to_ups(ups, CI_ST_STAT, 3, "SelftestStatus");
+      usb_write_int_to_ups(ups, CI_ST_STAT, 3, "SelftestStatus");
       return;
    }
 
@@ -1733,7 +1731,7 @@ or your UPS does not support self test.\n");
 static int usb_get_battery_date(void)
 {
    int result;
-   if (!read_int_from_ups(ups, CI_BATTDAT, &result))
+   if (!usb_read_int_from_ups(ups, CI_BATTDAT, &result))
    {
       pmsg("\nI don't know how to access the battery date on your UPS\n\
 or your UPS does not support the battery date feature.\n");
@@ -1778,7 +1776,7 @@ static void usb_set_battery_date(void)
    result = ((year-1980) << 9) | (month << 5) | day;
 
    pmsg("Writing new date...");
-   if (!write_int_to_ups(ups, CI_BATTDAT, result, "ManufactureDate"))
+   if (!usb_write_int_to_ups(ups, CI_BATTDAT, result, "ManufactureDate"))
    {
       pmsg("FAILED\n");
       return;
@@ -1789,7 +1787,7 @@ static void usb_set_battery_date(void)
    pmsg("Waiting for change to take effect...");
    for (max=0; max<10; max++)
    {
-      if (!read_int_from_ups(ups, CI_BATTDAT, &temp))
+      if (!usb_read_int_from_ups(ups, CI_BATTDAT, &temp))
       {
          pmsg("ERROR\n");
          return;
@@ -1812,7 +1810,7 @@ static void usb_set_battery_date(void)
 static void usb_get_manf_date(void)
 {
    int result;
-   if (!read_int_from_ups(ups, CI_MANDAT, &result))
+   if (!usb_read_int_from_ups(ups, CI_MANDAT, &result))
    {
       pmsg("\nI don't know how to access the manufacturing date on your UPS\n\
 or your UPS does not support the manufacturing date feature.\n");
