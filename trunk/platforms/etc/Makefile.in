@@ -19,15 +19,14 @@ clean: targetclean
 
 install:
 	@echo "Installing apcupsd.conf..."; \
-	srcconf=$(topdir)/etc/apcupsd.conf; \
+	srcconf=$(topdir)/platforms/etc/apcupsd.conf; \
 	if test -f $(sysconfdir)/apcupsd.conf; then \
 	  dstconf=apcupsd.conf.new; \
 	  echo " Found old apcupsd.conf, installing new conf file as $$dstconf"; \
 	else \
 	  dstconf=apcupsd.conf; \
 	fi; \
-	echo "$(INSTALL_DATA) $$srcconf $(sysconfdir)/$$dstconf"; \
-		$(INSTALL_DATA) $$srcconf $(sysconfdir)/$$dstconf
+	$(INSTALL_DATA) $$srcconf $(sysconfdir)/$$dstconf
 
 uninstall:
 
