@@ -6,6 +6,7 @@
 /*               ftp://ftp.apcupsd.com                                     */
 /***************************************************************************/
 
+    - Source tree is now under CVS revision control.
     - Added support for listening on specific IP addresses/subnets in
       NIS server, from Troy.
     - Doc updates, from Kern.
