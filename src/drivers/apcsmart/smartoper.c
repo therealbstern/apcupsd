@@ -67,7 +67,6 @@ int apcsmart_ups_kill_power(UPSINFO *ups) {
                     "UPS will power off after the configured delay  ...\n");
 	log_event(ups, LOG_WARNING,
                 _("Please power off your UPS before rebooting your computer ...\n"));
-    
     } else { 
 	/*
 	 * Experiments show that the UPS needs
@@ -85,7 +84,9 @@ int apcsmart_ups_kill_power(UPSINFO *ups) {
 	sleep(1);
         a = '0';
 	write(ups->fd, &a, 1);
-	sleep(2);
+	sleep(1);
+        a = '0';
+	write(ups->fd, &a, 1);
 	getline(response, sizeof(response), ups);
         if ((strcmp(response, "OK") == 0) || (strcmp(response,"*") == 0)) {
 	    if (shutdown_delay > 0) {
@@ -119,7 +120,23 @@ int apcsmart_ups_kill_power(UPSINFO *ups) {
             a = '0';
 	}
 	write(ups->fd, &a, 1);
-	sleep(2);
+	getline(response, sizeof(response), ups);
+        if ((strcmp(response, "OK") == 0) || (strcmp(response,"*") == 0)) {
+	    if (shutdown_delay > 0) {
+		log_event(ups, LOG_WARNING,
+                    "UPS will power off after %d seconds ...\n", shutdown_delay);
+	    } else {
+		log_event(ups, LOG_WARNING,
+                    "UPS will power off after the configured delay  ...\n");
+	    }
+	    log_event(ups, LOG_WARNING,
+                    _("Please power off your UPS before rebooting your computer ...\n"));
+	    errflag = 0;
+	} else {
+	    errflag++;
+	}
+   }
+   if (errflag) {
 	/* And yet another method !!! */
         a = 'K';
 	write(ups->fd, &a, 1);

@@ -1299,6 +1299,7 @@ dnl
     DFILES="\
 	platforms/freebsd/Makefile \
 	platforms/freebsd/apcupsd \
+	platforms/freebsd/apccontrol \
 	"
   ;;
 gentoo)
@@ -1348,23 +1349,8 @@ dnl
     DFILES="\
 	platforms/openbsd/Makefile \
 	platforms/openbsd/apcupsd \
+	platforms/openbsd/apccontrol \
 	"
-  ;;
-openserver)
-    DISTVER=`uname -X | awk '/Release/{print $3}'`
-    SCRIPTSHELL=/bin/ksh
-    SERIALDEV=/dev/ups
-    PWRFAILDIR=/etc
-    PIDDIR=/etc
-    LOCKDIR=/usr/spool/locks
-    LOGDIR=/usr/adm
-    if test x$prefix = xNONE -a x$mandir = x'${prefix}/man' ; then
-	mandir=/usr/man
-    fi
-    DFILES="\
-	platforms/openserver/Makefile \
-	platforms/openserver/apcupsd \
-	platforms/openserver/rc0.openserver"
   ;;
 mandrake)
     DISTVER=`cat /etc/mandrake-release | grep release |\
@@ -1437,7 +1423,8 @@ dnl
    DFILES="\
        platforms/sun/Makefile \
        platforms/sun/apcupsd \
-       platforms/sun/rc0.solaris"
+       platforms/sun/rc0.solaris \
+       platforms/sun/apccontrol"
   ;;
 suse)
     DISTVER=`cat /etc/SuSE-release |grep VERSION|\
