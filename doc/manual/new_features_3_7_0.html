@@ -3,7 +3,7 @@
 <HEAD>
         <TITLE>New Features</TITLE>
    <meta name="Author" content="Kern Sibbald">
-		<link rel=stylesheet href="apcupsd-styles.css" type="text/css">
+                <link rel=stylesheet href="apcupsd-styles.css" type="text/css">
 </HEAD>
 <BODY>
 <h2>New Features in Apcupsd 3.7.2</h2>
@@ -144,313 +144,313 @@ welcome. &middot;
         Fixed detection of UP-UX version.
         In apcnetlib.c use memset instead of bzero.
         In apcupsd.c don't use TIOCNOTTY if not defined.
-	Corrected a macro bug in arguments of setpgrp() call in apcupsd.
+        Corrected a macro bug in arguments of setpgrp() call in apcupsd.
 
 ----> apcupsd-3.7.0-rc1 released.
-	Updated my e-mail and (C) signatures: if you want to make it simple,
-	use vim and the scripts you can find in scripts/.
-	Restructured include/apc.h inclusion order: now make more sense.
-	Corrected setpgrp() call in apcupsd.c for BSD/non-BSD.
-	Added FreeBSD to configure autodetection and placeholder in distributions/.
-	Other minor fixes to Makefile.in and cgi/Makefile.in
-	Fixed make clean for cgi.
-	Applied kern diffs, see techlogs/kes17Jan00
-	Added slackware scripts from John McSwain.
-	Added Kern's fixes to distributions/redhat/awkhaltprog.in
-	Applied kern diffs, see techlogs/kes16Jan00
-	Added handling of `exit 0' at the end of halt.local as in suse 5.x.
-	Added autodetection for SuSE 5.x.
-	SuSE installation: written a shell script for installing apcupsd
-	directives in /etc/rc.config.
+        Updated my e-mail and (C) signatures: if you want to make it simple,
+        use vim and the scripts you can find in scripts/.
+        Restructured include/apc.h inclusion order: now make more sense.
+        Corrected setpgrp() call in apcupsd.c for BSD/non-BSD.
+        Added FreeBSD to configure autodetection and placeholder in distributions/.
+        Other minor fixes to Makefile.in and cgi/Makefile.in
+        Fixed make clean for cgi.
+        Applied kern diffs, see techlogs/kes17Jan00
+        Added slackware scripts from John McSwain.
+        Added Kern's fixes to distributions/redhat/awkhaltprog.in
+        Applied kern diffs, see techlogs/kes16Jan00
+        Added handling of `exit 0' at the end of halt.local as in suse 5.x.
+        Added autodetection for SuSE 5.x.
+        SuSE installation: written a shell script for installing apcupsd
+        directives in /etc/rc.config.
 
 ----> apcupsd-3.7.0-beta4 released.
-	Bumped version to beta4 and released.
-	Fixed a minor po/ problem.
-	Applied kern diffs, see techlogs/kes13Jan00
-	Applied kern diffs, see techlogs/kes12Jan00
-	Fixed CYGWIN detection in configure.in.
-	Added clean and distclean for distributions/.
-	Added slackware detection but still manual installation (scripts
-	generated but no actual installation performed: too dangerous doing
-	the code without being able to test).
+        Bumped version to beta4 and released.
+        Fixed a minor po/ problem.
+        Applied kern diffs, see techlogs/kes13Jan00
+        Applied kern diffs, see techlogs/kes12Jan00
+        Fixed CYGWIN detection in configure.in.
+        Added clean and distclean for distributions/.
+        Added slackware detection but still manual installation (scripts
+        generated but no actual installation performed: too dangerous doing
+        the code without being able to test).
 
 ----> apcupsd-3.7.0-beta3 released.
-	Bumped version to beta3 and released.
-	Applied kern diffs, see techlogs/kes09Jan00
-	Changed clean_threads() in apcexec.c not hang on waitpid, and make
-	sure we do all we can to kill the childs.
-	Updated INSTALL file to make clear that prior to install a new version
-	of apcupsd over an old version, is advisable to make uninstall.
-	Corrected a syntax error in distributions/*/apccontrol.sh.in.
-	Changed suse halt.local script to:
-	 . do something only if a powerdown is detected.
-	 . kill the processes before remounting read only the filesystems.
-	Corrected a minor cosmetic (-Wall) in apcnetd.c
-	Added -Wall to default CFLAGS.
-	Applied kern diffs, see techlogs/kes06Jan00
-	Kern minor changes to configure.in.
-	Thanks to Tom Schroll, corrected an execv nasty error in apcexec.c.
-	Applied kern diffs, see techlogs/kes30Dec99
+        Bumped version to beta3 and released.
+        Applied kern diffs, see techlogs/kes09Jan00
+        Changed clean_threads() in apcexec.c not hang on waitpid, and make
+        sure we do all we can to kill the childs.
+        Updated INSTALL file to make clear that prior to install a new version
+        of apcupsd over an old version, is advisable to make uninstall.
+        Corrected a syntax error in distributions/*/apccontrol.sh.in.
+        Changed suse halt.local script to:
+         . do something only if a powerdown is detected.
+         . kill the processes before remounting read only the filesystems.
+        Corrected a minor cosmetic (-Wall) in apcnetd.c
+        Added -Wall to default CFLAGS.
+        Applied kern diffs, see techlogs/kes06Jan00
+        Kern minor changes to configure.in.
+        Thanks to Tom Schroll, corrected an execv nasty error in apcexec.c.
+        Applied kern diffs, see techlogs/kes30Dec99
 
 ----> apcupsd-3.7.0-beta2 released.
-	Bumped version to beta2 and released.
-	Changed install-apcupsd target in main Makefile.in not to overwrite
-	old apcupsd.conf file and instead create an apcupsd.conf.new file.
-	Applied Kern diffs, see techlogs/kes19Dec99
-	Changed the install to warn the user that if an old apcupsd.conf is in
-	place, it is saved to apcupsd.conf.old.
-	Applied Kern diffs, see techlogs/kes18Dec99.
-	Reorganized the path construction in include/apc_defines.h so that now
-	file paths are built with autoconf variables and not hardcoded.
-	Applied Carl Erhorn patches for Solaris, see techlogs/cpe16Dec99.
-	Now SuSE 5.2 is correctly detected (don't know previous versions).
-	Cleanups of configure.in.
-	Corrected a problem with SuSE and halt scripts where killpower where
-	not issued correctly.
-	Applied Helmut Messerer corrections.
-	Applied Kern diffs, see techlogs/kes09Dec99
-	Applied Kern diffs, see techlogs/kes08Dec99
-	Added a new contrib/ directory where user contributed files are put.
-	New user contribution for sending sms messages on UPS troubles.
+        Bumped version to beta2 and released.
+        Changed install-apcupsd target in main Makefile.in not to overwrite
+        old apcupsd.conf file and instead create an apcupsd.conf.new file.
+        Applied Kern diffs, see techlogs/kes19Dec99
+        Changed the install to warn the user that if an old apcupsd.conf is in
+        place, it is saved to apcupsd.conf.old.
+        Applied Kern diffs, see techlogs/kes18Dec99.
+        Reorganized the path construction in include/apc_defines.h so that now
+        file paths are built with autoconf variables and not hardcoded.
+        Applied Carl Erhorn patches for Solaris, see techlogs/cpe16Dec99.
+        Now SuSE 5.2 is correctly detected (don't know previous versions).
+        Cleanups of configure.in.
+        Corrected a problem with SuSE and halt scripts where killpower where
+        not issued correctly.
+        Applied Helmut Messerer corrections.
+        Applied Kern diffs, see techlogs/kes09Dec99
+        Applied Kern diffs, see techlogs/kes08Dec99
+        Added a new contrib/ directory where user contributed files are put.
+        New user contribution for sending sms messages on UPS troubles.
 
 ----> apcupsd-3.7.0-beta1 released.
-	Applied Kern diffs, see techlogs/kes30Nov99
-	Applied Kern diffs, see techlogs/kes28Nov99
-	Applied Kern diffs, see techlogs/kes20Nov99
-	Applied Kern diffs, see techlogs/kes18Nov99
-	Applied Kern diffs, see techlogs/kes15Nov99
-	More internationalization.
-	Applied Kern diffs, see techlogs/kes13Nov99
-	Moved TIOCM_LE HP-UX define and friends to include/apc_config.h
-	Internationalization: internationalized and translated in Italian all the
-	messages that are printed with printf and fprintf: more need to be done
-	for error_* functions.
-	Removed #ifdef wrapping around debug code and substituted with debug_level
-	checks.
-	Cleaned a remaining spit of `killpower' in apcupsd.c
-	Help screen output to stdout.
-	Now (C) and Brian's Support Center are visible in help screen output.
-	Updates to the cgi files from Kern.
-	Added a vimrc for TABs.
-	--debug argument changed meaning. Now is meant to be set to a number that
-	range from 0 to N where increasing numbers means increasing debug output.
-	Now we use getopt_long [see getopt(3)] for parsing command line.
-	Documentation updates and reorganization: now `developers' documentation
-	is in doc/developers/.
-	Added support for cable 940-0095B.
-	Applied Kern patches: syslog, getline, code cleanups, new cgi
-	interface. Read his technical log in techlogs/kes03Nov99
-	Added doc/CodingStyle file.
-	Added Developers file.
-	Some minor code documentation.
-	Removed the "failed to reacquire the lockfile" problem. Now we release
-	the lockfile just before fork() and reacquire it just after.
-	More duplicated code cleanups and nasty bugs fixed in apcaction.c.
-	SuSE's apcupsd start script now return green "done" and red "failed"
-	(SuSE 6.2)
-	apccontrol is installed in /etc/apcupsd/ because we need it when
-	filesystems may be umounted.
-	Removed powersc script: now it is all done in apccontrol and
-	/etc/rc.d/apcupsd scripts.
-	Moved _all_ the scripts into scripts/ directory (where they belong).
-	apccontrol script installation dir is now sysconfdir
-	${prefix}/etc/apcupsd
-	Simplified apcaction.c (removed duplicate code).
-	Attempt to document some features of apcupsd.conf.
-	Deleted two alarm()s related to apcreports.c from apcaction.c: this
-	was a bug.
-	Added setproctitle for setting forked procs's argv[0]. Now we have
-	apcmain -> waiting for other tasks to exit, generic watchdog.
-	apcser -> serial task
-	apcact -> actions task
-	apcnet -> network task
-	apcslv -> netslave task
-	so that now we can tell with a `ps' which task is doing what.
-	apcserial+apcreports are now one single thread.
-	Better locking scheme.
-	Removed another nasty bug in Old* variables into apcaction.c. Now
-	there is a local structure for these values.
-	Removed a nasty bug in apcsetup.c.
-	Updated man pages and apcupsd.conf.
-	RedHat installation scripts.
-	Removed 10 seconds sleep() from terminate().
-	SHM ID for sanity checks on SHM accesses.
-	Obsolete config options now generate only warnings.
-	New error handling routines.
-	doc/README.developers updated.
-	Syslogging functions are bracketed with HAVE_GCC so that with gcc we
-	can use macros and with other compilers we use functions for
-	compatibility.
-	Syslog functions are now real functions. There's no point in having
-	incompatible preprocessor macros when a set of little functions can do
-	the job.
-	Fixed a next_slave label in apcnet.c with a semicolon for HPUX
-	compiler.
-	OS detection in configure: now Makefiles and sources know about which
-	OS they are supposed to compile for.
-	Better integration of lib/ sources into the configure mechanism.
-	configure cleanups.
-	Added cflags and ldflags selection in Makefile.in and configure.
-	Fixed getopt_long detection in configure. Now if not found it compile
-	the lib/ version.
-	Now configure.in have a hardcoded PATH in which search the system
-	programs needed.
-	Lot of cleanups in global variables and code partitioning and
-	duplication.
-	More configure cleanups.
-	Updated RH 6.0 halt script.
-	Removed apchttp.
-	Cleaned THREADS. Now forked processes are the only option.
-	Various cleanups.
-	SuSE-specific install/uninstall.
-	All distribution specific directories are now in distributions/.
-	All scripts are now in scripts/.
-	Moved default apcupsd.conf in etc/.
-	Added distribution-specific scripts installation.
-	Install /etc/apcupsd.conf if not alredy present.
-	Removed apc(un)install.sh: no more needed.
-	Rewritten external scripts: no more system(), better customization
-	support.
-	Removed Makefile.in.in from po/: it's not needed.
-	Fixed bogus --enable and --disable behavior of configure.
-	Cleaned up po/ and intl/ autoconf.
-	Only powerflute is linked with ncurses libraries.
-	The program makedepend is not any more vital for compilation.
+        Applied Kern diffs, see techlogs/kes30Nov99
+        Applied Kern diffs, see techlogs/kes28Nov99
+        Applied Kern diffs, see techlogs/kes20Nov99
+        Applied Kern diffs, see techlogs/kes18Nov99
+        Applied Kern diffs, see techlogs/kes15Nov99
+        More internationalization.
+        Applied Kern diffs, see techlogs/kes13Nov99
+        Moved TIOCM_LE HP-UX define and friends to include/apc_config.h
+        Internationalization: internationalized and translated in Italian all the
+        messages that are printed with printf and fprintf: more need to be done
+        for error_* functions.
+        Removed #ifdef wrapping around debug code and substituted with debug_level
+        checks.
+        Cleaned a remaining spit of `killpower' in apcupsd.c
+        Help screen output to stdout.
+        Now (C) and Brian's Support Center are visible in help screen output.
+        Updates to the cgi files from Kern.
+        Added a vimrc for TABs.
+        --debug argument changed meaning. Now is meant to be set to a number that
+        range from 0 to N where increasing numbers means increasing debug output.
+        Now we use getopt_long [see getopt(3)] for parsing command line.
+        Documentation updates and reorganization: now `developers' documentation
+        is in doc/developers/.
+        Added support for cable 940-0095B.
+        Applied Kern patches: syslog, getline, code cleanups, new cgi
+        interface. Read his technical log in techlogs/kes03Nov99
+        Added doc/CodingStyle file.
+        Added Developers file.
+        Some minor code documentation.
+        Removed the "failed to reacquire the lockfile" problem. Now we release
+        the lockfile just before fork() and reacquire it just after.
+        More duplicated code cleanups and nasty bugs fixed in apcaction.c.
+        SuSE's apcupsd start script now return green "done" and red "failed"
+        (SuSE 6.2)
+        apccontrol is installed in /etc/apcupsd/ because we need it when
+        filesystems may be umounted.
+        Removed powersc script: now it is all done in apccontrol and
+        /etc/rc.d/apcupsd scripts.
+        Moved _all_ the scripts into scripts/ directory (where they belong).
+        apccontrol script installation dir is now sysconfdir
+        ${prefix}/etc/apcupsd
+        Simplified apcaction.c (removed duplicate code).
+        Attempt to document some features of apcupsd.conf.
+        Deleted two alarm()s related to apcreports.c from apcaction.c: this
+        was a bug.
+        Added setproctitle for setting forked procs's argv[0]. Now we have
+        apcmain -> waiting for other tasks to exit, generic watchdog.
+        apcser -> serial task
+        apcact -> actions task
+        apcnet -> network task
+        apcslv -> netslave task
+        so that now we can tell with a `ps' which task is doing what.
+        apcserial+apcreports are now one single thread.
+        Better locking scheme.
+        Removed another nasty bug in Old* variables into apcaction.c. Now
+        there is a local structure for these values.
+        Removed a nasty bug in apcsetup.c.
+        Updated man pages and apcupsd.conf.
+        RedHat installation scripts.
+        Removed 10 seconds sleep() from terminate().
+        SHM ID for sanity checks on SHM accesses.
+        Obsolete config options now generate only warnings.
+        New error handling routines.
+        doc/README.developers updated.
+        Syslogging functions are bracketed with HAVE_GCC so that with gcc we
+        can use macros and with other compilers we use functions for
+        compatibility.
+        Syslog functions are now real functions. There's no point in having
+        incompatible preprocessor macros when a set of little functions can do
+        the job.
+        Fixed a next_slave label in apcnet.c with a semicolon for HPUX
+        compiler.
+        OS detection in configure: now Makefiles and sources know about which
+        OS they are supposed to compile for.
+        Better integration of lib/ sources into the configure mechanism.
+        configure cleanups.
+        Added cflags and ldflags selection in Makefile.in and configure.
+        Fixed getopt_long detection in configure. Now if not found it compile
+        the lib/ version.
+        Now configure.in have a hardcoded PATH in which search the system
+        programs needed.
+        Lot of cleanups in global variables and code partitioning and
+        duplication.
+        More configure cleanups.
+        Updated RH 6.0 halt script.
+        Removed apchttp.
+        Cleaned THREADS. Now forked processes are the only option.
+        Various cleanups.
+        SuSE-specific install/uninstall.
+        All distribution specific directories are now in distributions/.
+        All scripts are now in scripts/.
+        Moved default apcupsd.conf in etc/.
+        Added distribution-specific scripts installation.
+        Install /etc/apcupsd.conf if not alredy present.
+        Removed apc(un)install.sh: no more needed.
+        Rewritten external scripts: no more system(), better customization
+        support.
+        Removed Makefile.in.in from po/: it's not needed.
+        Fixed bogus --enable and --disable behavior of configure.
+        Cleaned up po/ and intl/ autoconf.
+        Only powerflute is linked with ncurses libraries.
+        The program makedepend is not any more vital for compilation.
 
 ----> apcupsd-3.6.2
-	Fixed the "apcupsd -c" configure command.
-	Fixed two thread bugs in alarm handling.
-	Fixed two potential security exploits.
-	More cleaned up autoconf.
-	Random documentation cleanups.
+        Fixed the "apcupsd -c" configure command.
+        Fixed two thread bugs in alarm handling.
+        Fixed two potential security exploits.
+        More cleaned up autoconf.
+        Random documentation cleanups.
 
 ----> apcupsd-3.6.1
-	Cleaned up new autoconf stuff from version 3.6.0
-	Undefined a test flag for testing networks wierdness.
-		#undef WACKY_NETWORK_ATTEMPS
-	Network is fully functional under non-threaded compile.
-	Possible fix for "pipe_master_status" calls on slaves.
-	Added 940-1524C smart signal cable support.
+        Cleaned up new autoconf stuff from version 3.6.0
+        Undefined a test flag for testing networks wierdness.
+                #undef WACKY_NETWORK_ATTEMPS
+        Network is fully functional under non-threaded compile.
+        Possible fix for "pipe_master_status" calls on slaves.
+        Added 940-1524C smart signal cable support.
 
 ----> apcupsd-3.6.0
-	Added autoconf.
-	Added internationalization support. There is _only_ the support but
-	no current code is written for the intl package. It can be compiled
-	in, but intl strings have still to be translated (to be done in the
-	future).
-	Reorganized documentation.
-	Reorganized support for distributions. Now we have a directory for
-	every possible distribution (suse, unifix, debian etc etc) so that the
-	job for the package-men can be easier.
+        Added autoconf.
+        Added internationalization support. There is _only_ the support but
+        no current code is written for the intl package. It can be compiled
+        in, but intl strings have still to be translated (to be done in the
+        future).
+        Reorganized documentation.
+        Reorganized support for distributions. Now we have a directory for
+        every possible distribution (suse, unifix, debian etc etc) so that the
+        job for the package-men can be easier.
 
 ----> apcupsd-3.5.9
-	Added new configuration options to reduce init time of daemon.
-	powersc CONFIG
-	powersc NAME
-	powersc BATTERY
+        Added new configuration options to reduce init time of daemon.
+        powersc CONFIG
+        powersc NAME
+        powersc BATTERY
 
 ----> apcupsd-3.5.8.patch
 
-	Fixes a FIFO error that I forgot to include in the rush
-	to release the code
+        Fixes a FIFO error that I forgot to include in the rush
+        to release the code
 
 ----> apcupsd-3.5.8
 
-	GPL2 source code status finally...........April 7, 1999
+        GPL2 source code status finally...........April 7, 1999
 
-	Threaded code is stable but requires glibc2 or libc6
-	Finished SELFTEST setup
-	Fixed naming of UPS if allowed.
-	Redesigned "apcsetup.c" to allow for ease of parameter setup.
+        Threaded code is stable but requires glibc2 or libc6
+        Finished SELFTEST setup
+        Fixed naming of UPS if allowed.
+        Redesigned "apcsetup.c" to allow for ease of parameter setup.
 
 ----> apcupsd-3.5.7
 
-	Added 940-0024G cable.
-	"newbackupspro" to be replaced by "backupspropnp"
+        Added 940-0024G cable.
+        "newbackupspro" to be replaced by "backupspropnp"
 
-	If you have a BackUPS Pro UPS that is identified as
-	BP(SIZE)(EXTRAS) examples BP420SC/BP650SC/BP650PRO-PnP,
-	then you have a PnP BackUPS Pro that is very near a SmartUPS.
-	Else anything with the identifier BK(SIZE)PRO or BKPRO(SIZE)
-	is the very early version of the "dumbed down smartups".
-	Unfortunately, it has very little to say.  It is superior to the
-	classic BackUPS (simple signals) in that it can at least tell event
-	histories and if the batteries are faulted. 
+        If you have a BackUPS Pro UPS that is identified as
+        BP(SIZE)(EXTRAS) examples BP420SC/BP650SC/BP650PRO-PnP,
+        then you have a PnP BackUPS Pro that is very near a SmartUPS.
+        Else anything with the identifier BK(SIZE)PRO or BKPRO(SIZE)
+        is the very early version of the "dumbed down smartups".
+        Unfortunately, it has very little to say.  It is superior to the
+        classic BackUPS (simple signals) in that it can at least tell event
+        histories and if the batteries are faulted. 
 
-	now powerflute is compiling and working, needs THREADS
+        now powerflute is compiling and working, needs THREADS
 
 ----> apcupsd-3.5.6
 
-	See Makefile for enabling flags.
+        See Makefile for enabling flags.
 
-	# New multi-threading code BETA
-	#
-	# THREADS   = 1
+        # New multi-threading code BETA
+        #
+        # THREADS   = 1
 
-	# New multi-threading code with http BETA functional needs THREADS
-	#
-	# HTTP      = 1
+        # New multi-threading code with http BETA functional needs THREADS
+        #
+        # HTTP      = 1
 
-	# New/Old powerflute tool
-	#
-	# MUSIC     = 1
+        # New/Old powerflute tool
+        #
+        # MUSIC     = 1
 
-	dual building model possible complete.
-	intergrated beta http data
-	breakages in logs and procfs are still present in shm.
-	code sorting and corrections.
-	return of ncurses powerflute tool.
-	fixed Makefile to find two possible locations of
-	ncurses package; however, there are three methods for this animal.
+        dual building model possible complete.
+        intergrated beta http data
+        breakages in logs and procfs are still present in shm.
+        code sorting and corrections.
+        return of ncurses powerflute tool.
+        fixed Makefile to find two possible locations of
+        ncurses package; however, there are three methods for this animal.
 
-	apcconfig.c: removed check for existance of lock directory. It's not
-	needed and dangerous when -killpower !
-	apcconfig.c: new configuration checks
-	added semun definition to apc_struct.h since it is needed for glibc6
+        apcconfig.c: removed check for existance of lock directory. It's not
+        needed and dangerous when -killpower !
+        apcconfig.c: new configuration checks
+        added semun definition to apc_struct.h since it is needed for glibc6
 
 ----> apcupsd-3.5.5
 
-	dual building model begun.
-	intergrated beta shared memory mapping.
-	breakages in logs and procfs are present.
+        dual building model begun.
+        intergrated beta shared memory mapping.
+        breakages in logs and procfs are present.
 
 ----> apcupsd-3.5.4
 
-	Preparation for GPL status and transfer to GNU.
-	Fixed Network bug.
-	Fixed IPC PIPE bug.
+        Preparation for GPL status and transfer to GNU.
+        Fixed Network bug.
+        Fixed IPC PIPE bug.
 
 ----> apcupsd-3.5.3
 
-	Fixed UPS killpower bug.
+        Fixed UPS killpower bug.
 
 ----> apcupsd-3.5.2
 
-	Source wide reformat to conform to standard C programing format
+        Source wide reformat to conform to standard C programing format
 
 ----> apcupsd-3.5.1
 
 
 ----> apcupsd-3.5.0
 
-	fixes "NO" reports in setup loops for UPSes that do not allow for
-	changing parameters at initialization.  Previously it was assumed that
-	UPSes did not report anything if the feature was not pollable and/or
-	changeble.
+        fixes "NO" reports in setup loops for UPSes that do not allow for
+        changing parameters at initialization.  Previously it was assumed that
+        UPSes did not report anything if the feature was not pollable and/or
+        changeble.
 
 ----> apcupsd-3.4.9
 
-	fixes a long missed error that was incorrectly fixed in the past.
+        fixes a long missed error that was incorrectly fixed in the past.
 
 ----> apcupsd-3.4.8
 
-	solved more mystery functions and the UPSlink language may
-	be completely decoded.
+        solved more mystery functions and the UPSlink language may
+        be completely decoded.
 
 ----> apcupsd-3.4.7
 
-	now auto-learns features based on UPS's answer to questions.
-	initial porting to Solaris for i386 is complete.
+        now auto-learns features based on UPS's answer to questions.
+        initial porting to Solaris for i386 is complete.
 
 ----> apcupsd-3.4.6 45493 Jul 15 13:14 apcupsd.c
                     22326 Jul  9 12:50 apcnet.c
@@ -460,9 +460,9 @@ welcome. &middot;
                     11039 Jul 15 13:09 apcreports.c
                     18137 Jul 15 13:19 apcsmart.c
 
-	all logging functions will be moved to "apcreports.c"
-	all smart mode calls will be moved to "apcsmart.c"
-	fix ups model reporting in "apcsetup.c"
+        all logging functions will be moved to "apcreports.c"
+        all smart mode calls will be moved to "apcsmart.c"
+        fix ups model reporting in "apcsetup.c"
 
 ----> apcupsd-3.4.5 77096 Jul  7 17:18 apcupsd.c
                     22326 Jul  7 03:12 apcnet.c
@@ -471,29 +471,29 @@ welcome. &middot;
 
                     18477 Jul  7 02:08 apcaccess.c
 
-	Added NOLOGON delay for systems with large Matrix UPSes.
-	Short information polling, with constant values being set
-	in the extended setup functions.
+        Added NOLOGON delay for systems with large Matrix UPSes.
+        Short information polling, with constant values being set
+        in the extended setup functions.
 
 ----> apcupsd-3.4.4
-	Fixed a missing and needed wait delay for netmaster systems.
-	This was discovered when mixing flavors of Linux.
-	Since SuSE, RHS, and Debain require extra time for shutdowns.
-	man-page is closer to date..........
+        Fixed a missing and needed wait delay for netmaster systems.
+        This was discovered when mixing flavors of Linux.
+        Since SuSE, RHS, and Debain require extra time for shutdowns.
+        man-page is closer to date..........
 
 ----> apcupsd-3.4.3
-	Added new limit features by polling a new command for
-	internal calculated remaining time on line.
-	Fixed naming UPS if allowed.
+        Added new limit features by polling a new command for
+        internal calculated remaining time on line.
+        Fixed naming UPS if allowed.
 
 ----> apcupsd-3.4.2
-	Fixed an unknown error for the forced ups-kill for the
-	backupspro models. This was discovered with a new
-	BackUPS Pro 1000.
+        Fixed an unknown error for the forced ups-kill for the
+        backupspro models. This was discovered with a new
+        BackUPS Pro 1000.
 
 ----> apcupsd-3.4.1
-	Changed ./includes to have an "apc_" prefix.
-	This is for initial port requirements to FreeBSD.
+        Changed ./includes to have an "apc_" prefix.
+        This is for initial port requirements to FreeBSD.
 
 ----> apcupsd-3.4.0 72305 May 19 14:18 apcupsd.c
                     21597 Apr 16 17:59 apcnet.c
@@ -504,11 +504,11 @@ welcome. &middot;
 
 Slave management disconnect/reconnect added to apcaccess.
 Fixed excessive loss of UPS communications loggings of ::
-	UPSlink Comm. Error, SM != SM
-	UPSlink Comm. reestablished, SM == SM
+        UPSlink Comm. Error, SM != SM
+        UPSlink Comm. reestablished, SM == SM
 
 Fixed Signal/Cable Combination errors.
-	A "SmartUPS" with a "Simple Cable" with report as a "BackUPS".
+        A "SmartUPS" with a "Simple Cable" with report as a "BackUPS".
 
 ----> apcupsd-3.3.0 72450 Mar 20 01:09 apcupsd.c
                     15321 Mar 20 01:08 apcnet.c
@@ -1119,5 +1119,9 @@ Andre Hedrick
 http://www.brisse.dk/site/apcupsd/
 
 </PRE>
+<hr>
+
+<a href="upgrading_to_3_7_0.html" target="_self"><img src="back.gif" border=0 alt="Back"></a>
+<a href="index.html"><img src="home.gif" border=0 alt="Home"></a>
 </BODY>
 </HTML>
