@@ -54,8 +54,8 @@ cgibin = @CGIBIN@
 # Style sheets dir for cgibins
 CSS_DIR = @CSS_DIR@
 
-# Ultrix 2.2 make doesn't expand th value of VPATH.
-VPATH = @srcdir@
+# Ultrix 2.2 make doesn't expand the value of VPATH.
+VPATH = /usr/lib:/usr/local1/lib
 
 # source directory where this Makefile is placed.
 srcdir = @srcdir@
@@ -95,7 +95,7 @@ WINLIBS = @WINLIBS@
 # Made INCFLAGS relative to the topdir and hardcoded into the Makefiles
 # For GDINCLUDE see src/cgi/Makefile.in
 INCFLAGS = $(GDINCLUDE) -I$(topdir)/include
-CFLAGS = @CFLAGS@ @PTHREAD_CFLAGS@ $(INCFLAGS)
+CFLAGS = @CFLAGS@ $(CPPFLAGS) @PTHREAD_CFLAGS@ $(INCFLAGS)
 LDFLAGS = @LDFLAGS@
 LIBS = $(DRVLIBS) $(APCLIBS) $(INTLLIBS) \
 		@PTHREAD_LFLAGS@ @LIBS@ -lm
