@@ -63,11 +63,25 @@
  */
 
 #ifdef ENABLE_NLS
-#undef __OPTIMIZE__
-#include <libintl.h>
-#define _(String) gettext((String))
-#define N_(String) (String)
+
+# undef __OPTIMIZE__
+# include <libintl.h>
+# define _(String) gettext((String))
+# define N_(String) (String)
+
 #else
-#define _(String) (String)
-#define N_(String) (String)
+
+# ifndef HAVE_AIX_OS
+#  define _(String) (String)
+#  define N_(String) (String)
+# else
+   /* 
+    * When using pthreads, AIX 5.1 (possible other versions?) occasionally 
+    * dies in log_event(). Eliminating the parens appears to fix it.
+    */
+#  define _(String) String
+#  define N_(String) String
+# endif
+
 #endif
+
