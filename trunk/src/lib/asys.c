@@ -4,7 +4,7 @@
  *   library routines. 
  * 
  *
- *   Version $Id: asys.c,v 1.2 2004-07-17 13:42:03 kerns Exp $
+ *   Version $Id: asys.c,v 1.3 2004-07-17 16:48:53 adk0212 Exp $
  */
 /*
    Copyright (C) 2004 Kern Sibbald
@@ -151,7 +151,7 @@ int avsnprintf(char *str, size_t size, const char  *format, va_list ap)
 struct tm *localtime_r(const time_t *timep, struct tm *tm)
 {
    struct tm *ltm;
-#ifndef HAVE_PTHREADS
+#ifdef HAVE_PTHREADS
    static pthread_mutex_t mutex;
    static int first = 1;
 
@@ -257,8 +257,8 @@ int amicrosleep(time_t sec, long usec)
    stat = pthread_cond_timedwait(&timer, &timer_mutex, &timeout);
    Dmsg1(200, "pthread_cond_timedwait stat=%d\n", stat);
    V(timer_mutex);
-#endif
    return stat;
+#endif
 
 #ifdef HAVE_USLEEP
    usleep(usec + sec * 1000);
