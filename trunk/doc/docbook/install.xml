@@ -1213,6 +1213,8 @@ that your UPS shutdown grace period is set sufficiently long so that
 you system will power down (usually 2 minutes), the use the
 <option>&#x2D;&#x2D;kill-on-powerfail</option> option on the
 <application>apcupsd</application> command line.</para>
+<para>Please note the concerns listed below under OpenBSD concerning
+the use of pthreads.</para>
 
 </sect2>
 <sect2 id="HPUX"><title>HPUX</title>
@@ -1226,6 +1228,8 @@ worked fine on 3.8.1</para>
 <para>Submitted during development of 3.8.2, this should be a complete
 distribution.  Please read the comments on the pthreads implementation
 in the FreeBSD section above as they may apply equally to OpenBSD.</para>
+<para>Please note the concerns listed below under OpenBSD concerning
+the use of pthreads.</para>
 
 </sect2>
 <sect2 id="OpenBSD"><title>OpenBSD</title>
@@ -1238,6 +1242,27 @@ to take this into account may result in the system not being fully
 halted when power is lost.  Please read the comments on the pthreads
 implementation in the FreeBSD section above as they may apply equally
 to OpenBSD.</para>
+<para>PLEASE NOTE. Due to some deficiencies or errors in the OpenBSD
+pthreads libraries, if you build apcupsd on OpenBSD with pthread and a
+child program is launched (i.e. mail notification of events), this may
+cause OpenBSD to freeze up. The best solution is probably to build 
+without pthread. However, in doing so, you must realize that the bulk 
+of this manual assumes that pthreads is enabled, and thus many of
+the comments about <application>apcaccess</application> will not
+be applicable. A second solution that seems to work is to delete
+all calls to the email notification routines from 
+<filename>apccontrol</filename>. In doing so, some users have succeeded
+in running apcupsd with pthreads.</para>
+<para>If you want to know the technical problems with pthreads on
+OpenBSD, it is as best we can tell because the pthreads are not
+real kernel pthreads as on Linux and Solaris, but rather a user
+program that makes all I/O non-blocking. So when apcupds does I/O,
+the userland pthreads libarary will switch to another thread if it
+wants to run. This works fine except that when a child process is
+called and it exits, all the blocking/non-blocking statuses of
+the open file descriptors in the parent program are reset as 
+blocking -- this causes chaos and an almost immediate freezing
+of the program (apcupsd). </para>
 
 </sect2>
 <sect2 id="RedHat"><title>Red Hat Systems</title>
