@@ -64,7 +64,6 @@ void log_event(UPSINFO *ups, int level, char *fmt, ...)
     char msg[2*MAXSTRING];
     char datetime[MAXSTRING];
     int event_fd = ups->event_fd;
-    char *p;
 
 #if AVERSION==4 
     /*
