@@ -1,0 +1,280 @@
+<chapter id='config-examples'><title>Configuration Examples</title>
+
+<sect1><title>A Simple USB Configuration</title>
+
+<para>If you have a USB UPS, and you have apcupsd version 3.10.7 or higher,
+the essential elements of your apcupsd.conf file should look like the
+following:</para>
+
+<programlisting>
+## apcupsd.conf v1.1 ##
+UPSCABLE usb
+UPSTYPE usb
+DEVICE
+LOCKFILE /var/lock
+UPSCLASS standalone
+UPSMODE disable
+</programlisting>
+
+<para>Notice that we have not specified a device. In doing so, apcupsd
+will try all the well known USB ports.</para>
+
+<para>
+If you have more than one device,
+you will need to specify each one individually. If you have a
+RedHat system, and know what you are doing,
+you may want a DEVICE specification as follows:
+</para>
+
+<programlisting>
+DEVICE /dev/usb/hiddev[0-15]
+</programlisting>
+
+<para>If you have used the <b>make-hiddev</b> that is in the
+<b>examples</b> directory of the source, you will want to specify
+a DEVICE as follows:</para>
+
+<programlisting>
+DEVICE /dev/usb/hid/hiddev[0-15]
+</programlisting>
+
+<para>Please use the explicit specifications of a device only if
+your know exactly what you are doing. In general, it is much easier
+to let <application>apcupsd</application> find the device itself.</para>
+<para>
+You should enter <b>/dev/usb/hiddev[0-15]</b>
+literally as shown.  The &quot;[0-15]&quot; expression tells
+apcupsd to search all hiddev devices until it finds a UPS. You
+can restrict the search to a subset of devices by using something
+like &quot;[0-4]&quot;, but keep in mind this will limit
+apcupsd's ability to locate the UPS if the kernel relocates it to
+a differentdevice node.
+</para>
+
+<para>
+On Debian systems, the <b>hiddev</b> devices are not automatically defined.   
+As a consequence, you will need to run the <b>make-hiddev</b> script in
+the <b>examples</b> directory of the source.</para>
+
+</sect1>
+
+
+<sect1><title>A Simple Configuration for a SmartUPS</title>
+
+<para>If you have a Smart UPS using the cable supplied by APC, or you 
+build a CUSTOM SMART cable outlined in the cables chapter, a very simple
+configuration file would look like the following:</para>
+
+<programlisting>
+## apcupsd.conf v1.1 ##
+UPSCABLE smart
+UPSTYPE smartups
+DEVICE /dev/ttyS0
+LOCKFILE /var/lock
+UPSCLASS standalone
+UPSMODE disable
+</programlisting>
+
+<para>Normally you would have many more configuration directives to
+completely customize your installation, but this example shows you
+the minimum required.</para>
+
+</sect1>
+
+<sect1><title>A Simple Configuration for a Simple Signaling or Dumb</title>
+
+<para>If you have a simple signaling or dumb UPS such as a BackUPS, you 
+will need to know exactly what cable you have and specify it on the
+UPSCABLE directive. Please see the list of UPSes versus cables in the
+beginning of this document for more information. The cable number
+is normally stamped in the plastic at one end of the cable.
+If you specify the
+wrong cable, it is very likely that at the first power failure, your
+computer will be immediately shutdown. This is an unfortunate consequence
+of the dumb signaling mode.  To avoid this, first replace
+<b>/etc/apcupsd/apccontrol</b> with <b>safe.apccontrol</b> found in
+the examples directory, then test until everything works correctly.
+Once you have the correct cable, be sure to remember to reinstall
+the correct apccontrol file and test that your computer is correctly
+shutdown during a power failure. 
+</para>
+<programlisting>
+## apcupsd.conf v1.1 ##
+UPSCABLE (number of cable you have)
+UPSTYPE dumb
+DEVICE /dev/ttyS0
+LOCKFILE /var/lock
+UPSCLASS standalone
+UPSMODE disable
+</programlisting>
+
+<para>If your cable does not have low battery detection, as is the
+case with some older models, you will also need to define
+<b>TIMEOUT nnn</b> where you set <b>nn</b> to be the number of
+seconds on a power failure after which a shutdown is effected.</para>
+
+<para>Normally you would have many more configuration directives to
+completely customize your installation, but this example shows you
+the minimum required.</para>
+
+</sect1>
+
+
+<sect1><title>A Simple Master Configuration</title>
+
+<para>You have a Smart UPS using the cable supplied by APC and you want
+it to act as a master for another computer, which is powered by the
+same UPS. A very simple configuration file would look like the
+following:</para>
+
+<programlisting>
+## apcupsd.conf v1.1 ## 
+UPSCABLE smart
+UPSTYPE smartups
+DEVICE /dev/ttyS0
+LOCKFILE /var/lock
+UPSCLASS netmaster
+UPSMODE net
+NETTIME 10
+NETPORT 6666
+SLAVE slave1.mynetwork.com
+SLAVE slave2.mynetwork.com
+</programlisting>
+
+<para>Note, the main difference from the stand alone configuration is
+that you have specified <emphasis role="bold">UPSCLASS
+netmaster</emphasis> and <emphasis role="bold">UPSMODE
+net</emphasis>. In addition, you have specified one or more slave
+machines. In this mode of networking, (as opposed to using the net 
+driver as described several sections below), your master knows the
+presence of all the slaves. They carry on a very explicit communication,
+and the slaves are explicitly notified by the master of any important
+changes such as a shutdown. </para>
+
+</sect1>
+<sect1><title>A Simple Slave Configuration</title>
+
+<para>You have a Smart UPS using the cable supplied by APC that is
+connected to the master machine configured above, and the master
+machine is running as a netmaster and has the address of your
+slave machine. This slave
+machine has no serial port connection to the UPS, but is powered by
+the same UPS as the master. A very simple configuration file would
+look like the following:</para>
+
+<programlisting>
+## apcupsd.conf v1.1 ## 
+UPSCABLE ether
+UPSTYPE smartups
+LOCKFILE /var/lock
+UPSCLASS netslave
+UPSMODE net
+NETPORT 6666
+MASTER master.mynetwork.com
+</programlisting>
+
+<para>The main difference from the master configuration is that you
+have specified <emphasis role="bold">UPSCABLE ether</emphasis> and
+<emphasis role="bold">UPSCLASS netslave</emphasis>.  In addition, you
+have specified a single controlling master.</para>
+
+<para>In this configuration, the shutdown will be initiated by the
+master. It is also possible to specify BATTERYLEVEL, MINUTES, and
+TIMEOUT configuration directives in the Slave machine that will
+cause the slave to shutdown before the master. This can often be
+useful if the slave is less important than the master and you wish
+to reduce battery power consumption so that the master can remain
+up longer during a power outage.</para>
+
+</sect1>
+<sect1><title>Variation on the Master/Slave Configuration</title>
+
+<para>It is also possible to have a Master/Slave configuration where
+the Slave is powered by a different UPS (or any other power source),
+but is nevertheless controlled (i.e. shutdown) by the master. The
+setup would be identical to the Master/Slave configuration files shown
+above. The only difference is where the slave actually receives its
+power. In effect, <application>apcupsd</application> does not
+know or care where the power really comes from.</para>
+
+</sect1>
+<sect1><title>A Sample NIS Slave Configuration Using the Net Driver</title>
+
+<para>As opposed to the master/slave mode demonstrated above, you can
+turn any computer into an NIS slave by configuring with the NIS network
+driver turned on <option>--enable-net</option>. The difference is
+that the NIS server has no explicit knowledge of the slaves. The NIS server
+makes its information available via the net (NIS), and the NIS slaves read
+it. When the NIS server is going to shutdown, it makes the information
+available to any NIS slave that polls it, but the NIS server does not
+explicitly call each NIS slave as is the case in the Master/Slave networking
+described several sections above.
+</para>
+<para>
+Running in this
+configuration, you can use any computer with
+<application>apcupsd</application> running the Network Information
+Server (NIS) as the server. The NIS slave simply uses the NIS information
+to decide when to shutdown. This is a much simpler mode than the older
+master/slave code mentioned above.</para>
+<para>
+The main apcupsd (NIS server) is connected to the UPS
+and has NIS turned on, but the configuration is a simple standalone
+as in the section <b>A Simple Configuration for a SmartUPS</b>. It doesn't
+matter how the UPS is connected to the computer (serial, USB, ...). 
+</para>      
+<para>
+For the NIS slave computer, you will have a configuration that looks something
+like what follows. What is important is that you get the information
+from an <b>ether</b> cable over the network and you must specify the
+address of a &quot;NIS server&quot; that is running NIS (not the Master/Slave
+networking described above). The NIS slave apcupsd will then poll the NIS server
+at the NETTIME interval you specify to obtain the status.</para>
+
+<programlisting>
+## apcupsd.conf v1.1 ## 
+UPSCABLE ether
+UPSTYPE net
+LOCKFILE /var/lock
+DEVICE server-network-address:3551
+UPSCLASS standalone
+UPSMODE disable
+NETTIME 10
+</programlisting>
+
+<para>where on the <emphasis role="bold">DEVICE</emphasis> directive
+you replace the <option>server-network-address</option> with the fully
+qualified domain name or IP address of a machine running
+<application>apcupsd</application> with NIS enabled (and normally, but
+not required, connected to a UPS). The :3551 that follows the NIS server
+address is the port to use. The default is 3551, but older versions of
+apcupsd used port 7000.</para>
+
+<para>Please do not confuse this with a master/slave network
+configuration that is described above. This is a master/slave
+setup, but much simpler (the NIS server does not know about the
+slaves), and any NIS server, even a slave, can act as a server to a
+slave that listens to it.</para>
+
+<para>The <b>NETTIME</b> directive defines the time interval       
+that the slave uses to poll the NIS server. If you set this too large,
+your slave may not see the change in state of the NIS server before
+the server has shutdown. Normally, you have at least 30 seconds
+of grace time between the time the NIS server decides to shutdown and
+the time it no longer responds. Your slave must poll during this
+interval.</para>
+
+<para>This mode works principally by reading the STATFLAG record that
+is sent by the NIS (present in the output of apcaccess). The low 16
+bits are the standard APC status flag, and the upper 16 bits
+represent the internal state of apcupsd, so the slave can see when
+the power fails and know when to shutdown.</para>
+<para>As with the Master/Slave configuration, any slave run using
+the Net driver will shutdown when its own timers expire or when
+the NIS server shuts down, whichever occurs first. This means that
+if you want the slave to shutdown before the server, you need only
+set BATTERYLEVEL, or any of the other values on the slave for 
+a faster shutdown than the values defined on the NIS server.</para>
+
+</sect1>
+</chapter>
