@@ -32,8 +32,7 @@
 #include "config.h"
 #include "apc_nis.h"
 
-int fill_buffer(int sockfd);
-
+static int fill_buffer(int sockfd);
 
 static int nis_port;
 char statbuf[4096];
@@ -255,13 +254,11 @@ int getupsvar(char *host, char *request, char *answer, int anslen)
     return 0;
 }
 
-#define MAXLINE 512
-
 /* Fill buffer with data from UPS network daemon   
  * Returns 0 on error
  * Returns 1 if OK
  */
-int fill_buffer(int sockfd)
+static int fill_buffer(int sockfd)
 {
    int n, stat = 1; 
    char buf[1000];

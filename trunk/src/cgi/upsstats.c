@@ -53,8 +53,6 @@ static char   answer[256];
 static char   answer2[256];
 static char   answer3[256];
 
-extern int fetch_events(char *host);
-
 void parsearg(char *var, char *value) 
 {
     if (!strcmp(var, "host")) {
