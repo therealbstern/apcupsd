@@ -282,6 +282,7 @@ int net_open(char *host, char *service, int port)
         asnprintf(net_errbuf, sizeof(net_errbuf), _("tcp_open: cannot connect to server %s on port %d.\n\
 ERR=%s\n"), host, port, strerror(errno));
 	net_errmsg = net_errbuf;
+	close (sockfd);
 	return -1;
     }
     return sockfd;
