@@ -91,7 +91,7 @@ case "$1" in
 	echo "Battery power exhaused on UPS ${2}. Doing shutdown." | ${WALL}
     ;;
     timeout)
-	echo "Battery time limit exceded on UPS ${2}. Doing shutdown." | ${WALL}
+	echo "Battery time limit exceeded on UPS ${2}. Doing shutdown." | ${WALL}
     ;;
     loadlimit)
 	echo "Remaining battery charge below limit on UPS ${2}. Doing shutdown." | ${WALL}

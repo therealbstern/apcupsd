@@ -65,7 +65,7 @@ case "$1" in
 		${POPUP} "apccontrol: UPS battery power exhaused. Doing shutdown." &
 	;;
 	timeout)
-		${POPUP} "apccontrol: UPS battery runtime limit exceded. Doing shutdown." &
+		${POPUP} "apccontrol: UPS battery runtime limit exceeded. Doing shutdown." &
 	;;
 	loadlimit)
 		${POPUP} "apccontrol: UPS battery discharge limit reached. Doing shutdown." &

@@ -72,7 +72,7 @@ case "$1" in
       printf "UPS battery power exhaused. Doing shutdown.\n" | wall -a
    ;;
    timeout)
-      printf "UPS battery runtime limit exceded. Doing shutdown.\n" | wall -a
+      printf "UPS battery runtime limit exceeded. Doing shutdown.\n" | wall -a
    ;;
    loadlimit)
       printf "UPS battery discharge limit reached. Doing shutdown.\n" | wall -a
