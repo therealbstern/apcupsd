@@ -7,78 +7,6 @@
 \index{Apcupsd Manual }
 \addcontentsline{toc}{section}{Apcupsd Manual}
 
-\subsection*{Image}
-\label{TOC0}
-\index{Image }
-\addcontentsline{toc}{subsection}{Image}
-
-\footnotesize
-\begin{verbatim}
-\end{verbatim}
-\normalsize
-
-\includegraphics{./apcupsd.eps} 
-
-\footnotesize
-\begin{verbatim}
-\end{verbatim}
-\normalsize
-
-\section*{Apcupsd User's Manual}
-\index{Manual!Apcupsd User's }
-\index{Apcupsd User's Manual }
-\addcontentsline{toc}{section}{Apcupsd User's Manual}
-
-\footnotesize
-\begin{verbatim}
-\end{verbatim}
-\normalsize
-
-Apcupsd Version 3.10.17 A UPS Control Program  
-
-\footnotesize
-\begin{verbatim}
-\end{verbatim}
-\normalsize
-
-Kern Sibbald 
-
-\footnotesize
-\begin{verbatim}
-\end{verbatim}
-\normalsize
-
-Apcupsd is a UPS control system that permits orderly shutdown of your computer
-in the event of a power failure.  
-
-\footnotesize
-\begin{verbatim}
-\end{verbatim}
-\normalsize
-
-This document was last updated 14 March 2005  
-
-Copyright {\copyright} 1999-2005 Kern Sibbald  
-
-\begin{quote}
-Copying and distribution of this file, with or without modification, are
-permitted in any medium without royalty provided the name Apcupsd, the
-copyright notice, and this notice are preserved. 
-\end{quote}
-
-Apcupsd source code is released under the GNU General Public License version
-2. Please see the file COPYING in the main source directory.  
-
-For more information on the project, please visit the main web site at 
-\elink{http://www.apcupsd.com}{http://www.apcupsd.com}. 
-
-\label{Top}
-
-\subsection*{Apcupsd User's Manual}
-\index{Manual!Apcupsd User's }
-\index{Apcupsd User's Manual }
-\addcontentsline{toc}{subsection}{Apcupsd User's Manual}
-
 \label{Release-Notes}
 
 \subsection*{Release Notes}
@@ -439,8 +367,8 @@ cable.
 The ``UPSTYPE Keyword'' field is the value you will put in your
 /etc/apcupsd/apcupd.conf file to tell apcupsd what type of UPS you have. 
 We'll describe the possible values here, because they're a good way to explain
-your UPS's single most important interface property \&mdash; the kind of
-protocol it uses to talk with its computer.  
+your UPS's single most important interface property {--} the kind of protocol
+it uses to talk with its computer.  
 
 \label{index-UPSTYPE-10}
 \label{index-Keywords_002c-USBTYPE-11}
@@ -508,7 +436,8 @@ not be available with your unit.
 \label{type_005ftable}
 \label{index-UPSTYPE_002c-table-12}
 
-\begin{longtable}{llll}
+\addcontentsline{lot}{table}{Supported UPS Models}
+\begin{longtable}{p{1in}p{1in}p{1in}p{2in}}
 {{\bf APC Model}} & {{\it UPSTYPE Keyword}} & {{\it UPSCABLE keywords for
 Cables Supported}} & {{\it Status} 
  } \\
@@ -591,7 +520,7 @@ Here is a diagram that summarizes the possibilities:
 
 \footnotesize
 \begin{verbatim}
-     \includegraphics{./main_configs.eps}
+     \addcontentsline{lof}{figure}{Configuration Types}\includegraphics{./main_configs.eps}
 \end{verbatim}
 \normalsize
 
@@ -772,9 +701,9 @@ installing.
 If it doesn't show, check the obvious things; the UPS must be powered on, and
 a cable must be properly seated in both the data port of the UPS and one of
 your machine's USB ports.  Many UPSes have phone ports to provide surge
-protection for phones or modems \&mdash; make sure you haven't plugged your
-USB cable into one of those rather than the data port (which will usually be
-near the top edge of the case.)  
+protection for phones or modems {--} make sure you haven't plugged your USB
+cable into one of those rather than the data port (which will usually be near
+the top edge of the case.)  
 
 Note, on recent Debian systems, they do not include the hiddev device nodes in
 /dev, so you may need to manually create them using the {\bf
@@ -843,8 +772,8 @@ If your 2.6.x system does not have the /sys/bus/usb directory, either you do
 not have sysfs mounted on /sys or the USB module(s) have not been loaded. 
 (Check /proc/mounts to make sure sysfs is mounted.)  
 
-A USB UPS needs all of these drivers \&mdash; the USB device filesystem, the
-USB hub, the Human Interface Device subsystem driver, and the Human Interface
+A USB UPS needs all of these drivers {--} the USB device filesystem, the USB
+hub, the Human Interface Device subsystem driver, and the Human Interface
 Device driver. If you are compiling your own kernel, you want to enable
 CONFIG\_USB, CONFIG\_USB\_HID, CONFIG\_USB\_HIDDEV, and CONFIG\_USB\_DEVICEFS
 as well as at least one USB Host Controller Driver (CONFIG\_USB\_UHCI\_HCD
@@ -1020,11 +949,11 @@ very unlikely that apcupsd will work.  You probably need to run the script
 ``make-hiddev'' before continuing.  
 
 If all there things check out and you still can't see the UPS, something is
-more seriously wrong than this manual can cover \&mdash; find expert help.  If
-you are unable to list USB devices or drivers, you kernel may not be
-USB-capable and that needs to be fixed. Please check if your kernel has the
-three patches listed in the \lt{}apcupsd-source\gt{}/examples directory. Each
-of the files ends with the name .patch, and at the current writing they are: 
+more seriously wrong than this manual can cover {--} find expert help.  If you
+are unable to list USB devices or drivers, you kernel may not be USB-capable
+and that needs to be fixed. Please check if your kernel has the three patches
+listed in the \lt{}apcupsd-source\gt{}/examples directory. Each of the files
+ends with the name .patch, and at the current writing they are: 
 
 \footnotesize
 \begin{verbatim}
@@ -1051,8 +980,8 @@ The BSD USB driver for apcupsd is BETA software and has some known issues.
 
 - FreeBSD lockups: Some users have experienced lockups (apcupsd stops 
 responding) on FreeBSD systems. In at least one case this problem was worked 
-around by disabling pthreads (\&ndash;disable-pthreads flag to configure). The
- problem seems to be caused by a FreeBSD kernel bug.  
+around by disabling pthreads ({---}disable-pthreads flag to configure). The 
+problem seems to be caused by a FreeBSD kernel bug.  
 
 - FreeBSD kernel panics if USB cable is unplugged while apcupsd is running. 
 This is another kernel bug and is most easily worked around by not hot- 
@@ -1163,7 +1092,7 @@ several sets of ugen nodes in case you add more USB devices.
 APCUPSD CONFIGURATION  
 
 Apcupsd must be built with USB support, which is accomplished via the
-\&ndash;enable-usb switch to configure.  
+{---}enable-usb switch to configure.  
 
 Your apcupsd.conf file needs the following hardware-related settings: 
 
@@ -1446,15 +1375,15 @@ customize your installation.
 
 \begin{description}
 
-\item {\bf \&ndash;prefix=\lt{}path\gt{}}
-\index{prefix }
+\item {\bf {---}prefix=\lt{}path\gt{}}
+\index{{---}prefix }
 This defines the directory for the non-executable files such as the manuals.
 The default is {\bf /usr}.  
 
 \label{index-options_002c-_002d_002d_002dsbindir-27}
 
-\item {\bf \&ndash;sbindir=\lt{}path\gt{}}
-\index{sbindir }
+\item {\bf {---}sbindir=\lt{}path\gt{}}
+\index{{---}sbindir }
 This defines the directory for the executable files such as apcupsd. The
 default is /sbin. You may be tempted to place the executable files in
 /usr/sbin or /usr/local/sbin. Please use caution here as these directories may
@@ -1465,164 +1394,164 @@ power returns.
 
 \label{index-options_002c-_002d_002d_002denable_002dpowerflute-28}
 
-\item {\bf \&ndash;enable-powerflute}
-\index{enable-powerflute }
+\item {\bf {---}enable-powerflute}
+\index{{---}enable-powerflute }
 This option enables the building of the powerflute executable, which is a
 ncurses based program to monitor the UPS. This program is not necessary for
 the proper execution of apcupsd.  
 
 \label{index-options_002c-_002d_002d_002denable_002dcgi-29}
 
-\item {\bf \&ndash;enable-cgi}
-\index{enable-cgi }
+\item {\bf {---}enable-cgi}
+\index{{---}enable-cgi }
 This enables the building of the CGI programs that permit Web browser access
 to apcupsd data. This option is not necessary for the proper execution of
 apcupsd.  
 
-\item {\bf \&ndash;with-cgi-bin=\lt{}path\gt{}}
-\index{with-cgi-bin }
+\item {\bf {---}with-cgi-bin=\lt{}path\gt{}}
+\index{{---}with-cgi-bin }
 The with-cgi-bin configuration option allows you to define the directory where
 the CGI programs will be installed. The default is /etc/apcupsd, which is
 probably not what you want.  
 
-\item {\bf \&ndash;with-css-dir=\lt{}path\gt{}}
-\index{with-css-dir }
+\item {\bf {---}with-css-dir=\lt{}path\gt{}}
+\index{{---}with-css-dir }
 This option allows you to specify where you want apcupsd to put the Cascading
 Style Sheet that goes with the multimoncss.cgi CGI program.  
 
-\item {\bf \&ndash;enable-master-slave}
-\index{enable-master-slave }
+\item {\bf {---}enable-master-slave}
+\index{{---}enable-master-slave }
 Turns on the master/slave networking code (default). This is sometimes
 referred to as the old master/slave code, and is more complicated than using
 NIS and the net driver to control Slaves (see below).  
 
-\item {\bf \&ndash;enable-apcsmart}
-\index{enable-apcsmart }
+\item {\bf {---}enable-apcsmart}
+\index{{---}enable-apcsmart }
 Turns on generation of the APC Smart driver (default).  
 
-\item {\bf \&ndash;enable-dumb}
-\index{enable-dumb }
+\item {\bf {---}enable-dumb}
+\index{{---}enable-dumb }
 Turns on generation of the dumb signalling driver code (default).  
 
-\item {\bf \&ndash;enable-usb}
-\index{enable-usb }
+\item {\bf {---}enable-usb}
+\index{{---}enable-usb }
 Turns on generation of the Linux (only) USB driver code. By default this is
 disabled.  
 
-\item {\bf \&ndash;enable-net}
-\index{enable-net }
+\item {\bf {---}enable-net}
+\index{{---}enable-net }
 Turns on generation of the NIS network driver for slaves. This is an
 alternative to old master/slave code. For the master, this code should be
 disabled. For each slave, this is the only driver needed. This driver works by
 reading the information from the the configured master using the NIS (Network
 Information Services) interface.  
 
-\item {\bf \&ndash;enable-snmp}
-\index{enable-snmp }
+\item {\bf {---}enable-snmp}
+\index{{---}enable-snmp }
 Turns on generation of the SNMP driver. This driver will control the computer
 by reading the UPS information over the network assuming you are running SNMP.
 By default this is disabled.  
 
-\item {\bf \&ndash;enable-test}
-\index{enable-test }
+\item {\bf {---}enable-test}
+\index{{---}enable-test }
 This turns on a test driver that is used only for debugging. By default it is
 disabled.  
 
-\item {\bf \&ndash;enable-nis}
-\index{enable-nis }
+\item {\bf {---}enable-nis}
+\index{{---}enable-nis }
 Turns on the Network Information Server (NIS) code within apcupsd. This is
 enabled by default. If you do not want to access the status of the UPS from
 the network and you are not controlling any slaves via NIS (enable-net), this
 can be disabled.  
 
-\item {\bf \&ndash;enable-pthreads}
-\index{enable-pthreads }
+\item {\bf {---}enable-pthreads}
+\index{{---}enable-pthreads }
 This option enables pthreads support causing apcupsd to be built as a threaded
 program rather than forking to create separate processes. apcupsd built in
 this fashion is more efficient that the standard version being one third the
 data size and less overhead locking and coping shared memory. This option is
 {\it highly} recommended for Windows builds.  
 
-\item {\bf \&ndash;with-libwrap=\lt{}path\gt{}}
-\index{with-libwrap }
+\item {\bf {---}with-libwrap=\lt{}path\gt{}}
+\index{{---}with-libwrap }
 This option when enabled causes apcupsd to be built with the TCP WRAPPER
 library for enhanced security. In most cases, the \lt{}path\gt{} is optional
 since configure will determine where the libraries are on most systems.  
 
-\item {\bf \&ndash;with-nologin=\lt{}path\gt{}}
-\index{with-nologin }
+\item {\bf {---}with-nologin=\lt{}path\gt{}}
+\index{{---}with-nologin }
 This option allows you to specify where apcupsd will create the nologin file
 when logins are prohibited. The default is /etc  
 
-\item {\bf \&ndash;with-pid-dir=\lt{}path\gt{}}
-\index{with-pid-dir }
+\item {\bf {---}with-pid-dir=\lt{}path\gt{}}
+\index{{---}with-pid-dir }
 This option allows you to specify where apcupsd will create the process id
 (PID) file to prevent multiple copies from running. The default is system
 dependent but usually /var/run.  
 
-\item {\bf \&ndash;with-log-dir=\lt{}path\gt{}}
-\index{with-log-dir }
+\item {\bf {---}with-log-dir=\lt{}path\gt{}}
+\index{{---}with-log-dir }
 This option allows you to specify where apcupsd will create the EVENTS and
 STATUS log files. The default is /etc/apcupsd. This option simply sets the
 default of the appropriate path in the apcupsd.conf file, which can be changed
 at any later time.  
 
-\item {\bf \&ndash;with-lock-dir=\lt{}path\gt{}}
-\index{with-lock-dir }
+\item {\bf {---}with-lock-dir=\lt{}path\gt{}}
+\index{{---}with-lock-dir }
 This option allows you to specify where apcupsd will create the serial port
 lock file. The default is systemdependent but usually /var/lock. This option
 simply sets the appropriate path in the apcupsd.conf file, which can be
 changed at any later time.  
 
-\item {\bf \&ndash;with-pwrfail-dir=\lt{}path\gt{}}
-\index{with-pwrfail-dir }
+\item {\bf {---}with-pwrfail-dir=\lt{}path\gt{}}
+\index{{---}with-pwrfail-dir }
 This option allows you to specify where apcupsd will create the powerfail file
 when a power failure occurs. The default is system dependent but usually /etc.
  
 
-\item {\bf \&ndash;with-serial-dev=\lt{}device-name\gt{}}
-\index{with-serial-dev }
+\item {\bf {---}with-serial-dev=\lt{}device-name\gt{}}
+\index{{---}with-serial-dev }
 This option allows you to specify where apcupsd will look for the serial
 device that talks to the UPS. The default is system dependent, but often
 /dev/ttyS0. This option simply sets the appropriate device name in the
 apcupsd.conf file, which can be changed at any later time.  
 
-\item {\bf \&ndash;with-nis-port=\lt{}port\gt{}}
-\index{with-nis-port }
+\item {\bf {---}with-nis-port=\lt{}port\gt{}}
+\index{{---}with-nis-port }
 This option allows you to specify what port apcupsd will use for the Network
 Information Server (the CGI programs). The default is system dependent but
 usually 3551 because that port has been officially assigned to apcupsd by the
 IANA. This option simply sets the appropriate port in the apcupsd.conf file,
 which can be changed at any later time.  
 
-\item {\bf \&ndash;with-nisip=\lt{}IP-Address\gt{}}
-\index{with-nisip }
+\item {\bf {---}with-nisip=\lt{}IP-Address\gt{}}
+\index{{---}with-nisip }
 This option allows you to specify the value that will be placed on then NISIP
 directive in the configuration file. The default is 0.0.0.0. No checking is
 done on the value entered, so you must ensure that it is a valid IP address.  
 
-\item {\bf \&ndash;with-net-port=\lt{}port\gt{}}
-\index{with-net-port }
+\item {\bf {---}with-net-port=\lt{}port\gt{}}
+\index{{---}with-net-port }
 This option allows you to specify what port apcupsd will use for Master and
 Slave communications. The default is system dependent but usually 6666. This
 option simply sets the appropriate port in the apcupsd.conf file, which can be
 changed at any later time.  
 
-\item {\bf \&ndash;with-upstype=\lt{}type\gt{}}
-\index{with-upstype }
+\item {\bf {---}with-upstype=\lt{}type\gt{}}
+\index{{---}with-upstype }
 This option allows you to specify the type of UPS that will be connected to
 your computer. The default is: smartups. This option simply sets the
 appropriate UPS type in the apcupsd.conf file, which can be changed at any
 later time.  
 
-\item {\bf \&ndash;with-upscable=\lt{}path\gt{}}
-\index{with-upscable }
+\item {\bf {---}with-upscable=\lt{}path\gt{}}
+\index{{---}with-upscable }
 This option allows you to specify what cable you are using to connect to the
 UPS. The default is: smart. This option simply sets the appropriate UPS cable
 in the apcupsd.conf file, which can be changed at any later time.  
 
-\item {\bf \&ndash;disable-install-distdir}
-\index{disable-install-distdir }
+\item {\bf {---}disable-install-distdir}
+\index{{---}disable-install-distdir }
 This option modifies the apcupsd Makefiles disable installation of the
 distribution (platform) directory. Generally, this used to do a full
 installation of apcupsd except the final modification of the operating system
@@ -1903,7 +1832,7 @@ and Solaris, but rather a user program that makes all I/O non-blocking. So
 when apcupds does I/O, the userland pthreads libarary will switch to another
 thread if it wants to run. This works fine except that when a child process is
 called and it exits, all the blocking/non-blocking statuses of the open file
-descriptors in the parent program are reset as blocking \&ndash; this causes
+descriptors in the parent program are reset as blocking {---} this causes
 chaos and an almost immediate freezing of the program (apcupsd). 
 
 \label{Red-Hat-Systems}
@@ -2286,9 +2215,9 @@ device automatically.
 
 If the first time you execute apcupsd, you get a message to the effect that
 the Apcupsd USB driver is missing, it means that you most likely forgot to put
-{\it \&ndash;enable-usb} on your ./configure command line. If you loaded
-apcupsd from an rpm file, you may have selected the wrong one \&ndash; please
-ensure that the word {\it usb} appears in the rpm package name.  
+{\it {---}enable-usb} on your ./configure command line. If you loaded apcupsd
+from an rpm file, you may have selected the wrong one {---} please ensure that
+the word {\it usb} appears in the rpm package name.  
 
 The next chapter (see 
 \ilink{Configuration Examples}{manual.tex#Configuration-Examples}) of this
@@ -2692,7 +2621,7 @@ Using the Net Driver}
 \label{index-Configuration_002c-NIS-slave-conf-83}
 As opposed to the old master/slave mode demonstrated above, you can turn any
 computer into an NIS slave by configuring with the NIS network driver turned
-on {\tt --enable-net}. The difference is that the NIS server has no explicit
+on {\tt \verb{--{enable-net}. The difference is that the NIS server has no explicit
 knowledge of the slaves. The NIS server makes its information available via
 the net (NIS), and the NIS slaves read it. When the NIS server is going to
 shutdown, it makes the information available to any NIS slave that polls it,
@@ -2932,7 +2861,7 @@ If you have installed the RPM, they will probably be in
 This test consists of running {\tt apcaccess} to see if apcupsd is properly
 updating its internal variables.  Please note that if you are running a
 pthreaded version of apcupsd, which you should be since the non-pthreaded
-version is no longer supported, (installed from rpm or {\tt --enable-pthreads}
+version is no longer supported, (installed from rpm or {\tt \verb{--{enable-pthreads}
 on the {\tt ./configure} line), you must enable the apcupsd Network
 Information Server in your configuration file for {\bf apcaccess} to work. 
 This is done by setting: 
@@ -3279,7 +3208,7 @@ apcupsd.conf with the original files.
 This is an intermediate test that you can do, for all UPS models before doing
 the Full Power Down Test. First modify the /etc/apcupsd/apccontrol file so
 that in the {\bf killpower)} case, the line that re-executes apcupsd with the
-{\tt --killpower} option is commented out. The original line probably looks
+{\tt \verb{--{killpower} option is commented out. The original line probably looks
 something like: 
 
 \footnotesize
@@ -3323,7 +3252,7 @@ wrong).
 
 Before proceeding, please ensure that your halt script or the equivalent has
 been properly updated by the install process to contain the logic to call {\tt
-apcupsd --killpower} when it detects a power failure situation (the presence
+apcupsd \verb{--{killpower} when it detects a power failure situation (the presence
 of a /etc/powerfail file). See the 
 \ilink{Building and Installing
 apcupsd}{manual.tex#Building-and-Installing-apcupsd} of this manual, or the
@@ -3838,10 +3767,10 @@ Programs}
 \label{index-CGI-programs-121}
 With this release, there are five CGI programs (multimon.cgi, multimoncss.cgi,
 upsstats.cgi, upsfstats.cgi, and upsimage.cgi). To have them properly
-installed, you must run the {\tt ./configure} command with {\tt --enable-cgi}
-and you should specify an installation directory with {\tt --with-cgi-bin=} or
+installed, you must run the {\tt ./configure} command with {\tt \verb{--{enable-cgi}
+and you should specify an installation directory with {\tt \verb{--{with-cgi-bin=} or
 load them manually. To install the Cascading Style Sheet, which is used by
-multimoncss.cgi, you must use the {\tt --with-css-dir=} option. The default
+multimoncss.cgi, you must use the {\tt \verb{--{with-css-dir=} option. The default
 directory for installation of the CGI programs is /etc/apcupsd, which is not
 really where you want them if you are going to use them. Normally, they should
 go in the cgi-bin of your Web server.  
@@ -3912,7 +3841,7 @@ following:
 \normalsize
 
 where the USB copy of apcupsd has been configured to use port 7001 (with {\tt
---with-nis-port=7001} on the {\tt ./configure} or by modifying apcupsd.conf).
+\verb{--{with-nis-port=7001} on the {\tt ./configure} or by modifying apcupsd.conf).
 Note, the default NIS port is 3551 on most platforms.  
 
 To test multimon.cgi, you can execute it as non-root directly from the source
@@ -3987,7 +3916,9 @@ cgi-bin/multimoncss.cgi}
 \label{index-multimon-126}
 \label{index-CGI_002c-multimon-127}
 This program monitors multiple UPSes at the same time. A typical output of
-multimon.cgi as displayed in your Web browser might look like the following: 
+multimon.cgi as displayed in your Web browser might look like the following:  
+
+\addcontentsline{lof}{figure}{Multimon Main Page}
 \includegraphics{./multimon.eps}  
 
 The machines monitored as well as the values and their column headings are all
@@ -4001,7 +3932,9 @@ configurable (see /etc/apcupsd/hosts.conf and /etc/apcupsd/multimon.conf)
 \label{index-CGI_002c-upsstats-129}
 By clicking on the {\bf system} name in the {\bf multimon.cgi} display, you
 will invoke upsstats.cgi for the specified system, which will produce a bar
-graph display of three of the monitored values. For example, 
+graph display of three of the monitored values. For example,  
+
+\addcontentsline{lof}{figure}{Multimon Statistics Display}
 \includegraphics{./status.eps}  
 
 You can display different bar graphs by selecting different variables from the
@@ -4219,7 +4152,7 @@ specified in your configuration file.
 \label{index-Wrappers_002c-TCP-138}
 \label{index-TCP-wrappers-139}
 As of apcupsd version 3.8.2, TCP Wrappers are implemented if you turn them on
-when configuring ({\tt ./configure --with-libwrap}).  With this code enabled,
+when configuring ({\tt ./configure \verb{--{with-libwrap}).  With this code enabled,
 you may control who may access your apcupsd via TCP connections (the Network
 Information Server, and the Master/Slave code). This control is done by
 modifying the file: /etc/hosts.allow. This code is implemented but untested.
@@ -4734,7 +4667,7 @@ warning of a low battery instead of what happened to me.
 
 Regards,  
 
-\&ndash;Carl 
+{---}Carl 
 \end{quote}
 
 \label{Where-Carl-Suggests-You-Get-Batteries}
@@ -4837,11 +4770,11 @@ Why all the craziness with custom serial cables?
 It was nothing more nor less than a form of customer control. For a long time
 APC wanted to keep other people from talking to its UPSes so it could lock out
 potential competition for its PowerChute software.  Scrambling the leads on
-its serial cables was a cheap way to accomplish this \&mdash; in fact, they
-tended to be wired so that if you tried a straight-through cable, opening a
-serial link to the UPS would be interpreted as a shutdown command!  
+its serial cables was a cheap way to accomplish this {--} in fact, they tended
+to be wired so that if you tried a straight-through cable, opening a serial
+link to the UPS would be interpreted as a shutdown command!  
 
-(Hardware companies often think like this \&mdash; they lock up interfaces by
+(Hardware companies often think like this {--} they lock up interfaces by
 instinct, cornering a small market rather than growing a bigger one.  It's
 fundamentally stupid and self-defeating, but it's the kind of stupid that
 tends to sound good at an executive meeting.)  
@@ -4909,7 +4842,7 @@ order of 0.5-1.0\%. This is higher than for Unix systems. However, compared to
 the 30\% CPU usage by APC's PowerChute (the version on the CDROM shipped with
 my UPS), apcupsd's 0.5-1.0\% is very modest.  
 
-If you configure apcupsd to run with pthreads ({\tt --with-pthreads} on the
+If you configure apcupsd to run with pthreads ({\tt \verb{--{with-pthreads} on the
 {\tt ./configure} line), apcupsd will run considerably faster, otherwise said,
 it will consume less of your CPU, and it will use approximately one third of
 the memory. For example, Carl Erhorn reports that on his Solaris system,
@@ -4929,7 +4862,7 @@ It is written entirely in C.
 \index{ Q: }
 We are using apcupsd-3.8.1-1 in RedHat 6.2. The slave, when shutting down, is
 reporting an error at line 436 of apcupsd.c. The error is initiated by {\tt
-apcupsd --killpower}! What can we do to fix this, and is it critical?  
+apcupsd \verb{--{killpower}! What can we do to fix this, and is it critical?  
 
 \item {\bf A:}
 \index{ A: }
@@ -4938,7 +4871,7 @@ master/slaves is not very detailed, and for that reason, your slave setup is
 not totally correct as explained below.  
 
 On master machines, we modify /etc/rc.d/init.d/halt to re-invoke apcupsd with
-the {\tt --killpower} option (actually the script apccontrol is called). This
+the {\tt \verb{--{killpower} option (actually the script apccontrol is called). This
 causes the UPS to send the codes to the UPS to make it power off.  
 
 On slave machines, these modifications should not be made to the
@@ -4960,7 +4893,7 @@ you have a remedy?
 \index{ A: }
 Normally, once the shutdown process has begun, we cannot stop it, though there
 {\it is} some code that tries to do so, we don't consider it a very good idea
-\&mdash; how do you stop a shutdown that has killed off half of the daemons
+{--} how do you stop a shutdown that has killed off half of the daemons
 running on your system? Most likely you will be left with an unusable system.
 In addition, when apcupsd is re-executed in the halt script after the disks
 are synced, it tries to shut off the UPS power, but the UPS will generally
@@ -5269,7 +5202,7 @@ apccontrol accepts the following command line options:
 When a shutdown is scheduled, and the time specified on the ANNOYME directive
 in the apcupsd.conf file expires, this event is generated.  
 
-Default \&ndash; does a {\tt printf ``Power problems please logoff.'' | wall}
+Default {---} does a {\tt printf ``Power problems please logoff.'' | wall}
 then exits.  
 
 \item {\bf changeme}
@@ -5277,7 +5210,7 @@ then exits.
 When apcupsd detects that the mains are on, but the battery is not functioning
 correctly, this event is generated. It is repeated every x hours.  
 
-Default \&ndash; does a {\tt printf ``Emergency! UPS batteries have
+Default {---} does a {\tt printf ``Emergency! UPS batteries have
 failed\textbackslash{}nChange them NOW'' | wall} then exits.  
 
 \item {\bf commfailure}
@@ -5293,8 +5226,8 @@ lost.'' | wall} then exits.
 After a commfailure event is issued, when the communications to the computer
 is re-established, this event will be generated.  
 
-Default \&ndash; does a {\tt printf ``Serial communications with UPS
-restored.'' | wall} then exits.  
+Default {---} does a {\tt printf ``Serial communications with UPS restored.''
+| wall} then exits.  
 
 \item {\bf doreboot}
 \index{doreboot }
@@ -5318,7 +5251,7 @@ Does an emergency shutdown of the system by calling {\tt shutdown -h now}
 This event is generated when the UPS is running on batteries and the battery
 power is exhausted. The event following this one will be a shutdown.  
 
-Default \&ndash; does a {\tt printf ``UPS battery power exhausted. Doing
+Default {---} does a {\tt printf ``UPS battery power exhausted. Doing
 shutdown.\textbackslash{}n'' | wall} then exits.  
 
 \item {\bf loadlimit}
@@ -5326,9 +5259,9 @@ shutdown.\textbackslash{}n'' | wall} then exits.
 This event is generated when the battery charge is below the low limit
 specified in the apcupsd.conf file.  
 
-Default \&ndash; does a {\tt printf ``UPS battery discharge limit reached.
-Doing shutdown.\textbackslash{}n'' | wall} then exits.  After completing this
-event, apcupsd will immediately initiate a {\tt doshutdown} event.  
+Default {---} does a {\tt printf ``UPS battery discharge limit reached. Doing
+shutdown.\textbackslash{}n'' | wall} then exits.  After completing this event,
+apcupsd will immediately initiate a {\tt doshutdown} event.  
 
 \item {\bf mainsback}
 \index{mainsback }
@@ -5338,7 +5271,7 @@ the paramaters you have defined and the length of the power outage. A cancel
 of a shutdown should never be attempted as it is very unlikely to succeed and
 will almost surely leave your machine in a indeterminate state.  
 
-Default \&ndash; attempts to cancel the shutdown with a {\tt shutdown -c} (not
+Default {---} attempts to cancel the shutdown with a {\tt shutdown -c} (not
 sure about that!!!!)  
 
 \item {\bf onbattery}
@@ -5348,15 +5281,15 @@ detected. It means that apcupsd definitely considers the UPS to be on
 batteries. The onset of this event can be delayed by the ONBATTERYDELAY
 apcupsd.conf configuration directive.  
 
-Default \&ndash; does a {\tt printf ``Power failure. Running on UPS
-batteries.'' | wall} then exits.  
+Default {---} does a {\tt printf ``Power failure. Running on UPS batteries.''
+| wall} then exits.  
 
 \item {\bf offbattery}
 \index{offbattery }
 This event is generated when the mains return only if the onbattery event has
 been generated.  
 
-Default \&ndash; does nothing.  
+Default {---} does nothing.  
 
 \item {\bf powerout}
 \index{powerout }
@@ -5366,15 +5299,15 @@ selftest of the UPS, or a longer powerfailure. In many cases, you may want to
 inhibit the normal message sent/emailed by this event to avoid being annoyed
 by short power failures.  
 
-Default \&ndash; does a {\tt printf ``Warning power loss detected.'' | wall}
-then exits.  
+Default {---} does a {\tt printf ``Warning power loss detected.'' | wall} then
+exits.  
 
 \item {\bf remotedown}
 \index{remotedown }
 This event is generated on a slave machine when it detects either that the
 master has shutdown, or that a onbattery situation exists and the
 communications line has been severed. Despite the name, you should never
-reboot the machine \&ndash; instead always shut it down.  
+reboot the machine {---} instead always shut it down.  
 
 Does a {\tt shutdown -h now}  
 
@@ -5682,8 +5615,8 @@ the SLAVE directive of the master's configuration file is incorrect.
 \index{Cannot open stream socket }
 \addcontentsline{toc}{paragraph}{12.3.1.6 Cannot open stream socket}
 
-This indicates a fundamental networking problem on your system \&mdash; either
-a lack of sufficient resources or you have not configured TCP/IP operations. 
+This indicates a fundamental networking problem on your system {--} either a
+lack of sufficient resources or you have not configured TCP/IP operations. 
 
 \label{Error-Messages-from-a-Slave-Configuration}
 
@@ -5885,7 +5818,7 @@ Note, in this case, we use considerably more configuration options to ensure
 that the system files are placed in a different directory
 (\$HOME/apcupsd/bin). We have also selected a different serial port and a
 different NIS (Network Information Server) port. And finally, we have used the
-{\tt --disable-install-distdir} option, which prevents {\tt make install} from
+{\tt \verb{--{disable-install-distdir} option, which prevents {\tt make install} from
 doing the final system installation (i.e. the modification of the halt script)
 since this was previously done. 
 
@@ -6031,8 +5964,8 @@ during powerdown do the following:
 UPS configuration menu and change the ``Shutdown Delay'' parameter to 180
 seconds or more, depending on how much time your system shutdown requires to
 umount all the filesystems.  
-\item Change /etc/rc.d/apcupsd script adding the '\&ndash;kill-on-powerfail'
-to the apcupsd invocation.  
+\item Change /etc/rc.d/apcupsd script adding the '{---}kill-on-powerfail' to
+the apcupsd invocation.  
 \item Restart your apcupsd 
 \end{itemize}
 
@@ -6424,6 +6357,7 @@ name of the icon will vary from one release version to another.
 \end{verbatim}
 \normalsize
 
+\addcontentsline{lof}{figure}{Windows Install - Explorer Window}
 \includegraphics{./wininstall3.eps}  
 
 \footnotesize
@@ -6443,6 +6377,7 @@ a temporary file, respond with {\bf Yes}.
 \end{verbatim}
 \normalsize
 
+\addcontentsline{lof}{figure}{Windows Install - Winzip Unpack}
 \includegraphics{./wininstall4.eps}  
 
 \footnotesize
@@ -6462,6 +6397,7 @@ C:\textbackslash{}
 \end{verbatim}
 \normalsize
 
+\addcontentsline{lof}{figure}{Windows Install - Winzip Extract Window}
 \includegraphics{./wininstall5.eps}  
 
 \footnotesize
@@ -6532,6 +6468,7 @@ output in a DOS shell window:
 \end{verbatim}
 \normalsize
 
+\addcontentsline{lof}{figure}{Windows Install - Setup Complete}
 \includegraphics{./wininstall1.eps}  
 
 \footnotesize
@@ -6554,6 +6491,7 @@ follows:
 \end{verbatim}
 \normalsize
 
+\addcontentsline{lof}{figure}{Windows Install - Success}
 \includegraphics{./wininstall2.eps}  
 
 \footnotesize
@@ -6591,6 +6529,7 @@ clicking on the Start button as shown below:
 \end{verbatim}
 \normalsize
 
+\addcontentsline{lof}{figure}{Windows NT - Start Service}
 \includegraphics{./wininstall6.eps}  
 
 \footnotesize
@@ -6683,7 +6622,7 @@ c:\textbackslash{}apcupsd\textbackslash{}bin directory, then apply the upgrade
 and restart apcupsd.  
 
 On WinNT systems (and Win2000 systems), you may stop apcupsd as indicated
-abover or alternatively you may stop apcupsd by using the {\bf Services} item
+above or alternatively you may stop apcupsd by using the {\bf Services} item
 in the {\bf Control Panel}. In addition, at least on my system, there seems to
 be a WinNT bug that causes the system to prevent {\bf apcupsd.exe} from being
 overwritten even though the file is no longer being used.  This is manifested
@@ -6691,10 +6630,15 @@ by an error message when attempting load a new version and overwrite the old
 apcupsd.exe (the extract part of WinZip as described above). To circumvent
 this problem (if it happens to you), after shutting down the running version
 of apcupsd, through the {\bf Services} dialogue in the {\bf Control Panel},
-first click on the {\bf Stop button}:  \includegraphics{./wininstall6.eps}  
+first click on the {\bf Stop button}:  
+
+\addcontentsline{lof}{figure}{Windows NT - Stopping the Service}
+\includegraphics{./wininstall6.eps}  
 
 then click on the {\bf Startup ...} button, and in the Startup dialogue select
-the {\bf Disabled} button to disable apcupsd: 
+the {\bf Disabled} button to disable apcupsd:  
+
+\addcontentsline{lof}{figure}{Windows NT - Disabling the Service}
 \includegraphics{./wininstall7.eps}  
 
 After closing the dialogues, reboot the system, typical of Microsoft :-(. When
@@ -6837,7 +6781,7 @@ shuts down, your computer may not reboot automatically. This is because we do
 not know how to regain control after the disks have been synced in order to
 shut off the UPS power.  
 
-Nevertheless, it is possible to use the {\tt --kill-on-powerfail} option on
+Nevertheless, it is possible to use the {\tt \verb{--{kill-on-powerfail} option on
 the apcupsd command line, but the use of this option could cause the power to
 be cut off while your machine is still running. See 
 \ilink{Shutdown Sequence}{manual.tex#Shutdown-Sequence-_003c1_003e} of this
@@ -6847,7 +6791,7 @@ commented out in
 c:\textbackslash{}apcupsd\textbackslash{}etc\textbackslash{}apcupsd\textbackslash
 {}apccontrol under the {\bf doshutdown} case.  
 
-An alternative to the {\tt --kill-on-powerfail} option is to use the KILLDELAY
+An alternative to the {\tt \verb{--{kill-on-powerfail} option is to use the KILLDELAY
 (see 
 \ilink{KILLDELAY \lt{}time in
 seconds\gt{}}{manual.tex#KILLDELAY-_003ctime-in-seconds_003e}) configuration
@@ -7002,9 +6946,9 @@ system registry and modify the appropriate entries.
 In order to avoid option clashes between the options necessary for apcupsd to
 run on Windows and the standard apcupsd options, all Windows specific options
 are signaled with a forward slash character (/), while as usual, the standard
-apcupsd options are signaled with a minus (-), or a minus minus (\&ndash;).
-All the standard apcupsd options can be used on the Windows version. In
-addition, the following Windows only options are implemented:  
+apcupsd options are signaled with a minus (-), or a minus minus ({---}). All
+the standard apcupsd options can be used on the Windows version. In addition,
+the following Windows only options are implemented:  
 
 \begin{description}
 
@@ -7486,7 +7430,8 @@ The following table shows the features supported by the current version of
 apcupsd (3.8.5 or later) for various cables running the UPS in
 voltage-signalling mode.  
 
-\begin{longtable}{lllll}
+\addcontentsline{lot}{table}{Supported Features}
+\begin{longtable}{p{1.2in}p{0.8in}p{1.2in}p{0.8in}p{1.0in}}
 {Cable} & {Power Loss} & {Low Battery} & {Kill Power} & {Cable Disconnected 
  } \\
 {940-0020B} & {Yes} & {No} & {Yes} & {No 
@@ -8133,58 +8078,59 @@ Conventions}
 
 \label{index-Cables-216}
 
+\addcontentsline{lot}{table}{RS232 Wiring and Signal Conventions}
 \begin{longtable}{llll}
 {DB-25 Pin \#} & {DB-9 Pin \#} & {Name} & {DTE-DCE Description 
  } \\
-{1} & {\&ndash;} & {FG} & {\&mdash; Frame Ground/Chassis GND 
+{1} & {{---}} & {FG} & {{--} Frame Ground/Chassis GND 
  } \\
-{2} & {3} & {TD} & {\&mdash;\gt{} Transmitted Data, TxD 
+{2} & {3} & {TD} & {{--}\gt{} Transmitted Data, TxD 
  } \\
-{3} & {2} & {RD} & {\lt{}\&mdash; Received Data, RxD 
+{3} & {2} & {RD} & {\lt{}{--} Received Data, RxD 
  } \\
-{4} & {7} & {RTS} & {\&mdash;\gt{} Request To Send 
+{4} & {7} & {RTS} & {{--}\gt{} Request To Send 
  } \\
-{5} & {8} & {CTS} & {\lt{}\&mdash; Clear To Send 
+{5} & {8} & {CTS} & {\lt{}{--} Clear To Send 
  } \\
-{6} & {6} & {DSR} & {\lt{}\&mdash; Data Set Ready 
+{6} & {6} & {DSR} & {\lt{}{--} Data Set Ready 
  } \\
-{7} & {5} & {SG} & {\&mdash;\&ndash; Signal Ground, GND 
+{7} & {5} & {SG} & {{--}{---} Signal Ground, GND 
  } \\
-{8} & {1} & {DCD} & {\lt{}\&mdash; Data Carrier Detect 
+{8} & {1} & {DCD} & {\lt{}{--} Data Carrier Detect 
  } \\
-{9} & {\&ndash;} & {\&ndash;} & {\&mdash; Positive DC test voltage 
+{9} & {{---}} & {{---}} & {{--} Positive DC test voltage 
  } \\
-{10} & {\&ndash;} & {\&ndash;} & {\&mdash; Negative DC test voltage 
+{10} & {{---}} & {{---}} & {{--} Negative DC test voltage 
  } \\
-{11} & {\&ndash;} & {QM} & {\lt{}\&mdash; Equalizer mode 
+{11} & {{---}} & {QM} & {\lt{}{--} Equalizer mode 
  } \\
-{12} & {\&ndash;} & {SDCD} & {\lt{}\&mdash; Secondary Data Carrier Detect 
+{12} & {{---}} & {SDCD} & {\lt{}{--} Secondary Data Carrier Detect 
  } \\
-{13} & {\&ndash;} & {SCTS} & {\lt{}\&mdash; Secondary Clear To Send 
+{13} & {{---}} & {SCTS} & {\lt{}{--} Secondary Clear To Send 
  } \\
-{14} & {\&ndash;} & {STD} & {\&mdash;\gt{} Secondary Transmitted Data 
+{14} & {{---}} & {STD} & {{--}\gt{} Secondary Transmitted Data 
  } \\
-{15} & {\&ndash;} & {TC} & {\lt{}\&mdash; Transmitter (signal) Clock 
+{15} & {{---}} & {TC} & {\lt{}{--} Transmitter (signal) Clock 
  } \\
-{16} & {\&ndash;} & {SRD} & {\lt{}\&mdash; Secondary Receiver Clock 
+{16} & {{---}} & {SRD} & {\lt{}{--} Secondary Receiver Clock 
  } \\
-{17} & {\&ndash;} & {RC} & {\&mdash;\gt{} Receiver (signal) Clock 
+{17} & {{---}} & {RC} & {{--}\gt{} Receiver (signal) Clock 
  } \\
-{18} & {\&ndash;} & {DCR} & {\lt{}\&mdash; Divided Clock Receiver 
+{18} & {{---}} & {DCR} & {\lt{}{--} Divided Clock Receiver 
  } \\
-{19} & {\&ndash;} & {SRTS} & {\&mdash;\gt{} Secondary Request To Send 
+{19} & {{---}} & {SRTS} & {{--}\gt{} Secondary Request To Send 
  } \\
-{20} & {4} & {DTR} & {\&mdash;\gt{} Data Terminal Ready 
+{20} & {4} & {DTR} & {{--}\gt{} Data Terminal Ready 
  } \\
-{21} & {\&ndash;} & {SQ} & {\lt{}\&mdash; Signal Quality Detect 
+{21} & {{---}} & {SQ} & {\lt{}{--} Signal Quality Detect 
  } \\
-{22} & {9} & {RI} & {\lt{}\&mdash; Ring Indicator 
+{22} & {9} & {RI} & {\lt{}{--} Ring Indicator 
  } \\
-{23} & {\&ndash;} & {\&ndash;} & {\&mdash;\gt{} Data rate selector 
+{23} & {{---}} & {{---}} & {{--}\gt{} Data rate selector 
  } \\
-{24} & {\&ndash;} & {\&ndash;} & {\lt{}\&mdash; Data rate selector 
+{24} & {{---}} & {{---}} & {\lt{}{--} Data rate selector 
  } \\
-{25} & {\&ndash;} & {TC} & {\lt{}\&mdash; Transmitted Clock  
+{25} & {{---}} & {TC} & {\lt{}{--} Transmitted Clock  
 }
 
 \end{longtable}
@@ -8831,7 +8777,7 @@ The name of a driver.  Should be one of dumb, apcsmart, net, usb, snmp, or
 test. This describes your interface type.  
 
 The UPSTYPE directive can be defined during installation by using the {\tt
---with-upstype=} option of the {\tt ./configure} program.  
+\verb{--{with-upstype=} option of the {\tt ./configure} program.  
 
 \item {\bf UPSCABLE \lt{}type of cable you are using\gt{}\gt{}}
 \index{UPSCABLE \lt{}type of cable you are using\gt{}\gt{} }
@@ -8847,7 +8793,7 @@ The UPSTYPE directive can be defined during installation by using the {\tt
 \end{verbatim}
 \normalsize
 
-The {\tt --with-upscable=} option of {\tt ./configure} can be used to set a
+The {\tt \verb{--{with-upscable=} option of {\tt ./configure} can be used to set a
 default for this directive during the your build.  
 
 \item {\bf DEVICE \lt{}name of device\gt{}}
@@ -8858,7 +8804,7 @@ the device blank (no specification) and apcupsd will automatically search the
 standard locations for the UPS.  
 
 Normally, the {\tt ./configure} program will set an appropriate default value.
-You may also specify the {\tt --with-serial-dev=} option of the {\tt
+You may also specify the {\tt \verb{--{with-serial-dev=} option of the {\tt
 ./configure} program to set this directive at build time.  
 
 If you have specified {\bf UPSTYPE net}, then the device name to be specified
@@ -8880,7 +8826,7 @@ directive name is LOCKFILE, you are actually specifying the lock file path.
 apcupsd automatically appends the name of the device when creating the file.
 On most systems, this directive is automatically set by the {\tt ./configure}
 program.  You may also explicitly set it during the build process by using the
-{\tt --with-lock-dir=} option of the {\tt ./configure} program. 
+{\tt \verb{--{with-lock-dir=} option of the {\tt ./configure} program. 
 \end{description}
 
 \label{Configuration-Directives-Used-by-the-Network-Information-Server}
@@ -8896,7 +8842,7 @@ Network Information Server}
 \label{index-Network-directives-242}
 None of these directives are required for proper operation of apcupsd. For the
 Network Information Server to work, it must be enabled in the configuration
-(default) with {\tt --enable-nis}  
+(default) with {\tt \verb{--{enable-nis}  
 
 \begin{description}
 
@@ -8916,7 +8862,7 @@ incoming connections. Default value is 0.0.0.0 that means any incoming request
 will be serviced but if you want it to listen to a single subnet you can set
 it up to that subnet address, for example 192.168.10.0. Additionally you can
 listen for a single IP like 192.168.10.1. You may also use the {\tt
---with-nisip=} option of the {\tt ./configure} program to set this directive
+\verb{--{with-nisip=} option of the {\tt ./configure} program to set this directive
 during the build.  
 
 This directive does not work on Win32 machines because inet\_ipton() is not
@@ -8929,7 +8875,7 @@ Network Information Server. The default is platform dependent, but typically
 3551, which we have received from IANA as the official apcupsd networking
 port. If you change this port, you must manually change the \#define
 SERV\_TCP\_PORT in cgi/upsfetch.c and rebuild the CGI programs. An alternative
-is to use the {\tt --with-nis-port=} option of the {\tt ./configure} program
+is to use the {\tt \verb{--{with-nis-port=} option of the {\tt ./configure} program
 during the build. In this case, all the appropriate locations will be
 automatically changed.  
 
@@ -8948,7 +8894,7 @@ numbers, apcupsd may make excessive memory demands on the system during the
 data access and file truncation operations.  
 
 This filename may also be specified at build time by using the {\tt
---with-log-dir=} option of the {\tt ./configure} program. 
+\verb{--{with-log-dir=} option of the {\tt ./configure} program. 
 \end{description}
 
 \label{Configuration-Directives-used-during-Power-Failures}
@@ -9093,8 +9039,8 @@ condition is determined, apcupsd will notify each of the slaves to perform a
 shutdown then apcupsd will sleep for 30 seconds before issuing the shutdown of
 its own computer. If you need the master to wait additional time before
 shutting down (to allow for shutdown of slower slaves or of slaves running
-software that requires more time to shutdown \&mdash; e.g. databases), you can
-do so by adding additional sleep() commands to /etc/apcupsd/apccontrol in each
+software that requires more time to shutdown {--} e.g. databases), you can do
+so by adding additional sleep() commands to /etc/apcupsd/apccontrol in each
 case that causes a shutdown.  
 
 {\bf TIMEOUT}, {\bf BATTERYLEVEL}, and {\bf MINUTES} can be set together
@@ -9179,14 +9125,14 @@ the slaves, will obtain their information via the network from the master.
 
 Note, as of version 3.10.x, the old master/slave code is by default turned off
 in the configuration. You must explicitly enable it by including a {\tt
---enable-master-slave} option on your {\tt ./configure} command before
+\verb{--{enable-master-slave} option on your {\tt ./configure} command before
 building the source.  
 
 In addition to the old master/slave code, there is now a new network driver
-enabled with {\tt --enable-net} (default disabled) that can be used to control
+enabled with {\tt \verb{--{enable-net} (default disabled) that can be used to control
 a slave from any version of apcupsd running NIS. This is a much more flexible
 system of controlling slaves because a slave machine that also has NIS turned
-on can thus act as a master for another slave with {\tt --enable-net} turned
+on can thus act as a master for another slave with {\tt \verb{--{enable-net} turned
 on. With this mode turned on, the slave obtains the address of the master from
 the {\bf DEVICE} directive, which takes the form {\bf hostname[:port]} as a
 consequence, none of the directives apply for this form of networking. In
@@ -9252,7 +9198,7 @@ typical value might be 60 seconds.
 This port number is used for communications in the master/slave networking
 code. Note that the master and each slave must have the same port number
 specified on the NETPORT directive in the configuration file. This port may
-also be specified during installation by using the {\tt --with-net-port=}
+also be specified during installation by using the {\tt \verb{--{with-net-port=}
 option of the {\tt ./configure} program.  
 
 The NETPORT should not be confused with the port number for the Network
@@ -9339,7 +9285,7 @@ the UPS EPROM}
 NOTE. THESE ARE DEPRECIATED AND NO LONGER WORK IN APCUPSD PLEASE USE APCTEST  
 
 The values specified with the following directives are only used if the {\tt
---configure} option is specified on the apcupsd command line, and the UPS is
+\verb{--{configure} option is specified on the apcupsd command line, and the UPS is
 capable of internal EPROM programming.  In that case, apcupsd attempts to set
 the values into the UPSes EPROM.  
 
@@ -9364,7 +9310,7 @@ want to try a less sensitive setting, providing that your computer equipment
 tolerates the poor quality mains. This value is written to the UPS EPROM when
 the configure option is specified.  
 
-Under normal apcupsd operations (no {\tt --configure} option), apcupsd will
+Under normal apcupsd operations (no {\tt \verb{--{configure} option), apcupsd will
 read the value stored in the UPS and display it in the STATUS output.  
 
 \label{WAKEUP-_003cset-wakeup-delay_003e}
@@ -9376,10 +9322,10 @@ has shut down during a power failure. This is to prevent the power from coming
 back on too quickly after a power down, and is important for those who have
 high rpm drives that need to spin down before powering them up again. Some
 older SCSI models are very sensitive to this problem. Default is zero. This
-value is written to the UPS EPROM when the {\tt --configure} option is
+value is written to the UPS EPROM when the {\tt \verb{--{configure} option is
 specified.  
 
-Under normal apcupsd operations (no {\tt --configure} option), apcupsd will
+Under normal apcupsd operations (no {\tt \verb{--{configure} option), apcupsd will
 read the value stored in the UPS and display it in the STATUS output.  
 
 \label{SLEEP-_003cset-sleep-delay_003e}
@@ -9388,9 +9334,9 @@ read the value stored in the UPS and display it in the STATUS output.
 \index{SLEEP \lt{}set sleep delay\gt{} }
 The UPS delay or grace period in [20,180,300,600] seconds before the UPS cuts
 the power to your equipment. The default is 20 seconds. This value is written
-to the UPS EPROM when the {\tt --configure} option is specified.  
+to the UPS EPROM when the {\tt \verb{--{configure} option is specified.  
 
-Under normal apcupsdoperations (no {\tt --configure} option), apcupsd will
+Under normal apcupsdoperations (no {\tt \verb{--{configure} option), apcupsd will
 read the value stored in the UPS and display it in the STATUS output.  
 
 \item {\bf LOTRANSFER \lt{}lower limit of ups batt. transfer\gt{}}
@@ -9398,10 +9344,10 @@ read the value stored in the UPS and display it in the STATUS output.
 This sets the low line voltage point at which to switch over to batteries.
 Different values are permitted based on the UPS model, classification, and
 manufacture date. Use {\tt apcaccess eeprom} to show you which values are
-permitted. This value is written to the UPS EPROM when the {\tt --configure}
+permitted. This value is written to the UPS EPROM when the {\tt \verb{--{configure}
 option is specified.  
 
-Under normal apcupsdoperations (no {\tt --configure} option), apcupsd will
+Under normal apcupsdoperations (no {\tt \verb{--{configure} option), apcupsd will
 read the value stored in the UPS and display it in the STATUS output.  
 
 \item {\bf HITRANSFER \lt{}upper limit of ups batt. transfer\gt{}}
@@ -9409,10 +9355,10 @@ read the value stored in the UPS and display it in the STATUS output.
 This sets the high line voltage point to switch over to batteries. Different
 values are permitted based on the UPS model, classification, and manufacture
 date. Use {\tt apcaccess eeprom} to show you which values are permitted. This
-value is written to the UPS EPROM when the {\tt --configure} option is
+value is written to the UPS EPROM when the {\tt \verb{--{configure} option is
 specified.  
 
-Under normal apcupsdoperations (no {\tt --configure} option), apcupsd will
+Under normal apcupsdoperations (no {\tt \verb{--{configure} option), apcupsd will
 read the value stored in the UPS and display it in the STATUS output.  
 
 \label{RETURNCHARGE-_003cmin_005f-batt_005f-charge-level_003e}
@@ -9423,10 +9369,10 @@ This parameter specifies what battery percentage charge is necessary before
 the UPS will supply power to your equipment after a power down. Different
 values are permitted based on the UPS model, classification, and manufacture
 date. Use {\tt apcaccess eeprom} to show you which values are permitted. This
-value is written to the UPS EPROM when the {\tt --configure} option is
+value is written to the UPS EPROM when the {\tt \verb{--{configure} option is
 specified.  
 
-Under normal apcupsdoperations (no {\tt --configure} option), apcupsd will
+Under normal apcupsdoperations (no {\tt \verb{--{configure} option), apcupsd will
 read the value stored in the UPS and display it in the STATUS output.  
 
 \item {\bf BEEPSTATE \lt{}alarm beep state\gt{}}
@@ -9963,7 +9909,7 @@ this standard halt script was modified to include a bit of new logic just
 before the final halt of the system. It first tests if the file
 /etc/apcupsd/powerfail exists, and if it does, it executes {\tt
 /etc/apcupsd/apccontrol killpower}. It is this last step that will cause
-apcupsd to be re-executed with the {\tt --killpower} option on the command
+apcupsd to be re-executed with the {\tt \verb{--{killpower} option on the command
 line. This option tells apcupsd to inform the UPS to kill the power.  
 
 This final step is important if you want to ensure that your system will
@@ -10007,7 +9953,7 @@ inserting code in the halt script.
 
 Only if you cannot insert the appropriate code in the halt script, when you
 start apcupsd, normally from the /etc/rc.d/init.d/apcupsd script, use the {\tt
---kill-on-powerfail} option. This will cause apcupsd to program the UPS to
+\verb{--{kill-on-powerfail} option. This will cause apcupsd to program the UPS to
 shutoff the power just before it (apcupsd) does the system shutdown. Please
 note that this is not the most ideal solution. Read on to understand why.  
 
@@ -10059,7 +10005,7 @@ can set it to 180, 300, or 600 seconds depending on your UPS. See the EEPROM
 \ilink{Configuring Your EEPROM}{manual.tex#Configuring-Your-EEPROM}) this
 manual for further details on how to change this EPROM value.  
 
-If you use the {\tt --kill-on-powerfail} option, you run the risk of having
+If you use the {\tt \verb{--{kill-on-powerfail} option, you run the risk of having
 the computer power cut before the system has shutdown. Even if the grace
 period is rather long, if something goes wrong in the shutdown, well, it is up
 to you to decide.  
@@ -10129,8 +10075,8 @@ just after the line that reads
 \end{verbatim}
 \normalsize
 
-in the apccontrol file (approximately line 79 \&mdash; depending on your
-system version).  
+in the apccontrol file (approximately line 79 {--} depending on your system
+version).  
 
 Also, on a slave machine, you do not want to use the modified halt script
 since it will recall apcupsd, which will detect that it is a slave (i.e. no
@@ -10295,7 +10241,8 @@ you send the UPS a command that it does not recognize or that is not available
 on your UPS, it will normally respond by ``NA'' for not available, otherwise
 the response is given in the ``Typical results'' column. \gt{}  
 
-\begin{longtable}{llll}
+\addcontentsline{lot}{table}{Single Character Commands}
+\begin{longtable}{p{0.5in}p{2.25in}p{2.25in}l}
 {Code} & {Meaning} & {Typical results} & { 
  } \\
 {\^{}A} & {Model string} & {SMART-UPS 700} & { 
@@ -10327,7 +10274,7 @@ spike, O = no transfers yet (since turnon), S = transfer due to serial port U
 command or activation of UPS test from front panel, NA = transfer reason still
 not available (read again).} & { 
  } \\
-{K\&ndash;K} & {Shutdown with grace period (set with 'p') - need \gt{} 1.5s
+{K{---}K} & {Shutdown with grace period (set with 'p') - need \gt{} 1.5s
 between first and second K} & {Matrix/3rd gen SmartUPS/Black Back-UPS Pros:
 ``OK'', all others: ``*''} & { 
  } \\
@@ -10368,8 +10315,8 @@ results available (no test performed in last 5 minutes)} & {
  } \\
 {Y} & {Enter smart mode} & {``SM''} & { 
  } \\
-{Z\&ndash;Z} & {Shutdown immediately (no delay) - need \gt{} 1.5s between
-first and second Z} & {N/A} & { 
+{Z{---}Z} & {Shutdown immediately (no delay) - need \gt{} 1.5s between first
+and second Z} & {N/A} & { 
  } \\
 {a} & {Show protocol version.alert messages.valid commands (delimited by
 periods)} & {
@@ -10449,8 +10396,8 @@ your UPS EEPROM or you may damage your UPS.} & {
 {@nnn} & {Shutdown (after delay 'p') with delayed wakeup of nnn tenths of an
 hour (after 'r' time)} & {Matrix/3rd gen UPS: ``OK'', others ``*''} & { 
  } \\
-{0x7f (DEL key)} & {Abort shutdown - use to abort @, S, K\&ndash;K} & {``OK''}
-& { 
+{0x7f (DEL key)} & {Abort shutdown - use to abort @, S, K{---}K} & {``OK''} &
+{ 
  } \\
 {\~{}} & {Register \#1} & {See below} & { 
  } \\
@@ -10507,7 +10454,8 @@ minutes of runtime to leave in battery (UPS shuts down ``early'')} & {
 \index{Info!Dip switch }
 \addcontentsline{toc}{subsubsection}{29.5 Dip switch info}
 
-\begin{longtable}{lll}
+\addcontentsline{lot}{table}{DIP Switch Info}
+\begin{longtable}{p{0.5in}p{0.5in}p{4in}}
 {Bit} & {Switch} & {Option when bit=1 
  } \\
 {0} & {4} & {Low battery alarm changed from 2 to 5 mins. Autostartup disabled
@@ -10542,7 +10490,8 @@ overall UPS status. Some common things you'll see:
 \item SM = Status bit is still not available (retry reading) 
 \end{itemize}
 
-\begin{longtable}{lll}
+\addcontentsline{lot}{table}{UPS Status Bits}
+\begin{longtable}{p{0.5in}p{0.5in}p{4in}}
 {Bit} & {Hex Bit} & {Meaning 
  } \\
 {0} & {0x01} & {1 = Runtime calibration occurring Not reported by Smart UPS
@@ -10577,7 +10526,8 @@ These single character messages are sent by the UPS any time there is an Alert
 condition. All other responses indicated above are sent by the UPS only in
 response to a query or action command.  
 
-\begin{longtable}{ll}
+\addcontentsline{lot}{table}{Alert Messages}
+\begin{longtable}{p{0.7in}p{4.3in}}
 {Character} & {Description 
  } \\
 {!} & {Line Fail - sent when the UPS goes on-battery, repeated every 30
@@ -10630,7 +10580,8 @@ changed. Only supported on Matrix UPS and 3rd generation SmartUPS models.
 All bits are valid on the Matrix UPS. SmartUPS models only support bits 6 and
 7. Other models do not respond.  
 
-\begin{longtable}{lll}
+\addcontentsline{lot}{table}{Register 1 Layout}
+\begin{longtable}{p{0.3in}p{0.5in}p{4.2in}}
 {Bit} & {Hex Bit} & {Meaning 
  } \\
 {0} & {0x01} & {In wakeup mode (typically lasts \lt{} 2s) 
@@ -10662,7 +10613,8 @@ Matrix UPS models report bits 0-5. SmartUPS models only support bits 4 and 6.
 SmartUPS v/s and BackUPS Pro report bits 4, 6, 7. Unused bits are set to 0.
 Other models do not respond.  
 
-\begin{longtable}{ll}
+\addcontentsline{lot}{table}{Register 2 Layout}
+\begin{longtable}{p{0.3in}p{4.7in}}
 {Bit} & {Meaning 
  } \\
 {0} & {Fan failure in electronics, UPS in bypass 
@@ -10696,7 +10648,8 @@ SmartUPS v/s and BackUPS Pro models report bits 0-5. All others report 0-4.
 State change of bits 1,2,5,6,7 are reported asynchronously with ? and =
 messages.  
 
-\begin{longtable}{ll}
+\addcontentsline{lot}{table}{Register 3 Layout}
+\begin{longtable}{p{0.3in}p{4.7in}}
 {Bit} & {Meaning 
  } \\
 {0} & {Output unpowered due to shutdown by low battery 
@@ -10893,7 +10846,8 @@ Here is an example broken out to be more readable:
 There are at this time a maximum of 12 different values that can be programmed
 into the UPS EEPROM. They are:  
 
-\begin{longtable}{lll}
+\addcontentsline{lot}{table}{Programming the UPS EEPROM}
+\begin{longtable}{p{0.7in}p{1in}p{3.3in}}
 {Item} & {Command} & {Meaning 
  } \\
 {1.} & {c} & {The UPS Id or name 
@@ -10961,10 +10915,10 @@ lists.sourceforge.net\gt{}}{http://www.apcupsd.com}
 
 \label{Apcupsd-_002d_002d-RPM-Packaging-FAQ}
 
-\subsection*{30 Apcupsd \&ndash; RPM Packaging FAQ}
-\index{Apcupsd  RPM Packaging FAQ }
-\index{FAQ!Apcupsd  RPM Packaging }
-\addcontentsline{toc}{subsection}{30 Apcupsd  RPM Packaging FAQ}
+\subsection*{30 Apcupsd {---} RPM Packaging FAQ}
+\index{Apcupsd {---} RPM Packaging FAQ }
+\index{FAQ!Apcupsd {---} RPM Packaging }
+\addcontentsline{toc}{subsection}{30 Apcupsd {---} RPM Packaging FAQ}
 
 \label{Answers}
 
@@ -11096,11 +11050,12 @@ following line:
 
 \label{Credits-_003c1_003e}
 
-\subsection*{Appendix A Credits}
-\index{Credits!Appendix A }
-\index{Appendix A Credits }
-\addcontentsline{toc}{subsection}{Appendix A Credits}
+\subsection*{=``appendix''>Appendix A Credits}
+\index{="appendix">Appendix A Credits }
+\index{Credits!="appendix">Appendix A }
+\addcontentsline{toc}{subsection}{="appendix">Appendix A Credits}
 
+\addcontentsline{lof}{figure}{Thanks}
 \includegraphics{./thanks.eps}  
 
 The success of apcupsd is due to the many people that helped in development,
