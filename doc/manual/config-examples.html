@@ -1,0 +1,81 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+  <TITLE>Configuration Examples</TITLE>
+   <meta name="Author" content="Kern Sibbald">
+  <link rel=stylesheet href="apcupsd-styles.css" type="text/css">
+</HEAD>
+<BODY>
+<H1>Configuration Examples</H1>
+<h2>A Simple Configuration</h2>
+You have a Smart UPS using the cable supplied by APC.
+A very simple configuration file would look like the following:
+<pre>
+## apcupsd.conf v1.1 ##
+UPSCABLE smart
+UPSTYPE smartups
+DEVICE /dev/ttyS0
+LOCKFILE /var/lock
+UPSCLASS standalone
+UPSMODE disable
+</pre>
+<p>Normally you would have many more configuration directives
+to completely customize your installation, but this example
+shows you the minimum required.</p>
+<h2>A Simple Master Configuration</h2>
+You have a Smart UPS using the cable supplied by APC and
+you want it to act as a master for another computer, which
+is powered by the same UPS.
+A very simple configuration file would look like the following:
+<pre>
+## apcupsd.conf v1.1 ## 
+UPSCABLE smart
+UPSTYPE smartups
+DEVICE /dev/ttyS0
+LOCKFILE /var/lock
+UPSCLASS netmaster
+UPSMODE net
+NETTIME 10
+NETPORT 6666
+SLAVE slave1.mynetwork.com
+SLAVE slave2.mynetwork.com
+</pre>
+<p>Note, the main difference from the stand alone configuration si
+that you have specified <b>UPSCLASS netmaster</b> and <b>UPSMODE net</b>.
+In addition, you have specified one or more slave machines. </p>
+<h2>A Simple Slave Configuration</h2>
+You have a Smart UPS using the cable supplied by APC that
+is connected to the master machine configured above. This
+slave machine has no serial port connection to the UPS, but
+is powered by the same UPS as the master.
+A very simple configuration file would look like the following:
+<pre>
+## apcupsd.conf v1.1 ## 
+UPSCABLE ether
+UPSTYPE smartups
+LOCKFILE /var/lock
+UPSCLASS netslave
+UPSMODE net
+NETPORT 6666
+MASTER master.mynetwork.com
+</pre>
+<p>The main difference from the master configuration is that you
+have specified <b>UPSCABLE ether</b> and <b>UPSCLASS netslave</b>. 
+In addition, you have specified a single controlling master.</p>
+In this configuration, the shutdown will be initiated by the
+master. It is also possible to specify BATTERYLEVEL, MINUTES,
+and TIMOUT configuration directives in the Slave machine that
+will cause the slave to shutdown before the master. This can
+often be useful if the slave is less important than the master
+and you wish to reduce battery power consumption so that the
+master can remain up longer during a power outage.
+<h2>Variation on the Master/Slave Configuration</h2>
+It is also possible to have a Master/Slave configuration where
+the Slave is powered by a different UPS (or any other power 
+source), but is nevertheless controlled (i.e. shutdown) by
+the master. The setup would be identical to the Master/Slave
+configuration files shown above. The only difference is where
+the slave actually receives its power. In effect, <b>apcupsd</b>
+does not know or care where the power really comes from.
+</BODY>
+</HTML>

@@ -1,0 +1,53 @@
+# Makefile template
+#
+# Copyright (C) 1999-2002 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
+#
+
+# Default variables
+@VARIABLES@
+# TOP source directory.
+topdir = @top_srcdir@
+top_builddir = $(topdir)
+
+# Include the default make targets: to be put before the all-targets: rule.
+@TARGETS@
+ 
+subdirs = etc @DISTNAME@
+
+all-targets: Makefile
+
+#
+# install symlinks after installing the boot script etc etc
+#
+install-distdir:
+	(cd $(DISTNAME); \
+	$(MAKE) "DISTNAME=$(DISTNAME)" "DISTVER=$(DISTVER)" install);
+	./install-symlinks.sh install $(DISTNAME)
+
+install: @INSTALL_DISTDIR@
+	@echo "Installing apccontrol script..."
+	@if test -f ./$(DISTNAME)/apccontrol; then \
+		$(INSTALL_PROGRAM) -m 744 ./$(DISTNAME)/apccontrol $(sysconfdir)/apccontrol; \
+	else \
+		$(INSTALL_PROGRAM) -m 744 ./apccontrol $(sysconfdir)/apccontrol; \
+	fi
+
+#
+# uninstall symlinks before removing the boot script etc etc
+#
+uninstall-distdir:
+	./install-symlinks.sh uninstall $(DISTNAME)
+	(cd $(DISTNAME); \
+	$(MAKE) "DISTNAME=$(DISTNAME)" "DISTVER=$(DISTVER)" uninstall);
+
+uninstall: @UNINSTALL_DISTDIR@
+	rm -f $(sysconfdir)/apccontrol
+
+clean: targetclean
+
+distclean: targetdistclean
+	$(RMF) Makefile
+	$(RMF) apccontrol
+
+# -----------------------------------------------------------------------
+# DO NOT DELETE THIS LINE -- make depend depends on it.

@@ -1,0 +1,71 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+        <TITLE>Apcupsd EEPROM Configuration</TITLE>
+   <meta name="Author" content="Kern Sibbald">
+                <link rel=stylesheet href="apcupsd-styles.css" type="text/css">
+</HEAD>
+<BODY>
+<H2>Configuring Your EEPROM</H2>
+If you have a SmartUPS, there are depending on the UPS at least 12
+different values stored in the EEPROM that determine how
+the UPS reacts to various conditions such as high line
+voltage, low line voltage, power down grace periods, etc.
+<p>
+In general, for the moment, we do not recommend that you
+change your EEPROM values unless absolutely necessary. There
+have been several reported cases of problems setting the
+Low Transfer Voltage. Consequently, if at all possible, do
+not attempt to change this value.
+<p>If despite these warnings, you must change your EEEPROM,
+we recommend connecting your UPS to a Windows or NT machine
+running PowerChute and making the changes.
+<p>If you have no other choice, you may also change the EEPROM
+values with <b>apcupsd</b>.  Before doing so, please make
+a printed copy of your UPS as it is before any EEPROM changes so
+that you can check the changes that you have made.
+Do so by printing a copy of the output from <b>apcaccess status</b>
+and also print a copy of the output from <b>apcaccess eprom</b>.
+<p>Once this is done, choose which values of the EEPROM you want 
+to change. Choose the new values from the list provided by 
+<b>apcaccess eprom</b>. For the battery date, and the UPS name,
+you can use any eight characters.
+<p>To make the EEPROM changes with <b>apcupsd</b> you must first
+stop the <b>apcupsd</b> daemon. See <a href="stopping.html">Stopping <b>Apcupsd</b></a>
+in the appropriate section of this manual.
+Then edit the appropriate configuration directive in <b>/etc/apcupsd/apcupsd.conf</b>.
+<p>
+NOTE: we recommend that you change one EEPROM value at a time, by defining only
+one configuration directive at a time. After each change, check that everything is
+OK before proceeding to the next value you wish to change.
+<p>
+To actually change the EEPROM, as <b>root</b> with the <b>apcupsd</b> daemon stopped,
+enter:
+<p class="indent"><b>apcupsd -c</b>
+<p>When it has completed the reprogramming of the EEPROM, it will print
+the new STATUS report. Check that you got the expected results before continuing.
+<p>The list of configuration directives and the permitted values for the
+SmartUPS follows:
+<p><pre>
+Valid EEPROM values for the SMART-UPS 1000
+
+                         Config        Current  Permitted
+Description              Directive     Value    Values
+===================================================================
+Upper transfer voltage   HITRANSFER    253      253 264 271 280 
+Lower transfer voltage   LOTRANSFER    204      196 188 208 204 
+Return threshold         RETURNCHARGE  15       00 15 50 90 
+Output voltage on batts  OUTPUTVOLTS   230      230 240 220 225 
+Sensitivity              SENSITIVITY   H        H M L L 
+Low battery warning      LOWBATT       2        02 05 07 10 
+Shutdown grace delay     SLEEP         180      020 180 300 600 
+Alarm delay              BEEPSTATE     T        0 T L N 
+Wakeup delay             WAKEUP        60       000 060 180 300 
+Self test interval       SELFTEST      336      336 168 ON  OFF 
+</pre>
+<p>
+<b>apcaccess eeprom</b> will produce the list that is appropriate for
+your UPS.
+
+</BODY>
+</HTML>

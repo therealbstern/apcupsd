@@ -1,0 +1,68 @@
+
+<html>
+<body>
+<pre>
+
+This document is the original design document written
+by Kern. Riccardo used it to implement drivers. As is
+always the case, the design has evolved since this
+document has been written and hence, it should be
+updated, but at least the base is here.
+
+Driver Design:
+The following entry points will be plugged in
+apcconfig.c in the UPSINFO structure depending
+on which driver is selected by the configuration.
+
+init_ups_port(ups)
+  Initializes the UPS port (if any) but does not
+  send any caracters or signals to the UPS. Equivalent
+  to the first half of setup_serial(ups).  This is
+  very generic and the same routine can probably serve
+  most serial UPSes. Called once at apcupsd startup,
+  but on some devices (usb) may be called again
+  if the device is unplugged.
+
+connect_ups(ups)
+  Actually establishes a connection with the UPS.
+  Sends the INITUPS signals (if any).  Equivalent
+  to the second half of setup_serial(ups) that
+  gets and sends setup data to the UPS.  Called
+  once after init_ups_port(), but may be called
+  again for some devices (usb) if they are unplugged.
+
+get_ups_capabilities(ups)
+  Determines the capabilities of the UPS.
+  Equivalent to get_apc_capabilities(ups).
+  Called once at initialization of the UPS to
+  determine (or set) the capabilities of the UPS
+  i.e. sets up the UPS_cap[] array.
+
+get_ups_static_data(ups)
+  Reads static data from UPS. This is done one
+  time during initialization. Equivalent to
+  read_static_ups_data(ups) plus
+  get_apc_model(ups).  Reads unchanging data
+  from the UPS such as battery voltage, high
+  and low transfer voltages, ...
+
+get_ups_volatile_data(ups)
+  Reads volatile or changing data from the UPS.
+  This is done every time in the big action loop.
+  Equivalent to the old fillUPS(ups).
+
+get_ups_state(ups)
+  This is the main routine that detects state changes
+  in the UPS. After this routine is called, do_action()
+  is called to process the state change. Equivalent
+  to check_serial(ups).
+
+kill_ups_power(ups)
+  Called to kill the power on the UPS.  Equivalent
+  to kill_power(ups).
+
+term_ups(ups)
+  Called to terminate the connection with the UPS.
+</pre>
+</body>
+</html>
