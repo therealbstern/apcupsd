@@ -206,30 +206,55 @@ goodout:
 extern UPSINFO *core_ups;
 extern int shm_OK;
 
+#define MAX_READ 20000
+
 /*  
  * Fill the Events list box with the last events
  * 
  */
 void FillEventsBox(HWND hwnd, int id_list)
 {
-    char buf[1000];
-    int len;
-    FILE *events_file;
+    off_t flen, fpos;
+    ssize_t len;
+    char *buf, *p, *l;
     
-    if (!shm_OK || core_ups->eventfile[0] == 0 ||
-        (events_file = fopen(core_ups->eventfile, "r")) == NULL) {
+    if (!shm_OK || core_ups->event_fd > 0) {
 	SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0, 
            (LONG)"Events not available");
 	return;
     }
-
-    while (fgets(buf, sizeof(buf), events_file) != NULL) {
-	len = strlen(buf);
-	/* strip trailing cr/lfs */
-        while (len > 0 && (buf[len-1] == '\n' || buf[len-1] == '\r'))
-	    buf[--len] = 0;
-	SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0, (LONG)buf);
+    /* Get size of file, but read only 20000 bytes at most */
+    flen = lseek(core_ups->event_fd, (off_t)0, SEEK_END);
+    if (flen > MAX_READ) {
+       fpos = flen - MAX_READ;
+       flen = MAX_READ;
+    } else {
+       fpos = 0;
     }
+    buf = (char *)malloc(flen + 1);
+    lseek(core_ups->event_fd, fpos, SEEK_SET);
+    len = read(core_ups->event_fd, buf, flen);
+    lseek(core_ups->event_fd, (off_t)0, SEEK_END);
+    if (len < 0) {
+	SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0, 
+           (LONG)"Events not available");
+	return;
+    }
+    buf[len] = 0;
+    len = 0;
+    for (l=p=buf; *p; p++) {
+       if (*p == '\n' || *p == '\r') {
+	  *p = 0;
+	  if (len > 1) {
+	      SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0, (LONG)l);
+	   }
+	   l = p+1;
+	   len = 0;
+	} else {
+	   len++;
+	}
+    }
+    free(buf);
     return;
 }
 

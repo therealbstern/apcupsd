@@ -8780,6 +8780,14 @@ then
     GENERATE_FILES="$GENERATE_FILES src/gd1.2/Makefile"
 fi
 
+case $host_os in
+    *cygwin* ) CC=g++
+	;;
+    * )
+	;;
+esac
+
+
 VARIABLES=$srcdir/autoconf/variables.mak
 
 TARGETS=$srcdir/autoconf/targets.mak
