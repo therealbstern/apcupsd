@@ -15,14 +15,37 @@ top_builddir = $(topdir)
 all-targets: Makefile
 
 install:
-	@echo "Installing apccontrol script..."
-	$(INSTALL_PROGRAM) -m 744 ./apcupsd $(sysconfdir)/apcupsd;
-	@echo "Darwin does not have an /etc/init.d system."
-	@echo "You have to manually call apcupsd on startup."
-	@echo "apcupsd has been installed in $(sysconfdir)."
+	@echo "Installing apcupsd startup script..."
+	mkdir -p /Library/StartupItems/apcupsd
+	$(INSTALL_SCRIPT) ./apcupsd /Library/StartupItems/apcupsd;
+	$(INSTALL_DATA) ./StartupParameters.plist /Library/StartupItems/apcupsd;
+	@echo "================================================="
+	@echo " "
+	@echo "apcupsd script installation for MacOS X (Darwin) complete." 
+	@echo " "
+	@echo "You should now edit $(DESTDIR)$(sysconfdir)/apcupsd.conf to correspond"
+	@echo "to your setup then start the apcupsd daemon with:"
+	@echo " "
+	@echo "    SystemStarter start \"APC UPS monitor\""
+	@echo " "
+	@echo "Thereafter when you reboot, it will be stopped and started"
+	@echo "automatically."
+	@echo " "
+	@if [ -f $(sysconfdir)/apcupsd ] ; then \
+		echo "WARNING: Old startup script $(sysconfdir)/apcupsd was renamed to"; \
+		echo "         $(sysconfdir)/apcupsd.obsolete. Be sure to remove any";   \
+		echo "         references to that script that you may have manually";    \
+		echo "         added to the system init scripts. Apcupsd startup is";    \
+		echo "         now managed via SystemStarter, making the old script";    \
+		echo "         obsolete.";                                               \
+		echo " ";                                                                \
+		mv $(sysconfdir)/apcupsd $(sysconfdir)/apcupsd.obsolete;                 \
+	fi
+	@echo "================================================="
+
 
 uninstall:
-	rm -f $(sysconfdir)/apcupsd
+	rm -rf /Library/StartupItems/apcupsd
 
 clean:
 
