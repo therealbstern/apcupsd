@@ -68,11 +68,24 @@ case "$1" in
     commok)
 	echo "Communciations restored with UPS ${2}" | wall
     ;;
+#
+# powerout, onbattery, offbattery, mainsback events occur
+#   in that order.
+#
     powerout)
 	echo "Warning power loss detected on UPS ${2}" | wall
     ;;
     onbattery)
 	echo "Power failure on UPS ${2}. Running on batteries." | wall
+    ;;
+    offbattery)
+    ;;
+    mainsback)
+	echo "Power has returned on UPS ${2}..." | wall
+	if [ -f @PWRFAILDIR@/powerfail ] ; then
+	   printf "Continuing with shutdown."  | wall
+	fi
+	;;
     ;;
     failing)
 	echo "Battery power exhaused on UPS ${2}. Doing shutdown." | wall
@@ -93,14 +106,6 @@ case "$1" in
     doshutdown)
 	echo "UPS ${2} initiated Shutdown Sequence" | wall
 	${SHUTDOWN} -h now "apcupsd UPS ${2} initiated shutdown"
-    ;;
-    mainsback)
-	echo "Power has returned on UPS ${2}..." | wall
-	if [ -f @PWRFAILDIR@/powerfail ] ; then
-	     echo "Attempting to cancel shutdown." | wall
-	     ${SHUTDOWN} -c
-	     ${SHUTDOWN} -r now "apcupsd initiated reboot"
-	fi
     ;;
     annoyme)
 	echo "Power problems with UPS ${2}. Please logoff." | wall

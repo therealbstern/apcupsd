@@ -5,9 +5,16 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+----> Release apcupsd-3.10.10 (16 January 2004)
+15Jan04
+- I added a new "offbattery" event that is only executed if the 
+  "onbattery" event was executed. This should allow users to easily
+  control what messages they get and by using the ONBATTERYDELAY the
+  time on batteries before the onbattery event is notified.
+
 ----> Release apcupsd-3.10.9 (31 December 2003)
 31Dec03
-- Bartlomiej Król found an unexpected interaction between the 6 second
+- Bartlomiej Krol found an unexpected interaction between the 6 second
   "debounce" code and the new ONBATTERY delay time that caused the
   USB and apcsmart drivers to sleep for a long time.
 

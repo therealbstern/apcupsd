@@ -63,6 +63,11 @@ case "$1" in
 	onbattery)
 		printf "Power failure. Running on UPS batteries." | wall -a
 	;;
+	offbattery)
+	;;
+	mainsback)
+		printf "Power has returned..." | wall -a
+	;;
 	failing)
 		printf "UPS battery power exhaused. Doing shutdown.\n" | wall -a
 	;;
@@ -83,9 +88,6 @@ case "$1" in
 	doshutdown)
 		printf "Beginning Shutdown Sequence" | wall -a
 		${SHUTDOWN} -y -g0 -i0 "apcupsd initiated shutdown"
-	;;
-	mainsback)
-		printf "Power has returned..." | wall -a
 	;;
 	annoyme)
 		printf "Power problems please logoff." | wall -a

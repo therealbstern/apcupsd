@@ -119,14 +119,15 @@ This package is built with standard serial port support.
         --with-cgi-bin=%{_sysconfdir}/apcupsd/cgi \
         --enable-cgi \
         --enable-pthreads \
-	--enable-master-slave \
-	--enable-apcsmart \
-	--enable-dumb \
-%if %{usb}
-        --with-serial-dev=/dev/usb/hiddev[0-15] \
-        --with-upstype=usb \
-        --with-upscable=usb \
+        --enable-master-slave \
+        --enable-apcsmart \
+        --enable-dumb \
+        --enable-net \
         --enable-usb
+%if %{usb}
+        --with-serial-dev= \
+        --with-upstype=usb \
+        --with-upscable=usb
 %endif
 
 make

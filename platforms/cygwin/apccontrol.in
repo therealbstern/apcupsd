@@ -56,6 +56,11 @@ case "$1" in
 	onbattery)
 		${POPUP} "apccontrol: Power failure. Running on UPS batteries." &
 	;;
+	offbattery)
+	;;
+	mainsback)
+		${POPUP} "apccontrol: Power has returned..." &
+	;;
 	failing)
 		${POPUP} "apccontrol: UPS battery power exhaused. Doing shutdown." &
 	;;
