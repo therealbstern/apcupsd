@@ -760,7 +760,8 @@ AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
 		USB_TYPE="linux"
 		AC_SUBST(USB_DRIVER)
 		AC_SUBST(USB_TYPE)
-	elif test $HAVE_UNAME=yes -a x`uname -s` = xFreeBSD ; then
+	elif test $HAVE_UNAME=yes -a x`uname -s` = xFreeBSD -o \
+		  $HAVE_UNAME=yes -a x`uname -s` = xOpenBSD ; then
 		AC_DEFINE(HAVE_USB_DRIVER)
 		USB_DRIVER="usb"
 		USB_TYPE="bsd"
