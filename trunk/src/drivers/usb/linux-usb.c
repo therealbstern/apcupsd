@@ -171,14 +171,17 @@ static const struct s_known_info {
     { CI_NONE,		      0x8500db, P_ANY,	  T_NONE    },	/* VoltageNotRegulated */
 
     /*	Pages 0xFF00 to 0xFFFF are vendor specific */
-    { CI_STATUS,	      0xFF860060, P_ANY,  T_BITS    },	/* APCStatusFlag */
-    { CI_DSHUTD,	      0xFF860076, P_ANY,  T_UNITS   },	/* APCShutdownAfterDelay */
-    { CI_NONE,		      0xFF860005, P_ANY,  T_NONE    },	/* APCGeneralCollection */
-    { CI_APCForceShutdown,    0xFF86007C, P_ANY,  T_NONE    },	/* APCForceShutdown */
-    { CI_NONE,		      0xFF860072, P_ANY,  T_NONE    },	/* APCPanelTest */
-    { CI_BattReplaceDate,     0xFF860016, P_ANY,  T_APCDATE },	/* APCBattReplaceDate */
-    { CI_NONE,		      0xFF860042, P_ANY,  T_NONE    },	/* APC_UPS_FirmwareRevision */
-    { CI_NONE,		      0xFF860079, P_ANY,  T_NONE    },	/* APC_USB_FirmwareRevision */
+    { CI_STATUS,                  0xFF860060, P_ANY,  T_BITS    },  /* APCStatusFlag */
+    { CI_DSHUTD,                  0xFF860076, P_ANY,  T_UNITS   },  /* APCShutdownAfterDelay */
+    { CI_NONE,                    0xFF860005, P_ANY,  T_NONE    },  /* APCGeneralCollection */
+    { CI_APCForceShutdown,        0xFF86007C, P_ANY,  T_NONE    },  /* APCForceShutdown */
+    { CI_NONE,                    0xFF860072, P_ANY,  T_NONE    },  /* APCPanelTest */
+    { CI_BattReplaceDate,         0xFF860016, P_ANY,  T_APCDATE },  /* APCBattReplaceDate */
+    { CI_NONE,                    0xFF860042, P_ANY,  T_NONE    },  /* APC_UPS_FirmwareRevision */
+    { CI_NONE,                    0xFF860079, P_ANY,  T_NONE    },  /* APC_USB_FirmwareRevision */
+    { CI_APCBattCapBeforeStartup, 0xFF860019, P_ANY,  T_CAPACITY},  /* APCBattCapBeforeStartup */
+    { CI_APCDelayBeforeStartup,   0xFF86007E, P_ANY,  T_UNITS   },  /* APCDelayBeforeStartup */
+    { CI_APCDelayBeforeShutdown,  0xFF86007D, P_ANY,  T_UNITS   },  /* APCDelayBeforeShutdown */
 };
 #define KNOWN_INFO_SZ (sizeof(known_info)/sizeof(known_info[0]))
 
@@ -1199,123 +1202,252 @@ bool read_int_from_ups(UPSINFO *ups, int ci, int* value)
 bool write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
 {
     struct hiddev_report_info rinfo;
-    struct hiddev_field_info finfo;
     USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
     USB_INFO *info;
     int old_value, new_value;
-    int i;
 
-    errno = 0; 
     if (ups->UPS_Cap[ci] && my_data->info[ci]) {
-	info = my_data->info[ci];	  /* point to our info structure */
-	rinfo.report_type = info->uref.report_type;
-	rinfo.report_id = info->uref.report_id;
-	if (ioctl(my_data->fd, HIDIOCGREPORTINFO, &rinfo) < 0) {  /* get Report */
-            Dmsg2(000, "HIDIOCGREPORTINFO for kill power function %s failed. ERR=%s\n", 
-		  name, strerror(errno));
-	    return false;
-	}
-        Dmsg1(100, "REPORTINFO num_fields=%d\n", rinfo.num_fields);
-	finfo.report_type = info->uref.report_type;
-	finfo.report_id = info->uref.report_id;
-	finfo.field_index = info->uref.field_index;
-        Dmsg7(100, "before FIELDINFO call: type=%d id=%d index=%d logical_min=%d \n\
-logical_max=%d exponent=%d unit=0x%x\n",
-	    finfo.report_type, finfo.report_id, finfo.field_index,
-	    finfo.logical_minimum, finfo.logical_maximum, 
-	    finfo.unit_exponent, finfo.unit);
-	if (ioctl(my_data->fd, HIDIOCGFIELDINFO, &finfo) < 0) {  /* Get field info */
-            Dmsg2(000, "HIDIOCGFIELDINFO for kill power function %s failed. ERR=%s\n", 
-		  name, strerror(errno));
-	    return false;
-	}
-        Dmsg7(100, "FIELDINFO type=%d id=%d index=%d logical_min=%d \n\
-logical_max=%d exponent=%d unit=0x%x\n",
-	    finfo.report_type, finfo.report_id, finfo.field_index,
-	    finfo.logical_minimum, finfo.logical_maximum, 
-	    finfo.unit_exponent, finfo.unit);
-        Dmsg3(100, "GUSAGE type=%d id=%d index=%d\n", info->uref.report_type,
-	   info->uref.report_id, info->uref.field_index);
-	if (ioctl(my_data->fd, HIDIOCGUSAGE, &info->uref) < 0) {  /* get UPS value */
-            Dmsg2(000, "HIDIOGSUSAGE for kill power function %s failed. ERR=%s\n", 
-		  name, strerror(errno));
-	    return false;
-	}
-	old_value = info->uref.value;
-	info->uref.value = value;
+        info = my_data->info[ci];         /* point to our info structure */
+        rinfo.report_type = info->uref.report_type;
+        rinfo.report_id = info->uref.report_id;
+
+        if (ioctl(my_data->fd, HIDIOCGREPORT, &rinfo) < 0) {  /* get Report */
+            Dmsg2(000, "HIDIOCGREPORT for function %s failed. ERR=%s\n", 
+                  name, strerror(errno));
+            return false;
+        }
+
+        if (ioctl(my_data->fd, HIDIOCGUSAGE, &info->uref) < 0) {  /* get UPS value */
+            Dmsg2(000, "HIDIOCGUSAGE for function %s failed. ERR=%s\n", 
+                  name, strerror(errno));
+            return false;
+        }
+        old_value = info->uref.value;
+
+        info->uref.value = value;
         Dmsg3(100, "SUSAGE type=%d id=%d index=%d\n", info->uref.report_type,
-	   info->uref.report_id, info->uref.field_index);
-	if (ioctl(my_data->fd, HIDIOCSUSAGE, &info->uref) < 0) {  /* update UPS value */
-            Dmsg2(000, "HIDIOCSUSAGE for kill power function %s failed. ERR=%s\n", 
-		  name, strerror(errno));
-	    return false;
-	}
-	for (i=0; i < 1; i++) {
-	   if (ioctl(my_data->fd, HIDIOCSREPORT, &rinfo) < 0) {  /* update Report */
-               Dmsg2(000, "HIDIOCSREPORT for kill power function %s failed. ERR=%s\n", 
-		     name, strerror(errno));
-	       return false;
-	   }
-	}
-	if (ioctl(my_data->fd, HIDIOCGUSAGE, &info->uref) < 0) {  /* get UPS value */
-            Dmsg2(000, "HIDIOCSUSAGE for kill power function %s failed. ERR=%s\n", 
-		  name, strerror(errno));
-	    return false;
-	}
-	new_value = info->uref.value;
+           info->uref.report_id, info->uref.field_index);
+        if (ioctl(my_data->fd, HIDIOCSUSAGE, &info->uref) < 0) {  /* update UPS value */
+            Dmsg2(000, "HIDIOCSUSAGE for function %s failed. ERR=%s\n", 
+                  name, strerror(errno));
+            return false;
+        }
+
+        if (ioctl(my_data->fd, HIDIOCSREPORT, &rinfo) < 0) {  /* update Report */
+            Dmsg2(000, "HIDIOCSREPORT for function %s failed. ERR=%s\n", 
+                  name, strerror(errno));
+            return false;
+        }
+
+        /*
+         * This readback of the report is NOT just for debugging. It has the effect
+         * of flushing the above SET_REPORT to the device, which is important since
+         * we need to make sure it happens before subsequent reports are sent.
+         */
+
+        if (ioctl(my_data->fd, HIDIOCGREPORT, &rinfo) < 0) {  /* get Report */
+            Dmsg2(000, "HIDIOCGREPORT for function %s failed. ERR=%s\n", 
+                  name, strerror(errno));
+            return false;
+        }
+
+        if (ioctl(my_data->fd, HIDIOCGUSAGE, &info->uref) < 0) {  /* get UPS value */
+            Dmsg2(000, "HIDIOCGUSAGE for function %s failed. ERR=%s\n", 
+                  name, strerror(errno));
+            return false;
+        }
+
+        new_value = info->uref.value;
         Dmsg3(100, "function %s ci=%d value=%d OK.\n", name, ci, value);
         Dmsg4(100, "%s before=%d set=%d after=%d\n", name, old_value, value, new_value);
-	return true;
+        return true;
     }
-    Dmsg2(000, "Kill power function %s ci=%d not available in this UPS.\n", name, ci);
+    Dmsg2(000, "function %s ci=%d not available in this UPS.\n", name, ci);
     return false;
 }
 
-#define CI_APCShutdownAfterDelay CI_DSHUTD
+/* How long to wait before killing output power */
+#define SHUTDOWN_DELAY  60 
+
+/* How many seconds of good utility power before turning output back on */
+#define STARTUP_DELAY   10
+
+#define UPS_HAS_CAP(ci) \
+    (ups->UPS_Cap[ci] && ((USB_DATA *)ups->driver_internal_data)->info[ci])
 
 int usb_ups_kill_power(UPSINFO *ups)
 {
     char *func;
+    int shutdown = 0;
+
+    Dmsg0(200, "Enter usb_ups_kill_power\n");
     
     if (!usb_ups_get_capabilities(ups)) {
        Dmsg0(000, "Cannot do kill power because cannot get UPS capabilities.\n");
        return 0;
     }
 
-    /* We try various different ways to shutdown the UPS (i.e. killpower).
-     *	 Some of these commands are not supported on all UPSes, but that
-     *	 should cause no harm.
+    /*
+     * We try various different ways to shutdown the UPS (i.e. killpower).
+     * Some of these commands are not supported on all UPSes, but that
+     * should cause no harm.
      */
-    func = "CI_DelayBeforeShutdown";
-    if (!write_int_to_ups(ups, CI_DelayBeforeShutdown, 20, func)) {
-       Dmsg1(000, "Kill power function \"%s\" failed. Continuing ...\n", func);   
-    } else {
-       Dmsg1(000, "Kill power function \"%s\" seems to have worked. Continuing ...\n", func);   
+
+    /*
+     * First, set required battery capacity before startup to 0 so UPS will not
+     * wait for the battery to charge before turning back on. Not all UPSes have
+     * this capability, so this setting is allowed to fail. The value we program
+     * here should be made configurable some day.
+     */
+    func = "CI_APCBattCapBeforeStartup";
+    if (!write_int_to_ups(ups, CI_APCBattCapBeforeStartup, 0, func)) {
+       Dmsg1(100, "Unable to set %s (not an error)\n", func);
     }
 
-    func = "CI_ShutdownRequested";
-    if (!write_int_to_ups(ups, CI_ShutdownRequested, 1, func)) {
-       Dmsg1(000, "Kill power function \"%s\" failed. Continuing ...\n", func);   
-    } else {
-       Dmsg1(000, "Kill power function \"%s\" seems to have worked. Continuing ...\n", func);   
+    /*
+     * Second, set the length of time to wait after power returns before starting
+     * up. We set it to something pretty low, but it seems the UPS rounds this
+     * value up to the nearest multiple of 60 seconds. Not all UPSes have this
+     * capability, so this setting is allowed to fail.  The value we program
+     * here should be made configurable some day.
+     */
+    func = "CI_APCDelayBeforeStartup";
+    if (!write_int_to_ups(ups, CI_APCDelayBeforeStartup, 10, func)) {
+       Dmsg1(100, "Unable to set %s (not an error)\n", func);
     }
 
-    func = "CI_APCShutdownAfterDelay";
-    if (!write_int_to_ups(ups, CI_APCShutdownAfterDelay, 30, func)) {
-       Dmsg1(000, "Kill power function \"%s\" failed. Continuing ...\n", func);   
-    } else {
-       Dmsg1(000, "Kill power function \"%s\" seems to have worked. Continuing ...\n", func);   
+    /*
+     * SmartUPS shutdown
+     *
+     * If both DWAKE and DelayBeforeShutdown are available, trigger a hibernate
+     * by writing DWAKE a few seconds longer than DelayBeforeShutdown. ORDER IS
+     * IMPORTANT. The write to DelayBeforeShutdown starts both timers ticking
+     * down and the UPS will hibernate when DelayBeforeShutdown hits zero.
+     */
+    if (UPS_HAS_CAP(CI_DWAKE) && UPS_HAS_CAP(CI_DelayBeforeShutdown)) {
+        Dmsg0(000, "UPS appears to support SmartUPS style shutdown.\n");   
+        func = "CI_DWAKE";
+        if (!write_int_to_ups(ups, CI_DWAKE, SHUTDOWN_DELAY+4, func)) {
+           Dmsg1(000, "Kill power function \"%s\" failed.\n", func);   
+        }
+        else {
+            func = "CI_DelayBeforeShutdown";
+            if (!write_int_to_ups(ups, CI_DelayBeforeShutdown, SHUTDOWN_DELAY, func)) {
+               Dmsg1(000, "Kill power function \"%s\" failed.\n", func);   
+               write_int_to_ups(ups, CI_DWAKE, -1, "CI_DWAKE"); /* reset prev timer */
+            }
+            else {
+                shutdown = 1;
+            }
+        }
     }
 
-    func = "CI_APCForceShutdown";
-    if (!write_int_to_ups(ups, CI_APCForceShutdown, 1, func)) {
-       Dmsg1(000, "Kill power function \"%s\" failed ...\n", func);   
-    } else {
-       Dmsg1(000, "Kill power function \"%s\" seems to have worked. Done ...\n", func);   
+    /*
+     * BackUPS shutdown
+     *
+     * Alternately, if APCDelayBeforeShutdown is available, setting it will
+     * start a countdown after which the UPS will hibernate.
+     */
+    if(!shutdown && UPS_HAS_CAP(CI_APCDelayBeforeShutdown)) {
+        Dmsg0(000, "UPS appears to support BackUPS style shutdown.\n");   
+        func = "CI_APCDelayBeforeShutdown";
+        if (!write_int_to_ups(ups, CI_APCDelayBeforeShutdown, SHUTDOWN_DELAY, func)) {
+           Dmsg1(000, "Kill power function \"%s\" failed.\n", func);   
+        }
+        else {
+            shutdown = 1;
+        }
     }
+
+    /*
+     * All UPSes tested so far are covered by one of the above cases. However,
+     * there are a couple other ways to shutdown.
+     */
+
+    /*
+     * Misc method A
+     *
+     * Writing CI_DelayBeforeReboot starts a countdown timer, after which the UPS
+     * will hibernate. If utility power is out, the UPS will stay hibernating until
+     * power is restored. SmartUPSes seem to support this method, but PowerChute
+     * uses the dual countdown method above, so we prefer that one. UPSes seem to
+     * round the value up to 90 seconds if it is any lower. Note that the behavior
+     * described here DOES NOT comply with the standard set out in the HID Usage
+     * Tables for Power Devices spec. 
+     */
+    if(!shutdown && UPS_HAS_CAP(CI_DelayBeforeReboot)) {
+        Dmsg0(000, "UPS appears to support DelayBeforeReboot style shutdown.\n");   
+        func = "CI_DelayBeforeReboot";
+        if (!write_int_to_ups(ups, CI_DelayBeforeReboot, SHUTDOWN_DELAY, func)) {
+           Dmsg1(000, "Kill power function \"%s\" failed.\n", func);   
+        }
+        else {
+            shutdown = 1;
+        }
+    }
+
+    /*
+     * Misc method B
+     *
+     * We can set CI_APCForceShutdown to true (it's a boolean flag). We have no
+     * control over how long the UPS waits before turning off. Experimentally
+     * it seems to be about 60 seconds. Some BackUPS models support this in
+     * addition to the preferred BackUPS method above. It's included here
+     * "just in case".
+     */
+    if(!shutdown && UPS_HAS_CAP(CI_APCForceShutdown)) {
+        Dmsg0(000, "UPS appears to support ForceShutdown style shutdown.\n");   
+        func = "CI_APCForceShutdown";
+        if (!write_int_to_ups(ups, CI_APCForceShutdown, 1, func)) {
+           Dmsg1(000, "Kill power function \"%s\" failed.\n", func);   
+        }
+        else {
+            shutdown = 1;
+        }
+    }
+
+    /*
+     * Misc method C
+     *
+     * This one seems to turn the UPS off completely after a given delay.
+     * The only way to power the UPS back on is to manually hit the power button.
+     */
+    if(!shutdown && UPS_HAS_CAP(CI_DelayBeforeShutdown)){
+        Dmsg0(000, "UPS appears to support DelayBeforeShutdown style shutdown.\n");   
+        func = "CI_DelayBeforeShutdown";
+        if (!write_int_to_ups(ups, CI_DelayBeforeShutdown, SHUTDOWN_DELAY, func)) {
+           Dmsg1(000, "Kill power function \"%s\" failed.\n", func);   
+        }
+        else {
+            shutdown = 1;
+        }
+    }
+
+    /*
+     * I give up.
+     */
+    if (!shutdown) {
+        Dmsg0(000, "I don't know how to turn off this UPS...sorry.\n"
+                   "Please report this, along with the output from\n"
+                   "running examples/hid-ups, to the apcupsd-users\n"
+                   "mailing list (apcupsd-users@lists.sourceforge.net).\n");
+    }
+
+    /*
+     * Note that there are a couple other CIs that look interesting for shutdown,
+     * but they're not what we want.
+     *
+     * APCShutdownAfterDelay: Tells the UPS how many seconds to wait after power
+     *     goes out before asserting ShutdownRequested (see next item).
+     *
+     * CI_ShutdownRequested: This is an indicator from the UPS to the server
+     *     that it would like the server to begin shutting down. In conjunction
+     *     with APCShutdownAfterDelay this can be used to offload the decision of
+     *     when to shut down the server to the UPS.
+     */
 
     Dmsg0(200, "Leave usb_ups_kill_power\n");
-    return 1;
+    return shutdown;
 }
 
 int usb_ups_program_eeprom(UPSINFO *ups, int command, char *data)
