@@ -50,7 +50,6 @@ make
 
 mkdir -p $RPM_BUILD_ROOT%{initdir}
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/cgi
-mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d
 
 make \
         prefix=$RPM_BUILD_ROOT%{_prefix} \
@@ -63,8 +62,6 @@ make \
 install -m744 platforms/apccontrol \
               $RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/apccontrol
 install -m755 platforms/redhat/apcupsd $RPM_BUILD_ROOT%{initdir}
-install -m644 platforms/redhat/apcupsd.logrotate \
-              $RPM_BUILD_ROOT%{_sysconfdir}/logrotate.d/apcupsd
 
 
 %clean
@@ -87,7 +84,6 @@ install -m644 platforms/redhat/apcupsd.logrotate \
 %config(noreplace) /etc/apcupsd/multimon.conf
 %config(noreplace) /etc/apcupsd/masterconnect
 %config(noreplace) /etc/apcupsd/mastertimeout
-/etc/logrotate.d/apcupsd
 /etc/apcupsd/cgi/*
 /sbin/*
 %attr(-,root,man) %{_mandir}/*/*
@@ -167,7 +163,7 @@ if [ "$1" -ge "1" ]; then
 fi
 
 %changelog
-* 16 Jan 2003 Scott at piedmontgse.com
+* Thu Jan 16 2003 Scott at fairfieldcomputers dot com
 - Update spec to new source layout
 - Added usb options to configure section
 - Added masterconnect and mastertimout to files section
