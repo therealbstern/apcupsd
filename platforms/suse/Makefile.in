@@ -1,13 +1,25 @@
 # Makefile template
 #
-# Copyright (C) 1999-2002 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
+# Copyright (C) 2004 D. Scott Barninger <barninger at fairfieldcomputers dot com>
 #
+# Modified from file
+# Copyright (C) 2004 D. Scott Barninger <barninger at fairfieldcomputers dot com>
+# Copyright (C) 2004 Kern Sibbald <kern at sibbald dot com>
+# Modified from file:
+# Copyright (C) 1999-2002 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
+# 
+# This file is used as the template to create the
+# Makefile for the SuSE specific installation.
+#
+#  25 Sep 1999 -- KES
+#  25 Apr 2004 -- DSB
 
 # Default variables
 @VARIABLES@
 # TOP source directory.
 topdir = @topdir@
 top_builddir = $(topdir)
+VER=`echo "$(DISTVER)" | cut -d. -f1`
 
 # Include the default make targets: to be put before the all-targets: rule.
 @TARGETS@
@@ -15,21 +27,80 @@ top_builddir = $(topdir)
 all-targets: Makefile
 
 install:
-	@echo "Installing apcupsd boot script..."
-	$(INSTALL_PROGRAM) -m 744 apcupsd /etc/rc.d/apcupsd
-	sh ./halt-setup.sh install
-	sh ./rc.config.sh install
-	sh ../install-symlinks.sh install $(DISTNAME) $(DISTVER)
+	@if test $(VER) -ge 9; then \
+	   if test x$(DESTDIR) = x ; then \
+	      if test -f /etc/rc.d/apcupsd; then \
+		  /sbin/chkconfig --del apcupsd; \
+	      fi; \
+	   fi; \
+	fi
+	# remove old 3.6.2 stuff
+	@rm -f $(DESTDIR)/etc/rc.d/rc0.d/K20apcups
+	@rm -f $(DESTDIR)/etc/rc.d/rc1.d/S20apcups
+	@rm -f $(DESTDIR)/etc/rc.d/rc1.d/K20apcups
+	@rm -f $(DESTDIR)/etc/rc.d/rc2.d/S20apcups
+	@rm -f $(DESTDIR)/etc/rc.d/rc3.d/S20apcups
+	@rm -f $(DESTDIR)/etc/rc.d/rc5.d/S20apcups
+	@rm -f $(DESTDIR)/etc/rc.d/rc6.d/K20apcups
+	@rm -f $(DESTDIR)/etc/rc.d/init.d/apcups
+	@$(INSTALL_PROGRAM) -m 744 apcupsd $(DESTDIR)/etc/rc.d/apcupsd
+	# save old halt script
+	@cp -f /etc/rc.d/halt $(DESTDIR)/etc/rc.d/halt.old
+	# insert apcupsd script into halt
+	@awk -f awkhaltprog $(DESTDIR)/etc/rc.d/halt.old >$(DESTDIR)/etc/rc.d/halt
+	@chmod 744 $(DESTDIR)/etc/rc.d/halt
+	# link new halt script for startup and shutdown
+	@if test $(VER) -ge 9; then \
+	   if test x$(DESTDIR) = x ; then \
+	      /sbin/chkconfig --add apcupsd; \
+	   fi; \
+	fi
+	@if test $(VER) -lt 9; then \
+	   echo "Installing apcupsd boot script..."; \
+	   $(INSTALL_PROGRAM) -m 744 apcupsd /etc/rc.d/apcupsd; \
+	   sh ./halt-setup.sh install; \
+	   sh ./rc.config.sh install; \
+	   sh ../install-symlinks.sh install $(DISTNAME) $(DISTVER); \
+	fi
+	@echo "================================================="
+	@echo " "
+	@echo "apcupsd script installation for SuSE $(DISTVER) complete." 
+	@echo " "
+	@echo "You should now edit  /etc/apcupsd/apcupsd.conf  to correspond"
+	@echo "to your setup then start the apcupsd daemon with:"
+	@echo " "
+	@echo "/etc/rc.d/apcupsd start"
+	@echo " "
+	@echo "thereafter when you reboot, it will be stopped and started"
+	@echo "automatically."
+	@echo " "
+	@echo "Please check that your halt script in:"
+	@echo "    /etc/rc.d/halt"
+	@echo "was properly updated (see installation section of manual)"
+	@echo " "
+	@echo "================================================="
 
 uninstall:
-	@echo "Removing boot script..."
-	@rm -f /etc/rc.d/apcupsd
-	sh ./halt-setup.sh uninstall
-	sh ./rc.config.sh uninstall
-	sh ../install-symlinks.sh uninstall $(DISTNAME) $(DISTVER)
+	@if test $(VER) -ge 9; then \
+	   echo "Removing symlinks..."; \
+	   if test x$(DESTDIR) = x ; then \
+	      /sbin/chkconfig --del apcupsd ; \
+	   fi; \
+	   echo "Removing boot script..."; \
+	   rm -f $(DESTDIR)/etc/rc.d/apcupsd; \
+	   echo "Restoring old halt script"; \
+	   cp -f $(DESTDIR)/etc/rc.d/halt.old /etc/rc.d/halt; \
+	fi
+	@if test $(VER) -lt 9; then \
+	   echo "Removing boot script..."; \
+	   rm -f /etc/rc.d/apcupsd; \
+	   sh ./halt-setup.sh uninstall; \
+	   sh ./rc.config.sh uninstall; \
+	   sh ../install-symlinks.sh uninstall $(DISTNAME) $(DISTVER); \
+	fi
 
 clean:
 
 distclean:
-	@rm -f apcupsd halt-setup.sh Makefile halt apccontrol.sh
+	@rm -f apccontrol.sh apcupsd awkhaltprog Makefile apcupsd.spec
 	@rm -rf CVS

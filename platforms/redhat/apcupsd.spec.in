@@ -26,10 +26,17 @@
 %define wb3 0
 %{?build_wb3:%define wb3 1}
 
+%define su9 0
+%{?build_su9:%define su9 1}
+
 %define usb 0
 %{?build_usb:%define usb 1}
 
-%define initdir /etc/rc.d/init.d
+%if %{su9}
+%define initdir /etc/rc.d
+%else
+%define initdir /etc/rd.d/init.d
+%endif
 
 Summary:      APC UPS Power Control Daemon for Linux
 Name:         apcupsd
@@ -71,7 +78,7 @@ Some features depend on what UPS model you have (simple or smart).
 Provides: apcupsd
 
 Requires: perl
-%if %{fc1}
+%if %{fc1} || %{su9}
 Requires: gd >= 2.0
 %else
 Requires: gd < 2.0
@@ -161,7 +168,14 @@ make \
 
 install -m744 platforms/apccontrol \
               $RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/apccontrol
+	      
+%if ! %{su9}	      
 install -m755 platforms/redhat/apcupsd $RPM_BUILD_ROOT%{initdir}
+%endif
+%if %{su9}
+install -m755 platforms/suse/apcupsd $RPM_BUILD_ROOT%{initdir}
+%endif
+
 rm $RPM_BUILD_ROOT%{initdir}/halt
 rm $RPM_BUILD_ROOT%{initdir}/halt.old
 
@@ -205,14 +219,14 @@ install -m744 examples/make-hiddev \
 %post usb
 # get rid of any 3.6.2 stuff
 rm -f /etc/rc.d/rc[0-6].d/[KS]20apcups
-rm -f /etc/rc.d/init.d/apcups
+rm -f %{initdir}/apcups
 
 # add our links
 if [ "$1" -ge 1 ] ; then
 /sbin/chkconfig --add apcupsd
 fi
 
-cp -f /etc/rc.d/init.d/halt /etc/rc.d/init.d/halt.old
+cp -f %{initdir}/halt %{initdir}/halt.old
 awk '# Stuff left over from a previous apcupsd, remove it
 /^# See if this is a powerfail situation\./ {
    do {
@@ -236,9 +250,9 @@ awk '# Stuff left over from a previous apcupsd, remove it
     print ""
 }
 # Everything else is duplicated 
-{ print } ' /etc/rc.d/init.d/halt.old > /etc/rc.d/init.d/halt
+{ print } ' %{initdir}/halt.old > %{initdir}/halt
 
-chmod 744 /etc/rc.d/init.d/halt
+chmod 744 %{initdir}/halt
 
 # Undo things a bit
 
@@ -255,7 +269,7 @@ if [ $1 = 0 ] ; then
         # restore old halt script (hopefully)
         #   mv -f /etc/rc.d/init.d/halt.old /etc/rc.d/init.d/halt
 
-        cp -f /etc/rc.d/init.d/halt /etc/rc.d/init.d/halt.old
+        cp -f %{initdir}/halt %{initdir}/halt.old
         awk '# Stuff added by apcupsd, remove it
         /^# See if this is a powerfail situation\./ {
            do {
@@ -264,9 +278,9 @@ if [ $1 = 0 ] ; then
            getline
         }
         # Everything else is duplicated 
-        { print } ' /etc/rc.d/init.d/halt.old > /etc/rc.d/init.d/halt
+        { print } ' %{initdir}/halt.old > %{initdir}/halt
 
-        chmod 744 /etc/rc.d/init.d/halt
+        chmod 744 %{initdir}/halt
 fi
 
 %postun usb
@@ -303,14 +317,14 @@ fi
 %post std
 # get rid of any 3.6.2 stuff
 rm -f /etc/rc.d/rc[0-6].d/[KS]20apcups
-rm -f /etc/rc.d/init.d/apcups
+rm -f %{initdir}/apcups
 
 # add our links
 if [ "$1" -ge 1 ] ; then
 /sbin/chkconfig --add apcupsd
 fi
 
-cp -f /etc/rc.d/init.d/halt /etc/rc.d/init.d/halt.old
+cp -f %{initdir}/halt %{initdir}/halt.old
 awk '# Stuff left over from a previous apcupsd, remove it
 /^# See if this is a powerfail situation\./ {
    do {
@@ -334,9 +348,9 @@ awk '# Stuff left over from a previous apcupsd, remove it
     print ""
 }
 # Everything else is duplicated 
-{ print } ' /etc/rc.d/init.d/halt.old > /etc/rc.d/init.d/halt
+{ print } ' %{initdir}/halt.old > %{initdir}/halt
 
-chmod 744 /etc/rc.d/init.d/halt
+chmod 744 %{initdir}/halt
 
 # Undo things a bit
 
@@ -353,7 +367,7 @@ if [ $1 = 0 ] ; then
         # restore old halt script (hopefully)
         #   mv -f /etc/rc.d/init.d/halt.old /etc/rc.d/init.d/halt
 
-        cp -f /etc/rc.d/init.d/halt /etc/rc.d/init.d/halt.old
+        cp -f %{initdir}/halt %{initdir}/halt.old
         awk '# Stuff added by apcupsd, remove it
         /^# See if this is a powerfail situation\./ {
            do {
@@ -362,9 +376,9 @@ if [ $1 = 0 ] ; then
            getline
         }
         # Everything else is duplicated 
-        { print } ' /etc/rc.d/init.d/halt.old > /etc/rc.d/init.d/halt
+        { print } ' %{initdir}/halt.old > %{initdir}/halt
 
-        chmod 744 /etc/rc.d/init.d/halt
+        chmod 744 %{initdir}/halt
 fi
 
 %postun std
@@ -376,6 +390,8 @@ fi
 %endif
 
 %changelog
+* Sun Apr 25 2004 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- add SuSE configuration
 * Sat Apr 24 2004 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - tidy up doc includes, add release notes
 * Mon Mar 08 2004 D. Scott Barninger <barninger at fairfieldcomputers.com>

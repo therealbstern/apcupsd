@@ -13594,6 +13594,7 @@ suse)
     DFILES="\
 	platforms/suse/Makefile \
 	platforms/suse/apcupsd \
+	platforms/suse/awkhaltprog \
 	platforms/suse/halt-setup.sh \
 	platforms/suse/halt"
    ;;
