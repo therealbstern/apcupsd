@@ -145,13 +145,19 @@ SLAVE slave2.mynetwork.com
 that you have specified <emphasis role="bold">UPSCLASS
 netmaster</emphasis> and <emphasis role="bold">UPSMODE
 net</emphasis>. In addition, you have specified one or more slave
-machines.</para>
+machines. In this mode of networking, (as opposed to using the net 
+driver as described several sections below), your master knows the
+presence of all the slaves. They carry on a very explicit communication,
+and the slaves are explicitly notified by the master of any important
+changes such as a shutdown. </para>
 
 </sect1>
 <sect1><title>A Simple Slave Configuration</title>
 
 <para>You have a Smart UPS using the cable supplied by APC that is
-connected to the master machine configured above. This slave
+connected to the master machine configured above, and the master
+machine is running as a netmaster and has the address of your
+slave machine. This slave
 machine has no serial port connection to the UPS, but is powered by
 the same UPS as the master. A very simple configuration file would
 look like the following:</para>
@@ -192,16 +198,38 @@ power. In effect, <application>apcupsd</application> does not
 know or care where the power really comes from.</para>
 
 </sect1>
-<sect1><title>A Sample Slave Configuration Using the Net Driver</title>
+<sect1><title>A Sample NIS Slave Configuration Using the Net Driver</title>
 
-<para>As opposed to the master/slave mode demonstrate above, you can
-turn any computer into a slave by configuring with the NIS network
-driver turned on <option>--enable-net</option>. Running in this
+<para>As opposed to the master/slave mode demonstrated above, you can
+turn any computer into an NIS slave by configuring with the NIS network
+driver turned on <option>--enable-net</option>. The difference is
+that the NIS server has no explicit knowledge of the slaves. The NIS server
+makes its information available via the net (NIS), and the NIS slaves read
+it. When the NIS server is going to shutdown, it makes the information
+available to any NIS slave that polls it, but the NIS server does not
+explicitly call each NIS slave as is the case in the Master/Slave networking
+described several sections above.
+</para>
+<para>
+Running in this
 configuration, you can use any computer with
 <application>apcupsd</application> running the Network Information
-Server (NIS) as the master. The slave simply uses the NIS information
+Server (NIS) as the server. The NIS slave simply uses the NIS information
 to decide when to shutdown. This is a much simpler mode than the older
 master/slave code mentioned above.</para>
+<para>
+The main apcupsd (NIS server) is connected to the UPS
+and has NIS turned on, but the configuration is a simple standalone
+as in the section <b>A Simple Configuration for a SmartUPS</b>. It doesn't
+matter how the UPS is connected to the computer (serial, USB, ...). 
+</para>      
+<para>
+For the NIS slave computer, you will have a configuration that looks something
+like what follows. What is important is that you get the information
+from an <b>ether</b> cable over the network and you must specify the
+address of a &quot;NIS server&quot; that is running NIS (not the Master/Slave
+networking described above). The NIS slave apcupsd will then poll the NIS server
+at the NETTIME interval you specify to obtain the status.</para>
 
 <programlisting>
 ## apcupsd.conf v1.1 ## 
@@ -218,21 +246,21 @@ NETTIME 10
 you replace the <option>server-network-address</option> with the fully
 qualified domain name or IP address of a machine running
 <application>apcupsd</application> with NIS enabled (and normally, but
-not required, connected to a UPS). The :3551 that follows the server
+not required, connected to a UPS). The :3551 that follows the NIS server
 address is the port to use. The default is 3551, but older versions of
 apcupsd used port 7000.</para>
 
 <para>Please do not confuse this with a master/slave network
 configuration that is described above. This is a master/slave
-setup, but much simpler (the master does not know about the
+setup, but much simpler (the NIS server does not know about the
 slaves), and any NIS server, even a slave, can act as a server to a
 slave that listens to it.</para>
 
 <para>The <b>NETTIME</b> directive defines the time interval       
-that the slave uses to poll the master. If you set this too large,
-your slave may not see the change in state of the master before
-the master has shutdown. Normally, you have at least 30 seconds
-of grace time between the time the master decides to shutdown and
+that the slave uses to poll the NIS server. If you set this too large,
+your slave may not see the change in state of the NIS server before
+the server has shutdown. Normally, you have at least 30 seconds
+of grace time between the time the NIS server decides to shutdown and
 the time it no longer responds. Your slave must poll during this
 interval.</para>
 
@@ -243,10 +271,10 @@ represent the internal state of apcupsd, so the slave can see when
 the power fails and know when to shutdown.</para>
 <para>As with the Master/Slave configuration, any slave run using
 the Net driver will shutdown when its own timers expire or when
-the master shuts down, whichever occurs first. This means that
-if you want the slave to shutdown before the master, you need only
+the NIS server shuts down, whichever occurs first. This means that
+if you want the slave to shutdown before the server, you need only
 set BATTERYLEVEL, or any of the other values on the slave for 
-a faster shutdown than the values defined on the master.</para>
+a faster shutdown than the values defined on the NIS server.</para>
 
 </sect1>
 </chapter>

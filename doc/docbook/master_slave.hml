@@ -49,41 +49,41 @@ section of the <link linkend='shutdown'>Shutdown chapter</link> of
 the Technical Reference.</para>
 
 </sect2>
-<sect2><title>Master/Slave Networking using NIS and the NET Driver</title>
+<sect2><title>Server/Slave Networking using NIS and the NET Driver</title>
 
-<para>It is also possible to implement a network of master/slave
+<para>It is also possible to implement a network of NIS server/slave
 apcupsds using the new 3.10.x code and the <emphasis
-role="bold">net</emphasis> driver. This mode of master/slave
+role="bold">net</emphasis> driver. This mode of NIS server/slave
 networking is considerably different from the old method described at
 the beginning of this chapter. In the old code, there is a lot of
 configuration on both the master and slave side, and the master polls
 or sends info to the slave. Using the <emphasis
 role="bold">net</emphasis> driver is much simpler. However, you should
-carefully check that the slave does a proper shutdown. In the
+carefully check that the NIS slave does a proper shutdown. In the
 master/slave code, the master ensures the best it can that the slave
 is shutdown or notified before it shuts down itself. On the other
-hand, using the net driver, the master knows nothing about the slaves
+hand, using the net driver, the NIS server knows nothing about the NIS slaves
 that may be listening and thus takes no special precautions to ensure
-that the slaves receive the shutdown signal. Since the slave reads the
+that the NIS slaves receive the shutdown signal. Since the NIS slave reads the
 master's data once per second there should be no shutdown problems,
 and our experience confirms this.  This question can only  be answered
 by carefully testing the shutdown.</para>
 
-<para>In this master/slave mode, the master is a standard stand alone
+<para>In this NIS server/slave mode, the NIS server is a standard stand alone
 configuration except that it must have <emphasis role="bold">NETSERVER
 on</emphasis> in the configuration file and have an <emphasis
 role="bold">NISPORT nnn</emphasis> defined. Thus any
 <application>apcupsd</application> running in this mode then becomes
-the master.</para>
+the NIS server.</para>
 
-<para>The slave then uses the net driver to connect to the master's
-NIS output. In this mode, the slave decides how often to poll the
-master for the NIS information. The slave copy of apcupsd, have
+<para>The NIS slave then uses the net driver to connect to the server's
+NIS output. In this mode, the NIS slave decides how often to poll the
+server for the NIS information. The NIS slave's conf file has
 <emphasis role="bold">UPSTYPE net</emphasis>, which will invoke the
 &quot;network&quot; driver. By setting this machine's <emphasis
 role="bold">DEVICE</emphasis> to be <emphasis
-role="bold">master-ip:master-NIS-port</emphasis> it will automatically
-connect to the master and use the master's signals to shutdown the
+role="bold">server-ip:server-NIS-port</emphasis> it will automatically
+connect to the NIS server and use the server's signals to shutdown the
 computer.  In the example net slave configuration file below, the
 slave uses the NIS information provided by the computer <emphasis
 role="bold">tibs</emphasis> on port <emphasis
@@ -113,13 +113,13 @@ NETTIME 30
 </programlisting>
 </sect2>
 </sect1>
-<sect1><title>Network Problems with Master/Slave Configurations</title>
 
-<para>When working with a master/slave configuration (one UPS powering
-more than one computer), the master and slave communicate via the
+<sect1><title>Network Problems with Master/Slave or Server/Slave Configurations</title>
+<para>When working with a master/slave or server/slave configurations (one UPS powering
+more than one computer), the master/server and slave communicate via the
 network. In many configurations, <application>apcupsd</application> is
 started before the network is initialized. In this case, it is
-possible that the master will be unable to contact the slave. On
+possible that the master  will be unable to contact the slave. On
 <application>apcupsd</application> versions prior to 3.8.0, this could
 cause <application>apcupsd</application> to error off. The solution to
 this problem is to either force <application>apcupsd</application> to

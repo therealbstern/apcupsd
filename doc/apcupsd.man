@@ -20,26 +20,38 @@ apcupsd \- daemon for most APC's UPS for Linux
 .br
 .SH DESCRIPTION
 .LP
-This daemon can be used for controlling the APC SmartUPS. During a power
-failure, "apcupsd" will inform the users about the power failure and
-that a shutdown may occur.  If power is not restored, a system shutdown
-will follow when the battery is exausted, a timeout (seconds) expires,
-or runtime expires based on internal APC calculations determined by
-power consumption rates.  If the power is restored before one of the
-above shutdown conditions is met, "apcupsd" will inform users about this
-fact.
-
-The shutdown is made by script calls to "/etc/apcupsd/apccontrol", which
-is called by "apcupsd". Consequently, no changes to /etc/inittab are necessary.
-There is no communication between "apcupsd" and init(1) process.
-Apcupsd modifies the halt script so that at the end of the shutdown
-process, apcupsd will be re-executed in order to power off the UPS.
+This document is considerably out of date. It can be used
+for a brief overview of apcupsd, but you should consult the
+html manual for current information. Normally this manual
+will be loaded on your system in the doc directory, which
+varies from system to system. Otherwise, you may find
+an online version at: http://www.apcupsd.com
 
 .LP
-The "apcupsd" daemon now supports two networking modes that function
-independently, but if desired at the same time.
+This daemon can be used for controlling the most APC UPSes.
+During a power failure, "apcupsd" will inform the users about the
+power failure and that a shutdown may occur.  If power is not
+restored, a system shutdown will follow when the battery is
+exausted, a timeout (seconds) expires, or runtime expires based
+on internal UPS calculations determined by power consumption
+rates.  If the power is restored before one of the above shutdown
+conditions is met, apcupsd will inform users about this fact.
 
-Most users will probably enable the first network mode, which
+The shutdown is made by script calls to
+"/etc/apcupsd/apccontrol", which is called by "apcupsd".
+Consequently, no changes to /etc/inittab are necessary.  There is
+no communication between apcupsd and init(1) process.  Apcupsd
+modifies the halt script so that at the end of the shutdown
+process, apcupsd will be re-executed in order to power off the
+UPS. On certain platforms (e.g. FreeBSD) there is no halt script
+so apccontrol must be modified to cause apcupsd to power off
+the UPS after a delay time.
+
+.LP
+The apcupsd daemon now supports two networking modes that function
+independently, but if desired they can both run at the same time.
+
+Most users will probably enable the first network mode (NIS), which
 permits apcupsd to serve status and event information 
 to clients over the network.
 
@@ -51,17 +63,20 @@ has a network connection with the slaves and sends them information
 about the UPS status.
 
 .LP
-RedHat and S.u.S.E. versions of Linux have direct install support.  All
-other flavors of Linux will need some fussing with to get the install
+RedHat and SuSE versions of Linux have direct install support.  All
+other flavors of Linux may need some fussing with to get the install
 correct.
 .SH OPTIONS
 .TP
 .B \-c --configure
 Attempts to configure the UPS EPROM to the values specified in the
 configuration file "/etc/apcupsd/apcupsd.conf".
+This option is now deprecated (not supported) and should not
+be used. Instead use the apctest program, which has an interactive
+EEPROM configuration.
 .TP
 .B \-d --debug <level>
-Turns on debugging output for a NETSLAVE or a NETMASTER.
+Turns on debugging output.
 .TP
 .B \-f --config-file <file>
 Specifies the location of the configuration file.  The default
@@ -72,16 +87,8 @@ Attempt to turn the UPS off. This option is normally only
 used by the daemon itself to shut the UPS off after a
 system shutdown has completed.
 .TP
-.B \-n --rename-ups
-Attempts to change the UPS name stored in the UPS EPROM
-to that specified in your "/etc/apcupsd/apcupsd.conf" file.
-.TP
-.B \-u --update-battery-date
-Attempts to update the battery date stored in the UPS EPROM. Normally
-done after a battery replacement.
-.TP
 .B \-V --version
-Prints the apcupsd version number and the usage.
+Prints the apcupsd version number and the help.
 .TP
 .B \-? --help
 Prints a brief apcupsd help screen.
@@ -281,143 +288,6 @@ or the remaining battery runtime
 .B (MINUTES).
 
 
-
-
-.LP
-.SS CONFIGURATION COMMANDS USED TO SET THE UPS EPROM
-
-
-The values specified with the following commands are only
-used if the 
-.B --configure
-option is specified on the apcupsd command line, and the UPS is capable
-of internal EPROM programming.  In that case, apcupsd attempts to set
-the values into the UPSes EPROM.
-
-Under normal operations, the values for these parameters specified
-in the configuration file are not used. Instead, they are 
-read from the UPS EPROM by apcupsd.
-
-.LP
-.B  SENSITIVITY
--- <sets sensitiviy level>
-.br
-(H)igh, (M)edium, (L)ow
-
-.br
-This value determine how sensitive the UPS is to the mains
-quality and voltage fluxuations. The more sensitive it is, the
-quicker the UPS will switch to battery power when the mains line
-quality is bad. Normally, this should be set to H, but if
-you find your UPS switching to batteries frequently, you might
-want to try a less sensitive setting, providing that your
-computer equipment tolerates the poor quality mains.
-This value is written to the UPS EPROM when the --configure option is
-specified.
-Under normal apcupsd operations (no --configure option), apcupsd
-will read the value store in the UPS and display it in the
-STATUS output.
-.LP
-.B  WAKEUP
--- <set wakeup delay>
-.br
-The power restart delay value in [0,60,180,300] in seconds
-after the UPS shuts down during a power failure. This
-is to prevent the power from coming back on too quickly
-after a power down, and is important for those who have 
-high RPM drives that need
-to spindown before powering them up again.
-Some older SCSI models are very sensitive to this problem. 
-Default is zero. This value is written to the UPS EPROM when the --configure
-option is specified.
-Under normal apcupsd operations (no --configure option), apcupsd
-will read the value store in the UPS and display it in the
-STATUS output.
-.LP
-.B  SLEEP
--- <set sleep delay>
-.br
-Delay in [20,180,300,600] seconds before the actual killpower event.
-The default is 20. This value is written to the UPS EPROM when the --configure
-option is specified.
-Under normal apcupsd operations (no --configure option), apcupsd
-will read the value store in the UPS and display it in the
-STATUS output.
-.LP
-.B  LOTRANSFER
--- <sets lower limit of ups batt. transfer>
-.br
-This sets the low line voltage point to switch over to batteries.
-There are four values that can be selected, but they vary based on
-the UPS model, classification, and manufacture date. Thus a value
-ranging from 0-3 are assigned the learned and bubble sorted values.
-This value is written to the UPS EPROM when the --configure option is
-specified.
-Under normal apcupsd operations (no --configure option), apcupsd
-will read the value store in the UPS and display it in the
-STATUS output.
-.LP
-.B  HITRANSFER
--- <sets upper limit of ups batt. transfer>
-.br
-This sets the high line voltage point to switch over to batteries.
-.br
-There are four values that can be selected, but they vary based on
-the UPS model, classification, and manufacture date. Thus a value
-ranging from 0-3 are assigned the learned and bubble sorted values.
-This value is written to the UPS EPROM when the --configure option is
-specified.
-Under normal apcupsd operations (no --configure option), apcupsd
-will read the value store in the UPS and display it in the
-STATUS output.
-.LP
-.B  RETURNCHARGE
--- <sets min. batt. charge level>
-.br
-This parameter specifies what battery percentage
-charge is necessary before
-the UPS will supply power to your equipment after a power down.
-There are four values that can be selected, but they vary based on
-the UPS model, classification, and manufacture date. Thus a value
-ranging from 0-3 are assigned the learned and bubble sorted values.
-This value is written to the UPS EPROM when the --configure option is
-specified.
-Under normal apcupsd operations (no --configure option), apcupsd
-will read the value store in the UPS and display it in the
-STATUS output.
-.LP
-.B  BEEPSTATE
--- <sets alarm beep state> 
-.br
-This parameter tells the UPS when it can sound its audio alarm.
-These settings are based on discrete
-events related to the remaining capacity of the UPS.
-
-.B 0 
-immediately upon power failure
-
-.B T 
-power failure + 30 seconds
-
-.B L 
-low battery power
-
-.B N 
-never
-.LP
-.B  UPSNAME
--- <string>
-.br
-This is normally an eight character string, but it currently
-only handles seven. This is the UPS name that will be stored
-in the UPS EPROM.
-This value is written to the UPS EPROM when the --configure option is
-specified.
-Under normal apcupsd operations (no --configure option), apcupsd
-will read the value store in the UPS and display it in the
-STATUS output.
-
-
 .LP
 .SS CONFIGURATION COMMANDS FOR SHARING A UPS
 .LP
@@ -499,12 +369,15 @@ The name of the slave machine attached to the master.
 There can be max. 20 slaves attached to one master.
 .LP
 .B  USERMAGIC
--- < user defined magic> for Slave machine.
+-- < user defined password> for the slave machine.
 .br
-The second level of magic security. It must be (17) characters long
+The second level of password security. It must be (17) characters long
 without spaces. This is passed to the master machine during
 initialization of sockets. This string should be different for
-each and every slave on the network.
+each and every slave on the network. This is not at all secure as
+passwords are passed in the clear. Please protect your network by
+firewalling or tcpwrappers.
+
 .SH SMARTUPS
 If you start getting the follow message:
    
@@ -637,73 +510,17 @@ OnlineStatus BatteryStatus
 .br
 
 .SH SEE ALSO
-.B apcstatus
-(8) 
-.B apcevents
-(8) 
-.B apcnetd
-(8) 
-
+The html manual installed on your system or
+http://www.apcupsd.com
 
 .SH AUTHOR
-Andre M. Hedrick <hedrick@astro.dyer.vanderbilt.edu>
+Andre M. Hedrick
 .SS Retired Co-AUTHOR
-Christopher J. Reimer <reimer@doe.carleton.ca>
-.SS The Brave Unnamed PATCH-WORKS and TESTERS
-"Daniel Quinlan" <quinlan@pathname.com>
-.br
-"Tom Kunicki" <kunicki@surgery.wisc.edu>
-.br
-"Karsten Wiborg" <4wiborg@informatik.uni-hamburg.de>
-.br
-"Jean-Michel Rouet" <JM.ROUET@maisel-gw.enst-bretagne.fr>
-.br
-"Chris Adams" <cadams@ro.com>
-.br
-"Jason Orendorf" <orendorf@sprintmail.com>
-.br
-"Neil McAllister" <pcm2@sentient.com>
-.br
-"Werner Panocha" <WPanocha@t-online.de>
-.br
-"Lee Maisel" <martian@rt66.com>
-.br
-"Brian Schau" <bsc@fleggaard.dk>
-.br
-"Riccardo Facchetti" <riccardo@master.oasi.gpa.it>
-.SS The Information HELPERS and TESTERS.
-"Eric S. Raymond" <esr@snark.thyrsus.com>
-.br
-"Chris Hanson" <cph@martigny.ai.mit.edu>
-.br
-"Pavel Alex" <pavel@petrolbank.mldnet.com>
-.br
-"Theo Van Dinter" <felicity@kluge.net>
-.br
-"Thomas Porter" <txporter@mindspring.com>
-.br
-"Alan Davis" <davis@ele.uri.edu>
-.br
-"Oliver Hvrmann" <ollo@compuserve.com>
-.br
-"Scott Horton" <Scott.Horton1@bridge.bellsouth.com>
-.br
-"Matt Hyne" <mhyne@tip.CSIRO.AU>
-.br
-"Chen Shiyuan" <csy@hjc.edu.sg>
-.SS OTHER CREDITS
-"Miquel van Smoorenburg" <miquels@drinkel.cistron.nl>
-.br
-"The Doctor What" <docwhat@itek.net>
-.br
-"Pavel Korensky" <pavelk@dator3.anet.cz>
-.br
-
-.SH BUGS AND LIMITATIONS
-.LP
-Not all network modes are supported as yet. There are no known bugs in the
-standard stuff.
-There are possible bugs in all ShareUPS mode types.
-If anyone has had success at all with any ShareUPS models, please report.
-.SH EtherUPS/NetUPS
-This is fully functional as of version 3.4.0.
+Christopher J. Reimer
+.SS Former programmer
+Riccardo Fachetti
+.SS Current maintainer
+Kern Sibbald
+.SS Contributors
+An enormous list of past and former persons who have devoted
+their time and energy to this project -- thanks.
