@@ -1,0 +1,153 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="Author" content="Riccardo Facchetti">
+   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.4.3 i586) [Netscape]">
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+
+<h2>
+Network Design</h2>
+&nbsp;
+<h3>
+DATA TRANSFER</h3>
+
+<p><br>First issue is which kind of data transfer use to solve the endianess
+problems and size of basic data types. Since the beginning I wanted to
+implement the data transfer in ascii form that allow us to forget about
+endianess and size of types. Transferring in ascii gives us these benefits:
+<br>&nbsp;
+<ul>
+<li>
+Endianess problems are not present.</li>
+
+<li>
+Size of data types (e.g. sizeof(int)) are solved locally by sscanf.</li>
+
+<li>
+The UPS status is human readable even on a 'telnet' connection.</li>
+
+<li>
+Ascii transfers fits very well with all the other transfers (commands)
+and chatting between clients and server.</li>
+</ul>
+
+<p><br>As discussed with Kern, ASCII data transfer does not alone solve
+every problem. In 32/64 bits architectures the use of sscanf may force
+us to pick correctly the format strings. I think we can deal with this
+on a per-architecture basis as this is the only customization needed for
+the data transfer to work correctly.
+<p>Another thing discussed with Kern is transmission format. The initial
+design is totally ASCII for ease of debugging. In the future, if we will
+need, we can switch to semi-binary interface where we announce the number
+of transmitted lines before starting a transmission.
+<br>&nbsp;
+<h3>
+CLIENT/SERVER COMMAND INTERFACE</h3>
+
+<p><br>As for data transfers, the client/server command interface is in
+ascii form. This design allowed to reuse the same interface for commands,
+answers and UPS data transfers. This command interface is a set of commands
+that the client can give to the server to ask for data. This command set
+is easily expandable and even if expanded, will mantain total backward
+compatibility with the initial implementation. In the future we will add
+for example front panel led test command but this will be totally transparent
+and clients of previous 4.x versions will be always able to talk with the
+new daemon as the older commands will not be touched. The command interface
+have commands for:
+<br>&nbsp;
+<ul>
+<li>
+Authentication for clients</li>
+
+<li>
+Selection of UPS from the daemon's known UPSes: multi-UPS.</li>
+
+<li>
+Gathering of UPS information.</li>
+
+<li>
+Sending service messages from client to server, for example to notify shutdown
+started.</li>
+
+<li>
+Polling interval setup so that clients can notify server if they use slow
+or fast polling. This is interesting for slow connections where the polling
+time may be long. Server will timeout on polling time and close the connection.
+This is done for handling stuck clients.</li>
+</ul>
+
+<p><br>The command set as defined is not definitive. Don't forget that
+we are still in alpha devel so I'm ready to change/add commands. To obtain
+a full list of the server command set, please look into daemon/apcnetcmd.c.
+<br>&nbsp;
+<h3>
+SERVER</h3>
+
+<p><br>The server is an apcupsd child that will serve (based on config
+file directives) the UPSes info over the network. The daemon do not fork
+but instead uses select() on multiple file descriptors. To handle slow
+clients it reads data in O_NDELAY so that a slow client will not block
+other, faster, clients. With this architecture I'm sure the apcupsd is
+able to handle thousand of clients regardless of the speed of their connection
+with only very limited delay (read the already available data and process
+them). Security checks include:
+<br>&nbsp;
+<ul>
+<li>
+User and password authentication.</li>
+
+<li>
+Tcpwrappers verification.</li>
+
+<li>
+Selection of listening interface.</li>
+</ul>
+
+<p><br>The advantages of this design include:
+<br>&nbsp;
+<ul>
+<li>
+Human understandable chatting.</li>
+
+<li>
+Almost unlimited number of clients.</li>
+
+<li>
+TCP connections always-on (this solves the high number of TIME_WAIT connections).</li>
+
+<li>
+Easy security implementation.</li>
+
+<li>
+Network connections treated just like serial connections (transparent to
+do_events()).</li>
+
+<li>
+Cleaner command set implementation.</li>
+</ul>
+
+<h3>
+CLIENTS</h3>
+
+<p><br>We can have different kinds of clients, but they will all share
+the same communication layer. The network layer of apcupsd is built to
+deliver all the information known to the server and not only a subset,
+like the current 3.x implementation. The advantages of this are:
+<br>&nbsp;
+<ul>
+<li>
+Single communication protocol shared by all the clients (no need anymore
+for the two communication protocols present in 3.x)</li>
+
+<li>
+Clients are all the same (no difference from the server view between other
+apcupsd on network, cgi-bin clients, powerflute or other clients).</li>
+
+<li>
+Common library functions for usual client tasks (login, ustat, disconnection).</li>
+</ul>
+
+</body>
+</html>
