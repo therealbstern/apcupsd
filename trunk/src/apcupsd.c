@@ -429,7 +429,7 @@ static void daemon_start(void)
    if (debug_level > 0) {
       low_fd = 2;                     /* don't close debug output */
    }
-   for (i=sysconf(_SC_OPEN_MAX)-1; i > 2; i--) {
+   for (i=sysconf(_SC_OPEN_MAX)-1; i > low_fd; i--) {
       close(i);
    }
 
