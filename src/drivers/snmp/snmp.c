@@ -67,6 +67,11 @@ static int initialize_device_data(UPSINFO *ups) {
     char *port_num = NULL;
     char *cp;
 
+    if (ups->device == NULL || *ups->device == '\0') {
+        log_event(ups, LOG_ERR, "Wrong device for SNMP driver.");
+        exit(1);
+    }
+
     strcpy(Sid->device, ups->device);
 
     /*
@@ -83,7 +88,7 @@ static int initialize_device_data(UPSINFO *ups) {
 
     cp = strchr(Sid->device, ':');
     if (cp == NULL) {
-        log_event(ups, LOG_ERR, "Wrong device for SNMP driver.");
+        log_event(ups, LOG_ERR, "Wrong port for SNMP driver.");
         exit(1);
     }
     *cp = '\0';
@@ -92,7 +97,7 @@ static int initialize_device_data(UPSINFO *ups) {
 
     cp = strchr(port_num, ':');
     if (cp == NULL) {
-        log_event(ups, LOG_ERR, "Wrong port for SNMP driver.");
+        log_event(ups, LOG_ERR, "Wrong vendor for SNMP driver.");
         exit(1);
     }
     *cp = '\0';
@@ -102,7 +107,7 @@ static int initialize_device_data(UPSINFO *ups) {
 
     cp = strchr(Sid->DeviceVendor, ':');
     if (cp == NULL) {
-        log_event(ups, LOG_ERR, "Wrong device for SNMP driver.");
+        log_event(ups, LOG_ERR, "Wrong community for SNMP driver.");
         exit(1);
     }
     *cp = '\0';
