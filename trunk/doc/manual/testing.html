@@ -8,15 +8,15 @@
 <body>
 <h1>Testing Apcupsd</h1>
 <h2>Simple Signaling UPSes (sometimes called Dumb UPSes)</h2>
-The following testing procedures apply only to Smart UPSes. If you have
-a simple signaling UPS such as a BackUPS or other non-Smart UPS,
-your testing procedures will be somewhat
-different (Smart UPSes include SmartUPS and MatrixUPS models).
-For example, for simple signaling (Dumb) UPSes, <b>apcupsd</b> is not currently
-able to detect whether or not the serial cable is connected. In addition,
-some simple signaling UPSes with certain cable combinations are not
-able to detect the low battery condition. For more details
-please see the <a href="cables.html">Cable Chapter
+The following testing procedures apply for the most part to Smart UPSes.
+If you have a simple signaling UPS such as a BackUPS or other non-Smart
+UPS, your testing procedures will be somewhat different (Smart UPSes
+include SmartUPS and MatrixUPS models).  For example, for simple
+signaling (Dumb) UPSes, <b>apcupsd</b> is not currently able to detect
+whether or not the serial cable is connected.  In addition, some simple
+signaling UPSes with certain cable combinations are not able to detect
+the low battery condition.  For more details please see the <a
+href="cables.html">Cable Chapter
 </a> of this manual, an more specifically, the <a href="cables.html#CableModes">Cable Modes section</a>.
 Many of the other testing features should work similar to
 described below. However, since it is easy to configure the
@@ -35,6 +35,9 @@ likely that your UPS will immediately shut off the power.
 This is due to the initialization of the serial port line signals.
 
 <h2><a name="CableTest"></a>Determining Which Simple Signaling Cable You Have</h2>
+<b>The most frequently encountered problem with Simple Signaling
+UPSes (e.g. BackUPS 650) is that you have incorrectly specified which
+cable is being used.</b> 
 For a simple signaling (dumb) UPS, it is important to know what
 cable you have. All cables furnished by APC have the cable number
 stamped on the side of the computer connector end of the cable.
@@ -44,6 +47,11 @@ the <b>apctest</b> program to determine the type of cable
 that you have. Please see the
 <a href="apctest.html">apctest Chapter</a> of this manual for
 the details of running <b>apctest</b>.
+<p>
+For simple signalling UPSes, you should NOT use <b>simple</b>
+in the cable specification (i.e. <b>UPSCABLE simple</b>) unless
+you have made the cable yourself according to the wiring diagram
+given in the cables chapter of this manual.
 
 <h2>Smart UPSes</h2>
 Most of rest of this chapter concerns testing Smart UPSes.
