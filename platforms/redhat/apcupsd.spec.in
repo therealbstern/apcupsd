@@ -115,11 +115,7 @@ mkdir -p $RPM_BUILD_ROOT%{initdir}
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/cgi
 
 make \
-        prefix=$RPM_BUILD_ROOT%{_prefix} \
-        sbindir=$RPM_BUILD_ROOT/sbin \
-        sysconfdir=$RPM_BUILD_ROOT%{_sysconfdir}/apcupsd \
-        cgibin=$RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/cgi \
-        mandir=$RPM_BUILD_ROOT%{_mandir} \
+        DESTDIR=$RPM_BUILD_ROOT \
         install
 
 install -m744 platforms/apccontrol \
