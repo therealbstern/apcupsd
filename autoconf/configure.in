@@ -143,8 +143,8 @@ with_pthreads=yes
 AC_MSG_CHECKING(for pthreads)
 
 AC_ARG_ENABLE(pthreads, [
-  --enable-pthreads	   Enable pthreads (default)
-  --disable-pthreads	   No pthreads],
+AC_HELP_STRING([--enable-pthreads], [Enable pthreads (default)])
+AC_HELP_STRING([--disable-pthreads], [No pthreads])],
 with_pthreads=$enableval)
 
 if test "$with_pthreads" != no; then
@@ -551,7 +551,7 @@ dnl	Check for enable particular features.
 #--------------------------------------------------------------------
 
 AC_ARG_WITH(libwrap,
-  [  --with-libwrap[=DIR]     Compile in libwrap (tcp_wrappers) support],
+  [AC_HELP_STRING([--with-libwrap=DIR], [Compile in libwrap (tcp_wrappers) support])],
   [
     if test "x$withval" != "xno" ; then
        saved_LIBS="$LIBS"
@@ -599,7 +599,7 @@ LIBGDOBJ=
 CGI_IMGFMT=
 SYS_GD_FOUND=no
 AC_ARG_ENABLE(cgi,
-  [  --enable-cgi		   Compile CGI programs],
+  [AC_HELP_STRING([--enable-cgi], [Compile CGI programs])],
   [
    if test "$enableval" = "yes"
    then
@@ -709,7 +709,7 @@ INSTALL_DISTDIR="install-distdir"
 UNINSTALL_DISTDIR="uninstall-distdir"
 with_distdir="yes"
 AC_ARG_ENABLE(install-distdir,
-	[  --enable-install-distdir Install distribution],	     
+	[AC_HELP_STRING([--enable-install-distdir], [Install distribution])],
 	[ if test "$enableval" = "no" ; then
 	    INSTALL_DISTDIR=" "
 	    UNINSTALL_DISTDIR=" "
@@ -722,8 +722,8 @@ dnl
 dnl Check for enable of drivers
 dnl
 AC_ARG_ENABLE(apcsmart, [
-  --enable-apcsmart	   Compile APC Smart UPS driver (default)
-  --disable-apcsmart	   No APC Smart UPS driver],
+AC_HELP_STRING([--enable-apcsmart], [Compile APC Smart UPS driver (default)])
+AC_HELP_STRING([--disable-apcsmart], [No APC Smart UPS driver])],
 	[ if test "$enableval" = "yes" ; then
 dnl
 dnl This is for C code inclusion
@@ -740,8 +740,8 @@ dnl This is for Makefile.in inside src/drivers/
 	])
 
 AC_ARG_ENABLE(dumb, [
-  --enable-dumb 	   Compile dumb UPS driver (default)
-  --disable-dumb	   No dumb UPS driver],
+AC_HELP_STRING([--enable-dumb], [Compile dumb UPS driver (default)])
+AC_HELP_STRING([--disable-dumb], [No dumb UPS driver])],
 	[ if test "$enableval" = "yes" ; then
 	    AC_DEFINE(HAVE_DUMB_DRIVER)
 	DUMB_DRIVER="dumb"
@@ -755,8 +755,8 @@ AC_ARG_ENABLE(dumb, [
 
 
 AC_ARG_ENABLE(usb, [
-  --enable-usb		   Compile USB UPS code
-  --disable-usb 	   No USB UPS code (default)],
+AC_HELP_STRING([--enable-usb], [Compile USB UPS code])
+AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
 	[ if test "$enableval" = "yes" ; then
 	if test "$host_os" = "linux-gnu"
 	then
@@ -770,8 +770,8 @@ AC_ARG_ENABLE(usb, [
     [])
 
 AC_ARG_ENABLE(net, [
-  --enable-net		   Compile new networking driver for slaves
-  --disable-net 	   No new network driver for slaves (default)],
+AC_HELP_STRING([--enable-net], [Compile new networking driver for slaves])
+AC_HELP_STRING([--disable-net], [No new network driver for slaves (default)])],
 	[ if test "$enableval" = "yes" ; then
 	AC_DEFINE(HAVE_NET_DRIVER)
 	AC_DEFINE(HAVE_NISLIB)
@@ -787,8 +787,8 @@ dnl
 SNMP_DRIVER_ENABLED="no"
 NET_SNMP_DRIVER_ENABLED="no"
 AC_ARG_ENABLE(snmp, [
-  --enable-snmp 	   Compile SNMP UPS code
-  --disable-snmp	   No SNMP UPS code (default)],
+AC_HELP_STRING([--enable-snmp], [Compile SNMP UPS code])
+AC_HELP_STRING([--disable-snmp], [No SNMP UPS code (default)])],
 	[ if test "$enableval" = "yes" ; then
 	    SNMP_DRIVER_ENABLED="yes"
 	    AC_CHECK_LIB(crypto, EVP_DigestInit,
@@ -821,8 +821,8 @@ if test "$SNMP_DRIVER_ENABLED" = "yes"; then
 fi
 
 AC_ARG_ENABLE(net-snmp, [
-  --enable-net-snmp	       Compile NET-SNMP UPS code
-  --disable-net-snmp	       No NET-SNMP UPS code (default)],
+AC_HELP_STRING([--enable-net-snmp], [Compile NET-SNMP UPS code])
+AC_HELP_STRING([--disable-net-snmp], [No NET-SNMP UPS code (default)])],
 	[ if test "$enableval" = "yes" ; then
 		NET_SNMP_DRIVER_ENABLED="yes"
 		AC_CHECK_LIB(crypto, EVP_DigestInit,
@@ -844,8 +844,8 @@ fi
 
 
 AC_ARG_ENABLE(test, [
-  --enable-test 	   Compile TEST driver code
-  --disable-test	   No TEST driver (default)],
+AC_HELP_STRING([--enable-test], [Compile TEST driver code])
+AC_HELP_STRING([--disable-test], [No TEST driver (default)])],
    [ if test "$enableval" = "yes" ; then
 	AC_DEFINE(HAVE_TEST_DRIVER)
 	TEST_DRIVER="test"
@@ -857,8 +857,8 @@ dnl Enable NIS code
 NISSRV_ENABLED=no
 APCNISD=
 AC_ARG_ENABLE(nis, [
-  --enable-nis		   Compile NIS server (default)
-  --disable-nis 	   No NIS server],
+AC_HELP_STRING([--enable-nis], [Compile NIS server (default)])
+AC_HELP_STRING([--disable-nis], [No NIS server])],
    [ if test "$enableval" = "yes" ; then
 	AC_DEFINE(HAVE_NISSERVER)
 	AC_DEFINE(HAVE_NISLIB)
@@ -876,7 +876,7 @@ AC_SUBST(APCNISD)
 dnl Allow setting of NISIP value
 NISIP="0.0.0.0"
 AC_ARG_WITH(nisip,
-	[  --with-nisip=IP-ADDRESS Specify the IP address to bind to],
+	[AC_HELP_STRING([--with-nisip=IP-ADDRESS], [Specify the IP address to bind to])],
 	[
 	   NISIP="$withval";
 	]
@@ -887,9 +887,8 @@ AC_SUBST(NISIP)
 dnl Enable old network code
 OLDNET_ENABLED=no
 AC_ARG_ENABLE(master-slave, [
-  --enable-master-slave    Compile old network master/server code
-  --disable-master-slave   No old network master/server (default)
-							],
+AC_HELP_STRING([--enable-master-slave], [Compile old network master/server code])
+AC_HELP_STRING([--disable-master-slave], [No old network master/server (default)])],
    [ if test "$enableval" = "yes" ; then
        AC_DEFINE(HAVE_OLDNET)
        OLDNET_ENABLED=yes
@@ -898,7 +897,7 @@ AC_ARG_ENABLE(master-slave, [
 
 CGIBIN="/etc/apcupsd"
 AC_ARG_WITH(cgi-bin,
-	[  --with-cgi-bin=DIR	   Specify cgi-bin directory (default=/etc/apcupsd)],
+	[AC_HELP_STRING([--with-cgi-bin=DIR], [Specify cgi-bin directory (default=/etc/apcupsd)])],
 	[
 	   CGIBIN="$withval";
 	]
@@ -911,7 +910,7 @@ dnl	use option --enable-powerflute to compile powerflute
 dnl
 POWERFLUTE_ENABLE="no"
 AC_ARG_ENABLE(powerflute,
-	[  --enable-powerflute	   Compile powerflute program],
+	[AC_HELP_STRING([--enable-powerflute], [Compile powerflute program])],
 	[ if test "$enableval" = "yes" ; then
 	    POWERFLUTE_ENABLE="yes"
 	    AC_CHECK_LIB(ncurses, initscr,
@@ -1107,7 +1106,7 @@ dnl
 
 # now allow user to specify DISTNAME
 AC_ARG_WITH(distname,
-	[  --with-distname=NAME     Specify DISTNAME],
+	[AC_HELP_STRING([--with-distname=NAME], [Specify DISTNAME])],
 	[
 		DISTNAME=$withval
 	]
@@ -1491,34 +1490,34 @@ dnl
 dnl Allow user to set nologdir
 dnl
 AC_ARG_WITH(nologin,
-    [  --with-nologin=DIR      Specify nologin file directory (default /etc)],
+    [AC_HELP_STRING([--with-nologin=DIR], [Specify nologin file directory (default /etc)])],
     [ nologdir="$withval"; ]
 )
 
 # now allow the user to specify the PID directory
 AC_ARG_WITH(pid-dir,
-    [  --with-pid-dir=DIR      Specify PIDDIR directory (default is OS dependent)],
+    [AC_HELP_STRING([--with-pid-dir=DIR], [Specify PIDDIR directory (default is OS dependent)])],
     [
 	PIDDIR="$withval";
     ]
 )
 # now allow user to specify LOGDIR
 AC_ARG_WITH(log-dir,
-    [  --with-log-dir=DIR      Specify EVENTS and STATUS directory (default is OS dependent)],
+    [AC_HELP_STRING([--with-log-dir=DIR], [Specify EVENTS and STATUS directory (default is OS dependent)])],
     [
 	LOGDIR="$withval";
     ]
 )
 # now allow user to specify LOCKDIR
 AC_ARG_WITH(lock-dir,
-    [  --with-lock-dir=DIR     Specify serial port lock directory (default is OS dependent)],
+    [AC_HELP_STRING([--with-lock-dir=DIR], [Specify serial port lock directory (default is OS dependent)])],
     [
 	LOCKDIR="$withval";
     ]
 )
 # now allow user to specify PWRFAILDIR
 AC_ARG_WITH(pwrfail-dir,
-    [  --with-pwrfail-dir=DIR	Specify power failure file directory (default is OS dependent)],
+    [AC_HELP_STRING([--with-pwrfail-dir=DIR], [Specify power failure file directory (default is OS dependent)])],
     [
 	PWRFAILDIR="$withval";
     ]
@@ -1527,14 +1526,14 @@ AC_ARG_WITH(pwrfail-dir,
 
 # now allow user to specify SERIALDEV
 AC_ARG_WITH(serial-dev,
-    [  --with-serial-dev=DEV	Specify serial port device],
+    [AC_HELP_STRING([--with-serial-dev=DEV], [Specify serial port device])],
     [
 	SERIALDEV="$withval";
     ]
 )
 
 AC_ARG_WITH(dev,
-    [  --with-dev=DEV	 Specify port or device],
+    [AC_HELP_STRING([--with-dev=DEV], [Specify port or device])],
     [
 	SERIALDEV="$withval";
     ]
@@ -1543,7 +1542,7 @@ AC_ARG_WITH(dev,
 
 # now allow user to specify NISPORT
 AC_ARG_WITH(nis-port,
-    [  --with-nis-port=PORT	Specify NIS (CGI) port (default 3551 except Debian)],
+    [AC_HELP_STRING([--with-nis-port=PORT], [Specify NIS (CGI) port (default 3551 except Debian)])],
     [
 	NISPORT="$withval";
     ]
@@ -1551,7 +1550,7 @@ AC_ARG_WITH(nis-port,
 
 # now allow user to specify NETPORT
 AC_ARG_WITH(net-port,
-    [  --with-net-port=PORT	Specify Master/slave port (default 6666 except Debian)],
+    [AC_HELP_STRING([--with-net-port=PORT], [Specify Master/slave port (default 6666 except Debian)])],
     [
 	NETPORT="$withval";
     ]
@@ -1560,7 +1559,7 @@ AC_ARG_WITH(net-port,
 
 # now allow user to specify UPSTYPE
 AC_ARG_WITH(upstype,
-    [  --with-upstype=TYPE     Specify the UPS type],
+    [AC_HELP_STRING([--with-upstype=TYPE], [Specify the UPS type])],
     [
 	UPSTYPE="$withval";
     ]
@@ -1568,7 +1567,7 @@ AC_ARG_WITH(upstype,
 
 # now allow user to specify UPSCABLE
 AC_ARG_WITH(upscable,
-    [  --with-upscable=CABLE	Specify the UPS cable],
+    [AC_HELP_STRING([--with-upscable=CABLE], [Specify the UPS cable])],
     [
 	UPSCABLE="$withval";
     ]
