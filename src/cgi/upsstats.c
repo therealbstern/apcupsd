@@ -39,6 +39,7 @@
 #include <string.h>
 #include <fcntl.h>
 #include "cgiconfig.h"
+#include "cgilib.h"
 #include "upsfetch.h"
 #include "status.h"
 
@@ -52,10 +53,7 @@ char   answer[256];
 char   answer2[256];
 char   answer3[256];
 
-int getupsvar(char *host, char *request, char *answer, int anslen);
-extern int extractcgiargs();
-int checkhost(char *check);
-int fetch_events(char *host);
+extern int fetch_events(char *host);
 
 void parsearg(char var[255], char value[255]) 
 {
@@ -120,7 +118,7 @@ void send_values(int report, int defrpt)
     }
 }
 
-int main() 
+int main(int argc, char **argv) 
 {
     int     status,img1,img2,img3,refresh;
     double  tempf;

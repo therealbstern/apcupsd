@@ -32,6 +32,7 @@
 #endif
 
 #include "cgiconfig.h"
+#include "cgilib.h"
 
 #include <math.h>
 #include <stdio.h>
@@ -42,8 +43,6 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
-
-extern int extractcgiargs();
 
 static char    monhost[128];
 static char    cmd[16] = "";
@@ -97,7 +96,7 @@ static void DrawText(gdImagePtr im, int min, int step)
     gdImageString(im, gdFontLarge, 0, 0, (unsigned char *)text, black);
 }
 
-static gdImagePtr InitImage()
+static gdImagePtr InitImage(void)
 {
     gdImagePtr im;
 
@@ -416,7 +415,7 @@ void drawruntime (char *upsrunts, char *lowbatts)
 }
 
 
-int main ()
+int main (int argc, char **argv)
 {
     if (!extractcgiargs()) {
         printf("Content-type: text/plain\n\n");

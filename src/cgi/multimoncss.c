@@ -56,7 +56,7 @@ void report_error(char *str)
     exit(1);
 }
 
-void noresp()
+void noresp(void)
 {
     printf("       <TD CLASS=\"Fault\">Unavailable</TD>\n");
 }
@@ -440,7 +440,7 @@ void parsefield (char *buf)
     addfield (var, name, suffix);
 }
 
-void readconf()
+void readconf(void)
 {
 	FILE	*conf;
 	char	buf[512], fn[256];
@@ -466,7 +466,7 @@ void readconf()
 }
 
 /* create default field configuration */
-void defaultfields()
+void defaultfields(void)
 {
         addfield ("SYSTEM", "System", "");
         addfield ("MODEL", "Model", "");
@@ -478,7 +478,7 @@ void defaultfields()
         addfield ("DATA",  "Data", "All data");
 }
 
-int main()
+int main(int argc, char **argv)
 {
 	FILE	*conf;
 	time_t	tod;
