@@ -29,7 +29,7 @@
 
    Kern Sibbald, July 2001
   
-   Version $Id: smtp.c,v 1.4 2004-04-16 13:18:43 kerns Exp $
+   Version $Id: smtp.c,v 1.5 2004-06-20 18:51:52 kerns Exp $
     
  */
 
@@ -295,15 +295,15 @@ hp:
     */
    get_response(); /* banner */
    chat("helo %s\r\n", my_hostname);
-   chat("mail from: <%s>\r\n", from_addr);
+   chat("mail from:<%s>\r\n", from_addr);
 
    for (i = 0; i < argc; i++) {
       Dmsg1(20, "rcpt to: %s\n", argv[i]);
-      chat("rcpt to: <%s>\r\n", argv[i]);
+      chat("rcpt to:<%s>\r\n", argv[i]);
    }
 
    if (cc_addr) {
-      chat("rcpt to: <%s>\r\n", cc_addr);
+      chat("rcpt to:<%s>\r\n", cc_addr);
    }
    Dmsg0(20, "Data\n");
    chat("data\r\n");

@@ -23,6 +23,7 @@ APCUPSD=@sbindir@/apcupsd
 SHUTDOWN=/sbin/shutdown
 SCRIPTSHELL=@SCRIPTSHELL@
 SCRIPTDIR=@sysconfdir@
+WALL=wall
 
 #
 # Concatenate all output from this script to the events file
@@ -60,64 +61,64 @@ case "$1" in
 	echo "Apccontrol doing: ${APCUPSD} --killpower on UPS ${2}"
 	sleep 10
 	${APCUPSD} --killpower
-	echo "Apccontrol has done: ${APCUPSD} --killpower on UPS ${2}" | wall
+	echo "Apccontrol has done: ${APCUPSD} --killpower on UPS ${2}" | ${WALL}
     ;;
     commfailure)
-	echo "Warning communications lost with UPS ${2}" | wall
+	echo "Warning communications lost with UPS ${2}" | ${WALL}
     ;;
     commok)
-	echo "Communciations restored with UPS ${2}" | wall
+	echo "Communciations restored with UPS ${2}" | ${WALL}
     ;;
 #
 # powerout, onbattery, offbattery, mainsback events occur
 #   in that order.
 #
     powerout)
-	echo "Warning power loss detected on UPS ${2}" | wall
+	echo "Warning power loss detected on UPS ${2}" | ${WALL}
     ;;
     onbattery)
-	echo "Power failure on UPS ${2}. Running on batteries." | wall
+	echo "Power failure on UPS ${2}. Running on batteries." | ${WALL}
     ;;
     offbattery)
     ;;
     mainsback)
-	echo "Power has returned on UPS ${2}..." | wall
+	echo "Power has returned on UPS ${2}..." | ${WALL}
 	if [ -f @PWRFAILDIR@/powerfail ] ; then
-	   printf "Continuing with shutdown."  | wall
+	   printf "Continuing with shutdown."  | ${WALL}
 	fi
     ;;
     failing)
-	echo "Battery power exhaused on UPS ${2}. Doing shutdown." | wall
+	echo "Battery power exhaused on UPS ${2}. Doing shutdown." | ${WALL}
     ;;
     timeout)
-	echo "Battery time limit exceded on UPS ${2}. Doing shutdown." | wall
+	echo "Battery time limit exceded on UPS ${2}. Doing shutdown." | ${WALL}
     ;;
     loadlimit)
-	echo "Remaining battery charge below limit on UPS ${2}. Doing shutdown." | wall
+	echo "Remaining battery charge below limit on UPS ${2}. Doing shutdown." | ${WALL}
     ;;
     runlimit)
-	echo "Remaining battery runtime below limit on UPS ${2}. Doing shutdown." | wall
+	echo "Remaining battery runtime below limit on UPS ${2}. Doing shutdown." | ${WALL}
     ;;
     doreboot)
-	echo "UPS ${2} initiating Reboot Sequence" | wall
+	echo "UPS ${2} initiating Reboot Sequence" | ${WALL}
 	${SHUTDOWN} -r now "apcupsd UPS ${2} initiated reboot"
     ;;
     doshutdown)
-	echo "UPS ${2} initiated Shutdown Sequence" | wall
+	echo "UPS ${2} initiated Shutdown Sequence" | ${WALL}
 	${SHUTDOWN} -h now "apcupsd UPS ${2} initiated shutdown"
     ;;
     annoyme)
-	echo "Power problems with UPS ${2}. Please logoff." | wall
+	echo "Power problems with UPS ${2}. Please logoff." | ${WALL}
     ;;
     emergency)
-	echo "Emergency Shutdown. Possible battery failure on UPS ${2}." | wall
+	echo "Emergency Shutdown. Possible battery failure on UPS ${2}." | ${WALL}
 	${SHUTDOWN} -h now "apcupsd emergency shutdown"
     ;;
     changeme)
-	echo "Emergency! Batteries have failed on UPS ${2}. Change them NOW" | wall
+	echo "Emergency! Batteries have failed on UPS ${2}. Change them NOW" | ${WALL}
     ;;
     remotedown)
-	echo "Remote Shutdown. Beginning Shutdown Sequence." | wall
+	echo "Remote Shutdown. Beginning Shutdown Sequence." | ${WALL}
 	${SHUTDOWN} -h now "apcupsd remote shutdown"
     ;;
     restartme)
@@ -136,10 +137,10 @@ case "$1" in
     endselftest)
     ;;
     mastertimeout)
-	echo "Warning connection from master lost." | wall
+	echo "Warning connection from master lost." | ${WALL}
     ;;
     masterconnect)
-	echo "Connection from master established." | wall
+	echo "Connection from master established." | ${WALL}
     ;;
     *)	echo "Usage: ${0##*/} command"
 	echo "	     warning: this script is intended to be launched by"

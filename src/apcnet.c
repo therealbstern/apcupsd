@@ -35,27 +35,6 @@
  *
  */
 
-/*
- *  IN NO EVENT SHALL ANY AND ALL PERSONS INVOLVED IN THE DEVELOPMENT OF THIS
- *  PACKAGE, NOW REFERRED TO AS "APCUPSD-Team" BE LIABLE TO ANY PARTY FOR
- *  DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING
- *  OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF ANY OR ALL
- *  OF THE "APCUPSD-Team" HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  THE "APCUPSD-Team" SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING,
- *  BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
- *  ON AN "AS IS" BASIS, AND THE "APCUPSD-Team" HAS NO OBLIGATION TO PROVIDE
- *  MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
- *
- *  THE "APCUPSD-Team" HAS ABSOLUTELY NO CONNECTION WITH THE COMPANY
- *  AMERICAN POWER CONVERSION, "APCC".  THE "APCUPSD-Team" DID NOT AND
- *  HAS NOT SIGNED ANY NON-DISCLOSURE AGREEMENTS WITH "APCC".  ANY AND ALL
- *  OF THE LOOK-A-LIKE ( UPSlink(tm) Language ) WAS DERIVED FROM THE
- *  SOURCES LISTED BELOW.
- *
- */
-
  /*
   * Major rewrite following same logic 11 Jan 2000, Kern Sibbald
   */
@@ -107,6 +86,96 @@ int prepare_master(UPSINFO *ups)
     }
     return 0;			  /* OK */
 }
+
+/********************************************************************** 
+ *
+ * connect() plus timeout (in seconds)
+ *   The purpose of this routine is to keep the connect() from blocking
+ *   too long while we are attempting to contact the slaves.  If we have
+ *   a lot of slaves, it is important to get around to each one quickly.
+ *
+ *
+ * some errors (fcntl(),getsockopt() or select() mysteriously failing)
+ * will make it default to normal connect(), without timeout
+ *
+ * -- Thomas Habets, 2004-05-06
+ *
+ * Bugs:  * if select() is interrupted (EINTR) the timeout will begin again
+ *	    from 0.
+ *	  * Some error handling marked with FIXME
+ *	  * There probably is an issue with select() timing out, function
+ *	    returns, then the connection is established, and then tconnect()
+ *	    is called again using the same socket. Solve by creating another
+ *	    socket and dup2():ing?
+ */
+static int tconnect(int  sockfd,  const  struct sockaddr *serv_addr,
+		    socklen_t addrlen, double timeout)
+{
+    int val,ret;
+    struct timeval tv;
+    int size = sizeof(int);
+
+    if (-1 == (val = fcntl(sockfd, F_GETFL, 0))) {
+	return connect(sockfd,serv_addr,addrlen);
+    }
+    if (-1 == fcntl(sockfd, F_SETFL, val | O_NONBLOCK)) {
+	return connect(sockfd,serv_addr,addrlen);
+    }
+
+    ret = connect(sockfd, serv_addr, addrlen);
+    if (ret < 0 && (errno == EINPROGRESS || EALREADY==errno)){
+	do {
+	    fd_set wfds;
+	    fd_set efds;
+	    FD_ZERO(&wfds);
+	    FD_ZERO(&efds);
+	    FD_SET(sockfd, &wfds);
+	    FD_SET(sockfd, &efds);
+	    tv.tv_sec = (long)timeout;
+	    tv.tv_usec = (long)(timeout * 1000000) % 1000000;
+	    ret = select(sockfd + 1, NULL, &wfds, &efds, &tv);
+	} while(-1 == ret && EINTR == errno);
+
+	if (-1 == ret) {
+	    goto errout1;
+	}
+	if (!ret) {
+	    ret = ETIMEDOUT;
+	    goto restore_and_return;
+	}
+
+	if (-1 == (ret = getsockopt(sockfd, SOL_SOCKET, SO_ERROR, (char*)&val,
+				    (socklen_t*)&size))) {
+	    goto errout1;
+	}
+	if (val != 0) {
+	    ret = val;
+	    goto restore_and_return;
+	}
+
+    }
+
+    if (-1 == fcntl(sockfd, F_SETFL, val)) {
+        /* hmm, what do we do here? We've ruined the socket, so do we create
+	   a new one? FIXME */
+    }
+    
+    return ret;
+
+ errout1:;
+    if (-1 == fcntl(sockfd, F_SETFL, val)) {
+	/* FIXME: recreate the socket or something? */
+    }
+    return connect(sockfd,serv_addr,addrlen);
+
+ restore_and_return:;
+    if (-1 == fcntl(sockfd, F_SETFL, val)) {
+	/* FIXME: recreate the socket or something? */
+    }
+    errno = ret;
+    return -1;
+}
+
 
 /*********************************************************************/
 static void send_to_all_slaves(UPSINFO *ups)
@@ -225,8 +294,8 @@ static int send_to_slave(UPSINFO *ups, int who)
             log_event(ups, LOG_WARNING, "Cannot set SO_KEEPALIVE on socket: %s\n" , strerror(errno));
 	}
 
-	if ((connect(slaves[who].socket, (struct sockaddr *) &slaves[who].addr,
-		     sizeof(slaves[who].addr))) == -1) {
+	if ((tconnect(slaves[who].socket,(struct sockaddr *) &slaves[who].addr,
+		     sizeof(slaves[who].addr), 2.0)) == -1) {
 	    slaves[who].ms_errno = errno;
             Dmsg1(100, "Cannot connect to slave: ERR=%s\n", strerror(errno));
 	    if (slaves[who].remote_state == RMT_CONNECTED)

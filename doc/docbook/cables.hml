@@ -90,6 +90,7 @@ Signal Computer              UPS     UPS
  RxD    2   ----------------  1      2     TxD  Send
  TxD    3   ----------------  7      8     RxD  Receive
  GND    5   ----------------  6      7     Ground
+ FG  Shield ----------------  3      4     Frame Ground
 
 The RJ45-8 pins are: looking at the end of the connector:
 
@@ -114,6 +115,12 @@ _______________________
 <para>For the serial port DB9F connector, the pin numbers are stamped
 in the plastic near each pin. In addition, there is a diagram near the
 end of this chapter.</para>
+
+<para>Note, one user, Martin, has found that if the shield is not
+connected to the Frame Ground in the above diagram (not in          
+our original schematic), the UPS (a BackUPS CS 500 EI) will be
+unstable and likely to rapidly switch from power to batteries (i.e. 
+chatter).</para>
 
 <para>When using this cable with <application>apcupsd</application>
 specify the following in <filename>apcupsd.conf</filename>:</para>

@@ -358,8 +358,7 @@ int main(int argc, char **argv)
 	    *p++ = 0;
 	    port = atoi(p);
 	}
-    }
-    else {
+    } else {
       /* check configuration so local NISIP and NISPORT variables can be used as defaults */ 
       if (!stat(cfgfile, &cfgstat)) {
 	check_for_config(ups, cfgfile);
@@ -376,6 +375,9 @@ int main(int argc, char **argv)
 
     astrncpy(myDATA.apcmagic, APC_MAGIC, sizeof(myDATA.apcmagic));
     astrncpy(myDATA.accessmagic, ACCESS_MAGIC, sizeof(myDATA.accessmagic));
+    if (!*host || strcmp(host, "0.0.0.0") == 0) {
+       host = "localhost";
+    }
 
     switch (mode) {
     case 1:

@@ -4,22 +4,22 @@
 # modifications by Gordon Morehouse <spambox@evernex.com> April 2001
 
 case "$1" in
-	poweroff | killpower)
-	if [ -f @PWRFAILDIR@/powerfail ]; then
-		echo ""
-		echo -n "apcupsd: Ordering UPS to kill power... "
-		@sysconfdir@/apccontrol killpower
-		echo "done."	
-		echo ""
-		echo "Please ensure the UPS has powered off before rebooting."
-		echo "Otherwise, the UPS may cut the power during the reboot!"
-		echo ""
-		sleep 2d
-	fi
-	;;
+    poweroff | killpower)
+    if [ -f @PWRFAILDIR@/powerfail ]; then
+	echo ""
+	echo -n "apcupsd: Ordering UPS to kill power... "
+	@sysconfdir@/apccontrol killpower
+	echo "done."	
+	echo ""
+	echo "Please ensure the UPS has powered off before rebooting."
+	echo "Otherwise, the UPS may cut the power during the reboot!"
+	echo ""
+	sleep 2d
+    fi
+    ;;
 
-	*)
-	;;
+    *)
+    ;;
 esac
 
 exit 0

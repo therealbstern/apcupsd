@@ -74,6 +74,8 @@ OBJ = \
 	@echo "s%</ol>%</orderedlist>%g" >> ${out}
 	@echo "s%<li>%<listitem>%g" >> ${out}
 	@echo "s%</li>%</listitem>%g" >> ${out}
+	@echo "s%<pre>%<programlisting>%g" >> ${out}
+	@echo "s%</pre>%</programlisting>%g" >> ${out}
 	sed -f ${out} $< >$@
 	@rm -f ${out}
 
