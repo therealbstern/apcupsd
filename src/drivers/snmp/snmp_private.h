@@ -1,5 +1,5 @@
 /*
- *  snmp.h  -- public header file for this driver
+ *  snmp_private.h  -- private header file for this driver
  *
  *  apcupsd.c -- Simple Daemon to catch power failure signals from a
  *		 BackUPS, BackUPS Pro, or SmartUPS (from APCC).
@@ -55,43 +55,19 @@
  *
  */
 
-#ifndef _SNMP_H
-#define _SNMP_H
+#ifndef _SNMP_PRIVATE_H
+#define _SNMP_PRIVATE_H
 
-#include <ucd-snmp/asn1.h>
-#include <ucd-snmp/snmp.h>
-#include <ucd-snmp/snmp_api.h>
-#include <ucd-snmp/snmp_client.h>
-#include "powernet-mib.h"
-#include "rfc1628-mib.h"
+/* APC */
+extern int powernet_snmp_ups_get_capabilities(UPSINFO *ups);
+extern int powernet_snmp_ups_read_static_data(UPSINFO *ups);
+extern int powernet_snmp_ups_read_volatile_data(UPSINFO *ups);
+extern int powernet_snmp_ups_check_state(UPSINFO *ups);
 
-/*********************************************************************/
-/* Internal structures                                               */
-/*********************************************************************/
+/* IETF */
+extern int rfc1628_snmp_ups_get_capabilities(UPSINFO *ups);
+extern int rfc1628_snmp_ups_read_static_data(UPSINFO *ups);
+extern int rfc1628_snmp_ups_read_volatile_data(UPSINFO *ups);
+extern int rfc1628_snmp_ups_check_state(UPSINFO *ups);
 
-struct snmp_ups_internal_data {
-    struct snmp_session session;            /* snmp session struct */
-    char device[MAXSTRING];                 /* Copy of ups->device */
-    char *peername;                         /* hostname|IP of peer */
-    unsigned short remote_port;             /* Remote socket, usually 161 */
-    char *DeviceVendor;                     /* Vendor (ex. APC|RFC) */
-    char *community;                        /* Community name */
-    void *MIB;                              /* Pointer to MIB data */
-};
-
-/*********************************************************************/
-/* Function ProtoTypes                                               */
-/*********************************************************************/
-
-extern int snmp_ups_get_capabilities(UPSINFO *ups);
-extern int snmp_ups_read_volatile_data(UPSINFO *ups);
-extern int snmp_ups_read_static_data(UPSINFO *ups);
-extern int snmp_ups_kill_power(UPSINFO *ups);
-extern int snmp_ups_check_state(UPSINFO *ups);
-extern int snmp_ups_open(UPSINFO *ups);
-extern int snmp_ups_close(UPSINFO *ups);
-extern int snmp_ups_setup(UPSINFO *ups);
-extern int snmp_ups_program_eeprom(UPSINFO *ups);
-extern int snmp_ups_entry_point(UPSINFO *ups, int command, void *data);
-
-#endif /* _SNMP_H */
+#endif /* _SNMP_PRIVATE_H */

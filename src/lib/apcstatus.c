@@ -175,6 +175,7 @@ int output_status(UPSINFO *ups, int sockfd,
     case TEST_UPS:
     case DUMB_UPS:
     case NETWORK_UPS:
+    case SNMP_UPS:
 	    status[0] = 0;
 	    /* Now output human readable form */
 	    if (UPS_ISSET(UPS_CALIBRATION))
@@ -499,6 +500,7 @@ char *ups_status(int stat)
     case TEST_UPS:
     case DUMB_UPS:
     case NETWORK_UPS:
+    case SNMP_UPS:
 	    buf[0] = 0;
 	    /* Now output human readable form */
 	    if (UPS_ISSET(UPS_CALIBRATION))

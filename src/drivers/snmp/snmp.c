@@ -60,9 +60,11 @@
 
 #include "apc.h"
 #include "snmp.h"
+#include "snmp_private.h"
 
 static int initialize_device_data(UPSINFO *ups) {
     struct snmp_ups_internal_data *Sid = ups->driver_internal_data;
+    char *port_num = NULL;
     char *cp;
 
     strcpy(Sid->device, ups->device);
@@ -72,7 +74,9 @@ static int initialize_device_data(UPSINFO *ups) {
      *
      * The DEVICE statement syntax in apcupsd.conf is:
      *
-     * DEVICE address:vendor:community
+     * DEVICE address:port:vendor:community
+     *
+     * vendor can be "APC" or "RFC".
      */
 
     Sid->peername = Sid->device;
@@ -80,16 +84,26 @@ static int initialize_device_data(UPSINFO *ups) {
     cp = strchr(Sid->device, ':');
     if (cp == NULL) {
         log_event(ups, LOG_ERR, "Wrong device for SNMP driver.");
-	exit(1);
+        exit(1);
     }
     *cp = '\0';
+
+    port_num = cp + 1;
+
+    cp = strchr(port_num, ':');
+    if (cp == NULL) {
+        log_event(ups, LOG_ERR, "Wrong port for SNMP driver.");
+        exit(1);
+    }
+    *cp = '\0';
+    Sid->remote_port = atoi(port_num);
 
     Sid->DeviceVendor = cp + 1;
 
     cp = strchr(Sid->DeviceVendor, ':');
     if (cp == NULL) {
         log_event(ups, LOG_ERR, "Wrong device for SNMP driver.");
-	exit(1);
+        exit(1);
     }
     *cp = '\0';
 
@@ -107,32 +121,22 @@ int snmp_ups_open(UPSINFO *ups) {
     Sid = malloc(sizeof(struct snmp_ups_internal_data));
     if (Sid == NULL) {
         log_event(ups, LOG_ERR, "Out of memory.");
-	exit(1);
+        exit(1);
     }
     memset(Sid, 0, sizeof(struct snmp_ups_internal_data));
+
+    write_lock(ups);
 
     ups->driver_internal_data = Sid;
 
     initialize_device_data(ups);
 
-    /*
-     * Initialize the requested MIB file, that will be read by init_mib()
-     * in the MIBFILE env variable (libsnmp reads it there).
-     */
-    if (!strcmp(Sid->DeviceVendor, "APC"))
-        setenv("MIBFILE", SYSCONFDIR "/mibs/APC-MIB", 1);
-
-    if (!strcmp(Sid->DeviceVendor, "RFC"))
-        setenv("MIBFILE", SYSCONFDIR "/mibs/UPS-MIB", 1);
-
-    /*
-     * Read the MIB file.
-     */
-    init_mib();
+    write_unlock(ups);
 
     memset(&Sid->session, 0, sizeof(struct snmp_session));
 
     Sid->session.peername = Sid->peername;
+    Sid->session.remote_port = Sid->remote_port;
 
     /*
      * We will use Version 1 of SNMP protocol as it is the most widely
@@ -147,26 +151,40 @@ int snmp_ups_open(UPSINFO *ups) {
     Sid->session.retries = 5;
     Sid->session.timeout = SNMP_DEFAULT_TIMEOUT;
     Sid->session.authenticator = NULL;
-    /*
-     * Setup synchronous conversation.
-     */
-    snmp_synch_setup(&Sid->session);
-    /*
-     * Open the snmp connection.
-     */
-    Sid->sessptr = snmp_open(&Sid->session);
-    if (Sid->sessptr == NULL) {
-        log_event(ups, LOG_ERR, "Can not connect to remote SNMP device.");
-	exit(1);
+
+    if (!strcmp(Sid->DeviceVendor, "APC")) {
+        Sid->MIB = malloc(sizeof(powernet_mib_t));
+        if (Sid->MIB == NULL) {
+            log_event(ups, LOG_ERR, "Out of memory.");
+            exit(1);
+        }
+        memset(Sid->MIB, 0, sizeof(powernet_mib_t));
+        return 1;
     }
-    return 1;
+
+    if (!strcmp(Sid->DeviceVendor, "RFC")) {
+        Sid->MIB = malloc(sizeof(ups_mib_t));
+        if (Sid->MIB == NULL) {
+            log_event(ups, LOG_ERR, "Out of memory.");
+            exit(1);
+        }
+        memset(Sid->MIB, 0, sizeof(ups_mib_t));
+        return 1;
+    }
+
+    /*
+     * No mib for this vendor.
+     */
+    Dmsg1(0, "No MIB defined for vendor %s\n", Sid->DeviceVendor);
+
+    return 0;
 }
 
 int snmp_ups_close(UPSINFO *ups) {
-    struct snmp_ups_internal_data *Sid = ups->driver_internal_data;
-
-    snmp_close(Sid->sessptr);
+    write_lock(ups);
     free(ups->driver_internal_data);
+    ups->driver_internal_data = NULL;
+    write_unlock(ups);
     return 1;
 }
 
@@ -179,7 +197,22 @@ int snmp_ups_setup(UPSINFO *ups) {
 
 int snmp_ups_get_capabilities(UPSINFO *ups)
 {
-    return 1;
+    struct snmp_ups_internal_data *Sid = ups->driver_internal_data;
+    int ret = 0;
+
+    write_lock(ups);
+
+    if (!strcmp(Sid->DeviceVendor, "APC")) {
+        ret = powernet_snmp_ups_get_capabilities(ups);
+    }
+
+    if (!strcmp(Sid->DeviceVendor, "RFC")) {
+        ret = rfc1628_snmp_ups_get_capabilities(ups);
+    }
+
+    write_unlock(ups);
+
+    return ret;
 }
 
 int snmp_ups_program_eeprom(UPSINFO *ups)
@@ -192,42 +225,67 @@ int snmp_ups_kill_power(UPSINFO *ups) {
 }
 
 int snmp_ups_check_state(UPSINFO *ups) {
-    return 1;
+    struct snmp_ups_internal_data *Sid = ups->driver_internal_data;
+    int ret = 0;
+
+    /*
+     * Wait the required amount of time before bugging the device.
+     */
+    sleep(ups->wait_time);
+
+    write_lock(ups);
+
+    if (!strcmp(Sid->DeviceVendor, "APC")) {
+        ret = powernet_snmp_ups_check_state(ups);
+    }
+
+    if (!strcmp(Sid->DeviceVendor, "RFC")) {
+        ret = rfc1628_snmp_ups_check_state(ups);
+    }
+
+    write_unlock(ups);
+
+    return ret;
 }
 
 int snmp_ups_read_volatile_data(UPSINFO *ups)
 {
-    return 1;
+    struct snmp_ups_internal_data *Sid = ups->driver_internal_data;
+    int ret = 0;
+
+    write_lock(ups);
+
+    if (!strcmp(Sid->DeviceVendor, "APC")) {
+        ret = powernet_snmp_ups_read_volatile_data(ups);
+    }
+
+    if (!strcmp(Sid->DeviceVendor, "RFC")) {
+        ret = rfc1628_snmp_ups_read_volatile_data(ups);
+    }
+
+    write_unlock(ups);
+
+    return ret;
 }
 
 int snmp_ups_read_static_data(UPSINFO *ups)
 {
     struct snmp_ups_internal_data *Sid = ups->driver_internal_data;
-    char names[128];
-    struct snmp_pdu *pdu;
-    struct snmp_pdu *response;
-    oid thisOID[MAX_OID_LEN];
-    size_t thisOID_len = MAX_OID_LEN;
-    int status;
+    int ret = 0;
 
-    pdu = snmp_pdu_create(SNMP_MSG_GET);
-    read_objid("system.sysDescr.0", thisOID, &thisOID_len);
-    snmp_add_null_var(pdu, thisOID, thisOID_len);
-    status = snmp_synch_response(Sid->sessptr, pdu, &response);
-    if (status == STAT_SUCCESS && response->errstat == SNMP_ERR_NOERROR) {
-	if (response->variables->type == ASN_OCTET_STR)
-	    log_event(ups, LOG_INFO,
-                    "[%d] SNMP sysdescr: %s",
-                    time(NULL),
-                    response->variables->val.string);
+    write_lock(ups);
+
+    if (!strcmp(Sid->DeviceVendor, "APC")) {
+        ret = powernet_snmp_ups_read_static_data(ups);
     }
-    /*
-     * If we had responses from SNMP device, we must free the PDU.
-     * Then we must close the snmp session and free the device_data.
-     */
-    if (response)
-	snmp_free_pdu(response);
-    return 1;
+
+    if (!strcmp(Sid->DeviceVendor, "RFC")) {
+        ret = rfc1628_snmp_ups_read_static_data(ups);
+    }
+
+    write_unlock(ups);
+
+    return ret;
 }
 
 int snmp_ups_entry_point(UPSINFO *ups, int command, void *data)

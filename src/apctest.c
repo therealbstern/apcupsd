@@ -425,6 +425,9 @@ int main (int argc, char *argv[]) {
        case NETWORK_UPS:
           pmsg("mode.type = NETWORK_UPS\n");
 	  break;
+       case SNMP_UPS:
+          pmsg("mode.type = SNMP_UPS\n");
+	  break;
        default:
           pmsg("Unknown mode.type: %d\n", ups->mode.type);
     }
