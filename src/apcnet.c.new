@@ -257,7 +257,7 @@ static int connect_slave(UPSINFO *ups, int who)
          * Set the socket into non-block mode, issue the connect and return
          */
 
-        if (fcntl(slaves[who].socket, F_SETFL, FNONBLOCK) < 0) {
+        if (fcntl(slaves[who].socket, F_SETFL, O_NONBLOCK) < 0) {
             log_event(ups, LOG_WARNING,
                       "Cannot set NONBLOCK on socket: %s", strerror(errno));
         }
