@@ -35,7 +35,7 @@
 %if %{su9}
 %define initdir /etc/rc.d
 %else
-%define initdir /etc/rd.d/init.d
+%define initdir /etc/rc.d/init.d
 %endif
 
 Summary:      APC UPS Power Control Daemon for Linux
@@ -210,6 +210,7 @@ install -m744 examples/make-hiddev \
 %config(noreplace) /etc/apcupsd/mastertimeout
 /etc/apcupsd/make-hiddev
 /etc/apcupsd/hid-ups
+/etc/apcupsd/apcupsd.css
 /etc/apcupsd/cgi/*
 /sbin/*
 %attr(-,root,man) %{_mandir}/*/*
@@ -308,6 +309,7 @@ fi
 %config(noreplace) /etc/apcupsd/multimon.conf
 %config(noreplace) /etc/apcupsd/masterconnect
 %config(noreplace) /etc/apcupsd/mastertimeout
+/etc/apcupsd/apcupsd.css
 /etc/apcupsd/cgi/*
 /sbin/*
 %attr(-,root,man) %{_mandir}/*/*
@@ -390,6 +392,9 @@ fi
 %endif
 
 %changelog
+* Wed Aug 04 2004 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- changed location of apcupsd.css to /etc/apcupsd from /etc/apcupsd/cgi
+- corrected typo introduced in SuSE configuration for initdir definition
 * Sun Apr 25 2004 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - add SuSE configuration
 * Sat Apr 24 2004 D. Scott Barninger <barninger at fairfieldcomputers.com>
