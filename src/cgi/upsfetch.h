@@ -23,6 +23,10 @@ extern int statlen;
 /* like strerror, but for errors that are related to the UPS code */
 char *upsstrerror (int errnum);
 
+
+/* Read data into memory buffer to be used by getupsvar() */
+int fetch_events (char *host);
+
 /* get <varname> from <host> and put the reply in <buf> */
 int getupsvar (char *host, char *varname, char *buf, int buflen);
 
