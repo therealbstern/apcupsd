@@ -157,7 +157,7 @@ static void status_write(UPSINFO *ups, char *fmt, ...)
     va_end(ap);
 
     if ((i=(strlen(largebuf) + strlen(buf))) < (int)(sizeof(largebuf)-1)) {
-	strcat(largebuf, buf);
+	astrncat(largebuf, buf, sizeof(largebuf));
 	stat_recs++;
     } else
 	log_event(ups, LOG_ERR,

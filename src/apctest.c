@@ -198,7 +198,7 @@ void apctest_error_out(const char *file, int line, const char *fmt,...)
     va_list   arg_ptr;
     int       i;
 
-    sprintf(buf, _("apctest FATAL ERROR in %s at line %d\n"), file, line);
+    asnprintf(buf, sizeof(buf), _("apctest FATAL ERROR in %s at line %d\n"), file, line);
     i = strlen(buf);
     va_start(arg_ptr, fmt);
     avsnprintf((char *)&buf[i], sizeof(buf)-i, (char *) fmt, arg_ptr);
@@ -572,26 +572,26 @@ print_bits(int bits)
 {
       char buf[200];
 
-      sprintf(buf, "IOCTL GET: %x ", bits);
+      asnprintf(buf, sizeof(buf), "IOCTL GET: %x ", bits);
       if (bits & le_bit)
-         strcat(buf, "LE ");
+         astrncat(buf, "LE ", sizeof(buf));
       if (bits & st_bit)
-         strcat(buf, "ST ");
+         astrncat(buf, "ST ", sizeof(buf));
       if (bits & sr_bit)
-         strcat(buf, "SR ");
+         astrncat(buf, "SR ", sizeof(buf));
       if (bits & dtr_bit)
-         strcat(buf, "DTR ");
+         astrncat(buf, "DTR ", sizeof(buf));
       if (bits & rts_bit)
-         strcat(buf, "RTS ");
+         astrncat(buf, "RTS ", sizeof(buf));
       if (bits & cts_bit)
-         strcat(buf, "CTS ");
+         astrncat(buf, "CTS ", sizeof(buf));
       if (bits & cd_bit)
-         strcat(buf, "CD ");
+         astrncat(buf, "CD ", sizeof(buf));
       if (bits & rng_bit)
-         strcat(buf, "RNG ");
+         astrncat(buf, "RNG ", sizeof(buf));
       if (bits & dsr_bit)
-         strcat(buf, "DSR ");
-      strcat(buf, "\n");
+         astrncat(buf, "DSR ", sizeof(buf));
+      astrncat(buf, "\n", sizeof(buf));
       pmsg(buf);
 }
 
@@ -1917,9 +1917,9 @@ static void print_valid_eeprom_values(UPSINFO *ups)
        for (j=0; cmd_table[j].cmd; j++) {
 	  if (cmd[i].cmd == cmd_table[j].cmd) {
              if (cmd_table[j].type == 'c') {
-                sprintf(val, "%s", (char *)cmd_table[j].data);
+                asnprintf(val, sizeof(val), "%s", (char *)cmd_table[j].data);
 	     } else {
-                sprintf(val, "%d", *cmd_table[j].data);
+                asnprintf(val, sizeof(val), "%d", *cmd_table[j].data);
 	     }
              pmsg("%-24s %-12s  %-6s   ", cmd_table[j].descript, 
 		     cmd_table[j].config_directive, val);

@@ -29,7 +29,7 @@
 
    Kern Sibbald, July 2001
   
-   Version $Id: smtp.c,v 1.5 2004-06-20 18:51:52 kerns Exp $
+   Version $Id: smtp.c,v 1.6 2005-03-22 00:29:26 adk0212 Exp $
     
  */
 
@@ -229,7 +229,7 @@ int main (int argc, char *argv[])
 	 strerror(errno));
       exit(1);
    }
-   strcpy(my_hostname, hp->h_name);
+   astrncpy(my_hostname, hp->h_name, sizeof(my_hostname));
    Dmsg1(20, "My hostname is: %s\n", my_hostname);
 
    /*
@@ -237,9 +237,9 @@ int main (int argc, char *argv[])
     */
    if (from_addr == NULL) {
       if ((pwd = getpwuid(getuid())) == 0) {
-         sprintf(buf, "userid-%d@%s", (int)getuid(), my_hostname);
+         asnprintf(buf, sizeof(buf), "userid-%d@%s", (int)getuid(), my_hostname);
       } else {
-         sprintf(buf, "%s@%s", pwd->pw_name, my_hostname);
+         asnprintf(buf, sizeof(buf), "%s@%s", pwd->pw_name, my_hostname);
       }
       from_addr = bstrdup(buf);
    }

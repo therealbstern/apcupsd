@@ -66,7 +66,7 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
     /* SENSITIVITY */
     case CI_SENS:
 	if (ups->UPS_Cap[CI_SENS]) {
-            sprintf(setting, "%.1s", data);
+            asnprintf(setting, sizeof(setting), "%.1s", data);
             change_ups_eeprom_item(ups, "sensitivity", ups->UPS_Cmd[CI_SENS], setting);
 	} else {
            printf(_("UPS sensitivity configuration not supported by this UPS.\n"));
@@ -77,7 +77,7 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
     /* ALARM_STATUS */
     case CI_DALARM:
 	if (ups->UPS_Cap[CI_DALARM]) {
-            sprintf(setting, "%.1s", data);
+            asnprintf(setting, sizeof(setting), "%.1s", data);
             change_ups_eeprom_item(ups, "alarm status", ups->UPS_Cmd[CI_DALARM], setting);
 	} else {
            printf(_("UPS alarm status configuration not supported by this UPS.\n"));
@@ -88,7 +88,7 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
     /* LOWBATT_SHUTDOWN_LEVEL */
     case CI_DLBATT:
 	if (ups->UPS_Cap[CI_DLBATT]) {
-            sprintf(setting, "%02d", (int)atoi(data));
+            asnprintf(setting, sizeof(setting), "%02d", (int)atoi(data));
             change_ups_eeprom_item(ups, "low battery warning delay",
 		   ups->UPS_Cmd[CI_DLBATT], setting);
 	} else {
@@ -100,7 +100,7 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
     /* WAKEUP_DELAY */
     case CI_DWAKE:
 	if (ups->UPS_Cap[CI_DWAKE]) {
-            sprintf(setting, "%03d", (int)atoi(data));
+            asnprintf(setting, sizeof(setting), "%03d", (int)atoi(data));
             change_ups_eeprom_item(ups, "wakeup delay", ups->UPS_Cmd[CI_DWAKE], setting);
 	} else {
            printf(_("UPS wakeup delay configuration not supported by this UPS.\n"));
@@ -112,7 +112,7 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
     /* SLEEP_DELAY */
     case CI_DSHUTD:
 	if (ups->UPS_Cap[CI_DSHUTD]) {
-            sprintf(setting, "%03d", (int)atoi(data));
+            asnprintf(setting, sizeof(setting), "%03d", (int)atoi(data));
             change_ups_eeprom_item(ups, "shutdown delay", ups->UPS_Cmd[CI_DSHUTD], setting);
 	} else {
            printf(_("UPS shutdown delay configuration not supported by this UPS.\n"));
@@ -123,7 +123,7 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
     /* LOW_TRANSFER_LEVEL */
     case CI_LTRANS:
 	if (ups->UPS_Cap[CI_LTRANS]) {
-            sprintf(setting, "%03d", (int)atoi(data));
+            asnprintf(setting, sizeof(setting), "%03d", (int)atoi(data));
             change_ups_eeprom_item(ups, "lower transfer voltage",
 		   ups->UPS_Cmd[CI_LTRANS], setting);
 	} else {
@@ -135,7 +135,7 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
     /* HIGH_TRANSFER_LEVEL */
     case CI_HTRANS:
 	if (ups->UPS_Cap[CI_HTRANS]) {
-            sprintf(setting, "%03d", (int)atoi(data));
+            asnprintf(setting, sizeof(setting), "%03d", (int)atoi(data));
             change_ups_eeprom_item(ups, "high transfer voltage",
 		   ups->UPS_Cmd[CI_HTRANS], setting);
 	} else {
@@ -147,7 +147,7 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
     /* UPS_BATT_CAP_RETURN */
     case CI_RETPCT:
 	if (ups->UPS_Cap[CI_RETPCT]) {
-            sprintf(setting, "%02d", (int)atoi(data));
+            asnprintf(setting, sizeof(setting), "%02d", (int)atoi(data));
             change_ups_eeprom_item(ups, "return threshold percent",
 		   ups->UPS_Cmd[CI_RETPCT], setting);
 	} else {
@@ -159,7 +159,7 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
     /* UPS_SELFTEST */
     case CI_STESTI:
 	if (ups->UPS_Cap[CI_STESTI]) {
-            sprintf(setting, "%.3s", data);
+            asnprintf(setting, sizeof(setting), "%.3s", data);
             /* Make sure "ON" is 3 characters */
 	    if (setting[2] == 0) {
                 setting[2] = ' ';
@@ -175,7 +175,7 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
     /* OUTPUT_VOLTAGE */
     case CI_NOMOUTV:
 	if (ups->UPS_Cap[CI_NOMOUTV]) {
-            sprintf(setting, "%03d", (int)atoi(data));
+            asnprintf(setting, sizeof(setting), "%03d", (int)atoi(data));
             change_ups_eeprom_item(ups, "output voltage on batteries",
 		   ups->UPS_Cmd[CI_NOMOUTV], setting);
 	} else {
@@ -424,61 +424,61 @@ static void change_extended(UPSINFO *ups)
 
     /* SENSITIVITY */
     if (ups->UPS_Cap[CI_SENS] && strcmp(ups->sensitivity, "-1") != 0) {
-        sprintf(setting, "%.1s", ups->sensitivity);
+        asnprintf(setting, sizeof(setting), "%.1s", ups->sensitivity);
         change_ups_eeprom_item(ups, "sensitivity", ups->UPS_Cmd[CI_SENS], setting);
     }
      
     /* WAKEUP_DELAY */
     if (ups->UPS_Cap[CI_DWAKE] && ups->dwake != -1) {
-        sprintf(setting, "%03d", (int)ups->dwake);
+        asnprintf(setting, sizeof(setting), "%03d", (int)ups->dwake);
         change_ups_eeprom_item(ups, "wakeup delay", ups->UPS_Cmd[CI_DWAKE], setting);
     }
 
    
     /* SLEEP_DELAY */
     if (ups->UPS_Cap[CI_DSHUTD] && ups->dshutd != -1) {
-        sprintf(setting, "%03d", (int)ups->dshutd);
+        asnprintf(setting, sizeof(setting), "%03d", (int)ups->dshutd);
         change_ups_eeprom_item(ups, "shutdown delay", ups->UPS_Cmd[CI_DSHUTD], setting);
     }
 
     /* LOW_TRANSFER_LEVEL */
     if (ups->UPS_Cap[CI_LTRANS] && ups->lotrans != -1) {
-        sprintf(setting, "%03d", (int)ups->lotrans);
+        asnprintf(setting, sizeof(setting), "%03d", (int)ups->lotrans);
         change_ups_eeprom_item(ups, "lower transfer voltage",
 	       ups->UPS_Cmd[CI_LTRANS], setting);
     }
 
     /* HIGH_TRANSFER_LEVEL */
     if (ups->UPS_Cap[CI_HTRANS] && ups->hitrans != -1) {
-        sprintf(setting, "%03d", (int)ups->hitrans);
+        asnprintf(setting, sizeof(setting), "%03d", (int)ups->hitrans);
         change_ups_eeprom_item(ups, "upper transfer voltage",
 	       ups->UPS_Cmd[CI_HTRANS], setting);
     }
 
     /* UPS_BATT_CAP_RETURN */
     if (ups->UPS_Cap[CI_RETPCT] && ups->rtnpct != -1) {
-        sprintf(setting, "%02d", (int)ups->rtnpct);
+        asnprintf(setting, sizeof(setting), "%02d", (int)ups->rtnpct);
         change_ups_eeprom_item(ups, "return threshold percent",
 	       ups->UPS_Cmd[CI_RETPCT], setting);
     }
 
     /* ALARM_STATUS */
     if (ups->UPS_Cap[CI_DALARM] && strcmp(ups->beepstate, "-1") != 0) {
-        sprintf(setting, "%.1s", ups->beepstate);
+        asnprintf(setting, sizeof(setting), "%.1s", ups->beepstate);
         change_ups_eeprom_item(ups, "alarm delay",
 	       ups->UPS_Cmd[CI_DALARM], setting);
     }
 
     /* LOWBATT_SHUTDOWN_LEVEL */
     if (ups->UPS_Cap[CI_DLBATT] && ups->dlowbatt != -1) {
-        sprintf(setting, "%02d", (int)ups->dlowbatt);
+        asnprintf(setting, sizeof(setting), "%02d", (int)ups->dlowbatt);
         change_ups_eeprom_item(ups, "low battery warning delay",
 	       ups->UPS_Cmd[CI_DLBATT], setting);
     }
 
     /* UPS_SELFTEST */
     if (ups->UPS_Cap[CI_STESTI] && strcmp(ups->selftest, "-1") != 0) {
-        sprintf(setting, "%.3s", ups->selftest);
+        asnprintf(setting, sizeof(setting), "%.3s", ups->selftest);
         /* Make sure "ON" is 3 characters */
 	if (setting[2] == 0) {
             setting[2] = ' ';
@@ -489,7 +489,7 @@ static void change_extended(UPSINFO *ups)
 
     /* OUTPUT_VOLTAGE */
     if (ups->UPS_Cap[CI_NOMOUTV] && ups->NomOutputVoltage != -1) {
-        sprintf(setting, "%03d", (int)ups->NomOutputVoltage);
+        asnprintf(setting, sizeof(setting), "%03d", (int)ups->NomOutputVoltage);
         change_ups_eeprom_item(ups, "output voltage on batteries",
 	       ups->UPS_Cmd[CI_NOMOUTV], setting);
     }
