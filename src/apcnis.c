@@ -271,6 +271,9 @@ void do_server(UPSINFO *ups)
        */
        clilen = sizeof(cli_addr);
        for (tlog=0; (newsockfd = accept(sockfd, (struct sockaddr *)&cli_addr, &clilen)) < 0; tlog -= 5*60 ) {
+	  if (errno == EINTR) {
+	     continue;
+	  }
 	  if (tlog <= 0) {
 	     tlog = 60*60; 
              log_event(ups, LOG_ERR,  "apcserver: accept error. ERR=%s",

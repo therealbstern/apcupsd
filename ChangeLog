@@ -5,6 +5,10 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+----> Release apcupsd-3.10.6 (18 July 2003)
+18Jul03
+- Reissue accept() immediately if interrupted rather than waiting.
+
 ----> Release apcupsd-3.10.6 (16 July 2003)
 15Jul03
 - In attempting to build the .cgi files on Windows, I realized that
