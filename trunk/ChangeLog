@@ -6,6 +6,7 @@
 /*               ftp://ftp.apcupsd.com                                     */
 /***************************************************************************/
 
+    - Added 127A and 128A cables support for dumb UPSes.
     - Implemented killpower for PowerNet MIB.
     - Implemented the SNMP driver for APC's PowerNet MIB.
     - Restructured UPSINFO so that now all the flags are contained

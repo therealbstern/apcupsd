@@ -329,6 +329,12 @@ int main (int argc, char *argv[]) {
 	  break;
        case APC_940_0119A:
           pmsg("cable.type = APC_940_0119A (simple)\n");
+      break;
+       case APC_940_0127A:
+          pmsg("cable.type = APC_940_0127A (simple)\n");
+	  break;
+       case APC_940_0128A:
+          pmsg("cable.type = APC_940_0128A (simple)\n");
 	  break;
        case APC_940_0020B:
           pmsg("cable.type = APC_940_0020B (simple)\n");

@@ -103,6 +103,8 @@ static GENINFO cables[] = {
     { "smart",     "Custom Cable Smart",  CUSTOM_SMART },
     { "ether",     "Ethernet Link",       APC_NET },
     { "940-0119A", "APC Cable 940-0119A", APC_940_0119A },
+    { "940-0127A", "APC Cable 940-0127A", APC_940_0127A },
+    { "940-0128A", "APC Cable 940-0128A", APC_940_0128A },
     { "940-0020B", "APC Cable 940-0020B", APC_940_0020B },
     { "940-0020C", "APC Cable 940-0020C", APC_940_0020C },
     { "940-0023A", "APC Cable 940-0023A", APC_940_0023A },
