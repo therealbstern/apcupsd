@@ -127,6 +127,8 @@ make \
 install -m744 platforms/apccontrol \
               $RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/apccontrol
 install -m755 platforms/redhat/apcupsd $RPM_BUILD_ROOT%{initdir}
+rm $RPM_BUILD_ROOT%{initdir}/halt
+rm $RPM_BUILD_ROOT%{initdir}/halt.old
 
 %if %{usb}
 install -m744 examples/hid-ups \
@@ -337,6 +339,9 @@ fi
 %endif
 
 %changelog
+* Sun Sep 14 2003 Scott at fairfieldcomputers dot com
+- added rm commands during install to remove halt scripts created
+- in the build root
 * Mon May 11 2003 Scott at fairfieldcomputers dot com
 - combined layout for usb/serial builds
 * Thu Jan 16 2003 Scott at fairfieldcomputers dot com

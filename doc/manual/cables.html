@@ -8,14 +8,19 @@
 </head>
 <body>
 <h1>Cables</h1>
-First, you will need a serial port cable between the APC UPS and your computer
-running <b>apcupsd</b>. You can use either the cable that came with your
+
+<p>First, you will need a serial port or USB cable between the APC UPS
+and your computer running <b>apcupsd</b>.  If you have a USB UPS and a
+free USB port, you can simply connect your UPS to that port, assume
+you have a "smart" or "sub-smart"device, and skip the rest of this
+section.</p>
+<p>Otherwise, you can either use the cable that came with your
 UPS (the easiest if we support it) or you can make your own cable. 
 We recommend that you obtain a supported cable directly from APC.
 <p>If you already have an APC cable, you can determine what kind it
 is by examining the flat sides of the two connectors where you will
 find the cable number embossed into the plastic. It is generally
-on one side of the male connector.
+on one side of the male connector.</p>
 <p>To make your own cable, first, you must know whether you have a Smart UPS
 that sends ASCII characters called <b>Smart Signaling</b>, 
 or a &quot;dumb&quot; UPS that uses serial port line voltage signaling, called
@@ -23,13 +28,13 @@ or a &quot;dumb&quot; UPS that uses serial port line voltage signaling, called
 <p>
 The &quot;dumb&quot; UPSes are older models such as
 the BackUPS (not BackUPS Pro) and the ShareUPS Basic Port that
-use <b>Simple Signaling</b>. Most other UPSes use
+use <b>Simple Signaling</b>. Most other UPSes (including USB UPSes) use
 <b>Smart Signaling</b>. If in
 doubt consult the <a href="configure.html">Configuration Section</a> of
 this manual, or the documentation that came with your UPS.
 <h3>Smart Signaling Cable for SmartUPSes</h3>
 If you must build your own cable, and you have a 
-Smart UPS, we recommend building the cable as
+Smart UPS, we recommend building a standard 3-lead RS232C cable as
 follows:
 <pre>
     SMART-CUSTOM CABLE

@@ -90,9 +90,10 @@ section of this manual. More information on configuring a kernel
 can be found in the kernel-HOWTO do.
 
 <h2>Making the Device Files</h2>
-Once you have your kernel installed and working, you need to 
-define the hiddev device files.  This can be done by invoking
-the script in <b>&lt;apcupsd-src&gt;/examples/make-hiddev</b>, which does the
+Once you have your kernel installed and working, you need to define
+the hiddev device files if they are not already present on your
+system.  This can be done by invoking the script in
+<b>&lt;apcupsd-src&gt;/examples/make-hiddev</b>, which does the
 following:
 <pre>
 #!/bin/sh
@@ -118,9 +119,9 @@ mknod /dev/usb/hid/hiddev15 c 180 111
 Note, as of RedHat 8.0, the hiddev devices are defined when the OS
 is installed, except they are defined as /dev/usb/hiddev0 - 15. Thus
 you will either need to run the above script and stick with our
-scheme, or you can choose to use the standard RedHat definitions, but
-you will need to modify all the apcupsd scripts appropriately.  In
-a later release, we will adapt better to this situation.
+scheme, or you can choose to use the standard RedHat definitions.
+If you go with the Red Hat locations, you will probanly have to change
+the DEVICE entry in your apcupsd.conf file by hand.
 
 <h2>Installing the HIDDEV Header File</h2>
 If you have built the kernel, you must put
@@ -161,13 +162,10 @@ in the <a href="kernel_config.html">Kernel Configuration </a>
 section of this manual, then unplug your UPS and plug it
 back in. This should permit the kernel to recognize the
 UPS.
-<p>If <b>./hid-ups</b> does not work, then it is very unlikely 
-that apcupsd will work. If it complains that it could not open
-the device, then either you have not run the script "make-hiddev"
-or you are not running as root.  In any case, you must correct
-the problem before continuing. If you choose to use the alternate
-RedHat device nameing scheme, you will need to modify the source
-code of hid-dev.c to have the correct device address.
+<p>If <b>./hid-ups</b> tells you "No permission, try this as root",
+you know what to try.  If it says "Couldn't find USB UPS device, check
+your /dev.", then it is very unlikely that apcupsd will work.  You 
+probably need to run the script "make-hiddev" before continuing.</p>
 
 <h2>Building and Installing apcupsd</h2>
 If you have gotten this far successfully, the last step should
@@ -190,6 +188,10 @@ line. This will cause the <b>apcupsd.conf</b> file to contain:
 <pre>
 DEVICE /dev/usb/hid/hiddev[0-15]
 </pre>
+If you are on a Red Hat system and sticking to the Red Hat naming
+scheme, however, the --with0serial-dev option needs to be
+/dev/usb/hiddev[0-15].
+
 The <b>[0-15]</b> is not a typo, but should be entered exactly
 as shown. This is because the UPS can change device numbers
 while it is running. Every time there is a blip or slowdown
@@ -198,6 +200,7 @@ then a few moments later, it will reconnect but with a different
 device number. Not very Unix like, but that is what happens.
 This bizarre syntax allows <b>apcupsd</b> to try a range of
 devices until it finds or re-finds the UPS device.
+
 
 <h2>USB Specific Information</h2>
 <p></p>The UPS has an internal set of timers and remaining capacity
@@ -362,7 +365,7 @@ shutdown.
 Normally, the modules you will need loaded are the following:
 <br><b>usbcore<br>hid<br>input<br></b>
 
-<h2>Discliamer</h2>
+<h2>Disclaimer</h2>
 First, please rememeber this is beta software. It is not yet complete
 and there are sure to be some problems. We would appreciate hearing
 about your experiences.

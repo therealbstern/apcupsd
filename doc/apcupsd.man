@@ -52,7 +52,7 @@ about the UPS status.
 
 .LP
 RedHat and S.u.S.E. versions of Linux have direct install support.  All
-other "FLAVORS" of Linux will need some fussing with to get the install
+other flavors of Linux will need some fussing with to get the install
 correct.
 .SH OPTIONS
 .TP
@@ -109,35 +109,27 @@ are:
 [ 940-0095A | 940-0095C ]
 .br
 [ ether ]
+.br 
+[ usb ]
 .LP
 .B  UPSTYPE
 -- <Type of APCC UPS you have>
 .br
-[ backups | sharebasic ] : Simple
-.br
-[ netups ] : Network Simple Signals
-.br
-[ backupspro | smartvsups | newbackupspro ] : SubSmart
-.br
-[ smartups | matrixups | sharesmart ] : Smart
-.LP
-[ backups | netups | backupspro | smartvsups ] and 
-.br
-[ newbackupspro | smartups | matrixups ] are tested.
-.br
-[ sharebasic | sharesmart ] models are being tested.
+[ dumb | apcsmart | net | usb | snmp | test ] 
 .LP
 .B  DEVICE
 -- <name of serial port>
 .br
 Please specify which device is used for UPS communication.
-The default is /dev/ttyS[0|1|2|3].
+The default is /dev/ttyS[0|1|2|3].  If you have a USB UPS,
+it is /dev/usb/hid/hiddev[0-9].  On some Red Hat versions
+you may need to specify /dev/usb/hiddev[0-9]
 .LP
 .B  LOCKFILE
 -- <path to lockfile>
 .br
 By supplying this argument, "apcupsd" tries to create a lockfile
-for the serial port in the specified directory.
+for the serial or USB port in the specified directory.
 
 
 
@@ -530,13 +522,13 @@ and can not be polled for its control codes.
 Special note for ShareUPS users,
 .B TIMEOUT, BATTERYLEVEL, and MINUTES
 are disabled or set to default values. Currently, there is not a known
-way of early signals to be sent to BASIC Ports. MINUTES are set to 0.
+way for early signals to be sent to BASIC Ports. MINUTES are set to 0.
 .SH Hewlett Packard
 The HP PowerTrust 2997A UPS has been tested as a "smartups" with cable
 Hewlett Packard part number 5061-2575 as "CUSTOM-SMART".
 .SH CABLES
 .br
-First, you will need the cable between APC Smart UPS and PC computer
+First, you will need the cable between APC Smart UPS and your computer
 running Linux. You can use either the special cable which is enclosed with
 the PowerChute (TM) software or you can make your own cable connected as
 follows:
@@ -569,7 +561,7 @@ follows:
 .br
   nc/1   Frame/Case Gnd (optional)    9
 .LP
-List if componets one needs to make this CABLE:
+List of componets one needs to make this cable:
 .br
 1) One (1) DB9 use solder type connector only.
 .br
@@ -792,7 +784,7 @@ Christopher J. Reimer <reimer@doe.carleton.ca>
 
 .SH BUGS AND LIMITATIONS
 .LP
-Any and all network modes are not supported yet. There are no known bugs in the
+Not all network modes are supported as yet. There are no known bugs in the
 standard stuff.
 There are possible bugs in all ShareUPS mode types.
 If anyone has had success at all with any ShareUPS models, please report.
