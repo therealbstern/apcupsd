@@ -8,7 +8,7 @@ dnl
 
 AC_INIT(Developers)		dnl A distinctive file to look for in srcdir. 
 AC_CONFIG_HEADER(include/config.h:autoconf/config.h.in) dnl Config header file.
-AC_CONFIG_AUX_DIR(autoconf)
+AC_CONFIG_AUX_DIR(${PWD}/autoconf)
 
 dnl
 dnl Absolute srcdir
@@ -136,28 +136,13 @@ dnl the pthreads libraries, if needed. For linker flags, add them to
 dnl LDFLAGS.
 PTHREAD_CFLAGS=""
 PTHREAD_LFLAGS=""
-with_pthreads=no
-
-dnl force pthreads when needed
-if test $HAVE_UNAME=yes
-  then case x`uname -s` in
-      xSunOS|xDarwin) with_pthreads=yes ;;
-      *) with_pthreads=no ;;
-  esac
-else
-  with_pthreads=no
-fi
-
-if test "$CFG_CYGWIN" = "yes"
-then
-    with_pthreads=yes
-fi
+with_pthreads=yes
 
 AC_MSG_CHECKING(for pthreads)
 
 AC_ARG_ENABLE(pthreads, [
-  --enable-pthreads	   Enable pthreads
-  --disable-pthreads	   No pthreads (default)],
+  --enable-pthreads	   Enable pthreads (default)
+  --disable-pthreads	   No pthreads],
 with_pthreads=$enableval)
 
 if test "$with_pthreads" != no; then
@@ -1667,8 +1652,6 @@ case $host_os in
 	;;
 esac
 
-CCVERSION=`${CC} --version | cut -b-15`
-
 
 dnl
 dnl Insert Makefile(s) fragments.
@@ -1682,6 +1665,16 @@ AC_OUTPUT([ ${GENERATE_FILES} ],
 )
 
 chmod 755 examples/safe.apccontrol
+
+
+#
+# A whole lot of hand springs to get the compiler version.
+#  This is because gcc changed the output in version 3.0
+#
+CCVERSION=`${CC} --version | tr '\n' ' ' | cut -f 3 -d ' '`
+if test "x${CCVERSION}" = "x" ; then
+  CCVERSION=`${CC} --version | tr '\n' ' ' | cut -f 1 -d ' '`
+fi
 
 eval srcdir=${srcdir}
 eval sbindir=${sbindir}
@@ -1735,7 +1728,7 @@ cat config.out
 dnl
 dnl Touch include/config.h since the last file updated was Makefile.
 dnl
-touch ${srcdir}/include/config.h
+dnl touch ${srcdir}/include/config.h
 
 echo $PATH | grep /usr/ucb >/dev/null
 if test $? = 0 ; then

@@ -122,14 +122,14 @@ configure:  $(topdir)/autoconf/configure.in $(topdir)/autoconf/aclocal.m4 \
 			$(topdir)/autoconf/acconfig.h $(topdir)/autoconf/config.h.in
 	cd $(topdir);
 	$(RMF) config.cache config.log config.out config.status include/config.h
-	autoconf --localdir=$(topdir)/autoconf \
+	autoconf --prepend-include=$(topdir)/autoconf \
 	autoconf/configure.in > configure
 	chmod 755 configure
 
 $(topdir)/autoconf/config.h.in: $(topdir)/autoconf/configure.in \
 								$(topdir)/autoconf/acconfig.h
 	cd $(srcdir);
-	autoheader --localdir=$(srcdir)/autoconf \
+	autoheader --prepend-include=$(srcdir)/autoconf \
 	autoconf/configure.in > autoconf/config.h.in
 	chmod 644 autoconf/config.h.in
 
