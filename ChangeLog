@@ -6,6 +6,10 @@
 /*               ftp://ftp.apcupsd.com                                     */
 /***************************************************************************/
 
+    - Conditional compilation of old and new network code. Old network code
+      disabled by default while new network code enabled by default.
+    - Removed old src/apcnet.c.old, old implementation of old networking.
+
 ----> Release apcupsd-3.10.0 (28 Jul 2002)
     - Added documentation for SNMP UPSes. Documented the use of
       --kill-on-powerfail switch during shutdown.
