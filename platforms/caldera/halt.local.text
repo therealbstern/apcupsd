@@ -1,6 +1,0 @@
-
-#  Added by apcupsd Caldera install
-if [ -x /etc/rc.d/halt.local ]
-  then
-    . /etc/rc.d/halt.local
-fi
