@@ -2,6 +2,10 @@
                         Kern Sibbald
 
 General:
+13Nov04
+- Change name of thread_terminate to apc_thread_terminate to avoid
+  conflict on AIX.
+- Put configure found SHUTDOWN in apccontrol.in
 06Nov04
 - Figured out how to scale the pdf images, so re-did them.
 - Some minor updates to the manual, particularly the title

@@ -101,7 +101,7 @@ extern int parse_options(int argc, char *argv[]);
 extern void powerfail (int ok);
 extern void logonfail (int ok);
 
-extern void thread_terminate (int sig);
+extern void apc_thread_terminate (int sig);
 extern void clean_threads(void);
 extern void apcupsd_terminate (int sig);
 extern void clear_files (void);
