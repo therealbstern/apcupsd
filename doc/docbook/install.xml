@@ -182,7 +182,7 @@ speaks Simple Network Management Protocol.</para>
 <row>
   <entry><para><emphasis role="bold">APC Model</emphasis></para></entry>
   <entry><para><emphasis>UPSTYPE Keyword</emphasis></para></entry>
-  <entry><para><emphasis>Cables Supported</emphasis></para></entry>
+  <entry><para><emphasis>UPSCABLE keywords for Cables Supported</emphasis></para></entry>
   <entry><para><emphasis>Status</emphasis></para></entry>
 </row>
 </thead>
@@ -190,9 +190,9 @@ speaks Simple Network Management Protocol.</para>
 <row>
   <entry>BackUPS</entry>
   <entry>dumb</entry>
-  <entry>Simple-Custom<footnote id='custom_cable'><para>This cable is
+  <entry>simple (note: using Simple-Custom<footnote id='custom_cable'><para>This cable is
   not an APC product.  You have to build it yourself using the
-  instructions in <xref linkend='cables'/>.</para></footnote>, 
+  instructions in <xref linkend='cables'/>.</para></footnote>),
   940-0020B, 940-0020C, 940-0119A, 940-0023A</entry>
   <entry>Supported</entry>
 </row>
@@ -217,7 +217,7 @@ speaks Simple Network Management Protocol.</para>
 <row>
   <entry>BackUPS CS (serial mode)</entry>
   <entry>apcsmart</entry>
-  <entry>Smart Custom RJ45<footnoteref linkend='custom_cable'/></entry>
+  <entry>smart (note: using Smart Custom RJ45<footnoteref linkend='custom_cable'/>)</entry>
   <entry>Supported</entry>
 </row>
 <row>
@@ -230,20 +230,20 @@ speaks Simple Network Management Protocol.</para>
   <entry>SmartUPS, SmartUPS VS<footnote><para>It has not been confirmed that the
   cable shipped with the VS is a 940-0095.</para></footnote>, PowerStack 450, Matrix UPS, ShareUPS Advanced Port</entry>
   <entry>apcsmart</entry>
-  <entry>Smart-Custom<footnoteref linkend='custom_cable'/>, 940-0024C</entry>
+  <entry>smart (note: using Smart-Custom<footnoteref linkend='custom_cable'/>), 940-0024C</entry>
   <entry>Supported</entry>
 </row>
 <row>
   <entry>BackUPS CS USB, Pro USB, and ES USB models including RS/XS 1000
 and RS/XS 1500.</entry>
   <entry>usb</entry>
-  <entry>USB (using APC cables 940-0127A/B)</entry>
+  <entry>usb (note: using APC cables 940-0127A/B)</entry>
   <entry>Supported in version >=3.9.4</entry>
 </row>
 <row>
   <entry>SmartUPS USB</entry>
   <entry>usb</entry>
-  <entry>USB (using APC cable)</entry>
+  <entry>usb (note: using APC cable, no number)</entry>
   <entry>Supported, version >=3.9.8</entry>
 </row>
 <row>
