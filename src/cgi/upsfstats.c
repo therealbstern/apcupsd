@@ -46,41 +46,31 @@ int main(int argc, char **argv)
 
     (void) extractcgiargs();
 
-    printf ("Content-type: text/html\n");
-    printf ("Pragma: no-cache\n\n");
-
-    printf("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"\n");
-    printf("  \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">\n");
-    printf("<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">\n");
-    printf ("<head>\n");
-    printf ("<title>APCUPSD STATUS Output Page</title>\n");
-    printf ("<meta http-equiv=\"Pragma\" content=\"no-cache\" />\n");
-    if (refresh != 0) {
-        printf ("<meta http-equiv=\"Refresh\" content=\"%d\" />\n", refresh);
-    }
-    printf ("<style type=\"text/css\" id=\"internalStyle\">\n");
-    printf ("  body {color: black; background: #ffffff}\n");
-    printf ("</style>\n");
-    printf ("</head>\n");
-    printf ("<body>\n");
+    html_begin("APCUPSD Full Status Page", refresh);
 
     if (!checkhost(monhost)) {
-        printf ("<p>Access to %s host is not authorized.</p>\n", monhost);
+        fputs ("<p><strong>Access to host ", stdout);
+	html_puts(monhost);
+        puts (" is not authorized.</strong></p>");
+
 	html_finish();
-	exit (0);
+	exit (EXIT_FAILURE);
     }
 
     /* check if host is available */
-    if (getupsvar (monhost, "date", answer, sizeof(answer)) <= -1)  {
-        printf ("<p>Unable to communicate with the UPS on %s.</p>\n", monhost);
+    if (getupsvar (monhost, "date", answer, sizeof(answer)) < 0)  {
+        fputs ("<p><strong>Unable to communicate with the UPS on ", stdout);
+	html_puts(monhost);
+        puts (".</strong></p>");
+
 	html_finish();
-	exit (0);
+	exit (EXIT_FAILURE);
     }
-    printf ("<blockquote><pre>");
 
+    fputs ("<blockquote><pre>", stdout);
     html_puts (statbuf);
+    puts ("</pre></blockquote>");
 
-    printf ("</pre></blockquote>\n");
     html_finish();
-    exit(0);
+    exit(EXIT_SUCCESS);
 }
