@@ -15,7 +15,7 @@
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static char rcsid[] = "$Id: inet_pton.c,v 1.4 2003-03-21 09:03:36 kerns Exp $";
+static char rcsid[] = "$Id: inet_pton.c,v 1.5 2003-09-02 07:55:35 kerns Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 #include "apc.h"
@@ -38,7 +38,9 @@ static char rcsid[] = "$Id: inet_pton.c,v 1.4 2003-03-21 09:03:36 kerns Exp $";
  */
 
 static int	inet_pton4 __P((const char *src, u_char *dst));
+#ifdef AF_INET6
 static int	inet_pton6 __P((const char *src, u_char *dst));
+#endif
 
 /* int
  * inet_pton(af, src, dst)
@@ -60,8 +62,10 @@ inet_pton(af, src, dst)
 	switch (af) {
 	case AF_INET:
 		return (inet_pton4(src, dst));
+#ifdef AF_INET6
 	case AF_INET6:
 		return (inet_pton6(src, dst));
+#endif
 	default:
 		errno = EAFNOSUPPORT;
 		return (-1);
@@ -132,6 +136,7 @@ inet_pton4(src, dst)
  * author:
  *	Paul Vixie, 1996.
  */
+#ifdef AF_INET6
 static int
 inet_pton6(src, dst)
 	const char *src;
@@ -216,6 +221,8 @@ inet_pton6(src, dst)
 	memcpy(dst, tmp, NS_IN6ADDRSZ);
 	return (1);
 }
+#endif /* AF_INET6 */
+
 #else
 int
 inet_pton(int af, const char *src, void *dst)

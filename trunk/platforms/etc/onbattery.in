@@ -17,5 +17,5 @@ MSG="$HOSTNAME Power Failure !!!"
    echo "$MSG"
    echo " "
    @sbindir@/apcaccess status
-) | $APCUPSD_MAIL $SYSADMIN
+) | $APCUPSD_MAIL -s "$MSG" $SYSADMIN
 exit 0

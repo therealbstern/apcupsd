@@ -1,7 +1,7 @@
 #!/bin/sh
 #
 # This shell script if placed in /etc/apcupsd
-# will be called by /etc/apcupsd/apccontrol when the	
+# will be called by /etc/apcupsd/apccontrol when the    
 # UPS goes back on to the mains after a power failure.
 # We send an email message to root to notify him.
 #
@@ -17,5 +17,5 @@ MSG="$HOSTNAME Power has returned"
    echo "$MSG"
    echo " "
    @sbindir@/apcaccess status
-) | $APCUPSD_MAIL $SYSADMIN
+) | $APCUPSD_MAIL -s "$MSG" $SYSADMIN
 exit 0
