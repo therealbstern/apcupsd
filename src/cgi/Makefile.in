@@ -59,8 +59,8 @@ distclean: targetdistclean
 
 install: all-targets
 	@for p in $(allexe) ; do \
-		echo $(INSTALL_PROGRAM) $$p $(DESTDIR)$(cgibin); \
-		$(INSTALL_PROGRAM) $$p $(DESTDIR)$(cgibin); \
+	    echo $(INSTALL_PROGRAM) $$p $(DESTDIR)$(cgibin); \
+	    $(INSTALL_PROGRAM) $$p $(DESTDIR)$(cgibin); \
 	done
 	@if test "x$(CSS_DIR)" != "x" ; then \
 	   if test -d $(DESTDIR)$(CSS_DIR) ; then \
@@ -73,33 +73,33 @@ install: all-targets
 	fi
 	# don't overwrite any existing config file
 	@if test ! -f $(DESTDIR)$(sysconfdir)/hosts.conf; then \
-		(echo "Installing hosts.conf..." && \
-			$(INSTALL_DATA) \
-				$(topdir)/platforms/etc/hosts.conf \
-				$(DESTDIR)$(sysconfdir)/hosts.conf); \
+	   (echo "Installing hosts.conf..." && \
+	      $(INSTALL_DATA) \
+		 $(topdir)/platforms/etc/hosts.conf \
+		 $(DESTDIR)$(sysconfdir)/hosts.conf); \
 	else \
-	       (echo "Installing hosts.conf as $(DESTDIR)$(sysconfdir)/hosts.conf.new" && \
-			$(INSTALL_DATA) \
-				$(topdir)/platforms/etc/hosts.conf \
-				$(DESTDIR)$(sysconfdir)/hosts.conf.new); \
+	    (echo "Installing hosts.conf as $(DESTDIR)$(sysconfdir)/hosts.conf.new" && \
+	       $(INSTALL_DATA) \
+		  $(topdir)/platforms/etc/hosts.conf \
+		  $(DESTDIR)$(sysconfdir)/hosts.conf.new); \
 	fi
 	# don't overwrite any existing config file
 	@if test ! -f $(DESTDIR)$(sysconfdir)/multimon.conf; then \
-		(echo "Installing multimon.conf..." && \
-			$(INSTALL_DATA) \
-				$(topdir)/platforms/etc/multimon.conf \
-				$(DESTDIR)$(sysconfdir)/multimon.conf ); \
+	   (echo "Installing multimon.conf..." && \
+	       $(INSTALL_DATA) \
+		  $(topdir)/platforms/etc/multimon.conf \
+		  $(DESTDIR)$(sysconfdir)/multimon.conf ); \
 	else \
-	       (echo "Installing multimon.conf as $(DESTDIR)$(sysconfdir)/multimon.conf.new" && \
-			$(INSTALL_DATA) \
-				$(topdir)/platforms/etc/multimon.conf \
-				$(DESTDIR)$(sysconfdir)/multimon.conf.new); \
+	   (echo "Installing multimon.conf as $(DESTDIR)$(sysconfdir)/multimon.conf.new" && \
+	       $(INSTALL_DATA) \
+		  $(topdir)/platforms/etc/multimon.conf \
+		  $(DESTDIR)$(sysconfdir)/multimon.conf.new); \
 	fi
 
 uninstall:
 	@echo "Uninstalling cgi program support..."
 	@for p in $(allexe) ; do \
-		$(RMF) $(DESTDIR)$(cgibin)/$$p; \
+	    $(RMF) $(DESTDIR)$(cgibin)/$$p; \
 	done
 	$(RMF) $(DESTDIR)$(sysconfdir)/hosts.conf
 	$(RMF) $(DESTDIR)$(sysconfdir)/hosts.conf.new

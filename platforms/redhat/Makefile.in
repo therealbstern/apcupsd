@@ -25,20 +25,20 @@ install:
 	    /sbin/chkconfig --del apcupsd; \
 	fi
 	# remove old 3.6.2 stuff
-	@rm -f /etc/rc.d/rc0.d/K20apcups
-	@rm -f /etc/rc.d/rc1.d/S20apcups
-	@rm -f /etc/rc.d/rc1.d/K20apcups
-	@rm -f /etc/rc.d/rc2.d/S20apcups
-	@rm -f /etc/rc.d/rc3.d/S20apcups
-	@rm -f /etc/rc.d/rc5.d/S20apcups
-	@rm -f /etc/rc.d/rc6.d/K20apcups
-	@rm -f /etc/rc.d/init.d/apcups
-	@$(INSTALL_PROGRAM) -m 744 apcupsd /etc/rc.d/init.d/apcupsd
+	@rm -f $(DESTDIR)/etc/rc.d/rc0.d/K20apcups
+	@rm -f $(DESTDIR)/etc/rc.d/rc1.d/S20apcups
+	@rm -f $(DESTDIR)/etc/rc.d/rc1.d/K20apcups
+	@rm -f $(DESTDIR)/etc/rc.d/rc2.d/S20apcups
+	@rm -f $(DESTDIR)/etc/rc.d/rc3.d/S20apcups
+	@rm -f $(DESTDIR)/etc/rc.d/rc5.d/S20apcups
+	@rm -f $(DESTDIR)/etc/rc.d/rc6.d/K20apcups
+	@rm -f $(DESTDIR)/etc/rc.d/init.d/apcups
+	@$(INSTALL_PROGRAM) -m 744 apcupsd $(DESTDIR)/etc/rc.d/init.d/apcupsd
 	# save old halt script
-	@cp -f /etc/rc.d/init.d/halt /etc/rc.d/init.d/halt.old
+	@cp -f /etc/rc.d/init.d/halt $(DESTDIR)/etc/rc.d/init.d/halt.old
 	# insert apcupsd script into halt
-	@awk -f awkhaltprog /etc/rc.d/init.d/halt.old >/etc/rc.d/init.d/halt
-	@chmod 744 /etc/rc.d/init.d/halt
+	@awk -f awkhaltprog /etc/rc.d/init.d/halt.old >$(DESTDIR)/etc/rc.d/init.d/halt
+	@chmod 744 $(DESTDIR)/etc/rc.d/init.d/halt
 	# link new halt script for startup and shutdown
 	@/sbin/chkconfig --add apcupsd
 	@echo "================================================="
@@ -63,9 +63,9 @@ uninstall:
 	@echo "Removing symlinks..."
 	@/sbin/chkconfig --del apcupsd
 	@echo "Removing boot script..."
-	@rm -f /etc/rc.d/init.d/apcupsd
+	@rm -f $(DESTDIR)/etc/rc.d/init.d/apcupsd
 	@echo "Restoring old halt script"
-	@cp -f /etc/rc.d/init.d/halt.old /etc/rc.d/init.d/halt
+	@cp -f $(DESTDIR)/etc/rc.d/init.d/halt.old /etc/rc.d/init.d/halt
 
 clean:
 
