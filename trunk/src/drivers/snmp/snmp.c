@@ -59,6 +59,8 @@
  */
 
 #include "apc.h"
+#undef UCD_COMPATIBLE
+#define UCD_COMPATIBLE 1
 #include "snmp.h"
 #include "snmp_private.h"
 

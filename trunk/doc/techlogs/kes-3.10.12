@@ -4,6 +4,7 @@
 
 General:
 - Remove some unused code in the snmp directory.
+- Cleanup some compile errors in the snmp directory.
 - Move install.xml to install.kml and implement simpler html directives in
   docbook.  Modify Makefile to convert html back into docbook.
 - Change references to serial port in apctest to device (USB included).

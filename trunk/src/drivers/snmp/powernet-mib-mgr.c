@@ -4,12 +4,15 @@
  *
  * This C file is derived from the PowerNet-MIB module.
  *
- * $Id: powernet-mib-mgr.c,v 1.4 2003-12-29 17:44:05 kerns Exp $
+ * $Id: powernet-mib-mgr.c,v 1.5 2004-02-12 19:42:56 kerns Exp $
  */
 
 #include "apc.h"
 
 #include <stdlib.h>
+
+#undef UCD_COMPATIBLE
+#define UCD_COMPATIBLE 1
 
 #include <ucd-snmp/asn1.h>
 #include <ucd-snmp/snmp.h>
