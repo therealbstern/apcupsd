@@ -44,10 +44,10 @@ fi
 #
 case "$1" in
 	commfailure)
-		${POPUP} "apccontrol: Warning serial port communications with UPS lost." &
+		${POPUP} "apccontrol: Communications with UPS lost." &
 	;;
 	commok)
-		${POPUP} "apccontrol: Serial communciations with UPS restored." &
+		${POPUP} "apccontrol: Communciations with UPS restored." &
 	;;
 	powerout)
 # remove the comment (#) really want to see the following -- not necessary
