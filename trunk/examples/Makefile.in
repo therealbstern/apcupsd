@@ -13,12 +13,12 @@ top_builddir = $(topdir)
 # Include the default make targets: to be put before the all-targets: rule.
 @TARGETS@
 
-allexe = client readfifo megaclient newslave upsapm hid-ups
+allexe = client readfifo megaclient newslave upsapm
 
 all-targets: $(allexe)
 
 hid-ups: hid-ups.c
-	$(CC) -g  -I../include hid-ups.c -o hid-ups
+	$(CC) -g  hid-ups.c -o hid-ups
 
 client:  client.c $(APCLIBS)
 	$(CC) client.c $(APCLIBS) -o client
