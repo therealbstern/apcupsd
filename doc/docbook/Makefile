@@ -26,6 +26,7 @@ SRC= \
     nis.hml \
     post_install.hml \
     release_notes.hml \
+    rpm-faq.hml \
     serial.hml \
     shutdown.hml \
     snmp.hml \
@@ -52,6 +53,7 @@ OBJ = \
     nis.xml \
     post_install.xml \
     release_notes.xml \
+    rpm-faq.xml \
     serial.xml \
     shutdown.xml \
     snmp.xml \

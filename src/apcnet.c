@@ -64,8 +64,6 @@
 
 #ifdef HAVE_OLDNET
 
-extern UPSCOMMANDS cmd[];
-
 /* Local variables */
 static int socketfd;	 
 static int newsocketfd = -1;
@@ -709,7 +707,7 @@ select_again3:
     if (is_ups_set(UPS_COMMLOST)) {
         log_event(ups, LOG_WARNING, "Connect from master %s succeeded",
 		slaves[0].name);
-	execute_command(ups, cmd[CMDMASTERCONN]);
+	execute_command(ups, ups_event[CMDMASTERCONN]);
         Dmsg0(100, "Clear UPS_COMMLOST\n");
 	clear_ups(UPS_COMMLOST);
     } 
