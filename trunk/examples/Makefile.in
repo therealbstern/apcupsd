@@ -20,6 +20,10 @@ all-targets: $(allexe)
 hid-ups: hid-ups.c
 	$(CC) -g  hid-ups.c -o hid-ups
 
+hid-set: hid-set.c
+	$(CC) -g  hid-set.c -o hid-set
+
+
 client:  client.c $(APCLIBS)
 	$(CC) client.c $(APCLIBS) -o client
 	$(CP) client@EXEEXT@ gui/
@@ -42,6 +46,7 @@ uninstall:
 
 clean: targetclean
 	$(RMF) core core.* 1 2 3 *.o
+	$(RMF) $(allexe) hid-ups hid-set
 
 distclean: targetdistclean
 	$(RMF) safe.apccontrol
