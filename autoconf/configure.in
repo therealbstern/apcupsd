@@ -785,28 +785,41 @@ dnl
 dnl If the crypto library is needed for snmp, autodetect it
 dnl
 SNMP_DRIVER_ENABLED="no"
+NET_SNMP_DRIVER_ENABLED="no"
 AC_ARG_ENABLE(snmp, [
   --enable-snmp 	   Compile SNMP UPS code
   --disable-snmp	   No SNMP UPS code (default)],
 	[ if test "$enableval" = "yes" ; then
-		SNMP_DRIVER_ENABLED="yes"
-		AC_CHECK_LIB(crypto, EVP_DigestInit,
-		  [echo '  including crypto library for snmp.'; LIBS="$LIBS -lcrypto"],
-		  [], [])
+	    SNMP_DRIVER_ENABLED="yes"
+	    AC_CHECK_LIB(crypto, EVP_DigestInit,
+	       [echo '	including crypto library for snmp.'; LIBS="$LIBS -lcrypto"],
+	       [], [])
 	    AC_CHECK_LIB(snmp, snmp_open,
-	  [LIBS="$LIBS -lsnmp"],
-	  [echo '  disabling SNMP driver.'; SNMP_DRIVER_ENABLED="no"])
+	      [LIBS="$LIBS -lsnmp"],
+	      [AC_CHECK_LIB(netsnmp, snmp_open,
+		[LIBS="$LIBS -lnetsnmp"
+		 NET_SNMP_DRIVER_ENABLED="yes"],
+		[echo " "
+		 echo "=======	snmp libraries not found, disabling SNMP driver. ======"  
+		 echo " "
+		 SNMP_DRIVER_ENABLED="no"])
+	     ])
 	fi],
     [])
 
 if test "$SNMP_DRIVER_ENABLED" = "yes"; then
   AC_DEFINE(HAVE_SNMP_DRIVER)
-  AC_DEFINE(HAVE_UCD_SNMP)
+  if test "$NET_SNMP_DRIVER_ENABLED" = "yes"; then
+     AC_DEFINE(HAVE_NET_SNMP)
+     DISPLAY_SNMP_DRIVER="net-snmp"
+  else
+     AC_DEFINE(HAVE_UCD_SNMP)
+     DISPLAY_SNMP_DRIVER="snmp"
+  fi
   SNMP_DRIVER="snmp"
   AC_SUBST(SNMP_DRIVER)
 fi
 
-NET_SNMP_DRIVER_ENABLED="no"
 AC_ARG_ENABLE(net-snmp, [
   --enable-net-snmp	       Compile NET-SNMP UPS code
   --disable-net-snmp	       No NET-SNMP UPS code (default)],
@@ -816,14 +829,15 @@ AC_ARG_ENABLE(net-snmp, [
 		  [echo '  including crypto library for snmp.'; LIBS="$LIBS -lcrypto"],
 		  [], [])
 	    AC_CHECK_LIB(netsnmp, snmp_open,
-	  [LIBS="$LIBS -lnetsnmp"],
-	  [echo '  disabling NET-SNMP driver.'; NET_SNMP_DRIVER_ENABLED="no"])
+	      [LIBS="$LIBS -lnetsnmp"],
+	      [echo '  disabling NET-SNMP driver.'; NET_SNMP_DRIVER_ENABLED="no"])
 	fi],
     [])
 
 if test "$NET_SNMP_DRIVER_ENABLED" = "yes"; then
   AC_DEFINE(HAVE_SNMP_DRIVER)
   AC_DEFINE(HAVE_NET_SNMP)
+  DISPLAY_SNMP_DRIVER="net-snmp"
   SNMP_DRIVER="snmp"
   AC_SUBST(SNMP_DRIVER)
 fi
@@ -1736,13 +1750,13 @@ Configuration on `date`:
   Loader flags: 	      ${WLDFLAGS} ${LDFLAGS}
   Host and version:	      ${DISTNAME} ${DISTVER}
   Shutdown Program:	      ${SHUTDOWN}
-  Serial device:	      ${SERIALDEV}
+  Port/Device:		      ${SERIALDEV}
   Network Info Port (CGI):    ${NISPORT}
   Master/slave Port:	      ${NETPORT}
   UPSTYPE		      ${UPSTYPE}
   UPSCABLE		      ${UPSCABLE}
 
-  drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${USB_DRIVER:-no-usb} ${SNMP_DRIVER:-no-snmp} ${TEST_DRIVER:-no-test}
+  drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${USB_DRIVER:-no-usb} ${DISPLAY_SNMP_DRIVER:-no-snmp} ${TEST_DRIVER:-no-test}
 
   enable-master-slave:	      ${OLDNET_ENABLED}
   enable-nis:		      ${NISSRV_ENABLED}
