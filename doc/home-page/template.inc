@@ -15,8 +15,8 @@
 <head>
 <meta name="Description" content="Apcupsd a monitoring daemon for APC UPSes">
 <meta name="Keywords" content="Apcupsd, APC, UPS, UNIX, monitor">
-<meta name="Copyright" content="Copyright (C) 2000-2002 Kern Sibbald and John Walker">
-##<link rel="stylesheet" href="bacula-styles.css" type="text/css">
+<meta name="Copyright" content="Copyright (C) 1999-2005 Kern Sibbald">
+##<link rel="stylesheet" href="apcupsd-styles.css" type="text/css">
 </head>
 
 <div align="center">
