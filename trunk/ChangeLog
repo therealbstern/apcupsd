@@ -6,6 +6,8 @@
 /*               ftp://ftp.apcupsd.com                                     */
 /***************************************************************************/
 
+    - Added documentation for SNMP UPSes. Documented the use of
+      --kill-on-powerfail switch during shutdown.
     - SuSE 8.0 is now supported.
     - Added forward declaration of inet_pton and localtime_r when they
       are extraobj.
