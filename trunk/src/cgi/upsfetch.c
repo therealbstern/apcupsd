@@ -22,7 +22,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/types.h>
 
 #include "cgiconfig.h"
 #include "config.h"
@@ -45,7 +44,7 @@ static char errmsg[200];
  *    line, and if 1 returns only to first space (e.g. integers,
  *    and floating point values.
  */
-static struct { 	
+static const struct { 	
    char *request;
    char *upskeyword;
    int nfields;

@@ -27,23 +27,29 @@
  *		   added runtim status
  */
 
-/* default host - only used if you don't specify one in the URL */
-#define MONHOST "127.0.0.1"
-#define REFRESH 30
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 
 #include "cgiconfig.h"
 #include "cgilib.h"
 #include "upsfetch.h"
 
-static char   monhost[256];
-static char   img1s[16];
-static char   img2s[16];
-static char   img3s[16];
-static char   temps[16];
+#ifndef DEFAULT_REFRESH
+#define DEFAULT_REFRESH 30
+#endif
+
+#ifndef MAXHOSTNAMELEN
+#define MAXHOSTNAMELEN	64
+#endif
+
+static char   monhost[MAXHOSTNAMELEN] = "127.0.0.1";
+static char   img1s[16] = "";;
+static char   img2s[16] = "";;
+static char   img3s[16] = "";;
+static char   temps[16] = "";;
+static int    refresh = DEFAULT_REFRESH;
 
 void parsearg(const char *var, const char *value) 
 {
@@ -66,6 +72,12 @@ void parsearg(const char *var, const char *value)
     } else if (strcmp(var, "temp") == 0) {
 	strncpy (temps, value, sizeof(temps));
 	temps[sizeof(temps) - 1] = '\0';
+
+    } else if (strcmp(var, "refresh") == 0) {
+	refresh = atoi(value);
+	if (refresh < 0) {
+		refresh = DEFAULT_REFRESH;
+	}
     }
 }
 
@@ -115,20 +127,13 @@ int main(int argc, char **argv)
     char *p;
     char   answer[256];
 
-    strcpy (monhost, MONHOST);	    /* default host */
+    (void) extractcgiargs();
 
     printf ("Content-type: text/html\n");
     printf ("Pragma: no-cache\n\n");
 
     printf ("<!DOCTYPE html PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\">\n");
     printf ("<html>\n");
-
-    if (!extractcgiargs()) {
-       printf("<head></head><body>\n");
-       printf("<p>Unable to extract cgi arguments.</p>\n");
-       html_finish();
-       exit(0);
-    }
 
     img1 = atoi(img1s);
     img2 = atoi(img2s);
@@ -161,7 +166,9 @@ int main(int argc, char **argv)
 
      printf ("<head>\n<title>%s on %s</title>\n", answer, monhost);
      printf ("  <meta http-equiv=\"Pragma\" content=\"no-cache\">\n");
-     printf ("  <meta http-equiv=\"Refresh\" content=\"%d\">\n", REFRESH);
+     if (refresh != 0) {
+         printf ("  <meta http-equiv=\"Refresh\" content=\"%d\">\n", refresh);
+     }
 
      printf ("<script type=\"text/javascript\">\n");
      printf ("var now = new Date()\n");

@@ -38,7 +38,6 @@
 #include "cgiconfig.h"
 #include "cgilib.h"
 
-static char    monhost[128];
 static char    cmd[16] = "";
 static char    upsval[16] = "";
 static char    upsval2[16] = "";
@@ -71,22 +70,27 @@ static void DrawText(gdImagePtr im, int min, int step)
     char text[10];
 
     next = min;
-    sprintf(text, "%d", next);
+    (void) snprintf(text, sizeof(text), "%d", next);
     gdImageString(im, gdFontLarge, 0, 295, (unsigned char *)text, black);
+
     next += step;
-    sprintf(text, "%d", next);
+    (void) snprintf(text, sizeof(text), "%d", next);
     gdImageString(im, gdFontLarge, 0, 235, (unsigned char *)text, black);
+
     next += step;
-    sprintf(text, "%d", next);
+    (void) snprintf(text, sizeof(text), "%d", next);
     gdImageString(im, gdFontLarge, 0, 175, (unsigned char *)text, black);
+
     next += step;
-    sprintf(text, "%d", next);
+    (void) snprintf(text, sizeof(text), "%d", next);
     gdImageString(im, gdFontLarge, 0, 115, (unsigned char *)text, black);
+
     next += step;
-    sprintf(text, "%d", next);
+    (void) snprintf(text, sizeof(text), "%d", next);
     gdImageString(im, gdFontLarge, 0, 55, (unsigned char *)text, black);
+
     next += step;
-    sprintf(text, "%d", next);
+    (void) snprintf(text, sizeof(text), "%d", next);
     gdImageString(im, gdFontLarge, 0, 0, (unsigned char *)text, black);
 }
 
@@ -106,11 +110,7 @@ static gdImagePtr InitImage(void)
 
 void parsearg(const char *var, const char *value) 
 {
-    if (strcmp(var, "host") == 0) {
-	  strncpy (monhost, value, sizeof(monhost));
-	  monhost[sizeof(monhost) - 1] = '\0';
-
-    } else if (strcmp(var, "display") == 0) {
+    if (strcmp(var, "display") == 0) {
 	  strncpy (cmd, value, sizeof(cmd));
 	  cmd[sizeof(cmd) - 1] = '\0';
 
@@ -132,12 +132,15 @@ void parsearg(const char *var, const char *value)
 static void imgheader (void)
 {
 #ifdef SYS_IMGFMT_PNG
-    printf ("Content-type: image/png\n");
+    puts ("Content-type: image/png");
 #else
-    printf ("Content-type: image/gif\n");
+    puts ("Content-type: image/gif");
 #endif
-    printf ("Pragma: no-cache\n");
-    printf ("\n");
+    /*
+     * Since this image is generated based on the parameters passed in
+     * the URL, caching is acceptable. No need for Cache-Control.
+     */
+    puts ("");
 }
 
 static void TermImage(gdImagePtr im)
@@ -152,7 +155,7 @@ static void TermImage(gdImagePtr im)
     gdImageDestroy (im);
 }  
 
-static void drawbattcap(char *battcaps, char *minbchgs)
+static void drawbattcap(const char *battcaps, const char *minbchgs)
 {
     gdImagePtr	    im;
     char	   batttxt[16];
@@ -174,13 +177,13 @@ static void drawbattcap(char *battcaps, char *minbchgs)
     battpos = (int)(300 - (battcap * 3));
     gdImageFilledRectangle(im, 75, battpos, 125, 300, black);
 
-    sprintf(batttxt, "%.1f %%", battcap);
+    (void) snprintf(batttxt, sizeof(batttxt), "%.1f %%", battcap);
     gdImageString(im, gdFontLarge, 70, 320, (unsigned char *)batttxt, black);
 
     TermImage(im);
 }
 
-static void drawbattvolt(char *battvolts, char *nombattvs) 
+static void drawbattvolt(const char *battvolts, const char *nombattvs) 
 {
     gdImagePtr	    im;
     char	   batttxt[16];
@@ -241,7 +244,7 @@ static void drawbattvolt(char *battvolts, char *nombattvs)
 
     gdImageFilledRectangle (im, 75, battpos, 125, 300, black);
 
-    sprintf (batttxt, "%.1f VDC", battvolt);
+    (void) snprintf (batttxt, sizeof(batttxt), "%.1f VDC", battvolt);
     gdImageString(im, gdFontLarge, 70, 320, (unsigned char *)batttxt, black);
 
     TermImage(im);
@@ -272,7 +275,7 @@ static void noimage (void)
 }
 #endif
 
-static void drawupsload(char *upsloads) 
+static void drawupsload(const char *upsloads) 
 {
     gdImagePtr	    im;
     char	   loadtxt[16];
@@ -291,7 +294,7 @@ static void drawupsload(char *upsloads)
     loadpos = (int)(300 - ((upsload / 125) * 300));
     gdImageFilledRectangle(im, 75, loadpos, 125, 300, black);
 
-    sprintf(loadtxt, "%.1f %%", upsload);
+    (void) snprintf(loadtxt, sizeof(loadtxt), "%.1f %%", upsload);
     gdImageString(im, gdFontLarge, 70, 320, (unsigned char *)loadtxt, black);
 
     TermImage(im);
@@ -299,7 +302,8 @@ static void drawupsload(char *upsloads)
 
 /*
  * Input Voltage */
-static void drawutility (char *utilitys, char *translos, char *transhis) 
+static void drawutility (const char *utilitys, const char *translos,
+    const char *transhis) 
 {
     gdImagePtr	    im;
     char	   utiltxt[16];
@@ -337,7 +341,7 @@ static void drawutility (char *utilitys, char *translos, char *transhis)
 
     gdImageFilledRectangle (im, 75, utilpos, 125, 300, black);
 
-    sprintf (utiltxt, "%.1f VAC", utility);
+    (void) snprintf (utiltxt, sizeof(utiltxt), "%.1f VAC", utility);
     gdImageString (im, gdFontLarge, 65, 320, (unsigned char *)utiltxt, black); 
 
     TermImage(im);
@@ -346,7 +350,7 @@ static void drawutility (char *utilitys, char *translos, char *transhis)
 /*
  * Output Voltage
  */
-static void drawupsout (char *upsouts) 
+static void drawupsout (const char *upsouts) 
 {
     gdImagePtr	    im;
     char	   utiltxt[16];
@@ -377,13 +381,13 @@ static void drawupsout (char *upsouts)
 
     gdImageFilledRectangle(im, 75, uoutpos, 125, 300, black);
 
-    sprintf(utiltxt, "%.1f VAC", upsout);
+    (void) snprintf(utiltxt, sizeof(utiltxt), "%.1f VAC", upsout);
     gdImageString(im, gdFontLarge, 65, 320, (unsigned char *)utiltxt, black); 
 
     TermImage(im);
 }
 
-static void drawruntime (char *upsrunts, char *lowbatts)
+static void drawruntime (const char *upsrunts, const char *lowbatts)
 {
     gdImagePtr	    im;
     char	   utiltxt[16];
@@ -410,7 +414,7 @@ static void drawruntime (char *upsrunts, char *lowbatts)
 
     gdImageFilledRectangle(im, 75, uoutpos, 125, 300, black);
 
-    sprintf(utiltxt, "%.1f mins", upsrunt);
+    (void) snprintf(utiltxt, sizeof(utiltxt), "%.1f mins", upsrunt);
     gdImageString(im, gdFontLarge, 65, 320, (unsigned char *)utiltxt, black); 
  
     TermImage(im);
@@ -419,45 +423,31 @@ static void drawruntime (char *upsrunts, char *lowbatts)
 
 int main (int argc, char **argv)
 {
-    if (!extractcgiargs()) {
-        printf("Content-type: text/plain\n\n");
-        printf("Unable to extract cgi arguments!\n");
-	exit(0);
-    }
+    (void) extractcgiargs();
 
-
-    if (!strcmp(cmd, "upsload")) {
+    if (strcmp(cmd, "upsload") == 0) {
 	drawupsload(upsval);
-	exit(0);
-    }
 
-    if (!strcmp(cmd, "battcap")) {
+    } else if (strcmp(cmd, "battcap") == 0) {
 	drawbattcap(upsval, upsval2);
-	exit(0);
-    }
 
-    if (!strcmp(cmd, "battvolt")) {
+    } else if (strcmp(cmd, "battvolt") == 0) {
 	drawbattvolt(upsval, upsval2);
-	exit(0);
-    }
 
-    if (!strcmp(cmd, "utility")) {
-	drawutility(upsval,upsval2,upsval3);
-	exit(0);
-    }
+    } else if (strcmp(cmd, "utility") == 0) {
+	drawutility(upsval, upsval2, upsval3);
 
-    if (!strcmp(cmd, "outputv")) {
+    } else if (strcmp(cmd, "outputv") == 0) {
 	drawupsout(upsval);
-	exit(0);
-    }
 
-    if (!strcmp(cmd, "runtime")) {
+    } else if (strcmp(cmd, "runtime") == 0) {
 	drawruntime(upsval, upsval2);
-	exit(0);
+
+    } else {
+        puts("Status: 400 Bad request");
+        puts("Content-type: text/plain\n");
+        puts("400 Bad request");
+        exit(EXIT_FAILURE);
     }
-
-    printf ("Content-type: text/plain\n\n");
-    printf ("Invalid request!\n");
-
-    exit(0);
+    exit(EXIT_SUCCESS);
 }
