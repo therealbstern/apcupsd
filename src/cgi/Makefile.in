@@ -57,7 +57,16 @@ install: all-targets
 	    echo $(INSTALL_PROGRAM) -s $$p $(DESTDIR)$(cgibin); \
 	    $(INSTALL_PROGRAM) -s $$p $(DESTDIR)$(cgibin); \
 	done
-	$(INSTALL_DATA) apcupsd.css $(DESTDIR)$(cgibin)
+	# don't overwrite any existing config file
+	@if test ! -f $(DESTDIR)$(sysconfdir)/apcupsd.css; then \
+	   (echo "Installing apcupsd.css..." && \
+	      $(INSTALL_DATA) apcupsd.css \
+		 $(DESTDIR)$(sysconfdir)/apcupsd.css); \
+	else \
+	    (echo "Installing apcupsd.css as $(DESTDIR)$(sysconfdir)/apcupsd.css.new" && \
+	       $(INSTALL_DATA) apcupsd.css \
+		 $(DESTDIR)$(sysconfdir)/apcupsd.css.new); \
+	fi
 
 	# don't overwrite any existing config file
 	@if test ! -f $(DESTDIR)$(sysconfdir)/hosts.conf; then \
@@ -89,7 +98,7 @@ uninstall:
 	@for p in $(allexe) ; do \
 	    $(RMF) $(DESTDIR)$(cgibin)/$$p; \
 	done
-	$(RMF) $(DESTDIR)$(cgibin)/apcupsd.css
+	$(RMF) $(DESTDIR)$(sysconfdir)/apcupsd.css
 	$(RMF) $(DESTDIR)$(sysconfdir)/hosts.conf
 	$(RMF) $(DESTDIR)$(sysconfdir)/hosts.conf.new
 	$(RMF) $(DESTDIR)$(sysconfdir)/multimon.conf

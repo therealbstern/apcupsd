@@ -336,7 +336,7 @@ static int change_ups_eeprom_item(UPSINFO *ups, char *title, char cmd, char *set
     fprintf(stderr, "The old UPS %s is: %s\n", title, oldvalue);
     astrncpy(allvalues, oldvalue, sizeof(allvalues));
     astrncat(allvalues, " ", sizeof(allvalues));
-    astrncpy(lastvalue, oldvalue, sizeof(allvalues));
+    astrncpy(lastvalue, oldvalue, sizeof(lastvalue));
 
     /* Try a second time to ensure that it is a stable value */
     write(ups->fd, &cmd, 1);
@@ -394,7 +394,7 @@ static int change_ups_eeprom_item(UPSINFO *ups, char *title, char cmd, char *set
 	if (strcmp(lastvalue, response) != 0) {
 	    astrncat(allvalues, response, sizeof(allvalues));
             astrncat(allvalues, " ", sizeof(allvalues));
-	    astrncpy(lastvalue, response, sizeof(allvalues));
+	    astrncpy(lastvalue, response, sizeof(lastvalue));
 	}
         sleep(5);             /* don't cycle too fast */
     }
