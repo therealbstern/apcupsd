@@ -108,7 +108,6 @@ UPSCMDMSG cmd_msg[] = {
     {LOG_ALERT,   N_("Battery failure. Emergency.")},
     {LOG_CRIT,    N_("UPS battery must be replaced.")},
     {LOG_CRIT,    N_("Remote shutdown requested")},
-    {LOG_CRIT,    N_("Too Many Errors. Restarting UPS daemon")},
     {LOG_WARNING, N_("Communications with UPS lost.")},
     {LOG_WARNING, N_("Communications with UPS restored.")},
     {LOG_ALERT,   N_("UPS Self Test switch to battery.")},
@@ -233,7 +232,7 @@ static void prohibit_logins(UPSINFO *ups)
 static void do_shutdown(UPSINFO *ups, int cmdtype)
 {
     if (UPS_ISSET(UPS_SHUTDOWN)) {
-    	return; 		      /* already done */
+	return; 		      /* already done */
     }
     ups->ShutDown = time(NULL);
     UPS_SET(UPS_SHUTDOWN);
@@ -243,16 +242,16 @@ static void do_shutdown(UPSINFO *ups, int cmdtype)
     prohibit_logins(ups);
 
     if (!UPS_ISSET(UPS_SLAVE)) {
-        /*
-         * Note, try avoid using this option if at all possible
-         * as it will shutoff the UPS power, and you cannot
-         * be guaranteed that the shutdown command will have
-         * succeeded. This PROBABLY should be executed AFTER
-         * the shutdown command is given (the execute_command below).
-         */
-        if (kill_on_powerfail) {
-            kill_power(ups);
-        }
+	/*
+	 * Note, try avoid using this option if at all possible
+	 * as it will shutoff the UPS power, and you cannot
+	 * be guaranteed that the shutdown command will have
+	 * succeeded. This PROBABLY should be executed AFTER
+	 * the shutdown command is given (the execute_command below).
+	 */
+	if (kill_on_powerfail) {
+	    kill_power(ups);
+	}
     } 
 
     /* Now execute the shutdown command */
@@ -289,21 +288,21 @@ static enum a_state get_state(UPSINFO *ups, time_t now)
     enum a_state state;
 
     if (UPS_ISSET(UPS_ONBATT)) {
-        if (UPS_ISSET(UPS_PREV_ONBATT)) {  /* if already detected on battery */
-            if (ups->SelfTest) {       /* see if UPS is doing self test */
-	            state = st_SelfTest;   /*   yes */
-            } else {
-                state = st_OnBattery;  /* No, this must be real power failure */
-	        }
+	if (UPS_ISSET(UPS_PREV_ONBATT)) {  /* if already detected on battery */
+	    if (ups->SelfTest) {       /* see if UPS is doing self test */
+		    state = st_SelfTest;   /*	yes */
 	    } else {
-	        state = st_PowerFailure;   /* Power failure just detected */
+		state = st_OnBattery;  /* No, this must be real power failure */
+		}
+	    } else {
+		state = st_PowerFailure;   /* Power failure just detected */
 	    }
     } else {
-        if (UPS_ISSET(UPS_PREV_ONBATT)) {		   /* if we were on batteries */
-            state = st_MainsBack;     /* then we just got power back */
-        } else {
-            state = st_OnMains;       /* Solid on mains, normal condition */
-        }
+	if (UPS_ISSET(UPS_PREV_ONBATT)) {		   /* if we were on batteries */
+	    state = st_MainsBack;     /* then we just got power back */
+	} else {
+	    state = st_OnMains;       /* Solid on mains, normal condition */
+	}
     }
     return state;
 }
@@ -326,45 +325,45 @@ void do_action(UPSINFO *ups)
 
     time(&now); 		  /* get current time */
     if (first) {
-        ups->last_time_nologon = ups->last_time_annoy = now;
-        ups->last_time_on_line = now;
-        UPS_CLEAR(UPS_PREV_ONBATT);
-        UPS_CLEAR(UPS_PREV_BATTLOW);
-        first = 0;
+	ups->last_time_nologon = ups->last_time_annoy = now;
+	ups->last_time_on_line = now;
+	UPS_CLEAR(UPS_PREV_ONBATT);
+	UPS_CLEAR(UPS_PREV_BATTLOW);
+	first = 0;
     }
 
-    if (UPS_ISSET(UPS_REPLACEBATT)) {   /* Replace battery */
-        /* Complain every 9 hours, this causes the complaint to
-         * cycle around the clock and hopefully be more noticable
-         * without being too annoying.	      Also, ignore all change battery
-         * indications for the first 10 minutes of running time to
-         * prevent false alerts.
-         * Finally, issue the event 5 times, then clear the flag
-         * to silence false alarms. If the battery is really dead, the
-         * flag will be reset in apcsmart.c
-         *
-         * UPS_REPLACEBATT is a flag. To count use a static local counter.
-         * The counter is initialized only one time at startup.
-         *
-         * -RF
-         */
-        if (now - ups->start_time < 60 * 10 || ups->ChangeBattCounter > 5) {
-            UPS_CLEAR(UPS_REPLACEBATT);
-            ups->ChangeBattCounter = 0;
-        } else if (now - ups->last_time_changeme > 60 * 60 * 9) {
-            generate_event(ups, CMDCHANGEME);
-            ups->last_time_changeme = now;
-            ups->ChangeBattCounter++;
-        }
+    if (UPS_ISSET(UPS_REPLACEBATT)) {	/* Replace battery */
+	/* Complain every 9 hours, this causes the complaint to
+	 * cycle around the clock and hopefully be more noticable
+	 * without being too annoying.	      Also, ignore all change battery
+	 * indications for the first 10 minutes of running time to
+	 * prevent false alerts.
+	 * Finally, issue the event 5 times, then clear the flag
+	 * to silence false alarms. If the battery is really dead, the
+	 * flag will be reset in apcsmart.c
+	 *
+	 * UPS_REPLACEBATT is a flag. To count use a static local counter.
+	 * The counter is initialized only one time at startup.
+	 *
+	 * -RF
+	 */
+	if (now - ups->start_time < 60 * 10 || ups->ChangeBattCounter > 5) {
+	    UPS_CLEAR(UPS_REPLACEBATT);
+	    ups->ChangeBattCounter = 0;
+	} else if (now - ups->last_time_changeme > 60 * 60 * 9) {
+	    generate_event(ups, CMDCHANGEME);
+	    ups->last_time_changeme = now;
+	    ups->ChangeBattCounter++;
+	}
     }
 
     /*
      *	      Must SHUTDOWN Remote System Calls
      */
     if (UPS_ISSET(UPS_SHUT_REMOTE)) {
-        UPS_CLEAR(UPS_ONBATT_MSG);
-        generate_event(ups, CMDREMOTEDOWN);
-        return;
+	UPS_CLEAR(UPS_ONBATT_MSG);
+	generate_event(ups, CMDREMOTEDOWN);
+	return;
     }
 
     state = get_state(ups, now);
@@ -427,18 +426,18 @@ void do_action(UPSINFO *ups)
 	       if (!UPS_ISSET(UPS_SLAVE))
 		   kill_power(ups);
 	       ups->ShutDown = now;   /* wait a bit before doing again */
-           UPS_SET(UPS_SHUTDOWN);
+	   UPS_SET(UPS_SHUTDOWN);
 	   }
 	} else {		/* not shutdown yet */
 	    /*
 	     * Did BattLow bit go high? Then the battery power is failing.
 	     * Normal Power down during Power Failure
 	     */
-        if (!UPS_ISSET(UPS_PREV_BATTLOW) && UPS_ISSET(UPS_BATTLOW)) {
-            UPS_CLEAR(UPS_ONBATT_MSG);
-            generate_event(ups, CMDFAILING);
-            break;
-        }
+	if (!UPS_ISSET(UPS_PREV_BATTLOW) && UPS_ISSET(UPS_BATTLOW)) {
+	    UPS_CLEAR(UPS_ONBATT_MSG);
+	    generate_event(ups, CMDFAILING);
+	    break;
+	}
 
 	    /*
 	     * Did MaxTimeOnBattery Expire?  (TIMEOUT in apcupsd.conf)
@@ -473,12 +472,12 @@ void do_action(UPSINFO *ups)
 	     *
 	     * Or of the UPS says he is going to shutdown, do it NOW!
 	     */
-        if (UPS_ISSET(UPS_SHUTDOWNIMM) ||
-                (UPS_ISSET(UPS_BATTLOW) && UPS_ISSET(UPS_ONLINE))) {
-            UPS_CLEAR(UPS_ONBATT_MSG);
-            UPS_SET(UPS_SHUT_EMERG);
-            generate_event(ups, CMDEMERGENCY);
-        }
+	if (UPS_ISSET(UPS_SHUTDOWNIMM) ||
+		(UPS_ISSET(UPS_BATTLOW) && UPS_ISSET(UPS_ONLINE))) {
+	    UPS_CLEAR(UPS_ONBATT_MSG);
+	    UPS_SET(UPS_SHUT_EMERG);
+	    generate_event(ups, CMDEMERGENCY);
+	}
 
 	    /*
 	     *	      Announce to LogOff, with initial delay ....
@@ -537,7 +536,7 @@ void do_action(UPSINFO *ups)
 	     * If we have a shutdown to cancel, do it now.
 	     */
 	    ups->ShutDown = 0;
-        UPS_CLEAR(UPS_SHUTDOWN);
+	UPS_CLEAR(UPS_SHUTDOWN);
 	    powerfail(1);
 	    unlink(PWRFAIL);
             log_event(ups, LOG_ALERT, _("Cancelling shutdown"));
@@ -587,14 +586,14 @@ void do_action(UPSINFO *ups)
      */
 
     if (UPS_ISSET(UPS_ONBATT)) {
-        UPS_SET(UPS_PREV_ONBATT);
+	UPS_SET(UPS_PREV_ONBATT);
     } else {
-        UPS_CLEAR(UPS_PREV_ONBATT);
+	UPS_CLEAR(UPS_PREV_ONBATT);
     }
     if (UPS_ISSET(UPS_BATTLOW)) {
-        UPS_SET(UPS_PREV_BATTLOW);
+	UPS_SET(UPS_PREV_BATTLOW);
     } else {
-        UPS_CLEAR(UPS_PREV_BATTLOW);
+	UPS_CLEAR(UPS_PREV_BATTLOW);
     }
 
     write_unlock(ups);
