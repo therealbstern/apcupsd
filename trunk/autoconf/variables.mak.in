@@ -63,16 +63,6 @@ srcdir = @srcdir@
 # Absolute top srcdir
 abssrcdir = @ABSSRCDIR@
 
-# Current directory
-CURDIR = $(shell echo $(PWD))
-
-# Relative current directory
-ifeq ($(abssrcdir), $(CURDIR))
-RELCURDIR =
-else
-RELCURDIR = `echo $(CURDIR) | sed -e "s|$(abssrcdir)/||g"`/
-endif
-
 # Directory in which to install.
 sbindir = @sbindir@
 

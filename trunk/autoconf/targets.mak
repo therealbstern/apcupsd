@@ -114,12 +114,9 @@ Makefiles:
 
 Makefile: $(srcdir)/Makefile.in $(topdir)/config.status \
 			$(topdir)/autoconf/variables.mak $(topdir)/autoconf/targets.mak
-	@(cd $(topdir) && \
-	SINGLE_MAKEFILE=yes \
-	CONFIG_FILES=$(RELCURDIR)Makefile \
-	CONFIG_HEADERS= $(SHELL) ./config.status)
+	@$(abssrcdir)/autoconf/rebuild-makefile.sh $(abssrcdir)
 	@echo "You can ignore any makedepend error messages"
-	@make depend
+	@make single-depend
 
 # Configuration targets
 
@@ -189,6 +186,13 @@ depend:
 		do \
 			(cd $$file && if test "$$file" != "."; then make depend; fi); \
 		done; \
+	fi
+
+single-depend:
+	@if test "`$(topdir)/autoconf/has-c-files.sh`" = "no"; then \
+		$(ECHO) "Nothing to do for depend."; \
+	else \
+		make real-depend; \
 	fi
 
 real-depend:
