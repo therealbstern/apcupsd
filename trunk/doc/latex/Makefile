@@ -77,9 +77,13 @@ dvipdf:
 	@rm -f *.eps
 
 
+# Does checking for the tex file
 texcheck:
-# Does checking for the tex file, and possibly fixes things.
 	./check_tex.pl apcupsd.tex
+
+# Fixes problems with tex files
+texfix:
+	./fix_tex.pl apcupsd.tex
   
 clean:
 	@rm -f 1 2 3
