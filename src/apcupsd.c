@@ -78,6 +78,7 @@ char argvalue[MAXSTRING];
 static void daemon_start(void);
 
 int shm_OK = 0;
+extern int kill_on_powerfail;
 
 /**********************************************************************
  * the terminate function and trapping signals allows apcupsd
@@ -246,6 +247,18 @@ int main(int argc, char *argv[]) {
 
     check_for_config(ups, cfgfile);
     Dmsg1(10, "Config file %s processed.\n", cfgfile);
+
+    /*
+     * Disallow --kill-on-powerfail in conjunction with simple signaling
+     * UPSes. Such UPSes have no shutdown grace period so using --kill-on-
+     * powerfail would guarantee an unclean shutdown.
+     */
+    if (kill_on_powerfail && ups->mode.type <= SHAREBASIC) {
+	kill_on_powerfail = 0;
+	log_event(ups, LOG_WARNING,
+		  _("Ignoring --kill-on-powerfail since it is unsafe "
+		    "on Simple Signaling UPSes"));
+    }
 
     /*
      * Attach the correct driver.
