@@ -3,7 +3,6 @@
 #  Makefile for texi
 #
 # Try the following in emacs for updating the texinfo menus
-#  ctl-c ctl-u ctl-m
 #  ctl-u ctl-c ctl-u ctl-a
 #
 
