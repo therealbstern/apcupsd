@@ -1,0 +1,110 @@
+# Network UPS Tools: clients
+#
+# Copyright (C) 1999-2002 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
+#
+
+# Default variables
+@VARIABLES@
+# TOP source directory.
+topdir = @topdir@
+top_builddir = $(topdir)
+
+allexe = upsstats.cgi upsfstats.cgi upsimage.cgi \
+	   multimon.cgi multimoncss.cgi 
+
+# Include the default make targets: to be put before the all-targets: rule.
+@TARGETS@
+
+# Multimon objects
+MOBJS = multimon.o upsfetch.o
+
+MCSSOBJS = multimoncss.o upsfetch.o
+
+# upssstats objects
+SOBJS = upsstats.o upsfetch.o cgilib.o
+
+# upsfstats objects
+FOBJS = upsfstats.o upsfetch.o cgilib.o
+
+# upsimage objects
+# The libgd-1.2 can be generated automatically when checking
+# dependencies.
+
+IOBJS = upsimage.o upsfetch.o cgilib.o @LIBGDOBJ@
+GDINCLUDE = @GDINCLUDE@
+
+all-targets: $(allexe)
+
+multimon.cgi: $(MOBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MOBJS) $(LIBS)
+
+multimoncss.cgi: $(MCSSOBJS)
+	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MCSSOBJS) $(LIBS)
+
+upsstats.cgi: $(SOBJS) 
+	$(CC) $(LDFLAGS) -o $@ $(SOBJS) $(LIBS)
+
+upsfstats.cgi: $(FOBJS) 
+	$(CC) $(LDFLAGS) -o $@ $(FOBJS) $(LIBS)
+
+upsimage.cgi: $(IOBJS)
+	$(CC) $(LDFLAGS) -o $@ $(IOBJS) $(LIBS) -lm
+
+clean: targetclean
+
+distclean: targetdistclean
+	$(RMF) cgiconfig.h
+	$(RMF) Makefile
+	$(RMF) -r CVS
+
+install: all-targets
+	@for p in $(allexe) ; do \
+	    echo $(INSTALL_PROGRAM) $$p $(DESTDIR)$(cgibin); \
+	    $(INSTALL_PROGRAM) $$p $(DESTDIR)$(cgibin); \
+	done
+	@if test "x$(CSS_DIR)" != "x" ; then \
+	   if test -d $(DESTDIR)$(CSS_DIR) ; then \
+	      $(INSTALL_DATA) multimon.css $(DESTDIR)$(CSS_DIR) ; \
+	   else \
+	      echo "CSS_DIR $(DESTDIR)$(CSS_DIR) not found, did not install multimon.css" ; \
+	   fi \
+	else \
+	   echo "No CSS_DIR found, did not install multimon.css" ; \
+	fi
+	# don't overwrite any existing config file
+	@if test ! -f $(DESTDIR)$(sysconfdir)/hosts.conf; then \
+	   (echo "Installing hosts.conf..." && \
+	      $(INSTALL_DATA) \
+		 $(topdir)/platforms/etc/hosts.conf \
+		 $(DESTDIR)$(sysconfdir)/hosts.conf); \
+	else \
+	    (echo "Installing hosts.conf as $(DESTDIR)$(sysconfdir)/hosts.conf.new" && \
+	       $(INSTALL_DATA) \
+		  $(topdir)/platforms/etc/hosts.conf \
+		  $(DESTDIR)$(sysconfdir)/hosts.conf.new); \
+	fi
+	# don't overwrite any existing config file
+	@if test ! -f $(DESTDIR)$(sysconfdir)/multimon.conf; then \
+	   (echo "Installing multimon.conf..." && \
+	       $(INSTALL_DATA) \
+		  $(topdir)/platforms/etc/multimon.conf \
+		  $(DESTDIR)$(sysconfdir)/multimon.conf ); \
+	else \
+	   (echo "Installing multimon.conf as $(DESTDIR)$(sysconfdir)/multimon.conf.new" && \
+	       $(INSTALL_DATA) \
+		  $(topdir)/platforms/etc/multimon.conf \
+		  $(DESTDIR)$(sysconfdir)/multimon.conf.new); \
+	fi
+
+uninstall:
+	@echo "Uninstalling cgi program support..."
+	@for p in $(allexe) ; do \
+	    $(RMF) $(DESTDIR)$(cgibin)/$$p; \
+	done
+	$(RMF) $(DESTDIR)$(sysconfdir)/hosts.conf
+	$(RMF) $(DESTDIR)$(sysconfdir)/hosts.conf.new
+	$(RMF) $(DESTDIR)$(sysconfdir)/multimon.conf
+	$(RMF) $(DESTDIR)$(sysconfdir)/multimon.conf.new
+
+# -----------------------------------------------------------------------
+# DO NOT DELETE THIS LINE -- make depend depends on it.
