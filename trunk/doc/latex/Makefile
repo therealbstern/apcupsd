@@ -26,7 +26,7 @@ MANUAL = manual
 
 first_rule: apcupsd
 
-apcupsd: h2l texcheck tex web html dvipdf
+apcupsd: h2l texcheck texfix tex web html dvipdf
 
 .SUFFIXES:     .tex .html
 .PHONY:
@@ -40,6 +40,8 @@ tex:
 	-latex -interaction=batchmode manual.tex
 	rm -f *.eps
 
+texfix:
+	./fix_tex.pl
 
 pdf:
 	cp -fp ${IMAGES}/hires/*.eps .
@@ -64,7 +66,7 @@ web:
 	cp ${IMAGES}/*.eps .
 	cp ${IMAGES}/*.eps apcupsd/
 	@rm -f next.*
-	latex2html -split 5 -local_icons -t "Apcupsd User's Guide" -long_titles 4 \
+	latex2html -split 4 -local_icons -t "Apcupsd User's Guide" -long_titles 4 \
 		-toc_stars -contents_in_nav -white -notransparent apcupsd >/dev/null
 	./translate_images.pl apcupsd/Apcupsd_Users_Guide.html
 	cp apcupsd/Apcupsd_Users_Guide.html apcupsd/index.html
