@@ -121,27 +121,27 @@ static struct {
  *
  */
 static int initialize_device_data(UPSINFO *ups) {
-    struct net_ups_internal_data *Nid = ups->driver_internal_data;
+    struct net_ups_internal_data *nid = ups->driver_internal_data;
     char *cp;
 
-    strcpy(Nid->device, ups->device);
+    strcpy(nid->device, ups->device);
 
     /*
      * Now split the device.
      */
-    Nid->hostname = Nid->device;
+    nid->hostname = nid->device;
 
-    cp = strchr(Nid->device, ':');
+    cp = strchr(nid->device, ':');
     if (cp) {
         *cp = '\0';
 	cp++;
-	Nid->port = atoi(cp);
+	nid->port = atoi(cp);
     } else {
-	Nid->port = ups->statusport;  /* use NIS port as default */
+	nid->port = ups->statusport;  /* use NIS port as default */
     }
 
-    Nid->statbuf[0] = '\0';
-    Nid->statlen = BIGBUF;
+    nid->statbuf[0] = '\0';
+    nid->statlen = BIGBUF;
 
     return SUCCESS;
 }
@@ -158,7 +158,7 @@ static int initialize_device_data(UPSINFO *ups) {
  */
 static int getupsvar(UPSINFO *ups, char *request, char *answer, int anslen)
 {
-    struct net_ups_internal_data *Nid = ups->driver_internal_data;
+    struct net_ups_internal_data *nid = ups->driver_internal_data;
     int i;
     char *stat_match = NULL;
     char *find;
@@ -171,7 +171,7 @@ static int getupsvar(UPSINFO *ups, char *request, char *answer, int anslen)
 	}
 
     if (stat_match) {
-	if ((find=strstr(Nid->statbuf, stat_match)) != NULL) {
+	if ((find=strstr(nid->statbuf, stat_match)) != NULL) {
 	     if (nfields == 1) {      /* get one field */
                  sscanf (find, "%*s %*s %s", answer);
 	     } else {			  /* get everything to eol */
@@ -202,7 +202,7 @@ static int getupsvar(UPSINFO *ups, char *request, char *answer, int anslen)
  */
 static int fill_status_buffer(UPSINFO *ups) 
 {
-    struct net_ups_internal_data *Nid = ups->driver_internal_data;
+    struct net_ups_internal_data *nid = ups->driver_internal_data;
     int n, stat = 1;
     char buf[1000];
     static time_t last_fill_time = 0;
@@ -215,38 +215,43 @@ static int fill_status_buffer(UPSINFO *ups)
     }
     last_fill_time = now;
 
-    Nid->statbuf[0] = 0;
-    Nid->statlen = 0;
+    nid->statbuf[0] = 0;
+    nid->statlen = 0;
     Dmsg2(20, "Opening connection to %s:%d\n",
-	    Nid->hostname, Nid->port);
-    if ((Nid->sockfd = net_open(Nid->hostname, NULL, Nid->port)) < 0) {
+	    nid->hostname, nid->port);
+    if ((nid->sockfd = net_open(nid->hostname, NULL, nid->port)) < 0) {
         log_event(ups, LOG_ERR, "fetch_data: tcp_open failed for %s port %d",
-		Nid->hostname, Nid->port);
+		nid->hostname, nid->port);
+	set_ups(UPS_COMMLOST);
 	return 0;
     }
 
-    if (net_send(Nid->sockfd, "status", 6) != 6) {
+    if (net_send(nid->sockfd, "status", 6) != 6) {
         log_event(ups, LOG_ERR, "fill_buffer: write error on socket.");
+	set_ups(UPS_COMMLOST);
 	return 0;
     }
 
     Dmsg0(99, "===============\n");
-    while ((n = net_recv(Nid->sockfd, buf, sizeof(buf)-1)) > 0) {
+    while ((n = net_recv(nid->sockfd, buf, sizeof(buf)-1)) > 0) {
 	buf[n] = 0;
-	strcat(Nid->statbuf, buf);
-        Dmsg3(99, "Partial buf (%d, %d):\n%s",n,strlen(Nid->statbuf), buf);
+	strcat(nid->statbuf, buf);
+        Dmsg3(99, "Partial buf (%d, %d):\n%s",n,strlen(nid->statbuf), buf);
     }
     Dmsg0(99, "===============\n");
 
     if (n < 0) {
 	stat = 0;
+	set_ups(UPS_COMMLOST);
+    } else {
+	clear_ups(UPS_COMMLOST);
     }
 
-    net_close(Nid->sockfd);
+    net_close(nid->sockfd);
 
-    Dmsg1(99, "Buffer:\n%s\n", Nid->statbuf);
+    Dmsg1(99, "Buffer:\n%s\n", nid->statbuf);
 
-    Nid->statlen = strlen(Nid->statbuf);
+    nid->statlen = strlen(nid->statbuf);
     return stat;
 }
 
@@ -254,11 +259,12 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
 {
     char answer[200];
     int stat = 1;
+    int32_t newStatus;		      /* this really should be uint32_t! */
 
     write_lock(ups);
 
     if (fill) {
-       fill_status_buffer(ups);
+       stat = fill_status_buffer(ups);
     }
 
     answer[0] = 0;
@@ -267,46 +273,51 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
         Dmsg0(100, "HEY!!! Couldn't get status flag.\n");
 	stat = 0;
     } else {
-       /* We probably do not want the local junk that is exported -- KES */
-       ups->Status |= strtol(answer, NULL, 0);
+	/*
+         * Make sure we don't override local bits, and that
+	 * all non-local bits are set/cleared correctly.
+	 */
+	newStatus = strtol(answer, NULL, 0);
+	newStatus &= ~UPS_LOCAL_BITS;	  /* clear local bits */
+	ups->Status &= UPS_LOCAL_BITS;	  /* clear non-local bits */
+	ups->Status |= newStatus;	  /* set new non-local bits */
     }
-    Dmsg2(100, "Got Status = %s %03x\n", answer, ups->Status);
+    Dmsg2(100, "Got Status = %s 0x%x\n", answer, ups->Status);
 
-    if (UPS_ISSET(UPS_SHUTDOWN)) {
-	UPS_SET(UPS_SHUT_REMOTE);  /* if master is shutting down so do we */
+    if (is_ups_set(UPS_SHUTDOWN)) {
+	set_ups(UPS_SHUT_REMOTE);  /* if master is shutting down so do we */
     }
 
-    write_unlock(ups);
 
     /* If we lost connection with master and we
      * are running on batteries, shutdown now
      */
-    if (stat == 0 && UPS_ISSET(UPS_ONBATT)) {
-	write_lock(ups);
-	UPS_SET(UPS_SHUT_REMOTE);
-	write_unlock(ups);
+    if (stat == 0 && is_ups_set(UPS_ONBATT)) {
+	set_ups(UPS_SHUT_REMOTE);
     }
+
+    write_unlock(ups);
     return stat;
 }
 
 
 int net_ups_open(UPSINFO *ups) 
 {
-    struct net_ups_internal_data *Nid;
+    struct net_ups_internal_data *nid;
 
-    Nid = malloc(sizeof(struct net_ups_internal_data));
-    if (Nid == NULL) {
+    nid = malloc(sizeof(struct net_ups_internal_data));
+    if (nid == NULL) {
         log_event(ups, LOG_ERR, "Out of memory.");
 	exit(1);
     }
-    memset(Nid, 0, sizeof(struct net_ups_internal_data));
+    memset(nid, 0, sizeof(struct net_ups_internal_data));
 
-    ups->driver_internal_data = Nid;
+    ups->driver_internal_data = nid;
 
     initialize_device_data(ups);
 
     /*
-     * Fake core code. Will go away when ups->fd will be cleaned up.
+     * Fake core code. Will go away when ups->fd is cleaned up.
      */
     ups->fd = 1;
 

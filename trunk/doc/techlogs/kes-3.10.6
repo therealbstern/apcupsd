@@ -6,6 +6,13 @@ General:
 
 Changes submitted this submission:
 08Jul03
+- As reported by Brandon Applegate, the net driver was not 
+  clearing old flags after a power failure. In fact, it was
+  really screwed up -- it always or'ed in the new bits thus
+  keeping any old status, and blasting out any local bits.
+  Fixed hopefully.
+- Made a new set of defines for setting/clearing/testing ups
+  Status bits that is much easier to read.
 - Added Sergey Vlasov's second USB kernel patch to the examples
   directory.  The two patches can be found in:
     linux-2.4.20-killpower.patch
