@@ -124,7 +124,7 @@ typedef struct upsdriver {
     /*
      * Data side of the driver structure.
      */
-    char *driver_name;
+    const char *driver_name;
 
     /*
      * Functions side of the driver structure.

@@ -101,47 +101,6 @@ int apc_enable(UPSINFO *ups)
     return 1;
 }
 
-/*
- * Helper functions for smart_poll. These are generic functions but when
- * there are too specialized tasks, like malloc the buffer or don't check
- * the ups link, call directly the smart_poll as this way you will be
- * doing something out of the ordinary tasks.
- */
-
-/*
- * apc_write: write a command to UPS but don't read the answer.
- */
-int apc_write(char cmd, UPSINFO *ups)
-{
-    if (write(ups->fd, &cmd, 1) != 1) {
-        log_event(ups, LOG_ERR, "Error writing to UPS. ERR=%s",
-		  strerror(errno));
-	return FAILURE;
-    }
-    return SUCCESS;
-}
-
-/*
- * apc_read: read an answer from UPS without writing a command.
- * This means that a command has been previously sent and now we
- * are reading the answer.
- */
-char *apc_read(UPSINFO *ups)
-{
-    static char line[1000];
-    getline(line, sizeof(line), ups);
-    return line;
-}
-
-/*
- * apc_chat_static: full chat with the ups, write a command and
- * read the answer. Return a ptr to static buffer.
- */
-char *apc_chat(char cmd, UPSINFO *ups)
-{
-    return smart_poll(cmd, ups);
-}
-
 /********************************************************************* 
  *
  * Send a charcter to the UPS and get
