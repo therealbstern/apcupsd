@@ -74,6 +74,7 @@ int dumb_ups_kill_power(UPSINFO *ups)
 	    (void) ioctl(ups->fd, TIOCMBIS, &serial_bits);
 	    (void) ioctl(ups->fd, TIOCMBIS, &serial_bits);
 	    (void) ioctl(ups->fd, TIOCMBIS, &serial_bits);
+	    sleep(10);		      /* hold for 10 seconds */
 	    serial_bits = TIOCM_ST;
 	    (void) ioctl(ups->fd, TIOCMBIS, &serial_bits);
 	    break;
@@ -87,7 +88,7 @@ int dumb_ups_kill_power(UPSINFO *ups)
 	    (void) ioctl(ups->fd, TIOCMBIS, &serial_bits);
 	    (void) ioctl(ups->fd, TIOCMBIS, &serial_bits);
 	    (void) ioctl(ups->fd, TIOCMBIS, &serial_bits);
-	    sleep(5);		      /* hold for at least 5 seconds */
+	    sleep(10);		      /* hold for at least 10 seconds */
 	    break;
 
 	case APC_940_0023A:	 /* killpwr_bit */
@@ -100,6 +101,7 @@ int dumb_ups_kill_power(UPSINFO *ups)
 	    (void) ioctl(ups->fd, TIOCMBIS, &serial_bits);
 	    (void) ioctl(ups->fd, TIOCMBIS, &serial_bits);
 	    (void) ioctl(ups->fd, TIOCMBIS, &serial_bits);
+	    sleep(10);		      /* hold */
 	    break;
 
 	case CUSTOM_SMART:
