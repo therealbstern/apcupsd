@@ -29,12 +29,15 @@ my $hyphsp = '\\s\\-{2,}\\s';
 # # This identifies other multiple hyphens.
 my $hyphens = '\\-{2,}';
 
+# This protects "protected" hyphen strings, such as for mdash and ndash.
+my $protected_hyphens = '\\{\\-{2,}\\}';
+
 # # This identifies \hyperpage{..} commands, which should be ignored.
 my $hyperpage = '\\\\hyperpage\\*?\\{.*?\\}';
 
 # # This builds the actual test string from the above strings.
 # #my $teststr = "$verbatimenv|$verb|$tocentry|$hyphens";
-my $teststr = "$verbatimenv|$verb|$hyphsp|$hyperpage|$hyphens";
+my $teststr = "$verbatimenv|$verb|$hyphsp|$protected_hyphens|$hyperpage|$hyphens";
 
 
 sub get_includes {

@@ -298,6 +298,8 @@ $htmlEntity{"yacute"} = "\\'y";
 $htmlEntity{"thorn"} = '';
 $htmlEntity{"yuml"} = '\"y';
 $htmlEntity{"quot"} = '&htmlQuote';
+$htmlEntity{"mdash"} = '{--}';  # KEC 3-21-05
+$htmlEntity{"ndash"} = '{---}';  # KEC 3-21-05
 
 
 #
