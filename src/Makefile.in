@@ -26,38 +26,43 @@ allexe = apcupsd @APCTEST@ @APCACCESS@ @SMTP@ @POWERFLUTE@ @APCNISD@
 @TARGETS@
 
 all-targets: $(allexe)
+ 
+#
+# Note, in some cases, all the libraries are not needed on the 
+#   dependencies, but it really does little harm and avoids missing one.
+#
 
-apcupsd: $(dobjs) $(gobjs) $(WINAPC)
+apcupsd: $(dobjs) $(gobjs) $(WINAPC) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
 	$(CC) $(LDFLAGS) $(WLDFLAGS) $(dobjs) $(gobjs) $(LIBS) $(WINAPC) $(WINLIBS) -o apcupsd
 
-apcnisd: $(nobjs) 
+apcnisd: $(nobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
 	$(CC) $(LDFLAGS) $(nobjs) $(LIBS) -o apcnisd
 
 # apctest is non-Windowing
-apctest.o: apctest.c
+apctest.o: apctest.c 
 	$(CC) -c $(CFLAGS) $(DEFS) $<
 
-apctest: $(tobjs) $(gobjs)
+apctest: $(tobjs) $(gobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
 	$(CC) $(LDFLAGS) $(tobjs) $(gobjs) $(LIBS) -o apctest
 
-devicedbg: $(xobjs)
+devicedbg: $(xobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
 	$(CC) $(LDFLAGS) $(xobjs) $(LIBS) -o devicedbg
 
 # apcaccess is non-Windowing
-apcaccess.o: apcaccess.c
+apcaccess.o: apcaccess.c 
 	$(CC) -c $(CFLAGS) $(DEFS) $<
 
-apcaccess: $(aobjs)
+apcaccess: $(aobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
 	$(CC) $(LDFLAGS) $(aobjs) $(LIBS) -o apcaccess
  
 # smtp is non-Windowing
 smtp.o: smtp.c
 	$(CC) -c $(CFLAGS) $(DEFS) $<
    
-smtp: $(sobjs)
+smtp: $(sobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
 	$(CC) $(LDFLAGS) $(sobjs) $(LIBS) -o smtp
  
-powerflute: $(fobjs)
+powerflute: $(fobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
 	$(CC) $(LDFLAGS) $(fobjs) $(LIBS) @POWERLIBS@ -o powerflute
 
 install: install-binary
