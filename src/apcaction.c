@@ -293,6 +293,50 @@ static enum a_state get_state(UPSINFO *ups, time_t now)
     return state;
 }
 
+/*
+	Carl Lindberg <lindberg@clindberg.org> patch applied 24Dec04
+
+	The APC network management cards have options to shut down, reboot, or 
+        "sleep" (really just a delayed reboot) the UPS.  For all of these, it 
+        has a "graceful" option, meaning it gives the PowerChute software a 
+	chance to cleanly shutdown the machine before the UPS is shut down.  To 
+	do this, the card sets the ONBATT and LOWBATT statuses at the same 
+	time, waits several minutes, then cuts power.  PowerChute (presumably) 
+	notices this and shuts the machine down, but unfortunately apcupsd did 
+	not.
+
+	The problem happens because in this situation, apcupsd sets the 
+	UPS_PREV_BATTLOW status before testing for it.	In the do_action() 
+	function, apcupsd notices the ONBATT status, and uses the 
+        "st_PowerFailure" state to send off an initial power failure event.   
+	After a short delay, do_action() is invoked again.    If ONBATT is 
+        still set, the "st_OnBattery" state is used, and the onbattery event 
+	(among other things) is sent.
+
+	The test for LOWBATT to see if shutdown is needed is only done in the 
+        st_OnBattery state, and it's done if LOWBATT is set but 
+	UPS_PREV_BATTLOW is not set yet.  In normal operation, LOWBATT will 
+	only come on after a period of ONBATT, and this situation works fine.  
+	However, since ONBATT and LOWBATT were set simultaneously, the 
+	UPS_PREV_BATTLOW was set the first time through, when the 
+	st_PowerFailure was used, meaning the test for LOWBATT was not 
+	performed.  The second time through in st_OnBattery, UPS_PREV_BATTLOW 
+	is already set, meaning apcupsd is assuming that the needed shutdown 
+	has already been invoked.
+
+	The code fix just moves setting of the UPS_PREV_BATTLOW status to 
+	inside the block that tests for it, ensuring that LOWBATT will never be 
+	ignored.  Clearing the UPS_PREV_BATTLOW status remains where it is in 
+	the code, and it will always be turned off if LOWBATT is no longer set.
+
+	After the fix, UPS_PREV_BATTLOW is not prematurely set, and apcupsd 
+        catches the signal from the management card to shut down.  I've had the 
+        code in for over a month, and it's worked fine, both from using the 
+	management card and regular pull-the-plug tests as well.   This was 
+	only tested with a serial UPS, but I assume it would be a problem with 
+	USB and SNMP connections as well.
+*/
+
 /*********************************************************************/
 void do_action(UPSINFO *ups)
 {
@@ -423,6 +467,7 @@ void do_action(UPSINFO *ups)
 	    if (!is_ups_set(UPS_PREV_BATTLOW) && is_ups_set(UPS_BATTLOW)) {
 		clear_ups(UPS_ONBATT_MSG);
 		generate_event(ups, CMDFAILING);
+		set_ups(UPS_PREV_BATTLOW);
 		break;
 	    }
 
@@ -581,9 +626,7 @@ void do_action(UPSINFO *ups)
     } else {
 	clear_ups(UPS_PREV_ONBATT);
     }
-    if (is_ups_set(UPS_BATTLOW)) {
-	set_ups(UPS_PREV_BATTLOW);
-    } else {
+    if (!is_ups_set(UPS_BATTLOW)) {
 	clear_ups(UPS_PREV_BATTLOW);
     }
 
