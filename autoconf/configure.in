@@ -1389,7 +1389,7 @@ sun)
 	DISTVER=Solaris
 	SERIALDEV=/dev/ttya
 	PWRFAILDIR=/etc
-	PIDDIR=/var/run/apcupsd
+	PIDDIR=/var/run
 	LOCKDIR=/var/spool/locks
 	LOGDIR=${sysconfdir}
 dnl
