@@ -63,9 +63,9 @@ void log_event(const UPSINFO *ups, int level, const char *fmt, ...)
     va_list  arg_ptr;
     char msg[2*MAXSTRING];
     char datetime[MAXSTRING];
-    int event_fd = ups->event_fd;
+    int event_fd;
 
-    event_fd = ups->event_fd;
+    event_fd = ups ? ups->event_fd : -1;
 
     va_start(arg_ptr, fmt);
     avsnprintf(msg, sizeof(msg), fmt, arg_ptr);
