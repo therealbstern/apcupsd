@@ -34,3 +34,13 @@ you can do by following the instructions at
 http://lists.sourceforge.net/lists/listinfo/apcupsd-users</a>
 The same link can be used to modify your preferences or unsubscribe
 as long as you have your password.
+
+<h2>apcupsd-commits</h2> 
+The <b>apcupsd-commits</b> list is a READ-ONLY list to which you
+may subscribe to receive diffs of CVS commits. Please do not send
+emails to this list. You may subscribe by following the instructions at
+<a href="http://lists.sourceforge.net/lists/listinfo/apcupsd-commits">
+http://lists.sourceforge.net/lists/listinfo/apcupsd-commits</a>
+The same link can be used to modify your preferences or unsubscribe
+as long as you have your password.
+

@@ -45,6 +45,7 @@ void clear_files(void)
     if (statusfile != NULL) {
 	fflush(statusfile);
 	fclose(statusfile);
+	statusfile = NULL;
     }
 }
 
