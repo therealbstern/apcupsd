@@ -1,8 +1,11 @@
              Technical notes on version 3.10.12
-                       07 February 2004
+                       11 February 2004
                         Kern Sibbald
 
 General:
+- Move install.xml to install.kml and implement simpler html directives in
+  docbook.  Modify Makefile to convert html back into docbook.
+- Change references to serial port in apctest to device (USB included).
 - Minor updates to the documentation from user input.
 - Fix a Makefile find that removes zero length files, which fails                 
   on some systems.

@@ -3,24 +3,49 @@
 #  Makefile for docbook
 #
 
+first_rule: all
+
 out="/tmp/db_tmp"
 
-all:	html web pdf
+.SUFFIXES:     .xml .kml
+.PHONY:
 
-html:	manual.xsl manual.xml
+install.xml: install.kml
+	@echo "s%<b>%<emphasis role=\"bold\">%g" >${out}
+	@echo "s%</b>%</emphasis>%g" >> ${out}
+	@echo "s%<p>%<para>%g" >> ${out}
+	@echo "s%</p>%</para>%g" >> ${out}
+	@echo "s%<ol>%<orderedlist>%g" >> ${out}
+	@echo "s%</ol>%</orderedlist>%g" >> ${out}
+	@echo "s%<li>%<listitem>%g" >> ${out}
+	@echo "s%</li>%</listitem>%g" >> ${out}
+	sed -f ${out} $< >$@
+	@rm -f ${out}
+
+all:	manual.html web pdf
+
+manual.html: install.xml manual.xsl manual.xml
 	xmlto -m manual.xsl xhtml-nochunks manual.xml
+	@rm -f install.xml
+	@echo "html manual built"
 
-web:	manual.xsl manual.xml
-	xmlto -m manual.xsl -o html html manual.xml
+web:	install.xml manual.xsl manual.xml
+	xmlto -m manual.xsl -o html html manual.xml >/dev/null 2>&1
+	@if [ $$? = 0 ] ; then \
+	   echo "web html manual build"; \
+	else \
+	   echo "Error building web manual"; \
+	fi
+	@rm -f install.xml
 
-pdf:
-	echo "s%<a id=\"%<a name=\"%g" >${out}
-	echo "s%href=\"#%href=\"manual.html#%g" >>${out}
-	echo "s%Â%\&nspb;%g" >>${out}
-	rm -f 1
-	cp manual.html 1
-	sed -f ${out} 1 >manual.html
-	@rm -f 1 ${out}
+pdf:	manual.html
+	@echo "s%<a id=\"%<a name=\"%g" >${out}
+	@echo "s%href=\"#%href=\"manual.html#%g" >>${out}
+	@echo "s%Â%\&nspb;%g" >>${out}
+	@cp -f manual.html broken_manual.html
+	sed -f ${out} broken_manual.html >manual.html
+	@rm -f broken_manual.html ${out}
+	@echo "html manual sanitized for pdf production"
 	  
 
 
