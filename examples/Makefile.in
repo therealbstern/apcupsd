@@ -51,7 +51,7 @@ clean: targetclean
 distclean: targetdistclean
 	$(RMF) safe.apccontrol
 	$(RMF) gui/client@EXEEXT@
-	$(RMF) Makefile
+	$(RMF) Makefile .cvsignore gui/.cvsignore
 	@rm -rf CVS gui/CVS
 
 # -----------------------------------------------------------------------

@@ -241,7 +241,10 @@ configuration (default) with <b>--enable-nis</b>.
         Additionally you can listen for a single IP like 192.168.10.1.
         You may also use the <b>--with-nisip=</b> option on the
         <b>./configure</b> program to set this directive during
-        the configuration phase. </dd>
+        the configuration phase. 
+        <p>
+        This directive does not work on Win32 machines because
+        inet_ipton() is not implemented there. </dd>
 
    <dt><a name="NISPORT"></a>
         NISPORT &lt;port&gt; 
