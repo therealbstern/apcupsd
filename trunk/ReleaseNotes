@@ -1,0 +1,28 @@
+
+          Release Notes for Apcupsd 3.10.6
+
+
+Major Changes this Release:
+
+- Full kill power for USB UPSes is supported if you apply the kernel
+  patch supplied by Sergey Vlasov.  See the examples directory.
+- Version 3.10.6 (as opposed to 3.8.x) has device specific drivers,
+  and thus can have a much smaller footprint by turning off unused
+  drivers.
+- There is a new networking driver that uses the NIS interface
+  rather than the older master/slave networking.
+- Win32 daemons work much better with a new version of cygwin.
+- Using a special cable (easy to build), you can run your APC
+  USB UPSes in serial mode.
+
+
+
+Other Changes this Release:
+
+- The rpms now build without being root.
+- A number of bug fixes.
+- Support for additional systems.
+- Support for system gd program rather than older version we
+  supply.
+
+Items to note:  !!!!!
