@@ -30,6 +30,7 @@
  */
 
 #include "apc.h"
+#include <termios.h>
 
 UPSINFO *core_ups;
 UPSINFO *ups;
@@ -70,6 +71,7 @@ static void do_usb_testing();
 static void usb_kill_power_test();
 static void program_smart_eeprom();
 static void print_eeprom_values(UPSINFO *ups);
+static void smart_ttymode();
 
 static void strip_trailing_junk(char *cmd);
 static char *get_cmd(char *prompt);
@@ -160,8 +162,6 @@ void apctest_terminate(int sig)
 
     clean_threads();
 
-
-    pmsg("apctest shutdown succeeded\n");
     closelog();
     destroy_ups(ups);
     _exit(0);
@@ -172,7 +172,7 @@ void apctest_error_cleanup(UPSINFO *ups)
     device_close(ups);
     delete_lockfile(ups);
     clean_threads();
-    pmsg("apctest error shutdown completed\n");
+    pmsg("apctest error termination completed\n");
     closelog();
     destroy_ups(ups);
     exit(1);
@@ -905,7 +905,8 @@ Please select the function you want to perform.\n");
 3) Abort Battery Calibration\n\
 4) Monitor Battery Calibration progress\n\
 5) Program EEPROM\n\
-6) Quit\n\n");
+6) Enter TTY mode communicating with UPS\n\
+7) Quit\n\n");
 
       cmd = get_cmd("Select function number: ");
       if (cmd) {
@@ -927,6 +928,9 @@ Please select the function you want to perform.\n");
 	       program_smart_eeprom();
 	       break;
 	    case 6:
+	       smart_ttymode();
+	       break;
+	    case 7:
 	       quit = TRUE;
 	       break;
 	    default:
@@ -940,6 +944,62 @@ Please select the function you want to perform.\n");
    ptime();
    pmsg("End apctest.\n");
 }
+
+static void smart_ttymode()
+{
+   char ch;
+   struct termios t, old_term_params;
+   fd_set rfds;
+   int stat;
+
+   if (tcgetattr(0, &old_term_params) != 0) {
+      pmsg("Cannot tcgetattr()\n");
+      return;
+   }
+   t = old_term_params; 			
+   t.c_cc[VMIN] = 1; /* satisfy read after 1 char */
+   t.c_cc[VTIME] = 0;
+   t.c_iflag &= ~(BRKINT | IGNPAR | PARMRK | INPCK | 
+		  ISTRIP | ICRNL | IXON | IXOFF | INLCR | IGNCR);     
+   t.c_iflag |= IGNBRK;
+   t.c_lflag &= ~(ICANON | ISIG | NOFLSH | TOSTOP);
+   tcflush(0, TCIFLUSH);
+   if (tcsetattr(0, TCSANOW, &t) == -1) {
+      pmsg("Cannot tcsetattr()\n");
+      return;
+   }
+
+   pmsg("Enter an ESC character (or ctl-[) to exit.\n\n");
+
+   tcflush(ups->fd, TCIOFLUSH);
+   for (;;) {
+      FD_ZERO(&rfds);
+      FD_SET(0, &rfds);
+      FD_SET(ups->fd, &rfds);
+      stat = select((ups->fd)+1, &rfds, NULL, NULL, NULL);  
+      if (stat == -1) {
+         pmsg("select() failed.\n");
+	 break;
+      }
+      if (FD_ISSET(0, &rfds)) {
+	 if (read(0, &ch, 1) != 1) {
+	    break;
+	 }
+	 if (ch == 0x1B) {
+	    break;
+	 }
+	 write(ups->fd, &ch, 1);
+      }    
+      if (FD_ISSET(ups->fd, &rfds)) {
+	 if (read(ups->fd, &ch, 1) != 1) { 
+	    break;
+	 }
+	 write(1, &ch, 1);
+      }
+   }
+   tcsetattr(0, TCSANOW, &old_term_params);
+}
+
 
 /*
  * Do runtime battery calibration
