@@ -32,6 +32,16 @@ either <filename>/dev/usb/hid/hiddev[0-15]</filename> (on non-Red-Hat
 systems) or <filename>/dev/usb/hiddev[0-15]</filename> (on Red Hat
 systems). Note, please enter the device names <emphasis>exactly</emphasis>
 as written above brackets, numbers, dash and all.</para>
+<para>
+If the first time you execute <application>apcupsd</application>, you get
+a message to the effect that the Apcupsd USB driver is missing, it means
+that you most likely forgot to put <emphasis>--enable-usb</emphasis> on
+your <filename>./configure</filename> command line. If you loaded        
+<application>apcupsd</application> from an rpm file, you may have
+selected the wrong one -- please ensure that the word <emphasis>usb</emphasis>
+appears in the rpm package name.
+</para>
+
 
 <para>The <link linkend="config-examples">next chapter</link> of this
 manual provides you with the essential characteristics of each main type
