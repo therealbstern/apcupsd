@@ -36,7 +36,7 @@ sharenet.type = DISABLE
 cable.type = USB_CABLE
 
 You are using a USB cable type, so I'm entering USB test mode
-modae.type = USB_UPS
+model.type = USB_UPS
 Setting up the port ...
 Creating the device lock file ...
 Hello, this is the apcupsd Cable Test program.
