@@ -391,7 +391,12 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups) {
     powernet_mib_mgr_get_upsBasicOutput(s, &(data->upsBasicOutput));
     if (data->upsBasicOutput) {
         /* Clear the following flags: only one status will be TRUE */
-        UPS_CLEAR(UPS_ONLINE|UPS_ONBATT|UPS_SMARTBOOST|UPS_SMARTTRIM);
+        Dmsg1(99, "Status before clearing: %d\n", ups->Status);
+        UPS_CLEAR(UPS_ONLINE);
+        UPS_CLEAR(UPS_ONBATT);
+        UPS_CLEAR(UPS_SMARTBOOST);
+        UPS_CLEAR(UPS_SMARTTRIM);
+        Dmsg1(99, "Status after clearing: %d\n", ups->Status);
         switch(data->upsBasicOutput->__upsBasicOutputStatus) {
             case 2:
                 UPS_SET(UPS_ONLINE);
@@ -504,7 +509,12 @@ int powernet_snmp_ups_check_state(UPSINFO *ups) {
     powernet_mib_mgr_get_upsBasicOutput(s, &(data->upsBasicOutput));
     if (data->upsBasicOutput) {
         /* Clear the following flags: only one status will be TRUE */
-        UPS_CLEAR(UPS_ONLINE|UPS_ONBATT|UPS_SMARTBOOST|UPS_SMARTTRIM);
+        Dmsg1(99, "Status before clearing: %d\n", ups->Status);
+        UPS_CLEAR(UPS_ONLINE);
+        UPS_CLEAR(UPS_ONBATT);
+        UPS_CLEAR(UPS_SMARTBOOST);
+        UPS_CLEAR(UPS_SMARTTRIM);
+        Dmsg1(99, "Status after clearing: %d\n", ups->Status);
         switch(data->upsBasicOutput->__upsBasicOutputStatus) {
             case 2:
                 UPS_SET(UPS_ONLINE);
