@@ -55,7 +55,7 @@ cgibin = @CGIBIN@
 CSS_DIR = @CSS_DIR@
 
 # Ultrix 2.2 make doesn't expand the value of VPATH.
-VPATH = /usr/lib:/usr/local1/lib
+VPATH = /usr/lib:/usr/local/lib
 
 # source directory where this Makefile is placed.
 srcdir = @srcdir@
