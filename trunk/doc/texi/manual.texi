@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: manual.texi,v 1.1 2004-10-28 14:06:00 kerns Exp $
+@comment $Id: manual.texi,v 1.2 2004-10-30 16:12:50 kerns Exp $
 @c %***start of header
 @setfilename manual.info
 @finalout
@@ -22,12 +22,13 @@ Apcupsd UPS User's Manual
                                                                                      
 @titlepage
 @title Apcupsd User's Manual
+@subtitle Version 3.10.16
 @subtitle A UPS control program
 @author Kern Sibbald
 @page
-@c @vskip 0pt plus 1filll
+@vskip 0pt plus 1filll
                                                                                      
-This manual is for Apcupsd Version 3.10.6, a UPS
+This manual is for Apcupsd Version 3.10.16, a UPS
 control system that permits orderly shutdown of your
 computer in the event of a power failure.
                                                                                      
@@ -289,6 +290,7 @@ Credits
 
 @node Release Notes, How To Use This Manual, Top, Top
 @unnumbered Release Notes
+@cindex Release Notes
 
 This release contains a good number of cleanups and bug fixes to
 prior 3.10.x versions, and is intended to be the official release.
@@ -300,6 +302,7 @@ See the ChangeLog below for more details.
 
 @node New Features,,,Release Notes
 @section New Features
+@cindex New Features
 @example
 - Fix killpower on USB UPSes to properly turn off UPS.
 - Fix killpower sequence for serial UPSes.
@@ -356,7 +359,7 @@ Change Log for older versions
 - Fix localtime_r in configure.in as reported with patch by Adam.
 - Fixed bad html in multimoncss.c reported by an anonymous user.
 - Added new Mandrake apcupsd.spec.in submitted by David Walser.
-- Revert to using the old master/slave networking code bu default.
+- Revert to using the old master/slave networking code by default.
 
 --- Release apcupsd-3.10.10 (16 January 2004)
 - This version has an additional fix to the USB driver based on
@@ -402,14 +405,13 @@ Change Log for older versions
   Makefile detection of changes is all botched up. Since I don't understand
   how the author expected it to work, I used the sledgehammer approach and
   do a "make clean" on every ./configure.
-- Replaced apcnet.c with Howard Wilkinson's new master/slave code. If
-  anyone *really* needs the old driver, it is in src/apcnet.c.old
 - Upgraded to Cygwin 1.5.5
 
 @end example
 
 @node How To Use This Manual, Basic User's Guide, Release Notes, Top
 @unnumbered How To Use This Manual
+@cindex Using this Manual
 
 This is the manual for apcupsd, a
 daemon for communicating with UPSes (Uninterruptible Power Supplies)
@@ -422,27 +424,28 @@ computer running Linux, Unix, or Windows NT, you are reading the right
 document.
 
 This manual is divided into parts which increase in technical
-depth as they go.  If you have just bought a state-of-the-art smart
-UPS with a USB or Ethernet interface, and you are running a current
-version of Red Hat or SUSE Linux (8.0 or later), then
-apcupsd is very nearly plug-and-play and
-you will have to read only the Basic User's
-Guide (@pxref{Basic User's Guide}). 
+depth as they go.  If you have just bought a state-of-the-art
+smart UPS with a USB or Ethernet interface, and you are running a
+current version of Red Hat or SUSE Linux (8.0 or later), then
+apcupsd is very nearly plug-and-play and you will have to read
+only the Basic User's Guide (@pxref{Basic User's Guide}).
 
 If your operating system is older, or if you have an
-old-fashioned serial-line UPS, you'll have to read about serial installation (@pxref{Installation on Serial-Line UPSes}).  If you need
-more details about administration for unusual situations (such as a
-master/slave or multi-UPS setup) you'll need to read the section on
-advanced topics (@pxref{Advanced topics}).  Finally, there
-is a Technical Reference (@pxref{Technical Reference})
-section which gives full details on things like configuration 
-file directives and event-logging formats.
+old-fashioned serial-line UPS, you'll have to read about serial
+installation (@pxref{Installation on Serial-Line UPSes}).  If you
+need more details about administration for unusual situations
+(such as a master/slave or multi-UPS setup) you'll need to read
+the section on advanced topics (@pxref{Advanced topics}).
+Finally, there is a Technical Reference (@pxref{Technical
+Reference}) section which gives full details on things like
+configuration file directives and event-logging formats.
 
 You should begin by reading the Quick
 Start (@pxref{Quick Start for Beginners}) instructions.
 
 @node Basic User's Guide, Advanced topics, How To Use This Manual, Top
 @majorheading Basic User's Guide
+@cindex User's Guide
 
 @menu
 * Planning Your Installation::
@@ -459,6 +462,8 @@ Start (@pxref{Quick Start for Beginners}) instructions.
 
 @node Planning Your Installation, Building and Installing apcupsd, , Basic User's Guide
 @chapter Planning Your Installation
+@cindex Planning Installation
+@cindex Installation, Planning
 
 @menu
 * Quick Start for Beginners::
@@ -470,22 +475,20 @@ Start (@pxref{Quick Start for Beginners}) instructions.
 
 @node Quick Start for Beginners, Supported Operating Systems; UPSes and Cables, , Planning Your Installation
 @section Quick Start for Beginners
+@cindex Quick Start
 
 apcupsd is a complex piece of
 software, but most of its complexities are meant for dealing with
 older hardware and operating systems.  On current hardware and 
 software getting it running should not be very complicated.
 
-The following is a  help guide to the steps needed to get
-apcupsd set up and
-running as painlessly as possible.
+The following is a help guide to the steps needed to get apcupsd
+set up and running as painlessly as possible.
 
 @enumerate 
 
 @item
-First, check to see if
-apcupsd 
-supports your UPS and operating
+First, check to see if apcupsd supports your UPS and operating
 system (@pxref{Supported Operating Systems; UPSes and Cables}).
 
 @item
@@ -563,11 +566,14 @@ using, what operating system you are using, and anything else you
 think might be helpful.
 
 @item
-Read the manual sections on @uref{monitoring,monitoring} and @uref{maintaining,maintaining} your UPS.
+Read the manual sections on @uref{monitoring,monitoring} and
+@uref{maintaining,maintaining} your UPS. 
 @end enumerate
 
 @node Supported Operating Systems; UPSes and Cables, Choosing a Configuration Type, Quick Start for Beginners, Planning Your Installation
 @section Supported Operating Systems, UPSes and Cables
+@cindex Supported OSes
+@cindex OSes Supported
 
 Please note that due to the lack of Unix USB API standards,
 the USB code in apcupsd works only on Linux.  Drivers for other
@@ -604,17 +610,21 @@ describe the possible values here, because they're a good way to
 explain your UPS's single most important interface property ---
 the kind of protocol it uses to talk with its computer.
 
+@cindex UPSTYPE
+@cindex Keywords, USBTYPE
+
 @table @asis
 
 @item apcsmart
 An apcsmart UPS and its computer also communicate through an
 RS232C serial connection, but they actually use it as a character
 channel (2400bps, 8 data bits, 1 stop bit, no parity) and pass
-commands back and forth in a primitive
-language (@pxref{APC smart protocol}) resembling modem-control codes. The different APC UPSes
-all use closely related firmware, so the language doesn't vary much
-(later versions add more commands).  This class of UPS is in decline,
-rapidly being replaced in APC's product line by USB UPSes.
+commands back and forth in a primitive language (@pxref{APC smart
+protocol}) resembling modem-control codes.  The different APC
+UPSes all use closely related firmware, so the language doesn't
+vary much (later versions add more commands).  This class of UPS
+is in decline, rapidly being replaced in APC's product line by
+USB UPSes.
 
 @item usb
 A USB UPS speaks a universal well defined control language
@@ -634,6 +644,9 @@ This is the keyword to specify if you are using your
 UPS in Slave mode (i.e. the machine is not directly connected
 to the UPS, but to another machine which is),
 and it is connected to the Master via an ethernet connection.
+You must have apcupsd's Network Information Services NIS 
+turned on for this mode to work. It is a much simpler form
+of running a Slave than the old Master/Slave code.
 
 @item snmp
 SNMP UPSes communicate via an Ethernet NIC and firmware that
@@ -661,6 +674,7 @@ not be available with your unit.
 
 @noindent
 @anchor{type_table}
+@cindex UPSTYPE, table
 
 @multitable @columnfractions 0.25 0.25 0.25 0.25
 @item
@@ -694,14 +708,14 @@ ShareUPS Basic Port@tab dumb@tab 940-0020B, 940-0020C, 940-0023A@tab Supported
 @end multitable
 
 @node Choosing a Configuration Type, Apcupsd Known USB Issues, Supported Operating Systems; UPSes and Cables, Planning Your Installation
-@section Choosing a Configuration Type
+@cindex Choosing a Configuration Type
+@cindex Configuration Type
 
-There are three major ways of running
-apcupsd on your system. The first is a
-standalone configuration where apcupsd
-controls a single UPS, which powers a single computer.  This is the most
-common configuration.  If you're working with just one machine and one UPS,
-skip the rest of this section.
+There are three major ways of running apcupsd on your system.
+The first is a standalone configuration where apcupsd controls a
+single UPS, which powers a single computer.  This is the most
+common configuration.  If you're working with just one machine
+and one UPS, skip the rest of this section.
 
 Your choices become more interesting if you are running a
 small cluster or a big server farm.  Under those circumstances, it 
@@ -709,18 +723,17 @@ may not be possible or even desirable to pair a UPS with every single
 machine.  apcupsd supports some alternate
 arrangements.
 
-The second type of configuration is a master/slave
-configuration, where one UPS powers several computers, each of which
-runs a copy of apcupsd. The computer that
-controls the UPS is called the master, and the other computers are
-called slaves. The master copy of apcupsd
-communicates with and controls the slaves via an Ethernet connection.
-This type of configuration may be appropriate for a small cluster
-of machines. Some example configuration files for the master and the
-slave machines can be found in the examples 
-directory of the source distribution. The more recent examples are in
-master.apcupsd.conf and 
-slave.apcupsd.conf. 
+The second type of configuration is a master/slave configuration,
+where one UPS powers several computers, each of which runs a copy
+of apcupsd.  The computer that controls the UPS is called the
+master, and the other computers are called slaves.  The master
+copy of apcupsd communicates with and controls the slaves via an
+Ethernet connection.  This type of configuration may be
+appropriate for a small cluster of machines.  Some example
+configuration files for the master and the slave machines can be
+found in the examples directory of the source distribution.  The
+more recent examples are in master.apcupsd.conf and
+slave.apcupsd.conf.
 
 The third configuration (new with version 3.8.3), is where
 a single computer controls multiple UPSes. In this case, there are
@@ -738,8 +751,11 @@ Here is a diagram that summarizes the possibilities:
 @anchor{Configuration types_}
 
 @strong{Configuration types.}
-
-@image{main_configs,,,,png}
+@sp 1
+@example
+@image{main_configs}
+@end example
+@sp 1
 
 If you decide to set up one of these more complex
 configurations, see the Advanced Topics (@pxref{Advanced topics})
@@ -747,6 +763,8 @@ section for details.
 
 @node Apcupsd Known USB Issues, Checking Out Your USB Subsystem, Choosing a Configuration Type, Planning Your Installation
 @section Apcupsd Known USB Issues
+@cindex USB problems
+@cindex Problems, USB
 
 - @strong{Problem:} USB is only supported on Linux systems (there is now an
 experimental FreeBSD USB version). Although the configuration script
@@ -1032,6 +1050,7 @@ make hid-ups
 There should be no errors. Now assuming that everything has gone
 well to this point and that you have connected your USB UPS, enter:
 
+@cindex hid-ups
 @example
 
 ./hid-ups
@@ -1079,6 +1098,8 @@ directory for additional information and details.
 
 A typical USB section of a .config file might be:
 
+@cindex Kernel config
+@cindex config, Kernel
 @example
 
 #
@@ -1973,6 +1994,8 @@ PC:  Dev# 1, root hub, 2 ports, 12 Mbps
 
 @node Building and Installing apcupsd, After Installation, Planning Your Installation, Basic User's Guide
 @chapter Building and Installing apcupsd
+@cindex Building
+@cindex Installing
 
 @menu
 * Installation from Binary Packages::
@@ -1994,6 +2017,7 @@ PC:  Dev# 1, root hub, 2 ports, 12 Mbps
 
 @node Red Hat Linux, Microsoft Windows, , Installation from Binary Packages
 @subsection Red Hat Linux
+@cindex Installing, Red Hat
 
 For Red Hat systems, apcupsd is
 available in binary RPM format.  This is the simplest way to install.
@@ -2022,6 +2046,7 @@ directory, which on many systems is located in
 
 @node Microsoft Windows, , Red Hat Linux, Installation from Binary Packages
 @subsection Microsoft Windows
+@cindex Installing, Microsoft
 
 If you have a binary release of the Win32
 apcupsd, please see the instructions in the Advanced Topics (@pxref{Advanced topics}) section of this
@@ -2152,6 +2177,8 @@ subdirectories of @file{/etc/rc.d}).
 
 @node Verifying a Source Installation, Configure Options, Installation from Source, Building and Installing apcupsd
 @section Verifying a Source Installation
+@cindex Verifying Source
+@cindex Installing, Source
 
 There are a number of things that you can do to check if the
 installation (make install) went well. The fist is to check where the
@@ -2254,6 +2281,8 @@ master.
 
 @node Configure Options, Recommended Options for most Systems, Verifying a Source Installation, Building and Installing apcupsd
 @section Configure Options
+@cindex configure options
+@cindex options, configure
 
 All the available @code{configure} options can be
 printed by entering:
@@ -2279,10 +2308,12 @@ The following command line options are available for
 
 @table @asis
 
+@cindex options, ---prefix
 @item --prefix=<path>
 This defines the directory for the non-executable files such as
 the manuals. The default is @strong{/usr}.
 
+@cindex options, ---sbindir
 @item --sbindir=<path>
 This defines the directory for the executable files such as
 apcupsd. The default is
@@ -2295,12 +2326,14 @@ calling apcupsd to turn off the UPS power.
 Though your data will be protected, in this case, your system will
 probably not be automatically rebooted when the power returns.
 
+@cindex options, ---enable-powerflute
 @item --enable-powerflute
 This option enables the building of the 
 powerflute executable, which is a ncurses
 based program to monitor the UPS. This program is not necessary for 
 the proper execution of apcupsd.
 
+@cindex options, ---enable-cgi
 @item --enable-cgi
 This enables the building of the CGI programs that permit Web
 browser access to apcupsd data. This option
@@ -2321,7 +2354,10 @@ CGI program.
 
 @item --enable-master-slave
 Turns on the master/slave networking code (default). This is
-sometimes referred to as the old master/slave code
+sometimes referred to as the old master/slave code, and
+is more complicated than using NIS and the net driver to
+control Slaves (see below).
+
 
 @item --enable-apcsmart
 Turns on generation of the APC Smart driver (default).
@@ -2336,7 +2372,7 @@ default this is disabled.
 
 @item --enable-net
 Turns on generation of the NIS network driver for slaves. This
-is an alternative to master/slave code. For the master, this code
+is an alternative to old master/slave code. For the master, this code
 should be disabled. For each slave, this is the only driver needed.
 This driver works by reading the information from the the
 configured master using the NIS (Network Information Services)
@@ -2495,6 +2531,7 @@ follows:
 
 @node Compilers and Options, Operating System Specifics, Recommended Options for most Systems, Building and Installing apcupsd
 @section Compilers and Options
+@cindex compiler options
 
 Some systems require unusual options for compilation or linking
 that the @code{./configure} script does not know about. You can
@@ -2535,6 +2572,7 @@ or simply see the previous section of this manual.
 
 @node Operating System Specifics, , Compilers and Options, Building and Installing apcupsd
 @section Operating System Specifics
+@cindex OSes
 
 With the exception of Linux SUSE and Linux Red Hat systems used
 by the developers, we rely on users to help create installation
@@ -2605,6 +2643,8 @@ Win32 (@pxref{Windows Systems with CYGWIN Installed})
 
 @node Alpha, Debian, , Operating System Specifics
 @subsection Alpha
+@cindex Alpha
+@cindex OS, Alpha
 
 The Alpha V4.0 version of apcupsd
 builds without compiler errors with gcc version 2.95.2. It is unlikely
@@ -2641,6 +2681,8 @@ The start/stop script can be found in:
 
 @node Debian, FreeBSD, Alpha, Operating System Specifics
 @subsection Debian
+@cindex Debian
+@cindex OS, Debian
 
 This port is complete and is operation by several users. Since
 Debian build and install procedures are somewhat particular, we have
@@ -2666,6 +2708,8 @@ site at:
 
 @node FreeBSD, HPUX, Debian, Operating System Specifics
 @subsection FreeBSD
+@cindex FreeBSD
+@cindex OS, FreeBSD
 
 This port is complete and is being used by several users. As of
 version 3.8.3, we do not recommend that you compile
@@ -2691,12 +2735,16 @@ the use of pthreads.
 
 @node HPUX, NetBSD, FreeBSD, Operating System Specifics
 @subsection HPUX
+@cindex HPUX
+@cindex OS, HPUX
 
 We have no reports from testing this yet on version 3.8.4, but
 worked fine on 3.8.1
 
 @node NetBSD, OpenBSD, HPUX, Operating System Specifics
 @subsection NetBSD
+@cindex NetBSD
+@cindex OS, NetBSD
 
 Submitted during development of 3.8.2, this should be a complete
 distribution.  Please read the comments on the pthreads implementation
@@ -2707,6 +2755,8 @@ the use of pthreads.
 
 @node OpenBSD, Red Hat Systems, NetBSD, Operating System Specifics
 @subsection OpenBSD
+@cindex OpenBSD
+@cindex OS, OpenBSD
 
 Ensure that you read the
 @file{distributions/openbsd/README} file before running
@@ -2742,6 +2792,8 @@ of the program (apcupsd).
 
 @node Red Hat Systems, Slackware, OpenBSD, Operating System Specifics
 @subsection Red Hat Systems
+@cindex Red Hat
+@cindex OS, Red Hat
 
 Red Hat systems are fully supported, and by following the
 standard installation instructions given above, you should experience
@@ -2749,6 +2801,8 @@ few or no problems.
 
 @node Slackware, SUSE, Red Hat Systems, Operating System Specifics
 @subsection Slackware
+@cindex Slackware
+@cindex OS, Slackware
 
 Slackware systems are fully supported, and by following the
 standard installation instructions given above, you should experience
@@ -2756,6 +2810,8 @@ few or no problems.
 
 @node SUSE, Sun Solaris, Slackware, Operating System Specifics
 @subsection SUSE
+@cindex SuSE
+@cindex OS, SuSE
 
 SUSE systems are fully supported, and by following the
 standard installation instructions given above, you should experience
@@ -2763,6 +2819,9 @@ few or no problems.
 
 @node Sun Solaris, Unknown System, SUSE, Operating System Specifics
 @subsection Sun Solaris
+@cindex Sun
+@cindex Solaris
+@cindex OS, Solaris
 
 Please read this before attempting to compile or install the
 beta software. It contains important information that will make your
@@ -2996,6 +3055,8 @@ Development Team.
 
 @node Unknown System, Windows Systems with CYGWIN Installed, Sun Solaris, Operating System Specifics
 @subsection Unknown System
+@cindex Unknown System
+@cindex OS, Unknown System
 
 During the @code{./configure}, if
 apcupsd does not find one of the systems
@@ -3011,6 +3072,8 @@ well.
 
 @node Windows Systems with CYGWIN Installed, , Unknown System, Operating System Specifics
 @subsection Windows Systems with CYGWIN Installed
+@cindex Windows
+@cindex OS, Windows
 
 If you wish to build from the source, and if you have CYGWIN
 version 1.5.5 and GCC 2.95.3-5 installed, it is possible to build the
@@ -3060,6 +3123,8 @@ part that describes unZipping the binary release.
 
 @node After Installation, Configuration Examples, Building and Installing apcupsd, Basic User's Guide
 @chapter After Installation
+@cindex After Installation
+@cindex Installation, After installing
 
 @menu
 * Checking Your Configuration File::
@@ -3069,6 +3134,7 @@ part that describes unZipping the binary release.
 
 @node Checking Your Configuration File, Arranging for Reboot on Power-Up, , After Installation
 @section Checking Your Configuration File
+@cindex Checking Conf file
 
 Once you have installed apcupsd, either
 from a binary package or by building from source, your next step
@@ -3121,6 +3187,8 @@ run, and then it is only a matter of customization of your setup.
 
 @node Arranging for Reboot on Power-Up, Making sure apcupsd Is Running, Checking Your Configuration File, After Installation
 @section Arranging for Reboot on Power-Up
+@cindex Reboot on power up
+@cindex Power up, reboot
 
 The final consideration for a automatic reboot after a full
 power down is to ensure that your computer will automatically reboot
@@ -3168,6 +3236,7 @@ try.
 
 @node Making sure apcupsd Is Running, , Arranging for Reboot on Power-Up, After Installation
 @section Making sure apcupsd Is Running
+@cindex Checking running
 
 The simplest way to invoke  apcupsd
 is from the command line by entering:
@@ -3247,6 +3316,8 @@ properly.
 
 @node Configuration Examples, Testing Apcupsd, After Installation, Basic User's Guide
 @chapter Configuration Examples
+@cindex Configuration, Examples
+@cindex Examples, Configuration
 
 @menu
 * A Simple USB Configuration::
@@ -3260,6 +3331,9 @@ properly.
 
 @node A Simple USB Configuration, A Simple Configuration for a SmartUPS, , Configuration Examples
 @section A Simple USB Configuration
+@cindex Configuration, USB
+@cindex USB, configuration
+@cindex Example, USB conf
 
 If you have a USB UPS, and you have apcupsd version 3.10.7 or higher,
 the essential elements of your apcupsd.conf file should look like the
@@ -3316,6 +3390,9 @@ the @strong{examples} directory of the source.
 
 @node A Simple Configuration for a SmartUPS, A Simple Configuration for a Simple Signaling or Dumb, A Simple USB Configuration, Configuration Examples
 @section A Simple Configuration for a SmartUPS
+@cindex Configuration, SmartUPS
+@cindex SmartUPS configuration
+@cindex Example, SmartUPS conf
 
 If you have a Smart UPS using the cable supplied by APC, or you 
 build a CUSTOM SMART cable outlined in the cables chapter, a very simple
@@ -3338,6 +3415,9 @@ the minimum required.
 
 @node A Simple Configuration for a Simple Signaling or Dumb, A Simple Master Configuration, A Simple Configuration for a SmartUPS, Configuration Examples
 @section A Simple Configuration for a Simple Signaling or Dumb
+@cindex Configuration, dumb
+@cindex dumb, configuration
+@cindex Example, dumb conf
 
 If you have a simple signaling or dumb UPS such as a BackUPS, you 
 will need to know exactly what cable you have and specify it on the
@@ -3376,6 +3456,9 @@ the minimum required.
 
 @node A Simple Master Configuration, A Simple Slave Configuration, A Simple Configuration for a Simple Signaling or Dumb, Configuration Examples
 @section A Simple Master Configuration
+@cindex Configuration, Master
+@cindex Master, config example
+@cindex Example, Master conf
 
 You have a Smart UPS using the cable supplied by APC and you want
 it to act as a master for another computer, which is powered by the
@@ -3398,25 +3481,32 @@ SLAVE slave2.mynetwork.com
 @end example
 
 Note, the main difference from the stand alone configuration is
-that you have specified @strong{UPSCLASS
-netmaster} and @strong{UPSMODE
-net}. In addition, you have specified one or more slave
-machines. In this mode of networking, (as opposed to using the net 
-driver as described several sections below), your master knows the
-presence of all the slaves. They carry on a very explicit communication,
-and the slaves are explicitly notified by the master of any important
-changes such as a shutdown. 
+that you have specified @strong{UPSCLASS netmaster} and
+@strong{UPSMODE net}.  In addition, you have specified one or
+more slave machines.  In this mode of networking, (as opposed to
+using the net driver as described several sections below), your
+master knows the presence of all the slaves.  They carry on a
+very explicit communication, and the slaves are explicitly
+notified by the master of any important changes such as a
+shutdown.
+
+There is a simpler form of contolling slaves using the net driver
+with an apcupsd NIS server. The simpler form is much easier to
+configure. See: @pxref{A Sample NIS Slave Configuration Using the Net Driver}
+below for details.
 
 @node A Simple Slave Configuration, Variation on the Master/Slave Configuration, A Simple Master Configuration, Configuration Examples
 @section A Simple Slave Configuration
+@cindex Slave Configuration
+@cindex Configuration, Slave
+@cindex Example, Slave conf
 
 You have a Smart UPS using the cable supplied by APC that is
 connected to the master machine configured above, and the master
 machine is running as a netmaster and has the address of your
-slave machine. This slave
-machine has no serial port connection to the UPS, but is powered by
-the same UPS as the master. A very simple configuration file would
-look like the following:
+slave machine.  This slave machine has no serial port connection
+to the UPS, but is powered by the same UPS as the master.  A very
+simple configuration file would look like the following:
 
 @example
 
@@ -3435,6 +3525,11 @@ have specified @strong{UPSCABLE ether} and
 @strong{UPSCLASS netslave}.  In addition, you
 have specified a single controlling master.
 
+Please note, there are reports that you @strong{must} use
+@strong{UPSTYPE smartups} on the slave even if the master
+is using @strong{UPSTYPE dumb}. This is apparently some bug
+in the new dumb driver.
+
 In this configuration, the shutdown will be initiated by the
 master. It is also possible to specify BATTERYLEVEL, MINUTES, and
 TIMEOUT configuration directives in the Slave machine that will
@@ -3445,19 +3540,23 @@ up longer during a power outage.
 
 @node Variation on the Master/Slave Configuration, A Sample NIS Slave Configuration Using the Net Driver, A Simple Slave Configuration, Configuration Examples
 @section Variation on the Master/Slave Configuration
+@cindex Master/Slave variation
 
 It is also possible to have a Master/Slave configuration where
-the Slave is powered by a different UPS (or any other power source),
-but is nevertheless controlled (i.e. shutdown) by the master. The
-setup would be identical to the Master/Slave configuration files shown
-above. The only difference is where the slave actually receives its
-power. In effect, apcupsd does not
-know or care where the power really comes from.
+the Slave is powered by a different UPS (or any other power
+source), but is nevertheless controlled (i.e.  shutdown) by the
+master.  The setup would be identical to the Master/Slave
+configuration files shown above.  The only difference is where
+the slave actually receives its power.  In effect, apcupsd does
+not know or care where the power really comes from.
 
 @node A Sample NIS Slave Configuration Using the Net Driver, , Variation on the Master/Slave Configuration, Configuration Examples
 @section A Sample NIS Slave Configuration Using the Net Driver
+@cindex Example, NIS slave
+@cindex NIS slave conf
+@cindex Configuration, NIS slave conf
 
-As opposed to the master/slave mode demonstrated above, you can
+As opposed to the old master/slave mode demonstrated above, you can
 turn any computer into an NIS slave by configuring with the NIS network
 driver turned on @code{--enable-net}. The difference is
 that the NIS server has no explicit knowledge of the slaves. The NIS server
@@ -3467,11 +3566,10 @@ available to any NIS slave that polls it, but the NIS server does not
 explicitly call each NIS slave as is the case in the Master/Slave networking
 described several sections above.
 
-Running in this
-configuration, you can use any computer with
-apcupsd running the Network Information
-Server (NIS) as the server. The NIS slave simply uses the NIS information
-to decide when to shutdown. This is a much simpler mode than the older
+Running in this configuration, you can use any computer with
+apcupsd running the Network Information Server (NIS) as the
+server.  The NIS slave simply uses the NIS information to decide
+when to shutdown.  This is a much simpler mode than the older
 master/slave code mentioned above.
 
 The main apcupsd (NIS server) is connected to the UPS
@@ -3479,12 +3577,39 @@ and has NIS turned on, but the configuration is a simple standalone
 as in the section @strong{A Simple Configuration for a SmartUPS}. It doesn't
 matter how the UPS is connected to the computer (serial, USB, ...). 
 
-For the NIS slave computer, you will have a configuration that looks something
-like what follows. What is important is that you get the information
-from an @strong{ether} cable over the network and you must specify the
-address of a "NIS server" that is running NIS (not the Master/Slave
-networking described above). The NIS slave apcupsd will then poll the NIS server
-at the NETTIME interval you specify to obtain the status.
+For the NIS slave computer, you will have a configuration that
+looks something like what follows.  What is important is that you
+get the information from an @strong{ether} cable over the network
+and you must specify the address of a "NIS server" that is
+running NIS (not the Master/Slave networking described above).
+The NIS slave apcupsd will then poll the NIS server at the
+NETTIME interval you specify to obtain the status.
+
+Here are a few words from Adam Kropelin concerning the difference
+between the Master/Slave networking and the NIS-based networking:
+
+Think of the difference as push (Master/Slave) vs. pull (NIS-based). In the 
+case of M/S, the master makes all the shutdown decisions and notifies the 
+slaves when they are to shut down or when some other interesting event 
+happens. The slaves just do whatever the master says, whenever the master 
+says to. On the other hand, with the NIS-based network config you basically 
+"publish" the UPS status from one server and then your clients view that 
+status and make their own decisions.
+
+Personally, I like the NIS-based approach because the master knows nothing 
+about the slaves, thus there are fewer configuration files to keep in sync. 
+I also like the flexibility of allowing each slave to make its own decision 
+on when to shut down; some of my old clunker servers take quite a long while 
+to shut down. There are problems reported occasionally with the M/S 
+approach, where slaves sometimes lose contact with the master or vice-versa. 
+I know improvements have been made in that code, but I still like the 
+simplicity of using NIS.
+
+Another thing to think about is how you feel about running a network service 
+like NIS on your firewall. My network is set up almost identically to yours 
+and I chose to run the apcupsd "master" on a server in the DMZ and have the 
+firewall just be a client of it. That way I don't have to run NIS on the 
+firewall apcupsd instance.
 
 @example
 
@@ -3506,11 +3631,11 @@ not required, connected to a UPS). The :3551 that follows the NIS server
 address is the port to use. The default is 3551, but older versions of
 apcupsd used port 7000.
 
-Please do not confuse this with a master/slave network
-configuration that is described above. This is a master/slave
-setup, but much simpler (the NIS server does not know about the
-slaves), and any NIS server, even a slave, can act as a server to a
-slave that listens to it.
+Please do not confuse this NIS server/slave mode with the old
+master/slave network configuration that is described above.  This
+is a master/slave setup, but much simpler (the NIS server does
+not know about the slaves), and any NIS server, even a slave, can
+act as a server to a slave that listens to it.
 
 The @strong{NETTIME} directive defines the time interval       
 that the slave uses to poll the NIS server. If you set this too large,
@@ -3535,11 +3660,13 @@ a faster shutdown than the values defined on the NIS server.
 
 @node Testing Apcupsd, Troubleshooting Your Installation, Configuration Examples, Basic User's Guide
 @chapter Testing Apcupsd
+@cindex Testing
 
 The following testing procedures apply for the most part to
-apcsmart UPSes, whether USB or serial. If you have a dumb
+apcsmart UPSes, whether USB or serial.  If you have a dumb
 voltage-signalling UPS, your testing procedures will be somewhat
-different, and you should see the section on Testing Serial UPSes (@pxref{Testing Serial-Line UPSes}).
+different, and you should see the section on Testing Serial UPSes
+(@pxref{Testing Serial-Line UPSes}).
 
 @menu
 * Process-Status Test::
@@ -3555,6 +3682,8 @@ different, and you should see the section on Testing Serial UPSes (@pxref{Testin
 
 @node Process-Status Test, Logging Test, , Testing Apcupsd
 @section Process-Status Test
+@cindex Process Status Testing
+@cindex Testing, Process Status
 
 After you start apcupsd, execute the
 following command:
@@ -3616,14 +3745,16 @@ apcupsd running, don't worry about it
 as this is normal on most non-Linux systems, and on Linux 2.6.x
 kernels. 
 
-If you do not find that apcupsd is        
-in the above list, the most likely problem is a configuration file glitch.
-If no messages were printed, you should check your system log 
-(normally @file{/var/log/messages} where you will find
-one or messages indicating the nature of the problem.
+If you do not find that apcupsd is in the above list, the most
+likely problem is a configuration file glitch.  If no messages
+were printed, you should check your system log (normally
+@file{/var/log/messages} where you will find one or messages
+indicating the nature of the problem.
 
 @node Logging Test, apcaccess Test, Process-Status Test, Testing Apcupsd
 @section Logging Test
+@cindex Testing, Logging
+@cindex Logging, Testing
 
 Once you have established that the proper processes are running,
 do a tail of the system log file, normally
@@ -3658,17 +3789,17 @@ will probably be in @file{/var/log/apcupsd.events}.
 
 @node apcaccess Test, Communications Test, Logging Test, Testing Apcupsd
 @section apcaccess Test
+@cindex Testing, apcaccess
+@cindex apcaccess Test
 
-This test consists of running @code{apcaccess} to
-see if apcupsd is properly updating its
-internal variables. Please note that if you are running a pthreaded
-version of apcupsd, which you should be since
-the non-pthreaded version is no longer supported, (installed from rpm or
-@code{--enable-pthreads} on the
-@code{./configure} line), you must enable the
-apcupsd Network Information Server in your
-configuration file for @strong{apcaccess} to
-work. This is done by setting:
+This test consists of running @code{apcaccess} to see if apcupsd
+is properly updating its internal variables.  Please note that if
+you are running a pthreaded version of apcupsd, which you should
+be since the non-pthreaded version is no longer supported,
+(installed from rpm or @code{--enable-pthreads} on the
+@code{./configure} line), you must enable the apcupsd Network
+Information Server in your configuration file for
+@strong{apcaccess} to work.  This is done by setting:
 
 @example
 
@@ -3765,11 +3896,13 @@ If you see the above output, it is a good sign that
 apcupsd is working. Assuming that the output looks
 reasonable, check the following variables:
 
-A very disturbing tendance is for some of the newer (Mar 2004) RS and ES UPSes 
-to have no Voltage information. This is annoying bug not serious. On the other 
-hand, some of those UPSes now have no battery charge information (BCHARGE). If
-BCHARGE is zero in your listing and you are running a Smart or a USB UPS, then
-you will have to set the BATTERYLEVEL directive in your apcupsd.conf file to -1.
+A very disturbing tendance is for some of the newer (Mar 2004) RS
+and ES UPSes to have no Voltage information.  This is annoying
+bug not serious.  On the other hand, some of those UPSes now have
+no battery charge information (BCHARGE).  If BCHARGE is zero in
+your listing and you are running a Smart or a USB UPS, then you
+will have to set the BATTERYLEVEL directive in your apcupsd.conf
+file to -1.
 
 @table @asis
 
@@ -3822,6 +3955,8 @@ in your @strong{apcupsd.conf} file.
 
 @node Communications Test, Simulated Power Fail Test, apcaccess Test, Testing Apcupsd
 @section Communications Test
+@cindex Testing, Communications
+@cindex Communications Testing
 
 At this point, you should ensure that
 apcupsd is handling the connection to the
@@ -3886,6 +4021,8 @@ problem before proceeding with additional tests.
 
 @node Simulated Power Fail Test, System Shutdown Test, Communications Test, Testing Apcupsd
 @section Simulated Power Fail Test
+@cindex Testing, Simulate Power Fail 
+@cindex Simulate Power Fail Test
 
 At this point, you should verify that in the event of a power
 fail apcupsd properly calls
@@ -4005,6 +4142,8 @@ please replace the changed apccontrol and
 
 @node System Shutdown Test, Full Power Down Test, Simulated Power Fail Test, Testing Apcupsd
 @section System Shutdown Test
+@cindex System Shutdown test
+@cindex Testing, System Shutdown
 
 This is an intermediate test that you can do, for all UPS models
 before doing the Full Power Down Test. First modify the
@@ -4036,6 +4175,8 @@ state.
 
 @node Full Power Down Test, Shutdown Sequence, System Shutdown Test, Testing Apcupsd
 @section Full Power Down Test
+@cindex Power down test
+@cindex Testing, Power down
 
 To complete the testing, you should do a power fail shutdown of
 your system. This test is applicable to all UPS models. Please do a
@@ -4078,6 +4219,7 @@ delay".
 
 @node Shutdown Sequence, apctest, Full Power Down Test, Testing Apcupsd
 @section Shutdown Sequence
+@cindex Shutdown Sequence
 
 If you experienced so problems with the above testing
 procedures, or if you are porting apcupsd
@@ -4088,6 +4230,7 @@ this manual.
 
 @node apctest, , Shutdown Sequence, Testing Apcupsd
 @section apctest
+@cindex apctest
 
 apctest is a program that allows you
 to talk directly to your UPS and run certain low-level tests, 
@@ -4196,6 +4339,8 @@ Item 7 will terminate apctest.
 
 @node Troubleshooting Your Installation, Monitoring and Tuning your UPS, Testing Apcupsd, Basic User's Guide
 @chapter Troubleshooting Your Installation
+@cindex Troubleshooting (see problems)
+@cindex Problems
 
 @menu
 * Known Problems with USB UPSes::
@@ -4203,6 +4348,7 @@ Item 7 will terminate apctest.
 
 @node Known Problems with USB UPSes, , , Troubleshooting Your Installation
 @section Known Problems with USB UPSes
+@cindex Problems, USB
 
 @menu
 * Some Cheaper Models Do Not Have Battery Charge::
@@ -4213,6 +4359,7 @@ Item 7 will terminate apctest.
 
 @node Some Cheaper Models Do Not Have Battery Charge, Reconnection does not clean up the lockfile, , Known Problems with USB UPSes
 @subsection Some Cheaper Models Do Not Have Battery Charge
+@cindex Problems, no Battery charge
 
 Unfortunately, some cheaper USB models do not seem to report
 BCHARGE in the apcaccess output listing, which means with a
@@ -4225,6 +4372,7 @@ is annoying but does not cause the unit to malfunction.
 
 @node Reconnection does not clean up the lockfile, Power Off [killpower] of UPS Does Not Work, Some Cheaper Models Do Not Have Battery Charge, Known Problems with USB UPSes
 @subsection Reconnection does not clean up the lockfile
+@cindex Problems, lock file not cleaned up
 
 If either you disconnect the UPS or it disconnects because of
 some electrical problem, it will most certainly reconnect with a
@@ -4235,6 +4383,8 @@ not too serious.
 
 @node Power Off [killpower] of UPS Does Not Work, apcupsd Cannot Reconnect After a Reboot, Reconnection does not clean up the lockfile, Known Problems with USB UPSes
 @subsection Power Off (killpower) of UPS Does Not Work
+@cindex Problems, Power off
+@cindex Problems, killpower
 
 Currently (as of 3.10.6) the code to power off the UPS works
 only if you have a Linux kernel version 2.4.22 or greater, or
@@ -4243,6 +4393,7 @@ kernel.
 
 @node apcupsd Cannot Reconnect After a Reboot, , Power Off [killpower] of UPS Does Not Work, Known Problems with USB UPSes
 @subsection apcupsd Cannot Reconnect After a Reboot
+@cindex Problems, reconnect
 
 If apcupsd does not connect to the
 USB port when you reboot, it is probably the appropriate kernel
@@ -4285,6 +4436,8 @@ invoked.
 
 @node Monitoring and Tuning your UPS, Maintaining Your UPS, Troubleshooting Your Installation, Basic User's Guide
 @chapter Monitoring and Tuning your UPS
+@cindex Monitoring
+@cindex Tuning
 
 After you have verified that your UPS is working correctly, you 
 will probably want to query the state of its health occasionally.
@@ -4305,6 +4458,7 @@ itself.
 
 @node apcaccess, Apcupsd Notification and Events, , Monitoring and Tuning your UPS
 @section apcaccess
+@cindex apcaccess
 
 apcaccess is a program (normally found
 in @file{/sbin/apcaccess}) that permits you to print out
@@ -4345,6 +4499,8 @@ in your @strong{apcupsd.conf} file.
 
 @node apcaccess status, apcaccess eprom, , apcaccess
 @subsection apcaccess status
+@cindex apcaccess status
+@cindex status, apcaccess
 
 As mentioned above, the full form of the command is:
 
@@ -4462,6 +4618,8 @@ less information.
 
 @node apcaccess eprom, , apcaccess status, apcaccess
 @subsection apcaccess eprom
+@cindex apcaccess eeprom
+@cindex eeprom, apcaccess
 
 The @strong{eprom} command line option
 for apcaccess allows you to examine the
@@ -4493,6 +4651,8 @@ Self test interval       SELFTEST      336      336 168 ON  OFF
 
 @node Apcupsd Notification and Events, hid-ups and USB Specific Information, apcaccess, Monitoring and Tuning your UPS
 @section Apcupsd Notification and Events
+@cindex Notification
+@cindex Events
 
 When a major event is generated within apcupsd,
 control is passed to the script @file{apccontrol} normally
@@ -4516,6 +4676,7 @@ Customizing Event Handling (@pxref{Customizing Event Handling}).
 
 @node hid-ups and USB Specific Information, apcupsd Network Monitoring [CGI] Programs, Apcupsd Notification and Events, Monitoring and Tuning your UPS
 @section hid-ups and USB Specific Information
+@cindex hid-ups
 
 The UPS has an internal set of timers and remaining capacity
 counters, which it uses to determine when to shutdown. These are in
@@ -4531,6 +4692,9 @@ UPS when less than 2 minutes of run time remain.
 
 @node apcupsd Network Monitoring [CGI] Programs, Setting up and Testing the CGI Programs, hid-ups and USB Specific Information, Monitoring and Tuning your UPS
 @section apcupsd Network Monitoring (CGI) Programs
+@cindex Network monitoring
+@cindex Monitoring
+@cindex CGI programs
 
 With this release, there are five CGI programs
 (multimon.cgi,
@@ -4563,6 +4727,8 @@ produce the bar charts.
 
 @node Setting up and Testing the CGI Programs, Configuring Your EEPROM, apcupsd Network Monitoring [CGI] Programs, Monitoring and Tuning your UPS
 @section Setting up and Testing the CGI Programs
+@cindex Setup CGI programs
+@cindex Testing CGI programs
 
 @menu
 * Network Information Server (NIS): Network Information Server [NIS].
@@ -4579,6 +4745,8 @@ produce the bar charts.
 
 @node Network Information Server [NIS], multimon_cgi, , Setting up and Testing the CGI Programs
 @subsection Network Information Server (NIS)
+@cindex Network Information Server
+@cindex NIS
 
 Before using multimon and the other
 CGI programs, first ensure that apcupsd is
@@ -4695,6 +4863,8 @@ or @uref{http://www.apcupsd.com/cgi-bin/multimoncss.cgi,http://www.apcupsd.com/c
 
 @node multimon_cgi, upsstats_cgi, Network Information Server [NIS], Setting up and Testing the CGI Programs
 @subsection multimon.cgi
+@cindex multimon
+@cindex CGI, multimon
 
 This program monitors multiple UPSes at the same time. A typical
 output of multimon.cgi as displayed in your
@@ -4709,6 +4879,8 @@ headings are all configurable (see
 
 @node upsstats_cgi, _/upsstats_cgi, multimon_cgi, Setting up and Testing the CGI Programs
 @subsection upsstats.cgi
+@cindex upsstats
+@cindex CGI, upsstats
 
 By clicking on the @strong{system} name
 in the @strong{multimon.cgi} display, you will
@@ -4729,12 +4901,16 @@ from a Unix shell from the source cgi directory as follows:
 
 @node _/upsstats_cgi, upsfstatus_cgi, upsstats_cgi, Setting up and Testing the CGI Programs
 @subsection ./upsstats.cgi
+@cindex upssstats
+@cindex CGI, upssstats
 
 As with multimon, quite a few lines
 of html should then be displayed.
 
 @node upsfstatus_cgi, Working Example, _/upsstats_cgi, Setting up and Testing the CGI Programs
 @subsection upsfstatus.cgi
+@cindex upsfstatus
+@cindex CGI, upsfstatus
 
 If you would like to see all of the STATUS variables available
 over the network, click on the @strong{Data}
@@ -4802,11 +4978,14 @@ multimon.cgi.
 
 @node Working Example, Client Test Program, upsfstatus_cgi, Setting up and Testing the CGI Programs
 @subsection Working Example
+@cindex CGI, working example
+@cindex Example, CGI
 
 To see a working example of the above programs, visit @uref{http://www.apcupsd.com/cgi-bin/multimon.cgi,http://www.apcupsd.com/cgi-bin/multimon.cgi}.
 
 @node Client Test Program, A Tip from Carl Erhorn for Sun Systems, Working Example, Setting up and Testing the CGI Programs
 @subsection Client Test Program
+@cindex Client Test program
 
 When your Network Information Server is up and running, you can
 test it using a simple program before attempting to access the server
@@ -4868,6 +5047,7 @@ events like line voltage boost, ...).
 
 @node A Tip from Carl Erhorn for Sun Systems, Credits, Client Test Program, Setting up and Testing the CGI Programs
 @subsection A Tip from Carl Erhorn for Sun Systems
+@cindex Tip
 
 It is possible to run the CGI code to monitor your UPS using the
 answerbook HTTP server that runs on Solaris. As long as your server
@@ -4928,6 +5108,8 @@ configuration file.
 
 @node TCP Wrappers, , , Security Issues
 @subsubsection TCP Wrappers
+@cindex Wrappers, TCP
+@cindex TCP wrappers
 
 As of apcupsd version 3.8.2, TCP Wrappers are implemented if you
 turn them on when configuring (@code{./configure
@@ -4940,6 +5122,8 @@ untested. If you use it, please send us some feedback.
 
 @node Configuring Your EEPROM, , Setting up and Testing the CGI Programs, Monitoring and Tuning your UPS
 @section Configuring Your EEPROM
+@cindex eeprom, configuring
+@cindex Configuring, eeprom
 
 If you have a SmartUPS, there are depending on the UPS at least 12
 different values stored in the EEPROM that determine how the UPS
@@ -5011,6 +5195,8 @@ and the Permitted Values will depend on what UPS model you have.
 
 @node Using apctest to Configure Your EEPROM, , apcupsd No Longer Configures EEPROM, Configuring Your EEPROM
 @subsection Using apctest to Configure Your EEPROM
+@cindex eeprom, apctest
+@cindex apctest setting eeprom
 
 To make the EEPROM changes with
 apctest you must first stop the
@@ -5137,6 +5323,7 @@ process especially if incorrect values were supplied.
 
 @node Maintaining Your UPS, Frequently-Asked Questions, Monitoring and Tuning your UPS, Basic User's Guide
 @chapter Maintaining Your UPS
+@cindex Maintenance
 
 If you have your UPS long enough, you will probably have battery
 problems. Below, you will find some suggestions for replacing
@@ -5165,6 +5352,7 @@ tends to shorten the battery life.
 
 @node What Various People Have to Say about Batteries, Where Carl Suggests You Get Batteries, , Maintaining Your UPS
 @section What Various People Have to Say about Batteries
+@cindex Batteries
 
 Here is what John Walker has to say about APC UPS batteries:
 
@@ -5461,6 +5649,7 @@ Regards,
 
 @node Where Carl Suggests You Get Batteries, , What Various People Have to Say about Batteries, Maintaining Your UPS
 @section Where Carl Suggests You Get Batteries
+@cindex Batteries
 
 @quotation
 
@@ -5527,6 +5716,7 @@ Here is a link to the
 
 @node Frequently-Asked Questions, Apcupsd Bugs, Maintaining Your UPS, Basic User's Guide
 @chapter Frequently-Asked Questions
+@cindex FAQ
 
 See the bugs section of this document for a list of known
 bugs and solutions.
@@ -5888,6 +6078,7 @@ code image is most likely shared).
 
 @node Apcupsd Bugs, , Frequently-Asked Questions, Basic User's Guide
 @chapter Apcupsd Bugs
+@cindex Bugs
 
 Unfortunately, it seems that every program has some bugs. We do
 our best to keep the bugs to a minimum by extensive testing. However,
@@ -5901,6 +6092,7 @@ the bug tracking system at SourceForge.
 
 @node Advanced topics, Installation on Windows, Basic User's Guide, Top
 @majorheading Advanced topics
+@cindex Advanced
 
 @menu
 * Customizing Event Handling::
@@ -5913,6 +6105,9 @@ the bug tracking system at SourceForge.
 
 @node Customizing Event Handling, Master/Slave Configurations, , Advanced topics
 @chapter Customizing Event Handling
+@cindex Event handling
+@cindex Customizing event handling
+
 
 When apcupsd detects anomalies from
 your UPS device, it will make some decisions that usually result in
@@ -6173,29 +6368,32 @@ taken.
 This event is generated when a slave detects that
 a master has not contacted it in a reasonable time, or
 when a slave polls a master and gets no response in 30 seconds.
+This event applies only to the old master/slave networking code and
+not to the NIS server/slave mode.
 
 No action is taken.
 
 @item masterconnect
 This event is generated when the slave and the
 master reconnect. 
+This event applies only to the old master/slave networking code and
+not to the NIS server/slave mode.
+
 
 No action is taken.
 @end table
 
-To write your own routine for the @strong{powerout} action, you create shell script named
-@strong{powerout} and put it in the lib
-directory (normally @file{/etc/apcupsd}). When the
-@strong{powerout} action is invoked by
-apcupsd,
-apccontrol will first give control to your
-script. If you want apccontrol to continue
-with the default action, simply exit your script with an exit status
-of zero. If you do not want apccontrol to
-continue with the default action, your script should exit with the
-special exit code of @strong{99}. However, in
-this case, please be aware that you must ensure proper shutdown of
-your machine if necessary.
+To write your own routine for the @strong{powerout} action, you
+create shell script named @strong{powerout} and put it in the lib
+directory (normally @file{/etc/apcupsd}).  When the
+@strong{powerout} action is invoked by apcupsd, apccontrol will
+first give control to your script.  If you want apccontrol to
+continue with the default action, simply exit your script with an
+exit status of zero.  If you do not want apccontrol to continue
+with the default action, your script should exit with the special
+exit code of @strong{99}.  However, in this case, please be aware
+that you must ensure proper shutdown of your machine if
+necessary.
 
 Some sample scripts (onbattery and mainsback) that email power
 failure messages can be found in the @file{examples}
@@ -6203,6 +6401,7 @@ directory of the source code.
 
 @node Master/Slave Configurations, Controlling Multiple UPSes on one Machine, Customizing Event Handling, Advanced topics
 @chapter Master/Slave Configurations
+@cindex Master/Slave
 
 If you have two or more computers that are powered by the same UPS
 and they are connected by a network, you can configure
@@ -6229,6 +6428,8 @@ If a picture is worth a thousand words for you, please see
 
 @node Configuration Directives, Master/Slave Problems, , Master/Slave Configurations
 @section Configuration Directives
+@cindex Directives
+@cindex Configuration, Directives
 
 If you are setting up a master/slave configuration, you will be
 required to make some modifications to the
@@ -6250,6 +6451,8 @@ found in the @file{<src>/examples} directory
 
 @node Master/Slave Problems, Network Problems with Master/Slave or Server/Slave Configurations, Configuration Directives, Master/Slave Configurations
 @section Master/Slave Problems
+@cindex Master/Slave
+@cindex Problems, Master/slave
 
 @menu
 * Master/Slave Shutdown::
@@ -6266,6 +6469,8 @@ the Technical Reference.
 
 @node Server/Slave Networking using NIS and the NET Driver, , Master/Slave Shutdown, Master/Slave Problems
 @subsection Server/Slave Networking using NIS and the NET Driver
+@cindex NIS networking
+@cindex Net driver
 
 It is also possible to implement a network of NIS server/slave
 apcupsds using the new 3.10.x code and the @strong{net} driver. This mode of NIS server/slave
@@ -6324,6 +6529,8 @@ NETTIME 30
 
 @node Network Problems with Master/Slave or Server/Slave Configurations, , Master/Slave Problems, Master/Slave Configurations
 @section Network Problems with Master/Slave or Server/Slave Configurations
+@cindex Problems, Master/Slave
+@cindex Problems, networking
 
 When working with a master/slave or server/slave configurations (one UPS powering
 more than one computer), the master/server and slave communicate via the
@@ -6583,6 +6790,7 @@ and stopped automatically when the system is booted and halted.
 
 @node The Second Copy of apcupsd, Important Steps after Installation of the Second Copy, The First Copy of apcupsd, Configuration
 @subsection The Second Copy of apcupsd
+@cindex Two apcupsds
 
 To configure and install the second copy of
 apcupsd, which controls the second UPS and
@@ -6641,17 +6849,18 @@ configuration. However, these configurations can be very useful for
 powering electronic equipment and such.
 
 If Computer B is vitally important, it would probably be better
-to purchase a serial port card for it, or perhaps use a USB UPS. To
-ensure that it is properly shutdown if Computer A goes down, you could
-run a second copy of apcupsd on Computer B
-as a slave connected to the main copy of
-apcupsd on Computer A. Thus Computer B
-would be running two slaves, one driven by the master controlling UPS
-1 and the other by the master controlling UPS 2, and Computer B could
-be shutdown by the first master that signaled it to do so.
+to purchase a serial port card for it, or perhaps use a USB UPS.
+To ensure that it is properly shutdown if Computer A goes down,
+you could run a second copy of apcupsd on Computer B as a slave
+connected to the main copy of apcupsd on Computer A. Thus
+Computer B would be running two slaves, one driven by the master
+controlling UPS 1 and the other by the master controlling UPS 2,
+and Computer B could be shutdown by the first master that
+signaled it to do so.
 
 @node Support for SNMP UPSes, Alternate Ways To Run The Network Information Server, Controlling Multiple UPSes on one Machine, Advanced topics
 @chapter Support for SNMP UPSes
+@cindex SNMP
 
 @uref{snmp,snmp}
 To run apcupsd with an SNMP UPS, you need the
@@ -6680,6 +6889,7 @@ apcupsd version 3.10.0 or higher
 
 @node Connecting an SNMP UPS, Building and Installing apcupsd <1>, , Support for SNMP UPSes
 @section Connecting an SNMP UPS
+@cindex SNMP, Connecting
 
 The Simple Network Management Protocol provides an interface to
 connect to remote devices through the
@@ -6734,6 +6944,7 @@ line:
 
 @node SNMP Specific Information, Known Problems, Building and Installing apcupsd <1>, Support for SNMP UPSes
 @section SNMP Specific Information
+@cindex SNMP
 
 The SNMP connection gives less information compared to a serial
 smart cable. This is not a problem as the most useful information
@@ -6776,6 +6987,7 @@ With this setup your UPS operations should be safe.
 
 @node Alternate Ways To Run The Network Information Server, apcupsd System Logging, Support for SNMP UPSes, Advanced topics
 @chapter Alternate Ways To Run The Network Information Server
+@cindex NIS alternate was of running
 
 apcupsd maintains STATUS and EVENTS
 data concerning the UPS and its operation. This information can be
@@ -6948,6 +7160,8 @@ apcupsd.
 
 @node apcupsd System Logging, , Alternate Ways To Run The Network Information Server, Advanced topics
 @chapter apcupsd System Logging
+@cindex Logging, System
+@cindex System Logging
 
 The apcupsd philosophy is that all
 logging should be done through the @strong{syslog} facility (see: @code{man
@@ -6965,6 +7179,7 @@ information server.
 
 @node Logging Types, Implementation Details, , apcupsd System Logging
 @section Logging Types
+@cindex Logging, types
 
 apcupsd splits its logging into four
 separate types called:
@@ -7092,6 +7307,7 @@ local0.warn                            /var/log/messages
 
 @node Developers Notes, , Implementation Details, apcupsd System Logging
 @section Developers Notes
+@cindex Developers Notes
 
 All logging functions and all error reporting are now done
 through the log_event() subroutine call. Exceptions to this are:
@@ -7105,6 +7321,8 @@ adding code to log_event() in apclog.c.
 
 @node Installation on Windows, Installation on Serial-Line UPSes, Advanced topics, Top
 @majorheading Installation: Windows
+@cindex Installation, Windows
+@cindex Windows, Installation
 
 @menu
 * The Windows Version of apcupsd::
@@ -7320,6 +7538,7 @@ that the battery is charging.
 
 @node Installation Directory, Testing, Installation, The Windows Version of apcupsd
 @section Installation Directory
+@cindex Windows, Installation Directory
 
 The Win32 version of apcupsd must
 reside in the @file{c:\apcupsd\} directory, and there
@@ -7331,6 +7550,8 @@ a rebuild of the source.
 
 @node Testing, Upgrading, Installation Directory, The Windows Version of apcupsd
 @section Testing
+@cindex Windows, Testing
+@cindex Testing, Windows
 
 It would be hard to overemphasize the need to do a full testing
 of your installation of apcupsd as there
@@ -7349,6 +7570,8 @@ type, or an incorrect address for the serial port.
 
 @node Upgrading, Post Installation, Testing, The Windows Version of apcupsd
 @section Upgrading
+@cindex Windows, Upgrading
+@cindex Upgrading Windows
 
 On Win98 and Win95 systems, to upgrade to a new release, simply
 stop apcupsd by using the tray icon and
@@ -7395,6 +7618,7 @@ problem is unknown, but the solution is simply to click again on the
 
 @node Post Installation, Problem Areas, Upgrading, The Windows Version of apcupsd
 @section Post Installation
+@cindex Windows, Post Installation
 
 After installing apcupsd and before
 running it, you should check the contents of two files to ensure that
@@ -7416,6 +7640,8 @@ a pound sign (#) in column one of the appropriate line.
 
 @node Problem Areas, Utility Functions, Post Installation, The Windows Version of apcupsd
 @section Problem Areas
+@cindex Problems, Windows
+@cindex Windows, Problems
 
 In addition to possible problems of reinstallation or upgrade on
 WinNT systems, as noted above, we have discovered the following
@@ -7500,6 +7726,7 @@ desired function from the popup menu.
 
 @node Disclaimer, Email Notification of Events, Utility Functions, The Windows Version of apcupsd
 @section Disclaimer
+@cindex Disclaimer
 
 Some of the features such as EEPROM programming have not been
 exhaustively tested on Win32 systems. If at all possible, we
@@ -7546,6 +7773,8 @@ annoy you, you can remove or comment out the calls to @strong{popup} from this f
 
 @node Email Notification of Events, Killpower under Windows, Disclaimer, The Windows Version of apcupsd
 @section Email Notification of Events
+@cindex Email
+@cindex Notification, Email
 
 On Win95/98 systems, it is possible to receive notification of
 apcupsd events that are passed to
@@ -7565,6 +7794,7 @@ files into the directory
 
 @node Killpower under Windows, Power Down During Shutdown, Email Notification of Events, The Windows Version of apcupsd
 @section Killpower under Windows
+@cindex Windows, Killpower
 
 If your batteries become exhausted during a power failure and
 you want your machine to automatically reboot when the power comes
@@ -7626,6 +7856,8 @@ sufficient.
 
 @node Power Down During Shutdown, Command Line Options Specific to the Windows Version, Killpower under Windows, The Windows Version of apcupsd
 @section Power Down During Shutdown
+@cindex Windows, Power down
+@cindex Power down, Windows
 
 Our philosophy is to shutdown a computer but not to power it down
 itself (as opposed to having the UPS cut the power as described
@@ -7653,6 +7885,7 @@ psshutdown.
 
 @node Command Line Options Specific to the Windows Version, Building the Win32 Version from the Source, Power Down During Shutdown, The Windows Version of apcupsd
 @section Command Line Options Specific to the Windows Version
+@cindex Windows, Options
 
 These options are not normally seen or used by the user, and are
 documented here only for information purposes. At the current time,
@@ -7710,6 +7943,8 @@ have been created for your use.
 
 @node Building the Win32 Version from the Source, , Command Line Options Specific to the Windows Version, The Windows Version of apcupsd
 @section Building the Win32 Version from the Source
+@cindex Windows, Building
+@cindex Building, Windows
 
 If you have the source code, follow the standard procedures for
 building apcupsd on Unix in @ref{Building and Installing apcupsd} of this manual. Please don't forget to look
@@ -7731,6 +7966,7 @@ at the system specifics for CYGWIN.
 
 @node Overview of Serial-Interface UPSes, Connecting a Serial-Line UPS to a USB Port, , Installation on Serial-Line UPSes
 @chapter Overview of Serial-Interface UPSes
+@cindex Serial UPSes
 
 If you have a UPS that communicates via serial port, you need to
 do two things before you can even think about configuring the
@@ -7744,12 +7980,14 @@ work (@pxref{crazy}).
 According to Bill Marr the Belkin F5U109, also sold as
 F5U409 also works with apcupsd for kernel versions 2.4.25 or
 higher and kernels 2.6.1 and higher.  These newer kernels are
-needed to have the patch that makes the mtc_u232 module and other
+needed to have the patch that makes the mct_u232 (Magic
+Control Technology) module and other
 adapters work with RS-232 devices that do not assert the CTS
 signal.
 
 @node Connecting a Serial-Line UPS to a USB Port, Connecting a APC USB UPS to either a PC USB or Serial Port, Overview of Serial-Interface UPSes, Installation on Serial-Line UPSes
 @chapter Connecting a Serial-Line UPS to a USB Port
+@cindex Serial on USB
 
 By using a special adaptor, you can connect your serial-line UPS
 to a USB port. If you would like to free up your serial port and
@@ -7762,7 +8000,7 @@ me.)
 
 The device that Joe Acosta and Kern are using is IOgear GUC232A USB 2
 serial adapter. Bill Marr
-informs us that it also works with a Back-UPS Pro 640 and the 940-0095B
+informs us that it also works with a Back-UPS Pro 650 and the 940-0095B
 cable.
 
 At Kern's site, running Red Hat 7.1 with kernel 2.4.9-12, he
@@ -7782,6 +8020,7 @@ necessary.
 @node Connecting a APC USB UPS to either a PC USB or Serial Port, Cables, Connecting a Serial-Line UPS to a USB Port, Installation on Serial-Line UPSes
 @chapter Connecting a APC USB UPS to either a PC USB or Serial Port
 
+
 An interesting fact is that 
 the USB ports (actually an RJ45 connector) on APC UPSes not only speak
 USB, but also serial apcsmart and dumb voltage-signalling as well!
@@ -7794,6 +8033,7 @@ will act as a serial-line device.
 
 @node Cables, Testing Serial-Line UPSes, Connecting a APC USB UPS to either a PC USB or Serial Port, Installation on Serial-Line UPSes
 @chapter Cables
+@cindex Cables
 
 You can either use the cable that came with your UPS
 (the easiest if we support it) or you can make your own cable. We
@@ -7833,6 +8073,8 @@ with a RJ45 connector, you can build your own
 
 @node Smart-Custom Cable for SmartUPSes, Smart Signalling Cable for BackUPS CS Models, , Cables
 @section Smart-Custom Cable for SmartUPSes
+@cindex Smart Custom Cable
+@cindex Cables, Smart Custom
 
 @example
 
@@ -7882,6 +8124,8 @@ Signal Computer                  UPS
 
 @node Smart Signalling Cable for BackUPS CS Models, Voltage-Signalling Cable for "dumb" UPSes, Smart-Custom Cable for SmartUPSes, Cables
 @section Smart Signalling Cable for BackUPS CS Models
+@cindex Cables, Smart Signalling
+@cindex Cables, BackUPS CS
 
 If you have a BackUPS CS, you are probably either using it with
 the USB cable that is supplied or with the 940-0128A supplied by APC,
@@ -7955,6 +8199,8 @@ transmitted to us by slither_man. Many thanks!
 
 @node Voltage-Signalling Cable for "dumb" UPSes, Other APC Cables that apcupsd Supports, Smart Signalling Cable for BackUPS CS Models, Cables
 @section Voltage-Signalling Cable for "dumb" UPSes
+@cindex Cables, dumb    
+@cindex dumb, Cables
 
 @strong{NOTE. YOU DO NOT HAVE THIS CABLE UNLESS
 YOU BUILT IT YOURSELF.  THE SIMPLE-CUSTOM CABLE IS NOT AN APC
@@ -8164,6 +8410,8 @@ simple@tab Yes@tab Yes@tab Yes@tab No
 
 @node Voltage Signalling, The Back-UPS Office 500 signals, Voltage Signalling Features Supported by Apcupsd for Various Cables, Cables
 @section Voltage Signalling
+@cindex Voltage Signalling, Cables
+@cindex Cables, Voltage Signalling
 
 Apparently, all APC voltage-signalling UPSes have the same
 signals on the output pins of the UPS. The difference at the computer
@@ -8197,6 +8445,8 @@ UPS Pin         Signal meaning
 
 @node The Back-UPS Office 500 signals, Analyses of APC Cables, Voltage Signalling, Cables
 @section The Back-UPS Office 500 signals
+@cindex Cables, BackUPS Office
+@cindex BackUPS Office, cables
 
 The Back-UPS Office UPS has a telephone type jack as output,
 which looks like the following:
@@ -8229,6 +8479,7 @@ It appears that the signals work as follows:
 
 @node Analyses of APC Cables, Win32 Implementation Restrictions for Simple UPSes, The Back-UPS Office 500 signals, Cables
 @section Analyses of APC Cables
+@cindex Cables
 
 @menu
 * 940-0020B Cable Wiring::
@@ -8243,6 +8494,7 @@ It appears that the signals work as follows:
 
 @node 940-0020B Cable Wiring, 940-0020C Cable Wiring, , Analyses of APC Cables
 @subsection 940-0020B Cable Wiring
+@cindex Cables
 
 This diagram is for informational purposes and is not complete.
 Although we do not know what the black box semi-conductor contains,
@@ -8276,6 +8528,7 @@ Thanks to Lazar M. Fleysher.
 
 @node 940-0020C Cable Wiring, 940-0023A Cable Wiring, 940-0020B Cable Wiring, Analyses of APC Cables
 @subsection 940-0020C Cable Wiring
+@cindex Cables
 
 This diagram is for informational purposes and may not be
 complete, we don't recommend that use it to build you build one
@@ -8303,6 +8556,7 @@ Signal Computer                  UPS
 
 @node 940-0023A Cable Wiring, 940-0095A Cable Wiring, 940-0020C Cable Wiring, Analyses of APC Cables
 @subsection 940-0023A Cable Wiring
+@cindex Cables
 
 This diagram is for informational purposes and may not be
 complete, we don't recommend that use it to build you build one
@@ -8332,6 +8586,7 @@ Signal Computer                  UPS
 
 @node 940-0095A Cable Wiring, 940-0095B Cable Wiring, 940-0023A Cable Wiring, Analyses of APC Cables
 @subsection 940-0095A Cable Wiring
+@cindex Cables
 
 This is the definitive wiring diagram for the 940-0095A cable
 submitted by Chris Hanson <cph at zurich.ai.mit.edu>, who
@@ -8410,6 +8665,7 @@ and MARK to a 0.
 
 @node 940-0095B Cable Wiring, 940-0119A Cable Wiring, 940-0095A Cable Wiring, Analyses of APC Cables
 @subsection 940-0095B Cable Wiring
+@cindex Cables
 
 This diagram is for informational purposes and may not be complete,
 we don't recommend that use it to build one yourself.
@@ -8436,6 +8692,7 @@ Signal Computer                  UPS
 
 @node 940-0119A Cable Wiring, BackOffice ES, 940-0095B Cable Wiring, Analyses of APC Cables
 @subsection 940-0119A Cable Wiring
+@cindex Cables
 
 This diagram is for informational purposes and may not be complete,
 we don't recommend that use it to build you build one yourself.
@@ -8458,6 +8715,8 @@ APC Part# - 940-0119A
 
 @node BackOffice ES, BackUPS ES and CS in Serial mode with Cable 940-0128A, 940-0119A Cable Wiring, Analyses of APC Cables
 @subsection BackOffice ES
+@cindex Cables
+@cindex BackOffice ES
 
 The BackUPS ES has a straight through serial cable with no
 identification on the plugs. To make it work with
@@ -8496,6 +8755,8 @@ pin    signal      pin
 
 @node BackUPS ES and CS in Serial mode with Cable 940-0128A, , BackOffice ES, Analyses of APC Cables
 @subsection BackUPS ES and CS in Serial mode with Cable 940-0128A
+@cindex BackUPS ES
+@cindex Cables
 
 Though these UPSes are USB UPSes, APC supplies a serial cable
 (typically with a green DB9 F connector) that has 940-0128A stamped
@@ -8566,8 +8827,73 @@ _______________________
 
 @end example
 
+From Jan Babinski jbabinsk at pulsarbeacon dot com: (many thanks)
+
+The BackUPS XS1000(BX-1000) ships with the 940-0127B usb cable and the
+optional 940-0128D serial cable. I'm trying to get it running under OpenBSD
+so usb is out of the question. I've tried smart serial with the custom
+cable, but that's not working, so I'm stuck with dumb serial over 940-0128D.
+
+I have noticed that this cable is not supported by apcupsd so I set out to
+find out how much different this cable is compared with the supported ones.
+After tearing the cable apart (see schematic below) I noticed that it is
+functionally similar to the 940-0128A cable except for NC on (6) DTR and (2)
+RD on the computer side.
+
+@example
+Cable 940-0128D
+
+DB9(Computer)               RJ45-10(UPS)
+
+ (5)     (1)                 ____________
+( o o o o o )               [ oooooooooo ]
+ \ o o o o /                [____________]
+  (9)   (6)                 (10)  [_]  (1)
+
+
+ RI(9)<---+
+          |
+CTS(8)<---+--- E   2N2222(NPN)
+                \|___
+           ____ /| B |
+          |    C     |
+          |          |
+          +---vvvv---+--[>|------<(2)OnBatt
+RTS(7)>---|    2k      1N5819
+          +---vvvv---+--[>|------<(3)LowBatt
+          |          |
+          +--- C     |
+                \|___|
+                /| B
+DCD(1)<------- E    2N2222(NPN)
+
+DTR(4)>-------------------------->(8)KillPwr
+
+GND(5)----------------------------(7)Signal GND
+(Shield)--------------------------(4)Chassis GND
+
+
+Cable 940-0127B
+
+USB(Computer)      RJ45-10(UPS)
+ _________          ____________
+| = = = = |        [ oooooooooo ]
+|_________|        [____________]
+ (1)   (4)         (10)  [_]  (1)
+
+  +5V(1)-----------(1)+5V
+DATA+(2)-----------(9)DATA+
+DATA-(3)-----------(10)DATA-
+  GND(4)-----------(7)Signal GND
+(Shield)-----------(4)Chassis GRND
+
+
+@end example
+
 @node Win32 Implementation Restrictions for Simple UPSes, Internal Apcupsd Actions for Simple Cables, Analyses of APC Cables, Cables
 @section Win32 Implementation Restrictions for Simple UPSes
+@cindex Cables
+@cindex Windows
 
 Due to inadequacies in the Win32 API, it is not possible to
 set/clear/get all the serial port line
@@ -8581,6 +8907,7 @@ the 0023A cable are not implemented.
 
 @node Internal Apcupsd Actions for Simple Cables, RS232 Wiring and Signal Conventions, Win32 Implementation Restrictions for Simple UPSes, Cables
 @section Internal Apcupsd Actions for Simple Cables
+@cindex Cables
 
 @example
 
@@ -8659,6 +8986,7 @@ apcserial.c
 
 @node RS232 Wiring and Signal Conventions, Pin Assignment for the Serial Port [RS-232C]; 25-pin and 9-pin; Female End, Internal Apcupsd Actions for Simple Cables, Cables
 @section RS232 Wiring and Signal Conventions
+@cindex Cables
 
 @multitable @columnfractions 0.25 0.25 0.25 0.25
 @item
@@ -8719,6 +9047,7 @@ Pin #@tab Name@tab DTE-DCE Description
 
 @node Pin Assignment for the Serial Port [RS-232C]; 25-pin and 9-pin; Female End, Ioctl to RS232 Correspondence, RS232 Wiring and Signal Conventions, Cables
 @section Pin Assignment for the Serial Port (RS-232C), 25-pin and 9-pin, Female End
+@cindex Cables
 
 @example
 
@@ -8746,6 +9075,7 @@ male end is the same, but looking from inside the cable.
 
 @node Ioctl to RS232 Correspondence, , Pin Assignment for the Serial Port [RS-232C]; 25-pin and 9-pin; Female End, Cables
 @section Ioctl to RS232 Correspondence
+@cindex Cables
 
 @example
 
@@ -8766,6 +9096,8 @@ male end is the same, but looking from inside the cable.
 
 @node Testing Serial-Line UPSes, Troubleshooting Serial Line communications, Cables, Installation on Serial-Line UPSes
 @chapter Testing Serial-Line UPSes
+@cindex Testing, Serial
+@cindex Serial, Testing
 
 If you have a serial-line UPS, there are some tests you should
 run before the general ones described in the Testing (@pxref{Testing Apcupsd}) section.
@@ -8809,6 +9141,7 @@ detect the low battery condition.  For more details please see
 
 @node Establishing Serial Port Connection, Using apctest on Serial-Line UPSses, , Testing Serial-Line UPSes
 @section Establishing Serial Port Connection
+@cindex Testing, Serial
 
 Once you have compiled, installed, and invoked
 apcupsd, you should wait to allow
@@ -8974,6 +9307,8 @@ proceed to the next test.
 
 @node Using apctest on Serial-Line UPSses, , Establishing Serial Port Connection, Testing Serial-Line UPSes
 @section Using apctest on Serial-Line UPSses
+@cindex apctest
+@cindex Testing, with apctest
 
 On an apcsmart serial-line UPS, apctest
 will give you access to the battery of low-level tests we described in
@@ -9060,6 +9395,8 @@ also your @file{apcupsd.conf} file.
 
 @node Expected apctest Signals for a UPS, Expected apctest Signals for a BackUPS Pro, , Using apctest on Serial-Line UPSses
 @subsection Expected apctest Signals for a UPS
+@cindex Testing
+@cindex apctest
 
 If you have configured your UPS as:
 
@@ -9091,6 +9428,8 @@ when the power fails and additionally @strong{CD} when the batteries are low.
 
 @node Expected apctest Signals for a BackUPS Pro, , Expected apctest Signals for a UPS, Using apctest on Serial-Line UPSses
 @subsection Expected apctest Signals for a BackUPS Pro
+@cindex Testing
+@cindex apctest
 
 If you have configured your UPS as:
 
@@ -9120,6 +9459,8 @@ the batteries are low.
 
 @node Troubleshooting Serial Line communications, Recalibrating the UPS Runtime, Testing Serial-Line UPSes, Installation on Serial-Line UPSes
 @chapter Troubleshooting Serial Line communications
+@cindex Problems, Serial
+@cindex Serial Problems
 
 @menu
 * Determining Which Voltage-Signaling Cable You Have::
@@ -9147,6 +9488,7 @@ the cables chapter of this manual.
 
 @node Once you have established serial communications, , Determining Which Voltage-Signaling Cable You Have, Troubleshooting Serial Line communications
 @section Once you have established serial communications
+@cindex Testing
 
 Once you have established that
 apcupsd can talk to the UPS over the serial
@@ -9174,6 +9516,8 @@ port mouse on the same serial port.
 
 @node Recalibrating the UPS Runtime, DATA Logging, Troubleshooting Serial Line communications, Installation on Serial-Line UPSes
 @chapter Recalibrating the UPS Runtime
+@cindex Runtime recalibration
+@cindex Recalibration Runtime
 
 Note: In a future release of apcupsd
 this procedure will be replaced by a daemon operation that can be
@@ -9280,6 +9624,8 @@ BATTSTAT : BatteryStatus
 
 @node DATA Logging, , Recalibrating the UPS Runtime, Installation on Serial-Line UPSes
 @chapter DATA Logging
+@cindex Logging, DATA
+@cindex DATA Logging
 
 This feature is somewhat outdated and not often used.
 
@@ -9314,6 +9660,7 @@ Nov  2 12:43:05 matou apcupsd[23439]: 224.9,227.5,226.2,27.74,50.00,100.0,30.6,,
 
 @node Technical Reference, Credits <1>, Installation on Serial-Line UPSes, Top
 @majorheading Technical Reference
+@cindex Technical Reference
 
 @menu
 * Configuration Directive Reference::
@@ -9325,6 +9672,9 @@ Nov  2 12:43:05 matou apcupsd[23439]: 224.9,227.5,226.2,27.74,50.00,100.0,30.6,,
 
 @node Configuration Directive Reference, apcupsd Status Logging, , Technical Reference
 @chapter Configuration Directive Reference
+@cindex Reference, Directives
+@cindex Configuration, Directives
+@cindex Directives
 
 Configuration directives in 
 @file{/etc/apcupsd/apcupsd.conf} control the behavior
@@ -9343,6 +9693,8 @@ can be left at their defaults unless you have an exotic configuration.
 
 @node General Configuration Directives, Configuration Directives Used by the Network Information Server, , Configuration Directive Reference
 @section General Configuration Directives
+@cindex Directives, General
+@cindex General Directives
 
 In general, each of these directives is required (ecept that the DEVICE
 directive is ignored for UPSCABLE ether).
@@ -9428,6 +9780,8 @@ set it during the build process by using the
 
 @node Configuration Directives Used by the Network Information Server, Configuration Directives used during Power Failures, General Configuration Directives, Configuration Directive Reference
 @section Configuration Directives Used by the Network Information Server
+@cindex Directives, Network
+@cindex Network directives
 
 None of these directives are required for proper operation of
 apcupsd. For the Network Information Server
@@ -9496,6 +9850,8 @@ using the @code{--with-log-dir=} option of the
 
 @node Configuration Directives used during Power Failures, Configuration Directives used to Control System Logging, Configuration Directives Used by the Network Information Server, Configuration Directive Reference
 @section Configuration Directives used during Power Failures
+@cindex Directives, Power fail
+@cindex Power fail directives
 
 In general, none of these directives are required. However, if
 you have a voltage-signalling (dumb) UPS with a cable that does not
@@ -9571,21 +9927,19 @@ specify a TIMEOUT value, so this option is probably not too
 useful (KES).
 
 @item percent
-specifies that apcupsd should
-prohibit logins when the remaining battery charge percentage
-reaches 110% or less than the value specified on the @strong{BATTERYLEVEL} configuration directive.
-Thus if the @strong{BATTERYLEVEL} is
-specified as 15, apcupsd will
-prohibit logins when the battery charge drops below 16% (15% X
-110% = 16%).
+specifies that apcupsd should prohibit logins when the remaining
+battery charge percentage reaches 110% or less than the value
+specified on the @strong{BATTERYLEVEL} configuration directive.
+Thus if the @strong{BATTERYLEVEL} is specified as 15, apcupsd
+will prohibit logins when the battery charge drops below 16% (15%
+X 110% = 16%).
 
 @item minutes
-specifies that apcupsd should
-prohibit logins when the remaining runtime in minutes reaches
-110% or less than the value specified on the @strong{MINUTES} configuration directive. Thus if
-@strong{MINUTES} is set to 3,
-apcupsd will prohibit logins when the
-remaining runtime is less than 3 minutes (3 X 110% = 3).
+specifies that apcupsd should prohibit logins when the remaining
+runtime in minutes reaches 110% or less than the value specified
+on the @strong{MINUTES} configuration directive.  Thus if
+@strong{MINUTES} is set to 3, apcupsd will prohibit logins when
+the remaining runtime is less than 3 minutes (3 X 110% = 3).
 
 @item always
 causes apcupsd to immediately
@@ -9618,21 +9972,21 @@ setting @strong{MINUTES -1} in your
 @file{apcupsd.conf} file.
 
 @item TIMEOUT <time in seconds>
-After a power failure, apcupsd
-will halt the system when TIMEOUT seconds have expired. A value
-of zero disables this timer. Normally for all Smart UPS models
-and dumb UPSes with cables that support low battery detection,
-this should be zero so that the shutdown time will be determined
-by the battery level and/or remaining runtime (see above) or in
-the case of a voltage-signalling UPS, when the battery is
-exhausted. This command is required for dumb UPSes that do not
-provide a battery exhausted signal (only testing can determine
-this point). For more information, see the Testing (@pxref{Testing Apcupsd}) section of this manual. This
-timer can also be useful if you want some slave machines to
-shutdown before other machines to conserve battery power. It is
-also useful for testing apcupsd
+After a power failure, apcupsd will halt the system when TIMEOUT
+seconds have expired.  A value of zero disables this timer.
+Normally for all Smart UPS models and dumb UPSes with cables that
+support low battery detection, this should be zero so that the
+shutdown time will be determined by the battery level and/or
+remaining runtime (see above) or in the case of a
+voltage-signalling UPS, when the battery is exhausted.  This
+command is required for dumb UPSes that do not provide a battery
+exhausted signal (only testing can determine this point).  For
+more information, see the Testing (@pxref{Testing Apcupsd})
+section of this manual.  This timer can also be useful if you
+want some slave machines to shutdown before other machines to
+conserve battery power.  It is also useful for testing apcupsd
 because you can force a rapid shutdown by setting a small value
-(e.g. 60) and pulling the plug to the UPS.
+(e.g.  60) and pulling the plug to the UPS.
 
 When apcupsd is running in master mode (UPSCLASS
 netmaster), and a shutdown condition is determined,
@@ -9646,34 +10000,34 @@ you can do so by adding additional sleep() commands to
 @file{/etc/apcupsd/apccontrol} in each case that 
 causes a shutdown.
 
-@strong{TIMEOUT}, @strong{BATTERYLEVEL}, and @strong{MINUTES} can be set together without
-problems. apcupsd will react to the first case or test that is
-valid. Normally SmartUPS users will set @strong{TIMEOUT} to zero so that the system is
-shutdown depending on the percentage battery charge remaining
-(@strong{BATTERYLEVEL}) or the remaining
-battery runtime (@strong{MINUTES}).
+@strong{TIMEOUT}, @strong{BATTERYLEVEL}, and @strong{MINUTES} can
+be set together without problems.  apcupsd will react to the
+first case or test that is valid.  Normally SmartUPS users will
+set @strong{TIMEOUT} to zero so that the system is shutdown
+depending on the percentage battery charge remaining
+(@strong{BATTERYLEVEL}) or the remaining battery runtime
+(@strong{MINUTES}).
 
 @anchor{KILLDELAY <time in seconds>}@item  KILLDELAY <time in seconds>
-If killdelay is set, apcupsd will 
-continue running after a shutdown has been requested, and after the 
-specified time in seconds, apcupsd will 
-attempt to shut off the UPS the power. This directive should
-normally be disabled by setting the value to zero, but on some
-systems such as Win32 systems apcupsd 
-cannot regain control after a shutdown to force the UPS to shut 
-off the power. In this case, with proper consideration for the timing,
-the @strong{KILLDELAY} directive can be useful.
-Please be aware, if you cause apcupsd to 
-kill the power to your computer too early, the system and the disks 
-may not have been properly prepared. In addition, 
-apcupsd must continue running after the 
-shutdown is requested, and on Unix systems, this is not normally the 
-case as the system will terminate all processes during the 
-shutdown.
-@end table
+If killdelay is set, apcupsd will continue running after a
+shutdown has been requested, and after the specified time in
+seconds, apcupsd will attempt to shut off the UPS the power.
+This directive should normally be disabled by setting the value
+to zero, but on some systems such as Win32 systems apcupsd cannot
+regain control after a shutdown to force the UPS to shut off the
+power.  In this case, with proper consideration for the timing,
+the @strong{KILLDELAY} directive can be useful.  Please be aware,
+if you cause apcupsd to kill the power to your computer too
+early, the system and the disks may not have been properly
+prepared.  In addition, apcupsd must continue running after the
+shutdown is requested, and on Unix systems, this is not normally
+the case as the system will terminate all processes during the
+shutdown.  @end table
 
 @node Configuration Directives used to Control System Logging, Configuration Directives for Sharing a UPS, Configuration Directives used during Power Failures, Configuration Directive Reference
 @section Configuration Directives used to Control System Logging
+@cindex Directives Logging
+@cindex Logging, directives
 
 @table @asis
 
@@ -9709,7 +10063,8 @@ details.
 @end table
 
 @node Configuration Directives for Sharing a UPS, Configuration Directives Used to Set the UPS EPROM, Configuration Directives used to Control System Logging, Configuration Directive Reference
-@section Configuration Directives for Sharing  a UPS
+@section Configuration Directives for Sharing a UPS
+@cindex Directives Sharing
 
 The following directives apply to the master/slave networking
 mode of apcupsd where multiple machines can
@@ -9889,6 +10244,11 @@ on the network. This directive is not required.
 
 @node Configuration Directives Used to Set the UPS EPROM, , Configuration Directives for Sharing a UPS, Configuration Directive Reference
 @section Configuration Directives Used to Set the  UPS EPROM
+@cindex Directives EEPROM
+@cindex EEPROM directives
+
+NOTE. THESE ARE DEPRECIATED AND NO LONGER WORK IN APCUPSD
+PLEASE USE APCTEST
 
 The values specified with the following directives are only used
 if the @code{--configure} option is specified on the 
@@ -10022,6 +10382,8 @@ batteries were changed.
 
 @node apcupsd Status Logging, The Shutown Sequence and its Discontents, Configuration Directive Reference, Technical Reference
 @chapter apcupsd Status Logging
+@cindex Logging, Status
+@cindex Status logging
 
 There is a good deal of information available about the UPS and
 apcupsd's status. This document describes
@@ -10038,6 +10400,8 @@ well.
 
 @node Status report format, Status Report Example, , apcupsd Status Logging
 @section Status report format
+@cindex Status Report
+@cindex Report, Status
 
 The STATUS output is in ASCII format with a single data value or
 piece of information on each line output. Because not all UPSes supply
@@ -10091,6 +10455,8 @@ status can be reliably reassembled.
 
 @node Status Report Example, Status Report Fields, Status report format, apcupsd Status Logging
 @section Status Report Example
+@cindex Examples, Status Report
+@cindex Status
 
 An example of output from an international SmartUPS 1000
 follows:
@@ -10156,6 +10522,7 @@ END APC  : Wed Sep 27 17:30:31 CEST 2000
 
 @node Status Report Fields, Logging the STATUS Information, Status Report Example, apcupsd Status Logging
 @section Status Report Fields
+@cindex Status
 
 The meaning of the above variables are:
 
@@ -10372,6 +10739,8 @@ is the time and date that the STATUS record was written.
 
 @node Logging the STATUS Information, , Status Report Fields, apcupsd Status Logging
 @section Logging the STATUS Information
+@cindex Logging Status
+@cindex Status, Logging
 
 If specified in the configuration file, the STATUS data will also
 be written to the system log file. Please note, that it would not
@@ -10397,6 +10766,7 @@ or the CGI interface to get this information.
 
 @node The Shutown Sequence and its Discontents, APC smart protocol, apcupsd Status Logging, Technical Reference
 @chapter The Shutown Sequence and its Discontents
+@cindex Shutdown Sequence
 
 @menu
 * Shutdown Sequence: Shutdown Sequence <1>.
@@ -10666,6 +11036,7 @@ of old versions. Please be sure to delete or rename all prior versions
 
 @node Startup, Windows Considerations, Master/Slave Shutdown <1>, The Shutown Sequence and its Discontents
 @section Startup
+@cindex Startup
 
 Normally, apcupsd is automatically
 started when your system is rebooted. This normally occurs because the
@@ -10701,13 +11072,16 @@ script:
 
 @node Windows Considerations, , Startup, The Shutown Sequence and its Discontents
 @section Windows Considerations
+@cindex Windows Considerations
 
-Please see the end of Windows
-chapter (@pxref{Installation on Windows}) of this manual for conderations pertaining to shutdown
+Please see the end of Windows chapter (@pxref{Installation on
+Windows}) of this manual for conderations pertaining to shutdown
 and killpower on Windows.
 
 @node APC smart protocol, Apcupsd -- RPM Packaging FAQ, The Shutown Sequence and its Discontents, Technical Reference
 @chapter APC smart protocol
+@cindex Smart protocol
+@cindex Protocol Smart
 
 The APC UPS protocol was originally analyzed by Pavel Korensky
 with additions from Andre H. Hendrick beginning in 1995, and we want
@@ -11705,6 +12079,7 @@ templates for our Win32 code, see:
 
 @node Disclaimer; NO WARRANTY,Index, Contributors, Credits <1>
 @section Disclaimer: NO WARRANTY
+@cindex Disclaimer
 
 BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO
 WARRANTY FOR THE PROGRAM, TO THE EXTENT PERMITTED BY APPLICABLE

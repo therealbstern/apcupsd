@@ -83,7 +83,7 @@ See the ChangeLog below for more details.
      - Fix localtime_r in configure.in as reported with patch by Adam.
      - Fixed bad html in multimoncss.c reported by an anonymous user.
      - Added new Mandrake apcupsd.spec.in submitted by David Walser.
-     - Revert to using the old master/slave networking code bu default.
+     - Revert to using the old master/slave networking code by default.
      
      --- Release apcupsd-3.10.10 (16 January 2004)
      - This version has an additional fix to the USB driver based on
@@ -129,8 +129,6 @@ See the ChangeLog below for more details.
        Makefile detection of changes is all botched up. Since I don't understand
        how the author expected it to work, I used the sledgehammer approach and
        do a "make clean" on every ./configure.
-     - Replaced apcnet.c with Howard Wilkinson's new master/slave code. If
-       anyone *really* needs the old driver, it is in src/apcnet.c.old
      - Upgraded to Cygwin 1.5.5
      
      </pre>
@@ -150,21 +148,20 @@ computer running Linux, Unix, or Windows NT, you are reading the right
 document.
 
   <p>This manual is divided into parts which increase in technical
-depth as they go.  If you have just bought a state-of-the-art smart
-UPS with a USB or Ethernet interface, and you are running a current
-version of Red Hat or SUSE Linux (8.0 or later), then
-apcupsd is very nearly plug-and-play and
-you will have to read only the Basic User's
-Guide (see <a href="#Basic%20User's%20Guide">Basic User's Guide</a>).
+depth as they go.  If you have just bought a state-of-the-art
+smart UPS with a USB or Ethernet interface, and you are running a
+current version of Red Hat or SUSE Linux (8.0 or later), then
+apcupsd is very nearly plug-and-play and you will have to read
+only the Basic User's Guide (see <a href="#Basic%20User's%20Guide">Basic User's Guide</a>).
 
   <p>If your operating system is older, or if you have an
-old-fashioned serial-line UPS, you'll have to read about serial installation (see <a href="#Installation%20on%20Serial-Line%20UPSes">Installation on Serial-Line UPSes</a>).  If you need
-more details about administration for unusual situations (such as a
-master/slave or multi-UPS setup) you'll need to read the section on
-advanced topics (see <a href="#Advanced%20topics">Advanced topics</a>).  Finally, there
-is a Technical Reference (see <a href="#Technical%20Reference">Technical Reference</a>)
-section which gives full details on things like configuration
-file directives and event-logging formats.
+old-fashioned serial-line UPS, you'll have to read about serial
+installation (see <a href="#Installation%20on%20Serial-Line%20UPSes">Installation on Serial-Line UPSes</a>).  If you
+need more details about administration for unusual situations
+(such as a master/slave or multi-UPS setup) you'll need to read
+the section on advanced topics (see <a href="#Advanced%20topics">Advanced topics</a>). 
+Finally, there is a Technical Reference (see <a href="#Technical%20Reference">Technical Reference</a>) section which gives full details on things like
+configuration file directives and event-logging formats.
 
   <p>You should begin by reading the Quick
 Start (see <a href="#Quick%20Start%20for%20Beginners">Quick Start for Beginners</a>) instructions.
@@ -190,15 +187,12 @@ software, but most of its complexities are meant for dealing with
 older hardware and operating systems.  On current hardware and
 software getting it running should not be very complicated.
 
-  <p>The following is a  help guide to the steps needed to get
-apcupsd set up and
-running as painlessly as possible.
+  <p>The following is a help guide to the steps needed to get apcupsd
+set up and running as painlessly as possible.
 
      <ol type=1 start=1>
 
-     <li>First, check to see if
-apcupsd
-supports your UPS and operating
+     <li>First, check to see if apcupsd supports your UPS and operating
 system (see <a href="#Supported%20Operating%20Systems%3b%20UPSes%20and%20Cables">Supported Operating Systems; UPSes and Cables</a>).
 
      <li>Second, plan your configuration
@@ -263,7 +257,8 @@ problem, what version of apcupsd you are
 using, what operating system you are using, and anything else you
 think might be helpful.
 
-     <li>Read the manual sections on <a href="monitoring">monitoring</a> and <a href="maintaining">maintaining</a> your UPS.
+     <li>Read the manual sections on <a href="monitoring">monitoring</a> and
+<a href="maintaining">maintaining</a> your UPS.
        </ol>
 
 <a name="Supported%20Operating%20Systems%3b%20UPSes%20and%20Cables"></a>
@@ -311,11 +306,11 @@ the kind of protocol it uses to talk with its computer.
      <dd>An apcsmart UPS and its computer also communicate through an
 RS232C serial connection, but they actually use it as a character
 channel (2400bps, 8 data bits, 1 stop bit, no parity) and pass
-commands back and forth in a primitive
-language (see <a href="#APC%20smart%20protocol">APC smart protocol</a>) resembling modem-control codes. The different APC UPSes
-all use closely related firmware, so the language doesn't vary much
-(later versions add more commands).  This class of UPS is in decline,
-rapidly being replaced in APC's product line by USB UPSes.
+commands back and forth in a primitive language (see <a href="#APC%20smart%20protocol">APC smart protocol</a>) resembling modem-control codes.  The different APC
+UPSes all use closely related firmware, so the language doesn't
+vary much (later versions add more commands).  This class of UPS
+is in decline, rapidly being replaced in APC's product line by
+USB UPSes.
 
      <br><dt>usb
      <dd>A USB UPS speaks a universal well defined control language
@@ -334,7 +329,10 @@ rather than <strong>usb</strong>.
      <dd>This is the keyword to specify if you are using your
 UPS in Slave mode (i.e. the machine is not directly connected
 to the UPS, but to another machine which is),
-and it is connected to the Master via an ethernet connection.
+and it is connected to the Master via an ethernet connection. 
+You must have apcupsd's Network Information Services NIS
+turned on for this mode to work. It is a much simpler form
+of running a Slave than the old Master/Slave code.
 
      <br><dt>snmp
      <dd>SNMP UPSes communicate via an Ethernet NIC and firmware that
@@ -383,14 +381,11 @@ instructions in <a href="#Cables">Cables</a>.),
 
 <a name="Choosing%20a%20Configuration%20Type"></a>
 
-<h3 class="section">1.3 Choosing a Configuration Type</h3>
-
-  <p>There are three major ways of running
-apcupsd on your system. The first is a
-standalone configuration where apcupsd
-controls a single UPS, which powers a single computer.  This is the most
-common configuration.  If you're working with just one machine and one UPS,
-skip the rest of this section.
+  <p>There are three major ways of running apcupsd on your system. 
+The first is a standalone configuration where apcupsd controls a
+single UPS, which powers a single computer.  This is the most
+common configuration.  If you're working with just one machine
+and one UPS, skip the rest of this section.
 
   <p>Your choices become more interesting if you are running a
 small cluster or a big server farm.  Under those circumstances, it
@@ -398,17 +393,16 @@ may not be possible or even desirable to pair a UPS with every single
 machine.  apcupsd supports some alternate
 arrangements.
 
-  <p>The second type of configuration is a master/slave
-configuration, where one UPS powers several computers, each of which
-runs a copy of apcupsd. The computer that
-controls the UPS is called the master, and the other computers are
-called slaves. The master copy of apcupsd
-communicates with and controls the slaves via an Ethernet connection. 
-This type of configuration may be appropriate for a small cluster
-of machines. Some example configuration files for the master and the
-slave machines can be found in the examples
-directory of the source distribution. The more recent examples are in
-master.apcupsd.conf and
+  <p>The second type of configuration is a master/slave configuration,
+where one UPS powers several computers, each of which runs a copy
+of apcupsd.  The computer that controls the UPS is called the
+master, and the other computers are called slaves.  The master
+copy of apcupsd communicates with and controls the slaves via an
+Ethernet connection.  This type of configuration may be
+appropriate for a small cluster of machines.  Some example
+configuration files for the master and the slave machines can be
+found in the examples directory of the source distribution.  The
+more recent examples are in master.apcupsd.conf and
 slave.apcupsd.conf.
 
   <p>The third configuration (new with version 3.8.3), is where
@@ -426,16 +420,18 @@ and diagnostics
 <p><a name="Configuration%20types_"></a>
 
   <p><strong>Configuration types.</strong>
+<br><p>
+<pre class="example">     <img src="main_configs.png" alt="main_configs.png">
+     </pre>
 
-  <img src="main_configs.png" alt="main_configs.png">
-
+<br><p>
   <p>If you decide to set up one of these more complex
 configurations, see the Advanced Topics (see <a href="#Advanced%20topics">Advanced topics</a>)
 section for details.
 
 <a name="Apcupsd%20Known%20USB%20Issues"></a>
 
-<h3 class="section">1.4 Apcupsd Known USB Issues</h3>
+<h3 class="section">1.3 Apcupsd Known USB Issues</h3>
 
   <p>- <strong>Problem:</strong> USB is only supported on Linux systems (there is now an
 experimental FreeBSD USB version). Although the configuration script
@@ -479,7 +475,7 @@ showup (see the next section).
 
 <a name="Checking%20Out%20Your%20USB%20Subsystem"></a>
 
-<h3 class="section">1.5 Checking Out Your USB Subsystem</h3>
+<h3 class="section">1.4 Checking Out Your USB Subsystem</h3>
 
   <p>You can skip this section if your UPS has an Ethernet or RS232-C
 interface or you are not running on a Linux kernel.  If it has a USB
@@ -1972,7 +1968,9 @@ CGI program.
 
      <br><dt>-enable-master-slave
      <dd>Turns on the master/slave networking code (default). This is
-sometimes referred to as the old master/slave code
+sometimes referred to as the old master/slave code, and
+is more complicated than using NIS and the net driver to
+control Slaves (see below).
 
      <br><dt>-enable-apcsmart
      <dd>Turns on generation of the APC Smart driver (default).
@@ -1987,7 +1985,7 @@ default this is disabled.
 
      <br><dt>-enable-net
      <dd>Turns on generation of the NIS network driver for slaves. This
-is an alternative to master/slave code. For the master, this code
+is an alternative to old master/slave code. For the master, this code
 should be disabled. For each slave, this is the only driver needed. 
 This driver works by reading the information from the the
 configured master using the NIS (Network Information Services)
@@ -3004,14 +3002,19 @@ following:
      </pre>
 
   <p>Note, the main difference from the stand alone configuration is
-that you have specified <strong>UPSCLASS
-netmaster</strong> and <strong>UPSMODE
-net</strong>. In addition, you have specified one or more slave
-machines. In this mode of networking, (as opposed to using the net
-driver as described several sections below), your master knows the
-presence of all the slaves. They carry on a very explicit communication,
-and the slaves are explicitly notified by the master of any important
-changes such as a shutdown.
+that you have specified <strong>UPSCLASS netmaster</strong> and
+<strong>UPSMODE net</strong>.  In addition, you have specified one or
+more slave machines.  In this mode of networking, (as opposed to
+using the net driver as described several sections below), your
+master knows the presence of all the slaves.  They carry on a
+very explicit communication, and the slaves are explicitly
+notified by the master of any important changes such as a
+shutdown.
+
+  <p>There is a simpler form of contolling slaves using the net driver
+with an apcupsd NIS server. The simpler form is much easier to
+configure. See: see <a href="#A%20Sample%20NIS%20Slave%20Configuration%20Using%20the%20Net%20Driver">A Sample NIS Slave Configuration Using the Net Driver</a>
+below for details.
 
 <a name="A%20Simple%20Slave%20Configuration"></a>
 
@@ -3020,10 +3023,9 @@ changes such as a shutdown.
   <p>You have a Smart UPS using the cable supplied by APC that is
 connected to the master machine configured above, and the master
 machine is running as a netmaster and has the address of your
-slave machine. This slave
-machine has no serial port connection to the UPS, but is powered by
-the same UPS as the master. A very simple configuration file would
-look like the following:
+slave machine.  This slave machine has no serial port connection
+to the UPS, but is powered by the same UPS as the master.  A very
+simple configuration file would look like the following:
 
 <pre class="example">     
      ## apcupsd.conf v1.1 ##
@@ -3041,6 +3043,11 @@ have specified <strong>UPSCABLE ether</strong> and
 <strong>UPSCLASS netslave</strong>.  In addition, you
 have specified a single controlling master.
 
+  <p>Please note, there are reports that you <strong>must</strong> use
+<strong>UPSTYPE smartups</strong> on the slave even if the master
+is using <strong>UPSTYPE dumb</strong>. This is apparently some bug
+in the new dumb driver.
+
   <p>In this configuration, the shutdown will be initiated by the
 master. It is also possible to specify BATTERYLEVEL, MINUTES, and
 TIMEOUT configuration directives in the Slave machine that will
@@ -3054,18 +3061,18 @@ up longer during a power outage.
 <h3 class="section">4.6 Variation on the Master/Slave Configuration</h3>
 
   <p>It is also possible to have a Master/Slave configuration where
-the Slave is powered by a different UPS (or any other power source),
-but is nevertheless controlled (i.e. shutdown) by the master. The
-setup would be identical to the Master/Slave configuration files shown
-above. The only difference is where the slave actually receives its
-power. In effect, apcupsd does not
-know or care where the power really comes from.
+the Slave is powered by a different UPS (or any other power
+source), but is nevertheless controlled (i.e.  shutdown) by the
+master.  The setup would be identical to the Master/Slave
+configuration files shown above.  The only difference is where
+the slave actually receives its power.  In effect, apcupsd does
+not know or care where the power really comes from.
 
 <a name="A%20Sample%20NIS%20Slave%20Configuration%20Using%20the%20Net%20Driver"></a>
 
 <h3 class="section">4.7 A Sample NIS Slave Configuration Using the Net Driver</h3>
 
-  <p>As opposed to the master/slave mode demonstrated above, you can
+  <p>As opposed to the old master/slave mode demonstrated above, you can
 turn any computer into an NIS slave by configuring with the NIS network
 driver turned on <code>--enable-net</code>. The difference is
 that the NIS server has no explicit knowledge of the slaves. The NIS server
@@ -3075,11 +3082,10 @@ available to any NIS slave that polls it, but the NIS server does not
 explicitly call each NIS slave as is the case in the Master/Slave networking
 described several sections above.
 
-  <p>Running in this
-configuration, you can use any computer with
-apcupsd running the Network Information
-Server (NIS) as the server. The NIS slave simply uses the NIS information
-to decide when to shutdown. This is a much simpler mode than the older
+  <p>Running in this configuration, you can use any computer with
+apcupsd running the Network Information Server (NIS) as the
+server.  The NIS slave simply uses the NIS information to decide
+when to shutdown.  This is a much simpler mode than the older
 master/slave code mentioned above.
 
   <p>The main apcupsd (NIS server) is connected to the UPS
@@ -3087,12 +3093,39 @@ and has NIS turned on, but the configuration is a simple standalone
 as in the section <strong>A Simple Configuration for a SmartUPS</strong>. It doesn't
 matter how the UPS is connected to the computer (serial, USB, ...).
 
-  <p>For the NIS slave computer, you will have a configuration that looks something
-like what follows. What is important is that you get the information
-from an <strong>ether</strong> cable over the network and you must specify the
-address of a "NIS server" that is running NIS (not the Master/Slave
-networking described above). The NIS slave apcupsd will then poll the NIS server
-at the NETTIME interval you specify to obtain the status.
+  <p>For the NIS slave computer, you will have a configuration that
+looks something like what follows.  What is important is that you
+get the information from an <strong>ether</strong> cable over the network
+and you must specify the address of a "NIS server" that is
+running NIS (not the Master/Slave networking described above). 
+The NIS slave apcupsd will then poll the NIS server at the
+NETTIME interval you specify to obtain the status.
+
+  <p>Here are a few words from Adam Kropelin concerning the difference
+between the Master/Slave networking and the NIS-based networking:
+
+  <p>Think of the difference as push (Master/Slave) vs. pull (NIS-based). In the
+case of M/S, the master makes all the shutdown decisions and notifies the
+slaves when they are to shut down or when some other interesting event
+happens. The slaves just do whatever the master says, whenever the master
+says to. On the other hand, with the NIS-based network config you basically
+"publish" the UPS status from one server and then your clients view that
+status and make their own decisions.
+
+  <p>Personally, I like the NIS-based approach because the master knows nothing
+about the slaves, thus there are fewer configuration files to keep in sync. 
+I also like the flexibility of allowing each slave to make its own decision
+on when to shut down; some of my old clunker servers take quite a long while
+to shut down. There are problems reported occasionally with the M/S
+approach, where slaves sometimes lose contact with the master or vice-versa. 
+I know improvements have been made in that code, but I still like the
+simplicity of using NIS.
+
+  <p>Another thing to think about is how you feel about running a network service
+like NIS on your firewall. My network is set up almost identically to yours
+and I chose to run the apcupsd "master" on a server in the DMZ and have the
+firewall just be a client of it. That way I don't have to run NIS on the
+firewall apcupsd instance.
 
 <pre class="example">     
      ## apcupsd.conf v1.1 ##
@@ -3113,11 +3146,11 @@ not required, connected to a UPS). The :3551 that follows the NIS server
 address is the port to use. The default is 3551, but older versions of
 apcupsd used port 7000.
 
-  <p>Please do not confuse this with a master/slave network
-configuration that is described above. This is a master/slave
-setup, but much simpler (the NIS server does not know about the
-slaves), and any NIS server, even a slave, can act as a server to a
-slave that listens to it.
+  <p>Please do not confuse this NIS server/slave mode with the old
+master/slave network configuration that is described above.  This
+is a master/slave setup, but much simpler (the NIS server does
+not know about the slaves), and any NIS server, even a slave, can
+act as a server to a slave that listens to it.
 
   <p>The <strong>NETTIME</strong> directive defines the time interval
 that the slave uses to poll the NIS server. If you set this too large,
@@ -3145,9 +3178,10 @@ a faster shutdown than the values defined on the NIS server.
 <h2 class="chapter">5 Testing Apcupsd</h2>
 
   <p>The following testing procedures apply for the most part to
-apcsmart UPSes, whether USB or serial. If you have a dumb
+apcsmart UPSes, whether USB or serial.  If you have a dumb
 voltage-signalling UPS, your testing procedures will be somewhat
-different, and you should see the section on Testing Serial UPSes (see <a href="#Testing%20Serial-Line%20UPSes">Testing Serial-Line UPSes</a>).
+different, and you should see the section on Testing Serial UPSes
+(see <a href="#Testing%20Serial-Line%20UPSes">Testing Serial-Line UPSes</a>).
 
   </ul>
 
@@ -3212,11 +3246,11 @@ apcupsd running, don't worry about it
 as this is normal on most non-Linux systems, and on Linux 2.6.x
 kernels.
 
-  <p>If you do not find that apcupsd is
-in the above list, the most likely problem is a configuration file glitch. 
-If no messages were printed, you should check your system log
-(normally <code>/var/log/messages</code> where you will find
-one or messages indicating the nature of the problem.
+  <p>If you do not find that apcupsd is in the above list, the most
+likely problem is a configuration file glitch.  If no messages
+were printed, you should check your system log (normally
+<code>/var/log/messages</code> where you will find one or messages
+indicating the nature of the problem.
 
 <a name="Logging%20Test"></a>
 
@@ -3254,16 +3288,14 @@ will probably be in <code>/var/log/apcupsd.events</code>.
 
 <h3 class="section">5.3 apcaccess Test</h3>
 
-  <p>This test consists of running <code>apcaccess</code> to
-see if apcupsd is properly updating its
-internal variables. Please note that if you are running a pthreaded
-version of apcupsd, which you should be since
-the non-pthreaded version is no longer supported, (installed from rpm or
-<code>--enable-pthreads</code> on the
-<code>./configure</code> line), you must enable the
-apcupsd Network Information Server in your
-configuration file for <strong>apcaccess</strong> to
-work. This is done by setting:
+  <p>This test consists of running <code>apcaccess</code> to see if apcupsd
+is properly updating its internal variables.  Please note that if
+you are running a pthreaded version of apcupsd, which you should
+be since the non-pthreaded version is no longer supported,
+(installed from rpm or <code>--enable-pthreads</code> on the
+<code>./configure</code> line), you must enable the apcupsd Network
+Information Server in your configuration file for
+<strong>apcaccess</strong> to work.  This is done by setting:
 
 <pre class="example">     
      NETSERVER on
@@ -3355,11 +3387,13 @@ will be very minimal as follows:
 apcupsd is working. Assuming that the output looks
 reasonable, check the following variables:
 
-  <p>A very disturbing tendance is for some of the newer (Mar 2004) RS and ES UPSes
-to have no Voltage information. This is annoying bug not serious. On the other
-hand, some of those UPSes now have no battery charge information (BCHARGE). If
-BCHARGE is zero in your listing and you are running a Smart or a USB UPS, then
-you will have to set the BATTERYLEVEL directive in your apcupsd.conf file to -1.
+  <p>A very disturbing tendance is for some of the newer (Mar 2004) RS
+and ES UPSes to have no Voltage information.  This is annoying
+bug not serious.  On the other hand, some of those UPSes now have
+no battery charge information (BCHARGE).  If BCHARGE is zero in
+your listing and you are running a Smart or a USB UPS, then you
+will have to set the BATTERYLEVEL directive in your apcupsd.conf
+file to -1.
 
      <dl>
 
@@ -5704,30 +5738,32 @@ taken.
      <br><dt>mastertimeout
      <dd>This event is generated when a slave detects that
 a master has not contacted it in a reasonable time, or
-when a slave polls a master and gets no response in 30 seconds.
+when a slave polls a master and gets no response in 30 seconds. 
+This event applies only to the old master/slave networking code and
+not to the NIS server/slave mode.
 
      <p>No action is taken.
 
      <br><dt>masterconnect
      <dd>This event is generated when the slave and the
-master reconnect.
+master reconnect. 
+This event applies only to the old master/slave networking code and
+not to the NIS server/slave mode.
 
      <p>No action is taken. 
 </dl>
 
-  <p>To write your own routine for the <strong>powerout</strong> action, you create shell script named
-<strong>powerout</strong> and put it in the lib
-directory (normally <code>/etc/apcupsd</code>). When the
-<strong>powerout</strong> action is invoked by
-apcupsd,
-apccontrol will first give control to your
-script. If you want apccontrol to continue
-with the default action, simply exit your script with an exit status
-of zero. If you do not want apccontrol to
-continue with the default action, your script should exit with the
-special exit code of <strong>99</strong>. However, in
-this case, please be aware that you must ensure proper shutdown of
-your machine if necessary.
+  <p>To write your own routine for the <strong>powerout</strong> action, you
+create shell script named <strong>powerout</strong> and put it in the lib
+directory (normally <code>/etc/apcupsd</code>).  When the
+<strong>powerout</strong> action is invoked by apcupsd, apccontrol will
+first give control to your script.  If you want apccontrol to
+continue with the default action, simply exit your script with an
+exit status of zero.  If you do not want apccontrol to continue
+with the default action, your script should exit with the special
+exit code of <strong>99</strong>.  However, in this case, please be aware
+that you must ensure proper shutdown of your machine if
+necessary.
 
   <p>Some sample scripts (onbattery and mainsback) that email power
 failure messages can be found in the <code>examples</code>
@@ -6161,14 +6197,14 @@ configuration. However, these configurations can be very useful for
 powering electronic equipment and such.
 
   <p>If Computer B is vitally important, it would probably be better
-to purchase a serial port card for it, or perhaps use a USB UPS. To
-ensure that it is properly shutdown if Computer A goes down, you could
-run a second copy of apcupsd on Computer B
-as a slave connected to the main copy of
-apcupsd on Computer A. Thus Computer B
-would be running two slaves, one driven by the master controlling UPS
-1 and the other by the master controlling UPS 2, and Computer B could
-be shutdown by the first master that signaled it to do so.
+to purchase a serial port card for it, or perhaps use a USB UPS. 
+To ensure that it is properly shutdown if Computer A goes down,
+you could run a second copy of apcupsd on Computer B as a slave
+connected to the main copy of apcupsd on Computer A. Thus
+Computer B would be running two slaves, one driven by the master
+controlling UPS 1 and the other by the master controlling UPS 2,
+and Computer B could be shutdown by the first master that
+signaled it to do so.
 
 <a name="Support%20for%20SNMP%20UPSes"></a>
 
@@ -7216,7 +7252,8 @@ work (see <a href="#crazy">crazy</a>).
   <p>According to Bill Marr the Belkin F5U109, also sold as
 F5U409 also works with apcupsd for kernel versions 2.4.25 or
 higher and kernels 2.6.1 and higher.  These newer kernels are
-needed to have the patch that makes the mtc_u232 module and other
+needed to have the patch that makes the mct_u232 (Magic
+Control Technology) module and other
 adapters work with RS-232 devices that do not assert the CTS
 signal.
 
@@ -7235,7 +7272,7 @@ me.)
 
   <p>The device that Joe Acosta and Kern are using is IOgear GUC232A USB 2
 serial adapter. Bill Marr
-informs us that it also works with a Back-UPS Pro 640 and the 940-0095B
+informs us that it also works with a Back-UPS Pro 650 and the 940-0095B
 cable.
 
   <p>At Kern's site, running Red Hat 7.1 with kernel 2.4.9-12, he
@@ -7982,6 +8019,68 @@ cable schematic is the following:
      |                     |
      -----------------------
             |____|
+     
+     </pre>
+
+  <p>From Jan Babinski jbabinsk at pulsarbeacon dot com: (many thanks)
+
+  <p>The BackUPS XS1000(BX-1000) ships with the 940-0127B usb cable and the
+optional 940-0128D serial cable. I'm trying to get it running under OpenBSD
+so usb is out of the question. I've tried smart serial with the custom
+cable, but that's not working, so I'm stuck with dumb serial over 940-0128D.
+
+  <p>I have noticed that this cable is not supported by apcupsd so I set out to
+find out how much different this cable is compared with the supported ones. 
+After tearing the cable apart (see schematic below) I noticed that it is
+functionally similar to the 940-0128A cable except for NC on (6) DTR and (2)
+RD on the computer side.
+
+<pre class="example">     Cable 940-0128D
+     
+     DB9(Computer)               RJ45-10(UPS)
+     
+      (5)     (1)                 ____________
+     ( o o o o o )               [ oooooooooo ]
+      \ o o o o /                [____________]
+       (9)   (6)                 (10)  [_]  (1)
+     
+     
+      RI(9)&lt;---+
+               |
+     CTS(8)&lt;---+--- E   2N2222(NPN)
+                     \|___
+                ____ /| B |
+               |    C     |
+               |          |
+               +---vvvv---+--[&gt;|------&lt;(2)OnBatt
+     RTS(7)&gt;---|    2k      1N5819
+               +---vvvv---+--[&gt;|------&lt;(3)LowBatt
+               |          |
+               +--- C     |
+                     \|___|
+                     /| B
+     DCD(1)&lt;------- E    2N2222(NPN)
+     
+     DTR(4)&gt;--------------------------&gt;(8)KillPwr
+     
+     GND(5)----------------------------(7)Signal GND
+     (Shield)--------------------------(4)Chassis GND
+     
+     
+     Cable 940-0127B
+     
+     USB(Computer)      RJ45-10(UPS)
+      _________          ____________
+     | = = = = |        [ oooooooooo ]
+     |_________|        [____________]
+      (1)   (4)         (10)  [_]  (1)
+     
+       +5V(1)-----------(1)+5V
+     DATA+(2)-----------(9)DATA+
+     DATA-(3)-----------(10)DATA-
+       GND(4)-----------(7)Signal GND
+     (Shield)-----------(4)Chassis GRND
+     
      
      </pre>
 
@@ -8920,21 +9019,19 @@ specify a TIMEOUT value, so this option is probably not too
 useful (KES).
 
           <br><dt>percent
-          <dd>specifies that apcupsd should
-prohibit logins when the remaining battery charge percentage
-reaches 110% or less than the value specified on the <strong>BATTERYLEVEL</strong> configuration directive. 
-Thus if the <strong>BATTERYLEVEL</strong> is
-specified as 15, apcupsd will
-prohibit logins when the battery charge drops below 16% (15% X
-110% = 16%).
+          <dd>specifies that apcupsd should prohibit logins when the remaining
+battery charge percentage reaches 110% or less than the value
+specified on the <strong>BATTERYLEVEL</strong> configuration directive. 
+Thus if the <strong>BATTERYLEVEL</strong> is specified as 15, apcupsd
+will prohibit logins when the battery charge drops below 16% (15%
+X 110% = 16%).
 
           <br><dt>minutes
-          <dd>specifies that apcupsd should
-prohibit logins when the remaining runtime in minutes reaches
-110% or less than the value specified on the <strong>MINUTES</strong> configuration directive. Thus if
-<strong>MINUTES</strong> is set to 3,
-apcupsd will prohibit logins when the
-remaining runtime is less than 3 minutes (3 X 110% = 3).
+          <dd>specifies that apcupsd should prohibit logins when the remaining
+runtime in minutes reaches 110% or less than the value specified
+on the <strong>MINUTES</strong> configuration directive.  Thus if
+<strong>MINUTES</strong> is set to 3, apcupsd will prohibit logins when
+the remaining runtime is less than 3 minutes (3 X 110% = 3).
 
           <br><dt>always
           <dd>causes apcupsd to immediately
@@ -8967,21 +9064,21 @@ setting <strong>MINUTES -1</strong> in your
 <code>apcupsd.conf</code> file.
 
      <br><dt>TIMEOUT &lt;time in seconds&gt;
-     <dd>After a power failure, apcupsd
-will halt the system when TIMEOUT seconds have expired. A value
-of zero disables this timer. Normally for all Smart UPS models
-and dumb UPSes with cables that support low battery detection,
-this should be zero so that the shutdown time will be determined
-by the battery level and/or remaining runtime (see above) or in
-the case of a voltage-signalling UPS, when the battery is
-exhausted. This command is required for dumb UPSes that do not
-provide a battery exhausted signal (only testing can determine
-this point). For more information, see the Testing (see <a href="#Testing%20Apcupsd">Testing Apcupsd</a>) section of this manual. This
-timer can also be useful if you want some slave machines to
-shutdown before other machines to conserve battery power. It is
-also useful for testing apcupsd
+     <dd>After a power failure, apcupsd will halt the system when TIMEOUT
+seconds have expired.  A value of zero disables this timer. 
+Normally for all Smart UPS models and dumb UPSes with cables that
+support low battery detection, this should be zero so that the
+shutdown time will be determined by the battery level and/or
+remaining runtime (see above) or in the case of a
+voltage-signalling UPS, when the battery is exhausted.  This
+command is required for dumb UPSes that do not provide a battery
+exhausted signal (only testing can determine this point).  For
+more information, see the Testing (see <a href="#Testing%20Apcupsd">Testing Apcupsd</a>)
+section of this manual.  This timer can also be useful if you
+want some slave machines to shutdown before other machines to
+conserve battery power.  It is also useful for testing apcupsd
 because you can force a rapid shutdown by setting a small value
-(e.g. 60) and pulling the plug to the UPS.
+(e.g.  60) and pulling the plug to the UPS.
 
      <p>When apcupsd is running in master mode (UPSCLASS
 netmaster), and a shutdown condition is determined,
@@ -8995,31 +9092,29 @@ you can do so by adding additional sleep() commands to
 <code>/etc/apcupsd/apccontrol</code> in each case that
 causes a shutdown.
 
-     <p><strong>TIMEOUT</strong>, <strong>BATTERYLEVEL</strong>, and <strong>MINUTES</strong> can be set together without
-problems. apcupsd will react to the first case or test that is
-valid. Normally SmartUPS users will set <strong>TIMEOUT</strong> to zero so that the system is
-shutdown depending on the percentage battery charge remaining
-(<strong>BATTERYLEVEL</strong>) or the remaining
-battery runtime (<strong>MINUTES</strong>).
+     <p><strong>TIMEOUT</strong>, <strong>BATTERYLEVEL</strong>, and <strong>MINUTES</strong> can
+be set together without problems.  apcupsd will react to the
+first case or test that is valid.  Normally SmartUPS users will
+set <strong>TIMEOUT</strong> to zero so that the system is shutdown
+depending on the percentage battery charge remaining
+(<strong>BATTERYLEVEL</strong>) or the remaining battery runtime
+(<strong>MINUTES</strong>).
 
      <p><a name="KILLDELAY%20%3ctime%20in%20seconds%3e"></a><br><dt>KILLDELAY &lt;time in seconds&gt;
-     <dd>If killdelay is set, apcupsd will
-continue running after a shutdown has been requested, and after the
-specified time in seconds, apcupsd will
-attempt to shut off the UPS the power. This directive should
-normally be disabled by setting the value to zero, but on some
-systems such as Win32 systems apcupsd
-cannot regain control after a shutdown to force the UPS to shut
-off the power. In this case, with proper consideration for the timing,
-the <strong>KILLDELAY</strong> directive can be useful. 
-Please be aware, if you cause apcupsd to
-kill the power to your computer too early, the system and the disks
-may not have been properly prepared. In addition,
-apcupsd must continue running after the
-shutdown is requested, and on Unix systems, this is not normally the
-case as the system will terminate all processes during the
-shutdown. 
-</dl>
+     <dd>If killdelay is set, apcupsd will continue running after a
+shutdown has been requested, and after the specified time in
+seconds, apcupsd will attempt to shut off the UPS the power. 
+This directive should normally be disabled by setting the value
+to zero, but on some systems such as Win32 systems apcupsd cannot
+regain control after a shutdown to force the UPS to shut off the
+power.  In this case, with proper consideration for the timing,
+the <strong>KILLDELAY</strong> directive can be useful.  Please be aware,
+if you cause apcupsd to kill the power to your computer too
+early, the system and the disks may not have been properly
+prepared.  In addition, apcupsd must continue running after the
+shutdown is requested, and on Unix systems, this is not normally
+the case as the system will terminate all processes during the
+shutdown.  </dl>
 
 <a name="Configuration%20Directives%20used%20to%20Control%20System%20Logging"></a>
 
@@ -9060,7 +9155,7 @@ details.
 
 <a name="Configuration%20Directives%20for%20Sharing%20a%20UPS"></a>
 
-<h3 class="section">26.5 Configuration Directives for Sharing  a UPS</h3>
+<h3 class="section">26.5 Configuration Directives for Sharing a UPS</h3>
 
   <p>The following directives apply to the master/slave networking
 mode of apcupsd where multiple machines can
@@ -9241,6 +9336,9 @@ on the network. This directive is not required.
 <a name="Configuration%20Directives%20Used%20to%20Set%20the%20UPS%20EPROM"></a>
 
 <h3 class="section">26.6 Configuration Directives Used to Set the  UPS EPROM</h3>
+
+  <p>NOTE. THESE ARE DEPRECIATED AND NO LONGER WORK IN APCUPSD
+PLEASE USE APCTEST
 
   <p>The values specified with the following directives are only used
 if the <code>--configure</code> option is specified on the
@@ -10041,8 +10139,7 @@ script:
 
 <h3 class="section">28.5 Windows Considerations</h3>
 
-  <p>Please see the end of Windows
-chapter (see <a href="#Installation%20on%20Windows">Installation on Windows</a>) of this manual for conderations pertaining to shutdown
+  <p>Please see the end of Windows chapter (see <a href="#Installation%20on%20Windows">Installation on Windows</a>) of this manual for conderations pertaining to shutdown
 and killpower on Windows.
 
 <a name="APC%20smart%20protocol"></a>
@@ -10903,6 +11000,239 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 <h2 class="unnumbered">Index</h2>
 
 <ul class="index-cp" compact>
+<li>Advanced: <a href="#Advanced%20topics">Advanced topics</a>
+<li>After Installation: <a href="#After%20Installation">After Installation</a>
+<li>Alpha: <a href="#Alpha">Alpha</a>
+<li>apcaccess: <a href="#apcaccess">apcaccess</a>
+<li>apcaccess eeprom: <a href="#apcaccess%20eprom">apcaccess eprom</a>
+<li>apcaccess status: <a href="#apcaccess%20status">apcaccess status</a>
+<li>apcaccess Test: <a href="#apcaccess%20Test">apcaccess Test</a>
+<li>apctest: <a href="#Expected%20apctest%20Signals%20for%20a%20BackUPS%20Pro">Expected apctest Signals for a BackUPS Pro</a>, <a href="#Expected%20apctest%20Signals%20for%20a%20UPS">Expected apctest Signals for a UPS</a>, <a href="#Using%20apctest%20on%20Serial-Line%20UPSses">Using apctest on Serial-Line UPSses</a>, <a href="#apctest">apctest</a>
+<li>apctest setting eeprom: <a href="#Using%20apctest%20to%20Configure%20Your%20EEPROM">Using apctest to Configure Your EEPROM</a>
+<li>BackOffice ES: <a href="#BackOffice%20ES">BackOffice ES</a>
+<li>BackUPS ES: <a href="#BackUPS%20ES%20and%20CS%20in%20Serial%20mode%20with%20Cable%20940-0128A">BackUPS ES and CS in Serial mode with Cable 940-0128A</a>
+<li>BackUPS Office, cables: <a href="#The%20Back-UPS%20Office%20500%20signals">The Back-UPS Office 500 signals</a>
+<li>Batteries: <a href="#Where%20Carl%20Suggests%20You%20Get%20Batteries">Where Carl Suggests You Get Batteries</a>, <a href="#What%20Various%20People%20Have%20to%20Say%20about%20Batteries">What Various People Have to Say about Batteries</a>
+<li>Bugs: <a href="#Apcupsd%20Bugs">Apcupsd Bugs</a>
+<li>Building: <a href="#Building%20and%20Installing%20apcupsd">Building and Installing apcupsd</a>
+<li>Building, Windows: <a href="#Building%20the%20Win32%20Version%20from%20the%20Source">Building the Win32 Version from the Source</a>
+<li>Cables: <a href="#Ioctl%20to%20RS232%20Correspondence">Ioctl to RS232 Correspondence</a>, <a href="#Pin%20Assignment%20for%20the%20Serial%20Port%20%5bRS-232C%5d%3b%2025-pin%20and%209-pin%3b%20Female%20End">Pin Assignment for the Serial Port [RS-232C]; 25-pin and 9-pin; Female End</a>, <a href="#RS232%20Wiring%20and%20Signal%20Conventions">RS232 Wiring and Signal Conventions</a>, <a href="#Internal%20Apcupsd%20Actions%20for%20Simple%20Cables">Internal Apcupsd Actions for Simple Cables</a>, <a href="#Win32%20Implementation%20Restrictions%20for%20Simple%20UPSes">Win32 Implementation Restrictions for Simple UPSes</a>, <a href="#BackUPS%20ES%20and%20CS%20in%20Serial%20mode%20with%20Cable%20940-0128A">BackUPS ES and CS in Serial mode with Cable 940-0128A</a>, <a href="#BackOffice%20ES">BackOffice ES</a>, <a href="#940-0119A%20Cable%20Wiring">940-0119A Cable Wiring</a>, <a href="#940-0095B%20Cable%20Wiring">940-0095B Cable Wiring</a>, <a href="#940-0095A%20Cable%20Wiring">940-0095A Cable Wiring</a>, <a href="#940-0023A%20Cable%20Wiring">940-0023A Cable Wiring</a>, <a href="#940-0020C%20Cable%20Wiring">940-0020C Cable Wiring</a>, <a href="#940-0020B%20Cable%20Wiring">940-0020B Cable Wiring</a>, <a href="#Analyses%20of%20APC%20Cables">Analyses of APC Cables</a>, <a href="#Cables">Cables</a>
+<li>Cables, BackUPS CS: <a href="#Smart%20Signalling%20Cable%20for%20BackUPS%20CS%20Models">Smart Signalling Cable for BackUPS CS Models</a>
+<li>Cables, BackUPS Office: <a href="#The%20Back-UPS%20Office%20500%20signals">The Back-UPS Office 500 signals</a>
+<li>Cables, dumb: <a href="#Voltage-Signalling%20Cable%20for%20%22dumb%22%20UPSes">Voltage-Signalling Cable for "dumb" UPSes</a>
+<li>Cables, Smart Custom: <a href="#Smart-Custom%20Cable%20for%20SmartUPSes">Smart-Custom Cable for SmartUPSes</a>
+<li>Cables, Smart Signalling: <a href="#Smart%20Signalling%20Cable%20for%20BackUPS%20CS%20Models">Smart Signalling Cable for BackUPS CS Models</a>
+<li>Cables, Voltage Signalling: <a href="#Voltage%20Signalling">Voltage Signalling</a>
+<li>CGI programs: <a href="#apcupsd%20Network%20Monitoring%20%5bCGI%5d%20Programs">apcupsd Network Monitoring [CGI] Programs</a>
+<li>CGI, multimon: <a href="#multimon_cgi">multimon_cgi</a>
+<li>CGI, upsfstatus: <a href="#upsfstatus_cgi">upsfstatus_cgi</a>
+<li>CGI, upssstats: <a href="#_%2fupsstats_cgi">_/upsstats_cgi</a>
+<li>CGI, upsstats: <a href="#upsstats_cgi">upsstats_cgi</a>
+<li>CGI, working example: <a href="#Working%20Example">Working Example</a>
+<li>Checking Conf file: <a href="#Checking%20Your%20Configuration%20File">Checking Your Configuration File</a>
+<li>Checking running: <a href="#Making%20sure%20apcupsd%20Is%20Running">Making sure apcupsd Is Running</a>
+<li>Choosing a Configuration Type: <a href="#Choosing%20a%20Configuration%20Type">Choosing a Configuration Type</a>
+<li>Client Test program: <a href="#Client%20Test%20Program">Client Test Program</a>
+<li>Communications Testing: <a href="#Communications%20Test">Communications Test</a>
+<li>compiler options: <a href="#Compilers%20and%20Options">Compilers and Options</a>
+<li>config, Kernel: <a href="#Checking%20Out%20Your%20USB%20Subsystem">Checking Out Your USB Subsystem</a>
+<li>Configuration Type: <a href="#Choosing%20a%20Configuration%20Type">Choosing a Configuration Type</a>
+<li>Configuration, Directives: <a href="#Configuration%20Directive%20Reference">Configuration Directive Reference</a>, <a href="#Configuration%20Directives">Configuration Directives</a>
+<li>Configuration, dumb: <a href="#A%20Simple%20Configuration%20for%20a%20Simple%20Signaling%20or%20Dumb">A Simple Configuration for a Simple Signaling or Dumb</a>
+<li>Configuration, Examples: <a href="#Configuration%20Examples">Configuration Examples</a>
+<li>Configuration, Master: <a href="#A%20Simple%20Master%20Configuration">A Simple Master Configuration</a>
+<li>Configuration, NIS slave conf: <a href="#A%20Sample%20NIS%20Slave%20Configuration%20Using%20the%20Net%20Driver">A Sample NIS Slave Configuration Using the Net Driver</a>
+<li>Configuration, Slave: <a href="#A%20Simple%20Slave%20Configuration">A Simple Slave Configuration</a>
+<li>Configuration, SmartUPS: <a href="#A%20Simple%20Configuration%20for%20a%20SmartUPS">A Simple Configuration for a SmartUPS</a>
+<li>Configuration, USB: <a href="#A%20Simple%20USB%20Configuration">A Simple USB Configuration</a>
+<li>configure options: <a href="#Configure%20Options">Configure Options</a>
+<li>Configuring, eeprom: <a href="#Configuring%20Your%20EEPROM">Configuring Your EEPROM</a>
+<li>Customizing event handling: <a href="#Customizing%20Event%20Handling">Customizing Event Handling</a>
+<li>DATA Logging: <a href="#DATA%20Logging">DATA Logging</a>
+<li>Debian: <a href="#Debian">Debian</a>
+<li>Developers Notes: <a href="#Developers%20Notes">Developers Notes</a>
+<li>Directives: <a href="#Configuration%20Directive%20Reference">Configuration Directive Reference</a>, <a href="#Configuration%20Directives">Configuration Directives</a>
+<li>Directives EEPROM: <a href="#Configuration%20Directives%20Used%20to%20Set%20the%20UPS%20EPROM">Configuration Directives Used to Set the UPS EPROM</a>
+<li>Directives Logging: <a href="#Configuration%20Directives%20used%20to%20Control%20System%20Logging">Configuration Directives used to Control System Logging</a>
+<li>Directives Sharing: <a href="#Configuration%20Directives%20for%20Sharing%20a%20UPS">Configuration Directives for Sharing a UPS</a>
+<li>Directives, General: <a href="#General%20Configuration%20Directives">General Configuration Directives</a>
+<li>Directives, Network: <a href="#Configuration%20Directives%20Used%20by%20the%20Network%20Information%20Server">Configuration Directives Used by the Network Information Server</a>
+<li>Directives, Power fail: <a href="#Configuration%20Directives%20used%20during%20Power%20Failures">Configuration Directives used during Power Failures</a>
+<li>Disclaimer: <a href="#Disclaimer%3b%20NO%20WARRANTY">Disclaimer; NO WARRANTY</a>, <a href="#Disclaimer">Disclaimer</a>
+<li>dumb, Cables: <a href="#Voltage-Signalling%20Cable%20for%20%22dumb%22%20UPSes">Voltage-Signalling Cable for "dumb" UPSes</a>
+<li>dumb, configuration: <a href="#A%20Simple%20Configuration%20for%20a%20Simple%20Signaling%20or%20Dumb">A Simple Configuration for a Simple Signaling or Dumb</a>
+<li>EEPROM directives: <a href="#Configuration%20Directives%20Used%20to%20Set%20the%20UPS%20EPROM">Configuration Directives Used to Set the UPS EPROM</a>
+<li>eeprom, apcaccess: <a href="#apcaccess%20eprom">apcaccess eprom</a>
+<li>eeprom, apctest: <a href="#Using%20apctest%20to%20Configure%20Your%20EEPROM">Using apctest to Configure Your EEPROM</a>
+<li>eeprom, configuring: <a href="#Configuring%20Your%20EEPROM">Configuring Your EEPROM</a>
+<li>Email: <a href="#Email%20Notification%20of%20Events">Email Notification of Events</a>
+<li>Event handling: <a href="#Customizing%20Event%20Handling">Customizing Event Handling</a>
+<li>Events: <a href="#Apcupsd%20Notification%20and%20Events">Apcupsd Notification and Events</a>
+<li>Example, CGI: <a href="#Working%20Example">Working Example</a>
+<li>Example, dumb conf: <a href="#A%20Simple%20Configuration%20for%20a%20Simple%20Signaling%20or%20Dumb">A Simple Configuration for a Simple Signaling or Dumb</a>
+<li>Example, Master conf: <a href="#A%20Simple%20Master%20Configuration">A Simple Master Configuration</a>
+<li>Example, NIS slave: <a href="#A%20Sample%20NIS%20Slave%20Configuration%20Using%20the%20Net%20Driver">A Sample NIS Slave Configuration Using the Net Driver</a>
+<li>Example, Slave conf: <a href="#A%20Simple%20Slave%20Configuration">A Simple Slave Configuration</a>
+<li>Example, SmartUPS conf: <a href="#A%20Simple%20Configuration%20for%20a%20SmartUPS">A Simple Configuration for a SmartUPS</a>
+<li>Example, USB conf: <a href="#A%20Simple%20USB%20Configuration">A Simple USB Configuration</a>
+<li>Examples, Configuration: <a href="#Configuration%20Examples">Configuration Examples</a>
+<li>Examples, Status Report: <a href="#Status%20Report%20Example">Status Report Example</a>
+<li>FAQ: <a href="#Frequently-Asked%20Questions">Frequently-Asked Questions</a>
+<li>FreeBSD: <a href="#FreeBSD">FreeBSD</a>
+<li>General Directives: <a href="#General%20Configuration%20Directives">General Configuration Directives</a>
+<li>hid-ups: <a href="#hid-ups%20and%20USB%20Specific%20Information">hid-ups and USB Specific Information</a>, <a href="#Checking%20Out%20Your%20USB%20Subsystem">Checking Out Your USB Subsystem</a>
+<li>HPUX: <a href="#HPUX">HPUX</a>
+<li>Installation, After installing: <a href="#After%20Installation">After Installation</a>
+<li>Installation, Planning: <a href="#Planning%20Your%20Installation">Planning Your Installation</a>
+<li>Installation, Windows: <a href="#Installation%20on%20Windows">Installation on Windows</a>
+<li>Installing: <a href="#Building%20and%20Installing%20apcupsd">Building and Installing apcupsd</a>
+<li>Installing, Microsoft: <a href="#Microsoft%20Windows">Microsoft Windows</a>
+<li>Installing, Red Hat: <a href="#Red%20Hat%20Linux">Red Hat Linux</a>
+<li>Installing, Source: <a href="#Verifying%20a%20Source%20Installation">Verifying a Source Installation</a>
+<li>Kernel config: <a href="#Checking%20Out%20Your%20USB%20Subsystem">Checking Out Your USB Subsystem</a>
+<li>Keywords, USBTYPE: <a href="#Supported%20Operating%20Systems%3b%20UPSes%20and%20Cables">Supported Operating Systems; UPSes and Cables</a>
+<li>Logging Status: <a href="#Logging%20the%20STATUS%20Information">Logging the STATUS Information</a>
+<li>Logging, DATA: <a href="#DATA%20Logging">DATA Logging</a>
+<li>Logging, directives: <a href="#Configuration%20Directives%20used%20to%20Control%20System%20Logging">Configuration Directives used to Control System Logging</a>
+<li>Logging, Status: <a href="#apcupsd%20Status%20Logging">apcupsd Status Logging</a>
+<li>Logging, System: <a href="#apcupsd%20System%20Logging">apcupsd System Logging</a>
+<li>Logging, Testing: <a href="#Logging%20Test">Logging Test</a>
+<li>Logging, types: <a href="#Logging%20Types">Logging Types</a>
+<li>Maintenance: <a href="#Maintaining%20Your%20UPS">Maintaining Your UPS</a>
+<li>Master, config example: <a href="#A%20Simple%20Master%20Configuration">A Simple Master Configuration</a>
+<li>Master/Slave: <a href="#Master%2fSlave%20Problems">Master/Slave Problems</a>, <a href="#Master%2fSlave%20Configurations">Master/Slave Configurations</a>
+<li>Master/Slave variation: <a href="#Variation%20on%20the%20Master%2fSlave%20Configuration">Variation on the Master/Slave Configuration</a>
+<li>Monitoring: <a href="#apcupsd%20Network%20Monitoring%20%5bCGI%5d%20Programs">apcupsd Network Monitoring [CGI] Programs</a>, <a href="#Monitoring%20and%20Tuning%20your%20UPS">Monitoring and Tuning your UPS</a>
+<li>multimon: <a href="#multimon_cgi">multimon_cgi</a>
+<li>Net driver: <a href="#Server%2fSlave%20Networking%20using%20NIS%20and%20the%20NET%20Driver">Server/Slave Networking using NIS and the NET Driver</a>
+<li>NetBSD: <a href="#NetBSD">NetBSD</a>
+<li>Network directives: <a href="#Configuration%20Directives%20Used%20by%20the%20Network%20Information%20Server">Configuration Directives Used by the Network Information Server</a>
+<li>Network Information Server: <a href="#Network%20Information%20Server%20%5bNIS%5d">Network Information Server [NIS]</a>
+<li>Network monitoring: <a href="#apcupsd%20Network%20Monitoring%20%5bCGI%5d%20Programs">apcupsd Network Monitoring [CGI] Programs</a>
+<li>New Features: <a href="#New%20Features">New Features</a>
+<li>NIS: <a href="#Network%20Information%20Server%20%5bNIS%5d">Network Information Server [NIS]</a>
+<li>NIS alternate was of running: <a href="#Alternate%20Ways%20To%20Run%20The%20Network%20Information%20Server">Alternate Ways To Run The Network Information Server</a>
+<li>NIS networking: <a href="#Server%2fSlave%20Networking%20using%20NIS%20and%20the%20NET%20Driver">Server/Slave Networking using NIS and the NET Driver</a>
+<li>NIS slave conf: <a href="#A%20Sample%20NIS%20Slave%20Configuration%20Using%20the%20Net%20Driver">A Sample NIS Slave Configuration Using the Net Driver</a>
+<li>Notification: <a href="#Apcupsd%20Notification%20and%20Events">Apcupsd Notification and Events</a>
+<li>Notification, Email: <a href="#Email%20Notification%20of%20Events">Email Notification of Events</a>
+<li>OpenBSD: <a href="#OpenBSD">OpenBSD</a>
+<li>options, --enable-cgi: <a href="#Configure%20Options">Configure Options</a>
+<li>options, --enable-powerflute: <a href="#Configure%20Options">Configure Options</a>
+<li>options, --prefix: <a href="#Configure%20Options">Configure Options</a>
+<li>options, --sbindir: <a href="#Configure%20Options">Configure Options</a>
+<li>options, configure: <a href="#Configure%20Options">Configure Options</a>
+<li>OS, Alpha: <a href="#Alpha">Alpha</a>
+<li>OS, Debian: <a href="#Debian">Debian</a>
+<li>OS, FreeBSD: <a href="#FreeBSD">FreeBSD</a>
+<li>OS, HPUX: <a href="#HPUX">HPUX</a>
+<li>OS, NetBSD: <a href="#NetBSD">NetBSD</a>
+<li>OS, OpenBSD: <a href="#OpenBSD">OpenBSD</a>
+<li>OS, Red Hat: <a href="#Red%20Hat%20Systems">Red Hat Systems</a>
+<li>OS, Slackware: <a href="#Slackware">Slackware</a>
+<li>OS, Solaris: <a href="#Sun%20Solaris">Sun Solaris</a>
+<li>OS, SuSE: <a href="#SUSE">SUSE</a>
+<li>OS, Unknown System: <a href="#Unknown%20System">Unknown System</a>
+<li>OS, Windows: <a href="#Windows%20Systems%20with%20CYGWIN%20Installed">Windows Systems with CYGWIN Installed</a>
+<li>OSes: <a href="#Operating%20System%20Specifics">Operating System Specifics</a>
+<li>OSes Supported: <a href="#Supported%20Operating%20Systems%3b%20UPSes%20and%20Cables">Supported Operating Systems; UPSes and Cables</a>
+<li>Planning Installation: <a href="#Planning%20Your%20Installation">Planning Your Installation</a>
+<li>Power down test: <a href="#Full%20Power%20Down%20Test">Full Power Down Test</a>
+<li>Power down, Windows: <a href="#Power%20Down%20During%20Shutdown">Power Down During Shutdown</a>
+<li>Power fail directives: <a href="#Configuration%20Directives%20used%20during%20Power%20Failures">Configuration Directives used during Power Failures</a>
+<li>Power up, reboot: <a href="#Arranging%20for%20Reboot%20on%20Power-Up">Arranging for Reboot on Power-Up</a>
+<li>Problems: <a href="#Troubleshooting%20Your%20Installation">Troubleshooting Your Installation</a>
+<li>Problems, killpower: <a href="#Power%20Off%20%5bkillpower%5d%20of%20UPS%20Does%20Not%20Work">Power Off [killpower] of UPS Does Not Work</a>
+<li>Problems, lock file not cleaned up: <a href="#Reconnection%20does%20not%20clean%20up%20the%20lockfile">Reconnection does not clean up the lockfile</a>
+<li>Problems, Master/Slave: <a href="#Network%20Problems%20with%20Master%2fSlave%20or%20Server%2fSlave%20Configurations">Network Problems with Master/Slave or Server/Slave Configurations</a>
+<li>Problems, Master/slave: <a href="#Master%2fSlave%20Problems">Master/Slave Problems</a>
+<li>Problems, networking: <a href="#Network%20Problems%20with%20Master%2fSlave%20or%20Server%2fSlave%20Configurations">Network Problems with Master/Slave or Server/Slave Configurations</a>
+<li>Problems, no Battery charge: <a href="#Some%20Cheaper%20Models%20Do%20Not%20Have%20Battery%20Charge">Some Cheaper Models Do Not Have Battery Charge</a>
+<li>Problems, Power off: <a href="#Power%20Off%20%5bkillpower%5d%20of%20UPS%20Does%20Not%20Work">Power Off [killpower] of UPS Does Not Work</a>
+<li>Problems, reconnect: <a href="#apcupsd%20Cannot%20Reconnect%20After%20a%20Reboot">apcupsd Cannot Reconnect After a Reboot</a>
+<li>Problems, Serial: <a href="#Troubleshooting%20Serial%20Line%20communications">Troubleshooting Serial Line communications</a>
+<li>Problems, USB: <a href="#Known%20Problems%20with%20USB%20UPSes">Known Problems with USB UPSes</a>, <a href="#Apcupsd%20Known%20USB%20Issues">Apcupsd Known USB Issues</a>
+<li>Problems, Windows: <a href="#Problem%20Areas">Problem Areas</a>
+<li>Process Status Testing: <a href="#Process-Status%20Test">Process-Status Test</a>
+<li>Protocol Smart: <a href="#APC%20smart%20protocol">APC smart protocol</a>
+<li>Quick Start: <a href="#Quick%20Start%20for%20Beginners">Quick Start for Beginners</a>
+<li>Reboot on power up: <a href="#Arranging%20for%20Reboot%20on%20Power-Up">Arranging for Reboot on Power-Up</a>
+<li>Recalibration Runtime: <a href="#Recalibrating%20the%20UPS%20Runtime">Recalibrating the UPS Runtime</a>
+<li>Red Hat: <a href="#Red%20Hat%20Systems">Red Hat Systems</a>
+<li>Reference, Directives: <a href="#Configuration%20Directive%20Reference">Configuration Directive Reference</a>
+<li>Release Notes: <a href="#Release%20Notes">Release Notes</a>
+<li>Report, Status: <a href="#Status%20report%20format">Status report format</a>
+<li>Runtime recalibration: <a href="#Recalibrating%20the%20UPS%20Runtime">Recalibrating the UPS Runtime</a>
+<li>Serial on USB: <a href="#Connecting%20a%20Serial-Line%20UPS%20to%20a%20USB%20Port">Connecting a Serial-Line UPS to a USB Port</a>
+<li>Serial Problems: <a href="#Troubleshooting%20Serial%20Line%20communications">Troubleshooting Serial Line communications</a>
+<li>Serial UPSes: <a href="#Overview%20of%20Serial-Interface%20UPSes">Overview of Serial-Interface UPSes</a>
+<li>Serial, Testing: <a href="#Testing%20Serial-Line%20UPSes">Testing Serial-Line UPSes</a>
+<li>Setup CGI programs: <a href="#Setting%20up%20and%20Testing%20the%20CGI%20Programs">Setting up and Testing the CGI Programs</a>
+<li>Shutdown Sequence: <a href="#The%20Shutown%20Sequence%20and%20its%20Discontents">The Shutown Sequence and its Discontents</a>, <a href="#Shutdown%20Sequence">Shutdown Sequence</a>
+<li>Simulate Power Fail Test: <a href="#Simulated%20Power%20Fail%20Test">Simulated Power Fail Test</a>
+<li>Slackware: <a href="#Slackware">Slackware</a>
+<li>Slave Configuration: <a href="#A%20Simple%20Slave%20Configuration">A Simple Slave Configuration</a>
+<li>Smart Custom Cable: <a href="#Smart-Custom%20Cable%20for%20SmartUPSes">Smart-Custom Cable for SmartUPSes</a>
+<li>Smart protocol: <a href="#APC%20smart%20protocol">APC smart protocol</a>
+<li>SmartUPS configuration: <a href="#A%20Simple%20Configuration%20for%20a%20SmartUPS">A Simple Configuration for a SmartUPS</a>
+<li>SNMP: <a href="#SNMP%20Specific%20Information">SNMP Specific Information</a>, <a href="#Support%20for%20SNMP%20UPSes">Support for SNMP UPSes</a>
+<li>SNMP, Connecting: <a href="#Connecting%20an%20SNMP%20UPS">Connecting an SNMP UPS</a>
+<li>Solaris: <a href="#Sun%20Solaris">Sun Solaris</a>
+<li>Startup: <a href="#Startup">Startup</a>
+<li>Status: <a href="#Status%20Report%20Fields">Status Report Fields</a>, <a href="#Status%20Report%20Example">Status Report Example</a>
+<li>Status logging: <a href="#apcupsd%20Status%20Logging">apcupsd Status Logging</a>
+<li>Status Report: <a href="#Status%20report%20format">Status report format</a>
+<li>status, apcaccess: <a href="#apcaccess%20status">apcaccess status</a>
+<li>Status, Logging: <a href="#Logging%20the%20STATUS%20Information">Logging the STATUS Information</a>
+<li>Sun: <a href="#Sun%20Solaris">Sun Solaris</a>
+<li>Supported OSes: <a href="#Supported%20Operating%20Systems%3b%20UPSes%20and%20Cables">Supported Operating Systems; UPSes and Cables</a>
+<li>SuSE: <a href="#SUSE">SUSE</a>
+<li>System Logging: <a href="#apcupsd%20System%20Logging">apcupsd System Logging</a>
+<li>System Shutdown test: <a href="#System%20Shutdown%20Test">System Shutdown Test</a>
+<li>TCP wrappers: <a href="#TCP%20Wrappers">TCP Wrappers</a>
+<li>Technical Reference: <a href="#Technical%20Reference">Technical Reference</a>
+<li>Testing: <a href="#Once%20you%20have%20established%20serial%20communications">Once you have established serial communications</a>, <a href="#Expected%20apctest%20Signals%20for%20a%20BackUPS%20Pro">Expected apctest Signals for a BackUPS Pro</a>, <a href="#Expected%20apctest%20Signals%20for%20a%20UPS">Expected apctest Signals for a UPS</a>, <a href="#Testing%20Apcupsd">Testing Apcupsd</a>
+<li>Testing CGI programs: <a href="#Setting%20up%20and%20Testing%20the%20CGI%20Programs">Setting up and Testing the CGI Programs</a>
+<li>Testing, apcaccess: <a href="#apcaccess%20Test">apcaccess Test</a>
+<li>Testing, Communications: <a href="#Communications%20Test">Communications Test</a>
+<li>Testing, Logging: <a href="#Logging%20Test">Logging Test</a>
+<li>Testing, Power down: <a href="#Full%20Power%20Down%20Test">Full Power Down Test</a>
+<li>Testing, Process Status: <a href="#Process-Status%20Test">Process-Status Test</a>
+<li>Testing, Serial: <a href="#Establishing%20Serial%20Port%20Connection">Establishing Serial Port Connection</a>, <a href="#Testing%20Serial-Line%20UPSes">Testing Serial-Line UPSes</a>
+<li>Testing, Simulate Power Fail: <a href="#Simulated%20Power%20Fail%20Test">Simulated Power Fail Test</a>
+<li>Testing, System Shutdown: <a href="#System%20Shutdown%20Test">System Shutdown Test</a>
+<li>Testing, Windows: <a href="#Testing">Testing</a>
+<li>Testing, with apctest: <a href="#Using%20apctest%20on%20Serial-Line%20UPSses">Using apctest on Serial-Line UPSses</a>
+<li>Tip: <a href="#A%20Tip%20from%20Carl%20Erhorn%20for%20Sun%20Systems">A Tip from Carl Erhorn for Sun Systems</a>
+<li>Troubleshooting (see problems): <a href="#Troubleshooting%20Your%20Installation">Troubleshooting Your Installation</a>
+<li>Tuning: <a href="#Monitoring%20and%20Tuning%20your%20UPS">Monitoring and Tuning your UPS</a>
+<li>Two apcupsds: <a href="#The%20Second%20Copy%20of%20apcupsd">The Second Copy of apcupsd</a>
+<li>Unknown System: <a href="#Unknown%20System">Unknown System</a>
+<li>Upgrading Windows: <a href="#Upgrading">Upgrading</a>
+<li>upsfstatus: <a href="#upsfstatus_cgi">upsfstatus_cgi</a>
+<li>upssstats: <a href="#_%2fupsstats_cgi">_/upsstats_cgi</a>
+<li>upsstats: <a href="#upsstats_cgi">upsstats_cgi</a>
+<li>UPSTYPE: <a href="#Supported%20Operating%20Systems%3b%20UPSes%20and%20Cables">Supported Operating Systems; UPSes and Cables</a>
+<li>UPSTYPE, table: <a href="#Supported%20Operating%20Systems%3b%20UPSes%20and%20Cables">Supported Operating Systems; UPSes and Cables</a>
+<li>USB problems: <a href="#Apcupsd%20Known%20USB%20Issues">Apcupsd Known USB Issues</a>
+<li>USB, configuration: <a href="#A%20Simple%20USB%20Configuration">A Simple USB Configuration</a>
+<li>User's Guide: <a href="#Basic%20User's%20Guide">Basic User's Guide</a>
+<li>Using this Manual: <a href="#How%20To%20Use%20This%20Manual">How To Use This Manual</a>
+<li>Verifying Source: <a href="#Verifying%20a%20Source%20Installation">Verifying a Source Installation</a>
+<li>Voltage Signalling, Cables: <a href="#Voltage%20Signalling">Voltage Signalling</a>
+<li>Windows: <a href="#Win32%20Implementation%20Restrictions%20for%20Simple%20UPSes">Win32 Implementation Restrictions for Simple UPSes</a>, <a href="#Windows%20Systems%20with%20CYGWIN%20Installed">Windows Systems with CYGWIN Installed</a>
+<li>Windows Considerations: <a href="#Windows%20Considerations">Windows Considerations</a>
+<li>Windows, Building: <a href="#Building%20the%20Win32%20Version%20from%20the%20Source">Building the Win32 Version from the Source</a>
+<li>Windows, Installation: <a href="#Installation%20on%20Windows">Installation on Windows</a>
+<li>Windows, Installation Directory: <a href="#Installation%20Directory">Installation Directory</a>
+<li>Windows, Killpower: <a href="#Killpower%20under%20Windows">Killpower under Windows</a>
+<li>Windows, Options: <a href="#Command%20Line%20Options%20Specific%20to%20the%20Windows%20Version">Command Line Options Specific to the Windows Version</a>
+<li>Windows, Post Installation: <a href="#Post%20Installation">Post Installation</a>
+<li>Windows, Power down: <a href="#Power%20Down%20During%20Shutdown">Power Down During Shutdown</a>
+<li>Windows, Problems: <a href="#Problem%20Areas">Problem Areas</a>
+<li>Windows, Testing: <a href="#Testing">Testing</a>
+<li>Windows, Upgrading: <a href="#Upgrading">Upgrading</a>
+<li>Wrappers, TCP: <a href="#TCP%20Wrappers">TCP Wrappers</a>
   </ul>
 
 
