@@ -51,6 +51,7 @@ html:
 	@echo "Making html"
 	rm -f *.eps *.png
 	cp ${IMAGES}/*.eps .
+	@rm -f next.*  
 	latex2html -white -no_subdir -split 0 -toc_stars -white -notransparent \
 		apcupsd >/dev/null
 	rm -f *.eps
@@ -61,6 +62,7 @@ web:
 	@rm -rf apcupsd/*
 	cp ${IMAGES}/*.eps ${IMAGES}/*.png .
 	cp ${IMAGES}/*.eps ${IMAGES}/*.png apcupsd/
+	@rm -f next.*
 	latex2html -split 4 -local_icons -t "Apcupsd User's Guide" -long_titles 4 \
 		-toc_stars -contents_in_nav -white -notransparent apcupsd >/dev/null
 	cp apcupsd/Apcupsd_Users_Guide.html apcupsd/index.html
@@ -93,11 +95,10 @@ clean:
 	@rm -f *.backup *.ps *.dvi *.ilg *.lof *.lot
 	@rm -f *.old WARNINGS *.out *.toc *.idx
 	@rm -f images.pl labels.pl internals.pl
+	@rm -f *.png *.pdf *.epf
 
 
 distclean:  clean
-
-
 
 
 
