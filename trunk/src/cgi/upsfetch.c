@@ -35,8 +35,6 @@
 int fill_buffer(int sockfd);
 
 
-#define STATFILE "/etc/apcupsd/apcupsd.status"
-
 static int nis_port;
 char statbuf[4096];
 int  statlen = 0;
@@ -135,25 +133,6 @@ int fetch_data(char *host)
    }
    net_close(sockfd);
    return stat;
-
-#ifdef READ_FROM_FILE /* old way of doing it, deprecated */
-   static int readfd = -1;
-
-   if (readfd < 0) {
-     if ((readfd = open(STATFILE, O_RDONLY)) < 0) {
-        sprintf (net_errbuf, "ERROR: Could not open status file %s\n", STATFILE);
-	net_errmsg = net_errbuf;
-	return 0;
-     }
-     if ((statlen = read(readfd, statbuf, sizeof(statbuf)-1)) < 100) {
-        sprintf (net_errbuf, "ERROR: read of status file %s returned %d\n", STATFILE, statlen);
-	net_errmsg = net_errbuf;
-	return 0;
-     }
-     statbuf[statlen] = 0;	   /* string terminator */
-   }
-   return 1;
-#endif
 } 
 
 /*
