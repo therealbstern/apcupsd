@@ -6,6 +6,8 @@ General:
 
 Changes submitted this submission:
 03Feb03
+- Sanitize messages before passing them to syslog() to avoid
+  %n exploit.
 - Added an avsnprinf() routine.          
 - Replaced all vsprintf() calls with avsnprintf() to close a
   master/slave exploit that was published.
