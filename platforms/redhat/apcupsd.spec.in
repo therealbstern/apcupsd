@@ -1,5 +1,10 @@
 # Platform configuration
 # 
+# Note, to build, you need:
+#   Release_Notes-%{version}-%{release}.tar.gz in the
+#   $HOME/redhat/apcupsd directory, and the tar file must contain
+#   Release_Notes-%{version}-%{release}.txt
+# 
 # Select the platform by setting the define below either by command
 # line arguments,
 #  e.g.  rpmbuild -ba --define "build_rh7 1" apcupsd.spec
@@ -48,8 +53,8 @@ Release:      1
 Vendor:       APC UPS Daemon Team
 Distribution: The apcupsd Team
 Packager:     D. Scott Barninger <barninger@fairfieldcomputers.com>
-URL:          http://www.sibbald.com/apcupsd/
-Source0:      http://www.sibbald.com/apcupsd/%{name}-%{version}.tar.gz
+URL:          http://www.apcupsd.com/
+Source0:      http://www.apcupsd.com/%{name}-%{version}.tar.gz
 Source1:      Release_Notes-%{version}-%{release}.tar.gz
 Group:        System Environment/Daemons
 Copyright:    GPL v2
@@ -171,8 +176,8 @@ make \
 
 install -m744 platforms/apccontrol \
               $RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/apccontrol
-	      
-%if ! %{su9} && ! %{mdk}	      
+              
+%if ! %{su9} && ! %{mdk}              
 install -m755 platforms/redhat/apcupsd $RPM_BUILD_ROOT%{initdir}
 %endif
 %if %{su9}
@@ -307,10 +312,10 @@ if [ $1 = 0 ] ; then
 
         # remove startup links
         /sbin/chkconfig --del apcupsd
-	
-	# are we Mandrake?
-	# Mandrake already handles apcupsd
-	if [ ! -s /etc/mandrake-release ]; then
+        
+        # are we Mandrake?
+        # Mandrake already handles apcupsd
+        if [ ! -s /etc/mandrake-release ]; then
         # restore old halt script (hopefully)
         #   mv -f /etc/rc.d/init.d/halt.old /etc/rc.d/init.d/halt
 
@@ -326,7 +331,7 @@ if [ $1 = 0 ] ; then
         { print } ' %{initdir}/halt.old > %{initdir}/halt
 
         chmod 744 %{initdir}/halt
-	fi
+        fi
 fi
 
 %postun usb
@@ -444,9 +449,9 @@ if [ $1 = 0 ] ; then
         # remove startup links
         /sbin/chkconfig --del apcupsd
 
-	# are we Mandrake?
-	# Mandrake already handles apcupsd
-	if [ ! -s /etc/mandrake-release ]; then
+        # are we Mandrake?
+        # Mandrake already handles apcupsd
+        if [ ! -s /etc/mandrake-release ]; then
         # restore old halt script (hopefully)
         #   mv -f /etc/rc.d/init.d/halt.old /etc/rc.d/init.d/halt
 
@@ -462,7 +467,7 @@ if [ $1 = 0 ] ; then
         { print } ' %{initdir}/halt.old > %{initdir}/halt
 
         chmod 744 %{initdir}/halt
-	fi
+        fi
 fi
 
 %postun std

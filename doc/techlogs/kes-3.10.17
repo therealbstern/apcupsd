@@ -3,6 +3,7 @@
 
 General:
 24Dec04
+- Minor tweak to RedHat spec.in
 - Apply Carl Lindberg <lindberg@clindberg.org>'s patch
   for apcaction.c to fix the network management card
   shutdown.
