@@ -1,11 +1,15 @@
-
+# Platform configuration
 # 
-# You must build the package with at least one define
+# Select the platform by setting the define below either by command
+# line arguments,
 #  e.g.  rpmbuild -ba --define "build_rh7 1" apcupsd.spec
+# or by manually setting it to 1 in this file,
+#  e.g. %define rh7 1
 #
 # If you want the usb version, use:
-#        rpmbuild -ba --define "build_usb 1" --define "build_rh7 1" apcupsd.spec
-#
+#  e.g.  rpmbuild -ba --define "build_usb 1" --define "build_rh7 1" apcupsd.spec
+# or by manually setting it to 1 in this file,
+#  e.g. %define usb 1
 
 %define rh7 0
 %{?build_rh7:%define rh7 1}
@@ -16,19 +20,14 @@
 %define rh9 0
 %{?build_rh9:%define rh9 1}
 
+%define fc1 0
+%{?build_fc1:%define fc1 1}
+
+%define wb3 0
+%{?build_wb3:%define wb3 1}
+
 %define usb 0
 %{?build_usb:%define usb 1}
-
-
-%if %{rh7}
-%define rh_version rh7
-%endif
-%if %{rh8}
-%define rh_version rh8
-%endif
-%if %{rh9}
-%define rh_version rh9
-%endif
 
 %define initdir /etc/rc.d/init.d
 
@@ -44,6 +43,12 @@ Source:       http://www.sibbald.com/apcupsd/%{name}-%{version}.tar.gz
 Group:        System Environment/Daemons
 Copyright:    GPL v2
 BuildRoot:    %{_tmppath}/%{name}-root
+BuildRequires: gd-devel
+%if %{rh7}
+BuildRequires: glibc-devel >= 2.2
+%else
+BuildRequires: glibc-devel >= 2.3
+%endif
 
 %description
 Apcupsd can be used for controlling most APC UPSes. During a
@@ -57,18 +62,32 @@ conditions is met, apcupsd will inform users about this fact.
 Some features depend on what UPS model you have (simple or smart).
 
 %if %{usb}
-%package usb-%{rh_version}
+%package usb
 %else
-%package std-%{rh_version}
+%package std
+%endif
+
+Provides: apcupsd
+
+Requires: perl
+%if %{fc1}
+Requires: gd >= 2.0
+%else
+Requires: gd < 2.0
+%endif
+%if %{rh7}
+Requires: glibc >= 2.2
+%else
+Requires: glibc >= 2.3
 %endif
 
 Summary:      APC UPS Power Control Daemon for Linux
 Group:        System Environment/Daemons
 
 %if %{usb}
-%description usb-%{rh_version}
+%description usb
 %else
-%description std-%{rh_version}
+%description std
 %endif
 
 Apcupsd can be used for controlling most APC UPSes. During a
@@ -152,7 +171,7 @@ install -m744 examples/make-hiddev \
 
 %if %{usb}
 
-%files usb-%{rh_version}
+%files usb
 %defattr(-,root,root)
 %doc COPYING ChangeLog INSTALL doc/* examples
 %dir /etc/apcupsd
@@ -175,9 +194,9 @@ install -m744 examples/make-hiddev \
 /sbin/*
 %attr(-,root,man) %{_mandir}/*/*
 
-%pre usb-%{rh_version}
+%pre usb
 
-%post usb-%{rh_version}
+%post usb
 # get rid of any 3.6.2 stuff
 rm -f /etc/rc.d/rc[0-6].d/[KS]20apcups
 rm -f /etc/rc.d/init.d/apcups
@@ -216,7 +235,7 @@ chmod 744 /etc/rc.d/init.d/halt
 
 # Undo things a bit
 
-%preun usb-%{rh_version}
+%preun usb
 if [ $1 = 0 ] ; then
         # stop running version (if any)                  
         # I have removed the following because it sometimes produces
@@ -243,7 +262,7 @@ if [ $1 = 0 ] ; then
         chmod 744 /etc/rc.d/init.d/halt
 fi
 
-%postun usb-%{rh_version}
+%postun usb
 if [ "$1" -ge "1" ]; then
         :
         # /sbin/service apcupsd condrestart >/dev/null 2>&1 || :
@@ -251,7 +270,7 @@ fi
 
 %else
 
-%files std-%{rh_version}
+%files std
 %defattr(-,root,root)
 %doc COPYING ChangeLog INSTALL doc/* examples
 %dir /etc/apcupsd
@@ -272,9 +291,9 @@ fi
 /sbin/*
 %attr(-,root,man) %{_mandir}/*/*
 
-%pre std-%{rh_version}
+%pre std
 
-%post std-%{rh_version}
+%post std
 # get rid of any 3.6.2 stuff
 rm -f /etc/rc.d/rc[0-6].d/[KS]20apcups
 rm -f /etc/rc.d/init.d/apcups
@@ -313,7 +332,7 @@ chmod 744 /etc/rc.d/init.d/halt
 
 # Undo things a bit
 
-%preun std-%{rh_version}
+%preun std
 if [ $1 = 0 ] ; then
         # stop running version (if any)                  
         # I have removed the following because it sometimes produces
@@ -340,7 +359,7 @@ if [ $1 = 0 ] ; then
         chmod 744 /etc/rc.d/init.d/halt
 fi
 
-%postun std-%{rh_version}
+%postun std
 if [ "$1" -ge "1" ]; then
         :
         # /sbin/service apcupsd condrestart >/dev/null 2>&1 || :
@@ -349,6 +368,12 @@ fi
 %endif
 
 %changelog
+* Sat Jan 10 2004 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- added build tags for rh8 rh9 fc1 and wb3
+- cleaned up dependancies and Requires by platform
+* Thu Jan 1 2004 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- removed rh_version from package names
+- added platform build configuration section to beginning of file
 * Sat Nov 08 2003 Scott at fairfieldcomputersdot com
 - expanded usb devices from 0-9 to 0-15
 * Fri Nov 07 2003 Scott at fairfieldcomputers dot com
