@@ -69,7 +69,8 @@
  */
 void child_handler(int sig)
 {
-   return;
+    /* Supposedly this will cause an infinite loop on Irix */
+    signal(SIGCHLD, child_handler);
 }
 
 /*********************************************************************/
