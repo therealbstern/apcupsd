@@ -5,7 +5,7 @@
 \usepackage{html}
 \usepackage{float}
 \usepackage{graphicx}
-\usepackage{bacula}
+\usepackage{apcupsd}
 \usepackage{longtable}
 \usepackage{makeidx}
 \usepackage{index}
@@ -13,12 +13,7 @@
 \usepackage{hyperref}
 
 
-%%\makeindex
-%%\newindex{dir}{ddx}{dnd}{Director Index}
-%%\newindex{fd}{fdx}{fnd}{File Daemon Index}
-%%\newindex{sd}{sdx}{snd}{Storage Daemon Index}
-%%\newindex{console}{cdx}{cnd}{Console Index}
-%%\newindex{general}{idx}{ind}{General Index}
+\makeindex
 
 \sloppy
 
@@ -34,12 +29,12 @@
 %% \evensidemargin -0.25in
 %% \textwidth 7in
 
-\title{\includegraphics{./apcupsd.eps} \\ \bigskip
-   \Large{It comes in the night and sucks the essence
-        from your computers.} }
+%%\title{\includegraphics{./apcupsd.eps} \\ \bigskip
+%%   \Large{It comes in the night and sucks the essence
+%%        from your computers.} }
 \author{Kern Sibbald}
 \date{\vspace{2.0in}\today \\
-      This manual documents Bacula version 1.37.4}
+%%      This manual documents Bacula version 1.37.4}
 
 \maketitle
 
@@ -52,18 +47,6 @@
 \clearpage
 
 \include{manual}
-%
-
-% The following line tells link_resolver.pl to not include these files:
-% nolinks baculai-dir baculai-fd baculai-sd baculai-console baculai-general
-
-% pull in the index
-%%\clearpage
-%%\include{baculai-dir}
-%%\include{baculai-fd}
-%%\include{baculai-sd}
-%%\include{baculai-console}
-%%\include{baculai-general}
-%\printindex
+\printindex
 
 \end{document}

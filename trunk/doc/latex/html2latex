@@ -49,14 +49,16 @@
 #                         will point to the user-specified custom .tag file
 #                         for that format.
 #
-###########################################################################
+##########################################################################
 #
 #  Update History:
 #
 #  who     when         what
 #  ------ --------     ------------------------------------------
+#  K. Cunningham 3/05   Modified to support apcupsd manual instead of Bacula manual
+#
 #  K. Cunningham 12/04  Turned on warnings; fixed things to avoid warning
-#                       messages.  Support for conversion of Bacula Manual
+#                       messages.  Support for conversion of Manuals
 #
 #  schaefer 7/97        Fixed bugs involving $htmlFormatPath and &htmlTag
 #
@@ -673,7 +675,10 @@ sub htmlPrintLine
 {
   local ($nl) = @_;
 
-  &htmlTestContext($htmlLine);
+  # Turns off warnings here because this variable is only used here.
+  no warnings;
+  $htmlIndexContext = &htmlTestContext($htmlLine);
+  use warnings;
   if ($htmlLine ne $htmlIndent) {print $htmlLine; $htmlLinePar = 0}
   $htmlLineSpace = 1;
   $htmlLine = "";

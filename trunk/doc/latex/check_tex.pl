@@ -5,34 +5,44 @@
 
 use strict;
 
+my %args;
+
+
 # The following builds the test string to identify and change multiple
 #   hyphens in the tex files.  Several constructs are identified but only
-#   multiple hyphens are changed; the others are fed to the output 
+#   multiple hyphens are changed; the others are fed to the output
 #   unchanged.
 my $b = '\\\\begin\\*?\\s*\\{\\s*';  # \begin{
 my $e = '\\\\end\\*?\\s*\\{\\s*';    # \end{
 my $c = '\\s*\\}';                   # closing curly brace
 
-# This captures entire verbatim environments.  These are passed to the output
-#   file unchanged.
-my $verbatimenv = $b . "verbatim" . $c . ".*?" . $e . "verbatim" . $c;  
+# # This captures entire verbatim environments.  These are passed to the output
+# #   file unchanged.
+my $verbatimenv = $b . "verbatim" . $c . ".*?" . $e . "verbatim" . $c;
 
-# This captures \verb{} constructs.  They are passed to the output unchanged.
+# # This captures \verb{..{ constructs.  They are passed to the output unchanged.
 my $verb = '\\\\verb\\*?(.).*?\\1';
 
-# This identifies multiple hyphens.
+# # This captures multiple hyphens with a leading and trailing space.  These are not changed.
+my $hyphsp = '\\s\\-{2,}\\s';
+
+# # This identifies other multiple hyphens.
 my $hyphens = '\\-{2,}';
 
-# This builds the actual test string from the above strings.
-#my $teststr = "$verbatimenv|$verb|$tocentry|$hyphens";
-my $teststr = "$verbatimenv|$verb|$hyphens";
+# # This identifies \hyperpage{..} commands, which should be ignored.
+my $hyperpage = '\\\\hyperpage\\*?\\{.*?\\}';
+
+# # This builds the actual test string from the above strings.
+# #my $teststr = "$verbatimenv|$verb|$tocentry|$hyphens";
+my $teststr = "$verbatimenv|$verb|$hyphsp|$hyperpage|$hyphens";
 
 
 sub get_includes {
 	# Get a list of include files from the top-level tex file.
 	my (@list,$file);
 	
-	while (my $filename = shift) {
+	foreach my $filename (@_) {
+		$filename or next;
 		# Start with the top-level latex file so it gets checked too.
 		push (@list,$filename);
 
@@ -50,7 +60,7 @@ sub get_includes {
 
 sub convert_hyphens {
 	my (@files) = @_;
-	my ($filedata,$out,$this,$thiscnt,$before,$verbenv,$cnt);
+	my ($linecnt,$filedata,$out,$this,$thiscnt,$before,$verbenv,$cnt);
 	
 	# Build the test string to check for the various environments.
 	#   We only do the conversion if the multiple hyphens are outside of a 
@@ -73,6 +83,7 @@ sub convert_hyphens {
 		$out = "";
 		$verbenv = 0;
 		$thiscnt = 0;
+		$linecnt = 1;
 
 		# Go through the file data from beginning to end.  For each match, save what
 		#   came before it and what matched.  $filedata now becomes only what came 
@@ -84,13 +95,22 @@ sub convert_hyphens {
 			$this = $&;
 			$before = $`;
 			$filedata = $';
-			# This is where the actual conversion is done.
 
-			# Use this contruct for putting something in between each hyphen
-			#$thiscnt += ($this =~ s/^\-+/do {join('\\,',split('',$&));}/e);
+			$linecnt += $before =~ tr/\n/\n/;
+			$linecnt += $this =~ tr/\n/\n/;
+			if (exists $args{'change'}) {
+				# Use this contruct for putting something in between each hyphen
+				#$thiscnt += ($this =~ s/^\-+/do {join('\\,',split('',$&));}/e);
 
-			# Use this construct for putting something around each hyphen.
-			$thiscnt += ($this =~ s/^\-+/\\verb\{$&\{/);
+				# This is where the actual conversion is done.
+				# Use this construct for putting something around each hyphen.
+				$thiscnt += ($this =~ s/^\-+/\\verb\{$&\{/);
+			} else {
+				if ($this =~ /^\-+/) {
+					$thiscnt++;
+					print "Multiple hyphen found at line $linecnt in $file\n";
+				}
+			}
 			
 			# Put what came before and our (possibly) changed string into 
 			#   the output buffer.
@@ -98,7 +118,7 @@ sub convert_hyphens {
 		}
 
 		# If any hyphens were converted, save the file.
-		if ($thiscnt) {
+		if ($thiscnt and exists $args{'change'}) {
 			open OF,">$file" or die "Cannot open output file $file";
 			print OF $out . $filedata;
 			close OF;
@@ -107,12 +127,30 @@ sub convert_hyphens {
 	}
 	return $cnt;
 }
+
+sub check_arguments {
+	# Checks command-line arguments for ones starting with --  puts them into
+	#   a hash called %args and removes them from @ARGV.
+	my $args = shift;
+	my $i;
+
+	for ($i = 0; $i < $#ARGV; $i++) {
+		$ARGV[$i] =~ /^\-+/ or next;
+		$ARGV[$i] =~ s/^\-+//;
+		$args{$ARGV[$i]} = "";
+		delete ($ARGV[$i]);
+		
+	}
+}
+
 ##################################################################
 #                       MAIN                                  ####
 ##################################################################
 
-my (@includes);
+my @includes;
 my $cnt;
+
+check_arguments(\%args);
 
 # Examine the file pointed to by the first argument to get a list of 
 #  includes to test.
@@ -120,4 +158,8 @@ my $cnt;
 
 $cnt = convert_hyphens(@includes);
 
-print "$cnt Multiple hyphen", ($cnt == 1) ? "" : "s"," Found\n";
+if (exists $args{'change'}) {
+	print "$cnt Multiple hyphen", ($cnt == 1) ? "" : "s"," Changed\n";
+} else {
+	print "$cnt Multiple hyphen", ($cnt == 1) ? "" : "s"," Found\n";
+}
