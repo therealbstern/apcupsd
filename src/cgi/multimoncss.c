@@ -171,10 +171,10 @@ void do_upstemp(char *monhost, char *suffix)
 
     if (getupsvar (monhost, "upstemp", upstemp, sizeof(upstemp)) > 0) {
 	if (use_celsius)
-            printf ("       <TD CLASS=\"Normal\">%s °C</TD>\n", upstemp); 
+            printf ("       <TD CLASS=\"Normal\">%s &deg;C</TD>\n", upstemp); 
 	else {
 	    tempf = (strtod(upstemp, 0) * 1.8) + 32;
-            printf ("       <TD CLASS=\"Normal\">%.1f °F</TD>\n", tempf); 
+            printf ("       <TD CLASS=\"Normal\">%.1f &deg;F</TD>\n", tempf); 
 	}
     } else {
         printf ("       <TD CLASS=\"Empty\">-</TD>\n");
@@ -187,7 +187,7 @@ void do_upstempc(char *monhost, char *suffix)
     char    upstemp[64];
 
     if (getupsvar(monhost, "upstemp", upstemp, sizeof(upstemp)) > 0)
-        printf ("       <TD CLASS=\"Normal\">%s °C</TD>\n", upstemp); 
+        printf ("       <TD CLASS=\"Normal\">%s &deg;C</TD>\n", upstemp); 
     else
         printf ("       <TD CLASS=\"Empty\">-</TD>\n");
 }
@@ -200,7 +200,7 @@ void do_upstempf(char *monhost, char *suffix)
 
     if (getupsvar(monhost, "upstemp", upstemp, sizeof(upstemp)) > 0) {
 	tempf = (strtod (upstemp, 0) * 1.8) + 32;
-        printf ("       <TD CLASS=\"Normal\">%.1f °F</TD>\n", tempf); 
+        printf ("       <TD CLASS=\"Normal\">%.1f &deg;F</TD>\n", tempf); 
     } else {
         printf ("       <TD CLASS=\"Empty\">-</TD>\n");
     }
@@ -227,10 +227,10 @@ void do_ambtemp(char *monhost, char *suffix)
 
     if (getupsvar (monhost, "ambtemp", ambtemp, sizeof(ambtemp)) > 0) {
 	if (use_celsius) 
-            printf ("        <TD CLASS=\"Normal\">%s °C</TD>\n", ambtemp); 
+            printf ("        <TD CLASS=\"Normal\">%s &deg;C</TD>\n", ambtemp); 
 	else {
 	    tempf = (strtod (ambtemp, 0) * 1.8) + 32;
-            printf ("        <TD CLASS=\"Normal\">%.1f °F</TD>\n", tempf); 
+            printf ("        <TD CLASS=\"Normal\">%.1f &deg;F</TD>\n", tempf); 
 	}
     } 
     else {
@@ -244,7 +244,7 @@ void do_ambtempc (char *monhost, char *suffix)
 	char	ambtemp[64];
 
     if (getupsvar (monhost, "ambtemp", ambtemp, sizeof(ambtemp)) > 0)
-        printf ("       <TD CLASS=\"Normal\">%s °C</TD>\n", ambtemp); 
+        printf ("       <TD CLASS=\"Normal\">%s &deg;C</TD>\n", ambtemp); 
     else
         printf ("       <TD CLASS=\"Empty\">-</TD>\n");
 }
@@ -257,7 +257,7 @@ void do_ambtempf (char *monhost, char *suffix)
 
     if (getupsvar (monhost, "ambtemp", ambtemp, sizeof(ambtemp)) > 0) {
 	tempf = (strtod (ambtemp, 0) * 1.8) + 32;
-        printf ("       <TD CLASS=\"Normal\">%.1f °F</TD>\n", tempf); 
+        printf ("       <TD CLASS=\"Normal\">%.1f &deg;F</TD>\n", tempf); 
     } else
         printf ("       <TD CLASS=\"Empty\">-</TD>\n");
 }
