@@ -64,6 +64,14 @@
 
 #include "apc.h"
 
+/*
+ * Pickup then ignore SIGCHLD
+ */
+void child_handler(int sig)
+{
+   return;
+}
+
 /*********************************************************************/
 void init_timer(int timer, void (*fnhandler)(int))
 {
@@ -84,7 +92,7 @@ void init_thread_signals(void)
     signal(SIGPIPE, SIG_IGN);
 
     /* Children reaped by waitpid() */
-    signal(SIGCHLD, SIG_IGN);
+    signal(SIGCHLD, child_handler);
 
     /*
      * I think this is not effective
@@ -105,7 +113,7 @@ void init_signals(void (*handler)(int))
     signal(SIGTERM, handler);
 
     /* Picked up via wait */
-    signal(SIGCHLD, SIG_IGN);
+    signal(SIGCHLD, child_handler);
 
     signal(SIGPIPE, SIG_IGN);
 
