@@ -4,7 +4,7 @@
  *
  * This header is derived from the PowerNet-MIB module.
  *
- * $Id: powernet-mib.h,v 1.2 2003-07-12 11:39:01 kerns Exp $
+ * $Id: powernet-mib.h,v 1.3 2003-07-15 19:44:41 kerns Exp $
  */
 
 #ifndef _POWERNET_MIB_H_
@@ -25,7 +25,7 @@ typedef struct upsBasicIdent {
     size_t    _upsBasicIdentModelLength;
     u_char    *upsBasicIdentName;
     size_t    _upsBasicIdentNameLength;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -60,7 +60,7 @@ typedef struct upsAdvIdent {
     size_t    _upsAdvIdentDateOfManufactureLength;
     u_char    *upsAdvIdentSerialNumber;
     size_t    _upsAdvIdentSerialNumberLength;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -94,7 +94,7 @@ typedef struct upsBasicBattery {
     uint32_t  *upsBasicBatteryTimeOnBattery;
     u_char    *upsBasicBatteryLastReplaceDate;
     size_t    _upsBasicBatteryLastReplaceDateLength;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -130,7 +130,7 @@ typedef struct upsAdvBattery {
     int32_t   *upsAdvBatteryReplaceIndicator;
     int32_t   *upsAdvBatteryNumOfBattPacks;
     int32_t   *upsAdvBatteryNumOfBadBattPacks;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -164,7 +164,7 @@ powernet_mib_agt_register_upsAdvBattery();
 
 typedef struct upsBasicInput {
     int32_t   *upsBasicInputPhase;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -197,7 +197,7 @@ typedef struct upsAdvInput {
     uint32_t  *upsAdvInputMinLineVoltage;
     uint32_t  *upsAdvInputFrequency;
     int32_t   *upsAdvInputLineFailCause;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -231,7 +231,7 @@ powernet_mib_agt_register_upsAdvInput();
 typedef struct upsBasicOutput {
     int32_t   *upsBasicOutputStatus;
     int32_t   *upsBasicOutputPhase;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -263,16 +263,14 @@ typedef struct upsAdvOutput {
     uint32_t  *upsAdvOutputVoltage;
     uint32_t  *upsAdvOutputFrequency;
     uint32_t  *upsAdvOutputLoad;
-    uint32_t  *upsPhaseOutputPercentPower;
     uint32_t  *upsAdvOutputCurrent;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
     uint32_t  __upsAdvOutputVoltage;
     uint32_t  __upsAdvOutputFrequency;
     uint32_t  __upsAdvOutputLoad;
-    uint32_t  __upsPhaseOutputPercentPower;
     uint32_t  __upsAdvOutputCurrent;
 } upsAdvOutput_t;
 
@@ -298,7 +296,7 @@ powernet_mib_agt_register_upsAdvOutput();
 
 typedef struct upsBasicConfig {
     int32_t   *upsBasicConfigNumDevices;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -331,8 +329,8 @@ typedef struct upsBasicConfigDeviceEntry {
     size_t    _deviceNameLength;
     int32_t   *vaRating;
     int32_t   *acceptThisDevice;
-    void      *_clientData;             /* pointer to client data structure */
-    struct upsBasicConfigDeviceEntry *_nextPtr; /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct upsBasicConfigDeviceEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -378,7 +376,7 @@ typedef struct upsAdvConfig {
     uint32_t  *upsAdvConfigBattExhaustThresh;
     u_char    *upsAdvConfigPassword;
     size_t    _upsAdvConfigPasswordLength;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -421,8 +419,8 @@ powernet_mib_agt_register_upsAdvConfig();
 typedef struct upsAdvConfigDipSwitchEntry {
     int32_t   *dipSwitchIndex;
     int32_t   *dipSwitchStatus;
-    void      *_clientData;             /* pointer to client data structure */
-    struct upsAdvConfigDipSwitchEntry *_nextPtr;        /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct upsAdvConfigDipSwitchEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -456,8 +454,8 @@ typedef struct apcUpsConfigEntry {
     size_t    _apcUpsConfigFieldOIDLength;
     u_char    *apcUpsConfigFieldValueRange;
     size_t    _apcUpsConfigFieldValueRangeLength;
-    void      *_clientData;             /* pointer to client data structure */
-    struct apcUpsConfigEntry *_nextPtr; /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct apcUpsConfigEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -488,7 +486,7 @@ powernet_mib_agt_register_apcUpsConfigEntry();
 
 typedef struct upsBasicControl {
     int32_t   *upsBasicControlConserveBattery;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -523,7 +521,7 @@ typedef struct upsAdvControl {
     int32_t   *upsAdvControlFlashAndBeep;
     int32_t   *upsAdvControlTurnOnUPS;
     int32_t   *upsAdvControlBypassSwitch;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -566,7 +564,7 @@ typedef struct upsAdvTest {
     int32_t   *upsAdvTestCalibrationResults;
     u_char    *upsAdvTestCalibrationDate;
     size_t    _upsAdvTestCalibrationDateLength;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -601,7 +599,7 @@ powernet_mib_agt_register_upsAdvTest();
 
 typedef struct upsComm {
     int32_t   *upsCommStatus;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -630,7 +628,7 @@ powernet_mib_agt_register_upsComm();
 
 typedef struct upsPhaseResetValues {
     int32_t   *upsPhaseResetMaxMinValues;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -659,7 +657,7 @@ powernet_mib_agt_register_upsPhaseResetValues();
 
 typedef struct upsPhaseInput {
     int32_t   *upsPhaseNumInputs;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -694,8 +692,8 @@ typedef struct upsPhaseInputEntry {
     int32_t   *upsPhaseInputType;
     u_char    *upsPhaseInputName;
     size_t    _upsPhaseInputNameLength;
-    void      *_clientData;             /* pointer to client data structure */
-    struct upsPhaseInputEntry *_nextPtr;        /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct upsPhaseInputEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -739,8 +737,8 @@ typedef struct upsPhaseInputPhaseEntry {
     int32_t   *upsPhaseInputPower;
     int32_t   *upsPhaseInputMaxPower;
     int32_t   *upsPhaseInputMinPower;
-    void      *_clientData;             /* pointer to client data structure */
-    struct upsPhaseInputPhaseEntry *_nextPtr;   /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct upsPhaseInputPhaseEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -779,7 +777,7 @@ powernet_mib_agt_register_upsPhaseInputPhaseEntry();
 
 typedef struct upsPhaseOutput {
     int32_t   *upsPhaseNumOutputs;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -811,8 +809,8 @@ typedef struct upsPhaseOutputEntry {
     int32_t   *upsPhaseNumOutputPhases;
     int32_t   *upsPhaseOutputVoltageOrientation;
     int32_t   *upsPhaseOutputFrequency;
-    void      *_clientData;             /* pointer to client data structure */
-    struct upsPhaseOutputEntry *_nextPtr;       /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct upsPhaseOutputEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -861,8 +859,8 @@ typedef struct upsPhaseOutputPhaseEntry {
     int32_t   *upsPhaseOutputPercentPower;
     int32_t   *upsPhaseOutputMaxPercentPower;
     int32_t   *upsPhaseOutputMinPercentPower;
-    void      *_clientData;             /* pointer to client data structure */
-    struct upsPhaseOutputPhaseEntry *_nextPtr;  /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct upsPhaseOutputPhaseEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -911,7 +909,7 @@ typedef struct mUpsEnviron {
     uint32_t  *mUpsEnvironRelativeHumidity;
     uint32_t  *mUpsEnvironAmbientTemperature2;
     uint32_t  *mUpsEnvironRelativeHumidity2;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -943,7 +941,7 @@ powernet_mib_agt_register_mUpsEnviron();
 
 typedef struct mUpsContact {
     int32_t   *mUpsContactNumContacts;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -977,8 +975,8 @@ typedef struct mUpsContactEntry {
     size_t    _descriptionLength;
     int32_t   *monitoringStatus;
     int32_t   *currentStatus;
-    void      *_clientData;             /* pointer to client data structure */
-    struct mUpsContactEntry *_nextPtr;  /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct mUpsContactEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -1011,7 +1009,7 @@ powernet_mib_agt_register_mUpsContactEntry();
 
 typedef struct serialPort2Config {
     int32_t   *serialPort2Mode;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -1040,7 +1038,7 @@ powernet_mib_agt_register_serialPort2Config();
 
 typedef struct serialPort2Control {
     int32_t   *setPulseOnTXD;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -1078,7 +1076,7 @@ typedef struct sPDUIdent {
     size_t    _sPDUIdentModelNumberLength;
     u_char    *sPDUIdentSerialNumber;
     size_t    _sPDUIdentSerialNumberLength;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -1115,7 +1113,7 @@ typedef struct sPDUMasterControl {
     size_t    _sPDUMasterStateLength;
     u_char    *sPDUMasterPending;
     size_t    _sPDUMasterPendingLength;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -1149,7 +1147,7 @@ typedef struct sPDUMasterConfig {
     int32_t   *sPDUMasterConfigReboot;
     u_char    *sPDUMasterConfigPDUName;
     size_t    _sPDUMasterConfigPDUNameLength;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -1180,7 +1178,7 @@ powernet_mib_agt_register_sPDUMasterConfig();
 
 typedef struct sPDUOutletControl {
     int32_t   *sPDUOutletControlTableSize;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -1213,8 +1211,8 @@ typedef struct sPDUOutletControlEntry {
     int32_t   *sPDUOutletCtl;
     u_char    *sPDUOutletCtlName;
     size_t    _sPDUOutletCtlNameLength;
-    void      *_clientData;             /* pointer to client data structure */
-    struct sPDUOutletControlEntry *_nextPtr;    /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct sPDUOutletControlEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -1246,7 +1244,7 @@ powernet_mib_agt_register_sPDUOutletControlEntry();
 
 typedef struct sPDUOutletConfig {
     int32_t   *sPDUOutletConfigTableSize;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -1280,8 +1278,8 @@ typedef struct sPDUOutletConfigEntry {
     size_t    _sPDUOutletNameLength;
     int32_t   *sPDUOutletPowerOffTime;
     int32_t   *sPDUOutletRebootDuration;
-    void      *_clientData;             /* pointer to client data structure */
-    struct sPDUOutletConfigEntry *_nextPtr;     /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct sPDUOutletConfigEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -1314,7 +1312,7 @@ powernet_mib_agt_register_sPDUOutletConfigEntry();
 
 typedef struct sPDUIdentVM {
     int32_t   *sPDUIdentVMTableSize;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -1355,8 +1353,8 @@ typedef struct sPDUIdentVMEntry {
     size_t    _sPDUIdentModelNumberVMLength;
     u_char    *sPDUIdentSerialNumberVM;
     size_t    _sPDUIdentSerialNumberVMLength;
-    void      *_clientData;             /* pointer to client data structure */
-    struct sPDUIdentVMEntry *_nextPtr;  /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct sPDUIdentVMEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -1391,7 +1389,7 @@ powernet_mib_agt_register_sPDUIdentVMEntry();
 
 typedef struct sPDUMasterControlVM {
     int32_t   *sPDUMasterControlVMTableSize;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -1423,8 +1421,8 @@ typedef struct sPDUMasterControlVMEntry {
     u_char    *sPDUMasterControlVMName;
     size_t    _sPDUMasterControlVMNameLength;
     int32_t   *sPDUMasterControlVMCommand;
-    void      *_clientData;             /* pointer to client data structure */
-    struct sPDUMasterControlVMEntry *_nextPtr;  /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct sPDUMasterControlVMEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -1455,7 +1453,7 @@ powernet_mib_agt_register_sPDUMasterControlVMEntry();
 
 typedef struct sPDUMasterConfigVM {
     int32_t   *sPDUMasterConfigVMTableSize;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -1491,8 +1489,8 @@ typedef struct sPDUMasterConfigVMEntry {
     int32_t   *sPDUMasterConfigVMHighLoadWarningThreshold;
     int32_t   *sPDUMasterConfigVMLowLoadWarningThreshold;
     int32_t   *sPDUMasterConfigVMOverloadRestriction;
-    void      *_clientData;             /* pointer to client data structure */
-    struct sPDUMasterConfigVMEntry *_nextPtr;   /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct sPDUMasterConfigVMEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -1527,7 +1525,7 @@ powernet_mib_agt_register_sPDUMasterConfigVMEntry();
 
 typedef struct sPDUMasterStatusVM {
     int32_t   *sPDUMasterStatusVMTableSize;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -1565,8 +1563,8 @@ typedef struct sPDUMasterStatusVMEntry {
     int32_t   *sPDUMasterStatusVMMaxLoad;
     int32_t   *sPDUMasterStatusVMOutletCount;
     int32_t   *sPDUMasterStatusVMRebootDuration;
-    void      *_clientData;             /* pointer to client data structure */
-    struct sPDUMasterStatusVMEntry *_nextPtr;   /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct sPDUMasterStatusVMEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -1609,8 +1607,8 @@ typedef struct sPDUOutletControlVMEntry {
     u_char    *sPDUOutletControlVMOutletName;
     size_t    _sPDUOutletControlVMOutletNameLength;
     int32_t   *sPDUOutletControlVMOutletCommand;
-    void      *_clientData;             /* pointer to client data structure */
-    struct sPDUOutletControlVMEntry *_nextPtr;  /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct sPDUOutletControlVMEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -1651,8 +1649,8 @@ typedef struct sPDUOutletConfigVMEntry {
     int32_t   *sPDUOutletConfigVMPowerOnTime;
     int32_t   *sPDUOutletConfigVMPowerOffTime;
     int32_t   *sPDUOutletConfigVMRebootDuration;
-    void      *_clientData;             /* pointer to client data structure */
-    struct sPDUOutletConfigVMEntry *_nextPtr;   /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct sPDUOutletConfigVMEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -1694,8 +1692,8 @@ typedef struct sPDUOutletStatusVMEntry {
     size_t    _sPDUOutletStatusVMOutletNameLength;
     int32_t   *sPDUOutletStatusVMOutletState;
     int32_t   *sPDUOutletStatusVMCommandPending;
-    void      *_clientData;             /* pointer to client data structure */
-    struct sPDUOutletStatusVMEntry *_nextPtr;   /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct sPDUOutletStatusVMEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -1729,7 +1727,7 @@ powernet_mib_agt_register_sPDUOutletStatusVMEntry();
 
 typedef struct sPDUIdentMSP {
     int32_t   *sPDUIdentMSPTableSize;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -1770,8 +1768,8 @@ typedef struct sPDUIdentMSPEntry {
     size_t    _sPDUIdentModelNumberMSPLength;
     u_char    *sPDUIdentSerialNumberMSP;
     size_t    _sPDUIdentSerialNumberMSPLength;
-    void      *_clientData;             /* pointer to client data structure */
-    struct sPDUIdentMSPEntry *_nextPtr; /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct sPDUIdentMSPEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -1806,7 +1804,7 @@ powernet_mib_agt_register_sPDUIdentMSPEntry();
 
 typedef struct sPDUMasterControlMSP {
     int32_t   *sPDUMasterControlMSPTableSize;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -1838,8 +1836,8 @@ typedef struct sPDUMasterControlMSPEntry {
     u_char    *sPDUMasterControlMSPName;
     size_t    _sPDUMasterControlMSPNameLength;
     int32_t   *sPDUMasterControlMSPCommand;
-    void      *_clientData;             /* pointer to client data structure */
-    struct sPDUMasterControlMSPEntry *_nextPtr; /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct sPDUMasterControlMSPEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -1870,7 +1868,7 @@ powernet_mib_agt_register_sPDUMasterControlMSPEntry();
 
 typedef struct sPDUMasterConfigMSP {
     int32_t   *sPDUMasterConfigMSPTableSize;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -1903,8 +1901,8 @@ typedef struct sPDUMasterConfigMSPEntry {
     size_t    _sPDUMasterConfigMSPNameLength;
     int32_t   *sPDUMasterConfigMSPPowerOnTimeDelay;
     int32_t   *sPDUMasterConfigMSPManualButton;
-    void      *_clientData;             /* pointer to client data structure */
-    struct sPDUMasterConfigMSPEntry *_nextPtr;  /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct sPDUMasterConfigMSPEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -1936,7 +1934,7 @@ powernet_mib_agt_register_sPDUMasterConfigMSPEntry();
 
 typedef struct sPDUMasterStatusMSP {
     int32_t   *sPDUMasterStatusMSPTableSize;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -1968,8 +1966,8 @@ typedef struct sPDUMasterStatusMSPEntry {
     u_char    *sPDUMasterStatusMSPName;
     size_t    _sPDUMasterStatusMSPNameLength;
     int32_t   *sPDUMasterStatusMSPOutletCount;
-    void      *_clientData;             /* pointer to client data structure */
-    struct sPDUMasterStatusMSPEntry *_nextPtr;  /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct sPDUMasterStatusMSPEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -2006,8 +2004,8 @@ typedef struct sPDUOutletControlMSPEntry {
     u_char    *sPDUOutletControlMSPOutletName;
     size_t    _sPDUOutletControlMSPOutletNameLength;
     int32_t   *sPDUOutletControlMSPOutletCommand;
-    void      *_clientData;             /* pointer to client data structure */
-    struct sPDUOutletControlMSPEntry *_nextPtr; /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct sPDUOutletControlMSPEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -2046,8 +2044,8 @@ typedef struct sPDUOutletConfigMSPallEntry {
     u_char    *sPDUOutletConfigMSPallOutletName;
     size_t    _sPDUOutletConfigMSPallOutletNameLength;
     int32_t   *sPDUOutletConfigMSPallOutletCtrlMode;
-    void      *_clientData;             /* pointer to client data structure */
-    struct sPDUOutletConfigMSPallEntry *_nextPtr;       /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct sPDUOutletConfigMSPallEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -2094,8 +2092,8 @@ typedef struct sPDUOutletConfigMSPgsEntry {
     int32_t   *sPDUOutletConfigMSPgsPowerOffDelay;
     int32_t   *sPDUOutletConfigMSPgsBattCapThresh;
     int32_t   *sPDUOutletConfigMSPgsRebootDuration;
-    void      *_clientData;             /* pointer to client data structure */
-    struct sPDUOutletConfigMSPgsEntry *_nextPtr;        /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct sPDUOutletConfigMSPgsEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -2144,8 +2142,8 @@ typedef struct sPDUOutletConfigMSPannunEntry {
     int32_t   *sPDUOutletConfigMSPannunOutletCtrlMode;
     int32_t   *sPDUOutletConfigMSPannunInitialState;
     int32_t   *sPDUOutletConfigMSPannunAlarmActionDly;
-    void      *_clientData;             /* pointer to client data structure */
-    struct sPDUOutletConfigMSPannunEntry *_nextPtr;     /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct sPDUOutletConfigMSPannunEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -2197,8 +2195,8 @@ typedef struct sPDUOutletConfigMSPmupsEntry {
     int32_t   *sPDUOutletConfigMSPmupsP2HiHum;
     int32_t   *sPDUOutletConfigMSPmupsP2LowTemp;
     int32_t   *sPDUOutletConfigMSPmupsP2HiTemp;
-    void      *_clientData;             /* pointer to client data structure */
-    struct sPDUOutletConfigMSPmupsEntry *_nextPtr;      /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct sPDUOutletConfigMSPmupsEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -2250,8 +2248,8 @@ typedef struct sPDUOutletStatusMSPEntry {
     int32_t   *sPDUOutletStatusMSPOutletState;
     int32_t   *sPDUOutletStatusMSPCommandPending;
     int32_t   *sPDUOutletStatusMSPOutletCtrlMode;
-    void      *_clientData;             /* pointer to client data structure */
-    struct sPDUOutletStatusMSPEntry *_nextPtr;  /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct sPDUOutletStatusMSPEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -2289,7 +2287,7 @@ typedef struct dm3IdentSystem {
     int32_t   *dm3IdentSysModel;
     int32_t   *dm3IdentSysCntrlRev;
     int32_t   *dm3IdentSysFWVersion;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -2323,8 +2321,8 @@ typedef struct dm3IdentSysDescriptionEntry {
     int32_t   *dm3IdentSysDescriptionIndex;
     u_char    *dm3IdentSysDescriptionText;
     size_t    _dm3IdentSysDescriptionTextLength;
-    void      *_clientData;             /* pointer to client data structure */
-    struct dm3IdentSysDescriptionEntry *_nextPtr;       /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct dm3IdentSysDescriptionEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -2360,7 +2358,7 @@ typedef struct dm3ConfigSystem {
     int32_t   *dm3ConfigSysLowTempAlarm;
     int32_t   *dm3ConfigSysHardwareTempAlarm;
     int32_t   *dm3ConfigSysRemoteAccess;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -2397,8 +2395,8 @@ typedef struct dm3ConfigSysDescriptionEntry {
     int32_t   *dm3ConfigSysDescriptionIndex;
     u_char    *dm3ConfigSysDescriptionText;
     size_t    _dm3ConfigSysDescriptionTextLength;
-    void      *_clientData;             /* pointer to client data structure */
-    struct dm3ConfigSysDescriptionEntry *_nextPtr;      /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct dm3ConfigSysDescriptionEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -2428,7 +2426,7 @@ powernet_mib_agt_register_dm3ConfigSysDescriptionEntry();
 
 typedef struct dm3ConfigLVD {
     int32_t   *dm3ConfigLVDTableSize;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -2464,8 +2462,8 @@ typedef struct dm3ConfigLVDEntry {
     int32_t   *dm3ConfigLVDResetThresh;
     int32_t   *dm3ConfigLVDOpenAlarm;
     int32_t   *dm3ConfigLVDHWAlarm;
-    void      *_clientData;             /* pointer to client data structure */
-    struct dm3ConfigLVDEntry *_nextPtr; /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct dm3ConfigLVDEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -2518,7 +2516,7 @@ typedef struct dm3ConfigBattery {
     int32_t   *dm3ConfigLowKneeTemp;
     int32_t   *dm3ConfigBattHwCurrentAlarm;
     int32_t   *dm3ConfigBattHwTempAlarm;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -2568,7 +2566,7 @@ typedef struct dm3ConfigRectThresh {
     int32_t   *dm3ConfigRectLowVoltThresh;
     int32_t   *dm3ConfigRectFailSafe;
     int32_t   *dm3ConfigRectFailComm;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -2611,7 +2609,7 @@ typedef struct dm3ConfigRectAlarms {
     int32_t   *dm3ConfigRectFanFailAlarm;
     int32_t   *dm3ConfigRectFailAlarm;
     int32_t   *dm3ConfigRectHwVoltAlarm;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -2657,7 +2655,7 @@ typedef struct dm3ConfigConvThresh {
     int32_t   *dm3ConfigConvFailMax;
     int32_t   *dm3ConfigConvFailMin;
     int32_t   *dm3ConfigConvFailComm;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -2703,7 +2701,7 @@ typedef struct dm3ConfigConvAlarms {
     int32_t   *dm3ConfigConvFanFailAlarm;
     int32_t   *dm3ConfigConvFailAlarm;
     int32_t   *dm3ConfigConvHwVoltAlarm;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -2743,7 +2741,7 @@ powernet_mib_agt_register_dm3ConfigConvAlarms();
 
 typedef struct dm3ConfigOutputRelays {
     int32_t   *dm3ConfigOutRlyTableSize;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -2776,8 +2774,8 @@ typedef struct dm3ConfigOutRlyEntry {
     size_t    _dm3ConfigOutRlyNameLength;
     int32_t   *dm3ConfigOutRlyDelay;
     int32_t   *dm3ConfigOutRlyAlarm;
-    void      *_clientData;             /* pointer to client data structure */
-    struct dm3ConfigOutRlyEntry *_nextPtr;      /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct dm3ConfigOutRlyEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -2809,7 +2807,7 @@ powernet_mib_agt_register_dm3ConfigOutRlyEntry();
 
 typedef struct dm3ConfigInputRelays {
     int32_t   *dm3ConfigInRlyTableSize;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -2842,8 +2840,8 @@ typedef struct dm3ConfigInRlyEntry {
     size_t    _dm3ConfigInRlyNameLength;
     int32_t   *dm3ConfigInRlyDelay;
     int32_t   *dm3ConfigInRlyAlarm;
-    void      *_clientData;             /* pointer to client data structure */
-    struct dm3ConfigInRlyEntry *_nextPtr;       /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct dm3ConfigInRlyEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -2875,7 +2873,7 @@ powernet_mib_agt_register_dm3ConfigInRlyEntry();
 
 typedef struct dm3ConfigBreakers {
     int32_t   *dm3ConfigBreakersTableSize;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -2907,8 +2905,8 @@ typedef struct dm3ConfigBreakersEntry {
     u_char    *dm3ConfigBreakersName;
     size_t    _dm3ConfigBreakersNameLength;
     int32_t   *dm3ConfigBreakersAlarm;
-    void      *_clientData;             /* pointer to client data structure */
-    struct dm3ConfigBreakersEntry *_nextPtr;    /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct dm3ConfigBreakersEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -2939,7 +2937,7 @@ powernet_mib_agt_register_dm3ConfigBreakersEntry();
 
 typedef struct dm3ConfigFuses {
     int32_t   *dm3ConfigFusesTableSize;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -2971,8 +2969,8 @@ typedef struct dm3ConfigFusesEntry {
     u_char    *dm3ConfigFusesName;
     size_t    _dm3ConfigFusesNameLength;
     int32_t   *dm3ConfigFusesAlarm;
-    void      *_clientData;             /* pointer to client data structure */
-    struct dm3ConfigFusesEntry *_nextPtr;       /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct dm3ConfigFusesEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -3009,7 +3007,7 @@ typedef struct dm3StatusSystem {
     int32_t   *dm3StatusSysSecurityLevel;
     int32_t   *dm3StatusSysTempSanity;
     int32_t   *dm3StatusSysAlarmState;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -3043,7 +3041,7 @@ powernet_mib_agt_register_dm3StatusSystem();
 
 typedef struct dm3StatusAlarms {
     int32_t   *dm3StatusAlarmsTableSize;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -3074,8 +3072,8 @@ typedef struct dm3StatusAlarmsEntry {
     int32_t   *dm3StatusAlarmsIndex;
     u_char    *dm3StatusAlarmsText;
     size_t    _dm3StatusAlarmsTextLength;
-    void      *_clientData;             /* pointer to client data structure */
-    struct dm3StatusAlarmsEntry *_nextPtr;      /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct dm3StatusAlarmsEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -3108,7 +3106,7 @@ typedef struct dm3StatusBattery {
     int32_t   *dm3StatusBattTemp;
     int32_t   *dm3StatusBattCurrentSanity;
     int32_t   *dm3StatusBattTempSanity;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -3145,7 +3143,7 @@ typedef struct dm3StatusOEM {
     int32_t   *dm3StatusOEMconvGain;
     int32_t   *dm3StatusOEMshuntOffset;
     int32_t   *dm3StatusOEMshuntGain;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -3179,7 +3177,7 @@ powernet_mib_agt_register_dm3StatusOEM();
 
 typedef struct dm3StatusLVD {
     int32_t   *dm3StatusLVDTableSize;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -3212,8 +3210,8 @@ typedef struct dm3StatusLVDEntry {
     size_t    _dm3StatusLVDNameLength;
     int32_t   *dm3StatusLVDState;
     int32_t   *dm3StatusLVDHwFault;
-    void      *_clientData;             /* pointer to client data structure */
-    struct dm3StatusLVDEntry *_nextPtr; /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct dm3StatusLVDEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -3250,7 +3248,7 @@ typedef struct dm3StatusRectifier {
     int32_t   *dm3StatusSysRectType;
     int32_t   *dm3StatusSysRectVoltage;
     int32_t   *dm3StatusSysRectCurrent;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -3300,8 +3298,8 @@ typedef struct dm3StatusRectEntry {
     int32_t   *dm3StatusRectPresent;
     int32_t   *dm3StatusRectDiagPass;
     int32_t   *dm3StatusRectState;
-    void      *_clientData;             /* pointer to client data structure */
-    struct dm3StatusRectEntry *_nextPtr;        /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct dm3StatusRectEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -3350,7 +3348,7 @@ typedef struct dm3StatusConverter {
     int32_t   *dm3StatusSysConvType;
     int32_t   *dm3StatusSysConvVoltage;
     int32_t   *dm3StatusSysConvCurrent;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -3400,8 +3398,8 @@ typedef struct dm3StatusConvEntry {
     int32_t   *dm3StatusConvPresent;
     int32_t   *dm3StatusConvDiagPass;
     int32_t   *dm3StatusConvState;
-    void      *_clientData;             /* pointer to client data structure */
-    struct dm3StatusConvEntry *_nextPtr;        /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct dm3StatusConvEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -3445,7 +3443,7 @@ powernet_mib_agt_register_dm3StatusConvEntry();
 
 typedef struct dm3StatusOutputRelays {
     int32_t   *dm3StatusOutRlyTableSize;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -3477,8 +3475,8 @@ typedef struct dm3StatusOutRlyEntry {
     u_char    *dm3StatusOutRlyName;
     size_t    _dm3StatusOutRlyNameLength;
     int32_t   *dm3StatusOutRlyStatus;
-    void      *_clientData;             /* pointer to client data structure */
-    struct dm3StatusOutRlyEntry *_nextPtr;      /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct dm3StatusOutRlyEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -3509,7 +3507,7 @@ powernet_mib_agt_register_dm3StatusOutRlyEntry();
 
 typedef struct dm3StatusInputRelays {
     int32_t   *dm3StatusInRlyTableSize;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -3541,8 +3539,8 @@ typedef struct dm3StatusInRlyEntry {
     u_char    *dm3StatusInRlyName;
     size_t    _dm3StatusInRlyNameLength;
     int32_t   *dm3StatusInRlyStatus;
-    void      *_clientData;             /* pointer to client data structure */
-    struct dm3StatusInRlyEntry *_nextPtr;       /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct dm3StatusInRlyEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -3573,7 +3571,7 @@ powernet_mib_agt_register_dm3StatusInRlyEntry();
 
 typedef struct dm3StatusBreakers {
     int32_t   *dm3StatusBreakersTableSize;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -3605,8 +3603,8 @@ typedef struct dm3StatusBreakersEntry {
     u_char    *dm3StatusBreakersName;
     size_t    _dm3StatusBreakersNameLength;
     int32_t   *dm3StatusBreakersStatus;
-    void      *_clientData;             /* pointer to client data structure */
-    struct dm3StatusBreakersEntry *_nextPtr;    /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct dm3StatusBreakersEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -3637,7 +3635,7 @@ powernet_mib_agt_register_dm3StatusBreakersEntry();
 
 typedef struct dm3StatusFuses {
     int32_t   *dm3StatusFusesTableSize;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -3669,8 +3667,8 @@ typedef struct dm3StatusFusesEntry {
     u_char    *dm3StatusFusesName;
     size_t    _dm3StatusFusesNameLength;
     int32_t   *dm3StatusFusesStatus;
-    void      *_clientData;             /* pointer to client data structure */
-    struct dm3StatusFusesEntry *_nextPtr;       /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct dm3StatusFusesEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -3705,7 +3703,7 @@ typedef struct powerNetSoftwareSystem {
     uint32_t  *powerNetSoftwareOid;
     size_t    _powerNetSoftwareOidLength;
     uint32_t  *powerNetSoftwareSystemUpTime;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -3736,7 +3734,7 @@ powernet_mib_agt_register_powerNetSoftwareSystem();
 
 typedef struct powerNetSoftwareConfig {
     int32_t   *powerNetSoftwareTableSize;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -3771,8 +3769,8 @@ typedef struct powerNetSoftwareEntry {
     size_t    _moduleVersionLength;
     u_char    *moduleDate;
     size_t    _moduleDateLength;
-    void      *_clientData;             /* pointer to client data structure */
-    struct powerNetSoftwareEntry *_nextPtr;     /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct powerNetSoftwareEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -3807,7 +3805,7 @@ typedef struct mconfig {
     int32_t   *mconfigBOOTPEnabled;
     u_char    *mconfigTFTPServerIP;
     int32_t   *newCodeAuthentViaTFTP;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -3845,8 +3843,8 @@ typedef struct mconfigTrapReceiverEntry {
     int32_t   *severity;
     int32_t   *acceptThisReceiver;
     int32_t   *receiveTrapType;
-    void      *_clientData;             /* pointer to client data structure */
-    struct mconfigTrapReceiverEntry *_nextPtr;  /* pointer to next table entry */
+    void      *_clientData;		/* pointer to client data structure */
+    struct mconfigTrapReceiverEntry *_nextPtr;	/* pointer to next table entry */
 
     /* private space to hold actual values */
 
@@ -3883,7 +3881,7 @@ typedef struct mconfigClock {
     size_t    _mconfigClockDateLength;
     u_char    *mconfigClockTime;
     size_t    _mconfigClockTimeLength;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -3913,7 +3911,7 @@ powernet_mib_agt_register_mconfigClock();
 
 typedef struct mcontrol {
     int32_t   *mcontrolRestartAgent;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -3959,7 +3957,7 @@ typedef struct mtrapargs {
     uint32_t  *mtrapargsGauge03;
     uint32_t  *mtrapargsTimeTicks02;
     uint32_t  *mtrapargsTimeTicks03;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -4002,7 +4000,7 @@ powernet_mib_agt_register_mtrapargs();
 
 typedef struct mfiletransferStatus {
     int32_t   *mfiletransferStatusLastTransferResult;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -4032,7 +4030,7 @@ powernet_mib_agt_register_mfiletransferStatus();
 typedef struct mfiletransferConfigSettings {
     u_char    *mfiletransferConfigSettingsFilename;
     size_t    _mfiletransferConfigSettingsFilenameLength;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -4062,7 +4060,7 @@ powernet_mib_agt_register_mfiletransferConfigSettings();
 typedef struct mfiletransferConfigTFTP {
     u_char    *mfiletransferConfigTFTPServerAddress;
     size_t    _mfiletransferConfigTFTPServerAddressLength;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -4096,7 +4094,7 @@ typedef struct mfiletransferConfigFTP {
     size_t    _mfiletransferConfigFTPServerUserLength;
     u_char    *mfiletransferConfigFTPServerPassword;
     size_t    _mfiletransferConfigFTPServerPasswordLength;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -4127,7 +4125,7 @@ powernet_mib_agt_register_mfiletransferConfigFTP();
 
 typedef struct mfiletransferControl {
     int32_t   *mfiletransferControlInitiateFileTransfer;
-    void      *_clientData;             /* pointer to client data structure */
+    void      *_clientData;		/* pointer to client data structure */
 
     /* private space to hold actual values */
 
@@ -4152,118 +4150,118 @@ powernet_mib_agt_register_mfiletransferControl();
 
 
 typedef struct powernet_mib {
-    upsBasicIdent_t     *upsBasicIdent;
-    upsAdvIdent_t       *upsAdvIdent;
-    upsBasicBattery_t   *upsBasicBattery;
-    upsAdvBattery_t     *upsAdvBattery;
-    upsBasicInput_t     *upsBasicInput;
-    upsAdvInput_t       *upsAdvInput;
-    upsBasicOutput_t    *upsBasicOutput;
-    upsAdvOutput_t      *upsAdvOutput;
-    upsBasicConfig_t    *upsBasicConfig;
-    upsBasicConfigDeviceEntry_t *upsBasicConfigDeviceEntry;
-    upsAdvConfig_t      *upsAdvConfig;
-    upsAdvConfigDipSwitchEntry_t        *upsAdvConfigDipSwitchEntry;
-    apcUpsConfigEntry_t *apcUpsConfigEntry;
-    upsBasicControl_t   *upsBasicControl;
-    upsAdvControl_t     *upsAdvControl;
-    upsAdvTest_t        *upsAdvTest;
-    upsComm_t   *upsComm;
-    upsPhaseResetValues_t       *upsPhaseResetValues;
-    upsPhaseInput_t     *upsPhaseInput;
-    upsPhaseInputEntry_t        *upsPhaseInputEntry;
-    upsPhaseInputPhaseEntry_t   *upsPhaseInputPhaseEntry;
-    upsPhaseOutput_t    *upsPhaseOutput;
-    upsPhaseOutputEntry_t       *upsPhaseOutputEntry;
-    upsPhaseOutputPhaseEntry_t  *upsPhaseOutputPhaseEntry;
-    mUpsEnviron_t       *mUpsEnviron;
-    mUpsContact_t       *mUpsContact;
-    mUpsContactEntry_t  *mUpsContactEntry;
-    serialPort2Config_t *serialPort2Config;
-    serialPort2Control_t        *serialPort2Control;
-    sPDUIdent_t *sPDUIdent;
-    sPDUMasterControl_t *sPDUMasterControl;
-    sPDUMasterConfig_t  *sPDUMasterConfig;
-    sPDUOutletControl_t *sPDUOutletControl;
-    sPDUOutletControlEntry_t    *sPDUOutletControlEntry;
-    sPDUOutletConfig_t  *sPDUOutletConfig;
-    sPDUOutletConfigEntry_t     *sPDUOutletConfigEntry;
-    sPDUIdentVM_t       *sPDUIdentVM;
-    sPDUIdentVMEntry_t  *sPDUIdentVMEntry;
-    sPDUMasterControlVM_t       *sPDUMasterControlVM;
-    sPDUMasterControlVMEntry_t  *sPDUMasterControlVMEntry;
-    sPDUMasterConfigVM_t        *sPDUMasterConfigVM;
-    sPDUMasterConfigVMEntry_t   *sPDUMasterConfigVMEntry;
-    sPDUMasterStatusVM_t        *sPDUMasterStatusVM;
-    sPDUMasterStatusVMEntry_t   *sPDUMasterStatusVMEntry;
-    sPDUOutletControlVMEntry_t  *sPDUOutletControlVMEntry;
-    sPDUOutletConfigVMEntry_t   *sPDUOutletConfigVMEntry;
-    sPDUOutletStatusVMEntry_t   *sPDUOutletStatusVMEntry;
-    sPDUIdentMSP_t      *sPDUIdentMSP;
-    sPDUIdentMSPEntry_t *sPDUIdentMSPEntry;
-    sPDUMasterControlMSP_t      *sPDUMasterControlMSP;
-    sPDUMasterControlMSPEntry_t *sPDUMasterControlMSPEntry;
-    sPDUMasterConfigMSP_t       *sPDUMasterConfigMSP;
-    sPDUMasterConfigMSPEntry_t  *sPDUMasterConfigMSPEntry;
-    sPDUMasterStatusMSP_t       *sPDUMasterStatusMSP;
-    sPDUMasterStatusMSPEntry_t  *sPDUMasterStatusMSPEntry;
-    sPDUOutletControlMSPEntry_t *sPDUOutletControlMSPEntry;
-    sPDUOutletConfigMSPallEntry_t       *sPDUOutletConfigMSPallEntry;
-    sPDUOutletConfigMSPgsEntry_t        *sPDUOutletConfigMSPgsEntry;
-    sPDUOutletConfigMSPannunEntry_t     *sPDUOutletConfigMSPannunEntry;
-    sPDUOutletConfigMSPmupsEntry_t      *sPDUOutletConfigMSPmupsEntry;
-    sPDUOutletStatusMSPEntry_t  *sPDUOutletStatusMSPEntry;
-    dm3IdentSystem_t    *dm3IdentSystem;
-    dm3IdentSysDescriptionEntry_t       *dm3IdentSysDescriptionEntry;
-    dm3ConfigSystem_t   *dm3ConfigSystem;
-    dm3ConfigSysDescriptionEntry_t      *dm3ConfigSysDescriptionEntry;
-    dm3ConfigLVD_t      *dm3ConfigLVD;
-    dm3ConfigLVDEntry_t *dm3ConfigLVDEntry;
-    dm3ConfigBattery_t  *dm3ConfigBattery;
-    dm3ConfigRectThresh_t       *dm3ConfigRectThresh;
-    dm3ConfigRectAlarms_t       *dm3ConfigRectAlarms;
-    dm3ConfigConvThresh_t       *dm3ConfigConvThresh;
-    dm3ConfigConvAlarms_t       *dm3ConfigConvAlarms;
-    dm3ConfigOutputRelays_t     *dm3ConfigOutputRelays;
-    dm3ConfigOutRlyEntry_t      *dm3ConfigOutRlyEntry;
-    dm3ConfigInputRelays_t      *dm3ConfigInputRelays;
-    dm3ConfigInRlyEntry_t       *dm3ConfigInRlyEntry;
-    dm3ConfigBreakers_t *dm3ConfigBreakers;
-    dm3ConfigBreakersEntry_t    *dm3ConfigBreakersEntry;
-    dm3ConfigFuses_t    *dm3ConfigFuses;
-    dm3ConfigFusesEntry_t       *dm3ConfigFusesEntry;
-    dm3StatusSystem_t   *dm3StatusSystem;
-    dm3StatusAlarms_t   *dm3StatusAlarms;
-    dm3StatusAlarmsEntry_t      *dm3StatusAlarmsEntry;
-    dm3StatusBattery_t  *dm3StatusBattery;
-    dm3StatusOEM_t      *dm3StatusOEM;
-    dm3StatusLVD_t      *dm3StatusLVD;
-    dm3StatusLVDEntry_t *dm3StatusLVDEntry;
-    dm3StatusRectifier_t        *dm3StatusRectifier;
-    dm3StatusRectEntry_t        *dm3StatusRectEntry;
-    dm3StatusConverter_t        *dm3StatusConverter;
-    dm3StatusConvEntry_t        *dm3StatusConvEntry;
-    dm3StatusOutputRelays_t     *dm3StatusOutputRelays;
-    dm3StatusOutRlyEntry_t      *dm3StatusOutRlyEntry;
-    dm3StatusInputRelays_t      *dm3StatusInputRelays;
-    dm3StatusInRlyEntry_t       *dm3StatusInRlyEntry;
-    dm3StatusBreakers_t *dm3StatusBreakers;
-    dm3StatusBreakersEntry_t    *dm3StatusBreakersEntry;
-    dm3StatusFuses_t    *dm3StatusFuses;
-    dm3StatusFusesEntry_t       *dm3StatusFusesEntry;
-    powerNetSoftwareSystem_t    *powerNetSoftwareSystem;
-    powerNetSoftwareConfig_t    *powerNetSoftwareConfig;
-    powerNetSoftwareEntry_t     *powerNetSoftwareEntry;
-    mconfig_t   *mconfig;
-    mconfigTrapReceiverEntry_t  *mconfigTrapReceiverEntry;
-    mconfigClock_t      *mconfigClock;
-    mcontrol_t  *mcontrol;
-    mtrapargs_t *mtrapargs;
-    mfiletransferStatus_t       *mfiletransferStatus;
-    mfiletransferConfigSettings_t       *mfiletransferConfigSettings;
-    mfiletransferConfigTFTP_t   *mfiletransferConfigTFTP;
-    mfiletransferConfigFTP_t    *mfiletransferConfigFTP;
-    mfiletransferControl_t      *mfiletransferControl;
+    upsBasicIdent_t	*upsBasicIdent;
+    upsAdvIdent_t	*upsAdvIdent;
+    upsBasicBattery_t	*upsBasicBattery;
+    upsAdvBattery_t	*upsAdvBattery;
+    upsBasicInput_t	*upsBasicInput;
+    upsAdvInput_t	*upsAdvInput;
+    upsBasicOutput_t	*upsBasicOutput;
+    upsAdvOutput_t	*upsAdvOutput;
+    upsBasicConfig_t	*upsBasicConfig;
+    upsBasicConfigDeviceEntry_t	*upsBasicConfigDeviceEntry;
+    upsAdvConfig_t	*upsAdvConfig;
+    upsAdvConfigDipSwitchEntry_t	*upsAdvConfigDipSwitchEntry;
+    apcUpsConfigEntry_t	*apcUpsConfigEntry;
+    upsBasicControl_t	*upsBasicControl;
+    upsAdvControl_t	*upsAdvControl;
+    upsAdvTest_t	*upsAdvTest;
+    upsComm_t	*upsComm;
+    upsPhaseResetValues_t	*upsPhaseResetValues;
+    upsPhaseInput_t	*upsPhaseInput;
+    upsPhaseInputEntry_t	*upsPhaseInputEntry;
+    upsPhaseInputPhaseEntry_t	*upsPhaseInputPhaseEntry;
+    upsPhaseOutput_t	*upsPhaseOutput;
+    upsPhaseOutputEntry_t	*upsPhaseOutputEntry;
+    upsPhaseOutputPhaseEntry_t	*upsPhaseOutputPhaseEntry;
+    mUpsEnviron_t	*mUpsEnviron;
+    mUpsContact_t	*mUpsContact;
+    mUpsContactEntry_t	*mUpsContactEntry;
+    serialPort2Config_t	*serialPort2Config;
+    serialPort2Control_t	*serialPort2Control;
+    sPDUIdent_t	*sPDUIdent;
+    sPDUMasterControl_t	*sPDUMasterControl;
+    sPDUMasterConfig_t	*sPDUMasterConfig;
+    sPDUOutletControl_t	*sPDUOutletControl;
+    sPDUOutletControlEntry_t	*sPDUOutletControlEntry;
+    sPDUOutletConfig_t	*sPDUOutletConfig;
+    sPDUOutletConfigEntry_t	*sPDUOutletConfigEntry;
+    sPDUIdentVM_t	*sPDUIdentVM;
+    sPDUIdentVMEntry_t	*sPDUIdentVMEntry;
+    sPDUMasterControlVM_t	*sPDUMasterControlVM;
+    sPDUMasterControlVMEntry_t	*sPDUMasterControlVMEntry;
+    sPDUMasterConfigVM_t	*sPDUMasterConfigVM;
+    sPDUMasterConfigVMEntry_t	*sPDUMasterConfigVMEntry;
+    sPDUMasterStatusVM_t	*sPDUMasterStatusVM;
+    sPDUMasterStatusVMEntry_t	*sPDUMasterStatusVMEntry;
+    sPDUOutletControlVMEntry_t	*sPDUOutletControlVMEntry;
+    sPDUOutletConfigVMEntry_t	*sPDUOutletConfigVMEntry;
+    sPDUOutletStatusVMEntry_t	*sPDUOutletStatusVMEntry;
+    sPDUIdentMSP_t	*sPDUIdentMSP;
+    sPDUIdentMSPEntry_t	*sPDUIdentMSPEntry;
+    sPDUMasterControlMSP_t	*sPDUMasterControlMSP;
+    sPDUMasterControlMSPEntry_t	*sPDUMasterControlMSPEntry;
+    sPDUMasterConfigMSP_t	*sPDUMasterConfigMSP;
+    sPDUMasterConfigMSPEntry_t	*sPDUMasterConfigMSPEntry;
+    sPDUMasterStatusMSP_t	*sPDUMasterStatusMSP;
+    sPDUMasterStatusMSPEntry_t	*sPDUMasterStatusMSPEntry;
+    sPDUOutletControlMSPEntry_t	*sPDUOutletControlMSPEntry;
+    sPDUOutletConfigMSPallEntry_t	*sPDUOutletConfigMSPallEntry;
+    sPDUOutletConfigMSPgsEntry_t	*sPDUOutletConfigMSPgsEntry;
+    sPDUOutletConfigMSPannunEntry_t	*sPDUOutletConfigMSPannunEntry;
+    sPDUOutletConfigMSPmupsEntry_t	*sPDUOutletConfigMSPmupsEntry;
+    sPDUOutletStatusMSPEntry_t	*sPDUOutletStatusMSPEntry;
+    dm3IdentSystem_t	*dm3IdentSystem;
+    dm3IdentSysDescriptionEntry_t	*dm3IdentSysDescriptionEntry;
+    dm3ConfigSystem_t	*dm3ConfigSystem;
+    dm3ConfigSysDescriptionEntry_t	*dm3ConfigSysDescriptionEntry;
+    dm3ConfigLVD_t	*dm3ConfigLVD;
+    dm3ConfigLVDEntry_t	*dm3ConfigLVDEntry;
+    dm3ConfigBattery_t	*dm3ConfigBattery;
+    dm3ConfigRectThresh_t	*dm3ConfigRectThresh;
+    dm3ConfigRectAlarms_t	*dm3ConfigRectAlarms;
+    dm3ConfigConvThresh_t	*dm3ConfigConvThresh;
+    dm3ConfigConvAlarms_t	*dm3ConfigConvAlarms;
+    dm3ConfigOutputRelays_t	*dm3ConfigOutputRelays;
+    dm3ConfigOutRlyEntry_t	*dm3ConfigOutRlyEntry;
+    dm3ConfigInputRelays_t	*dm3ConfigInputRelays;
+    dm3ConfigInRlyEntry_t	*dm3ConfigInRlyEntry;
+    dm3ConfigBreakers_t	*dm3ConfigBreakers;
+    dm3ConfigBreakersEntry_t	*dm3ConfigBreakersEntry;
+    dm3ConfigFuses_t	*dm3ConfigFuses;
+    dm3ConfigFusesEntry_t	*dm3ConfigFusesEntry;
+    dm3StatusSystem_t	*dm3StatusSystem;
+    dm3StatusAlarms_t	*dm3StatusAlarms;
+    dm3StatusAlarmsEntry_t	*dm3StatusAlarmsEntry;
+    dm3StatusBattery_t	*dm3StatusBattery;
+    dm3StatusOEM_t	*dm3StatusOEM;
+    dm3StatusLVD_t	*dm3StatusLVD;
+    dm3StatusLVDEntry_t	*dm3StatusLVDEntry;
+    dm3StatusRectifier_t	*dm3StatusRectifier;
+    dm3StatusRectEntry_t	*dm3StatusRectEntry;
+    dm3StatusConverter_t	*dm3StatusConverter;
+    dm3StatusConvEntry_t	*dm3StatusConvEntry;
+    dm3StatusOutputRelays_t	*dm3StatusOutputRelays;
+    dm3StatusOutRlyEntry_t	*dm3StatusOutRlyEntry;
+    dm3StatusInputRelays_t	*dm3StatusInputRelays;
+    dm3StatusInRlyEntry_t	*dm3StatusInRlyEntry;
+    dm3StatusBreakers_t	*dm3StatusBreakers;
+    dm3StatusBreakersEntry_t	*dm3StatusBreakersEntry;
+    dm3StatusFuses_t	*dm3StatusFuses;
+    dm3StatusFusesEntry_t	*dm3StatusFusesEntry;
+    powerNetSoftwareSystem_t	*powerNetSoftwareSystem;
+    powerNetSoftwareConfig_t	*powerNetSoftwareConfig;
+    powerNetSoftwareEntry_t	*powerNetSoftwareEntry;
+    mconfig_t	*mconfig;
+    mconfigTrapReceiverEntry_t	*mconfigTrapReceiverEntry;
+    mconfigClock_t	*mconfigClock;
+    mcontrol_t	*mcontrol;
+    mtrapargs_t	*mtrapargs;
+    mfiletransferStatus_t	*mfiletransferStatus;
+    mfiletransferConfigSettings_t	*mfiletransferConfigSettings;
+    mfiletransferConfigTFTP_t	*mfiletransferConfigTFTP;
+    mfiletransferConfigFTP_t	*mfiletransferConfigFTP;
+    mfiletransferControl_t	*mfiletransferControl;
 } powernet_mib_t;
 
 /*
