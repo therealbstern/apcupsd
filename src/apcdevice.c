@@ -69,7 +69,7 @@ void setup_device(UPSINFO *ups)
 	 * Marko Sakari Asplund <Marko.Asplund@cern.ch>
 	 *    prevents double init of UPS device 9/25/98
 	 */
-        UPS_SET(UPS_DEV_SETUP);
+	UPS_SET(UPS_DEV_SETUP);
     } else {
         Error_abort0(_("Serial port already initialized.\n"));
     }
@@ -83,7 +83,7 @@ void setup_device(UPSINFO *ups)
      * -RF
      */ 		    
     if (create_lockfile(ups) == LCKERROR) {
-        device_close(ups);
+	device_close(ups);
         Error_abort0(_("Unable to create UPS lock file.\n"));
     }
 
@@ -134,53 +134,52 @@ void kill_power(UPSINFO *ups)
 	 */
 	log_event(ups, LOG_WARNING,
                  _("Cannot find " PWRFAIL " file.\n Killpower requested in \
-non power fail condition or bug.\n Killpower request ignored at %s:%d\n"),
+non-power fail condition or bug.\n Killpower request ignored at %s:%d\n"),
 		 __FILE__, __LINE__);
 	Error_abort2(
                 _("Cannot find " PWRFAIL " file.\n Killpower requested in \
-non power fail condition or bug.\n Killpower request ignored at %s:%d\n"),
+non-power fail condition or bug.\n Killpower request ignored at %s:%d\n"),
 		 __FILE__, __LINE__);
     } else {
+	/*
+	 * We are on batteries, so do the kill_power 
+	 */
 	if ((ups->class.type == SHAREMASTER) ||
 	    (ups->class.type == SHARENETMASTER)) {
-		log_event(ups, LOG_WARNING,
+	    log_event(ups, LOG_WARNING,
                           _("Waiting 30 seconds for slave(s) to shutdown."));
 		sleep(30);
 	} else if (ups->class.type == NETMASTER) {
-		log_event(ups, LOG_WARNING,
+	    log_event(ups, LOG_WARNING,
                           _("Waiting 30 seconds for slave(s) to shutdown"));
-		sleep(30);
+	    sleep(30);
 	}
 	if (pwdf) {
-	   fclose(pwdf);
+	    fclose(pwdf);	      /* close the powerfail file */
 	}
 
-        log_event(ups, LOG_WARNING,_("Attempting to kill the power!"));
+        log_event(ups, LOG_WARNING,_("Attempting to kill the UPS power!"));
 
 	if (ups->mode.type == BK) {
-	device_kill_power(ups);
+	    device_kill_power(ups);
 	    sleep(10);
-	    device_close(ups);
 	    /*
 	     * ***FIXME*** this really should not do a reboot here,
 	     * but rather a halt or nothing -- KES
 	     */
-	    generate_event(ups, CMDDOREBOOT);
-        log_event(ups, LOG_WARNING,_("Perform CPU-reset or power-off"));
+	    /*	generate_event(ups, CMDDOREBOOT); */
+            log_event(ups, LOG_WARNING, _("Perform CPU-reset or power-off"));
 	    return;
 	} else if (ups->mode.type == SHAREBASIC) {
 	    sleep(10);
-	    device_close(ups);
-	log_event(ups, LOG_WARNING,
-                _("Waiting For ShareUPS Master to shutdown"));
+            log_event(ups, LOG_WARNING, _("Waiting For ShareUPS Master to shutdown"));
 	    sleep(60);
-	    log_event(ups, LOG_WARNING,
-               _("Failed to have power killed by Master!"));
+            log_event(ups, LOG_WARNING, _("Failed to have power killed by Master!"));
 	    /*
 	     * ***FIXME*** this really should not do a reboot here,
 	     * but rather a halt or nothing -- KES
 	     */
-	    generate_event(ups, CMDDOREBOOT);
+	    /* generate_event(ups, CMDDOREBOOT); */
             log_event(ups, LOG_WARNING,_("Perform CPU-reset or power-off"));
 	    return;
 	} else {		      /* it must be a SmartUPS */

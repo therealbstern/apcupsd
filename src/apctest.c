@@ -66,6 +66,10 @@ static void smart_calibration();
 static void monitor_calibration_progress();
 static void terminate_calibration(int ask);
 
+static void do_usb_testing();
+static void usb_kill_power_test();
+
+
 static void strip_trailing_junk(char *cmd);
 static char *get_cmd(char *prompt);
 static int write_file(char *buf);
@@ -438,7 +442,7 @@ int main (int argc, char *argv[]) {
           pmsg("Unknown mode.type: %d\n", ups->mode.type);
     }
     if (ups->mode.type > SHAREBASIC) {
-       if (mode != M_SMART) {
+       if (mode != M_SMART && mode != M_USB) {
           pmsg("You specified a DUMB mode cable, but a SMART UPS. I give up.\n");
        }
     }
@@ -532,6 +536,8 @@ int main (int argc, char *argv[]) {
 	  do_dumb_testing();
        } else if (mode == M_SMART) {
 	  do_smart_testing();
+       } else if (mode == M_USB) {
+	  do_usb_testing();
        } else {
           pmsg("USB testing not yet implemented.\n");
        }
@@ -578,9 +584,9 @@ do_dumb_testing()
    int quit = FALSE;
    char *cmd;
 
-   pmsg("Hello, this is the apcupsd Cable Test program.\n\
-This part of apctest is for testing dumb UPSes (ones that use\
-signalling rather than commands.\n\
+   pmsg("Hello, this is the apcupsd Cable Test program.\n\n\
+We are beginning testing for dumb UPSes, which\n\
+use signaling rather than commands.\n\
 Most tests enter a loop polling every second for 10 seconds.\n");
 
    while (!quit) {
@@ -806,6 +812,8 @@ Please enter any character when ready to continue: ");
 
 static void test6()
 {
+   int bits;
+
    pmsg("\nThis test will attempt to power down the UPS.\n\
 The serial cable should be plugged in to the UPS, but the\n\
 AC power plug to the UPS should be DISCONNECTED.\n\n\
@@ -813,11 +821,23 @@ PLEASE DO NOT RUN THIS TEST WITH A COMPUTER CONNECTED TO YOUR UPS!!!\n\n\
 Please enter any character when ready to continue: ");
    fgetc(stdin);
    pmsg("\n");
+   if (ioctl(ups->fd, TIOCMGET, &bits) < 0) {
+      pmsg("ioctl error, big problem: %s\n", strerror(errno));
+      return;
+   }
+   ptime();
+   print_bits(bits);
    make_file(ups, PWRFAIL);
    kill_power(ups);
    unlink(PWRFAIL);
    ptime();
-   pmsg("Kill_power function called.\n");
+   pmsg("returned from kill_power function.\n");
+   if (ioctl(ups->fd, TIOCMGET, &bits) < 0) {
+      pmsg("ioctl error, big problem: %s\n", strerror(errno));
+      return;
+   }
+   ptime();
+   print_bits(bits);
 }
 
 /*
@@ -1409,6 +1429,61 @@ void parse_eprom_cmds(char *eprom, char locale)
 #endif
 }
     
+static void do_usb_testing()
+{
+   char *cmd;
+   int quit = FALSE;
+
+   pmsg("Hello, this is the apcupsd Cable Test program.\n\
+This part of apctest is for testing USB UPSes.\n\
+Please select the function you want to perform.\n");
+
+   while (!quit) {
+      pmsg( "\n\
+1) Test 1 - kill UPS power\n\
+2) Quit\n\n");
+
+      cmd = get_cmd("Select function number: ");
+      if (cmd) {
+	 int item = atoi(cmd);
+	 switch (item) {
+	    case 1:
+	       usb_kill_power_test();
+	       break;
+	    case 2:
+	       quit = TRUE;
+	       break;
+	    default:
+               pmsg("Illegal response. Please enter 1-2\n");
+	       break;
+	 }
+      } else {
+         pmsg("Illegal response. Please enter 1-2\n");
+      }
+   }
+   ptime();
+   pmsg("End apctest.\n");
+}
+
+
+static void usb_kill_power_test()
+{
+   pmsg("\nThis test will attempt to power down the UPS.\n\
+The USB cable should be plugged in to the UPS, but the\n\
+AC power plug to the UPS should be DISCONNECTED.\n\n\
+PLEASE DO NOT RUN THIS TEST WITH A COMPUTER CONNECTED TO YOUR UPS!!!\n\n\
+Please enter any character when ready to continue: ");
+   fgetc(stdin);
+   pmsg("\n");
+   ptime();
+   pmsg("calling kill_power function.\n");
+   make_file(ups, PWRFAIL);
+   kill_power(ups);
+   unlink(PWRFAIL);
+   ptime();
+   pmsg("returned from kill_power function.\n");
+}
+
 
 /*
  * Gen next input command from the terminal

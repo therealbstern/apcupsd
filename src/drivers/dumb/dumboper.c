@@ -87,6 +87,7 @@ int dumb_ups_kill_power(UPSINFO *ups)
 	    (void) ioctl(ups->fd, TIOCMBIS, &serial_bits);
 	    (void) ioctl(ups->fd, TIOCMBIS, &serial_bits);
 	    (void) ioctl(ups->fd, TIOCMBIS, &serial_bits);
+	    sleep(5);		      /* hold for at least 5 seconds */
 	    break;
 
 	case APC_940_0023A:	 /* killpwr_bit */
@@ -148,7 +149,7 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
      *	not have interrupts like the smarter devices
      */
     if (ups->wait_time > TIMER_DUMB) {
-        ups->wait_time = TIMER_DUMB;
+	ups->wait_time = TIMER_DUMB;
     }
     sleep(ups->wait_time);
 
@@ -159,11 +160,11 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
     case BK:
     case SHAREBASIC: 
     case NETUPS:
-        if (private->sp_flags & TIOCM_DTR) {
-            BattFail = 1;
-        } else {
-            BattFail = 0;
-        }
+	if (private->sp_flags & TIOCM_DTR) {
+	    BattFail = 1;
+	} else {
+	    BattFail = 0;
+	}
        break;
     default:
        break;
@@ -171,37 +172,37 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
 
     switch(ups->cable.type) {
 	case CUSTOM_SIMPLE:
-        /*
-         * This is the ONBATT signal sent by UPS.
-         */
+	/*
+	 * This is the ONBATT signal sent by UPS.
+	 */
 	    if (private->sp_flags & TIOCM_CD) {
-            UPS_SET(UPS_ONBATT);
-        } else {
-            UPS_CLEAR(UPS_ONBATT);
-        }
-        /*
-         * This is the ONLINE signal that is delivered
-         * by CUSTOM_SIMPLE cable. We use the UPS_ONLINE flag
-         * to report this condition to apcaction.
-         * If we are both ONBATT and ONLINE there is clearly
-         * something wrong with battery or charger. Set also the
-         * UPS_REPLACEBATT flag if needed.
-         */
-        if (private->sp_flags & TIOCM_SR) {
-            UPS_CLEAR(UPS_ONLINE);
-        } else {
-            UPS_SET(UPS_ONLINE);
-        }
-        if (UPS_ISSET(UPS_ONLINE) && UPS_ISSET(UPS_ONBATT)) {
-            BattFail = 1;
-        } else {
-            BattFail = 0;
-        }
-        if (!(private->sp_flags & TIOCM_CTS)) {
-            UPS_SET(UPS_BATTLOW);
-        } else {
-            UPS_CLEAR(UPS_BATTLOW);
-        }
+	    UPS_SET(UPS_ONBATT);
+	} else {
+	    UPS_CLEAR(UPS_ONBATT);
+	}
+	/*
+	 * This is the ONLINE signal that is delivered
+	 * by CUSTOM_SIMPLE cable. We use the UPS_ONLINE flag
+	 * to report this condition to apcaction.
+	 * If we are both ONBATT and ONLINE there is clearly
+	 * something wrong with battery or charger. Set also the
+	 * UPS_REPLACEBATT flag if needed.
+	 */
+	if (private->sp_flags & TIOCM_SR) {
+	    UPS_CLEAR(UPS_ONLINE);
+	} else {
+	    UPS_SET(UPS_ONLINE);
+	}
+	if (UPS_ISSET(UPS_ONLINE) && UPS_ISSET(UPS_ONBATT)) {
+	    BattFail = 1;
+	} else {
+	    BattFail = 0;
+	}
+	if (!(private->sp_flags & TIOCM_CTS)) {
+	    UPS_SET(UPS_BATTLOW);
+	} else {
+	    UPS_CLEAR(UPS_BATTLOW);
+	}
 	    break;
 
 	case APC_940_0119A:
@@ -210,67 +211,67 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
 	case APC_940_0020B:
 	case APC_940_0020C:
 	    if (private->sp_flags & TIOCM_CTS) {
-            UPS_CLEAR_ONLINE();
-        } else {
-            UPS_SET_ONLINE();
-        }
-        if (private->sp_flags & TIOCM_CD) {
-            UPS_SET(UPS_BATTLOW);
-        } else {
-            UPS_CLEAR(UPS_BATTLOW);
-        }
+	    UPS_CLEAR_ONLINE();
+	} else {
+	    UPS_SET_ONLINE();
+	}
+	if (private->sp_flags & TIOCM_CD) {
+	    UPS_SET(UPS_BATTLOW);
+	} else {
+	    UPS_CLEAR(UPS_BATTLOW);
+	}
 	    break;
 
 	case APC_940_0023A:
 	    if (private->sp_flags & TIOCM_CD) {
-            UPS_CLEAR_ONLINE();
-        } else {
-            UPS_SET_ONLINE();
-        }
+	    UPS_CLEAR_ONLINE();
+	} else {
+	    UPS_SET_ONLINE();
+	}
 
 	    /* BOGUS STUFF MUST FIX IF POSSIBLE */
 
-        if (private->sp_flags & TIOCM_SR) {
-            UPS_SET(UPS_BATTLOW);
-        } else {
-            UPS_CLEAR(UPS_BATTLOW);
-        }
+	if (private->sp_flags & TIOCM_SR) {
+	    UPS_SET(UPS_BATTLOW);
+	} else {
+	    UPS_CLEAR(UPS_BATTLOW);
+	}
 	    break;
 
 	case APC_940_0095A:
 	case APC_940_0095C:
 	    if (private->sp_flags & TIOCM_RNG) {
-            UPS_CLEAR_ONLINE();
-        } else {
-            UPS_SET_ONLINE();
-        }
-        if (private->sp_flags & TIOCM_CD) {
-            UPS_SET(UPS_BATTLOW);
-        } else {
-            UPS_CLEAR(UPS_BATTLOW);
-        }
+	    UPS_CLEAR_ONLINE();
+	} else {
+	    UPS_SET_ONLINE();
+	}
+	if (private->sp_flags & TIOCM_CD) {
+	    UPS_SET(UPS_BATTLOW);
+	} else {
+	    UPS_CLEAR(UPS_BATTLOW);
+	}
 	    break;
 
 	case APC_940_0095B:
 	    if (private->sp_flags & TIOCM_RNG) {
-            UPS_CLEAR_ONLINE();
-        } else {
-            UPS_SET_ONLINE();
-        }
+	    UPS_CLEAR_ONLINE();
+	} else {
+	    UPS_SET_ONLINE();
+	}
 	    break;
 
 	case MAM_CABLE:
-        if (!(private->sp_flags & TIOCM_CTS)) {
-            UPS_CLEAR_ONLINE();
-        } else {
-            UPS_SET_ONLINE();
-        }
-        if (!(private->sp_flags & TIOCM_CD)) {
-            UPS_SET(UPS_BATTLOW);
-        } else {
-            UPS_CLEAR(UPS_BATTLOW);
-        }
-        break;
+	if (!(private->sp_flags & TIOCM_CTS)) {
+	    UPS_CLEAR_ONLINE();
+	} else {
+	    UPS_SET_ONLINE();
+	}
+	if (!(private->sp_flags & TIOCM_CD)) {
+	    UPS_SET(UPS_BATTLOW);
+	} else {
+	    UPS_CLEAR(UPS_BATTLOW);
+	}
+	break;
 
 	case CUSTOM_SMART:
 	case APC_940_0024B:
@@ -279,13 +280,13 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
 	case APC_940_0024G:
 	case APC_NET:
 	default:
-        stat = 0;
+	stat = 0;
     }
 
     if (UPS_ISSET(UPS_ONBATT) && BattFail) {
-        UPS_SET(UPS_REPLACEBATT);
+	UPS_SET(UPS_REPLACEBATT);
     } else {
-        UPS_CLEAR(UPS_REPLACEBATT);
+	UPS_CLEAR(UPS_REPLACEBATT);
     }
 
     write_unlock(ups);

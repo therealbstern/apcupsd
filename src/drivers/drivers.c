@@ -247,7 +247,7 @@ UPSDRIVER *attach_driver(UPSINFO *ups) {
 
 	default:
 	case NO_UPS:
-            Dmsg1(10, "Warning: no UPS driver found (ups->mode.type=%d).\n",
+            Dmsg1(000, "Warning: no UPS driver found (ups->mode.type=%d).\n",
 			ups->mode.type);
 	    break;
     }

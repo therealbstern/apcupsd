@@ -326,8 +326,8 @@ static int usb_link_check(UPSINFO *ups)
     }
 
     if (!comm_err) {
-        generate_event(ups, CMDCOMMOK);
-        UPS_CLEAR(UPS_COMMLOST);
+	generate_event(ups, CMDCOMMOK);
+	UPS_CLEAR(UPS_COMMLOST);
         Dmsg0(200, "link check comm OK.\n");
     }
     linkcheck = FALSE;
@@ -531,16 +531,16 @@ int usb_ups_check_state(UPSINFO *ups)
 		   private->debounce = time(NULL);
 		}
 		if (ev[i].value) {
-            UPS_CLEAR_ONLINE();
-        } else {
-            UPS_SET_ONLINE();
-        }
+	    UPS_CLEAR_ONLINE();
+	} else {
+	    UPS_SET_ONLINE();
+	}
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_BelowRemCapLimit]) {
-            if (ev[i].value) {
-                UPS_SET(UPS_BATTLOW);
-            } else {
-                UPS_CLEAR(UPS_BATTLOW);
-            }
+	    if (ev[i].value) {
+		UPS_SET(UPS_BATTLOW);
+	    } else {
+		UPS_CLEAR(UPS_BATTLOW);
+	    }
                 Dmsg1(200, "UPS_BATTLOW = %d\n", UPS_ISSET(UPS_BATTLOW));
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_ACPresent]) {
 		/* If first time on batteries, debounce */
@@ -548,10 +548,10 @@ int usb_ups_check_state(UPSINFO *ups)
 		   private->debounce = time(NULL);
 		}
 		if (!ev[i].value) {
-            UPS_CLEAR_ONLINE();
-        } else {
-            UPS_SET_ONLINE();
-        }
+	    UPS_CLEAR_ONLINE();
+	} else {
+	    UPS_SET_ONLINE();
+	}
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_RemainingCapacity]) {
 		ups->BattChg = ev[i].value;
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_RunTimeToEmpty]) {
@@ -561,19 +561,19 @@ int usb_ups_check_state(UPSINFO *ups)
 		    ups->TimeLeft = ev[i].value;  /* minutes */
 		}
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_NeedReplacement]) {
-            if (ev[i].value) {
-                UPS_SET(UPS_REPLACEBATT);
-            } else {
-                UPS_CLEAR(UPS_REPLACEBATT);
-            }
+	    if (ev[i].value) {
+		UPS_SET(UPS_REPLACEBATT);
+	    } else {
+		UPS_CLEAR(UPS_REPLACEBATT);
+	    }
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_ShutdownImminent]) {
-            if (ev[i].value) {
-                UPS_SET(UPS_SHUTDOWNIMM);
-            } else {
-                UPS_CLEAR(UPS_SHUTDOWNIMM);
-            }
+	    if (ev[i].value) {
+		UPS_SET(UPS_SHUTDOWNIMM);
+	    } else {
+		UPS_CLEAR(UPS_SHUTDOWNIMM);
+	    }
             Dmsg1(200, "ShutdownImminent=%d\n", UPS_ISSET(UPS_SHUTDOWNIMM));
-        }
+	}
             Dmsg1(200, "Status=%d\n", ups->Status);
 	}
 	write_unlock(ups);
@@ -891,28 +891,28 @@ int usb_ups_read_volatile_data(UPSINFO *ups)
        UPS_CLEAR_ONLINE();
 	}
 	if (get_value(ups, CI_BelowRemCapLimit, &uinfo) && uinfo.uref.value) {
-        UPS_SET(UPS_BATTLOW);
+	UPS_SET(UPS_BATTLOW);
            Dmsg1(200, "BelowRemCapLimit=%d\n", uinfo.uref.value);
 	}
 	if (get_value(ups, CI_RemTimeLimitExpired, &uinfo) && uinfo.uref.value) {
-        UPS_SET(UPS_BATTLOW);
+	UPS_SET(UPS_BATTLOW);
            Dmsg0(200, "RemTimeLimitExpired\n");
 	}
 	if (get_value(ups, CI_ShutdownImminent, &uinfo) && uinfo.uref.value) {
-        UPS_SET(UPS_BATTLOW);
+	UPS_SET(UPS_BATTLOW);
            Dmsg0(200, "ShutdownImminent\n");
 	}
 	if (get_value(ups, CI_Boost, &uinfo) && uinfo.uref.value) {
-        UPS_SET(UPS_SMARTBOOST);
+	UPS_SET(UPS_SMARTBOOST);
 	}
 	if (get_value(ups, CI_Trim, &uinfo) && uinfo.uref.value) {
-        UPS_SET(UPS_SMARTTRIM);
+	UPS_SET(UPS_SMARTTRIM);
 	}
 	if (get_value(ups, CI_Overload, &uinfo) && uinfo.uref.value) {
-        UPS_SET(UPS_OVERLOAD);
+	UPS_SET(UPS_OVERLOAD);
 	}
 	if (get_value(ups, CI_NeedReplacement, &uinfo) && uinfo.uref.value) {
-        UPS_SET(UPS_REPLACEBATT);
+	UPS_SET(UPS_REPLACEBATT);
 	}
     }
 
@@ -995,11 +995,12 @@ int usb_ups_read_volatile_data(UPSINFO *ups)
     return 1;
 }
 
-static int write_int_to_ups(UPSINFO *ups, int ci, int value)
+static int write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
 {
     struct hiddev_report_info rinfo;
     USB_DATA *private = ups->driver_internal_data;
     USB_INFO *info;
+    int old_value, new_value;
 
     errno = 0; 
     if (ups->UPS_Cap[ci] && private->info[ci]) {
@@ -1010,7 +1011,16 @@ static int write_int_to_ups(UPSINFO *ups, int ci, int value)
             Dmsg1(000, "HIDIOCGREPORT for shutdown failed. ERR=%s\n", strerror(errno));
 	    return 0;
 	}
+        Dmsg3(000, "GUSAGE type=%d id=%d index=%d\n", info->uref.report_type,
+	   info->uref.report_id, info->uref.field_index);
+	if (ioctl(private->fd, HIDIOCGUSAGE, &info->uref) < 0) {  /* get UPS value */
+            Dmsg1(000, "HIDIOCSUSAGE for shutdown failed. ERR=%s\n", strerror(errno));
+	    return 0;
+	}
+	old_value = info->uref.value;
 	info->uref.value = value;
+        Dmsg3(000, "SUSAGE type=%d id=%d index=%d\n", info->uref.report_type,
+	   info->uref.report_id, info->uref.field_index);
 	if (ioctl(private->fd, HIDIOCSUSAGE, &info->uref) < 0) {  /* update UPS value */
             Dmsg1(000, "HIDIOCSUSAGE for shutdown failed. ERR=%s\n", strerror(errno));
 	    return 0;
@@ -1019,7 +1029,13 @@ static int write_int_to_ups(UPSINFO *ups, int ci, int value)
             Dmsg1(000, "HIDIOCSREPORT for shutdown failed. ERR=%s\n", strerror(errno));
 	    return 0;
 	}
+	if (ioctl(private->fd, HIDIOCGUSAGE, &info->uref) < 0) {  /* get UPS value */
+            Dmsg1(000, "HIDIOCSUSAGE for shutdown failed. ERR=%s\n", strerror(errno));
+	    return 0;
+	}
+	new_value = info->uref.value;
         Dmsg2(100, "shutdown ci=%d value=%d OK.\n", ci, value);
+        Dmsg4(000, "%s before=%d set=%d after=%d\n", name, old_value, value, new_value);
 	return 1;
     }
     return 0;
@@ -1034,20 +1050,21 @@ int usb_ups_kill_power(UPSINFO *ups)
        return 0;
     }
 
-    write_int_to_ups(ups, CI_DelayBeforeShutdown, 1);
+    write_int_to_ups(ups, CI_DelayBeforeShutdown, 20, "CI_DelayBeforeShutdown");
 
-    write_int_to_ups(ups, CI_ShutdownRequested, 1);
+    write_int_to_ups(ups, CI_ShutdownRequested, 1, "CI_ShutdownRequested");
 
-    write_int_to_ups(ups, CI_APCShutdownAfterDelay, 10);
+    write_int_to_ups(ups, CI_APCShutdownAfterDelay, 30, "CI_APCShutdownAfterDelay");
 
-    write_int_to_ups(ups, CI_APCForceShutdown, 1);
+    write_int_to_ups(ups, CI_APCForceShutdown, 1, "CI_APCForceShutdown");
 
-/*
- *  write_int_to_ups(ups, CI_WarningCapacityLimit, 40);
- *  write_int_to_ups(ups, CI_RemCapLimit, 20);
+/*  ****** DEBUG testing
+ *  write_int_to_ups(ups, CI_WarningCapacityLimit, 40, "CIWarningCapacityLimit");
+ *  write_int_to_ups(ups, CI_RemCapLimit, 20, "CI_RemCapLibmit");
  */
 
     Dmsg0(200, "Leave usb_ups_kill_power\n");
+    Dmsg0(000, "Kill power does not yet work. Please ignore the debug output.\n");
     return 1;
 }
 
