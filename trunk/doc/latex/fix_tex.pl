@@ -121,4 +121,4 @@ check_arguments(\%args);
 @includes = get_includes(@ARGV);
 
 $cnt = convert_files(@includes);
-$cnt or print "No lines changed\n";
+print "No lines changed\n" unless $cnt;
