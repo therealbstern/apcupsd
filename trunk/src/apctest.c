@@ -948,7 +948,8 @@ static void smart_calibration()
 {
    char *ans, cmd;
    char answer[2000];
-   int stat, monitor;
+   int stat, monitor, elapse;
+   time_t start_time;
 
    pmsg("First ensure that we have a good link and \n\
 that the UPS is functionning normally.\n");
@@ -996,13 +997,15 @@ Giving up.\n");
 
    pmsg("\nThe battery calibration should automatically end\n"
         "when the battery level drops below about 25, depending\n"
-        "on your UPS. I can also optionally monitor the progress\n"
+        "on your UPS.\n\n"
+        "I can also optionally monitor the progress\n"
         "and stop the calibration if it goes below 10. However,\n"
         "in the case of a new battery this may prematurely end the\n"
         "calibration loosing the effect.\n\n");
 
    ans = get_cmd(
-    "Do you me to stop the calibration if the battery level goes too low? (y/n): ");
+    "Do you want me to stop the calibration\n"
+    "if the battery level goes too low? (y/n): ");
    if (*ans == 'Y' || *ans == 'y') {
       monitor = 1;
    } else {
@@ -1018,7 +1021,10 @@ Giving up.\n");
       pmsg("Unexpected response from UPS: %s\n", ans);
       return;
    }
+   start_time = time(NULL);
    monitor_calibration_progress(monitor);
+   elapse = time(NULL) - start_time;
+   pmsg("On battery %d sec or %dm%ds.\n", elapse, elapse/60, elapse%60);
 }
 
 static void terminate_calibration(int ask)
@@ -1054,8 +1060,8 @@ is already doing a calibration.\n");
 static void monitor_calibration_progress(int monitor)
 {
    char *ans;
-   int count = 10;
-   int max_count = 10;
+   int count = 6;
+   int max_count = 6;
    char period = '.';
 
    pmsg("Monitoring the calibration progress ...\n\
@@ -1069,43 +1075,46 @@ To stop the calibration, enter a return.\n");
       FD_ZERO(&rfds);
       FD_SET(ups->fd, &rfds);
       FD_SET(STDIN_FILENO, &rfds);
-      tv.tv_sec = 12;
+      tv.tv_sec = 10;
       tv.tv_usec = 0;
       errno = 0;
       retval = select((ups->fd)+1, &rfds, NULL, NULL, &tv);
       switch (retval) {
       case 0:
-	 write(STDOUT_FILENO, &period, 1);
 	 if (++count >= max_count) {
             ans = smart_poll('f', ups);   /* Get battery charge */
 	    percent = (int)strtod(ans, NULL);
             pmsg("\nBattery charge %d\n", percent);
 	    if (percent > 0) {
 	       if (monitor && percent <= 10) {
+                  pmsg("Battery charge less than 10% terminating calibration ...\n");
 		  terminate_calibration(0);
 		  return;
 	       }
-	       if (percent < 40) {
-		  max_count = 3;      /* report faster */
+	       if (percent < 30) {
+		  max_count = 2;      /* report faster */
 	       }
 	    }
             ans = smart_poll('j', ups);  /* Get runtime */
             if (*ans >= '0' && *ans <= '9') {
 	       int rt = atoi(ans);
                pmsg("Remaining runtime is %d minutes\n", rt);
-	       if (monitor && rt > 0 && rt < 4) {
+	       if (monitor && rt < 2) {
+                  pmsg("Runtime less than 2 minutes terminating calibration ...\n");
 		  terminate_calibration(0);
 		  return;
 	       }
 	    }
 	    count = 0;
+	 } else {
+	    write(STDOUT_FILENO, &period, 1);
 	 }
 	 continue;
       case -1:
 	 if (errno == EINTR || errno == EAGAIN) {
 	    continue;
 	 }
-         pmsg("Select error. ERR=%s\n", strerror(errno));
+         pmsg("\nSelect error. ERR=%s\n", strerror(errno));
 	 return;
       default:
 	 break;
@@ -1113,13 +1122,14 @@ To stop the calibration, enter a return.\n");
       /* *ANY* user input aborts the calibration */
       if (FD_ISSET(STDIN_FILENO, &rfds)) {
 	 read(STDIN_FILENO, &cmd, 1);
+         pmsg("\nUser input. Terminating calibration ...\n");
 	 terminate_calibration(0);
 	 return;
       }
       if (FD_ISSET(ups->fd, &rfds)) {
 	 read(ups->fd, &cmd, 1);
          if (cmd == '$') {
-            pmsg("Battery Runtime Calibration terminated by UPS.\n");
+            pmsg("\nBattery Runtime Calibration terminated by UPS.\n");
             pmsg("Checking estimated runtime ...\n");
             ans = smart_poll('j', ups);
             if (*ans >= '0' && *ans <= '9') {
@@ -1129,8 +1139,12 @@ To stop the calibration, enter a return.\n");
                pmsg("Unexpected response from UPS: %s\n", ans);
 	    }
 	    return;
+	 /* ignore normal characters */
+         } else if (cmd == '!' || cmd == '+' || cmd == ' ' ||
+                    cmd == '\n' || cmd == '\r') {
+	    continue;
 	 } else {
-            pmsg("UPS sent: %c\n", cmd);
+            pmsg("\nUPS sent: %c\n", cmd);
 	 }
       }
    }

@@ -354,6 +354,17 @@ AC_CHECK_FUNC(gethostname,
     AC_CHECK_LIB(xnet,gethostname)
     AC_CHECK_LIB(inet,gethostname))
 
+dnl# --------------------------------------------------------------------------
+dnl# Check for socklen_t
+dnl# --------------------------------------------------------------------------
+AC_CACHE_CHECK(for socklen_t, ba_cv_header_socklen_t,
+  [AC_TRY_COMPILE([
+#include <sys/types.h>
+#include <sys/socket.h>],
+  [socklen_t x],
+  ba_cv_header_socklen_t=yes, ba_cv_header_socklen_t=no)])
+test $ba_cv_header_socklen_t = yes && AC_DEFINE(HAVE_SOCKLEN_T)
+
 # If resolver functions are not in libc check for -lnsl or -lresolv.
 AC_CHECK_FUNC(gethostbyname,
     AC_MSG_RESULT(using libc's resolver),
