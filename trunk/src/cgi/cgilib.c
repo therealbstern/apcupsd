@@ -103,28 +103,28 @@ int checkhost(char *check)
  */
 void html_puts(const unsigned char *p)
 {
-	while (*p != '\0') {
-		if (*p >= 0x7f) {
-			printf ("&#%d;", *p);
-		} else {
-			switch (*p) {
-				case '\"':
-					fputs("&quot;", stdout);
-					break;
-				case '&':
-					fputs("&amp;", stdout);
-					break;
-				case '<':
-					fputs("&lt;", stdout);
-					break;
-				case '>':
-					fputs("&gt;", stdout);
-					break;
-				default:
-					putchar(*p);
-					break;
-			}
-		}
-		p++;
-	}
+    while (*p != '\0') {
+        if (*p >= 0x7f) {
+            printf ("&#%d;", *p);
+        } else {
+            switch (*p) {
+                case '\"':
+                    fputs("&quot;", stdout);
+                    break;
+                case '&':
+                    fputs("&amp;", stdout);
+                    break;
+                case '<':
+                    fputs("&lt;", stdout);
+                    break;
+                case '>':
+                    fputs("&gt;", stdout);
+                    break;
+                default:
+                    putchar(*p);
+                    break;
+            }
+        }
+        p++;
+    }
 }
