@@ -54,8 +54,8 @@ distclean: targetdistclean
 
 install: all-targets
 	@for p in $(allexe) ; do \
-	    echo $(INSTALL_PROGRAM) $$p $(DESTDIR)$(cgibin); \
-	    $(INSTALL_PROGRAM) $$p $(DESTDIR)$(cgibin); \
+	    echo $(INSTALL_PROGRAM) -s $$p $(DESTDIR)$(cgibin); \
+	    $(INSTALL_PROGRAM) -s $$p $(DESTDIR)$(cgibin); \
 	done
 	$(INSTALL_DATA) apcupsd.css $(DESTDIR)$(cgibin)
 
