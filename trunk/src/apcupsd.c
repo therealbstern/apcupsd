@@ -475,7 +475,7 @@ int main(int argc, char *argv[]) {
 static void daemon_start(void)
 {
 #ifndef HAVE_CYGWIN
-    int i;
+    int i, fd;
     pid_t cpid;
     mode_t oldmask;
 
@@ -496,6 +496,19 @@ static void daemon_start(void)
      */
     for (i=sysconf(_SC_OPEN_MAX)-1; i > 2; i--) {
        close(i);
+    }
+
+    /*
+     * Create NULL stdout so that a UPS connection doesn't end up on
+     *	stdin, stdout, or stderr
+     */
+    fd = open("/dev/null", O_RDONLY, 644);
+    if (fd > 2) {
+	close(tmp_fd);
+    } else {
+	for (i=1; fd+i <= 2; i++) {
+	   dup2(fd, fd+i);
+	}
     }
 											
     /* move to root directory */
