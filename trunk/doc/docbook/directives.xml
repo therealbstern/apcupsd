@@ -55,6 +55,14 @@ directive is ignored for UPSCABLE ether).</para>
        automatically search the standard locations for the UPS.
        You may also specify a port range specification of the form
        <filename>/dev/usb/hid/hiddev[0-15]</filename>, .</para>
+       <para>
+       Note that you should enter &quot;/dev/usb/hiddev[0-15]&quot;
+       literally as shown.  The &quot;[0-15]&quot; expression tells
+       apcupsd to search all hiddev devices until it finds a UPS. You
+       can restrict the search to a subset of devices by using something
+       like &quot;[0-4]&quot;, but keep in mind this will limit
+       apcupsd's ability to locate the UPS if the kernel relocates it to
+       a differentdevice node.  </para>
 
        <para>Normally, the <command>./configure</command> program will
        set an appropriate default value.  You may also specify the 

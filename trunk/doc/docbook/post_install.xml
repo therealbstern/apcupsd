@@ -30,8 +30,15 @@ will search all the standard locations for the UPS. You
 may also explicitly specify the device location as
 either <filename>/dev/usb/hid/hiddev[0-15]</filename> (on non-Red-Hat
 systems) or <filename>/dev/usb/hiddev[0-15]</filename> (on Red Hat
-systems). Note, please enter the device names <emphasis>exactly</emphasis>
-as written above brackets, numbers, dash and all.</para>
+systems).</para>
+<para>
+Note that you should enter &quot;/dev/usb/hiddev[0-15]&quot; literally
+as shown.  The &quot;[0-15]&quot; expression tells apcupsd to search all
+hiddev devices until it finds a UPS. You can restrict the search to a
+subset of devices by using something like &quot;[0-4]&quot;, but keep in
+mind this will limit apcupsd's ability to locate the UPS if the kernel
+relocates it to a differentdevice node.
+</para>
 <para>
 If the first time you execute <application>apcupsd</application>, you get
 a message to the effect that the Apcupsd USB driver is missing, it means
