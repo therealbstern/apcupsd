@@ -60,48 +60,47 @@ Forge site has a CVS repository where you can find the very latest
 development software. Please visit it and become familiar with how it
 works.
 <h2><a href="3.10.x-manual/pr01s01.html">
-What is new in Apcupsd version 3.10.9</a></h2>
-<b>Apcupsd</b> version 3.10.9 includes drivers,
-smaller footprint if configured only for the driver
-you use, re-organized manual, apctest enhanced
-to do interactive EEPROM programming. It also contains
-a workaround for kernel 2.5 and 2.6 control queue overflows.
-Note, this is fixed in kernel 2.6.1.
-<h2><a href="3.10.x-manual/index.html" target="_top">Online 3.10.9 Manual</a> or a
+What is new in Apcupsd version 3.10.10</a></h2>
+<b>Apcupsd</b> version 3.10.10 has a new
+offbattery event that will allow you to modify
+apccontrol to see only delayed transitions to battery
+as defined by ONBATTERYDELAY and transitions off battery.
+It also contains another
+a workaround for kernel 2.5 and 2.6 control queue overflows
+thanks to Adam Kropelin.
+<h2><a href="3.10.x-manual/index.html" target="_top">Online 3.10.x Manual</a> or a
 <a href="3.10.x-manual/apcupsd.pdf" target="_top">PDF Version of the Manual</a> </h2>
 If you want to learn a bit more about <b>apcupsd</b>, you can browse the
-<a href="3.10-xmanual/index.html" target="_top">manual online</a>.
+<a href="3.10.x-manual/index.html" target="_top">manual online</a>.
 If you have any corrections/comments to the manual, please send them to me at:
 kern at sibbald dot com. For bug reports and
 developer contact, please see below.
 If you want a pdf copy of the manual, you can find it
-<a href="3.10.xmanual/apcupsd.pdf" target="_top">here</a>,
+<a href="3.10.x-manual/apcupsd.pdf" target="_top">here</a>,
 and finally, if you want one big manual in a single html file,
 it can be found
-<a href="3.10.xmanual/manual.html" target="_top">here</a>.
+<a href="3.10.x-manual/manual.html" target="_top">here</a>.
 <h2><a href="/cgi-bin/multimon.cgi" target="_top">Apcupsd Network Information</a></h2>
 To see my Linux/Windows APC UPSes running with
 <b>apcupsd</b> in real-time, just
 <a href="/cgi-bin/multimon.cgi" target="_top">click here</a>.
-<h2>Bugs</h2>
-All known bugs have been corrected for version 3.10.6.
-<p>
-Although, you can always email me directly, it is much better to address
-bug reports and questions to the full developer's mailing list, which
-is at: <A href="mailto:apcupsd-users at lists.sourceforge.net">Apcupsd Mailing List</a>.
-The previous address was modified to prevent easy use by spammers. To use it,
-you must replace the <b>at</b> with an @ symbol.
-In addition to a problem description, please include the following
-with any bug report you send: the
-apcupsd version that you are using; your operating system (uname -a); and if
-it involves configuration issues, your apcupsd.conf and apcupsd.events files.
-<h2>Release Notification and Developer Email List</h2>
+<h2>Bugs and Email Support</h2>
+Please don't email me directly, it is much better to address bug reports
+and questions to the user's mailing list, which is at:<b><a
+href="mailto:apcupsd-users at lists.sourceforge.net">Apcupsd Mailing
+List</a></b>. The previous address was modified to prevent easy use by
+spammers. To use it, you must replace the <b>at</b> with an @ symbol.
+In addition to a problem description, please include the following with
+any bug report you send: the apcupsd version that you are using; your
+operating system (uname -a); and if it involves configuration issues,
+your apcupsd.conf and apcupsd.events files.
+<h2>Release Notification and User's Email List</h2>
 <p>If you want to be notified by email when new releases are available, please
 sign up for the apcupsd-announce mailing list. This is easily accomplished by
 following the instructions at:
 <a href="http://lists.sourceforge.net/lists/subscribe/apcupsd-announce">
 http://lists.sourceforge.net/lists/subscribe/apcupsd-announce</a>.
-<p>If you would like to receive the developer email, please visit the
+<p>If you would like to receive the user's email, please visit the
 following site and follow the instructions:
 <a href="http://lists.sourceforge.net/lists/subscribe/apcupsd-users">
 http://lists.sourceforge.net/lists/subscribe/apcupsd-users</a>.
