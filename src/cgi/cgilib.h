@@ -24,13 +24,19 @@ void parsearg (const char *var, const char *value);
 int extractcgiargs(void);
 
 /* see if a host is allowed per the hosts.conf */
-int checkhost(char *check);
+int checkhost(const char *check);
 
 /*
  * Output a string taking care to assure that any html meta characters
  * are output properly.
  */
 void html_puts(const unsigned char *s);
+
+/*
+ * Print the standard http header, html header which is common to all
+ * html pages.
+ */
+void html_begin(const char *title, int refresh);
 
 /*
  * Print the standard footer which appears on every html page and close out

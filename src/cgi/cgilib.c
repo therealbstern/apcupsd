@@ -73,7 +73,7 @@ int extractcgiargs()
  *	    0 on failure
  *	    1 on success (default if not hosts.conf file)
  */
-int checkhost(char *check)
+int checkhost(const char *check)
 {
     FILE    *hostlist;
     char    fn[256], buf[256], addr[256];
@@ -133,6 +133,42 @@ void html_puts(const unsigned char *p)
         }
         p++;
     }
+}
+
+
+/*
+ * Print the standard http header, html header which is common to all
+ * html pages.
+ */
+void html_begin(const char *title, int refresh)
+{
+    puts ("Content-type: text/html");
+    puts ("Pragma: no-cache\n");
+
+    puts("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"");
+    puts("  \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">");
+    puts("<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">");
+    puts ("<head>");
+    fputs ("<title>", stdout);
+    html_puts(title);
+    puts ("</title>");
+    puts ("<meta http-equiv=\"Pragma\" content=\"no-cache\" />");
+    if (refresh != 0) {
+        printf ("<meta http-equiv=\"Refresh\" content=\"%d\" />\n", refresh);
+    }
+    puts ("<style type=\"text/css\" id=\"internalStyle\">");
+    puts ("  body {color: black; background: white}");
+    puts ("  div.Center {text-align: center}");
+    puts ("  pre {text-align: left}");
+    puts ("  td.Empty {color: black; background: aqua}");
+    puts ("  td.Fault {color: black; background: red}");
+    puts ("  td.Label {color: black; background: aqua}");
+    puts ("  td.Normal {color: black; background: lime}");
+    puts ("  td.Warning {color: black; background: yellow}");
+    puts ("  strong {color: red}");
+    puts ("</style>");
+    puts ("</head>");
+    puts ("<body>");
 }
 
 /*
