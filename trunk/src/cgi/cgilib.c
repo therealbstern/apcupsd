@@ -142,43 +142,54 @@ void html_puts(const unsigned char *p)
  */
 void html_begin(const char *title, int refresh)
 {
-    puts ("Content-type: text/html");
-    puts ("Pragma: no-cache\n");
+    int http_version;
+    char *server_protocol;
+    
+    server_protocol = getenv("SERVER_PROTOCOL");
+    if (server_protocol == NULL) {
+        http_version = 10;
+    } else if (strcmp(server_protocol, "HTTP/1.0") == 0) {
+        http_version = 10;
+    } else if (strcmp(server_protocol, "HTTP/1.1") == 0) {
+        http_version = 11;
+    } else {
+    	http_version = 11;
+    }
+        
+    (void) puts ("Content-Type: text/html; charset=utf-8"); 
+    (void) puts ("Content-Language: en");
+    if (http_version > 10) {
+        (void) puts ("Cache-Control: no-cache");
+    } else {
+        (void) puts ("Pragma: no-cache");
+    }
+    (void) puts ("");
 
-    puts("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"");
-    puts("  \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">");
-    puts("<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">");
-    puts ("<head>");
-    fputs ("<title>", stdout);
+    (void) puts("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"");
+    (void) puts("  \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">");
+    (void) puts("<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">");
+    (void) puts ("<head>");
+    (void) fputs ("<title>", stdout);
     html_puts(title);
-    puts ("</title>");
-    puts (" <meta http-equiv=\"Pragma\" content=\"no-cache\" />");
+    (void) puts ("</title>");
+
+    if (http_version > 10) {
+        (void) puts (" <meta http-equiv=\"Cache-Control\" content=\"no-cache\" />");
+    }
+    /* Always put the Pragma: no-cache tag in the document. Even if the request
+     * was received from a HTTP 1.1 proxy, the requesting client may have
+     * made the request via HTTP 1.0.
+     */
+    (void) puts (" <meta http-equiv=\"Pragma\" content=\"no-cache\" />");
+
     if (refresh != 0) {
         printf (" <meta http-equiv=\"Refresh\" content=\"%d\" />\n", refresh);
     }
 
-#ifdef EMBEDDED_STYLESHEET
-    puts ("<style type=\"text/css\" id=\"internalStyle\">");
-    puts ("  body {color: black; background: white}");
-    puts ("  div.Center {text-align: center}");
-    puts ("  img {border-style: none}");
-    puts ("  pre {text-align: left}");
-    puts ("  strong {color: red}");
-    puts ("  table.Outer {color: black; background: #60a0a0; empty-cells: show; border: solid #60a0a0}");
-    puts ("  th.Outer {color: black; background: #60b0b0}");
-    puts ("  .Title { font-size: 18pt; }");
-    puts ("  .SubTitle { font-size: 12pt; }");
-    puts ("  .Empty {color: black; background: lime}");
-    puts ("  .Fault {color: black; background: red}");
-    puts ("  .Label {color: black; background: aqua}");
-    puts ("  .Normal {color: black; background: lime}");
-    puts ("  .Warning {color: black; background: yellow}");
-    puts ("</style>");
-#else
-    puts (" <link href=\"apcupsd.css\" rel=\"stylesheet\" type=\"text/css\" />");
-#endif
-    puts ("</head>");
-    puts ("<body>");
+    (void) puts (" <link href=\"apcupsd.css\" rel=\"stylesheet\" type=\"text/css\" />");
+
+    (void) puts ("</head>");
+    (void) puts ("<body>");
 }
 
 /*
@@ -188,12 +199,12 @@ void html_begin(const char *title, int refresh)
 void html_finish(void)
 {
 #ifdef VALIDATE_HTML
-    puts ("<hr /><div><small>");
-    puts ("<a href=\"http://jigsaw.w3.org/css-validator/check/referer\">");
-    puts ("<img style=\"float:right\" src=\"http://jigsaw.w3.org/css-validator/images/vcss\" alt=\"Valid CSS!\" height=\"31\" width=\"88\"/></a>");
-    puts ("<a href=\"http://validator.w3.org/check/referer\">");
-    puts ("<img style=\"float:right\" src=\"http://www.w3.org/Icons/valid-xhtml10\" alt=\"Valid XHTML 1.0!\" height=\"31\" width=\"88\"/></a>");
-    puts ("</small></div>");
+    (void) puts ("<hr /><div><small>");
+    (void) puts ("<a href=\"http://jigsaw.w3.org/css-validator/check/referer\">");
+    (void) puts ("<img style=\"float:right\" src=\"http://jigsaw.w3.org/css-validator/images/vcss\" alt=\"Valid CSS!\" height=\"31\" width=\"88\"/></a>");
+    (void) puts ("<a href=\"http://validator.w3.org/check/referer\">");
+    (void) puts ("<img style=\"float:right\" src=\"http://www.w3.org/Icons/valid-xhtml10\" alt=\"Valid XHTML 1.0!\" height=\"31\" width=\"88\"/></a>");
+    (void) puts ("</small></div>");
 #endif
-    puts ("</body></html>");
+    (void) puts ("</body></html>");
 }
