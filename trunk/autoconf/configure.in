@@ -393,6 +393,10 @@ AC_CHECK_FUNC(setproctitle, AC_DEFINE(HAVE_SETPROCTITLE),
     [LIBEXTRAOBJ="$LIBEXTRAOBJ proctitle.o"
      EXTRAOBJ="$EXTRAOBJ lib/proctitle.o"])
 
+AC_CHECK_FUNC(inet_pton, AC_DEFINE(HAVE_INETPTON), 
+    [LIBEXTRAOBJ="$LIBEXTRAOBJ inet_pton.o"
+     EXTRAOBJ="$EXTRAOBJ lib/inet_pton.o"])
+
 dnl
 dnl If we are compiling with pthreads, check for presence of localtime_r
 dnl
