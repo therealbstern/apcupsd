@@ -646,6 +646,23 @@ int usb_ups_kill_power(UPSINFO *ups)
     }
 
     /*
+     * BackUPS shutdown
+     *
+     * Alternately, if APCDelayBeforeShutdown is available, setting it will
+     * start a countdown after which the UPS will hibernate.
+     */
+    if(!shutdown && UPS_HAS_CAP(CI_APCDelayBeforeShutdown)) {
+        Dmsg0(000, "UPS appears to support BackUPS style shutdown.\n");   
+        func = "CI_APCDelayBeforeShutdown";
+        if (!usb_write_int_to_ups(ups, CI_APCDelayBeforeShutdown, SHUTDOWN_DELAY, func)) {
+           Dmsg1(000, "Kill power function \"%s\" failed.\n", func);   
+        }
+        else {
+            shutdown = 1;
+        }
+    }
+
+    /*
      * SmartUPS shutdown
      *
      * If both DWAKE and DelayBeforeShutdown are available, trigger a hibernate
@@ -653,7 +670,7 @@ int usb_ups_kill_power(UPSINFO *ups)
      * IMPORTANT. The write to DelayBeforeShutdown starts both timers ticking
      * down and the UPS will hibernate when DelayBeforeShutdown hits zero.
      */
-    if (UPS_HAS_CAP(CI_DWAKE) && UPS_HAS_CAP(CI_DelayBeforeShutdown)) {
+    if (!shutdown && UPS_HAS_CAP(CI_DWAKE) && UPS_HAS_CAP(CI_DelayBeforeShutdown)) {
         Dmsg0(000, "UPS appears to support SmartUPS style shutdown.\n");   
         func = "CI_DWAKE";
         if (!usb_write_int_to_ups(ups, CI_DWAKE, SHUTDOWN_DELAY+4, func)) {
@@ -668,23 +685,6 @@ int usb_ups_kill_power(UPSINFO *ups)
             else {
                 shutdown = 1;
             }
-        }
-    }
-
-    /*
-     * BackUPS shutdown
-     *
-     * Alternately, if APCDelayBeforeShutdown is available, setting it will
-     * start a countdown after which the UPS will hibernate.
-     */
-    if(!shutdown && UPS_HAS_CAP(CI_APCDelayBeforeShutdown)) {
-        Dmsg0(000, "UPS appears to support BackUPS style shutdown.\n");   
-        func = "CI_APCDelayBeforeShutdown";
-        if (!usb_write_int_to_ups(ups, CI_APCDelayBeforeShutdown, SHUTDOWN_DELAY, func)) {
-           Dmsg1(000, "Kill power function \"%s\" failed.\n", func);   
-        }
-        else {
-            shutdown = 1;
         }
     }
 
