@@ -215,12 +215,18 @@ int getline(char *s, int len, UPSINFO *ups)
 	struct timeval tv;
  
 	if (my_data->debounce) {
+	   int sleep_time;
 	   /* Wait 6 seconds before returning next sample.
 	    * This eliminates the annoyance of detecting
 	    * transitions to battery that last less than
-	    * 6 seconds.
-	    */
-	   sleep(6 - (time(NULL) - my_data->debounce));
+	    * 6 seconds.  Do sanity check on calculated
+	    * sleep time.
+	    */	 
+	   sleep_time = 6 - (time(NULL) - my_data->debounce); 
+	   if (sleep_time < 0 || sleep_time > 6) {
+	      sleep_time = 6;
+	   }
+	   sleep(sleep_time);
 	   my_data->debounce = 0;
 	}
   

@@ -5,6 +5,11 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+----> Release apcupsd-3.10.9 (31 December 2003)
+31Dec03
+- Bartlomiej Król found an unexpected interaction between the 6 second
+  "debounce" code and the new ONBATTERY delay time that caused the
+  USB and apcsmart drivers to sleep for a long time.
 
 ----> Release apcupsd-3.10.8 (28 December 2003)
 28Dec03

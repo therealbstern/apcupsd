@@ -1,7 +1,11 @@
 
-          Release Notes for Apcupsd 3.10.8
+          Release Notes for Apcupsd 3.10.9
 
 General:
+31Dec03
+- Bartlomiej Król found an unexpected interaction between the 6 second
+  "debounce" code and the new ONBATTERY delay time that caused the
+  USB and apcsmart drivers to sleep for a long time.
 28Dec03
 - Added upsBaiscOntrolConverveBattery change to smtp requested by
   Kastus Shchuka (kastus@list.sourceforge.net) 
