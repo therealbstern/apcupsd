@@ -106,7 +106,7 @@ static gdImagePtr InitImage(void)
 }
 
 
-void parsearg(char *var, char *value) 
+void parsearg(const char *var, const char *value) 
 {
     if (!strcmp(var, "host"))
 	  strncpy (monhost, value, sizeof(monhost));
@@ -125,7 +125,7 @@ void parsearg(char *var, char *value)
 }
 
 
-void imgheader (void)
+static void imgheader (void)
 {
 #ifdef SYS_IMGFMT_PNG
     printf ("Content-type: image/png\n");
@@ -148,7 +148,7 @@ static void TermImage(gdImagePtr im)
     gdImageDestroy (im);
 }  
 
-void drawbattcap(char *battcaps, char *minbchgs)
+static void drawbattcap(char *battcaps, char *minbchgs)
 {
     gdImagePtr	    im;
     char	   batttxt[16];
@@ -176,7 +176,7 @@ void drawbattcap(char *battcaps, char *minbchgs)
     TermImage(im);
 }
 
-void drawbattvolt(char *battvolts, char *nombattvs) 
+static void drawbattvolt(char *battvolts, char *nombattvs) 
 {
     gdImagePtr	    im;
     char	   batttxt[16];
@@ -243,7 +243,8 @@ void drawbattvolt(char *battvolts, char *nombattvs)
     TermImage(im);
 }
 
-void noimage (void)
+#if 0
+static void noimage (void)
 {
     gdImagePtr	    im;
 
@@ -265,8 +266,9 @@ void noimage (void)
 #endif
     gdImageDestroy (im);
 }
+#endif
 
-void drawupsload(char *upsloads) 
+static void drawupsload(char *upsloads) 
 {
     gdImagePtr	    im;
     char	   loadtxt[16];
@@ -293,7 +295,7 @@ void drawupsload(char *upsloads)
 
 /*
  * Input Voltage */
-void drawutility (char *utilitys, char *translos, char *transhis) 
+static void drawutility (char *utilitys, char *translos, char *transhis) 
 {
     gdImagePtr	    im;
     char	   utiltxt[16];
@@ -340,7 +342,7 @@ void drawutility (char *utilitys, char *translos, char *transhis)
 /*
  * Output Voltage
  */
-void drawupsout (char *upsouts) 
+static void drawupsout (char *upsouts) 
 {
     gdImagePtr	    im;
     char	   utiltxt[16];
@@ -377,7 +379,7 @@ void drawupsout (char *upsouts)
     TermImage(im);
 }
 
-void drawruntime (char *upsrunts, char *lowbatts)
+static void drawruntime (char *upsrunts, char *lowbatts)
 {
     gdImagePtr	    im;
     char	   utiltxt[16];

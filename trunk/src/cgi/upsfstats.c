@@ -19,7 +19,7 @@
 
 static char   monhost[256];
 
-void parsearg(char *var, char *value) 
+void parsearg(const char *var, const char *value) 
 {
     if (!strcmp(var, "host")) {
 	strncpy (monhost, value, sizeof(monhost));

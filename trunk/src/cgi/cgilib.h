@@ -18,7 +18,7 @@
 */
 
 /* other programs that link to this should provide parsearg() ... */
-void parsearg (char *var, char *value);
+void parsearg (const char *var, const char *value);
 
 /* actually extract the values from QUERY_STRING */
 int extractcgiargs(void);
