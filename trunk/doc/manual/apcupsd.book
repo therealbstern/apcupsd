@@ -27,6 +27,7 @@
 ./status.html
 ./upsbible.html
 ./usb.html
+./snmp.html
 ./kernel_config.html
 ./win32.html
 ./multiUPS.html
