@@ -77,26 +77,26 @@ SLAVEINFO slaves[MAXSLAVES];	     /* Slaves description */
 static HANDLER match_int, match_range, match_slave, match_str,
 	       match_facility, match_index; 
 static HANDLER obsolete;
-#if AVERSION==4
+#ifdef UNSUPPORTED_CODE
 static HANDLER start_ups, end_ups;
 #endif
 
 /* ---------------------------------------------------------------------- */
 
-static GENINFO accesses[] = {
+static const GENINFO accesses[] = {
     { "false",  "false",                 FALSE }, /* must come first */
     { "true",   "true",                  TRUE },
     { NULL,     "*invalid-access-mode*", FALSE },
 };
 
-static GENINFO onoroff[] = {
+static const GENINFO onoroff[] = {
     { "off",    "off",                   FALSE },
     { "on",     "on",                    TRUE },
     { NULL,     "value must be ON or OFF", FALSE },
 };
 
 
-static GENINFO cables[] = {
+static const GENINFO cables[] = {
     { "simple",    "Custom Cable Simple", CUSTOM_SIMPLE },
     { "smart",     "Custom Cable Smart",  CUSTOM_SMART },
     { "ether",     "Ethernet Link",       APC_NET },
@@ -118,7 +118,7 @@ static GENINFO cables[] = {
     { NULL,        "*invalid-cable*",     NO_CABLE  },
 };
 
-static GENINFO upsclasses[] = {
+static const GENINFO upsclasses[] = {
     { "standalone",     "Stand Alone",           STANDALONE },
     { "shareslave",     "ShareUPS Slave",        SHARESLAVE },
     { "sharemaster",    "ShareUPS Master",       SHAREMASTER },
@@ -128,7 +128,7 @@ static GENINFO upsclasses[] = {
     { NULL,             "*invalid-ups-class*",   NO_CLASS },
 };
 
-static GENINFO logins[] = {
+static const GENINFO logins[] = {
     { "always",  "always",               ALWAYS }, /* must come first */
     { "disable", "disable",              NEVER },
     { "timeout", "timeout",              TIMEOUT },
@@ -137,7 +137,7 @@ static GENINFO logins[] = {
     { NULL,      "*invalid-login-mode*", NO_LOGON },
 };
 
-static GENINFO modes[] = {
+static const GENINFO modes[] = {
     { "disable",  "Network & ShareUPS Disabled", DISABLE },
     { "share",    "ShareUPS",                    SHARE },
     { "net",      "NetworkUPS",                  NET },
@@ -145,7 +145,7 @@ static GENINFO modes[] = {
     { NULL,       "*invalid-ups-mode*",          NO_SHARE_NET },
 };
 
-static GENINFO types[] = {
+static const GENINFO types[] = {
     { "backups",       "BackUPS",                   BK },
     { "sharebasic",    "ShareUPS Basic Port",       SHAREBASIC },
     { "netups",        "NetUPS Virtual Basic Port", NETUPS },
@@ -169,11 +169,11 @@ static GENINFO types[] = {
     { NULL,            "*invalid-ups-type*",        NO_UPS },
 };
 
-static PAIRS table[] = {
+static const PAIRS table[] = {
 
     /* General parameters */
 
-#if AVERSION==4
+#ifdef UNSUPPORTED_CODE
     {"UPSSTART", start_ups, WHERE(upsname), SIZE(upsname),
         "UPS configuration id: start entry"},
     {"UPSEND", end_ups, 0, 0,
@@ -331,7 +331,7 @@ void print_pairs_table(void)
 
 
 static int obsolete(UPSINFO *ups, size_t offset,
-		    GENINFO *junk, const char *v) 
+		    const GENINFO *junk, const char *v) 
 {
     char *msg = (char *)junk;
 
@@ -340,9 +340,9 @@ static int obsolete(UPSINFO *ups, size_t offset,
     return SUCCESS;
 }
 
-#if AVERSION==4
+#ifdef UNSUPPORTED_CODE
 static int start_ups(UPSINFO *ups, size_t offset,
-		     GENINFO *size, const char *v)
+		     const GENINFO *size, const char *v)
 {
     char x[MAXSTRING];
 
@@ -382,7 +382,7 @@ static int start_ups(UPSINFO *ups, size_t offset,
 }
 
 static int end_ups(UPSINFO *ups, size_t offset,
-		   GENINFO *size, const char *v)
+		   const GENINFO *size, const char *v)
 {
     char x[MAXSTRING];
 
@@ -409,7 +409,7 @@ static int end_ups(UPSINFO *ups, size_t offset,
 
 
 static int match_int(UPSINFO *ups, size_t offset,
-		     GENINFO *junk, const char *v) 
+		     const GENINFO *junk, const char *v) 
 {
     int x;
 
@@ -421,7 +421,7 @@ static int match_int(UPSINFO *ups, size_t offset,
 }
 
 static int match_range(UPSINFO *ups, size_t offset,
-			GENINFO *vs, const char *v) 
+			const GENINFO *vs, const char *v) 
 {
     char x[MAXSTRING];
     INTERNALGENINFO *t;
@@ -475,7 +475,7 @@ static int match_range(UPSINFO *ups, size_t offset,
  * item.
  */
 static int match_index(UPSINFO *ups, size_t offset,
-		       GENINFO *vs, const char *v) 
+		       const GENINFO *vs, const char *v) 
 {
     char x[MAXSTRING];
 
@@ -515,7 +515,7 @@ static int match_index(UPSINFO *ups, size_t offset,
 
 
 static int match_slave (UPSINFO *ups, size_t offset,
-			GENINFO *junk, const char *v) 
+			const GENINFO *junk, const char *v) 
 {
     char x[MAXSTRING];
 
@@ -541,7 +541,7 @@ static int match_slave (UPSINFO *ups, size_t offset,
  * If so, we can't use sscanf(3)
  */
 static int match_str(UPSINFO *ups, size_t offset,
-		     GENINFO *gen, const char *v) 
+		     const GENINFO *gen, const char *v) 
 {
     char x[MAXSTRING];
     long size = (long)gen;
@@ -554,13 +554,10 @@ static int match_str(UPSINFO *ups, size_t offset,
     return SUCCESS;
 }
 
-static int
-match_facility(UPSINFO *ups,
-	       size_t offset,
-	       GENINFO *junk,
-	       const char *v)
+static int match_facility(UPSINFO *ups, size_t offset,
+	       const GENINFO *junk, const char *v)
 {
-    struct {
+    const struct {
 	char *fn;
 	int fi;
     } facnames[] = {
@@ -613,7 +610,7 @@ match_facility(UPSINFO *ups,
  **
  **/
 static int ParseConfig(UPSINFO *ups, char *line) {
-    PAIRS *p;
+    const PAIRS *p;
     char *key, *value;
 /**
  ** Hopefully my notation is obvious enough:

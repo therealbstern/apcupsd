@@ -168,8 +168,8 @@ typedef struct SELFTEST {
 
 
 typedef struct geninfo {
-    char *name;             /* JHNC: name mustn't contain whitespace */
-    char *long_name;
+    const char *name;             /* JHNC: name mustn't contain whitespace */
+    const char *long_name;
     int type;
 } GENINFO; /* for static declaration of data */
 
@@ -418,13 +418,13 @@ typedef struct datainfo {
     char accessmagic[ACCESS_MAGIC_SIZE];
 } DATAINFO;
 
-typedef int (HANDLER) (UPSINFO *, size_t, GENINFO *, const char *);
+typedef int (HANDLER) (UPSINFO *, size_t, const GENINFO *, const char *);
 
 typedef struct {
     const char *key;
     HANDLER *handler;
     size_t offset;
-    GENINFO *values;
+    const GENINFO *values;
     const char *help;
 } PAIRS;
 

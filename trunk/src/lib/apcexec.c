@@ -88,11 +88,6 @@ void clean_threads(void)
 #else
 
 static int child_pid[MAX_THREADS] = { 0, 0, 0, 0, 0, 0, 0};
-
-#if AVERSION==4
-#define core_ups ((UPSINFO *)&gcfg)    /* gross kludge !!! */
-#endif
-
 static char *child_name[MAX_THREADS];
 
 /*
