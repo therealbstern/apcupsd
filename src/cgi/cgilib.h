@@ -31,3 +31,9 @@ int checkhost(char *check);
  * are output properly.
  */
 void html_puts(const unsigned char *s);
+
+/*
+ * Print the standard footer which appears on every html page and close out
+ * the html document.
+ */
+void html_finish(void);
