@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: manual.texi,v 1.4 2004-11-06 14:27:25 kerns Exp $
+@comment $Id: manual.texi,v 1.5 2005-01-08 17:05:06 kerns Exp $
 @c %***start of header
 @setfilename manual.info
 @finalout
@@ -976,6 +976,17 @@ where you should get
     drwxr-xr-x    2 root     root            0 May  1 18:55 usbfs
 @end example
 
+or perhaps something like
+
+@example
+   total 0
+   drwxr-xr-x  2 root root 0 Jan  6 15:27 hiddev
+   drwxr-xr-x  2 root root 0 Jan  6 15:28 hub
+   drwxr-xr-x  2 root root 0 Jan  6 15:28 usb
+   drwxr-xr-x  2 root root 0 Jan  6 15:27 usbfs
+   drwxr-xr-x  2 root root 0 Jan  6 15:28 usbhid
+@end example
+
 If your 2.6.x system does not have the /sys/bus/usb
 directory, either you do not have sysfs mounted on /sys or the USB
 module(s) have not been loaded.  (Check /proc/mounts to make sure
@@ -993,6 +1004,53 @@ etc.).
 If CONFIG_USB is set as M, CONFIG_USB_HID must be M (if enabled
 at all). If CONFIG_USB is set as Y, CONFIG_USB_HID can be M or
 Y. hiddev, in turn, will be built however HID is.
+
+To complicate things more many Linux flavors running 2.6 kernels 
+such as Fedora FC3 use the udev filesystem,
+which creates the devices in /dev (as well as some others
+such as network devices) on the fly as they are needed. It
+is basically a hotplug system, giving a lot more power
+to the user to determine what happens when a device is
+probed or opened. It is also a lot more complicated. 
+
+The bottom line for apcupsd on such a system is that the
+file /dev/usb/hiddev# is not defined, and hence apcupsd
+terminates in error. The solution to the problem is
+to add a rule to the udev rules file.  On Fedora FC3, this
+file is found in /etc/udev/rules.d/50-udev.rules. Start      
+by adding the following line:
+  
+@example
+BUS="usb", SYSFS[idVendor]="051d", NAME="usb/hiddev%n"
+@end example
+
+where you replace the [ and ] with braces in the line above.
+
+Then either reboot your system, or unplug and replug your UPS
+and then restart apcupsd. At that point apcupsd should work
+fine.  You can use:
+
+@example
+udevinfo -a -p /sys/class/usb/hiddev0/
+@end example
+
+to get more information on the fields that can be matched.
+
+Adam has provided the following as a more generic rule:
+
+@example
+KERNEL="hiddev*", NAME="usb/hiddev%n"
+@end example
+
+If you have several UPSes or you just want to give your
+UPS a fixed name, you can use:
+
+@example
+BUS="usb", SYSFS[serial]="AS0123456789", NAME="usb/ups0"
+@end example
+
+where you replace the [ and ] with braces and the serial
+number with the one that correspnds to your UPS.
 
 Some kernels ship, such as Mandrake 10, ship with 
 CONFIG_USB_DYNAMIC_MINORS turned on. This is not ideal for
@@ -3384,7 +3442,7 @@ supported.
 
 Normally apctest will have been built
 but not installed, so you must execute it from the
-@file{<bacula-source>/src} directory. You can
+@file{<apcupsd-source>/src} directory. You can
 explicitly build it on Unix with:
 
 @example
@@ -6957,7 +7015,7 @@ This feature is implemented on Unix systems by first requesting
 a system shutdown. As a part of the shutdown, apcupsd is terminated
 by the system, but the shutdown process executes a script where
 apcupsd is recalled after the disks are synced and the machine is
-idle. Bacula then requests the UPS to shut off the power
+idle. Apcupsd then requests the UPS to shut off the power
 (killpower).
 
 Unfortunately on Windows, there is no such shutdown script that
@@ -11036,12 +11094,15 @@ The only other define is for the initdir for the daemon control script.
 On RedHat systems this is set to /etc/rc.d/init.d/.  You would only need to edit this
 if packaging for a platform with uses a different directory.
 
-@item @strong{I'm getting errors about not having permission when I try  to build the packages. Do I need to be root?}
-No, you do not need to be root and, in fact, it is better practice to build rpm packages
-as a non-root user. Bacula packages are designed to be built by a regular user but you must
-make a few changes on your system to do this. If you are building on your own system then
-the simplest method is to add write permissions for all to the build directory
-(/usr/src/redhat/). To accomplish this execute the following command as root:
+@item @strong{I'm getting errors about not having permission when
+I try to build the packages.  Do I need to be root?} No, you do
+not need to be root and, in fact, it is better practice to build
+rpm packages as a non-root user.  Apcupds packages are designed to
+be built by a regular user but you must make a few changes on
+your system to do this.  If you are building on your own system
+then the simplest method is to add write permissions for all to
+the build directory (/usr/src/redhat/).  To accomplish this
+execute the following command as root:
 
 @example
     chmod -R 777 /usr/src/redhat
