@@ -702,7 +702,7 @@ bool pusb_read_int_from_ups(UPSINFO *ups, int ci, int* value)
     return true;
 }
 
-bool write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
+bool pusb_write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
 {
     struct hiddev_report_info rinfo;
     USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
