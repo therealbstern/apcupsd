@@ -31,6 +31,7 @@ install: @INSTALL_DISTDIR@
 	else \
 		$(INSTALL_PROGRAM) -m 744 ./apccontrol $(sysconfdir)/apccontrol; \
 	fi
+	(cd etc/; $(MAKE) install)
 
 #
 # uninstall symlinks before removing the boot script etc etc
