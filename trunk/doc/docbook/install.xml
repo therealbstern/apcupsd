@@ -1,0 +1,1533 @@
+<chapter><title>Planning Your Installation</title>
+
+<sect1 id='quickstart'><title>Quick Start for Beginners</title>
+
+<para><application>apcupsd</application> is a complex piece of
+software, but most of its complexities are meant for dealing with
+older hardware and operating systems.  On current hardware and 
+software getting it running should not be very complicated.</para>
+
+<para>The following is a  help guide to the steps needed to get
+<application>apcupsd</application> set up and
+running as painlessly as possible.</para>
+
+<procedure>
+<step><para>First, check to see if
+<application>apcupsd</application> 
+<link linkend='supported'>supports your UPS and operating
+system</link>.</para></step>
+
+<step><para>Second, <link linkend='configtype'>plan your configuration
+type</link>.  If you have just one UPS and one computer, this is easy.
+If you have more than one machine being served by the same UPS, or
+more than one UPS supplying power to computers that are on the same
+local network, you have more choices to make,</para></step>
+
+<step><para>Third, figure out if you have one of the easy setups.
+If you have a USB UPS, and a USB-capable recent Linux such as Red Hat
+or Suse at version 8.0, and you want to use one UPS with one computer,
+that's an easy setup.  APC supplies the cable needed to talk with 
+that UPS along with the UPS. All you need to do is <link
+linkend='check_usb'>check that your USB subsystem is working</link>;
+if so, you can go to the build and install step.</para></step>
+
+<step><para>If you have a UPS designed to communicate via SNMP
+over Ethernet, that is also a relatively easy installation. It's
+in <link linkend='advanced'>Advanced Topics</link> mainly because
+it's an unusual situation.</para></step>
+
+<step><para>If you have a UPS that communicates via an
+old-fashioned RS232C serial interface, your life may be about 
+to get interesting.</para>
+
+<substeps>
+<step><para>If you have a vendor-supplied cable, find out what cable type
+you have by looking on the flat ends of the cable for a number, such
+as 940-0020A, stamped in the plastic.  Check the cables column of the
+<link linkend='type_table'>table of types</link> to see if it's a
+supported type.</para></step>
+
+<step><para>If you don't have a vendor-supplied cable, or your type is
+not supported, you may have to <link linkend='cables'>build one
+yourself</link>.  Here is hoping you are good with a soldering
+iron!</para></step>
+</substeps>
+</step>
+
+<step><para>Now you are ready to read the <link
+linkend="build_install">Building and Installing</link> section of
+the manual and follow those directions.  If you are installing from
+an RPM or some other form of binary package, this step will probably
+consist of executing a single command.</para></step>
+
+<step><para>Tweak your <filename>/etc/apcupsd/apcupd.conf</filename> file as
+necessary. Often it will not be.</para></step>
+
+<step><para><link linkend='autoboot'>Change the BIOS settings</link>
+on your computer so that boots up every time it gets power. (This is
+not the default on most systems.)</para></step>
+
+<step><para>To verify that your UPS is communicating with your
+computer and will do the right thing when the power goes out, read and
+follow the instructions in the <link linkend='testing'>Testing</link>
+section.</para></step>
+
+<step><para>If you run into problems, read the <link
+linkend='troubleshooting'>Troubleshooting</link> section of this
+manual.</para></step>
+
+<step><para>If you still need help, send a message to the developer's
+email list <email>apcupsd-users at lists.sourceforge.net</email> describing your
+problem, what version of <application>apcupsd</application> you are
+using, what operating system you are using, and anything else you
+think might be helpful.</para></step>
+
+<step><para>Read the manual sections on <ulink
+url='monitoring'>monitoring</ulink> and <ulink
+url='maintaining'>maintaining</ulink> your UPS.</para></step>
+
+</procedure>
+</sect1>
+
+<sect1 id='supported'><title>Supported Operating Systems, UPSes and Cables</title>
+
+<para>The <application>apcupsd</application> maintainers develop it
+under Red Hat and SuSe Linux; those ports are, accordingly, the most
+up to date and best tested.  There are enough Debian Linux users that
+that port is also generally pretty fresh.  Slackware Linux is also
+fully supported.</para>
+
+<para><application>apcupsd</application> has also been ported to
+FreeBSD, NetBSD, OpenBSD, HP/UX, Solaris, Alpha Unix and the Cygwin
+Unix emulation under Windows. It is quite likely to work on those
+systems, though the port may occasionally get stale and require minor
+tweaking.</para>
+
+<para>In <xref linkend="OS_Specifics"/> you'll find
+operating-system-specific tips for building and configuring
+<application>apcupsd</application>.</para>
+
+<para>You can generally count on your UPS being supported if it has
+either an Ethernet-connected SNMP interface or a USB interface with
+an APC-supplied cable.</para>
+
+<para id='upstypes'>The "UPSTYPE Keyword" field is the value you will
+put in your <filename>/etc/apcupsd/apcupd.conf</filename> file to tell
+<application>apcupsd</application> what type of UPS you have.  We'll
+describe the possible values here, because they're a good way to
+explain your UPS's single most important interface property &mdash;
+the kind of protocol it uses to talk with its computer.</para>
+
+<variablelist>
+<varlistentry>
+<term>dumb</term>
+<listitem>
+<para>A dumb or voltage-signalling UPS and its computer communicate
+through the signal lines on an RS232C serial connection.  Not much can
+actually be conveyed this way other than an order to shut down.
+Voltage-signalling UPses are obsolete; you are unlikely to encounter
+one other than as legacy hardware.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>apcsmart</term>
+<listitem>
+<para>An apcsmart UPS and its computer also communicate through an
+RS232C serial connection, but they actually use it as a character
+channel (2400bps, 8 data bits, 1 stop bit, no parity) and pass
+commands back and forth in a <link linkend='upsbible'>primitive
+language</link> resembling modem-control codes. The different APC UPSs
+all use closely related firmware, so the language doesn't vary much
+(later versions add more commands).  This class of UPS is in decline,
+rapidly being replaced in APC's product line by USB UPSes.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>usb</term>
+<listitem>
+<para>A USB UPS speaks a universal well defined control language over a USB wire.  
+Most of APC's lineup now uses this method as of late 2003, and it
+seems likely to completely take over in their low- and middle range.
+Other manufacturers (Belkin, Tripp-Lite, etc.) are moving the same
+way, though with a different control protocol for each manufacturer.
+As long as USB hardware can be mass-produced more cheaply than an
+Ethernet card, most UPSes are likely to go this design route.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>net</term>
+<listitem>
+<para>Some higher-end APC models can declare an IP address and speak 
+Ethernet.  These use a different command format than apcsmart,
+token-oriented and looking a bit more like a classical Internet
+protocol.</para>
+</listitem>
+</varlistentry>
+<varlistentry>
+<term>snmp</term>
+<listitem>
+<para>SNMP UPSes communicate via an Ethernet NIC and firmware that
+speaks Simple Network Management Protocol.</para>
+</listitem>
+</varlistentry>
+</variablelist>
+
+<informaltable id='type_table'>
+<tgroup cols="4">
+<colspec colnum="1" colname="col1"/>
+<colspec colnum="2" colname="col2"/>
+<colspec colnum="3" colname="col3"/>
+<colspec colnum="4" colname="col4"/>
+<thead>
+<row>
+  <entry><para><emphasis role="bold">APC Model</emphasis></para></entry>
+  <entry><para><emphasis>UPSTYPE Keyword</emphasis></para></entry>
+  <entry><para><emphasis>Cables Supported</emphasis></para></entry>
+  <entry><para><emphasis>Status</emphasis></para></entry>
+</row>
+</thead>
+<tbody>
+<row>
+  <entry>BackUPS</entry>
+  <entry>dumb</entry>
+  <entry>Simple-Custom<footnote id='custom_cable'><para>This cable is
+  not an APC product.  You have to build it yourself using the
+  instructions in <xref linkend='cables'/>.</para></footnote>, 
+  940-0020B, 940-0020C, 940-0119A, 940-0023A</entry>
+  <entry>Supported</entry>
+</row>
+<row>
+  <entry>BackUPS Office, BackUPS ES</entry>
+  <entry>dumb</entry>
+  <entry>940-0119A</entry>
+  <entry>Supported</entry>
+</row>
+<row>
+  <entry>BackUPS CS and possibly ES models (serial mode)</entry>
+  <entry>dumb</entry>
+  <entry>940-0128A</entry>
+  <entry>Supported</entry>
+</row>
+<row>
+  <entry>ShareUPS Basic Port</entry>
+  <entry>dumb</entry>
+  <entry>940-0020B, 940-0020C, 940-0023A</entry>
+  <entry>Supported</entry>
+</row>
+<row>
+  <entry>BackUPS CS (serial mode)</entry>
+  <entry>apcsmart</entry>
+  <entry>Smart Custom RJ45<footnoteref linkend='custom_cable'/></entry>
+  <entry>Supported</entry>
+</row>
+<row>
+  <entry>BackUPS Pro, Smarter BackUPS Pro</entry>
+  <entry>apcsmart</entry>
+  <entry>940-0095A</entry>
+  <entry>Supported</entry>
+</row>
+<row>
+  <entry>SmartUPS, SmartUPS VS<footnote><para>It has not been confirmed that the
+  cable shipped with the VS is a 940-0095.</para></footnote>, PowerStack 450, Matrix UPS, ShareUPS Advanced Port</entry>
+  <entry>apcsmart</entry>
+  <entry>Smart-Custom<footnoteref linkend='custom_cable'/>, 940-0024C</entry>
+  <entry>Supported</entry>
+</row>
+<row>
+  <entry>BackUPS CS USB, Pro USB, and ES USB models including RS/XS 1000
+and RS/XS 1500.</entry>
+  <entry>usb</entry>
+  <entry>USB (using APC cables 940-0127A/B)</entry>
+  <entry>Supported in version >=3.9.4</entry>
+</row>
+<row>
+  <entry>SmartUPS USB</entry>
+  <entry>usb</entry>
+  <entry>USB (using APC cable)</entry>
+  <entry>Supported, version >=3.9.8</entry>
+</row>
+<row>
+  <entry>All SNMP-capable models</entry>
+  <entry>snmp</entry>
+  <entry>Ethernet</entry>
+  <entry>Supported</entry>
+</row>
+</tbody>
+</tgroup>
+</informaltable>
+
+</sect1>
+<sect1 id='configtype'><title>Choosing a Configuration Type</title>
+
+<para>There are three major ways of running
+<application>apcupsd</application> on your system. The first is a
+standalone configuration where <application>apcupsd</application>
+controls a single UPS, which powers a single computer.  This is the most
+common configuration.  If you're working with just one machine and one UPS,
+skip the rest of this section.</para>
+
+<para>Your choices become more interesting if you are running a
+small cluster or a big server farm.  Under those circumstances, it 
+may not be possible or even desirable to pair a UPS with every single
+machine.  <application>apcupsd</application> supports some alternate
+arrangements.</para>
+
+<para>The second type of configuration is a master/slave
+configuration, where one UPS powers several computers, each of which
+runs a copy of <application>apcupsd</application>. The computer that
+controls the UPS is called the master, and the other computers are
+called slaves. The master copy of <application>apcupsd</application>
+communicates with and controls the slaves via an Ethernet connection.
+This type of configuration may be appropriate for a small cluster
+of machines. Some example configuration files for the master and the
+slave machines can be found in the <application>examples</application> 
+directory of the source distribution. The more recent examples are in
+<application>master.apcupsd.conf</application> and 
+<application>slave.apcupsd.conf</application>. </para>
+
+<para>The third configuration (new with version 3.8.3), is where
+a single computer controls multiple UPSes. In this case, there are
+several copies of <application>apcupsd</application> on the same
+computer, each controlling a different UPS. One copy of
+<application>apcupsd</application> will run in standalone mode, and
+the other copy or copies will normally run in master/slave
+mode.  This type of configuration may be appropriate for large
+server farms that use one dedicated machine for monitoring 
+and diagnostics</para>
+
+<para>Here is a diagram that summarizes the possibilities:</para>
+
+<figure id='configtypes'><title>Configuration types.</title>
+<mediaobject>
+  <imageobject>
+    <imagedata fileref="main_configs.png" depth="727" width="357"/>
+  </imageobject>
+</mediaobject>
+</figure>
+
+<para>If you decide to set up one of these more complex
+configurations, see the <link linkend='advanced'>Advanced Topics</link>
+section for details.</para>
+
+</sect1>
+<sect1 id='check_usb'><title>Checking Out Your USB Subsystem</title>
+
+<para>You can skip this section if your UPS has an Ethernet or RS232-C 
+interface.  If it has a USB interface, you need to make sure that
+your USB subsystem can see the UPS.  On a Linux system this is easy,
+just do this from a shell prompt:</para>
+
+<screen>
+cat /proc/bus/usb/devices
+</screen>
+
+<para>This information is updated by the kernel whenever a device is
+plugged in or unplugged, irrespective of whether
+<application>apcupsd</application> is running or not. To interpret the
+codes in this file, please see <ulink
+url="http://www.linuxhq.com/kernel/v2.4/doc/usb/proc_usb_info.txt.html">
+http://www.linuxhq.com/kernel/v2.4/doc/usb/proc_usb_info.txt.html</ulink></para>
+<para>You should get some output back that includes something like
+this from ESR's site, featuring an RS 1000:</para>
+
+<screen>
+T:  Bus=02 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  3 Spd=1.5 MxCh= 0
+D:  Ver= 1.10 Cls=00(>ifc ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
+P:  Vendor=051d ProdID=0002 Rev= 1.06
+S:  Manufacturer=American Power Conversion
+S:  Product=Back-UPS RS 1000 FW:7.g3 .D USB FW:g3
+S:  SerialNumber=JB0308036505
+C:* #Ifs= 1 Cfg#= 1 Atr=a0 MxPwr= 24mA
+I:  If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=00 Prot=00 Driver=hid
+</screen>
+
+<para>Here are two more ample entries from Kern Sibbald.  The first
+features a  Back-UPS 350 direct connected USB device:</para>
+
+<programlisting>
+T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=1.5 MxCh= 0
+D:  Ver= 1.10 Cls=00(&gt;ifc ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
+P:  Vendor=051d ProdID=0002 Rev= 1.00
+S:  Manufacturer=American Power Conversion
+S:  Product=Back-UPS 350 FW: 5.2.I USB FW: c1 
+S:  SerialNumber=BB0115017954
+C:* #Ifs= 1 Cfg#= 1 Atr=a0 MxPwr= 30mA
+I:  If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=00 Prot=00 Driver=hid
+E:  Ad=81(I) Atr=03(Int.) MxPS=   8 Ivl= 10ms
+</programlisting>
+
+<para>The second features an IOgear USB-to-serial adaptor that runs my
+serial SmartUPS 1000 :</para>
+
+<programlisting>
+T:  Bus=01 Lev=01 Prnt=01 Port=01 Cnt=02 Dev#=  4 Spd=12  MxCh= 0
+D:  Ver= 1.10 Cls=00(&gt;ifc ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
+P:  Vendor=0557 ProdID=2008 Rev= 0.01
+C:* #Ifs= 1 Cfg#= 1 Atr=a0 MxPwr=100mA
+I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=00 Prot=00 Driver=serial
+E:  Ad=81(I) Atr=03(Int.) MxPS=  10 Ivl=  1ms
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=  0ms
+E:  Ad=83(I) Atr=02(Bulk) MxPS=  64 Ivl=  0ms
+</programlisting>
+
+<para>Note that the IOgear device is using the <emphasis
+role="bold">serial</emphasis> driver (the I: line) while the Back-UPS
+350 is using the <emphasis role="bold">hid</emphasis> driver.</para>
+
+<para>In general, f you see your UPS model in the S field, you're
+done.  You can skip the rest of this section and go straight to
+building and installing.</para>
+
+<para>If it doesn't show, check the obvious things; the UPS must be
+powered on, and a cable must be properly seated in both the data port
+of the UPS and one of your machine's USB ports.  Many UPSes have phone
+ports to provide surge protection for phones or modems &mdash; make
+sure you haven't plugged your USB cable into one of those rather than
+the data port (which will usually be near the top edge of the
+case.)</para>
+
+<para>Also, ensure that the correct drivers are loaded. Under Linux,
+you can check this out easily by examining the right file in the
+<filename>/proc</filename> system.  Here's how you can do that:</para>
+
+<screen>
+esr@grelber$ cat /proc/bus/usb/drivers
+         usbdevfs
+         hub
+ 96-111: hiddev
+         hid
+</screen>
+
+<para>A USB UPS needs all of these drivers &mdash; the USB device filesystem,
+the USB hub, the Human Interface Device subsysten driver, and the
+Human Interface Device driver.</para>
+
+<para>For the IOGear serial USB connection, you need:</para>
+
+<programlisting>
+usbcore
+usbserial
+pl2303
+</programlisting>
+
+<para>Finally, check that appropriate USB devices exist.  On a Red Hat
+system you can do this:</para>
+
+<screen>
+esr@grelber$ ls /dev/usb/h*
+/dev/usb/hiddev0   /dev/usb/hiddev12  /dev/usb/hiddev2  /dev/usb/hiddev6
+/dev/usb/hiddev1   /dev/usb/hiddev13  /dev/usb/hiddev3  /dev/usb/hiddev7
+/dev/usb/hiddev10  /dev/usb/hiddev14  /dev/usb/hiddev4  /dev/usb/hiddev8
+/dev/usb/hiddev11  /dev/usb/hiddev15  /dev/usb/hiddev5  /dev/usb/hiddev9
+</screen> 
+
+<para>This will tell you that the Human Interface Device nodes, one of
+which <application>apcupsd</application> will use to talk with the
+UPS, exist.  On other Linuxes the layout will be slightly different;
+the hiddev devices will usually live in a
+<filename>/dev/usb/hid/</filename> subdirectory. If these devices
+don't exist, you may need to run
+<filename>&lt;apcupsd-src&gt;/examples/make-hiddev</filename> to
+create them.</para>
+
+<para>Now build and run the <application>hid-ups</application> test
+program. You do not have to configure and build the rest of
+<application>apcupsd</application> to do this.  To build
+<application>hid-ups</application> enter:</para>
+
+<programlisting>
+cd &lt;apcupsd-src&gt;/examples
+make hid-ups
+</programlisting>
+
+<para>There should be no errors. Now assuming that everything has gone
+well to this point and that you have connected your USB UPS, enter:</para>
+
+<programlisting>
+./hid-ups
+</programlisting>
+
+<para>It should print a sample report of the information that it has
+obtained from your UPS. CAUTION! if you have a 2.4.x Linux kernel
+do  not run two copies of this program
+at the same time, or your kernel will freeze. The report that is
+printed should look very similar to the report in
+<filename>&lt;src&gt;/hid-ups.rpt</filename>. If the program reports
+that the device was not found ensure that all the appropriate modules
+are loaded (as described earlier), then unplug your UPS and plug it
+back in. This should permit the kernel to recognize the UPS.</para>
+
+<para>If <application>./hid-ups</application> tells you &quot;No
+permission, try this as root&quot;, you know what to try. If it says
+&quot;Couldn't find USB UPS device, check your /dev.&quot;, then it is
+very unlikely that <application>apcupsd</application> will work.  You
+probably need to run the script &quot;make-hiddev&quot; before
+continuing.</para>
+
+<para>If all there things check out and you still can't see the UPS,
+something is more seriously wrong than this manual can cover &mdash;
+find expert help.  If you are unable to list USB devices or drivers,
+you kernel may not be USB-capable and that needs to be fixed. </para>
+
+</sect1>
+</chapter>
+
+
+
+
+<chapter id='build_install'><title>Building and Installing apcupsd</title>
+
+<sect1><title>Installation from Binary Packages</title>
+
+<sect2><title>Red Hat Linux</title>
+
+<para>For Red Hat systems, <application>apcupsd</application> is
+available in binary RPM format.  This is the simplest way to install.
+If you have no previous version of <application>apcupsd</application>
+on your machine and are creating a standalone configuration, simply
+install the RPM with a normal <command>rpm -ihv</command> command.
+You're done, and can now skip the rest of this chapter and go straight
+to <link linkend='after_installation'>tweaking your run-time
+configuration file.</link></para>
+
+<para>If you have a previous installation, you can upgrade with a normal
+<command>rpm -Uhv</command>, but this may not upgrade the halt script.
+It may be better to do the upgrade as a remove (<command>rpm -e</command>)
+foll;owed by a fresh install (<command>rpm -ihv</command>).</para>
+
+<para>After installation of the binary RPM, please verify carefully
+that <filename>/etc/rc.d/init.d/halt</filename> was properly updated
+and contains new script lines flagged with <emphasis
+role="bold">***APCUPSD***</emphasis>.</para>
+
+<para>Since there is no standard location for
+<filename>cgi-bin</filename>, the rpm will place the binary CGI
+programs in the directory <filename>/etc/apcupsd/cgi</filename>. To
+actually use them, you must copy or move them to your actual cgi-bin
+directory, which on many systems is located in
+<filename>/home/httpd/cgi-bin</filename>.</para>
+
+</sect2>
+<sect2><title>Microsoft Windows</title>
+
+<para>If you have a binary release of the <application>Win32
+apcupsd</application>, please see the instructions in the <link
+linkend='advanced'>Advanced Topics</link> section of this
+manual.</para>
+
+</sect2>
+</sect1>
+<sect1><title>Installation from Source</title>
+
+<para>Installation from source might have to be be done different ways
+depending on what system you are running. The basic procedure involves
+getting a source distribution, running the configuration, rebuilding,
+and installing.</para>
+
+<para>The basic installation from a tar source file is rather simple:</para>
+
+<orderedlist>
+<listitem>
+  <para>Unpack the source code from its tar archive.</para>
+</listitem>
+<listitem>
+  <para>Go into the directory containing the source code.</para>
+</listitem>
+<listitem>
+  <para>Run <command>./configure</command> (with appropriate options 
+  as described below)</para>
+</listitem>
+<listitem>
+  <para>make</para>
+</listitem>
+<listitem>
+  <para>su (i.e. become root)</para>
+</listitem>
+<listitem>
+  <para>Stop any running instance of <application>apcupsd</application>.  The
+  command to do this will look like 
+  <command>&lt;system-dependent-path&gt;/apcupsd stop</command></para>
+</listitem>
+<listitem>
+  <para>uninstall any old <application>apcupsd</application>
+  This is important since the default install locations may have
+  changed.</para>
+</listitem>
+<listitem>
+  <para>make install</para>
+</listitem>
+<listitem>
+  <para>edit your <filename>/etc/apcupsd/apcupsd.conf</filename> file if
+  necessary</para>
+</listitem>
+<listitem>
+  <para>ensure that your halt script is properly updated</para>
+</listitem>
+<listitem>
+  <para>Start the new <application>apcupsd</application> with:
+  <command>&lt;system-dependent-path&gt;/apcupsd start</command></para>
+</listitem>
+</orderedlist>
+
+<para>If all goes well, the <command>./configure</command> will
+correctly determine which operating system you are running and
+configure the source code appropriately. <command>configure</command>
+currently recognizes the systems listed below in the <xref
+linkend="OS_Specifics"/> section of this chapter and adapts the
+configuration appropriately.  Check that the configuration report
+printed at the end of the <command>configure</command> process
+corresponds to your choice of directories, options, and that it has
+correctly detected your operating system.  If not, redo the
+<command>configure</command> with the appropriate options until your
+configuration is correct.</para>
+
+<para>Please note that a number of the <command>configure</command>
+options preset <filename>apcupsd.conf</filename> directive values in
+an attempt to automatically adapt <application>apcupsd</application>
+as best possible to your system.  You can change the values in
+<filename>apcupsd.conf</filename> at a later time without redoing the
+configuration process by simply editing the
+<filename>apcupsd.conf</filename> file.</para>
+
+<para>Other configuration options can be used to set up the installation
+of HTML documentation and optional modules, notably the CGI interface
+that enables the UPS state to be queried via the Web and the 
+optional <application>powerflute</application> curses-based control
+panel.  Still others enable features such as thread support.  You 
+will find a complete reference later in this chapter.</para>
+
+<para>In general, you will probably want to supply a more elaborate
+<command>configure</command> statement to ensure that the modules you
+want are built and that everything is placed into the correct
+directories.</para>
+
+<para>On Red Hat, a fairly typical configuration command would
+look like the following:</para>
+
+<programlisting>
+CFLAGS=&quot;-g -O2&quot; LDFLAGS=&quot;-g&quot; ./configure \
+  &#x2D;&#x2D;enable-usb \
+  &#x2D;&#x2D;with-serial-dev=/dev/usb/hiddev[0-15] \
+  &#x2D;&#x2D;with-upstype=usb \
+  &#x2D;&#x2D;with-upscable=usb \
+  &#x2D;&#x2D;prefix=/usr \
+  &#x2D;&#x2D;sbindir=/sbin \
+  &#x2D;&#x2D;with-cgi-bin=/var/www/cgi-bin \
+  &#x2D;&#x2D;enable-cgi \
+  &#x2D;&#x2D;with-css-dir=/var/www/docs/css \
+  &#x2D;&#x2D;with-log-dir=/etc/apcupsd \
+  &#x2D;&#x2D;enable-pthreads \
+  &#x2D;&#x2D;enable-powerflute
+</programlisting>
+
+<para>On other Linux systems, the <option>--with-serial-dev</option>
+may need to be <filename>/dev/usb/hid/hiddev[0-15]</filename>.
+The <emphasis role="bold">[0-15]</emphasis> is not a typo, but should
+be entered exactly as shown. This is because the UPS can change device
+numbers while it is running. Every time there is a blip or slowdown on
+the USB line, the kernel will invalidate the UPS connection, then a
+few moments later, it will reconnect but with a different device
+number. Not very Unix-like, but that is what happens. This bizarre
+syntax allows <application>apcupsd</application> to try a range of
+devices until it finds or re-finds the UPS device.</para>
+
+<para>By default, <command>make install</command> will install the
+executable files in <filename>/sbin</filename>, the manuals in
+<filename>/usr/man</filename>, and the configuration and script files
+in <filename>/etc/apcupsd</filename>. In addition, if your system is
+recognized, certain files such as the startup script and the system
+halt script will be placed in appropriate system directories (usually
+subdirectories of <filename>/etc/rc.d</filename>).</para>
+
+</sect1>
+<sect1><title>Verifying a Source Installation</title>
+  
+<para>There are a number of things that you can do to check if the
+installation (make install) went well. The fist is to check where the
+system has installed <application>apcupsd</application> using
+<command>which</command> and <command>whereis</command>. On my Red Hat
+system, you should get the following (lines preceded with a $ indicate what
+you type):</para>
+
+<screen>
+$ which apcupsd 
+/sbin/apcupsd
+$ whereis apcupsd
+apcupsd: /sbin/apcupsd /etc/apcupsd /etc/apcupsd.conf
+/etc/apcupsd.status /usr/man/man8/apcupsd.8.gz
+/usr/man/man8/apcupsd.8
+</screen>
+
+<para>If you find an <application>apcupsd</application> in
+<filename>/usr/sbin</filename>, <filename>/usr/local/sbin</filename>,
+<filename>/usr/lib</filename>, or another such directory, it is
+probably a piece of an old version of
+<application>apcupsd</application> that you can delete. If you are in
+doubt, delete it, then rerun the <command>make install</command> to
+ensure that you haven't deleted anything needed by the new
+<application>apcupsd</application>.  Please note that the files
+specified above assume the default installation locations.</para>
+
+<para>As a final check that the <command>make install</command> went
+well, you should check your halt script (in
+<filename>/etc/rc.d</filename> on SuSE systems, and in
+<filename>/etc/rc.d/init.d</filename> on Red Hat systems) to see that
+the appropriate lines have been inserted in the correct
+place. Modification of the halt script is important so that at the end
+of the shutdown procedure, <application>apcupsd</application> will be
+called again to command the UPS to turn off the power. This should
+only be done in a power failure situation as indicated by the presence
+of the <filename>/etc/powerfail</filename> file, and is necessary if
+you want your machine to automatically be restarted when the power
+returns. On a Red Hat system, the lines containing the <command>#
+***apcupsd***</command> should be inserted just before the final halt
+command:</para>
+
+<programlisting>
+# Remount read only anything that's left mounted.
+#echo &quot;Remounting remaining filesystems (if any) readonly&quot;
+mount | awk '/ext2/ { print $3 }' | while read line; do
+    mount -n -o ro,remount $line
+done
+
+# See if this is a powerfail situation.                               # ***apcupsd***
+if [ -f /etc/apcupsd/powerfail ]; then                                # ***apcupsd***
+   echo                                                               # ***apcupsd***
+   echo &quot;APCUPSD will now power off the UPS&quot;                          # ***apcupsd***
+   echo                                                               # ***apcupsd***
+   /etc/apcupsd/apccontrol killpower                                  # ***apcupsd***
+   echo                                                               # ***apcupsd***
+   echo &quot;Please ensure that the UPS has powered off before rebooting&quot; # ***apcupsd***
+   echo &quot;Otherwise, the UPS may cut the power during the reboot!!!&quot;   # ***apcupsd***
+   echo                                                               # ***apcupsd***
+fi                                                                    # ***apcupsd***
+
+# Now halt or reboot.
+echo &quot;$message&quot;
+if [ -f /fastboot ]; then
+ echo &quot;On the next boot fsck will be skipped.&quot;
+elif [ -f /forcefsck ]; then
+ echo &quot;On the next boot fsck will be forced.&quot;
+fi
+</programlisting>
+
+<para>The purpose of modifying the system halt files is so that
+<application>apcupsd</application> will be recalled after the system
+is in a stable state. At that point,
+<application>apcupsd</application> will instruct the UPS to shut off
+the power. This is necessary if you wish your system to automatically
+reboot when the mains power is restored. If you prefer to manually
+reboot your system, you can skip this final system dependent
+installation step by specifying the
+<option>&#x2D;&#x2D;disable-install-distdir</option> option on the
+<command>./configure</command> command (see below for more
+details).</para>
+
+<para>The above pertains to Red Hat systems only. There are significant
+differences in the procedures on each system, as well as the location
+of the halt script. Also, the information that is inserted in your
+halt script varies from system to system. Other systems such as
+Solaris require you the make the changes manually, which has the
+advantage that you won't have any unpleasant surprises in your halt
+script should things go wrong. Please consult the specific system
+dependent README files for more details.</para>
+
+<para>Please note that if you install from RPMs for a slave machine,
+you will need to remove the changes that the RPM install script made
+(similar to what is noted above) to the halt script. This is because
+on a slave machine there is no connection to the UPS, so there is no
+need to attempt to power off the UPS. That will be done by the
+master.</para>
+
+</sect1>
+<sect1><title>Configure Options</title>
+
+  <para>All the available <command>configure</command> options can be
+printed by entering:</para>
+
+<programlisting>
+./configure &#x2D;&#x2D;help
+</programlisting>
+
+<para>When specifying options for <command>./configure</command>, if
+in doubt, don't put anything, since normally the configuration process
+will determine the proper settings for your system. The advantage of
+these options is that it permits you to customize your version of
+<application>apcupsd</application>.  If you save the
+<command>./configure</command> command that you use to create
+<application>apcupsd</application>, you can quickly reset the same
+customization in the next version of
+<application>apcupsd</application> by simply re-using the same
+<command>./configure</command> command.</para>
+
+<para>The following command line options are available for
+<command>configure</command> to customize your installation.</para>
+
+<variablelist>
+  <varlistentry>
+    <term>&#x2D;&#x2D;prefix=&lt;path&gt;</term>
+    <listitem>
+      <para>This defines the directory for the non-executable files such as
+      the manuals. The default is <emphasis role="bold">/usr</emphasis>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;sbindir=&lt;path&gt;</term>
+    <listitem>
+      <para>This defines the directory for the executable files such as
+      <application>apcupsd</application>. The default is
+      <filename>/sbin</filename>. You may be tempted to
+      place the executable files in <filename>/usr/sbin</filename> or 
+      <filename>/usr/local/sbin</filename>. Please
+      use caution here as these directories may be unmounted during a
+      shutdown and thus may prevent the <command>halt</command> script from
+      calling <application>apcupsd</application> to turn off the UPS power.
+      Though your data will be protected, in this case, your system will
+      probably not be automatically rebooted when the power returns.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;enable-powerflute</term>
+    <listitem>
+      <para>This option enables the building of the 
+      <application>powerflute</application> executable, which is a ncurses
+      based program to monitor the UPS. This program is not necessary for 
+      the proper execution of <application>apcupsd</application>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;enable-cgi</term>
+    <listitem>
+      <para>This enables the building of the CGI programs that permit Web
+      browser access to <application>apcupsd</application> data. This option
+      is not necessary for the proper execution of 
+      <application>apcupsd</application>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;with-cgi-bin=&lt;path&gt;</term>
+    <listitem>
+      <para>The with-cgi-bin configuration option allows you to define the
+      directory where the CGI programs will be installed. The default
+      is <filename>/etc/apcupsd</filename>, which is probably not 
+      what you want.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;with-css-dir=&lt;path&gt;</term>
+    <listitem>
+      <para>This option allows you to specify where you want 
+      <application>apcupsd</application> to put the Cascading Style Sheet
+      that goes with the <application>multimoncss.cgi</application> 
+      CGI program.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;enable-master-slave</term>
+    <listitem>
+      <para>Turns on the master/slave networking code (default). This is
+      sometimes referred to as the old master/slave code</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;enable-apcsmart</term>
+    <listitem>
+      <para>Turns on generation of the APC Smart driver (default).</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;enable-dumb</term>
+    <listitem>
+      <para>Turns on generation of the dumb signalling driver code
+      (default).</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;enable-usb</term>
+    <listitem>
+      <para>Turns on generation of the Linux (only) USB driver code. By
+      default this is disabled.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;enable-net</term>
+    <listitem>
+      <para>Turns on generation of the NIS network driver for slaves. This
+      is an alternative to master/slave code. For the master, this code
+      should be disabled. For each slave, this is the only driver needed.
+      This driver works by reading the information from the the
+      configured master using the NIS (Network Information Services)
+      interface.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;enable-snmp</term>
+    <listitem>
+      <para>Turns on generation of the SNMP driver. This driver will
+      control the computer by reading the UPS information over the
+      network assuming you are running SNMP. By default this is
+      disabled.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;enable-test</term>
+    <listitem>
+      <para>This turns on a test driver that is used only for debugging.
+      By default it is disabled.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;enable-nis</term>
+    <listitem>
+      <para>Turns on the Network Information Server (NIS) code within
+      <application>apcupsd</application>. This is enabled by default. If you 
+      do not want to access the status of the UPS from the network and you
+      are not controlling any slaves via NIS (enable-net), this can be
+      disabled.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;enable-pthreads</term>
+    <listitem>
+      <para>This option enables pthreads support causing 
+      <application>apcupsd</application> to
+      be built as a threaded program rather than forking to create
+      separate processes. <application>apcupsd</application> built
+      in this fashion is more efficient that the standard version being
+      one third the data size and less overhead locking and coping shared
+      memory. This option is <emphasis>highly</emphasis> recommended for
+      Windows builds.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;with-libwrap=&lt;path&gt;</term>
+    <listitem>
+      <para>This option when enabled causes <application>apcupsd</application>
+      to be built with the TCP WRAPPER library for enhanced security.
+      In most cases, the &lt;path&gt; is optional since 
+      <application>configure</application>
+      will determine where the libraries are on most systems.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;with-nologin=&lt;path&gt;</term>
+    <listitem>
+      <para>This option allows you to specify where 
+      <application>apcupsd</application> will
+      create the nologin file when logins are prohibited. The default is
+      <filename>/etc</filename></para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;with-pid-dir=&lt;path&gt;</term>
+    <listitem>
+      <para>This option allows you to specify where 
+       <application>apcupsd</application> will
+       create the process id (PID) file to prevent multiple copies from
+       running. The default is system dependent but usually
+       <filename>/var/run</filename>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;with-log-dir=&lt;path&gt;</term>
+    <listitem>
+      <para>This option allows you to specify where 
+      <application>apcupsd</application> will
+      create the EVENTS and STATUS log files. The default is
+      <filename>/etc/apcupsd</filename>. This option simply sets the default
+      of the appropriate path in the <filename>apcupsd.conf</filename> file,
+      which can be changed at any later time.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;with-lock-dir=&lt;path&gt;</term>
+    <listitem>
+      <para>This option allows you to specify where 
+      <application>apcupsd</application> will create the serial port lock file.
+      The default is systemdependent but usually 
+      <filename>/var/lock</filename>. This option simply sets the
+      appropriate path in the <filename>apcupsd.conf</filename> file,
+      which can be changed at any later time.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;with-pwrfail-dir=&lt;path&gt;</term>
+    <listitem>
+      <para>This option allows you to specify where 
+      <application>apcupsd</application> will create the 
+      <filename>powerfail</filename> file when a power failure occurs. The
+      default is system dependent but usually <filename>/etc</filename>.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;with-serial-dev=&lt;device-name&gt;</term>
+    <listitem>
+      <para>This option allows you to specify where 
+      <application>apcupsd</application> will look for the serial device 
+      that talks to the UPS. The default is system dependent, but
+      often <filename>/dev/ttyS0</filename>. This option simply sets 
+      the appropriate device name in the <filename>apcupsd.conf</filename>
+      file, which can be changed at any later time.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;with-nis-port=&lt;port&gt;</term>
+    <listitem>
+      <para>This option allows you to specify what port 
+      <application>apcupsd</application> will use for the Network Information
+      Server (the CGI programs). The default is system dependent but usually
+      3551 because that port has been officially assigned to 
+      <application>apcupsd</application> by the IANA. This option
+      simply sets the appropriate port in the 
+      <filename>apcupsd.conf</filename> file, which can be changed at
+      any later time.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;with-nisip=&lt;IP-Address&gt;</term>
+    <listitem>
+      <para>This option allows you to specify the value that will be placed
+      on then NISIP directive in the configuration file. The default is
+      0.0.0.0. No checking is done on the value entered, so you must
+      ensure that it is a valid IP address.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;with-net-port=&lt;port&gt;</term>
+    <listitem>
+      <para>This option allows you to specify what port
+      <application>apcupsd</application> will use for Master and Slave
+      communications. The default is system dependent but usually 6666.
+      This option simply sets the appropriate port in the 
+      <filename>apcupsd.conf</filename> file, which can be changed at any
+      later time.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;with-upstype=&lt;type&gt;</term>
+    <listitem>
+      <para>This option allows you to specify the type of UPS that will be
+      connected to your computer. The default is: smartups. This
+      option simply sets the appropriate UPS type in the
+      <filename>apcupsd.conf</filename> file, which can be changed at any later
+      time.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;with-upscable=&lt;path&gt;</term>
+    <listitem>
+      <para>This option allows you to specify what cable you are using to
+      connect to the UPS. The default is: smart. This option
+      simply sets the appropriate UPS cable in the 
+      <filename>apcupsd.conf</filename>
+      file, which can be changed at any later time.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>&#x2D;&#x2D;disable-install-distdir</term>
+    <listitem>
+      <para>This option modifies the <application>apcupsd</application> 
+      Makefiles disable installation of the distribution (platform) directory.
+      Generally, this used to do a full installation of 
+      <application>apcupsd</application> except the
+      final modification of the operating system files (normally
+      <filename>/etc/rc.d/halt</filename>, etc.). This is useful if your
+      operating system is not directly supported by 
+      <application>apcupsd</application> or if you want to run two
+      copies of <application>apcupsd</application> on the same system.
+      This option can also be used by those of you who prefer to manually
+      reboot your system after a power failure or who do not want to modify
+      your system halt files.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+
+</sect1>
+<sect1><title>Recommended Options for most Systems</title>
+
+<para>For most systems, we recommend the following options:</para>
+
+<programlisting>
+./configure &#x2D;&#x2D;prefix=/usr &#x2D;&#x2D;sbindir=/sbin
+</programlisting>
+
+<para>and you can optionally build and install the CGI programs as
+follows:</para>
+
+<programlisting>
+./configure &#x2D;&#x2D;prefix=/usr &#x2D;&#x2D;sbindir=/sbin \
+                  &#x2D;&#x2D;enable-cgi &#x2D;&#x2D;with-cgi-bin=/home/httpd/cgi-bin
+</programlisting>
+
+</sect1>
+<sect1><title>Compilers and Options</title>
+
+<para>Some systems require unusual options for compilation or linking
+that the <command>./configure</command> script does not know about. You can
+specify initial values for variables by setting them in the
+environment. Using a Bourne-compatible shell, you can do that on
+the command line like this:</para>
+
+<programlisting>
+CFLAGS=&quot;-O2 -Wall&quot; LDFLAGS= ./configure
+</programlisting>
+
+<para>Or on systems that have the <command>env</command> program, 
+you can do it like this:</para>
+
+<programlisting>
+env CPPFLAGS=-I/usr/local/include LDFLAGS=-s ./configure
+</programlisting>
+
+<para>Or for example on the Sun Solaris system, you can use:</para>
+
+<programlisting>
+setenv CFLAGS -O2
+setenv LDFLAGS -O
+./configure
+</programlisting>
+
+</sect1>
+<sect1 id='OS_Specifics'><title>Operating System Specifics</title>
+
+<para>With the exception of Linux SuSe and Linux Red Hat systems used
+by the developers, we rely on users to help create installation
+scripts and instructions as well as to test that
+<application>apcupsd</application> runs correctly on their system. As
+you can imagine, most of these people are system administrators rather
+than developers so they are very busy and don't always have time to
+test the latest releases.  With that in mind, we believe that you will
+find that a lot of very valuable work has been already done to make
+your installation much easier (and probably totally automatic).</para>
+
+<para>Below, you will find a list of operating systems for which we
+have received installation files:</para>
+
+<itemizedlist>
+<listitem><para><link linkend="Alpha">Alpha</link></para></listitem>
+<listitem><para><link linkend="Debian">Debian</link></para></listitem>
+<listitem><para><link linkend="FreeBSD">FreeBSD</link></para></listitem>
+<listitem><para><link linkend="HPUX">HPUX</link></para></listitem>
+<listitem><para><link linkend="NetBSD">NetBSD</link></para></listitem>
+<listitem><para><link linkend="OpenBSD">OpenBSD</link></para></listitem>
+<listitem><para><link linkend="RedHat">Red Hat</link></para></listitem>
+<listitem><para><link linkend="Slackware">Slackware</link></para></listitem>
+<listitem><para><link linkend="SuSE">SuSE</link></para></listitem>
+<listitem><para><link linkend="Solaris">Solaris</link></para></listitem>
+<listitem><para><link linkend="unknown">unknown</link></para></listitem>
+<listitem><para><link linkend="Win32">Win32</link></para></listitem>
+</itemizedlist>
+
+<sect2 id="Alpha"><title>Alpha</title>
+
+<para>The Alpha V4.0 version of <application>apcupsd</application>
+builds without compiler errors with gcc version 2.95.2. It is unlikely
+that the native Alpha compiler will work because of varargs
+differences. Unless you are a system guru, we recommend that you
+connect your UPS to the second serial port
+<filename>/dev/tty01</filename> to avoid conflicts with the console
+device.</para>
+
+<programlisting>
+DEVICE /dev/tty01
+</programlisting>
+
+<para>In addition, you should ensure serial port lock file in
+<filename>apcupsd.conf</filename> is defined as:</para>
+
+<programlisting>
+LOCKFILE /var/spool/locks
+</programlisting>
+
+<para>Unlike the Linux systems, the system halt routine is located in
+<filename>/sbin/rc0</filename>, so after the <command>make
+install</command>, please check that this file has been correctly
+updated.</para>
+
+<para>The start/stop script can be found in:</para>
+
+<programlisting>
+/sbin/init.d/apcupsd
+</programlisting>
+
+</sect2>
+<sect2 id="Debian"><title>Debian</title>
+
+<para>This port is complete and is operation by several users. Since
+Debian build and install procedures are somewhat particular, we have
+put the extra Debian information into the following two
+subdirectories:
+<filename>&lt;src&gt;/distributions/debian/examples/</filename> and
+<filename>&lt;src&gt;/distributions/debian/packageinfo</filename></para>
+
+<para>You can also find the official Debian packages on the Debian
+site at:</para>
+
+<itemizedlist>
+    <listitem><para><ulink url="http://packages.debian.org/stable/admin/apcupsd.html">http://packages.debian.org/stable/admin/apcupsd.html</ulink></para></listitem>
+    <listitem><para><ulink url="http://packages.debian.org/testing/admin/apcupsd.html">http://packages.debian.org/testing/admin/apcupsd.html</ulink></para></listitem>
+    <listitem><para><ulink url="http://packages.debian.org/unstable/admin/apcupsd.html">http://packages.debian.org/unstable/admin/apcupsd.html</ulink></para></listitem>
+</itemizedlist>
+
+</sect2>
+<sect2 id="FreeBSD"><title>FreeBSD</title>
+
+<para>This port is complete and is being used by several users. As of
+version 3.8.3, we do not recommend that you compile
+<application>apcupsd</application> with pthreads enabled. This is
+because the current FreeBSD implementation of pthreads runs as a
+single process, and thus is less efficient (consumes more CPU time)
+than the forking version of <application>apcupsd</application>. We
+hope to rectify this in a future version by using the FreeBSD
+LinuxThreads implementation of pthreads.</para>
+
+<para>On the FreeBSD OS, there is no known way for a user program to
+get control when all the disks are synced. This is needed for
+<application>apcupsd</application> to be able to issue the killpower
+command to the UPS so that the UPS shuts off the power. To accomplish
+the same thing on FreeBSD systems, make sure you have a SmartUPS and
+that your UPS shutdown grace period is set sufficiently long so that
+you system will power down (usually 2 minutes), the use the
+<option>&#x2D;&#x2D;kill-on-powerfail</option> option on the
+<application>apcupsd</application> command line.</para>
+
+</sect2>
+<sect2 id="HPUX"><title>HPUX</title>
+
+<para>We have no reports from testing this yet on version 3.8.4, but
+worked fine on 3.8.1</para>
+
+</sect2>
+<sect2 id="NetBSD"><title>NetBSD</title>
+
+<para>Submitted during development of 3.8.2, this should be a complete
+distribution.  Please read the comments on the pthreads implementation
+in the FreeBSD section above as they may apply equally to OpenBSD.</para>
+
+</sect2>
+<sect2 id="OpenBSD"><title>OpenBSD</title>
+
+<para>Ensure that you read the
+<filename>distributions/openbsd/README</filename> file before running
+apcupsd. There are some critical differences in how the OpenBSD
+implementation operates when the UPS batteries are exhausted. Failure
+to take this into account may result in the system not being fully
+halted when power is lost.  Please read the comments on the pthreads
+implementation in the FreeBSD section above as they may apply equally
+to OpenBSD.</para>
+
+</sect2>
+<sect2 id="RedHat"><title>Red Hat Systems</title>
+
+<para>Red Hat systems are fully supported, and by following the
+standard installation instructions given above, you should experience
+few or no problems.</para>
+
+</sect2>
+<sect2 id="Slackware"><title>Slackware</title>
+
+<para>Slackware systems are fully supported, and by following the
+standard installation instructions given above, you should experience
+few or no problems.</para>
+
+</sect2>
+<sect2 id="SuSE"><title>SuSE</title>
+
+<para>SuSE systems are fully supported, and by following the
+standard installation instructions given above, you should experience
+few or no problems.</para>
+
+</sect2>
+<sect2 id="Solaris"><title>Sun Solaris</title>
+
+<para>Please read this before attempting to compile or install the
+beta software. It contains important information that will make your
+efforts easier.</para>
+
+<para>If you find bugs, or run into problems that seem to be related
+to the version of Solaris that you run, please feel free to contact
+the maintainers by email, or through the development mailing
+list. We'll attempt to help with problems getting the beta running,
+although we can't promise a quick response.</para>
+
+<para>As always, remember testing UPSes can be hazardous to you
+system, and, <application>apcupsd</application> <emphasis>may contain
+bugs that can damage your system and data files!</emphasis> You must
+accept all responsibility for running this software. An unexpected
+power-off of a running system can be a disaster. As always, make
+backups of any critical information before you install this
+software.</para>
+
+<para>Remember, we told you. we'll listen sympathetically if you lose
+data, but there will be nothing we can do to help you.</para>
+
+<para>Please read the general installation instructions given above
+before continuing on with these Solaris-specific instructions. Then
+come back and read this section before attempting to build the
+package.</para>
+
+<para>For building the system, we suggest that you run the configure
+and make processes as your normal UNIX user ID. The <command>make
+install</command> must be run as root. But if your normal ID has an
+environment setup for using the C compiler, it's simpler to do that
+than to set up root to have the correct environment.</para>
+
+<para>Normally, we support the GCC compiler, but we have also
+attempted to support the Solaris workshop compilers and EGCS
+compilers. Please be aware that if you do not use GCC, you may
+experience a few problems.</para>
+
+<para>Whichever compiler you do have, please insure that you can
+execute the compiler from the command line before running
+configure. If you do not have an environment setup to run the
+compiler first, configure will fail.</para>
+
+<para>Before running <command>./configure</command>, please be sure
+that you do not have <filename>/usr/ucb</filename> on your path. This
+may cause the <command>./configure</command> to choose the wrong
+shutdown program. If <command>./configure</command> detects that
+/usr/usb is on your path, it will print a warning message. Please
+follow the advice to avoid shutdown problems.</para>
+
+<para>Your normal UNIX user ID must own the source tree directories, and
+you must have the normal development tools in your path. This
+includes make, the compiler, the M4 preprocessor, the linker, and
+ar or ranlib. If the user you are logged in as can compile and link
+a C program from a source file, then you have all the required
+tools available.</para>
+
+<para>You will want to install the executables in a directory that
+remains mounted during the shutdown. Solaris will unmount almost
+everything except the root directories. Since the ability to power the
+UPS off requires access to the executable programs, they need to be in
+a directory that will never be unmounted. And since they should also
+be in a directory that normal users cannot get into,
+<filename>/sbin</filename> is the default. However, please be aware
+that if you want to follow Sun's filesystem conventions you would use
+the following:</para>
+
+<programlisting>
+./configure \
+   &#x2D;&#x2D;prefix=/opt/apcupsd \
+   &#x2D;&#x2D;sbindir=/etc/opt/apcupsd/sbin \
+   &#x2D;&#x2D;sysconfdir=/etc/opt/apcupsd \
+   &#x2D;&#x2D;with-cgi-bin=/opt/apcupsd/cgi-bin
+</programlisting>
+
+<para>The way to setup the <filename>/sbin</filename> directory as the
+executables directory is to pass configure the <emphasis
+role="bold">&#x2D;&#x2D;sbindir=/sbin</emphasis> option. No other arguments
+should be required, and your setup and platform should be detected
+automatically by configure.</para>
+
+<para>Once you have run configure, you will need to do a
+<command>make</command>.  Once the make has completed with no errors,
+you must su to root to complete the install. After the su, you may not
+have a path to the make program anymore. In that case, you should do
+the <command>make install</command> step as:</para>
+
+<programlisting>
+/usr/ccs/bin/make install
+</programlisting>
+
+<para>Once the install completes, you must edit the /sbin/rc0 script as
+detailed below, then exit from the su'ed shell.</para>
+
+<para>In order to support unattended operation and shutdown during a
+power failure, it's important that the UPS remove power after the
+shutdown completes. This allows the unattended UPS to reboot the
+system when power returns by re-powering the system. Of course, you
+need autoboot enabled for your system to do this, but all Solaris
+systems have this by default. If you have disabled this on your
+system, please re-enable it.</para>
+
+<para>To get the UPS to remove power from the system at the correct
+time during shutdown, i.e., after the disks have done their final
+sync, we need to modify a system script. This script is
+<filename>/sbin/rc0</filename>.</para>
+
+<para>We do not have access to every version of Solaris, but we
+believe this file will be almost identical on every version. Please
+let us know if this is not true.</para>
+
+<para>At the very end of the <filename>/sbin/rc0</filename> script,
+you should find lines just like the following:</para>
+
+<programlisting>
+# unmount file systems. /usr, /var and /var/adm are not unmounted by umountall
+# because they are mounted by rcS (for single user mode) rather than
+# mountall.
+# If this is changed, mountall, umountall and rcS should also change.
+/sbin/umountall
+/sbin/umount /var/adm &gt;/dev/null 2&gt;&amp;1
+/sbin/umount /var &gt;/dev/null 2&gt;&amp;1
+/sbin/umount /usr &gt;/dev/null 2&gt;&amp;1
+
+echo 'The system is down.'
+</programlisting>
+
+<para>We need to insert the following lines just before the last 'echo':</para>
+
+<programlisting>
+#see if this is a powerfail situation
+if [ -f /etc/apcupsd/powerfail ]; then
+        echo 
+        echo &quot;APCUPSD will power off the UPS&quot;
+        echo
+        /etc/apcupsd/apccontrol killpower
+        echo
+        echo &quot;Please ensure that the UPS has powered off before rebooting&quot;
+        echo &quot;Otherwise, the UPS may cut the power during the reboot!!!&quot;
+        echo
+fi
+</programlisting>
+
+<para>We have included these lines in a file called
+<filename>rc0.solaris</filename> in the distributions/sun subdirectory
+of the source tree. You can cut and paste them into the /sbin/rc0 file
+at the correct place, or yank and put them using vi or any other
+editor. Note that you must be root to edit this file.</para>
+
+<para>You must be absolutely sure you have them in the right place. If
+your <filename>/sbin/rc0</filename> file does not look like the lines
+shown above, do not modify the file. Instead, email a copy of the file
+to the maintainers, and we will attempt to figure out what you should
+do. If you mess up this file, the system will not shut down cleanly,
+and you could lose data. Don't take the chance.</para>
+
+<para>This feature has only been tested with APC SmartUPS models. If
+you do not have a SmartUPS, you will be one of the first testers to
+try this feature. Please send email to let us know if it works with
+your UPS model, what model you have, and if possible, the event logs
+located in <filename>/etc/apcupsd</filename>. We'd be very interested
+in your results, and would be glad to work with you to get this
+feature working correctly with all the APC models. A detailed
+description of the screen output during the shutdown would be very
+helpful if you see problems.</para>
+
+<para>You will then need to make the normal changes to the
+<filename>/etc/apcupsd/apcupsd.conf</filename> file. This file
+contains the configuration settings for the package. It is important
+that you set the values to match your UPS model and cable type, and
+the serial port that you have attached the UPS to.  People have used both
+<filename>/dev/ttya</filename> and <filename>/dev/ttyb</filename> with
+no problems. You should be sure that logins are disabled on the port
+you are going to use, otherwise you will not be able to communicate
+with the UPS. If you are not sure that logins are disabled for the
+port, run the 'admintool' program as root, and disable the port. The
+'admintool' program is a GUI administration program, and required that
+you are running CDE, OpenWindows, or another XWindows program such as
+KDE.</para>
+
+<para>Solaris probes the serial ports during boot, and during this
+process, it toggles some handshaking lines used by dumb UPSes. As a
+result, particularly for simple signalling &quot;dumb&quot; UPSes it seems to
+kick it into a mode that makes the UPS think it's either in a
+calibration run, or some self-test mode. Since at this point we are
+really not communicating with the UPS, it's pretty hard to tell
+what happened. But it's easy to prevent this, and you should.
+Disconnect the UPS, and boot the system. When you get to a login
+prompt, log in as root. Type the following command:</para>
+
+<programlisting>
+eeprom com1-noprobe=true
+</programlisting>
+
+<para>or</para>
+
+<programlisting>
+eeprom com2-noprobe=true
+</programlisting>
+
+<para>depending on which com port your UPS is attached to. Then sync and
+shutdown the system normally, reattach the UPS, and reboot. This
+should solve the problem. However, we have some reports that recent
+versions of Solaris (7 &amp; 8) appear to have removed this eeprom
+option and there seems to be no way to suppress the serial port
+probing during boot.</para>
+
+<para>At this point, you should have a complete installation. The
+daemon will load automatically at the next boot. Watch for any error
+messages during boot, and check the event logs in
+<filename>/etc/apcupsd</filename>. If everything looks OK, you can try
+testing the package by removing power from the UPS. NOTE! if you have
+a voltage-signalling UPS, please run the first power tests with your
+computer plugged into the wall rather than into the UPS. This is
+because dumb serial-port UPSes have a tendency to power off if your
+configuration or cable are not correct.</para>
+
+<para>As a user, your input is very helpful in solving problems with
+the package, and providing suggestions and future directions for the
+development of the package. We are striving to provide a useful
+package that works across all platforms, and welcome your
+feedback.</para>
+
+<para>Best regards, and thanks for your interest and help, The Apcupsd
+Development Team.</para>
+
+</sect2>
+<sect2 id="unknown"><title>Unknown System</title>
+
+<para>During the <command>./configure</command>, if
+<application>apcupsd</application> does not find one of the systems
+for which it has specific installation programs, it will set the
+Operating System to <emphasis role="bold">unknown</emphasis> and will
+use the incomplete installation scripts that are in <filename>
+&lt;src&gt;/distributions/unknown/</filename>. You will be
+on your own, or you can ask the developers list (apcupsd-users at
+lists.sourceforge.net) for installation instructions. This directory also
+contains a hint file for <emphasis>Linux From
+Scratch</emphasis>, which could be helpful for other systems as
+well.</para>
+
+</sect2>
+<sect2 id="Win32"><title>Windows Systems with CYGWIN Installed</title>
+
+<para>If you wish to build from the source, and if you have CYGWIN
+version 1.5.5 and GCC 2.95.3-5 installed, it is possible to build the
+Win32 version of <application>apcupsd</application>. Please don't try
+any other versions of CYGWIN as there were known problems.</para>
+
+<para>To date, the Win32 version has only been build on a Win98 SR2
+and a WinXP system with the above CYGWIN environment and all the
+available CYGWIN tools loaded. In addition, the builds were done
+running under the <emphasis role="bold">bash</emphasis> shell. As time
+permits, we will experiment with other environments, and if any of you
+do build it from source, please let us know. The current CYGWIN
+environment was loaded using the CYGWIN setup.exe program, downloading
+ALL the latest binaries and installing them.</para>
+
+<para>We recommend that you run the <command>./configure</command>
+command with the following options:</para>
+
+<programlisting>
+./configure \
+  &#x2D;&#x2D;prefix=/apcupsd \
+  &#x2D;&#x2D;sbindir=/apcupsd/bin \
+  &#x2D;&#x2D;sysconfdir=/apcupsd/etc/apcupsd \
+  &#x2D;&#x2D;with-pid-dir=/apcupsd/etc/apcupsd \
+  &#x2D;&#x2D;mandir=/apcupsd \
+  &#x2D;&#x2D;with-cgi-bin=/apcupsd/etc/apcupsd/cgi \
+  &#x2D;&#x2D;enable-pthreads
+</programlisting>
+
+  <para>After which, you can do a:</para>
+
+<programlisting>
+make
+</programlisting>
+
+  <para>And to install <application>apcupsd</application>, do:</para>
+
+<programlisting>
+make install
+</programlisting>
+
+<para>Finally, you should follow the <link
+linkend='win32'>Win32</link> installation instruction, skipping the
+part that describes unZipping the binary release.</para>
+
+</sect2>
+</sect1>
+
+</chapter>

@@ -1,0 +1,629 @@
+<chapter id='testing'><title>Testing <application>apcupsd</application></title>
+
+<para>The following testing procedures apply for the most part to
+apcsmart UPSes, whether USB or serial. If you have a dumb
+voltage-signalling UPS, your testing procedures will be somewhat
+different, and you should see the section on <link
+linkend='dumb_testing'>Testing Serial UPSes</link>.</para>
+
+<sect1><title>Process-Status Test</title>
+
+<para>After you start <application>apcupsd</application>, execute the
+following command:</para>
+
+<programlisting>
+ps fax
+</programlisting>
+
+<para>or the equivalent for your system. If you are running on Linux
+and using the fork()ing version of apcupsd, you should something
+similar to the following output.</para>
+
+<programlisting>
+4492 ?        S      0:00 apcmain       -f /etc/apcupsd/apcupsd.conf
+4496 ?        S      0:00  \_ apcser        -f /etc/apcupsd/apcupsd.conf
+4497 ?        S      0:00  \_ apcnis        -f /etc/apcupsd/apcupsd.conf
+</programlisting>
+
+<para>This indicates that <application>apcupsd</application> is up and
+running and has started the two (default) child processes.</para>
+
+<variablelist>
+  <varlistentry>
+    <term>apcmain</term>
+    <listitem>
+      <para>is the main program that waits until it receives a termination
+      signal (SIGTERM) or one of the child processes dies.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>apcser</term>
+    <listitem>
+      <para>is the process that manages the serial port and takes any
+      actions (generates events) that are necessary as a result of a
+      change of state of the UPS.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>apcnis</term>
+    <listitem>
+      <para>is the Network information server process that provides EVENTS
+      and STATUS information over the network. This information is used
+      by the CGI programs.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+
+<para>If you are running on a non-Linux system, or using pthreads on a
+Linux system (recommended), your output will probably not show the
+names of the processes and will appear more like the following:</para>
+
+<programlisting>
+632 ?        S      0:00 /sbin/apcupsd -f /etc/apcupsd/apcupsd.conf
+841 ?        S      0:00  \_ /sbin/apcupsd -f /etc/apcupsd/apcupsd.conf
+842 ?        S      0:00      \_ /sbin/apcupsd -f /etc/apcupsd/apcupsd.conf
+</programlisting>
+
+<para>If you see only one instance of
+<application>apcupsd</application> running, don't worry about it
+unless the communication test fails.</para>
+
+</sect1>
+<sect1><title>Logging Test</title>
+
+<para>Once you have established that the proper processes are running,
+do a tail of the system log file, normally
+<filename>/etc/var/messages</filename>:</para>
+
+<programlisting>
+tail /etc/var/messages
+</programlisting>
+
+<para>You should see output that looks similar to the following:</para>
+
+<programlisting>
+Dec 5 17:01:05 matou apcupsd[5917]: apcupsd 3.7.2
+startup succeeded
+</programlisting>
+
+<para>And if you have configured the network information server, you
+should also see:</para>
+
+<programlisting>
+Dec 5 17:01:05 polymatou apcupsd[5975]: apcserver
+startup succeeded
+</programlisting>
+
+<para>These messages should also appear in the temporary file
+(<filename>/etc/apcupsd/apcupsd.events</filename>) if you are using
+the default configuration file.</para>
+
+</sect1>
+<sect1><title>apcaccess Test</title>
+
+<para>This test consists of running <command>apcaccess</command> to
+see if <application>apcupsd</application> is properly updating its
+internal variables. Please note that if you are running a pthreaded
+version of <application>apcupsd</application>, which you should be since
+the non-pthreaded version is no longer supported, (installed from rpm or
+<option>--enable-pthreads</option> on the
+<command>./configure</command> line), you must enable the
+<application>apcupsd</application> Network Information Server in your
+configuration file for <emphasis role="bold">apcaccess</emphasis> to
+work. This is done by setting:
+<programlisting>
+NETSERVER on
+NISPORT 3551
+</programlisting>
+in your <emphasis role="bold">apcupsd.conf</emphasis> file.
+</para>
+
+<para>To run the apcaccess test, use the following command:</para>
+
+<programlisting>
+apcaccess status
+</programlisting>
+
+<para>Depending on the type of UPS you have, you will get slightly
+different output, but an example For a Smart-UPS is as follows:</para>
+
+<programlisting>
+APC      : 001,048,1088
+DATE     : Fri Dec 03 16:49:24 EST 1999
+HOSTNAME : daughter
+RELEASE  : 3.7.2
+CABLE    : APC Cable 940-0024C
+MODEL    : APC Smart-UPS 600
+UPSMODE  : Stand Alone
+UPSNAME  : SU600   
+LINEV    : 122.1 Volts
+MAXLINEV : 123.3 Volts
+MINLINEV : 122.1 Volts
+LINEFREQ : 60.0 Hz
+OUTPUTV  : 122.1 Volts
+LOADPCT  :  32.7 Percent Load Capacity
+BATTV    : 26.6 Volts
+BCHARGE  : 095.0 Percent
+MBATTCHG : 15 Percent
+TIMELEFT :  19.0 Minutes
+MINTIMEL : 3 Minutes
+SENSE    : Medium
+DWAKE    : 000 Seconds
+DSHUTD   : 020 Seconds
+LOTRANS  : 106.0 Volts
+HITRANS  : 129.0 Volts
+RETPCT   : 010.0 Percent
+STATFLAG : 0x08 Status Flag
+STATUS   : ONLINE 
+ITEMP    : 34.6 C Internal
+ALARMDEL : Low Battery
+LASTXFER : Unacceptable Utility Voltage Change
+SELFTEST : NO
+STESTI   : 336
+DLOWBATT : 05 Minutes
+DIPSW    : 0x00 Dip Switch
+REG1     : N/A
+REG2     : N/A
+REG3     : 0x00 Register 3
+MANDATE  : 03/30/95
+SERIALNO : 13035861
+BATTDATE : 05/05/98
+NOMOUTV  : 115.0
+NOMBATTV :  24.0
+HUMIDITY : N/A
+AMBTEMP  : N/A
+EXTBATTS : N/A
+BADBATTS : N/A
+FIRMWARE : N/A
+APCMODEL : 6TD
+END APC  : Fri Dec 03 16:49:25 EST 1999
+</programlisting>
+
+<para>For a simple signaling or dumb UPS such as BackUPS, your output
+will be very minimal as follows:</para>
+
+<programlisting>
+APC      : 001,012,0319
+DATE     : Mon Feb 18 09:11:50 CST 2002
+RELEASE  : 3.8.5
+UPSNAME  : UPS_IDEN
+CABLE    : APC Cable 940-0128A
+MODEL    : BackUPS
+UPSMODE  : Stand Alone
+STARTTIME: Mon Feb 18 09:11:45 CST 2002
+LINEFAIL : OK
+BATTSTAT : OK
+STATFLAG : 0x008 Status Flag
+END APC  : Mon Feb 18 09:15:01 CST 2002
+</programlisting>
+
+<para>If you see the above output, it is a good sign that
+<application>apcupsd</application> is working. Assuming that the output looks
+reasonable, check the following variables:</para>
+
+<variablelist>
+  <varlistentry>
+    <term>LINEV</term>
+    <listitem>
+      <para>This is the line voltage and it should be a value that is
+      appropriate for your equipment. In the USA, it is typically about
+      120 Volts while in Europe, it is about 220 Volts.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>BATTV</term>
+    <listitem>
+      <para>Unless you have additional battery packs, this should be near
+      24 Volts plus or minus 5 Volts.</para>
+    </listitem>
+  </varlistentry>
+  <varlistentry>
+    <term>STATUS</term>
+    <listitem>
+      <para>This is the status of the UPS and it should normally be
+      <emphasis role="bold">ONLINE</emphasis>.</para>
+    </listitem>
+  </varlistentry>
+</variablelist>
+
+<para>If you see a message to the effect of:</para>
+
+<programlisting>
+attach_shmarea: shared memory version mismatch (or UPS not yet ready to report)
+</programlisting>
+
+<para>or if all the displayed values are zero, you have not waited
+long enough. Wait a bit longer and then re-execute the
+<command>apcaccess status</command> command.</para>
+
+<para>If you see a message to the effect of:</para>
+
+<programlisting>
+APCACCESS FATAL ERROR in apcaccess.c at line 336
+tcp_open: cannot connect to server localhost on port 3551.
+</programlisting>
+
+<para>It means that you have probably not enabled the
+Network Information Server in your
+configuration file for <emphasis role="bold">apcaccess</emphasis> to
+work. This is done by setting:
+<programlisting>
+NETSERVER on
+NISPORT 3551
+</programlisting>
+in your <emphasis role="bold">apcupsd.conf</emphasis> file.
+
+</para>
+
+</sect1>
+<sect1><title>Communications Test</title>
+
+<para>At this point, you should ensure that
+<application>apcupsd</application> is handling the connection to the
+UPS correctly. This test assumes you have a UPS that speaks apcsmart
+protocol, over either USB or a serial port.  If you have an old-style
+voltage-signaling UPS, please skip to the next section (Simulated
+Power Fail Test).</para>
+
+<para>When <application>apcupsd</application> detects a problem, it
+generates an EVENT, which consists of sending a message to the system
+log then invoking the <emphasis role="bold">apccontrol</emphasis>
+script (normally in <filename>/etc/acpupsd/apccontrol</filename>) to
+handle the event.</para>
+
+<para>In order to create an event, remove the serial port plug from
+the back of your computer or from the back of the UPS. Within 6
+seconds, <application>apcupsd</application> should detect the lack of
+serial port communications and broadcast a <command>wall</command>
+message indicating that the serial port communications was
+lost:</para>
+
+<para>Warning communications lost with UPS lost.</para>
+
+<para>At the same time, it sends the same message to the system log
+and to the temporary EVENTS file
+(<filename>/etc/apcupsd/apcupsd.events</filename>).</para>
+
+<para>Plug the serial port plug back into your computer, and within
+about 12 seconds, <application>apcupsd</application> should
+reestablish communications and broadcast and log the following
+message:</para>
+
+<para>Communications with UPS restored.</para>
+
+<para>If these messages are logged but not broadcast, either you have
+your <application>mesg</application> permission set to
+<emphasis>no</emphasis> (see <emphasis role="bold">man
+wall</emphasis>) or there is a problem with
+<application>apccontrol</application>. If you are running a window
+manager such as GNOME and don't have a console window open, you may
+not receive the <command>wall</command> messages. However, you should
+find them in your system log file (normally
+<filename>/var/log/messages</filename> and in the temporary EVENTS
+file, <filename>/etc/apcupsd/apcupsd.events</filename>. For example,
+to observe these events in the temporary EVENTS file, you might do
+a</para>
+
+<programlisting>
+tail -f /etc/apcupsd/apcupsd.events
+</programlisting>
+
+<para>before running the test.</para>
+
+<para>If you do not observe these messages, you should correct this
+problem before proceeding with additional tests.</para>
+
+</sect1>
+<sect1><title id="PowerFailSimulation">Simulated Power Fail Test</title>
+
+<para>At this point, you should verify that in the event of a power
+fail <application>apcupsd</application> properly calls
+<application>apccontrol</application>. This test is appropriate for
+all models of UPSes (smart or dumb).</para>
+
+<para>To avoid the possibility that <application>apcupsd</application>
+might shut down your system, locate where
+<application>apccontrol</application> resides on your system
+(normally, <filename>/etc/apcupsd/apccontrol</filename>. Move this
+script to another location e.g. <filename>apccontrol.save</filename>
+and replace it with the script found in
+<filename>examples/safe.apccontrol</filename>. When that is done,
+ensure that your UPS battery is fully charged and that you have at
+least 5 minutes of remaining runtime on the batteries. This can be
+done by examining the values of the <emphasis
+role="bold">BATTCHG</emphasis> and <emphasis
+role="bold">TIMELEFT</emphasis> variables in the printout of
+<command>apcaccess status</command>.</para>
+
+<para>Athough this should not be necessary, as an extra precaution,
+you can shutdown your machine, remove the plug from the UPS you are
+testing, and plug your machine into another UPS or directly into the
+wall. Doing so, will ensure that the UPS doesn't cut the power to your
+machine at a bad time. Remember at the end of the testing to plug your
+machine back into the UPS.</para>
+
+<para>You can also minimize the risk from an unexpected shutdown by
+using a journaling filesystem such as Linux's EXT3.  All modern disk
+drives park themselves safely when they power down, rather than ploughing
+up oxide on your disk's recording surface.  Thus, unexpected power less 
+has to hit very narrow timing windows in order to trash an EXT3 
+transaction.</para>
+
+<para>To begin the test, pull the power plug from the UPS. The first
+time that you do this, psychologically it won't be easy, but after you
+have pulled the plug a few times, you may even come to enjoy it. If
+all goes well, <application>apcupsd</application> should detect the
+power failure and print several warning messages. The first should
+appear after 5 to 6 seconds and read:</para>
+
+<programlisting>
+Warning power loss detected.
+</programlisting>
+
+<para>Then generally 6 seconds later,
+<application>apcupsd</application> is sure that it isn't a transient
+effect, so it sends:</para>
+
+<programlisting>
+Power failure. Running on UPS batteries.
+</programlisting>
+
+<para>After a few more seconds (total around 15 seconds), plug the
+power cord back in and ensure that <application>apcupsd</application>
+is aware that the power has returned. It should print:</para>
+
+<programlisting>
+Power has returned...
+</programlisting>
+
+<para>If you do not observe the above messages, please correct the
+situation before proceeding. The most likely cause of problems
+are:</para>
+
+<itemizedlist>
+  <listitem>
+    <para><application>apcupsd</application> doesn't recognize the
+    power failure because the configuration directives are not
+    correct. E.g. wrong cable.</para>
+  </listitem>
+  <listitem>
+    <para>The file <filename>/etc/apcupsd/apccontrol</filename> doesn't 
+    exist or is not marked as executable.</para>
+  </listitem>
+</itemizedlist>
+
+<para>At this point, we recommend that you do a simulated power down
+of your system. If you are adventuresome or have been through this
+before, skip to the next section in this manual and do the real power
+fail shutdown. If you continue with the simulated power down and if
+all goes well, <application>apcupsd</application> will go through all
+the motions without actually shutting down the system. Continue using
+the safe <application>apccontrol</application> that you
+installed. Edit the configuration file <filename>apcupsd</filename>
+and change the value of <emphasis role="bold">TIMEOUT</emphasis> from
+0 to something like 30. Doing so will cause
+<application>apcupsd</application> to attempt to shutdown the system
+30 seconds after it detects a power failure. Once this change has been
+made, you must stop and restart <application>apcupsd</application> for
+the new configuration value to take effect.</para>
+
+<para>Once again, pull the power plug, and if all goes as expected,
+<application>apcupsd</application> should attempt to shutdown the
+system about 30 seconds after it detects the power failure. All the
+messages should be displayed by <command>wall</command> or by the
+<command>tail -f</command> command. The precise message is determined
+by what is printed in <filename>/etc/apcupsd/apccontrol</filename> for
+the <emphasis role="bold">doshutdown</emphasis> event.  Though it
+varies from system to system, it will generally be something
+like:</para>
+
+<programlisting>
+Beginning Shutdown Sequence
+</programlisting>
+
+<para>When <application>apcupsd</application> this message prints,
+reconnect the power.  <application>apcupsd</application> should detect
+that the power has been restored and attempt to cancel the
+shutdown.</para>
+
+<para><emphasis role="bold">IMPORTANT</emphasis> after this test,
+please replace the changed <application>apccontrol</application> and
+<filename>apcupsd.conf</filename> with the original files.</para>
+
+</sect1>
+<sect1><title>System Shutdown Test</title>
+
+<para>This is an intermediate test that you can do, for all UPS models
+before doing the Full Power Down Test. First modify the
+<filename>/etc/apcupsd/apccontrol</filename> file so that in the
+<emphasis role="bold">killpower)</emphasis> case, the line that
+re-executes <application>apcupsd</application> with the
+<option>--killpower</option> option is commented out. The original
+line probably looks something like:</para>
+
+<programlisting>
+&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;${APCUPSD} --killpower
+</programlisting>
+
+<para>when it is commented out, it looks like:</para>
+
+<programlisting>
+#&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;${APCUPSD}--killpower
+</programlisting>
+
+<para>Now when you pull the power plug, and either the timer expires
+or the batteries are exhausted (see the next section for more
+details), the system should be fully shutdown.</para>
+
+<para>After performing this test, please be sure to restore
+<filename>/etc/apcupsd/apccontrol</filename> to its previous
+state.</para>
+
+</sect1>
+<sect1><title>Full Power Down Test</title>
+
+<para>To complete the testing, you should do a power fail shutdown of
+your system. This test is applicable to all UPS models. Please do a
+backup of your system or take other precautions before attempting this
+to avoid the possibility of lost data due to a problem (I have been
+through this at least 10 times and never once had problems, but we all
+know that someday something will go wrong).</para>
+
+<para>Before proceeding, please ensure that your halt script or the
+equivalent has been properly updated by the install process to contain
+the logic to call <command>apcupsd --killpower</command> when it
+detects a power failure situation (the presence of a
+<filename>/etc/powerfail</filename> file). See the <xref
+linkend="build_install"/> of this manual, or the README files for
+additional details about the halt modifications necessary.</para>
+
+<para>When you are ready to do the test, either simply pull the plug
+and wait for the batteries to become exhausted, or set the <emphasis
+role="bold">TIMEOUT</emphasis> configuration directive to something
+like 60 so that the system will shutdown before the batteries are
+exhausted. We recommend doing the full shutdown without using
+<emphasis role="bold">TIMEOUT</emphasis> to correctly simulate a real
+power failure, but the choice is yours (I did it once here, but now
+use TIMEOUT 30).</para>
+
+<para>If all goes well, your system should be shutdown before the
+batteries are completely exhausted and the UPS should be powered off
+by <application>apcupsd</application>. Please be aware that if you do
+the full power down, you must ensure that your UPS is totally powered
+off.  Otherwise, it may have been given the command to power off, but
+due to a long grace period it is still waiting. If you were to reboot
+your computer during the grace period, the UPS could then suddenly
+turn off the power (this happened to me). To avoid this problem,
+always wait for your UPS to power itself off, or power if off manually
+before restarting your computer. On my system, the UPS is configured
+as at the factory to have a 180 second grace period before shutting
+off the power. During this type of testing, 180 seconds <emphasis
+role="bold">seems</emphasis> like an eternity, so please take care to
+either wait or manually power off your UPS. To determine what grace
+period is programmed into your UPS EEPROM, run <command>apcaccess
+eprom</command> and look at the &quot;Shutdown grace
+delay&quot;.</para>
+
+</sect1>
+<sect1><title id="ShutdownSequence">Shutdown Sequence</title>
+
+<para>If you experienced so problems with the above testing
+procedures, or if you are porting <application>apcupsd</application>
+to another system, or you are simply curious, you may want to know
+exactly what is going on during the shutdown process. If so, please
+see the <link linkend='shutdown'>Shutdown Sequence</link> section of
+this manual.</para>
+
+</sect1>
+<sect1 id='usb_apctest'><title>apctest</title>
+
+<para><application>apctest</application> is a program that allows you
+to talk directly to your UPS and run certain low-level tests, 
+display all know values from the UPS's EEPROM, perform a 
+battery runtime calibration, program the EEPROM (serial
+connection only), and enter in TTY mode with the UPS. Here we
+describe how to use it for a USB or apcsmart UPS; see <xref
+linkend='serial_apctest'/> for a description of how to use it
+with a voltage-signalling UPS.</para>
+
+<para>Shutdown <application>apcupsd</application> if it is running.
+Make sure your <emphasis
+role="bold">/etc/apcupsd/apcupsd.conf</emphasis> file has <emphasis
+role="bold">UPSTYPE smart</emphasis> and <emphasis
+role="bold">UPSCABLE</emphasis> has one of the smart cables that are
+supported.</para>
+
+<para>Normally <application>apctest</application> will have been built
+but not installed, so you must execute it from the
+<filename>&lt;bacula-source&gt;/src</filename> directory. You can
+explicitly build it on Unix with:</para>
+
+<programlisting>
+cd &lt;apcupsd-source-directory&gt;
+make apctest
+./apctest
+</programlisting>
+
+<para>or on Windows systems with: </para>
+
+<programlisting>
+make apctestwin32
+./apctest
+</programlisting>
+
+<para>It will read your installed apcupsd.conf configuration
+(so it knows where to find the UPS) and then
+it will present you with the following output:</para>
+
+
+<programlisting>
+2003-07-07 11:19:21 apctest 3.10.6 (07 July 2003) redhat
+Checking configuration ...
+Attached to driver: apcsmart
+sharenet.type = DISABLE
+cable.type = CUSTOM_SMART
+
+You are using a SMART cable type, so I'm entering SMART test mode
+mode.type = SMART
+Setting up serial port ...
+Creating serial port lock file ...
+Hello, this is the apcupsd Cable Test program.
+This part of apctest is for testing Smart UPSes.
+Please select the function you want to perform.
+
+1) Query the UPS for all known values
+2) Perform a Battery Runtime Calibration
+3) Abort Battery Calibration
+4) Monitor Battery Calibration progress
+5) Program EEPROM
+6) Enter TTY mode communicating with UPS
+7) Quit
+
+Select function number: 1
+
+</programlisting>
+
+<para>Item 1 will probe the UPS for all values known to
+<application>apcupsd</application> and present them in rather raw
+format. This output can be useful for providing technical support if
+you are having problems with your UPS.</para>
+
+<para>Item 2 will perform a Battery Runtime Calibration. This test
+will only be performed if your battery is 100% charged. Running the
+test will cause the batteries to be discharged to approximately 30% of
+capacity. The exact number depends on the UPS model. In any case,
+<application>apctest</application> will abort the test if it detects
+that the battery charge is 20% or less.</para>
+
+<para>The advantage of doing this test is that the UPS will be able to
+recalibrate the remaining runtime counter that it maintains in its
+firmware. As your batteries age, they tend to hold less of a
+charge, so the runtime calibration may not be accurate after
+several years.</para>
+
+<para>We recommend that perform a Battery Calibration about once a
+year. You should not perform this calibration too often since
+discharging the batteries tends to shorten their lifespan.</para>
+
+<para>Item 3 can be used to abort a Battery Calibration in progress,
+if you some how became disconnected.</para>
+
+<para>Item 4 can be used to restart the monitoring of a Battery
+Calibration if you should some how become disconnected during the
+test.</para>
+
+<para>Item 5 is used to program the EEPROM. Please see the <xref linkend="eprom"/> chapter of this manual for
+the details.</para>
+
+<para>Item 6 will initiate a direct communication between your
+terminal and the UPS at which point, you can enter raw UPS
+commands. Please be aware that you should be careful what commands you
+enter because you can cause your UPS to suddenly shutdown, or you can
+modify the EEPROM in a way to disable your UPS. The details of the raw
+Smart mode UPS commands can be found in the <link
+linkend="upsbible">UPS Bible</link> chapter of this manual.</para>
+
+<para>Item 7 will terminate <application>apctest</application>.</para>
+</sect1>
+
+</chapter>
