@@ -3034,7 +3034,7 @@ fi
 if test x$GCC = xyes
 then
   CFLAGS=${CFLAGS-"-g -O2"}
-  CFLAGS="${CFLAGS} -Wall -Wstrict-prototypes"
+  CFLAGS="${CFLAGS} -Wall"
   LDFLAGS=${LDFLAGS-"-g -O"}
 else
   CFLAGS=${CFLAGS--O2}

@@ -238,7 +238,7 @@ static int open_usb_device(UPSINFO *ups)
     if (my_data->orig_device[0] == 0) {
        strcpy(my_data->orig_device, ups->device);
     }
-    strcpy(name, my_data->orig_device);
+    astrncpy(name, my_data->orig_device, sizeof(name));
     p = strchr(name, '[');
     if (p) {			      /* range specified */
        q = strchr(p+1, '-');
@@ -273,7 +273,7 @@ static int open_usb_device(UPSINFO *ups)
     ups->fd = 1;
     for (i=0; i<10; i++) {
        for ( ; start <= end; start++) {
-	   sprintf(devname, name, start);
+	   asnprintf(devname, sizeof(devname), name, start);
     
 	   /* Open the device port */
 	   if ((my_data->fd = open(devname, O_RDWR | O_NOCTTY)) < 0) {

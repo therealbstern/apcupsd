@@ -3,5 +3,6 @@
 
 General:
 09Mar04
+- Fix a few string functions using the new routines.
 - Added asys.c imported from Bacula, which contains a number of 
   simple system routines such as astrncpy(), ...

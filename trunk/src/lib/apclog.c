@@ -139,7 +139,7 @@ d_msg(char *file, int line, int level, char *fmt,...)
     if (level <= debug_level) {
 #ifdef FULL_LOCATION
        if (details) {
-          sprintf(buf, "%s: %s:%d ", my_name, file, line);
+          asnprintf(buf, sizeof(buf), "%s: %s:%d ", my_name, file, line);
 	  i = strlen(buf);
        } else {
 	  i = 0;
@@ -151,7 +151,7 @@ d_msg(char *file, int line, int level, char *fmt,...)
        avsnprintf(buf+i, sizeof(buf)-i, (char *)fmt, arg_ptr);
        va_end(arg_ptr);
 
-       fprintf(stdout, buf);
+       fprintf(stdout, "%s", buf);
        fflush(stdout);
     }
 #endif
