@@ -18,8 +18,8 @@ apclibobjs = @LIBEXTRAOBJ@ \
 	     apcconfig.o apcerror.o \
 	     apcevents.o apcexec.o \
 	     apcfile.o apcipc.o apclibnis.o \
-	     apclist.o apclock.o apclog.o \
-	     apcsignal.o apcstatus.o apcwinipc.o
+	     apclist.o apclock.o apclog.o apcsignal.o \
+	     apcstatus.o asys.o apcwinipc.o
 
 all-targets: $(apclib)
 

@@ -100,36 +100,6 @@ void generic_error_exit(char *fmt, ...)
     exit(1);
 }
 
-/*
- * Implement vsnprintf()
- */
-int avsnprintf(char *str, size_t size, const char *format, va_list ap)
-{
-#ifdef HAVE_VSNPRINTF
-   int len;
-   len = vsnprintf(str, size, format, ap);
-   str[size-1] = 0;
-   return len;
-
-#else
-
-   int len;
-   char *buf;
-   buf = malloc(5000);
-   len = vsprintf(buf, format, ap);
-   if (len >= 5000) {
-      syslog(LOG_ERR, _("Buffer overflow. Possible exploit attempt."));
-      abort();
-   }
-   memcpy(str, buf, size);
-   str[size-1] = 0;
-   free(buf);
-   return len;
-#endif
-}
-
-
-
 void (*error_out)(char *file, int line, char *fmt,...) = generic_error_out;
 void (*error_exit)(char *fmt,...) = generic_error_exit;
 void (*error_cleanup)(void) = NULL;
