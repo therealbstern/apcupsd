@@ -19,12 +19,14 @@ install:
 	$(INSTALL_PROGRAM) -m 744 apcupsd /etc/rc.d/apcupsd
 	sh ./halt-setup.sh install
 	sh ./rc.config.sh install
+	sh ../install-symlinks.sh install $(DISTNAME) $(DISTVER)
 
 uninstall:
 	@echo "Removing boot script..."
 	@rm -f /etc/rc.d/apcupsd
 	sh ./halt-setup.sh uninstall
 	sh ./rc.config.sh uninstall
+	sh ../install-symlinks.sh uninstall $(DISTNAME) $(DISTVER)
 
 clean:
 

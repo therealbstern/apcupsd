@@ -21,8 +21,7 @@ all-targets: Makefile
 #
 install-distdir:
 	(cd $(DISTNAME); \
-	$(MAKE) "DISTNAME=$(DISTNAME)" "DISTVER=$(DISTVER)" install);
-	./install-symlinks.sh install "$(DISTNAME)" "$(DISTVER)"
+	    $(MAKE) "DISTNAME=$(DISTNAME)" "DISTVER=$(DISTVER)" install);
 
 install: @INSTALL_DISTDIR@
 	@echo "Installing apccontrol script..."
@@ -39,9 +38,8 @@ install: @INSTALL_DISTDIR@
 # uninstall symlinks before removing the boot script etc etc
 #
 uninstall-distdir:
-	./install-symlinks.sh uninstall $(DISTNAME) $(DISTVER)
 	(cd $(DISTNAME); \
-	$(MAKE) "DISTNAME=$(DISTNAME)" "DISTVER=$(DISTVER)" uninstall);
+	    $(MAKE) "DISTNAME=$(DISTNAME)" "DISTVER=$(DISTVER)" uninstall);
 
 uninstall: @UNINSTALL_DISTDIR@
 	rm -f $(DESTDIR)$(sysconfdir)/apccontrol

@@ -16,7 +16,7 @@
 all: all-subdirs all-targets
 
 all-subdirs:
-	@if test ! -z "$(subdirs)"; then \
+	@if test ! x"$(subdirs)" = x; then \
 		for file in . ${subdirs}; \
 		do \
 			(cd $$file && if test "$$file" != "."; then $(MAKE) all; fi); \
@@ -143,7 +143,7 @@ $(topdir)/config.status:
 	fi
 
 clean-subdirs:
-	@if test ! -z "$(subdirs)"; then \
+	@if test ! x"$(subdirs)" = x; then \
 		for file in . ${subdirs}; \
 		do \
 			(cd $$file && if test "$$file" != "."; then $(MAKE) clean; fi); \
@@ -151,7 +151,7 @@ clean-subdirs:
 	fi
 
 distclean-subdirs:
-	@if test ! -z "$(subdirs)"; then \
+	@if test ! x"$(subdirs)" = x; then \
 		for file in . ${subdirs}; \
 		do \
 			(cd $$file && if test "$$file" != "."; then $(MAKE) distclean; fi); \
@@ -179,7 +179,7 @@ depend:
 	else \
 		$(MAKE) real-depend; \
 	fi
-	@if test ! -z "$(subdirs)"; then \
+	@if test ! x"$(subdirs)" = x; then \
 		for file in . ${subdirs}; \
 		do \
 			(cd $$file && if test "$$file" != "."; then $(MAKE) depend; fi); \
@@ -211,7 +211,7 @@ real-depend:
 	fi
 
 install-subdirs:
-	@if test ! -z "$(subdirs)"; then \
+	@if test ! x"$(subdirs)" = x; then \
 		for file in . ${subdirs}; \
 		do \
 			(cd $$file && if test "$$file" != "."; then $(MAKE) install; fi); \
@@ -219,7 +219,7 @@ install-subdirs:
 	fi
 
 uninstall-subdirs:
-	@if test ! -z "$(subdirs)"; then \
+	@if test ! x"$(subdirs)" = x; then \
 		for file in . ${subdirs}; \
 		do \
 			(cd $$file && if test "$$file" != "."; then $(MAKE) uninstall; fi); \
