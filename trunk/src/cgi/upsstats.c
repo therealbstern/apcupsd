@@ -179,18 +179,20 @@ int main(int argc, char **argv)
     html_begin(answer, refresh);
     
     if (!checkhost(monhost)) {
-        puts ("<head></head><body>");
-        printf ("<p><strong>Access to %s host is not authorized.</strong></p>\n", monhost);
+	fputs ("<p><strong>Access to host ", stdout);
+	html_puts(monhost);
+	puts (" is not authorized.</strong></p>");
 	html_finish();
 	exit (EXIT_FAILURE);
     }
     
     /* check if host is available */
     if (getupsvar(monhost, "date", answer, sizeof(answer)) <= 0) {
-           puts ("<head></head><body>");
-           printf ("<p><strong>Unable to communicate with the UPS on %s</strong></p>\n", monhost);
-	   html_finish();
-	   exit (EXIT_FAILURE);
+	fputs ("<p><strong>Unable to communicate with the UPS on ", stdout);
+	html_puts(monhost);
+	puts (".</strong></p>");
+        html_finish();
+        exit (EXIT_FAILURE);
     }
 
      puts ("<div class=\"Center\">");
