@@ -9379,8 +9379,8 @@ Configuration on `date`:
   LOCK dir (for serial port)  ${LOCKDIR}
   Power Fail dir	      ${PWRFAILDIR}
   Compiler:		      ${CC} ${CCVERSION}
-  Compiler flags:	      ${CFLAGS} ${PTHREAD_FLAGS}
-  Loader flags: 	      ${LDFLAGS}
+  Compiler flags:	      ${WCFLAGS} ${CFLAGS} ${PTHREAD_FLAGS}
+  Loader flags: 	      ${WLDFLAGS} ${LDFLAGS}
   Host and version:	      ${DISTNAME} ${DISTVER}
   Shutdown Program:	      ${SHUTDOWN}
   Serial device:	      ${SERIALDEV}
