@@ -52,10 +52,10 @@ case "$1" in
       ${APCUPSD} --killpower
    ;;
    commfailure)
-      printf "Warning serial port communications with UPS lost." | wall -a
+      printf "Communications with UPS lost." | wall -a
    ;;
    commok)
-      printf "Serial communciations with UPS restored." | wall -a
+      printf "Communciations with UPS restored." | wall -a
    ;;
    powerout)
       printf "Warning power loss detected." | wall -a
