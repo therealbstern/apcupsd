@@ -503,21 +503,27 @@ int usb_ups_check_state(UPSINFO *ups)
 {
     int i;
     int retval;
+    int valid = 0;
     struct hiddev_event ev[64];
     USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
 
+    struct timeval tv;
+    tv.tv_sec = ups->wait_time;
+    tv.tv_usec = 0;
 
     for ( ;; ) {
 	fd_set rfds;
-	struct timeval tv;
  
 	FD_ZERO(&rfds);
 	FD_SET(my_data->fd, &rfds);
-	tv.tv_sec = ups->wait_time;
-	tv.tv_usec = 0;
 	   
-	errno = 0;
 	retval = select((my_data->fd)+1, &rfds, NULL, NULL, &tv);
+
+	/* Note: We are relying on select() adjusting tv to the amount
+	 * of time NOT waited. This is a Linux-specific feature but
+         * shouldn't be a problem since the driver is only intended for
+	 * for Linux.
+	 */
 
 	switch (retval) {
 	case 0: /* No chars available in TIMER seconds. */
@@ -533,14 +539,6 @@ int usb_ups_check_state(UPSINFO *ups)
 	    break;
 	}
 
-	/*
-	 *  The usleep() is a workaround for the Linux 2.6 kernel flooding
-         *    the syslog bug. If for some strange reason it doesn't work for
-	 *    you, try slightly larger values.	I recommend not more than
-	 *    1 million (i.e. 1 second).   
-	 *  This workaround was found by Reg. Clemens <reg at dwf dot com>.
-	 */
-	usleep(100000);
 	do {
 	   retval = read(my_data->fd, &ev, sizeof(ev));
 	} while (retval == -1 && (errno == EAGAIN || errno == EINTR));
@@ -580,6 +578,17 @@ int usb_ups_check_state(UPSINFO *ups)
 	}
 	write_lock(ups);
 	for (i=0; i < (retval/(int)sizeof(ev[0])); i++) {
+	    /* Workaround for Linux 2.5.x and (at least) early 2.6.
+	     * The kernel hiddev driver mistakenly returns empty events
+	     * whenever the device updates a report. We will filter out
+	     * such events here. Patch by Adam Kropelin (thanks).
+	     */
+	    if (ev[i].hid == 0 && ev[i].value == 0)
+		continue;
+
+	    /* Got at least 1 valid event. */
+	    valid = 1;
+
 	    if (ev[i].hid == ups->UPS_Cmd[CI_Discharging]) {
 		/* If first time on batteries, debounce */
 		if (!is_ups_set(UPS_ONBATT) && ev[i].value) {
@@ -632,7 +641,9 @@ int usb_ups_check_state(UPSINFO *ups)
             Dmsg1(200, "Status=%d\n", ups->Status);
 	}
 	write_unlock(ups);
-	break;
+	if (valid) {
+	    break;
+	}
     }
     return 1;
 }
