@@ -151,7 +151,7 @@ static void get_raw_upsinfo(UPSINFO *ups, char *host, int port)
     }
     net_send(sockfd, "rawupsinfo", 10);
     if ((n = net_recv(sockfd, (char *)ups, sizeof(UPSINFO)))
-	    != sizeof(UPSINFO)) {
+            != sizeof(UPSINFO)) {
        Error_abort2("net_recv of UPSINFO returned %d bytes, wanted %d\n",
 	  n, sizeof(UPSINFO));
     }
@@ -356,8 +356,8 @@ void update_upsdata(int sig) {
         mvwprintw(statwin, 3, 1, "Cable      : %s", ups->cable.long_name);
         mvwprintw(statwin, 4, 1, "Mode       : %s", ups->class.long_name);
         mvwprintw(statwin, 5, 1, "AC Line    : %s",
-			(ups->OnBatt) ?
-                         "failing" : "okay");
+                        (UPS_ISSET(UPS_ONBATT) ?
+                         "failing" : "okay"));
         mvwprintw(statwin, 6, 1, "Battery    : %s",
                         (ups->BattLow ? "failing" : "okay"));
         mvwprintw(statwin, 7, 1, "AC Level   : %s",
@@ -372,7 +372,7 @@ void update_upsdata(int sig) {
                                 ((ups->LineLevel == 1) ? "high" : "low"));
 	}
 
-	if (ups->OnBatt) {
+	if (UPS_ISSET(UPS_ONBATT)) {
 		if (power_fail == FALSE) {
                         write_mesg("* [%s] warning: power is failing", t);
 			power_fail = TRUE;
@@ -691,7 +691,7 @@ int main(int argc, char **argv)
 
     if (!ups) {
         fprintf(stderr, "Out of memory.\n");
-	exit(-1);
+        exit(-1);
     }
 
 	strncpy(argvalue, argv[0], sizeof(argvalue)-1);
