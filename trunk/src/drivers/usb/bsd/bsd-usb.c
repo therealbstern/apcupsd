@@ -36,9 +36,6 @@
 #include <dev/usb/usbhid.h>
 
 
-static bool linkcheck = false;
-
-
 /*
  * When we are traversing the USB reports given by the UPS
  *   and we find an entry corresponding to an entry in the 
@@ -295,6 +292,7 @@ static int usb_link_check(UPSINFO *ups)
     int tlog;
     bool once = true;
     USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
+    static bool linkcheck = false;
 
     if (linkcheck) {
 	return 0;
