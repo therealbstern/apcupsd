@@ -123,7 +123,9 @@
 /* #undef ino_t */
 
 /* Define to 1 if utime.h exists and declares struct utimbuf.  */
-/* #undef HAVE_UTIME_H 1 */
+#ifdef HAVE_MINGW
+#define HAVE_UTIME_H 1
+#endif
 
 #if (HAVE_MYSQL||HAVE_PGSQL||HAVE_MSQL||HAVE_IODBC||HAVE_UNIXODBC||HAVE_SOLID||HAVE_VIRT||HAVE_IBASE||HAVE_ORACLE8||HAVE_ORACLE7||HAVE_EASYSOFT)
 #define HAVE_SQL
@@ -149,7 +151,7 @@
 #define _PATH_BACULA_PIDDIR "/var/run"
 
 /* Define if you have zlib */
-#define HAVE_LIBZ 1 
+#define HAVE_LIBZ 1
 
 /* General libs */
 /* #undef LIBS */
@@ -225,7 +227,9 @@
 
 /* Define to 1 if you have `alloca', as a function or macro. */
 #define HAVE_ALLOCA 1
+#ifndef HAVE_MINGW
 #define alloca _alloca
+#endif
 /* Define to 1 if you have <alloca.h> and it should be used (not on Ultrix).
    */
 #define HAVE_ALLOCA_H 1
@@ -356,7 +360,9 @@
 #define HAVE_SETENV 1
 
 /* Define to 1 if you have the `setlocale' function. */
-#define HAVE_SETLOCALE 1
+#undef HAVE_SETLOCALE
+
+#undef HAVE_NL_LANGINFO
 
 /* Define to 1 if you have the `setpgid' function. */
 #define HAVE_SETPGID 1
@@ -371,7 +377,7 @@
 /*#define HAVE_SIGNAL 1 */
 
 /* Define to 1 if you have the `snprintf' function. */
-#define HAVE_SNPRINTF 1 
+#define HAVE_SNPRINTF 1
 
 /* Define to 1 if you have the <stdarg.h> header file. */
 /*#define HAVE_STDARG_H 1*/
@@ -556,9 +562,9 @@
 /* If using the C implementation of alloca, define if you know the
    direction of stack growth for your system; otherwise it will be
    automatically deduced at run-time.
-        STACK_DIRECTION > 0 => grows toward higher addresses
-        STACK_DIRECTION < 0 => grows toward lower addresses
-        STACK_DIRECTION = 0 => direction of growth unknown */
+	STACK_DIRECTION > 0 => grows toward higher addresses
+	STACK_DIRECTION < 0 => grows toward lower addresses
+	STACK_DIRECTION = 0 => direction of growth unknown */
 /* #undef STACK_DIRECTION */
 
 /* Define to 1 if the `S_IS*' macros in <sys/stat.h> do not work properly. */
