@@ -147,26 +147,47 @@
 #define UPS_PLUGGED       0x01000000  /* Set if computer is plugged into UPS */
 #define UPS_DEV_SETUP     0x02000000  /* Set if UPS's driver did the setup() */
 
+#define UPS_LOCAL_BITS (UPS_COMMLOST|UPS_SLAVE|UPS_SLAVEDOWN|UPS_PREV_ONBATT| \
+            UPS_PREV_BATTLOW|UPS_ONBATT_MSG|UPS_FASTPOLL|UPS_PLUGGED|UPS_DEV_SETUP)
+
 /* Macro to set/clear/test bit values in ups->Status */
-#define UPS_ISSET(bit) ((ups->Status) & (bit))
-#define UPS_SET(bit) ((ups->Status) |= (bit))
-#define UPS_CLEAR(bit) ((ups->Status) &= ~(bit))
+#define is_ups_set(bit) ((ups->Status) & (bit))
+#define set_ups(bit) ((ups->Status) |= (bit))
+#define clear_ups(bit) ((ups->Status) &= ~(bit))
+
 /*
  * Macro specific for UPS_ONLINE/UPS_ONBATT. It's a pity but
  * we can't do anything else as APC smart Status handles both.
  * Use these macros anytime you want to SET/CLEAR any of
  * UPS_ONLINE and UPS_ONBATT.
  */
+#define set_ups_online() \
+    do { \
+        set_ups(UPS_ONLINE); \
+        clear_ups(UPS_ONBATT); \
+    } while (0)
+#define clear_ups_online() \
+    do { \
+        set_ups(UPS_ONBATT); \
+        clear_ups(UPS_ONLINE); \
+    } while (0)
+
+
+/* Old deprecated defines (hard to read) */
+#define UPS_ISSET(bit) ((ups->Status) & (bit))
+#define UPS_SET(bit) ((ups->Status) |= (bit))
+#define UPS_CLEAR(bit) ((ups->Status) &= ~(bit))
 #define UPS_SET_ONLINE() \
     do { \
-        UPS_SET(UPS_ONLINE); \
-        UPS_CLEAR(UPS_ONBATT); \
+        set_ups(UPS_ONLINE); \
+        clear_ups(UPS_ONBATT); \
     } while (0)
 #define UPS_CLEAR_ONLINE() \
     do { \
-    UPS_SET(UPS_ONBATT); \
-    UPS_CLEAR(UPS_ONLINE); \
+        set_ups(UPS_ONBATT); \
+        clear_ups(UPS_ONLINE); \
     } while (0)
+
 
 /*
  * CI_ is Capability or command index

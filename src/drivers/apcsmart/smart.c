@@ -285,7 +285,7 @@ int getline(char *s, int len, UPSINFO *ups)
 	    if (!UPS_ISSET(UPS_ONBATT)) {
 	       my_data->debounce = time(NULL);
 	    }
-	UPS_CLEAR_ONLINE();
+	    UPS_CLEAR_ONLINE();
             Dmsg0(80, "Got UPS ON BATT.\n");
 	    if (s == NULL) {
 		write_unlock(ups);
@@ -295,7 +295,7 @@ int getline(char *s, int len, UPSINFO *ups)
         case UPS_REPLACE_BATTERY: /* UPS_REPLACE_BATTERY = '#'   */
 	    if (s == NULL)
 		write_lock(ups);
-	UPS_SET(UPS_REPLACEBATT);
+	    UPS_SET(UPS_REPLACEBATT);
 	    if (s == NULL) {
 		write_unlock(ups);
 		ending = 1;
@@ -314,7 +314,7 @@ int getline(char *s, int len, UPSINFO *ups)
         case BATT_LOW:           /* BATT_LOW    = '%'   */
 	    if (s == NULL)
 		write_lock(ups);
-	UPS_SET(UPS_BATTLOW);
+	    UPS_SET(UPS_BATTLOW);
 	    if (s == NULL) {
 		write_unlock(ups);
 		ending = 1;
@@ -323,7 +323,7 @@ int getline(char *s, int len, UPSINFO *ups)
         case BATT_OK:            /* BATT_OK     = '+'   */
 	    if (s == NULL)
 		write_lock(ups);
-	UPS_CLEAR(UPS_BATTLOW);
+	    UPS_CLEAR(UPS_BATTLOW);
 	    if (s == NULL) {
 		write_unlock(ups);
 		ending = 1;
