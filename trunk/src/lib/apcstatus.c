@@ -471,9 +471,11 @@ char *ups_status(int stat)
        return buf;
     }
       
+/*
     if (read_lock(ups)) {
          Error_abort0(_("Cannot read UPS data area.\n"));
     }
+ */
 
     if (!UPS_ISSET(UPS_ONBATT))
        battstat = 100;
@@ -523,7 +525,7 @@ char *ups_status(int stat)
 	    battstat = (int)ups->BattChg;
 	break;
     }
-    read_unlock(ups);
+/*  read_unlock(ups); */
 
     return buf;
 }
