@@ -9,6 +9,9 @@ General:
   a missing semicolon in the new Makefile.  Before my previous cleanup,
   there were actually 4 missing semicolons.  Hopefully this
   will correct the problem.
+- For a second time, David Walser came to the rescue finding the
+  CGI install problem reported by lots of people.  The new code
+  used "make" instead of $(MAKE) to call the CGI make.  Fixed.
 
 Changes submitted this submission:
 - Removed Makefile code that creates and sets permission bits on
