@@ -78,6 +78,7 @@ void setup_device(UPSINFO *ups)
     }
 
     device_setup(ups);
+    device_get_capabilities(ups);
 
     return;
 }
@@ -182,7 +183,6 @@ non-power fail condition or bug.\n Killpower request ignored at %s:%d\n"),
 void prep_device(UPSINFO *ups)
 {
 
-    device_get_capabilities(ups);
     device_read_static_data(ups);
 
     /* If no UPS name found, use hostname, or "default" */
