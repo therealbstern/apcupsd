@@ -38,6 +38,7 @@
 #define HID_MAX_USAGES 1024
 
 #include "apc.h"
+#include "../usb_common.h"
 #include <asm/types.h>
 #include <linux/hiddev.h>
 
@@ -88,6 +89,22 @@ static void reinitialize_private_structure(UPSINFO *ups)
 	    my_data->info[k] = NULL;
 	}
     }
+}
+
+/* 
+ * See if the USB device speaks UPS language
+ */
+static int find_usb_application(UPSINFO *ups)
+{
+    int i, ret;
+    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
+
+    for (i=0; (ret = ioctl(my_data->fd, HIDIOCAPPLICATION, i)) > 0; i++) {
+       if ((ret & 0xffff000) == (UPS_USAGE & 0xffff0000)) {
+	  return 1;
+       }
+    }
+    return 0;
 }
 
 /*
@@ -224,6 +241,7 @@ static int usb_link_check(UPSINFO *ups)
     int tlog;
     bool once = true;
     USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
+    static bool linkcheck = false;
 
     if (linkcheck) {
 	return 0;
@@ -268,22 +286,6 @@ static int usb_link_check(UPSINFO *ups)
     return 1;
 }
 
-
-/* 
- * See if the USB device speaks UPS language
- */
-static int find_usb_application(UPSINFO *ups)
-{
-    int i, ret;
-    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
-
-    for (i=0; (ret = ioctl(my_data->fd, HIDIOCAPPLICATION, i)) > 0; i++) {
-       if ((ret & 0xffff000) == (UPS_USAGE & 0xffff0000)) {
-	  return 1;
-       }
-    }
-    return 0;
-}
 
 /*
  * Get a field value
@@ -512,7 +514,7 @@ int pusb_ups_check_state(UPSINFO *ups)
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_RemainingCapacity]) {
 		ups->BattChg = ev[i].value;
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_RunTimeToEmpty]) {
-		if (my_data->vendor == Vendor_APC) {
+		if (my_data->vendor == VENDOR_APC) {
 		    ups->TimeLeft = ((double)ev[i].value) / 60;  /* seconds */
 		} else {
 		    ups->TimeLeft = ev[i].value;  /* minutes */
@@ -652,7 +654,7 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info* known_inf
 		     * know_info table and see if we have a match.
 		     * If so, allocate a new entry for it.
 		     */
-		    for (k=0; k < (int)KNOWN_INFO_SZ; k++) {
+		    for (k=0; known_info[k].usage_code; k++) {
 			USB_INFO *info;
 			int ci = known_info[k].ci;
 
