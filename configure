@@ -3170,7 +3170,8 @@ fi
 
 if test "$CFG_CYGWIN" = "yes"
 then
-    echo 'Hardcoding APCUPSD_MAIL to /apcupsd/bin/smtp'
+    { echo "$as_me:$LINENO: WARNING: Hardcoding APCUPSD_MAIL to /apcupsd/bin/smtp" >&5
+echo "$as_me: WARNING: Hardcoding APCUPSD_MAIL to /apcupsd/bin/smtp" >&2;}
     APCUPSD_MAIL='/apcupsd/bin/smtp'
 else
     for ac_prog in mail
@@ -8665,8 +8666,6 @@ _ACEOF
 
 	 CGI=cgi
 
-     { echo "$as_me:$LINENO: checking for libgd..." >&5
-echo "$as_me: checking for libgd..." >&6;}
      echo "$as_me:$LINENO: checking for gdImagePng in -lgd" >&5
 echo $ECHO_N "checking for gdImagePng in -lgd... $ECHO_C" >&6
 if test "${ac_cv_lib_gd_gdImagePng+set}" = set; then
@@ -13290,7 +13289,9 @@ _ACEOF
 
 else
 
-			echo 'configure: ncurses headers not found.' ; exit 1
+			{ { echo "$as_me:$LINENO: error: ncurses headers not found." >&5
+echo "$as_me: error: ncurses headers not found." >&2;}
+   { (exit 1); exit 1; }; }
 fi
 
 done
@@ -13666,7 +13667,8 @@ unknown)
 	"
   ;;
 *)
-  echo " === Something went wrong. Unknown DISTNAME $DISTNAME ==="
+  { echo "$as_me:$LINENO: WARNING: Something went wrong. Unknown DISTNAME $DISTNAME" >&5
+echo "$as_me: WARNING: Something went wrong. Unknown DISTNAME $DISTNAME" >&2;}
   ;;
 esac
 
