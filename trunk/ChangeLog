@@ -6,6 +6,9 @@
 /***************************************************************************/
 
 ----> Release 3.10.17 xxMar05
+- Move docbook directory to old_documents
+- Modify Win32 Makefile to pull apcupsd.html from texi directory.
+  It was still using the old docbook directory.
 - Update default apcupsd.conf to recommend a blank DEVICE setting for USB
   driver.
 - Add /dev/hiddev? to Linux USB driver device node search path.
