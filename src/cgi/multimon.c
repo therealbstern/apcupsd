@@ -29,6 +29,9 @@
 #include "status.h"
 #include "apc_nis.h"
 
+#ifndef DEFAULT_REFRESH
+#define DEFAULT_REFRESH 30
+#endif
 
 typedef struct {
 	char	*var;
@@ -40,9 +43,16 @@ typedef struct {
 static	ftype	*firstfield = NULL;
 static	int	numfields = 0, use_celsius;
 static	char	*desc;
+static  int     refresh = DEFAULT_REFRESH;
 
 void parsearg(const char *var, const char *value)
 {
+    if (strcmp(var, "refresh") == 0) {
+        refresh = atoi(value);
+        if (refresh < 0) {
+            refresh = DEFAULT_REFRESH;
+        }
+    }
 }
 
 void report_error(char *str) 
@@ -483,6 +493,8 @@ int main(int argc, char **argv)
     use_celsius = 0;
 #endif
 
+    (void) extractcgiargs();
+
     /* print out header first so we can give error reports */
     printf ("Content-type: text/html\n");
     printf ("\n");
@@ -491,6 +503,9 @@ int main(int argc, char **argv)
     printf ("<html>\n");
     printf ("<head><title>Multimon: UPS Status Page</title>\n");
     printf ("<meta http-equiv=\"Pragma\" content=\"no-cache\">\n");
+    if (refresh != 0) {
+        printf ("<meta http-equiv=\"Refresh\" content=\"%d\">\n", refresh);
+    }
     printf ("</head>\n");
     printf ("<body BGCOLOR=\"#FFFFFF\">\n");
 

@@ -9,18 +9,34 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <sys/types.h>
 
 #include "cgiconfig.h"
 #include "cgilib.h"
 #include "upsfetch.h"
 
-static char   monhost[256];
+#ifndef DEFAULT_REFRESH
+#define DEFAULT_REFRESH 30
+#endif
+
+#ifndef MAXHOSTNAMELEN
+#define MAXHOSTNAMELEN 64
+#endif
+
+static char   monhost[MAXHOSTNAMELEN] = "127.0.0.1";
+static int    refresh = DEFAULT_REFRESH;
 
 void parsearg(const char *var, const char *value) 
 {
     if (strcmp(var, "host") == 0) {
-	strncpy (monhost, value, sizeof(monhost));
-	monhost[sizeof(monhost) - 1] = '\0';
+        strncpy (monhost, value, sizeof(monhost));
+        monhost[sizeof(monhost) - 1] = '\0';
+
+    } else if (strcmp(var, "refresh") == 0) {
+        refresh = atoi(value);
+        if (refresh < 0) {
+            refresh = DEFAULT_REFRESH;
+        }
     }
 }
 
@@ -28,7 +44,7 @@ int main(int argc, char **argv)
 {
     char   answer[256];
 
-    strcpy (monhost, "127.0.0.1");  /* default host */
+    (void) extractcgiargs();
 
     printf ("Content-type: text/html\n");
     printf ("Pragma: no-cache\n\n");
@@ -39,17 +55,14 @@ int main(int argc, char **argv)
     printf ("<head>\n");
     printf ("<title>APCUPSD STATUS Output Page</title>\n");
     printf ("<meta http-equiv=\"Pragma\" content=\"no-cache\" />\n");
+    if (refresh != 0) {
+        printf ("<meta http-equiv=\"Refresh\" content=\"%d\" />\n", refresh);
+    }
     printf ("<style type=\"text/css\" id=\"internalStyle\">\n");
     printf ("  body {color: black; background: #ffffff}\n");
     printf ("</style>\n");
     printf ("</head>\n");
     printf ("<body>\n");
-
-    if (!extractcgiargs()) {
-        printf("<p>Unable to extract cgi arguments!</p>\n");
-	html_finish();
-	exit (0);
-    }
 
     if (!checkhost(monhost)) {
         printf ("<p>Access to %s host is not authorized.</p>\n", monhost);
