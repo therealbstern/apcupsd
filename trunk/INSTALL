@@ -226,8 +226,8 @@ If you configure apcupsd with the --enable-cgi support you may need to make
 configuration changes to the httpd.conf file. The changes you will need to
 make depend on what directory you choose install the cgi files in.
 
-There are four files which are installed in the cgi-bin directory.
-Three of these are .cgi files which are executable images and the fourth file
+There are five files which are installed in the cgi-bin directory.
+Four of these are .cgi files which are executable images and the fifth file
 is apcupsd.css which is a style sheet used to give a common style to all output.
 
 There are two ways of enabling cgi support for Apache. The first method is
