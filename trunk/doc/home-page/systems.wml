@@ -9,14 +9,13 @@ any Posix system.
 <b>apcupsd</b> has been built and tested on:
 <ul>
  <li>RedHat</li>
- <li> Solaris</li>
+ <li>Solaris</li>
  <li>FreeBSD</li>
 </ul>
 In addition, apcupsd has been ported to the
 following systems:
 <ul>
  <li>Alpha</li>
- <li>Caldera</li>
  <li>Darwin</li>
  <li>Debian</li>
  <li>Engard</li>
@@ -25,11 +24,8 @@ following systems:
  <li>Mandrake</li>
  <li>NetBSD</li>
  <li>OpenBSD</li>
- <li>OpenServer</li>
- <li>SCO</li>
  <li>Slackware</li>
  <li>SuSE</li>
  <li>Unifix</li> 
  <li>Win95/98/Me/XP/NT/2000</li>
 </ul>
-

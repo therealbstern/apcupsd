@@ -1,80 +1,57 @@
+
 Current Code Maintainer and Project Manager:
-	Kern Sibbald <kern@sibbald.com> 
+        Kern Sibbald <kern@sibbald.com> 
+
+Super USB bug fixer and Code Maintainer:
+        Adam Kropelin <akropel1@rochester.rr.com> 
 
 RPM Packager:
-	D. Scott Barninger <barninger@fairfieldcomputers.com> 
-
-Super USB bug fixer:
-	Adam Kropelin <akropel1@rochester.rr.com> 
-
-CGI and HTML fixer:
-	William King <wrking@dadaboom.com> 
+        D. Scott Barninger <barninger@fairfieldcomputers.com> 
 
 Project Starter and Former Code Maintainer:
-	Andre Hedrick <andre@linux-ide.org> 
-
-Former Code Maintainer and Project Manager:
-	Riccardo Facchetti <riccardo@master.oasi.gpa.it> 
-
-Serial Communications:
-	Andre Hedrick <andre@linux-ide.org> 
-
-2.0 User's Manual:
-	Eric S. Raymond <esr@thyrsus.com> 
+        Andre Hedrick <andre@linux-ide.org> 
 
 Alpha Port:
-	Kern Sibbald <kern@sibbald.com> 
-	J. Rochate <jrochate@ualg.pt> testing and machine loan 
-
-Caldera:
-	John Pinner <john@clocksoft.com> 
+        J. Rochate <jrochate@ualg.pt> testing and machine loan 
 
 HP-UX Port
-	Carl Erhorn <Carl_Erhorn@hyperion.com> 
-	Robert K Nelson <rnelson@airflowsciences.com> 
+        Carl Erhorn <Carl_Erhorn@hyperion.com> 
+        Robert K Nelson <rnelson@airflowsciences.com> 
 
 SOLARIS Port:
-	Carl Erhorn <Carl_Erhorn@hyperion.com> 
+        Carl Erhorn <Carl_Erhorn@hyperion.com> 
 
 OpenBSD Port:
-	Devin Reade <gdr@gno.org> 
+        Devin Reade <gdr@gno.org> 
 
 NetBSD Port:
-	Neil Darlow <neil@darlow.co.uk> 
+        Neil Darlow <neil@darlow.co.uk> 
 
 Win32 Port:
-	Kern Sibbald <kern@sibbald.com> 
-	Paul Z. Stagner <paul.stagner@charterco.com> testing 
+        Kern Sibbald <kern@sibbald.com> 
+        Paul Z. Stagner <paul.stagner@charterco.com> testing 
 
 WEB Interfaces:
-	Kern Sibbald <kern@sibbald.com> 
-	Joseph Acosta <joeja@mindspring.com> 
-
-Apcupsd Support and Knowledge Base:
-	Brian Schau <Brian.Schau@compaq.com> 
+        Kern Sibbald <kern@sibbald.com> 
+        Joseph Acosta <joeja@mindspring.com> 
 
 Hard Core Coders:
-	Riccardo Facchetti <riccardo@master.oasi.gpa.it> 
-	Kern Sibbald <kern@sibbald.com> 
-
-Part Time Coders:
-	Jonathan H N Chin <jc254@newton.cam.ac.uk> 
-	Andre Hedrick <andre@linux-ide.org> 
-	Brian Schau <Brian.Schau@compaq.com> 
-	Carl Erhorn <Carl_Erhorn@hyperion.com> 
+        Kern Sibbald <kern@sibbald.com> 
+        Adam Kropelin <akropel1@rochester.rr.com> 
 
 Distribution Maintainers:
-	Alpha:		Kern Sibbald <kern@sibbald.com> temp 
-	Debian:		Leon Breedt <ljb@debian.org> 
-	FreeBSD/BSDi:	Jeff Palmer <scorpio@drkshdw.org> 
-	NetBSD:		Neil Darlow <neil@darlow.co.uk> 
-	HP-UX:		Carl Erhorn <Carl_Erhorn@hyperion.com>, Robert K Nelson <rnelson@airflowsciences.com> 
-	OpenBSD:	Devin Reade <gdr@gno.org> 
-	RedHat:		Kern Sibbald <kern@sibbald.com> 
-	Slackware:	Devin Reade <gdr@gno.org> 
-	Sparc Solaris:	Carl Erhorn <Carl_Erhorn@hyperion.com> 
-	SUSE:		Riccardo Facchetti <riccardo@master.oasi.gpa.it> 
-	Win32:		Kern Sibbald <kern@sibbald.com> 
+        Alpha:          J. Rochate <jrochate@ualg.pt> ????
+        Debian:         Leon Breedt <ljb@debian.org> 
+        FreeBSD/BSDi:   Jeff Palmer <scorpio@drkshdw.org> 
+        NetBSD:         Neil Darlow <neil@darlow.co.uk> 
+        HP-UX:          Carl Erhorn <Carl_Erhorn@hyperion.com>, Robert K Nelson <rnelson@airflowsciences.com> 
+        OpenBSD:        Devin Reade <gdr@gno.org> 
+        RedHat:         Kern Sibbald <kern@sibbald.com> 
+        Fedora:         Kern Sibbald <kern@sibbald.com>
+        Slackware:      Devin Reade <gdr@gno.org> 
+        Sparc Solaris:  Carl Erhorn <Carl_Erhorn@hyperion.com> 
+        SuSE:           None
+        Win32:          Kern Sibbald <kern@sibbald.com> 
 
 Project Discussions:
-	APCUPSD Mailing List <apcupsd-users@lists.sourceforge.net>
+        APCUPSD Mailing List <apcupsd-users@lists.sourceforge.net>

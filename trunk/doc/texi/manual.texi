@@ -1,5 +1,5 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: manual.texi,v 1.5 2005-01-08 17:05:06 kerns Exp $
+@comment $Id: manual.texi,v 1.6 2005-02-02 20:27:49 kerns Exp $
 @c %***start of header
 @setfilename manual.info
 @finalout
@@ -7,7 +7,7 @@
 @c %***end of header
 
 @set VERSION 3.10.16
-@set UPDATED 06 November 2004
+@set UPDATED 02 January 2005
 
 @ifnottex
 @documentdescription
@@ -47,7 +47,7 @@ computer in the event of a power failure.
                                                                                       
 This document was last updated @value{UPDATED}
                                                                                       
-Copyright @copyright{} 1999-2004 Kern Sibbald
+Copyright @copyright{} 1999-2005 Kern Sibbald
                                                                                       
 @quotation
 Copying and distribution of this file, with or without

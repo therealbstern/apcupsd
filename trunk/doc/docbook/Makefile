@@ -93,7 +93,7 @@ web:	manual.xsl $(OBJ)
 	else \
 	   echo "Error building web manual"; \
 	fi
-	@rm -f *.xml
+#	@rm -f *.xml
 # Cleanup crappy html
 	@echo "s%Â% %g" >${out}
 	@echo "s% % %g" >>${out}
