@@ -109,6 +109,12 @@ This package is built with standard serial port support.
 
 make
 
+%if %{usb}
+cd examples
+make hid-ups
+cd ../
+%endif
+
 %install
 
 mkdir -p $RPM_BUILD_ROOT%{initdir}
@@ -122,12 +128,19 @@ install -m744 platforms/apccontrol \
               $RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/apccontrol
 install -m755 platforms/redhat/apcupsd $RPM_BUILD_ROOT%{initdir}
 
+%if %{usb}
+install -m744 examples/hid-ups \
+              $RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/hid-ups
+install -m744 examples/make-hiddev \
+              $RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/make-hiddev
+%endif
+
 %clean
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 
 %if %{usb}
 
-%files usb-${rh_version}
+%files usb-%{rh_version}
 %defattr(-,root,root)
 %doc COPYING ChangeLog INSTALL doc/* examples
 %dir /etc/apcupsd
@@ -150,9 +163,9 @@ install -m755 platforms/redhat/apcupsd $RPM_BUILD_ROOT%{initdir}
 /sbin/*
 %attr(-,root,man) %{_mandir}/*/*
 
-%pre usb-${rh_version}
+%pre usb-%{rh_version}
 
-%post usb-${rh_version}
+%post usb-%{rh_version}
 # get rid of any 3.6.2 stuff
 rm -f /etc/rc.d/rc[0-6].d/[KS]20apcups
 rm -f /etc/rc.d/init.d/apcups
@@ -191,7 +204,7 @@ chmod 744 /etc/rc.d/init.d/halt
 
 # Undo things a bit
 
-%preun usb-${rh_version}
+%preun usb-%{rh_version}
 if [ $1 = 0 ] ; then
         # stop running version (if any)                  
         # I have removed the following because it sometimes produces
@@ -218,7 +231,7 @@ if [ $1 = 0 ] ; then
         chmod 744 /etc/rc.d/init.d/halt
 fi
 
-%postun usb-${rh_version}
+%postun usb-%{rh_version}
 if [ "$1" -ge "1" ]; then
         :
         # /sbin/service apcupsd condrestart >/dev/null 2>&1 || :
