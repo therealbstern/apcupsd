@@ -100,8 +100,11 @@ This package is built with standard serial port support.
         --with-cgi-bin=%{_sysconfdir}/apcupsd/cgi \
         --enable-cgi \
         --enable-pthreads \
+        --enable-master-slave \
+        --enable-apcsmart \
+        --enable-dumb \
 %if %{usb}
-        --with-serial-dev=/dev/usb/hid/hiddev[0-9] \
+        --with-serial-dev=/dev/usb/hid/hiddev[0-15] \
         --with-upstype=usb \
         --with-upscable=usb \
         --enable-usb
@@ -339,6 +342,8 @@ fi
 %endif
 
 %changelog
+* Sat Oct 18 2003 Scott at fairfieldcomputers dot com
+- added master-slave, apcsmart and dumb to configure options
 * Sun Sep 14 2003 Scott at fairfieldcomputers dot com
 - added rm commands during install to remove halt scripts created
 - in the build root
