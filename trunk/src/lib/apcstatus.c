@@ -221,8 +221,10 @@ int output_status(UPSINFO *ups, int sockfd,
                 s_write(ups, "SENSE    : Medium\n");
 		break;
             case 'H':
-	    default :
                 s_write(ups, "SENSE    : High\n");
+		break;
+	    default :
+                s_write(ups, "SENSE    : Unknown\n");
 		break;
 	    }
 	}

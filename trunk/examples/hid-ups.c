@@ -1,5 +1,5 @@
 /*
- * $Id: hid-ups.c,v 1.9 2004-08-04 20:39:27 kerns Exp $
+ * $Id: hid-ups.c,v 1.10 2004-08-26 09:20:06 kerns Exp $
  *
  *  Copyright (c) 2001 Vojtech Pavlik <vojtech@ucw.cz>
  *  Copyright (c) 2001 Paul Stewart <hiddev@wetlogic.net>
@@ -172,6 +172,7 @@ struct s_ups_info {
     { 0xFF860005, T_NONE,   "APCGeneralCollection" },
     { 0xFF860013, T_NONE,   "APC860013_SetMinReturn?" },
     { 0xFF860016, T_APCDATE,"APCBattReplacementDate" },
+    { 0xFF860019, T_UNITS,  "APCBattCapBeforeRestart" },
     { 0xFF860023, T_NONE,   "APC860023_??????" },
     { 0xFF860024, T_NONE,   "APC860024_??????" },
     { 0xFF860025, T_NONE,   "APC860025_??????" },

@@ -305,17 +305,19 @@
 #define    APC_CMD_ForceShutdown          0
 #define CI_DelayBeforeShutdown           62
 #define    APC_CMD_DelayBeforeShutdown    0
+#define CI_APCBattCapBeforeStartup       63
+#define    APC_CMD_BattCapBeforeStartup   0
 
 /* Items below this line are not "probed" for */
-#define CI_CYCLE_EPROM         63     /* Cycle programmable EPROM values */
+#define CI_CYCLE_EPROM         64     /* Cycle programmable EPROM values */
 #define    APC_CMD_CYCLE_EPROM    '-'
-#define CI_UPS_CAPS            64     /* Get UPS capabilities (command) string */
+#define CI_UPS_CAPS            65     /* Get UPS capabilities (command) string */
 #define    APC_CMD_UPS_CAPS       'a'
 /* ^^^^^^^^^^ see below if you change this ^^^^^^ */
 /* set to last command index. CHANGE!!! when adding new code.  */
 /* vvvvvvvvvv change here vvvvvvvvvvvvvvvvvvvvvvv */
 #define CI_MAXCI         CI_UPS_CAPS      /* maximum UPS commands we handle */
-#define CI_MAX_CAPS      CI_DelayBeforeShutdown
+#define CI_MAX_CAPS      CI_APCBattCapBeforeStartup
 
 #define GO_ON_BATT              'W'
 #define GO_ON_LINE              'X'

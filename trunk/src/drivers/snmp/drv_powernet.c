@@ -150,27 +150,27 @@ int powernet_snmp_ups_read_static_data(UPSINFO *ups) {
 
     powernet_mib_mgr_get_upsBasicIdent(s, &(data->upsBasicIdent));
     if (data->upsBasicIdent) {
-	strncpy(ups->upsmodel, data->upsBasicIdent->upsBasicIdentModel,
+	astrncpy(ups->upsmodel, data->upsBasicIdent->upsBasicIdentModel,
 		sizeof(ups->upsmodel));
-	strncpy(ups->upsname, data->upsBasicIdent->upsBasicIdentName,
+	astrncpy(ups->upsname, data->upsBasicIdent->upsBasicIdentName,
 		sizeof(ups->upsname));
 	free(data->upsBasicIdent);
     }
 
     powernet_mib_mgr_get_upsAdvIdent(s, &(data->upsAdvIdent));
     if (data->upsAdvIdent) {
-	strncpy(ups->firmrev, data->upsAdvIdent->upsAdvIdentFirmwareRevision,
+	astrncpy(ups->firmrev, data->upsAdvIdent->upsAdvIdentFirmwareRevision,
 		sizeof(ups->firmrev));
-	strncpy(ups->birth, data->upsAdvIdent->upsAdvIdentDateOfManufacture,
+	astrncpy(ups->birth, data->upsAdvIdent->upsAdvIdentDateOfManufacture,
 		sizeof(ups->birth));
-	strncpy(ups->serial, data->upsAdvIdent->upsAdvIdentSerialNumber,
+	astrncpy(ups->serial, data->upsAdvIdent->upsAdvIdentSerialNumber,
 		sizeof(ups->serial));
 	free(data->upsAdvIdent);
     }
 
     powernet_mib_mgr_get_upsBasicBattery(s, &(data->upsBasicBattery));
     if (data->upsBasicBattery) {
-	strncpy(ups->battdat,
+	astrncpy(ups->battdat,
 		data->upsBasicBattery->upsBasicBatteryLastReplaceDate,
 		sizeof(ups->battdat));
 	free(data->upsBasicBattery);
@@ -191,45 +191,45 @@ int powernet_snmp_ups_read_static_data(UPSINFO *ups) {
 	ups->hitrans = data->upsAdvConfig->__upsAdvConfigHighTransferVolt;
 	ups->lotrans = data->upsAdvConfig->__upsAdvConfigLowTransferVolt;
 	switch(data->upsAdvConfig->__upsAdvConfigAlarm) {
-	    case 1:
-		if (data->upsAdvConfig->__upsAdvConfigAlarmTimer/100 < 30) {
-                    strncpy(ups->beepstate, "0 Seconds",
-			    sizeof(ups->beepstate));
-		} else {
-                    strncpy(ups->beepstate, "Timed",
-			    sizeof(ups->beepstate));
-		}
-		break;
-	    case 2:
-                strncpy(ups->beepstate, "LowBatt",
-			    sizeof(ups->beepstate));
-		break;
-	    case 3:
-                strncpy(ups->beepstate, "NoAlarm",
-			    sizeof(ups->beepstate));
-		break;
-	    default:
-                strncpy(ups->beepstate, "Timed",
-			    sizeof(ups->beepstate));
-		break;
+	case 1:
+	    if (data->upsAdvConfig->__upsAdvConfigAlarmTimer/100 < 30) {
+                astrncpy(ups->beepstate, "0 Seconds",
+			sizeof(ups->beepstate));
+	    } else {
+                aastrncpy(ups->beepstate, "Timed",
+			sizeof(ups->beepstate));
+	    }
+	    break;
+	case 2:
+            astrncpy(ups->beepstate, "LowBatt",
+			sizeof(ups->beepstate));
+	    break;
+	case 3:
+            astrncpy(ups->beepstate, "NoAlarm",
+			sizeof(ups->beepstate));
+	    break;
+	default:
+            astrncpy(ups->beepstate, "Timed",
+			sizeof(ups->beepstate));
+	    break;
 	}
 	ups->rtnpct = data->upsAdvConfig->__upsAdvConfigMinReturnCapacity;
 	switch (data->upsAdvConfig->__upsAdvConfigSensitivity) {
-	    case 1:
-                strncpy(ups->sensitivity, "auto", sizeof(ups->sensitivity));
-		break;
-	    case 2:
-                strncpy(ups->sensitivity, "low", sizeof(ups->sensitivity));
-		break;
-	    case 3:
-                strncpy(ups->sensitivity, "medium", sizeof(ups->sensitivity));
-		break;
-	    case 4:
-                strncpy(ups->sensitivity, "high", sizeof(ups->sensitivity));
-		break;
-	    default:
-                strncpy(ups->sensitivity, "unknown", sizeof(ups->sensitivity));
-		break;
+	case 1:
+            astrncpy(ups->sensitivity, "Auto", sizeof(ups->sensitivity));
+	    break;
+	case 2:
+            astrncpy(ups->sensitivity, "Low", sizeof(ups->sensitivity));
+	    break;
+	case 3:
+            astrncpy(ups->sensitivity, "Medium", sizeof(ups->sensitivity));
+	    break;
+	case 4:
+            astrncpy(ups->sensitivity, "High", sizeof(ups->sensitivity));
+	    break;
+	default:
+            astrncpy(ups->sensitivity, "Unknown", sizeof(ups->sensitivity));
+	    break;
 	}
 	/* Data in Timeticks (1/100th sec). */
 	ups->dlowbatt =
@@ -243,48 +243,48 @@ int powernet_snmp_ups_read_static_data(UPSINFO *ups) {
     if (data->upsAdvTest) {
 	switch(data->upsAdvTest->__upsAdvTestDiagnosticSchedule) {
 	    case 1:
-                strncpy(ups->selftest, "unknown", sizeof(ups->selftest));
+                astrncpy(ups->selftest, "unknown", sizeof(ups->selftest));
 		break;
 	    case 2:
-                strncpy(ups->selftest, "biweekly", sizeof(ups->selftest));
+                astrncpy(ups->selftest, "biweekly", sizeof(ups->selftest));
 		break;
 	    case 3:
-                strncpy(ups->selftest, "weekly", sizeof(ups->selftest));
+                astrncpy(ups->selftest, "weekly", sizeof(ups->selftest));
 		break;
 	    case 4:
-                strncpy(ups->selftest, "atTurnOn", sizeof(ups->selftest));
+                astrncpy(ups->selftest, "atTurnOn", sizeof(ups->selftest));
 		break;
 	    case 5:
-                strncpy(ups->selftest, "never", sizeof(ups->selftest));
+                astrncpy(ups->selftest, "never", sizeof(ups->selftest));
 		break;
 	    default:
-                strncpy(ups->selftest, "unknown", sizeof(ups->selftest));
+                astrncpy(ups->selftest, "unknown", sizeof(ups->selftest));
 		break;
 	}
 	switch (data->upsAdvTest->__upsAdvTestDiagnosticsResults) {
 	    case 1:
-                strncpy(ups->X, "OK", sizeof(ups->X));
-                strncpy(ups->selftestmsg, "Self Test Ok",
+                astrncpy(ups->X, "OK", sizeof(ups->X));
+                astrncpy(ups->selftestmsg, "Self Test Ok",
 			sizeof(ups->selftestmsg));
 		break;
 	    case 2:
-                strncpy(ups->X, "BT", sizeof(ups->X));
-                strncpy(ups->selftestmsg, "Self Test Failed",
+                astrncpy(ups->X, "BT", sizeof(ups->X));
+                astrncpy(ups->selftestmsg, "Self Test Failed",
 			sizeof(ups->selftestmsg));
 		break;
 	    case 3:
-                strncpy(ups->X, "BT", sizeof(ups->X));
-                strncpy(ups->selftestmsg, "Invalid Self Test",
+                astrncpy(ups->X, "BT", sizeof(ups->X));
+                astrncpy(ups->selftestmsg, "Invalid Self Test",
 			sizeof(ups->selftestmsg));
 		break;
 	    case 4:
-                strncpy(ups->X, "NO", sizeof(ups->X));
-                strncpy(ups->selftestmsg, "Self Test in Progress",
+                astrncpy(ups->X, "NO", sizeof(ups->X));
+                astrncpy(ups->selftestmsg, "Self Test in Progress",
 			sizeof(ups->selftestmsg));
 		break;
 	    default:
-                strncpy(ups->X, "NO", sizeof(ups->X));
-                strncpy(ups->selftestmsg, "Unknown Result",
+                astrncpy(ups->X, "NO", sizeof(ups->X));
+                astrncpy(ups->selftestmsg, "Unknown Result",
 			sizeof(ups->selftestmsg));
 		break;
 	}
@@ -347,37 +347,37 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups) {
 	ups->LineFreq = data->upsAdvInput->__upsAdvInputFrequency;
 	switch(data->upsAdvInput->__upsAdvInputLineFailCause) {
 	    case 1:
-                strncpy(ups->G, "O-No Transfer", sizeof(ups->G));
+                astrncpy(ups->G, "O-No Transfer", sizeof(ups->G));
 		break;
 	    case 2:
-                strncpy(ups->G, "High Line Voltage", sizeof(ups->G));
+                astrncpy(ups->G, "High Line Voltage", sizeof(ups->G));
 		break;
 	    case 3:
-                strncpy(ups->G, "R-Brownout", sizeof(ups->G));
+                astrncpy(ups->G, "R-Brownout", sizeof(ups->G));
 		break;
 	    case 4:
-                strncpy(ups->G, "R-Blackout", sizeof(ups->G));
+                astrncpy(ups->G, "R-Blackout", sizeof(ups->G));
 		break;
 	    case 5:
-                strncpy(ups->G, "T-Small Sag", sizeof(ups->G));
+                astrncpy(ups->G, "T-Small Sag", sizeof(ups->G));
 		break;
 	    case 6:
-                strncpy(ups->G, "T-Deep Sag", sizeof(ups->G));
+                astrncpy(ups->G, "T-Deep Sag", sizeof(ups->G));
 		break;
 	    case 7:
-                strncpy(ups->G, "T-Small Spike", sizeof(ups->G));
+                astrncpy(ups->G, "T-Small Spike", sizeof(ups->G));
 		break;
 	    case 8:
-                strncpy(ups->G, "T-Deep Spike", sizeof(ups->G));
+                astrncpy(ups->G, "T-Deep Spike", sizeof(ups->G));
 		break;
 	    case 9:
-                strncpy(ups->G, "Self Test", sizeof(ups->G));
+                astrncpy(ups->G, "Self Test", sizeof(ups->G));
 		break;
 	    case 10:
-                strncpy(ups->G, "R-Rate of Volt Change", sizeof(ups->G));
+                astrncpy(ups->G, "R-Rate of Volt Change", sizeof(ups->G));
 		break;
 	    default:
-                strncpy(ups->G, "Unknown", sizeof(ups->G));
+                astrncpy(ups->G, "Unknown", sizeof(ups->G));
 		break;
 	}
 	free(data->upsAdvInput);
@@ -433,28 +433,28 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups) {
     if (data->upsAdvTest) {
 	switch (data->upsAdvTest->__upsAdvTestDiagnosticsResults) {
 	    case 1:
-                strncpy(ups->X, "OK", sizeof(ups->X));
-                strncpy(ups->selftestmsg, "Self Test Ok",
+                astrncpy(ups->X, "OK", sizeof(ups->X));
+                astrncpy(ups->selftestmsg, "Self Test Ok",
 			sizeof(ups->selftestmsg));
 		break;
 	    case 2:
-                strncpy(ups->X, "BT", sizeof(ups->X));
-                strncpy(ups->selftestmsg, "Self Test Failed",
+                astrncpy(ups->X, "BT", sizeof(ups->X));
+                astrncpy(ups->selftestmsg, "Self Test Failed",
 			sizeof(ups->selftestmsg));
 		break;
 	    case 3:
-                strncpy(ups->X, "BT", sizeof(ups->X));
-                strncpy(ups->selftestmsg, "Invalid Self Test",
+                astrncpy(ups->X, "BT", sizeof(ups->X));
+                astrncpy(ups->selftestmsg, "Invalid Self Test",
 			sizeof(ups->selftestmsg));
 		break;
 	    case 4:
-                strncpy(ups->X, "NO", sizeof(ups->X));
-                strncpy(ups->selftestmsg, "Self Test in Progress",
+                astrncpy(ups->X, "NO", sizeof(ups->X));
+                astrncpy(ups->selftestmsg, "Self Test in Progress",
 			sizeof(ups->selftestmsg));
 		break;
 	    default:
-                strncpy(ups->X, "NO", sizeof(ups->X));
-                strncpy(ups->selftestmsg, "Unknown Result",
+                astrncpy(ups->X, "NO", sizeof(ups->X));
+                astrncpy(ups->selftestmsg, "Unknown Result",
 			sizeof(ups->selftestmsg));
 		break;
 	}
