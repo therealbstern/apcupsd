@@ -56,6 +56,25 @@
  *
  */
 
+/*    
+ * This is a sort of helper routine between apcupsd core and the drivers.
+ *  The raw calls into the drivers are through function pointers in the 
+ *  ups device structure, and are #defined to the following:
+ *
+ *    device_open(ups)
+ *    device_setup(ups)
+ *    device_close(ups)
+ *    device_kill_power(ups)
+ *    device_read_static_data(ups)
+ *    device_read_volatile_data(ups)
+ *    device_get_capabilities(ups) 
+ *    device_check_state(ups)
+ *    device_program_eeprom(ups)
+ *    device_entry_point(ups, command, data)
+ * 
+ *   see include/apc_drivers.h for more details on each routine.
+ */
+
 #include "apc.h"
 
 /* Forward referenced function */

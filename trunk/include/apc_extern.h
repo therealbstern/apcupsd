@@ -106,10 +106,6 @@ extern int kill_ups_power;
 extern int dumb_mode_test;
 extern int go_background;
 
-/*
- * In apcdevice.c
- */
-void setup_device(UPSINFO *ups);
 
 /*
  * In apceeprom.c
@@ -137,6 +133,7 @@ extern void make_pid (void);
 /*
  * In apcdevice.c
  */
+void setup_device(UPSINFO *ups);
 extern void setup_serial(UPSINFO *ups);
 extern void kill_power(UPSINFO *ups);
 extern void save_dumb_status(UPSINFO *ups);
