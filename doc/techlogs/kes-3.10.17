@@ -2,6 +2,8 @@
                         Kern Sibbald
 
 General:
+28Nov04
+- Fix typo in targets.mak that prevents uninstall from working.
 13Nov04
 - Change name of thread_terminate to apc_thread_terminate to avoid
   conflict on AIX.
