@@ -120,7 +120,7 @@ static int open_usb_device(UPSINFO *ups)
     char name[MAXSTRING];
     char devname[MAXSTRING];
     USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
-    const char *hiddev[] = {"/dev/usb/hiddev", "/dev/usb/hid/hiddev", NULL};
+    const char *hiddev[] = {"/dev/usb/hiddev", "/dev/usb/hid/hiddev", "/dev/hiddev", NULL};
     int i, j, k;
 
     /*
