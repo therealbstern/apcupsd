@@ -33,8 +33,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <fcntl.h>
-#include <unistd.h>
 #include <string.h>
 
 #include "cgiconfig.h"
@@ -108,20 +106,26 @@ static gdImagePtr InitImage(void)
 
 void parsearg(const char *var, const char *value) 
 {
-    if (!strcmp(var, "host"))
+    if (strcmp(var, "host") == 0) {
 	  strncpy (monhost, value, sizeof(monhost));
+	  monhost[sizeof(monhost) - 1] = '\0';
 
-    if (!strcmp(var, "display"))
+    } else if (strcmp(var, "display") == 0) {
 	  strncpy (cmd, value, sizeof(cmd));
+	  cmd[sizeof(cmd) - 1] = '\0';
 
-    if (!strcmp(var, "value"))
+    } else if (strcmp(var, "value") == 0) {
 	  strncpy (upsval, value, sizeof(upsval));
+	  upsval[sizeof(upsval) - 1] = '\0';
 
-    if (!strcmp(var, "value2"))
+    } else if (strcmp(var, "value2") == 0) {
 	  strncpy (upsval2, value, sizeof(upsval2));
+	  upsval2[sizeof(upsval2) - 1] = '\0';
 
-    if (!strcmp(var, "value3"))
+    } else if (strcmp(var, "value3") == 0) {
 	  strncpy (upsval3, value, sizeof(upsval3));
+	  upsval3[sizeof(upsval3) - 1] = '\0';
+    }
 }
 
 

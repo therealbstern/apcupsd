@@ -141,6 +141,7 @@ void html_puts(const unsigned char *p)
  */
 void html_finish(void)
 {
+#define VALIDATE_HTML
 #ifdef VALIDATE_HTML
     puts ("<hr /><div><small>");
     puts ("<a href=\"http://jigsaw.w3.org/css-validator/check/referer\">");
