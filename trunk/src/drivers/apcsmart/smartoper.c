@@ -82,7 +82,7 @@ int apcsmart_ups_kill_power(UPSINFO *ups) {
      * interrupt the ouput-power. So LINUX will not come up without
      * operator intervention.  w.p.
      */
-    sleep(10);
+    sleep(5);
     getline(response, sizeof response, ups);
     if (strcmp(response, "OK") == 0) {
 	if (shutdown_delay > 0)
@@ -94,9 +94,10 @@ int apcsmart_ups_kill_power(UPSINFO *ups) {
                     "UPS will power off after the configured delay  ...\n");
 	log_event(ups, LOG_WARNING,
                 _("Please power off your UPS before rebooting your computer ...\n"));
-    } else if (strcmp(response,"NA") == 0) {
+    
+    } else { 
 	/*
-	 * experiments shows that UPS needs
+	 * Experiments show that the UPS needs
 	 * delays between chars to accept
 	 * this command
 	 *
@@ -114,18 +115,20 @@ int apcsmart_ups_kill_power(UPSINFO *ups) {
 	sleep(2);
 	getline(response, sizeof(response), ups);
         if ((strcmp(response, "OK") == 0) || (strcmp(response,"*") == 0)) {
-	    if (shutdown_delay > 0)
+	    if (shutdown_delay > 0) {
 		log_event(ups, LOG_WARNING,
-                        "UPS will power off after %d seconds ...\n",
-			shutdown_delay);
-	    else
+                    "UPS will power off after %d seconds ...\n", shutdown_delay);
+	    } else {
 		log_event(ups, LOG_WARNING,
-                        "UPS will power off after the configured delay  ...\n");
+                    "UPS will power off after the configured delay  ...\n");
+	    }
 	    log_event(ups, LOG_WARNING,
                     _("Please power off your UPS before rebooting your computer ...\n"));
-	} else
+	} else {
 	    errflag++;
-    } else {  /* neither OK nor NA, try alternate way */
+	}
+    }
+    if (errflag) {
         a = '@';
 	write(ups->fd, &a, 1);
 	sleep(1);
@@ -152,17 +155,19 @@ int apcsmart_ups_kill_power(UPSINFO *ups) {
 	getline(response, sizeof response, ups);
         if ((strcmp(response,"*") == 0) || (strcmp(response,"OK") == 0) ||
 		(ups->mode.type >= BKPRO)) {
-	    if (shutdown_delay > 0)
+	    if (shutdown_delay > 0) {
 		log_event(ups, LOG_WARNING,
-                        "UPS will power off after %d seconds ...\n",
-			shutdown_delay);
-	    else
+                    "UPS will power off after %d seconds ...\n", shutdown_delay);
+	    } else {
 		log_event(ups, LOG_WARNING,
                         "UPS will power off after the configured delay  ...\n");
+	    }
 	    log_event(ups, LOG_WARNING,
                     _("Please power off your UPS before rebooting your computer ...\n"));
-	} else
+	    errflag = 0;
+	} else {
 	    errflag++;
+	}
     }
     if (errflag) {
         log_event(ups, LOG_WARNING,_("Unexpected error!\n"));
