@@ -66,6 +66,7 @@ static int powernet_check_comm_lost(UPSINFO *ups) {
     struct snmp_ups_internal_data *Sid = ups->driver_internal_data;
     struct snmp_session *s = &Sid->session;
     powernet_mib_t *data = Sid->MIB;
+    int ret = 1;
 
     /*
      * Check the Ethernet COMMLOST first, then check the
@@ -73,19 +74,23 @@ static int powernet_check_comm_lost(UPSINFO *ups) {
      */
     if (powernet_mib_mgr_get_upsComm(s, &(data->upsComm)) == -1) {
         UPS_SET(UPS_COMMLOST);
-        return 0;
+        ret = 0;
+        goto out;
     } else {
         UPS_CLEAR(UPS_COMMLOST);
     }
     if (data->upsComm) {
         if (data->upsComm->__upsCommStatus == 2) {
             UPS_SET(UPS_COMMLOST);
-            return 0;
+            ret = 0;
+            goto out;
         } else {
             UPS_CLEAR(UPS_COMMLOST);
         }
     }
-    return 1;
+out:
+    free(data->upsComm);
+    return ret;
 }
 
 
@@ -169,6 +174,7 @@ int powernet_snmp_ups_read_static_data(UPSINFO *ups) {
                 sizeof(ups->upsmodel));
         strncpy(ups->upsname, data->upsBasicIdent->upsBasicIdentName,
                 sizeof(ups->upsname));
+        free(data->upsBasicIdent);
     }
 
     powernet_mib_mgr_get_upsAdvIdent(s, &(data->upsAdvIdent));
@@ -179,6 +185,7 @@ int powernet_snmp_ups_read_static_data(UPSINFO *ups) {
                 sizeof(ups->birth));
         strncpy(ups->serial, data->upsAdvIdent->upsAdvIdentSerialNumber,
                 sizeof(ups->serial));
+        free(data->upsAdvIdent);
     }
 
     powernet_mib_mgr_get_upsBasicBattery(s, &(data->upsBasicBattery));
@@ -186,6 +193,7 @@ int powernet_snmp_ups_read_static_data(UPSINFO *ups) {
         strncpy(ups->battdat,
                 data->upsBasicBattery->upsBasicBatteryLastReplaceDate,
                 sizeof(ups->battdat));
+        free(data->upsBasicBattery);
     }
 
     powernet_mib_mgr_get_upsAdvBattery(s, &(data->upsAdvBattery));
@@ -193,6 +201,7 @@ int powernet_snmp_ups_read_static_data(UPSINFO *ups) {
         ups->extbatts = data->upsAdvBattery->__upsAdvBatteryNumOfBattPacks;
         ups->badbatts = data->upsAdvBattery->__upsAdvBatteryNumOfBadBattPacks;
         ups->nombattv = 0.0; /* PowerNet MIB doesn't give this value */
+        free(data->upsAdvBattery);
     }
 
     powernet_mib_mgr_get_upsAdvConfig(s, &(data->upsAdvConfig));
@@ -247,6 +256,7 @@ int powernet_snmp_ups_read_static_data(UPSINFO *ups) {
             data->upsAdvConfig->__upsAdvConfigLowBatteryRunTime/6000;
         ups->dwake = data->upsAdvConfig->__upsAdvConfigReturnDelay/100;
         ups->dshutd = data->upsAdvConfig->__upsAdvConfigShutoffDelay/100;
+        free(data->upsAdvConfig);
     }
 
     powernet_mib_mgr_get_upsAdvTest(s, &(data->upsAdvTest));
@@ -299,6 +309,7 @@ int powernet_snmp_ups_read_static_data(UPSINFO *ups) {
                 break;
         }
     }
+    free(data->upsAdvTest);
     return 1;
 }
 
@@ -324,6 +335,7 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups) {
                 UPS_CLEAR(UPS_BATTLOW);
                 break;
         }
+        free(data->upsBasicBattery);
     }
     
     powernet_mib_mgr_get_upsAdvBattery(s, &(data->upsAdvBattery));
@@ -338,11 +350,13 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups) {
         } else {
             UPS_CLEAR(UPS_REPLACEBATT);
         }
+        free(data->upsAdvBattery);
     }
 
     powernet_mib_mgr_get_upsBasicInput(s, &(data->upsBasicInput));
     if (data->upsBasicInput) {
         ups->InputPhase = data->upsBasicInput->__upsBasicInputPhase;
+        free(data->upsBasicInput);
     }
 
     powernet_mib_mgr_get_upsAdvInput(s, &(data->upsAdvInput));
@@ -386,6 +400,7 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups) {
                 strncpy(ups->G, "Unknown", sizeof(ups->G));
                 break;
         }
+        free(data->upsAdvInput);
     }
 
     powernet_mib_mgr_get_upsBasicOutput(s, &(data->upsBasicOutput));
@@ -422,6 +437,7 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups) {
                 break;
         }
         ups->OutputPhase = data->upsBasicOutput->__upsBasicOutputPhase;
+        free(data->upsBasicOutput);
     }
 
     powernet_mib_mgr_get_upsAdvOutput(s, &(data->upsAdvOutput));
@@ -430,6 +446,7 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups) {
         ups->OutputFreq = data->upsAdvOutput->__upsAdvOutputFrequency;
         ups->UPSLoad = data->upsAdvOutput->__upsAdvOutputLoad;
         ups->OutputCurrent = data->upsAdvOutput->__upsAdvOutputCurrent;
+        free(data->upsAdvOutput);
     }
 
     powernet_mib_mgr_get_upsAdvTest(s, &(data->upsAdvTest));
@@ -468,6 +485,7 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups) {
         } else {
             UPS_CLEAR(UPS_CALIBRATION);
         }
+        free(data->upsAdvTest);
     }
 
     return 1;
@@ -495,6 +513,7 @@ int powernet_snmp_ups_check_state(UPSINFO *ups) {
                 UPS_CLEAR(UPS_BATTLOW);
                 break;
         }
+        free(data->upsBasicBattery);
     }
     
     powernet_mib_mgr_get_upsAdvBattery(s, &(data->upsAdvBattery));
@@ -504,6 +523,7 @@ int powernet_snmp_ups_check_state(UPSINFO *ups) {
         } else {
             UPS_CLEAR(UPS_REPLACEBATT);
         }
+        free(data->upsAdvBattery);
     }
 
     powernet_mib_mgr_get_upsBasicOutput(s, &(data->upsBasicOutput));
@@ -539,6 +559,7 @@ int powernet_snmp_ups_check_state(UPSINFO *ups) {
             default: /* unknown */
                 break;
         }
+        free(data->upsBasicOutput);
     }
 
     powernet_mib_mgr_get_upsAdvTest(s, &(data->upsAdvTest));
@@ -548,6 +569,7 @@ int powernet_snmp_ups_check_state(UPSINFO *ups) {
         } else {
             UPS_CLEAR(UPS_CALIBRATION);
         }
+        free(data->upsAdvTest);
     }
 
     return 1;
