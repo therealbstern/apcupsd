@@ -6,9 +6,7 @@ General:
 - Correct apccontrol script to remove extra ;; that I inadvertantly
   left the last release -- apparently that prevented proper shutdown.
 - Updates to manual as requested by Adam and other users.
-- Update net driver to check return statuses in a number of cases,
-  and to ensure that the device is properly setup if the comm 
-  connection is not immediately made.
 - Fix localtime_r in configure.in as reported with patch by Adam.
 - Fixed bad html in multimoncss.c reported by an anonymous user.
 - Added new Mandrake apcupsd.spec.in submitted by David Walser.
+- Revert to using the old master/slave networking code bu default.
