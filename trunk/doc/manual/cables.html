@@ -232,7 +232,7 @@ Looking at the end of the connector:
    |__|
 
 </pre>
-<p>It appears tht the signals work as follows:
+<p>It appears that the signals work as follows:
 <pre>
     UPS            Signal meaning
  1 (brown)    &lt;-   Shutdown when set by computer for 1-5 seconds.
@@ -331,35 +331,14 @@ APC Part# - 940-0023A
 </pre>
 
 <h2>940-0095A Cable Wiring</h2>
-This diagram is for informational purposes and may
-not be complete, we don't recommend that use it
-to build you build one yourself. This cable is used
+This cable is used         
 with the <b>backupspropnp</b> and the <b>newbackupspro</b>.
-<pre>
-APC Part# - 940-0095A
-
- Signal Computer                  UPS
-         DB9F                     DB9M
-   DTR    4   ----*
-   CTS    8   ----|
-   DSR    6   ----*
-   GND    5   ---------------*----  4  Ground
-                             |
-                             *----  9  Common
-   RI     9   ----*
-                  |
-   RxD    2   ----*---------------  2  On Battery
-   
-                4.7K ohm
-   DCD    1   --[####]-*
-                       |
-   TxD    3   ---------*--[####]--  1  Kill UPS Power
-                        4.7K ohm
-</pre>
-
-Here is an alternative and probably the definitive
+It is the definitive
 wiring diagram for the 940-0095A cable submitted
-by Chris Hanson &lt;cph@zurich.ai.mit.edu&gt;
+by Chris Hanson &lt;cph@zurich.ai.mit.edu&gt;, who
+disassembled the original cable, destroying it in
+the process. He then built one from his diagram and it
+works perfectly.
 <pre>
 Construction and operation of the APC #940-0095A cable.
 This cable is included with the APC Back-UPS Pro PNP series.

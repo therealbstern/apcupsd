@@ -28,7 +28,7 @@
 
 <H1 ALIGN=CENTER>Apcupsd Bugs</H1>
 <h1>Apcupsd Version 3.9.8 Bugs</h1>
-Since the sofware has major modifications, there are probably
+Since the software has major modifications, there are probably
 quite a few bugs, many of which are simply unfinished implementations.
 For example, the EEPROM programming feature is disabled in this
 version while we are deciding how to do it the <b>right</b> way.
@@ -100,7 +100,7 @@ from <b>./configure</b>
 <h1>Apcupsd Version 3.8.4 Bugs</h1>
 Version 3.8.4 is a bug fix version to 3.8.3 that corrects
 improper placement of the subsystem lock file that crept in
-between 3.8.2 and 3.8.3.  It also corrects an oversite in
+between 3.8.2 and 3.8.3.  It also corrects an oversight in
 the multimoncss.c code that didn't include the temperature
 and humidity columns in the <b>Normal</b> class.
    
@@ -134,7 +134,7 @@ startup script.
 <p></p>If this occurs and your <b>apcupsd</b> is a master, the problem 
 can be because you master/slave networking port is used by another program
 on the slave machine. The master/slave networking code has been modified
-to timout in 10 seconds in this case.
+to timeout in 10 seconds in this case.
 
 <h1>Apcupsd Version 3.8.2 Bugs</h1>
 All version 3.8.0 and 3.8.1 bugs have been corrected in version 3.8.2.
@@ -268,7 +268,7 @@ apcupsd-3.8.1 is:
 <h2>Version 3.8.1 May Cause Networking Problems on Win95</h2>
 We have a report by a user that installing version 3.8.1 on a
 Windows 95 machine caused the loss of all networking capabilities
-on that machine. Reinstallation of version 3.8.0 restored the
+on that machine. Re-installation of version 3.8.0 restored the
 networking capabilities. It should be noted that the major difference
 between the two versions was addition of support on Win32 for simple
 signaling UPSes (no change for Smart UPSes or networking) and upgrading from
@@ -349,7 +349,7 @@ version of <b>apcupsd</b>. An alternate method is to place your own script in th
 /etc/apcupsd directory with the name of the event that you wish to control. For example,
 you may want to shutdown an Oracle database prior to issuing the system shutdown
 command. If the script you create is a shell script, everything is OK. However, if
-you use a perl script the script may not run. To correct this problem, change the
+you use a Perl script the script may not run. To correct this problem, change the
 following line in apccontrol:
 <pre>
       ${SCRIPTSHELL} ${SCRIPTDIR}/${1}
