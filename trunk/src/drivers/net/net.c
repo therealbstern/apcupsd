@@ -260,6 +260,7 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
     char answer[200];
     int stat = 1;
     int32_t newStatus;		      /* this really should be uint32_t! */
+    int32_t masterStatus;	      /* status from master */
 
     write_lock(ups);
 
@@ -272,19 +273,20 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
         log_event(ups, LOG_ERR, "getupsvar: failed for ""status"".");
         Dmsg0(100, "HEY!!! Couldn't get status flag.\n");
 	stat = 0;
+	masterStatus = 0;
     } else {
 	/*
          * Make sure we don't override local bits, and that
 	 * all non-local bits are set/cleared correctly.
 	 */
-	newStatus = strtol(answer, NULL, 0);
-	newStatus &= ~UPS_LOCAL_BITS;	  /* clear local bits */
+	masterStatus = strtol(answer, NULL, 0);
+	newStatus = masterStatus & ~UPS_LOCAL_BITS;   /* clear local bits */
 	ups->Status &= UPS_LOCAL_BITS;	  /* clear non-local bits */
 	ups->Status |= newStatus;	  /* set new non-local bits */
     }
     Dmsg2(100, "Got Status = %s 0x%x\n", answer, ups->Status);
 
-    if (is_ups_set(UPS_SHUTDOWN)) {
+    if (masterStatus & (UPS_SHUTDOWN|UPS_SHUTDOWNIMM|UPS_BELOWCAPLIMIT|UPS_REMTIMELIMIT)) {
 	set_ups(UPS_SHUT_REMOTE);  /* if master is shutting down so do we */
     }
 
