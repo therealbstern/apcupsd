@@ -1,0 +1,53 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<html>
+<head>
+   <title>Master/Slave Configuration</title>
+   <meta name="Author" content="Kern Sibbald">
+   <link rel=stylesheet href="apcupsd-styles.css" type="text/css">
+</head>
+<body>
+<H1>Master/Slave Configuration</H1>
+<h2>General</h2>
+If you have two or more computers that are powered by the same
+UPS and they are connected by a network, you can configure 
+<b>apcupsd</b> so that the computer that controls the UPS
+(connected by the serial port or USB port), which is called
+the master, can provide information to other machines powered
+by the UPS, called slaves. When the master detects a power 
+failure, it will notify all the slaves (maximum of twenty).
+If the master detects that the battery is low, it will also
+notify the slave so that the slave may perform a shutdown.
+<p>In addition, in cases where you wish to keep the master
+up longer than the slave, you can configure the slave to
+shutdown in a predetermined time after the UPS goes on
+batteries.
+<p>
+If a picture is worth a thousand words for you, please see
+the <a href="configure.html#ConfigTypes">Three Major Configuration
+Possibilities for Apcupsd</a> section of the Configuration chapter
+of this manual.
+<h2>Configuration Directives</h2>
+The minimum set of configuration directive changes needed to
+create a proper master and slave configuration files is
+described in the <a href="config-examples.html">Configuration
+Examples</a> section of this manual.
+<p>
+The details of these directives is explained in
+the <a href="configure.html#UPS_Sharing">UPS Sharing</a> section
+of the Configuration chapter of this document.
+<p>
+In addition, sample master and slave configuration files can
+be found in the &lt;src&gt;/examples directory (<b>apcupsd.master.conf</b>
+and <b>apcupsd.slave.conf</b>).
+<h2>Master/Slave Problems</h2>
+If you are having problems getting a master/slave configuration
+to work, or you are getting error messages, please see the
+<a href="troubles.html">Trouble Shooting Apcupsd</a> Chapter
+of this manual for more details.
+<h2>Master/Slave Shutdown</h2>
+For additional details of shutting down a master/slave configuration,
+please see the <a href="shutdown.html#MasterSlaveShutdown">Master/Slave
+Shutdown</a> section of the Shutdown chapter of this manual.
+       
+</body>
+</html>
