@@ -221,7 +221,18 @@ int snmp_ups_program_eeprom(UPSINFO *ups)
 }
 
 int snmp_ups_kill_power(UPSINFO *ups) {
-    return 0;
+    struct snmp_ups_internal_data *Sid = ups->driver_internal_data;
+    int ret = 0;
+
+    if (!strcmp(Sid->DeviceVendor, "APC")) {
+        ret = powernet_snmp_kill_ups_power(ups);
+    }
+
+    if (!strcmp(Sid->DeviceVendor, "RFC")) {
+        ret = rfc1628_snmp_kill_ups_power(ups);
+    }
+
+    return ret;
 }
 
 int snmp_ups_check_state(UPSINFO *ups) {
