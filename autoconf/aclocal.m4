@@ -366,17 +366,6 @@ strdup __argz_count __argz_stringify __argz_next])
    AC_SUBST(GT_NO)
    AC_SUBST(GT_YES)
 
-   dnl If the AC_CONFIG_AUX_DIR macro for autoconf is used we will probably
-   dnl find the mkinstalldirs script in another subdir than ($top_srcdir).
-   dnl Try to locate it.
-   MKINSTALLDIRS=
-   if test -n "$ac_aux_dir"; then
-     MKINSTALLDIRS="$ac_aux_dir/mkinstalldirs"
-   fi
-   if test x$MKINSTALLDIRS = x ; then
-     MKINSTALLDIRS="\$(top_srcdir)/autoconf/mkinstalldirs"
-   fi
-   AC_SUBST(MKINSTALLDIRS)
 
    dnl *** For now the libtool support in src/intl/Makefile is not for real.
    l=
