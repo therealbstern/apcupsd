@@ -87,44 +87,52 @@ void parsearg(const char *var, const char *value)
     }
 }
 
-void send_values(int report, int defrpt)
+void send_image(int report, int defrpt)
 {
     char   answer[256], answer2[256], answer3[256];
 
     if (report < 1 || report > 6)
 	   report = defrpt;
 
+    fputs ("<img src=\"upsimage.cgi?display=", stdout);
     switch ( report ) {
     case 1:
         getupsvar (monhost, "battcap", answer, sizeof(answer));  
         getupsvar (monhost, "mbattchg", answer2, sizeof(answer2));
-        printf ("battcap&amp;value=%s&amp;value2=%s\" width=\"150\" height=\"350\" alt=\"Battery Capacity\"",answer, answer2);
+        printf ("battcap&amp;value=%s&amp;value2=%s\" alt=\"Battery Capacity %s%%\"",
+	    answer, answer2, answer);
 	break;
     case 2: 
         getupsvar (monhost, "battvolt", answer, sizeof(answer));  
         getupsvar (monhost, "nombattv", answer2, sizeof(answer2));
-        printf ("battvolt&amp;value=%s&amp;value2=%s\" width=\"150\" height=\"350\" alt=\"Battery Voltage\"",answer, answer2);
+        printf ("battvolt&amp;value=%s&amp;value2=%s\" alt=\"Battery Voltage %s VDC\"",
+	    answer, answer2, answer);
 	break;
     case 3: 
         getupsvar (monhost, "utility", answer, sizeof(answer));  
         getupsvar (monhost, "lowxfer", answer2, sizeof(answer2));
         getupsvar (monhost, "highxfer", answer3, sizeof(answer3));
-        printf ("utility&amp;value=%s&amp;value2=%s&amp;value3=%s\" width=\"150\" height=\"350\" alt=\"Utility Voltage\"",answer,answer2,answer3);
+        printf ("utility&amp;value=%s&amp;value2=%s&amp;value3=%s\" alt=\"Utility Voltage %s VAC\"",
+            answer, answer2, answer3, answer);
 	break;
     case 4: 
         getupsvar (monhost, "outputv", answer, sizeof(answer));  
-        printf ("outputv&amp;value=%s\" width=\"150\" height=\"350\" alt=\"Output Voltage\"",answer);
+        printf ("outputv&amp;value=%s\" alt=\"Output Voltage %s VAC\"",
+	    answer, answer);
 	break;
     case 5: 
         getupsvar (monhost, "upsload", answer, sizeof(answer));  
-        printf ("upsload&amp;value=%s\" width=\"150\" height=\"350\" alt=\"UPS Load\"",answer);
+        printf ("upsload&amp;value=%s\" alt=\"UPS Load %s%%\"",
+	    answer, answer);
 	break;
     case 6:
         getupsvar (monhost, "runtime", answer, sizeof(answer));  
         getupsvar (monhost, "mintimel", answer2, sizeof(answer2));
-        printf ("runtime&amp;value=%s&amp;value2=%s\" width=\"150\" height=\"350\" alt=\"Run time remaining\"",answer, answer2);
+        printf ("runtime&amp;value=%s&amp;value2=%s\" alt=\"Run time remaining %s minutes\"",
+            answer, answer2, answer);
 	break;
     }
+    puts (" width=\"150\" height=\"350\" />");
 }
 
 static void image_menu(int select)
@@ -298,19 +306,16 @@ int main(int argc, char **argv)
      puts ("</pre></td>");
 
      puts ("<td rowspan=\"3\">");
-     fputs ("<img src=\"upsimage.cgi?display=", stdout);
-     send_values(img1, 1);
-     puts (" /></td>");
+     send_image(img1, 1);
+     puts ("</td>");
 
      puts ("<td rowspan=\"3\">");
-     fputs ("<img src=\"upsimage.cgi?display=", stdout);
-     send_values(img2, 6);
-     puts (" /></td>");
+     send_image(img2, 6);
+     puts ("</td>");
 
      puts ("<td rowspan=\"3\">");
-     fputs ("<img src=\"upsimage.cgi?display=", stdout);
-     send_values(img3, 5);
-     puts (" /></td>");
+     send_image(img3, 5);
+     puts ("</td>");
      puts ("</tr>");
 
      puts ("<tr><td><pre>");
