@@ -46,7 +46,7 @@ net_stamp: net/libnet.a
 	touch net_stamp
 
 usb_stamp: usb/libusb.a
-	ar cru libdrivers.a usb/*.o usb/@USB_TYPE@/*.o
+	ar cru libdrivers.a usb/*.o usb/@USB_TYPE@/*.o @LIBUSBHIDOBJS@
 	@RANLIB@ $(driverslib)
 	touch usb_stamp
 
