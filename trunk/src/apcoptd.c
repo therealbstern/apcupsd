@@ -60,7 +60,7 @@
 
 #include "apc.h"
 
-static char *shortoptions = "b?RtVcf:ud:npP:k";
+static char * const shortoptions = "b?RtVcf:ud:npP:k";
 
 enum {
     OPT_NOARG,
@@ -77,7 +77,7 @@ enum {
     OPT_PIDFILE,
 };
 
-static struct option longoptions[] = {
+static const struct option longoptions[] = {
     { "help",                       no_argument,            NULL,   OPT_HELP          },
     { "version",                    no_argument,            NULL,   OPT_VERSION       },
     { "config-file",                required_argument,      NULL,   OPT_CFGFILE       },
@@ -106,8 +106,6 @@ int kill_ups_power = FALSE;
 int dumb_mode_test = FALSE;		/* for testing dumb mode */
 int go_background = TRUE;
 char *pidfile = APCPID;
-
-extern int debug_level;
 
 static void print_usage(char *argv[]) {
     /*
