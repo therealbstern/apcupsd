@@ -52,26 +52,26 @@ struct termios oldtio;
 struct termios newtio;
 
 /* Forward referenced functions */
-static void do_dumb_testing();
-static void test1();
-static void test2();
-static void test3();
-static void test4();
-static void test5();
-static void test6();
-static void guess();
+static void do_dumb_testing(void);
+static void test1(void);
+static void test2(void);
+static void test3(void);
+static void test4(void);
+static void test5(void);
+static void test6(void);
+static void guess(void);
 
-static void do_smart_testing();
-static void smart_test1();
-static void smart_calibration();
+static void do_smart_testing(void);
+static void smart_test1(void);
+static void smart_calibration(void);
 static void monitor_calibration_progress(int monitor);
 static void terminate_calibration(int ask);
 
-static void do_usb_testing();
-static void usb_kill_power_test();
-static void program_smart_eeprom();
+static void do_usb_testing(void);
+static void usb_kill_power_test(void);
+static void program_smart_eeprom(void);
 static void print_eeprom_values(UPSINFO *ups);
-static void smart_ttymode();
+static void smart_ttymode(void);
 
 static void strip_trailing_junk(char *cmd);
 static char *get_cmd(char *prompt);
@@ -126,7 +126,7 @@ static int write_file(char *buf)
 /*
  * Print out current time 
  */
-static void ptime()
+static void ptime(void)
 {
    char dt[MAXSTRING];
    time_t now = time(NULL);
@@ -588,7 +588,7 @@ print_bits(int bits)
 }
 
 static void
-do_dumb_testing()
+do_dumb_testing(void)
 {
    int quit = FALSE;
    char *cmd;
@@ -681,7 +681,7 @@ static int test_bits(int inbits)
    return bits;
 }
 
-static void test1()
+static void test1(void)
 {
    pmsg("\nFor the first test, everything should be normal.\n\
 The UPS should be plugged in to the power, and the serial cable\n\
@@ -697,7 +697,7 @@ Please enter any character when ready to continue: ");
    test1_done = TRUE;
 }
 
-static void test2()
+static void test2(void)
 {
    pmsg("\nFor the second test, the UPS should be plugged in to the power, \n\
 but the serial port should be DISCONNECTED from the computer.\n\n\
@@ -712,7 +712,7 @@ Please enter any character when ready to continue: ");
    test2_done = TRUE;
 }
 
-static void test3()
+static void test3(void)
 {
    pmsg("\nFor the third test, the serial cable should be plugged\n\
 back into the UPS, but the AC power plug to the UPS should be DISCONNECTED.\n\n\
@@ -727,7 +727,7 @@ Please enter any character when ready to continue: ");
    test3_done = TRUE;
 }
 
-static void test4()
+static void test4(void)
 {
    int i, bits;
 
@@ -777,7 +777,7 @@ Please enter any character when ready to continue: ");
    test4_done = TRUE;
 }
 
-static void test5()
+static void test5(void)
 {
    int i, bits, last_bits = 0;
 
@@ -819,7 +819,7 @@ Please enter any character when ready to continue: ");
    test5_done = TRUE;
 }
 
-static void test6()
+static void test6(void)
 {
    int bits;
 
@@ -855,7 +855,7 @@ Please enter any character when ready to continue: ");
  *  If I had more data on each of the cable types, this could
  *  be much improved.
  */
-static void guess()
+static void guess(void)
 {
    int found = 0;
 
@@ -888,7 +888,7 @@ static void guess()
    }
 }
 
-static void do_smart_testing()
+static void do_smart_testing(void)
 {
    char *cmd;
    int quit = FALSE;
@@ -944,7 +944,7 @@ Please select the function you want to perform.\n");
    pmsg("End apctest.\n");
 }
 
-static void smart_ttymode()
+static void smart_ttymode(void)
 {
    char ch;
    struct termios t, old_term_params;
@@ -1003,7 +1003,7 @@ static void smart_ttymode()
 /*
  * Do runtime battery calibration
  */
-static void smart_calibration()
+static void smart_calibration(void)
 {
    char *ans, cmd;
    char answer[2000];
@@ -1209,7 +1209,7 @@ To stop the calibration, enter a return.\n");
    }
 }
 
-static void program_smart_eeprom() 
+static void program_smart_eeprom(void) 
 {
    char *cmd;
    int quit = FALSE;
@@ -1327,7 +1327,7 @@ Please select the function you want to perform.\n");
 
 
 
-static void smart_test1()
+static void smart_test1(void)
 {
    char *ans, *p, *o, cmd;
    char answer[2000];
@@ -1507,7 +1507,7 @@ NA  indicates that the feature is Not Available\n\n");
    return;
 }
 
-static void do_usb_testing()
+static void do_usb_testing(void)
 {
    char *cmd;
    int quit = FALSE;
@@ -1544,7 +1544,7 @@ Please select the function you want to perform.\n");
 }
 
 
-static void usb_kill_power_test()
+static void usb_kill_power_test(void)
 {
    pmsg("\nThis test will attempt to power down the UPS.\n\
 The USB cable should be plugged in to the UPS, but the\n\

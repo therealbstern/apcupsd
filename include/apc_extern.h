@@ -281,7 +281,7 @@ extern void sleep_forever(void);
 /*
  * In apcipc.c
  */
-extern UPSINFO *new_ups();
+extern UPSINFO *new_ups(void);
 extern UPSINFO *attach_ups(UPSINFO *ups, int shmperm);
 extern int detach_ups(UPSINFO *ups);
 extern int destroy_ups(UPSINFO *ups);
