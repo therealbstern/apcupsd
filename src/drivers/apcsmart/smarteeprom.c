@@ -6,62 +6,52 @@
 #include "apc.h"
 #include "apcsmart.h"
 
+static void change_ups_battery_date(UPSINFO *ups);
+static void change_ups_name(UPSINFO *ups);
+static void change_extended(UPSINFO *ups);
+
+
 /*********************************************************************/
 /*  apcsmart_ups_program_eeprom()					      */
 /*********************************************************************/
 
 int apcsmart_ups_program_eeprom(UPSINFO *ups)
 {
-    /*
-     * For now disable it as I think this needs more thinkering.
-     */
-#ifdef HAVE_GCC
-# warning "EEPROM programming is disabled in SMART UPSes for design issues."
-#endif
-
-#if 0
-    printf(_("EEPROM programming temporarly disabled for design issues.\n"));
-#endif
-
-    return 0;
-
-#if 0
     if (update_battery_date) {
         printf(_("Attempting to update UPS battery date ...\n"));
-	setup_serial(ups);
-	get_apc_capabilities(ups);
-	if (ups->UPS_Cap[CI_BATTDAT])
-	    setup_ups_replace(ups);
-	exit(0);
+	setup_device(ups);
+	apcsmart_ups_get_capabilities(ups);
+	if (ups->UPS_Cap[CI_BATTDAT]) {
+	    change_ups_battery_date(ups);
+	}
+	device_close(ups);
     }
 
     if (configure_ups) {
         printf(_("Attempting to configure UPS ...\n"));
-	setup_serial(ups);
-	setup_extended(ups);	     /* set new values in UPS */
+	setup_device(ups);
+	change_extended(ups);	      /* set new values in UPS */
         printf("\nReading updated UPS configuration ...\n\n");
-	read_apc_volatile_data(ups);
-	read_apc_static_data(ups);
+	device_read_volatile_data(ups);
+	device_read_static_data(ups);
 	/* Print report of status */
 	output_status(ups, 0, stat_open, stat_print, stat_close);
-	exit(0);
     }
 
     if (rename_ups) {
         printf(_("Attempting to rename UPS ...\n"));
-	setup_serial(ups);
-	get_apc_capabilities(ups);
-	if (ups->UPS_Cap[CI_IDEN])
-	    setup_ups_name(ups);
-	exit(0);
+	setup_device(ups);
+	apcsmart_ups_get_capabilities(ups);
+	if (ups->UPS_Cap[CI_IDEN]) {
+	    change_ups_name(ups);
+	}
     }
 
     return 1;
-#endif
 }
 
 /*********************************************************************/
-void setup_ups_name(UPSINFO *ups)
+static void change_ups_name(UPSINFO *ups)
 {
     char *n;
     char response[32];
@@ -116,7 +106,7 @@ void setup_ups_name(UPSINFO *ups)
 /********************************************************************* 
  * update date battery replaced
  */
-void setup_ups_replace(UPSINFO *ups)
+static void change_ups_battery_date(UPSINFO *ups)
 {
     char *n;
     char response[32];
@@ -125,6 +115,7 @@ void setup_ups_replace(UPSINFO *ups)
     char c = ups->UPS_Cmd[CI_BATTDAT];
     int i;
     int j = strlen(ups->battdat);
+
     battdat[0] = '\0';
 
     if (j != 8) {
@@ -258,10 +249,10 @@ int setup_ups_item(UPSINFO *ups, char *title, char cmd, char *setting)
 
 /********************************************************************* 
  *
- * Set new values in UPS memory.  Change the UPS !!!!!!!!
+ * Set new values in EEPROM memmory.  Change the UPS EEPROM !!!!!!!!
  *
  */
-void setup_extended(UPSINFO *ups)
+static void change_extended(UPSINFO *ups)
 {
     char setting[20];
 

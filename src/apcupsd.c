@@ -316,7 +316,7 @@ int main(int argc, char *argv[]) {
     ups->start_time = time(NULL);
     delete_lockfile(ups);
 
-    device_program_eeprom(ups);  /* if requested do eeprom changes */
+/*  device_program_eeprom(ups);     if requested do eeprom changes */
 
     /* Create temp events file */
     if (ups->eventfile[0] != 0) {
