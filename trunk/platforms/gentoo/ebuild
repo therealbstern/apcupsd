@@ -1,6 +1,6 @@
 # Copyright 1999-2002 Gentoo Technologies, Inc.
 # Distributed under the terms of the GNU General Public License, v2 or later
-# $Header: /home/adk0212/src/cvs2svn/cvsrepo/apcupsd/platforms/gentoo/ebuild,v 1.2 2002-09-23 21:34:53 rfacchetti Exp $
+# $Header: /home/adk0212/src/cvs2svn/cvsrepo/apcupsd/platforms/gentoo/ebuild,v 1.3 2004-04-01 20:32:22 wrking Exp $
 
 S=${WORKDIR}/${P}
 DESCRIPTION="APC UPS daemon with integrated tcp/ip remote shutdown (*ALPHA*)"
@@ -53,7 +53,6 @@ src_compile() {
 		--enable-net \
 		--enable-powerflute \
 		--enable-pthreads \
-		--with-css-dir=/home/httpd/apcupsd \
 		--with-cgi-bin=/home/httpd/apcupsd \
 		--enable-cgi \
 		|| die   

@@ -858,17 +858,6 @@ AC_ARG_ENABLE(master-slave, [
    fi],
    [])
 
-dnl
-dnl Pickup any css_dir specification
-dnl
-CSS_DIR=
-AC_ARG_WITH(css-dir,
-	[  --with-css-dir=DIR	   Specify Style Sheet directory (default=)],
-	[
-	   CSS_DIR="$withval";
-	]
-)
-
 CGIBIN="/etc/apcupsd"
 AC_ARG_WITH(cgi-bin,
 	[  --with-cgi-bin=DIR	   Specify cgi-bin directory (default=/etc/apcupsd/cgi)],
@@ -932,7 +921,6 @@ AC_SUBST(LIBGD)
 AC_SUBST(LIBGDOBJ)
 AC_SUBST(CGI_IMGFMT)
 AC_SUBST(CGIBIN)
-AC_SUBST(CSS_DIR)
 AC_DEFINE_UNQUOTED(SYSCONFDIR, "$sysconfdir")
 
 
@@ -1729,7 +1717,6 @@ Configuration on `date`:
   with-nisip:		      ${NISIP}
   enable-cgi:		      ${ENABLE_CGI}
   with-cgi-bin: 	      ${CGIBIN}
-  with-css-dir: 	      ${CSS_DIR}
   with-libwrap: 	      ${with_libwrap}
   enable-nls:		      ${USE_NLS}
   enable-libintl:	      ${USE_INCLUDED_LIBINTL}
