@@ -97,7 +97,7 @@ static const struct {
   {'k', "BEEPSTATE",     "Alarm delay", 'c', (int *)eeprom_ups.beepstate},
   {'r', "WAKEUP",        "Wakeup delay", 'i', &eeprom_ups.dwake},
   {'E', "SELFTEST",      "Self test interval", 'c', (int *)eeprom_ups.selftest},
-  {0, NULL, NULL}	/* Last entry */
+  {0, NULL, NULL, 'x', NULL}       /* Last entry */
 };
 
 void print_valid_eprom_values(UPSINFO *ups)
