@@ -6,7 +6,7 @@
 # Default variables
 @VARIABLES@
 # TOP source directory.
-topdir = @top_srcdir@
+topdir = @topdir@
 top_builddir = $(topdir)
 
 # Makefile for program source directory in GNU NLS utilities package.
@@ -48,7 +48,7 @@ all-yes: cat-id-tbl.c $(CATALOGS)
 all-no:
 
 $(srcdir)/$(PACKAGE).pot:
-	$(XGETTEXT) --default-domain=$(PACKAGE) --directory=$(top_srcdir) \
+	$(XGETTEXT) --default-domain=$(PACKAGE) --directory=$(topdir) \
 	  --add-comments --keyword=_ --keyword=N_ \
 	  --files-from=$(srcdir)/POTFILES.in \
 	&& test ! -f $(PACKAGE).po \
@@ -79,7 +79,7 @@ install-data-yes: all
 	@if test -r "$(MKINSTALLDIRS)"; then \
 	  $(MKINSTALLDIRS) $(DESTDIR)$(datadir); \
 	else \
-	  $(SHELL) $(top_srcdir)/mkinstalldirs $(DESTDIR)$(datadir); \
+	  $(SHELL) $(topdir)/mkinstalldirs $(DESTDIR)$(datadir); \
 	fi
 	@catalogs='$(CATALOGS)'; \
 	for cat in $$catalogs; do \
@@ -93,7 +93,7 @@ install-data-yes: all
 	  if test -r "$(MKINSTALLDIRS)"; then \
 	    $(MKINSTALLDIRS) $$dir; \
 	  else \
-	    $(SHELL) $(top_srcdir)/mkinstalldirs $$dir; \
+	    $(SHELL) $(topdir)/mkinstalldirs $$dir; \
 	  fi; \
 	  if test -r $$cat; then \
 	    $(INSTALL_DATA) $$cat $$dir/$(PACKAGE)$(INSTOBJEXT); \
@@ -121,7 +121,7 @@ install-data-yes: all
 	  if test -r "$(MKINSTALLDIRS)"; then \
 	    $(MKINSTALLDIRS) $(DESTDIR)$(gettextsrcdir); \
 	  else \
-	    $(SHELL) $(top_srcdir)/mkinstalldirs $(DESTDIR)$(gettextsrcdir); \
+	    $(SHELL) $(topdir)/mkinstalldirs $(DESTDIR)$(gettextsrcdir); \
 	  fi; \
 	  $(INSTALL_DATA) Makefile.in \
 			  $(DESTDIR)$(gettextsrcdir)/Makefile.in; \
@@ -186,7 +186,7 @@ update-po:
 
 POTFILES: POTFILES.in
 	( if test 'x$(srcdir)' != 'x.'; then \
-	    posrcprefix='$(top_srcdir)/'; \
+	    posrcprefix='$(topdir)/'; \
 	  else \
 	    posrcprefix="../"; \
 	  fi; \

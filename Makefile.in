@@ -6,7 +6,7 @@
 # Default variables
 @VARIABLES@
 # TOP source directory.
-topdir = @top_srcdir@
+topdir = @topdir@
 top_builddir = $(topdir)
 
 #
@@ -27,8 +27,8 @@ install-directories: install-dir@CGI@
 	$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(sbindir)	
 	$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(mandir)  
 	@if [ ! -d $(DESTDIR)$(sysconfdir) ] ; then \
-		$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(sysconfdir); \
-		chmod 755 $(DESTDIR)$(sysconfdir); \
+	      $(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(sysconfdir); \
+	      chmod 755 $(DESTDIR)$(sysconfdir); \
 	fi
 
 install-dir: dummy

@@ -7,7 +7,7 @@
 # Default variables
 @VARIABLES@
 # TOP source directory.
-topdir = @top_srcdir@
+topdir = @topdir@
 top_builddir = $(topdir)
 
 # Include the default make targets: to be put before the all-targets: rule.
@@ -28,8 +28,13 @@ install:
 	fi; \
 	$(INSTALL_DATA) $$srcconf $(DESTDIR)$(sysconfdir)/$$dstconf; \
 	for src in changeme commfailure commok masterconnect \
-			mastertimeout mainsback onbattery; do \
-		$(INSTALL_PROGRAM) $$src $(DESTDIR)$(sysconfdir)/$$src; \
+		mastertimeout mainsback onbattery; do \
+	   if test -f $(DESTDIR)$(sysconfdir)/$$src; then \
+	       echo " Found old $$src moving it to $$src.orig"; \
+	       $(RMF) $(DESTDIR)$(sysconfdir)/$$src.orig; \
+	       mv $(DESTDIR)$(sysconfdir)/$$src $(DESTDIR)$(sysconfdir)/$$src.orig; \
+	   fi; \
+	   $(INSTALL_PROGRAM) $$src $(DESTDIR)$(sysconfdir)/$$src; \
 	done
 
 uninstall:

@@ -17,13 +17,13 @@ all: all-subdirs all-targets
 
 all-subdirs:
 	@if test ! x"$(subdirs)" = x; then \
-		for file in . ${subdirs}; \
-		do \
-			(cd $$file && if test "$$file" != "."; then $(MAKE) DESTDIR=$(DESTDIR) all; fi); \
-			if test "$$?" != "0"; then \
-				break; \
-			fi; \
-		done; \
+	    for file in . ${subdirs}; \
+	    do \
+		(cd $$file && if test "$$file" != "."; then $(MAKE) DESTDIR=$(DESTDIR) all; fi); \
+		  if test "$$?" != "0"; then \
+		     break; \
+		  fi; \
+	    done; \
 	fi
 
 # Standard compilation targets
@@ -127,11 +127,11 @@ configure:  $(topdir)/autoconf/configure.in $(topdir)/autoconf/aclocal.m4 \
 	chmod 755 configure
 
 $(topdir)/autoconf/config.h.in: $(topdir)/autoconf/configure.in \
-								$(topdir)/autoconf/acconfig.h
-	cd $(srcdir);
-	autoheader --prepend-include=$(srcdir)/autoconf \
-	autoconf/configure.in > autoconf/config.h.in
-	chmod 644 autoconf/config.h.in
+		$(topdir)/autoconf/acconfig.h
+#	cd $(srcdir);
+#	autoheader --prepend-include=$(srcdir)/autoconf \
+#	autoconf/configure.in > autoconf/config.h.in
+#	chmod 644 autoconf/config.h.in
 
 $(topdir)/config.status:
 	@if test -x $(topdir)/config.status; then \

@@ -6,13 +6,14 @@
 # Default variables
 @VARIABLES@
 # TOP source directory.
-topdir = @top_srcdir@
+topdir = @topdir@
 top_builddir = $(topdir)
+
+subdirs = etc @DISTNAME@
+
 
 # Include the default make targets: to be put before the all-targets: rule.
 @TARGETS@
- 
-subdirs = etc @DISTNAME@
 
 all-targets: Makefile
 
