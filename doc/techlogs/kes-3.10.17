@@ -2,6 +2,10 @@
                         Kern Sibbald
 
 General:
+17Mar05
+- Move docbook directory to old_documents
+- Modify Win32 Makefile to pull apcupsd.html from texi directory.
+  It was still using the old docbook directory.
 03Mar05
 - Commit kernstodo
 24Feb05
