@@ -312,6 +312,8 @@ static int send_to_slave(UPSINFO *ups, int who)
 	    break;
 	}
 	read(slaves[who].socket, &read_data, sizeof(read_data));
+	read_data.apcmagic[APC_MAGIC_SIZE-1] = 0;
+	read_data.usermagic[APC_MAGIC_SIZE-1] = 0;
 	if (strcmp(APC_MAGIC, read_data.apcmagic) == 0) { 
 	    /*
 	     * new non-disconnecting slaves send 1000 back in the
@@ -454,7 +456,7 @@ static int get_data_from_master(UPSINFO *ups)
 	struct timeval tv;
 
 	if (newsocketfd == -1) {
-	UPS_SET(UPS_COMMLOST);
+	    UPS_SET(UPS_COMMLOST);
 	    masterlen = sizeof(master_adr);
 	    FD_ZERO(&rfds);
 	    FD_SET(socketfd, &rfds);
@@ -524,20 +526,24 @@ static int get_data_from_master(UPSINFO *ups)
 	    shutdown(newsocketfd, SHUT_RDWR);
 	    close(newsocketfd);
 	    newsocketfd = -1;
-	UPS_SET(UPS_COMMLOST);
+	    UPS_SET(UPS_COMMLOST);
 	    return 6;		      /* master not responding */
 	default:
 	    break;
 	}
 	if ((read(newsocketfd, &get_data, sizeof(get_data))) != sizeof(get_data)) {
+	    get_data.apcmagic[APC_MAGIC_SIZE-1] = 0;
+	    get_data.usermagic[APC_MAGIC_SIZE-1] = 0;
 	    slaves[0].remote_state = RMT_ERROR;
 	    slaves[0].ms_errno = errno;
 	    shutdown(newsocketfd, SHUT_RDWR);
 	    close(newsocketfd);
 	    newsocketfd = -1;
-	UPS_SET(UPS_COMMLOST);
+	    UPS_SET(UPS_COMMLOST);
 	    return 3;		      /* read error */
 	}
+	get_data.apcmagic[APC_MAGIC_SIZE-1] = 0;
+	get_data.usermagic[APC_MAGIC_SIZE-1] = 0;
 	break;
     }
 
@@ -548,7 +554,7 @@ static int get_data_from_master(UPSINFO *ups)
 	shutdown(newsocketfd, SHUT_RDWR);
 	close(newsocketfd);
 	newsocketfd = -1;
-    UPS_SET(UPS_COMMLOST);
+	UPS_SET(UPS_COMMLOST);
 	return 4;
     }
 	  
@@ -620,8 +626,9 @@ static int get_data_from_master(UPSINFO *ups)
 	return 5;
     }
 
-    if (ShutDown)		    /* if master has shutdown */
+    if (ShutDown) {		    /* if master has shutdown */
 	UPS_SET(UPS_SHUT_REMOTE); /* we go down too */
+    }
 	 
 #ifdef old_disconnecting_code
     close(newsocketfd);
@@ -776,9 +783,9 @@ void do_slaves(UPSINFO *ups)
 	    if (slave_stat != slave_disconnected) {
 		write_lock(ups);
 		if (slave_disconnected) {
-	    UPS_SET(UPS_SLAVEDOWN);
+		   UPS_SET(UPS_SLAVEDOWN);
 		} else {
-	    UPS_CLEAR(UPS_SLAVEDOWN);
+		   UPS_CLEAR(UPS_SLAVEDOWN);
 		}
 		write_unlock(ups);
 	    }

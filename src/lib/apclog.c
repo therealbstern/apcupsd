@@ -64,6 +64,7 @@ void log_event(UPSINFO *ups, int level, char *fmt, ...)
     char msg[2*MAXSTRING];
     char datetime[MAXSTRING];
     int event_fd = ups->event_fd;
+    char *p;
 
 #if AVERSION==4 
     /*
@@ -83,6 +84,14 @@ void log_event(UPSINFO *ups, int level, char *fmt, ...)
     va_start(arg_ptr, fmt);
     avsnprintf(msg, sizeof(msg), fmt, arg_ptr);
     va_end(arg_ptr);
+     
+    /*
+     * Sanitize message to be sent to syslog to 
+     * eliminate all %s which can be used as exploits.
+     */
+    for (p=msg; p=strchr(p, '%'); ) {
+       *p = '\\';
+    }
 
     syslog(level, msg); 	  /* log the event */
 
