@@ -17,23 +17,29 @@ things:
      IOGear Serial to USB converter.</li>
  <li>Apcupsd version 3.9.8 or higher</li>
  <li>Version 2.4.5 or later of the Linux kernel</li>
- <li>Either Alan Cox's patch to your kernel. If you have
+ <li>A a pre-built kernel containing the USB patches such
+     as is available as an update for RedHat 7.1, or standard
+     in RedHat 7.2 and later. Other Linux vendors provide USB ready kernels
+     as well.</li>
+
+ <li>Or Alan Cox's patch to your kernel. If you have
      kernel 2.4.5, you must have patch <b>ac12</b> or
      later. For later versions of the kernel, any
      <b>ac</b> patch should do. Please note that USB
      enabled kernels are becoming more and more common
-     so you may not need to build your own.</li>
- <li>Or a pre-built kernel containing the USB patches such
-     as is available as an update for RedHat 7.1, or standard
-     in RedHat 7.2 and later. Other Linux vendors provide USB ready kernels
-     as well.</li>
+     so you may not need to build your own so this option
+     is no longer recommended (Feb 2003).</li>
 </ul>
 At the current time (August 2002), <b>apcupsd</b> supports USB on Linux
 systems only. This is because there is no standard
 USB programming interface and USB on the majority of 
 machines other than Windows and Linux is currently
 under development and not stable.
-<h2>Connecting a Serial port UPS to a USB port</h2>
+
+<h2>Indirect USB Support -- Connecting a Serial port UPS to a USB port</h2>
+By using a special adaptor, you can connect your serial
+UPS to a USB port (note, this works only if you do NOT have
+a USB enabled UPS). 
 If you would like to free up your serial port and
 connect your existing serial port UPS to a USB port,
 it is possible if you have one of the later kernels.
@@ -109,6 +115,13 @@ mknod /dev/usb/hid/hiddev14 c 180 110
 mknod /dev/usb/hid/hiddev15 c 180 111
 </pre>
 
+Note, as of RedHat 8.0, the hiddev devices are defined when the OS
+is installed, except they are defined as /dev/usb/hiddev0 - 15. Thus
+you will either need to run the above script and stick with our
+scheme, or you can choose to use the standard RedHat definitions, but
+you will need to modify all the apcupsd scripts appropriatedly.  In
+a later release, we will adapt better to this situation.
+
 <h2>Installing the HIDDEV Header File</h2>
 If you have built the kernel, you must put
 a copy of hiddev.h into /usr/include. 
@@ -148,6 +161,14 @@ in the <a href="kernel_config.html">Kernel Configuration </a>
 section of this manual, then unplug your UPS and plug it
 back in. This should permit the kernel to recognize the
 UPS.
+<p>If <b>./hid-ups</b> does not work, then it is very unlikely 
+that apcupsd will work. If it complains that it could not open
+the device, then either you have not run the script "make-hiddev"
+or you are not running as root.  In any case, you must correct
+the problem before continuing. If you choose to use the alternate
+RedHat device nameing scheme, you will need to modify the source
+code of hid-dev.c to have the correct device address.
+
 <h2>Building and Installing apcupsd</h2>
 If you have gotten this far successfully, the last step should
 go fairly easily. You need a beta version 3.9.4 or later of
@@ -292,9 +313,10 @@ the change and do a complete reinitialization of the UPS and so
 do not have this problem.
 
 <h3>Power Off (killpower) of UPS Does Not Work</h3>
-<p></p>Currently (as of 3.9.8) the code to power off the UPS does not
-function properly.  We are working on a solution, and it will be
-forthcoming in a subsequent release.  In the mean time, the UPS will
+<p></p>Currently (as of 3.10.5) the code to power off the UPS does not
+function properly.  It does not look like a solution to this
+problem will be available until 2.5 of the kernel is released.
+In the mean time, the UPS will
 normally power itself down one to two minutes after the machine is
 shutdown.
 

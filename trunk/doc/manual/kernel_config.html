@@ -7,12 +7,21 @@
 </head>
 <body>
 <h1>Configuring a Kernel for USB Support</h1>
+Note, this chapter is somewhat out of date as the kernel has evolved
+quite a bit in the last year and a half. In fact, you should not
+have to venture into building your own kernel unless your OS provider
+is seriously behind the times. With that said, there is still much
+valuable information here that you can use if you must build your
+own system.
+
 <h2>General</h2>
-Apcupsd version 3.9.x (development version to be released as
-3.10.1) provides support for USB UPSes on Linux systems.
-However at this time (August 2001) Linux kernels do not yet
+Apcupsd version 3.10.5 provides support for USB UPSes on Linux systems.
+However at this time (February 2003) Linux kernels do not yet
 support the HIDDEV device that is used by <b>apcupsd</b>.
-If you have a kernel version 2.4.5 or later and you
+If you are running a release such as RedHat 7.3 or 8.0,
+the kernels generally come preconfigured with all the
+necessary patches.  If you are not so fortunate but
+you have a kernel version 2.4.5 or later and you
 apply the appropriate Alan Cox patch, you will be able
 to enable USB support in <b>apcupsd</b>.  
 <p></p>For kernel 2.4.5, you need patch <b>ac12</b> or
@@ -98,6 +107,11 @@ step 11 below.
 
     Note, the CONFIG_USB_LARGE_CONFIG does not seem to be present
     in some of the later kernels (e.g. 2.4.18)
+
+    Note, apparently in later kernels the CONFIG_USB_HIDDEV should
+    be set to CONFIG_USB_HIDDEV=y (at least our users report this,
+    I suspect it may depend on the setting you use for CONFIG_USB, in
+    any case, please note to get this stright).
 
 13. make menuconfig  or   make xconfig (if you are running X)
     load a valid configuration file
