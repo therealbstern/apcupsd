@@ -1,0 +1,31 @@
+# Makefile template
+#
+# Copyright (C) 1999-2002 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
+#
+
+# Default variables
+@VARIABLES@
+# TOP source directory.
+topdir = @topdir@
+top_builddir = $(topdir)
+
+# Include the default make targets: to be put before the all-targets: rule.
+@TARGETS@
+
+all-targets: Makefile
+
+install:
+	@echo "Installing apccontrol script..."
+	$(INSTALL_PROGRAM) -m 744 ./apcupsd $(sysconfdir)/apcupsd;
+	@echo "Darwin does not have an /etc/init.d system."
+	@echo "You have to manually call apcupsd on startup."
+	@echo "apcupsd has been installed in $(sysconfdir)."
+
+uninstall:
+	rm -f $(sysconfdir)/apcupsd
+
+clean:
+
+distclean:
+	@rm -f apcupsd Makefile
+	@rm -rf CVS

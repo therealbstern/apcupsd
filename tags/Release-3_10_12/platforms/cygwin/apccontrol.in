@@ -1,0 +1,133 @@
+#!@sbindir@/sh
+#
+#  This is the Windows apccontrol file.
+#
+prefix=/usr
+exec_prefix=${prefix}
+
+APCUPSD=@sbindir@/apcupsd
+SHUTDOWN=@sbindir@/shutdown
+SCRIPTDIR=@sysconfdir@
+POPUP=@sbindir@/popup
+
+#
+# This piece is to substitute the default behaviour with your own script,
+#   perl, or C program.
+#
+# You can customize every single command creating an executable file (may be a
+#   script or a compiled program) and calling it the same as the $1 parameter
+#   passed by apcupsd to this script.
+#
+# After executing your script, apccontrol continues with the default action.
+#   If you do not want apccontrol to continue, exit your script with exit 
+#   code 99. E.g. "exit 99".
+#
+# WARNING: please be aware that if you add any commands before the shutdown
+#   in the downshutdown) case and your command errors or stalls, it will
+#   prevent your machine from being shutdown, so test, test, test to
+#   make sure it works correctly.
+#
+# The apccontrol file with no extension will be rebuilt (overwritten)
+#   every time that "make" is invoked if you are working with the
+#   source files. Thus if you build from a source distribution, we
+#   recommend you make your changes to the apccontrol.in file.
+#
+if [ -f ${SCRIPTDIR}/${1} -a -x ${SCRIPTDIR}/${1} ]
+then
+	${SCRIPTDIR}/${1}
+	# exit code 99 means he does not want us to do default action
+	if [ $? = 99 ] ; then
+		exit 0
+	fi
+fi
+
+#
+case "$1" in
+	commfailure)
+		${POPUP} "apccontrol: Warning serial port communications with UPS lost." &
+	;;
+	commok)
+		${POPUP} "apccontrol: Serial communciations with UPS restored." &
+	;;
+	powerout)
+# remove the comment (#) really want to see the following -- not necessary
+#		${POPUP} "apccontrol: Warning power loss detected." &
+	;;
+	onbattery)
+		${POPUP} "apccontrol: Power failure. Running on UPS batteries." &
+	;;
+	offbattery)
+	;;
+	mainsback)
+		${POPUP} "apccontrol: Power has returned..." &
+	;;
+	failing)
+		${POPUP} "apccontrol: UPS battery power exhaused. Doing shutdown." &
+	;;
+	timeout)
+		${POPUP} "apccontrol: UPS battery runtime limit exceded. Doing shutdown." &
+	;;
+	loadlimit)
+		${POPUP} "apccontrol: UPS battery discharge limit reached. Doing shutdown." &
+	;;
+	runlimit)
+		${POPUP} "apccontrol: UPS battery runtime percent reached. Doing shutdown." &
+	;;
+	doshutdown)
+#
+#  If you want to try to power down your UPS, uncomment
+#    out the following lines, but be warned that if the
+#    following shutdown -h now doesn't work, you may find
+#    the power being shut off to a running computer :-(
+#  Also note, we do this in the doshutdown case, because
+#    there is no way to get control when the machine is
+#    shutdown to call this script with --killpower. As
+#    a consequence, we do both killpower and shutdown
+#    here.
+#
+#		${APCUPSD} /kill
+#		@sbindir@/sleep 5
+#		@sbindir@/rm -f @sysconfdir@/*.com*
+#		${POPUP} "apccontrol: Doing ${APCUPSD} --killpower" &
+#		${APCUPSD} --killpower &
+#		@sbindir@/sleep 20
+#
+		${POPUP} "apccontrol: Doing ${SHUTDOWN} -h now" &
+		${SHUTDOWN} -h now
+	;;
+	mainsback)
+		${POPUP} "apccontrol: Power has returned..." &
+	;;
+	annoyme)
+		${POPUP} "apccontrol: Power problems please logoff." &
+	;;
+	emergency)
+		${APCUPSD} /kill
+		@sbindir@/sleep 5
+		@sbindir@/rm -f @sysconfdir@/*.com*
+		${POPUP} "apccontrol: Doing ${APCUPSD} --killpower" &
+		${APCUPSD} --killpower &
+		@sbindir@/sleep 20
+		${POPUP} "apccontrol: Doing ${SHUTDOWN} -h now" &
+		${SHUTDOWN} -h now
+	;;
+	changeme)
+		${POPUP} "apccontrol: Emergency! UPS batteries have failedChange them NOW" &
+	;;
+	remotedown)
+		${POPUP} "apccontrol: Doing ${SHUTDOWN} -h now" &
+		${SHUTDOWN} -h now
+	;;
+	restartme)
+		${POPUP} "apccontrol: restarting apcupsd would have been called." &
+	;;
+	startselftest)
+	;;
+	endselftest)
+	;;
+	*)	echo "Usage: ${0##*/} command"
+		echo "	     Warning: this script is intended to be launched by"
+		echo "	     apcupsd and should never be launched by users."
+		exit 1
+	;;
+esac
