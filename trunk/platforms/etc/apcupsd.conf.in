@@ -49,13 +49,12 @@ UPSTYPE @UPSTYPE@
 #
 # Here a table of the possible devices related with the UPS drivers.
 #
-#   NOTE!!! for USB devices, please use a form indicated below 
-#      including the [0-15] as written!
-#
 # Driver   Device                    Description
 # dumb     /dev/tty**                Serial character device
 # apcsmart /dev/tty**                Serial character device
-# usb      /dev/usb/hiddev[0-15]     On most systems
+# usb      <BLANK>                   A blank DEVICE setting enables
+#                                    autodetection, best choice for most
+#                                    installations.
 # net      hostname:port             Network link to a master apcupsd
 #                                    through NIS
 # snmp     hostname:port:vendor:community
