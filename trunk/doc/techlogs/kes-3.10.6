@@ -1,0 +1,26 @@
+             Technical notes on version 3.10.6
+                       06 March 2003
+                        Kern Sibbald
+
+General:
+
+Changes submitted this submission:
+06Mar03
+- Made some mindor modifications to configure.in and aclocal.m4 to
+  make consistent use of double quotes in test statements in
+  response to problems with make install reported by Andrew Surratt.
+- Thanks to Richard Schwaninger for finding and submitting a patch to
+  the tcp-wrappers code that prevented it from working because of an
+  invalid name. Fixed.
+05Mar03
+- Thanks to Andrew Reid for pointing out that the child reaping code
+  should be clearing the pid slot if a -1 is returned. The pid table
+  was filling up on his system due to killed children. Fixed
+21Feb03
+- A bug report against the Mandrake version of apcupsd indicates that
+  apcupsd is not releasing /dev/console.  I've moved the close() of
+  STDIN so that it is always executed to prevent this possibility.
+12Feb03
+- Implement very crude first cut of EEPROM programming in apctest.
+  Set battery date, set UPS name, and print EEPROM values should
+  work.
