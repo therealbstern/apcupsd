@@ -25,6 +25,7 @@
   <!ENTITY directives      SYSTEM "directives.xml">
   <!ENTITY shutdown        SYSTEM "shutdown.xml">
   <!ENTITY bible           SYSTEM "bible.xml">
+  <!ENTITY rpm-faq         SYSTEM "rpm-faq.xml">
  ]>
 
 <!--
@@ -1248,6 +1249,8 @@ or the CGI interface to get this information.</para>
 
 &shutdown;
 &bible;
+
+&rpm-faq;
 
 </part>
 
