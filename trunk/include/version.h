@@ -1,3 +1,3 @@
 #define DEBUG 1
-#define VERSION "3.10.14"
-#define ADATE   "30 July 2004"
+#define VERSION "3.10.15"
+#define ADATE   "03 August 2004"

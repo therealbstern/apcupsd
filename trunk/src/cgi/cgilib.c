@@ -76,13 +76,13 @@ int extractcgiargs()
 int checkhost(const char *check)
 {
     FILE    *hostlist;
-    char    fn[256], buf[256], addr[256];
+    char    fn[256], buf[500], addr[256];
 
-    snprintf(fn, sizeof(fn), "%s/hosts.conf", SYSCONFDIR);
+    asnprintf(fn, sizeof(fn), "%s/hosts.conf", SYSCONFDIR);
     hostlist = fopen(fn, "r");
-
-    if (hostlist == NULL)
+    if (hostlist == NULL) {
 	return 1;		/* default to allow */
+    }
 
     while (fgets(buf, (size_t) sizeof(buf), hostlist)) {
         if (strncmp("MONITOR", buf, 7) == 0) {
@@ -107,31 +107,31 @@ int checkhost(const char *check)
 void html_puts(const unsigned char *p)
 {
     while (*p != '\0') {
-        if (*p >= 0x7f) {
+	if (*p >= 0x7f) {
             printf ("&#%d;", (int) *p);
-        } else {
-            switch (*p) {
+	} else {
+	    switch (*p) {
                 case '\"':
                     (void) fputs("&quot;", stdout);
-                    break;
+		    break;
                 case '&':
                     (void) fputs("&amp;", stdout);
-                    break;
+		    break;
                 case '\'':
                     (void) fputs("&#39;", stdout);
-                    break;
+		    break;
                 case '<':
                     (void) fputs("&lt;", stdout);
-                    break;
+		    break;
                 case '>':
                     (void) fputs("&gt;", stdout);
-                    break;
-                default:
-                    (void) putchar(*p);
-                    break;
-            }
-        }
-        p++;
+		    break;
+		default:
+		    (void) putchar(*p);
+		    break;
+	    }
+	}
+	p++;
     }
 }
 
@@ -144,18 +144,20 @@ void html_begin(const char *title, int refresh)
 {
     int http_version;
     char *server_protocol;
-    
+    FILE *hostlist;
+    char fn[256], buf[500];
+
     server_protocol = getenv("SERVER_PROTOCOL");
     if (server_protocol == NULL) {
-        http_version = 10;
+	http_version = 10;
     } else if (strcmp(server_protocol, "HTTP/1.0") == 0) {
-        http_version = 10;
+	http_version = 10;
     } else if (strcmp(server_protocol, "HTTP/1.1") == 0) {
-        http_version = 11;
+	http_version = 11;
     } else {
-    	http_version = 11;
+	http_version = 11;
     }
-        
+	
     (void) puts ("Content-Type: text/html; charset=utf-8"); 
     (void) puts ("Content-Language: en");
     if (http_version > 10) {
@@ -195,7 +197,16 @@ void html_begin(const char *title, int refresh)
         printf (" <meta http-equiv=\"Refresh\" content=\"%d\" />\n", refresh);
     }
 
-    (void) puts (" <link href=\"apcupsd.css\" rel=\"stylesheet\" type=\"text/css\" />");
+    asnprintf(fn, sizeof(fn), "%s/apcupsd.css", SYSCONFDIR);
+    hostlist = fopen(fn, "r");
+    if (hostlist != NULL) {
+        (void) puts (" <style>");
+	while (fgets(buf, (size_t) sizeof(buf), hostlist)) {
+	    (void) puts (buf);
+	}
+	(void) fclose (hostlist);
+        (void) puts (" </style>");
+    }
 
     (void) puts ("</head>");
     (void) puts ("<body>");
