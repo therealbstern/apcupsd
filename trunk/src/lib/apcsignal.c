@@ -114,7 +114,9 @@ void init_signals(void (*handler)(int))
     signal(SIGTERM, handler);
 
     /* Picked up via wait */
+#ifndef HAVE_CYGWIN
     signal(SIGCHLD, child_handler);
+#endif
 
     signal(SIGPIPE, SIG_IGN);
 

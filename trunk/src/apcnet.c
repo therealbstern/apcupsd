@@ -120,6 +120,7 @@ static void send_to_all_slaves(UPSINFO *ups)
     for (i=0; i<slave_count; i++) {
        stat = send_to_slave(ups, i);
        /* Print error message once */
+       Dmsg2(100, "send_to_slave %d  returned %d\n", i, stat);
        if (slaves[i].error == 0) {
 	  switch(stat) {
 	  case 6:
@@ -178,6 +179,7 @@ static int send_to_slave(UPSINFO *ups, int who)
     int stat = 0;
     long l;
 
+    Dmsg1(100, "Enter send_to_slave %d\n", who);
     switch (slaves[who].remote_state) {
     case RMT_NOTCONNECTED:
 	if ((slavent = gethostbyname(slaves[who].name)) == NULL) {
@@ -227,11 +229,13 @@ static int send_to_slave(UPSINFO *ups, int who)
 	if ((connect(slaves[who].socket, (struct sockaddr *) &slaves[who].addr,
 		     sizeof(slaves[who].addr))) == -1) {
 	    slaves[who].ms_errno = errno;
+            Dmsg1(100, "Cannot connect to slave: ERR=%s\n", strerror(errno));
 	    if (slaves[who].remote_state == RMT_CONNECTED)
 		slaves[who].remote_state = RMT_RECONNECT;
 
 	    shutdown(slaves[who].socket, SHUT_RDWR);
 	    close(slaves[who].socket);
+            Dmsg1(100, "close slave %d\n", slaves[who].socket);
 	    slaves[who].socket = -1;
 	    return 2;
 	}
@@ -239,9 +243,9 @@ static int send_to_slave(UPSINFO *ups, int who)
     /* Extra complexity is because of compiler
      * problems with htonl(ups->OnBatt);
      */
-    l = (UPS_ISSET(UPS_ONBATT) ? 1 : 0);
+    l = (is_ups_set(UPS_ONBATT) ? 1 : 0);
     send_data.OnBatt	    = htonl(l);
-    l = (UPS_ISSET(UPS_BATTLOW) ? 1 : 0);
+    l = (is_ups_set(UPS_BATTLOW) ? 1 : 0);
     send_data.BattLow	    = htonl(l);
     l = (long)ups->BattChg;
     send_data.BattChg	    = htonl(l);
@@ -251,15 +255,15 @@ static int send_to_slave(UPSINFO *ups, int who)
     send_data.nettime	    = htonl(l);
     l = (long)ups->TimeLeft;
     send_data.TimeLeft	    = htonl(l);
-    l = (UPS_ISSET(UPS_REPLACEBATT) ? 1 : 0);
+    l = (is_ups_set(UPS_REPLACEBATT) ? 1 : 0);
     send_data.ChangeBatt    = htonl(l);
-    l = (UPS_ISSET(UPS_SHUT_LOAD) ? 1 : 0);
+    l = (is_ups_set(UPS_SHUT_LOAD) ? 1 : 0);
     send_data.load	    = htonl(l);
-    l = (UPS_ISSET(UPS_SHUT_BTIME) ? 1 : 0);
+    l = (is_ups_set(UPS_SHUT_BTIME) ? 1 : 0);
     send_data.timedout	    = htonl(l);
-    l = (UPS_ISSET(UPS_SHUT_LTIME) ? 1 : 0);
+    l = (is_ups_set(UPS_SHUT_LTIME) ? 1 : 0);
     send_data.timelout	    = htonl(l);
-    l = (UPS_ISSET(UPS_SHUT_EMERG) ? 1 : 0);
+    l = (is_ups_set(UPS_SHUT_EMERG) ? 1 : 0);
     send_data.emergencydown = htonl(l);
     l = ups->UPS_Cap[CI_BATTLEV];
     send_data.cap_battlev   = htonl(l);
@@ -270,9 +274,14 @@ static int send_to_slave(UPSINFO *ups, int who)
     strcpy(send_data.apcmagic, APC_MAGIC);
     strcpy(send_data.usermagic, slaves[who].usermagic);
 
+    Dmsg3(100, "Write %d bytes to slaves magic=%s usrmagic=%s\n",   
+       sizeof(send_data),
+       send_data.apcmagic, send_data.usermagic);
     /* Send our data to Slave */
-    if ((write(slaves[who].socket, &send_data,
-			  sizeof(send_data))) != sizeof(send_data)) {
+    do {
+	stat = write(slaves[who].socket, &send_data, sizeof(send_data));
+    } while (stat < 0 && errno == EINTR);
+    if (stat != sizeof(send_data)) {
 	if (slaves[who].remote_state == RMT_CONNECTED)
 	    slaves[who].remote_state = RMT_RECONNECT;
 	slaves[who].ms_errno = errno;
@@ -290,37 +299,48 @@ static int send_to_slave(UPSINFO *ups, int who)
 	read_data.apcmagic[0] = 0;
 	read_data.usermagic[0] = 0;
 
+select_again1:
 	FD_ZERO(&rfds);
 	FD_SET(slaves[who].socket, &rfds);
 	tv.tv_sec = 10; 	      /* wait 10 seconds for response */
 	tv.tv_usec = 0;
-	   
 	switch (select(slaves[who].socket+1, &rfds, NULL, NULL, &tv)) {
 	case 0: 	     /* No chars available in 10 seconds. */
 	    slaves[who].ms_errno = ETIME;
 	    shutdown(slaves[who].socket, SHUT_RDWR);
+            Dmsg1(100, "close slave %d\n", slaves[who].socket);
 	    close(slaves[who].socket);
 	    slaves[who].socket = -1;
+            Dmsg0(100, "Slave did not respond.\n");
 	    return 2;
 	case -1:	     /* error */
+	    if (errno == EINTR) {
+	       goto select_again1;
+	    }
 	    slaves[who].ms_errno = errno;
 	    shutdown(slaves[who].socket, SHUT_RDWR);
+            Dmsg1(100, "close slave %d\n", slaves[who].socket);
 	    close(slaves[who].socket);
 	    slaves[who].socket = -1;
 	    return 2;
 	default:
 	    break;
 	}
-	read(slaves[who].socket, &read_data, sizeof(read_data));
+	do {
+	   stat = read(slaves[who].socket, &read_data, sizeof(read_data));
+	} while (stat < 0 && errno == EINTR);
 	read_data.apcmagic[APC_MAGIC_SIZE-1] = 0;
 	read_data.usermagic[APC_MAGIC_SIZE-1] = 0;
+        Dmsg3(100, "Read from slave %d magic=%s usr=%s\n",
+	   stat, read_data.apcmagic, read_data.usermagic);
+	stat = 0;
 	if (strcmp(APC_MAGIC, read_data.apcmagic) == 0) { 
 	    /*
 	     * new non-disconnecting slaves send 1000 back in the
 	     * UPS_CHANGEBATT field 
 	     */
 	    slaves[who].disconnecting_slave = ntohl(read_data.ChangeBatt) != 1000;	
-            Dmsg3(400, "Slave %s disconnecting_slave=%d ChangeBatt value=%d\n", 
+            Dmsg3(100, "Slave %s disconnecting_slave=%d ChangeBatt value=%d\n", 
 	       slaves[who].name, slaves[who].disconnecting_slave,
 	       ntohl(read_data.ChangeBatt));
 	    if (slaves[who].remote_state == RMT_NOTCONNECTED) {
@@ -340,6 +360,7 @@ static int send_to_slave(UPSINFO *ups, int who)
     if (slaves[who].remote_state != RMT_CONNECTED || 
 	  slaves[who].disconnecting_slave) {
 	shutdown(slaves[who].socket, SHUT_RDWR);
+        Dmsg1(100, "close slave %d\n", slaves[who].socket);
 	close(slaves[who].socket);
 	slaves[who].socket = -1;
     }
@@ -403,6 +424,13 @@ int prepare_slave(UPSINFO *ups)
       log_event(ups, LOG_WARNING, "Cannot set SO_REUSEADDR on socket: %s\n" , strerror(errno));
    }
 
+    /*
+     * Receive notification when connection dies.
+     */
+    if (setsockopt(newsocketfd, SOL_SOCKET, SO_KEEPALIVE, &turnon, sizeof(turnon)) < 0) {
+        log_event(ups, LOG_WARNING, "Cannot set SO_KEEPALIVE on socket: %s\n" , strerror(errno));
+    }
+
     /* memset is more portable than bzero */
     memset((char *) &my_adr, 0, sizeof(struct sockaddr_in));
     my_adr.sin_family = AF_INET;
@@ -421,16 +449,19 @@ int prepare_slave(UPSINFO *ups)
     }
     if (!bound) {
         log_event(ups, LOG_ERR, "Cannot bind port %d, probably already in use", ups->NetUpsPort);
+        Dmsg1(100, "close master %d\n", socketfd);
 	close(socketfd);
 	return 1;
     }
 
     if (listen(socketfd, 1) == -1) {
         log_event(ups, LOG_ERR, "Listen Failure");
+        Dmsg1(100, "close master %d\n", socketfd);
 	close(socketfd);
 	return 1;
     }
 
+    Dmsg1(100, "Slave listening on port %d\n", ups->NetUpsPort);
     slaves[0].remote_state = RMT_NOTCONNECTED;
     strcpy(slaves[0].name, ups->master_name);
     return 0;
@@ -449,116 +480,138 @@ static int get_data_from_master(UPSINFO *ups)
  {
     int stat;
     int ShutDown;
-    int turnon = 1;
 
-    for ( ;; ) {
-	fd_set rfds;
-	struct timeval tv;
+    fd_set rfds;
+    struct timeval tv;
 
-	if (newsocketfd == -1) {
-	    UPS_SET(UPS_COMMLOST);
-	    masterlen = sizeof(master_adr);
-	    FD_ZERO(&rfds);
-	    FD_SET(socketfd, &rfds);
-	    tv.tv_sec = MASTER_TIMEOUT;
-	    tv.tv_usec = 0;
-	    switch (select(socketfd+1, &rfds, NULL, NULL, &tv)) {
-	    case 0:		 /* No chars available in 2 minutes. */
-	    case -1:		 /* error */
-		slaves[0].remote_state = RMT_ERROR;
-		return 6;
-	    default:
-		break;
-	    }
-accept_again:
-	    if ((newsocketfd = accept(socketfd, (struct sockaddr *) &master_adr,
-				  &masterlen)) < 0) {
-		if (errno == EINTR) {
-		   goto accept_again;
-		}
-		slaves[0].remote_state = RMT_DOWN;
-		slaves[0].down_time = time(NULL);
-		slaves[0].ms_errno = errno;
-		newsocketfd = -1;
-		return 1;
-	    }
-
-#ifdef HAVE_LIBWRAP
-	    /*
-             * This function checks the incoming client and if it's not
-	     * allowed closes the connection.
-	     */
-	    if (check_wrappers(argvalue, newsocketfd) == FAILURE) {
-		slaves[0].remote_state = RMT_DOWN;
-		slaves[0].down_time = time(NULL);
-		shutdown(newsocketfd, SHUT_RDWR);
-		close(newsocketfd);
-		newsocketfd = -1;
-		return 2;
-	    }
-#endif
-
-	    /*
-             *  Let's add some basic security
-	     */
-	    if (memcmp((void *) &master_adr.sin_addr, (void *)&master_h_addr,
-		       sizeof(struct in_addr)) != 0) {
-		slaves[0].remote_state = RMT_DOWN;
-		slaves[0].down_time = time(NULL);
-		shutdown(newsocketfd, SHUT_RDWR);
-		close(newsocketfd);
-		newsocketfd = -1;
-		return 2;
-	    }
-	}
-
-	/*
-	 * Receive notification when connection dies.
-	 */
-	if (setsockopt(newsocketfd, SOL_SOCKET, SO_KEEPALIVE, &turnon, sizeof(turnon)) < 0) {
-            log_event(ups, LOG_WARNING, "Cannot set SO_KEEPALIVE on socket: %s\n" , strerror(errno));
-	}
-
+    if (newsocketfd == -1) {
+	set_ups(UPS_COMMLOST);
+	masterlen = sizeof(master_adr);
+select_again2:
 	FD_ZERO(&rfds);
-	FD_SET(newsocketfd, &rfds);
-	tv.tv_sec = MASTER_TIMEOUT;
+	FD_SET(socketfd, &rfds);
+	tv.tv_sec = MASTER_TIMEOUT;   /* 120 secs */
 	tv.tv_usec = 0;
-	switch (select(newsocketfd+1, &rfds, NULL, NULL, &tv)) {
+        Dmsg0(100, "get_data_from_master on select before accept.\n");
+	switch (select(socketfd+1, &rfds, NULL, NULL, &tv)) {
 	case 0: 	     /* No chars available in 2 minutes. */
 	case -1:	     /* error */
+	    if (errno == EINTR) {
+	       goto select_again2;
+	    }
 	    slaves[0].remote_state = RMT_ERROR;
-	    shutdown(newsocketfd, SHUT_RDWR);
-	    close(newsocketfd);
-	    newsocketfd = -1;
-	    UPS_SET(UPS_COMMLOST);
-	    return 6;		      /* master not responding */
+            Dmsg0(100, "select timeout return 6.\n"); 
+	    return 6;
 	default:
 	    break;
 	}
-	if ((read(newsocketfd, &get_data, sizeof(get_data))) != sizeof(get_data)) {
-	    get_data.apcmagic[APC_MAGIC_SIZE-1] = 0;
-	    get_data.usermagic[APC_MAGIC_SIZE-1] = 0;
-	    slaves[0].remote_state = RMT_ERROR;
+        Dmsg0(100, "Doing accept\n");
+	do {
+	   newsocketfd = accept(socketfd, (struct sockaddr *) &master_adr, 
+				&masterlen);
+	} while (newsocketfd < 0 && errno == EINTR);
+        Dmsg1(100, "Accept returned %d\n", newsocketfd);
+	if (newsocketfd < 0) {
+	    slaves[0].remote_state = RMT_DOWN;
+	    slaves[0].down_time = time(NULL);
 	    slaves[0].ms_errno = errno;
+	    newsocketfd = -1;
+            Dmsg1(100, "Accept error: %s\n", strerror(errno));
+	    return 1;
+	}
+        Dmsg0(100, "Done with accept()\n");
+
+#ifdef HAVE_LIBWRAP
+	/*
+         * This function checks the incoming client and if it's not
+	 * allowed closes the connection.
+	 */
+	if (check_wrappers(argvalue, newsocketfd) == FAILURE) {
+	    slaves[0].remote_state = RMT_DOWN;
+	    slaves[0].down_time = time(NULL);
 	    shutdown(newsocketfd, SHUT_RDWR);
+            Dmsg1(100, "close newsock %d\n", newsocketfd);
 	    close(newsocketfd);
 	    newsocketfd = -1;
-	    UPS_SET(UPS_COMMLOST);
-	    return 3;		      /* read error */
+            Dmsg0(100, "Wrappers reject return 2\n");
+	    return 2;
 	}
-	get_data.apcmagic[APC_MAGIC_SIZE-1] = 0;
-	get_data.usermagic[APC_MAGIC_SIZE-1] = 0;
+#endif
+
+	/*
+         *  Let's add some basic security
+	 */
+	if (memcmp((void *) &master_adr.sin_addr, (void *)&master_h_addr,
+		   sizeof(struct in_addr)) != 0) {
+	    slaves[0].remote_state = RMT_DOWN;
+	    slaves[0].down_time = time(NULL);
+	    shutdown(newsocketfd, SHUT_RDWR);
+            Dmsg1(100, "close newsock %d\n", newsocketfd);
+	    close(newsocketfd);
+	    newsocketfd = -1;
+            Dmsg0(100, "Remove address does not correspond. return 2\n");
+	    return 2;
+	}
+    } /* end if newsocketfd */
+
+select_again3:
+    FD_ZERO(&rfds);
+    FD_SET(newsocketfd, &rfds);
+    tv.tv_sec = MASTER_TIMEOUT;
+    tv.tv_usec = 0;
+    Dmsg1(100, "Doing select to get master data on %d.\n", newsocketfd);
+    switch (select(newsocketfd+1, &rfds, NULL, NULL, &tv)) {
+    case 0:		 /* No chars available in 2 minutes. */
+    case -1:		 /* error */
+	if (errno == EINTR) {
+	   goto select_again3;
+	}
+        Dmsg2(100, "close newsock %d socket err=%s\n", newsocketfd,
+	   strerror(errno));
+	slaves[0].remote_state = RMT_ERROR;
+	shutdown(newsocketfd, SHUT_RDWR);
+        Dmsg1(100, "close newsock %d\n", newsocketfd);
+	close(newsocketfd);
+	newsocketfd = -1;
+	set_ups(UPS_COMMLOST);
+        Dmsg0(100, "select timed out return 6");
+	return 6;		  /* master not responding */
+    default:
 	break;
     }
+    Dmsg0(100, "Doing read from master.\n");
+    do {
+	stat=read(newsocketfd, &get_data, sizeof(get_data));
+    } while (stat < 0 && errno == EINTR);
+    if (stat != sizeof(get_data)){
+	get_data.apcmagic[APC_MAGIC_SIZE-1] = 0;
+	get_data.usermagic[APC_MAGIC_SIZE-1] = 0;
+	slaves[0].remote_state = RMT_ERROR;
+	slaves[0].ms_errno = errno;
+        Dmsg3(100, "Read error fd=%d stat=%d err: %s\n", 
+	   newsocketfd, stat, strerror(errno));
+	shutdown(newsocketfd, SHUT_RDWR);
+        Dmsg1(100, "close newsock after read %d\n", newsocketfd);
+	close(newsocketfd);
+	newsocketfd = -1;
+	set_ups(UPS_COMMLOST);
+	return 3;		  /* read error */
+    }
+    get_data.apcmagic[APC_MAGIC_SIZE-1] = 0;
+    get_data.usermagic[APC_MAGIC_SIZE-1] = 0;
 
     /* At this point, we read something */
 
+    Dmsg1(100, "Got something stat=%d.\n", stat);
     if (strcmp(APC_MAGIC, get_data.apcmagic) != 0) { 
 	slaves[0].remote_state = RMT_ERROR;
 	shutdown(newsocketfd, SHUT_RDWR);
+        Dmsg1(100, "close newsock %d\n", newsocketfd);
 	close(newsocketfd);
 	newsocketfd = -1;
-	UPS_SET(UPS_COMMLOST);
+	set_ups(UPS_COMMLOST);
+        Dmsg2(100, "magic does not compare: mine %s\nhis %s\n",
+	   APC_MAGIC, get_data.apcmagic);
 	return 4;
     }
 	  
@@ -568,21 +621,24 @@ accept_again:
 	strcpy(get_data.apcmagic, APC_MAGIC);
 	strcpy(get_data.usermagic, ups->usermagic);
 	get_data.ChangeBatt = htonl(1000); /* flag to say we are non-disconnecting */
-        Dmsg1(400, "Slave sending non-disconnecting flag = %d.\n",
+        Dmsg1(100, "Slave sending non-disconnecting flag = %d.\n",
 	   ntohl(get_data.ChangeBatt));
-	write(newsocketfd, &get_data, sizeof(get_data));
+	do {
+	   stat = write(newsocketfd, &get_data, sizeof(get_data));
+	} while (stat < 0 && errno == EINTR);
     }
 
     if (strcmp(ups->usermagic, get_data.usermagic) == 0) {
+        Dmsg0(100, "Got good data\n");
 	if (ntohl(get_data.OnBatt)) {
-	    UPS_CLEAR_ONLINE();
+	    clear_ups_online();
 	} else {
-	    UPS_SET_ONLINE();
+	    set_ups_online();
 	}
 	if (ntohl(get_data.BattLow)) {
-	    UPS_SET(UPS_BATTLOW);
+	    set_ups(UPS_BATTLOW);
 	} else {
-	    UPS_CLEAR(UPS_BATTLOW);
+	    clear_ups(UPS_BATTLOW);
 	}
 	ups->BattChg	   = ntohl(get_data.BattChg);
 	ShutDown	   = ntohl(get_data.ShutDown);
@@ -593,65 +649,66 @@ accept_again:
  * down and comes back up, so remove it for now.  KES 27Feb01
  *
  *	if (ntohl(get_data.ChangeBatt)) {
- *	    UPS_SET(UPS_REPLACEBATT);
+ *	    set_ups(UPS_REPLACEBATT);
  *	} else {
- *	    UPS_CLEAR(UPS_REPLACEBATT);
+ *	    clear_ups(UPS_REPLACEBATT);
  *	}
  */
 	if (ntohl(get_data.load)) {
-	    UPS_SET(UPS_SHUT_LOAD);
+	    set_ups(UPS_SHUT_LOAD);
 	} else {
-	    UPS_CLEAR(UPS_SHUT_LOAD);
+	    clear_ups(UPS_SHUT_LOAD);
 	}
 	if (ntohl(get_data.timedout)) {
-	    UPS_SET(UPS_SHUT_BTIME);
+	    set_ups(UPS_SHUT_BTIME);
 	} else {
-	    UPS_CLEAR(UPS_SHUT_BTIME);
+	    clear_ups(UPS_SHUT_BTIME);
 	}
 	if (ntohl(get_data.timelout)) {
-	    UPS_SET(UPS_SHUT_LTIME);
+	    set_ups(UPS_SHUT_LTIME);
 	} else {
-	    UPS_CLEAR(UPS_SHUT_LTIME);
+	    clear_ups(UPS_SHUT_LTIME);
 	}
 	if (ntohl(get_data.emergencydown)) {
-	    UPS_SET(UPS_SHUT_EMERG);
+	    set_ups(UPS_SHUT_EMERG);
 	} else {
-	    UPS_CLEAR(UPS_SHUT_EMERG);
+	    clear_ups(UPS_SHUT_EMERG);
 	}
 	ups->remote_state  = ntohl(get_data.remote_state);
 	ups->UPS_Cap[CI_BATTLEV] = ntohl(get_data.cap_battlev);
 	ups->UPS_Cap[CI_RUNTIM] = ntohl(get_data.cap_runtim);
     } else {
+        Dmsg2(100, "User magic does not compare: mine %s his %s\n",
+	       ups->usermagic, get_data.usermagic);
+
 	slaves[0].remote_state = RMT_ERROR;
 	shutdown(newsocketfd, SHUT_RDWR);
+        Dmsg1(100, "close newsock %d\n", newsocketfd);
 	close(newsocketfd);
 	newsocketfd = -1;
-	UPS_SET(UPS_COMMLOST);
+	set_ups(UPS_COMMLOST);
 	return 5;
     }
 
     if (ShutDown) {		    /* if master has shutdown */
-	UPS_SET(UPS_SHUT_REMOTE); /* we go down too */
+	set_ups(UPS_SHUT_REMOTE); /* we go down too */
     }
 	 
-#ifdef old_disconnecting_code
-    close(newsocketfd);
-    newsocketfd = -1;
-#endif
-
     /* 
      * Note if UPS_COMMLOST is set at this point, it is because it
      * was previously detected. If we get here, we have a good
      * connection, so generate the event and clear the flag.
      */
-    if (UPS_ISSET(UPS_COMMLOST)) {
+    if (is_ups_set(UPS_COMMLOST)) {
         log_event(ups, LOG_WARNING, "Connect from master %s succeeded",
 		slaves[0].name);
 	execute_command(ups, cmd[CMDMASTERCONN]);
-	UPS_CLEAR(UPS_COMMLOST);
+        Dmsg0(100, "Clear UPS_COMMLOST\n");
+	clear_ups(UPS_COMMLOST);
     } 
     slaves[0].remote_state = RMT_CONNECTED;
-    time(&ups->last_master_connect_time);
+    ups->last_master_connect_time = time(NULL);
+    Dmsg0(100, "Exit get_from_master\n");
     return 0;
 }
 
@@ -663,40 +720,44 @@ accept_again:
  */
 static int update_from_master(UPSINFO *ups)
 {
-    int stat = get_data_from_master(ups);
+    int stat; 
+    Dmsg0(100, "Enter update_from_master\n");
+    stat =  get_data_from_master(ups);
+    Dmsg1(100, "get_data_from_master=%d\n", stat);
     /* Print error message once */
     if (slaves[0].error == 0) {
        switch(stat) {
-	  case 0:
-	     break;
-	  case 1:
-             log_event(ups, LOG_ERR, "Socket accept error");
-	     break;
-	  case 2:
-             log_event(ups, LOG_ERR, "Unauthorised attempt from master %s",
-			inet_ntoa(master_adr.sin_addr));
-	     break;
-	  case 3:
-             log_event(ups, LOG_ERR, "Read failure from socket. ERR=%s\n",
-		 strerror(slaves[0].ms_errno));
-	     break;
-	  case 4:
-             log_event(ups, LOG_ERR, "Bad APC magic from master: %s", get_data.apcmagic);
-	     break;
-	  case 5:
-             log_event(ups, LOG_ERR, "Bad user magic from master: %s", get_data.usermagic);
-	     break;
-	  case 6:
-	     generate_event(ups, CMDMASTERTIMEOUT);
-	     break;
-	  default:
-             log_event(ups, LOG_ERR, "Unknown Error in get_from_master");
-	     break;
+       case 0:
+	  break;
+       case 1:
+          log_event(ups, LOG_ERR, "Socket accept error");
+	  break;
+       case 2:
+          log_event(ups, LOG_ERR, "Unauthorised attempt from master %s",
+		     inet_ntoa(master_adr.sin_addr));
+	  break;
+       case 3:
+          log_event(ups, LOG_ERR, "Read failure from socket. ERR=%s\n",
+	      strerror(slaves[0].ms_errno));
+	  break;
+       case 4:
+          log_event(ups, LOG_ERR, "Bad APC magic from master: %s", get_data.apcmagic);
+	  break;
+       case 5:
+          log_event(ups, LOG_ERR, "Bad user magic from master: %s", get_data.usermagic);
+	  break;
+       case 6:
+	  generate_event(ups, CMDMASTERTIMEOUT);
+	  break;
+       default:
+          log_event(ups, LOG_ERR, "Unknown Error in get_from_master");
+	  break;
        }
     }
     slaves[0].error = stat;
-    if (stat != 0)
+    if (stat != 0) {
        slaves[0].errorcnt++;
+    }
     return 0;
 }
 
@@ -739,7 +800,7 @@ void do_net(UPSINFO *ups)
 {
     init_thread_signals();
 
-    UPS_SET(UPS_SLAVE);       /* We are networking not connected */
+    set_ups(UPS_SLAVE);       /* We are networking not connected */
 
     while (1) {
 	/* Note, we do not lock shm so that apcaccess can
@@ -768,7 +829,7 @@ void do_slaves(UPSINFO *ups)
     init_thread_signals();
 
     while (1) {
-	time(&now);
+	now = time(NULL);
 
         /* This read is necessary to update "ups" */
 
@@ -776,25 +837,26 @@ void do_slaves(UPSINFO *ups)
 	 * or in power fail situation (FASTPOLL) or some slave is 
 	 * not connected (slave_disconnected)
 	 */
-	if (((now - last_time_net) > ups->nettime) || UPS_ISSET(UPS_FASTPOLL) ||
+	if (((now - last_time_net) > ups->nettime) || is_ups_set(UPS_FASTPOLL) ||
 	     slave_disconnected) {;
 	    slave_stat = slave_disconnected;
+            Dmsg0(100, "do_slaves calling send_to_all\n");
 	    send_to_all_slaves(ups);
-	    time(&last_time_net);
+	    last_time_net = time(NULL);
 	    /*
 	     * If change in slave status, update Status
 	     */
 	    if (slave_stat != slave_disconnected) {
 		write_lock(ups);
 		if (slave_disconnected) {
-		   UPS_SET(UPS_SLAVEDOWN);
+		   set_ups(UPS_SLAVEDOWN);
 		} else {
-		   UPS_CLEAR(UPS_SLAVEDOWN);
+		   clear_ups(UPS_SLAVEDOWN);
 		}
 		write_unlock(ups);
 	    }
 	}
-	if (UPS_ISSET(UPS_FASTPOLL)) {
+	if (is_ups_set(UPS_FASTPOLL)) {
 	    sleep(1);		      /* urgent send data faster */
 	} else {
 	    sleep(TIMER_SLAVES);      /* wait 10 seconds */

@@ -438,7 +438,7 @@ upsService::ApcupsdServiceMain()
        break;
     }
     // Windows NT
-    case VER_PLATFORM_WIN32_NT: {
+    case VER_PLATFORM_WIN32_NT:
        // Create a service entry table
        SERVICE_TABLE_ENTRY dispatchTable[] = {
                {UPS_SERVICENAME, (LPSERVICE_MAIN_FUNCTION)ServiceMain},
@@ -450,7 +450,6 @@ upsService::ApcupsdServiceMain()
            MessageBox(NULL, "StartServiceCtrlDispatcher error", "Apcupsd", MB_OK);
        }
        break;
-    } /* end case */
     } /* end switch */
     return 0;
 }

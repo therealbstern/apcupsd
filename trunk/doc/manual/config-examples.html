@@ -7,7 +7,7 @@
 </HEAD>
 <BODY>
 <H1>Configuration Examples</H1>
-<h2>A Simple Configuration</h2>
+<h2>A Simple Configuration for a SmartUPS</h2>
 You have a Smart UPS using the cable supplied by APC.
 A very simple configuration file would look like the following:
 <pre>
@@ -22,6 +22,17 @@ UPSMODE disable
 <p>Normally you would have many more configuration directives
 to completely customize your installation, but this example
 shows you the minimum required.</p>
+<h2>A Simple USB Configuration</h2>
+<pre>
+## apcupsd.conf v1.1 ##
+UPSCABLE usb
+UPSTYPE usb
+DEVICE /dev/usb/hid/hiddev[0-15]
+LOCKFILE /var/lock
+UPSCLASS standalone
+UPSMODE disable
+</pre>
+
 <h2>A Simple Master Configuration</h2>
 You have a Smart UPS using the cable supplied by APC and
 you want it to act as a master for another computer, which
@@ -79,7 +90,7 @@ configuration files shown above. The only difference is where
 the slave actually receives its power. In effect, <b>apcupsd</b>
 does not know or care where the power really comes from.
 
-<h2>A Sample Slave Configuration Using the Net Driver</h>
+<h2>A Sample Slave Configuration Using the Net Driver</h2>
 As opposed to the master/slave mode demonstrate above, you
 can turn any computer into a slave by configuring with the
 NIS network driver turned on <b>--enable-net</b>.  Running 
