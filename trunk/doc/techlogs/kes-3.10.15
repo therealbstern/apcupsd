@@ -2,6 +2,12 @@
                         Kern Sibbald
 
 General:
+06Oct04
+- Add proper platform code so that configure will create
+  the 4 platform specific apccontrol files (some were missing).
+- Apply fix from user to correct one of the shutdown
+  sequences for the Smart UPS. During the conversion to drivers
+  this was apparently mangled.
 09Sep04
 - Added code to close all file descriptors before becoming
   daemon unless debug turned on.
