@@ -140,7 +140,7 @@ PTHREAD_CFLAGS=""
 PTHREAD_LFLAGS=""
 with_pthreads=yes
 
-AC_MSG_CHECKING(for pthreads)
+AC_MSG_CHECKING([for pthreads])
 
 AC_ARG_ENABLE(pthreads, [
 AC_HELP_STRING([--enable-pthreads], [Enable pthreads (default)])
@@ -149,7 +149,7 @@ with_pthreads=$enableval)
 
 if test "$with_pthreads" != no; then
     AC_DEFINE(HAVE_PTHREADS)
-    AC_MSG_RESULT(enabled)
+    AC_MSG_RESULT([enabled])
     PTHREAD_CFLAGS=""
     PTHREAD_LFLAGS="-lpthread"
 else
@@ -186,8 +186,7 @@ if test "$SHUTDOWN" = "no"
 then
 	if test "$CFG_CYGWIN" = "no"
 	then
-	   echo 'ERROR: shutdown program not found !'
-	   exit 1
+	   AC_MSG_ERROR([shutdown program not found !])
 	fi
 fi
 
@@ -199,7 +198,7 @@ else
     AC_PATH_PROGS(APCUPSD_MAIL, mail, no)
     if test "$APCUPSD_MAIL" = "no"
     then
-	echo 'WARNING: mail program not found !'
+	AC_MSG_WARN([mail program not found !])
 	APCUPSD_MAIL=mail
     fi
 fi
@@ -209,16 +208,14 @@ if test "$WALL" = "no"
 then
 	if test "$CFG_CYGWIN" = "no"
 	then
-	   echo 'ERROR: wall program not found !'
-	   exit 1
+	   AC_MSG_ERROR([wall program not found !])
 	fi
 fi
 
 AC_PATH_PROGS(SCRIPTSHELL, sh bash, no)
 if test "$SCRIPTSHELL" = "no"
 then
-	echo 'ERROR: shell program not found !'
-	exit 1
+	AC_MSG_ERROR([shell program not found !])
 fi
 
 dnl
@@ -228,8 +225,7 @@ dnl
 AC_PATH_PROGS(MAKE, gmake pmake make, no)
 if test "$MAKE" = "no"
 then
-	echo 'ERROR: make program not found !'
-	exit 1
+	AC_MSG_ERROR([make program not found !])
 fi
 
 AC_PATH_PROGS(MAKEDEPEND, makedepend true, :)
@@ -262,7 +258,7 @@ AC_CHECK_FUNCS(
 		abort fork calloc getpid \
 		ioctl kill rewind select setsid signal strerror strncmp \
 		strncpy tcgetattr vfprintf setpgrp,,
-		[echo 'configure: cannot find needed function.'; exit 1]
+		[AC_MSG_ERROR([cannot find required function.])]
 		)
 
 AC_CHECK_FUNCS(snprintf vsnprintf)
@@ -273,12 +269,12 @@ AC_TRY_LINK(
 	[#include <syslog.h>],
 	[syslog(0, "%s", "test");], AC_MSG_RESULT([yes]),
 	  AC_CHECK_LIB(socket, std_syslog,,
-	[echo 'configure: cannot find needed function.'; exit 1]
+	[AC_MSG_ERROR([cannot find required function.])]
 	  )
 	  AC_TRY_LINK(
 	    [#include <syslog.h>],
 	    [syslog(0, "%s", "test");], AC_MSG_RESULT([yes]),
-	    [echo 'configure: cannot find needed function.'; exit 1]
+	    [AC_MSG_ERROR([cannot find required function.])]
 	  )
 	)
 
@@ -289,7 +285,7 @@ dnl shmctl doesn't exist on cygwin so don't check for it there
 if test "$CFG_CYGWIN" = "no" -a "$with_pthreads" = "no"; then
 AC_CHECK_FUNCS(
 		shmctl,,
-		[echo 'configure: cannot find needed function.'; exit 1]
+		[AC_MSG_ERROR([cannot find required function.])]
 		)
 fi
    
@@ -305,13 +301,13 @@ dnl
 # - RF
 #
 AC_CHECK_FUNC(socket,
-    AC_MSG_RESULT(using libc's socket),
+    AC_MSG_RESULT([using libc's socket]),
     AC_CHECK_LIB(xnet,socket)
     AC_CHECK_LIB(socket,socket)
     AC_CHECK_LIB(inet,socket))
 
 AC_CHECK_FUNC(gethostname,
-    AC_MSG_RESULT(using libc's gethostname),
+    AC_MSG_RESULT([using libc's gethostname]),
     AC_CHECK_LIB(socket,gethostname)
     AC_CHECK_LIB(xnet,gethostname)
     AC_CHECK_LIB(inet,gethostname))
@@ -329,23 +325,23 @@ test $ba_cv_header_socklen_t = yes && AC_DEFINE(HAVE_SOCKLEN_T)
 
 # If resolver functions are not in libc check for -lnsl or -lresolv.
 AC_CHECK_FUNC(gethostbyname,
-    AC_MSG_RESULT(using libc's resolver),
+    AC_MSG_RESULT([using libc's resolver]),
     AC_CHECK_LIB(nsl,gethostbyname)
     AC_CHECK_LIB(resolv,gethostbyname))
 
 # If gettext isn't in the C library, maybe there's a -lintl.
 AC_CHECK_FUNC(gettext,
-    AC_MSG_RESULT(using libc's gettext),
+    AC_MSG_RESULT([using libc's gettext]),
     AC_CHECK_LIB(intl,gettext))
 
 # The condition in this test copes with the presence of inet_addr in libc6.
 AC_CHECK_FUNC(inet_addr,
-    AC_MSG_RESULT(using libc's inet_addr),
+    AC_MSG_RESULT([using libc's inet_addr]),
     AC_CHECK_LIB(nsl,inet_addr))
 
 dnl Needed by Interactive UNIX System V/386 Release 3.2
 AC_CHECK_FUNC(strchr,
-    AC_MSG_RESULT(using libc's strchr),
+    AC_MSG_RESULT([using libc's strchr]),
     AC_CHECK_LIB(cposix,strchr,
     [EXTRADEFS="$EXTRADEFS -D_SYSV3"
      LIBS="$LIBS -lcposix"]))
@@ -390,14 +386,14 @@ AC_CHECK_HEADERS(
     stdarg.h stdio.h stdlib.h string.h strings.h sys/ioctl.h \
     sys/socket.h sys/types.h syslog.h termios.h \
     unistd.h
-    ,,[echo 'configure: at least 1 header file is missing. This may not compile.']
+    ,,[AC_MSG_WARN([at least 1 header file is missing. This may not compile.])]
     )		    dnl Check for _all_ included headers.
 
 dnl ipc.h, sem.h and shm.h do not exist on cygwin so don't check for them
 if test "$CFG_CYGWIN" = "no" -a "$with_pthreads" = "no"; then
 AC_CHECK_HEADERS(
    sys/ipc.h sys/sem.h sys/shm.h
-   ,,[echo 'configure: some header files are missing. This may not compile.']
+   ,,[AC_MSG_WARN([some header files are missing. This may not compile.])]
    )		   dnl Check for _all_ included headers.
 fi
 
@@ -556,7 +552,7 @@ AC_ARG_WITH(libwrap,
     if test "x$withval" != "xno" ; then
        saved_LIBS="$LIBS"
        LIBS="$saved_LIBS -lwrap"
-       AC_MSG_CHECKING(for libwrap)
+       AC_MSG_CHECKING([for libwrap])
        AC_TRY_LINK(
 	  [ #include <tcpd.h>
 	     int deny_severity = 0;
@@ -564,7 +560,7 @@ AC_ARG_WITH(libwrap,
 	     struct request_info *req; ],
 	  [ hosts_access(req); ],
 	  [
-	    AC_MSG_RESULT(yes)
+	    AC_MSG_RESULT([yes])
 	    AC_DEFINE(HAVE_LIBWRAP)
 	    TCPW_MSG="yes" 
 	  ], [
@@ -576,7 +572,7 @@ AC_ARG_WITH(libwrap,
 		 struct request_info *req; ],
 	      [ hosts_access(req); ],
 	      [
-		 AC_MSG_RESULT(yes)
+		 AC_MSG_RESULT([yes])
 		 AC_DEFINE(HAVE_LIBWRAP)
 		 TCPW_MSG="yes" 
 	      ],
@@ -606,11 +602,13 @@ AC_ARG_ENABLE(cgi,
      ENABLE_CGI="yes"
      AC_DEFINE(HAVE_NISLIB)
 	 CGI=cgi
+
+     AC_CHECKING([for libgd])
 dnl
 dnl First search for system library that defines gdImagePng
      AC_CHECK_LIB(gd, gdImagePng,
        [
-	 echo '  using PNG file format (/usr/lib).'
+	 AC_MSG_RESULT([using PNG file format (/usr/lib).])
 	 AC_DEFINE(SYS_IMGFMT_PNG)
 	 LIBGDOBJ="-lgd"
 	 SYS_GD_FOUND=yes
@@ -621,7 +619,7 @@ dnl Second search for system library that defines gdImageGif
      then
        AC_CHECK_LIB(gd, gdImageGif,
 	 [
-	   echo '  using GIF file format (/usr/lib).'
+	   AC_MSG_RESULT([using GIF file format (/usr/lib).])
 	   AC_DEFINE(SYS_IMGFMT_GIF)
 	   LIBGDOBJ="-lgd"
 	   SYS_GD_FOUND=yes
@@ -639,7 +637,7 @@ dnl Destroy cached value
        unset ac_cv_lib_gd_gdImagePng
        AC_CHECK_LIB(gd, gdImagePng,
 	 [
-	   echo '  using PNG file format (/usr/local/lib).'
+	   AC_MSG_RESULT([using PNG file format (/usr/local/lib).])
 	   AC_DEFINE(SYS_IMGFMT_PNG)
 	   LIBGDOBJ="-lgd"
 	   SYS_GD_FOUND=yes
@@ -653,7 +651,7 @@ dnl Destroy cached value
        unset ac_cv_lib_gd_gdImageGif
        AC_CHECK_LIB(gd, gdImageGif,
 	 [
-	   echo '  using GIF file format (/usr/local/lib).'
+	   AC_MSG_RESULT([using GIF file format (/usr/local/lib).])
 	   AC_DEFINE(SYS_IMGFMT_GIF)
 	   LIBGDOBJ="-lgd"
 	   SYS_GD_FOUND=yes
@@ -665,6 +663,7 @@ dnl As last resort, use provided GD library v1.2
      then
        if test -d src/gd1.2
        then
+         AC_MSG_RESULT([using GIF file format (local copy of libgd).])
 	 CPPFLAGS=${_cppflags}
 	 LDFLAGS=${_ldflags}
 	 GDINCLUDE='-I$(topdir)/src/gd1.2'
@@ -672,17 +671,16 @@ dnl As last resort, use provided GD library v1.2
 	 LIBGDOBJ='$(topdir)/src/gd1.2/libgd.a'
 	 AC_DEFINE(IMGFMT_GIF)
        else
-	 echo 'Your system lacks the GD library for compiling CGI'
-	 echo 'programs. Please download this library from'
-	 echo
-	 echo 'http://www.boutell.com/gd/'
-	 echo
-	 echo 'After building it and installing it on your system'
-	 echo 'preferrably in /usr/lib or /usr/local/lib,'
-	 echo 're-run the ./configure script.'
-	 echo
-	 echo 'Alternatively you can disable the CGI support.'
-	 exit 1
+	AC_MSG_ERROR([Your system lacks the GD library for compiling CGI
+programs. Please download this library from
+
+http://www.boutell.com/gd/
+
+After building it and installing it on your system
+preferrably in /usr/lib or /usr/local/lib,
+re-run the ./configure script.
+
+Alternatively you can disable the CGI support.])
        fi
      fi
 	 if test x$GDINCLUDE = x ; then
@@ -690,11 +688,10 @@ dnl As last resort, use provided GD library v1.2
 	     [
 	       AC_CHECK_HEADER(gd/gd.h, [ GDHEAD="gd/" ],
 	     [
-	       echo 'Found system GD library but no header file.'
-	       echo 'Please find the file gd.h in your system'
-	       echo 'include directories and report its position'
-	       echo 'to apcupsd-devel@apcupsd.com'
-	       exit 1
+		AC_MSG_ERROR([Found system GD library but no header file.
+Please find the file gd.h in your system
+include directories and report its position
+to apcupsd-devel@apcupsd.com])
 	     ])
 	   ])
 	   AC_SUBST(GDHEAD)
@@ -764,7 +761,7 @@ AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
 		USB_DRIVER="usb"
 		AC_SUBST(USB_DRIVER)
 	else
-		echo "Can't build USB driver on this OS, disabled."
+		AC_MSG_NOTICE([Can't build USB driver on this OS, disabled.])
 	fi
 	fi],
     [])
@@ -876,7 +873,7 @@ AC_SUBST(APCNISD)
 dnl Allow setting of NISIP value
 NISIP="0.0.0.0"
 AC_ARG_WITH(nisip,
-	[AC_HELP_STRING([--with-nisip=IP-ADDRESS], [Specify the IP address to bind to])],
+	[AC_HELP_STRING([--with-nisip=IP-ADDRESS], [Specify the IP address to bind to (default=0.0.0.0)])],
 	[
 	   NISIP="$withval";
 	]
@@ -1025,7 +1022,7 @@ AC_SUBST(EXTRAOBJ)
 
 dnl Check out the wait reality.  We have to assume sys/wait.h is present.
 AC_CHECK_FUNCS(wait waitpid wait3)
-AC_MSG_CHECKING(for union wait);
+AC_MSG_CHECKING([for union wait]);
 AC_TRY_LINK([#include <sys/types.h>
 #include <sys/wait.h>],
 		 [union wait status; int pid; pid = wait (&status);
@@ -1040,8 +1037,8 @@ if (WEXITSTATUS (status) != 0) pid = -1;
 pid = waitpid (-1, &status, 0);
 #endif
 ],
-  [AC_DEFINE(HAVE_UNION_WAIT) AC_MSG_RESULT(yes)],
-  AC_MSG_RESULT(no))
+  [AC_DEFINE(HAVE_UNION_WAIT) AC_MSG_RESULT([yes])],
+  AC_MSG_RESULT([no]))
 
 
 if test "$USE_INCLUDED_LIBINTL" = "yes"
@@ -1069,7 +1066,7 @@ fi
 if test "$ENABLE_CGI" = "yes"
 then
 	AC_CHECK_FUNCS( snprintf,,
-		[echo 'configure: cannot find needed function.'; exit 1]
+		[AC_MSG_ERROR([cannot find required function.])]
 		)
 	echo 'Enabling cgi program support...'
 else
@@ -1780,11 +1777,11 @@ dnl touch ${srcdir}/include/config.h
 
 echo $PATH | grep /usr/ucb >/dev/null
 if test $? = 0 ; then
-echo "
+AC_MSG_WARN([ 
 
 WARNING! You have /usr/ucb on your path. We STRONGLY recommend
-	 that you remove it and rerun your configure, otherwise
+	 that you remove it and rerun configure. Otherwise
 	 apcupsd may be unable to shutdown your system.
 
-  "
+]);
 fi

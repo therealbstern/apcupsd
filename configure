@@ -885,7 +885,7 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-libwrap=DIR      Compile in libwrap (tcp_wrappers) support
-  --with-nisip=IP-ADDRESS Specify the IP address to bind to
+  --with-nisip=IP-ADDRESS Specify the IP address to bind to (default=0.0.0.0)
   --with-cgi-bin=DIR      Specify cgi-bin directory (default=/etc/apcupsd)
   --with-included-gettext use the GNU gettext library included here
   --with-catgets          use catgets functions if available
@@ -3162,8 +3162,9 @@ if test "$SHUTDOWN" = "no"
 then
 	if test "$CFG_CYGWIN" = "no"
 	then
-	   echo 'ERROR: shutdown program not found !'
-	   exit 1
+	   { { echo "$as_me:$LINENO: error: shutdown program not found !" >&5
+echo "$as_me: error: shutdown program not found !" >&2;}
+   { (exit 1); exit 1; }; }
 	fi
 fi
 
@@ -3219,7 +3220,8 @@ test -n "$APCUPSD_MAIL" || APCUPSD_MAIL="no"
 
     if test "$APCUPSD_MAIL" = "no"
     then
-	echo 'WARNING: mail program not found !'
+	{ echo "$as_me:$LINENO: WARNING: mail program not found !" >&5
+echo "$as_me: WARNING: mail program not found !" >&2;}
 	APCUPSD_MAIL=mail
     fi
 fi
@@ -3273,8 +3275,9 @@ if test "$WALL" = "no"
 then
 	if test "$CFG_CYGWIN" = "no"
 	then
-	   echo 'ERROR: wall program not found !'
-	   exit 1
+	   { { echo "$as_me:$LINENO: error: wall program not found !" >&5
+echo "$as_me: error: wall program not found !" >&2;}
+   { (exit 1); exit 1; }; }
 	fi
 fi
 
@@ -3325,8 +3328,9 @@ test -n "$SCRIPTSHELL" || SCRIPTSHELL="no"
 
 if test "$SCRIPTSHELL" = "no"
 then
-	echo 'ERROR: shell program not found !'
-	exit 1
+	{ { echo "$as_me:$LINENO: error: shell program not found !" >&5
+echo "$as_me: error: shell program not found !" >&2;}
+   { (exit 1); exit 1; }; }
 fi
 
 for ac_prog in gmake pmake make
@@ -3376,8 +3380,9 @@ test -n "$MAKE" || MAKE="no"
 
 if test "$MAKE" = "no"
 then
-	echo 'ERROR: make program not found !'
-	exit 1
+	{ { echo "$as_me:$LINENO: error: make program not found !" >&5
+echo "$as_me: error: make program not found !" >&2;}
+   { (exit 1); exit 1; }; }
 fi
 
 for ac_prog in makedepend true
@@ -4014,7 +4019,9 @@ if test `eval echo '${'$as_ac_var'}'` = yes; then
 _ACEOF
 
 else
-  echo 'configure: cannot find needed function.'; exit 1
+  { { echo "$as_me:$LINENO: error: cannot find required function." >&5
+echo "$as_me: error: cannot find required function." >&2;}
+   { (exit 1); exit 1; }; }
 
 fi
 done
@@ -4206,7 +4213,9 @@ _ACEOF
   LIBS="-lsocket $LIBS"
 
 else
-  echo 'configure: cannot find needed function.'; exit 1
+  { { echo "$as_me:$LINENO: error: cannot find required function." >&5
+echo "$as_me: error: cannot find required function." >&2;}
+   { (exit 1); exit 1; }; }
 
 fi
 
@@ -4244,7 +4253,9 @@ else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-echo 'configure: cannot find needed function.'; exit 1
+{ { echo "$as_me:$LINENO: error: cannot find required function." >&5
+echo "$as_me: error: cannot find required function." >&2;}
+   { (exit 1); exit 1; }; }
 
 fi
 rm -f conftest.$ac_objext conftest$ac_exeext conftest.$ac_ext
@@ -4547,7 +4558,9 @@ if test `eval echo '${'$as_ac_var'}'` = yes; then
 _ACEOF
 
 else
-  echo 'configure: cannot find needed function.'; exit 1
+  { { echo "$as_me:$LINENO: error: cannot find required function." >&5
+echo "$as_me: error: cannot find required function." >&2;}
+   { (exit 1); exit 1; }; }
 
 fi
 done
@@ -6758,7 +6771,8 @@ if test `eval echo '${'$as_ac_Header'}'` = yes; then
 _ACEOF
 
 else
-  echo 'configure: at least 1 header file is missing. This may not compile.'
+  { echo "$as_me:$LINENO: WARNING: at least 1 header file is missing. This may not compile." >&5
+echo "$as_me: WARNING: at least 1 header file is missing. This may not compile." >&2;}
 
 fi
 
@@ -6907,7 +6921,8 @@ if test `eval echo '${'$as_ac_Header'}'` = yes; then
 _ACEOF
 
 else
-  echo 'configure: some header files are missing. This may not compile.'
+  { echo "$as_me:$LINENO: WARNING: some header files are missing. This may not compile." >&5
+echo "$as_me: WARNING: some header files are missing. This may not compile." >&2;}
 
 fi
 
@@ -8649,6 +8664,9 @@ if test "${enable_cgi+set}" = set; then
 _ACEOF
 
 	 CGI=cgi
+
+     { echo "$as_me:$LINENO: checking for libgd..." >&5
+echo "$as_me: checking for libgd..." >&6;}
      echo "$as_me:$LINENO: checking for gdImagePng in -lgd" >&5
 echo $ECHO_N "checking for gdImagePng in -lgd... $ECHO_C" >&6
 if test "${ac_cv_lib_gd_gdImagePng+set}" = set; then
@@ -8705,7 +8723,8 @@ echo "$as_me:$LINENO: result: $ac_cv_lib_gd_gdImagePng" >&5
 echo "${ECHO_T}$ac_cv_lib_gd_gdImagePng" >&6
 if test $ac_cv_lib_gd_gdImagePng = yes; then
 
-	 echo '  using PNG file format (/usr/lib).'
+	 echo "$as_me:$LINENO: result: using PNG file format (/usr/lib)." >&5
+echo "${ECHO_T}using PNG file format (/usr/lib)." >&6
 	 cat >>confdefs.h <<\_ACEOF
 #define SYS_IMGFMT_PNG 1
 _ACEOF
@@ -8773,7 +8792,8 @@ echo "$as_me:$LINENO: result: $ac_cv_lib_gd_gdImageGif" >&5
 echo "${ECHO_T}$ac_cv_lib_gd_gdImageGif" >&6
 if test $ac_cv_lib_gd_gdImageGif = yes; then
 
-	   echo '  using GIF file format (/usr/lib).'
+	   echo "$as_me:$LINENO: result: using GIF file format (/usr/lib)." >&5
+echo "${ECHO_T}using GIF file format (/usr/lib)." >&6
 	   cat >>confdefs.h <<\_ACEOF
 #define SYS_IMGFMT_GIF 1
 _ACEOF
@@ -8847,7 +8867,8 @@ echo "$as_me:$LINENO: result: $ac_cv_lib_gd_gdImagePng" >&5
 echo "${ECHO_T}$ac_cv_lib_gd_gdImagePng" >&6
 if test $ac_cv_lib_gd_gdImagePng = yes; then
 
-	   echo '  using PNG file format (/usr/local/lib).'
+	   echo "$as_me:$LINENO: result: using PNG file format (/usr/local/lib)." >&5
+echo "${ECHO_T}using PNG file format (/usr/local/lib)." >&6
 	   cat >>confdefs.h <<\_ACEOF
 #define SYS_IMGFMT_PNG 1
 _ACEOF
@@ -8917,7 +8938,8 @@ echo "$as_me:$LINENO: result: $ac_cv_lib_gd_gdImageGif" >&5
 echo "${ECHO_T}$ac_cv_lib_gd_gdImageGif" >&6
 if test $ac_cv_lib_gd_gdImageGif = yes; then
 
-	   echo '  using GIF file format (/usr/local/lib).'
+	   echo "$as_me:$LINENO: result: using GIF file format (/usr/local/lib)." >&5
+echo "${ECHO_T}using GIF file format (/usr/local/lib)." >&6
 	   cat >>confdefs.h <<\_ACEOF
 #define SYS_IMGFMT_GIF 1
 _ACEOF
@@ -8932,6 +8954,8 @@ fi
      then
        if test -d src/gd1.2
        then
+         echo "$as_me:$LINENO: result: using GIF file format (local copy of libgd)." >&5
+echo "${ECHO_T}using GIF file format (local copy of libgd)." >&6
 	 CPPFLAGS=${_cppflags}
 	 LDFLAGS=${_ldflags}
 	 GDINCLUDE='-I$(topdir)/src/gd1.2'
@@ -8942,17 +8966,27 @@ fi
 _ACEOF
 
        else
-	 echo 'Your system lacks the GD library for compiling CGI'
-	 echo 'programs. Please download this library from'
-	 echo
-	 echo 'http://www.boutell.com/gd/'
-	 echo
-	 echo 'After building it and installing it on your system'
-	 echo 'preferrably in /usr/lib or /usr/local/lib,'
-	 echo 're-run the ./configure script.'
-	 echo
-	 echo 'Alternatively you can disable the CGI support.'
-	 exit 1
+	{ { echo "$as_me:$LINENO: error: Your system lacks the GD library for compiling CGI
+programs. Please download this library from
+
+http://www.boutell.com/gd/
+
+After building it and installing it on your system
+preferrably in /usr/lib or /usr/local/lib,
+re-run the ./configure script.
+
+Alternatively you can disable the CGI support." >&5
+echo "$as_me: error: Your system lacks the GD library for compiling CGI
+programs. Please download this library from
+
+http://www.boutell.com/gd/
+
+After building it and installing it on your system
+preferrably in /usr/lib or /usr/local/lib,
+re-run the ./configure script.
+
+Alternatively you can disable the CGI support." >&2;}
+   { (exit 1); exit 1; }; }
        fi
      fi
 	 if test x$GDINCLUDE = x ; then
@@ -9222,11 +9256,15 @@ if test $ac_cv_header_gd_gd_h = yes; then
    GDHEAD="gd/"
 else
 
-	       echo 'Found system GD library but no header file.'
-	       echo 'Please find the file gd.h in your system'
-	       echo 'include directories and report its position'
-	       echo 'to apcupsd-devel@apcupsd.com'
-	       exit 1
+		{ { echo "$as_me:$LINENO: error: Found system GD library but no header file.
+Please find the file gd.h in your system
+include directories and report its position
+to apcupsd-devel@apcupsd.com" >&5
+echo "$as_me: error: Found system GD library but no header file.
+Please find the file gd.h in your system
+include directories and report its position
+to apcupsd-devel@apcupsd.com" >&2;}
+   { (exit 1); exit 1; }; }
 
 fi
 
@@ -9314,7 +9352,8 @@ _ACEOF
 		USB_DRIVER="usb"
 
 	else
-		echo "Can't build USB driver on this OS, disabled."
+		{ echo "$as_me:$LINENO: Can't build USB driver on this OS, disabled." >&5
+echo "$as_me: Can't build USB driver on this OS, disabled." >&6;}
 	fi
 	fi
 fi;
@@ -12943,7 +12982,9 @@ if test `eval echo '${'$as_ac_var'}'` = yes; then
 _ACEOF
 
 else
-  echo 'configure: cannot find needed function.'; exit 1
+  { { echo "$as_me:$LINENO: error: cannot find required function." >&5
+echo "$as_me: error: cannot find required function." >&2;}
+   { (exit 1); exit 1; }; }
 
 fi
 done
@@ -15360,11 +15401,18 @@ cat config.out
 
 echo $PATH | grep /usr/ucb >/dev/null
 if test $? = 0 ; then
-echo "
+{ echo "$as_me:$LINENO: WARNING:
 
 WARNING! You have /usr/ucb on your path. We STRONGLY recommend
-	 that you remove it and rerun your configure, otherwise
+	 that you remove it and rerun configure. Otherwise
 	 apcupsd may be unable to shutdown your system.
 
-  "
+" >&5
+echo "$as_me: WARNING:
+
+WARNING! You have /usr/ucb on your path. We STRONGLY recommend
+	 that you remove it and rerun configure. Otherwise
+	 apcupsd may be unable to shutdown your system.
+
+" >&2;};
 fi
