@@ -67,7 +67,7 @@ case "$1" in
 	echo "Warning communications lost with UPS ${2}" | ${WALL}
     ;;
     commok)
-	echo "Communciations restored with UPS ${2}" | ${WALL}
+	echo "Communications restored with UPS ${2}" | ${WALL}
     ;;
 #
 # powerout, onbattery, offbattery, mainsback events occur
