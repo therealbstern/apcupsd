@@ -94,7 +94,7 @@ clean: targetclean
 
 distclean: targetdistclean
 	$(RMF) Makefile
-	@rm -rf CVS win32/CVS
+	$(RMF) -r CVS win32/CVS
 
 # -----------------------------------------------------------------------
 # DO NOT DELETE THIS LINE -- make depend depends on it.

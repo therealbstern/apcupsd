@@ -53,7 +53,8 @@ libmymapi32.a: mymapi32.def
 clean: targetclean
 
 distclean: targetdistclean
-	$(RMF) Makefile CVS
+	$(RMF) Makefile
+	$(RMF) -r CVS
 
 install:
 	@echo "Installing executables ..."

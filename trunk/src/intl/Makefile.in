@@ -155,7 +155,8 @@ clean: targetclean
 
 distclean: targetdistclean
 	$(RMF) po2msg.sed po2tbl.sed
-	$(RMF) Makefile CVS
+	$(RMF) Makefile
+	$(RMF) -r CVS
 
 # -----------------------------------------------------------------------
 # DO NOT DELETE THIS LINE -- make depend depends on it.

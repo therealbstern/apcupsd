@@ -1,6 +1,6 @@
 # main Makefile for apcupsd
 #
-# Copyright (C) 1999-2002 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
+# Copyright (C) 1999-2003 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
 #
 
 # Default variables
@@ -39,13 +39,13 @@ install-dircgi:
 uninstall: uninstall-subdirs
 
 example_clean:
-	(cd examples; make clean)
+	(cd examples; $(MAKE) clean)
 
 clean: example_clean targetclean
 	$(RMF) `find . -type f -size 0 -print`
 
 example_distclean: example_clean
-	(cd examples; make distclean)
+	(cd examples; $(MAKE) distclean)
 
 distclean: example_distclean targetdistclean
 	$(RMF) TAGS tags

@@ -1,6 +1,6 @@
 # Makefile template
 #
-# Copyright (C) 1999-2002 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
+# Copyright (C) 1999-2003 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
 #
 
 # Default variables
@@ -42,14 +42,18 @@ uninstall-distdir:
 	    $(MAKE) "DISTNAME=$(DISTNAME)" "DISTVER=$(DISTVER)" uninstall);
 
 uninstall: @UNINSTALL_DISTDIR@
-	rm -f $(DESTDIR)$(sysconfdir)/apccontrol
+	$(RMF) $(DESTDIR)$(sysconfdir)/apccontrol
 
 clean: targetclean
 
 distclean: targetdistclean
 	$(RMF) Makefile
 	$(RMF) apccontrol
-	@rm -rf CVS cygwin/CVS cygwin/bin/CVS cygwin/examples/CVS
+	$(RMF) -r CVS cygwin/CVS cygwin/bin/CVS cygwin/examples/CVS
+	$(RMF) -r alpha/CVS caldera/CVS darwin/CVS debian/CVS engarde/CVS
+	$(RMF) -r etc/CVS freebsd/CVS gentoo/CVS hpux/CVS mandrake/CVS netbsd/CVS
+	$(RMF) -r openbsd/CVS openserver/CVS redhat/CVS sco/CVS slackware/CVS
+	$(RMF) -r sun/CVS suse/CVS unifix/CVS unknown/CVS
 
 # -----------------------------------------------------------------------
 # DO NOT DELETE THIS LINE -- make depend depends on it.
