@@ -637,18 +637,18 @@ look like the following:</para>
 
 <programlisting>
 CFLAGS=&quot;-g -O2&quot; LDFLAGS=&quot;-g&quot; ./configure \
-  &#x2D;&#x2D;enable-usb \
-  &#x2D;&#x2D;with-serial-dev=/dev/usb/hiddev[0-15] \
-  &#x2D;&#x2D;with-upstype=usb \
-  &#x2D;&#x2D;with-upscable=usb \
-  &#x2D;&#x2D;prefix=/usr \
-  &#x2D;&#x2D;sbindir=/sbin \
-  &#x2D;&#x2D;with-cgi-bin=/var/www/cgi-bin \
-  &#x2D;&#x2D;enable-cgi \
-  &#x2D;&#x2D;with-css-dir=/var/www/docs/css \
-  &#x2D;&#x2D;with-log-dir=/etc/apcupsd \
-  &#x2D;&#x2D;enable-pthreads \
-  &#x2D;&#x2D;enable-powerflute
+  enable-usb \
+  with-serial-dev=/dev/usb/hiddev[0-15] \
+  with-upstype=usb \
+  with-upscable=usb \
+  prefix=/usr \
+  sbindir=/sbin \
+  with-cgi-bin=/var/www/cgi-bin \
+  enable-cgi \
+  with-css-dir=/var/www/docs/css \
+  with-log-dir=/etc/apcupsd \
+  enable-pthreads \
+  enable-powerflute
 </programlisting>
 
 <para>On other Linux systems, the <option>--with-serial-dev</option>
@@ -750,7 +750,7 @@ the power. This is necessary if you wish your system to automatically
 reboot when the mains power is restored. If you prefer to manually
 reboot your system, you can skip this final system dependent
 installation step by specifying the
-<option>&#x2D;&#x2D;disable-install-distdir</option> option on the
+<option>disable-install-distdir</option> option on the
 <command>./configure</command> command (see below for more
 details).</para>
 
@@ -777,7 +777,7 @@ master.</para>
 printed by entering:</para>
 
 <programlisting>
-./configure &#x2D;&#x2D;help
+./configure help
 </programlisting>
 
 <para>When specifying options for <command>./configure</command>, if
@@ -796,14 +796,14 @@ customization in the next version of
 
 <variablelist>
   <varlistentry>
-    <term>&#x2D;&#x2D;prefix=&lt;path&gt;</term>
+    <term>prefix=&lt;path&gt;</term>
     <listitem>
       <para>This defines the directory for the non-executable files such as
       the manuals. The default is <emphasis role="bold">/usr</emphasis>.</para>
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;sbindir=&lt;path&gt;</term>
+    <term>sbindir=&lt;path&gt;</term>
     <listitem>
       <para>This defines the directory for the executable files such as
       <application>apcupsd</application>. The default is
@@ -818,7 +818,7 @@ customization in the next version of
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;enable-powerflute</term>
+    <term>enable-powerflute</term>
     <listitem>
       <para>This option enables the building of the 
       <application>powerflute</application> executable, which is a ncurses
@@ -827,7 +827,7 @@ customization in the next version of
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;enable-cgi</term>
+    <term>enable-cgi</term>
     <listitem>
       <para>This enables the building of the CGI programs that permit Web
       browser access to <application>apcupsd</application> data. This option
@@ -836,7 +836,7 @@ customization in the next version of
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;with-cgi-bin=&lt;path&gt;</term>
+    <term>with-cgi-bin=&lt;path&gt;</term>
     <listitem>
       <para>The with-cgi-bin configuration option allows you to define the
       directory where the CGI programs will be installed. The default
@@ -845,7 +845,7 @@ customization in the next version of
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;with-css-dir=&lt;path&gt;</term>
+    <term>with-css-dir=&lt;path&gt;</term>
     <listitem>
       <para>This option allows you to specify where you want 
       <application>apcupsd</application> to put the Cascading Style Sheet
@@ -854,34 +854,34 @@ customization in the next version of
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;enable-master-slave</term>
+    <term>enable-master-slave</term>
     <listitem>
       <para>Turns on the master/slave networking code (default). This is
       sometimes referred to as the old master/slave code</para>
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;enable-apcsmart</term>
+    <term>enable-apcsmart</term>
     <listitem>
       <para>Turns on generation of the APC Smart driver (default).</para>
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;enable-dumb</term>
+    <term>enable-dumb</term>
     <listitem>
       <para>Turns on generation of the dumb signalling driver code
       (default).</para>
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;enable-usb</term>
+    <term>enable-usb</term>
     <listitem>
       <para>Turns on generation of the Linux (only) USB driver code. By
       default this is disabled.</para>
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;enable-net</term>
+    <term>enable-net</term>
     <listitem>
       <para>Turns on generation of the NIS network driver for slaves. This
       is an alternative to master/slave code. For the master, this code
@@ -892,7 +892,7 @@ customization in the next version of
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;enable-snmp</term>
+    <term>enable-snmp</term>
     <listitem>
       <para>Turns on generation of the SNMP driver. This driver will
       control the computer by reading the UPS information over the
@@ -901,14 +901,14 @@ customization in the next version of
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;enable-test</term>
+    <term>enable-test</term>
     <listitem>
       <para>This turns on a test driver that is used only for debugging.
       By default it is disabled.</para>
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;enable-nis</term>
+    <term>enable-nis</term>
     <listitem>
       <para>Turns on the Network Information Server (NIS) code within
       <application>apcupsd</application>. This is enabled by default. If you 
@@ -918,7 +918,7 @@ customization in the next version of
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;enable-pthreads</term>
+    <term>enable-pthreads</term>
     <listitem>
       <para>This option enables pthreads support causing 
       <application>apcupsd</application> to
@@ -931,7 +931,7 @@ customization in the next version of
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;with-libwrap=&lt;path&gt;</term>
+    <term>with-libwrap=&lt;path&gt;</term>
     <listitem>
       <para>This option when enabled causes <application>apcupsd</application>
       to be built with the TCP WRAPPER library for enhanced security.
@@ -941,7 +941,7 @@ customization in the next version of
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;with-nologin=&lt;path&gt;</term>
+    <term>with-nologin=&lt;path&gt;</term>
     <listitem>
       <para>This option allows you to specify where 
       <application>apcupsd</application> will
@@ -950,7 +950,7 @@ customization in the next version of
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;with-pid-dir=&lt;path&gt;</term>
+    <term>with-pid-dir=&lt;path&gt;</term>
     <listitem>
       <para>This option allows you to specify where 
        <application>apcupsd</application> will
@@ -960,7 +960,7 @@ customization in the next version of
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;with-log-dir=&lt;path&gt;</term>
+    <term>with-log-dir=&lt;path&gt;</term>
     <listitem>
       <para>This option allows you to specify where 
       <application>apcupsd</application> will
@@ -971,7 +971,7 @@ customization in the next version of
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;with-lock-dir=&lt;path&gt;</term>
+    <term>with-lock-dir=&lt;path&gt;</term>
     <listitem>
       <para>This option allows you to specify where 
       <application>apcupsd</application> will create the serial port lock file.
@@ -982,7 +982,7 @@ customization in the next version of
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;with-pwrfail-dir=&lt;path&gt;</term>
+    <term>with-pwrfail-dir=&lt;path&gt;</term>
     <listitem>
       <para>This option allows you to specify where 
       <application>apcupsd</application> will create the 
@@ -991,7 +991,7 @@ customization in the next version of
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;with-serial-dev=&lt;device-name&gt;</term>
+    <term>with-serial-dev=&lt;device-name&gt;</term>
     <listitem>
       <para>This option allows you to specify where 
       <application>apcupsd</application> will look for the serial device 
@@ -1002,7 +1002,7 @@ customization in the next version of
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;with-nis-port=&lt;port&gt;</term>
+    <term>with-nis-port=&lt;port&gt;</term>
     <listitem>
       <para>This option allows you to specify what port 
       <application>apcupsd</application> will use for the Network Information
@@ -1015,7 +1015,7 @@ customization in the next version of
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;with-nisip=&lt;IP-Address&gt;</term>
+    <term>with-nisip=&lt;IP-Address&gt;</term>
     <listitem>
       <para>This option allows you to specify the value that will be placed
       on then NISIP directive in the configuration file. The default is
@@ -1024,7 +1024,7 @@ customization in the next version of
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;with-net-port=&lt;port&gt;</term>
+    <term>with-net-port=&lt;port&gt;</term>
     <listitem>
       <para>This option allows you to specify what port
       <application>apcupsd</application> will use for Master and Slave
@@ -1035,7 +1035,7 @@ customization in the next version of
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;with-upstype=&lt;type&gt;</term>
+    <term>with-upstype=&lt;type&gt;</term>
     <listitem>
       <para>This option allows you to specify the type of UPS that will be
       connected to your computer. The default is: smartups. This
@@ -1045,7 +1045,7 @@ customization in the next version of
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;with-upscable=&lt;path&gt;</term>
+    <term>with-upscable=&lt;path&gt;</term>
     <listitem>
       <para>This option allows you to specify what cable you are using to
       connect to the UPS. The default is: smart. This option
@@ -1055,7 +1055,7 @@ customization in the next version of
     </listitem>
   </varlistentry>
   <varlistentry>
-    <term>&#x2D;&#x2D;disable-install-distdir</term>
+    <term>disable-install-distdir</term>
     <listitem>
       <para>This option modifies the <application>apcupsd</application> 
       Makefiles disable installation of the distribution (platform) directory.
@@ -1079,15 +1079,15 @@ customization in the next version of
 <para>For most systems, we recommend the following options:</para>
 
 <programlisting>
-./configure &#x2D;&#x2D;prefix=/usr &#x2D;&#x2D;sbindir=/sbin
+./configure prefix=/usr sbindir=/sbin
 </programlisting>
 
 <para>and you can optionally build and install the CGI programs as
 follows:</para>
 
 <programlisting>
-./configure &#x2D;&#x2D;prefix=/usr &#x2D;&#x2D;sbindir=/sbin \
-                  &#x2D;&#x2D;enable-cgi &#x2D;&#x2D;with-cgi-bin=/home/httpd/cgi-bin
+./configure prefix=/usr sbindir=/sbin \
+                  enable-cgi with-cgi-bin=/home/httpd/cgi-bin
 </programlisting>
 
 </sect1>
@@ -1219,7 +1219,7 @@ command to the UPS so that the UPS shuts off the power. To accomplish
 the same thing on FreeBSD systems, make sure you have a SmartUPS and
 that your UPS shutdown grace period is set sufficiently long so that
 you system will power down (usually 2 minutes), the use the
-<option>&#x2D;&#x2D;kill-on-powerfail</option> option on the
+<option>kill-on-powerfail</option> option on the
 <application>apcupsd</application> command line.</para>
 <para>Please note the concerns listed below under OpenBSD concerning
 the use of pthreads.</para>
@@ -1364,15 +1364,15 @@ the following:</para>
 
 <programlisting>
 ./configure \
-   &#x2D;&#x2D;prefix=/opt/apcupsd \
-   &#x2D;&#x2D;sbindir=/etc/opt/apcupsd/sbin \
-   &#x2D;&#x2D;sysconfdir=/etc/opt/apcupsd \
-   &#x2D;&#x2D;with-cgi-bin=/opt/apcupsd/cgi-bin
+   prefix=/opt/apcupsd \
+   sbindir=/etc/opt/apcupsd/sbin \
+   sysconfdir=/etc/opt/apcupsd \
+   with-cgi-bin=/opt/apcupsd/cgi-bin
 </programlisting>
 
 <para>The way to setup the <filename>/sbin</filename> directory as the
 executables directory is to pass configure the <emphasis
-role="bold">&#x2D;&#x2D;sbindir=/sbin</emphasis> option. No other arguments
+role="bold">sbindir=/sbin</emphasis> option. No other arguments
 should be required, and your setup and platform should be detected
 automatically by configure.</para>
 
@@ -1558,13 +1558,13 @@ command with the following options:</para>
 
 <programlisting>
 ./configure \
-  &#x2D;&#x2D;prefix=/apcupsd \
-  &#x2D;&#x2D;sbindir=/apcupsd/bin \
-  &#x2D;&#x2D;sysconfdir=/apcupsd/etc/apcupsd \
-  &#x2D;&#x2D;with-pid-dir=/apcupsd/etc/apcupsd \
-  &#x2D;&#x2D;mandir=/apcupsd \
-  &#x2D;&#x2D;with-cgi-bin=/apcupsd/etc/apcupsd/cgi \
-  &#x2D;&#x2D;enable-pthreads
+  prefix=/apcupsd \
+  sbindir=/apcupsd/bin \
+  sysconfdir=/apcupsd/etc/apcupsd \
+  with-pid-dir=/apcupsd/etc/apcupsd \
+  mandir=/apcupsd \
+  with-cgi-bin=/apcupsd/etc/apcupsd/cgi \
+  enable-pthreads
 </programlisting>
 
   <para>After which, you can do a:</para>

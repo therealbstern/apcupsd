@@ -448,13 +448,13 @@ re-executes <application>apcupsd</application> with the
 line probably looks something like:</para>
 
 <programlisting>
-&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;${APCUPSD} --killpower
+${APCUPSD} --killpower
 </programlisting>
 
 <para>when it is commented out, it looks like:</para>
 
 <programlisting>
-#&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;&#xA0;${APCUPSD}--killpower
+#${APCUPSD}--killpower
 </programlisting>
 
 <para>Now when you pull the power plug, and either the timer expires
