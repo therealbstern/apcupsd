@@ -116,6 +116,9 @@
 #define int32_t		int
 #define socklen_t	unsigned int
 #define _SEM_SEMUN_UNDEFINED 1
+#endif
+
+#ifndef SHUT_RDWR
 #define SHUT_RDWR 2		/* for socket shutdown() calls */
 #endif
 

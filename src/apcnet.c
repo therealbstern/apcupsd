@@ -362,6 +362,15 @@ int prepare_slave(UPSINFO *ups)
     int i, bound;
     struct hostent *mastent;
     int turnon = 1;
+	struct in_addr local_ip;
+
+	local_ip.s_addr = INADDR_ANY;
+   if (ups->nisip) {
+      if (inet_pton(AF_INET, ups->nisip, &local_ip) != 1) {
+         log_event(ups, LOG_WARNING, "Invalid IP: '%s'", ups->nisip);
+         local_ip.s_addr = INADDR_ANY;
+      }  
+   }  
 
     strcpy(ups->mode.long_name, "Network Slave"); /* don't know model */
     slaves[0].remote_state = RMT_DOWN;
@@ -393,7 +402,7 @@ int prepare_slave(UPSINFO *ups)
     /* memset is more portable than bzero */
     memset((char *) &my_adr, 0, sizeof(struct sockaddr_in));
     my_adr.sin_family = AF_INET;
-    my_adr.sin_addr.s_addr = htonl(INADDR_ANY);
+    my_adr.sin_addr = local_ip;
     my_adr.sin_port = htons(ups->NetUpsPort);
 
     bound = FALSE;

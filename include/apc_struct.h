@@ -356,6 +356,7 @@ typedef struct upsinfo {
     int nettime;                     /* Time interval for master to send to slaves */
     int percent;                     /* shutdown when batt % less than this */
     int runtime;                     /* shutdown when runtime less than this */
+    char nisip[64];          			 /* IP for NIS */
     int statusport;                  /* TCP port for STATUS */
     int netstats;                    /* turn on/off network status */
     int logstats;                    /* turn on/off logging of status info */

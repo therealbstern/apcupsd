@@ -196,12 +196,15 @@ int main(int argc, char *argv[])
     strncpy(argvalue, argv[0], sizeof(argvalue)-1);
     argvalue[sizeof(argvalue)-1] = 0;
 
-    if (argc == 1) {
+	if (argc == 1 || argc == 3) {
 	do_daemon(argc, argv);
-    } else if ((argc == 2) && (strcmp(argv[1], "-i") == 0)) {
+	} 
+	else if ((argc == 2) && (strcmp(argv[1], "-i") == 0)) {
 	do_inetd(argc, argv);
-    } else
+	} 
+	else {
         error_exit("Usage: %s \n", argv[0]);
+	}
     return 0;
 }
 
@@ -244,6 +247,15 @@ int do_daemon(int argc, char *argv[])
     struct sockaddr_in cli_addr;       /* client's address */
     struct sockaddr_in serv_addr;      /* our address */
     int turnon = 1;
+	struct in_addr local_ip;
+
+   local_ip.s_addr = INADDR_ANY;
+	if ((argc == 3) && (strcmp(argv[1], "-a") == 0)) {
+      if (inet_pton(AF_INET, argv[2], &local_ip) != 1) {
+         error_exit("Invalid IP: '%s'", argv[2]);
+      }
+   }
+
 
     pname = argv[0];
 
@@ -278,7 +290,7 @@ int do_daemon(int argc, char *argv[])
      */
     bzero((char *) &serv_addr, sizeof(serv_addr));
     serv_addr.sin_family = AF_INET;
-    serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+    serv_addr.sin_addr = local_ip;
     serv_addr.sin_port = htons(NISPORT);
 
     if (bind(sockfd, (struct sockaddr *) &serv_addr, sizeof(serv_addr)) < 0)
