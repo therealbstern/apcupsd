@@ -183,6 +183,14 @@ void html_begin(const char *title, int refresh)
      */
     (void) puts (" <meta http-equiv=\"Pragma\" content=\"no-cache\" />");
 
+    /*
+     * Add a generator tag so that when bugs are logged, we know what version
+     * of the code we are dealing with.
+     */
+    (void) fputs (" <meta name=\"generator\" content=\"apcupsd ", stdout);
+    html_puts(VERSION);
+    (void) puts(", See: http://www.apcupsd.com/\" />");
+
     if (refresh != 0) {
         printf (" <meta http-equiv=\"Refresh\" content=\"%d\" />\n", refresh);
     }
