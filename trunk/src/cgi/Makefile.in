@@ -10,15 +10,13 @@ topdir = @topdir@
 top_builddir = $(topdir)
 
 allexe = upsstats.cgi upsfstats.cgi upsimage.cgi \
-	   multimon.cgi multimoncss.cgi 
+	   multimon.cgi
 
 # Include the default make targets: to be put before the all-targets: rule.
 @TARGETS@
 
 # Multimon objects
 MOBJS = multimon.o upsfetch.o cgilib.o
-
-MCSSOBJS = multimoncss.o upsfetch.o cgilib.o
 
 # upssstats objects
 SOBJS = upsstats.o upsfetch.o cgilib.o
@@ -37,9 +35,6 @@ all-targets: $(allexe)
 
 multimon.cgi: $(MOBJS)
 	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MOBJS) $(LIBS)
-
-multimoncss.cgi: $(MCSSOBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MCSSOBJS) $(LIBS)
 
 upsstats.cgi: $(SOBJS) 
 	$(CC) $(LDFLAGS) -o $@ $(SOBJS) $(LIBS)
@@ -62,15 +57,8 @@ install: all-targets
 	    echo $(INSTALL_PROGRAM) $$p $(DESTDIR)$(cgibin); \
 	    $(INSTALL_PROGRAM) $$p $(DESTDIR)$(cgibin); \
 	done
-	@if test "x$(CSS_DIR)" != "x" ; then \
-	   if test -d $(DESTDIR)$(CSS_DIR) ; then \
-	      $(INSTALL_DATA) multimon.css $(DESTDIR)$(CSS_DIR) ; \
-	   else \
-	      echo "CSS_DIR $(DESTDIR)$(CSS_DIR) not found, did not install multimon.css" ; \
-	   fi \
-	else \
-	   echo "No CSS_DIR found, did not install multimon.css" ; \
-	fi
+	$(INSTALL_DATA) apcupsd.css $(DESTDIR)$(cgibin)
+
 	# don't overwrite any existing config file
 	@if test ! -f $(DESTDIR)$(sysconfdir)/hosts.conf; then \
 	   (echo "Installing hosts.conf..." && \

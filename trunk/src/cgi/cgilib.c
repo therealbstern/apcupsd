@@ -152,11 +152,12 @@ void html_begin(const char *title, int refresh)
     fputs ("<title>", stdout);
     html_puts(title);
     puts ("</title>");
-    puts ("<meta http-equiv=\"Pragma\" content=\"no-cache\" />");
+    puts (" <meta http-equiv=\"Pragma\" content=\"no-cache\" />");
     if (refresh != 0) {
-        printf ("<meta http-equiv=\"Refresh\" content=\"%d\" />\n", refresh);
+        printf (" <meta http-equiv=\"Refresh\" content=\"%d\" />\n", refresh);
     }
 
+#ifdef EMBEDDED_STYLESHEET
     puts ("<style type=\"text/css\" id=\"internalStyle\">");
     puts ("  body {color: black; background: white}");
     puts ("  div.Center {text-align: center}");
@@ -173,7 +174,9 @@ void html_begin(const char *title, int refresh)
     puts ("  .Normal {color: black; background: lime}");
     puts ("  .Warning {color: black; background: yellow}");
     puts ("</style>");
-
+#else
+    puts (" <link href=\"apcupsd.css\" rel=\"stylesheet\" type=\"text/css\" />");
+#endif
     puts ("</head>");
     puts ("<body>");
 }
