@@ -267,8 +267,8 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
         Dmsg0(100, "HEY!!! Couldn't get status flag.\n");
 	stat = 0;
     } else {
-       ups->Status &= ~0xFF;	      /* clear APC byte */
-       ups->Status |= strtol(answer, NULL, 0) & 0xFF; /* set APC byte */
+       /* We probably do not want the local junk that is exported -- KES */
+       ups->Status |= strtol(answer, NULL, 0);
     }
     Dmsg2(100, "Got Status = %s %03x\n", answer, ups->Status);
 

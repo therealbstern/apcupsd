@@ -22,7 +22,7 @@ all-targets: Makefile
 install-distdir:
 	(cd $(DISTNAME); \
 	$(MAKE) "DISTNAME=$(DISTNAME)" "DISTVER=$(DISTVER)" install);
-	./install-symlinks.sh install $(DISTNAME) $(DISTVER)
+	./install-symlinks.sh install "$(DISTNAME)" "$(DISTVER)"
 
 install: @INSTALL_DISTDIR@
 	@echo "Installing apccontrol script..."
