@@ -2,5 +2,5 @@
 #define AVERSION 3
 #define VERSION "3.10.6"
 #define VSTRING "3106"
-#define ADATE   "08 July 2003"
-#define LSMDATE "08Jul03"
+#define ADATE   "12 July 2003"
+#define LSMDATE "12Jul03"
