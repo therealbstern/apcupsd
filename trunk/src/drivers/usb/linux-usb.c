@@ -31,15 +31,16 @@
  */
 
 
-#include "apc.h"
-#include "usb.h"
-#include <math.h>
-
 /*
  * The following is a work around for a problem in 2.6 kernel
  *  linux/hiddev.h file that should be fixed in 2.6.8
  */
 #define HID_MAX_USAGES 1024
+
+#include "apc.h"
+#include "usb.h"
+#include <math.h>
+
 
 #include <asm/types.h>
 #include <linux/hiddev.h>

@@ -24,6 +24,8 @@
  */
 
 
+#define HID_MAX_USAGES 1024
+
 #include <stdlib.h>
 #include <string.h>
 #include <fcntl.h>

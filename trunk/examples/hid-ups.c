@@ -1,5 +1,5 @@
 /*
- * $Id: hid-ups.c,v 1.8 2003-09-21 19:14:10 kerns Exp $
+ * $Id: hid-ups.c,v 1.9 2004-08-04 20:39:27 kerns Exp $
  *
  *  Copyright (c) 2001 Vojtech Pavlik <vojtech@ucw.cz>
  *  Copyright (c) 2001 Paul Stewart <hiddev@wetlogic.net>
@@ -32,6 +32,8 @@
 
 #define DEBUG 1 		      /* if set prints full reports */
 #define TESTING 1		      /* if set disables actual operation */
+
+#define HID_MAX_USAGES 1024
 
 #include <stdlib.h>
 #include <string.h>
