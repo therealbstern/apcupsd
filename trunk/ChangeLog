@@ -5,7 +5,13 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
-----> Release apcupsd-3.10.6 (20 May 2003)
+----> Release apcupsd-3.10.6 (30 May 2003)
+    30May03
+    - Made non-existent header files non-fatal and added #ifdef 
+      around sys/socket.h so it will compile on IRIX.
+    - Add Scott's latest apcupsd.conf with the hid-ups program code 
+      (actually I had done this some time ago ...).
+    - Start a ReleaseNotes file
     20May03
     - Fixed a typo error (mine) that prevented Scott from building
       rpms. Strange, it worked for me????
@@ -248,7 +254,6 @@
       largely non-functional.
     - Reorganized developers documentation inside an html manual
       (Riccardo).
-    - Support SCO OpenServer.
     - Includes all enhancements to the officially released versions through
       3.8.5.
     - Make drivers block a reasonable amount of
