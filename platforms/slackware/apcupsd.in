@@ -16,19 +16,24 @@ case "$1" in
     start)
 	rm -f @PWRFAILDIR@/powerfail
 	rm -f @nologdir@/nologin
-	echo -n "Starting apcupsd power management"
-	@sbindir@/apcupsd || return="  Failed."
-	touch @LOCKDIR@/subsys/apcupsd
+	echo -n "Starting apcupsd power management.."
+	if [ -f ${APCPID} ]; then
+		return="  Already running."
+	else
+		@sbindir@/apcupsd && touch @LOCKDIR@/subsys/apcupsd \
+		|| return="  Failed."
+	fi
+
 	echo -e "$return"
     ;;
     stop)
-	echo -n "Stopping apcupsd power management"
+	echo -n "Stopping apcupsd power management.."
 	if [ -f ${APCPID} ]; then
 		THEPID=`cat ${APCPID}`
-		kill ${THEPID} || return=" Failed."
+		kill ${THEPID} || return="  Failed."
 		rm -f ${APCPID}
 	else
-		return=" Failed."
+		return="  Nothing to stop."
 	fi
 	rm -f @LOCKDIR@/subsys/apcupsd
 	echo -e "$return"

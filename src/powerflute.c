@@ -314,8 +314,7 @@ void update_upsdata(int sig) {
 	time_t now;
 	char *t;
 
-    
-    memcpy(ups, sharedups, sizeof(UPSINFO));
+	memcpy(ups, sharedups, sizeof(UPSINFO));
 
 	get_raw_upsinfo(ups, host, port);
 
@@ -325,24 +324,117 @@ void update_upsdata(int sig) {
 
         mvwprintw(statwin, 1, 1, "Last update: %s", t);
         mvwprintw(statwin, 2, 1, "Model      : %s", ups->mode.long_name);
-        mvwprintw(statwin, 3, 1, "Cable      : %s", ups->cable.long_name);
-        mvwprintw(statwin, 4, 1, "Mode       : %s", ups->upsclass.long_name);
-        mvwprintw(statwin, 5, 1, "AC Line    : %s",
-			(UPS_ISSET(UPS_ONBATT) ?
-                         "failing" : "okay"));
-        mvwprintw(statwin, 6, 1, "Battery    : %s",
-                        (UPS_ISSET(UPS_BATTLOW) ? "failing" : "okay"));
-        mvwprintw(statwin, 7, 1, "AC Level   : %s",
-                        (UPS_ISSET(UPS_SMARTBOOST) ? "low" :
-                         (UPS_ISSET(UPS_SMARTTRIM) ? "high" : "normal")));
-        mvwprintw(statwin, 8, 1, "Last event : %s",
-			xlate_history(ups->G[0]));
+	mvwprintw(statwin, 3, 1, "Serial No. : %s", ups->serial);
+        mvwprintw(statwin, 4, 1, "Cable      : %s", ups->cable.long_name);
+        mvwprintw(statwin, 5, 1, "Mode       : %s", ups->upsclass.long_name);
+        mvwprintw(statwin, 6, 1, "AC Line    : %s",
+		(UPS_ISSET(UPS_ONBATT) ? "failing" : "okay"));
+        mvwprintw(statwin, 7, 1, "Battery    : %s",
+		(UPS_ISSET(UPS_BATTLOW) ? "failing" : "okay"));
+        mvwprintw(statwin, 8, 1, "AC Level   : %s",
+		(UPS_ISSET(UPS_SMARTBOOST) ? "low" :
+		(UPS_ISSET(UPS_SMARTTRIM) ? "high" : "normal")));
+        mvwprintw(statwin, 9, 1, "Last event : %s", xlate_history(ups->G[0]));
+
+	mvwprintw(moniwin, 1, 1, "ACin");
+	if (ups->UPS_Cap[CI_VLINE]) {
+		int count;
+
+		wprintw(moniwin, "  %03d [", ups->lotrans);
+		mvwprintw(moniwin, 1, 32, "] %03d V", ups->hitrans);
+		count = 20 * (ups->LineVoltage - ups->lotrans) /
+			(ups->hitrans - ups->lotrans);
+		mvwprintw(moniwin, 1, 19, "%5.1f", ups->LineVoltage);
+		mvwchgat(moniwin, 1, 12, count, A_REVERSE, 0, NULL);
+	} else {
+		wprintw(moniwin, ": N/A");
+	}
+
+	mvwprintw(moniwin, 2, 1, "ACout");
+	if (ups->UPS_Cap[CI_VOUT]) {
+		int count;
+
+		wprintw(moniwin, " %03d [", ups->lotrans);
+		mvwprintw(moniwin, 2, 32, "] %03d V", ups->hitrans);
+		count = 20 * (ups->OutputVoltage - ups->lotrans) /
+			(ups->hitrans - ups->lotrans);
+		mvwprintw(moniwin, 2, 19, "%5.1f", ups->OutputVoltage);
+		mvwchgat(moniwin, 2, 12, count, A_REVERSE, 0, NULL);
+	} else {
+		wprintw(moniwin, ": N/A");
+	}
+
+	mvwprintw(moniwin, 3, 1, "Charge");
+	if (ups->UPS_Cap[CI_BATTLEV]) {
+		int count;
+
+		wprintw(moniwin, "  0 [");
+		mvwprintw(moniwin, 3, 32, "] 100 %%");
+		mvwprintw(moniwin, 3, 19, "%5.0f", ups->BattChg);
+			count = 20 * ups->BattChg / 100;
+		mvwchgat(moniwin, 3, 12, count, A_REVERSE, 0, NULL);
+	} else {
+		wprintw(moniwin, ": N/A");
+	}
+
+	mvwprintw(moniwin, 4, 1, "V Batt.");
+	if (ups->UPS_Cap[CI_VBATT]) {
+		int count;
+
+		wprintw(moniwin, " 0 [");
+		mvwprintw(moniwin, 4, 32, "] %2.1f", ups->nombattv);
+		mvwprintw(moniwin, 4, 20, "%2.1f", ups->BattVoltage);
+			count = 20 * ups->BattVoltage / ups->nombattv;
+		if (count > 20)
+			count = 20;
+
+		mvwchgat(moniwin, 4, 12, count, A_REVERSE, 0, NULL);
+	} else {
+		wprintw(moniwin, ": N/A");
+	}
+
+	mvwprintw(moniwin, 5, 1, "Load");
+	if (ups->UPS_Cap[CI_LOAD]) {
+		int count;
+
+		wprintw(moniwin, "    0 [");
+		mvwprintw(moniwin, 5, 32, "] 100 %%");
+		mvwprintw(moniwin, 5, 19, "%5.0f", ups->UPSLoad);
+		count = 20 * ups->UPSLoad / 100;
+		mvwchgat(moniwin, 5, 12, count, A_REVERSE, 0, NULL);
+	} else {
+		wprintw(moniwin, ": N/A");
+	}
+
+	mvwprintw(moniwin, 6, 1, "Runtime: ");
+	if (ups->UPS_Cap[CI_RUNTIM])
+		wprintw(moniwin, "%5.1f minutes", ups->TimeLeft);
+	else
+		wprintw(moniwin, "N/A");
+
+	mvwprintw(moniwin, 7, 1, "Input line frequency: ");
+	if (ups->UPS_Cap[CI_FREQ])
+		wprintw(moniwin, "%2.1f Hz", ups->LineFreq);
+	else
+		wprintw(moniwin, "N/A");
+
+	mvwprintw(moniwin, 8, 1, "Internal temperature: ");
+	if (ups->UPS_Cap[CI_ITEMP])
+		wprintw(moniwin, "%2.1f C", ups->UPSTemp);
+	else
+		wprintw(moniwin, "N/A");
+
+	mvwprintw(moniwin, 9, 1, "Ambient temperature: ");
+	if (ups->UPS_Cap[CI_ATEMP])
+		wprintw(moniwin, "%2.1f C", ups->ambtemp);
+	else
+		wprintw(moniwin, "N/A");
 
 	if (UPS_ISSET(UPS_SMARTBOOST)) {
-            write_mesg("* [%s] warning: AC level is low", t);
+		write_mesg("* [%s] warning: AC level is low", t);
 	}
 	if (UPS_ISSET(UPS_SMARTTRIM)) {
-            write_mesg("* [%s] warning: AC level is high", t);
+		write_mesg("* [%s] warning: AC level is high", t);
 	}
 
 	if (UPS_ISSET(UPS_ONBATT)) {
@@ -352,7 +444,7 @@ void update_upsdata(int sig) {
 		}
 	} else {
 		if (power_fail == TRUE) {
-                        write_mesg("* [%s] warning: power is returned", t);
+                        write_mesg("* [%s] warning: power has returned", t);
 			power_fail = FALSE;
 		}
 	}
