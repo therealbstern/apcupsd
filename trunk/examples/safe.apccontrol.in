@@ -44,6 +44,12 @@ apccontrol: Power failure. Running on UPS batteries.
 
 EOF
         ;;
+        offbattery)
+                wall <<EOF
+apccontrol: Off battery. Mains returned.
+
+EOF
+        ;;
         failing)
                 wall <<EOF
 apccontrol: UPS battery power exhaused. Doing shutdown.
@@ -131,13 +137,13 @@ EOF
         ;;
         mastertimeout)
                 wall <<EOF
-apccontrol: Warning connection to master lost.
+apccontrol: Warning connection from master lost.
 
 EOF
         ;;
         masterconnect)
                 wall <<EOF
-apccontrol: Connection to master established.
+apccontrol: Connection from master established.
 
 EOF
         ;;

@@ -136,10 +136,10 @@ case "$1" in
     endselftest)
     ;;
     mastertimeout)
-	echo "Warning connection to master lost." | wall
+	echo "Warning connection from master lost." | wall
     ;;
     masterconnect)
-	echo "Connection to master established." | wall
+	echo "Connection from master established." | wall
     ;;
     *)	echo "Usage: ${0##*/} command"
 	echo "	     warning: this script is intended to be launched by"

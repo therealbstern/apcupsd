@@ -86,6 +86,7 @@ void log_event(UPSINFO *ups, int level, char *fmt, ...)
     va_end(arg_ptr);
      
     syslog(level, "%s", msg);           /* log the event */
+    Dmsg1(100, "%s\n", msg);
 
     /* Write out to our temp file. LOG_INFO is DATA logging, so
        do not write it to our temp events file. */
@@ -99,8 +100,9 @@ void log_event(UPSINFO *ups, int level, char *fmt, ...)
         strftime(datetime, 100, "%a %b %d %X %Z %Y  ", &tm);
 	write(event_fd, datetime, strlen(datetime));
 	lm = strlen(msg);
-        if (msg[lm-1] != '\n') 
+        if (msg[lm-1] != '\n') {
            msg[lm++] = '\n';
+	}
 	write(event_fd, msg, lm);
     }
 }

@@ -1447,7 +1447,6 @@ darwin)
     DFILES="\
 	platforms/darwin/Makefile \
 	platforms/darwin/apcupsd"
-    LDFLAGS="${LDFLAGS} -m"
   ;;
 unknown)
 	DISTVER=unknown
