@@ -200,11 +200,13 @@ static UPSDRIVER *helper_attach_driver(UPSINFO *ups, char *drvname)
 	}
     }
     if (!ups->driver) {
-        printf("\nDriver %s not found.\nThe available drivers are:\n", drvname);
+        printf("\nApcupsd driver %s not found.\nThe available apcupsd drivers are:\n", drvname);
 	for (i=0; drivers[i].driver_name; i++) {
             printf("%s\n", drivers[i].driver_name);
 	}
         printf("\n");
+        printf("Most likely, you need to add --enable-%s to your ./configure options.\n\n",
+	   drvname);
     }
 
     write_unlock(ups);
