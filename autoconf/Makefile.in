@@ -14,6 +14,10 @@ top_builddir = $(topdir)
 
 all-targets:
 
+install:
+
+uninstall:
+
 clean: targetclean
 
 distclean: targetdistclean

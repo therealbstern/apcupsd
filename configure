@@ -9316,19 +9316,8 @@ cat >> $CONFIG_STATUS <<\EOF
 case "$CONFIG_FILES" in *po/Makefile.in*)
         sed -e "/POTFILES =/r src/po/POTFILES" src/po/Makefile.in > src/po/Makefile
       esac
+(echo "Doing make of dependencies"; make depend;) 
 
-	if test "$SINGLE_MAKEFILE" != "yes"; then
-		echo "You can ignore any makedepend error messages";
-		make depend 2>/dev/null;
-		if test $? != 0; then
-		   echo " ";
-		   echo "There was a problem with make depend.";
-		   echo "Dependencies probably not generated.";
-		   echo "This is not fatal.";
-		   echo " ";
-		fi;
-	fi
-	 
 exit 0
 EOF
 chmod +x $CONFIG_STATUS

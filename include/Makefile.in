@@ -9,10 +9,16 @@
 topdir = @top_srcdir@
 top_builddir = $(topdir)
 
+subdirs =
+
 # Include the default make targets: to be put before the all-targets: rule.
 @TARGETS@
 
 all-targets:
+
+install:
+
+uninstall:
 
 clean: targetclean
 

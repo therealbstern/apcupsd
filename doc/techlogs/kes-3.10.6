@@ -1,10 +1,19 @@
              Technical notes on version 3.10.6
-                        05 August 2003
+                        06 August 2003
                         Kern Sibbald
 
 General:
 
 Changes submitted this submission:
+06Aug03
+- The dependencies were not being correctly generated, so
+  simplified the code. 
+- Added install: to the include Makefile.in.  Lack of it 
+  caused problems on OpenBSD.
+- Changed LINEVOLT to MAINS in apcstatus.c to fix a problem   
+  reported by David Walser of CGI reporting zero volts.
+- Tried to clarify the difference between the net and
+  the master/slave drivers.
 05Aug03
 - Because of the complaints about the master/slave code, I finally
   got around to testing it, and it was seriously broken in more

@@ -26,6 +26,7 @@ If a picture is worth a thousand words for you, please see
 the <a href="configure.html#ConfigTypes">Three Major Configuration
 Possibilities for Apcupsd</a> section of the Configuration chapter
 of this manual.
+
 <h2>Configuration Directives</h2>
 The minimum set of configuration directive changes needed to
 create a proper master and slave configuration files is
@@ -56,7 +57,20 @@ This mode of master/slave networking is considerably different
 from the old method described at the beginning of this chapter.
 In the old code, there is a lot of configuration on both the
 master and slave side, and the master polls or sends info
-to the slave.
+to the slave. Using the <b>net</b> driver is much simpler.
+However, you should carefully check that the slave does
+a proper shutdown.  In the master/slave code, the master
+ensures the best it can that the slave is shutdown or
+notified before it shuts down itself.  On the other hand,
+using the net driver, the master knows nothing about the
+slaves that may be listening and thus takes no special
+precautions to ensure that the slaves receive the shutdown
+signal.  
+Since the slave reads the master's data
+once per second there should be no shutdown problems,
+and our experience confirms this.
+This point can be answered in your case by carefully
+testing the shutdown.
 <p>
 In this master/slave mode, the master is a standard stand alone
 configuration except that it must have <b>NETSERVER on</b>

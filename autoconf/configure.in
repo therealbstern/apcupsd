@@ -1677,19 +1677,9 @@ AC_SUBST_FILE(VARIABLES)
 TARGETS=$srcdir/autoconf/targets.mak
 AC_SUBST_FILE(TARGETS)
 
-AC_OUTPUT([ ${GENERATE_FILES} ], [
-	if test "$SINGLE_MAKEFILE" != "yes"; then
-		echo "You can ignore any makedepend error messages";
-		make depend 2>/dev/null;
-		if test $? != 0; then
-		   echo " ";
-		   echo "There was a problem with make depend.";
-		   echo "Dependencies probably not generated.";
-		   echo "This is not fatal.";
-		   echo " ";
-		fi;
-	fi
-	] )
+AC_OUTPUT([ ${GENERATE_FILES} ], 
+     [(echo "Doing make of dependencies"; make depend;) ]
+)
 
 chmod 755 examples/safe.apccontrol
 
