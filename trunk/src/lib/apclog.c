@@ -85,15 +85,7 @@ void log_event(UPSINFO *ups, int level, char *fmt, ...)
     avsnprintf(msg, sizeof(msg), fmt, arg_ptr);
     va_end(arg_ptr);
      
-    /*
-     * Sanitize message to be sent to syslog to 
-     * eliminate all %s which can be used as exploits.
-     */
-    for (p=msg; (p=strchr(p, '%')); ) {
-       *p = '\\';
-    }
-
-    syslog(level, msg); 	  /* log the event */
+    syslog(level, "%s", msg);           /* log the event */
 
     /* Write out to our temp file. LOG_INFO is DATA logging, so
        do not write it to our temp events file. */
