@@ -169,6 +169,14 @@ line. This will cause the <b>apcupsd.conf</b> file to contain:
 <pre>
 DEVICE /dev/usb/hid/hiddev[0-9]
 </pre>
+The <b>[0-9]</b> is not a typo, but should be entered exactly
+as shown. This is because the UPS can change device numbers
+while it is running. Every time there is a blip or slowdown
+on the USB line, the kernel will invalidate the UPS connection,
+then a few moments later, it will reconnect but with a different
+device number. Not very Unix like, but that is what happens.
+This bizarre syntax allows <b>apcupsd</b> to try a range of
+devices until it finds or re-finds the UPS device.
 
 <h2>USB Specific Information</h2>
 <p></p>The UPS has an internal set of timers and remaining capacity

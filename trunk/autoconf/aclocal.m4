@@ -33,13 +33,13 @@ AC_CACHE_VAL(ac_cv_path_$1,
   ac_cv_path_$1="[$]$1" # Let the user override the test with a path.
   ;;
   *)
-  IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS="${IFS}:"
+  IFS="${IFS=   }"; ac_save_ifs="$IFS"; IFS="${IFS}:"
   for ac_dir in ifelse([$5], , $PATH, [$5]); do
     test -z "$ac_dir" && ac_dir=.
     if test -f $ac_dir/$ac_word; then
       if [$3]; then
-	ac_cv_path_$1="$ac_dir/$ac_word"
-	break
+        ac_cv_path_$1="$ac_dir/$ac_word"
+        break
       fi
     fi
   done
@@ -116,87 +116,87 @@ AC_DEFUN(AM_WITH_NLS,
         dnl User does not insist on using GNU NLS library.  Figure out what
         dnl to use.  If gettext or catgets are available (in this order) we
         dnl use this.  Else we have to fall back to GNU NLS library.
-	dnl catgets is only used if permitted by option --with-catgets.
-	nls_cv_header_intl=
-	nls_cv_header_libgt=
-	CATOBJEXT=NONE
+        dnl catgets is only used if permitted by option --with-catgets.
+        nls_cv_header_intl=
+        nls_cv_header_libgt=
+        CATOBJEXT=NONE
 
-	AC_CHECK_HEADER(libintl.h,
-	  [AC_CACHE_CHECK([for gettext in libc], gt_cv_func_gettext_libc,
-	    [AC_TRY_LINK([#include <libintl.h>], [return (int) gettext ("")],
-	       gt_cv_func_gettext_libc=yes, gt_cv_func_gettext_libc=no)])
+        AC_CHECK_HEADER(libintl.h,
+          [AC_CACHE_CHECK([for gettext in libc], gt_cv_func_gettext_libc,
+            [AC_TRY_LINK([#include <libintl.h>], [return (int) gettext ("")],
+               gt_cv_func_gettext_libc=yes, gt_cv_func_gettext_libc=no)])
 
-	   if test "$gt_cv_func_gettext_libc" != "yes"; then
-	     AC_CHECK_LIB(intl, bindtextdomain,
-	       [AC_CACHE_CHECK([for gettext in libintl],
-		 gt_cv_func_gettext_libintl,
-		 [AC_CHECK_LIB(intl, gettext,
-		  gt_cv_func_gettext_libintl=yes,
-		  gt_cv_func_gettext_libintl=no)],
-		 gt_cv_func_gettext_libintl=no)])
-	   fi
+           if test "$gt_cv_func_gettext_libc" != "yes"; then
+             AC_CHECK_LIB(intl, bindtextdomain,
+               [AC_CACHE_CHECK([for gettext in libintl],
+                 gt_cv_func_gettext_libintl,
+                 [AC_CHECK_LIB(intl, gettext,
+                  gt_cv_func_gettext_libintl=yes,
+                  gt_cv_func_gettext_libintl=no)],
+                 gt_cv_func_gettext_libintl=no)])
+           fi
 
-	   if test "$gt_cv_func_gettext_libc" = "yes" \
-	      || test "$gt_cv_func_gettext_libintl" = "yes"; then
-	      AC_DEFINE(HAVE_GETTEXT)
-	      AM_PATH_PROG_WITH_TEST(MSGFMT, msgfmt,
-		[test -z "`$ac_dir/$ac_word -h 2>&1 | grep 'dv '`"], no)dnl
-	      if test "$MSGFMT" != "no"; then
-		AC_CHECK_FUNCS(dcgettext)
-		AC_PATH_PROG(GMSGFMT, gmsgfmt, $MSGFMT)
-		AM_PATH_PROG_WITH_TEST(XGETTEXT, xgettext,
-		  [test -z "`$ac_dir/$ac_word -h 2>&1 | grep '(HELP)'`"], :)
-		AC_TRY_LINK(, [extern int _nl_msg_cat_cntr;
-			       return _nl_msg_cat_cntr],
-		  [CATOBJEXT=.gmo
-		   DATADIRNAME=share],
-		  [CATOBJEXT=.mo
-		   DATADIRNAME=lib])
-		INSTOBJEXT=.mo
-	      fi
-	    fi
-	])
+           if test "$gt_cv_func_gettext_libc" = "yes" \
+              || test "$gt_cv_func_gettext_libintl" = "yes"; then
+              AC_DEFINE(HAVE_GETTEXT)
+              AM_PATH_PROG_WITH_TEST(MSGFMT, msgfmt,
+                [test -z "`$ac_dir/$ac_word -h 2>&1 | grep 'dv '`"], no)dnl
+              if test "$MSGFMT" != "no"; then
+                AC_CHECK_FUNCS(dcgettext)
+                AC_PATH_PROG(GMSGFMT, gmsgfmt, $MSGFMT)
+                AM_PATH_PROG_WITH_TEST(XGETTEXT, xgettext,
+                  [test -z "`$ac_dir/$ac_word -h 2>&1 | grep '(HELP)'`"], :)
+                AC_TRY_LINK(, [extern int _nl_msg_cat_cntr;
+                               return _nl_msg_cat_cntr],
+                  [CATOBJEXT=.gmo
+                   DATADIRNAME=share],
+                  [CATOBJEXT=.mo
+                   DATADIRNAME=lib])
+                INSTOBJEXT=.mo
+              fi
+            fi
+        ])
 
         if test "$CATOBJEXT" = "NONE"; then
-	  AC_MSG_CHECKING([whether catgets can be used])
-	  AC_ARG_WITH(catgets,
-	    [  --with-catgets          use catgets functions if available],
-	    nls_cv_use_catgets=$withval, nls_cv_use_catgets=no)
-	  AC_MSG_RESULT($nls_cv_use_catgets)
+          AC_MSG_CHECKING([whether catgets can be used])
+          AC_ARG_WITH(catgets,
+            [  --with-catgets          use catgets functions if available],
+            nls_cv_use_catgets=$withval, nls_cv_use_catgets=no)
+          AC_MSG_RESULT($nls_cv_use_catgets)
 
-	  if test "$nls_cv_use_catgets" = "yes"; then
-	    dnl No gettext in C library.  Try catgets next.
-	    AC_CHECK_LIB(i, main)
-	    AC_CHECK_FUNC(catgets,
-	      [AC_DEFINE(HAVE_CATGETS)
-	       INTLOBJS="\$(CATOBJS)"
-	       AC_PATH_PROG(GENCAT, gencat, no)dnl
-	       if test "$GENCAT" != "no"; then
-		 AC_PATH_PROG(GMSGFMT, gmsgfmt, no)
-		 if test "$GMSGFMT" = "no"; then
-		   AM_PATH_PROG_WITH_TEST(GMSGFMT, msgfmt,
-		    [test -z "`$ac_dir/$ac_word -h 2>&1 | grep 'dv '`"], no)
-		 fi
-		 AM_PATH_PROG_WITH_TEST(XGETTEXT, xgettext,
-		   [test -z "`$ac_dir/$ac_word -h 2>&1 | grep '(HELP)'`"], :)
-		 USE_INCLUDED_LIBINTL=yes
-		 CATOBJEXT=.cat
-		 INSTOBJEXT=.cat
-		 DATADIRNAME=lib
-		 INTLDEPS='$(topdir)/src/intl/libintl.a'
-		 INTLINCLUDE='-I$(topdir)/src/intl'
-		 INTLLIBS=$INTLDEPS
-		 LIBS=`echo $LIBS | sed -e 's/-lintl//'`
-		 nls_cv_header_intl=$srcdir/include/libintl.h
-		 nls_cv_header_libgt=$srcdir/src/intl/libgettext.h
-	       fi])
-	  fi
+          if test "$nls_cv_use_catgets" = "yes"; then
+            dnl No gettext in C library.  Try catgets next.
+            AC_CHECK_LIB(i, main)
+            AC_CHECK_FUNC(catgets,
+              [AC_DEFINE(HAVE_CATGETS)
+               INTLOBJS="\$(CATOBJS)"
+               AC_PATH_PROG(GENCAT, gencat, no)dnl
+               if test "$GENCAT" != "no"; then
+                 AC_PATH_PROG(GMSGFMT, gmsgfmt, no)
+                 if test "$GMSGFMT" = "no"; then
+                   AM_PATH_PROG_WITH_TEST(GMSGFMT, msgfmt,
+                    [test -z "`$ac_dir/$ac_word -h 2>&1 | grep 'dv '`"], no)
+                 fi
+                 AM_PATH_PROG_WITH_TEST(XGETTEXT, xgettext,
+                   [test -z "`$ac_dir/$ac_word -h 2>&1 | grep '(HELP)'`"], :)
+                 USE_INCLUDED_LIBINTL=yes
+                 CATOBJEXT=.cat
+                 INSTOBJEXT=.cat
+                 DATADIRNAME=lib
+                 INTLDEPS='$(topdir)/src/intl/libintl.a'
+                 INTLINCLUDE='-I$(topdir)/src/intl'
+                 INTLLIBS=$INTLDEPS
+                 LIBS=`echo $LIBS | sed -e 's/-lintl//'`
+                 nls_cv_header_intl=$srcdir/include/libintl.h
+                 nls_cv_header_libgt=$srcdir/src/intl/libgettext.h
+               fi])
+          fi
         fi
 
         if test "$CATOBJEXT" = "NONE"; then
-	  dnl Neither gettext nor catgets in included in the C library.
-	  dnl Fall back on GNU gettext library.
-	  nls_cv_use_gnu_gettext=yes
+          dnl Neither gettext nor catgets in included in the C library.
+          dnl Fall back on GNU gettext library.
+          nls_cv_use_gnu_gettext=yes
         fi
       fi
 
@@ -204,34 +204,34 @@ AC_DEFUN(AM_WITH_NLS,
         dnl Mark actions used to generate GNU NLS library.
         INTLOBJS="\$(GETTOBJS)"
         AM_PATH_PROG_WITH_TEST(MSGFMT, msgfmt,
-	  [test -z "`$ac_dir/$ac_word -h 2>&1 | grep 'dv '`"], msgfmt)
+          [test -z "`$ac_dir/$ac_word -h 2>&1 | grep 'dv '`"], msgfmt)
         AC_PATH_PROG(GMSGFMT, gmsgfmt, $MSGFMT)
         AM_PATH_PROG_WITH_TEST(XGETTEXT, xgettext,
-	  [test -z "`$ac_dir/$ac_word -h 2>&1 | grep '(HELP)'`"], :)
+          [test -z "`$ac_dir/$ac_word -h 2>&1 | grep '(HELP)'`"], :)
         AC_SUBST(MSGFMT)
-	USE_INCLUDED_LIBINTL=yes
+        USE_INCLUDED_LIBINTL=yes
         CATOBJEXT=.gmo
         INSTOBJEXT=.mo
         DATADIRNAME=share
-	INTLDEPS='$(topdir)/src/intl/libintl.a'
-	INTLINCLUDE='-I$(topdir)/src/intl'
-	INTLLIBS=$INTLDEPS
-	LIBS=`echo $LIBS | sed -e 's/-lintl//'`
+        INTLDEPS='$(topdir)/src/intl/libintl.a'
+        INTLINCLUDE='-I$(topdir)/src/intl'
+        INTLLIBS=$INTLDEPS
+        LIBS=`echo $LIBS | sed -e 's/-lintl//'`
         nls_cv_header_intl=$srcdir/include/libintl.h
         nls_cv_header_libgt=$srcdir/src/intl/libgettext.h
       fi
 
       dnl Test whether we really found GNU xgettext.
       if test "$XGETTEXT" != ":"; then
-	dnl If it is no GNU xgettext we define it as : so that the
-	dnl Makefiles still can work.
-	if $XGETTEXT --omit-header /dev/null 2> /dev/null; then
-	  : ;
-	else
-	  AC_MSG_RESULT(
-	    [found xgettext program is not GNU xgettext; ignore it])
-	  XGETTEXT=":"
-	fi
+        dnl If it is no GNU xgettext we define it as : so that the
+        dnl Makefiles still can work.
+        if $XGETTEXT --omit-header /dev/null 2> /dev/null; then
+          : ;
+        else
+          AC_MSG_RESULT(
+            [found xgettext program is not GNU xgettext; ignore it])
+          XGETTEXT=":"
+        fi
       fi
 
       # We need to process the po/ directory.
@@ -366,14 +366,14 @@ strdup __argz_count __argz_stringify __argz_next])
    AC_SUBST(GT_NO)
    AC_SUBST(GT_YES)
 
-   dnl If the AC_CONFIG_AUX_DIR macro for autoconf is used we possibly
-   dnl find the mkinstalldirs script in another subdir but ($top_srcdir).
-   dnl Try to locate is.
+   dnl If the AC_CONFIG_AUX_DIR macro for autoconf is used we will probably
+   dnl find the mkinstalldirs script in another subdir than ($top_srcdir).
+   dnl Try to locate it.
    MKINSTALLDIRS=
    if test -n "$ac_aux_dir"; then
      MKINSTALLDIRS="$ac_aux_dir/mkinstalldirs"
    fi
-   if test -z "$MKINSTALLDIRS"; then
+   if test x"$MKINSTALLDIRS" = x ; then
      MKINSTALLDIRS="\$(top_srcdir)/mkinstalldirs"
    fi
    AC_SUBST(MKINSTALLDIRS)
@@ -395,8 +395,8 @@ strdup __argz_count __argz_stringify __argz_next])
      posrcprefix="../"
    fi
    rm -f src/po/POTFILES
-   sed -e "/^#/d" -e "/^\$/d" -e "s,.*,	$posrcprefix& \\\\," -e "\$s/\(.*\) \\\\/\1/" \
-	< $srcdir/src/po/POTFILES.in > src/po/POTFILES
+   sed -e "/^#/d" -e "/^\$/d" -e "s,.*, $posrcprefix& \\\\," -e "\$s/\(.*\) \\\\/\1/" \
+        < $srcdir/src/po/POTFILES.in > src/po/POTFILES
   ])
 
 AC_DEFUN(AC_TYPE_SOCKETLEN_T,

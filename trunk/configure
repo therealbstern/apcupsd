@@ -6957,11 +6957,11 @@ fi
 
       nls_cv_use_gnu_gettext="$nls_cv_force_use_gnu_gettext"
       if test "$nls_cv_force_use_gnu_gettext" != "yes"; then
-                        		nls_cv_header_intl=
-	nls_cv_header_libgt=
-	CATOBJEXT=NONE
+                                        nls_cv_header_intl=
+        nls_cv_header_libgt=
+        CATOBJEXT=NONE
 
-	ac_safe=`echo "libintl.h" | sed 'y%./+-%__p_%'`
+        ac_safe=`echo "libintl.h" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for libintl.h""... $ac_c" 1>&6
 echo "configure:6967: checking for libintl.h" >&5
 if eval "test \"`echo '$''{'ac_cv_header_$ac_safe'+set}'`\" = set"; then
@@ -7016,8 +7016,8 @@ fi
 
 echo "$ac_t""$gt_cv_func_gettext_libc" 1>&6
 
-	   if test "$gt_cv_func_gettext_libc" != "yes"; then
-	     echo $ac_n "checking for bindtextdomain in -lintl""... $ac_c" 1>&6
+           if test "$gt_cv_func_gettext_libc" != "yes"; then
+             echo $ac_n "checking for bindtextdomain in -lintl""... $ac_c" 1>&6
 echo "configure:7022: checking for bindtextdomain in -lintl" >&5
 ac_lib_var=`echo intl'_'bindtextdomain | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
@@ -7105,15 +7105,15 @@ else
   echo "$ac_t""no" 1>&6
 fi
 
-	   fi
+           fi
 
-	   if test "$gt_cv_func_gettext_libc" = "yes" \
-	      || test "$gt_cv_func_gettext_libintl" = "yes"; then
-	      cat >> confdefs.h <<\EOF
+           if test "$gt_cv_func_gettext_libc" = "yes" \
+              || test "$gt_cv_func_gettext_libintl" = "yes"; then
+              cat >> confdefs.h <<\EOF
 #define HAVE_GETTEXT 1
 EOF
 
-	      # Extract the first word of "msgfmt", so it can be a program name with args.
+              # Extract the first word of "msgfmt", so it can be a program name with args.
 set dummy msgfmt; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
 echo "configure:7120: checking for $ac_word" >&5
@@ -7125,13 +7125,13 @@ else
   ac_cv_path_MSGFMT="$MSGFMT" # Let the user override the test with a path.
   ;;
   *)
-  IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS="${IFS}:"
+  IFS="${IFS=   }"; ac_save_ifs="$IFS"; IFS="${IFS}:"
   for ac_dir in $PATH; do
     test -z "$ac_dir" && ac_dir=.
     if test -f $ac_dir/$ac_word; then
       if test -z "`$ac_dir/$ac_word -h 2>&1 | grep 'dv '`"; then
-	ac_cv_path_MSGFMT="$ac_dir/$ac_word"
-	break
+        ac_cv_path_MSGFMT="$ac_dir/$ac_word"
+        break
       fi
     fi
   done
@@ -7146,8 +7146,8 @@ if test -n "$MSGFMT"; then
 else
   echo "$ac_t""no" 1>&6
 fi
-	      if test "$MSGFMT" != "no"; then
-		for ac_func in dcgettext
+              if test "$MSGFMT" != "no"; then
+                for ac_func in dcgettext
 do
 echo $ac_n "checking for $ac_func""... $ac_c" 1>&6
 echo "configure:7154: checking for $ac_func" >&5
@@ -7202,7 +7202,7 @@ else
 fi
 done
 
-		# Extract the first word of "gmsgfmt", so it can be a program name with args.
+                # Extract the first word of "gmsgfmt", so it can be a program name with args.
 set dummy gmsgfmt; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
 echo "configure:7209: checking for $ac_word" >&5
@@ -7238,7 +7238,7 @@ else
   echo "$ac_t""no" 1>&6
 fi
 
-		# Extract the first word of "xgettext", so it can be a program name with args.
+                # Extract the first word of "xgettext", so it can be a program name with args.
 set dummy xgettext; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
 echo "configure:7245: checking for $ac_word" >&5
@@ -7250,13 +7250,13 @@ else
   ac_cv_path_XGETTEXT="$XGETTEXT" # Let the user override the test with a path.
   ;;
   *)
-  IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS="${IFS}:"
+  IFS="${IFS=   }"; ac_save_ifs="$IFS"; IFS="${IFS}:"
   for ac_dir in $PATH; do
     test -z "$ac_dir" && ac_dir=.
     if test -f $ac_dir/$ac_word; then
       if test -z "`$ac_dir/$ac_word -h 2>&1 | grep '(HELP)'`"; then
-	ac_cv_path_XGETTEXT="$ac_dir/$ac_word"
-	break
+        ac_cv_path_XGETTEXT="$ac_dir/$ac_word"
+        break
       fi
     fi
   done
@@ -7272,40 +7272,40 @@ else
   echo "$ac_t""no" 1>&6
 fi
 
-		cat > conftest.$ac_ext <<EOF
+                cat > conftest.$ac_ext <<EOF
 #line 7277 "configure"
 #include "confdefs.h"
 
 int main() {
 extern int _nl_msg_cat_cntr;
-			       return _nl_msg_cat_cntr
+                               return _nl_msg_cat_cntr
 ; return 0; }
 EOF
 if { (eval echo configure:7285: \"$ac_link\") 1>&5; (eval $ac_link) 2>&5; } && test -s conftest${ac_exeext}; then
   rm -rf conftest*
   CATOBJEXT=.gmo
-		   DATADIRNAME=share
+                   DATADIRNAME=share
 else
   echo "configure: failed program was:" >&5
   cat conftest.$ac_ext >&5
   rm -rf conftest*
   CATOBJEXT=.mo
-		   DATADIRNAME=lib
+                   DATADIRNAME=lib
 fi
 rm -f conftest*
-		INSTOBJEXT=.mo
-	      fi
-	    fi
-	
+                INSTOBJEXT=.mo
+              fi
+            fi
+        
 else
   echo "$ac_t""no" 1>&6
 fi
 
 
         if test "$CATOBJEXT" = "NONE"; then
-	  echo $ac_n "checking whether catgets can be used""... $ac_c" 1>&6
+          echo $ac_n "checking whether catgets can be used""... $ac_c" 1>&6
 echo "configure:7308: checking whether catgets can be used" >&5
-	  # Check whether --with-catgets or --without-catgets was given.
+          # Check whether --with-catgets or --without-catgets was given.
 if test "${with_catgets+set}" = set; then
   withval="$with_catgets"
   nls_cv_use_catgets=$withval
@@ -7313,10 +7313,10 @@ else
   nls_cv_use_catgets=no
 fi
 
-	  echo "$ac_t""$nls_cv_use_catgets" 1>&6
+          echo "$ac_t""$nls_cv_use_catgets" 1>&6
 
-	  if test "$nls_cv_use_catgets" = "yes"; then
-	    	    echo $ac_n "checking for main in -li""... $ac_c" 1>&6
+          if test "$nls_cv_use_catgets" = "yes"; then
+                        echo $ac_n "checking for main in -li""... $ac_c" 1>&6
 echo "configure:7321: checking for main in -li" >&5
 ac_lib_var=`echo i'_'main | sed 'y%./+-%__p_%'`
 if eval "test \"`echo '$''{'ac_cv_lib_$ac_lib_var'+set}'`\" = set"; then
@@ -7359,7 +7359,7 @@ else
   echo "$ac_t""no" 1>&6
 fi
 
-	    echo $ac_n "checking for catgets""... $ac_c" 1>&6
+            echo $ac_n "checking for catgets""... $ac_c" 1>&6
 echo "configure:7364: checking for catgets" >&5
 if eval "test \"`echo '$''{'ac_cv_func_catgets'+set}'`\" = set"; then
   echo $ac_n "(cached) $ac_c" 1>&6
@@ -7406,8 +7406,8 @@ if eval "test \"`echo '$ac_cv_func_'catgets`\" = yes"; then
 #define HAVE_CATGETS 1
 EOF
 
-	       INTLOBJS="\$(CATOBJS)"
-	       # Extract the first word of "gencat", so it can be a program name with args.
+               INTLOBJS="\$(CATOBJS)"
+               # Extract the first word of "gencat", so it can be a program name with args.
 set dummy gencat; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
 echo "configure:7414: checking for $ac_word" >&5
@@ -7442,8 +7442,8 @@ if test -n "$GENCAT"; then
 else
   echo "$ac_t""no" 1>&6
 fi
-	       if test "$GENCAT" != "no"; then
-		 # Extract the first word of "gmsgfmt", so it can be a program name with args.
+               if test "$GENCAT" != "no"; then
+                 # Extract the first word of "gmsgfmt", so it can be a program name with args.
 set dummy gmsgfmt; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
 echo "configure:7450: checking for $ac_word" >&5
@@ -7479,8 +7479,8 @@ else
   echo "$ac_t""no" 1>&6
 fi
 
-		 if test "$GMSGFMT" = "no"; then
-		   # Extract the first word of "msgfmt", so it can be a program name with args.
+                 if test "$GMSGFMT" = "no"; then
+                   # Extract the first word of "msgfmt", so it can be a program name with args.
 set dummy msgfmt; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
 echo "configure:7487: checking for $ac_word" >&5
@@ -7492,13 +7492,13 @@ else
   ac_cv_path_GMSGFMT="$GMSGFMT" # Let the user override the test with a path.
   ;;
   *)
-  IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS="${IFS}:"
+  IFS="${IFS=   }"; ac_save_ifs="$IFS"; IFS="${IFS}:"
   for ac_dir in $PATH; do
     test -z "$ac_dir" && ac_dir=.
     if test -f $ac_dir/$ac_word; then
       if test -z "`$ac_dir/$ac_word -h 2>&1 | grep 'dv '`"; then
-	ac_cv_path_GMSGFMT="$ac_dir/$ac_word"
-	break
+        ac_cv_path_GMSGFMT="$ac_dir/$ac_word"
+        break
       fi
     fi
   done
@@ -7514,8 +7514,8 @@ else
   echo "$ac_t""no" 1>&6
 fi
 
-		 fi
-		 # Extract the first word of "xgettext", so it can be a program name with args.
+                 fi
+                 # Extract the first word of "xgettext", so it can be a program name with args.
 set dummy xgettext; ac_word=$2
 echo $ac_n "checking for $ac_word""... $ac_c" 1>&6
 echo "configure:7522: checking for $ac_word" >&5
@@ -7527,13 +7527,13 @@ else
   ac_cv_path_XGETTEXT="$XGETTEXT" # Let the user override the test with a path.
   ;;
   *)
-  IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS="${IFS}:"
+  IFS="${IFS=   }"; ac_save_ifs="$IFS"; IFS="${IFS}:"
   for ac_dir in $PATH; do
     test -z "$ac_dir" && ac_dir=.
     if test -f $ac_dir/$ac_word; then
       if test -z "`$ac_dir/$ac_word -h 2>&1 | grep '(HELP)'`"; then
-	ac_cv_path_XGETTEXT="$ac_dir/$ac_word"
-	break
+        ac_cv_path_XGETTEXT="$ac_dir/$ac_word"
+        break
       fi
     fi
   done
@@ -7549,26 +7549,26 @@ else
   echo "$ac_t""no" 1>&6
 fi
 
-		 USE_INCLUDED_LIBINTL=yes
-		 CATOBJEXT=.cat
-		 INSTOBJEXT=.cat
-		 DATADIRNAME=lib
-		 INTLDEPS='$(topdir)/src/intl/libintl.a'
-		 INTLINCLUDE='-I$(topdir)/src/intl'
-		 INTLLIBS=$INTLDEPS
-		 LIBS=`echo $LIBS | sed -e 's/-lintl//'`
-		 nls_cv_header_intl=$srcdir/include/libintl.h
-		 nls_cv_header_libgt=$srcdir/src/intl/libgettext.h
-	       fi
+                 USE_INCLUDED_LIBINTL=yes
+                 CATOBJEXT=.cat
+                 INSTOBJEXT=.cat
+                 DATADIRNAME=lib
+                 INTLDEPS='$(topdir)/src/intl/libintl.a'
+                 INTLINCLUDE='-I$(topdir)/src/intl'
+                 INTLLIBS=$INTLDEPS
+                 LIBS=`echo $LIBS | sed -e 's/-lintl//'`
+                 nls_cv_header_intl=$srcdir/include/libintl.h
+                 nls_cv_header_libgt=$srcdir/src/intl/libgettext.h
+               fi
 else
   echo "$ac_t""no" 1>&6
 fi
 
-	  fi
+          fi
         fi
 
         if test "$CATOBJEXT" = "NONE"; then
-	  	  	  nls_cv_use_gnu_gettext=yes
+                              nls_cv_use_gnu_gettext=yes
         fi
       fi
 
@@ -7586,13 +7586,13 @@ else
   ac_cv_path_MSGFMT="$MSGFMT" # Let the user override the test with a path.
   ;;
   *)
-  IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS="${IFS}:"
+  IFS="${IFS=   }"; ac_save_ifs="$IFS"; IFS="${IFS}:"
   for ac_dir in $PATH; do
     test -z "$ac_dir" && ac_dir=.
     if test -f $ac_dir/$ac_word; then
       if test -z "`$ac_dir/$ac_word -h 2>&1 | grep 'dv '`"; then
-	ac_cv_path_MSGFMT="$ac_dir/$ac_word"
-	break
+        ac_cv_path_MSGFMT="$ac_dir/$ac_word"
+        break
       fi
     fi
   done
@@ -7656,13 +7656,13 @@ else
   ac_cv_path_XGETTEXT="$XGETTEXT" # Let the user override the test with a path.
   ;;
   *)
-  IFS="${IFS= 	}"; ac_save_ifs="$IFS"; IFS="${IFS}:"
+  IFS="${IFS=   }"; ac_save_ifs="$IFS"; IFS="${IFS}:"
   for ac_dir in $PATH; do
     test -z "$ac_dir" && ac_dir=.
     if test -f $ac_dir/$ac_word; then
       if test -z "`$ac_dir/$ac_word -h 2>&1 | grep '(HELP)'`"; then
-	ac_cv_path_XGETTEXT="$ac_dir/$ac_word"
-	break
+        ac_cv_path_XGETTEXT="$ac_dir/$ac_word"
+        break
       fi
     fi
   done
@@ -7679,25 +7679,25 @@ else
 fi
 
         
-	USE_INCLUDED_LIBINTL=yes
+        USE_INCLUDED_LIBINTL=yes
         CATOBJEXT=.gmo
         INSTOBJEXT=.mo
         DATADIRNAME=share
-	INTLDEPS='$(topdir)/src/intl/libintl.a'
-	INTLINCLUDE='-I$(topdir)/src/intl'
-	INTLLIBS=$INTLDEPS
-	LIBS=`echo $LIBS | sed -e 's/-lintl//'`
+        INTLDEPS='$(topdir)/src/intl/libintl.a'
+        INTLINCLUDE='-I$(topdir)/src/intl'
+        INTLLIBS=$INTLDEPS
+        LIBS=`echo $LIBS | sed -e 's/-lintl//'`
         nls_cv_header_intl=$srcdir/include/libintl.h
         nls_cv_header_libgt=$srcdir/src/intl/libgettext.h
       fi
 
             if test "$XGETTEXT" != ":"; then
-			if $XGETTEXT --omit-header /dev/null 2> /dev/null; then
-	  : ;
-	else
-	  echo "$ac_t""found xgettext program is not GNU xgettext; ignore it" 1>&6
-	  XGETTEXT=":"
-	fi
+                        if $XGETTEXT --omit-header /dev/null 2> /dev/null; then
+          : ;
+        else
+          echo "$ac_t""found xgettext program is not GNU xgettext; ignore it" 1>&6
+          XGETTEXT=":"
+        fi
       fi
 
       # We need to process the po/ directory.
@@ -7822,7 +7822,7 @@ fi
    if test -n "$ac_aux_dir"; then
      MKINSTALLDIRS="$ac_aux_dir/mkinstalldirs"
    fi
-   if test -z "$MKINSTALLDIRS"; then
+   if test x"$MKINSTALLDIRS" = x ; then
      MKINSTALLDIRS="\$(top_srcdir)/mkinstalldirs"
    fi
    
@@ -7841,8 +7841,8 @@ fi
      posrcprefix="../"
    fi
    rm -f src/po/POTFILES
-   sed -e "/^#/d" -e "/^\$/d" -e "s,.*,	$posrcprefix& \\\\," -e "\$s/\(.*\) \\\\/\1/" \
-	< $srcdir/src/po/POTFILES.in > src/po/POTFILES
+   sed -e "/^#/d" -e "/^\$/d" -e "s,.*, $posrcprefix& \\\\," -e "\$s/\(.*\) \\\\/\1/" \
+        < $srcdir/src/po/POTFILES.in > src/po/POTFILES
   
 fi
 
