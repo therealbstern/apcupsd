@@ -1,0 +1,23 @@
+# doc/Makefile.in
+#
+# Copyright (C) 1999-2002 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
+#
+
+# Default variables
+@VARIABLES@
+# TOP source directory.
+topdir = @top_srcdir@
+top_builddir = $(topdir)
+
+# Include the default make targets: to be put before the all-targets: rule.
+@TARGETS@
+
+all-targets:
+
+clean: targetclean
+
+distclean: targetdistclean
+	$(RMF) variables.mak Makefile
+
+# -----------------------------------------------------------------------
+# DO NOT DELETE THIS LINE -- make depend depends on it.

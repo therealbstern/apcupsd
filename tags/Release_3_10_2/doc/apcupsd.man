@@ -1,0 +1,800 @@
+.\" manual page [] for apcupsd
+.\" SH section heading
+.\" SS subsection heading
+.\" LP paragraph
+.\" IP indented paragraph
+.\" TP hanging label
+.TH apcupsd 8 "APC UPS management under Linux -- November 1999"
+.SH NAME
+apcupsd \- daemon for most APC's UPS for Linux
+.SH SYNOPSIS
+.B /sbin/apcupsd 
+.br
+.B /etc/apcupsd/apccontrol
+.br
+.B /etc/apcupsd/apcupsd.conf
+.br
+.B /sbin/apcaccess
+.br
+.B /sbin/apcnetd
+.br
+.SH DESCRIPTION
+.LP
+This daemon can be used for controlling the APC SmartUPS. During a power
+failure, "apcupsd" will inform the users about the power failure and
+that a shutdown may occur.  If power is not restored, a system shutdown
+will follow when the battery is exausted, a timeout (seconds) expires,
+or runtime expires based on internal APC calculations determined by
+power consumption rates.  If the power is restored before one of the
+above shutdown conditions is met, "apcupsd" will inform users about this
+fact.
+
+The shutdown is made by script calls to "/etc/apcupsd/apccontrol", which
+is called by "apcupsd". Consequently, no changes to /etc/inittab are necessary.
+There is no communication between "apcupsd" and init(1) process.
+Apcupsd modifies the halt script so that at the end of the shutdown
+process, apcupsd will be re-executed in order to power off the UPS.
+
+.LP
+The "apcupsd" daemon now supports two networking modes that function
+independently, but if desired at the same time.
+
+Most users will probably enable the first network mode, which
+permits apcupsd to serve status and event information 
+to clients over the network.
+
+The second networking mode is for multiple networked machines that are
+powered by the same UPS. In this mode, one machine is configured as a
+master with the UPS attached to the serial port.  The other machines
+(max.  20) powered by the same UPS are configured as slaves.  The master
+has a network connection with the slaves and sends them information
+about the UPS status.
+
+.LP
+RedHat and S.u.S.E. versions of Linux have direct install support.  All
+other "FLAVORS" of Linux will need some fussing with to get the install
+correct.
+.SH OPTIONS
+.TP
+.B \-c --configure
+Attempts to configure the UPS EPROM to the values specified in the
+configuration file "/etc/apcupsd/apcupsd.conf".
+.TP
+.B \-d --debug <level>
+Turns on debugging output for a NETSLAVE or a NETMASTER.
+.TP
+.B \-f --config-file <file>
+Specifies the location of the configuration file.  The default
+is: /etc/apcupsd/apcupsd.conf
+.TP
+.B \-k --killpower
+Attempt to turn the UPS off. This option is normally only
+used by the daemon itself to shut the UPS off after a
+system shutdown has completed.
+.TP
+.B \-n --rename-ups
+Attempts to change the UPS name stored in the UPS EPROM
+to that specified in your "/etc/apcupsd/apcupsd.conf" file.
+.TP
+.B \-u --update-battery-date
+Attempts to update the battery date stored in the UPS EPROM. Normally
+done after a battery replacement.
+.TP
+.B \-V --version
+Prints the apcupsd version number and the usage.
+.TP
+.B \-? --help
+Prints a brief apcupsd help screen.
+
+.SH CONFIGURATION
+It may be necessary to change the configuration information in the file
+"/etc/apcupsd/apcupsd.conf" to meet your needs and to correspond to your
+configuration.  This file is a plain ASCII file and you can use your
+favorite editor to change it. 
+.LP 
+Configuration commands in 
+.B /etc/apcupsd/apcupsd.conf
+are:
+
+.LP
+.SS GENERAL CONFIGURATION COMMANDS
+.LP
+.B  UPSCABLE
+-- <type of cable you are using>
+.br
+[ simple | 940-0020B | 940-0023A (broken) ]
+.br
+[ smart | 940-0024B | 940-0024C ]
+.br
+[ 940-0095A | 940-0095C ]
+.br
+[ ether ]
+.LP
+.B  UPSTYPE
+-- <Type of APCC UPS you have>
+.br
+[ backups | sharebasic ] : Simple
+.br
+[ netups ] : Network Simple Signals
+.br
+[ backupspro | smartvsups | newbackupspro ] : SubSmart
+.br
+[ smartups | matrixups | sharesmart ] : Smart
+.LP
+[ backups | netups | backupspro | smartvsups ] and 
+.br
+[ newbackupspro | smartups | matrixups ] are tested.
+.br
+[ sharebasic | sharesmart ] models are being tested.
+.LP
+.B  DEVICE
+-- <name of serial port>
+.br
+Please specify which device is used for UPS communication.
+The default is /dev/ttyS[0|1|2|3].
+.LP
+.B  LOCKFILE
+-- <path to lockfile>
+.br
+By supplying this argument, "apcupsd" tries to create a lockfile
+for the serial port in the specified directory.
+
+
+
+.LP
+.SS CONFIGURATION COMMANDS USED BY THE NETWORK INFORMATION SERVER
+.LP
+.B NETSTATUS 
+[on | off]
+.br
+This configuration command turns the network information server
+on or off. If it is on, apcupsd will spawn a child process that
+serves STATUS and EVENTS information over the network. This
+information is currently used by the Web based CGI programs.
+The default is on. In some cases, for added security, you may
+want to invoke a separate information server daemon from the inetd
+daemon. In this case, NETSTATUS should be off.
+
+.LP
+.B STATUSPORT 
+<port>
+.br
+This configuration command specifies the port to be used by the
+apcupsd server. The default is 7000. If you change this port,
+you must manually change the #define SERV_TCP_PORT in 
+cgi/upsfetch.c and rebuild the CGI programs.
+
+.LP
+.B EVENTFILE 
+<filename>
+.br
+If you want the apcupsd network information server to provide
+the last 10 events via the network, you must specify a
+file where apcupsd will save these events. The default is:
+/etc/apcupsd/apcupsd.events. Currently, apcupsd will save
+at most the last 50 events. When more than 50 events are
+recorded and a network request for the events arrives,
+the network server will truncate the file to
+the most recent 10 events. Consequently this file
+will not grow indefinitely as long as the events are
+checked from time to time.
+
+
+.LP
+.SS CONFIGURATION COMMANDS USED TO CONTROL SYSTEM LOGGING
+.LP
+.B STATTIME
+
+.LP
+.B STATFILE
+
+.LP
+.B DATATIME
+
+.LP
+.B FACILITY
+
+
+
+.LP
+.B CONFIGUATION COMMANDS USED DURING POWER FAILURES
+.LP
+.B  ANNOY
+-- <time in seconds>
+.br
+Please specify the time in seconds between messages requesting
+logged in users to get off the system. This timer starts only when
+the UPS is running on batteries.  The default is 300 seconds 
+(5 minutes).
+.LP
+.B  ANNOYDELAY
+-- <time in seconds>
+.br
+Please specify delay time in seconds before apcupsd begins requesting
+logged in users to get off the system. This timer starts
+only after the UPS is running on batteries.
+This timer is reset when the power returns. The default
+is 60 seconds.  That is the first warning to log off the
+system occurs after 60 seconds on batteries.
+
+
+.LP
+.B  NOLOGON
+-- <specifies when apcupsd should create the nologon file>
+.br
+[ disable | timeout | percent | minutes | always ] are valid types.
+
+Based on Ten (10) percent of a setting.  This allows one to define the
+point when the /etc/nologin file is added.  This is important for
+allowing systems with BIG UPSes to run as normally until the system
+administrator determines the need for dumping users.  The feature also
+allows the system administrator to hold the "ANNOY" factor until the
+/etc/nologin file is added.
+
+.B disable 
+prevents apcupsd from creating the nologin file.
+
+.B timeout 
+specifies a specific wait time before creating the nologin file.
+
+.B percent 
+specifies the percent battery charge remaining before creating
+the nologin file. 
+
+.B minutes 
+specifies the battery runtime remaining before creating the
+nologin file.
+
+.B always 
+causes the nologin file to be immediately created on a power
+failure.
+.LP
+.B  BATTERYLEVEL
+-- <percent of battery>
+.br
+If BATTERYLEVEL is specified, during a power failure, apcupsd will
+shutdown the system when the remaining battery charge falls below the
+specified percentage.  The default is 5.
+.LP
+.B  MINUTES
+-- <battery runtime in minutes>
+.br
+If MINUTES is specified, during a power failure, apcupsd will
+shutdown the system when the remaining remaining runtime on batteries
+as internally calculated by the UPS 
+falls below the time specified. The default is 3.
+
+.LP
+.B  TIMEOUT
+-- <time in seconds>
+.br
+After a power failure, the system will be shutdown after TIMEOUT seconds
+have expired.  Normally for SMARTUPSes, this should be zero so that the
+shutdown time will be determined by the battery level or remaining runtime 
+(see above). This command is useful for dumb UPSes that do not report
+battery level or the remaining runtime. It is also useful for
+testing apcupsd in that you can force a rapid shutdown by setting
+a small value (e.g. 60) and pulling the plug to the UPS. 
+
+The timeout for the master is always 30 seconds longer than slaves.
+
+.B TIMEOUT, BATTERYLEVEL, and MINUTES
+can be set together without problems. The daemon will react to the
+first case or test that is valid. Normally SmartUPS users will set
+.B TIMEOUT
+to zero so that the system is shutdown depending on the 
+percentage battery charge remaining 
+.B (BATTERYLEVEL)
+or the remaining battery runtime
+.B (MINUTES).
+
+
+
+
+.LP
+.SS CONFIGURATION COMMANDS USED TO SET THE UPS EPROM
+
+
+The values specified with the following commands are only
+used if the 
+.B --configure
+option is specified on the apcupsd command line, and the UPS is capable
+of internal EPROM programming.  In that case, apcupsd attempts to set
+the values into the UPSes EPROM.
+
+Under normal operations, the values for these parameters specified
+in the configuration file are not used. Instead, they are 
+read from the UPS EPROM by apcupsd.
+
+.LP
+.B  SENSITIVITY
+-- <sets sensitiviy level>
+.br
+(H)igh, (M)edium, (L)ow
+
+.br
+This value determine how sensitive the UPS is to the mains
+quality and voltage fluxuations. The more sensitive it is, the
+quicker the UPS will switch to battery power when the mains line
+quality is bad. Normally, this should be set to H, but if
+you find your UPS switching to batteries frequently, you might
+want to try a less sensitive setting, providing that your
+computer equipment tolerates the poor quality mains.
+This value is written to the UPS EPROM when the --configure option is
+specified.
+Under normal apcupsd operations (no --configure option), apcupsd
+will read the value store in the UPS and display it in the
+STATUS output.
+.LP
+.B  WAKEUP
+-- <set wakeup delay>
+.br
+The power restart delay value in [0,60,180,300] in seconds
+after the UPS shuts down during a power failure. This
+is to prevent the power from coming back on too quickly
+after a power down, and is important for those who have 
+high RPM drives that need
+to spindown before powering them up again.
+Some older SCSI models are very sensitive to this problem. 
+Default is zero. This value is written to the UPS EPROM when the --configure
+option is specified.
+Under normal apcupsd operations (no --configure option), apcupsd
+will read the value store in the UPS and display it in the
+STATUS output.
+.LP
+.B  SLEEP
+-- <set sleep delay>
+.br
+Delay in [20,180,300,600] seconds before the actual killpower event.
+The default is 20. This value is written to the UPS EPROM when the --configure
+option is specified.
+Under normal apcupsd operations (no --configure option), apcupsd
+will read the value store in the UPS and display it in the
+STATUS output.
+.LP
+.B  LOTRANSFER
+-- <sets lower limit of ups batt. transfer>
+.br
+This sets the low line voltage point to switch over to batteries.
+There are four values that can be selected, but they vary based on
+the UPS model, classification, and manufacture date. Thus a value
+ranging from 0-3 are assigned the learned and bubble sorted values.
+This value is written to the UPS EPROM when the --configure option is
+specified.
+Under normal apcupsd operations (no --configure option), apcupsd
+will read the value store in the UPS and display it in the
+STATUS output.
+.LP
+.B  HITRANSFER
+-- <sets upper limit of ups batt. transfer>
+.br
+This sets the high line voltage point to switch over to batteries.
+.br
+There are four values that can be selected, but they vary based on
+the UPS model, classification, and manufacture date. Thus a value
+ranging from 0-3 are assigned the learned and bubble sorted values.
+This value is written to the UPS EPROM when the --configure option is
+specified.
+Under normal apcupsd operations (no --configure option), apcupsd
+will read the value store in the UPS and display it in the
+STATUS output.
+.LP
+.B  RETURNCHARGE
+-- <sets min. batt. charge level>
+.br
+This parameter specifies what battery percentage
+charge is necessary before
+the UPS will supply power to your equipment after a power down.
+There are four values that can be selected, but they vary based on
+the UPS model, classification, and manufacture date. Thus a value
+ranging from 0-3 are assigned the learned and bubble sorted values.
+This value is written to the UPS EPROM when the --configure option is
+specified.
+Under normal apcupsd operations (no --configure option), apcupsd
+will read the value store in the UPS and display it in the
+STATUS output.
+.LP
+.B  BEEPSTATE
+-- <sets alarm beep state> 
+.br
+This parameter tells the UPS when it can sound its audio alarm.
+These settings are based on discrete
+events related to the remaining capacity of the UPS.
+
+.B 0 
+immediately upon power failure
+
+.B T 
+power failure + 30 seconds
+
+.B L 
+low battery power
+
+.B N 
+never
+.LP
+.B  UPSNAME
+-- <string>
+.br
+This is normally an eight character string, but it currently
+only handles seven. This is the UPS name that will be stored
+in the UPS EPROM.
+This value is written to the UPS EPROM when the --configure option is
+specified.
+Under normal apcupsd operations (no --configure option), apcupsd
+will read the value store in the UPS and display it in the
+STATUS output.
+
+
+.LP
+.SS CONFIGURATION COMMANDS FOR SHARING A UPS
+.LP
+.B  UPSCLASS
+-- <class of operation>
+.br
+[ standalone | shareslave | sharemaster ] and
+.br
+[ netslave | netmaster ] are valid types.
+.br
+[ standalone | netslave | netmaster ] are tested classes.
+.br
+[ shareslave | sharemaster ] classes are being tested.
+.LP
+The default is "standalone" and should be used for 
+all machines powered by the UPS and having a serial port
+connection to the UPS, but where there are no other computers
+dependent power from the same UPS.  This is the "normal" case.
+
+Use "netmaster", if and only if you have a serial port connection
+to the UPS and there are other machines deriving power from the
+same UPS. 
+
+Use "netslave" if and only if you have no serial port connection
+to the UPS, but you derive power from it.
+
+Use "shareslave" if and
+only if you are using a ShareUPS and connected to a BASIC Port with
+Simple Signal. 
+
+Use "sharemaster", if and only if you are using a
+ShareUPS and connected to the ADVANCED Port Smart Signal control.
+
+.LP
+.B  UPSMODE -- 
+[ disable | share | net | sharenet ] are valid types.
+.br
+.LP
+[ disable | net ] are the only known and tested classes.
+.br
+[ share | sharenet ] classes are being tested.
+.LP
+BETA [ share ] For two or seven (2/7) additional simple signal
+ports on a SmartAccessories(tm) (internal/external box) for SmartUPSes.
+.LP
+.LP
+.B  NETTIME
+-- <time in seconds>
+.br
+The rate in seconds that broadcasts information to Slave machines.
+This rate is reset if there is a power state change. This value
+is now passed to the slaves to sync. the openning of a socket
+by the slave for the master.
+.LP
+.B  NETPORT
+-- <TCP|UDP port number>
+.br
+This unix service port number must be set in the /etc/services file
+as follows:
+.br
+        tab     tab(spacejunk)  tab     tab
+.br
+name                    (stuff)/xxp             #
+.br
+.br
+apcupsd         NETPORT/tcp             #
+.br
+apcupsd         NETPORT/udp             #
+.LP
+.B  MASTER
+-- <name of master> for Slave machine.
+.br
+The name of the master which is authorized to send commands to this slave.
+.LP
+.B  SLAVE
+-- <name of slave(s)> for Master machine.
+.br
+The name of the slave machine attached to the master.
+There can be max. 20 slaves attached to one master.
+.LP
+.B  USERMAGIC
+-- < user defined magic> for Slave machine.
+.br
+The second level of magic security. It must be (17) characters long
+without spaces. This is passed to the master machine during
+initialization of sockets. This string should be different for
+each and every slave on the network.
+.SH SMARTUPS
+If you start getting the follow message:
+   
+.B Emergency -- Batteries Have Failed!
+.br
+.B Change Them NOW!
+
+Act upon it quickly. It means what it says.
+
+Also, not all "SmartUPS" models are eqaully smart. A non-NET or old
+class of "SmartUPS" has a subset of the full UPSlink(TM) language,
+and can not be polled for its control codes.
+.LP
+.SH SHAREUPS
+Special note for ShareUPS users,
+.B TIMEOUT, BATTERYLEVEL, and MINUTES
+are disabled or set to default values. Currently, there is not a known
+way of early signals to be sent to BASIC Ports. MINUTES are set to 0.
+.SH Hewlett Packard
+The HP PowerTrust 2997A UPS has been tested as a "smartups" with cable
+Hewlett Packard part number 5061-2575 as "CUSTOM-SMART".
+.SH CABLES
+.br
+First, you will need the cable between APC Smart UPS and PC computer
+running Linux. You can use either the special cable which is enclosed with
+the PowerChute (TM) software or you can make your own cable connected as
+follows:
+.LP
+        SMART-CUSTOM
+.br
+        PC (9 pin)      APC (9 pin)
+.br
+        2 RxD           2
+.br
+        3 TxD           1
+.br
+        5 GND           9
+.LP 
+        SIMPLE-CUSTOM
+.br
+ DB9/25F PC Side                DB9M UPS Side
+.br
+  4/20   DTR (5vcc)                  nc    (*)
+.br
+   8/5   CTS (low-batt)               5    (*)
+.br
+   2/3   RxD (other line-fail)        3    (*)
+.br
+   5/7   Ground (Signal)              4
+.br
+   1/8   CD (line-fail from ups)      2
+.br
+   7/4   RTS (shutdown ups)           1
+.br
+  nc/1   Frame/Case Gnd (optional)    9
+.LP
+List if componets one needs to make this CABLE:
+.br
+1) One (1) DB9 use solder type connector only.
+.br
+2) One (1) DB9/25F use solder type connector only.
+.br
+3) two (2) 4.7K ohm 1/4 watt %5 resistors.
+.br
+4) one (1) foot of 3/32" (inch) shrink wrap/boot.
+.br
+5) rosin core solder.
+.br
+6) three (3) to five (5) feet of 22AWG multi-stranded five
+.br
+   (5) conductor cable.
+.LP
+First solder both of the resistors into pin# (4) DB9 or (20) DB25 the DTR. 
+This will be used as the Vcc pull-up voltage for testing the outputs on 
+any "UPS by APC" ONLY in Simple Signal mode. This may not work on a 
+BackUPS Pro if the default communications are Smart Signal mode. This 
+cable is valid for "ShareUPS" BASIC Port mode if there are no other cables
+that can be gotten.
+.LP
+Next bend each of the resistors so that one connects to (8) DB9 or (5) DB25 
+the CTS (aka battery low signal) and the other to (2) DB9 or (3) DB25 the 
+RxD (aka another line fail signal). This line is not currently used, but 
+it will be in the near future.
+.LP
+(*) 8/5 is also wire to pin# 5 on UPS cable side.
+.br
+(*) 2/3 is also wire to pin# 3 on UPS cable side.
+.br
+(*) we use the DTR as our +5 volts power for the circuit.
+.LP
+If you have one of the following cables supplied by APCC,
+.B apcupsd
+will support off the shelf cables.
+.br
+940-0020B     Simple Signal Only, all models.
+.br
+940-0024[B/C]  SmartMode Only, SU and BKPro only.
+.br
+940-0095[A/C]  PnP (Plug and Play), all models.
+.br
+940-0023A     Simple Signal UNIX, [BROKEN STILL].
+.SH FILES
+.B /etc/apcupsd/apcupsd.conf
+- configuration file.
+.br
+.B /etc/apcupsd/apcupsd.status
+- STATUS file
+.br
+.B /etc/apcupsd/apcupsd.events
+- where up to the last 50 events are stored
+for the network information server.
+.SH EVENTS
+apcupsd generates events when certain conditions occur 
+such as a power failure, batteries exhausted, power return, 
+...
+
+These events are sent to the system log, optionally sent
+to the temporary events file (/etc/apcupsd/apcupsd.events),
+and they also generate a call to /etc/apcupsd/apccontrol
+which in turn will call any scripts you have placed in the
+/etc/apcupsd directory.
+
+.SH DATA format
+If the DATATIME configuration command is set nonzero, 
+apcupsd will log a data record at the interval defined
+on the DATATIME command. This data record is in a format
+similar to the PowerChute data file format.
+
+.SH STATUS format
+The STATUS output is in ASCII format and generally there
+is a single piece of information on each line output.
+The format varies based on the type of UPS that you are using.
+.LP
+.br
+DATE     : time and date of last update
+.br
+CABLE    : cable type used
+.br
+UPSMODEL : ups type or signal method
+.br
+UPSMODE  : tells apcupsd what to check
+.br
+SHARE    : if ShareUPS is used, this determines what
+.LP
+.B SmartUPS and MatrixUPS Smart Signals
+.br
+ULINE    : Current (observed) Input Line Voltage
+.br
+MLINE    : Max (observed) Input Line Voltage
+.br
+NLINE    : Min (observed) Input Line Voltage
+.br
+FLINE    : Line Freq (cycles)
+.br
+VOUTP    : UPS Output Voltage
+.br
+LOUTP    : Percent Load of UPS Capacity
+.br
+BOUTP    : Current Charge Voltage of Batteries
+.br
+BCHAR    : Batteries Current Charge Percent of Capacity
+.br
+BFAIL    : UNSIGNED INT CODE (ups state)
+.br
+UTEMP    : Current UPS Temp. in Degrees Cel.
+.br
+DIPSW    : Current DIP switch settings for UPS.
+.LP
+.B Newer BackUPS Pro Smart Signals
+.br
+ULINE    : Current (observed) Input Line Voltage
+.br
+MLINE    : Max (observed) Input Line Voltage
+.br
+NLINE    : Min (observed) Input Line Voltage
+.br
+FLINE    : Line Freq (cycles)
+.br
+VOUTP    : UPS Output Voltage
+.br
+LOUTP    : Percent Load of UPS Capacity
+.br
+BOUTP    : Current Charge Voltage of Batteries
+.br
+BCHAR    : Batteries Current Charge Percent of Capacity
+.br
+BFAIL    : UNSIGNED INT CODE (ups state)
+.LP
+.B BackUPS Pro and SmartUPS v/s Smart Signals
+.br
+LINEFAIL : OnlineStatus
+.br
+BATTSTAT : BatteryStatus
+.br
+LINEVOLT : LineVoltageState
+.br
+LASTEVNT : LastEventObserved
+.LP
+.B BackUPS and NetUPS Simple Signals
+.br
+LINEFAIL : OnlineStatus
+.br
+BATTSTAT : BatteryStatus
+.LP
+.B BackUPS Pro and SmartUPS v/s Smart Signals
+.br
+OnlineStatus BatteryStatus LineVoltageState
+LastEventObserved
+.LP
+.B BackUPS and NetUPS Simple Signals
+.br
+OnlineStatus BatteryStatus
+.br
+
+.SH SEE ALSO
+.B apcstatus
+(8) 
+.B apcevents
+(8) 
+.B apcnetd
+(8) 
+
+
+.SH AUTHOR
+Andre M. Hedrick <hedrick@astro.dyer.vanderbilt.edu>
+.SS Retired Co-AUTHOR
+Christopher J. Reimer <reimer@doe.carleton.ca>
+.SS The Brave Unnamed PATCH-WORKS and TESTERS
+"Daniel Quinlan" <quinlan@pathname.com>
+.br
+"Tom Kunicki" <kunicki@surgery.wisc.edu>
+.br
+"Karsten Wiborg" <4wiborg@informatik.uni-hamburg.de>
+.br
+"Jean-Michel Rouet" <JM.ROUET@maisel-gw.enst-bretagne.fr>
+.br
+"Chris Adams" <cadams@ro.com>
+.br
+"Jason Orendorf" <orendorf@sprintmail.com>
+.br
+"Neil McAllister" <pcm2@sentient.com>
+.br
+"Werner Panocha" <WPanocha@t-online.de>
+.br
+"Lee Maisel" <martian@rt66.com>
+.br
+"Brian Schau" <bsc@fleggaard.dk>
+.br
+"Riccardo Facchetti" <riccardo@master.oasi.gpa.it>
+.SS The Information HELPERS and TESTERS.
+"Eric S. Raymond" <esr@snark.thyrsus.com>
+.br
+"Chris Hanson" <cph@martigny.ai.mit.edu>
+.br
+"Pavel Alex" <pavel@petrolbank.mldnet.com>
+.br
+"Theo Van Dinter" <felicity@kluge.net>
+.br
+"Thomas Porter" <txporter@mindspring.com>
+.br
+"Alan Davis" <davis@ele.uri.edu>
+.br
+"Oliver Hvrmann" <ollo@compuserve.com>
+.br
+"Scott Horton" <Scott.Horton1@bridge.bellsouth.com>
+.br
+"Matt Hyne" <mhyne@tip.CSIRO.AU>
+.br
+"Chen Shiyuan" <csy@hjc.edu.sg>
+.SS OTHER CREDITS
+"Miquel van Smoorenburg" <miquels@drinkel.cistron.nl>
+.br
+"The Doctor What" <docwhat@itek.net>
+.br
+"Pavel Korensky" <pavelk@dator3.anet.cz>
+.br
+
+.SH BUGS AND LIMITATIONS
+.LP
+Any and all network modes are not supported yet. There are no known bugs in the
+standard stuff.
+There are possible bugs in all ShareUPS mode types.
+If anyone has had success at all with any ShareUPS models, please report.
+.SH EtherUPS/NetUPS
+This is fully functional as of version 3.4.0.
