@@ -113,13 +113,13 @@
 #endif
 
 #ifdef HAVE_OPENSERVER_OS
-#define int32_t		int
-#define socklen_t	unsigned int
+#define int32_t         int
+#define socklen_t       unsigned int
 #define _SEM_SEMUN_UNDEFINED 1
 #endif
 
 #ifndef SHUT_RDWR
-#define SHUT_RDWR 2		/* for socket shutdown() calls */
+#define SHUT_RDWR 2             /* for socket shutdown() calls */
 #endif
 
 #ifdef SETPGRP_VOID
@@ -134,14 +134,32 @@
  */
 #ifdef HAVE_CYGWIN
 
+/* Apparently later version of Cygwin have this
+ *
+ */
 #define ioctl(fd, func, addr) winioctl(fd, func, addr)
 
 /* modem ioctls */
+#undef  TIOCMGET
 #define TIOCMGET ('d'<<8 | 1)
+#undef  TIOCMBIS
 #define TIOCMBIS ('d'<<8 | 2)
+#undef  TIOCMBIC
 #define TIOCMBIC ('d'<<8 | 3)
 
 /* modem lines */
+#undef  TIOCM_LE
+#undef  TIOCM_DTR
+#undef  TIOCM_RTS
+#undef  TIOCM_ST
+#undef  TIOCM_SR
+#undef  TIOCM_CTS
+#undef  TIOCM_CAR
+#undef  TIOCM_RNG
+#undef  TIOCM_DSR
+#undef  TIOCM_CD
+#undef  TIOCM_RI
+
 #define TIOCM_LE        0x001
 #define TIOCM_DTR       0x002
 #define TIOCM_RTS       0x004
@@ -153,6 +171,8 @@
 #define TIOCM_DSR       0x100
 #define TIOCM_CD        TIOCM_CAR
 #define TIOCM_RI        TIOCM_RNG
+
+#undef HAVE_NAMESER_H
                                                                                                                                                                                                                                                                                                                                                          
 #undef SIGTSTP
 #undef SIGTTOU

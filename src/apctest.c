@@ -270,7 +270,7 @@ int main (int argc, char *argv[]) {
 
     pmsg("\n\n");
     ptime();
-    pmsg("apctest " APCUPSD_RELEASE " (" DATE ") " APCUPSD_HOST"\n");
+    pmsg("apctest " APCUPSD_RELEASE " (" ADATE ") " APCUPSD_HOST"\n");
 
     pmsg("Checking configuration ...\n");
     check_for_config(ups, cfgfile);

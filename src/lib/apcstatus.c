@@ -88,7 +88,7 @@ int output_status(UPSINFO *ups, int sockfd,
     gethostname(buf, sizeof buf);
     s_write(ups, "HOSTNAME : %s\n", buf);
     s_write(ups, "RELEASE  : %s\n", ups->release);
-    s_write(ups, "VERSION  : " APCUPSD_RELEASE " (" DATE ") " APCUPSD_HOST"\n");
+    s_write(ups, "VERSION  : " APCUPSD_RELEASE " (" ADATE ") " APCUPSD_HOST"\n");
     if (*ups->upsname)	 
         s_write(ups, "UPSNAME  : %s\n", ups->upsname);
     s_write(ups, "CABLE    : %s\n", ups->cable.long_name);

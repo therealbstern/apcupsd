@@ -280,7 +280,7 @@ int main(int argc, char *argv[]) {
     Dmsg0(10, "Options parsed.\n");
 
     if (show_version) {
-        printf("apcupsd " APCUPSD_RELEASE " (" DATE ") " APCUPSD_HOST"\n");
+        printf("apcupsd " APCUPSD_RELEASE " (" ADATE ") " APCUPSD_HOST"\n");
 	exit(0);
     }
 
@@ -428,7 +428,7 @@ int main(int argc, char *argv[]) {
     }
    
 #ifdef HAVE_PTHREADS
-    log_event(ups, LOG_WARNING, "apcupsd " APCUPSD_RELEASE " (" DATE ") " APCUPSD_HOST " startup succeeded");
+    log_event(ups, LOG_WARNING, "apcupsd " APCUPSD_RELEASE " (" ADATE ") " APCUPSD_HOST " startup succeeded");
     /* If we have threads, we simply go there rather
      * than creating a thread.
      */
@@ -448,7 +448,7 @@ int main(int argc, char *argv[]) {
         serial_pid = start_thread(ups, do_net, "apcslv", argv[0]);
     }
 
-    log_event(ups, LOG_WARNING, "apcupsd " APCUPSD_RELEASE " (" DATE ") " APCUPSD_HOST " startup succeeded");
+    log_event(ups, LOG_WARNING, "apcupsd " APCUPSD_RELEASE " (" ADATE ") " APCUPSD_HOST " startup succeeded");
     wait_for_termination(serial_pid);  /* wait for child processes to terminate */
 #endif
 
@@ -477,8 +477,8 @@ static void daemon_start()
     /* Should close open file descriptors here, but since  
        we have a lot of them open including the serial
        port, we close only the standard descriptors */
-#ifndef DEBUG
     close(STDIN_FILENO);
+#ifndef DEBUG
     close(STDOUT_FILENO);
     close(STDERR_FILENO);
 #endif

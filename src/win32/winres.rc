@@ -129,7 +129,7 @@ BEGIN
 //  CONTROL         "\3", IDC_APCUPSDBMP,"Static",SS_ICON | SS_CENTERIMAGE |
 //                  SS_SUNKEN,7,5,73,65
     CONTROL         "a", IDB_APCUPSDBMP,"Static",SS_BITMAP|SS_SUNKEN,7,5,73,65
-    LTEXT           "Apcupsd Version " VERSION " (" DATE ")", IDC_VERSION,90,10,239,10
+    LTEXT           "Apcupsd Version " VERSION " (" ADATE ")", IDC_VERSION,90,10,239,10
     LTEXT           "      by Kern Sibbald",IDC_NAME,90,20,239,10
     LTEXT           "For more information, see:",
                     IDC_WWW,90,40,239,10
