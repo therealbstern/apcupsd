@@ -962,7 +962,7 @@ AC_SUBST(LSMDATE)dnl
 #
 # Warning: here we must list all and only the languages we have a
 #	   translation for.
-ALL_LINGUAS="it"
+ALL_LINGUAS="fr it et_EE"
 
 AC_PATH_PROGS(MSGFMT, msgfmt, no)
 if test "$MSGFMT" = "no"

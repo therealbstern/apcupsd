@@ -37,7 +37,7 @@ msgstr "%s (ipc) : interrogation de apcupsd pour %s.\n"
 #: apcaccess.c:234
 #, c-format
 msgid "%s (ipc) <%s> : is not functional yet.\n"
-msgstr "%s (ipc) <%s> : pas encore fonctionnel"
+msgstr "%s (ipc) <%s> : pas encore fonctionnel.\n"
 
 #: apcaccess.c:237
 #, c-format
@@ -524,7 +524,7 @@ msgstr "Type de réseau partagé inconnu\n"
 #: apcupsd.c:448
 #, c-format
 msgid "%s: init_ipc failed.\n"
-msgstr "%s : échec init_ipc"
+msgstr "%s : échec init_ipc.\n"
 
 #. Failed to become daemon.
 #: apcupsd.c:466
