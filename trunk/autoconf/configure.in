@@ -230,6 +230,7 @@ else
     if test "$APCUPSD_MAIL" = "no"
     then
 	echo 'WARNING: mail program not found !'
+	APCUPSD_MAIL=mail
     fi
 fi
 
