@@ -1,10 +1,5 @@
 # Platform configuration
 # 
-# Note, to build, you need:
-#   Release_Notes-%{version}-%{release}.tar.gz in the
-#   $HOME/redhat/apcupsd directory, and the tar file must contain
-#   Release_Notes-%{version}-%{release}.txt
-# 
 # Select the platform by setting the define below either by command
 # line arguments,
 #  e.g.  rpmbuild -ba --define "build_rh7 1" apcupsd.spec
@@ -41,10 +36,12 @@
 %{?build_usb:%define usb 1}
 
 %if %{su9}
-%define initdir /etc/rc.d
+%define initdir /etc/init.d
 %else
 %define initdir /etc/rc.d/init.d
 %endif
+
+%define pwrfaildir @PWRFAILDIR@
 
 Summary:      APC UPS Power Control Daemon for Linux
 Name:         apcupsd
@@ -53,15 +50,15 @@ Release:      1
 Vendor:       APC UPS Daemon Team
 Distribution: The apcupsd Team
 Packager:     D. Scott Barninger <barninger@fairfieldcomputers.com>
-URL:          http://www.apcupsd.com/
-Source0:      http://www.apcupsd.com/%{name}-%{version}.tar.gz
+URL:          http://www.sibbald.com/apcupsd/
+Source0:      http://www.sibbald.com/apcupsd/%{name}-%{version}.tar.gz
 Source1:      Release_Notes-%{version}-%{release}.tar.gz
 Group:        System Environment/Daemons
 Copyright:    GPL v2
 BuildRoot:    %{_tmppath}/%{name}-root
 BuildRequires: gd-devel
 %if %{rh7}
-BuildRequires: glibc-devel >= 2.2
+BuildRequires: glibc-devel >= 2.2, libjpeg-devel, libpng-devel, zlib-devel, freetype-devel
 %else
 BuildRequires: glibc-devel >= 2.3
 %endif
@@ -92,7 +89,7 @@ Requires: gd >= 2.0
 Requires: gd < 2.0
 %endif
 %if %{rh7}
-Requires: glibc >= 2.2
+Requires: glibc >= 2.2, ligjpeg, libpng, zlib, freetype
 %else
 Requires: glibc >= 2.3
 %endif
@@ -165,19 +162,10 @@ make \
         DESTDIR=$RPM_BUILD_ROOT \
         install
 
-# This should no longer be necessary - see Jan 17 2004 changelog note below
-
-# RedHat 7 put usb hid devices in /dev/usd/hid directory rather than /dev/usb
-# which follows usb standard. This was corrected with RedHat 8 so we patch the
-# apcupsd.conf file as created by our configure statement above for rh7 builds.
-#%if %{usb} && %{rh7}
-#patch $RPM_BUILD_ROOT/etc/apcupsd/apcupsd.conf platforms/redhat/apcupsd.conf.patch
-#%endif
-
 install -m744 platforms/apccontrol \
               $RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/apccontrol
-              
-%if ! %{su9} && ! %{mdk}              
+	      
+%if ! %{su9} && ! %{mdk}	      
 install -m755 platforms/redhat/apcupsd $RPM_BUILD_ROOT%{initdir}
 %endif
 %if %{su9}
@@ -207,24 +195,24 @@ install -m744 examples/make-hiddev \
 %files usb
 %defattr(-,root,root)
 %doc COPYING ChangeLog doc/README.* doc/developers_manual examples ../Release_Notes-%{version}-%{release}.txt
-%dir /etc/apcupsd
-%dir /etc/apcupsd/cgi
+%dir %{_sysconfdir}/apcupsd
+%dir %{_sysconfdir}/apcupsd/cgi
 %{initdir}/apcupsd
-%config(noreplace) /etc/apcupsd/apccontrol
-%config(noreplace) /etc/apcupsd/changeme
-%config(noreplace) /etc/apcupsd/commfailure
-%config(noreplace) /etc/apcupsd/commok
-%config(noreplace) /etc/apcupsd/onbattery
-%config(noreplace) /etc/apcupsd/mainsback
-%config(noreplace) /etc/apcupsd/apcupsd.conf
-%config(noreplace) /etc/apcupsd/hosts.conf
-%config(noreplace) /etc/apcupsd/multimon.conf
-%config(noreplace) /etc/apcupsd/masterconnect
-%config(noreplace) /etc/apcupsd/mastertimeout
-/etc/apcupsd/make-hiddev
-/etc/apcupsd/hid-ups
-/etc/apcupsd/apcupsd.css
-/etc/apcupsd/cgi/*
+%config(noreplace) %{_sysconfdir}/apcupsd/apccontrol
+%config(noreplace) %{_sysconfdir}/apcupsd/changeme
+%config(noreplace) %{_sysconfdir}/apcupsd/commfailure
+%config(noreplace) %{_sysconfdir}/apcupsd/commok
+%config(noreplace) %{_sysconfdir}/apcupsd/onbattery
+%config(noreplace) %{_sysconfdir}/apcupsd/mainsback
+%config(noreplace) %{_sysconfdir}/apcupsd/apcupsd.conf
+%config(noreplace) %{_sysconfdir}/apcupsd/hosts.conf
+%config(noreplace) %{_sysconfdir}/apcupsd/multimon.conf
+%config(noreplace) %{_sysconfdir}/apcupsd/masterconnect
+%config(noreplace) %{_sysconfdir}/apcupsd/mastertimeout
+%{_sysconfdir}/apcupsd/make-hiddev
+%{_sysconfdir}/apcupsd/hid-ups
+%{_sysconfdir}/apcupsd/apcupsd.css
+%{_sysconfdir}/apcupsd/cgi/*
 /sbin/*
 %attr(-,root,man) %{_mandir}/*/*
 
@@ -242,7 +230,7 @@ fi
 
 # are we Red Hat or SuSE?
 # Mandrake already handles apcupsd
-if [ -s /etc/redhat-release ]; then
+if [ -s /etc/redhat-release -o -s /etc/SuSE-release -o -s /etc/whitebox-release ]; then
 cp -f %{initdir}/halt %{initdir}/halt.old
 awk '# Stuff left over from a previous apcupsd, remove it
 /^# See if this is a powerfail situation\./ {
@@ -254,40 +242,11 @@ awk '# Stuff left over from a previous apcupsd, remove it
 # We insert the new apcupsd code just before the following line
 /^# Now halt or reboot\./ {
     print "# See if this is a powerfail situation.                               # ***apcupsd***"
-    print "if [ -f @PWRFAILDIR@/powerfail ]; then                                # ***apcupsd***"
+    print "if [ -f %{pwrfaildir}/powerfail ]; then                                # ***apcupsd***"
     print "   echo                                                               # ***apcupsd***"
     print "   echo \"APCUPSD will now power off the UPS\"                          # ***apcupsd***"
     print "   echo                                                               # ***apcupsd***"
-    print "   @PWRFAILDIR@/apccontrol killpower                                  # ***apcupsd***"
-    print "   echo                                                               # ***apcupsd***"
-    print "   echo \"Please ensure that the UPS has powered off before rebooting\" # ***apcupsd***"
-    print "   echo \"Otherwise, the UPS may cut the power during the reboot!!!\"   # ***apcupsd***"
-    print "   echo                                                               # ***apcupsd***"
-    print "fi                                                                    # ***apcupsd***"
-    print ""
-}
-# Everything else is duplicated 
-{ print } ' %{initdir}/halt.old > %{initdir}/halt
-
-chmod 744 %{initdir}/halt
-fi
-if [ -s /etc/SuSE-release ]; then
-cp -f %{initdir}/halt %{initdir}/halt.old
-awk '# Stuff left over from a previous apcupsd, remove it
-/^# See if this is a powerfail situation\./ {
-   do {
-      getline
-   }  while (length($0) != 0)
-   getline
-}
-# We insert the new apcupsd code just before the following line
-/^# Set system console back to intial value/ {
-    print "# See if this is a powerfail situation.                               # ***apcupsd***"
-    print "if [ -f @PWRFAILDIR@/powerfail ]; then                                # ***apcupsd***"
-    print "   echo                                                               # ***apcupsd***"
-    print "   echo \"APCUPSD will now power off the UPS\"                          # ***apcupsd***"
-    print "   echo                                                               # ***apcupsd***"
-    print "   @PWRFAILDIR@/apccontrol killpower                                  # ***apcupsd***"
+    print "   %{pwrfaildir}/apccontrol killpower                                  # ***apcupsd***"
     print "   echo                                                               # ***apcupsd***"
     print "   echo \"Please ensure that the UPS has powered off before rebooting\" # ***apcupsd***"
     print "   echo \"Otherwise, the UPS may cut the power during the reboot!!!\"   # ***apcupsd***"
@@ -305,19 +264,13 @@ fi
 
 %preun usb
 if [ $1 = 0 ] ; then
-        # stop running version (if any)                  
-        # I have removed the following because it sometimes produces
-        # an error message which may confuse someone.
-        #/sbin/service apcupsd stop
 
         # remove startup links
         /sbin/chkconfig --del apcupsd
-        
-        # are we Mandrake?
-        # Mandrake already handles apcupsd
-        if [ ! -s /etc/mandrake-release ]; then
-        # restore old halt script (hopefully)
-        #   mv -f /etc/rc.d/init.d/halt.old /etc/rc.d/init.d/halt
+	
+	# are we Red Hat or SuSE?
+	# Mandrake already handles apcupsd
+	if [ -s /etc/redhat-release -o -s /etc/SuSE-release -o -s /etc/whitebox-release ]; then
 
         cp -f %{initdir}/halt %{initdir}/halt.old
         awk '# Stuff added by apcupsd, remove it
@@ -331,13 +284,7 @@ if [ $1 = 0 ] ; then
         { print } ' %{initdir}/halt.old > %{initdir}/halt
 
         chmod 744 %{initdir}/halt
-        fi
-fi
-
-%postun usb
-if [ "$1" -ge "1" ]; then
-        :
-        # /sbin/service apcupsd condrestart >/dev/null 2>&1 || :
+	fi
 fi
 
 %else
@@ -345,22 +292,22 @@ fi
 %files std
 %defattr(-,root,root)
 %doc COPYING ChangeLog doc/README.* doc/developers_manual examples ../Release_Notes-%{version}-%{release}.txt
-%dir /etc/apcupsd
-%dir /etc/apcupsd/cgi
+%dir %{_sysconfdir}/apcupsd
+%dir %{_sysconfdir}/apcupsd/cgi
 %{initdir}/apcupsd
-%config(noreplace) /etc/apcupsd/apccontrol
-%config(noreplace) /etc/apcupsd/changeme
-%config(noreplace) /etc/apcupsd/commfailure
-%config(noreplace) /etc/apcupsd/commok
-%config(noreplace) /etc/apcupsd/onbattery
-%config(noreplace) /etc/apcupsd/mainsback
-%config(noreplace) /etc/apcupsd/apcupsd.conf
-%config(noreplace) /etc/apcupsd/hosts.conf
-%config(noreplace) /etc/apcupsd/multimon.conf
-%config(noreplace) /etc/apcupsd/masterconnect
-%config(noreplace) /etc/apcupsd/mastertimeout
-/etc/apcupsd/apcupsd.css
-/etc/apcupsd/cgi/*
+%config(noreplace) %{_sysconfdir}/apcupsd/apccontrol
+%config(noreplace) %{_sysconfdir}/apcupsd/changeme
+%config(noreplace) %{_sysconfdir}/apcupsd/commfailure
+%config(noreplace) %{_sysconfdir}/apcupsd/commok
+%config(noreplace) %{_sysconfdir}/apcupsd/onbattery
+%config(noreplace) %{_sysconfdir}/apcupsd/mainsback
+%config(noreplace) %{_sysconfdir}/apcupsd/apcupsd.conf
+%config(noreplace) %{_sysconfdir}/apcupsd/hosts.conf
+%config(noreplace) %{_sysconfdir}/apcupsd/multimon.conf
+%config(noreplace) %{_sysconfdir}/apcupsd/masterconnect
+%config(noreplace) %{_sysconfdir}/apcupsd/mastertimeout
+%{_sysconfdir}/apcupsd/apcupsd.css
+%{_sysconfdir}/apcupsd/cgi/*
 /sbin/*
 %attr(-,root,man) %{_mandir}/*/*
 
@@ -378,7 +325,7 @@ fi
 
 # are we Red Hat or SuSE?
 # Mandrake already handles apcupsd
-if [ -s /etc/redhat-release ]; then
+if [ -s /etc/redhat-release -o -s /etc/SuSE-release -o -s /etc/whitebox-release ]; then
 cp -f %{initdir}/halt %{initdir}/halt.old
 awk '# Stuff left over from a previous apcupsd, remove it
 /^# See if this is a powerfail situation\./ {
@@ -390,40 +337,11 @@ awk '# Stuff left over from a previous apcupsd, remove it
 # We insert the new apcupsd code just before the following line
 /^# Now halt or reboot\./ {
     print "# See if this is a powerfail situation.                               # ***apcupsd***"
-    print "if [ -f @PWRFAILDIR@/powerfail ]; then                                # ***apcupsd***"
+    print "if [ -f %{pwrfaildir}/powerfail ]; then                                # ***apcupsd***"
     print "   echo                                                               # ***apcupsd***"
     print "   echo \"APCUPSD will now power off the UPS\"                          # ***apcupsd***"
     print "   echo                                                               # ***apcupsd***"
-    print "   @PWRFAILDIR@/apccontrol killpower                                  # ***apcupsd***"
-    print "   echo                                                               # ***apcupsd***"
-    print "   echo \"Please ensure that the UPS has powered off before rebooting\" # ***apcupsd***"
-    print "   echo \"Otherwise, the UPS may cut the power during the reboot!!!\"   # ***apcupsd***"
-    print "   echo                                                               # ***apcupsd***"
-    print "fi                                                                    # ***apcupsd***"
-    print ""
-}
-# Everything else is duplicated 
-{ print } ' %{initdir}/halt.old > %{initdir}/halt
-
-chmod 744 %{initdir}/halt
-fi
-if [ -s /etc/SuSE-release ]; then
-cp -f %{initdir}/halt %{initdir}/halt.old
-awk '# Stuff left over from a previous apcupsd, remove it
-/^# See if this is a powerfail situation\./ {
-   do {
-      getline
-   }  while (length($0) != 0)
-   getline
-}
-# We insert the new apcupsd code just before the following line
-/^# Set system console back to intial value/ {
-    print "# See if this is a powerfail situation.                               # ***apcupsd***"
-    print "if [ -f @PWRFAILDIR@/powerfail ]; then                                # ***apcupsd***"
-    print "   echo                                                               # ***apcupsd***"
-    print "   echo \"APCUPSD will now power off the UPS\"                          # ***apcupsd***"
-    print "   echo                                                               # ***apcupsd***"
-    print "   @PWRFAILDIR@/apccontrol killpower                                  # ***apcupsd***"
+    print "   %{pwrfaildir}/apccontrol killpower                                  # ***apcupsd***"
     print "   echo                                                               # ***apcupsd***"
     print "   echo \"Please ensure that the UPS has powered off before rebooting\" # ***apcupsd***"
     print "   echo \"Otherwise, the UPS may cut the power during the reboot!!!\"   # ***apcupsd***"
@@ -441,19 +359,13 @@ fi
 
 %preun std
 if [ $1 = 0 ] ; then
-        # stop running version (if any)                  
-        # I have removed the following because it sometimes produces
-        # an error message which may confuse someone.
-        #/sbin/service apcupsd stop
 
         # remove startup links
         /sbin/chkconfig --del apcupsd
 
-        # are we Mandrake?
-        # Mandrake already handles apcupsd
-        if [ ! -s /etc/mandrake-release ]; then
-        # restore old halt script (hopefully)
-        #   mv -f /etc/rc.d/init.d/halt.old /etc/rc.d/init.d/halt
+	# are we Red Hat or SuSE?
+	# Mandrake already handles apcupsd
+	if [ -s /etc/redhat-release -o -s /etc/SuSE-release -o -s /etc/whitebox-release ]; then
 
         cp -f %{initdir}/halt %{initdir}/halt.old
         awk '# Stuff added by apcupsd, remove it
@@ -467,18 +379,18 @@ if [ $1 = 0 ] ; then
         { print } ' %{initdir}/halt.old > %{initdir}/halt
 
         chmod 744 %{initdir}/halt
-        fi
-fi
-
-%postun std
-if [ "$1" -ge "1" ]; then
-        :
-        # /sbin/service apcupsd condrestart >/dev/null 2>&1 || :
+	fi
 fi
 
 %endif
 
 %changelog
+* Sat Mar 12 2005 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- clean up halt insertion code, add check for whitebox-release
+- remove cruft that has been commented out for a long time
+- add pwrfaildir as variable
+- correct SuSE initdir
+- add libjpeg libpng zlib freetype dependencies for RH7
 * Sun Nov 28 2004 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - correct awk insertion in halt script for SuSE
 * Fri Nov 05 2004 D. Scott Barninger <barninger at fairfieldcomputers.com>
