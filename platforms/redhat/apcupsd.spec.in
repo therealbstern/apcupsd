@@ -10,6 +10,12 @@
 #  e.g.  rpmbuild -ba --define "build_usb 1" --define "build_rh7 1" apcupsd.spec
 # or by manually setting it to 1 in this file,
 #  e.g. %define usb 1
+#
+# Note, to build, you need:
+#   Release_Notes-%{version}-%{release}.tar.gz in your
+#   rpm SOURCES directory, and the tar file must contain
+#   Release_Notes-%{version}-%{release}.txt
+#
 
 %define rh7 0
 %{?build_rh7:%define rh7 1}
@@ -50,8 +56,8 @@ Release:      1
 Vendor:       APC UPS Daemon Team
 Distribution: The apcupsd Team
 Packager:     D. Scott Barninger <barninger@fairfieldcomputers.com>
-URL:          http://www.sibbald.com/apcupsd/
-Source0:      http://www.sibbald.com/apcupsd/%{name}-%{version}.tar.gz
+URL:          http://www.apcupsd.com
+Source0:      http://www.spcupsd.com/%{name}-%{version}.tar.gz
 Source1:      Release_Notes-%{version}-%{release}.tar.gz
 Group:        System Environment/Daemons
 Copyright:    GPL v2
