@@ -49,9 +49,11 @@ pdf:
 
 html:
 	@echo "Making html"
-	cp ${IMAGES}/*.eps ${IMAGES}/*.png .
+	rm -f *.eps *.png
+	cp ${IMAGES}/*.eps .
 	latex2html -white -no_subdir -split 0 -toc_stars -white -notransparent \
 		apcupsd >/dev/null
+	rm -f *.eps
 
 web:
 	@echo "Making web"
