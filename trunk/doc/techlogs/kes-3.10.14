@@ -3,6 +3,7 @@
 
 General:
 28Jul04
+- Add workaround from Adam for linux/hiddev.h missing define.
 - Updates to manual.
 - Integrate patch for Mandrake apcupsd.in forwarded by David Walser.
 18Jul04
