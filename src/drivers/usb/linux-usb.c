@@ -20,8 +20,9 @@
 #include <asm/types.h>
 #include <linux/hiddev.h>
 
-/* Forware referenced function */
+/* Forward referenced functions */
 static int find_usb_application(UPSINFO *ups);
+static double pow_ten(int exponent);
 
 extern UPSCOMMANDS cmd[];
 extern UPSCMDMSG cmd_msg[];
@@ -420,7 +421,7 @@ static int get_value(UPSINFO *ups, int ci, USB_INFO *uinfo)
 	    if (exponent == 0) {
 	       info->dValue = info->uref.value;
 	    } else {
-	       info->dValue = ((double)info->uref.value) * pow(10, exponent);
+	       info->dValue = ((double)info->uref.value) * pow_ten(exponent);
 	    }
 	    break;
 	default:
@@ -432,7 +433,7 @@ static int get_value(UPSINFO *ups, int ci, USB_INFO *uinfo)
 	if (exponent == 0) {
 	   info->dValue = info->uref.value;
 	} else {
-	   info->dValue = ((double)info->uref.value) * pow(10, exponent);
+	   info->dValue = ((double)info->uref.value) * pow_ten(exponent);
 	}
     } else {   /* should be T_NONE */
         info->UnitName = "";
@@ -441,7 +442,7 @@ static int get_value(UPSINFO *ups, int ci, USB_INFO *uinfo)
 	if (exponent == 0) {
 	   info->dValue = info->uref.value;
 	} else {
-	   info->dValue = ((double)info->uref.value) * pow(10, exponent);
+	   info->dValue = ((double)info->uref.value) * pow_ten(exponent);
 	}
         Dmsg3(200, "Def val=%d exp=%d dVal=%f\n", info->uref.value,
 	      exponent, info->dValue);
@@ -1106,3 +1107,22 @@ int usb_ups_entry_point(UPSINFO *ups, int command, void *data)
 {
     return 0;
 }   
+
+static double pow_ten(int exponent)
+{
+    int i;
+    double val = 1; 
+
+    if (exponent < 0) {
+       exponent = -exponent;
+       for (i=0; i<exponent; i++) {
+	  val = val / 10;
+       }
+       return val;
+    } else {
+       for (i=0; i<exponent; i++) {
+	  val = val * 10;
+       }
+    }
+    return val;
+}
