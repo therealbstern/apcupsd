@@ -35,7 +35,12 @@ first two steps in the next section.
 
 <h2>Building the Kernel</h2>
 I provide here only a very brief explanation of the steps
-necessary to build your kernel.
+necessary to build your kernel.  If you have a later
+kernel such as RedHat 7.3 (kernel 2.4.18-5), you don't
+need to rebuild it. If you want to anyway, you can install
+the <b>kernel-source</b> rpm, cd to the appropriate
+directory (usually <b>/usr/src/linux-2.4</b>), then skip immediately to
+step 11 below.
 <pre>
  1. Download kernel from:
     http://www.kernel.org/pub/linux/kernel/v2.4/
@@ -91,12 +96,15 @@ necessary to build your kernel.
     CONFIG_USB_HID=m
     CONFIG_USB_HIDDEV=m
 
+    Note, the CONFIG_USB_LARGE_CONFIG does not seem to be present
+    in some of the later kernels (e.g. 2.4.18)
+
 13. make menuconfig  or   make xconfig (if you are running X)
     load a valid configuration file
     check the above values and ensure they are correct
     save config
 
-14. Check what you saved by editing ./config
+14. Check what you saved by editing .config
     You can skip this if you have done kernel builds
         before.
 
@@ -119,9 +127,9 @@ necessary to build your kernel.
     If you are using grub, edit the /boot/grub config
     file and skip steps 24 and 25.
 
-24. cd /etc
+24. cd /etc  (skip this if you are using grub)
 
-25. lilo -v
+25. lilo -v  (skip this if you are using grub) 
 
 26. reboot
 
@@ -133,6 +141,19 @@ necessary to build your kernel.
         modprobe uhci
         modprobe hid
 </pre>
+
+<h3>Build Problems</h3>
+If you start with the RedHat <b>kernel-source</b> package as
+I did and use one of their config files in <b>configs</b> as I
+did, you are very likely to get a number of undefined symbols
+when making or installing the modules. In this case, I found that
+I can simply edit <b>.config</b> with my favorite editor, comment
+out modules that don't build (knowing which ones is not always
+obvious from the names), then simply <b>make modules</b> and
+<b>make modules_install</b> until all the problems go away.
+Once the module build and install is correct,
+I recommend doing <b>make bzImage</b> and <b>make install</b>
+again.                                 
 
 <h3>Disclaimer</h3>
 I'm not at all a kernel expert so you are pretty much

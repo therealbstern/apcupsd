@@ -998,9 +998,11 @@ int usb_ups_read_volatile_data(UPSINFO *ups)
 static int write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
 {
     struct hiddev_report_info rinfo;
+    struct hiddev_field_info finfo;
     USB_DATA *private = ups->driver_internal_data;
     USB_INFO *info;
     int old_value, new_value;
+    int i;
 
     errno = 0; 
     if (ups->UPS_Cap[ci] && private->info[ci]) {
@@ -1011,6 +1013,24 @@ static int write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
             Dmsg1(000, "HIDIOCGREPORT for shutdown failed. ERR=%s\n", strerror(errno));
 	    return 0;
 	}
+	rinfo.report_type = info->uref.report_type;
+	rinfo.report_id = info->uref.report_id;
+	if (ioctl(private->fd, HIDIOCGREPORTINFO, &rinfo) < 0) {  /* get Report */
+            Dmsg1(000, "HIDIOCGREPORT for shutdown failed. ERR=%s\n", strerror(errno));
+	    return 0;
+	}
+        Dmsg1(000, "REPORTINFO num_fields=%d\n", rinfo.num_fields);
+	finfo.report_type = info->uref.report_type;
+	finfo.report_id = info->uref.report_id;
+	if (ioctl(private->fd, HIDIOCGFIELDINFO, &finfo) < 0) {  /* Get field info */
+            Dmsg1(000, "HIDIOCGFIELDINFO for shutdown failed. ERR=%s\n", strerror(errno));
+	    return 0;
+	}
+        Dmsg7(000, "FIELDINFO type=%d id=%d index=%d logical_min=%d \n\
+logical_max=%d exponent=%d unit=0x%x\n",
+	    finfo.report_type, finfo.report_id, finfo.field_index,
+	    finfo.logical_minimum, finfo.logical_maximum, 
+	    finfo.unit_exponent, finfo.unit);
         Dmsg3(000, "GUSAGE type=%d id=%d index=%d\n", info->uref.report_type,
 	   info->uref.report_id, info->uref.field_index);
 	if (ioctl(private->fd, HIDIOCGUSAGE, &info->uref) < 0) {  /* get UPS value */
@@ -1025,9 +1045,11 @@ static int write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
             Dmsg1(000, "HIDIOCSUSAGE for shutdown failed. ERR=%s\n", strerror(errno));
 	    return 0;
 	}
-	if (ioctl(private->fd, HIDIOCSREPORT, &rinfo) < 0) {  /* update Report */
-            Dmsg1(000, "HIDIOCSREPORT for shutdown failed. ERR=%s\n", strerror(errno));
-	    return 0;
+	for (i=0; i < 1; i++) {
+	   if (ioctl(private->fd, HIDIOCSREPORT, &rinfo) < 0) {  /* update Report */
+               Dmsg1(000, "HIDIOCSREPORT for shutdown failed. ERR=%s\n", strerror(errno));
+	       return 0;
+	   }
 	}
 	if (ioctl(private->fd, HIDIOCGUSAGE, &info->uref) < 0) {  /* get UPS value */
             Dmsg1(000, "HIDIOCSUSAGE for shutdown failed. ERR=%s\n", strerror(errno));
@@ -1058,10 +1080,10 @@ int usb_ups_kill_power(UPSINFO *ups)
 
     write_int_to_ups(ups, CI_APCForceShutdown, 1, "CI_APCForceShutdown");
 
-/*  ****** DEBUG testing
- *  write_int_to_ups(ups, CI_WarningCapacityLimit, 40, "CIWarningCapacityLimit");
- *  write_int_to_ups(ups, CI_RemCapLimit, 20, "CI_RemCapLibmit");
- */
+  /******* DEBUG testing */
+    write_int_to_ups(ups, CI_WarningCapacityLimit, 40, "CIWarningCapacityLimit");
+    write_int_to_ups(ups, CI_RemCapLimit, 20, "CI_RemCapLibmit");
+   
 
     Dmsg0(200, "Leave usb_ups_kill_power\n");
     Dmsg0(000, "Kill power does not yet work. Please ignore the debug output.\n");
