@@ -31,18 +31,14 @@
 # error "A graphic file format must be defined to compile this program."
 #endif
 
-#include "cgiconfig.h"
-#include "cgilib.h"
-
-#include <math.h>
-#include <stdio.h>
-#include <stdlib.h>
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <string.h>
+
+#include "cgiconfig.h"
+#include "cgilib.h"
 
 static char    monhost[128];
 static char    cmd[16] = "";

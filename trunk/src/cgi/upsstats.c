@@ -38,11 +38,11 @@
 #include <time.h>
 #include <string.h>
 #include <fcntl.h>
+
 #include "cgiconfig.h"
 #include "cgilib.h"
 #include "upsfetch.h"
 #include "status.h"
-
 
 static char   monhost[256];
 static char   img1s[16];
