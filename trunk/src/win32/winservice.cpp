@@ -414,7 +414,7 @@ upsService::ApcupsdServiceMain()
        }
 
        // And find the RegisterServiceProcess function
-       DWORD (*RegisterService)(DWORD, DWORD);
+       DWORD WINAPI (*RegisterService)(DWORD, DWORD);
        RegisterService = (DWORD (*)(DWORD, DWORD))
                GetProcAddress(kerneldll, "RegisterServiceProcess");
        if (RegisterService == NULL) {
