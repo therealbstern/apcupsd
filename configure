@@ -9594,12 +9594,12 @@ if test "${enable_nis+set}" = set; then
 #define HAVE_NISSERVER 1
 _ACEOF
 
-    cat >>confdefs.h <<\_ACEOF
+	cat >>confdefs.h <<\_ACEOF
 #define HAVE_NISLIB 1
 _ACEOF
 
 	if test "$CFG_CYGWIN" = "no"; then APCNISD=apcnisd; fi
-    NISSRV_ENABLED=yes
+	   NISSRV_ENABLED=yes
 	fi
 else
 
@@ -9607,12 +9607,12 @@ else
 #define HAVE_NISSERVER 1
 _ACEOF
 
-    cat >>confdefs.h <<\_ACEOF
+	cat >>confdefs.h <<\_ACEOF
 #define HAVE_NISLIB 1
 _ACEOF
 
 	if test "$CFG_CYGWIN" = "no"; then APCNISD=apcnisd; fi
-    NISSRV_ENABLED=yes
+	NISSRV_ENABLED=yes
 
 fi;
 
@@ -9635,7 +9635,7 @@ OLDNET_ENABLED=no
 if test "${enable_master_slave+set}" = set; then
   enableval="$enable_master_slave"
    if test "$enableval" = "yes" ; then
-	   cat >>confdefs.h <<\_ACEOF
+       cat >>confdefs.h <<\_ACEOF
 #define HAVE_OLDNET 1
 _ACEOF
 
@@ -9672,7 +9672,7 @@ POWERFLUTE_ENABLE="no"
 if test "${enable_powerflute+set}" = set; then
   enableval="$enable_powerflute"
    if test "$enableval" = "yes" ; then
-	POWERFLUTE_ENABLE="yes"
+	    POWERFLUTE_ENABLE="yes"
 	    echo "$as_me:$LINENO: checking for initscr in -lncurses" >&5
 echo $ECHO_N "checking for initscr in -lncurses... $ECHO_C" >&6
 if test "${ac_cv_lib_ncurses_initscr+set}" = set; then

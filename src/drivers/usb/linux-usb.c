@@ -222,6 +222,16 @@ static int open_usb_device(UPSINFO *ups)
     char name[MAXSTRING];
     char devname[MAXSTRING];
     USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
+    const char *hiddev[] = {"/dev/usb/hiddev", "/dev/usb/hid/hiddev", NULL};
+    int i, j;
+
+    /*
+     * If no device locating specified, we go autodetect it
+     *	 by searching known places.
+     */
+    if (ups->device[0] == 0) {
+       goto auto_detect;
+    }
 
     if (my_data->orig_device[0] == 0) {
        strcpy(my_data->orig_device, ups->device);
@@ -280,6 +290,37 @@ static int open_usb_device(UPSINFO *ups)
        ups->device[0] = 0;
        return 0;
     }
+
+/*
+ * Come here if no device name is given.  We try
+ *   to autodetect it in the standard places.
+ */
+auto_detect:
+
+    for (i=0; hiddev[i]; i++) {
+	for (j=0; j<16; j++) {
+           sprintf(devname, "%s%d", hiddev[i], j);
+	   /* Open the device port */
+	   if ((my_data->fd = open(devname, O_RDWR | O_NOCTTY)) < 0) {
+	      continue;
+	   }
+	   if (!find_usb_application(ups)) {
+	      close(my_data->fd);
+	      my_data->fd = -1;
+	      continue;
+	    }
+	    goto auto_opened;
+	}
+    }
+
+auto_opened:
+    if (my_data->fd >= 0) {
+       strcpy(ups->device, devname);
+       return 1;
+    } else {
+       ups->device[0] = 0;
+       return 0;
+    }
 }
 
 /*********************************************************************
@@ -299,7 +340,7 @@ static int usb_link_check(UPSINFO *ups)
     }
     linkcheck = TRUE;		  /* prevent recursion */
 
-    UPS_SET(UPS_COMMLOST);
+    set_ups(UPS_COMMLOST);
     Dmsg0(200, "link_check comm lost\n");
 
     /* Don't warn until we try to get it at least 2 times and fail */
@@ -330,7 +371,7 @@ static int usb_link_check(UPSINFO *ups)
 
     if (!comm_err) {
 	generate_event(ups, CMDCOMMOK);
-	UPS_CLEAR(UPS_COMMLOST);
+	clear_ups(UPS_COMMLOST);
         Dmsg0(200, "link check comm OK.\n");
     }
     linkcheck = FALSE;
@@ -522,7 +563,7 @@ int usb_ups_check_state(UPSINFO *ups)
 	    * This eliminates the annoyance of detecting
 	    * transitions to battery that last less than
 	    * 6 seconds.
- */   
+	    */	 
 	   sleep(6 - (time(NULL) - my_data->debounce));
 	   my_data->debounce = 0;
 	}
@@ -530,31 +571,31 @@ int usb_ups_check_state(UPSINFO *ups)
 	for (i=0; i < (retval/(int)sizeof(ev[0])); i++) {
 	    if (ev[i].hid == ups->UPS_Cmd[CI_Discharging]) {
 		/* If first time on batteries, debounce */
-		if (!UPS_ISSET(UPS_ONBATT) && ev[i].value) {
+		if (!is_ups_set(UPS_ONBATT) && ev[i].value) {
 		   my_data->debounce = time(NULL);
 		}
 		if (ev[i].value) {
-	    UPS_CLEAR_ONLINE();
-	} else {
-	    UPS_SET_ONLINE();
-	}
+		    clear_ups_online();
+		} else {
+		    set_ups_online();
+		}
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_BelowRemCapLimit]) {
-	    if (ev[i].value) {
-		UPS_SET(UPS_BATTLOW);
-	    } else {
-		UPS_CLEAR(UPS_BATTLOW);
-	    }
-                Dmsg1(200, "UPS_BATTLOW = %d\n", UPS_ISSET(UPS_BATTLOW));
+		if (ev[i].value) {
+		    set_ups(UPS_BATTLOW);
+		} else {
+		    clear_ups(UPS_BATTLOW);
+		}
+                Dmsg1(200, "UPS_BATTLOW = %d\n", is_ups_set(UPS_BATTLOW));
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_ACPresent]) {
 		/* If first time on batteries, debounce */
-		if (!UPS_ISSET(UPS_ONBATT) && !ev[i].value) {
+		if (!is_ups_set(UPS_ONBATT) && !ev[i].value) {
 		   my_data->debounce = time(NULL);
 		}
 		if (!ev[i].value) {
-	    UPS_CLEAR_ONLINE();
-	} else {
-	    UPS_SET_ONLINE();
-	}
+		    clear_ups_online();
+		} else {
+		    set_ups_online();
+		}
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_RemainingCapacity]) {
 		ups->BattChg = ev[i].value;
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_RunTimeToEmpty]) {
@@ -564,19 +605,19 @@ int usb_ups_check_state(UPSINFO *ups)
 		    ups->TimeLeft = ev[i].value;  /* minutes */
 		}
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_NeedReplacement]) {
-	    if (ev[i].value) {
-		UPS_SET(UPS_REPLACEBATT);
-	    } else {
-		UPS_CLEAR(UPS_REPLACEBATT);
-	    }
+		if (ev[i].value) {
+		    set_ups(UPS_REPLACEBATT);
+		} else {
+		    clear_ups(UPS_REPLACEBATT);
+		}
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_ShutdownImminent]) {
-	    if (ev[i].value) {
-		UPS_SET(UPS_SHUTDOWNIMM);
-	    } else {
-		UPS_CLEAR(UPS_SHUTDOWNIMM);
+		if (ev[i].value) {
+		    set_ups(UPS_SHUTDOWNIMM);
+		} else {
+		   clear_ups(UPS_SHUTDOWNIMM);
+		}
+                Dmsg1(200, "ShutdownImminent=%d\n", is_ups_set(UPS_SHUTDOWNIMM));
 	    }
-            Dmsg1(200, "ShutdownImminent=%d\n", UPS_ISSET(UPS_SHUTDOWNIMM));
-	}
             Dmsg1(200, "Status=%d\n", ups->Status);
 	}
 	write_unlock(ups);
@@ -612,9 +653,9 @@ int usb_ups_open(UPSINFO *ups)
     }
     if (!open_usb_device(ups)) {
 	write_unlock(ups);
-        Error_abort1(_("Cannot open UPS device %s\n"), ups->device);
+        Error_abort1(_("Cannot open UPS device: %s\n"), ups->device);
     }
-    UPS_CLEAR(UPS_SLAVE);
+    clear_ups(UPS_SLAVE);
     write_unlock(ups);
     return 1;
 }
@@ -892,34 +933,34 @@ int usb_ups_read_volatile_data(UPSINFO *ups)
     } else {
 	/* No APC Status value, well, fabricate one */
 	if (get_value(ups, CI_ACPresent, &uinfo) && uinfo.uref.value) {
-	    UPS_SET_ONLINE();
+	    set_ups_online();
 	}
 	if (get_value(ups, CI_Discharging, &uinfo) && uinfo.uref.value) {
-	    UPS_CLEAR_ONLINE();
+	    clear_ups_online();
 	}
 	if (get_value(ups, CI_BelowRemCapLimit, &uinfo) && uinfo.uref.value) {
-	    UPS_SET(UPS_BATTLOW);
+	    set_ups(UPS_BATTLOW);
             Dmsg1(200, "BelowRemCapLimit=%d\n", uinfo.uref.value);
 	}
 	if (get_value(ups, CI_RemTimeLimitExpired, &uinfo) && uinfo.uref.value) {
-	    UPS_SET(UPS_BATTLOW);
+	    set_ups(UPS_BATTLOW);
             Dmsg0(200, "RemTimeLimitExpired\n");
 	}
 	if (get_value(ups, CI_ShutdownImminent, &uinfo) && uinfo.uref.value) {
-	    UPS_SET(UPS_BATTLOW);
+	    set_ups(UPS_BATTLOW);
             Dmsg0(200, "ShutdownImminent\n");
 	}
 	if (get_value(ups, CI_Boost, &uinfo) && uinfo.uref.value) {
-	    UPS_SET(UPS_SMARTBOOST);
+	    set_ups(UPS_SMARTBOOST);
 	}
 	if (get_value(ups, CI_Trim, &uinfo) && uinfo.uref.value) {
-	    UPS_SET(UPS_SMARTTRIM);
+	    set_ups(UPS_SMARTTRIM);
 	}
 	if (get_value(ups, CI_Overload, &uinfo) && uinfo.uref.value) {
-	    UPS_SET(UPS_OVERLOAD);
+	    set_ups(UPS_OVERLOAD);
 	}
 	if (get_value(ups, CI_NeedReplacement, &uinfo) && uinfo.uref.value) {
-	    UPS_SET(UPS_REPLACEBATT);
+	    set_ups(UPS_REPLACEBATT);
 	}
     }
 

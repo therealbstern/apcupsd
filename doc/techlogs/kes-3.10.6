@@ -1,10 +1,20 @@
              Technical notes on version 3.10.6
-                        14 September 2003
+                        28 September 2003
                         Kern Sibbald
 
 General:
 
 Changes submitted this submission:
+28Sep03
+- Test net slave mode.
+- Add MASTER name to status output if device is a slave.
+- Display last master update if device is a net slave.
+- Add 10 sec delay before calling apcupsd --killpower it is
+  needed for USB killpower to work right. Why????
+- Save old apccontrol when installing a new one.
+- Replace old UPS_SET() with set_ups() in a number of places.
+27Sep03
+- Implement autodetect of USB port if no DEVICE given.
 14Sep03
 - After the upgrade to RH9 with the new autoconf, quite a
   few things broke. As far as I can tell, it is because autoconf

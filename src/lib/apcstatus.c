@@ -110,6 +110,7 @@ int output_status(UPSINFO *ups, int sockfd,
           strftime(datetime, 100, "%a %b %d %X %Z %Y", &tm);
           s_write(ups, "MASTERUPD: %s\n", datetime);
        }
+       s_write(ups,"MASTER   : %s\n", ups->master_name);
     }
 
     switch(ups->mode.type) {

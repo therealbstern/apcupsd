@@ -51,94 +51,95 @@ then
     ${SCRIPTDIR}/${1} ${2} ${3} ${4}
     # exit code 99 means he does not want us to do default action
     if [ $? = 99 ] ; then
-        exit 0
+	exit 0
     fi
 fi
 
 case "$1" in
     killpower)
-        echo "Apccontrol doing: ${APCUPSD} --killpower on UPS ${2}"
-        echo "Apccontrol doing: ${APCUPSD} --killpower on UPS ${2}" | wall
-        ${APCUPSD} --killpower
+	echo "Apccontrol doing: ${APCUPSD} --killpower on UPS ${2}"
+	echo "Apccontrol doing: ${APCUPSD} --killpower on UPS ${2}" | wall
+	sleep 10
+	${APCUPSD} --killpower
     ;;
     commfailure)
-        echo "Warning communications lost with UPS ${2}" | wall
+	echo "Warning communications lost with UPS ${2}" | wall
     ;;
     commok)
-        echo "Communciations restored with UPS ${2}" | wall
+	echo "Communciations restored with UPS ${2}" | wall
     ;;
     powerout)
-        echo "Warning power loss detected on UPS ${2}" | wall
+	echo "Warning power loss detected on UPS ${2}" | wall
     ;;
     onbattery)
-        echo "Power failure on UPS ${2}. Running on batteries." | wall
+	echo "Power failure on UPS ${2}. Running on batteries." | wall
     ;;
     failing)
-        echo "Battery power exhaused on UPS ${2}. Doing shutdown." | wall
+	echo "Battery power exhaused on UPS ${2}. Doing shutdown." | wall
     ;;
     timeout)
-        echo "Battery time limit exceded on UPS ${2}. Doing shutdown." | wall
+	echo "Battery time limit exceded on UPS ${2}. Doing shutdown." | wall
     ;;
     loadlimit)
-        echo "Remaining battery charge below limit on UPS ${2}. Doing shutdown." | wall
+	echo "Remaining battery charge below limit on UPS ${2}. Doing shutdown." | wall
     ;;
     runlimit)
-        echo "Remaining battery runtime below limit on UPS ${2}. Doing shutdown." | wall
+	echo "Remaining battery runtime below limit on UPS ${2}. Doing shutdown." | wall
     ;;
     doreboot)
-        echo "UPS ${2} initiating Reboot Sequence" | wall
-        ${SHUTDOWN} -r now "apcupsd UPS ${2} initiated reboot"
+	echo "UPS ${2} initiating Reboot Sequence" | wall
+	${SHUTDOWN} -r now "apcupsd UPS ${2} initiated reboot"
     ;;
     doshutdown)
-        echo "UPS ${2} initiated Shutdown Sequence" | wall
-        ${SHUTDOWN} -h now "apcupsd UPS ${2} initiated shutdown"
+	echo "UPS ${2} initiated Shutdown Sequence" | wall
+	${SHUTDOWN} -h now "apcupsd UPS ${2} initiated shutdown"
     ;;
     mainsback)
-        echo "Power has returned on UPS ${2}..." | wall
-        if [ -f @PWRFAILDIR@/powerfail ] ; then
-             echo "Attempting to cancel shutdown." | wall
-             ${SHUTDOWN} -c
-             ${SHUTDOWN} -r now "apcupsd initiated reboot"
-        fi
+	echo "Power has returned on UPS ${2}..." | wall
+	if [ -f @PWRFAILDIR@/powerfail ] ; then
+	     echo "Attempting to cancel shutdown." | wall
+	     ${SHUTDOWN} -c
+	     ${SHUTDOWN} -r now "apcupsd initiated reboot"
+	fi
     ;;
     annoyme)
-        echo "Power problems with UPS ${2}. Please logoff." | wall
+	echo "Power problems with UPS ${2}. Please logoff." | wall
     ;;
     emergency)
-        echo "Emergency Shutdown. Possible battery failure on UPS ${2}." | wall
-        ${SHUTDOWN} -h now "apcupsd emergency shutdown"
+	echo "Emergency Shutdown. Possible battery failure on UPS ${2}." | wall
+	${SHUTDOWN} -h now "apcupsd emergency shutdown"
     ;;
     changeme)
-        echo "Emergency! Batteries have failed on UPS ${2}. Change them NOW" | wall
+	echo "Emergency! Batteries have failed on UPS ${2}. Change them NOW" | wall
     ;;
     remotedown)
-        echo "Remote Shutdown. Beginning Shutdown Sequence." | wall
-        ${SHUTDOWN} -h now "apcupsd remote shutdown"
+	echo "Remote Shutdown. Beginning Shutdown Sequence." | wall
+	${SHUTDOWN} -h now "apcupsd remote shutdown"
     ;;
     restartme)
-        echo -n "Restarting APCUPSD Power Management: "
-        THEPID=`cat ${APCPID}`
-        kill ${THEPID}
-        rm -f ${APCPID}
-        rm -f @PWRFAILDIR@/powerfail
-        rm -f @nologdir@/nologin
-        sleep 5
-        `${APCUPSD}`
-        echo "apcupsd"
+	echo -n "Restarting APCUPSD Power Management: "
+	THEPID=`cat ${APCPID}`
+	kill ${THEPID}
+	rm -f ${APCPID}
+	rm -f @PWRFAILDIR@/powerfail
+	rm -f @nologdir@/nologin
+	sleep 5
+	`${APCUPSD}`
+	echo "apcupsd"
     ;;
     startselftest)
     ;;
     endselftest)
     ;;
     mastertimeout)
-        echo "Warning connection to master lost." | wall
+	echo "Warning connection to master lost." | wall
     ;;
     masterconnect)
-        echo "Connection to master established." | wall
+	echo "Connection to master established." | wall
     ;;
-    *)  echo "Usage: ${0##*/} command"
-        echo "       warning: this script is intended to be launched by"
-        echo "       apcupsd and should never be launched by users."
-        exit 1
+    *)	echo "Usage: ${0##*/} command"
+	echo "	     warning: this script is intended to be launched by"
+	echo "	     apcupsd and should never be launched by users."
+	exit 1
     ;;
 esac

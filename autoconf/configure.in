@@ -832,15 +832,15 @@ AC_ARG_ENABLE(nis, [
   --disable-nis 	   No NIS server],
    [ if test "$enableval" = "yes" ; then
 	AC_DEFINE(HAVE_NISSERVER)
-    AC_DEFINE(HAVE_NISLIB)
+	AC_DEFINE(HAVE_NISLIB)
 	if test "$CFG_CYGWIN" = "no"; then APCNISD=apcnisd; fi
-    NISSRV_ENABLED=yes
+	   NISSRV_ENABLED=yes
 	fi],
    [
 	AC_DEFINE(HAVE_NISSERVER)
-    AC_DEFINE(HAVE_NISLIB)
+	AC_DEFINE(HAVE_NISLIB)
 	if test "$CFG_CYGWIN" = "no"; then APCNISD=apcnisd; fi
-    NISSRV_ENABLED=yes
+	NISSRV_ENABLED=yes
    ])
 AC_SUBST(APCNISD)
 
@@ -862,7 +862,7 @@ AC_ARG_ENABLE(master-slave, [
   --disable-master-slave   No old network master/server (default)
 							],
    [ if test "$enableval" = "yes" ; then
-	   AC_DEFINE(HAVE_OLDNET)
+       AC_DEFINE(HAVE_OLDNET)
        OLDNET_ENABLED=yes
    fi],
    [])
@@ -895,7 +895,7 @@ POWERFLUTE_ENABLE="no"
 AC_ARG_ENABLE(powerflute,
 	[  --enable-powerflute	   Compile powerflute program],
 	[ if test "$enableval" = "yes" ; then
-	POWERFLUTE_ENABLE="yes"
+	    POWERFLUTE_ENABLE="yes"
 	    AC_CHECK_LIB(ncurses, initscr,
 	[PL="-lncurses"],
 	[echo '  disabling powerflute.'; POWERFLUTE_ENABLE="no"])
