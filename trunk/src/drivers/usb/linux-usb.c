@@ -31,7 +31,7 @@ extern UPSCOMMANDS cmd[];
 #define Vendor_APC 0x51D
 #define Vendor_MGE 0x463
 
-static int linkcheck = FALSE;
+static bool linkcheck = false;
 #define LINK_RETRY_INTERVAL 5	      /* retry every 5 seconds */
 
 #define MAX_VOLATILE_POLL_RATE 5      /* max rate to update volatile data */
@@ -155,6 +155,65 @@ struct s_known_info {
 };
 #define KNOWN_INFO_SZ (sizeof(known_info)/sizeof(known_info[0]))
 
+/*
+   From Matthew Mastracci
+   Looks like the ff86007d register is some sort of smart shutdown.  When
+   you write a value (say 5) to the register, it will wait that many
+   seconds and then, depending on the power, perform an action:
+   1.  If power is off. 
+   - UPS will wait with Online/Overload alternating for a few seconds and
+   then power off completely.
+   2.  If power is on. - UPS will wait with Online/Overload alternating for a few seconds and
+   then power back on.
+   UPS HID device name: "American Power Conversion Back-UPS RS 1000 FW:7.g5
+
+===
+
+    From the NUT project   
+     
+    0x860060 == "441HMLL" - looks like a 'capability' string     
+	     == locale 4, 4 choices, 1 byte each		 
+	     == line sensitivity (high, medium, low, low)	 
+    NOTE! the above does not seem to correspond to my info 
+
+    0x860013 == 44200155090 - capability again			 
+	     == locale 4, 4 choices, 2 bytes, 00, 15, 50, 90	 
+	     == minimum charge to return online 		 
+
+    0x860062 == D43133136127130 				 
+	     == locale D, 4 choices, 3 bytes, 133, 136, 127, 130 
+	     == high transfer voltage				 
+
+    0x860064 == D43103100097106 				 
+	     == locale D, 4 choices, 3 bytes, 103, 100, 097, 106 
+	     == low transfer voltage				 
+
+    0x860066 == 441HMLL (see 860060)				       
+
+    0x860074 == 4410TLN 					 
+	     == locale 4, 4 choices, 1 byte, 0, T, L, N 	 
+	     == alarm setting (5s, 30s, low battery, none)	 
+
+    0x860077 == 443060180300600 				 
+	     == locale 4, 4 choices, 3 bytes, 060,180,300,600	 
+	     == wake-up delay (after power returns)		 
+  
+===
+
+   
+   From MGE -- MGE specific items
+
+   TestPeriod			   0xffff0045
+   RemainingCapacityLimitSetting   0xffff004d
+   LowVoltageBoostTransfer	   0xffff0050
+   HighVoltageBoostTransfer	   0xffff0051
+   LowVoltageBuckTransfer	   0xffff0052
+   HighVoltageBuckTransfer	   0xffff0053
+   iModel			   0xffff00f0
+ */ 
+ 
+							 
+
 
 /*
  * When we are traversing the USB reports given by the UPS
@@ -202,7 +261,7 @@ static void reinitialize_private_structure(UPSINFO *ups)
      *	 array, and release previously allocated memory.
      */
     for (k=0; k <= CI_MAXCI; k++) {
-	ups->UPS_Cap[k] = FALSE;
+	ups->UPS_Cap[k] = false;
 	if (my_data->info[k] != NULL) {
 	    free(my_data->info[k]);
 	    my_data->info[k] = NULL;
@@ -340,15 +399,15 @@ auto_opened:
  */
 static int usb_link_check(UPSINFO *ups)
 {
-    int comm_err = TRUE;
+    bool comm_err = true;
     int tlog;
-    int once = TRUE;
+    bool once = true;
     USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
 
     if (linkcheck) {
 	return 0;
     }
-    linkcheck = TRUE;		  /* prevent recursion */
+    linkcheck = true;		  /* prevent recursion */
 
     set_ups(UPS_COMMLOST);
     Dmsg0(200, "link_check comm lost\n");
@@ -361,7 +420,7 @@ static int usb_link_check(UPSINFO *ups)
 		      event_msg[CMDCOMMFAILURE].msg);
 	    if (once) {    /* execute script once */
 		execute_command(ups, ups_event[CMDCOMMFAILURE]);
-		once = FALSE;
+		once = false;
 	    }
 	}
 	/* Retry every LINK_RETRY_INTERVAL seconds */
@@ -373,7 +432,7 @@ static int usb_link_check(UPSINFO *ups)
 	}
 	if (open_usb_device(ups) && usb_ups_get_capabilities(ups) &&
 	    usb_ups_read_static_data(ups)) {
-	   comm_err = FALSE;
+	   comm_err = false;
 	} else {
 	   continue;
 	}
@@ -384,7 +443,7 @@ static int usb_link_check(UPSINFO *ups)
 	clear_ups(UPS_COMMLOST);
         Dmsg0(200, "link check comm OK.\n");
     }
-    linkcheck = FALSE;
+    linkcheck = false;
     return 1;
 }
 
@@ -687,7 +746,9 @@ int usb_ups_open(UPSINFO *ups)
     }
     if (!open_usb_device(ups)) {
 	write_unlock(ups);
-        Error_abort1(_("Cannot open UPS device: %s\n"), ups->device);
+        Error_abort1(_("Cannot open UPS device: \"%s\" --\n"
+           "For a link to detailed USB troubleshooting information,\n"
+           "please see <http://www.apcupsd.com/support.html>.\n"), ups->device);
     }
     clear_ups(UPS_SLAVE);
     write_unlock(ups);
@@ -774,7 +835,7 @@ int usb_ups_get_capabilities(UPSINFO *ups)
 			     uref.usage_code == known_info[k].usage_code &&
 			     (known_info[k].physical == P_ANY ||
 			      known_info[k].physical == finfo.physical)) {
-			    ups->UPS_Cap[ci] = TRUE;
+			    ups->UPS_Cap[ci] = true;
 			    /* ***FIXME*** remove UPS_Cmd */
 			    ups->UPS_Cmd[ci] = uref.usage_code;
 			    info = (USB_INFO *)malloc(sizeof(USB_INFO));
@@ -799,7 +860,7 @@ int usb_ups_get_capabilities(UPSINFO *ups)
 	    rinfo.report_id |= HID_REPORT_ID_NEXT;
 	}
     }
-    ups->UPS_Cap[CI_STATUS] = TRUE;   /* we have status flag */
+    ups->UPS_Cap[CI_STATUS] = true;   /* we have status flag */
     write_unlock(ups);
     return 1;
 }
@@ -851,7 +912,7 @@ int usb_ups_read_static_data(UPSINFO *ups)
 	    *(p-1) = 0;
 	    strncpy(ups->firmrev, p+4, sizeof(ups->firmrev)-1);
 	    ups->firmrev[sizeof(ups->firmrev)-1] = 0;
-	    ups->UPS_Cap[CI_REVNO] = TRUE;
+	    ups->UPS_Cap[CI_REVNO] = true;
 	}
 	strncpy(ups->upsmodel, ups->buf, sizeof(ups->upsmodel)-1);
 	ups->upsmodel[sizeof(ups->upsmodel)-1] = 0;
@@ -926,7 +987,7 @@ int usb_ups_read_static_data(UPSINFO *ups)
 	for (p=ups->serial; *p; p++) {
             if (*p < ' ' || *p > 'z') {
 	       *ups->serial = 0;
-	       ups->UPS_Cap[CI_SERNO] = FALSE;
+	       ups->UPS_Cap[CI_SERNO] = false;
 	    }
 	}
     }
