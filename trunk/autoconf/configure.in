@@ -261,7 +261,7 @@ AC_CHECK_FUNCS(
 		[AC_MSG_ERROR([cannot find required function.])]
 		)
 
-AC_CHECK_FUNCS(snprintf vsnprintf)
+AC_CHECK_FUNCS(snprintf vsnprintf nanosleep usleep)
 
 AC_MSG_CHECKING([for syslog])
 
@@ -284,9 +284,9 @@ AC_FUNC_SETPGRP 		dnl check for BSD setpgrp.
 dnl shmctl doesn't exist on cygwin so don't check for it there
 if test "$CFG_CYGWIN" = "no" -a "$with_pthreads" = "no"; then
 AC_CHECK_FUNCS(
-		shmctl,,
-		[AC_MSG_ERROR([cannot find required function.])]
-		)
+   shmctl,,
+   [AC_MSG_ERROR([cannot find required function.])]
+   )
 fi
    
 dnl
@@ -662,7 +662,7 @@ dnl As last resort, use provided GD library v1.2
      then
        if test -d src/gd1.2
        then
-         AC_MSG_RESULT([using GIF file format (local copy of libgd).])
+	 AC_MSG_RESULT([using GIF file format (local copy of libgd).])
 	 CPPFLAGS=${_cppflags}
 	 LDFLAGS=${_ldflags}
 	 GDINCLUDE='-I$(topdir)/src/gd1.2'

@@ -166,6 +166,8 @@
 /* Set if you want dumb support */
 #undef HAVE_DUMB_DRIVER
 
+#undef HAVE_NANOSLEEP
+
 /* Set if you want NIS server support */
 #undef HAVE_NISSERVER
 
@@ -203,6 +205,12 @@
 
 /* Set if socklen_t defined */
 #undef HAVE_SOCKLEN_T
+#undef SOCKLEN_T
+
+
+#undef HAVE_USLEEP
+
+
 
 
 /* Leave that blank line there!!  Autoheader needs it.

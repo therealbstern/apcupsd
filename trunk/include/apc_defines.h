@@ -555,6 +555,9 @@ void d_msg(const char *file, int line, int level, const char *fmt,...);
            strerror(errstat)); \
    } while(0)
 
+#else
+#define P(x)
+#define V(x)
 #endif
 
 /*

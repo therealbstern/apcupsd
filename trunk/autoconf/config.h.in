@@ -467,3 +467,7 @@
 
 /* Define if you have the xnet library (-lxnet).  */
 #undef HAVE_LIBXNET
+
+#undef HAVE_NANOSLEEP
+
+#undef HAVE_USLEEP
