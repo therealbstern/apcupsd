@@ -159,6 +159,13 @@ int snmp_ups_open(UPSINFO *ups) {
             exit(1);
         }
         memset(Sid->MIB, 0, sizeof(powernet_mib_t));
+        if (snmp_ups_get_capabilities(ups) == 0) { /* Check Comm */
+            Error_abort0(_("PANIC! Cannot communicate with UPS via SNMP.\n\n"
+                "Please make sure the port specified on the DEVICE directive\n"
+                "is correct, that your able UPSCABLE is smart and the\n"
+                "remote SNMP UPS is running and reachable.\n"));
+            return 0;
+        }
         return 1;
     }
 
@@ -169,6 +176,13 @@ int snmp_ups_open(UPSINFO *ups) {
             exit(1);
         }
         memset(Sid->MIB, 0, sizeof(ups_mib_t));
+        if (snmp_ups_get_capabilities(ups) == 0) { /* Check Comm */
+            Error_abort0(_("PANIC! Cannot communicate with UPS via SNMP.\n\n"
+                "Please make sure the port specified on the DEVICE directive\n"
+                "is correct, that your able UPSCABLE is smart and the\n"
+                "remote SNMP UPS is running and reachable.\n"));
+            return 0;
+        }
         return 1;
     }
 
