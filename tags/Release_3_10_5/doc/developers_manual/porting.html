@@ -1,0 +1,37 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="Author" content="Riccardo Facchetti">
+   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.4.3 i586) [Netscape]">
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+
+<h2>
+Porting APCUPSD to other architectures</h2>
+
+<p><br>Porting apcupsd seem to be quite easy at least at first glance.
+The most important thing for porting APCUPSD is OS detection. It is done
+in configure.in with the macro AM_CONDITIONAL and AC_DEFINE.
+<p>The AM_CONDITIONAL is for Makefile generating HAVE_SUN_OS_TRUE=' ' or
+HAVE_SUN_OS_TRUE='#' for example if you have or not SUNOS. It expand these
+variables and they become comments or spaces. It is used for selecting
+the compiler switches but even for selecting parts of code based on which
+is the local architecture. The AC_DEFINE define HAVE_SUN_OS in the config.h
+file so that the C preprocessor can know which OS we are compiling for.
+<p>For adding a new OS in configure.in add these lines:
+<p>if test $HAVE_UNAME=yes -a x`uname -s` = xSunOS
+<br>then
+<br>&nbsp; AM_CONDITIONAL(HAVE_NEW_OS, /bin/true)
+<br>&nbsp; AC_DEFINE(HAVE_NEW_OS)
+<br>else
+<br>&nbsp; AM_CONDITIONAL(HAVE_NEW_OS, /bin/false)
+<br>fi
+<p>In acconfig.h add:
+<p>#undef HAVE_NEW_OS
+<p>then regenerate the configure script and config.h.in files with autoregen.sh.
+This design is useful for compilers too. I have added checks for GCC so
+that the Makefile know if we are using GCC or not.
+<br>&nbsp;
+</body>
+</html>
