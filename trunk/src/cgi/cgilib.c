@@ -165,6 +165,7 @@ void html_begin(const char *title, int refresh)
     }
     (void) puts ("");
 
+    (void) puts("<?xml version=\"1.0\" encoding=\"UTF-8\" ?>");
     (void) puts("<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Strict//EN\"");
     (void) puts("  \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd\">");
     (void) puts("<html xmlns=\"http://www.w3.org/1999/xhtml\" lang=\"en\" xml:lang=\"en\">");
