@@ -19,7 +19,8 @@
 --></style>
 </head>
 <body>
-<h1>Apcupsd Manual</h1>
+
+<h2 class="unnumbered">Apcupsd User's Manual</h2>
 
 <p><a name="Release-Notes"></a>
 
@@ -219,13 +220,13 @@ Start (see <a href="#Quick-Start-for-Beginners">Quick Start for Beginners</a>) i
 
 <p><a name="Planning-Your-Installation"></a>
 
-<h2 class="chapter">1 Planning Your Installation</h2>
+<h2 class="chapter">Planning Your Installation</h2>
 
 <p><a name="index-Planning-Installation-5"></a><a name="index-Installation_002c-Planning-6"></a>
 
 <p><a name="Quick-Start-for-Beginners"></a>
 
-<h3 class="section">1.1 Quick Start for Beginners</h3>
+<h3 class="section">Quick Start for Beginners</h3>
 
 <p><a name="index-Quick-Start-7"></a>
 apcupsd is a complex piece of
@@ -314,7 +315,7 @@ think might be helpful.
 
 <p><a name="Supported-Operating-Systems_003b-UPSes-and-Cables"></a>
 
-<h3 class="section">1.2 Supported Operating Systems, UPSes and Cables</h3>
+<h3 class="section">Supported Operating Systems, UPSes and Cables</h3>
 
 <p><a name="index-Supported-OSes-8"></a><a name="index-OSes-Supported-9"></a>
 Please note that due to the lack of Unix USB API standards,
@@ -411,8 +412,6 @@ not be available with your unit.
 
 <p class="noindent"><a name="type_005ftable"></a>
 <a name="index-UPSTYPE_002c-table-12"></a>
-<!-- tablename="Supported UPS Models" -->
-<!-- tcolumnwidths=1in,1in,1in,2in -->
   <p><table summary=""><tr align="left"><td valign="top" width="25%"><strong>APC Model</strong></td><td valign="top" width="25%"><em>UPSTYPE Keyword</em></td><td valign="top" width="25%"><em>UPSCABLE keywords for Cables Supported</em></td><td valign="top" width="25%"><em>Status</em>
 <br></td></tr><tr align="left"><td valign="top" width="25%">BackUPS CS/ES (serial mode)</td><td valign="top" width="25%">apcsmart</td><td valign="top" width="25%">smart (note: using Smart Custom RJ45) the
 new Back-UPS RS 500 models are reported NOT to work with this cable.</td><td valign="top" width="25%">Supported
@@ -477,7 +476,6 @@ and diagnostics
   <pre class="sp">
 
 </pre>
-<!-- imagename="Configuration Types" -->
 <pre class="example">     <img src="main_configs.png" alt="main_configs.png">
 </pre>
   <pre class="sp">
@@ -490,7 +488,7 @@ section for details.
 
 <p><a name="Apcupsd-Known-USB-Issues"></a>
 
-<h3 class="section">1.3 Apcupsd Known USB Issues</h3>
+<h3 class="section">Apcupsd Known USB Issues</h3>
 
 <p><a name="index-USB-problems-15"></a><a name="index-Problems_002c-USB-16"></a>
 - <strong>Problem:</strong> USB is only supported on Linux and *BSD systems (though
@@ -544,7 +542,7 @@ add the following:
 
 <p><a name="Checking-Out-Your-USB-Subsystem"></a>
 
-<h3 class="section">1.4 Checking Out Your USB Subsystem</h3>
+<h3 class="section">Checking Out Your USB Subsystem</h3>
 
 <p>You can skip this section if your UPS has an Ethernet or RS232-C
 interface or you are not running on a Linux kernel.  If it has a USB
@@ -553,8 +551,8 @@ UPS. On a Linux system this is easy, just do this from a shell
 prompt (please see below for 2.6 kernel considerations):
 
   <p>Most of this section applies to Linux. However, toward the end, there
-is a list of known issues with the BSD USB driver and the associated
-kernels.
+is critical information about the BSD USB driver, including a list of
+known issues and kernel configuration requirements.
 
 <pre class="example">     
      cat /proc/bus/usb/devices
@@ -976,17 +974,17 @@ your usual preference.
 
 <p><a name="Building-and-Installing-apcupsd"></a>
 
-<h2 class="chapter">2 Building and Installing apcupsd</h2>
+<h2 class="chapter">Building and Installing apcupsd</h2>
 
 <p><a name="index-Building-18"></a><a name="index-Installing-19"></a>
 
 <p><a name="Installation-from-Binary-Packages"></a>
 
-<h3 class="section">2.1 Installation from Binary Packages</h3>
+<h3 class="section">Installation from Binary Packages</h3>
 
 <p><a name="Red-Hat-Linux"></a>
 
-<h4 class="subsection">2.1.1 Red Hat Linux</h4>
+<h4 class="subsection">Red Hat Linux</h4>
 
 <p><a name="index-Installing_002c-Red-Hat-20"></a>
 For Red Hat systems, apcupsd is
@@ -1016,7 +1014,7 @@ directory, which on many systems is located in
 
 <p><a name="Microsoft-Windows"></a>
 
-<h4 class="subsection">2.1.2 Microsoft Windows</h4>
+<h4 class="subsection">Microsoft Windows</h4>
 
 <p><a name="index-Installing_002c-Microsoft-21"></a>
 If you have a binary release of the Win32
@@ -1025,7 +1023,7 @@ manual.
 
 <p><a name="Installation-from-Source"></a>
 
-<h3 class="section">2.2 Installation from Source</h3>
+<h3 class="section">Installation from Source</h3>
 
 <p>Installation from source might have to be be done different ways
 depending on what system you are running. The basic procedure involves
@@ -1124,7 +1122,7 @@ subdirectories of <span class="file">/etc/rc.d</span>).
 
 <p><a name="Verifying-a-Source-Installation"></a>
 
-<h3 class="section">2.3 Verifying a Source Installation</h3>
+<h3 class="section">Verifying a Source Installation</h3>
 
 <p><a name="index-Verifying-Source-22"></a><a name="index-Installing_002c-Source-23"></a>
 There are a number of things that you can do to check if the
@@ -1224,7 +1222,7 @@ master.
 
 <p><a name="Configure-Options"></a>
 
-<h3 class="section">2.4 Configure Options</h3>
+<h3 class="section">Configure Options</h3>
 
 <p><a name="index-configure-options-24"></a><a name="index-options_002c-configure-25"></a>
 All the available <code>configure</code> options can be
@@ -1418,7 +1416,7 @@ your system halt files.
 
 <p><a name="Recommended-Options-for-most-Systems"></a>
 
-<h3 class="section">2.5 Recommended Options for most Systems</h3>
+<h3 class="section">Recommended Options for most Systems</h3>
 
 <p>For most systems, we recommend the following options:
 
@@ -1436,7 +1434,7 @@ follows:
 </pre>
   <p><a name="Compilers-and-Options"></a>
 
-<h3 class="section">2.6 Compilers and Options</h3>
+<h3 class="section">Compilers and Options</h3>
 
 <p><a name="index-compiler-options-30"></a>
 Some systems require unusual options for compilation or linking
@@ -1470,7 +1468,7 @@ you can do it like this:
 
 <p><a name="Operating-System-Specifics"></a>
 
-<h3 class="section">2.7 Operating System Specifics</h3>
+<h3 class="section">Operating System Specifics</h3>
 
 <p><a name="index-OSes-31"></a>
 With the exception of Linux SUSE and Linux Red Hat systems used
@@ -1514,7 +1512,7 @@ have received installation files:
 
 <p><a name="Alpha"></a>
 
-<h4 class="subsection">2.7.1 Alpha</h4>
+<h4 class="subsection">Alpha</h4>
 
 <p><a name="index-Alpha-32"></a><a name="index-OS_002c-Alpha-33"></a>
 The Alpha V4.0 version of apcupsd
@@ -1546,7 +1544,7 @@ updated.
 </pre>
   <p><a name="Debian"></a>
 
-<h4 class="subsection">2.7.2 Debian</h4>
+<h4 class="subsection">Debian</h4>
 
 <p><a name="index-Debian-34"></a><a name="index-OS_002c-Debian-35"></a>
 This port is complete and is operation by several users. Since
@@ -1569,7 +1567,7 @@ site at:
 
 <p><a name="FreeBSD"></a>
 
-<h4 class="subsection">2.7.3 FreeBSD</h4>
+<h4 class="subsection">FreeBSD</h4>
 
 <p><a name="index-FreeBSD-36"></a><a name="index-OS_002c-FreeBSD-37"></a>
 This port is complete and is being used by several users. As of
@@ -1596,7 +1594,7 @@ the use of pthreads.
 
 <p><a name="HPUX"></a>
 
-<h4 class="subsection">2.7.4 HPUX</h4>
+<h4 class="subsection">HPUX</h4>
 
 <p><a name="index-HPUX-38"></a><a name="index-OS_002c-HPUX-39"></a>
 We have no reports from testing this yet on version 3.8.4, but
@@ -1604,7 +1602,7 @@ worked fine on 3.8.1
 
 <p><a name="NetBSD"></a>
 
-<h4 class="subsection">2.7.5 NetBSD</h4>
+<h4 class="subsection">NetBSD</h4>
 
 <p><a name="index-NetBSD-40"></a><a name="index-OS_002c-NetBSD-41"></a>
 Submitted during development of 3.8.2, this should be a complete
@@ -1616,7 +1614,7 @@ the use of pthreads.
 
 <p><a name="OpenBSD"></a>
 
-<h4 class="subsection">2.7.6 OpenBSD</h4>
+<h4 class="subsection">OpenBSD</h4>
 
 <p><a name="index-OpenBSD-42"></a><a name="index-OS_002c-OpenBSD-43"></a>
 Ensure that you read the
@@ -1653,7 +1651,7 @@ of the program (apcupsd).
 
 <p><a name="Red-Hat-Systems"></a>
 
-<h4 class="subsection">2.7.7 Red Hat Systems</h4>
+<h4 class="subsection">Red Hat Systems</h4>
 
 <p><a name="index-Red-Hat-44"></a><a name="index-OS_002c-Red-Hat-45"></a>
 Red Hat systems are fully supported, and by following the
@@ -1662,7 +1660,7 @@ few or no problems.
 
 <p><a name="Slackware"></a>
 
-<h4 class="subsection">2.7.8 Slackware</h4>
+<h4 class="subsection">Slackware</h4>
 
 <p><a name="index-Slackware-46"></a><a name="index-OS_002c-Slackware-47"></a>
 Slackware systems are fully supported, and by following the
@@ -1671,7 +1669,7 @@ few or no problems.
 
 <p><a name="SUSE"></a>
 
-<h4 class="subsection">2.7.9 SUSE</h4>
+<h4 class="subsection">SUSE</h4>
 
 <p><a name="index-SuSE-48"></a><a name="index-OS_002c-SuSE-49"></a>
 SUSE systems are fully supported, and by following the
@@ -1680,7 +1678,7 @@ few or no problems.
 
 <p><a name="Sun-Solaris"></a>
 
-<h4 class="subsection">2.7.10 Sun Solaris</h4>
+<h4 class="subsection">Sun Solaris</h4>
 
 <p><a name="index-Sun-50"></a><a name="index-Solaris-51"></a><a name="index-OS_002c-Solaris-52"></a>
 Please read this before attempting to compile or install the
@@ -1903,7 +1901,7 @@ Development Team.
 
 <p><a name="Unknown-System"></a>
 
-<h4 class="subsection">2.7.11 Unknown System</h4>
+<h4 class="subsection">Unknown System</h4>
 
 <p><a name="index-Unknown-System-53"></a><a name="index-OS_002c-Unknown-System-54"></a>
 During the <code>./configure</code>, if
@@ -1920,7 +1918,7 @@ well.
 
 <p><a name="Windows-Systems-with-CYGWIN-Installed"></a>
 
-<h4 class="subsection">2.7.12 Windows Systems with CYGWIN Installed</h4>
+<h4 class="subsection">Windows Systems with CYGWIN Installed</h4>
 
 <p><a name="index-Windows-55"></a><a name="index-OS_002c-Windows-56"></a>
 If you wish to build from the source, and if you have CYGWIN
@@ -1965,13 +1963,13 @@ part that describes unZipping the binary release.
 
 <p><a name="After-Installation"></a>
 
-<h2 class="chapter">3 After Installation</h2>
+<h2 class="chapter">After Installation</h2>
 
 <p><a name="index-After-Installation-57"></a><a name="index-Installation_002c-After-installing-58"></a>
 
 <p><a name="Checking-Your-Configuration-File"></a>
 
-<h3 class="section">3.1 Checking Your Configuration File</h3>
+<h3 class="section">Checking Your Configuration File</h3>
 
 <p><a name="index-Checking-Conf-file-59"></a>
 Once you have installed apcupsd, either
@@ -2026,7 +2024,7 @@ run, and then it is only a matter of customization of your setup.
 
 <p><a name="Arranging-for-Reboot-on-Power_002dUp"></a>
 
-<h3 class="section">3.2 Arranging for Reboot on Power-Up</h3>
+<h3 class="section">Arranging for Reboot on Power-Up</h3>
 
 <p><a name="index-Reboot-on-power-up-60"></a><a name="index-Power-up_002c-reboot-61"></a>
 The final consideration for a automatic reboot after a full
@@ -2075,7 +2073,7 @@ try.
 
 <p><a name="Making-sure-apcupsd-Is-Running"></a>
 
-<h3 class="section">3.3 Making sure apcupsd Is Running</h3>
+<h3 class="section">Making sure apcupsd Is Running</h3>
 
 <p><a name="index-Checking-running-62"></a>
 The simplest way to invoke  apcupsd
@@ -2146,13 +2144,13 @@ properly.
 
 <p><a name="Configuration-Examples"></a>
 
-<h2 class="chapter">4 Configuration Examples</h2>
+<h2 class="chapter">Configuration Examples</h2>
 
 <p><a name="index-Configuration_002c-Examples-63"></a><a name="index-Examples_002c-Configuration-64"></a>
 
 <p><a name="A-Simple-USB-Configuration"></a>
 
-<h3 class="section">4.1 A Simple USB Configuration</h3>
+<h3 class="section">A Simple USB Configuration</h3>
 
 <p><a name="index-Configuration_002c-USB-65"></a><a name="index-USB_002c-configuration-66"></a><a name="index-Example_002c-USB-conf-67"></a>
 If you have a USB UPS, and you have apcupsd version 3.10.7 or higher,
@@ -2202,7 +2200,7 @@ the <strong>examples</strong> directory of the source.
 
 <p><a name="A-Simple-Configuration-for-a-SmartUPS"></a>
 
-<h3 class="section">4.2 A Simple Configuration for a SmartUPS</h3>
+<h3 class="section">A Simple Configuration for a SmartUPS</h3>
 
 <p><a name="index-Configuration_002c-SmartUPS-68"></a><a name="index-SmartUPS-configuration-69"></a><a name="index-Example_002c-SmartUPS-conf-70"></a>
 If you have a Smart UPS using the cable supplied by APC, or you
@@ -2224,7 +2222,7 @@ the minimum required.
 
 <p><a name="A-Simple-Configuration-for-a-Simple-Signaling-or-Dumb"></a>
 
-<h3 class="section">4.3 A Simple Configuration for a Simple Signaling or Dumb</h3>
+<h3 class="section">A Simple Configuration for a Simple Signaling or Dumb</h3>
 
 <p><a name="index-Configuration_002c-dumb-71"></a><a name="index-dumb_002c-configuration-72"></a><a name="index-Example_002c-dumb-conf-73"></a>
 If you have a simple signaling or dumb UPS such as a BackUPS, you
@@ -2262,7 +2260,7 @@ the minimum required.
 
 <p><a name="A-Simple-Master-Configuration"></a>
 
-<h3 class="section">4.4 A Simple Master Configuration</h3>
+<h3 class="section">A Simple Master Configuration</h3>
 
 <p><a name="index-Configuration_002c-Master-74"></a><a name="index-Master_002c-config-example-75"></a><a name="index-Example_002c-Master-conf-76"></a>
 You have a Smart UPS using the cable supplied by APC and you want
@@ -2300,7 +2298,7 @@ below for details.
 
 <p><a name="A-Simple-Slave-Configuration"></a>
 
-<h3 class="section">4.5 A Simple Slave Configuration</h3>
+<h3 class="section">A Simple Slave Configuration</h3>
 
 <p><a name="index-Slave-Configuration-77"></a><a name="index-Configuration_002c-Slave-78"></a><a name="index-Example_002c-Slave-conf-79"></a>
 You have a Smart UPS using the cable supplied by APC that is
@@ -2340,7 +2338,7 @@ up longer during a power outage.
 
 <p><a name="Variation-on-the-Master_002fSlave-Configuration"></a>
 
-<h3 class="section">4.6 Variation on the Master/Slave Configuration</h3>
+<h3 class="section">Variation on the Master/Slave Configuration</h3>
 
 <p><a name="index-Master_002fSlave-variation-80"></a>
 It is also possible to have a Master/Slave configuration where
@@ -2353,7 +2351,7 @@ not know or care where the power really comes from.
 
 <p><a name="A-Sample-NIS-Slave-Configuration-Using-the-Net-Driver"></a>
 
-<h3 class="section">4.7 A Sample NIS Slave Configuration Using the Net Driver</h3>
+<h3 class="section">A Sample NIS Slave Configuration Using the Net Driver</h3>
 
 <p><a name="index-Example_002c-NIS-slave-81"></a><a name="index-NIS-slave-conf-82"></a><a name="index-Configuration_002c-NIS-slave-conf-83"></a>
 As opposed to the old master/slave mode demonstrated above, you can
@@ -2458,7 +2456,7 @@ a faster shutdown than the values defined on the NIS server.
 
 <p><a name="Testing-Apcupsd"></a>
 
-<h2 class="chapter">5 Testing Apcupsd</h2>
+<h2 class="chapter">Testing Apcupsd</h2>
 
 <p><a name="index-Testing-84"></a>
 The following testing procedures apply for the most part to
@@ -2469,7 +2467,7 @@ different, and you should see the section on Testing Serial UPSes
 
 <p><a name="Process_002dStatus-Test"></a>
 
-<h3 class="section">5.1 Process-Status Test</h3>
+<h3 class="section">Process-Status Test</h3>
 
 <p><a name="index-Process-Status-Testing-85"></a><a name="index-Testing_002c-Process-Status-86"></a>
 After you start apcupsd, execute the
@@ -2530,7 +2528,7 @@ indicating the nature of the problem.
 
 <p><a name="Logging-Test"></a>
 
-<h3 class="section">5.2 Logging Test</h3>
+<h3 class="section">Logging Test</h3>
 
 <p><a name="index-Testing_002c-Logging-87"></a><a name="index-Logging_002c-Testing-88"></a>
 Once you have established that the proper processes are running,
@@ -2560,7 +2558,7 @@ will probably be in <span class="file">/var/log/apcupsd.events</span>.
 
 <p><a name="apcaccess-Test"></a>
 
-<h3 class="section">5.3 apcaccess Test</h3>
+<h3 class="section">apcaccess Test</h3>
 
 <p><a name="index-Testing_002c-apcaccess-89"></a><a name="index-apcaccess-Test-90"></a>
 This test consists of running <code>apcaccess</code> to see if apcupsd
@@ -2706,7 +2704,7 @@ work. This is done by setting:
 
 <p><a name="Communications-Test"></a>
 
-<h3 class="section">5.4 Communications Test</h3>
+<h3 class="section">Communications Test</h3>
 
 <p><a name="index-Testing_002c-Communications-91"></a><a name="index-Communications-Testing-92"></a>
 At this point, you should ensure that
@@ -2770,7 +2768,7 @@ problem before proceeding with additional tests.
 
 <p><a name="Simulated-Power-Fail-Test"></a>
 
-<h3 class="section">5.5 Simulated Power Fail Test</h3>
+<h3 class="section">Simulated Power Fail Test</h3>
 
 <p><a name="index-Testing_002c-Simulate-Power-Fail-93"></a><a name="index-Simulate-Power-Fail-Test-94"></a>
 At this point, you should verify that in the event of a power
@@ -2880,7 +2878,7 @@ please replace the changed apccontrol and
 
 <p><a name="System-Shutdown-Test"></a>
 
-<h3 class="section">5.6 System Shutdown Test</h3>
+<h3 class="section">System Shutdown Test</h3>
 
 <p><a name="index-System-Shutdown-test-95"></a><a name="index-Testing_002c-System-Shutdown-96"></a>
 This is an intermediate test that you can do, for all UPS models
@@ -2909,7 +2907,7 @@ state.
 
 <p><a name="Full-Power-Down-Test"></a>
 
-<h3 class="section">5.7 Full Power Down Test</h3>
+<h3 class="section">Full Power Down Test</h3>
 
 <p><a name="index-Power-down-test-97"></a><a name="index-Testing_002c-Power-down-98"></a>
 To complete the testing, you should do a power fail shutdown of
@@ -2953,7 +2951,7 @@ delay".
 
 <p><a name="Shutdown-Sequence"></a>
 
-<h3 class="section">5.8 Shutdown Sequence</h3>
+<h3 class="section">Shutdown Sequence</h3>
 
 <p><a name="index-Shutdown-Sequence-99"></a>
 If you experienced so problems with the above testing
@@ -2965,7 +2963,7 @@ this manual.
 
 <p><a name="apctest"></a>
 
-<h3 class="section">5.9 apctest</h3>
+<h3 class="section">apctest</h3>
 
 <p><a name="index-apctest-100"></a>
 apctest is a program that allows you
@@ -3069,19 +3067,19 @@ Smart mode UPS commands can be found in the UPS Bible (see <a href="#APC-smart-p
 
 <p><a name="Troubleshooting-Your-Installation"></a>
 
-<h2 class="chapter">6 Troubleshooting Your Installation</h2>
+<h2 class="chapter">Troubleshooting Your Installation</h2>
 
 <p><a name="index-Troubleshooting-_0028see-problems_0029-101"></a><a name="index-Problems-102"></a>
 
 <p><a name="Known-Problems-with-USB-UPSes"></a>
 
-<h3 class="section">6.1 Known Problems with USB UPSes</h3>
+<h3 class="section">Known Problems with USB UPSes</h3>
 
 <p><a name="index-Problems_002c-USB-103"></a>
 
 <p><a name="Some-Cheaper-Models-Do-Not-Have-Battery-Charge"></a>
 
-<h4 class="subsection">6.1.1 Some Cheaper Models Do Not Have Battery Charge</h4>
+<h4 class="subsection">Some Cheaper Models Do Not Have Battery Charge</h4>
 
 <p><a name="index-Problems_002c-no-Battery-charge-104"></a>
 Unfortunately, some cheaper USB models do not seem to report
@@ -3095,7 +3093,7 @@ is annoying but does not cause the unit to malfunction.
 
 <p><a name="Reconnection-does-not-clean-up-the-lockfile"></a>
 
-<h4 class="subsection">6.1.2 Reconnection does not clean up the lockfile</h4>
+<h4 class="subsection">Reconnection does not clean up the lockfile</h4>
 
 <p><a name="index-Problems_002c-lock-file-not-cleaned-up-105"></a>
 If either you disconnect the UPS or it disconnects because of
@@ -3107,7 +3105,7 @@ not too serious.
 
 <p><a name="Power-Off-_005bkillpower_005d-of-UPS-Does-Not-Work"></a>
 
-<h4 class="subsection">6.1.3 Power Off (killpower) of UPS Does Not Work</h4>
+<h4 class="subsection">Power Off (killpower) of UPS Does Not Work</h4>
 
 <p><a name="index-Problems_002c-Power-off-106"></a><a name="index-Problems_002c-killpower-107"></a>
 Currently (as of 3.10.6) the code to power off the UPS works
@@ -3117,7 +3115,7 @@ kernel.
 
 <p><a name="apcupsd-Cannot-Reconnect-After-a-Reboot"></a>
 
-<h4 class="subsection">6.1.4 apcupsd Cannot Reconnect After a Reboot</h4>
+<h4 class="subsection">apcupsd Cannot Reconnect After a Reboot</h4>
 
 <p><a name="index-Problems_002c-reconnect-108"></a>
 If apcupsd does not connect to the
@@ -3156,7 +3154,7 @@ invoked.
 
 <p><a name="Monitoring-and-Tuning-your-UPS"></a>
 
-<h2 class="chapter">7 Monitoring and Tuning your UPS</h2>
+<h2 class="chapter">Monitoring and Tuning your UPS</h2>
 
 <p><a name="index-Monitoring-109"></a><a name="index-Tuning-110"></a>
 After you have verified that your UPS is working correctly, you
@@ -3169,7 +3167,7 @@ itself.
 
 <p><a name="apcaccess"></a>
 
-<h3 class="section">7.1 apcaccess</h3>
+<h3 class="section">apcaccess</h3>
 
 <p><a name="index-apcaccess-111"></a>
 apcaccess is a program (normally found
@@ -3203,7 +3201,7 @@ is normally the default, you set:
 
 <p><a name="apcaccess-status"></a>
 
-<h4 class="subsection">7.1.1 apcaccess status</h4>
+<h4 class="subsection">apcaccess status</h4>
 
 <p><a name="index-apcaccess-status-112"></a><a name="index-status_002c-apcaccess-113"></a>
 As mentioned above, the full form of the command is:
@@ -3314,7 +3312,7 @@ less information.
 
 <p><a name="apcaccess-eprom"></a>
 
-<h4 class="subsection">7.1.2 apcaccess eprom</h4>
+<h4 class="subsection">apcaccess eprom</h4>
 
 <p><a name="index-apcaccess-eeprom-114"></a><a name="index-eeprom_002c-apcaccess-115"></a>
 The <strong>eprom</strong> command line option
@@ -3345,7 +3343,7 @@ parameters (see <a href="#Configuring-Your-EEPROM">Configuring Your EEPROM</a>).
 </pre>
   <p><a name="Apcupsd-Notification-and-Events"></a>
 
-<h3 class="section">7.2 Apcupsd Notification and Events</h3>
+<h3 class="section">Apcupsd Notification and Events</h3>
 
 <p><a name="index-Notification-116"></a><a name="index-Events-117"></a>
 When a major event is generated within apcupsd,
@@ -3370,7 +3368,7 @@ Customizing Event Handling (see <a href="#Customizing-Event-Handling">Customizin
 
 <p><a name="hid_002dups-and-USB-Specific-Information"></a>
 
-<h3 class="section">7.3 hid-ups and USB Specific Information</h3>
+<h3 class="section">hid-ups and USB Specific Information</h3>
 
 <p><a name="index-hid_002dups-118"></a>
 The UPS has an internal set of timers and remaining capacity
@@ -3387,7 +3385,7 @@ UPS when less than 2 minutes of run time remain.
 
 <p><a name="apcupsd-Network-Monitoring-_005bCGI_005d-Programs"></a>
 
-<h3 class="section">7.4 apcupsd Network Monitoring (CGI) Programs</h3>
+<h3 class="section">apcupsd Network Monitoring (CGI) Programs</h3>
 
 <p><a name="index-Network-monitoring-119"></a><a name="index-Monitoring-120"></a><a name="index-CGI-programs-121"></a>
 With this release, there are five CGI programs
@@ -3421,13 +3419,13 @@ produce the bar charts.
 
 <p><a name="Setting-up-and-Testing-the-CGI-Programs"></a>
 
-<h3 class="section">7.5 Setting up and Testing the CGI Programs</h3>
+<h3 class="section">Setting up and Testing the CGI Programs</h3>
 
 <p><a name="index-Setup-CGI-programs-122"></a><a name="index-Testing-CGI-programs-123"></a>
 
 <p><a name="Network-Information-Server-_005bNIS_005d"></a>
 
-<h4 class="subsection">7.5.1 Network Information Server (NIS)</h4>
+<h4 class="subsection">Network Information Server (NIS)</h4>
 
 <p><a name="index-Network-Information-Server-124"></a><a name="index-NIS-125"></a>
 Before using multimon and the other
@@ -3537,14 +3535,13 @@ or <a href="http://www.apcupsd.com/cgi-bin/multimoncss.cgi">http://www.apcupsd.c
 
 <p><a name="multimon_005fcgi"></a>
 
-<h4 class="subsection">7.5.2 multimon.cgi</h4>
+<h4 class="subsection">multimon.cgi</h4>
 
 <p><a name="index-multimon-126"></a><a name="index-CGI_002c-multimon-127"></a>
 This program monitors multiple UPSes at the same time. A typical
 output of multimon.cgi as displayed in your
 Web browser might look like the following:
 
-<!-- imagename="Multimon Main Page" -->
   <div class="block-image"><img src="multimon.png" alt="multimon.png"></div>
 
   <p>The machines monitored as well as the values and their column
@@ -3554,7 +3551,7 @@ headings are all configurable (see
 
 <p><a name="upsstats_005fcgi"></a>
 
-<h4 class="subsection">7.5.3 upsstats.cgi</h4>
+<h4 class="subsection">upsstats.cgi</h4>
 
 <p><a name="index-upsstats-128"></a><a name="index-CGI_002c-upsstats-129"></a>
 By clicking on the <strong>system</strong> name
@@ -3563,7 +3560,6 @@ invoke upsstats.cgi for the specified
 system, which will produce a bar graph display of three of the
 monitored values. For example,
 
-<!-- imagename="Multimon Statistics Display" -->
   <div class="block-image"><img src="status.png" alt="status.png"></div>
 
   <p>You can display different bar graphs by selecting different
@@ -3577,7 +3573,7 @@ from a Unix shell from the source cgi directory as follows:
 
 <p><a name="_005f_002fupsstats_005fcgi"></a>
 
-<h4 class="subsection">7.5.4 ./upsstats.cgi</h4>
+<h4 class="subsection">./upsstats.cgi</h4>
 
 <p><a name="index-upssstats-130"></a><a name="index-CGI_002c-upssstats-131"></a>
 As with multimon, quite a few lines
@@ -3585,7 +3581,7 @@ of html should then be displayed.
 
 <p><a name="upsfstatus_005fcgi"></a>
 
-<h4 class="subsection">7.5.5 upsfstatus.cgi</h4>
+<h4 class="subsection">upsfstatus.cgi</h4>
 
 <p><a name="index-upsfstatus-132"></a><a name="index-CGI_002c-upsfstatus-133"></a>
 If you would like to see all of the STATUS variables available
@@ -3652,14 +3648,14 @@ multimon.cgi.
 
 <p><a name="Working-Example"></a>
 
-<h4 class="subsection">7.5.6 Working Example</h4>
+<h4 class="subsection">Working Example</h4>
 
 <p><a name="index-CGI_002c-working-example-134"></a><a name="index-Example_002c-CGI-135"></a>
 To see a working example of the above programs, visit <a href="http://www.apcupsd.com/cgi-bin/multimon.cgi">http://www.apcupsd.com/cgi-bin/multimon.cgi</a>.
 
 <p><a name="Client-Test-Program"></a>
 
-<h4 class="subsection">7.5.7 Client Test Program</h4>
+<h4 class="subsection">Client Test Program</h4>
 
 <p><a name="index-Client-Test-program-136"></a>
 When your Network Information Server is up and running, you can
@@ -3716,7 +3712,7 @@ events like line voltage boost, ...).
 
 <p><a name="A-Tip-from-Carl-Erhorn-for-Sun-Systems"></a>
 
-<h4 class="subsection">7.5.8 A Tip from Carl Erhorn for Sun Systems</h4>
+<h4 class="subsection">A Tip from Carl Erhorn for Sun Systems</h4>
 
 <p><a name="index-Tip-137"></a>
 It is possible to run the CGI code to monitor your UPS using the
@@ -3729,7 +3725,7 @@ and access the cgi using something like:
 
 <p><a name="Credits"></a>
 
-<h4 class="subsection">7.5.9 Credits</h4>
+<h4 class="subsection">Credits</h4>
 
 <p>Many thanks go to Russell Kroll &lt;rkroll at exploits.org&gt; who
 wrote the CGI programs to work with his UPS Monitoring system named
@@ -3742,7 +3738,7 @@ can be useful to the original author in his project.
 
 <p><a name="Security-Issues"></a>
 
-<h4 class="subsection">7.5.10 Security Issues</h4>
+<h4 class="subsection">Security Issues</h4>
 
      <ul>
 <li><strong>apcupsd</strong> runs as root.
@@ -3772,7 +3768,7 @@ configuration file.
 
 <p><a name="TCP-Wrappers"></a>
 
-<h5 class="subsubsection">7.5.10.1 TCP Wrappers</h5>
+<h5 class="subsubsection">TCP Wrappers</h5>
 
 <p><a name="index-Wrappers_002c-TCP-138"></a><a name="index-TCP-wrappers-139"></a>
 As of apcupsd version 3.8.2, TCP Wrappers are implemented if you
@@ -3786,7 +3782,7 @@ untested. If you use it, please send us some feedback.
 
 <p><a name="Configuring-Your-EEPROM"></a>
 
-<h3 class="section">7.6 Configuring Your EEPROM</h3>
+<h3 class="section">Configuring Your EEPROM</h3>
 
 <p><a name="index-eeprom_002c-configuring-140"></a><a name="index-Configuring_002c-eeprom-141"></a>
 If you have a SmartUPS, there are depending on the UPS at least 12
@@ -3806,7 +3802,7 @@ PowerChute and making the changes.
 
 <p><a name="apcupsd-No-Longer-Configures-EEPROM"></a>
 
-<h4 class="subsection">7.6.1 apcupsd No Longer Configures EEPROM</h4>
+<h4 class="subsection">apcupsd No Longer Configures EEPROM</h4>
 
 <p>Unlike version 3.8.6, apcupsd version 3.10.x no longer has code
 to program the EEPROM. Instead we have implemented interactive EEPROM
@@ -3853,7 +3849,7 @@ and the Permitted Values will depend on what UPS model you have.
 
 <p><a name="Using-apctest-to-Configure-Your-EEPROM"></a>
 
-<h4 class="subsection">7.6.2 Using apctest to Configure Your EEPROM</h4>
+<h4 class="subsection">Using apctest to Configure Your EEPROM</h4>
 
 <p><a name="index-eeprom_002c-apctest-142"></a><a name="index-apctest-setting-eeprom-143"></a>
 To make the EEPROM changes with
@@ -3973,7 +3969,7 @@ process especially if incorrect values were supplied.
 
 <p><a name="Maintaining-Your-UPS"></a>
 
-<h2 class="chapter">8 Maintaining Your UPS</h2>
+<h2 class="chapter">Maintaining Your UPS</h2>
 
 <p><a name="index-Maintenance-144"></a>
 If you have your UPS long enough, you will probably have battery
@@ -3998,7 +3994,7 @@ tends to shorten the battery life.
 
 <p><a name="What-Various-People-Have-to-Say-about-Batteries"></a>
 
-<h3 class="section">8.1 What Various People Have to Say about Batteries</h3>
+<h3 class="section">What Various People Have to Say about Batteries</h3>
 
 <p><a name="index-Batteries-145"></a>
 Here is what John Walker has to say about APC UPS batteries:
@@ -4289,7 +4285,7 @@ what happened to me.
 
 <p><a name="Where-Carl-Suggests-You-Get-Batteries"></a>
 
-<h3 class="section">8.2 Where Carl Suggests You Get Batteries</h3>
+<h3 class="section">Where Carl Suggests You Get Batteries</h3>
 
 <p><a name="index-Batteries-146"></a>
 <blockquote>
@@ -4356,7 +4352,7 @@ can get as technical as you need to go.
 
 <p><a name="Frequently_002dAsked-Questions"></a>
 
-<h2 class="chapter">9 Frequently-Asked Questions</h2>
+<h2 class="chapter">Frequently-Asked Questions</h2>
 
 <p><a name="index-FAQ-147"></a>
 See the bugs section of this document for a list of known
@@ -4676,7 +4672,7 @@ code image is most likely shared).
 
 <p><a name="Apcupsd-Bugs"></a>
 
-<h2 class="chapter">10 Apcupsd Bugs</h2>
+<h2 class="chapter">Apcupsd Bugs</h2>
 
 <p><a name="index-Bugs-148"></a>
 Unfortunately, it seems that every program has some bugs. We do
@@ -4697,7 +4693,7 @@ the bug tracking system at SourceForge.
 
 <p><a name="Customizing-Event-Handling"></a>
 
-<h2 class="chapter">11 Customizing Event Handling</h2>
+<h2 class="chapter">Customizing Event Handling</h2>
 
 <p><a name="index-Event-handling-150"></a><a name="index-Customizing-event-handling-151"></a>
 
@@ -4771,7 +4767,7 @@ always 0.
 
 <p><a name="apccontrol-Command-Line-Options"></a>
 
-<h3 class="section">11.1 apccontrol Command Line Options</h3>
+<h3 class="section">apccontrol Command Line Options</h3>
 
 <p>apccontrol accepts the following
 command line options:
@@ -4962,7 +4958,7 @@ directory of the source code.
 
 <p><a name="Master_002fSlave-Configurations"></a>
 
-<h2 class="chapter">12 Master/Slave Configurations</h2>
+<h2 class="chapter">Master/Slave Configurations</h2>
 
 <p><a name="index-Master_002fSlave-152"></a>
 If you have two or more computers that are powered by the same UPS
@@ -4984,7 +4980,7 @@ predetermined time after the UPS goes on batteries.
 
 <p><a name="Configuration-Directives"></a>
 
-<h3 class="section">12.1 Configuration Directives</h3>
+<h3 class="section">Configuration Directives</h3>
 
 <p><a name="index-Directives-153"></a><a name="index-Configuration_002c-Directives-154"></a>
 If you are setting up a master/slave configuration, you will be
@@ -5007,13 +5003,13 @@ found in the <span class="file">&lt;src&gt;/examples</span> directory
 
 <p><a name="Master_002fSlave-Problems"></a>
 
-<h3 class="section">12.2 Master/Slave Problems</h3>
+<h3 class="section">Master/Slave Problems</h3>
 
 <p><a name="index-Master_002fSlave-155"></a><a name="index-Problems_002c-Master_002fslave-156"></a>
 
 <p><a name="Master_002fSlave-Shutdown"></a>
 
-<h4 class="subsection">12.2.1 Master/Slave Shutdown</h4>
+<h4 class="subsection">Master/Slave Shutdown</h4>
 
 <p>For additional details of shutting down a master/slave
 configuration, please see the Master/Slave Shutdown
@@ -5022,7 +5018,7 @@ the Technical Reference.
 
 <p><a name="Server_002fSlave-Networking-using-NIS-and-the-NET-Driver"></a>
 
-<h4 class="subsection">12.2.2 Server/Slave Networking using NIS and the NET Driver</h4>
+<h4 class="subsection">Server/Slave Networking using NIS and the NET Driver</h4>
 
 <p><a name="index-NIS-networking-157"></a><a name="index-Net-driver-158"></a>
 It is also possible to implement a network of NIS server/slave
@@ -5080,7 +5076,7 @@ slave uses the NIS information provided by the computer <strong>tibs</strong> on
 </pre>
   <p><a name="Network-Problems-with-Master_002fSlave-or-Server_002fSlave-Configurations"></a>
 
-<h3 class="section">12.3 Network Problems with Master/Slave or Server/Slave Configurations</h3>
+<h3 class="section">Network Problems with Master/Slave or Server/Slave Configurations</h3>
 
 <p><a name="index-Problems_002c-Master_002fSlave-159"></a><a name="index-Problems_002c-networking-160"></a>
 When working with a master/slave or server/slave configurations (one UPS powering
@@ -5100,7 +5096,7 @@ host names.
 
 <p><a name="Error-Messages-from-a-Master-Configuration"></a>
 
-<h4 class="subsection">12.3.1 Error Messages from a Master Configuration</h4>
+<h4 class="subsection">Error Messages from a Master Configuration</h4>
 
 <p>In a master/slave configuration, you can get the following error
 messages from a master. The error message is followed by a possible
@@ -5108,7 +5104,7 @@ explanation:
 
 <p><a name="Cannot-resolve-slave-name-XXX"></a>
 
-<h5 class="subsubsection">12.3.1.1 Cannot resolve slave name XXX</h5>
+<h5 class="subsubsection">Cannot resolve slave name XXX</h5>
 
 <p>To contact the slave, the slave name given in the configuration
 file must be resolved to an IP address. In this case,
@@ -5119,13 +5115,13 @@ the boot process before the network is operational.
 
 <p><a name="Got-slave-shutdown-from-SSS"></a>
 
-<h5 class="subsubsection">12.3.1.2 Got slave shutdown from SSS</h5>
+<h5 class="subsubsection">Got slave shutdown from SSS</h5>
 
 <p>This message should not be printed as it is not yet used.
 
 <p><a name="Cannot-write-to-slave-SSS"></a>
 
-<h5 class="subsubsection">12.3.1.3 Cannot write to slave SSS</h5>
+<h5 class="subsubsection">Cannot write to slave SSS</h5>
 
 <p>This message occurs when the master attempts to send a message
 to the slave SSS and gets an error. It indicates that either the slave
@@ -5134,7 +5130,7 @@ the system crashed, ...) or that the network is down.
 
 <p><a name="Cannot-read-magic-from-slave-SSS"></a>
 
-<h5 class="subsubsection">12.3.1.4 Cannot read magic from slave SSS</h5>
+<h5 class="subsubsection">Cannot read magic from slave SSS</h5>
 
 <p>This message indicates that the master attempted to read the
 code key from the slave SSS and it did not match the value expected. A
@@ -5145,7 +5141,7 @@ on all your master and slave machines.
 
 <p><a name="Connect-to-slave-SSS-failed"></a>
 
-<h5 class="subsubsection">12.3.1.5 Connect to slave SSS failed</h5>
+<h5 class="subsubsection">Connect to slave SSS failed</h5>
 
 <p>This message is logged when the master attempts to connect to
 slave SSS and no connection is accepted. The most common cause of this
@@ -5158,7 +5154,7 @@ file is incorrect.
 
 <p><a name="Cannot-open-stream-socket"></a>
 
-<h5 class="subsubsection">12.3.1.6 Cannot open stream socket</h5>
+<h5 class="subsubsection">Cannot open stream socket</h5>
 
 <p>This indicates a fundamental networking problem on your system &mdash;
 either a lack of sufficient resources or you have not configured
@@ -5166,7 +5162,7 @@ TCP/IP operations.
 
 <p><a name="Error-Messages-from-a-Slave-Configuration"></a>
 
-<h4 class="subsection">12.3.2 Error Messages from a Slave Configuration</h4>
+<h4 class="subsection">Error Messages from a Slave Configuration</h4>
 
 <p>In a master/slave configuration, you can get the following error
 messages from a slave. The error message is followed by a possible
@@ -5174,7 +5170,7 @@ explanation:
 
 <p><a name="Cannot-resolve-master-name-MMM"></a>
 
-<h5 class="subsubsection">12.3.2.1 Cannot resolve master name MMM</h5>
+<h5 class="subsubsection">Cannot resolve master name MMM</h5>
 
 <p>This message is logged when the slave attempts to resolve the
 name given on the MASTER configuration directive to an IP address. It
@@ -5187,7 +5183,7 @@ configuration file.
 
 <p><a name="Cannot-bind-local-address_003b-probably-already-in-use"></a>
 
-<h5 class="subsubsection">12.3.2.2 Cannot bind local address, probably already in use</h5>
+<h5 class="subsubsection">Cannot bind local address, probably already in use</h5>
 
 <p>This means that the slave has attempted to bind the port number
 so that it can listen for messages from the master. This can occur if
@@ -5201,14 +5197,14 @@ configuration files.
 
 <p><a name="Socket-accept-error"></a>
 
-<h5 class="subsubsection">12.3.2.3 Socket accept error</h5>
+<h5 class="subsubsection">Socket accept error</h5>
 
 <p>The slave got an error waiting on the accept() system call. This is
 probably due to a fundamental networking problem.
 
 <p><a name="Unauthorized-attempt-from-master-MMM"></a>
 
-<h5 class="subsubsection">12.3.2.4 Unauthorized attempt from master MMM</h5>
+<h5 class="subsubsection">Unauthorized attempt from master MMM</h5>
 
 <p>The master named MMM (probably an IP address) contacted the slave
 but MMM is not the master that was listed on the MASTER
@@ -5219,14 +5215,14 @@ files respectively are correct.
 
 <p><a name="Read-failure-from-socket"></a>
 
-<h5 class="subsubsection">12.3.2.5 Read failure from socket</h5>
+<h5 class="subsubsection">Read failure from socket</h5>
 
 <p>The slave got an error reading the socket open to the master. This
 indicates a fundamental networking problem.
 
 <p><a name="Bad-APC-magic-from-master_003b-MMM"></a>
 
-<h5 class="subsubsection">12.3.2.6 Bad APC magic from master: MMM</h5>
+<h5 class="subsubsection">Bad APC magic from master: MMM</h5>
 
 <p>The slave received a code key from the master that does not
 correspond to the one expected by the slave. The most common cause of
@@ -5238,7 +5234,7 @@ slaves.
 
 <p><a name="Bad-user-magic-from-master_003b-MMM"></a>
 
-<h5 class="subsubsection">12.3.2.7 Bad user magic from master: MMM</h5>
+<h5 class="subsubsection">Bad user magic from master: MMM</h5>
 
 <p>This message indicates that the master and slave have previously
 communicated, but that the code key transmitted with the most
@@ -5249,7 +5245,7 @@ port.
 
 <p><a name="Master_002fSlave-Connection-Not-Working"></a>
 
-<h4 class="subsection">12.3.3 Master/Slave Connection Not Working</h4>
+<h4 class="subsection">Master/Slave Connection Not Working</h4>
 
 <p>Master/slave problems are usually related to one of the following
 items:
@@ -5273,7 +5269,7 @@ master and slave machines.
 
 <p><a name="Controlling-Multiple-UPSes-on-one-Machine"></a>
 
-<h2 class="chapter">13 Controlling Multiple UPSes on one Machine</h2>
+<h2 class="chapter">Controlling Multiple UPSes on one Machine</h2>
 
 <p>You may want to use your server to control multiple UPSes. This
 is possible by proper configuration and by running one copy of
@@ -5282,7 +5278,7 @@ controlled (recall the <a href="#Configuration-types_005f">Configuration types.<
 
 <p><a name="Configuration"></a>
 
-<h3 class="section">13.1 Configuration</h3>
+<h3 class="section">Configuration</h3>
 
 <p>The way to accomplish the above is to ensure that none of the
 critical files used by each of the two copies of
@@ -5291,7 +5287,7 @@ configuration options, this is possible.
 
 <p><a name="The-First-Copy-of-apcupsd"></a>
 
-<h4 class="subsection">13.1.1 The First Copy of apcupsd</h4>
+<h4 class="subsection">The First Copy of apcupsd</h4>
 
 <p>For example, assuming you have SmartUPSes in both cases, to
 configure and install the first copy of
@@ -5319,7 +5315,7 @@ and stopped automatically when the system is booted and halted.
 
 <p><a name="The-Second-Copy-of-apcupsd"></a>
 
-<h4 class="subsection">13.1.2 The Second Copy of apcupsd</h4>
+<h4 class="subsection">The Second Copy of apcupsd</h4>
 
 <p><a name="index-Two-apcupsds-161"></a>
 To configure and install the second copy of
@@ -5353,7 +5349,7 @@ was previously done.
 
 <p><a name="Important-Steps-after-Installation-of-the-Second-Copy"></a>
 
-<h4 class="subsection">13.1.3 Important Steps after Installation of the Second Copy</h4>
+<h4 class="subsection">Important Steps after Installation of the Second Copy</h4>
 
 <p>After the <code>make install</code> of the second copy of
 apcupsd there are a number important steps
@@ -5389,7 +5385,7 @@ signaled it to do so.
 
 <p><a name="Support-for-SNMP-UPSes"></a>
 
-<h2 class="chapter">14 Support for SNMP UPSes</h2>
+<h2 class="chapter">Support for SNMP UPSes</h2>
 
 <p><a name="index-SNMP-162"></a>
 <a href="snmp">snmp</a>
@@ -5408,7 +5404,7 @@ SmartSlot.
 
 <p><a name="Connecting-an-SNMP-UPS"></a>
 
-<h3 class="section">14.1 Connecting an SNMP UPS</h3>
+<h3 class="section">Connecting an SNMP UPS</h3>
 
 <p><a name="index-SNMP_002c-Connecting-163"></a>
 The Simple Network Management Protocol provides an interface to
@@ -5439,7 +5435,7 @@ APC's powernet MIB
 
 <p><a name="Building-and-Installing-apcupsd-_003c1_003e"></a>
 
-<h3 class="section">14.2 Building and Installing apcupsd</h3>
+<h3 class="section">Building and Installing apcupsd</h3>
 
 <p>Follow the instructions in <a href="#Building-and-Installing-apcupsd">Building and Installing apcupsd</a>l,
 being sure to include the following options (in addition to any others
@@ -5456,7 +5452,7 @@ line:
 </pre>
   <p><a name="SNMP-Specific-Information"></a>
 
-<h3 class="section">14.3 SNMP Specific Information</h3>
+<h3 class="section">SNMP Specific Information</h3>
 
 <p><a name="index-SNMP-164"></a>
 The SNMP connection gives less information compared to a serial
@@ -5466,7 +5462,7 @@ informative enough to run safely your UPS.
 
 <p><a name="Known-Problems"></a>
 
-<h3 class="section">14.4 Known Problems</h3>
+<h3 class="section">Known Problems</h3>
 
 <p>Currently (as of 3.10.0) the code to power off the UPS needs
 special configuration. The killpower command for SNMP UPSes can not be
@@ -5497,7 +5493,7 @@ system shutdown requires to umount all the filesystems.
 
 <p><a name="Alternate-Ways-To-Run-The-Network-Information-Server"></a>
 
-<h2 class="chapter">15 Alternate Ways To Run The Network Information Server</h2>
+<h2 class="chapter">Alternate Ways To Run The Network Information Server</h2>
 
 <p><a name="index-NIS-alternate-was-of-running-165"></a>
 apcupsd maintains STATUS and EVENTS
@@ -5525,7 +5521,7 @@ otherwise. Option 3 is what is configured in by default.
 
 <p><a name="Running-the-server-as-a-child-of-apcupsd"></a>
 
-<h3 class="section">15.1 Running the server as a child of apcupsd</h3>
+<h3 class="section">Running the server as a child of apcupsd</h3>
 
 <p>This is probably the simplest way to run the network information
 server. To do so, you simply make sure the <strong>NETSERVER</strong> directive in
@@ -5558,7 +5554,7 @@ controlled by the statements you put in
 
 <p><a name="Running-apcnisd-from-INETD"></a>
 
-<h3 class="section">15.2 Running apcnisd from INETD</h3>
+<h3 class="section">Running apcnisd from INETD</h3>
 
 <p>This is probably the most secure and most desirable way of
 running the network information server. Unfortunately, it is a bit
@@ -5628,7 +5624,7 @@ apcnisd.
 
 <p><a name="Running-apcnisd-Standalome"></a>
 
-<h3 class="section">15.3 Running apcnisd Standalome</h3>
+<h3 class="section">Running apcnisd Standalome</h3>
 
 <p>This is probably the least desirable of the three ways to run an
 apcupsd network information server because
@@ -5658,7 +5654,7 @@ apcupsd.
 
 <p><a name="apcupsd-System-Logging"></a>
 
-<h2 class="chapter">16 apcupsd System Logging</h2>
+<h2 class="chapter">apcupsd System Logging</h2>
 
 <p><a name="index-Logging_002c-System-166"></a><a name="index-System-Logging-167"></a>
 The apcupsd philosophy is that all
@@ -5671,7 +5667,7 @@ information server.
 
 <p><a name="Logging-Types"></a>
 
-<h3 class="section">16.1 Logging Types</h3>
+<h3 class="section">Logging Types</h3>
 
 <p><a name="index-Logging_002c-types-168"></a>
 apcupsd splits its logging into four
@@ -5719,7 +5715,7 @@ handling (see <a href="#Customizing-Event-Handling">Customizing Event Handling</
 
 <p><a name="Implementation-Details"></a>
 
-<h3 class="section">16.2 Implementation Details</h3>
+<h3 class="section">Implementation Details</h3>
 
 <p>In order to ensure that the data logged to syslog() can be directed
 to different files, I have assigned syslog() levels to each of our
@@ -5792,7 +5788,7 @@ accomplish the above, my syslog.conf file looks like:
 </pre>
   <p><a name="Developers-Notes"></a>
 
-<h3 class="section">16.3 Developers Notes</h3>
+<h3 class="section">Developers Notes</h3>
 
 <p><a name="index-Developers-Notes-169"></a>
 All logging functions and all error reporting are now done
@@ -5813,7 +5809,7 @@ adding code to log_event() in apclog.c.
 
 <p><a name="The-Windows-Version-of-apcupsd"></a>
 
-<h2 class="chapter">17 The Windows Version of apcupsd</h2>
+<h2 class="chapter">The Windows Version of apcupsd</h2>
 
 <p>The Windows version of apcupsd has
 been tested on Win95, Win98, WinMe, WinNT, WinXP, and Win2000
@@ -5839,7 +5835,7 @@ even if there is no user logged into the system.
 
 <p><a name="Installation"></a>
 
-<h3 class="section">17.1 Installation</h3>
+<h3 class="section">Installation</h3>
 
 <p>Normally, you will install the Windows version of
 apcupsd from the binaries. This install is
@@ -5854,7 +5850,6 @@ of the icon will vary from one release version to another.
      
      </pre>
      
-<!-- imagename="Windows Install - Explorer Window" -->
 <img src="wininstall3.png" alt="wininstall3.png">
 
      <pre class="sp">
@@ -5867,7 +5862,6 @@ it into a temporary file, respond with <strong>Yes</strong>.
      
      </pre>
      
-<!-- imagename="Windows Install - Winzip Unpack" -->
 <img src="wininstall4.png" alt="wininstall4.png">
 
      <pre class="sp">
@@ -5880,7 +5874,6 @@ go into <span class="file">C:\</span>
      
      </pre>
      
-<!-- imagename="Windows Install - Winzip Extract Window" -->
 <img src="wininstall5.png" alt="wininstall5.png">
 
      <pre class="sp">
@@ -5953,7 +5946,6 @@ following output in a DOS shell window:
      <pre class="sp">
      
      </pre>
-<!-- imagename="Windows Install - Setup Complete" -->
      <img src="wininstall1.png" alt="wininstall1.png">
      <pre class="sp">
      
@@ -5967,7 +5959,6 @@ dialogue box as follows:
      <pre class="sp">
      
      </pre>
-<!-- imagename="Windows Install - Success" -->
      <img src="wininstall2.png" alt="wininstall2.png">
      <pre class="sp">
      
@@ -5994,7 +5985,6 @@ then clicking on the Start button as shown below:
      <pre class="sp">
      
      </pre>
-<!-- imagename="Windows NT - Start Service" -->
      <img src="wininstall6.png" alt="wininstall6.png">
      <pre class="sp">
      
@@ -6035,7 +6025,7 @@ that the battery is charging.
 
 <p><a name="Installation-Directory"></a>
 
-<h3 class="section">17.2 Installation Directory</h3>
+<h3 class="section">Installation Directory</h3>
 
 <p><a name="index-Windows_002c-Installation-Directory-172"></a>
 The Win32 version of apcupsd must
@@ -6048,7 +6038,7 @@ a rebuild of the source.
 
 <p><a name="Testing"></a>
 
-<h3 class="section">17.3 Testing</h3>
+<h3 class="section">Testing</h3>
 
 <p><a name="index-Windows_002c-Testing-173"></a><a name="index-Testing_002c-Windows-174"></a>
 It would be hard to overemphasize the need to do a full testing
@@ -6068,7 +6058,7 @@ type, or an incorrect address for the serial port.
 
 <p><a name="Upgrading"></a>
 
-<h3 class="section">17.4 Upgrading</h3>
+<h3 class="section">Upgrading</h3>
 
 <p><a name="index-Windows_002c-Upgrading-175"></a><a name="index-Upgrading-Windows-176"></a>
 On Win98 and Win95 systems, to upgrade to a new release, simply
@@ -6080,7 +6070,7 @@ the <span class="file">c:\apcupsd\bin</span> directory, then apply the
 upgrade and restart apcupsd.
 
   <p>On WinNT systems (and Win2000 systems), you may stop
-apcupsd as indicated above or
+apcupsd as indicated abover or
 alternatively you may stop apcupsd by using
 the <strong>Services</strong> item in the <strong>Control Panel</strong>. In addition, at least on my
 system, there seems to be a WinNT bug that causes the system to
@@ -6092,14 +6082,12 @@ part of WinZip as described above). To circumvent this problem (if it
 happens to you), after shutting down the running version of
 apcupsd, through the <strong>Services</strong> dialogue in the <strong>Control Panel</strong>, first click on the <strong>Stop button</strong>:
 
-<!-- imagename="Windows NT - Stopping the Service" -->
   <div class="block-image"><img src="wininstall6.png" alt="wininstall6.png"></div>
 
   <p>then click on the <strong>Startup ...</strong>
 button, and in the Startup dialogue select the <strong>Disabled</strong> button to disable
 apcupsd:
 
-<!-- imagename="Windows NT - Disabling the Service" -->
   <div class="block-image"><img src="wininstall7.png" alt="wininstall7.png"></div>
 
   <p>After closing the dialogues, reboot the system, typical of
@@ -6118,7 +6106,7 @@ problem is unknown, but the solution is simply to click again on the
 
 <p><a name="Post-Installation"></a>
 
-<h3 class="section">17.5 Post Installation</h3>
+<h3 class="section">Post Installation</h3>
 
 <p><a name="index-Windows_002c-Post-Installation-177"></a>
 After installing apcupsd and before
@@ -6141,7 +6129,7 @@ a pound sign (#) in column one of the appropriate line.
 
 <p><a name="Problem-Areas"></a>
 
-<h3 class="section">17.6 Problem Areas</h3>
+<h3 class="section">Problem Areas</h3>
 
 <p><a name="index-Problems_002c-Windows-178"></a><a name="index-Windows_002c-Problems-179"></a>
 In addition to possible problems of reinstallation or upgrade on
@@ -6191,7 +6179,7 @@ to this file.
 
 <p><a name="Utility-Functions"></a>
 
-<h3 class="section">17.7 Utility Functions</h3>
+<h3 class="section">Utility Functions</h3>
 
 <p>The directory <span class="file">c:\apcupsd\bin</span> contains six
 utility routines (actually .pif files) that you may find useful. They
@@ -6226,7 +6214,7 @@ desired function from the popup menu.
 
 <p><a name="Disclaimer"></a>
 
-<h3 class="section">17.8 Disclaimer</h3>
+<h3 class="section">Disclaimer</h3>
 
 <p><a name="index-Disclaimer-180"></a>
 Some of the features such as EEPROM programming have not been
@@ -6271,7 +6259,7 @@ annoy you, you can remove or comment out the calls to <strong>popup</strong> fro
 
 <p><a name="Email-Notification-of-Events"></a>
 
-<h3 class="section">17.9 Email Notification of Events</h3>
+<h3 class="section">Email Notification of Events</h3>
 
 <p><a name="index-Email-181"></a><a name="index-Notification_002c-Email-182"></a>
 On Win95/98 systems, it is possible to receive notification of
@@ -6292,7 +6280,7 @@ files into the directory
 
 <p><a name="Killpower-under-Windows"></a>
 
-<h3 class="section">17.10 Killpower under Windows</h3>
+<h3 class="section">Killpower under Windows</h3>
 
 <p><a name="index-Windows_002c-Killpower-183"></a>
 If your batteries become exhausted during a power failure and
@@ -6349,7 +6337,7 @@ sufficient.
 
 <p><a name="Power-Down-During-Shutdown"></a>
 
-<h3 class="section">17.11 Power Down During Shutdown</h3>
+<h3 class="section">Power Down During Shutdown</h3>
 
 <p><a name="index-Windows_002c-Power-down-184"></a><a name="index-Power-down_002c-Windows-185"></a>
 Our philosophy is to shutdown a computer but not to power it down
@@ -6376,7 +6364,7 @@ psshutdown.
 
 <p><a name="Command-Line-Options-Specific-to-the-Windows-Version"></a>
 
-<h3 class="section">17.12 Command Line Options Specific to the Windows Version</h3>
+<h3 class="section">Command Line Options Specific to the Windows Version</h3>
 
 <p><a name="index-Windows_002c-Options-186"></a>
 These options are not normally seen or used by the user, and are
@@ -6424,7 +6412,7 @@ have been created for your use.
 
 <p><a name="Building-the-Win32-Version-from-the-Source"></a>
 
-<h3 class="section">17.13 Building the Win32 Version from the Source</h3>
+<h3 class="section">Building the Win32 Version from the Source</h3>
 
 <p><a name="index-Windows_002c-Building-187"></a><a name="index-Building_002c-Windows-188"></a>
 If you have the source code, follow the standard procedures for
@@ -6437,7 +6425,7 @@ at the system specifics for CYGWIN.
 
 <p><a name="Overview-of-Serial_002dInterface-UPSes"></a>
 
-<h2 class="chapter">18 Overview of Serial-Interface UPSes</h2>
+<h2 class="chapter">Overview of Serial-Interface UPSes</h2>
 
 <p><a name="index-Serial-UPSes-189"></a>
 If you have a UPS that communicates via serial port, you need to
@@ -6459,7 +6447,7 @@ signal.
 
 <p><a name="Connecting-a-Serial_002dLine-UPS-to-a-USB-Port"></a>
 
-<h2 class="chapter">19 Connecting a Serial-Line UPS to a USB Port</h2>
+<h2 class="chapter">Connecting a Serial-Line UPS to a USB Port</h2>
 
 <p><a name="index-Serial-on-USB-190"></a>
 By using a special adaptor, you can connect your serial-line UPS
@@ -6490,7 +6478,7 @@ necessary.
 
 <p><a name="Connecting-a-APC-USB-UPS-to-either-a-PC-USB-or-Serial-Port"></a>
 
-<h2 class="chapter">20 Connecting a APC USB UPS to either a PC USB or Serial Port</h2>
+<h2 class="chapter">Connecting a APC USB UPS to either a PC USB or Serial Port</h2>
 
 <p>An interesting fact is that
 the USB ports (actually an RJ45 connector) on APC UPSes not only speak
@@ -6504,7 +6492,7 @@ will act as a serial-line device.
 
 <p><a name="Cables"></a>
 
-<h2 class="chapter">21 Cables</h2>
+<h2 class="chapter">Cables</h2>
 
 <p><a name="index-Cables-191"></a>
 You can either use the cable that came with your UPS
@@ -6529,7 +6517,7 @@ with a RJ45 connector, you can build your own
 
 <p><a name="Smart_002dCustom-Cable-for-SmartUPSes"></a>
 
-<h3 class="section">21.1 Smart-Custom Cable for SmartUPSes</h3>
+<h3 class="section">Smart-Custom Cable for SmartUPSes</h3>
 
 <p><a name="index-Smart-Custom-Cable-192"></a><a name="index-Cables_002c-Smart-Custom-193"></a>
 <pre class="example">     
@@ -6574,7 +6562,7 @@ APC (940-0024C), use the following diagram.
 </pre>
   <p><a name="Smart-Signalling-Cable-for-BackUPS-CS-Models"></a>
 
-<h3 class="section">21.2 Smart Signalling Cable for BackUPS CS Models</h3>
+<h3 class="section">Smart Signalling Cable for BackUPS CS Models</h3>
 
 <p><a name="index-Cables_002c-Smart-Signalling-194"></a><a name="index-Cables_002c-BackUPS-CS-195"></a>
 If you have a BackUPS CS, you are probably either using it with
@@ -6645,7 +6633,7 @@ transmitted to us by slither_man. Many thanks!
 
 <p><a name="Voltage_002dSignalling-Cable-for-_0022dumb_0022-UPSes"></a>
 
-<h3 class="section">21.3 Voltage-Signalling Cable for "dumb" UPSes</h3>
+<h3 class="section">Voltage-Signalling Cable for "dumb" UPSes</h3>
 
 <p><a name="index-Cables_002c-dumb-196"></a><a name="index-dumb_002c-Cables-197"></a>
 <strong>NOTE. YOU DO NOT HAVE THIS CABLE UNLESS
@@ -6777,7 +6765,7 @@ specify the following in <span class="file">apcupsd.conf</span>:
 </pre>
   <p><a name="Other-APC-Cables-that-apcupsd-Supports"></a>
 
-<h3 class="section">21.4 Other APC Cables that apcupsd Supports</h3>
+<h3 class="section">Other APC Cables that apcupsd Supports</h3>
 
 <p>apcupsd will also support the
 following off the shelf cables that are supplied by APC
@@ -6802,14 +6790,12 @@ following off the shelf cables that are supplied by APC
 
 <p><a name="Voltage-Signalling-Features-Supported-by-Apcupsd-for-Various-Cables"></a>
 
-<h3 class="section">21.5 Voltage Signalling Features Supported by Apcupsd for Various Cables</h3>
+<h3 class="section">Voltage Signalling Features Supported by Apcupsd for Various Cables</h3>
 
 <p>The following table shows the features supported by the current
 version of apcupsd (3.8.5 or later) for
 various cables running the UPS in voltage-signalling mode.
 
-<!-- tablename="Supported Features" -->
-<!-- tcolumnwidths=1.2in,0.8in,1.2in,0.8in,1.0in -->
   <p><table summary=""><tr align="left"><td valign="top" width="20%">Cable</td><td valign="top" width="20%">Power Loss</td><td valign="top" width="20%">Low Battery</td><td valign="top" width="20%">Kill Power</td><td valign="top" width="20%">Cable Disconnected
 <br></td></tr><tr align="left"><td valign="top" width="20%">940-0020B</td><td valign="top" width="20%">Yes</td><td valign="top" width="20%">No</td><td valign="top" width="20%">Yes</td><td valign="top" width="20%">No
 <br></td></tr><tr align="left"><td valign="top" width="20%">940-0020C</td><td valign="top" width="20%">Yes</td><td valign="top" width="20%">Yes</td><td valign="top" width="20%">Yes</td><td valign="top" width="20%">No
@@ -6823,7 +6809,7 @@ various cables running the UPS in voltage-signalling mode.
 
 <p><a name="Voltage-Signalling"></a>
 
-<h3 class="section">21.6 Voltage Signalling</h3>
+<h3 class="section">Voltage Signalling</h3>
 
 <p><a name="index-Voltage-Signalling_002c-Cables-198"></a><a name="index-Cables_002c-Voltage-Signalling-199"></a>
 Apparently, all APC voltage-signalling UPSes have the same
@@ -6856,7 +6842,7 @@ connector using the numbering scheme listed above is:
 </pre>
   <p><a name="The-Back_002dUPS-Office-500-signals"></a>
 
-<h3 class="section">21.7 The Back-UPS Office 500 signals</h3>
+<h3 class="section">The Back-UPS Office 500 signals</h3>
 
 <p><a name="index-Cables_002c-BackUPS-Office-200"></a><a name="index-BackUPS-Office_002c-cables-201"></a>
 The Back-UPS Office UPS has a telephone type jack as output,
@@ -6886,13 +6872,13 @@ which looks like the following:
 </pre>
   <p><a name="Analyses-of-APC-Cables"></a>
 
-<h3 class="section">21.8 Analyses of APC Cables</h3>
+<h3 class="section">Analyses of APC Cables</h3>
 
 <p><a name="index-Cables-202"></a>
 
 <p><a name="940_002d0020B-Cable-Wiring"></a>
 
-<h4 class="subsection">21.8.1 940-0020B Cable Wiring</h4>
+<h4 class="subsection">940-0020B Cable Wiring</h4>
 
 <p><a name="index-Cables-203"></a>
 This diagram is for informational purposes and is not complete. 
@@ -6925,7 +6911,7 @@ confirmed.
 
 <p><a name="940_002d0020C-Cable-Wiring"></a>
 
-<h4 class="subsection">21.8.2 940-0020C Cable Wiring</h4>
+<h4 class="subsection">940-0020C Cable Wiring</h4>
 
 <p><a name="index-Cables-204"></a>
 This diagram is for informational purposes and may not be
@@ -6952,7 +6938,7 @@ diagram may not be accurate.
 </pre>
   <p><a name="940_002d0023A-Cable-Wiring"></a>
 
-<h4 class="subsection">21.8.3 940-0023A Cable Wiring</h4>
+<h4 class="subsection">940-0023A Cable Wiring</h4>
 
 <p><a name="index-Cables-205"></a>
 This diagram is for informational purposes and may not be
@@ -6981,7 +6967,7 @@ note that we are not sure the following diagram is correct.
 </pre>
   <p><a name="940_002d0095A-Cable-Wiring"></a>
 
-<h4 class="subsection">21.8.4 940-0095A Cable Wiring</h4>
+<h4 class="subsection">940-0095A Cable Wiring</h4>
 
 <p><a name="index-Cables-206"></a>
 This is the definitive wiring diagram for the 940-0095A cable
@@ -7059,7 +7045,7 @@ built one from his diagram and it works perfectly.
 </pre>
   <p><a name="940_002d0095B-Cable-Wiring"></a>
 
-<h4 class="subsection">21.8.5 940-0095B Cable Wiring</h4>
+<h4 class="subsection">940-0095B Cable Wiring</h4>
 
 <p><a name="index-Cables-207"></a>
 This diagram is for informational purposes and may not be complete,
@@ -7085,7 +7071,7 @@ we don't recommend that use it to build one yourself.
 </pre>
   <p><a name="940_002d0119A-Cable-Wiring"></a>
 
-<h4 class="subsection">21.8.6 940-0119A Cable Wiring</h4>
+<h4 class="subsection">940-0119A Cable Wiring</h4>
 
 <p><a name="index-Cables-208"></a>
 This diagram is for informational purposes and may not be complete,
@@ -7107,7 +7093,7 @@ This cable is used with the BackUPS Office UPSes.
 </pre>
   <p><a name="BackOffice-ES"></a>
 
-<h4 class="subsection">21.8.7 BackOffice ES</h4>
+<h4 class="subsection">BackOffice ES</h4>
 
 <p><a name="index-Cables-209"></a><a name="index-BackOffice-ES-210"></a>
 The BackUPS ES has a straight through serial cable with no
@@ -7145,7 +7131,7 @@ cable, the PCB, and the following diagram:
 </pre>
   <p><a name="BackUPS-ES-and-CS-in-Serial-mode-with-Cable-940_002d0128A"></a>
 
-<h4 class="subsection">21.8.8 BackUPS ES and CS in Serial mode with Cable 940-0128A</h4>
+<h4 class="subsection">BackUPS ES and CS in Serial mode with Cable 940-0128A</h4>
 
 <p><a name="index-BackUPS-ES-211"></a><a name="index-Cables-212"></a>
 Though these UPSes are USB UPSes, APC supplies a serial cable
@@ -7278,7 +7264,7 @@ RD on the computer side.
 </pre>
   <p><a name="Win32-Implementation-Restrictions-for-Simple-UPSes"></a>
 
-<h3 class="section">21.9 Win32 Implementation Restrictions for Simple UPSes</h3>
+<h3 class="section">Win32 Implementation Restrictions for Simple UPSes</h3>
 
 <p><a name="index-Cables-213"></a><a name="index-Windows-214"></a>
 Due to inadequacies in the Win32 API, it is not possible to
@@ -7293,7 +7279,7 @@ the 0023A cable are not implemented.
 
 <p><a name="Internal-Apcupsd-Actions-for-Simple-Cables"></a>
 
-<h3 class="section">21.10 Internal Apcupsd Actions for Simple Cables</h3>
+<h3 class="section">Internal Apcupsd Actions for Simple Cables</h3>
 
 <p><a name="index-Cables-215"></a>
 <pre class="example">     
@@ -7371,10 +7357,9 @@ the 0023A cable are not implemented.
 </pre>
   <p><a name="RS232-Wiring-and-Signal-Conventions"></a>
 
-<h3 class="section">21.11 RS232 Wiring and Signal Conventions</h3>
+<h3 class="section">RS232 Wiring and Signal Conventions</h3>
 
 <p><a name="index-Cables-216"></a>
-<!-- tablename="RS232 Wiring and Signal Conventions" -->
   <p><table summary=""><tr align="left"><td valign="top" width="25%">DB-25
 Pin #</td><td valign="top" width="25%">DB-9
 Pin #</td><td valign="top" width="25%">Name</td><td valign="top" width="25%">DTE-DCE Description
@@ -7407,7 +7392,7 @@ Pin #</td><td valign="top" width="25%">Name</td><td valign="top" width="25%">DTE
 
 <p><a name="Pin-Assignment-for-the-Serial-Port-_005bRS_002d232C_005d_003b-25_002dpin-and-9_002dpin_003b-Female-End"></a>
 
-<h3 class="section">21.12 Pin Assignment for the Serial Port (RS-232C), 25-pin and 9-pin, Female End</h3>
+<h3 class="section">Pin Assignment for the Serial Port (RS-232C), 25-pin and 9-pin, Female End</h3>
 
 <p><a name="index-Cables-217"></a>
 <pre class="example">     
@@ -7434,7 +7419,7 @@ Pin #</td><td valign="top" width="25%">Name</td><td valign="top" width="25%">DTE
 </pre>
   <p><a name="Ioctl-to-RS232-Correspondence"></a>
 
-<h3 class="section">21.13 Ioctl to RS232 Correspondence</h3>
+<h3 class="section">Ioctl to RS232 Correspondence</h3>
 
 <p><a name="index-Cables-218"></a>
 <pre class="example">     
@@ -7454,7 +7439,7 @@ Pin #</td><td valign="top" width="25%">Name</td><td valign="top" width="25%">DTE
 </pre>
   <p><a name="Testing-Serial_002dLine-UPSes"></a>
 
-<h2 class="chapter">22 Testing Serial-Line UPSes</h2>
+<h2 class="chapter">Testing Serial-Line UPSes</h2>
 
 <p><a name="index-Testing_002c-Serial-219"></a><a name="index-Serial_002c-Testing-220"></a>
 If you have a serial-line UPS, there are some tests you should
@@ -7494,7 +7479,7 @@ detect the low battery condition.  For more details please see
 
 <p><a name="Establishing-Serial-Port-Connection"></a>
 
-<h3 class="section">22.1 Establishing Serial Port Connection</h3>
+<h3 class="section">Establishing Serial Port Connection</h3>
 
 <p><a name="index-Testing_002c-Serial-221"></a>
 Once you have compiled, installed, and invoked
@@ -7637,7 +7622,7 @@ proceed to the next test.
 
 <p><a name="Using-apctest-on-Serial_002dLine-UPSses"></a>
 
-<h3 class="section">22.2 Using apctest on Serial-Line UPSses</h3>
+<h3 class="section">Using apctest on Serial-Line UPSses</h3>
 
 <p><a name="index-apctest-222"></a><a name="index-Testing_002c-with-apctest-223"></a>
 On an apcsmart serial-line UPS, apctest
@@ -7712,7 +7697,7 @@ also your <span class="file">apcupsd.conf</span> file.
 
 <p><a name="Expected-apctest-Signals-for-a-UPS"></a>
 
-<h4 class="subsection">22.2.1 Expected apctest Signals for a UPS</h4>
+<h4 class="subsection">Expected apctest Signals for a UPS</h4>
 
 <p><a name="index-Testing-224"></a><a name="index-apctest-225"></a>
 If you have configured your UPS as:
@@ -7741,7 +7726,7 @@ when the power fails and additionally <strong>CD</strong> when the batteries are
 
 <p><a name="Expected-apctest-Signals-for-a-BackUPS-Pro"></a>
 
-<h4 class="subsection">22.2.2 Expected apctest Signals for a BackUPS Pro</h4>
+<h4 class="subsection">Expected apctest Signals for a BackUPS Pro</h4>
 
 <p><a name="index-Testing-226"></a><a name="index-apctest-227"></a>
 If you have configured your UPS as:
@@ -7768,13 +7753,13 @@ the batteries are low.
 
 <p><a name="Troubleshooting-Serial-Line-communications"></a>
 
-<h2 class="chapter">23 Troubleshooting Serial Line communications</h2>
+<h2 class="chapter">Troubleshooting Serial Line communications</h2>
 
 <p><a name="index-Problems_002c-Serial-228"></a><a name="index-Serial-Problems-229"></a>
 
 <p><a name="Determining-Which-Voltage_002dSignaling-Cable-You-Have"></a>
 
-<h3 class="section">23.1 Determining Which Voltage-Signaling Cable You Have</h3>
+<h3 class="section">Determining Which Voltage-Signaling Cable You Have</h3>
 
 <p><em>The most frequently encountered problem with
 voltage-signalling UPSes (e.g. BackUPS 650) is that you have
@@ -7794,7 +7779,7 @@ the cables chapter of this manual.
 
 <p><a name="Once-you-have-established-serial-communications"></a>
 
-<h3 class="section">23.2 Once you have established serial communications</h3>
+<h3 class="section">Once you have established serial communications</h3>
 
 <p><a name="index-Testing-230"></a>
 Once you have established that
@@ -7806,7 +7791,7 @@ Testing (see <a href="#Testing-Apcupsd">Testing Apcupsd</a>) section.
 
 <p><a name="Bizarre-Intermittent-Behavior"></a>
 
-<h4 class="subsection">23.2.1 Bizarre Intermittent Behavior</h4>
+<h4 class="subsection">Bizarre Intermittent Behavior</h4>
 
 <p>In one case, a user reported that he received random incorrect
 values from the UPS in the status output. It turned out that
@@ -7820,7 +7805,7 @@ port mouse on the same serial port.
 
 <p><a name="Recalibrating-the-UPS-Runtime"></a>
 
-<h2 class="chapter">24 Recalibrating the UPS Runtime</h2>
+<h2 class="chapter">Recalibrating the UPS Runtime</h2>
 
 <p><a name="index-Runtime-recalibration-231"></a><a name="index-Recalibration-Runtime-232"></a>
 Note: In a future release of apcupsd
@@ -7887,7 +7872,7 @@ shorten their life span.
 
 <p><a name="Status-Logging-On-Serial_002dLine-UPSes"></a>
 
-<h3 class="section">24.1 Status Logging On Serial-Line UPSes</h3>
+<h3 class="section">Status Logging On Serial-Line UPSes</h3>
 
 <p>Serial-line UPSes that speak the apcsmart protocol log all of
 the events described in the Status
@@ -7915,7 +7900,7 @@ corrections and additions will be welcome.
 </pre>
   <p><a name="DATA-Logging"></a>
 
-<h2 class="chapter">25 DATA Logging</h2>
+<h2 class="chapter">DATA Logging</h2>
 
 <p><a name="index-Logging_002c-DATA-233"></a><a name="index-DATA-Logging-234"></a>
 This feature is somewhat outdated and not often used.
@@ -7955,7 +7940,7 @@ identical.
 
 <p><a name="Configuration-Directive-Reference"></a>
 
-<h2 class="chapter">26 Configuration Directive Reference</h2>
+<h2 class="chapter">Configuration Directive Reference</h2>
 
 <p><a name="index-Reference_002c-Directives-236"></a><a name="index-Configuration_002c-Directives-237"></a><a name="index-Directives-238"></a>
 Configuration directives in
@@ -7966,7 +7951,7 @@ can be left at their defaults unless you have an exotic configuration.
 
 <p><a name="General-Configuration-Directives"></a>
 
-<h3 class="section">26.1 General Configuration Directives</h3>
+<h3 class="section">General Configuration Directives</h3>
 
 <p><a name="index-Directives_002c-General-239"></a><a name="index-General-Directives-240"></a>
 In general, each of these directives is required (ecept that the DEVICE
@@ -8036,7 +8021,7 @@ set it during the build process by using the
 
 <p><a name="Configuration-Directives-Used-by-the-Network-Information-Server"></a>
 
-<h3 class="section">26.2 Configuration Directives Used by the Network Information Server</h3>
+<h3 class="section">Configuration Directives Used by the Network Information Server</h3>
 
 <p><a name="index-Directives_002c-Network-241"></a><a name="index-Network-directives-242"></a>
 None of these directives are required for proper operation of
@@ -8101,7 +8086,7 @@ using the <code>--with-log-dir=</code> option of the
 
 <p><a name="Configuration-Directives-used-during-Power-Failures"></a>
 
-<h3 class="section">26.3 Configuration Directives used during Power Failures</h3>
+<h3 class="section">Configuration Directives used during Power Failures</h3>
 
 <p><a name="index-Directives_002c-Power-fail-243"></a><a name="index-Power-fail-directives-244"></a>
 In general, none of these directives are required. However, if
@@ -8263,7 +8248,7 @@ shutdown.  </dl>
 
 <p><a name="Configuration-Directives-used-to-Control-System-Logging"></a>
 
-<h3 class="section">26.4 Configuration Directives used to Control System Logging</h3>
+<h3 class="section">Configuration Directives used to Control System Logging</h3>
 
 <p><a name="index-Directives-Logging-245"></a><a name="index-Logging_002c-directives-246"></a>
      <dl>
@@ -8296,7 +8281,7 @@ details.
 
 <p><a name="Configuration-Directives-for-Sharing-a-UPS"></a>
 
-<h3 class="section">26.5 Configuration Directives for Sharing a UPS</h3>
+<h3 class="section">Configuration Directives for Sharing a UPS</h3>
 
 <p><a name="index-Directives-Sharing-247"></a>
 The following directives apply to the master/slave networking
@@ -8469,7 +8454,7 @@ on the network. This directive is not required.
 
 <p><a name="Configuration-Directives-Used-to-Set-the-UPS-EPROM"></a>
 
-<h3 class="section">26.6 Configuration Directives Used to Set the  UPS EPROM</h3>
+<h3 class="section">Configuration Directives Used to Set the  UPS EPROM</h3>
 
 <p><a name="index-Directives-EEPROM-248"></a><a name="index-EEPROM-directives-249"></a>
 NOTE. THESE ARE DEPRECIATED AND NO LONGER WORK IN APCUPSD
@@ -8592,7 +8577,7 @@ batteries were changed.
 
 <p><a name="apcupsd-Status-Logging"></a>
 
-<h2 class="chapter">27 apcupsd Status Logging</h2>
+<h2 class="chapter">apcupsd Status Logging</h2>
 
 <p><a name="index-Logging_002c-Status-250"></a><a name="index-Status-logging-251"></a>
 There is a good deal of information available about the UPS and
@@ -8603,7 +8588,7 @@ well.
 
 <p><a name="Status-report-format"></a>
 
-<h3 class="section">27.1 Status report format</h3>
+<h3 class="section">Status report format</h3>
 
 <p><a name="index-Status-Report-252"></a><a name="index-Report_002c-Status-253"></a>
 The STATUS output is in ASCII format with a single data value or
@@ -8658,7 +8643,7 @@ status can be reliably reassembled.
 
 <p><a name="Status-Report-Example"></a>
 
-<h3 class="section">27.2 Status Report Example</h3>
+<h3 class="section">Status Report Example</h3>
 
 <p><a name="index-Examples_002c-Status-Report-254"></a><a name="index-Status-255"></a>
 An example of output from an international SmartUPS 1000
@@ -8723,7 +8708,7 @@ follows:
 </pre>
   <p><a name="Status-Report-Fields"></a>
 
-<h3 class="section">27.3 Status Report Fields</h3>
+<h3 class="section">Status Report Fields</h3>
 
 <p><a name="index-Status-256"></a>
 The meaning of the above variables are:
@@ -8882,7 +8867,7 @@ more accurately.
 
 <p><a name="Logging-the-STATUS-Information"></a>
 
-<h3 class="section">27.4 Logging the STATUS Information</h3>
+<h3 class="section">Logging the STATUS Information</h3>
 
 <p><a name="index-Logging-Status-257"></a><a name="index-Status_002c-Logging-258"></a>
 If specified in the configuration file, the STATUS data will also
@@ -8909,13 +8894,13 @@ or the CGI interface to get this information.
 
 <p><a name="The-Shutown-Sequence-and-its-Discontents"></a>
 
-<h2 class="chapter">28 The Shutown Sequence and its Discontents</h2>
+<h2 class="chapter">The Shutown Sequence and its Discontents</h2>
 
 <p><a name="index-Shutdown-Sequence-259"></a>
 
 <p><a name="Shutdown-Sequence-_003c1_003e"></a>
 
-<h3 class="section">28.1 Shutdown Sequence</h3>
+<h3 class="section">Shutdown Sequence</h3>
 
 <p>If you experienced so problems with the testing procedures, or
 if you are porting apcupsd to another
@@ -9116,7 +9101,7 @@ values.
 
 <p><a name="Shutdown-Problems"></a>
 
-<h3 class="section">28.2 Shutdown Problems</h3>
+<h3 class="section">Shutdown Problems</h3>
 
 <p>Obviously if your halt script is not properly modified,
 apcupsd will not be able to shut off the
@@ -9126,7 +9111,7 @@ machine should have been cleanly shut down.
 
 <p><a name="Master_002fSlave-Shutdown-_003c1_003e"></a>
 
-<h3 class="section">28.3 Master/Slave Shutdown</h3>
+<h3 class="section">Master/Slave Shutdown</h3>
 
 <p>In master/slave configurations, however, the master cannot be
 100 percent sure that the slaves have all shutdown before it performs
@@ -9161,7 +9146,7 @@ of old versions. Please be sure to delete or rename all prior versions
 
 <p><a name="Startup"></a>
 
-<h3 class="section">28.4 Startup</h3>
+<h3 class="section">Startup</h3>
 
 <p><a name="index-Startup-260"></a>
 Normally, apcupsd is automatically
@@ -9194,7 +9179,7 @@ script:
 </pre>
   <p><a name="Windows-Considerations"></a>
 
-<h3 class="section">28.5 Windows Considerations</h3>
+<h3 class="section">Windows Considerations</h3>
 
 <p><a name="index-Windows-Considerations-261"></a>
 Please see the end of Windows chapter (see <a href="#Installation-on-Windows">Installation on Windows</a>) of this manual for conderations pertaining to shutdown
@@ -9202,7 +9187,7 @@ and killpower on Windows.
 
 <p><a name="APC-smart-protocol"></a>
 
-<h2 class="chapter">29 APC smart protocol</h2>
+<h2 class="chapter">APC smart protocol</h2>
 
 <p><a name="index-Smart-protocol-262"></a><a name="index-Protocol-Smart-263"></a>
 The APC UPS protocol was originally analyzed by Pavel Korensky
@@ -9224,7 +9209,7 @@ apcupsd project and the <strong>NUT</strong> project can join forces.
 
 <p><a name="Description"></a>
 
-<h3 class="section">29.1 Description</h3>
+<h3 class="section">Description</h3>
 
 <p>Here's the information on the elusive APC smart signaling protocol
 used by their higher end units (Back-UPS Pro, Smart-UPS,
@@ -9235,7 +9220,7 @@ the UPS and figured out what the results meant.
 
 <p><a name="RS_002d232-differences"></a>
 
-<h3 class="section">29.2 RS-232 differences</h3>
+<h3 class="section">RS-232 differences</h3>
 
 <p>Normal 9 pin serial connections have TxD on 3 and RxD on 2. APC's
 smart serial ports put TxD on pin 1 and RxD on pin 2. This means
@@ -9261,7 +9246,7 @@ the cable you need.
 
 <p><a name="Diagram-for-cable-hackers"></a>
 
-<h3 class="section">29.3 Diagram for cable hackers</h3>
+<h3 class="section">Diagram for cable hackers</h3>
 
 <p>If you are handy with cable creation tools, check out the <a href="http://www.exploits.org/nut/library/940-0024C.jpg">940-0024C clone diagram</a>. That's the black "smart" cable
 normally provided with APC models sold after 1996. The loopback pins
@@ -9275,7 +9260,7 @@ pins don't matter.
 
 <p><a name="The-Smart-Protocol"></a>
 
-<h3 class="section">29.4 The Smart Protocol</h3>
+<h3 class="section">The Smart Protocol</h3>
 
 <p>Despite the lack of official information from APC, this table has
 been constructed. It's standard RS-232 serial communications at
@@ -9294,8 +9279,6 @@ UPS, it will normally respond by "NA" for not available,
 otherwise the response is given in the "Typical results"
 column. &gt;
 
-<!-- tablename="Single Character Commands" -->
-<!-- tcolumnwidths=0.5in,2.25in,2.25in -->
   <p><table summary=""><tr align="left"><td valign="top" width="20%">Code</td><td valign="top" width="20%">Meaning</td><td valign="top" width="20%">Typical results</td><td valign="top" width="20%">
 <br></td></tr><tr align="left"><td valign="top" width="20%">^A</td><td valign="top" width="20%">Model string</td><td valign="top" width="20%">SMART-UPS 700</td><td valign="top" width="20%">
 <br></td></tr><tr align="left"><td valign="top" width="20%">^N</td><td valign="top" width="20%">Turn on UPS (send twice, with &gt; 1.5s delay between chars)
@@ -9421,10 +9404,8 @@ in battery (UPS shuts down "early")</td><td valign="top" width="20%">
 
 <p><a name="Dip-switch-info"></a>
 
-<h3 class="section">29.5 Dip switch info</h3>
+<h3 class="section">Dip switch info</h3>
 
-<!-- tablename="DIP Switch Info" -->
-<!-- tcolumnwidths=0.5in,0.5in,4in -->
 <p><table summary=""><tr align="left"><td valign="top" width="33%">Bit</td><td valign="top" width="33%">Switch</td><td valign="top" width="33%">Option when bit=1
 <br></td></tr><tr align="left"><td valign="top" width="33%">0</td><td valign="top" width="33%">4</td><td valign="top" width="33%">Low battery alarm changed from 2 to 5 mins. Autostartup
 disabled on SU370ci and 400
@@ -9437,7 +9418,7 @@ disabled on SU370ci and 400
 
 <p><a name="Status-bits"></a>
 
-<h3 class="section">29.6 Status bits</h3>
+<h3 class="section">Status bits</h3>
 
 <p>This is probably the most important register of the UPS, which
 indicates the overall UPS status. Some common things you'll see:
@@ -9452,8 +9433,6 @@ indicates the overall UPS status. Some common things you'll see:
      <li>SM = Status bit is still not available (retry reading)
 </ul>
 
-<!-- tablename="UPS Status Bits" -->
-<!-- tcolumnwidths=0.5in,0.5in,4in -->
   <p><table summary=""><tr align="left"><td valign="top" width="33%">Bit</td><td valign="top" width="33%">Hex Bit</td><td valign="top" width="33%">Meaning
 <br></td></tr><tr align="left"><td valign="top" width="33%">0</td><td valign="top" width="33%">0x01</td><td valign="top" width="33%">1 = Runtime calibration occurring
 Not reported by Smart UPS v/s and BackUPS Pro
@@ -9469,14 +9448,12 @@ Not reported by 1st and 2nd generation SmartUPS models
 
 <p><a name="Alert-messages"></a>
 
-<h3 class="section">29.7 Alert messages</h3>
+<h3 class="section">Alert messages</h3>
 
 <p>These single character messages are sent by the UPS any time there
 is an Alert condition. All other responses indicated above are sent
 by the UPS only in response to a query or action command.
 
-<!-- tablename="Alert Messages" -->
-<!-- tcolumnwidths=0.7in,4.3in -->
   <p><table summary=""><tr align="left"><td valign="top" width="50%">Character</td><td valign="top" width="50%">Description
 <br></td></tr><tr align="left"><td valign="top" width="50%">!</td><td valign="top" width="50%">Line Fail - sent when the UPS goes on-battery, repeated every
 30 seconds until low battery condition reached. Sometimes occurs
@@ -9514,13 +9491,11 @@ SmartUPS models.
 
 <p><a name="Register-1"></a>
 
-<h3 class="section">29.8 Register 1</h3>
+<h3 class="section">Register 1</h3>
 
 <p>All bits are valid on the Matrix UPS. SmartUPS models only support
 bits 6 and 7. Other models do not respond.
 
-<!-- tablename="Register 1 Layout" -->
-<!-- tcolumnwidths=0.3in,0.5in,4.2in -->
   <p><table summary=""><tr align="left"><td valign="top" width="33%">Bit</td><td valign="top" width="33%">Hex Bit</td><td valign="top" width="33%">Meaning
 <br></td></tr><tr align="left"><td valign="top" width="33%">0</td><td valign="top" width="33%">0x01</td><td valign="top" width="33%">In wakeup mode (typically lasts &lt; 2s)
 <br></td></tr><tr align="left"><td valign="top" width="33%">1</td><td valign="top" width="33%">0x02</td><td valign="top" width="33%">In bypass mode due to internal fault - see register 2 or 3
@@ -9535,14 +9510,12 @@ power
 
 <p><a name="Register-2"></a>
 
-<h3 class="section">29.9 Register 2</h3>
+<h3 class="section">Register 2</h3>
 
 <p>Matrix UPS models report bits 0-5. SmartUPS models only support
 bits 4 and 6. SmartUPS v/s and BackUPS Pro report bits 4, 6, 7. 
 Unused bits are set to 0. Other models do not respond.
 
-<!-- tablename="Register 2 Layout" -->
-<!-- tcolumnwidths=0.3in,4.7in -->
   <p><table summary=""><tr align="left"><td valign="top" width="50%">Bit</td><td valign="top" width="50%">Meaning
 <br></td></tr><tr align="left"><td valign="top" width="50%">0</td><td valign="top" width="50%">Fan failure in electronics, UPS in bypass
 <br></td></tr><tr align="left"><td valign="top" width="50%">1</td><td valign="top" width="50%">Fan failure in isolation unit
@@ -9557,15 +9530,13 @@ still in bypass
 
 <p><a name="Register-3"></a>
 
-<h3 class="section">29.10 Register 3</h3>
+<h3 class="section">Register 3</h3>
 
 <p>All bits are valid on the Matrix UPS and 3rd generation SmartUPS
 models. SmartUPS v/s and BackUPS Pro models report bits 0-5. All
 others report 0-4. State change of bits 1,2,5,6,7 are reported
 asynchronously with ? and = messages.
 
-<!-- tablename="Register 3 Layout" -->
-<!-- tcolumnwidths=0.3in,4.7in -->
   <p><table summary=""><tr align="left"><td valign="top" width="50%">Bit</td><td valign="top" width="50%">Meaning
 <br></td></tr><tr align="left"><td valign="top" width="50%">0</td><td valign="top" width="50%">Output unpowered due to shutdown by low battery
 <br></td></tr><tr align="left"><td valign="top" width="50%">1</td><td valign="top" width="50%">Unable to transfer to battery due to overload
@@ -9579,7 +9550,7 @@ asynchronously with ? and = messages.
 
 <p><a name="Interpretation-of-the-Old-Firmware-Revision"></a>
 
-<h3 class="section">29.11 Interpretation of the Old Firmware Revision</h3>
+<h3 class="section">Interpretation of the Old Firmware Revision</h3>
 
 <p>The Old Firmware Revision is obtained with the "V"
 command, which gives a typical response such as "GWD" or
@@ -9619,7 +9590,7 @@ command, which gives a typical response such as "GWD" or
 </pre>
   <p><a name="Interpretation-of-the-New-Firmware-Revision"></a>
 
-<h3 class="section">29.12 Interpretation of the New Firmware Revision</h3>
+<h3 class="section">Interpretation of the New Firmware Revision</h3>
 
 <pre class="example">     
      New Firmware revison and model ID String in NN.M.L is the format
@@ -9656,7 +9627,7 @@ command, which gives a typical response such as "GWD" or
 </pre>
 <p><a name="EEPROM-Values"></a>
 
-<h3 class="section">29.13 EEPROM Values</h3>
+<h3 class="section">EEPROM Values</h3>
 
 <p>Upon sending a ^Z, your UPS will probably spit back approximately
 254 characters something like the following (truncated here for the
@@ -9728,13 +9699,11 @@ reason.
 </pre>
   <p><a name="Programming-the-UPS-EEPROM"></a>
 
-<h3 class="section">29.14 Programming the UPS EEPROM</h3>
+<h3 class="section">Programming the UPS EEPROM</h3>
 
 <p>There are at this time a maximum of 12 different values that can be
 programmed into the UPS EEPROM. They are:
 
-<!-- tablename="Programming the UPS EEPROM" -->
-<!-- tcolumnwidths=0.7in,1in,3.3in -->
   <p><table summary=""><tr align="left"><td valign="top" width="33%">Item</td><td valign="top" width="33%">Command</td><td valign="top" width="33%">Meaning
 <br></td></tr><tr align="left"><td valign="top" width="33%">1.</td><td valign="top" width="33%">c</td><td valign="top" width="33%">The UPS Id or name
 <br></td></tr><tr align="left"><td valign="top" width="33%">2.</td><td valign="top" width="33%">x</td><td valign="top" width="33%">The last date the batteries were replaced
@@ -9770,7 +9739,7 @@ by a vertical bar (|) to indicate that the EEPROM was changed.
 
 <p><a name="Acknowledgements"></a>
 
-<h3 class="section">29.15 Acknowledgements</h3>
+<h3 class="section">Acknowledgements</h3>
 
 <p>The apcupsd has a rather long and tormented history. Many thanks to
 the guys that, with time, contributed to the general public
@@ -9788,11 +9757,11 @@ Steven Freed, <a href="http://www.exploits.org/~rkroll/contact.html">Russell Kro
 
 <p><a name="Apcupsd-_002d_002d-RPM-Packaging-FAQ"></a>
 
-<h2 class="chapter">30 Apcupsd &ndash; RPM Packaging FAQ</h2>
+<h2 class="chapter">Apcupsd &ndash; RPM Packaging FAQ</h2>
 
 <p><a name="Answers"></a>
 
-<h3 class="section">30.1 Answers</h3>
+<h3 class="section">Answers</h3>
 
      <dl>
 <dt><strong>How do I build Apcupsd for platform xxx?</strong><dd>The apcupsd spec file contains defines to build for
@@ -9868,9 +9837,8 @@ the file if it already exists) and add the following line:
 
 <p><a name="Credits-_003c1_003e"></a>
 
-<h2 class="appendix">Appendix A Credits</h2>
+<h2 class="appendix">Credits</h2>
 
-<!-- imagename="Thanks" -->
 <div class="block-image"><img src="thanks.png" alt="thanks.png"></div>
 
   <p>The success of apcupsd is due to the many
@@ -9883,7 +9851,7 @@ UPSmanagement.
 
 <p><a name="Contributors"></a>
 
-<h3 class="section">A.1 Contributors</h3>
+<h3 class="section">Contributors</h3>
 
      <dl>
 <dt>Current Code Maintainer and Project Manager:<dd>Kern Sibbald (kern at sibbald dot com)
@@ -10004,7 +9972,7 @@ templates for our Win32 code, see:
 
 <p><a name="Disclaimer_003b-NO-WARRANTY"></a>
 
-<h3 class="section">A.2 Disclaimer: NO WARRANTY</h3>
+<h3 class="section">Disclaimer: NO WARRANTY</h3>
 
 <p><a name="index-Disclaimer-264"></a>
 BECAUSE THE PROGRAM IS LICENSED FREE OF CHARGE, THERE IS NO
@@ -10031,7 +9999,7 @@ ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 
 <p><a name="Kernel-Config"></a>
 
-<h2 class="appendix">Appendix B Kernel Config</h2>
+<h2 class="appendix">Kernel Config</h2>
 
 <p>A typical USB section of a .config file might be:
 

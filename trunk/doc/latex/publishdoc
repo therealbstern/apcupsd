@@ -1,8 +1,8 @@
 #!/bin/sh
 echo "Copying manual to www/apcupsd"
 sudo rm -f /mnt/matou/home/www/apcupsd/public/docs/3.10.x-manual/*
-sudo cp -afup /home/kern/apcupsd/k/doc/texi/manual.pdf /mnt/matou/home/www/apcupsd/public/docs/3.10.x-manual/apcupsd.pdf
-sudo cp -afup /home/kern/apcupsd/k/doc/texi/manual.html /mnt/matou/home/www/apcupsd/public/docs/3.10.x-manual/manual.html
-sudo cp -afup /home/kern/apcupsd/k/doc/texi/manual/* /mnt/matou/home/www/apcupsd/public/docs/3.10.x-manual
+sudo cp -afup /home/kern/apcupsd/k/doc/latex/apcupsd.pdf /mnt/matou/home/www/apcupsd/public/docs/3.10.x-manual/apcupsd.pdf
+sudo cp -afup /home/kern/apcupsd/k/doc/latex/apcupsd.html /mnt/matou/home/www/apcupsd/public/docs/3.10.x-manual/manual.html
+sudo cp -afup /home/kern/apcupsd/k/doc/latex/apcupsd/* /mnt/matou/home/www/apcupsd/public/docs/3.10.x-manual
 echo "Setting correct permissions"
 sudo ./set_permissions
