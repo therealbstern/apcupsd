@@ -44,18 +44,18 @@
 #include "status.h"
 
 
-char   monhost[256];
-char   img1s[16];
-char   img2s[16];
-char   img3s[16];
-char   temps[16];
-char   answer[256];
-char   answer2[256];
-char   answer3[256];
+static char   monhost[256];
+static char   img1s[16];
+static char   img2s[16];
+static char   img3s[16];
+static char   temps[16];
+static char   answer[256];
+static char   answer2[256];
+static char   answer3[256];
 
 extern int fetch_events(char *host);
 
-void parsearg(char var[255], char value[255]) 
+void parsearg(char *var, char *value) 
 {
     if (!strcmp(var, "host")) {
 	strncpy (monhost, value, sizeof(monhost));

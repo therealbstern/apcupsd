@@ -20,7 +20,7 @@
 static char   monhost[256];
 static char   answer[256];
 
-void parsearg(char var[255], char value[255]) 
+void parsearg(char *var, char *value) 
 {
     if (!strcmp(var, "host")) {
 	strncpy (monhost, value, sizeof(monhost));
