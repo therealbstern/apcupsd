@@ -48,9 +48,11 @@ int output_status(UPSINFO *ups, int sockfd,
 
     s_open(ups);
 
+#ifdef HAVE_PTHREADS
     if (ups->poll_time == 0) {	  /* this is always zero on slave */
        ups->poll_time = now;
     }
+#endif
 
     localtime_r(&ups->poll_time, &tm);
     strftime(datetime, 100, "%a %b %d %X %Z %Y", &tm);
