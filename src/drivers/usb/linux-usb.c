@@ -1017,54 +1017,61 @@ static int write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
 	rinfo.report_type = info->uref.report_type;
 	rinfo.report_id = info->uref.report_id;
 	if (ioctl(my_data->fd, HIDIOCGREPORT, &rinfo) < 0) {  /* update Report */
-            Dmsg1(000, "HIDIOCGREPORT for shutdown failed. ERR=%s\n", strerror(errno));
+            Dmsg2(000, "HIDIOCGREPORT for shutdown function %s failed. ERR=%s\n", 
+		  name, strerror(errno));
 	    return 0;
 	}
 	rinfo.report_type = info->uref.report_type;
 	rinfo.report_id = info->uref.report_id;
 	if (ioctl(my_data->fd, HIDIOCGREPORTINFO, &rinfo) < 0) {  /* get Report */
-            Dmsg1(000, "HIDIOCGREPORT for shutdown failed. ERR=%s\n", strerror(errno));
+            Dmsg2(000, "HIDIOCGREPORT for shutdown function %s failed. ERR=%s\n", 
+		  name, strerror(errno));
 	    return 0;
 	}
-        Dmsg1(000, "REPORTINFO num_fields=%d\n", rinfo.num_fields);
+        Dmsg1(100, "REPORTINFO num_fields=%d\n", rinfo.num_fields);
 	finfo.report_type = info->uref.report_type;
 	finfo.report_id = info->uref.report_id;
 	if (ioctl(my_data->fd, HIDIOCGFIELDINFO, &finfo) < 0) {  /* Get field info */
-            Dmsg1(000, "HIDIOCGFIELDINFO for shutdown failed. ERR=%s\n", strerror(errno));
+            Dmsg2(000, "HIDIOCGFIELDINFO for shutdown function %s failed. ERR=%s\n", 
+		  name, strerror(errno));
 	    return 0;
 	}
-        Dmsg7(000, "FIELDINFO type=%d id=%d index=%d logical_min=%d \n\
+        Dmsg7(100, "FIELDINFO type=%d id=%d index=%d logical_min=%d \n\
 logical_max=%d exponent=%d unit=0x%x\n",
 	    finfo.report_type, finfo.report_id, finfo.field_index,
 	    finfo.logical_minimum, finfo.logical_maximum, 
 	    finfo.unit_exponent, finfo.unit);
-        Dmsg3(000, "GUSAGE type=%d id=%d index=%d\n", info->uref.report_type,
+        Dmsg3(100, "GUSAGE type=%d id=%d index=%d\n", info->uref.report_type,
 	   info->uref.report_id, info->uref.field_index);
 	if (ioctl(my_data->fd, HIDIOCGUSAGE, &info->uref) < 0) {  /* get UPS value */
-            Dmsg1(000, "HIDIOCSUSAGE for shutdown failed. ERR=%s\n", strerror(errno));
+            Dmsg2(000, "HIDIOCSUSAGE for shutdown function %s failed. ERR=%s\n", 
+		  name, strerror(errno));
 	    return 0;
 	}
 	old_value = info->uref.value;
 	info->uref.value = value;
-        Dmsg3(000, "SUSAGE type=%d id=%d index=%d\n", info->uref.report_type,
+        Dmsg3(100, "SUSAGE type=%d id=%d index=%d\n", info->uref.report_type,
 	   info->uref.report_id, info->uref.field_index);
 	if (ioctl(my_data->fd, HIDIOCSUSAGE, &info->uref) < 0) {  /* update UPS value */
-            Dmsg1(000, "HIDIOCSUSAGE for shutdown failed. ERR=%s\n", strerror(errno));
+            Dmsg2(000, "HIDIOCSUSAGE for shutdown function %s failed. ERR=%s\n", 
+		  name, strerror(errno));
 	    return 0;
 	}
 	for (i=0; i < 1; i++) {
 	   if (ioctl(my_data->fd, HIDIOCSREPORT, &rinfo) < 0) {  /* update Report */
-               Dmsg1(000, "HIDIOCSREPORT for shutdown failed. ERR=%s\n", strerror(errno));
+               Dmsg2(000, "HIDIOCSREPORT for shutdown function %s failed. ERR=%s\n", 
+		     name, strerror(errno));
 	       return 0;
 	   }
 	}
 	if (ioctl(my_data->fd, HIDIOCGUSAGE, &info->uref) < 0) {  /* get UPS value */
-            Dmsg1(000, "HIDIOCSUSAGE for shutdown failed. ERR=%s\n", strerror(errno));
+            Dmsg2(000, "HIDIOCSUSAGE for shutdown function %s failed. ERR=%s\n", 
+		  name, strerror(errno));
 	    return 0;
 	}
 	new_value = info->uref.value;
-        Dmsg2(100, "shutdown ci=%d value=%d OK.\n", ci, value);
-        Dmsg4(000, "%s before=%d set=%d after=%d\n", name, old_value, value, new_value);
+        Dmsg3(000, "Shutdown function %s ci=%d value=%d OK.\n", name, ci, value);
+        Dmsg4(100, "%s before=%d set=%d after=%d\n", name, old_value, value, new_value);
 	return 1;
     }
     return 0;
