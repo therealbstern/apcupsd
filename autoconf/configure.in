@@ -612,7 +612,7 @@ dnl First search for system library that defines gdImagePng
        [
 	 echo '  using PNG file format (/usr/lib).'
 	 AC_DEFINE(SYS_IMGFMT_PNG)
-	 LIBS="$LIBS -lgd"
+	 LIBGDOBJ="-lgd"
 	 SYS_GD_FOUND=yes
        ], [], [])
 dnl
@@ -623,7 +623,7 @@ dnl Second search for system library that defines gdImageGif
 	 [
 	   echo '  using GIF file format (/usr/lib).'
 	   AC_DEFINE(SYS_IMGFMT_GIF)
-	   LIBS="$LIBS -lgd"
+	   LIBGDOBJ="-lgd"
 	   SYS_GD_FOUND=yes
 	 ], [], [])
      fi
@@ -641,7 +641,7 @@ dnl Destroy cached value
 	 [
 	   echo '  using PNG file format (/usr/local/lib).'
 	   AC_DEFINE(SYS_IMGFMT_PNG)
-	   LIBS="$LIBS -lgd"
+	   LIBGDOBJ="-lgd"
 	   SYS_GD_FOUND=yes
 	 ], [], [])
      fi
@@ -655,7 +655,7 @@ dnl Destroy cached value
 	 [
 	   echo '  using GIF file format (/usr/local/lib).'
 	   AC_DEFINE(SYS_IMGFMT_GIF)
-	   LIBS="$LIBS -lgd"
+	   LIBGDOBJ="-lgd"
 	   SYS_GD_FOUND=yes
 	 ], [], [])
      fi
@@ -898,7 +898,7 @@ AC_ARG_ENABLE(master-slave, [
 
 CGIBIN="/etc/apcupsd"
 AC_ARG_WITH(cgi-bin,
-	[  --with-cgi-bin=DIR	   Specify cgi-bin directory (default=/etc/apcupsd/cgi)],
+	[  --with-cgi-bin=DIR	   Specify cgi-bin directory (default=/etc/apcupsd)],
 	[
 	   CGIBIN="$withval";
 	]

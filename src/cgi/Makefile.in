@@ -28,7 +28,7 @@ FOBJS = upsfstats.o upsfetch.o cgilib.o
 # The libgd-1.2 can be generated automatically when checking
 # dependencies.
 
-IOBJS = upsimage.o upsfetch.o cgilib.o @LIBGDOBJ@
+IOBJS = upsimage.o upsfetch.o cgilib.o
 GDINCLUDE = @GDINCLUDE@
 
 all-targets: $(allexe)
@@ -43,7 +43,7 @@ upsfstats.cgi: $(FOBJS)
 	$(CC) $(LDFLAGS) -o $@ $(FOBJS) $(LIBS)
 
 upsimage.cgi: $(IOBJS)
-	$(CC) $(LDFLAGS) -o $@ $(IOBJS) $(LIBS) -lm
+	$(CC) $(LDFLAGS) -o $@ $(IOBJS) @LIBGDOBJ@ $(LIBS) -lm
 
 clean: targetclean
 
