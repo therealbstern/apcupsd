@@ -42,7 +42,7 @@
 %{?build_usb:%define usb 1}
 
 %if %{su9}
-%define initdir /etc/init.d
+%define initdir /etc/rc.d
 %else
 %define initdir /etc/rc.d/init.d
 %endif
