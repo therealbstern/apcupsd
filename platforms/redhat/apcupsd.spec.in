@@ -129,7 +129,7 @@ install -m755 platforms/redhat/apcupsd $RPM_BUILD_ROOT%{initdir}
 %clean
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 
-%if %{usb)
+%if %{usb}
 
 %files usb-${rh_version}
 %defattr(-,root,root)
