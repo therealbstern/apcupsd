@@ -73,28 +73,32 @@ static int rfc_1628_check_alarms(UPSINFO *ups) {
      * alarms.
      */
     if (ups_mib_mgr_get_upsAlarmEntry(s, &(data->upsAlarmEntry)) == -1) {
-        UPS_SET(UPS_COMMLOST);
-        free(data->upsAlarmEntry);
-        return 0;
+	UPS_SET(UPS_COMMLOST);
+	free(data->upsAlarmEntry);
+	return 0;
     } else {
-        UPS_CLEAR(UPS_COMMLOST);
+	UPS_CLEAR(UPS_COMMLOST);
     }
     free(data->upsAlarmEntry);
     return 1;
 }
 
 int rfc1628_snmp_kill_ups_power(UPSINFO *ups) {
-    struct snmp_ups_internal_data *Sid = ups->driver_internal_data;
-    struct snmp_session *s = &Sid->session;
-    ups_mib_t *data = Sid->MIB;
+/*
+ *  struct snmp_ups_internal_data *Sid = ups->driver_internal_data;
+ *  struct snmp_session *s = &Sid->session;
+ *  ups_mib_t *data = Sid->MIB;
+ */
 
     return 0;
 }
 
 int rfc1628_snmp_ups_get_capabilities(UPSINFO *ups) {
-    struct snmp_ups_internal_data *Sid = ups->driver_internal_data;
-    struct snmp_session *s = &Sid->session;
-    ups_mib_t *data = Sid->MIB;
+/*
+ *  struct snmp_ups_internal_data *Sid = ups->driver_internal_data;
+ *  struct snmp_session *s = &Sid->session;
+ *  ups_mib_t *data = Sid->MIB;
+ */
     int i = 0;
 
     /*
@@ -103,34 +107,40 @@ int rfc1628_snmp_ups_get_capabilities(UPSINFO *ups) {
      * capabilities. We do this way for sake of simplicity.
      */
     for (i = 0; i <= CI_MAX_CAPS; i++) {
-        ups->UPS_Cap[i] = TRUE;
+	ups->UPS_Cap[i] = TRUE;
     }
 
     return 1;
 }
 
 int rfc1628_snmp_ups_read_static_data(UPSINFO *ups) {
-    struct snmp_ups_internal_data *Sid = ups->driver_internal_data;
-    struct snmp_session *s = &Sid->session;
-    ups_mib_t *data = Sid->MIB;
+/*
+ *  struct snmp_ups_internal_data *Sid = ups->driver_internal_data;
+ *  struct snmp_session *s = &Sid->session;
+ *  ups_mib_t *data = Sid->MIB;
+ */
 
     rfc_1628_check_alarms(ups);
     return 1;
 }
 
 int rfc1628_snmp_ups_read_volatile_data(UPSINFO *ups) {
-    struct snmp_ups_internal_data *Sid = ups->driver_internal_data;
-    struct snmp_session *s = &Sid->session;
-    ups_mib_t *data = Sid->MIB;
+/*
+ *  struct snmp_ups_internal_data *Sid = ups->driver_internal_data;
+ *  struct snmp_session *s = &Sid->session;
+ *  ups_mib_t *data = Sid->MIB;
+ */
 
     rfc_1628_check_alarms(ups);
     return 1;
 }
 
 int rfc1628_snmp_ups_check_state(UPSINFO *ups) {
-    struct snmp_ups_internal_data *Sid = ups->driver_internal_data;
-    struct snmp_session *s = &Sid->session;
-    ups_mib_t *data = Sid->MIB;
+/*
+ *  struct snmp_ups_internal_data *Sid = ups->driver_internal_data;
+ *  struct snmp_session *s = &Sid->session;
+ *  ups_mib_t *data = Sid->MIB;
+ */
 
     rfc_1628_check_alarms(ups);
     return 1;
