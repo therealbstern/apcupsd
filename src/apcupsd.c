@@ -303,7 +303,7 @@ int main(int argc, char *argv[]) {
      * it at any time. However, please note that if the user
      * specifies a different facility in the config file
      * the log will be closed and reopened (see match_facility())
-     * in apcconfig.c.	      Any changes here should also be made
+     * in apcconfig.c.	Any changes here should also be made
      * to the code in match_facility().
      */
     openlog("apcupsd", LOG_CONS|LOG_PID, ups->sysfac);   
@@ -334,6 +334,8 @@ int main(int argc, char *argv[]) {
 
     if (go_background) {
        daemon_start();
+       /* Reopen log file, closed during becoming daemon */
+       openlog("apcupsd", LOG_CONS|LOG_PID, ups->sysfac);   
     }
 
     setproctitle("apcmain");
@@ -484,6 +486,9 @@ static void daemon_start(void)
 
     /* Child continues */
     setsid();			       /* become session leader */
+
+    /* Call closelog() to close syslog file descriptor */
+    closelog();
 
     /* In the PRODUCTION system, we close ALL
      * file descriptors except stdin, stdout, and stderr.
