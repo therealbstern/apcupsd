@@ -6156,7 +6156,7 @@ EOF
 
 VERSION=`sed -n -e 's/^.*VERSION.*"\(.*\)"$/\1/p' ${srcdir}/include/version.h`
 #AC_DEFINE_UNQUOTED(VERSION, "$VERSION")
-DATE=`sed -n -e 's/^.* \t*DATE.*"\(.*\)"$/\1/p' ${srcdir}/include/version.h`
+DATE=`sed -n -e 's/^.* \t*ADATE.*"\(.*\)"$/\1/p' ${srcdir}/include/version.h`
 LSMDATE=`sed -n -e 's/^.*LSMDATE.*"\(.*\)"$/\1/p' ${srcdir}/include/version.h`
 
 
@@ -8787,6 +8787,8 @@ case $host_os in
 	;;
 esac
 
+CCVERSION=`${CC} --version`
+
 
 VARIABLES=$srcdir/autoconf/variables.mak
 
@@ -9358,6 +9360,7 @@ echo "
 
 Configuration on `date`:
 
+  Host: 		      $host -- ${DISTNAME} ${DISTVER} 
   Apcupsd version:	      ${VERSION} (${DATE})
   Source code location:       ${srcdir}
   Install binaries:	      ${sbindir}
@@ -9368,7 +9371,7 @@ Configuration on `date`:
   LOG dir (events, status)    ${LOGDIR}
   LOCK dir (for serial port)  ${LOCKDIR}
   Power Fail dir	      ${PWRFAILDIR}
-  Compiler:		      ${CC}
+  Compiler:		      ${CC} ${CCVERSION}
   Compiler flags:	      ${CFLAGS} ${PTHREAD_FLAGS}
   Loader flags: 	      ${LDFLAGS}
   Host and version:	      ${DISTNAME} ${DISTVER}

@@ -306,44 +306,45 @@ PSTR CmdLine, int iCmdShow)
 //DWORD WINAPI Main_Msg_Loop(LPVOID lpwThreadParam)
 void *Main_Msg_Loop(LPVOID lpwThreadParam)
 {
-        DWORD old_servicethread = g_servicethread;
+    DWORD old_servicethread = g_servicethread;
 
-        pthread_detach(pthread_self());
- 
-        /* Since we are the only thread with a message loop
-         * mark ourselves as the service thread so that
-         * we can receive all the window events.
-         */
-        g_servicethread = GetCurrentThreadId();
+    pthread_detach(pthread_self());
 
-        // Create tray icon & menu if we're running as an app
-        upsMenu *menu = new upsMenu();
-        if (menu == NULL) {
-           PostQuitMessage(0);
-        }
+    /* Since we are the only thread with a message loop
+     * mark ourselves as the service thread so that
+     * we can receive all the window events.
+     */
+    g_servicethread = GetCurrentThreadId();
+
+    // Create tray icon & menu if we're running as an app
+    upsMenu *menu = new upsMenu();
+    if (menu == NULL) {
+       PostQuitMessage(0);
+    }
 
 
-        // Now enter the Windows message handling loop until told to quit!
-        MSG msg;
-        while (GetMessage(&msg, NULL, 0,0) ) {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
-        }
+    // Now enter the Windows message handling loop until told to quit!
+    MSG msg;
+    while (GetMessage(&msg, NULL, 0,0) ) {
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+    }
 
-        if (menu != NULL)
-           delete menu;
+    if (menu != NULL) {
+       delete menu;
+    }
 
-        if (old_servicethread != 0) { /* started as NT service */
-           // Mark that we're no longer running
-           g_servicethread = 0;
+    if (old_servicethread != 0) { /* started as NT service */
+       // Mark that we're no longer running
+       g_servicethread = 0;
 
-           // Tell the service manager that we've stopped.
-           ReportStatus(SERVICE_STOPPED, g_error, 0);
-        }   
-        pthread_kill(main_tid, SIGTERM);
-        sleep(1);
-        kill(main_pid, SIGTERM);      /* ask main thread to terminate */
-        _exit(0);
+       // Tell the service manager that we've stopped.
+       ReportStatus(SERVICE_STOPPED, g_error, 0);
+    }   
+    pthread_kill(main_tid, SIGTERM);
+    sleep(1);
+    kill(main_pid, SIGTERM);      /* ask main thread to terminate */
+    _exit(0);
 }
  
 
@@ -354,24 +355,25 @@ void *Main_Msg_Loop(LPVOID lpwThreadParam)
 
 int ApcupsdAppMain()
 {
-//        DWORD dwThreadID;
-        pthread_t tid;
+//  DWORD dwThreadID;
+    pthread_t tid;
 
-        // Set this process to be the last application to be shut down.
-        SetProcessShutdownParameters(0x100, 0);
+    // Set this process to be the last application to be shut down.
+    SetProcessShutdownParameters(0x100, 0);
         
-        HWND hservwnd = FindWindow(MENU_CLASS_NAME, NULL);
-        if (hservwnd != NULL) {
-           // We don't allow multiple instances!
-           MessageBox(NULL, "Another instance of Apcupsd is already running", szAppName, MB_OK);
-           return 0;
-        }
+    HWND hservwnd = FindWindow(MENU_CLASS_NAME, NULL);
+    if (hservwnd != NULL) {
+       // We don't allow multiple instances!
+       MessageBox(NULL, "Another instance of Apcupsd is already running", szAppName, MB_OK);
+       _exit(0);
+    }
 
-        // Create a thread to handle the Windows messages
-//        (void)CreateThread(NULL, 0, Main_Msg_Loop, NULL, 0, &dwThreadID);
-        pthread_create(&tid, NULL, Main_Msg_Loop, (void *)0);
+    // Create a thread to handle the Windows messages
+//    (void)CreateThread(NULL, 0, Main_Msg_Loop, NULL, 0, &dwThreadID);
+    pthread_create(&tid, NULL, Main_Msg_Loop, (void *)0);
 
-        // Call the "real" apcupsd
-        ApcupsdMain(num_command_args, command_args);
-        return 0;
+    // Call the "real" apcupsd
+    ApcupsdMain(num_command_args, command_args);
+    PostQuitMessage(0);
+    _exit(0);
 }
