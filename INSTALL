@@ -202,7 +202,7 @@ additional features. These options are:
      system library. When set to [DIR] enables libwrap in DIR.
 
 For RedHat Linux 9 users, some useful configure options are:
-=========================================================
+===========================================================
 
  ./configure --enable-threads --enable-cgi --with-cgi-bin=/var/www/cgi-bin
 
@@ -220,6 +220,50 @@ are installed, the cgi code will use these libraries for generation of png
 images. If these are not installed, the version included with apcupsd will
 be used instead.
 
+Configuring Apache HTTP Server for use with cgi support
+=======================================================
+If you configure apcupsd with the --enable-cgi support you may need to make
+configuration changes to the httpd.conf file. The changes you will need to
+make depend on what directory you choose install the cgi files in.
+
+There are four files which are installed in the cgi-bin directory.
+Three of these are .cgi files which are executable images and the fourth file
+is apcupsd.css which is a style sheet used to give a common style to all output.
+
+There are two ways of enabling cgi support for Apache. The first method is
+to add the following line to httpd.conf:
+
+	ScriptAlias /cgi-bin /var/www/cgi-bin
+
+The second method is to add the following lines to httpd.conf:
+
+	Alias /cgi-bin /var/www/cgi-bin
+	<Directory /var/www/cgi-bin>
+		Options +ExecCGI
+	</Directory>
+	AddHandler cgi-script .cgi
+
+The first example tells Apache that all files in the cgi-bin directory are
+executable cgi programs. The second example tells Apache that programs in
+the cgi-bin directory may be executable cgi programs if the file extension
+is .cgi. You can also add extra extensions to the AddHandler directive if
+you have other files in the directory. For example, if you have perl files
+in your cgi-bin directory:
+
+	AddHandler cgi-script .cgi .pl
+
+Using the first example, you will have a problem with trying to serve
+the file apcupsd.css. Since this file is installed in the cgi-bin directory,
+Apache will assume it is an executable program and will produce an error
+when trying to serve it. You must use the second method of enabling cgi
+support.
+
+If you are using the default Apache configuration file, you  will need
+to remove (or comment out) the first example and replace it with the second.
+
+If you install the apcupsd cgi files in another directory, you will need to
+add the second example to your httpd.conf file and adjust the pathname
+accordingly.
 
 Customization of apcupsd events 
 ================================
