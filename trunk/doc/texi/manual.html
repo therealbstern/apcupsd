@@ -7,12 +7,52 @@
 <link href="http://www.gnu.org/software/texinfo/" rel="generator-home">
 </head>
 <body>
-<h1 class="settitle">apcupsd User's Manual</h1>
+<h2 class="unnumbered"><a name="TOC0"></a></h2>
+
+<br><p>
+<br><p>
+<div align="center"><img src="apcupsd.png" alt="apcupsd.png"></div>
+<br><p>
+<br><p>
+<div align="center"><h1 class="titlefont">Apcupsd User's Manual</h1>
+</div>
+<br><p>
+<br><p>
+<div align="center">Apcupsd Version 3.10.16</div>
+<div align="center">A UPS Control Program</div>
+<br><p>
+<br><p>
+<div align="center">Kern Sibbald</div>
+<br><p>
+<br><p>
+  <p>Apcupsd is a UPS
+control system that permits orderly shutdown of your
+computer in the event of a power failure.
+<br><p>
+<br><p>
+  <p>This document was last updated 06 November 2004
+
+  <p>Copyright &copy; 1999-2004 Kern Sibbald
+
+  <blockquote>
+Copying and distribution of this file, with or without
+modification, are permitted in any medium without royalty provided
+the name Apcupsd, the copyright notice, and this notice are
+preserved. 
+</blockquote>
+
+  <p>Apcupsd source code is released under the GNU General Public
+License version 2. Please see the file COPYING in the main source directory.
+
+  <p>For more information on the project, please visit the main web
+site at <a href="http://www.apcupsd.com">http://www.apcupsd.com</a>.
+
 
 <div class="contents">
 <h2>Table of Contents</h2>
 <ul>
-<li><a name="toc_Top" href="#Top">apcupsd User's Manual</a>
+<li><a name="toc_TOC0" href="#TOC0"></a>
+<li><a name="toc_Top" href="#Top">Apcupsd User's Manual</a>
 <li><a name="toc_Release%20Notes" href="#Release%20Notes">Release Notes</a>
 <ul>
 <li><a href="#New%20Features">New Features</a>
@@ -324,7 +364,6 @@
 </li></ul>
 </div>
 
-
 <div class="node">
 <p><hr>
 Node:<a name="Top">Top</a>,
@@ -332,7 +371,7 @@ Next:<a rel="next" accesskey="n" href="#Release%20Notes">Release Notes</a>
 <br>
 </div>
 
-<h2 class="unnumbered">apcupsd User's Manual</h2>
+<h2 class="unnumbered">Apcupsd User's Manual</h2>
 
 <ul class="menu">
 <li><a accesskey="1" href="#Release%20Notes">Release Notes</a>: 
@@ -7397,19 +7436,24 @@ hand. To install the binaries, you need <strong>WinZip</strong>.
      <li>Simply double click on the
 <code>winapcupsd-3.8.5.tar.gz</code> icon.  The actual name
 of the icon will vary from one release version to another.
-
+<br><p>
      <img src="wininstall3.png" alt="wininstall3.png">
 
+<br><p>
      <li>When Zip says that it has one file and asks if it should unpack
 it into a temporary file, respond with <strong>Yes</strong>.
 
+<br><p>
      <img src="wininstall4.png" alt="wininstall4.png">
 
+<br><p>
      <li>Ensure that you extract all files and that the extraction will
 go into <code>C:\</code>
-
+<br><p>
      <img src="wininstall5.png" alt="wininstall5.png">
-</ul>
+
+<br><p>
+  </ul>
 
   <p>If you wish to install the package elsewhere, please note that you
 will need to proceed with a manual installation, which is not
@@ -7473,18 +7517,18 @@ running.
 
      <p>If everything went well, you will get something similar to the
 following output in a DOS shell window:
-
+<br><p>
      <img src="wininstall1.png" alt="wininstall1.png">
-
+<br><p>
      <p>What is important to verify in the DOS window is that the root
 directory <code>\</code> is mounted on device
 <code>c:\</code>.
 
      <p>The DOS window will be followed immediately by a Windows
 dialogue box as follows:
-
+<br><p>
      <img src="wininstall2.png" alt="wininstall2.png">
-
+<br><p>
      </p><li>On Windows 98, to actually start the service, either reboot the
 machine, which is not necessary, or open a DOS shell window, and
 type the following commands:
@@ -7505,9 +7549,9 @@ which is not necessary, or go to the Control Panel, open the Services
 folder and start the apcupsd daemon program
 by selecting the apcupsd UPS Server and
 then clicking on the Start button as shown below:
-
+<br><p>
      <img src="wininstall6.png" alt="wininstall6.png">
-
+<br><p>
      <p>If the Services dialog reports a problem, it is normally
 because your DEVICE statement does not contain the correct serial
 port name. 

@@ -1,10 +1,13 @@
 \input texinfo    @c -*-texinfo-*-
-@comment $Id: manual.texi,v 1.3 2004-10-30 18:44:47 kerns Exp $
+@comment $Id: manual.texi,v 1.4 2004-11-06 14:27:25 kerns Exp $
 @c %***start of header
 @setfilename manual.info
 @finalout
 @settitle apcupsd User's Manual
 @c %***end of header
+
+@set VERSION 3.10.16
+@set UPDATED 06 November 2004
 
 @ifnottex
 @documentdescription
@@ -19,28 +22,54 @@ Apcupsd UPS User's Manual
 
                                                                                      
 @paragraphindent 2
-                                                                                     
-@titlepage
-@title Apcupsd User's Manual
-@subtitle Version 3.10.16
-@subtitle A UPS control program
-@author Kern Sibbald
-@page
-@vskip 0pt plus 1filll
-                                                                                     
-This manual is for Apcupsd Version 3.10.16, a UPS
+
+
+@unnumbered
+@sp 2
+@center @image{apcupsd}
+@sp 2
+@center @titlefont{Apcupsd User's Manual}
+@sp 2
+@center Apcupsd Version @value{VERSION}
+@center A UPS Control Program
+@sp 2
+@center Kern Sibbald
+@sp 2
+Apcupsd is a UPS                      
 control system that permits orderly shutdown of your
 computer in the event of a power failure.
-                                                                                     
-Copyright (C) 1999-2004, Kern Sibbald
-                                                                                     
+@sp 2
+@page
+
+@iftex
+@vskip 0pt plus 1filll
+@end iftex
+                                                                                      
+This document was last updated @value{UPDATED}
+                                                                                      
+Copyright @copyright{} 1999-2004 Kern Sibbald
+                                                                                      
+@quotation
+Copying and distribution of this file, with or without
+modification, are permitted in any medium without royalty provided
+the name Apcupsd, the copyright notice, and this notice are
+preserved.
+@end quotation
+                                                                                      
+Apcupsd source code is released under the GNU General Public
+License version 2. Please see the file COPYING in the main source directory.
+                                                                                      
+For more information on the project, please visit the main web
+site at @uref{http://www.apcupsd.com, http://www.apcupsd.com}.
+                                                                                      
+@titlepage
 @end titlepage
-                                                                                     
+
 @contents
 
 @ifnottex
 @node Top, Release Notes, ,
-@top apcupsd User's Manual
+@top Apcupsd User's Manual
 @end ifnottex
 
 @menu
@@ -6492,20 +6521,30 @@ hand. To install the binaries, you need @strong{WinZip}.
 Simply double click on the
 @file{winapcupsd-3.8.5.tar.gz} icon.  The actual name
 of the icon will vary from one release version to another.
+@sp 1
 
 @image{wininstall3,,,,png}
 
+@sp 1
 @item
 When Zip says that it has one file and asks if it should unpack
 it into a temporary file, respond with @strong{Yes}.
 
+@sp 1
+
 @image{wininstall4,,,,png}
+
+@sp 1
 
 @item
 Ensure that you extract all files and that the extraction will
 go into @file{C:\}
+@sp 1
 
 @image{wininstall5,,,,png}
+
+@sp 1
+
 @end itemize
 
 If you wish to install the package elsewhere, please note that you
@@ -6573,18 +6612,18 @@ running.
 
 If everything went well, you will get something similar to the
 following output in a DOS shell window:
-
+@sp 1
 @image{wininstall1,,,,png}
-
+@sp 1
 What is important to verify in the DOS window is that the root
 directory @file{\} is mounted on device
 @file{c:\}.
 
 The DOS window will be followed immediately by a Windows
 dialogue box as follows:
-
+@sp 1
 @image{wininstall2,,,,png}
-
+@sp 1
 @item
 On Windows 98, to actually start the service, either reboot the
 machine, which is not necessary, or open a DOS shell window, and
@@ -6608,9 +6647,9 @@ which is not necessary, or go to the Control Panel, open the Services
 folder and start the apcupsd daemon program
 by selecting the apcupsd UPS Server and
 then clicking on the Start button as shown below:
-
+@sp 1
 @image{wininstall6,,,,png}
-
+@sp 1
 If the Services dialog reports a problem, it is normally
 because your DEVICE statement does not contain the correct serial
 port name.
