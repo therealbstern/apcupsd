@@ -9,13 +9,20 @@ see if the bug is already reported and if a patch exists.
 <p>
 There are two ways of reporting bugs: 
 <p>The first
-and recommended way, if you are not 100% sure
+and recommended way, even if you are not 100% sure
 whether it is a bug or not,
 is to send an email to the 
 <a href="mailto:apcupsd-users at lists.sourceforge.net">
 apcupsd-users at lists.sourceforge.net</a> email list.
 The previous address was modified to prevent easy use by spammers. To use it,
 you must replace the <b>at</b> with an @ symbol. 
+p>I get a number of &quot;off-list&quot; emails sent
+directly to me. Please always copy the appropriate list, if you
+do not copy the list, I may not answer you, or I will answer by copying
+the list. If you <em>really</em> have something confidential,
+please clearly indicate it.
+<p>
+
 Please see <b>Information Needed</b> below for what to
 include.
 
@@ -23,10 +30,7 @@ include.
 href="http://sourceforge.net/tracker/?group_id=54413&func=browse">
 http://sourceforge.net/tracker/?group_id=54413&func=browse</a>.<br>This
 second method is less convenient for the the developers as it requires
-us to login to SourceForge to respond. However, this method
-is preferable if you are sure it is a bug since it will
-be clearly tracked. In fact, if you do not open a bug report,
-and the bug is serious enough, we will do so ourselves.
+us to login to SourceForge to respond. 
 <p>
 Which ever method you use, please follow the instructions below.
 

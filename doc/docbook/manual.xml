@@ -702,7 +702,7 @@ C:* #Ifs= 1 Cfg#= 1 Atr=a0 MxPwr= 24mA
 I:  If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=00 Prot=00 Driver=hid
 </screen>
 
-<para>Here are two more ample entries from Kern Sinbbald.  The first
+<para>Here are two more ample entries from Kern Sibbald.  The first
 features a  Back-UPS 350 direct connected USB device:</para>
 
 <programlisting>
