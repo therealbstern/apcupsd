@@ -151,7 +151,7 @@ supplied by APC:
 <br>
 940-0023A     Simple Signal Only, all models.
 <br>
-940-0119A     Simple Signal Only, Back-UPS Office.
+940-0119A     Simple Signal Only, Back-UPS Office, and BackUPS ES.
 <br>
 940-0024[B/C/G]  SmartMode Only, SU and BKPro only.
 <br>
@@ -461,6 +461,42 @@ APC Part# - 940-0119A
  6 (none)     none
 
 </pre>
+
+<h2>BackOffice ES</h2>
+The BackUPS ES has a straight through cable with no identification
+on the plugs. To make it work with <b>apcupsd</b>, specify the
+<b>UPSCABLE 940-0119A</b> and <b>UPSTYPE backups</b>.
+The equivalent of cable 940-0119A is done on a PCB inside the
+unit. Thanks to William Stock for supplying us with the information
+about the straight through cable, the PCB, and the following diagram:
+<pre>
+
+computer           ----------- BackUPS-ES -----------------
+ DB9-M              DB-9F
+  pin    signal      pin
+
+   4      DSR   ->    4 --+
+                          |  diode   resistor
+   6      DTR   ->    6 --+---->|----/\/\/\---o kill power
+
+   1      DCD   <-    1 --+
+                          |
+   2      RxD   <-    2 --+----------------+--o low battery
+                                           |
+   7      RTS   ->    7 --------+--/\/\/\--+
+                                |
+                                +--/\/\/\--+
+                                           |
+   8      RI    <-    8 --+----------------+--o on battery
+                          |
+   9      CTS   <-    9 --+
+
+   5      GND   ---   5 ----------------------o ground
+
+   3      TxD         3 nc
+
+</pre>
+
 
 
 <h2>Win32 Implementation Restrictions for Simple UPSes</h2>

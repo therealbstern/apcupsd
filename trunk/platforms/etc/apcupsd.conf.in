@@ -114,6 +114,14 @@ KILLDELAY 0
 #  EVENT data over the network (used by CGI programs).
 NETSERVER on
 #
+# NISIP <dotted notation ip address>
+#  IP address on which NIS server will listen for incoming connections.
+#  Default value is 0.0.0.0 that means any incoming request will be
+#  serviced but if you want it to listen to a single subnet you can
+#  set it up to that subnet address, for example 192.168.10.0
+#  Additionally you can listen for a single IP like 192.168.10.1
+NISIP 0.0.0.0
+#
 # NISPORT <port> default is 7000
 #  port to use for sending STATUS and EVENTS data over the network.
 #  It is not used unless NETSERVER is on. If you change this port,

@@ -216,6 +216,8 @@ static PAIRS table[] = {
             "Send status information over the network"      }, /* to be deleted */
     { "NETSERVER",   match_index, WHERE(netstats),  onoroff,
             "Become a server for STATUS and EVENTS data on the network"  },
+    { "NISIP",  match_str, WHERE(nisip),  SIZE(nisip),
+            "TCP IP for NIS communications"     },
     { "NISPORT",  match_int, WHERE(statusport), 0,
             "TCP port for Network Information Server communications"     },
     { "SERVERPORT",  match_int, WHERE(statusport), 0,
@@ -772,6 +774,7 @@ void init_ups_struct(UPSINFO *ups)
 
 
 
+    ups->nisip[0] = 0;	    /* no nis IP file as default */
     ups->NetUpsPort	       = 0;
 
     ups->lockfile	     = -1;

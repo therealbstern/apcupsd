@@ -221,8 +221,18 @@ void do_server(UPSINFO *ups)
    int tlog;
    int turnon = 1;
    struct s_arg *arg;
+   struct in_addr local_ip;
 
    init_thread_signals();
+
+	local_ip.s_addr = INADDR_ANY;
+	if (ups->nisip) {
+		if (inet_pton(AF_INET, ups->nisip, &local_ip) != 1) {
+			log_event(ups, LOG_WARNING, "Invalid IP: '%s'", ups->nisip);
+			local_ip.s_addr = INADDR_ANY;
+		}
+	}
+
 
    for (tlog=0; attach_ipc(ups, SHM_RDONLY) != SUCCESS; tlog -= 5*60 ) {
       if (tlog <= 0) {
@@ -262,7 +272,7 @@ void do_server(UPSINFO *ups)
     */
    memset((char *)&serv_addr, 0, sizeof(serv_addr));
    serv_addr.sin_family = AF_INET;
-   serv_addr.sin_addr.s_addr = htonl(INADDR_ANY);
+   serv_addr.sin_addr = local_ip;
    serv_addr.sin_port = htons(ups->statusport);
 
    for (tlog=0; bind(sockfd, (struct sockaddr *)&serv_addr, sizeof(serv_addr)) < 0; tlog -= 5*60 ) {

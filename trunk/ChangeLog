@@ -6,6 +6,10 @@
 /*               ftp://ftp.apcupsd.com                                     */
 /***************************************************************************/
 
+    - Added support for listening on specific IP addresses/subnets in
+      NIS server, from Troy.
+    - Doc updates, from Kern.
+
 ----> Release apcupsd-3.9.9 (18 May 2002)
     - Applied final Kern's patch.
     - Added a little program 'devicedbg' to help in debugging device
