@@ -84,44 +84,50 @@ int checkhost(char *check)
     if (hostlist == NULL)
 	return 1;		/* default to allow */
 
-    while (fgets(buf, sizeof(buf), hostlist)) {
+    while (fgets(buf, (size_t) sizeof(buf), hostlist)) {
         if (strncmp("MONITOR", buf, 7) == 0) {
             sscanf (buf, "%*s %s", addr);
 	    if (strncmp(addr, check, strlen(check)) == 0) {
-		fclose (hostlist);
+		(void) fclose (hostlist);
 		return 1;	/* allowed */
 	    }
 	}
     }
-    fclose (hostlist);
+    (void) fclose (hostlist);
     return 0;		    /* denied */
 }	
 
 /*
  * Output a string taking care to assure that any html meta characters
  * are output properly.
+ *
+ * Note: XHTML added the meta character &apos;, but for backwards compatibility
+ * with HTML 4.0, output it as &#39;
  */
 void html_puts(const unsigned char *p)
 {
     while (*p != '\0') {
         if (*p >= 0x7f) {
-            printf ("&#%d;", *p);
+            printf ("&#%d;", (int) *p);
         } else {
             switch (*p) {
                 case '\"':
-                    fputs("&quot;", stdout);
+                    (void) fputs("&quot;", stdout);
                     break;
                 case '&':
-                    fputs("&amp;", stdout);
+                    (void) fputs("&amp;", stdout);
+                    break;
+                case '\'':
+                    (void) fputs("&#39;", stdout);
                     break;
                 case '<':
-                    fputs("&lt;", stdout);
+                    (void) fputs("&lt;", stdout);
                     break;
                 case '>':
-                    fputs("&gt;", stdout);
+                    (void) fputs("&gt;", stdout);
                     break;
                 default:
-                    putchar(*p);
+                    (void) putchar(*p);
                     break;
             }
         }
