@@ -79,6 +79,8 @@ int dumb_ups_kill_power(UPSINFO *ups)
 	    break;
 
 	case APC_940_0119A:
+	case APC_940_0127A:
+	case APC_940_0128A:
 	case APC_940_0020B:	  /* killpwr_bit */
 	case APC_940_0020C:
 	    serial_bits = TIOCM_DTR;
@@ -202,6 +204,8 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
 	    break;
 
 	case APC_940_0119A:
+	case APC_940_0127A:
+	case APC_940_0128A:
 	case APC_940_0020B:
 	case APC_940_0020C:
 	    if (ups->sp_flags & TIOCM_CTS) {

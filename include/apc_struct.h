@@ -65,6 +65,8 @@ typedef enum {
     NO_CABLE=0,     /* Default Disable            */
     CUSTOM_SIMPLE,  /* SIMPLE cable simple        */
     APC_940_0119A,  /* APC cable number 940-0119A */
+    APC_940_0127A,  /* APC cable number 940-0127A */
+    APC_940_0128A,  /* APC cable number 940-0128A */
     APC_940_0020B,  /* APC cable number 940-0020B */
     APC_940_0020C,  /* APC cable number 940-0020C identical to 20B */
     APC_940_0023A,  /* APC cable number 940-0023A */

@@ -164,6 +164,8 @@ int dumb_ups_close(UPSINFO *ups)
 	    break;
 
 	case APC_940_0119A:
+	case APC_940_0127A:
+	case APC_940_0128A:
 	case APC_940_0020B:	     /* clear killpwr_bit */
 	case APC_940_0020C:
 	    (void)ioctl(ups->fd, TIOCMBIC, &dtr_bit);
@@ -201,6 +203,8 @@ int dumb_ups_setup(UPSINFO *ups) {
 	    break;
 
 	case APC_940_0119A:
+	case APC_940_0127A:
+	case APC_940_0128A:
 	case APC_940_0020B:
 	case APC_940_0020C:
 	case MAM_CABLE: 	      /* DTR=>enable CD & CTS RTS=>killpower */
