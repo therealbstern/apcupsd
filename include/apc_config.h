@@ -259,4 +259,13 @@ extern struct tm *localtime_r(const time_t *timep, struct tm *tm);
 extern int inet_pton(int af, const char *src, void *dst);
 #endif
 
+/* Determine if the C(++) compiler requires complete function prototype  */
+#ifndef __P
+# if defined(__STDC__) || defined(__cplusplus) || defined(c_plusplus)
+#  define __P(x) x
+# else
+#  define __P(x) ()
+# endif
+#endif
+
 #endif /* _APC_CONFIG */
