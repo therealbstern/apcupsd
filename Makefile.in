@@ -51,6 +51,7 @@ distclean: example_distclean targetdistclean
 	$(RMF) TAGS tags
 	$(RMF) config.cache config.status config.log config.out stamp-config
 	$(RMF) Makefile
+	rm -rf CVS
 
 # -----------------------------------------------------------------------
 # DO NOT DELETE THIS LINE -- make depend depends on it.

@@ -110,6 +110,7 @@ static struct {
 static int ncmd = 0;
 
 UPSINFO eeprom_ups;
+UPSINFO *core_ups = &eeprom_ups;
 
 /* Table of the UPS command, the apcupsd configuration directive,
  *  and an explanation of what the command sets in the EPROM.

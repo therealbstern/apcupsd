@@ -17,7 +17,7 @@ all-targets:
 clean: targetclean
 
 distclean: targetdistclean
-	$(RMF) libintl.h config.h Makefile
+	$(RMF) libintl.h config.h Makefile CVS
 
 # -----------------------------------------------------------------------
 # DO NOT DELETE THIS LINE -- make depend depends on it.

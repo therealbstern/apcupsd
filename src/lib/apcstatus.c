@@ -102,7 +102,7 @@ int output_status(UPSINFO *ups, int sockfd,
     }
 
     /* If slave, send last update time/date from master */
-    if (UPS_ISSET(UPS_SLAVE)) {	  /* we must be a slave */
+    if (UPS_ISSET(UPS_SLAVE)) {   /* we must be a slave */
        if (ups->last_master_connect_time == 0) {
           s_write(ups, "MASTERUPD: No connection to Master\n");
        } else {
@@ -144,9 +144,9 @@ int output_status(UPSINFO *ups, int sockfd,
 	    }
 	} else {
         s_write(ups, "LINEFAIL : DOWN\n");
-        if (!UPS_ISSET(UPS_BATTLOW)) {
+	if (!UPS_ISSET(UPS_BATTLOW)) {
             s_write(ups, "BATTSTAT : RUNNING\n");
-        } else {
+	} else {
             s_write(ups, "BATTSTAT : FAILING\n");
 	    }
 	}
@@ -471,8 +471,8 @@ char *ups_status(int stat)
        return buf;
     }
       
-    if (read_shmarea(ups, 0) != SUCCESS) {
-         Error_abort0(_("Cannot read shm data area.\n"));
+    if (read_lock(ups)) {
+         Error_abort0(_("Cannot read UPS data area.\n"));
     }
 
     if (!UPS_ISSET(UPS_ONBATT))
@@ -501,28 +501,29 @@ char *ups_status(int stat)
     case DUMB_UPS:
     case NETWORK_UPS:
     case SNMP_UPS:
-	    buf[0] = 0;
-	    /* Now output human readable form */
-	    if (UPS_ISSET(UPS_CALIBRATION))
-                strcat(buf, "CAL ");
-	    if (UPS_ISSET(UPS_SMARTTRIM))
-                strcat(buf, "TRIM ");
-	    if (UPS_ISSET(UPS_SMARTBOOST))
-                strcat(buf, "BOOST ");
-	    if (UPS_ISSET(UPS_ONLINE))
-                strcat(buf, "ONLINE ");
-	    if (UPS_ISSET(UPS_ONBATT))
-                strcat(buf, "ON BATTERY ");
-	    if (UPS_ISSET(UPS_OVERLOAD))
-                strcat(buf, "OVERLOAD ");
-	    if (UPS_ISSET(UPS_BATTLOW))
-                strcat(buf, "LOWBATT ");
-	    if (UPS_ISSET(UPS_REPLACEBATT))
-                strcat(buf, "REPLACEBATT ");
+	buf[0] = 0;
+	/* Now output human readable form */
+	if (UPS_ISSET(UPS_CALIBRATION))
+            strcat(buf, "CAL ");
+	if (UPS_ISSET(UPS_SMARTTRIM))
+            strcat(buf, "TRIM ");
+	if (UPS_ISSET(UPS_SMARTBOOST))
+            strcat(buf, "BOOST ");
+	if (UPS_ISSET(UPS_ONLINE))
+            strcat(buf, "ONLINE ");
+	if (UPS_ISSET(UPS_ONBATT))
+            strcat(buf, "ON BATTERY ");
+	if (UPS_ISSET(UPS_OVERLOAD))
+            strcat(buf, "OVERLOAD ");
+	if (UPS_ISSET(UPS_BATTLOW))
+            strcat(buf, "LOWBATT ");
+	if (UPS_ISSET(UPS_REPLACEBATT))
+            strcat(buf, "REPLACEBATT ");
 	if (!UPS_ISSET(UPS_ONBATT) && ups->UPS_Cap[CI_BATTLEV])
 	    battstat = (int)ups->BattChg;
 	break;
     }
+    read_unlock(ups);
 
     return buf;
 }

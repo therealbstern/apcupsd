@@ -7,7 +7,13 @@
 /*               ftp://ftp.apcupsd.com                                     */
 /***************************************************************************/
 
-----> Release apcupsd-3.10.4 (21 Jan 2003)
+----> Release apcupsd-3.10.4 (28 Jan 2003)
+    28Jan03
+    - Fixed a lot of problems in the Win32 build (improper #ifdefing,
+      missing prototypes, inet_pton not properly ifdeffed. Header files
+      that are not available, ...)
+    - Modified make distclean to remove CVS directories (or most of them).
+    21Jan03
     - Added error messages if old master/slave code called.
     - Reworked the messages for ./configure --help to be aligned and
       clearer for networking and master/slave

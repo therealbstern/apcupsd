@@ -32,3 +32,4 @@ clean:
 
 distclean:
 	@rm -f apcupsd halt-setup.sh Makefile halt apccontrol.sh
+	@rm -rf CVS

@@ -32,6 +32,7 @@
 #define my_name_is(x)
 #define bstrdup(x) strdup(x)
 UPSINFO myUPS;
+UPSINFO *core_ups = &myUPS;
 
 #ifndef MAXSTRING
 #define MAXSTRING 254

@@ -428,6 +428,8 @@ AC_CHECK_HEADERS(
 		)		dnl Check for _all_ included headers.
 fi
 
+AC_CHECK_HEADERS(arpa/nameser.h,AC_DEFINE(HAVE_NAMESER_H))
+
 AC_HEADER_STAT			dnl Check for S_ISDIR and S_ISREG macros.
 AC_HEADER_TIME			dnl Check for time.h and sys/time.h.
 AC_HEADER_SYS_WAIT		dnl Check for <sys/wait.h>
@@ -1269,6 +1271,7 @@ cygwin)
 		src/win32/Makefile \
 		platforms/cygwin/Makefile \
 		platforms/cygwin/apcupsd \
+		platforms/cygwin/apccontrol \
 		"
   ;;
 debian)
@@ -1586,7 +1589,6 @@ dnl
 dnl First entry must always be "variables.mak"
 dnl
 GENERATE_FILES="\
-	Makefile \
 	autoconf/variables.mak \
 	autoconf/Makefile \
 	doc/Makefile \
@@ -1607,6 +1609,7 @@ GENERATE_FILES="\
 	platforms/etc/apcupsd.conf \
 	examples/Makefile \
 	examples/safe.apccontrol \
+	Makefile \
 	$DFILES"
 
 if test "$APCSMART_DRIVER"x != ""x
@@ -1661,10 +1664,10 @@ fi
 
 dnl
 dnl Insert Makefile(s) fragments.
-AC_SUBST_FILE(VARIABLES)
 VARIABLES=$srcdir/autoconf/variables.mak
-AC_SUBST_FILE(TARGETS)
+AC_SUBST_FILE(VARIABLES)
 TARGETS=$srcdir/autoconf/targets.mak
+AC_SUBST_FILE(TARGETS)
 
 AC_OUTPUT([ ${GENERATE_FILES} ], [
 	if test "$SINGLE_MAKEFILE" != "yes"; then

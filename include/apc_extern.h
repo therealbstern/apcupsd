@@ -342,4 +342,9 @@ extern UPSINFO *getUpsByname(char *name);
 extern void generic_error_out(char *file, int line, char *fmt, ...);
 extern void generic_error_exit(char *fmt, ...);
 
+/* 
+ * In apcwinipc.c
+ */
+int winioctl(int fd, int func, int *addr);
+
 #endif /* _APC_EXTERN_H */

@@ -17,7 +17,8 @@ all-targets:
 clean: targetclean
 
 distclean: targetdistclean
-	$(RMF) variables.mak Makefile
+	$(RMF) variables.mak Makefile 
+	@rm -rf CVS
 
 # -----------------------------------------------------------------------
 # DO NOT DELETE THIS LINE -- make depend depends on it.

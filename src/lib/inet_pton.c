@@ -15,8 +15,12 @@
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static char rcsid[] = "$Id: inet_pton.c,v 1.2 2002-07-05 18:03:25 rfacchetti Exp $";
+static char rcsid[] = "$Id: inet_pton.c,v 1.3 2003-01-29 14:01:35 kerns Exp $";
 #endif /* LIBC_SCCS and not lint */
+
+#include "apc.h"
+
+#ifdef HAVE_NAMESER_H
 
 #include <sys/param.h>
 #include <sys/types.h>
@@ -27,7 +31,6 @@ static char rcsid[] = "$Id: inet_pton.c,v 1.2 2002-07-05 18:03:25 rfacchetti Exp
 #include <string.h>
 #include <errno.h>
 
-#include "apc.h"
 
 /*
  * WARNING: Don't even consider trying to compile this on a system where
@@ -43,8 +46,8 @@ static int	inet_pton6 __P((const char *src, u_char *dst));
  *	to network format (which is usually some kind of binary format).
  * return:
  *	1 if the address was valid for the specified address family
- *	0 if the address wasn't valid (`dst' is untouched in this case)
- *	-1 if some other error occurred (`dst' is untouched in this case, too)
+ *      0 if the address wasn't valid (`dst' is untouched in this case)
+ *      -1 if some other error occurred (`dst' is untouched in this case, too)
  * author:
  *	Paul Vixie, 1996.
  */
@@ -70,9 +73,9 @@ inet_pton(af, src, dst)
  * inet_pton4(src, dst)
  *	like inet_aton() but without all the hexadecimal and shorthand.
  * return:
- *	1 if `src' is a valid dotted quad, else 0.
+ *      1 if `src' is a valid dotted quad, else 0.
  * notice:
- *	does not touch `dst' unless it's returning 1.
+ *      does not touch `dst' unless it's returning 1.
  * author:
  *	Paul Vixie, 1996.
  */
@@ -81,14 +84,14 @@ inet_pton4(src, dst)
 	const char *src;
 	u_char *dst;
 {
-	static const char digits[] = "0123456789";
+        static const char digits[] = "0123456789";
 	int saw_digit, octets, ch;
 	u_char tmp[NS_INADDRSZ], *tp;
 
 	saw_digit = 0;
 	octets = 0;
 	*(tp = tmp) = 0;
-	while ((ch = *src++) != '\0') {
+        while ((ch = *src++) != '\0') {
 		const char *pch;
 
 		if ((pch = strchr(digits, ch)) != NULL) {
@@ -102,7 +105,7 @@ inet_pton4(src, dst)
 					return (0);
 				saw_digit = 1;
 			}
-		} else if (ch == '.' && saw_digit) {
+                } else if (ch == '.' && saw_digit) {
 			if (octets == 4)
 				return (0);
 			*++tp = 0;
@@ -120,9 +123,9 @@ inet_pton4(src, dst)
  * inet_pton6(src, dst)
  *	convert presentation level address to network order binary form.
  * return:
- *	1 if `src' is a valid [RFC1884 2.2] address, else 0.
+ *      1 if `src' is a valid [RFC1884 2.2] address, else 0.
  * notice:
- *	(1) does not touch `dst' unless it's returning 1.
+ *      (1) does not touch `dst' unless it's returning 1.
  *	(2) :: in a full address is silently ignored.
  * credit:
  *	inspired by Mark Andrews.
@@ -134,24 +137,24 @@ inet_pton6(src, dst)
 	const char *src;
 	u_char *dst;
 {
-	static const char xdigits_l[] = "0123456789abcdef",
-			  xdigits_u[] = "0123456789ABCDEF";
+        static const char xdigits_l[] = "0123456789abcdef",
+                          xdigits_u[] = "0123456789ABCDEF";
 	u_char tmp[NS_IN6ADDRSZ], *tp, *endp, *colonp;
 	const char *xdigits, *curtok;
 	int ch, saw_xdigit;
 	u_int val;
 
-	memset((tp = tmp), '\0', NS_IN6ADDRSZ);
+        memset((tp = tmp), '\0', NS_IN6ADDRSZ);
 	endp = tp + NS_IN6ADDRSZ;
 	colonp = NULL;
 	/* Leading :: requires some special handling. */
-	if (*src == ':')
-		if (*++src != ':')
+        if (*src == ':')
+                if (*++src != ':')
 			return (0);
 	curtok = src;
 	saw_xdigit = 0;
 	val = 0;
-	while ((ch = *src++) != '\0') {
+        while ((ch = *src++) != '\0') {
 		const char *pch;
 
 		if ((pch = strchr((xdigits = xdigits_l), ch)) == NULL)
@@ -164,7 +167,7 @@ inet_pton6(src, dst)
 			saw_xdigit = 1;
 			continue;
 		}
-		if (ch == ':') {
+                if (ch == ':') {
 			curtok = src;
 			if (!saw_xdigit) {
 				if (colonp)
@@ -180,11 +183,11 @@ inet_pton6(src, dst)
 			val = 0;
 			continue;
 		}
-		if (ch == '.' && ((tp + NS_INADDRSZ) <= endp) &&
+                if (ch == '.' && ((tp + NS_INADDRSZ) <= endp) &&
 		    inet_pton4(curtok, tp) > 0) {
 			tp += NS_INADDRSZ;
 			saw_xdigit = 0;
-			break;	/* '\0' was seen by inet_pton4(). */
+                        break;  /* '\0' was seen by inet_pton4(). */
 		}
 		return (0);
 	}
@@ -196,8 +199,8 @@ inet_pton6(src, dst)
 	}
 	if (colonp != NULL) {
 		/*
-		 * Since some memmove()'s erroneously fail to handle
-		 * overlapping regions, we'll do the shift by hand.
+                 * Since some memmove()'s erroneously fail to handle
+                 * overlapping regions, we'll do the shift by hand.
 		 */
 		const int n = tp - colonp;
 		int i;
@@ -213,3 +216,14 @@ inet_pton6(src, dst)
 	memcpy(dst, tmp, NS_IN6ADDRSZ);
 	return (1);
 }
+#else
+int
+inet_pton(af, src, dst)
+	int af;
+	const char *src;
+	void *dst;
+{
+   return -1;			      /* not implemented */
+}
+
+#endif
