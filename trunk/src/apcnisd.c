@@ -149,7 +149,7 @@ static void status_write(UPSINFO *ups, char *fmt, ...)
     avsnprintf(buf, sizeof(buf), fmt, ap);
     va_end(ap);
 
-    strcat(largebuf, buf);
+    astrncat(largebuf, buf, sizeof(largebuf));
     stat_recs++;
 }
 
