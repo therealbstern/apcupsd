@@ -89,7 +89,7 @@ void log_event(UPSINFO *ups, int level, char *fmt, ...)
      * Sanitize message to be sent to syslog to 
      * eliminate all %s which can be used as exploits.
      */
-    for (p=msg; p=strchr(p, '%'); ) {
+    for (p=msg; (p=strchr(p, '%')); ) {
        *p = '\\';
     }
 
