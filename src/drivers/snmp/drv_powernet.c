@@ -97,7 +97,7 @@ out:
 int powernet_snmp_kill_ups_power(UPSINFO *ups) {
     /* Was 1} change submitted by Kastus Shchuka (kastus@lists.sourceforge.net) 10Dec03 */
     oid upsBasicControlConserveBattery[] =
-		    {1, 3, 6, 1, 4, 1, 318, 1, 1, 1, 6, 1, 0};
+		    {1, 3, 6, 1, 4, 1, 318, 1, 1, 1, 6, 1, 1, 0};
     struct snmp_ups_internal_data *Sid = ups->driver_internal_data;
     struct snmp_session *s = &Sid->session;
     struct snmp_session *peer;
