@@ -16,52 +16,52 @@ ac_default_prefix=/etc
 ac_default_prefix=/usr
 ac_help="$ac_help
 
-  --enable-pthreads        Enable pthreads
-  --disable-pthreads       No pthreads (default)"
+  --enable-pthreads	   Enable pthreads
+  --disable-pthreads	   No pthreads (default)"
 ac_help="$ac_help
   --with-libwrap[=DIR]      Compile in libwrap (tcp_wrappers) support"
 ac_help="$ac_help
-  --enable-cgi             Compile CGI programs"
+  --enable-cgi	      Compile CGI programs"
 ac_help="$ac_help
   --enable-install-distdir Install distribution"
 ac_help="$ac_help
 
   --enable-apcsmart	       Compile APC Smart UPS driver (default)
-  --disable-apcsmart       No APC Smart UPS driver"
+  --disable-apcsmart	   No APC Smart UPS driver"
 ac_help="$ac_help
 
   --enable-dumb 	       Compile dumb UPS driver (default)
   --disable-dumb	       No dumb UPS driver"
 ac_help="$ac_help
 
-  --enable-usb             Compile USB UPS code
-  --disable-usb            No USB UPS code (default)"
+  --enable-usb		   Compile USB UPS code
+  --disable-usb 	   No USB UPS code (default)"
 ac_help="$ac_help
 
-  --enable-net             Compile NETWORKING UPS code
-  --disable-net            No NETWORKING UPS code (default)"
+  --enable-net		   Compile NETWORKING UPS code
+  --disable-net 	   No NETWORKING UPS code (default)"
 ac_help="$ac_help
 
-  --enable-snmp            Compile SNMP UPS code
-  --disable-snmp           No SNMP UPS code (default)"
+  --enable-snmp 	   Compile SNMP UPS code
+  --disable-snmp	   No SNMP UPS code (default)"
 ac_help="$ac_help
 
-  --enable-test            Compile TEST driver code
-  --disable-test           No TEST driver (default)"
+  --enable-test 	   Compile TEST driver code
+  --disable-test	   No TEST driver (default)"
 ac_help="$ac_help
 
-  --enable-nis             Compile NIS server (default)
-  --disable-nis            No NIS server"
+  --enable-nis		   Compile NIS server (default)
+  --disable-nis 	   No NIS server"
 ac_help="$ac_help
 
-  --enable-oldnet          Compile old network server
-  --disable-oldnet         No old network server (default)"
+  --enable-oldnet	   Compile old network server
+  --disable-oldnet	   No old network server (default)"
 ac_help="$ac_help
-  --with-css-dir=DIR      Specify Style Sheet directory (default=)"
+  --with-css-dir=DIR	   Specify Style Sheet directory (default=)"
 ac_help="$ac_help
-  --with-cgi-bin=DIR      Specify cgi-bin directory (default=/etc/apcupsd/cgi)"
+  --with-cgi-bin=DIR	   Specify cgi-bin directory (default=/etc/apcupsd/cgi)"
 ac_help="$ac_help
-  --enable-powerflute      Compile powerflute program"
+  --enable-powerflute	    Compile powerflute program"
 ac_help="$ac_help
   --enable-nls             enable Native Language Support"
 ac_help="$ac_help
@@ -71,23 +71,23 @@ ac_help="$ac_help
 ac_help="$ac_help
   --with-distname=NAME    Specify DISTNAME"
 ac_help="$ac_help
-  --with-nologin=DIR      Specify nologin file directory (default /etc)"
+  --with-nologin=DIR	   Specify nologin file directory (default /etc)"
 ac_help="$ac_help
-  --with-pid-dir=DIR      Specify PIDDIR directory"
+  --with-pid-dir=DIR	   Specify PIDDIR directory (default is OS dependent)"
 ac_help="$ac_help
-  --with-log-dir=DIR      Specify EVENTS and STATUS directory"
+  --with-log-dir=DIR	   Specify EVENTS and STATUS directory (default is OS dependent)"
 ac_help="$ac_help
-  --with-lock-dir=DIR     Specify serial port lock directory"
+  --with-lock-dir=DIR	   Specify serial port lock directory (default is OS dependent)"
 ac_help="$ac_help
-  --with-pwrfail-dir=DIR  Specify power failure file directory"
+  --with-pwrfail-dir=DIR  Specify power failure file directory (default is OS dependent)"
 ac_help="$ac_help
   --with-serial-dev=DEV   Specify serial port device"
 ac_help="$ac_help
-  --with-nis-port=PORT    Specify NIS (CGI) port"
+  --with-nis-port=PORT    Specify NIS (CGI) port (default 3551 except Debian)"
 ac_help="$ac_help
-  --with-net-port=PORT    Specify Master/slave port"
+  --with-net-port=PORT    Specify Master/slave port (default 6666 except Debian)"
 ac_help="$ac_help
-  --with-upstype=TYPE     Specify the UPS type"
+  --with-upstype=TYPE	   Specify the UPS type"
 ac_help="$ac_help
   --with-upscable=CABLE   Specify the UPS cable"
 
@@ -1500,7 +1500,7 @@ test -n "$APCUPSD_MAIL" || APCUPSD_MAIL="no"
 
     if test "$APCUPSD_MAIL" = "no"
     then
-        echo 'WARNING: mail program not found !'
+	echo 'WARNING: mail program not found !'
     fi
 fi
 
@@ -5297,13 +5297,13 @@ fi
 if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
   echo "$ac_t""yes" 1>&6
   
-         echo '  using PNG file format (/usr/lib).'
-         cat >> confdefs.h <<\EOF
+	 echo '  using PNG file format (/usr/lib).'
+	 cat >> confdefs.h <<\EOF
 #define SYS_IMGFMT_PNG 1
 EOF
 
-         LIBS="$LIBS -lgd"
-         SYS_GD_FOUND=yes
+	 LIBS="$LIBS -lgd"
+	 SYS_GD_FOUND=yes
        
 else
   echo "$ac_t""no" 1>&6
@@ -5347,14 +5347,14 @@ fi
 if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
   echo "$ac_t""yes" 1>&6
   
-           echo '  using GIF file format (/usr/lib).'
-           cat >> confdefs.h <<\EOF
+	   echo '  using GIF file format (/usr/lib).'
+	   cat >> confdefs.h <<\EOF
 #define SYS_IMGFMT_GIF 1
 EOF
 
-           LIBS="$LIBS -lgd"
-           SYS_GD_FOUND=yes
-         
+	   LIBS="$LIBS -lgd"
+	   SYS_GD_FOUND=yes
+	 
 else
   echo "$ac_t""no" 1>&6
 fi
@@ -5403,14 +5403,14 @@ fi
 if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
   echo "$ac_t""yes" 1>&6
   
-           echo '  using PNG file format (/usr/local/lib).'
-           cat >> confdefs.h <<\EOF
+	   echo '  using PNG file format (/usr/local/lib).'
+	   cat >> confdefs.h <<\EOF
 #define SYS_IMGFMT_PNG 1
 EOF
 
-           LIBS="$LIBS -lgd"
-           SYS_GD_FOUND=yes
-         
+	   LIBS="$LIBS -lgd"
+	   SYS_GD_FOUND=yes
+	 
 else
   echo "$ac_t""no" 1>&6
 fi
@@ -5455,14 +5455,14 @@ fi
 if eval "test \"`echo '$ac_cv_lib_'$ac_lib_var`\" = yes"; then
   echo "$ac_t""yes" 1>&6
   
-           echo '  using GIF file format (/usr/local/lib).'
-           cat >> confdefs.h <<\EOF
+	   echo '  using GIF file format (/usr/local/lib).'
+	   cat >> confdefs.h <<\EOF
 #define SYS_IMGFMT_GIF 1
 EOF
 
-           LIBS="$LIBS -lgd"
-           SYS_GD_FOUND=yes
-         
+	   LIBS="$LIBS -lgd"
+	   SYS_GD_FOUND=yes
+	 
 else
   echo "$ac_t""no" 1>&6
 fi
@@ -5472,27 +5472,27 @@ fi
      then
        if test -d src/gd1.2
        then
-         CPPFLAGS=${_cppflags}
-         LDFLAGS=${_ldflags}
-         GDINCLUDE='-I$(topdir)/src/gd1.2'
-         LIBGD=gd1.2
-         LIBGDOBJ='$(topdir)/src/gd1.2/libgd.a'
-         cat >> confdefs.h <<\EOF
+	 CPPFLAGS=${_cppflags}
+	 LDFLAGS=${_ldflags}
+	 GDINCLUDE='-I$(topdir)/src/gd1.2'
+	 LIBGD=gd1.2
+	 LIBGDOBJ='$(topdir)/src/gd1.2/libgd.a'
+	 cat >> confdefs.h <<\EOF
 #define IMGFMT_GIF 1
 EOF
 
        else
-         echo 'Your system lacks the GD library for compiling CGI'
-         echo 'programs. Please download this library from'
-         echo
-         echo 'ftp://ftp.apcupsd.com/pub/apcupsd/contrib/gd1.2.tar.gz'
-         echo
-         echo 'Untar the file inside the src/ directory so that'
-         echo 'the library is in src/gd1.2/ then you can succesfully'
-         echo 're-run the ./configure script.'
-         echo
-         echo 'Alternatively you can disable the CGI support.'
-         exit 1
+	 echo 'Your system lacks the GD library for compiling CGI'
+	 echo 'programs. Please download this library from'
+	 echo
+	 echo 'ftp://ftp.apcupsd.com/pub/apcupsd/contrib/gd1.2.tar.gz'
+	 echo
+	 echo 'Untar the file inside the src/ directory so that'
+	 echo 'the library is in src/gd1.2/ then you can succesfully'
+	 echo 're-run the ./configure script.'
+	 echo
+	 echo 'Alternatively you can disable the CGI support.'
+	 exit 1
        fi
      fi
 	 if test x"$GDINCLUDE" = x
@@ -5561,15 +5561,15 @@ if eval "test \"`echo '$ac_cv_header_'$ac_safe`\" = yes"; then
 else
   echo "$ac_t""no" 1>&6
 
-             echo 'Found system GD library but no header file.'
-             echo 'Please find the file gd.h in your system'
-             echo 'include directories and report its position'
-             echo 'to apcupsd-devel@apcupsd.com'
-             exit 1
-           
+	     echo 'Found system GD library but no header file.'
+	     echo 'Please find the file gd.h in your system'
+	     echo 'include directories and report its position'
+	     echo 'to apcupsd-devel@apcupsd.com'
+	     exit 1
+	   
 fi
 
-         
+	 
 fi
 
        
@@ -5664,16 +5664,16 @@ fi
 if test "${enable_net+set}" = set; then
   enableval="$enable_net"
    if test "$enableval" = "yes" ; then
-        cat >> confdefs.h <<\EOF
+	cat >> confdefs.h <<\EOF
 #define HAVE_NET_DRIVER 1
 EOF
 
-        cat >> confdefs.h <<\EOF
+	cat >> confdefs.h <<\EOF
 #define HAVE_NISLIB 1
 EOF
 
-        NET_DRIVER="net"
-        
+	NET_DRIVER="net"
+	
 	fi
 fi
 
@@ -8400,12 +8400,12 @@ openserver)
   ;;
 mandrake)
     DISTVER=`cat /etc/mandrake-release | grep release |\
-                cut -f 5 -d ' '`
+		cut -f 5 -d ' '`
     DFILES="\
-        platforms/apccontrol \
-        platforms/mandrake/Makefile \
-        platforms/mandrake/apcupsd \
-        platforms/mandrake/awkhaltprog"
+	platforms/apccontrol \
+	platforms/mandrake/Makefile \
+	platforms/mandrake/apcupsd \
+	platforms/mandrake/awkhaltprog"
   ;;
 redhat)
 	DISTVER=`cat /etc/redhat-release | grep release |\
@@ -8477,9 +8477,9 @@ darwin)
     PIDDIR=/var/run
     LOCKDIR=/var/tmp
     DFILES="\
-        platforms/apccontrol \
-        platforms/darwin/Makefile \
-        platforms/darwin/apcupsd"
+	platforms/apccontrol \
+	platforms/darwin/Makefile \
+	platforms/darwin/apcupsd"
     LDFLAGS="${LDFLAGS} -m"
   ;;
 unknown)
