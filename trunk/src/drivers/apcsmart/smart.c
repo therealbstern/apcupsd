@@ -90,7 +90,7 @@ static void copy_self_test_results(UPSINFO *ups)
     } else {
        msg = "No test results available"; 
     }	   
-    strcpy(ups->selftestmsg, msg);
+    astrncpy(ups->selftestmsg, msg, sizeof(ups->selftestmsg));
 }
 
 int apc_enable(UPSINFO *ups)

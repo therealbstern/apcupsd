@@ -9,58 +9,29 @@
  *  All rights reserved.
  *
  */
-
-/*
- *			 GNU GENERAL PUBLIC LICENSE
- *			    Version 2, June 1991
- *
- *  Copyright (C) 1989, 1991 Free Software Foundation, Inc.
- *			       675 Mass Ave, Cambridge, MA 02139, USA
- *  Everyone is permitted to copy and distribute verbatim copies
- *  of this license document, but changing it is not allowed.
- *
- *  This program is free software; you can redistribute it and/or modify
- *  it under the terms of the GNU General Public License as published by
- *  the Free Software Foundation; either version 2 of the License, or
- *  (at your option) any later version.
- *
- *  This program is distributed in the hope that it will be useful,
- *  but WITHOUT ANY WARRANTY; without even the implied warranty of
- *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- *  GNU General Public License for more details.
- *
- *  You should have received a copy of the GNU General Public License
- *  along with this program; if not, write to the Free Software
- *  Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
- *
- */
-
-/*
- *  IN NO EVENT SHALL ANY AND ALL PERSONS INVOLVED IN THE DEVELOPMENT OF THIS
- *  PACKAGE, NOW REFERRED TO AS "APCUPSD-Team" BE LIABLE TO ANY PARTY FOR
- *  DIRECT, INDIRECT, SPECIAL, INCIDENTAL, OR CONSEQUENTIAL DAMAGES ARISING
- *  OUT OF THE USE OF THIS SOFTWARE AND ITS DOCUMENTATION, EVEN IF ANY OR ALL
- *  OF THE "APCUPSD-Team" HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- *  THE "APCUPSD-Team" SPECIFICALLY DISCLAIMS ANY WARRANTIES, INCLUDING,
- *  BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND
- *  FITNESS FOR A PARTICULAR PURPOSE.  THE SOFTWARE PROVIDED HEREUNDER IS
- *  ON AN "AS IS" BASIS, AND THE "APCUPSD-Team" HAS NO OBLIGATION TO PROVIDE
- *  MAINTENANCE, SUPPORT, UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
- *
- *  THE "APCUPSD-Team" HAS ABSOLUTELY NO CONNECTION WITH THE COMPANY
- *  AMERICAN POWER CONVERSION, "APCC".  THE "APCUPSD-Team" DID NOT AND
- *  HAS NOT SIGNED ANY NON-DISCLOSURE AGREEMENTS WITH "APCC".  ANY AND ALL
- *  OF THE LOOK-A-LIKE ( UPSlink(tm) Language ) WAS DERIVED FROM THE
- *  SOURCES LISTED BELOW.
- *
- */
-
 /*
  * Rewritten by:
  *	  Riccardo Facchetti <riccardo@master.oasi.gpa.it>
  *	  Jonathan H N Chin  <jc254@newton.cam.ac.uk>
- *
+ */
+/*
+   Copyright (C) 2000-2004 Kern Sibbald
+
+   This program is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 2 of
+   the License, or (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public
+   License along with this program; if not, write to the Free
+   Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+   MA 02111-1307, USA.
+
  */
 
 #include "apc.h"
@@ -330,7 +301,7 @@ void print_pairs_table(void)
 }
 
 
-static int obsolete(UPSINFO *ups, size_t offset,
+static int obsolete(UPSINFO *ups, int offset,
 		    const GENINFO *junk, const char *v) 
 {
     char *msg = (char *)junk;
@@ -341,7 +312,7 @@ static int obsolete(UPSINFO *ups, size_t offset,
 }
 
 #ifdef UNSUPPORTED_CODE
-static int start_ups(UPSINFO *ups, size_t offset,
+static int start_ups(UPSINFO *ups, int offset,
 		     const GENINFO *size, const char *v)
 {
     char x[MAXSTRING];
@@ -372,7 +343,7 @@ static int start_ups(UPSINFO *ups, size_t offset,
     init_ups_struct(ups);
  
 
-    strncpy((char *)AT(ups, offset), x, (int)size);
+    astrncpy((char *)AT(ups, offset), x, (int)size);
 
     /*
      * Terminate string
@@ -381,7 +352,7 @@ static int start_ups(UPSINFO *ups, size_t offset,
     return SUCCESS;
 }
 
-static int end_ups(UPSINFO *ups, size_t offset,
+static int end_ups(UPSINFO *ups, int offset,
 		   const GENINFO *size, const char *v)
 {
     char x[MAXSTRING];
@@ -408,7 +379,7 @@ static int end_ups(UPSINFO *ups, size_t offset,
 #endif
 
 
-static int match_int(UPSINFO *ups, size_t offset,
+static int match_int(UPSINFO *ups, int offset,
 		     const GENINFO *junk, const char *v) 
 {
     int x;
@@ -420,7 +391,7 @@ static int match_int(UPSINFO *ups, size_t offset,
     return FAILURE;
 }
 
-static int match_range(UPSINFO *ups, size_t offset,
+static int match_range(UPSINFO *ups, int offset,
 			const GENINFO *vs, const char *v) 
 {
     char x[MAXSTRING];
@@ -466,15 +437,15 @@ static int match_range(UPSINFO *ups, size_t offset,
      * overwrite memory. - KES
      */
     t->type = vs->type;
-    strcpy(t->name, vs->name);
-    strcpy(t->long_name, vs->long_name);
+    astrncpy(t->name, vs->name, sizeof(t->name));
+    astrncpy(t->long_name, vs->long_name, sizeof(t->long_name));
     return SUCCESS;
 }
 
 /* Similar to match range except that it only returns the index of the
  * item.
  */
-static int match_index(UPSINFO *ups, size_t offset,
+static int match_index(UPSINFO *ups, int offset,
 		       const GENINFO *vs, const char *v) 
 {
     char x[MAXSTRING];
@@ -514,7 +485,7 @@ static int match_index(UPSINFO *ups, size_t offset,
 }
 
 
-static int match_slave (UPSINFO *ups, size_t offset,
+static int match_slave (UPSINFO *ups, int offset,
 			const GENINFO *junk, const char *v) 
 {
     char x[MAXSTRING];
@@ -528,7 +499,7 @@ static int match_slave (UPSINFO *ups, size_t offset,
 	return FAILURE;
     }
 
-    strcpy(slaves[slave_count].name, x);
+    astrncpy(slaves[slave_count].name, x, sizeof(slaves[0].name));
     slave_count++;
 
     return SUCCESS;
@@ -540,7 +511,7 @@ static int match_slave (UPSINFO *ups, size_t offset,
  * Do we ever want str to contain whitespace?
  * If so, we can't use sscanf(3)
  */
-static int match_str(UPSINFO *ups, size_t offset,
+static int match_str(UPSINFO *ups, int offset,
 		     const GENINFO *gen, const char *v) 
 {
     char x[MAXSTRING];
@@ -549,12 +520,12 @@ static int match_str(UPSINFO *ups, size_t offset,
     if (!sscanf(v, "%s", x))
 	return FAILURE;
 
-    strncpy((char *)AT(ups, offset), x, (int)size);
+    astrncpy((char *)AT(ups, offset), x, (int)size);
     *((char *)AT(ups, (offset+(int)size)-1)) = 0;  /* terminate string */
     return SUCCESS;
 }
 
-static int match_facility(UPSINFO *ups, size_t offset,
+static int match_facility(UPSINFO *ups, int offset,
 	       const GENINFO *junk, const char *v)
 {
     const struct {
@@ -713,21 +684,23 @@ void init_ups_struct(UPSINFO *ups)
     }
 
     /* put some basic information for sanity checks */
-    strncpy(ups->id, UPSINFO_ID, sizeof(ups->id));
+    astrncpy(ups->id, UPSINFO_ID, sizeof(ups->id));
     ups->version = UPSINFO_VERSION;
     ups->size = sizeof(UPSINFO);
-    strcpy(ups->release, APCUPSD_RELEASE);
+    astrncpy(ups->release, APCUPSD_RELEASE, sizeof(ups->release));
 
     ups->fd		       = -1;
 
     UPS_SET(UPS_PLUGGED);
 
-    strcpy(ups->enable_access.name, accesses[0].name);
-    strcpy(ups->enable_access.long_name, accesses[0].long_name);
+    astrncpy(ups->enable_access.name, accesses[0].name, sizeof(ups->enable_access.name));
+    astrncpy(ups->enable_access.long_name, accesses[0].long_name,
+       sizeof(ups->enable_access.long_name));
     ups->enable_access.type = accesses[0].type;
 
-    strcpy(ups->nologin.name, logins[0].name);
-    strcpy(ups->nologin.long_name, logins[0].long_name);
+    astrncpy(ups->nologin.name, logins[0].name, sizeof(ups->nologin.name));
+    astrncpy(ups->nologin.long_name, logins[0].long_name,
+       sizeof(ups->nologin.long_name));
     ups->nologin.type	       = logins[0].type;
 
     ups->annoy		       = 5 * 60;  /* annoy every 5 mins */
@@ -750,16 +723,16 @@ void init_ups_struct(UPSINFO *ups)
 
     /* EPROM values that can be changed with config directives */
 
-    strcpy(ups->sensitivity, "-1"); /* no value */
+    astrncpy(ups->sensitivity, "-1", sizeof(ups->sensitivity)); /* no value */
     ups->dwake		       = -1;
     ups->dshutd 	       = -1;
-    strcpy(ups->selftest, "-1"); /* no value */
+    astrncpy(ups->selftest, "-1", sizeof(ups->selftest)); /* no value */
     ups->lotrans	       = -1;
     ups->hitrans	       = -1;
     ups->rtnpct 	       = -1;
     ups->dlowbatt	       = -1;
     ups->NomOutputVoltage      = -1;
-    strcpy(ups->beepstate,  "-1"); /* no value */
+    astrncpy(ups->beepstate,  "-1", sizeof(ups->beepstate)); /* no value */
 
 
 
@@ -839,7 +812,7 @@ void check_for_config(UPSINFO *ups, char *cfgfile)
         Error_abort2(_("Error opening configuration file (%s): %s\n"),            
 	       cfgfile, strerror(errno));
     }
-    strcpy(ups->configfile, cfgfile);
+    astrncpy(ups->configfile, cfgfile, sizeof(ups->configfile));
 
     /* JHNC: check configuration file format is a suitable version */
     if (fgets(line, sizeof(line), apcconf) != NULL) {
@@ -954,7 +927,7 @@ jump_into_the_loop:
      * -RF
      */
     if (ups->lockpath[0] == '\0')
-	strcpy(ups->lockpath, LOCK_DEFAULT);
+	astrncpy(ups->lockpath, LOCK_DEFAULT, sizeof(ups->lockpath));
 
     /*
      * If APC_NET, the lockfile is not needed.
@@ -962,8 +935,8 @@ jump_into_the_loop:
     if (ups->cable.type != APC_NET) {
         char *dev = strrchr(ups->device, '/');
 
-	strcat(ups->lockpath, APC_LOCK_PREFIX);
-	strcat(ups->lockpath, dev?++dev:ups->device);
+	astrncat(ups->lockpath, APC_LOCK_PREFIX, sizeof(ups->lockpath));
+	astrncat(ups->lockpath, dev?++dev:ups->device, sizeof(ups->lockpath));
     } else {
 	ups->lockpath[0] = 0;
 	ups->lockfile = -1;

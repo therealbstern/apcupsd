@@ -3,6 +3,27 @@
  *
  */
 
+/*
+   Copyright (C) 2000-2004 Kern Sibbald
+
+   This program is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 2 of
+   the License, or (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public
+   License along with this program; if not, write to the Free
+   Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+   MA 02111-1307, USA.
+
+ */
+
+
 #include "apc.h"
 #include "apcsmart.h"
 
@@ -233,7 +254,7 @@ static void change_ups_name(UPSINFO *ups, char *newname)
 
     ups->upsname[0] = '\0';
     smart_poll(ups->UPS_Cmd[CI_IDEN], ups);
-    strcpy(ups->upsname, smart_poll(ups->UPS_Cmd[CI_IDEN], ups));
+    astrncpy(ups->upsname, smart_poll(ups->UPS_Cmd[CI_IDEN], ups), sizeof(ups->upsname));
 
     fprintf(stderr, "The new UPS name is: %s\n", ups->upsname);
 }
@@ -258,7 +279,7 @@ static void change_ups_battery_date(UPSINFO *ups, char *newdate)
 	return;
     }
 
-    strcpy(battdat, newdate);
+    astrncpy(battdat, newdate, sizeof(battdat));
 
     /* Ask for battdat */
     write(ups->fd, &c, 1);  /* c = 'x' */
@@ -284,7 +305,8 @@ static void change_ups_battery_date(UPSINFO *ups, char *newdate)
 
     ups->battdat[0] = '\0';
     smart_poll(ups->UPS_Cmd[CI_BATTDAT], ups);
-    strcpy(ups->battdat, smart_poll(ups->UPS_Cmd[CI_BATTDAT], ups));
+    astrncpy(ups->battdat, smart_poll(ups->UPS_Cmd[CI_BATTDAT], ups), 
+       sizeof(ups->battdat));
 
     fprintf(stderr, "The new UPS battery date is: %s\n", ups->battdat);
 }
@@ -312,9 +334,9 @@ static int change_ups_eeprom_item(UPSINFO *ups, char *title, char cmd, char *set
 	return SUCCESS;
     }
     fprintf(stderr, "The old UPS %s is: %s\n", title, oldvalue);
-    strcpy(allvalues, oldvalue);
-    strcat(allvalues, " ");
-    strcpy(lastvalue, oldvalue);
+    astrncpy(allvalues, oldvalue, sizeof(allvalues));
+    astrncat(allvalues, " ", sizeof(allvalues));
+    astrncpy(lastvalue, oldvalue, sizeof(allvalues));
 
     /* Try a second time to ensure that it is a stable value */
     write(ups->fd, &cmd, 1);
@@ -370,9 +392,9 @@ static int change_ups_eeprom_item(UPSINFO *ups, char *title, char cmd, char *set
 	if (strcmp(oldvalue, response) == 0 && i > 0)
 	    break;
 	if (strcmp(lastvalue, response) != 0) {
-	    strcat(allvalues, response);
-            strcat(allvalues, " ");
-	    strcpy(lastvalue, response);
+	    astrncat(allvalues, response, sizeof(allvalues));
+            astrncat(allvalues, " ", sizeof(allvalues));
+	    astrncpy(lastvalue, response, sizeof(allvalues));
 	}
         sleep(5);             /* don't cycle too fast */
     }

@@ -114,11 +114,11 @@ d_msg(const char *file, int line, int level, const char *fmt,...)
     char      buf[4096];
     int       i;
     va_list   arg_ptr;
-    int       details = TRUE;
+    bool      details = true;
     char      *my_name = "apcupsd";
 
     if (level < 0) {
-       details = FALSE;
+       details = false;
        level = -level;
     }
 

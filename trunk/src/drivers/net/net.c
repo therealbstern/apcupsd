@@ -1,6 +1,5 @@
 /*
  *  net.c -- network driver
- *  Copyright (C) 1999-2001 Riccardo Facchetti <riccardo@apcupsd.org>
  *
  *  apcupsd.c		  -- Simple Daemon to catch power failure signals from a
  *		       BackUPS, BackUPS Pro, or SmartUPS (from APCC).
@@ -41,7 +40,7 @@
  * line, and if 1 returns only to first space (e.g. integers,
  * and floating point values.
  */
-static const struct { 	
+static const struct {	
    const char *request;
    const char *upskeyword;
    int nfields;
@@ -166,7 +165,7 @@ static int getupsvar(UPSINFO *ups, char *request, char *answer, int anslen)
 	     return 1;
 	}
     } else {
-       Dmsg1(100, "No match in getupsvar for %s!\n", request);
+       Dmsg1(100, "Hey!!! No match in getupsvar for %s!\n", request);
     }
 
     strcpy(answer, "Not found");
@@ -183,30 +182,35 @@ static int poll_ups(UPSINFO *ups)
     nid->statlen = 0;
     Dmsg2(20, "Opening connection to %s:%d\n", nid->hostname, nid->port);
     if ((nid->sockfd = net_open(nid->hostname, NULL, nid->port)) < 0) {
-        log_event(ups, LOG_ERR, "fetch_data: tcp_open failed for %s port %d",
-		nid->hostname, nid->port);
-        Dmsg0(90, "Exit poll_ups 0 comm lost\n");
-	return 0;
+       log_event(ups, LOG_ERR, "fetch_data: tcp_open failed for %s port %d",
+	       nid->hostname, nid->port);
+       Dmsg0(90, "Exit poll_ups 0 comm lost\n");
+       set_ups(UPS_COMMLOST);
+       return 0;
     }
 
     if (net_send(nid->sockfd, "status", 6) != 6) {
-        log_event(ups, LOG_ERR, "fill_buffer: write error on socket.");
-	net_close(nid->sockfd);
-        Dmsg0(90, "Exit poll_ups 0 no status flag\n");
-	return 0;
+       log_event(ups, LOG_ERR, "fill_buffer: write error on socket.");
+       net_close(nid->sockfd);
+       Dmsg0(90, "Exit poll_ups 0 no status flag\n");
+       set_ups(UPS_COMMLOST);
+       return 0;
     }
 
     Dmsg0(99, "===============\n");
     while ((n = net_recv(nid->sockfd, buf, sizeof(buf)-1)) > 0) {
-	buf[n] = 0;
-	astrncat(nid->statbuf, buf, sizeof(nid->statbuf));
-        Dmsg3(99, "Partial buf (%d, %d):\n%s",n,strlen(nid->statbuf), buf);
+       buf[n] = 0;
+       astrncat(nid->statbuf, buf, sizeof(nid->statbuf));
+       Dmsg3(99, "Partial buf (%d, %d):\n%s",n,strlen(nid->statbuf), buf);
     }
     Dmsg0(99, "===============\n");
 
     if (n < 0) {
-	stat = 0;
-        Dmsg0(90, "Exit poll_ups 0 bad stat net_recv\n");
+       stat = 0;
+       Dmsg0(90, "Exit poll_ups 0 bad stat net_recv\n");
+       set_ups(UPS_COMMLOST);
+    } else {
+       clear_ups(UPS_COMMLOST);
     }
     net_close(nid->sockfd);
 
@@ -219,22 +223,22 @@ static int poll_ups(UPSINFO *ups)
 
 /*
  * Fill buffer with data from UPS network daemon   
- * Returns 0 on error
- * Returns 1 if OK
+ * Returns false on error
+ * Returns true  if OK
  */
 #define SLEEP_TIME 2
-static int fill_status_buffer(UPSINFO *ups) 
+static bool fill_status_buffer(UPSINFO *ups) 
 {
     struct driver_data *nid = (struct driver_data *)ups->driver_internal_data;
     time_t now;
     int tlog;
-    int comm_err = FALSE;
+    bool comm_err = false;
 
     /* Poll or fill the buffer maximum one time per second */
     now = time(NULL);
     if ((now - nid->last_fill_time) < 2) {
         Dmsg0(90, "Exit fill_status_buffer OK less than 2 sec\n");
-       return 1;
+       return true;
     }
 
     for (tlog=0; !poll_ups(ups); tlog -= SLEEP_TIME) {
@@ -247,7 +251,7 @@ static int fill_status_buffer(UPSINFO *ups)
 
 	}
 	sleep(SLEEP_TIME);
-	comm_err = TRUE;
+	comm_err = true;
 	set_ups(UPS_COMMLOST);
     }
 
@@ -261,11 +265,11 @@ static int fill_status_buffer(UPSINFO *ups)
     if (!nid->got_caps) {
        net_ups_get_capabilities(ups);	      
     }
-    if (!nid->got_static_data) {
+    if (nid->got_caps && !nid->got_static_data) {
 	net_ups_read_static_data(ups);
     }
 
-    return 1;
+    return true;
 }
 
 static int get_ups_status_flag(UPSINFO *ups, int fill)
@@ -274,14 +278,33 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
     int stat = 1;
     int32_t newStatus;		      /* this really should be uint32_t! */
     int32_t masterStatus;	      /* status from master */
-    static int comm_loss = 0;
+    static bool comm_loss = false;
+    struct driver_data *nid = (struct driver_data *)ups->driver_internal_data;
 
-    write_lock(ups);
+    if (!nid->got_caps) {
+       net_ups_get_capabilities(ups);
+       if (!nid->got_caps) {
+	  return 0;
+       }
+    }
+    if (!nid->got_static_data) {
+       net_ups_read_static_data(ups);
+       if (!nid->got_static_data) {
+	  return 0;
+       }
+    }
+
 
     if (fill) {
+       /* 
+	* Not locked because no one else should be writing in the 
+        * status buffer, and we don't want to lock across I/O
+	* operations. 
+	*/
        stat = fill_status_buffer(ups);
     }
 
+    write_lock(ups);
     answer[0] = 0;
     if (!getupsvar(ups, "status", answer, sizeof(answer))) {
         log_event(ups, LOG_ERR, "getupsvar: failed for ""status"".");
@@ -425,9 +448,9 @@ int net_ups_get_capabilities(UPSINFO *ups)
            getupsvar(ups, "nombattv", answer, sizeof(answer));
        ups->UPS_Cap[CI_REVNO] =
            getupsvar(ups, "firmware", answer, sizeof(answer));
-       nid->got_caps = TRUE;
+       nid->got_caps = true;
     } else {
-       nid->got_caps = FALSE;
+       nid->got_caps = false;
     }
     write_unlock(ups);
     return 1;
@@ -454,7 +477,6 @@ int net_ups_check_state(UPSINFO *ups)
     }
     Dmsg1(100, "Sleep %d secs.\n", sleep_time);
     sleep(sleep_time);
-
     get_ups_status_flag(ups, 1);
 
     return 1;
@@ -464,13 +486,17 @@ int net_ups_read_volatile_data(UPSINFO *ups)
 {
     char answer[200];
 
+
+    if (!fill_status_buffer(ups)) {
+       return 0;
+    }
+
     write_lock(ups);
     set_ups(UPS_SLAVE);   
 
     /* ***FIXME**** poll time needs to be scanned */
     ups->poll_time = time(NULL);
     ups->last_master_connect_time = ups->poll_time;
-    fill_status_buffer(ups);
 
     if (ups->UPS_Cap[CI_VLINE] && 
           getupsvar(ups, "utility", answer, sizeof(answer))) {
@@ -551,7 +577,7 @@ int net_ups_read_volatile_data(UPSINFO *ups)
 	    ups->G[0] = *(answer+15);
     }
     if (getupsvar(ups, "selftest", answer, sizeof(answer))) {
-	strcpy(ups->X, answer);
+	astrncpy(ups->X, answer, sizeof(ups->X));
     }
 
     write_unlock(ups);
@@ -563,39 +589,45 @@ int net_ups_read_volatile_data(UPSINFO *ups)
 
 int net_ups_read_static_data(UPSINFO *ups) 
 {
-    struct driver_data *nid = (struct driver_data *)ups->driver_internal_data;
-    char answer[200];
+   struct driver_data *nid = (struct driver_data *)ups->driver_internal_data;
+   char answer[200];
 
-    write_lock(ups);
 
-    if (poll_ups(ups)) {
-        if (!getupsvar(ups, "model", ups->mode.long_name,
-		    sizeof(ups->mode.long_name))) {
-            log_event(ups, LOG_ERR, "getupsvar: failed for \"model\".");
-	}
-	if (ups->UPS_Cap[CI_SERNO] &&
-                getupsvar(ups, "serialno", answer, sizeof(answer))) {
-	    strcpy(ups->serial, answer);
-	}
-	if (ups->UPS_Cap[CI_BATTDAT] &&
-                getupsvar(ups, "battdate", answer, sizeof(answer))) {
-	    strcpy(ups->battdat, answer);
-	}
-	if (ups->UPS_Cap[CI_NOMBATTV] &&
-                getupsvar(ups, "nombattv", answer, sizeof(answer))) {
-	    ups->nombattv = atof(answer);
-	}
-	if (ups->UPS_Cap[CI_REVNO] &&
-                getupsvar(ups, "firmware", answer, sizeof(answer))) {
-	    strcpy(ups->firmrev, answer);
-	}
-       nid->got_static_data = TRUE;
-    } else {
-       nid->got_static_data = FALSE;
-    }
+   if (poll_ups(ups)) {
+       write_lock(ups);
+       if (!getupsvar(ups, "model", ups->mode.long_name,
+		   sizeof(ups->mode.long_name))) {
+           log_event(ups, LOG_ERR, "getupsvar: failed for \"model\".");
+       }
+       if (!getupsvar(ups, "upsmode", ups->upsclass.long_name,
+		   sizeof(ups->upsclass.long_name))) {
+           log_event(ups, LOG_ERR, "getupsvar: failed for \"upsmode\".");
+       }
+       if (ups->UPS_Cap[CI_SERNO] &&
+               getupsvar(ups, "serialno", answer, sizeof(answer))) {
+	   astrncpy(ups->serial, answer, sizeof(ups->serial));
+       }
+       if (ups->UPS_Cap[CI_BATTDAT] &&
+               getupsvar(ups, "battdate", answer, sizeof(answer))) {
+	   astrncpy(ups->battdat, answer, sizeof(ups->battdat));
+       }
+       if (ups->UPS_Cap[CI_NOMBATTV] &&
+               getupsvar(ups, "nombattv", answer, sizeof(answer))) {
+	   ups->nombattv = atof(answer);
+       }
+       if (ups->UPS_Cap[CI_REVNO] &&
+               getupsvar(ups, "firmware", answer, sizeof(answer))) {
+	   astrncpy(ups->firmrev, answer, sizeof(ups->firmrev));
+       }
+      nid->got_static_data = true;
+      write_unlock(ups);
+   } else {
+      write_lock(ups);
+      nid->got_static_data = false;
+      write_unlock(ups);
+   }
 
-    write_unlock(ups);
-    return 1;
+   return 1;
 }
 
 int net_ups_entry_point(UPSINFO *ups, int command, void *data) 

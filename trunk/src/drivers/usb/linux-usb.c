@@ -6,10 +6,28 @@
  *
  *   Parts of this code (especially the initialization and walking
  *     the reports) were derived from a test program hid-ups.c by:    
- *
- *     Copyright (c) 2001 Vojtech Pavlik <vojtech@ucw.cz>
- *     Copyright (c) 2001 Paul Stewart <hiddev@wetlogic.net>
- *
+ *	 Vojtech Pavlik <vojtech@ucw.cz>
+ *	 Paul Stewart <hiddev@wetlogic.net>
+ */
+
+/*
+   Copyright (C) 2001-2004 Kern Sibbald
+
+   This program is free software; you can redistribute it and/or
+   modify it under the terms of the GNU General Public License as
+   published by the Free Software Foundation; either version 2 of
+   the License, or (at your option) any later version.
+
+   This program is distributed in the hope that it will be useful,
+   but WITHOUT ANY WARRANTY; without even the implied warranty of
+   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+   General Public License for more details.
+
+   You should have received a copy of the GNU General Public
+   License along with this program; if not, write to the Free
+   Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+   MA 02111-1307, USA.
+
  */
 
 
@@ -294,7 +312,7 @@ static int open_usb_device(UPSINFO *ups)
     }
 
     if (my_data->orig_device[0] == 0) {
-       strcpy(my_data->orig_device, ups->device);
+       astrncpy(my_data->orig_device, ups->device, sizeof(my_data->orig_device));
     }
     astrncpy(name, my_data->orig_device, sizeof(name));
     p = strchr(name, '[');
@@ -345,7 +363,7 @@ static int open_usb_device(UPSINFO *ups)
 	   break;
        }
        if (my_data->fd >= 0) {
-	  strcpy(ups->device, devname);
+	  astrncpy(ups->device, devname, sizeof(ups->device));
 	  return 1;
        }
        sleep(1);
@@ -384,7 +402,7 @@ auto_detect:
 
 auto_opened:
     if (my_data->fd >= 0) {
-       strcpy(ups->device, devname);
+       astrncpy(ups->device, devname, sizeof(ups->device));
        return 1;
     } else {
        ups->device[0] = 0;
@@ -467,7 +485,7 @@ static int find_usb_application(UPSINFO *ups)
 /*
  * Get a field value
  */
-static int get_value(UPSINFO *ups, int ci, USB_INFO *uinfo)
+static bool get_value(UPSINFO *ups, int ci, USB_INFO *uinfo)
 {
     struct hiddev_string_descriptor sdesc;
     struct hiddev_report_info rinfo;
@@ -476,16 +494,16 @@ static int get_value(UPSINFO *ups, int ci, USB_INFO *uinfo)
     int exponent;
 
     if (!ups->UPS_Cap[ci] || !my_data->info[ci]) {
-	return 0;		      /* UPS does not have capability */
+	return false;		      /* UPS does not have capability */
     }
     info = my_data->info[ci];	      /* point to our info structure */
     rinfo.report_type = info->uref.report_type;
     rinfo.report_id = info->uref.report_id;
     if (ioctl(my_data->fd, HIDIOCGREPORT, &rinfo) < 0) {  /* update Report */
-       return 0;
+       return false;
     }
     if (ioctl(my_data->fd, HIDIOCGUSAGE, &info->uref) < 0) {  /* update UPS value */
-       return 0;
+       return false;
     }
     exponent = info->unit_exponent;
     if (exponent > 7) {
@@ -493,11 +511,11 @@ static int get_value(UPSINFO *ups, int ci, USB_INFO *uinfo)
     }
     if (info->data_type == T_INDEX) { /* get string */
 	if (info->uref.value == 0) {
-	   return 0;
+	   return false;
 	}
 	sdesc.index = info->uref.value;
 	if (ioctl(my_data->fd, HIDIOCGSTRING, &sdesc) < 0) {
-	    return 0;
+	    return false;
 	}
 	strncpy(ups->buf, sdesc.value, ups->buf_len);
 	info->value_type = V_STRING;
@@ -558,7 +576,7 @@ static int get_value(UPSINFO *ups, int ci, USB_INFO *uinfo)
 	      exponent, info->dValue, ci);
     }
     memcpy(uinfo, info, sizeof(USB_INFO));
-    return 1;
+    return true;
 }
 
 /*
@@ -742,13 +760,19 @@ int usb_ups_open(UPSINFO *ups)
        reinitialize_private_structure(ups);
     }
     if (my_data->orig_device[0] == 0) {
-       strcpy(my_data->orig_device, ups->device);
+       astrncpy(my_data->orig_device, ups->device, sizeof(my_data->orig_device));
     }
     if (!open_usb_device(ups)) {
 	write_unlock(ups);
-        Error_abort1(_("Cannot open UPS device: \"%s\" --\n"
-           "For a link to detailed USB troubleshooting information,\n"
-           "please see <http://www.apcupsd.com/support.html>.\n"), ups->device);
+	if (ups->device[0]) {
+           Error_abort1(_("Cannot open UPS device: \"%s\" --\n"
+              "For a link to detailed USB trouble shooting information,\n"
+              "please see <http://www.apcupsd.com/support.html>.\n"), ups->device);
+	} else {
+           Error_abort0(_("Cannot find UPS device --\n"
+              "For a link to detailed USB trouble shooting information,\n"
+              "please see <http://www.apcupsd.com/support.html>.\n"));
+	}
     }
     clear_ups(UPS_SLAVE);
     write_unlock(ups);
@@ -788,12 +812,11 @@ int usb_ups_get_capabilities(UPSINFO *ups)
     struct hiddev_usage_ref uref;
     int i, j, k, n;
 
-    write_lock(ups);
     if (ioctl(my_data->fd, HIDIOCINITREPORT, 0) < 0) {
-       write_unlock(ups);
        Error_abort1("Cannot init USB HID report. ERR=%s\n", strerror(errno));
     }
 
+    write_lock(ups);
     /*
      * Walk through all available reports and determine
      * what information we can use.
@@ -803,7 +826,6 @@ int usb_ups_get_capabilities(UPSINFO *ups)
 	rinfo.report_id = HID_REPORT_ID_FIRST;
 	while (ioctl(my_data->fd, HIDIOCGREPORTINFO, &rinfo) >= 0) {
 	    for (i = 0; i < (int)rinfo.num_fields; i++) { 
-
 		memset(&finfo, 0, sizeof(finfo));
 		finfo.report_type = rinfo.report_type;
 		finfo.report_id = rinfo.report_id;
@@ -980,7 +1002,7 @@ int usb_ups_read_static_data(UPSINFO *ups)
     /* UPS_SERIAL_NUMBER */
     if (get_value(ups, CI_SERNO, &uinfo)) {
 	char *p;
-	strncpy(ups->serial, ups->buf, sizeof(ups->serial));
+	astrncpy(ups->serial, ups->buf, sizeof(ups->serial));
 	/*
 	 * If serial number has garbage, trash it.
 	 */
@@ -1131,20 +1153,20 @@ int usb_ups_read_volatile_data(UPSINFO *ups)
     if (get_value(ups, CI_ST_STAT, &uinfo)) {
 	switch (uinfo.uref.value) {
 	case 1: 		      /* passed */
-           strcpy(ups->X, "OK");
+           astrncpy(ups->X, "OK", sizeof(ups->X));
 	   break;
 	case 2: 		      /* Warning */
-           strcpy(ups->X, "WN");
+           astrncpy(ups->X, "WN", sizeof(ups->X));
 	   break;
 	case 3: 		      /* Error */
 	case 4: 		      /* Aborted */
-           strcpy(ups->X, "NG");
+           astrncpy(ups->X, "NG", sizeof(ups->X));
 	   break;
 	case 5: 		      /* In progress */
-           strcpy(ups->X, "IP");
+           astrncpy(ups->X, "IP", sizeof(ups->X));
 	   break;
 	case 6: 		      /* None */
-           strcpy(ups->X, "NO");
+           astrncpy(ups->X, "NO", sizeof(ups->X));
 	   break;
 	default:
 	   break;
@@ -1155,7 +1177,7 @@ int usb_ups_read_volatile_data(UPSINFO *ups)
     return 1;
 }
 
-static int write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
+static bool write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
 {
     struct hiddev_report_info rinfo;
     struct hiddev_field_info finfo;
@@ -1170,9 +1192,9 @@ static int write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
 	rinfo.report_type = info->uref.report_type;
 	rinfo.report_id = info->uref.report_id;
 	if (ioctl(my_data->fd, HIDIOCGREPORTINFO, &rinfo) < 0) {  /* get Report */
-            Dmsg2(000, "HIDIOCGREPORTINFO for shutdown function %s failed. ERR=%s\n", 
+            Dmsg2(000, "HIDIOCGREPORTINFO for kill power function %s failed. ERR=%s\n", 
 		  name, strerror(errno));
-	    return 0;
+	    return false;
 	}
         Dmsg1(100, "REPORTINFO num_fields=%d\n", rinfo.num_fields);
 	finfo.report_type = info->uref.report_type;
@@ -1184,9 +1206,9 @@ logical_max=%d exponent=%d unit=0x%x\n",
 	    finfo.logical_minimum, finfo.logical_maximum, 
 	    finfo.unit_exponent, finfo.unit);
 	if (ioctl(my_data->fd, HIDIOCGFIELDINFO, &finfo) < 0) {  /* Get field info */
-            Dmsg2(000, "HIDIOCGFIELDINFO for shutdown function %s failed. ERR=%s\n", 
+            Dmsg2(000, "HIDIOCGFIELDINFO for kill power function %s failed. ERR=%s\n", 
 		  name, strerror(errno));
-	    return 0;
+	    return false;
 	}
         Dmsg7(100, "FIELDINFO type=%d id=%d index=%d logical_min=%d \n\
 logical_max=%d exponent=%d unit=0x%x\n",
@@ -1196,45 +1218,48 @@ logical_max=%d exponent=%d unit=0x%x\n",
         Dmsg3(100, "GUSAGE type=%d id=%d index=%d\n", info->uref.report_type,
 	   info->uref.report_id, info->uref.field_index);
 	if (ioctl(my_data->fd, HIDIOCGUSAGE, &info->uref) < 0) {  /* get UPS value */
-            Dmsg2(000, "HIDIOGSUSAGE for shutdown function %s failed. ERR=%s\n", 
+            Dmsg2(000, "HIDIOGSUSAGE for kill power function %s failed. ERR=%s\n", 
 		  name, strerror(errno));
-	    return 0;
+	    return false;
 	}
 	old_value = info->uref.value;
 	info->uref.value = value;
         Dmsg3(100, "SUSAGE type=%d id=%d index=%d\n", info->uref.report_type,
 	   info->uref.report_id, info->uref.field_index);
 	if (ioctl(my_data->fd, HIDIOCSUSAGE, &info->uref) < 0) {  /* update UPS value */
-            Dmsg2(000, "HIDIOCSUSAGE for shutdown function %s failed. ERR=%s\n", 
+            Dmsg2(000, "HIDIOCSUSAGE for kill power function %s failed. ERR=%s\n", 
 		  name, strerror(errno));
-	    return 0;
+	    return false;
 	}
 	for (i=0; i < 1; i++) {
 	   if (ioctl(my_data->fd, HIDIOCSREPORT, &rinfo) < 0) {  /* update Report */
-               Dmsg2(000, "HIDIOCSREPORT for shutdown function %s failed. ERR=%s\n", 
+               Dmsg2(000, "HIDIOCSREPORT for kill power function %s failed. ERR=%s\n", 
 		     name, strerror(errno));
-	       return 0;
+	       return false;
 	   }
 	}
 	if (ioctl(my_data->fd, HIDIOCGUSAGE, &info->uref) < 0) {  /* get UPS value */
-            Dmsg2(000, "HIDIOCSUSAGE for shutdown function %s failed. ERR=%s\n", 
+            Dmsg2(000, "HIDIOCSUSAGE for kill power function %s failed. ERR=%s\n", 
 		  name, strerror(errno));
-	    return 0;
+	    return false;
 	}
 	new_value = info->uref.value;
-        Dmsg3(000, "Shutdown function %s ci=%d value=%d OK.\n", name, ci, value);
+        Dmsg3(000, "Kill power function %s ci=%d value=%d OK.\n", name, ci, value);
         Dmsg4(100, "%s before=%d set=%d after=%d\n", name, old_value, value, new_value);
-	return 1;
+	return true;
     }
-    return 0;
+    Dmsg2(000, "Kill power function %s ci=%d not available in this UPS.\n", name, ci);
+    return false;
 }
 
 #define CI_APCShutdownAfterDelay CI_DSHUTD
 
 int usb_ups_kill_power(UPSINFO *ups)
 {
-
+    char *func;
+    
     if (!usb_ups_get_capabilities(ups)) {
+       Dmsg0(000, "Cannot do kill power because cannot get UPS capabilities.\n");
        return 0;
     }
 
@@ -1242,13 +1267,33 @@ int usb_ups_kill_power(UPSINFO *ups)
      *	 Some of these commands are not supported on all UPSes, but that
      *	 should cause no harm.
      */
-    write_int_to_ups(ups, CI_DelayBeforeShutdown, 20, "CI_DelayBeforeShutdown");
+    func = "CI_DelayBeforeShutdown";
+    if (!write_int_to_ups(ups, CI_DelayBeforeShutdown, 20, func)) {
+       Dmsg1(000, "Kill power function \"%s\" failed. Continuing ...\n", func);   
+    } else {
+       Dmsg1(000, "Kill power function \"%s\" seems to have worked. Continuing ...\n", func);   
+    }
 
-    write_int_to_ups(ups, CI_ShutdownRequested, 1, "CI_ShutdownRequested");
+    func = "CI_ShutdownRequested";
+    if (!write_int_to_ups(ups, CI_ShutdownRequested, 1, func)) {
+       Dmsg1(000, "Kill power function \"%s\" failed. Continuing ...\n", func);   
+    } else {
+       Dmsg1(000, "Kill power function \"%s\" seems to have worked. Continuing ...\n", func);   
+    }
 
-    write_int_to_ups(ups, CI_APCShutdownAfterDelay, 30, "CI_APCShutdownAfterDelay");
+    func = "CI_APCShutdownAfterDelay";
+    if (!write_int_to_ups(ups, CI_APCShutdownAfterDelay, 30, func)) {
+       Dmsg1(000, "Kill power function \"%s\" failed. Continuing ...\n", func);   
+    } else {
+       Dmsg1(000, "Kill power function \"%s\" seems to have worked. Continuing ...\n", func);   
+    }
 
-    write_int_to_ups(ups, CI_APCForceShutdown, 1, "CI_APCForceShutdown");
+    func = "CI_APCForceShutdown";
+    if (!write_int_to_ups(ups, CI_APCForceShutdown, 1, func)) {
+       Dmsg1(000, "Kill power function \"%s\" failed ...\n", func);   
+    } else {
+       Dmsg1(000, "Kill power function \"%s\" seems to have worked. Done ...\n", func);   
+    }
 
     Dmsg0(200, "Leave usb_ups_kill_power\n");
     return 1;

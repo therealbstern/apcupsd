@@ -146,7 +146,7 @@ void get_apc_model(UPSINFO *ups)
     }
 
     response[0] = '\0';
-    strcpy(response, smart_poll(ups->UPS_Cmd[CI_UPSMODEL], ups));
+    astrncpy(response, smart_poll(ups->UPS_Cmd[CI_UPSMODEL], ups), sizeof(response));
 
     if (strlen(response)) {
 	cp = get_apc_model_V_codes(response, ups);
@@ -156,7 +156,7 @@ void get_apc_model(UPSINFO *ups)
     }
 
     response[0] = '\0';
-    strcpy(response, smart_poll(ups->UPS_Cmd[CI_REVNO], ups));
+    astrncpy(response, smart_poll(ups->UPS_Cmd[CI_REVNO], ups), sizeof(response));
 
     if (strlen(response))
         fprintf(stderr, "\n%s: 'b' %s", argvalue,
@@ -178,7 +178,7 @@ int apcsmart_ups_get_capabilities(UPSINFO *ups)
     int i;
 
     /* Get UPS capabilities string */
-    strcpy(caps, smart_poll(ups->UPS_Cmd[CI_UPS_CAPS], ups));
+    astrncpy(caps, smart_poll(ups->UPS_Cmd[CI_UPS_CAPS], ups), sizeof(caps));
     if (strlen(caps) && (strcmp(caps,"NA") != 0)) {
 	ups->UPS_Cap[CI_UPS_CAPS] = TRUE;
 	/* skip version */
@@ -204,9 +204,9 @@ int apcsmart_ups_get_capabilities(UPSINFO *ups)
      */
     for (i = 0; i <= CI_MAX_CAPS; i++) {
 	if (!cmds || strchr(cmds, ups->UPS_Cmd[i]) != NULL) {
-	    strcpy(answer, smart_poll(ups->UPS_Cmd[i], ups));
+	    astrncpy(answer, smart_poll(ups->UPS_Cmd[i], ups), sizeof(answer));
             if (answer && *answer && (strcmp(answer, "NA") != 0)) {
-		ups->UPS_Cap[i] = TRUE;
+		ups->UPS_Cap[i] = true;
 	    }
 	}
     }
