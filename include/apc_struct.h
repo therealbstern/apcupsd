@@ -246,7 +246,6 @@ typedef struct upsinfo {
     char release[20];
 
     int fd;                       /* serial port file descriptor */
-    int sp_flags;                 /* serial port flags on DUMB UPSes */
 
     /* UPS capability array and codes */
     char     UPS_Cap[CI_MAXCI+1];     /* TRUE if UPS has capability */

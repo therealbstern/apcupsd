@@ -58,6 +58,15 @@
 #ifndef _DUMB_H
 #define _DUMB_H
 
+/* Private dumb driver data structure */
+
+typedef struct s_dumb_data {
+    int sp_flags;                 /* Serial port flags */
+    time_t debounce;		      /* last event time for debounce */
+    struct termios oldtio;
+    struct termios newtio;
+} SIMPLE_DATA;
+
 /*********************************************************************/
 /* Function ProtoTypes						     */
 /*********************************************************************/

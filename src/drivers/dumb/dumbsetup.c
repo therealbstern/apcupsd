@@ -61,19 +61,12 @@
 #include "apc.h"
 #include "dumb.h"
 
-typedef struct s_smart_data {
-    time_t debounce;		      /* last event time for debounce */
-    struct termios oldtio;
-    struct termios newtio;
-} SIMPLE_DATA;
-
 /*
  * This is the first routine called in the driver, and it is only
  * called once.
  */
 int dumb_ups_open(UPSINFO *ups) {
     int cmd;
-
     SIMPLE_DATA *private = ups->driver_internal_data;
 
     if (private == NULL) {
