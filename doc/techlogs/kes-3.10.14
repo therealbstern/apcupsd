@@ -2,6 +2,9 @@
                         Kern Sibbald
 
 General:
+18Jul04
+- Found another store into the ups buffer so #ifdefed it. Cannot
+  store into the ups buffer on non-pthreads systems.
 17Jul04
 - Fiddle with apcconfig.c to correct astrncpy() problem noted by
   Adam.
