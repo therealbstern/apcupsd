@@ -119,15 +119,16 @@ This package is built with standard serial port support.
         --with-cgi-bin=%{_sysconfdir}/apcupsd/cgi \
         --enable-cgi \
         --enable-pthreads \
+        --enable-net \
         --enable-master-slave \
         --enable-apcsmart \
         --enable-dumb \
-        --enable-net \
-        --enable-usb
+        --enable-usb \
 %if %{usb}
         --with-serial-dev= \
         --with-upstype=usb \
-        --with-upscable=usb
+        --with-upscable=usb 
+
 %endif
 
 make
@@ -369,6 +370,9 @@ fi
 %endif
 
 %changelog
+* Sat Jan 17 2004 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- added build of net driver to configure
+- moved usb driver build into both packages
 * Sat Jan 10 2004 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - added build tags for rh8 rh9 fc1 and wb3
 - cleaned up dependancies and Requires by platform
