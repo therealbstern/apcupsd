@@ -6,12 +6,9 @@
  *
  */
 
-#include <unistd.h>
 #include <stdio.h>
-#include <syslog.h>
 #include <stdlib.h>
 #include <string.h>
-#include <sys/time.h>
 
 #include "cgiconfig.h"
 #include "cgilib.h"
@@ -21,8 +18,9 @@ static char   monhost[256];
 
 void parsearg(const char *var, const char *value) 
 {
-    if (!strcmp(var, "host")) {
+    if (strcmp(var, "host") == 0) {
 	strncpy (monhost, value, sizeof(monhost));
+	monhost[sizeof(monhost) - 1] = '\0';
     }
 }
 
