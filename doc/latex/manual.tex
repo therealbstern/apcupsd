@@ -3,13 +3,13 @@
 
 \section*{Apcupsd Manual}
 \label{_ChapterStart}
-\index[general]{Manual!Apcupsd }
-\index[general]{Apcupsd Manual }
+\index{Manual!Apcupsd }
+\index{Apcupsd Manual }
 \addcontentsline{toc}{section}{Apcupsd Manual}
 
 \subsection*{Image}
 \label{TOC0}
-\index[general]{Image }
+\index{Image }
 \addcontentsline{toc}{subsection}{Image}
 
 \footnotesize
@@ -25,8 +25,8 @@
 \normalsize
 
 \section*{Apcupsd User's Manual}
-\index[general]{Manual!Apcupsd User's }
-\index[general]{Apcupsd User's Manual }
+\index{Manual!Apcupsd User's }
+\index{Apcupsd User's Manual }
 \addcontentsline{toc}{section}{Apcupsd User's Manual}
 
 \footnotesize
@@ -75,15 +75,15 @@ For more information on the project, please visit the main web site at
 \label{Top}
 
 \subsection*{Apcupsd User's Manual}
-\index[general]{Manual!Apcupsd User's }
-\index[general]{Apcupsd User's Manual }
+\index{Manual!Apcupsd User's }
+\index{Apcupsd User's Manual }
 \addcontentsline{toc}{subsection}{Apcupsd User's Manual}
 
 \label{Release-Notes}
 
 \subsection*{Release Notes}
-\index[general]{Release Notes }
-\index[general]{Notes!Release }
+\index{Release Notes }
+\index{Notes!Release }
 \addcontentsline{toc}{subsection}{Release Notes}
 
 \label{index-Release-Notes-1}
@@ -94,8 +94,8 @@ for more details.
 \label{New-Features}
 
 \subsubsection*{New Features}
-\index[general]{Features!New }
-\index[general]{New Features }
+\index{Features!New }
+\index{New Features }
 \addcontentsline{toc}{subsubsection}{New Features}
 
 \label{index-New-Features-2}
@@ -257,8 +257,8 @@ Change Log for older versions
 \label{How-To-Use-This-Manual}
 
 \subsection*{How To Use This Manual}
-\index[general]{Manual!How To Use This }
-\index[general]{How To Use This Manual }
+\index{Manual!How To Use This }
+\index{How To Use This Manual }
 \addcontentsline{toc}{subsection}{How To Use This Manual}
 
 \label{index-Using-this-Manual-3}
@@ -296,8 +296,8 @@ instructions.
 \label{Basic-User_0027s-Guide}
 
 \subsection*{Basic User's Guide}
-\index[general]{Guide!Basic User's }
-\index[general]{Basic User's Guide }
+\index{Guide!Basic User's }
+\index{Basic User's Guide }
 \addcontentsline{toc}{subsection}{Basic User's Guide}
 
 \label{index-User_0027s-Guide-4}
@@ -305,8 +305,8 @@ instructions.
 \label{Planning-Your-Installation}
 
 \subsection*{1 Planning Your Installation}
-\index[general]{Installation!1 Planning Your }
-\index[general]{1 Planning Your Installation }
+\index{Installation!Planning Your }
+\index{Planning Your Installation }
 \addcontentsline{toc}{subsection}{1 Planning Your Installation}
 
 \label{index-Planning-Installation-5}
@@ -315,8 +315,8 @@ instructions.
 \label{Quick-Start-for-Beginners}
 
 \subsubsection*{1.1 Quick Start for Beginners}
-\index[general]{Beginners!1.1 Quick Start for }
-\index[general]{1.1 Quick Start for Beginners }
+\index{Quick Start for Beginners }
+\index{Beginners!Quick Start for }
 \addcontentsline{toc}{subsubsection}{1.1 Quick Start for Beginners}
 
 \label{index-Quick-Start-7}
@@ -400,8 +400,8 @@ might be helpful.
 \label{Supported-Operating-Systems_003b-UPSes-and-Cables}
 
 \subsubsection*{1.2 Supported Operating Systems, UPSes and Cables}
-\index[general]{Cables!1.2 Supported Operating Systems UPSes and }
-\index[general]{1.2 Supported Operating Systems, UPSes and Cables }
+\index{Cables!Supported Operating Systems UPSes and }
+\index{Supported Operating Systems, UPSes and Cables }
 \addcontentsline{toc}{subsubsection}{1.2 Supported Operating Systems, UPSes
 and Cables}
 
@@ -448,7 +448,7 @@ protocol it uses to talk with its computer.
 \begin{description}
 
 \item {\bf apcsmart}
-\index[fd]{apcsmart }
+\index{apcsmart }
 An APCSmart UPS and its computer also communicate through an RS232C serial
 connection, but they actually use it as a character channel (2400bps, 8 data
 bits, 1 stop bit, no parity) and pass commands back and forth in a primitive
@@ -460,7 +460,7 @@ commands).  This class of UPS is in decline, rapidly being replaced in APC's
 product line by USB UPSes.  
 
 \item {\bf usb}
-\index[fd]{usb }
+\index{usb }
 A USB UPS speaks a universal well defined control language over a USB wire. 
 Most of APC's lineup now uses this method as of late 2003, and it seems likely
 to completely take over in their low- and middle range.  Other manufacturers
@@ -472,7 +472,7 @@ serial cable with it (as can be supplied by APC), you will need to configure
 your UPS as {\bf apcsmart} rather than {\bf usb}.  
 
 \item {\bf net}
-\index[fd]{net }
+\index{net }
 This is the keyword to specify if you are using your UPS in Slave mode (i.e.
 the machine is not directly connected to the UPS, but to another machine which
 is), and it is connected to the Master via an ethernet connection. You must
@@ -481,12 +481,12 @@ work. It is a much simpler form of running a Slave than the old Master/Slave
 code.  
 
 \item {\bf snmp}
-\index[fd]{snmp }
+\index{snmp }
 SNMP UPSes communicate via an Ethernet NIC and firmware that speaks Simple
 Network Management Protocol.  
 
 \item {\bf dumb}
-\index[fd]{dumb }
+\index{dumb }
 A dumb or voltage-signaling UPS and its computer communicate through the
 signal lines on an RS232C serial connection.  Not much can actually be
 conveyed this way other than an order to shut down. Voltage-signaling UPSes
@@ -607,8 +607,8 @@ Advanced Topics (see
 \label{Apcupsd-Known-USB-Issues}
 
 \subsubsection*{1.3 Apcupsd Known USB Issues}
-\index[general]{Issues!1.3 Apcupsd Known USB }
-\index[general]{1.3 Apcupsd Known USB Issues }
+\index{Issues!Apcupsd Known USB }
+\index{Apcupsd Known USB Issues }
 \addcontentsline{toc}{subsubsection}{1.3 Apcupsd Known USB Issues}
 
 \label{index-USB-problems-15}
@@ -672,8 +672,8 @@ More details are provided in the following section ...
 \label{Checking-Out-Your-USB-Subsystem}
 
 \subsubsection*{1.4 Checking Out Your USB Subsystem}
-\index[general]{1.4 Checking Out Your USB Subsystem }
-\index[general]{Subsystem!1.4 Checking Out Your USB }
+\index{Subsystem!Checking Out Your USB }
+\index{Checking Out Your USB Subsystem }
 \addcontentsline{toc}{subsubsection}{1.4 Checking Out Your USB Subsystem}
 
 You can skip this section if your UPS has an Ethernet or RS232-C interface or
@@ -1184,8 +1184,8 @@ your usual preference.
 \label{Building-and-Installing-apcupsd}
 
 \subsection*{2 Building and Installing apcupsd}
-\index[general]{Apcupsd!2 Building and Installing }
-\index[general]{2 Building and Installing apcupsd }
+\index{Building and Installing apcupsd }
+\index{Apcupsd!Building and Installing }
 \addcontentsline{toc}{subsection}{2 Building and Installing apcupsd}
 
 \label{index-Building-18}
@@ -1194,8 +1194,8 @@ your usual preference.
 \label{Installation-from-Binary-Packages}
 
 \subsubsection*{2.1 Installation from Binary Packages}
-\index[general]{Packages!2.1 Installation from Binary }
-\index[general]{2.1 Installation from Binary Packages }
+\index{Installation from Binary Packages }
+\index{Packages!Installation from Binary }
 \addcontentsline{toc}{subsubsection}{2.1 Installation from Binary Packages}
 
 \label{Red-Hat-Linux}
@@ -1237,8 +1237,8 @@ in the Advanced Topics (see
 \label{Installation-from-Source}
 
 \subsubsection*{2.2 Installation from Source}
-\index[general]{2.2 Installation from Source }
-\index[general]{Source!2.2 Installation from }
+\index{Source!Installation from }
+\index{Installation from Source }
 \addcontentsline{toc}{subsubsection}{2.2 Installation from Source}
 
 Installation from source might have to be be done different ways depending on
@@ -1320,8 +1320,8 @@ directories (usually subdirectories of /etc/rc.d).
 \label{Verifying-a-Source-Installation}
 
 \subsubsection*{2.3 Verifying a Source Installation}
-\index[general]{Installation!2.3 Verifying a Source }
-\index[general]{2.3 Verifying a Source Installation }
+\index{Verifying a Source Installation }
+\index{Installation!Verifying a Source }
 \addcontentsline{toc}{subsubsection}{2.3 Verifying a Source Installation}
 
 \label{index-Verifying-Source-22}
@@ -1417,8 +1417,8 @@ That will be done by the master.
 \label{Configure-Options}
 
 \subsubsection*{2.4 Configure Options}
-\index[general]{2.4 Configure Options }
-\index[general]{Options!2.4 Configure }
+\index{Options!Configure }
+\index{Configure Options }
 \addcontentsline{toc}{subsubsection}{2.4 Configure Options}
 
 \label{index-configure-options-24}
@@ -1447,14 +1447,14 @@ customize your installation.
 \begin{description}
 
 \item {\bf \&ndash;prefix=\lt{}path\gt{}}
-\index[dir]{prefix }
+\index{prefix }
 This defines the directory for the non-executable files such as the manuals.
 The default is {\bf /usr}.  
 
 \label{index-options_002c-_002d_002d_002dsbindir-27}
 
 \item {\bf \&ndash;sbindir=\lt{}path\gt{}}
-\index[dir]{sbindir }
+\index{sbindir }
 This defines the directory for the executable files such as apcupsd. The
 default is /sbin. You may be tempted to place the executable files in
 /usr/sbin or /usr/local/sbin. Please use caution here as these directories may
@@ -1466,7 +1466,7 @@ power returns.
 \label{index-options_002c-_002d_002d_002denable_002dpowerflute-28}
 
 \item {\bf \&ndash;enable-powerflute}
-\index[dir]{enable-powerflute }
+\index{enable-powerflute }
 This option enables the building of the powerflute executable, which is a
 ncurses based program to monitor the UPS. This program is not necessary for
 the proper execution of apcupsd.  
@@ -1474,43 +1474,43 @@ the proper execution of apcupsd.
 \label{index-options_002c-_002d_002d_002denable_002dcgi-29}
 
 \item {\bf \&ndash;enable-cgi}
-\index[dir]{enable-cgi }
+\index{enable-cgi }
 This enables the building of the CGI programs that permit Web browser access
 to apcupsd data. This option is not necessary for the proper execution of
 apcupsd.  
 
 \item {\bf \&ndash;with-cgi-bin=\lt{}path\gt{}}
-\index[dir]{with-cgi-bin }
+\index{with-cgi-bin }
 The with-cgi-bin configuration option allows you to define the directory where
 the CGI programs will be installed. The default is /etc/apcupsd, which is
 probably not what you want.  
 
 \item {\bf \&ndash;with-css-dir=\lt{}path\gt{}}
-\index[dir]{with-css-dir }
+\index{with-css-dir }
 This option allows you to specify where you want apcupsd to put the Cascading
 Style Sheet that goes with the multimoncss.cgi CGI program.  
 
 \item {\bf \&ndash;enable-master-slave}
-\index[dir]{enable-master-slave }
+\index{enable-master-slave }
 Turns on the master/slave networking code (default). This is sometimes
 referred to as the old master/slave code, and is more complicated than using
 NIS and the net driver to control Slaves (see below).  
 
 \item {\bf \&ndash;enable-apcsmart}
-\index[dir]{enable-apcsmart }
+\index{enable-apcsmart }
 Turns on generation of the APC Smart driver (default).  
 
 \item {\bf \&ndash;enable-dumb}
-\index[dir]{enable-dumb }
+\index{enable-dumb }
 Turns on generation of the dumb signalling driver code (default).  
 
 \item {\bf \&ndash;enable-usb}
-\index[dir]{enable-usb }
+\index{enable-usb }
 Turns on generation of the Linux (only) USB driver code. By default this is
 disabled.  
 
 \item {\bf \&ndash;enable-net}
-\index[dir]{enable-net }
+\index{enable-net }
 Turns on generation of the NIS network driver for slaves. This is an
 alternative to old master/slave code. For the master, this code should be
 disabled. For each slave, this is the only driver needed. This driver works by
@@ -1518,25 +1518,25 @@ reading the information from the the configured master using the NIS (Network
 Information Services) interface.  
 
 \item {\bf \&ndash;enable-snmp}
-\index[dir]{enable-snmp }
+\index{enable-snmp }
 Turns on generation of the SNMP driver. This driver will control the computer
 by reading the UPS information over the network assuming you are running SNMP.
 By default this is disabled.  
 
 \item {\bf \&ndash;enable-test}
-\index[dir]{enable-test }
+\index{enable-test }
 This turns on a test driver that is used only for debugging. By default it is
 disabled.  
 
 \item {\bf \&ndash;enable-nis}
-\index[dir]{enable-nis }
+\index{enable-nis }
 Turns on the Network Information Server (NIS) code within apcupsd. This is
 enabled by default. If you do not want to access the status of the UPS from
 the network and you are not controlling any slaves via NIS (enable-net), this
 can be disabled.  
 
 \item {\bf \&ndash;enable-pthreads}
-\index[dir]{enable-pthreads }
+\index{enable-pthreads }
 This option enables pthreads support causing apcupsd to be built as a threaded
 program rather than forking to create separate processes. apcupsd built in
 this fashion is more efficient that the standard version being one third the
@@ -1544,51 +1544,51 @@ data size and less overhead locking and coping shared memory. This option is
 {\it highly} recommended for Windows builds.  
 
 \item {\bf \&ndash;with-libwrap=\lt{}path\gt{}}
-\index[dir]{with-libwrap }
+\index{with-libwrap }
 This option when enabled causes apcupsd to be built with the TCP WRAPPER
 library for enhanced security. In most cases, the \lt{}path\gt{} is optional
 since configure will determine where the libraries are on most systems.  
 
 \item {\bf \&ndash;with-nologin=\lt{}path\gt{}}
-\index[dir]{with-nologin }
+\index{with-nologin }
 This option allows you to specify where apcupsd will create the nologin file
 when logins are prohibited. The default is /etc  
 
 \item {\bf \&ndash;with-pid-dir=\lt{}path\gt{}}
-\index[dir]{with-pid-dir }
+\index{with-pid-dir }
 This option allows you to specify where apcupsd will create the process id
 (PID) file to prevent multiple copies from running. The default is system
 dependent but usually /var/run.  
 
 \item {\bf \&ndash;with-log-dir=\lt{}path\gt{}}
-\index[dir]{with-log-dir }
+\index{with-log-dir }
 This option allows you to specify where apcupsd will create the EVENTS and
 STATUS log files. The default is /etc/apcupsd. This option simply sets the
 default of the appropriate path in the apcupsd.conf file, which can be changed
 at any later time.  
 
 \item {\bf \&ndash;with-lock-dir=\lt{}path\gt{}}
-\index[dir]{with-lock-dir }
+\index{with-lock-dir }
 This option allows you to specify where apcupsd will create the serial port
 lock file. The default is systemdependent but usually /var/lock. This option
 simply sets the appropriate path in the apcupsd.conf file, which can be
 changed at any later time.  
 
 \item {\bf \&ndash;with-pwrfail-dir=\lt{}path\gt{}}
-\index[dir]{with-pwrfail-dir }
+\index{with-pwrfail-dir }
 This option allows you to specify where apcupsd will create the powerfail file
 when a power failure occurs. The default is system dependent but usually /etc.
  
 
 \item {\bf \&ndash;with-serial-dev=\lt{}device-name\gt{}}
-\index[dir]{with-serial-dev }
+\index{with-serial-dev }
 This option allows you to specify where apcupsd will look for the serial
 device that talks to the UPS. The default is system dependent, but often
 /dev/ttyS0. This option simply sets the appropriate device name in the
 apcupsd.conf file, which can be changed at any later time.  
 
 \item {\bf \&ndash;with-nis-port=\lt{}port\gt{}}
-\index[dir]{with-nis-port }
+\index{with-nis-port }
 This option allows you to specify what port apcupsd will use for the Network
 Information Server (the CGI programs). The default is system dependent but
 usually 3551 because that port has been officially assigned to apcupsd by the
@@ -1596,33 +1596,33 @@ IANA. This option simply sets the appropriate port in the apcupsd.conf file,
 which can be changed at any later time.  
 
 \item {\bf \&ndash;with-nisip=\lt{}IP-Address\gt{}}
-\index[dir]{with-nisip }
+\index{with-nisip }
 This option allows you to specify the value that will be placed on then NISIP
 directive in the configuration file. The default is 0.0.0.0. No checking is
 done on the value entered, so you must ensure that it is a valid IP address.  
 
 \item {\bf \&ndash;with-net-port=\lt{}port\gt{}}
-\index[dir]{with-net-port }
+\index{with-net-port }
 This option allows you to specify what port apcupsd will use for Master and
 Slave communications. The default is system dependent but usually 6666. This
 option simply sets the appropriate port in the apcupsd.conf file, which can be
 changed at any later time.  
 
 \item {\bf \&ndash;with-upstype=\lt{}type\gt{}}
-\index[dir]{with-upstype }
+\index{with-upstype }
 This option allows you to specify the type of UPS that will be connected to
 your computer. The default is: smartups. This option simply sets the
 appropriate UPS type in the apcupsd.conf file, which can be changed at any
 later time.  
 
 \item {\bf \&ndash;with-upscable=\lt{}path\gt{}}
-\index[dir]{with-upscable }
+\index{with-upscable }
 This option allows you to specify what cable you are using to connect to the
 UPS. The default is: smart. This option simply sets the appropriate UPS cable
 in the apcupsd.conf file, which can be changed at any later time.  
 
 \item {\bf \&ndash;disable-install-distdir}
-\index[dir]{disable-install-distdir }
+\index{disable-install-distdir }
 This option modifies the apcupsd Makefiles disable installation of the
 distribution (platform) directory. Generally, this used to do a full
 installation of apcupsd except the final modification of the operating system
@@ -1636,8 +1636,8 @@ to modify your system halt files.
 \label{Recommended-Options-for-most-Systems}
 
 \subsubsection*{2.5 Recommended Options for most Systems}
-\index[general]{2.5 Recommended Options for most Systems }
-\index[general]{Systems!2.5 Recommended Options for most }
+\index{Systems!Recommended Options for most }
+\index{Recommended Options for most Systems }
 \addcontentsline{toc}{subsubsection}{2.5 Recommended Options for most Systems}
 
 For most systems, we recommend the following options: 
@@ -1664,8 +1664,8 @@ and you can optionally build and install the CGI programs as follows:
 \label{Compilers-and-Options}
 
 \subsubsection*{2.6 Compilers and Options}
-\index[general]{Options!2.6 Compilers and }
-\index[general]{2.6 Compilers and Options }
+\index{Options!Compilers and }
+\index{Compilers and Options }
 \addcontentsline{toc}{subsubsection}{2.6 Compilers and Options}
 
 \label{index-compiler-options-30}
@@ -1715,8 +1715,8 @@ or simply see the previous section of this manual.
 \label{Operating-System-Specifics}
 
 \subsubsection*{2.7 Operating System Specifics}
-\index[general]{Specifics!2.7 Operating System }
-\index[general]{2.7 Operating System Specifics }
+\index{Operating System Specifics }
+\index{Specifics!Operating System }
 \addcontentsline{toc}{subsubsection}{2.7 Operating System Specifics}
 
 \label{index-OSes-31}
@@ -2234,8 +2234,8 @@ binary release.
 \label{After-Installation}
 
 \subsection*{3 After Installation}
-\index[general]{3 After Installation }
-\index[general]{Installation!3 After }
+\index{Installation!After }
+\index{After Installation }
 \addcontentsline{toc}{subsection}{3 After Installation}
 
 \label{index-After-Installation-57}
@@ -2244,8 +2244,8 @@ binary release.
 \label{Checking-Your-Configuration-File}
 
 \subsubsection*{3.1 Checking Your Configuration File}
-\index[general]{File!3.1 Checking Your Configuration }
-\index[general]{3.1 Checking Your Configuration File }
+\index{File!Checking Your Configuration }
+\index{Checking Your Configuration File }
 \addcontentsline{toc}{subsubsection}{3.1 Checking Your Configuration File}
 
 \label{index-Checking-Conf-file-59}
@@ -2299,7 +2299,7 @@ then it is only a matter of customization of your setup.
 \label{Arranging-for-Reboot-on-Power_002dUp}
 
 \subsubsection*{3.2 Arranging for Reboot on Power-Up}
-\index[general]{3.2 Arranging for Reboot on Power-Up }
+\index{Arranging for Reboot on Power-Up }
 \addcontentsline{toc}{subsubsection}{3.2 Arranging for Reboot on Power-Up}
 
 \label{index-Reboot-on-power-up-60}
@@ -2344,8 +2344,8 @@ problems it is worth a try.
 \label{Making-sure-apcupsd-Is-Running}
 
 \subsubsection*{3.3 Making sure apcupsd Is Running}
-\index[general]{3.3 Making sure apcupsd Is Running }
-\index[general]{Running!3.3 Making sure apcupsd Is }
+\index{Making sure apcupsd Is Running }
+\index{Running!Making sure apcupsd Is }
 \addcontentsline{toc}{subsubsection}{3.3 Making sure apcupsd Is Running}
 
 \label{index-Checking-running-62}
@@ -2427,8 +2427,8 @@ on insuring that apcupsd is running properly.
 \label{Configuration-Examples}
 
 \subsection*{4 Configuration Examples}
-\index[general]{4 Configuration Examples }
-\index[general]{Examples!4 Configuration }
+\index{Configuration Examples }
+\index{Examples!Configuration }
 \addcontentsline{toc}{subsection}{4 Configuration Examples}
 
 \label{index-Configuration_002c-Examples-63}
@@ -2437,8 +2437,8 @@ on insuring that apcupsd is running properly.
 \label{A-Simple-USB-Configuration}
 
 \subsubsection*{4.1 A Simple USB Configuration}
-\index[general]{Configuration!4.1 A Simple USB }
-\index[general]{4.1 A Simple USB Configuration }
+\index{Configuration!Simple USB }
+\index{Simple USB Configuration }
 \addcontentsline{toc}{subsubsection}{4.1 A Simple USB Configuration}
 
 \label{index-Configuration_002c-USB-65}
@@ -2500,8 +2500,8 @@ examples} directory of the source.
 \label{A-Simple-Configuration-for-a-SmartUPS}
 
 \subsubsection*{4.2 A Simple Configuration for a SmartUPS}
-\index[general]{SmartUPS!4.2 A Simple Configuration for a }
-\index[general]{4.2 A Simple Configuration for a SmartUPS }
+\index{SmartUPS!Simple Configuration for a }
+\index{Simple Configuration for a SmartUPS }
 \addcontentsline{toc}{subsubsection}{4.2 A Simple Configuration for a
 SmartUPS}
 
@@ -2531,8 +2531,8 @@ customize your installation, but this example shows you the minimum required.
 \label{A-Simple-Configuration-for-a-Simple-Signaling-or-Dumb}
 
 \subsubsection*{4.3 A Simple Configuration for a Simple Signaling or Dumb}
-\index[general]{Dumb!4.3 A Simple Configuration for a Simple Signaling or }
-\index[general]{4.3 A Simple Configuration for a Simple Signaling or Dumb }
+\index{Dumb!Simple Configuration for a Simple Signaling or }
+\index{Simple Configuration for a Simple Signaling or Dumb }
 \addcontentsline{toc}{subsubsection}{4.3 A Simple Configuration for a Simple
 Signaling or Dumb}
 
@@ -2576,8 +2576,8 @@ customize your installation, but this example shows you the minimum required.
 \label{A-Simple-Master-Configuration}
 
 \subsubsection*{4.4 A Simple Master Configuration}
-\index[general]{4.4 A Simple Master Configuration }
-\index[general]{Configuration!4.4 A Simple Master }
+\index{Configuration!Simple Master }
+\index{Simple Master Configuration }
 \addcontentsline{toc}{subsubsection}{4.4 A Simple Master Configuration}
 
 \label{index-Configuration_002c-Master-74}
@@ -2621,8 +2621,8 @@ below for details.
 \label{A-Simple-Slave-Configuration}
 
 \subsubsection*{4.5 A Simple Slave Configuration}
-\index[general]{4.5 A Simple Slave Configuration }
-\index[general]{Configuration!4.5 A Simple Slave }
+\index{Configuration!Simple Slave }
+\index{Simple Slave Configuration }
 \addcontentsline{toc}{subsubsection}{4.5 A Simple Slave Configuration}
 
 \label{index-Slave-Configuration-77}
@@ -2666,8 +2666,8 @@ remain up longer during a power outage.
 \label{Variation-on-the-Master_002fSlave-Configuration}
 
 \subsubsection*{4.6 Variation on the Master/Slave Configuration}
-\index[general]{4.6 Variation on the Master/Slave Configuration }
-\index[general]{Configuration!4.6 Variation on the Master/Slave }
+\index{Configuration!Variation on the Master/Slave }
+\index{Variation on the Master/Slave Configuration }
 \addcontentsline{toc}{subsubsection}{4.6 Variation on the Master/Slave
 Configuration}
 
@@ -2682,8 +2682,8 @@ or care where the power really comes from.
 \label{A-Sample-NIS-Slave-Configuration-Using-the-Net-Driver}
 
 \subsubsection*{4.7 A Sample NIS Slave Configuration Using the Net Driver}
-\index[general]{Driver!4.7 A Sample NIS Slave Configuration Using the Net }
-\index[general]{4.7 A Sample NIS Slave Configuration Using the Net Driver }
+\index{Sample NIS Slave Configuration Using the Net Driver }
+\index{Driver!Sample NIS Slave Configuration Using the Net }
 \addcontentsline{toc}{subsubsection}{4.7 A Sample NIS Slave Configuration
 Using the Net Driver}
 
@@ -2692,7 +2692,7 @@ Using the Net Driver}
 \label{index-Configuration_002c-NIS-slave-conf-83}
 As opposed to the old master/slave mode demonstrated above, you can turn any
 computer into an NIS slave by configuring with the NIS network driver turned
-on {\tt \verb{--{enable-net}. The difference is that the NIS server has no explicit
+on {\tt --enable-net}. The difference is that the NIS server has no explicit
 knowledge of the slaves. The NIS server makes its information available via
 the net (NIS), and the NIS slaves read it. When the NIS server is going to
 shutdown, it makes the information available to any NIS slave that polls it,
@@ -2788,8 +2788,8 @@ on the slave for a faster shutdown than the values defined on the NIS server.
 \label{Testing-Apcupsd}
 
 \subsection*{5 Testing Apcupsd}
-\index[general]{5 Testing Apcupsd }
-\index[general]{Apcupsd!5 Testing }
+\index{Apcupsd!Testing }
+\index{Testing Apcupsd }
 \addcontentsline{toc}{subsection}{5 Testing Apcupsd}
 
 \label{index-Testing-84}
@@ -2802,8 +2802,8 @@ on Testing Serial UPSes (see
 \label{Process_002dStatus-Test}
 
 \subsubsection*{5.1 Process-Status Test}
-\index[general]{5.1 Process-Status Test }
-\index[general]{Test!5.1 Process-Status }
+\index{Process-Status Test }
+\index{Test!Process-Status }
 \addcontentsline{toc}{subsubsection}{5.1 Process-Status Test}
 
 \label{index-Process-Status-Testing-85}
@@ -2839,17 +2839,17 @@ process ids so everything will be compressed into a single {\bf ps} line.
 \begin{description}
 
 \item {\bf apcmain}
-\index[fd]{apcmain }
+\index{apcmain }
 is the main program that waits until it receives a termination signal
 (SIGTERM) or one of the child processes dies.  
 
 \item {\bf apcser}
-\index[fd]{apcser }
+\index{apcser }
 is the process that manages the serial port and takes any actions (generates
 events) that are necessary as a result of a change of state of the UPS.  
 
 \item {\bf apcnis}
-\index[fd]{apcnis }
+\index{apcnis }
 is the Network information server process that provides EVENTS and STATUS
 information over the network. This information is used by the CGI programs. 
 \end{description}
@@ -2878,8 +2878,8 @@ messages indicating the nature of the problem.
 \label{Logging-Test}
 
 \subsubsection*{5.2 Logging Test}
-\index[general]{Test!5.2 Logging }
-\index[general]{5.2 Logging Test }
+\index{Test!Logging }
+\index{Logging Test }
 \addcontentsline{toc}{subsubsection}{5.2 Logging Test}
 
 \label{index-Testing_002c-Logging-87}
@@ -2923,8 +2923,8 @@ If you have installed the RPM, they will probably be in
 \label{apcaccess-Test}
 
 \subsubsection*{5.3 apcaccess Test}
-\index[general]{5.3 apcaccess Test }
-\index[general]{Test!5.3 apcaccess }
+\index{Test!apcaccess }
+\index{Apcaccess Test }
 \addcontentsline{toc}{subsubsection}{5.3 apcaccess Test}
 
 \label{index-Testing_002c-apcaccess-89}
@@ -2932,7 +2932,7 @@ If you have installed the RPM, they will probably be in
 This test consists of running {\tt apcaccess} to see if apcupsd is properly
 updating its internal variables.  Please note that if you are running a
 pthreaded version of apcupsd, which you should be since the non-pthreaded
-version is no longer supported, (installed from rpm or {\tt \verb{--{enable-pthreads}
+version is no longer supported, (installed from rpm or {\tt --enable-pthreads}
 on the {\tt ./configure} line), you must enable the apcupsd Network
 Information Server in your configuration file for {\bf apcaccess} to work. 
 This is done by setting: 
@@ -3048,18 +3048,18 @@ apcupsd.conf file to -1.
 \begin{description}
 
 \item {\bf LINEV}
-\index[fd]{LINEV }
+\index{LINEV }
 This is the line voltage and it should be a value that is appropriate for your
 equipment. In the USA, it is typically about 120 Volts while in Europe, it is
 about 220 Volts.  
 
 \item {\bf BATTV}
-\index[fd]{BATTV }
+\index{BATTV }
 Unless you have additional battery packs, this should be near 24 Volts plus or
 minus 5 Volts.  
 
 \item {\bf STATUS}
-\index[fd]{STATUS }
+\index{STATUS }
 This is the status of the UPS and it should normally be {\bf ONLINE}. 
 \end{description}
 
@@ -3101,8 +3101,8 @@ in your {\bf apcupsd.conf} file.
 \label{Communications-Test}
 
 \subsubsection*{5.4 Communications Test}
-\index[general]{Test!5.4 Communications }
-\index[general]{5.4 Communications Test }
+\index{Test!Communications }
+\index{Communications Test }
 \addcontentsline{toc}{subsubsection}{5.4 Communications Test}
 
 \label{index-Testing_002c-Communications-91}
@@ -3161,8 +3161,8 @@ proceeding with additional tests.
 \label{Simulated-Power-Fail-Test}
 
 \subsubsection*{5.5 Simulated Power Fail Test}
-\index[general]{Test!5.5 Simulated Power Fail }
-\index[general]{5.5 Simulated Power Fail Test }
+\index{Simulated Power Fail Test }
+\index{Test!Simulated Power Fail }
 \addcontentsline{toc}{subsubsection}{5.5 Simulated Power Fail Test}
 
 \label{index-Testing_002c-Simulate-Power-Fail-93}
@@ -3270,8 +3270,8 @@ apcupsd.conf with the original files.
 \label{System-Shutdown-Test}
 
 \subsubsection*{5.6 System Shutdown Test}
-\index[general]{5.6 System Shutdown Test }
-\index[general]{Test!5.6 System Shutdown }
+\index{System Shutdown Test }
+\index{Test!System Shutdown }
 \addcontentsline{toc}{subsubsection}{5.6 System Shutdown Test}
 
 \label{index-System-Shutdown-test-95}
@@ -3279,7 +3279,7 @@ apcupsd.conf with the original files.
 This is an intermediate test that you can do, for all UPS models before doing
 the Full Power Down Test. First modify the /etc/apcupsd/apccontrol file so
 that in the {\bf killpower)} case, the line that re-executes apcupsd with the
-{\tt \verb{--{killpower} option is commented out. The original line probably looks
+{\tt --killpower} option is commented out. The original line probably looks
 something like: 
 
 \footnotesize
@@ -3308,8 +3308,8 @@ to its previous state.
 \label{Full-Power-Down-Test}
 
 \subsubsection*{5.7 Full Power Down Test}
-\index[general]{5.7 Full Power Down Test }
-\index[general]{Test!5.7 Full Power Down }
+\index{Full Power Down Test }
+\index{Test!Full Power Down }
 \addcontentsline{toc}{subsubsection}{5.7 Full Power Down Test}
 
 \label{index-Power-down-test-97}
@@ -3323,7 +3323,7 @@ wrong).
 
 Before proceeding, please ensure that your halt script or the equivalent has
 been properly updated by the install process to contain the logic to call {\tt
-apcupsd \verb{--{killpower} when it detects a power failure situation (the presence
+apcupsd --killpower} when it detects a power failure situation (the presence
 of a /etc/powerfail file). See the 
 \ilink{Building and Installing
 apcupsd}{manual.tex#Building-and-Installing-apcupsd} of this manual, or the
@@ -3354,8 +3354,8 @@ programmed into your UPS EEPROM, run {\tt apcaccess eprom} and look at the
 \label{Shutdown-Sequence}
 
 \subsubsection*{5.8 Shutdown Sequence}
-\index[general]{Sequence!5.8 Shutdown }
-\index[general]{5.8 Shutdown Sequence }
+\index{Shutdown Sequence }
+\index{Sequence!Shutdown }
 \addcontentsline{toc}{subsubsection}{5.8 Shutdown Sequence}
 
 \label{index-Shutdown-Sequence-99}
@@ -3370,8 +3370,7 @@ manual.
 \label{apctest}
 
 \subsubsection*{5.9 apctest}
-\index[general]{Apctest!5.9 }
-\index[general]{5.9 apctest }
+\index{Apctest }
 \addcontentsline{toc}{subsubsection}{5.9 apctest}
 
 \label{index-apctest-100}
@@ -3488,8 +3487,8 @@ Item 7 will terminate apctest.
 \label{Troubleshooting-Your-Installation}
 
 \subsection*{6 Troubleshooting Your Installation}
-\index[general]{6 Troubleshooting Your Installation }
-\index[general]{Installation!6 Troubleshooting Your }
+\index{Troubleshooting Your Installation }
+\index{Installation!Troubleshooting Your }
 \addcontentsline{toc}{subsection}{6 Troubleshooting Your Installation}
 
 \label{index-Troubleshooting-_0028see-problems_0029-101}
@@ -3498,8 +3497,8 @@ Item 7 will terminate apctest.
 \label{Known-Problems-with-USB-UPSes}
 
 \subsubsection*{6.1 Known Problems with USB UPSes}
-\index[general]{UPSes!6.1 Known Problems with USB }
-\index[general]{6.1 Known Problems with USB UPSes }
+\index{Known Problems with USB UPSes }
+\index{UPSes!Known Problems with USB }
 \addcontentsline{toc}{subsubsection}{6.1 Known Problems with USB UPSes}
 
 \label{index-Problems_002c-USB-103}
@@ -3580,8 +3579,8 @@ invoked.
 \label{Monitoring-and-Tuning-your-UPS}
 
 \subsection*{7 Monitoring and Tuning your UPS}
-\index[general]{7 Monitoring and Tuning your UPS }
-\index[general]{UPS!7 Monitoring and Tuning your }
+\index{UPS!Monitoring and Tuning your }
+\index{Monitoring and Tuning your UPS }
 \addcontentsline{toc}{subsection}{7 Monitoring and Tuning your UPS}
 
 \label{index-Monitoring-109}
@@ -3595,8 +3594,7 @@ of the UPS itself.
 \label{apcaccess}
 
 \subsubsection*{7.1 apcaccess}
-\index[general]{Apcaccess!7.1 }
-\index[general]{7.1 apcaccess }
+\index{Apcaccess }
 \addcontentsline{toc}{subsubsection}{7.1 apcaccess}
 
 \label{index-apcaccess-111}
@@ -3787,8 +3785,8 @@ A typical output from {\tt apcaccess eprom} is:
 \label{Apcupsd-Notification-and-Events}
 
 \subsubsection*{7.2 Apcupsd Notification and Events}
-\index[general]{7.2 Apcupsd Notification and Events }
-\index[general]{Events!7.2 Apcupsd Notification and }
+\index{Events!Apcupsd Notification and }
+\index{Apcupsd Notification and Events }
 \addcontentsline{toc}{subsubsection}{7.2 Apcupsd Notification and Events}
 
 \label{index-Notification-116}
@@ -3813,8 +3811,8 @@ in the Advanced topics section entitled Customizing Event Handling (see
 \label{hid_002dups-and-USB-Specific-Information}
 
 \subsubsection*{7.3 hid-ups and USB Specific Information}
-\index[general]{Information!7.3 hid-ups and USB Specific }
-\index[general]{7.3 hid-ups and USB Specific Information }
+\index{Information!hid-ups and USB Specific }
+\index{Hid-ups and USB Specific Information }
 \addcontentsline{toc}{subsubsection}{7.3 hid-ups and USB Specific Information}
 
 \label{index-hid_002dups-118}
@@ -3830,8 +3828,8 @@ less than 2 minutes of run time remain.
 \label{apcupsd-Network-Monitoring-_005bCGI_005d-Programs}
 
 \subsubsection*{7.4 apcupsd Network Monitoring (CGI) Programs}
-\index[general]{Programs!7.4 apcupsd Network Monitoring CGI }
-\index[general]{7.4 apcupsd Network Monitoring (CGI) Programs }
+\index{Programs!apcupsd Network Monitoring CGI }
+\index{Apcupsd Network Monitoring (CGI) Programs }
 \addcontentsline{toc}{subsubsection}{7.4 apcupsd Network Monitoring (CGI)
 Programs}
 
@@ -3840,10 +3838,10 @@ Programs}
 \label{index-CGI-programs-121}
 With this release, there are five CGI programs (multimon.cgi, multimoncss.cgi,
 upsstats.cgi, upsfstats.cgi, and upsimage.cgi). To have them properly
-installed, you must run the {\tt ./configure} command with {\tt \verb{--{enable-cgi}
-and you should specify an installation directory with {\tt \verb{--{with-cgi-bin=} or
+installed, you must run the {\tt ./configure} command with {\tt --enable-cgi}
+and you should specify an installation directory with {\tt --with-cgi-bin=} or
 load them manually. To install the Cascading Style Sheet, which is used by
-multimoncss.cgi, you must use the {\tt \verb{--{with-css-dir=} option. The default
+multimoncss.cgi, you must use the {\tt --with-css-dir=} option. The default
 directory for installation of the CGI programs is /etc/apcupsd, which is not
 really where you want them if you are going to use them. Normally, they should
 go in the cgi-bin of your Web server.  
@@ -3859,8 +3857,8 @@ upsstats.cgi to produce the bar charts.
 \label{Setting-up-and-Testing-the-CGI-Programs}
 
 \subsubsection*{7.5 Setting up and Testing the CGI Programs}
-\index[general]{7.5 Setting up and Testing the CGI Programs }
-\index[general]{Programs!7.5 Setting up and Testing the CGI }
+\index{Programs!Setting up and Testing the CGI }
+\index{Setting up and Testing the CGI Programs }
 \addcontentsline{toc}{subsubsection}{7.5 Setting up and Testing the CGI
 Programs}
 
@@ -3914,7 +3912,7 @@ following:
 \normalsize
 
 where the USB copy of apcupsd has been configured to use port 7001 (with {\tt
-\verb{--{with-nis-port=7001} on the {\tt ./configure} or by modifying apcupsd.conf).
+--with-nis-port=7001} on the {\tt ./configure} or by modifying apcupsd.conf).
 Note, the default NIS port is 3551 on most platforms.  
 
 To test multimon.cgi, you can execute it as non-root directly from the source
@@ -4214,14 +4212,14 @@ specified in your configuration file.
 \label{TCP-Wrappers}
 
 {\small7.5.10.1 TCP Wrappers}
-\index[general]{Wrappers!7.5.10.1 TCP }
-\index[general]{7.5.10.1 TCP Wrappers }
+\index{TCP Wrappers }
+\index{Wrappers!TCP }
 \addcontentsline{toc}{paragraph}{7.5.10.1 TCP Wrappers}
 
 \label{index-Wrappers_002c-TCP-138}
 \label{index-TCP-wrappers-139}
 As of apcupsd version 3.8.2, TCP Wrappers are implemented if you turn them on
-when configuring ({\tt ./configure \verb{--{with-libwrap}).  With this code enabled,
+when configuring ({\tt ./configure --with-libwrap}).  With this code enabled,
 you may control who may access your apcupsd via TCP connections (the Network
 Information Server, and the Master/Slave code). This control is done by
 modifying the file: /etc/hosts.allow. This code is implemented but untested.
@@ -4230,8 +4228,8 @@ If you use it, please send us some feedback.
 \label{Configuring-Your-EEPROM}
 
 \subsubsection*{7.6 Configuring Your EEPROM}
-\index[general]{EEPROM!7.6 Configuring Your }
-\index[general]{7.6 Configuring Your EEPROM }
+\index{Configuring Your EEPROM }
+\index{EEPROM!Configuring Your }
 \addcontentsline{toc}{subsubsection}{7.6 Configuring Your EEPROM}
 
 \label{index-eeprom_002c-configuring-140}
@@ -4429,8 +4427,8 @@ the old ``batch'' like process especially if incorrect values were supplied.
 \label{Maintaining-Your-UPS}
 
 \subsection*{8 Maintaining Your UPS}
-\index[general]{UPS!8 Maintaining Your }
-\index[general]{8 Maintaining Your UPS }
+\index{UPS!Maintaining Your }
+\index{Maintaining Your UPS }
 \addcontentsline{toc}{subsection}{8 Maintaining Your UPS}
 
 \label{index-Maintenance-144}
@@ -4455,8 +4453,8 @@ battery life.
 \label{What-Various-People-Have-to-Say-about-Batteries}
 
 \subsubsection*{8.1 What Various People Have to Say about Batteries}
-\index[general]{8.1 What Various People Have to Say about Batteries }
-\index[general]{Batteries!8.1 What Various People Have to Say about }
+\index{What Various People Have to Say about Batteries }
+\index{Batteries!What Various People Have to Say about }
 \addcontentsline{toc}{subsubsection}{8.1 What Various People Have to Say about
 Batteries}
 
@@ -4742,8 +4740,8 @@ Regards,
 \label{Where-Carl-Suggests-You-Get-Batteries}
 
 \subsubsection*{8.2 Where Carl Suggests You Get Batteries}
-\index[general]{8.2 Where Carl Suggests You Get Batteries }
-\index[general]{Batteries!8.2 Where Carl Suggests You Get }
+\index{Where Carl Suggests You Get Batteries }
+\index{Batteries!Where Carl Suggests You Get }
 \addcontentsline{toc}{subsubsection}{8.2 Where Carl Suggests You Get
 Batteries}
 
@@ -4818,8 +4816,8 @@ Store}
 \label{Frequently_002dAsked-Questions}
 
 \subsection*{9 Frequently-Asked Questions}
-\index[general]{Questions!9 Frequently-Asked }
-\index[general]{9 Frequently-Asked Questions }
+\index{Questions!Frequently-Asked }
+\index{Frequently-Asked Questions }
 \addcontentsline{toc}{subsection}{9 Frequently-Asked Questions}
 
 \label{index-FAQ-147}
@@ -4831,11 +4829,11 @@ See the bugs section of this document for a list of known bugs and solutions.
 \item {\bf 
 \label{crazy}
 Q:}
-\index[fd]{a name }
+\index{a name }
 Why all the craziness with custom serial cables?  
 
 \item {\bf A:}
-\index[fd]{ A: }
+\index{ A: }
 It was nothing more nor less than a form of customer control. For a long time
 APC wanted to keep other people from talking to its UPSes so it could lock out
 potential competition for its PowerChute software.  Scrambling the leads on
@@ -4852,11 +4850,11 @@ Fortunately, APC has lost a lot of this attitude since about 2000; nowadays
 they even release technical information to the apcupsd maintainers.  
 
 \item {\bf Q:}
-\index[fd]{ Q: }
+\index{ Q: }
 What UPS brands does apcupsd support?  
 
 \item {\bf A:}
-\index[fd]{ A: }
+\index{ A: }
 Currently apcupsd supports only APC UPSes. However, some companies such as
 Hewlett Packard put their own brand name on APC manufactured UPSes. Thus even
 if you do not have an APC branded UPS, it may work with apcupsd. You will need
@@ -4865,11 +4863,11 @@ APC models. See the installation and configurations sections of this document
 for more details.  
 
 \item {\bf Q:}
-\index[fd]{ Q: }
+\index{ Q: }
 Does apcupsd support Windows?  
 
 \item {\bf A:}
-\index[fd]{ A: }
+\index{ A: }
 With release 3.8.0, apcupsd now runs on Win95/98, WinMe, WinNT, and Win2000
 machines. All features of the Unix versions of apcupsd are implemented. The
 UPS EEPROM programming features of apcupsd have not been tested under Windows.
@@ -4880,11 +4878,11 @@ reports that apcupsd does not work properly on the WinXP system. If you have
 any information on this, please email us.  
 
 \item {\bf Q:}
-\index[fd]{ Q: }
+\index{ Q: }
 I don't have a cable, which one should I build?  
 
 \item {\bf A:}
-\index[fd]{ A: }
+\index{ A: }
 First you must know if you have an apcsmart UPS or a voltage-signalling UPS.
 See the table of supported UPSes (see 
 \ilink{type\_table}{manual.tex#type_005ftable}). If you have a apcsmart UPS,
@@ -4898,11 +4896,11 @@ UPSes}{manual.tex#Voltage_002dSignalling-Cable-for-_0022dumb_0022-UPSes})
 cable.  
 
 \item {\bf Q:}
-\index[fd]{ Q: }
+\index{ Q: }
 How much CPU resources does apcupsd use?  
 
 \item {\bf A:}
-\index[fd]{ A: }
+\index{ A: }
 Depending on your CPU speed, you may see more or less of the CPU consumed by
 apcupsd. On a 400MHz Unix system, the CPU usage should fall well below 0.1\%.
 On slower systems, the percentage will increase proportionally to the decrease
@@ -4911,7 +4909,7 @@ order of 0.5-1.0\%. This is higher than for Unix systems. However, compared to
 the 30\% CPU usage by APC's PowerChute (the version on the CDROM shipped with
 my UPS), apcupsd's 0.5-1.0\% is very modest.  
 
-If you configure apcupsd to run with pthreads ({\tt \verb{--{with-pthreads} on the
+If you configure apcupsd to run with pthreads ({\tt --with-pthreads} on the
 {\tt ./configure} line), apcupsd will run considerably faster, otherwise said,
 it will consume less of your CPU, and it will use approximately one third of
 the memory. For example, Carl Erhorn reports that on his Solaris system,
@@ -4920,27 +4918,27 @@ used. With the new single process, we use only about 1.7MB! That's also a very
 good improvement.''  
 
 \item {\bf Q:}
-\index[fd]{ Q: }
+\index{ Q: }
 What language is apcupsd written in?  
 
 \item {\bf A:}
-\index[fd]{ A: }
+\index{ A: }
 It is written entirely in C.  
 
 \item {\bf Q:}
-\index[fd]{ Q: }
+\index{ Q: }
 We are using apcupsd-3.8.1-1 in RedHat 6.2. The slave, when shutting down, is
 reporting an error at line 436 of apcupsd.c. The error is initiated by {\tt
-apcupsd \verb{--{killpower}! What can we do to fix this, and is it critical?  
+apcupsd --killpower}! What can we do to fix this, and is it critical?  
 
 \item {\bf A:}
-\index[fd]{ A: }
+\index{ A: }
 No, the error is not serious. Unfortunately, the documentation in the area of
 master/slaves is not very detailed, and for that reason, your slave setup is
 not totally correct as explained below.  
 
 On master machines, we modify /etc/rc.d/init.d/halt to re-invoke apcupsd with
-the {\tt \verb{--{killpower} option (actually the script apccontrol is called). This
+the {\tt --killpower} option (actually the script apccontrol is called). This
 causes the UPS to send the codes to the UPS to make it power off.  
 
 On slave machines, these modifications should not be made to the
@@ -4951,7 +4949,7 @@ original halt file, or simply delete all the lines containing ***apcupsd***,
 which were inserted by the apcupsd installation process.  
 
 \item {\bf Q:}
-\index[fd]{ Q: }
+\index{ Q: }
 To test apcupsd, I unplugged the UPS to simulate a power outage. After the
 machine went into the shutdown process I plugged the UPS back into the
 commercial power source. This caused the shutdown process to hang after the
@@ -4959,7 +4957,7 @@ daemon tried to shut-off the ups. Have you run into this problem, and if so do
 you have a remedy?  
 
 \item {\bf A:}
-\index[fd]{ A: }
+\index{ A: }
 Normally, once the shutdown process has begun, we cannot stop it, though there
 {\it is} some code that tries to do so, we don't consider it a very good idea
 \&mdash; how do you stop a shutdown that has killed off half of the daemons
@@ -4972,12 +4970,12 @@ if we detect that the power is back as it might then get caught by a delayed
 power off (at least for Smart UPSes).  
 
 \item {\bf Q:}
-\index[fd]{ Q: }
+\index{ Q: }
 After running apcupsd for a while, I get the following error: ``Serial
 communications with UPS lost.'' What is the problem?  
 
 \item {\bf A:}
-\index[fd]{ A: }
+\index{ A: }
 We use standard Unix serial port read() and write() calls so once a connection
 is made, we generally have few problems. However, there have been reports that
 APC's SNMP Management Card can cause serial port problems. If you have such a
@@ -4986,12 +4984,12 @@ also possible that some other process such as a getty is reading the serial
 port.  
 
 \item {\bf Q:}
-\index[fd]{ Q: }
+\index{ Q: }
 When apcupsd starts, I get the following error: ``attach\_shmarea: cannot get
 shm area: Identifier removed.'' What is the problem?  
 
 \item {\bf A:}
-\index[fd]{ A: }
+\index{ A: }
 This problem and the problem of {\bf cannot create shm area} are due to the
 fact that the shared memory key that apcupsd wants to use is already in use.
 This happens most frequently when there is an old zombie apcupsd process still
@@ -5004,14 +5002,14 @@ of apcupsd starting with apcupsd-3.8.2Beta6 should no longer have this problem
 as they will automatically try using a different key.  
 
 \item {\bf Q:}
-\index[fd]{ Q: }
+\index{ Q: }
 I get the following error: ``Starting apcupsd power management.  Mar 20
 21:19:40 box apcupsd[297]: apcupsd FATAL ERROR in apcserial.c at line 83.
 Cannot open UPS tty /dev/cua01: No such file or directory.'' What is the
 problem?  
 
 \item {\bf A:}
-\index[dir]{ A: }
+\index{ A: }
 The two most likely causes of your problem are:  1. You have the wrong serial
 port device name in the apcupsd.conf file. 2. The device name is not defined
 on your system. Suggestions for proceeding:For the first item, check what your
@@ -5034,11 +5032,11 @@ Looking at the documentation may tell you what the correct name is, or at
 least allow you to create the device.  
 
 \item {\bf Q:}
-\index[dir]{ Q: }
+\index{ Q: }
 How do I ensure that the slaves shutdown before the master?  
 
 \item {\bf A:}
-\index[dir]{ A: }
+\index{ A: }
 There are several strategies for getting the slaves properly shutdown before
 shutting down the master. The first is to make the master wait a period of
 time for the slaves to shutdown before doing its own shutdown. Currently, the
@@ -5052,11 +5050,11 @@ will shutdown before the master. If the shutdown is done with a poweroff, this
 will also save power so that the master can stay up longer.  
 
 \item {\bf Q:}
-\index[fd]{ Q: }
+\index{ Q: }
 How do I ensure that my database server is correctly shutdown?  
 
 \item {\bf A:}
-\index[fd]{ A: }
+\index{ A: }
 You simply add whatever commands are necessary in the appropriate case
 statements in /etc/apcupsd/apccontrol, which is a standard script file that is
 called to actually do the shutdown. Alternatively, you can add your own script
@@ -5065,13 +5063,13 @@ file must have the same name as the appropriate case statement in apccontrol;
 it must be executable; and it must be in the same directory as apccontrol.  
 
 \item {\bf Q:}
-\index[dir]{ Q: }
+\index{ Q: }
 I have Win2k Advanced server, and when starting the service, get: Could not
 start the Apcupsd Server service on Local Computer. Error 1067: The process
 terminated unexpectedly  
 
 \item {\bf A:}
-\index[dir]{ A: }
+\index{ A: }
 The most common error causing your problem is an incorrect serial port
 specification on your DEVICE directive. It should be:  
 
@@ -5107,24 +5105,24 @@ Many error messages associated with Windows services will be reported in the
 Windows System Log.  
 
 \item {\bf Q:}
-\index[dir]{ Q: }
+\index{ Q: }
 When using USB, I get the following log messages: usb-uhci.c: interrupt,
 status 3, frame\# 826. What does it mean?  
 
 \item {\bf A:}
-\index[dir]{ A: }
+\index{ A: }
 It means one transfer worked (bit 0 in status) and another one (after that)
 failed (bit 1) at time frame 826. This kind of soft error is common on USB and
 if everything seems to be working, you can ignore it.  
 
 \item {\bf Q:}
-\index[dir]{ Q: }
+\index{ Q: }
 apcnisd doesn't work. It always gives: FATAL ERROR in apcipc.c at line 497.
 attach\_shmarea: shared memory version mismatch (or UPS not yet ready to
 report)  
 
 \item {\bf A:}
-\index[dir]{ A: }
+\index{ A: }
 Unfortunately apcnisd does not work with pthreads enabled. You have the
 following options:  
 
@@ -5160,8 +5158,8 @@ image (the code image is most likely shared).
 \label{Apcupsd-Bugs}
 
 \subsection*{10 Apcupsd Bugs}
-\index[general]{10 Apcupsd Bugs }
-\index[general]{Bugs!10 Apcupsd }
+\index{Bugs!Apcupsd }
+\index{Apcupsd Bugs }
 \addcontentsline{toc}{subsection}{10 Apcupsd Bugs}
 
 \label{index-Bugs-148}
@@ -5177,8 +5175,8 @@ at SourceForge.
 \label{Advanced-topics}
 
 \subsection*{Advanced topics}
-\index[general]{Advanced topics }
-\index[general]{Topics!Advanced }
+\index{Advanced topics }
+\index{Topics!Advanced }
 \addcontentsline{toc}{subsection}{Advanced topics}
 
 \label{index-Advanced-149}
@@ -5186,8 +5184,8 @@ at SourceForge.
 \label{Customizing-Event-Handling}
 
 \subsection*{11 Customizing Event Handling}
-\index[general]{Handling!11 Customizing Event }
-\index[general]{11 Customizing Event Handling }
+\index{Customizing Event Handling }
+\index{Handling!Customizing Event }
 \addcontentsline{toc}{subsection}{11 Customizing Event Handling}
 
 \label{index-Event-handling-150}
@@ -5234,23 +5232,23 @@ where:
 \begin{description}
 
 \item {\bf event}
-\index[dir]{event }
+\index{event }
 is the event that occurred and it may be any one of the values described in
 the next section.  
 
 \item {\bf ups-name}
-\index[dir]{ups-name }
+\index{ups-name }
 is the name of the UPS as specified in the configuration file (not the name in
 the EEPROM). For version 3.8.2, this is always set to {\bf Default}  
 
 \item {\bf connected}
-\index[fd]{connected }
+\index{connected }
 is 1 if apcupsd is connected to the UPS via a serial port (or a USB port). In
 most configurations, this will be the case. In the case of a Slave machine
 where apcupsd is not directly connected to the UPS, this value will be 0.  
 
 \item {\bf powered}
-\index[fd]{powered }
+\index{powered }
 is 1 if the computer on which apcupsd is running is powered by the UPS and 0
 if not.  At the moment, this value is unimplemented and always 0. 
 \end{description}
@@ -5258,8 +5256,8 @@ if not.  At the moment, this value is unimplemented and always 0.
 \label{apccontrol-Command-Line-Options}
 
 \subsubsection*{11.1 apccontrol Command Line Options}
-\index[general]{Options!11.1 apccontrol Command Line }
-\index[general]{11.1 apccontrol Command Line Options }
+\index{Options!apccontrol Command Line }
+\index{Apccontrol Command Line Options }
 \addcontentsline{toc}{subsubsection}{11.1 apccontrol Command Line Options}
 
 apccontrol accepts the following command line options:  
@@ -5267,7 +5265,7 @@ apccontrol accepts the following command line options:
 \begin{description}
 
 \item {\bf annoyme}
-\index[fd]{annoyme }
+\index{annoyme }
 When a shutdown is scheduled, and the time specified on the ANNOYME directive
 in the apcupsd.conf file expires, this event is generated.  
 
@@ -5275,7 +5273,7 @@ Default \&ndash; does a {\tt printf ``Power problems please logoff.'' | wall}
 then exits.  
 
 \item {\bf changeme}
-\index[fd]{changeme }
+\index{changeme }
 When apcupsd detects that the mains are on, but the battery is not functioning
 correctly, this event is generated. It is repeated every x hours.  
 
@@ -5283,7 +5281,7 @@ Default \&ndash; does a {\tt printf ``Emergency! UPS batteries have
 failed\textbackslash{}nChange them NOW'' | wall} then exits.  
 
 \item {\bf commfailure}
-\index[fd]{commfailure }
+\index{commfailure }
 This event is generated each time the communications line with the computer is
 severed. This event is not detected on dumb signaling UPSes.  
 
@@ -5291,7 +5289,7 @@ Default -does a {\tt printf ``Warning serial port communications with UPS
 lost.'' | wall} then exits.  
 
 \item {\bf commok}
-\index[fd]{commok }
+\index{commok }
 After a commfailure event is issued, when the communications to the computer
 is re-established, this event will be generated.  
 
@@ -5299,24 +5297,24 @@ Default \&ndash; does a {\tt printf ``Serial communications with UPS
 restored.'' | wall} then exits.  
 
 \item {\bf doreboot}
-\index[fd]{doreboot }
+\index{doreboot }
 This event is depreciated and should not be used.  
 
 Default - does a reboot of the system by calling {\tt shutdown -h now}  
 
 \item {\bf doshutdown}
-\index[fd]{doshutdown }
+\index{doshutdown }
 When the UPS is running on batteries and one of the limits expires (time, run,
 load), this event is generated to cause the machine to shutdown.  
 
 Default does a shutdown of the system by calling {\tt shutdown -h now}  
 
 \item {\bf emergency}
-\index[fd]{emergency }
+\index{emergency }
 Does an emergency shutdown of the system by calling {\tt shutdown -h now}  
 
 \item {\bf failing}
-\index[fd]{failing }
+\index{failing }
 This event is generated when the UPS is running on batteries and the battery
 power is exhausted. The event following this one will be a shutdown.  
 
@@ -5324,7 +5322,7 @@ Default \&ndash; does a {\tt printf ``UPS battery power exhausted. Doing
 shutdown.\textbackslash{}n'' | wall} then exits.  
 
 \item {\bf loadlimit}
-\index[fd]{loadlimit }
+\index{loadlimit }
 This event is generated when the battery charge is below the low limit
 specified in the apcupsd.conf file.  
 
@@ -5333,7 +5331,7 @@ Doing shutdown.\textbackslash{}n'' | wall} then exits.  After completing this
 event, apcupsd will immediately initiate a {\tt doshutdown} event.  
 
 \item {\bf mainsback}
-\index[fd]{mainsback }
+\index{mainsback }
 This event is generated when the mains power returns after a powerout
 condition. The shutdown event may or may not have been generated depending on
 the paramaters you have defined and the length of the power outage. A cancel
@@ -5344,7 +5342,7 @@ Default \&ndash; attempts to cancel the shutdown with a {\tt shutdown -c} (not
 sure about that!!!!)  
 
 \item {\bf onbattery}
-\index[fd]{onbattery }
+\index{onbattery }
 This event is generated 5 or 6 seconds after an initial powerfailure is
 detected. It means that apcupsd definitely considers the UPS to be on
 batteries. The onset of this event can be delayed by the ONBATTERYDELAY
@@ -5354,14 +5352,14 @@ Default \&ndash; does a {\tt printf ``Power failure. Running on UPS
 batteries.'' | wall} then exits.  
 
 \item {\bf offbattery}
-\index[fd]{offbattery }
+\index{offbattery }
 This event is generated when the mains return only if the onbattery event has
 been generated.  
 
 Default \&ndash; does nothing.  
 
 \item {\bf powerout}
-\index[fd]{powerout }
+\index{powerout }
 This event is generated immediately when apcupsd detects that the UPS has
 switched to batteries. It may be due to a short powerfailure, an automatic
 selftest of the UPS, or a longer powerfailure. In many cases, you may want to
@@ -5372,7 +5370,7 @@ Default \&ndash; does a {\tt printf ``Warning power loss detected.'' | wall}
 then exits.  
 
 \item {\bf remotedown}
-\index[fd]{remotedown }
+\index{remotedown }
 This event is generated on a slave machine when it detects either that the
 master has shutdown, or that a onbattery situation exists and the
 communications line has been severed. Despite the name, you should never
@@ -5381,13 +5379,13 @@ reboot the machine \&ndash; instead always shut it down.
 Does a {\tt shutdown -h now}  
 
 \item {\bf restartme}
-\index[fd]{restartme }
+\index{restartme }
 This event is depreciated and should not be used.  
 
 Terminates the currently running apcupsd and then restarts it.  
 
 \item {\bf runlimit}
-\index[fd]{runlimit }
+\index{runlimit }
 This event is generated when the MINUTES value defined in the apcupsd.conf
 file expires while in a power fail condition. The MINUTES is the remaining
 runtime as internally calculated by the UPS and monitored by apcuspd.  
@@ -5397,7 +5395,7 @@ shutdown.\textbackslash{}n'' | wall} then exits.  After completing this event,
 apcupsd will immediately initiate a {\tt doshutdown} event.  
 
 \item {\bf timeout}
-\index[fd]{timeout }
+\index{timeout }
 This event is generated when the TIMOUT value defined in the apcupsd.conf file
 expires while in a power fail condition. It indicates that the total time in a
 power failure has been exeeded and the machine should be shutdown. Normally,
@@ -5410,7 +5408,7 @@ shutdown.\textbackslash{}n'' | wall} then exits. After completing this event,
 apcupsd will immediately initiate a {\tt doshutdown} event.  
 
 \item {\bf startselftest}
-\index[fd]{startselftest }
+\index{startselftest }
 This event is generated when apcupsd detects a self test by the UPS. Normally
 due to the 6 second onbattery delay default time, self test events are not
 detected.  
@@ -5419,14 +5417,14 @@ This is called when apcupsd detects that the UPS is doing a self test. No
 action is taken.  
 
 \item {\bf endselftest}
-\index[fd]{endselftest }
+\index{endselftest }
 This event is generated when the end of a self test is detected.  
 
 This is called when apcupsd determines that a self test has been completed. No
 action is taken.  
 
 \item {\bf mastertimeout}
-\index[fd]{mastertimeout }
+\index{mastertimeout }
 This event is generated when a slave detects that a master has not contacted
 it in a reasonable time, or when a slave polls a master and gets no response
 in 30 seconds. This event applies only to the old master/slave networking code
@@ -5435,7 +5433,7 @@ and not to the NIS server/slave mode.
 No action is taken.  
 
 \item {\bf masterconnect}
-\index[fd]{masterconnect }
+\index{masterconnect }
 This event is generated when the slave and the master reconnect. This event
 applies only to the old master/slave networking code and not to the NIS
 server/slave mode.  
@@ -5459,8 +5457,8 @@ messages can be found in the examples directory of the source code.
 \label{Master_002fSlave-Configurations}
 
 \subsection*{12 Master/Slave Configurations}
-\index[general]{Configurations!12 Master/Slave }
-\index[general]{12 Master/Slave Configurations }
+\index{Configurations!Master/Slave }
+\index{Master/Slave Configurations }
 \addcontentsline{toc}{subsection}{12 Master/Slave Configurations}
 
 \label{index-Master_002fSlave-152}
@@ -5482,8 +5480,8 @@ If a picture is worth a thousand words for you, please see
 \label{Configuration-Directives}
 
 \subsubsection*{12.1 Configuration Directives}
-\index[general]{12.1 Configuration Directives }
-\index[general]{Directives!12.1 Configuration }
+\index{Directives!Configuration }
+\index{Configuration Directives }
 \addcontentsline{toc}{subsubsection}{12.1 Configuration Directives}
 
 \label{index-Directives-153}
@@ -5508,8 +5506,8 @@ In addition, sample master and slave configuration files can be found in the
 \label{Master_002fSlave-Problems}
 
 \subsubsection*{12.2 Master/Slave Problems}
-\index[general]{Problems!12.2 Master/Slave }
-\index[general]{12.2 Master/Slave Problems }
+\index{Problems!Master/Slave }
+\index{Master/Slave Problems }
 \addcontentsline{toc}{subsubsection}{12.2 Master/Slave Problems}
 
 \label{index-Master_002fSlave-155}
@@ -5591,10 +5589,8 @@ ns}
 
 \subsubsection*{12.3 Network Problems with Master/Slave or Server/Slave
 Configurations}
-\index[general]{12.3 Network Problems with Master/Slave or Server/Slave
-Configurations }
-\index[general]{Configurations!12.3 Network Problems with Master/Slave or
-Server/Slave }
+\index{Network Problems with Master/Slave or Server/Slave Configurations }
+\index{Configurations!Network Problems with Master/Slave or Server/Slave }
 \addcontentsline{toc}{subsubsection}{12.3 Network Problems with Master/Slave
 or Server/Slave Configurations}
 
@@ -5622,8 +5618,8 @@ a master. The error message is followed by a possible explanation:
 \label{Cannot-resolve-slave-name-XXX}
 
 {\small12.3.1.1 Cannot resolve slave name XXX}
-\index[general]{XXX!12.3.1.1 Cannot resolve slave name }
-\index[general]{12.3.1.1 Cannot resolve slave name XXX }
+\index{XXX!Cannot resolve slave name }
+\index{Cannot resolve slave name XXX }
 \addcontentsline{toc}{paragraph}{12.3.1.1 Cannot resolve slave name XXX}
 
 To contact the slave, the slave name given in the configuration file must be
@@ -5634,8 +5630,8 @@ started apcupsd during the boot process before the network is operational.
 \label{Got-slave-shutdown-from-SSS}
 
 {\small12.3.1.2 Got slave shutdown from SSS}
-\index[general]{12.3.1.2 Got slave shutdown from SSS }
-\index[general]{SSS!12.3.1.2 Got slave shutdown from }
+\index{SSS!Got slave shutdown from }
+\index{Got slave shutdown from SSS }
 \addcontentsline{toc}{paragraph}{12.3.1.2 Got slave shutdown from SSS}
 
 This message should not be printed as it is not yet used. 
@@ -5643,8 +5639,8 @@ This message should not be printed as it is not yet used.
 \label{Cannot-write-to-slave-SSS}
 
 {\small12.3.1.3 Cannot write to slave SSS}
-\index[general]{SSS!12.3.1.3 Cannot write to slave }
-\index[general]{12.3.1.3 Cannot write to slave SSS }
+\index{SSS!Cannot write to slave }
+\index{Cannot write to slave SSS }
 \addcontentsline{toc}{paragraph}{12.3.1.3 Cannot write to slave SSS}
 
 This message occurs when the master attempts to send a message to the slave
@@ -5655,8 +5651,8 @@ down.
 \label{Cannot-read-magic-from-slave-SSS}
 
 {\small12.3.1.4 Cannot read magic from slave SSS}
-\index[general]{SSS!12.3.1.4 Cannot read magic from slave }
-\index[general]{12.3.1.4 Cannot read magic from slave SSS }
+\index{SSS!Cannot read magic from slave }
+\index{Cannot read magic from slave SSS }
 \addcontentsline{toc}{paragraph}{12.3.1.4 Cannot read magic from slave SSS}
 
 This message indicates that the master attempted to read the code key from the
@@ -5668,8 +5664,8 @@ and slave machines.
 \label{Connect-to-slave-SSS-failed}
 
 {\small12.3.1.5 Connect to slave SSS failed}
-\index[general]{12.3.1.5 Connect to slave SSS failed }
-\index[general]{Failed!12.3.1.5 Connect to slave SSS }
+\index{Connect to slave SSS failed }
+\index{Failed!Connect to slave SSS }
 \addcontentsline{toc}{paragraph}{12.3.1.5 Connect to slave SSS failed}
 
 This message is logged when the master attempts to connect to slave SSS and no
@@ -5682,8 +5678,8 @@ the SLAVE directive of the master's configuration file is incorrect.
 \label{Cannot-open-stream-socket}
 
 {\small12.3.1.6 Cannot open stream socket}
-\index[general]{Socket!12.3.1.6 Cannot open stream }
-\index[general]{12.3.1.6 Cannot open stream socket }
+\index{Socket!Cannot open stream }
+\index{Cannot open stream socket }
 \addcontentsline{toc}{paragraph}{12.3.1.6 Cannot open stream socket}
 
 This indicates a fundamental networking problem on your system \&mdash; either
@@ -5699,8 +5695,8 @@ a slave. The error message is followed by a possible explanation:
 \label{Cannot-resolve-master-name-MMM}
 
 {\small12.3.2.1 Cannot resolve master name MMM}
-\index[general]{MMM!12.3.2.1 Cannot resolve master name }
-\index[general]{12.3.2.1 Cannot resolve master name MMM }
+\index{Cannot resolve master name MMM }
+\index{MMM!Cannot resolve master name }
 \addcontentsline{toc}{paragraph}{12.3.2.1 Cannot resolve master name MMM}
 
 This message is logged when the slave attempts to resolve the name given on
@@ -5713,8 +5709,8 @@ directive in the slave's configuration file.
 \label{Cannot-bind-local-address_003b-probably-already-in-use}
 
 {\small12.3.2.2 Cannot bind local address, probably already in use}
-\index[general]{12.3.2.2 Cannot bind local address, probably already in use }
-\index[general]{Use!12.3.2.2 Cannot bind local address probably already in }
+\index{Cannot bind local address, probably already in use }
+\index{Use!Cannot bind local address probably already in }
 \addcontentsline{toc}{paragraph}{12.3.2.2 Cannot bind local address, probably
 already in use}
 
@@ -5729,8 +5725,8 @@ in both your master and slave configuration files.
 \label{Socket-accept-error}
 
 {\small12.3.2.3 Socket accept error}
-\index[general]{Error!12.3.2.3 Socket accept }
-\index[general]{12.3.2.3 Socket accept error }
+\index{Socket accept error }
+\index{Error!Socket accept }
 \addcontentsline{toc}{paragraph}{12.3.2.3 Socket accept error}
 
 The slave got an error waiting on the accept() system call. This is probably
@@ -5739,8 +5735,8 @@ due to a fundamental networking problem.
 \label{Unauthorized-attempt-from-master-MMM}
 
 {\small12.3.2.4 Unauthorized attempt from master MMM}
-\index[general]{MMM!12.3.2.4 Unauthorized attempt from master }
-\index[general]{12.3.2.4 Unauthorized attempt from master MMM }
+\index{Unauthorized attempt from master MMM }
+\index{MMM!Unauthorized attempt from master }
 \addcontentsline{toc}{paragraph}{12.3.2.4 Unauthorized attempt from master
 MMM}
 
@@ -5753,8 +5749,8 @@ master configuration files respectively are correct.
 \label{Read-failure-from-socket}
 
 {\small12.3.2.5 Read failure from socket}
-\index[general]{12.3.2.5 Read failure from socket }
-\index[general]{Socket!12.3.2.5 Read failure from }
+\index{Socket!Read failure from }
+\index{Read failure from socket }
 \addcontentsline{toc}{paragraph}{12.3.2.5 Read failure from socket}
 
 The slave got an error reading the socket open to the master. This indicates a
@@ -5763,8 +5759,8 @@ fundamental networking problem.
 \label{Bad-APC-magic-from-master_003b-MMM}
 
 {\small12.3.2.6 Bad APC magic from master: MMM}
-\index[general]{MMM!12.3.2.6 Bad APC magic from master: }
-\index[general]{12.3.2.6 Bad APC magic from master: MMM }
+\index{Bad APC magic from master: MMM }
+\index{MMM!Bad APC magic from master: }
 \addcontentsline{toc}{paragraph}{12.3.2.6 Bad APC magic from master: MMM}
 
 The slave received a code key from the master that does not correspond to the
@@ -5776,8 +5772,8 @@ slaves.
 \label{Bad-user-magic-from-master_003b-MMM}
 
 {\small12.3.2.7 Bad user magic from master: MMM}
-\index[general]{12.3.2.7 Bad user magic from master: MMM }
-\index[general]{MMM!12.3.2.7 Bad user magic from master: }
+\index{MMM!Bad user magic from master: }
+\index{Bad user magic from master: MMM }
 \addcontentsline{toc}{paragraph}{12.3.2.7 Bad user magic from master: MMM}
 
 This message indicates that the master and slave have previously communicated,
@@ -5807,8 +5803,8 @@ and slave machines.
 \label{Controlling-Multiple-UPSes-on-one-Machine}
 
 \subsection*{13 Controlling Multiple UPSes on one Machine}
-\index[general]{13 Controlling Multiple UPSes on one Machine }
-\index[general]{Machine!13 Controlling Multiple UPSes on one }
+\index{Controlling Multiple UPSes on one Machine }
+\index{Machine!Controlling Multiple UPSes on one }
 \addcontentsline{toc}{subsection}{13 Controlling Multiple UPSes on one
 Machine}
 
@@ -5820,8 +5816,7 @@ controlled (recall the
 \label{Configuration}
 
 \subsubsection*{13.1 Configuration}
-\index[general]{13.1 Configuration }
-\index[general]{Configuration!13.1 }
+\index{Configuration }
 \addcontentsline{toc}{subsubsection}{13.1 Configuration}
 
 The way to accomplish the above is to ensure that none of the critical files
@@ -5890,7 +5885,7 @@ Note, in this case, we use considerably more configuration options to ensure
 that the system files are placed in a different directory
 (\$HOME/apcupsd/bin). We have also selected a different serial port and a
 different NIS (Network Information Server) port. And finally, we have used the
-{\tt \verb{--{disable-install-distdir} option, which prevents {\tt make install} from
+{\tt --disable-install-distdir} option, which prevents {\tt make install} from
 doing the final system installation (i.e. the modification of the halt script)
 since this was previously done. 
 
@@ -5926,8 +5921,8 @@ Computer B could be shutdown by the first master that signaled it to do so.
 \label{Support-for-SNMP-UPSes}
 
 \subsection*{14 Support for SNMP UPSes}
-\index[general]{14 Support for SNMP UPSes }
-\index[general]{UPSes!14 Support for SNMP }
+\index{Support for SNMP UPSes }
+\index{UPSes!Support for SNMP }
 \addcontentsline{toc}{subsection}{14 Support for SNMP UPSes}
 
 \label{index-SNMP-162}
@@ -5945,8 +5940,8 @@ ucd-snmp) installed
 \label{Connecting-an-SNMP-UPS}
 
 \subsubsection*{14.1 Connecting an SNMP UPS}
-\index[general]{UPS!14.1 Connecting an SNMP }
-\index[general]{14.1 Connecting an SNMP UPS }
+\index{Connecting an SNMP UPS }
+\index{UPS!Connecting an SNMP }
 \addcontentsline{toc}{subsubsection}{14.1 Connecting an SNMP UPS}
 
 \label{index-SNMP_002c-Connecting-163}
@@ -5978,8 +5973,8 @@ read-write access.
 \label{Building-and-Installing-apcupsd-_003c1_003e}
 
 \subsubsection*{14.2 Building and Installing apcupsd}
-\index[general]{Apcupsd!14.2 Building and Installing }
-\index[general]{14.2 Building and Installing apcupsd }
+\index{Building and Installing apcupsd }
+\index{Apcupsd!Building and Installing }
 \addcontentsline{toc}{subsubsection}{14.2 Building and Installing apcupsd}
 
 Follow the instructions in 
@@ -6003,8 +5998,8 @@ the following options (in addition to any others you need) on the {\bf
 \label{SNMP-Specific-Information}
 
 \subsubsection*{14.3 SNMP Specific Information}
-\index[general]{14.3 SNMP Specific Information }
-\index[general]{Information!14.3 SNMP Specific }
+\index{Information!SNMP Specific }
+\index{SNMP Specific Information }
 \addcontentsline{toc}{subsubsection}{14.3 SNMP Specific Information}
 
 \label{index-SNMP-164}
@@ -6016,8 +6011,8 @@ UPS.
 \label{Known-Problems}
 
 \subsubsection*{14.4 Known Problems}
-\index[general]{Problems!14.4 Known }
-\index[general]{14.4 Known Problems }
+\index{Known Problems }
+\index{Problems!Known }
 \addcontentsline{toc}{subsubsection}{14.4 Known Problems}
 
 Currently (as of 3.10.0) the code to power off the UPS needs special
@@ -6046,8 +6041,8 @@ With this setup your UPS operations should be safe.
 \label{Alternate-Ways-To-Run-The-Network-Information-Server}
 
 \subsection*{15 Alternate Ways To Run The Network Information Server}
-\index[general]{Server!15 Alternate Ways To Run The Network Information }
-\index[general]{15 Alternate Ways To Run The Network Information Server }
+\index{Server!Alternate Ways To Run The Network Information }
+\index{Alternate Ways To Run The Network Information Server }
 \addcontentsline{toc}{subsection}{15 Alternate Ways To Run The Network
 Information Server}
 
@@ -6076,8 +6071,7 @@ default.
 \label{Running-the-server-as-a-child-of-apcupsd}
 
 \subsubsection*{15.1 Running the server as a child of apcupsd}
-\index[general]{15.1 Running the server as a child of apcupsd }
-\index[general]{Apcupsd!15.1 Running the server as a child of }
+\index{Running the server as a child of apcupsd }
 \addcontentsline{toc}{subsubsection}{15.1 Running the server as a child of
 apcupsd}
 
@@ -6107,8 +6101,8 @@ server will be controlled by the statements you put in /etc/hosts.allow.
 \label{Running-apcnisd-from-INETD}
 
 \subsubsection*{15.2 Running apcnisd from INETD}
-\index[general]{INETD!15.2 Running apcnisd from }
-\index[general]{15.2 Running apcnisd from INETD }
+\index{INETD!Running apcnisd from }
+\index{Running apcnisd from INETD }
 \addcontentsline{toc}{subsubsection}{15.2 Running apcnisd from INETD}
 
 This is probably the most secure and most desirable way of running the network
@@ -6184,8 +6178,8 @@ will automatically invoke apcnisd.
 \label{Running-apcnisd-Standalome}
 
 \subsubsection*{15.3 Running apcnisd Standalome}
-\index[general]{15.3 Running apcnisd Standalome }
-\index[general]{Standalome!15.3 Running apcnisd }
+\index{Standalome!Running apcnisd }
+\index{Running apcnisd Standalome }
 \addcontentsline{toc}{subsubsection}{15.3 Running apcnisd Standalome}
 
 This is probably the least desirable of the three ways to run an apcupsd
@@ -6213,8 +6207,8 @@ affect the operation of apcupsd.
 \label{apcupsd-System-Logging}
 
 \subsection*{16 apcupsd System Logging}
-\index[general]{Logging!16 apcupsd System }
-\index[general]{16 apcupsd System Logging }
+\index{Logging!apcupsd System }
+\index{Apcupsd System Logging }
 \addcontentsline{toc}{subsection}{16 apcupsd System Logging}
 
 \label{index-Logging_002c-System-166}
@@ -6229,8 +6223,8 @@ server.
 \label{Logging-Types}
 
 \subsubsection*{16.1 Logging Types}
-\index[general]{Types!16.1 Logging }
-\index[general]{16.1 Logging Types }
+\index{Types!Logging }
+\index{Logging Types }
 \addcontentsline{toc}{subsubsection}{16.1 Logging Types}
 
 \label{index-Logging_002c-types-168}
@@ -6247,8 +6241,8 @@ Debug logging consists of debug messages. Normally these are turned on only by
 developers, and currently there exist very few of these debug messages. 
 
 {\smallDATA Logging}
-\index[general]{Logging!DATA }
-\index[general]{DATA Logging }
+\index{Logging!DATA }
+\index{DATA Logging }
 \addcontentsline{toc}{paragraph}{DATA Logging}
 
 Data logging consists of periodically logging important data concerning the
@@ -6257,8 +6251,8 @@ operation of the UPS. See the Data Logging (see
 details. 
 
 {\smallSTATUS Logging}
-\index[general]{STATUS Logging }
-\index[general]{Logging!STATUS }
+\index{STATUS Logging }
+\index{Logging!STATUS }
 \addcontentsline{toc}{paragraph}{STATUS Logging}
 
 Status logging consists of logging all available information known about your
@@ -6270,8 +6264,8 @@ For more details on STATUS logging, see the Status (see
 the Technical Reference. 
 
 {\smallEVENTS Logging}
-\index[general]{Logging!EVENTS }
-\index[general]{EVENTS Logging }
+\index{Logging!EVENTS }
+\index{EVENTS Logging }
 \addcontentsline{toc}{paragraph}{EVENTS Logging}
 
 Events logging consists of logging events as they happen. For example,
@@ -6284,8 +6278,8 @@ more details.
 \label{Implementation-Details}
 
 \subsubsection*{16.2 Implementation Details}
-\index[general]{16.2 Implementation Details }
-\index[general]{Details!16.2 Implementation }
+\index{Details!Implementation }
+\index{Implementation Details }
 \addcontentsline{toc}{subsubsection}{16.2 Implementation Details}
 
 In order to ensure that the data logged to syslog() can be directed to
@@ -6362,8 +6356,8 @@ looks like:
 \label{Developers-Notes}
 
 \subsubsection*{16.3 Developers Notes}
-\index[general]{Notes!16.3 Developers }
-\index[general]{16.3 Developers Notes }
+\index{Developers Notes }
+\index{Notes!Developers }
 \addcontentsline{toc}{subsubsection}{16.3 Developers Notes}
 
 \label{index-Developers-Notes-169}
@@ -6379,8 +6373,8 @@ log\_event() in apclog.c.
 \label{Installation-on-Windows}
 
 \subsection*{Installation: Windows}
-\index[general]{Windows!Installation: }
-\index[general]{Installation: Windows }
+\index{Windows!Installation: }
+\index{Installation: Windows }
 \addcontentsline{toc}{subsection}{Installation: Windows}
 
 \label{index-Installation_002c-Windows-170}
@@ -6389,8 +6383,7 @@ log\_event() in apclog.c.
 \label{The-Windows-Version-of-apcupsd}
 
 \subsection*{17 The Windows Version of apcupsd}
-\index[general]{Apcupsd!17 The Windows Version of }
-\index[general]{17 The Windows Version of apcupsd }
+\index{Windows Version of apcupsd }
 \addcontentsline{toc}{subsection}{17 The Windows Version of apcupsd}
 
 The Windows version of apcupsd has been tested on Win95, Win98, WinMe, WinNT,
@@ -6413,8 +6406,7 @@ runs in the background even if there is no user logged into the system.
 \label{Installation}
 
 \subsubsection*{17.1 Installation}
-\index[general]{Installation!17.1 }
-\index[general]{17.1 Installation }
+\index{Installation }
 \addcontentsline{toc}{subsubsection}{17.1 Installation}
 
 Normally, you will install the Windows version of apcupsd from the binaries.
@@ -6642,8 +6634,8 @@ charged, the plug icon will become a plug with a lightning bolt in the middle
 \label{Installation-Directory}
 
 \subsubsection*{17.2 Installation Directory}
-\index[general]{17.2 Installation Directory }
-\index[general]{Directory!17.2 Installation }
+\index{Installation Directory }
+\index{Directory!Installation }
 \addcontentsline{toc}{subsubsection}{17.2 Installation Directory}
 
 \label{index-Windows_002c-Installation-Directory-172}
@@ -6657,8 +6649,7 @@ a rebuild of the source.
 \label{Testing}
 
 \subsubsection*{17.3 Testing}
-\index[general]{Testing!17.3 }
-\index[general]{17.3 Testing }
+\index{Testing }
 \addcontentsline{toc}{subsubsection}{17.3 Testing}
 
 \label{index-Windows_002c-Testing-173}
@@ -6680,8 +6671,7 @@ cable type, or an incorrect address for the serial port.
 \label{Upgrading}
 
 \subsubsection*{17.4 Upgrading}
-\index[general]{Upgrading!17.4 }
-\index[general]{17.4 Upgrading }
+\index{Upgrading }
 \addcontentsline{toc}{subsubsection}{17.4 Upgrading}
 
 \label{index-Windows_002c-Upgrading-175}
@@ -6721,8 +6711,8 @@ button.
 \label{Post-Installation}
 
 \subsubsection*{17.5 Post Installation}
-\index[general]{17.5 Post Installation }
-\index[general]{Installation!17.5 Post }
+\index{Post Installation }
+\index{Installation!Post }
 \addcontentsline{toc}{subsubsection}{17.5 Post Installation}
 
 \label{index-Windows_002c-Post-Installation-177}
@@ -6746,8 +6736,8 @@ boxes by putting a pound sign (\#) in column one of the appropriate line.
 \label{Problem-Areas}
 
 \subsubsection*{17.6 Problem Areas}
-\index[general]{Areas!17.6 Problem }
-\index[general]{17.6 Problem Areas }
+\index{Areas!Problem }
+\index{Problem Areas }
 \addcontentsline{toc}{subsubsection}{17.6 Problem Areas}
 
 \label{index-Problems_002c-Windows-178}
@@ -6792,8 +6782,8 @@ found, etc are written to this file.
 \label{Utility-Functions}
 
 \subsubsection*{17.7 Utility Functions}
-\index[general]{17.7 Utility Functions }
-\index[general]{Functions!17.7 Utility }
+\index{Functions!Utility }
+\index{Utility Functions }
 \addcontentsline{toc}{subsubsection}{17.7 Utility Functions}
 
 The directory c:\textbackslash{}apcupsd\textbackslash{}bin contains six
@@ -6829,8 +6819,7 @@ and selecting the desired function from the popup menu.
 \label{Disclaimer}
 
 \subsubsection*{17.8 Disclaimer}
-\index[general]{Disclaimer!17.8 }
-\index[general]{17.8 Disclaimer }
+\index{Disclaimer }
 \addcontentsline{toc}{subsubsection}{17.8 Disclaimer}
 
 \label{index-Disclaimer-180}
@@ -6848,7 +6837,7 @@ shuts down, your computer may not reboot automatically. This is because we do
 not know how to regain control after the disks have been synced in order to
 shut off the UPS power.  
 
-Nevertheless, it is possible to use the {\tt \verb{--{kill-on-powerfail} option on
+Nevertheless, it is possible to use the {\tt --kill-on-powerfail} option on
 the apcupsd command line, but the use of this option could cause the power to
 be cut off while your machine is still running. See 
 \ilink{Shutdown Sequence}{manual.tex#Shutdown-Sequence-_003c1_003e} of this
@@ -6858,7 +6847,7 @@ commented out in
 c:\textbackslash{}apcupsd\textbackslash{}etc\textbackslash{}apcupsd\textbackslash
 {}apccontrol under the {\bf doshutdown} case.  
 
-An alternative to the {\tt \verb{--{kill-on-powerfail} option is to use the KILLDELAY
+An alternative to the {\tt --kill-on-powerfail} option is to use the KILLDELAY
 (see 
 \ilink{KILLDELAY \lt{}time in
 seconds\gt{}}{manual.tex#KILLDELAY-_003ctime-in-seconds_003e}) configuration
@@ -6878,8 +6867,8 @@ remove or comment out the calls to {\bf popup} from this file.
 \label{Email-Notification-of-Events}
 
 \subsubsection*{17.9 Email Notification of Events}
-\index[general]{17.9 Email Notification of Events }
-\index[general]{Events!17.9 Email Notification of }
+\index{Email Notification of Events }
+\index{Events!Email Notification of }
 \addcontentsline{toc}{subsubsection}{17.9 Email Notification of Events}
 
 \label{index-Email-181}
@@ -6900,8 +6889,8 @@ c:\textbackslash{}apcupsd\textbackslash{}etc\textbackslash{}apcupsd.
 \label{Killpower-under-Windows}
 
 \subsubsection*{17.10 Killpower under Windows}
-\index[general]{Windows!17.10 Killpower under }
-\index[general]{17.10 Killpower under Windows }
+\index{Windows!Killpower under }
+\index{Killpower under Windows }
 \addcontentsline{toc}{subsubsection}{17.10 Killpower under Windows}
 
 \label{index-Windows_002c-Killpower-183}
@@ -6966,8 +6955,8 @@ probably sufficient.
 \label{Power-Down-During-Shutdown}
 
 \subsubsection*{17.11 Power Down During Shutdown}
-\index[general]{Shutdown!17.11 Power Down During }
-\index[general]{17.11 Power Down During Shutdown }
+\index{Shutdown!Power Down During }
+\index{Power Down During Shutdown }
 \addcontentsline{toc}{subsubsection}{17.11 Power Down During Shutdown}
 
 \label{index-Windows_002c-Power-down-184}
@@ -6999,8 +6988,8 @@ with any text editor and change our calls to shutdown to psshutdown.
 \label{Command-Line-Options-Specific-to-the-Windows-Version}
 
 \subsubsection*{17.12 Command Line Options Specific to the Windows Version}
-\index[general]{Version!17.12 Command Line Options Specific to the Windows }
-\index[general]{17.12 Command Line Options Specific to the Windows Version }
+\index{Command Line Options Specific to the Windows Version }
+\index{Version!Command Line Options Specific to the Windows }
 \addcontentsline{toc}{subsubsection}{17.12 Command Line Options Specific to
 the Windows Version}
 
@@ -7020,43 +7009,43 @@ addition, the following Windows only options are implemented:
 \begin{description}
 
 \item {\bf /servicehelper}
-\index[dir]{/servicehelper }
+\index{/servicehelper }
 Run the service helper application  
 
 \item {\bf /service}
-\index[dir]{/service }
+\index{/service }
 Start apcupsdas a service  
 
 \item {\bf /run}
-\index[dir]{/run }
+\index{/run }
 Run the apcupsd application  
 
 \item {\bf /install}
-\index[dir]{/install }
+\index{/install }
 Install apcupsd as a service in the system registry  
 
 \item {\bf /remove}
-\index[dir]{/remove }
+\index{/remove }
 Uninstall apcupsd from the system registry  
 
 \item {\bf /about}
-\index[dir]{/about }
+\index{/about }
 Show the apcupsd about dialogue box  
 
 \item {\bf /status}
-\index[dir]{/status }
+\index{/status }
 Show the apcupsd status dialogue box  
 
 \item {\bf /events}
-\index[dir]{/events }
+\index{/events }
 Show the apcupsd events dialogue box  
 
 \item {\bf /kill}
-\index[dir]{/kill }
+\index{/kill }
 Stop any running apcupsd  
 
 \item {\bf /help}
-\index[dir]{/help }
+\index{/help }
 Show the apcupsd help dialogue box 
 \end{description}
 
@@ -7068,8 +7057,8 @@ in some of the .pif files that have been created for your use.
 \label{Building-the-Win32-Version-from-the-Source}
 
 \subsubsection*{17.13 Building the Win32 Version from the Source}
-\index[general]{17.13 Building the Win32 Version from the Source }
-\index[general]{Source!17.13 Building the Win32 Version from the }
+\index{Building the Win32 Version from the Source }
+\index{Source!Building the Win32 Version from the }
 \addcontentsline{toc}{subsubsection}{17.13 Building the Win32 Version from the
 Source}
 
@@ -7084,15 +7073,15 @@ don't forget to look at the system specifics for CYGWIN.
 \label{Installation-on-Serial_002dLine-UPSes}
 
 \subsection*{Installation: Serial-Line UPSes}
-\index[general]{Installation: Serial-Line UPSes }
-\index[general]{UPSes!Installation: Serial-Line }
+\index{Installation: Serial-Line UPSes }
+\index{UPSes!Installation: Serial-Line }
 \addcontentsline{toc}{subsection}{Installation: Serial-Line UPSes}
 
 \label{Overview-of-Serial_002dInterface-UPSes}
 
 \subsection*{18 Overview of Serial-Interface UPSes}
-\index[general]{18 Overview of Serial-Interface UPSes }
-\index[general]{UPSes!18 Overview of Serial-Interface }
+\index{UPSes!Overview of Serial-Interface }
+\index{Overview of Serial-Interface UPSes }
 \addcontentsline{toc}{subsection}{18 Overview of Serial-Interface UPSes}
 
 \label{index-Serial-UPSes-189}
@@ -7115,8 +7104,8 @@ that do not assert the CTS signal.
 \label{Connecting-a-Serial_002dLine-UPS-to-a-USB-Port}
 
 \subsection*{19 Connecting a Serial-Line UPS to a USB Port}
-\index[general]{Port!19 Connecting a Serial-Line UPS to a USB }
-\index[general]{19 Connecting a Serial-Line UPS to a USB Port }
+\index{Port!Connecting a Serial-Line UPS to a USB }
+\index{Connecting a Serial-Line UPS to a USB Port }
 \addcontentsline{toc}{subsection}{19 Connecting a Serial-Line UPS to a USB
 Port}
 
@@ -7149,10 +7138,8 @@ case, this was not necessary.
 \label{Connecting-a-APC-USB-UPS-to-either-a-PC-USB-or-Serial-Port}
 
 \subsection*{20 Connecting a APC USB UPS to either a PC USB or Serial Port}
-\index[general]{Port!20 Connecting a APC USB UPS to either a PC USB or Serial
-}
-\index[general]{20 Connecting a APC USB UPS to either a PC USB or Serial Port
-}
+\index{Port!Connecting a APC USB UPS to either a PC USB or Serial }
+\index{Connecting a APC USB UPS to either a PC USB or Serial Port }
 \addcontentsline{toc}{subsection}{20 Connecting a APC USB UPS to either a PC
 USB or Serial Port}
 
@@ -7167,8 +7154,7 @@ cost models) will act as a serial-line device.
 \label{Cables}
 
 \subsection*{21 Cables}
-\index[general]{Cables!21 }
-\index[general]{21 Cables }
+\index{Cables }
 \addcontentsline{toc}{subsection}{21 Cables}
 
 \label{index-Cables-191}
@@ -7193,8 +7179,8 @@ can build your own {\it Custom-RJ45} cable.
 \label{Smart_002dCustom-Cable-for-SmartUPSes}
 
 \subsubsection*{21.1 Smart-Custom Cable for SmartUPSes}
-\index[general]{SmartUPSes!21.1 Smart-Custom Cable for }
-\index[general]{21.1 Smart-Custom Cable for SmartUPSes }
+\index{SmartUPSes!Smart-Custom Cable for }
+\index{Smart-Custom Cable for SmartUPSes }
 \addcontentsline{toc}{subsubsection}{21.1 Smart-Custom Cable for SmartUPSes}
 
 \label{index-Smart-Custom-Cable-192}
@@ -7254,8 +7240,8 @@ following diagram.
 \label{Smart-Signalling-Cable-for-BackUPS-CS-Models}
 
 \subsubsection*{21.2 Smart Signalling Cable for BackUPS CS Models}
-\index[general]{Models!21.2 Smart Signalling Cable for BackUPS CS }
-\index[general]{21.2 Smart Signalling Cable for BackUPS CS Models }
+\index{Models!Smart Signalling Cable for BackUPS CS }
+\index{Smart Signalling Cable for BackUPS CS Models }
 \addcontentsline{toc}{subsubsection}{21.2 Smart Signalling Cable for BackUPS
 CS Models}
 
@@ -7333,8 +7319,8 @@ us by slither\_man. Many thanks!
 \label{Voltage_002dSignalling-Cable-for-_0022dumb_0022-UPSes}
 
 \subsubsection*{21.3 Voltage-Signalling Cable for ``dumb'' UPSes}
-\index[general]{UPSes!21.3 Voltage-Signalling Cable for "dumb" }
-\index[general]{21.3 Voltage-Signalling Cable for "dumb" UPSes }
+\index{UPSes!Voltage-Signalling Cable for "dumb" }
+\index{Voltage-Signalling Cable for "dumb" UPSes }
 \addcontentsline{toc}{subsubsection}{21.3 Voltage-Signalling Cable for "dumb"
 UPSes}
 
@@ -7468,8 +7454,8 @@ When using this cable with apcupsd specify the following in apcupsd.conf:
 \label{Other-APC-Cables-that-apcupsd-Supports}
 
 \subsubsection*{21.4 Other APC Cables that apcupsd Supports}
-\index[general]{Supports!21.4 Other APC Cables that apcupsd }
-\index[general]{21.4 Other APC Cables that apcupsd Supports }
+\index{Other APC Cables that apcupsd Supports }
+\index{Supports!Other APC Cables that apcupsd }
 \addcontentsline{toc}{subsubsection}{21.4 Other APC Cables that apcupsd
 Supports}
 
@@ -7491,10 +7477,8 @@ by APC
 
 \subsubsection*{21.5 Voltage Signalling Features Supported by Apcupsd for
 Various Cables}
-\index[general]{Cables!21.5 Voltage Signalling Features Supported by Apcupsd
-for Various }
-\index[general]{21.5 Voltage Signalling Features Supported by Apcupsd for
-Various Cables }
+\index{Cables!Voltage Signalling Features Supported by Apcupsd for Various }
+\index{Voltage Signalling Features Supported by Apcupsd for Various Cables }
 \addcontentsline{toc}{subsubsection}{21.5 Voltage Signalling Features
 Supported by Apcupsd for Various Cables}
 
@@ -7527,8 +7511,8 @@ voltage-signalling mode.
 \label{Voltage-Signalling}
 
 \subsubsection*{21.6 Voltage Signalling}
-\index[general]{Signalling!21.6 Voltage }
-\index[general]{21.6 Voltage Signalling }
+\index{Signalling!Voltage }
+\index{Voltage Signalling }
 \addcontentsline{toc}{subsubsection}{21.6 Voltage Signalling}
 
 \label{index-Voltage-Signalling_002c-Cables-198}
@@ -7567,8 +7551,8 @@ numbering scheme listed above is:
 \label{The-Back_002dUPS-Office-500-signals}
 
 \subsubsection*{21.7 The Back-UPS Office 500 signals}
-\index[general]{Signals!21.7 The Back-UPS Office 500 }
-\index[general]{21.7 The Back-UPS Office 500 signals }
+\index{Back-UPS Office 500 signals }
+\index{Signals!Back-UPS Office 500 }
 \addcontentsline{toc}{subsubsection}{21.7 The Back-UPS Office 500 signals}
 
 \label{index-Cables_002c-BackUPS-Office-200}
@@ -7609,8 +7593,8 @@ It appears that the signals work as follows:
 \label{Analyses-of-APC-Cables}
 
 \subsubsection*{21.8 Analyses of APC Cables}
-\index[general]{21.8 Analyses of APC Cables }
-\index[general]{Cables!21.8 Analyses of APC }
+\index{Cables!Analyses of APC }
+\index{Analyses of APC Cables }
 \addcontentsline{toc}{subsubsection}{21.8 Analyses of APC Cables}
 
 \label{index-Cables-202}
@@ -8037,8 +8021,8 @@ RD on the computer side.
 \label{Win32-Implementation-Restrictions-for-Simple-UPSes}
 
 \subsubsection*{21.9 Win32 Implementation Restrictions for Simple UPSes}
-\index[general]{UPSes!21.9 Win32 Implementation Restrictions for Simple }
-\index[general]{21.9 Win32 Implementation Restrictions for Simple UPSes }
+\index{UPSes!Win32 Implementation Restrictions for Simple }
+\index{Win32 Implementation Restrictions for Simple UPSes }
 \addcontentsline{toc}{subsubsection}{21.9 Win32 Implementation Restrictions
 for Simple UPSes}
 
@@ -8055,8 +8039,8 @@ the 0023A cable are not implemented.
 \label{Internal-Apcupsd-Actions-for-Simple-Cables}
 
 \subsubsection*{21.10 Internal Apcupsd Actions for Simple Cables}
-\index[general]{21.10 Internal Apcupsd Actions for Simple Cables }
-\index[general]{Cables!21.10 Internal Apcupsd Actions for Simple }
+\index{Internal Apcupsd Actions for Simple Cables }
+\index{Cables!Internal Apcupsd Actions for Simple }
 \addcontentsline{toc}{subsubsection}{21.10 Internal Apcupsd Actions for Simple
 Cables}
 
@@ -8142,8 +8126,8 @@ Cables}
 \label{RS232-Wiring-and-Signal-Conventions}
 
 \subsubsection*{21.11 RS232 Wiring and Signal Conventions}
-\index[general]{21.11 RS232 Wiring and Signal Conventions }
-\index[general]{Conventions!21.11 RS232 Wiring and Signal }
+\index{Conventions!RS232 Wiring and Signal }
+\index{RS232 Wiring and Signal Conventions }
 \addcontentsline{toc}{subsubsection}{21.11 RS232 Wiring and Signal
 Conventions}
 
@@ -8210,10 +8194,10 @@ n-and-9_002dpin_003b-Female-End}
 
 \subsubsection*{21.12 Pin Assignment for the Serial Port (RS-232C), 25-pin and
 9-pin, Female End}
-\index[general]{21.12 Pin Assignment for the Serial Port (RS-232C), 25-pin and
-9-pin, Female End }
-\index[general]{End!21.12 Pin Assignment for the Serial Port RS-232C 25-pin
-and 9-pin Female }
+\index{Pin Assignment for the Serial Port (RS-232C), 25-pin and 9-pin, Female
+End }
+\index{End!Pin Assignment for the Serial Port RS-232C 25-pin and 9-pin Female
+}
 \addcontentsline{toc}{subsubsection}{21.12 Pin Assignment for the Serial Port
 (RS-232C), 25-pin and 9-pin, Female End}
 
@@ -8248,8 +8232,8 @@ and 9-pin Female }
 \label{Ioctl-to-RS232-Correspondence}
 
 \subsubsection*{21.13 Ioctl to RS232 Correspondence}
-\index[general]{Correspondence!21.13 Ioctl to RS232 }
-\index[general]{21.13 Ioctl to RS232 Correspondence }
+\index{Ioctl to RS232 Correspondence }
+\index{Correspondence!Ioctl to RS232 }
 \addcontentsline{toc}{subsubsection}{21.13 Ioctl to RS232 Correspondence}
 
 \label{index-Cables-218}
@@ -8276,8 +8260,8 @@ and 9-pin Female }
 \label{Testing-Serial_002dLine-UPSes}
 
 \subsection*{22 Testing Serial-Line UPSes}
-\index[general]{UPSes!22 Testing Serial-Line }
-\index[general]{22 Testing Serial-Line UPSes }
+\index{Testing Serial-Line UPSes }
+\index{UPSes!Testing Serial-Line }
 \addcontentsline{toc}{subsection}{22 Testing Serial-Line UPSes}
 
 \label{index-Testing_002c-Serial-219}
@@ -8320,8 +8304,8 @@ s}.
 \label{Establishing-Serial-Port-Connection}
 
 \subsubsection*{22.1 Establishing Serial Port Connection}
-\index[general]{Connection!22.1 Establishing Serial Port }
-\index[general]{22.1 Establishing Serial Port Connection }
+\index{Establishing Serial Port Connection }
+\index{Connection!Establishing Serial Port }
 \addcontentsline{toc}{subsubsection}{22.1 Establishing Serial Port Connection}
 
 \label{index-Testing_002c-Serial-221}
@@ -8452,8 +8436,8 @@ next test.
 \label{Using-apctest-on-Serial_002dLine-UPSses}
 
 \subsubsection*{22.2 Using apctest on Serial-Line UPSses}
-\index[general]{UPSses!22.2 Using apctest on Serial-Line }
-\index[general]{22.2 Using apctest on Serial-Line UPSses }
+\index{UPSses!Using apctest on Serial-Line }
+\index{Using apctest on Serial-Line UPSses }
 \addcontentsline{toc}{subsubsection}{22.2 Using apctest on Serial-Line UPSses}
 
 \label{index-apctest-222}
@@ -8613,8 +8597,8 @@ and additionally {\bf CD} when the batteries are low.
 \label{Troubleshooting-Serial-Line-communications}
 
 \subsection*{23 Troubleshooting Serial Line communications}
-\index[general]{23 Troubleshooting Serial Line communications }
-\index[general]{Communications!23 Troubleshooting Serial Line }
+\index{Communications!Troubleshooting Serial Line }
+\index{Troubleshooting Serial Line communications }
 \addcontentsline{toc}{subsection}{23 Troubleshooting Serial Line
 communications}
 
@@ -8624,8 +8608,8 @@ communications}
 \label{Determining-Which-Voltage_002dSignaling-Cable-You-Have}
 
 \subsubsection*{23.1 Determining Which Voltage-Signaling Cable You Have}
-\index[general]{Have!23.1 Determining Which Voltage-Signaling Cable You }
-\index[general]{23.1 Determining Which Voltage-Signaling Cable You Have }
+\index{Determining Which Voltage-Signaling Cable You Have }
+\index{Have!Determining Which Voltage-Signaling Cable You }
 \addcontentsline{toc}{subsubsection}{23.1 Determining Which Voltage-Signaling
 Cable You Have}
 
@@ -8644,8 +8628,8 @@ manual.
 \label{Once-you-have-established-serial-communications}
 
 \subsubsection*{23.2 Once you have established serial communications}
-\index[general]{Communications!23.2 Once you have established serial }
-\index[general]{23.2 Once you have established serial communications }
+\index{Once you have established serial communications }
+\index{Communications!Once you have established serial }
 \addcontentsline{toc}{subsubsection}{23.2 Once you have established serial
 communications}
 
@@ -8670,8 +8654,8 @@ configured with a serial port mouse on the same serial port.
 \label{Recalibrating-the-UPS-Runtime}
 
 \subsection*{24 Recalibrating the UPS Runtime}
-\index[general]{Runtime!24 Recalibrating the UPS }
-\index[general]{24 Recalibrating the UPS Runtime }
+\index{Runtime!Recalibrating the UPS }
+\index{Recalibrating the UPS Runtime }
 \addcontentsline{toc}{subsection}{24 Recalibrating the UPS Runtime}
 
 \label{index-Runtime-recalibration-231}
@@ -8728,8 +8712,8 @@ as discharging these kinds of batteries tends to shorten their life span.
 \label{Status-Logging-On-Serial_002dLine-UPSes}
 
 \subsubsection*{24.1 Status Logging On Serial-Line UPSes}
-\index[general]{UPSes!24.1 Status Logging On Serial-Line }
-\index[general]{24.1 Status Logging On Serial-Line UPSes }
+\index{UPSes!Status Logging On Serial-Line }
+\index{Status Logging On Serial-Line UPSes }
 \addcontentsline{toc}{subsubsection}{24.1 Status Logging On Serial-Line UPSes}
 
 Serial-line UPSes that speak the apcsmart protocol log all of the events
@@ -8768,8 +8752,8 @@ BackUPS and NetUPS Simple Signals
 \label{DATA-Logging}
 
 \subsection*{25 DATA Logging}
-\index[general]{Logging!25 DATA }
-\index[general]{25 DATA Logging }
+\index{Logging!DATA }
+\index{DATA Logging }
 \addcontentsline{toc}{subsection}{25 DATA Logging}
 
 \label{index-Logging_002c-DATA-233}
@@ -8806,8 +8790,8 @@ An actual example from the log file is:
 \label{Technical-Reference}
 
 \subsection*{Technical Reference}
-\index[general]{Reference!Technical }
-\index[general]{Technical Reference }
+\index{Reference!Technical }
+\index{Technical Reference }
 \addcontentsline{toc}{subsection}{Technical Reference}
 
 \label{index-Technical-Reference-235}
@@ -8815,8 +8799,8 @@ An actual example from the log file is:
 \label{Configuration-Directive-Reference}
 
 \subsection*{26 Configuration Directive Reference}
-\index[general]{Reference!26 Configuration Directive }
-\index[general]{26 Configuration Directive Reference }
+\index{Configuration Directive Reference }
+\index{Reference!Configuration Directive }
 \addcontentsline{toc}{subsection}{26 Configuration Directive Reference}
 
 \label{index-Reference_002c-Directives-236}
@@ -8830,8 +8814,8 @@ you have an exotic configuration.
 \label{General-Configuration-Directives}
 
 \subsubsection*{26.1 General Configuration Directives}
-\index[general]{26.1 General Configuration Directives }
-\index[general]{Directives!26.1 General Configuration }
+\index{General Configuration Directives }
+\index{Directives!General Configuration }
 \addcontentsline{toc}{subsubsection}{26.1 General Configuration Directives}
 
 \label{index-Directives_002c-General-239}
@@ -8842,15 +8826,15 @@ directive is ignored for UPSCABLE ether).
 \begin{description}
 
 \item {\bf UPSTYPE \lt{}type of APC UPS you have\gt{}}
-\index[fd]{UPSTYPE \lt{}type of APC UPS you have\gt{} }
+\index{UPSTYPE \lt{}type of APC UPS you have\gt{} }
 The name of a driver.  Should be one of dumb, apcsmart, net, usb, snmp, or
 test. This describes your interface type.  
 
 The UPSTYPE directive can be defined during installation by using the {\tt
-\verb{--{with-upstype=} option of the {\tt ./configure} program.  
+--with-upstype=} option of the {\tt ./configure} program.  
 
 \item {\bf UPSCABLE \lt{}type of cable you are using\gt{}\gt{}}
-\index[fd]{UPSCABLE \lt{}type of cable you are using\gt{}\gt{} }
+\index{UPSCABLE \lt{}type of cable you are using\gt{}\gt{} }
 
 \footnotesize
 \begin{verbatim}
@@ -8863,18 +8847,18 @@ The UPSTYPE directive can be defined during installation by using the {\tt
 \end{verbatim}
 \normalsize
 
-The {\tt \verb{--{with-upscable=} option of {\tt ./configure} can be used to set a
+The {\tt --with-upscable=} option of {\tt ./configure} can be used to set a
 default for this directive during the your build.  
 
 \item {\bf DEVICE \lt{}name of device\gt{}}
-\index[fd]{DEVICE \lt{}name of device\gt{} }
+\index{DEVICE \lt{}name of device\gt{} }
 Specify which device is used for UPS communications. For serial ports, it is
 usually something like /dev/ttyS0. For USB ports, you may leave the name of
 the device blank (no specification) and apcupsd will automatically search the
 standard locations for the UPS.  
 
 Normally, the {\tt ./configure} program will set an appropriate default value.
-You may also specify the {\tt \verb{--{with-serial-dev=} option of the {\tt
+You may also specify the {\tt --with-serial-dev=} option of the {\tt
 ./configure} program to set this directive at build time.  
 
 If you have specified {\bf UPSTYPE net}, then the device name to be specified
@@ -8888,7 +8872,7 @@ hostname:vendor:community}. Please see the SNMP chapter (see
 manual for more details.  
 
 \item {\bf LOCKFILE \lt{}path to lockfile\gt{}}
-\index[fd]{LOCKFILE \lt{}path to lockfile\gt{} }
+\index{LOCKFILE \lt{}path to lockfile\gt{} }
 This option tells apcupsd where to create a lockfile for the USB or serial
 port in the specified directory. This is important to keep two programs from
 reading or writing the port at the same time. Please note that although the
@@ -8896,17 +8880,15 @@ directive name is LOCKFILE, you are actually specifying the lock file path.
 apcupsd automatically appends the name of the device when creating the file.
 On most systems, this directive is automatically set by the {\tt ./configure}
 program.  You may also explicitly set it during the build process by using the
-{\tt \verb{--{with-lock-dir=} option of the {\tt ./configure} program. 
+{\tt --with-lock-dir=} option of the {\tt ./configure} program. 
 \end{description}
 
 \label{Configuration-Directives-Used-by-the-Network-Information-Server}
 
 \subsubsection*{26.2 Configuration Directives Used by the Network Information
 Server}
-\index[general]{Server!26.2 Configuration Directives Used by the Network
-Information }
-\index[general]{26.2 Configuration Directives Used by the Network Information
-Server }
+\index{Configuration Directives Used by the Network Information Server }
+\index{Server!Configuration Directives Used by the Network Information }
 \addcontentsline{toc}{subsubsection}{26.2 Configuration Directives Used by the
 Network Information Server}
 
@@ -8914,12 +8896,12 @@ Network Information Server}
 \label{index-Network-directives-242}
 None of these directives are required for proper operation of apcupsd. For the
 Network Information Server to work, it must be enabled in the configuration
-(default) with {\tt \verb{--{enable-nis}  
+(default) with {\tt --enable-nis}  
 
 \begin{description}
 
 \item {\bf NETSERVER [on | off]}
-\index[dir]{NETSERVER [on | off] }
+\index{NETSERVER [on | off] }
 This configuration directive turns the network information server on or off.
 If it is on, apcupsd will spawn a child process that serves STATUS and EVENTS
 information over the network. This information is currently used by the
@@ -8928,31 +8910,31 @@ you may want to invoke a separate information server daemon from the inetd
 daemon. In that case, {\it NETSERVER} should be {\it off}.  
 
 \item {\bf NISIP \lt{}IP-address\gt{}}
-\index[dir]{NISIP \lt{}IP-address\gt{} }
+\index{NISIP \lt{}IP-address\gt{} }
 This directive specifies an IP address on which NIS server will listen for
 incoming connections. Default value is 0.0.0.0 that means any incoming request
 will be serviced but if you want it to listen to a single subnet you can set
 it up to that subnet address, for example 192.168.10.0. Additionally you can
 listen for a single IP like 192.168.10.1. You may also use the {\tt
-\verb{--{with-nisip=} option of the {\tt ./configure} program to set this directive
+--with-nisip=} option of the {\tt ./configure} program to set this directive
 during the build.  
 
 This directive does not work on Win32 machines because inet\_ipton() is not
 implemented there.  
 
 \item {\bf NISPORT \lt{}port\gt{}}
-\index[dir]{NISPORT \lt{}port\gt{} }
+\index{NISPORT \lt{}port\gt{} }
 This configuration directive specifies the port to be used by the apcupsd
 Network Information Server. The default is platform dependent, but typically
 3551, which we have received from IANA as the official apcupsd networking
 port. If you change this port, you must manually change the \#define
 SERV\_TCP\_PORT in cgi/upsfetch.c and rebuild the CGI programs. An alternative
-is to use the {\tt \verb{--{with-nis-port=} option of the {\tt ./configure} program
+is to use the {\tt --with-nis-port=} option of the {\tt ./configure} program
 during the build. In this case, all the appropriate locations will be
 automatically changed.  
 
 \item {\bf EVENTSFILE \lt{}filename\gt{}}
-\index[dir]{EVENTSFILE \lt{}filename\gt{} }
+\index{EVENTSFILE \lt{}filename\gt{} }
 If you want the apcupsd network information server to provide the last 10
 events via the network, you must specify a file where apcupsd will save these
 events. The default is: /etc/apcupsd/apcupsd.events. Currently, apcupsd will
@@ -8966,14 +8948,14 @@ numbers, apcupsd may make excessive memory demands on the system during the
 data access and file truncation operations.  
 
 This filename may also be specified at build time by using the {\tt
-\verb{--{with-log-dir=} option of the {\tt ./configure} program. 
+--with-log-dir=} option of the {\tt ./configure} program. 
 \end{description}
 
 \label{Configuration-Directives-used-during-Power-Failures}
 
 \subsubsection*{26.3 Configuration Directives used during Power Failures}
-\index[general]{Failures!26.3 Configuration Directives used during Power }
-\index[general]{26.3 Configuration Directives used during Power Failures }
+\index{Configuration Directives used during Power Failures }
+\index{Failures!Configuration Directives used during Power }
 \addcontentsline{toc}{subsubsection}{26.3 Configuration Directives used during
 Power Failures}
 
@@ -8988,7 +8970,7 @@ see the Cables (see
 \begin{description}
 
 \item {\bf ANNOY \lt{}time in seconds\gt{}}
-\index[dir]{ANNOY \lt{}time in seconds\gt{} }
+\index{ANNOY \lt{}time in seconds\gt{} }
 Specify the time in seconds between messages requesting logged in users to get
 off the system during a power failure. This timer starts only when the UPS is
 running on batteries. The default is 300 seconds (5 minutes). apcupsd sends
@@ -9004,7 +8986,7 @@ Note that if {\bf NOLOGON} is set to {\bf disable} the annoy messages will
 also be disabled.  
 
 \item {\bf ANNOYDELAY \lt{}time in seconds\gt{}}
-\index[dir]{ANNOYDELAY \lt{}time in seconds\gt{} }
+\index{ANNOYDELAY \lt{}time in seconds\gt{} }
 Specify delay time in seconds before apcupsd begins requesting logged in users
 to get off the system during a power failure. This timer starts only after the
 UPS is running on batteries. This timer is reset when the power returns. The
@@ -9014,8 +8996,7 @@ disable}.
 
 \item {\bf NOLOGON \lt{}specifies when apcupsd should prevent user
 logins\gt{}}
-\index[dir]{NOLOGON \lt{}specifies when apcupsd should prevent user
-logins\gt{} }
+\index{NOLOGON \lt{}specifies when apcupsd should prevent user logins\gt{} }
 [ disable | timeout | percent | minutes | always ] are valid types.  
 
 The type specified allows you define the point when apcupsd will create the
@@ -9034,20 +9015,20 @@ for the other types is very short (KES).
 \begin{description}
 
 \item {\bf disable}
-\index[fd]{disable }
+\index{disable }
 prevents apcupsd from creating the nologin file.  Consequently, any user can
 login during a power failure condition.  Also, the ANNOY feature is disabled
 so users will not be warned to logoff the system.  
 
 \item {\bf timeout}
-\index[fd]{timeout }
+\index{timeout }
 specifies that apcupsd should prohibit logins after the UPS is on batteries
 for 90\% of the time specified on the {\bf TIMEOUT} configuration directive.
 Note! Normally you don't want to specify a TIMEOUT value, so this option is
 probably not too useful (KES).  
 
 \item {\bf percent}
-\index[fd]{percent }
+\index{percent }
 specifies that apcupsd should prohibit logins when the remaining battery
 charge percentage reaches 110\% or less than the value specified on the {\bf
 BATTERYLEVEL} configuration directive. Thus if the {\bf BATTERYLEVEL} is
@@ -9055,7 +9036,7 @@ specified as 15, apcupsd will prohibit logins when the battery charge drops
 below 16\% (15\% X 110\% = 16\%).  
 
 \item {\bf minutes}
-\index[fd]{minutes }
+\index{minutes }
 specifies that apcupsd should prohibit logins when the remaining runtime in
 minutes reaches 110\% or less than the value specified on the {\bf MINUTES}
 configuration directive.  Thus if {\bf MINUTES} is set to 3, apcupsd will
@@ -9063,14 +9044,14 @@ prohibit logins when the remaining runtime is less than 3 minutes (3 X 110\% =
 3).  
 
 \item {\bf always}
-\index[fd]{always }
+\index{always }
 causes apcupsd to immediately prohibit logins when a power failure occurs.
 This will also enable the ANNOY feature. 
 \end{description}
 
 
 \item {\bf BATTERYLEVEL \lt{}percent of battery\gt{}}
-\index[fd]{BATTERYLEVEL \lt{}percent of battery\gt{} }
+\index{BATTERYLEVEL \lt{}percent of battery\gt{} }
 If BATTERYLEVEL is specified, during a power failure, apcupsd will halt the
 system when the remaining battery charge falls below the specified percentage.
 The default is 5 percent. This directive is ignored for dumb
@@ -9078,7 +9059,7 @@ The default is 5 percent. This directive is ignored for dumb
 BATTERYLEVEL -1} in your apcupsd.conf file.  
 
 \item {\bf MINUTES \lt{}battery runtime in minutes\gt{}}
-\index[fd]{MINUTES \lt{}battery runtime in minutes\gt{} }
+\index{MINUTES \lt{}battery runtime in minutes\gt{} }
 If MINUTES is specified, during a power failure, apcupsd will shutdown the
 system when the remaining runtime on batteries as internally calculated by the
 UPS falls below the time specified. The default is 3. This directive is
@@ -9091,7 +9072,7 @@ recommend that you disable this timer by setting {\bf MINUTES -1} in your
 apcupsd.conf file.  
 
 \item {\bf TIMEOUT \lt{}time in seconds\gt{}}
-\index[fd]{TIMEOUT \lt{}time in seconds\gt{} }
+\index{TIMEOUT \lt{}time in seconds\gt{} }
 After a power failure, apcupsd will halt the system when TIMEOUT seconds have
 expired.  A value of zero disables this timer. Normally for all Smart UPS
 models and dumb UPSes with cables that support low battery detection, this
@@ -9125,7 +9106,7 @@ BATTERYLEVEL}) or the remaining battery runtime ({\bf MINUTES}).
 \label{KILLDELAY-_003ctime-in-seconds_003e}
 
 \item {\bf KILLDELAY \lt{}time in seconds\gt{}}
-\index[fd]{KILLDELAY \lt{}time in seconds\gt{} }
+\index{KILLDELAY \lt{}time in seconds\gt{} }
 If killdelay is set, apcupsd will continue running after a shutdown has been
 requested, and after the specified time in seconds, apcupsd will attempt to
 shut off the UPS the power. This directive should normally be disabled by
@@ -9142,8 +9123,8 @@ the system will terminate all processes during the shutdown.
 \label{Configuration-Directives-used-to-Control-System-Logging}
 
 \subsubsection*{26.4 Configuration Directives used to Control System Logging}
-\index[general]{26.4 Configuration Directives used to Control System Logging }
-\index[general]{Logging!26.4 Configuration Directives used to Control System }
+\index{Logging!Configuration Directives used to Control System }
+\index{Configuration Directives used to Control System Logging }
 \addcontentsline{toc}{subsubsection}{26.4 Configuration Directives used to
 Control System Logging}
 
@@ -9153,7 +9134,7 @@ Control System Logging}
 \begin{description}
 
 \item {\bf STATTIME\lt{}time\gt{}}
-\index[dir]{STATTIME\lt{}time\gt{} }
+\index{STATTIME\lt{}time\gt{} }
 This directive supplies the time interval between writes to the STATUS file.
 If set to zero, the STATUS file will not be written. Please note that in a
 future version of apcupsd the STATUS file code will disappear since its
@@ -9162,19 +9143,19 @@ apcaccess status}, as a consequence, it is normally disabled by setting it to
 zero.  
 
 \item {\bf STATFILE \lt{}file\gt{}}
-\index[fd]{STATFILE \lt{}file\gt{} }
+\index{STATFILE \lt{}file\gt{} }
 This directive specifies the file to be used when writing the STATUS
 information. The default is /etc/apcupsd/apcupsd.status.  
 
 \item {\bf DATATIME\lt{}time\gt{}}
-\index[fd]{DATATIME\lt{}time\gt{} }
+\index{DATATIME\lt{}time\gt{} }
 This directives supplies the time interval between writes of PowerChute\&tm;
 like data information to the log file. See the Data (see 
 \ilink{DATA Logging}{manual.tex#DATA-Logging}) section of this manual for
 additional details.  
 
 \item {\bf FACILITY\lt{}log-facility\gt{}}
-\index[fd]{FACILITY\lt{}log-facility\gt{} }
+\index{FACILITY\lt{}log-facility\gt{} }
 The facility directive can be used to change the system logging class or
 facility. The default is {\bf DAEMON}. This parameter can be useful if you
 wish to direct the apcupsd system logging information to other than your
@@ -9185,8 +9166,8 @@ details.
 \label{Configuration-Directives-for-Sharing-a-UPS}
 
 \subsubsection*{26.5 Configuration Directives for Sharing a UPS}
-\index[general]{UPS!26.5 Configuration Directives for Sharing a }
-\index[general]{26.5 Configuration Directives for Sharing a UPS }
+\index{UPS!Configuration Directives for Sharing a }
+\index{Configuration Directives for Sharing a UPS }
 \addcontentsline{toc}{subsubsection}{26.5 Configuration Directives for Sharing
 a UPS}
 
@@ -9198,14 +9179,14 @@ the slaves, will obtain their information via the network from the master.
 
 Note, as of version 3.10.x, the old master/slave code is by default turned off
 in the configuration. You must explicitly enable it by including a {\tt
-\verb{--{enable-master-slave} option on your {\tt ./configure} command before
+--enable-master-slave} option on your {\tt ./configure} command before
 building the source.  
 
 In addition to the old master/slave code, there is now a new network driver
-enabled with {\tt \verb{--{enable-net} (default disabled) that can be used to control
+enabled with {\tt --enable-net} (default disabled) that can be used to control
 a slave from any version of apcupsd running NIS. This is a much more flexible
 system of controlling slaves because a slave machine that also has NIS turned
-on can thus act as a master for another slave with {\tt \verb{--{enable-net} turned
+on can thus act as a master for another slave with {\tt --enable-net} turned
 on. With this mode turned on, the slave obtains the address of the master from
 the {\bf DEVICE} directive, which takes the form {\bf hostname[:port]} as a
 consequence, none of the directives apply for this form of networking. In
@@ -9219,7 +9200,7 @@ configuration option.
 \begin{description}
 
 \item {\bf UPSCLASS \lt{}class of operation\gt{}}
-\index[fd]{UPSCLASS \lt{}class of operation\gt{} }
+\index{UPSCLASS \lt{}class of operation\gt{} }
 [ standalone | shareslave | sharemaster ] and [ netslave | netmaster ] are
 valid types. [ standalone | netslave | netmaster ] are tested classes. [
 shareslave | sharemaster ] classes are being tested.  
@@ -9244,7 +9225,7 @@ Use {\bf sharemaster}, if and only if you are using a ShareUPS and connected
 to the ADVANCED Port Smart Signal control. This code is not fully tested.  
 
 \item {\bf UPSMODE [disable | share | net | sharenet ] are valid types.}
-\index[fd]{UPSMODE [disable | share | net | sharenet ] are valid types. }
+\index{UPSMODE [disable | share | net | sharenet ] are valid types. }
 [ disable | net ] are the only known and tested classes.  
 
 [ share | sharenet ] classes are being tested.  
@@ -9260,18 +9241,18 @@ SmartAccessories(tm) (internal/external box) for SmartUPSes. The share and
 sharenet code is not fully tested.  
 
 \item {\bf NETTIME \lt{}time in seconds\gt{}}
-\index[fd]{NETTIME \lt{}time in seconds\gt{} }
+\index{NETTIME \lt{}time in seconds\gt{} }
 The interval in seconds that the master uses to send information to slave
 machines. This rate is automatically set to 1 second if the UPS goes on
 batteries and reset to your specified value when the mains power returns. A
 typical value might be 60 seconds.  
 
 \item {\bf NETPORT \lt{}IP port number\gt{}}
-\index[fd]{NETPORT \lt{}IP port number\gt{} }
+\index{NETPORT \lt{}IP port number\gt{} }
 This port number is used for communications in the master/slave networking
 code. Note that the master and each slave must have the same port number
 specified on the NETPORT directive in the configuration file. This port may
-also be specified during installation by using the {\tt \verb{--{with-net-port=}
+also be specified during installation by using the {\tt --with-net-port=}
 option of the {\tt ./configure} program.  
 
 The NETPORT should not be confused with the port number for the Network
@@ -9279,7 +9260,7 @@ Information Server which is specified with the {\bf SERVERPORT} configuration
 directive.  
 
 \item {\bf MASTER \lt{}name of the master\gt{} for slave machines.}
-\index[fd]{MASTER \lt{}name of the master\gt{} for slave machines. }
+\index{MASTER \lt{}name of the master\gt{} for slave machines. }
 Used in slave configuration files, this is the network name of the master
 which is authorized to send commands to this slave. In all cases (of which I
 am aware), when you specify a {\bf MASTER} directive, you will also specify
@@ -9311,7 +9292,7 @@ SLAVE} directives, but this is less flexible.
 
 \item {\bf SLAVE \lt{}name of slave(s)\gt{} used only in MASTER configuration
 files.}
-\index[fd]{SLAVE \lt{}name of slave(s)\gt{} used only in MASTER configuration
+\index{SLAVE \lt{}name of slave(s)\gt{} used only in MASTER configuration
 files. }
 Used in master configuration files, this is the name of a slave machine that
 depends on this master. There can be a maximum of 20 slaves attached to one
@@ -9333,7 +9314,7 @@ SLAVE} directives, but this is less flexible.
 
 \item {\bf USERMAGIC \lt{} user defined magic\gt{} used only in SLAVE
 configuration files.}
-\index[fd]{USERMAGIC \lt{} user defined magic\gt{} used only in SLAVE
+\index{USERMAGIC \lt{} user defined magic\gt{} used only in SLAVE
 configuration files. }
 The USERMAGIC directive is a sort of password that gives a second level of
 identification security in a slave configuration file. It is a character
@@ -9348,8 +9329,8 @@ and every slave on the network. This directive is not required.
 \label{Configuration-Directives-Used-to-Set-the-UPS-EPROM}
 
 \subsubsection*{26.6 Configuration Directives Used to Set the UPS EPROM}
-\index[general]{26.6 Configuration Directives Used to Set the UPS EPROM }
-\index[general]{EPROM!26.6 Configuration Directives Used to Set the UPS }
+\index{Configuration Directives Used to Set the UPS EPROM }
+\index{EPROM!Configuration Directives Used to Set the UPS }
 \addcontentsline{toc}{subsubsection}{26.6 Configuration Directives Used to Set
 the UPS EPROM}
 
@@ -9358,7 +9339,7 @@ the UPS EPROM}
 NOTE. THESE ARE DEPRECIATED AND NO LONGER WORK IN APCUPSD PLEASE USE APCTEST  
 
 The values specified with the following directives are only used if the {\tt
-\verb{--{configure} option is specified on the apcupsd command line, and the UPS is
+--configure} option is specified on the apcupsd command line, and the UPS is
 capable of internal EPROM programming.  In that case, apcupsd attempts to set
 the values into the UPSes EPROM.  
 
@@ -9372,7 +9353,7 @@ manual for further details before attempting to reprogram your EEPROM.
 \begin{description}
 
 \item {\bf SENSITIVITY \lt{}sets sensitivity level\gt{}}
-\index[fd]{SENSITIVITY \lt{}sets sensitivity level\gt{} }
+\index{SENSITIVITY \lt{}sets sensitivity level\gt{} }
 (H)igh, (M)edium, (L)ow  
 
 This value determine how sensitive the UPS is to the mains quality and voltage
@@ -9383,73 +9364,73 @@ want to try a less sensitive setting, providing that your computer equipment
 tolerates the poor quality mains. This value is written to the UPS EPROM when
 the configure option is specified.  
 
-Under normal apcupsd operations (no {\tt \verb{--{configure} option), apcupsd will
+Under normal apcupsd operations (no {\tt --configure} option), apcupsd will
 read the value stored in the UPS and display it in the STATUS output.  
 
 \label{WAKEUP-_003cset-wakeup-delay_003e}
 
 \item {\bf WAKEUP \lt{}set wakeup delay\gt{}}
-\index[fd]{WAKEUP \lt{}set wakeup delay\gt{} }
+\index{WAKEUP \lt{}set wakeup delay\gt{} }
 The UPS power restart delay value in [0,60,180,300] in seconds after the UPS
 has shut down during a power failure. This is to prevent the power from coming
 back on too quickly after a power down, and is important for those who have
 high rpm drives that need to spin down before powering them up again. Some
 older SCSI models are very sensitive to this problem. Default is zero. This
-value is written to the UPS EPROM when the {\tt \verb{--{configure} option is
+value is written to the UPS EPROM when the {\tt --configure} option is
 specified.  
 
-Under normal apcupsd operations (no {\tt \verb{--{configure} option), apcupsd will
+Under normal apcupsd operations (no {\tt --configure} option), apcupsd will
 read the value stored in the UPS and display it in the STATUS output.  
 
 \label{SLEEP-_003cset-sleep-delay_003e}
 
 \item {\bf SLEEP \lt{}set sleep delay\gt{}}
-\index[fd]{SLEEP \lt{}set sleep delay\gt{} }
+\index{SLEEP \lt{}set sleep delay\gt{} }
 The UPS delay or grace period in [20,180,300,600] seconds before the UPS cuts
 the power to your equipment. The default is 20 seconds. This value is written
-to the UPS EPROM when the {\tt \verb{--{configure} option is specified.  
+to the UPS EPROM when the {\tt --configure} option is specified.  
 
-Under normal apcupsdoperations (no {\tt \verb{--{configure} option), apcupsd will
+Under normal apcupsdoperations (no {\tt --configure} option), apcupsd will
 read the value stored in the UPS and display it in the STATUS output.  
 
 \item {\bf LOTRANSFER \lt{}lower limit of ups batt. transfer\gt{}}
-\index[fd]{LOTRANSFER \lt{}lower limit of ups batt. transfer\gt{} }
+\index{LOTRANSFER \lt{}lower limit of ups batt. transfer\gt{} }
 This sets the low line voltage point at which to switch over to batteries.
 Different values are permitted based on the UPS model, classification, and
 manufacture date. Use {\tt apcaccess eeprom} to show you which values are
-permitted. This value is written to the UPS EPROM when the {\tt \verb{--{configure}
+permitted. This value is written to the UPS EPROM when the {\tt --configure}
 option is specified.  
 
-Under normal apcupsdoperations (no {\tt \verb{--{configure} option), apcupsd will
+Under normal apcupsdoperations (no {\tt --configure} option), apcupsd will
 read the value stored in the UPS and display it in the STATUS output.  
 
 \item {\bf HITRANSFER \lt{}upper limit of ups batt. transfer\gt{}}
-\index[fd]{HITRANSFER \lt{}upper limit of ups batt. transfer\gt{} }
+\index{HITRANSFER \lt{}upper limit of ups batt. transfer\gt{} }
 This sets the high line voltage point to switch over to batteries. Different
 values are permitted based on the UPS model, classification, and manufacture
 date. Use {\tt apcaccess eeprom} to show you which values are permitted. This
-value is written to the UPS EPROM when the {\tt \verb{--{configure} option is
+value is written to the UPS EPROM when the {\tt --configure} option is
 specified.  
 
-Under normal apcupsdoperations (no {\tt \verb{--{configure} option), apcupsd will
+Under normal apcupsdoperations (no {\tt --configure} option), apcupsd will
 read the value stored in the UPS and display it in the STATUS output.  
 
 \label{RETURNCHARGE-_003cmin_005f-batt_005f-charge-level_003e}
 
 \item {\bf RETURNCHARGE \lt{}min. batt. charge level\gt{}}
-\index[fd]{RETURNCHARGE \lt{}min. batt. charge level\gt{} }
+\index{RETURNCHARGE \lt{}min. batt. charge level\gt{} }
 This parameter specifies what battery percentage charge is necessary before
 the UPS will supply power to your equipment after a power down. Different
 values are permitted based on the UPS model, classification, and manufacture
 date. Use {\tt apcaccess eeprom} to show you which values are permitted. This
-value is written to the UPS EPROM when the {\tt \verb{--{configure} option is
+value is written to the UPS EPROM when the {\tt --configure} option is
 specified.  
 
-Under normal apcupsdoperations (no {\tt \verb{--{configure} option), apcupsd will
+Under normal apcupsdoperations (no {\tt --configure} option), apcupsd will
 read the value stored in the UPS and display it in the STATUS output.  
 
 \item {\bf BEEPSTATE \lt{}alarm beep state\gt{}}
-\index[fd]{BEEPSTATE \lt{}alarm beep state\gt{} }
+\index{BEEPSTATE \lt{}alarm beep state\gt{} }
 This parameter tells the UPS when it can sound its audio alarm. These settings
 are based on discrete events related to the remaining capacity of the UPS.  
 
@@ -9470,12 +9451,12 @@ never
 
 
 \item {\bf UPSNAME \lt{}string\gt{}}
-\index[fd]{UPSNAME \lt{}string\gt{} }
+\index{UPSNAME \lt{}string\gt{} }
 This is an eight character string. This is the UPS name that will be stored in
 the UPS EPROM.  
 
 \item {\bf BATTDATE \lt{}string\gt{}}
-\index[fd]{BATTDATE \lt{}string\gt{} }
+\index{BATTDATE \lt{}string\gt{} }
 This is an eight character string that is the last date the batteries were
 changed. 
 \end{description}
@@ -9483,8 +9464,8 @@ changed.
 \label{apcupsd-Status-Logging}
 
 \subsection*{27 apcupsd Status Logging}
-\index[general]{Logging!27 apcupsd Status }
-\index[general]{27 apcupsd Status Logging }
+\index{Logging!apcupsd Status }
+\index{Apcupsd Status Logging }
 \addcontentsline{toc}{subsection}{27 apcupsd Status Logging}
 
 \label{index-Logging_002c-Status-250}
@@ -9496,8 +9477,8 @@ will get at it via apcaccess, but there are other ways as well.
 \label{Status-report-format}
 
 \subsubsection*{27.1 Status report format}
-\index[general]{Format!27.1 Status report }
-\index[general]{27.1 Status report format }
+\index{Format!Status report }
+\index{Status report format }
 \addcontentsline{toc}{subsubsection}{27.1 Status report format}
 
 \label{index-Status-Report-252}
@@ -9550,8 +9531,8 @@ size in the first record, the complete status can be reliably reassembled.
 \label{Status-Report-Example}
 
 \subsubsection*{27.2 Status Report Example}
-\index[general]{Example!27.2 Status Report }
-\index[general]{27.2 Status Report Example }
+\index{Example!Status Report }
+\index{Status Report Example }
 \addcontentsline{toc}{subsubsection}{27.2 Status Report Example}
 
 \label{index-Examples_002c-Status-Report-254}
@@ -9622,8 +9603,8 @@ An example of output from an international SmartUPS 1000 follows:
 \label{Status-Report-Fields}
 
 \subsubsection*{27.3 Status Report Fields}
-\index[general]{Fields!27.3 Status Report }
-\index[general]{27.3 Status Report Fields }
+\index{Fields!Status Report }
+\index{Status Report Fields }
 \addcontentsline{toc}{subsubsection}{27.3 Status Report Fields}
 
 \label{index-Status-256}
@@ -9632,258 +9613,258 @@ The meaning of the above variables are:
 \begin{description}
 
 \item {\bf APC}
-\index[fd]{APC }
+\index{APC }
 is the header record indicating the STATUS format revision level, the number
 of records that follow the APC statement, and the number of bytes that follow
 the record.  
 
 \item {\bf DATE}
-\index[fd]{DATE }
+\index{DATE }
 is the date and time that the information was last obtained from the UPS.  
 
 \item {\bf HOSTNAME}
-\index[fd]{HOSTNAME }
+\index{HOSTNAME }
 is the name of the machine that collected the UPS data.  
 
 \item {\bf RELEASE}
-\index[fd]{RELEASE }
+\index{RELEASE }
 is the apcupsd release number.  
 
 \item {\bf CABLE}
-\index[fd]{CABLE }
+\index{CABLE }
 is the cable as specified in the configuration file.  
 
 \item {\bf MODEL}
-\index[fd]{MODEL }
+\index{MODEL }
 is the UPS model as derived from information from the UPS.  
 
 \item {\bf UPSMODE}
-\index[fd]{UPSMODE }
+\index{UPSMODE }
 is the mode in which apcupsd is operating.  
 
 \item {\bf STARTTIME}
-\index[fd]{STARTTIME }
+\index{STARTTIME }
 is the time/date that apcupsd was started.  
 
 \item {\bf UPSNAME}
-\index[fd]{UPSNAME }
+\index{UPSNAME }
 is the name of the UPS as stored in the EEPROM.  
 
 \item {\bf STATUS}
-\index[fd]{STATUS }
+\index{STATUS }
 is the current status of the UPS (ONLINE, CHARGING, ONBATT,...)  
 
 \item {\bf MASTERUPD}
-\index[fd]{MASTERUPD }
+\index{MASTERUPD }
 is the last time the master sent an update to the slave. This value is present
 only in slave configurations.  
 
 \item {\bf LINEV}
-\index[fd]{LINEV }
+\index{LINEV }
 is the current line voltage as returned by the UPS.  
 
 \item {\bf LOADPCT}
-\index[fd]{LOADPCT }
+\index{LOADPCT }
 is the percentage of load capacity as estimated by the UPS.  
 
 \item {\bf BCHARGE}
-\index[fd]{BCHARGE }
+\index{BCHARGE }
 is the percentage charge on the batteries.  
 
 \item {\bf TIMELEFT}
-\index[fd]{TIMELEFT }
+\index{TIMELEFT }
 is the remaining runtime left on batteries as estimated by the UPS.  
 
 \item {\bf MBATTCHG}
-\index[fd]{MBATTCHG }
+\index{MBATTCHG }
 if the battery charge percentage (BCHARGE) drops below this value, apcupsd
 will shutdown your system.  
 
 \item {\bf MINTIMEL}
-\index[fd]{MINTIMEL }
+\index{MINTIMEL }
 apcupsd will shutdown your system if the remaining runtime equals or is below
 this point.  
 
 \item {\bf MAXTIME}
-\index[fd]{MAXTIME }
+\index{MAXTIME }
 apcupsd will shutdown your system if the time on batteries exceeds this value.
 A value of zero disables the feature.  
 
 \item {\bf MAXLINEV}
-\index[fd]{MAXLINEV }
+\index{MAXLINEV }
 is the maximum line voltage since the last STATUS as returned by the UPS.  
 
 \item {\bf MINLINEV}
-\index[fd]{MINLINEV }
+\index{MINLINEV }
 is the minimum line voltage since the last STATUS as returned by the UPS.  
 
 \item {\bf OUTPUTV}
-\index[fd]{OUTPUTV }
+\index{OUTPUTV }
 is the voltage the UPS is supplying to your equipment.  
 
 \item {\bf SENSE}
-\index[fd]{SENSE }
+\index{SENSE }
 is the sensitivity level of the UPS to line voltage fluctuations.  
 
 \item {\bf DWAKE}
-\index[fd]{DWAKE }
+\index{DWAKE }
 is the amount of time the UPS will wait after a power off condition when the
 power is restored.  
 
 \item {\bf DSHUTD}
-\index[fd]{DSHUTD }
+\index{DSHUTD }
 is the grace delay that the UPS gives after receiving a power down command
 from apcupsd before it powers off your equipment.  
 
 \item {\bf DLOWBATT}
-\index[fd]{DLOWBATT }
+\index{DLOWBATT }
 is the remaining runtime below which the UPS sends the low battery signal. At
 this point apcupsd will force an immediate emergency shutdown.  
 
 \item {\bf LOTRANS}
-\index[fd]{LOTRANS }
+\index{LOTRANS }
 is the line voltage below which the UPS will switch to batteries.  
 
 \item {\bf HITRANS}
-\index[fd]{HITRANS }
+\index{HITRANS }
 is the line voltage above which the UPS will switch to batteries.  
 
 \item {\bf RETPCT}
-\index[fd]{RETPCT }
+\index{RETPCT }
 is the percentage charge that the batteries must have after a power off
 condition before the UPS will restore power to your equipment.  
 
 \item {\bf STATFLAG}
-\index[fd]{STATFLAG }
+\index{STATFLAG }
 is a status flag indicating the UPS status. See STATUS.  
 
 \item {\bf ITEMP}
-\index[fd]{ITEMP }
+\index{ITEMP }
 is the internal UPS temperature as supplied by the UPS.  
 
 \item {\bf ALARMDEL}
-\index[fd]{ALARMDEL }
+\index{ALARMDEL }
 is the delay period for the UPS alarm.  
 
 \item {\bf BATTV}
-\index[fd]{BATTV }
+\index{BATTV }
 is the battery voltage as supplied by the UPS.  
 
 \item {\bf LINEFREQ}
-\index[fd]{LINEFREQ }
+\index{LINEFREQ }
 is the line frequency in Hertz as given by the UPS.  
 
 \item {\bf LASTXFER}
-\index[fd]{LASTXFER }
+\index{LASTXFER }
 is the reason for the last transfer to batteries.  
 
 \item {\bf NUMXFERS}
-\index[fd]{NUMXFERS }
+\index{NUMXFERS }
 the number of transfers to batteries since apcupsd startup.  
 
 \item {\bf XONBATT}
-\index[fd]{XONBATT }
+\index{XONBATT }
 time and date of last transfer to batteries, or N/A.  
 
 \item {\bf TONBATT}
-\index[fd]{TONBATT }
+\index{TONBATT }
 time in seconds currently on batteries, or 0.  
 
 \item {\bf CUMONBATT}
-\index[fd]{CUMONBATT }
+\index{CUMONBATT }
 total (cumulative) time on batteries in seconds since apcupsd startup.  
 
 \item {\bf XOFFBATT}
-\index[fd]{XOFFBATT }
+\index{XOFFBATT }
 time and date of last transfer from batteries, or N/A.  
 
 \item {\bf SELFTEST}
-\index[fd]{SELFTEST }
+\index{SELFTEST }
 is the results of the last self test, and may have the following values: OK -
 self test indicates good battery BT - self test failed due to insufficient
 battery capacity NG - self test failed due to overload NO - No results (i.e.
 no self test performed in the last 5 minutes).  
 
 \item {\bf STESTI}
-\index[fd]{STESTI }
+\index{STESTI }
 is the interval in hours between automatic self tests.  
 
 \item {\bf STATFLAG}
-\index[fd]{STATFLAG }
+\index{STATFLAG }
 status flag. English version is given by STATUS.  
 
 \item {\bf DIPSW}
-\index[fd]{DIPSW }
+\index{DIPSW }
 is the dip switch settings.  
 
 \item {\bf REG1}
-\index[fd]{REG1 }
+\index{REG1 }
 is the value from the UPS fault register 1.  
 
 \item {\bf REG2}
-\index[fd]{REG2 }
+\index{REG2 }
 is the value from the UPS fault register 2.  
 
 \item {\bf REG3}
-\index[fd]{REG3 }
+\index{REG3 }
 is the value from the UPS fault register 3.  
 
 \item {\bf MANDATE}
-\index[fd]{MANDATE }
+\index{MANDATE }
 is the date the UPS was manufactured.  
 
 \item {\bf SERIALNO}
-\index[fd]{SERIALNO }
+\index{SERIALNO }
 is the UPS serial number.  
 
 \item {\bf BATTDATE}
-\index[fd]{BATTDATE }
+\index{BATTDATE }
 is the date that batteries were last replaced.  
 
 \item {\bf NOMOUTV}
-\index[fd]{NOMOUTV }
+\index{NOMOUTV }
 is the output voltage that the UPS will attempt to supply when on battery
 power.  
 
 \item {\bf NOMBATTV}
-\index[fd]{NOMBATTV }
+\index{NOMBATTV }
 is the nominal battery voltage.  
 
 \item {\bf HUMIDITY}
-\index[fd]{HUMIDITY }
+\index{HUMIDITY }
 is the humidity as measured by the UPS.  
 
 \item {\bf AMBTEMP}
-\index[fd]{AMBTEMP }
+\index{AMBTEMP }
 is the ambient temperature as measured by the UPS.  
 
 \item {\bf EXTBATTS}
-\index[fd]{EXTBATTS }
+\index{EXTBATTS }
 is the number of external batteries as defined by the user. A correct number
 here helps the UPS compute the remaining runtime more accurately.  
 
 \item {\bf BADBATTS}
-\index[fd]{BADBATTS }
+\index{BADBATTS }
 is the number of bad battery packs.  
 
 \item {\bf FIRMWARE}
-\index[fd]{FIRMWARE }
+\index{FIRMWARE }
 is the firmware revision number.  
 
 \item {\bf APCMODEL}
-\index[fd]{APCMODEL }
+\index{APCMODEL }
 is the old APC model identification code.  
 
 \item {\bf END APC}
-\index[fd]{END APC }
+\index{END APC }
 is the time and date that the STATUS record was written. 
 \end{description}
 
 \label{Logging-the-STATUS-Information}
 
 \subsubsection*{27.4 Logging the STATUS Information}
-\index[general]{Information!27.4 Logging the STATUS }
-\index[general]{27.4 Logging the STATUS Information }
+\index{Logging the STATUS Information }
+\index{Information!Logging the STATUS }
 \addcontentsline{toc}{subsubsection}{27.4 Logging the STATUS Information}
 
 \label{index-Logging-Status-257}
@@ -9911,8 +9892,8 @@ recommend that you use apcaccess or the CGI interface to get this information.
 \label{The-Shutown-Sequence-and-its-Discontents}
 
 \subsection*{28 The Shutown Sequence and its Discontents}
-\index[general]{Discontents!28 The Shutown Sequence and its }
-\index[general]{28 The Shutown Sequence and its Discontents }
+\index{Shutown Sequence and its Discontents }
+\index{Discontents!Shutown Sequence and its }
 \addcontentsline{toc}{subsection}{28 The Shutown Sequence and its Discontents}
 
 \label{index-Shutdown-Sequence-259}
@@ -9920,8 +9901,8 @@ recommend that you use apcaccess or the CGI interface to get this information.
 \label{Shutdown-Sequence-_003c1_003e}
 
 \subsubsection*{28.1 Shutdown Sequence}
-\index[general]{Sequence!28.1 Shutdown }
-\index[general]{28.1 Shutdown Sequence }
+\index{Shutdown Sequence }
+\index{Sequence!Shutdown }
 \addcontentsline{toc}{subsubsection}{28.1 Shutdown Sequence}
 
 If you experienced so problems with the testing procedures, or if you are
@@ -9982,7 +9963,7 @@ this standard halt script was modified to include a bit of new logic just
 before the final halt of the system. It first tests if the file
 /etc/apcupsd/powerfail exists, and if it does, it executes {\tt
 /etc/apcupsd/apccontrol killpower}. It is this last step that will cause
-apcupsd to be re-executed with the {\tt \verb{--{killpower} option on the command
+apcupsd to be re-executed with the {\tt --killpower} option on the command
 line. This option tells apcupsd to inform the UPS to kill the power.  
 
 This final step is important if you want to ensure that your system will
@@ -10026,7 +10007,7 @@ inserting code in the halt script.
 
 Only if you cannot insert the appropriate code in the halt script, when you
 start apcupsd, normally from the /etc/rc.d/init.d/apcupsd script, use the {\tt
-\verb{--{kill-on-powerfail} option. This will cause apcupsd to program the UPS to
+--kill-on-powerfail} option. This will cause apcupsd to program the UPS to
 shutoff the power just before it (apcupsd) does the system shutdown. Please
 note that this is not the most ideal solution. Read on to understand why.  
 
@@ -10078,7 +10059,7 @@ can set it to 180, 300, or 600 seconds depending on your UPS. See the EEPROM
 \ilink{Configuring Your EEPROM}{manual.tex#Configuring-Your-EEPROM}) this
 manual for further details on how to change this EPROM value.  
 
-If you use the {\tt \verb{--{kill-on-powerfail} option, you run the risk of having
+If you use the {\tt --kill-on-powerfail} option, you run the risk of having
 the computer power cut before the system has shutdown. Even if the grace
 period is rather long, if something goes wrong in the shutdown, well, it is up
 to you to decide.  
@@ -10108,8 +10089,8 @@ manual for further details on how to change these EPROM values.
 \label{Shutdown-Problems}
 
 \subsubsection*{28.2 Shutdown Problems}
-\index[general]{Problems!28.2 Shutdown }
-\index[general]{28.2 Shutdown Problems }
+\index{Shutdown Problems }
+\index{Problems!Shutdown }
 \addcontentsline{toc}{subsubsection}{28.2 Shutdown Problems}
 
 Obviously if your halt script is not properly modified, apcupsd will not be
@@ -10120,8 +10101,8 @@ case, your machine should have been cleanly shut down.
 \label{Master_002fSlave-Shutdown-_003c1_003e}
 
 \subsubsection*{28.3 Master/Slave Shutdown}
-\index[general]{Shutdown!28.3 Master/Slave }
-\index[general]{28.3 Master/Slave Shutdown }
+\index{Shutdown!Master/Slave }
+\index{Master/Slave Shutdown }
 \addcontentsline{toc}{subsubsection}{28.3 Master/Slave Shutdown}
 
 In master/slave configurations, however, the master cannot be 100 percent sure
@@ -10163,8 +10144,7 @@ versions. Please be sure to delete or rename all prior versions
 \label{Startup}
 
 \subsubsection*{28.4 Startup}
-\index[general]{28.4 Startup }
-\index[general]{Startup!28.4 }
+\index{Startup }
 \addcontentsline{toc}{subsubsection}{28.4 Startup}
 
 \label{index-Startup-260}
@@ -10199,8 +10179,8 @@ shutting down apcupsd should be done with the same script:
 \label{Windows-Considerations}
 
 \subsubsection*{28.5 Windows Considerations}
-\index[general]{Considerations!28.5 Windows }
-\index[general]{28.5 Windows Considerations }
+\index{Windows Considerations }
+\index{Considerations!Windows }
 \addcontentsline{toc}{subsubsection}{28.5 Windows Considerations}
 
 \label{index-Windows-Considerations-261}
@@ -10211,8 +10191,8 @@ manual for conderations pertaining to shutdown and killpower on Windows.
 \label{APC-smart-protocol}
 
 \subsection*{29 APC smart protocol}
-\index[general]{Protocol!29 APC smart }
-\index[general]{29 APC smart protocol }
+\index{Protocol!APC smart }
+\index{APC smart protocol }
 \addcontentsline{toc}{subsection}{29 APC smart protocol}
 
 \label{index-Smart-protocol-262}
@@ -10237,8 +10217,7 @@ the apcupsd project and the {\bf NUT} project can join forces.
 \label{Description}
 
 \subsubsection*{29.1 Description}
-\index[general]{29.1 Description }
-\index[general]{Description!29.1 }
+\index{Description }
 \addcontentsline{toc}{subsubsection}{29.1 Description}
 
 Here's the information on the elusive APC smart signaling protocol used by
@@ -10250,8 +10229,8 @@ characters to the UPS and figured out what the results meant.
 \label{RS_002d232-differences}
 
 \subsubsection*{29.2 RS-232 differences}
-\index[general]{Differences!29.2 RS-232 }
-\index[general]{29.2 RS-232 differences }
+\index{RS-232 differences }
+\index{Differences!RS-232 }
 \addcontentsline{toc}{subsubsection}{29.2 RS-232 differences}
 
 Normal 9 pin serial connections have TxD on 3 and RxD on 2. APC's smart serial
@@ -10276,8 +10255,8 @@ have the cable you need.
 \label{Diagram-for-cable-hackers}
 
 \subsubsection*{29.3 Diagram for cable hackers}
-\index[general]{29.3 Diagram for cable hackers }
-\index[general]{Hackers!29.3 Diagram for cable }
+\index{Hackers!Diagram for cable }
+\index{Diagram for cable hackers }
 \addcontentsline{toc}{subsubsection}{29.3 Diagram for cable hackers}
 
 If you are handy with cable creation tools, check out the 
@@ -10297,8 +10276,8 @@ For additional information on cables, see the section on custom cables (see
 \label{The-Smart-Protocol}
 
 \subsubsection*{29.4 The Smart Protocol}
-\index[general]{Protocol!29.4 The Smart }
-\index[general]{29.4 The Smart Protocol }
+\index{Protocol!Smart }
+\index{Smart Protocol }
 \addcontentsline{toc}{subsubsection}{29.4 The Smart Protocol}
 
 Despite the lack of official information from APC, this table has been
@@ -10524,8 +10503,8 @@ minutes of runtime to leave in battery (UPS shuts down ``early'')} & {
 \label{Dip-switch-info}
 
 \subsubsection*{29.5 Dip switch info}
-\index[general]{Info!29.5 Dip switch }
-\index[general]{29.5 Dip switch info }
+\index{Dip switch info }
+\index{Info!Dip switch }
 \addcontentsline{toc}{subsubsection}{29.5 Dip switch info}
 
 \begin{longtable}{lll}
@@ -10549,8 +10528,8 @@ on SU370ci and 400
 \label{Status-bits}
 
 \subsubsection*{29.6 Status bits}
-\index[general]{29.6 Status bits }
-\index[general]{Bits!29.6 Status }
+\index{Status bits }
+\index{Bits!Status }
 \addcontentsline{toc}{subsubsection}{29.6 Status bits}
 
 This is probably the most important register of the UPS, which indicates the
@@ -10590,8 +10569,8 @@ models
 \label{Alert-messages}
 
 \subsubsection*{29.7 Alert messages}
-\index[general]{Messages!29.7 Alert }
-\index[general]{29.7 Alert messages }
+\index{Alert messages }
+\index{Messages!Alert }
 \addcontentsline{toc}{subsubsection}{29.7 Alert messages}
 
 These single character messages are sent by the UPS any time there is an Alert
@@ -10645,8 +10624,7 @@ changed. Only supported on Matrix UPS and 3rd generation SmartUPS models.
 \label{Register-1}
 
 \subsubsection*{29.8 Register 1}
-\index[general]{29.8 Register 1 }
-\index[general]{Register 1!29.8 }
+\index{Register 1 }
 \addcontentsline{toc}{subsubsection}{29.8 Register 1}
 
 All bits are valid on the Matrix UPS. SmartUPS models only support bits 6 and
@@ -10677,8 +10655,7 @@ All bits are valid on the Matrix UPS. SmartUPS models only support bits 6 and
 \label{Register-2}
 
 \subsubsection*{29.9 Register 2}
-\index[general]{Register 2!29.9 }
-\index[general]{29.9 Register 2 }
+\index{Register 2 }
 \addcontentsline{toc}{subsubsection}{29.9 Register 2}
 
 Matrix UPS models report bits 0-5. SmartUPS models only support bits 4 and 6.
@@ -10711,8 +10688,7 @@ bypass
 \label{Register-3}
 
 \subsubsection*{29.10 Register 3}
-\index[general]{29.10 Register 3 }
-\index[general]{Register 3!29.10 }
+\index{Register 3 }
 \addcontentsline{toc}{subsubsection}{29.10 Register 3}
 
 All bits are valid on the Matrix UPS and 3rd generation SmartUPS models.
@@ -10745,8 +10721,8 @@ messages.
 \label{Interpretation-of-the-Old-Firmware-Revision}
 
 \subsubsection*{29.11 Interpretation of the Old Firmware Revision}
-\index[general]{Revision!29.11 Interpretation of the Old Firmware }
-\index[general]{29.11 Interpretation of the Old Firmware Revision }
+\index{Revision!Interpretation of the Old Firmware }
+\index{Interpretation of the Old Firmware Revision }
 \addcontentsline{toc}{subsubsection}{29.11 Interpretation of the Old Firmware
 Revision}
 
@@ -10793,8 +10769,8 @@ follows:
 \label{Interpretation-of-the-New-Firmware-Revision}
 
 \subsubsection*{29.12 Interpretation of the New Firmware Revision}
-\index[general]{Revision!29.12 Interpretation of the New Firmware }
-\index[general]{29.12 Interpretation of the New Firmware Revision }
+\index{Revision!Interpretation of the New Firmware }
+\index{Interpretation of the New Firmware Revision }
 \addcontentsline{toc}{subsubsection}{29.12 Interpretation of the New Firmware
 Revision}
 
@@ -10838,8 +10814,8 @@ Revision}
 \label{EEPROM-Values}
 
 \subsubsection*{29.13 EEPROM Values}
-\index[general]{Values!29.13 EEPROM }
-\index[general]{29.13 EEPROM Values }
+\index{EEPROM Values }
+\index{Values!EEPROM }
 \addcontentsline{toc}{subsubsection}{29.13 EEPROM Values}
 
 Upon sending a \^{}Z, your UPS will probably spit back approximately 254
@@ -10910,8 +10886,8 @@ Here is an example broken out to be more readable:
 \label{Programming-the-UPS-EEPROM}
 
 \subsubsection*{29.14 Programming the UPS EEPROM}
-\index[general]{EEPROM!29.14 Programming the UPS }
-\index[general]{29.14 Programming the UPS EEPROM }
+\index{Programming the UPS EEPROM }
+\index{EEPROM!Programming the UPS }
 \addcontentsline{toc}{subsubsection}{29.14 Programming the UPS EEPROM}
 
 There are at this time a maximum of 12 different values that can be programmed
@@ -10966,8 +10942,7 @@ bar (|) to indicate that the EEPROM was changed.
 \label{Acknowledgements}
 
 \subsubsection*{29.15 Acknowledgements}
-\index[general]{Acknowledgements!29.15 }
-\index[general]{29.15 Acknowledgements }
+\index{Acknowledgements }
 \addcontentsline{toc}{subsubsection}{29.15 Acknowledgements}
 
 The apcupsd has a rather long and tormented history. Many thanks to the guys
@@ -10987,21 +10962,20 @@ lists.sourceforge.net\gt{}}{http://www.apcupsd.com}
 \label{Apcupsd-_002d_002d-RPM-Packaging-FAQ}
 
 \subsection*{30 Apcupsd \&ndash; RPM Packaging FAQ}
-\index[general]{30 Apcupsd  RPM Packaging FAQ }
-\index[general]{FAQ!30 Apcupsd  RPM Packaging }
+\index{Apcupsd  RPM Packaging FAQ }
+\index{FAQ!Apcupsd  RPM Packaging }
 \addcontentsline{toc}{subsection}{30 Apcupsd  RPM Packaging FAQ}
 
 \label{Answers}
 
 \subsubsection*{30.1 Answers}
-\index[general]{30.1 Answers }
-\index[general]{Answers!30.1 }
+\index{Answers }
 \addcontentsline{toc}{subsubsection}{30.1 Answers}
 
 \begin{description}
 
 \item {\bf {\bf How do I build Apcupsd for platform xxx?}}
-\index[fd]{How do I build Apcupsd for platform xxx? }
+\index{How do I build Apcupsd for platform xxx? }
 The apcupsd spec file contains defines to build for several platforms: RedHat
 7.x (rh7), RedHat 8.0 (rh8), RedHat 9 (rh9), Fedora Core 1 (fc1), and Whitebox
 Enterprise Linux 3.0 (wb3).  The package build is controlled by a define set
@@ -11044,7 +11018,7 @@ Alternately you may pass the define on the command line when calling rpmbuild:
 
 
 \item {\bf {\bf How do I control whether usb support gets built?}}
-\index[fd]{How do I control whether usb support gets built? }
+\index{How do I control whether usb support gets built? }
 By default standard serial port support will be built and the apcupsd-std
 package will be produced. To get the usb package and support either set the  
 
@@ -11075,13 +11049,13 @@ in the spec file directly or pass it to rpmbuild on the command line:
 
 
 \item {\bf {\bf other defines are used?}}
-\index[fd]{other defines are used? }
+\index{other defines are used? }
 The only other define is for the initdir for the daemon control script. On
 RedHat systems this is set to /etc/rc.d/init.d/.  You would only need to edit
 this if packaging for a platform with uses a different directory.  
 
 \item {\bf {\bf I'm getting errors about not having permission when}}
-\index[dir]{I'm getting errors about not having permission when }
+\index{I'm getting errors about not having permission when }
 I try to build the packages.  Do I need to be root? No, you do not need to be
 root and, in fact, it is better practice to build rpm packages as a non-root
 user.  Apcupds packages are designed to be built by a regular user but you
@@ -11123,8 +11097,8 @@ following line:
 \label{Credits-_003c1_003e}
 
 \subsection*{Appendix A Credits}
-\index[general]{Credits!Appendix A }
-\index[general]{Appendix A Credits }
+\index{Credits!Appendix A }
+\index{Appendix A Credits }
 \addcontentsline{toc}{subsection}{Appendix A Credits}
 
 \includegraphics{./thanks.eps}  
@@ -11138,96 +11112,96 @@ of software for UPSmanagement.
 \label{Contributors}
 
 \subsubsection*{A.1 Contributors}
-\index[general]{A.1 Contributors }
-\index[general]{Contributors!A.1 }
+\index{A.1 Contributors }
+\index{Contributors!A.1 }
 \addcontentsline{toc}{subsubsection}{A.1 Contributors}
 
 \begin{description}
 
 \item {\bf Current Code Maintainer and Project Manager:}
-\index[fd]{Current Code Maintainer and Project Manager: }
+\index{Current Code Maintainer and Project Manager: }
 Kern Sibbald (kern at sibbald dot com)  
 
 \item {\bf RPM Packager:}
-\index[fd]{RPM Packager: }
+\index{RPM Packager: }
 D. Scott Barninger (barninger at fairfieldcomputers dot com)  
 
 \item {\bf Super USB bug fixer:}
-\index[fd]{Super USB bug fixer: }
+\index{Super USB bug fixer: }
 Adam Kropelin (akropel1 at rochester dot rr dot com)  
 
 \item {\bf CGI and HTML fixer:}
-\index[fd]{CGI and HTML fixer: }
+\index{CGI and HTML fixer: }
 William King (wrking at dadaboom dot com)  
 
 \item {\bf Project Starter and Former Code Maintainer:}
-\index[fd]{Project Starter and Former Code Maintainer: }
+\index{Project Starter and Former Code Maintainer: }
 Andre Hedrick (andre at linux-ide.org)  
 
 \item {\bf Former Code Maintainer and Project Manager:}
-\index[fd]{Former Code Maintainer and Project Manager: }
+\index{Former Code Maintainer and Project Manager: }
 Riccardo Facchetti (riccardo at master.oasi.gpa.it)  
 
 \item {\bf Serial Communications:}
-\index[fd]{Serial Communications: }
+\index{Serial Communications: }
 Andre Hedrick (andre at linux-ide.org)  
 
 \item {\bf 2.0 User's Manual:}
-\index[fd]{2.0 User's Manual: }
+\index{2.0 User's Manual: }
 Eric S. Raymond (esr at thyrsus.com)  
 
 \item {\bf Alpha Port:}
-\index[fd]{Alpha Port: }
+\index{Alpha Port: }
 Kern Sibbald (kern at sibbald dot com)  
 
 J. Rochate (jrochate at ualg.pt) testing and machine loan  
 
 \item {\bf Caldera:}
-\index[fd]{Caldera: }
+\index{Caldera: }
 John Pinner (john at clocksoft.com)  
 
 \item {\bf HP-UX Port}
-\index[fd]{HP-UX Port }
+\index{HP-UX Port }
 Carl Erhorn (Carl\_Erhorn at hyperion.com)  
 
 Robert K Nelson (rnelson at airflowsciences.com)  
 
 \item {\bf SOLARIS Port:}
-\index[fd]{SOLARIS Port: }
+\index{SOLARIS Port: }
 Carl Erhorn (Carl\_Erhorn at hyperion.com)  
 
 \item {\bf OpenBSD Port:}
-\index[fd]{OpenBSD Port: }
+\index{OpenBSD Port: }
 Devin Reade (gdr at gno.org)  
 
 \item {\bf NetBSD Port:}
-\index[fd]{NetBSD Port: }
+\index{NetBSD Port: }
 Neil Darlow (neil at darlow.co.uk)  
 
 \item {\bf Win32 Port:}
-\index[fd]{Win32 Port: }
+\index{Win32 Port: }
 Kern Sibbald (kern at sibbald dot com)  
 
 Paul Z. Stagner (paul.stagner at charterco.com) testing  
 
 \item {\bf WEB Interfaces:}
-\index[fd]{WEB Interfaces: }
+\index{WEB Interfaces: }
 Kern Sibbald (kern at sibbald dot com)  
 
 Joseph Acosta (joeja at mindspring.com)  
 
 \item {\bf Apcupsd Support and Knowledge Base:}
-\index[fd]{Apcupsd Support and Knowledge Base: }
+\index{Apcupsd Support and Knowledge Base: }
 Brian Schau (Brian.Schau at compaq.com)  
 
 \item {\bf Hard Core Coders:}
-\index[fd]{Hard Core Coders: }
+\index{Hard Core Coders: }
 Riccardo Facchetti (riccardo at master.oasi.gpa.it)  
 
 Kern Sibbald (kern at sibbald dot com)  
 
 \item {\bf Part Time Coders:}
-\index[fd]{Part Time Coders: }
+\index{Part Time Coders: }
 Jonathan H N Chin (jc254 at newton.cam.ac.uk)  
 
 Andre Hedrick (andre at linux-ide.org)  
@@ -11237,7 +11211,7 @@ Brian Schau (Brian.Schau at compaq.com)
 Carl Erhorn (Carl\_Erhorn at hyperion.com)  
 
 \item {\bf Distribution Maintainers:}
-\index[fd]{Distribution Maintainers: }
+\index{Distribution Maintainers: }
 Alpha: Kern Sibbald (kern at sibbald dot com) temp  
 
 Debian: Leon Breedt (ljb at debian.org)  
@@ -11262,7 +11236,7 @@ SUSE: Riccardo Facchetti (riccardo at master.oasi.gpa.it)
 Win32: Kern Sibbald (kern at sibbald dot com)  
 
 \item {\bf Project Discussions:}
-\index[fd]{Project Discussions: }
+\index{Project Discussions: }
 \elink{APCUPSD Mailing
 List}{http://wb_mailto:apcupsd-users@lists.sourceforge.net} 
 \end{description}
@@ -11304,8 +11278,8 @@ Win32 code, see:
 \label{Disclaimer_003b-NO-WARRANTY}
 
 \subsubsection*{A.2 Disclaimer: NO WARRANTY}
-\index[general]{WARRANTY!A.2 Disclaimer: NO }
-\index[general]{A.2 Disclaimer: NO WARRANTY }
+\index{WARRANTY!A.2 Disclaimer: NO }
+\index{A.2 Disclaimer: NO WARRANTY }
 \addcontentsline{toc}{subsubsection}{A.2 Disclaimer: NO WARRANTY}
 
 \label{index-Disclaimer-264}
@@ -11330,8 +11304,8 @@ HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 \label{Kernel-Config}
 
 \subsection*{Appendix B Kernel Config}
-\index[general]{Config!Appendix B Kernel }
-\index[general]{Appendix B Kernel Config }
+\index{Config!Appendix B Kernel }
+\index{Appendix B Kernel Config }
 \addcontentsline{toc}{subsection}{Appendix B Kernel Config}
 
 A typical USB section of a .config file might be:  
@@ -12240,6 +12214,6 @@ Interpretation of /proc/bus/usb info on 2.6 kernels:
 \label{Index}
 
 \subsection*{Index}
-\index[general]{Index }
+\index{Index }
 \addcontentsline{toc}{subsection}{Index}
 

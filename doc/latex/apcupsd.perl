@@ -1,3 +1,8 @@
+# Provides support for latex2html for additional commands needed for 
+#  the apcupsd manual.
+
+
+
 # Returns the minimum of any number of numeric arguments.
 sub min {
 	my $tmp = shift;
@@ -63,7 +68,7 @@ sub make_name {
 	if ($LONG_TITLES) {
 		$saved = $_;
 		&process_command($sections_rx, $_) if /^$sections_rx/;
-		$title = &make_bacula_title($TITLE)
+		$title = &make_apcupsd_title($TITLE)
 			unless ((! $TITLE) || ($TITLE eq $default_title));
 		$_ = $saved;
 	} elsif ($CUSTOM_TITLES) {
@@ -111,7 +116,7 @@ sub make_name {
 }
 }
 
-sub make_bacula_title {
+sub make_apcupsd_title {
     local($_)= @_;
 	local($num_words) = $LONG_TITLES;
 	#RRM:  scan twice for short words, due to the $4 overlap
@@ -128,7 +133,7 @@ sub make_bacula_title {
 	$_ = &revert_to_raw_tex($_);
 
 	# get $LONG_TITLES number of words from what remains
-	$_ = &get_bacula_words($_, $num_words) if ($num_words);
+	$_ = &get_apcupsd_words($_, $num_words) if ($num_words);
 	# ...and cleanup accents, spaces and punctuation
 	$_ = join('', ($SHOW_SECTION_NUMBERS ? $sec_num : ''), $_);
 	s/\\\W\{?|\}//g;
@@ -154,7 +159,7 @@ sub make_bacula_title {
 	#  total length of all the words is acceptable.
 	# Put the words back together and return the result.
 	#
-sub get_bacula_words {
+sub get_apcupsd_words {
 	local($_, $min) = @_;
 	local($words,$i);
 	local($id,%markup);
@@ -197,8 +202,6 @@ sub do_cmd_htmlfilename {
 	my $input = shift;
 
 	my ($id,$filename) = $input =~ /^<#(\d+)#>(.*?)<#\d+#>/;
-	print STDERR "\nid: $id  filename: $filename\n";
-
 }
 
 # KEC 2-26-05
@@ -286,7 +289,7 @@ sub make_contents_entry {
 	$str =~ s/\&\#;\`<BR> /\\/g;	#  ditto
 	$str =~ s/\&\#;*SPMquot;92/\\/g;	#  ditto
 
-	$thisref = &make_named_href('',"$CURRENT_FILE#$br_id",$words);
+	$thisref = &make_named_href('',"$CURRENT_FILE#$br_id",$str);
 	$thisref =~ s/\n//g;
 
 	# Now we build the actual entry that will go in the lot and lof.

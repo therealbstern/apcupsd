@@ -22,25 +22,11 @@ WMLSRC=.
 
 IMAGES=../images
 
-#  bacula  -- special case below
-#  running -- special case below
-#  developers -- special case below
-
-#
-# Note, these are all parts of the manual not in any
-#  particular order (mostly alphabetic). The order they
-#  appear in the manual is defined in bacula.tex
-#
-# Note also that certain of these chapters are in the 
-#  bacula.tex manual, and others in the developers.tex 
-#  manual.
-#
 MANUAL = manual
 
+first_rule: apcupsd
 
-first_rule: bacula developers
-
-bacula: h2l hyphens tex web html dvipdf
+apcupsd: h2l texcheck tex web html dvipdf
 
 .SUFFIXES:     .tex .html
 .PHONY:
@@ -49,19 +35,8 @@ bacula: h2l hyphens tex web html dvipdf
 
 tex:
 	-latex -interaction=batchmode apcupsd.tex
-#	makeindex manual.idx
-#	@mv -f manual.ind manuali-general.linked.tex
-#	makeindex manual.ddx
-#	@mv -f manual.ind manuali-dir.linked.tex
-#	makeindex manual.fdx
-#	@mv -f manual.ind manuali-fd.linked.tex
-#	makeindex manual.sdx
-#	@mv -f manual.ind manuali-sd.linked.tex
-#	makeindex manual.cdx
-#	@mv -f manual.ind manuali-console.linked.tex
-#	./check_hyphens.pl manuali-general.linked.tex manuali-dir.linked.tex \
-#		manuali-fd.linked.tex manuali-sd.linked.tex manuali-console.linked.tex
-#	-latex -interaction=batchmode manual.tex
+	makeindex apcupsd.idx
+	-latex -interaction=batchmode manual.tex
 
 
 pdf:
@@ -77,8 +52,10 @@ web:
 	@echo "Making web"
 	@mkdir -p apcupsd
 	@rm -rf apcupsd/*
+	cp *.eps *.png apcupsd/
 	latex2html -split 4 -local_icons -t "Apcupsd User's Guide" -long_titles 4 \
 		-toc_stars -contents_in_nav -white -notransparent apcupsd >/dev/null
+	cp apcupsd/Apcupsd_Users_Guide.html apcupsd/index.html
 
 h2l:
 	@echo "Making html2latex"
@@ -89,14 +66,9 @@ h2l:
 	    /tmp/1 $$i.tex; \
 	 done)
 
-links:
-# Include link translation for files that have changed.
-	@echo "Making links"
-	./link_resolver.pl -f manual.tex
-
-hyphens:
-# Changes '--' to '\verb{--{ in the tex files.
-	./check_hyphens.pl manual.tex
+texcheck:
+# Does checking for the tex file, and possibly fixes things.
+	./check_tex.pl --change apcupsd.tex
 
 clean:
 	@rm -f 1 2 3
