@@ -285,7 +285,7 @@ int getline(char *s, int len, UPSINFO *ups)
 	    if (!UPS_ISSET(UPS_ONBATT)) {
 	       private->debounce = time(NULL);
 	    }
-        UPS_CLEAR_ONLINE();
+	UPS_CLEAR_ONLINE();
             Dmsg0(80, "Got UPS ON BATT.\n");
 	    if (s == NULL) {
 		write_unlock(ups);
@@ -295,7 +295,7 @@ int getline(char *s, int len, UPSINFO *ups)
         case UPS_REPLACE_BATTERY: /* UPS_REPLACE_BATTERY = '#'   */
 	    if (s == NULL)
 		write_lock(ups);
-        UPS_SET(UPS_REPLACEBATT);
+	UPS_SET(UPS_REPLACEBATT);
 	    if (s == NULL) {
 		write_unlock(ups);
 		ending = 1;
@@ -304,7 +304,7 @@ int getline(char *s, int len, UPSINFO *ups)
         case UPS_ON_LINE:        /* UPS_ON_LINE = '$'   */
 	    if (s == NULL)
 		write_lock(ups);
-        UPS_SET_ONLINE();
+	UPS_SET_ONLINE();
             Dmsg0(80, "Got UPS ON LINE.\n");
 	    if (s == NULL) {
 		write_unlock(ups);
@@ -314,7 +314,7 @@ int getline(char *s, int len, UPSINFO *ups)
         case BATT_LOW:           /* BATT_LOW    = '%'   */
 	    if (s == NULL)
 		write_lock(ups);
-        UPS_SET(UPS_BATTLOW);
+	UPS_SET(UPS_BATTLOW);
 	    if (s == NULL) {
 		write_unlock(ups);
 		ending = 1;
@@ -323,7 +323,7 @@ int getline(char *s, int len, UPSINFO *ups)
         case BATT_OK:            /* BATT_OK     = '+'   */
 	    if (s == NULL)
 		write_lock(ups);
-        UPS_CLEAR(UPS_BATTLOW);
+	UPS_CLEAR(UPS_BATTLOW);
 	    if (s == NULL) {
 		write_unlock(ups);
 		ending = 1;
@@ -456,7 +456,8 @@ again:
         if (status[0] == 'S' && status[1] == 'M' && (retries-- > 0))
 	    goto again;
 
-	ups->Status = strtoul(status,NULL,16);
+	ups->Status &= ~0xFF;	      /* clear APC byte */
+	ups->Status |= strtoul(status,NULL,16) & 0xFF;	/* set APC byte */
     }
 
     /* ONBATT_STATUS_FLAG -- line quality */ 

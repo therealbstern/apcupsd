@@ -146,6 +146,7 @@
 #define UPS_SHUT_REMOTE   0x00800000  /* Set when remote shutdown */
 #define UPS_PLUGGED       0x01000000  /* Set if computer is plugged into UPS */
 #define UPS_DEV_SETUP     0x02000000  /* Set if UPS's driver did the setup() */
+
 /* Macro to set/clear/test bit values in ups->Status */
 #define UPS_ISSET(bit) ((ups->Status) & (bit))
 #define UPS_SET(bit) ((ups->Status) |= (bit))

@@ -120,6 +120,7 @@ void generate_event(UPSINFO *ups, int event)
 {
     /* Log message and execute script for this event */
     log_event(ups, cmd_msg[event].level, _(cmd_msg[event].msg));
+    Dmsg2(80, "calling execute_cmd %s event=%d\n", cmd[event], event);
     execute_command(ups, cmd[event]);
 
     /*
@@ -190,12 +191,12 @@ void powerfail (int ok)
     if (ok == 2) {
 	clear_files();
 	if (terminate_on_powerfail)
-        /*
-         * This sends a SIGTERM signal to itself.
-         * The SIGTERM is bound to apcupsd_ or apctest_terminate(),
-         * depending on which program is running this code, so it will
-         * do in anyway the right thing.
-         */
+	/*
+	 * This sends a SIGTERM signal to itself.
+	 * The SIGTERM is bound to apcupsd_ or apctest_terminate(),
+	 * depending on which program is running this code, so it will
+	 * do in anyway the right thing.
+	 */
 	    sendsig_terminate();
     }
 
@@ -296,13 +297,13 @@ static enum a_state get_state(UPSINFO *ups, time_t now)
     if (UPS_ISSET(UPS_ONBATT)) {
 	if (UPS_ISSET(UPS_PREV_ONBATT)) {  /* if already detected on battery */
 	    if (ups->SelfTest) {       /* see if UPS is doing self test */
-		    state = st_SelfTest;   /*	yes */
+		state = st_SelfTest;   /*   yes */
 	    } else {
 		state = st_OnBattery;  /* No, this must be real power failure */
-		}
-	    } else {
-		state = st_PowerFailure;   /* Power failure just detected */
 	    }
+	} else {
+	    state = st_PowerFailure;   /* Power failure just detected */
+	}
     } else {
 	if (UPS_ISSET(UPS_PREV_ONBATT)) {		   /* if we were on batteries */
 	    state = st_MainsBack;     /* then we just got power back */
@@ -380,16 +381,16 @@ void do_action(UPSINFO *ups)
 	 */
 	ups->last_time_nologon = ups->last_time_annoy = now;
 	ups->last_time_on_line = now;
-    UPS_CLEAR(UPS_FASTPOLL);
+	UPS_CLEAR(UPS_FASTPOLL);
 	break;
 
     case st_PowerFailure:
        /*
 	*  This is our first indication of a power problem
 	*/
-    UPS_SET(UPS_FASTPOLL);		   /* speed up polling */
+	UPS_SET(UPS_FASTPOLL);		       /* speed up polling */
 	/* Check if selftest */
-        Dmsg0(80, "Power failure detected.\n");
+        Dmsg1(80, "Power failure detected. 0x%x\n", ups->Status);
 	device_entry_point(ups, DEVICE_CMD_CHECK_SELFTEST, NULL);
 	if (ups->SelfTest) {
 	    generate_event(ups, CMDSTARTSELFTEST);
@@ -412,7 +413,7 @@ void do_action(UPSINFO *ups)
 	   break;
        /* Cancel self test, announce power failure */
        ups->SelfTest = 0;
-       Dmsg0(80, "UPS Self Test cancelled, fall-thru to On Battery.\n");
+       Dmsg1(80, "UPS Self Test cancelled, fall-thru to On Battery. 0x%x\n", ups->Status);
        /* FALL-THRU to st_OnBattery */
     case st_OnBattery:
 	/*
@@ -432,7 +433,7 @@ void do_action(UPSINFO *ups)
 	       if (!UPS_ISSET(UPS_SLAVE))
 		   kill_power(ups);
 	       ups->ShutDown = now;   /* wait a bit before doing again */
-	   UPS_SET(UPS_SHUTDOWN);
+	       UPS_SET(UPS_SHUTDOWN);
 	   }
 	} else {		/* not shutdown yet */
 	    /*
@@ -536,13 +537,13 @@ void do_action(UPSINFO *ups)
 	/*
 	 *  The the power is back after a power failure or a self test	       
 	 */
-    UPS_CLEAR(UPS_ONBATT_MSG);
+	UPS_CLEAR(UPS_ONBATT_MSG);
 	if (UPS_ISSET(UPS_SHUTDOWN)) {
 	    /*
 	     * If we have a shutdown to cancel, do it now.
 	     */
 	    ups->ShutDown = 0;
-	UPS_CLEAR(UPS_SHUTDOWN);
+	    UPS_CLEAR(UPS_SHUTDOWN);
 	    powerfail(1);
 	    unlink(PWRFAIL);
             log_event(ups, LOG_ALERT, _("Cancelling shutdown"));
