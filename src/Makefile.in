@@ -28,32 +28,25 @@ allexe = apcupsd @APCTEST@ @APCACCESS@ @SMTP@ @POWERFLUTE@ @APCNISD@
 all-targets: $(allexe)
 
 apcupsd: $(dobjs) $(gobjs) $(LIBS) $(WINAPC)
-	$(CC) $(LDFLAGS) $(dobjs) $(gobjs) $(LIBS) $(WINAPC) $(WINLIBS) \
-		-o apcupsd
+	$(CC) $(LDFLAGS) $(dobjs) $(gobjs) $(LIBS) $(WINAPC) $(WINLIBS) -o apcupsd
 
 apcnisd: $(nobjs) $(LIBS)
-	$(CC) $(LDFLAGS) $(nobjs) $(LIBS) \
-		-o apcnisd
+	$(CC) $(LDFLAGS) $(nobjs) $(LIBS) -o apcnisd
 
 apctest: $(tobjs) $(gobjs) $(LIBS)
-	$(CC) $(LDFLAGS) $(tobjs) $(gobjs) $(LIBS) \
-		-o apctest
+	$(CC) $(LDFLAGS) $(tobjs) $(gobjs) $(LIBS) -o apctest
 
 devicedbg: $(xobjs) $(LIBS)
-	$(CC) $(LDFLAGS) $(xobjs) $(LIBS) \
-		-o devicedbg
+	$(CC) $(LDFLAGS) $(xobjs) $(LIBS) -o devicedbg
 
 apcaccess: $(aobjs) $(LIBS)
-	$(CC) $(LDFLAGS) $(aobjs) $(LIBS) \
-		-o apcaccess
+	$(CC) $(LDFLAGS) $(aobjs) $(LIBS) -o apcaccess
  
 smtp: $(sobjs) $(LIBS)
-	$(CC) $(LDFLAGS) $(sobjs) $(LIBS) \
-		-o smtp
+	$(CC) $(LDFLAGS) $(sobjs) $(LIBS) -o smtp
  
 powerflute: $(fobjs) $(LIBS)
-	$(CC) $(LDFLAGS) $(fobjs) $(LIBS) \
-		@POWERLIBS@ -o powerflute
+	$(CC) $(LDFLAGS) $(fobjs) $(LIBS) @POWERLIBS@ -o powerflute
 
 install: install-binary
 
@@ -86,7 +79,7 @@ install-powerflute:
 	@$(INSTALL_PROGRAM) -s -m 755 powerflute@EXEEXT@ \
 		$(DESTDIR)$(sbindir)/powerflute@EXEEXT@
 install-cgi:
-	(cd cgi/; make install)
+	(cd cgi/; $(MAKE) install)
 
 uninstall:
 	@$(ECHO) "Removing daemons ..."
