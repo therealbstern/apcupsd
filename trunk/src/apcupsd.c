@@ -379,7 +379,7 @@ int main(int argc, char *argv[]) {
     }
 
     if (kill_ups_power) {
-	if (!UPS_ISSET(UPS_SLAVE)) {
+	if (!is_ups_set(UPS_SLAVE)) {
 	    kill_power(ups);
 	} else {
 	    kill_net(ups);
@@ -391,7 +391,7 @@ int main(int argc, char *argv[]) {
         Error_abort1(_("Failed to reacquire serial port lock file on device %s\n"), ups->device);
     }
 
-    if (!UPS_ISSET(UPS_SLAVE)) {
+    if (!is_ups_set(UPS_SLAVE)) {
 	prep_device(ups);
         /* This isn't a documented option but can be used
 	 * for testing dumb mode on a SmartUPS if you have
@@ -427,7 +427,7 @@ int main(int argc, char *argv[]) {
     /* If we have threads, we simply go there rather
      * than creating a thread.
      */
-    if (!UPS_ISSET(UPS_SLAVE)) {
+    if (!is_ups_set(UPS_SLAVE)) {
 	/* serial port reading and report generation -- apcserial.c */
 	do_device(ups);
     } else {
@@ -435,7 +435,7 @@ int main(int argc, char *argv[]) {
 	do_net(ups);
     }
 #else
-    if (!UPS_ISSET(UPS_SLAVE)) {
+    if (!is_ups_set(UPS_SLAVE)) {
 	/* serial port reading and report generation -- apcserial.c */
         serial_pid = start_thread(ups, do_device, "apcdev", argv[0]); 
     } else {

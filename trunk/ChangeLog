@@ -4,6 +4,19 @@
 /*               http://www.apcupsd.com/                                   */
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
+
+----> Release apcupsd-3.10.6 (28 September 2003)
+28Sep03
+- Test net slave mode.
+- Add MASTER name to status output if device is a slave.
+- Display last master update if device is a net slave.
+- Add 10 sec delay before calling apcupsd --killpower it is
+  needed for USB killpower to work right. Why????
+- Save old apccontrol when installing a new one.
+- Replace old UPS_SET() with set_ups() in a number of places.
+27Sep03
+- Implement autodetect of USB port if no DEVICE given.
+
 ----> Release apcupsd-3.10.6 (12 September 2003)
 14Sep03
 - After the upgrade to RH9 with the new autoconf, quite a

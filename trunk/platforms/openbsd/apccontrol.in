@@ -37,92 +37,93 @@ SCRIPTDIR=@sysconfdir@
 #
 if [ -f ${SCRIPTDIR}/${1} -a -x ${SCRIPTDIR}/${1} ]
 then
-        ${SCRIPTDIR}/${1} ${2} ${3} ${4}
-        # exit code 99 means he does not want us to do default action
-        if [ $? = 99 ] ; then
-                exit 0
-        fi
+	${SCRIPTDIR}/${1} ${2} ${3} ${4}
+	# exit code 99 means he does not want us to do default action
+	if [ $? = 99 ] ; then
+		exit 0
+	fi
 fi
 
 case "$1" in
-        killpower)
-                printf "UPS now committed to shut down" | wall
-#                echo "Apccontrol doing: ${APCUPSD} --killpower"       
-#                ${APCUPSD} --killpower
-        ;;
-        commfailure)
-                printf "Warning serial port communications with UPS lost." | wall
-        ;;
-        commok)
-                printf "Serial communciations with UPS restored." | wall
-        ;;
-        powerout)
-                printf "Warning power loss detected." | wall
-        ;;
-        onbattery)
-                printf "Power failure. Running on UPS batteries." | wall
-        ;;
-        failing)
-                printf "UPS battery power exhaused. Doing shutdown.\n" | wall
-        ;;
-        timeout)
-                printf "UPS battery runtime limit exceded. Doing shutdown.\n" | wall
-        ;;
-        loadlimit)
-                printf "UPS battery discharge limit reached. Doing shutdown.\n" | wall
-        ;;
-        runlimit)
-                printf "UPS battery runtime percent reached. Doing shutdown.\n" \
-                        | wall
-        ;;
-        doreboot)
-                printf "Beginning Reboot Sequence" | wall
-                ${SHUTDOWN} -r now "apcupsd initiated reboot"
-        ;;
-        doshutdown)
-                printf "Beginning Shutdown Sequence" | wall
-                ${SHUTDOWN} -h now "apcupsd initiated shutdown"
-        ;;
-        mainsback)
-                printf "Power has returned..." | wall
-                if [ -f @PWRFAILDIR@/powerfail ] ; then
-                   printf "Continuing with shutdown.  I hope you don't have a linux box as the UPS master ..."  | wall
-                fi
-        ;;
-        annoyme)
-                printf "Power problems please logoff." | wall
-        ;;
-        emergency)
-                printf "Emergency Shutdown. Possible UPS battery failure." \
-                        | wall
-                ${SHUTDOWN} -h now "apcupsd emergency shutdown"
-        ;;
-        changeme)
-                printf "Emergency! UPS batteries have failed\nChange them NOW" \
-                        | wall
-        ;;
-        remotedown)
-                printf "Remote Shutdown.\nBeginning Shutdown Sequence." | wall
-                ${SHUTDOWN} -h now "apcupsd remote shutdown"
-        ;;
-        restartme)
-                echo -n "Restarting APCUPSD Power Management: "
-                THEPID=`cat ${APCPID}`
-                kill ${THEPID}
-                rm -f ${APCPID}
-                rm -f @PWRFAILDIR@/powerfail
-                rm -f @nologdir@/nologin
-                sleep 5
-                `${APCUPSD} --kill-on-powerfail`
-                echo "apcupsd"
-        ;;
-        startselftest)
-        ;;
-        endselftest)
-        ;;
-        *)      echo "Usage: ${0##*/} command"
-                echo "       warning: this script is intended to be launched by"
-                echo "       apcupsd and should never be launched by users."
-                exit 1
-        ;;
+	killpower)
+		printf "UPS now committed to shut down" | wall
+#		 echo "Apccontrol doing: ${APCUPSD} --killpower"       
+#		 sleep 10
+#		 ${APCUPSD} --killpower
+	;;
+	commfailure)
+		printf "Warning serial port communications with UPS lost." | wall
+	;;
+	commok)
+		printf "Serial communciations with UPS restored." | wall
+	;;
+	powerout)
+		printf "Warning power loss detected." | wall
+	;;
+	onbattery)
+		printf "Power failure. Running on UPS batteries." | wall
+	;;
+	failing)
+		printf "UPS battery power exhaused. Doing shutdown.\n" | wall
+	;;
+	timeout)
+		printf "UPS battery runtime limit exceded. Doing shutdown.\n" | wall
+	;;
+	loadlimit)
+		printf "UPS battery discharge limit reached. Doing shutdown.\n" | wall
+	;;
+	runlimit)
+		printf "UPS battery runtime percent reached. Doing shutdown.\n" \
+			| wall
+	;;
+	doreboot)
+		printf "Beginning Reboot Sequence" | wall
+		${SHUTDOWN} -r now "apcupsd initiated reboot"
+	;;
+	doshutdown)
+		printf "Beginning Shutdown Sequence" | wall
+		${SHUTDOWN} -h now "apcupsd initiated shutdown"
+	;;
+	mainsback)
+		printf "Power has returned..." | wall
+		if [ -f @PWRFAILDIR@/powerfail ] ; then
+		   printf "Continuing with shutdown.  I hope you don't have a linux box as the UPS master ..."	| wall
+		fi
+	;;
+	annoyme)
+		printf "Power problems please logoff." | wall
+	;;
+	emergency)
+		printf "Emergency Shutdown. Possible UPS battery failure." \
+			| wall
+		${SHUTDOWN} -h now "apcupsd emergency shutdown"
+	;;
+	changeme)
+		printf "Emergency! UPS batteries have failed\nChange them NOW" \
+			| wall
+	;;
+	remotedown)
+		printf "Remote Shutdown.\nBeginning Shutdown Sequence." | wall
+		${SHUTDOWN} -h now "apcupsd remote shutdown"
+	;;
+	restartme)
+		echo -n "Restarting APCUPSD Power Management: "
+		THEPID=`cat ${APCPID}`
+		kill ${THEPID}
+		rm -f ${APCPID}
+		rm -f @PWRFAILDIR@/powerfail
+		rm -f @nologdir@/nologin
+		sleep 5
+		`${APCUPSD} --kill-on-powerfail`
+		echo "apcupsd"
+	;;
+	startselftest)
+	;;
+	endselftest)
+	;;
+	*)	echo "Usage: ${0##*/} command"
+		echo "	     warning: this script is intended to be launched by"
+		echo "	     apcupsd and should never be launched by users."
+		exit 1
+	;;
 esac

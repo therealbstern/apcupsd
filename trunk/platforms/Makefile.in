@@ -27,6 +27,10 @@ install-distdir:
 
 install: @INSTALL_DISTDIR@
 	@echo "Installing apccontrol script..."
+	@if test -f $(DESTDIR)$(sysconfdir)/apccontrol; then \
+	   mv -f $(DESTDIR)$(sysconfdir)/apccontrol $(DESTDIR)$(sysconfdir)/apccontrol.orig; \
+	   echo " Found old apccontrol moving it to $(DESTDIR)$(sysconfdir)/apccontrol.orig"; \
+	fi 
 	@if test -f ./$(DISTNAME)/apccontrol; then \
 	     $(INSTALL_PROGRAM) -m 744 ./$(DISTNAME)/apccontrol \
 		$(DESTDIR)$(sysconfdir)/apccontrol; \

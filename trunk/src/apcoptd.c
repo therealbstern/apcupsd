@@ -149,12 +149,11 @@ int parse_options(int argc, char *argv[]) {
     int c;
 
     while(!errflag &&
-	       (c = getopt_long(argc, argv, shortoptions,
-						    longoptions, &option_index)) != -1) {
+	   (c = getopt_long(argc, argv, shortoptions,
+			   longoptions, &option_index)) != -1) {
+	options++;
 
-    options++;
-
-    switch(c) {
+	switch(c) {
         case 'b':                     /* do not become daemon */
 	    go_background = FALSE;
 	    break;
@@ -240,8 +239,8 @@ int parse_options(int argc, char *argv[]) {
 	errflag++;
     }
 
-    if (errflag)
+    if (errflag) {
 	print_usage(argv);
-
+    }
     return errflag;
 }

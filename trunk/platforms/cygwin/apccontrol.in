@@ -71,9 +71,14 @@ case "$1" in
 	doshutdown)
 #
 #  If you want to try to power down your UPS, uncomment
-#  out the following lines, but be warned that if the
-#  following shutdown -h now doesn't work, you may find
-#  the power being shut off to a running computer :-(
+#    out the following lines, but be warned that if the
+#    following shutdown -h now doesn't work, you may find
+#    the power being shut off to a running computer :-(
+#  Also note, we do this in the doshutdown case, because
+#    there is no way to get control when the machine is
+#    shutdown to call this script with --killpower. As
+#    a consequence, we do both killpower and shutdown
+#    here.
 #
 #		${APCUPSD} /kill
 #		@sbindir@/sleep 5

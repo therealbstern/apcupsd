@@ -125,6 +125,7 @@ static int initialize_device_data(UPSINFO *ups) {
     char *cp;
 
     strcpy(nid->device, ups->device);
+    strcpy(ups->master_name, ups->device);
 
     /*
      * Now split the device.
@@ -280,6 +281,11 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
 	/*
          * Make sure we don't override local bits, and that
 	 * all non-local bits are set/cleared correctly.
+	 *
+	 * local bits = UPS_COMMLOST|UPS_SHUTDOWN|UPS_SLAVE|UPS_SLAVEDOWN|
+	 *		UPS_PREV_ONBATT|UPS_PREV_BATTLOW|UPS_ONBATT_MSG|
+	 *		UPS_FASTPOLL|UPS_PLUGGED|UPS_DEV_SETUP
+	 *
 	 */
 	masterStatus = strtol(answer, NULL, 0);
 	newStatus = masterStatus & ~UPS_LOCAL_BITS;   /* clear local bits */
@@ -437,6 +443,7 @@ int net_ups_read_volatile_data(UPSINFO *ups)
     char answer[200];
 
     write_lock(ups);
+    set_ups(UPS_SLAVE);   
 
     /* ***FIXME**** poll time needs to be scanned */
     ups->poll_time = time(NULL);

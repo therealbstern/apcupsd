@@ -16,8 +16,10 @@ Major Changes this Release:
 - Version 3.10.6 (as opposed to 3.8.x) has device specific drivers,
   and thus can have a much smaller footprint by turning off unused
   drivers and parts of the code. See the new ./configure options.
-- There is a new networking driver that uses the NIS interface
-  rather than the older master/slave networking.
+- There is a new networking driver (net) that uses the NIS interface
+  rather than the older master/slave networking. It is very
+  simple to setup, has certain disadvantages -- for details 
+  see the manual
 - Win32 daemons work much better with a new version of cygwin.
 - Using a special cable (easy to build), you can run your APC
   USB UPSes in serial mode.
