@@ -65,8 +65,9 @@ static void change_ups_name(UPSINFO *ups)
     if (j == 0) {
         fprintf(stderr, "Error, new name of zero length.\n");
 	return;
-    } else if (j > 8)			  
+    } else if (j > 8) { 		  
 	j = 8;			    /* maximum size */
+    }
 
     strncpy(name, ups->upsname, j);
     /* blank fill to 8 chars */
@@ -93,8 +94,9 @@ static void change_ups_name(UPSINFO *ups)
     /* Expect OK after successful name change */
     *response = 0;
     getline(response, sizeof(response), ups);
-    if (strcmp(response, "OK") != 0)
+    if (strcmp(response, "OK") != 0) {
         fprintf(stderr, "\nError changing UPS name\n");
+    }
 
     ups->upsname[0] = '\0';
     smart_poll(ups->UPS_Cmd[CI_IDEN], ups);

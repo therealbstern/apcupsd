@@ -1241,6 +1241,10 @@ do
 	fi
 done
 
+# set Windows (cygwin) build flags to null
+WCFLAGS=
+WLDFLAGS=
+
 # set the default PWRFAILDIR
 PWRFAILDIR=${sysconfdir}
 
@@ -1287,8 +1291,8 @@ cygwin)
 	SERIALDEV=/dev/com1
 	LOGDIR=/apcupsd/etc/apcupsd
 	nologdir=/apcupsd/etc
-	CFLAGS="${CFLAGS} -mwindows"
-	LDFLAGS="${LDFLAGS} -mwindows"
+	WCFLAGS="-mwindows"
+	WLDFLAGS="-mwindows"
 	PWRFAILDIR=/apcupsd/etc        
 	PIDDIR=/apcupsd/etc/apcupsd
 	PTHREAD_CFLAGS=""
@@ -1591,8 +1595,9 @@ AC_SUBST(UPSCABLE)
 HOST=$DISTNAME
 AC_DEFINE_UNQUOTED(HOST, "$HOST")
 AC_SUBST(HOST)
-
-
+   
+AC_SUBST(WCFLAGS)
+AC_SUBST(WLDFLAGS)
 
 dnl
 dnl Find out gcc's installation directory and include files. Used in

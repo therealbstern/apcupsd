@@ -30,13 +30,13 @@ all-subdirs:
 dummy:
 
 .c.o:
-	$(CC) -c $(CFLAGS) $(DEFS) $<
+	$(CC) -c $(WCFLAGS) $(CFLAGS) $(DEFS) $<
 
 .c.lo:
 	$(LIBTOOL) --mode=compile $(COMPILE) $<
 
 .cpp.o:
-	$(CC) -c $(CFLAGS) $(DEFS) $<
+	$(CC) -c $(WCFLAGS) $(CFLAGS) $(DEFS) $<
 
 .po.pox:
 	$(MAKE) $(PACKAGE).pot

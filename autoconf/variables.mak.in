@@ -87,7 +87,7 @@ DRVLIBS = $(topdir)/src/drivers/libdrivers.a
 win32 = $(topdir)/src/win32/winmain.o $(topdir)/src/win32/winlib.a $(topdir)/src/win32/winres.res
 INTLLIBS = @INTLLIBS@
 WINAPC = $(@WIN32@)
-# Hack or die: seems that cygwin don't like -lgdi32 and -luser32 in deps.
+# Hack or die: seems that cygwin doesnn't like -lgdi32 and -luser32 in deps.
 WINLIBS = @WINLIBS@
 
 
@@ -97,3 +97,7 @@ INCFLAGS = $(GDINCLUDE) -I$(topdir)/include
 CFLAGS = @CFLAGS@ $(CPPFLAGS) @PTHREAD_CFLAGS@ $(INCFLAGS)
 LDFLAGS = @LDFLAGS@
 LIBS = $(DRVLIBS) $(APCLIBS) $(INTLLIBS) @PTHREAD_LFLAGS@ @LIBS@ -lm
+
+# Flags for windows programs
+WCFLAGS = @WCFLAGS@
+WLDFLAGS = @WLDFLAGS@

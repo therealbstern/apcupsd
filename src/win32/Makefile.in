@@ -32,17 +32,17 @@ winlib.a: $(UPSOBJS) winres.res
 shutdown.o: shutdown.c
 	gcc -c $(CFLAGS) $<
 
-shutdown.exe:	 ${OBJS} 
+shutdown.exe: ${OBJS} 
 	gcc ${CFLAGS} -o shutdown ${OBJS} -luser32 -lgdi32
 
 winres.res: winres.rc apcupsd.ico winres.h online.ico onbatt.ico
 	windres $< -O coff -o $@
 
 winmain.o: winmain.cpp winups.h
-	$(CC) -c $(CFLAGS) $<
+	$(CC) -c $(WCFLAGS) $(CFLAGS) $<
 
 popup.exe: popup.o
-	$(CC) ${CFLAGS} -o popup popup.o -luser32 -lgdi32
+	$(CC) ${WCFLAGS} $(CFLAGS) -o popup popup.o -luser32 -lgdi32
 
 email.o: email.c
 	gcc -c ${CFLAGS} $<
