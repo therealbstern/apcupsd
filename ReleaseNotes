@@ -6,6 +6,8 @@ This is essentially a bug fix release but to avoid
 confusion, I have incremented the release number.
 
 Changes since apcupsd 3.10.6
+- Do automatic UPS detection in the USB code if no device is specified
+  or if the specified device cannot be opened.
 - Include patch provided by Howard Wilkinson, but put the new apcnet.c
   in apcnet.c.new until I have a chance to examine it in detail.
 
