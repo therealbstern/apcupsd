@@ -595,6 +595,9 @@ int net_ups_read_static_data(UPSINFO *ups)
 
    if (poll_ups(ups)) {
        write_lock(ups);
+       if (!getupsvar(ups, "upsname", ups->upsname, sizeof(ups->upsname))) {
+           log_event(ups, LOG_ERR, "getupsvar: failed for \"upsname\".");
+       }
        if (!getupsvar(ups, "model", ups->mode.long_name,
 		   sizeof(ups->mode.long_name))) {
            log_event(ups, LOG_ERR, "getupsvar: failed for \"model\".");
