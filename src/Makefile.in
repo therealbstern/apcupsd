@@ -9,7 +9,7 @@
 topdir = @topdir@
 top_builddir = $(topdir)
 
-subdirs = lib drivers @WIN32@ @INTLSUB@ @POSUB@ @LIBGD@ @CGI@
+subdirs = lib @LIBUSBHID@ drivers @WIN32@ @INTLSUB@ @POSUB@ @LIBGD@ @CGI@
 
 gobjs = apcnet.o apcreports.o apcaction.o apcnis.o apcdevice.o
 dobjs = apcupsd.o apcoptd.o
