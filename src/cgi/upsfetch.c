@@ -21,12 +21,8 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include <sys/types.h>
-#include <sys/socket.h>
-#include <sys/time.h>
 #include <string.h>
-#include <errno.h>
-#include <unistd.h>
+#include <sys/types.h>
 
 #include "cgiconfig.h"
 #include "config.h"
@@ -34,10 +30,11 @@
 
 static int fill_buffer(int sockfd);
 
-static int nis_port;
 char statbuf[4096];
-int  statlen = 0;
-char last_host[256];
+size_t  statlen = 0;
+
+static int nis_port;
+static char last_host[256];
 static char errmsg[200];
 
 /* List of variables that can be read by getupsvar()   
@@ -91,7 +88,7 @@ static struct {
    {"lowxfer",    "LOTRANS",  1},
    {"cable",      "CABLE",    0},
    {"firmware",   "FIRMWARE", 0},
-   {NULL, NULL}
+   {NULL, NULL, 0}
 };
 
 /*
@@ -99,7 +96,7 @@ static struct {
  * Returns 0 on error
  * Returns 1 if data fetched
  */
-int fetch_data(char *host)
+static int fetch_data(const char *host)
 {
    int sockfd;
    int stat;
@@ -109,25 +106,26 @@ int fetch_data(char *host)
    if (statlen != 0 && (strcmp(last_host, host) == 0))
        return 1;		      /* alread have data this host */
    strncpy(last_host, host, sizeof(last_host)); 
-   last_host[sizeof(last_host) - 1] = 0;
+   last_host[sizeof(last_host) - 1] = '\0';
    statlen = 0;
    nis_port = NISPORT;
    strncpy(lhost, host, sizeof(lhost)-1);
-   lhost[sizeof(lhost)-1] = 0;
+   lhost[sizeof(lhost)-1] = '\0';
    p = strchr(lhost, ':');
    if (p) {
-      *p++ = 0;
+      *p++ = '\0';
       nis_port = atoi(p);
    }
    if ((sockfd = net_open(lhost, NULL, nis_port)) < 0) {
-      sprintf(errmsg, "upsfetch: tcp_open failed for %s port %d", lhost, nis_port);
+      (void) snprintf(errmsg, sizeof (errmsg),
+          "upsfetch: tcp_open failed for %s port %d", lhost, nis_port);
       net_errmsg = errmsg;
       return 0;
    }
 
    stat = fill_buffer(sockfd);		     /* fill statbuf */
    if (stat == 0) {
-      *last_host = 0;
+      *last_host = '\0';
       statlen = 0;
    }
    net_close(sockfd);
@@ -139,35 +137,36 @@ int fetch_data(char *host)
  * Returns 0 on error
  * Returns 1 if data fetched
  */
-int fetch_events(char *host)
+int fetch_events(const char *host)
 {
    char buf[500];
    int sockfd;
    int n, stat = 1;
    char *p;
    char lhost[200];
-   int len;
+   size_t len;
 
    statlen = 0;
-   statbuf[0] = 0;
+   statbuf[0] = '\0';
    nis_port = NISPORT;
    strncpy(lhost, host, sizeof(lhost)-1);
-   lhost[sizeof(lhost)-1] = 0;
+   lhost[sizeof(lhost)-1] = '\0';
    p = strchr(lhost, ':');
    if (p) {
-      *p++ = 0;
+      *p++ = '\0';
       nis_port = atoi(p);
    }
    if ((sockfd = net_open(lhost, NULL, nis_port)) < 0) {
-      sprintf(errmsg, "upsfetch: tcp_open failed for %s port %d", lhost, nis_port);
+      (void) snprintf(errmsg, sizeof(errmsg),
+          "upsfetch: tcp_open failed for %s port %d", lhost, nis_port);
       net_errmsg = errmsg;
-      printf(net_errmsg);
+      (void) fputs(net_errmsg, stdout);
       return 0;
    }
 
    if (net_send(sockfd, "events", 6) != 6) {
       net_errmsg = "fill_buffer: write error on socket\n";
-      printf(net_errmsg);
+      (void) fputs(net_errmsg, stdout);
       return 0;
    }
    /*
@@ -180,10 +179,10 @@ int fetch_events(char *host)
       if (n >= (int)sizeof(buf)) {
 	 n = (int)sizeof(buf)-1;
       }
-      buf[n] = 0;			 /* ensure string terminated */
+      buf[n] = '\0';			 /* ensure string terminated */
       len = strlen(buf);
       /* if message is bigger than the buffer, truncate it */
-      if (len < (int)sizeof(statbuf)) {
+      if (len < sizeof(statbuf)) {
 	 /* move previous messages to the end of the buffer */
 	 memmove(statbuf+len, statbuf, sizeof(statbuf)-len);
 	 /* copy new message */
@@ -191,13 +190,13 @@ int fetch_events(char *host)
       } else {
 	 strncpy(statbuf, buf, sizeof(statbuf)-1);
       }
-      statbuf[sizeof(statbuf)-1] = 0;
+      statbuf[sizeof(statbuf)-1] = '\0';
    }
 
    if (n < 0) {
       stat = 0;
    }
-   *last_host = 0;
+   *last_host = '\0';
    net_close(sockfd);
    return stat;
 
@@ -215,20 +214,22 @@ int fetch_events(char *host)
  * Returns -1 if network problem
  *   answer has "N/A" if host is not available or network error
  */
-int getupsvar(char *host, char *request, char *answer, int anslen) 
+int getupsvar(const char *host, const char *request,
+    char *answer, size_t anslen) 
 {
     int i;
     char *stat_match = NULL;
     char *find;
     int nfields = 0;
      
-    if (!fetch_data(host)) {
-        strcpy(answer, "N/A");
+    if (fetch_data(host) == 0) {
+        strncpy(answer, "N/A", anslen);
+        answer[anslen - 1] = '\0';
 	return -1;
     }
 
     for (i=0; cmdtrans[i].request; i++) 
-	if (!(strcmp(cmdtrans[i].request, request))) {
+	if (strcmp(cmdtrans[i].request, request) == 0) {
 	     stat_match = cmdtrans[i].upskeyword;
 	     nfields = cmdtrans[i].nfields;
 	}
@@ -242,7 +243,7 @@ int getupsvar(char *host, char *request, char *answer, int anslen)
 		 find += 11;  /* skip label */
                  while (*find != '\n')
 		     answer[i++] = *find++;
-		 answer[i] = 0;
+		 answer[i] = '\0';
 	     }
              if (strcmp(answer, "N/A") == 0)
 		 return 0;
@@ -250,7 +251,8 @@ int getupsvar(char *host, char *request, char *answer, int anslen)
 	}
     }
 
-    strcpy(answer, "Not found");
+    strncpy(answer, "Not found", anslen);
+    answer[anslen - 1] = '\0';
     return 0;
 }
 
@@ -263,7 +265,7 @@ static int fill_buffer(int sockfd)
    int n, stat = 1; 
    char buf[1000];
 
-   statbuf[0] = 0;
+   statbuf[0] = '\0';
    statlen = 0;
    if (net_send(sockfd, "status", 6) != 6) {
       net_errmsg = "fill_buffer: write error on socket\n";
@@ -271,7 +273,7 @@ static int fill_buffer(int sockfd)
    }
 
    while ((n = net_recv(sockfd, buf, sizeof(buf)-1)) > 0) {
-      buf[n] = 0;
+      buf[n] = '\0';
       strcat(statbuf, buf);
    }
    if (n < 0)

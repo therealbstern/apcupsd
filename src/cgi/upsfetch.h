@@ -17,47 +17,18 @@
    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.              
 */
 
+#ifndef __UPSFETCH_H
+#define __UPSFETCH_H
+
+#include <sys/types.h>
+
 extern char statbuf[4096];
-extern int statlen;
-
-/* like strerror, but for errors that are related to the UPS code */
-char *upsstrerror (int errnum);
-
+extern size_t statlen;
 
 /* Read data into memory buffer to be used by getupsvar() */
-int fetch_events (char *host);
+int fetch_events (const char *host);
 
 /* get <varname> from <host> and put the reply in <buf> */
-int getupsvar (char *host, char *varname, char *buf, int buflen);
+int getupsvar (const char *host, const char *varname, char *buf, size_t buflen);
 
-/* get a list of all variables from <host> and put it in <buf> */
-int getupsvarlist (char *host, char *buf, int buflen);
-
-/* open a tcp connection to <host> and return the fd if successful */
-int upsconnect (char *host);
-
-/* close tcp connection cleanly */
-void closeupsfd (int fd);
-
-/* get variable list via open connection <fd> and put it in <buf> */
-int getupsvarlistfd (int fd, char *upsname, char *buf, int buflen);
-
-/* get variable via open connection <fd> and put it in <buf> */
-int getupsvarfd (int fd, char *upsname, char *varname, char *buf, int buflen);
-
-/* login to the <upsname> via connection <fd> with <password> */
-int upslogin (int fd, char *upsname, char *password);
-
-extern int upserror;
-
-/* privilege levels for upsgetprivs() */
-#define UPSPRIV_MASTER  0x2001
-
-/* request a privilege for this connection */
-int upsgetprivs (int fd, int level);
-
-/* send a raw buffer to the ups */
-int upssendraw (int fd, char *cmd);
-
-/* get a raw buffer from the ups */
-int upsreadraw (int fd, char *buf, int buflen);
+#endif
