@@ -2,10 +2,16 @@
           Release Notes for Apcupsd 3.10.10
 
 Changes since 3.10.9:
+- This version has an additional fix to the USB driver based on
+  work by Adam Kropelin -- it limits the rate at which apcupsd will
+  poll the UPS for the volatile data, which in turn reduces the possiblity
+  of flooding the kernel with control messages (hide-core.c: control
+  queue full ...".
 - I added a new "offbattery" event that is only executed if the 
   "onbattery" event was executed. This should allow users to easily
   control what messages they get and by using the ONBATTERYDELAY the
-  time on batteries before the onbattery event is notified.
+  time on batteries before the onbattery event is notified. The code
+  is untested, so any feedback would be appreciated.
 
 Release 3.10.9
 31Dec03
