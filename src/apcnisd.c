@@ -100,24 +100,34 @@ static void reap_children(int childpid)
    static int times[10];
    int i;
    time_t now;
+    int wpid;
 
 
-   time(&now);
-   for (i=0; i<10; i++) {
-      if (pids[i] && (waitpid(pids[i], NULL, WNOHANG) == pids[i]))
-	 pids[i] = 0;
-      else if (pids[i] && ((now - times[i]) > 30))
-	 kill(pids[i], SIGTERM);
-   }
-   for (i=0; i<10; i++) {
-      if (pids[i] && (waitpid(pids[i], NULL, WNOHANG) == pids[i]))
-	 pids[i] = 0;
-      if (childpid && (pids[i] == 0)) {
-	 pids[i] = childpid;
-	 times[i] = now;
-	 childpid = 0;
-      }
-   }
+    time(&now);
+    for (i=0; i<10; i++) {
+	if (pids[i]) {
+	    wpid = waitpid(pids[i], NULL, WNOHANG);	       
+	    if (wpid == -1 || wpid == pids[i]) {
+		pids[i] = 0;	      /* Child gone, remove from table */
+	    } else if (wpid == 0 && ((now - times[i]) > 30)) {
+		kill(pids[i], SIGTERM);  /* still running, kill it */
+	    }
+	}
+    }
+    /* Make another pass reaping killed programs and inserting new child */
+    for (i=0; i<10; i++) {
+	if (pids[i]) {
+	    wpid = waitpid(pids[i], NULL, WNOHANG);	       
+	    if (wpid == -1 || wpid == pids[i]) {
+		pids[i] = 0;	      /* Child gone, remove from table */
+	     }
+	}
+	if (childpid && (pids[i] == 0)) {
+	    pids[i] = childpid;
+	    times[i] = now;
+	    childpid = 0;
+	}
+    }
 }
 
 
