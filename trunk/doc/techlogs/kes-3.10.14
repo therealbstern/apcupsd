@@ -2,6 +2,9 @@
                         Kern Sibbald
 
 General:
+28Jul04
+- Updates to manual.
+- Integrate patch for Mandrake apcupsd.in forwarded by David Walser.
 18Jul04
 - Found another store into the ups buffer so #ifdefed it. Cannot
   store into the ups buffer on non-pthreads systems.
