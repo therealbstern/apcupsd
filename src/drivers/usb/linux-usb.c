@@ -1036,11 +1036,11 @@ int usb_ups_kill_power(UPSINFO *ups)
        return 0;
     }
 
-    write_int_to_ups(ups, CI_DelayBeforeShutdown, 0);
+    write_int_to_ups(ups, CI_DelayBeforeShutdown, 1);
 
     write_int_to_ups(ups, CI_ShutdownRequested, 1);
 
-    write_int_to_ups(ups, CI_APCShutdownAfterDelay, 1);
+    write_int_to_ups(ups, CI_APCShutdownAfterDelay, 10);
 
     write_int_to_ups(ups, CI_APCForceShutdown, 1);
 

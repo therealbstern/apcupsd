@@ -55,7 +55,7 @@ case "$1" in
                 ${APCUPSD} --killpower
         ;;
         commfailure)
-                wall "Warning communications list with UPS ${2}"
+                wall "Warning communications lost with UPS ${2}"
         ;;
         commok)
                 wall "Communciations restored with UPS ${2}"
