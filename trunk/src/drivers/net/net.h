@@ -2,19 +2,19 @@
  *  net.h  -- public header file for this driver
  *
  *  apcupsd.c -- Simple Daemon to catch power failure signals from a
- *               BackUPS, BackUPS Pro, or SmartUPS (from APCC).
- *            -- Now SmartMode support for SmartUPS and BackUPS Pro.
+ *		 BackUPS, BackUPS Pro, or SmartUPS (from APCC).
+ *	      -- Now SmartMode support for SmartUPS and BackUPS Pro.
  *
  *  All rights reserved.
  *
  */
 
 /*
- *                     GNU GENERAL PUBLIC LICENSE
- *                        Version 2, June 1991
+ *		       GNU GENERAL PUBLIC LICENSE
+ *			  Version 2, June 1991
  *
  *  Copyright (C) 1989, 1991 Free Software Foundation, Inc.
- *                           675 Mass Ave, Cambridge, MA 02139, USA
+ *			     675 Mass Ave, Cambridge, MA 02139, USA
  *  Everyone is permitted to copy and distribute verbatim copies
  *  of this license document, but changing it is not allowed.
  *
@@ -60,7 +60,7 @@
 
 #define BIGBUF 4096
 
-struct net_ups_internal_data {
+struct driver_data {
     char device[MAXSTRING];
     char *hostname;
     int port;
@@ -70,7 +70,7 @@ struct net_ups_internal_data {
 };
 
 /*********************************************************************/
-/* Function ProtoTypes                                               */
+/* Function ProtoTypes						     */
 /*********************************************************************/
 
 extern int net_ups_get_capabilities(UPSINFO *ups);

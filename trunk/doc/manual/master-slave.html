@@ -49,19 +49,55 @@ For additional details of shutting down a master/slave configuration,
 please see the <a href="shutdown.html#MasterSlaveShutdown">Master/Slave
 Shutdown</a> section of the Shutdown chapter of this manual.
 
-<h2>Master/Slave Networking using NIS</h2>
+<h2>Master/Slave Networking using NIS and the NET Driver</h2>
 It is also possible to implement a network of master/slave
 apcupsds using the new 3.10.x code and the <b>net</b> driver.
 This mode of master/slave networking is considerably different
 from the old method described at the beginning of this chapter.
-In this master/slave mode, the master must have <b>NETSERVER on</b>
+In the old code, there is a lot of configuration on both the
+master and slave side, and the master polls or sends info
+to the slave.
+<p>
+In this master/slave mode, the master is a standard stand alone
+configuration except that it must have <b>NETSERVER on</b>
 in the configuration file and have an <b>NISPORT nnn</b> defined.
-The apcupsd running in this mode then becomes the master.  The
+Thus any apcupsd running in this mode then becomes the master.  
+<p>
+The slave then uses the net driver to connect to the master's
+NIS output.  In this mode, the slave decides how often to
+poll the master for the NIS information. The
 slave copy of apcupsd, have <b>UPSTYPE net</b>, which will invoke
-the &quot;network&quot; driver. By setting this machine's <b>NISPORT nnn</b>
-to the same value as the master, it will automatically connect
+the &quot;network&quot; driver. By setting this machine's <b>DEVICE</b>
+to be  <b>master-ip:master-NIS-port</b>
+it will automatically connect
 to the master and use the master's signals to shutdown the computer.
-This code is not yet well tested.
+In the example net slave configuration file below, the slave 
+uses the NIS information provided by the computer <b>tibs</b>
+on port <b>3551</b>.
+<p>
+<pre>
+## apcupsd.conf v1.1 ##
+UPSCABLE ether
+UPSTYPE net
+# Specify the server name:port where NIS is running
+DEVICE tibs:3551
+LOCKFILE /var/lock
+BATTERYLEVEL 5
+MINUTES 3
+TIMEOUT 0
+ANNOY 300
+ANNOYDELAY 60
+NOLOGON disable
+EVENTSFILE /etc/apcupsd/apcupsd.events
+UPSCLASS standalone
+UPSMODE disable
+#
+# Use this to control the poll time.
+#  the default is 60 or 1 minute
+#
+NETTIME 30
+</pre>
+<p>
 <hr>
        
 <a href="logging.html" target="_self"><img src="back.gif" border=0 alt="Back"></a>

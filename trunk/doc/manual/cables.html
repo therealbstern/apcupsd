@@ -60,8 +60,12 @@ is available as running it in USB mode.
 <p>The jack in the UPS is actually a 10 pin RJ45.
 However, you can just as easily use a 8 pin RJ45
 connector, which is more standard (ethernet TX,
-and ISDN connector).
->Below, you will find a diagram for the CUSTOM-RJ45
+and ISDN connector). It is easy to
+construct the cable by cutting off one end of a
+standard RJ45-8 ethernet cable and wiring the other end (three wires)
+into a standard DB9F female serial port connector.
+<p>
+Below, you will find a diagram for the CUSTOM-RJ45
 cable:
 <pre>
     CUSTOM-RJ45 CABLE
@@ -91,6 +95,12 @@ The RJ45-10  pins are: looking at the end of the connector:
          |____|
 
 </pre>
+
+For the serial port DB9F connector, the pin numbers
+are stamped in the plastic near each pin. In addition,
+there is a diagram near the end of this chapter.
+
+<p>
 When using this cable with <b>apcupsd</b> specify the
 following in <b>apcupsd.conf</b>:
 <pre>
