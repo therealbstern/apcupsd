@@ -1,0 +1,53 @@
+--- linux-2.4.20/drivers/usb/hid-core.c.alt-apc_usb_ups	2003-04-21 19:39:27 +0400
++++ linux-2.4.20/drivers/usb/hid-core.c	2003-04-21 19:54:21 +0400
+@@ -1016,10 +1016,18 @@
+ 
+ void hid_write_report(struct hid_device *hid, struct hid_report *report)
+ {
+-	hid_output_report(report, hid->out[hid->outhead].buffer);
+-
+-	hid->out[hid->outhead].dr.wValue = cpu_to_le16(0x200 | report->id);
+-	hid->out[hid->outhead].dr.wLength = cpu_to_le16((report->size + 7) >> 3);
++	if ((hid->quirks & HID_QUIRK_SETREPORT_NEEDS_ID) && report->id) {
++		hid->out[hid->outhead].buffer[0] = report->id;
++		hid_output_report(report, hid->out[hid->outhead].buffer + 1);
++		hid->out[hid->outhead].dr.wLength =
++			cpu_to_le16(((report->size + 7) >> 3) + 1);
++	} else {
++		hid_output_report(report, hid->out[hid->outhead].buffer);
++		hid->out[hid->outhead].dr.wLength =
++			cpu_to_le16((report->size + 7) >> 3);
++	}
++	hid->out[hid->outhead].dr.wValue =
++		cpu_to_le16(((report->type + 1) << 8) | report->id);
+ 
+ 	hid->outhead = (hid->outhead + 1) & (HID_CONTROL_FIFO_SIZE - 1);
+ 
+@@ -1090,6 +1098,9 @@
+ #define USB_DEVICE_ID_POWERMATE		0x0410 /* Griffin PowerMate */
+ #define USB_DEVICE_ID_SOUNDKNOB		0x04AA /* Griffin SoundKnob */
+ 
++#define USB_VENDOR_ID_APC		0x051d
++#define USB_DEVICE_ID_APC_UPS_0002	0x0002 /* APC UPS - many models */
++
+ struct hid_blacklist {
+ 	__u16 idVendor;
+ 	__u16 idProduct;
+@@ -1121,6 +1132,7 @@
+ 	{ USB_VENDOR_ID_ATEN, USB_DEVICE_ID_ATEN_4PORTKVM, HID_QUIRK_NOGET },
+ 	{ USB_VENDOR_ID_GRIFFIN, USB_DEVICE_ID_POWERMATE, HID_QUIRK_IGNORE },
+ 	{ USB_VENDOR_ID_GRIFFIN, USB_DEVICE_ID_SOUNDKNOB, HID_QUIRK_IGNORE },
++	{ USB_VENDOR_ID_APC, USB_DEVICE_ID_APC_UPS_0002, HID_QUIRK_SETREPORT_NEEDS_ID },
+ 	{ 0, 0 }
+ };
+ 
+--- linux-2.4.20/drivers/usb/hid.h.alt-apc_usb_ups	2002-11-29 02:53:14 +0300
++++ linux-2.4.20/drivers/usb/hid.h	2003-04-21 19:42:32 +0400
+@@ -186,6 +186,7 @@
+ #define HID_QUIRK_NOTOUCH	0x02
+ #define HID_QUIRK_IGNORE	0x04
+ #define HID_QUIRK_NOGET		0x08
++#define HID_QUIRK_SETREPORT_NEEDS_ID	0x10
+ 
+ /*
+  * This is the global enviroment of the parser. This information is

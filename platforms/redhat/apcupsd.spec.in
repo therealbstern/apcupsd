@@ -39,7 +39,7 @@ Some features depend on what UPS model you have (simple or smart).
         --with-cgi-bin=%{_sysconfdir}/apcupsd/cgi \
         --enable-cgi \
         --enable-pthreads \
-        --with-serial-dev=/dev/usb/hiddev[0-9] \
+        --with-serial-dev=/dev/usb/hiddev[0-15] \
         --with-upstype=usb \
         --with-upscable=usb \
         --enable-usb

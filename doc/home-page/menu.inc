@@ -22,5 +22,5 @@
 <font color="#0000ff" size=+2><b>SourceForge</b></font><br>
 <a href="http://sourceforge.net/projects/apcupsd">Project Page</a><br>
 <a href="http://sourceforge.net/project/showfiles.php?group_id=54413">Current Downloads</a><br>
-<a href="http://download.sourceforge.net/bacula">All Downloads</a><br>
+<a href="http://download.sourceforge.net/apcupsd">All Downloads</a><br>
 <a href="http://sourceforge.net/cvs/?group_id=54413">CVS</a><br>
