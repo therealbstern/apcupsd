@@ -1,0 +1,814 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2 Final//EN">
+
+<html>
+<head>
+                <title>Apcupsd Cable Configuration</title>
+   <meta name="Author" content="Kern Sibbald">
+                <link rel=stylesheet href="apcupsd-styles.css" type="text/css">
+</head>
+<body>
+<h1>Cables</h1>
+First, you will need a serial port cable between the APC UPS and your computer
+running <b>apcupsd</b>. You can use either the cable that came with your
+UPS (the easiest if we support it) or you can make your own cable. 
+We recommend that you obtain a supported cable directly from APC.
+<p>If you already have an APC cable, you can determine what kind it
+is by examining the flat sides of the two connectors where you will
+find the cable number embossed into the plastic. It is generally
+on one side of the male connector.
+<p>To make your own cable, first, you must know whether you have a Smart UPS
+that sends ASCII characters called <b>Smart Signaling</b>, 
+or a &quot;dumb&quot; UPS that uses serial port line voltage signaling, called
+<b>Simple Signaling</b>.
+<p>
+The &quot;dumb&quot; UPSes are older models such as
+the BackUPS (not BackUPS Pro) and the ShareUPS Basic Port that
+use <b>Simple Signaling</b>. Most other UPSes use
+<b>Smart Signaling</b>. If in
+doubt consult the <a href="configure.html">Configuration Section</a> of
+this manual, or the documentation that came with your UPS.
+<h3>Smart Signaling Cable for SmartUPSes</h3>
+If you must build your own cable, and you have a 
+Smart UPS, we recommend building the cable as
+follows:
+<pre>
+    SMART-CUSTOM CABLE
+
+ Signal Computer                  UPS
+         DB9F                     DB9M
+   RxD    2   --------------------  2  TxD  Send
+   TxD    3   --------------------  1  RxD  Receive
+   GND    5   --------------------  9  Ground
+
+</pre>
+When using this cable with <b>apcupsd</b> specify the
+following in <b>apcupsd.conf</b>:
+<pre>
+  UPSCABLE smart
+  UPSTYPE smartups
+  DEVICE /dev/ttyS0 (or whatever your serial port is)
+</pre>
+
+<h3>Smart Signaling Cable for BackUPS CS Models</h3>
+If you have a BackUPS CS, you are probably either using
+it with the USB cable that is supplied or with the
+940-0128A supplied by APC, which permits running the 
+UPS in dumb mode. By building your own cable, you can now
+run the BackUPS CS models (and perhaps also the ES models)
+using Smart signaling and have all the same information that
+is available as running it in USB mode.
+<p>The jack in the UPS is actually a 10 pin RJ45.
+However, you can just as easily use a 8 pin RJ45
+connector, which is more standard (ethernet TX,
+and ISDN connector). It is easy to
+construct the cable by cutting off one end of a
+standard RJ45-8 ethernet cable and wiring the other end (three wires)
+into a standard DB9F female serial port connector.
+<p>
+Below, you will find a diagram for the CUSTOM-RJ45
+cable:
+<pre>
+    CUSTOM-RJ45 CABLE
+
+ Signal Computer              UPS     UPS
+         DB9F                 RJ45-8  RJ45-10
+   RxD    2   ----------------  1      2     TxD  Send
+   TxD    3   ----------------  7      8     RxD  Receive
+   GND    5   ----------------  6      7     Ground
+
+The RJ45-8 pins are: looking at the end of the connector:
+
+   8 7 6 5 4 3 2 1
+ ___________________
+ | . . . . . . . . |
+ |                 |
+ -------------------
+         |____|
+
+The RJ45-10  pins are: looking at the end of the connector:
+
+  10 9 8 7 6 5 4 3 2 1
+ _______________________
+ | . . . . . . . . . . |
+ |                     |
+ -----------------------
+         |____|
+
+</pre>
+
+For the serial port DB9F connector, the pin numbers
+are stamped in the plastic near each pin. In addition,
+there is a diagram near the end of this chapter.
+
+<p>
+When using this cable with <b>apcupsd</b> specify the
+following in <b>apcupsd.conf</b>:
+<pre>
+  UPSCABLE smart
+  UPSTYPE smartups
+  DEVICE /dev/ttyS0 (or whatever your serial port is)
+</pre>
+<p>
+The information for constructing this cable was discovered
+and transmitted to us by slither_man.  Many thanks!
+
+
+<h3>Simple Signaling Cable for &quot;dumb&quot; UPSes</h3>
+<b>NOTE. YOU DO NOT HAVE THIS CABLE UNLESS YOU BUILT IT
+YOURSELF. THE SIMPLE-CUSTOM CABLE IS NOT AN APC PRODUCT.</b>
+<p>
+For &quot;dumb&quot; UPSes using Simple Signaling, if you
+are going to build your own cable, we recommend to make
+the cable designed by the <b>Apcupsd</b> team 
+as follows:
+<pre>
+         SIMPLE-CUSTOM CABLE
+                 
+ Signal Computer                  UPS
+         DB9F   4.7K ohm          DB9M
+   DTR    4   --[####]--*              DTR set to +5V by Apcupsd
+                        |
+   CTS    8   ----------*---------  5  Low Battery
+   GND    5   --------------------  4  Ground
+   DCD    1   --------------------  2  On Battery
+   RTS    7   --------------------  1  Kill UPS Power
+
+</pre>
+
+List of components one needs to make the Simple cable:
+<ol>
+   <li>One (1) male DB9 connector, use solder type connector only.
+   <li>One (1) female DB9/25F connector, use solder type connector only.
+   <li>One (1) 4.7K ohm 1/4 watt 5% resistor.
+   <li>resin core solder.
+   <li>three (3) to five (5) feet of 22AWG multi-stranded four or more
+    conductor cable.
+</ol>
+
+<p>
+- Solder the resistor into pin 4 of the female DB9 connector.
+<p>
+- Next bend the resistor so that it connects to pin 8 of the female DB9 connector. 
+<p>
+- Pin 8 on the female connector is also wired to pin 5 on the male DB9 connector. Solder both
+ends.
+<p></p>
+- Solder the other pins, pin 5 on the female DB9 to pin 4 on the male
+connector; pin 1 on the female connector to pin 2 on the male connector; and
+pin 7 on the female connector to pin 1 on the male connector.
+<p></p>- Double check your work.
+<br>
+<p>We use the DTR (pin 4 on the female connector) as our +5 volts power for the circuit.
+It is used as the Vcc pull-up voltage for testing the outputs on 
+any &quot;UPS by APC&quot; in Simple Signaling mode. This cable may not work on a 
+BackUPS Pro if the default communications are Smart Signaling mode. This 
+cable is also valid for &quot;ShareUPS&quot; BASIC Port mode and is also 
+reported to work on SmartUPSes. However, the Smart Cable described above is much
+simpler.
+
+To have a better idea of what is going on inside <b>apcupsd</b>, for the SIMPLE 
+cable <b>apcupsd</b> reads three signals and sets three:
+<pre>
+Reads:
+  CD, which apcupsd uses for the On Battery signal when high.
+   
+  CTS, which apcupsd uses for the Battery Low signal when high.
+
+  RxD (SR), which apcupsd uses for the Line Down 
+      signal when high. This signal isn't used for much.
+
+Sets:
+  DTR, which apcupsd sets when it detects a power failure (generally
+       5 to 10 seconds after the CD signal goes high). It
+       clears this signal if the CD signal subsequently goes low
+       -- i.e. power is restored.
+
+  TxD (ST), which apcupsd clears when it detects that the CD signal
+       has gone low after having gone high - i.e. power is restored.
+
+  RTS, which apcupsd sets for the killpower signal -- to cause the UPS
+       to shut off the power.
+</pre>
+<p>Please note that these actions apply only to the SIMPLE cable, the signals
+used on the other cables are different.
+</p>
+Finally, here is another way of looking at the CUSTOM-SIMPLE cable:
+<pre>
+
+APCUPSD  SIMPLE-CUSTOM CABLE
+
+                
+Computer Side  |  Description of Cable           |     UPS Side  
+DB9f  |  DB25f |                                 |   DB9m  | DB25m
+ 4    |   20   |  DTR (5vcc)             *below  |    n/c  |
+ 8    |    5   |  CTS (low battery)      *below  | &lt;-  5   |   7
+ 2    |    3   |  RxD (no line voltage)  *below  | &lt;-  3   |   2
+ 5    |    7   |  Ground (Signal)                |     4   |  20
+ 1    |    8   |  CD (on battery from UPS)       | &lt;-  2   |   3
+ 7    |    4   |  RTS (kill UPS power)           | -&gt;  1   |   8
+n/c   |    1   |  Frame/Case Gnd (optional)      |     9   |  22
+
+Note: the &lt;- and -&gt; indicate the signal direction.
+
+
+ Optional connections of original SIMPLE-CUSTOM specification
+  that are not used.
+
+                4.7K ohm
+   DTR    4   --[####]--*              Note needed
+                        |
+   RxD    2   ----------*---------  3  Not used by Apcupsd
+
+</pre>
+When using this cable with <b>apcupsd</b> specify the
+following in <b>apcupsd.conf</b>:
+<pre>
+  UPSCABLE simple
+  UPSTYPE backups
+  DEVICE /dev/ttyS0 (or whatever your serial port is)
+</pre>
+
+
+<h2>Other APC Cables that Apcupsd Supports</h2>
+<b>Apcupsd</b> will also support the following off the shelf cables that are
+supplied by APC:
+<p>
+940-0020B/C   Simple Signal Only, all models.
+<br>
+940-0023A     Simple Signal Only, all models.
+<br>
+940-0119A     Simple Signal Only, Back-UPS Office, and BackUPS ES.
+<br>
+940-0024[B/C/G]  SmartMode Only, SU and BKPro only.
+<br>
+940-0095[A/B/C]  PnP (Plug and Play), all models.
+<br>
+940-1524C     SmartMode Only
+<br>
+940-0127A/B   USB Cables
+<br>
+940-0128A     Simple Signal Only, Back-UPS CS in serial mode.
+
+
+
+<h2><a name="CableModes"></a>Simple Signaling Features Supported by Apcupsd for Various Cables</h2>
+The following table shows the features supported by the 
+current version of <b>Apcupsd</b> (3.8.5 or later) for various
+cables running the UPS in Simple Signaling mode.
+<p class="indent">
+<table cellspacing="2" cellpadding="2" border="2">
+<tr align="center" valign="middle"><th>Cable</th>     <th>Power Loss</th> <th>Low Battery</th> <th>Kill Power</th> <th>Cable Disconnected</th></tr>
+<tr align="center" valign="middle"><td>940-0020B</td>    <td>Yes</td>     <td>No</td>         <td>Yes</td>        <td>No</td></tr>
+<tr align="center" valign="middle"><td>940-0020C</td>    <td>Yes</td>     <td>Yes</td>        <td>Yes</td>        <td>No</td></tr>
+<tr align="center" valign="middle"><td>940-0023A</td>    <td>Yes</td>     <td>No</td>          <td>No</td>         <td>No</td></tr>
+<tr align="center" valign="middle"><td>940-0119A</td>    <td>Yes</td>     <td>Yes</td>         <td>Yes</td>        <td>No</td></tr>
+<tr align="center" valign="middle"><td>940-0127A</td>    <td>Yes</td>     <td>Yes</td>         <td>Yes</td>        <td>No</td></tr>
+<tr align="center" valign="middle"><td>940-0128A</td>    <td>Yes</td>     <td>Yes</td>         <td>Yes</td>        <td>No</td></tr>
+<tr align="center" valign="middle"><td>940-0095A/B/C</td> <td>Yes</td>    <td>Yes</td>         <td>Yes</td>        <td>No</td></tr>
+<tr align="center" valign="middle"><td>simple</td>       <td>Yes</td>     <td>Yes</td>         <td>Yes</td>        <td>No</td></tr>
+</table>
+</p>
+<h2>Simple UPS Signaling</h2>
+Apparently, all APC signaling UPSes have the same signals on the
+output pins of the UPS. The difference at the computer end is due
+to different cable configurations. Thus, by measuring the connectivity
+of a cable, one can determine how to program the UPS. This
+is to be verified.
+<p>
+The signals presented or accepted by the UPS on its DB9
+connector using the numbering scheme listed above is:
+<pre>
+UPS Pin         Signal meaning
+   1     &lt;-     Shutdown when set by computer for 1-5 seconds.
+   2     -&gt;     On battery power (this signal is normally low but
+                      goes high when the UPS switches to batteries).
+   3     -&gt;     Mains down (line fail) See Note 1 below.
+   5     -&gt;     Low battery. See Note 1 below.
+   6     -&gt;     Inverse of mains down signal. See Note 2 below.
+   7     &lt;-     Turn on/off power (only on advanced UPSes only)
+   
+   Note 1: these two lines are normally open, but close when the
+       appropriate signal is triggered. In fact, they are open collector
+       outputs which are rated for a maximum of +40VDC and 25 mA. Thus
+       the 4.7K ohm resistor used in the Custom Simple cable works 
+       quite well.
+   
+   Note 2: the same as note 1 except that the line is normally closed,
+       and opens when the line voltage fails.
+</pre>
+<h2>The Back-UPS Office 500 signals</h2>
+The Back-UPS Office UPS has a telephone type jack as
+output, which looks like the following:
+<pre>
+Looking at the end of the connector:
+
+     6 5 4 3 2 1
+    _____________
+   | . . . . . . |
+   |             |
+   |  |----------|
+   |__|
+
+</pre>
+<p>It appears that the signals work as follows:
+<pre>
+    UPS            Signal meaning
+ 1 (brown)    &lt;-   Shutdown when set by computer for 1-5 seconds.
+ 2 (black)    -&gt;   On battery power
+ 3 (blue)     -&gt;   Low battery
+ 4 (red)           Signal ground 
+ 5 (yellow)   &lt;-   Begin signaling on other pins
+ 6 (none)          none
+</pre>
+
+<h2>940-0020B Cable Wiring</h2>
+This diagram is for informational purposes and is 
+not complete. Although we do not know what the
+black box semi-conductor contains, we believe
+that we understand its operation (many thanks
+to Lazar M. Fleysher for working this out).
+<p>
+This cable can
+only be used on simple signaling UPSes, and 
+provides the On Battery signal as well as 
+kill UPS power. Most recent evidence (Lazar's
+analysis) indicates
+that this cable under the right conditions may
+provide the Low Battery signal. This is to be
+confirmed. 
+<pre>
+APC Part# - 940-0020B
+
+ Signal Computer                  UPS
+         DB9F                     DB9M
+   CTS    8   --------------------  2  On Battery
+   DTR    4   --------------------  1  Kill power
+   GND    5   ---------------*----  4  Ground
+                             |
+                  ---        *----  9  Common
+   DCD    1  ----|///|-----------   5  Low Battery
+                 |\\\|
+   RTS    7  ----|///| (probably a
+                  ---   semi-conductor)
+</pre>
+Thanks to Lazar M. Fleysher for proper
+
+<h2>940-0020C Cable Wiring</h2>
+This diagram is for informational purposes and may
+not be complete, we don't recommend that use it
+to build you build one yourself. This cable can
+only be used on simple signaling UPSes, and 
+provides the On Battery signal, the Low Battery
+signal as well as kill UPS power. In <b>apcupsd</b> 
+versions 3.8.2 and prior, please set your
+UPSCABLE to 940-0020B. In version 3.8.3 and later,
+you may specify the cable as 940-0020C.
+Please note that this diagram may
+not be accurate.
+<pre>
+APC Part# - 940-0020C
+
+ Signal Computer                  UPS
+         DB9F                     DB9M
+   CTS    8   --------------------  2  On Battery
+   DTR    4   --------------------  1  Kill power
+   GND    5   ---------------*----  4  Ground
+                             |
+                             *----  9  Common
+   RTS    7 -----[ 93.5K ohm ]----- 5  Low Battery
+                 or semi-conductor
+</pre>
+
+
+<h2>940-0023A Cable Wiring</h2>
+This diagram is for informational purposes and may
+not be complete, we don't recommend that use it
+to build you build one yourself. This cable can
+only be used on simple signaling UPSes, and apparently only
+provides the On Battery signal. As a consequence, this
+cable is pretty much useless, and we recommend
+that you find a better cable because all APC UPSes
+support more than just On Battery.
+Please note that we are not sure the following diagram
+is correct.
+<pre>
+APC Part# - 940-0023A
+
+ Signal Computer                  UPS
+         DB9F                     DB9M
+   DCD    1   --------------------  2  On Battery
+   
+                3.3K ohm
+   TxD    3   --[####]-*
+                       |
+   DTR    4   ---------*
+   GND    5   ---------------*----  4  Ground
+                             |
+                             *----  9  Common
+
+</pre>
+
+<h2>940-0095A Cable Wiring</h2>
+This cable is used         
+with the <b>backupspropnp</b> and the <b>newbackupspro</b>.
+It is the definitive
+wiring diagram for the 940-0095A cable submitted
+by Chris Hanson &lt;cph at zurich.ai.mit.edu&gt;, who
+disassembled the original cable, destroying it in
+the process. He then built one from his diagram and it
+works perfectly.
+<pre>
+Construction and operation of the APC #940-0095A cable.
+This cable is included with the APC Back-UPS Pro PNP series.
+
+
+UPS end                                      Computer end
+-------                                      ------------
+                    47k        47k
+BATTERY-LOW (5) >----R1----*----R2----*----< DTR,DSR,CTS (4,6,8)
+                           |          |
+                           |          |
+                           |         /  E
+                           |       |/
+                           |    B  |
+                           *-------|  2N3906 PNP
+                                   |
+                                   |\
+                                     \  C
+                                      |
+                                      |
+                                      *----< DCD (1)     Low Batt
+                                      |
+                                      |
+                                      R 4.7k
+                                      3
+                                      |
+                               4.7k   |
+SHUTDOWN (1)    >----------*----R4----*----< TxD (3)            
+                           |
+                           |  1N4148
+                           *----K|---------< RTS (7)      Shutdown
+
+POWER-FAIL (2)  >--------------------------< RxD,RI (2,9) On Batt
+
+GROUND (4,9)    >--------------------------< GND (5)
+
+
+Operation:
+
+* DTR is "cable power" and must be held at SPACE.  DSR or CTS may be
+  used as a loopback input to determine if the cable is plugged in.
+
+* DCD is the "battery low" signal to the computer.  A SPACE on this
+  line means the battery is low.  This is signalled by BATTERY-LOW
+  being pulled down (it is probably open circuit normally).
+
+  Normally, the transistor is turned off, and DCD is held at the MARK
+  voltage by TxD.  When BATTERY-LOW is pulled down, the voltage
+  divider R2/R1 biases the transistor so that it is turned on, causing
+  DCD to be pulled up to the SPACE voltage.
+
+* TxD must be held at MARK; this is the default state when no data is
+  being transmitted.  This sets the default bias for both DCD and
+  SHUTDOWN.  If this line is an open circuit, then when BATTERY-LOW is
+  signalled, SHUTDOWN will be automatically signalled; this would be
+  true if the cable were plugged in to the UPS and not the computer,
+  or if the computer were turned off.
+
+* RTS is the "shutdown" signal from the computer.  A SPACE on this
+  line tells the UPS to shut down.
+
+* RxD and RI are both the "power-fail" signals to the computer.  A
+  MARK on this line means the power has failed.
+
+* SPACE is a positive voltage, typically +12V.  MARK is a negative
+  voltage, typically -12V.  Linux appears to translate SPACE to a 1
+  and MARK to a 0.
+</pre>
+
+<h2>940-0095B Cable Wiring</h2>
+This diagram is for informational purposes and may
+not be complete, we don't recommend that use it
+to build you build one yourself.
+<pre>
+APC Part# - 940-0095B
+
+ Signal Computer                  UPS
+         DB9F                     DB9M
+   DTR    4   ----*
+   CTS    8   ----|
+   DSR    6   ----|
+   DCD    1   ----*
+   GND    5   ---------------*----  4  Ground
+                             |
+                             *----  9  Common
+   RI     9   ----*
+                  |
+   RxD    2   ----*---------------  2  On Battery
+   TxD    3   ----------[####]----  1  Kill UPS Power
+                        4.7K ohm
+</pre>
+<h2>940-0119A Cable Wiring</h2>
+This diagram is for informational purposes and may
+not be complete, we don't recommend that use it
+to build you build one yourself. This cable is used with
+the BackUPS Office UPSes.
+<pre>
+APC Part# - 940-0119A
+
+    UPS      Computer
+    pins     pins      Signal             Signal meaning
+ 1 (brown)    4,6      DSR DTR     &lt;-   Shutdown when set by computer for 1-5 seconds.
+ 2 (black)    8,9      RI  CTS     -&gt;   On battery power
+ 3 (blue)     1,2      CD  RxD     -&gt;   Low battery 
+ 4 (red)       5       Ground
+ 5 (yellow)    7       RTS         &lt;-   Begin signaling on other pins 
+ 6 (none)     none
+
+</pre>
+
+<h2>BackOffice ES</h2>
+The BackUPS ES has a straight through serial cable with no identification
+on the plugs. To make it work with <b>apcupsd</b>, specify the
+<b>UPSCABLE 940-0119A</b> and <b>UPSTYPE backups</b>.
+The equivalent of cable 940-0119A is done on a PCB inside the
+unit. Thanks to William Stock for supplying us with the information
+about the straight through cable, the PCB, and the following diagram:
+<pre>
+
+computer           ----------- BackUPS-ES -----------------
+ DB9-M              DB-9F
+  pin    signal      pin
+
+   4      DSR   ->    4 --+
+                          |  diode   resistor
+   6      DTR   ->    6 --+---->|----/\/\/\---o kill power
+
+   1      DCD   <-    1 --+
+                          |
+   2      RxD   <-    2 --+----------------+--o low battery
+                                           |
+   7      RTS   ->    7 --------+--/\/\/\--+
+                                |
+                                +--/\/\/\--+
+                                           |
+   8      RI    <-    8 --+----------------+--o on battery
+                          |
+   9      CTS   <-    9 --+
+
+   5      GND   ---   5 ----------------------o ground
+
+   3      TxD         3 nc
+
+</pre>
+
+<h2>BackUPS ES and CS in Serial mode with Cable 940-0128A</h2>
+Though these UPSes are USB UPSes, APC supplies a serial
+cable (typically with a green DB9 F connector) that has
+940-0128A stamped into one side of the plastic serial
+port connector.  The other end of the cable is a 10 pin
+RJ45 connector that plugs into the UPS (thanks to 
+Dean Waldow for sending me a cable!).
+Apcupsd version
+3.8.5 and later supports this cable when specified as
+<b>UPSCABLE 940-0128A</b> and <b>UPSTYPE backups</b>.
+However, running in this mode much of the information
+that would be available in USB mode is lost.
+In addition, when <b>apcupsd</b> attempts to     
+instruct the UPS to kill the power, it begins
+cycling about 4 times a second between battery
+and line. The solution to the problem (thanks
+to Tom Suzda) is to unplug the UPS and while it
+is still chattering, press the power button
+(on the front of the unit) until the unit beeps
+and the chattering stops. After that the UPS
+should behave normally and power down 1-2 minutes
+after requested to do so.
+
+<p>An amazing discovery by slither_man allows one
+to build a CUSTOM-RJ45 cable (documented above) and
+run the BackUPS CS (and probably also the ES) in
+Smart mode. Running it this way provides all the
+same information that you would get by running it
+in USB mode. As a consequence, we recommend that you
+either purchase (where I don't know) or build your
+own CUSTOM-RJ45 cable rather than use the
+940-0128A cable.
+
+<p>Thanks to all the people who have helped test
+this and have provided information on the
+cable wiring, our best guess    
+for the cable schematic is the following:
+
+<pre>
+
+computer        --------- Inside the Connector---------  UPS
+ DB9-F          |                                     |  RJ45
+  pin - signal  |                                     |  Pin - Color
+                |                                     |
+   4     DSR  ->|---+                                 |
+                |   |  diode   resistor               |
+   6     DTR  ->|---+---->|----/\/\/\---o kill power  |  8  Orange
+                |                                     |
+   1     DCD  <-|----+                                |
+                |    |                                |
+   2     RxD  <-|----+----------------+--o low battery|  3  Brown
+                |                     |               |
+   7     RTS  ->|----------+--/\/\/\--+               |
+                |          |                          |   
+                |          +--/\/\/\--+               |
+                |                     |               |
+   8     RI   <-|----+----------------+--o on battery |  2  Black
+                |    |                                |
+   9     CTS  <-|----+                                |
+                |                         signal      |
+   5     GND  --|-----------------------o ground      |  7  Red
+                |                                     |
+   3     TxD    |                                     |
+                |                         chassis     |
+   Chassis/GND  |-----------------------o ground      |  4  Black
+                |                                     |
+                |          Not connected              |  1, 5, 6, 9, 10
+                -------------------------------------- 
+
+The RJ45 pins are: looking at the end of the connector:
+
+  10 9 8 7 6 5 4 3 2 1
+ _______________________
+ | . . . . . . . . . . |
+ |                     |
+ -----------------------
+         |____|
+
+</pre>
+
+
+<h2>Win32 Implementation Restrictions for Simple UPSes</h2>
+Due to inadequacies in the Win32 API, it is not possible
+to set/clear/get all the serial port line signals. <b>apcupsd</b>
+can detect: CTS, DSR, RNG, and CD.  It can set and clear:
+RTS and DTR.
+<p>This imposes a few minor restrictions on the functionality
+of some of the cables. In particular, LineDown on the 
+Custom Simple cable, and Low Battery on the 0023A cable
+are not implemented.
+<h2>Internal Apcupsd Actions for Simple Cables</h2>
+<pre>
+This section describes how apcupsd 3.8.5 (March 2002)
+treats the serial port line signals for simple cables.
+
+apcaction.c: 
+   condition = power failure detected
+   cable = CUSTOM_SIMPLE
+   action = ioctl(TIOCMBIS, DTR)      set DTR (enable power bit?)
+
+apcaction.c: 
+   condition = power back
+   cable = CUSTOM_SIMPLE
+   action = ioctl(TIOCMBIC, DTR)      clear DTR (clear power bit)
+   action = ioctl(TIOCMBIC, ST)       clear ST (TxD)
+
+apcserial.c: 
+   condition = serial port initialization
+   cable = 0095A, 0095B, 0095C
+   action = ioctl(TIOMBIC, RTS)       clear RTS (set PnP mode)
+
+   cable = 0119A, 0127A, 0128A
+   action = ioctl(TIOMBIC, DTR)       clear DTR (killpower)
+   action = ioctl(TIOMBIS, RTS)       set   RTS (ready to receive)
+
+apcserial.c: 
+   condition = save_dumb_status
+   cable = CUSTOM_SIMPLE
+   action = ioctl(TIOMBIC, DTR)       clear DTR (power bit?)
+   action = ioctl(TIOMBIC, RTS)       clear RTS (killpower)
+
+   cable = 0020B, 0020C, 0119A, 0127A, 0128A
+   action = ioctl(TIOMBIC, DTR)       clear DTR (killpower)
+
+   cable = 0095A, 0095B, 0095C
+   action = ioctl(TIOMBIC, RTS)       clear RTS (killpower)
+   action = ioctl(TIOMBIC, CD)        clear DCD (low batt)
+   action = ioctl(TIOMBIC, RTS)       clear RTS (killpower) a second time!
+
+apcserial.c:
+   condition = check_serial
+
+   cable = CUSTOM_SIMPLE
+   action = OnBatt = CD
+   action = BattLow = CTS
+   action = LineDown = SR
+
+   cable = 0020B, 0020C, 0119A, 0127A, 0128A
+   action = OnBatt = CTS
+   action = BattLow = CD
+   action = LineDown = 0
+
+   cable = 0023A
+   action = Onbatt = CD
+   action = BattLow = SR
+   action = LineDown = 0
+
+   cable = 0095A, 0095B, 0095C
+   action = OnBatt = RNG
+   action = BattLow = CD
+   action = LineDown = 0
+
+
+apcserial.c
+   condition = killpower
+
+   cable = CUSTOM_SIMPLE, 0095A, 0095B, 0095C
+   action = ioctl(TIOMCBIS, RTS)      set RTS (kills power)
+   action = ioctl(TIOMCBIS, ST)       set TxD       
+
+   cable = 0020B, 020C, 0119A, 0127A, 0128A
+   action = ioctl(TIOMCBIS, DTR)      set DTR (kills power)
+
+</pre>
+
+<h3>RS232 Wiring and Signal Conventions</h3>
+<p class="indent">
+<table border="2" cellspacing="2" cellpadding="4">
+<tr><th>DB-25
+    <br>Pin #</th>  <th>DB-9
+                       <br>Pin #</th>  <th>Name</th>  <th>DTE-DCE Description</th> </tr>
+<tr><td>1</td>      <td>--</td>    <td>FG</td>    <td>--- Frame Ground/Chassis GND</td></tr>
+<tr><td>2</td>      <td>3</td>     <td>TD</td>    <td>---&gt; Transmitted Data, TxD</td></tr>
+<tr><td>3</td>      <td>2</td>     <td>RD</td>    <td>&lt;--- Received Data, RxD</td></tr>
+<tr><td>4</td>      <td>7</td>     <td>RTS</td>   <td>---&gt; Request To Send</td></tr>
+<tr><td>5</td>      <td>8</td>     <td>CTS</td>   <td>&lt;--- Clear To Send</td></tr>
+<tr><td>6</td>      <td>6</td>     <td>DSR</td>   <td>&lt;--- Data Set Ready</td></tr>
+<tr><td>7</td>      <td>5</td>     <td>SG</td>    <td>---- Signal Ground, GND</td> </tr>
+<tr><td>8</td>      <td>1</td>     <td>DCD</td>   <td>&lt;--- Data Carrier Detect</td></tr>
+<tr><td>9</td>      <td>--</td>    <td>--</td>    <td>--- Positive DC test voltage</td></tr>
+<tr><td>10</td>     <td>--</td>    <td>--</td>    <td>--- Negative DC test voltage</td></tr>
+<tr><td>11</td>     <td>--</td>    <td>QM</td>    <td>&lt;--- Equalizer mode</td></tr>
+<tr><td>12</td>     <td>--</td>    <td>SDCD</td>  <td>&lt;--- Secondary Data Carrier Detect</td></tr>
+<tr><td>13</td>     <td>--</td>    <td>SCTS</td>  <td>&lt;--- Secondary Clear To Send</td></tr>
+<tr><td>14</td>     <td>--</td>    <td>STD</td>   <td>---&gt; Secondary Transmitted Data</td></tr>
+<tr><td>15</td>     <td>--</td>    <td>TC</td>    <td>&lt;--- Transmitter (signal) Clock</td></tr>
+<tr><td>16</td>     <td>--</td>    <td>SRD</td>   <td>&lt;--- Secondary Receiver Clock</td></tr>
+<tr><td>17</td>     <td>--</td>    <td>RC</td>    <td>---&gt; Receiver (signal) Clock</td></tr>
+<tr><td>18</td>     <td>--</td>    <td>DCR</td>   <td>&lt;--- Divided Clock Receiver</td></tr>
+<tr><td>19</td>     <td>--</td>    <td>SRTS</td>  <td>---&gt; Secondary Request To Send</td></tr>
+<tr><td>20</td>     <td>4</td>     <td>DTR</td>   <td>---&gt; Data Terminal Ready</td></tr>
+<tr><td>21</td>     <td>--</td>    <td>SQ</td>    <td>&lt;--- Signal Quality Detect</td></tr>
+<tr><td>22</td>     <td>9</td>     <td>RI</td>    <td>&lt;--- Ring Indicator</td></tr>
+<tr><td>23</td>     <td>--</td>    <td>--</td>    <td>---&gt; Data rate selector</td></tr>
+<tr><td>24</td>     <td>--</td>    <td>--</td>    <td>&lt;--- Data rate selector</td></tr>
+<tr><td>25</td>     <td>--</td>    <td>TC</td>    <td>&lt;--- Transmitted Clock</td></tr>
+</table>
+</p>
+<p>
+  <h4>Pin Assignment for the Serial Port (RS-232C), 25-pin and 
+  9-pin, Female End</h4>
+<P><PRE>
+     13                         1         5         1
+   _______________________________      _______________
+   \  . . . . . . . . . . . . .  /      \  . . . . .  /    RS232-connectors
+    \  . . . . . . . . . . . .  /        \  . . . .  /     looking into the
+     ---------------------------          -----------      end of the cable.
+     25                      14            9       6
+
+ The diagram above represents the Female end of the cable. The
+ male end is the same, but looking from inside the cable.
+          
+   DTE : Data Terminal Equipment (i.e. computer)
+   DCE : Data Communications Equipment (i.e. UPS)
+   RxD : Data received; 1 is transmitted "low", 0 as "high"
+   TxD : Data sent; 1 is transmitted "low", 0 as "high"
+   DTR : DTE announces that it is powered up and ready to communicate
+   DSR : DCE announces that it is ready to communicate; low=modem hang-up
+   RTS : DTE asks DCE for permission to send data
+   CTS : DCE agrees on RTS
+   RI  : DCE signals the DTE that an establishment of a connection is attempted
+   DCD : DCE announces that a connection is established
+</PRE>
+<P></P>
+<H2><A name=ioctl></A>Ioctl to RS232 Correspondence</H2>
+
+<P>
+<BLOCKQUOTE><PRE>
+#define TIOCM_LE        0x001
+#define TIOCM_DTR       0x002
+#define TIOCM_RTS       0x004
+#define TIOCM_ST        0x008
+#define TIOCM_SR        0x010
+#define TIOCM_CTS       0x020
+#define TIOCM_CAR       0x040
+#define TIOCM_RNG       0x080
+#define TIOCM_DSR       0x100
+#define TIOCM_CD        TIOCM_CAR
+#define TIOCM_RI        TIOCM_RNG
+#define TIOCM_OUT1      0x2000
+#define TIOCM_OUT2      0x4000
+
+</PRE></BLOCKQUOTE>
+<hr>
+
+<a href="config-examples.html" target="_self"><img src="back.gif" border=0 alt="Back"></a>
+<a href="invoking.html" target="_self"><img src="next.gif" border=0 alt="Next"></a>
+<a href="index.html"><img src="home.gif" border=0 alt="Home"></a>
+</body>
+</html>
