@@ -1,0 +1,7 @@
+"TODO" List
+
+- Finish powerflute client.
+- Java interface.
+- SNMP interface.
+- SIGHUP handler for re-reading config file without restarting.
+- SIGHUP and SIGINT must not shutdown the daemon.
