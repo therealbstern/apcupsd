@@ -27,9 +27,11 @@ install-distdir:
 install: @INSTALL_DISTDIR@
 	@echo "Installing apccontrol script..."
 	@if test -f ./$(DISTNAME)/apccontrol; then \
-		$(INSTALL_PROGRAM) -m 744 ./$(DISTNAME)/apccontrol $(sysconfdir)/apccontrol; \
+		$(INSTALL_PROGRAM) -m 744 ./$(DISTNAME)/apccontrol \
+			$(DESTDIR)$(sysconfdir)/apccontrol; \
 	else \
-		$(INSTALL_PROGRAM) -m 744 ./apccontrol $(sysconfdir)/apccontrol; \
+		$(INSTALL_PROGRAM) -m 744 ./apccontrol \
+			$(DESTDIR)$(sysconfdir)/apccontrol; \
 	fi
 	(cd etc/; $(MAKE) install)
 
@@ -42,7 +44,7 @@ uninstall-distdir:
 	$(MAKE) "DISTNAME=$(DISTNAME)" "DISTVER=$(DISTVER)" uninstall);
 
 uninstall: @UNINSTALL_DISTDIR@
-	rm -f $(sysconfdir)/apccontrol
+	rm -f $(DESTDIR)$(sysconfdir)/apccontrol
 
 clean: targetclean
 

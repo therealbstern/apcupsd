@@ -20,13 +20,17 @@ clean: targetclean
 install:
 	@echo "Installing apcupsd.conf..."; \
 	srcconf=$(topdir)/platforms/etc/apcupsd.conf; \
-	if test -f $(sysconfdir)/apcupsd.conf; then \
+	if test -f $(DESTDIR)$(sysconfdir)/apcupsd.conf; then \
 	  dstconf=apcupsd.conf.new; \
-	  echo " Found old apcupsd.conf, installing new conf file as $$dstconf"; \
+	  echo " Found old apcupsd.conf, installing new file as $$dstconf"; \
 	else \
 	  dstconf=apcupsd.conf; \
 	fi; \
-	$(INSTALL_DATA) $$srcconf $(sysconfdir)/$$dstconf
+	$(INSTALL_DATA) $$srcconf $(DESTDIR)$(sysconfdir)/$$dstconf; \
+	for src in changeme commfailure commok masterconnect \
+			mastertimeout mainsback onbattery; do \
+		$(INSTALL_PROGRAM) $$src $(DESTDIR)$(sysconfdir)/$$src; \
+	done
 
 uninstall:
 
