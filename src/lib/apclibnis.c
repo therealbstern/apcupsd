@@ -51,6 +51,8 @@
 
 #include "apc.h"
 
+#ifdef HAVE_NISLIB
+
 #ifndef   INADDR_NONE
 #define   INADDR_NONE	 -1
 #endif
@@ -243,3 +245,5 @@ void net_close(int sockfd)
  
 
 int	upserror, syserrno;
+
+#endif /* HAVE_NISLIB */

@@ -62,6 +62,8 @@
 
 #include "apc.h"
 
+#ifdef HAVE_OLDNET
+
 extern UPSCOMMANDS cmd[];
 
 /* Local variables */
@@ -788,3 +790,31 @@ void do_slaves(UPSINFO *ups)
 	}
     }
 }
+
+#else /* HAVE_OLDNET */
+
+int prepare_master(UPSINFO *ups) {
+    log_event(ups, LOG_ERR,"Old network code is disabled");
+    return 1; /* Not OK */
+}
+
+int prepare_slave(UPSINFO *ups) {
+    log_event(ups, LOG_ERR,"Old network code is disabled");
+    return 1; /* Not OK */
+}
+
+void kill_net(UPSINFO *ups) {
+    log_event(ups, LOG_ERR,"Old network code is disabled");
+}
+
+void do_slaves(UPSINFO *ups) {
+    log_event(ups, LOG_ERR,"Old network code is disabled");
+    exit(1);
+}
+
+void do_net(UPSINFO *ups) {
+    log_event(ups, LOG_ERR,"Old network code is disabled");
+    exit(1);
+}
+
+#endif /* HAVE_OLDNET */
