@@ -235,7 +235,7 @@ void do_device(UPSINFO *ups)
     while (1) {
 	ups->wait_time = device_wait_time(ups); /* compute appropriate wait time */
 
-        Dmsg2(70, "Before device_check_state: %d (OB:%d).\n", ups->Status,
+        Dmsg2(70, "Before device_check_state: 0x%x (OB:%d).\n", ups->Status,
 	    UPS_ISSET(UPS_ONBATT));
 	/*
 	 * Check the UPS to see if has changed state.
@@ -243,19 +243,20 @@ void do_device(UPSINFO *ups)
 	 * consuming too much CPU time.
 	 */
 	device_check_state(ups);
+	ups->wait_time = device_wait_time(ups); /* compute appropriate wait time */
 
-        Dmsg2(70, "Before do_action: %d (OB:%d).\n", ups->Status,
+        Dmsg2(70, "Before do_action: 0x%x (OB:%d).\n", ups->Status,
 	    UPS_ISSET(UPS_ONBATT));
 
 	do_action(ups);    /* take event actions */
 	
-        Dmsg2(70, "Before fillUPS: %d (OB:%d).\n", ups->Status,
+        Dmsg2(70, "Before fillUPS: 0x%x (OB:%d).\n", ups->Status,
 	    UPS_ISSET(UPS_ONBATT));
 
 	/* Get all info available from UPS by asking it questions */
 	fillUPS(ups);
 
-        Dmsg2(70, "Before do_reports: %d (OB:%d).\n", ups->Status,
+        Dmsg2(70, "Before do_reports: 0x%x (OB:%d).\n", ups->Status,
 	    UPS_ISSET(UPS_ONBATT));
 
 	do_reports(ups);

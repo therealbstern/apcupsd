@@ -267,12 +267,13 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
         Dmsg0(100, "HEY!!! Couldn't get status flag.\n");
 	stat = 0;
     } else {
-       ups->Status = strtol(answer, NULL, 0);
+       ups->Status &= ~0xFF;	      /* clear APC byte */
+       ups->Status |= strtol(answer, NULL, 0) & 0xFF; /* set APC byte */
     }
     Dmsg2(100, "Got Status = %s %03x\n", answer, ups->Status);
 
     if (UPS_ISSET(UPS_SHUTDOWN)) {
-        UPS_SET(UPS_SHUT_REMOTE);  /* if master is shutting down so do we */
+	UPS_SET(UPS_SHUT_REMOTE);  /* if master is shutting down so do we */
     }
 
     write_unlock(ups);
@@ -281,9 +282,9 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
      * are running on batteries, shutdown now
      */
     if (stat == 0 && UPS_ISSET(UPS_ONBATT)) {
-        write_lock(ups);
-        UPS_SET(UPS_SHUT_REMOTE);
-        write_unlock(ups);
+	write_lock(ups);
+	UPS_SET(UPS_SHUT_REMOTE);
+	write_unlock(ups);
     }
     return stat;
 }

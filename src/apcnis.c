@@ -414,7 +414,7 @@ void do_server(UPSINFO *ups) {
     exit(1);
 }
 
-#endif HAVE_NISSERVER
+#endif /* HAVE_NISSERVER */
 
 
 #ifdef HAVE_LIBWRAP

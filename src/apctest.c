@@ -1105,6 +1105,8 @@ To stop the calibration, enter a return.\n");
                pmsg("Unexpected response from UPS: %s\n", ans);
 	    }
 	    return;
+	 } else {
+            pmsg("UPS sent: %c\n", cmd);
 	 }
       }
    }
