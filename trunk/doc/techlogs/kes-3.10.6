@@ -1,10 +1,19 @@
              Technical notes on version 3.10.6
-                        07 July 2003
+                        08 July 2003
                         Kern Sibbald
 
 General:
 
 Changes submitted this submission:
+08Jul03
+- Added Sergey Vlasov's second USB kernel patch to the examples
+  directory.  The two patches can be found in:
+    linux-2.4.20-killpower.patch
+    linux-2.4.20-USB-reject.patch
+  The emails are also in that directory.
+- As suggested by Sergey for the 2.5 kernel, I have #ifdefed
+  out the call to HIDIOCGREPORT in the int_write routine used
+  for killpower.
 07Jul03
 - Lots of updates to the document.
 - Fixed a slave crash in master/slave mode. It was a missing setup_device,

@@ -1020,6 +1020,7 @@ static int write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
     errno = 0; 
     if (ups->UPS_Cap[ci] && my_data->info[ci]) {
 	info = my_data->info[ci];	  /* point to our info structure */
+#ifdef not_really_needed
 	rinfo.report_type = info->uref.report_type;
 	rinfo.report_id = info->uref.report_id;
 	if (ioctl(my_data->fd, HIDIOCGREPORT, &rinfo) < 0) {  /* update Report */
@@ -1027,6 +1028,7 @@ static int write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
 		  name, strerror(errno));
 	    return 0;
 	}
+#endif
 	rinfo.report_type = info->uref.report_type;
 	rinfo.report_id = info->uref.report_id;
 	if (ioctl(my_data->fd, HIDIOCGREPORTINFO, &rinfo) < 0) {  /* get Report */
