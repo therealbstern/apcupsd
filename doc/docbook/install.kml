@@ -342,6 +342,11 @@ C:* #Ifs= 1 Cfg#= 1 Atr=a0 MxPwr= 24mA
 I:  If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=00 Prot=00 Driver=hid
 </screen>
 
+<p>Note, if on the last line, <b>Driver</b> is listed as 
+<b>Driver=none</b> then you do not have the HID driver loaded. Please 
+read further for instructions how to correct it.</p>
+     
+
 <para>Here are two more ample entries from Kern Sibbald.  The first
 features a  Back-UPS 350 direct connected USB device:</para>
 
@@ -375,7 +380,9 @@ E:  Ad=83(I) Atr=02(Bulk) MxPS=  64 Ivl=  0ms
 role="bold">serial</emphasis> driver (the I: line) while the Back-UPS
 350 is using the <emphasis role="bold">hid</emphasis> driver.</para>
 
-<para>In general, f you see your UPS model in the S field, you're
+<para>In general, if you see your UPS model in the S field, 
+and you see <b>hid</b> in the I field (or <b>serial</b> if you
+are using an IOGear connection,    you're
 done.  You can skip the rest of this section and go straight to
 building and installing.</para>
 

@@ -289,117 +289,116 @@ int main (int argc, char *argv[]) {
 
     /* Print configuration */
     switch(ups->sharenet.type) {
-	case DISABLE:
-            pmsg("sharenet.type = DISABLE\n");
-	    break;
-	case SHARE:
-            pmsg("sharenet.type = SHARE\n");
-	    break;
-	case NET:
-            pmsg("sharenet.type = NET\n");
+    case DISABLE:
+        pmsg("sharenet.type = DISABLE\n");
+	break;
+    case SHARE:
+        pmsg("sharenet.type = SHARE\n");
+	break;
+    case NET:
+        pmsg("sharenet.type = NET\n");
 
-	    switch(ups->upsclass.type) {
-		case NO_CLASS:
-                    pmsg("upsclass.type = NO_CLASS\n");
-		    break;
-		case STANDALONE:
-                    pmsg("upsclass.type = STANDALONE\n");
-		    break;
-		case SHARESLAVE:
-                    pmsg("upsclass.type = SHARESLAVE\n");
-		    break;
-		case SHAREMASTER:
-                    pmsg("upsclass.type = SHAREMASTER\n");
-		    break;
-		case SHARENETMASTER:
-                    pmsg("upsclass.type = SHARENETMASTER\n");
-		    break;
-		case NETSLAVE:
-                    pmsg("upsclass.type = NETSLAVE\n");
-		    break;
-		case NETMASTER:
-                    pmsg("upsclass.type = NETMASTER\n");
-		    break;
-		default:
-                    pmsg("upsclass.type = DEFAULT\n");
-		    break;
-
-		}
+	switch(ups->upsclass.type) {
+	case NO_CLASS:
+            pmsg("upsclass.type = NO_CLASS\n");
 	    break;
-	case SHARENET:
-            pmsg("sharenet.type = SHARENET\n");
-            pmsg("I cannot handle sharenet.type = SHARENET\n");
-	    apctest_terminate(1);
+	case STANDALONE:
+            pmsg("upsclass.type = STANDALONE\n");
+	    break;
+	case SHARESLAVE:
+            pmsg("upsclass.type = SHARESLAVE\n");
+	    break;
+	case SHAREMASTER:
+            pmsg("upsclass.type = SHAREMASTER\n");
+	    break;
+	case SHARENETMASTER:
+            pmsg("upsclass.type = SHARENETMASTER\n");
+	    break;
+	case NETSLAVE:
+            pmsg("upsclass.type = NETSLAVE\n");
+	    break;
+	case NETMASTER:
+            pmsg("upsclass.type = NETMASTER\n");
+	    break;
 	default:
-            pmsg("sharenet.type = DEFAULT\n");
-            pmsg("I cannot handle sharenet.type = DEFAULT\n");
-	    apctest_terminate(1);
+            pmsg("upsclass.type = DEFAULT\n");
+	    break;
+	}
+	break;
+    case SHARENET:
+        pmsg("sharenet.type = SHARENET\n");
+        pmsg("I cannot handle sharenet.type = SHARENET\n");
+	apctest_terminate(1);
+    default:
+        pmsg("sharenet.type = DEFAULT\n");
+        pmsg("I cannot handle sharenet.type = DEFAULT\n");
+	apctest_terminate(1);
     }
 
     switch (ups->cable.type) {
-       case NO_CABLE:
-          pmsg("cable.type = NO_CABLE\n");
-	  break;
-       case CUSTOM_SIMPLE:
-          pmsg("cable.type = CUSTOM_SIMPLE\n");
-	  break;
-       case APC_940_0119A:
-          pmsg("cable.type = APC_940_0119A (simple)\n");
-      break;
-       case APC_940_0127A:
-          pmsg("cable.type = APC_940_0127A (simple)\n");
-	  break;
-       case APC_940_0128A:
-          pmsg("cable.type = APC_940_0128A (simple)\n");
-	  break;
-       case APC_940_0020B:
-          pmsg("cable.type = APC_940_0020B (simple)\n");
-	  break;
-       case APC_940_0020C:
-          pmsg("cable.type = APC_940_0020C (simple)\n");
-	  break;
-       case APC_940_0023A:
-          pmsg("cable.type = APC_940_0023A (simple)\n");
-	  break;
-       case CUSTOM_SMART:
-          pmsg("cable.type = CUSTOM_SMART\n");
-	  break;
-       case APC_940_0024B:
-          pmsg("cable.type = APC_940_0024B (smart)\n");
-	  break;
-       case APC_940_0024C:
-          pmsg("cable.type = APC_940_0024C (smart)\n");
-	  break;
-       case APC_940_1524C:
-          pmsg("cable.type = APC_940_1524C (smart)\n");
-	  break;
-       case APC_940_0024G:
-          pmsg("cable.type = APC_940_0024G (smart)\n");
-	  break;
-       case APC_940_0095A:
-          pmsg("cable.type = APC_940_0095A (smart)\n");
-	  break;
-       case APC_940_0095B:
-          pmsg("cable.type = APC_940_0095B (smart)\n");
-	  break;
-       case APC_940_0095C:
-          pmsg("cable.type = APC_940_0095C (smart)\n");
-	  break;
-       case APC_NET:
-          pmsg("cable.type = APC_NET\n");
-	  break;
-       case USB_CABLE:
-          pmsg("cable.type = USB_CABLE\n");
-	  break;
-       case MAM_CABLE:
-          pmsg("cable.type = MAM_CABLE\n");
-	  break;
-       case APC_940_00XXX:
-          pmsg("cable.type = APC_940_00XXX (unknown)\n");
-	  break;
-       default:
-          pmsg("Unknown cable type: %d\n", ups->cable.type);
-	  break;
+    case NO_CABLE:
+       pmsg("cable.type = NO_CABLE\n");
+       break;
+    case CUSTOM_SIMPLE:
+       pmsg("cable.type = CUSTOM_SIMPLE\n");
+       break;
+    case APC_940_0119A:
+       pmsg("cable.type = APC_940_0119A (simple)\n");
+       break;
+    case APC_940_0127A:
+       pmsg("cable.type = APC_940_0127A (simple)\n");
+       break;
+    case APC_940_0128A:
+       pmsg("cable.type = APC_940_0128A (simple)\n");
+       break;
+    case APC_940_0020B:
+       pmsg("cable.type = APC_940_0020B (simple)\n");
+       break;
+    case APC_940_0020C:
+       pmsg("cable.type = APC_940_0020C (simple)\n");
+       break;
+    case APC_940_0023A:
+       pmsg("cable.type = APC_940_0023A (simple)\n");
+       break;
+    case CUSTOM_SMART:
+       pmsg("cable.type = CUSTOM_SMART\n");
+       break;
+    case APC_940_0024B:
+       pmsg("cable.type = APC_940_0024B (smart)\n");
+       break;
+    case APC_940_0024C:
+       pmsg("cable.type = APC_940_0024C (smart)\n");
+       break;
+    case APC_940_1524C:
+       pmsg("cable.type = APC_940_1524C (smart)\n");
+       break;
+    case APC_940_0024G:
+       pmsg("cable.type = APC_940_0024G (smart)\n");
+       break;
+    case APC_940_0095A:
+       pmsg("cable.type = APC_940_0095A (smart)\n");
+       break;
+    case APC_940_0095B:
+       pmsg("cable.type = APC_940_0095B (smart)\n");
+       break;
+    case APC_940_0095C:
+       pmsg("cable.type = APC_940_0095C (smart)\n");
+       break;
+    case APC_NET:
+       pmsg("cable.type = APC_NET\n");
+       break;
+    case USB_CABLE:
+       pmsg("cable.type = USB_CABLE\n");
+       break;
+    case MAM_CABLE:
+       pmsg("cable.type = MAM_CABLE\n");
+       break;
+    case APC_940_00XXX:
+       pmsg("cable.type = APC_940_00XXX (unknown)\n");
+       break;
+    default:
+       pmsg("Unknown cable type: %d\n", ups->cable.type);
+       break;
 
     }
     if (ups->cable.type == USB_CABLE) {
@@ -411,47 +410,47 @@ int main (int argc, char *argv[]) {
     }
 
     switch (ups->mode.type) {
-       case NO_UPS:
-          pmsg("mode.type = NO_UPS\n");
-	  break;
-       case BK:
-          pmsg("mode.type = BK\n");
-	  break;
-       case SHAREBASIC:
-          pmsg("mode.type = SHAREBASIC\n");
-	  break;
-       case NETUPS:
-          pmsg("mode.type = NETUPS\n");
-	  break;
-       case BKPRO:
-          pmsg("mode.type = BKPRO\n");
-	  break;
-       case VS:
-          pmsg("mode.type = VS\n");
-	  break;
-       case NBKPRO:
-          pmsg("mode.type = NBKPRO\n");
-	  break;
-       case SMART:
-          pmsg("mode.type = SMART\n");
-	  break;
-       case MATRIX:
-          pmsg("mode.type = MATRIX\n");
-	  break;
-       case SHARESMART:
-          pmsg("mode.type = SHARESMART\n");
-	  break;
-       case USB_UPS:
-          pmsg("mode.type = USB_UPS\n");
-	  break;
-       case NETWORK_UPS:
-          pmsg("mode.type = NETWORK_UPS\n");
-	  break;
-       case SNMP_UPS:
-          pmsg("mode.type = SNMP_UPS\n");
-	  break;
-       default:
-          pmsg("Unknown mode.type: %d\n", ups->mode.type);
+    case NO_UPS:
+       pmsg("mode.type = NO_UPS\n");
+       break;
+    case BK:
+       pmsg("mode.type = BK\n");
+       break;
+    case SHAREBASIC:
+       pmsg("mode.type = SHAREBASIC\n");
+       break;
+    case NETUPS:
+       pmsg("mode.type = NETUPS\n");
+       break;
+    case BKPRO:
+       pmsg("mode.type = BKPRO\n");
+       break;
+    case VS:
+       pmsg("mode.type = VS\n");
+       break;
+    case NBKPRO:
+       pmsg("mode.type = NBKPRO\n");
+       break;
+    case SMART:
+       pmsg("mode.type = SMART\n");
+       break;
+    case MATRIX:
+       pmsg("mode.type = MATRIX\n");
+       break;
+    case SHARESMART:
+       pmsg("mode.type = SHARESMART\n");
+       break;
+    case USB_UPS:
+       pmsg("mode.type = USB_UPS\n");
+       break;
+    case NETWORK_UPS:
+       pmsg("mode.type = NETWORK_UPS\n");
+       break;
+    case SNMP_UPS:
+       pmsg("mode.type = SNMP_UPS\n");
+       break;
+    default:
+       pmsg("Unknown mode.type: %d\n", ups->mode.type);
     }
     if (ups->mode.type > SHAREBASIC) {
        if (mode != M_SMART && mode != M_USB) {
@@ -462,41 +461,41 @@ int main (int argc, char *argv[]) {
     delete_lockfile(ups);
 
     switch(ups->sharenet.type) {
-	case DISABLE:
-	case SHARE:
-            pmsg("Setting up serial port ...\n");
-	    setup_device(ups);
-	    break;
-	case NET:
-	    switch(ups->upsclass.type) {
-		case NO_CLASS:
-		case STANDALONE:
-		case SHARESLAVE:
-		case SHAREMASTER:
-		case SHARENETMASTER:
-		    break;
-		case NETSLAVE:
-		    if (kill_ups_power)
-                        Error_abort0(_("Ignoring killpower for slave\n"));
-		    if (prepare_slave(ups)) 
-                        Error_abort0(_("Error setting up slave\n"));
-		    break;
-		case NETMASTER:
-		    setup_device(ups);
-		    if ((kill_ups_power == 0) && (prepare_master(ups)))
-                        Error_abort0("Error setting up master\n");
-		    break;
-		default:
-                    Error_abort1(_("NET Class Error %s\n\a"), strerror(errno));
-	    }
-	    break;
-	case SHARENET:
-	    setup_device(ups);
-	    if ((kill_ups_power == 0) && (prepare_master(ups)))
-                Error_abort0("Error setting up master.\n");
-	    break;
-	default:
-            Error_abort0(_("Unknown share net type\n"));
+    case DISABLE:
+    case SHARE:
+        pmsg("Setting up the port ...\n");
+	setup_device(ups);
+	break;
+    case NET:
+	switch(ups->upsclass.type) {
+	    case NO_CLASS:
+	    case STANDALONE:
+	    case SHARESLAVE:
+	    case SHAREMASTER:
+	    case SHARENETMASTER:
+		break;
+	    case NETSLAVE:
+		if (kill_ups_power)
+                    Error_abort0(_("Ignoring killpower for slave\n"));
+		if (prepare_slave(ups)) 
+                    Error_abort0(_("Error setting up slave\n"));
+		break;
+	    case NETMASTER:
+		setup_device(ups);
+		if ((kill_ups_power == 0) && (prepare_master(ups)))
+                    Error_abort0("Error setting up master\n");
+		break;
+	    default:
+                Error_abort1(_("NET Class Error %s\n\a"), strerror(errno));
+	}
+	break;
+    case SHARENET:
+	setup_device(ups);
+	if ((kill_ups_power == 0) && (prepare_master(ups)))
+            Error_abort0("Error setting up master.\n");
+	break;
+    default:
+        Error_abort0(_("Unknown share net type\n"));
     }
 
     if (kill_ups_power) {
@@ -513,9 +512,9 @@ int main (int argc, char *argv[]) {
 
     make_pid_file();
 
-    pmsg("Creating serial port lock file ...\n");
+    pmsg("Creating the device lock file ...\n");
     if (create_lockfile(ups) == LCKERROR) {
-        Error_abort1(_("failed to reacquire serial port lock file on device %s\n"), ups->device);
+        Error_abort1(_("failed to reacquire device lock file on device %s\n"), ups->device);
     }
 
     init_signals(apctest_terminate);
@@ -553,7 +552,7 @@ int main (int argc, char *argv[]) {
        }
 
     } else {
-       pmsg("apctest: there is a problem here.  We have no serial port.\n");
+       pmsg("apctest: there is a problem here! We have no device open.\n");
     }
 
     apctest_terminate(0);
@@ -615,40 +614,40 @@ Most tests enter a loop polling every second for 10 seconds.\n");
       if (cmd) {
 	 int item = atoi(cmd);
 	 switch (item) {
-	    case 1:
-	       test1();
-	       break;
-	    case 2:
-	       test2();
-	       break;
-	    case 3:
-	       test3();
-	       break;
-	    case 4:
-	       test4();
-	       break;
-	    case 5:
-	       test5();
-	       break;
-	    case 6:
-	       test6();
-	       break;
-	    case 7:
-	       test1();
-	       test2();
-	       test3();
-	       test4();
-	       test5();
-	       break;
-	    case 8:
-	       guess();
-	       break;
-	    case 9:
-	       quit = TRUE;
-	       break;
-	    default:
-               pmsg("Illegal response. Please enter 1-9\n");
-	       break;
+	 case 1:
+	    test1();
+	    break;
+	 case 2:
+	    test2();
+	    break;
+	 case 3:
+	    test3();
+	    break;
+	 case 4:
+	    test4();
+	    break;
+	 case 5:
+	    test5();
+	    break;
+	 case 6:
+	    test6();
+	    break;
+	 case 7:
+	    test1();
+	    test2();
+	    test3();
+	    test4();
+	    test5();
+	    break;
+	 case 8:
+	    guess();
+	    break;
+	 case 9:
+	    quit = TRUE;
+	    break;
+	 default:
+            pmsg("Illegal response. Please enter 1-9\n");
+	    break;
 	 }
       } else {
          pmsg("Illegal response. Please enter 1-9\n");
@@ -912,30 +911,30 @@ Please select the function you want to perform.\n");
       if (cmd) {
 	 int item = atoi(cmd);
 	 switch (item) {
-	    case 1:
-	       smart_test1();
-	       break;
-	    case 2:
-	       smart_calibration();
-	       break;
-	    case 3:
-	       terminate_calibration(1);
-	       break;
-	    case 4:
-	       monitor_calibration_progress(0);
-	       break;
-	    case 5:
-	       program_smart_eeprom();
-	       break;
-	    case 6:
-	       smart_ttymode();
-	       break;
-	    case 7:
-	       quit = TRUE;
-	       break;
-	    default:
-               pmsg("Illegal response. Please enter 1-6\n");
-	       break;
+	 case 1:
+	    smart_test1();
+	    break;
+	 case 2:
+	    smart_calibration();
+	    break;
+	 case 3:
+	    terminate_calibration(1);
+	    break;
+	 case 4:
+	    monitor_calibration_progress(0);
+	    break;
+	 case 5:
+	    program_smart_eeprom();
+	    break;
+	 case 6:
+	    smart_ttymode();
+	    break;
+	 case 7:
+	    quit = TRUE;
+	    break;
+	 default:
+            pmsg("Illegal response. Please enter 1-6\n");
+	    break;
 	 }
       } else {
          pmsg("Illegal response. Please enter 1-6\n");
@@ -1240,83 +1239,83 @@ Please select the function you want to perform.\n");
       if (cmd) {
 	 int item = atoi(cmd);
 	 switch (item) {
-	    case 1:
-	       print_eeprom_values(ups);
+	 case 1:
+	    print_eeprom_values(ups);
+	    break;
+	 case 2:
+            cmd = get_cmd("Enter new battery date -- DD/MM/YY: ");
+            if (strlen(cmd) != 8 || cmd[2] != '/' || cmd[5] != '/') {
+               pmsg("Date must be exactly DD/MM/YY\n");
 	       break;
-	    case 2:
-               cmd = get_cmd("Enter new battery date -- DD/MM/YY: ");
-               if (strlen(cmd) != 8 || cmd[2] != '/' || cmd[5] != '/') {
-                  pmsg("Date must be exactly DD/MM/YY\n");
-		  break;
-	       }
-	       apcsmart_ups_program_eeprom(ups, CI_BATTDAT, cmd);
+	    }
+	    apcsmart_ups_program_eeprom(ups, CI_BATTDAT, cmd);
+	    break;
+	 case 3:
+            cmd = get_cmd("Enter new UPS name -- max 8 chars: ");
+	    if (strlen(cmd) == 0 || strlen(cmd) > 8) {
+               pmsg("Name must be between 1 and 8 characters long.\n");
 	       break;
-	    case 3:
-               cmd = get_cmd("Enter new UPS name -- max 8 chars: ");
-	       if (strlen(cmd) == 0 || strlen(cmd) > 8) {
-                  pmsg("Name must be between 1 and 8 characters long.\n");
-		  break;
-	       }
-	       apcsmart_ups_program_eeprom(ups, CI_IDEN, cmd);
-	       break;
-	   case 4:
-               cmd = get_cmd("Enter new sensitivity: ");
-	       apcsmart_ups_program_eeprom(ups, CI_SENS, cmd);
-	       break;
-	   case 5:
-               cmd = get_cmd("Enter new alarm delay: ");
-	       apcsmart_ups_program_eeprom(ups, CI_DALARM, cmd);
-	       break;
+	    }
+	    apcsmart_ups_program_eeprom(ups, CI_IDEN, cmd);
+	    break;
+	case 4:
+            cmd = get_cmd("Enter new sensitivity: ");
+	    apcsmart_ups_program_eeprom(ups, CI_SENS, cmd);
+	    break;
+	case 5:
+            cmd = get_cmd("Enter new alarm delay: ");
+	    apcsmart_ups_program_eeprom(ups, CI_DALARM, cmd);
+	    break;
 
-	   case 6:
-               cmd = get_cmd("Enter new low battery delay: ");
-	       apcsmart_ups_program_eeprom(ups, CI_DLBATT, cmd);
-	       break;
-	   case 7:
-               cmd = get_cmd("Enter new wakeup delay: ");
-	       apcsmart_ups_program_eeprom(ups, CI_DWAKE, cmd);
-	       break;
-	   case 8:
-               cmd = get_cmd("Enter new shutdown delay: ");
-	       apcsmart_ups_program_eeprom(ups, CI_DSHUTD, cmd);
-	       break;
-	   case 9:
-               cmd = get_cmd("Enter new low transfer voltage: ");
-	       apcsmart_ups_program_eeprom(ups, CI_LTRANS, cmd);
-	       break;
-	   case 10:
-               cmd = get_cmd("Enter new high transfer voltage: ");
-	       apcsmart_ups_program_eeprom(ups, CI_HTRANS, cmd);
-	       break;
-	   case 11:
-               cmd = get_cmd("Enter new battery return level: ");
-	       apcsmart_ups_program_eeprom(ups, CI_RETPCT, cmd);
-	       break;
-	   case 12:
-               cmd = get_cmd("Enter new output voltage on batteries: ");
-	       apcsmart_ups_program_eeprom(ups, CI_NOMOUTV, cmd);
-	       break;
-	   case 13:
-               cmd = get_cmd("Enter new self test interval: ");
-	       apcsmart_ups_program_eeprom(ups, CI_STESTI, cmd);
-	       break;
+	case 6:
+            cmd = get_cmd("Enter new low battery delay: ");
+	    apcsmart_ups_program_eeprom(ups, CI_DLBATT, cmd);
+	    break;
+	case 7:
+            cmd = get_cmd("Enter new wakeup delay: ");
+	    apcsmart_ups_program_eeprom(ups, CI_DWAKE, cmd);
+	    break;
+	case 8:
+            cmd = get_cmd("Enter new shutdown delay: ");
+	    apcsmart_ups_program_eeprom(ups, CI_DSHUTD, cmd);
+	    break;
+	case 9:
+            cmd = get_cmd("Enter new low transfer voltage: ");
+	    apcsmart_ups_program_eeprom(ups, CI_LTRANS, cmd);
+	    break;
+	case 10:
+            cmd = get_cmd("Enter new high transfer voltage: ");
+	    apcsmart_ups_program_eeprom(ups, CI_HTRANS, cmd);
+	    break;
+	case 11:
+            cmd = get_cmd("Enter new battery return level: ");
+	    apcsmart_ups_program_eeprom(ups, CI_RETPCT, cmd);
+	    break;
+	case 12:
+            cmd = get_cmd("Enter new output voltage on batteries: ");
+	    apcsmart_ups_program_eeprom(ups, CI_NOMOUTV, cmd);
+	    break;
+	case 13:
+            cmd = get_cmd("Enter new self test interval: ");
+	    apcsmart_ups_program_eeprom(ups, CI_STESTI, cmd);
+	    break;
 
-	    case 14:
-               pmsg("The EEPROM values to be changed will be taken from\n"
-                    "the configuration directives in your apcupsd.conf file.\n");
-               cmd = get_cmd("Do you want to continue? (Y/N): ");
-               if (*cmd != 'y' && *cmd != 'Y') {
-                  pmsg("EEPROM changes NOT made.\n");
-		  break;
-	       }
-	       apcsmart_ups_program_eeprom(ups, -1, NULL);
+	 case 14:
+            pmsg("The EEPROM values to be changed will be taken from\n"
+                 "the configuration directives in your apcupsd.conf file.\n");
+            cmd = get_cmd("Do you want to continue? (Y/N): ");
+            if (*cmd != 'y' && *cmd != 'Y') {
+               pmsg("EEPROM changes NOT made.\n");
 	       break;
-	    case 15:
-	       quit = TRUE;
-	       break;
-	    default:
-               pmsg("Illegal response. Please enter 1-7\n");
-	       break;
+	    }
+	    apcsmart_ups_program_eeprom(ups, -1, NULL);
+	    break;
+	 case 15:
+	    quit = TRUE;
+	    break;
+	 default:
+            pmsg("Illegal response. Please enter 1-7\n");
+	    break;
 	 }
       } else {
          pmsg("Illegal response. Please enter 1-7\n");
@@ -1526,15 +1525,15 @@ Please select the function you want to perform.\n");
       if (cmd) {
 	 int item = atoi(cmd);
 	 switch (item) {
-	    case 1:
-	       usb_kill_power_test();
-	       break;
-	    case 2:
-	       quit = TRUE;
-	       break;
-	    default:
-               pmsg("Illegal response. Please enter 1-2\n");
-	       break;
+	 case 1:
+	    usb_kill_power_test();
+	    break;
+	 case 2:
+	    quit = TRUE;
+	    break;
+	 default:
+            pmsg("Illegal response. Please enter 1-2\n");
+	    break;
 	 }
       } else {
          pmsg("Illegal response. Please enter 1-2\n");
