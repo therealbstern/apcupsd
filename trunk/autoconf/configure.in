@@ -248,7 +248,7 @@ then
 	exit 1
 fi
 
-AC_PATH_PROGS(MAKE, make, no)
+AC_PATH_PROGS(MAKE, make gmake pmake, no)
 if test "$MAKE" = "no"
 then
 	echo 'ERROR: make program not found !'
