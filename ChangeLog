@@ -1,11 +1,22 @@
 /***************************************************************************/
 /*                     ChangeLog of apcupsd                                */
-/*               Kern Sibbald <kern at sibbald dot com>
-/*               Riccardo Facchetti <riccardo@master.oasi.gpa.it>          */
-/*               http://www.apcupsd.com                                    */
-/*               http://www.sibbald.com/apcupsd                            */
-/*               ftp://ftp.apcupsd.com                                     */
+/*               Kern Sibbald <kern at sibbald dot com>                    */
+/*               http://www2.apcupsd.com/apcupsd                           */
+/*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
+
+----> Release apcupsd-3.10.5 (03 Feb 2003)
+    03Feb03
+    - Added an avsnprinf() routine.          
+    - Replaced all vsprintf() calls with avsnprintf() to close a
+      master/slave exploit that was published.
+    - Remove awk processing of halt script for Mandrake as suggested by
+      David Walser.
+    02Feb03
+    - Corrected --enable-oldnet to be --enable-master-slave as I
+      had intended. Thanks to David Walser for pointing this out.
+    - Added David Walser's apcupsd.spec.in for Mandrake and his
+      changes to configure.in.
 
 ----> Release apcupsd-3.10.4 (28 Jan 2003)
     28Jan03

@@ -97,7 +97,7 @@ static void pmsg(char *fmt,...)
     va_list   arg_ptr;
 
     va_start(arg_ptr, fmt);
-    vsprintf(buf, (char *) fmt, arg_ptr);
+    avsnprintf(buf, sizeof(buf), (char *) fmt, arg_ptr);
     va_end(arg_ptr);
     printf(buf);
     write_file(buf);
@@ -191,7 +191,7 @@ void apctest_error_out(char *file, int line, char *fmt,...)
     sprintf(buf, _("apctest FATAL ERROR in %s at line %d\n"), file, line);
     i = strlen(buf);
     va_start(arg_ptr, fmt);
-    vsprintf((char *)&buf[i], (char *) fmt, arg_ptr);
+    avsnprintf((char *)&buf[i], sizeof(buf)-i, (char *) fmt, arg_ptr);
     va_end(arg_ptr);
     fprintf(stderr, buf);
     pmsg(buf);
@@ -207,7 +207,7 @@ void apctest_error_exit(char *fmt,...)
     va_list   arg_ptr;
 
     va_start(arg_ptr, fmt);
-    vsprintf(buf, (char *) fmt, arg_ptr);
+    avsnprintf(buf, sizeof(buf), (char *) fmt, arg_ptr);
     va_end(arg_ptr);
     pmsg(buf);
     apctest_error_cleanup(core_ups);		  /* finish the work */

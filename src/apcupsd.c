@@ -207,7 +207,7 @@ void apcupsd_error_out(char *file, int line, char *fmt,...)
     sprintf(buf, _("apcupsd FATAL ERROR in %s at line %d\n"), file, line);
     i = strlen(buf);
     va_start(arg_ptr, fmt);
-    vsprintf((char *)&buf[i], (char *) fmt, arg_ptr);
+    avsnprintf((char *)&buf[i], sizeof(buf)-i, (char *) fmt, arg_ptr);
     va_end(arg_ptr);
     fprintf(stderr, buf);
     log_event(core_ups, LOG_ERR, buf);
@@ -223,7 +223,7 @@ void apcupsd_error_exit(char *fmt,...)
     va_list   arg_ptr;
 
     va_start(arg_ptr, fmt);
-    vsprintf(buf, (char *) fmt, arg_ptr);
+    avsnprintf(buf, sizeof(buf), (char *) fmt, arg_ptr);
     va_end(arg_ptr);
     fprintf(stderr, buf);
     log_event(core_ups, LOG_ERR, buf);
@@ -366,12 +366,12 @@ int main(int argc, char *argv[]) {
     }
 
     if (kill_ups_power) {
-        if (!UPS_ISSET(UPS_SLAVE)) {
-            kill_power(ups);
-        } else {
-            kill_net(ups);
-        }
-        apcupsd_terminate(0);
+	if (!UPS_ISSET(UPS_SLAVE)) {
+	    kill_power(ups);
+	} else {
+	    kill_net(ups);
+	}
+	apcupsd_terminate(0);
     }
 
     /*
@@ -396,14 +396,14 @@ int main(int argc, char *argv[]) {
     init_signals(apcupsd_terminate);
 
     if (!UPS_ISSET(UPS_SLAVE)) {
-        prep_device(ups);
+	prep_device(ups);
         /* This isn't a documented option but can be used
-         * for testing dumb mode on a SmartUPS if you have
-         * the proper cable.
-         */
-        if (dumb_mode_test) {
-            device_entry_point(ups, DEVICE_CMD_SET_DUMB_MODE, NULL);
-        }
+	 * for testing dumb mode on a SmartUPS if you have
+	 * the proper cable.
+	 */
+	if (dumb_mode_test) {
+	    device_entry_point(ups, DEVICE_CMD_SET_DUMB_MODE, NULL);
+	}
     }
 
     shm_OK = 1;
@@ -433,15 +433,15 @@ int main(int argc, char *argv[]) {
      * than creating a thread.
      */
     if (!UPS_ISSET(UPS_SLAVE)) {
-        /* serial port reading and report generation -- apcserial.c */
-        do_device(ups);
+	/* serial port reading and report generation -- apcserial.c */
+	do_device(ups);
     } else {
         /* we are a slave -- thus the net is our "serial port" */
-        do_net(ups);
+	do_net(ups);
     }
 #else
     if (!UPS_ISSET(UPS_SLAVE)) {
-        /* serial port reading and report generation -- apcserial.c */
+	/* serial port reading and report generation -- apcserial.c */
         serial_pid = start_thread(ups, do_device, "apcdev", argv[0]); 
     } else {
         /* we are a slave -- thus the net is our "serial port" */

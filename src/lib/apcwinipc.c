@@ -97,7 +97,7 @@ void syslog (int type, const char *fmt, ...)
    struct tm tm;
 
    va_start(arg_ptr, fmt);
-   vsprintf(msg, fmt, arg_ptr);
+   avsnprintf(msg, sizeof(msg), fmt, arg_ptr);
    va_end(arg_ptr);
       
    printf("syslog: %s\n", msg);

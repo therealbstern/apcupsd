@@ -341,6 +341,7 @@ extern UPSINFO *getUpsByname(char *name);
  */
 extern void generic_error_out(char *file, int line, char *fmt, ...);
 extern void generic_error_exit(char *fmt, ...);
+extern int avsnprintf(char *str, size_t size, const char *format, va_list ap);
 
 /* 
  * In apcwinipc.c
