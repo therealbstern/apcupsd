@@ -401,20 +401,20 @@ dnl
 dnl	Check for header files.
 dnl
 AC_CHECK_HEADERS(
-		arpa/inet.h ctype.h errno.h fcntl.h \
-		limits.h netdb.h netinet/in.h pwd.h signal.h \
-		stdarg.h stdio.h stdlib.h string.h strings.h sys/ioctl.h \
-		sys/socket.h sys/types.h syslog.h termios.h \
-		unistd.h
-		,,[echo 'configure: some header files are missing.'; exit 1]
-		)		dnl Check for _all_ included headers.
+    arpa/inet.h ctype.h errno.h fcntl.h \
+    limits.h netdb.h netinet/in.h pwd.h signal.h \
+    stdarg.h stdio.h stdlib.h string.h strings.h sys/ioctl.h \
+    sys/socket.h sys/types.h syslog.h termios.h \
+    unistd.h
+    ,,[echo 'configure: at least 1 header file is missing. This may not compile.']
+    )		    dnl Check for _all_ included headers.
 
 dnl ipc.h, sem.h and shm.h do not exist on cygwin so don't check for them
 if test "$CFG_CYGWIN" = "no" -a "$with_pthreads" = "no"; then
 AC_CHECK_HEADERS(
-		sys/ipc.h sys/sem.h sys/shm.h
-		,,[echo 'configure: some header files are missing.'; exit 1]
-		)		dnl Check for _all_ included headers.
+   sys/ipc.h sys/sem.h sys/shm.h
+   ,,[echo 'configure: some header files are missing. This may not compile.']
+   )		   dnl Check for _all_ included headers.
 fi
 
 AC_CHECK_HEADERS(arpa/nameser.h,AC_DEFINE(HAVE_NAMESER_H))

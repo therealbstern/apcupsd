@@ -3778,11 +3778,11 @@ fi
 fi
 
 for ac_hdr in arpa/inet.h ctype.h errno.h fcntl.h \
-		limits.h netdb.h netinet/in.h pwd.h signal.h \
-		stdarg.h stdio.h stdlib.h string.h strings.h sys/ioctl.h \
-		sys/socket.h sys/types.h syslog.h termios.h \
-		unistd.h
-		
+    limits.h netdb.h netinet/in.h pwd.h signal.h \
+    stdarg.h stdio.h stdlib.h string.h strings.h sys/ioctl.h \
+    sys/socket.h sys/types.h syslog.h termios.h \
+    unistd.h
+    
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
@@ -3819,14 +3819,14 @@ EOF
  
 else
   echo "$ac_t""no" 1>&6
-echo 'configure: some header files are missing.'; exit 1
-		
+echo 'configure: at least 1 header file is missing. This may not compile.'
+    
 fi
 done
-		
+		    
 if test "$CFG_CYGWIN" = "no" -a "$with_pthreads" = "no"; then
 for ac_hdr in sys/ipc.h sys/sem.h sys/shm.h
-		
+   
 do
 ac_safe=`echo "$ac_hdr" | sed 'y%./+-%__p_%'`
 echo $ac_n "checking for $ac_hdr""... $ac_c" 1>&6
@@ -3863,11 +3863,11 @@ EOF
  
 else
   echo "$ac_t""no" 1>&6
-echo 'configure: some header files are missing.'; exit 1
-		
+echo 'configure: some header files are missing. This may not compile.'
+   
 fi
 done
-		fi
+		   fi
 
 for ac_hdr in arpa/nameser.h
 do
