@@ -1,0 +1,299 @@
+<chapter><title>The Shutown Sequence and its Discontents</title>
+
+<sect1 id='shutdown'><title>Shutdown Sequence</title>
+
+<para>If you experienced so problems with the testing procedures, or
+if you are porting <application>apcupsd</application> to another
+system, or you are simply curious, you may want to know exactly what
+is going on during the shutdown process.</para>
+
+<para>The shutdown sequence is as follows:</para>
+
+<itemizedlist>
+  <listitem>
+    <para><application>apcupsd</application> detects that there is a
+    power problem and it calls <command>/etc/apcupsd/apccontrol
+    powerout</command>, which normally sends a message to all users
+    informing them of a potential problem.</para>
+  </listitem>
+  <listitem>
+    <para>After approximately 5 seconds in the power problem mode,
+    <application>apcupsd</application> calls
+    <command>/etc/apcupsd/apccontrol onbattery</command>, which
+    normally sends a message to all users informing them that the UPS
+    is on batteries.</para>
+  </listitem>
+  <listitem>
+     <para>When one of the conditions listed below occurs,
+     <application>apcupsd</application> issues a shutdown command by
+     calling <command>/etc/apcupsd/apccontrol doshutdown</command>,
+     which should perform a shutdown of your system using the system
+     <citerefentry><refentrytitle>shutdown</refentrytitle><manvolnum>8</manvolnum></citerefentry>
+     command. You can modify the behavior by editing the
+     <filename>/etc/apcupsd/apccontrol</filename> script, but doing so
+     will make it more complicated to upgrade to the next
+     <application>apcupsd</application> version.</para>
+
+     <para>The conditions that trigger the shutdown can be: running time on
+     batteries have expired (TIMEOUT), the battery runtime remaining is
+     below the configured value (BATTERYLEVEL), the estimated remaining
+     runtime is below the configured value (MINUTES), or the UPS signals
+     that the batteries are exhausted.</para>
+
+     <para>A shutdown could also be initiated if 
+     <application>apcupsd</application> detects
+     that the batteries are no longer functioning correctly. This case,
+     though very unusual, can happen at any time even if there is proper
+     mains voltage, and <command>/etc/apcupsd/apccontrol emergency</command> is
+     called.</para>
+
+     <para>Just before initiating any shutdown through the 
+     <application>apccontrol</application>
+     script, <application>apcupsd</application> will create the file
+     <filename>/etc/apcupsd/powerfail</filename>. This file will be
+     used later in the shutdown sequence to recall 
+     <application>apcupsd</application> after syncing of the
+     disks to initiate a power off of the UPS.</para>
+
+     <para>If the <filename>/etc/nologin</filename> file has not
+     already been created, it will normally be created during the
+     shutdown sequence to prevent additional users from logging in 
+     (see the NOLOGIN configuration directive).</para>
+
+     <para>Even though <application>apcupsd</application> has
+     requested the system to perform a shutdown, it continues
+     running. If it is a master with slaves, it will inform the slaves
+     to do a shutdown. They perform their shutdown by calling
+     <command>/etc/apcupsd/apccontrol remotedown</command>.</para>
+  </listitem>
+  <listitem>
+    <para>When the system signals <application>apcupsd</application>
+    to do exit, it does so.  This is part of the normal system
+    shutdown (at least on Unix and Linux systems) and the exact time
+    that <application>apcupsd</application> receives the termination
+    signal depends on how the shutdown links (usually in
+    <filename>/etc/rc.d</filename>) are set.</para>
+
+    <para>Note that on Windows NT systems,
+    <application>apcupsd</application> apparently continues to run as a
+    Service even though the machine is &quot;shutdown&quot;.</para>
+  </listitem>
+  <listitem>
+     <para>During the shutdown of the system after
+     <application>apcupsd</application> has been forced to exit, one
+     of the last things done by the system shutdown is to call the
+     halt script, which is usually in
+     <filename>/etc/rc.d/halt</filename> or
+     <filename>/etc/rc.d/init.d/halt</filename>, or possibly in
+     <filename>/sbin/init.d/rc.0</filename> depending on your
+     system. If apcupsd was properly installed, this standard halt
+     script was modified to include a bit of new logic just before the
+     final halt of the system. It first tests if the file
+     <filename>/etc/apcupsd/powerfail</filename> exists, and if it
+     does, it executes <command>/etc/apcupsd/apccontrol
+     killpower</command>. It is this last step that will cause
+     <application>apcupsd</application> to be re-executed with the
+     <option>--killpower</option> option on the command line. This
+     option tells <application>apcupsd</application> to inform the UPS
+     to kill the power.</para>
+
+     <para>This final step is important if you want to ensure that your
+     system will automatically reboot when the power comes back on. The
+     actual code used on the Red Hat version is:</para>
+
+<programlisting>
+# See if this is a powerfail situation.                             # ***apcupsd***
+if [ -f /etc/apcupsd/powerfail ]; then                              # ***apcupsd***
+ echo                                                               # ***apcupsd***
+ echo &quot;APCUPSD will now power off the UPS&quot;                          # ***apcupsd***
+ echo                                                               # ***apcupsd***
+ /etc/apcupsd/apccontrol killpower                                  # ***apcupsd***
+ echo                                                               # ***apcupsd***
+ echo &quot;Please ensure that the UPS has powered off before rebooting&quot; # ***apcupsd***
+ echo &quot;Otherwise, the UPS may cut the power during the reboot!!!&quot;   # ***apcupsd***
+ echo                                                               # ***apcupsd***
+fi                                                                  # ***apcupsd***
+</programlisting>
+    </listitem>
+</itemizedlist>
+
+<para>The above code must be inserted as late as possible in the halt
+script. On many systems, such as Red Hat, all the disk drives were
+unmounted, then remounted read-only, thus permitting access to the
+<filename>/etc</filename> files and the
+<application>apcupsd</application> executable. If your system does not
+explicitly remount the disks, you must remount them in read-only mode
+in the code that you add. Examples of code fragments that do this can
+be found in the <filename>distributions/suse</filename> subdirectory
+of the source.</para>
+
+<para>If you are not able to insert the above code in your halt script
+because there is no halt script, or because your halt script calls the
+<application>init</application> program as some Unix systems do, you
+can either just forget about powering off the UPS, which means that
+your machine will not automatically reboot after a power failure, or
+there is yet another alternative, though not at all as satisfying as
+inserting code in the halt script.</para>
+
+<para>Only if you cannot insert the appropriate code in the halt
+script, when you start <application>apcupsd</application>, normally
+from the <filename>/etc/rc.d/init.d/apcupsd</filename> script, use the
+<option>--kill-on-powerfail</option> option. This will cause
+<application>apcupsd</application> to program the UPS to shutoff the
+power just before it (<application>apcupsd</application>) does the
+system shutdown. Please note that this is not the most ideal solution.
+Read on to understand why.</para>
+
+<para>A very important consideration is that you must set the EEPROM
+in your UPS so that it waits a sufficient time for the system to
+halt before it shuts off the UPS power. The current value as well
+as the permitted values for your UPS can be determined by
+executing:</para>
+
+<programlisting>
+apcaccess eeprom
+</programlisting>
+
+<para>The output should look something like the following:</para>
+
+<programlisting>
+apcaccess eeprom
+
+Valid EPROM values for the SMART-UPS 1000
+
+                       Config        Current  Permitted
+Description              Directive     Value    Values
+===================================================================
+Upper transfer voltage   HITRANSFER    253      253 264 271 280 
+Lower transfer voltage   LOTRANSFER    196      196 188 208 204 
+Return threshold         RETURNCHARGE  0        00 15 50 90 
+Output voltage on batts  OUTPUTVOLTS   230      230 240 220 225 
+Sensitivity              SENSITIVITY   H        H M L L 
+Low battery warning      LOWBATT       2        02 05 07 10 
+Shutdown grace delay     SLEEP         20       020 180 300 600 
+Alarm delay              BEEPSTATE     0        0 T L N 
+Wakeup delay             WAKEUP        0        000 060 180 300 
+Self test interval       SELFTEST      336      336 168 ON  OFF 
+
+</programlisting>
+
+<para>The line of interest for you is the <emphasis
+role="bold">Shutdown grace delay</emphasis>, which can be changed
+using the <link linkend="SLEEP">SLEEP</link> directive in your <emphasis
+role="bold">apcupsd.conf</emphasis> file. The default value is 20
+seconds, but generally, you can set it to 180, 300, or 600 seconds
+depending on your UPS. See the <link linkend='eeprom'>EEPROM</link> this
+manual for further details on how to change this EPROM value.</para>
+
+<para>If you use the <option>--kill-on-powerfail</option> option, you
+run the risk of having the computer power cut before the system has
+shutdown. Even if the grace period is rather long, if something goes
+wrong in the shutdown, well, it is up to you to decide.</para>
+
+<para>If <application>apcupsd</application> has successfully shutdown
+your computer and powered off the UPS during a power outage, you can
+control whether or not your computer is automatically rebooted when
+the power returns.</para>
+
+<para>The UPS contains two internal EPROM values that determine when
+it will restore power to your computer after a full power shutdown.
+They are the <link linkend="RETURNCHARGE">RETURNCHARGE</link>
+percentage and the <link linkend="WAKEUP">WAKEUP</link>
+delay. Briefly, the <emphasis role="bold">RETURNCHARGE</emphasis>
+specifies what percentage charge the battery must have before the
+power is restored. Higher values are recommended in regions where the
+power goes up and down frequently. The <emphasis
+role="bold">WAKEUP</emphasis> delay is a simple time delay. Most sites
+will have both of these at zero, or perhaps the <emphasis
+role="bold">RETURNCHARGE</emphasis> set to 15. Please follow the links
+to the <emphasis role="bold">Configuration</emphasis> section of this
+manual for more information.  See the <link linkend='eeprom'>EEPROM</link> of
+this manual for further details on how to change these EPROM
+values.</para>
+
+</sect1>
+<sect1><title>Shutdown Problems</title>
+
+<para>Obviously if your halt script is not properly modified,
+<application>apcupsd</application> will not be able to shut off the
+power to the UPS, and if the power returns before the batteries are
+exhausted your system will not automatically reboot. In any case, your
+machine should have been cleanly shut down. </para>
+
+</sect1>
+<sect1><title>Master/Slave Shutdown</title>
+
+<para>In master/slave configurations, however, the master cannot be
+100 percent sure that the slaves have all shutdown before it performs
+the power off. As a consequence, it is possible that the master will
+shut off the power before the slave has finished shutdown. If this is
+the case, the best procedure is to put an appropriate sleep command in
+the <filename>/etc/apcupsd/apccontrol</filename> file on the master.
+For example to give the slaves 30 additional seconds to shutdown, one
+would add:</para>
+
+<programlisting>
+sleep 30
+</programlisting>
+
+<para>just after the line that reads</para>
+
+<programlisting>
+doshutdown)
+</programlisting>
+
+<para>in the <filename>apccontrol</filename> file (approximately line
+79 &mdash; depending on your system version).</para>
+
+<para>Also, on a slave machine, you do not want to use the modified
+halt script since it will recall <application>apcupsd</application>,
+which will detect that it is a slave (i.e. no connection to the UPS)
+and will complain that it cannot do the killpower. This situation is
+not harmful just annoying and possibly confusing.</para>
+
+<para>One possible problem during shutdown can be caused by remnants
+of old versions. Please be sure to delete or rename all prior versions
+(<filename>/usr/local/sbin/apcupsd</filename> or
+<filename>/sbin/powersc</filename>).</para>
+
+</sect1>
+<sect1><title>Startup</title>
+
+<para>Normally, <application>apcupsd</application> is automatically
+started when your system is rebooted. This normally occurs because the
+startup script <application>apcupsd</application> is linked into the
+appropriate places in <filename>/etc/rc.d</filename>. On most Linux
+systems, there is a program called
+<citerefentry><refentrytitle>chkconfig</refentrytitle><manvolnum>8</manvolnum></citerefentry>
+that will automatically link the startup script.  This program is
+invoked by the <command>make install</command> scripts, or it is
+explicitly done for those systems that do not have
+<citerefentry><refentrytitle>chkconfig</refentrytitle><manvolnum>8</manvolnum></citerefentry>. If
+this is not the case, you can either link it in appropriately yourself
+or explicitly call it from your rc.local file. The appropriate manual
+way to startup <application>apcupsd</application> is by
+executing:</para>
+
+<programlisting>
+&lt;path&gt;/apcupsd start
+</programlisting>
+
+<para>where &lt;path&gt; is normally <filename>/etc/rc.d</filename> or
+<filename>/etc/rc.d/init.d</filename> depending on your system (isn't
+Unix wonderful? :-)). Using this script is important so that any files
+remaining around after a power failure are removed. Likewise, shutting
+down <application>apcupsd</application> should be done with the same
+script: </para>
+
+<programlisting>
+&lt;path&gt;/apcupsd stop
+</programlisting>
+
+</sect1>
+<sect1><title>Windows Considerations</title>
+
+<para>Please see the end of <link linkend='win32'>Windows
+chapter</link> of this manual for conderations pertaining to shutdown
+and killpower on Windows.</para>
+</sect1>
+</chapter>
