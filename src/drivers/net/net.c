@@ -41,9 +41,9 @@
  * line, and if 1 returns only to first space (e.g. integers,
  * and floating point values.
  */
-static struct { 	
-   char *request;
-   char *upskeyword;
+static const struct { 	
+   const char *request;
+   const char *upskeyword;
    int nfields;
 } cmdtrans[] = {
    {"battcap",    "BCHARGE",  1},
@@ -138,7 +138,7 @@ static int getupsvar(UPSINFO *ups, char *request, char *answer, int anslen)
 {
     struct driver_data *nid = (struct driver_data *)ups->driver_internal_data;
     int i;
-    char *stat_match = NULL;
+    const char *stat_match = NULL;
     char *find;
     int nfields = 0;
      
