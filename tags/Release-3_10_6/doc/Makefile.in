@@ -1,0 +1,37 @@
+# doc/Makefile.in
+#
+# Copyright (C) 1999-2002 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
+#
+
+# Default variables
+@VARIABLES@
+# TOP source directory.
+topdir = @topdir@
+top_builddir = $(topdir)
+
+# Include the default make targets: to be put before the all-targets: rule.
+@TARGETS@
+
+all-targets: apcupsd.man
+
+apcupsd.man: dummy
+
+install: install-man
+
+install-man: apcupsd.man
+	@$(ECHO) "Installing manual pages..."
+	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(mandir)/man$(manext)
+	@$(INSTALL_DATA) apcupsd.man $(DESTDIR)$(mandir)/man$(manext)/apcupsd.$(manext)
+
+uninstall:
+	@$(ECHO) "Removing manual page ..."
+	@$(RM) -f $(DESTDIR)$(mandir)/man$(manext)/apcupsd.$(manext)
+
+clean: targetclean
+
+distclean: targetdistclean
+	$(RMF) Makefile 
+	@rm -rf CVS techlogs/CVS manual/CVS
+
+# -----------------------------------------------------------------------
+# DO NOT DELETE THIS LINE -- make depend depends on it.
