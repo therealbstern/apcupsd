@@ -88,6 +88,57 @@ static int powernet_check_comm_lost(UPSINFO *ups) {
     return 1;
 }
 
+
+int powernet_snmp_kill_ups_power(UPSINFO *ups) {
+    oid upsBasicControlConserveBattery[] =
+                    {1, 3, 6, 1, 4, 1, 318, 1, 1, 1, 6, 1, 1};
+    struct snmp_ups_internal_data *Sid = ups->driver_internal_data;
+    struct snmp_session *s = &Sid->session;
+    struct snmp_session *peer;
+    struct snmp_pdu *request, *response;
+    int status;
+
+    /*
+     * Set up the SET request.
+     */
+    request = snmp_pdu_create(SNMP_MSG_SET);
+
+    /*
+     * Set upsBasicControlConserveBattery variable (INTEGER) to
+     * turnOffUpsToConserveBattery(2) value. Will turn on the UPS only
+     * when power returns.
+     */
+    if (snmp_add_var(request, upsBasicControlConserveBattery,
+            sizeof(upsBasicControlConserveBattery)/sizeof(oid), 'i', "2")) {
+        return 0;
+    }
+
+    peer = snmp_open(s);
+
+    if (!peer) {
+        Dmsg0(0, "Can not open the SNMP connection.\n");
+        return 0;
+    }
+
+    status = snmp_synch_response(peer, request, &response);
+    
+    if (status != STAT_SUCCESS) {
+        Dmsg0(0, "Unable to communicate with UPS.\n");
+        return 0;
+    }
+
+    if (response->errstat != SNMP_ERR_NOERROR) {
+        Dmsg0(0, "Unable to kill UPS power: can not set SNMP variable.\n");
+        return 0;
+    }
+
+    if (response) snmp_free_pdu(response);
+
+    snmp_close(peer);
+
+    return 1;
+}
+
 int powernet_snmp_ups_get_capabilities(UPSINFO *ups) {
     struct snmp_ups_internal_data *Sid = ups->driver_internal_data;
     struct snmp_session *s = &Sid->session;
@@ -488,4 +539,6 @@ int powernet_snmp_ups_check_state(UPSINFO *ups) {
             UPS_CLEAR(UPS_CALIBRATION);
         }
     }
+
+    return 1;
 }

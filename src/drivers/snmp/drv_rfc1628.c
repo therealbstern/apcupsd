@@ -74,10 +74,19 @@ static int rfc_1628_check_alarms(UPSINFO *ups) {
      */
     if (ups_mib_mgr_get_upsAlarmEntry(s, &(data->upsAlarmEntry)) == -1) {
         UPS_SET(UPS_COMMLOST);
-        return 1;
+        return 0;
     } else {
         UPS_CLEAR(UPS_COMMLOST);
     }
+    return 1;
+}
+
+int rfc1628_snmp_kill_ups_power(UPSINFO *ups) {
+    struct snmp_ups_internal_data *Sid = ups->driver_internal_data;
+    struct snmp_session *s = &Sid->session;
+    ups_mib_t *data = Sid->MIB;
+
+    return 0;
 }
 
 int rfc1628_snmp_ups_get_capabilities(UPSINFO *ups) {
