@@ -89,6 +89,7 @@ uninstall:
 	@for p in $(allexe) ; do \
 	    $(RMF) $(DESTDIR)$(cgibin)/$$p; \
 	done
+	$(RMF) $(DESTDIR)$(cgibin)/apcupsd.css
 	$(RMF) $(DESTDIR)$(sysconfdir)/hosts.conf
 	$(RMF) $(DESTDIR)$(sysconfdir)/hosts.conf.new
 	$(RMF) $(DESTDIR)$(sysconfdir)/multimon.conf
