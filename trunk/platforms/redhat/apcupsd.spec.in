@@ -39,7 +39,8 @@ Vendor:       APC UPS Daemon Team
 Distribution: The apcupsd Team
 Packager:     D. Scott Barninger <barninger@fairfieldcomputers.com>
 URL:          http://www.sibbald.com/apcupsd/
-Source:       http://www.sibbald.com/apcupsd/%{name}-%{version}.tar.gz
+Source0:       http://www.sibbald.com/apcupsd/%{name}-%{version}.tar.gz
+Source1: Release_Notes-%{version}-%{release}.tar.gz
 Group:        System Environment/Daemons
 Copyright:    GPL v2
 BuildRoot:    %{_tmppath}/%{name}-root
@@ -108,7 +109,7 @@ This package is built with standard serial port support.
 
 %prep
 
-%setup
+%setup -b 1
 
 %build
 
@@ -178,7 +179,7 @@ install -m744 examples/make-hiddev \
 
 %files usb
 %defattr(-,root,root)
-%doc COPYING ChangeLog INSTALL doc/* examples
+%doc COPYING ChangeLog doc/README.* doc/developers_manual examples ../Release_Notes-%{version}-%{release}.txt
 %dir /etc/apcupsd
 %dir /etc/apcupsd/cgi
 %{initdir}/apcupsd
@@ -278,7 +279,7 @@ fi
 
 %files std
 %defattr(-,root,root)
-%doc COPYING ChangeLog INSTALL doc/* examples
+%doc COPYING ChangeLog doc/README.* doc/developers_manual examples ../Release_Notes-%{version}-%{release}.txt
 %dir /etc/apcupsd
 %dir /etc/apcupsd/cgi
 %{initdir}/apcupsd
@@ -375,6 +376,8 @@ fi
 %endif
 
 %changelog
+* Sat Apr 24 2004 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- tidy up doc includes, add release notes
 * Mon Mar 08 2004 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - added additional clean of buildroot to beginning of install section
 - corrected post install routines for nicer chkconfig
