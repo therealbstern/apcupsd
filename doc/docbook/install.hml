@@ -25,7 +25,7 @@ local network, you have more choices to make,</para></step>
 
 <step><para>Third, figure out if you have one of the easy setups.
 If you have a USB UPS, and a USB-capable recent Linux such as Red Hat
-or SUSE at version 8.0, and you want to use one UPS with one computer,
+or SuSE at version 8.0, and you want to use one UPS with one computer,
 that's an easy setup.  APC supplies the cable needed to talk with 
 that UPS along with the UPS. All you need to do is <link
 linkend='check_usb'>check that your USB subsystem is working</link>;
@@ -130,10 +130,10 @@ the kind of protocol it uses to talk with its computer.</para>
 <varlistentry>
 <term>dumb</term>
 <listitem>
-<para>A dumb or voltage-signalling UPS and its computer communicate
+<para>A dumb or voltage-signaling UPS and its computer communicate
 through the signal lines on an RS232C serial connection.  Not much can
 actually be conveyed this way other than an order to shut down.
-Voltage-signalling UPses are obsolete; you are unlikely to encounter
+Voltage-signaling UPSes are obsolete; you are unlikely to encounter
 one other than as legacy hardware.</para>
 </listitem>
 </varlistentry>
@@ -144,7 +144,7 @@ one other than as legacy hardware.</para>
 RS232C serial connection, but they actually use it as a character
 channel (2400bps, 8 data bits, 1 stop bit, no parity) and pass
 commands back and forth in a <link linkend='upsbible'>primitive
-language</link> resembling modem-control codes. The different APC UPSs
+language</link> resembling modem-control codes. The different APC UPSes
 all use closely related firmware, so the language doesn't vary much
 (later versions add more commands).  This class of UPS is in decline,
 rapidly being replaced in APC's product line by USB UPSes.</para>
@@ -376,7 +376,7 @@ I:  If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=00 Prot=00 Driver=hid
 E:  Ad=81(I) Atr=03(Int.) MxPS=   8 Ivl= 10ms
 </programlisting>
 
-<para>The second features an IOgear USB-to-serial adaptor that runs my
+<para>The second features an IOgear USB-to-serial adapter that runs my
 serial SmartUPS 1000 :</para>
 
 <programlisting>
@@ -422,8 +422,14 @@ esr@grelber$ cat /proc/bus/usb/drivers
 </screen>
 
 <para>A USB UPS needs all of these drivers &mdash; the USB device filesystem,
-the USB hub, the Human Interface Device subsysten driver, and the
-Human Interface Device driver.</para>
+the USB hub, the Human Interface Device subsystem driver, and the
+Human Interface Device driver.             
+If you are compiling your own kernel, you want to enable
+CONFIG_USB, CONFIG_USB_HID, CONFIG_USB_HIDDEV, and
+CONFIG_USB_DEVICEFS as well as at least one USB Host Controller
+Driver (CONFIG_USB_UHCI_HCD [2.6.x], CONFIG_USB_UHCI [2.4.x],
+etc.).
+</para>
 
 <para>For the IOGear serial USB connection, you need:</para>
 

@@ -210,7 +210,7 @@ static void prohibit_logins(UPSINFO *ups)
     if (ups->nologin_file)
 	return; 		      /* already done */
     make_file(ups, NOLOGIN);
-    ups->nologin_file = TRUE;
+    ups->nologin_file = true;
     logonfail(0);
     log_event(ups, LOG_ALERT, _("User logins prohibited"));
 }
@@ -480,7 +480,7 @@ void do_action(UPSINFO *ups)
 			execute_command(ups, ups_event[CMDANNOYME]);
 		    }
 		    time(&ups->last_time_annoy);
-		    requested_logoff = TRUE;
+		    requested_logoff = true;
 	    }
 	    /*
 	     *	      Delay NoLogons....
@@ -550,8 +550,8 @@ void do_action(UPSINFO *ups)
             log_event(ups, LOG_ALERT, _("Allowing logins"));
 	}
 	logonfail(1);
-	ups->nologin_file = FALSE;
-	requested_logoff = FALSE;
+	ups->nologin_file = false;
+	requested_logoff = false;
 	device_entry_point(ups, DEVICE_CMD_DTR_ST_DISABLE, NULL);
 	ups->last_offbatt_time = now;
 	/* Sanity check. Sometimes only first power problem trips    
