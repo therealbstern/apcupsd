@@ -1,0 +1,37 @@
+%% bacula.sty
+%% Provides macros and other stuff for the bacula manual
+%% 
+%% Original Creation -- K. Cunningham 2005-01-09
+%% 
+%% 
+%% 
+%% Currently implemented:
+%% 
+%% \elink{target}{text}
+%%    Inserts the text indicated (highlighted) and provides
+%%    an external hyperlink to the target.
+%% 
+%% 
+%% \ilink{target}{text}
+%%    Inserts the text indicated (highlighted) and provides
+%%    an internal hyperlink to the target. Target must be a
+%%    \label somewhere in the same document.
+%% 
+%% 
+%% 
+\ProvidesPackage{bacula}[2005/01/09]
+%%
+%%
+\newcommand*{\elink}[2]{%
+  \htmladdnormallink{#1}{#2}%
+}
+%%
+\newcommand*{\ilink}[2]{%
+  \htmlref{#1}{#2}%
+}
+%%
+\newcommand{\lt}{$<$}
+\newcommand{\gt}{$>$}
+%% 
+\endinput
+%% 
