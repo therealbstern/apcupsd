@@ -112,7 +112,13 @@ int main (int argc, char *argv[]) {
 
     device_open(ups);
 
+    device_get_capabilities(ups);
+
     device_read_static_data(ups);
+
+    device_read_volatile_data(ups);
+
+    output_status(ups, 0, stat_open, stat_print, stat_close);
 
     device_close(ups);
 }

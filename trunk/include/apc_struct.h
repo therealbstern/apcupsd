@@ -289,7 +289,9 @@ typedef struct upsinfo {
     unsigned int reg2;            /* register 2 */
     unsigned int reg3;            /* register 3 */
     unsigned int dipsw;           /* dip switch info */
-    char G[8];                    /* reason for last switch to batteries */
+    unsigned int InputPhase;      /* The current AC input phase. */
+    unsigned int OutputPhase;     /* The current AC output phase. */
+    char G[22];                   /* reason for last switch to batteries */
     char X[8];                    /* results of last seft test */
     double BattChg;               /* remaining UPS charge % */
     double LineMin;               /* min line voltage seen */
@@ -298,11 +300,12 @@ typedef struct upsinfo {
     double LineFreq;              /* line freq. */
     double LineVoltage;           /* Line Voltage */
     double OutputVoltage;         /* Output Voltage */
+    double OutputFreq;            /* Output Frequency */
+    double OutputCurrent;         /* Output Current */
     double UPSTemp;               /* UPS internal temperature */
     double BattVoltage;           /* Actual Battery voltage -- about 24V */
-    double LastSTTime;            /* hours since last self test -- not yet implemented */
+    double LastSTTime; /* hours since last self test -- not yet implemented */
     int32_t Status;               /* UPS status (Bitmapped) */
-    int PoweredByUPS;             /* The only bit left out from the bitmap */
     double TimeLeft;              /* Est. time UPS can run on batt. */
     double humidity;              /* Humidity */
     double ambtemp;               /* Ambient temperature */
@@ -323,14 +326,16 @@ typedef struct upsinfo {
     char birth[20];               /* manufacture date */
     char serial[32];              /* serial number */
     char battdat[20];             /* battery installation date */
-    char selftest[8];             /* selftest interval as ASCII */
+    char selftest[9];             /* selftest interval as ASCII */
     char firmrev[20];             /* firmware revision */
+    char upsname[UPSNAMELEN];     /* UPS internal name */
     char upsmodel[20];            /* ups model number */
     char sensitivity[8];          /* sensitivity to line fluxuations */
     char beepstate[8];            /* when to beep on power failure. */
     char selftestmsg[80];
 
     /* Items specified from config file */
+    int PoweredByUPS;             /* The only bit left out from the bitmap */
     int annoy;
     int maxtime;
     int annoydelay;      /* delay before annoying users with logoff request */
@@ -371,7 +376,6 @@ typedef struct upsinfo {
      * possible to be backward compatible. All moved variables are kept as
      * reserved and all the new variables are at the end of the structure.
      */
-    char upsname[UPSNAMELEN];   /* UPS config name */
 
 #ifndef HAVE_PTHREADS
     /*

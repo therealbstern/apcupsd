@@ -14,7 +14,9 @@ top_builddir = $(topdir)
 
 apclib = libsnmp.a
 
-apclibobjs = snmp.o
+apclibobjs = powernet-mib-mgr.o drv_powernet.o \
+             rfc1628-mib-mgr.o drv_rfc1628.o \
+             snmp.o
 
 all-targets: $(apclib)
 

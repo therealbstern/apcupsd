@@ -39,11 +39,13 @@ UPSTYPE @UPSTYPE@
 # apcsmart /dev/tty**                Serial character device
 # net      hostname:port             Network link to a master apcupsd
 #                                    through NIS
-# snmp     hostname:vendor:community SNMP Network link to an SNMP-enabled
+# snmp     hostname:port:vendor:community
+#                                    SNMP Network link to an SNMP-enabled
 #                                    UPS device. Vendor is the MIB used by
 #                                    the UPS device: can be "APC" or "RFC"
 #                                    where APC is the powernet MIB and RFC
-#                                    is the IETF's standardized UPS-MIB.
+#                                    is the IETF's rfc1628 UPS-MIB.
+#                                    Port is usually 161.
 DEVICE @SERIALDEV@
 #
 #LOCKFILE <path to lockfile>
