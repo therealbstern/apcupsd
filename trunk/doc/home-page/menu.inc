@@ -5,6 +5,7 @@
 <a href="manual/configure.html#ConfigGeneral">Models and Cables</a><br>
 <a href="systems.html">Systems Supported</a><br>
 <a href="license.html">License</a><br>
+<a href="usage/index.html">Site Visits</a><br>
 
 &nbsp;<br>
 <font color="#0000ff" size=+2><b>Documentation</b></font><br>
@@ -20,5 +21,6 @@
 &nbsp;<br>
 <font color="#0000ff" size=+2><b>SourceForge</b></font><br>
 <a href="http://sourceforge.net/projects/apcupsd">Project Page</a><br>
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413">Download</a><br>
+<a href="http://sourceforge.net/project/showfiles.php?group_id=54413">Current Downloads</a><br>
+<a href="http://download.sourceforge.net/bacula">All Downloads</a><br>
 <a href="http://sourceforge.net/cvs/?group_id=54413">CVS</a><br>
