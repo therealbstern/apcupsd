@@ -91,7 +91,7 @@ void error_abort(char *msg)
 
 int main(int argc, char *argv[]) 
 {
-   int sockfd, port;
+   int port;
    char host[200];
    char msg[200], *p;
    char hostname[100];
@@ -151,7 +151,6 @@ int fetch_data(char *host, int port)
 {
    int sockfd;
    int stat;
-   char *p;
 
    if ((sockfd = net_open(host, NULL, port)) < 0) {
       printf("fetch_data: tcp_open failed for %s port %d", host, port);

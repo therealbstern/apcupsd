@@ -139,7 +139,7 @@ int main(int argc, char *argv[])
    net_close(sockfd);
 #endif
    done = time(NULL);
-   printf("Total time = %d secs.\n", done - now);
+   printf("Total time = %ld secs.\n", done - now);
    exit(0);
 }   
 

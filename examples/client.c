@@ -84,7 +84,6 @@ int main(int argc, char *argv[])
 void handle_client(FILE *fp, int sockfd, char *cmd)
 {
    int n; 
-   long nlines;
    char sendline[MAXLINE];
    char recvline[MAXLINE+1];
    int quit = 0;

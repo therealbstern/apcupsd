@@ -83,7 +83,7 @@ void error_abort(char *msg)
 
 int main(int argc, char *argv[]) 
 {
-   int sockfd, port;
+   int port;
    char host[200];
    char msg[200], *p;
    long stat_flag;
@@ -104,25 +104,25 @@ int main(int argc, char *argv[])
 
    /* make sure we are communicating */
    if (getupsvar(host, port, "date", msg, sizeof(msg)) <= 0) {
-       printf("1.14 1.2 0x03 0x01 0xff 0x80 -1% -1 ? : Cannot get date\n");
+       printf("1.14 1.2 0x03 0x01 0xff 0x80 -1%% -1 ? : Cannot get date\n");
        exit(1);
    }
 
    if (getupsvar(host, port, "status", msg, sizeof(msg)) <= 0) {
-       printf("1.14 1.2 0x03 0x01 0xff 0x80 -1% -1 ? : Cannot get status\n");
+       printf("1.14 1.2 0x03 0x01 0xff 0x80 -1%% -1 ? : Cannot get status\n");
        exit(1);
    }
    stat_flag = strtol(msg, NULL, 16);
    
    if (getupsvar(host, port, "battcap", msg, sizeof(msg)) <= 0) {
-       printf("1.14 1.2 0x03 0x01 0xff 0x80 -1% -1 ? : Cannot get battcap\n");
+       printf("1.14 1.2 0x03 0x01 0xff 0x80 -1%% -1 ? : Cannot get battcap\n");
        exit(1);
    }
 
    battchg = (int)strtod(msg, NULL);
 
    if (getupsvar(host, port, "runtime", msg, sizeof(msg)) <= 0) {
-       printf("1.14 1.2 0x03 0x01 0xff 0x80 -1% -1 ? : Cannot get runtime\n");
+       printf("1.14 1.2 0x03 0x01 0xff 0x80 -1%% -1 ? : Cannot get runtime\n");
        exit(1);
    }
 
@@ -147,7 +147,6 @@ int fetch_data(char *host, int port)
 {
    int sockfd;
    int stat;
-   char *p;
 
    if ((sockfd = net_open(host, NULL, port)) < 0) {
       printf("fetch_data: tcp_open failed for %s port %d", host, port);

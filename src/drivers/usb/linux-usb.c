@@ -879,40 +879,40 @@ int usb_ups_read_volatile_data(UPSINFO *ups)
 
     /* UPS_STATUS -- this is the most important status for apcupsd */
 
+    ups->Status &= ~0xff;	     /* Clear APC part of Status */
     if (get_value(ups, CI_STATUS, &uinfo)) {
-	ups->Status = uinfo.iValue;
+	ups->Status |= (uinfo.iValue & 0xff); /* set new APC part */
     } else {
 	/* No APC Status value, well, fabricate one */
-	ups->Status = 0;
 	if (get_value(ups, CI_ACPresent, &uinfo) && uinfo.uref.value) {
-	   UPS_SET_ONLINE();
+	    UPS_SET_ONLINE();
 	}
 	if (get_value(ups, CI_Discharging, &uinfo) && uinfo.uref.value) {
-       UPS_CLEAR_ONLINE();
+	    UPS_CLEAR_ONLINE();
 	}
 	if (get_value(ups, CI_BelowRemCapLimit, &uinfo) && uinfo.uref.value) {
 	UPS_SET(UPS_BATTLOW);
-           Dmsg1(200, "BelowRemCapLimit=%d\n", uinfo.uref.value);
+            Dmsg1(200, "BelowRemCapLimit=%d\n", uinfo.uref.value);
 	}
 	if (get_value(ups, CI_RemTimeLimitExpired, &uinfo) && uinfo.uref.value) {
 	UPS_SET(UPS_BATTLOW);
-           Dmsg0(200, "RemTimeLimitExpired\n");
+            Dmsg0(200, "RemTimeLimitExpired\n");
 	}
 	if (get_value(ups, CI_ShutdownImminent, &uinfo) && uinfo.uref.value) {
 	UPS_SET(UPS_BATTLOW);
-           Dmsg0(200, "ShutdownImminent\n");
+            Dmsg0(200, "ShutdownImminent\n");
 	}
 	if (get_value(ups, CI_Boost, &uinfo) && uinfo.uref.value) {
-	UPS_SET(UPS_SMARTBOOST);
+	    UPS_SET(UPS_SMARTBOOST);
 	}
 	if (get_value(ups, CI_Trim, &uinfo) && uinfo.uref.value) {
-	UPS_SET(UPS_SMARTTRIM);
+	    UPS_SET(UPS_SMARTTRIM);
 	}
 	if (get_value(ups, CI_Overload, &uinfo) && uinfo.uref.value) {
-	UPS_SET(UPS_OVERLOAD);
+	    UPS_SET(UPS_OVERLOAD);
 	}
 	if (get_value(ups, CI_NeedReplacement, &uinfo) && uinfo.uref.value) {
-	UPS_SET(UPS_REPLACEBATT);
+	    UPS_SET(UPS_REPLACEBATT);
 	}
     }
 
