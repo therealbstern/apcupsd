@@ -8825,7 +8825,7 @@ case $host_os in
 	;;
 esac
 
-CCVERSION=`${CC} --version`
+CCVERSION=`${CC} --version | cut -b-15`
 
 
 VARIABLES=$srcdir/autoconf/variables.mak
