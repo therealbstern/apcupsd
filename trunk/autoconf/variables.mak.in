@@ -73,7 +73,7 @@ piddir = @PIDDIR@
 manext = 8
 
 # Manual directory
-mandir=@mandir@/man$(manext)
+mandir=@mandir@
 
 
 # Compilation macros.
