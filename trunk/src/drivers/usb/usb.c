@@ -558,9 +558,11 @@ int usb_ups_kill_power(UPSINFO *ups)
      * this capability, so this setting is allowed to fail. The value we program
      * here should be made configurable some day.
      */
-    func = "CI_APCBattCapBeforeStartup";
-    if (!usb_write_int_to_ups(ups, CI_APCBattCapBeforeStartup, 0, func)) {
-       Dmsg1(100, "Unable to set %s (not an error)\n", func);
+    if (UPS_HAS_CAP(CI_APCBattCapBeforeStartup)) {
+        func = "CI_APCBattCapBeforeStartup";
+        if (!usb_write_int_to_ups(ups, CI_APCBattCapBeforeStartup, 0, func)) {
+           Dmsg1(100, "Unable to set %s (not an error)\n", func);
+        }
     }
 
     /*
@@ -603,9 +605,11 @@ int usb_ups_kill_power(UPSINFO *ups)
      * capability, so this setting is allowed to fail.  The value we program
      * here should be made configurable some day.
      */
-    func = "CI_APCDelayBeforeStartup";
-    if (!usb_write_int_to_ups(ups, CI_APCDelayBeforeStartup, 10, func)) {
-       Dmsg1(100, "Unable to set %s (not an error)\n", func);
+    if (UPS_HAS_CAP(CI_APCDelayBeforeStartup)) {
+        func = "CI_APCDelayBeforeStartup";
+        if (!usb_write_int_to_ups(ups, CI_APCDelayBeforeStartup, 10, func)) {
+           Dmsg1(100, "Unable to set %s (not an error)\n", func);
+        }
     }
 
     /*
