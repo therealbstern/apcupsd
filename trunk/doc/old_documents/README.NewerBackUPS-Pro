@@ -37,7 +37,7 @@ UPSMODEL : BackUPS Pro
 UPSMODE  : Stand Alone
 LINEFAIL : OK
 BATTSTAT : OK
-LINEVOLT : OK
+MAINS    : OK
 LASTEVNT : POWER FAILURE
 
 Yes, all I did was change the "UPSTYPE" for this example.

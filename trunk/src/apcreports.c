@@ -192,7 +192,7 @@ static void log_data(UPSINFO *ups)
                 ptr = "HIGH";
 	    else 
                 ptr = "OK";
-            log_event(ups, LOG_INFO, "LINEFAIL:OK BATTSTAT:OK LINEVOLT:%s", ptr);
+            log_event(ups, LOG_INFO, "LINEFAIL:OK BATTSTAT:OK MAINS:%s", ptr);
 	} else {
 	    if (!UPS_ISSET(UPS_BATTLOW)) 
                 ptr = "RUNNING";
