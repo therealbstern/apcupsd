@@ -26,7 +26,7 @@ MANUAL = manual
 
 first_rule: apcupsd
 
-apcupsd: h2l texcheck texfix tex web html dvipdf
+apcupsd: texcheck tex web html dvipdf
 
 .SUFFIXES:     .tex .html
 .PHONY:
@@ -39,9 +39,6 @@ tex:
 	makeindex apcupsd.idx
 	-latex -interaction=batchmode manual.tex
 	rm -f *.eps
-
-texfix:
-	./fix_tex.pl
 
 pdf:
 	cp -fp ${IMAGES}/hires/*.eps .
@@ -80,18 +77,9 @@ dvipdf:
 	@rm -f *.eps
 
 
-h2l:
-	@echo "Making html2latex"
-	@(for i in ${MANUAL}; do \
-	   echo "$$i"; \
-	   grep -v "#include *" ${WMLSRC}/$$i.html >/tmp/1; \
-	   ./html2latex -images -home ${IMAGES} -noinitstring \
-	    /tmp/1 $$i.tex; \
-	 done)
-
 texcheck:
 # Does checking for the tex file, and possibly fixes things.
-	./check_tex.pl --change apcupsd.tex
+	./check_tex.pl apcupsd.tex
   
 clean:
 	@rm -f 1 2 3
