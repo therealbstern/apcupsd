@@ -4030,7 +4030,9 @@ done
 
 
 
-for ac_func in snprintf vsnprintf
+
+
+for ac_func in snprintf vsnprintf nanosleep usleep
 do
 as_ac_var=`echo "ac_cv_func_$ac_func" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $ac_func" >&5
@@ -8953,7 +8955,7 @@ fi
      then
        if test -d src/gd1.2
        then
-         echo "$as_me:$LINENO: result: using GIF file format (local copy of libgd)." >&5
+	 echo "$as_me:$LINENO: result: using GIF file format (local copy of libgd)." >&5
 echo "${ECHO_T}using GIF file format (local copy of libgd)." >&6
 	 CPPFLAGS=${_cppflags}
 	 LDFLAGS=${_ldflags}

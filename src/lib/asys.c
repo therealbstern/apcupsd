@@ -4,7 +4,7 @@
  *   library routines. 
  * 
  *
- *   Version $Id: asys.c,v 1.1 2004-03-09 08:42:09 kerns Exp $
+ *   Version $Id: asys.c,v 1.2 2004-07-17 13:42:03 kerns Exp $
  */
 /*
    Copyright (C) 2004 Kern Sibbald
@@ -150,21 +150,23 @@ int avsnprintf(char *str, size_t size, const char  *format, va_list ap)
 
 struct tm *localtime_r(const time_t *timep, struct tm *tm)
 {
-    static pthread_mutex_t mutex;
-    static int first = 1;
-    struct tm *ltm;
+   struct tm *ltm;
+#ifndef HAVE_PTHREADS
+   static pthread_mutex_t mutex;
+   static int first = 1;
 
-    if (first) {
-       pthread_mutex_init(&mutex, NULL);
-       first = 0;
-    }
-    P(mutex);
-    ltm = localtime(timep);
-    if (ltm) {
-       memcpy(tm, ltm, sizeof(struct tm));
-    }
-    V(mutex);
-    return ltm ? tm : NULL;
+   if (first) {
+      pthread_mutex_init(&mutex, NULL);
+      first = 0;
+   }
+#endif 
+   P(mutex);
+   ltm = localtime(timep);
+   if (ltm) {
+      memcpy(tm, ltm, sizeof(struct tm));
+   }
+   V(mutex);
+   return ltm ? tm : NULL;
 }
 #endif /* HAVE_LOCALTIME_R */
 
@@ -173,6 +175,11 @@ struct tm *localtime_r(const time_t *timep, struct tm *tm)
  *  for deadlock and such.  Normally not turned on.
  */
 #ifdef DEBUG_MUTEX
+
+#ifndef HAVE_PTHREADS
+#error pthreads must be enabled when enabling DEBUG_MUTEX
+#endif
+
 void _p(char *file, int line, pthread_mutex_t *m)
 {
    int errstat;
@@ -205,8 +212,10 @@ void _v(char *file, int line, pthread_mutex_t *m)
 #endif /* DEBUG_MUTEX */
 
 
+#ifdef HAVE_PTHREADS
 static pthread_mutex_t timer_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t timer = PTHREAD_COND_INITIALIZER;
+#endif
 
 /*
  * This routine will sleep (sec, microsec).  Note, however, that if a 
@@ -232,6 +241,7 @@ int amicrosleep(time_t sec, long usec)
    /* If we reach here it is because nanosleep is not supported by the OS */
 #endif
 
+#ifdef HAVE_PTHREADS
    /* Do it the old way */
    gettimeofday(&tv, &tz);
    timeout.tv_nsec += tv.tv_usec * 1000;
@@ -247,7 +257,16 @@ int amicrosleep(time_t sec, long usec)
    stat = pthread_cond_timedwait(&timer, &timer_mutex, &timeout);
    Dmsg1(200, "pthread_cond_timedwait stat=%d\n", stat);
    V(timer_mutex);
+#endif
    return stat;
+
+#ifdef HAVE_USLEEP
+   usleep(usec + sec * 1000);
+   return 0;
+#endif
+
+   sleep(sec);
+   return 0;
 }
 
 /* BSDI does not have this.  This is a *poor* simulation */
