@@ -42,9 +42,13 @@ follows:
 
 </pre>
 <h3>Simple Signaling Cable for &quot;dumb&quot; UPSes</h3>
+<b>NOTE. YOU DO NOT HAVE THIS CABLE UNLESS YOU BUILT IT
+YOURSELF. THE SIMPLE-CUSTOM CABLE IS NOT AN APC PRODUCT.</b>
+<p>
 For &quot;dumb&quot; UPSes using Simple Signaling, if you
-are going to build your own cable, we recommend to 
-do so as follows:
+are going to build your own cable, we recommend to make
+the cable designed by the <b>Apcupsd</b> team 
+as follows:
 <pre>
          SIMPLE-CUSTOM CABLE
                  
@@ -143,11 +147,15 @@ Note: the &lt;- and -&gt; indicate the signal direction.
    RxD    2   ----------*---------  3  Not used by Apcupsd
 
 </pre>
+You use <b>UPSCABLE simple</b> and <b>UPSTYPE backups</b> in your
+<b>apcupsd.conf</b> file if you have built this cable.
 
+
+<h2>Other APC Cables that Apcupsd Supports</h2>
 <b>Apcupsd</b> will also support the following off the shelf cables that are
 supplied by APC:
 <p>
-940-0020B     Simple Signal Only, all models.
+940-0020B/C   Simple Signal Only, all models.
 <br>
 940-0023A     Simple Signal Only, all models.
 <br>
@@ -167,7 +175,7 @@ supplied by APC:
 
 <h2><a name="CableModes"></a>Simple Signaling Features Supported by Apcupsd for Various Cables</h2>
 The following table shows the features supported by the 
-current version of <b>Apcupsd</b> (3.8.2 or later) for various
+current version of <b>Apcupsd</b> (3.8.5 or later) for various
 cables running the UPS in Simple Signaling mode.
 <p class="indent">
 <table cellspacing="2" cellpadding="2" border="2">
@@ -463,7 +471,7 @@ APC Part# - 940-0119A
 </pre>
 
 <h2>BackOffice ES</h2>
-The BackUPS ES has a straight through cable with no identification
+The BackUPS ES has a straight through serial cable with no identification
 on the plugs. To make it work with <b>apcupsd</b>, specify the
 <b>UPSCABLE 940-0119A</b> and <b>UPSTYPE backups</b>.
 The equivalent of cable 940-0119A is done on a PCB inside the
@@ -497,6 +505,74 @@ computer           ----------- BackUPS-ES -----------------
 
 </pre>
 
+<h2>BackUPS ES and CS</h2>
+Though these UPSes are USB UPSes, APC supplies a serial
+cable (typically with a green DB9 F connector) that has
+940-0128A stamped into one side of the plastic serial
+port connector.  The other end of the cable is a 10 pin
+RJ45 connector that plugs into the UPS (thanks to 
+Dean Waldow for sending me a cable!).
+Apcupsd version
+3.8.5 and later supports this cable when specified as
+<b>UPSCABLE 940-0128A</b> and <b>UPSTYPE backups</b>.
+However, running in this mode much of the information
+that would be available in USB mode is lost.
+In addition, when <b>apcupsd</b> attempts to     
+instruct the UPS to kill the power, it begins
+cycling about 4 times a second between battery
+and line. The solution to the problem (thanks
+to Tom Suzda) is to unplug the UPS and while it
+is still chattering, press the power button
+(on the front of the unit) until the unit beeps
+and the chattering stops. After that the UPS
+should behave normally and power down 1-2 minutes
+after requested to do so.
+<p>Thanks to all the people who have helped test
+this and have provided information on the
+cable wiring, our best guess    
+for the cable schematic is the following:
+
+<pre>
+
+computer        --------- Inside the Connector---------  UPS
+ DB9-F          |                                     |  RJ45
+  pin - signal  |                                     |  Pin - Color
+                |                                     |
+   4     DSR  ->|---+                                 |
+                |   |  diode   resistor               |
+   6     DTR  ->|---+---->|----/\/\/\---o kill power  |  8  Orange
+                |                                     |
+   1     DCD  <-|----+                                |
+                |    |                                |
+   2     RxD  <-|----+----------------+--o low battery|  3  Brown
+                |                     |               |
+   7     RTS  ->|----------+--/\/\/\--+               |
+                |          |                          |   
+                |          +--/\/\/\--+               |
+                |                     |               |
+   8     RI   <-|----+----------------+--o on battery |  2  Black
+                |    |                                |
+   9     CTS  <-|----+                                |
+                |                                     |
+   5     GND  --|-----------------------o ground      |  7  Red
+                |                                     |
+   3     TxD    |                                     |
+                |                                     |
+                |           ????????????              |  4  Black
+                |                                     |
+                |          Not connected              |  1, 5, 6, 9, 10
+                -------------------------------------- 
+
+The RJ45 pins are: looking at the end of the connector:
+
+  10 9 8 7 6 5 4 3 2 1
+ _______________________
+ | . . . . . . . . . . |
+ |                     |
+ -----------------------
+         |____|
+
+</pre>
 
 
 <h2>Win32 Implementation Restrictions for Simple UPSes</h2>
