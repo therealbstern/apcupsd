@@ -1,5 +1,5 @@
 /*
- * $Id: hid-ups.c,v 1.3 2002-06-14 20:46:07 rfacchetti Exp $
+ * $Id: hid-ups.c,v 1.4 2002-07-12 07:03:46 kerns Exp $
  *
  *  Copyright (c) 2001 Vojtech Pavlik <vojtech@ucw.cz>
  *  Copyright (c) 2001 Paul Stewart <hiddev@wetlogic.net>
@@ -30,7 +30,6 @@
  * Vojtech Pavlik, Simunkova 1492, Prague 8, 182 00 Czech Republic
  */
 
-#ifdef HAVE_USB_DRIVER
 
 #define DEBUG 1 		      /* if set prints full reports */
 #define TESTING 1		      /* if set disables actual operation */
@@ -643,8 +642,6 @@ int main (int argc, char **argv) {
 #else /* HAVE_USB_DRIVER */
 #include <stdio.h>
 int main(void) {
-	printf("USB Driver disabled in config.\n");
+        printf("USB Driver disabled in config.\n");
 	return -1;
 }
-#endif /* HAVE_USB_DRIVER */
-
