@@ -5,7 +5,19 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
-----> Release apcupsd-3.10.6 (10 July 2003)
+----> Release apcupsd-3.10.6 (16 July 2003)
+15Jul03
+- In attempting to build the .cgi files on Windows, I realized that
+  the gd1.2 code was no longer in the distribution.  Although some
+  people were worried about the gif patent (I wasn't) it has now
+  expired, so I see no reason why not to distribute the code as
+  we always have. For the purists, it appears that the version you
+  have on your system (png) will be used in preference to the local
+  gd code.
+- I backed out the 12July SNMP changes since they probably only
+  work for 3 phase and I don't have the libraries to test compile
+  or the card to test.
+
 12Jul03
 - Modify snmp driver to use upsPhaseOutputPercentPower instead of
   upsAdvOutputLoad as requested by ivac@gnjilux.srk.fer.hr.
