@@ -1,5 +1,15 @@
                 Kern's ToDo List
 
+- Convert Windows emulation from Cygwin to native Win32
+  The main missing piece here is an emulation layer for
+  the serial port.
+- Implement USB support for Windows
+- Convert the manual to LaTeX
+  This will be done in the next couple of months.
+- Consider converting apcupsd to C++
+  This will be done in the next couple months -- after
+  the 3.10.17 release.
+
 - UPS 500ES with cable 094-0127B
   BATTERYLEVEL -5
   otherwise the UPS would shut off immediately.
