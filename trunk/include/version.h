@@ -1,6 +1,6 @@
 #define DEBUG 1
 #define AVERSION 3
-#define VERSION "3.9.10"
-#define VSTRING "3910"
-#define DATE    "15 July 2002"
-#define LSMDATE "15Jul02"
+#define VERSION "3.10.0"
+#define VSTRING "3100"
+#define DATE    "28 July 2002"
+#define LSMDATE "28Jul02"

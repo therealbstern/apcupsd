@@ -6,6 +6,7 @@
 /*               ftp://ftp.apcupsd.com                                     */
 /***************************************************************************/
 
+----> Release apcupsd-3.10.0 (28 Jul 2002)
     - Added documentation for SNMP UPSes. Documented the use of
       --kill-on-powerfail switch during shutdown.
     - SuSE 8.0 is now supported.
