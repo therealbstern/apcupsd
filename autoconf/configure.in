@@ -877,6 +877,17 @@ AC_ARG_ENABLE(nis, [
    ])
 AC_SUBST(APCNISD)
 
+dnl Allow setting of NISIP value
+NISIP=0.0.0.0
+AC_ARG_WITH(nisip,
+	[  --with-nisis=IP-ADDRESS Specify the IP address to bind to],
+	[
+	   NISIP="$withval";
+	]
+)
+AC_SUBST(NISIP)
+
+
 dnl Enable old network code
 OLDNET_ENABLED=no
 AC_ARG_ENABLE(master-slave, [
@@ -1720,6 +1731,7 @@ Configuration on `date`:
 
   enable-master-slave:	      ${OLDNET_ENABLED}
   enable-nis:		      ${NISSRV_ENABLED}
+  with-nisip:		      ${NISIP}
   enable-cgi:		      ${ENABLE_CGI}
   with-cgi-bin: 	      ${CGIBIN}
   with-css-dir: 	      ${CSS_DIR}
