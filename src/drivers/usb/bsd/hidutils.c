@@ -197,7 +197,7 @@ do                        \
 int hidu_locate_item(report_desc_t rdesc, int usage, int app, int phys,
                      int logical, int kind, hid_item_t* outitem)
 {
-    int rc, i, indent=0;
+    int rc;
     hid_data_t cookie;
     hid_item_t item;
 
@@ -223,22 +223,6 @@ int hidu_locate_item(report_desc_t rdesc, int usage, int app, int phys,
                 PUSH_COLLECTION(logical, item.usage);
             else if (item.collection == HIDCOL_APPLICATION)
                 PUSH_COLLECTION(app, item.usage);
-        }
-
-        if (debug_level >= 400)
-        {
-            if (item.kind == hid_endcollection)
-                indent--;
-
-            for (i=0; i<indent; i++)
-                    printf("  ");
-
-            printf("rpt=%d/%c page=%x usage=%x %c %d/%d/%d %s\n",
-                    item.report_ID, KIND_TO_CHAR(item.kind), item._usage_page, item.usage,
-                    COLLECTION_TO_CHAR(item.collection), app_idx, phys_idx, logical_idx, hid_usage_in_page(item.usage));
-
-            if (item.kind == hid_collection)
-                indent++;
         }
 
         if (usage != -1 && usage != item.usage)
