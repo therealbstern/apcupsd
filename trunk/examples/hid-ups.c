@@ -1,5 +1,5 @@
 /*
- * $Id: hid-ups.c,v 1.7 2002-08-20 12:29:53 kerns Exp $
+ * $Id: hid-ups.c,v 1.8 2003-09-21 19:14:10 kerns Exp $
  *
  *  Copyright (c) 2001 Vojtech Pavlik <vojtech@ucw.cz>
  *  Copyright (c) 2001 Paul Stewart <hiddev@wetlogic.net>
@@ -383,7 +383,7 @@ static char evdev[50];
 static int vendor = 0;
 
 int main (int argc, char **argv) {
-    int fd = -1, rd, i, RemainingCapacity;
+    int fd = -1, rd, i, j, RemainingCapacity;
     struct hiddev_event ev[64];
     struct hiddev_devinfo dinfo;
     char name[256] = "Unknown";
@@ -393,21 +393,30 @@ int main (int argc, char **argv) {
     struct hiddev_usage_ref uref;
 
     if (argc < 2) {
-	for (i = 0; i < 4; i++) {
-            sprintf(evdev, "/dev/usb/hid/hiddev%d", i);
-	    if ((fd = open(evdev, O_RDONLY)) >= 0) {
-		if (find_application(fd, UPS_USAGE)) break;
-		close(fd);
-	    }
-	}
-	if (i >= 4) {
-            fprintf(stderr, "Couldn't find UPS device or no permission.\n");
-	    exit(1);
-	}
-        printf("Found UPS at %s\n", evdev);
-    } else {
-	strncpy(evdev, argv[argc -1], sizeof(evdev)-1);
-	evdev[sizeof(evdev)-1] = 0;
+	struct hiddev_usage_ref uref;
+         /* deal with either standard location or Red Hat's */
+         const char *hid_dirs[] = {"/dev/usb/hid", "/dev/usb",};
+	 for (i = 0; i < sizeof(hid_dirs)/sizeof(hid_dirs[0]); i++) {
+	     for (j = 0; j < 4; j++) {
+                 sprintf(evdev, "%s/hiddev%d", hid_dirs[i], j);
+		 if ((fd = open(evdev, O_RDONLY)) < 0) {
+		     if (errno == EACCES) {
+                         fprintf(stderr, "No permission, try this as root.\n");
+			 exit(1);
+		     }
+		 } else {
+		     if (find_application(fd, UPS_USAGE)) goto foundit;
+		     close(fd);
+		 }
+	      }
+	  }
+          fprintf(stderr, "Couldn't find USB UPS device, check your /dev.\n");
+	  exit(1);
+foundit:
+          printf("Found UPS at %s\n", evdev);
+      } else {
+	   strncpy(evdev, argv[argc -1], sizeof(evdev)-1);
+           printf("Found UPS at %s\n", evdev);
 	if ((fd = open(evdev, O_RDONLY)) < 0) {
             perror("hiddev open");
 	    exit(1);
@@ -417,7 +426,6 @@ int main (int argc, char **argv) {
 	    exit(1);
 	}
     }
-
 
 #ifdef DEBUG
     {
@@ -436,7 +444,7 @@ int main (int argc, char **argv) {
         printf("\n");
         printf("HID: bus: %d devnum: %d ifnum: %d\n",
 	       dinfo.busnum, dinfo.devnum, dinfo.ifnum);
-       vendor = dinfo.vendor;
+	vendor = dinfo.vendor;
 		   
     }
 #endif

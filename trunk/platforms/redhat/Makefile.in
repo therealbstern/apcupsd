@@ -38,7 +38,7 @@ install:
 	# save old halt script
 	@cp -f /etc/rc.d/init.d/halt $(DESTDIR)/etc/rc.d/init.d/halt.old
 	# insert apcupsd script into halt
-	@awk -f awkhaltprog /etc/rc.d/init.d/halt.old >$(DESTDIR)/etc/rc.d/init.d/halt
+	@awk -f awkhaltprog $(DESTDIR)/etc/rc.d/init.d/halt.old >$(DESTDIR)/etc/rc.d/init.d/halt
 	@chmod 744 $(DESTDIR)/etc/rc.d/init.d/halt
 	# link new halt script for startup and shutdown
 	@if test x$(DESTDIR) = x ; then \
