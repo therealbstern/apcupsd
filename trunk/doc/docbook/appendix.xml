@@ -16,6 +16,25 @@ UPSmanagement.</para>
 <sect1><title>Contributors</title>
 
 <variablelist>
+
+<varlistentry>
+<term>Current Code Maintainer and Project Manager:</term>
+<listitem>
+    <para>Kern Sibbald (kern at sibbald dot com)</para>
+</listitem>
+</varlistentry>
+
+<varlistentry>
+<term>RPM Packager:</term>
+<listitem>
+    <para>D. Scott Barninger (barninger at fairfieldcomputers dot com)</para>
+</listitem>
+</varlistentry>
+
+
+
+
+
 <varlistentry>
 <term>Project Starter and Former Code Maintainer:</term>
 <listitem>
@@ -23,11 +42,12 @@ UPSmanagement.</para>
 </listitem>
 </varlistentry>
 <varlistentry>
-<term>Current Code Maintainer and Project Manager:</term>
+<term>Former Code Maintainer and Project Manager:</term>
 <listitem>
     <para>Riccardo Facchetti (riccardo at master.oasi.gpa.it)</para>
 </listitem>
 </varlistentry>
+
 <varlistentry>
 <term>Serial Communications:</term>
 <listitem>
@@ -151,7 +171,7 @@ you guys, your help has been invaluable.</para>
 <para>Thanks to all the users that send bug reports and
 suggestions:we need your help.</para>
 
-<para>Thanks to every one Iforgot here. If you feel Ihave
+<para>Thanks to every one I forgot here. If you feel Ihave
 forgot your name, please don't hesitate to tell me.</para>
 
 <para>Miquel van Smoorenburg, The Doctor What, Pavel Korensky,

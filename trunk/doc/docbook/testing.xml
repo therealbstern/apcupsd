@@ -206,6 +206,12 @@ END APC  : Mon Feb 18 09:15:01 CST 2002
 <para>If you see the above output, it is a good sign that
 <application>apcupsd</application> is working. Assuming that the output looks
 reasonable, check the following variables:</para>
+<para>A very disturbing tendance is for some of the newer (Mar 2004) RS and ES UPSes 
+to have no Voltage information. This is annoying bug not serious. On the other 
+hand, some of those UPSes now have no battery charge information (BCHARGE). If
+BCHARGE is zero in your listing and you are running a Smart or a USB UPS, then
+you will have to set the BATTERYLEVEL directive in your apcupsd.conf file to -1.
+</para>
 
 <variablelist>
   <varlistentry>

@@ -73,6 +73,31 @@ completely customize your installation, but this example shows you
 the minimum required.</para>
 
 </sect1>
+
+<sect1><title>A Simple Configuration for a Simple Signaling or Dumb</title>
+
+<para>If you have a simple signaling or dumb UPS such as a BackUPS, you 
+will need to know exactly what cable you have and specify it on the
+UPSCABLE directive. Please see the list of UPSes versus cables in the
+beginning of this document for more information.
+</para>
+<programlisting>
+## apcupsd.conf v1.1 ##
+UPSCABLE (number of cable you have)
+UPSTYPE dumb
+DEVICE /dev/ttyS0
+LOCKFILE /var/lock
+UPSCLASS standalone
+UPSMODE disable
+</programlisting>
+
+<para>Normally you would have many more configuration directives to
+completely customize your installation, but this example shows you
+the minimum required.</para>
+
+</sect1>
+
+
 <sect1><title>A Simple Master Configuration</title>
 
 <para>You have a Smart UPS using the cable supplied by APC and you want
