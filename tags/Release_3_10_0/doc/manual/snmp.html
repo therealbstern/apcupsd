@@ -1,0 +1,91 @@
+<!doctype html public "-//W3C//DTD HTML 4.0//EN">
+<html>
+<head>
+<title>Apcupsd's Support for SNMP UPSes</title>
+<meta name="Author" content="Riccardo Facchetti">
+<link rel=stylesheet href="apcupsd-styles.css" type="text/css">
+</head>
+<body>
+<h1>Apcupsd's Support for SNMP UPSes</h1>
+<h2>General</h2>
+Apcupsd version 3.10.0 or later provides direct support for SNMP UPSes.
+To run <b>apcupsd</b> with an SNMP UPS, you need the following
+things:
+<ul>
+ <li>An SNMP UPS, for example a Web/SNMP card installed into the SmartSlot.
+ </li>
+ <li>Apcupsd version 3.10.0 or higher</li></ul>
+<p>
+
+<h2>Connecting an SNMP UPS</h2>
+The Simple Network Management Protocol provides an interface
+to connect to remote devices through the network.
+<b>apcupsd</b> is now capable of using the SNMP interface of
+an SNMP-enabled UPS to communicate with an UPS.
+Currently <b>apcupsd</b> supports only APC's PowerNet MIB.
+To enable the SNMP support it is enough to configure the correct
+device in your apcupsd.conf configuration file.
+The directive needed for this configuration is:
+
+<pre>
+
+  DEVICE 192.168.100.2:161:APC:private
+
+</pre>
+
+where the directive is made by four parts:
+
+<ul>
+<li>IP address of the remote UPS</li>
+<li>Remote SNMP port</li>
+<li>Kind of remote SNMP agent, currently can only be "APC" for APC's
+powernet MIB</li>
+<li>The read-write community string, usually it is "private"
+for read-write access.</li></ul>
+<p>
+
+<h2>Building and Installing apcupsd</h2>
+Follow the instructions in the <a href="install.html">Installation Chapter</a>
+of this manual, being sure to include the following options (in addition
+to any others you need) on the <b>./configure</b> line:
+<pre>
+  ./configure \
+  --with-serial-dev=<your-SNMP-device> \
+  --with-upstype=snmp \
+  --with-upscable=smart \
+  --enable-pthreads \
+  --enable-snmp
+</pre>
+
+<h2>SNMP Specific Information</h2>
+The SNMP connection gives less information compared to a serial
+smart cable. This is not a problem as the most useful information
+is given, together with a number of secondary parameters that are
+informative enough to run safely your UPS.
+
+
+<h2>Known Problems</h2>
+<h3>Power Off (killpower) of SNMP UPS needs special handling</h3>
+<p></p>Currently (as of 3.10.0) the code to power off the UPS needs special
+configuration. The killpower command for SNMP UPSes can not be
+issued during shutdown as tipically at some time during shutdown
+operations the network stack is stopped. To overcome this problem
+it is needed to modify the /etc/rc.d/apcupsd system control script to
+tell <b>apcupsd</b> to issue the power down command (killpower) to the
+UPS immediately before apcupsd initiates the system shutdown. For this
+reason it is paramount to set your UPS grace time to a value greater
+than 120 seconds to allow for clean shutdown operations before the
+UPS removes the power from its plugs.
+To enable correct shutdown operation during powerdown do the following:
+<ul>
+<li>Connect to your Web/SNMP card using your favorite web browser, go
+to the UPS configuration menu and change the "Shutdown Delay" parameter
+to 180 seconds or more, depending on how much time your system shutdown
+requires to umount all the filesystems.</li>
+<li>Change /etc/rc.d/apcupsd script adding the '--kill-on-powerfail'
+to the apcupsd invocation.</li>
+<li>Restart your <b>apcupsd</b></li></ul>
+<p>
+With this setup your UPS operations should be safe.
+</body>
+</html>

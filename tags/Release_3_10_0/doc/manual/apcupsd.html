@@ -1,0 +1,150 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 3.2//EN">
+<HTML>
+<HEAD>
+        <TITLE>APC UPS management under Linux</TITLE>
+        <META NAME="DESCRIPTION" CONTENT="apcupsd a Linux daemon for controlling APCC UPSes">
+        <META NAME="KEYWORDS" CONTENT="apcupsd, UPS, APCC, Power">
+   <meta name="Author" content="Kern Sibbald">
+        <!-- Background white, links blue (unvisited), navy (visited), red (active) -->
+                <link rel=stylesheet href="apcupsd-styles.css" type="text/css">
+</HEAD>
+<BODY TEXT="#000000" LINK="#0000ff" VLINK="#000080" BGCOLOR="#ffffff">
+<P ALIGN=CENTER><IMG SRC="apcupsd.gif" NAME="Graphic1" ALT="[APCUPSD DOCUMENTATION]" ALIGN=BOTTOM WIDTH=584 HEIGHT=64 BORDER=0>
+</P>
+<H3 ALIGN=CENTER>Apcupsd Linux UPS daemon version 3.8.3 
+</H3>
+<H1 ALIGN=CENTER>apcupsd a program for controlling APC UPSes</H1>
+<H2>SYNOPSIS</H2>
+<P><B>/sbin/apcupsd</B> <BR><B>/etc/apcupsd/apccontrol</B>
+<BR><B>/etc/apcupsd/apcupsd.conf</B> <BR><B>/sbin/apcaccess</B>
+<BR><B>/sbin/apcnisd</B> 
+</P>
+<H2>DESCRIPTION</H2>
+<P><B>Apcupsd </B>can be used for controlling APC UPSes.
+During a power failure, <B>apcupsd</B> will inform the users about
+the power failure and that a shutdown may occur. If power is not
+restored, a system shutdown will follow when the battery is exhausted,
+a timeout (seconds) expires, or runtime expires based on internal APC
+calculations determined by power consumption rates. If the power is
+restored before one of the above shutdown conditions is met, <B>apcupsd</B>
+will inform users about this fact. 
+</P>
+<p><b>Apcupsd</b> runs on Linux systems, many Unix systems (Solaris,
+FreeBSD, OpenBSD, Alpha, ...) as well as on Windows systems
+(Win95/98/Me/NT/2000).</p>
+<P><B>Apcupsd</B> performs the shutdown by calling
+<B>/etc/apcupsd/apccontrol</B>, which is a shell script.
+Consequently, no changes to /etc/inittab are necessary. There is no
+communication between <B>apcupsd</B> and init(1) process. During
+installation, the system halt script was modified so that at the end
+of the shutdown process during a power failure, <B>apcupsd</B> will
+be re-executed in order to power off the UPS. This step is not
+mandatory, but is good practice as it avoids the possibility of your
+system being prematurely restarted if the power returns for a short
+period. It also permits your computer to be automatically rebooted
+when the power is restored providing you have configured your computer
+BIOS appropriately.
+</P>
+<P>The <B>apcupsd</B> daemon now supports two networking modes that
+function independently, but if desired at the same time. 
+</P>
+<P>Most users will probably enable the first network mode, which
+permits <B>apcupsd</B> to serve <A HREF="status.html">STATUS</A> and
+<A HREF="events.html">EVENTS</A> information to clients over the
+network. 
+</P>
+<P>The second networking mode is for multiple networked machines that
+are powered by the same UPS. In this mode, one machine is configured
+as a master with the UPS attached to the serial port. The other
+machines (maximum 20) powered by the same UPS are configured as
+slaves. The master has a network connection with the slaves and sends
+them information about the UPS status. Please see the <A HREF="configure.html#UPS_Sharing">UPS
+Sharing section</A> of this document for more details.</P>
+
+<P>RedHat and SuSE. versions of Linux have direct install support, as does
+Solaris.
+All other flavors of Linux and Unix machines
+may need some fussing with to get the
+install correct. 
+</P>
+<h2>SUPPORTED MODELS</h2>
+Please see the <A HREF="configure.html#ModelsSupported">Configuration section</A> of this document for more details.</P>
+<H2>OPTIONS</H2>
+<DL>
+        <DT>-c --configure 
+        </DT><DD>
+        Attempts to configure the UPS EPROM to the values specified in the
+        configuration file <B>/etc/apcupsd/apcupsd.conf</B>. 
+        </DD><DT>
+        -d --debug &lt;level&gt; 
+        </DT><DD>
+        Turns on debugging output for a NETSLAVE or a NETMASTER. 
+        </DD><DT>
+        -f --config-file &lt;file&gt; 
+        </DT><DD>
+        Specifies the location of the configuration file. The default is:
+        <B>/etc/apcupsd/apcupsd.conf</B> 
+        </DD><DT>
+        -k --killpower 
+        </DT><DD>
+        Attempt to turn the UPS off. This option is normally only used by
+        the daemon itself to shut the UPS off after a system shutdown has
+        completed. Note, if the killpower is done by a netmaster, it will
+                sleep for 30 seconds before issuing the power kill request to the
+                UPS to allow the slaves to properly shutdown.
+        </DD><DT>
+        -n --rename-ups 
+        </DT><DD>
+        Attempts to change the UPS name stored in the UPS EPROM to that
+        specified in your <B>/etc/apcupsd/apcupsd.conf</B> file. </DD>
+     <dt>-p, --kill-on-powerfail</dt> 
+        <dd>If this option is specified and a power failure occurs, immediately
+            after <b>apcupsd</b> issues the system shutdown request, it will
+            instruct the UPS to shut off the mains power. This option can be
+            useful if your system does not let <b>apcupsd</b> regain control
+            at the end of the shutdown procedure to shut off the mains power.
+            However, if you use this option, you must insure that your UPS
+            has a sufficiently long power off grace period to permit your
+            computer to fully shutdown.</dd>
+     <DT>-t, --term-on-powerfail
+                </dt><dd>
+                This option tells <b>apcupsd</b> to exit immediately when it issues
+                the system shutdown command (i.e. calls <b>apccontrol</b>). This 
+                behavior can be useful for those systems where it is not possible
+                to insert <b>apcupsd</b> commands in the termination script in order
+                to do the killpower. Without this option, <b>apcupsd</b> will wait 
+                for the <b>SIGTERM</b> signal from the system shutdown before exiting.
+                </dd>
+      <dt> -u --update-battery-date 
+        </DT><DD>
+        Attempts to update the battery date stored in the UPS EPROM.
+        Normally done after a battery replacement. 
+        </DD><DT>
+        -V --version 
+        </DT><DD>
+        Prints the <B>apcupsd</B> version number and the usage. 
+        </DD><DT>
+        -? --help 
+        </DT><DD STYLE="margin-bottom: 0.2in">
+        Prints a brief <B>apcupsd</B> help screen. 
+        </DD></DL>
+<H2>
+FILES</H2>
+<DL>
+        <DT>/etc/apcupsd/apcupsd.conf - configuration file. 
+        </DT><DT>
+        /etc/apcupsd/apcupsd.status - STATUS file 
+        </DT><DT>
+        /etc/apcupsd/apcupsd.events 
+        </DT><DD STYLE="margin-bottom: 0.2in">
+        where up to the last 50 events are stored for the network
+        information server. 
+        </DD></DL>
+<H2>
+SEE ALSO</H2>
+<P><B>apcnisd</B>(8) 
+</P>
+For credits, please see the <a href="thanks.html">Thanks Chapter</a> of
+this manual.
+</BODY>
+</HTML>
