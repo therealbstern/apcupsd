@@ -240,7 +240,7 @@ typedef struct netdata {
 #define UPSINFO_ID "UPS!"
 
 typedef struct upsinfo {
-    char id[4];
+    char id[5];
     int version;
     int size;
     char release[20];

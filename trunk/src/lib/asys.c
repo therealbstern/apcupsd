@@ -4,7 +4,7 @@
  *   library routines. 
  * 
  *
- *   Version $Id: asys.c,v 1.4 2004-07-17 17:57:47 adk0212 Exp $
+ *   Version $Id: asys.c,v 1.5 2004-07-17 21:38:01 kerns Exp $
  */
 /*
    Copyright (C) 2004 Kern Sibbald
@@ -226,9 +226,11 @@ static pthread_cond_t timer = PTHREAD_COND_INITIALIZER;
 int amicrosleep(time_t sec, long usec)
 {
    struct timespec timeout;
+   int stat;
+#ifdef HAVE_PTHREADS
    struct timeval tv;
    struct timezone tz;
-   int stat;
+#endif
 
    timeout.tv_sec = sec;
    timeout.tv_nsec = usec * 1000;
