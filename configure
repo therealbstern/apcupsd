@@ -10479,7 +10479,7 @@ PWRFAILDIR=${sysconfdir}
 SERIALDEV=/dev/ttyS0
 
 # define the default NIS (Network Information Server -- CGI) port
-NISPORT=7000
+NISPORT=3551
 
 #define the default master/slave networking port
 NETPORT=6666
@@ -10560,7 +10560,7 @@ freebsd)
 	DFILES="\
 		platforms/freebsd/Makefile \
 		platforms/freebsd/apcupsd \
-		platforms/freebsd/apccontrol.sh \
+		platforms/freebsd/apccontrol \
 		"
   ;;
 hpux)
@@ -10601,7 +10601,7 @@ openbsd)
 	DFILES="\
 		platforms/openbsd/Makefile \
 		platforms/openbsd/apcupsd \
-		platforms/openbsd/apccontrol.sh \
+		platforms/openbsd/apccontrol \
 		"
   ;;
 openserver)
@@ -10619,16 +10619,16 @@ openserver)
 		platforms/openserver/Makefile \
 		platforms/openserver/apcupsd \
 		platforms/openserver/rc0.openserver \
-		platforms/openserver/apccontrol.sh"
+		platforms/openserver/apccontrol"
   ;;
 mandrake)
     DISTVER=`cat /etc/mandrake-release | grep release |\
-		cut -f 5 -d ' '`
+                cut -f 5 -d ' '`
     DFILES="\
-	distributions/apccontrol \
-	distributions/mandrake/Makefile \
-	distributions/mandrake/apcupsd \
-	distributions/mandrake/awkhaltprog"
+        platforms/apccontrol \
+        platforms/mandrake/Makefile \
+        platforms/mandrake/apcupsd \
+        platforms/mandrake/awkhaltprog"
   ;;
 redhat)
 	DISTVER=`cat /etc/redhat-release | grep release |\
@@ -10672,7 +10672,7 @@ sun)
 		platforms/sun/Makefile \
 		platforms/sun/apcupsd \
 		platforms/sun/rc0.solaris \
-		platforms/sun/apccontrol.sh"
+		platforms/sun/apccontrol"
   ;;
 suse)
 	DISTVER=`cat /etc/SuSE-release |grep VERSION|\
@@ -10700,9 +10700,9 @@ darwin)
     PIDDIR=/var/run
     LOCKDIR=/var/tmp
     DFILES="\
-	platforms/apccontrol \
-	platforms/darwin/Makefile \
-	platforms/darwin/apcupsd"
+        platforms/apccontrol \
+        platforms/darwin/Makefile \
+        platforms/darwin/apcupsd"
     LDFLAGS="${LDFLAGS} -m"
   ;;
 unknown)
