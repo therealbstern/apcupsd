@@ -13,15 +13,16 @@ runtime expires based on internal APC calculations determined by power
 consumption rates. Apcupsd is licensed under the GPL version 2.
 <p>
 
-<h2><a href="http://sourceforge.net/projects/apcupsd">
-Apcupsd Hosted on Source Forge</a></h2>
-We have moved the release of source and binaries (downloads) to Source
-Forge for several reasons: 1.  Lack of manpower to maintain several
-sites, 2.  The excellent Open Software Development services offered by
-Source Forge.  In addition to hosting all our new releases, the Source
-Forge site has a CVS repository where you can find the very latest
-development software.  Please visit it and become familiar with how it
-works.
+<h2>What is new in Apcupsd version 
+<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=49059&release_id=314194">
+3.10.17</a> (18 March 2005)</h2>
+<b>Apcupsd</b> version 3.10.17 includes the <b>beta</b> release of
+USB support for FreeBSD, OpenBSD, and NetBSD. <i>Please read
+"Checking Out Your USB Subsystem (BSD)" in the manual for details on
+how to configure these platforms for USB support and for information
+on known bugs.</i> Also included in 3.10.17 is improved support for 
+hibernating USB UPSes and a fix for the slave mode segfault bug 
+introduced in 3.10.16.
 
 <h2><a href="3.10.x-manual/index.html" target="_top">Online
 3.10.x Manual</a> or a
@@ -38,16 +39,11 @@ and finally, if you want one big manual in a single html file,
 it can be found 
 <a href="3.10.x-manual/manual.html" target="_top">here</a>.
 
-
-<h2><a href="/cgi-bin/multimon.cgi" target="_top">Apcupsd Network Information</a></h2>
-To see my Linux/Windows APC UPSes running with
-<b>apcupsd</b> in real-time, just 
-<a href="/cgi-bin/multimon.cgi" target="_top">click here</a>.
-
-
 <h2>Bugs and Email Support</h2>
 Please don't email me directly, it is much better to address bug reports
-and questions to the user's mailing list, to which you must 
+and questions to the 
+<a href="http://lists.sourceforge.net/lists/subscribe/apcupsd-users">
+user's mailing list</a>, to which you must 
 be subscribed, otherwise your email regrettably goes down
 the bit bucket -- you can blame the spammers for that. See the
 <a href="lists.html">Email Lists page</a> for links and how to subscribe.
@@ -63,43 +59,10 @@ following site and follow the instructions:
 <a href="http://lists.sourceforge.net/lists/subscribe/apcupsd-users">
 http://lists.sourceforge.net/lists/subscribe/apcupsd-users</a>.
 
-
-
-<h2>Debian Users Stable Download</h2>
-The Debian packages for <b>apcupsd</b> may be obtained directly
-from the Debian site at:
-<p> 
-<a href="http://packages.debian.org/stable/admin/apcupsd.html">
-http://packages.debian.org/stable/admin/apcupsd.html</a>
-<br>
-<a href="http://packages.debian.org/testing/admin/apcupsd.html">
-http://packages.debian.org/testing/admin/apcupsd.html</a>
-<br>
-<a href="http://packages.debian.org/unstable/admin/apcupsd.html">
-http://packages.debian.org/unstable/admin/apcupsd.html</a>
-<br>
-
-<h2>For SuSE Users</h2>
-You can find rpms at:
-<a href="http://www.linux-user.de/ausgabe/2003/03/064-usv/apcupsd">
-http://www.linux-user.de/ausgabe/2003/03/064-usv/apcupsd</a>.      
-
-<h2>For Mandrake Users</h2>
-You can find apcupsd rpms at:
-<a href="http://www.linux-user.de/ausgabe/2003/03/064-usv/apcupsd">
-http://www.linux-user.de/ausgabe/2003/03/064-usv/apcupsd</a>.      
-
-<h2>For FreeBSD Users</h2>
-You can find a FreeBSD &quot;port&quot; at:
-<a href="http://www.freshports.org/sysutils/apcupsd/">
-http://www.freshports.org/sysutils/apcupsd/</a>
-   
-<h2><a href="http://sourceforge.net/cvs/?group_id=54413">
-Testers/Developers CVS Repository</a></h2>
-This is where you can find the very latest
-source code at the official development   
-CVS repository hosted by Source Forge.
-<p>
+<h2><a href="/cgi-bin/multimon.cgi" target="_top">Apcupsd Network Information</a></h2>
+To see my Linux/Windows APC UPSes running with
+<b>apcupsd</b> in real-time, just 
+<a href="/cgi-bin/multimon.cgi" target="_top">click here</a>.
 
 <h2>Other Software for Apcupsd</h2>
 David Ranch has developed some very interesting graphing support for APC
@@ -114,3 +77,13 @@ his site</a>.
 <h2>APC</h2>
 If you want to know more about APC products for protecting your computer,
 you can find it at the <a href="http://www.apc.com">APC Home Site</a>.
+
+<h2><a href="http://sourceforge.net/projects/apcupsd">
+Apcupsd Hosted on Source Forge</a></h2>
+We have moved the release of source and binaries (downloads) to Source
+Forge for several reasons: 1.  Lack of manpower to maintain several
+sites, 2.  The excellent Open Software Development services offered by
+Source Forge.  In addition to hosting all our new releases, the Source
+Forge site has a CVS repository where you can find the very latest
+development software.  Please visit it and become familiar with how it
+works.
