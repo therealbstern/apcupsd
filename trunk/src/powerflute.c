@@ -125,10 +125,10 @@ WINDOW *dmw = NULL;
 PANEL *mpan;
 
 /*
- * UPS structure.
+ * UPS structure pointers for shared ptr and for local ptr.
  */
-UPSINFO myUPS;
-UPSINFO *ups = &myUPS;
+UPSINFO *sharedups = NULL;
+UPSINFO *ups = NULL;
 char argvalue[MAXSTRING];
 
 /* Default values for contacting daemon */
@@ -150,7 +150,8 @@ static void get_raw_upsinfo(UPSINFO *ups, char *host, int port)
        Error_abort0(net_errmsg);
     }
     net_send(sockfd, "rawupsinfo", 10);
-    if ((n = net_recv(sockfd, (char *)ups, sizeof(UPSINFO))) != sizeof(UPSINFO)) {
+    if ((n = net_recv(sockfd, (char *)ups, sizeof(UPSINFO)))
+            != sizeof(UPSINFO)) {
        Error_abort2("net_recv of UPSINFO returned %d bytes, wanted %d\n",
 	  n, sizeof(UPSINFO));
     }
@@ -170,7 +171,7 @@ void load_events(void) {
 	int count=0;
 	char buffer[1024];
 
-        fp = fopen(myUPS.eventfile, "r");
+        fp = fopen(ups->eventfile, "r");
 
 	if (fp == NULL)
 		return;
@@ -341,36 +342,37 @@ void update_upsdata(int sig) {
 	time_t now;
 	char *t;
 
-	if (read_shmarea(&myUPS, 0) != SUCCESS) {
-	    exit(1);
-	}
-	get_raw_upsinfo(&myUPS, host, port);
+    
+    memcpy(ups, sharedups, sizeof(UPSINFO));
+
+	get_raw_upsinfo(ups, host, port);
 
 	time(&now);
 	t = ctime (&now);
         t[strlen(t)-1] = '\0';
 
         mvwprintw(statwin, 1, 1, "Last update: %s", t);
-        mvwprintw(statwin, 2, 1, "Model      : %s", myUPS.mode.long_name);
-        mvwprintw(statwin, 3, 1, "Cable      : %s", myUPS.cable.long_name);
-        mvwprintw(statwin, 4, 1, "Mode       : %s", myUPS.class.long_name);
+        mvwprintw(statwin, 2, 1, "Model      : %s", ups->mode.long_name);
+        mvwprintw(statwin, 3, 1, "Cable      : %s", ups->cable.long_name);
+        mvwprintw(statwin, 4, 1, "Mode       : %s", ups->class.long_name);
         mvwprintw(statwin, 5, 1, "AC Line    : %s",
-                        (myUPS.OnBatt ? "failing" : "okay"));
+                        (ups->OnBatt) ?
+                         "failing" : "okay"));
         mvwprintw(statwin, 6, 1, "Battery    : %s",
-                        (myUPS.BattLow ? "failing" : "okay"));
+                        (ups->BattLow ? "failing" : "okay"));
         mvwprintw(statwin, 7, 1, "AC Level   : %s",
-			(myUPS.LineLevel ?
-                         ((myUPS.LineLevel == 1) ? "high" : "low")
+			(ups->LineLevel ?
+                         ((ups->LineLevel == 1) ? "high" : "low")
                          : "normal"));
         mvwprintw(statwin, 8, 1, "Last event : %s",
-			xlate_history(myUPS.G[0]));
+			xlate_history(ups->G[0]));
 
-	if (myUPS.LineLevel) {
+	if (ups->LineLevel) {
                 write_mesg("* [%s] warning: AC level is %s", t,
-                                ((myUPS.LineLevel == 1) ? "high" : "low"));
+                                ((ups->LineLevel == 1) ? "high" : "low"));
 	}
 
-	if (myUPS.OnBatt) {
+	if (ups->OnBatt) {
 		if (power_fail == FALSE) {
                         write_mesg("* [%s] warning: power is failing", t);
 			power_fail = TRUE;
@@ -382,7 +384,7 @@ void update_upsdata(int sig) {
 		}
 	}
 
-	if (myUPS.BattLow) {
+	if (ups->BattLow) {
 		if (battery_fail == FALSE) {
                         write_mesg("* [%s] warning: battery is failing", t);
 			power_fail = TRUE;
@@ -413,7 +415,7 @@ void close_curses(void) {
 	werase(stdscr);
 	update_all();
 	endwin();
-	detach_ipc(&myUPS);
+	detach_ups(sharedups);
 }
 
 static int menu_virtualize(int c)
@@ -685,10 +687,15 @@ int main(int argc, char **argv)
 	int status;
 	int flag;
 
+    ups = malloc(sizeof(UPSINFO));
+
+    if (!ups) {
+        fprintf(stderr, "Out of memory.\n");
+        exit(-1);
+    }
+
 	strncpy(argvalue, argv[0], sizeof(argvalue)-1);
 	argvalue[sizeof(argvalue)-1] = 0;
-
-	init_ups_struct(ups);
 
 	if (argc > 2) { 		  /* assume host:port */
 	    char *p;
@@ -716,9 +723,10 @@ int main(int argc, char **argv)
 	closing_curses = 0;
 
 	/*
-	 * Attach daemon shared memory area.
+	 * Attach daemon
 	 */
-	if (attach_ipc(ups, SHM_RDONLY) != SUCCESS) {
+    sharedups = attach_ups(sharedups, SHM_RDONLY);
+	if (!sharedups) {
                 fprintf(stderr, "Can not attach SYSV IPC: "
                                 "Apcupsd not running or you are not root.\n");
 		exit(1);
@@ -757,7 +765,7 @@ int main(int argc, char **argv)
 	close_curses();
 
 out:
-	detach_ipc(ups);
+	detach_ups(sharedups);
 	return status;
 }
 
@@ -765,7 +773,7 @@ out:
 /* Fixup missing error_cleanup() */
 void error_cleanup(UPSINFO *ups)
 {
-    detach_ipc(ups);
+    detach_ups(sharedups);
     close_curses();
     exit(1);
 }
