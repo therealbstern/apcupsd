@@ -8235,7 +8235,7 @@ then
 elif test -f /etc/slackware-version
 then
 	DISTNAME=slackware
-elif test -f /etc/gentoo-version
+elif test -f /etc/gentoo-release
 then
 	DISTNAME=gentoo
 elif test -f /etc/engarde-version
@@ -8374,7 +8374,7 @@ freebsd)
 		"
   ;;
 gentoo)
-	DISTVER=`uname -r`
+	DISTVER=`awk '/version / {print $5}' < /etc/gentoo-release`
 	DFILES="\
 		platforms/gentoo/Makefile \
 		platforms/gentoo/apcupsd \
