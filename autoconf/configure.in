@@ -728,20 +728,19 @@ dnl As last resort, use provided GD library v1.2
 	 exit 1
        fi
      fi
-	 if test x"$GDINCLUDE" = x
-	 then
+	 if test x$GDINCLUDE = x ; then
 	   AC_CHECK_HEADER(gd.h, [ GDHEAD= ],
 	     [
 	       AC_CHECK_HEADER(gd/gd.h, [ GDHEAD="gd/" ],
-	   [
-	     echo 'Found system GD library but no header file.'
-	     echo 'Please find the file gd.h in your system'
-	     echo 'include directories and report its position'
-	     echo 'to apcupsd-devel@apcupsd.com'
-	     exit 1
+	     [
+	       echo 'Found system GD library but no header file.'
+	       echo 'Please find the file gd.h in your system'
+	       echo 'include directories and report its position'
+	       echo 'to apcupsd-devel@apcupsd.com'
+	       exit 1
+	     ])
 	   ])
-	 ])
-       AC_SUBST(GDHEAD)
+	   AC_SUBST(GDHEAD)
 	 fi
    fi
   ])
