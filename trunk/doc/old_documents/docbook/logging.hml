@@ -1,0 +1,151 @@
+<chapter><title><application>apcupsd</application> System Logging</title>
+
+<para>The <application>apcupsd</application> philosophy is that all
+logging should be done through the <emphasis
+role="bold">syslog</emphasis> facility (see: <command>man
+syslog</command>). This is now implemented with the exceptions that
+<emphasis role="bold">STATUS</emphasis> logging, for compatibility,
+with prior versions is still done to a file, and <emphasis
+role="bold">EVENTS</emphasis> logging can be directed to a
+&quot;temporary&quot; file so that it can be reported by the network
+information server.</para>
+
+<sect1><title>Logging Types</title>
+
+<para><application>apcupsd</application> splits its logging into four
+separate types called:</para>
+
+<orderedlist>
+  <listitem>
+    <para>DEBUG</para>
+  </listitem>
+  <listitem>
+    <para>DATA</para>
+  </listitem>
+  <listitem>
+    <para>STATUS</para>
+  </listitem>
+  <listitem>
+    <para>EVENTS</para>
+  </listitem>
+</orderedlist>
+
+<para>Debug logging consists of debug messages. Normally these are
+turned on only by developers, and currently there exist very few of
+these debug messages.</para>
+
+<bridgehead>DATA Logging</bridgehead>
+
+<para>Data logging consists of periodically logging important data
+concerning the operation of the UPS. See the <link
+linkend='datalogging'>Data Logging</link> section of this manual for
+more details.</para>
+
+<bridgehead>STATUS Logging</bridgehead>
+
+<para>Status logging consists of logging all available information known
+about your UPS as a series of ASCII records. This information is
+also made available by the <application>apcupsd</application> network
+information server.</para>
+
+<para>For more details on STATUS logging, see the <link
+linkend="statusformat">Status</link> section of the Technical
+Reference.</para>
+
+<bridgehead>EVENTS Logging</bridgehead>
+
+<para>Events logging consists of logging events as they happen. For
+example, successful startup, power fail, battery failure, system
+shutdown, ...</para>
+
+<para>See the manual section on <link linkend='events'>customizing event
+handling</link> for more details.</para>
+
+</sect1>
+<sect1><title>Implementation Details</title>
+
+<para>In order to ensure that the data logged to syslog() can be directed
+to different files, I have assigned syslog() levels to each of our
+four types of data as follows:</para>
+
+<orderedlist>
+<listitem><para>1. DEBUG logging has level LOG_DEBUG</para></listitem>
+
+<listitem><para>2. DATA logging has level LOG_INFO</para></listitem>
+
+<listitem><para>3. STATUS logging has level LOG_NOTICE</para></listitem>
+
+<listitem><para>4. EVENTS logging has levels LOG_WARNING, LOG_ERR, 
+LOG_CRIT, and LOG_ALERT</para></listitem>
+</orderedlist>
+
+<para>It should be noted that more work needs to be done on the
+precise definitions of each of the levels for EVENTS logging.
+Currently, it is roughly broken down as follows:</para>
+
+<para>LOG_WARNING general information such as startup, etc.</para>
+
+<para>LOG_ERR an error condition detected, e.g. communications problem
+with the UPS.</para>
+
+<para>LOG_CRIT a serious problem has occurred such as power failure,
+running on UPS batteries, ...</para>
+
+<para>LOG_ALERT a condition that needs immediate attention such as
+pending system shutdown, ...</para>
+
+<para>The default Facility for syslog() logging is DAEMON, although this
+can be changed with the FACILITY directive in apcupsd.conf. In the
+following example, we should the facility as local0.</para>
+
+<para>More work needs to be done to the code to ensure that it
+corresponds to the above levels.</para>
+
+<para>As a practical example of how to setup your syslog() to use the
+new logging feature, suppose you wish to direct all DATA logging to a
+file named <filename>/var/log/apcupsd.data</filename>, all EVENTS to
+the standard <filename>/var/log/messages</filename> file (to be mixed
+with other system messages), and at the same time send all EVENTS to
+<filename>/var/log/apcupsd.events</filename>, and finally, you want to
+send all STATUS logging to the named pipe
+<filename>/var/log/apcupsd.status</filename></para>
+
+<para>First as root, you create the named pipe:</para>
+
+<programlisting>
+mkfifo /var/log/apcupsd.status
+</programlisting>
+
+<para>Change its permissions as necessary or use the -m option to set
+them when creating the pipe.</para>
+
+<para>Then you modify your <filename>/etc/syslog.conf</filename> file
+to direct the appropriate levels of messages where you want them. To
+accomplish the above, my syslog.conf file looks like:</para>
+
+<programlisting>
+# exclude all apcupsd info by default
+*.info;local0.none                    /var/log/messages
+
+# Everything for apcupsd goes here
+local0.info;local0.!notice             /var/log/apcupsd.data
+local0.notice;local0.!warn            |/var/log/apcupsd.status
+local0.warn                            /var/log/apcupsd.events
+local0.warn                            /var/log/messages
+</programlisting>
+
+</sect1>
+<sect1><title>Developer's Notes</title>
+
+<para>All logging functions and all error reporting are now done
+through the log_event() subroutine call. Exceptions to this are:
+initialization code where printf's are done, and writing to the
+status file. Once the initialization code has completed and the
+fork() to become a daemon is done, no printf's are used.
+log_event() has exactly the same format as syslog(). In fact, the
+subroutine consists of only a syslog() call. If anyone really
+wishes to log to a file, the code to do so can easily be done by
+adding code to log_event() in apclog.c.</para>
+
+</sect1>
+</chapter>
