@@ -554,7 +554,7 @@ int usb_ups_kill_power(UPSINFO *ups)
      * here should be made configurable some day.
      */
     func = "CI_APCBattCapBeforeStartup";
-    if (!write_int_to_ups(ups, CI_APCBattCapBeforeStartup, 0, func)) {
+    if (!usb_write_int_to_ups(ups, CI_APCBattCapBeforeStartup, 0, func)) {
        Dmsg1(100, "Unable to set %s (not an error)\n", func);
     }
 
@@ -566,7 +566,7 @@ int usb_ups_kill_power(UPSINFO *ups)
      * here should be made configurable some day.
      */
     func = "CI_APCDelayBeforeStartup";
-    if (!write_int_to_ups(ups, CI_APCDelayBeforeStartup, 10, func)) {
+    if (!usb_write_int_to_ups(ups, CI_APCDelayBeforeStartup, 10, func)) {
        Dmsg1(100, "Unable to set %s (not an error)\n", func);
     }
 
@@ -581,14 +581,14 @@ int usb_ups_kill_power(UPSINFO *ups)
     if (UPS_HAS_CAP(CI_DWAKE) && UPS_HAS_CAP(CI_DelayBeforeShutdown)) {
         Dmsg0(000, "UPS appears to support SmartUPS style shutdown.\n");   
         func = "CI_DWAKE";
-        if (!write_int_to_ups(ups, CI_DWAKE, SHUTDOWN_DELAY+4, func)) {
+        if (!usb_write_int_to_ups(ups, CI_DWAKE, SHUTDOWN_DELAY+4, func)) {
            Dmsg1(000, "Kill power function \"%s\" failed.\n", func);   
         }
         else {
             func = "CI_DelayBeforeShutdown";
-            if (!write_int_to_ups(ups, CI_DelayBeforeShutdown, SHUTDOWN_DELAY, func)) {
+            if (!usb_write_int_to_ups(ups, CI_DelayBeforeShutdown, SHUTDOWN_DELAY, func)) {
                Dmsg1(000, "Kill power function \"%s\" failed.\n", func);   
-               write_int_to_ups(ups, CI_DWAKE, -1, "CI_DWAKE"); /* reset prev timer */
+               usb_write_int_to_ups(ups, CI_DWAKE, -1, "CI_DWAKE"); /* reset prev timer */
             }
             else {
                 shutdown = 1;
@@ -605,7 +605,7 @@ int usb_ups_kill_power(UPSINFO *ups)
     if(!shutdown && UPS_HAS_CAP(CI_APCDelayBeforeShutdown)) {
         Dmsg0(000, "UPS appears to support BackUPS style shutdown.\n");   
         func = "CI_APCDelayBeforeShutdown";
-        if (!write_int_to_ups(ups, CI_APCDelayBeforeShutdown, SHUTDOWN_DELAY, func)) {
+        if (!usb_write_int_to_ups(ups, CI_APCDelayBeforeShutdown, SHUTDOWN_DELAY, func)) {
            Dmsg1(000, "Kill power function \"%s\" failed.\n", func);   
         }
         else {
@@ -632,7 +632,7 @@ int usb_ups_kill_power(UPSINFO *ups)
     if(!shutdown && UPS_HAS_CAP(CI_DelayBeforeReboot)) {
         Dmsg0(000, "UPS appears to support DelayBeforeReboot style shutdown.\n");   
         func = "CI_DelayBeforeReboot";
-        if (!write_int_to_ups(ups, CI_DelayBeforeReboot, SHUTDOWN_DELAY, func)) {
+        if (!usb_write_int_to_ups(ups, CI_DelayBeforeReboot, SHUTDOWN_DELAY, func)) {
            Dmsg1(000, "Kill power function \"%s\" failed.\n", func);   
         }
         else {
@@ -652,7 +652,7 @@ int usb_ups_kill_power(UPSINFO *ups)
     if(!shutdown && UPS_HAS_CAP(CI_APCForceShutdown)) {
         Dmsg0(000, "UPS appears to support ForceShutdown style shutdown.\n");   
         func = "CI_APCForceShutdown";
-        if (!write_int_to_ups(ups, CI_APCForceShutdown, 1, func)) {
+        if (!usb_write_int_to_ups(ups, CI_APCForceShutdown, 1, func)) {
            Dmsg1(000, "Kill power function \"%s\" failed.\n", func);   
         }
         else {
@@ -669,7 +669,7 @@ int usb_ups_kill_power(UPSINFO *ups)
     if(!shutdown && UPS_HAS_CAP(CI_DelayBeforeShutdown)){
         Dmsg0(000, "UPS appears to support DelayBeforeShutdown style shutdown.\n");   
         func = "CI_DelayBeforeShutdown";
-        if (!write_int_to_ups(ups, CI_DelayBeforeShutdown, SHUTDOWN_DELAY, func)) {
+        if (!usb_write_int_to_ups(ups, CI_DelayBeforeShutdown, SHUTDOWN_DELAY, func)) {
            Dmsg1(000, "Kill power function \"%s\" failed.\n", func);   
         }
         else {
