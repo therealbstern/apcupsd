@@ -4,7 +4,7 @@
  * commands to the apcupsd network information server.
  * It then prints to stdout the responses from the server.
  *
- * Build it with: cc client.c ../lib/libapc.a -o client
+ * Build it with: cc -I../include client.c ../src/lib/libapc.a -o client
  *
  * Execute: ./client [host[:port]] [command]
  *   reads commands from STDIN if command is not present

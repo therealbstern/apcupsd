@@ -27,37 +27,37 @@ allexe = apcupsd @APCTEST@ @APCACCESS@ @SMTP@ @POWERFLUTE@ @APCNISD@
 
 all-targets: $(allexe)
 
-apcupsd: $(dobjs) $(gobjs) $(LIBS) $(WINAPC)
+apcupsd: $(dobjs) $(gobjs) $(WINAPC)
 	$(CC) $(LDFLAGS) $(WLDFLAGS) $(dobjs) $(gobjs) $(LIBS) $(WINAPC) $(WINLIBS) -o apcupsd
 
-apcnisd: $(nobjs) $(LIBS)
+apcnisd: $(nobjs) 
 	$(CC) $(LDFLAGS) $(nobjs) $(LIBS) -o apcnisd
 
 # apctest is non-Windowing
 apctest.o: apctest.c
 	$(CC) -c $(CFLAGS) $(DEFS) $<
 
-apctest: $(tobjs) $(gobjs) $(LIBS)
+apctest: $(tobjs) $(gobjs)
 	$(CC) $(LDFLAGS) $(tobjs) $(gobjs) $(LIBS) -o apctest
 
-devicedbg: $(xobjs) $(LIBS)
+devicedbg: $(xobjs)
 	$(CC) $(LDFLAGS) $(xobjs) $(LIBS) -o devicedbg
 
 # apcaccess is non-Windowing
 apcaccess.o: apcaccess.c
 	$(CC) -c $(CFLAGS) $(DEFS) $<
 
-apcaccess: $(aobjs) $(LIBS)
+apcaccess: $(aobjs)
 	$(CC) $(LDFLAGS) $(aobjs) $(LIBS) -o apcaccess
  
 # smtp is non-Windowing
 smtp.o: smtp.c
 	$(CC) -c $(CFLAGS) $(DEFS) $<
    
-smtp: $(sobjs) $(LIBS)
+smtp: $(sobjs)
 	$(CC) $(LDFLAGS) $(sobjs) $(LIBS) -o smtp
  
-powerflute: $(fobjs) $(LIBS)
+powerflute: $(fobjs)
 	$(CC) $(LDFLAGS) $(fobjs) $(LIBS) @POWERLIBS@ -o powerflute
 
 install: install-binary

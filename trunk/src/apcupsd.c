@@ -209,8 +209,8 @@ void apcupsd_error_out(char *file, int line, char *fmt,...)
     va_start(arg_ptr, fmt);
     avsnprintf((char *)&buf[i], sizeof(buf)-i, (char *) fmt, arg_ptr);
     va_end(arg_ptr);
-    fprintf(stderr, buf);
-    log_event(core_ups, LOG_ERR, buf);
+    fprintf(stderr, "%s", buf);
+    log_event(core_ups, LOG_ERR, "%s", buf);
     apcupsd_error_cleanup(core_ups);		    /* finish the work */
 }
 
@@ -225,8 +225,8 @@ void apcupsd_error_exit(char *fmt,...)
     va_start(arg_ptr, fmt);
     avsnprintf(buf, sizeof(buf), (char *) fmt, arg_ptr);
     va_end(arg_ptr);
-    fprintf(stderr, buf);
-    log_event(core_ups, LOG_ERR, buf);
+    fprintf(stderr, "%s", buf);
+    log_event(core_ups, LOG_ERR, "%s", buf);
     apcupsd_error_cleanup(core_ups);		    /* finish the work */
 }
 

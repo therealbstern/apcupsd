@@ -100,11 +100,11 @@ This package is built with standard serial port support.
         --with-cgi-bin=%{_sysconfdir}/apcupsd/cgi \
         --enable-cgi \
         --enable-pthreads \
-        --enable-master-slave \
-        --enable-apcsmart \
-        --enable-dumb \
+	--enable-master-slave \
+	--enable-apcsmart \
+	--enable-dumb \
 %if %{usb}
-        --with-serial-dev=/dev/usb/hid/hiddev[0-15] \
+        --with-serial-dev=/dev/usb/hiddev[0-15] \
         --with-upstype=usb \
         --with-upscable=usb \
         --enable-usb
@@ -126,6 +126,13 @@ mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/cgi
 make \
         DESTDIR=$RPM_BUILD_ROOT \
         install
+
+# RedHat 7 put usb hid devices in /dev/usd/hid directory rather than /dev/usb
+# which follows usb standard. This was corrected with RedHat 8 so we patch the
+# apcupsd.conf file as created by our configure statement above for rh7 builds.
+%if %{usb} && %{rh7}
+patch $RPM_BUILD_ROOT/etc/apcupsd/apcupsd.conf platforms/redhat/apcupsd.conf.patch
+%endif
 
 install -m744 platforms/apccontrol \
               $RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/apccontrol
@@ -194,7 +201,7 @@ awk '# Stuff left over from a previous apcupsd, remove it
     print "   echo                                                               # ***apcupsd***"
     print "   echo \"APCUPSD will now power off the UPS\"                          # ***apcupsd***"
     print "   echo                                                               # ***apcupsd***"
-    print "   /etc/apcupsd/apccontrol killpower                                  # ***apcupsd***"
+    print "   @PWRFAILDIR@/apccontrol killpower                                  # ***apcupsd***"
     print "   echo                                                               # ***apcupsd***"
     print "   echo \"Please ensure that the UPS has powered off before rebooting\" # ***apcupsd***"
     print "   echo \"Otherwise, the UPS may cut the power during the reboot!!!\"   # ***apcupsd***"
@@ -291,7 +298,7 @@ awk '# Stuff left over from a previous apcupsd, remove it
     print "   echo                                                               # ***apcupsd***"
     print "   echo \"APCUPSD will now power off the UPS\"                          # ***apcupsd***"
     print "   echo                                                               # ***apcupsd***"
-    print "   /etc/apcupsd/apccontrol killpower                                  # ***apcupsd***"
+    print "   @PWRFAILDIR@/apccontrol killpower                                  # ***apcupsd***"
     print "   echo                                                               # ***apcupsd***"
     print "   echo \"Please ensure that the UPS has powered off before rebooting\" # ***apcupsd***"
     print "   echo \"Otherwise, the UPS may cut the power during the reboot!!!\"   # ***apcupsd***"
@@ -342,6 +349,11 @@ fi
 %endif
 
 %changelog
+* Sat Nov 08 2003 Scott at fairfieldcomputersdot com
+- expanded usb devices from 0-9 to 0-15
+* Fri Nov 07 2003 Scott at fairfieldcomputers dot com
+- corrected device path for usb devices to /dev/usb and added patch for
+- rh7 builds to make it /dev/usb/hid in /etc/apcupsd/apcupsd.conf
 * Sat Oct 18 2003 Scott at fairfieldcomputers dot com
 - added master-slave, apcsmart and dumb to configure options
 * Sun Sep 14 2003 Scott at fairfieldcomputers dot com

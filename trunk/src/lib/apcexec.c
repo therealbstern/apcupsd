@@ -299,8 +299,8 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
 		 */
 	 return SUCCESS;
     }
-    sprintf(connected, "%d", !UPS_ISSET(UPS_SLAVE));
-    sprintf(powered,   "%d", UPS_ISSET(UPS_PLUGGED));
+    sprintf(connected, "%d", !is_ups_set(UPS_SLAVE));
+    sprintf(powered,   "%d", (int)is_ups_set(UPS_PLUGGED));
 
 /*
  * fork() and exec()

@@ -340,6 +340,7 @@ typedef struct upsinfo {
     int annoy;
     int maxtime;
     int annoydelay;      /* delay before annoying users with logoff request */
+    int onbattdelay;     /* delay before reacting to a power failure */
     int killdelay;       /* delay after pwrfail before issuing UPS shutdown */
     int nologin_time;
     int nologin_file;
