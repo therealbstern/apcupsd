@@ -500,6 +500,7 @@
 #define CMDENDSELFTEST   16
 #define CMDMASTERTIMEOUT 17           /* Master timed out */
 #define CMDMASTERCONN    18           /* Connect to master */
+#define CMDOFFBATTERY    19           /* off battery power */
 
 /*
  * NetCodes for numeric chatting.

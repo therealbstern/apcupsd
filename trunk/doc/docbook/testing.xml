@@ -1,4 +1,4 @@
-<chapter id='testing'><title>Testing <application>apcupsd</application></title>
+<chapter id='testing'><title>Testing <application>Apcupsd</application></title>
 
 <para>The following testing procedures apply for the most part to
 apcsmart UPSes, whether USB or serial. If you have a dumb
@@ -67,6 +67,11 @@ names of the processes and will appear more like the following:</para>
 <para>If you see only one instance of
 <application>apcupsd</application> running, don't worry about it
 unless the communication test fails.</para>
+<para>If you do not find that <application>apcupsd</application> is        
+in the above list, the most likely problem is a configuration file glitch.
+If no messages were printed, you should check your system log 
+(normally <filename>/var/log/messages</filename> where you will find
+one or messages indicating the nature of the problem.</para>
 
 </sect1>
 <sect1><title>Logging Test</title>

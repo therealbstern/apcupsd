@@ -63,6 +63,14 @@ case "$1" in
 	onbattery)
 		printf "Power failure. Running on UPS batteries." | wall
 	;;
+	offbattery)
+	;;
+	mainsback)
+		printf "Power has returned..." | wall
+		if [ -f @PWRFAILDIR@/powerfail ] ; then
+		   printf "Continuing with shutdown."  | wall
+		fi
+	;;
 	failing)
 		printf "UPS battery power exhaused. Doing shutdown.\n" | wall
 	;;
@@ -83,12 +91,6 @@ case "$1" in
 	doshutdown)
 		printf "Beginning Shutdown Sequence" | wall
 		${SHUTDOWN} -h now "apcupsd initiated shutdown"
-	;;
-	mainsback)
-		printf "Power has returned..." | wall
-		if [ -f @PWRFAILDIR@/powerfail ] ; then
-		   printf "Continuing with shutdown.  I hope you don't have a linux box as the UPS master ..."	| wall
-		fi
 	;;
 	annoyme)
 		printf "Power problems please logoff." | wall

@@ -87,7 +87,9 @@ UPSCOMMANDS cmd[] = {
     {"startselftest", 0},             /* CMDSTARTSELFTEST */
     {"endselftest",   0},             /* CMDENDSELFTEST */
     {"mastertimeout", 0},             /* CMDMASTERTIMEOUT */
-    {"masterconnect", 0}              /* CMDMASTERCONN */
+    {"masterconnect", 0},             /* CMDMASTERCONN */
+    {"offbattery",    0}              /* CMDOFFBATTERY */
+
 };
 
 /*
@@ -113,7 +115,8 @@ UPSCMDMSG cmd_msg[] = {
     {LOG_ALERT,   N_("UPS Self Test switch to battery.")},
     {LOG_ALERT,   N_("UPS Self Test completed.")},
     {LOG_CRIT,    N_("Master not responding.")},
-    {LOG_WARNING, N_("Connect from master.")}
+    {LOG_WARNING, N_("Connect from master.")},
+    {LOG_CRIT,    N_("Mains returned. No longer on UPS batteries.")}
 };
 
 void generate_event(UPSINFO *ups, int event)
@@ -159,6 +162,7 @@ void generate_event(UPSINFO *ups, int event)
     case CMDDOSHUTDOWN:               /* Already shutdown, don't recall */
     case CMDPOWEROUT:
     case CMDONBATTERY:
+    case CMDOFFBATTERY:
     case CMDMASTERTIMEOUT:
     case CMDMASTERCONN:
     default:
@@ -306,7 +310,7 @@ static enum a_state get_state(UPSINFO *ups, time_t now)
 	    state = st_PowerFailure;   /* Power failure just detected */
 	}
     } else {
-	if (is_ups_set(UPS_PREV_ONBATT)) {		    /* if we were on batteries */
+	if (is_ups_set(UPS_PREV_ONBATT)) {   /* if we were on batteries */
 	    state = st_MainsBack;     /* then we just got power back */
 	} else {
 	    state = st_OnMains;       /* Solid on mains, normal condition */
@@ -442,11 +446,11 @@ void do_action(UPSINFO *ups)
 	     * Did BattLow bit go high? Then the battery power is failing.
 	     * Normal Power down during Power Failure
 	     */
-	if (!is_ups_set(UPS_PREV_BATTLOW) && is_ups_set(UPS_BATTLOW)) {
-	    clear_ups(UPS_ONBATT_MSG);
-	    generate_event(ups, CMDFAILING);
-	    break;
-	}
+	    if (!is_ups_set(UPS_PREV_BATTLOW) && is_ups_set(UPS_BATTLOW)) {
+		clear_ups(UPS_ONBATT_MSG);
+		generate_event(ups, CMDFAILING);
+		break;
+	    }
 
 	    /*
 	     * Did MaxTimeOnBattery Expire?  (TIMEOUT in apcupsd.conf)
@@ -481,12 +485,12 @@ void do_action(UPSINFO *ups)
 	     *
 	     * Or of the UPS says he is going to shutdown, do it NOW!
 	     */
-	if (is_ups_set(UPS_SHUTDOWNIMM) ||
-		(is_ups_set(UPS_BATTLOW) && is_ups_set(UPS_ONLINE))) {
-	    clear_ups(UPS_ONBATT_MSG);
-	    set_ups(UPS_SHUT_EMERG);
-	    generate_event(ups, CMDEMERGENCY);
-	}
+	    if (is_ups_set(UPS_SHUTDOWNIMM) ||
+		 (is_ups_set(UPS_BATTLOW) && is_ups_set(UPS_ONLINE))) {
+		clear_ups(UPS_ONBATT_MSG);
+		set_ups(UPS_SHUT_EMERG);
+		generate_event(ups, CMDEMERGENCY);
+	    }
 
 	    /*
 	     *	      Announce to LogOff, with initial delay ....
@@ -539,7 +543,10 @@ void do_action(UPSINFO *ups)
 	/*
 	 *  The the power is back after a power failure or a self test	       
 	 */
-	clear_ups(UPS_ONBATT_MSG);
+	if (is_ups_set(UPS_ONBATT_MSG)) {
+	   clear_ups(UPS_ONBATT_MSG);
+	   generate_event(ups, CMDOFFBATTERY);
+	}
 	if (is_ups_set(UPS_SHUTDOWN)) {
 	    /*
 	     * If we have a shutdown to cancel, do it now.

@@ -135,8 +135,8 @@ FIRMWARE : 60.11.I
 APCMODEL : IWI
 END APC  : Fri Dec 03 12:34:33 CET 1999
 </programlisting>
-
 </sect2>
+
 <sect2><title>apcaccess eprom</title>
 
 <para>The <emphasis role="bold">eprom</emphasis> command line option
@@ -168,6 +168,32 @@ Self test interval       SELFTEST      336      336 168 ON  OFF
 </sect2>
 </sect1>
 
+<sect1 id='notification'><title><application>Apcupsd</application> Notification and Events</title>
+<para>
+When a major event is generated within <application>apcupsd</application>,
+control is passed to the script <filename>apccontrol</filename> normally
+found in <filename>/etc/apcupsd/apccontrol</filename>. The event name,
+and a number of other important parameters are passed to the script.
+</para>
+<para>
+The major function of the <filename>apccontrol</filename> script is
+to performa a shutdown of the system (as well as the killpower
+operation). In addition, another major task for this script is to
+notify you by email when certain events such as powerfail occur.
+</para>
+<para>
+Since <filename>apccontrol</filename> is a script, you can 
+customize it to your own needs using any text editor. To do 
+so, you must have a minimal knowledge of Unix shell programming.
+In addition, another feature is that you can write your own 
+scripts that will be automatically called by <filename>apccontrol</filename>
+before any of its own code is executed.
+Details of the events and how to program them are contained in
+the Advanced topics section entitled <link linkend='events'>
+Customizing Event Handling</link>.
+</para>
+</sect1>
+
 <sect1><title><application>hid-ups</application> and USB Specific Information</title>
 
 <para>The UPS has an internal set of timers and remaining capacity
@@ -181,8 +207,8 @@ be found in the <application>hid-ups</application> report as
 RemainingCapacityLimit, which is typically factory set to 10
 percent. In addition, the Low Battery signal is normally given by the
 UPS when less than 2 minutes of run time remain.</para>
-
 </sect1>
+
 <sect1 id='cgiprogs'><title><application>apcupsd</application> Network Monitoring (CGI)
 Programs</title>
 
@@ -214,9 +240,11 @@ user. However, it is possible to directly invoke
 <application>upsimage.cgi</application> should never be directly
 invoked as it is used by <application>upsstats.cgi</application> to
 produce the bar charts.</para>
+</sect1>
 
-<sect2><title>Setting up and Testing the CGI Programs</title>
+<sect1 id='CGI-setup'><title>Setting up and Testing the CGI Programs</title>
 
+<sect2><title>Network Information Server (NIS)</title>
 <para>Before using <application>multimon</application> and the other
 CGI programs, first ensure that <application>apcupsd</application> is
 configured to run the Network Information Server. This is done by
@@ -326,8 +354,8 @@ of the source tree.</para>
 
 <para>To see a working example of the these programs, visit <ulink url="http://www.apcuspd.com/cgi-bin/multimon.cgi">http://www.apcupsd.com/cgi-bin/multimon.cgi</ulink>
 or <ulink url="http://www.apcupsd.com/cgi-bin/multimoncss.cgi">http://www.apcupsd.com/cgi-bin/multimoncss.cgi</ulink></para>
-
 </sect2>
+
 <sect2><title>multimon.cgi</title>
 
 <para>This program monitors multiple UPSes at the same time. A typical
@@ -344,8 +372,8 @@ Web browser might look like the following:</para>
 headings are all configurable (see
 <filename>/etc/apcupsd/hosts.conf</filename> and
 <filename>/etc/apcupsd/multimon.conf</filename>)</para>
-
 </sect2>
+
 <sect2><title>upsstats.cgi</title>
 
 <para>By clicking on the <emphasis role="bold">system</emphasis> name
@@ -368,14 +396,14 @@ bar graphs.</para>
 local host configured in the
 <filename>/etc/apcupsd/hosts.conf</filename> file, you can execute it
 from a Unix shell from the source cgi directory as follows:</para>
-
 </sect2>
+
 <sect2><title>./upsstats.cgi</title>
 
 <para>As with <application>multimon</application>, quite a few lines
 of html should then be displayed.</para> 
-
 </sect2>
+
 <sect2><title>upsfstatus.cgi</title>
 
 <para>If you would like to see all of the STATUS variables available
@@ -440,16 +468,15 @@ you execute <application>upsfstats.cgi</application> directly from a
 Unix shell in the cgi subdirectory as explained above for
 <application>upsstats.cgi</application> and
 <application>multimon.cgi</application>.</para>
-
 </sect2>
+
 <sect2><title>Working Example</title>
 
 <para>To see a working example of the above programs, visit <ulink
 url="http://www.apcupsd.com/cgi-bin/multimon.cgi">http://www.apcupsd.com/cgi-bin/multimon.cgi</ulink>.</para>
-
 </sect2>
-<sect2><title>Client Test Program</title>
 
+<sect2 id='client-program'><title>Client Test Program</title>
 <para>When your Network Information Server is up and running, you can
 test it using a simple program before attempting to access the server
 via your Web server. The test program is called
@@ -495,15 +522,20 @@ xyz
 ^D
 </programlisting>
 
-<para>Should produce the status listing (the same as produced by
+<para>should produce the status listing (the same as produced by
 <command>apcaccess status</command>), followed by the list of the last
 10 events (in response to the <emphasis role="bold">events</emphasis>
 command), and finally <emphasis role="bold">Invalid command</emphasis>
 in response to the <emphasis role="bold">xyz</emphasis> input, which
 is not a valid command. The control-D terminates the <emphasis
 role="bold">client</emphasis> program.</para>
-
+<para>
+The purpose of this program is to show you how to write your own
+program that can determine the status of <application>apcupsd</application> 
+and act any way you want (e.g. send you email messages on certain
+events like line voltage boost, ...).</para>
 </sect2>
+
 <sect2><title>A Tip from Carl Erhorn for Sun Systems</title>
 
 <para>It is possible to run the CGI code to monitor your UPS using the
@@ -513,8 +545,8 @@ insert the cgi scripts into the cgi directory of the web server,
 and access the cgi using something like:</para>
 
 <para>http://hostname:8888/cgi/multimon.cgi</para>
-
 </sect2>
+
 <sect2><title>Credits</title>
 
 <para>Many thanks go to Russell Kroll &lt;rkroll at exploits.org&gt; who
@@ -527,6 +559,7 @@ program to work with <application>apcupsd</application>.</para>
 <para>We have enhanced the bar graph program and hope that our changes
 can be useful to the original author in his project.</para>
 </sect2>
+
 <sect2><title>Security Issues</title>
 
   <itemizedlist>
@@ -573,6 +606,7 @@ untested. If you use it, please send us some feedback.</para>
 </sect2>
 
 </sect1>
+
 <sect1 id='eeprom'><title>Configuring Your EEPROM</title>
 
 <para>If you have a SmartUPS, there are depending on the UPS at least 12

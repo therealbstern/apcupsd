@@ -162,5 +162,10 @@ following:</para>
 /etc/rc.d/apcupsd stop
 </programlisting>
 
+<para>
+Please see the <link linkend="testing">Testing Apcupsd</link> chapter for more   
+details on insuring that <application>apcupsd</application> is running
+properly.</para>
+
 </sect1>
 </chapter>

@@ -9,6 +9,7 @@
   <!ENTITY testing         SYSTEM "testing.xml"> 
   <!ENTITY troubleshooting SYSTEM "troubleshooting.xml"> 
   <!ENTITY monitoring      SYSTEM "monitoring.xml"> 
+  <!ENTITY events          SYSTEM "events.xml"> 
  ]>
 
 <!--
@@ -44,7 +45,7 @@ xmlto -m manual.xsl xhtml-nochunks manual.xml
    </revision>
    <revision>
       <revnumber>3.0</revnumber>
-      <date>13 Jan 2004</date>
+      <date>15 Jan 2004</date>
       <authorinitials>KES</authorinitials>
        <revremark>
           Last time Book changed.
@@ -1036,260 +1037,7 @@ the bug tracking system at SourceForge.</para>
 </part>
 <part id='advanced'><title>Advanced topics</title>
 
-<chapter id='events'><title>Customizing Event Handling</title>
-
-<para>When <application>apcupsd</application> detects anomalies from
-your UPS device, it will make some decisions that usually result in
-one or more calls to the script located in
-<filename>/etc/apcupsd/apccontrol</filename>. The <emphasis
-role="bold">apccontrol</emphasis> file is a shell script that acts on
-the first argument that <application>apcupsd</application> passes to
-it. These actions are set up by default to sane behavior for all
-psituations <application>apcupsd</application> is likely to
-detect from the UPS. However, you can change the
-<application>apccontrol</application> behavior for every single
-action.</para>
-
-<para>To customize, so create a file with the same name as the action,
-which is passed as a command line argument. Put your script in the
-<filename>/etc/apcupsd</filename> directory.</para>
-
-<para>These events are sent to the system log, optionally sent to the
-temporary events file
-(<filename>/etc/apcupsd/apcupsd.events</filename>), and they also
-generate a call to <filename>/etc/apcupsd/apccontrol</filename> which
-in turn will call any scripts you have placed in the
-<filename>/etc/apcupsd</filename> directory.</para>
-
-<para>Normally, <filename>/etc/apcupsd/acpcontrol</filename> is called
-only by <application>apcupsd</application>. Consequently, you should
-not invoke it directly.  However, it is important to understand how it
-functions, and in some cases, you may want to change the messages that
-it prints using <command>wall</command>. We recommend that you do so
-by writing your own script to be invoked by
-<command>apccontrol</command> rather than by modifying
-<application>apccontrol</application> directly. This makes it easier
-for you to upgrade to the next version of
-<application>apcupsd</application></para>
-
-<para>In other case, you may want to write your own shell scripts that
-will be invoked by <application>apccontrol</application>. For example,
-when a power fail occurs, you may want to send an email message to
-root. At present the arguments that
-<application>apccontrol</application> recognizes are:</para>
-
-<para>When <application>apcupsd</application> detects an event, it
-calls the <application>apccontrol</application> script with four
-arguments as:</para>
-
-<para>apccontrol &lt;event&gt; &lt;ups-name&gt; &lt;connected&gt;
-&lt;powered&gt;</para>
-
-<para>where:</para>
-<variablelist>
-  <varlistentry>
-    <term>event</term>
-    <listitem>
-      <para>is the event that occurred and it may be any one of the values
-      described in the next section.</para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term>ups-name</term>
-    <listitem>
-      <para>is the name of the UPS as specified in the configuration file
-      (not the name in the EEPROM). For version 3.8.2, this is always set
-      to <emphasis role="bold">Default</emphasis></para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term>connected</term>
-    <listitem>
-      <para>is 1 if <application>apcupsd</application> is connected to
-      the UPS via a serial port (or a USB port). In most
-      configurations, this will be the case. In the case of a Slave
-      machine where <application>apcupsd</application> is not directly
-      connected to the UPS, this value will be 0.</para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term>powered</term>
-    <listitem>
-      <para>is 1 if <application>apcupsd</application> is powered by
-      the UPS and 0 if not. In version 3.8.2, this value is always 1.</para>
-    </listitem>
-  </varlistentry>
-</variablelist>
-
-<sect1><title><application>apccontrol</application> Command Line Options</title>
-
-<para><application>apccontrol</application> accepts the following
-command line options:</para>
-
-<variablelist>
-  <varlistentry>
-    <term>annoyme</term>
-    <listitem>
-      <para>Does a &#xA0;&#xA0;<command>printf
-      &quot;Power problems please logoff.&quot; | wall</command>
-      &#xA0;&#xA0; then exits.</para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term>changeme</term>
-    <listitem>
-      <para>Does a &#xA0;&#xA0; <command>printf
-      &quot;Emergency! UPS batteries have failed\nChange them NOW&quot; |
-      wall</command> &#xA0;&#xA0; then exits.</para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term>commfailure</term>
-    <listitem>
-      <para>Does a &#xA0;&#xA0;<command>printf
-      &quot;Warning serial port communications with UPS lost.&quot; |
-      wall</command> &#xA0;&#xA0; then exits.</para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term>commok</term>
-    <listitem>
-      <para>Does a &#xA0;&#xA0;<command>printf
-      &quot;Serial communications with UPS restored.&quot; | wall</command>
-      &#xA0;&#xA0;then exits.</para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term>doreboot</term>
-    <listitem>
-      <para>Does a reboot of the system by calling &#xA0;&#xA0;
-      <command>shutdown -r now</command></para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term>doshutdown</term>
-    <listitem>
-      <para>Does a shutdown of the system by calling&#xA0;&#xA0;
-      <command>shutdown -h now</command></para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term>emergency</term>
-    <listitem>
-      <para>Does an emergency shutdown of the system by calling&#xA0;&#xA0;
-      <command>shutdown -h now</command></para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term>failing</term>
-    <listitem>
-      <para>Does a&#xA0;&#xA0;<command>printf &quot;UPS battery power
-      exhausted. Doing shutdown.\n&quot; | wall</command> &#xA0;&#xA0;then
-      exits.</para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term>loadlimit</term>
-    <listitem>
-      <para>Does a &#xA0;&#xA0; <command>printf &quot;UPS battery
-      discharge limit reached. Doing shutdown.\n&quot; | wall</command>
-      &#xA0;&#xA0; then exits.  After completing this event,
-      <application>apcupsd</application> will immediately initiate a
-      &#xA0;&#xA0; <command>doshutdown</command> event.</para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term>mainsback</term>
-    <listitem>
-      <para>Attempts to cancel the shutdown with a &#xA0;&#xA0;
-      <command>shutdown -c</command></para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term>onbattery</term>
-    <listitem>
-      <para>Does a &#xA0;&#xA0;<command>printf &quot;Power
-      failure. Running on UPS batteries.&quot; | wall</command>
-      &#xA0;&#xA0;then exits.</para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term>powerout</term>
-    <listitem>
-      <para>Does a &#xA0;&#xA0;<command>printf &quot;Warning power
-      loss detected.&quot; | wall</command>&#xA0;&#xA0; then exits.</para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term>remotedown</term>
-    <listitem>
-      <para>Does a &#xA0;&#xA0; <command>shutdown -h now</command></para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term>restartme</term>
-    <listitem>
-      <para>Terminates the currently running
-      <application>apcupsd</application> and then restarts it.</para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term>runlimit</term>
-    <listitem>
-      <para>Does a &#xA0;&#xA0;<command>printf &quot;UPS battery
-      runtime percent reached. Doing shutdown.\n&quot; |
-      wall</command> &#xA0;&#xA0; then exits.  After completing this
-      event, <application>apcupsd</application> will immediately
-      initiate a <command>doshutdown</command> event.</para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term>timeout</term>
-    <listitem>
-      <para>Does a &#xA0;&#xA0;<command>printf &quot;UPS battery
-      runtime limit exceeded. Doing shutdown.\n&quot; | wall</command>
-      &#xA0;&#xA0; then exits. After completing this event,
-      <application>apcupsd</application> will immediately initiate a
-      <command>doshutdown</command> event.</para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term>startselftest</term>
-    <listitem>
-      <para>This is called when <application>apcupsd</application>
-      detects that the UPS is doing a self test. No action is taken.</para>
-    </listitem>
-  </varlistentry>
-  <varlistentry>
-    <term>endselftest</term>
-    <listitem>
-      <para>This is called when <application>apcupsd</application>
-      determines that a self test has been completed. No action is
-      taken.</para>
-    </listitem>
-  </varlistentry>
-</variablelist>
-
-<para>To write your own routine for the <emphasis
-role="bold">powerout</emphasis> action, you create shell script named
-<emphasis role="bold">powerout</emphasis> and put it in the lib
-directory (normally <filename>/etc/apcupsd</filename>). When the
-<emphasis role="bold">powerout</emphasis> action is invoked by
-<application>apcupsd</application>,
-<application>apccontrol</application> will first give control to your
-script. If you want <application>apccontrol</application> to continue
-with the default action, simply exit your script with an exit status
-of zero. If you do not want <application>apccontrol</application> to
-continue with the default action, your script should exit with the
-special exit code of <emphasis role="bold">99</emphasis>. However, in
-this case, please be aware that you must ensure proper shutdown of
-your machine if necessary.</para>
-
-<para>Some sample scripts (onbattery and mainsback) that email power
-failure messages can be found in the <filename>examples</filename>
-directory of the source code.</para>
-</sect1>
-</chapter>
+&events;
 
 <chapter><title>Master/Slave Configurations</title>
 
@@ -6174,7 +5922,7 @@ script: </para>
 
 <para>Please see the end of <link linkend='win32'>Windows
 chapter</link> of this manual for conderations pertaining to shutdown
-and killpower on Windows.&gt;</para>
+and killpower on Windows.</para>
 </sect1>
 </chapter>
 <chapter id='upsbible'><title>APC's smart protocol</title>

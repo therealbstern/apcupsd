@@ -1,0 +1,9 @@
+             Technical notes on version 3.10.10
+                       16 January 2004
+                        Kern Sibbald
+
+General:
+- I added a new "offbattery" event that is only executed if the 
+  "onbattery" event was executed. This should allow users to easily
+  control what messages they get and by using the ONBATTERYDELAY the
+  time on batteries before the onbattery event is notified.
