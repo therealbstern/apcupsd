@@ -5,6 +5,33 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+
+----> Release 3.10.16 xxOct04
+- Adam has fixed the killpower problem for USB so that the
+  USB now properly turns off the power. Nice job!
+- Added Adam's snoopdecode.c to examples that allows viewing
+  USB events.
+- A number of typos fixed in apccontrol files.
+- Adam fixed a race condition in killpower with --kill-on-powerfail.
+- --kill-on-powerfail disallowed for dumb UPSes since the      
+  kill power will always occur before the system has been halted.
+- Lots of doc updates.
+- Add proper platform code so that configure will create
+  the 4 platform specific apccontrol files (some were missing).
+- Apply fix from user to correct one of the shutdown
+  sequences for the Smart UPS. During the conversion to drivers
+  this was apparently mangled.
+- Added code to close all file descriptors before becoming
+  daemon unless debug turned on.
+- Add APCBATTCapBeforeRestore found by Adam to hid-ups.c
+- Update copyright in apc_struct.h
+- Take Adam's new apc_defines.h with minor modification.
+- Correct a bug reported by a user (he also had the fix) to
+  the snmp driver where Sensitivity was incorrectly reported.
+- Add astrncpy() to snmp driver.
+- Fix apcstatus.c to report Unknown for the sensitivity rather than
+  High if the sense word cannot be read or is incorrect.
+
 ----> Release 3.10.15 07Aug04
 - Document Mandrake USB kernel problems.
 - Fix HID_MAX_USAGES in the examples directory
