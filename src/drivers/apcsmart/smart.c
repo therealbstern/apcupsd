@@ -423,13 +423,13 @@ int apcsmart_ups_read_volatile_data(UPSINFO *ups)
     /*
      * We need it for self-test start time.
      */
-    time(&now);
+    now = time(NULL);
 
     write_lock(ups);
 
     UPSlinkCheck(ups);			/* make sure serial port is working */
 
-    time(&ups->poll_time);	    /* save time stamp */
+    ups->poll_time = time(NULL);	/* save time stamp */
 
     /* UPS_STATUS */
     if (ups->UPS_Cap[CI_STATUS]) {
@@ -680,6 +680,10 @@ int apcsmart_ups_entry_point(UPSINFO *ups, int command, void *data)
 {
     int retries = 5; /* Number of retries if reason is NA (see below) */
     char ans[20];
+
+    if (is_ups_set(UPS_SLAVE)) {
+       return SUCCESS;
+    }
 
     switch(command) {
 	case DEVICE_CMD_SET_DUMB_MODE:

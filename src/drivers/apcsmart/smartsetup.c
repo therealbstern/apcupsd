@@ -81,6 +81,14 @@ int apcsmart_ups_open(UPSINFO *ups) {
        log_event(ups, LOG_ERR, "apcsmart_ups_open called twice. This shouldn't happen.");
     }
 
+    /*
+     * For a slave, we skip actually setting up the serial port
+     */
+    if (is_ups_set(UPS_SLAVE)) {
+       ups->fd = -1;
+       return 1;
+    }
+
     if ((ups->fd = open(ups->device, O_RDWR | O_NOCTTY | O_NDELAY)) < 0) {
         Error_abort2(_("Cannot open UPS port %s: %s\n"),
 		ups->device, strerror(errno));
@@ -117,8 +125,6 @@ int apcsmart_ups_open(UPSINFO *ups) {
     tcsetattr(ups->fd, TCSANOW, &my_data->newtio);
     tcflush(ups->fd, TCIFLUSH);
 
-    UPS_CLEAR(UPS_SLAVE);
-
     return 1;
 }
 
@@ -134,11 +140,13 @@ int apcsmart_ups_close(UPSINFO *ups)
         return SUCCESS;               /* shouldn't happen */
     }
     /* Reset serial line to old values */
-    tcflush(ups->fd, TCIFLUSH);
-    tcsetattr(ups->fd, TCSANOW, &my_data->oldtio);
-    tcflush(ups->fd, TCIFLUSH);
+    if (ups->fd >= 0) {
+       tcflush(ups->fd, TCIFLUSH);
+       tcsetattr(ups->fd, TCSANOW, &my_data->oldtio);
+       tcflush(ups->fd, TCIFLUSH);
 
-    close(ups->fd);
+       close(ups->fd);
+    }
     ups->fd = -1;
     free(ups->driver_internal_data);
     ups->driver_internal_data = NULL;
@@ -150,6 +158,10 @@ int apcsmart_ups_setup(UPSINFO *ups) {
     int attempts;
     int rts_bit = TIOCM_RTS;
     char a = 'Y';
+
+    if (ups->fd == -1) {
+       return 1;		      /* we must be a slave */
+    }
 
     /* The following enables communcations with the
      * BackUPS Pro models in Smart Mode.

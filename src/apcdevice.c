@@ -87,10 +87,10 @@ void setup_device(UPSINFO *ups)
      * Marko Sakari Asplund <Marko.Asplund@cern.ch>
      *	  prevents double init of UPS device 9/25/98
      */
-    if (UPS_ISSET(UPS_DEV_SETUP)) {
+    if (is_ups_set(UPS_DEV_SETUP)) {
 	return;
     }
-    UPS_SET(UPS_DEV_SETUP);
+    set_ups(UPS_DEV_SETUP);
 
     device_open(ups);
 
@@ -100,7 +100,7 @@ void setup_device(UPSINFO *ups)
      * If create_lockfile fails there's no need to delete_lockfile.
      * -RF
      */ 		    
-    if (create_lockfile(ups) == LCKERROR) {
+    if ((ups->fd != -1) && create_lockfile(ups) == LCKERROR) {
 	device_close(ups);
         Error_abort0(_("Unable to create UPS lock file.\n"));
     }
