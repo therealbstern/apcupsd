@@ -1,0 +1,19 @@
+#!/bin/sh
+#
+# This shell script if placed in /etc/apcupsd
+# will be called by /etc/apcupsd/apccontrol when apcupsd
+# restores contact with the UPS (i.e. the serial connection is restored).
+# We send an email message to root to notify him.
+#
+SYSADMIN=root
+MAIL="@MAIL@"
+
+HOSTNAME=`hostname`
+MSG="$HOSTNAME Serial port communications with UPS restored"
+#
+(
+   echo "$MSG"
+   echo " "
+   @sbindir@/apcaccess status
+) | $MAIL -s "$MSG" $SYSADMIN
+exit 0
