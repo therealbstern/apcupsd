@@ -135,10 +135,11 @@ static void log_status_write(UPSINFO *ups, char *fmt, ...)
 
     va_start(ap, fmt);
 
-    vsprintf(buf, fmt, ap);
+    avsnprintf(buf, sizeof(buf), fmt, ap);
     va_end(ap);
 
-    strcat(largebuf, buf);
+    strncat(largebuf, buf, sizeof(largebuf));
+    largebuf[sizeof(largebuf)-1] = 0;
     stat_recs++;
 }
 

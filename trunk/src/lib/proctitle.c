@@ -93,7 +93,7 @@ int setproctitle(char *fmt, ...)
 	buf[0] = 0;
 
 	va_start(ap, fmt);
-	len = vsprintf(buf, fmt, ap);
+	len = avsnprintf(buf, sizeof(buf), fmt, ap);
 	va_end(ap);
 
 	memset(argv0, 0, maxproclen + 1);

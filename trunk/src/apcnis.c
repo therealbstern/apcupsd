@@ -170,7 +170,7 @@ static void status_write(UPSINFO *ups, char *fmt, ...)
     char buf[MAXSTRING];
 
     va_start(ap, fmt);
-    vsprintf(buf, fmt, ap);
+    avsnprintf(buf, sizeof(buf), fmt, ap);
     va_end(ap);
 
     if ((i=(strlen(largebuf) + strlen(buf))) < (sizeof(largebuf)-1)) {

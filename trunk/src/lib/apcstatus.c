@@ -535,7 +535,7 @@ static void stat_list(UPSINFO *ups, char *fmt, ...)
     int len;
 
     va_start(arg_ptr, fmt);
-    vsprintf(buf, (char *) fmt, arg_ptr);
+    avsnprintf(buf, sizeof(buf), (char *) fmt, arg_ptr);
     va_end(arg_ptr);
     len = strlen(buf);
     while (len > 0 && (buf[len-1] == '\n' || buf[len-1] == '\r'))

@@ -73,12 +73,12 @@ void generic_error_out(char *file, int line, char *fmt, ...)
     sprintf(buf, "FATAL ERROR in %s at line %d\n", file, line);
     i = strlen(buf);
     va_start(arg_ptr, fmt);
-    vsprintf((char *)&buf[i], (char *)fmt, arg_ptr);
+    avsnprintf((char *)&buf[i], sizeof(buf)-i, (char *)fmt, arg_ptr);
     va_end(arg_ptr);
     fprintf(stdout, buf);
 
     if (error_cleanup)
-        error_cleanup();
+	error_cleanup();
 
     exit(1);
 }
@@ -90,15 +90,45 @@ void generic_error_exit(char *fmt, ...)
     char buf[256];
 
     va_start(arg_ptr, fmt);
-    vsprintf(buf, (char *)fmt, arg_ptr);
+    avsnprintf(buf, sizeof(buf), (char *)fmt, arg_ptr);
     va_end(arg_ptr);
     fprintf(stdout, buf);
 
     if (error_cleanup)
-        error_cleanup();
+	error_cleanup();
 
     exit(1);
 }
+
+/*
+ * Implement vsnprintf()
+ */
+int avsnprintf(char *str, size_t size, const char *format, va_list ap)
+{
+#ifdef HAVE_VSNPRINTF
+   int len;
+   len = vsnprintf(str, size, format, ap);
+   str[size-1] = 0;
+   return len;
+
+#else
+
+   int len;
+   char *buf;
+   buf = malloc(5000);
+   len = vsprintf(buf, format, ap);
+   if (len >= 5000) {
+      syslog(LOG_ERR, _("Buffer overflow. Possible exploit attempt."));
+      abort();
+   }
+   memcpy(str, buf, size);
+   str[size-1] = 0;
+   free(buf);
+   return len;
+#endif
+}
+
+
 
 void (*error_out)(char *file, int line, char *fmt,...) = generic_error_out;
 void (*error_exit)(char *fmt,...) = generic_error_exit;

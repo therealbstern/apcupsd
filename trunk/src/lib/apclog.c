@@ -81,7 +81,7 @@ void log_event(UPSINFO *ups, int level, char *fmt, ...)
 #endif
 
     va_start(arg_ptr, fmt);
-    vsprintf(msg, fmt, arg_ptr);
+    avsnprintf(msg, sizeof(msg), fmt, arg_ptr);
     va_end(arg_ptr);
 
     syslog(level, msg); 	  /* log the event */
@@ -103,34 +103,6 @@ void log_event(UPSINFO *ups, int level, char *fmt, ...)
 	write(event_fd, msg, lm);
     }
 }
-
-
-/*
- * Implement vsnprintf()
- */
-int avsnprintf(char *str, size_t size, const char  *format, va_list ap)
-{
-#ifdef HAVE_VSNPRINTF
-   int len;
-   len = vsnprintf(str, size, format, ap);
-   str[size-1] = 0;
-   return len;
-
-#else
-   int len;
-   char *buf;
-   buf = malloc(5000);
-   len = vsprintf(buf, format, ap);
-   if (len >= 5000) {
-      Error_abort0("Buffer overflow.\n");
-   }
-   memcpy(str, buf, size);
-   str[size-1] = 0;
-   free(buf);
-   return len;
-#endif
-}
-
 
 /*********************************************************************
  *

@@ -81,7 +81,7 @@ int do_inetd(int argc, char *argv[]);
 void apcnisd_error_cleanup(void)
 {
     if (ups)
-        destroy_ups(ups);
+	destroy_ups(ups);
     closelog();
     exit(1);
 }
@@ -172,7 +172,7 @@ static void status_write(UPSINFO *ups, char *fmt, ...)
 
     va_start(ap, fmt);
 
-    vsprintf(buf, fmt, ap);
+    avsnprintf(buf, sizeof(buf), fmt, ap);
     va_end(ap);
 
     strcat(largebuf, buf);
