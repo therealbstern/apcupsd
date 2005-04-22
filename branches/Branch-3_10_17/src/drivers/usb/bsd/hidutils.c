@@ -259,43 +259,22 @@ next:
 
 /*
  * Fetch a report from a device given an fd for the device's control
- * endpoint, the populated item structure describing the report, and
- * a data buffer in which to store the result. Returns report length
- * (in bytes) on success and -1 on failure.
+ * endpoint, the populated item structure describing the report, a
+ * data buffer in which to store the result, and the report length.
+ * Returns actual report length (in bytes) on success and -1 on failure.
  */
-int hidu_get_report(int fd, hid_item_t* item, unsigned char* data)
+int hidu_get_report(int fd, hid_item_t* item, unsigned char* data, int len)
 {
-    int rc, len;
+    int rc;
     struct usb_ctl_request req;
-    unsigned char buf[100];
 
     Dmsg4(200, "get_report: id=0x%02x, kind=%d, length=%d pos=%d\n",
-        item->report_ID, item->kind, item->report_size, item->pos);
-
-#if 0
-    /*
-     * Length is report size (in bits) rounded up to nearest
-     * byte, plus one additional byte for the report tag.
-     */
-    len = (item->report_size+7)/8+1;
-#else
-    /*
-     * Some reports seem to be longer than the above calculation says.
-     * Either APC has bogus length fields in their descriptors or
-     * libusbhid is buggy. The FreeBSD kernel corrupts its memory when
-     * this happens, resulting in a panic shortly thereafter. Work around
-     * the problem by using a plenty large buffer and letting the transfer
-     * return less than was requested.
-     */
-    len = sizeof(buf);
-#endif
-
-    memset(buf, 0, sizeof(buf));
+        item->report_ID, item->kind, len, item->pos);
 
     req.ucr_flags = USBD_SHORT_XFER_OK;
     req.ucr_actlen = 0;
     req.ucr_addr = 0;
-    req.ucr_data = buf;
+    req.ucr_data = data;
     req.ucr_request.bmRequestType = UT_READ_CLASS_INTERFACE;
     req.ucr_request.bRequest = UR_GET_REPORT;
     USETW(req.ucr_request.wValue, ((item->kind+1) << 8) | item->report_ID);
@@ -308,7 +287,7 @@ int hidu_get_report(int fd, hid_item_t* item, unsigned char* data)
     rc = ioctl(fd, USB_DO_REQUEST, &req);
     if (rc)
     {
-        Dmsg1(100, "Error getting report: %s\n", strerror(-rc));
+        Dmsg1(100, "Error getting report: %s\n", strerror(errno));
         return -1;
     }
 
@@ -316,32 +295,25 @@ int hidu_get_report(int fd, hid_item_t* item, unsigned char* data)
     {
         printf( "%02x: ", item->report_ID);
         for (rc=0; rc<req.ucr_actlen; rc++)
-            printf("%02x,", buf[rc]);
+            printf("%02x,", data[rc]);
         printf("\n");
     }
 
-    memcpy(data, buf, req.ucr_actlen);
     return req.ucr_actlen;
 }
 
 /*
  * Send a report to the device given an fd for the device's control
- * endpoint, the populated item structure, and the data to send. 
- * Returns true on success, false on failure.
+ * endpoint, the populated item structure, the data to send, and the
+ * report length. Returns true on success, false on failure.
  */
-int hidu_set_report(int fd, hid_item_t* item, unsigned char* data)
+int hidu_set_report(int fd, hid_item_t* item, unsigned char* data, int len)
 {
-    int rc, len;
+    int rc;
     struct usb_ctl_request req;
 
     Dmsg4(200, "set_report: id=0x%02x, kind=%d, length=%d pos=%d\n",
-        item->report_ID, item->kind, item->report_size, item->pos);
-
-    /*
-     * Length is report size (in bits) rounded up to nearest
-     * byte, plus one additional byte for the report tag.
-     */
-    len = (item->report_size+7)/8+1;
+        item->report_ID, item->kind, len, item->pos);
 
     if (debug_level >= 300)
     {
@@ -367,7 +339,7 @@ int hidu_set_report(int fd, hid_item_t* item, unsigned char* data)
     rc = ioctl(fd, USB_DO_REQUEST, &req);
     if (rc)
     {
-        Dmsg2(100, "Error setting report: (%d) %s\n", rc, strerror(-rc));
+        Dmsg2(100, "Error setting report: (%d) %s\n", errno, strerror(errno));
         return 0;
     }
 
@@ -391,7 +363,7 @@ const char* hidu_get_string(int fd, int index)
     rc = ioctl(fd, USB_GET_STRING_DESC, &sd);
     if (rc)
     {
-        Dmsg1(100, "Error fetching string descriptor: %s\n", strerror(-rc));
+        Dmsg1(100, "Error fetching string descriptor: %s\n", strerror(errno));
         return NULL;
     }
 

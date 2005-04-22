@@ -34,18 +34,18 @@ int hidu_locate_item(report_desc_t rdesc, int usage, int app, int phys,
 
 /*
  * Fetch a report from a device given an fd for the device's control
- * endpoint, the populated item structure describing the report, and
- * a data buffer in which to store the result. Returns report length
- * (in bytes) on success and -1 on failure.
+ * endpoint, the populated item structure describing the report, a
+ * data buffer in which to store the result, and the report length.
+ * Returns actual report length (in bytes) on success and -1 on failure.
  */
-int hidu_get_report(int fd, hid_item_t* item, unsigned char* data);
+int hidu_get_report(int fd, hid_item_t* item, unsigned char* data, int len);
 
 /*
  * Send a report to the device given an fd for the device's control
- * endpoint, the populated item structure, and the data to send. 
- * Returns true on success, false on failure.
+ * endpoint, the populated item structure, the data to send, and the
+ * report length. Returns true on success, false on failure.
  */
-int hidu_set_report(int fd, hid_item_t* item, unsigned char* data);
+int hidu_set_report(int fd, hid_item_t* item, unsigned char* data, int len);
 
 /*
  * Fetch a string descriptor from the device given an fd for the
