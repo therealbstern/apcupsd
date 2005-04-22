@@ -48,6 +48,7 @@ typedef struct s_usb_info {
    unsigned unit;		      /* units */
    int data_type;		      /* data type */
    hid_item_t item;                   /* HID item */
+   int report_len;                    /* Length of containing report */
 } USB_INFO;
 
 
@@ -394,6 +395,8 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info* known_inf
                 info->unit = item.unit;
                 info->data_type = known_info[i].data_type;
                 memcpy(&info->item, &item, sizeof(item));
+                info->report_len = hid_report_size( /* +1 for report id */
+                    my_data->rdesc, item.kind, item.report_ID) + 1;
                 Dmsg3(200, "Got ci=%d, usage=0x%x (len=%d)\n",ci,
                    known_info[i].usage_code, item.report_size);
             }
@@ -424,10 +427,37 @@ bool pusb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
     if (!UPS_HAS_CAP(ci) || !info)
         return false;                 /* UPS does not have capability */
 
+    /*
+     * Clear the destination buffer. In the case of a short transfer (see
+     * below) this will increase the likelihood of extracting the correct
+     * value in spite of the missing data.
+     */
+    memset(data, 0, sizeof(data));
+
     /* Fetch the proper report */
-    len = hidu_get_report(my_data->fd, &info->item, data);
+    len = hidu_get_report(my_data->fd, &info->item, data, info->report_len);
     if (len == -1)
         return false;
+
+    /*
+     * Some UPSes seem to have broken firmware that sends a different number
+     * of bytes (usually fewer) than the report descriptor specifies. On
+     * UHCI controllers under *BSD, this can lead to random lockups. To
+     * reduce the likelihood of a lockup, we adjust our expected length to
+     * match the actual as soon as a mismatch is detected, so future
+     * transfers will have the proper lengths from the outset. NOTE that
+     * the data returned may not be parsed properly (since the parsing is
+     * necessarily based on the report descriptor) but given that HID
+     * reports are in little endian byte order and we cleared the buffer
+     * above, chances are good that we will actually extract the right
+     * value in spite of the UPS's brokenness.
+     */
+    if (info->report_len != len) {
+        Dmsg4(100, "Report length mismatch, fixing "
+                   "(id=%d, ci=%d, expected=%d, actual=%d)\n",
+                   info->item.report_ID, ci, info->report_len, len);
+        info->report_len = len;
+    }
 
     /* data+1 skips the report tag byte */
     value = hid_get_data(data+1, &info->item);
@@ -798,7 +828,8 @@ int pusb_write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
     {
         info = my_data->info[ci];         /* point to our info structure */
 
-        if (hidu_get_report(my_data->fd, &info->item, rpt) < 1)
+        if (hidu_get_report(
+               my_data->fd, &info->item, rpt, info->report_len) < 1)
         {
             Dmsg1(000, "get_report for kill power function %s failed.\n", 
                   name);
@@ -809,14 +840,15 @@ int pusb_write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
 
         hid_set_data(rpt+1, &info->item, value);
 
-        if (!hidu_set_report(my_data->fd, &info->item, rpt))
+        if (!hidu_set_report(my_data->fd, &info->item, rpt, info->report_len))
         {
             Dmsg1(000, "set_report for kill power function %s failed.\n", 
                   name);
             return false;
         }
 
-        if (hidu_get_report(my_data->fd, &info->item, rpt) < 1)
+        if (hidu_get_report(
+               my_data->fd, &info->item, rpt, info->report_len) < 1)
         {
             Dmsg1(000, "get_report for kill power function %s failed.\n", 
                   name);
