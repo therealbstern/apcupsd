@@ -5,6 +5,9 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+----> Release 3.10.17a 22Apr05
+- Fix BSD USB driver lockups.
+
 ----> Release 3.10.17 18Mar05
 - Fix termination of empty directives in .conf file.
 - Move docbook directory to old_documents
