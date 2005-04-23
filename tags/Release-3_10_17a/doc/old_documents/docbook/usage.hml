@@ -1,0 +1,33 @@
+<preface><title>How To Use This Manual</title>
+
+<para>This is the manual for <application>apcupsd</application>, a
+daemon for communicating with UPSes (Uninterruptible Power Supplies)
+made by American Power Corporation (APC).  If you have an APC-made
+UPS, whether sold under the APC nameplate or OEMed<footnote><para>The
+HP PowerTrust 2997A UPS has been tested as a "smartups" with cable
+Hewlett Packard part number 5061-2575 equivalent to a custom-smart
+cable"</para></footnote>, and you want you get it working with a
+computer running Linux, Unix, or Windows NT, you are reading the right
+document.</para>
+
+<para>This manual is divided into parts which increase in technical
+depth as they go.  If you have just bought a state-of-the-art smart
+UPS with a USB or Ethernet interface, and you are running a current
+version of Red Hat or SUSE Linux (8.0 or later), then
+<application>apcupsd</application> is very nearly plug-and-play and
+you will have to read only the <link linkend='basics'>Basic User's
+Guide</link>. </para>
+
+<para>If your operating system is older, or if you have an
+old-fashioned serial-line UPS, you'll have to read about <link
+linkend='legacy'>serial installation</link>.  If you need
+more details about administration for unusual situations (such as a
+master/slave or multi-UPS setup) you'll need to read the section on
+<link linkend='advanced'>advanced topics</link>.  Finally, there
+is a <link linkend='arcana'>Technical Reference</link>
+section which gives full details on things like configuration 
+file directives and event-logging formats.</para>
+
+<para>You should begin by reading the <link linkend='quickstart'>Quick
+Start</link> instructions.</para>
+</preface>
