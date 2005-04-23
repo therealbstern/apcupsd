@@ -483,16 +483,14 @@ int usb_ups_read_static_data(UPSINFO *ups)
 
     /* UPS_MANUFACTURE_DATE */
     if (pusb_get_value(ups, CI_MANDAT, &uval)) {
-        asnprintf(ups->birth, sizeof(ups->birth), "%4d-%02d-%02d",
-                  (uval.iValue >> 9) + 1980, (uval.iValue >> 5) & 0xF,
-                  uval.iValue & 0x1F);
+        sprintf(ups->birth, "%4d-%02d-%02d", (uval.iValue >> 9) + 1980,
+                            (uval.iValue >> 5) & 0xF, uval.iValue & 0x1F);
     }
 
     /* Last UPS_BATTERY_REPLACE */
     if (pusb_get_value(ups, CI_BATTDAT, &uval)) {
-        asnprintf(ups->battdat, sizeof(ups->battdat), "%4d-%02d-%02d",
-                  (uval.iValue >> 9) + 1980, (uval.iValue >> 5) & 0xF,
-                  uval.iValue & 0x1F);
+        sprintf(ups->battdat, "%4d-%02d-%02d", (uval.iValue >> 9) + 1980,
+                            (uval.iValue >> 5) & 0xF, uval.iValue & 0x1F);
     }
  
     /* APC_BATTERY_DATE */
@@ -503,7 +501,7 @@ int usb_ups_read_static_data(UPSINFO *ups)
         dd = ((v>>4) & 0xF)*10 + (v&0xF);
         v >>= 8;
         mm = ((v>>4) & 0xF)*10 + (v&0xF);       
-        asnprintf(ups->battdat, sizeof(ups->battdat), "%4d-%02d-%02d", yy, mm, dd);
+        sprintf(ups->battdat, "%4d-%02d-%02d", yy, mm, dd);
     }
 
     /* UPS_SERIAL_NUMBER */

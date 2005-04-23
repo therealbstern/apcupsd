@@ -18,7 +18,7 @@
 #  who     when         what
 #  -----  --------     ------------------------------------------
 #  K. Cunningham  12/04  Mods to avoid warning messages. Support for 
-#                        conversion of the apcupsd Manual.
+#                        conversion of Bacula Manual.
 #  dpvc    10/95        Wrote it.
 #
 
@@ -46,20 +46,11 @@ my $htmlIMGDefaultRes = 240;
 #  with the main heading separated by a comma from subordinate entryes.
 #  $INDEX_FORMAT = 0 for heirarchical form, = 1 for comma-separated form.
 my $INDEX_FORMAT = 0;
-my $MULTIPLE_INDICES = 0;
-
-# %index_selection is a hash of indices and search regexes.  A blank search regex indicates the 
-#   default index, into which things go that don't have an otherwise obvious destination.
-# If %index_selection is not present, everything will go into an unnamed default index.
-# A special index called '*default' may be present in %index, which is an unnamed index.
-# Comment out this hash to get only one index.
-#my %INDEX_SELECTION = (
-#	'general' => "",
-#	'dir' => "director|-dir",
-#	'fd' =>	"\\s+file\\s+|file\\s+deamon|\\s+fd\\s+|-fd",
-#	'sd' => "\\s+storage\\s+|storage\\s+deamon|\\s+sd\\s+|-sd",
-#	'console' => "console",
-#);
+my $MAININDEX = "general";
+my $DIRINDEX = "dir";
+my $FDINDEX = "fd";
+my $SDINDEX = "sd";
+my $CONSOLEINDEX = "console";
 
 # This is the list of top level domains, to test links against.
 my $tldlist = "com|net|org|info|biz|aero|coop|museum|name|pro|gov|edu|mil|int|ac|ad|ae|ag|am|as|au|bb|be|bg|bi|bmbr|bt|bv|ca|cc|cd|ch|ck|cl|cm|cn|cr|cucx|cz|de|dk|do|ec|ee|es|fj|fm|fo|fr|gb|ge|gi|gl|gm|gr|gs|gt|gu|hk|hm|hr|hu|id|ir|ie|il|in|io|is|it|jo|jp|kr|ky|kz|lb|li|lk|lt|lu|ly|mc|mn|ms|mw|mx|na|nc|nl|no|nu|nz|pe|ph|pk|pl|pm|py|re|ro|ru|sa|se|sg|sh|si|sk|sm|su|tc|tf|th|tj|to|tr|tv|tw|ua|ug|uk|us|uy|uz|va|vc|vg|vi|vn|vu|wf|ws|za|agent|arts|auction|chat|church|club|family|free|game|golf|inc|kids|law|llc|llp|love|ltd|med|mp3|school|scifi|shop|soc|sport|tech|travel|video|xxx|america|com2|etc|earth|not|online|usa|z";
@@ -298,8 +289,6 @@ $htmlEntity{"yacute"} = "\\'y";
 $htmlEntity{"thorn"} = '';
 $htmlEntity{"yuml"} = '\"y';
 $htmlEntity{"quot"} = '&htmlQuote';
-$htmlEntity{"mdash"} = '{--}';  # KEC 3-21-05
-$htmlEntity{"ndash"} = '{---}';  # KEC 3-21-05
 
 
 #
@@ -788,7 +777,7 @@ sub htmlRunInitLatex {
 
 	# Changed this to be a our current directory as a relative path. K.Cunningham
 	$htmlTMP = "." if (!defined $htmlTMP or $htmlTMP eq "");
-	$htmlIndexContext = &htmlGetDefaultIndex;
+	$htmlIndexContext = $DIRINDEX;
 }
 
 # This is the closing code. It is executed after everything else is finished.
@@ -1070,36 +1059,62 @@ sub makeSpecialIndexEntry {
 }
 
 # htmlTestContext checks the string being sent out for the presence of keywords which
-#  indicate context. Searches for the last occurance of a string that matches
-#  any of the test regexes from %INDEX_SELECTION.
+#  indicate context.
 sub htmlTestContext {
-	my $string = shift;
-	my $context = "";
-	defined %INDEX_SELECTION or return "";
+	$string = shift;
 	
+	$contextDIR = "director|-dir";
+	$contextFD = "\\s+file\\s+|file\\s+deamon|\\s+fd\\s+|-fd";
+	$contextSD = "\\s+storage\\s+|storage\\s+deamon|\\s+sd\\s+|-sd";
+	$contextConsole = "console";
+
 	# Replace newlines with spaces in the string.
 	$string =~ s/\n+/ /sg;
-	foreach (keys(%INDEX_SELECTION)) {
-		$INDEX_SELECTION{$_} or next;  # Skip blank ones.
-		while ($string =~ /$INDEX_SELECTION{$_}/s) {
-			$string = $';
-			$context = $_;
-		}
+	while ($string =~ /$contextDIR/s) {
+		$string = $';
+		$htmlIndexContext = $DIRINDEX;
 	}
-	return $context;
+	while ($string =~ /$contextFD/s) {
+		$string = $';
+		$htmlIndexContext = $FDINDEX;
+	}
+	while ($string =~ /$contextSD/s) {
+		$string = $';
+		$htmlIndexContext = $SDINDEX;
+	}
+	while ($string =~ /$contextConsole/s) {
+		$string = $';
+		$htmlIndexContext = $CONSOLEINDEX;
+	}
 }
 
-sub htmlGetDefaultIndex {
-	# Examines the %index_selection hash (if there is one) and returns a default
-	#  index.  If one cannot be determined from the %indices hash,
-	#  returns "".
-	defined %INDEX_SELECTION or return "";
-	foreach (keys(%INDEX_SELECTION)) {
-		$INDEX_SELECTION{$_} or return $_
-	}
-	return "";
-}
+# Detects the context of the outgoing string, for indexing.
+# Searches the string to be output for the last entry that matches. 
+# Sets the context accordingly.
+sub htmlDetectContext {
+	my $string = shift;
 
+	my $dirSearch = "director|-dir";
+	my $fdSearch = "file daemon|-?fd";
+	my $sdSearch = "storage daemon|-?sd";
+	my $consoleSearch = "console";
+	while ($string =~ /$dirSearch/is) {
+		$string = $';
+		$htmlBaculaContext = $DIRINDEX;
+	}
+	while ($string =~ /$fdSearch/is) {
+		$string = $';
+		$htmlBaculaContext = $FDINDEX;
+	}
+	while ($string =~ /$sdSearch/is) {
+		$string = $';
+		$htmlBaculaContext = $SDINDEX;
+	}
+	while ($string =~ /$consoleSearch/is) {
+		$string = $';
+		$htmlBaculaContext = $CONSOLEINDEX;
+	}
+}
 
 #
 #  Define the special formatiing tags
@@ -1296,7 +1311,7 @@ sub htmlHeadingEnd {
 
         if (defined($htmlHeadingData{source})) {
                 my $indexNames = &createIndexName($htmlHeadingData{source});
-                &htmlInsertIndex($indexNames,$htmlIndexContext);
+                &htmlInsertIndex($indexNames,$MAININDEX);
         }
 
         # The table of contents will only accept section, subsection, etc.  It will
@@ -1336,16 +1351,15 @@ sub htmlInsertTOC {
 # The string is provided as the first argument, and the following is done:
 # Remove newlines or trailing spaces.
 # Convert any whitespace to single space characters.
-# Remove any leading numbers and decimal points, but only if it leaves something.
 # Remove any exclaimation points
 # Remove a leading the,and,a,an, or non-word characters.
 # Save the string as an index item, with leading uppercase and the rest lowercase.
 # Drop any embedded commas or parentheses or trailing non-word characters
-# Drop any preposition followed by 'apcupsd' at the end of the string.
+# Drop any preposition followed by 'Bacula' at the end of the string.
 # Separate the trailing word in the remaining string from the rest.
 # If there was more than one word and the length of the trailing word is less
 #  than three characters and the rest of the sentence doesn't end in a, and, an, or
-#  the, and there are more than two words
+#  the
 #    Separate the trailing two words from the rest instead of the last word.
 #    Drop any leading prepositions in the trailing two words.
 # Put together an index entry using the trailing word(s), an exclamation point,
@@ -1353,23 +1367,20 @@ sub htmlInsertTOC {
 # Do any needed character conversion to that index entry and return both names.
 sub createIndexName {
         my $inputname = shift;
-        my (%names,$tmp);
+        my (%names);
 
         $inputname =~ s/(\n|\s+$)//g;
         $inputname =~ s/\s+/ /g;
-		$tmp = $inputname;
-		$inputname =~ s/^[0-9\.\s]+//g;
-		$inputname = $tmp unless $inputname;
 		$inputname =~ s/\!+//g;
         $inputname =~ s/^(\W+|the|an|and|a)\s+//i;
         $names{ucfirst(&charconv($inputname))} = undef; 
 
         $inputname =~ s/(,|\(|\)|\W+$)//g;
-        $inputname =~ s/($prepositions)\s+apcupsd$//io;
+        $inputname =~ s/($prepositions)\s+bacula$//io;
         my ($rest,$trailing) = $inputname =~ /(.+)\s+(\w+)$/;
         if ($trailing and length($trailing) < 3 and $rest !~ /(a|an|and|the)$/i) {
                 ($rest,$trailing) = $inputname =~ /(.+)\s+(\w+\s+\w+)$/; 
-                $trailing =~ s/^($prepositions)\s+//io if $trailing;  # Drop leading Prepositions and space
+                $trailing =~ s/^($prepositions)\s+//io;  # Drop leading Prepositions and space
         }
 
         if ($trailing and $rest) {
@@ -1438,26 +1449,16 @@ sub charconv {
 	return $outbfr . $string;
 }
 
-# Send index entries to the output. The first argument can either be a scalar
-#  index entry, or it can be a pointer to a hash of index entries.
 sub htmlInsertIndex {
         my ($names,$indexType) = @_;
 
 		if (ref($names) eq "HASH") {
 			# Names are passed as keys of a hash.
 			foreach (keys(%$names)) {
-				if ($indexType) {
 					&htmlPrint("\\index[$indexType]{$_ }\n");
-				} else {
-					&htmlPrint("\\index{$_ }\n");
-				}
 			}
 		} else {
-			if ($indexType) {
-				&htmlPrint("\\index[$indexType]{$names }\n");
-			} else {
-				&htmlPrint("\\index{$names }\n");
-			}
+			&htmlPrint("\\index[$indexType]{$names }\n");
 		}
 }
 
@@ -2106,6 +2107,7 @@ sub htmlWebEQEquation {
     &htmlPrint($WebTeXEndChar);
 
 }
+
 
 #
 # We replace WebTeX commands with the appropriate LaTeX commands

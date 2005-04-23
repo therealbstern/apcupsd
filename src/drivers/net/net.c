@@ -140,8 +140,7 @@ static int getupsvar(UPSINFO *ups, char *request, char *answer, int anslen)
     const char *stat_match = NULL;
     char *find;
     int nfields = 0;
-    char format[21];
-    
+     
     for (i=0; cmdtrans[i].request; i++) 
 	if (!(strcmp(cmdtrans[i].request, request))) {
 	     stat_match = cmdtrans[i].upskeyword;
@@ -151,12 +150,11 @@ static int getupsvar(UPSINFO *ups, char *request, char *answer, int anslen)
     if (stat_match) {
 	if ((find=strstr(nid->statbuf, stat_match)) != NULL) {
 	     if (nfields == 1) {      /* get one field */
-	         asnprintf(format, sizeof(format), "%%*s %%*s %%%ds", anslen);
-                 sscanf(find, format, answer);
+                 sscanf (find, "%*s %*s %s", answer);
 	     } else {			  /* get everything to eol */
 		 i = 0;
 		 find += 11;  /* skip label */
-                 while (*find != '\n' && i < anslen-1)
+                 while (*find != '\n')
 		     answer[i++] = *find++;
 		 answer[i] = 0;
 	     }
@@ -170,7 +168,7 @@ static int getupsvar(UPSINFO *ups, char *request, char *answer, int anslen)
        Dmsg1(100, "Hey!!! No match in getupsvar for %s!\n", request);
     }
 
-    astrncpy(answer, "Not found", anslen);
+    strcpy(answer, "Not found");
     return 0;
 }
 

@@ -165,7 +165,7 @@ hid_usage_page(int i)
 	for (k = 0; k < npages; k++)
 		if (pages[k].usage == i)
 			return pages[k].name;
-	asnprintf(b, sizeof(b), "0x%04x", i);
+	sprintf(b, "0x%04x", i);
 	return b;
 }
 
@@ -187,7 +187,7 @@ hid_usage_in_page(unsigned int u)
 	for (j = 0; j < pages[k].pagesize; j++) {
 		us = pages[k].page_contents[j].usage;
 		if (us == -1) {
-			asnprintf(b, sizeof(b),
+			sprintf(b,
 			    fmtcheck(pages[k].page_contents[j].name, "%d"),
 			    i);
 			return b;
@@ -196,7 +196,7 @@ hid_usage_in_page(unsigned int u)
 			return pages[k].page_contents[j].name;
 	}
  bad:
-	asnprintf(b, sizeof(b), "0x%04x", i);
+	sprintf(b, "0x%04x", i);
 	return b;
 }
 

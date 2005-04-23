@@ -24,7 +24,7 @@
 //
 // Author          : Christopher S. Hull
 // Created On      : Sat Jan 31 15:55:00 2004
-// $Id: compat.cpp,v 1.3 2005-03-29 01:28:57 adk0212 Exp $
+// $Id: compat.cpp,v 1.2 2005-03-19 09:55:10 kerns Exp $
 
 #include <stdio.h>
 
@@ -899,13 +899,12 @@ CreateChildProcess(const char *cmdline, HANDLE in, HANDLE out, HANDLE err)
     if (comspec == NULL) // should never happen
         return INVALID_HANDLE_VALUE;
 
-    int cmdLineLen = strlen(cmdline) + strlen(comspec) + 16;
-    char *cmdLine = (char *)alloca(cmdLineLen);
+    char *cmdLine = (char *)alloca(strlen(cmdline) + strlen(comspec) + 16);
     
-    astrncpy(exeFile, comspec, sizeof(exeFile));
-    astrncpy(cmdLine, cmdLineLen, comspec);
-    astrncat(cmdLine, cmdLineLen, " /c ");
-    astrncat(cmdLine, cmdLineLen, cmdline);
+    strcpy(exeFile, comspec);
+    strcpy(cmdLine, comspec);
+    strcat(cmdLine, " /c ");
+    strcat(cmdLine, cmdline);
 
     // try to execute program
     bFuncRetn = CreateProcess(exeFile,

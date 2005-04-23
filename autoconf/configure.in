@@ -810,7 +810,10 @@ AC_HELP_STRING([--disable-snmp], [No SNMP UPS code (default)])],
 	      [AC_CHECK_LIB(netsnmp, snmp_open,
 		[LIBS="$LIBS -lnetsnmp"
 		 NET_SNMP_DRIVER_ENABLED="yes"],
-		AC_MSG_ERROR([Cannot find SNMP libraries.]))
+		[echo " "
+		 echo "=======	snmp libraries not found, disabling SNMP driver. ======"  
+		 echo " "
+		 SNMP_DRIVER_ENABLED="no"])
 	     ])
 	fi],
     [])
@@ -838,7 +841,7 @@ AC_HELP_STRING([--disable-net-snmp], [No NET-SNMP UPS code (default)])],
 		  [], [])
 	    AC_CHECK_LIB(netsnmp, snmp_open,
 	      [LIBS="$LIBS -lnetsnmp"],
-	      AC_MSG_ERROR([Cannot find SNMP libraries.]))
+	      [echo '  disabling NET-SNMP driver.'; NET_SNMP_DRIVER_ENABLED="no"])
 	fi],
     [])
 

@@ -43,8 +43,8 @@ int main(int argc, char **argv)
 	 if (++i < argc)
 	    emsg.lpszNoteText = argv[i];
       } else {				       /* address */
-         astrncpy(addr, "SMTP:", sizeof(addr));
-	 astrncat(addr, argv[i], sizeof(addr));
+         strcpy(addr, "SMTP:");
+	 strcat(addr, argv[i]);
 	 recip.lpszAddress = addr;
 	 recip.lpszName = argv[i];
       }
@@ -54,7 +54,7 @@ int main(int argc, char **argv)
 
    if (err != SUCCESS_SUCCESS) {
       char buf[100];
-      asnprintf(buf, sizeof(buf), "MAPI error code = %d", (int)err);
+      sprintf(buf, "MAPI error code = %d", (int)err);
 
 // Note, if we put up a dialogue box, this may stall the
 // calling script, not a good thing.

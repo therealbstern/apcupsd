@@ -141,7 +141,7 @@ void get_apc_model(UPSINFO *ups)
 
     if (strlen(response)) {
         ups->mode.long_name[0] = '\0';
-        asnprintf(ups->mode.long_name, sizeof(ups->mode.long_name), "%s", response);
+        sprintf(ups->mode.long_name, "%s", response);
 	return;
     }
 
@@ -151,7 +151,7 @@ void get_apc_model(UPSINFO *ups)
     if (strlen(response)) {
 	cp = get_apc_model_V_codes(response, ups);
 	if (cp != ups->mode.long_name)
-            asnprintf(ups->mode.long_name, sizeof(ups->mode.long_name), "%s", cp);
+            sprintf(ups->mode.long_name, "%s", cp);
 	return;
     }
 

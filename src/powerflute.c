@@ -249,10 +249,10 @@ static void write_mesg(const char *fmt, ...) {
 	static char buffer[1024];
 	int x, y;
 
-	memset(buffer, 0, sizeof(buffer));
+	memset(buffer, 0, 1024);
 
 	va_start(args, fmt);
-	avsnprintf(buffer, sizeof(buffer)-1, fmt, args);
+	vsprintf(buffer, fmt, args);
 	va_end(args);
 
         buffer[strlen(buffer)] = '\n';
@@ -289,7 +289,7 @@ static void write_mesg(const char *fmt, ...) {
 		 * Scroll the buffer.
 		 */
 		for (y = 1; y < 8; y++) {
-			astrncpy(mesgbuf[y-1], mesgbuf[y], sizeof(mesgbuf[y-1]));
+			strcpy(mesgbuf[y-1], mesgbuf[y]);
 		}
 		/*
 		 * Now point to the last line of the mesgbuf.
@@ -305,7 +305,7 @@ static void write_mesg(const char *fmt, ...) {
 	/*
 	 * y now point to a free slot.
 	 */
-	astrncpy(mesgbuf[y], buffer, sizeof(mesgbuf[y]));
+	strcpy(mesgbuf[y], buffer);
 }
 
 void update_upsdata(int sig) {
@@ -535,7 +535,7 @@ char * do_menu(int * pos, ITEM **it0, int pos_x) {
 	} while (menu_driver(mu, menu_virtualize(mc))
 			!= E_UNKNOWN_COMMAND);
 
-	astrncpy(answer, item_name(current_item(mu)), sizeof(answer));
+	strcpy(answer, item_name(current_item(mu)));
 
 out_nokey:
 	unpost_menu(mu);
