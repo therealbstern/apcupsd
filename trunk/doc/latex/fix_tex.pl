@@ -1,7 +1,5 @@
 #!/usr/bin/perl -w
-# Finds multiple hyphens not inside a verbatim environment (or \verb).  
-#   Places these inside a \verb{} contruct so they will not be converted
-#   to single hyphen by latex or latex2html.
+# Fixes various things within tex files.
 
 use strict;
 
@@ -31,14 +29,8 @@ sub get_includes {
 
 sub convert_files {
 	my (@files) = @_;
-	my ($linecnt,$filedata,$output,$thiscnt,$cnt);
+	my ($linecnt,$filedata,$output,$itemcnt,$indentcnt,$cnt);
 	
-	# Build the test string to check for the various environments.
-	#   We only do the conversion if the multiple hyphens are outside of a 
-	#   verbatim environment (either \begin{verbatim}...\end{verbatim} or 
-	#   \verb{--}).  Capture those environments and pass them to the output
-	#   unchanged.
-
 	$cnt = 0;
 	foreach my $file (@files) {
 		# Open the file and load the whole thing into $filedata. A bit wasteful but
@@ -50,14 +42,12 @@ sub convert_files {
 		}
 		close IF;
 		
-		# Set up to process the file data.
-		$thiscnt = 0;
-
 		# We look for a line that starts with \item, and indent the two next lines (if not blank)
 		#  by three spaces.
 		my $linecnt = 3;
-		my $itemcnt = 0;
+		$indentcnt = 0;
 		$output = "";
+		# Process a line at a time.
 		foreach (split(/\n/,$filedata)) {
 			$_ .= "\n"; # Put back the return.
 			# If this line is less than the third line past the \item command,
@@ -67,7 +57,7 @@ sub convert_files {
 			if ($linecnt < 3 and !/^\\item/) {
 				if (/^[^\n\s]/) {
 					$output .= "   " . $_;
-					$thiscnt++;
+					$indentcnt++;
 				} else {
 					$output .= $_;
 				}
@@ -78,18 +68,87 @@ sub convert_files {
 			}
 			/^\\item / and $linecnt = 1;
 		}
+
+		
+		# This is an item line.  We need to process it too. If inside a \begin{description} environment, convert 
+		#  \item {\bf xxx} to \item [xxx] or \item [{xxx}] (if xxx contains '[' or ']'.
+		$itemcnt = 0;
+		$filedata = $output;
+		$output = "";
+		my ($before,$descrip,$this,$between);
+
+		# Find any \begin{description} environment
+		while ($filedata =~ /(\\begin[\s\n]*\{[\s\n]*description[\s\n]*\})(.*?)(\\end[\s\n]*\{[\s\n]*description[\s\n]*\})/s) {
+			$output .= $` . $1;
+			$filedata = $3 . $';
+			$descrip = $2;
+
+			# Search for \item {\bf xxx}
+			while ($descrip =~ /\\item[\s\n]*\{[\s\n]*\\bf[\s\n]*/s) {
+				$descrip = $';
+				$output .= $`;
+				($between,$descrip) = find_matching_brace($descrip);
+				if (!$descrip) {
+					$linecnt = $output =~ tr/\n/\n/;
+					print STDERR "Missing matching curly brace at line $linecnt in $file\n" if (!$descrip);
+				}
+
+				# Now do the replacement.
+				$between = '{' . $between . '}' if ($between =~ /\[|\]/);
+				$output .= "\\item \[$between\]";	
+				$itemcnt++;
+			}
+			$output .= $descrip;
+		}
+		$output .= $filedata;
 	
-		# If any hyphens were converted, save the file.
-		if ($thiscnt) {
+		# If any hyphens or \item commnads were converted, save the file.
+		if ($indentcnt or $itemcnt) {
 			open OF,">$file" or die "Cannot open output file $file";
 			print OF $output;
 			close OF;
-			print "$thiscnt line", ($thiscnt == 1) ? "" : "s"," Changed in $file\n";
+			print "$indentcnt indent", ($indentcnt == 1) ? "" : "s"," added in $file\n";
+			print "$itemcnt item", ($itemcnt == 1) ? "" : "s"," Changed in $file\n";
 		}
 
-		$cnt += $thiscnt;
+		$cnt += $indentcnt + $itemcnt;
 	}
 	return $cnt;
+}
+
+sub find_matching_brace {
+	# Finds text up to the next matching brace.  Assumes that the input text doesn't contain
+	#  the opening brace, but we want to find text up to a matching closing one.
+	# Returns the text between the matching braces, followed by the rest of the text following
+	#   (which does not include the matching brace).
+	# 
+	my $str = shift;
+	my ($this,$temp);
+	my $cnt = 1;
+
+	while ($cnt) {
+		# Ignore verbatim constructs involving curly braces, or if the character preceding
+		#  the curly brace is a backslash.
+		if ($str =~ /\\verb\*?\{.*?\{|\\verb\*?\}.*?\}|\{|\}/s) {
+			$this .= $`;
+			$str = $';
+			$temp = $&;
+
+			if ((substr($this,-1,1) eq '\\') or 
+				$temp =~ /^\\verb/) {
+					$this .= $temp;
+					next;
+			}
+				
+			$cnt +=  ($temp eq '{') ? 1 : -1;
+			# If this isn't the matching curly brace ($cnt > 0), include the brace.
+			$this .= $temp if ($cnt);
+		} else {
+			# No matching curly brace found.
+			return ($this . $str,'');
+		}
+	}
+	return ($this,$str);
 }
 
 sub check_arguments {
@@ -115,6 +174,7 @@ my @includes;
 my $cnt;
 
 check_arguments(\%args);
+die "No Files given to Check\n" if ($#ARGV < 0);
 
 # Examine the file pointed to by the first argument to get a list of 
 #  includes to test.
