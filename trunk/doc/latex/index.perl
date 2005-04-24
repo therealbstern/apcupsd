@@ -435,9 +435,10 @@ sub add_bbl_and_idx_dummy_commands {
 	#}
 	$global{'max_id'} = $id;
 	# KEC. Modified to global substitution to place multiple index tokens.
-	s/([\\]begin\s*$O\d+$C\s*theindex)/\\textohtmlindex $1/go;
+	s/[\\]begin\s*($O\d+$C)\s*theindex/\\textohtmlindex$1/go;
 	# KEC. Modified to pick up the optional argument to \printindex
-	s/([\\]printindex(\s*\[.*?\])?)/\\textohtmlindex $1/go;
+	s/[\\]printindex\s*(\[.*?\])?/
+		do { (defined $1) ? "\\textohtmlindex $1" : "\\textohtmlindex []"; } /ego;
 	&lib_add_bbl_and_idx_dummy_commands() if defined(&lib_add_bbl_and_idx_dummy_commands);
 }
 
@@ -463,54 +464,45 @@ sub add_bbl_and_idx_dummy_commands {
 #  Build index_labels if needed.
 #  Create the index headings and put them in the output stream.
 
-{ my $index_number = -1;  # Will be incremented before use.
+{ my $index_number = 0;  # Will be incremented before use.
 	my $first_idx_file;  # Static
-	my %ids_done;
+	my $no_increment = 0;
+
 sub do_cmd_textohtmlindex {
 	local($_) = @_;
 	my ($idxref,$idxnum,$index_name);
 
-	# If the index is delineated by \\begin<<br_id>>theindex<<br_id>> we get
-	#  the br_id from it. Otherwise, it may be delineated by \printindex{idxref}, 
-	#  in which case get get that reference. Otherwise, it may be delineated by
-	#  [br_id].
-	# Grab the index reference from whatever form the input was in.
-	if ((($idxnum) = /^\\begin<<\d+>>theindex<<(\d+)>>/)) {
-	} elsif (/^\\printindex[^[\[]/) {
-		$idxnum = 0;
-	} elsif (!(($idxref) = /^\\printindex\[(.*?)\]/)) {
-		($idxnum) = /^\[(.*?)\]/;
+	# We get called from make_name with the first argument = "\001noincrement". This is a sign
+	#  to not increment $index_number the next time we are called. We get called twice, once
+	#  my make_name and once by process_command.  Unfortunately, make_name calls us just to set the name
+	#  but doesn't use the result so we get called a second time by process_command.  This works fine
+	#  except for cases where there are multiple indices except if they aren't named, which is the case
+	#  when the index is inserted by an include command in latex. In these cases we are only able to use
+	#  the index number to decide which index to draw from, and we don't know how to increment that index
+	#  number if we get called a variable number of times for the same index, as is the case between
+	#  making html (one output file) and web (multiple output files) output formats.
+	if (/\001noincrement/) {
+		$no_increment = 1;
+		return;
 	}
 
-	# If the type is idxnum, get the index_name (title) from the sequential list based
-	#  on the order of newindex commands.  If the type is idxref, get the title
-	#  based on that. For the default index done with begin{theindex} , idxnum 
-	#  will be there but it will refer to.  For the default index with the \printindex
-	#  command, the ref will be missing, so we use the default, which is nothing.
-	#  nothing.  
-	if (defined $idxnum) {
-		# If we've not seen this idxref before, increment index_number.
-		if (!exists $ids_done{$idxnum}) {
-			$index_number++;
-			$ids_done{$idxnum} = undef;
-		}
-		$idxref = $indices{'newcmdorder'}->[$index_number];
-	} else {
-		if (!exists $ids_done{$idxref}) {
-			$index_number++;
-			$ids_done{$idxref} = undef;
-		}
-	}
+	# Remove (but save) the index reference 
+	s/^\s*\[(.*?)\]/{$idxref = $1; "";}/e;
 
-	if (!defined($idxref)) {
-		# This handles the default index.
-		$idxref = '';
-		$index_name = "Index";
-	} else {
+	# If we have an $idxref, the index name was specified.  In this case, we have all the
+	#  information we need to carry on.  Otherwise, we need to get the idxref
+	#  from the $index_number and set the name to "Index".
+	if ($idxref) {
 		$index_name = $indices{'title'}{$idxref};
+	} else {
+		if (defined ($idxref = $indices{'newcmdorder'}->[$index_number])) {
+			$index_name = $indices{'title'}{$idxref};
+		} else { 
+			$idxref = '';
+			$index_name = "Index";
+		}
 	}
 
-		
 	$idx_title = "Index"; # The name displayed in the nav bar text.
 
 	# Only set $idxfile if we are at the first index.  This will point the 
@@ -527,6 +519,8 @@ sub do_cmd_textohtmlindex {
 		, &make_section_heading($TITLE, $idx_head)
 		, $idx_mark, "\002", $idxref, "\002" );
 	local($pre,$post) = &minimize_open_tags($heading);
+	$index_number++ unless ($no_increment);
+	$no_increment = 0;
 	join('',"<BR>\n" , $pre, $_);
 }
 }
@@ -566,7 +560,5 @@ sub add_idx_key {
 	}
 	return $index;
 }
-
-
 
 1;  # Must be present as the last line.
