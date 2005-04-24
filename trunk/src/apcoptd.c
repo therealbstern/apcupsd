@@ -48,7 +48,7 @@ enum {
     OPT_KILLPWR,
     OPT_TERMONPWRFAIL,
     OPT_KILLONPWRFAIL,
-    OPT_PIDFILE,
+    OPT_PIDFILE
 };
 
 static const struct option longoptions[] = {

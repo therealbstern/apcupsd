@@ -75,7 +75,7 @@ typedef enum {
     USB_UPS,    /* USB UPS driver       */
     SNMP_UPS,   /* SNMP UPS driver      */
     NETWORK_UPS,/* NETWORK UPS driver   */
-    TEST_UPS,   /* TEST UPS Driver      */
+    TEST_UPS    /* TEST UPS Driver      */
 } UpsMode;
 
 typedef enum {
