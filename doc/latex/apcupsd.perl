@@ -70,12 +70,16 @@ sub make_name {
 	my $final_name;
 	if ($LONG_TITLES) {
 		$saved = $_;
+		# This alerts the subroutine textohtmlindex not to increment its index counter on the next call.
+		&do_cmd_textohtmlindex("\001noincrement");
 		&process_command($sections_rx, $_) if /^$sections_rx/;
 		$title = &make_apcupsd_title($TITLE)
 			unless ((! $TITLE) || ($TITLE eq $default_title));
 		$_ = $saved;
 	} elsif ($CUSTOM_TITLES) {
 		$saved = $_;
+		# This alerts the subroutine textohtmlindex not to increment its index counter on the next call.
+		&do_cmd_textohtmlindex("\001noincrement");
 		&process_command($sections_rx, $_) if /^$sections_rx/;
 		$title = &custom_title_hook($TITLE)
 			unless ((! $TITLE) || ($TITLE eq $default_title));
