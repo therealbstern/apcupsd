@@ -322,7 +322,7 @@ int asnprintf(char *str, size_t size, const char *fmt,  ...);
 char *astrncpy(char *dest, const char *src, int maxlen);
 char *astrncat(char *dest, const char *src, int maxlen);
 struct tm *localtime_r(const time_t *timep, struct tm *tm);
-char *afgets(char *s, int size, FILE *fd);;
+char *afgets(char *s, int size, FILE *fd);
 void *amalloc(size_t size);
 void *arealloc (void *buf, size_t size);
 void *acalloc (size_t size1, size_t size2);
