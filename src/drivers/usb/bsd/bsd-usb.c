@@ -191,6 +191,14 @@ static int open_usb_device(UPSINFO *ups)
     char devname[USB_MAX_DEVNAMELEN + 5 + 1];
     struct usb_device_info devinfo;
     USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
+
+    /*
+     * Note, we set ups->fd here so the "core" of apcupsd doesn't
+     * think we are a slave, which is what happens when it is -1.
+     * (ADK: Actually this only appears to be true for apctest as
+     * apcupsd proper uses the UPS_SLAVE flag.)
+     * Internally, we use the fd in our own private space   
+     */
     ups->fd = 1;
 
     /*
@@ -208,11 +216,6 @@ static int open_usb_device(UPSINFO *ups)
      * search them all.
      */
 
-    /*
-     * Note, we set ups->fd here so the "core" of apcupsd doesn't
-     * think we are a slave, which is what happens when it is -1
-     * Internally, we use the fd in our own private space   
-     */
     for (i=0; i<10; i++)
     {
         if (init_device(ups, ups->device))
