@@ -327,7 +327,7 @@ int hidu_set_report(int fd, hid_item_t* item, unsigned char* data, int len)
     req.ucr_actlen = 0;
     req.ucr_addr = 0;
     req.ucr_data = data;
-    req.ucr_request.bmRequestType = UT_WRITE_CLASS_ENDPOINT;
+    req.ucr_request.bmRequestType = UT_WRITE_CLASS_INTERFACE;
     req.ucr_request.bRequest = UR_SET_REPORT;
     USETW(req.ucr_request.wValue, ((item->kind+1) << 8) | item->report_ID);
     USETW(req.ucr_request.wIndex, 0);
