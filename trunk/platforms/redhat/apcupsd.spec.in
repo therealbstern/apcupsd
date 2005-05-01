@@ -95,7 +95,7 @@ Requires: gd >= 2.0
 Requires: gd < 2.0
 %endif
 %if %{rh7}
-Requires: glibc >= 2.2, ligjpeg, libpng, zlib, freetype
+Requires: glibc >= 2.2, libjpeg, libpng, zlib, freetype
 %else
 Requires: glibc >= 2.3
 %endif
@@ -391,6 +391,8 @@ fi
 %endif
 
 %changelog
+* Sat Apr 30 2005 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- fix typo in rh7 dependencies
 * Sat Mar 12 2005 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - clean up halt insertion code, add check for whitebox-release
 - remove cruft that has been commented out for a long time
