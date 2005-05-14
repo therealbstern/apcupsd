@@ -203,22 +203,22 @@ go.  If you have just bought a state-of-the-art smart UPS with a USB or
 Ethernet interface, and you are running a current version of Red Hat or SUSE
 Linux (8.0 or later), then apcupsd is very nearly plug-and-play and you will
 have to read only the Basic User's Guide (see 
-\ilink{Basic User's Guide}{manual.tex#Basic-User_0027s-Guide}).  
+\ilink{Basic User's Guide}{Basic-User_0027s-Guide}).  
 
 If your operating system is older, or if you have an old-fashioned serial-line
 UPS, you'll have to read about serial installation (see 
 \ilink{Installation on Serial-Line
-UPSes}{manual.tex#Installation-on-Serial_002dLine-UPSes}).  If you need more
+UPSes}{Installation-on-Serial_002dLine-UPSes}).  If you need more
 details about administration for unusual situations (such as a master/slave or
 multi-UPS setup) you'll need to read the section on advanced topics (see 
-\ilink{Advanced topics}{manual.tex#Advanced-topics}). Finally, there is a
+\ilink{Advanced topics}{Advanced-topics}). Finally, there is a
 Technical Reference (see 
-\ilink{Technical Reference}{manual.tex#Technical-Reference}) section which
+\ilink{Technical Reference}{Technical-Reference}) section which
 gives full details on things like configuration file directives and
 event-logging formats.  
 
 You should begin by reading the Quick Start (see 
-\ilink{Quick Start for Beginners}{manual.tex#Quick-Start-for-Beginners})
+\ilink{Quick Start for Beginners}{Quick-Start-for-Beginners})
 instructions. 
 
 \label{Basic-User_0027s-Guide}
@@ -231,7 +231,6 @@ instructions.
 \label{index-User_0027s-Guide-4}
 
 \label{Planning-Your-Installation}
-
 \section*{Planning Your Installation}
 \index{Installation!Planning Your }
 \index{Planning Your Installation }
@@ -256,28 +255,31 @@ The following is a help guide to the steps needed to get apcupsd set up and
 running as painlessly as possible.  
 
 \begin{enumerate}
-\item First, check to see if apcupsd supports your UPS and operating system
+\item Check to see if apcupsd supports your UPS and cable
+   (see \ilink{Supported UPSes and Cables} 
+   {Supported-UPSes}).  
+\item Check to see if apcupsd supports your operating system
    (see 
-   \ilink{Supported Operating Systems; UPSes and
-Cables}{manual.tex#Supported-Operating-Systems_003b-UPSes-and-Cables}).  
-\item Second, plan your configuration type (see 
+   \ilink{Supported Operating Systems}
+   {Supported-Operating-Systems_003b}).  
+\item Plan your configuration type (see 
    \ilink{Choosing a Configuration
-   Type}{manual.tex#Choosing-a-Configuration-Type}).  If you have just one UPS
-and one computer, this is easy.  If you have more than one machine being
-served by the same UPS, or more than one UPS supplying power to computers that
-are on the same local network, you have more choices to make.  
-\item Third, figure out if you have one of the easy setups.  If you have a USB
+   Type}{Choosing-a-Configuration-Type}).  If you have just one UPS
+   and one computer, this is easy.  If you have more than one machine being
+   served by the same UPS, or more than one UPS supplying power to computers that
+   are on the same local network, you have more choices to make.  
+\item Figure out if you have one of the easy setups.  If you have a USB
    UPS, and a USB-capable recent Linux such as Red Hat or SuSE at version 8.0,
    and you want to use one UPS with one computer, that's an easy setup.  APC
-supplies the cable needed to talk with that UPS along with the UPS. All you
-need to do is check that your USB subsystem is working (see 
-\ilink{Checking Out Your USB
-Subsystem}{manual.tex#Checking-Out-Your-USB-Subsystem}); if so, you can go to
-the build and install step.  
+   supplies the cable needed to talk with that UPS along with the UPS. All you
+   need to do is check that your USB subsystem is working (see 
+   \ilink{Checking Out Your USB
+   Subsystem}{Checking-Out-Your-USB-Subsystem}); if so, you can go to
+   the build and install step.  
 \item If you have a UPS designed to communicate via SNMP over Ethernet, that
    is also a relatively easy installation. It's in Advanced Topics (see 
-   \ilink{Advanced topics}{manual.tex#Advanced-topics}) mainly because it's an
-unusual situation.  
+   \ilink{Advanced topics}{Advanced-topics}) mainly because it's an
+   unusual situation.  
 \item If you have a UPS that communicates via an RS232C serial interface and
    it is a SmartUPS, then things are relatively simple, otherwise, your life is
    about to get interesting.  
@@ -286,17 +288,17 @@ unusual situation.
 \item If you have a vendor-supplied cable, find out what cable type you have
    by looking on the flat ends of the cable for a number, such as 940-0020A,
    stamped in the plastic.  Check the cables column of the table of types (see 
-\ilink{type\_table}{manual.tex#type_005ftable}) to see if it's a supported
-type.  
+   \ilink{type\_table}{type_005ftable}) to see if it's a supported
+   type.  
 \item If you don't have a vendor-supplied cable, or your type is not
    supported, you may have to build one yourself (see 
-   \ilink{Cables}{manual.tex#Cables}).  Here is hoping you are good with a
-soldering iron!  
+   \ilink{Cables}{Cables}).  Here is hoping you are good with a
+   soldering iron!  
 \end{enumerate}
 
 \item Now you are ready to read the Building and Installing (see 
    \ilink{Building and Installing
-   apcupsd}{manual.tex#Building-and-Installing-apcupsd}) section of the manual
+   apcupsd}{Building-and-Installing-apcupsd}) section of the manual
 and follow those directions.  If you are installing from an RPM or some other
 form of binary package, this step will probably consist of executing a single
 command.  
@@ -304,16 +306,16 @@ command.
    be.  
 \item Change the BIOS settings (see 
    \ilink{Arranging for Reboot on
-   Power-Up}{manual.tex#Arranging-for-Reboot-on-Power_002dUp}) on your computer
+   Power-Up}{Arranging-for-Reboot-on-Power_002dUp}) on your computer
 so that boots up every time it gets power. (This is not the default on most
 systems.)  
 \item To verify that your UPS is communicating with your computer and will do
    the right thing when the power goes out, read and follow the instructions in
    the Testing (see 
-\ilink{Testing Apcupsd}{manual.tex#Testing-Apcupsd}) section.  
+\ilink{Testing Apcupsd}{Testing-Apcupsd}) section.  
 \item If you run into problems, read the Troubleshooting (see 
    \ilink{Troubleshooting Your
-   Installation}{manual.tex#Troubleshooting-Your-Installation}) section of this
+   Installation}{Troubleshooting-Your-Installation}) section of this
 manual.  
 \item If you still need help, send a message to the developer's email list 
    \elink{apcupsd-users at lists.sourceforge.net}{mailto:apcupsd-users at
@@ -321,165 +323,21 @@ manual.
 are using, what operating system you are using, and anything else you think
 might be helpful.  
 \item Read the manual sections on 
-   \ilink{monitoring}{manual.tex#monitoring} and 
-   \ilink{maintaining}{manual.tex#maintaining} your UPS.  
+   \ilink{monitoring}{monitoring} and 
+   \ilink{maintaining}{maintaining} your UPS.  
 \end{enumerate}
 
-\label{Supported-Operating-Systems_003b-UPSes-and-Cables}
+\include{supportedoses}
 
-\subsection*{Supported Operating Systems, UPSes and Cables}
-\index{Cables!Supported Operating Systems UPSes and }
-\index{Supported Operating Systems, UPSes and Cables }
-\addcontentsline{toc}{subsection}{Supported Operating Systems, UPSes and
-Cables}
-
-\label{index-Supported-OSes-8}
-\label{index-OSes-Supported-9}
-Please note that due to the lack of Unix USB API standards, the USB code in
-apcupsd works only on Linux and *BSD systems. In addition, at the current
-release (3.10.17) the USB support for *BSD systems can at best be considered
-BETA due to fragile kernel drivers. Drivers for other OSes can be written, but
-it requires someone with a knowledge of the OS and the USB to do so.  (This
-lack of a Unix USB API interface is one of the big failings of Unix.  It
-occurs in other areas such as the GUI. Many people tout the diversity as an
-advantage, but it is in fact a weakness.)  
-
-The apcupsd maintainers develop it under Fedora (Red Hat); that port is,
-accordingly, the most up to date and best tested.  There are enough Debian
-Linux users that that port is also generally pretty fresh.  Slackware Linux is
-also fully supported.  
-
-apcupsd has also been ported to FreeBSD, NetBSD, OpenBSD, HP/UX, Solaris,
-Alpha Unix and the Cygwin Unix emulation under Windows. It is quite likely to
-work on those systems, though the port may occasionally get stale and require
-minor tweaking.  
-
-In 
-\ilink{Operating System Specifics}{manual.tex#Operating-System-Specifics}
-you'll find operating-system-specific tips for building and configuring
-apcupsd.  
-
-You can generally count on your UPS being supported if it has either an
-Ethernet-connected SNMP interface or a USB interface with an APC-supplied
-cable.  
-
-\label{upstypes}
-The ``UPSTYPE Keyword'' field is the value you will put in your
-/etc/apcupsd/apcupd.conf file to tell apcupsd what type of UPS you have. 
-We'll describe the possible values here, because they're a good way to explain
-your UPS's single most important interface property {--} the kind of protocol
-it uses to talk with its computer.  
-
-\label{index-UPSTYPE-10}
-\label{index-Keywords_002c-USBTYPE-11}
-
-\begin{description}
-
-\item [apcsmart]
-   \index{apcsmart }
-   An APCSmart UPS and its computer also communicate through an RS232C serial
-connection, but they actually use it as a character channel (2400bps, 8 data
-bits, 1 stop bit, no parity) and pass commands back and forth in a primitive
-language (see 
-\ilink{APC smart protocol}{manual.tex#APC-smart-protocol}) resembling
-modem-control codes.  The different APC UPSes all use closely related
-firmware, so the language doesn't vary much (later versions add more
-commands).  This class of UPS is in decline, rapidly being replaced in APC's
-product line by USB UPSes.  
-
-\item [usb]
-   \index{usb }
-   A USB UPS speaks a universal well defined control language over a USB wire. 
-Most of APC's lineup now uses this method as of late 2003, and it seems likely
-to completely take over in their low- and middle range.  Other manufacturers
-(Belkin, Tripp-Lite, etc.) are moving the same way, though with a different
-control protocol for each manufacturer.  As long as USB hardware can be
-mass-produced more cheaply than an Ethernet card, most UPSes are likely to go
-this design route. Please note that even if you have a USB UPS, if you use a
-serial cable with it (as can be supplied by APC), you will need to configure
-your UPS as {\bf apcsmart} rather than {\bf usb}.  
-
-\item [net]
-   \index{net }
-   This is the keyword to specify if you are using your UPS in Slave mode (i.e.
-the machine is not directly connected to the UPS, but to another machine which
-is), and it is connected to the Master via an ethernet connection. You must
-have apcupsd's Network Information Services NIS turned on for this mode to
-work. It is a much simpler form of running a Slave than the old Master/Slave
-code.  
-
-\item [snmp]
-   \index{snmp }
-   SNMP UPSes communicate via an Ethernet NIC and firmware that speaks Simple
-Network Management Protocol.  
-
-\item [dumb]
-   \index{dumb }
-   A dumb or voltage-signaling UPS and its computer communicate through the
-signal lines on an RS232C serial connection.  Not much can actually be
-conveyed this way other than an order to shut down. Voltage-signaling UPSes
-are obsolete; you are unlikely to encounter one other than as legacy hardware.
-If you have a choice, we recommend you avoid simple signalling UPSes.  
-\end{description}
-
-The table shown below lists the APC model supported, and the possible kewords
-that you would use in the configuration with the listed cables. Some of the
-models, particularly USB enabled models, can be run in multiple modes, so they
-may appear more than once in the table. APC is putting out new models at a
-furious rate, and so it is very likely that your model is not listed in the
-table. If it is USB enabled, it will probably work in USB mode. Please note
-that some of these new models are extremely inexpensive, so they are stripped
-down versions of more expensive units, and as such they do not offer as many
-features, so some of the example output you see elsewhere in this manual may
-not be available with your unit. 
-
-\label{type_005ftable}
-\label{index-UPSTYPE_002c-table-12}
-
-\addcontentsline{lot}{table}{Supported UPS Models}
-\begin{longtable}{p{1in}p{1in}p{1in}p{2in}}
-{{\bf APC Model}} & {{\it UPSTYPE Keyword}} & {{\it UPSCABLE keywords for
-Cables Supported}} & {{\it Status} 
- } \\
-{BackUPS CS/ES (serial mode)} & {apcsmart} & {smart (note: using Smart Custom
-RJ45) the new Back-UPS RS 500 models are reported NOT to work with this
-cable.} & {Supported 
- } \\
-{BackUPS Pro, Smarter BackUPS Pro} & {apcsmart} & {940-0095A} & {Supported 
- } \\
-{SmartUPS, SmartUPS VS (It has not been confirmed that the cable shipped with
-the VS is a 940-0095.), PowerStack 450, Matrix UPS, ShareUPS Advanced Port} &
-{apcsmart} & {smart (note: using Smart-Custom), 940-0024C } & {Supported 
- } \\
-{BackUPS CS USB, Pro USB, ES USB, RS/XS 1000, RS/XS 1500, and probably other
-USB models} & {usb} & {usb (note: using APC cables 940-0127A/B/C)} &
-{Supported in version \gt{}=3.9.8 
- } \\
-{SmartUPS USB, BackUPS Office USB, and any other USB UPS} & {usb} & {usb
-(note: using APC cable, no number)} & {Supported, version \gt{}=3.9.8 
- } \\
-{All SNMP-capable models} & {snmp} & {ether} & {Supported 
- } \\
-{BackUPS} & {dumb} & {simple (note: using Simple-Custom (This cable is not an
-APC product.  You have to build it yourself using the instructions in 
-\ilink{Cables}{manual.tex#Cables}.), 940-0020B, 940-0020C, 940-0119A,
-940-0023A} & {Supported 
- } \\
-{BackUPS Office, BackUPS ES} & {dumb} & {940-0119A} & {Supported 
- } \\
-{BackUPS CS and possibly ES models (serial mode)} & {dumb} & {940-0128A} &
-{Supported 
- } \\
-{ShareUPS Basic Port} & {dumb} & {940-0020B, 940-0020C, 940-0023A} &
-{Supported  
-}
-
-\end{longtable}
+\include{supportedupses}
 
 \label{Choosing-a-Configuration-Type}
-
 \label{index-Choosing-a-Configuration-Type-13}
 \label{index-Configuration-Type-14}
+\section*{Choosing a Configuration Type}
+\index{Choosing a Configuration Type} 
+\index{Configuration Types}
+\addcontentsline{toc}{section}{Choosing a Configuration Type}
 There are three major ways of running apcupsd on your system. The first is a
 standalone configuration where apcupsd controls a single UPS, which powers a
 single computer.  This is the most common configuration.  If you're working
@@ -513,32 +371,19 @@ Here is a diagram that summarizes the possibilities:
 
 {\bf Configuration types.}  
 
-\footnotesize
-\begin{verbatim}
-\end{verbatim}
-\normalsize
-
-\footnotesize
-\begin{verbatim}
-     \addcontentsline{lof}{figure}{Configuration Types}\includegraphics{./main_configs.eps}
-\end{verbatim}
-\normalsize
-
-\footnotesize
-\begin{verbatim}
-\end{verbatim}
-\normalsize
+\addcontentsline{lof}{figure}{Configuration Types}
+\includegraphics{./main_configs.eps}
 
 If you decide to set up one of these more complex configurations, see the
 Advanced Topics (see 
-\ilink{Advanced topics}{manual.tex#Advanced-topics}) section for details. 
+\ilink{Advanced topics}{Advanced-topics}) section for details. 
 
 \label{Apcupsd-Known-USB-Issues}
 
-\subsection*{Apcupsd Known USB Issues}
+\section*{Apcupsd Known USB Issues}
 \index{Issues!Apcupsd Known USB }
 \index{Apcupsd Known USB Issues }
-\addcontentsline{toc}{subsection}{Apcupsd Known USB Issues}
+\addcontentsline{toc}{section}{Apcupsd Known USB Issues}
 
 \label{index-USB-problems-15}
 \label{index-Problems_002c-USB-16}
@@ -973,7 +818,7 @@ directory for additional information and details.
 
 Finally, check your Kernel Config. You will find more information about it at:
 
-\ilink{Kernel Config}{manual.tex#Kernel-Config}.  
+\ilink{Kernel Config}{Kernel-Config}.  
 
 KNOWN ISSUES WITH BSD USB  
 
@@ -1139,7 +984,7 @@ machine and are creating a standalone configuration, simply install the RPM
 with a normal {\tt rpm -ihv} command. You're done, and can now skip the rest
 of this chapter and go straight to tweaking your run-time configuration file.
 (see 
-\ilink{After Installation}{manual.tex#After-Installation})  
+\ilink{After Installation}{After-Installation})  
 
 If you have a previous installation, you can upgrade with a normal {\tt rpm
 -Uhv}, but this may not upgrade the halt script. It may be better to do the
@@ -1162,7 +1007,7 @@ located in /home/httpd/cgi-bin.
 \label{index-Installing_002c-Microsoft-21}
 If you have a binary release of the Win32 apcupsd, please see the instructions
 in the Advanced Topics (see 
-\ilink{Advanced topics}{manual.tex#Advanced-topics}) section of this manual. 
+\ilink{Advanced topics}{Advanced-topics}) section of this manual. 
 
 \label{Installation-from-Source}
 
@@ -1197,7 +1042,7 @@ The basic installation from a tar source file is rather simple:
 If all goes well, the {\tt ./configure} will correctly determine which
 operating system you are running and configure the source code appropriately.
 {\tt configure} currently recognizes the systems listed below in the 
-\ilink{Operating System Specifics}{manual.tex#Operating-System-Specifics}
+\ilink{Operating System Specifics}{Operating-System-Specifics}
 section of this chapter and adapts the configuration appropriately.  Check
 that the configuration report printed at the end of the {\tt configure}
 process corresponds to your choice of directories, options, and that it has
@@ -1664,30 +1509,30 @@ installation files:
 
 \begin{itemize}
 \item Alpha (see 
-   \ilink{Alpha}{manual.tex#Alpha})  
+   \ilink{Alpha}{Alpha})  
 \item Debian (see 
-   \ilink{Debian}{manual.tex#Debian})  
+   \ilink{Debian}{Debian})  
 \item FreeBSD (see 
-   \ilink{FreeBSD}{manual.tex#FreeBSD})  
+   \ilink{FreeBSD}{FreeBSD})  
 \item HPUX (see 
-   \ilink{HPUX}{manual.tex#HPUX})  
+   \ilink{HPUX}{HPUX})  
 \item NetBSD (see 
-   \ilink{NetBSD}{manual.tex#NetBSD})  
+   \ilink{NetBSD}{NetBSD})  
 \item OpenBSD (see 
-   \ilink{OpenBSD}{manual.tex#OpenBSD})  
+   \ilink{OpenBSD}{OpenBSD})  
 \item Red Hat (see 
-   \ilink{Red Hat Systems}{manual.tex#Red-Hat-Systems})  
+   \ilink{Red Hat Systems}{Red-Hat-Systems})  
 \item Slackware (see 
-   \ilink{Slackware}{manual.tex#Slackware})  
+   \ilink{Slackware}{Slackware})  
 \item SUSE (see 
-   \ilink{SUSE}{manual.tex#SUSE})  
+   \ilink{SUSE}{SUSE})  
 \item Solaris (see 
-   \ilink{Sun Solaris}{manual.tex#Sun-Solaris})  
+   \ilink{Sun Solaris}{Sun-Solaris})  
 \item unknown (see 
-   \ilink{Unknown System}{manual.tex#Unknown-System})  
+   \ilink{Unknown System}{Unknown-System})  
 \item Win32 (see 
    \ilink{Windows Systems with CYGWIN
-   Installed}{manual.tex#Windows-Systems-with-CYGWIN-Installed}) 
+   Installed}{Windows-Systems-with-CYGWIN-Installed}) 
 \end{itemize}
 
 \label{Alpha}
@@ -2157,7 +2002,7 @@ And to install apcupsd, do:
 \normalsize
 
 Finally, you should follow the Win32 (see 
-\ilink{Installation on Windows}{manual.tex#Installation-on-Windows})
+\ilink{Installation on Windows}{Installation-on-Windows})
 installation instruction, skipping the part that describes unZipping the
 binary release. 
 
@@ -2185,14 +2030,14 @@ from source, your next step should be to inspect your
 
 You can read the complete reference on configuration directives (see 
 \ilink{Configuration Directive
-Reference}{manual.tex#Configuration-Directive-Reference}), but if you are
+Reference}{Configuration-Directive-Reference}), but if you are
 setting up a normal standalone configuration you should only need to check
 (and possibly fix) the first three items listed below.  
 
 Your UPSTYPE should be the UPS's protocol type: dumb, apcsmart, usb, net,
 snmp, or ether.  Your UPSCABLE should be the type of cable you are using.  You
 should have gotten both from the table of types (see 
-\ilink{type\_table}{manual.tex#type_005ftable}); usually they will both be the
+\ilink{type\_table}{type_005ftable}); usually they will both be the
 string ``usb''.  
 
 If you have a USB device, it is better not to specify a DEVICE directive by
@@ -2221,7 +2066,7 @@ from an rpm file, you may have selected the wrong one {---} please ensure that
 the word {\it usb} appears in the rpm package name.  
 
 The next chapter (see 
-\ilink{Configuration Examples}{manual.tex#Configuration-Examples}) of this
+\ilink{Configuration Examples}{Configuration-Examples}) of this
 manual provides you with the essential characteristics of each main type of
 configuration file.  After those elements are correct, apcupsd should run, and
 then it is only a matter of customization of your setup. 
@@ -2351,7 +2196,7 @@ On SUSE systems:
 \normalsize
 
 Please see the Testing Apcupsd (see 
-\ilink{Testing Apcupsd}{manual.tex#Testing-Apcupsd}) chapter for more details
+\ilink{Testing Apcupsd}{Testing-Apcupsd}) chapter for more details
 on insuring that apcupsd is running properly. 
 
 \label{Configuration-Examples}
@@ -2544,7 +2389,7 @@ important changes such as a shutdown.
 There is a simpler form of contolling slaves using the net driver with an
 apcupsd NIS server. The simpler form is much easier to configure. See: see 
 \ilink{A Sample NIS Slave Configuration Using the Net
-Driver}{manual.tex#A-Sample-NIS-Slave-Configuration-Using-the-Net-Driver}
+Driver}{A-Sample-NIS-Slave-Configuration-Using-the-Net-Driver}
 below for details. 
 
 \label{A-Simple-Slave-Configuration}
@@ -2726,7 +2571,7 @@ The following testing procedures apply for the most part to apcsmart UPSes,
 whether USB or serial.  If you have a dumb voltage-signalling UPS, your
 testing procedures will be somewhat different, and you should see the section
 on Testing Serial UPSes (see 
-\ilink{Testing Serial-Line UPSes}{manual.tex#Testing-Serial_002dLine-UPSes}). 
+\ilink{Testing Serial-Line UPSes}{Testing-Serial_002dLine-UPSes}). 
 
 \label{Process_002dStatus-Test}
 
@@ -3255,7 +3100,7 @@ been properly updated by the install process to contain the logic to call {\tt
 apcupsd \verb{--{killpower} when it detects a power failure situation (the presence
 of a /etc/powerfail file). See the 
 \ilink{Building and Installing
-apcupsd}{manual.tex#Building-and-Installing-apcupsd} of this manual, or the
+apcupsd}{Building-and-Installing-apcupsd} of this manual, or the
 README files for additional details about the halt modifications necessary.  
 
 When you are ready to do the test, either simply pull the plug and wait for
@@ -3293,7 +3138,7 @@ are porting apcupsd to another system, or you are simply curious, you may want
 to know exactly what is going on during the shutdown process. If so, please
 see the Shutdown Sequence (see 
 \ilink{Shutdown Sequence
-\lt{}1\gt{}}{manual.tex#Shutdown-Sequence-_003c1_003e}) section of this
+\lt{}1\gt{}}{Shutdown-Sequence-_003c1_003e}) section of this
 manual. 
 
 \label{apctest}
@@ -3309,7 +3154,7 @@ perform a battery runtime calibration, program the EEPROM (serial connection
 only), and enter in TTY mode with the UPS. Here we describe how to use it for
 a USB or apcsmart UPS; see 
 \ilink{Using apctest on Serial-Line
-UPSses}{manual.tex#Using-apctest-on-Serial_002dLine-UPSses} for a description
+UPSses}{Using-apctest-on-Serial_002dLine-UPSses} for a description
 of how to use it with a voltage-signalling UPS.  
 
 Shutdown apcupsd if it is running. Make sure your {\bf
@@ -3399,7 +3244,7 @@ should some how become disconnected during the test.
 
 Item 5 is used to program the EEPROM. Please see the 
 \ilink{Configuration Directives Used to Set the UPS
-EPROM}{manual.tex#Configuration-Directives-Used-to-Set-the-UPS-EPROM} chapter
+EPROM}{Configuration-Directives-Used-to-Set-the-UPS-EPROM} chapter
 of this manual for the details.  
 
 Item 6 will initiate a direct communication between your terminal and the UPS
@@ -3408,7 +3253,7 @@ should be careful what commands you enter because you can cause your UPS to
 suddenly shutdown, or you can modify the EEPROM in a way to disable your UPS.
 The details of the raw Smart mode UPS commands can be found in the UPS Bible
 (see 
-\ilink{APC smart protocol}{manual.tex#APC-smart-protocol}) chapter of this
+\ilink{APC smart protocol}{APC-smart-protocol}) chapter of this
 manual.  
 
 Item 7 will terminate apctest. 
@@ -3581,7 +3426,7 @@ of all the {\bf STATUS} variables used by apcupsd. This can be very helpful
 for checking the condition of your UPS and to know whether or not apcupsd is
 properly connected to it. For a complete description of the variables and
 their meanings, please read the Status Format (see 
-\ilink{apcupsd Status Logging}{manual.tex#apcupsd-Status-Logging}) section of
+\ilink{apcupsd Status Logging}{apcupsd-Status-Logging}) section of
 the Technical Reference.  
 
 Please note that if you invoke apcaccess within the first 30 seconds of
@@ -3686,7 +3531,7 @@ The {\bf eprom} command line option for apcaccess allows you to examine the
 current values of your UPS' EPROM as well as to know the permitted values that
 can be set in the EPROM. For information about changing these values, see the
 section on tuning EEPROM parameters (see 
-\ilink{Configuring Your EEPROM}{manual.tex#Configuring-Your-EEPROM}).  
+\ilink{Configuring Your EEPROM}{Configuring-Your-EEPROM}).  
 
 A typical output from {\tt apcaccess eprom} is: 
 
@@ -3735,7 +3580,7 @@ programming. In addition, another feature is that you can write your own
 scripts that will be automatically called by apccontrol before any of its own
 code is executed. Details of the events and how to program them are contained
 in the Advanced topics section entitled Customizing Event Handling (see 
-\ilink{Customizing Event Handling}{manual.tex#Customizing-Event-Handling}). 
+\ilink{Customizing Event Handling}{Customizing-Event-Handling}). 
 
 \label{hid_002dups-and-USB-Specific-Information}
 
@@ -4815,14 +4660,14 @@ any information on this, please email us.
    \index{ A: }
    First you must know if you have an apcsmart UPS or a voltage-signalling UPS.
 See the table of supported UPSes (see 
-\ilink{type\_table}{manual.tex#type_005ftable}). If you have a apcsmart UPS,
+\ilink{type\_table}{type_005ftable}). If you have a apcsmart UPS,
 we recommend building a Custom Smart (see 
 \ilink{Smart-Custom Cable for
-SmartUPSes}{manual.tex#Smart_002dCustom-Cable-for-SmartUPSes}) cable. If you
+SmartUPSes}{Smart_002dCustom-Cable-for-SmartUPSes}) cable. If you
 have a voltage-signaling UPS, we recommend that you build a Custom Simple (see
 
 \ilink{Voltage-Signalling Cable for "dumb"
-UPSes}{manual.tex#Voltage_002dSignalling-Cable-for-_0022dumb_0022-UPSes})
+UPSes}{Voltage_002dSignalling-Cable-for-_0022dumb_0022-UPSes})
 cable.  
 
 \item [Q:]
@@ -5405,7 +5250,7 @@ slave, you can configure the slave to shut down in a predetermined time after
 the UPS goes on batteries.  
 
 If a picture is worth a thousand words for you, please see 
-\ilink{Configuration types.}{manual.tex#Configuration-types_005f}. 
+\ilink{Configuration types.}{Configuration-types_005f}. 
 
 \label{Configuration-Directives}
 
@@ -5421,12 +5266,12 @@ make some modifications to the apcupsd.conf files after the build is done.
 
 The minimum set of configuration directive changes needed to create a proper
 master and slave configuration files is described in the 
-\ilink{Configuration Examples}{manual.tex#Configuration-Examples} section of
+\ilink{Configuration Examples}{Configuration-Examples} section of
 this manual.  
 
 The details of these directives are explained in the 
 \ilink{Configuration Directives for Sharing a
-UPS}{manual.tex#Configuration-Directives-for-Sharing-a-UPS} section of the
+UPS}{Configuration-Directives-for-Sharing-a-UPS} section of the
 Configuration chapter of this document.  
 
 In addition, sample master and slave configuration files can be found in the
@@ -5450,7 +5295,7 @@ In addition, sample master and slave configuration files can be found in the
 For additional details of shutting down a master/slave configuration, please
 see the Master/Slave Shutdown section of the Shutdown chapter (see 
 \ilink{Shutdown Sequence
-\lt{}1\gt{}}{manual.tex#Shutdown-Sequence-_003c1_003e}) of the Technical
+\lt{}1\gt{}}{Shutdown-Sequence-_003c1_003e}) of the Technical
 Reference. 
 
 \label{Server_002fSlave-Networking-using-NIS-and-the-NET-Driver}
@@ -5739,7 +5584,7 @@ Master/slave problems are usually related to one of the following items:
 You may want to use your server to control multiple UPSes. This is possible by
 proper configuration and by running one copy of apcupsd for each UPS to be
 controlled (recall the 
-\ilink{Configuration types.}{manual.tex#Configuration-types_005f}). 
+\ilink{Configuration types.}{Configuration-types_005f}). 
 
 \label{Configuration}
 
@@ -5854,7 +5699,7 @@ Computer B could be shutdown by the first master that signaled it to do so.
 \addcontentsline{toc}{section}{Support for SNMP UPSes}
 
 \label{index-SNMP-162}
-\ilink{snmp}{manual.tex#snmp} To run apcupsd with an SNMP UPS, you need the
+\ilink{snmp}{snmp} To run apcupsd with an SNMP UPS, you need the
 following things:  
 
 \begin{itemize}
@@ -5907,7 +5752,7 @@ where the directive is made by four parts:
 
 Follow the instructions in 
 \ilink{Building and Installing
-apcupsd}{manual.tex#Building-and-Installing-apcupsd}l, being sure to include
+apcupsd}{Building-and-Installing-apcupsd}l, being sure to include
 the following options (in addition to any others you need) on the {\bf
 ./configure} line: 
 
@@ -5986,7 +5831,7 @@ The information served to the network by this interface should not be confused
 with master/slave mode that shares a UPS between two or more computers. That
 code is described in 
 \ilink{Configuration Directives for Sharing a
-UPS}{manual.tex#Configuration-Directives-for-Sharing-a-UPS} of this
+UPS}{Configuration-Directives-for-Sharing-a-UPS} of this
 documentation.  
 
 There are three different ways to run the information server depending on your
@@ -6174,7 +6019,7 @@ developers, and currently there exist very few of these debug messages.
 
 Data logging consists of periodically logging important data concerning the
 operation of the UPS. See the Data Logging (see 
-\ilink{DATA Logging}{manual.tex#DATA-Logging}) section of this manual for more
+\ilink{DATA Logging}{DATA-Logging}) section of this manual for more
 details. 
 
 {\smallSTATUS Logging}
@@ -6187,7 +6032,7 @@ UPS as a series of ASCII records. This information is also made available by
 the apcupsd network information server.  
 
 For more details on STATUS logging, see the Status (see 
-\ilink{apcupsd Status Logging}{manual.tex#apcupsd-Status-Logging}) section of
+\ilink{apcupsd Status Logging}{apcupsd-Status-Logging}) section of
 the Technical Reference. 
 
 {\smallEVENTS Logging}
@@ -6199,7 +6044,7 @@ Events logging consists of logging events as they happen. For example,
 successful startup, power fail, battery failure, system shutdown, ...  
 
 See the manual section on customizing event handling (see 
-\ilink{Customizing Event Handling}{manual.tex#Customizing-Event-Handling}) for
+\ilink{Customizing Event Handling}{Customizing-Event-Handling}) for
 more details. 
 
 \label{Implementation-Details}
@@ -6592,7 +6437,7 @@ installation of apcupsd as there are a number of reasons why it may not behave
 properly in a real power failure situation.  
 
 Please read 
-\ilink{Testing Apcupsd}{manual.tex#Testing-Apcupsd} of this document for
+\ilink{Testing Apcupsd}{Testing-Apcupsd} of this document for
 general instructions on testing the Win32 version. However, on Win32 systems,
 there is no Unix system log file, so if something goes wrong, look in the file
 c:\textbackslash{}apcupsd\textbackslash{}etc\textbackslash{}apcupsd\textbackslash
@@ -6778,7 +6623,7 @@ shut off the UPS power.
 Nevertheless, it is possible to use the {\tt \verb{--{kill-on-powerfail} option on
 the apcupsd command line, but the use of this option could cause the power to
 be cut off while your machine is still running. See 
-\ilink{Shutdown Sequence}{manual.tex#Shutdown-Sequence-_003c1_003e} of this
+\ilink{Shutdown Sequence}{Shutdown-Sequence-_003c1_003e} of this
 document for a more complete discussion of this subject. If you are still
 interested in trying to get this to work, please look at the code that is
 commented out in
@@ -6788,7 +6633,7 @@ c:\textbackslash{}apcupsd\textbackslash{}etc\textbackslash{}apcupsd\textbackslas
 An alternative to the {\tt \verb{--{kill-on-powerfail} option is to use the KILLDELAY
 (see 
 \ilink{KILLDELAY \lt{}time in
-seconds\gt{}}{manual.tex#KILLDELAY-_003ctime-in-seconds_003e}) configuration
+seconds\gt{}}{KILLDELAY-_003ctime-in-seconds_003e}) configuration
 directive.  
 
 This configuration directive is appropriate on Windows machines where apcupsd
@@ -7005,7 +6850,7 @@ Source}
 If you have the source code, follow the standard procedures for building
 apcupsd on Unix in 
 \ilink{Building and Installing
-apcupsd}{manual.tex#Building-and-Installing-apcupsd} of this manual. Please
+apcupsd}{Building-and-Installing-apcupsd} of this manual. Please
 don't forget to look at the system specifics for CYGWIN. 
 
 \label{Installation-on-Serial_002dLine-UPSes}
@@ -7027,11 +6872,11 @@ If you have a UPS that communicates via serial port, you need to do two things
 before you can even think about configuring the software. First, you need to
 figure out whether it's a dumb (voltage-signalling) UPS or speaks the apcsmart
 protocol (see this discussion (see 
-\ilink{upstypes}{manual.tex#upstypes})).  Second, if you have an interface
+\ilink{upstypes}{upstypes})).  Second, if you have an interface
 cable from APC, you need to figure out what kind it is.  If you don't have
 such a cable, you need to build one.  A straight-through serial cable won't
 work (see 
-\ilink{crazy}{manual.tex#crazy}).  
+\ilink{crazy}{crazy}).  
 
 According to Bill Marr the Belkin F5U109, also sold as F5U409 also works with
 apcupsd for kernel versions 2.4.25 or higher and kernels 2.6.1 and higher. 
@@ -7088,1114 +6933,9 @@ plugged into the APC UPS USB socket at one end and the other end plugged into
 a serial port on your PC, any APC USB UPS (except some of the newer really low
 cost models) will act as a serial-line device. 
 
-\label{Cables}
-
-\section*{Cables}
-\index{Cables }
-\addcontentsline{toc}{section}{Cables}
-
-\label{index-Cables-191}
-You can either use the cable that came with your UPS (the easiest if we
-support it) or you can make your own cable. We recommend that you obtain a
-supported cable directly from APC.  
-
-If you already have an APC cable, you can determine what kind it is by
-examining the flat sides of the two connectors where you will find the cable
-number embossed into the plastic. It is generally on one side of the male
-connector.  
-
-To make your own cable you must first know whether you have a UPS that speaks
-the apcsmart protocol or a ``dumb'' UPS that uses serial port line voltage
-signalling.  
-
-If you have an apcmart UPS, and you build your own cable, build a {\it
-Smart-Custom} cable. If you have a voltage-Signalling or dumb UPS, build a
-{\it Simple-Custom} cable. If you have a BackUPS CS with a RJ45 connector, you
-can build your own {\it Custom-RJ45} cable. 
-
-\label{Smart_002dCustom-Cable-for-SmartUPSes}
-
-\subsection*{Smart-Custom Cable for SmartUPSes}
-\index{SmartUPSes!Smart-Custom Cable for }
-\index{Smart-Custom Cable for SmartUPSes }
-\addcontentsline{toc}{subsection}{Smart-Custom Cable for SmartUPSes}
-
-\label{index-Smart-Custom-Cable-192}
-\label{index-Cables_002c-Smart-Custom-193}
-
-\footnotesize
-\begin{verbatim}
-     
-       SMART-CUSTOM CABLE
-     
-     Signal Computer                  UPS
-            DB9F                     DB9M
-      RxD    2   --------------------  2  TxD  Send
-      TxD    3   --------------------  1  RxD  Receive
-      GND    5   --------------------  9  Ground
-\end{verbatim}
-\normalsize
-
-When using this cable with apcupsd specify the following in apcupsd.conf:  
-
-If you have an OS that requires DCD or RTS to be set before you can receive
-input, you might try building the standard APC Smart 940-0024C cable listed
-below. 
-
-\footnotesize
-\begin{verbatim}
-     
-     UPSCABLE smart
-     UPSTYPE apcsmart
-     DEVICE /dev/ttyS0 (or whatever your serial port is)
-\end{verbatim}
-\normalsize
-
-If you wish to build the standard cable furnished by APC (940-0024C), use the
-following diagram. 
-
-\footnotesize
-\begin{verbatim}
-     
-       APC Smart Cable 940-0024C
-     
-     Signal Computer                  UPS
-            DB9F                     DB9M
-      RxD    2   --------------------  2  TxD  Send
-      TxD    3   --------------------  1  RxD  Receive
-      DCD    1   --*
-                   |
-      DTR    4   --*
-      GND    5   --------------------  9  Ground
-      RTS    7   --*
-                   |
-      CTS    8   --*
-     
-\end{verbatim}
-\normalsize
-
-\label{Smart-Signalling-Cable-for-BackUPS-CS-Models}
-
-\subsection*{Smart Signalling Cable for BackUPS CS Models}
-\index{Models!Smart Signalling Cable for BackUPS CS }
-\index{Smart Signalling Cable for BackUPS CS Models }
-\addcontentsline{toc}{subsection}{Smart Signalling Cable for BackUPS CS
-Models}
-
-\label{index-Cables_002c-Smart-Signalling-194}
-\label{index-Cables_002c-BackUPS-CS-195}
-If you have a BackUPS CS, you are probably either using it with the USB cable
-that is supplied or with the 940-0128A supplied by APC, which permits running
-the UPS in dumb mode. By building your own cable, you can now run the BackUPS
-CS models (and perhaps also the ES models) using smart signalling and have all
-the same information that is available as running it in USB mode.  
-
-The jack in the UPS is actually a 10 pin RJ45. However, you can just as easily
-use a 8 pin RJ45 connector, which is more standard (ethernet TX, and ISDN
-connector). It is easy to construct the cable by cutting off one end of a
-standard RJ45-8 ethernet cable and wiring the other end (three wires) into a
-standard DB9F female serial port connector.  
-
-Below, you will find a diagram for the CUSTOM-RJ45 cable: 
-
-\footnotesize
-\begin{verbatim}
-     
-       CUSTOM-RJ45 CABLE
-     
-     Signal Computer              UPS     UPS
-            DB9F                 RJ45-8  RJ45-10
-      RxD    2   ----------------  1      2     TxD  Send
-      TxD    3   ----------------  7      8     RxD  Receive
-      GND    5   ----------------  6      7     Ground
-      FG  Shield ----------------  3      4     Frame Ground
-     
-     The RJ45-8 pins are: looking at the end of the connector:
-     
-      8 7 6 5 4 3 2 1
-     ___________________
-     | . . . . . . . . |
-     |                 |
-     -------------------
-            |____|
-     
-     The RJ45-10  pins are: looking at the end of the connector:
-     
-     10 9 8 7 6 5 4 3 2 1
-     _______________________
-     | . . . . . . . . . . |
-     |                     |
-     -----------------------
-            |____|
-     
-\end{verbatim}
-\normalsize
-
-For the serial port DB9F connector, the pin numbers are stamped in the plastic
-near each pin. In addition, there is a diagram near the end of this chapter.  
-
-Note, one user, Martin, has found that if the shield is not connected to the
-Frame Ground in the above diagram (not in our original schematic), the UPS (a
-BackUPS CS 500 EI) will be unstable and likely to rapidly switch from power to
-batteries (i.e. chatter).  
-
-When using this cable with apcupsd specify the following in apcupsd.conf: 
-
-\footnotesize
-\begin{verbatim}
-     
-     UPSCABLE smart
-     UPSTYPE apcsmart
-     DEVICE /dev/ttyS0 (or whatever your serial port is)
-\end{verbatim}
-\normalsize
-
-The information for constructing this cable was discovered and transmitted to
-us by slither\_man. Many thanks! 
-
-\label{Voltage_002dSignalling-Cable-for-_0022dumb_0022-UPSes}
-
-\subsection*{Voltage-Signalling Cable for ``dumb'' UPSes}
-\index{UPSes!Voltage-Signalling Cable for "dumb" }
-\index{Voltage-Signalling Cable for "dumb" UPSes }
-\addcontentsline{toc}{subsection}{Voltage-Signalling Cable for "dumb"
-UPSes}
-
-\label{index-Cables_002c-dumb-196}
-\label{index-dumb_002c-Cables-197}
-{\bf NOTE. YOU DO NOT HAVE THIS CABLE UNLESS YOU BUILT IT YOURSELF.  THE
-SIMPLE-CUSTOM CABLE IS NOT AN APC PRODUCT.}  
-
-For ``dumb'' UPSes using voltage signalling, if you are going to build your
-own cable, we recommend to make the cable designed by the apcupsd team as
-follows: 
-
-\footnotesize
-\begin{verbatim}
-     
-            SIMPLE-CUSTOM CABLE
-     
-     Signal Computer                  UPS
-            DB9F   4.7K ohm          DB9M
-      DTR    4   --[####]--*              DTR set to +5V by Apcupsd
-                           |
-      CTS    8   ----------*---------  5  Low Battery
-      GND    5   --------------------  4  Ground
-      DCD    1   --------------------  2  On Battery
-      RTS    7   --------------------  1  Kill UPS Power
-     
-\end{verbatim}
-\normalsize
-
-List of components one needs to make the Simple cable:  
-
-\begin{enumerate}
-\item One (1) male DB9 connector, use solder type connector only.  
-\item One (1) female DB9/25F connector, use solder type connector only.  
-\item One (1) 4.7K ohm 1/4 watt 5\% resistor.  
-\item resin core solder.  
-\item three (3) to five (5) feet of 22AWG multi-stranded four or more
-   conductor cable.  
-   \end{enumerate}
-
-\begin{enumerate}
-\item Solder the resistor into pin 4 of the female DB9 connector.  
-\item Next bend the resistor so that it connects to pin 8 of the female DB9
-   connector.  
-\item Pin 8 on the female connector is also wired to pin 5 on the male DB9
-   connector. Solder both ends.  
-\item Solder the other pins, pin 5 on the female DB9 to pin 4 on the male
-   connector; pin 1 on the female connector to pin 2 on the male connector; and
-   pin 7 on the female connector to pin 1 on the male connector.  
-\item Double check your work.  
-   \end{enumerate}
-
-We use the DTR (pin 4 on the female connector) as our +5 volts power for the
-circuit. It is used as the Vcc pull-up voltage for testing the outputs on any
-``UPS by APC'' in voltage-signalling mode.  This cable may not work on a
-BackUPS Pro if the default communications are in apcsmart mode. This cable is
-also valid for ``ShareUPS'' BASIC Port mode and is also reported to work on
-SmartUPSes. However, the Smart Cable described above is much simpler. To have
-a better idea of what is going on inside apcupsd, for the SIMPLE cable apcupsd
-reads three signals and sets three: 
-
-\footnotesize
-\begin{verbatim}
-     
-     Reads:
-     CD, which apcupsd uses for the On Battery signal when high.
-     
-     CTS, which apcupsd uses for the Battery Low signal when high.
-     
-     RxD (SR), which apcupsd uses for the Line Down
-         signal when high. This signal isn't used for much.
-     
-     Sets:
-     DTR, which apcupsd sets when it detects a power failure (generally
-          5 to 10 seconds after the CD signal goes high). It
-          clears this signal if the CD signal subsequently goes low
-          -- i.e. power is restored.
-     
-     TxD (ST), which apcupsd clears when it detects that the CD signal
-          has gone low after having gone high - i.e. power is restored.
-     
-     RTS, which apcupsd sets for the killpower signal -- to cause the UPS
-          to shut off the power.
-\end{verbatim}
-\normalsize
-
-Please note that these actions apply only to the SIMPLE cable, the signals
-used on the other cables are different.  
-
-Finally, here is another way of looking at the CUSTOM-SIMPLE cable: 
-
-\footnotesize
-\begin{verbatim}
-     
-     APCUPSD SIMPLE-CUSTOM CABLE
-     
-     Computer Side  |  Description of Cable           |     UPS Side
-     DB9f  |  DB25f |                                 |   DB9m  | DB25m
-     4     |   20   |  DTR (5vcc)             *below  |    n/c  |
-     8     |    5   |  CTS (low battery)      *below  | <-  5   |   7
-     2     |    3   |  RxD (no line voltage)  *below  | <-  3   |   2
-     5     |    7   |  Ground (Signal)                |     4   |  20
-     1     |    8   |  CD (on battery from UPS)       | <-  2   |   3
-     7     |    4   |  RTS (kill UPS power)           | ->  1   |   8
-     n/c   |    1   |  Frame/Case Gnd (optional)      |     9   |  22
-     
-     Note: the <- and -> indicate the signal direction.
-     
-     Optional connections of original SIMPLE-CUSTOM specification
-     that are not used.
-     
-                   4.7K ohm
-      DTR    4   --[####]--*              Note needed
-                           |
-      RxD    2   ----------*---------  3  Not used by Apcupsd
-     
-\end{verbatim}
-\normalsize
-
-When using this cable with apcupsd specify the following in apcupsd.conf: 
-
-\footnotesize
-\begin{verbatim}
-     
-     UPSCABLE simple
-     UPSTYPE dumb
-     DEVICE /dev/ttyS0 (or whatever your serial port is)
-\end{verbatim}
-\normalsize
-
-\label{Other-APC-Cables-that-apcupsd-Supports}
-
-\subsection*{Other APC Cables that apcupsd Supports}
-\index{Other APC Cables that apcupsd Supports }
-\index{Supports!Other APC Cables that apcupsd }
-\addcontentsline{toc}{subsection}{Other APC Cables that apcupsd Supports}
-
-apcupsd will also support the following off the shelf cables that are supplied
-by APC  
-
-\begin{itemize}
-\item 940-0020B/C Simple Signal Only, all models.  
-\item 940-0023A Simple Signal Only, all models.  
-\item 940-0119A Simple Signal Only, Back-UPS Office, and BackUPS ES.  
-\item 940-0024[B/C/G] SmartMode Only, SU and BKPro only.  
-\item 940-0095[A/B/C] PnP (Plug and Play), all models.  
-\item 940-1524C SmartMode Only  
-\item 940-0127A/B USB Cables  
-\item 940-0128A Simple Signal Only, Back-UPS CS in serial mode. 
-   \end{itemize}
-
-\label{Voltage-Signalling-Features-Supported-by-Apcupsd-for-Various-Cables}
-
-\subsection*{Voltage Signalling Features Supported by Apcupsd for Various
-Cables}
-\index{Cables!Voltage Signalling Features Supported by Apcupsd for Various }
-\index{Voltage Signalling Features Supported by Apcupsd for Various Cables }
-\addcontentsline{toc}{subsection}{Voltage Signalling Features Supported by
-Apcupsd for Various Cables}
-
-The following table shows the features supported by the current version of
-apcupsd (3.8.5 or later) for various cables running the UPS in
-voltage-signalling mode.  
-
-\addcontentsline{lot}{table}{Supported Features}
-\begin{longtable}{p{1.2in}p{0.8in}p{1.2in}p{0.8in}p{1.0in}}
-{Cable} & {Power Loss} & {Low Battery} & {Kill Power} & {Cable Disconnected 
- } \\
-{940-0020B} & {Yes} & {No} & {Yes} & {No 
- } \\
-{940-0020C} & {Yes} & {Yes} & {Yes} & {No 
- } \\
-{940-0023A} & {Yes} & {No} & {No} & {No 
- } \\
-{940-0119A} & {Yes} & {Yes} & {Yes} & {No 
- } \\
-{940-0127A} & {Yes} & {Yes} & {Yes} & {No 
- } \\
-{940-0128A} & {Yes} & {Yes} & {Yes} & {No 
- } \\
-{940-0095A/B/C} & {Yes} & {Yes} & {Yes} & {No 
- } \\
-{simple} & {Yes} & {Yes} & {Yes} & {No  
-}
-
-\end{longtable}
-
-\label{Voltage-Signalling}
-
-\subsection*{Voltage Signalling}
-\index{Signalling!Voltage }
-\index{Voltage Signalling }
-\addcontentsline{toc}{subsection}{Voltage Signalling}
-
-\label{index-Voltage-Signalling_002c-Cables-198}
-\label{index-Cables_002c-Voltage-Signalling-199}
-Apparently, all APC voltage-signalling UPSes have the same signals on the
-output pins of the UPS. The difference at the computer end is due to different
-cable configurations. Thus, by measuring the connectivity of a cable, one can
-determine how to program the UPS. This is to be verified.  
-
-The signals presented or accepted by the UPS on its DB9 connector using the
-numbering scheme listed above is: 
-
-\footnotesize
-\begin{verbatim}
-     
-     UPS Pin         Signal meaning
-      1     <-     Shutdown when set by computer for 1-5 seconds.
-      2     ->     On battery power (this signal is normally low but
-                         goes high when the UPS switches to batteries).
-      3     ->     Mains down (line fail) See Note 1 below.
-      5     ->     Low battery. See Note 1 below.
-      6     ->     Inverse of mains down signal. See Note 2 below.
-      7     <-     Turn on/off power (only on advanced UPSes only)
-     
-      Note 1: these two lines are normally open, but close when the
-          appropriate signal is triggered. In fact, they are open collector
-          outputs which are rated for a maximum of +40VDC and 25 mA. Thus
-          the 4.7K ohm resistor used in the Custom Simple cable works
-          quite well.
-     
-      Note 2: the same as note 1 except that the line is normally closed,
-          and opens when the line voltage fails.
-\end{verbatim}
-\normalsize
-
-\label{The-Back_002dUPS-Office-500-signals}
-
-\subsection*{The Back-UPS Office 500 signals}
-\index{Back-UPS Office 500 signals }
-\index{Signals!Back-UPS Office 500 }
-\addcontentsline{toc}{subsection}{Back-UPS Office 500 signals}
-
-\label{index-Cables_002c-BackUPS-Office-200}
-\label{index-BackUPS-Office_002c-cables-201}
-The Back-UPS Office UPS has a telephone type jack as output, which looks like
-the following: 
-
-\footnotesize
-\begin{verbatim}
-     
-     Looking at the end of the connector:
-     
-        6 5 4 3 2 1
-       _____________
-      | . . . . . . |
-      |             |
-      |  |----------|
-      |__|
-     
-\end{verbatim}
-\normalsize
-
-It appears that the signals work as follows: 
-
-\footnotesize
-\begin{verbatim}
-     
-       UPS            Signal meaning
-     1 (brown)    <-   Shutdown when set by computer for 1-5 seconds.
-     2 (black)    ->   On battery power
-     3 (blue)     ->   Low battery
-     4 (red)           Signal ground
-     5 (yellow)   <-   Begin signalling on other pins
-     6 (none)          none
-\end{verbatim}
-\normalsize
-
-\label{Analyses-of-APC-Cables}
-
-\subsection*{Analyses of APC Cables}
-\index{Cables!Analyses of APC }
-\index{Analyses of APC Cables }
-\addcontentsline{toc}{subsection}{Analyses of APC Cables}
-
-\label{index-Cables-202}
-
-\label{940_002d0020B-Cable-Wiring}
-
-\subsubsection*{940-0020B Cable Wiring:}
-
-\label{index-Cables-203}
-This diagram is for informational purposes and is not complete. Although we do
-not know what the black box semi-conductor contains, we believe that we
-understand its operation (many thanks to Lazar M. Fleysher for working this
-out).  
-
-This cable can only be used on voltage-signalling UPSes, and provides the On
-Battery signal as well as kill UPS power. Most recent evidence (Lazar's
-analysis) indicates that this cable under the right conditions may provide the
-Low Battery signal. This is to be confirmed. 
-
-\footnotesize
-\begin{verbatim}
-     
-     APC Part# - 940-0020B
-     
-     Signal Computer                  UPS
-            DB9F                     DB9M
-      CTS    8   --------------------  2  On Battery
-      DTR    4   --------------------  1  Kill power
-      GND    5   ---------------*----  4  Ground
-                                |
-                     ---        *----  9  Common
-      DCD    1  ----|///|-----------   5  Low Battery
-                    |\\\|
-      RTS    7  ----|///| (probably a
-                     ---   semi-conductor)
-\end{verbatim}
-\normalsize
-
-Thanks to Lazar M. Fleysher. 
-
-\label{940_002d0020C-Cable-Wiring}
-
-\subsubsection*{940-0020C Cable Wiring:}
-
-\label{index-Cables-204}
-This diagram is for informational purposes and may not be complete, we don't
-recommend that use it to build you build one yourself.  This cable can only be
-used on voltage-signalling UPSes, and provides the On Battery signal, the Low
-Battery signal as well as kill UPS power. In apcupsd versions 3.8.2 and prior,
-please set your UPSCABLE to 940-0020B. In version 3.8.3 and later, you may
-specify the cable as 940-0020C. Please note that this diagram may not be
-accurate. 
-
-\footnotesize
-\begin{verbatim}
-     
-     APC Part# - 940-0020C
-     
-     Signal Computer                  UPS
-            DB9F                     DB9M
-      CTS    8   --------------------  2  On Battery
-      DTR    4   --------------------  1  Kill power
-      GND    5   ---------------*----  4  Ground
-                                |
-                                *----  9  Common
-      RTS    7 -----[ 93.5K ohm ]----- 5  Low Battery
-                    or semi-conductor
-\end{verbatim}
-\normalsize
-
-\label{940_002d0023A-Cable-Wiring}
-
-\subsubsection*{940-0023A Cable Wiring:}
-
-\label{index-Cables-205}
-This diagram is for informational purposes and may not be complete, we don't
-recommend that use it to build you build one yourself.  This cable can only be
-used on voltage-signalling UPSes, and apparently only provides the On Battery
-signal. As a consequence, this cable is pretty much useless, and we recommend
-that you find a better cable because all APC UPSes support more than just On
-Battery. Please note that we are not sure the following diagram is correct. 
-
-\footnotesize
-\begin{verbatim}
-     
-     APC Part# - 940-0023A
-     
-     Signal Computer                  UPS
-            DB9F                     DB9M
-      DCD    1   --------------------  2  On Battery
-     
-                   3.3K ohm
-      TxD    3   --[####]-*
-                          |
-      DTR    4   ---------*
-      GND    5   ---------------*----  4  Ground
-                                |
-                                *----  9  Common
-     
-\end{verbatim}
-\normalsize
-
-\label{940_002d0095A-Cable-Wiring}
-
-\subsubsection*{940-0095A Cable Wiring:}
-
-\label{index-Cables-206}
-This is the definitive wiring diagram for the 940-0095A cable submitted by
-Chris Hanson \lt{}cph at zurich.ai.mit.edu\gt{}, who disassembled the original
-cable, destroying it in the process. He then built one from his diagram and it
-works perfectly. 
-
-\footnotesize
-\begin{verbatim}
-     
-     Construction and operation of the APC #940-0095A cable.
-     This cable is included with the APC Back-UPS Pro PNP series.
-     
-     
-     UPS end                                      Computer end
-     -------                                      ------------
-                       47k        47k
-     BATTERY-LOW (5) >----R1----*----R2----*----< DTR,DSR,CTS (4,6,8)
-                              |          |
-                              |          |
-                              |         /  E
-                              |       |/
-                              |    B  |
-                              *-------|  2N3906 PNP
-                                      |
-                                      |\
-                                        \  C
-                                         |
-                                         |
-                                         *----< DCD (1)     Low Batt
-                                         |
-                                         |
-                                         R 4.7k
-                                         3
-                                         |
-                                  4.7k   |
-     SHUTDOWN (1)    >----------*----R4----*----< TxD (3)
-                              |
-                              |  1N4148
-                              *----K|---------< RTS (7)      Shutdown
-     
-     POWER-FAIL (2)  >--------------------------< RxD,RI (2,9) On Batt
-     
-     GROUND (4,9)    >--------------------------< GND (5)
-     
-     
-     Operation:
-     
-     * DTR is "cable power" and must be held at SPACE.  DSR or CTS may be
-     used as a loopback input to determine if the cable is plugged in.
-     
-     * DCD is the "battery low" signal to the computer.  A SPACE on this
-     line means the battery is low.  This is signalled by BATTERY-LOW
-     being pulled down (it is probably open circuit normally).
-     
-     Normally, the transistor is turned off, and DCD is held at the MARK
-     voltage by TxD.  When BATTERY-LOW is pulled down, the voltage
-     divider R2/R1 biases the transistor so that it is turned on, causing
-     DCD to be pulled up to the SPACE voltage.
-     
-     * TxD must be held at MARK; this is the default state when no data is
-     being transmitted.  This sets the default bias for both DCD and
-     SHUTDOWN.  If this line is an open circuit, then when BATTERY-LOW is
-     signalled, SHUTDOWN will be automatically signalled; this would be
-     true if the cable were plugged in to the UPS and not the computer,
-     or if the computer were turned off.
-     
-     * RTS is the "shutdown" signal from the computer.  A SPACE on this
-     line tells the UPS to shut down.
-     
-     * RxD and RI are both the "power-fail" signals to the computer.  A
-     MARK on this line means the power has failed.
-     
-     * SPACE is a positive voltage, typically +12V.  MARK is a negative
-     voltage, typically -12V.  Linux appears to translate SPACE to a 1
-     and MARK to a 0.
-\end{verbatim}
-\normalsize
-
-\label{940_002d0095B-Cable-Wiring}
-
-\subsubsection*{940-0095B Cable Wiring:}
-
-\label{index-Cables-207}
-This diagram is for informational purposes and may not be complete, we don't
-recommend that use it to build one yourself. 
-
-\footnotesize
-\begin{verbatim}
-     
-     APC Part# - 940-0095B
-     
-     Signal Computer                  UPS
-            DB9F                     DB9M
-      DTR    4   ----*
-      CTS    8   ----|
-      DSR    6   ----|
-      DCD    1   ----*
-      GND    5   ---------------*----  4  Ground
-                                |
-                                *----  9  Common
-      RI     9   ----*
-                     |
-      RxD    2   ----*---------------  2  On Battery
-      TxD    3   ----------[####]----  1  Kill UPS Power
-                           4.7K ohm
-\end{verbatim}
-\normalsize
-
-\label{940_002d0119A-Cable-Wiring}
-
-\subsubsection*{940-0119A Cable Wiring:}
-
-\label{index-Cables-208}
-This diagram is for informational purposes and may not be complete, we don't
-recommend that use it to build you build one yourself. This cable is used with
-the BackUPS Office UPSes. 
-
-\footnotesize
-\begin{verbatim}
-     
-     APC Part# - 940-0119A
-     
-       UPS      Computer
-       pins     pins      Signal             Signal meaning
-     1 (brown)    4,6      DSR DTR     <-   Shutdown when set by computer for 1-5 seconds.
-     2 (black)    8,9      RI  CTS     ->   On battery power
-     3 (blue)     1,2      CD  RxD     ->   Low battery
-     4 (red)       5       Ground
-     5 (yellow)    7       RTS         <-   Begin signalling on other pins
-     6 (none)     none
-     
-\end{verbatim}
-\normalsize
-
-\label{BackOffice-ES}
-
-\subsubsection*{BackOffice ES:}
-
-\label{index-Cables-209}
-\label{index-BackOffice-ES-210}
-The BackUPS ES has a straight through serial cable with no identification on
-the plugs. To make it work with apcupsd, specify the {\bf UPSCABLE 940-0119A}
-and {\bf UPSTYPE backups}.  The equivalent of cable 940-0119A is done on a PCB
-inside the unit.  Thanks to William Stock for supplying us with the
-information about the straight through cable, the PCB, and the following
-diagram: 
-
-\footnotesize
-\begin{verbatim}
-     
-     computer           ----------- BackUPS-ES -----------------
-     DB9-M              DB-9F
-     pin    signal      pin
-     
-      4      DSR   ->    4 --+
-                             |  diode   resistor
-      6      DTR   ->    6 --+---->|----/\/\/\---o kill power
-     
-      1      DCD   <-    1 --+
-                             |
-      2      RxD   <-    2 --+----------------+--o low battery
-                                              |
-      7      RTS   ->    7 --------+--/\/\/\--+
-                                   |
-                                   +--/\/\/\--+
-                                              |
-      8      RI    <-    8 --+----------------+--o on battery
-                             |
-      9      CTS   <-    9 --+
-     
-      5      GND   ---   5 ----------------------o ground
-     
-      3      TxD         3 nc
-     
-\end{verbatim}
-\normalsize
-
-\label{BackUPS-ES-and-CS-in-Serial-mode-with-Cable-940_002d0128A}
-
-\subsubsection*{BackUPS ES and CS in Serial mode with Cable 940-0128A:}
-
-\label{index-BackUPS-ES-211}
-\label{index-Cables-212}
-Though these UPSes are USB UPSes, APC supplies a serial cable (typically with
-a green DB9 F connector) that has 940-0128A stamped into one side of the
-plastic serial port connector. The other end of the cable is a 10 pin RJ45
-connector that plugs into the UPS (thanks to Dean Waldow for sending me a
-cable!). Apcupsd version 3.8.5 and later supports this cable when specified as
-{\bf UPSCABLE 940-0128A} and {\bf UPSTYPE backups}. However, running in this
-mode much of the information that would be available in USB mode is lost. In
-addition, when apcupsd attempts to instruct the UPS to kill the power, it
-begins cycling about 4 times a second between battery and line. The solution
-to the problem (thanks to Tom Suzda) is to unplug the UPS and while it is
-still chattering, press the power button (on the front of the unit) until the
-unit beeps and the chattering stops. After that the UPS should behave normally
-and power down 1-2 minutes after requested to do so.  
-
-An amazing discovery by slither\_man allows one to build a CUSTOM-RJ45 cable
-(documented above) and run the BackUPS CS (and probably also the ES) in Smart
-mode. Running it this way provides all the same information that you would get
-by running it in USB mode. As a consequence, we recommend that you either
-purchase (where I don't know) or build your own CUSTOM-RJ45 cable rather than
-use the 940-0128A cable.  
-
-Thanks to all the people who have helped test this and have provided
-information on the cable wiring, our best guess for the cable schematic is the
-following: 
-
-\footnotesize
-\begin{verbatim}
-     
-     computer      --------- Inside the Connector---------  UPS
-     DB9-F         |                                     |  RJ45
-     pin - signal  |                                     |  Pin - Color
-                   |                                     |
-      4     DSR  ->|---+                                 |
-                   |   |  diode   resistor               |
-      6     DTR  ->|---+---->|----/\/\/\---o kill power  |  8  Orange
-                   |                                     |
-      1     DCD  <-|----+                                |
-                   |    |                                |
-      2     RxD  <-|----+----------------+--o low battery|  3  Brown
-                   |                     |               |
-      7     RTS  ->|----------+--/\/\/\--+               |
-                   |          |                          |
-                   |          +--/\/\/\--+               |
-                   |                     |               |
-      8     RI   <-|----+----------------+--o on battery |  2  Black
-                   |    |                                |
-      9     CTS  <-|----+                                |
-                   |                         signal      |
-      5     GND  --|-----------------------o ground      |  7  Red
-                   |                                     |
-      3     TxD    |                                     |
-                   |                         chassis     |
-      Chassis/GND  |-----------------------o ground      |  4  Black
-                   |                                     |
-                   |          Not connected              |  1, 5, 6, 9, 10
-                   --------------------------------------
-     
-     The RJ45 pins are: looking at the end of the connector:
-     
-     10 9 8 7 6 5 4 3 2 1
-     _______________________
-     | . . . . . . . . . . |
-     |                     |
-     -----------------------
-            |____|
-     
-\end{verbatim}
-\normalsize
-
-From Jan Babinski jbabinsk at pulsarbeacon dot com: (many thanks)  
-
-The BackUPS XS1000(BX-1000) ships with the 940-0127B usb cable and the
-optional 940-0128D serial cable. I'm trying to get it running under OpenBSD so
-usb is out of the question. I've tried smart serial with the custom cable, but
-that's not working, so I'm stuck with dumb serial over 940-0128D.  
-
-I have noticed that this cable is not supported by apcupsd so I set out to
-find out how much different this cable is compared with the supported ones.
-After tearing the cable apart (see schematic below) I noticed that it is
-functionally similar to the 940-0128A cable except for NC on (6) DTR and (2)
-RD on the computer side. 
-
-\footnotesize
-\begin{verbatim}
-     Cable 940-0128D
-     
-     DB9(Computer)               RJ45-10(UPS)
-     
-      (5)     (1)                 ____________
-     ( o o o o o )               [ oooooooooo ]
-      \ o o o o /                [____________]
-       (9)   (6)                 (10)  [_]  (1)
-     
-     
-      RI(9)<---+
-               |
-     CTS(8)<---+--- E   2N2222(NPN)
-                     \|___
-                ____ /| B |
-               |    C     |
-               |          |
-               +---vvvv---+--[>|------<(2)OnBatt
-     RTS(7)>---|    2k      1N5819
-               +---vvvv---+--[>|------<(3)LowBatt
-               |          |
-               +--- C     |
-                     \|___|
-                     /| B
-     DCD(1)<------- E    2N2222(NPN)
-     
-     DTR(4)>-------------------------->(8)KillPwr
-     
-     GND(5)----------------------------(7)Signal GND
-     (Shield)--------------------------(4)Chassis GND
-     
-     
-     Cable 940-0127B
-     
-     USB(Computer)      RJ45-10(UPS)
-      _________          ____________
-     | = = = = |        [ oooooooooo ]
-     |_________|        [____________]
-      (1)   (4)         (10)  [_]  (1)
-     
-       +5V(1)-----------(1)+5V
-     DATA+(2)-----------(9)DATA+
-     DATA-(3)-----------(10)DATA-
-       GND(4)-----------(7)Signal GND
-     (Shield)-----------(4)Chassis GRND
-     
-     
-\end{verbatim}
-\normalsize
-
-\label{Win32-Implementation-Restrictions-for-Simple-UPSes}
-
-\subsection*{Win32 Implementation Restrictions for Simple UPSes}
-\index{UPSes!Win32 Implementation Restrictions for Simple }
-\index{Win32 Implementation Restrictions for Simple UPSes }
-\addcontentsline{toc}{subsection}{Win32 Implementation Restrictions for
-Simple UPSes}
-
-\label{index-Cables-213}
-\label{index-Windows-214}
-Due to inadequacies in the Win32 API, it is not possible to set/clear/get all
-the serial port line signals. apcupsd can detect: CTS, DSR, RNG, and CD. It
-can set and clear: RTS and DTR.  
-
-This imposes a few minor restrictions on the functionality of some of the
-cables. In particular, LineDown on the Custom Simple cable, and Low Battery on
-the 0023A cable are not implemented. 
-
-\label{Internal-Apcupsd-Actions-for-Simple-Cables}
-
-\subsection*{Internal Apcupsd Actions for Simple Cables}
-\index{Internal Apcupsd Actions for Simple Cables }
-\index{Cables!Internal Apcupsd Actions for Simple }
-\addcontentsline{toc}{subsection}{Internal Apcupsd Actions for Simple
-Cables}
-
-\label{index-Cables-215}
-
-\footnotesize
-\begin{verbatim}
-     
-     This section describes how apcupsd 3.8.5 (March 2002)
-     treats the serial port line signals for simple cables.
-     
-     apcaction.c:
-      condition = power failure detected
-      cable = CUSTOM_SIMPLE
-      action = ioctl(TIOCMBIS, DTR)      set DTR (enable power bit?)
-     
-     apcaction.c:
-      condition = power back
-      cable = CUSTOM_SIMPLE
-      action = ioctl(TIOCMBIC, DTR)      clear DTR (clear power bit)
-      action = ioctl(TIOCMBIC, ST)       clear ST (TxD)
-     
-     apcserial.c:
-      condition = serial port initialization
-      cable = 0095A, 0095B, 0095C
-      action = ioctl(TIOMBIC, RTS)       clear RTS (set PnP mode)
-     
-      cable = 0119A, 0127A, 0128A
-      action = ioctl(TIOMBIC, DTR)       clear DTR (killpower)
-      action = ioctl(TIOMBIS, RTS)       set   RTS (ready to receive)
-     
-     apcserial.c:
-      condition = save_dumb_status
-      cable = CUSTOM_SIMPLE
-      action = ioctl(TIOMBIC, DTR)       clear DTR (power bit?)
-      action = ioctl(TIOMBIC, RTS)       clear RTS (killpower)
-     
-      cable = 0020B, 0020C, 0119A, 0127A, 0128A
-      action = ioctl(TIOMBIC, DTR)       clear DTR (killpower)
-     
-      cable = 0095A, 0095B, 0095C
-      action = ioctl(TIOMBIC, RTS)       clear RTS (killpower)
-      action = ioctl(TIOMBIC, CD)        clear DCD (low batt)
-      action = ioctl(TIOMBIC, RTS)       clear RTS (killpower) a second time!
-     
-     apcserial.c:
-      condition = check_serial
-     
-      cable = CUSTOM_SIMPLE
-      action = OnBatt = CD
-      action = BattLow = CTS
-      action = LineDown = SR
-     
-      cable = 0020B, 0020C, 0119A, 0127A, 0128A
-      action = OnBatt = CTS
-      action = BattLow = CD
-      action = LineDown = 0
-     
-      cable = 0023A
-      action = Onbatt = CD
-      action = BattLow = SR
-      action = LineDown = 0
-     
-      cable = 0095A, 0095B, 0095C
-      action = OnBatt = RNG
-      action = BattLow = CD
-      action = LineDown = 0
-     
-     
-     apcserial.c
-      condition = killpower
-     
-      cable = CUSTOM_SIMPLE, 0095A, 0095B, 0095C
-      action = ioctl(TIOMCBIS, RTS)      set RTS (kills power)
-      action = ioctl(TIOMCBIS, ST)       set TxD
-     
-      cable = 0020B, 020C, 0119A, 0127A, 0128A
-      action = ioctl(TIOMCBIS, DTR)      set DTR (kills power)
-     
-\end{verbatim}
-\normalsize
-
-\label{RS232-Wiring-and-Signal-Conventions}
-
-\subsection*{RS232 Wiring and Signal Conventions}
-\index{Conventions!RS232 Wiring and Signal }
-\index{RS232 Wiring and Signal Conventions }
-\addcontentsline{toc}{subsection}{RS232 Wiring and Signal Conventions}
-
-\label{index-Cables-216}
-
-\addcontentsline{lot}{table}{RS232 Wiring and Signal Conventions}
-\begin{longtable}{llll}
-{DB-25 Pin \#} & {DB-9 Pin \#} & {Name} & {DTE-DCE Description 
- } \\
-{1} & {{---}} & {FG} & {{--} Frame Ground/Chassis GND 
- } \\
-{2} & {3} & {TD} & {{--}\gt{} Transmitted Data, TxD 
- } \\
-{3} & {2} & {RD} & {\lt{}{--} Received Data, RxD 
- } \\
-{4} & {7} & {RTS} & {{--}\gt{} Request To Send 
- } \\
-{5} & {8} & {CTS} & {\lt{}{--} Clear To Send 
- } \\
-{6} & {6} & {DSR} & {\lt{}{--} Data Set Ready 
- } \\
-{7} & {5} & {SG} & {{--}{---} Signal Ground, GND 
- } \\
-{8} & {1} & {DCD} & {\lt{}{--} Data Carrier Detect 
- } \\
-{9} & {{---}} & {{---}} & {{--} Positive DC test voltage 
- } \\
-{10} & {{---}} & {{---}} & {{--} Negative DC test voltage 
- } \\
-{11} & {{---}} & {QM} & {\lt{}{--} Equalizer mode 
- } \\
-{12} & {{---}} & {SDCD} & {\lt{}{--} Secondary Data Carrier Detect 
- } \\
-{13} & {{---}} & {SCTS} & {\lt{}{--} Secondary Clear To Send 
- } \\
-{14} & {{---}} & {STD} & {{--}\gt{} Secondary Transmitted Data 
- } \\
-{15} & {{---}} & {TC} & {\lt{}{--} Transmitter (signal) Clock 
- } \\
-{16} & {{---}} & {SRD} & {\lt{}{--} Secondary Receiver Clock 
- } \\
-{17} & {{---}} & {RC} & {{--}\gt{} Receiver (signal) Clock 
- } \\
-{18} & {{---}} & {DCR} & {\lt{}{--} Divided Clock Receiver 
- } \\
-{19} & {{---}} & {SRTS} & {{--}\gt{} Secondary Request To Send 
- } \\
-{20} & {4} & {DTR} & {{--}\gt{} Data Terminal Ready 
- } \\
-{21} & {{---}} & {SQ} & {\lt{}{--} Signal Quality Detect 
- } \\
-{22} & {9} & {RI} & {\lt{}{--} Ring Indicator 
- } \\
-{23} & {{---}} & {{---}} & {{--}\gt{} Data rate selector 
- } \\
-{24} & {{---}} & {{---}} & {\lt{}{--} Data rate selector 
- } \\
-{25} & {{---}} & {TC} & {\lt{}{--} Transmitted Clock  
-}
-
-\end{longtable}
-
-\label{Pin-Assignment-for-the-Serial-Port-_005bRS_002d232C_005d_003b-25_002dpi%
-n-and-9_002dpin_003b-Female-End}
-
-\subsection*{Pin Assignment for the Serial Port (RS-232C), 25-pin and
-9-pin, Female End}
-\index{Pin Assignment for the Serial Port (RS-232C), 25-pin and 9-pin, Female
-End }
-\index{End!Pin Assignment for the Serial Port RS-232C 25-pin and 9-pin Female
-}
-\addcontentsline{toc}{subsection}{Pin Assignment for the Serial Port
-(RS-232C), 25-pin and 9-pin, Female End}
-
-\label{index-Cables-217}
-
-\footnotesize
-\begin{verbatim}
-     
-        13                         1         5         1
-      _______________________________      _______________
-      \  . . . . . . . . . . . . .  /      \  . . . . .  /    RS232-connectors
-       \  . . . . . . . . . . . .  /        \  . . . .  /     looking into the
-        ---------------------------          -----------      end of the cable.
-        25                      14            9       6
-     
-     The diagram above represents the Female end of the cable. The
-     male end is the same, but looking from inside the cable.
-     
-      DTE : Data Terminal Equipment (i.e. computer)
-      DCE : Data Communications Equipment (i.e. UPS)
-      RxD : Data received; 1 is transmitted "low", 0 as "high"
-      TxD : Data sent; 1 is transmitted "low", 0 as "high"
-      DTR : DTE announces that it is powered up and ready to communicate
-      DSR : DCE announces that it is ready to communicate; low=modem hang-up
-      RTS : DTE asks DCE for permission to send data
-      CTS : DCE agrees on RTS
-      RI  : DCE signals the DTE that an establishment of a connection is attempted
-      DCD : DCE announces that a connection is established
-\end{verbatim}
-\normalsize
-
-\label{Ioctl-to-RS232-Correspondence}
-
-\subsection*{Ioctl to RS232 Correspondence}
-\index{Ioctl to RS232 Correspondence }
-\index{Correspondence!Ioctl to RS232 }
-\addcontentsline{toc}{subsection}{Ioctl to RS232 Correspondence}
-
-\label{index-Cables-218}
-
-\footnotesize
-\begin{verbatim}
-     
-     #define TIOCM_LE        0x001
-     #define TIOCM_DTR       0x002
-     #define TIOCM_RTS       0x004
-     #define TIOCM_ST        0x008
-     #define TIOCM_SR        0x010
-     #define TIOCM_CTS       0x020
-     #define TIOCM_CAR       0x040
-     #define TIOCM_RNG       0x080
-     #define TIOCM_DSR       0x100
-     #define TIOCM_CD        TIOCM_CAR
-     #define TIOCM_RI        TIOCM_RNG
-     #define TIOCM_OUT1      0x2000
-     #define TIOCM_OUT2      0x4000
-\end{verbatim}
-\normalsize
+\include{cables}
 
 \label{Testing-Serial_002dLine-UPSes}
-
 \section*{Testing Serial-Line UPSes}
 \index{Testing Serial-Line UPSes }
 \index{UPSes!Testing Serial-Line }
@@ -8205,7 +6945,7 @@ End }
 \label{index-Serial_002c-Testing-220}
 If you have a serial-line UPS, there are some tests you should run before the
 general ones described in the Testing (see 
-\ilink{Testing Apcupsd}{manual.tex#Testing-Apcupsd}) section.  
+\ilink{Testing Apcupsd}{Testing-Apcupsd}) section.  
 
 To test your computer's connection with a serial-line UPS, you first need to
 establish that the serial line is functioning, and then that the UPS is
@@ -8235,7 +6975,7 @@ addition, some simple signaling UPSes with certain cable combinations are not
 able to detect the low battery condition.  For more details please see 
 \ilink{Voltage Signalling Features Supported by Apcupsd for Various
 Cables}
-{manual.tex#Voltage-Signalling-Features-Supported-by-Apcupsd-for-Various-Cable%
+{Voltage-Signalling-Features-Supported-by-Apcupsd-for-Various-Cable%
 s}. 
 
 \label{Establishing-Serial-Port-Connection}
@@ -8279,7 +7019,7 @@ use.
 \item You may have a problem with the /etc/apcupsd/acpupsd.conf file. For
    example, check that you have specified the correct type of UPS and the correct
    networking directives.  For more details, see the 
-\ilink{After Installation}{manual.tex#After-Installation}.  
+\ilink{After Installation}{After-Installation}.  
 \item If you have a SmartUPS 5000 RM 15U or similar model, that comes with a
    ``Web/SNMP management card'' in one of the ``Smart Slots'', this card may
    interfere with the serial port operation. If you are having problems, please
@@ -8356,7 +7096,7 @@ because apcupsd writes more detailed information to the log file whenever
 there is an error.  
 
 If you have a UPS that uses apcsmart protcol (see table of types (see 
-\ilink{type\_table}{manual.tex#type_005ftable}) for a list of the UPSes using
+\ilink{type\_table}{type_005ftable}) for a list of the UPSes using
 these protocols), you can manually test the serial communications with the UPS
 by starting a serial port communications program (such as minicom, tip, or cu)
 with the settings 2400 8N1 (2400 baud, 8 bits, no parity, 1 stop bit). Be
@@ -8381,7 +7121,7 @@ next test.
 \label{index-Testing_002c-with-apctest-223}
 On an apcsmart serial-line UPS, apctest will give you access to the battery of
 low-level tests we described in 
-\ilink{apctest}{manual.tex#apctest}.  If you have a voltage-signalling UPS, it
+\ilink{apctest}{apctest}.  If you have a voltage-signalling UPS, it
 enables a different test repertoire which is described here, Among other
 things, if you are uncertain about what kind of cable you have, you may be
 able to use apctest to figure that out.  
@@ -8572,7 +7312,7 @@ communications}
 \label{index-Testing-230}
 Once you have established that apcupsd can talk to the UPS over the serial
 part, go do the series of functional tests described in the main Testing (see 
-\ilink{Testing Apcupsd}{manual.tex#Testing-Apcupsd}) section.  
+\ilink{Testing Apcupsd}{Testing-Apcupsd}) section.  
 
 One additional note applies: 
 
@@ -8654,7 +7394,7 @@ as discharging these kinds of batteries tends to shorten their life span.
 
 Serial-line UPSes that speak the apcsmart protocol log all of the events
 described in the Status Format (see 
-\ilink{apcupsd Status Logging}{manual.tex#apcupsd-Status-Logging}) section of
+\ilink{apcupsd Status Logging}{apcupsd-Status-Logging}) section of
 the Technical Reference.  Voltage-signalling UPSes, on the other hand, have a
 much narrower data channel.  They can only report a small handful of
 conditions.  
@@ -8804,7 +7544,7 @@ use to contact the server.
 
 If you specified {\bf UPSTYPE snmp}, then the device name becomes {\bf
 hostname:vendor:community}. Please see the SNMP chapter (see 
-\ilink{Support for SNMP UPSes}{manual.tex#Support-for-SNMP-UPSes}) in this
+\ilink{Support for SNMP UPSes}{Support-for-SNMP-UPSes}) in this
 manual for more details.  
 
 \item [LOCKFILE \lt{}path to lockfile\gt{}]
@@ -8901,7 +7641,7 @@ In general, none of these directives are required. However, if you have a
 voltage-signalling (dumb) UPS with a cable that does not support the Low
 Battery signal, you must set the TIMEOUT directive to force a shutdown. Please
 see the Cables (see 
-\ilink{Cables}{manual.tex#Cables}) section of this manual for more details.  
+\ilink{Cables}{Cables}) section of this manual for more details.  
 
 \begin{description}
 
@@ -9018,7 +7758,7 @@ voltage-signalling UPS, when the battery is exhausted.  This command is
 required for dumb UPSes that do not provide a battery exhausted signal (only
 testing can determine this point).  For more information, see the Testing (see
 
-\ilink{Testing Apcupsd}{manual.tex#Testing-Apcupsd}) section of this manual. 
+\ilink{Testing Apcupsd}{Testing-Apcupsd}) section of this manual. 
 This timer can also be useful if you want some slave machines to shutdown
 before other machines to conserve battery power.  It is also useful for
 testing apcupsd because you can force a rapid shutdown by setting a small
@@ -9087,7 +7827,7 @@ information. The default is /etc/apcupsd/apcupsd.status.
    \index{DATATIME\lt{}time\gt{} }
    This directives supplies the time interval between writes of PowerChute\&tm;
 like data information to the log file. See the Data (see 
-\ilink{DATA Logging}{manual.tex#DATA-Logging}) section of this manual for
+\ilink{DATA Logging}{DATA-Logging}) section of this manual for
 additional details.  
 
 \item [FACILITY\lt{}log-facility\gt{}]
@@ -9283,7 +8023,7 @@ Under normal operations, the values for these parameters specified in the
 configuration file are not used. Instead, they are read from the UPS EPROM by
 apcupsd.  See 
 \ilink{Configuration Directives Used to Set the UPS
-EPROM}{manual.tex#Configuration-Directives-Used-to-Set-the-UPS-EPROM} of this
+EPROM}{Configuration-Directives-Used-to-Set-the-UPS-EPROM} of this
 manual for further details before attempting to reprogram your EEPROM.  
 
 \begin{description}
@@ -9439,7 +8179,7 @@ for backward compatibility and will be eliminated in a future version of
 apcupsd. The preferred method for obtaining this information is from apcaccess
 or by using the CGI interface (see 
 \ilink{apcupsd Network Monitoring [CGI]
-Programs}{manual.tex#apcupsd-Network-Monitoring-_005bCGI_005d-Programs}).  
+Programs}{apcupsd-Network-Monitoring-_005bCGI_005d-Programs}).  
 
 To make reading the status data reliable via a named pipe, the first record
 written contains a version number, the number of records that follow the first
@@ -9988,11 +8728,11 @@ The output should look something like the following:
 The line of interest for you is the {\bf Shutdown grace delay}, which can be
 changed using the SLEEP (see 
 \ilink{SLEEP \lt{}set sleep
-delay\gt{}}{manual.tex#SLEEP-_003cset-sleep-delay_003e}) directive in your
+delay\gt{}}{SLEEP-_003cset-sleep-delay_003e}) directive in your
 {\bf apcupsd.conf} file. The default value is 20 seconds, but generally, you
 can set it to 180, 300, or 600 seconds depending on your UPS. See the EEPROM
 (see 
-\ilink{Configuring Your EEPROM}{manual.tex#Configuring-Your-EEPROM}) this
+\ilink{Configuring Your EEPROM}{Configuring-Your-EEPROM}) this
 manual for further details on how to change this EPROM value.  
 
 If you use the {\tt \verb{--{kill-on-powerfail} option, you run the risk of having
@@ -10009,17 +8749,17 @@ power to your computer after a full power shutdown. They are the RETURNCHARGE
 (see 
 \ilink{RETURNCHARGE \lt{}min\_ batt\_ charge
 level\gt{}}
-{manual.tex#RETURNCHARGE-_003cmin_005f-batt_005f-charge-level_003e})
+{RETURNCHARGE-_003cmin_005f-batt_005f-charge-level_003e})
 percentage and the WAKEUP (see 
 \ilink{WAKEUP \lt{}set wakeup
-delay\gt{}}{manual.tex#WAKEUP-_003cset-wakeup-delay_003e}) delay. Briefly, the
+delay\gt{}}{WAKEUP-_003cset-wakeup-delay_003e}) delay. Briefly, the
 {\bf RETURNCHARGE} specifies what percentage charge the battery must have
 before the power is restored. Higher values are recommended in regions where
 the power goes up and down frequently. The {\bf WAKEUP} delay is a simple time
 delay. Most sites will have both of these at zero, or perhaps the {\bf
 RETURNCHARGE} set to 15. Please follow the links to the {\bf Configuration}
 section of this manual for more information.  See the EEPROM (see 
-\ilink{Configuring Your EEPROM}{manual.tex#Configuring-Your-EEPROM}) of this
+\ilink{Configuring Your EEPROM}{Configuring-Your-EEPROM}) of this
 manual for further details on how to change these EPROM values. 
 
 \label{Shutdown-Problems}
@@ -10121,7 +8861,7 @@ shutting down apcupsd should be done with the same script:
 
 \label{index-Windows-Considerations-261}
 Please see the end of Windows chapter (see 
-\ilink{Installation on Windows}{manual.tex#Installation-on-Windows}) of this
+\ilink{Installation on Windows}{Installation-on-Windows}) of this
 manual for conderations pertaining to shutdown and killpower on Windows. 
 
 \label{APC-smart-protocol}
@@ -10207,7 +8947,7 @@ matter.
 Many thanks to Steve Draper for providing this scan.  
 
 For additional information on cables, see the section on custom cables (see 
-\ilink{Cables}{manual.tex#Cables}) in this manual. 
+\ilink{Cables}{Cables}) in this manual. 
 
 \label{The-Smart-Protocol}
 

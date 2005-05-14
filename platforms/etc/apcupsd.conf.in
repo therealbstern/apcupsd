@@ -9,7 +9,7 @@
 # UPSNAME xxx
 #   Use this to give your UPS a name in log files and such. This
 #   is particulary useful if you have multiple UPSes.  This does not
-#   set the EEPROM.
+#   set the EEPROM. It should be 8 characters or less.
 #UPSNAME
 #
 # UPSCABLE [ simple    | smart     | ether     | usb |
@@ -18,7 +18,8 @@
 #            940-1524C | 940-0024G | 940-0095A | 940-0095B |
 #            940-0095C | M-04-02-2000 ]
 #
-# defines the type of cable that you have.
+# defines the type of cable that you have chosen from the above
+# list.
 UPSCABLE @UPSCABLE@
 #
 # Old types, still valid, are mapped to the new drivers
@@ -40,14 +41,17 @@ UPSCABLE @UPSCABLE@
 #
 # UPSTYPE [ dumb | apcsmart | net | usb | snmp | test]
 #
-# defines the type of UPS you have.
+# defines the driver to use for your type of UPS
 UPSTYPE @UPSTYPE@
 #
 #
 #DEVICE <string> /dev/<serial port>
 # name of your UPS device
 #
-# Here a table of the possible devices related with the UPS drivers.
+# Here is a table of the possible devices and the related UPS drivers.
+#  Select a device from the "Device" column that corresponds to
+#  your driver as specified in the UPSTYPE directive above,
+#  and how you have connected the UPS.
 #
 # Driver   Device                    Description
 # dumb     /dev/tty**                Serial character device
