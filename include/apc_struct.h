@@ -213,7 +213,8 @@ typedef struct netdata {
  */
 #define UPSINFO_ID "UPS!"
 
-typedef struct upsinfo {
+class UPSINFO {
+public:
     char id[5];
     int version;
     int size;
@@ -372,7 +373,7 @@ typedef struct upsinfo {
      * Linked list of UPSes used in apclist.c
      */
 
-    struct upsinfo *next;
+    UPSINFO *next;
 #ifdef HAVE_PTHREADS
     pthread_mutex_t mutex;
     int refcnt;                       /* thread attach count */
@@ -380,7 +381,7 @@ typedef struct upsinfo {
 
     const struct upsdriver *driver; /* UPS driver for this UPSINFO */
     void *driver_internal_data;     /* Driver private data */
-} UPSINFO;
+};
 
 /* Used only in apcaccess.c */
 typedef struct datainfo {

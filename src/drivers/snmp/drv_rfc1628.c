@@ -2,9 +2,9 @@
  *  drv_rfc1628.c -- rfc1628 aka UPS-MIB driver
  *  Copyright (C) 1999-2002 Riccardo Facchetti <riccardo@apcupsd.org>
  *
- *  apcupsd.c	-- Simple Daemon to catch power failure signals from a
- *		   BackUPS, BackUPS Pro, or SmartUPS (from APCC).
- *		-- Now SmartMode support for SmartUPS and BackUPS Pro.
+ *  apcupsd.c   -- Simple Daemon to catch power failure signals from a
+ *                 BackUPS, BackUPS Pro, or SmartUPS (from APCC).
+ *              -- Now SmartMode support for SmartUPS and BackUPS Pro.
  *
  */
 
@@ -33,9 +33,9 @@
 #include "snmp_private.h"
 
 static int rfc_1628_check_alarms(UPSINFO *ups) {
-    struct snmp_ups_internal_data *Sid = ups->driver_internal_data;
+    struct snmp_ups_internal_data *Sid = (struct snmp_ups_internal_data *)ups->driver_internal_data;
     struct snmp_session *s = &Sid->session;
-    ups_mib_t *data = Sid->MIB;
+    ups_mib_t *data = (ups_mib_t *)Sid->MIB;
 
     /*
      * Check the Ethernet COMMLOST first, then check the
@@ -43,11 +43,11 @@ static int rfc_1628_check_alarms(UPSINFO *ups) {
      * alarms.
      */
     if (ups_mib_mgr_get_upsAlarmEntry(s, &(data->upsAlarmEntry)) == -1) {
-	set_ups(UPS_COMMLOST);
-	free(data->upsAlarmEntry);
-	return 0;
+        set_ups(UPS_COMMLOST);
+        free(data->upsAlarmEntry);
+        return 0;
     } else {
-	clear_ups(UPS_COMMLOST);
+        clear_ups(UPS_COMMLOST);
     }
     free(data->upsAlarmEntry);
     return 1;
@@ -77,7 +77,7 @@ int rfc1628_snmp_ups_get_capabilities(UPSINFO *ups) {
      * capabilities. We do this way for sake of simplicity.
      */
     for (i = 0; i <= CI_MAX_CAPS; i++) {
-	ups->UPS_Cap[i] = TRUE;
+        ups->UPS_Cap[i] = TRUE;
     }
 
     return 1;

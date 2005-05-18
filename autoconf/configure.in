@@ -92,6 +92,7 @@ dnl
 
 AC_PROG_CC			dnl Determine a C compiler to use.
 AC_PROG_CPP			dnl Determine a C pre-processor to use.
+AC_PROG_CXX
 AC_PROG_CC_C_O			dnl Determine if C compiler support -c -o.
 AC_PROG_GCC_TRADITIONAL 	dnl Determine if ioctl() need -traditional.
 AC_PROG_INSTALL 		dnl Determine a BSD install program.
@@ -960,6 +961,7 @@ AC_SUBST(ETAGS)
 AC_SUBST(CTAGS)
 AC_SUBST(RM)
 AC_SUBST(CC)
+AC_SUBST(CXX)
 AC_SUBST(CGI)
 AC_SUBST(GDINCLUDE)
 AC_SUBST(LIBGD)
@@ -1728,9 +1730,9 @@ make clean
 # A whole lot of hand springs to get the compiler version.
 #  This is because gcc changed the output in version 3.0
 #
-CCVERSION=`${CC} --version | tr '\n' ' ' | cut -f 3 -d ' '`
-if test "x${CCVERSION}" = "x" ; then
-  CCVERSION=`${CC} --version | tr '\n' ' ' | cut -f 1 -d ' '`
+CXXVERSION=`${CXX} --version | tr '\n' ' ' | cut -f 3 -d ' '`
+if test "x${CXXVERSION}" = "x" ; then
+  CXXVERSION=`${CXX} --version | tr '\n' ' ' | cut -f 1 -d ' '`
 fi
 
 eval srcdir=${srcdir}
@@ -1753,7 +1755,7 @@ Configuration on `date`:
   LOG dir (events, status)    ${LOGDIR}
   LOCK dir (for serial port)  ${LOCKDIR}
   Power Fail dir	      ${PWRFAILDIR}
-  Compiler:		      ${CC} ${CCVERSION}
+  Compiler:		      ${CXX} ${CXXVERSION}
   Compiler flags:	      ${WCFLAGS} ${CFLAGS} ${PTHREAD_FLAGS}
   Loader flags: 	      ${WLDFLAGS} ${LDFLAGS}
   Host and version:	      ${DISTNAME} ${DISTVER}

@@ -30,13 +30,13 @@ all-subdirs:
 dummy:
 
 .c.o:
-	$(CC) -c $(WCFLAGS) $(CFLAGS) $(DEFS) $<
+	$(CXX) -c $(WCFLAGS) $(CFLAGS) $(DEFS) $<
 
 .c.lo:
 	$(LIBTOOL) --mode=compile $(COMPILE) $<
 
 .cpp.o:
-	$(CC) -c $(WCFLAGS) $(CFLAGS) $(DEFS) $<
+	$(CXX) -c $(WCFLAGS) $(CFLAGS) $(DEFS) $<
 
 .po.pox:
 	$(MAKE) DESTDIR=$(DESTDIR) $(PACKAGE).pot
@@ -195,11 +195,11 @@ single-depend:
 
 real-depend:
 	@$(RMF) Makefile.bak
-	@if test "$(CC)" = "gcc" ; then \
+	@if test "$(CXX)" = "g++" ; then \
 	   $(MV) Makefile Makefile.bak; \
 	   $(SED) "/^# DO NOT DELETE THIS LINE/,$$ d" Makefile.bak > Makefile; \
 	   $(ECHO) "# DO NOT DELETE THIS LINE -- make depend depends on it." >> Makefile; \
-	   $(CC) -S -M $(CPPFLAGS) $(INCFLAGS) *.c >> Makefile; \
+	   $(CXX) -S -M $(CPPFLAGS) $(INCFLAGS) *.c >> Makefile; \
 	else \
 	   makedepend -- $(CFLAGS) -- $(INCFLAGS) *.c; \
 	fi 

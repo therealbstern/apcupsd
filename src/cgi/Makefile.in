@@ -34,16 +34,16 @@ GDINCLUDE = @GDINCLUDE@
 all-targets: $(allexe)
 
 multimon.cgi: $(MOBJS)
-	$(CC) $(CFLAGS) $(LDFLAGS) -o $@ $(MOBJS) $(LIBS)
+	$(CXX) $(CFLAGS) $(LDFLAGS) -o $@ $(MOBJS) $(LIBS)
 
 upsstats.cgi: $(SOBJS) 
-	$(CC) $(LDFLAGS) -o $@ $(SOBJS) $(LIBS)
+	$(CXX) $(LDFLAGS) -o $@ $(SOBJS) $(LIBS)
 
 upsfstats.cgi: $(FOBJS) 
-	$(CC) $(LDFLAGS) -o $@ $(FOBJS) $(LIBS)
+	$(CXX) $(LDFLAGS) -o $@ $(FOBJS) $(LIBS)
 
 upsimage.cgi: $(IOBJS)
-	$(CC) $(LDFLAGS) -o $@ $(IOBJS) @LIBGDOBJ@ $(LIBS) -lm
+	$(CXX)	$(LDFLAGS) -o $@ $(IOBJS) @LIBGDOBJ@ $(LIBS) -lm
 
 clean: targetclean
 

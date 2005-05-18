@@ -14,7 +14,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.		  
+   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.              
  */
 
 #include <stdio.h>
@@ -88,17 +88,19 @@ static const struct {
         { NULL,         NULL,                   0       }
 };
 
-typedef struct {
-	const char	*var;
-	const char	*name;
-	const char	*suffix;
-	void	*next;
-} ftype_t;
+struct ftype_t;
 
-static	ftype_t	*firstfield = NULL;
-static	int	numfields = 0;
+struct ftype_t {
+        const char      *var;
+        const char      *name;
+        const char      *suffix;
+        ftype_t         *next;
+};        
+
+static  ftype_t *firstfield = NULL;
+static  int     numfields = 0;
 static  int     use_celsius;
-static	char	*desc;
+static  char    *desc;
 static  int     refresh = DEFAULT_REFRESH;
 
 void parsearg(const char *var, const char *value)
@@ -128,8 +130,8 @@ static void do_model (const char *monhost, const char *suffix)
 
     } else {
         fputs ("<td class=\"Label\">", stdout);
-	html_puts(model);
-	(void) puts("</td>");
+        html_puts(model);
+        (void) puts("</td>");
     }
 }
 
@@ -146,13 +148,13 @@ static void do_system(const char *monhost, const char *suffix)
 static void do_status(const char *monhost, const char *suffix)
 {
     char    status[64], *stat, stattxt[128], temp[128];
-    char    *class;
+    char    *class_type;
     int     i, severity;
     long    ups_status;
 
     if (getupsvar (monhost, "status", status, sizeof(status)) <= 0) {
             printf ("<td class=\"Fault\">Unavailable</td>\n");
-	    return;
+            return;
     }
 
     stattxt[0] = '\0';
@@ -185,34 +187,34 @@ static void do_status(const char *monhost, const char *suffix)
 
     stat = strtok (status, " ");
     while (stat != NULL) {  
-	for (i = 0; stattab[i].name != NULL; i++) {
-		if (strcmp(stattab[i].name, stat) == 0) {
+        for (i = 0; stattab[i].name != NULL; i++) {
+                if (strcmp(stattab[i].name, stat) == 0) {
                         snprintf (temp, sizeof(temp), "%s %s<br />",
-				  stattxt, stattab[i].desc);
+                                  stattxt, stattab[i].desc);
                         snprintf (stattxt, sizeof(stattxt), "%s",
-				  temp);
-			if (stattab[i].severity > severity)
-				severity = stattab[i].severity;
-		}
-	}
+                                  temp);
+                        if (stattab[i].severity > severity)
+                                severity = stattab[i].severity;
+                }
+        }
         stat = strtok (NULL, " ");
     }
 
     switch (severity) {
         case 0:
-            class = "Normal";
+            class_type = "Normal";
             break;
 
         case 1:
-            class = "Warning";
+            class_type = "Warning";
             break;
 
         case 2:
         default:
-            class = "Fault";
+            class_type = "Fault";
             break;
     }
-    printf ("<td class=\"%s\">%s</td>\n", class, stattxt);
+    printf ("<td class=\"%s\">%s</td>\n", class_type, stattxt);
 }
 
 /* handler for "DATA" */
@@ -242,7 +244,7 @@ static void do_upstempf(const char *monhost, const char *suffix)
     float   tempf;
 
     if (getupsvar(monhost, "upstemp", upstemp, sizeof(upstemp)) > 0) {
-	tempf = (strtod (upstemp, 0) * 1.8) + 32;
+        tempf = (strtod (upstemp, 0) * 1.8) + 32;
         printf ("<td class=\"Normal\">%.1f&deg; F</td>\n", tempf); 
 
     } else {
@@ -264,8 +266,8 @@ static void do_upstemp(const char *monhost, const char *suffix)
 /* handler for "HUMIDITY" */
 static void do_humidity(const char *monhost, const char *suffix)
 {
-    char	humidity[64];
-    float	ambhum;
+    char        humidity[64];
+    float       ambhum;
 
     if (getupsvar (monhost, "humidity", humidity, sizeof(humidity)) > 0) {
         ambhum = strtod (humidity, 0);
@@ -279,7 +281,7 @@ static void do_humidity(const char *monhost, const char *suffix)
 /* handler for "AMBTEMPC" */
 static void do_ambtempc(const char *monhost, const char *suffix)
 {
-	char	ambtemp[64];
+        char    ambtemp[64];
 
     if (getupsvar (monhost, "ambtemp", ambtemp, sizeof(ambtemp)) > 0) {
         printf ("<td class=\"Normal\">%s&deg; C</td>\n", ambtemp); 
@@ -292,11 +294,11 @@ static void do_ambtempc(const char *monhost, const char *suffix)
 /* handler for "AMBTEMPF" */
 static void do_ambtempf (const char *monhost, const char *suffix)
 {
-	char	ambtemp[64];
-	float	tempf;
+        char    ambtemp[64];
+        float   tempf;
 
     if (getupsvar (monhost, "ambtemp", ambtemp, sizeof(ambtemp)) > 0) {
-	tempf = (strtod (ambtemp, 0) * 1.8) + 32;
+        tempf = (strtod (ambtemp, 0) * 1.8) + 32;
         printf ("<td class=\"Normal\">%.1f&deg; F</td>\n", tempf); 
 
     } else {
@@ -322,27 +324,27 @@ static void do_utility(const char *monhost, const char *suffix)
     int  lowx, highx, util;
 
     if (getupsvar (monhost, "utility", utility, sizeof(utility)) > 0) {
-	/* try to get low and high transfer points for color codes */
+        /* try to get low and high transfer points for color codes */
 
-	lowx = highx = 0;
+        lowx = highx = 0;
 
         if (getupsvar (monhost, "lowxfer", lowxfer, sizeof(lowxfer)) > 0)
-	    lowx = atoi(lowxfer);
+            lowx = atoi(lowxfer);
         if (getupsvar (monhost, "highxfer", highxfer, sizeof(highxfer)) > 0)
-	    highx = atoi(highxfer);
+            highx = atoi(highxfer);
 
         printf ("<td class=\"");
 
-	/* only do this if we got both values */
-	if ((lowx != 0) && (highx != 0)) {
-	    util = atoi(utility);
+        /* only do this if we got both values */
+        if ((lowx != 0) && (highx != 0)) {
+            util = atoi(utility);
 
-	    if ((util < lowx) || (util > highx))
+            if ((util < lowx) || (util > highx))
                 printf ("Fault");
-	    else
+            else
                 printf ("Normal");
-	}
-	else
+        }
+        else
             printf ("Normal");
 
         printf ("\">%s VAC</td>\n", utility);
@@ -365,33 +367,33 @@ static void getinfo(char *monhost)
     if (getupsvar(monhost, "date", tmpbuf, sizeof(tmpbuf)) <= 0) {
         printf ("<td class=\"Fault\">%s</td>\n", desc);
         printf ("<td colspan=\"%d\" class=\"Fault\">Not available: %s</td></tr>\n",
-		 numfields - 1, net_errmsg);
-	return;
+                 numfields - 1, net_errmsg);
+        return;
     }
 
     /* process each field one by one */
     for (tmp = firstfield; tmp != NULL; tmp = tmp->next) {
-	found = 0;
+        found = 0;
 
-	/* search for a recognized special field name */
-	for (i = 0; fields[i].name != NULL; i++) {
-		if (strcmp(fields[i].name, tmp->var) == 0) {
-			fields[i].func(monhost, tmp->suffix);
-			found = 1;
-		}
-	}
+        /* search for a recognized special field name */
+        for (i = 0; fields[i].name != NULL; i++) {
+                if (strcmp(fields[i].name, tmp->var) == 0) {
+                        fields[i].func(monhost, tmp->suffix);
+                        found = 1;
+                }
+        }
 
-	if (found)
-	    continue;
+        if (found)
+            continue;
 
-	if (getupsvar(monhost, tmp->var, tmpbuf, sizeof(tmpbuf)) > 0) {
-	    if (tmp->suffix == NULL) {
+        if (getupsvar(monhost, tmp->var, tmpbuf, sizeof(tmpbuf)) > 0) {
+            if (tmp->suffix == NULL) {
                 printf ("<td class=\"Normal\">%s</td>\n", tmpbuf);
-	    } else {
+            } else {
                 printf ("<td class=\"Normal\">%s %s</td>\n", 
-				tmpbuf, tmp->suffix);
+                                tmpbuf, tmp->suffix);
             }
-	} else {
+        } else {
            (void) puts ("<td class=\"Empty\">-</td>");
         }
     }
@@ -406,8 +408,8 @@ static void addfield(const char *var, const char *name, const char *suffix)
     tmp = last = firstfield;
 
     while (tmp != NULL) {
-	last = tmp;
-	tmp = tmp->next;
+        last = tmp;
+        tmp = tmp->next;
     }
 
     tmp = (ftype_t *)malloc (sizeof (ftype_t));
@@ -417,9 +419,9 @@ static void addfield(const char *var, const char *name, const char *suffix)
     tmp->next = NULL;
 
     if (last == NULL) {
-	firstfield = tmp;
+        firstfield = tmp;
     } else {
-	last->next = tmp;
+        last->next = tmp;
     }
     numfields++;
 }
@@ -444,48 +446,48 @@ static void parsefield(char *buf)
     ptr = buf + strlen(var) + 1;
     while (*ptr) {
         if (*ptr == '"') {
-	    in_string = !in_string;
-	    if (!in_string) {
+            in_string = !in_string;
+            if (!in_string) {
                 tmp[i] = '\0';
-		i = 0;
-		if (suffix) {
+                i = 0;
+                if (suffix) {
                         snprintf(tmp, sizeof(tmp), "multimon.conf: "
                                 "More than two strings "
                                 "in field %s.", var);
-			report_error(tmp);
-		}
-		else if (name) {
-			suffix = strdup(tmp);
-		}
-		else {
-			name = strdup(tmp);
-		}
-	    }
-	} else if (in_string) {
+                        report_error(tmp);
+                }
+                else if (name) {
+                        suffix = strdup(tmp);
+                }
+                else {
+                        name = strdup(tmp);
+                }
+            }
+        } else if (in_string) {
             if (*ptr == '\\') {
-		++ptr;
+                ++ptr;
                 if (*ptr == '\0') {
                         snprintf(tmp, sizeof(tmp), "multimon.conf: "
                                 "Backslash at end of line "
                                 "in field %s.", var);
-			report_error(tmp);
-		}
-	    }
-	    tmp[i++] = *ptr;
-	}
-	++ptr;
+                        report_error(tmp);
+                }
+            }
+            tmp[i++] = *ptr;
+        }
+        ++ptr;
     }
 
     if (in_string) {
             snprintf(tmp, sizeof(tmp), "multimon.conf: "
                     "Unbalanced quotes in field %s!", var);
-	    report_error(tmp);
+            report_error(tmp);
     }
 
     free(tmp);
 
     addfield(var, name, suffix);
-}	
+}       
 
 static void readconf(void)
 {
@@ -497,23 +499,23 @@ static void readconf(void)
 
     /* the config file is not required */
     if (conf == NULL)
-	return;
+        return;
 
     while (fgets (buf, sizeof(buf), conf)) {
-	buf[strlen(buf) - 1] = '\0';
+        buf[strlen(buf) - 1] = '\0';
 
         if (strncmp (buf, "FIELD", 5) == 0) {
-	     parsefield (&buf[6]);
+             parsefield (&buf[6]);
 
         } else if (strncmp (buf, "TEMPC", 5) == 0) {
-	     use_celsius = 1;
+             use_celsius = 1;
 
         } else if (strncmp (buf, "TEMPF", 5) == 0) {
-	     use_celsius = 0;
-	}
+             use_celsius = 0;
+        }
     }
     fclose (conf);
-}	
+}       
 
 /* create default field configuration */
 static void defaultfields(void)
@@ -526,7 +528,7 @@ static void defaultfields(void)
     addfield ("loadpct", "UPS Load", "%");
     addfield ("UPSTEMP", "UPS Temperature", "");
     addfield ("DATA",  "Data", "All data");
-}	
+}       
 
 int main(int argc, char **argv) 
 {
@@ -543,8 +545,8 @@ int main(int argc, char **argv)
     use_celsius = 0;
 #endif
     readconf();
-    if (firstfield == NULL)	    /* nothing from config file? */
-	    defaultfields();
+    if (firstfield == NULL)         /* nothing from config file? */
+            defaultfields();
 
     (void) extractcgiargs();
     html_begin("Multimon: UPS Status Page", refresh);
@@ -568,17 +570,17 @@ int main(int argc, char **argv)
     conf = fopen (fn, "r");
     if (conf == NULL) {
         printf ("<tr><td colspan=\"%d\" class=\"Fault\">Error: Cannot open hosts file</td></tr>\n",
-		   numfields);
+                   numfields);
     } else {
-	while (fgets (buf, sizeof(buf), conf)) {
+        while (fgets (buf, sizeof(buf), conf)) {
             if (strncmp("MONITOR", buf, 7) == 0) {
                 sscanf (buf, "%*s %s %n", addr, &restofs);
-		rest = buf + restofs + 1;
+                rest = buf + restofs + 1;
                 desc = strtok(rest, "\"");
-		getinfo(addr);	/* get and print info for this host */
-	    }
-	}
-	fclose (conf);
+                getinfo(addr);  /* get and print info for this host */
+            }
+        }
+        fclose (conf);
     }
     (void) puts ("</table>");
 
