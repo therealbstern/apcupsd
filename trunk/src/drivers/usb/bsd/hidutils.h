@@ -1,5 +1,30 @@
-#ifndef __HIDUTILS_H
-#define __HIDUTILS_H
+/*
+ * hidutils.h
+ *
+ * Utility functions for interfacing with the libusbhid userspace
+ * HID parsing library.
+ */
+
+/*
+ * Copyright (C) 2004-2005 Adam Kropelin
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of version 2 of the GNU General
+ * Public License as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the Free
+ * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+ * MA 02111-1307, USA.
+ */
+
+#ifndef _HIDUTILS_H
+#define _HIDUTILS_H
 
 #include "usbhid.h"
 
@@ -21,7 +46,7 @@
  * rlen out paramter and a pointer to a malloc'ed buffer containing
  * the descriptor is returned. Returns NULL on failure.
  */
-unsigned char* hidu_fetch_report_descriptor(int fd, int* rlen);
+unsigned char *hidu_fetch_report_descriptor(int fd, int *rlen);
 
 /*
  * Locate an item matching the given parameters. If found, the
@@ -30,7 +55,7 @@ unsigned char* hidu_fetch_report_descriptor(int fd, int* rlen);
  * may be set to -1 for "don't care".
  */
 int hidu_locate_item(report_desc_t rdesc, int usage, int app, int phys,
-                     int logical, int kind, hid_item_t* outitem);
+   int logical, int kind, hid_item_t *outitem);
 
 /*
  * Fetch a report from a device given an fd for the device's control
@@ -38,14 +63,14 @@ int hidu_locate_item(report_desc_t rdesc, int usage, int app, int phys,
  * data buffer in which to store the result, and the report length.
  * Returns actual report length (in bytes) on success and -1 on failure.
  */
-int hidu_get_report(int fd, hid_item_t* item, unsigned char* data, int len);
+int hidu_get_report(int fd, hid_item_t *item, unsigned char *data, int len);
 
 /*
  * Send a report to the device given an fd for the device's control
  * endpoint, the populated item structure, the data to send, and the
  * report length. Returns true on success, false on failure.
  */
-int hidu_set_report(int fd, hid_item_t* item, unsigned char* data, int len);
+int hidu_set_report(int fd, hid_item_t *item, unsigned char *data, int len);
 
 /*
  * Fetch a string descriptor from the device given an fd for the
@@ -53,7 +78,7 @@ int hidu_set_report(int fd, hid_item_t* item, unsigned char* data, int len);
  * to a static buffer containing the NUL-terminated string or NULL
  * on failure.
  */
-const char* hidu_get_string(int fd, int index);
+const char *hidu_get_string(int fd, int index);
 
 
 #endif
