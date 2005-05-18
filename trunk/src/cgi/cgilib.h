@@ -30,7 +30,7 @@ int checkhost(const char *check);
  * Output a string taking care to assure that any html meta characters
  * are output properly.
  */
-void html_puts(const unsigned char *s);
+void html_puts(const char *s);
 
 /*
  * Print the standard http header, html header which is common to all

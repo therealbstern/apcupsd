@@ -2,5 +2,10 @@
                         Kern Sibbald
 
 General:
+15May05
+- Convert the core code to be compiled by C++. Most of it was already
+  done.
+- Modify the UPSINFO structure to be a class so that I can add class
+  methods for accessing some of the variables (status bits).
 05Apr05
 - Move kes-3.10.17 to new 2005 directory (keeps techlogs cleaner).

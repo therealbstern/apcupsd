@@ -14,7 +14,7 @@
 
    You should have received a copy of the GNU General Public License
    along with this program; if not, write to the Free Software
-   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.		  
+   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.              
 */
 
 #include <stdio.h>
@@ -30,48 +30,48 @@
  * each argument found.
  * 
  * Returns 0 on failure
- *	   1 on success
+ *         1 on success
  */
 int extractcgiargs()
 {
-	char	*query, *ptr, *eq, *varname, *value, *amp;
+        char    *query, *ptr, *eq, *varname, *value, *amp;
 
         query = getenv ("QUERY_STRING");
-	if (query == NULL)
-		return 0;	/* not run as a cgi script! */
+        if (query == NULL)
+                return 0;       /* not run as a cgi script! */
 
-	/* varname=value&varname=value&varname=value ... */
+        /* varname=value&varname=value&varname=value ... */
 
-	ptr = query;
+        ptr = query;
 
-	while (ptr) {
-		varname = ptr;
+        while (ptr) {
+                varname = ptr;
                 eq = strchr (varname, '=');
-		if (!eq) {
-			return 0;     /* Malformed string argument */
-		}
-		
+                if (!eq) {
+                        return 0;     /* Malformed string argument */
+                }
+                
                 *eq = '\0';
-		value = eq + 1;
+                value = eq + 1;
                 amp = strchr (value, '&');
-		if (amp) {
-			ptr = amp + 1;
+                if (amp) {
+                        ptr = amp + 1;
                         *amp = '\0';
-		}
-		else
-			ptr = NULL;
-	
-		parsearg (varname, value);
-	}
+                }
+                else
+                        ptr = NULL;
+        
+                parsearg (varname, value);
+        }
 
-	return 1;
+        return 1;
 }
 
 /* 
  * Checks if the host to be monitored is in xxx/hosts.conf
  * Returns:
- *	    0 on failure
- *	    1 on success (default if not hosts.conf file)
+ *          0 on failure
+ *          1 on success (default if not hosts.conf file)
  */
 int checkhost(const char *check)
 {
@@ -81,21 +81,21 @@ int checkhost(const char *check)
     asnprintf(fn, sizeof(fn), "%s/hosts.conf", SYSCONFDIR);
     hostlist = fopen(fn, "r");
     if (hostlist == NULL) {
-	return 1;		/* default to allow */
+        return 1;               /* default to allow */
     }
 
     while (fgets(buf, (size_t) sizeof(buf), hostlist)) {
         if (strncmp("MONITOR", buf, 7) == 0) {
             sscanf (buf, "%*s %s", addr);
-	    if (strncmp(addr, check, strlen(check)) == 0) {
-		(void) fclose (hostlist);
-		return 1;	/* allowed */
-	    }
-	}
+            if (strncmp(addr, check, strlen(check)) == 0) {
+                (void) fclose (hostlist);
+                return 1;       /* allowed */
+            }
+        }
     }
     (void) fclose (hostlist);
-    return 0;		    /* denied */
-}	
+    return 0;               /* denied */
+}       
 
 /*
  * Output a string taking care to assure that any html meta characters
@@ -104,34 +104,35 @@ int checkhost(const char *check)
  * Note: XHTML added the meta character &apos;, but for backwards compatibility
  * with HTML 4.0, output it as &#39;
  */
-void html_puts(const unsigned char *p)
+void html_puts(const char *str)
 {
+    unsigned char *p = (unsigned char *)str;
     while (*p != '\0') {
-	if (*p >= 0x7f) {
+        if (*p >= 0x7f) {
             printf ("&#%d;", (int) *p);
-	} else {
-	    switch (*p) {
+        } else {
+            switch (*p) {
                 case '\"':
                     (void) fputs("&quot;", stdout);
-		    break;
+                    break;
                 case '&':
                     (void) fputs("&amp;", stdout);
-		    break;
+                    break;
                 case '\'':
                     (void) fputs("&#39;", stdout);
-		    break;
+                    break;
                 case '<':
                     (void) fputs("&lt;", stdout);
-		    break;
+                    break;
                 case '>':
                     (void) fputs("&gt;", stdout);
-		    break;
-		default:
-		    (void) putchar(*p);
-		    break;
-	    }
-	}
-	p++;
+                    break;
+                default:
+                    (void) putchar(*p);
+                    break;
+            }
+        }
+        p++;
     }
 }
 
@@ -149,15 +150,15 @@ void html_begin(const char *title, int refresh)
 
     server_protocol = getenv("SERVER_PROTOCOL");
     if (server_protocol == NULL) {
-	http_version = 10;
+        http_version = 10;
     } else if (strcmp(server_protocol, "HTTP/1.0") == 0) {
-	http_version = 10;
+        http_version = 10;
     } else if (strcmp(server_protocol, "HTTP/1.1") == 0) {
-	http_version = 11;
+        http_version = 11;
     } else {
-	http_version = 11;
+        http_version = 11;
     }
-	
+        
     (void) puts ("Content-Type: text/html; charset=utf-8"); 
     (void) puts ("Content-Language: en");
     if (http_version > 10) {
@@ -201,10 +202,10 @@ void html_begin(const char *title, int refresh)
     hostlist = fopen(fn, "r");
     if (hostlist != NULL) {
         (void) puts (" <style>");
-	while (fgets(buf, (size_t) sizeof(buf), hostlist)) {
-	    (void) puts (buf);
-	}
-	(void) fclose (hostlist);
+        while (fgets(buf, (size_t) sizeof(buf), hostlist)) {
+            (void) puts (buf);
+        }
+        (void) fclose (hostlist);
         (void) puts (" </style>");
     }
 

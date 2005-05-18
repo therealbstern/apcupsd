@@ -33,37 +33,37 @@ all-targets: $(allexe)
 #
 
 apcupsd: $(dobjs) $(gobjs) $(WINAPC) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
-	$(CC) $(LDFLAGS) $(WLDFLAGS) $(dobjs) $(gobjs) $(LIBS) $(WINAPC) $(WINLIBS) -o apcupsd
+	$(CXX) $(LDFLAGS) $(WLDFLAGS) $(dobjs) $(gobjs) $(LIBS) $(WINAPC) $(WINLIBS) -o apcupsd
 
 apcnisd: $(nobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
-	$(CC) $(LDFLAGS) $(nobjs) $(LIBS) -o apcnisd
+	$(CXX) $(LDFLAGS) $(nobjs) $(LIBS) -o apcnisd
 
 # apctest is non-Windowing
 apctest.o: apctest.c 
-	$(CC) -c $(CFLAGS) $(DEFS) $<
+	$(CXX) -c $(CFLAGS) $(DEFS) $<
 
 apctest: $(tobjs) $(gobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
-	$(CC) $(LDFLAGS) $(tobjs) $(gobjs) $(LIBS) -o apctest
+	$(CXX) $(LDFLAGS) $(tobjs) $(gobjs) $(LIBS) -o apctest
 
 devicedbg: $(xobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
-	$(CC) $(LDFLAGS) $(xobjs) $(LIBS) -o devicedbg
+	$(CXX) $(LDFLAGS) $(xobjs) $(LIBS) -o devicedbg
 
 # apcaccess is non-Windowing
 apcaccess.o: apcaccess.c 
-	$(CC) -c $(CFLAGS) $(DEFS) $<
+	$(CXX) -c $(CFLAGS) $(DEFS) $<
 
 apcaccess: $(aobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
-	$(CC) $(LDFLAGS) $(aobjs) $(LIBS) -o apcaccess
+	$(CXX) $(LDFLAGS) $(aobjs) $(LIBS) -o apcaccess
  
 # smtp is non-Windowing
 smtp.o: smtp.c
-	$(CC) -c $(CFLAGS) $(DEFS) $<
+	$(CXX) -c $(CFLAGS) $(DEFS) $<
    
 smtp: $(sobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
-	$(CC) $(LDFLAGS) $(sobjs) $(LIBS) -o smtp
+	$(CXX) $(LDFLAGS) $(sobjs) $(LIBS) -o smtp
  
 powerflute: $(fobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
-	$(CC) $(LDFLAGS) $(fobjs) $(LIBS) @POWERLIBS@ -o powerflute
+	$(CXX) $(LDFLAGS) $(fobjs) $(LIBS) @POWERLIBS@ -o powerflute
 
 install: install-binary
 

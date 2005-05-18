@@ -75,6 +75,7 @@ mandir=@mandir@
 
 # Compilation macros.
 CC = @CC@
+CXX = @CXX@
 DEFS = @EXTRADEFS@ $(LOCALDEFS)
 CPPFLAGS = @CPPFLAGS@
 
