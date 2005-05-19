@@ -411,7 +411,7 @@ bool pusb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
    USB_INFO *info = my_data->info[ci];
    USB_VALUE val;
-   char data[20];
+   unsigned char data[20];
    int exponent, len, value;
    const char *str;
 

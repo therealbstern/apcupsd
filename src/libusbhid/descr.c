@@ -60,7 +60,7 @@ hid_use_report_desc(unsigned char *data, unsigned int size)
 {
 	report_desc_t r;
 
-	r = malloc(sizeof(*r) + size);
+	r = (report_desc_t)malloc(sizeof(*r) + size);
 	if (r == 0) {
 		errno = ENOMEM;
 		return (NULL);
