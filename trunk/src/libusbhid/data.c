@@ -41,7 +41,7 @@ hid_get_data(const void *p, const hid_item_t *h)
 	int data;
 	int i, end, offs;
 
-	buf = p;
+	buf = (const unsigned char *)p;
 	hpos = h->pos;			/* bit position of data */
 	hsize = h->report_size;		/* bit length of data */
 
@@ -70,7 +70,7 @@ hid_set_data(void *p, const hid_item_t *h, int data)
 	unsigned int hsize;
 	int i, end, offs, mask;
 
-	buf = p;
+	buf = (unsigned char *)p;
 	hpos = h->pos;			/* bit position of data */
 	hsize = h->report_size;		/* bit length of data */
 

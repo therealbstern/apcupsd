@@ -92,7 +92,7 @@ hid_start_parse(report_desc_t d, int kindset, int id)
 {
 	struct hid_data *s;
 
-	s = malloc(sizeof *s);
+	s = (struct hid_data *)malloc(sizeof *s);
 	memset(s, 0, sizeof *s);
 	s->start = s->p = d->data;
 	s->end = d->data + d->size;
@@ -344,7 +344,7 @@ hid_get_item_raw(hid_data_t s, hid_item_t *h)
 				c->report_count = dval;
 				break;
 			case 10: /* Push */
-				hi = malloc(sizeof *hi);
+				hi = (hid_item_t *)malloc(sizeof *hi);
 				*hi = s->cur;
 				c->next = hi;
 				break;

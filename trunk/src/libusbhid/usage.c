@@ -34,6 +34,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include "apc.h"
 
 #include "usbhid.h"
 
@@ -110,7 +111,7 @@ hid_init(const char *hidname)
 				     hidname, lineno);
 			if (curpage->pagesize >= curpage->pagesizemax) {
 				curpage->pagesizemax += 10;
-				curpage->page_contents =
+				curpage->page_contents = (usage_in_page *)
 					realloc(curpage->page_contents,
 						curpage->pagesizemax *
 						sizeof (struct usage_in_page));
@@ -124,11 +125,11 @@ hid_init(const char *hidname)
 			if (npages >= npagesmax) {
 				if (pages == 0) {
 					npagesmax = 5;
-					pages = malloc(npagesmax *
+					pages = (usage_page *)malloc(npagesmax *
 						  sizeof (struct usage_page));
 				} else {
 					npagesmax += 5;
-					pages = realloc(pages,
+					pages = (usage_page *)realloc(pages,
 						   npagesmax *
 						   sizeof (struct usage_page));
 				}
@@ -140,7 +141,7 @@ hid_init(const char *hidname)
 			curpage->usage = no;
 			curpage->pagesize = 0;
 			curpage->pagesizemax = 10;
-			curpage->page_contents =
+			curpage->page_contents = (usage_in_page *)
 				malloc(curpage->pagesizemax *
 				       sizeof (struct usage_in_page));
 			if (!curpage->page_contents)

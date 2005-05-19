@@ -81,7 +81,7 @@ unsigned char *hidu_fetch_report_descriptor(int fd, int *rlen)
     * report descriptor).
     */
    fdesc.ufd_size = len;
-   fdesc.ufd_data = malloc(len);
+   fdesc.ufd_data = (u_char*)malloc(len);
    fdesc.ufd_config_index = USB_CURRENT_CONFIG_INDEX;
    rc = ioctl(fd, USB_GET_FULL_DESC, &fdesc);
    if (rc) {
@@ -155,7 +155,7 @@ unsigned char *hidu_fetch_report_descriptor(int fd, int *rlen)
    }
 
    *rlen = rdesclen;
-   return req.ucr_data;
+   return (unsigned char *)req.ucr_data;
 }
 
 /* Push a value onto the collection stack */
