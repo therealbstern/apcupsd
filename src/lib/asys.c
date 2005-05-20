@@ -4,7 +4,7 @@
  *   library routines. 
  * 
  *
- *   Version $Id: asys.c,v 1.5 2004-07-17 21:38:01 kerns Exp $
+ *   Version $Id: asys.c,v 1.6 2005-05-20 06:42:33 kerns Exp $
  */
 /*
    Copyright (C) 2004 Kern Sibbald
@@ -87,7 +87,7 @@ void *acalloc (size_t size1, size_t size2)
 /*
  * Implement snprintf
  */
-int asnprintf(char *str, size_t size, const char *fmt,	...) 
+int asnprintf(char *str, size_t size, const char *fmt,  ...) 
 {
 #ifdef HAVE_VSNPRINTF
    va_list   arg_ptr;
@@ -188,11 +188,11 @@ void _p(char *file, int line, pthread_mutex_t *m)
       /* We didn't get the lock, so do it definitely now */
       if ((errstat=pthread_mutex_lock(m))) {
          e_msg(file, line, M_ABORT, 0, _("Mutex lock failure. ERR=%s\n"),
-	       strerror(errstat));
+               strerror(errstat));
       } else {
          e_msg(file, line, M_ERROR, 0, _("Possible mutex deadlock resolved.\n"));
       }
-	 
+         
    }
 }
 
@@ -202,11 +202,11 @@ void _v(char *file, int line, pthread_mutex_t *m)
 
    if ((errstat=pthread_mutex_trylock(m)) == 0) {
       e_msg(file, line, M_ERROR, 0, _("Mutex unlock not locked. ERR=%s\n"),
-	   strerror(errstat));
+           strerror(errstat));
     }
     if ((errstat=pthread_mutex_unlock(m))) {
        e_msg(file, line, M_ABORT, 0, _("Mutex unlock failure. ERR=%s\n"),
-	      strerror(errstat));
+              strerror(errstat));
     }
 }
 #endif /* DEBUG_MUTEX */
@@ -238,7 +238,7 @@ int amicrosleep(time_t sec, long usec)
 #ifdef HAVE_NANOSLEEP
    stat = nanosleep(&timeout, NULL);
    if (!(stat < 0 && errno == ENOSYS)) {
-      return stat;		     
+      return stat;                   
    }
    /* If we reach here it is because nanosleep is not supported by the OS */
 #endif
@@ -272,11 +272,12 @@ int amicrosleep(time_t sec, long usec)
 }
 
 /* BSDI does not have this.  This is a *poor* simulation */
-#ifndef HAVE_STRTOLL
+/* This seems to create some problems, so is removed KES 20May05 */
+#ifndef xHAVE_STRTOLL
 long long int
 strtoll(const char *ptr, char **endptr, int base)
 {
-   return (long long int)strtod(ptr, endptr);	
+   return (long long int)strtod(ptr, endptr);   
 }
 #endif
 
@@ -288,24 +289,24 @@ strtoll(const char *ptr, char **endptr, int base)
 char *afgets(char *s, int size, FILE *fd)
 {
    char *p = s;
-   int ch, i;	 
+   int ch, i;    
    *p = 0;
    for (i=0; i < size-1; i++) {
       do {
-	 errno = 0;
-	 ch = fgetc(fd);
+         errno = 0;
+         ch = fgetc(fd);
       } while (ch == -1 && (errno == EINTR || errno == EAGAIN));
       if (ch == -1) {
-	 if (i == 0) {
-	    return NULL;
-	 } else {
-	    return s;
-	 }
+         if (i == 0) {
+            return NULL;
+         } else {
+            return s;
+         }
       }
       *p++ = ch;
       *p = 0;
       if (ch == '\n') {
-	 break;
+         break;
       }
    }
    return s;
