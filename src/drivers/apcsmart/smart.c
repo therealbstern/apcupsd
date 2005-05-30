@@ -1,3 +1,4 @@
+
 /*
  *  apcsmart.c -- The decoding of the chatty little beasts.
  *		    THE LOOK-A-LIKE ( UPSlink(tm) Language )
@@ -72,33 +73,33 @@
  */
 static void copy_self_test_results(UPSINFO *ups)
 {
-    char *msg;
+   char *msg;
 
-    /*
-     * Responses are:
-     * "OK" - good battery, 
-     * "BT" - failed due to insufficient capacity, 
-     * "NG" - failed due to overload, 
-     * "NO" - no results available (no test performed in last 5 minutes) 
-     */
-    if (ups->X[0] == 'O' && ups->X[1] == 'K') {
-       msg = "Battery OK"; 
-    } else if (ups->X[0] == 'B' && ups->X[1] == 'T') {
-       msg = "Test failed -- insufficient battery capacity"; 
-    } else if (ups->X[0] == 'N' && ups->X[1] == 'G') {
-       msg = "Test failed -- battery overloaded"; 
-    } else {
-       msg = "No test results available"; 
-    }	   
-    astrncpy(ups->selftestmsg, msg, sizeof(ups->selftestmsg));
+   /*
+    * Responses are:
+    * "OK" - good battery, 
+    * "BT" - failed due to insufficient capacity, 
+    * "NG" - failed due to overload, 
+    * "NO" - no results available (no test performed in last 5 minutes) 
+    */
+   if (ups->X[0] == 'O' && ups->X[1] == 'K') {
+      msg = "Battery OK";
+   } else if (ups->X[0] == 'B' && ups->X[1] == 'T') {
+      msg = "Test failed -- insufficient battery capacity";
+   } else if (ups->X[0] == 'N' && ups->X[1] == 'G') {
+      msg = "Test failed -- battery overloaded";
+   } else {
+      msg = "No test results available";
+   }
+   astrncpy(ups->selftestmsg, msg, sizeof(ups->selftestmsg));
 }
 
 int apc_enable(UPSINFO *ups)
 {
-    /* Enable APC Smart UPS */
-    smart_poll('Y', ups);
-    smart_poll('Y', ups);
-    return 1;
+   /* Enable APC Smart UPS */
+   smart_poll('Y', ups);
+   smart_poll('Y', ups);
+   return 1;
 }
 
 /********************************************************************* 
@@ -109,21 +110,21 @@ int apc_enable(UPSINFO *ups)
  */
 char *smart_poll(char cmd, UPSINFO *ups)
 {
-    static char answer[2000];
-    int stat;
+   static char answer[2000];
+   int stat;
 
-    *answer=0;
-    if (ups->mode.type <= SHAREBASIC)
-	return answer;	      
-    write(ups->fd, &cmd, 1);
-    stat = getline(answer, sizeof answer, ups);
-    /* If nothing returned, the link is probably down */
-    if (*answer == 0 && stat == FAILURE) {
-	UPSlinkCheck(ups);    /* wait for link to come up */
-	*answer = 0;
-    } 
+   *answer = 0;
+   if (ups->mode.type <= SHAREBASIC)
+      return answer;
+   write(ups->fd, &cmd, 1);
+   stat = getline(answer, sizeof answer, ups);
+   /* If nothing returned, the link is probably down */
+   if (*answer == 0 && stat == FAILURE) {
+      UPSlinkCheck(ups);           /* wait for link to come up */
+      *answer = 0;
+   }
 
-    return answer;
+   return answer;
 }
 
 /*
@@ -134,168 +135,169 @@ char *smart_poll(char cmd, UPSINFO *ups)
  */
 int getline(char *s, int len, UPSINFO *ups)
 {
-    int i = 0;
-    int ending = 0;
-    char c;
-    int retval;
-    SMART_DATA *my_data = (SMART_DATA *)ups->driver_internal_data;
+   int i = 0;
+   int ending = 0;
+   char c;
+   int retval;
+   SMART_DATA *my_data = (SMART_DATA *) ups->driver_internal_data;
 
-    while (!ending) {
+   while (!ending) {
 #ifndef HAVE_CYGWIN
-	fd_set rfds;
-	struct timeval tv;
- 
-	if (my_data->debounce) {
-	   int sleep_time;
-	   /* Wait 6 seconds before returning next sample.
-	    * This eliminates the annoyance of detecting
-	    * transitions to battery that last less than
-	    * 6 seconds.  Do sanity check on calculated
-	    * sleep time.
-	    */	 
-	   sleep_time = 6 - (time(NULL) - my_data->debounce); 
-	   if (sleep_time < 0 || sleep_time > 6) {
-	      sleep_time = 6;
-	   }
-	   sleep(sleep_time);
-	   my_data->debounce = 0;
-	}
-  
-	FD_ZERO(&rfds);
-	FD_SET(ups->fd, &rfds);
-	if (s != NULL) {
-	    tv.tv_sec = TIMER_FAST;  /* 1 sec, expect fast response */
-	} else {
-	    tv.tv_sec = ups->wait_time;
-	}
-	tv.tv_usec = 0;
-	   
-	errno = 0;
-	retval = select((ups->fd)+1, &rfds, NULL, NULL, &tv);
+      fd_set rfds;
+      struct timeval tv;
 
-	switch (retval) {
-	case 0: /* No chars available in TIMER seconds. */
-	    return FAILURE;
-	case -1:
-	    if (errno == EINTR || errno == EAGAIN) { /* assume SIGCHLD */
-		continue;
-	    }
-            Error_abort1("Select error on UPS FD. %s\n", strerror(errno));
-	    break;
-	default:
-	    break;
-	}
+      if (my_data->debounce) {
+         int sleep_time;
+
+         /* Wait 6 seconds before returning next sample.
+          * This eliminates the annoyance of detecting
+          * transitions to battery that last less than
+          * 6 seconds.  Do sanity check on calculated
+          * sleep time.
+          */
+         sleep_time = 6 - (time(NULL) - my_data->debounce);
+         if (sleep_time < 0 || sleep_time > 6) {
+            sleep_time = 6;
+         }
+         sleep(sleep_time);
+         my_data->debounce = 0;
+      }
+
+      FD_ZERO(&rfds);
+      FD_SET(ups->fd, &rfds);
+      if (s != NULL) {
+         tv.tv_sec = TIMER_FAST;   /* 1 sec, expect fast response */
+      } else {
+         tv.tv_sec = ups->wait_time;
+      }
+      tv.tv_usec = 0;
+
+      errno = 0;
+      retval = select((ups->fd) + 1, &rfds, NULL, NULL, &tv);
+
+      switch (retval) {
+      case 0:                     /* No chars available in TIMER seconds. */
+         return FAILURE;
+      case -1:
+         if (errno == EINTR || errno == EAGAIN) {       /* assume SIGCHLD */
+            continue;
+         }
+         Error_abort1("Select error on UPS FD. %s\n", strerror(errno));
+         break;
+      default:
+         break;
+      }
 
 #endif
 
-	do {
-	   retval =  read(ups->fd, &c, 1);
-	} while (retval == -1 && (errno == EAGAIN || errno == EINTR));
-	if (retval == 0) {
-	   return FAILURE;
-	}
+      do {
+         retval = read(ups->fd, &c, 1);
+      } while (retval == -1 && (errno == EAGAIN || errno == EINTR));
+      if (retval == 0) {
+         return FAILURE;
+      }
 
-	switch(c) {
-	/*
-	 * Here we can be called in two ways:
-	 * 
-	 * s == NULL
-	 *     The shm lock is not held so we must hold it here.
-	 *
-	 * s != NULL
-	 *     We are called from a routine that have 
-	 *     already held the shm lock so no need to hold it
-	 *     another time. Simply update the UPS structure
-	 *     fields and the shm will be updated when
-	 *     write_unlock is called by the calling
-	 *     routine.
-	 *
-	 * If something changes on the UPS, a special character is
-         * sent over the serial line but no \n\r sequence is sent:
-	 * only a single character. This way if s == NULL, if we
-	 * receive a character like this we must return immediately
-	 * and not wait for a string completion.
-	 */
-        case UPS_ON_BATT:        /* UPS_ON_BATT = '!'   */
-	    if (s == NULL)
-		write_lock(ups);
-	    if (!is_ups_set(UPS_ONBATT)) {
-	       my_data->debounce = time(NULL);
-	    }
-	    clear_ups_online();
-            Dmsg0(80, "Got UPS ON BATT.\n");
-	    if (s == NULL) {
-		write_unlock(ups);
-		ending = 1;
-	    }
-	    break;
-        case UPS_REPLACE_BATTERY: /* UPS_REPLACE_BATTERY = '#'   */
-	    if (s == NULL)
-		write_lock(ups);
-	    set_ups(UPS_REPLACEBATT);
-	    if (s == NULL) {
-		write_unlock(ups);
-		ending = 1;
-	    }
-	    break;
-        case UPS_ON_LINE:        /* UPS_ON_LINE = '$'   */
-	    if (s == NULL)
-		write_lock(ups);
-	    set_ups_online();
-            Dmsg0(80, "Got UPS ON LINE.\n");
-	    if (s == NULL) {
-		write_unlock(ups);
-		ending = 1;
-	    }
-	    break;
-        case BATT_LOW:           /* BATT_LOW    = '%'   */
-	    if (s == NULL)
-		write_lock(ups);
-	    set_ups(UPS_BATTLOW);
-	    if (s == NULL) {
-		write_unlock(ups);
-		ending = 1;
-	    }
-	    break;
-        case BATT_OK:            /* BATT_OK     = '+'   */
-	    if (s == NULL)
-		write_lock(ups);
-	    clear_ups(UPS_BATTLOW);
-	    if (s == NULL) {
-		write_unlock(ups);
-		ending = 1;
-	    }
-	    break;
-        case UPS_EPROM_CHANGE:   /* UPS_EPROM_CHANGE = '|'   */
-	    break;
-        case UPS_TRAILOR:        /* UPS_TRAILOR = ':'   */
-	    break;
+      switch (c) {
+         /*
+          * Here we can be called in two ways:
+          * 
+          * s == NULL
+          *     The shm lock is not held so we must hold it here.
+          *
+          * s != NULL
+          *     We are called from a routine that have 
+          *     already held the shm lock so no need to hold it
+          *     another time. Simply update the UPS structure
+          *     fields and the shm will be updated when
+          *     write_unlock is called by the calling
+          *     routine.
+          *
+          * If something changes on the UPS, a special character is
+          * sent over the serial line but no \n\r sequence is sent:
+          * only a single character. This way if s == NULL, if we
+          * receive a character like this we must return immediately
+          * and not wait for a string completion.
+          */
+      case UPS_ON_BATT:           /* UPS_ON_BATT = '!'   */
+         if (s == NULL)
+            write_lock(ups);
+         if (!is_ups_set(UPS_ONBATT)) {
+            my_data->debounce = time(NULL);
+         }
+         clear_ups_online();
+         Dmsg0(80, "Got UPS ON BATT.\n");
+         if (s == NULL) {
+            write_unlock(ups);
+            ending = 1;
+         }
+         break;
+      case UPS_REPLACE_BATTERY:   /* UPS_REPLACE_BATTERY = '#'   */
+         if (s == NULL)
+            write_lock(ups);
+         set_ups(UPS_REPLACEBATT);
+         if (s == NULL) {
+            write_unlock(ups);
+            ending = 1;
+         }
+         break;
+      case UPS_ON_LINE:           /* UPS_ON_LINE = '$'   */
+         if (s == NULL)
+            write_lock(ups);
+         set_ups_online();
+         Dmsg0(80, "Got UPS ON LINE.\n");
+         if (s == NULL) {
+            write_unlock(ups);
+            ending = 1;
+         }
+         break;
+      case BATT_LOW:              /* BATT_LOW    = '%'   */
+         if (s == NULL)
+            write_lock(ups);
+         set_ups(UPS_BATTLOW);
+         if (s == NULL) {
+            write_unlock(ups);
+            ending = 1;
+         }
+         break;
+      case BATT_OK:               /* BATT_OK     = '+'   */
+         if (s == NULL)
+            write_lock(ups);
+         clear_ups(UPS_BATTLOW);
+         if (s == NULL) {
+            write_unlock(ups);
+            ending = 1;
+         }
+         break;
+      case UPS_EPROM_CHANGE:      /* UPS_EPROM_CHANGE = '|'   */
+         break;
+      case UPS_TRAILOR:           /* UPS_TRAILOR = ':'   */
+         break;
 
-	/* NOTE: The UPS terminates what it sends to us
-         * with a \r\n. Thus the line feed signals the
-	 * end of what we are to receive.
-	 */
-        case UPS_LF:             /* UPS_LF      = '\n'  */
-	    if (s != NULL)
-		ending = 1;	    /* This what we waited for */
-	    break;
-        case UPS_CR:             /* UPS_CR      = '\r'  */
-	    break;	   
-	default:
-	    if (s != NULL) {
-		if (i+1 < len)
-		    s[i++] = c;
-		else
-		    ending = 1;  /* no more room in buffer */
-	    }
-	    break;
-	}
-    }
+         /* NOTE: The UPS terminates what it sends to us
+          * with a \r\n. Thus the line feed signals the
+          * end of what we are to receive.
+          */
+      case UPS_LF:                /* UPS_LF      = '\n'  */
+         if (s != NULL)
+            ending = 1;            /* This what we waited for */
+         break;
+      case UPS_CR:                /* UPS_CR      = '\r'  */
+         break;
+      default:
+         if (s != NULL) {
+            if (i + 1 < len)
+               s[i++] = c;
+            else
+               ending = 1;         /* no more room in buffer */
+         }
+         break;
+      }
+   }
 
-    if (s != NULL) {
-        s[i] = '\0';
-    }
-    return SUCCESS;
+   if (s != NULL) {
+      s[i] = '\0';
+   }
+   return SUCCESS;
 }
 
 static int linkcheck = FALSE;
@@ -303,48 +305,49 @@ static int linkcheck = FALSE;
 /*********************************************************************/
 void UPSlinkCheck(UPSINFO *ups)
 {
-    char *a;
-    int comm_err = FALSE;
-    int tlog;
+   char *a;
+   int comm_err = FALSE;
+   int tlog;
 
-    if (linkcheck)
-	return;
-    linkcheck = TRUE;		       /* prevent recursion */
+   if (linkcheck)
+      return;
+   linkcheck = TRUE;               /* prevent recursion */
 
-    tcflush(ups->fd, TCIOFLUSH);
-    if (strcmp((a=smart_poll('Y', ups)), "SM") == 0) {
-	linkcheck = FALSE;
-	clear_ups(UPS_COMMLOST);
-	return;
-    }
-    set_ups(UPS_COMMLOST);
-    tcflush(ups->fd, TCIOFLUSH);
+   tcflush(ups->fd, TCIOFLUSH);
+   if (strcmp((a = smart_poll('Y', ups)), "SM") == 0) {
+      linkcheck = FALSE;
+      clear_ups(UPS_COMMLOST);
+      return;
+   }
+   set_ups(UPS_COMMLOST);
+   tcflush(ups->fd, TCIOFLUSH);
 
-    for (tlog=0; strcmp((a=smart_poll('Y', ups)), "SM") != 0; tlog -= (1+TIMER_SELECT)) {
-	if (tlog <= 0) {
-	    tlog = 10 * 60; /* notify every 10 minutes */
-	    log_event(ups, event_msg[CMDCOMMFAILURE].level,
-		      event_msg[CMDCOMMFAILURE].msg);
-	    if (!comm_err)  /* execute script once */
-		execute_command(ups, ups_event[CMDCOMMFAILURE]);
+   for (tlog = 0; strcmp((a = smart_poll('Y', ups)), "SM") != 0;
+      tlog -= (1 + TIMER_SELECT)) {
+      if (tlog <= 0) {
+         tlog = 10 * 60;           /* notify every 10 minutes */
+         log_event(ups, event_msg[CMDCOMMFAILURE].level,
+            event_msg[CMDCOMMFAILURE].msg);
+         if (!comm_err)            /* execute script once */
+            execute_command(ups, ups_event[CMDCOMMFAILURE]);
 
-	}
-	/* This sleep should not be necessary since the smart_poll() 
-	 * routine normally waits TIMER_SELECT (60) seconds. However,
-	 * in case the serial port is broken and generating spurious
-	 * characters, we sleep to reduce CPU consumption. 
-	 */
-	sleep(1);
-	comm_err = TRUE;
-	tcflush(ups->fd, TCIOFLUSH);
-    }
+      }
+      /* This sleep should not be necessary since the smart_poll() 
+       * routine normally waits TIMER_SELECT (60) seconds. However,
+       * in case the serial port is broken and generating spurious
+       * characters, we sleep to reduce CPU consumption. 
+       */
+      sleep(1);
+      comm_err = TRUE;
+      tcflush(ups->fd, TCIOFLUSH);
+   }
 
-    if (comm_err) {
-	tcflush(ups->fd, TCIOFLUSH);
-	generate_event(ups, CMDCOMMOK);
-    }
-    clear_ups(UPS_COMMLOST);
-    linkcheck = FALSE;
+   if (comm_err) {
+      tcflush(ups->fd, TCIOFLUSH);
+      generate_event(ups, CMDCOMMOK);
+   }
+   clear_ups(UPS_COMMLOST);
+   linkcheck = FALSE;
 }
 
 /********************************************************************* 
@@ -355,151 +358,148 @@ void UPSlinkCheck(UPSINFO *ups)
  */
 int apcsmart_ups_read_volatile_data(UPSINFO *ups)
 {
-    time_t now;
+   time_t now;
 
-    /*
-     * We need it for self-test start time.
-     */
-    now = time(NULL);
+   /*
+    * We need it for self-test start time.
+    */
+   now = time(NULL);
 
-    write_lock(ups);
+   write_lock(ups);
 
-    UPSlinkCheck(ups);			/* make sure serial port is working */
+   UPSlinkCheck(ups);              /* make sure serial port is working */
 
-    ups->poll_time = time(NULL);	/* save time stamp */
+   ups->poll_time = time(NULL);    /* save time stamp */
 
-    /* UPS_STATUS */
-    if (ups->UPS_Cap[CI_STATUS]) {
-	char status[10];
-	int retries = 5; /* Number of retries on status read */
+   /* UPS_STATUS */
+   if (ups->UPS_Cap[CI_STATUS]) {
+      char status[10];
+      int retries = 5;             /* Number of retries on status read */
 
-again:
-	strncpy(status, smart_poll(ups->UPS_Cmd[CI_STATUS], ups),
-		sizeof(status));
+    again:
+      strncpy(status, smart_poll(ups->UPS_Cmd[CI_STATUS], ups), sizeof(status));
 
-        Dmsg1(80, "Got status:%s\n", status);
-	/*
-         * The Status command may return "SM" probably because firmware
-         * is in a state where it still didn't updated its internal status
-	 * register. In this case retry to read the register. To be sure
-	 * not to get stuck here, we retry only 5 times.
-	 *
-	 * XXX
-	 *
-	 * If this fails, apcupsd may not be able to detect a status
-	 * change and will have unpredictable behavior. This will be fixed
-	 * once we will handle correctly the own apcupsd Status word.
-	 */
-        if (status[0] == 'S' && status[1] == 'M' && (retries-- > 0))
-	    goto again;
+      Dmsg1(80, "Got status:%s\n", status);
+      /*
+       * The Status command may return "SM" probably because firmware
+       * is in a state where it still didn't updated its internal status
+       * register. In this case retry to read the register. To be sure
+       * not to get stuck here, we retry only 5 times.
+       *
+       * XXX
+       *
+       * If this fails, apcupsd may not be able to detect a status
+       * change and will have unpredictable behavior. This will be fixed
+       * once we will handle correctly the own apcupsd Status word.
+       */
+      if (status[0] == 'S' && status[1] == 'M' && (retries-- > 0))
+         goto again;
 
-	ups->Status &= ~0xFF;	      /* clear APC byte */
-	ups->Status |= strtoul(status,NULL,16) & 0xFF;	/* set APC byte */
-    }
+      ups->Status &= ~0xFF;        /* clear APC byte */
+      ups->Status |= strtoul(status, NULL, 16) & 0xFF;  /* set APC byte */
+   }
 
-    /* ONBATT_STATUS_FLAG -- line quality */ 
-    if (ups->UPS_Cap[CI_LQUAL])
-	strncpy(ups->linequal, smart_poll(ups->UPS_Cmd[CI_LQUAL], ups),
-	       sizeof(ups->linequal));
+   /* ONBATT_STATUS_FLAG -- line quality */
+   if (ups->UPS_Cap[CI_LQUAL])
+      strncpy(ups->linequal, smart_poll(ups->UPS_Cmd[CI_LQUAL], ups),
+         sizeof(ups->linequal));
 
-    /* Reason for last transfer to batteries */
-    if (ups->UPS_Cap[CI_WHY_BATT]) {
-	strncpy(ups->G, smart_poll(ups->UPS_Cmd[CI_WHY_BATT], ups), 
-	       sizeof(ups->G));
-	/*
-	 * XXX
-	 *
-	 * See if this is a self test rather than power failure
-	 * But not now !
-	 * When we will be ready we will copy the code below inside
-	 * the driver entry point, for performing this check inside the
-	 * driver.
-	 */
-    }
+   /* Reason for last transfer to batteries */
+   if (ups->UPS_Cap[CI_WHY_BATT]) {
+      strncpy(ups->G, smart_poll(ups->UPS_Cmd[CI_WHY_BATT], ups), sizeof(ups->G));
+      /*
+       * XXX
+       *
+       * See if this is a self test rather than power failure
+       * But not now !
+       * When we will be ready we will copy the code below inside
+       * the driver entry point, for performing this check inside the
+       * driver.
+       */
+   }
 
-    /* Results of last self test */
-    if (ups->UPS_Cap[CI_ST_STAT]) {
-	strncpy(ups->X,smart_poll(ups->UPS_Cmd[CI_ST_STAT], ups), 
-	       sizeof(ups->X));
-    /*
-     * Decode the self test result into a string inside UPSINFO.
-     */
-	copy_self_test_results(ups);
-    }
+   /* Results of last self test */
+   if (ups->UPS_Cap[CI_ST_STAT]) {
+      strncpy(ups->X, smart_poll(ups->UPS_Cmd[CI_ST_STAT], ups), sizeof(ups->X));
+      /*
+       * Decode the self test result into a string inside UPSINFO.
+       */
+      copy_self_test_results(ups);
+   }
 
-    /* LINE_VOLTAGE */
-    if (ups->UPS_Cap[CI_VLINE])
-	ups->LineVoltage = atof(smart_poll(ups->UPS_Cmd[CI_VLINE], ups));
+   /* LINE_VOLTAGE */
+   if (ups->UPS_Cap[CI_VLINE])
+      ups->LineVoltage = atof(smart_poll(ups->UPS_Cmd[CI_VLINE], ups));
 
-    /* UPS_LINE_MAX */
-    if (ups->UPS_Cap[CI_VMAX])
-	ups->LineMax = atof(smart_poll(ups->UPS_Cmd[CI_VMAX], ups));
+   /* UPS_LINE_MAX */
+   if (ups->UPS_Cap[CI_VMAX])
+      ups->LineMax = atof(smart_poll(ups->UPS_Cmd[CI_VMAX], ups));
 
-    /* UPS_LINE_MIN */
-    if (ups->UPS_Cap[CI_VMIN])
-	ups->LineMin = atof(smart_poll(ups->UPS_Cmd[CI_VMIN], ups));
+   /* UPS_LINE_MIN */
+   if (ups->UPS_Cap[CI_VMIN])
+      ups->LineMin = atof(smart_poll(ups->UPS_Cmd[CI_VMIN], ups));
 
-    /* OUTPUT_VOLTAGE */
-    if (ups->UPS_Cap[CI_VOUT])
-	ups->OutputVoltage = atof(smart_poll(ups->UPS_Cmd[CI_VOUT], ups));
+   /* OUTPUT_VOLTAGE */
+   if (ups->UPS_Cap[CI_VOUT])
+      ups->OutputVoltage = atof(smart_poll(ups->UPS_Cmd[CI_VOUT], ups));
 
-    /* BATT_FULL Battery level percentage */
-    if (ups->UPS_Cap[CI_BATTLEV])
-	ups->BattChg = atof(smart_poll(ups->UPS_Cmd[CI_BATTLEV], ups));
+   /* BATT_FULL Battery level percentage */
+   if (ups->UPS_Cap[CI_BATTLEV])
+      ups->BattChg = atof(smart_poll(ups->UPS_Cmd[CI_BATTLEV], ups));
 
-    /* BATT_VOLTAGE */
-    if (ups->UPS_Cap[CI_VBATT])
-	ups->BattVoltage = atof(smart_poll(ups->UPS_Cmd[CI_VBATT], ups));
+   /* BATT_VOLTAGE */
+   if (ups->UPS_Cap[CI_VBATT])
+      ups->BattVoltage = atof(smart_poll(ups->UPS_Cmd[CI_VBATT], ups));
 
-    /* UPS_LOAD */
-    if (ups->UPS_Cap[CI_LOAD])
-	ups->UPSLoad = atof(smart_poll(ups->UPS_Cmd[CI_LOAD], ups));
+   /* UPS_LOAD */
+   if (ups->UPS_Cap[CI_LOAD])
+      ups->UPSLoad = atof(smart_poll(ups->UPS_Cmd[CI_LOAD], ups));
 
-    /* LINE_FREQ */
-    if (ups->UPS_Cap[CI_FREQ])
-	ups->LineFreq = atof(smart_poll(ups->UPS_Cmd[CI_FREQ], ups));
+   /* LINE_FREQ */
+   if (ups->UPS_Cap[CI_FREQ])
+      ups->LineFreq = atof(smart_poll(ups->UPS_Cmd[CI_FREQ], ups));
 
-    /* UPS_RUNTIME_LEFT */
-    if (ups->UPS_Cap[CI_RUNTIM])
-	ups->TimeLeft = atof(smart_poll(ups->UPS_Cmd[CI_RUNTIM], ups));
+   /* UPS_RUNTIME_LEFT */
+   if (ups->UPS_Cap[CI_RUNTIM])
+      ups->TimeLeft = atof(smart_poll(ups->UPS_Cmd[CI_RUNTIM], ups));
 
-    /* UPS_TEMP */
-    if (ups->UPS_Cap[CI_ITEMP])
-	ups->UPSTemp = atof(smart_poll(ups->UPS_Cmd[CI_ITEMP], ups));
+   /* UPS_TEMP */
+   if (ups->UPS_Cap[CI_ITEMP])
+      ups->UPSTemp = atof(smart_poll(ups->UPS_Cmd[CI_ITEMP], ups));
 
-    /* DIP_SWITCH_SETTINGS */
-    if (ups->UPS_Cap[CI_DIPSW])
-	ups->dipsw = strtoul(smart_poll(ups->UPS_Cmd[CI_DIPSW], ups), NULL, 16);
+   /* DIP_SWITCH_SETTINGS */
+   if (ups->UPS_Cap[CI_DIPSW])
+      ups->dipsw = strtoul(smart_poll(ups->UPS_Cmd[CI_DIPSW], ups), NULL, 16);
 
-    /* Register 1 */
-    if (ups->UPS_Cap[CI_REG1])
-	ups->reg1 = strtoul(smart_poll(ups->UPS_Cmd[CI_REG1], ups), NULL, 16);
+   /* Register 1 */
+   if (ups->UPS_Cap[CI_REG1])
+      ups->reg1 = strtoul(smart_poll(ups->UPS_Cmd[CI_REG1], ups), NULL, 16);
 
-    /* Register 2 */
-    if (ups->UPS_Cap[CI_REG2])
-	ups->reg2 = strtoul(smart_poll(ups->UPS_Cmd[CI_REG2], ups), NULL, 16);
+   /* Register 2 */
+   if (ups->UPS_Cap[CI_REG2])
+      ups->reg2 = strtoul(smart_poll(ups->UPS_Cmd[CI_REG2], ups), NULL, 16);
 
-    /* Register 3 */
-    if (ups->UPS_Cap[CI_REG3])
-	ups->reg3 = strtoul(smart_poll(ups->UPS_Cmd[CI_REG3], ups), NULL, 16);
+   /* Register 3 */
+   if (ups->UPS_Cap[CI_REG3])
+      ups->reg3 = strtoul(smart_poll(ups->UPS_Cmd[CI_REG3], ups), NULL, 16);
 
-    /*	      Humidity percentage */ 
-    if (ups->UPS_Cap[CI_HUMID])
-	ups->humidity = atof(smart_poll(ups->UPS_Cmd[CI_HUMID], ups));
+   /*        Humidity percentage */
+   if (ups->UPS_Cap[CI_HUMID])
+      ups->humidity = atof(smart_poll(ups->UPS_Cmd[CI_HUMID], ups));
 
-    /*	      Ambient temperature */ 
-    if (ups->UPS_Cap[CI_ATEMP])
-	ups->ambtemp = atof(smart_poll(ups->UPS_Cmd[CI_ATEMP], ups));
+   /*        Ambient temperature */
+   if (ups->UPS_Cap[CI_ATEMP])
+      ups->ambtemp = atof(smart_poll(ups->UPS_Cmd[CI_ATEMP], ups));
 
-    /*	      Hours since self test */
-    if (ups->UPS_Cap[CI_ST_TIME])
-	ups->LastSTTime = atof(smart_poll(ups->UPS_Cmd[CI_ST_TIME], ups));
+   /*        Hours since self test */
+   if (ups->UPS_Cap[CI_ST_TIME])
+      ups->LastSTTime = atof(smart_poll(ups->UPS_Cmd[CI_ST_TIME], ups));
 
-    write_unlock(ups);
+   write_unlock(ups);
 
-    apc_enable(ups); /* reenable APC serial UPS */
+   apc_enable(ups);                /* reenable APC serial UPS */
 
-    return SUCCESS;
+   return SUCCESS;
 }
 
 /********************************************************************* 
@@ -511,183 +511,181 @@ again:
  */
 int apcsmart_ups_read_static_data(UPSINFO *ups)
 {
-    /* Everything from here on down is non-volitile, that is
-     * we do not expect it to change while the UPS is running
-     * unless we explicitly change it.
-     */
+   /* Everything from here on down is non-volitile, that is
+    * we do not expect it to change while the UPS is running
+    * unless we explicitly change it.
+    */
 
-    /* SENSITIVITY */
-    if (ups->UPS_Cap[CI_SENS])
-	strncpy(ups->sensitivity, smart_poll(ups->UPS_Cmd[CI_SENS], ups),
-	       sizeof(ups->sensitivity));
+   /* SENSITIVITY */
+   if (ups->UPS_Cap[CI_SENS])
+      strncpy(ups->sensitivity, smart_poll(ups->UPS_Cmd[CI_SENS], ups),
+         sizeof(ups->sensitivity));
 
-    /* WAKEUP_DELAY */
-    if (ups->UPS_Cap[CI_DWAKE])
-	ups->dwake = (int)atof(smart_poll(ups->UPS_Cmd[CI_DWAKE], ups));
+   /* WAKEUP_DELAY */
+   if (ups->UPS_Cap[CI_DWAKE])
+      ups->dwake = (int)atof(smart_poll(ups->UPS_Cmd[CI_DWAKE], ups));
 
-    /* SLEEP_DELAY */
-    if (ups->UPS_Cap[CI_DSHUTD])
-	ups->dshutd = (int)atof(smart_poll(ups->UPS_Cmd[CI_DSHUTD], ups));
+   /* SLEEP_DELAY */
+   if (ups->UPS_Cap[CI_DSHUTD])
+      ups->dshutd = (int)atof(smart_poll(ups->UPS_Cmd[CI_DSHUTD], ups));
 
-    /* LOW_TRANSFER_LEVEL */
-    if (ups->UPS_Cap[CI_LTRANS])
-	ups->lotrans = (int)atof(smart_poll(ups->UPS_Cmd[CI_LTRANS], ups));
+   /* LOW_TRANSFER_LEVEL */
+   if (ups->UPS_Cap[CI_LTRANS])
+      ups->lotrans = (int)atof(smart_poll(ups->UPS_Cmd[CI_LTRANS], ups));
 
-    /* HIGH_TRANSFER_LEVEL */
-    if (ups->UPS_Cap[CI_HTRANS])
-	ups->hitrans = (int)atof(smart_poll(ups->UPS_Cmd[CI_HTRANS], ups));
+   /* HIGH_TRANSFER_LEVEL */
+   if (ups->UPS_Cap[CI_HTRANS])
+      ups->hitrans = (int)atof(smart_poll(ups->UPS_Cmd[CI_HTRANS], ups));
 
-    /* UPS_BATT_CAP_RETURN */
-    if (ups->UPS_Cap[CI_RETPCT])
-	ups->rtnpct = (int)atof(smart_poll(ups->UPS_Cmd[CI_RETPCT], ups));
+   /* UPS_BATT_CAP_RETURN */
+   if (ups->UPS_Cap[CI_RETPCT])
+      ups->rtnpct = (int)atof(smart_poll(ups->UPS_Cmd[CI_RETPCT], ups));
 
-    /* ALARM_STATUS */
-    if (ups->UPS_Cap[CI_DALARM])
-	strncpy(ups->beepstate, smart_poll(ups->UPS_Cmd[CI_DALARM], ups), 
-	       sizeof(ups->beepstate));
+   /* ALARM_STATUS */
+   if (ups->UPS_Cap[CI_DALARM])
+      strncpy(ups->beepstate, smart_poll(ups->UPS_Cmd[CI_DALARM], ups),
+         sizeof(ups->beepstate));
 
-    /* LOWBATT_SHUTDOWN_LEVEL */
-    if (ups->UPS_Cap[CI_DLBATT])
-	ups->dlowbatt = (int)atof(smart_poll(ups->UPS_Cmd[CI_DLBATT], ups));
+   /* LOWBATT_SHUTDOWN_LEVEL */
+   if (ups->UPS_Cap[CI_DLBATT])
+      ups->dlowbatt = (int)atof(smart_poll(ups->UPS_Cmd[CI_DLBATT], ups));
 
-    /* UPS_NAME */
-    if (ups->upsname[0] == 0 && ups->UPS_Cap[CI_IDEN])
-	strncpy(ups->upsname, smart_poll(ups->UPS_Cmd[CI_IDEN], ups), 
-	       sizeof(ups->upsname));
+   /* UPS_NAME */
+   if (ups->upsname[0] == 0 && ups->UPS_Cap[CI_IDEN])
+      strncpy(ups->upsname, smart_poll(ups->UPS_Cmd[CI_IDEN], ups),
+         sizeof(ups->upsname));
 
-    /* UPS_SELFTEST */
-    if (ups->UPS_Cap[CI_STESTI])
-	strncpy(ups->selftest, smart_poll(ups->UPS_Cmd[CI_STESTI], ups), 
-	       sizeof(ups->selftest));
+   /* UPS_SELFTEST */
+   if (ups->UPS_Cap[CI_STESTI])
+      strncpy(ups->selftest, smart_poll(ups->UPS_Cmd[CI_STESTI], ups),
+         sizeof(ups->selftest));
 
-    /* UPS_MANUFACTURE_DATE */
-    if (ups->UPS_Cap[CI_MANDAT])
-	strncpy(ups->birth, smart_poll(ups->UPS_Cmd[CI_MANDAT], ups), 
-	       sizeof(ups->birth));
+   /* UPS_MANUFACTURE_DATE */
+   if (ups->UPS_Cap[CI_MANDAT])
+      strncpy(ups->birth, smart_poll(ups->UPS_Cmd[CI_MANDAT], ups),
+         sizeof(ups->birth));
 
-    /* UPS_SERIAL_NUMBER */
-    if (ups->UPS_Cap[CI_SERNO])
-	strncpy(ups->serial, smart_poll(ups->UPS_Cmd[CI_SERNO], ups), 
-	       sizeof(ups->serial));
+   /* UPS_SERIAL_NUMBER */
+   if (ups->UPS_Cap[CI_SERNO])
+      strncpy(ups->serial, smart_poll(ups->UPS_Cmd[CI_SERNO], ups),
+         sizeof(ups->serial));
 
-    /* UPS_BATTERY_REPLACE */
-    if (ups->UPS_Cap[CI_BATTDAT])
-	strncpy(ups->battdat, smart_poll(ups->UPS_Cmd[CI_BATTDAT], ups), 
-	       sizeof(ups->battdat));
+   /* UPS_BATTERY_REPLACE */
+   if (ups->UPS_Cap[CI_BATTDAT])
+      strncpy(ups->battdat, smart_poll(ups->UPS_Cmd[CI_BATTDAT], ups),
+         sizeof(ups->battdat));
 
-    /* Nominal output voltage when on batteries */
-    if (ups->UPS_Cap[CI_NOMOUTV])
-	ups->NomOutputVoltage = (int)atof(smart_poll(ups->UPS_Cmd[CI_NOMOUTV], ups));
+   /* Nominal output voltage when on batteries */
+   if (ups->UPS_Cap[CI_NOMOUTV])
+      ups->NomOutputVoltage = (int)atof(smart_poll(ups->UPS_Cmd[CI_NOMOUTV], ups));
 
-    /* Nominal battery voltage */
-    if (ups->UPS_Cap[CI_NOMBATTV]) 
-	ups->nombattv = atof(smart_poll(ups->UPS_Cmd[CI_NOMBATTV], ups));
+   /* Nominal battery voltage */
+   if (ups->UPS_Cap[CI_NOMBATTV])
+      ups->nombattv = atof(smart_poll(ups->UPS_Cmd[CI_NOMBATTV], ups));
 
-    /*	      Firmware revision */ 
-    if (ups->UPS_Cap[CI_REVNO])
-	strncpy(ups->firmrev, smart_poll(ups->UPS_Cmd[CI_REVNO], ups), 
-	       sizeof(ups->firmrev));
+   /*        Firmware revision */
+   if (ups->UPS_Cap[CI_REVNO])
+      strncpy(ups->firmrev, smart_poll(ups->UPS_Cmd[CI_REVNO], ups),
+         sizeof(ups->firmrev));
 
-    /*	      Number of external batteries installed */
-    if (ups->UPS_Cap[CI_EXTBATTS])
-	ups->extbatts = (int) atof(smart_poll(ups->UPS_Cmd[CI_EXTBATTS], ups));
-    
-    /*	      Number of bad batteries installed */
-    if (ups->UPS_Cap[CI_BADBATTS])
-	ups->badbatts = (int) atof(smart_poll(ups->UPS_Cmd[CI_BADBATTS], ups));
+   /*        Number of external batteries installed */
+   if (ups->UPS_Cap[CI_EXTBATTS])
+      ups->extbatts = (int)atof(smart_poll(ups->UPS_Cmd[CI_EXTBATTS], ups));
 
-    /*	      Old firmware revision */
-    if (ups->UPS_Cap[CI_UPSMODEL])
-	strncpy(ups->upsmodel, smart_poll(ups->UPS_Cmd[CI_UPSMODEL], ups),
-	       sizeof(ups->upsmodel));
+   /*        Number of bad batteries installed */
+   if (ups->UPS_Cap[CI_BADBATTS])
+      ups->badbatts = (int)atof(smart_poll(ups->UPS_Cmd[CI_BADBATTS], ups));
+
+   /*        Old firmware revision */
+   if (ups->UPS_Cap[CI_UPSMODEL])
+      strncpy(ups->upsmodel, smart_poll(ups->UPS_Cmd[CI_UPSMODEL], ups),
+         sizeof(ups->upsmodel));
 
 
-    /*	      EPROM Capabilities */
-    if (ups->UPS_Cap[CI_EPROM]) {
-	strncpy(ups->eprom, smart_poll(ups->UPS_Cmd[CI_EPROM], ups),
-	       sizeof(ups->eprom));
-    }
+   /*        EPROM Capabilities */
+   if (ups->UPS_Cap[CI_EPROM]) {
+      strncpy(ups->eprom, smart_poll(ups->UPS_Cmd[CI_EPROM], ups),
+         sizeof(ups->eprom));
+   }
 
-     get_apc_model(ups);
+   get_apc_model(ups);
 
-     return SUCCESS;
+   return SUCCESS;
 }
 
 int apcsmart_ups_entry_point(UPSINFO *ups, int command, void *data)
 {
-    int retries = 5; /* Number of retries if reason is NA (see below) */
-    char ans[20];
+   int retries = 5;                /* Number of retries if reason is NA (see below) */
+   char ans[20];
 
-    if (is_ups_set(UPS_SLAVE)) {
-       return SUCCESS;
-    }
+   if (is_ups_set(UPS_SLAVE)) {
+      return SUCCESS;
+   }
 
-    switch(command) {
-	case DEVICE_CMD_SET_DUMB_MODE:
-	    /* Set dumb mode for a smart UPS */
-            write(ups->fd, "R", 1);  /* enter dumb mode */
-	    *ans = 0;
-	    getline(ans, sizeof(ans), ups);
-            printf("Going dumb: %s\n", ans);
-	    break;
+   switch (command) {
+   case DEVICE_CMD_SET_DUMB_MODE:
+      /* Set dumb mode for a smart UPS */
+      write(ups->fd, "R", 1);      /* enter dumb mode */
+      *ans = 0;
+      getline(ans, sizeof(ans), ups);
+      printf("Going dumb: %s\n", ans);
+      break;
 
-	case DEVICE_CMD_GET_SELFTEST_MSG:
-	    /* Results of last self test */
-	    if (ups->UPS_Cap[CI_ST_STAT]) {
-		strncpy(ups->X,smart_poll(ups->UPS_Cmd[CI_ST_STAT], ups), 
-			sizeof(ups->X));
-		/*
-		 * Decode the self test result into a string inside UPSINFO.
-		 */
-		copy_self_test_results(ups);
-	    }
-	    break;
+   case DEVICE_CMD_GET_SELFTEST_MSG:
+      /* Results of last self test */
+      if (ups->UPS_Cap[CI_ST_STAT]) {
+         strncpy(ups->X, smart_poll(ups->UPS_Cmd[CI_ST_STAT], ups), sizeof(ups->X));
+         /*
+          * Decode the self test result into a string inside UPSINFO.
+          */
+         copy_self_test_results(ups);
+      }
+      break;
 
-	case DEVICE_CMD_CHECK_SELFTEST:
+   case DEVICE_CMD_CHECK_SELFTEST:
 
-            Dmsg0(80, "Checking self test.\n");
-	    /*
-	     * XXX
-	     *
-	     * One day we will do this test inside the driver and not as an
-	     * entry point.
-	     */
-redo:
-	    /* Reason for last transfer to batteries */
-	    if (ups->UPS_Cap[CI_WHY_BATT]) {
-		ups->G[0] = 0;
-		strncpy(ups->G, smart_poll(ups->UPS_Cmd[CI_WHY_BATT], ups), 
-			sizeof(ups->G));
-                Dmsg1(80, "Transfer reason: %c\n", ups->G[0]);
-                if (ups->G[0] == 'N' && ups->G[1] == 'A') {
-                    Dmsg0(80, "Transfer reason still not available.\n");
-		    if (retries-- > 0) {
-			sleep(2);		      /* debounce */
-			goto redo;
-		    }
-		    /*
-		     * Be careful because if we go out of here without
-		     * knowing the reason of transfer (i.e. the reason
-                     * is "NA", apcupsd will think this is a power failure
-		     * even if it is a self test. Not much of a problem
-		     * as this should not happen.
-		     * We allow 5 retries for reading reason from UPS before
-		     * giving up.
-		     */
-		}
-	    /* See if this is a self test rather than power failure */
-                if (ups->G[0] == 'S') {
-		    /*
-		     * set Self Test start time
-		     */
-		    ups->SelfTest = time(NULL);
-                    Dmsg1(80, "Self Test time: %s", ctime(&ups->SelfTest));
-		}
-	    }
+      Dmsg0(80, "Checking self test.\n");
+      /*
+       * XXX
+       *
+       * One day we will do this test inside the driver and not as an
+       * entry point.
+       */
+    redo:
+      /* Reason for last transfer to batteries */
+      if (ups->UPS_Cap[CI_WHY_BATT]) {
+         ups->G[0] = 0;
+         strncpy(ups->G, smart_poll(ups->UPS_Cmd[CI_WHY_BATT], ups), sizeof(ups->G));
+         Dmsg1(80, "Transfer reason: %c\n", ups->G[0]);
+         if (ups->G[0] == 'N' && ups->G[1] == 'A') {
+            Dmsg0(80, "Transfer reason still not available.\n");
+            if (retries-- > 0) {
+               sleep(2);           /* debounce */
+               goto redo;
+            }
+            /*
+             * Be careful because if we go out of here without
+             * knowing the reason of transfer (i.e. the reason
+             * is "NA", apcupsd will think this is a power failure
+             * even if it is a self test. Not much of a problem
+             * as this should not happen.
+             * We allow 5 retries for reading reason from UPS before
+             * giving up.
+             */
+         }
+         /* See if this is a self test rather than power failure */
+         if (ups->G[0] == 'S') {
+            /*
+             * set Self Test start time
+             */
+            ups->SelfTest = time(NULL);
+            Dmsg1(80, "Self Test time: %s", ctime(&ups->SelfTest));
+         }
+      }
 
-	default:
-	    return FAILURE;
-	    break;
-    }
-    return SUCCESS;
+   default:
+      return FAILURE;
+      break;
+   }
+   return SUCCESS;
 }
