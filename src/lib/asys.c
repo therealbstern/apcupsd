@@ -4,7 +4,7 @@
  *   library routines. 
  * 
  *
- *   Version $Id: asys.c,v 1.6 2005-05-20 06:42:33 kerns Exp $
+ *   Version $Id: asys.c,v 1.7 2005-05-30 16:29:03 adk0212 Exp $
  */
 /*
    Copyright (C) 2004 Kern Sibbald
@@ -273,7 +273,7 @@ int amicrosleep(time_t sec, long usec)
 
 /* BSDI does not have this.  This is a *poor* simulation */
 /* This seems to create some problems, so is removed KES 20May05 */
-#ifndef xHAVE_STRTOLL
+#if 0
 long long int
 strtoll(const char *ptr, char **endptr, int base)
 {
