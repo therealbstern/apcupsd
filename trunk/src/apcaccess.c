@@ -239,7 +239,7 @@ static void get_raw_upsinfo(UPSINFO *ups, char *host, int port)
    net_send(sockfd, "rawupsinfo", 10);
 
    n = net_recv(sockfd, (char *)ups, sizeof(UPSINFO));
-   if (n != sizeof(UPSINFO) {
+   if (n != sizeof(UPSINFO)) {
       Error_abort2("net_recv of UPSINFO returned %d bytes, wanted %d\n",
          n, sizeof(UPSINFO));
    }
