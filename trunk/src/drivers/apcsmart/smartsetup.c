@@ -69,15 +69,15 @@ int apcsmart_ups_open(UPSINFO *ups)
 
    my_data->newtio.c_cflag = DEFAULT_SPEED | CS8 | CLOCAL | CREAD;
    my_data->newtio.c_iflag = IGNPAR;    /* Ignore errors, raw input */
-   my_data->newtio.c_oflag = 0;    /* Raw output */
-   my_data->newtio.c_lflag = 0;    /* No local echo */
+   my_data->newtio.c_oflag = 0;         /* Raw output */
+   my_data->newtio.c_lflag = 0;         /* No local echo */
 
 #if defined(HAVE_OPENBSD_OS) || \
     defined(HAVE_FREEBSD_OS) || \
     defined(HAVE_NETBSD_OS)
    my_data->newtio.c_ispeed = DEFAULT_SPEED;    /* Set input speed */
    my_data->newtio.c_ospeed = DEFAULT_SPEED;    /* Set output speed */
-#endif  /* __openbsd__ || __freebsd__ || __netbsd__  */
+#endif   /* __openbsd__ || __freebsd__ || __netbsd__  */
 
    /* This makes a non.blocking read() with TIMER_READ (10) sec. timeout */
    my_data->newtio.c_cc[VMIN] = 0;
