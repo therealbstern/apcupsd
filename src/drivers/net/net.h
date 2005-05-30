@@ -1,33 +1,26 @@
 /*
- *  net.h  -- public header file for this driver
+ * net.h
  *
- *  apcupsd.c -- Simple Daemon to catch power failure signals from a
- *               BackUPS, BackUPS Pro, or SmartUPS (from APCC).
- *            -- Now SmartMode support for SmartUPS and BackUPS Pro.
- *
- *  All rights reserved.
- *
+ * Public header file for the net client driver.
  */
+
 /*
-   Copyright (C) 2000-2004 Kern Sibbald
-
-   This program is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public License as
-   published by the Free Software Foundation; either version 2 of
-   the License, or (at your option) any later version.
-
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-   General Public License for more details.
-
-   You should have received a copy of the GNU General Public
-   License along with this program; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
-   MA 02111-1307, USA.
-
+ * Copyright (C) 2000-2004 Kern Sibbald
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of version 2 of the GNU General
+ * Public License as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the Free
+ * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+ * MA 02111-1307, USA.
  */
-
 
 #ifndef _NET_H
 #define _NET_H
@@ -35,15 +28,15 @@
 #define BIGBUF 4096
 
 struct driver_data {
-    char device[MAXSTRING];
-    char *hostname;
-    int port;
-    int sockfd;
-    int got_caps;
-    int got_static_data;
-    time_t last_fill_time;
-    char statbuf[BIGBUF];
-    int statlen;
+   char device[MAXSTRING];
+   char *hostname;
+   int port;
+   int sockfd;
+   int got_caps;
+   int got_static_data;
+   time_t last_fill_time;
+   char statbuf[BIGBUF];
+   int statlen;
 };
 
 /*********************************************************************/
@@ -61,4 +54,4 @@ extern int net_ups_setup(UPSINFO *ups);
 extern int net_ups_program_eeprom(UPSINFO *ups, int command, char *data);
 extern int net_ups_entry_point(UPSINFO *ups, int command, void *data);
 
-#endif /* _NET_H */
+#endif   /* _NET_H */
