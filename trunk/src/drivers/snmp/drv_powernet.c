@@ -134,7 +134,7 @@ int powernet_snmp_ups_get_capabilities(UPSINFO *ups)
 int powernet_snmp_ups_read_static_data(UPSINFO *ups)
 {
    struct snmp_ups_internal_data *Sid = 
-      struct snmp_ups_internal_data *)ups->driver_internal_data;
+      (struct snmp_ups_internal_data *)ups->driver_internal_data;
    struct snmp_session *s = &Sid->session;
    powernet_mib_t *data = (powernet_mib_t *)Sid->MIB;
 
