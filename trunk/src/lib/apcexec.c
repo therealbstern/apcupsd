@@ -1,34 +1,27 @@
 /*
- *  apcexec.c -- fork/exec functions
+ * apcexec.c
  *
- *
- *  apcupsd.c -- Simple Daemon to catch power failure signals from a
- *		 BackUPS, BackUPS Pro, or SmartUPS (from APCC).
- *	      -- Now SmartMode support for SmartUPS and BackUPS Pro.
- *
- *  Copyright (C) 1996-99 Andre M. Hedrick <andre@suse.com>
- *  Copyright (C) 1999-2000 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
- *  All rights reserved.
- *
+ * Fork/exec functions.
  */
+
 /*
-   Copyright (C) 2000-2004 Kern Sibbald
-
-   This program is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public License as
-   published by the Free Software Foundation; either version 2 of
-   the License, or (at your option) any later version.
-
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-   General Public License for more details.
-
-   You should have received a copy of the GNU General Public
-   License along with this program; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
-   MA 02111-1307, USA.
-
+ * Copyright (C) 2000-2004 Kern Sibbald
+ * Copyright (C) 1996-99 Andre M. Hedrick <andre@suse.com>
+ * Copyright (C) 1999-2000 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of version 2 of the GNU General
+ * Public License as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the Free
+ * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+ * MA 02111-1307, USA.
  */
 
 #include "apc.h"
@@ -39,55 +32,53 @@ static pthread_t thread_id[MAX_THREADS];
 static char *thread_name[MAX_THREADS];
 static int num_threads = 0;
 
-/* 
- * Start a "real" POSIX thread
- */
-int start_thread(UPSINFO *ups, void (*action)(UPSINFO *ups),
-		char *proctitle, char *argv0)
+/* Start a "real" POSIX thread */
+int start_thread(UPSINFO *ups, void (*action) (UPSINFO * ups),
+   char *proctitle, char *argv0)
 {
-    pthread_t tid;
-    int status, t_index;
+   pthread_t tid;
+   int status, t_index;
 
-    set_thread_concurrency();
-    if ((status=pthread_create(&tid, NULL, (void * (*)(void *))action, (void *)ups)) != 0) {
-       log_event(ups, LOG_WARNING, _("Unable to start thread: ERR=%s\n"), 
-	  strerror(status));
-       return 0;
-    }
+   set_thread_concurrency();
+   status = pthread_create(&tid, NULL, (void *(*)(void *))action, (void *)ups);
+   if (status != 0) {
+      log_event(ups, LOG_WARNING, _("Unable to start thread: ERR=%s\n"),
+         strerror(status));
+      return 0;
+   }
 
-    t_index = num_threads;
-    if (num_threads < MAX_THREADS) {
-	thread_id[num_threads] = tid;
-	thread_name[num_threads] = proctitle;
-	num_threads++;
-    } else {
-	log_event(ups, LOG_ERR, 
-"Something is wrong, we have %d threads, max is %d\n", num_threads+1, MAX_THREADS);
-    }
+   t_index = num_threads;
+   if (num_threads < MAX_THREADS) {
+      thread_id[num_threads] = tid;
+      thread_name[num_threads] = proctitle;
+      num_threads++;
+   } else {
+      log_event(ups, LOG_ERR,
+         "Something is wrong, we have %d threads, max is %d\n",
+         num_threads + 1, MAX_THREADS);
+   }
 
-    return t_index;	 
+   return t_index;
 }
 
-/*
- * Cancel all running threads except ourselves
- */
+/* Cancel all running threads except ourselves */
 void clean_threads(void)
 {
    int i;
    pthread_t my_tid;
 
    my_tid = pthread_self();
-   for (i=0; i < num_threads; i++) {
+   for (i = 0; i < num_threads; i++) {
       if (!pthread_equal(my_tid, thread_id[i])) {
-	 pthread_cancel(thread_id[i]);
-	 pthread_detach(thread_id[i]);
+         pthread_cancel(thread_id[i]);
+         pthread_detach(thread_id[i]);
       }
    }
 }
 
 #else
 
-static int child_pid[MAX_THREADS] = { 0, 0, 0, 0, 0, 0, 0};
+static int child_pid[MAX_THREADS] = { 0, 0, 0, 0, 0, 0, 0 };
 static char *child_name[MAX_THREADS];
 
 /*
@@ -100,91 +91,87 @@ static char *child_name[MAX_THREADS];
  */
 void wait_for_termination(int serial_pid)
 {
-    int status, pid, i;
+   int status, pid, i;
 
-    for (;;) {
-	pid = wait(&status);
-	for (i=0; i < MAX_THREADS; i++) {
-	    if (child_pid[i] == 0)
-		break;
-	    else if (child_pid[i] == pid) {
-		if (WIFSIGNALED(status))
-		    log_event(core_ups, LOG_ERR, 
-                        _("Unexpected termination of child %s by signal %d"),
-			 child_name[i], WTERMSIG(status));
-		else
-		    log_event(core_ups, LOG_ERR, 
-                        _("Unexpected termination of child %s. Status = %d"), 
-			 child_name[i], WEXITSTATUS(status));
-		/* If our serial port process died, return to exit */
-		if (pid == serial_pid)
-		    return;
-	    }
-	}
-    }
+   for (;;) {
+      pid = wait(&status);
+      for (i = 0; i < MAX_THREADS; i++) {
+         if (child_pid[i] == 0)
+            break;
+         else if (child_pid[i] == pid) {
+            if (WIFSIGNALED(status))
+               log_event(core_ups, LOG_ERR,
+                  _("Unexpected termination of child %s by signal %d"),
+                  child_name[i], WTERMSIG(status));
+            else
+               log_event(core_ups, LOG_ERR,
+                  _("Unexpected termination of child %s. Status = %d"),
+                  child_name[i], WEXITSTATUS(status));
+            /* If our serial port process died, return to exit */
+            if (pid == serial_pid)
+               return;
+         }
+      }
+   }
 }
 
-int start_thread(UPSINFO *ups, void (*action)(UPSINFO *ups),
-		char *proctitle, char *argv0)
+int start_thread(UPSINFO *ups, void (*action) (UPSINFO * ups),
+   char *proctitle, char *argv0)
 {
-    int pid;
-    static int this_child = 0;
+   int pid;
+   static int this_child = 0;
 
-    switch(pid = fork()) {
-    case 0:		  /* child process */
-	setproctitle(proctitle);
-	action(ups);
-	break;
-    case -1:		  /* error */
-        log_event(ups, LOG_WARNING,_("start_thread: cannot fork. ERR=%s"),
-	    strerror(errno));
-	break;
-    default:		  /* parent continues here */
-	/*
-	 * Keep process id of child
-	 */
-	child_pid[this_child++] = pid;
-	child_name[this_child-1] = proctitle;
-	child_pid[this_child] = 0;
-	if (debug_level > 0)
-	    log_event(ups, LOG_DEBUG,
-                _("%s: start_thread(%s).\n"), argv0, proctitle);
-	return pid;
-    }
-    return 0;
+   switch (pid = fork()) {
+   case 0:                        /* child process */
+      setproctitle(proctitle);
+      action(ups);
+      break;
+   case -1:                       /* error */
+      log_event(ups, LOG_WARNING, _("start_thread: cannot fork. ERR=%s"),
+         strerror(errno));
+      break;
+   default:                       /* parent continues here */
+      /* Keep process id of child */
+      child_pid[this_child++] = pid;
+      child_name[this_child - 1] = proctitle;
+      child_pid[this_child] = 0;
+      if (debug_level > 0) {
+         log_event(ups, LOG_DEBUG, _("%s: start_thread(%s).\n"),
+            argv0, proctitle);
+      }
+      return pid;
+   }
+
+   return 0;
 }
 
-/**********************************************************************
- * the apc_thread_terminate function and trapping signals allows threads
+/*
+ * The apc_thread_terminate function; trapping signals allows threads
  * to cleanly exit.
- *********************************************************************/
+ */
 void apc_thread_terminate(int sig)
 {
-    UPSINFO *ups;
+   UPSINFO *ups;
 
-    /*
-     * Before doing anything else restore the signal handlers,
-     * stopping daemon work.
-     *
-     * -RF
-     */
+   /*
+    * Before doing anything else restore the signal handlers,
+    * stopping daemon work.
+    */
 
-    restore_signals();
+   restore_signals();
 
-    for (ups = NULL; (ups = getNextUps(ups)) != NULL;) {
-	/*
-	 * Jump over the fake ups.
-	 */
-	if (!strcmp(ups->upsname, CORENAME))
-	    continue;
-	detach_ups(ups);
-    }
+   for (ups = NULL; (ups = getNextUps(ups)) != NULL;) {
+      /* Jump over the fake ups. */
+      if (!strcmp(ups->upsname, CORENAME))
+         continue;
+      detach_ups(ups);
+   }
 
-    /*
-     * Nothing to do. This is a thread: cleanup is managed by the father
-     * process.
-     */
-    _exit(0);
+   /*
+    * Nothing to do. This is a thread: cleanup is managed by the father
+    * process.
+    */
+   _exit(0);
 }
 
 /*
@@ -199,113 +186,108 @@ void apc_thread_terminate(int sig)
  */
 void clean_threads(void)
 {
-    int i;
-    int status;
+   int i;
+   int status;
 
-    for (i=0; i < MAX_THREADS; i++) {
-	/*
-	 * Stop if there are no more children
-	 */
-	if (child_pid[i] == 0)
-	    break;
+   for (i = 0; i < MAX_THREADS; i++) {
+      /* Stop if there are no more children */
+      if (child_pid[i] == 0)
+         break;
 
-	/*
-	 * Terminate the child.
-	 */
-	kill(child_pid[i], SIGTERM);
-    }
+      /* Terminate the child. */
+      kill(child_pid[i], SIGTERM);
+   }
 
-    /*
-     * Give the processes some time to settle down: not too much.
-     * This sequence is similar to killing processes in shutdown.
-     */
-    sleep(1);
+   /*
+    * Give the processes some time to settle down: not too much.
+    * This sequence is similar to killing processes in shutdown.
+    */
+   sleep(1);
 
-    /*
-     * Again, but now SIGKILL.
-     */
-    for (i=0; i < MAX_THREADS; i++) {
-	/*
-	 * This is the same as of SIGTERM,
-	 * but now the child must exit.
-	 */
-	if (child_pid[i] == 0)
-	    break;
-	kill(child_pid[i], SIGKILL);
+   /* Again, but now SIGKILL. */
+   for (i = 0; i < MAX_THREADS; i++) {
+      /*
+       * This is the same as of SIGTERM,
+       * but now the child must exit.
+       */
+      if (child_pid[i] == 0)
+         break;
+      kill(child_pid[i], SIGKILL);
 
-	/*
-	 * Make sure the process is dead.
-	 * Call with WNOHANG because at this
-	 * point if a process is still alive
-         * means that it's hanging and is
-	 * unkillable.
-	 */
-	waitpid(child_pid[i], &status, WNOHANG);
-    }
+      /*
+       * Make sure the process is dead.
+       * Call with WNOHANG because at this
+       * point if a process is still alive
+       * means that it's hanging and is
+       * unkillable.
+       */
+      waitpid(child_pid[i], &status, WNOHANG);
+   }
 }
 
 
-#endif /* HAVE_PTHREADS */
+#endif   /* HAVE_PTHREADS */
 
 int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
 {
-    char *argv[6];
-    char connected[20], powered[20];
+   char *argv[6];
+   char connected[20], powered[20];
 
-    if (cmd.pid && (kill(cmd.pid, 0) == 0)) {
-	/*
-	 * Command is already running. No point in running it two
-	 * times.
-		 */
-	 return SUCCESS;
-    }
-    asnprintf(connected, sizeof(connected), "%d", !is_ups_set(UPS_SLAVE));
-    asnprintf(powered, sizeof(powered), "%d", (int)is_ups_set(UPS_PLUGGED));
+   if (cmd.pid && (kill(cmd.pid, 0) == 0)) {
+      /*
+       * Command is already running. No point in running it two
+       * times.
+       */
+      return SUCCESS;
+   }
 
-/*
- * fork() and exec()
- */
-    switch (cmd.pid = fork()) {
-    case -1:		    /* error */
-        log_event(ups, LOG_WARNING, _("execute: cannot fork(). ERR=%s"),
-	   strerror(errno));
-	return FAILURE;
-    case 0:		    /* child */
-	argv[0] = APCCONTROL;	  /* Shell script to execute. */
-	argv[1] = cmd.command;	  /* Parameter to script. */
-	argv[2] = ups->upsname;   /* UPS name */
-	argv[3] = connected;
-	argv[4] = powered;
-	argv[5] = (char *)NULL;
-	execv(APCCONTROL, argv);
-	/* NOT REACHED */
-        log_event(ups, LOG_WARNING,_("Cannot exec %s %s: %s"), 
-		 APCCONTROL, cmd.command, strerror(errno));
-	/*
-         * Child must exit if fails exec'ing.
-	 */
-	exit(-1);
-	break;
+   asnprintf(connected, sizeof(connected), "%d", !is_ups_set(UPS_SLAVE));
+   asnprintf(powered, sizeof(powered), "%d", (int)is_ups_set(UPS_PLUGGED));
 
-    default:		  /* parent */
-	/*
-	 * NOTE, we do a nonblocking waitpid) here to
-	 * pick up any previous children. We also]
-	 * increment a counter, and then in do_action()
-	 * in apcaction.c, we wait again each pass until
-	 * all the children are reaped.  This is for
-	 * BSD systems where SIG_IGN does not prevent
-	 * zombies.
-	 */
-	if (ups->num_execed_children < 0) {
-	    ups->num_execed_children = 1;
-	} else {
-	    ups->num_execed_children++;
-	}
-	while (ups->num_execed_children > 0 && waitpid(-1, NULL, WNOHANG) > 0) {
-	    ups->num_execed_children--;
-	}
-	break;
-    }
-    return SUCCESS;
+   /* fork() and exec() */
+   switch (cmd.pid = fork()) {
+   case -1:     /* error */
+      log_event(ups, LOG_WARNING, _("execute: cannot fork(). ERR=%s"),
+         strerror(errno));
+      return FAILURE;
+
+   case 0:      /* child */
+      argv[0] = APCCONTROL;        /* Shell script to execute. */
+      argv[1] = cmd.command;       /* Parameter to script. */
+      argv[2] = ups->upsname;      /* UPS name */
+      argv[3] = connected;
+      argv[4] = powered;
+      argv[5] = (char *)NULL;
+      execv(APCCONTROL, argv);
+
+      /* NOT REACHED */
+      log_event(ups, LOG_WARNING, _("Cannot exec %s %s: %s"),
+         APCCONTROL, cmd.command, strerror(errno));
+
+      /* Child must exit if fails exec'ing. */
+      exit(-1);
+      break;
+
+   default:      /* parent */
+      /*
+       * NOTE, we do a nonblocking waitpid) here to
+       * pick up any previous children. We also]
+       * increment a counter, and then in do_action()
+       * in apcaction.c, we wait again each pass until
+       * all the children are reaped.  This is for
+       * BSD systems where SIG_IGN does not prevent
+       * zombies.
+       */
+      if (ups->num_execed_children < 0)
+         ups->num_execed_children = 1;
+      else
+         ups->num_execed_children++;
+
+      while (ups->num_execed_children > 0 && waitpid(-1, NULL, WNOHANG) > 0)
+         ups->num_execed_children--;
+
+      break;
+   }
+
+   return SUCCESS;
 }
