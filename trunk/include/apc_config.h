@@ -1,50 +1,39 @@
 /*
- *  apc_config.h -- header file for apcupsd package
+ * apc_config.h
  *
- *  Copyright (C) 1999-2002 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
+ * Platform compatibility cruft.
  *
- *  apcupsd.c -- Simple Daemon to catch power failure signals from a
- *               BackUPS, BackUPS Pro, or SmartUPS (from APCC).
- *            -- Now SmartMode support for SmartUPS and BackUPS Pro.
- *
- *  Copyright (C) 1996-99 Andre M. Hedrick <andre@suse.com>
- *  All rights reserved.
- */
-/*
-
-   This program is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public License as
-   published by the Free Software Foundation; either version 2 of
-   the License, or (at your option) any later version.
-
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-   General Public License for more details.
-
-   You should have received a copy of the GNU General Public
-   License along with this program; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
-   MA 02111-1307, USA.
-
- */
-
-
-/*
  * Contributed by Riccardo Facchetti <riccardo@master.oasi.gpa.it>
  * Modify it accordingly to configure.in file. Do _not_ use it for
  * apcupsd-specific things, just for configure.
  */
+
+/*
+ *  Copyright (C) 1999-2002 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
+ *  Copyright (C) 1996-1999 Andre M. Hedrick <andre@suse.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of version 2 of the GNU General
+ * Public License as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the Free
+ * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+ * MA 02111-1307, USA.
+ */
+
 #ifndef _APC_CONFIG_H
 #define _APC_CONFIG_H
 
 #ifndef HAVE_STRFTIME
-
-#define strftime(msg, max, format, tm) \
-        ( \
-          strncpy(msg, "time not available", max) \
-        )
-#endif /* !HAVE_STRFTIME */
+# define strftime(msg, max, format, tm) \
+   strncpy(msg, "time not available", max)
+#endif   /* !HAVE_STRFTIME */
 
 /* 
  * wait macros.
@@ -57,17 +46,18 @@
 #endif
 
 #ifndef HAVE_SOCKLEN_T
-#define socklen_t unsigned int
+# define socklen_t unsigned int
 #endif
 
 /* Alpha Tru64 */
 #ifdef HAVE_OSF1_OS
-#define int32_t int
-#define _SEM_SEMUN_UNDEFINED 1
+# define int32_t int
+# define _SEM_SEMUN_UNDEFINED 1
 #endif
 
 #ifdef HAVE_HPUX_OS
-#define _SEM_SEMUN_UNDEFINED 1
+# define _SEM_SEMUN_UNDEFINED 1
+
 /*
  * These defines, related to serial devices, need to be clarified for HP-UX
  * operating system.
@@ -79,28 +69,28 @@
 
 /* NetBSD */
 #ifdef HAVE_NETBSD_OS
-#define _SEM_SEMUN_UNDEFINED 1
+# define _SEM_SEMUN_UNDEFINED 1
 #endif
 
 #ifdef HAVE_SUN_OS
-#define _SEM_SEMUN_UNDEFINED 1 
+# define _SEM_SEMUN_UNDEFINED 1
 #endif
 
 #ifdef HAVE_AIX_OS
-#define _SEM_SEMUN_UNDEFINED 1 
+# define _SEM_SEMUN_UNDEFINED 1
 #endif
 
 #ifdef HAVE_OPENSERVER_OS
-#define int32_t         int
-#define _SEM_SEMUN_UNDEFINED 1
+# define int32_t         int
+# define _SEM_SEMUN_UNDEFINED 1
 #endif
 
 #ifndef SHUT_RDWR
-#define SHUT_RDWR 2             /* for socket shutdown() calls */
+# define SHUT_RDWR 2                /* for socket shutdown() calls */
 #endif
 
 #ifdef SETPGRP_VOID
-# define SETPGRP_ARGS(x, y) /* No arguments */
+# define SETPGRP_ARGS(x, y)        /* No arguments */
 #else
 # define SETPGRP_ARGS(x, y) x,y
 #endif
@@ -111,9 +101,7 @@
  */
 #ifdef HAVE_CYGWIN
 
-/* Apparently later version of Cygwin have this
- *
- */
+/* Apparently later version of Cygwin have this */
 #define ioctl(fd, func, addr) winioctl(fd, func, addr)
 
 /* modem ioctls */
@@ -150,7 +138,7 @@
 #define TIOCM_RI        TIOCM_RNG
 
 #undef HAVE_NAMESER_H
-                                                                                                                                                                                                                                                                                                                                                         
+
 #undef SIGTSTP
 #undef SIGTTOU
 #undef SIGTTIN
@@ -163,35 +151,37 @@
 #define HAVE_SETPROCTITLE
 #define setproctitle(x)
 #define init_proctitle(x)
- 
-/* pretend that we are always root --
+
+/*
+ * Pretend that we are always root --
  * probably should fix this on NT for administrator
  */
 #define getuid() 0
 #define geteuid() 0
 
 
-/* ApcupsdMain is called from win32/winmain.cpp
+/*
+ * ApcupsdMain is called from win32/winmain.cpp
  * we need to eliminate "main" as an entry point,
  * otherwise, it interferes with the Windows
  * startup.
  */
 #define main ApcupsdMain
 
-#endif /* HAVE_CYGWIN */ 
+#endif   /* HAVE_CYGWIN */
 
-#ifdef HAVE_SETPROCTITLE
 /* If we have it, the init is not needed */
-#undef init_proctitle
-#define init_proctitle(x)
+#ifdef HAVE_SETPROCTITLE
+# undef init_proctitle
+# define init_proctitle(x)
 #endif
 
 #ifndef ENABLE_NLS
-#define textdomain(x)
+# define textdomain(x)
 #endif
 
 #ifndef O_NDELAY
-#define O_NDELAY 0
+# define O_NDELAY 0
 #endif
 
 /*
@@ -210,9 +200,7 @@
 # define APC_FILENAME_MAX 256
 #endif
 
-/*
- * ETIME not on BSD, incl. Darwin
- */
+/* ETIME not on BSD, incl. Darwin */
 #ifndef ETIME
 # define ETIME ETIMEDOUT
 #endif
@@ -225,34 +213,29 @@
 # define SHM_RDONLY O_RDONLY
 #endif
 
-/*
- * If no system localtime_r(), forward declaration of our internal substitute.
- */
+/* If no system localtime_r(), forward declaration of our internal substitute. */
 #if !defined(HAVE_LOCALTIME_R)
 extern struct tm *localtime_r(const time_t *timep, struct tm *tm);
 #endif
 
-/*
- * If no system inet_pton(), forward declaration of our internal substitute.
- */
+/* If no system inet_pton(), forward declaration of our internal substitute. */
 #if !defined(HAVE_INETPTON)
-/*
- * Define constants based on RFC 883, RFC 1034, RFC 1035
- */
-#define NS_PACKETSZ 512 /* maximum packet size */
-#define NS_MAXDNAME 1025    /* maximum domain name */
-#define NS_MAXCDNAME    255 /* maximum compressed domain name */
-#define NS_MAXLABEL 63  /* maximum length of domain label */
-#define NS_HFIXEDSZ 12  /* #/bytes of fixed data in header */
-#define NS_QFIXEDSZ 4   /* #/bytes of fixed data in query */
-#define NS_RRFIXEDSZ    10  /* #/bytes of fixed data in r record */
-#define NS_INT32SZ  4   /* #/bytes of data in a u_int32_t */
-#define NS_INT16SZ  2   /* #/bytes of data in a u_int16_t */
-#define NS_INT8SZ   1   /* #/bytes of data in a u_int8_t */
-#define NS_INADDRSZ 4   /* IPv4 T_A */
-#define NS_IN6ADDRSZ    16  /* IPv6 T_AAAA */
-#define NS_CMPRSFLGS    0xc0    /* Flag bits indicating name compression. */
-#define NS_DEFAULTPORT  53  /* For both TCP and UDP. */
+
+/* Define constants based on RFC 883, RFC 1034, RFC 1035 */
+#define NS_PACKETSZ     512        /* maximum packet size */
+#define NS_MAXDNAME     1025       /* maximum domain name */
+#define NS_MAXCDNAME    255        /* maximum compressed domain name */
+#define NS_MAXLABEL     63         /* maximum length of domain label */
+#define NS_HFIXEDSZ     12         /* #/bytes of fixed data in header */
+#define NS_QFIXEDSZ     4          /* #/bytes of fixed data in query */
+#define NS_RRFIXEDSZ    10         /* #/bytes of fixed data in r record */
+#define NS_INT32SZ      4          /* #/bytes of data in a u_int32_t */
+#define NS_INT16SZ      2          /* #/bytes of data in a u_int16_t */
+#define NS_INT8SZ       1          /* #/bytes of data in a u_int8_t */
+#define NS_INADDRSZ     4          /* IPv4 T_A */
+#define NS_IN6ADDRSZ    16         /* IPv6 T_AAAA */
+#define NS_CMPRSFLGS    0xc0       /* Flag bits indicating name compression. */
+#define NS_DEFAULTPORT  53         /* For both TCP and UDP. */
 extern int inet_pton(int af, const char *src, void *dst);
 #endif
 
@@ -271,4 +254,4 @@ extern int inet_pton(int af, const char *src, void *dst);
 #define false 0
 #endif
 
-#endif /* _APC_CONFIG */
+#endif   /* _APC_CONFIG */
