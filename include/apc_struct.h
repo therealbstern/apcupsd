@@ -1,122 +1,111 @@
 /*
- *  struct.h  -- header file for apcupsd package
+ * apc_struct.h
  *
- *  apcupsd.c -- Simple Daemon to catch power failure signals from a
- *               BackUPS, BackUPS Pro, or SmartUPS (from APCC).
- *            -- Now SmartMode support for SmartUPS and BackUPS Pro.
- *
- *  Copyright (C) 1996-99 Andre M. Hedrick <andre@suse.com>
- *  All rights reserved.
- *
+ * Common apcupsd structures.
  */
 
 /*
-   Copyright (C) 2000-2004 Kern Sibbald
-
-   This program is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public License as
-   published by the Free Software Foundation; either version 2 of
-   the License, or (at your option) any later version.
-
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-   General Public License for more details.
-
-   You should have received a copy of the GNU General Public
-   License along with this program; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
-   MA 02111-1307, USA.
-
+ * Copyright (C) 2000-2004 Kern Sibbald
+ * Copyright (C) 1996-1999 Andre M. Hedrick <andre@suse.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of version 2 of the GNU General
+ * Public License as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the Free
+ * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+ * MA 02111-1307, USA.
  */
-
-/*********************************************************************/
 
 #ifndef _APC_STRUCT_H
 #define _APC_STRUCT_H
 
 typedef enum {
-    NO_CABLE=0,     /* Default Disable            */
-    CUSTOM_SIMPLE,  /* SIMPLE cable simple        */
-    APC_940_0119A,  /* APC cable number 940-0119A */
-    APC_940_0127A,  /* APC cable number 940-0127A */
-    APC_940_0128A,  /* APC cable number 940-0128A */
-    APC_940_0020B,  /* APC cable number 940-0020B */
-    APC_940_0020C,  /* APC cable number 940-0020C identical to 20B */
-    APC_940_0023A,  /* APC cable number 940-0023A */
-    MAM_CABLE,      /* MAM cable for Alfatronic SPS500X */
-    CUSTOM_SMART,   /* SMART cable smart          */
-    APC_940_0024B,  /* APC cable number 940-0024B */
-    APC_940_0024C,  /* APC cable number 940-0024C */
-    APC_940_1524C,  /* APC cable number 940-1524C */
-    APC_940_0024G,  /* APC cable number 940-0024G */
-    APC_940_0095A,  /* APC cable number 940-0095A */
-    APC_940_0095B,  /* APC cable number 940-0095B */
-    APC_940_0095C,  /* APC cable number 940-0095C */
-    APC_NET,        /* Ethernet Link              */
-    USB_CABLE,      /* USB cable */
-    APC_940_00XXX   /* APC cable number UNKNOWN   */
+   NO_CABLE = 0,        /* Default Disable            */
+   CUSTOM_SIMPLE,       /* SIMPLE cable simple        */
+   APC_940_0119A,       /* APC cable number 940-0119A */
+   APC_940_0127A,       /* APC cable number 940-0127A */
+   APC_940_0128A,       /* APC cable number 940-0128A */
+   APC_940_0020B,       /* APC cable number 940-0020B */
+   APC_940_0020C,       /* APC cable number 940-0020C identical to 20B */
+   APC_940_0023A,       /* APC cable number 940-0023A */
+   MAM_CABLE,           /* MAM cable for Alfatronic SPS500X */
+   CUSTOM_SMART,        /* SMART cable smart          */
+   APC_940_0024B,       /* APC cable number 940-0024B */
+   APC_940_0024C,       /* APC cable number 940-0024C */
+   APC_940_1524C,       /* APC cable number 940-1524C */
+   APC_940_0024G,       /* APC cable number 940-0024G */
+   APC_940_0095A,       /* APC cable number 940-0095A */
+   APC_940_0095B,       /* APC cable number 940-0095B */
+   APC_940_0095C,       /* APC cable number 940-0095C */
+   APC_NET,             /* Ethernet Link              */
+   USB_CABLE,           /* USB cable */
+   APC_940_00XXX        /* APC cable number UNKNOWN   */
 } UpsCable;
 
 /* The order of these UpsModes is important!! */
 typedef enum {
-    NO_UPS=0,   /* Default Disable      */
-    DUMB_UPS,   /* Dumb UPS driver      */
-    BK,         /* Simple Signal        */
-    SHAREBASIC, /* Simple Signal, Share */
-    NETUPS,     /*                      */
-    BKPRO,      /* SubSet Smart Signal  */
-    VS,         /* SubSet Smart Signal  */
-    NBKPRO,     /* Smarter BKPRO Signal */
-    SMART,      /* Smart Signal         */
-    MATRIX,     /* Smart Signal         */
-    SHARESMART, /* Smart Signal, Share  */
-    APCSMART_UPS, /* APC Smart UPS (any)*/
-    USB_UPS,    /* USB UPS driver       */
-    SNMP_UPS,   /* SNMP UPS driver      */
-    NETWORK_UPS,/* NETWORK UPS driver   */
-    TEST_UPS    /* TEST UPS Driver      */
+   NO_UPS = 0,          /* Default Disable      */
+   DUMB_UPS,            /* Dumb UPS driver      */
+   BK,                  /* Simple Signal        */
+   SHAREBASIC,          /* Simple Signal, Share */
+   NETUPS,              /*                      */
+   BKPRO,               /* SubSet Smart Signal  */
+   VS,                  /* SubSet Smart Signal  */
+   NBKPRO,              /* Smarter BKPRO Signal */
+   SMART,               /* Smart Signal         */
+   MATRIX,              /* Smart Signal         */
+   SHARESMART,          /* Smart Signal, Share  */
+   APCSMART_UPS,        /* APC Smart UPS (any) */
+   USB_UPS,             /* USB UPS driver       */
+   SNMP_UPS,            /* SNMP UPS driver      */
+   NETWORK_UPS,         /* NETWORK UPS driver   */
+   TEST_UPS             /* TEST UPS Driver      */
 } UpsMode;
 
 typedef enum {
-    NO_CLASS=0,
-    STANDALONE,     /**/
-    SHARESLAVE,     /**/
-    NETSLAVE,       /**/
-    SHAREMASTER,    /**/
-    NETMASTER,      /**/
-    SHARENETMASTER  /**/
+   NO_CLASS = 0,
+   STANDALONE,
+   SHARESLAVE,
+   NETSLAVE,
+   SHAREMASTER,
+   NETMASTER,
+   SHARENETMASTER
 } ClassMode;
 
 typedef enum {
-    NO_SHARE_NET=0,
-    DISABLE,    /* Disable Share or Net UPS  */
-    SHARE,      /* ShareUPS Internal         */
-    NET,        /* NetUPS                    */
-    SHARENET    /* Share and Net, Master     */
+   NO_SHARE_NET = 0,
+   DISABLE,             /* Disable Share or Net UPS  */
+   SHARE,               /* ShareUPS Internal         */
+   NET,                 /* NetUPS                    */
+   SHARENET             /* Share and Net, Master     */
 } ShareNetMode;
 
 typedef enum {
-    NO_LOGON=0,   
-    NEVER,      /* Disable Setting NoLogon               */
-    TIMEOUT,    /* Based on TIMEOUT + 10 percent         */
-    PERCENT,    /* Based on PERCENT + 10 percent         */
-    MINUTES,    /* Based on MINUTES + 10 percent         */
-    ALWAYS      /* Stop All New Login Attempts. but ROOT */
+   NO_LOGON = 0,
+   NEVER,               /* Disable Setting NoLogon               */
+   TIMEOUT,             /* Based on TIMEOUT + 10 percent         */
+   PERCENT,             /* Based on PERCENT + 10 percent         */
+   MINUTES,             /* Based on MINUTES + 10 percent         */
+   ALWAYS               /* Stop All New Login Attempts. but ROOT */
 } NoLoginMode;
 
-/*
- * List all the internal self tests allowed.
- */
+/* List all the internal self tests allowed. */
 typedef enum {
-    SMART_TEST_LEDS = 0,
-    SMART_TEST_SELFTEST,
-    SMART_TEST_POWERFAIL,
-    SMART_TEST_CALIBRATION,
-    SMART_CHANGE_NAME,
-    SMART_CHANGE_BATTDATE,
-    SMART_CHANGE_EPROM,
-    SMART_TEST_MAX
+   SMART_TEST_LEDS = 0,
+   SMART_TEST_SELFTEST,
+   SMART_TEST_POWERFAIL,
+   SMART_TEST_CALIBRATION,
+   SMART_CHANGE_NAME,
+   SMART_CHANGE_BATTDATE,
+   SMART_CHANGE_EPROM,
+   SMART_TEST_MAX
 } SelfTests;
 
 /*
@@ -136,40 +125,40 @@ typedef enum {
  * selftest.
  */
 typedef struct SELFTEST {
-    int activate;
-    int status;
+   int activate;
+   int status;
 } SELFTEST;
 
 
 typedef struct geninfo {
-    const char *name;             /* JHNC: name mustn't contain whitespace */
-    const char *long_name;
-    int type;
-} GENINFO; /* for static declaration of data */
+   const char *name;               /* JHNC: name mustn't contain whitespace */
+   const char *long_name;
+   int type;
+} GENINFO;                         /* for static declaration of data */
 
 typedef struct internalgeninfo {
-    char name[MAXSTRING];   /* JHNC: name mustn't contain whitespace */
-    char long_name[MAXSTRING];
-    int type;
-} INTERNALGENINFO; /* for assigning into upsinfo */
+   char name[MAXSTRING];           /* JHNC: name mustn't contain whitespace */
+   char long_name[MAXSTRING];
+   int type;
+} INTERNALGENINFO;                 /* for assigning into upsinfo */
 
 /* Structure that contains information on each of our slaves.
  * Also, for a slave, the first slave packet is info on the
  * master.
  */
 typedef struct slaveinfo {
-    int remote_state;                 /* state of master */
-    int disconnecting_slave;          /* set if old style slave */
-    int ms_errno;                     /* errno last error */
-    int socket;                       /* current open socket this slave */
-    int port;                         /* port */
-    int error;                        /* set when error message printed */
-    int errorcnt;                     /* count of errors */
-    time_t down_time;                 /* time slave was set RMT_DOWN */
-    struct sockaddr_in addr;
-    char usermagic[APC_MAGIC_SIZE];   /* Old style password */
-    char name[MAXTOKENLEN];           /* master/slave domain name (or IP) */
-    char password[MAXTOKENLEN];       /* for CRAM-MD5 authentication */
+   int remote_state;               /* state of master */
+   int disconnecting_slave;        /* set if old style slave */
+   int ms_errno;                   /* errno last error */
+   int socket;                     /* current open socket this slave */
+   int port;                       /* port */
+   int error;                      /* set when error message printed */
+   int errorcnt;                   /* count of errors */
+   time_t down_time;               /* time slave was set RMT_DOWN */
+   struct sockaddr_in addr;
+   char usermagic[APC_MAGIC_SIZE]; /* Old style password */
+   char name[MAXTOKENLEN];         /* master/slave domain name (or IP) */
+   char password[MAXTOKENLEN];     /* for CRAM-MD5 authentication */
 } SLAVEINFO;
 
 /* 
@@ -180,32 +169,34 @@ typedef struct slaveinfo {
  * problems. 
  */
 typedef struct netdata {
-    int32_t OnBatt;
-    int32_t BattLow;
-    int32_t BatteryUp;
-    int32_t BattChg;
-    int32_t ShutDown;
-    int32_t nettime;
-    int32_t TimeLeft;
-    int32_t ChangeBatt;
-    int32_t load;
-    int32_t timedout;
-    int32_t timelout;
-    int32_t emergencydown;
-    int32_t remote_state;
-    int32_t cap_battlev;
-    int32_t cap_runtim;
-    char apcmagic[APC_MAGIC_SIZE];
-    char usermagic[APC_MAGIC_SIZE];
+   int32_t OnBatt;
+   int32_t BattLow;
+   int32_t BatteryUp;
+   int32_t BattChg;
+   int32_t ShutDown;
+   int32_t nettime;
+   int32_t TimeLeft;
+   int32_t ChangeBatt;
+   int32_t load;
+   int32_t timedout;
+   int32_t timelout;
+   int32_t emergencydown;
+   int32_t remote_state;
+   int32_t cap_battlev;
+   int32_t cap_runtim;
+   char apcmagic[APC_MAGIC_SIZE];
+   char usermagic[APC_MAGIC_SIZE];
 } NETDATA;
 
 
-/* the following define MUST be changed each time you
+/*
+ * The following define MUST be changed each time you
  * change something in the upsinfo structure. Otherwise, you
  * risk to have users reading the shared memory with an old
  * nonvalid upsinfo structure. 
  */
 #define UPSINFO_VERSION 12
+
 /*
  * There is no need to change the following, but you can if
  * you want, but it must be at least 4 characters to match
@@ -214,251 +205,241 @@ typedef struct netdata {
 #define UPSINFO_ID "UPS!"
 
 class UPSINFO {
-public:
-    char id[5];
-    int version;
-    int size;
-    char release[20];
+ public:
+   char id[5];
+   int version;
+   int size;
+   char release[20];
 
-    int fd;                       /* serial port file descriptor */
+   int fd;                         /* serial port file descriptor */
 
-    /* UPS capability array and codes */
-    char     UPS_Cap[CI_MAXCI+1];     /* TRUE if UPS has capability */
-    unsigned int UPS_Cmd[CI_MAXCI+1]; /* Command or function code */
+   /* UPS capability array and codes */
+   char UPS_Cap[CI_MAXCI + 1];          /* TRUE if UPS has capability */
+   unsigned int UPS_Cmd[CI_MAXCI + 1];  /* Command or function code */
 
-    char *buf;                        /* scratch buffer */
-    int buf_len;                      /* buffer length */
+   char *buf;                      /* scratch buffer */
+   int buf_len;                    /* buffer length */
 
 
-    INTERNALGENINFO cable;
-    INTERNALGENINFO enable_access;
-    INTERNALGENINFO nologin;
-    INTERNALGENINFO mode;
-    INTERNALGENINFO upsclass;
-    INTERNALGENINFO sharenet;
+   INTERNALGENINFO cable;
+   INTERNALGENINFO enable_access;
+   INTERNALGENINFO nologin;
+   INTERNALGENINFO mode;
+   INTERNALGENINFO upsclass;
+   INTERNALGENINFO sharenet;
 
-    int num_execed_children;      /* children created in execute_command() */
+   int num_execed_children;        /* children created in execute_command() */
 
-    /* Internal state flags set in response to UPS condition */
-    time_t ShutDown;              /* set when doing shutdown */
-    time_t SelfTest;              /* start time of self test */
-    time_t LastSelfTest;          /* time of last self test */
-    time_t poll_time;             /* last time UPS polled -- fillUPS() */
-    time_t start_time;            /* time apcupsd started */
-    time_t last_onbatt_time;      /* last time on batteries */
-    time_t last_offbatt_time;     /* last time off batteries */
-    time_t last_time_on_line;
-    time_t last_time_annoy;
-    time_t last_time_nologon;
-    time_t last_time_changeme;
-    time_t last_master_connect_time; /* last time master connected */
-    int num_xfers;                /* number of times on batteries */
-    int cum_time_on_batt;         /* total time on batteries since startup */
-    int wait_time;                /* suggested wait time for drivers in 
-                                   * device_check_state() 
-                                   */
+   /* Internal state flags set in response to UPS condition */
+   time_t ShutDown;                /* set when doing shutdown */
+   time_t SelfTest;                /* start time of self test */
+   time_t LastSelfTest;            /* time of last self test */
+   time_t poll_time;               /* last time UPS polled -- fillUPS() */
+   time_t start_time;              /* time apcupsd started */
+   time_t last_onbatt_time;        /* last time on batteries */
+   time_t last_offbatt_time;       /* last time off batteries */
+   time_t last_time_on_line;
+   time_t last_time_annoy;
+   time_t last_time_nologon;
+   time_t last_time_changeme;
+   time_t last_master_connect_time;     /* last time master connected */
+   int num_xfers;                  /* number of times on batteries */
+   int cum_time_on_batt;           /* total time on batteries since startup */
+   int wait_time;                  /* suggested wait time for drivers in 
+                                    * device_check_state() */
 
-    /* Items reported by smart UPS */
-    /* Volatile items -- i.e. they change with the state of the UPS */
-    char linequal[8];             /* Line quality */
-    unsigned int reg1;            /* register 1 */
-    unsigned int reg2;            /* register 2 */
-    unsigned int reg3;            /* register 3 */
-    unsigned int dipsw;           /* dip switch info */
-    unsigned int InputPhase;      /* The current AC input phase. */
-    unsigned int OutputPhase;     /* The current AC output phase. */
-    char G[22];                   /* reason for last switch to batteries */
-    char X[8];                    /* results of last seft test */
-    double BattChg;               /* remaining UPS charge % */
-    double LineMin;               /* min line voltage seen */
-    double LineMax;               /* max line voltage seen */
-    double UPSLoad;               /* battery load percentage */
-    double LineFreq;              /* line freq. */
-    double LineVoltage;           /* Line Voltage */
-    double OutputVoltage;         /* Output Voltage */
-    double OutputFreq;            /* Output Frequency */
-    double OutputCurrent;         /* Output Current */
-    double UPSTemp;               /* UPS internal temperature */
-    double BattVoltage;           /* Actual Battery voltage -- about 24V */
-    double LastSTTime; /* hours since last self test -- not yet implemented */
-    int32_t Status;               /* UPS status (Bitmapped) */
-    double TimeLeft;              /* Est. time UPS can run on batt. */
-    double humidity;              /* Humidity */
-    double ambtemp;               /* Ambient temperature */
-    char eprom[500];              /* Eprom values */
+   /* Items reported by smart UPS */
+   /* Volatile items -- i.e. they change with the state of the UPS */
+   char linequal[8];               /* Line quality */
+   unsigned int reg1;              /* register 1 */
+   unsigned int reg2;              /* register 2 */
+   unsigned int reg3;              /* register 3 */
+   unsigned int dipsw;             /* dip switch info */
+   unsigned int InputPhase;        /* The current AC input phase. */
+   unsigned int OutputPhase;       /* The current AC output phase. */
+   char G[22];                     /* reason for last switch to batteries */
+   char X[8];                      /* results of last seft test */
+   double BattChg;                 /* remaining UPS charge % */
+   double LineMin;                 /* min line voltage seen */
+   double LineMax;                 /* max line voltage seen */
+   double UPSLoad;                 /* battery load percentage */
+   double LineFreq;                /* line freq. */
+   double LineVoltage;             /* Line Voltage */
+   double OutputVoltage;           /* Output Voltage */
+   double OutputFreq;              /* Output Frequency */
+   double OutputCurrent;           /* Output Current */
+   double UPSTemp;                 /* UPS internal temperature */
+   double BattVoltage;             /* Actual Battery voltage -- about 24V */
+   double LastSTTime;              /* hours since last self test -- not yet implemented */
+   int32_t Status;                 /* UPS status (Bitmapped) */
+   double TimeLeft;                /* Est. time UPS can run on batt. */
+   double humidity;                /* Humidity */
+   double ambtemp;                 /* Ambient temperature */
+   char eprom[500];                /* Eprom values */
 
-    /* Items reported by smart UPS */
-    /* Static items that normally do not change during UPS operation */
-    int NomOutputVoltage;         /* Nominial voltage when on batteries */
-    double nombattv;              /* Nominal batt. voltage -- not actual */
-    int extbatts;                 /* number of external batteries attached */
-    int badbatts;                 /* number of bad batteries */
-    int lotrans;                  /* min line voltage before using batt. */   
-    int hitrans;                  /* max line voltage before using batt. */
-    int rtnpct;                   /* % batt charge necessary for return */
-    int dlowbatt;                 /* low batt warning in mins. */
-    int dwake;                    /* wakeup delay seconds */
-    int dshutd;                   /* shutdown delay seconds */
-    char birth[20];               /* manufacture date */
-    char serial[32];              /* serial number */
-    char battdat[20];             /* battery installation date */
-    char selftest[9];             /* selftest interval as ASCII */
-    char firmrev[20];             /* firmware revision */
-    char upsname[UPSNAMELEN];     /* UPS internal name */
-    char upsmodel[20];            /* ups model number */
-    char sensitivity[8];          /* sensitivity to line fluxuations */
-    char beepstate[8];            /* when to beep on power failure. */
-    char selftestmsg[80];
+   /* Items reported by smart UPS */
+   /* Static items that normally do not change during UPS operation */
+   int NomOutputVoltage;           /* Nominial voltage when on batteries */
+   double nombattv;                /* Nominal batt. voltage -- not actual */
+   int extbatts;                   /* number of external batteries attached */
+   int badbatts;                   /* number of bad batteries */
+   int lotrans;                    /* min line voltage before using batt. */
+   int hitrans;                    /* max line voltage before using batt. */
+   int rtnpct;                     /* % batt charge necessary for return */
+   int dlowbatt;                   /* low batt warning in mins. */
+   int dwake;                      /* wakeup delay seconds */
+   int dshutd;                     /* shutdown delay seconds */
+   char birth[20];                 /* manufacture date */
+   char serial[32];                /* serial number */
+   char battdat[20];               /* battery installation date */
+   char selftest[9];               /* selftest interval as ASCII */
+   char firmrev[20];               /* firmware revision */
+   char upsname[UPSNAMELEN];       /* UPS internal name */
+   char upsmodel[20];              /* ups model number */
+   char sensitivity[8];            /* sensitivity to line fluxuations */
+   char beepstate[8];              /* when to beep on power failure. */
+   char selftestmsg[80];
 
-    /* Items specified from config file */
-    int PoweredByUPS;             /* The only bit left out from the bitmap */
-    int annoy;
-    int maxtime;
-    int annoydelay;      /* delay before annoying users with logoff request */
-    int onbattdelay;     /* delay before reacting to a power failure */
-    int killdelay;       /* delay after pwrfail before issuing UPS shutdown */
-    int nologin_time;
-    int nologin_file;
-    int stattime;
-    int datatime;
-    int sysfac;
-    int reports;
-    int nettime;         /* Time interval for master to send to slaves */
-    int percent;                     /* shutdown when batt % less than this */
-    int runtime;                     /* shutdown when runtime less than this */
-    char nisip[64];                  /* IP for NIS */
-    int statusport;                  /* TCP port for STATUS */
-    int netstats;                    /* turn on/off network status */
-    int logstats;                    /* turn on/off logging of status info */
-    char device[MAXSTRING];          /* device name in use */
-    char configfile[APC_FILENAME_MAX];   /* config filename */
-    char statfile[APC_FILENAME_MAX];     /* status filename */
-    char eventfile[APC_FILENAME_MAX];    /* temp events file */
-    int eventfilemax;                /* max size of eventfile in kilobytes */
-    int event_fd;                    /* fd for eventfile */
+   /* Items specified from config file */
+   int PoweredByUPS;               /* The only bit left out from the bitmap */
+   int annoy;
+   int maxtime;
+   int annoydelay;                 /* delay before annoying users with logoff request */
+   int onbattdelay;                /* delay before reacting to a power failure */
+   int killdelay;                  /* delay after pwrfail before issuing UPS shutdown */
+   int nologin_time;
+   int nologin_file;
+   int stattime;
+   int datatime;
+   int sysfac;
+   int reports;
+   int nettime;                    /* Time interval for master to send to slaves */
+   int percent;                    /* shutdown when batt % less than this */
+   int runtime;                    /* shutdown when runtime less than this */
+   char nisip[64];                 /* IP for NIS */
+   int statusport;                 /* TCP port for STATUS */
+   int netstats;                   /* turn on/off network status */
+   int logstats;                   /* turn on/off logging of status info */
+   char device[MAXSTRING];         /* device name in use */
+   char configfile[APC_FILENAME_MAX];   /* config filename */
+   char statfile[APC_FILENAME_MAX];     /* status filename */
+   char eventfile[APC_FILENAME_MAX];    /* temp events file */
+   int eventfilemax;               /* max size of eventfile in kilobytes */
+   int event_fd;                   /* fd for eventfile */
 
-    int NetUpsPort;                  /* Our communication port */
-    char master_name[APC_FILENAME_MAX];  /**/
+   int NetUpsPort;                 /* Our communication port */
+   char master_name[APC_FILENAME_MAX];
+    /**/ char lockpath[APC_FILENAME_MAX];  /* BSC, made static -RF */
+   int lockfile;                   /* BSC */
 
-    char lockpath[APC_FILENAME_MAX];     /* BSC, made static -RF */
-    int lockfile;                    /* BSC */
+   char usermagic[APC_MAGIC_SIZE]; /* security id string */
+   int ChangeBattCounter;          /* For UPS_REPLACEBATT, see apcaction.c */
 
-    char usermagic[APC_MAGIC_SIZE];  /* security id string */
-    int ChangeBattCounter;           /* For UPS_REPLACEBATT, see apcaction.c */
+   int remote_state;
 
-    int remote_state;                /**/
-
-    /*
-     * Added with multi-UPS. We try to mantain the UPSINFO layout as clean as
-     * possible to be backward compatible. All moved variables are kept as
-     * reserved and all the new variables are at the end of the structure.
-     */
-
+   /*
+    * Added with multi-UPS. We try to mantain the UPSINFO layout as clean as
+    * possible to be backward compatible. All moved variables are kept as
+    * reserved and all the new variables are at the end of the structure.
+    */
 #ifndef HAVE_PTHREADS
-    /*
-     * IPC
-     */
-    /*
-     * Don't use shmUPS directly: call ipc functions to get it or
-     * unpredictable results may happen.
-     */
-    int sem_id;                 /* Semaphore ID */
-    int shm_id;                 /* Shared memory ID */
-    struct sembuf semUPS[NUM_SEM_OPER]; /* Semaphore operators */
-    int idshmUPS;               /* key of shared memory area */
-    int idsemUPS;               /* key of semphores */
+   /* IPC */
+
+   /*
+    * Don't use shmUPS directly: call ipc functions to get it or
+    * unpredictable results may happen.
+    */
+   int sem_id;                     /* Semaphore ID */
+   int shm_id;                     /* Shared memory ID */
+   struct sembuf semUPS[NUM_SEM_OPER];  /* Semaphore operators */
+   int idshmUPS;                   /* key of shared memory area */
+   int idsemUPS;                   /* key of semphores */
 #endif
 
-    /*
-     * Linked list of UPSes used in apclist.c
-     */
+   /* Linked list of UPSes used in apclist.c */
 
-    UPSINFO *next;
+   UPSINFO *next;
 #ifdef HAVE_PTHREADS
-    pthread_mutex_t mutex;
-    int refcnt;                       /* thread attach count */
+   pthread_mutex_t mutex;
+   int refcnt;                     /* thread attach count */
 #endif
 
-    const struct upsdriver *driver; /* UPS driver for this UPSINFO */
-    void *driver_internal_data;     /* Driver private data */
+   const struct upsdriver *driver; /* UPS driver for this UPSINFO */
+   void *driver_internal_data;     /* Driver private data */
 };
 
 /* Used only in apcaccess.c */
 typedef struct datainfo {
-    char apcmagic[APC_MAGIC_SIZE];
-    int update_master_config;
-    int get_master_status;
-    int slave_status;
-    int call_master_shutdown;
-    char accessmagic[ACCESS_MAGIC_SIZE];
+   char apcmagic[APC_MAGIC_SIZE];
+   int update_master_config;
+   int get_master_status;
+   int slave_status;
+   int call_master_shutdown;
+   char accessmagic[ACCESS_MAGIC_SIZE];
 } DATAINFO;
 
 typedef int (HANDLER) (UPSINFO *, int, const GENINFO *, const char *);
 
 typedef struct {
-    const char *key;
-    HANDLER *handler;
-    size_t offset;
-    const GENINFO *values;
-    const char *help;
+   const char *key;
+   HANDLER *handler;
+   size_t offset;
+   const GENINFO *values;
+   const char *help;
 } PAIRS;
 
 typedef struct configinfo {
-    int new_annoy;
-    int new_maxtime;
-    int new_delay;
+   int new_annoy;
+   int new_maxtime;
+   int new_delay;
 #ifdef __NOLOGIN
-    int new_nologin;
-#endif /* __NOLOGIN */
-    int new_stattime;
-    int new_datatime;
-    int new_nettime;
-    int new_percent;
+   int new_nologin;
+#endif  /* __NOLOGIN */
+   int new_stattime;
+   int new_datatime;
+   int new_nettime;
+   int new_percent;
 
 } CONFIGINFO;
 
 
-/*
- * These are needed for commands executed in apcaction.c
- */
+/*These are needed for commands executed in apcaction.c */
 typedef struct {
-    char *command;
-    int pid;
+   char *command;
+   int pid;
 } UPSCOMMANDS;
 
 typedef struct s_cmd_msg {
-    int level;
-    char *msg;
+   int level;
+   char *msg;
 } UPSCMDMSG;
 
 typedef struct netclient_s {
-    int fd;                     /* Network FD */
-    struct sockaddr_in who;     /* Other side's IP address */
-    UPSINFO *ups;               /* Client's selected UPS */
-    int authlevel;              /* Level of authorization of the client */
-    int net_poll_time;          /* Time between two client's polls */
-    int last_poll;              /* Last client's poll */
-    struct netclient_s *next;   /* Linked list */
+   int fd;                         /* Network FD */
+   struct sockaddr_in who;         /* Other side's IP address */
+   UPSINFO *ups;                   /* Client's selected UPS */
+   int authlevel;                  /* Level of authorization of the client */
+   int net_poll_time;              /* Time between two client's polls */
+   int last_poll;                  /* Last client's poll */
+   struct netclient_s *next;       /* Linked list */
 } NETCLIENT;
 
-/*
- * Net commands structure.
- */
+/* Net commands structure. */
 typedef struct {
-    char *name;
-    int (*function) (NETCLIENT * nc, int argc, char *argv[]);
-    char *syntax;
-    char *help;
-    int authlevel;
+   char *name;
+   int (*function) (NETCLIENT *nc, int argc, char *argv[]);
+   char *syntax;
+   char *help;
+   int authlevel;
 } NETCMD;
 
 #if defined(_SEM_SEMUN_UNDEFINED)
 union semun {
-    int val;                           /* value for SETVAL */
-    struct semid_ds *buf;              /* buffer for IPC_STAT & IPC_SET */
-    unsigned short int *array;         /* array for GETALL & SETALL */
-    struct seminfo *__buf;             /* buffer for IPC_INFO */
+   int val;                        /* value for SETVAL */
+   struct semid_ds *buf;           /* buffer for IPC_STAT & IPC_SET */
+   unsigned short int *array;      /* array for GETALL & SETALL */
+   struct seminfo *__buf;          /* buffer for IPC_INFO */
 };
 #endif
 
-#endif /* _APC_STRUCT_H */
+#endif   /* _APC_STRUCT_H */
