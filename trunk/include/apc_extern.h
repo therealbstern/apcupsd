@@ -1,55 +1,44 @@
 /*
- *  apc_extern.h  -- header file for apcupsd package
+ * apc_extern.h
  *
- *  apcupsd.c -- Simple Daemon to catch power failure signals from a
- *               BackUPS, BackUPS Pro, or SmartUPS (from APCC).
- *            -- Now SmartMode support for SmartUPS and BackUPS Pro.
- *
- *  All rights reserved.
- *
+ * Public exports.
  */
 
 /*
-   Copyright (C) 2000-2004 Kern Sibbald
-
-   This program is free software; you can redistribute it and/or
-   modify it under the terms of the GNU General Public License as
-   published by the Free Software Foundation; either version 2 of
-   the License, or (at your option) any later version.
-
-   This program is distributed in the hope that it will be useful,
-   but WITHOUT ANY WARRANTY; without even the implied warranty of
-   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
-   General Public License for more details.
-
-   You should have received a copy of the GNU General Public
-   License along with this program; if not, write to the Free
-   Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
-   MA 02111-1307, USA.
-
+ * Copyright (C) 2000-2004 Kern Sibbald
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of version 2 of the GNU General
+ * Public License as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the Free
+ * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+ * MA 02111-1307, USA.
  */
 
 #ifndef _APC_EXTERN_H
 #define _APC_EXTERN_H
 
-/*********************************************************************/
-/* Function ProtoTypes                                               */
-/*********************************************************************/
+/* Function Prototypes */
 
 extern UPSINFO myUPS;
 extern UPSINFO *core_ups;
 extern char argvalue[MAXSTRING];
-extern void (*error_out)(const char *file, int line, const char *fmt,...);
-extern void (*error_exit)(const char *fmt,...);
-extern void (*error_cleanup)(void);
+extern void (*error_out) (const char *file, int line, const char *fmt, ...);
+extern void (*error_exit) (const char *fmt, ...);
+extern void (*error_cleanup) (void);
 
 extern UPSCOMMANDS ups_event[];
 extern UPSCMDMSG event_msg[];
 
 
-/*
- * Serial bits
- */
+/* Serial bits */
 extern int le_bit;
 extern int dtr_bit;
 extern int rts_bit;
@@ -60,18 +49,14 @@ extern int cd_bit;
 extern int rng_bit;
 extern int dsr_bit;
 
-/*
- * File opened
- */
+/* File opened */
 extern int flags;
 
 extern struct termios newtio;
 
 extern int debug_net;
 
-/*
- * getopt flags (see apcoptd.c)
- */
+/* getopt flags (see apcoptd.c) */
 extern int show_version;
 extern char *cfgfile;
 extern int configure_ups;
@@ -84,32 +69,24 @@ extern int dumb_mode_test;
 extern int go_background;
 
 
-/*
- * In apceeprom.c
- */
+/* In apceeprom.c */
 extern int do_eeprom_programming(UPSINFO *ups);
 
 
-/*
- * In apcopt.c
- */
+/* In apcopt.c */
 extern int parse_options(int argc, char *argv[]);
 
-/*
- * In apcupsd.c
- */
-extern void powerfail (int ok);
-extern void logonfail (int ok);
+/* In apcupsd.c */
+extern void powerfail(int ok);
+extern void logonfail(int ok);
 
-extern void apc_thread_terminate (int sig);
+extern void apc_thread_terminate(int sig);
 extern void clean_threads(void);
-extern void apcupsd_terminate (int sig);
-extern void clear_files (void);
-extern void make_pid (void);
+extern void apcupsd_terminate(int sig);
+extern void clear_files(void);
+extern void make_pid(void);
 
-/*
- * In apcdevice.c
- */
+/* In apcdevice.c */
 void setup_device(UPSINFO *ups);
 extern void setup_serial(UPSINFO *ups);
 extern void kill_power(UPSINFO *ups);
@@ -118,143 +95,115 @@ extern int check_serial(UPSINFO *ups);
 extern void prep_device(UPSINFO *ups);
 extern void do_device(UPSINFO *ups);
 
-/*
- * In apcaction.c
- */
+/* In apcaction.c */
 extern void timer_action(int sig);
 extern void do_action(UPSINFO *ups);
 extern void generate_event(UPSINFO *ups, int event);
 
-/*
- * In apclock.c
- */
-extern int create_lockfile (UPSINFO *ups);
-extern void delete_lockfile (UPSINFO *ups);
+/* In apclock.c */
+extern int create_lockfile(UPSINFO *ups);
+extern void delete_lockfile(UPSINFO *ups);
 
-/*
- * In apcnet.c
- */
-extern int write_struct_net (int wsocketfd, struct netdata *write_struct, size_t size);
-extern int read_struct_net (int rsocketfd, struct netdata *read_struct, size_t size);
-extern void log_struct (struct netdata *logstruct);
+/* In apcnet.c */
+extern int write_struct_net(int wsocketfd, struct netdata *write_struct,
+   size_t size);
+extern int read_struct_net(int rsocketfd, struct netdata *read_struct, size_t size);
+extern void log_struct(struct netdata *logstruct);
 
-extern int reconnect_master (UPSINFO *ups, int who);
-extern int prepare_master (UPSINFO *ups);
+extern int reconnect_master(UPSINFO *ups, int who);
+extern int prepare_master(UPSINFO *ups);
 
-extern int reconnect_slave (UPSINFO *ups);
-extern int prepare_slave (UPSINFO *ups);
-extern void kill_net (UPSINFO *ups);
+extern int reconnect_slave(UPSINFO *ups);
+extern int prepare_slave(UPSINFO *ups);
+extern void kill_net(UPSINFO *ups);
 
-extern void timer_net (int sig);
+extern void timer_net(int sig);
 extern void do_net(UPSINFO *ups);
-extern void timer_slaves (int sig);
+extern void timer_slaves(int sig);
 extern void do_slaves(UPSINFO *ups);
 
-/*
- * In apcfile.c
- */
+/* In apcfile.c */
 extern int make_file(UPSINFO *ups, const char *path);
 extern void make_pid_file(void);
 
-/*
- * In apcpipe.c
- */
-extern void sig_fifo_alarm (int sig);
-extern int pipe_requests (UPSINFO *ups);
-extern int pipe_reconfig (UPSINFO *ups, CONFIGINFO *config);
-extern int pipe_master_status (UPSINFO *ups);
-extern int pipe_call_shutdown (UPSINFO *ups);
-extern int pipe_slave_reconnect (UPSINFO *ups);
-extern int pipe_slave_release (UPSINFO *ups);
+/* In apcpipe.c */
+extern void sig_fifo_alarm(int sig);
+extern int pipe_requests(UPSINFO *ups);
+extern int pipe_reconfig(UPSINFO *ups, CONFIGINFO * config);
+extern int pipe_master_status(UPSINFO *ups);
+extern int pipe_call_shutdown(UPSINFO *ups);
+extern int pipe_slave_reconnect(UPSINFO *ups);
+extern int pipe_slave_release(UPSINFO *ups);
 
-/*
- * In apcconfig.c
- */
+/* In apcconfig.c */
 extern int slave_count;
 extern SLAVEINFO slaves[MAXSLAVES];
 
 extern void init_ups_struct(UPSINFO *ups);
 extern void check_for_config(UPSINFO *ups, char *cfgfile);
 
-/*
- * In apcsetup.c
- */
-extern void setup_ups_name (UPSINFO *ups);
-extern void setup_ups_replace (UPSINFO *ups);
+/* In apcsetup.c */
+extern void setup_ups_name(UPSINFO *ups);
+extern void setup_ups_replace(UPSINFO *ups);
 
-extern char *setup_ups_string (UPSINFO *ups, char cmd, char *setting);
-extern int setup_ups_single (UPSINFO *ups, char cmd, int single);
-extern int setup_ups_bubble (UPSINFO *ups, char cmd, int setting);
+extern char *setup_ups_string(UPSINFO *ups, char cmd, char *setting);
+extern int setup_ups_single(UPSINFO *ups, char cmd, int single);
+extern int setup_ups_bubble(UPSINFO *ups, char cmd, int setting);
 
-extern void setup_ups_sensitivity (UPSINFO *ups);
-extern void setup_ups_wakeup (UPSINFO *ups);
-extern void setup_ups_sleep (UPSINFO *ups);
-extern void setup_ups_lo_xfer (UPSINFO *ups);
-extern void setup_ups_hi_xfer (UPSINFO *ups);
-extern void setup_ups_chargepoint (UPSINFO *ups);
-extern void setup_ups_alarm (UPSINFO *ups);
-extern void setup_ups_lowbatt_delay (UPSINFO *ups);
-extern void setup_ups_selftest (UPSINFO *ups);
+extern void setup_ups_sensitivity(UPSINFO *ups);
+extern void setup_ups_wakeup(UPSINFO *ups);
+extern void setup_ups_sleep(UPSINFO *ups);
+extern void setup_ups_lo_xfer(UPSINFO *ups);
+extern void setup_ups_hi_xfer(UPSINFO *ups);
+extern void setup_ups_chargepoint(UPSINFO *ups);
+extern void setup_ups_alarm(UPSINFO *ups);
+extern void setup_ups_lowbatt_delay(UPSINFO *ups);
+extern void setup_ups_selftest(UPSINFO *ups);
 
 extern void get_apc_model(UPSINFO *ups);
 extern void get_apc_capabilities(UPSINFO *ups);
-extern void read_extended (UPSINFO *ups); 
-extern void setup_extended(UPSINFO *ups); 
+extern void read_extended(UPSINFO *ups);
+extern void setup_extended(UPSINFO *ups);
 
-/*
- * In apcnis.c
- */
+/* In apcnis.c */
 extern void do_server(UPSINFO *ups);
 extern int check_wrappers(char *av, int newsock);
 
-/*
- * In apcstatus.c
- */
-extern int output_status (UPSINFO *ups, int fd, void s_open(UPSINFO *ups), 
-           void s_write(UPSINFO *ups, char *fmt,...),  
-           int s_close(UPSINFO *ups, int fd));
+/* In apcstatus.c */
+extern int output_status(UPSINFO *ups, int fd, void s_open(UPSINFO * ups),
+   void s_write(UPSINFO *ups, char *fmt, ...), int s_close(UPSINFO * ups, int fd));
 extern void stat_open(UPSINFO *ups);
 extern int stat_close(UPSINFO *ups, int fd);
 extern void stat_print(UPSINFO *ups, char *fmt, ...);
 
 
-/*
- * In apcevents.c
- */
+/* In apcevents.c */
 extern int trim_eventfile(UPSINFO *ups);
 extern int output_events(int sockfd, FILE *events_file);
 
 
-/*
- * In apcreports.c
- */
+/* In apcreports.c */
 extern void clear_files(void);
-extern int log_status (UPSINFO *ups);
+extern int log_status(UPSINFO *ups);
 
-extern void timer_reports (int sig);
-extern void do_reports (UPSINFO *ups);
+extern void timer_reports(int sig);
+extern void do_reports(UPSINFO *ups);
 
-/*
- * In apcsmart.c
- */
+/* In apcsmart.c */
 extern int apc_enable(UPSINFO *ups);
-extern int getline (char *s, int len, UPSINFO *ups);
-extern void UPSlinkCheck (UPSINFO *ups);
-extern char *smart_poll (char cmd, UPSINFO *ups);
-extern int fillUPS (UPSINFO *ups);
+extern int getline(char *s, int len, UPSINFO *ups);
+extern void UPSlinkCheck(UPSINFO *ups);
+extern char *smart_poll(char cmd, UPSINFO *ups);
+extern int fillUPS(UPSINFO *ups);
 
-/*
- * In apcsignal.c
- */
-extern void init_timer (int timer, void (*fnhandler)(int));
-extern void init_signals(void (*handler)(int));
+/* In apcsignal.c */
+extern void init_timer(int timer, void (*fnhandler) (int));
+extern void init_signals(void (*handler) (int));
 extern void init_thread_signals(void);
 extern void restore_signals(void);
 extern void sleep_forever(void);
 
-/*
- * In apcipc.c
- */
+/* In apcipc.c */
 extern UPSINFO *new_ups(void);
 extern UPSINFO *attach_ups(UPSINFO *ups, int shmperm);
 extern int detach_ups(UPSINFO *ups);
@@ -271,65 +220,49 @@ extern int _read_unlock(char *file, int line, UPSINFO *ups);
 extern int _write_lock(char *file, int line, UPSINFO *ups);
 extern int _write_unlock(char *file, int line, UPSINFO *ups);
 
-/*
- * In apcexec.c
- */
-extern int start_thread(UPSINFO *ups, void(*action)(UPSINFO *ups),
-                       char *proctitle, char *argv0);
+/* In apcexec.c */
+extern int start_thread(UPSINFO *ups, void (*action) (UPSINFO * ups),
+   char *proctitle, char *argv0);
 extern int execute_command(UPSINFO *ups, UPSCOMMANDS cmd);
-extern void wait_for_termination (int serial_pid);
+extern void wait_for_termination(int serial_pid);
 
-/*
- * In apclog.c
- */
-extern void log_event (const UPSINFO *ups, int level, const char *fmt, ...);
+/* In apclog.c */
+extern void log_event(const UPSINFO *ups, int level, const char *fmt, ...);
 
-/*
- * In apcproctitle.c
- */
+/* In apcproctitle.c */
 #ifndef HAVE_SETPROCTITLE
 extern void init_proctitle(char *a0);
 extern int setproctitle(char *fmt, ...);
 #endif
 
-/*
- * In apcnetlib.c
- */
+/* In apcnetlib.c */
 extern int net_open(char *host, char *service, int port);
 extern void net_close(int sockfd);
 extern int net_send(int sockfd, char *buff, int len);
 extern int net_recv(int sockfd, char *buff, int maxlen);
 
-/*
- * In apclist.c
- */
+/* In apclist.c */
 extern int insertUps(UPSINFO *ups);
 extern UPSINFO *getNextUps(UPSINFO *ups);
 extern UPSINFO *getUpsByname(char *name);
 
-/*
- * In apcerror.c
- */
+/* In apcerror.c */
 extern void generic_error_out(const char *file, int line, const char *fmt, ...);
 extern void generic_error_exit(const char *fmt, ...);
 
-/*  
- * In asys.c 
- */
+/* In asys.c */
 int amicrosleep(time_t sec, long usec);
 int avsnprintf(char *str, size_t size, const char *format, va_list ap);
-int asnprintf(char *str, size_t size, const char *fmt,  ...);
+int asnprintf(char *str, size_t size, const char *fmt, ...);
 char *astrncpy(char *dest, const char *src, int maxlen);
 char *astrncat(char *dest, const char *src, int maxlen);
 struct tm *localtime_r(const time_t *timep, struct tm *tm);
 char *afgets(char *s, int size, FILE *fd);
 void *amalloc(size_t size);
-void *arealloc (void *buf, size_t size);
-void *acalloc (size_t size1, size_t size2);
+void *arealloc(void *buf, size_t size);
+void *acalloc(size_t size1, size_t size2);
 
-/* 
- * In apcwinipc.c
- */
+/* In apcwinipc.c */
 int winioctl(int fd, int func, int *addr);
 
-#endif /* _APC_EXTERN_H */
+#endif   /* _APC_EXTERN_H */
