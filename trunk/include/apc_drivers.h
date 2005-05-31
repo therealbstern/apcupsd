@@ -104,27 +104,46 @@ typedef struct upsdriver {
 } UPSDRIVER;
 
 /* Some defines that helps code readability. */
-/* FIXME (adk): Danger...dangling else clauses */
 #define device_open(ups) \
-    if (ups->driver) ups->driver->open(ups)
+   do { \
+      if (ups->driver) ups->driver->open(ups); \
+   } while(0)
 #define device_setup(ups) \
-    if (ups->driver) ups->driver->setup(ups)
+   do { \
+      if (ups->driver) ups->driver->setup(ups); \
+   } while(0)
 #define device_close(ups) \
-    if (ups->driver) ups->driver->close(ups)
+   do { \
+      if (ups->driver) ups->driver->close(ups); \
+   } while(0)
 #define device_kill_power(ups) \
-    if (ups->driver) ups->driver->kill_power(ups)
+   do { \
+      if (ups->driver) ups->driver->kill_power(ups); \
+   } while(0)
 #define device_read_static_data(ups) \
-    if (ups->driver) ups->driver->read_ups_static_data(ups)
+   do { \
+      if (ups->driver) ups->driver->read_ups_static_data(ups); \
+   } while(0)
 #define device_read_volatile_data(ups) \
-    if (ups->driver) ups->driver->read_ups_volatile_data(ups)
+   do { \
+      if (ups->driver) ups->driver->read_ups_volatile_data(ups); \
+   } while(0)
 #define device_get_capabilities(ups) \
-    if (ups->driver) ups->driver->get_ups_capabilities(ups)
+   do { \
+      if (ups->driver) ups->driver->get_ups_capabilities(ups); \
+   } while(0)
 #define device_check_state(ups) \
-    if (ups->driver) ups->driver->check_ups_state(ups)
+   do { \
+      if (ups->driver) ups->driver->check_ups_state(ups); \
+   } while(0)
 #define device_program_eeprom(ups, command, data) \
-    if (ups->driver) ups->driver->ups_program_eeprom(ups, command, data)
+   do { \
+      if (ups->driver) ups->driver->ups_program_eeprom(ups, command, data); \
+   } while(0)
 #define device_entry_point(ups, command, data) \
-    if (ups->driver) ups->driver->ups_entry_point(ups, command, data)
+   do { \
+      if (ups->driver) ups->driver->ups_entry_point(ups, command, data); \
+   } while(0)
 
 /* Now some defines for device_entry_point commands. */
 
