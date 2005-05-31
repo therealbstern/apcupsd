@@ -288,7 +288,14 @@ int amicrosleep(time_t sec, long usec)
 
 /* BSDI does not have this.  This is a *poor* simulation */
 
-/* This seems to create some problems, so is removed KES 20May05 */
+/*
+ * This seems to create some problems, so is removed KES 20May05
+ * Specifically, configure isn't picking up that I already have
+ * it (gcc-2.96, glibc-2.2.4, RH7.1) so this implementation gets
+ * compiled and conflicts with my system one. The problem
+ * appeared after Kern's C++ conversion. ADK
+ */
+/* #ifndef HAVE_STRTOLL */
 #if 0
 long long int strtoll(const char *ptr, char **endptr, int base)
 {
