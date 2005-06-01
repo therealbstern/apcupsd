@@ -56,10 +56,7 @@ int trim_eventfile(UPSINFO *ups)
    if (!buf)
       return -1;
 
-   if (write_lock(ups)) {
-      log_event(ups, LOG_CRIT, _("Failed to acquire shm lock in trim_eventfile."));
-      goto trim_done;
-   }
+   write_lock(ups);
 
    /* Read the desired number of bytes from end of file */
    if (lseek(ups->event_fd, -maxb, SEEK_END) < 0) {
@@ -102,7 +99,7 @@ int trim_eventfile(UPSINFO *ups)
    }
    status = 1;
 
- trim_done:
+trim_done:
    write_unlock(ups);
    free(buf);
 
@@ -117,8 +114,8 @@ int trim_eventfile(UPSINFO *ups)
 /*
  * Send the last events.
  * Returns:
- *	    -1 error or EOF
- *	     0 OK
+ *          -1 error or EOF
+ *           0 OK
  */
 int output_events(int sockfd, FILE *events_file)
 {

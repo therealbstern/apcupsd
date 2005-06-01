@@ -126,15 +126,6 @@ extern void do_slaves(UPSINFO *ups);
 extern int make_file(UPSINFO *ups, const char *path);
 extern void make_pid_file(void);
 
-/* In apcpipe.c */
-extern void sig_fifo_alarm(int sig);
-extern int pipe_requests(UPSINFO *ups);
-extern int pipe_reconfig(UPSINFO *ups, CONFIGINFO * config);
-extern int pipe_master_status(UPSINFO *ups);
-extern int pipe_call_shutdown(UPSINFO *ups);
-extern int pipe_slave_reconnect(UPSINFO *ups);
-extern int pipe_slave_release(UPSINFO *ups);
-
 /* In apcconfig.c */
 extern int slave_count;
 extern SLAVEINFO slaves[MAXSLAVES];
@@ -203,11 +194,11 @@ extern void init_thread_signals(void);
 extern void restore_signals(void);
 extern void sleep_forever(void);
 
-/* In apcipc.c */
+/* In aups.c */
 extern UPSINFO *new_ups(void);
-extern UPSINFO *attach_ups(UPSINFO *ups, int shmperm);
-extern int detach_ups(UPSINFO *ups);
-extern int destroy_ups(UPSINFO *ups);
+extern UPSINFO *attach_ups(UPSINFO *ups);
+extern void detach_ups(UPSINFO *ups);
+extern void destroy_ups(UPSINFO *ups);
 
 #define read_lock(ups) _read_lock(__FILE__, __LINE__, (ups))
 #define read_unlock(ups) _read_unlock(__FILE__, __LINE__, (ups))
@@ -215,10 +206,10 @@ extern int destroy_ups(UPSINFO *ups);
 #define write_unlock(ups) _write_unlock(__FILE__, __LINE__, (ups))
 #define read_lock(ups) _read_lock(__FILE__, __LINE__, (ups))
 
-extern int _read_lock(char *file, int line, UPSINFO *ups);
-extern int _read_unlock(char *file, int line, UPSINFO *ups);
-extern int _write_lock(char *file, int line, UPSINFO *ups);
-extern int _write_unlock(char *file, int line, UPSINFO *ups);
+extern void _read_lock(char *file, int line, UPSINFO *ups);
+extern void _read_unlock(char *file, int line, UPSINFO *ups);
+extern void _write_lock(char *file, int line, UPSINFO *ups);
+extern void _write_unlock(char *file, int line, UPSINFO *ups);
 
 /* In apcexec.c */
 extern int start_thread(UPSINFO *ups, void (*action) (UPSINFO * ups),
@@ -228,12 +219,6 @@ extern void wait_for_termination(int serial_pid);
 
 /* In apclog.c */
 extern void log_event(const UPSINFO *ups, int level, const char *fmt, ...);
-
-/* In apcproctitle.c */
-#ifndef HAVE_SETPROCTITLE
-extern void init_proctitle(char *a0);
-extern int setproctitle(char *fmt, ...);
-#endif
 
 /* In apcnetlib.c */
 extern int net_open(char *host, char *service, int port);

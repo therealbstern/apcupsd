@@ -6,8 +6,7 @@
  */
 
 /*
- * Copyright (C) 1999 Kern Sibbald <kern@sibbald.com>
- * Copyright (C) 1996-99 Andre M. Hedrick <andre@suse.com>
+ * Copyright (C) 1999-2005 Kern Sibbald <kern@sibbald.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of version 2 of the GNU General
@@ -27,10 +26,6 @@
 #include "apc.h"
 
 #if !defined(HAVE_LOCALTIME_R)
-
-#if !defined(HAVE_PTHREADS)
-# error Either pthreads or localtime_r is required
-#endif
 
 struct tm *localtime_r(const time_t *timep, struct tm *tm)
 {

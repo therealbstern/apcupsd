@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright (C) 1999-2004 Kern Sibbald
+ * Copyright (C) 1999-2005 Kern Sibbald
  * Copyright (C) 1999 Brian Schau <Brian@Schau.dk>
  * Copyright (C) 1996-99 Andre M. Hedrick <andre@suse.com>
  *
@@ -50,10 +50,6 @@
 # include <stdarg.h>
 #endif
 
-#ifdef HAVE_OPENSERVER_OS
-# define _SVID3                    /* OpenServer needs this to see TIOCM_ defn's */
-#endif
-
 #ifdef HAVE_UNISTD_H
 # include <unistd.h>
 #endif
@@ -64,24 +60,14 @@
 # include "getopt.h"
 #endif
 
-#ifdef HAVE_PTHREADS
-
-# define _THREAD_SAFE 1
-# define _REENTRANT   1
-
-# include <pthread.h>
-# ifdef HAVE_SUN_OS
+#define _THREAD_SAFE 1
+#define _REENTRANT   1
+#include <pthread.h>
+#ifdef HAVE_SUN_OS
 #  include <thread.h>
 #  define set_thread_concurrency() thr_setconcurrency(4)
-# else
+#else
 #  define set_thread_concurrency()
-# endif
-
-/* setproctitle not used with pthreads */
-# undef  HAVE_SETPROCTITLE
-# define HAVE_SETPROCTITLE
-# define init_proctitle(x)
-# define setproctitle(x)
 #endif
 
 #include <string.h>

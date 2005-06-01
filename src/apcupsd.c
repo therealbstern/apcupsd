@@ -5,8 +5,7 @@
  */
 
 /*
- * Copyright (C) 1999-2004 Kern Sibbald
- * Copyright (C) 1996-1999 Andre M. Hedrick <andre@suse.com>
+ * Copyright (C) 1999-2005 Kern Sibbald
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of version 2 of the GNU General
@@ -40,21 +39,21 @@
  *
  * Child process apcdev -- subroutine do_device()
  *   wait for activity on serial port or timeout 
- *	  from select() (5 seconds) -- check_serial()
+ *        from select() (5 seconds) -- check_serial()
  *   call do_action()
- *	  read and lock the shared memory
- *	  check to see if UPS state has changed and if we should take any action. I.e.
- *		are we on batteries, should we shutdown, ...
- *	  write and unlock shared memory
+ *        read and lock the shared memory
+ *        check to see if UPS state has changed and if we should take any action. I.e.
+ *              are we on batteries, should we shutdown, ...
+ *        write and unlock shared memory
  *   call fillUPS()
- *	  read and lock shared memory
- *	  Poll the UPS for each state variable
- *	  enable the UPS
- *	  enable the UPS again
- *	  write and unlock shared memory
+ *        read and lock shared memory
+ *        Poll the UPS for each state variable
+ *        enable the UPS
+ *        enable the UPS again
+ *        write and unlock shared memory
  *   call do_reports()
- *	  if DATA report time expired, write DATA report -- log_data()
- *	  if STATUS report time expired, write STATUS report
+ *        if DATA report time expired, write DATA report -- log_data()
+ *        if STATUS report time expired, write STATUS report
  *   loop
  */
 
@@ -162,9 +161,6 @@ void apcupsd_error_exit(const char *fmt, ...)
 /* Main program */
 int main(int argc, char *argv[])
 {
-#ifndef HAVE_PTHREADS
-   int serial_pid = 0;
-#endif
    UPSINFO *ups;
    int tmp_fd, i;
 
@@ -198,7 +194,6 @@ int main(int argc, char *argv[])
     * If there's not one in libc, then we have to use our own version
     * which requires initialization.
     */
-   init_proctitle(argv[0]);
    astrncpy(argvalue, argv[0], sizeof(argvalue));
 
    ups = new_ups();                /* get new ups */
@@ -267,7 +262,6 @@ int main(int argc, char *argv[])
       openlog("apcupsd", LOG_CONS | LOG_PID, ups->sysfac);
    }
 
-   setproctitle("apcmain");
    make_pid_file();
    init_signals(apcupsd_terminate);
 
@@ -367,7 +361,6 @@ int main(int argc, char *argv[])
       Dmsg0(10, "NIS thread started.\n");
    }
 
-#ifdef HAVE_PTHREADS
    log_event(ups, LOG_WARNING,
       "apcupsd " APCUPSD_RELEASE " (" ADATE ") " APCUPSD_HOST " startup succeeded");
 
@@ -382,21 +375,6 @@ int main(int argc, char *argv[])
       /* we are a slave -- thus the net is our "serial port" */
       do_net(ups);
    }
-#else
-   if (!is_ups_set(UPS_SLAVE)) {
-      /* serial port reading and report generation -- apcserial.c */
-      serial_pid = start_thread(ups, do_device, "apcdev", argv[0]);
-   } else {
-      /* we are a slave -- thus the net is our "serial port" */
-      serial_pid = start_thread(ups, do_net, "apcslv", argv[0]);
-   }
-
-   log_event(ups, LOG_WARNING,
-      "apcupsd " APCUPSD_RELEASE " (" ADATE ") " APCUPSD_HOST " startup succeeded");
-
-   wait_for_termination(serial_pid);    /* wait for child processes to terminate */
-#endif
-
    apcupsd_terminate(0);
    return 0;                       /* to keep compiler happy */
 }

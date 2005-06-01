@@ -153,7 +153,6 @@ struct tm *localtime_r(const time_t *timep, struct tm *tm)
 {
    struct tm *ltm;
 
-#ifdef HAVE_PTHREADS
    static pthread_mutex_t mutex;
    static int first = 1;
 
@@ -161,7 +160,6 @@ struct tm *localtime_r(const time_t *timep, struct tm *tm)
       pthread_mutex_init(&mutex, NULL);
       first = 0;
    }
-#endif
 
    P(mutex);
 
@@ -180,10 +178,6 @@ struct tm *localtime_r(const time_t *timep, struct tm *tm)
  * for deadlock and such.  Normally not turned on.
  */
 #ifdef DEBUG_MUTEX
-
-#ifndef HAVE_PTHREADS
-#error pthreads must be enabled when enabling DEBUG_MUTEX
-#endif
 
 void _p(char *file, int line, pthread_mutex_t *m)
 {
@@ -219,10 +213,8 @@ void _v(char *file, int line, pthread_mutex_t *m)
 #endif   /* DEBUG_MUTEX */
 
 
-#ifdef HAVE_PTHREADS
 static pthread_mutex_t timer_mutex = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t timer = PTHREAD_COND_INITIALIZER;
-#endif
 
 /*
  * This routine will sleep (sec, microsec).  Note, however, that if a 
@@ -235,10 +227,8 @@ int amicrosleep(time_t sec, long usec)
    struct timespec timeout;
    int stat;
 
-#ifdef HAVE_PTHREADS
    struct timeval tv;
    struct timezone tz;
-#endif
 
    timeout.tv_sec = sec;
    timeout.tv_nsec = usec * 1000;
@@ -254,7 +244,6 @@ int amicrosleep(time_t sec, long usec)
     */
 #endif
 
-#ifdef HAVE_PTHREADS
    /* Do it the old way */
    gettimeofday(&tv, &tz);
    timeout.tv_nsec += tv.tv_usec * 1000;
@@ -275,7 +264,6 @@ int amicrosleep(time_t sec, long usec)
    V(timer_mutex);
 
    return stat;
-#endif
 
 #ifdef HAVE_USLEEP
    usleep(usec + sec * 1000000);

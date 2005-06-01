@@ -2,6 +2,9 @@
                         Kern Sibbald
 
 General:
+01Jun05
+- Get rid of old forking code.
+- Start conversion of Status word to method accesses.
 15May05
 - Convert the core code to be compiled by C++. Most of it was already
   done.

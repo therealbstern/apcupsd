@@ -36,7 +36,7 @@
 #ifdef HAVE_NISLIB
 
 #ifndef   INADDR_NONE
-#define   INADDR_NONE	 -1
+#define   INADDR_NONE    -1
 #endif
 
 struct sockaddr_in tcp_serv_addr;  /* socket information */
@@ -55,7 +55,7 @@ static int read_nbytes(int fd, char *ptr, int nbytes)
 {
    int nleft, nread;
 
-#if defined HAVE_PTHREADS && (defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS)
+#if defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS
    int rc;
    fd_set fds;
 #endif
@@ -64,7 +64,7 @@ static int read_nbytes(int fd, char *ptr, int nbytes)
 
    while (nleft > 0) {
       do {
-#if defined HAVE_PTHREADS && (defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS)
+#if defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS
          /* 
           * Work around a bug in OpenBSD & FreeBSD userspace pthreads
           * implementations.
@@ -120,7 +120,7 @@ static int write_nbytes(int fd, char *ptr, int nbytes)
 
    nleft = nbytes;
    while (nleft > 0) {
-#if defined HAVE_PTHREADS && (defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS)
+#if defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS
       /* 
        * Work around a bug in OpenBSD & FreeBSD userspace pthreads
        * implementations. Rationale is the same as described above.
@@ -260,7 +260,7 @@ int net_open(char *host, char *service, int port)
    }
 
    /* connect to server */
-#if defined HAVE_PTHREADS && (defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS)
+#if defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS
    /* 
     * Work around a bug in OpenBSD & FreeBSD userspace pthreads
     * implementations. Rationale is the same as described above.
@@ -300,14 +300,14 @@ int net_accept(int fd, struct sockaddr_in *cli_addr)
    socklen_t clilen = sizeof(*cli_addr);
    int newfd;
 
-#if defined HAVE_PTHREADS && (defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS)
+#if defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS
    int rc;
    fd_set fds;
 #endif
 
    do {
 
-#if defined HAVE_PTHREADS && (defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS)
+#if defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS
       /*
        * Work around a bug in OpenBSD & FreeBSD userspace pthreads
        * implementations. Rationale is the same as described above.

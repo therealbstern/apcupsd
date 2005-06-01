@@ -206,6 +206,24 @@ typedef struct netdata {
 
 class UPSINFO {
  public:
+   /* Methods */
+   void set_battlow() { Status |= UPS_BATTLOW; };
+   void clear_battlow() { Status &= ~UPS_BATTLOW; };
+   void set_slave() { Status |= UPS_SLAVE; };
+   void clear_slave() { Status &= ~UPS_SLAVE; };
+   void set_online() { Status |= UPS_ONLINE; Status &= ~UPS_ONBATT; };
+   void clear_online() { Status |= UPS_ONBATT; Status &= ~UPS_ONLINE; };
+   void set_replacebatt() { Status |= UPS_REPLACEBATT; };
+   void clear_replacebatt() { Status &= ~UPS_REPLACEBATT; };
+
+   bool is_onbatt() const { return (Status & UPS_ONBATT) == UPS_ONBATT; };
+   bool is_battlow() const { return (Status & UPS_BATTLOW) == UPS_BATTLOW; };
+   bool is_replacebatt() const { return (Status & UPS_REPLACEBATT) == UPS_REPLACEBATT; };
+   bool is_boost() const { return (Status & UPS_SMARTBOOST) == UPS_SMARTBOOST; };
+   bool is_trim() const { return (Status & UPS_SMARTTRIM) == UPS_SMARTTRIM; };
+
+
+   /* DATA */
    char id[5];
    int version;
    int size;
@@ -272,6 +290,7 @@ class UPSINFO {
    double BattVoltage;             /* Actual Battery voltage -- about 24V */
    double LastSTTime;              /* hours since last self test -- not yet implemented */
    int32_t Status;                 /* UPS status (Bitmapped) */
+   int32_t local_Status;           /* UPS status (Bitmapped) not seen by slaves */
    double TimeLeft;                /* Est. time UPS can run on batt. */
    double humidity;                /* Humidity */
    double ambtemp;                 /* Ambient temperature */
@@ -337,32 +356,11 @@ class UPSINFO {
 
    int remote_state;
 
-   /*
-    * Added with multi-UPS. We try to mantain the UPSINFO layout as clean as
-    * possible to be backward compatible. All moved variables are kept as
-    * reserved and all the new variables are at the end of the structure.
-    */
-#ifndef HAVE_PTHREADS
-   /* IPC */
-
-   /*
-    * Don't use shmUPS directly: call ipc functions to get it or
-    * unpredictable results may happen.
-    */
-   int sem_id;                     /* Semaphore ID */
-   int shm_id;                     /* Shared memory ID */
-   struct sembuf semUPS[NUM_SEM_OPER];  /* Semaphore operators */
-   int idshmUPS;                   /* key of shared memory area */
-   int idsemUPS;                   /* key of semphores */
-#endif
-
    /* Linked list of UPSes used in apclist.c */
-
    UPSINFO *next;
-#ifdef HAVE_PTHREADS
+
    pthread_mutex_t mutex;
    int refcnt;                     /* thread attach count */
-#endif
 
    const struct upsdriver *driver; /* UPS driver for this UPSINFO */
    void *driver_internal_data;     /* Driver private data */

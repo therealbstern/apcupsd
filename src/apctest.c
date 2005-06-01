@@ -237,8 +237,8 @@ void apctest_error_exit(const char *fmt, ...)
 #endif
 
 #define M_SMART  1
-#define M_DUMB	 2
-#define M_USB	 3
+#define M_DUMB   2
+#define M_USB    3
 static int mode = M_DUMB;
 
 int main(int argc, char *argv[])
@@ -252,14 +252,6 @@ int main(int argc, char *argv[])
     * will be re-filled by parse_options()
     */
    cfgfile = APCCONF;
-
-#ifndef HAVE_SETPROCTITLE
-   /*
-    * If there's not one in libc, then we have to use our own version
-    * which requires initialization.
-    */
-   init_proctitle(argv[0]);
-#endif
 
    ups = new_ups();                /* get new ups */
    if (!ups)

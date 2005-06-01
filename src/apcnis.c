@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright (C) 1999-2004 Kern Sibbald
+ * Copyright (C) 1999-2005 Kern Sibbald
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of version 2 of the GNU General
@@ -26,12 +26,7 @@
 
 #ifdef HAVE_NISSERVER
 
-#ifdef HAVE_PTHREADS
 static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-#else
-#define P(x)
-#define V(x)
-#endif
 
 
 static char largebuf[4096];
@@ -45,51 +40,6 @@ struct s_arg {
 
 /* forward referenced subroutines */
 void *handle_client_request(void *arg);
-
-/*
- * This routine is called by the main process to
- * track its children. On CYGWIN, the child processes
- * don't always exit when the other end of the socket
- * hangs up. Thus they remain hung on a read(). After
- * 30 seconds, we send them a SIGTERM signal, which 
- * causes them to wake up to the reality of the situation.
- */
-#ifndef HAVE_PTHREADS
-static void reap_children(int childpid)
-{
-   static int pids[10] = { 0, 0, 0, 0, 0, 0, 0, 0, 0, 0 };
-   static int times[10];
-   int i;
-   time_t now;
-   int wpid;
-
-   time(&now);
-   for (i = 0; i < 10; i++) {
-      if (pids[i]) {
-         wpid = waitpid(pids[i], NULL, WNOHANG);
-         if (wpid == -1 || wpid == pids[i])
-            pids[i] = 0;                /* Child gone, remove from table */
-         else if (wpid == 0 && ((now - times[i]) > 30))
-            kill(pids[i], SIGTERM);     /* still running, kill it */
-      }
-   }
-
-   /* Make another pass reaping killed programs and inserting new child */
-   for (i = 0; i < 10; i++) {
-      if (pids[i]) {
-         wpid = waitpid(pids[i], NULL, WNOHANG);
-         if (wpid == -1 || wpid == pids[i])
-            pids[i] = 0;           /* Child gone, remove from table */
-      }
-
-      if (childpid && (pids[i] == 0)) {
-         pids[i] = childpid;
-         times[i] = now;
-         childpid = 0;
-      }
-   }
-}
-#endif   /* HAVE_PTHREADS */
 
 static void status_open(UPSINFO *ups)
 {
@@ -105,7 +55,7 @@ static void status_open(UPSINFO *ups)
  * at a time (to prevent sending too large a buffer).
  *
  * Returns -1 on error or EOF
- *	    0 OK
+ *          0 OK
  */
 static int status_close(UPSINFO *ups, int nsockfd)
 {
@@ -179,9 +129,7 @@ void do_server(UPSINFO *ups)
    struct s_arg *arg;
    struct in_addr local_ip;
 
-   init_thread_signals();
-
-   for (tlog = 0; (ups = attach_ups(ups, SHM_RDONLY)) == NULL; tlog -= 5 * 60) {
+   for (tlog = 0; (ups = attach_ups(ups)) == NULL; tlog -= 5 * 60) {
       if (tlog <= 0) {
          tlog = 60 * 60;
          log_event(ups, LOG_ERR, "apcserver: Cannot attach SYSV IPC.\n");
@@ -270,35 +218,8 @@ void do_server(UPSINFO *ups)
       handle_client_request(arg);
       close(newsockfd);            /* parent process */
 #else
-
-#ifdef HAVE_PTHREADS
-      {
-         pthread_t tid;
-         pthread_create(&tid, NULL, handle_client_request, arg);
-      }
-#else
-      /* fork to provide the response */
-      for (tlog = 0; (childpid = fork()) < 0; tlog -= 5 * 60) {
-         if (tlog <= 0) {
-            tlog = 60 * 60;
-            log_event(ups, LOG_ERR, "apcserver: fork error. ERR=%s",
-               strerror(errno));
-         }
-         sleep(5 * 60);
-      }
-
-      if (childpid == 0) {         /* child process */
-         close(sockfd);            /* close original socket */
-         handle_client_request(arg);    /* process the request */
-         shutdown(newsockfd, 2);
-         close(newsockfd);
-         exit(0);
-      }
-
-      close(newsockfd);            /* parent process */
-      reap_children(childpid);
-#endif   /* HAVE_PTHREADS */
-
+      pthread_t tid;
+      pthread_create(&tid, NULL, handle_client_request, arg);
 #endif   /* HAVE_CYGWIN */
 
    }
@@ -321,10 +242,8 @@ void *handle_client_request(void *arg)
    int nsockfd = ((struct s_arg *)arg)->newsockfd;
    UPSINFO *ups = ((struct s_arg *)arg)->ups;
 
-#ifdef HAVE_PTHREADS
    pthread_detach(pthread_self());
-#endif
-   if ((ups = attach_ups(ups, SHM_RDONLY)) == NULL) {
+   if ((ups = attach_ups(ups)) == NULL) {
       net_send(nsockfd, notrun, sizeof(notrun));
       net_send(nsockfd, NULL, 0);
       free(arg);
@@ -380,10 +299,8 @@ void *handle_client_request(void *arg)
       }
    }
 
-#ifdef HAVE_PTHREADS
    shutdown(nsockfd, 2);
    close(nsockfd);
-#endif
 
    free(arg);
    detach_ups(ups);

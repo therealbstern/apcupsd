@@ -1,12 +1,11 @@
 /*
- * apcwinipc.c
+ * wincompat.c
  *
- * IPC functions for Windows.
+ * Functions to make apcupsd work with Windows
  */
 
 /*
- * Copyright (C) 1999 Kern Sibbald <kern@sibbald.com>
- * Copyright (C) 1996-99 Andre M. Hedrick <andre@suse.com>
+ * Copyright (C) 1999-2005 Kern Sibbald <kern@sibbald.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of version 2 of the GNU General
@@ -28,16 +27,6 @@
 #ifdef HAVE_CYGWIN
 
 #include <windows.h>
-
-#ifndef HAVE_PTHREADS
-static int mapsize;
-static SECURITY_ATTRIBUTES atts = {
-   sizeof(SECURITY_ATTRIBUTES),
-   NULL,
-   1                               /* inherit */
-};
-static HANDLE hMyMappedFile;
-#endif
 
 extern UPSINFO *core_ups;
 
@@ -66,10 +55,6 @@ void syslog(int type, const char *fmt, ...)
    avsnprintf(msg, sizeof(msg), fmt, arg_ptr);
    va_end(arg_ptr);
 
-#ifdef needed
-   printf("syslog: %s\n", msg);
-   fflush(stdout);
-#endif
 
    /*
     * Write out to our temp file. LOG_INFO is DATA logging, so
@@ -102,72 +87,6 @@ void syslog(int type, const char *fmt, ...)
       }
    }
 }
-
-#ifndef HAVE_PTHREADS
-
-int semop(int semid, struct sembuf *sops, unsigned nsops)
-{
-   return 0;
-}
-
-int semctl(int semid, int semnum, int cmd, ...)
-{
-   return 0;
-}
-
-int semget(key_t key, int nsems, int semflg)
-{
-   return 0;
-}
-
-int shmctl(int shmid, int cmd, void *buf)
-{
-   return 0;
-}
-
-int shmget(key_t key, int size, int shmflg)
-{
-   mapsize = size;
-   if (shmflg & IPC_CREAT) {
-      hMyMappedFile = CreateFileMapping((HANDLE) 0xFFFFFFFF,
-         &atts, PAGE_READWRITE, 0, mapsize, "apcupsd_shared_memory");
-
-      if (hMyMappedFile == (HANDLE) 0)
-         Error_abort0("Could not create shared memory file\n");
-   } else {
-      hMyMappedFile = OpenFileMapping(FILE_MAP_WRITE,
-         FALSE, "apcupsd_shared_memory");
-
-      if (hMyMappedFile == (HANDLE) 0)
-         Error_abort0("Could not create shared memory file\n");
-   }
-
-   return 0;
-}
-
-void *shmat(int shmid, const void *shmaddr, int shmflg)
-{
-   char *mapview;
-
-   if (hMyMappedFile == (HANDLE) 0)
-      Error_abort0("No handle to shared memory file\n");
-
-   mapview = (char *)MapViewOfFile(hMyMappedFile,
-      FILE_MAP_READ | FILE_MAP_WRITE, 0, 0, 0);
-
-   if (mapview == NULL)
-      Error_abort0("Could not MapView of shared memory file\n");
-
-   return (void *)mapview;
-}
-
-int shmdt(const void *shmaddr)
-{
-   UnmapViewOfFile((LPVOID) shmaddr);
-   return 0;
-}
-
-#endif                             /* HAVE_PTHREADS */
 
 struct tm *localtime_r(const time_t *timep, struct tm *tm)
 {

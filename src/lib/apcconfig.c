@@ -604,8 +604,8 @@ static int ParseConfig(UPSINFO *ups, char *line)
 /**
  ** key   = KEY
  ** value = (VALUE (WS+ VALUE)* WS* (WS+ COMMENT)? (EOL|EOF))
- **	     | (COMMENT (EOL|EOF))
- **	     | EOF
+ **          | (COMMENT (EOL|EOF))
+ **          | EOF
  **
  ** key is now fully `normalised' (no leading or trailing garbage)
  ** value contains zero or more whitespace delimited elements and there
@@ -648,8 +648,8 @@ static int ParseConfig(UPSINFO *ups, char *line)
 /*
  * Setup general defaults for the ups structure.
  * N.B. Do not zero the structure because it already has
- *	pthreads sturctures or shared memory/semaphore
- *	structures initialized.
+ *      pthreads sturctures or shared memory/semaphore
+ *      structures initialized.
  */
 void init_ups_struct(UPSINFO *ups)
 {
@@ -665,7 +665,7 @@ void init_ups_struct(UPSINFO *ups)
 
    ups->fd = -1;
 
-   UPS_SET(UPS_PLUGGED);
+   set_ups(UPS_PLUGGED);
 
    astrncpy(ups->enable_access.name, accesses[0].name,
       sizeof(ups->enable_access.name));
@@ -922,7 +922,7 @@ jump_into_the_loop:
    }
 
    if (ups->PoweredByUPS)
-      UPS_SET(UPS_PLUGGED);
+      set_ups(UPS_PLUGGED);
    else
       clear_ups(UPS_PLUGGED);
 
