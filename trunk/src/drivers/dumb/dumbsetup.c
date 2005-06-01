@@ -84,7 +84,7 @@ int dumb_ups_open(UPSINFO *ups)
    tcsetattr(ups->fd, TCSANOW, &my_data->newtio);
    tcflush(ups->fd, TCIFLUSH);
 
-   UPS_CLEAR(UPS_SLAVE);
+   ups->clear_slave();
 
    return 1;
 }

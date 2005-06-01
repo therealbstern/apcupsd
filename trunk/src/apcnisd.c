@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright (C) 1999-2004 Kern Sibbald
+ * Copyright (C) 1999-2005 Kern Sibbald
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of version 2 of the GNU General
@@ -162,7 +162,7 @@ int main(int argc, char *argv[])
    /* Set specific cleanup handler. */
    error_cleanup = apcnisd_error_cleanup;
 
-   strncpy(argvalue, argv[0], sizeof(argvalue) - 1);
+   astrncpy(argvalue, argv[0], sizeof(argvalue) - 1);
    argvalue[sizeof(argvalue) - 1] = 0;
 
    if (argc == 1 || argc == 3)
@@ -329,7 +329,7 @@ void handle_client_request(int nsockfd)
    char notavail[] = "Not available\n";
    char notrun[] = "Apcupsd not running\n";
 
-   ups = attach_ups(ups, SHM_RDONLY);
+   ups = attach_ups(ups);
    if (!ups) {
       net_send(nsockfd, notrun, sizeof(notrun));
       net_send(nsockfd, NULL, 0);

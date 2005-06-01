@@ -137,23 +137,6 @@
         clear_ups(UPS_ONLINE); \
     } while (0)
 
-
-/* Old deprecated defines (hard to read) */
-#define UPS_ISSET(bit) ((ups->Status) & (bit))
-#define UPS_SET(bit) ((ups->Status) |= (bit))
-#define UPS_CLEAR(bit) ((ups->Status) &= ~(bit))
-#define UPS_SET_ONLINE() \
-    do { \
-        set_ups(UPS_ONLINE); \
-        clear_ups(UPS_ONBATT); \
-    } while (0)
-#define UPS_CLEAR_ONLINE() \
-    do { \
-        set_ups(UPS_ONBATT); \
-        clear_ups(UPS_ONLINE); \
-    } while (0)
-
-
 /*
  * CI_ is Capability or command index
  * APC_CMD_ is the command code sent to UPS for APC Smart UPSes
@@ -167,89 +150,89 @@
  * will be true.
  */
 
-#define CI_UPSMODEL             0  	/* Model number */
+#define CI_UPSMODEL             0       /* Model number */
 #define    APC_CMD_UPSMODEL       'V'
-#define CI_STATUS               1  	/* status function */
+#define CI_STATUS               1       /* status function */
 #define    APC_CMD_STATUS         'Q'
-#define CI_LQUAL                2  	/* line quality status */
+#define CI_LQUAL                2       /* line quality status */
 #define    APC_CMD_LQUAL          '9'
-#define CI_WHY_BATT             3  	/* why transferred to battery */
+#define CI_WHY_BATT             3       /* why transferred to battery */
 #define    APC_CMD_WHY_BATT       'G'
-#define CI_ST_STAT              4  	/* self test stat */
+#define CI_ST_STAT              4       /* self test stat */
 #define    APC_CMD_ST_STAT        'X'
-#define CI_VLINE                5  	/* line voltage */
+#define CI_VLINE                5       /* line voltage */
 #define    APC_CMD_VLINE          'L'
-#define CI_VMAX                 6  	/* max voltage */
+#define CI_VMAX                 6       /* max voltage */
 #define    APC_CMD_VMAX           'M'
-#define CI_VMIN                 7  	/* min line voltage */
+#define CI_VMIN                 7       /* min line voltage */
 #define    APC_CMD_VMIN           'N'
-#define CI_VOUT                 8  	/* Output voltage */
+#define CI_VOUT                 8       /* Output voltage */
 #define    APC_CMD_VOUT           'O'
-#define CI_BATTLEV              9  	/* Battery level percentage */
+#define CI_BATTLEV              9       /* Battery level percentage */
 #define CI_RemainingCapacity    9
 #define    APC_CMD_BATTLEV        'f'
-#define CI_VBATT               10  	/* Battery voltage */
+#define CI_VBATT               10       /* Battery voltage */
 #define    APC_CMD_VBATT          'B'
-#define CI_LOAD                11  	/* UPS Load */
+#define CI_LOAD                11       /* UPS Load */
 #define    APC_CMD_LOAD           'P'
-#define CI_FREQ                12  	/* Line Frequency */
+#define CI_FREQ                12       /* Line Frequency */
 #define    APC_CMD_FREQ           'F'
-#define CI_RUNTIM              13  	/* Est. Runtime left */
+#define CI_RUNTIM              13       /* Est. Runtime left */
 #define CI_RunTimeToEmpty      13
 #define    APC_CMD_RUNTIM         'j'
-#define CI_ITEMP               14  	/* Internal UPS temperature */
+#define CI_ITEMP               14       /* Internal UPS temperature */
 #define    APC_CMD_ITEMP          'C'
-#define CI_DIPSW               15  	/* Dip switch settings */
+#define CI_DIPSW               15       /* Dip switch settings */
 #define    APC_CMD_DIPSW          '7'
-#define CI_SENS                16  	/* Sensitivity */
+#define CI_SENS                16       /* Sensitivity */
 #define    APC_CMD_SENS           's'
-#define CI_DWAKE               17  	/* Wakeup delay */
+#define CI_DWAKE               17       /* Wakeup delay */
 #define    APC_CMD_DWAKE          'r'
-#define CI_DSHUTD              18  	/* Shutdown delay */
+#define CI_DSHUTD              18       /* Shutdown delay */
 #define    APC_CMD_DSHUTD         'p'
-#define CI_LTRANS              19  	/* Low transfer voltage */
+#define CI_LTRANS              19       /* Low transfer voltage */
 #define    APC_CMD_LTRANS         'l'
-#define CI_HTRANS              20  	/* High transfer voltage */
+#define CI_HTRANS              20       /* High transfer voltage */
 #define    APC_CMD_HTRANS         'u'
-#define CI_RETPCT              21  	/* Return percent threshhold */
+#define CI_RETPCT              21       /* Return percent threshhold */
 #define    APC_CMD_RETPCT         'e'
-#define CI_DALARM              22  	/* Alarm delay */
+#define CI_DALARM              22       /* Alarm delay */
 #define    APC_CMD_DALARM         'k'
-#define CI_DLBATT              23  	/* low battery warning, mins */
+#define CI_DLBATT              23       /* low battery warning, mins */
 #define    APC_CMD_DLBATT         'q'
-#define CI_IDEN                24  	/* UPS Identification (name) */
+#define CI_IDEN                24       /* UPS Identification (name) */
 #define    APC_CMD_IDEN           'c'
-#define CI_STESTI              25  	/* Self test interval */
+#define CI_STESTI              25       /* Self test interval */
 #define    APC_CMD_STESTI         'E'
-#define CI_MANDAT              26  	/* Manufacture date */
+#define CI_MANDAT              26       /* Manufacture date */
 #define    APC_CMD_MANDAT         'm'
-#define CI_SERNO               27  	/* serial number */
+#define CI_SERNO               27       /* serial number */
 #define    APC_CMD_SERNO          'n'
-#define CI_BATTDAT             28  	/* Last battery change */
+#define CI_BATTDAT             28       /* Last battery change */
 #define    APC_CMD_BATTDAT        'x'
-#define CI_NOMBATTV            29  	/* Nominal battery voltage */
+#define CI_NOMBATTV            29       /* Nominal battery voltage */
 #define    APC_CMD_NOMBATTV       'g'
-#define CI_HUMID               30  	/* UPS Humidity percentage */
+#define CI_HUMID               30       /* UPS Humidity percentage */
 #define    APC_CMD_HUMID          'h'
-#define CI_REVNO               31  	/* Firmware revision */
+#define CI_REVNO               31       /* Firmware revision */
 #define    APC_CMD_REVNO          'b'
-#define CI_REG1                32  	/* Register 1 */
+#define CI_REG1                32       /* Register 1 */
 #define    APC_CMD_REG1           '~'
-#define CI_REG2                33  	/* Register 2 */
+#define CI_REG2                33       /* Register 2 */
 #define    APC_CMD_REG2           '\''
-#define CI_REG3                34  	/* Register 3 */
+#define CI_REG3                34       /* Register 3 */
 #define    APC_CMD_REG3           '8'
-#define CI_EXTBATTS            35  	/* Number of external batteries */
+#define CI_EXTBATTS            35       /* Number of external batteries */
 #define    APC_CMD_EXTBATTS       '>'
-#define CI_ATEMP               36  	/* Ambient temp */
+#define CI_ATEMP               36       /* Ambient temp */
 #define    APC_CMD_ATEMP          't'
-#define CI_NOMOUTV             37  	/* Nominal output voltage */
+#define CI_NOMOUTV             37       /* Nominal output voltage */
 #define    APC_CMD_NOMOUTV        'o'
-#define CI_BADBATTS            38  	/* Number of bad battery packs */
+#define CI_BADBATTS            38       /* Number of bad battery packs */
 #define    APC_CMD_BADBATTS       '<'
-#define CI_EPROM               39  	/* Valid eprom values */
+#define CI_EPROM               39       /* Valid eprom values */
 #define    APC_CMD_EPROM          0x1a
-#define CI_ST_TIME             40  	/* hours since last self test */
+#define CI_ST_TIME             40       /* hours since last self test */
 #define    APC_CMD_ST_TIME        'd'
 #define CI_Manufacturer                  41
 #define    APC_CMD_MANUFACTURER           0
@@ -314,9 +297,9 @@
 
 
 /* Items below this line are not "probed" for */
-#define CI_CYCLE_EPROM         70  	/* Cycle programmable EPROM values */
+#define CI_CYCLE_EPROM         70       /* Cycle programmable EPROM values */
 #define    APC_CMD_CYCLE_EPROM    '-'
-#define CI_UPS_CAPS            71  	/* Get UPS capabilities (command) string */
+#define CI_UPS_CAPS            71       /* Get UPS capabilities (command) string */
 #define    APC_CMD_UPS_CAPS       'a'
 /* ^^^^^^^^^^ see below if you change this ^^^^^^ */
 
@@ -365,12 +348,6 @@
 #endif
 #ifndef FALSE
 # define FALSE                  0
-#endif
-
-#ifndef __cplusplus
-#define bool int
-#define true  1
-#define false 0
 #endif
 
 
@@ -426,22 +403,10 @@
 
 #define MAX_THREADS             7
 
-/* IPC defines. */
-#define SEM_ID                  0x00FEED00
-#define SHM_ID                  0x10FEED01
-#define READ_CNT                0
-#define WRITE_LCK               1
-#define NUM_SEM                 2
-#define NUM_SEM_OPER            3  /* 3 for write sem that need 1 operation more */
-
 /* Find members position in the UPSINFO and GLOBALCFG structures. */
 #define WHERE(MEMBER) ((size_t) &((UPSINFO *)0)->MEMBER)
 #define AT(UPS,OFFSET) ((size_t)UPS + OFFSET)
 #define SIZE(MEMBER) ((GENINFO *)sizeof(((UPSINFO *)0)->MEMBER))
-
-
-/* Only 1 semaphore */
-#define SEMNUM                  0
 
 
 /*
@@ -532,8 +497,6 @@ void d_msg(const char *file, int line, int level, const char *fmt, ...);
 #endif
 
 
-#ifdef HAVE_PTHREADS
-
 /* These probably should be subroutines */
 #define P(x) \
    do { \
@@ -549,12 +512,6 @@ void d_msg(const char *file, int line, int level, const char *fmt, ...);
          error_out(__FILE__, __LINE__, "Mutex unlock failure. ERR=%s\n", strerror(errstat)); \
    } while(0)
 
-#else
-
-#define P(x)
-#define V(x)
-
-#endif
 
 /* Send terminate signal to itself. */
 #define sendsig_terminate() \

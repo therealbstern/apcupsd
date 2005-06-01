@@ -292,7 +292,7 @@ static enum a_state get_state(UPSINFO *ups, time_t now)
  * not.
  *
  * The problem happens because in this situation, apcupsd sets the 
- * UPS_PREV_BATTLOW status before testing for it.	In the do_action() 
+ * UPS_PREV_BATTLOW status before testing for it.       In the do_action() 
  * function, apcupsd notices the ONBATT status, and uses the 
  * "st_PowerFailure" state to send off an initial power failure event.   
  * After a short delay, do_action() is invoked again. If ONBATT is 
@@ -331,11 +331,7 @@ void do_action(UPSINFO *ups)
    static int first = 1;
    enum a_state state;
 
-   if (write_lock(ups)) {
-      /* If failed to acquire shm lock, return and try again later. */
-      log_event(ups, LOG_CRIT, _("Failed to acquire shm lock in do_action."));
-      return;
-   }
+   write_lock(ups);
 
    time(&now);                     /* get current time */
    if (first) {

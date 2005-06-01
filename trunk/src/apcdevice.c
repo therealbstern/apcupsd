@@ -200,8 +200,6 @@ int fillUPS(UPSINFO *ups)
 /* NOTE! This is the starting point for a separate process (thread). */
 void do_device(UPSINFO *ups)
 {
-   init_thread_signals();
-
    /* get all data so apcaccess is happy */
    fillUPS(ups);
 

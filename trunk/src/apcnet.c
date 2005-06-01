@@ -3,8 +3,8 @@
  *  apcnet.c  -- network parts for apcupsd package
  *
  *  apcupsd.c -- Simple Daemon to catch power failure signals from a
- *		 BackUPS, BackUPS Pro, or SmartUPS (from APCC).
- *	      -- Now SmartMode support for SmartUPS and BackUPS Pro.
+ *               BackUPS, BackUPS Pro, or SmartUPS (from APCC).
+ *            -- Now SmartMode support for SmartUPS and BackUPS Pro.
  *
  *  Copyright (C) 1996-99 Andre M. Hedrick <andre@suse.com>
  *  All rights reserved.
@@ -52,18 +52,18 @@ static int send_to_slave(UPSINFO *ups, int who);
 /* 
  * Possible state for a slave (also partially for a master)
  * RMT_NOTCONNECTED    not yet connected, except for RECONNECT, this is the
- *		       only time when the slave sends back a message in response
- *		       to the packet we send.  He sends back his usermagic
- *		       or security id string.
+ *                     only time when the slave sends back a message in response
+ *                     to the packet we send.  He sends back his usermagic
+ *                     or security id string.
  * RMT_CONNECTED       All is OK
  * RMT_RECONNECT       Must redo initial packet swap, but this time we
- *		       verify his usermagic rather than just store it.
- *		       This occurs after a connect() error.
- * RMT_ERROR	       Set when some packet error occurs, presumably the
- *		       next call should work.
- * RMT_DOWN	       This occurs when we detect a security violation (e.g.
- *		       unauthorized slave. We mark him down and no longer
- *		       talk to him.
+ *                     verify his usermagic rather than just store it.
+ *                     This occurs after a connect() error.
+ * RMT_ERROR           Set when some packet error occurs, presumably the
+ *                     next call should work.
+ * RMT_DOWN            This occurs when we detect a security violation (e.g.
+ *                     unauthorized slave. We mark him down and no longer
+ *                     talk to him.
  */
 
 /********************************************************************** 
@@ -95,12 +95,12 @@ int prepare_master(UPSINFO *ups)
  * -- Thomas Habets, 2004-05-06
  *
  * Bugs:  * if select() is interrupted (EINTR) the timeout will begin again
- *	    from 0.
- *	  * Some error handling marked with FIXME
- *	  * There probably is an issue with select() timing out, function
- *	    returns, then the connection is established, and then tconnect()
- *	    is called again using the same socket. Solve by creating another
- *	    socket and dup2():ing?
+ *          from 0.
+ *        * Some error handling marked with FIXME
+ *        * There probably is an issue with select() timing out, function
+ *          returns, then the connection is established, and then tconnect()
+ *          is called again using the same socket. Solve by creating another
+ *          socket and dup2():ing?
  */
 static int tconnect(int sockfd, const struct sockaddr *serv_addr,
    socklen_t addrlen, double timeout)
@@ -228,7 +228,7 @@ static void send_to_all_slaves(UPSINFO *ups)
 /********************************************************************* 
  * Called from master to send data to a specific slave (who).
  * Returns: 0 if OK
- *	    non-zero, see send_to_all_slaves();
+ *          non-zero, see send_to_all_slaves();
  *
  * Note, be careful not to change RMT_NOTCONNECTED or 
  * RMT_RECONNECT until we have completed the connection, even if an
@@ -451,7 +451,7 @@ static int send_to_slave(UPSINFO *ups, int who)
  *
  * Called by a slave to open a socket and listen for the master 
  * Returns: 1 on error
- *	    0 OK
+ *          0 OK
  */
 int prepare_slave(UPSINFO *ups)
 {
@@ -549,7 +549,7 @@ int prepare_slave(UPSINFO *ups)
  * something. We must be patient.
  *
  * Returns: 0 OK 
- *	    non-zero is error, see update_from_master();
+ *          non-zero is error, see update_from_master();
  */
 static int get_data_from_master(UPSINFO *ups)
 {
@@ -723,11 +723,11 @@ static int get_data_from_master(UPSINFO *ups)
  * Setting ChangeBatt triggers false alarms if the master goes
  * down and comes back up, so remove it for now.  KES 27Feb01
  *
- *	if (ntohl(get_data.ChangeBatt)) {
- *	    set_ups(UPS_REPLACEBATT);
- *	} else {
- *	    clear_ups(UPS_REPLACEBATT);
- *	}
+ *      if (ntohl(get_data.ChangeBatt)) {
+ *          set_ups(UPS_REPLACEBATT);
+ *      } else {
+ *          clear_ups(UPS_REPLACEBATT);
+ *      }
  */
       if (ntohl(get_data.load)) {
          set_ups(UPS_SHUT_LOAD);
@@ -792,7 +792,7 @@ static int get_data_from_master(UPSINFO *ups)
  *
  * Called from slave to get data from the master 
  * Returns: 0 on error
- *	    1 OK
+ *          1 OK
  */
 static int update_from_master(UPSINFO *ups)
 {
@@ -877,8 +877,6 @@ void kill_net(UPSINFO *ups)
  */
 void do_net(UPSINFO *ups)
 {
-   init_thread_signals();
-
    set_ups(UPS_SLAVE);             /* We are networking not connected */
 
    while (1) {

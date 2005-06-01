@@ -94,7 +94,6 @@ static int port = NISPORT;
  */
 static void get_raw_upsinfo(UPSINFO *ups, char *host, int port)
 {
-#ifdef HAVE_PTHREADS
    int sockfd, n;
 
    if ((sockfd = net_open(host, NULL, port)) < 0)
@@ -109,8 +108,6 @@ static void get_raw_upsinfo(UPSINFO *ups, char *host, int port)
    }
 
    net_close(sockfd);
-
-#endif
 }
 
 int closing_curses = 0;
@@ -301,12 +298,12 @@ void update_upsdata(int sig)
    mvwprintw(statwin, 4, 1, "Cable      : %s", ups->cable.long_name);
    mvwprintw(statwin, 5, 1, "Mode       : %s", ups->upsclass.long_name);
    mvwprintw(statwin, 6, 1, "AC Line    : %s",
-      (UPS_ISSET(UPS_ONBATT) ? "failing" : "okay"));
+      (ups->is_onbatt() ? "failing" : "okay"));
    mvwprintw(statwin, 7, 1, "Battery    : %s",
-      (UPS_ISSET(UPS_BATTLOW) ? "failing" : "okay"));
+      (ups->is_battlow() ? "failing" : "okay"));
    mvwprintw(statwin, 8, 1, "AC Level   : %s",
-      (UPS_ISSET(UPS_SMARTBOOST) ? "low" :
-         (UPS_ISSET(UPS_SMARTTRIM) ? "high" : "normal")));
+      (ups->is_boost() ? "low" :
+         (ups->is_trim() ? "high" : "normal")));
    mvwprintw(statwin, 9, 1, "Last event : %s", xlate_history(ups->G[0]));
 
    mvwprintw(moniwin, 1, 1, "ACin");
@@ -403,13 +400,13 @@ void update_upsdata(int sig)
    else
       wprintw(moniwin, "N/A");
 
-   if (UPS_ISSET(UPS_SMARTBOOST))
+   if (ups->is_boost())
       write_mesg("* [%s] warning: AC level is low", t);
 
-   if (UPS_ISSET(UPS_SMARTTRIM))
+   if (ups->is_trim())
       write_mesg("* [%s] warning: AC level is high", t);
 
-   if (UPS_ISSET(UPS_ONBATT)) {
+   if (ups->is_onbatt()) {
       if (power_fail == FALSE) {
          write_mesg("* [%s] warning: power is failing", t);
          power_fail = TRUE;
@@ -421,7 +418,7 @@ void update_upsdata(int sig)
       }
    }
 
-   if (UPS_ISSET(UPS_BATTLOW)) {
+   if (ups->is_battlow()) {
       if (battery_fail == FALSE) {
          write_mesg("* [%s] warning: battery is failing", t);
          power_fail = TRUE;
@@ -769,7 +766,7 @@ int main(int argc, char **argv)
    closing_curses = 0;
 
    /* Attach daemon */
-   sharedups = attach_ups(sharedups, SHM_RDONLY);
+   sharedups = attach_ups(sharedups);
    if (!sharedups) {
       fprintf(stderr, "Can not attach SYSV IPC: "
          "Apcupsd not running or you are not root.\n");

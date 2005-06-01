@@ -135,14 +135,15 @@ static void log_data(UPSINFO *ups)
    case BK:
    case SHAREBASIC:
    case NETUPS:
-      if (!UPS_ISSET(UPS_ONBATT)) {
-         if (!UPS_ISSET(UPS_REPLACEBATT))
+      if (!ups->is_onbatt()) {
+         if (!ups->is_replacebatt()) {
             ptr = "OK";
-         else
+         } else {
             ptr = "REPLACE";
+         }
          log_event(ups, LOG_INFO, "LINEFAIL:OK BATTSTAT:%s", ptr);
       } else {
-         if (!UPS_ISSET(UPS_BATTLOW))
+         if (!ups->is_battlow())
             ptr = "RUNNING";
          else
             ptr = "FAILING";
@@ -151,16 +152,16 @@ static void log_data(UPSINFO *ups)
       break;
    case BKPRO:
    case VS:
-      if (!UPS_ISSET(UPS_ONBATT)) {
-         if (UPS_ISSET(UPS_SMARTBOOST))
+      if (!ups->is_onbatt()) {
+         if (ups->is_boost())
             ptr = "LOW";
-         else if (UPS_ISSET(UPS_SMARTTRIM))
+         else if (ups->is_trim())
             ptr = "HIGH";
          else
             ptr = "OK";
          log_event(ups, LOG_INFO, "LINEFAIL:OK BATTSTAT:OK MAINS:%s", ptr);
       } else {
-         if (!UPS_ISSET(UPS_BATTLOW))
+         if (!ups->is_battlow())
             ptr = "RUNNING";
          else
             ptr = "FAILING";

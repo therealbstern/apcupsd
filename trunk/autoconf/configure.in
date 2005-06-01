@@ -138,24 +138,12 @@ dnl Initialize pthreads inclusion: warn PTHREAD_LFLAGS must contain only
 dnl the pthreads libraries, if needed. For linker flags, add them to
 dnl LDFLAGS.
 PTHREAD_CFLAGS=""
-PTHREAD_LFLAGS=""
+PTHREAD_LFLAGS="-lpthread"
 with_pthreads=yes
 
 AC_MSG_CHECKING([for pthreads])
 
-AC_ARG_ENABLE(pthreads, [
-AC_HELP_STRING([--enable-pthreads], [Enable pthreads (default)])
-AC_HELP_STRING([--disable-pthreads], [No pthreads])],
-with_pthreads=$enableval)
-
-if test "$with_pthreads" != no; then
-    AC_DEFINE(HAVE_PTHREADS)
-    AC_MSG_RESULT([enabled])
-    PTHREAD_CFLAGS=""
-    PTHREAD_LFLAGS="-lpthread"
-else
-    AC_MSG_RESULT([disabled])
-fi
+AC_DEFINE(HAVE_PTHREADS)
 
 AC_SUBST(PTHREAD_CFLAGS)
 AC_SUBST(PTHREAD_LFLAGS)
@@ -282,14 +270,6 @@ AC_TRY_LINK(
 AC_FUNC_STRFTIME		dnl check for strftime.
 AC_FUNC_SETPGRP 		dnl check for BSD setpgrp.
 
-dnl shmctl doesn't exist on cygwin so don't check for it there
-if test "$CFG_CYGWIN" = "no" -a "$with_pthreads" = "no"; then
-AC_CHECK_FUNCS(
-   shmctl,,
-   [AC_MSG_ERROR([cannot find required function.])]
-   )
-fi
-   
 dnl
 # Under sysV68, socket and friends are provided by the C library.
 # -linet does not provide socket, but causes multiple definition
@@ -363,10 +343,6 @@ AC_CHECK_FUNC(getopt_long, AC_DEFINE(HAVE_GETOPTLONG),
     [LIBEXTRAOBJ="$LIBEXTRAOBJ getopt.o getopt1.o"
      EXTRAOBJ="$EXTRAOBJ lib/getopt.o lib/getopt1.o"])
 
-AC_CHECK_FUNC(setproctitle, AC_DEFINE(HAVE_SETPROCTITLE), 
-    [LIBEXTRAOBJ="$LIBEXTRAOBJ proctitle.o"
-     EXTRAOBJ="$EXTRAOBJ lib/proctitle.o"])
-
 AC_CHECK_FUNC(inet_pton, AC_DEFINE(HAVE_INETPTON), 
     [LIBEXTRAOBJ="$LIBEXTRAOBJ inet_pton.o"
      EXTRAOBJ="$EXTRAOBJ lib/inet_pton.o"])
@@ -389,14 +365,6 @@ AC_CHECK_HEADERS(
     unistd.h
     ,,[AC_MSG_WARN([at least 1 header file is missing. This may not compile.])]
     )		    dnl Check for _all_ included headers.
-
-dnl ipc.h, sem.h and shm.h do not exist on cygwin so don't check for them
-if test "$CFG_CYGWIN" = "no" -a "$with_pthreads" = "no"; then
-AC_CHECK_HEADERS(
-   sys/ipc.h sys/sem.h sys/shm.h
-   ,,[AC_MSG_WARN([some header files are missing. This may not compile.])]
-   )		   dnl Check for _all_ included headers.
-fi
 
 AC_CHECK_HEADERS(arpa/nameser.h,AC_DEFINE(HAVE_NAMESER_H))
 
@@ -1251,9 +1219,7 @@ NETPORT=6666
 #
 case "$DISTNAME" in
 alpha)
-    if test "$with_pthreads" != no; then
-	PTHREAD_LFLAGS="-lpthread -lexc"
-    fi
+    PTHREAD_LFLAGS="-lpthread -lexc"
 
     DISTVER=`uname -r`
     SERIALDEV=/dev/tty01
@@ -1302,11 +1268,9 @@ freebsd)
     nologdir=/var/run
     PWRFAILDIR=/var/run
     LOCKDIR=/var/spool/lock
-    if test "$with_pthreads" != no; then
-	PTHREAD_CFLAGS="-pthread"
-	PTHREAD_LFLAGS=""
-	LDFLAGS="$LDFLAGS -pthread"
-    fi
+    PTHREAD_CFLAGS="-pthread"
+    PTHREAD_LFLAGS=""
+    LDFLAGS="$LDFLAGS -pthread"
 dnl
 dnl	For FreeBSD, system man pages are in /usr/share/man, not /usr/man.
 dnl
@@ -1337,11 +1301,9 @@ hpux)
 netbsd)
     DISTVER=`uname -a |awk '{print $3}'`
     SERIALDEV=/dev/cua01
-    if test "$with_pthreads" != no; then
-	PTHREAD_CFLAGS="-pthread"
-	PTHREAD_LFLAGS=""
-	LDFLAGS="$LDFLAGS -pthread"
-    fi
+    PTHREAD_CFLAGS="-pthread"
+    PTHREAD_LFLAGS=""
+    LDFLAGS="$LDFLAGS -pthread"
     DFILES="\
 	platforms/netbsd/Makefile \
 	platforms/netbsd/apcupsd \
@@ -1351,11 +1313,9 @@ openbsd)
     DISTVER=`uname -a |awk '{print $3}'`
     SERIALDEV=/dev/cua01
     LOCKDIR=/var/spool/lock
-    if test "$with_pthreads" != no; then
-	PTHREAD_CFLAGS="-pthread"
-	PTHREAD_LFLAGS=""
-	LDFLAGS="$LDFLAGS -pthread"
-    fi
+    PTHREAD_CFLAGS="-pthread"
+    PTHREAD_LFLAGS=""
+    LDFLAGS="$LDFLAGS -pthread"
 dnl
 dnl	For OpenBSD, system man pages are in /usr/share/man, not /usr/man.
 dnl

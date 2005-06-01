@@ -180,18 +180,14 @@ void parse_eprom_cmds(char *eprom, char locale)
 #endif
 }
 
-#ifdef HAVE_PTHREADS
 static void get_raw_upsinfo(UPSINFO *ups, char *host, int port);
-#endif
 
 /*********************************************************************/
 void do_eprom(UPSINFO *ups)
 {
    char locale, locale1, locale2;
 
-#ifdef HAVE_PTHREADS
    get_raw_upsinfo(ups, host, port);
-#endif
 
    if (!ups->UPS_Cap[CI_EPROM])
       Error_abort0("Your model does not support EPROM programming.\n");
@@ -222,7 +218,6 @@ void do_eprom(UPSINFO *ups)
 }
 
 
-#ifdef HAVE_PTHREADS
 
 /*
  * In a non-shared memory environment, we use the network
@@ -269,8 +264,6 @@ static void do_pthreads_status(UPSINFO *ups, char *host, int port)
    net_close(sockfd);
 }
 
-#endif
-
 /*********************************************************************/
 
 #ifdef HAVE_CYGWIN
@@ -282,14 +275,12 @@ int main(int argc, char **argv)
    int mode = 0;
    UPSINFO *ups = NULL;
 
-#ifdef HAVE_PTHREADS
    char *cfgfile = APCCONF;
    struct stat cfgstat;
-#endif
 
    astrncpy(argvalue, argv[0], sizeof(argvalue) - 1);
 
-   ups = attach_ups(ups, SHM_RDONLY);
+   ups = attach_ups(ups);
    if (!ups)
       Error_abort0(_("Cannot attach SYSV IPC.\n"));
 
@@ -346,15 +337,6 @@ int main(int argc, char **argv)
          port = atoi(p);
       }
    } else {
-#ifdef HAVE_PTHREADS
-      /* 
-       * Note, this is turned off if pthreads are not
-       * turned on because check_for_config() will want to
-       * write into the ups structure, which we cannot
-       * do because it is shared memory mapped read-only
-       * for us.
-       */
-
       /* check configuration so local NISIP and NISPORT variables can be used as defaults */
       if (!stat(cfgfile, &cfgstat)) {
          check_for_config(ups, cfgfile);
@@ -367,7 +349,6 @@ int main(int argc, char **argv)
                port = ups->statusport;
          }
       }
-#endif
    }
 
    astrncpy(myDATA.apcmagic, APC_MAGIC, sizeof(myDATA.apcmagic));
@@ -381,11 +362,7 @@ int main(int argc, char **argv)
       break;
 
    case 2:       /* status */
-#ifdef HAVE_PTHREADS
       do_pthreads_status(ups, host, port);
-#else
-      output_status(ups, 0, stat_open, stat_print, stat_close);
-#endif
       break;
 
    case 3:

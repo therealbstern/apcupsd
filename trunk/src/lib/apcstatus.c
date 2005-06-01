@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright (C) 1999-2004 Kern Sibbald
+ * Copyright (C) 1999-2005 Kern Sibbald
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of version 2 of the GNU General
@@ -39,10 +39,8 @@ int output_status(UPSINFO *ups, int sockfd,
 
    s_open(ups);
 
-#ifdef HAVE_PTHREADS
    if (ups->poll_time == 0)        /* this is always zero on slave */
       ups->poll_time = now;
-#endif
 
    localtime_r(&ups->poll_time, &tm);
    strftime(datetime, 100, "%a %b %d %X %Z %Y", &tm);

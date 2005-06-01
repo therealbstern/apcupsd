@@ -45,24 +45,6 @@ void init_timer(int timer, void (*fnhandler) (int))
 }
 
 /*********************************************************************/
-void init_thread_signals(void)
-{
-#ifndef HAVE_PTHREADS              /* only done once for real threads */
-   /* Set up signals. */
-   signal(SIGHUP, apc_thread_terminate);
-   signal(SIGINT, apc_thread_terminate);
-   signal(SIGTERM, apc_thread_terminate);
-   signal(SIGPIPE, SIG_IGN);
-
-   /* Children reaped by waitpid() */
-   signal(SIGCHLD, child_handler);
-
-   /* I think this is not effective -RF */
-   signal(SIGKILL, apc_thread_terminate);
-#endif   /* !HAVE_PTHREADS */
-}
-
-/*********************************************************************/
 void init_signals(void (*handler) (int))
 {
    /* Set up signals. */

@@ -113,7 +113,7 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
 {
    SIMPLE_DATA *my_data = (SIMPLE_DATA *) ups->driver_internal_data;
    int stat = 1;
-   int BattFail = 0;
+   bool BattFail = false;
 
    /*
     * We generally poll a bit faster because we do 
@@ -132,10 +132,11 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
    case BK:
    case SHAREBASIC:
    case NETUPS:
-      if (my_data->sp_flags & TIOCM_DTR)
-         BattFail = 1;
-      else
-         BattFail = 0;
+      if (my_data->sp_flags & TIOCM_DTR) {
+         BattFail = true;
+      } else {
+         BattFail = false;
+      }
       break;
    default:
       break;
@@ -147,9 +148,9 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
        * This is the ONBATT signal sent by UPS.
        */
       if (my_data->sp_flags & TIOCM_CD)
-         UPS_SET(UPS_ONBATT);
+         set_ups(UPS_ONBATT);
       else
-         UPS_CLEAR(UPS_ONBATT);
+         clear_ups(UPS_ONBATT);
 
       /*
        * This is the ONLINE signal that is delivered
@@ -159,20 +160,22 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
        * something wrong with battery or charger. Set also the
        * UPS_REPLACEBATT flag if needed.
        */
-      if (my_data->sp_flags & TIOCM_SR)
-         UPS_CLEAR(UPS_ONLINE);
-      else
-         UPS_SET(UPS_ONLINE);
+      if (my_data->sp_flags & TIOCM_SR) {
+         ups->clear_online();
+      } else {
+         ups->set_online();
+      }
 
-      if (UPS_ISSET(UPS_ONLINE) && UPS_ISSET(UPS_ONBATT))
-         BattFail = 1;
+      if (is_ups_set(UPS_ONLINE) && is_ups_set(UPS_ONBATT))
+         BattFail = true;
       else
-         BattFail = 0;
+         BattFail = false;
 
-      if (!(my_data->sp_flags & TIOCM_CTS))
-         UPS_SET(UPS_BATTLOW);
-      else
-         UPS_CLEAR(UPS_BATTLOW);
+      if (!(my_data->sp_flags & TIOCM_CTS)) {
+         ups->set_battlow();
+      } else {
+         ups->clear_battlow();
+      }
 
       break;
 
@@ -181,65 +184,74 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
    case APC_940_0128A:
    case APC_940_0020B:
    case APC_940_0020C:
-      if (my_data->sp_flags & TIOCM_CTS)
-         UPS_CLEAR_ONLINE();
-      else
-         UPS_SET_ONLINE();
+      if (my_data->sp_flags & TIOCM_CTS) {
+         ups->clear_online();
+      } else {
+         ups->set_online();
+      }
 
-      if (my_data->sp_flags & TIOCM_CD)
-         UPS_SET(UPS_BATTLOW);
-      else
-         UPS_CLEAR(UPS_BATTLOW);
+      if (my_data->sp_flags & TIOCM_CD) {
+         ups->set_battlow();
+      } else {
+         ups->clear_battlow();
+      }
 
       break;
 
    case APC_940_0023A:
-      if (my_data->sp_flags & TIOCM_CD)
-         UPS_CLEAR_ONLINE();
-      else
-         UPS_SET_ONLINE();
+      if (my_data->sp_flags & TIOCM_CD) {
+         ups->clear_online();
+      } else {
+         ups->set_online();
+      }
 
       /* BOGUS STUFF MUST FIX IF POSSIBLE */
 
-      if (my_data->sp_flags & TIOCM_SR)
-         UPS_SET(UPS_BATTLOW);
-      else
-         UPS_CLEAR(UPS_BATTLOW);
+      if (my_data->sp_flags & TIOCM_SR) {
+         ups->clear_online();
+      } else {
+         ups->set_online();
+      }
 
       break;
 
    case APC_940_0095A:
    case APC_940_0095C:
-      if (my_data->sp_flags & TIOCM_RNG)
-         UPS_CLEAR_ONLINE();
-      else
-         UPS_SET_ONLINE();
+      if (my_data->sp_flags & TIOCM_RNG) {
+         ups->clear_online();
+      } else {
+         ups->set_online();
+      }
 
-      if (my_data->sp_flags & TIOCM_CD)
-         UPS_SET(UPS_BATTLOW);
-      else
-         UPS_CLEAR(UPS_BATTLOW);
+      if (my_data->sp_flags & TIOCM_CD) {
+         ups->set_battlow();
+      } else {
+         ups->clear_battlow();
+      }
 
       break;
 
    case APC_940_0095B:
-      if (my_data->sp_flags & TIOCM_RNG)
-         UPS_CLEAR_ONLINE();
-      else
-         UPS_SET_ONLINE();
+      if (my_data->sp_flags & TIOCM_RNG) {
+         ups->clear_online();
+      } else {
+         ups->set_online();
+      }
 
       break;
 
    case MAM_CABLE:
-      if (!(my_data->sp_flags & TIOCM_CTS))
-         UPS_CLEAR_ONLINE();
-      else
-         UPS_SET_ONLINE();
+      if (!(my_data->sp_flags & TIOCM_CTS)) {
+         ups->clear_online();
+      } else {
+         ups->set_online();
+      }
 
-      if (!(my_data->sp_flags & TIOCM_CD))
-         UPS_SET(UPS_BATTLOW);
-      else
-         UPS_CLEAR(UPS_BATTLOW);
+      if (!(my_data->sp_flags & TIOCM_CD)) {
+         ups->set_battlow();
+      } else {
+         ups->clear_battlow();
+      }
 
       break;
 
@@ -253,10 +265,11 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
       stat = 0;
    }
 
-   if (UPS_ISSET(UPS_ONBATT) && BattFail)
-      UPS_SET(UPS_REPLACEBATT);
-   else
-      UPS_CLEAR(UPS_REPLACEBATT);
+   if (ups->is_onbatt() && BattFail) {
+      ups->set_replacebatt();
+   } else {
+      ups->clear_replacebatt();
+   }
 
    write_unlock(ups);
 
@@ -301,7 +314,7 @@ int dumb_ups_entry_point(UPSINFO *ups, int command, void *data)
 
 /* Leave it set */
 
-/*		(void)ioctl(ups->fd, TIOCMBIC, &serial_bits);
+/*              (void)ioctl(ups->fd, TIOCMBIC, &serial_bits);
  */
       }
       break;
