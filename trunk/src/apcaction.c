@@ -208,17 +208,17 @@ static void prohibit_logins(UPSINFO *ups)
 
 static void do_shutdown(UPSINFO *ups, int cmdtype)
 {
-   if (is_ups_set(UPS_SHUTDOWN))
+   if (ups->is_status_set(UPS_SHUTDOWN))
       return;                      /* already done */
 
    ups->ShutDown = time(NULL);
-   set_ups(UPS_SHUTDOWN);
+   ups->set_status(UPS_SHUTDOWN);
    delete_lockfile(ups);
-   set_ups(UPS_FASTPOLL);
+   ups->set_status(UPS_FASTPOLL);
    make_file(ups, PWRFAIL);
    prohibit_logins(ups);
 
-   if (!is_ups_set(UPS_SLAVE)) {
+   if (!ups->is_status_set(UPS_SLAVE)) {
       /*
        * Note, try avoid using this option if at all possible
        * as it will shutoff the UPS power, and you cannot
@@ -261,8 +261,8 @@ static enum a_state get_state(UPSINFO *ups, time_t now)
 {
    enum a_state state;
 
-   if (is_ups_set(UPS_ONBATT)) {
-      if (is_ups_set(UPS_PREV_ONBATT)) {  /* if already detected on battery */
+   if (ups->is_status_set(UPS_ONBATT)) {
+      if (ups->is_status_set(UPS_PREV_ONBATT)) {  /* if already detected on battery */
          if (ups->SelfTest)        /* see if UPS is doing self test */
             state = st_SelfTest;   /*   yes */
          else
@@ -271,7 +271,7 @@ static enum a_state get_state(UPSINFO *ups, time_t now)
          state = st_PowerFailure;  /* Power failure just detected */
       }
    } else {
-      if (is_ups_set(UPS_PREV_ONBATT)) /* if we were on batteries */
+      if (ups->is_status_set(UPS_PREV_ONBATT)) /* if we were on batteries */
          state = st_MainsBack;     /* then we just got power back */
       else
          state = st_OnMains;       /* Solid on mains, normal condition */
@@ -337,12 +337,12 @@ void do_action(UPSINFO *ups)
    if (first) {
       ups->last_time_nologon = ups->last_time_annoy = now;
       ups->last_time_on_line = now;
-      clear_ups(UPS_PREV_ONBATT);
-      clear_ups(UPS_PREV_BATTLOW);
+      ups->clear_status(UPS_PREV_ONBATT);
+      ups->clear_status(UPS_PREV_BATTLOW);
       first = 0;
    }
 
-   if (is_ups_set(UPS_REPLACEBATT)) {   /* Replace battery */
+   if (ups->is_status_set(UPS_REPLACEBATT)) {   /* Replace battery */
       /*
        * Complain every 9 hours, this causes the complaint to
        * cycle around the clock and hopefully be more noticable
@@ -356,7 +356,7 @@ void do_action(UPSINFO *ups)
        * The counter is initialized only one time at startup.
        */
       if (now - ups->start_time < 60 * 10 || ups->ChangeBattCounter > 5) {
-         clear_ups(UPS_REPLACEBATT);
+         ups->clear_status(UPS_REPLACEBATT);
          ups->ChangeBattCounter = 0;
       } else if (now - ups->last_time_changeme > 60 * 60 * 9) {
          generate_event(ups, CMDCHANGEME);
@@ -366,8 +366,8 @@ void do_action(UPSINFO *ups)
    }
 
    /* Must SHUTDOWN Remote System Calls */
-   if (is_ups_set(UPS_SHUT_REMOTE)) {
-      clear_ups(UPS_ONBATT_MSG);
+   if (ups->is_status_set(UPS_SHUT_REMOTE)) {
+      ups->clear_status(UPS_ONBATT_MSG);
       generate_event(ups, CMDREMOTEDOWN);
       return;
    }
@@ -378,12 +378,12 @@ void do_action(UPSINFO *ups)
       /* If power is good, update the timers. */
       ups->last_time_nologon = ups->last_time_annoy = now;
       ups->last_time_on_line = now;
-      clear_ups(UPS_FASTPOLL);
+      ups->clear_status(UPS_FASTPOLL);
       break;
 
    case st_PowerFailure:
       /* This is our first indication of a power problem */
-      set_ups(UPS_FASTPOLL);       /* speed up polling */
+      ups->set_status(UPS_FASTPOLL);       /* speed up polling */
 
       /* Check if selftest */
       Dmsg1(80, "Power failure detected. 0x%x\n", ups->Status);
@@ -405,7 +405,7 @@ void do_action(UPSINFO *ups)
 
    case st_SelfTest:
       /* allow 12 seconds max for selftest */
-      if (now - ups->SelfTest < 12 && !is_ups_set(UPS_BATTLOW))
+      if (now - ups->SelfTest < 12 && !ups->is_status_set(UPS_BATTLOW))
          break;
 
       /* Cancel self test, announce power failure */
@@ -417,9 +417,9 @@ void do_action(UPSINFO *ups)
 
    case st_OnBattery:
       /* Did the second test verify the power is failing? */
-      if (!is_ups_set(UPS_ONBATT_MSG) &&
+      if (!ups->is_status_set(UPS_ONBATT_MSG) &&
          time(NULL) - ups->last_time_on_line >= ups->onbattdelay) {
-         set_ups(UPS_ONBATT_MSG);  /* it is confirmed, we are on batteries */
+         ups->set_status(UPS_ONBATT_MSG);  /* it is confirmed, we are on batteries */
          generate_event(ups, CMDONBATTERY);
          ups->last_time_nologon = ups->last_time_annoy = now;
          ups->last_time_on_line = now;
@@ -427,22 +427,22 @@ void do_action(UPSINFO *ups)
       }
 
       /* shutdown requested but still running */
-      if (is_ups_set(UPS_SHUTDOWN)) {
+      if (ups->is_status_set(UPS_SHUTDOWN)) {
          if (ups->killdelay && now - ups->ShutDown >= ups->killdelay) {
-            if (!is_ups_set(UPS_SLAVE))
+            if (!ups->is_status_set(UPS_SLAVE))
                kill_power(ups);
             ups->ShutDown = now;   /* wait a bit before doing again */
-            set_ups(UPS_SHUTDOWN);
+            ups->set_status(UPS_SHUTDOWN);
          }
       } else {                     /* not shutdown yet */
          /*
           * Did BattLow bit go high? Then the battery power is failing.
           * Normal Power down during Power Failure
           */
-         if (!is_ups_set(UPS_PREV_BATTLOW) && is_ups_set(UPS_BATTLOW)) {
-            clear_ups(UPS_ONBATT_MSG);
+         if (!ups->is_status_set(UPS_PREV_BATTLOW) && ups->is_status_set(UPS_BATTLOW)) {
+            ups->clear_status(UPS_ONBATT_MSG);
             generate_event(ups, CMDFAILING);
-            set_ups(UPS_PREV_BATTLOW);
+            ups->set_status(UPS_PREV_BATTLOW);
             break;
          }
 
@@ -451,7 +451,7 @@ void do_action(UPSINFO *ups)
           * Normal Power down during Power Failure
           */
          if ((ups->maxtime > 0) && ((now - ups->last_time_on_line) > ups->maxtime)) {
-            set_ups(UPS_SHUT_BTIME);
+            ups->set_status(UPS_SHUT_BTIME);
             generate_event(ups, CMDTIMEOUT);
             break;
          }
@@ -461,11 +461,11 @@ void do_action(UPSINFO *ups)
           * Normal Power down during Power Failure
           */
          if (ups->UPS_Cap[CI_BATTLEV] && ups->BattChg <= ups->percent) {
-            set_ups(UPS_SHUT_LOAD);
+            ups->set_status(UPS_SHUT_LOAD);
             generate_event(ups, CMDLOADLIMIT);
             break;
          } else if (ups->UPS_Cap[CI_RUNTIM] && ups->TimeLeft <= ups->runtime) {
-            set_ups(UPS_SHUT_LTIME);
+            ups->set_status(UPS_SHUT_LTIME);
             generate_event(ups, CMDRUNLIMIT);
             break;
          }
@@ -479,10 +479,10 @@ void do_action(UPSINFO *ups)
           *
           * Or of the UPS says he is going to shutdown, do it NOW!
           */
-         if (is_ups_set(UPS_SHUTDOWNIMM) ||
-            (is_ups_set(UPS_BATTLOW) && is_ups_set(UPS_ONLINE))) {
-            clear_ups(UPS_ONBATT_MSG);
-            set_ups(UPS_SHUT_EMERG);
+         if (ups->is_status_set(UPS_SHUTDOWNIMM) ||
+            (ups->is_status_set(UPS_BATTLOW) && ups->is_status_set(UPS_ONLINE))) {
+            ups->clear_status(UPS_ONBATT_MSG);
+            ups->set_status(UPS_SHUT_EMERG);
             generate_event(ups, CMDEMERGENCY);
          }
 
@@ -529,15 +529,15 @@ void do_action(UPSINFO *ups)
 
    case st_MainsBack:
       /* The power is back after a power failure or a self test */
-      if (is_ups_set(UPS_ONBATT_MSG)) {
-         clear_ups(UPS_ONBATT_MSG);
+      if (ups->is_status_set(UPS_ONBATT_MSG)) {
+         ups->clear_status(UPS_ONBATT_MSG);
          generate_event(ups, CMDOFFBATTERY);
       }
 
-      if (is_ups_set(UPS_SHUTDOWN)) {
+      if (ups->is_status_set(UPS_SHUTDOWN)) {
          /* If we have a shutdown to cancel, do it now. */
          ups->ShutDown = 0;
-         clear_ups(UPS_SHUTDOWN);
+         ups->clear_status(UPS_SHUTDOWN);
          powerfail(1);
          unlink(PWRFAIL);
          log_event(ups, LOG_ALERT, _("Cancelling shutdown"));
@@ -586,13 +586,13 @@ void do_action(UPSINFO *ups)
    }
 
    /* Remember status */
-   if (is_ups_set(UPS_ONBATT))
-      set_ups(UPS_PREV_ONBATT);
+   if (ups->is_status_set(UPS_ONBATT))
+      ups->set_status(UPS_PREV_ONBATT);
    else
-      clear_ups(UPS_PREV_ONBATT);
+      ups->clear_status(UPS_PREV_ONBATT);
 
-   if (!is_ups_set(UPS_BATTLOW))
-      clear_ups(UPS_PREV_BATTLOW);
+   if (!ups->is_status_set(UPS_BATTLOW))
+      ups->clear_status(UPS_PREV_BATTLOW);
 
    write_unlock(ups);
 }

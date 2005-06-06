@@ -1,11 +1,11 @@
 
 /*
  *  apcsmart.c -- The decoding of the chatty little beasts.
- *		    THE LOOK-A-LIKE ( UPSlink(tm) Language )
+ *                  THE LOOK-A-LIKE ( UPSlink(tm) Language )
  *
  *  apcupsd.c  -- Simple Daemon to catch power failure signals from a
- *		    BackUPS, BackUPS Pro, or SmartUPS (from APCC).
- *		 -- Now SmartMode support for SmartUPS and BackUPS Pro.
+ *                  BackUPS, BackUPS Pro, or SmartUPS (from APCC).
+ *               -- Now SmartMode support for SmartUPS and BackUPS Pro.
  *
  *  Copyright (C) 1996-99 Andre M. Hedrick <andre@suse.com>
  *  All rights reserved.
@@ -31,7 +31,7 @@
  *  BASIS, AND PAVEL KORENSKY HAS NO OBLIGATION TO PROVIDE MAINTENANCE, SUPPORT,
  *  UPDATES, ENHANCEMENTS, OR MODIFICATIONS.
  *
- *  Pavel Korensky	      pavelk@dator3.anet.cz
+ *  Pavel Korensky            pavelk@dator3.anet.cz
  *
  *  8.11.1995
  *
@@ -221,10 +221,10 @@ int getline(char *s, int len, UPSINFO *ups)
       case UPS_ON_BATT:           /* UPS_ON_BATT = '!'   */
          if (s == NULL)
             write_lock(ups);
-         if (!is_ups_set(UPS_ONBATT)) {
+         if (!ups->is_status_set(UPS_ONBATT)) {
             my_data->debounce = time(NULL);
          }
-         clear_ups_online();
+         ups->clear_online();
          Dmsg0(80, "Got UPS ON BATT.\n");
          if (s == NULL) {
             write_unlock(ups);
@@ -234,7 +234,7 @@ int getline(char *s, int len, UPSINFO *ups)
       case UPS_REPLACE_BATTERY:   /* UPS_REPLACE_BATTERY = '#'   */
          if (s == NULL)
             write_lock(ups);
-         set_ups(UPS_REPLACEBATT);
+         ups->set_status(UPS_REPLACEBATT);
          if (s == NULL) {
             write_unlock(ups);
             ending = 1;
@@ -243,7 +243,7 @@ int getline(char *s, int len, UPSINFO *ups)
       case UPS_ON_LINE:           /* UPS_ON_LINE = '$'   */
          if (s == NULL)
             write_lock(ups);
-         set_ups_online();
+         ups->set_online();
          Dmsg0(80, "Got UPS ON LINE.\n");
          if (s == NULL) {
             write_unlock(ups);
@@ -253,7 +253,7 @@ int getline(char *s, int len, UPSINFO *ups)
       case BATT_LOW:              /* BATT_LOW    = '%'   */
          if (s == NULL)
             write_lock(ups);
-         set_ups(UPS_BATTLOW);
+         ups->set_status(UPS_BATTLOW);
          if (s == NULL) {
             write_unlock(ups);
             ending = 1;
@@ -262,7 +262,7 @@ int getline(char *s, int len, UPSINFO *ups)
       case BATT_OK:               /* BATT_OK     = '+'   */
          if (s == NULL)
             write_lock(ups);
-         clear_ups(UPS_BATTLOW);
+         ups->clear_status(UPS_BATTLOW);
          if (s == NULL) {
             write_unlock(ups);
             ending = 1;
@@ -316,10 +316,10 @@ void UPSlinkCheck(UPSINFO *ups)
    tcflush(ups->fd, TCIOFLUSH);
    if (strcmp((a = smart_poll('Y', ups)), "SM") == 0) {
       linkcheck = FALSE;
-      clear_ups(UPS_COMMLOST);
+      ups->clear_status(UPS_COMMLOST);
       return;
    }
-   set_ups(UPS_COMMLOST);
+   ups->set_status(UPS_COMMLOST);
    tcflush(ups->fd, TCIOFLUSH);
 
    for (tlog = 0; strcmp((a = smart_poll('Y', ups)), "SM") != 0;
@@ -346,7 +346,7 @@ void UPSlinkCheck(UPSINFO *ups)
       tcflush(ups->fd, TCIOFLUSH);
       generate_event(ups, CMDCOMMOK);
    }
-   clear_ups(UPS_COMMLOST);
+   ups->clear_status(UPS_COMMLOST);
    linkcheck = FALSE;
 }
 
@@ -505,7 +505,7 @@ int apcsmart_ups_read_volatile_data(UPSINFO *ups)
 /********************************************************************* 
  *
  *  This subroutine is called to load our shared memory with
- *  information that is static inside the UPS.	      Hence it
+ *  information that is static inside the UPS.        Hence it
  *  normally would only be called once when starting up the
  *  UPS.
  */
@@ -618,7 +618,7 @@ int apcsmart_ups_entry_point(UPSINFO *ups, int command, void *data)
    int retries = 5;                /* Number of retries if reason is NA (see below) */
    char ans[20];
 
-   if (is_ups_set(UPS_SLAVE)) {
+   if (ups->is_status_set(UPS_SLAVE)) {
       return SUCCESS;
    }
 

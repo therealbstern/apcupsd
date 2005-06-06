@@ -148,9 +148,9 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
        * This is the ONBATT signal sent by UPS.
        */
       if (my_data->sp_flags & TIOCM_CD)
-         set_ups(UPS_ONBATT);
+         ups->set_status(UPS_ONBATT);
       else
-         clear_ups(UPS_ONBATT);
+         ups->clear_status(UPS_ONBATT);
 
       /*
        * This is the ONLINE signal that is delivered
@@ -166,7 +166,7 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
          ups->set_online();
       }
 
-      if (is_ups_set(UPS_ONLINE) && is_ups_set(UPS_ONBATT))
+      if (ups->is_status_set(UPS_ONLINE) && ups->is_status_set(UPS_ONBATT))
          BattFail = true;
       else
          BattFail = false;

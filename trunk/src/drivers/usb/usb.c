@@ -261,7 +261,7 @@ int usb_ups_read_volatile_data(UPSINFO *ups)
     * MAX_VOLATILE_POLL_RATE seconds. This prevents flailing around
     * too much if the UPS state is rapidly changing while on mains.
     */
-   if (is_ups_set(UPS_ONBATT) && last_poll &&
+   if (ups->is_status_set(UPS_ONBATT) && last_poll &&
        (now - last_poll < MAX_VOLATILE_POLL_RATE)) {
       return 1;
    }
@@ -277,36 +277,36 @@ int usb_ups_read_volatile_data(UPSINFO *ups)
    } else {
       /* No APC Status value, well, fabricate one */
       if (pusb_get_value(ups, CI_ACPresent, &uval) && uval.iValue) {
-         set_ups_online();
+         ups->set_online();
          Dmsg0(200, "ACPRESENT\n");
       }
       if (pusb_get_value(ups, CI_Discharging, &uval) && uval.iValue) {
-         clear_ups_online();
+         ups->clear_online();
          Dmsg0(200, "DISCHARGING\n");
       }
       if (pusb_get_value(ups, CI_BelowRemCapLimit, &uval) && uval.iValue) {
-         set_ups(UPS_BATTLOW);
+         ups->set_status(UPS_BATTLOW);
          Dmsg1(200, "BelowRemCapLimit=%d\n", uval.iValue);
       }
       if (pusb_get_value(ups, CI_RemTimeLimitExpired, &uval) && uval.iValue) {
-         set_ups(UPS_BATTLOW);
+         ups->set_status(UPS_BATTLOW);
          Dmsg0(200, "RemTimeLimitExpired\n");
       }
       if (pusb_get_value(ups, CI_ShutdownImminent, &uval) && uval.iValue) {
-         set_ups(UPS_BATTLOW);
+         ups->set_status(UPS_BATTLOW);
          Dmsg0(200, "ShutdownImminent\n");
       }
       if (pusb_get_value(ups, CI_Boost, &uval) && uval.iValue)
-         set_ups(UPS_SMARTBOOST);
+         ups->set_status(UPS_SMARTBOOST);
 
       if (pusb_get_value(ups, CI_Trim, &uval) && uval.iValue)
-         set_ups(UPS_SMARTTRIM);
+         ups->set_status(UPS_SMARTTRIM);
 
       if (pusb_get_value(ups, CI_Overload, &uval) && uval.iValue)
-         set_ups(UPS_OVERLOAD);
+         ups->set_status(UPS_OVERLOAD);
 
       if (pusb_get_value(ups, CI_NeedReplacement, &uval) && uval.iValue)
-         set_ups(UPS_REPLACEBATT);
+         ups->set_status(UPS_REPLACEBATT);
    }
 
    /* LINE_VOLTAGE */

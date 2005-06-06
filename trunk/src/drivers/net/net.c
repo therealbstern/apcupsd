@@ -121,7 +121,7 @@ static int initialize_device_data(UPSINFO *ups)
  * Returns 0 if variable name not found
  *   answer has "Not found" is variable name not found
  *   answer may have "N/A" if the UPS does not support this
- *	     feature
+ *           feature
  * Returns -1 if network problem
  *   answer has "N/A" if host is not available or network error
  */
@@ -183,7 +183,7 @@ static int poll_ups(UPSINFO *ups)
       log_event(ups, LOG_ERR, "fetch_data: tcp_open failed for %s port %d",
          nid->hostname, nid->port);
       Dmsg0(90, "Exit poll_ups 0 comm lost\n");
-      set_ups(UPS_COMMLOST);
+      ups->set_status(UPS_COMMLOST);
       return 0;
    }
 
@@ -191,7 +191,7 @@ static int poll_ups(UPSINFO *ups)
       log_event(ups, LOG_ERR, "fill_buffer: write error on socket.");
       net_close(nid->sockfd);
       Dmsg0(90, "Exit poll_ups 0 no status flag\n");
-      set_ups(UPS_COMMLOST);
+      ups->set_status(UPS_COMMLOST);
       return 0;
    }
 
@@ -206,9 +206,9 @@ static int poll_ups(UPSINFO *ups)
    if (n < 0) {
       stat = 0;
       Dmsg0(90, "Exit poll_ups 0 bad stat net_recv\n");
-      set_ups(UPS_COMMLOST);
+      ups->set_status(UPS_COMMLOST);
    } else {
-      clear_ups(UPS_COMMLOST);
+      ups->clear_status(UPS_COMMLOST);
    }
    net_close(nid->sockfd);
 
@@ -253,7 +253,7 @@ static bool fill_status_buffer(UPSINFO *ups)
 
       sleep(SLEEP_TIME);
       comm_err = true;
-      set_ups(UPS_COMMLOST);
+      ups->set_status(UPS_COMMLOST);
    }
 
    if (comm_err) {
@@ -263,7 +263,7 @@ static bool fill_status_buffer(UPSINFO *ups)
       nid->last_fill_time = now;
    }
 
-   clear_ups(UPS_COMMLOST);
+   ups->clear_status(UPS_COMMLOST);
 
    if (!nid->got_caps)
       net_ups_get_capabilities(ups);
@@ -339,7 +339,7 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
 
    if (masterStatus & (UPS_SHUTDOWN | UPS_SHUTDOWNIMM |
                        UPS_BELOWCAPLIMIT | UPS_REMTIMELIMIT)) {
-      set_ups(UPS_SHUT_REMOTE);    /* if master is shutting down so do we */
+      ups->set_status(UPS_SHUT_REMOTE);    /* if master is shutting down so do we */
       log_event(ups, LOG_ERR, "Shutdown because NIS master is shutting down.");
       Dmsg0(100, "Set SHUT_REMOTE because of master status.\n");
    }
@@ -350,9 +350,9 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
     * consequtive pass here. While on batteries, this code
     * is called once per second.
     */
-   if (stat == 0 && is_ups_set(UPS_ONBATT)) {
+   if (stat == 0 && ups->is_status_set(UPS_ONBATT)) {
       if (comm_loss++ == 4) {
-         set_ups(UPS_SHUT_REMOTE);
+         ups->set_status(UPS_SHUT_REMOTE);
          log_event(ups, LOG_ERR,
             "Shutdown because loss of comm with NIS master while on batteries.");
          Dmsg0(100, "Set SHUT_REMOTE because of loss of comm on batteries.\n");
@@ -483,7 +483,7 @@ int net_ups_read_volatile_data(UPSINFO *ups)
       return 0;
 
    write_lock(ups);
-   set_ups(UPS_SLAVE);
+   ups->set_status(UPS_SLAVE);
 
    /* ***FIXME**** poll time needs to be scanned */
    ups->poll_time = time(NULL);
