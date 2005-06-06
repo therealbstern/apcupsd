@@ -3,6 +3,7 @@
 
 General:
 06Jun05
+- Implement trace to file with -T option.
 - Convert all set/clear/test of Status to method accesses.
   There are some inconsistencies that must be resolved.
 - Eliminate apc_version.h by combining it with version.h

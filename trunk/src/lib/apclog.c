@@ -6,6 +6,7 @@
 
 /*
  * Copyright (C) 1996-99 Andre M. Hedrick <andre@suse.com>
+ * Copyright (C) 2000-2005 Kern Sibbald <kern@sibbald.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of version 2 of the GNU General
@@ -71,6 +72,8 @@ void log_event(const UPSINFO *ups, int level, const char *fmt, ...)
  */
 
 int debug_level = 0;
+static FILE *trace_fd = NULL;
+bool trace = false;
 
 #define FULL_LOCATION 1
 void d_msg(const char *file, int line, int level, const char *fmt, ...)
@@ -102,8 +105,23 @@ void d_msg(const char *file, int line, int level, const char *fmt, ...)
       avsnprintf(buf + i, sizeof(buf) - i, (char *)fmt, arg_ptr);
       va_end(arg_ptr);
 
-      fprintf(stdout, "%s", buf);
-      fflush(stdout);
+       if (trace) {
+          if (!trace_fd) {
+             char fn[200];
+             asnprintf(fn, sizeof(fn), "./apcupsd.trace");
+             trace_fd = fopen(fn, "a+");
+          }
+          if (trace_fd) {
+             fputs(buf, trace_fd);
+             fflush(trace_fd);
+          } else {
+             /* Some problem, turn off tracing */
+             trace = false;
+          }
+       } else {   /* not tracing */
+          fputs(buf, stdout);
+          fflush(stdout);
+       }
    }
 #endif
 }
