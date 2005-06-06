@@ -1,5 +1,5 @@
 /*
- * usb.c
+ * apcupsd.c
  *
  * APC UPS monitoring daemon.
  */

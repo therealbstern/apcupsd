@@ -12,13 +12,13 @@ top_builddir = $(topdir)
 subdirs = lib @LIBUSBHID@ drivers @WIN32@ @INTLSUB@ @POSUB@ @LIBGD@ @CGI@
 
 gobjs = apcnet.o apcreports.o apcaction.o apcnis.o apcdevice.o
-dobjs = apcupsd.o apcoptd.o
+dobjs = apcupsd.o options.o
 nobjs = apcnisd.o
-tobjs = apctest.o apcoptd.o
+tobjs = apctest.o options.o
 aobjs = apcaccess.o
 sobjs = smtp.o
 fobjs = powerflute.o
-xobjs = devicedbg.o apcoptd.o apcaction.o
+xobjs = devicedbg.o options.o apcaction.o
 
 allexe = apcupsd @APCTEST@ @APCACCESS@ @SMTP@ @POWERFLUTE@ @APCNISD@
 
