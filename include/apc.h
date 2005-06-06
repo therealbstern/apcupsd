@@ -136,7 +136,7 @@
 #include "apc_config.h"
 
 #include "apc_i18n.h"
-#include "apc_version.h"
+#include "version.h"
 #include "apc_defines.h"
 #include "apc_struct.h"
 #include "apc_drivers.h"

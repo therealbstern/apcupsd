@@ -216,6 +216,11 @@ class UPSINFO {
    void set_replacebatt() { Status |= UPS_REPLACEBATT; };
    void clear_replacebatt() { Status &= ~UPS_REPLACEBATT; };
 
+   /* General set/clear/test bit. */           
+   void set_status(int bit) { Status |= bit; };
+   void clear_status(int bit) { Status &= ~bit; };
+   bool is_status_set(int bit) const { return (Status & bit) == bit; };
+
    bool is_onbatt() const { return (Status & UPS_ONBATT) == UPS_ONBATT; };
    bool is_battlow() const { return (Status & UPS_BATTLOW) == UPS_BATTLOW; };
    bool is_replacebatt() const { return (Status & UPS_REPLACEBATT) == UPS_REPLACEBATT; };

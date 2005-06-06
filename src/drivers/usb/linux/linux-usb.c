@@ -257,7 +257,7 @@ static int usb_link_check(UPSINFO *ups)
 
    linkcheck = true;               /* prevent recursion */
 
-   set_ups(UPS_COMMLOST);
+   ups->set_status(UPS_COMMLOST);
    Dmsg0(200, "link_check comm lost\n");
 
    /* Don't warn until we try to get it at least 2 times and fail */
@@ -290,7 +290,7 @@ static int usb_link_check(UPSINFO *ups)
 
    if (!comm_err) {
       generate_event(ups, CMDCOMMOK);
-      clear_ups(UPS_COMMLOST);
+      ups->clear_status(UPS_COMMLOST);
       Dmsg0(200, "link check comm OK.\n");
    }
 
@@ -497,31 +497,31 @@ int pusb_ups_check_state(UPSINFO *ups)
 
          if (ev[i].hid == ups->UPS_Cmd[CI_Discharging]) {
             /* If first time on batteries, debounce */
-            if (!is_ups_set(UPS_ONBATT) && ev[i].value)
+            if (!ups->is_status_set(UPS_ONBATT) && ev[i].value)
                my_data->debounce = time(NULL);
 
             if (ev[i].value)
-               clear_ups_online();
+               ups->clear_online();
             else
-               set_ups_online();
+               ups->set_online();
 
          } else if (ev[i].hid == ups->UPS_Cmd[CI_BelowRemCapLimit]) {
             if (ev[i].value)
-               set_ups(UPS_BATTLOW);
+               ups->set_status(UPS_BATTLOW);
             else
-               clear_ups(UPS_BATTLOW);
+               ups->clear_status(UPS_BATTLOW);
 
-            Dmsg1(200, "UPS_BATTLOW = %d\n", is_ups_set(UPS_BATTLOW));
+            Dmsg1(200, "UPS_BATTLOW = %d\n", ups->is_status_set(UPS_BATTLOW));
 
          } else if (ev[i].hid == ups->UPS_Cmd[CI_ACPresent]) {
             /* If first time on batteries, debounce */
-            if (!is_ups_set(UPS_ONBATT) && !ev[i].value)
+            if (!ups->is_status_set(UPS_ONBATT) && !ev[i].value)
                my_data->debounce = time(NULL);
 
             if (!ev[i].value)
-               clear_ups_online();
+               ups->clear_online();
             else
-               set_ups_online();
+               ups->set_online();
 
          } else if (ev[i].hid == ups->UPS_Cmd[CI_RemainingCapacity]) {
             ups->BattChg = ev[i].value;
@@ -534,17 +534,17 @@ int pusb_ups_check_state(UPSINFO *ups)
 
          } else if (ev[i].hid == ups->UPS_Cmd[CI_NeedReplacement]) {
             if (ev[i].value)
-               set_ups(UPS_REPLACEBATT);
+               ups->set_status(UPS_REPLACEBATT);
             else
-               clear_ups(UPS_REPLACEBATT);
+               ups->clear_status(UPS_REPLACEBATT);
 
          } else if (ev[i].hid == ups->UPS_Cmd[CI_ShutdownImminent]) {
             if (ev[i].value)
-               set_ups(UPS_SHUTDOWNIMM);
+               ups->set_status(UPS_SHUTDOWNIMM);
             else
-               clear_ups(UPS_SHUTDOWNIMM);
+               ups->clear_status(UPS_SHUTDOWNIMM);
 
-            Dmsg1(200, "ShutdownImminent=%d\n", is_ups_set(UPS_SHUTDOWNIMM));
+            Dmsg1(200, "ShutdownImminent=%d\n", ups->is_status_set(UPS_SHUTDOWNIMM));
          }
 
          Dmsg1(200, "Status=%d\n", ups->Status);
@@ -598,7 +598,7 @@ int pusb_ups_open(UPSINFO *ups)
       }
    }
 
-   clear_ups(UPS_SLAVE);
+   ups->clear_status(UPS_SLAVE);
    write_unlock(ups);
    return 1;
 }

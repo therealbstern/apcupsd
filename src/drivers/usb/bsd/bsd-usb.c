@@ -293,7 +293,7 @@ static int usb_link_check(UPSINFO *ups)
 
    linkcheck = true;               /* prevent recursion */
 
-   set_ups(UPS_COMMLOST);
+   ups->set_status(UPS_COMMLOST);
    Dmsg0(200, "link_check comm lost\n");
 
    /* Don't warn until we try to get it at least 2 times and fail */
@@ -331,7 +331,7 @@ static int usb_link_check(UPSINFO *ups)
 
    if (!comm_err) {
       generate_event(ups, CMDCOMMOK);
-      clear_ups(UPS_COMMLOST);
+      ups->clear_status(UPS_COMMLOST);
       Dmsg0(200, "link check comm OK.\n");
    }
 
@@ -654,37 +654,37 @@ int pusb_ups_check_state(UPSINFO *ups)
          value = hid_get_data(buf + 1, &my_data->info[CI_Discharging]->item);
 
          /* If first time on batteries, debounce */
-         if (!is_ups_set(UPS_ONBATT) && value)
+         if (!ups->is_status_set(UPS_ONBATT) && value)
             my_data->debounce = time(NULL);
 
          if (value)
-            clear_ups_online();
+            ups->clear_status_online();
          else
-            set_ups_online();
+            ups->set_status_online();
       }
 
       if (MATCH_CI(CI_BelowRemCapLimit)) {
          value = hid_get_data(buf + 1, &my_data->info[CI_BelowRemCapLimit]->item);
 
          if (value)
-            set_ups(UPS_BATTLOW);
+            ups->set_status(UPS_BATTLOW);
          else
-            clear_ups(UPS_BATTLOW);
+            ups->clear_status(UPS_BATTLOW);
 
-         Dmsg1(200, "UPS_BATTLOW = %d\n", is_ups_set(UPS_BATTLOW));
+         Dmsg1(200, "UPS_BATTLOW = %d\n", ups->is_status_set(UPS_BATTLOW));
       }
 
       if (MATCH_CI(CI_ACPresent)) {
          value = hid_get_data(buf + 1, &my_data->info[CI_ACPresent]->item);
 
          /* If first time on batteries, debounce */
-         if (!is_ups_set(UPS_ONBATT) && !value)
+         if (!ups->is_status_set(UPS_ONBATT) && !value)
             my_data->debounce = time(NULL);
 
          if (!value)
-            clear_ups_online();
+            ups->clear_status_online();
          else
-            set_ups_online();
+            ups->set_status_online();
       }
 
       if (MATCH_CI(CI_RemainingCapacity)) {
@@ -705,20 +705,20 @@ int pusb_ups_check_state(UPSINFO *ups)
          value = hid_get_data(buf + 1, &my_data->info[CI_NeedReplacement]->item);
 
          if (value)
-            set_ups(UPS_REPLACEBATT);
+            ups->set_status(UPS_REPLACEBATT);
          else
-            clear_ups(UPS_REPLACEBATT);
+            ups->clear_status(UPS_REPLACEBATT);
       }
 
       if (MATCH_CI(CI_ShutdownImminent)) {
          value = hid_get_data(buf + 1, &my_data->info[CI_ShutdownImminent]->item);
 
          if (value)
-            set_ups(UPS_SHUTDOWNIMM);
+            ups->set_status(UPS_SHUTDOWNIMM);
          else
-            clear_ups(UPS_SHUTDOWNIMM);
+            ups->clear_status(UPS_SHUTDOWNIMM);
 
-         Dmsg1(200, "ShutdownImminent=%d\n", is_ups_set(UPS_SHUTDOWNIMM));
+         Dmsg1(200, "ShutdownImminent=%d\n", ups->is_status_set(UPS_SHUTDOWNIMM));
       }
 
       Dmsg1(200, "Status=%d\n", ups->Status);
@@ -772,7 +772,7 @@ int pusb_ups_open(UPSINFO *ups)
       }
    }
 
-   clear_ups(UPS_SLAVE);
+   ups->clear_status(UPS_SLAVE);
    write_unlock(ups);
    return 1;
 }
