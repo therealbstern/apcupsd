@@ -28,7 +28,7 @@ install:
 	fi; \
 	$(INSTALL_DATA) $$srcconf $(DESTDIR)$(sysconfdir)/$$dstconf; \
 	for src in changeme commfailure commok masterconnect \
-		mastertimeout mainsback onbattery; do \
+		mastertimeout offbattery onbattery; do \
 	   if test -f $(DESTDIR)$(sysconfdir)/$$src; then \
 	       echo " Found old $$src moving it to $$src.orig"; \
 	       $(RMF) $(DESTDIR)$(sysconfdir)/$$src.orig; \
@@ -40,7 +40,7 @@ install:
 uninstall:
 
 distclean: targetdistclean
-	$(RMF) apcupsd.conf changeme commfailure commok mainsback onbattery
+	$(RMF) apcupsd.conf changeme commfailure commok offbattery onbattery
 	$(RMF) masterconnect mastertimeout
 	$(RMF) Makefile
 	@rm -rf CVS

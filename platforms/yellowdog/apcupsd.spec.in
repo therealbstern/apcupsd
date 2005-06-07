@@ -185,7 +185,7 @@ install -m744 examples/make-hiddev \
 %config(noreplace) /etc/apcupsd/commfailure
 %config(noreplace) /etc/apcupsd/commok
 %config(noreplace) /etc/apcupsd/onbattery
-%config(noreplace) /etc/apcupsd/mainsback
+%config(noreplace) /etc/apcupsd/offbattery
 %config(noreplace) /etc/apcupsd/apcupsd.conf
 %config(noreplace) /etc/apcupsd/hosts.conf
 %config(noreplace) /etc/apcupsd/multimon.conf
@@ -284,7 +284,7 @@ fi
 %config(noreplace) /etc/apcupsd/commfailure
 %config(noreplace) /etc/apcupsd/commok
 %config(noreplace) /etc/apcupsd/onbattery
-%config(noreplace) /etc/apcupsd/mainsback
+%config(noreplace) /etc/apcupsd/offbattery
 %config(noreplace) /etc/apcupsd/apcupsd.conf
 %config(noreplace) /etc/apcupsd/hosts.conf
 %config(noreplace) /etc/apcupsd/multimon.conf
