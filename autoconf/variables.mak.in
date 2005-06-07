@@ -91,7 +91,7 @@ WINLIBS = @WINLIBS@
 
 # Made INCFLAGS relative to the topdir and hardcoded into the Makefiles
 # For GDINCLUDE see src/cgi/Makefile.in
-INCFLAGS = $(GDINCLUDE) -I$(topdir)/include
+INCFLAGS = $(GDINCLUDE) -I$(topdir)/include $(EXTRAINCS)
 CFLAGS = @CFLAGS@ $(CPPFLAGS) @PTHREAD_CFLAGS@ $(INCFLAGS)
 LDFLAGS = @LDFLAGS@
 LIBS = $(DRVLIBS) $(APCLIBS) $(INTLLIBS) @PTHREAD_LFLAGS@ @LIBS@
