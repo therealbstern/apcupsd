@@ -7,5 +7,5 @@
 /etc/apcupsd/changeme
 /etc/apcupsd/commfailure
 /etc/apcupsd/commok
-/etc/apcupsd/mainsback
+/etc/apcupsd/offbattery
 /etc/apcupsd/onbattery

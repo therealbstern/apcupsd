@@ -1597,7 +1597,7 @@ GENERATE_FILES="\
     platforms/etc/changeme \
     platforms/etc/commfailure \
     platforms/etc/commok \
-    platforms/etc/mainsback 
+    platforms/etc/offbattery \
     platforms/etc/masterconnect \
     platforms/etc/mastertimeout \
     platforms/etc/onbattery \
