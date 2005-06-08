@@ -84,33 +84,59 @@
 
 /* bit values for APC UPS Status Byte (ups->Status) */
 #define UPS_CALIBRATION   0x00000001
+#define UPS_calibration   0x00000001
 #define UPS_SMARTTRIM     0x00000002
+#define UPS_trim          0x00000002
 #define UPS_SMARTBOOST    0x00000004
+#define UPS_boost         0x00000004
 #define UPS_ONLINE        0x00000008
+#define UPS_online        0x00000008
 #define UPS_ONBATT        0x00000010
+#define UPS_onbatt        0x00000010
 #define UPS_OVERLOAD      0x00000020
+#define UPS_overload      0x00000020
 #define UPS_BATTLOW       0x00000040
+#define UPS_battlow       0x00000040
 #define UPS_REPLACEBATT   0x00000080
+#define UPS_replacebatt   0x00000080
 
 /* Extended bit values added by apcupsd */
 #define UPS_COMMLOST      0x00000100    /* Communications with UPS lost */
+#define UPS_commlost      0x00000100    /* Communications with UPS lost */
 #define UPS_SHUTDOWN      0x00000200    /* Shutdown in progress */
+#define UPS_shutdown      0x00000200    /* Shutdown in progress */
 #define UPS_SLAVE         0x00000400    /* Set if this is a slave */
+#define UPS_slave         0x00000400    /* Set if this is a slave */
 #define UPS_SLAVEDOWN     0x00000800    /* Slave not responding */
+#define UPS_slavedown     0x00000800    /* Slave not responding */
 #define UPS_SHUTDOWNIMM   0x00001000    /* Shutdown imminent */
+#define UPS_shutdownimm   0x00001000    /* Shutdown imminent */
 #define UPS_BELOWCAPLIMIT 0x00002000    /* Below battery capacity limit */
+#define UPS_belowcaplimit 0x00002000    /* Below battery capacity limit */
 #define UPS_REMTIMELIMIT  0x00004000    /* Remaining run time limit exceeded */
+#define UPS_remtimelimit  0x00004000    /* Remaining run time limit exceeded */
 #define UPS_PREV_ONBATT   0x00008000    /* Previous value for UPS_ONBATT */
+#define UPS_prev_onbatt   0x00008000    /* Previous value for UPS_ONBATT */
 #define UPS_PREV_BATTLOW  0x00010000    /* Previous value for UPS_BATTLOW */
+#define UPS_prev_battlow  0x00010000    /* Previous value for UPS_BATTLOW */
 #define UPS_ONBATT_MSG    0x00020000    /* Set when UPS_ONBATT message is sent */
+#define UPS_onbatt_msg    0x00020000    /* Set when UPS_ONBATT message is sent */
 #define UPS_FASTPOLL      0x00040000    /* Set on power failure to poll faster */
+#define UPS_fastpoll      0x00040000    /* Set on power failure to poll faster */
 #define UPS_SHUT_LOAD     0x00080000    /* Set when BatLoad <= percent */
+#define UPS_shut_load     0x00080000    /* Set when BatLoad <= percent */
 #define UPS_SHUT_BTIME    0x00100000    /* Set when time on batts > maxtime */
+#define UPS_shut_btime    0x00100000    /* Set when time on batts > maxtime */
 #define UPS_SHUT_LTIME    0x00200000    /* Set when TimeLeft <= runtime */
+#define UPS_shut_ltime    0x00200000    /* Set when TimeLeft <= runtime */
 #define UPS_SHUT_EMERG    0x00400000    /* Set when battery power has failed */
+#define UPS_shut_emerg    0x00400000    /* Set when battery power has failed */
 #define UPS_SHUT_REMOTE   0x00800000    /* Set when remote shutdown */
+#define UPS_shut_remove   0x00800000    /* Set when remote shutdown */
 #define UPS_PLUGGED       0x01000000    /* Set if computer is plugged into UPS */
+#define UPS_plugged       0x01000000    /* Set if computer is plugged into UPS */
 #define UPS_DEV_SETUP     0x02000000    /* Set if UPS's driver did the setup() */
+#define UPS_dev_setup     0x02000000    /* Set if UPS's driver did the setup() */
 
 #define UPS_LOCAL_BITS (UPS_COMMLOST|UPS_SHUTDOWN|UPS_SLAVE|UPS_SLAVEDOWN|UPS_PREV_ONBATT| \
             UPS_PREV_BATTLOW|UPS_ONBATT_MSG|UPS_FASTPOLL|UPS_PLUGGED|UPS_DEV_SETUP)

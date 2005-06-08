@@ -207,26 +207,57 @@ typedef struct netdata {
 class UPSINFO {
  public:
    /* Methods */
-   void set_battlow() { Status |= UPS_BATTLOW; };
-   void clear_battlow() { Status &= ~UPS_BATTLOW; };
-   void set_slave() { Status |= UPS_SLAVE; };
-   void clear_slave() { Status &= ~UPS_SLAVE; };
-   void set_online() { Status |= UPS_ONLINE; Status &= ~UPS_ONBATT; };
-   void clear_online() { Status |= UPS_ONBATT; Status &= ~UPS_ONLINE; };
-   void set_replacebatt() { Status |= UPS_REPLACEBATT; };
-   void clear_replacebatt() { Status &= ~UPS_REPLACEBATT; };
+   void set_battlow() { Status |= UPS_battlow; };
+   void clear_battlow() { Status &= ~UPS_battlow; };
+   void set_slave() { Status |= UPS_slave; };
+   void clear_slave() { Status &= ~UPS_slave; };
+   void set_online() { Status |= UPS_online; Status &= ~UPS_onbatt; };
+   void clear_online() { Status |= UPS_onbatt; Status &= ~UPS_online; };
+   void set_replacebatt() { Status |= UPS_replacebatt; };
+   void clear_replacebatt() { Status &= ~UPS_replacebatt; };
+   void set_commlost() { Status |= UPS_commlost; };
+   void clear_commlost() { Status &= ~UPS_commlost; };
+   void set_shutdown() { Status |= UPS_shutdown; };
+   void clear_shutdown() { Status &= ~UPS_shutdown; };
+   void set_slavedown() { Status |= UPS_slavedown; };
+   void clear_slavedown() { Status &= ~UPS_slavedown; };
+   void set_shutdownimm() { Status |= UPS_shutdownimm; };
+   void clear_shutdownimm() { Status &= ~UPS_shutdownimm; };
+   void set_belowcaplimit() { Status |= UPS_belowcaplimit; };
+   void clear_belowcaplimit() { Status &= ~UPS_belowcaplimit; };
+   void set_remtimelimit() { Status |= UPS_remtimelimit; };
+   void clear_remtimelimit() { Status &= ~UPS_remtimelimit; };
+   void set_prev_onbatt() { Status |= UPS_prev_onbatt; };
+   void clear_prev_onbatt() { Status &= ~UPS_prev_onbatt; };
+   void set_prev_battlow() { Status |= UPS_prev_battlow; };
+   void clear_prev_battlow() { Status &= ~UPS_prev_battlow; };
+   void set_onbatt_msg() { Status |= UPS_onbatt_msg; };
+   void clear_onbatt_msg() { Status &= ~UPS_onbatt_msg; };
+   void set_fastpoll() { Status |= UPS_fastpoll; };
+   void clear_fastpoll() { Status &= ~UPS_fastpoll; };
+   void set_shut_load() { Status |= UPS_shut_load; };
+   void clear_shut_load() { Status &= ~UPS_shut_load; };
+   void set_shut_btime() { Status |= UPS_shut_btime; };
+   void clear_shut_btime() { Status &= ~UPS_shut_btime; };
+   void set_shut_ltime() { Status |= UPS_shut_ltime; };
+   void clear_shut_ltime() { Status &= ~UPS_shut_ltime; };
+   void set_shut_emerg() { Status |= UPS_shut_emerg; };
+   void clear_shut_emerg() { Status &= ~UPS_shut_emerg; };
+   void set_plugged() { Status |= UPS_plugged; };
+   void clear_plugged() { Status &= ~UPS_plugged; };
+   void set_dev_setup() { Status |= UPS_dev_setup; };
+   void clear_dev_setup() { Status &= ~UPS_dev_setup; };
 
    /* General set/clear/test bit. */           
    void set_status(int bit) { Status |= bit; };
    void clear_status(int bit) { Status &= ~bit; };
    bool is_status_set(int bit) const { return (Status & bit) == bit; };
 
-   bool is_onbatt() const { return (Status & UPS_ONBATT) == UPS_ONBATT; };
-   bool is_battlow() const { return (Status & UPS_BATTLOW) == UPS_BATTLOW; };
-   bool is_replacebatt() const { return (Status & UPS_REPLACEBATT) == UPS_REPLACEBATT; };
-   bool is_boost() const { return (Status & UPS_SMARTBOOST) == UPS_SMARTBOOST; };
-   bool is_trim() const { return (Status & UPS_SMARTTRIM) == UPS_SMARTTRIM; };
-
+   bool is_onbatt() const { return (Status & UPS_onbatt) == UPS_onbatt; };
+   bool is_battlow() const { return (Status & UPS_battlow) == UPS_battlow; };
+   bool is_replacebatt() const { return (Status & UPS_replacebatt) == UPS_replacebatt; };
+   bool is_boost() const { return (Status & UPS_boost) == UPS_boost; };
+   bool is_trim() const { return (Status & UPS_trim) == UPS_trim; };
 
    /* DATA */
    char id[5];
