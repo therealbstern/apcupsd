@@ -1,0 +1,36 @@
+             Technical notes on version 3.11.0
+                        Adam Kropelin
+
+General:
+08Jun05
+- Retroactively create my own techlog
+07Jun05
+- Rename mainsback.in to offbattery.in so default power loss/return
+  actions are symmetrical.
+- Fix bsd-usb build on FreeBSD-4.11 by allowing Makefiles to add 
+  their own include flags via EXTRAINCS.
+- Exclude HPUX from signal recursion
+31May05
+- Code style normalization.
+19May05
+- C++ cleanliness fixes in libusbhid
+27Apr05
+- Merge hidu_set_report bug fix from Branch-3_10_17.
+24Apr05
+- Make apctest work with empty DEVICE setting for USB driver.
+22Apr05
+- Merge BSD UHCI lockup fixes from Branch-3_10_17.
+04Apr05
+- Remove trailing commas in enum declarations to make AIX 5.1 +
+  VACPP 6.0 happy.
+29Mar05
+- Make SNMP missing SNMP libs cause ./configure fail
+- Remove references to serial port in comms lost/restored messages
+  in apccontrol.in since in UPSes may be connected by other means
+  (USB, net, etc.).
+- More unsafe string conversions. strcpy -> astrncpy and
+  sprintf -> asnprintf.
+22Mar05
+- Convert some potentially unsafe string functions to apcupsd safe
+  versions. None of the usages were actually unsafe, but this change
+  pacifies OpenBSD and prevents future bugs.
