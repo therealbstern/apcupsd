@@ -221,7 +221,7 @@ int getline(char *s, int len, UPSINFO *ups)
       case UPS_ON_BATT:           /* UPS_ON_BATT = '!'   */
          if (s == NULL)
             write_lock(ups);
-         if (!ups->is_status_set(UPS_ONBATT)) {
+         if (!ups->is_onbatt()) {
             my_data->debounce = time(NULL);
          }
          ups->clear_online();
@@ -234,7 +234,7 @@ int getline(char *s, int len, UPSINFO *ups)
       case UPS_REPLACE_BATTERY:   /* UPS_REPLACE_BATTERY = '#'   */
          if (s == NULL)
             write_lock(ups);
-         ups->set_status(UPS_REPLACEBATT);
+         ups->set_replacebatt();
          if (s == NULL) {
             write_unlock(ups);
             ending = 1;
@@ -253,7 +253,7 @@ int getline(char *s, int len, UPSINFO *ups)
       case BATT_LOW:              /* BATT_LOW    = '%'   */
          if (s == NULL)
             write_lock(ups);
-         ups->set_status(UPS_BATTLOW);
+         ups->set_battlow();
          if (s == NULL) {
             write_unlock(ups);
             ending = 1;
@@ -262,7 +262,7 @@ int getline(char *s, int len, UPSINFO *ups)
       case BATT_OK:               /* BATT_OK     = '+'   */
          if (s == NULL)
             write_lock(ups);
-         ups->clear_status(UPS_BATTLOW);
+         ups->clear_battlow();
          if (s == NULL) {
             write_unlock(ups);
             ending = 1;
@@ -316,10 +316,10 @@ void UPSlinkCheck(UPSINFO *ups)
    tcflush(ups->fd, TCIOFLUSH);
    if (strcmp((a = smart_poll('Y', ups)), "SM") == 0) {
       linkcheck = FALSE;
-      ups->clear_status(UPS_COMMLOST);
+      ups->clear_commlost();
       return;
    }
-   ups->set_status(UPS_COMMLOST);
+   ups->set_commlost();
    tcflush(ups->fd, TCIOFLUSH);
 
    for (tlog = 0; strcmp((a = smart_poll('Y', ups)), "SM") != 0;
@@ -346,7 +346,7 @@ void UPSlinkCheck(UPSINFO *ups)
       tcflush(ups->fd, TCIOFLUSH);
       generate_event(ups, CMDCOMMOK);
    }
-   ups->clear_status(UPS_COMMLOST);
+   ups->clear_commlost();
    linkcheck = FALSE;
 }
 
@@ -618,7 +618,7 @@ int apcsmart_ups_entry_point(UPSINFO *ups, int command, void *data)
    int retries = 5;                /* Number of retries if reason is NA (see below) */
    char ans[20];
 
-   if (ups->is_status_set(UPS_SLAVE)) {
+   if (ups->is_slave()) {
       return SUCCESS;
    }
 

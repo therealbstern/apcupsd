@@ -4,27 +4,27 @@
  * Author: Russell Kroll <rkroll@exploits.org>
  *
  * To use: install the binary in a directory where CGI programs may be
- *	 executed by your web server.  On many systems something like
- *	 /usr/local/etc/httpd/cgi-bin will work nicely.  I recommend
+ *       executed by your web server.  On many systems something like
+ *       /usr/local/etc/httpd/cgi-bin will work nicely.  I recommend
  *         calling the binary "upsstats.cgi" in that directory.
  *
- *	 Assuming a path like the above, the following link will suffice:
+ *       Assuming a path like the above, the following link will suffice:
  *         <A HREF="/cgi-bin/upsstats.cgi">UPS Status</A>
  * 
- *	 This program assumes that upsimage.cgi will be in the same 
- *	 directory.  The install-cgi target will take care of putting
- *	 things in the right place if you set the paths properly in the
- *	 Makefile.
+ *       This program assumes that upsimage.cgi will be in the same 
+ *       directory.  The install-cgi target will take care of putting
+ *       things in the right place if you set the paths properly in the
+ *       Makefile.
  *
  * Modified: Jonathan Benson <jbenson@technologist.com>
- *	   19/6/98 to suit apcupsd
- *	   23/6/98 added more graphs and menu options
+ *         19/6/98 to suit apcupsd
+ *         23/6/98 added more graphs and menu options
  *
  * Modified: Kern Sibbald <kern@sibbald.com>
- *	  Nov 1999 to work with apcupsd networking and
- *		   to include as much of the NUT code
- *		     as possible.
- *		   added runtim status
+ *        Nov 1999 to work with apcupsd networking and
+ *                 to include as much of the NUT code
+ *                   as possible.
+ *                 added runtim status
  */
 
 #include <stdio.h>
@@ -41,7 +41,7 @@
 #endif
 
 #ifndef MAXHOSTNAMELEN
-#define MAXHOSTNAMELEN	64
+#define MAXHOSTNAMELEN  64
 #endif
 
 static char   monhost[MAXHOSTNAMELEN] = "127.0.0.1";
@@ -54,36 +54,36 @@ static int    refresh = DEFAULT_REFRESH;
 void parsearg(const char *var, const char *value) 
 {
     if (strcmp(var, "host") == 0) {
-	strncpy (monhost, value, sizeof(monhost));
-	monhost[sizeof(monhost) - 1] = '\0';
+        strncpy (monhost, value, sizeof(monhost));
+        monhost[sizeof(monhost) - 1] = '\0';
 
     } else if (strcmp(var, "img1") == 0) {
-	img1 = atoi(value);
+        img1 = atoi(value);
         if ((img1 <= 0) || (img1 > 6)) {
             img1 = 1;
         }
 
     } else if (strcmp(var, "img2") == 0) {
-	img2 = atoi(value);
+        img2 = atoi(value);
         if ((img2 <= 0) || (img2 > 6)) {
             img2 = 6;
         }
 
     } else if (strcmp(var, "img3") == 0) {
-	img3 = atoi(value);
+        img3 = atoi(value);
         if ((img3 <= 0) || (img3 > 6)) {
             img3 = 5;
         }
 
     } else if (strcmp(var, "temp") == 0) {
-	strncpy (temps, value, sizeof(temps));
-	temps[sizeof(temps) - 1] = '\0';
+        strncpy (temps, value, sizeof(temps));
+        temps[sizeof(temps) - 1] = '\0';
 
     } else if (strcmp(var, "refresh") == 0) {
-	refresh = atoi(value);
-	if (refresh < 0) {
-		refresh = DEFAULT_REFRESH;
-	}
+        refresh = atoi(value);
+        if (refresh < 0) {
+                refresh = DEFAULT_REFRESH;
+        }
     }
 }
 
@@ -92,7 +92,7 @@ void send_image(int report, int defrpt)
     char   answer[256], answer2[256], answer3[256];
 
     if (report < 1 || report > 6)
-	   report = defrpt;
+           report = defrpt;
 
     fputs ("<img src=\"upsimage.cgi?display=", stdout);
     switch ( report ) {
@@ -100,37 +100,37 @@ void send_image(int report, int defrpt)
         getupsvar (monhost, "battcap", answer, sizeof(answer));  
         getupsvar (monhost, "mbattchg", answer2, sizeof(answer2));
         printf ("battcap&amp;value=%s&amp;value2=%s\" alt=\"Battery Capacity %s%%\"",
-	    answer, answer2, answer);
-	break;
+            answer, answer2, answer);
+        break;
     case 2: 
         getupsvar (monhost, "battvolt", answer, sizeof(answer));  
         getupsvar (monhost, "nombattv", answer2, sizeof(answer2));
         printf ("battvolt&amp;value=%s&amp;value2=%s\" alt=\"Battery Voltage %s VDC\"",
-	    answer, answer2, answer);
-	break;
+            answer, answer2, answer);
+        break;
     case 3: 
         getupsvar (monhost, "utility", answer, sizeof(answer));  
         getupsvar (monhost, "lowxfer", answer2, sizeof(answer2));
         getupsvar (monhost, "highxfer", answer3, sizeof(answer3));
         printf ("utility&amp;value=%s&amp;value2=%s&amp;value3=%s\" alt=\"Utility Voltage %s VAC\"",
             answer, answer2, answer3, answer);
-	break;
+        break;
     case 4: 
         getupsvar (monhost, "outputv", answer, sizeof(answer));  
         printf ("outputv&amp;value=%s\" alt=\"Output Voltage %s VAC\"",
-	    answer, answer);
-	break;
+            answer, answer);
+        break;
     case 5: 
         getupsvar (monhost, "upsload", answer, sizeof(answer));  
         printf ("upsload&amp;value=%s\" alt=\"UPS Load %s%%\"",
-	    answer, answer);
-	break;
+            answer, answer);
+        break;
     case 6:
         getupsvar (monhost, "runtime", answer, sizeof(answer));  
         getupsvar (monhost, "mintimel", answer2, sizeof(answer2));
         printf ("runtime&amp;value=%s&amp;value2=%s\" alt=\"Run time remaining %s minutes\"",
             answer, answer2, answer);
-	break;
+        break;
     }
     puts (" width=\"150\" height=\"350\" />");
 }
@@ -187,18 +187,18 @@ int main(int argc, char **argv)
     html_begin(answer, refresh);
     
     if (!checkhost(monhost)) {
-	fputs ("<p><strong>Access to host ", stdout);
-	html_puts(monhost);
-	puts (" is not authorized.</strong></p>");
-	html_finish();
-	exit (EXIT_FAILURE);
+        fputs ("<p><strong>Access to host ", stdout);
+        html_puts(monhost);
+        puts (" is not authorized.</strong></p>");
+        html_finish();
+        exit (EXIT_FAILURE);
     }
     
     /* check if host is available */
     if (getupsvar(monhost, "date", answer, sizeof(answer)) <= 0) {
-	fputs ("<p><strong>Unable to communicate with the UPS on ", stdout);
-	html_puts(monhost);
-	puts (".</strong></p>");
+        fputs ("<p><strong>Unable to communicate with the UPS on ", stdout);
+        html_puts(monhost);
+        puts (".</strong></p>");
         html_finish();
         exit (EXIT_FAILURE);
     }
@@ -277,28 +277,28 @@ int main(int argc, char **argv)
      if (getupsvar (monhost, "status", answer, sizeof(answer)) <= 0) {
              puts ("Not available");
      } else {
-	 status = strtol(answer, 0, 16);
-	 if (status & UPS_CALIBRATION) 
+         status = strtol(answer, 0, 16);
+         if (status & UPS_calibration) 
              fputs ("CALIBRATION ", stdout); 
-	 if (status & UPS_SMARTTRIM)
-             fputs ("SMART TRIM ", stdout);
-	 if (status & UPS_SMARTBOOST)
-             fputs ("SMART BOOST ", stdout);
-	 if (status & UPS_ONLINE)
+         if (status & UPS_trim)
+             fputs ("TRIM ", stdout);
+         if (status & UPS_boost)
+             fputs ("BOOST ", stdout);
+         if (status & UPS_online)
              fputs ("ONLINE ", stdout); 
-	 if (status & UPS_ONBATT) 
+         if (status & UPS_onbatt) 
              fputs ("ON BATTERY ", stdout); 
-	 if (status & UPS_OVERLOAD)
+         if (status & UPS_overload)
              fputs ("OVERLOADED ", stdout);
-	 if (status & UPS_BATTLOW) 
+         if (status & UPS_battlow) 
              fputs ("BATTERY LOW ", stdout); 
-	 if (status & UPS_REPLACEBATT)
+         if (status & UPS_replacebatt)
              fputs ("REPLACE BATTERY ", stdout);
-	 if (status & UPS_COMMLOST)
+         if (status & UPS_commlost)
              fputs("COMM LOST ", stdout); 
-	 if (status & UPS_SHUTDOWN)
+         if (status & UPS_shutdown)
              fputs("SHUTDOWN ", stdout);
-	 if (status & UPS_SLAVE)
+         if (status & UPS_slave)
              fputs("SLAVE ", stdout);
          fputs ("\n", stdout); 
      }
@@ -331,7 +331,7 @@ int main(int argc, char **argv)
       */
      for (p=answer; *p && *p != ':'; p++) ;
      if (*p == ':')
-	p++;
+        p++;
      for ( ; *p && *p != ':'; p++) ;
      *p = '\0';
      fputs ("Last Test Date: ", stdout);
@@ -365,15 +365,15 @@ int main(int argc, char **argv)
      if (getupsvar(monhost, "ambtemp", answer, sizeof(answer)) > 0) {
          if (strcmp(answer, "Not found" ) != 0) {
              if (strcmp(temps,"F") == 0) {
-		tempf = (strtod (answer, 0) * 1.8) + 32;
+                tempf = (strtod (answer, 0) * 1.8) + 32;
                 printf ("     Amb. Temp.: %.1f&deg; F\n", tempf);
              } else if (strcmp(temps,"K") == 0) {
-		tempf = (strtod (answer, 0)) + 273;
+                tempf = (strtod (answer, 0)) + 273;
                 printf ("     Amb. Temp.: %.1f&deg; K\n", tempf);
-	     } else {
+             } else {
                 printf ("     Amb. Temp.: %s&deg; C\n", answer);
-	     } 
-	 }
+             } 
+         }
      }
 
      if ( getupsvar (monhost, "humidity", answer, sizeof(answer)) > 0) {
@@ -381,14 +381,14 @@ int main(int argc, char **argv)
               fputs ("  Amb. Humidity: ", stdout);
               html_puts (answer);
               puts (" %");
-	 }
+         }
      }
 
      printf ("</pre>\n<table border=\"0\" cellspacing=\"0\" cellpadding=\"0\">\n<tr>\n<td colspan=\"2\">\n<pre>\n");
 
     if (getupsvar (monhost, "upstemp", answer, sizeof(answer)) > 0) {
          if (strcmp(temps,"F") == 0) {
-	      tempf = (strtod (answer, 0) * 1.8) + 32;
+              tempf = (strtod (answer, 0) * 1.8) + 32;
               printf ("       UPS Temp: %.1f \n</pre>\n</td>\n<td>\n", tempf); 
               printf ("       <form method=\"get\" action=\"upsstats.cgi\"><div>\n");
               printf ("       <input type=\"hidden\" name=\"host\" value=\"%s\" />\n",monhost);
@@ -401,8 +401,8 @@ int main(int argc, char **argv)
               printf ("          <option selected=\"selected\" value=\"F\">&deg; F</option>\n");
               printf ("          <option value=\"K\">&deg; K</option>\n");
 
-	  } else if (strcmp(temps,"K") == 0) {
-	       tempf = (strtod (answer, 0)) + 273;
+          } else if (strcmp(temps,"K") == 0) {
+               tempf = (strtod (answer, 0)) + 273;
                printf ("       UPS Temp: %.1f \n</pre>\n</td>\n<td>\n", tempf); 
                printf ("       <form method=\"get\" action=\"upsstats.cgi\"><div>\n");
                printf ("       <input type=\"hidden\" name=\"host\" value=\"%s\" />\n",monhost);
@@ -415,7 +415,7 @@ int main(int argc, char **argv)
                printf ("         <option value=\"F\">&deg; F</option>\n");
                printf ("         <option selected=\"selected\" value=\"K\">&deg; K</option>\n");
 
-	 } else {
+         } else {
                printf ("       UPS Temp: %s \n</pre>\n</td>\n<td>\n", answer);
                printf ("       <form method=\"get\" action=\"upsstats.cgi\"><div>\n");
                printf ("       <input type=\"hidden\" name=\"host\" value=\"%s\" />\n",monhost);
@@ -427,7 +427,7 @@ int main(int argc, char **argv)
                printf ("         <option selected=\"selected\" value=\"C\">&deg; C</option>\n");
                printf ("         <option value=\"F\">&deg; F</option>\n");
                printf ("         <option value=\"K\">&deg; K</option>\n");
-	 }
+         }
     }
 
      puts ("       </select>");

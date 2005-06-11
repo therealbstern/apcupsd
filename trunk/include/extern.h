@@ -1,11 +1,11 @@
 /*
- * apc_extern.h
+ * extern.h
  *
  * Public exports.
  */
 
 /*
- * Copyright (C) 2000-2004 Kern Sibbald
+ * Copyright (C) 2000-2005 Kern Sibbald
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of version 2 of the GNU General
@@ -22,8 +22,8 @@
  * MA 02111-1307, USA.
  */
 
-#ifndef _APC_EXTERN_H
-#define _APC_EXTERN_H
+#ifndef _EXTERN_H
+#define _EXTERN_H
 
 /* Function Prototypes */
 
@@ -250,4 +250,4 @@ void *acalloc(size_t size1, size_t size2);
 /* In apcwinipc.c */
 int winioctl(int fd, int func, int *addr);
 
-#endif   /* _APC_EXTERN_H */
+#endif   /* _EXTERN_H */

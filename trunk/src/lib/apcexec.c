@@ -87,8 +87,8 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
       return SUCCESS;
    }
 
-   asnprintf(connected, sizeof(connected), "%d", !ups->is_status_set(UPS_SLAVE));
-   asnprintf(powered, sizeof(powered), "%d", (int)ups->is_status_set(UPS_PLUGGED));
+   asnprintf(connected, sizeof(connected), "%d", !ups->is_slave());
+   asnprintf(powered, sizeof(powered), "%d", (int)ups->is_plugged());
 
    /* fork() and exec() */
    switch (cmd.pid = fork()) {

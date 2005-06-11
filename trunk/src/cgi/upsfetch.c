@@ -8,15 +8,15 @@
  * status file.
  *
  * Modified: Jonathan Benson <jbenson@technologist.com>
- *	   19/6/98 to suit apcupsd
- *	   23/6/98 added more graphs and menu options
+ *         19/6/98 to suit apcupsd
+ *         23/6/98 added more graphs and menu options
  *
  * Modified: Kern Sibbald <kern@sibbald.com>
- *	   2 Nov 99 to work with apcupsd named pipes
- *	   5 Nov 99 added more graphs	      
- *	  11 Nov 99 to work with apcnetd networking
- *		    also modified it to be a bit closer 
- *		    to the original version.
+ *         2 Nov 99 to work with apcupsd named pipes
+ *         5 Nov 99 added more graphs         
+ *        11 Nov 99 to work with apcnetd networking
+ *                  also modified it to be a bit closer 
+ *                  to the original version.
  */
 
 #include <stdio.h>
@@ -25,7 +25,7 @@
 
 #include "cgiconfig.h"
 #include "config.h"
-#include "apc_nis.h"
+#include "nis.h"
 
 static int fill_buffer(int sockfd);
 
@@ -43,7 +43,7 @@ static char errmsg[200];
  *    line, and if 1 returns only to first space (e.g. integers,
  *    and floating point values.
  */
-static const struct { 	
+static const struct {   
    char *request;
    char *upskeyword;
    int nfields;
@@ -103,7 +103,7 @@ static int fetch_data(const char *host)
    char lhost[200];
 
    if (statlen != 0 && (strcmp(last_host, host) == 0))
-       return 1;		      /* alread have data this host */
+       return 1;                      /* alread have data this host */
    strncpy(last_host, host, sizeof(last_host)); 
    last_host[sizeof(last_host) - 1] = '\0';
    statlen = 0;
@@ -121,7 +121,7 @@ static int fetch_data(const char *host)
       return 0;
    }
 
-   stat = fill_buffer(sockfd);		     /* fill statbuf */
+   stat = fill_buffer(sockfd);               /* fill statbuf */
    if (stat == 0) {
       *last_host = '\0';
       statlen = 0;
@@ -169,24 +169,24 @@ int fetch_events(const char *host)
    }
    /*
     * Now read the events and invert them for the list box,
-    * with most recend event at the beginning.	
+    * with most recend event at the beginning.  
     * by dg2fer.  
     */
    while ((n = net_recv(sockfd, buf, sizeof(buf)-1)) > 0) {
       /* terminate string for strlen()-calls in next lines */
       if (n >= (int)sizeof(buf)) {
-	 n = (int)sizeof(buf)-1;
+         n = (int)sizeof(buf)-1;
       }
-      buf[n] = '\0';			 /* ensure string terminated */
+      buf[n] = '\0';                     /* ensure string terminated */
       len = strlen(buf);
       /* if message is bigger than the buffer, truncate it */
       if (len < sizeof(statbuf)) {
-	 /* move previous messages to the end of the buffer */
-	 memmove(statbuf+len, statbuf, sizeof(statbuf)-len);
-	 /* copy new message */
-	 memcpy(statbuf, buf, len);
+         /* move previous messages to the end of the buffer */
+         memmove(statbuf+len, statbuf, sizeof(statbuf)-len);
+         /* copy new message */
+         memcpy(statbuf, buf, len);
       } else {
-	 strncpy(statbuf, buf, sizeof(statbuf)-1);
+         strncpy(statbuf, buf, sizeof(statbuf)-1);
       }
       statbuf[sizeof(statbuf)-1] = '\0';
    }
@@ -208,7 +208,7 @@ int fetch_events(const char *host)
  * Returns 0 if variable name not found
  *   answer has "Not found" is variable name not found
  *   answer may have "N/A" if the UPS does not support this
- *	 feature
+ *       feature
  * Returns -1 if network problem
  *   answer has "N/A" if host is not available or network error
  */
@@ -223,30 +223,30 @@ int getupsvar(const char *host, const char *request,
     if (fetch_data(host) == 0) {
         strncpy(answer, "N/A", anslen);
         answer[anslen - 1] = '\0';
-	return -1;
+        return -1;
     }
 
     for (i=0; cmdtrans[i].request; i++) 
-	if (strcmp(cmdtrans[i].request, request) == 0) {
-	     stat_match = cmdtrans[i].upskeyword;
-	     nfields = cmdtrans[i].nfields;
-	}
+        if (strcmp(cmdtrans[i].request, request) == 0) {
+             stat_match = cmdtrans[i].upskeyword;
+             nfields = cmdtrans[i].nfields;
+        }
 
     if (stat_match != NULL) {
-	if ((find=strstr(statbuf, stat_match)) != NULL) {
-	     if (nfields == 1)	/* get one field */
+        if ((find=strstr(statbuf, stat_match)) != NULL) {
+             if (nfields == 1)  /* get one field */
                  sscanf (find, "%*s %*s %s", answer);
-	     else {		/* get everything to eol */
-		 i = 0;
-		 find += 11;  /* skip label */
+             else {             /* get everything to eol */
+                 i = 0;
+                 find += 11;  /* skip label */
                  while (*find != '\n')
-		     answer[i++] = *find++;
-		 answer[i] = '\0';
-	     }
+                     answer[i++] = *find++;
+                 answer[i] = '\0';
+             }
              if (strcmp(answer, "N/A") == 0)
-		 return 0;
-	     return 1;
-	}
+                 return 0;
+             return 1;
+        }
     }
 
     strncpy(answer, "Not found", anslen);

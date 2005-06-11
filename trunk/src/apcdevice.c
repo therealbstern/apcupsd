@@ -55,10 +55,10 @@ void setup_device(UPSINFO *ups)
     * Marko Sakari Asplund <Marko.Asplund@cern.ch>
     *    prevents double init of UPS device 9/25/98
     */
-   if (ups->is_status_set(UPS_DEV_SETUP))
+   if (ups->is_dev_setup())
       return;
 
-   ups->set_status(UPS_DEV_SETUP);
+   ups->set_dev_setup();
 
    device_open(ups);
 
@@ -71,7 +71,7 @@ void setup_device(UPSINFO *ups)
    device_setup(ups);
 
    /* Must not be called on slaves */
-   if (!ups->is_status_set(UPS_SLAVE))
+   if (!ups->is_slave())
       device_get_capabilities(ups);
 
    return;
@@ -95,12 +95,12 @@ void kill_power(UPSINFO *ups)
     *
     * We really need to find out if we are on batteries
     * and if not, delete the PWRFAIL file.  Note, the code
-    * above only tests UPS_ONBATT flag for dumb UPSes.
+    * above only tests UPS_onbatt flag for dumb UPSes.
     */
     
    pwdf = fopen(PWRFAIL, "r");
    if ((pwdf == NULL && ups->mode.type != BK) ||
-       (pwdf == NULL && ups->is_status_set(UPS_ONBATT) && ups->mode.type == BK)) {
+       (pwdf == NULL && ups->is_onbatt() && ups->mode.type == BK)) {
       
       /*                                                  
        * At this point, we really should not be attempting
@@ -208,7 +208,7 @@ void do_device(UPSINFO *ups)
       ups->wait_time = device_wait_time(ups);
 
       Dmsg2(70, "Before device_check_state: 0x%x (OB:%d).\n",
-         ups->Status, ups->is_status_set(UPS_ONBATT));
+         ups->Status, ups->is_onbatt());
 
       /*
        * Check the UPS to see if has changed state.
@@ -221,19 +221,19 @@ void do_device(UPSINFO *ups)
       ups->wait_time = device_wait_time(ups);
 
       Dmsg2(70, "Before do_action: 0x%x (OB:%d).\n",
-         ups->Status, ups->is_status_set(UPS_ONBATT));
+         ups->Status, ups->is_onbatt());
 
       /* take event actions */
       do_action(ups);
 
       Dmsg2(70, "Before fillUPS: 0x%x (OB:%d).\n",
-         ups->Status, ups->is_status_set(UPS_ONBATT));
+         ups->Status, ups->is_onbatt());
 
       /* Get all info available from UPS by asking it questions */
       fillUPS(ups);
 
       Dmsg2(70, "Before do_reports: 0x%x (OB:%d).\n",
-         ups->Status, ups->is_status_set(UPS_ONBATT));
+         ups->Status, ups->is_onbatt());
 
       do_reports(ups);
    }
@@ -252,7 +252,7 @@ static int device_wait_time(UPSINFO *ups)
 {
    int wait_time;
 
-   if (ups->is_status_set(UPS_FASTPOLL))
+   if (ups->is_fastpoll())
       wait_time = TIMER_FAST;
    else
       wait_time = TIMER_SELECT;    /* normally 60 seconds */

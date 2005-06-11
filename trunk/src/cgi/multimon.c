@@ -153,8 +153,8 @@ static void do_status(const char *monhost, const char *suffix)
     long    ups_status;
 
     if (getupsvar (monhost, "status", status, sizeof(status)) <= 0) {
-            printf ("<td class=\"Fault\">Unavailable</td>\n");
-            return;
+       printf ("<td class=\"Fault\">Unavailable</td>\n");
+       return;
     }
 
     stattxt[0] = '\0';
@@ -162,28 +162,28 @@ static void do_status(const char *monhost, const char *suffix)
     ups_status = strtol(status, 0, 16);
     status[0] = '\0';
 
-    if (ups_status & UPS_CALIBRATION) 
-        strcat(status, "CAL ");
-    if (ups_status & UPS_SMARTTRIM)
-        strcat(status, "TRIM ");
-    if (ups_status & UPS_SMARTBOOST)
-        strcat(status, "BOOST ");
-    if (ups_status & UPS_ONLINE)
-        strcat(status, "OL ");
-    if (ups_status & UPS_ONBATT) 
-        strcat(status, "OB ");
-    if (ups_status & UPS_OVERLOAD)
-        strcat(status, "OVER ");
-    if (ups_status & UPS_BATTLOW) 
-        strcat(status, "LB ");
-    if (ups_status & UPS_REPLACEBATT)
-        strcat(status, "RB ");
-    if (ups_status & UPS_COMMLOST)
-        strcat(status, "CL ");
-    if (ups_status & UPS_SHUTDOWN)
-        strcat(status, "SD ");
-    if (ups_status & UPS_SLAVE)
-        strcat(status, "SLAVE ");
+    if (ups_status & UPS_calibration) 
+       strcat(status, "CAL ");
+    if (ups_status & UPS_trim)
+       strcat(status, "TRIM ");
+    if (ups_status & UPS_boost)
+       strcat(status, "BOOST ");
+    if (ups_status & UPS_online)
+       strcat(status, "OL ");
+    if (ups_status & UPS_onbatt) 
+       strcat(status, "OB ");
+    if (ups_status & UPS_overload)
+       strcat(status, "OVER ");
+    if (ups_status & UPS_battlow) 
+       strcat(status, "LB ");
+    if (ups_status & UPS_replacebatt)
+       strcat(status, "RB ");
+    if (ups_status & UPS_commlost)
+       strcat(status, "CL ");
+    if (ups_status & UPS_shutdown)
+       strcat(status, "SD ");
+    if (ups_status & UPS_slave)
+       strcat(status, "SLAVE ");
 
     stat = strtok (status, " ");
     while (stat != NULL) {  

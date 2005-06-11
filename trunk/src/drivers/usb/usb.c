@@ -261,7 +261,7 @@ int usb_ups_read_volatile_data(UPSINFO *ups)
     * MAX_VOLATILE_POLL_RATE seconds. This prevents flailing around
     * too much if the UPS state is rapidly changing while on mains.
     */
-   if (ups->is_status_set(UPS_ONBATT) && last_poll &&
+   if (ups->is_onbatt() && last_poll &&
        (now - last_poll < MAX_VOLATILE_POLL_RATE)) {
       return 1;
    }
@@ -285,28 +285,28 @@ int usb_ups_read_volatile_data(UPSINFO *ups)
          Dmsg0(200, "DISCHARGING\n");
       }
       if (pusb_get_value(ups, CI_BelowRemCapLimit, &uval) && uval.iValue) {
-         ups->set_status(UPS_BATTLOW);
+         ups->set_battlow();
          Dmsg1(200, "BelowRemCapLimit=%d\n", uval.iValue);
       }
       if (pusb_get_value(ups, CI_RemTimeLimitExpired, &uval) && uval.iValue) {
-         ups->set_status(UPS_BATTLOW);
+         ups->set_battlow();
          Dmsg0(200, "RemTimeLimitExpired\n");
       }
       if (pusb_get_value(ups, CI_ShutdownImminent, &uval) && uval.iValue) {
-         ups->set_status(UPS_BATTLOW);
+         ups->set_battlow();
          Dmsg0(200, "ShutdownImminent\n");
       }
       if (pusb_get_value(ups, CI_Boost, &uval) && uval.iValue)
-         ups->set_status(UPS_SMARTBOOST);
+         ups->set_boost();
 
       if (pusb_get_value(ups, CI_Trim, &uval) && uval.iValue)
-         ups->set_status(UPS_SMARTTRIM);
+         ups->set_trim();
 
       if (pusb_get_value(ups, CI_Overload, &uval) && uval.iValue)
-         ups->set_status(UPS_OVERLOAD);
+         ups->set_overload();
 
       if (pusb_get_value(ups, CI_NeedReplacement, &uval) && uval.iValue)
-         ups->set_status(UPS_REPLACEBATT);
+         ups->set_replacebatt();
    }
 
    /* LINE_VOLTAGE */

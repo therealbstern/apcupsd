@@ -665,7 +665,7 @@ void init_ups_struct(UPSINFO *ups)
 
    ups->fd = -1;
 
-   ups->set_status(UPS_PLUGGED);
+   ups->set_plugged();
 
    astrncpy(ups->enable_access.name, accesses[0].name,
       sizeof(ups->enable_access.name));
@@ -714,11 +714,11 @@ void init_ups_struct(UPSINFO *ups)
 
    ups->lockfile = -1;
 
-   ups->clear_status(UPS_SHUT_LOAD);
-   ups->clear_status(UPS_SHUT_BTIME);
-   ups->clear_status(UPS_SHUT_LTIME);
-   ups->clear_status(UPS_SHUT_EMERG);
-   ups->clear_status(UPS_SHUT_REMOTE);
+   ups->clear_shut_load();
+   ups->clear_shut_btime();
+   ups->clear_shut_ltime();
+   ups->clear_shut_emerg();
+   ups->clear_shut_remote();
    ups->remote_state = TRUE;
 
    ups->sysfac = LOG_DAEMON;
@@ -922,9 +922,9 @@ jump_into_the_loop:
    }
 
    if (ups->PoweredByUPS)
-      ups->set_status(UPS_PLUGGED);
+      ups->set_plugged();
    else
-      ups->clear_status(UPS_PLUGGED);
+      ups->clear_plugged();
 
 bail_out:
    if (errors)

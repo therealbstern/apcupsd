@@ -1,11 +1,11 @@
 /*
- * apc_struct.h
+ * struct.h
  *
  * Common apcupsd structures.
  */
 
 /*
- * Copyright (C) 2000-2004 Kern Sibbald
+ * Copyright (C) 2000-2005 Kern Sibbald
  * Copyright (C) 1996-1999 Andre M. Hedrick <andre@suse.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -23,8 +23,8 @@
  * MA 02111-1307, USA.
  */
 
-#ifndef _APC_STRUCT_H
-#define _APC_STRUCT_H
+#ifndef _STRUCT_H
+#define _STRUCT_H
 
 typedef enum {
    NO_CABLE = 0,        /* Default Disable            */
@@ -189,12 +189,7 @@ typedef struct netdata {
 } NETDATA;
 
 
-/*
- * The following define MUST be changed each time you
- * change something in the upsinfo structure. Otherwise, you
- * risk to have users reading the shared memory with an old
- * nonvalid upsinfo structure. 
- */
+/* No longer really needed since we do not use shared memory */
 #define UPSINFO_VERSION 12
 
 /*
@@ -207,56 +202,79 @@ typedef struct netdata {
 class UPSINFO {
  public:
    /* Methods */
-   void set_battlow() { Status |= UPS_battlow; };
    void clear_battlow() { Status &= ~UPS_battlow; };
-   void set_slave() { Status |= UPS_slave; };
-   void clear_slave() { Status &= ~UPS_slave; };
-   void set_online() { Status |= UPS_online; Status &= ~UPS_onbatt; };
-   void clear_online() { Status |= UPS_onbatt; Status &= ~UPS_online; };
-   void set_replacebatt() { Status |= UPS_replacebatt; };
-   void clear_replacebatt() { Status &= ~UPS_replacebatt; };
-   void set_commlost() { Status |= UPS_commlost; };
-   void clear_commlost() { Status &= ~UPS_commlost; };
-   void set_shutdown() { Status |= UPS_shutdown; };
-   void clear_shutdown() { Status &= ~UPS_shutdown; };
-   void set_slavedown() { Status |= UPS_slavedown; };
-   void clear_slavedown() { Status &= ~UPS_slavedown; };
-   void set_shutdownimm() { Status |= UPS_shutdownimm; };
-   void clear_shutdownimm() { Status &= ~UPS_shutdownimm; };
-   void set_belowcaplimit() { Status |= UPS_belowcaplimit; };
    void clear_belowcaplimit() { Status &= ~UPS_belowcaplimit; };
-   void set_remtimelimit() { Status |= UPS_remtimelimit; };
-   void clear_remtimelimit() { Status &= ~UPS_remtimelimit; };
-   void set_prev_onbatt() { Status |= UPS_prev_onbatt; };
-   void clear_prev_onbatt() { Status &= ~UPS_prev_onbatt; };
-   void set_prev_battlow() { Status |= UPS_prev_battlow; };
-   void clear_prev_battlow() { Status &= ~UPS_prev_battlow; };
-   void set_onbatt_msg() { Status |= UPS_onbatt_msg; };
-   void clear_onbatt_msg() { Status &= ~UPS_onbatt_msg; };
-   void set_fastpoll() { Status |= UPS_fastpoll; };
-   void clear_fastpoll() { Status &= ~UPS_fastpoll; };
-   void set_shut_load() { Status |= UPS_shut_load; };
-   void clear_shut_load() { Status &= ~UPS_shut_load; };
-   void set_shut_btime() { Status |= UPS_shut_btime; };
-   void clear_shut_btime() { Status &= ~UPS_shut_btime; };
-   void set_shut_ltime() { Status |= UPS_shut_ltime; };
-   void clear_shut_ltime() { Status &= ~UPS_shut_ltime; };
-   void set_shut_emerg() { Status |= UPS_shut_emerg; };
-   void clear_shut_emerg() { Status &= ~UPS_shut_emerg; };
-   void set_plugged() { Status |= UPS_plugged; };
-   void clear_plugged() { Status &= ~UPS_plugged; };
-   void set_dev_setup() { Status |= UPS_dev_setup; };
+   void clear_boost() { Status &= ~UPS_boost; };
+   void clear_calibration() { Status &= ~UPS_calibration; };
+   void clear_commlost() { Status &= ~UPS_commlost; };
    void clear_dev_setup() { Status &= ~UPS_dev_setup; };
+   void clear_fastpoll() { Status &= ~UPS_fastpoll; };
+   void clear_onbatt_msg() { Status &= ~UPS_onbatt_msg; };
+   void clear_onbatt() { Status &= ~UPS_onbatt; };
+   void clear_online() { Status |= UPS_onbatt; Status &= ~UPS_online; };
+   void clear_overload() { Status &= ~UPS_overload; };
+   void clear_plugged() { Status &= ~UPS_plugged; };
+   void clear_prev_battlow() { Status &= ~UPS_prev_battlow; };
+   void clear_prev_onbatt() { Status &= ~UPS_prev_onbatt; };
+   void clear_remtimelimit() { Status &= ~UPS_remtimelimit; };
+   void clear_replacebatt() { Status &= ~UPS_replacebatt; };
+   void clear_shut_btime() { Status &= ~UPS_shut_btime; };
+   void clear_shutdownimm() { Status &= ~UPS_shutdownimm; };
+   void clear_shutdown() { Status &= ~UPS_shutdown; };
+   void clear_shut_emerg() { Status &= ~UPS_shut_emerg; };
+   void clear_shut_load() { Status &= ~UPS_shut_load; };
+   void clear_shut_ltime() { Status &= ~UPS_shut_ltime; };
+   void clear_shut_remote() { Status &= ~UPS_shut_remote; };
+   void clear_slavedown() { Status &= ~UPS_slavedown; };
+   void clear_slave() { Status &= ~UPS_slave; };
+   void clear_trim() { Status &= ~UPS_trim; };
 
-   /* General set/clear/test bit. */           
-   void set_status(int bit) { Status |= bit; };
-   void clear_status(int bit) { Status &= ~bit; };
-   bool is_status_set(int bit) const { return (Status & bit) == bit; };
+   void set_battlow() { Status |= UPS_battlow; };
+   void set_belowcaplimit() { Status |= UPS_belowcaplimit; };
+   void set_boost() { Status |= UPS_boost; };
+   void set_calibration() { Status |= UPS_calibration; };
+   void set_commlost() { Status |= UPS_commlost; };
+   void set_dev_setup() { Status |= UPS_dev_setup; };
+   void set_fastpoll() { Status |= UPS_fastpoll; };
+   void set_onbatt_msg() { Status |= UPS_onbatt_msg; };
+   void set_onbatt() { Status |= UPS_onbatt; };
+   void set_online() { Status |= UPS_online; Status &= ~UPS_onbatt; };
+   void set_overload() { Status |= UPS_overload; };
+   void set_plugged() { Status |= UPS_plugged; };
+   void set_prev_battlow() { Status |= UPS_prev_battlow; };
+   void set_prev_onbatt() { Status |= UPS_prev_onbatt; };
+   void set_remtimelimit() { Status |= UPS_remtimelimit; };
+   void set_replacebatt() { Status |= UPS_replacebatt; };
+   void set_shut_btime() { Status |= UPS_shut_btime; };
+   void set_shutdownimm() { Status |= UPS_shutdownimm; };
+   void set_shutdown() { Status |= UPS_shutdown; };
+   void set_shut_emerg() { Status |= UPS_shut_emerg; };
+   void set_shut_load() { Status |= UPS_shut_load; };
+   void set_shut_ltime() { Status |= UPS_shut_ltime; };
+   void set_shut_remote() { Status |= UPS_shut_remote; };
+   void set_slavedown() { Status |= UPS_slavedown; };
+   void set_slave() { Status |= UPS_slave; };
+   void set_trim() { Status |= UPS_trim; };
 
-   bool is_onbatt() const { return (Status & UPS_onbatt) == UPS_onbatt; };
    bool is_battlow() const { return (Status & UPS_battlow) == UPS_battlow; };
-   bool is_replacebatt() const { return (Status & UPS_replacebatt) == UPS_replacebatt; };
    bool is_boost() const { return (Status & UPS_boost) == UPS_boost; };
+   bool is_calibration() const { return (Status & UPS_calibration) == UPS_calibration; };
+   bool is_commlost() const { return (Status & UPS_commlost) == UPS_commlost; };
+   bool is_dev_setup() const { return (Status & UPS_dev_setup) == UPS_dev_setup; };
+   bool is_fastpoll() const { return (Status & UPS_fastpoll) == UPS_fastpoll; };
+   bool is_onbatt() const { return (Status & UPS_onbatt) == UPS_onbatt; };
+   bool is_onbatt_msg() const { return (Status & UPS_onbatt_msg) == UPS_onbatt_msg; };
+   bool is_online() const { return (Status & UPS_online) == UPS_online; };
+   bool is_overload() const { return (Status & UPS_overload) == UPS_overload; };
+   bool is_plugged() const { return (Status & UPS_plugged) == UPS_plugged; };
+   bool is_prev_battlow() const { return (Status & UPS_prev_battlow) == UPS_prev_battlow; };
+   bool is_prev_onbatt() const { return (Status & UPS_prev_onbatt) == UPS_prev_onbatt; };
+   bool is_replacebatt() const { return (Status & UPS_replacebatt) == UPS_replacebatt; };
+   bool is_shutdown() const { return (Status & UPS_shutdown) == UPS_shutdown; };
+   bool is_shutdownimm() const { return (Status & UPS_shutdownimm) == UPS_shutdownimm; };
+   bool is_shut_remote() const { return (Status & UPS_shut_remote) == UPS_shut_remote; };
+   bool is_slave() const { return (Status & UPS_slave) == UPS_slave; };
+   bool is_slavedown() const { return (Status & UPS_slavedown) == UPS_slavedown; };
    bool is_trim() const { return (Status & UPS_trim) == UPS_trim; };
 
    /* DATA */
@@ -467,13 +485,4 @@ typedef struct {
    int authlevel;
 } NETCMD;
 
-#if defined(_SEM_SEMUN_UNDEFINED)
-union semun {
-   int val;                        /* value for SETVAL */
-   struct semid_ds *buf;           /* buffer for IPC_STAT & IPC_SET */
-   unsigned short int *array;      /* array for GETALL & SETALL */
-   struct seminfo *__buf;          /* buffer for IPC_INFO */
-};
-#endif
-
-#endif   /* _APC_STRUCT_H */
+#endif   /* _STRUCT_H */

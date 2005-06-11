@@ -2,6 +2,18 @@
                         Kern Sibbald
 
 General:
+11Jun05
+- Renamed:
+    apc_defines.h  defines.h
+    apc_struct.h   struct.h
+    apc_drivers.h  drivers.h
+    apc_nis.h      nis.h
+    apc_extern.h   extern.h 
+- Replace all old bit set/tests with methods. There are a
+  few exceptions to this (multimon.c, ...) generally where
+  status bits from the network are being examined.
+
+
 06Jun05
 - Implement trace to file with -T option.
 - Convert all set/clear/test of Status to method accesses.

@@ -1,7 +1,7 @@
 /*
- * apc_nis.h
+ * nis.h
  *
- * Include file for apc_nis.c definitions
+ * Include file for nis.c definitions
  */
 
 /*

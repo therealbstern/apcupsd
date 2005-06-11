@@ -137,11 +137,11 @@
 
 #include "apc_i18n.h"
 #include "version.h"
-#include "apc_defines.h"
-#include "apc_struct.h"
-#include "apc_drivers.h"
-#include "apc_nis.h"
-#include "apc_extern.h"
+#include "defines.h"
+#include "struct.h"
+#include "drivers.h"
+#include "nis.h"
+#include "extern.h"
 
 /* System includes conditionally included */
 
