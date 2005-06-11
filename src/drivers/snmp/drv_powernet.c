@@ -40,20 +40,20 @@ static int powernet_check_comm_lost(UPSINFO *ups)
     * Web/SNMP->UPS serial COMMLOST.
     */
    if (powernet_mib_mgr_get_upsComm(s, &(data->upsComm)) < 0) {
-      ups->set_status(UPS_COMMLOST);
+      ups->set_commlost();
       ret = 0;
       goto out;
    } else {
-      ups->clear_status(UPS_COMMLOST);
+      ups->clear_commlost();
    }
 
    if (data->upsComm) {
       if (data->upsComm->__upsCommStatus == 2) {
-         ups->set_status(UPS_COMMLOST);
+         ups->set_commlost();
          ret = 0;
          goto out;
       } else {
-         ups->clear_status(UPS_COMMLOST);
+         ups->clear_commlost();
       }
    }
 
@@ -298,13 +298,13 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups)
    if (data->upsBasicBattery) {
       switch (data->upsBasicBattery->__upsBasicBatteryStatus) {
       case 2:
-         ups->clear_status(UPS_BATTLOW);
+         ups->clear_battlow();
          break;
       case 3:
-         ups->set_status(UPS_BATTLOW);
+         ups->set_battlow();
          break;
       default:                    /* Unknown, assume battery is ok */
-         ups->clear_status(UPS_BATTLOW);
+         ups->clear_battlow();
          break;
       }
       free(data->upsBasicBattery);
@@ -318,9 +318,9 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups)
       ups->TimeLeft = data->upsAdvBattery->__upsAdvBatteryRunTimeRemaining / 6000;
 
       if (data->upsAdvBattery->__upsAdvBatteryReplaceIndicator == 2)
-         ups->set_status(UPS_REPLACEBATT);
+         ups->set_replacebatt();
       else
-         ups->clear_status(UPS_REPLACEBATT);
+         ups->clear_replacebatt();
 
       free(data->upsAdvBattery);
    }
@@ -379,24 +379,24 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups)
    if (data->upsBasicOutput) {
       /* Clear the following flags: only one status will be TRUE */
       Dmsg1(99, "Status before clearing: %d\n", ups->Status);
-      ups->clear_status(UPS_ONLINE);
-      ups->clear_status(UPS_ONBATT);
-      ups->clear_status(UPS_SMARTBOOST);
-      ups->clear_status(UPS_SMARTTRIM);
+      ups->clear_online();
+      ups->clear_onbatt();
+      ups->clear_boost();
+      ups->clear_trim();
       Dmsg1(99, "Status after clearing: %d\n", ups->Status);
 
       switch (data->upsBasicOutput->__upsBasicOutputStatus) {
       case 2:
-         ups->set_status(UPS_ONLINE);
+         ups->set_online();
          break;
       case 3:
-         ups->set_status(UPS_ONBATT);
+         ups->set_onbatt();
          break;
       case 4:
-         ups->set_status(UPS_SMARTBOOST);
+         ups->set_boost();
          break;
       case 12:
-         ups->set_status(UPS_SMARTTRIM);
+         ups->set_trim();
          break;
       case 1:                     /* unknown */
       case 5:                     /* timed sleeping */
@@ -452,9 +452,9 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups)
       // ups->LastSTTime = data->upsAdvTest->upsAdvTestLastDiagnosticsDate;
 
       if (data->upsAdvTest->__upsAdvTestCalibrationResults == 3)
-         ups->set_status(UPS_CALIBRATION);
+         ups->set_calibration();
       else
-         ups->clear_status(UPS_CALIBRATION);
+         ups->clear_calibration();
 
       free(data->upsAdvTest);
    }
@@ -476,13 +476,13 @@ int powernet_snmp_ups_check_state(UPSINFO *ups)
    if (data->upsBasicBattery) {
       switch (data->upsBasicBattery->__upsBasicBatteryStatus) {
       case 2:
-         ups->clear_status(UPS_BATTLOW);
+         ups->clear_battlow();
          break;
       case 3:
-         ups->set_status(UPS_BATTLOW);
+         ups->set_battlow();
          break;
       default:                    /* Unknown, assume battery is ok */
-         ups->clear_status(UPS_BATTLOW);
+         ups->clear_battlow();
          break;
       }
       free(data->upsBasicBattery);
@@ -491,9 +491,9 @@ int powernet_snmp_ups_check_state(UPSINFO *ups)
    powernet_mib_mgr_get_upsAdvBattery(s, &(data->upsAdvBattery));
    if (data->upsAdvBattery) {
       if (data->upsAdvBattery->__upsAdvBatteryReplaceIndicator == 2)
-         ups->set_status(UPS_REPLACEBATT);
+         ups->set_replacebatt();
       else
-         ups->clear_status(UPS_REPLACEBATT);
+         ups->clear_replacebatt();
 
       free(data->upsAdvBattery);
    }
@@ -502,24 +502,24 @@ int powernet_snmp_ups_check_state(UPSINFO *ups)
    if (data->upsBasicOutput) {
       /* Clear the following flags: only one status will be TRUE */
       Dmsg1(99, "Status before clearing: %d\n", ups->Status);
-      ups->clear_status(UPS_ONLINE);
-      ups->clear_status(UPS_ONBATT);
-      ups->clear_status(UPS_SMARTBOOST);
-      ups->clear_status(UPS_SMARTTRIM);
+      ups->clear_online();
+      ups->clear_onbatt();
+      ups->clear_boost();
+      ups->clear_trim();
       Dmsg1(99, "Status after clearing: %d\n", ups->Status);
 
       switch (data->upsBasicOutput->__upsBasicOutputStatus) {
       case 2:
-         ups->set_status(UPS_ONLINE);
+         ups->set_online();
          break;
       case 3:
-         ups->set_status(UPS_ONBATT);
+         ups->set_onbatt();
          break;
       case 4:
-         ups->set_status(UPS_SMARTBOOST);
+         ups->set_boost();
          break;
       case 12:
-         ups->set_status(UPS_SMARTTRIM);
+         ups->set_trim();
          break;
       case 1:                     /* unknown */
       case 5:                     /* timed sleeping */
@@ -538,9 +538,9 @@ int powernet_snmp_ups_check_state(UPSINFO *ups)
    powernet_mib_mgr_get_upsAdvTest(s, &(data->upsAdvTest));
    if (data->upsAdvTest) {
       if (data->upsAdvTest->__upsAdvTestCalibrationResults == 3)
-         ups->set_status(UPS_CALIBRATION);
+         ups->set_calibration();
       else
-         ups->clear_status(UPS_CALIBRATION);
+         ups->clear_calibration();
 
       free(data->upsAdvTest);
    }

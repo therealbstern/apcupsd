@@ -183,7 +183,7 @@ static int poll_ups(UPSINFO *ups)
       log_event(ups, LOG_ERR, "fetch_data: tcp_open failed for %s port %d",
          nid->hostname, nid->port);
       Dmsg0(90, "Exit poll_ups 0 comm lost\n");
-      ups->set_status(UPS_COMMLOST);
+      ups->set_commlost();
       return 0;
    }
 
@@ -191,7 +191,7 @@ static int poll_ups(UPSINFO *ups)
       log_event(ups, LOG_ERR, "fill_buffer: write error on socket.");
       net_close(nid->sockfd);
       Dmsg0(90, "Exit poll_ups 0 no status flag\n");
-      ups->set_status(UPS_COMMLOST);
+      ups->set_commlost();
       return 0;
    }
 
@@ -206,9 +206,9 @@ static int poll_ups(UPSINFO *ups)
    if (n < 0) {
       stat = 0;
       Dmsg0(90, "Exit poll_ups 0 bad stat net_recv\n");
-      ups->set_status(UPS_COMMLOST);
+      ups->set_commlost();
    } else {
-      ups->clear_status(UPS_COMMLOST);
+      ups->clear_commlost();
    }
    net_close(nid->sockfd);
 
@@ -253,7 +253,7 @@ static bool fill_status_buffer(UPSINFO *ups)
 
       sleep(SLEEP_TIME);
       comm_err = true;
-      ups->set_status(UPS_COMMLOST);
+      ups->set_commlost();
    }
 
    if (comm_err) {
@@ -263,7 +263,7 @@ static bool fill_status_buffer(UPSINFO *ups)
       nid->last_fill_time = now;
    }
 
-   ups->clear_status(UPS_COMMLOST);
+   ups->clear_commlost();
 
    if (!nid->got_caps)
       net_ups_get_capabilities(ups);
@@ -316,9 +316,9 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
        * Make sure we don't override local bits, and that
        * all non-local bits are set/cleared correctly.
        *
-       * local bits = UPS_COMMLOST|UPS_SHUTDOWN|UPS_SLAVE|UPS_SLAVEDOWN|
-       *              UPS_PREV_ONBATT|UPS_PREV_BATTLOW|UPS_ONBATT_MSG|
-       *              UPS_FASTPOLL|UPS_PLUGGED|UPS_DEV_SETUP
+       * local bits = UPS_commlost|UPS_shutdown|UPS_slave|UPS_slavedown|
+       *              UPS_prev_onbatt|UPS_prev_battlow|UPS_onbatt_msg|
+       *              UPS_fastpoll|UPS_plugged|UPS_dev_setup
        */
 
       /* First transfer set or not set all non-local bits */
@@ -331,15 +331,15 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
        * Now set any special bits, note this is set only, we do
        * not clear these bits, but let our own core code clear them
        */
-      newStatus = masterStatus & (UPS_COMMLOST | UPS_FASTPOLL);
+      newStatus = masterStatus & (UPS_commlost | UPS_fastpoll);
       ups->Status |= newStatus;
    }
 
    Dmsg2(100, "Got Status = %s 0x%x\n", answer, ups->Status);
 
-   if (masterStatus & (UPS_SHUTDOWN | UPS_SHUTDOWNIMM |
-                       UPS_BELOWCAPLIMIT | UPS_REMTIMELIMIT)) {
-      ups->set_status(UPS_SHUT_REMOTE);    /* if master is shutting down so do we */
+   if (masterStatus & (UPS_shutdown | UPS_shutdownimm |
+                       UPS_belowcaplimit | UPS_remtimelimit)) {
+      ups->set_shut_remote();    /* if master is shutting down so do we */
       log_event(ups, LOG_ERR, "Shutdown because NIS master is shutting down.");
       Dmsg0(100, "Set SHUT_REMOTE because of master status.\n");
    }
@@ -350,9 +350,9 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
     * consequtive pass here. While on batteries, this code
     * is called once per second.
     */
-   if (stat == 0 && ups->is_status_set(UPS_ONBATT)) {
+   if (stat == 0 && ups->is_onbatt()) {
       if (comm_loss++ == 4) {
-         ups->set_status(UPS_SHUT_REMOTE);
+         ups->set_shut_remote();
          log_event(ups, LOG_ERR,
             "Shutdown because loss of comm with NIS master while on batteries.");
          Dmsg0(100, "Set SHUT_REMOTE because of loss of comm on batteries.\n");
@@ -483,7 +483,7 @@ int net_ups_read_volatile_data(UPSINFO *ups)
       return 0;
 
    write_lock(ups);
-   ups->set_status(UPS_SLAVE);
+   ups->set_slave();
 
    /* ***FIXME**** poll time needs to be scanned */
    ups->poll_time = time(NULL);

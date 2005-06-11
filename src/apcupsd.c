@@ -291,7 +291,7 @@ int main(int argc, char *argv[])
       case NETSLAVE:
          if (kill_ups_power)
             Error_abort0(_("Ignoring killpower for slave\n"));
-         ups->set_status(UPS_SLAVE);
+         ups->set_slave();
          setup_device(ups);
          if (prepare_slave(ups))
             Error_abort0(_("Error setting up slave\n"));
@@ -317,7 +317,7 @@ int main(int argc, char *argv[])
    }
 
    if (kill_ups_power) {
-      if (!ups->is_status_set(UPS_SLAVE))
+      if (!ups->is_slave())
          kill_power(ups);
       else
          kill_net(ups);
@@ -330,7 +330,7 @@ int main(int argc, char *argv[])
          ups->device);
    }
 
-   if (!ups->is_status_set(UPS_SLAVE)) {
+   if (!ups->is_slave()) {
       prep_device(ups);
       /*
        * This isn't a documented option but can be used
@@ -368,7 +368,7 @@ int main(int argc, char *argv[])
     * If we have threads, we simply go there rather
     * than creating a thread.
     */
-   if (!ups->is_status_set(UPS_SLAVE)) {
+   if (!ups->is_slave()) {
       /* serial port reading and report generation -- apcserial.c */
       do_device(ups);
    } else {

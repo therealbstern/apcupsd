@@ -1,5 +1,5 @@
 /*
- * apc_drivers.h
+ * drivers.h
  *
  * Header file for exporting UPS drivers.
  */
@@ -23,8 +23,8 @@
  * MA 02111-1307, USA.
  */
 
-#ifndef _APC_DRIVERS_H
-#define _APC_DRIVERS_H
+#ifndef _DRIVERS_H
+#define _DRIVERS_H
 
 /*
  * This is the generic drivers structure. It contain any routine needed for
@@ -159,4 +159,4 @@ typedef struct upsdriver {
 /* Support routines. */
 const UPSDRIVER *attach_driver(UPSINFO *ups);
 
-#endif /*_APC_DRIVERS_H */
+#endif /*_DRIVERS_H */

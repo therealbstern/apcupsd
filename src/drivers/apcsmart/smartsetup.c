@@ -52,7 +52,7 @@ int apcsmart_ups_open(UPSINFO *ups)
    /*
     * For a slave, we skip actually setting up the serial port
     */
-   if (ups->is_status_set(UPS_SLAVE)) {
+   if (ups->is_slave()) {
       ups->fd = -1;
       return 1;
    }

@@ -192,7 +192,7 @@ static int open_usb_device(UPSINFO *ups)
     * Note, we set ups->fd here so the "core" of apcupsd doesn't
     * think we are a slave, which is what happens when it is -1.
     * (ADK: Actually this only appears to be true for apctest as
-    * apcupsd proper uses the UPS_SLAVE flag.)
+    * apcupsd proper uses the UPS_slave flag.)
     * Internally, we use the fd in our own private space   
     */
    ups->fd = 1;
@@ -293,7 +293,7 @@ static int usb_link_check(UPSINFO *ups)
 
    linkcheck = true;               /* prevent recursion */
 
-   ups->set_status(UPS_COMMLOST);
+   ups->set_commlost();
    Dmsg0(200, "link_check comm lost\n");
 
    /* Don't warn until we try to get it at least 2 times and fail */
@@ -331,7 +331,7 @@ static int usb_link_check(UPSINFO *ups)
 
    if (!comm_err) {
       generate_event(ups, CMDCOMMOK);
-      ups->clear_status(UPS_COMMLOST);
+      ups->clear_commlost();
       Dmsg0(200, "link check comm OK.\n");
    }
 
@@ -654,7 +654,7 @@ int pusb_ups_check_state(UPSINFO *ups)
          value = hid_get_data(buf + 1, &my_data->info[CI_Discharging]->item);
 
          /* If first time on batteries, debounce */
-         if (!ups->is_status_set(UPS_ONBATT) && value)
+         if (!ups->is_onbatt() && value)
             my_data->debounce = time(NULL);
 
          if (value)
@@ -667,18 +667,18 @@ int pusb_ups_check_state(UPSINFO *ups)
          value = hid_get_data(buf + 1, &my_data->info[CI_BelowRemCapLimit]->item);
 
          if (value)
-            ups->set_status(UPS_BATTLOW);
+            ups->set_battlow();
          else
-            ups->clear_status(UPS_BATTLOW);
+            ups->clear_battlow();
 
-         Dmsg1(200, "UPS_BATTLOW = %d\n", ups->is_status_set(UPS_BATTLOW));
+         Dmsg1(200, "UPS_battlow = %d\n", ups->is_battlow());
       }
 
       if (MATCH_CI(CI_ACPresent)) {
          value = hid_get_data(buf + 1, &my_data->info[CI_ACPresent]->item);
 
          /* If first time on batteries, debounce */
-         if (!ups->is_status_set(UPS_ONBATT) && !value)
+         if (!ups->is_onbatt() && !value)
             my_data->debounce = time(NULL);
 
          if (!value)
@@ -705,20 +705,20 @@ int pusb_ups_check_state(UPSINFO *ups)
          value = hid_get_data(buf + 1, &my_data->info[CI_NeedReplacement]->item);
 
          if (value)
-            ups->set_status(UPS_REPLACEBATT);
+            ups->set_replacebatt();
          else
-            ups->clear_status(UPS_REPLACEBATT);
+            ups->clear_replacebatt();
       }
 
       if (MATCH_CI(CI_ShutdownImminent)) {
          value = hid_get_data(buf + 1, &my_data->info[CI_ShutdownImminent]->item);
 
          if (value)
-            ups->set_status(UPS_SHUTDOWNIMM);
+            ups->set_shutdownimm();
          else
-            ups->clear_status(UPS_SHUTDOWNIMM);
+            ups->clear_shutdownimm();
 
-         Dmsg1(200, "ShutdownImminent=%d\n", ups->is_status_set(UPS_SHUTDOWNIMM));
+         Dmsg1(200, "ShutdownImminent=%d\n", ups->is_shutdownimm());
       }
 
       Dmsg1(200, "Status=%d\n", ups->Status);
@@ -772,7 +772,7 @@ int pusb_ups_open(UPSINFO *ups)
       }
    }
 
-   ups->clear_status(UPS_SLAVE);
+   ups->clear_slave();
    write_unlock(ups);
    return 1;
 }

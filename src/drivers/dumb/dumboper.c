@@ -148,17 +148,17 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
        * This is the ONBATT signal sent by UPS.
        */
       if (my_data->sp_flags & TIOCM_CD)
-         ups->set_status(UPS_ONBATT);
+         ups->set_onbatt();
       else
-         ups->clear_status(UPS_ONBATT);
+         ups->clear_onbatt();
 
       /*
        * This is the ONLINE signal that is delivered
-       * by CUSTOM_SIMPLE cable. We use the UPS_ONLINE flag
+       * by CUSTOM_SIMPLE cable. We use the UPS_online flag
        * to report this condition to apcaction.
        * If we are both ONBATT and ONLINE there is clearly
        * something wrong with battery or charger. Set also the
-       * UPS_REPLACEBATT flag if needed.
+       * UPS_replacebatt flag if needed.
        */
       if (my_data->sp_flags & TIOCM_SR) {
          ups->clear_online();
@@ -166,7 +166,7 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
          ups->set_online();
       }
 
-      if (ups->is_status_set(UPS_ONLINE) && ups->is_status_set(UPS_ONBATT))
+      if (ups->is_online() && ups->is_onbatt())
          BattFail = true;
       else
          BattFail = false;
@@ -296,7 +296,7 @@ int dumb_ups_entry_point(UPSINFO *ups, int command, void *data)
           *
           * Now enable the DTR for the CUSTOM_SIMPLE cable
           * Note: this enables the the CTS bit, which allows
-          * us to detect the UPS_BATTLOW condition!!!!
+          * us to detect the UPS_battlow condition!!!!
           */
          serial_bits = TIOCM_DTR;
          (void)ioctl(ups->fd, TIOCMBIS, &serial_bits);

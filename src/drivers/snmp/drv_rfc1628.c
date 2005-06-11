@@ -40,11 +40,11 @@ static int rfc_1628_check_alarms(UPSINFO *ups)
     * alarms.
     */
    if (ups_mib_mgr_get_upsAlarmEntry(s, &(data->upsAlarmEntry)) == -1) {
-      ups->set_status(UPS_COMMLOST);
+      ups->set_commlost();
       free(data->upsAlarmEntry);
       return 0;
    } else {
-      ups->clear_status(UPS_COMMLOST);
+      ups->clear_commlost();
    }
 
    free(data->upsAlarmEntry);
