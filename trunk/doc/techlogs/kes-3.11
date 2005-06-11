@@ -12,8 +12,6 @@ General:
 - Replace all old bit set/tests with methods. There are a
   few exceptions to this (multimon.c, ...) generally where
   status bits from the network are being examined.
-
-
 06Jun05
 - Implement trace to file with -T option.
 - Convert all set/clear/test of Status to method accesses.
