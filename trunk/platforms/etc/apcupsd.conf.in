@@ -22,53 +22,56 @@
 # list.
 UPSCABLE @UPSCABLE@
 #
-# Old types, still valid, are mapped to the new drivers
-# 
-#           keyword       driver used     
-# UPSTYPE [ backups        dumb
-#         | sharebasic     dumb
-#         | netups         dumb
-#         | backupspro     apcsmart
-#         | smartvsups     apcsmart
-#         | newbackupspro  apcsmart
-#         | backupspropnp  apcsmart
-#         | smartups       apcsmart
-#         | matrixups      apcsmart
-#         | sharesmart     apcsmart
 #
-# *** New driver names. They can be used directly 
-#       rather than using one of the above aliases.
+# To get apcupsd to work, in addition to defining the cable
+#  above, you must also define a UPSTYPE, which corresponds to
+#  the type of UPS you have (see the Description for more details).
+#  You must also specify a DEVICE, sometimes referred to as a port.
+#  For USB UPSes, please leave the DEVICE directive blank. For
+#  other UPS types, you must specify an appropriate port or address.
 #
-# UPSTYPE [ dumb | apcsmart | net | usb | snmp | test]
+# UPSTYPE   DEVICE           Description
+# apcsmart  /dev/tty**       Newer serial character device.
 #
-# defines the driver to use for your type of UPS
+# usb       <BLANK>          Most new UPSes are USB.
+#                            A blank DEVICE setting enables
+#                            autodetection, best choice for most
+#                            installations.
+#
+# net       hostname:port    Network link to a master apcupsd
+#                            through apcupsd's Network Information
+#                            server. This is used if you don't have
+#                            a UPS directly connected to your computer.
+#
+# snmp      hostname:port:vendor:community
+#                            SNMP Network link to an SNMP-enabled
+#                            UPS device. Vendor is the MIB used by
+#                            the UPS device: can be "APC" or "RFC"
+#                            where APC is the powernet MIB and RFC
+#                            is the IETF's rfc1628 UPS-MIB.
+#                            Port is usually 161.
+#
+# dumb      /dev/tty**       Old, old serial character device
+#
 UPSTYPE @UPSTYPE@
-#
-#
-#DEVICE <string> /dev/<serial port>
-# name of your UPS device
-#
-# Here is a table of the possible devices and the related UPS drivers.
-#  Select a device from the "Device" column that corresponds to
-#  your driver as specified in the UPSTYPE directive above,
-#  and how you have connected the UPS.
-#
-# Driver   Device                    Description
-# dumb     /dev/tty**                Serial character device
-# apcsmart /dev/tty**                Serial character device
-# usb      <BLANK>                   A blank DEVICE setting enables
-#                                    autodetection, best choice for most
-#                                    installations.
-# net      hostname:port             Network link to a master apcupsd
-#                                    through NIS
-# snmp     hostname:port:vendor:community
-#                                    SNMP Network link to an SNMP-enabled
-#                                    UPS device. Vendor is the MIB used by
-#                                    the UPS device: can be "APC" or "RFC"
-#                                    where APC is the powernet MIB and RFC
-#                                    is the IETF's rfc1628 UPS-MIB.
-#                                    Port is usually 161.
 DEVICE @SERIALDEV@
+
+#   If you have an old apcupsd config, you should be using the
+#     "new keyword" in places of the "old keyword" for UPSTYPE
+#     The DEVICE will be the same as before.
+#
+#          old keyword     new keyword
+#           backups        dumb
+#           sharebasic     dumb
+#           netups         dumb
+#           backupspro     apcsmart
+#           smartvsups     apcsmart
+#           newbackupspro  apcsmart
+#           backupspropnp  apcsmart
+#           smartups       apcsmart
+#           matrixups      apcsmart
+#           sharesmart     apcsmart
+#
 #
 #LOCKFILE <path to lockfile>
 # path for serial port lock file
