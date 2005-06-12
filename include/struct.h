@@ -245,8 +245,12 @@ class UPSINFO {
    void set_prev_onbatt() { Status |= UPS_prev_onbatt; };
    void set_remtimelimit() { Status |= UPS_remtimelimit; };
    void set_replacebatt() { Status |= UPS_replacebatt; };
+   void set_replacebatt(int val) { if (val) Status |= UPS_replacebatt; \
+           else Status &= ~UPS_replacebatt; };
    void set_shut_btime() { Status |= UPS_shut_btime; };
    void set_shutdownimm() { Status |= UPS_shutdownimm; };
+   void set_shutdownimm(int val) { if (val) Status |= UPS_shutdownimm; \
+           else Status &= ~UPS_shutdownimm; };
    void set_shutdown() { Status |= UPS_shutdown; };
    void set_shut_emerg() { Status |= UPS_shut_emerg; };
    void set_shut_load() { Status |= UPS_shut_load; };
