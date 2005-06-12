@@ -658,9 +658,9 @@ int pusb_ups_check_state(UPSINFO *ups)
             my_data->debounce = time(NULL);
 
          if (value)
-            ups->clear_status_online();
+            ups->clear_online();
          else
-            ups->set_status_online();
+            ups->set_online();
       }
 
       if (MATCH_CI(CI_BelowRemCapLimit)) {
@@ -682,9 +682,9 @@ int pusb_ups_check_state(UPSINFO *ups)
             my_data->debounce = time(NULL);
 
          if (!value)
-            ups->clear_status_online();
+            ups->clear_online();
          else
-            ups->set_status_online();
+            ups->set_online();
       }
 
       if (MATCH_CI(CI_RemainingCapacity)) {
