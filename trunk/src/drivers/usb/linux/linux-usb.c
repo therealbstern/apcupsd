@@ -533,17 +533,10 @@ int pusb_ups_check_state(UPSINFO *ups)
                ups->TimeLeft = ev[i].value;                 /* minutes */
 
          } else if (ev[i].hid == ups->UPS_Cmd[CI_NeedReplacement]) {
-            if (ev[i].value)
-               ups->set_replacebatt();
-            else
-               ups->clear_replacebatt();
+            ups->set_replacebatt(ev[i].value);
 
          } else if (ev[i].hid == ups->UPS_Cmd[CI_ShutdownImminent]) {
-            if (ev[i].value)
-               ups->set_shutdownimm();
-            else
-               ups->clear_shutdownimm();
-
+            ups->set_shutdownimm(ev[i].value);
             Dmsg1(200, "ShutdownImminent=%d\n", ups->is_shutdownimm());
          }
 

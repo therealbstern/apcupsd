@@ -2,6 +2,12 @@
                         Kern Sibbald
 
 General:
+12Jun05
+- Renamed:
+    apcdevice.c    device.c
+    apcreports.c   reports.c
+    apcaction.c    action.c
+- Added set_replacebatt(value) and set_shutdownimm(value)
 11Jun05
 - Renamed:
     apc_defines.h  defines.h
