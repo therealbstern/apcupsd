@@ -92,29 +92,30 @@ dnl
 
 AC_PROG_CC			dnl Determine a C compiler to use.
 AC_PROG_CPP			dnl Determine a C pre-processor to use.
-AC_PROG_CXX
+AC_PROG_CXX			dnl We require a C++ compiler now
 AC_PROG_CC_C_O			dnl Determine if C compiler support -c -o.
 AC_PROG_GCC_TRADITIONAL 	dnl Determine if ioctl() need -traditional.
 AC_PROG_INSTALL 		dnl Determine a BSD install program.
 AC_PROG_AWK
 AC_ISC_POSIX
 
-if test x$GCC = xyes
-then
-	AM_CONDITIONAL(HAVE_GCC, $TRUEPRG)
-	AC_DEFINE(HAVE_GCC)
+if test x$GCC = xyes; then
+   AM_CONDITIONAL(HAVE_GCC, $TRUEPRG)
+   AC_DEFINE(HAVE_GCC)
 else
-	AM_CONDITIONAL(HAVE_GCC, $FALSEPRG)
+   AM_CONDITIONAL(HAVE_GCC, $FALSEPRG)
 fi
 
-
+AC_PATH_PROG(CXX, $CXX, $CXX)
+if test ! -e $CXX; then
+   AC_MSG_ERROR(Unable to find C++ compiler)
+fi
 
 dnl
 dnl Supply default CFLAGS, if not specified by `CFLAGS=flags ./configure'
 dnl   but only gcc has -Wall in general
 dnl
-if test x$GCC = xyes
-then
+if test x$GCC = xyes; then
   CFLAGS=${CFLAGS-"-g -O2"}
   CFLAGS="${CFLAGS} -Wall"
   LDFLAGS=${LDFLAGS-"-g -O"}
