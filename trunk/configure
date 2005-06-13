@@ -3084,8 +3084,7 @@ ac_cpp='$CPP $CPPFLAGS'
 ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
 ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
-
-if test "x$CC" != xcc; then
+			if test "x$CC" != xcc; then
   echo "$as_me:$LINENO: checking whether $CC and cc understand -c and -o together" >&5
 echo $ECHO_N "checking whether $CC and cc understand -c and -o together... $ECHO_C" >&6
 else
@@ -3485,8 +3484,7 @@ if test "$ac_cv_search_strerror" != no; then
 fi
 
 
-if test x$GCC = xyes
-then
+if test x$GCC = xyes; then
 
 
 if $TRUEPRG; then
@@ -3496,7 +3494,7 @@ else
   HAVE_GCC_TRUE='#'
   HAVE_GCC_FALSE=
 fi
-	cat >>confdefs.h <<\_ACEOF
+   cat >>confdefs.h <<\_ACEOF
 #define HAVE_GCC 1
 _ACEOF
 
@@ -3512,10 +3510,53 @@ else
 fi
 fi
 
+# Extract the first word of "$CXX", so it can be a program name with args.
+set dummy $CXX; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_CXX+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $CXX in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_CXX="$CXX" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_CXX="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
 
+  test -z "$ac_cv_path_CXX" && ac_cv_path_CXX="$CXX"
+  ;;
+esac
+fi
+CXX=$ac_cv_path_CXX
 
-if test x$GCC = xyes
-then
+if test -n "$CXX"; then
+  echo "$as_me:$LINENO: result: $CXX" >&5
+echo "${ECHO_T}$CXX" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+if test ! -e $CXX; then
+   { { echo "$as_me:$LINENO: error: Unable to find C++ compiler" >&5
+echo "$as_me: error: Unable to find C++ compiler" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+if test x$GCC = xyes; then
   CFLAGS=${CFLAGS-"-g -O2"}
   CFLAGS="${CFLAGS} -Wall"
   LDFLAGS=${LDFLAGS-"-g -O"}

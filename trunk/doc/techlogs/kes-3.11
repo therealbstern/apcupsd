@@ -4,6 +4,7 @@
 General:
 13Jun05
 - Make /usr/share/man the default man directory.  
+- Require C++ compiler and use full path.
 12Jun05
 - Renamed:
     apcdevice.c    device.c
