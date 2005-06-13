@@ -2,6 +2,8 @@
                         Kern Sibbald
 
 General:
+13Jun05
+- Make /usr/share/man the default man directory.  
 12Jun05
 - Renamed:
     apcdevice.c    device.c

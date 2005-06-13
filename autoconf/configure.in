@@ -230,6 +230,13 @@ AC_PATH_PROGS(SED, sed)
 AC_PATH_PROGS(AR, ar)
 AC_PATH_PROGS(MV, mv)
 
+# -------------------------------------------------------------------------
+#  If the user has not set --mandir, we default to /usr/share/man
+# -------------------------------------------------------------------------
+if test x$mandir = x'${prefix}/man' ; then
+   mandir=/usr/share/man
+fi
+
 
 dnl	Check for libraries.
 dnl
@@ -1271,12 +1278,6 @@ freebsd)
     PTHREAD_CFLAGS="-pthread"
     PTHREAD_LFLAGS=""
     LDFLAGS="$LDFLAGS -pthread"
-dnl
-dnl	For FreeBSD, system man pages are in /usr/share/man, not /usr/man.
-dnl
-    if test x$prefix = xNONE -a x$mandir = x'${prefix}/man' ; then
-	mandir=/usr/share/man
-    fi
     DFILES="\
 	platforms/freebsd/Makefile \
 	platforms/freebsd/apcupsd \
@@ -1316,13 +1317,6 @@ openbsd)
     PTHREAD_CFLAGS="-pthread"
     PTHREAD_LFLAGS=""
     LDFLAGS="$LDFLAGS -pthread"
-dnl
-dnl	For OpenBSD, system man pages are in /usr/share/man, not /usr/man.
-dnl
-    if test x$prefix = xNONE -a x$mandir = x'${prefix}/man' ; then
-	mandir=/usr/share/man
-    fi
-
     DFILES="\
 	platforms/openbsd/Makefile \
 	platforms/openbsd/apcupsd \
@@ -1397,13 +1391,7 @@ sun)
     LOCKDIR=/var/spool/locks
     LOGDIR=${sysconfdir}
     APCUPSD_MAIL=/usr/bin/mailx
-dnl
-dnl	For SunOS, system man pages are in /usr/share/man, not /usr/man.
-dnl
-   if test x$prefix = xNONE -a x$mandir = x'${prefix}/man' ; then
-       mandir=/usr/share/man
-   fi
-   DFILES="\
+    DFILES="\
        platforms/sun/Makefile \
        platforms/sun/apcupsd \
        platforms/sun/rc0.solaris \
