@@ -71,7 +71,6 @@ typedef struct s_usb_info {
 typedef struct s_usb_data {
    int fd;                         /* Our UPS fd when open */
    char orig_device[MAXSTRING];    /* Original port specification */
-   short vendor;                   /* UPS vendor id */
    time_t debounce;                /* last event time for debounce */
    USB_INFO *info[CI_MAXCI + 1];   /* Info pointers for each command */
 } USB_DATA;
@@ -549,10 +548,9 @@ int pusb_ups_check_state(UPSINFO *ups)
             ev[i].report_id, ev[i].usage_code, ev[i].value);
          info->uref.value = ev[i].value;
 
-         /* Got at least 1 valid event. */
-         valid = 1;
-
-         if (info->ci == CI_Discharging) {
+         switch (info->ci)
+         {
+         case CI_Discharging:
             /* If first time on batteries, debounce */
             if (!ups->is_onbatt() && ev[i].value)
                my_data->debounce = time(NULL);
@@ -561,16 +559,10 @@ int pusb_ups_check_state(UPSINFO *ups)
                ups->clear_online();
             else
                ups->set_online();
+            valid = 1;
+            break;
 
-         } else if (info->ci == CI_BelowRemCapLimit) {
-            if (ev[i].value)
-               ups->set_battlow();
-            else
-               ups->clear_battlow();
-
-            Dmsg1(200, "UPS_battlow = %d\n", ups->is_battlow());
-
-         } else if (info->ci == CI_ACPresent) {
+         case CI_ACPresent:
             /* If first time on batteries, debounce */
             if (!ups->is_onbatt() && !ev[i].value)
                my_data->debounce = time(NULL);
@@ -579,22 +571,39 @@ int pusb_ups_check_state(UPSINFO *ups)
                ups->clear_online();
             else
                ups->set_online();
+            valid = 1;
+            break;
 
-         } else if (info->ci == CI_RemainingCapacity) {
-            ups->BattChg = ev[i].value;
-
-         } else if (info->ci == CI_RunTimeToEmpty) {
-            if (my_data->vendor == VENDOR_APC)
-               ups->TimeLeft = ((double)ev[i].value) / 60;  /* seconds */
+         case CI_BelowRemCapLimit:
+            if (ev[i].value)
+               ups->set_battlow();
             else
-               ups->TimeLeft = ev[i].value;                 /* minutes */
+               ups->clear_battlow();
 
-         } else if (info->ci == CI_NeedReplacement) {
+            Dmsg1(200, "UPS_battlow = %d\n", ups->is_battlow());
+            valid = 1;
+            break;
+         
+         case CI_RemainingCapacity:
+            ups->BattChg = ev[i].value;
+            valid = 1;
+            break;
+
+         case CI_RunTimeToEmpty:
+            ups->TimeLeft = ((double)ev[i].value) / 60;  /* seconds */
+            valid = 1;
+            break;
+
+         case CI_NeedReplacement:
             ups->set_replacebatt(ev[i].value);
+            valid = 1;
+            break;
 
-         } else if (info->ci == CI_ShutdownImminent) {
+         case CI_ShutdownImminent:
             ups->set_shutdownimm(ev[i].value);
             Dmsg1(200, "ShutdownImminent=%d\n", ups->is_shutdownimm());
+            valid = 1;
+            break;
          }
 
          Dmsg1(200, "Status=%d\n", ups->Status);
