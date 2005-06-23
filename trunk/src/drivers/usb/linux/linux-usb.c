@@ -518,6 +518,7 @@ int pusb_ups_check_state(UPSINFO *ups)
          sleep(sleep_time);
          my_data->debounce = 0;
       }
+
       write_lock(ups);
       for (i = 0; i < (retval / (int)sizeof(ev[0])); i++) {
          /*
@@ -575,15 +576,11 @@ int pusb_ups_check_state(UPSINFO *ups)
             break;
 
          case CI_BelowRemCapLimit:
-            if (ev[i].value)
-               ups->set_battlow();
-            else
-               ups->clear_battlow();
-
+            ups->set_battlow(ev[i].value);
             Dmsg1(200, "UPS_battlow = %d\n", ups->is_battlow());
             valid = 1;
             break;
-         
+
          case CI_RemainingCapacity:
             ups->BattChg = ev[i].value;
             valid = 1;
@@ -608,8 +605,8 @@ int pusb_ups_check_state(UPSINFO *ups)
 
          Dmsg1(200, "Status=%d\n", ups->Status);
       }
-
       write_unlock(ups);
+
       if (valid)
          break;
    }
