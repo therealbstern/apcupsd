@@ -437,17 +437,16 @@ int pusb_ups_check_state(UPSINFO *ups)
 {
    int i;
    int retval;
-   int valid = 0;
+   bool valid = false;
    struct hiddev_usage_ref ev[64];
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
    USB_INFO* info;
-   
-   struct timeval tv;
 
+   struct timeval tv;
    tv.tv_sec = ups->wait_time;
    tv.tv_usec = 0;
 
-   for (;;) {
+   while (!valid) {
       fd_set rfds;
 
       FD_ZERO(&rfds);
@@ -560,7 +559,7 @@ int pusb_ups_check_state(UPSINFO *ups)
                ups->clear_online();
             else
                ups->set_online();
-            valid = 1;
+            valid = true;
             break;
 
          case CI_ACPresent:
@@ -572,33 +571,52 @@ int pusb_ups_check_state(UPSINFO *ups)
                ups->clear_online();
             else
                ups->set_online();
-            valid = 1;
+            valid = true;
             break;
 
          case CI_BelowRemCapLimit:
             ups->set_battlow(ev[i].value);
             Dmsg1(200, "UPS_battlow = %d\n", ups->is_battlow());
-            valid = 1;
+            valid = true;
             break;
 
          case CI_RemainingCapacity:
             ups->BattChg = ev[i].value;
-            valid = 1;
+            valid = true;
             break;
 
          case CI_RunTimeToEmpty:
             ups->TimeLeft = ((double)ev[i].value) / 60;  /* seconds */
-            valid = 1;
+            valid = true;
             break;
 
          case CI_NeedReplacement:
             ups->set_replacebatt(ev[i].value);
-            valid = 1;
+            valid = true;
             break;
 
          case CI_ShutdownImminent:
             ups->set_shutdownimm(ev[i].value);
             Dmsg1(200, "ShutdownImminent=%d\n", ups->is_shutdownimm());
+            valid = true;
+            break;
+
+         /*
+          * We don't handle these directly, but rather use them as a
+          * signal to go poll the full set of volatile data.
+          */
+         case CI_IFailure:
+         case CI_Overload:
+         case CI_PWVoltageOOR:
+         case CI_PWFrequencyOOR:
+         case CI_OverCharged:
+         case CI_OverTemp:
+         case CI_CommunicationLost:
+         case CI_ChargerVoltageOOR:
+         case CI_ChargerCurrentOOR:
+         case CI_CurrentNotRegulated:
+         case CI_VoltageNotRegulated:
+         case CI_BatteryPresent:
             valid = 1;
             break;
          }
@@ -606,9 +624,6 @@ int pusb_ups_check_state(UPSINFO *ups)
          Dmsg1(200, "Status=%d\n", ups->Status);
       }
       write_unlock(ups);
-
-      if (valid)
-         break;
    }
 
    return 1;

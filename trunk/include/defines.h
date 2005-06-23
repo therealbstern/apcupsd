@@ -273,18 +273,33 @@
 #define CI_BUPHibernate                  69
 #define    BUP_CMD_Hibernate              0
 
+/*
+ * We don't actually handle these, but use them as a signal
+ * to re-examine the other UPS data items. (USB only)
+ */
+#define CI_IFailure                      70  /* Internal failure */
+#define CI_PWVoltageOOR                  71  /* Power sys voltage out of range */
+#define CI_PWFrequencyOOR                72  /* Power sys frequency out of range */
+#define CI_OverCharged                   73  /* Battery overcharged */
+#define CI_OverTemp                      74  /* Over temperature */
+#define CI_CommunicationLost             75  /* USB comms with subsystem lost */
+#define CI_ChargerVoltageOOR             76  /* Charger voltage our of range */
+#define CI_ChargerCurrentOOR             77  /* Charger current our of range */
+#define CI_CurrentNotRegulated           78  /* Charger current not regulated */
+#define CI_VoltageNotRegulated           79  /* Charger voltage not regulated */
+#define CI_BatteryPresent                80  /* Battery is present */
 
 /* Items below this line are not "probed" for */
-#define CI_CYCLE_EPROM         70       /* Cycle programmable EPROM values */
+#define CI_CYCLE_EPROM         81       /* Cycle programmable EPROM values */
 #define    APC_CMD_CYCLE_EPROM    '-'
-#define CI_UPS_CAPS            71       /* Get UPS capabilities (command) string */
+#define CI_UPS_CAPS            82       /* Get UPS capabilities (command) string */
 #define    APC_CMD_UPS_CAPS       'a'
 /* ^^^^^^^^^^ see below if you change this ^^^^^^ */
 
 /* set to last command index. CHANGE!!! when adding new code.  */
 /* vvvvvvvvvv change here vvvvvvvvvvvvvvvvvvvvvvv */
 #define CI_MAXCI         CI_UPS_CAPS    /* maximum UPS commands we handle */
-#define CI_MAX_CAPS      CI_BUPHibernate
+#define CI_MAX_CAPS      CI_BatteryPresent
 
 #define GO_ON_BATT              'W'
 #define GO_ON_LINE              'X'
