@@ -230,6 +230,8 @@ class UPSINFO {
    void clear_trim() { Status &= ~UPS_trim; };
 
    void set_battlow() { Status |= UPS_battlow; };
+   void set_battlow(int val) { if (val) Status |= UPS_battlow; \
+           else Status &= ~UPS_battlow; };
    void set_belowcaplimit() { Status |= UPS_belowcaplimit; };
    void set_boost() { Status |= UPS_boost; };
    void set_calibration() { Status |= UPS_calibration; };
