@@ -39,6 +39,13 @@
 #include <asm/types.h>
 #include <linux/hiddev.h>
 
+/* RHEL has an out-of-date hiddev.h */
+#ifndef HIDIOCGFLAG
+# define HIDIOCSFLAG       _IOW('H', 0x0F, int)
+#endif
+#ifndef HIDDEV_FLAG_UREF
+# define HIDDEV_FLAG_UREF  0x1
+#endif
 
 /*
  * When we are traversing the USB reports given by the UPS and we
@@ -48,10 +55,10 @@
  */
 typedef struct s_usb_info {
    unsigned physical;              /* physical value wanted */
-   unsigned usage_code;            /* usage code wanted */
    unsigned unit_exponent;         /* exponent */
    unsigned unit;                  /* units */
    int data_type;                  /* data type */
+   int ci;                         /* which CI does this usage represent? */
    struct hiddev_usage_ref uref;   /* usage reference */
 } USB_INFO;
 
@@ -120,6 +127,7 @@ static int open_usb_device(UPSINFO *ups)
    const char *hiddev[] =
       { "/dev/usb/hiddev", "/dev/usb/hid/hiddev", "/dev/hiddev", NULL };
    int i, j, k;
+   int flaguref = HIDDEV_FLAG_UREF;
 
    /*
     * Note, we set ups->fd here so the "core" of apcupsd doesn't
@@ -183,6 +191,9 @@ static int open_usb_device(UPSINFO *ups)
             continue;
          }
 
+         /* Request full uref reporting from read() */
+         ioctl(my_data->fd, HIDIOCSFLAG, &flaguref);
+
          break;
       }
 
@@ -222,6 +233,9 @@ static int open_usb_device(UPSINFO *ups)
                my_data->fd = -1;
                continue;
             }
+
+            /* Request full uref reporting from read() */
+            ioctl(my_data->fd, HIDIOCSFLAG, &flaguref);
 
             goto auto_opened;
          }
@@ -395,6 +409,29 @@ bool pusb_get_value(UPSINFO *ups, int ci, USB_VALUE * uval)
 }
 
 /*
+ * Find the USB_INFO structure used for tracking a given usage. Searching
+ * by usage_code alone is insufficient since the same usage may appear in
+ * multiple reports or even multiple times in the same report.
+ */
+static USB_INFO* find_info(UPSINFO *ups, struct hiddev_usage_ref* uref)
+{
+   USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
+   int i;
+
+   for (i=0; i<CI_MAXCI; i++) {
+      if (my_data->info[i] &&
+          my_data->info[i]->uref.report_id == uref->report_id &&
+          my_data->info[i]->uref.field_index == uref->field_index &&
+          my_data->info[i]->uref.usage_index == uref->usage_index &&
+          my_data->info[i]->uref.usage_code == uref->usage_code) {
+            return my_data->info[i];
+      }
+   }
+
+   return NULL;
+}
+
+/*
  * Read UPS events. I.e. state changes.
  */
 int pusb_ups_check_state(UPSINFO *ups)
@@ -402,9 +439,10 @@ int pusb_ups_check_state(UPSINFO *ups)
    int i;
    int retval;
    int valid = 0;
-   struct hiddev_event ev[64];
+   struct hiddev_usage_ref ev[64];
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
-
+   USB_INFO* info;
+   
    struct timeval tv;
 
    tv.tv_sec = ups->wait_time;
@@ -489,13 +527,32 @@ int pusb_ups_check_state(UPSINFO *ups)
           * whenever the device updates a report. We will filter out
           * such events here. Patch by Adam Kropelin (thanks).
           */
-         if (ev[i].hid == 0 && ev[i].value == 0)
+         if (ev[i].usage_code == 0 && ev[i].value == 0)
             continue;
+
+         /* Ignore events we don't recognize */
+         if ((info = find_info(ups, &ev[i])) == NULL) {
+            Dmsg2(200, "Unrecognized usage (rpt=%d, usg=0x%08x)\n",
+               ev[i].report_id, ev[i].usage_code);
+            continue;
+         }
+
+         /* Ignore events whose value is unchanged */
+         if (info->uref.value == ev[i].value) {
+            Dmsg3(200, "Ignoring unchanged value (rpt=%d, usg=0x%08x, val=%d)\n",
+               ev[i].report_id, ev[i].usage_code, ev[i].value);
+            continue;
+         }
+
+         /* Update tracked value */
+         Dmsg3(200, "Processing changed value (rpt=%d, usg=0x%08x, val=%d)\n",
+            ev[i].report_id, ev[i].usage_code, ev[i].value);
+         info->uref.value = ev[i].value;
 
          /* Got at least 1 valid event. */
          valid = 1;
 
-         if (ev[i].hid == ups->UPS_Cmd[CI_Discharging]) {
+         if (info->ci == CI_Discharging) {
             /* If first time on batteries, debounce */
             if (!ups->is_onbatt() && ev[i].value)
                my_data->debounce = time(NULL);
@@ -505,7 +562,7 @@ int pusb_ups_check_state(UPSINFO *ups)
             else
                ups->set_online();
 
-         } else if (ev[i].hid == ups->UPS_Cmd[CI_BelowRemCapLimit]) {
+         } else if (info->ci == CI_BelowRemCapLimit) {
             if (ev[i].value)
                ups->set_battlow();
             else
@@ -513,7 +570,7 @@ int pusb_ups_check_state(UPSINFO *ups)
 
             Dmsg1(200, "UPS_battlow = %d\n", ups->is_battlow());
 
-         } else if (ev[i].hid == ups->UPS_Cmd[CI_ACPresent]) {
+         } else if (info->ci == CI_ACPresent) {
             /* If first time on batteries, debounce */
             if (!ups->is_onbatt() && !ev[i].value)
                my_data->debounce = time(NULL);
@@ -523,19 +580,19 @@ int pusb_ups_check_state(UPSINFO *ups)
             else
                ups->set_online();
 
-         } else if (ev[i].hid == ups->UPS_Cmd[CI_RemainingCapacity]) {
+         } else if (info->ci == CI_RemainingCapacity) {
             ups->BattChg = ev[i].value;
 
-         } else if (ev[i].hid == ups->UPS_Cmd[CI_RunTimeToEmpty]) {
+         } else if (info->ci == CI_RunTimeToEmpty) {
             if (my_data->vendor == VENDOR_APC)
                ups->TimeLeft = ((double)ev[i].value) / 60;  /* seconds */
             else
                ups->TimeLeft = ev[i].value;                 /* minutes */
 
-         } else if (ev[i].hid == ups->UPS_Cmd[CI_NeedReplacement]) {
+         } else if (info->ci == CI_NeedReplacement) {
             ups->set_replacebatt(ev[i].value);
 
-         } else if (ev[i].hid == ups->UPS_Cmd[CI_ShutdownImminent]) {
+         } else if (info->ci == CI_ShutdownImminent) {
             ups->set_shutdownimm(ev[i].value);
             Dmsg1(200, "ShutdownImminent=%d\n", ups->is_shutdownimm());
          }
@@ -682,8 +739,6 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
                       (known_info[k].physical == P_ANY ||
                          known_info[k].physical == finfo.physical)) {
                      ups->UPS_Cap[ci] = true;
-                     /* ***FIXME*** remove UPS_Cmd */
-                     ups->UPS_Cmd[ci] = uref.usage_code;
                      info = (USB_INFO *)malloc(sizeof(USB_INFO));
 
                      if (!info) {
@@ -692,8 +747,8 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
                      }
 
                      my_data->info[ci] = info;
+                     info->ci = ci;
                      info->physical = finfo.physical;
-                     info->usage_code = uref.usage_code;
                      info->unit_exponent = finfo.unit_exponent;
                      info->unit = finfo.unit;
                      info->data_type = known_info[k].data_type;
