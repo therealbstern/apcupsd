@@ -67,7 +67,6 @@ typedef struct s_usb_info {
 typedef struct s_usb_data {
    int fd;			      /* Our UPS fd when open */
    char orig_device[MAXSTRING];       /* Original port specification */
-   short vendor;		      /* UPS vendor id */
    time_t debounce;		      /* last event time for debounce */
    USB_INFO *info[CI_MAXCI+1];	      /* Info pointers for each command */
 } USB_DATA;
@@ -124,6 +123,13 @@ static int open_usb_device(UPSINFO *ups)
     int i, j, k;
 
     /*
+     * Note, we set ups->fd here so the "core" of apcupsd doesn't
+     *	think we are a slave, which is what happens when it is -1
+     *	Internally, we use the fd in our own private space   
+     */
+    ups->fd = 1;
+
+    /*
      * If no device locating specified, we go autodetect it
      *	 by searching known places.
      */
@@ -161,12 +167,6 @@ static int open_usb_device(UPSINFO *ups)
        start = end = 1;
     }
 
-    /*
-     * Note, we set ups->fd here so the "core" of apcupsd doesn't
-     *	think we are a slave, which is what happens when it is -1
-     *	Internally, we use the fd in our own private space   
-     */
-    ups->fd = 1;
     for (i=0; i<10; i++) {
        for ( ; start <= end; start++) {
 	   asnprintf(devname, sizeof(devname), name, start);
@@ -476,10 +476,9 @@ int pusb_ups_check_state(UPSINFO *ups)
 	    if (ev[i].hid == 0 && ev[i].value == 0)
 		continue;
 
-	    /* Got at least 1 valid event. */
-	    valid = 1;
-
 	    if (ev[i].hid == ups->UPS_Cmd[CI_Discharging]) {
+		if (!!ev[i].value == !is_ups_set(UPS_ONLINE))
+		   continue;	/* Value did not change */
 		/* If first time on batteries, debounce */
 		if (!is_ups_set(UPS_ONBATT) && ev[i].value) {
 		   my_data->debounce = time(NULL);
@@ -489,14 +488,21 @@ int pusb_ups_check_state(UPSINFO *ups)
 		} else {
 		    set_ups_online();
 		}
+		valid = 1;
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_BelowRemCapLimit]) {
+		if (!!ev[i].value == !!is_ups_set(UPS_BATTLOW))
+		   continue;	/* Value did not change */
 		if (ev[i].value) {
 		    set_ups(UPS_BATTLOW);
 		} else {
 		    clear_ups(UPS_BATTLOW);
 		}
                 Dmsg1(200, "UPS_BATTLOW = %d\n", is_ups_set(UPS_BATTLOW));
+		valid = 1;
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_ACPresent]) {
+		if (!!ev[i].value == !is_ups_set(UPS_ONBATT))
+		   continue;	/* Value did not change */
+
 		/* If first time on batteries, debounce */
 		if (!is_ups_set(UPS_ONBATT) && !ev[i].value) {
 		   my_data->debounce = time(NULL);
@@ -506,27 +512,37 @@ int pusb_ups_check_state(UPSINFO *ups)
 		} else {
 		    set_ups_online();
 		}
+		valid = 1;
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_RemainingCapacity]) {
+		if (ev[i].value == ups->BattChg)
+		   continue;	/* Value did not change */
 		ups->BattChg = ev[i].value;
+		valid = 1;
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_RunTimeToEmpty]) {
-		if (my_data->vendor == VENDOR_APC) {
-		    ups->TimeLeft = ((double)ev[i].value) / 60;  /* seconds */
-		} else {
-		    ups->TimeLeft = ev[i].value;  /* minutes */
-		}
+	        double timeleft = ((double)ev[i].value) / 60;  /* seconds */
+		if (timeleft == ups->TimeLeft)
+		   continue;	/* Value did not change */
+ 		ups->TimeLeft = timeleft;
+		valid = 1;
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_NeedReplacement]) {
+		if (!!ev[i].value == !!is_ups_set(UPS_REPLACEBATT))
+		   continue;	/* Value did not change */
 		if (ev[i].value) {
 		    set_ups(UPS_REPLACEBATT);
 		} else {
 		    clear_ups(UPS_REPLACEBATT);
 		}
+		valid = 1;
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_ShutdownImminent]) {
+		if (!!ev[i].value == !!is_ups_set(UPS_SHUTDOWNIMM))
+		   continue;	/* Value did not change */
 		if (ev[i].value) {
 		    set_ups(UPS_SHUTDOWNIMM);
 		} else {
 		   clear_ups(UPS_SHUTDOWNIMM);
 		}
                 Dmsg1(200, "ShutdownImminent=%d\n", is_ups_set(UPS_SHUTDOWNIMM));
+		valid = 1;
 	    }
             Dmsg1(200, "Status=%d\n", ups->Status);
 	}
