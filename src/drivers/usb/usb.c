@@ -73,15 +73,19 @@ const struct s_known_info known_info[] = {
    {CI_ST_STAT,                 0x00840058, P_ANY,     T_NONE},     /* Test */
    {CI_DALARM,                  0x0084005a, P_ANY,     T_NONE},     /* AudibleAlarmControl */
    {CI_NONE,                    0x00840061, P_ANY,     T_NONE},     /* Good */
-   {CI_NONE,                    0x00840062, P_ANY,     T_NONE},     /* InternalFailure */
+   {CI_IFailure,                0x00840062, P_ANY,     T_NONE},     /* InternalFailure */
+   {CI_PWVoltageOOR,            0x00840063, P_ANY,     T_NONE},     /* Volt out-of-range */
+   {CI_PWFrequencyOOR,          0x00840064, P_ANY,     T_NONE},     /* Freq out-of-range */
    {CI_Overload,                0x00840065, P_ANY,     T_NONE},     /* Overload */
+   {CI_OverCharged,             0x00840066, P_ANY,     T_NONE},     /* Overcharged */
+   {CI_OverTemp,                0x00840067, P_ANY,     T_NONE},     /* Overtemp */
    {CI_ShutdownRequested,       0x00840068, P_ANY,     T_NONE},     /* ShutdownRequested */
    {CI_ShutdownImminent,        0x00840069, P_ANY,     T_NONE},     /* ShutdownImminent */
    {CI_NONE,                    0x0084006b, P_ANY,     T_NONE},     /* Switch On/Off */
    {CI_NONE,                    0x0084006c, P_ANY,     T_NONE},     /* Switchable */
    {CI_Boost,                   0x0084006e, P_ANY,     T_NONE},     /* Boost */
    {CI_Trim,                    0x0084006f, P_ANY,     T_NONE},     /* Buck */
-   {CI_NONE,                    0x00840073, P_ANY,     T_NONE},     /* CommunicationLost */
+   {CI_CommunicationLost,       0x00840073, P_ANY,     T_NONE},     /* CommunicationLost */
    {CI_Manufacturer,            0x008400fd, P_ANY,     T_INDEX},    /* iManufacturer */
    {CI_UPSMODEL,                0x008400fe, P_ANY,     T_INDEX},    /* iProduct */
    {CI_SERNO,                   0x008400ff, P_ANY,     T_INDEX},    /* iSerialNumber */
@@ -111,8 +115,11 @@ const struct s_known_info known_info[] = {
    {CI_NONE,                    0x0085008e, P_ANY,     T_CAPACITY}, /* CapacityGranularity2 */
    {CI_NONE,                    0x0085008f, P_ANY,     T_INDEX},    /* iOEMInformation */
    {CI_ACPresent,               0x008500d0, P_ANY,     T_NONE},     /* ACPresent */
-   {CI_NONE,                    0x008500d1, P_ANY,     T_NONE},     /* BatteryPresent */
-   {CI_NONE,                    0x008500db, P_ANY,     T_NONE},     /* VoltageNotRegulated */
+   {CI_BatteryPresent,          0x008500d1, P_ANY,     T_NONE},     /* BatteryPresent */
+   {CI_ChargerVoltageOOR,       0x008500d8, P_ANY,     T_NONE},     /* Volt out-of-range */
+   {CI_ChargerCurrentOOR,       0x008500d9, P_ANY,     T_NONE},     /* Current out-of-range */
+   {CI_CurrentNotRegulated,     0x008500da, P_ANY,     T_NONE},     /* Current not regulated */
+   {CI_VoltageNotRegulated,     0x008500db, P_ANY,     T_NONE},     /* VoltageNotRegulated */
 
    /*  Pages 0xFF00 to 0xFFFF are vendor specific */
    {CI_STATUS,                  0xFF860060, P_ANY,     T_BITS},     /* APCStatusFlag */
