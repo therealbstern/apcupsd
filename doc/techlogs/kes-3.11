@@ -2,6 +2,8 @@
                         Kern Sibbald
 
 General:
+26Jun05
+- Correct compiler warnings in cgi for g++ 4.0
 13Jun05
 - Make /usr/share/man the default man directory.  
 - Require C++ compiler and use full path.
