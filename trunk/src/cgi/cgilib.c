@@ -104,7 +104,7 @@ int checkhost(const char *check)
  * Note: XHTML added the meta character &apos;, but for backwards compatibility
  * with HTML 4.0, output it as &#39;
  */
-void html_puts(const char *str)
+void html_puts(char *str)
 {
     unsigned char *p = (unsigned char *)str;
     while (*p != '\0') {
@@ -174,7 +174,7 @@ void html_begin(const char *title, int refresh)
     (void) puts("<html xmlns=\"http://www.w3.org/1999/xhtml\" xml:lang=\"en\">");
     (void) puts ("<head>");
     (void) fputs ("<title>", stdout);
-    html_puts(title);
+    html_puts((char *)title);
     (void) puts ("</title>");
 
     if (http_version > 10) {
