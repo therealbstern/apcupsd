@@ -479,6 +479,7 @@ int pusb_ups_check_state(UPSINFO *ups)
 	    if (ev[i].hid == ups->UPS_Cmd[CI_Discharging]) {
 		if (!!ev[i].value == !is_ups_set(UPS_ONLINE))
 		   continue;	/* Value did not change */
+		Dmsg1(200,"CI_Discharging changed (%d)\n", ev[i].value);
 		/* If first time on batteries, debounce */
 		if (!is_ups_set(UPS_ONBATT) && ev[i].value) {
 		   my_data->debounce = time(NULL);
@@ -492,6 +493,7 @@ int pusb_ups_check_state(UPSINFO *ups)
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_BelowRemCapLimit]) {
 		if (!!ev[i].value == !!is_ups_set(UPS_BATTLOW))
 		   continue;	/* Value did not change */
+		Dmsg1(200,"CI_BelowRemCapLimit changed (%d)\n", ev[i].value);
 		if (ev[i].value) {
 		    set_ups(UPS_BATTLOW);
 		} else {
@@ -502,7 +504,7 @@ int pusb_ups_check_state(UPSINFO *ups)
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_ACPresent]) {
 		if (!!ev[i].value == !is_ups_set(UPS_ONBATT))
 		   continue;	/* Value did not change */
-
+		Dmsg1(200, "CI_ACPresent changed (%d)\n", ev[i].value);
 		/* If first time on batteries, debounce */
 		if (!is_ups_set(UPS_ONBATT) && !ev[i].value) {
 		   my_data->debounce = time(NULL);
@@ -516,17 +518,20 @@ int pusb_ups_check_state(UPSINFO *ups)
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_RemainingCapacity]) {
 		if (ev[i].value == ups->BattChg)
 		   continue;	/* Value did not change */
+		Dmsg1(200, "CI_RemainingCapacity changed (%d)\n", ev[i].value);
 		ups->BattChg = ev[i].value;
 		valid = 1;
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_RunTimeToEmpty]) {
 	        double timeleft = ((double)ev[i].value) / 60;  /* seconds */
-		if (timeleft == ups->TimeLeft)
+	        if ((int)timeleft == (int)ups->TimeLeft)
 		   continue;	/* Value did not change */
+		Dmsg1(200,"CI_RunTimeToEmpty changed (%f)\n", timeleft);
  		ups->TimeLeft = timeleft;
 		valid = 1;
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_NeedReplacement]) {
 		if (!!ev[i].value == !!is_ups_set(UPS_REPLACEBATT))
 		   continue;	/* Value did not change */
+		Dmsg1(200,"CI_NeedReplacement changed (%d)\n", ev[i].value);
 		if (ev[i].value) {
 		    set_ups(UPS_REPLACEBATT);
 		} else {
@@ -536,6 +541,7 @@ int pusb_ups_check_state(UPSINFO *ups)
 	    } else if (ev[i].hid == ups->UPS_Cmd[CI_ShutdownImminent]) {
 		if (!!ev[i].value == !!is_ups_set(UPS_SHUTDOWNIMM))
 		   continue;	/* Value did not change */
+		Dmsg1(200, "CI_ShutdownImminent changed (%d)\n", ev[i].value);
 		if (ev[i].value) {
 		    set_ups(UPS_SHUTDOWNIMM);
 		} else {
