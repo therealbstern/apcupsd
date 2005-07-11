@@ -226,6 +226,33 @@ int usb_read_int_from_ups(UPSINFO *ups, int ci, int *value)
    return pusb_read_int_from_ups(ups, ci, value);
 }
 
+#define TV_DIFF_MS(a, b) \
+    ((b).tv_sec - (a).tv_sec) * 1000 + ((b).tv_usec - (a).tv_usec) / 1000;
+
+#define URB_DELAY_MS 5
+
+int usb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
+{
+   static struct timeval prev = {0};
+   struct timeval now;
+   int diff;
+
+   /*
+    * Some UPSes (650 CS and 800 RS, possibly others) lock up if
+    * control transfers are issued too quickly, so we throttle a
+    * bit here.
+    */
+   if (prev.tv_sec) {
+      gettimeofday(&now, NULL);
+      diff = TV_DIFF_MS(prev, now);
+      if (diff >= 0 && diff < URB_DELAY_MS)
+          usleep((URB_DELAY_MS-diff)*1000);
+   }
+   gettimeofday(&prev, NULL);
+
+   return pusb_get_value(ups, ci, uval);
+}
+
 
 /*
  * Operations that are not supported
@@ -279,97 +306,97 @@ int usb_ups_read_volatile_data(UPSINFO *ups)
    /* UPS_STATUS -- this is the most important status for apcupsd */
 
    ups->Status &= ~0xff;           /* Clear APC part of Status */
-   if (pusb_get_value(ups, CI_STATUS, &uval)) {
+   if (usb_get_value(ups, CI_STATUS, &uval)) {
       ups->Status |= (uval.iValue & 0xff);      /* set new APC part */
    } else {
       /* No APC Status value, well, fabricate one */
-      if (pusb_get_value(ups, CI_ACPresent, &uval) && uval.iValue) {
+      if (usb_get_value(ups, CI_ACPresent, &uval) && uval.iValue) {
          ups->set_online();
          Dmsg0(200, "ACPRESENT\n");
       }
-      if (pusb_get_value(ups, CI_Discharging, &uval) && uval.iValue) {
+      if (usb_get_value(ups, CI_Discharging, &uval) && uval.iValue) {
          ups->clear_online();
          Dmsg0(200, "DISCHARGING\n");
       }
-      if (pusb_get_value(ups, CI_BelowRemCapLimit, &uval) && uval.iValue) {
+      if (usb_get_value(ups, CI_BelowRemCapLimit, &uval) && uval.iValue) {
          ups->set_battlow();
          Dmsg1(200, "BelowRemCapLimit=%d\n", uval.iValue);
       }
-      if (pusb_get_value(ups, CI_RemTimeLimitExpired, &uval) && uval.iValue) {
+      if (usb_get_value(ups, CI_RemTimeLimitExpired, &uval) && uval.iValue) {
          ups->set_battlow();
          Dmsg0(200, "RemTimeLimitExpired\n");
       }
-      if (pusb_get_value(ups, CI_ShutdownImminent, &uval) && uval.iValue) {
+      if (usb_get_value(ups, CI_ShutdownImminent, &uval) && uval.iValue) {
          ups->set_battlow();
          Dmsg0(200, "ShutdownImminent\n");
       }
-      if (pusb_get_value(ups, CI_Boost, &uval) && uval.iValue)
+      if (usb_get_value(ups, CI_Boost, &uval) && uval.iValue)
          ups->set_boost();
 
-      if (pusb_get_value(ups, CI_Trim, &uval) && uval.iValue)
+      if (usb_get_value(ups, CI_Trim, &uval) && uval.iValue)
          ups->set_trim();
 
-      if (pusb_get_value(ups, CI_Overload, &uval) && uval.iValue)
+      if (usb_get_value(ups, CI_Overload, &uval) && uval.iValue)
          ups->set_overload();
 
-      if (pusb_get_value(ups, CI_NeedReplacement, &uval) && uval.iValue)
+      if (usb_get_value(ups, CI_NeedReplacement, &uval) && uval.iValue)
          ups->set_replacebatt();
    }
 
    /* LINE_VOLTAGE */
-   if (pusb_get_value(ups, CI_VLINE, &uval)) {
+   if (usb_get_value(ups, CI_VLINE, &uval)) {
       ups->LineVoltage = uval.dValue;
       Dmsg1(200, "LineVoltage = %d\n", (int)ups->LineVoltage);
    }
 
    /* OUTPUT_VOLTAGE */
-   if (pusb_get_value(ups, CI_VOUT, &uval)) {
+   if (usb_get_value(ups, CI_VOUT, &uval)) {
       ups->OutputVoltage = uval.dValue;
       Dmsg1(200, "OutputVoltage = %d\n", (int)ups->OutputVoltage);
    }
 
    /* BATT_FULL Battery level percentage */
-   if (pusb_get_value(ups, CI_BATTLEV, &uval)) {
+   if (usb_get_value(ups, CI_BATTLEV, &uval)) {
       ups->BattChg = uval.dValue;
       Dmsg1(200, "BattCharge = %d\n", (int)ups->BattChg);
    }
 
    /* BATT_VOLTAGE */
-   if (pusb_get_value(ups, CI_VBATT, &uval)) {
+   if (usb_get_value(ups, CI_VBATT, &uval)) {
       ups->BattVoltage = uval.dValue;
       Dmsg1(200, "BattVoltage = %d\n", (int)ups->BattVoltage);
    }
 
    /* UPS_LOAD */
-   if (pusb_get_value(ups, CI_LOAD, &uval)) {
+   if (usb_get_value(ups, CI_LOAD, &uval)) {
       ups->UPSLoad = uval.dValue;
       Dmsg1(200, "UPSLoad = %d\n", (int)ups->UPSLoad);
    }
 
    /* LINE_FREQ */
-   if (pusb_get_value(ups, CI_FREQ, &uval))
+   if (usb_get_value(ups, CI_FREQ, &uval))
       ups->LineFreq = uval.dValue;
 
    /* UPS_RUNTIME_LEFT */
-   if (pusb_get_value(ups, CI_RUNTIM, &uval)) {
+   if (usb_get_value(ups, CI_RUNTIM, &uval)) {
       ups->TimeLeft = uval.dValue / 60; /* convert to minutes */
       Dmsg1(200, "TimeLeft = %d\n", (int)ups->TimeLeft);
    }
 
    /* UPS_TEMP */
-   if (pusb_get_value(ups, CI_ITEMP, &uval))
+   if (usb_get_value(ups, CI_ITEMP, &uval))
       ups->UPSTemp = uval.dValue - 273.15;      /* convert to deg C. */
 
    /*  Humidity percentage */
-   if (pusb_get_value(ups, CI_HUMID, &uval))
+   if (usb_get_value(ups, CI_HUMID, &uval))
       ups->humidity = uval.dValue;
 
    /*  Ambient temperature */
-   if (pusb_get_value(ups, CI_ATEMP, &uval))
+   if (usb_get_value(ups, CI_ATEMP, &uval))
       ups->ambtemp = uval.dValue;
 
    /* Self test results */
-   if (pusb_get_value(ups, CI_ST_STAT, &uval)) {
+   if (usb_get_value(ups, CI_ST_STAT, &uval)) {
       switch (uval.iValue) {
       case 1:  /* Passed */
          astrncpy(ups->X, "OK", sizeof(ups->X));
@@ -417,12 +444,12 @@ int usb_ups_read_static_data(UPSINFO *ups)
    }
 
    /* UPS_SELFTEST Interval */
-   if (pusb_get_value(ups, CI_STESTI, &uval))
+   if (usb_get_value(ups, CI_STESTI, &uval))
       ups->selftest = uval.iValue;
 #endif
 
    /* UPS_NAME */
-   if (ups->upsname[0] == 0 && pusb_get_value(ups, CI_IDEN, &uval)) {
+   if (ups->upsname[0] == 0 && usb_get_value(ups, CI_IDEN, &uval)) {
       if (ups->buf[0] != 0) {
          strncpy(ups->upsname, ups->buf, sizeof(ups->upsname) - 1);
          ups->upsname[sizeof(ups->upsname) - 1] = 0;
@@ -430,7 +457,7 @@ int usb_ups_read_static_data(UPSINFO *ups)
    }
 
    /* model, firmware */
-   if (pusb_get_value(ups, CI_UPSMODEL, &uval)) {
+   if (usb_get_value(ups, CI_UPSMODEL, &uval)) {
       char *p;
 
       /* Truncate Firmware info on APC Product string */
@@ -448,45 +475,45 @@ int usb_ups_read_static_data(UPSINFO *ups)
    }
 
    /* WAKEUP_DELAY */
-   if (pusb_get_value(ups, CI_DWAKE, &uval))
+   if (usb_get_value(ups, CI_DWAKE, &uval))
       ups->dwake = (int)uval.dValue;
 
    /* SLEEP_DELAY */
-   if (pusb_get_value(ups, CI_DSHUTD, &uval))
+   if (usb_get_value(ups, CI_DSHUTD, &uval))
       ups->dshutd = (int)uval.dValue;
 
    /* LOW_TRANSFER_LEVEL */
-   if (pusb_get_value(ups, CI_LTRANS, &uval))
+   if (usb_get_value(ups, CI_LTRANS, &uval))
       ups->lotrans = (int)uval.dValue;
 
    /* HIGH_TRANSFER_LEVEL */
-   if (pusb_get_value(ups, CI_HTRANS, &uval))
+   if (usb_get_value(ups, CI_HTRANS, &uval))
       ups->hitrans = (int)uval.dValue;
 
    /* UPS_BATT_CAP_RETURN */
-   if (pusb_get_value(ups, CI_RETPCT, &uval))
+   if (usb_get_value(ups, CI_RETPCT, &uval))
       ups->rtnpct = (int)uval.dValue;
 
    /* LOWBATT_SHUTDOWN_LEVEL */
-   if (pusb_get_value(ups, CI_DLBATT, &uval))
+   if (usb_get_value(ups, CI_DLBATT, &uval))
       ups->dlowbatt = (int)uval.dValue;
 
    /* UPS_MANUFACTURE_DATE */
-   if (pusb_get_value(ups, CI_MANDAT, &uval)) {
+   if (usb_get_value(ups, CI_MANDAT, &uval)) {
       asnprintf(ups->birth, sizeof(ups->birth), "%4d-%02d-%02d",
          (uval.iValue >> 9) + 1980, (uval.iValue >> 5) & 0xF,
          uval.iValue & 0x1F);
    }
 
    /* Last UPS_BATTERY_REPLACE */
-   if (pusb_get_value(ups, CI_BATTDAT, &uval)) {
+   if (usb_get_value(ups, CI_BATTDAT, &uval)) {
       asnprintf(ups->battdat, sizeof(ups->battdat), "%4d-%02d-%02d",
          (uval.iValue >> 9) + 1980, (uval.iValue >> 5) & 0xF,
          uval.iValue & 0x1F);
    }
 
    /* APC_BATTERY_DATE */
-   if (pusb_get_value(ups, CI_BattReplaceDate, &uval)) {
+   if (usb_get_value(ups, CI_BattReplaceDate, &uval)) {
       v = uval.iValue;
       yy = ((v >> 4) & 0xF) * 10 + (v & 0xF) + 2000;
       v >>= 8;
@@ -497,7 +524,7 @@ int usb_ups_read_static_data(UPSINFO *ups)
    }
 
    /* UPS_SERIAL_NUMBER */
-   if (pusb_get_value(ups, CI_SERNO, &uval)) {
+   if (usb_get_value(ups, CI_SERNO, &uval)) {
       char *p;
 
       astrncpy(ups->serial, ups->buf, sizeof(ups->serial));
@@ -514,11 +541,11 @@ int usb_ups_read_static_data(UPSINFO *ups)
    }
 
    /* Nominal output voltage when on batteries */
-   if (pusb_get_value(ups, CI_NOMOUTV, &uval))
+   if (usb_get_value(ups, CI_NOMOUTV, &uval))
       ups->NomOutputVoltage = (int)uval.dValue;
 
    /* Nominal battery voltage */
-   if (pusb_get_value(ups, CI_NOMBATTV, &uval))
+   if (usb_get_value(ups, CI_NOMBATTV, &uval))
       ups->nombattv = uval.dValue;
 
    write_unlock(ups);
