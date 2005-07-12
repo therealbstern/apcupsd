@@ -311,30 +311,12 @@ static int usb_link_check(UPSINFO *ups)
    return 1;
 }
 
-
-/*
- * Get a field value
- */
-bool pusb_get_value(UPSINFO *ups, int ci, USB_VALUE * uval)
+static bool process_uref(UPSINFO *ups, USB_INFO *info, USB_VALUE *uval)
 {
-   struct hiddev_string_descriptor sdesc;
-   struct hiddev_report_info rinfo;
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
-   USB_INFO *info;
+   struct hiddev_string_descriptor sdesc;
    USB_VALUE val;
    int exponent;
-
-   if (!ups->UPS_Cap[ci] || !my_data->info[ci])
-      return false;                /* UPS does not have capability */
-
-   info = my_data->info[ci];       /* point to our info structure */
-   rinfo.report_type = info->uref.report_type;
-   rinfo.report_id = info->uref.report_id;
-   if (ioctl(my_data->fd, HIDIOCGREPORT, &rinfo) < 0)   /* update Report */
-      return false;
-
-   if (ioctl(my_data->fd, HIDIOCGUSAGE, &info->uref) < 0)       /* update UPS value */
-      return false;
 
    exponent = info->unit_exponent;
    if (exponent > 7)
@@ -400,7 +382,7 @@ bool pusb_get_value(UPSINFO *ups, int ci, USB_VALUE * uval)
          val.dValue = ((double)info->uref.value) * pow_ten(exponent);
 
       Dmsg4(200, "Def val=%d exp=%d dVal=%f ci=%d\n", info->uref.value,
-         exponent, val.dValue, ci);
+         exponent, val.dValue, info->ci);
    }
 
    memcpy(uval, &val, sizeof(*uval));
@@ -408,11 +390,38 @@ bool pusb_get_value(UPSINFO *ups, int ci, USB_VALUE * uval)
 }
 
 /*
+ * Get a field value
+ */
+bool pusb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
+{
+   struct hiddev_report_info rinfo;
+   USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
+   USB_INFO *info;
+
+   if (!ups->UPS_Cap[ci] || !my_data->info[ci])
+      return false;                /* UPS does not have capability */
+
+   /* Fetch the new value from the UPS */
+
+   info = my_data->info[ci];       /* point to our info structure */
+   rinfo.report_type = info->uref.report_type;
+   rinfo.report_id = info->uref.report_id;
+   if (ioctl(my_data->fd, HIDIOCGREPORT, &rinfo) < 0)   /* update Report */
+      return false;
+
+   if (ioctl(my_data->fd, HIDIOCGUSAGE, &info->uref) < 0)       /* update UPS value */
+      return false;
+
+   /* Process the updated value */
+   return process_uref(ups, info, uval);
+}
+
+/*
  * Find the USB_INFO structure used for tracking a given usage. Searching
  * by usage_code alone is insufficient since the same usage may appear in
  * multiple reports or even multiple times in the same report.
  */
-static USB_INFO* find_info(UPSINFO *ups, struct hiddev_usage_ref* uref)
+static USB_INFO *find_info(UPSINFO *ups, struct hiddev_usage_ref *uref)
 {
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
    int i;
@@ -433,18 +442,17 @@ static USB_INFO* find_info(UPSINFO *ups, struct hiddev_usage_ref* uref)
 /*
  * Read UPS events. I.e. state changes.
  */
-int pusb_ups_check_state(UPSINFO *ups)
+bool pusb_ups_check_state(UPSINFO *ups, unsigned int timeout_msec, int *ci, USB_VALUE *uval)
 {
-   int i;
    int retval;
    bool valid = false;
-   struct hiddev_usage_ref ev[64];
+   struct hiddev_usage_ref ev;
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
    USB_INFO* info;
 
    struct timeval tv;
-   tv.tv_sec = ups->wait_time;
-   tv.tv_usec = 0;
+   tv.tv_sec = timeout_msec / 1000;
+   tv.tv_usec = (timeout_msec % 1000) * 1000;
 
    while (!valid) {
       fd_set rfds;
@@ -463,14 +471,14 @@ int pusb_ups_check_state(UPSINFO *ups)
 
       switch (retval) {
       case 0:                     /* No chars available in TIMER seconds. */
-         return 0;
+         return false;
       case -1:
          if (errno == EINTR || errno == EAGAIN)         /* assume SIGCHLD */
             continue;
 
          Dmsg1(200, "select error: ERR=%s\n", strerror(errno));
          usb_link_check(ups);      /* link is down, wait */
-         return 0;
+         return false;
       default:
          break;
       }
@@ -482,11 +490,11 @@ int pusb_ups_check_state(UPSINFO *ups)
       if (retval < 0) {            /* error */
          Dmsg1(200, "read error: ERR=%s\n", strerror(errno));
          usb_link_check(ups);      /* notify that link is down, wait */
-         return 0;
+         return false;
       }
 
-      if (retval == 0 || retval < (int)sizeof(ev[0]))
-         return 0;
+      if (retval == 0 || retval < (int)sizeof(ev))
+         return false;
 
       /* Walk through events
        * Detected:
@@ -519,114 +527,49 @@ int pusb_ups_check_state(UPSINFO *ups)
       }
 
       write_lock(ups);
-      for (i = 0; i < (retval / (int)sizeof(ev[0])); i++) {
-         /*
-          * Workaround for Linux 2.5.x and (at least) early 2.6.
-          * The kernel hiddev driver mistakenly returns empty events
-          * whenever the device updates a report. We will filter out
-          * such events here. Patch by Adam Kropelin (thanks).
-          */
-         if (ev[i].usage_code == 0 && ev[i].value == 0)
-            continue;
 
-         /* Ignore events we don't recognize */
-         if ((info = find_info(ups, &ev[i])) == NULL) {
-            Dmsg2(200, "Unrecognized usage (rpt=%d, usg=0x%08x)\n",
-               ev[i].report_id, ev[i].usage_code);
-            continue;
-         }
-
-         /* Ignore events whose value is unchanged */
-         if (info->uref.value == ev[i].value) {
-            Dmsg3(200, "Ignoring unchanged value (rpt=%d, usg=0x%08x, val=%d)\n",
-               ev[i].report_id, ev[i].usage_code, ev[i].value);
-            continue;
-         }
-
-         /* Update tracked value */
-         Dmsg3(200, "Processing changed value (rpt=%d, usg=0x%08x, val=%d)\n",
-            ev[i].report_id, ev[i].usage_code, ev[i].value);
-         info->uref.value = ev[i].value;
-
-         switch (info->ci)
-         {
-         case CI_Discharging:
-            /* If first time on batteries, debounce */
-            if (!ups->is_onbatt() && ev[i].value)
-               my_data->debounce = time(NULL);
-
-            if (ev[i].value)
-               ups->clear_online();
-            else
-               ups->set_online();
-            valid = true;
-            break;
-
-         case CI_ACPresent:
-            /* If first time on batteries, debounce */
-            if (!ups->is_onbatt() && !ev[i].value)
-               my_data->debounce = time(NULL);
-
-            if (!ev[i].value)
-               ups->clear_online();
-            else
-               ups->set_online();
-            valid = true;
-            break;
-
-         case CI_BelowRemCapLimit:
-            ups->set_battlow(ev[i].value);
-            Dmsg1(200, "UPS_battlow = %d\n", ups->is_battlow());
-            valid = true;
-            break;
-
-         case CI_RemainingCapacity:
-            ups->BattChg = ev[i].value;
-            valid = true;
-            break;
-
-         case CI_RunTimeToEmpty:
-            ups->TimeLeft = ((double)ev[i].value) / 60;  /* seconds */
-            valid = true;
-            break;
-
-         case CI_NeedReplacement:
-            ups->set_replacebatt(ev[i].value);
-            valid = true;
-            break;
-
-         case CI_ShutdownImminent:
-            ups->set_shutdownimm(ev[i].value);
-            Dmsg1(200, "ShutdownImminent=%d\n", ups->is_shutdownimm());
-            valid = true;
-            break;
-
-         /*
-          * We don't handle these directly, but rather use them as a
-          * signal to go poll the full set of volatile data.
-          */
-         case CI_IFailure:
-         case CI_Overload:
-         case CI_PWVoltageOOR:
-         case CI_PWFrequencyOOR:
-         case CI_OverCharged:
-         case CI_OverTemp:
-         case CI_CommunicationLost:
-         case CI_ChargerVoltageOOR:
-         case CI_ChargerCurrentOOR:
-         case CI_CurrentNotRegulated:
-         case CI_VoltageNotRegulated:
-         case CI_BatteryPresent:
-            valid = 1;
-            break;
-         }
-
-         Dmsg1(200, "Status=%d\n", ups->Status);
+      /*
+       * Workaround for Linux 2.5.x and (at least) early 2.6.
+       * The kernel hiddev driver mistakenly returns empty events
+       * whenever the device updates a report. We will filter out
+       * such events here. Patch by Adam Kropelin (thanks).
+       */
+      if (ev.usage_code == 0 && ev.value == 0) {
+         write_unlock(ups);
+         continue;
       }
+   
+      /* Ignore events we don't recognize */
+      if ((info = find_info(ups, &ev)) == NULL) {
+         Dmsg2(200, "Unrecognized usage (rpt=%d, usg=0x%08x)\n",
+            ev.report_id, ev.usage_code);
+         write_unlock(ups);
+         continue;
+      }
+
+      /* Ignore events whose value is unchanged */
+      if (info->uref.value == ev.value) {
+         Dmsg3(200, "Ignoring unchanged value (rpt=%d, usg=0x%08x, val=%d)\n",
+            ev.report_id, ev.usage_code, ev.value);
+         write_unlock(ups);
+         continue;
+      }
+
+      /* Update tracked value */
+      Dmsg3(200, "Processing changed value (rpt=%d, usg=0x%08x, val=%d)\n",
+         ev.report_id, ev.usage_code, ev.value);
+      info->uref.value = ev.value;
+
+      /* Convert the uref to a USB_VALUE */
+      if (process_uref(ups, info, uval)) {
+         *ci = info->ci;
+         valid = true;
+      }
+
       write_unlock(ups);
    }
 
-   return 1;
+   return true;
 }
 
 /*
