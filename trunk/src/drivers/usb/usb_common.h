@@ -72,7 +72,8 @@
    unsigned usage_code;          /* Usage code */
    unsigned physical;            /* Physical usage */
    int data_type;                /* Data type expected */
-};
+   bool isvolatile;              /* Volatile data item */
+};
 typedef struct s_usb_value {
    int value_type;               /* Type of returned value */
    double dValue;                /* Value if double */
