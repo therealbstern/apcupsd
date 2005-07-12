@@ -2,6 +2,19 @@
                         Adam Kropelin
 
 General:
+08Jul05
+- Bump version number and date
+- Back-port inter-URB delay lockup fix from Branch-3_10_17
+- Significantly rework USB driver event and poll handling.
+  More cleanup to come, and BSD driver still needs update.
+22Jun05
+- bsd-usb: compile fix
+- linux-usb: Filter duplicate reports in pusb_ups_check_state().
+- linux-usb: Strengthen CI <-> usage association 
+- linux-usb: Only exit event read() loop when an 'important' CI
+  is processed
+- Add a parameterized version of set_battlow() and make use of it.
+- linux-usb: Add some more 'important'-looking events
 08Jun05
 - Retroactively create my own techlog
 07Jun05
