@@ -193,9 +193,6 @@ const struct s_known_info known_info[] = {
  * iModel                          0xffff00f0
  */
 
-#define TV_DIFF_MS(a, b) \
-    ((b).tv_sec - (a).tv_sec) * 1000 + ((b).tv_usec - (a).tv_usec) / 1000;
-
 
 /*
  * Operations that must be handled by platform-specific code
