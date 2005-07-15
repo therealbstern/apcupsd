@@ -47,6 +47,9 @@
 # define HIDDEV_FLAG_UREF  0x1
 #endif
 
+/* Enable this to force Linux 2.4 compatability mode */
+#define FORCE_COMPAT24  true
+
 /*
  * When we are traversing the USB reports given by the UPS and we
  * find an entry corresponding to an entry in the known_info table
@@ -70,6 +73,7 @@ typedef struct s_usb_info {
  */
 typedef struct s_usb_data {
    int fd;                         /* Our UPS fd when open */
+   bool compat24;                  /* Linux 2.4 compatibility mode */
    char orig_device[MAXSTRING];    /* Original port specification */
    time_t debounce;                /* last event time for debounce */
    USB_INFO *info[CI_MAXCI + 1];   /* Info pointers for each command */
@@ -191,7 +195,11 @@ static int open_usb_device(UPSINFO *ups)
          }
 
          /* Request full uref reporting from read() */
-         ioctl(my_data->fd, HIDIOCSFLAG, &flaguref);
+         if (FORCE_COMPAT24 || ioctl(my_data->fd, HIDIOCSFLAG, &flaguref)) {
+            Dmsg0(100, "HIDIOCSFLAG failed; enabling linux-2.4 "
+                       "compatibility mode\n");
+            my_data->compat24 = true;
+         }
 
          break;
       }
@@ -234,7 +242,11 @@ static int open_usb_device(UPSINFO *ups)
             }
 
             /* Request full uref reporting from read() */
-            ioctl(my_data->fd, HIDIOCSFLAG, &flaguref);
+            if (FORCE_COMPAT24 || ioctl(my_data->fd, HIDIOCSFLAG, &flaguref)) {
+               Dmsg0(100, "HIDIOCSFLAG failed; enabling linux-2.4 "
+                          "compatibility mode\n");
+               my_data->compat24 = true;
+            }
 
             goto auto_opened;
          }
@@ -421,7 +433,7 @@ bool pusb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
  * by usage_code alone is insufficient since the same usage may appear in
  * multiple reports or even multiple times in the same report.
  */
-static USB_INFO *find_info(UPSINFO *ups, struct hiddev_usage_ref *uref)
+static USB_INFO *find_info_by_uref(UPSINFO *ups, struct hiddev_usage_ref *uref)
 {
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
    int i;
@@ -440,13 +452,33 @@ static USB_INFO *find_info(UPSINFO *ups, struct hiddev_usage_ref *uref)
 }
 
 /*
+ * Same as find_info_by_uref() but only checks the usage code. This is
+ * not entirely reliable, but it's the best be have on linux-2.4.
+ */
+static USB_INFO *find_info_by_ucode(UPSINFO *ups, unsigned int ucode)
+{
+   USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
+   int i;
+
+   for (i=0; i<CI_MAXCI; i++) {
+      if (my_data->info[i] &&
+          my_data->info[i]->uref.usage_code == ucode) {
+            return my_data->info[i];
+      }
+   }
+
+   return NULL;
+}
+
+/*
  * Read UPS events. I.e. state changes.
  */
 bool pusb_ups_check_state(UPSINFO *ups, unsigned int timeout_msec, int *ci, USB_VALUE *uval)
 {
    int retval;
    bool valid = false;
-   struct hiddev_usage_ref ev;
+   struct hiddev_usage_ref uref;
+   struct hiddev_event hev;
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
    USB_INFO* info;
 
@@ -483,33 +515,66 @@ bool pusb_ups_check_state(UPSINFO *ups, unsigned int timeout_msec, int *ci, USB_
          break;
       }
 
-      do {
-         retval = read(my_data->fd, &ev, sizeof(ev));
-      } while (retval == -1 && (errno == EAGAIN || errno == EINTR));
+      if (!my_data->compat24) {
+         /* This is >= linux-2.6, so we can read a uref directly */
+         do {
+            retval = read(my_data->fd, &uref, sizeof(uref));
+         } while (retval == -1 && (errno == EAGAIN || errno == EINTR));
 
-      if (retval < 0) {            /* error */
-         Dmsg1(200, "read error: ERR=%s\n", strerror(errno));
-         usb_link_check(ups);      /* notify that link is down, wait */
-         return false;
+         if (retval < 0) {            /* error */
+            Dmsg1(200, "read error: ERR=%s\n", strerror(errno));
+            usb_link_check(ups);      /* notify that link is down, wait */
+            return false;
+         }
+
+         if (retval == 0 || retval < (int)sizeof(uref))
+            return false;
+
+         /* Ignore events we don't recognize */
+         if ((info = find_info_by_uref(ups, &uref)) == NULL) {
+            Dmsg3(200, "Unrecognized usage (rpt=%d, usg=0x%08x, val=%d)\n",
+               uref.report_id, uref.usage_code, uref.value);
+            write_unlock(ups);
+            continue;
+         }
+      } else {
+         /*
+          * We're in linux-2.4 compatibility mode, so we read a
+          * hiddev_event and use it to construct a uref.
+          */
+         do {
+            retval = read(my_data->fd, &hev, sizeof(hev));
+         } while (retval == -1 && (errno == EAGAIN || errno == EINTR));
+
+         if (retval < 0) {            /* error */
+            Dmsg1(200, "read error: ERR=%s\n", strerror(errno));
+            usb_link_check(ups);      /* notify that link is down, wait */
+            return false;
+         }
+
+         if (retval == 0 || retval < (int)sizeof(hev))
+            return false;
+
+         /* Ignore events we don't recognize */
+         if ((info = find_info_by_ucode(ups, hev.hid)) == NULL) {
+            Dmsg2(200, "Unrecognized usage (usg=0x%08x, val=%d)\n",
+               hev.hid, hev.value);
+            continue;
+         }
+
+         /*
+          * ADK FIXME: The info-> struct we have now is not guaranteed to
+          * actually be the right one, because linux-2.4 does not give us
+          * enough data in the event to make a positive match. We may need
+          * to filter out ambiguous usages here or manually fetch each CI
+          * that matches the given usage.
+          */
+
+         /* Copy the stored uref, replacing its value */
+         uref = info->uref;
+         uref.value = hev.value;
       }
 
-      if (retval == 0 || retval < (int)sizeof(ev))
-         return false;
-
-      /* Walk through events
-       * Detected:
-       *   Discharging
-       *   BelowRemCapLimit
-       *   ACPresent
-       *   RemainingCapacity
-       *   RunTimeToEmpty
-       *   ShutdownImminent
-       *   NeedReplacement
-       *
-       * Perhaps Add:
-       *   APCStatusFlag
-       *   Charging
-       */
       if (my_data->debounce) {
          int sleep_time;
 
@@ -528,37 +593,18 @@ bool pusb_ups_check_state(UPSINFO *ups, unsigned int timeout_msec, int *ci, USB_
 
       write_lock(ups);
 
-      /*
-       * Workaround for Linux 2.5.x and (at least) early 2.6.
-       * The kernel hiddev driver mistakenly returns empty events
-       * whenever the device updates a report. We will filter out
-       * such events here. Patch by Adam Kropelin (thanks).
-       */
-      if (ev.usage_code == 0 && ev.value == 0) {
-         write_unlock(ups);
-         continue;
-      }
-   
-      /* Ignore events we don't recognize */
-      if ((info = find_info(ups, &ev)) == NULL) {
-         Dmsg2(200, "Unrecognized usage (rpt=%d, usg=0x%08x)\n",
-            ev.report_id, ev.usage_code);
-         write_unlock(ups);
-         continue;
-      }
-
       /* Ignore events whose value is unchanged */
-      if (info->uref.value == ev.value) {
+      if (info->uref.value == uref.value) {
          Dmsg3(200, "Ignoring unchanged value (rpt=%d, usg=0x%08x, val=%d)\n",
-            ev.report_id, ev.usage_code, ev.value);
+            uref.report_id, uref.usage_code, uref.value);
          write_unlock(ups);
          continue;
       }
 
       /* Update tracked value */
       Dmsg3(200, "Processing changed value (rpt=%d, usg=0x%08x, val=%d)\n",
-         ev.report_id, ev.usage_code, ev.value);
-      info->uref.value = ev.value;
+         uref.report_id, uref.usage_code, uref.value);
+      info->uref.value = uref.value;
 
       /* Convert the uref to a USB_VALUE */
       if (process_uref(ups, info, uval)) {
