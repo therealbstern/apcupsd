@@ -41,6 +41,81 @@
     Fri Sep 05 15:20:07 CEST 2003 Running on UPS batteries.
     Fri Sep 05 15:20:10 CEST 2003 Power is back. UPS running on mains.
 
+=== USB on windows ====
+usbhidioc2.zip in apcupsd/others
+    Re: Apcupsd for Win32 with USB support ?
+    From: "Vladislav Staroselskiy" <inet@vladstar.pp.ru>
+    To: kern@sibbald.com
+    CC: "Apcupsd-users" <apcupsd-users@lists.sourceforge.net>
+        
+    Hi Kern !
+
+    > > Is there any chance to see Apcupsd for Win32 with USB support at the
+    near
+    > > future ?
+    > Very unlikely, unless someone sends me or points me to some sample code
+    > that reads and writes USB via Windows. Even then, I'm not too
+    > enthusiastic about programming in Windows.
+
+
+    There are code examples here: http://www.alanmacek.com/usb/deviceAPI.html
+
+    There are also few helpful links:
+    USB Central: http://www.lvr.com/usb.htm
+    USB drivers page on MSDN:
+    http://msdn.microsoft.com/library/default.asp?url=/library/en-us/wceddk40/html/cxconusbdrivers.asp
+    MSDN newsgroups, where programming questions can be asked:
+    http://msdn.microsoft.com/newsgroups/
+
+    P.S. Please, don't drop this idea, the most of modern UPS's don't have
+    serial port anymore, but Windows is still OS, that users like to have on
+    their workstations... and THANKS for doing this project, apcupsd is great !
+
+    Sincerely yours, Vladislav Staroselskiy.
+======
+
+=====
+    In PowerChute Plus a daemon "_upsd" starts during the booting
+    process (or it could be started manually) by reading the
+    "pwrchute.ini" file such as "apcups.conf" in APCUPSD. This file
+    specify the parameters to the daemon, in which several variables
+    are included.  The interesting one is ups turn off and wakeup
+    time in hours.
+
+    By reading the ups turn off time the daemon execute the process
+    to turn off the Computer and ups at specific time, based on the
+    system clock.  This process would be summarized as follows:
+
+    1.  At the specific time the daemon (_upsd) execute a script to
+    shutdown the system.  This script contain the command to shutdown
+    the system (system dependent)
+
+    2.  An script file is written on root directory called
+    "upsoff.cmd" by the daemon.  This file consist the command to
+    turn off the ups.  Such as:
+
+    !/bin/sh
+    /usr/lib/powerchute/upsoff /dev/ttyd0 Normal UUS^@
+
+    The above script produced during the power failure situation and
+    similarly the following script will be produced during the
+    scheduled shutdown, in which "upsoff" is a binary in PowerChute
+    Plus package to turnoff the UPS. The above scenario is as power
+    failing situation in APCUPSD with "killpower" option.
+
+    !/bin/sh
+    /usr/lib/powerchute/upsoff /dev/ttyd0 Normal @165^@
+
+    The final parameter specifies the amount of time UPS has to go on
+    sleep, i.e., the above script is executed by the "halt" script in
+    RedHat and removed.  So that, it turn of the UPS (or make it to
+    sleep for specific time in 24 hors time period) then it the UPS
+    will wake up after the prescribed time.  Just as power failing
+    situation in APCUPSD with "killpower" option.  Then the system
+    will up as usual.  The last parameter variables specify from the
+    command set of the UPS (as I hope).
+===
+
 - Possibly add a user configurable delay before declaring a
   power outage.
 - If you add a battery pack, there is a special procedure to do
