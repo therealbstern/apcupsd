@@ -48,7 +48,7 @@
 #endif
 
 /* Enable this to force Linux 2.4 compatability mode */
-#define FORCE_COMPAT24  true
+#define FORCE_COMPAT24  false
 
 /*
  * When we are traversing the USB reports given by the UPS and we
