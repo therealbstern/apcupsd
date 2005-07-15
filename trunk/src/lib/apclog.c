@@ -80,10 +80,15 @@ void d_msg(const char *file, int line, int level, const char *fmt, ...)
 {
 #ifdef DEBUG
    char buf[4096];
-   int i;
+   int i, diff;
    va_list arg_ptr;
    bool details = true;
+   struct timeval now;
    char *my_name = "apcupsd";
+   static struct timeval start = {0,0};
+
+   if (start.tv_sec == 0 && start.tv_usec == 0)
+      gettimeofday(&start, NULL);
 
    if (level < 0) {
       details = false;
@@ -93,7 +98,10 @@ void d_msg(const char *file, int line, int level, const char *fmt, ...)
    if (level <= debug_level) {
 #ifdef FULL_LOCATION
       if (details) {
-         asnprintf(buf, sizeof(buf), "%s: %s:%d ", my_name, file, line);
+         gettimeofday(&now, NULL);
+         diff = TV_DIFF_MS(start, now);
+         asnprintf(buf, sizeof(buf), "%lu.%lu %s: %s:%d ",
+            diff/1000, diff%1000, my_name, file, line);
          i = strlen(buf);
       } else {
          i = 0;
@@ -105,23 +113,23 @@ void d_msg(const char *file, int line, int level, const char *fmt, ...)
       avsnprintf(buf + i, sizeof(buf) - i, (char *)fmt, arg_ptr);
       va_end(arg_ptr);
 
-       if (trace) {
-          if (!trace_fd) {
-             char fn[200];
-             asnprintf(fn, sizeof(fn), "./apcupsd.trace");
-             trace_fd = fopen(fn, "a+");
-          }
-          if (trace_fd) {
-             fputs(buf, trace_fd);
-             fflush(trace_fd);
-          } else {
-             /* Some problem, turn off tracing */
-             trace = false;
-          }
-       } else {   /* not tracing */
-          fputs(buf, stdout);
-          fflush(stdout);
-       }
+      if (trace) {
+         if (!trace_fd) {
+            char fn[200];
+            asnprintf(fn, sizeof(fn), "./apcupsd.trace");
+            trace_fd = fopen(fn, "a+");
+         }
+         if (trace_fd) {
+            fputs(buf, trace_fd);
+            fflush(trace_fd);
+         } else {
+            /* Some problem, turn off tracing */
+            trace = false;
+         }
+      } else {   /* not tracing */
+         fputs(buf, stdout);
+         fflush(stdout);
+      }
    }
 #endif
 }
