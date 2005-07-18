@@ -234,7 +234,7 @@ int usb_read_int_from_ups(UPSINFO *ups, int ci, int* value)
 #define TV_DIFF_MS(a, b) \
     ((b).tv_sec - (a).tv_sec) * 1000 + ((b).tv_usec - (a).tv_usec) / 1000;
 
-#define URB_DELAY_MS 5
+#define URB_DELAY_MS 20
 
 int usb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
 {
