@@ -5,7 +5,7 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
-----> Release 3.10.18 ??Jul05
+----> Release 3.10.18 21Jul05
 - Fix USB lockups on 800 RS and 650 CS models by inserting a 20 ms delay
   between control transfers.
 - bsd-usb build fix for FreeBSD-4.11
