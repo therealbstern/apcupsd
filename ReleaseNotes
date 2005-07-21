@@ -2,9 +2,9 @@
           Release Notes for Apcupsd 3.10.18
 
 NOTE: The non-pthreaded version should work in this release, but
-      will be removed in the next major release (3.12.x).
+      has been removed in the next major release (3.12.x).
 
-Release 3.10.18 ??Jul05
+Release 3.10.18 21Jul05
 * This is a bug-fix only release. There are no new features. Users with
   USB connections are especially recommended to upgrade.
 - Fix runaway process with USB on 2.6.12 (and 2.6.11 SUSE) kernels
