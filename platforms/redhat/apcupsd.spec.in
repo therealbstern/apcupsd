@@ -95,7 +95,7 @@ Requires: gd >= 2.0
 Requires: gd < 2.0
 %endif
 %if %{rh7}
-Requires: glibc >= 2.2, libjpeg, libpng, zlib, freetype
+Requires: glibc >= 2.2, ligjpeg, libpng, zlib, freetype
 %else
 Requires: glibc >= 2.3
 %endif
@@ -209,7 +209,7 @@ install -m744 examples/make-hiddev \
 %config(noreplace) %{_sysconfdir}/apcupsd/commfailure
 %config(noreplace) %{_sysconfdir}/apcupsd/commok
 %config(noreplace) %{_sysconfdir}/apcupsd/onbattery
-%config(noreplace) %{_sysconfdir}/apcupsd/offbattery
+%config(noreplace) %{_sysconfdir}/apcupsd/mainsback
 %config(noreplace) %{_sysconfdir}/apcupsd/apcupsd.conf
 %config(noreplace) %{_sysconfdir}/apcupsd/hosts.conf
 %config(noreplace) %{_sysconfdir}/apcupsd/multimon.conf
@@ -306,7 +306,7 @@ fi
 %config(noreplace) %{_sysconfdir}/apcupsd/commfailure
 %config(noreplace) %{_sysconfdir}/apcupsd/commok
 %config(noreplace) %{_sysconfdir}/apcupsd/onbattery
-%config(noreplace) %{_sysconfdir}/apcupsd/offbattery
+%config(noreplace) %{_sysconfdir}/apcupsd/mainsback
 %config(noreplace) %{_sysconfdir}/apcupsd/apcupsd.conf
 %config(noreplace) %{_sysconfdir}/apcupsd/hosts.conf
 %config(noreplace) %{_sysconfdir}/apcupsd/multimon.conf
@@ -391,8 +391,6 @@ fi
 %endif
 
 %changelog
-* Sat Apr 30 2005 D. Scott Barninger <barninger at fairfieldcomputers.com>
-- fix typo in rh7 dependencies
 * Sat Mar 12 2005 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - clean up halt insertion code, add check for whitebox-release
 - remove cruft that has been commented out for a long time

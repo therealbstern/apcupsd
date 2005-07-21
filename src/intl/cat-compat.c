@@ -108,14 +108,14 @@ textdomain (domainname)
   if (new_name == NULL)
     return NULL;
 
-  astrncpy (new_name, PACKAGE, new_name_len);
+  strcpy (new_name, PACKAGE);
   new_catalog = catopen (new_name, 0);
 
   if (new_catalog == (nl_catd) -1)
     {
       /* NLSPATH search didn't work, try absolute path */
-      asnprintf (new_name, new_name_len, "%s/%s/LC_MESSAGES/%s.cat",
-                 LOCALEDIR, lang, PACKAGE);
+      sprintf (new_name, "%s/%s/LC_MESSAGES/%s.cat", LOCALEDIR, lang,
+	       PACKAGE);
       new_catalog = catopen (new_name, 0);
 
       if (new_catalog == (nl_catd) -1)

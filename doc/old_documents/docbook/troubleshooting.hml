@@ -1,0 +1,84 @@
+<chapter id='troubleshooting'><title>Troubleshooting Your Installation</title>
+
+<sect1><title>Known Problems with USB UPSes</title>
+
+<sect2><title>Some Cheaper Models Do Not Have Battery Charge</title>
+
+<para>
+Unfortunately, some cheaper USB models do not seem to report
+BCHARGE in the apcaccess output listing, which means with a
+standard conf file, your system will be immediately shutdown.
+To correct this, set the BATTERYLEVEL directive in your apcupsd.conf
+file to -1.
+</para>
+<para>
+Some of these cheaper USB UPSes also do not report the Voltage. This
+is annoying but does not cause the unit to malfunction.
+</para>
+
+</sect2>
+
+
+<sect2><title>Reconnection does not clean up the lockfile</title>
+
+<para>If either you disconnect the UPS or it disconnects because of
+some electrical problem, it will most certainly reconnect with a
+different device number. Apcupsd will detect this and reconnect
+properly. However, <application>apcupsd</application> does not release
+the old device (USB port) lock file and create a new one. This is
+not too serious.</para>
+
+</sect2>
+<sect2><title>Power Off (killpower) of UPS Does Not Work</title>
+
+<para>Currently (as of 3.10.6) the code to power off the UPS works
+only if you have a Linux kernel version 2.4.22 or greater, or
+you have applied the patches in the examples directory to your
+kernel.</para>
+
+</sect2>
+<sect2><title><application>apcupsd</application> Cannot Reconnect
+After a Reboot</title>
+
+<para>If <application>apcupsd</application> does not connect to the
+USB port when you reboot, it is probably the appropriate kernel
+modules are not getting loaded correctly.</para>
+
+<para>You can check this by bringing up your system, fiddling around
+until you get <application>apcupsd</application> to work with the UPS,
+then doing <command>cat /proc/modules</command> andnd save the output
+some place. Then reboot your computer and before you do anything else,
+do the <command>cat /proc/modules</command> again. Most likely you
+will find some of the usb modules are missing in the second listing.</para>
+
+<para>There are two solutions:</para>
+
+<itemizedlist>
+<listitem>
+  <para>Ensure that you have the hotplug program loaded. It should fix
+  the problem. This is a bit of magic, so we are not exactly sure how
+  it works. The rpm I (Kern) have loaded is: hotplug-2001_02_14-15</para>
+
+  <para>You might want to read the man page on hotplug, and it might
+  be necessary to <command>cp /etc/hotplug/usb.rc
+  /etc/init.d/hotplug</command> to get it fully working.</para>
+</listitem>
+<listitem>
+
+  <para>You can explicitly force the appropriate usb modules to be
+  loaded by adding:</para>
+
+<programlisting>
+/sbin/modprobe &lt;missing-module-name&gt;
+</programlisting>
+
+  <para>in the <filename>/etc/rc.d/init.d/apcupsd</filename> script
+  just after the <emphasis role="bold">start)</emphasis> case (at about
+  line 17). This will force the modules to be loaded before apcupsd is
+  invoked.</para>
+</listitem>
+</itemizedlist>
+
+</sect2>
+</sect1>
+</chapter>

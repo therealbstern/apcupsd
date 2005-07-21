@@ -34,7 +34,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "apc.h"
 
 #include "usbhid.h"
 
@@ -111,7 +110,7 @@ hid_init(const char *hidname)
 				     hidname, lineno);
 			if (curpage->pagesize >= curpage->pagesizemax) {
 				curpage->pagesizemax += 10;
-				curpage->page_contents = (usage_in_page *)
+				curpage->page_contents =
 					realloc(curpage->page_contents,
 						curpage->pagesizemax *
 						sizeof (struct usage_in_page));
@@ -125,11 +124,11 @@ hid_init(const char *hidname)
 			if (npages >= npagesmax) {
 				if (pages == 0) {
 					npagesmax = 5;
-					pages = (usage_page *)malloc(npagesmax *
+					pages = malloc(npagesmax *
 						  sizeof (struct usage_page));
 				} else {
 					npagesmax += 5;
-					pages = (usage_page *)realloc(pages,
+					pages = realloc(pages,
 						   npagesmax *
 						   sizeof (struct usage_page));
 				}
@@ -141,7 +140,7 @@ hid_init(const char *hidname)
 			curpage->usage = no;
 			curpage->pagesize = 0;
 			curpage->pagesizemax = 10;
-			curpage->page_contents = (usage_in_page *)
+			curpage->page_contents =
 				malloc(curpage->pagesizemax *
 				       sizeof (struct usage_in_page));
 			if (!curpage->page_contents)
@@ -166,7 +165,7 @@ hid_usage_page(int i)
 	for (k = 0; k < npages; k++)
 		if (pages[k].usage == i)
 			return pages[k].name;
-	asnprintf(b, sizeof(b), "0x%04x", i);
+	sprintf(b, "0x%04x", i);
 	return b;
 }
 
@@ -188,7 +187,7 @@ hid_usage_in_page(unsigned int u)
 	for (j = 0; j < pages[k].pagesize; j++) {
 		us = pages[k].page_contents[j].usage;
 		if (us == -1) {
-			asnprintf(b, sizeof(b),
+			sprintf(b,
 			    fmtcheck(pages[k].page_contents[j].name, "%d"),
 			    i);
 			return b;
@@ -197,7 +196,7 @@ hid_usage_in_page(unsigned int u)
 			return pages[k].page_contents[j].name;
 	}
  bad:
-	asnprintf(b, sizeof(b), "0x%04x", i);
+	sprintf(b, "0x%04x", i);
 	return b;
 }
 

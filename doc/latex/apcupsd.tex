@@ -5,14 +5,20 @@
 \usepackage{html}
 \usepackage{float}
 \usepackage{graphicx}
-\usepackage{apcupsd}
+\usepackage{bacula}
 \usepackage{longtable}
 \usepackage{makeidx}
 \usepackage{index}
 \usepackage{setspace}
 \usepackage{hyperref}
 
-\makeindex
+
+%%\makeindex
+%%\newindex{dir}{ddx}{dnd}{Director Index}
+%%\newindex{fd}{fdx}{fnd}{File Daemon Index}
+%%\newindex{sd}{sdx}{snd}{Storage Daemon Index}
+%%\newindex{console}{cdx}{cnd}{Console Index}
+%%\newindex{general}{idx}{ind}{General Index}
 
 \sloppy
 
@@ -29,28 +35,13 @@
 %% \textwidth 7in
 
 \title{\includegraphics{./apcupsd.eps} \\ \bigskip
-   \Large{Apcupsd is a UPS control system that permits
-   orderly shutdown of your
-   computer in the event of a power failure.} }
+   \Large{It comes in the night and sucks the essence
+        from your computers.} }
 \author{Kern Sibbald}
 \date{\vspace{2.0in}\today \\
-      This manual documents apcupsd version 3.10.17 \\
-Copyright (C) 1999-2005 Kern Sibbald }
-
+      This manual documents Bacula version 1.37.4}
 
 \maketitle
-
-Copying and distribution of this file, with or without
-modification, are permitted in any medium without royalty
-provided the name Apcupsd, the copyright notice, and this notice
-are preserved.
-
-Apcupsd source code is released under the GNU General Public
-License version 2. Please see the file COPYING in the main source
-directory.
-
-For more information on the project, please visit the main web
-site at http://www.apcupsd.com
 
 \clearpage
 \tableofcontents
@@ -61,6 +52,18 @@ site at http://www.apcupsd.com
 \clearpage
 
 \include{manual}
-\printindex
+%
+
+% The following line tells link_resolver.pl to not include these files:
+% nolinks baculai-dir baculai-fd baculai-sd baculai-console baculai-general
+
+% pull in the index
+%%\clearpage
+%%\include{baculai-dir}
+%%\include{baculai-fd}
+%%\include{baculai-sd}
+%%\include{baculai-console}
+%%\include{baculai-general}
+%\printindex
 
 \end{document}
