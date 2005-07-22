@@ -46,6 +46,21 @@ runtime expires based on internal APC calculations determined by power
 consumption rates. Apcupsd is licensed under the GPL version 2.
 <p>
 <h2>Recent Apcupsd Releases</h2>
+<h3>3.10.18 (21 July 2005) [
+<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=49059&release_id=343935">Source</a>
+&nbsp;/&nbsp;
+RPMs
+&nbsp;/&nbsp;
+Win32
+]</h3>
+<b>Apcupsd</b> version 3.10.18 is a bug-fix only release; there are
+no new features. Users with USB connections are especially recommended
+to upgrade. This version contains changes for compatibility with linux
+2.6.12 kernels, and a fix for crashes on HPUX systems, a fix for
+'control queue full' lockups with certain USB models (650 CS, 800 RS,
+possibly others). Also included are minor fixes to apctest when used
+with a blank DEVICE setting (which is the recommended configuration
+for USB) and a BSD USB shutdown fix for ES models.
 <h3>3.10.17a (22 April 2005) [
 <a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=49059&release_id=322777">Source</a>
 ]</h3>
@@ -122,19 +137,25 @@ We have moved the release of source and binaries (downloads) to Source
 Forge for several reasons: 1. Lack of manpower to maintain several
 sites, 2. The excellent Open Software Development services offered by
 Source Forge. In addition to hosting all our new releases, the Source
-Forge site has a CVS repository where you can find the very latest
-development software. Please visit it and become familiar with how it
-works.
+Forge site has a <a href="http://sourceforge.net/cvs/?group_id=54413">
+CVS repository</a> where you can find the very latest development
+software. Please visit it and become familiar with how it works.
+<p>
 If you wish to get a copy of the latest CVS code, you can do so
 by doing:
-  cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/apcupsd login
-  (Press ENTER when prompted for a password)
-  cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/apcupsd co apcupsd
+<p>
+<pre>  cvs -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/apcupsd login</pre>
+(Press ENTER when prompted for a password)
+<pre>  cvs -z3 -d:pserver:anonymous@cvs.sourceforge.net:/cvsroot/apcupsd co apcupsd</pre>
+<p>
 The above will put a copy of the current CVS into the directory named apcupsd
 (better make sure it does not exist before issuing the command).
+<p>
 Thereafter to get the latest code, simply:
+<pre>
   cd apcupsd
   cvs -z3 update -Pd
+</pre>
 </td>
 </tr>
 </table>
