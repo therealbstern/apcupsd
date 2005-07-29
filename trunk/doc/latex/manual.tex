@@ -5227,7 +5227,8 @@ this case, please be aware that you must ensure proper shutdown of your
 machine if necessary.  
 
 Some sample scripts (onbattery and mainsback) that email power failure
-messages can be found in the examples directory of the source code. 
+messages can be found in /etc/apcupsd after an install or in the
+platforms/etc directory of the source code.
 
 \label{Master_002fSlave-Configurations}
 
@@ -8595,10 +8596,11 @@ The shutdown sequence is as follows:
    {\tt /etc/apcupsd/apccontrol onbattery}, which normally sends a message to all
    users informing them that the UPS is on batteries.  
 \item When one of the conditions listed below occurs, apcupsd issues a
-   shutdown command by calling {\tt /etc/apcupsd/apccontrol doshutdown}, which
-   should perform a shutdown of your system using the system shutdown(8) command.
-You can modify the behavior by editing the /etc/apcupsd/apccontrol script, but
-doing so will make it more complicated to upgrade to the next apcupsd version.
+   shutdown command by calling {\tt /etc/apcupsd/apccontrol doshutdown},
+   which should perform a shutdown of your system using the system
+   shutdown(8) command.  You can modify the behavior by editing the
+   /etc/apcupsd/apccontrol script, but doing so will make it more
+   complicated to upgrade to the next apcupsd version.
  
 
 The conditions that trigger the shutdown can be: running time on batteries
