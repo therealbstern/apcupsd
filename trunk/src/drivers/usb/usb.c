@@ -298,8 +298,8 @@ int usb_read_int_from_ups(UPSINFO *ups, int ci, int *value)
    return pusb_read_int_from_ups(ups, ci, value);
 }
 
-#define URB_DELAY_MS 5
-
+/* Fetch the given CI from the UPS */
+#define URB_DELAY_MS 20
 static int usb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
 {
    static struct timeval prev = {0};
@@ -345,6 +345,10 @@ int usb_ups_entry_point(UPSINFO *ups, int command, void *data)
  * implemented here
  */
 
+/*
+ * Given a CI and a raw uval, update the UPSINFO structure with the
+ * new value.
+ */
 static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
 {
    int v, yy, mm, dd;
@@ -619,6 +623,7 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
    }
 }
 
+/* Fetch the given CI from the UPS and update the UPSINFO structure */
 static void usb_update_value(UPSINFO* ups, int ci)
 {
    USB_VALUE uval;
@@ -627,7 +632,6 @@ static void usb_update_value(UPSINFO* ups, int ci)
       usb_process_value(ups, ci, &uval);
    }
 }
-
 
 /*
  * Read UPS info that changes -- e.g. voltage, temperature, etc.
@@ -655,7 +659,7 @@ int usb_ups_read_volatile_data(UPSINFO *ups)
    write_lock(ups);
    ups->poll_time = now;           /* save time stamp */
 
-   /* Loop through all known data, polling the ones marked volatile */
+   /* Loop through all known data, polling those marked volatile */
    for (int i=0; known_info[i].usage_code; i++) {
       if (known_info[i].isvolatile && known_info[i].ci != CI_NONE)
          usb_update_value(ups, known_info[i].ci);
@@ -675,7 +679,7 @@ int usb_ups_read_static_data(UPSINFO *ups)
 {
    write_lock(ups);
 
-   /* Loop through all known data, polling the ones marked non-volatile */
+   /* Loop through all known data, polling those marked non-volatile */
    for (int i=0; known_info[i].usage_code; i++) {
       if (!known_info[i].isvolatile && known_info[i].ci != CI_NONE)
          usb_update_value(ups, known_info[i].ci);
