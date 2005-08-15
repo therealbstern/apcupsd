@@ -35,7 +35,7 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
 int pusb_ups_open(UPSINFO *ups);
 int pusb_ups_close(UPSINFO *ups);
 int pusb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval);
-int pusb_ups_check_state(UPSINFO *ups, unsigned int timeout_msec, int *ci, USB_VALUE *uval);
+int pusb_ups_check_state(UPSINFO *ups);
 int pusb_ups_setup(UPSINFO *ups);
 int pusb_write_int_to_ups(UPSINFO *ups, int ci, int value, char *name);
 int pusb_read_int_from_ups(UPSINFO *ups, int ci, int *value);
@@ -205,72 +205,7 @@ int usb_ups_get_capabilities(UPSINFO *ups)
 
 int usb_ups_check_state(UPSINFO *ups)
 {
-   USB_VALUE uval;
-   struct timeval exit, now;
-   int diff, ci;
-
-   /* Calculate at what time we need to exit */
-   gettimeofday(&exit, NULL);
-   exit.tv_sec += ups->wait_time;
-
-   while(1) {
-      /* Calculate how long before we need to exit */
-      gettimeofday(&now, NULL);
-      diff = TV_DIFF_MS(now, exit);
-      if (diff <= 0)
-         break;
-
-      Dmsg1(300, "usb_ups_check_state: Waiting %d msec\n", diff);
-
-      /* Call the lower layer to wait for an event */
-      if (pusb_ups_check_state(ups, diff, &ci, &uval)) {
-         
-         /* Got an event: go process it */
-         usb_process_value(ups, ci, &uval);
-
-         switch (ci) {
-         /*
-          * Some important usages cause us to return so immediate
-          * action can be taken.
-          */
-         case CI_Discharging:
-         case CI_ACPresent:
-         case CI_BelowRemCapLimit:
-         case CI_RemainingCapacity:
-         case CI_RunTimeToEmpty:
-         case CI_NeedReplacement:
-         case CI_ShutdownImminent:
-            return true;
-
-         /*
-          * We don't handle these directly, but rather use them as a
-          * signal to go poll the full set of volatile data.
-          */
-         case CI_IFailure:
-         case CI_Overload:
-         case CI_PWVoltageOOR:
-         case CI_PWFrequencyOOR:
-         case CI_OverCharged:
-         case CI_OverTemp:
-         case CI_CommunicationLost:
-         case CI_ChargerVoltageOOR:
-         case CI_ChargerCurrentOOR:
-         case CI_CurrentNotRegulated:
-         case CI_VoltageNotRegulated:
-         case CI_BatteryPresent:
-            return true;
-
-         /*
-          * Anything else is relatively unimportant, so we can
-          * keep gathering data until the timeout.
-          */
-         default:
-            break;
-         }
-      }
-   }
-
-   return true;
+   return pusb_ups_check_state(ups);
 }
 
 int usb_ups_open(UPSINFO *ups)
@@ -982,14 +917,63 @@ double pow_ten(int exponent)
 
    if (exponent < 0) {
       exponent = -exponent;
-      for (i = 0; i < exponent; i++) {
+      for (i = 0; i < exponent; i++)
          val = val / 10;
-      }
       return val;
    } else {
-      for (i = 0; i < exponent; i++) {
+      for (i = 0; i < exponent; i++)
          val = val * 10;
-      }
    }
+
    return val;
+}
+
+/* Called by platform-specific code to report an interrupt event */
+int usb_report_event(UPSINFO *ups, int ci, USB_VALUE *uval)
+{
+   Dmsg2(200, "USB driver reported event ci=%d, val=%f\n",
+      ci, uval->dValue);
+
+   /* Got an event: go process it */
+   usb_process_value(ups, ci, uval);
+
+   switch (ci) {
+   /*
+    * Some important usages cause us to abort interrupt waiting
+    * so immediate action can be taken.
+    */
+   case CI_Discharging:
+   case CI_ACPresent:
+   case CI_BelowRemCapLimit:
+   case CI_RemainingCapacity:
+   case CI_RunTimeToEmpty:
+   case CI_NeedReplacement:
+   case CI_ShutdownImminent:
+      return true;
+
+   /*
+    * We don't handle these directly, but rather use them as a
+    * signal to go poll the full set of volatile data.
+    */
+   case CI_IFailure:
+   case CI_Overload:
+   case CI_PWVoltageOOR:
+   case CI_PWFrequencyOOR:
+   case CI_OverCharged:
+   case CI_OverTemp:
+   case CI_CommunicationLost:
+   case CI_ChargerVoltageOOR:
+   case CI_ChargerCurrentOOR:
+   case CI_CurrentNotRegulated:
+   case CI_VoltageNotRegulated:
+   case CI_BatteryPresent:
+      return true;
+
+   /*
+    * Anything else is relatively unimportant, so we can
+    * keep gathering data until the timeout.
+    */
+   default:
+      return false;
+   }
 }

@@ -43,6 +43,8 @@ typedef struct s_usb_info {
    int data_type;                  /* data type */
    hid_item_t item;                /* HID item */
    int report_len;                 /* Length of containing report */
+   int ci;                         /* which CI does this usage represent? */
+   int value;                      /* Previous value of this item */
 } USB_INFO;
 
 /*
@@ -385,6 +387,7 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
             }
 
             my_data->info[ci] = info;
+            info->ci = ci;
             info->usage_code = item.usage;
             info->unit_exponent = item.unit_exponent;
             info->unit = item.unit;
@@ -403,6 +406,94 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
    return 1;
 }
 
+static bool populate_uval(UPSINFO *ups, USB_INFO *info, unsigned char *data, USB_VALUE *uval)
+{
+   USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
+   const char *str;
+   int exponent;
+   USB_VALUE val;
+
+   /* data+1 skips the report tag byte */
+   info->value = hid_get_data(data+1, &info->item);
+
+   exponent = info->unit_exponent;
+   if (exponent > 7)
+      exponent = exponent - 16;
+
+   if (info->data_type == T_INDEX) {    /* get string */
+      if (info->value == 0)
+         return false;
+
+      str = hidu_get_string(my_data->fd, info->value);
+      if (!str)
+         return false;
+
+      strncpy(ups->buf, str, ups->buf_len);
+      val.value_type = V_STRING;
+      val.sValue = ups->buf;
+   } else if (info->data_type == T_UNITS) {
+      val.value_type = V_DOUBLE;
+
+      switch (info->unit) {
+      case 0x00F0D121:
+         val.UnitName = "Volts";
+         exponent -= 7;            /* remove bias */
+         break;
+      case 0x00100001:
+         exponent += 2;            /* remove bias */
+         val.UnitName = "Amps";
+         break;
+      case 0xF001:
+         val.UnitName = "Hertz";
+         break;
+      case 0x1001:
+         val.UnitName = "Seconds";
+         break;
+      case 0xD121:
+         exponent -= 7;            /* remove bias */
+         val.UnitName = "Watts";
+         break;
+      case 0x010001:
+         val.UnitName = "Degrees K";
+         break;
+      case 0x0101001:
+         val.UnitName = "AmpSecs";
+         if (exponent == 0)
+            val.dValue = info->value;
+         else
+            val.dValue = ((double)info->value) * pow_ten(exponent);
+         break;
+      default:
+         val.UnitName = "";
+         val.value_type = V_INTEGER;
+         val.iValue = info->value;
+         break;
+      }
+
+      if (exponent == 0)
+         val.dValue = info->value;
+      else
+         val.dValue = ((double)info->value) * pow_ten(exponent);
+
+   } else {                        /* should be T_NONE */
+
+      val.UnitName = "";
+      val.value_type = V_INTEGER;
+      val.iValue = info->value;
+
+      if (exponent == 0)
+         val.dValue = info->value;
+      else
+         val.dValue = ((double)info->value) * pow_ten(exponent);
+
+      Dmsg4(200, "Def val=%d exp=%d dVal=%f ci=%d\n", info->value,
+         exponent, val.dValue, info->ci);
+   }
+
+   memcpy(uval, &val, sizeof(*uval));
+   return true;   
+}
+
 /*
  * Get a field value
  */
@@ -410,10 +501,9 @@ bool pusb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
 {
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
    USB_INFO *info = my_data->info[ci];
-   USB_VALUE val;
    unsigned char data[20];
-   int exponent, len, value;
-   const char *str;
+   int len;
+   bool rc;
 
    /*
     * Note we need to check info since CI_STATUS is always true
@@ -454,105 +544,24 @@ bool pusb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
       info->report_len = len;
    }
 
-   /* data+1 skips the report tag byte */
-   value = hid_get_data(data + 1, &info->item);
-
-   exponent = info->unit_exponent;
-   if (exponent > 7)
-      exponent = exponent - 16;
-
-   if (info->data_type == T_INDEX) {    /* get string */
-      if (value == 0)
-         return false;
-
-      str = hidu_get_string(my_data->fd, value);
-      if (!str)
-         return false;
-
-      strncpy(ups->buf, str, ups->buf_len);
-      val.value_type = V_STRING;
-      val.sValue = ups->buf;
-   } else if (info->data_type == T_UNITS) {
-      val.value_type = V_DOUBLE;
-
-      switch (info->unit) {
-      case 0x00F0D121:
-         val.UnitName = "Volts";
-         exponent -= 7;            /* remove bias */
-         break;
-      case 0x00100001:
-         exponent += 2;            /* remove bias */
-         val.UnitName = "Amps";
-         break;
-      case 0xF001:
-         val.UnitName = "Hertz";
-         break;
-      case 0x1001:
-         val.UnitName = "Seconds";
-         break;
-      case 0xD121:
-         exponent -= 7;            /* remove bias */
-         val.UnitName = "Watts";
-         break;
-      case 0x010001:
-         val.UnitName = "Degrees K";
-         break;
-      case 0x0101001:
-         val.UnitName = "AmpSecs";
-         if (exponent == 0)
-            val.dValue = value;
-         else
-            val.dValue = ((double)value) * pow_ten(exponent);
-         break;
-      default:
-         val.UnitName = "";
-         val.value_type = V_INTEGER;
-         val.iValue = value;
-         break;
-      }
-
-      if (exponent == 0)
-         val.dValue = value;
-      else
-         val.dValue = ((double)value) * pow_ten(exponent);
-
-   } else {                        /* should be T_NONE */
-
-      val.UnitName = "";
-      val.value_type = V_INTEGER;
-      val.iValue = value;
-
-      if (exponent == 0)
-         val.dValue = value;
-      else
-         val.dValue = ((double)value) * pow_ten(exponent);
-
-      Dmsg4(200, "Def val=%d exp=%d dVal=%f ci=%d\n", value,
-         exponent, val.dValue, ci);
-   }
-
-   memcpy(uval, &val, sizeof(*uval));
-   return true;
+   /* Populate a uval struct using the raw report data */
+   return populate_uval(ups, info, data, uval);
 }
-
-
-#define MATCH_CI(x)     \
-    (ups->UPS_Cap[x] && \
-    (buf[0] == my_data->info[x]->item.report_ID))
 
 /*
  * Read UPS events. I.e. state changes.
  */
 int pusb_ups_check_state(UPSINFO *ups)
 {
-   int i;
+   int i, ci;
    int retval, value;
    unsigned char buf[20];
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
    struct timespec now, exit;
    struct timeval tv;
    fd_set rfds;
-
+   USB_VALUE uval;
+   
    /* Figure out when we need to exit by */
    clock_gettime(CLOCK_REALTIME, &exit);
    exit.tv_sec += ups->wait_time;
@@ -611,20 +620,6 @@ int pusb_ups_check_state(UPSINFO *ups)
          printf("\n");
       }
 
-      /* Walk through events
-       * Detected:
-       *   Discharging
-       *   BelowRemCapLimit
-       *   ACPresent
-       *   RemainingCapacity
-       *   RunTimeToEmpty
-       *   ShutdownImminent
-       *   NeedReplacement
-       *
-       * Perhaps Add:
-       *   APCStatusFlag
-       *   Charging
-       */
       if (my_data->debounce) {
          int sleep_time;
 
@@ -645,90 +640,35 @@ int pusb_ups_check_state(UPSINFO *ups)
       write_lock(ups);
 
       /*
-       * We have to check all CIs we're interested in and not stop
-       * at the first match because a single report update can affect
-       * multiple CIs.
+       * Iterate over all CIs, firing off events for any that are
+       * affected by this report.
        */
+      for (ci=0; ci<CI_MAXCI; ci++) {
+         if (my_data->info[ci] &&
+             my_data->info[ci]->item.report_ID == buf[0]) {
 
-      if (MATCH_CI(CI_Discharging)) {
-         value = hid_get_data(buf + 1, &my_data->info[CI_Discharging]->item);
+            /* Ignore this event if the value has not changed */
+            value = hid_get_data(buf+1, &my_data->info[ci]->item);
+            if (my_data->info[ci]->value == value) {
+               Dmsg3(200, "Ignoring unchanged value (ci=%d, rpt=%d, val=%d)\n",
+                  ci, buf[0], value);
+               continue;
+            }
 
-         /* If first time on batteries, debounce */
-         if (!ups->is_onbatt() && value)
-            my_data->debounce = time(NULL);
+            Dmsg3(200, "Processing changed value (ci=%d, rpt=%d, val=%d)\n",
+               ci, buf[0], value);
 
-         if (value)
-            ups->clear_online();
-         else
-            ups->set_online();
+            /* Populate a uval and report it to the upper layer */
+            populate_uval(ups, my_data->info[ci], buf, &uval);
+            if (usb_report_event(ups, ci, &uval)) {
+               write_unlock(ups);
+               return true;
+            }
+         }
       }
-
-      if (MATCH_CI(CI_BelowRemCapLimit)) {
-         value = hid_get_data(buf + 1, &my_data->info[CI_BelowRemCapLimit]->item);
-
-         if (value)
-            ups->set_battlow();
-         else
-            ups->clear_battlow();
-
-         Dmsg1(200, "UPS_battlow = %d\n", ups->is_battlow());
-      }
-
-      if (MATCH_CI(CI_ACPresent)) {
-         value = hid_get_data(buf + 1, &my_data->info[CI_ACPresent]->item);
-
-         /* If first time on batteries, debounce */
-         if (!ups->is_onbatt() && !value)
-            my_data->debounce = time(NULL);
-
-         if (!value)
-            ups->clear_online();
-         else
-            ups->set_online();
-      }
-
-      if (MATCH_CI(CI_RemainingCapacity)) {
-         value = hid_get_data(buf + 1, &my_data->info[CI_RemainingCapacity]->item);
-         ups->BattChg = value;
-      }
-
-      if (MATCH_CI(CI_RunTimeToEmpty)) {
-         value = hid_get_data(buf + 1, &my_data->info[CI_RunTimeToEmpty]->item);
-
-         if (my_data->vendor == VENDOR_APC)
-            ups->TimeLeft = ((double)value) / 60;  /* seconds */
-         else
-            ups->TimeLeft = value;                 /* minutes */
-      }
-
-      if (MATCH_CI(CI_NeedReplacement)) {
-         value = hid_get_data(buf + 1, &my_data->info[CI_NeedReplacement]->item);
-
-         if (value)
-            ups->set_replacebatt();
-         else
-            ups->clear_replacebatt();
-      }
-
-      if (MATCH_CI(CI_ShutdownImminent)) {
-         value = hid_get_data(buf + 1, &my_data->info[CI_ShutdownImminent]->item);
-
-         if (value)
-            ups->set_shutdownimm();
-         else
-            ups->clear_shutdownimm();
-
-         Dmsg1(200, "ShutdownImminent=%d\n", ups->is_shutdownimm());
-      }
-
-      Dmsg1(200, "Status=%d\n", ups->Status);
 
       write_unlock(ups);
-
-      break;
    }
-
-   return 1;
 }
 
 /*
