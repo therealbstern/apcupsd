@@ -2,6 +2,12 @@
                         Adam Kropelin
 
 General:
+15Aug05
+- Increase inter-URB delay to 20 msec as per 3.10.18.
+- Fix powerflute compilation on Solaris by preferring
+  ncurses/*.h headers over include/*.h when both
+  exist.
+- C++ fixes for compilation on Solaris.
 08Jul05
 - Bump version number and date
 - Back-port inter-URB delay lockup fix from Branch-3_10_17
