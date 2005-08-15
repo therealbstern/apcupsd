@@ -15,7 +15,7 @@
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static char rcsid[] = "$Id: inet_pton.c,v 1.5 2003-09-02 07:55:35 kerns Exp $";
+static char rcsid[] = "$Id: inet_pton.c,v 1.6 2005-08-15 05:32:31 adk0212 Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 #include "apc.h"
@@ -54,17 +54,14 @@ static int	inet_pton6 __P((const char *src, u_char *dst));
  *	Paul Vixie, 1996.
  */
 int
-inet_pton(af, src, dst)
-	int af;
-	const char *src;
-	void *dst;
+inet_pton(int af, const char *src, void *dst)
 {
 	switch (af) {
 	case AF_INET:
-		return (inet_pton4(src, dst));
+		return (inet_pton4(src, (u_char*)dst));
 #ifdef AF_INET6
 	case AF_INET6:
-		return (inet_pton6(src, dst));
+		return (inet_pton6(src, (u_char*)dst));
 #endif
 	default:
 		errno = EAFNOSUPPORT;
@@ -84,9 +81,7 @@ inet_pton(af, src, dst)
  *	Paul Vixie, 1996.
  */
 static int
-inet_pton4(src, dst)
-	const char *src;
-	u_char *dst;
+inet_pton4(const char *src, u_char *dst)
 {
         static const char digits[] = "0123456789";
 	int saw_digit, octets, ch;
@@ -99,11 +94,11 @@ inet_pton4(src, dst)
 		const char *pch;
 
 		if ((pch = strchr(digits, ch)) != NULL) {
-			u_int new = *tp * 10 + (pch - digits);
+			u_int nw = *tp * 10 + (pch - digits);
 
-			if (new > 255)
+			if (nw > 255)
 				return (0);
-			*tp = new;
+			*tp = nw;
 			if (! saw_digit) {
 				if (++octets > 4)
 					return (0);
@@ -138,9 +133,7 @@ inet_pton4(src, dst)
  */
 #ifdef AF_INET6
 static int
-inet_pton6(src, dst)
-	const char *src;
-	u_char *dst;
+inet_pton6(const char *src, u_char *dst)
 {
         static const char xdigits_l[] = "0123456789abcdef",
                           xdigits_u[] = "0123456789ABCDEF";
