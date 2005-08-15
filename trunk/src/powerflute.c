@@ -41,8 +41,6 @@
 # endif                            /* HAVE_MENU_H */
 #endif                             /* HAVE_NCURSES_MENU_H */
 
-#include <curses.h>
-
 #define TIMER_POWERFLUTE        5
 #define RESTORE_BUFFER          3
 
