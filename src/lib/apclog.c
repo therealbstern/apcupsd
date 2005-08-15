@@ -100,7 +100,7 @@ void d_msg(const char *file, int line, int level, const char *fmt, ...)
       if (details) {
          gettimeofday(&now, NULL);
          diff = TV_DIFF_MS(start, now);
-         asnprintf(buf, sizeof(buf), "%lu.%lu %s: %s:%d ",
+         asnprintf(buf, sizeof(buf), "%lu.%03lu %s: %s:%d ",
             diff/1000, diff%1000, my_name, file, line);
          i = strlen(buf);
       } else {
