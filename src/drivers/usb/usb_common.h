@@ -91,6 +91,6 @@ int usb_ups_get_capabilities(UPSINFO *ups);
 
 /* Useful helper functions for use by platform-specific code */ 
 double pow_ten(int exponent);
+int usb_report_event(UPSINFO *ups, int ci, USB_VALUE *uval);
 
-
 #endif  /* _USB_COMMON_H */
