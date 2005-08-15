@@ -175,8 +175,9 @@ static char *posixly_correct;
 
 /* Avoid depending on library functions or files
    whose names are inconsistent.  */
-
-char *getenv ();
+/* ADK: No, let's just include the darn thing and be done with it. */
+/* char *getenv (); */
+#include <stdlib.h>
 
 static char *
 my_index (const char *str, int chr)
@@ -669,8 +670,7 @@ _getopt_internal (int argc, char *const *argv, const char *optstring,
 }
 
 int
-getopt (int argc, char *const *argv, const char *optstring,
-)
+getopt (int argc, char *const *argv, const char *optstring)
 {
   return _getopt_internal (argc, argv, optstring,
 			   (const struct option *) 0,
