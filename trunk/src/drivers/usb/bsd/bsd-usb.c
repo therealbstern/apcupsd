@@ -503,7 +503,6 @@ bool pusb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
    USB_INFO *info = my_data->info[ci];
    unsigned char data[20];
    int len;
-   bool rc;
 
    /*
     * Note we need to check info since CI_STATUS is always true
@@ -561,12 +560,13 @@ int pusb_ups_check_state(UPSINFO *ups)
    struct timeval tv;
    fd_set rfds;
    USB_VALUE uval;
-   
+   bool done = false;
+
    /* Figure out when we need to exit by */
    clock_gettime(CLOCK_REALTIME, &exit);
    exit.tv_sec += ups->wait_time;
 
-   for (;;) {
+   while (!done) {
 
       /* Figure out how long until we have to exit */
       clock_gettime(CLOCK_REALTIME, &now);
@@ -661,14 +661,20 @@ int pusb_ups_check_state(UPSINFO *ups)
             /* Populate a uval and report it to the upper layer */
             populate_uval(ups, my_data->info[ci], buf, &uval);
             if (usb_report_event(ups, ci, &uval)) {
-               write_unlock(ups);
-               return true;
+               /*
+                * The upper layer considers this an important event,
+                * so we will return after processing any remaining
+                * CIs for this report.
+                */
+               done = true;
             }
          }
       }
 
       write_unlock(ups);
    }
+   
+   return true;
 }
 
 /*
