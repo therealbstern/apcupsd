@@ -323,7 +323,7 @@ static int usb_link_check(UPSINFO *ups)
    return 1;
 }
 
-static bool process_uref(UPSINFO *ups, USB_INFO *info, USB_VALUE *uval)
+static bool populate_uval(UPSINFO *ups, USB_INFO *info, USB_VALUE *uval)
 {
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
    struct hiddev_string_descriptor sdesc;
@@ -425,7 +425,7 @@ bool pusb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
       return false;
 
    /* Process the updated value */
-   return process_uref(ups, info, uval);
+   return populate_uval(ups, info, uval);
 }
 
 /*
@@ -473,20 +473,21 @@ static USB_INFO *find_info_by_ucode(UPSINFO *ups, unsigned int ucode)
 /*
  * Read UPS events. I.e. state changes.
  */
-bool pusb_ups_check_state(UPSINFO *ups, unsigned int timeout_msec, int *ci, USB_VALUE *uval)
+bool pusb_ups_check_state(UPSINFO *ups)
 {
    int retval;
-   bool valid = false;
+   bool done = false;
    struct hiddev_usage_ref uref;
    struct hiddev_event hev;
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
    USB_INFO* info;
+   USB_VALUE uval;
 
    struct timeval tv;
-   tv.tv_sec = timeout_msec / 1000;
-   tv.tv_usec = (timeout_msec % 1000) * 1000;
+   tv.tv_sec = ups->wait_time;
+   tv.tv_usec = 0;
 
-   while (!valid) {
+   while (!done) {
       fd_set rfds;
 
       FD_ZERO(&rfds);
@@ -606,10 +607,15 @@ bool pusb_ups_check_state(UPSINFO *ups, unsigned int timeout_msec, int *ci, USB_
          uref.report_id, uref.usage_code, uref.value);
       info->uref.value = uref.value;
 
-      /* Convert the uref to a USB_VALUE */
-      if (process_uref(ups, info, uval)) {
-         *ci = info->ci;
-         valid = true;
+      /* Populate a uval and report it to the upper layer */
+      populate_uval(ups, info, &uval);
+      if (usb_report_event(ups, info->ci, &uval)) {
+         /*
+          * The upper layer considers this an important event,
+          * so we will return after processing any remaining
+          * CIs for this report.
+          */
+         done = true;
       }
 
       write_unlock(ups);
