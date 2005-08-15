@@ -893,30 +893,21 @@ AC_ARG_WITH(cgi-bin,
 dnl
 dnl	use option --enable-powerflute to compile powerflute
 dnl
-POWERFLUTE_ENABLE="no"
 AC_ARG_ENABLE(powerflute,
 	[AC_HELP_STRING([--enable-powerflute], [Compile powerflute program])],
-	[ if test "$enableval" = "yes" ; then
-	    POWERFLUTE_ENABLE="yes"
-	    AC_CHECK_LIB(ncurses, initscr,
-	[PL="-lncurses"],
-	[echo '  disabling powerflute.'; POWERFLUTE_ENABLE="no"])
-	    AC_CHECK_LIB(menu, new_menu,
-	[PL="-lmenu $PL"],
-	[echo '  disabling powerflute.'; POWERFLUTE_ENABLE="no"], -lncurses)
-	    AC_CHECK_LIB(form, new_form,
-	[PL="-lform $PL"],
-	[echo '  disabling powerflute.'; POWERFLUTE_ENABLE="no"], -lncurses)
-	    AC_CHECK_LIB(panel, new_panel,
-	[PL="-lpanel $PL"],
-	[echo '  disabling powerflute.'; POWERFLUTE_ENABLE="no"], -lncurses)
+	[ if test "$enableval" = "yes" ; then 
+	    AC_CHECK_LIB(ncurses, initscr, [],
+		AC_MSG_ERROR([Powerflute requires libncurses.]), [])
+	    AC_CHECK_LIB(menu, new_menu, [],
+		AC_MSG_ERROR([Powerflute requires libncurses.]), [])
+	    AC_CHECK_LIB(form, new_form, [],
+		AC_MSG_ERROR([Powerflute requires libncurses.]), [])
+	    AC_CHECK_LIB(panel, new_panel, [],
+		AC_MSG_ERROR([Powerflute requires libncurses.]), [])
+	    POWERFLUTE="powerflute"
+	    POWERLIBS="-lncurses -lmenu -lform -lpanel"
+	    AC_DEFINE(HAVE_POWERFLUTE)
 	  fi])
-
-if test "$POWERFLUTE_ENABLE" = "yes"; then
-  POWERFLUTE="powerflute"
-  POWERLIBS="$PL"
-  AC_DEFINE(HAVE_POWERFLUTE)
-fi
 
 AC_SUBST(POMAKE)
 AC_SUBST(INTLSUB)
@@ -1059,7 +1050,6 @@ else
 	echo 'Disabling cgi support...'
 fi
 
-
 dnl
 dnl Checks for powerflute
 dnl
@@ -1071,10 +1061,10 @@ dnl Check if ncurses headers are present.
 dnl
 	NCH="yes"
 
-	AC_CHECK_HEADERS(curses.h menu.h panel.h,,[NCH="no"])
+	AC_CHECK_HEADERS(ncurses/curses.h ncurses/menu.h ncurses/panel.h,,[NCH="no"])
 	if test "$NCH" = "no"
 	then
-		AC_CHECK_HEADERS(ncurses/curses.h ncurses/menu.h ncurses/panel.h,,[
+		AC_CHECK_HEADERS(curses.h menu.h panel.h,,[
 			AC_MSG_ERROR([ncurses headers not found.])])
 	fi
 else

@@ -10739,13 +10739,12 @@ fi;
 
 
 
-POWERFLUTE_ENABLE="no"
 # Check whether --enable-powerflute or --disable-powerflute was given.
 if test "${enable_powerflute+set}" = set; then
   enableval="$enable_powerflute"
    if test "$enableval" = "yes" ; then
-	    POWERFLUTE_ENABLE="yes"
-	    echo "$as_me:$LINENO: checking for initscr in -lncurses" >&5
+
+echo "$as_me:$LINENO: checking for initscr in -lncurses" >&5
 echo $ECHO_N "checking for initscr in -lncurses... $ECHO_C" >&6
 if test "${ac_cv_lib_ncurses_initscr+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -10810,18 +10809,26 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_lib_ncurses_initscr" >&5
 echo "${ECHO_T}$ac_cv_lib_ncurses_initscr" >&6
 if test $ac_cv_lib_ncurses_initscr = yes; then
-  PL="-lncurses"
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBNCURSES 1
+_ACEOF
+
+  LIBS="-lncurses $LIBS"
+
 else
-  echo '  disabling powerflute.'; POWERFLUTE_ENABLE="no"
+  { { echo "$as_me:$LINENO: error: Powerflute requires libncurses." >&5
+echo "$as_me: error: Powerflute requires libncurses." >&2;}
+   { (exit 1); exit 1; }; }
 fi
 
-	    echo "$as_me:$LINENO: checking for new_menu in -lmenu" >&5
+
+echo "$as_me:$LINENO: checking for new_menu in -lmenu" >&5
 echo $ECHO_N "checking for new_menu in -lmenu... $ECHO_C" >&6
 if test "${ac_cv_lib_menu_new_menu+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lmenu -lncurses $LIBS"
+LIBS="-lmenu  $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -10880,18 +10887,26 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_lib_menu_new_menu" >&5
 echo "${ECHO_T}$ac_cv_lib_menu_new_menu" >&6
 if test $ac_cv_lib_menu_new_menu = yes; then
-  PL="-lmenu $PL"
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBMENU 1
+_ACEOF
+
+  LIBS="-lmenu $LIBS"
+
 else
-  echo '  disabling powerflute.'; POWERFLUTE_ENABLE="no"
+  { { echo "$as_me:$LINENO: error: Powerflute requires libncurses." >&5
+echo "$as_me: error: Powerflute requires libncurses." >&2;}
+   { (exit 1); exit 1; }; }
 fi
 
-	    echo "$as_me:$LINENO: checking for new_form in -lform" >&5
+
+echo "$as_me:$LINENO: checking for new_form in -lform" >&5
 echo $ECHO_N "checking for new_form in -lform... $ECHO_C" >&6
 if test "${ac_cv_lib_form_new_form+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lform -lncurses $LIBS"
+LIBS="-lform  $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -10950,18 +10965,26 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_lib_form_new_form" >&5
 echo "${ECHO_T}$ac_cv_lib_form_new_form" >&6
 if test $ac_cv_lib_form_new_form = yes; then
-  PL="-lform $PL"
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBFORM 1
+_ACEOF
+
+  LIBS="-lform $LIBS"
+
 else
-  echo '  disabling powerflute.'; POWERFLUTE_ENABLE="no"
+  { { echo "$as_me:$LINENO: error: Powerflute requires libncurses." >&5
+echo "$as_me: error: Powerflute requires libncurses." >&2;}
+   { (exit 1); exit 1; }; }
 fi
 
-	    echo "$as_me:$LINENO: checking for new_panel in -lpanel" >&5
+
+echo "$as_me:$LINENO: checking for new_panel in -lpanel" >&5
 echo $ECHO_N "checking for new_panel in -lpanel... $ECHO_C" >&6
 if test "${ac_cv_lib_panel_new_panel+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lpanel -lncurses $LIBS"
+LIBS="-lpanel  $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -11020,22 +11043,26 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_lib_panel_new_panel" >&5
 echo "${ECHO_T}$ac_cv_lib_panel_new_panel" >&6
 if test $ac_cv_lib_panel_new_panel = yes; then
-  PL="-lpanel $PL"
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBPANEL 1
+_ACEOF
+
+  LIBS="-lpanel $LIBS"
+
 else
-  echo '  disabling powerflute.'; POWERFLUTE_ENABLE="no"
+  { { echo "$as_me:$LINENO: error: Powerflute requires libncurses." >&5
+echo "$as_me: error: Powerflute requires libncurses." >&2;}
+   { (exit 1); exit 1; }; }
 fi
 
-	  fi
-fi;
-
-if test "$POWERFLUTE_ENABLE" = "yes"; then
-  POWERFLUTE="powerflute"
-  POWERLIBS="$PL"
-  cat >>confdefs.h <<\_ACEOF
+	    POWERFLUTE="powerflute"
+	    POWERLIBS="-lncurses -lmenu -lform -lpanel"
+	    cat >>confdefs.h <<\_ACEOF
 #define HAVE_POWERFLUTE 1
 _ACEOF
 
-fi
+	  fi
+fi;
 
 
 
@@ -14219,7 +14246,6 @@ else
 	echo 'Disabling cgi support...'
 fi
 
-
 if test "$POWERFLUTE" = "powerflute"
 then
 	USE_POWERFLUTE=yes
@@ -14228,7 +14254,7 @@ then
 
 
 
-for ac_header in curses.h menu.h panel.h
+for ac_header in ncurses/curses.h ncurses/menu.h ncurses/panel.h
 do
 as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
 if eval "test \"\${$as_ac_Header+set}\" = set"; then
@@ -14384,7 +14410,7 @@ done
 
 
 
-for ac_header in ncurses/curses.h ncurses/menu.h ncurses/panel.h
+for ac_header in curses.h menu.h panel.h
 do
 as_ac_Header=`echo "ac_cv_header_$ac_header" | $as_tr_sh`
 if eval "test \"\${$as_ac_Header+set}\" = set"; then

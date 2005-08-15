@@ -27,19 +27,19 @@
 #include "apc.h"
 #ifdef HAVE_POWERFLUTE
 
-#ifdef HAVE_MENU_H
-# include <curses.h>
-# include <panel.h>
-# include <menu.h>
+#ifdef HAVE_NCURSES_MENU_H
+# include <ncurses/curses.h>
+# include <ncurses/panel.h>
+# include <ncurses/menu.h>
 #else
-# ifdef HAVE_NCURSES_MENU_H
-#  include <ncurses/curses.h>
-#  include <ncurses/panel.h>
-#  include <ncurses/menu.h>
+# ifdef HAVE_MENU_H
+#  include <curses.h>
+#  include <panel.h>
+#  include <menu.h>
 # else
 #  error You must have ncurses installed to use powerflute.
-# endif                            /* HAVE_NCURSES_MENU_H */
-#endif                             /* HAVE_MENU_H */
+# endif                            /* HAVE_MENU_H */
+#endif                             /* HAVE_NCURSES_MENU_H */
 
 #include <curses.h>
 
