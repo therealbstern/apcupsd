@@ -430,7 +430,7 @@ void update_upsdata(int sig)
 
    update_all();
 
-   alarm(TIMER_POWERFLUTE);
+   init_timer(TIMER_POWERFLUTE, update_upsdata);
 }
 
 static void close_curses(void)
@@ -779,8 +779,6 @@ int main(int argc, char **argv)
       status = FAILURE;
       goto out;
    }
-
-   init_timer(TIMER_POWERFLUTE, update_upsdata);
 
    /* If after the longjmp we need to restore the mesg buffer, do it now. */
    if (flag == RESTORE_BUFFER)
