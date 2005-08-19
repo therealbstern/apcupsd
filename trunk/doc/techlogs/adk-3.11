@@ -2,12 +2,17 @@
                         Adam Kropelin
 
 General:
+
+18Aug05
+- Fix powerflute SIGALRM timer on Solaris by reinstalling signal
+  handler whenever the timer expires.
 15Aug05
 - Increase inter-URB delay to 20 msec as per 3.10.18.
 - Fix powerflute compilation on Solaris by preferring
   ncurses/*.h headers over include/*.h when both
   exist.
 - C++ fixes for compilation on Solaris.
+- BSD and Linux USB rework to report events via callback.
 08Jul05
 - Bump version number and date
 - Back-port inter-URB delay lockup fix from Branch-3_10_17
