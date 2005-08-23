@@ -256,43 +256,41 @@
 #define    APC_CMD_ForceShutdown          0
 #define CI_DelayBeforeShutdown           62
 #define    APC_CMD_DelayBeforeShutdown    0
-#define CI_APCBattCapBeforeStartup       63
-#define    APC_CMD_BattCapBeforeStartup   0
-#define CI_APCDelayBeforeStartup         64
+#define CI_APCDelayBeforeStartup         63
 #define    APC_CMD_DelayBeforeStartup     0
-#define CI_APCDelayBeforeShutdown        65
+#define CI_APCDelayBeforeShutdown        64
 #define    APC_CMD_DelayBeforeShutdown    0
 
 /* Only seen on the BackUPS Pro USB (so far) */
-#define CI_BUPBattCapBeforeStartup       66
+#define CI_BUPBattCapBeforeStartup       65
 #define    BUP_CMD_BattCapBeforeStartup   0
-#define CI_BUPDelayBeforeStartup         67
+#define CI_BUPDelayBeforeStartup         66
 #define    BUP_CMD_DelayBeforeStartup     0
-#define CI_BUPSelfTest                   68
+#define CI_BUPSelfTest                   67
 #define    BUP_CMD_SelfTest               0
-#define CI_BUPHibernate                  69
+#define CI_BUPHibernate                  68
 #define    BUP_CMD_Hibernate              0
 
 /*
  * We don't actually handle these, but use them as a signal
  * to re-examine the other UPS data items. (USB only)
  */
-#define CI_IFailure                      70  /* Internal failure */
-#define CI_PWVoltageOOR                  71  /* Power sys voltage out of range */
-#define CI_PWFrequencyOOR                72  /* Power sys frequency out of range */
-#define CI_OverCharged                   73  /* Battery overcharged */
-#define CI_OverTemp                      74  /* Over temperature */
-#define CI_CommunicationLost             75  /* USB comms with subsystem lost */
-#define CI_ChargerVoltageOOR             76  /* Charger voltage our of range */
-#define CI_ChargerCurrentOOR             77  /* Charger current our of range */
-#define CI_CurrentNotRegulated           78  /* Charger current not regulated */
-#define CI_VoltageNotRegulated           79  /* Charger voltage not regulated */
-#define CI_BatteryPresent                80  /* Battery is present */
+#define CI_IFailure                      69  /* Internal failure */
+#define CI_PWVoltageOOR                  70  /* Power sys voltage out of range */
+#define CI_PWFrequencyOOR                71  /* Power sys frequency out of range */
+#define CI_OverCharged                   72  /* Battery overcharged */
+#define CI_OverTemp                      73  /* Over temperature */
+#define CI_CommunicationLost             74  /* USB comms with subsystem lost */
+#define CI_ChargerVoltageOOR             75  /* Charger voltage our of range */
+#define CI_ChargerCurrentOOR             76  /* Charger current our of range */
+#define CI_CurrentNotRegulated           77  /* Charger current not regulated */
+#define CI_VoltageNotRegulated           78  /* Charger voltage not regulated */
+#define CI_BatteryPresent                79  /* Battery is present */
 
 /* Items below this line are not "probed" for */
-#define CI_CYCLE_EPROM         81       /* Cycle programmable EPROM values */
+#define CI_CYCLE_EPROM         80       /* Cycle programmable EPROM values */
 #define    APC_CMD_CYCLE_EPROM    '-'
-#define CI_UPS_CAPS            82       /* Get UPS capabilities (command) string */
+#define CI_UPS_CAPS            81       /* Get UPS capabilities (command) string */
 #define    APC_CMD_UPS_CAPS       'a'
 /* ^^^^^^^^^^ see below if you change this ^^^^^^ */
 

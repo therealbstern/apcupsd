@@ -137,7 +137,7 @@ const struct s_known_info known_info[] = {
    {CI_BattReplaceDate,         0xFF860016, P_ANY,     T_APCDATE,  false},  /* APCBattReplaceDate */
    {CI_NONE,                    0xFF860042, P_ANY,     T_NONE,     false},  /* APC_UPS_FirmwareRevision */
    {CI_NONE,                    0xFF860079, P_ANY,     T_NONE,     false},  /* APC_USB_FirmwareRevision */
-   {CI_APCBattCapBeforeStartup, 0xFF860019, P_ANY,     T_CAPACITY, false},  /* APCBattCapBeforeStartup */
+   {CI_RETPCT,                  0xFF860019, P_ANY,     T_CAPACITY, false},  /* APCBattCapBeforeStartup */
    {CI_APCDelayBeforeStartup,   0xFF86007E, P_ANY,     T_UNITS,    false},  /* APCDelayBeforeStartup */
    {CI_APCDelayBeforeShutdown,  0xFF86007D, P_ANY,     T_UNITS,    false},  /* APCDelayBeforeShutdown */
    {CI_BUPBattCapBeforeStartup, 0x00860012, P_ANY,     T_NONE,     false},  /* BUPBattCapBeforeStartup */
@@ -624,11 +624,24 @@ int usb_ups_read_static_data(UPSINFO *ups)
    return 1;
 }
 
-/* How long to wait before killing output power */
+/*
+ * How long to wait before killing output power.
+ * This value is NOT used on BackUPS Pro models.
+ */
 #define SHUTDOWN_DELAY  60
 
-/* How many seconds of good utility power before turning output back on */
+/*
+ * How many seconds of good utility power before turning output back on.
+ * This value is NOT used on BackUPS Pro models.
+ */
 #define STARTUP_DELAY   10
+
+/*
+ * What percentage battery charge before turning output back on.
+ * On at least some models this must be a multiple of 15%.
+ * This value is NOT used on BackUPS Pro models.
+ */
+#define STARTUP_PERCENT 0
 
 int usb_ups_kill_power(UPSINFO *ups)
 {
@@ -651,9 +664,9 @@ int usb_ups_kill_power(UPSINFO *ups)
     * to fail. The value we program here should be made configurable
     * some day.
     */
-   if (UPS_HAS_CAP(CI_APCBattCapBeforeStartup)) {
-      func = "CI_APCBattCapBeforeStartup";
-      if (!usb_write_int_to_ups(ups, CI_APCBattCapBeforeStartup, 0, func))
+   if (UPS_HAS_CAP(CI_RETPCT)) {
+      func = "CI_RETPCT";
+      if (!usb_write_int_to_ups(ups, CI_RETPCT, STARTUP_PERCENT, func))
          Dmsg1(100, "Unable to set %s (not an error)\n", func);
    }
 
@@ -702,7 +715,7 @@ int usb_ups_kill_power(UPSINFO *ups)
     */
    if (UPS_HAS_CAP(CI_APCDelayBeforeStartup)) {
       func = "CI_APCDelayBeforeStartup";
-      if (!usb_write_int_to_ups(ups, CI_APCDelayBeforeStartup, 10, func)) {
+      if (!usb_write_int_to_ups(ups, CI_APCDelayBeforeStartup, STARTUP_DELAY, func)) {
          Dmsg1(100, "Unable to set %s (not an error)\n", func);
       }
    }
