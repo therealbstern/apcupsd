@@ -9,7 +9,7 @@ SYSADMIN=root
 APCUPSD_MAIL="@APCUPSD_MAIL@"
 
 HOSTNAME=`hostname`
-MSG="$HOSTNAME Serial port communications with UPS restored"
+MSG="$HOSTNAME Communications with UPS restored"
 #
 (
    echo "Subject: $MSG"
