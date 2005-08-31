@@ -278,8 +278,9 @@ static void copy_self_test_results(UPSINFO *ups)
    /*
     * Responses are:
     * "OK" - good battery, 
-    * "BT" - failed due to insufficient capacity, 
-    * "NG" - failed due to overload, 
+    * "NG" - failed, 
+    * "WN" - warning, 
+    * "IP" - test in progress, 
     * "NO" - no results available (no test performed in last 5 minutes) 
     */
    if (ups->X[0] == 'O' && ups->X[1] == 'K') {
