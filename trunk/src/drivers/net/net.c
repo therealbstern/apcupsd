@@ -534,7 +534,7 @@ int net_ups_read_volatile_data(UPSINFO *ups)
    if (GETVAR(CI_FREQ, "outputfreq"))
       ups->LineFreq = atof(answer);
 
-   if (GETVAR(CI_LTRANS, "lastxfer")) {
+   if (GETVAR(CI_WHY_BATT, "lastxfer")) {
       if (!strcmp(answer, "No transfers since turnon"))
          ups->G[0] = 'O';
       if (!strcmp(answer, "Automatic or explicit self test"))
