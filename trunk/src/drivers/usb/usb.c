@@ -481,7 +481,8 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
       case 0:  /* No transfers have ocurred */
          ups->G[0] = 'O';
          break;
-      case 4:  /* Low line voltage */
+      case 4:  /* Low line voltage (Guess) */
+      case 8:  /* Low line voltage (Guess) */
          ups->G[0] = 'L';
          break;
       case 5:  /* Self Test or Discharge Calibration commanded thru */
