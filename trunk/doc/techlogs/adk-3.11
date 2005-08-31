@@ -2,7 +2,20 @@
                         Adam Kropelin
 
 General:
-
+30Aug05
+- Rephrase comm{ok,failure} messages to not assume a serial port
+  connection.
+- USB: Add CI_APCLineFailStatus support. This allows apcupsd to
+  distinguish battery transitions due to self test from those 
+  due to utility power failure.
+- Increase self test grace period to 20 seconds (from 12) to
+  accomodate lengthy USB event hysteresis imposed by the UPS.
+- USB: Set self test result string.
+- USB: Fix excessive unlocking bug in pusb_ups_check_state().
+- NET: Fix minor copy-n-paste error in net_ups_read_volatile_data.
+23Aug05
+- USB: Use CI_RETPCT instead of CI_APCDelayBeforeStartup which is not
+  only cleaner but also causes RETPCT to be properly reported.
 18Aug05
 - Fix powerflute SIGALRM timer on Solaris by reinstalling signal
   handler whenever the timer expires.
