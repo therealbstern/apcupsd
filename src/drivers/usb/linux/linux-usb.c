@@ -453,7 +453,7 @@ static USB_INFO *find_info_by_uref(UPSINFO *ups, struct hiddev_usage_ref *uref)
 
 /*
  * Same as find_info_by_uref() but only checks the usage code. This is
- * not entirely reliable, but it's the best be have on linux-2.4.
+ * not entirely reliable, but it's the best we have on linux-2.4.
  */
 static USB_INFO *find_info_by_ucode(UPSINFO *ups, unsigned int ucode)
 {
@@ -535,7 +535,6 @@ bool pusb_ups_check_state(UPSINFO *ups)
          if ((info = find_info_by_uref(ups, &uref)) == NULL) {
             Dmsg3(200, "Unrecognized usage (rpt=%d, usg=0x%08x, val=%d)\n",
                uref.report_id, uref.usage_code, uref.value);
-            write_unlock(ups);
             continue;
          }
       } else {
@@ -612,8 +611,7 @@ bool pusb_ups_check_state(UPSINFO *ups)
       if (usb_report_event(ups, info->ci, &uval)) {
          /*
           * The upper layer considers this an important event,
-          * so we will return after processing any remaining
-          * CIs for this report.
+          * so we will return immediately.
           */
          done = true;
       }
