@@ -282,39 +282,37 @@ int output_status(UPSINFO *ups, int sockfd,
          s_write(ups, "LINEFREQ : %03.1f Hz\n", ups->LineFreq);
 
       /* Output cause of last transfer to batteries */
-      /*
-       * FIXME This code has no business knowing about CI_APCLineFailCause
-       * or any other bizarre USB CI. We should have an is_valid flag for
-       * each field in the ups-> structure instead of relying on CIs.
-       */
-      if (ups->UPS_Cap[CI_WHY_BATT] || ups->UPS_Cap[CI_APCLineFailCause]) {
-         switch ((*ups).G[0]) {
-         case 'O':
-            s_write(ups, "LASTXFER : No transfers since turnon\n");
-            break;
-         case 'S':
-            s_write(ups, "LASTXFER : Automatic or explicit self test\n");
-            break;
-         case 'L':
-            s_write(ups, "LASTXFER : Low line voltage\n");
-            break;
-         case 'H':
-            s_write(ups, "LASTXFER : High line voltage\n");
-            break;
-         case 'T':
-            s_write(ups, "LASTXFER : Line voltage notch or spike\n");
-            break;
-         case 'R':
-            s_write(ups, "LASTXFER : Unacceptable line voltage changes\n");
-            break;
-         case 'K':
-            s_write(ups, "LASTXFER : Software command or UPS's test control\n");
-            break;
-         default:
-            s_write(ups, "LASTXFER : UNKNOWN EVENT %s\n", ups->G);
-            break;
-         }
+      switch (ups->lastxfer) {
+      case XFER_NONE:
+         s_write(ups, "LASTXFER : No transfers since turnon\n");
+         break;
+      case XFER_SELFTEST:
+         s_write(ups, "LASTXFER : Automatic or explicit self test\n");
+         break;
+      case XFER_FORCED:
+         s_write(ups, "LASTXFER : Forced by software\n");
+         break;
+      case XFER_UNDERVOLT:
+         s_write(ups, "LASTXFER : Low line voltage\n");
+         break;
+      case XFER_OVERVOLT:
+         s_write(ups, "LASTXFER : High line voltage\n");
+         break;
+      case XFER_RIPPLE:
+         s_write(ups, "LASTXFER : Unacceptable line voltage changes\n");
+         break;
+      case XFER_NOTCHSPIKE:
+         s_write(ups, "LASTXFER : Line voltage notch or spike\n");
+         break;
+      case XFER_UNKNOWN:
+         s_write(ups, "LASTXFER : UNKNOWN EVENT\n");
+         break;
+      case XFER_NA:
+      default:
+         /* UPS doesn't report this data */
+         break;
       }
+
       s_write(ups, "NUMXFERS : %d\n", ups->num_xfers);
       if (ups->num_xfers > 0) {
          localtime_r(&ups->last_onbatt_time, &tm);

@@ -152,33 +152,32 @@ void init_timer(int timer, void (*fnhandler) (int))
    alarm(timer);
 }
 
-char *xlate_history(char code)
+char *xlate_history(LastXferCause code)
 {
    switch (code) {
-   case 'O':
+   case XFER_NONE:
       return "Power Up";
       break;
-   case 'S':
+   case XFER_SELFTEST:
       return "Self Test";
       break;
-   case 'L':
+   case XFER_UNDERVOLT:
       return "Line Voltage Decrease";
       break;
-   case 'H':
+   case XFER_OVERVOLT:
       return "Line Voltage Increase";
       break;
-   case 'T':
+   case XFER_NOTCHSPIKE:
       return "Power Failure";
       break;
+   case XFER_FORCED:
+      return "Forced";
+      break;
+   case XFER_RIPPLE:
+      return "Ripple";
+      break;
    default:
-      /*
-       * XXX
-       *
-       * The value of the 'G' query from UPS is unknown
-       * and need to be investigated. We should log to
-       * syslog the value of code.
-       */
-      return "Unknown Event (see syslog)";
+      return "Unknown Event";
       break;
    }
 }
@@ -302,7 +301,7 @@ void update_upsdata(int sig)
    mvwprintw(statwin, 8, 1, "AC Level   : %s",
       (ups->is_boost() ? "low" :
          (ups->is_trim() ? "high" : "normal")));
-   mvwprintw(statwin, 9, 1, "Last event : %s", xlate_history(ups->G[0]));
+   mvwprintw(statwin, 9, 1, "Last event : %s", xlate_history(ups->lastxfer));
 
    mvwprintw(moniwin, 1, 1, "ACin");
    if (ups->UPS_Cap[CI_VLINE]) {

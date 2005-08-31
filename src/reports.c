@@ -168,28 +168,27 @@ static void log_data(UPSINFO *ups)
          log_event(ups, LOG_INFO, "LINEFAIL:DOWN BATTSTAT:%s", ptr);
       }
 
-      switch ((*ups).G[0]) {
-      case 'O':
+      switch (ups->lastxfer) {
+      case XFER_NONE:
          ptr = "POWER UP";
          break;
-      case 'S':
+      case XFER_SELFTEST:
          ptr = "SELF TEST";
          break;
-      case 'L':
+      case XFER_UNDERVOLT:
          ptr = "LINE VOLTAGE DECREASE";
          break;
-      case 'H':
+      case XFER_OVERVOLT:
          ptr = "LINE VOLTAGE INCREASE";
          break;
-      case 'T':
+      case XFER_NOTCHSPIKE:
          ptr = "POWER FAILURE";
          break;
-      case 'R':
+      case XFER_RIPPLE:
          ptr = "R-EVENT";
          break;
       default:
-         asnprintf(msg, sizeof(msg), "UNKNOWN EVENT %c %c",
-            (*ups).G[0], (*ups).G[1]);
+         asnprintf(msg, sizeof(msg), "UNKNOWN EVENT");
          ptr = msg;
          break;
       }

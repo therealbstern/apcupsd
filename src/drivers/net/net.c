@@ -536,19 +536,21 @@ int net_ups_read_volatile_data(UPSINFO *ups)
 
    if (GETVAR(CI_WHY_BATT, "lastxfer")) {
       if (!strcmp(answer, "No transfers since turnon"))
-         ups->G[0] = 'O';
-      if (!strcmp(answer, "Automatic or explicit self test"))
-         ups->G[0] = 'S';
-      if (!strcmp(answer, "Low line voltage"))
-         ups->G[0] = 'L';
-      if (!strcmp(answer, "High line voltage"))
-         ups->G[0] = 'H';
-      if (!strcmp(answer, "Line voltage notch or spike"))
-         ups->G[0] = 'T';
-      if (!strcmp(answer, "Unacceptable line voltage changes"))
-         ups->G[0] = 'R';
-      if (!strncmp(answer, "UNKNOWN EVENT", 13))
-         ups->G[0] = *(answer + 15);
+         ups->lastxfer = XFER_NONE;
+      else if (!strcmp(answer, "Automatic or explicit self test"))
+         ups->lastxfer = XFER_SELFTEST;
+      else if (!strcmp(answer, "Forced by software"))
+         ups->lastxfer = XFER_FORCED;
+      else if (!strcmp(answer, "Low line voltage"))
+         ups->lastxfer = XFER_UNDERVOLT;
+      else if (!strcmp(answer, "High line voltage"))
+         ups->lastxfer = XFER_OVERVOLT;
+      else if (!strcmp(answer, "Line voltage notch or spike"))
+         ups->lastxfer = XFER_NOTCHSPIKE;
+      else if (!strcmp(answer, "Unacceptable line voltage changes"))
+         ups->lastxfer = XFER_RIPPLE;
+      else
+         ups->lastxfer = XFER_UNKNOWN;
    }
 
    if (getupsvar(ups, "selftest", answer, sizeof(answer)))

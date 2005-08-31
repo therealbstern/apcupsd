@@ -479,21 +479,21 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
       Dmsg1(100, "CI_APCLineFailCause=%d\n", uval->iValue);
       switch (uval->iValue) {
       case 0:  /* No transfers have ocurred */
-         ups->G[0] = 'O';
+         ups->lastxfer = XFER_NONE;
          break;
       case 4:  /* Low line voltage (Guess) */
       case 8:  /* Low line voltage (Guess) */
-         ups->G[0] = 'L';
+         ups->lastxfer = XFER_UNDERVOLT;
          break;
       case 5:  /* Self Test or Discharge Calibration commanded thru */
                /* Test usage, front button, or 2 week self test */
       case 11: /* Test usage invoked */
       case 12: /* Front button initiated self test */
       case 13: /* 2 week self test */
-         ups->G[0] = 'S';
+         ups->lastxfer = XFER_SELFTEST;
          break;
       default:
-         ups->G[0] = 'U';
+         ups->lastxfer = XFER_UNKNOWN;
          break;
       }
       break;
@@ -635,10 +635,10 @@ int usb_ups_entry_point(UPSINFO *ups, int command, void *data)
       if (usb_update_value(ups, CI_WHY_BATT) ||
           usb_update_value(ups, CI_APCLineFailCause))
       {
-         Dmsg1(80, "Transfer reason: %c\n", ups->G[0]);
+         Dmsg1(80, "Transfer reason: %d\n", ups->lastxfer);
 
          /* See if this is a self test rather than power failure */
-         if (ups->G[0] == 'S') {
+         if (ups->lastxfer == XFER_SELFTEST) {
             /*
              * set Self Test start time
              */
