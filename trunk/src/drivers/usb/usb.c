@@ -305,6 +305,7 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
 {
    int v, yy, mm, dd;
    char *p;
+   int32_t temp;
 
    /*
     * ADK FIXME: This switch statement is really excessive. Consider
@@ -320,7 +321,7 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
        * Use a temporary for bitmasking so ups->Status will be
        * updated atomically.
        */
-      int32_t temp = ups->Status & ~0xff;
+      temp = ups->Status & ~0xff;
       temp |= (uval->iValue & 0xff);
       ups->Status = temp;
       break;
