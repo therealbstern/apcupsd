@@ -94,6 +94,32 @@ static void copy_self_test_results(UPSINFO *ups)
    astrncpy(ups->selftestmsg, msg, sizeof(ups->selftestmsg));
 }
 
+static LastXferCause decode_lastxfer(char *str)
+{
+   Dmsg1(80, "Transfer reason: %c\n", *str);
+
+   switch (*str) {
+   case 'N':
+      return XFER_NA;
+   case 'R':
+      return XFER_RIPPLE;
+   case 'H':
+      return XFER_OVERVOLT;
+   case 'L':
+      return XFER_UNDERVOLT;
+   case 'T':
+      return XFER_NOTCHSPIKE;
+   case 'O':
+      return XFER_NONE;
+   case 'K':
+      return XFER_FORCE;
+   case 'S':
+      return XFER_SELFTEST;
+   default:
+      return XFER_UNKNOWN;
+   }
+}
+
 int apc_enable(UPSINFO *ups)
 {
    /* Enable APC Smart UPS */
@@ -406,7 +432,8 @@ int apcsmart_ups_read_volatile_data(UPSINFO *ups)
 
    /* Reason for last transfer to batteries */
    if (ups->UPS_Cap[CI_WHY_BATT]) {
-      strncpy(ups->G, smart_poll(ups->UPS_Cmd[CI_WHY_BATT], ups), sizeof(ups->G));
+      ups->lastxfer = decode_lastxfer(
+         smart_poll(ups->UPS_Cmd[CI_WHY_BATT], ups));
       /*
        * XXX
        *
@@ -651,41 +678,38 @@ int apcsmart_ups_entry_point(UPSINFO *ups, int command, void *data)
        * One day we will do this test inside the driver and not as an
        * entry point.
        */
-    redo:
       /* Reason for last transfer to batteries */
       if (ups->UPS_Cap[CI_WHY_BATT]) {
-         ups->G[0] = 0;
-         strncpy(ups->G, smart_poll(ups->UPS_Cmd[CI_WHY_BATT], ups), sizeof(ups->G));
-         Dmsg1(80, "Transfer reason: %c\n", ups->G[0]);
-         if (ups->G[0] == 'N' && ups->G[1] == 'A') {
-            Dmsg0(80, "Transfer reason still not available.\n");
-            if (retries-- > 0) {
-               sleep(2);           /* debounce */
-               goto redo;
-            }
-            /*
-             * Be careful because if we go out of here without
-             * knowing the reason of transfer (i.e. the reason
-             * is "NA", apcupsd will think this is a power failure
-             * even if it is a self test. Not much of a problem
-             * as this should not happen.
-             * We allow 5 retries for reading reason from UPS before
-             * giving up.
-             */
-         }
-         /* See if this is a self test rather than power failure */
-         if (ups->G[0] == 'S') {
-            /*
-             * set Self Test start time
-             */
-            ups->SelfTest = time(NULL);
-            Dmsg1(80, "Self Test time: %s", ctime(&ups->SelfTest));
+         ups->lastxfer = XFER_NA;
+         while (ups->lastxfer == XFER_NA && retries--) {
+            ups->lastxfer = decode_lastxfer(
+               smart_poll(ups->UPS_Cmd[CI_WHY_BATT], ups));
+            if (ups->lastxfer == XFER_NA) {
+               Dmsg0(80, "Transfer reason still not available.\n");
+               if (retries > 0)
+                  sleep(2);           /* debounce */
+
+               /*
+                * Be careful because if we go out of here without
+                * knowing the reason of transfer (i.e. the reason
+                * is "NA", apcupsd will think this is a power failure
+                * even if it is a self test. Not much of a problem
+                * as this should not happen.
+                * We allow 5 retries for reading reason from UPS before
+                * giving up.
+                */
+            } else if (ups->lastxfer == XFER_SELFTEST) {
+               ups->SelfTest = time(NULL);
+               Dmsg1(80, "Self Test time: %s", ctime(&ups->SelfTest));
+            } 
          }
       }
+      break;
 
    default:
       return FAILURE;
       break;
    }
+
    return SUCCESS;
 }

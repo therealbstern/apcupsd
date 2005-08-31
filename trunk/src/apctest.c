@@ -84,6 +84,7 @@ static void usb_run_self_test(void);
 static int usb_get_battery_date(void);
 static void usb_set_battery_date(void);
 static void usb_get_manf_date(void);
+static void usb_set_alarm(void);
 #endif
 
 static void strip_trailing_junk(char *cmd);
@@ -1635,7 +1636,8 @@ static void do_usb_testing(void)
            "4) Change battery date\n"
            "5) View battery date\n"
            "6) View manufacturing date\n"
-           "7) Quit\n\n");
+           "7) Set alarm behavior\n"
+           "8) Quit\n\n");
 
       cmd = get_cmd("Select function number: ");
       if (cmd) {
@@ -1661,6 +1663,9 @@ static void do_usb_testing(void)
             usb_get_manf_date();
             break;
          case 7:
+            usb_set_alarm();
+            break;
+         case 8:
             quit = TRUE;
             break;
          default:
@@ -1679,6 +1684,74 @@ static void do_usb_testing(void)
 }
 
 #ifdef HAVE_USB_DRIVER
+
+static void usb_set_alarm(void)
+{
+   int result;
+   char* cmd;
+
+   if (!usb_read_int_from_ups(ups, CI_DALARM, &result)) {
+      pmsg("\nI don't know how to control the alarm settings on your UPS.\n");
+      return;
+   }
+   
+   pmsg("Current alarm setting: ");
+   switch(result) {
+   case 1:
+      pmsg("DISABLED\n");
+      break;
+   case 2:
+      pmsg("ENABLED\n");
+      break;
+   default:
+      pmsg("UNKNOWN\n");
+      break;
+   }
+   
+   while(1) {
+      pmsg("Press...\n"
+           " E to Enable alarms\n"
+           " D to Disable alarms\n"
+           " Q to Quit with no changes\n"
+           "Your choice: ");
+      cmd = get_cmd("Select function: ");
+      if (cmd) {
+         switch(tolower(*cmd)) {
+         case 'e':
+            usb_write_int_to_ups(ups, CI_DALARM, 2, "CI_DALARM");
+            break;
+         case 'd':
+            usb_write_int_to_ups(ups, CI_DALARM, 1, "CI_DALARM");
+            break;
+         case 'q':
+            return;
+         default:
+            pmsg("Illegal response.\n");
+            continue;
+         }
+      } else {
+         pmsg("Illegal response.\n");
+         continue;
+      }
+      
+      break;
+   }
+   
+   usb_read_int_from_ups(ups, CI_DALARM, &result);
+   pmsg("New alarm setting: ");
+   switch(result) {
+   case 1:
+      pmsg("DISABLED\n");
+      break;
+   case 2:
+      pmsg("ENABLED\n");
+      break;
+   default:
+      pmsg("UNKNOWN\n");
+      break;
+   }
+   
+}
 
 static void usb_kill_power_test(void)
 {

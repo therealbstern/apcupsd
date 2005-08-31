@@ -108,6 +108,19 @@ typedef enum {
    SMART_TEST_MAX
 } SelfTests;
 
+typedef enum {
+   XFER_NA = 0,
+   XFER_NONE,            /* No xfer since power on */
+   XFER_OVERVOLT,        /* Utility voltage too high */
+   XFER_UNDERVOLT,       /* Utility voltage too low */
+   XFER_NOTCHSPIKE,      /* Line voltage notch or spike */
+   XFER_RIPPLE,          /* Excessive utility voltage rate of change */
+   XFER_SELFTEST,        /* Auto or manual self test */
+   XFER_FORCED,          /* Forced onto battery by sw command */
+   XFER_UNKNOWN
+} LastXferCause;
+
+
 /*
  * Internal selftest structure.
  * This structure is made by two variables, one for client side
@@ -335,7 +348,7 @@ class UPSINFO {
    unsigned int dipsw;             /* dip switch info */
    unsigned int InputPhase;        /* The current AC input phase. */
    unsigned int OutputPhase;       /* The current AC output phase. */
-   char G[22];                     /* reason for last switch to batteries */
+   LastXferCause lastxfer;         /* Reason for last xfer to battery */
    char X[8];                      /* results of last seft test */
    double BattChg;                 /* remaining UPS charge % */
    double LineMin;                 /* min line voltage seen */
