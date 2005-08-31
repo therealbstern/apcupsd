@@ -40,10 +40,6 @@ int pusb_ups_setup(UPSINFO *ups);
 int pusb_write_int_to_ups(UPSINFO *ups, int ci, int value, char *name);
 int pusb_read_int_from_ups(UPSINFO *ups, int ci, int *value);
 
-/* Private helpers */
-static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval);
-static int usb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval);
-
 /*
  * This table is used when walking through the USB reports to see
  * what information found in the UPS that we want. If the usage_code 
@@ -140,6 +136,7 @@ const struct s_known_info known_info[] = {
    {CI_RETPCT,                  0xFF860019, P_ANY,     T_CAPACITY, false},  /* APCBattCapBeforeStartup */
    {CI_APCDelayBeforeStartup,   0xFF86007E, P_ANY,     T_UNITS,    false},  /* APCDelayBeforeStartup */
    {CI_APCDelayBeforeShutdown,  0xFF86007D, P_ANY,     T_UNITS,    false},  /* APCDelayBeforeShutdown */
+   {CI_APCLineFailCause,        0xFF860052, P_ANY,     T_NONE,     true},   /* APCLineFailCause */
    {CI_BUPBattCapBeforeStartup, 0x00860012, P_ANY,     T_NONE,     false},  /* BUPBattCapBeforeStartup */
    {CI_BUPDelayBeforeStartup,   0x00860076, P_ANY,     T_NONE,     false},  /* BUPDelayBeforeStartup */
    {CI_BUPSelfTest,             0x00860010, P_ANY,     T_NONE,     false},  /* BUPSelfTest */
@@ -235,7 +232,7 @@ int usb_read_int_from_ups(UPSINFO *ups, int ci, int *value)
 
 /* Fetch the given CI from the UPS */
 #define URB_DELAY_MS 20
-static int usb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
+static bool usb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
 {
    static struct timeval prev = {0};
    struct timeval now;
@@ -268,17 +265,36 @@ int usb_ups_program_eeprom(UPSINFO *ups, int command, char *data)
    return 0;
 }
 
-int usb_ups_entry_point(UPSINFO *ups, int command, void *data)
-{
-   /* What should this do? */
-   return 0;
-}
-
 
 /*
  * Operations which are platform agnostic and therefore can be
  * implemented here
  */
+
+static void copy_self_test_results(UPSINFO *ups)
+{
+   char *msg;
+
+   /*
+    * Responses are:
+    * "OK" - good battery, 
+    * "BT" - failed due to insufficient capacity, 
+    * "NG" - failed due to overload, 
+    * "NO" - no results available (no test performed in last 5 minutes) 
+    */
+   if (ups->X[0] == 'O' && ups->X[1] == 'K') {
+      msg = "Battery OK";
+   } else if (ups->X[0] == 'N' && ups->X[1] == 'G') {
+      msg = "Test failed";
+   } else if (ups->X[0] == 'W' && ups->X[1] == 'N') {
+      msg = "Warning";
+   } else if (ups->X[0] == 'I' && ups->X[1] == 'P') {
+      msg = "In progress";
+   } else {
+      msg = "No test results available";
+   }
+   astrncpy(ups->selftestmsg, msg, sizeof(ups->selftestmsg));
+}
 
 /*
  * Given a CI and a raw uval, update the UPSINFO structure with the
@@ -299,7 +315,13 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
    {
    /* UPS_STATUS -- this is the most important status for apcupsd */
    case CI_STATUS:
-      ups->Status |= (uval->iValue & 0xff);
+      /*
+       * Use a temporary for bitmasking so ups->Status will be
+       * updated atomically.
+       */
+      int32_t temp = ups->Status & ~0xff;
+      temp |= (uval->iValue & 0xff);
+      ups->Status = temp;
       break;
 
    case CI_ACPresent:
@@ -447,6 +469,30 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
       default:
          break;
       }
+      copy_self_test_results(ups);
+      break;
+
+   /* Reason for last xfer to battery */
+   case CI_APCLineFailCause:
+      Dmsg1(100, "CI_APCLineFailCause=%d\n", uval->iValue);
+      switch (uval->iValue) {
+      case 0:  /* No transfers have ocurred */
+         ups->G[0] = 'O';
+         break;
+      case 4:  /* Low line voltage */
+         ups->G[0] = 'L';
+         break;
+      case 5:  /* Self Test or Discharge Calibration commanded thru */
+               /* Test usage, front button, or 2 week self test */
+      case 11: /* Test usage invoked */
+      case 12: /* Front button initiated self test */
+      case 13: /* 2 week self test */
+         ups->G[0] = 'S';
+         break;
+      default:
+         ups->G[0] = 'U';
+         break;
+      }
       break;
 
    /* UPS_NAME */
@@ -559,13 +605,54 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
 }
 
 /* Fetch the given CI from the UPS and update the UPSINFO structure */
-static void usb_update_value(UPSINFO* ups, int ci)
+static bool usb_update_value(UPSINFO* ups, int ci)
 {
    USB_VALUE uval;
 
-   if (usb_get_value(ups, ci, &uval)) {
-      usb_process_value(ups, ci, &uval);
+   if (!usb_get_value(ups, ci, &uval))
+      return false;
+      
+   usb_process_value(ups, ci, &uval);
+   return true;
+}
+
+/* Process commands from the main loop */
+int usb_ups_entry_point(UPSINFO *ups, int command, void *data)
+{
+   switch (command) {
+   case DEVICE_CMD_CHECK_SELFTEST:
+      Dmsg0(80, "Checking self test.\n");
+      /*
+       * XXX FIXME
+       *
+       * One day we will do this test inside the driver and not as an
+       * entry point.
+       */
+      /* Reason for last transfer to batteries */
+      if (usb_update_value(ups, CI_WHY_BATT) ||
+          usb_update_value(ups, CI_APCLineFailCause))
+      {
+         Dmsg1(80, "Transfer reason: %c\n", ups->G[0]);
+
+         /* See if this is a self test rather than power failure */
+         if (ups->G[0] == 'S') {
+            /*
+             * set Self Test start time
+             */
+            ups->SelfTest = time(NULL);
+            Dmsg1(80, "Self Test time: %s", ctime(&ups->SelfTest));
+         }
+      }
+      break;
+
+   case DEVICE_CMD_GET_SELFTEST_MSG:
+      return usb_update_value(ups, CI_ST_STAT);
+
+   default:
+      return FAILURE;
    }
+
+   return SUCCESS;
 }
 
 /*
