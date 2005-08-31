@@ -282,7 +282,12 @@ int output_status(UPSINFO *ups, int sockfd,
          s_write(ups, "LINEFREQ : %03.1f Hz\n", ups->LineFreq);
 
       /* Output cause of last transfer to batteries */
-      if (ups->UPS_Cap[CI_WHY_BATT]) {
+      /*
+       * FIXME This code has no business knowing about CI_APCLineFailCause
+       * or any other bizarre USB CI. We should have an is_valid flag for
+       * each field in the ups-> structure instead of relying on CIs.
+       */
+      if (ups->UPS_Cap[CI_WHY_BATT] || ups->UPS_Cap[CI_APCLineFailCause]) {
          switch ((*ups).G[0]) {
          case 'O':
             s_write(ups, "LASTXFER : No transfers since turnon\n");
