@@ -271,32 +271,6 @@ int usb_ups_program_eeprom(UPSINFO *ups, int command, char *data)
  * implemented here
  */
 
-static void copy_self_test_results(UPSINFO *ups)
-{
-   char *msg;
-
-   /*
-    * Responses are:
-    * "OK" - good battery, 
-    * "NG" - failed, 
-    * "WN" - warning, 
-    * "IP" - test in progress, 
-    * "NO" - no results available (no test performed in last 5 minutes) 
-    */
-   if (ups->X[0] == 'O' && ups->X[1] == 'K') {
-      msg = "Battery OK";
-   } else if (ups->X[0] == 'N' && ups->X[1] == 'G') {
-      msg = "Test failed";
-   } else if (ups->X[0] == 'W' && ups->X[1] == 'N') {
-      msg = "Warning";
-   } else if (ups->X[0] == 'I' && ups->X[1] == 'P') {
-      msg = "In progress";
-   } else {
-      msg = "No test results available";
-   }
-   astrncpy(ups->selftestmsg, msg, sizeof(ups->selftestmsg));
-}
-
 /*
  * Given a CI and a raw uval, update the UPSINFO structure with the
  * new value.
@@ -453,25 +427,25 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
    case CI_ST_STAT:
       switch (uval->iValue) {
       case 1:  /* Passed */
-         astrncpy(ups->X, "OK", sizeof(ups->X));
+         ups->testresult = TEST_PASSED;
          break;
       case 2:  /* Warning */
-         astrncpy(ups->X, "WN", sizeof(ups->X));
+         ups->testresult = TEST_WARNING;
          break;
       case 3:  /* Error */
       case 4:  /* Aborted */
-         astrncpy(ups->X, "NG", sizeof(ups->X));
+         ups->testresult = TEST_FAILED;
          break;
       case 5:  /* In progress */
-         astrncpy(ups->X, "IP", sizeof(ups->X));
+         ups->testresult = TEST_INPROGRESS;
          break;
       case 6:  /* None */
-         astrncpy(ups->X, "NO", sizeof(ups->X));
+         ups->testresult = TEST_NONE;
          break;
       default:
+         ups->testresult = TEST_UNKNOWN;
          break;
       }
-      copy_self_test_results(ups);
       break;
 
    /* Reason for last xfer to battery */

@@ -279,6 +279,31 @@ static enum a_state get_state(UPSINFO *ups, time_t now)
    return state;
 }
 
+static const char *testresult_to_string(SelfTestResult res)
+{
+   switch (res) {
+   case TEST_NA:
+      return "Not supported";
+   case TEST_NONE:
+      return "No test results available";
+   case TEST_FAILED:
+      return "Test failed";
+   case TEST_WARNING:
+      return "Warning";
+   case TEST_INPROGRESS:
+      return "In progress";
+   case TEST_PASSED:
+      return "Battery OK";
+   case TEST_FAILCAP:
+      return "Test failed -- insufficient battery capacity";
+   case TEST_FAILLOAD:
+      return "Test failed -- battery overloaded";
+   case TEST_UNKNOWN:
+   default:
+      return "Unknown";
+   }
+}
+
 /*
  * Carl Lindberg <lindberg@clindberg.org> patch applied 24Dec04
  *
@@ -550,7 +575,7 @@ void do_action(UPSINFO *ups)
          /* Get last selftest results, only for smart UPSes. */
          device_entry_point(ups, DEVICE_CMD_GET_SELFTEST_MSG, NULL);
          log_event(ups, LOG_ALERT, _("UPS Self Test completed: %s"),
-            ups->selftestmsg);
+            testresult_to_string(ups->testresult));
          execute_command(ups, ups_event[CMDENDSELFTEST]);
       } else {
          generate_event(ups, CMDMAINSBACK);

@@ -342,8 +342,36 @@ int output_status(UPSINFO *ups, int sockfd,
       }
 
       /* Status of last self test */
-      if (ups->UPS_Cap[CI_ST_STAT])
-         s_write(ups, "SELFTEST : %s\n", ups->X);
+      switch (ups->testresult) {
+      case TEST_NONE:
+         s_write(ups, "SELFTEST : NO\n");
+         break;
+      case TEST_FAILED:
+         s_write(ups, "SELFTEST : NG\n");
+         break;
+      case TEST_WARNING:
+         s_write(ups, "SELFTEST : WN\n");
+         break;
+      case TEST_INPROGRESS:
+         s_write(ups, "SELFTEST : IP\n");
+         break;
+      case TEST_PASSED:
+         s_write(ups, "SELFTEST : OK\n");
+         break;
+      case TEST_FAILCAP:
+         s_write(ups, "SELFTEST : BT\n");
+         break;
+      case TEST_FAILLOAD:
+         s_write(ups, "SELFTEST : NG\n");
+         break;
+      case TEST_UNKNOWN:
+         s_write(ups, "SELFTEST : ??\n");
+         break;
+      case TEST_NA:
+      default:
+         /* UPS doesn't report this data */
+         break;
+      }
 
       /* Self test interval */
       if (ups->UPS_Cap[CI_STESTI])
