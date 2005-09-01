@@ -288,9 +288,9 @@ int getline(char *s, int len, UPSINFO *ups)
             ending = 1;
          }
          break;
-      case UPS_EPROM_CHANGE:      /* UPS_EPROM_CHANGE = '|'   */
-         break;
-      case UPS_TRAILOR:           /* UPS_TRAILOR = ':'   */
+
+      case UPS_EPROM_CHANGE:      /* UPS_EPROM_CHANGE = '|' */
+      case UPS_TRAILOR:           /* UPS_TRAILOR = ':'      */
          break;
 
          /* NOTE: The UPS terminates what it sends to us
@@ -494,22 +494,24 @@ int apcsmart_ups_read_volatile_data(UPSINFO *ups)
       ups->reg1 = strtoul(smart_poll(ups->UPS_Cmd[CI_REG1], ups), NULL, 16);
 
    /* Register 2 */
-   if (ups->UPS_Cap[CI_REG2])
+   if (ups->UPS_Cap[CI_REG2]) {
       ups->reg2 = strtoul(smart_poll(ups->UPS_Cmd[CI_REG2], ups), NULL, 16);
+      ups->set_battpresent(!(ups->reg2 & 0x20));
+   }
 
    /* Register 3 */
    if (ups->UPS_Cap[CI_REG3])
       ups->reg3 = strtoul(smart_poll(ups->UPS_Cmd[CI_REG3], ups), NULL, 16);
 
-   /*        Humidity percentage */
+   /* Humidity percentage */
    if (ups->UPS_Cap[CI_HUMID])
       ups->humidity = atof(smart_poll(ups->UPS_Cmd[CI_HUMID], ups));
 
-   /*        Ambient temperature */
+   /* Ambient temperature */
    if (ups->UPS_Cap[CI_ATEMP])
       ups->ambtemp = atof(smart_poll(ups->UPS_Cmd[CI_ATEMP], ups));
 
-   /*        Hours since self test */
+   /* Hours since self test */
    if (ups->UPS_Cap[CI_ST_TIME])
       ups->LastSTTime = atof(smart_poll(ups->UPS_Cmd[CI_ST_TIME], ups));
 
