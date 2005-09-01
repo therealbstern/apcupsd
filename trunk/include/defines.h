@@ -111,6 +111,7 @@
 #define UPS_shut_remote   0x00800000    /* Set when remote shutdown */
 #define UPS_plugged       0x01000000    /* Set if computer is plugged into UPS */
 #define UPS_dev_setup     0x02000000    /* Set if UPS's driver did the setup() */
+#define UPS_battpresent   0x04000000    /* Indicates if battery is connected */
 
 #define UPS_LOCAL_BITS (UPS_commlost|UPS_shutdown|UPS_slave|UPS_slavedown|UPS_prev_onbatt| \
             UPS_prev_battlow|UPS_onbatt_msg|UPS_fastpoll|UPS_plugged|UPS_dev_setup)

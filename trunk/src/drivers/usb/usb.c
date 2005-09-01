@@ -117,7 +117,7 @@ const struct s_known_info known_info[] = {
    {CI_NONE,                    0x0085008e, P_ANY,     T_CAPACITY, false},  /* CapacityGranularity2 */
    {CI_NONE,                    0x0085008f, P_ANY,     T_INDEX,    false},  /* iOEMInformation */
    {CI_ACPresent,               0x008500d0, P_ANY,     T_NONE,     true },  /* ACPresent */
-   {CI_BatteryPresent,          0x008500d1, P_ANY,     T_NONE,     false},  /* BatteryPresent */
+   {CI_BatteryPresent,          0x008500d1, P_ANY,     T_NONE,     true },  /* BatteryPresent */
    {CI_ChargerVoltageOOR,       0x008500d8, P_ANY,     T_NONE,     false},  /* Volt out-of-range */
    {CI_ChargerCurrentOOR,       0x008500d9, P_ANY,     T_NONE,     false},  /* Current out-of-range */
    {CI_CurrentNotRegulated,     0x008500da, P_ANY,     T_NONE,     false},  /* Current not regulated */
@@ -470,6 +470,11 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
          ups->lastxfer = XFER_UNKNOWN;
          break;
       }
+      break;
+
+   /* Battery connected/disconnected */
+   case CI_BatteryPresent:
+      ups->set_battpresent(uval->iValue);
       break;
 
    /* UPS_NAME */
@@ -1026,6 +1031,7 @@ int usb_report_event(UPSINFO *ups, int ci, USB_VALUE *uval)
    case CI_RunTimeToEmpty:
    case CI_NeedReplacement:
    case CI_ShutdownImminent:
+   case CI_BatteryPresent:
       return true;
 
    /*
@@ -1043,7 +1049,6 @@ int usb_report_event(UPSINFO *ups, int ci, USB_VALUE *uval)
    case CI_ChargerCurrentOOR:
    case CI_CurrentNotRegulated:
    case CI_VoltageNotRegulated:
-   case CI_BatteryPresent:
       return true;
 
    /*

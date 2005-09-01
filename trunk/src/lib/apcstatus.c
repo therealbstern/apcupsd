@@ -172,6 +172,9 @@ int output_status(UPSINFO *ups, int sockfd,
       if (ups->is_replacebatt())
          astrncat(status, "REPLACEBATT ", sizeof(status));
 
+      if (!ups->is_battpresent())
+         astrncat(status, "NOBATT ", sizeof(status));
+
       if (ups->is_slave())
          astrncat(status, "SLAVE ", sizeof(status));
 

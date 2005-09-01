@@ -46,6 +46,9 @@ UPSINFO *new_ups()
       return NULL;
    }
 
+   /* Most drivers do not support this, so preset it to true */
+   ups->set_battpresent();
+
    ups->refcnt = 1;
    return ups;
 }

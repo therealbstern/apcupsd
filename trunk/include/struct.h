@@ -252,6 +252,7 @@ class UPSINFO {
    void clear_slavedown() { Status &= ~UPS_slavedown; };
    void clear_slave() { Status &= ~UPS_slave; };
    void clear_trim() { Status &= ~UPS_trim; };
+   void clear_battpresent() {Status &= ~UPS_battpresent; };
 
    void set_battlow() { Status |= UPS_battlow; };
    void set_battlow(int val) { if (val) Status |= UPS_battlow; \
@@ -285,6 +286,9 @@ class UPSINFO {
    void set_slavedown() { Status |= UPS_slavedown; };
    void set_slave() { Status |= UPS_slave; };
    void set_trim() { Status |= UPS_trim; };
+   void set_battpresent() { Status |= UPS_battpresent; };
+   void set_battpresent(int val) { if (val) Status |= UPS_battpresent; \
+           else Status &= ~UPS_battpresent; };
 
    bool is_battlow() const { return (Status & UPS_battlow) == UPS_battlow; };
    bool is_boost() const { return (Status & UPS_boost) == UPS_boost; };
@@ -306,6 +310,7 @@ class UPSINFO {
    bool is_slave() const { return (Status & UPS_slave) == UPS_slave; };
    bool is_slavedown() const { return (Status & UPS_slavedown) == UPS_slavedown; };
    bool is_trim() const { return (Status & UPS_trim) == UPS_trim; };
+   bool is_battpresent() const { return (Status & UPS_battpresent) == UPS_battpresent; };
 
    /* DATA */
    char id[5];
