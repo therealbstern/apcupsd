@@ -1,7 +1,19 @@
-             Technical notes on version 3.11.0
+             Technical notes on version 3.11.8
                         Adam Kropelin
 
 General:
+31Aug05
+- USB: Make older gcc happy by not introducing a local variable in
+  the middle of a switch statement.
+- USB: My RS 1500 models seem to return APCLineFailCause=8 for
+  transitions due to utility power failure. Update return value
+  decoding to account for this.
+- hid-ups: Name usage 0xFF860052 as APCLineFailCause.
+- Convert UPSINFO::G[] to LastXferCause enumeration and eliminate
+  the need for core code to know about last xfer CIs.
+- Kill off UPSINFO::X[], replacing it with enum SelfTestResult.
+- Add support for tracking battery presence via new NOBATT status
+  flag.
 30Aug05
 - Rephrase comm{ok,failure} messages to not assume a serial port
   connection.
