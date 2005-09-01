@@ -109,7 +109,7 @@ typedef enum {
 } SelfTests;
 
 typedef enum {
-   XFER_NA = 0,
+   XFER_NA = 0,          /* Not supported by this UPS */
    XFER_NONE,            /* No xfer since power on */
    XFER_OVERVOLT,        /* Utility voltage too high */
    XFER_UNDERVOLT,       /* Utility voltage too low */
@@ -120,6 +120,17 @@ typedef enum {
    XFER_UNKNOWN
 } LastXferCause;
 
+typedef enum {
+   TEST_NA = 0,          /* Not supported by this UPS */
+   TEST_NONE,            /* No self test result available */
+   TEST_FAILED,          /* Test failed (reason unknown) */
+   TEST_WARNING,         /* Test passed with warning */
+   TEST_INPROGRESS,      /* Test currently in progress */
+   TEST_PASSED,          /* Test passed */
+   TEST_FAILCAP,         /* Test failed due to insufficient capacity */
+   TEST_FAILLOAD,        /* Test failed due to overload */
+   TEST_UNKNOWN
+} SelfTestResult;
 
 /*
  * Internal selftest structure.
@@ -349,7 +360,7 @@ class UPSINFO {
    unsigned int InputPhase;        /* The current AC input phase. */
    unsigned int OutputPhase;       /* The current AC output phase. */
    LastXferCause lastxfer;         /* Reason for last xfer to battery */
-   char X[8];                      /* results of last seft test */
+   SelfTestResult testresult;      /* results of last seft test */
    double BattChg;                 /* remaining UPS charge % */
    double LineMin;                 /* min line voltage seen */
    double LineMax;                 /* max line voltage seen */
@@ -390,7 +401,6 @@ class UPSINFO {
    char upsmodel[20];              /* ups model number */
    char sensitivity[8];            /* sensitivity to line fluxuations */
    char beepstate[8];              /* when to beep on power failure. */
-   char selftestmsg[80];
 
    /* Items specified from config file */
    int PoweredByUPS;               /* The only bit left out from the bitmap */

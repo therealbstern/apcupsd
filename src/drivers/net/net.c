@@ -553,8 +553,22 @@ int net_ups_read_volatile_data(UPSINFO *ups)
          ups->lastxfer = XFER_UNKNOWN;
    }
 
-   if (getupsvar(ups, "selftest", answer, sizeof(answer)))
-      astrncpy(ups->X, answer, sizeof(ups->X));
+   if (GETVAR(CI_ST_STAT, "selftest")) {
+      if (!strncmp(answer, "OK", 2))
+         ups->testresult = TEST_PASSED;
+      else if (!strncmp(answer, "NO", 2))
+         ups->testresult = TEST_NONE;
+      else if (!strncmp(answer, "BT", 2))
+         ups->testresult = TEST_FAILCAP;
+      else if (!strncmp(answer, "NG", 2))
+         ups->testresult = TEST_FAILED;
+      else if (!strncmp(answer, "WN", 2))
+         ups->testresult = TEST_WARNING;
+      else if (!strncmp(answer, "IP", 2))
+         ups->testresult = TEST_INPROGRESS;
+      else
+         ups->testresult = TEST_UNKNOWN;
+   }
 
    write_unlock(ups);
 

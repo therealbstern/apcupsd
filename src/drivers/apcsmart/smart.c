@@ -67,14 +67,9 @@
 #include "apc.h"
 #include "apcsmart.h"
 
-/*
- * Get last Self Test result and edit into string
- *  This routine assumes the UPS is connected !
- */
-static void copy_self_test_results(UPSINFO *ups)
+/* Convert UPS response to enum and string */
+static SelfTestResult decode_testresult(char* str)
 {
-   char *msg;
-
    /*
     * Responses are:
     * "OK" - good battery, 
@@ -82,18 +77,17 @@ static void copy_self_test_results(UPSINFO *ups)
     * "NG" - failed due to overload, 
     * "NO" - no results available (no test performed in last 5 minutes) 
     */
-   if (ups->X[0] == 'O' && ups->X[1] == 'K') {
-      msg = "Battery OK";
-   } else if (ups->X[0] == 'B' && ups->X[1] == 'T') {
-      msg = "Test failed -- insufficient battery capacity";
-   } else if (ups->X[0] == 'N' && ups->X[1] == 'G') {
-      msg = "Test failed -- battery overloaded";
-   } else {
-      msg = "No test results available";
-   }
-   astrncpy(ups->selftestmsg, msg, sizeof(ups->selftestmsg));
+   if (str[0] == 'O' && str[1] == 'K')
+      return TEST_PASSED;
+   else if (str[0] == 'B' && str[1] == 'T')
+      return TEST_FAILCAP;
+   else if (str[0] == 'N' && str[1] == 'G')
+      return TEST_FAILLOAD;
+
+   return TEST_NONE;
 }
 
+/* Convert UPS response to enum and string */
 static LastXferCause decode_lastxfer(char *str)
 {
    Dmsg1(80, "Transfer reason: %c\n", *str);
@@ -112,7 +106,7 @@ static LastXferCause decode_lastxfer(char *str)
    case 'O':
       return XFER_NONE;
    case 'K':
-      return XFER_FORCE;
+      return XFER_FORCED;
    case 'S':
       return XFER_SELFTEST;
    default:
@@ -447,11 +441,8 @@ int apcsmart_ups_read_volatile_data(UPSINFO *ups)
 
    /* Results of last self test */
    if (ups->UPS_Cap[CI_ST_STAT]) {
-      strncpy(ups->X, smart_poll(ups->UPS_Cmd[CI_ST_STAT], ups), sizeof(ups->X));
-      /*
-       * Decode the self test result into a string inside UPSINFO.
-       */
-      copy_self_test_results(ups);
+      ups->testresult = decode_testresult(
+         smart_poll(ups->UPS_Cmd[CI_ST_STAT], ups));
    }
 
    /* LINE_VOLTAGE */
@@ -661,11 +652,8 @@ int apcsmart_ups_entry_point(UPSINFO *ups, int command, void *data)
    case DEVICE_CMD_GET_SELFTEST_MSG:
       /* Results of last self test */
       if (ups->UPS_Cap[CI_ST_STAT]) {
-         strncpy(ups->X, smart_poll(ups->UPS_Cmd[CI_ST_STAT], ups), sizeof(ups->X));
-         /*
-          * Decode the self test result into a string inside UPSINFO.
-          */
-         copy_self_test_results(ups);
+         ups->testresult = decode_testresult(
+            smart_poll(ups->UPS_Cmd[CI_ST_STAT], ups));
       }
       break;
 
