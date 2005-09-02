@@ -256,26 +256,18 @@ int powernet_snmp_ups_read_static_data(UPSINFO *ups)
       }
 
       switch (data->upsAdvTest->__upsAdvTestDiagnosticsResults) {
-      case 1:
-         astrncpy(ups->X, "OK", sizeof(ups->X));
-         astrncpy(ups->selftestmsg, "Self Test Ok", sizeof(ups->selftestmsg));
+      case 1:  /* Passed */
+         ups->testresult = TEST_PASSED;
          break;
-      case 2:
-         astrncpy(ups->X, "BT", sizeof(ups->X));
-         astrncpy(ups->selftestmsg, "Self Test Failed", sizeof(ups->selftestmsg));
+      case 2:  /* Failed */
+      case 3:  /* Invalid test */
+         ups->testresult = TEST_FAILED;
          break;
-      case 3:
-         astrncpy(ups->X, "BT", sizeof(ups->X));
-         astrncpy(ups->selftestmsg, "Invalid Self Test", sizeof(ups->selftestmsg));
-         break;
-      case 4:
-         astrncpy(ups->X, "NO", sizeof(ups->X));
-         astrncpy(ups->selftestmsg, "Self Test in Progress",
-            sizeof(ups->selftestmsg));
+      case 4:  /* Test in progress */
+         ups->testresult = TEST_INPROGRESS;
          break;
       default:
-         astrncpy(ups->X, "NO", sizeof(ups->X));
-         astrncpy(ups->selftestmsg, "Unknown Result", sizeof(ups->selftestmsg));
+         ups->testresult = TEST_UNKNOWN;
          break;
       }
    }
@@ -339,37 +331,29 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups)
       ups->LineFreq = data->upsAdvInput->__upsAdvInputFrequency;
       switch (data->upsAdvInput->__upsAdvInputLineFailCause) {
       case 1:
-         astrncpy(ups->G, "O-No Transfer", sizeof(ups->G));
+         ups->lastxfer = XFER_NONE;
          break;
-      case 2:
-         astrncpy(ups->G, "High Line Voltage", sizeof(ups->G));
+      case 2:  /* High line voltage */
+         ups->lastxfer = XFER_OVERVOLT;
          break;
-      case 3:
-         astrncpy(ups->G, "R-Brownout", sizeof(ups->G));
+      case 3:  /* Brownout */
+      case 4:  /* Blackout */
+         ups->lastxfer = XFER_UNDERVOLT;
          break;
-      case 4:
-         astrncpy(ups->G, "R-Blackout", sizeof(ups->G));
-         break;
-      case 5:
-         astrncpy(ups->G, "T-Small Sag", sizeof(ups->G));
-         break;
-      case 6:
-         astrncpy(ups->G, "T-Deep Sag", sizeof(ups->G));
-         break;
-      case 7:
-         astrncpy(ups->G, "T-Small Spike", sizeof(ups->G));
-         break;
-      case 8:
-         astrncpy(ups->G, "T-Deep Spike", sizeof(ups->G));
+      case 5:  /* Small sag */
+      case 6:  /* Deep sag */
+      case 7:  /* Small spike */
+      case 8:  /* Deep spike */
+         ups->lastxfer = XFER_NOTCHSPIKE;
          break;
       case 9:
-         astrncpy(ups->G, "Self Test", sizeof(ups->G));
+         ups->lastxfer = XFER_SELFTEST;
          break;
       case 10:
-         astrncpy(ups->G, "R-Rate of Volt Change", sizeof(ups->G));
+         ups->lastxfer = XFER_RIPPLE;
          break;
       default:
-         astrncpy(ups->G, "Unknown", sizeof(ups->G));
+         ups->lastxfer = XFER_UNKNOWN;
          break;
       }
       free(data->upsAdvInput);
@@ -425,26 +409,18 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups)
    powernet_mib_mgr_get_upsAdvTest(s, &(data->upsAdvTest));
    if (data->upsAdvTest) {
       switch (data->upsAdvTest->__upsAdvTestDiagnosticsResults) {
-      case 1:
-         astrncpy(ups->X, "OK", sizeof(ups->X));
-         astrncpy(ups->selftestmsg, "Self Test Ok", sizeof(ups->selftestmsg));
+      case 1:  /* Passed */
+         ups->testresult = TEST_PASSED;
          break;
-      case 2:
-         astrncpy(ups->X, "BT", sizeof(ups->X));
-         astrncpy(ups->selftestmsg, "Self Test Failed", sizeof(ups->selftestmsg));
+      case 2:  /* Failed */
+      case 3:  /* Invalid test */
+         ups->testresult = TEST_FAILED;
          break;
-      case 3:
-         astrncpy(ups->X, "BT", sizeof(ups->X));
-         astrncpy(ups->selftestmsg, "Invalid Self Test", sizeof(ups->selftestmsg));
-         break;
-      case 4:
-         astrncpy(ups->X, "NO", sizeof(ups->X));
-         astrncpy(ups->selftestmsg, "Self Test in Progress",
-            sizeof(ups->selftestmsg));
+      case 4:  /* Test in progress */
+         ups->testresult = TEST_INPROGRESS;
          break;
       default:
-         astrncpy(ups->X, "NO", sizeof(ups->X));
-         astrncpy(ups->selftestmsg, "Unknown Result", sizeof(ups->selftestmsg));
+         ups->testresult = TEST_UNKNOWN;
          break;
       }
 
