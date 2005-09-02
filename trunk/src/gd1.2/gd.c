@@ -463,7 +463,7 @@ void gdImageCharUp(gdImagePtr im, gdFontPtr f, int x, int y, char c, int color)
        }
 }
 
-void gdImageString(gdImagePtr im, gdFontPtr f, int x, int y, char *s, int color)
+void gdImageString(gdImagePtr im, gdFontPtr f, int x, int y, unsigned char *s, int color)
 {
        int i;
        int l;
