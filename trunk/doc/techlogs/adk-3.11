@@ -1,7 +1,12 @@
-             Technical notes on version 3.11.8
+             Technical notes on version 3.11.9
                         Adam Kropelin
 
 General:
+1Sep05
+- SNMP: UPSINFO::G[] and UPSINFO::X[] to enum conversion.
+- CGI: Fix C++ compilation.
+- Kill unused (or nearly unused) fields from class UPSINFO. Also remove
+  unused structs while we're in the neighborhood.
 31Aug05
 - USB: Make older gcc happy by not introducing a local variable in
   the middle of a switch statement.
