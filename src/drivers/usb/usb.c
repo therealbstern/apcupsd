@@ -479,26 +479,21 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
 
    /* UPS_NAME */
    case CI_IDEN:
-      if (ups->upsname[0] == 0 && ups->buf[0] != 0) {
-         strncpy(ups->upsname, ups->buf, sizeof(ups->upsname) - 1);
-         ups->upsname[sizeof(ups->upsname) - 1] = 0;
-      }
+      if (ups->upsname[0] == 0 && uval->sValue[0] != 0)
+         astrncpy(ups->upsname, uval->sValue, sizeof(ups->upsname));
       break;
 
    /* model, firmware */
    case CI_UPSMODEL:
       /* Truncate Firmware info on APC Product string */
-      if ((p = strchr(ups->buf, 'F')) && *(p + 1) == 'W' && *(p + 2) == ':') {
+      if ((p = strchr(uval->sValue, 'F')) && *(p + 1) == 'W' && *(p + 2) == ':') {
          *(p - 1) = 0;
-         strncpy(ups->firmrev, p + 4, sizeof(ups->firmrev) - 1);
-         ups->firmrev[sizeof(ups->firmrev) - 1] = 0;
+         astrncpy(ups->firmrev, p + 4, sizeof(ups->firmrev));
          ups->UPS_Cap[CI_REVNO] = true;
       }
 
-      strncpy(ups->upsmodel, ups->buf, sizeof(ups->upsmodel) - 1);
-      ups->upsmodel[sizeof(ups->upsmodel) - 1] = 0;
-      strncpy(ups->mode.long_name, ups->buf, sizeof(ups->mode.long_name) - 1);
-      ups->mode.long_name[sizeof(ups->mode.long_name) - 1] = 0;
+      astrncpy(ups->upsmodel, uval->sValue, sizeof(ups->upsmodel));
+      astrncpy(ups->mode.long_name, uval->sValue, sizeof(ups->mode.long_name));
       break;
 
    /* WAKEUP_DELAY */
@@ -558,7 +553,7 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
 
    /* UPS_SERIAL_NUMBER */
    case CI_SERNO:
-      astrncpy(ups->serial, ups->buf, sizeof(ups->serial));
+      astrncpy(ups->serial, uval->sValue, sizeof(ups->serial));
 
       /*
        * If serial number has garbage, trash it.

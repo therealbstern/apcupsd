@@ -137,15 +137,6 @@ static const PAIRS table[] = {
 
    /* General parameters */
 
-#ifdef UNSUPPORTED_CODE
-   {"UPSSTART",     start_ups,   WHERE(upsname),      SIZE(upsname),
-      "UPS configuration id: start entry"},
-   {"UPSEND",       end_ups,     0,                   0,
-      "UPS configuration id: end entry"},
-   {"POWEREDBYUPS", match_index, WHERE(PoweredByUPS), onoroff,
-      "This computer is power by the UPS, there must be only one"},
-#endif
-
    {"UPSNAME",  match_str,   WHERE(upsname),  SIZE(upsname),
       "UPS name"},
    {"UPSCABLE", match_range, WHERE(cable),    cables,
@@ -648,19 +639,11 @@ static int ParseConfig(UPSINFO *ups, char *line)
 /*
  * Setup general defaults for the ups structure.
  * N.B. Do not zero the structure because it already has
- *      pthreads sturctures or shared memory/semaphore
- *      structures initialized.
+ *      pthreads structures initialized.
  */
 void init_ups_struct(UPSINFO *ups)
 {
-   ups->buf = (char *)malloc(BUF_SIZE);
-   if (ups->buf)
-      ups->buf_len = BUF_SIZE;
-
    /* put some basic information for sanity checks */
-   astrncpy(ups->id, UPSINFO_ID, sizeof(ups->id));
-   ups->version = UPSINFO_VERSION;
-   ups->size = sizeof(UPSINFO);
    astrncpy(ups->release, APCUPSD_RELEASE, sizeof(ups->release));
 
    ups->fd = -1;
@@ -687,7 +670,6 @@ void init_ups_struct(UPSINFO *ups)
 
    ups->stattime = 0;
    ups->datatime = 0;
-   ups->reports = FALSE;
    ups->nettime = 60;
    ups->percent = 10;
    ups->runtime = 5;
@@ -920,11 +902,6 @@ jump_into_the_loop:
    default:
       break;
    }
-
-   if (ups->PoweredByUPS)
-      ups->set_plugged();
-   else
-      ups->clear_plugged();
 
 bail_out:
    if (errors)
