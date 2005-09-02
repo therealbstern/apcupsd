@@ -77,10 +77,10 @@
 typedef struct s_usb_value {
    int value_type;               /* Type of returned value */
    double dValue;                /* Value if double */
-   char *sValue;                 /* Value if string */
    int iValue;                   /* Integer value */
    char *UnitName;               /* Name of units */
-} USB_VALUE;
+   char sValue[MAXSTRING];       /* Value if string */
+} USB_VALUE;
 
 /* Check if the UPS has the given capability */ 
 #define UPS_HAS_CAP(ci) (ups->UPS_Cap[ci])

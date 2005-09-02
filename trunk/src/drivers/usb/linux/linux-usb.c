@@ -342,9 +342,8 @@ static bool populate_uval(UPSINFO *ups, USB_INFO *info, USB_VALUE *uval)
       if (ioctl(my_data->fd, HIDIOCGSTRING, &sdesc) < 0)
          return false;
 
-      strncpy(ups->buf, sdesc.value, ups->buf_len);
+      astrncpy(val.sValue, sdesc.value, sizeof(val.sValue));
       val.value_type = V_STRING;
-      val.sValue = ups->buf;
    } else if (info->data_type == T_UNITS) {
       val.value_type = V_DOUBLE;
       switch (info->unit) {

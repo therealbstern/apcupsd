@@ -428,9 +428,8 @@ static bool populate_uval(UPSINFO *ups, USB_INFO *info, unsigned char *data, USB
       if (!str)
          return false;
 
-      strncpy(ups->buf, str, ups->buf_len);
+      astrncpy(val.sValue, str, sizeof(val.sValue));
       val.value_type = V_STRING;
-      val.sValue = ups->buf;
    } else if (info->data_type == T_UNITS) {
       val.value_type = V_DOUBLE;
 

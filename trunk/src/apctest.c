@@ -279,7 +279,6 @@ int main(int argc, char *argv[])
 
    pmsg("Attached to driver: %s\n", ups->driver->driver_name);
 
-   insertUps(ups);
    ups->start_time = time(NULL);
 
    /* Print configuration */

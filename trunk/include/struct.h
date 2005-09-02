@@ -313,20 +313,13 @@ class UPSINFO {
    bool is_battpresent() const { return (Status & UPS_battpresent) == UPS_battpresent; };
 
    /* DATA */
-   char id[5];
-   int version;
-   int size;
    char release[20];
 
-   int fd;                         /* serial port file descriptor */
+   int fd;                         /* UPS device node file descriptor */
 
    /* UPS capability array and codes */
    char UPS_Cap[CI_MAXCI + 1];          /* TRUE if UPS has capability */
    unsigned int UPS_Cmd[CI_MAXCI + 1];  /* Command or function code */
-
-   char *buf;                      /* scratch buffer */
-   int buf_len;                    /* buffer length */
-
 
    INTERNALGENINFO cable;
    INTERNALGENINFO enable_access;
@@ -379,7 +372,6 @@ class UPSINFO {
    double BattVoltage;             /* Actual Battery voltage -- about 24V */
    double LastSTTime;              /* hours since last self test -- not yet implemented */
    int32_t Status;                 /* UPS status (Bitmapped) */
-   int32_t local_Status;           /* UPS status (Bitmapped) not seen by slaves */
    double TimeLeft;                /* Est. time UPS can run on batt. */
    double humidity;                /* Humidity */
    double ambtemp;                 /* Ambient temperature */
@@ -408,7 +400,6 @@ class UPSINFO {
    char beepstate[8];              /* when to beep on power failure. */
 
    /* Items specified from config file */
-   int PoweredByUPS;               /* The only bit left out from the bitmap */
    int annoy;
    int maxtime;
    int annoydelay;                 /* delay before annoying users with logoff request */
@@ -419,12 +410,11 @@ class UPSINFO {
    int stattime;
    int datatime;
    int sysfac;
-   int reports;
    int nettime;                    /* Time interval for master to send to slaves */
    int percent;                    /* shutdown when batt % less than this */
    int runtime;                    /* shutdown when runtime less than this */
    char nisip[64];                 /* IP for NIS */
-   int statusport;                 /* TCP port for STATUS */
+   int statusport;                 /* NIS port */
    int netstats;                   /* turn on/off network status */
    int logstats;                   /* turn on/off logging of status info */
    char device[MAXSTRING];         /* device name in use */
@@ -434,18 +424,15 @@ class UPSINFO {
    int eventfilemax;               /* max size of eventfile in kilobytes */
    int event_fd;                   /* fd for eventfile */
 
-   int NetUpsPort;                 /* Our communication port */
+   int NetUpsPort;                 /* Master/slave port */
    char master_name[APC_FILENAME_MAX];
-    /**/ char lockpath[APC_FILENAME_MAX];  /* BSC, made static -RF */
-   int lockfile;                   /* BSC */
+   char lockpath[APC_FILENAME_MAX];
+   int lockfile;
 
    char usermagic[APC_MAGIC_SIZE]; /* security id string */
    int ChangeBattCounter;          /* For UPS_REPLACEBATT, see apcaction.c */
 
    int remote_state;
-
-   /* Linked list of UPSes used in apclist.c */
-   UPSINFO *next;
 
    pthread_mutex_t mutex;
    int refcnt;                     /* thread attach count */
@@ -485,7 +472,6 @@ typedef struct configinfo {
    int new_datatime;
    int new_nettime;
    int new_percent;
-
 } CONFIGINFO;
 
 
@@ -499,24 +485,5 @@ typedef struct s_cmd_msg {
    int level;
    char *msg;
 } UPSCMDMSG;
-
-typedef struct netclient_s {
-   int fd;                         /* Network FD */
-   struct sockaddr_in who;         /* Other side's IP address */
-   UPSINFO *ups;                   /* Client's selected UPS */
-   int authlevel;                  /* Level of authorization of the client */
-   int net_poll_time;              /* Time between two client's polls */
-   int last_poll;                  /* Last client's poll */
-   struct netclient_s *next;       /* Linked list */
-} NETCLIENT;
-
-/* Net commands structure. */
-typedef struct {
-   char *name;
-   int (*function) (NETCLIENT *nc, int argc, char *argv[]);
-   char *syntax;
-   char *help;
-   int authlevel;
-} NETCMD;
 
 #endif   /* _STRUCT_H */

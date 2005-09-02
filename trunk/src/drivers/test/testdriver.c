@@ -102,7 +102,6 @@ int test_ups_read_static_data(UPSINFO *ups)
    /* model, firmware */
    astrncpy(ups->upsmodel, "Test Driver", sizeof(ups->upsmodel));
    astrncpy(ups->firmrev, "Rev 1.0", sizeof(ups->firmrev));
-   astrncpy(ups->selftestmsg, "Test Battery OK", sizeof(ups->selftestmsg));
    astrncpy(ups->selftest, "336", sizeof(ups->selftest));
 
    /* WAKEUP_DELAY */
@@ -195,7 +194,8 @@ int test_ups_read_volatile_data(UPSINFO *ups)
    ups->ambtemp = 22.5;
 
    /* Self test results */
-   astrncpy(ups->X, "OK", sizeof(ups->X));
+   ups->testresult = TEST_PASSED;
+
    write_unlock(ups);
 
    return 1;
