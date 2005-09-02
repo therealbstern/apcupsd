@@ -451,7 +451,7 @@ static void parsefield(char *buf)
                 tmp[i] = '\0';
                 i = 0;
                 if (suffix) {
-                        snprintf(tmp, sizeof(tmp), "multimon.conf: "
+                        snprintf(tmp, strlen(buf)+1, "multimon.conf: "
                                 "More than two strings "
                                 "in field %s.", var);
                         report_error(tmp);
@@ -467,7 +467,7 @@ static void parsefield(char *buf)
             if (*ptr == '\\') {
                 ++ptr;
                 if (*ptr == '\0') {
-                        snprintf(tmp, sizeof(tmp), "multimon.conf: "
+                        snprintf(tmp, strlen(buf)+1, "multimon.conf: "
                                 "Backslash at end of line "
                                 "in field %s.", var);
                         report_error(tmp);
@@ -479,7 +479,7 @@ static void parsefield(char *buf)
     }
 
     if (in_string) {
-            snprintf(tmp, sizeof(tmp), "multimon.conf: "
+            snprintf(tmp, strlen(buf)+1, "multimon.conf: "
                     "Unbalanced quotes in field %s!", var);
             report_error(tmp);
     }
