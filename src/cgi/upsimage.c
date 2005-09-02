@@ -71,27 +71,27 @@ static void DrawText(gdImagePtr im, int min, int step)
 
     next = min;
     (void) snprintf(text, sizeof(text), "%d", next);
-    gdImageString(im, gdFontLarge, 0, 295, (unsigned char *)text, black);
+    gdImageString(im, gdFontLarge, 0, 295, (char *)text, black);
 
     next += step;
     (void) snprintf(text, sizeof(text), "%d", next);
-    gdImageString(im, gdFontLarge, 0, 235, (unsigned char *)text, black);
+    gdImageString(im, gdFontLarge, 0, 235, (char *)text, black);
 
     next += step;
     (void) snprintf(text, sizeof(text), "%d", next);
-    gdImageString(im, gdFontLarge, 0, 175, (unsigned char *)text, black);
+    gdImageString(im, gdFontLarge, 0, 175, (char *)text, black);
 
     next += step;
     (void) snprintf(text, sizeof(text), "%d", next);
-    gdImageString(im, gdFontLarge, 0, 115, (unsigned char *)text, black);
+    gdImageString(im, gdFontLarge, 0, 115, (char *)text, black);
 
     next += step;
     (void) snprintf(text, sizeof(text), "%d", next);
-    gdImageString(im, gdFontLarge, 0, 55, (unsigned char *)text, black);
+    gdImageString(im, gdFontLarge, 0, 55, (char *)text, black);
 
     next += step;
     (void) snprintf(text, sizeof(text), "%d", next);
-    gdImageString(im, gdFontLarge, 0, 0, (unsigned char *)text, black);
+    gdImageString(im, gdFontLarge, 0, 0, (char *)text, black);
 }
 
 static gdImagePtr InitImage(void)
@@ -178,7 +178,7 @@ static void drawbattcap(const char *battcaps, const char *minbchgs)
     gdImageFilledRectangle(im, 75, battpos, 125, 300, black);
 
     (void) snprintf(batttxt, sizeof(batttxt), "%.1f %%", battcap);
-    gdImageString(im, gdFontLarge, 70, 320, (unsigned char *)batttxt, black);
+    gdImageString(im, gdFontLarge, 70, 320, (char *)batttxt, black);
 
     TermImage(im);
 }
@@ -245,7 +245,7 @@ static void drawbattvolt(const char *battvolts, const char *nombattvs)
     gdImageFilledRectangle (im, 75, battpos, 125, 300, black);
 
     (void) snprintf (batttxt, sizeof(batttxt), "%.1f VDC", battvolt);
-    gdImageString(im, gdFontLarge, 70, 320, (unsigned char *)batttxt, black);
+    gdImageString(im, gdFontLarge, 70, 320, (char *)batttxt, black);
 
     TermImage(im);
 }
@@ -263,7 +263,7 @@ static void noimage (void)
 
     gdImageFilledRectangle (im, 0, 0, 150, 300, grey);
 
-    gdImageString (im, gdFontLarge, 0, 0, (unsigned char *)"Data not available", black);
+    gdImageString (im, gdFontLarge, 0, 0, (char *)"Data not available", black);
 
     imgheader();
 #ifdef SYS_IMGFMT_PNG
@@ -295,7 +295,7 @@ static void drawupsload(const char *upsloads)
     gdImageFilledRectangle(im, 75, loadpos, 125, 300, black);
 
     (void) snprintf(loadtxt, sizeof(loadtxt), "%.1f %%", upsload);
-    gdImageString(im, gdFontLarge, 70, 320, (unsigned char *)loadtxt, black);
+    gdImageString(im, gdFontLarge, 70, 320, (char *)loadtxt, black);
 
     TermImage(im);
 }
@@ -342,7 +342,7 @@ static void drawutility (const char *utilitys, const char *translos,
     gdImageFilledRectangle (im, 75, utilpos, 125, 300, black);
 
     (void) snprintf (utiltxt, sizeof(utiltxt), "%.1f VAC", utility);
-    gdImageString (im, gdFontLarge, 65, 320, (unsigned char *)utiltxt, black); 
+    gdImageString (im, gdFontLarge, 65, 320, (char *)utiltxt, black); 
 
     TermImage(im);
 }
@@ -382,7 +382,7 @@ static void drawupsout (const char *upsouts)
     gdImageFilledRectangle(im, 75, uoutpos, 125, 300, black);
 
     (void) snprintf(utiltxt, sizeof(utiltxt), "%.1f VAC", upsout);
-    gdImageString(im, gdFontLarge, 65, 320, (unsigned char *)utiltxt, black); 
+    gdImageString(im, gdFontLarge, 65, 320, (char *)utiltxt, black); 
 
     TermImage(im);
 }
@@ -415,7 +415,7 @@ static void drawruntime (const char *upsrunts, const char *lowbatts)
     gdImageFilledRectangle(im, 75, uoutpos, 125, 300, black);
 
     (void) snprintf(utiltxt, sizeof(utiltxt), "%.1f mins", upsrunt);
-    gdImageString(im, gdFontLarge, 65, 320, (unsigned char *)utiltxt, black); 
+    gdImageString(im, gdFontLarge, 65, 320, (char *)utiltxt, black); 
  
     TermImage(im);
 }

@@ -300,6 +300,8 @@ int main(int argc, char **argv)
              fputs("SHUTDOWN ", stdout);
          if (status & UPS_slave)
              fputs("SLAVE ", stdout);
+         if (!(status & UPS_battpresent))
+             fputs("NOBATT ", stdout);
          fputs ("\n", stdout); 
      }
 
