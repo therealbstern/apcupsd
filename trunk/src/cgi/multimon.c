@@ -78,6 +78,7 @@ static const struct {
         { "OB",         "ON BATTERY",           2       },
         { "LB",         "LOW BATTERY",          2       },
         { "RB",         "REPLACE BATTERY",      2       },
+        { "NB",         "NO BATTERY",           2       },
         { "OVER",       "OVERLOAD",             2       },
         { "TRIM",       "VOLTAGE TRIM",         1       },
         { "BOOST",      "VOLTAGE BOOST",        1       },
