@@ -178,6 +178,8 @@ static void do_status(const char *monhost, const char *suffix)
        strcat(status, "LB ");
     if (ups_status & UPS_replacebatt)
        strcat(status, "RB ");
+    if (!(ups_status & UPS_battpresent))
+       strcat(status, "NB ");
     if (ups_status & UPS_commlost)
        strcat(status, "CL ");
     if (ups_status & UPS_shutdown)
@@ -431,8 +433,9 @@ static void parsefield(char *buf)
 {
     char *ptr, *var, *name = NULL, *suffix = NULL, *tmp;
     int i = 0, in_string = 0;
-
-    tmp = (char *)malloc(strlen(buf) + 1);
+    int len = strlen(buf) + 1;
+    
+    tmp = (char *)malloc(len);
 
     /* <variable> "<field name>" "<field suffix>" */
 
@@ -451,7 +454,7 @@ static void parsefield(char *buf)
                 tmp[i] = '\0';
                 i = 0;
                 if (suffix) {
-                        snprintf(tmp, strlen(buf)+1, "multimon.conf: "
+                        snprintf(tmp, len, "multimon.conf: "
                                 "More than two strings "
                                 "in field %s.", var);
                         report_error(tmp);
@@ -467,7 +470,7 @@ static void parsefield(char *buf)
             if (*ptr == '\\') {
                 ++ptr;
                 if (*ptr == '\0') {
-                        snprintf(tmp, strlen(buf)+1, "multimon.conf: "
+                        snprintf(tmp, len, "multimon.conf: "
                                 "Backslash at end of line "
                                 "in field %s.", var);
                         report_error(tmp);
@@ -479,7 +482,7 @@ static void parsefield(char *buf)
     }
 
     if (in_string) {
-            snprintf(tmp, strlen(buf)+1, "multimon.conf: "
+            snprintf(tmp, len, "multimon.conf: "
                     "Unbalanced quotes in field %s!", var);
             report_error(tmp);
     }
