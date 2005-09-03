@@ -344,6 +344,9 @@ static bool populate_uval(UPSINFO *ups, USB_INFO *info, USB_VALUE *uval)
 
       astrncpy(val.sValue, sdesc.value, sizeof(val.sValue));
       val.value_type = V_STRING;
+
+      Dmsg4(200, "Def val=%d exp=%d sVal=\"%s\" ci=%d\n", info->uref.value,
+         exponent, val.sValue, info->ci);
    } else if (info->data_type == T_UNITS) {
       val.value_type = V_DOUBLE;
       switch (info->unit) {
@@ -382,6 +385,9 @@ static bool populate_uval(UPSINFO *ups, USB_INFO *info, USB_VALUE *uval)
          val.dValue = info->uref.value;
       else
          val.dValue = ((double)info->uref.value) * pow_ten(exponent);
+
+      Dmsg4(200, "Def val=%d exp=%d dVal=%f ci=%d\n", info->uref.value,
+         exponent, val.dValue, info->ci);
    } else {                        /* should be T_NONE */
       val.UnitName = "";
       val.value_type = V_INTEGER;

@@ -259,6 +259,8 @@ class UPSINFO {
            else Status &= ~UPS_battlow; };
    void set_belowcaplimit() { Status |= UPS_belowcaplimit; };
    void set_boost() { Status |= UPS_boost; };
+   void set_boost(int val) { if (val) Status |= UPS_boost; \
+           else Status &= ~UPS_boost; };
    void set_calibration() { Status |= UPS_calibration; };
    void set_commlost() { Status |= UPS_commlost; };
    void set_dev_setup() { Status |= UPS_dev_setup; };
@@ -266,7 +268,11 @@ class UPSINFO {
    void set_onbatt_msg() { Status |= UPS_onbatt_msg; };
    void set_onbatt() { Status |= UPS_onbatt; };
    void set_online() { Status |= UPS_online; Status &= ~UPS_onbatt; };
+   void set_online(int val) { if (val) Status |= UPS_online; \
+           else Status &= ~UPS_online; };
    void set_overload() { Status |= UPS_overload; };
+   void set_overload(int val) { if (val) Status |= UPS_overload; \
+           else Status &= ~UPS_overload; };
    void set_plugged() { Status |= UPS_plugged; };
    void set_prev_battlow() { Status |= UPS_prev_battlow; };
    void set_prev_onbatt() { Status |= UPS_prev_onbatt; };
@@ -286,6 +292,8 @@ class UPSINFO {
    void set_slavedown() { Status |= UPS_slavedown; };
    void set_slave() { Status |= UPS_slave; };
    void set_trim() { Status |= UPS_trim; };
+   void set_trim(int val) { if (val) Status |= UPS_trim; \
+           else Status &= ~UPS_trim; };
    void set_battpresent() { Status |= UPS_battpresent; };
    void set_battpresent(int val) { if (val) Status |= UPS_battpresent; \
            else Status &= ~UPS_battpresent; };

@@ -298,69 +298,52 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
       temp = ups->Status & ~0xff;
       temp |= (uval->iValue & 0xff);
       ups->Status = temp;
+      Dmsg1(200, "Status=0x%08x\n", temp);
       break;
 
    case CI_ACPresent:
-      if (uval->iValue) {
-         ups->set_online();
-         Dmsg0(200, "ACPRESENT\n");
-      }
+      ups->set_online(uval->iValue);
+      Dmsg1(200, "ACPresent=%d\n", uval->iValue);
       break;
 
    case CI_Discharging:
-      if (uval->iValue) {
-         ups->clear_online();
-         Dmsg0(200, "DISCHARGING\n");
-      }
+      ups->set_online(!uval->iValue);
+      Dmsg1(200, "Discharging=%d\n", uval->iValue);
       break;
 
    case CI_BelowRemCapLimit:
-      if (uval->iValue) {
-         ups->set_battlow();
-         Dmsg1(200, "BelowRemCapLimit=%d\n", uval->iValue);
-      }
+      ups->set_battlow(uval->iValue);
+      Dmsg1(200, "BelowRemCapLimit=%d\n", uval->iValue);
       break;
 
    case CI_RemTimeLimitExpired:
-      if (uval->iValue) {
-         ups->set_battlow();
-         Dmsg0(200, "RemTimeLimitExpired\n");
-      }
+      ups->set_battlow(uval->iValue);
+      Dmsg1(200, "RemTimeLimitExpired=%d\n", uval->iValue);
       break;
 
    case CI_ShutdownImminent:
-      if (uval->iValue) {
-         ups->set_battlow();
-         Dmsg0(200, "ShutdownImminent\n");
-      }
+      ups->set_battlow(uval->iValue);
+      Dmsg1(200, "ShutdownImminent=%d\n", uval->iValue);
       break;
 
    case CI_Boost:
-      if (uval->iValue) {
-         ups->set_boost();
-         Dmsg0(200, "Boost\n");
-      }
+      ups->set_boost(uval->iValue);
+      Dmsg1(200, "Boost=%d\n", uval->iValue);
       break;
 
    case CI_Trim:
-      if (uval->iValue) {
-         ups->set_trim();
-         Dmsg0(200, "Trim\n");
-      }
+      ups->set_trim(uval->iValue);
+      Dmsg1(200, "Trim=%d\n", uval->iValue);
       break;
 
    case CI_Overload:
-      if (uval->iValue) {
-         ups->set_overload();
-         Dmsg0(200, "Overload\n");
-      }
+      ups->set_overload(uval->iValue);
+      Dmsg1(200, "Overload=%d\n", uval->iValue);
       break;
 
    case CI_NeedReplacement:
-      if (uval->iValue) {
-         ups->set_replacebatt();
-         Dmsg0(200, "ReplaceBatt\n");
-      }
+      ups->set_replacebatt(uval->iValue);
+      Dmsg1(200, "ReplaceBatt=%d\n", uval->iValue);
       break;
 
    /* LINE_VOLTAGE */
