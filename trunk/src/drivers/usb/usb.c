@@ -455,6 +455,9 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
       case 0:  /* No transfers have ocurred */
          ups->lastxfer = XFER_NONE;
          break;
+      case 2:  /* High line voltage (Guess) */
+         ups->lastxfer = XFER_OVERVOLT;
+         break;
       case 4:  /* Low line voltage (Guess) */
       case 8:  /* Low line voltage (Guess) */
          ups->lastxfer = XFER_UNDERVOLT;
