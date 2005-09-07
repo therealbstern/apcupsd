@@ -279,7 +279,6 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
 {
    int v, yy, mm, dd;
    char *p;
-   int32_t temp;
 
    /*
     * ADK FIXME: This switch statement is really excessive. Consider
@@ -295,32 +294,23 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
        * Use a temporary for bitmasking so ups->Status will be
        * updated atomically.
        */
-      temp = ups->Status & ~0xff;
-      temp |= (uval->iValue & 0xff);
-      ups->Status = temp;
-      Dmsg1(200, "Status=0x%08x\n", temp);
+      ups->Status &= ~0xff;
+      ups->Status |= uval->iValue & 0xff;
+      Dmsg1(200, "Status=0x%08x\n", ups->Status);
       break;
 
    case CI_ACPresent:
-      ups->set_online(uval->iValue);
+      if (uval->iValue)
+         ups->set_online();
       Dmsg1(200, "ACPresent=%d\n", uval->iValue);
       break;
 
    case CI_Discharging:
-      ups->set_online(!uval->iValue);
+      if (uval->iValue)
+         ups->clear_online();
       Dmsg1(200, "Discharging=%d\n", uval->iValue);
       break;
 
-   /*
-    * ADK FIXME: All three of CI_BelowRemCapLimit, CI_RemTimeLimitExpired,
-    * and CI_ShutdownImminent can set UPS_battlow. However, we cannot allow
-    * any of them to clear that bit unless all three agree it can be
-    * cleared...i.e., we need to implement a logical OR of the three CIs.
-    * Unfortunately there isn't enough data here to perform that operation
-    * so we punt by NEVER allowing these CIs to clear the bit. Once battlow
-    * gets set it will never be cleared. (This is how the USB driver has
-    * always behaved, but we ought to fix it.)
-    */
    case CI_BelowRemCapLimit:
       if (uval->iValue)
          ups->set_battlow();
@@ -340,22 +330,26 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
       break;
 
    case CI_Boost:
-      ups->set_boost(uval->iValue);
+      if (uval->iValue)
+         ups->set_boost();
       Dmsg1(200, "Boost=%d\n", uval->iValue);
       break;
 
    case CI_Trim:
-      ups->set_trim(uval->iValue);
+      if (uval->iValue)
+         ups->set_trim();
       Dmsg1(200, "Trim=%d\n", uval->iValue);
       break;
 
    case CI_Overload:
-      ups->set_overload(uval->iValue);
+      if (uval->iValue)
+         ups->set_overload();
       Dmsg1(200, "Overload=%d\n", uval->iValue);
       break;
 
    case CI_NeedReplacement:
-      ups->set_replacebatt(uval->iValue);
+      if (uval->iValue)
+         ups->set_replacebatt(uval->iValue);
       Dmsg1(200, "ReplaceBatt=%d\n", uval->iValue);
       break;
 
@@ -669,6 +663,9 @@ int usb_ups_read_volatile_data(UPSINFO *ups)
 
    write_lock(ups);
    ups->poll_time = now;           /* save time stamp */
+
+   /* Clear APC status bits; let the various CIs set them again */
+   ups->Status &= ~0xFF;
 
    /* Loop through all known data, polling those marked volatile */
    for (int i=0; known_info[i].usage_code; i++) {
