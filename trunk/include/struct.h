@@ -239,8 +239,6 @@ class UPSINFO {
    void clear_online() { Status |= UPS_onbatt; Status &= ~UPS_online; };
    void clear_overload() { Status &= ~UPS_overload; };
    void clear_plugged() { Status &= ~UPS_plugged; };
-   void clear_prev_battlow() { Status &= ~UPS_prev_battlow; };
-   void clear_prev_onbatt() { Status &= ~UPS_prev_onbatt; };
    void clear_remtimelimit() { Status &= ~UPS_remtimelimit; };
    void clear_replacebatt() { Status &= ~UPS_replacebatt; };
    void clear_shut_btime() { Status &= ~UPS_shut_btime; };
@@ -275,8 +273,6 @@ class UPSINFO {
    void set_overload(int val) { if (val) Status |= UPS_overload; \
            else Status &= ~UPS_overload; };
    void set_plugged() { Status |= UPS_plugged; };
-   void set_prev_battlow() { Status |= UPS_prev_battlow; };
-   void set_prev_onbatt() { Status |= UPS_prev_onbatt; };
    void set_remtimelimit() { Status |= UPS_remtimelimit; };
    void set_replacebatt() { Status |= UPS_replacebatt; };
    void set_replacebatt(int val) { if (val) Status |= UPS_replacebatt; \
@@ -310,8 +306,6 @@ class UPSINFO {
    bool is_online() const { return (Status & UPS_online) == UPS_online; };
    bool is_overload() const { return (Status & UPS_overload) == UPS_overload; };
    bool is_plugged() const { return (Status & UPS_plugged) == UPS_plugged; };
-   bool is_prev_battlow() const { return (Status & UPS_prev_battlow) == UPS_prev_battlow; };
-   bool is_prev_onbatt() const { return (Status & UPS_prev_onbatt) == UPS_prev_onbatt; };
    bool is_replacebatt() const { return (Status & UPS_replacebatt) == UPS_replacebatt; };
    bool is_shutdown() const { return (Status & UPS_shutdown) == UPS_shutdown; };
    bool is_shutdownimm() const { return (Status & UPS_shutdownimm) == UPS_shutdownimm; };
@@ -320,6 +314,10 @@ class UPSINFO {
    bool is_slavedown() const { return (Status & UPS_slavedown) == UPS_slavedown; };
    bool is_trim() const { return (Status & UPS_trim) == UPS_trim; };
    bool is_battpresent() const { return (Status & UPS_battpresent) == UPS_battpresent; };
+
+   bool chg_battlow() const { return ((Status ^ PrevStatus) & UPS_battlow) == UPS_battlow; };
+   bool chg_onbatt() const { return ((Status ^ PrevStatus) & UPS_onbatt) == UPS_onbatt; };
+   bool chg_battpresent() const { return ((Status ^ PrevStatus) & UPS_battpresent) == UPS_battpresent; };
 
    /* DATA */
    char release[20];
@@ -381,6 +379,7 @@ class UPSINFO {
    double BattVoltage;             /* Actual Battery voltage -- about 24V */
    double LastSTTime;              /* hours since last self test -- not yet implemented */
    int32_t Status;                 /* UPS status (Bitmapped) */
+   int32_t PrevStatus;             /* Previous UPS status */
    double TimeLeft;                /* Est. time UPS can run on batt. */
    double humidity;                /* Humidity */
    double ambtemp;                 /* Ambient temperature */
