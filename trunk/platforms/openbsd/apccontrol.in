@@ -123,6 +123,10 @@ case "$1" in
 	;;
 	endselftest)
 	;;
+	battdetach)
+	;;
+	battattach)
+	;;
 	*)	echo "Usage: ${0##*/} command"
 		echo "	     warning: this script is intended to be launched by"
 		echo "	     apcupsd and should never be launched by users."

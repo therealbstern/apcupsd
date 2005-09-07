@@ -142,6 +142,10 @@ case "$1" in
     masterconnect)
 	echo "Connection from master established." | ${WALL}
     ;;
+    battdetach)
+    ;;
+    battattach)
+    ;;
     *)	echo "Usage: ${0##*/} command"
 	echo "	     warning: this script is intended to be launched by"
 	echo "	     apcupsd and should never be launched by users."
