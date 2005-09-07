@@ -254,12 +254,10 @@ class UPSINFO {
    void clear_battpresent() {Status &= ~UPS_battpresent; };
 
    void set_battlow() { Status |= UPS_battlow; };
-   void set_battlow(int val) { if (val) Status |= UPS_battlow; \
-           else Status &= ~UPS_battlow; };
+   void set_battlow(int val) { if (val) set_battlow(); else clear_battlow(); };
    void set_belowcaplimit() { Status |= UPS_belowcaplimit; };
    void set_boost() { Status |= UPS_boost; };
-   void set_boost(int val) { if (val) Status |= UPS_boost; \
-           else Status &= ~UPS_boost; };
+   void set_boost(int val) { if (val) set_boost(); else clear_boost(); };
    void set_calibration() { Status |= UPS_calibration; };
    void set_commlost() { Status |= UPS_commlost; };
    void set_dev_setup() { Status |= UPS_dev_setup; };
@@ -267,20 +265,16 @@ class UPSINFO {
    void set_onbatt_msg() { Status |= UPS_onbatt_msg; };
    void set_onbatt() { Status |= UPS_onbatt; };
    void set_online() { Status |= UPS_online; Status &= ~UPS_onbatt; };
-   void set_online(int val) { if (val) Status |= UPS_online; \
-           else Status &= ~UPS_online; };
+   void set_online(int val) { if (val) set_online(); else clear_online(); };
    void set_overload() { Status |= UPS_overload; };
-   void set_overload(int val) { if (val) Status |= UPS_overload; \
-           else Status &= ~UPS_overload; };
+   void set_overload(int val) { if (val) set_overload(); else clear_overload(); };
    void set_plugged() { Status |= UPS_plugged; };
    void set_remtimelimit() { Status |= UPS_remtimelimit; };
    void set_replacebatt() { Status |= UPS_replacebatt; };
-   void set_replacebatt(int val) { if (val) Status |= UPS_replacebatt; \
-           else Status &= ~UPS_replacebatt; };
+   void set_replacebatt(int val) { if (val) set_replacebatt(); else clear_replacebatt(); };
    void set_shut_btime() { Status |= UPS_shut_btime; };
    void set_shutdownimm() { Status |= UPS_shutdownimm; };
-   void set_shutdownimm(int val) { if (val) Status |= UPS_shutdownimm; \
-           else Status &= ~UPS_shutdownimm; };
+   void set_shutdownimm(int val) { if (val) set_shutdownimm(); else clear_shutdownimm(); };
    void set_shutdown() { Status |= UPS_shutdown; };
    void set_shut_emerg() { Status |= UPS_shut_emerg; };
    void set_shut_load() { Status |= UPS_shut_load; };
@@ -289,11 +283,9 @@ class UPSINFO {
    void set_slavedown() { Status |= UPS_slavedown; };
    void set_slave() { Status |= UPS_slave; };
    void set_trim() { Status |= UPS_trim; };
-   void set_trim(int val) { if (val) Status |= UPS_trim; \
-           else Status &= ~UPS_trim; };
+   void set_trim(int val) { if (val) set_trim(); else clear_trim(); };
    void set_battpresent() { Status |= UPS_battpresent; };
-   void set_battpresent(int val) { if (val) Status |= UPS_battpresent; \
-           else Status &= ~UPS_battpresent; };
+   void set_battpresent(int val) { if (val) set_battpresent(); else clear_battpresent(); };
 
    bool is_battlow() const { return (Status & UPS_battlow) == UPS_battlow; };
    bool is_boost() const { return (Status & UPS_boost) == UPS_boost; };
