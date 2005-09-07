@@ -262,16 +262,16 @@ static enum a_state get_state(UPSINFO *ups, time_t now)
    enum a_state state;
 
    if (ups->is_onbatt()) {
-      if (ups->is_prev_onbatt()) {  /* if already detected on battery */
+      if (ups->chg_onbatt()) {
+         state = st_PowerFailure;  /* Power failure just detected */
+      } else {
          if (ups->SelfTest)        /* see if UPS is doing self test */
             state = st_SelfTest;   /*   yes */
          else
             state = st_OnBattery;  /* No, this must be real power failure */
-      } else {
-         state = st_PowerFailure;  /* Power failure just detected */
       }
    } else {
-      if (ups->is_prev_onbatt()) /* if we were on batteries */
+      if (ups->chg_onbatt())       /* if we were on batteries */
          state = st_MainsBack;     /* then we just got power back */
       else
          state = st_OnMains;       /* Solid on mains, normal condition */
@@ -362,8 +362,7 @@ void do_action(UPSINFO *ups)
    if (first) {
       ups->last_time_nologon = ups->last_time_annoy = now;
       ups->last_time_on_line = now;
-      ups->clear_prev_onbatt();
-      ups->clear_prev_battlow();
+      ups->PrevStatus = ups->Status;
       first = 0;
    }
 
@@ -444,11 +443,11 @@ void do_action(UPSINFO *ups)
       /* Did the second test verify the power is failing? */
       if (!ups->is_onbatt_msg() &&
          time(NULL) - ups->last_time_on_line >= ups->onbattdelay) {
-         ups->set_onbatt_msg();  /* it is confirmed, we are on batteries */
-         generate_event(ups, CMDONBATTERY);
-         ups->last_time_nologon = ups->last_time_annoy = now;
-         ups->last_time_on_line = now;
-         break;
+            ups->set_onbatt_msg();  /* it is confirmed, we are on batteries */
+            generate_event(ups, CMDONBATTERY);
+            ups->last_time_nologon = ups->last_time_annoy = now;
+            ups->last_time_on_line = now;
+            break;
       }
 
       /* shutdown requested but still running */
@@ -464,10 +463,9 @@ void do_action(UPSINFO *ups)
           * Did BattLow bit go high? Then the battery power is failing.
           * Normal Power down during Power Failure
           */
-         if (!ups->is_prev_battlow() && ups->is_battlow()) {
+         if (ups->chg_battlow() && ups->is_battlow()) {
             ups->clear_onbatt_msg();
             generate_event(ups, CMDFAILING);
-            ups->set_prev_battlow();
             break;
          }
 
@@ -611,13 +609,7 @@ void do_action(UPSINFO *ups)
    }
 
    /* Remember status */
-   if (ups->is_onbatt())
-      ups->set_prev_onbatt();
-   else
-      ups->clear_prev_onbatt();
-
-   if (!ups->is_battlow())
-      ups->clear_prev_battlow();
+   ups->PrevStatus = ups->Status;
 
    write_unlock(ups);
 }
