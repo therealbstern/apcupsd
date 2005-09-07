@@ -549,6 +549,8 @@ int net_ups_read_volatile_data(UPSINFO *ups)
          ups->lastxfer = XFER_NOTCHSPIKE;
       else if (!strcmp(answer, "Unacceptable line voltage changes"))
          ups->lastxfer = XFER_RIPPLE;
+      else if (!strcmp(answer, "Input frequency out of range"))
+         ups->lastxfer = XFER_FREQ;
       else
          ups->lastxfer = XFER_UNKNOWN;
    }
