@@ -54,7 +54,9 @@ UPSCOMMANDS ups_event[] = {
    {"endselftest",   0},           /* CMDENDSELFTEST */
    {"mastertimeout", 0},           /* CMDMASTERTIMEOUT */
    {"masterconnect", 0},           /* CMDMASTERCONN */
-   {"offbattery",    0}            /* CMDOFFBATTERY */
+   {"offbattery",    0},           /* CMDOFFBATTERY */
+   {"battdetach",    0},           /* CMDBATTDETACH */
+   {"battattach",    0}            /* CMDBATTATTACH */
 };
 
 /*
@@ -81,7 +83,9 @@ UPSCMDMSG event_msg[] = {
    {LOG_ALERT,   N_("UPS Self Test completed.")},
    {LOG_CRIT,    N_("Master not responding.")},
    {LOG_WARNING, N_("Connect from master.")},
-   {LOG_CRIT,    N_("Mains returned. No longer on UPS batteries.")}
+   {LOG_CRIT,    N_("Mains returned. No longer on UPS batteries.")},
+   {LOG_CRIT,    N_("Battery disconnected.")},
+   {LOG_CRIT,    N_("Battery reattached.")}
 };
 
 void generate_event(UPSINFO *ups, int event)
@@ -131,6 +135,8 @@ void generate_event(UPSINFO *ups, int event)
    case CMDOFFBATTERY:
    case CMDMASTERTIMEOUT:
    case CMDMASTERCONN:
+   case CMDBATTDETACH:
+   case CMDBATTATTACH:
    default:
       break;
 
@@ -360,10 +366,19 @@ void do_action(UPSINFO *ups)
 
    time(&now);                     /* get current time */
    if (first) {
+      first = 0;
       ups->last_time_nologon = ups->last_time_annoy = now;
       ups->last_time_on_line = now;
-      ups->PrevStatus = 0;
-      first = 0;
+      
+      /*
+       * This is cheating slightly. We want to initialize the previous
+       * status to zero so all set bits in current status will appear
+       * as changes, thus allowing us to handle starting up when power
+       * has already failed, for instance. However, we don't want to
+       * get a BATTATTACHED event every time the daemon starts, so we
+       * set the UPS_battpresent bit in the previous status.
+       */
+      ups->PrevStatus = UPS_battpresent;
    }
 
    if (ups->is_replacebatt()) {   /* Replace battery */
@@ -394,6 +409,14 @@ void do_action(UPSINFO *ups)
       ups->clear_onbatt_msg();
       generate_event(ups, CMDREMOTEDOWN);
       return;
+   }
+
+   /* Generate event if battery is disconnected or reattached */
+   if (ups->chg_battpresent()) {
+      if (ups->is_battpresent())
+         generate_event(ups, CMDBATTATTACH);
+      else
+         generate_event(ups, CMDBATTDETACH);
    }
 
    state = get_state(ups, now);

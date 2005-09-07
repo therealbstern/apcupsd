@@ -404,7 +404,7 @@
 /*
  * These are the commands understood by the apccontrol shell script.
  * You _must_ keep the #defines in sync with the commands[] array in
- * apcaction.c
+ * action.c
  */
 #define CMDPOWEROUT      0
 #define CMDONBATTERY     1
@@ -426,6 +426,8 @@
 #define CMDMASTERTIMEOUT 17        /* Master timed out */
 #define CMDMASTERCONN    18        /* Connect to master */
 #define CMDOFFBATTERY    19        /* off battery power */
+#define CMDBATTDETACH    20        /* Battery disconnected */
+#define CMDBATTATTACH    21        /* Battery reconnected */
 
 /* NetCodes for numeric chatting. */
 #define NETCODENUL          100
