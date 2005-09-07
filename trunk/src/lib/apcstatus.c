@@ -39,6 +39,17 @@ int output_status(UPSINFO *ups, int sockfd,
 
    s_open(ups);
 
+   /*
+    * Lock the UPS structure for reading so the driver doesn't haul
+    * off and start updating fields on us. Note that this creates
+    * the potential for a misbehaving client to create long lock
+    * hold times, essentially locking the driver out. This could
+    * be mitigated by making a local copy of UPSINFO under the
+    * lock, then releasing the lock and feeding the client from
+    * the copy.
+    */
+   read_lock(ups);
+
    if (ups->poll_time == 0)        /* this is always zero on slave */
       ups->poll_time = now;
 
@@ -436,6 +447,8 @@ int output_status(UPSINFO *ups, int sockfd,
    default:
       break;
    }
+
+   read_unlock(ups);
 
    /* put the current time in the END APC record */
    localtime_r(&now, &tm);
