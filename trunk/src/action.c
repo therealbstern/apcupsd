@@ -362,7 +362,7 @@ void do_action(UPSINFO *ups)
    if (first) {
       ups->last_time_nologon = ups->last_time_annoy = now;
       ups->last_time_on_line = now;
-      ups->PrevStatus = ups->Status;
+      ups->PrevStatus = 0;
       first = 0;
    }
 
