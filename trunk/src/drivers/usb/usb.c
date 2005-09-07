@@ -441,9 +441,21 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
       case 2:  /* High line voltage (Guess) */
          ups->lastxfer = XFER_OVERVOLT;
          break;
-      case 4:  /* Low line voltage (Guess) */
-      case 8:  /* Low line voltage (Guess) */
+      case 3:  /* Ripple */
+         ups->lastxfer = XFER_RIPPLE;
+         break;
+      case 1:  /* Low line voltage */
+      case 4:  /* notch, spike, or blackout */
+      case 8:  /* Notch or blackout */
+      case 9:  /* Spike or blackout */
          ups->lastxfer = XFER_UNDERVOLT;
+         break;
+      case 6:  /* DelayBeforeShutdown or APCDelayBeforeShutdown */
+      case 10: /* Graceful shutdown by accessories */
+         ups->lastxfer = XFER_FORCED;
+         break;
+      case 7: /* Input frequency out of range */
+         ups->lastxfer = XFER_FREQ;
          break;
       case 5:  /* Self Test or Discharge Calibration commanded thru */
                /* Test usage, front button, or 2 week self test */

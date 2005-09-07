@@ -117,6 +117,7 @@ typedef enum {
    XFER_RIPPLE,          /* Excessive utility voltage rate of change */
    XFER_SELFTEST,        /* Auto or manual self test */
    XFER_FORCED,          /* Forced onto battery by sw command */
+   XFER_FREQ,            /* Input frequency out of range */
    XFER_UNKNOWN
 } LastXferCause;
 

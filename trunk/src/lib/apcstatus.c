@@ -307,6 +307,9 @@ int output_status(UPSINFO *ups, int sockfd,
       case XFER_NOTCHSPIKE:
          s_write(ups, "LASTXFER : Line voltage notch or spike\n");
          break;
+      case XFER_FREQ:
+         s_write(ups, "LASTXFER : Input frequency out of range\n");
+         break;
       case XFER_UNKNOWN:
          s_write(ups, "LASTXFER : UNKNOWN EVENT\n");
          break;
