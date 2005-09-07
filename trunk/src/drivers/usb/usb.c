@@ -311,18 +311,31 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
       Dmsg1(200, "Discharging=%d\n", uval->iValue);
       break;
 
+   /*
+    * ADK FIXME: All three of CI_BelowRemCapLimit, CI_RemTimeLimitExpired,
+    * and CI_ShutdownImminent can set UPS_battlow. However, we cannot allow
+    * any of them to clear that bit unless all three agree it can be
+    * cleared...i.e., we need to implement a logical OR of the three CIs.
+    * Unfortunately there isn't enough data here to perform that operation
+    * so we punt by NEVER allowing these CIs to clear the bit. Once battlow
+    * gets set it will never be cleared. (This is how the USB driver has
+    * always behaved, but we ought to fix it.)
+    */
    case CI_BelowRemCapLimit:
-      ups->set_battlow(uval->iValue);
+      if (uval->iValue)
+         ups->set_battlow();
       Dmsg1(200, "BelowRemCapLimit=%d\n", uval->iValue);
       break;
 
    case CI_RemTimeLimitExpired:
-      ups->set_battlow(uval->iValue);
+      if (uval->iValue)
+         ups->set_battlow();
       Dmsg1(200, "RemTimeLimitExpired=%d\n", uval->iValue);
       break;
 
    case CI_ShutdownImminent:
-      ups->set_battlow(uval->iValue);
+      if (uval->iValue)
+         ups->set_battlow();
       Dmsg1(200, "ShutdownImminent=%d\n", uval->iValue);
       break;
 
@@ -438,7 +451,7 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
       case 0:  /* No transfers have ocurred */
          ups->lastxfer = XFER_NONE;
          break;
-      case 2:  /* High line voltage (Guess) */
+      case 2:  /* High line voltage */
          ups->lastxfer = XFER_OVERVOLT;
          break;
       case 3:  /* Ripple */
@@ -473,6 +486,7 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
    /* Battery connected/disconnected */
    case CI_BatteryPresent:
       ups->set_battpresent(uval->iValue);
+      Dmsg1(200, "BatteryPresent=%d\n", uval->iValue);
       break;
 
    /* UPS_NAME */
