@@ -203,20 +203,8 @@ void do_device(UPSINFO *ups)
    /* get all data so apcaccess is happy */
    fillUPS(ups);
 
-   while (1) {
-      /* compute appropriate wait time */
-      ups->wait_time = device_wait_time(ups);
-
-      Dmsg2(70, "Before device_check_state: 0x%x (OB:%d).\n",
-         ups->Status, ups->is_onbatt());
-
-      /*
-       * Check the UPS to see if has changed state.
-       * This routine waits a reasonable time to prevent
-       * consuming too much CPU time.
-       */
-      device_check_state(ups);
-
+   while(1)
+   {
       /* compute appropriate wait time */
       ups->wait_time = device_wait_time(ups);
 
@@ -236,6 +224,19 @@ void do_device(UPSINFO *ups)
          ups->Status, ups->is_onbatt());
 
       do_reports(ups);
+
+      /* compute appropriate wait time */
+      ups->wait_time = device_wait_time(ups);
+
+      Dmsg2(70, "Before device_check_state: 0x%x (OB:%d).\n",
+         ups->Status, ups->is_onbatt());
+
+      /*
+       * Check the UPS to see if has changed state.
+       * This routine waits a reasonable time to prevent
+       * consuming too much CPU time.
+       */
+      device_check_state(ups);
    }
 }
 
