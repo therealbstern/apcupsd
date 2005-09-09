@@ -1,7 +1,41 @@
-             Technical notes on version 3.11.9
+             Technical notes on version 3.11.10
                         Adam Kropelin
 
 General:
+7Sep05:
+- Fix set_online(int) modifier to change both UPS_online and UPS_onbatt
+  like the regular set_online(void) does. Eliminate future ocurrences
+  of this bug by writing all set_foo(int) modifiers in terms of 
+  set_foo(void) and clear_foo(void).
+- Reorder device loop contents so do_action() is invoked early to handle
+  preexisting conditions instead of waiting thru a device_check_state()
+  period first. The overall order of operations is unchanged; only the
+  loop entrypoint has shifted.
+- Add BATTDETACH and BATTATTACH events which are triggered by changes in
+  the UPS_battpresent flag.
+- USB: Fix the battlow FIXME by performing status bit updates the way
+  the USB driver used to, namely by clearing the APC part of the status
+  word and then setting bits based on CIs. Note that this technique 
+  requires a locking change in apcstatus.c to solve the NIS race 
+  condition seen with the old USB code.
+- NIS: Lock the UPS structure for reading in output_status(). Otherwise
+  a client can get corrupt NIS data if the driver is in the middle of 
+  updating a field. This is particularly troublesome for the net driver.
+6Sep05:
+- USB: Update APCLineFailCause interpretation in USB driver with info
+  from APC.
+- Add XFER_FREQ to represent transfers due to input frequency out of
+  range.
+- Remove individual UPS_prev_onbatt and UPS_prev_battlow bits in favor
+  of a generic status bit change detection mechanism.
+3Sep05:
+- CGI: Teach multimon about NOBATT and make buffer length tracking in
+  parsefield() less prone to errors in the future.
+- USB: Make volatile data debug output consistent.
+- USB: Set status bits directly from USB data so UPSINFO follows the
+  hw state.
+2Sep05:
+- CGI: Fix a few instances of "sizeof(pointer)" caught by g++ on OpenBSD.
 1Sep05
 - SNMP: UPSINFO::G[] and UPSINFO::X[] to enum conversion.
 - CGI: Fix C++ compilation.
