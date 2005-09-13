@@ -163,9 +163,7 @@ daemon. In this case, NETSTATUS should be off.
 <port>
 .br
 This configuration command specifies the port to be used by the
-apcupsd server. The default is 3550. If you change this port,
-you must manually change the #define SERV_TCP_PORT in 
-cgi/upsfetch.c and rebuild the CGI programs.
+apcupsd server. The default is 3551.
 
 .LP
 .B EVENTFILE 
