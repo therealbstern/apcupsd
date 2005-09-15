@@ -279,6 +279,7 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
 {
    int v, yy, mm, dd;
    char *p;
+   static int bpcnt = 0;
 
    /*
     * ADK FIXME: This switch statement is really excessive. Consider
@@ -479,7 +480,30 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
 
    /* Battery connected/disconnected */
    case CI_BatteryPresent:
-      ups->set_battpresent(uval->iValue);
+      /*
+       * Work around a firmware bug in some models (RS 1500,
+       * possibly others) where BatteryPresent=1 is sporadically
+       * reported while the battery is disconnected. The work-
+       * around is to ignore BatteryPresent=1 until we see it
+       * at least twice in a row. The down side of this approach
+       * is that legitimate BATTATTCH events are unnecessarily
+       * delayed. C'est la vie.
+       *
+       * ADK FIXME: 'bpcnt' should be kept in the UPS structure
+       * in order to allow multiple UPSes to be managed by this
+       * driver. To avoid bloating UPSINFO with USB-specific
+       * junk we really need a USB private structure akin to
+       * USB_INFO in the platform specific drivers. The URB 
+       * delay timer in usb_get_value() could also live in such
+       * a structure.
+       */
+      if (uval->iValue) {
+         if (bpcnt++)
+            ups->set_battpresent();
+      } else {
+         bpcnt = 0;
+         ups->clear_battpresent();
+      }
       Dmsg1(200, "BatteryPresent=%d\n", uval->iValue);
       break;
 
