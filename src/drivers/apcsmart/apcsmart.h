@@ -25,7 +25,6 @@
 
 /* Private data structure */
 typedef struct s_smart_data {
-   time_t debounce;                /* Last event time for debounce */
    struct termios oldtio;
    struct termios newtio;
 } SMART_DATA;

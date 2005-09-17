@@ -159,29 +159,11 @@ int getline(char *s, int len, UPSINFO *ups)
    int ending = 0;
    char c;
    int retval;
-   SMART_DATA *my_data = (SMART_DATA *) ups->driver_internal_data;
 
    while (!ending) {
 #ifndef HAVE_CYGWIN
       fd_set rfds;
       struct timeval tv;
-
-      if (my_data->debounce) {
-         int sleep_time;
-
-         /* Wait 6 seconds before returning next sample.
-          * This eliminates the annoyance of detecting
-          * transitions to battery that last less than
-          * 6 seconds.  Do sanity check on calculated
-          * sleep time.
-          */
-         sleep_time = 6 - (time(NULL) - my_data->debounce);
-         if (sleep_time < 0 || sleep_time > 6) {
-            sleep_time = 6;
-         }
-         sleep(sleep_time);
-         my_data->debounce = 0;
-      }
 
       FD_ZERO(&rfds);
       FD_SET(ups->fd, &rfds);
@@ -241,9 +223,6 @@ int getline(char *s, int len, UPSINFO *ups)
       case UPS_ON_BATT:           /* UPS_ON_BATT = '!'   */
          if (s == NULL)
             write_lock(ups);
-         if (!ups->is_onbatt()) {
-            my_data->debounce = time(NULL);
-         }
          ups->clear_online();
          Dmsg0(80, "Got UPS ON BATT.\n");
          if (s == NULL) {
