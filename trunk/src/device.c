@@ -220,6 +220,12 @@ void do_device(UPSINFO *ups)
       /* Get all info available from UPS by asking it questions */
       fillUPS(ups);
 
+      Dmsg2(70, "Before do_action: 0x%x (OB:%d).\n",
+         ups->Status, ups->is_onbatt());
+
+      /* take event actions */
+      do_action(ups);
+
       Dmsg2(70, "Before do_reports: 0x%x (OB:%d).\n",
          ups->Status, ups->is_onbatt());
 
