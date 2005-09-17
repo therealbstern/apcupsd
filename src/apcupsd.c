@@ -71,6 +71,7 @@ static void daemon_start(void);
 
 int shm_OK = 0;
 extern int kill_on_powerfail;
+extern FILE *trace_fd;
 
 /*
  * The terminate function and trapping signals allows apcupsd
@@ -390,7 +391,6 @@ static void daemon_start(void)
    int i, fd;
    pid_t cpid;
    mode_t oldmask;
-   int low_fd = -1;
 
    if ((cpid = fork()) < 0)
       Error_abort0("Cannot fork to become daemon\n");
@@ -406,12 +406,17 @@ static void daemon_start(void)
    /*
     * In the PRODUCTION system, we close ALL file descriptors unless
     * debugging is on then we laeve stdin, stdout, and stderr open.
+    * We also take care to leave the trace fd open if tracing is on.
     */
-   if (debug_level > 0)
-      low_fd = 2;                  /* don't close debug output */
+   for (i=0; i<sysconf(_SC_OPEN_MAX); i++) {
+      if (debug_level && (i == STDIN_FILENO ||
+           i == STDOUT_FILENO || i == STDERR_FILENO))
+         continue;
+      if (trace_fd && i == fileno(trace_fd))
+         continue;
 
-   for (i = sysconf(_SC_OPEN_MAX) - 1; i > low_fd; i--)
       close(i);
+   }
 
    /* move to root directory */
    chdir("/");
