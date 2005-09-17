@@ -75,7 +75,6 @@ typedef struct s_usb_data {
    int fd;                         /* Our UPS fd when open */
    bool compat24;                  /* Linux 2.4 compatibility mode */
    char orig_device[MAXSTRING];    /* Original port specification */
-   time_t debounce;                /* last event time for debounce */
    USB_INFO *info[CI_MAXCI + 1];   /* Info pointers for each command */
 } USB_DATA;
 
@@ -578,22 +577,6 @@ bool pusb_ups_check_state(UPSINFO *ups)
          /* Copy the stored uref, replacing its value */
          uref = info->uref;
          uref.value = hev.value;
-      }
-
-      if (my_data->debounce) {
-         int sleep_time;
-
-         /* Wait 6 seconds before returning next sample. This 
-          * eliminates the annoyance of detecting transitions to
-          * battery that last less than 6 seconds.  Do sanity check
-          * on calculated sleep time.
-          */
-         sleep_time = 6 - (time(NULL) - my_data->debounce);
-         if (sleep_time < 0 || sleep_time > 6)
-            sleep_time = 6;
-
-         sleep(sleep_time);
-         my_data->debounce = 0;
       }
 
       write_lock(ups);

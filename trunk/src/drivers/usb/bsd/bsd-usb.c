@@ -58,7 +58,6 @@ typedef struct s_usb_data {
    int intfd;                      /* Interrupt pipe fd */
    char orig_device[MAXSTRING];    /* Original port specification */
    short vendor;                   /* UPS vendor id */
-   time_t debounce;                /* last event time for debounce */
    report_desc_t rdesc;            /* Device's report descrptor */
    USB_INFO *info[CI_MAXCI + 1];   /* Info pointers for each command */
 } USB_DATA;
@@ -622,23 +621,6 @@ int pusb_ups_check_state(UPSINFO *ups)
          for (i = 0; i < retval; i++)
             printf("%02x, ", buf[i]);
          printf("\n");
-      }
-
-      if (my_data->debounce) {
-         int sleep_time;
-
-         /* Wait 6 seconds before returning next sample.
-          * This eliminates the annoyance of detecting
-          * transitions to battery that last less than
-          * 6 seconds.  Do sanity check on calculated
-          * sleep time.
-          */
-         sleep_time = 6 - (time(NULL) - my_data->debounce);
-         if (sleep_time < 0 || sleep_time > 6)
-            sleep_time = 6;
-
-         sleep(sleep_time);
-         my_data->debounce = 0;
       }
 
       write_lock(ups);
