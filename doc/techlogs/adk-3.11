@@ -1,7 +1,29 @@
-             Technical notes on version 3.11.10
+             Technical notes on version 3.11.11
                         Adam Kropelin
 
 General:
+
+17Sep05:
+- Use fast polling when battery is disconnected. This minimizes the battery
+  reattach delay.
+- Process actions immediately after volatile poll in addition to after a
+  state check. This allows transitions caught by polling to be acted upon
+  without waiting thru another state check interval.
+- Remove debounce logic. The USB debounce code was vestigial since the big
+  USB changes went in.  The SmartUPS code actually interfered with proper
+  operation of ONBATTERYDELAY, causing powerfail and onbattery messages to be
+  generated ~2 seconds apart instead of whatever the user configured via
+  ONBATTERYDELAY.
+- USB: Fix selftest detection on RS 1500 models. Delay slightly before reading
+  APCLineFailCause because this usage apparently is not valid immediately
+  after power failure. Also disable CI_ACPresent when CI_Discharging is
+  available because the RS 1500 reports (Discharging=1 && ACPresent=1) during
+  self test, which confuses Apcupsd.
+15Sep05:
+- USB: Work around spurious BatteryPresent=1 bug in RS 1500 firmware.
+13Sep05:
+- manpage: Default STATUSPORT is 3551. Manually editing cgi is no 
+  longer required when changing the port.
 7Sep05:
 - Fix set_online(int) modifier to change both UPS_online and UPS_onbatt
   like the regular set_online(void) does. Eliminate future ocurrences
