@@ -630,7 +630,7 @@ int pusb_ups_check_state(UPSINFO *ups)
        * affected by this report.
        */
       for (ci=0; ci<CI_MAXCI; ci++) {
-         if (my_data->info[ci] &&
+         if (ups->UPS_Cap[i] && my_data->info[ci] &&
              my_data->info[ci]->item.report_ID == buf[0]) {
 
             /* Ignore this event if the value has not changed */

@@ -197,7 +197,21 @@ const struct s_known_info known_info[] = {
 
 int usb_ups_get_capabilities(UPSINFO *ups)
 {
-   return pusb_ups_get_capabilities(ups, known_info);
+   int rc;
+   
+   rc = pusb_ups_get_capabilities(ups, known_info);
+   if (!rc)
+      return 0;
+
+   /*
+    * If the hardware supports CI_Discharging, ignore CI_ACPresent.
+    * Some hardware (RS 1500, possibly others) reports confusing
+    * values for these during self test. (Discharging=1 && ACPresent=1)
+    */
+   if (ups->UPS_Cap[CI_Discharging])
+      ups->UPS_Cap[CI_ACPresent] = false;
+
+   return 1;
 }
 
 int usb_ups_check_state(UPSINFO *ups)
@@ -291,10 +305,6 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
    {
    /* UPS_STATUS -- this is the most important status for apcupsd */
    case CI_STATUS:
-      /*
-       * Use a temporary for bitmasking so ups->Status will be
-       * updated atomically.
-       */
       ups->Status &= ~0xff;
       ups->Status |= uval->iValue & 0xff;
       Dmsg1(200, "Status=0x%08x\n", ups->Status);
@@ -636,6 +646,7 @@ int usb_ups_entry_point(UPSINFO *ups, int command, void *data)
        * entry point.
        */
       /* Reason for last transfer to batteries */
+      usleep(40000);  /* Give UPS a chance to update the value */
       if (usb_update_value(ups, CI_WHY_BATT) ||
           usb_update_value(ups, CI_APCLineFailCause))
       {

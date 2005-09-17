@@ -443,7 +443,7 @@ static USB_INFO *find_info_by_uref(UPSINFO *ups, struct hiddev_usage_ref *uref)
    int i;
 
    for (i=0; i<CI_MAXCI; i++) {
-      if (my_data->info[i] &&
+      if (ups->UPS_Cap[i] && my_data->info[i] &&
           my_data->info[i]->uref.report_id == uref->report_id &&
           my_data->info[i]->uref.field_index == uref->field_index &&
           my_data->info[i]->uref.usage_index == uref->usage_index &&
@@ -465,7 +465,7 @@ static USB_INFO *find_info_by_ucode(UPSINFO *ups, unsigned int ucode)
    int i;
 
    for (i=0; i<CI_MAXCI; i++) {
-      if (my_data->info[i] &&
+      if (ups->UPS_Cap[i] && my_data->info[i] &&
           my_data->info[i]->uref.usage_code == ucode) {
             return my_data->info[i];
       }
