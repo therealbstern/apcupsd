@@ -72,7 +72,7 @@ void log_event(const UPSINFO *ups, int level, const char *fmt, ...)
  */
 
 int debug_level = 0;
-static FILE *trace_fd = NULL;
+FILE *trace_fd = NULL;
 bool trace = false;
 
 #define FULL_LOCATION 1
