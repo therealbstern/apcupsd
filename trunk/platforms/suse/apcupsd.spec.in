@@ -60,7 +60,7 @@ URL:          http://www.apcupsd.com
 Source0:      http://www.spcupsd.com/%{name}-%{version}.tar.gz
 Source1:      Release_Notes-%{version}-%{release}.tar.gz
 Group:        System Environment/Daemons
-Copyright:    GPL v2
+License:      GPL v2
 BuildRoot:    %{_tmppath}/%{name}-root
 BuildRequires: gd-devel
 %if %{rh7}
@@ -391,6 +391,11 @@ fi
 %endif
 
 %changelog
+* Sun Sep 18 2005 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- Change deprecated Copyright tag to License
+* Tue Jun 07 2005 Adam Kropelin <akropel1@rochester.rr.com>
+- Rename mainsback.in to offbattery.in so default power loss/return actions
+- are symmetrical.
 * Sat Apr 30 2005 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - fix typo in rh7 dependencies
 * Sat Mar 12 2005 D. Scott Barninger <barninger at fairfieldcomputers.com>
