@@ -299,52 +299,56 @@ int getline(char *s, int len, UPSINFO *ups)
    return SUCCESS;
 }
 
-static int linkcheck = FALSE;
-
 /*********************************************************************/
+/* Note this routine MUST be called with the UPS write lock held! */
 void UPSlinkCheck(UPSINFO *ups)
 {
-   char *a;
-   int comm_err = FALSE;
-   int tlog;
+   struct timeval now, prev;
+   static int linkcheck = FALSE;
 
    if (linkcheck)
       return;
+
    linkcheck = TRUE;               /* prevent recursion */
 
    tcflush(ups->fd, TCIOFLUSH);
-   if (strcmp((a = smart_poll('Y', ups)), "SM") == 0) {
+   if (strcmp(smart_poll('Y', ups), "SM") == 0) {
       linkcheck = FALSE;
       ups->clear_commlost();
       return;
    }
+
    ups->set_commlost();
    tcflush(ups->fd, TCIOFLUSH);
+   generate_event(ups, CMDCOMMFAILURE);
 
-   for (tlog = 0; strcmp((a = smart_poll('Y', ups)), "SM") != 0;
-      tlog -= (1 + TIMER_SELECT)) {
-      if (tlog <= 0) {
-         tlog = 10 * 60;           /* notify every 10 minutes */
+   write_unlock(ups);
+
+   gettimeofday(&prev, NULL);
+   do {
+      /* Log an event every 10 minutes */
+      gettimeofday(&now, NULL);
+      if (TV_DIFF_MS(prev, now) >= 10*60*1000) {
          log_event(ups, event_msg[CMDCOMMFAILURE].level,
             event_msg[CMDCOMMFAILURE].msg);
-         if (!comm_err)            /* execute script once */
-            execute_command(ups, ups_event[CMDCOMMFAILURE]);
-
+         prev = now;
       }
-      /* This sleep should not be necessary since the smart_poll() 
-       * routine normally waits TIMER_SELECT (60) seconds. However,
+
+      /*
+       * This sleep should not be necessary since the smart_poll() 
+       * routine normally waits TIMER_FAST (1) seconds. However,
        * in case the serial port is broken and generating spurious
        * characters, we sleep to reduce CPU consumption. 
        */
       sleep(1);
-      comm_err = TRUE;
       tcflush(ups->fd, TCIOFLUSH);
    }
+   while (strcmp(smart_poll('Y', ups), "SM") != 0);
 
-   if (comm_err) {
-      tcflush(ups->fd, TCIOFLUSH);
-      generate_event(ups, CMDCOMMOK);
-   }
+   tcflush(ups->fd, TCIOFLUSH);
+   generate_event(ups, CMDCOMMOK);
+
+   write_lock(ups);
    ups->clear_commlost();
    linkcheck = FALSE;
 }
