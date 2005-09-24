@@ -487,7 +487,6 @@ void do_action(UPSINFO *ups)
           * Normal Power down during Power Failure
           */
          if (ups->chg_battlow() && ups->is_battlow()) {
-            ups->clear_onbatt_msg();
             generate_event(ups, CMDFAILING);
             break;
          }
@@ -527,7 +526,6 @@ void do_action(UPSINFO *ups)
           */
          if (ups->is_shutdownimm() ||
             (ups->is_battlow() && ups->is_online())) {
-            ups->clear_onbatt_msg();
             ups->set_shut_emerg();
             generate_event(ups, CMDEMERGENCY);
          }
