@@ -197,6 +197,8 @@ int apcsmart_ups_get_capabilities(UPSINFO *ups)
     * capability.
     */
    for (i = 0; i <= CI_MAX_CAPS; i++) {
+      if (ups->UPS_Cmd[i] == 0)
+         continue;
       if (!cmds || strchr(cmds, ups->UPS_Cmd[i]) != NULL) {
          astrncpy(answer, smart_poll(ups->UPS_Cmd[i], ups), sizeof(answer));
          if (answer && *answer && (strcmp(answer, "NA") != 0)) {
