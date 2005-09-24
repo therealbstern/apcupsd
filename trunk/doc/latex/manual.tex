@@ -7588,13 +7588,14 @@ daemon. In that case, {\it NETSERVER} should be {\it off}.
 
 \item [NISIP \lt{}IP-address\gt{}]
    \index{NISIP \lt{}IP-address\gt{} }
-   This directive specifies an IP address on which NIS server will listen for
-incoming connections. Default value is 0.0.0.0 that means any incoming request
-will be serviced but if you want it to listen to a single subnet you can set
-it up to that subnet address, for example 192.168.10.0. Additionally you can
-listen for a single IP like 192.168.10.1. You may also use the {\tt
-\verb{--{with-nisip=} option of the {\tt ./configure} program to set this directive
-during the build.  
+   This directive specifies the IP address of the network interface on which
+the NIS server will listen for incoming connections. Default value is 0.0.0.0
+which means the NIS will listen for connections on all network interfaces. If
+your machine has more than one interface, you can specify the IP of a single
+interface to limit connections to only that interface. Furthermore, you can
+specify the loopback address (127.0.0.1) to accept connections only from the 
+local machine. You may also use the {\tt \verb{--{with-nisip=} option of the
+{\tt ./configure} program to set this directive during the build.  
 
 This directive does not work on Win32 machines because inet\_ipton() is not
 implemented there.  
