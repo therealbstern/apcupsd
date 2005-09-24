@@ -1,8 +1,30 @@
-             Technical notes on version 3.11.11
+             Technical notes on version 3.11.12
                         Adam Kropelin
 
 General:
 
+24Sep05:
+- Update examples/snoopdecode.c to latest version and add to Makefile.
+- Add SmartUPS serial protocol simulator 'smartsim' to examples/ directory.
+- Do not clear_onbatt_msg() when shutting down. This just causes a redundant
+  "On Battery" event.
+- apcsmart: Convert do/while loop to a regular while loop in UPSlinkCheck().
+  The do/while form is harder to read and doesn't add any value.
+- apcsmart: Remove pointless check in apcsmart_ups_get_capabilities().
+- apcsmart: Fix commlost deadlock caused when locking was added to NIS code.
+  We have to drop the UPS lock in UPSlinkCheck(), otherwise NIS is blocked 
+  until the link comes back up. Also fix timing bug which caused commlost 
+  events every 20 seconds instead of every 10 minutes. To do that, rewrite
+  the event loop to not depend on the timing behavior of getline().
+- Fix TV_DIFF_MS macro.
+- apcsmart: Fix excessive startup delay: Don't probe for commands where
+  ups->UPS_Cmd[i] == 0.
+18Sep05:
+- Be careful not to close trace_fd while daemonizing.
+- Add example {on,off}battery scripts that scale CPU frequency down to save
+  power when UPS is running on battery. Requires linux-2.6.x kernel with
+  cpufreq support and compatible CPU. Inspired by Paul Devriendt's talk
+  at OLS 2004.
 17Sep05:
 - Use fast polling when battery is disconnected. This minimizes the battery
   reattach delay.
