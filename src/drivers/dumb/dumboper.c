@@ -148,9 +148,9 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
        * This is the ONBATT signal sent by UPS.
        */
       if (my_data->sp_flags & TIOCM_CD) {
-         ups->set_onbatt();
+         ups->clear_online();
       } else {
-         ups->clear_onbatt();
+         ups->set_online();
       }
 
       if (!(my_data->sp_flags & TIOCM_CTS)) {
