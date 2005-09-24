@@ -23,7 +23,6 @@ hid-ups: hid-ups.c
 hid-set: hid-set.c
 	$(CC) -g  hid-set.c -o hid-set
 
-
 client:  client.c $(APCLIBS)
 	$(CC) $(CFLAGS) client.c $(APCLIBS) -o client
 	$(CP) client@EXEEXT@ gui/
@@ -39,6 +38,9 @@ newslave: newslave.c $(APCLIBS)
 
 upsapm: upsapm.c $(APCLIBS)
 	$(CC) $(CFLAGS) upsapm.c $(APCLIBS) -o upsapm
+
+smartsim: smartsim.c
+	$(CC) $(CFLAGS) smartsim.c -o smartsim
 
 install:
 
