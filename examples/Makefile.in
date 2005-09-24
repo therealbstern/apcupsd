@@ -42,6 +42,9 @@ upsapm: upsapm.c $(APCLIBS)
 smartsim: smartsim.c
 	$(CC) $(CFLAGS) smartsim.c -o smartsim
 
+snoopdecode: snoopdecode.c
+	$(CC) $(CFLAGS) snoopdecode.c -o snoopdecode
+
 install:
 
 uninstall:
