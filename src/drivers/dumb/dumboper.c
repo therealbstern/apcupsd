@@ -147,29 +147,11 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
       /*
        * This is the ONBATT signal sent by UPS.
        */
-      if (my_data->sp_flags & TIOCM_CD)
+      if (my_data->sp_flags & TIOCM_CD) {
          ups->set_onbatt();
-      else
-         ups->clear_onbatt();
-
-      /*
-       * This is the ONLINE signal that is delivered
-       * by CUSTOM_SIMPLE cable. We use the UPS_online flag
-       * to report this condition to apcaction.
-       * If we are both ONBATT and ONLINE there is clearly
-       * something wrong with battery or charger. Set also the
-       * UPS_replacebatt flag if needed.
-       */
-      if (my_data->sp_flags & TIOCM_SR) {
-         ups->clear_online();
       } else {
-         ups->set_online();
+         ups->clear_onbatt();
       }
-
-      if (ups->is_online() && ups->is_onbatt())
-         BattFail = true;
-      else
-         BattFail = false;
 
       if (!(my_data->sp_flags & TIOCM_CTS)) {
          ups->set_battlow();
