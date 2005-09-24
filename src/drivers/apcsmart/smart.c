@@ -325,7 +325,7 @@ void UPSlinkCheck(UPSINFO *ups)
    write_unlock(ups);
 
    gettimeofday(&prev, NULL);
-   do {
+   while (strcmp(smart_poll('Y', ups), "SM") != 0) {
       /* Log an event every 10 minutes */
       gettimeofday(&now, NULL);
       if (TV_DIFF_MS(prev, now) >= 10*60*1000) {
@@ -343,7 +343,6 @@ void UPSlinkCheck(UPSINFO *ups)
       sleep(1);
       tcflush(ups->fd, TCIOFLUSH);
    }
-   while (strcmp(smart_poll('Y', ups), "SM") != 0);
 
    tcflush(ups->fd, TCIOFLUSH);
    generate_event(ups, CMDCOMMOK);
