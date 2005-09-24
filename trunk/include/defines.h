@@ -516,7 +516,7 @@ void d_msg(const char *file, int line, int level, const char *fmt, ...);
 
 /* Determine the difference, in milliseconds, between two struct timevals. */
 #define TV_DIFF_MS(a, b) \
-    ((b).tv_sec - (a).tv_sec) * 1000 + ((b).tv_usec - (a).tv_usec) / 1000;
+    (((b).tv_sec - (a).tv_sec) * 1000 + ((b).tv_usec - (a).tv_usec) / 1000)
 
 
 #endif   /* _DEFINES_H */
