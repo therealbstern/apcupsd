@@ -378,62 +378,73 @@ If you decide to set up one of these more complex configurations, see the
 Advanced Topics (see 
 \ilink{Advanced topics}{Advanced-topics}) section for details. 
 
-\label{Apcupsd-Known-USB-Issues}
+\section*{USB Configuration}
+\label{USB-Configuration}
+\index{USB Configuration}
+\index{Configuration!USB}
 
-\section*{Apcupsd Known USB Issues}
-\index{Issues!Apcupsd Known USB }
-\index{Apcupsd Known USB Issues }
-\addcontentsline{toc}{section}{Apcupsd Known USB Issues}
+Apcupsd supports USB connections on Linux, FreeBSD, OpenBSD, and NetBSD. If
+you plan to use a USB conenction, please read this section in its entirety.
+You can skip this section if your UPS has a serial (RS232-C) or Ethernet 
+interface or if you are not running one of the platforms listed above. 
 
-\label{index-USB-problems-15}
-\label{index-Problems_002c-USB-16}
-- {\bf Problem:} USB is only supported on Linux and *BSD systems (though the
-*BSD is still BETA). Although the configuration script allows the usb driver
-to be enabled on other platforms, it will only compile and run on Linux and
-*BSD systems.  
+\subsection*{Linux USB Configuration}
+\index{Linux USB Configuration}
+\index{Linux!USB Configuration}
+\index{USB!Linux Configuration}
 
-- {\bf Workaround:} Try using UPS in serial mode instead of USB.  
+\subsubsection*{Known Linux USB Issues}
+\index{Issues!Known Linux USB}
+\index{Linux!Known USB Issues}
+\index{USB!Known Linux USB Issues}
 
-- {\bf Problem:} Linux 2.4 series kernels older than 2.4.22 do not bind the
+\begin{description}
+\item [Problem]
+Linux 2.4 series kernels older than 2.4.22 (RH 9, RHEL 3) do not bind the
 USB device to the proper driver. This is evidenced by /proc/bus/usb/devices
 listing the UPS correctly but it will have ``driver=(none)'' instead of
 ``driver=(hid)''. This affects RHEL3, among others.  
+\item [Workaround]
+Upgrade linux kernel to 2.4.22 or higher. Alternately, you apply the
+linux-2.4.20-killpower.patch and linux-2.4.20-USB-reject.patch patches
+to your kernel and rebuild it. These patches can be found in the examples/
+directory in the apcupsd source distribution.
 
-- {\bf Workaround:} Upgrade linux kernel to 2.4.22 or higher.  
-
-- {\bf Problem:} Mandrake 10.0 and 10.1 systems with high security mode
+\item [Problem]
+Mandrake 10.0 and 10.1 systems with high security mode
 enabled (running kernel-secure kernel) use static device nodes but still
 assign USB minor numbers dynamically. This is evidenced by {\bf hiddev0: USB
 HID v1.10 Device [...]} instead of {\bf hiddev96: ...} in dmesg log.  
-
-- {\bf Workaround:} Boot standard kernel instead of kernel-secure or disable
+\item [Workaround]
+Boot standard kernel instead of kernel-secure or disable
 CONFIG\_USB\_DYNAMIC\_MINORS and rebuild kernel-secure.  
 
-- {\bf Problem:} USB driver linux-usb.c fails to compile, reporting errors
+\item [Problem]
+USB driver linux-usb.c fails to compile, reporting errors
 about {\bf HID\_MAX\_USAGES undefined}. This is due to a defect in the linux
 kernel hiddev.h header file on 2.6.5 and higher kernels.  
+\item [Workaround]
+Upgrade to apcupsd-3.10.14 or higher. These versions contain a workaround 
+for the defect.  
 
-- {\bf Workaround:} Workaround: Upgrade to apcupsd-3.10.14 or higher.  These
-versions contain a workaround for the defect.  
-
-- {\bf Problem:} On some systems such as Slackware 10.0, no USB devices will
-showup (see the next section).  
-
-- {\bf Workaround:} add the following to rc.local 
+\item [Problem]
+On some systems such as Slackware 10.0, no USB devices will
+show up (see the next section).  
+\item [Workaround]
+Add the following to rc.local 
 
 \footnotesize
 \begin{verbatim}
-     
-      mount -t usbdevfs none /proc/bus/usb
-     
+     mount -t usbdevfs none /proc/bus/usb
 \end{verbatim}
 \normalsize
 
-- {\bf Problem:} 2.6 kernels use udev and does not automatically create
-/dev/usb/hiddev?? as it should, causing apcupsd to  
-
-- {\bf Workaround:} Edit the file /etc/udev/rules.d/50-udev.rules, and add the
-following: 
+\item [Problem]
+2.6 kernels use udev and some distributions to not configure it
+to automatically create /dev/usb/hiddev?? as they should, causing apcupsd to
+fail to locate the UPS.
+\item [Workaround]
+Edit the file /etc/udev/rules.d/50-udev.rules, and add the following: 
 
 \footnotesize
 \begin{verbatim}
@@ -442,43 +453,40 @@ following:
 \normalsize
 
 More details are provided in the following section ... 
+\end{description}
 
-\label{Checking-Out-Your-USB-Subsystem}
+\label{Checking-Out-Your-Linux-USB-Subsystem}
+\subsubsection*{Checking Out Your Linux USB Subsystem}
+\index{Subsystem!Checking Out Your Linux USB}
+\index{Checking Out Your Linux USB Subsystem}
 
-\subsection*{Checking Out Your USB Subsystem}
-\index{Subsystem!Checking Out Your USB }
-\index{Checking Out Your USB Subsystem }
-\addcontentsline{toc}{subsection}{Checking Out Your USB Subsystem}
+You need to check three things: 
+\begin{enumerate}
+   \item That your USB subsystem can see the UPS
+   \item That the kernel has bound the correct driver
+   \item That the correct device nodes are available in /dev
+\end{enumerate}
 
-You can skip this section if your UPS has an Ethernet or RS232-C interface or
-you are not running on a Linux kernel.  If it has a USB interface, you need to
-make sure that your USB subsystem can see the UPS. On a Linux system this is
-easy, just do this from a shell prompt (please see below for 2.6 kernel
-considerations):  
+\subsubsection*{Verifying Device Detection and Driver}
+\index{Linux!Verifying USB Device Detection and Driver}
+\index{USB!Verifying Linux Device Detection and Driver}
 
-Most of this section applies to Linux. However, toward the end, there is
-critical information about the BSD USB driver, including a list of known
-issues and kernel configuration requirements. 
+To make sure that your USB subsystem can see the UPS, just do this from a
+shell prompt:
 
-\footnotesize
 \begin{verbatim}
-     
      cat /proc/bus/usb/devices
 \end{verbatim}
-\normalsize
 
 This information is updated by the kernel whenever a device is plugged in or
-unplugged, irrespective of whether apcupsd is running or not. To interpret the
-codes in this file, please see 
-\elink{http://www.linuxhq.com/kernel/v2.4/doc/usb/proc\_usb\_info.txt.html}{ht%
-tp://www.linuxhq.com/kernel/v2.4/doc/usb/proc_usb_info.txt.html}  
+unplugged, irrespective of whether apcupsd is running or not. It contains
+details on all the USB devices in your system including hubs (internal and
+external), input devices, and UPSes.
 
-You should get some output back that includes something like this from ESR's
-site, featuring an RS 1000: 
+You should get some output back that includes something like this, featuring
+a BackUPS RS 1000: 
 
-\footnotesize
 \begin{verbatim}
-     
      T:  Bus=02 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  3 Spd=1.5 MxCh= 0
      D:  Ver= 1.10 Cls=00(>ifc ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
      P:  Vendor=051d ProdID=0002 Rev= 1.06
@@ -488,24 +496,25 @@ site, featuring an RS 1000:
      C:* #Ifs= 1 Cfg#= 1 Atr=a0 MxPwr= 24mA
      I:  If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=00 Prot=00 Driver=hid
 \end{verbatim}
-\normalsize
 
-Note, if on the last line, {\bf Driver} is listed as {\bf Driver=none} then
+The important things to check for are the {\bf S:} lines describing your
+UPS and and the {\bf I:} line showing what driver is handling it.
+If on the {\bf I:} line, {\bf Driver} is listed as {\bf Driver=none} then
 you do not have the HID driver loaded or the driver did not attach to the UPS.
 One common cause is having a Linux kernel older than 2.4.22 (such as a stock
-RedHat 9 kernel). If this is the case for your system, please upgrade to at
-least kernel version 2.4.22 and try again.  Otherwise, please read further for
-instructions for other possible courses of action.  
+RedHat 9 or RHEL 3 kernel). If this is the case for your system, please
+upgrade to at least kernel version 2.4.22 and try again. If you are already
+running a 2.4.22 or higher kernel, please read further for instructions for
+other possible courses of action.  
 
-For more details on how to interpret these codes, please see the end of this
-section.  
+For a detailed description of the contents of the /proc/bus/usb files, see
+\ilink{Interpreting /proc/bus/usb (linux-2.4)}{proc\_usb\_info-2.4} or 
+\ilink{Interpreting /proc/bus/usb (linux-2.6)}{proc\_usb\_info-2.6} as
+appropriate for your kernel version.
 
-Here are two more ample entries from Kern Sibbald.  The first features a
-Back-UPS 350 direct connected USB device: 
+Here is another example, this time featuring a Back-UPS 350:
 
-\footnotesize
 \begin{verbatim}
-     
      T:  Bus=01 Lev=01 Prnt=01 Port=00 Cnt=01 Dev#=  2 Spd=1.5 MxCh= 0
      D:  Ver= 1.10 Cls=00(>ifc ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
      P:  Vendor=051d ProdID=0002 Rev= 1.00
@@ -516,103 +525,63 @@ Back-UPS 350 direct connected USB device:
      I:  If#= 0 Alt= 0 #EPs= 1 Cls=03(HID  ) Sub=00 Prot=00 Driver=hid
      E:  Ad=81(I) Atr=03(Int.) MxPS=   8 Ivl= 10ms
 \end{verbatim}
-\normalsize
 
-The second features an IOgear USB-to-serial adapter that runs my serial
-SmartUPS 1000: 
+In general, if you see your UPS model in the {\bf S:} field, which means
+{\bf Manufacturer=}, {\bf Product=}, and {\bf SerialNumber=}, and you see
+{\bf Driver=hid} in the {\bf I:} field, you know the UPS has been recognized
+and is bound to the correct driver.
 
-\footnotesize
-\begin{verbatim}
-     
-     T:  Bus=01 Lev=01 Prnt=01 Port=01 Cnt=02 Dev#=  4 Spd=12  MxCh= 0
-     D:  Ver= 1.10 Cls=00(>ifc ) Sub=00 Prot=00 MxPS= 8 #Cfgs=  1
-     P:  Vendor=0557 ProdID=2008 Rev= 0.01
-     C:* #Ifs= 1 Cfg#= 1 Atr=a0 MxPwr=100mA
-     I:  If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=00 Prot=00 Driver=serial
-     E:  Ad=81(I) Atr=03(Int.) MxPS=  10 Ivl=  1ms
-     E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=  0ms
-     E:  Ad=83(I) Atr=02(Bulk) MxPS=  64 Ivl=  0ms
-\end{verbatim}
-\normalsize
-
-Note that the IOgear device is using the {\bf serial} driver (the I: line)
-while the Back-UPS 350 is using the {\bf hid} driver.  
-
-In general, if you see your UPS model in the S field, which means {\bf
-Manufacturer=}, {\bf Product=}, and {\bf SerialNumber=}, and you see {\bf hid}
-in the I field (or {\bf serial} if you are using an IOGear connection), you're
-done.  You can skip the rest of this section and go straight to building and
-installing.  
-
-If it doesn't show, check the obvious things; the UPS must be powered on, and
-a cable must be properly seated in both the data port of the UPS and one of
-your machine's USB ports.  Many UPSes have phone ports to provide surge
-protection for phones or modems {--} make sure you haven't plugged your USB
-cable into one of those rather than the data port (which will usually be near
-the top edge of the case.)  
-
-Note, on recent Debian systems, they do not include the hiddev device nodes in
-/dev, so you may need to manually create them using the {\bf
-examples/make-hiddev} script.  
+If your UPS doesn't appear in the list at all, check the obvious things:
+The UPS must be powered on, and a cable must be properly seated in both the
+data port of the UPS and one of your machine's USB ports. Many UPSes have 
+phone ports to provide surge protection for phones or modems {--} make
+sure you haven't plugged your USB cable into one of those rather than the
+data port (which will usually be near the top edge of the case.)  
 
 Also, ensure that the correct drivers are loaded. Under Linux-2.4.x, you can
-check this out easily by examining the right file in the /proc system.  Here's
+check this out easily by examining the /proc/bus/usb/drivers file.  Here's
 how you can do that: 
 
-\footnotesize
 \begin{verbatim}
-     
-     esr@grelber$ cat /proc/bus/usb/drivers
+     cat /proc/bus/usb/drivers
 \end{verbatim}
-\normalsize
 
-and you should get: 
+...and you should get:
 
-\footnotesize
 \begin{verbatim}
-     
-              usbdevfs
-              hub
-      96-111: hiddev
-              hid
+             usbdevfs
+             hub
+     96-111: hiddev
+             hid
 \end{verbatim}
-\normalsize
 
 On Linux-2.6.x, make sure the sysfs filesystem is mounted on /sys and do: 
 
-\footnotesize
 \begin{verbatim}
-     
-     adk0212@mail$ ls -l /sys/bus/usb/drivers/
+     ls -l /sys/bus/usb/drivers/
 \end{verbatim}
-\normalsize
 
-where you should get 
+...where you should get:
 
-\footnotesize
 \begin{verbatim}
-     
-         total 0
-         drwxr-xr-x    2 root     root            0 May  1 18:55 hid
-         drwxr-xr-x    2 root     root            0 May  1 18:55 hiddev
-         drwxr-xr-x    2 root     root            0 May  1 18:55 hub
-         drwxr-xr-x    2 root     root            0 May  1 18:55 usb
-         drwxr-xr-x    2 root     root            0 May  1 18:55 usbfs
+     total 0
+     drwxr-xr-x    2 root     root            0 May  1 18:55 hid
+     drwxr-xr-x    2 root     root            0 May  1 18:55 hiddev
+     drwxr-xr-x    2 root     root            0 May  1 18:55 hub
+     drwxr-xr-x    2 root     root            0 May  1 18:55 usb
+     drwxr-xr-x    2 root     root            0 May  1 18:55 usbfs
 \end{verbatim}
-\normalsize
 
-or perhaps something like 
+...or perhaps something like:
 
-\footnotesize
 \begin{verbatim}
-        total 0
-        drwxr-xr-x  2 root root 0 Jan  6 15:27 hiddev
-        drwxr-xr-x  2 root root 0 Jan  6 15:28 hub
-        drwxr-xr-x  2 root root 0 Jan  6 15:28 usb
-        drwxr-xr-x  2 root root 0 Jan  6 15:27 usbfs
-        drwxr-xr-x  2 root root 0 Jan  6 15:28 usbhid
+     total 0
+     drwxr-xr-x  2 root root 0 Jan  6 15:27 hiddev
+     drwxr-xr-x  2 root root 0 Jan  6 15:28 hub
+     drwxr-xr-x  2 root root 0 Jan  6 15:28 usb
+     drwxr-xr-x  2 root root 0 Jan  6 15:27 usbfs
+     drwxr-xr-x  2 root root 0 Jan  6 15:28 usbhid
 \end{verbatim}
-\normalsize
 
 If your 2.6.x system does not have the /sys/bus/usb directory, either you do
 not have sysfs mounted on /sys or the USB module(s) have not been loaded. 
@@ -621,290 +590,227 @@ not have sysfs mounted on /sys or the USB module(s) have not been loaded.
 A USB UPS needs all of these drivers {--} the USB device filesystem, the USB
 hub, the Human Interface Device subsystem driver, and the Human Interface
 Device driver. If you are compiling your own kernel, you want to enable
-CONFIG\_USB, CONFIG\_USB\_HID, CONFIG\_USB\_HIDDEV, and CONFIG\_USB\_DEVICEFS
-as well as at least one USB Host Controller Driver (CONFIG\_USB\_UHCI\_HCD
-[2.6.x], CONFIG\_USB\_UHCI [2.4.x], etc.).  
 
-If CONFIG\_USB is set as M, CONFIG\_USB\_HID must be M (if enabled at all). If
-CONFIG\_USB is set as Y, CONFIG\_USB\_HID can be M or Y. hiddev, in turn, will
-be built however HID is.  
-
-To complicate things more many Linux flavors running 2.6 kernels such as
-Fedora FC3 use the udev filesystem, which creates the devices in /dev (as well
-as some others such as network devices) on the fly as they are needed. It is
-basically a hotplug system, giving a lot more power to the user to determine
-what happens when a device is probed or opened. It is also a lot more
-complicated.  
-
-The bottom line for apcupsd on such a system is that the file
-/dev/usb/hiddev\# is not defined, and hence apcupsd terminates in error. The
-solution to the problem is to add a rule to the udev rules file.  On Fedora
-FC3, this file is found in /etc/udev/rules.d/50-udev.rules. Start by adding
-the following line: 
-
-\footnotesize
 \begin{verbatim}
-     BUS="usb", SYSFS[idVendor]="051d", NAME="usb/hiddev%n"
+     CONFIG_USB
+     CONFIG_USB_HID
+     CONFIG_USB_HIDDEV
+     CONFIG_USB_DEVICEFS
 \end{verbatim}
-\normalsize
 
-where you replace the [ and ] with braces in the line above.  
+...as well as at least one USB Host Controller Driver...
+
+\begin{verbatim}
+     CONFIG_USB_UHCI_HCD (linux-2.6.x)
+     CONFIG_USB_OHCI_HCD (linux-2.6.x)
+     CONFIG_USB_UHCI     (linux-2.4.x)
+     CONFIG_USB_OHCI     (linux-2.4.x)
+\end{verbatim}
+
+For a typical USB section of a kernel .config file, please see
+\ilink{Typical Linux Kernel Config}{Linux-Kernel-Config}
+
+\subsubsection*{Device Nodes}
+\index{Linux!USB Device Nodes}
+\index{USB!Linux Device Nodes}
+
+Apcupsd accesses USB UPSes via the hiddev device nodes. Typically these are
+located in /dev/hiddev{\it N}, /dev/usb/hiddev{\it N} or
+/dev/usb/hiddev/hiddev{\it N} (where {\it N} is a digit 0 thru 9). Some 
+distributions (some Debian releases, possibly others) do not provides these
+device nodes for you, so you will have to make them yourself. Check /dev, 
+/dev/usb, and /dev/usb/hiddev and if you  cannot find the hiddev{\it N} nodes,
+run (as root) the examples/make-hiddev script from the apcupsd source distribution.
+
+To complicate things more, many Linux flavors running 2.6 kernels such as
+Fedora FC3 use the udev utility, which dynamically creates the devices in /dev
+on the fly as they are needed. It is basically a hotplug system, giving a lot
+more power to the user to determine what happens when a device is probed or 
+opened. It is also a lot more complicated.  
+
+Some default udev rule sets do not include rules for creating hiddev nodes.
+The bottom line for apcupsd on such a system is that if the
+hiddev{\it N} is not created when you plug in your UPS, apcupsd will terminate
+with an error. The solution to the problem is to add a rule to the udev rules
+file.  On Fedora FC3, this file is found in /etc/udev/rules.d/50-udev.rules.
+Start by adding the following line:
+
+\begin{verbatim}
+     BUS="usb", SYSFS{idVendor}="051d", NAME="usb/hiddev%n"
+\end{verbatim}
 
 Then either reboot your system, or unplug and replug your UPS and then restart
-apcupsd. At that point apcupsd should work fine.  You can use: 
+apcupsd. At that point a /dev/usb/hiddev{\it N} node should appear and apcupsd
+should work fine.  You can use: 
 
-\footnotesize
 \begin{verbatim}
      udevinfo -a -p /sys/class/usb/hiddev0/
 \end{verbatim}
-\normalsize
 
-to get more information on the fields that can be matched.  
+to get more information on the fields that can be matched.
 
-Adam has provided the following as a more generic rule: 
+You can also create a more generic rule that creates nodes for any device
+using the hiddev driver, not just APC UPSes:
 
-\footnotesize
 \begin{verbatim}
      KERNEL="hiddev*", NAME="usb/hiddev%n"
 \end{verbatim}
-\normalsize
 
 If you have several UPSes or you just want to give your UPS a fixed name, you
 can use: 
 
-\footnotesize
 \begin{verbatim}
-     BUS="usb", SYSFS[serial]="AS0123456789", NAME="usb/ups0"
+     BUS="usb", SYSFS{serial}="AS0123456789", NAME="usb/ups0"
 \end{verbatim}
-\normalsize
 
-where you replace the [ and ] with braces and the serial number with the one
-that correspnds to your UPS.  
+where you replace the serial number in quotes with the one that correspnds to
+your UPS. Then whenever you plug in your UPS it will be given a device node
+called usb/ups0.
 
-Some kernels ship, such as Mandrake 10, ship with CONFIG\_USB\_DYNAMIC\_MINORS
-turned on. This is not ideal for running with apcupsd, and the easiest
-solution is to turn CONFIG\_USB\_DYNAMIC\_MINORS off and rebuild your kernel,
-or find a pre-built kernel with it off. For a kernel with
+An additional device-node-related problem is the use of dynamic minors. Some
+distributions, such as Mandrake 10, ship with a kernel having
+CONFIG\_USB\_DYNAMIC\_MINORS turned on. This is not ideal for running with
+apcupsd, and the easiest solution is to turn CONFIG\_USB\_DYNAMIC\_MINORS off
+and rebuild your kernel, or find a pre-built kernel with it off. For a kernel with
 CONFIG\_USB\_DYNAMIC\_MINORS turned on to work with apcupsd, you must enable
 {\bf devfs}. The following will tell you if devfs is enabled: 
 
-\footnotesize
 \begin{verbatim}
-     
      $ ps ax | grep devs
 \end{verbatim}
-\normalsize
 
-which should give something like the following: 
+...which should give something like the following: 
 
-\footnotesize
 \begin{verbatim}
-     
      533 ?        S      0:00 devfsd /dev
 \end{verbatim}
-\normalsize
 
 What complicates the situation much more on Mandrake kernels is their security
 level since CONFIG\_DYNAMIC\_USB\_MINORS is turned on, but on higher security
 levels devfs is turned off. The net result, is that in those situations hiddev
-is hosed (to use Adam's terms) so apcupsd will not work. So, in these cases,
+is completely unusable so apcupsd will not work. So, in these cases,
 the choices are: 
 
-\footnotesize
-\begin{verbatim}
-     
-     (a) Reduce the security level setting of the system
-         (not sure if this is possible after the initial install).
-     (b) Custom build a high security kernel with devfs enabled
-         and make sure devfs is mounted and devfsd is running.
-     (c) Custom build a high security kernel with dynamic
-         minors disabled
-     (d) Use udev
-\end{verbatim}
-\normalsize
+\begin{enumerate}
+    \item Reduce the security level setting of the system (not sure if 
+    this is possible after the initial install).
+    \item Custom build a high security kernel with devfs enabled and make
+    sure devfs is mounted and devfsd is running.
+    \item Custom build a high security kernel with dynamic minors disabled
+    \item Use udev
+\end{enumerate}
 
-For a typical USB section of a kernel .config file, please see the end of this
-section.  
+\subsubsection*{Miscellaneous}
+\index{Linux!USB Miscellaneous}
+\index{USB!Linux Miscellaneous}
 
-For the IOGear serial USB connection, you need: 
-
-\footnotesize
-\begin{verbatim}
-     
-     usbcore
-     usbserial
-     pl2303
-\end{verbatim}
-\normalsize
-
-Finally, check that appropriate USB devices exist.  On a Red Hat system you
-can do this: 
-
-\footnotesize
-\begin{verbatim}
-     
-     esr@grelber$ ls /dev/usb/h*
-     /dev/usb/hiddev0   /dev/usb/hiddev12  /dev/usb/hiddev2  /dev/usb/hiddev6
-     /dev/usb/hiddev1   /dev/usb/hiddev13  /dev/usb/hiddev3  /dev/usb/hiddev7
-     /dev/usb/hiddev10  /dev/usb/hiddev14  /dev/usb/hiddev4  /dev/usb/hiddev8
-     /dev/usb/hiddev11  /dev/usb/hiddev15  /dev/usb/hiddev5  /dev/usb/hiddev9
-\end{verbatim}
-\normalsize
-
-This will tell you that the Human Interface Device nodes, one of which apcupsd
-will use to talk with the UPS, exist.  On other Linuxes the layout will be
-slightly different; the hiddev devices will usually live in a /dev/usb/hid/
-subdirectory. If these devices don't exist, you may need to run
-\lt{}apcupsd-source\gt{}/examples/make-hiddev to create them.  
-
-Now build and run the hid-ups test program. You do not have to configure and
-build the rest of apcupsd to do this.  To build hid-ups enter: 
-
-\footnotesize
-\begin{verbatim}
-     
-     cd <apcupsd-source>/examples
-     make hid-ups
-\end{verbatim}
-\normalsize
-
-There should be no errors. Now assuming that everything has gone well to this
-point and that you have connected your USB UPS, enter:  
-
-\label{index-hid_002dups-17}
-
-\footnotesize
-\begin{verbatim}
-     
-     ./hid-ups
-\end{verbatim}
-\normalsize
-
-It should print a sample report of the information that it has obtained from
-your UPS. CAUTION! if you have a 2.4.x Linux kernel do not run two copies of
-this program at the same time, or your kernel will freeze. The report that is
-printed should look very similar to the report in
-\lt{}apcupsd-source\gt{}/examples/hid-ups.rpt. If the program reports that the
-device was not found ensure that all the appropriate modules are loaded (as
-described earlier), then unplug your UPS and plug it back in. This should
-permit the kernel to recognize the UPS.  
-
-If ./hid-ups tells you ``No permission, try this as root'', you know what to
-try. If it says ``Couldn't find USB UPS device, check your /dev.'', then it is
-very unlikely that apcupsd will work.  You probably need to run the script
-``make-hiddev'' before continuing.  
-
-If all there things check out and you still can't see the UPS, something is
+If all these things check out and you still can't see the UPS, something is
 more seriously wrong than this manual can cover {--} find expert help.  If you
 are unable to list USB devices or drivers, you kernel may not be USB-capable
-and that needs to be fixed. Please check if your kernel has the three patches
-listed in the \lt{}apcupsd-source\gt{}/examples directory. Each of the files
-ends with the name .patch, and at the current writing they are: 
+and that needs to be fixed.
 
-\footnotesize
-\begin{verbatim}
-     
-     linux-2.4.20-killpower.patch
-     linux-2.4.20-USB-reject.patch
-     linux-2.6.0-USB-queue-overflow.patch
-\end{verbatim}
-\normalsize
+\subsection*{BSD USB Configuration}
+\index{BSD USB Configuration}
+\index{BSD!USB Configuration}
+\index{USB!BSD Configuration}
 
-For example, RedHat 9 and/or pre-2.4.22 kernels are known to need the
-linux-2.4.20-USB-reject.patch for APC SmartUPS XL series devices.  
+\subsubsection*{Known BSD USB Issues}
+\index{Issues!Known BSD USB}
+\index{BSD!Known USB Issues}
+\index{USB!Known BSD USB Issues}
 
-There are also a few email files that you can consult in the examples
-directory for additional information and details.  
+\begin{description}
+\item [Problem]
+FreeBSD lockups: Some users have experienced lockups (apcupsd stops 
+responding) on FreeBSD systems. Recent versions of Apcupsd have addressed
+this issue. Please upgrade to apcupsd-3.10.18 or higher.
 
-Finally, check your Kernel Config. You will find more information about it at:
-
-\ilink{Kernel Config}{Kernel-Config}.  
-
-KNOWN ISSUES WITH BSD USB  
-
-The BSD USB driver for apcupsd is BETA software and has some known issues.  
-
-- FreeBSD lockups: Some users have experienced lockups (apcupsd stops 
-responding) on FreeBSD systems. In at least one case this problem was worked 
-around by disabling pthreads ({---}disable-pthreads flag to configure). The 
-problem seems to be caused by a FreeBSD kernel bug.  
-
-- FreeBSD kernel panics if USB cable is unplugged while apcupsd is running. 
+\item [Problem]
+FreeBSD kernel panics if USB cable is unplugged while apcupsd is running. 
 This is another kernel bug and is most easily worked around by not hot- 
-unplugging the UPS while apcupsd is running.  
+unplugging the UPS while apcupsd is running. This issue may be fixed in
+recent FreeBSD kernels.
+\end{description}
 
-PLATFORMS \& VERSIONS  
+\subsubsection*{Platforms and Versions}
+\index{BSD!USB Platforms and Versions}
+\index{USB!BSD Platforms and Versions}
 
-The new (beta) FreeBSD USB driver supports FreeBSD, OpenBSD and NetBSD.
-(Thanks go to the *BSD developers who kept a nearly identical interface across
-all three platforms.)  
+The \*BSD USB driver supports FreeBSD, OpenBSD and NetBSD. (Thanks go to 
+the \*BSD developers who kept a nearly identical interface across all 
+three platforms.)  
 
 The driver has been tested with the following platform versions: 
 
-\footnotesize
 \begin{verbatim}
-     FreeBSD-5.3     (Primary development platform)
+     FreeBSD-5.4     (Primary development platform)
+     FreeBSD-5.3
      FreeBSD-4.11
      NetBSD-2.0
      NetBSD-1.6.2
      OpenBSD-3.6
 \end{verbatim}
-\normalsize
 
-FreeBSD-5.3 has had the most testing since it is the primary platform on which
+FreeBSD-5.4 has had the most testing since it is the primary platform on which
 the driver is developed. The other platforms and versions have had somewhat
 less testing. The only architecture tested so far (on any platform) is i386,
 althought there is no reason to think it will not work on other archs. If you
 run the driver on a new platform version or architecture, please report your
-experience to the apcupsd-users mailing list.  
+experience (good or bad) to the apcupsd-users mailing list.  
 
-KERNEL CONFIGURATION  
+\subsubsection*{Kernel Configuration}
+\index{BSD!USB Kernel Configuration}
+\index{USB!BSD Kernel Configuration}
 
 You will need to rebuild your kernel in order to disable the uhid driver. uhid
 is not sufficient for apcupsd at this time and we need to prevent it from
-grabbing the UPS device. You should disable the following devices in your
-kernel config file (comment them out):  
+grabbing the UPS device. You should {\bf disable the following devices} in your
+kernel config file (comment them out):
 
-FreeBSD (you WILL NOT lose use of USB keyboard and mouse):  uhid  
+\begin{description}
+\item [FreeBSD]
+(you {\bf will not} lose use of USB keyboard and mouse):
+\\uhid
 
-NetBSD (you WILL lose use of USB keyboard and mouse):  uhidev, ums, wsmouse,
-ukbd, wskbd, uhid  
+\item [NetBSD] (you {\bf will} lose use of USB keyboard and mouse):
+\\uhidev, ums, wsmouse, ukbd, wskbd, uhid  
 
-OpenBSD (you WILL lose use of USB keyboard and mouse):  uhidev, ums, wsmouse,
-ukbd, wskbd, uhid  
+\item [OpenBSD] (you {\bf will} lose use of USB keyboard and mouse):
+\\uhidev, ums, wsmouse, ukbd, wskbd, uhid  
+\end{description}
 
 For detailed information on rebuilding your kernel, consult these references: 
 
-\footnotesize
-\begin{verbatim}
-     FreeBSD:
-     http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/kernelconfig.html
-     
-     NetBSD:
-     http://www.netbsd.org/guide/en/chap-kernel.html
-     
-     OpenBSD:
-     http://www.openbsd.org/faq/faq5.html#Building
-\end{verbatim}
-\normalsize
+\begin{description}
+\item [FreeBSD]
+\elink{http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/kernelconfig.html}
+      {http://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/kernelconfig.html}
+\item [NetBSD]
+\elink{http://www.netbsd.org/guide/en/chap-kernel.html}
+      {http://www.netbsd.org/guide/en/chap-kernel.html}
+\item [OpenBSD]
+\elink{http://www.openbsd.org/faq/faq5.html#Building}
+      {http://www.openbsd.org/faq/faq5.html#Building}
+\end{description}
 
-CHECKING UPS IS RECOGNIZED BY THE KERNEL  
+\subsubsection*{Verifying Device Detection and Driver}
+\index{BSD!Verifying USB Device Detection and Driver}
+\index{USB!Verifying BSD Device Detection and Driver}
 
 After building a properly configured kernel, reboot into that kernel and plug
 in your UPS USB cable. You should see a dmesg log message like the following: 
 
+\begin{verbatim}
+     ugen0: American Power Conversion Back-UPS RS 1500 FW:8.g6 .D USB FW:g6, rev 1.10/1.06, addr 2
+\end{verbatim}
 
-ugen0: American Power Conversion Back-UPS RS 1500 FW:8.g6 .D USB FW:g6, rev
-1.10/1.06, addr 2  
-
-Note that the ``ugen'' driver is called out. If you see ``uhid'' instead, it
+Note that the {\bf ugen} driver is called out. If you see {\bf uhid} instead, it
 probably means you did not properly disable the uhid driver when you compiled
-your kernel or perhaps you're not running the new kernel.  
+your kernel or perhaps you're not running the new kernel.
 
 You can also check with 'usbdevs -d' to get a list of USB devices recognized
 by the system as well as the drivers they are associated with. For example: 
 
-\footnotesize
 \begin{verbatim}
      # usbdevs -d
      addr 1: UHCI root hub, VIA
@@ -912,49 +818,36 @@ by the system as well as the drivers they are associated with. For example:
       addr 2: Back-UPS RS 1500 FW:8.g6 .D USB FW:g6, American Power Conversion
         ugen0
 \end{verbatim}
-\normalsize
 
-MAKING DEVICE NODES  
+\subsubsection*{Device Nodes}
+\index{BSD!USB Device Nodes}
+\index{USB!BSD Device Nodes}
 
-Apcupsd communicates with the UPS through the USB generic device, ugen. You
-may or may not need to manually make ugen device nodes in /dev, depending on
-what OS you are using.  
+Apcupsd communicates with the UPS through the USB generic device, {\bf ugen}.
+You may or may not need to manually make {\bf ugen} device nodes in /dev, 
+depending on what OS you are using.  
 
-FreeBSD: No manual intervention needed. FreeBSD automatically creates the ugen
-nodes on demand.  
+\begin{description}
+\item [FreeBSD]
+No manual intervention needed. FreeBSD automatically creates the ugen
+nodes on demand.
 
-NetBSD: By default, NetBSD only creates nodes for the first ugen device,
-ugen0. Check 'usbdevs -d' to see which device your UPS was bound to and then
-create the appropriate nodes by running 'cd /dev ; ./MAKEDEV ugenN', where
-ugenN is the ugen device name shown by usbdevs. It is probably a good idea to
-create several sets of ugen nodes in case you add more USB devices.  
+\item [NetBSD]
+By default, NetBSD only creates nodes for the first ugen device, {\bf ugen0}.
+Check "{\bf usbdevs -d}" to see which device your UPS was bound to and then
+create the appropriate node by running "{\bf cd /dev ; ./MAKEDEV ugenN}",
+where {\bf ugenN} is the ugen device name shown by usbdevs. It is probably
+a good idea to create several sets of ugen nodes in case you add more USB
+devices.
 
-OpenBSD: Similar to NetBSD, OpenBSD creates nodes for ugen0 and ugen1. Check
-'usbdevs -d' to see which device your UPS was bound to and then create the
-appropriate nodes by running 'cd /dev ; ./MAKEDEV ugenN', where ugenN is the
-ugen device name shown by usbdevs. It is probably a good idea to create
-several sets of ugen nodes in case you add more USB devices.  
-
-APCUPSD CONFIGURATION  
-
-Apcupsd must be built with USB support, which is accomplished via the
-{---}enable-usb switch to configure.  
-
-Your apcupsd.conf file needs the following hardware-related settings: 
-
-\footnotesize
-\begin{verbatim}
-     UPSCABLE usb
-     UPSTYPE usb
-     DEVICE
-\end{verbatim}
-\normalsize
-
-The DEVICE setting is blank on purpose; apcupsd will automatically locate your
-UPS.  
-
-The delay-, timeout-, and NIS-related settings should be configured as per
-your usual preference. 
+\item [OpenBSD]
+Similar to NetBSD, OpenBSD creates nodes for {\bf ugen0} and {\bf ugen1}.
+Check "{\bf usbdevs -d}" to see which device your UPS was bound to and then
+create the appropriate node by running "{\bf cd /dev ; ./MAKEDEV ugenN}",
+where {\bf ugenN} is the ugen device name shown by usbdevs. It is probably
+a good idea to create several sets of ugen nodes in case you add more USB
+devices.
+\end{description}
 
 \label{Building-and-Installing-apcupsd}
 
@@ -9987,12 +9880,13 @@ DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU OR THIRD PARTIES OR
 A FAILURE OF THE PROGRAM TO OPERATE WITH ANY OTHER PROGRAMS), EVEN IF SUCH
 HOLDER OR OTHER PARTY HAS BEEN ADVISED OF THE POSSIBILITY OF SUCH DAMAGES. 
 
-\label{Kernel-Config}
+\label{Linux-Kernel-Info}
+\section*{Linux-Kernel-Info}
 
-\section*{Kernel Config}
-\index{Config!Kernel }
-\index{Kernel Config }
-\addcontentsline{toc}{section}{Kernel Config}
+\subsection*{Linux Kernel Config}
+\index{Config!Linux Kernel}
+\index{Linux Kernel Config}
+\label{Linux-Kernel-Config}
 
 A typical USB section of a .config file might be:  
 
@@ -10116,7 +10010,9 @@ A typical USB section of a .config file might be:
 \end{verbatim}
 \normalsize
 
-Interpretation of /proc/usb info on 2.4 kernels: 
+\label{proc\_usb\_info-2.4}
+\subsection*{Interpreting /proc/bus/usb (linux-2.4)}
+Interpretation of /proc/bus/usb info on 2.4 kernels: 
 
 \footnotesize
 \begin{verbatim}
@@ -10518,6 +10414,8 @@ Interpretation of /proc/usb info on 2.4 kernels:
 \end{verbatim}
 \normalsize
 
+\label{proc\_usb\_info-2.6}
+\subsection*{Interpreting /proc/bus/usb (linux-2.6)}
 Interpretation of /proc/bus/usb info on 2.6 kernels: 
 
 \footnotesize
