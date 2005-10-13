@@ -21,6 +21,7 @@ WMLSRC=.
 
 IMAGES=../images
 
+L2H_COMMON_OPTS=-t "Apcupsd User's Guide" -notransparent -white -toc_stars
 
 MANUAL = manual
 
@@ -51,9 +52,11 @@ html:
 	rm -f *.eps *.png
 	cp ${IMAGES}/*.eps .
 	@rm -f next.*  
-	latex2html -white -no_subdir -split 0 -toc_stars -white -notransparent \
-		apcupsd >/dev/null
+	latex2html ${L2H_COMMON_OPTS} -no_subdir -split 0 \
+		-nonavigation apcupsd >/dev/null
 	./translate_images.pl apcupsd.html
+	sed -e "s/HREF=\"apcupsd.html/HREF=\"/" apcupsd.html > manual.html
+	cp manual.html apcupsd.html
 	rm -f *.eps
 
 web:
@@ -63,8 +66,8 @@ web:
 	cp ${IMAGES}/*.eps .
 	cp ${IMAGES}/*.eps apcupsd/
 	@rm -f next.*
-	latex2html -split 4 -local_icons -t "Apcupsd User's Guide" -long_titles 4 \
-		-toc_stars -contents_in_nav -white -notransparent apcupsd >/dev/null
+	latex2html ${L2H_COMMON_OPTS} split 4 -local_icons -long_titles 4 \
+		-contents_in_nav apcupsd >/dev/null
 	./translate_images.pl apcupsd/Apcupsd_Users_Guide.html
 	cp apcupsd/Apcupsd_Users_Guide.html apcupsd/index.html
 	rm -f apcupsd/*.old
