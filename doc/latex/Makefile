@@ -66,7 +66,7 @@ web:
 	cp ${IMAGES}/*.eps .
 	cp ${IMAGES}/*.eps apcupsd/
 	@rm -f next.*
-	latex2html ${L2H_COMMON_OPTS} split 4 -local_icons -long_titles 4 \
+	latex2html ${L2H_COMMON_OPTS} -split 4 -local_icons -long_titles 4 \
 		-contents_in_nav apcupsd >/dev/null
 	./translate_images.pl apcupsd/Apcupsd_Users_Guide.html
 	cp apcupsd/Apcupsd_Users_Guide.html apcupsd/index.html
