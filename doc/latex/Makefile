@@ -38,7 +38,7 @@ tex:
 	cp -fp ${IMAGES}/hires/*.eps .
 	-latex -interaction=batchmode apcupsd.tex
 	makeindex apcupsd.idx
-	-latex -interaction=batchmode manual.tex
+	-latex -interaction=batchmode apcupsd.tex
 	rm -f *.eps
 
 pdf:
