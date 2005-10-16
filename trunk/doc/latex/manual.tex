@@ -762,21 +762,24 @@ experience (good or bad) to the apcupsd-users mailing list.
 \index{BSD!USB Kernel Configuration}
 \index{USB!BSD Kernel Configuration}
 
-You will need to rebuild your kernel in order to disable the uhid driver. uhid
-is not sufficient for apcupsd at this time and we need to prevent it from
-grabbing the UPS device. You should {\bf disable the following devices} in your
-kernel config file (comment them out):
+You will need to rebuild your kernel in order to {\bf enable the ugen driver}
+and {\bf disable the uhid driver}. uhid is not sufficient for apcupsd at this
+time and we need to prevent it from grabbing the UPS device. You should 
+{\bf make the following changes} to your kernel config file:
 
 \begin{description}
 \item [FreeBSD]
 (you {\bf will not} lose use of USB keyboard and mouse):
-\\uhid
+\\{\bf Disable:} uhid
+\\{\bf Enable:} ugen
 
 \item [NetBSD] (you {\bf will} lose use of USB keyboard and mouse):
-\\uhidev, ums, wsmouse, ukbd, wskbd, uhid  
+\\{\bf Disable:} uhidev, ums, wsmouse, ukbd, wskbd, uhid  
+\\{\bf Enable:} ugen
 
 \item [OpenBSD] (you {\bf will} lose use of USB keyboard and mouse):
-\\uhidev, ums, wsmouse, ukbd, wskbd, uhid  
+\\{\bf Disable:} uhidev, ums, wsmouse, ukbd, wskbd, uhid  
+\\{\bf Enable:} ugen
 \end{description}
 
 For detailed information on rebuilding your kernel, consult these references: 
@@ -2112,12 +2115,12 @@ on insuring that apcupsd is running properly.
 \label{index-Configuration_002c-USB-65}
 \label{index-USB_002c-configuration-66}
 \label{index-Example_002c-USB-conf-67}
-If you have a USB UPS, and you have apcupsd version 3.10.7 or higher, the
-essential elements of your apcupsd.conf file should look like the following: 
+If you have a USB UPS, and you have apcupsd version 3.10.7 (3.10.17a for *BSD)
+or higher, the essential elements of your apcupsd.conf file should look like 
+the following: 
 
 \footnotesize
 \begin{verbatim}
-     
      ## apcupsd.conf v1.1 ##
      UPSCABLE usb
      UPSTYPE usb
@@ -2132,38 +2135,12 @@ Notice that we have not specified a device. In doing so, apcupsd will try all
 the well known USB ports. We strongly recommend you use this (empty device
 address) form unless you have a good reason to do otherwise.  
 
-An alternate way of specifying the device is to specify a range of device
-addressess as follows: 
-
-\footnotesize
-\begin{verbatim}
-     DEVICE /dev/usb/hid/hiddev[0-15]
-\end{verbatim}
-\normalsize
-
-If you have more than one device, you may need to specify each device
-individually using absolute device paths. This is not, however, recommended. 
-
-\footnotesize
-\begin{verbatim}
-     DEVICE /dev/usb/hiddev0
-\end{verbatim}
-\normalsize
-
-Please use the explicit specifications of a device only if your know exactly
+Please use the explicit specifications of a device only if you know exactly
 what you are doing. In general, it is much easier to let apcupsd find the
-device itself.  
+device itself.
 
-If you use the range specification, you should enter {\bf
-/dev/usb/hiddev[0-15]} literally as shown.  The ``[0-15]'' expression tells
-apcupsd to search all hiddev devices until it finds a UPS. You can restrict
-the search to a subset of devices by using something like ``[0-4]'', but keep
-in mind this will limit apcupsd's ability to locate the UPS if the kernel
-relocates it to a different device node.  
-
-On Debian systems, the {\bf hiddev} devices are not automatically defined. As
-a consequence, you will need to run the {\bf make-hiddev} script in the {\bf
-examples} directory of the source. 
+Please see \ilink{USB Configuration}{USB-Configuration} for detailed help
+on setting up your system to work with a USB UPS.
 
 \label{A-Simple-Configuration-for-a-SmartUPS}
 
