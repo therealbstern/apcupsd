@@ -966,7 +966,6 @@ following:
 
 \footnotesize
 \begin{verbatim}
-     
      CFLAGS="-g -O2" LDFLAGS="-g" ./configure \
        --enable-usb \
        --with-upstype=usb \
@@ -1004,7 +1003,6 @@ get the following (lines preceded with a \$ indicate what you type):
 
 \footnotesize
 \begin{verbatim}
-     
      $ which apcupsd
      /sbin/apcupsd
      $ whereis apcupsd
@@ -1034,7 +1032,6 @@ inserted just before the final halt command:
 
 \footnotesize
 \begin{verbatim}
-     
      # Remount read only anything that's left mounted.
      #echo "Remounting remaining filesystems (if any) readonly"
      mount | awk '/ext2/ { print $3 }' | while read line; do
@@ -1098,7 +1095,6 @@ All the available {\tt configure} options can be printed by entering:
 
 \footnotesize
 \begin{verbatim}
-     
      ./configure --help
 \end{verbatim}
 \normalsize
@@ -1315,7 +1311,6 @@ For most systems, we recommend the following options:
 
 \footnotesize
 \begin{verbatim}
-     
      ./configure --prefix=/usr --sbindir=/sbin --enable-usb \
                  --enable-pthreads
 \end{verbatim}
@@ -1325,7 +1320,6 @@ and you can optionally build and install the CGI programs as follows:
 
 \footnotesize
 \begin{verbatim}
-     
      ./configure --prefix=/usr --sbindir=/sbin --enable-usb \
                  --enable-cgi --with-cgi-bin=/home/httpd/cgi-bin \
                  --enable-pthreads
@@ -1347,7 +1341,6 @@ you can do that on the command line like this:
 
 \footnotesize
 \begin{verbatim}
-     
      CFLAGS="-O2 -Wall" LDFLAGS= ./configure
 \end{verbatim}
 \normalsize
@@ -1356,7 +1349,6 @@ Or on systems that have the {\tt env} program, you can do it like this:
 
 \footnotesize
 \begin{verbatim}
-     
      env CPPFLAGS=-I/usr/local/include LDFLAGS=-s ./configure
 \end{verbatim}
 \normalsize
@@ -1365,7 +1357,6 @@ Or for example on the Sun Solaris system, you can use:
 
 \footnotesize
 \begin{verbatim}
-     
      setenv CFLAGS -O2
      setenv LDFLAGS -O
      ./configure
@@ -1376,7 +1367,6 @@ You can get a listing of all available options by doing:
 
 \footnotesize
 \begin{verbatim}
-     
      ./configure --help
 \end{verbatim}
 \normalsize
@@ -1445,7 +1435,6 @@ conflicts with the console device.
 
 \footnotesize
 \begin{verbatim}
-     
      DEVICE /dev/tty01
 \end{verbatim}
 \normalsize
@@ -1455,7 +1444,6 @@ defined as:
 
 \footnotesize
 \begin{verbatim}
-     
      LOCKFILE /var/spool/locks
 \end{verbatim}
 \normalsize
@@ -1468,7 +1456,6 @@ The start/stop script can be found in:
 
 \footnotesize
 \begin{verbatim}
-     
      /sbin/init.d/apcupsd
 \end{verbatim}
 \normalsize
@@ -1669,7 +1656,6 @@ want to follow Sun's filesystem conventions you would use the following:
 
 \footnotesize
 \begin{verbatim}
-     
      ./configure \
         --prefix=/opt/apcupsd \
         --sbindir=/etc/opt/apcupsd/sbin \
@@ -1690,7 +1676,6 @@ case, you should do the {\tt make install} step as:
 
 \footnotesize
 \begin{verbatim}
-     
      /usr/ccs/bin/make install
 \end{verbatim}
 \normalsize
@@ -1718,7 +1703,6 @@ following:
 
 \footnotesize
 \begin{verbatim}
-     
      # unmount file systems. /usr, /var and /var/adm are not unmounted by umountall
      # because they are mounted by rcS (for single user mode) rather than
      # mountall.
@@ -1736,7 +1720,6 @@ We need to insert the following lines just before the last 'echo':
 
 \footnotesize
 \begin{verbatim}
-     
      #see if this is a powerfail situation
      if [ -f /etc/apcupsd/powerfail ]; then
              echo
@@ -1793,7 +1776,6 @@ in as root. Type the following command:
 
 \footnotesize
 \begin{verbatim}
-     
      eeprom com1-noprobe=true
 \end{verbatim}
 \normalsize
@@ -1802,7 +1784,6 @@ or
 
 \footnotesize
 \begin{verbatim}
-     
      eeprom com2-noprobe=true
 \end{verbatim}
 \normalsize
@@ -1867,7 +1848,6 @@ options:
 
 \footnotesize
 \begin{verbatim}
-     
      ./configure \
        --prefix=/apcupsd \
        --sbindir=/apcupsd/bin \
@@ -1883,7 +1863,6 @@ After which, you can do a:
 
 \footnotesize
 \begin{verbatim}
-     
      make
 \end{verbatim}
 \normalsize
@@ -1892,7 +1871,6 @@ And to install apcupsd, do:
 
 \footnotesize
 \begin{verbatim}
-     
      make install
 \end{verbatim}
 \normalsize
@@ -2024,7 +2002,6 @@ The simplest way to invoke apcupsd is from the command line by entering:
 
 \footnotesize
 \begin{verbatim}
-     
      /sbin/apcupsd
 \end{verbatim}
 \normalsize
@@ -2043,7 +2020,6 @@ installation), enter the following:
 
 \footnotesize
 \begin{verbatim}
-     
      /etc/rc.d/init.d/apcupsd start
 \end{verbatim}
 \normalsize
@@ -2059,7 +2035,6 @@ installation), enter the following:
 
 \footnotesize
 \begin{verbatim}
-     
      /etc/rc.d/apcupsd start
 \end{verbatim}
 \normalsize
@@ -2077,7 +2052,6 @@ On Red Hat systems:
 
 \footnotesize
 \begin{verbatim}
-     
      /etc/rc.d/init.d/apcupsd stop
 \end{verbatim}
 \normalsize
@@ -2086,7 +2060,6 @@ On SUSE systems:
 
 \footnotesize
 \begin{verbatim}
-     
      /etc/rc.d/apcupsd stop
 \end{verbatim}
 \normalsize
@@ -2158,7 +2131,6 @@ would look like the following:
 
 \footnotesize
 \begin{verbatim}
-     
      ## apcupsd.conf v1.1 ##
      UPSCABLE smart
      UPSTYPE smartups
@@ -2198,7 +2170,6 @@ power failure.
 
 \footnotesize
 \begin{verbatim}
-     
      ## apcupsd.conf v1.1 ##
      UPSCABLE (number of cable you have)
      UPSTYPE dumb
@@ -2233,7 +2204,6 @@ configuration file would look like the following:
 
 \footnotesize
 \begin{verbatim}
-     
      ## apcupsd.conf v1.1 ##
      UPSCABLE smart
      UPSTYPE smartups
@@ -2280,7 +2250,6 @@ master.  A very simple configuration file would look like the following:
 
 \footnotesize
 \begin{verbatim}
-     
      ## apcupsd.conf v1.1 ##
      UPSCABLE ether
      UPSTYPE smartups
@@ -2388,7 +2357,6 @@ firewall apcupsd instance.
 
 \footnotesize
 \begin{verbatim}
-     
      ## apcupsd.conf v1.1 ##
      UPSCABLE ether
      UPSTYPE net
@@ -2456,7 +2424,6 @@ After you start apcupsd, execute the following command:
 
 \footnotesize
 \begin{verbatim}
-     
      ps fax
 \end{verbatim}
 \normalsize
@@ -2467,7 +2434,6 @@ output.
 
 \footnotesize
 \begin{verbatim}
-     
      4492 ?        S      0:00 apcmain       -f /etc/apcupsd/apcupsd.conf
      4496 ?        S      0:00  \_ apcser        -f /etc/apcupsd/apcupsd.conf
      4497 ?        S      0:00  \_ apcnis        -f /etc/apcupsd/apcupsd.conf
@@ -2504,7 +2470,6 @@ and will appear more like the following:
 
 \footnotesize
 \begin{verbatim}
-     
      632 ?        S      0:00 /sbin/apcupsd -f /etc/apcupsd/apcupsd.conf
      841 ?        S      0:00  \_ /sbin/apcupsd -f /etc/apcupsd/apcupsd.conf
      842 ?        S      0:00      \_ /sbin/apcupsd -f /etc/apcupsd/apcupsd.conf
@@ -2533,7 +2498,6 @@ the system log file, normally /var/log/messages:
 
 \footnotesize
 \begin{verbatim}
-     
      tail /var/log/messages
 \end{verbatim}
 \normalsize
@@ -2542,7 +2506,6 @@ You should see output that looks similar to the following:
 
 \footnotesize
 \begin{verbatim}
-     
      Dec 5 17:01:05 matou apcupsd[5917]: apcupsd 3.7.2
      startup succeeded
 \end{verbatim}
@@ -2553,7 +2516,6 @@ see:
 
 \footnotesize
 \begin{verbatim}
-     
      Dec 5 17:01:05 polymatou apcupsd[5975]: apcserver
      startup succeeded
 \end{verbatim}
@@ -2583,7 +2545,6 @@ This is done by setting:
 
 \footnotesize
 \begin{verbatim}
-     
      NETSERVER on
      NISPORT 3551
 \end{verbatim}
@@ -2595,7 +2556,6 @@ To run the apcaccess test, use the following command:
 
 \footnotesize
 \begin{verbatim}
-     
      apcaccess status
 \end{verbatim}
 \normalsize
@@ -2605,7 +2565,6 @@ but an example For a Smart-UPS is as follows:
 
 \footnotesize
 \begin{verbatim}
-     
      APC      : 001,048,1088
      DATE     : Fri Dec 03 16:49:24 EST 1999
      HOSTNAME : daughter
@@ -2663,7 +2622,6 @@ minimal as follows:
 
 \footnotesize
 \begin{verbatim}
-     
      APC      : 001,012,0319
      DATE     : Mon Feb 18 09:11:50 CST 2002
      RELEASE  : 3.8.5
@@ -2711,7 +2669,6 @@ If you see a message to the effect of:
 
 \footnotesize
 \begin{verbatim}
-     
      attach_shmarea: shared memory version mismatch (or UPS not yet ready to report)
 \end{verbatim}
 \normalsize
@@ -2723,7 +2680,6 @@ If you see a message to the effect of:
 
 \footnotesize
 \begin{verbatim}
-     
      APCACCESS FATAL ERROR in apcaccess.c at line 336
      tcp_open: cannot connect to server localhost on port 3551.
 \end{verbatim}
@@ -2734,7 +2690,6 @@ your configuration file for {\bf apcaccess} to work. This is done by setting:
 
 \footnotesize
 \begin{verbatim}
-     
      NETSERVER on
      NISPORT 3551
 \end{verbatim}
@@ -2788,7 +2743,6 @@ temporary EVENTS file, you might do a
 
 \footnotesize
 \begin{verbatim}
-     
      tail -f /etc/apcupsd/apcupsd.events
 \end{verbatim}
 \normalsize
@@ -2844,7 +2798,6 @@ appear after 5 to 6 seconds and read:
 
 \footnotesize
 \begin{verbatim}
-     
      Warning power loss detected.
 \end{verbatim}
 \normalsize
@@ -2854,7 +2807,6 @@ effect, so it sends:
 
 \footnotesize
 \begin{verbatim}
-     
      Power failure. Running on UPS batteries.
 \end{verbatim}
 \normalsize
@@ -2865,7 +2817,6 @@ print:
 
 \footnotesize
 \begin{verbatim}
-     
      Power has returned...
 \end{verbatim}
 \normalsize
@@ -2900,7 +2851,6 @@ system to system, it will generally be something like:
 
 \footnotesize
 \begin{verbatim}
-     
      Beginning Shutdown Sequence
 \end{verbatim}
 \normalsize
@@ -2928,7 +2878,6 @@ something like:
 
 \footnotesize
 \begin{verbatim}
-     
      ${APCUPSD} --killpower
 \end{verbatim}
 \normalsize
@@ -2937,7 +2886,6 @@ when it is commented out, it looks like:
 
 \footnotesize
 \begin{verbatim}
-     
      #${APCUPSD}--killpower
 \end{verbatim}
 \normalsize
@@ -3037,7 +2985,6 @@ it on Unix with:
 
 \footnotesize
 \begin{verbatim}
-     
      cd <apcupsd-source-directory>
      make apctest
      ./apctest
@@ -3048,7 +2995,6 @@ or on Windows systems with:
 
 \footnotesize
 \begin{verbatim}
-     
      make apctestwin32
      ./apctest
 \end{verbatim}
@@ -3059,7 +3005,6 @@ find the UPS) and then it will present you with the following output:
 
 \footnotesize
 \begin{verbatim}
-     
      2003-07-07 11:19:21 apctest 3.10.6 (07 July 2003) redhat
      Checking configuration ...
      Attached to driver: apcsmart
@@ -3209,7 +3154,6 @@ You might want to read the man page on hotplug, and it might be necessary to
 
 \footnotesize
 \begin{verbatim}
-          
           /sbin/modprobe <missing-module-name>
      
 \end{verbatim}
@@ -3263,7 +3207,6 @@ default, you set:
 
 \footnotesize
 \begin{verbatim}
-     
      NETSERVER on
      NISPORT 3551
 \end{verbatim}
@@ -3281,7 +3224,6 @@ As mentioned above, the full form of the command is:
 
 \footnotesize
 \begin{verbatim}
-     
      apcaccess status localhost:3551
 \end{verbatim}
 \normalsize
@@ -3304,7 +3246,6 @@ launching apcupsd, you will likely get an error message such as:
 
 \footnotesize
 \begin{verbatim}
-     
      APCACCESS FATAL ERROR in apcipc.c at line 325
      attach_shmarea: shared memory version mismatch
 \end{verbatim}
@@ -3322,7 +3263,6 @@ To invoke apcaccess, enter:
 
 \footnotesize
 \begin{verbatim}
-     
      apcaccess status
 \end{verbatim}
 \normalsize
@@ -3331,7 +3271,6 @@ For a SmartUPS 1000 apcaccess will emit the following output:
 
 \footnotesize
 \begin{verbatim}
-     
      DATE     : Fri Dec 03 12:34:26 CET 1999
      HOSTNAME : matou
      RELEASE  : 3.7.0-beta-1
@@ -3407,7 +3346,6 @@ A typical output from {\tt apcaccess eprom} is:
 
 \footnotesize
 \begin{verbatim}
-     
      Valid EPROM values for the SMART-UPS 1000
      
                             Config        Current  Permitted
@@ -3528,7 +3466,6 @@ lines:
 
 \footnotesize
 \begin{verbatim}
-     
      MONITOR matou "Server"
      MONITOR polymatou "Backup server"
      MONITOR deuter  "Disk server"
@@ -3546,7 +3483,6 @@ following:
 
 \footnotesize
 \begin{verbatim}
-     
      MONITOR matou "Server"
      MONITOR polymatou "Backup server"
      MONITOR deuter  "Disk server"
@@ -3563,7 +3499,6 @@ cgi build directory. To do so, enter at a shell prompt:
 
 \footnotesize
 \begin{verbatim}
-     
      ./multimon.cgi
 \end{verbatim}
 \normalsize
@@ -3575,7 +3510,6 @@ reproduced here):
 
 \footnotesize
 \begin{verbatim}
-     
      Content-type: text/html
      
      <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN"
@@ -3678,7 +3612,6 @@ will display something like the following:
 
 \footnotesize
 \begin{verbatim}
-     
      APC      : 001,048,1109
      DATE     : Thu Dec 02 17:27:21 CET 1999
      HOSTNAME : matou.sibbald.com
@@ -3758,7 +3691,6 @@ examples directory, use something like the following:
 
 \footnotesize
 \begin{verbatim}
-     
      cc client.c ../lib/libapc.a -o client
 \end{verbatim}
 \normalsize
@@ -3767,7 +3699,6 @@ Then execute it:
 
 \footnotesize
 \begin{verbatim}
-     
      ./client <host>[:<port>] [<command>]
 \end{verbatim}
 \normalsize
@@ -3788,7 +3719,6 @@ There are currently two commands recognized by the server: {\bf events} and
 
 \footnotesize
 \begin{verbatim}
-     
      ./client
      status
      events
@@ -3917,7 +3847,6 @@ Typical output from apcaccess should look like the following:
 
 \footnotesize
 \begin{verbatim}
-     
      apcaccess eeprom
      
      Valid EPROM values for the SMART-UPS 1000
@@ -3955,7 +3884,6 @@ will need to do the following after having built apcupsd:
 
 \footnotesize
 \begin{verbatim}
-     
      cd <apcupsd-source>/src
      su
      <root-password>
@@ -3967,7 +3895,6 @@ At that point, you should get output similar to the following:
 
 \footnotesize
 \begin{verbatim}
-     
      2003-07-07 11:19:21 apctest 3.10.6 (07 July 2003) redhat
      Checking configuration ...
      Attached to driver: apcsmart
@@ -4002,7 +3929,6 @@ follows:
 
 \footnotesize
 \begin{verbatim}
-     
      This is the EEPROM programming section of apctest.
      Please select the function you want to perform.
      
@@ -4035,7 +3961,6 @@ EEPROM battery date and UPS Name should be displayed. For example:
 
 \footnotesize
 \begin{verbatim}
-     
      Select function number: 1
      
      Doing prep_device() ...
@@ -4145,7 +4070,6 @@ recharge time in half.
 
 \footnotesize
 \begin{verbatim}
-          
           Jet Works
           1587 Monrovia Ave.
           Newport Beach CA 9266?
@@ -4165,7 +4089,6 @@ for APCC UPS products that use In the two systems below:
 
 \footnotesize
 \begin{verbatim}
-          
           SMART-UPS 3000 10.9% is running at 327W runs for 47.0 min.
           Smart-UPS 1250 22.3% is running at 279W runs for 54.0 min.
           
@@ -4185,7 +4108,6 @@ total running energy than standard ones.
 
 \footnotesize
 \begin{verbatim}
-          
           SMART-UPS 3000 10.9% is running at 327W runs for 47.0 min.
           Smart-UPS 1250 22.3% is running at 279W runs for 54.0 min.
           
@@ -4217,7 +4139,6 @@ Cheers,
 
 \footnotesize
 \begin{verbatim}
-          
           Andre Hedrick
           Linux ATA Development
      
@@ -4444,7 +4365,6 @@ get as technical as you need to go.
 
 \footnotesize
 \begin{verbatim}
-          
           Regards,
           --Carl
      
@@ -4663,7 +4583,6 @@ an:
 
 \footnotesize
 \begin{verbatim}
-          
           ls /dev
      
 \end{verbatim}
@@ -4720,7 +4639,6 @@ specification on your DEVICE directive. It should be:
 
 \footnotesize
 \begin{verbatim}
-          
           DEVICE /dev/com2
      
 \end{verbatim}
@@ -5206,7 +5124,6 @@ provided by the computer {\bf tibs} on port {\bf 3551}.
 
 \footnotesize
 \begin{verbatim}
-     
      ## apcupsd.conf v1.1 ##
      UPSCABLE ether
      UPSTYPE net
@@ -5477,7 +5394,6 @@ could use the following configuration:
 
 \footnotesize
 \begin{verbatim}
-     
      ./configure \
        --prefix=/usr \
        --sbindir=/sbin \
@@ -5507,7 +5423,6 @@ UPS and Computer B, you could use the following configuration:
 
 \footnotesize
 \begin{verbatim}
-     
      ./configure \
        --prefix=$HOME/apcupsd/bin \
        --sbindir=$HOME/apcupsd/bin \
@@ -5597,7 +5512,6 @@ directive needed for this configuration is:
 
 \footnotesize
 \begin{verbatim}
-     
      DEVICE 192.168.100.2:161:APC:private
 \end{verbatim}
 \normalsize
@@ -5628,7 +5542,6 @@ the following options (in addition to any others you need) on the {\bf
 
 \footnotesize
 \begin{verbatim}
-     
      ./configure \
      --with-serial-dev=<your-SNMP-device> \
      --with-upstype=snmp \
@@ -5768,7 +5681,6 @@ To configure apcnisd to run from INETD, you must first put an entry in
 
 \footnotesize
 \begin{verbatim}
-     
      apcnisd         3551/tcp
 \end{verbatim}
 \normalsize
@@ -5781,7 +5693,6 @@ Next, you must modify /etc/inetd.conf to have the following line:
 
 \footnotesize
 \begin{verbatim}
-     
      apcnisd stream  tcp     nowait  root    /usr/sbin/tcpd  /sbin/apcnisd -i
 \end{verbatim}
 \normalsize
@@ -5791,7 +5702,6 @@ follows (not tested):
 
 \footnotesize
 \begin{verbatim}
-     
      apcnisd stream  tcp     nowait  root    /sbin/apcnisd -i
 \end{verbatim}
 \normalsize
@@ -5809,7 +5719,6 @@ system, you can do so by:
 
 \footnotesize
 \begin{verbatim}
-     
      /etc/rc.d/init.d/inet reload
 \end{verbatim}
 \normalsize
@@ -5837,7 +5746,6 @@ server. Restart apcupsd normally, then:
 
 \footnotesize
 \begin{verbatim}
-     
      /sbin/apcnisd
 \end{verbatim}
 \normalsize
@@ -5969,7 +5877,6 @@ First as root, you create the named pipe:
 
 \footnotesize
 \begin{verbatim}
-     
      mkfifo /var/log/apcupsd.status
 \end{verbatim}
 \normalsize
@@ -5983,7 +5890,6 @@ looks like:
 
 \footnotesize
 \begin{verbatim}
-     
      # exclude all apcupsd info by default
      *.info;local0.none                    /var/log/messages
      
@@ -6052,7 +5958,6 @@ by hand. To install the binaries, you need {\bf WinZip}.
 \footnotesize
 \begin{verbatim}
      
-     
 \end{verbatim}
 \normalsize
 
@@ -6061,7 +5966,6 @@ by hand. To install the binaries, you need {\bf WinZip}.
 
 \footnotesize
 \begin{verbatim}
-     
      
 \end{verbatim}
 \normalsize
@@ -6072,7 +5976,6 @@ by hand. To install the binaries, you need {\bf WinZip}.
 \footnotesize
 \begin{verbatim}
      
-     
 \end{verbatim}
 \normalsize
 
@@ -6081,7 +5984,6 @@ by hand. To install the binaries, you need {\bf WinZip}.
 
 \footnotesize
 \begin{verbatim}
-     
      
 \end{verbatim}
 \normalsize
@@ -6092,7 +5994,6 @@ by hand. To install the binaries, you need {\bf WinZip}.
 \footnotesize
 \begin{verbatim}
      
-     
 \end{verbatim}
 \normalsize
 
@@ -6101,7 +6002,6 @@ by hand. To install the binaries, you need {\bf WinZip}.
 
 \footnotesize
 \begin{verbatim}
-     
      
 \end{verbatim}
 \normalsize
@@ -6163,7 +6063,6 @@ output in a DOS shell window:
 \footnotesize
 \begin{verbatim}
      
-     
 \end{verbatim}
 \normalsize
 
@@ -6172,7 +6071,6 @@ output in a DOS shell window:
 
 \footnotesize
 \begin{verbatim}
-     
      
 \end{verbatim}
 \normalsize
@@ -6186,7 +6084,6 @@ follows:
 \footnotesize
 \begin{verbatim}
      
-     
 \end{verbatim}
 \normalsize
 
@@ -6194,7 +6091,6 @@ follows:
 
 \footnotesize
 \begin{verbatim}
-     
      
 \end{verbatim}
 \normalsize
@@ -6205,7 +6101,6 @@ follows:
 
 \footnotesize
 \begin{verbatim}
-          
               cd c:\apcupsd\bin
               apcupsd /service
           
@@ -6223,7 +6118,6 @@ clicking on the Start button as shown below:
 \footnotesize
 \begin{verbatim}
      
-     
 \end{verbatim}
 \normalsize
 
@@ -6232,7 +6126,6 @@ clicking on the Start button as shown below:
 
 \footnotesize
 \begin{verbatim}
-     
      
 \end{verbatim}
 \normalsize
@@ -6433,7 +6326,6 @@ utility routines (actually .pif files) that you may find useful. They are:
 
 \footnotesize
 \begin{verbatim}
-     
      Start
      Stop
      Install
@@ -6565,7 +6457,6 @@ manual. You do so by editing the registry and changing the line:
 
 \footnotesize
 \begin{verbatim}
-     
      c:\apcupsd\apcupsd.exe /service
 \end{verbatim}
 \normalsize
@@ -6574,7 +6465,6 @@ found under the key:
 
 \footnotesize
 \begin{verbatim}
-     
      HKEY_LOCAL_MACHINE Software\Microsoft\Windows\CurrentVersion\RunServices
 \end{verbatim}
 \normalsize
@@ -6583,7 +6473,6 @@ to
 
 \footnotesize
 \begin{verbatim}
-     
      c:\apcupsd\apcupsd.exe /service -p
 \end{verbatim}
 \normalsize
@@ -6620,7 +6509,6 @@ rather than the apcupsd supplied version, you simply edit:
 
 \footnotesize
 \begin{verbatim}
-     
      c:\apcupsd\etc\apcupsd\apccontrol
 \end{verbatim}
 \normalsize
@@ -6767,7 +6655,6 @@ his /etc/apcupsd/apcupsd.conf configuration line to be:
 
 \footnotesize
 \begin{verbatim}
-     
      DEVICE /dev/ttyUSB0
 \end{verbatim}
 \normalsize
@@ -6852,7 +6739,6 @@ If you see the following message about 30 seconds after starting apcupsd:
 
 \footnotesize
 \begin{verbatim}
-     
      apcupsd FATAL ERROR in apcserial.c at line 156
      PANIC! Cannot communicate with UPS via serial port.
 \end{verbatim}
@@ -6895,7 +6781,6 @@ a line that looks something like the following:
 
 \footnotesize
 \begin{verbatim}
-          
           multi(0)disk(0)rdisk(0)partition(1)\WINNT="Windows NT Workstation Version 4.00"
      
 \end{verbatim}
@@ -6906,7 +6791,6 @@ the new line looks like:
 
 \footnotesize
 \begin{verbatim}
-          
           multi(0)disk(0)rdisk(0)partition(1)\WINNT="Windows NT Workstation Version 4.00" /NoSerialMice:COM1
      
 \end{verbatim}
@@ -6941,7 +6825,6 @@ should print something like the following:
 
 \footnotesize
 \begin{verbatim}
-          
           serinfo:1.0 driver:5.05c revision:2001-07-08
           0: uart:16550A port:3F8 irq:4 baud:9600 tx:1503168 rx:1461721 fe:8
      
@@ -6992,7 +6875,6 @@ it on Unix with:
 
 \footnotesize
 \begin{verbatim}
-     
      cd <apcupsd-source-directory>
      make apctest
      ./apctest
@@ -7003,7 +6885,6 @@ on Win32 systems, use:
 
 \footnotesize
 \begin{verbatim}
-     
      make apctestwin32
      ./apctest
 \end{verbatim}
@@ -7013,7 +6894,6 @@ It will present you with the following output
 
 \footnotesize
 \begin{verbatim}
-     
      2001-02-07 04:08:26 apctest 3.8.5 (3 January 2002) redhat
      Checking configuration ...
      sharenet.type = DISABLE
@@ -7032,7 +6912,6 @@ Then it will present you with the following list of choices:
 
 \footnotesize
 \begin{verbatim}
-     
      1) Test 1 - normal mode
      2) Test 2 - no cable
      3) Test 3 - no power
@@ -7069,7 +6948,6 @@ If you have configured your UPS as:
 
 \footnotesize
 \begin{verbatim}
-     
      UPSTYPE backups
      UPSCABLE APC_940_0119A
          or APC_940_0127A
@@ -7084,7 +6962,6 @@ various tests of apctest:
 
 \footnotesize
 \begin{verbatim}
-     
      Test 1 normal:              RTS for cables (0119A 0127A 0128A)
      Test 2 no serial cable:     not important
      Test 3 no AC power:         CTS for all cables
@@ -7106,7 +6983,6 @@ If you have configured your UPS as:
 
 \footnotesize
 \begin{verbatim}
-     
      UPSTYPE backupspro
      UPSCABLE APC_940_0095A
          or APC_940_0095C
@@ -7118,7 +6994,6 @@ various tests of apctest:
 
 \footnotesize
 \begin{verbatim}
-     
      Test 1 normal:              RTS not set
      Test 2 no serial cable:     not important
      Test 3 no AC power:         RNG
@@ -7266,7 +7141,6 @@ From BackUPS Pro and SmartUPS v/s:
 
 \footnotesize
 \begin{verbatim}
-     
      LINEFAIL : OnlineStatus
      BATTSTAT : BatteryStatus
      MAINS    : LineVoltageState
@@ -7278,7 +7152,6 @@ BackUPS and NetUPS Simple Signals
 
 \footnotesize
 \begin{verbatim}
-     
      LINEFAIL : OnlineStatus
      BATTSTAT : BatteryStatus
 \end{verbatim}
@@ -7317,7 +7190,6 @@ An actual example from the log file is:
 
 \footnotesize
 \begin{verbatim}
-     
      Nov  2 12:43:05 matou apcupsd[23439]: 224.9,227.5,226.2,27.74,50.00,100.0,30.6,,,226.2,50.0,1
 \end{verbatim}
 \normalsize
@@ -7373,7 +7245,6 @@ The UPSTYPE directive can be defined during installation by using the {\tt
 
 \footnotesize
 \begin{verbatim}
-          
                 [ simple | 940-0020B | 940-0023A ]
                 [ smart | 940-0024B | 940-0024C ]
                 [ 940-1524C | 940-0024G | 940-0095A | 940-0095B | 940-0095C | 940-0119A]
@@ -8077,7 +7948,6 @@ An example of output from an international SmartUPS 1000 follows:
 
 \footnotesize
 \begin{verbatim}
-     
      DATE     : Wed Sep 27 17:30:23 CEST 2000
      HOSTNAME : polymatou.sibbald.com
      RELEASE  : 3.7.3-20000925
@@ -8509,7 +8379,6 @@ Red Hat version is:
 
 \footnotesize
 \begin{verbatim}
-          
           # See if this is a powerfail situation.                             # ***apcupsd***
           if [ -f /etc/apcupsd/powerfail ]; then                              # ***apcupsd***
            echo                                                               # ***apcupsd***
@@ -8555,7 +8424,6 @@ be determined by executing:
 
 \footnotesize
 \begin{verbatim}
-     
      apcaccess eeprom
 \end{verbatim}
 \normalsize
@@ -8564,7 +8432,6 @@ The output should look something like the following:
 
 \footnotesize
 \begin{verbatim}
-     
      apcaccess eeprom
      
      Valid EPROM values for the SMART-UPS 1000
@@ -8652,7 +8519,6 @@ would add:
 
 \footnotesize
 \begin{verbatim}
-     
      sleep 30
 \end{verbatim}
 \normalsize
@@ -8661,7 +8527,6 @@ just after the line that reads
 
 \footnotesize
 \begin{verbatim}
-     
      doshutdown)
 \end{verbatim}
 \normalsize
@@ -8696,7 +8561,6 @@ rc.local file. The appropriate manual way to startup apcupsd is by executing:
 
 \footnotesize
 \begin{verbatim}
-     
      <path>/apcupsd start
 \end{verbatim}
 \normalsize
@@ -8708,7 +8572,6 @@ shutting down apcupsd should be done with the same script:
 
 \footnotesize
 \begin{verbatim}
-     
      <path>/apcupsd stop
 \end{verbatim}
 \normalsize
@@ -9276,7 +9139,6 @@ follows:
 
 \footnotesize
 \begin{verbatim}
-     
      Old Firmware revision and model ID String for SmartUPS \& MatrixUPS
      
      This is a three character string XYZ
@@ -9320,7 +9182,6 @@ Revision}
 
 \footnotesize
 \begin{verbatim}
-     
      New Firmware revison and model ID String in NN.M.L is the format
      
          where NN == UPS ID Code.
@@ -9384,7 +9245,6 @@ Here is an example broken out to be more readable:
 
 \footnotesize
 \begin{verbatim}
-     
       CMD DFO RSP FSZ FVL
       u   D   4   3   127 130 133 136
       u   M   4   3   229 234 239 224
@@ -9554,7 +9414,6 @@ Alternately you may pass the define on the command line when calling rpmbuild:
 
 \footnotesize
 \begin{verbatim}
-          
               rpmbuild -ba --define "build_rh7 1" apcupsd.spec
               rpmbuild --rebuild --define build_rh7 1" apcupsd-x.x.x-x.src.rpm
      
@@ -9860,7 +9719,6 @@ A typical USB section of a .config file might be:
 
 \footnotesize
 \begin{verbatim}
-     
      #
      # USB support
      #
@@ -9981,7 +9839,6 @@ Interpretation of /proc/bus/usb info on 2.4 kernels:
 
 \footnotesize
 \begin{verbatim}
-     
      /proc/bus/usb filesystem output
      ===============================
      (version 2002.03.18)
@@ -10385,7 +10242,6 @@ Interpretation of /proc/bus/usb info on 2.6 kernels:
 
 \footnotesize
 \begin{verbatim}
-     
      /proc/bus/usb filesystem output
      ===============================
      (version 2003.05.30)
