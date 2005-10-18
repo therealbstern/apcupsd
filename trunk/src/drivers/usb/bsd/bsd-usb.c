@@ -508,7 +508,7 @@ static bool populate_uval(UPSINFO *ups, USB_INFO *info, unsigned char *data, USB
 /*
  * Get a field value
  */
-bool pusb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
+int pusb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
 {
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
    USB_INFO *info = my_data->info[ci];
