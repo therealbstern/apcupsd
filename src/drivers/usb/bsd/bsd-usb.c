@@ -517,7 +517,7 @@ int pusb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
 
    /*
     * Note we need to check info since CI_STATUS is always true
-    * even when the UPS doesn't directory support that CI.
+    * even when the UPS doesn't directly support that CI.
     */
    if (!UPS_HAS_CAP(ci) || !info)
       return false;                /* UPS does not have capability */
