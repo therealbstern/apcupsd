@@ -408,7 +408,7 @@ static bool populate_uval(UPSINFO *ups, USB_INFO *info, USB_VALUE *uval)
 /*
  * Get a field value
  */
-bool pusb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
+int pusb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
 {
    struct hiddev_report_info rinfo;
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
@@ -477,7 +477,7 @@ static USB_INFO *find_info_by_ucode(UPSINFO *ups, unsigned int ucode)
 /*
  * Read UPS events. I.e. state changes.
  */
-bool pusb_ups_check_state(UPSINFO *ups)
+int pusb_ups_check_state(UPSINFO *ups)
 {
    int retval;
    bool done = false;
@@ -773,7 +773,7 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
 }
 
 
-bool pusb_read_int_from_ups(UPSINFO *ups, int ci, int *value)
+int pusb_read_int_from_ups(UPSINFO *ups, int ci, int *value)
 {
    USB_VALUE val;
 
@@ -784,7 +784,7 @@ bool pusb_read_int_from_ups(UPSINFO *ups, int ci, int *value)
    return true;
 }
 
-bool pusb_write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
+int pusb_write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
 {
    struct hiddev_report_info rinfo;
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
