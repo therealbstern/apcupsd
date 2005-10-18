@@ -30,6 +30,14 @@
 #include <dev/usb/usb.h>
 #include <dev/usb/usbhid.h>
 
+/* Compatibility cruft for FreeBSD <= 4.7 */
+#ifndef USB_MAX_DEVNAMES
+#define USB_MAX_DEVNAMES MAXDEVNAMES
+#endif
+#ifndef USB_MAX_DEVNAMELEN
+#define USB_MAX_DEVNAMELEN MAXDEVNAMELEN
+#endif
+
 /*
  * When we are traversing the USB reports given by the UPS and we find
  * an entry corresponding to an entry in the known_info table above,
@@ -630,7 +638,7 @@ int pusb_ups_check_state(UPSINFO *ups)
        * affected by this report.
        */
       for (ci=0; ci<CI_MAXCI; ci++) {
-         if (ups->UPS_Cap[i] && my_data->info[ci] &&
+         if (ups->UPS_Cap[ci] && my_data->info[ci] &&
              my_data->info[ci]->item.report_ID == buf[0]) {
 
             /* Ignore this event if the value has not changed */
