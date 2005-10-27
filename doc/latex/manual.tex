@@ -3418,27 +3418,25 @@ Programs}
 \label{index-Network-monitoring-119}
 \label{index-Monitoring-120}
 \label{index-CGI-programs-121}
-With this release, there are five CGI programs (multimon.cgi, multimoncss.cgi,
+With this release, there are four CGI programs (multimon.cgi,
 upsstats.cgi, upsfstats.cgi, and upsimage.cgi). To have them properly
 installed, you must run the {\tt ./configure} command with {\tt \verb{--{enable-cgi}
 and you should specify an installation directory with {\tt \verb{--{with-cgi-bin=} or
-load them manually. To install the Cascading Style Sheet, which is used by
-multimoncss.cgi, you must use the {\tt \verb{--{with-css-dir=} option. The default
-directory for installation of the CGI programs is /etc/apcupsd, which is not
-really where you want them if you are going to use them. Normally, they should
-go in the cgi-bin of your Web server.  
+load them manually. The default directory for installation of the CGI programs is
+/etc/apcupsd, which is not really where you want them if you are going to use them.
+Normally, they should go in the cgi-bin of your Web server.
 
 Once built and loaded, they will give you the status of your UPS or UPSes over
-the network.  
+the network.
 
-Normally only {\tt multimon.cgi} or multimoncss.cgiis directly invoked by the
+Normally only {\tt multimon.cgi} is directly invoked by the
 user. However, it is possible to directly invoke upsstats.cgi and
 upsfstats.cgi. upsimage.cgi should never be directly invoked as it is used by
 upsstats.cgi to produce the bar charts. 
 
 \label{Setting-up-and-Testing-the-CGI-Programs}
 
-\subsection*{Setting up and Testing the CGI Programs}
+\subsubsection*{Setting up and Testing the CGI Programs}
 \index{Programs!Setting up and Testing the CGI }
 \index{Setting up and Testing the CGI Programs }
 \addcontentsline{toc}{subsection}{Setting up and Testing the CGI Programs}
@@ -3446,12 +3444,6 @@ upsstats.cgi to produce the bar charts.
 \label{index-Setup-CGI-programs-122}
 \label{index-Testing-CGI-programs-123}
 
-\label{Network-Information-Server-_005bNIS_005d}
-
-\subsubsection*{Network Information Server (NIS):}
-
-\label{index-Network-Information-Server-124}
-\label{index-NIS-125}
 Before using multimon and the other CGI programs, first ensure that apcupsd is
 configured to run the Network Information Server. This is done by setting {\bf
 NETSERVER on} in /etc/apcupsd/apcupsd.conf.  This switch is on by default.  If
@@ -3546,16 +3538,8 @@ http://\lt{}your-site\gt{}/cgi-bin/multimon.cgi
 You should get something similar to the screen shot shown below.  
 
 If you wish additional control over the colors, type faces, and sizes of the
-multimon output, you might wish to use multimoncss.cgi in place of multimon.
-In this case, you simply edit the multimon.css file to specify the styles you
-prefer.  There are several sample Style Sheet files in the cgi subdirectory of
-the source tree.  
-
-To see a working example of the these programs, visit 
-\elink{http://www.apcupsd.com/cgi-bin/multimon.cgi}{http://www.apcuspd.com/cgi%
--bin/multimon.cgi} or 
-\elink{http://www.apcupsd.com/cgi-bin/multimoncss.cgi}{http://www.apcupsd.com/%
-cgi-bin/multimoncss.cgi} 
+multimon output, you may simply edit the apcupsd.css file to specify the styles 
+you prefer.
 
 \label{multimon_005fcgi}
 
@@ -3594,7 +3578,9 @@ source cgi directory as follows:
 
 \label{_005f_002fupsstats_005fcgi}
 
-\subsubsection*{./upsstats.cgi:}
+\begin{verbatim}
+     ./upsstats.cgi
+\end{verbatim}
 
 \label{index-upssstats-130}
 \label{index-CGI_002c-upssstats-131}
@@ -3765,7 +3751,7 @@ to the original author in his project.
 
 \label{Security-Issues}
 
-\subsubsection*{Security Issues:}
+\subsection*{Security Issues:}
 
 \begin{itemize}
 \item {\bf apcupsd} runs as root.  
@@ -3788,7 +3774,7 @@ specified in your configuration file.
 
 \label{TCP-Wrappers}
 
-\small{TCP Wrappers}
+\subsection*{TCP Wrappers}
 \index{TCP Wrappers }
 \index{Wrappers!TCP }
 \addcontentsline{toc}{subsubsection}{TCP Wrappers}
