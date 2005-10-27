@@ -36,9 +36,10 @@ apcupsd: texcheck tex web html dvipdf
 
 tex:
 	cp -fp ${IMAGES}/hires/*.eps .
-	-latex -interaction=batchmode apcupsd.tex
-	makeindex apcupsd.idx
-	-latex -interaction=batchmode apcupsd.tex
+	-latex -interaction=batchmode apcupsd.tex	# initial run
+	-latex -interaction=batchmode apcupsd.tex	# build the TOC
+	makeindex apcupsd.idx				# build the index
+	-latex -interaction=batchmode apcupsd.tex	# incorporate the index
 	rm -f *.eps
 
 pdf:
