@@ -1,8 +1,48 @@
-             Technical notes on version 3.11.12
+             Technical notes on version 3.11.13
                         Adam Kropelin
 
 General:
 
+29Oct05:
+- m/s: Convert is_ups_foo() to ups->is_foo().
+- m/s: C++ compatibility fixes.
+- Add a few set_foo(bool) methods plus a few missing is_foo() methods.
+26Oct05:
+- docs: Fix page numbers in the index.
+- docs: Fix multimon section and a few other details in the surrounding area.
+18Oct05:
+- bsd-usb: Workaround for compile failure on FreeBSD <= 4.7.
+- bsd-usb: Fix a subtle bug in pusb_ups_check_state() which was pointed out by
+  a compiler warning.
+- usb: Make all pusb_* functions return int and thus match their prototypes in
+  usb.c. Previously some functions were defined to return bool but declared
+  to return int in usb.c. This led to bizarre return value corruption on
+  FreeBSD. Eventually all boolean type returns should be bool, but that
+  change is better done all at once.
+16Oct05:
+- docs: USB updates suggested by Mark Martinec.
+- docs: Fix typo in web target.
+- docs: Fix first round of major LaTeX bugs. There are many more such as 
+  undefined references and overfull hboxes, but this is a step in the right 
+  direction.
+- docs: Second run of latex should be on apcupsd.tex not manual.tex. On its 
+  own, manual.tex is just a massive stream of syntax errors.
+- docs: Add missing \\.
+- docs: Fix undefined and redefined symbols.
+- docs: Kill blank lines after \begin{verbatim}.
+12Oct05:
+- docs: Move common latex2html flags into a variable so html and web targets do
+  not accidentally differ. (Previously -t was not specified for html target).
+  Also run apcupsd.html thru a sed script to remove references to
+  "apcupsd.html" and thus allow the file to be renamed at will. Copy
+  final html output into manual.html to maintain an archived copy of the
+  generated output.
+10Oct05:
+- Rewrite the UPSCABLE description to hopefully eliminate the common mistake
+  of thinking the cable model numbers were listed in columns by type. Also
+  clean up some of the config directive descriptions and add some blank lines
+  to improve readability.
+- docs: Fix up some links to the Win32 section.
 24Sep05:
 - Update examples/snoopdecode.c to latest version and add to Makefile.
 - Add SmartUPS serial protocol simulator 'smartsim' to examples/ directory.
