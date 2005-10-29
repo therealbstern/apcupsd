@@ -310,9 +310,9 @@ static int send_to_slave(UPSINFO *ups, int who)
    /* Extra complexity is because of compiler
     * problems with htonl(ups->OnBatt);
     */
-   l = (is_ups_set(UPS_ONBATT) ? 1 : 0);
+   l = (ups->is_onbatt() ? 1 : 0);
    send_data.OnBatt = htonl(l);
-   l = (is_ups_set(UPS_BATTLOW) ? 1 : 0);
+   l = (ups->is_battlow() ? 1 : 0);
    send_data.BattLow = htonl(l);
    l = (long)ups->BattChg;
    send_data.BattChg = htonl(l);
@@ -322,15 +322,15 @@ static int send_to_slave(UPSINFO *ups, int who)
    send_data.nettime = htonl(l);
    l = (long)ups->TimeLeft;
    send_data.TimeLeft = htonl(l);
-   l = (is_ups_set(UPS_REPLACEBATT) ? 1 : 0);
+   l = (ups->is_replacebatt() ? 1 : 0);
    send_data.ChangeBatt = htonl(l);
-   l = (is_ups_set(UPS_SHUT_LOAD) ? 1 : 0);
+   l = (ups->is_shut_load() ? 1 : 0);
    send_data.load = htonl(l);
-   l = (is_ups_set(UPS_SHUT_BTIME) ? 1 : 0);
+   l = (ups->is_shut_btime() ? 1 : 0);
    send_data.timedout = htonl(l);
-   l = (is_ups_set(UPS_SHUT_LTIME) ? 1 : 0);
+   l = (ups->is_shut_ltime() ? 1 : 0);
    send_data.timelout = htonl(l);
-   l = (is_ups_set(UPS_SHUT_EMERG) ? 1 : 0);
+   l = (ups->is_shut_emerg() ? 1 : 0);
    send_data.emergencydown = htonl(l);
    l = ups->UPS_Cap[CI_BATTLEV];
    send_data.cap_battlev = htonl(l);
@@ -560,7 +560,7 @@ static int get_data_from_master(UPSINFO *ups)
    struct timeval tv;
 
    if (newsocketfd == -1) {
-      set_ups(UPS_COMMLOST);
+      ups->set_commlost();
       masterlen = sizeof(master_adr);
     select_again2:
       FD_ZERO(&rfds);
@@ -582,7 +582,7 @@ static int get_data_from_master(UPSINFO *ups)
       }
       Dmsg0(100, "Doing accept\n");
       do {
-         newsocketfd = accept(socketfd, (struct sockaddr *)&master_adr, &masterlen);
+         newsocketfd = accept(socketfd, (struct sockaddr *)&master_adr, (socklen_t*)&masterlen);
       } while (newsocketfd < 0 && errno == EINTR);
       Dmsg1(100, "Accept returned netsocketfd=%d\n", newsocketfd);
       if (newsocketfd < 0) {
@@ -646,7 +646,7 @@ static int get_data_from_master(UPSINFO *ups)
       Dmsg1(100, "close newsock %d\n", newsocketfd);
       close(newsocketfd);
       newsocketfd = -1;
-      set_ups(UPS_COMMLOST);
+      ups->set_commlost();
       Dmsg0(100, "select timed out return 6");
       return 6;                    /* master not responding */
    default:
@@ -667,7 +667,7 @@ static int get_data_from_master(UPSINFO *ups)
       Dmsg1(100, "close newsock after read %d\n", newsocketfd);
       close(newsocketfd);
       newsocketfd = -1;
-      set_ups(UPS_COMMLOST);
+      ups->set_commlost();
       return 3;                    /* read error */
    }
    get_data.apcmagic[APC_MAGIC_SIZE - 1] = 0;
@@ -682,7 +682,7 @@ static int get_data_from_master(UPSINFO *ups)
       Dmsg1(100, "close newsock %d\n", newsocketfd);
       close(newsocketfd);
       newsocketfd = -1;
-      set_ups(UPS_COMMLOST);
+      ups->set_commlost();
       Dmsg2(100, "magic does not compare: mine %s\nhis %s\n",
          APC_MAGIC, get_data.apcmagic);
       return 4;
@@ -704,16 +704,8 @@ static int get_data_from_master(UPSINFO *ups)
 
    if (strcmp(ups->usermagic, get_data.usermagic) == 0) {
       Dmsg0(100, "Got good data\n");
-      if (ntohl(get_data.OnBatt)) {
-         clear_ups_online();
-      } else {
-         set_ups_online();
-      }
-      if (ntohl(get_data.BattLow)) {
-         set_ups(UPS_BATTLOW);
-      } else {
-         clear_ups(UPS_BATTLOW);
-      }
+      ups->set_online(ntohl(get_data.OnBatt));
+      ups->set_battlow(ntohl(get_data.BattLow));
       ups->BattChg = ntohl(get_data.BattChg);
       ShutDown = ntohl(get_data.ShutDown);
       ups->nettime = ntohl(get_data.nettime);
@@ -729,26 +721,10 @@ static int get_data_from_master(UPSINFO *ups)
  *          clear_ups(UPS_REPLACEBATT);
  *      }
  */
-      if (ntohl(get_data.load)) {
-         set_ups(UPS_SHUT_LOAD);
-      } else {
-         clear_ups(UPS_SHUT_LOAD);
-      }
-      if (ntohl(get_data.timedout)) {
-         set_ups(UPS_SHUT_BTIME);
-      } else {
-         clear_ups(UPS_SHUT_BTIME);
-      }
-      if (ntohl(get_data.timelout)) {
-         set_ups(UPS_SHUT_LTIME);
-      } else {
-         clear_ups(UPS_SHUT_LTIME);
-      }
-      if (ntohl(get_data.emergencydown)) {
-         set_ups(UPS_SHUT_EMERG);
-      } else {
-         clear_ups(UPS_SHUT_EMERG);
-      }
+      ups->set_shut_load(ntohl(get_data.load));
+      ups->set_shut_btime(ntohl(get_data.timedout));
+      ups->set_shut_ltime(ntohl(get_data.timelout));
+      ups->set_shut_emerg(ntohl(get_data.emergencydown));
       ups->remote_state = ntohl(get_data.remote_state);
       ups->UPS_Cap[CI_BATTLEV] = ntohl(get_data.cap_battlev);
       ups->UPS_Cap[CI_RUNTIM] = ntohl(get_data.cap_runtim);
@@ -761,13 +737,13 @@ static int get_data_from_master(UPSINFO *ups)
       Dmsg1(100, "close newsock %d\n", newsocketfd);
       close(newsocketfd);
       newsocketfd = -1;
-      set_ups(UPS_COMMLOST);
+      ups->set_commlost();
       return 5;
    }
 
    if (ShutDown) {                 /* if master has shutdown */
       Dmsg0(100, "Call shutdown\n");
-      set_ups(UPS_SHUT_REMOTE);    /* we go down too */
+      ups->set_shut_remote();      /* we go down too */
    }
 
    /* 
@@ -775,12 +751,12 @@ static int get_data_from_master(UPSINFO *ups)
     * was previously detected. If we get here, we have a good
     * connection, so generate the event and clear the flag.
     */
-   if (is_ups_set(UPS_COMMLOST)) {
+   if (ups->is_commlost()) {
       log_event(ups, LOG_WARNING, "Connect from master %s succeeded",
          slaves[0].name);
       execute_command(ups, ups_event[CMDMASTERCONN]);
       Dmsg0(100, "Clear UPS_COMMLOST\n");
-      clear_ups(UPS_COMMLOST);
+      ups->clear_commlost();
    }
    slaves[0].remote_state = RMT_CONNECTED;
    ups->last_master_connect_time = time(NULL);
@@ -877,7 +853,7 @@ void kill_net(UPSINFO *ups)
  */
 void do_net(UPSINFO *ups)
 {
-   set_ups(UPS_SLAVE);             /* We are networking not connected */
+   ups->set_slave();               /* We are networking not connected */
 
    while (1) {
       /* Note, we do not lock shm so that apcaccess can
@@ -903,8 +879,6 @@ void do_slaves(UPSINFO *ups)
    time_t last_time_net = 0;
    int slave_stat;
 
-   init_thread_signals();
-
    while (1) {
       now = time(NULL);
 
@@ -914,7 +888,7 @@ void do_slaves(UPSINFO *ups)
        * or in power fail situation (FASTPOLL) or some slave is 
        * not connected (slave_disconnected)
        */
-      if (((now - last_time_net) > ups->nettime) || is_ups_set(UPS_FASTPOLL) ||
+      if (((now - last_time_net) > ups->nettime) || ups->is_fastpoll() ||
          slave_disconnected) {;
          slave_stat = slave_disconnected;
          Dmsg0(100, "do_slaves calling send_to_all\n");
@@ -925,15 +899,11 @@ void do_slaves(UPSINFO *ups)
           */
          if (slave_stat != slave_disconnected) {
             write_lock(ups);
-            if (slave_disconnected) {
-               set_ups(UPS_SLAVEDOWN);
-            } else {
-               clear_ups(UPS_SLAVEDOWN);
-            }
+            ups->set_slavedown(slave_disconnected);
             write_unlock(ups);
          }
       }
-      if (is_ups_set(UPS_FASTPOLL)) {
+      if (ups->is_fastpoll()) {
          sleep(1);                 /* urgent send data faster */
       } else {
          sleep(TIMER_SLAVES);      /* wait 10 seconds */
