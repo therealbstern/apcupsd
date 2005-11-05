@@ -35,30 +35,26 @@ static int powernet_check_comm_lost(UPSINFO *ups)
    powernet_mib_t *data = (powernet_mib_t *)Sid->MIB;
    int ret = 1;
 
+   /* Assume comms are ok */
+   ups->clear_commlost();
+
    /*
     * Check the Ethernet COMMLOST first, then check the
     * Web/SNMP->UPS serial COMMLOST.
     */
+   data->upsComm = NULL;
    if (powernet_mib_mgr_get_upsComm(s, &(data->upsComm)) < 0) {
       ups->set_commlost();
       ret = 0;
-      goto out;
-   } else {
-      ups->clear_commlost();
+   }
+   else if (data->upsComm && data->upsComm->__upsCommStatus == 2) {
+      ups->set_commlost();
+      ret = 0;
    }
 
-   if (data->upsComm) {
-      if (data->upsComm->__upsCommStatus == 2) {
-         ups->set_commlost();
-         ret = 0;
-         goto out;
-      } else {
-         ups->clear_commlost();
-      }
-   }
+   if (data->upsComm)
+      free(data->upsComm);
 
- out:
-   free(data->upsComm);
    return ret;
 }
 
