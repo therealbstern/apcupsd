@@ -121,9 +121,18 @@ int powernet_snmp_ups_get_capabilities(UPSINFO *ups)
 {
    int i = 0;
 
-   /* Assume that an UPS with Web/SNMP card has all the capabilities. */
+   /*
+    * Assume that an UPS with Web/SNMP card has all the capabilities,
+    * minus a few.
+    */
    for (i = 0; i <= CI_MAX_CAPS; i++)
-      ups->UPS_Cap[i] = TRUE;
+   {
+      if (i != CI_NOMBATTV &&
+          i != CI_HUMID    &&
+          i != CI_ATEMP    &&
+          i != CI_VBATT)
+         ups->UPS_Cap[i] = TRUE;
+   }
 
    if (powernet_check_comm_lost(ups) == 0)
       return 0;
@@ -183,7 +192,6 @@ int powernet_snmp_ups_read_static_data(UPSINFO *ups)
    if (data->upsAdvBattery) {
       ups->extbatts = data->upsAdvBattery->__upsAdvBatteryNumOfBattPacks;
       ups->badbatts = data->upsAdvBattery->__upsAdvBatteryNumOfBadBattPacks;
-      ups->nombattv = 0.0;         /* PowerNet MIB doesn't give this value */
       free(data->upsAdvBattery);
    }
 
