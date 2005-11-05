@@ -536,20 +536,7 @@ int main(int argc, char *argv[])
       apctest_terminate(0);
    }
 
-   /*
-    * Delete the lockfile just before fork. We will reacquire it just
-    * after.
-    */
-
-   delete_lockfile(ups);
-
    make_pid_file();
-
-   pmsg("Creating the device lock file ...\n");
-   if (create_lockfile(ups) == LCKERROR) {
-      Error_abort1(_("failed to reacquire device lock file on device %s\n"),
-         ups->device);
-   }
 
    init_signals(apctest_terminate);
 
