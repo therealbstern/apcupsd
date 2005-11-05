@@ -131,6 +131,23 @@ int powernet_snmp_ups_get_capabilities(UPSINFO *ups)
    return 1;
 }
 
+#define MIN(a, b) ( ((a) < (b)) ? (a) : (b) )
+
+/*
+ * Copy a string from the SNMP library structure into the UPSINFO structure.
+ * Structure member names are formed by simple patterns, so allow the caller
+ * to specify nice readable names and build the ugly ones ourself. Source
+ * strings are NOT nul-terminated, so let astrncpy terminate them for us.
+ */
+#define SNMP_STRING(oid, field, dest) \
+   do \
+   {  \
+      astrncpy(ups->dest, \
+         (const char *)data->oid->oid##field, \
+         MIN(sizeof(ups->dest), data->oid->_##oid##field##Length+1)); \
+   }  \
+   while(0)
+
 int powernet_snmp_ups_read_static_data(UPSINFO *ups)
 {
    struct snmp_ups_internal_data *Sid = 
@@ -143,34 +160,22 @@ int powernet_snmp_ups_read_static_data(UPSINFO *ups)
 
    powernet_mib_mgr_get_upsBasicIdent(s, &(data->upsBasicIdent));
    if (data->upsBasicIdent) {
-      astrncpy(ups->upsmodel,
-         (const char *)data->upsBasicIdent->upsBasicIdentModel,
-         sizeof(ups->upsmodel));
-      astrncpy(ups->upsname,
-         (const char *)data->upsBasicIdent->upsBasicIdentName,
-         sizeof(ups->upsname));
+      SNMP_STRING(upsBasicIdent, Model, upsmodel);
+      SNMP_STRING(upsBasicIdent, Name, upsname);
       free(data->upsBasicIdent);
    }
 
    powernet_mib_mgr_get_upsAdvIdent(s, &(data->upsAdvIdent));
    if (data->upsAdvIdent) {
-      astrncpy(ups->firmrev,
-         (const char *)data->upsAdvIdent->upsAdvIdentFirmwareRevision,
-         sizeof(ups->firmrev));
-      astrncpy(ups->birth,
-         (const char *)data->upsAdvIdent->upsAdvIdentDateOfManufacture,
-         sizeof(ups->birth));
-      astrncpy(ups->serial,
-         (const char *)data->upsAdvIdent->upsAdvIdentSerialNumber,
-         sizeof(ups->serial));
+      SNMP_STRING(upsAdvIdent, FirmwareRevision, firmrev);
+      SNMP_STRING(upsAdvIdent, DateOfManufacture, birth);
+      SNMP_STRING(upsAdvIdent, SerialNumber, serial);
       free(data->upsAdvIdent);
    }
 
    powernet_mib_mgr_get_upsBasicBattery(s, &(data->upsBasicBattery));
    if (data->upsBasicBattery) {
-      astrncpy(ups->battdat,
-         (const char *)data->upsBasicBattery->upsBasicBatteryLastReplaceDate,
-         sizeof(ups->battdat));
+      SNMP_STRING(upsBasicBattery, LastReplaceDate, battdat);
       free(data->upsBasicBattery);
    }
 
