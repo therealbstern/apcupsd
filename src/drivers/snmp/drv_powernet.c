@@ -371,12 +371,12 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups)
    powernet_mib_mgr_get_upsBasicOutput(s, &(data->upsBasicOutput));
    if (data->upsBasicOutput) {
       /* Clear the following flags: only one status will be TRUE */
-      Dmsg1(99, "Status before clearing: %d\n", ups->Status);
+      Dmsg1(99, "Status before clearing: 0x%08x\n", ups->Status);
       ups->clear_online();
       ups->clear_onbatt();
       ups->clear_boost();
       ups->clear_trim();
-      Dmsg1(99, "Status after clearing: %d\n", ups->Status);
+      Dmsg1(99, "Status after clearing: 0x%08x\n", ups->Status);
 
       switch (data->upsBasicOutput->__upsBasicOutputStatus) {
       case 2:
@@ -486,12 +486,12 @@ int powernet_snmp_ups_check_state(UPSINFO *ups)
    powernet_mib_mgr_get_upsBasicOutput(s, &(data->upsBasicOutput));
    if (data->upsBasicOutput) {
       /* Clear the following flags: only one status will be TRUE */
-      Dmsg1(99, "Status before clearing: %d\n", ups->Status);
+      Dmsg1(99, "Status before clearing: 0x%08x\n", ups->Status);
       ups->clear_online();
       ups->clear_onbatt();
       ups->clear_boost();
       ups->clear_trim();
-      Dmsg1(99, "Status after clearing: %d\n", ups->Status);
+      Dmsg1(99, "Status after clearing: 0x%08x\n", ups->Status);
 
       switch (data->upsBasicOutput->__upsBasicOutputStatus) {
       case 2:
