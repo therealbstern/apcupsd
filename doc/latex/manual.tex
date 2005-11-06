@@ -5474,7 +5474,8 @@ Computer B could be shutdown by the first master that signaled it to do so.
 To run apcupsd with an SNMP UPS, you need the following things:  
 
 \begin{itemize}
-\item An SNMP UPS, for example a Web/SNMP card installed into the SmartSlot.  
+\item An SNMP UPS, for example a Web/SNMP (AP9716) or PowerNet SNMP (AP9605)
+card installed into the SmartSlot.  
 \item apcupsd version 3.10.0 or higher  
 \item 
    \elink{Net-SNMP}{http://www.net-snmp.org/} library (previously known as
@@ -5505,26 +5506,24 @@ directive needed for this configuration is:
 where the directive is made by four parts:  
 
 \begin{itemize}
-\item IP address of the remote UPS  
-\item Remote SNMP port  
-\item Kind of remote SNMP agent, currently can only be ``APC'' for APC's
-   powernet MIB  
-\item The read-write community string, usually it is ``private'' for
-   read-write access. 
-   \end{itemize}
+\item {\bf host}: IP address of the remote UPS  
+\item {\bf port}: Remote SNMP port, normally 161
+\item {\bf vendor}: Kind of remote SNMP agent: ``APC'' for APC's PowerNet MIB, ``APC_NOTRAP''
+for the PowerNet MIB with SNMP trap catching disabled, or "RFC" for the IETF's 
+rfc1628 UPS-MIB. (Note that APC_NOTRAP is only accepted by apcupsd-3.11.14 and
+higher. See below for trap catching details.)
+\item {\bf community}: The read-write community string, usually ``private''
+\end{itemize}
 
-\label{Building-and-Installing-apcupsd-_003c1_003e}
-
-\subsection*{Building and Installing apcupsd}
-\index{Building and Installing apcupsd }
-\index{Apcupsd!Building and Installing }
-\addcontentsline{toc}{subsection}{Building and Installing apcupsd}
+\subsection*{Building with SNMP support}
+\index{Building with SNMP support}
+\index{SNMP!Building with support for}
+\addcontentsline{toc}{subsection}{Building with SNMP support}
 
 Follow the instructions in 
-\ilink{Building and Installing
-apcupsd}{Building-and-Installing-apcupsd}l, being sure to include
-the following options (in addition to any others you need) on the {\bf
-./configure} line: 
+\ilink{Building and Installing apcupsd}{Building-and-Installing-apcupsd},
+being sure to include the following options (in addition to any others you need) on the
+{\bf ./configure} line: 
 
 \footnotesize
 \begin{verbatim}
@@ -5537,18 +5536,31 @@ the following options (in addition to any others you need) on the {\bf
 \end{verbatim}
 \normalsize
 
-\label{SNMP-Specific-Information}
+\label{SNMP-Trap-Catching}
+\subsection*{SNMP Trap Catching}
+\index{Traps!SNMP}
+\index{SNMP Trap Catching}
+\addcontentsline{toc}{subsection}{SNMP Trap Catching}
 
-\subsection*{SNMP Specific Information}
-\index{Information!SNMP Specific }
-\index{SNMP Specific Information }
-\addcontentsline{toc}{subsection}{SNMP Specific Information}
+apcupsd-3.11.14 introduces support for SNMP trap catching with the APC
+PowerNet MIB driver. Previous versions polled the UPS status once per minute, 
+leading to significany delays before UPS state changes were recognized. With 
+SNMP trap handling, apcupsd monitors the SNMP trap port and will re-poll the
+UPS whenever a trap is received. This happens, for example, when the UPS 
+switches on or off battery.
 
-\label{index-SNMP-164}
-The SNMP connection gives less information compared to a serial smart cable.
-This is not a problem as the most useful information is given, together with a
-number of secondary parameters that are informative enough to run safely your
-UPS. 
+In order for this feature to work, you must configure your UPS to
+deliver traps to the server running apcupsd. This is generally done by 
+connecting to your SNMP card via a web browser or telnet connection. You
+will need to enter your server's IP address as a trap receiver and make sure
+trap delivery is enabled.
+
+Trap catching can lead to problems if you are already running another SNMP
+trap daemon on your server. Only one daemon can listen to the trap port, so
+whichever one is started first will succeed and the others will fail. Apcupsd
+will fall back to polling behavior if it is unable to open the trap port. You
+can also forcibly disable trap catching by setting your vendor string in the
+{\bf apcupsd.conf} {\bf DEVICE} directive to "APC_NOTRAP".
 
 \label{Known-Problems}
 
