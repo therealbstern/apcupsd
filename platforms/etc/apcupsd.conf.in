@@ -53,11 +53,12 @@ UPSCABLE @UPSCABLE@
 # snmp      hostname:port:vendor:community
 #                            SNMP Network link to an SNMP-enabled
 #                            UPS device. Vendor is the MIB used by
-#                            the UPS device: can be "APC" or "RFC"
-#                            where APC is the powernet MIB and RFC
-#                            is the IETF's rfc1628 UPS-MIB.
-#                            Port is usually 161. Community is
-#                            "private".
+#                            the UPS device: can be "APC", "APC_NOTRAP"
+#                            or "RFC" where APC is the powernet MIB,
+#                            "APC_NOTRAP" is powernet with SNMP trap
+#                            catching disabled, and RFC is the IETF's 
+#                            rfc1628 UPS-MIB. Port is usually 161. 
+#                            Community is "private".
 #
 # dumb      /dev/tty**       Old serial character device for use 
 #                            with simple-signaling UPSes.
