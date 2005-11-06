@@ -7,6 +7,8 @@ General:
 - snmp: Add support for SNMP traps in powernet_snmp_ups_check_state().
 - snmp: Accept "APC_NOTRAP" as a valid DeviceVendor string, providing
   users a way to disable SNMP trap catching.
+- docs: Document SNMP trap catching.
+- docs: Fix formatting of master/slave network errors section.
 05Nov05:
 - apctest: Remove useless deletion and recreation of lock file.
 - snmp: SNMP strings are not NUL terminated. Treat them accordingly.
@@ -14,8 +16,6 @@ General:
 - snmp: Regenerate *-mib-mgr.c and *-mib.h files with smidump-0.4.3.
 - snmp: Fix heap corruption bug in powernet_check_comm_lost().
 - snmp: Generate events during commlost handling.
-- docs: Document SNMP trap catching.
-- docs: Fix formatting of master/slave network errors section.
 29Oct05:
 - m/s: Convert is_ups_foo() to ups->is_foo().
 - m/s: C++ compatibility fixes.
