@@ -55,13 +55,15 @@
 /*********************************************************************/
 
 struct snmp_ups_internal_data {
-   struct snmp_session session;    /* snmp session struct */
-   char device[MAXSTRING];         /* Copy of ups->device */
-   char *peername;                 /* hostname|IP of peer */
-   unsigned short remote_port;     /* Remote socket, usually 161 */
-   char *DeviceVendor;             /* Vendor (ex. APC|RFC) */
-   char *community;                /* Community name */
-   void *MIB;                      /* Pointer to MIB data */
+   struct snmp_session session;        /* snmp session struct */
+   char device[MAXSTRING];             /* Copy of ups->device */
+   char *peername;                     /* hostname|IP of peer */
+   unsigned short remote_port;         /* Remote socket, usually 161 */
+   char *DeviceVendor;                 /* Vendor (ex. APC|RFC) */
+   char *community;                    /* Community name */
+   void *MIB;                          /* Pointer to MIB data */
+   struct snmp_session *trap_session;  /* snmp session for traps */
+   bool trap_received;                 /* Have we seen a trap? */
 };
 
 /*********************************************************************/
