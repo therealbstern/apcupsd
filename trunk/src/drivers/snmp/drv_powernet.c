@@ -29,27 +29,42 @@
 
 static int powernet_check_comm_lost(UPSINFO *ups)
 {
+   struct timeval now;
+   static struct timeval prev;
    struct snmp_ups_internal_data *Sid =
       (struct snmp_ups_internal_data *)ups->driver_internal_data;
    struct snmp_session *s = &Sid->session;
    powernet_mib_t *data = (powernet_mib_t *)Sid->MIB;
    int ret = 1;
 
-   /* Assume comms are ok */
-   ups->clear_commlost();
-
    /*
     * Check the Ethernet COMMLOST first, then check the
     * Web/SNMP->UPS serial COMMLOST.
     */
    data->upsComm = NULL;
-   if (powernet_mib_mgr_get_upsComm(s, &(data->upsComm)) < 0) {
-      ups->set_commlost();
+   if (powernet_mib_mgr_get_upsComm(s, &(data->upsComm)) < 0 ||
+       (data->upsComm && data->upsComm->__upsCommStatus == 2)) {
+
+      if (!ups->is_commlost()) {
+         generate_event(ups, CMDCOMMFAILURE);
+         ups->set_commlost();
+         gettimeofday(&prev, NULL);
+      }
+
+      /* Log an event every 10 minutes */
+      gettimeofday(&now, NULL);
+      if (TV_DIFF_MS(prev, now) >= 10*60*1000) {
+         log_event(ups, event_msg[CMDCOMMFAILURE].level,
+            event_msg[CMDCOMMFAILURE].msg);
+         prev = now;
+      }
+
       ret = 0;
    }
-   else if (data->upsComm && data->upsComm->__upsCommStatus == 2) {
-      ups->set_commlost();
-      ret = 0;
+   else if (ups->is_commlost())
+   {
+      generate_event(ups, CMDCOMMOK);
+      ups->clear_commlost();
    }
 
    if (data->upsComm)
