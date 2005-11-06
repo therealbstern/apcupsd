@@ -132,7 +132,8 @@ int snmp_ups_open(UPSINFO *ups)
    Sid->session.timeout = SNMP_DEFAULT_TIMEOUT;
    Sid->session.authenticator = NULL;
 
-   if (!strcmp(Sid->DeviceVendor, "APC")) {
+   if (!strcmp(Sid->DeviceVendor, "APC") ||
+       !strcmp(Sid->DeviceVendor, "APC_NOTRAP")) {
       Sid->MIB = malloc(sizeof(powernet_mib_t));
       if (Sid->MIB == NULL) {
          log_event(ups, LOG_ERR, "Out of memory.");
@@ -147,7 +148,9 @@ int snmp_ups_open(UPSINFO *ups)
                "remote SNMP UPS is running and reachable.\n"));
          return 0;
       }
-      return 1;
+
+      /* Run powernet specific init */
+      return powernet_snmp_ups_open(ups);
    }
 
    if (!strcmp(Sid->DeviceVendor, "RFC")) {
@@ -234,18 +237,11 @@ int snmp_ups_check_state(UPSINFO *ups)
       (struct snmp_ups_internal_data *)ups->driver_internal_data;
    int ret = 0;
 
-   /* Wait the required amount of time before bugging the device. */
-   sleep(ups->wait_time);
-
-   write_lock(ups);
-
    if (!strcmp(Sid->DeviceVendor, "APC"))
       ret = powernet_snmp_ups_check_state(ups);
 
    if (!strcmp(Sid->DeviceVendor, "RFC"))
       ret = rfc1628_snmp_ups_check_state(ups);
-
-   write_unlock(ups);
 
    return ret;
 }
