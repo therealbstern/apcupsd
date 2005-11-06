@@ -5164,59 +5164,50 @@ rather than simple host names.
 In a master/slave configuration, you can get the following error messages from
 a master. The error message is followed by a possible explanation: 
 
-\label{Cannot-resolve-slave-name-XXX}
-
-\small{Cannot resolve slave name XXX}
-\index{XXX!Cannot resolve slave name }
-\index{Cannot resolve slave name XXX }
-\addcontentsline{toc}{subsubsection}{Cannot resolve slave name XXX}
-
+\begin{description}
+\item[Cannot resolve slave name XXX]
+   \label{Cannot-resolve-slave-name-XXX}
+   \index{Errors!Cannot resolve slave name XXX}
+   \index{Cannot resolve slave name XXX}
+   \addcontentsline{toc}{subsubsection}{Cannot resolve slave name XXX}
 To contact the slave, the slave name given in the configuration file must be
 resolved to an IP address. In this case, apcupsd could not get the IP address.
 Either the slave name is incorrect, your DNS may not be working, or you have
 started apcupsd during the boot process before the network is operational. 
 
-\label{Got-slave-shutdown-from-SSS}
-
-\small{Got slave shutdown from SSS}
-\index{SSS!Got slave shutdown from }
-\index{Got slave shutdown from SSS }
-\addcontentsline{toc}{subsubsection}{Got slave shutdown from SSS}
-
+\item[Got slave shutdown from SSS]
+   \label{Got-slave-shutdown-from-SSS}
+   \index{Errors!Got slave shutdown from SSS}
+   \index{Got slave shutdown from SSS}
+   \addcontentsline{toc}{subsubsection}{Got slave shutdown from SSS}
 This message should not be printed as it is not yet used. 
 
-\label{Cannot-write-to-slave-SSS}
-
-\small{Cannot write to slave SSS}
-\index{SSS!Cannot write to slave }
-\index{Cannot write to slave SSS }
-\addcontentsline{toc}{subsubsection}{Cannot write to slave SSS}
-
+\item[Cannot write to slave SSS]
+   \label{Cannot-write-to-slave-SSS}
+   \index{Errors!Cannot write to slave SSS}
+   \index{Cannot write to slave SSS}
+   \addcontentsline{toc}{subsubsection}{Cannot write to slave SSS}
 This message occurs when the master attempts to send a message to the slave
 SSS and gets an error. It indicates that either the slave machine is not
 responding (apcupsd died, the system crashed, ...) or that the network is
 down. 
 
-\label{Cannot-read-magic-from-slave-SSS}
-
-\small{Cannot read magic from slave SSS}
-\index{SSS!Cannot read magic from slave }
-\index{Cannot read magic from slave SSS }
-\addcontentsline{toc}{subsubsection}{Cannot read magic from slave SSS}
-
+\item[Cannot read magic from slave SSS]
+   \label{Cannot-read-magic-from-slave-SSS}
+   \index{Errors!Cannot read magic from slave SSS}
+   \index{Cannot read magic from slave SSS}
+   \addcontentsline{toc}{subsubsection}{Cannot read magic from slave SSS}
 This message indicates that the master attempted to read the code key from the
 slave SSS and it did not match the value expected. A common cause of this
 problem is that the master and slave versions of apcupsd are not the same.
 Please be sure you are running the same version of apcupsd on all your master
 and slave machines. 
 
-\label{Connect-to-slave-SSS-failed}
-
-\small{Connect to slave SSS failed}
-\index{Connect to slave SSS failed }
-\index{Failed!Connect to slave SSS }
-\addcontentsline{toc}{subsubsection}{Connect to slave SSS failed}
-
+\item[Connect to slave SSS failed]
+   \label{Connect-to-slave-SSS-failed}
+   \index{Connect to slave SSS failed}
+   \index{Errors!Connect to slave SSS failed}
+   \addcontentsline{toc}{subsubsection}{Connect to slave SSS failed}
 This message is logged when the master attempts to connect to slave SSS and no
 connection is accepted. The most common cause of this problem is that the
 slave copy of apcuspd is not yet ready to accept connections or is not
@@ -5224,30 +5215,27 @@ running. Generally, apcupsd will retry the connection a bit later. If the
 problem is persistent, it can indicate a network problem or the slave name on
 the SLAVE directive of the master's configuration file is incorrect. 
 
-\label{Cannot-open-stream-socket}
-
-\small{Cannot open stream socket}
-\index{Socket!Cannot open stream }
-\index{Cannot open stream socket }
-\addcontentsline{toc}{subsubsection}{Cannot open stream socket}
-
+\item[Cannot open stream socket]
+   \label{Cannot-open-stream-socket}
+   \index{Errors!Cannot open stream socket}
+   \index{Cannot open stream socket}
+   \addcontentsline{toc}{subsubsection}{Cannot open stream socket}
 This indicates a fundamental networking problem on your system {--} either a
 lack of sufficient resources or you have not configured TCP/IP operations. 
+\end{description}
 
 \label{Error-Messages-from-a-Slave-Configuration}
-
 \subsubsection*{Error Messages from a Slave Configuration:}
 
 In a master/slave configuration, you can get the following error messages from
 a slave. The error message is followed by a possible explanation: 
 
-\label{Cannot-resolve-master-name-MMM}
-
-\small{Cannot resolve master name MMM}
-\index{Cannot resolve master name MMM }
-\index{MMM!Cannot resolve master name }
-\addcontentsline{toc}{subsubsection}{Cannot resolve master name MMM}
-
+\begin{description}
+\item[Cannot resolve master name MMM]
+   \label{Cannot-resolve-master-name-MMM}
+   \index{Cannot resolve master name MMM}
+   \index{Errors!Cannot resolve master name MMM}
+   \addcontentsline{toc}{subsubsection}{Cannot resolve master name MMM}
 This message is logged when the slave attempts to resolve the name given on
 the MASTER configuration directive to an IP address. It probably means that
 the master name MMM is not defined, your DNS is not properly working, or you
@@ -5255,14 +5243,12 @@ have started apcupsd in the boot process before the network is initialized.
 Check the name MMM, or use an explicit IP address on the MASTER configuration
 directive in the slave's configuration file. 
 
-\label{Cannot-bind-local-address_003b-probably-already-in-use}
-
-\small{Cannot bind local address, probably already in use}
-\index{Cannot bind local address, probably already in use }
-\index{Use!Cannot bind local address probably already in }
-\addcontentsline{toc}{subsubsection}{Cannot bind local address, probably already
-in use}
-
+\item[Cannot bind local address, probably already in use]
+   \label{Cannot-bind-local-address_003b-probably-already-in-use}
+   \index{Cannot bind local address, probably already in use}
+   \index{Errors!Cannot bind local address probably already in use}
+   \addcontentsline{toc}{subsubsection}{Cannot bind local address, probably 
+      already in use}
 This means that the slave has attempted to bind the port number so that it can
 listen for messages from the master. This can occur if already have a copy of
 apcupsd running, or you have previously run apcupsd in the past 5 or 10
@@ -5271,64 +5257,55 @@ correctly for 5 to 10 minutes after a program exits. In this case, you can
 either wait a few minutes for the problem to go away, or use a different port
 in both your master and slave configuration files. 
 
-\label{Socket-accept-error}
-
-\small{Socket accept error}
-\index{Socket accept error }
-\index{Error!Socket accept }
-\addcontentsline{toc}{subsubsection}{Socket accept error}
-
+\item[Socket accept error]
+   \label{Socket-accept-error}
+   \index{Socket accept error}
+   \index{Errors!Socket accept error}
+   \addcontentsline{toc}{subsubsection}{Socket accept error}
 The slave got an error waiting on the accept() system call. This is probably
 due to a fundamental networking problem. 
 
-\label{Unauthorized-attempt-from-master-MMM}
-
-\small{Unauthorized attempt from master MMM}
-\index{Unauthorized attempt from master MMM }
-\index{MMM!Unauthorized attempt from master }
-\addcontentsline{toc}{subsubsection}{Unauthorized attempt from master MMM}
-
+\item[Unauthorized attempt from master MMM]
+   \label{Unauthorized-attempt-from-master-MMM}
+   \index{Unauthorized attempt from master MMM}
+   \index{Errors!Unauthorized attempt from master MMM}
+   \addcontentsline{toc}{subsubsection}{Unauthorized attempt from master MMM}
 The master named MMM (probably an IP address) contacted the slave but MMM is
 not the master that was listed on the MASTER configuration directive in
 /etc/apcupsd.conf, and consequently, it is not authorized to communicate with
 the slave. Please check that your MASTER and SLAVE names in your slave and
 master configuration files respectively are correct. 
 
-\label{Read-failure-from-socket}
-
-\small{Read failure from socket}
-\index{Socket!Read failure from }
-\index{Read failure from socket }
-\addcontentsline{toc}{subsubsection}{Read failure from socket}
-
+\item[Read failure from socket]
+   \label{Read-failure-from-socket}
+   \index{Errors!Read failure from socket}
+   \index{Read failure from socket}
+   \addcontentsline{toc}{subsubsection}{Read failure from socket}
 The slave got an error reading the socket open to the master. This indicates a
 fundamental networking problem. 
 
-\label{Bad-APC-magic-from-master_003b-MMM}
-
-\small{Bad APC magic from master: MMM}
-\index{Bad APC magic from master: MMM }
-\index{MMM!Bad APC magic from master: }
-\addcontentsline{toc}{subsubsection}{Bad APC magic from master: MMM}
-
+\item[Bad APC magic from master: MMM]
+   \label{Bad-APC-magic-from-master_003b-MMM}
+   \index{Bad APC magic from master: MMM}
+   \index{Errors!Bad APC magic from master: MMM}
+   \addcontentsline{toc}{subsubsection}{Bad APC magic from master: MMM}
 The slave received a code key from the master that does not correspond to the
 one expected by the slave. The most common cause of this problem is that you
 are running a different version of apcupsd on the master and the slave. Please
 ensure that you are running the same version of apcupsd on all your master and
 slaves. 
 
-\label{Bad-user-magic-from-master_003b-MMM}
-
-\small{Bad user magic from master: MMM}
-\index{MMM!Bad user magic from master: }
-\index{Bad user magic from master: MMM }
-\addcontentsline{toc}{subsubsection}{Bad user magic from master: MMM}
-
+\item[Bad user magic from master: MMM]
+   \label{Bad-user-magic-from-master_003b-MMM}
+   \index{Errors!Bad user magic from master: MMM}
+   \index{Bad user magic from master: MMM}
+   \addcontentsline{toc}{subsubsection}{Bad user magic from master: MMM}
 This message indicates that the master and slave have previously communicated,
 but that the code key transmitted with the most recent message from the master
 does not correspond to what the slave expects. This problem is probably due to
 a network error or some other user or machine contacting the slave on the
 network port. 
+\end{description}
 
 \label{Master_002fSlave-Connection-Not-Working}
 
