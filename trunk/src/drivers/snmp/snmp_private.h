@@ -32,6 +32,7 @@ extern int powernet_snmp_ups_read_static_data(UPSINFO *ups);
 extern int powernet_snmp_ups_read_volatile_data(UPSINFO *ups);
 extern int powernet_snmp_ups_check_state(UPSINFO *ups);
 extern int powernet_snmp_kill_ups_power(UPSINFO *ups);
+extern int powernet_snmp_ups_open(UPSINFO *ups);
 
 /* IETF */
 extern int rfc1628_snmp_ups_get_capabilities(UPSINFO *ups);
