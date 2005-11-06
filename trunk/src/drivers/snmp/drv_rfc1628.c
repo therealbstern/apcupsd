@@ -85,6 +85,12 @@ int rfc1628_snmp_ups_read_volatile_data(UPSINFO *ups)
 
 int rfc1628_snmp_ups_check_state(UPSINFO *ups)
 {
+   /* Wait the required amount of time before bugging the device. */
+   sleep(ups->wait_time);
+
+   write_lock(ups);
    rfc_1628_check_alarms(ups);
+   write_unlock(ups);
+
    return 1;
 }
