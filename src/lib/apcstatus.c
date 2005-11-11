@@ -504,7 +504,7 @@ static int dlg_idlist = 0;
  */
 char *ups_status(int stat)
 {
-   UPSINFO *ups = getNextUps(NULL);
+   UPSINFO *ups = core_ups;
 
    if (!shm_OK) {
       battstat = 0;
@@ -588,7 +588,7 @@ static void stat_list(UPSINFO *ups, char *fmt, ...)
 
 void FillStatusBox(HWND hwnd, int id_list)
 {
-   UPSINFO *ups = getNextUps(NULL);
+   UPSINFO *ups = core_ups;
 
    dlg_hwnd = hwnd;
    dlg_idlist = id_list;
