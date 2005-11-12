@@ -769,65 +769,73 @@ AC_HELP_STRING([--disable-net], [No new network driver for slaves (default)])],
     [])
 
 
-dnl
-dnl If the crypto library is needed for snmp, autodetect it
-dnl
-SNMP_DRIVER_ENABLED="no"
-NET_SNMP_DRIVER_ENABLED="no"
+WANT_SNMP="no"
 AC_ARG_ENABLE(snmp, [
 AC_HELP_STRING([--enable-snmp], [Compile SNMP UPS code])
 AC_HELP_STRING([--disable-snmp], [No SNMP UPS code (default)])],
 	[ if test "$enableval" = "yes" ; then
-	    SNMP_DRIVER_ENABLED="yes"
-	    AC_CHECK_LIB(crypto, EVP_DigestInit,
-	       [echo '	including crypto library for snmp.'; LIBS="$LIBS -lcrypto"],
-	       [], [])
-	    AC_CHECK_LIB(snmp, snmp_open,
-	      [LIBS="$LIBS -lsnmp"],
-	      [AC_CHECK_LIB(netsnmp, snmp_open,
-		[LIBS="$LIBS -lnetsnmp"
-		 NET_SNMP_DRIVER_ENABLED="yes"],
-		AC_MSG_ERROR([Cannot find SNMP libraries.]))
-	     ])
-	fi],
-    [])
-
-if test "$SNMP_DRIVER_ENABLED" = "yes"; then
-  AC_DEFINE(HAVE_SNMP_DRIVER)
-  if test "$NET_SNMP_DRIVER_ENABLED" = "yes"; then
-     AC_DEFINE(HAVE_NET_SNMP)
-     DISPLAY_SNMP_DRIVER="net-snmp"
-  else
-     AC_DEFINE(HAVE_UCD_SNMP)
-     DISPLAY_SNMP_DRIVER="snmp"
-  fi
-  SNMP_DRIVER="snmp"
-  AC_SUBST(SNMP_DRIVER)
-fi
+	    WANT_SNMP="yes"
+	  fi
+        ], [])
 
 AC_ARG_ENABLE(net-snmp, [
 AC_HELP_STRING([--enable-net-snmp], [Compile NET-SNMP UPS code])
 AC_HELP_STRING([--disable-net-snmp], [No NET-SNMP UPS code (default)])],
 	[ if test "$enableval" = "yes" ; then
-		NET_SNMP_DRIVER_ENABLED="yes"
-		AC_CHECK_LIB(crypto, EVP_DigestInit,
-		  [echo '  including crypto library for snmp.'; LIBS="$LIBS -lcrypto"],
-		  [], [])
-	    AC_CHECK_LIB(netsnmp, snmp_open,
-	      [LIBS="$LIBS -lnetsnmp"],
-	      AC_MSG_ERROR([Cannot find SNMP libraries.]))
-	fi],
-    [])
+	    WANT_SNMP="yes"
+	  fi
+        ], [])
 
-if test "$NET_SNMP_DRIVER_ENABLED" = "yes"; then
-  AC_DEFINE(HAVE_SNMP_DRIVER)
-  AC_DEFINE(HAVE_NET_SNMP)
-  DISPLAY_SNMP_DRIVER="net-snmp"
-  SNMP_DRIVER="snmp"
-  AC_SUBST(SNMP_DRIVER)
+dnl If we're building SNMP, try to find relevant libs
+if test "$WANT_SNMP" = "yes" ; then
+	dnl Check for optional crypto lib
+	AC_CHECK_LIB(crypto, EVP_DigestInit,
+	  [echo '	including crypto library for snmp.'; LIBS="$LIBS -lcrypto"],
+	  [], [])
+
+	WANT_NET_SNMP="yes"
+	SNMP_LIB_FOUND="no"
+
+	dnl libsnmp is often in /usr/local
+	_cppflags=${CPPFLAGS}
+	_ldflags=${LDFLAGS}
+	CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
+	LDFLAGS="${LDFLAGS} -L/usr/local/lib"
+
+	dnl Start by looking for libnetsnmp (net-snmp).
+	if test "$SNMP_LIB_FOUND" = "no" ; then
+		AC_CHECK_LIB(netsnmp, snmp_open,
+		  [LIBS="$LIBS -lnetsnmp"
+		   SNMP_LIB_FOUND="yes"], [], [])
+	fi
+
+	dnl If no lib yet, fall back on libsnmp (ucd-snmp)
+	if test "$SNMP_LIB_FOUND" = "no" ; then
+		WANT_NET_SNMP="no"
+		AC_CHECK_LIB(snmp, snmp_open,
+		  [LIBS="$LIBS -lsnmp"
+		   SNMP_LIB_FOUND="yes"], [], [])
+	fi
+
+	if test "$SNMP_LIB_FOUND" = "no" ; then
+	  AC_MSG_ERROR([Cannot find SNMP libraries.])
+	fi
+
+	dnl If we get this far, we found a valid lib
+	AC_DEFINE(HAVE_SNMP_DRIVER)
+	if test "$WANT_NET_SNMP" = "yes" ; then
+	     AC_DEFINE(HAVE_NET_SNMP)
+	     DISPLAY_SNMP_DRIVER="net-snmp"
+	else
+	     AC_DEFINE(HAVE_UCD_SNMP)
+	     DISPLAY_SNMP_DRIVER="snmp"
+	fi
+
+	SNMP_DRIVER="snmp"
+	AC_SUBST(SNMP_DRIVER)
 fi
 
-
+dnl Enable test driver
 AC_ARG_ENABLE(test, [
 AC_HELP_STRING([--enable-test], [Compile TEST driver code])
 AC_HELP_STRING([--disable-test], [No TEST driver (default)])],
