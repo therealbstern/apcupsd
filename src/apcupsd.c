@@ -180,7 +180,7 @@ int main(int argc, char *argv[])
     * which occur if apcupsd doesn't have a valid stdout
     * Fix by Alexander Schremmer <alex at alexanderweb dot de>
     */
-   tmp_fd = open("/dev/null", O_RDONLY, 644);
+   tmp_fd = open("/dev/null", O_RDONLY);
    if (tmp_fd > 2) {
       close(tmp_fd);
    } else {
@@ -435,7 +435,7 @@ static void daemon_start(void)
     * there and if we then use stdout, it could
     * send total garbage to our socket.
     */
-   fd = open("/dev/null", O_RDONLY, 0644);
+   fd = open("/dev/null", O_RDONLY);
    if (fd > 2) {
       close(fd);
    } else {
