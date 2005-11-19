@@ -100,10 +100,9 @@ upsService::CurrentUser(char *buffer, UINT size)
           g_impersonating_user = FALSE;
 
           // Return "" as the name...
-          if (strlen("") >= size)
-                  return FALSE;
-          astrncpy(buffer, "", size);
-
+          if (size == 0)
+              return FALSE;
+          *buffer = '\0';
           return TRUE;
        }
 
@@ -111,9 +110,9 @@ upsService::CurrentUser(char *buffer, UINT size)
        //     them then we can't continue!
        if (!g_impersonating_user) {
           // Return "" as the name...
-          if (strlen("") >= size)
-                  return FALSE;
-          astrncpy(buffer, "", size);
+          if (size == 0)
+              return FALSE;
+          *buffer = '\0';
           return TRUE;
        }
     }
@@ -134,9 +133,10 @@ upsService::CurrentUser(char *buffer, UINT size)
 
                if (error == ERROR_NOT_LOGGED_ON) {
                        // No user logged on
-                       if (strlen("") >= size)
-                               return FALSE;
-                       astrncpy(buffer, "", size);
+                       if (size == 0)
+                           return FALSE;
+
+                       *buffer = '\0';
                        return TRUE;
                } else {
                        // Genuine error...
@@ -415,7 +415,7 @@ upsService::ApcupsdServiceMain()
 
        // And find the RegisterServiceProcess function
        DWORD WINAPI (*RegisterService)(DWORD, DWORD);
-       RegisterService = (DWORD (*)(DWORD, DWORD))
+       RegisterService = (DWORD WINAPI (*)(DWORD, DWORD))
                GetProcAddress(kerneldll, "RegisterServiceProcess");
        if (RegisterService == NULL) {
           LogErrorMsg("Kernel service entry not found", 0);
@@ -423,7 +423,7 @@ upsService::ApcupsdServiceMain()
              "Apcupsd Service", MB_OK);
           break;
        }
-       
+
        // Register this process with the OS as a service!
        RegisterService(0, 1);
 
@@ -547,7 +547,7 @@ upsService::InstallService()
 
         // Append the service-start flag to the end of the path:
         if ((int)strlen(path) + 20 + (int)strlen(ApcupsdRunService) < pathlength) {
-            asnprintf(servicecmd, sizeof(servicecmd), "\"%s\" %s", path, ApcupsdRunService);
+            snprintf(servicecmd, sizeof(servicecmd), "\"%s\" %s", path, ApcupsdRunService);
         } else {
             MessageBox(NULL, "Apcupsd path too long to register service", "Service error", MB_OK);
             return 0;
@@ -638,7 +638,7 @@ upsService::InstallService()
 
               // Append the service-helper-start flag to the end of the path:
               if ((int)strlen(path) + 4 + (int)strlen(ApcupsdRunServiceHelper) < pathlength) {
-                 asnprintf(servicehelpercmd, sizeof(servicehelpercmd), "\"%s\" %s", path, ApcupsdRunServiceHelper);
+                 snprintf(servicehelpercmd, sizeof(servicehelpercmd), "\"%s\" %s", path, ApcupsdRunServiceHelper);
               } else {
                  MessageBox(NULL, "WARNING: Unable to install the ServiceHelper path too long", 
                     szAppName, MB_ICONEXCLAMATION | MB_OK);
@@ -875,7 +875,7 @@ void LogErrorMsg(char *message, int eventID)
     // Use event logging to log the error
     heventsrc = RegisterEventSource(NULL, UPS_SERVICENAME);
 
-    asnprintf(msgbuff, sizeof(msgbuff), "%s error: %ld", UPS_SERVICENAME, g_error);
+    snprintf(msgbuff, sizeof(msgbuff), "%s error: %ld", UPS_SERVICENAME, g_error);
     strings[0] = msgbuff;
     strings[1] = message;
     strings[2] = msg;
