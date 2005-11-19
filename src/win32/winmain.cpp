@@ -46,7 +46,7 @@
 #include <pthread.h>
 #include <errno.h>
 #include "config.h"
-#include "apc_defines.h"
+#include "defines.h"
 
 extern int ApcupsdMain(int argc, char **argv);
 extern int terminate(int sig);
