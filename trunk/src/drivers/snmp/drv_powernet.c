@@ -525,6 +525,7 @@ int powernet_snmp_ups_check_state(UPSINFO *ups)
       /* Get select parameters from SNMP library */
       FD_ZERO(&fds);
       block = 0;
+      numfds = 0;
       snmp_select_info(&numfds, &fds, &tmo, &block);
 
       /* Wait for something to happen */
