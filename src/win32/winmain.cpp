@@ -306,8 +306,8 @@ PSTR CmdLine, int iCmdShow)
 // Called as a thread from ApcupsdAppMain()
 // Here we handle the Windows messages
 //
-DWORD WINAPI Main_Msg_Loop(LPVOID lpwThreadParam)
-//void *Main_Msg_Loop(LPVOID lpwThreadParam)
+//DWORD WINAPI Main_Msg_Loop(LPVOID lpwThreadParam)
+void *Main_Msg_Loop(LPVOID lpwThreadParam)
 {
     DWORD old_servicethread = g_servicethread;
 
@@ -358,8 +358,8 @@ DWORD WINAPI Main_Msg_Loop(LPVOID lpwThreadParam)
 
 int ApcupsdAppMain(int service)
 {
-    DWORD dwThreadID;
-//  pthread_t tid;
+//  DWORD dwThreadID;
+    pthread_t tid;
 
     // Set this process to be the last application to be shut down.
     SetProcessShutdownParameters(0x100, 0);
@@ -372,8 +372,8 @@ int ApcupsdAppMain(int service)
     }
 
     // Create a thread to handle the Windows messages
-    (void)CreateThread(NULL, 0, Main_Msg_Loop, NULL, 0, &dwThreadID);
-//  pthread_create(&tid, NULL, Main_Msg_Loop, (void *)0);
+//  (void)CreateThread(NULL, 0, Main_Msg_Loop, NULL, 0, &dwThreadID);
+    pthread_create(&tid, NULL, Main_Msg_Loop, (void *)0);
 
     /* If service do cleanups normally done in Unix scripts */
     if (service) {
