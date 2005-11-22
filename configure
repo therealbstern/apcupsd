@@ -14589,7 +14589,6 @@ cygwin)
     SERIALDEV=/dev/com1
     LOGDIR=/apcupsd/etc/apcupsd
     nologdir=/apcupsd/etc
-    WCFLAGS="-mwindows"
     WLDFLAGS="-mwindows"
     PWRFAILDIR=/apcupsd/etc
     PIDDIR=/apcupsd/etc/apcupsd
@@ -16622,8 +16621,8 @@ Configuration on `date`:
   LOCK dir (for serial port)  ${LOCKDIR}
   Power Fail dir	      ${PWRFAILDIR}
   Compiler:		      ${CXX} ${CXXVERSION}
-  Compiler flags:	      ${WCFLAGS} ${CFLAGS} ${PTHREAD_FLAGS}
-  Loader flags: 	      ${WLDFLAGS} ${LDFLAGS}
+  Compiler flags:	      ${CFLAGS} ${PTHREAD_FLAGS}
+  Linker flags: 	      ${WLDFLAGS} ${LDFLAGS}
   Host and version:	      ${DISTNAME} ${DISTVER}
   Shutdown Program:	      ${SHUTDOWN}
   Port/Device:		      ${SERIALDEV}

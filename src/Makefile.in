@@ -38,27 +38,15 @@ apcupsd: $(dobjs) $(gobjs) $(WINAPC) $(APCLIBS) $(DRVLIBS) $(INTLLIBS)
 apcnisd: $(nobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
 	$(CXX) $(LDFLAGS) $(nobjs) $(LIBS) -o apcnisd
 
-# apctest is non-Windowing
-apctest.o: apctest.c 
-	$(CXX) -c $(CFLAGS) $(DEFS) $<
-
 apctest: $(tobjs) $(gobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
 	$(CXX) $(LDFLAGS) $(tobjs) $(gobjs) $(LIBS) -o apctest
 
 devicedbg: $(xobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
 	$(CXX) $(LDFLAGS) $(xobjs) $(LIBS) -o devicedbg
 
-# apcaccess is non-Windowing
-apcaccess.o: apcaccess.c 
-	$(CXX) -c $(CFLAGS) $(DEFS) $<
-
 apcaccess: $(aobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
 	$(CXX) $(LDFLAGS) $(aobjs) $(LIBS) -o apcaccess
  
-# smtp is non-Windowing
-smtp.o: smtp.c
-	$(CXX) -c $(CFLAGS) $(DEFS) $<
-   
 smtp: $(sobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
 	$(CXX) $(LDFLAGS) $(sobjs) $(LIBS) -o smtp
  

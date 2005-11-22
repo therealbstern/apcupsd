@@ -30,7 +30,7 @@ all-subdirs:
 dummy:
 
 .c.o:
-	$(CXX) -c $(WCFLAGS) $(CFLAGS) $(DEFS) $<
+	$(CXX) -c $(CFLAGS) $(DEFS) $<
 
 .c.lo:
 	$(LIBTOOL) --mode=compile $(COMPILE) $<
