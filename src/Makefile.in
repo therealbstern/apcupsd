@@ -13,14 +13,13 @@ subdirs = lib @LIBUSBHID@ drivers @WIN32@ @INTLSUB@ @POSUB@ @LIBGD@ @CGI@
 
 gobjs = apcnet.o reports.o action.o apcnis.o device.o
 dobjs = apcupsd.o options.o
-nobjs = apcnisd.o
 tobjs = apctest.o options.o
 aobjs = apcaccess.o
 sobjs = smtp.o
 fobjs = powerflute.o
 xobjs = devicedbg.o options.o action.o
 
-allexe = apcupsd @APCTEST@ @APCACCESS@ @SMTP@ @POWERFLUTE@ @APCNISD@
+allexe = apcupsd @APCTEST@ @APCACCESS@ @SMTP@ @POWERFLUTE@
 
 # Include the default make targets: to be put before the all-targets: rule.
 @TARGETS@
@@ -34,9 +33,6 @@ all-targets: $(allexe)
 
 apcupsd: $(dobjs) $(gobjs) $(WINAPC) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
 	$(CXX) $(LDFLAGS) $(WLDFLAGS) $(dobjs) $(gobjs) $(LIBS) $(WINAPC) $(WINLIBS) -o apcupsd
-
-apcnisd: $(nobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
-	$(CXX) $(LDFLAGS) $(nobjs) $(LIBS) -o apcnisd
 
 apctest: $(tobjs) $(gobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
 	$(CXX) $(LDFLAGS) $(tobjs) $(gobjs) $(LIBS) -o apctest
@@ -64,7 +60,6 @@ install-binary: $(allexe)
 		$(DESTDIR)$(sbindir)/apcupsd@EXEEXT@
 	@$(INSTALL_PROGRAM) -s -m 700 apctest@EXEEXT@ \
 		$(DESTDIR)$(sbindir)/apctest@EXEEXT@
-	@$(MAKE) DESTDIR=$(DESTDIR) install-@APCNISD@
 	@$(MAKE) DESTDIR=$(DESTDIR) install-@APCACCESS@
 	@$(MAKE) DESTDIR=$(DESTDIR) install-@SMTP@
 	@$(MAKE) DESTDIR=$(DESTDIR) install-@POWERFLUTE@
@@ -78,10 +73,6 @@ install-smtp:
 	@$(INSTALL_PROGRAM) -s -m 755 smtp@EXEEXT@ \
 		$(DESTDIR)$(sbindir)/smtp@EXEEXT@
 
-install-apcnisd:
-	@$(INSTALL_PROGRAM) -s -m 700 apcnisd@EXEEXT@ \
-		$(DESTDIR)$(sbindir)/apcnisd@EXEEXT@
-
 install-powerflute:
 	@$(INSTALL_PROGRAM) -s -m 755 powerflute@EXEEXT@ \
 		$(DESTDIR)$(sbindir)/powerflute@EXEEXT@
@@ -91,7 +82,6 @@ install-cgi:
 uninstall:
 	@$(ECHO) "Removing daemons ..."
 	@$(RMF) $(DESTDIR)$(sbindir)/apcupsd@EXEEXT@
-	@$(RMF) $(DESTDIR)$(sbindir)/apcnisd@EXEEXT@
 	@$(RMF) $(DESTDIR)$(sbindir)/apcaccess@EXEEXT@
 	@$(RMF) $(DESTDIR)$(sbindir)/apctest@EXEEXT@
 	@$(RMF) $(DESTDIR)$(sbindir)/powerflute@EXEEXT@
