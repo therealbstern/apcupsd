@@ -36,7 +36,7 @@ dummy:
 	$(LIBTOOL) --mode=compile $(COMPILE) $<
 
 .cpp.o:
-	$(CXX) -c $(WCFLAGS) $(CFLAGS) $(DEFS) $<
+	$(CXX) -c $(CFLAGS) $(DEFS) $<
 
 .po.pox:
 	$(MAKE) DESTDIR=$(DESTDIR) $(PACKAGE).pot
