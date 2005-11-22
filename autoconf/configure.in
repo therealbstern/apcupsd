@@ -904,16 +904,15 @@ dnl
 AC_ARG_ENABLE(powerflute,
 	[AC_HELP_STRING([--enable-powerflute], [Compile powerflute program])],
 	[ if test "$enableval" = "yes" ; then 
-	    AC_CHECK_LIB(ncurses, initscr, [],
+	    AC_CHECK_LIB(ncurses, initscr, [POWERLIBS="-lncurses"],
 		AC_MSG_ERROR([Powerflute requires libncurses.]), [])
-	    AC_CHECK_LIB(menu, new_menu, [],
+	    AC_CHECK_LIB(menu, new_menu, [POWERLIBS="$POWERLIBS -lmenu"],
 		AC_MSG_ERROR([Powerflute requires libncurses.]), [])
-	    AC_CHECK_LIB(form, new_form, [],
+	    AC_CHECK_LIB(form, new_form, [POWERLIBS="$POWERLIBS -lform"],
 		AC_MSG_ERROR([Powerflute requires libncurses.]), [])
-	    AC_CHECK_LIB(panel, new_panel, [],
+	    AC_CHECK_LIB(panel, new_panel, [POWERLIBS="$POWERLIBS -lpanel"],
 		AC_MSG_ERROR([Powerflute requires libncurses.]), [])
 	    POWERFLUTE="powerflute"
-	    POWERLIBS="-lncurses -lmenu -lform -lpanel"
 	    AC_DEFINE(HAVE_POWERFLUTE)
 	  fi])
 
