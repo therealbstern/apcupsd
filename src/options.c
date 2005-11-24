@@ -26,17 +26,14 @@
 
 #include "apc.h"
 
-static char *const shortoptions = "b?RtTVcf:ud:npP:k";
+static char *const shortoptions = "b?RtTVf:d:pP:k";
 
 enum {
    OPT_NOARG,
    OPT_HELP,
    OPT_VERSION,
    OPT_CFGFILE,
-   OPT_CONFIG,
-   OPT_BATTERY,
    OPT_DEBUG,
-   OPT_RENAME,
    OPT_KILLPWR,
    OPT_TERMONPWRFAIL,
    OPT_KILLONPWRFAIL,
@@ -47,10 +44,7 @@ static const struct option longoptions[] = {
    {"help",                no_argument,       NULL, OPT_HELP},
    {"version",             no_argument,       NULL, OPT_VERSION},
    {"config-file",         required_argument, NULL, OPT_CFGFILE},
-   {"configure",           no_argument,       NULL, OPT_CONFIG},
-   {"update-battery-date", no_argument,       NULL, OPT_BATTERY},
    {"debug",               required_argument, NULL, OPT_DEBUG},
-   {"rename-ups",          no_argument,       NULL, OPT_RENAME},
    {"killpower",           no_argument,       NULL, OPT_KILLPWR},
    {"term-on-powerfail",   no_argument,       NULL, OPT_TERMONPWRFAIL},
    {"kill-on-powerfail",   no_argument,       NULL, OPT_KILLONPWRFAIL},
@@ -61,9 +55,6 @@ static const struct option longoptions[] = {
 /* Globals used by command line options. */
 int show_version = FALSE;
 char *cfgfile = NULL;
-int configure_ups = FALSE;
-int update_battery_date = FALSE;
-int rename_ups = FALSE;
 int terminate_on_powerfail = FALSE;
 int kill_on_powerfail = FALSE;
 int kill_ups_power = FALSE;
@@ -77,21 +68,19 @@ static void print_usage(char *argv[])
    printf(_("usage: apcupsd [options]\n"
          "  Options are as follows:\n"
          "  -b,                       don't go into background\n"
-         "  -c, --configure           attempt to configure UPS [*]\n"
          "  -d, --debug <level>       set debug level (>0)\n"
          "  -f, --config-file <file>  load specified config file\n"
          "  -k, --killpower           attempt to power down UPS [*]\n"
-         "  -n, --rename-ups          attempt to rename UPS [*]\n"
          "  -p, --kill-on-powerfail   power down UPS on powerfail\n"
          "  -R,                       put SmartUPS into dumb mode\n"
          "  -t, --term-on-powerfail   terminate when battery power fails\n"
          "  -T                        send debug to ./apcupsd.trace\n"
-         "  -u, --update-battery-date update UPS battery date [*]\n"
          "  -V, --version             display version info\n"
          "  -?, --help                display this help\n"
          "\n"
          "  [*] Only one parameter of this kind and apcupsd must not already be running.\n"
          "\n"
+         "Copyright (C) 2004-2005 Adam Kropelin\n"
          "Copyright (C) 1999-2005 Kern Sibbald\n"
          "Copyright (C) 1996-1999 Andre Hedrick\n"
          "Copyright (C) 1999-2001 Riccardo Facchetti\n"
@@ -127,11 +116,6 @@ int parse_options(int argc, char *argv[])
          show_version = TRUE;
          oneshot = TRUE;
          break;
-      case 'c':
-      case OPT_CONFIG:
-         configure_ups = TRUE;
-         oneshot = TRUE;
-         break;
       case 'f':
       case OPT_CFGFILE:
          if (optarg[0] == '-') {
@@ -159,11 +143,6 @@ int parse_options(int argc, char *argv[])
          options--;
          pidfile = optarg;
          break;
-      case 'u':
-      case OPT_BATTERY:
-         update_battery_date = TRUE;
-         oneshot = TRUE;
-         break;
       case 'd':
       case OPT_DEBUG:
          if (optarg[0] == '-') {
@@ -177,11 +156,6 @@ int parse_options(int argc, char *argv[])
           */
          options--;
          debug_level = atoi(optarg);
-         break;
-      case 'n':
-      case OPT_RENAME:
-         rename_ups = TRUE;
-         oneshot = TRUE;
          break;
       case 'p':
       case OPT_KILLONPWRFAIL:
