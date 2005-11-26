@@ -195,17 +195,6 @@ PSTR CmdLine, int iCmdShow)
 
         // Now check for command-line arguments
 
-        // /servicehelper
-        //  Used on NT to connect to apcupsd
-        if (strncmp(&szCmdLine[i], ApcupsdRunServiceHelper, strlen(ApcupsdRunServiceHelper)) == 0) {
-            // NB : This flag MUST be parsed BEFORE "-service", otherwise it will match
-            // the wrong option!  (This code should really be replaced with a simple
-            // parser machine and parse-table...)
-
-            // Run the Apcupsd Service Helper app
-            upsService::PostUserHelperMessage();
-            return 0;
-        }
         // /service
         if (strncmp(&szCmdLine[i], ApcupsdRunService, strlen(ApcupsdRunService)) == 0) {
             // Run Apcupsd as a service

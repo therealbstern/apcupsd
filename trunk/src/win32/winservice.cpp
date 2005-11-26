@@ -1,6 +1,6 @@
 //  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
 //
-//  This file is part of the VNC system.
+//  This file was part of the VNC system.
 //
 //  The VNC system is free software; you can redistribute it and/or modify
 //  it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 // by Kern E. Sibbald.  Many thanks to ATT and James Weatherall,
 // the original author, for providing an excellent template.
 //
-// Copyright (2000) Kern E. Sibbald
+// Copyright (2000-2005) Kern E. Sibbald
 //
 
 
@@ -73,82 +73,6 @@ upsService::upsService()
     }
 }
 
-// CurrentUser - fills a buffer with the name of the current user!
-BOOL
-upsService::CurrentUser(char *buffer, UINT size)
-{
-    // How to obtain the name of the current user depends upon the OS being used
-    if ((g_platform_id == VER_PLATFORM_WIN32_NT) && upsService::RunningAsService()) {
-       // Windows NT, service-mode
-
-       // -=- FIRSTLY - verify that a user is logged on
-
-       // Get the current Window station
-       HWINSTA station = GetProcessWindowStation();
-       if (station == NULL)
-               return FALSE;
-
-       // Get the current user SID size
-       DWORD usersize;
-       GetUserObjectInformation(station,
-               UOI_USER_SID, NULL, 0, &usersize);
-
-       // Check the required buffer size isn't zero
-       if (usersize == 0) {
-          // No user is logged in - ensure we're not impersonating anyone
-          RevertToSelf();
-          g_impersonating_user = FALSE;
-
-          // Return "" as the name...
-          if (size == 0)
-              return FALSE;
-          *buffer = '\0';
-          return TRUE;
-       }
-
-       // -=- SECONDLY - a user is logged on but if we're not impersonating
-       //     them then we can't continue!
-       if (!g_impersonating_user) {
-          // Return "" as the name...
-          if (size == 0)
-              return FALSE;
-          *buffer = '\0';
-          return TRUE;
-       }
-    }
-            
-    // -=- When we reach here, we're either running under Win9x, or we're running
-    //     under NT as an application or as a service impersonating a user
-    // Either way, we should find a suitable user name.
-
-    switch (g_platform_id) {
-
-    case VER_PLATFORM_WIN32_WINDOWS:
-    case VER_PLATFORM_WIN32_NT:
-       // Just call GetCurrentUser
-       DWORD length = size;
-
-       if (GetUserName(buffer, &length) == 0) {
-               UINT error = GetLastError();
-
-               if (error == ERROR_NOT_LOGGED_ON) {
-                       // No user logged on
-                       if (size == 0)
-                           return FALSE;
-
-                       *buffer = '\0';
-                       return TRUE;
-               } else {
-                       // Genuine error...
-                       return FALSE;
-               }
-       }
-       return TRUE;
-    }
-
-    // OS was not recognised!
-    return FALSE;
-}
 
 // IsWin95 - returns a BOOL indicating whether the current OS is Win95
 BOOL
@@ -188,13 +112,6 @@ PostToApcupsd(UINT message, WPARAM wParam, LPARAM lParam)
 BOOL
 upsService::ShowProperties()
 {
-#ifdef properties_implemented
-        // Post to the Apcupsd menu window
-        if (!PostToApcupsd(MENU_PROPERTIES_SHOW, 0, 0)) {
-           MessageBox(NULL, "No existing instance of Apcupsd could be contacted", szAppName, MB_ICONEXCLAMATION | MB_OK);
-           return FALSE;
-        }
-#endif
         return TRUE;
 }
 
@@ -204,14 +121,6 @@ upsService::ShowProperties()
 BOOL
 upsService::ShowDefaultProperties()
 {
-#ifdef properties_implemented
-    // Post to the Apcupsd menu window
-    if (!PostToApcupsd(MENU_DEFAULT_PROPERTIES_SHOW, 0, 0)) {
-       MessageBox(NULL, "No existing instance of Apcupsd could be contacted", szAppName, MB_ICONEXCLAMATION | MB_OK);
-       return FALSE;
-    }
-
-#endif
     return TRUE;
 }
 
@@ -257,21 +166,6 @@ upsService::ShowEvents()
         return TRUE;
 }
 
-
-// Static routine to tell a locally-running instance of the server
-// to connect out to a new client
-
-BOOL
-upsService::PostAddNewClient(unsigned long ipaddress)
-{
-        // Post to the Apcupsd menu window
-        if (!PostToApcupsd(MENU_ADD_CLIENT_MSG, 0, ipaddress)) {
-           MessageBox(NULL, "No existing instance of Apcupsd could be contacted", szAppName, MB_ICONEXCLAMATION | MB_OK);
-           return FALSE;
-        }
-
-        return TRUE;
-}
 
 // SERVICE-MODE ROUTINES
 
@@ -327,131 +221,66 @@ upsService::KillRunningCopy()
 }
 
 
-// ROUTINE TO POST THE HANDLE OF THE CURRENT USER TO THE RUNNING Apcupsd, IN ORDER
-// THAT IT CAN LOAD THE APPROPRIATE SETTINGS.  THIS IS USED ONLY BY THE SVCHELPER
-// OPTION, WHEN RUNNING UNDER NT
-BOOL
-upsService::PostUserHelperMessage()
-{
-    // - Check the platform type
-    if (!IsWinNT()) {
-        return TRUE;
-    }
-
-    // - Get the current process ID
-    DWORD processId = GetCurrentProcessId();
-
-    // - Post it to the existing Apcupsd
-    if (!PostToApcupsd(MENU_SERVICEHELPER_MSG, 0, (LPARAM)processId)) {
-        return FALSE;
-    }
-
-    // - Wait until it's been used
-    return TRUE;
-}
-
-// ROUTINE TO PROCESS AN INCOMING INSTANCE OF THE ABOVE MESSAGE
-BOOL
-upsService::ProcessUserHelperMessage(WPARAM wParam, LPARAM lParam) {
-    // - Check the platform type
-    if (!IsWinNT() || !upsService::RunningAsService())
-            return TRUE;
-
-    // - Close the HKEY_CURRENT_USER key, to force NT to reload it for the new user
-    // NB: Note that this is _really_ dodgy if ANY other thread is accessing the key!
-    if (RegCloseKey(HKEY_CURRENT_USER) != ERROR_SUCCESS) {
-        return FALSE;
-    }
-
-    // - Revert to our own identity
-    RevertToSelf();
-    g_impersonating_user = FALSE;
-
-    // - Open the specified process
-    HANDLE processHandle = OpenProcess(PROCESS_QUERY_INFORMATION, FALSE, (DWORD)lParam);
-    if (processHandle == NULL) {
-            return FALSE;
-    }
-
-    // - Get the token for the given process
-    HANDLE userToken = NULL;
-    if (!OpenProcessToken(processHandle, TOKEN_QUERY | TOKEN_DUPLICATE | TOKEN_IMPERSONATE, &userToken)) {
-        CloseHandle(processHandle);
-        return FALSE;
-    }
-    CloseHandle(processHandle);
-
-    // - Set this thread to impersonate them
-    if (!ImpersonateLoggedOnUser(userToken)) {
-        CloseHandle(userToken);
-        return FALSE;
-    }
-    CloseHandle(userToken);
-
-    g_impersonating_user = TRUE;
-    return TRUE;
-}
-
 // SERVICE MAIN ROUTINE
 int
 upsService::ApcupsdServiceMain()
 {
-    // Mark that we are a service
-    g_servicemode = TRUE;
+   // Mark that we are a service
+   g_servicemode = TRUE;
 
-    // How to run as a service depends upon the OS being used
-    switch (g_platform_id) {
+   // How to run as a service depends upon the OS being used
+   switch (g_platform_id) {
 
-    // Windows 95/98
-    case VER_PLATFORM_WIN32_WINDOWS: {
-       // Obtain a handle to the kernel library
-       HINSTANCE kerneldll = LoadLibrary("KERNEL32.DLL");
-       if (kerneldll == NULL) {
-          LogErrorMsg("KERNEL32.DLL not found", 0);
-          MessageBox(NULL, "KERNEL32.DLL not found: Apcupsd service not started", 
-              "Apcupsd Service", MB_OK);
-          break;
-       }
-
-       // And find the RegisterServiceProcess function
-       DWORD WINAPI (*RegisterService)(DWORD, DWORD);
-       RegisterService = (DWORD WINAPI (*)(DWORD, DWORD))
-               GetProcAddress(kerneldll, "RegisterServiceProcess");
-       if (RegisterService == NULL) {
-          LogErrorMsg("Kernel service entry not found", 0);
-          MessageBox(NULL, "Kernel service entry point not found: Apcupsd service not started",
+   // Windows 95/98
+   case VER_PLATFORM_WIN32_WINDOWS: {
+      // Obtain a handle to the kernel library
+      HINSTANCE kerneldll = LoadLibrary("KERNEL32.DLL");
+      if (kerneldll == NULL) {
+         LogErrorMsg("KERNEL32.DLL not found", 0);
+         MessageBox(NULL, "KERNEL32.DLL not found: Apcupsd service not started", 
              "Apcupsd Service", MB_OK);
-          break;
-       }
+         break;
+      }
 
-       // Register this process with the OS as a service!
-       RegisterService(0, 1);
+      // And find the RegisterServiceProcess function
+      DWORD WINAPI (*RegisterService)(DWORD, DWORD);
+      RegisterService = (DWORD WINAPI (*)(DWORD, DWORD))
+              GetProcAddress(kerneldll, "RegisterServiceProcess");
+      if (RegisterService == NULL) {
+         LogErrorMsg("Kernel service entry not found", 0);
+         MessageBox(NULL, "Kernel service entry point not found: Apcupsd service not started",
+            "Apcupsd Service", MB_OK);
+         break;
+      }
 
-       // Run the service itself
-       ApcupsdAppMain(1);
+      // Register this process with the OS as a service!
+      RegisterService(0, 1);
 
-       // Then remove the service from the system service table
-       RegisterService(0, 0);
+      // Run the service itself
+      ApcupsdAppMain(1);
 
-       // Free the kernel library
-       FreeLibrary(kerneldll);
-       break;
-    }
-    // Windows NT
-    case VER_PLATFORM_WIN32_NT:
-       // Create a service entry table
-       SERVICE_TABLE_ENTRY dispatchTable[] = {
-               {UPS_SERVICENAME, (LPSERVICE_MAIN_FUNCTION)ServiceMain},
-               {NULL, NULL} };
+      // Then remove the service from the system service table
+      RegisterService(0, 0);
 
-       // Call the service control dispatcher with our entry table
-       if (!StartServiceCtrlDispatcher(dispatchTable)) {
-           LogErrorMsg("StartServiceCtrlDispatcher failed.", 0);
-           MessageBox(NULL, "StartServiceCtrlDispatcher error", "Apcupsd", MB_OK);
-       }
-       break;
-    } /* end switch */
-    return 0;
+      // Free the kernel library
+      FreeLibrary(kerneldll);
+      break;
+   }
+   // Windows NT
+   case VER_PLATFORM_WIN32_NT:
+      // Create a service entry table
+      SERVICE_TABLE_ENTRY dispatchTable[] = {
+              {UPS_SERVICENAME, (LPSERVICE_MAIN_FUNCTION)ServiceMain},
+              {NULL, NULL} };
+
+      // Call the service control dispatcher with our entry table
+      if (!StartServiceCtrlDispatcher(dispatchTable)) {
+          LogErrorMsg("StartServiceCtrlDispatcher failed.", 0);
+          MessageBox(NULL, "StartServiceCtrlDispatcher error", "Apcupsd", MB_OK);
+      }
+      break;
+   } /* end switch */
+   return 0;
 }
 
 // SERVICE MAIN ROUTINE - NT ONLY !!!
@@ -625,6 +454,7 @@ upsService::InstallService()
            }
            CloseServiceHandle(hservice);
 
+#ifdef xxx_neeeded
            // Now install the servicehelper registry setting...
            // Locate the RunService registry entry
            HKEY runapps;
@@ -653,6 +483,7 @@ upsService::InstallService()
               }
               RegCloseKey(runapps);
            }
+#endif
 
            // Everything went fine
            MessageBox(NULL,

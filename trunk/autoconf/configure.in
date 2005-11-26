@@ -776,7 +776,7 @@ AC_HELP_STRING([--disable-snmp], [No SNMP UPS code (default)])],
 	[ if test "$enableval" = "yes" ; then
 	    WANT_SNMP="yes"
 	  fi
-        ], [])
+	], [])
 
 AC_ARG_ENABLE(net-snmp, [
 AC_HELP_STRING([--enable-net-snmp], [Compile NET-SNMP UPS code])
@@ -784,7 +784,7 @@ AC_HELP_STRING([--disable-net-snmp], [No NET-SNMP UPS code (default)])],
 	[ if test "$enableval" = "yes" ; then
 	    WANT_SNMP="yes"
 	  fi
-        ], [])
+	], [])
 
 dnl If we're building SNMP, try to find relevant libs
 if test "$WANT_SNMP" = "yes" ; then
@@ -1247,6 +1247,7 @@ cygwin)
     PTHREAD_LFLAGS=""
     DFILES="\
 	src/win32/Makefile \
+	src/win32/winapcupsd.nsi \
 	platforms/cygwin/Makefile \
 	platforms/cygwin/apcupsd \
 	platforms/cygwin/apccontrol \

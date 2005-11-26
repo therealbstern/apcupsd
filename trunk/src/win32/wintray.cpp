@@ -381,17 +381,6 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
                         return 0;
                 }
 
-                if (iMsg == MENU_SERVICEHELPER_MSG) {
-                        // External ServiceHelper message.
-                        // This message holds a process id which we can use to
-                        // impersonate a specific user.  In doing so, we can load their
-                        // preferences correctly
-                        upsService::ProcessUserHelperMessage(wParam, lParam);
-
-                        // - Trigger a check of the current user
-                        PostMessage(hwnd, WM_USERCHANGED, 0, 0);
-                        return 0;
-                }
                 if (iMsg == MENU_ADD_CLIENT_MSG) {
                         // Add Client message.  This message includes an IP address
                         // of a listening client, to which we should connect.

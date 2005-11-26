@@ -2,6 +2,23 @@
                         Kern Sibbald
 
 General:
+- Implement NSIS installer. It can be downloaded from:
+  http://sourceforge.net/projects/nsis/  I'm using version
+  2.0, but the latest one is 2.11
+- Create winapcupsd.nsi.in file in src/win32 directory.
+- Modify configure.in to generate winapcupsd.nsi file.
+- Remove most of the old ServiceHelper code. It is not used,
+  and creates problems on remote logins.
+- Add nagios plugin contributed by Christian Masopust.
+- Add all the new cygwin 1.5.18 binaries and the dll.
+- Eliminate some compiler warnings.
+- Make the old make binary-release work.
+- Implement a new target for building the NSIS installer.
+    ./configure (options...)
+    make
+    cd src/win32
+    make winapcupsd.exe
+
 26Jun05
 - Correct compiler warnings in cgi for g++ 4.0
 13Jun05

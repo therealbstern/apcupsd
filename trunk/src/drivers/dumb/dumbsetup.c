@@ -40,7 +40,7 @@ int dumb_ups_open(UPSINFO *ups)
       my_data = (SIMPLE_DATA *) malloc(sizeof(SIMPLE_DATA));
       if (my_data == NULL) {
          log_event(ups, LOG_ERR, "Out of memory.");
-         exit(1);
+	 exit(1);
       }
       memset(my_data, 0, sizeof(SIMPLE_DATA));
       ups->driver_internal_data = my_data;
@@ -60,25 +60,25 @@ int dumb_ups_open(UPSINFO *ups)
    tcgetattr(ups->fd, &my_data->oldtio);
 
    my_data->newtio.c_cflag = DEFAULT_SPEED | CS8 | CLOCAL | CREAD;
-   my_data->newtio.c_iflag = IGNPAR;    /* Ignore errors, raw input */
-   my_data->newtio.c_oflag = 0;         /* Raw output */
-   my_data->newtio.c_lflag = 0;         /* No local echo */
+   my_data->newtio.c_iflag = IGNPAR;	/* Ignore errors, raw input */
+   my_data->newtio.c_oflag = 0; 	/* Raw output */
+   my_data->newtio.c_lflag = 0; 	/* No local echo */
 
 #if defined(HAVE_OPENBSD_OS) || \
     defined(HAVE_FREEBSD_OS) || \
     defined(HAVE_NETBSD_OS)
-   my_data->newtio.c_ispeed = DEFAULT_SPEED;    /* Set input speed */
-   my_data->newtio.c_ospeed = DEFAULT_SPEED;    /* Set output speed */
-#endif   /* __openbsd__ || __freebsd__ || __netbsd__  */
+   my_data->newtio.c_ispeed = DEFAULT_SPEED;	/* Set input speed */
+   my_data->newtio.c_ospeed = DEFAULT_SPEED;	/* Set output speed */
+#endif	 /* __openbsd__ || __freebsd__ || __netbsd__  */
 
    /* This makes a non.blocking read() with TIMER_READ (10) sec. timeout */
    my_data->newtio.c_cc[VMIN] = 0;
    my_data->newtio.c_cc[VTIME] = TIMER_READ * 10;
 
 #if defined(HAVE_CYGWIN) || defined(HAVE_OSF1_OS) || defined(HAVE_LINUX_OS)
-   cfsetospeed(&my_data->newtio, DEFAULT_SPEED);
-   cfsetispeed(&my_data->newtio, DEFAULT_SPEED);
-#endif   /* do it the POSIX way */
+   (void)cfsetospeed(&my_data->newtio, DEFAULT_SPEED);
+   (void)cfsetispeed(&my_data->newtio, DEFAULT_SPEED);
+#endif	 /* do it the POSIX way */
 
    tcflush(ups->fd, TCIFLUSH);
    tcsetattr(ups->fd, TCSANOW, &my_data->newtio);
@@ -101,7 +101,7 @@ int dumb_ups_close(UPSINFO *ups)
    /*
     * Do NOT reset the old values here as it causes the kill
     * power to trigger on some systems.
-    *                 
+    *		      
     * On the other hand do clear any kill_power bit previously
     * set so that it doesn't remain set in the serial port and
     * trigger a problem later.
@@ -114,7 +114,7 @@ int dumb_ups_close(UPSINFO *ups)
    case CUSTOM_SIMPLE:
    case APC_940_0095A:
    case APC_940_0095B:
-   case APC_940_0095C:            /* clear killpwr_bit */
+   case APC_940_0095C:		  /* clear killpwr_bit */
       (void)ioctl(ups->fd, TIOCMBIC, &rts_bit);
       (void)ioctl(ups->fd, TIOCMBIC, &rts_bit);
       (void)ioctl(ups->fd, TIOCMBIC, &st_bit);
@@ -123,7 +123,7 @@ int dumb_ups_close(UPSINFO *ups)
    case APC_940_0119A:
    case APC_940_0127A:
    case APC_940_0128A:
-   case APC_940_0020B:            /* clear killpwr_bit */
+   case APC_940_0020B:		  /* clear killpwr_bit */
    case APC_940_0020C:
       (void)ioctl(ups->fd, TIOCMBIC, &dtr_bit);
       (void)ioctl(ups->fd, TIOCMBIC, &dtr_bit);
@@ -163,7 +163,7 @@ int dumb_ups_setup(UPSINFO *ups)
    case APC_940_0128A:
    case APC_940_0020B:
    case APC_940_0020C:
-   case MAM_CABLE:                /* DTR=>enable CD & CTS RTS=>killpower */
+   case MAM_CABLE:		  /* DTR=>enable CD & CTS RTS=>killpower */
       /* Clear DTR bit (shutdown) and set RTS bit (tell we are ready) */
       serial_bits = TIOCM_DTR;
       (void)ioctl(ups->fd, TIOCMBIC, &serial_bits);

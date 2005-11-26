@@ -10,6 +10,8 @@
 topdir = @topdir@
 top_builddir = $(topdir)
 
+MAKENSIS="c:/Program Files/NSIS/makensis"
+
 # Include the default make targets: to be put before the all-targets: rule.
 @TARGETS@
 
@@ -57,7 +59,7 @@ clean: targetclean
 
 distclean: targetdistclean
 	$(RMF) Makefile
-	$(RMF) -r CVS
+	$(RMF) -rf CVS
 
 install:
 	@echo "Installing executables ..."
@@ -87,8 +89,8 @@ binary-release:
 	@echo "Copying apcupsd.conf..."
 	@cp -f $(topdir)/platforms/etc/apcupsd.conf wr/$(sysconfdir)/apcupsd.conf
 	@echo "Copying manual ..."
-	@cp -p $(topdir)/doc/texi/manual.html wr/$(prefix)
-	@cp -p $(topdir)/doc/texi/*.png wr/$(prefix)
+	@cp -p $(topdir)/doc/latex/manual.html wr/$(prefix)
+	@cp -p $(topdir)/doc/latex/*.png wr/$(prefix)
 	@echo "Copying examples ..."
 	@cp -rp $(topdir)/examples wr/$(prefix)
 	@cp -f $(topdir)/platforms/cygwin/examples/* wr/$(prefix)/examples
@@ -103,6 +105,15 @@ binary-release:
 	@rm -rf wr
 	@(cd $(topdir)/..; \
 		echo "Tar file in: `pwd`/winapcupsd-${VERSION}.tar.gz")
+
+#
+# Build installer
+#
+winapcupsd.exe:
+	@strip $(topdir)/src/*.exe
+	@strip *.exe
+	${MAKENSIS} /V2 winapcupsd.nsi
+
 
 # -----------------------------------------------------------------------
 # DO NOT DELETE THIS LINE -- make depend depends on it.
