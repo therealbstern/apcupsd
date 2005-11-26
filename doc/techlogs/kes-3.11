@@ -3,6 +3,10 @@
 
 General:
 26Nov05
+- Set default UPSTYPE to apcsmart (was smartups)
+- Add examples to installer script.
+- Try to remove all files on uninstall.
+- Add "missing" installer macro files.
 - Implement NSIS installer. It can be downloaded from:
   http://sourceforge.net/projects/nsis/  I'm using version
   2.0, but the latest one is 2.11
