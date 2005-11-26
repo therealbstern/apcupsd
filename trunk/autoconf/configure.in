@@ -1163,7 +1163,7 @@ dnl  command line options will apply.
 dnl  
 
 # Define the default UPS
-UPSTYPE=smartups
+UPSTYPE=apcsmart
 
 # Define the default Cable
 UPSCABLE=smart
