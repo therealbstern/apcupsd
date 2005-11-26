@@ -2,6 +2,7 @@
                         Kern Sibbald
 
 General:
+26Nov05
 - Implement NSIS installer. It can be downloaded from:
   http://sourceforge.net/projects/nsis/  I'm using version
   2.0, but the latest one is 2.11
