@@ -552,11 +552,12 @@ upsService::RemoveService()
        MessageBox(NULL, "The Apcupsd service has been removed", szAppName, MB_ICONINFORMATION | MB_OK);
        break;
 
-            // Windows NT
+     // Windows NT
     case VER_PLATFORM_WIN32_NT:
        SC_HANDLE   hservice;
        SC_HANDLE   hsrvmanager;
 
+#ifdef xxx_needed
        // Attempt to remove the service-helper hook
        HKEY runapps;
        if (RegOpenKey(HKEY_LOCAL_MACHINE, 
@@ -569,6 +570,7 @@ upsService::RemoveService()
            }
            RegCloseKey(runapps);
        }
+#endif
 
        // Open the SCM
        hsrvmanager = OpenSCManager(
