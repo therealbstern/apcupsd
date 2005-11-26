@@ -97,9 +97,8 @@ Section "Apcupsd Service" SecService
   File email.exe
   File ..\..\platforms\cygwin\README.txt
 
-  
-  SetOutPath "$INSTDIR\etc\apcupsd"
-  File ..\..\platforms\cygwin\apccontrol
+  SetOutPath "$INSTDIR\examples"
+  File ..\..\examples\*
 
   SetOutPath "$INSTDIR"
   File ..\..\platforms\cygwin\README.txt
@@ -107,6 +106,7 @@ Section "Apcupsd Service" SecService
   File ..\..\ChangeLog
 
   SetOutPath "$INSTDIR\etc\apcupsd"
+  File ..\..\platforms\cygwin\apccontrol
   IfFileExists "$INSTDIR\etc\apcupsd\apcupsd.conf" newconf 
   File ..\..\platforms\etc\apcupsd.conf
   goto do_service
@@ -231,10 +231,13 @@ Section "Uninstall"
   ; remove files and uninstaller (preserving config for now)
   CopyFiles /SILENT "$INSTDIR\etc\apcupsd\apcupsd.conf" "$INSTDIR\apcupsd.conf"
   Delete /REBOOTOK "$INSTDIR\bin\*.*"
+  Delete /REBOOTOK "$INSTDIR\exe\apcupsd\*.*"
   Delete /REBOOTOK "$INSTDIR\doc\*.*"
+  Delete /REBOOTOK "$INSTDIR\examples\*" 
+  Delete /REBOOTOK "$INSTDIR\examples\*.*"
   CopyFiles /SILENT "$INSTDIR\apcupsd.conf" "$INSTDIR\etc\apcupsd\apcupsd.conf"
-  Delete /REBOOTOK "$INSTDIR\*.conf"
-  Delete /REBOOTOK "$INSTDIR\Uninstall.exe"
+  Delete /REBOOTOK "$INSTDIR\*.*"
+  Delete /REBOOTOK "$INSTDIR\*"
 
   ; Check for existing installation
   MessageBox MB_YESNO|MB_ICONQUESTION "Would you like to delete the current configuration files and the working state file?" IDNO LeaveConfig
