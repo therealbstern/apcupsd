@@ -3,6 +3,9 @@
 
 General:
 26Nov05
+- Update the version
+- Cleanup errors in the uninstall script
+- Remove a few MessageBoxes that annoy on Win98
 - Set default UPSTYPE to apcsmart (was smartups)
 - Add examples to installer script.
 - Try to remove all files on uninstall.
