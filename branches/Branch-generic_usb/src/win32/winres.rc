@@ -1,0 +1,178 @@
+#include <winuser.h>
+#include <winver.h>
+#include "winres.h"
+#include "../../include/version.h"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Icons
+//
+
+// Icon with lowest ID value placed first to ensure application icon
+// remains consistent on all systems.
+IDI_APCUPSD		ICON	DISCARDABLE	"apcupsd.ico"
+IDI_ONLINE		ICON	DISCARDABLE	"online.ico"
+IDI_ONBATT		ICON	DISCARDABLE	"onbatt.ico"
+IDI_CHARGING		ICON	DISCARDABLE	"charging.ico"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Menu
+//
+
+IDR_TRAYMENU MENU DISCARDABLE 
+BEGIN
+    POPUP "tray"
+    BEGIN
+	MENUITEM "&Status",			ID_STATUS
+	MENUITEM "&Events",			ID_EVENTS
+#ifdef properties_implemented
+	MENUITEM "&Properties", 		ID_PROPERTIES
+#endif
+	MENUITEM SEPARATOR
+	MENUITEM "&About Apcupsd",		ID_ABOUT
+	MENUITEM SEPARATOR
+	MENUITEM "&Close Apcupsd",		ID_CLOSE
+    END
+END
+
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Version
+//
+
+VS_VERSION_INFO VERSIONINFO
+ FILEVERSION 3,8,0,0
+ PRODUCTVERSION 3,8,0,0
+ FILEFLAGSMASK VS_FFI_FILEFLAGSMASK
+#ifdef _DEBUG
+ FILEFLAGS 0x1L
+#else
+ FILEFLAGS 0 //
+#endif
+ FILEOS VOS_NT_WINDOWS32
+ FILETYPE VFT_APP
+ FILESUBTYPE 0
+BEGIN
+    BLOCK "StringFileInfo"
+    BEGIN
+	BLOCK "040904E0" // Lang=US English, CharSet=Windows Multiligual
+	BEGIN
+	    VALUE "Comments", "by Kern Sibbald\0"
+	    VALUE "CompanyName", "Apcupsd Team\0"
+	    VALUE "FileDescription", "APC UPS daemon for Win32\0"
+	    VALUE "FileVersion", VERSION "\0"
+	    VALUE "InternalName", "Apcupsd\0"
+	    VALUE "LegalCopyright", "Copyright Kern Sibbald, 1999-2005\0"
+	    VALUE "LegalTrademarks", "Licensed under GNU GPL 2.0\0"
+	    VALUE "OriginalFilename", "apcupsd.exe\0"
+	    VALUE "PrivateBuild", "\0"
+	    VALUE "ProductName", "APCUPSD - Win32 Version\0"
+	    VALUE "ProductVersion", VERSION
+	    VALUE "SpecialBuild", "\0"
+	END
+    END
+    BLOCK "VarFileInfo"
+    BEGIN
+	VALUE "Translation", 0x409, 1252 // US English, Multilingual
+    END
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Bitmap
+//
+
+IDB_APCUPSDBMP		BITMAP	DISCARDABLE	"apcupsd.bmp"
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// String Table
+//
+
+STRINGTABLE DISCARDABLE 
+BEGIN
+    IDI_APCUPSD 	    "Apcupsd"
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Properties Dialog
+//
+#ifdef properties_implemented
+
+IDD_PROPERTIES DIALOG DISCARDABLE  0, 0, 221, 204
+STYLE DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | 
+    WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Apcupsd Properties"
+FONT 8, "MS Sans Serif"
+BEGIN
+    PUSHBUTTON	    "&Cancel",IDCANCEL,165,25,51,15
+    DEFPUSHBUTTON   "&OK",IDOK,165,5,51,15
+    LTEXT	    "No Properites yet",IDC_NONYET_LABEL,19,30,56,15,
+		    SS_CENTERIMAGE
+END
+#endif
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// About Dialog
+//
+
+IDD_ABOUT DIALOG DISCARDABLE  0, 0, 250, 145
+STYLE DS_MODALFRAME | DS_CENTER | WS_POPUP | WS_CAPTION | WS_SYSMENU
+CAPTION "About Apcupsd"
+FONT 8, "MS Sans Serif"
+BEGIN
+    DEFPUSHBUTTON   "OK",IDOK,190,120,50,15
+//  CONTROL	    "\3", IDC_APCUPSDBMP,"Static",SS_ICON | SS_CENTERIMAGE |
+//		    SS_SUNKEN,7,5,73,65
+    CONTROL	    "a", IDB_APCUPSDBMP,"Static",SS_BITMAP|SS_SUNKEN,7,5,73,65
+    LTEXT	    "Apcupsd Version " VERSION " (" ADATE ")", IDC_VERSION,90,10,239,10
+    LTEXT	    "	   by Kern Sibbald",IDC_NAME,90,20,239,10
+    LTEXT	    "For more information, see:",
+		    IDC_WWW,90,40,239,10
+    LTEXT	    "	      www.apcupsd.com",
+		    IDC_WWW,90,50,239,10
+    LTEXT	    "	      sourceforge.net/projects/apcupsd",
+		    IDC_WWW,90,60,239,10
+    LTEXT	    "Copyright (C) 1999-2005, Kern Sibbald",
+		    IDC_COPYRIGHT,7,100,175,10
+    LTEXT	    "Copyright (C) 1999-2002, Riccardo Facchetti",
+		    IDC_COPYRIGHT,7,110,175,10
+    LTEXT	    "Copyright (C) 1996-1999, André M. Hedrick",
+		    IDC_COPYRIGHT,7,120,175,10
+    LTEXT	    "Licensed under GNU GPL 2.0.",
+		    IDC_TRADEMARK,7,130,175,10
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Status Dialog
+//
+
+IDD_STATUS DIALOG DISCARDABLE  0, 0, 261, 244
+STYLE DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | 
+    WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Apcupsd Status"
+FONT 8, "Courier New"
+BEGIN
+    DEFPUSHBUTTON   "&OK",IDOK,205,5,51,15
+    LISTBOX	    IDC_LIST, 2, 2, 200, 240, WS_VSCROLL | WS_BORDER
+END
+
+/////////////////////////////////////////////////////////////////////////////
+//
+// Events Dialog
+//
+
+IDD_EVENTS DIALOG DISCARDABLE  0, 0, 411, 204
+STYLE DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | 
+    WS_VISIBLE | WS_CAPTION | WS_SYSMENU
+CAPTION "Apcupsd Events"
+FONT 8, "Courier New"
+BEGIN
+    DEFPUSHBUTTON   "&OK",IDOK,355,5,51,15
+    LISTBOX	    IDC_LIST, 2, 2, 350, 200, WS_VSCROLL | WS_HSCROLL | WS_BORDER
+END

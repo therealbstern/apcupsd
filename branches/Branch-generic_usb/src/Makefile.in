@@ -1,0 +1,97 @@
+# src/Makefile.in
+#
+# Copyright (C) 1999-2002 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
+#
+
+# Default variables
+@VARIABLES@
+# TOP source directory.
+topdir = @topdir@
+top_builddir = $(topdir)
+
+subdirs = lib @LIBUSBHID@ drivers @WIN32@ @INTLSUB@ @POSUB@ @LIBGD@ @CGI@
+
+gobjs = apcnet.o reports.o action.o apcnis.o device.o
+dobjs = apcupsd.o options.o
+tobjs = apctest.o options.o
+aobjs = apcaccess.o
+sobjs = smtp.o
+fobjs = powerflute.o
+xobjs = devicedbg.o options.o action.o
+
+allexe = apcupsd @APCTEST@ @APCACCESS@ @SMTP@ @POWERFLUTE@
+
+# Include the default make targets: to be put before the all-targets: rule.
+@TARGETS@
+
+all-targets: $(allexe)
+ 
+#
+# Note, in some cases, all the libraries are not needed on the 
+#   dependencies, but it really does little harm and avoids missing one.
+#
+
+apcupsd: $(dobjs) $(gobjs) $(WINAPC) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
+	$(CXX) $(LDFLAGS) $(WLDFLAGS) $(dobjs) $(gobjs) $(LIBS) $(WINAPC) $(WINLIBS) -o apcupsd
+
+apctest: $(tobjs) $(gobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
+	$(CXX) $(LDFLAGS) $(tobjs) $(gobjs) $(LIBS) -o apctest
+
+devicedbg: $(xobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
+	$(CXX) $(LDFLAGS) $(xobjs) $(LIBS) -o devicedbg
+
+apcaccess: $(aobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
+	$(CXX) $(LDFLAGS) $(aobjs) $(LIBS) -o apcaccess
+ 
+smtp: $(sobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
+	$(CXX) $(LDFLAGS) $(sobjs) $(LIBS) -o smtp
+ 
+powerflute: $(fobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
+	$(CXX) $(LDFLAGS) $(fobjs) $(LIBS) @POWERLIBS@ -o powerflute
+
+install: install-binary
+
+install-:
+
+install-binary: $(allexe)
+	@$(ECHO) "Installing daemons ..."
+	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(sbindir)
+	@$(INSTALL_PROGRAM) -s -m 700 apcupsd@EXEEXT@ \
+		$(DESTDIR)$(sbindir)/apcupsd@EXEEXT@
+	@$(INSTALL_PROGRAM) -s -m 700 apctest@EXEEXT@ \
+		$(DESTDIR)$(sbindir)/apctest@EXEEXT@
+	@$(MAKE) DESTDIR=$(DESTDIR) install-@APCACCESS@
+	@$(MAKE) DESTDIR=$(DESTDIR) install-@SMTP@
+	@$(MAKE) DESTDIR=$(DESTDIR) install-@POWERFLUTE@
+	@$(MAKE) DESTDIR=$(DESTDIR) install-@CGI@
+
+install-apcaccess:
+	@$(INSTALL_PROGRAM) -s -m 755 apcaccess@EXEEXT@ \
+		$(DESTDIR)$(sbindir)/apcaccess@EXEEXT@
+
+install-smtp:
+	@$(INSTALL_PROGRAM) -s -m 755 smtp@EXEEXT@ \
+		$(DESTDIR)$(sbindir)/smtp@EXEEXT@
+
+install-powerflute:
+	@$(INSTALL_PROGRAM) -s -m 755 powerflute@EXEEXT@ \
+		$(DESTDIR)$(sbindir)/powerflute@EXEEXT@
+install-cgi:
+	(cd cgi/; $(MAKE) DESTDIR=$(DESTDIR) install)
+
+uninstall:
+	@$(ECHO) "Removing daemons ..."
+	@$(RMF) $(DESTDIR)$(sbindir)/apcupsd@EXEEXT@
+	@$(RMF) $(DESTDIR)$(sbindir)/apcaccess@EXEEXT@
+	@$(RMF) $(DESTDIR)$(sbindir)/apctest@EXEEXT@
+	@$(RMF) $(DESTDIR)$(sbindir)/powerflute@EXEEXT@
+
+clean: targetclean
+	$(RM) -f devicedbg
+
+distclean: targetdistclean
+	$(RMF) Makefile
+	$(RMF) -r CVS win32/CVS
+
+# -----------------------------------------------------------------------
+# DO NOT DELETE THIS LINE -- make depend depends on it.

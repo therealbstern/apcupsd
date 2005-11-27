@@ -1,0 +1,100 @@
+# General rules for Makefile(s) subsystem.
+# In this file we will put everything that need to be
+# shared betweek all the Makefile(s).
+# This file must be included at the beginning of every Makefile
+#
+# Copyright (C) 1999-2002 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
+
+#
+# package version
+PACKAGE = apcupsd
+DISTNAME = @DISTNAME@
+DISTVER = @DISTVER@
+VERSION = @VERSION@
+
+#
+# programs needed by compilation
+CP = @CP@
+MV = @MV@
+ECHO = @ECHO@
+RM = @RM@
+RMF = $(RM) -f
+LN = @LN@
+SED = @SED@
+MAKE = @MAKE@
+SHELL = @SHELL@
+RANLIB = @RANLIB@
+AR = @AR@
+LIBTOOL = @LIBTOOL@
+INSTALL = @INSTALL@
+INSTALL_PROGRAM = @INSTALL_PROGRAM@
+INSTALL_DATA = @INSTALL_DATA@
+INSTALL_SCRIPT = @INSTALL_SCRIPT@
+MKINSTALLDIRS = @MKINSTALLDIRS@
+ETAGS = @ETAGS@
+CTAGS = @CTAGS@
+GENCAT = @GENCAT@
+MSGFMT = @MSGFMT@
+
+
+# Files and directories (paths)
+#
+# Commond prefix for machine-independent installed files.
+prefix = @prefix@
+
+# Commond prefix for machine-dependent installed files.
+exec_prefix = @exec_prefix@
+
+# system configuration directory.
+sysconfdir = @sysconfdir@
+
+# cgi-bin install directory.
+cgibin = @CGIBIN@
+
+# Ultrix 2.2 make doesn't expand the value of VPATH.
+VPATH = /usr/lib:/usr/local/lib
+
+# source directory where this Makefile is placed.
+srcdir = @srcdir@
+
+# Absolute top srcdir
+abssrcdir = @ABSSRCDIR@
+
+# Directory in which to install.
+sbindir = @sbindir@
+
+# Directory for pid files.
+piddir = @PIDDIR@
+
+# Manual extension
+manext = 8
+
+# Manual directory
+mandir=@mandir@
+
+
+# Compilation macros.
+CC = @CC@
+CXX = @CXX@
+DEFS = @EXTRADEFS@ $(LOCALDEFS)
+CPPFLAGS = @CPPFLAGS@
+
+# Libraries
+APCLIBS = $(topdir)/src/lib/libapc.a
+DRVLIBS = $(topdir)/src/drivers/libdrivers.a
+win32 = $(topdir)/src/win32/winmain.o $(topdir)/src/win32/winlib.a $(topdir)/src/win32/winres.res
+INTLLIBS = @INTLLIBS@
+WINAPC = $(@WIN32@)
+# Hack or die: seems that cygwin doesnn't like -lgdi32 and -luser32 in deps.
+WINLIBS = @WINLIBS@
+
+
+# Made INCFLAGS relative to the topdir and hardcoded into the Makefiles
+# For GDINCLUDE see src/cgi/Makefile.in
+INCFLAGS = $(GDINCLUDE) -I$(topdir)/include $(EXTRAINCS)
+CFLAGS = @CFLAGS@ $(CPPFLAGS) @PTHREAD_CFLAGS@ $(INCFLAGS)
+LDFLAGS = @LDFLAGS@
+LIBS = $(DRVLIBS) $(APCLIBS) $(INTLLIBS) @PTHREAD_LFLAGS@ @LIBS@
+
+# Flags for windows programs
+WLDFLAGS = @WLDFLAGS@

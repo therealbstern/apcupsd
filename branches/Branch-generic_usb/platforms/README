@@ -1,0 +1,14 @@
+Setting up an apcupsd installation
+==================================
+
+First of all look at sample-apcupsd. This is a sample script for apcupsd
+start/stop at boot time. This need to be present and links need to be done
+into /etc/rc.d/... for automatic startup/shutdown of the daemon.
+Then look into SuSE/ directory: it is the most up to date installation
+routines.
+Then try to mimic the behaviour of SuSE installation with your routines.
+Keep in mind that while shutting down, the UPS will be powered off so you must
+be sure that at UPS poweroff all the filesystems are umounted or, at least,
+remounted read-only!
+
+-RF
