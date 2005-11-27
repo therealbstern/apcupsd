@@ -39,7 +39,7 @@ int apcsmart_ups_open(UPSINFO *ups)
       my_data = (SMART_DATA *) malloc(sizeof(SMART_DATA));
       if (my_data == NULL) {
          log_event(ups, LOG_ERR, "Out of memory.");
-	 exit(1);
+         exit(1);
       }
 
       memset(my_data, 0, sizeof(SMART_DATA));
@@ -68,16 +68,16 @@ int apcsmart_ups_open(UPSINFO *ups)
    tcgetattr(ups->fd, &my_data->oldtio);
 
    my_data->newtio.c_cflag = DEFAULT_SPEED | CS8 | CLOCAL | CREAD;
-   my_data->newtio.c_iflag = IGNPAR;	/* Ignore errors, raw input */
-   my_data->newtio.c_oflag = 0; 	/* Raw output */
-   my_data->newtio.c_lflag = 0; 	/* No local echo */
+   my_data->newtio.c_iflag = IGNPAR;    /* Ignore errors, raw input */
+   my_data->newtio.c_oflag = 0;         /* Raw output */
+   my_data->newtio.c_lflag = 0;         /* No local echo */
 
 #if defined(HAVE_OPENBSD_OS) || \
     defined(HAVE_FREEBSD_OS) || \
     defined(HAVE_NETBSD_OS)
-   my_data->newtio.c_ispeed = DEFAULT_SPEED;	/* Set input speed */
-   my_data->newtio.c_ospeed = DEFAULT_SPEED;	/* Set output speed */
-#endif	 /* __openbsd__ || __freebsd__ || __netbsd__  */
+   my_data->newtio.c_ispeed = DEFAULT_SPEED;    /* Set input speed */
+   my_data->newtio.c_ospeed = DEFAULT_SPEED;    /* Set output speed */
+#endif   /* __openbsd__ || __freebsd__ || __netbsd__  */
 
    /* This makes a non.blocking read() with TIMER_READ (10) sec. timeout */
    my_data->newtio.c_cc[VMIN] = 0;
@@ -87,7 +87,7 @@ int apcsmart_ups_open(UPSINFO *ups)
     defined(HAVE_LINUX_OS) || defined(HAVE_DARWIN_OS)
    (void)cfsetospeed(&my_data->newtio, DEFAULT_SPEED);
    (void)cfsetispeed(&my_data->newtio, DEFAULT_SPEED);
-#endif	/* do it the POSIX way */
+#endif  /* do it the POSIX way */
 
    tcflush(ups->fd, TCIFLUSH);
    tcsetattr(ups->fd, TCSANOW, &my_data->newtio);
@@ -130,7 +130,7 @@ int apcsmart_ups_setup(UPSINFO *ups)
    char a = 'Y';
 
    if (ups->fd == -1)
-      return 1; 		   /* we must be a slave */
+      return 1;                    /* we must be a slave */
 
    /*
     * The following enables communcations with the
@@ -148,8 +148,8 @@ int apcsmart_ups_setup(UPSINFO *ups)
       break;
    }
 
-   write(ups->fd, &a, 1);	   /* This one might not work, if UPS is */
-   sleep(1);			   /* in an unstable communication state */
+   write(ups->fd, &a, 1);          /* This one might not work, if UPS is */
+   sleep(1);                       /* in an unstable communication state */
    tcflush(ups->fd, TCIOFLUSH);    /* Discard UPS's response, if any */
 
    /*
@@ -162,10 +162,10 @@ int apcsmart_ups_setup(UPSINFO *ups)
       char answer[10];
 
       *answer = 0;
-      write(ups->fd, &a, 1);	   /* enter smart mode */
+      write(ups->fd, &a, 1);       /* enter smart mode */
       getline(answer, sizeof(answer), ups);
       if (strcmp("SM", answer) == 0)
-	 goto out;
+         goto out;
       sleep(1);
    }
    Error_abort0(
