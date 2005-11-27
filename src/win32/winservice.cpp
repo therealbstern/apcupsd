@@ -406,6 +406,8 @@ upsService::InstallService()
            RegCloseKey(runservices);
 
            // We have successfully installed the service!
+// Turn off so we don't annoy the user
+#ifdef xxx_needed
            MessageBox(NULL,
                    "The Apcupsd service was successfully installed.\n"
                    "The service may be started by double clicking on the\n"
@@ -413,6 +415,7 @@ upsService::InstallService()
                    "be run the next time this machine is rebooted. ",
                    szAppName,
                    MB_ICONINFORMATION | MB_OK);
+#endif
            break;
 
         // Windows NT
@@ -490,11 +493,6 @@ upsService::InstallService()
                    "The Apcupsd service was successfully installed.\n"
                    "The service may be started from the Control Panel and will\n"
                    "automatically be run the next time this machine is rebooted.",
-                   szAppName,
-                   MB_ICONINFORMATION | MB_OK);
-
-           MessageBox(NULL,
-                   servicecmd,
                    szAppName,
                    MB_ICONINFORMATION | MB_OK);
 
