@@ -11,7 +11,7 @@
 !define PRODUCT "Apcupsd"
 !define VERSION "@VERSION@"
 
-;                           
+;			    
 ; Include the Modern UI
 ;
 !include "MUI.nsh"
