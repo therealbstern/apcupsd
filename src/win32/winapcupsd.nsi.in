@@ -48,7 +48,7 @@
 
 
 
-DirText "Setup will install the Apcupsd ${VERSION} to the directory specified below. To install in a different folder, click Browse and select another folder.$\n$\nNote to CYGWIN users: please choose your CYGWIN root directory."
+DirText "Setup will install the Apcupsd ${VERSION} to the directory specified below. To install in a different folder, click Browse and select another folder.$\n$\nNote to CYGWIN users: please use a UNIQUE folder name in your CYGWIN root directory."
 
 
 Section "Apcupsd Service" SecService
@@ -211,7 +211,7 @@ UninstallText "This will uninstall Apcupsd. Hit next to continue."
 
 Section "Uninstall"
 
-  ; Shutdown any baculum that could be running
+  ; Shutdown any apcupsd that could be running
   ExecWait '"$INSTDIR\bin\apcupsd.exe" /kill'
 
   ReadRegDWORD $9 HKLM "Software\Apcupsd" "InstalledService"
@@ -232,12 +232,13 @@ Section "Uninstall"
   CopyFiles /SILENT "$INSTDIR\etc\apcupsd\apcupsd.conf" "$INSTDIR\apcupsd.conf"
   Delete /REBOOTOK "$INSTDIR\bin\*.*"
   Delete /REBOOTOK "$INSTDIR\exe\apcupsd\*.*"
-  Delete /REBOOTOK "$INSTDIR\doc\*.*"
+  Delete /REBOOTOK "$INSTDIR\doc\manual.html"
+  Delete /REBOOTOK "$INSTDIR\doc\*.png"      
   Delete /REBOOTOK "$INSTDIR\examples\*" 
-  Delete /REBOOTOK "$INSTDIR\examples\*.*"
   CopyFiles /SILENT "$INSTDIR\apcupsd.conf" "$INSTDIR\etc\apcupsd\apcupsd.conf"
-  Delete /REBOOTOK "$INSTDIR\*.*"
-  Delete /REBOOTOK "$INSTDIR\*"
+  Delete /REBOOTOK "$INSTDIR\README.txt
+  Delete /REBOOTOK "$INSTDIR\COPYING
+  Delete /REBOOTOK "$INSTDIR\ChangeLog
 
   ; Check for existing installation
   MessageBox MB_YESNO|MB_ICONQUESTION "Would you like to delete the current configuration files and the working state file?" IDNO LeaveConfig
