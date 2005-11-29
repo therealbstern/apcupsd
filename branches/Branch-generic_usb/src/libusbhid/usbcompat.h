@@ -9,6 +9,7 @@
 #define _USBCOMPAT_H
 
 #include <stdint.h>
+#include <sys/types.h>
 
 /* From /usr/include/dev/usb/usb.h */
 
