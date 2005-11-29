@@ -8,7 +8,7 @@
 #ifndef _USBCOMPAT_H
 #define _USBCOMPAT_H
 
-#include <sys/types.h>
+#include <stdint.h>
 
 /* From /usr/include/dev/usb/usb.h */
 
