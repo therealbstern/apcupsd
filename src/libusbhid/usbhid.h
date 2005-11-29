@@ -29,8 +29,6 @@
  *
  */
 
-#include "usbcompat.h"
-
 typedef struct report_desc *report_desc_t;
 
 typedef struct hid_data *hid_data_t;
