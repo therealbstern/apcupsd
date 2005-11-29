@@ -726,36 +726,64 @@ AC_HELP_STRING([--disable-dumb], [No dumb UPS driver])],
 	AC_SUBST(DUMB_DRIVER)
 	])
 
+# Allow user to force USB type to generic
+GENERICUSB="no"
+AC_ARG_WITH(generic-usb,
+    [AC_HELP_STRING([--with-generic-usb], [Force use of generic USB driver])],
+    [
+	GENERICUSB="yes"
+    ]
+)
 
 AC_ARG_ENABLE(usb, [
 AC_HELP_STRING([--enable-usb], [Compile USB UPS code])
 AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
 	[ if test "$enableval" = "yes" ; then
-	if test $HAVE_UNAME=yes -a x`uname -s` = xLinux ; then
-		AC_DEFINE(HAVE_USB_DRIVER)
-		USB_DRIVER="usb"
-		USB_TYPE="linux"
-		AC_SUBST(USB_DRIVER)
-		AC_SUBST(USB_TYPE)
-	elif test $HAVE_UNAME=yes -a x`uname -s` = xFreeBSD -o \
+	if test $GENERICUSB == "no" -a \
+	        $HAVE_UNAME=yes -a x`uname -s` = xLinux ; then
+	   USB_TYPE="linux"
+	   AC_MSG_RESULT([Using Linux USB driver.])
+	elif test $GENERICUSB == "no" -a \
+	          $HAVE_UNAME=yes -a x`uname -s` = xFreeBSD -o \
 		  $HAVE_UNAME=yes -a x`uname -s` = xOpenBSD -o \
 		  $HAVE_UNAME=yes -a x`uname -s` = xNetBSD ; then
-		AC_DEFINE(HAVE_USB_DRIVER)
-		USB_DRIVER="usb"
-		USB_TYPE="bsd"
-		LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
-		LIBUSBHID=libusbhid
-		LIBUSBHIDOBJS="\$(topdir)/src/libusbhid/*.o"
-		AC_SUBST(USB_DRIVER)
-		AC_SUBST(USB_TYPE)
-		AC_SUBST(LIBUSBHID)
-		AC_SUBST(LIBUSBHIDINC)
-		AC_SUBST(LIBUSBHIDOBJS)
+
+	   LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
+	   LIBUSBHID=libusbhid
+	   LIBUSBHIDOBJS="\$(topdir)/src/libusbhid/*.o"
+	   AC_SUBST(LIBUSBHID)
+	   AC_SUBST(LIBUSBHIDINC)
+	   AC_SUBST(LIBUSBHIDOBJS)
+
+	   USB_TYPE="bsd"
+	   AC_MSG_RESULT([Using BSD USB driver.])
 	else
-		AC_MSG_ERROR([Can't build USB driver on this OS ($host_os).])
+	   AC_CHECK_LIB(usb, usb_open, [],
+	                [AC_MSG_ERROR([Cannot find libusb.])], [])
+
+	   LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
+	   LIBUSBHID=libusbhid
+	   LIBUSBHIDOBJS="\$(topdir)/src/libusbhid/*.o"
+	   AC_SUBST(LIBUSBHID)
+	   AC_SUBST(LIBUSBHIDINC)
+	   AC_SUBST(LIBUSBHIDOBJS)
+
+	   LIBUSB="-lusb"
+
+	   USB_TYPE="generic"
+	   AC_MSG_RESULT([Using generic libusb USB driver.])
 	fi
+
+	AC_DEFINE(HAVE_USB_DRIVER)
+	USB_DRIVER="usb"
+	AC_SUBST(USB_DRIVER)
+	AC_SUBST(USB_TYPE)
+
+	DISPLAY_USB_DRIVER=$USB_TYPE-$USB_DRIVER
+
 	fi],
     [])
+AC_SUBST(LIBUSB)
 
 AC_ARG_ENABLE(net, [
 AC_HELP_STRING([--enable-net], [Compile new networking driver for slaves])
@@ -1708,7 +1736,7 @@ Configuration on `date`:
   UPSTYPE		      ${UPSTYPE}
   UPSCABLE		      ${UPSCABLE}
 
-  drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${USB_DRIVER:-no-usb} ${DISPLAY_SNMP_DRIVER:-no-snmp} ${TEST_DRIVER:-no-test}
+  drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${DISPLAY_USB_DRIVER:-no-usb} ${DISPLAY_SNMP_DRIVER:-no-snmp} ${TEST_DRIVER:-no-test}
 
   enable-master-slave:	      ${OLDNET_ENABLED}
   enable-nis:		      ${NISSRV_ENABLED}
