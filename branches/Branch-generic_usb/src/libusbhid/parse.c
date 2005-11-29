@@ -26,18 +26,14 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
-
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
 
-#include <dev/usb/usb.h>
-#include <dev/usb/usbhid.h>
-
 #include "usbhid.h"
 #include "usbvar.h"
+#include "usbcompat.h"
 
 #define MAXUSAGE 100
 struct hid_data {
