@@ -26,8 +26,6 @@
  * SUCH DAMAGE.
  */
 
-#include <sys/cdefs.h>
-
 #include <sys/types.h>
 
 #include <assert.h>
@@ -38,22 +36,8 @@
 #include <sys/time.h>
 #include <sys/ioctl.h>
 
-#include <dev/usb/usb.h>
-
 #include "usbhid.h"
 #include "usbvar.h"
-
-report_desc_t
-hid_get_report_desc(int fd)
-{
-	struct usb_ctl_report_desc rep;
-
-	rep.ucrd_size = 0;
-	if (ioctl(fd, USB_GET_REPORT_DESC, &rep) < 0)
-		return (NULL);
-
-	return hid_use_report_desc(rep.ucrd_data, (unsigned int)rep.ucrd_size);
-}
 
 report_desc_t
 hid_use_report_desc(unsigned char *data, unsigned int size)
