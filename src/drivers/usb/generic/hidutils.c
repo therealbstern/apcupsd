@@ -27,10 +27,14 @@
 #include "hidutils.h"
 
 /* This sucks. Need something better here. */
-#ifdef HAVE_SUN_OS
-# include "/usr/sfw/include/usb.h"  /* libusb */
+#if defined HAVE_SUN_OS
+# include "/usr/sfw/include/usb.h"     /* libusb */
+#elif defined HAVE_LINUX_OS
+# include "/usr/include/usb.h"
+#elif defined HAVE_DARWIN_OS
+# include "/opt/local/include/usb.h"
 #else
-# include "/usr/include/usb.h"      /* libusb */
+# include "/usr/local/include/usb.h"
 #endif
 
 #define MAX_SANE_DESCRIPTOR_LEN 4096
