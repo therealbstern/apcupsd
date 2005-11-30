@@ -10462,6 +10462,10 @@ fi
 
 	   LIBUSB="-lusb"
 
+                      if test $HAVE_UNAME=yes -a x`uname -s` = xDarwin ; then
+               LIBUSB="$LIBUSB -Wl,-framework -Wl,IOKit -Wl,-framework -Wl,CoreFoundation"
+           fi
+
 	   USB_TYPE="generic"
 	   echo "$as_me:$LINENO: result: Using generic libusb USB driver." >&5
 echo "${ECHO_T}Using generic libusb USB driver." >&6
