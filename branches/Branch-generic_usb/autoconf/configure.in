@@ -758,8 +758,8 @@ AC_DEFUN(AC_LIB_SEARCH,
             AC_MSG_ERROR([Cannot find lib$lib.])
         fi
 
-        LIBS=${_libs}
         AC_CHECK_LIB($lib, $func, [], [AC_MSG_ERROR([Cannot find lib$lib.])], [])
+        LIBS=${_libs}
     ])
 
 # Allow user to force USB type to generic

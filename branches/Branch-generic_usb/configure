@@ -10371,7 +10371,6 @@ echo "$as_me: error: Cannot find lib$lib." >&2;}
    { (exit 1); exit 1; }; }
         fi
 
-        LIBS=${_libs}
 
 as_ac_Lib=`echo "ac_cv_lib_$lib''_$func" | $as_tr_sh`
 echo "$as_me:$LINENO: checking for $func in -l$lib" >&5
@@ -10451,6 +10450,7 @@ echo "$as_me: error: Cannot find lib$lib." >&2;}
    { (exit 1); exit 1; }; }
 fi
 
+        LIBS=${_libs}
 
 
 	   LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
