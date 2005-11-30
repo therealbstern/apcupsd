@@ -805,6 +805,11 @@ AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
 
 	   LIBUSB="-lusb"
 
+           dnl Darwin needs some frameworks linked in
+           if test $HAVE_UNAME=yes -a x`uname -s` = xDarwin ; then
+               LIBUSB="$LIBUSB -Wl,-framework -Wl,IOKit -Wl,-framework -Wl,CoreFoundation"
+           fi
+
 	   USB_TYPE="generic"
 	   AC_MSG_RESULT([Using generic libusb USB driver.])
 	fi
