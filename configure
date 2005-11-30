@@ -10192,6 +10192,8 @@ _ACEOF
 
 fi;
 
+
+
 # Allow user to force USB type to generic
 GENERICUSB="no"
 
@@ -10230,14 +10232,18 @@ echo "${ECHO_T}Using Linux USB driver." >&6
 echo "${ECHO_T}Using BSD USB driver." >&6
 	else
 
-echo "$as_me:$LINENO: checking for usb_open in -lusb" >&5
-echo $ECHO_N "checking for usb_open in -lusb... $ECHO_C" >&6
-if test "${ac_cv_lib_usb_usb_open+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lusb  $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
+        lib="usb"
+        func="usb_open"
+        opts="/usr/local/lib /opt/local/lib"
+
+        found="no"
+
+        _libs=${LIBS}
+        LIBS="${LIBS} -l$lib"
+
+        echo "$as_me:$LINENO: checking for lib$lib in <default>" >&5
+echo $ECHO_N "checking for lib$lib in <default>... $ECHO_C" >&6
+        cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
 cat confdefs.h >>conftest.$ac_ext
@@ -10250,11 +10256,11 @@ extern "C"
 #endif
 /* We use char because int might match the return type of a gcc2
    builtin and then its argument prototype would still apply.  */
-char usb_open ();
+char $func ();
 int
 main ()
 {
-usb_open ();
+$func ();
   ;
   return 0;
 }
@@ -10281,31 +10287,170 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  ac_cv_lib_usb_usb_open=yes
+  found="yes"; echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-ac_cv_lib_usb_usb_open=no
+echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+
+        if test "$found" = "no" ; then
+            _ldflags=${LDFLAGS}
+
+            for opt in $opts ; do
+                echo "$as_me:$LINENO: checking for lib$lib in $opt" >&5
+echo $ECHO_N "checking for lib$lib in $opt... $ECHO_C" >&6
+                LDFLAGS="${LDFLAGS} -L$opt"
+                cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char $func ();
+int
+main ()
+{
+$func ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  found="yes"; echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6; break
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+                LDFLAGS=${_ldflags}
+            done
+        fi
+
+        if test "$found" = "no" ; then
+            { { echo "$as_me:$LINENO: error: Cannot find lib$lib." >&5
+echo "$as_me: error: Cannot find lib$lib." >&2;}
+   { (exit 1); exit 1; }; }
+        fi
+
+        LIBS=${_libs}
+
+as_ac_Lib=`echo "ac_cv_lib_$lib''_$func" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $func in -l$lib" >&5
+echo $ECHO_N "checking for $func in -l$lib... $ECHO_C" >&6
+if eval "test \"\${$as_ac_Lib+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-l$lib  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char $func ();
+int
+main ()
+{
+$func ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  eval "$as_ac_Lib=yes"
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+eval "$as_ac_Lib=no"
 fi
 rm -f conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
 LIBS=$ac_check_lib_save_LIBS
 fi
-echo "$as_me:$LINENO: result: $ac_cv_lib_usb_usb_open" >&5
-echo "${ECHO_T}$ac_cv_lib_usb_usb_open" >&6
-if test $ac_cv_lib_usb_usb_open = yes; then
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_Lib'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_Lib'}'`" >&6
+if test `eval echo '${'$as_ac_Lib'}'` = yes; then
   cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBUSB 1
+#define `echo "HAVE_LIB$lib" | $as_tr_cpp` 1
 _ACEOF
 
-  LIBS="-lusb $LIBS"
+  LIBS="-l$lib $LIBS"
 
 else
-  { { echo "$as_me:$LINENO: error: Cannot find libusb." >&5
-echo "$as_me: error: Cannot find libusb." >&2;}
+  { { echo "$as_me:$LINENO: error: Cannot find lib$lib." >&5
+echo "$as_me: error: Cannot find lib$lib." >&2;}
    { (exit 1); exit 1; }; }
 fi
+
 
 
 	   LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"

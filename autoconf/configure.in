@@ -726,6 +726,42 @@ AC_HELP_STRING([--disable-dumb], [No dumb UPS driver])],
 	AC_SUBST(DUMB_DRIVER)
 	])
 
+dnl
+dnl Search for lib ($1) containing func ($2) in default path plus paths listed in opts ($3)
+dnl
+AC_DEFUN(AC_LIB_SEARCH,
+    [
+        lib="$1"
+        func="$2"
+        opts="$3"
+
+        found="no"
+
+        _libs=${LIBS}
+        LIBS="${LIBS} -l$lib"
+
+        AC_MSG_CHECKING([for lib$lib in <default>])
+        AC_LINK_IFELSE([AC_LANG_CALL([], [$func])], [found="yes"; AC_MSG_RESULT([yes])], [AC_MSG_RESULT([no])])
+
+        if test "$found" = "no" ; then
+            _ldflags=${LDFLAGS}
+
+            for opt in $opts ; do
+                AC_MSG_CHECKING([for lib$lib in $opt])
+                LDFLAGS="${LDFLAGS} -L$opt"
+                AC_LINK_IFELSE([AC_LANG_CALL([], [$func])], [found="yes"; AC_MSG_RESULT([yes]); break], [AC_MSG_RESULT([no])])
+                LDFLAGS=${_ldflags}
+            done
+        fi
+
+        if test "$found" = "no" ; then
+            AC_MSG_ERROR([Cannot find lib$lib.])
+        fi
+
+        LIBS=${_libs}
+        AC_CHECK_LIB($lib, $func, [], [AC_MSG_ERROR([Cannot find lib$lib.])], [])
+    ])
+
 # Allow user to force USB type to generic
 GENERICUSB="no"
 AC_ARG_WITH(generic-usb,
@@ -758,8 +794,7 @@ AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
 	   USB_TYPE="bsd"
 	   AC_MSG_RESULT([Using BSD USB driver.])
 	else
-	   AC_CHECK_LIB(usb, usb_open, [],
-	                [AC_MSG_ERROR([Cannot find libusb.])], [])
+	   AC_LIB_SEARCH(usb, usb_open, [/usr/local/lib /opt/local/lib])
 
 	   LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
 	   LIBUSBHID=libusbhid
