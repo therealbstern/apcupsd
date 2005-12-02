@@ -402,6 +402,6 @@ const char *hidu_get_string(usb_dev_handle *fd, int index)
       return NULL;
    }
 
-   Dmsg1(200, "Got string of length=rc\n", rc);
+   Dmsg1(200, "Got string of length=%d\n", rc);
    return string;
 }
