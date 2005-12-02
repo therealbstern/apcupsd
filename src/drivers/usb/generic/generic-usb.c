@@ -122,7 +122,8 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
             memcpy(&info->item, &item, sizeof(item));
             info->report_len = hid_report_size( /* +1 for report id */
                my_data->rdesc, item.kind, item.report_ID) + 1;
-            Dmsg3(200, "Got ci=%d, usage=0x%x (len=%d)\n", ci,
+            Dmsg5(200, "Got ci=%d, rpt=%d (len=%d), usage=0x%x (len=%d)\n",
+               ci, item.report_ID, info->report_len,
                known_info[i].usage_code, item.report_size);
          }
       }
