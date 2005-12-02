@@ -279,105 +279,6 @@ int pusb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
    return populate_uval(ups, info, data, uval);
 }
 
-/* 
- * Called if there is an ioctl() or read() error, we close() and
- * re open() the port since the device was probably unplugged.
- */
-static int usb_link_check(UPSINFO *ups)
-{
-   return 0;
-}
-
-int pusb_ups_check_state(UPSINFO *ups)
-{
-   int i, ci;
-   int retval, value;
-   unsigned char buf[20];
-   USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
-   struct timeval now, exit;
-   int timeout;
-   USB_VALUE uval;
-   bool done = false;
-
-   /* Figure out when we need to exit by */
-   gettimeofday(&exit, NULL);
-   exit.tv_sec += ups->wait_time;
-
-   while (!done) {
-
-      /* Figure out how long until we have to exit */
-      gettimeofday(&now, NULL);
-      timeout = TV_DIFF_MS(now, exit);
-      if (timeout <= 0) {
-         /* Done already? How time flies... */
-         Dmsg0(1, "Done already\n");
-         return 0;
-      }
-
-      retval = usb_interrupt_read(my_data->fd, 1, (char*)buf, sizeof(buf), timeout);
-
-      if (retval == 0) {
-         /* No chars available in TIMER seconds. */
-         Dmsg0(1, "Happy timeout\n");
-         return 0;
-      } else if (retval == -EINTR || retval == -EAGAIN) {
-         /* assume SIGCHLD */
-         continue;
-      } else if (retval < 0) {
-         /* Hard error */
-         Dmsg0(1, "Error\n");
-         Dmsg2(200, "usb_interrupt_read error: (%d) %s\n", retval, strerror(-retval));
-         usb_link_check(ups);      /* link is down, wait */
-         return 0;
-      }
-
-      if (debug_level >= 300) {
-         printf("Interrupt data: ");
-         for (i = 0; i < retval; i++)
-            printf("%02x, ", buf[i]);
-         printf("\n");
-      }
-
-      write_lock(ups);
-
-      /*
-       * Iterate over all CIs, firing off events for any that are
-       * affected by this report.
-       */
-      for (ci=0; ci<CI_MAXCI; ci++) {
-         if (ups->UPS_Cap[ci] && my_data->info[ci] &&
-             my_data->info[ci]->item.report_ID == buf[0]) {
-
-            /* Ignore this event if the value has not changed */
-            value = hid_get_data(buf+1, &my_data->info[ci]->item);
-            if (my_data->info[ci]->value == value) {
-               Dmsg3(200, "Ignoring unchanged value (ci=%d, rpt=%d, val=%d)\n",
-                  ci, buf[0], value);
-               continue;
-            }
-
-            Dmsg3(200, "Processing changed value (ci=%d, rpt=%d, val=%d)\n",
-               ci, buf[0], value);
-
-            /* Populate a uval and report it to the upper layer */
-            populate_uval(ups, my_data->info[ci], buf, &uval);
-            if (usb_report_event(ups, ci, &uval)) {
-               /*
-                * The upper layer considers this an important event,
-                * so we will return after processing any remaining
-                * CIs for this report.
-                */
-               done = true;
-            }
-         }
-      }
-
-      write_unlock(ups);
-   }
-   
-   return true;
-}
-
 static void reinitialize_private_structure(UPSINFO *ups)
 {
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
@@ -472,20 +373,17 @@ int open_usb_device(UPSINFO *ups)
    struct usb_bus* bus;
    struct usb_device* dev;
 
-   reinitialize_private_structure(ups);
-
-   /* Set libusb debug level */
-   usb_set_debug(debug_level/100);
-
+   /* Initialize libusb */
    Dmsg0(200, "Initializing libusb\n");
    usb_init();
 
+   /* Enumerate usb busses and devices */
    i = usb_find_busses();
    Dmsg1(200, "Found %d USB busses\n", i);
-
    i = usb_find_devices();
    Dmsg1(200, "Found %d USB devices\n", i);
 
+   /* Iterate over all devices, checking for idVendor=APC */
    bus = usb_get_busses();
    while (bus)
    {
@@ -499,6 +397,7 @@ int open_usb_device(UPSINFO *ups)
          if (dev->descriptor.idVendor == VENDOR_APC) {
             Dmsg2(200, "Trying device %s:%s\n", bus->dirname, dev->filename);
             if (init_device(ups, dev)) {
+               /* Successfully found and initialized an UPS */
                astrncpy(ups->device, bus->dirname, sizeof(ups->device));
                astrncat(ups->device, ":", sizeof(ups->device));
                astrncat(ups->device, dev->filename, sizeof(ups->device));
@@ -512,8 +411,160 @@ int open_usb_device(UPSINFO *ups)
       bus = bus->next;
    }
 
+   /* Failed to find an UPS */
    ups->device[0] = 0;
    return 0;
+}
+
+/* 
+ * Called if there is an ioctl() or read() error, we close() and
+ * re open() the port since the device was probably unplugged.
+ */
+static int usb_link_check(UPSINFO *ups)
+{
+   bool comm_err = true;
+   int tlog;
+   bool once = true;
+   USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
+   static bool linkcheck = false;
+
+   if (linkcheck)
+      return 0;
+
+   linkcheck = true;               /* prevent recursion */
+
+   ups->set_commlost();
+   Dmsg0(200, "link_check comm lost\n");
+
+   /* Don't warn until we try to get it at least 2 times and fail */
+   for (tlog = LINK_RETRY_INTERVAL * 2; comm_err; tlog -= (LINK_RETRY_INTERVAL)) {
+
+      if (tlog <= 0) {
+         tlog = 10 * 60;           /* notify every 10 minutes */
+         log_event(ups, event_msg[CMDCOMMFAILURE].level,
+                   event_msg[CMDCOMMFAILURE].msg);
+         if (once) {               /* execute script once */
+            execute_command(ups, ups_event[CMDCOMMFAILURE]);
+            once = false;
+         }
+      }
+
+      /* Retry every LINK_RETRY_INTERVAL seconds */
+      sleep(LINK_RETRY_INTERVAL);
+
+      if (my_data->fd) {
+         usb_close(my_data->fd);
+         my_data->fd = NULL;
+         hid_dispose_report_desc(my_data->rdesc);
+         reinitialize_private_structure(ups);
+      }
+
+      if (open_usb_device(ups) && usb_ups_get_capabilities(ups) &&
+         usb_ups_read_static_data(ups)) {
+         comm_err = false;
+      } else {
+         continue;
+      }
+   }
+
+   if (!comm_err) {
+      generate_event(ups, CMDCOMMOK);
+      ups->clear_commlost();
+      Dmsg0(200, "link check comm OK.\n");
+   }
+
+   linkcheck = false;
+   return 1;
+}
+
+int pusb_ups_check_state(UPSINFO *ups)
+{
+   int i, ci;
+   int retval, value;
+   unsigned char buf[20];
+   USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
+   struct timeval now, exit;
+   int timeout;
+   USB_VALUE uval;
+   bool done = false;
+
+   /* Figure out when we need to exit by */
+   gettimeofday(&exit, NULL);
+   exit.tv_sec += ups->wait_time;
+
+   while (!done) {
+
+      /* Figure out how long until we have to exit */
+      gettimeofday(&now, NULL);
+      timeout = TV_DIFF_MS(now, exit);
+      if (timeout <= 0) {
+         /* Done already? How time flies... */
+         Dmsg0(1, "Done already\n");
+         return 0;
+      }
+
+      retval = usb_interrupt_read(my_data->fd, 1, (char*)buf, sizeof(buf), timeout);
+
+      if (retval == 0) {
+         /* No chars available in TIMER seconds. */
+         Dmsg0(1, "Happy timeout\n");
+         return 0;
+      } else if (retval == -EINTR || retval == -EAGAIN) {
+         /* assume SIGCHLD */
+         continue;
+      } else if (retval < 0) {
+         /* Hard error */
+         Dmsg0(1, "Error\n");
+         Dmsg2(200, "usb_interrupt_read error: (%d) %s\n", retval, strerror(-retval));
+         usb_link_check(ups);      /* link is down, wait */
+         return 0;
+      }
+
+      if (debug_level >= 300) {
+         printf("Interrupt data: ");
+         for (i = 0; i < retval; i++)
+            printf("%02x, ", buf[i]);
+         printf("\n");
+      }
+
+      write_lock(ups);
+
+      /*
+       * Iterate over all CIs, firing off events for any that are
+       * affected by this report.
+       */
+      for (ci=0; ci<CI_MAXCI; ci++) {
+         if (ups->UPS_Cap[ci] && my_data->info[ci] &&
+             my_data->info[ci]->item.report_ID == buf[0]) {
+
+            /* Ignore this event if the value has not changed */
+            value = hid_get_data(buf+1, &my_data->info[ci]->item);
+            if (my_data->info[ci]->value == value) {
+               Dmsg3(200, "Ignoring unchanged value (ci=%d, rpt=%d, val=%d)\n",
+                  ci, buf[0], value);
+               continue;
+            }
+
+            Dmsg3(200, "Processing changed value (ci=%d, rpt=%d, val=%d)\n",
+               ci, buf[0], value);
+
+            /* Populate a uval and report it to the upper layer */
+            populate_uval(ups, my_data->info[ci], buf, &uval);
+            if (usb_report_event(ups, ci, &uval)) {
+               /*
+                * The upper layer considers this an important event,
+                * so we will return after processing any remaining
+                * CIs for this report.
+                */
+               done = true;
+            }
+         }
+      }
+
+      write_unlock(ups);
+   }
+   
+   return true;
 }
 
 /*
@@ -525,6 +576,9 @@ int open_usb_device(UPSINFO *ups)
 int pusb_ups_open(UPSINFO *ups)
 {
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
+
+   /* Set libusb debug level */
+   usb_set_debug(debug_level/100);
 
    write_lock(ups);
    if (my_data == NULL) {
@@ -546,15 +600,18 @@ int pusb_ups_open(UPSINFO *ups)
 
    if (!open_usb_device(ups)) {
       write_unlock(ups);
-      if (ups->device[0]) {
-         Error_abort1(_("Cannot open UPS device: \"%s\" --\n"
-               "For a link to detailed USB trouble shooting information,\n"
-               "please see <http://www.apcupsd.com/support.html>.\n"), ups->device);
-      } else {
-         Error_abort0(_("Cannot find UPS device --\n"
-               "For a link to detailed USB trouble shooting information,\n"
-               "please see <http://www.apcupsd.com/support.html>.\n"));
-      }
+      Error_abort0(_("Cannot find UPS device --\n"
+            "For a link to detailed USB trouble shooting information,\n"
+            "please see <http://www.apcupsd.com/support.html>.\n"));
+
+      /*
+       * Note, we set ups->fd here so the "core" of apcupsd doesn't
+       * think we are a slave, which is what happens when it is -1.
+       * (ADK: Actually this only appears to be true for apctest as
+       * apcupsd proper uses the UPS_slave flag.)
+       * Internally, we use the fd in our own private space   
+       */
+      ups->fd = 1;
    }
 
    ups->clear_slave();
