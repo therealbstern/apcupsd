@@ -239,7 +239,7 @@ int hidu_locate_item(report_desc_t rdesc, int usage, int app, int phys,
             PUSH_COLLECTION(app, item.usage);
       }
 
-      if (usage != -1 && usage != item.usage)
+      if (usage != -1 && (unsigned int)usage != item.usage)
          goto next;
       if (app != -1 && app != TOP_COLLECTION(app))
          goto next;
