@@ -403,7 +403,7 @@ int init_device(UPSINFO *ups, struct usb_device *dev)
    int rc;
    unsigned char* rdesc;
    int rdesclen;
-   
+
    /* Open the device with libusb */
    fd = usb_open(dev);
    if (!fd) {
@@ -424,7 +424,7 @@ int init_device(UPSINFO *ups, struct usb_device *dev)
    rc = usb_claim_interface(fd, 0);
    if (rc) {
       usb_close(fd);
-      Dmsg1(100, "Unable to claim interface (%d).\n", rc);
+      Dmsg2(100, "Unable to claim interface (%d) %s.\n", rc, usb_strerror());
       return 0;
    }
 
@@ -472,6 +472,9 @@ int open_usb_device(UPSINFO *ups)
    struct usb_device* dev;
 
    reinitialize_private_structure(ups);
+
+   /* Set libusb debug level */
+   usb_set_debug(debug_level/100);
 
    Dmsg0(200, "Initializing libusb\n");
    usb_init();
