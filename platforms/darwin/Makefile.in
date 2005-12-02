@@ -14,7 +14,11 @@ top_builddir = $(topdir)
 
 all-targets: Makefile
 
-install:
+install: install-exec install-@USB_DRIVER@
+
+install-:
+
+install-exec:
 	@echo "Installing apcupsd startup script..."
 	mkdir -p /Library/StartupItems/apcupsd
 	$(INSTALL_SCRIPT) ./apcupsd /Library/StartupItems/apcupsd;
@@ -43,9 +47,35 @@ install:
 	fi
 	@echo "================================================="
 
+install-usb:
+	@echo "Installing ApcupsdDummy.kext driver..."
+	mkdir -p /System/Library/Extensions/ApcupsdDummy.kext/Contents
+	cp ./Info.plist /System/Library/Extensions/ApcupsdDummy.kext/Contents
+	chown root:wheel /System/Library/Extensions/ApcupsdDummy.kext
+	chown root:wheel /System/Library/Extensions/ApcupsdDummy.kext/Contents
+	chown root:wheel /System/Library/Extensions/ApcupsdDummy.kext/Contents/Info.plist
+	chmod 755 /System/Library/Extensions/ApcupsdDummy.kext
+	chmod 755 /System/Library/Extensions/ApcupsdDummy.kext/Contents
+	chmod 644 /System/Library/Extensions/ApcupsdDummy.kext/Contents/Info.plist
+	rm -f /System/Library/Extensions.mkext
+	rm -f /System/Library/Extensions.kextcache
+	@echo "================================================="
+	@echo " "
+	@echo "Driver installation complete." 
+	@echo "You must REBOOT before running apcupsd."
+	@echo " "
+	@echo "================================================="
 
 uninstall:
 	rm -rf /Library/StartupItems/apcupsd
+	rm -rf /System/Library/Extensions/ApcupsdDummy.kext
+	rm -f /System/Library/Extensions.mkext
+	rm -f /System/Library/Extensions.kextcache
+	@echo "================================================="
+	@echo " "
+	@echo "Please REBOOT to complete uninstall." 
+	@echo " "
+	@echo "================================================="
 
 clean:
 
