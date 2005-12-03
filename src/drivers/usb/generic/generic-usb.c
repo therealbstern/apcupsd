@@ -509,22 +509,20 @@ int pusb_ups_check_state(UPSINFO *ups)
       timeout = TV_DIFF_MS(now, exit);
       if (timeout <= 0) {
          /* Done already? How time flies... */
-         Dmsg0(1, "Done already\n");
          return 0;
       }
 
+      Dmsg1(200, "Timeout=%d\n", timeout);
       retval = usb_interrupt_read(my_data->fd, USB_ENDPOINT_IN|1, (char*)buf, sizeof(buf), timeout);
 
-      if (retval == 0) {
-         /* No chars available in TIMER seconds. */
-         Dmsg0(1, "Happy timeout\n");
+      if (retval == 0 || retval == -ETIMEDOUT) {
+         /* No events available in ups->wait_time seconds. */
          return 0;
       } else if (retval == -EINTR || retval == -EAGAIN) {
          /* assume SIGCHLD */
          continue;
       } else if (retval < 0) {
          /* Hard error */
-         Dmsg0(1, "Error\n");
          Dmsg2(200, "usb_interrupt_read error: (%d) %s\n", retval, strerror(-retval));
          usb_link_check(ups);      /* link is down, wait */
          return 0;
