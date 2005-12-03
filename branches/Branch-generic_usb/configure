@@ -10210,16 +10210,14 @@ fi;
 if test "${enable_usb+set}" = set; then
   enableval="$enable_usb"
    if test "$enableval" = "yes" ; then
-	if test $GENERICUSB == "no" -a \
+	if test $GENERICUSB = "no" -a \
 	        $HAVE_UNAME=yes -a x`uname -s` = xLinux ; then
 	   USB_TYPE="linux"
 	   echo "$as_me:$LINENO: result: Using Linux USB driver." >&5
 echo "${ECHO_T}Using Linux USB driver." >&6
-	elif test $GENERICUSB == "no" -a \
-	          $HAVE_UNAME=yes -a x`uname -s` = xFreeBSD -o \
-		  $HAVE_UNAME=yes -a x`uname -s` = xOpenBSD -o \
-		  $HAVE_UNAME=yes -a x`uname -s` = xNetBSD ; then
-
+	elif test $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xFreeBSD -o \
+		  $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xOpenBSD -o \
+		  $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xNetBSD ; then
 	   LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
 	   LIBUSBHID=libusbhid
 	   LIBUSBHIDOBJS="\$(topdir)/src/libusbhid/*.o"
@@ -10233,8 +10231,7 @@ echo "${ECHO_T}Using BSD USB driver." >&6
 	else
 
         lib="usb"
-        func="usb_open"
-        opts="/usr/local/lib /opt/local/lib"
+        func="usb_interrupt_read"
 
         found="no"
 
@@ -10302,7 +10299,7 @@ rm -f conftest.err conftest.$ac_objext \
         if test "$found" = "no" ; then
             _ldflags=${LDFLAGS}
 
-            for opt in $opts ; do
+            for opt in /usr/local/lib /opt/local/lib ; do
                 echo "$as_me:$LINENO: checking for lib$lib in $opt" >&5
 echo $ECHO_N "checking for lib$lib in $opt... $ECHO_C" >&6
                 LDFLAGS="${LDFLAGS} -L$opt"

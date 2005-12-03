@@ -733,7 +733,6 @@ AC_DEFUN(AC_LIB_SEARCH,
     [
         lib="$1"
         func="$2"
-        opts="$3"
 
         found="no"
 
@@ -746,7 +745,7 @@ AC_DEFUN(AC_LIB_SEARCH,
         if test "$found" = "no" ; then
             _ldflags=${LDFLAGS}
 
-            for opt in $opts ; do
+            for opt in $3 ; do
                 AC_MSG_CHECKING([for lib$lib in $opt])
                 LDFLAGS="${LDFLAGS} -L$opt"
                 AC_LINK_IFELSE([AC_LANG_CALL([], [$func])], [found="yes"; AC_MSG_RESULT([yes]); break], [AC_MSG_RESULT([no])])
@@ -775,15 +774,13 @@ AC_ARG_ENABLE(usb, [
 AC_HELP_STRING([--enable-usb], [Compile USB UPS code])
 AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
 	[ if test "$enableval" = "yes" ; then
-	if test $GENERICUSB == "no" -a \
+	if test $GENERICUSB = "no" -a \
 	        $HAVE_UNAME=yes -a x`uname -s` = xLinux ; then
 	   USB_TYPE="linux"
 	   AC_MSG_RESULT([Using Linux USB driver.])
-	elif test $GENERICUSB == "no" -a \
-	          $HAVE_UNAME=yes -a x`uname -s` = xFreeBSD -o \
-		  $HAVE_UNAME=yes -a x`uname -s` = xOpenBSD -o \
-		  $HAVE_UNAME=yes -a x`uname -s` = xNetBSD ; then
-
+	elif test $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xFreeBSD -o \
+		  $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xOpenBSD -o \
+		  $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xNetBSD ; then
 	   LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
 	   LIBUSBHID=libusbhid
 	   LIBUSBHIDOBJS="\$(topdir)/src/libusbhid/*.o"
@@ -794,7 +791,7 @@ AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
 	   USB_TYPE="bsd"
 	   AC_MSG_RESULT([Using BSD USB driver.])
 	else
-	   AC_LIB_SEARCH(usb, usb_open, [/usr/local/lib /opt/local/lib])
+	   AC_LIB_SEARCH(usb, usb_interrupt_read, [/usr/local/lib /opt/local/lib])
 
 	   LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
 	   LIBUSBHID=libusbhid
