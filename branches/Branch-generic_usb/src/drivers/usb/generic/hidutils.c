@@ -33,6 +33,8 @@
 # include "/usr/include/usb.h"
 #elif defined HAVE_DARWIN_OS
 # include "/opt/local/include/usb.h"
+#elif defined HAVE_CYGWIN
+# include "/cygdrive/c/Program Files/LibUSB-Win32/include/usb.h"
 #else
 # include "/usr/local/include/usb.h"
 #endif

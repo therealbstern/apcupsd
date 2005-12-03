@@ -33,6 +33,8 @@
 # include "/usr/include/usb.h"
 #elif defined HAVE_DARWIN_OS
 # include "/opt/local/include/usb.h"
+#elif defined HAVE_CYGWIN
+# include "/cygdrive/c/Program Files/LibUSB-Win32/include/usb.h"
 #else
 # include "/usr/local/include/usb.h"
 #endif
@@ -322,6 +324,14 @@ int init_device(UPSINFO *ups, struct usb_device *dev)
    Dmsg1(200, "Kernel detach returned %d\n", rc);
 #endif
 
+   /* Choose config #1 */
+   rc = usb_set_configuration(fd, 1);
+   if (rc) {
+      usb_close(fd);
+      Dmsg2(100, "Unable to set configuration (%d) %s.\n", rc, usb_strerror());
+      return 0;
+   }
+
    /* Claim the interface */
    rc = usb_claim_interface(fd, 0);
    if (rc) {
@@ -503,7 +513,7 @@ int pusb_ups_check_state(UPSINFO *ups)
          return 0;
       }
 
-      retval = usb_interrupt_read(my_data->fd, 1, (char*)buf, sizeof(buf), timeout);
+      retval = usb_interrupt_read(my_data->fd, USB_ENDPOINT_IN|1, (char*)buf, sizeof(buf), timeout);
 
       if (retval == 0) {
          /* No chars available in TIMER seconds. */
