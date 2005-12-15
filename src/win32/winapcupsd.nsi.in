@@ -231,7 +231,7 @@ Section "Uninstall"
   ; remove files and uninstaller (preserving config for now)
   CopyFiles /SILENT "$INSTDIR\etc\apcupsd\apcupsd.conf" "$INSTDIR\apcupsd.conf"
   Delete /REBOOTOK "$INSTDIR\bin\*.*"
-  Delete /REBOOTOK "$INSTDIR\exe\apcupsd\*.*"
+  Delete /REBOOTOK "$INSTDIR\etc\apcupsd\*.*"
   Delete /REBOOTOK "$INSTDIR\doc\manual.html"
   Delete /REBOOTOK "$INSTDIR\doc\*.png"      
   Delete /REBOOTOK "$INSTDIR\examples\*" 
@@ -241,8 +241,8 @@ Section "Uninstall"
   Delete /REBOOTOK "$INSTDIR\ChangeLog"
 
   ; Check for existing installation
-  MessageBox MB_YESNO|MB_ICONQUESTION "Would you like to delete the current configuration files and the working state file?" IDNO LeaveConfig
-  Delete /REBOOTOK "$INSTDIR\bin\*.conf"
+  MessageBox MB_YESNO|MB_ICONQUESTION "Would you like to delete the current configuration file?" IDNO LeaveConfig
+  Delete /REBOOTOK "$INSTDIR\etc\*.conf"
   ; remove directories used
   RMDir "$INSTDIR\bin"
   RMDir "$INSTDIR\doc"
