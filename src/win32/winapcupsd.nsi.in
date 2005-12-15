@@ -48,7 +48,11 @@
 
 
 
-DirText "Setup will install the Apcupsd ${VERSION} to the directory specified below. To install in a different folder, click Browse and select another folder.$\n$\nNote to CYGWIN users: please use a UNIQUE folder name in your CYGWIN root directory."
+DirText "Setup will install Apcupsd ${VERSION} to the directory \
+         specified below. $\n$\nNote to CYGWIN users: please use \
+         the folder name "apcupsd" in your CYGWIN root directory. \
+         $\n$\nDO NOT CHANGE THIS SETTING UNLESS YOU HAVE AN \
+         EXISTING CYGWIN INSTALLATION. "
 
 
 Section "Apcupsd Service" SecService
@@ -85,8 +89,13 @@ Section "Apcupsd Service" SecService
   CreateDirectory "$INSTDIR\etc\apcupsd"
   CreateDirectory "$INSTDIR\examples"
   CreateDirectory "c:\tmp"
-  ; Put files there
 
+  ; Put files there
+  ;
+  ; NOTE: If you add new files here, be sure to remove them
+  ;       in the uninstaller!
+  ;
+  
   File \cygwin\bin\cygwin1.dll
   File ..\apcupsd.exe
   File ..\smtp.exe
@@ -95,7 +104,6 @@ Section "Apcupsd Service" SecService
   File popup.exe 
   File shutdown.exe
   File email.exe
-  File ..\..\platforms\cygwin\README.txt
 
   SetOutPath "$INSTDIR\examples"
   File ..\..\examples\*
@@ -140,7 +148,7 @@ Section "Apcupsd Service" SecService
   CreateDirectory "$SMPROGRAMS\Apcupsd"
   ; If not installed as service create Start Menu link
   StrCmp $9 "1" Uninstall
-  CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "$INSTDIR\bin\apcupsd.exe" 0
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe"
 
   Uninstall:
   ; Write the uninstall keys for Windows & create Start Menu entry
@@ -152,7 +160,9 @@ Section "Apcupsd Service" SecService
   ; Create apcupsd.conf and have the user edit it (skipped if silent)
   IfSilent NoReminder
   StrCmp $7 "1" NoReminder  ; skip if it is an upgrade
-  MessageBox MB_OK "Please edit the client configuration file $INSTDIR\etc\apcupsd\apcupsd.conf to fit your installation. When you click the OK button Wordpad will open to allow you to do this. Be sure to save your changes before closing Wordpad."
+  MessageBox MB_OK "Please edit the client configuration file $INSTDIR\etc\apcupsd\apcupsd.conf \
+                    to fit your installation. When you click the OK button Wordpad will open to \
+                    allow you to do this. Be sure to save your changes before closing Wordpad."
   Exec 'write "$INSTDIR\etc\apcupsd\apcupsd.conf"'  ; spawn wordpad with the file to be edited
  NoReminder:
 
@@ -188,7 +198,7 @@ Section "Install Documentation" SecDoc
   File ..\..\doc\latex\*.png
   ; Create Start Menu entry
   SetShellVarContext all
-;  CreateShortCut "$SMPROGRAMS\Apcupsd\Manual.lnk" "$INSTDIR\doc\apcupsd.pdf"
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Manual.lnk" "$INSTDIR\doc\manual.html"
 SectionEnd
 
 ;
@@ -227,33 +237,39 @@ Section "Uninstall"
   ; remove start menu items
   SetShellVarContext all
   Delete /REBOOTOK "$SMPROGRAMS\Apcupsd\*"
+  RMDir /REBOOTOK "$SMPROGRAMS\Apcupsd"
 
   ; remove files and uninstaller (preserving config for now)
-  CopyFiles /SILENT "$INSTDIR\etc\apcupsd\apcupsd.conf" "$INSTDIR\apcupsd.conf"
-  Delete /REBOOTOK "$INSTDIR\bin\*.*"
-  Delete /REBOOTOK "$INSTDIR\etc\apcupsd\*.*"
-  Delete /REBOOTOK "$INSTDIR\doc\manual.html"
-  Delete /REBOOTOK "$INSTDIR\doc\*.png"      
-  Delete /REBOOTOK "$INSTDIR\examples\*" 
-  CopyFiles /SILENT "$INSTDIR\apcupsd.conf" "$INSTDIR\etc\apcupsd\apcupsd.conf"
+  Delete /REBOOTOK "$INSTDIR\bin\cygwin1.dll"
+  Delete /REBOOTOK "$INSTDIR\bin\apcupsd.exe"
+  Delete /REBOOTOK "$INSTDIR\bin\smtp.exe"
+  Delete /REBOOTOK "$INSTDIR\bin\apcaccess.exe"
+  Delete /REBOOTOK "$INSTDIR\bin\apctest.exe"
+  Delete /REBOOTOK "$INSTDIR\bin\popup.exe"
+  Delete /REBOOTOK "$INSTDIR\bin\shutdown.exe"
+  Delete /REBOOTOK "$INSTDIR\bin\email.exe"
+  Delete /REBOOTOK "$INSTDIR\examples\*"
   Delete /REBOOTOK "$INSTDIR\README.txt"
   Delete /REBOOTOK "$INSTDIR\COPYING"
   Delete /REBOOTOK "$INSTDIR\ChangeLog"
+  Delete /REBOOTOK "$INSTDIR\Uninstall.exe"
+  Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apccontrol"
+  Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apcupsd.conf.new"
+  Delete /REBOOTOK "$INSTDIR\doc\*"
 
-  ; Check for existing installation
+  ; Delete conf if user approves
   MessageBox MB_YESNO|MB_ICONQUESTION "Would you like to delete the current configuration file?" IDNO LeaveConfig
-  Delete /REBOOTOK "$INSTDIR\etc\*.conf"
+  Delete /REBOOTOK "$INSTDIR\etc\apcupsd\*.conf"
+
+  LeaveConfig:
   ; remove directories used
   RMDir "$INSTDIR\bin"
   RMDir "$INSTDIR\doc"
   RMDir "$INSTDIR\etc\apcupsd"
   RMDir "$INSTDIR\etc"
   RMDir "$INSTDIR\examples"
-  RMDir "$INSTDIR\manual"
   RMDir "$INSTDIR"
   RMDir "C:\tmp"
-  LeaveConfig:
-  RMDir "$SMPROGRAMS\Apcupsd"
   
 SectionEnd
 
