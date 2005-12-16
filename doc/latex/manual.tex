@@ -269,13 +269,11 @@ running as painlessly as possible.
    served by the same UPS, or more than one UPS supplying power to computers that
    are on the same local network, you have more choices to make.  
 \item Figure out if you have one of the easy setups.  If you have a USB
-   UPS, and a USB-capable recent Linux such as Red Hat or SuSE at version 8.0,
-   and you want to use one UPS with one computer, that's an easy setup.  APC
-   supplies the cable needed to talk with that UPS along with the UPS. All you
-   need to do is check that your USB subsystem is working (see 
-   \ilink{Checking Out Your USB
-   Subsystem}{Checking-Out-Your-USB-Subsystem}); if so, you can go to
-   the build and install step.  
+   UPS, and a supported operating system and you want to use one UPS with one
+   computer, that's an easy setup.  APC supplies the cable needed to talk with
+   that UPS along with the UPS. All you need to do is check that your USB 
+   subsystem is working (see \ilink{USB Configuration}{USB-Configuration}); 
+   if so, you can go to the build and install step.  
 \item If you have a UPS designed to communicate via SNMP over Ethernet, that
    is also a relatively easy installation. It's in Advanced Topics (see 
    \ilink{Advanced topics}{Advanced-topics}) mainly because it's an
@@ -5485,10 +5483,10 @@ where the directive is made by four parts:
 \begin{itemize}
 \item {\bf host}: IP address of the remote UPS  
 \item {\bf port}: Remote SNMP port, normally 161
-\item {\bf vendor}: Kind of remote SNMP agent: ``APC'' for APC's PowerNet MIB, ``APC_NOTRAP''
-for the PowerNet MIB with SNMP trap catching disabled, or "RFC" for the IETF's 
-rfc1628 UPS-MIB. (Note that APC_NOTRAP is only accepted by apcupsd-3.11.14 and
-higher. See below for trap catching details.)
+\item {\bf vendor}: Kind of remote SNMP agent: ``APC'' for APC's PowerNet MIB, 
+``APC\_NOTRAP'' for the PowerNet MIB with SNMP trap catching disabled, or "RFC"
+for the IETF's rfc1628 UPS-MIB. (Note that APC\_NOTRAP is only accepted by 
+apcupsd-3.11.14 and higher. See below for trap catching details.)
 \item {\bf community}: The read-write community string, usually ``private''
 \end{itemize}
 
@@ -5537,7 +5535,7 @@ trap daemon on your server. Only one daemon can listen to the trap port, so
 whichever one is started first will succeed and the others will fail. Apcupsd
 will fall back to polling behavior if it is unable to open the trap port. You
 can also forcibly disable trap catching by setting your vendor string in the
-{\bf apcupsd.conf} {\bf DEVICE} directive to "APC_NOTRAP".
+{\bf apcupsd.conf} {\bf DEVICE} directive to "APC\_NOTRAP".
 
 \label{Known-Problems}
 
