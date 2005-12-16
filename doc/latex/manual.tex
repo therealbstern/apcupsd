@@ -1193,13 +1193,6 @@ By default this is disabled.
    This turns on a test driver that is used only for debugging. By default it is
 disabled.  
 
-\item [{---}enable-nis]
-   \index{{---}enable-nis }
-   Turns on the Network Information Server (NIS) code within apcupsd. This is
-enabled by default. If you do not want to access the status of the UPS from
-the network and you are not controlling any slaves via NIS (enable-net), this
-can be disabled.  
-
 \item [{---}enable-pthreads]
    \index{{---}enable-pthreads }
    This option enables pthreads support causing apcupsd to be built as a threaded
@@ -7273,9 +7266,7 @@ Network Information Server}
 
 \label{index-Directives_002c-Network-241}
 \label{index-Network-directives-242}
-None of these directives are required for proper operation of apcupsd. For the
-Network Information Server to work, it must be enabled in the configuration
-(default) with {\tt \verb{--{enable-nis}  
+None of these directives are required for proper operation of apcupsd.
 
 \begin{description}
 
