@@ -49,10 +49,10 @@
 
 
 DirText "Setup will install Apcupsd ${VERSION} to the directory \
-         specified below. $\n$\nNote to CYGWIN users: please use \
-         the folder name "apcupsd" in your CYGWIN root directory. \
+         specified below. $\n$\nNote to CYGWIN users: Please use \
+         the folder name $\"apcupsd$\" in your CYGWIN root directory. \
          $\n$\nDO NOT CHANGE THIS SETTING UNLESS YOU HAVE AN \
-         EXISTING CYGWIN INSTALLATION. "
+         EXISTING CYGWIN INSTALLATION."
 
 
 Section "Apcupsd Service" SecService
@@ -146,16 +146,21 @@ Section "Apcupsd Service" SecService
   ; Create Start Menu Directory
   SetShellVarContext all
   CreateDirectory "$SMPROGRAMS\Apcupsd"
-  ; If not installed as service create Start Menu link
-  StrCmp $9 "1" Uninstall
-  CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe"
 
-  Uninstall:
+  ; Create a start menu link to start apcupsd (possibly as a service)
+  StrCmp $9 "1" +3
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe"
+  Goto +2
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "/service"
+
+  ; Create a start menu link to stop apcupsd
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Stop Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "/kill"
+
   ; Write the uninstall keys for Windows & create Start Menu entry
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apcupsd" "DisplayName" "Apcupsd"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apcupsd" "UninstallString" '"$INSTDIR\uninstall.exe"'
   WriteUninstaller "$INSTDIR\Uninstall.exe"
-  CreateShortCut "$SMPROGRAMS\Apcupsd\Uninstall Apcupsd.lnk" "$INSTDIR\Uninstall.exe" "" "$INSTDIR\Uninstall.exe" 0
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Uninstall Apcupsd.lnk" "$INSTDIR\Uninstall.exe"
 
   ; Create apcupsd.conf and have the user edit it (skipped if silent)
   IfSilent NoReminder
@@ -164,7 +169,7 @@ Section "Apcupsd Service" SecService
                     to fit your installation. When you click the OK button Wordpad will open to \
                     allow you to do this. Be sure to save your changes before closing Wordpad."
   Exec 'write "$INSTDIR\etc\apcupsd\apcupsd.conf"'  ; spawn wordpad with the file to be edited
- NoReminder:
+NoReminder:
 
   ; Start the client? (default skipped if silent, use /start to force starting)
   Push "/start"
@@ -228,8 +233,8 @@ Section "Uninstall"
   StrCmp $9 "" NoService
   ; Remove apcuspd service
   ExecWait '"$INSTDIR\bin\apcupsd.exe" /remove'
-  NoService:
-  
+ NoService:
+ 
   ; remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apcupsd"
   DeleteRegKey HKLM "Software\Apcupsd"
@@ -258,10 +263,11 @@ Section "Uninstall"
   Delete /REBOOTOK "$INSTDIR\doc\*"
 
   ; Delete conf if user approves
-  MessageBox MB_YESNO|MB_ICONQUESTION "Would you like to delete the current configuration file?" IDNO LeaveConfig
-  Delete /REBOOTOK "$INSTDIR\etc\apcupsd\*.conf"
+  MessageBox MB_YESNO|MB_ICONQUESTION "Would you like to delete the current configuration and events files?" IDNO LeaveConfig
+  Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apcupsd.conf"
+  Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apcupsd.events"
 
-  LeaveConfig:
+ LeaveConfig:
   ; remove directories used
   RMDir "$INSTDIR\bin"
   RMDir "$INSTDIR\doc"
