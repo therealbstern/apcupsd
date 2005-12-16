@@ -148,14 +148,20 @@ Section "Apcupsd Service" SecService
   CreateDirectory "$SMPROGRAMS\Apcupsd"
 
   ; Create a start menu link to start apcupsd (possibly as a service)
-  StrCmp $9 "1" +3
+  StrCmp $9 "1" +4
   CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe"
-  Goto +2
-  CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "/service"
-
-  ; Create a start menu link to stop apcupsd
   CreateShortCut "$SMPROGRAMS\Apcupsd\Stop Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "/kill"
+  Goto L2
+  Call IsNt
+  Pop $R0
+  StrCmp $R0 "false" 0 +4
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "/service"
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Stop Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "/kill"
+  Goto L2
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$SYSDIR\net.exe" "start apcupsd" "$INSTDIR\bin\apcupsd.exe"
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Stop Apcupsd.lnk" "$SYSDIR\net.exe" "stop apcupsd" "$INSTDIR\bin\apcupsd.exe"
 
+ L2:
   ; Write the uninstall keys for Windows & create Start Menu entry
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apcupsd" "DisplayName" "Apcupsd"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apcupsd" "UninstallString" '"$INSTDIR\uninstall.exe"'
@@ -190,7 +196,7 @@ NoReminder:
  do_win98:
   MessageBox MB_YESNO|MB_ICONQUESTION  "Would you like to start Apcupsd now?" IDNO NoStart
  Start:
-  Exec '"$INSTDIR\bin\apcupsd.exe"'
+  Exec "$INSTDIR\bin\apcupsd.exe"
   Sleep 3000
  NoStart:
 SectionEnd
@@ -233,8 +239,8 @@ Section "Uninstall"
   StrCmp $9 "" NoService
   ; Remove apcuspd service
   ExecWait '"$INSTDIR\bin\apcupsd.exe" /remove'
- NoService:
- 
+  NoService:
+  
   ; remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apcupsd"
   DeleteRegKey HKLM "Software\Apcupsd"
@@ -267,7 +273,7 @@ Section "Uninstall"
   Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apcupsd.conf"
   Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apcupsd.events"
 
- LeaveConfig:
+  LeaveConfig:
   ; remove directories used
   RMDir "$INSTDIR\bin"
   RMDir "$INSTDIR\doc"
