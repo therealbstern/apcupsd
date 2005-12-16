@@ -846,21 +846,11 @@ AC_HELP_STRING([--disable-test], [No TEST driver (default)])],
 	fi],
     [])
 
-dnl Enable NIS code
-NISSRV_ENABLED=no
-AC_ARG_ENABLE(nis, [
-AC_HELP_STRING([--enable-nis], [Compile NIS server (default)])
-AC_HELP_STRING([--disable-nis], [No NIS server])],
-   [ if test "$enableval" = "yes" ; then
-	AC_DEFINE(HAVE_NISSERVER)
-	AC_DEFINE(HAVE_NISLIB)
-	NISSRV_ENABLED=yes
-     fi],
-   [
-	AC_DEFINE(HAVE_NISSERVER)
-	AC_DEFINE(HAVE_NISLIB)
-	NISSRV_ENABLED=yes
-   ])
+dnl Force NIS to enabled since libnis is required by apcaccess.
+dnl Users may still disable NIS at runtime in apcupsd.conf.
+AC_DEFINE(HAVE_NISSERVER)
+AC_DEFINE(HAVE_NISLIB)
+NISSRV_ENABLED=yes
 
 dnl Allow setting of NISIP value
 NISIP="0.0.0.0"

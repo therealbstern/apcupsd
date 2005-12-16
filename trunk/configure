@@ -879,9 +879,6 @@ Optional Features:
   --enable-test           Compile TEST driver code
   --disable-test          No TEST driver (default)
 
-  --enable-nis            Compile NIS server (default)
-  --disable-nis           No NIS server
-
   --enable-master-slave   Compile old network master/server code
   --disable-master-slave  No old network master/server (default)
   --enable-powerflute     Compile powerflute program
@@ -10531,34 +10528,15 @@ _ACEOF
 	fi
 fi;
 
-NISSRV_ENABLED=no
-# Check whether --enable-nis or --disable-nis was given.
-if test "${enable_nis+set}" = set; then
-  enableval="$enable_nis"
-   if test "$enableval" = "yes" ; then
-	cat >>confdefs.h <<\_ACEOF
+cat >>confdefs.h <<\_ACEOF
 #define HAVE_NISSERVER 1
 _ACEOF
 
-	cat >>confdefs.h <<\_ACEOF
+cat >>confdefs.h <<\_ACEOF
 #define HAVE_NISLIB 1
 _ACEOF
 
-	NISSRV_ENABLED=yes
-     fi
-else
-
-	cat >>confdefs.h <<\_ACEOF
-#define HAVE_NISSERVER 1
-_ACEOF
-
-	cat >>confdefs.h <<\_ACEOF
-#define HAVE_NISLIB 1
-_ACEOF
-
-	NISSRV_ENABLED=yes
-
-fi;
+NISSRV_ENABLED=yes
 
 NISIP="0.0.0.0"
 
