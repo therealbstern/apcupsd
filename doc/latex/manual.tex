@@ -1822,8 +1822,8 @@ Scratch}, which could be helpful for other systems as well.
 
 \label{index-Windows-55}
 \label{index-OS_002c-Windows-56}
-If you wish to build from the source, and if you have CYGWIN version 1.5.5 and
-GCC 2.95.3-5 installed, it is possible to build the Win32 version of apcupsd.
+If you wish to build from the source, and if you have CYGWIN version 1.5.18 and
+GCC 3.4.4 installed, it is possible to build the Win32 version of apcupsd.
 Please don't try any other versions of CYGWIN as there were known problems.  
 
 To date, the Win32 version has only been build on a Win98 SR2 and a WinXP
@@ -5908,178 +5908,87 @@ is immediately started by the operating system when the system is booted, and
 runs in the background even if there is no user logged into the system. 
 
 \label{Installation}
-
 \subsection*{Installation}
 \index{Installation }
 \addcontentsline{toc}{subsection}{Installation}
 
 Normally, you will install the Windows version of apcupsd from the binaries.
-This install is somewhat Unix like since you do many parts of the installation
-by hand. To install the binaries, you need {\bf WinZip}.  
+Starting with version 3.11.15, the Windows binaries are distributed with
+a full GUI installer (driven by NSIS, the 
+\elink{Nullsoft Scriptable Install System}{http://nsis.sourceforge.net}).
 
-\begin{itemize}
-\item Simply double click on the winapcupsd-3.8.5.tar.gz icon.  The actual
-   name of the icon will vary from one release version to another.  
+Installation is very simple and straight-forward: Simply double-click the
+installer executable and follow the instructions. {\bf Do not change the
+installation directory without reading the next section!}
 
-\footnotesize
+\label{Installation-Directory}
+\subsection*{Installation Directory}
+\index{Installation Directory }
+\index{Directory!Installation }
+\addcontentsline{toc}{subsection}{Installation Directory}
+
+\label{index-Windows_002c-Installation-Directory-172}
+The Win32 version of apcupsd must reside in the
+c:\textbackslash{}apcupsd\textbackslash{} directory, and there must be a
+c:\textbackslash{}tmp directory on your machine. The installation will do this
+automatically, and we recommend that you do not attempt to place apcupsd in
+another directory. If you do so, you are on your own, and you will need to do
+a rebuild of the source. 
+
+If you wish to install the package elsewhere, you will need to proceed with a
+manual installation, which is not particularly easy as you must rebuild the
+source and change the configuration file as well.  
+
+If you have an existing CYGWIN installation, you {\bf must} change the
+installation directory to /apcupsd within your CYGWIN root directory
+(usually c:\textbackslash{}cygwin).
+
+\label{Configuration}
+\subsection*{Configuration}
+\index{Configuration}
+\addcontentsline{toc}{subsection}{Configuration}
+
+If you are installing Apcupsd for the first time, the installer will give
+you an opportunity to edit the apcupsd.conf configuration file to contain
+the values appropriate for your site. (Subsequent installations will
+maintain your existing apcupsd.conf, so you need not edit it again unless
+there are new features or syntax changes that must be accounted for.)
+
+In most cases, no changes will be needed, but if you are not using COM1 
+for your serial port, you will need to set the {\bf DEVICE} configuration
+directive to the correct serial port. Note, if you are using WinNT or Win2000,
+the operating system may probe the port attempting to attach a serial mouse
+This will cause apcupsd to be unable to communicate with the serial port. 
+If this happens, or out of precaution, you can edit the c:\textbackslash{}boot.ini
+file. Find the line that looks something like the following:  
+
 \begin{verbatim}
-     
+   multi(0)disk(0)rdisk(0)partition(1)\WINNT="Windows NT Workstation Version 4.00"
 \end{verbatim}
-\normalsize
-
-\addcontentsline{lof}{figure}{Windows Install - Explorer Window}
-\includegraphics{./wininstall3.eps}  
-
-\footnotesize
-\begin{verbatim}
-     
-\end{verbatim}
-\normalsize
-
-\item When Zip says that it has one file and asks if it should unpack it into
-   a temporary file, respond with {\bf Yes}.  
-
-\footnotesize
-\begin{verbatim}
-     
-\end{verbatim}
-\normalsize
-
-\addcontentsline{lof}{figure}{Windows Install - Winzip Unpack}
-\includegraphics{./wininstall4.eps}  
-
-\footnotesize
-\begin{verbatim}
-     
-\end{verbatim}
-\normalsize
-
-\item Ensure that you extract all files and that the extraction will go into
-   C:\textbackslash{}  
-
-\footnotesize
-\begin{verbatim}
-     
-\end{verbatim}
-\normalsize
-
-\addcontentsline{lof}{figure}{Windows Install - Winzip Extract Window}
-\includegraphics{./wininstall5.eps}  
-
-\footnotesize
-\begin{verbatim}
-     
-\end{verbatim}
-\normalsize
-
-\end{itemize}
-
-If you wish to install the package elsewhere, please note that you will need
-to proceed with a manual installation, which is not particularly easy as you
-must rebuild the source and change the configuration file as well.  
-
-This installation assumes that you do {\bf not} have CYGWIN installed on your
-computer. If you do, and you use mount points, you may need to do a special
-manual installation.  
-
-Once you have unzipped the binaries, open a window pointing to the binary
-installation folder (normally c:\textbackslash{}apcupsd). This folder should
-contain folders with the name bin, etc, examples, and manual. If and when you
-no longer need them, the examples and manual sub-folders of the
-c:\textbackslash{}apcupsd directory may be removed.  
-
-Continuing the installation process:  
-
-\begin{itemize}
-\item Open the directory
-   c:\textbackslash{}apcupsd\textbackslash{}etc\textbackslash{}apcupsd in the
-   Windows Explorer by Clicking on the apcupsd folder then on the etc folder,
-then on the apcupsd folder. Finally double click on the file apcupsd.conf and
-edit it to contain the values appropriate for your site. In most cases, no
-changes will be needed, but if you are not using COM1 for your serial port,
-you will need to set the {\bf DEVICE} configuration directive to the correct
-serial port. Note, if you are using WinNT or Win2000, the operating system may
-probe the port attempting to attach a serial mouse. This will cause apcupsd to
-be unable to communicate with the serial port. If this happens, or out of
-precaution, you can edit the c:\textbackslash{}boot.ini file. Find the line
-that looks something like the following:  
-
-multi(0)disk(0)rdisk(0)partition(1)\textbackslash{}WINNT=``Windows NT
-Workstation Version 4.00''  
 
 and add the following to the end of the line: /NoSerialMice:COM1 (or COM2
-depending on what you want to use). The new line should look similar to:  
+depending on what you want to use). The new line should look similar to...
 
-multi(0)disk(0)rdisk(0)partition(1)\textbackslash{}WINNT=``Windows NT
-Workstation Version 4.00'' /NoSerialMice:COM1  
+\begin{verbatim}
+   multi(0)disk(0)rdisk(0)partition(1)\WINNT="Windows NT Workstation Version 4.00" /NoSerialMice:COM1  
+\end{verbatim}
 
-where the only thing you have changed is to append to the end of the line.
+...where the only thing you have changed is to append to the end of the line.
 This addition will prevent the operating system from interferring with apcupsd
- 
-\item Then return to c:\textbackslash{}apcupsd and open on the bin folder so
-   that you see its contents.  
-\item To do the final step of installation, double click on the setup.bat
-   program. This script will setup the appropriate mount points for the
-   directories that apcupsd uses, it will install apcupsd in the system registry,
-and on Windows 98, it will start apcupsd running.  
 
-If everything went well, you will get something similar to the following
-output in a DOS shell window:  
 
-\footnotesize
-\begin{verbatim}
-     
-\end{verbatim}
-\normalsize
+\label{Starting Apcupsd}
+\subsection*{Starting Apcupsd}
+\index{Starting Apcupsd}
+\addcontentsline{toc}{subsection}{Starting Apcupsd}
 
-\addcontentsline{lof}{figure}{Windows Install - Setup Complete}
-\includegraphics{./wininstall1.eps}  
+The installer will give you an opportunity start the Apcupsd service
+immediately. If you choose to start it manually, you may do so by selecting
+the "Start Apcuspd" link from the Start -\gt{}Programs -\gt{} Apcupsd folder.
 
-\footnotesize
-\begin{verbatim}
-     
-\end{verbatim}
-\normalsize
-
-What is important to verify in the DOS window is that the root directory
-\textbackslash{} is mounted on device c:\textbackslash{}.  
-
-The DOS window will be followed immediately by a Windows dialogue box as
-follows:  
-
-\footnotesize
-\begin{verbatim}
-     
-\end{verbatim}
-\normalsize
-
-\includegraphics{./wininstall2.eps}  
-
-\footnotesize
-\begin{verbatim}
-     
-\end{verbatim}
-\normalsize
-
-\item On Windows 98, to actually start the service, either reboot the machine,
-   which is not necessary, or open a DOS shell window, and type the following
-   commands:  
-
-\footnotesize
-\begin{verbatim}
-              cd c:\apcupsd\bin
-              apcupsd /service
-          
-     
-\end{verbatim}
-\normalsize
-
-Alternatively, you can go to the c:\textbackslash{}apcupsd\textbackslash{}bin
-folder with the Explorer and double click on the {\bf Start} icon.  
-\item On Windows NT, to start the service, either reboot the machine, which is
-   not necessary, or go to the Control Panel, open the Services folder and start
-   the apcupsd daemon program by selecting the apcupsd UPS Server and then
-clicking on the Start button as shown below:  
+On Windows NT/2000/XP, you may alternatively go to the Control Panel, open
+the Services folder, select Apcupsd UPS Server, and then click on the
+{\bf Start} button as shown below:
 
 \footnotesize
 \begin{verbatim}
@@ -6098,7 +6007,6 @@ clicking on the Start button as shown below:
 
 If the Services dialog reports a problem, it is normally because your DEVICE
 statement does not contain the correct serial port name. 
-\end{itemize}
 
 You probably should also click on the {\bf Startup...} button to ensure that
 the correct defaults are set. The dialogue box that appears should have {\bf
@@ -6107,7 +6015,7 @@ System Account} with {\bf Allow Service to Interact with Desktop} checked. If
 these values are not set correctly by default, please change them otherwise
 apcupsd will not work.  
 
-For WinXP systems (and probably Win2K), the dialogs are a bit different from
+For WinXP and Win2K systems, the dialogs are a bit different from
 those shown here for WinNT, but he concept is the same. You get to the
 Services dialog by clicking on: {\bf Control Panel -\gt{} Administrative Tools
 -\gt{} Component Services}. The apcupsd service should appear in the right
@@ -6126,21 +6034,6 @@ When the UPS switches to the battery, the battery icon will reappear in the
 system tray. While the UPS is online, if the battery is not at least 99\%
 charged, the plug icon will become a plug with a lightning bolt in the middle
 \includegraphics{./charging.eps} to indicate that the battery is charging. 
-
-\label{Installation-Directory}
-
-\subsection*{Installation Directory}
-\index{Installation Directory }
-\index{Directory!Installation }
-\addcontentsline{toc}{subsection}{Installation Directory}
-
-\label{index-Windows_002c-Installation-Directory-172}
-The Win32 version of apcupsd must reside in the
-c:\textbackslash{}apcupsd\textbackslash{} directory, and there must be a
-c:\textbackslash{}tmp directory on your machine. The installation will do this
-automatically, and we recommend that you do not attempt to place apcupsd in
-another directory. If you do so, you are on your own, and you will need to do
-a rebuild of the source. 
 
 \label{Testing}
 
@@ -6165,52 +6058,22 @@ The most common cause of problems is either improper configuration of the
 cable type, or an incorrect address for the serial port. 
 
 \label{Upgrading}
-
 \subsection*{Upgrading}
 \index{Upgrading }
 \addcontentsline{toc}{subsection}{Upgrading}
 
-\label{index-Windows_002c-Upgrading-175}
-\label{index-Upgrading-Windows-176}
-On Win98 and Win95 systems, to upgrade to a new release, simply stop apcupsd
-by using the tray icon and selecting the {\bf Close apcupsd} menu item, or by
-double clicking on the {\bf Stop} icon located in the
-c:\textbackslash{}apcupsd\textbackslash{}bin directory, then apply the upgrade
-and restart apcupsd.  
+An upgrade may be accomplished by uninstalling the old version (using
+the Add/Remove Programs Control Panel or clicking the "Uninstall Apcupsd" 
+link from Start -\gt{} Programs -\gt{} Apcupsd. Near the end of the
+uninstall you will be prompted about removing configuration and event
+files. You should answer "No" in order to preserve your existing
+apcupsd.conf file.
 
-On WinNT systems (and Win2000 systems), you may stop apcupsd as indicated
-abover or alternatively you may stop apcupsd by using the {\bf Services} item
-in the {\bf Control Panel}. In addition, at least on my system, there seems to
-be a WinNT bug that causes the system to prevent {\bf apcupsd.exe} from being
-overwritten even though the file is no longer being used.  This is manifested
-by an error message when attempting load a new version and overwrite the old
-apcupsd.exe (the extract part of WinZip as described above). To circumvent
-this problem (if it happens to you), after shutting down the running version
-of apcupsd, through the {\bf Services} dialogue in the {\bf Control Panel},
-first click on the {\bf Stop button}:  
-
-\addcontentsline{lof}{figure}{Windows NT - Stopping the Service}
-\includegraphics{./wininstall6.eps}  
-
-then click on the {\bf Startup ...} button, and in the Startup dialogue select
-the {\bf Disabled} button to disable apcupsd:  
-
-\addcontentsline{lof}{figure}{Windows NT - Disabling the Service}
-\includegraphics{./wininstall7.eps}  
-
-After closing the dialogues, reboot the system, typical of Microsoft :-(. When
-the system comes back up, apcupsd will not be automatically launched as a
-service, and you can install the new version. To reinstate apcupsd as an
-automatic service, using the {\bf Control Panel}: reset apcupsd to {\bf
-Automatic} startup in the Startup dialogue, then restart apcupsd in the {\bf
-Services} dialogue as shown above in the installation instructions. Frequently
-after an upgrade, you will click on the {\bf Start} button and after a few
-seconds, the system reports that it failed to start. The cause of this problem
-is unknown, but the solution is simply to click again on the {\bf Start}
-button. 
+After the uninstall completes you may install the new version of
+Apcupsd as described above. If you preserved your existing apcupsd.conf
+file, the new apcupsd.conf will be installed as apcupsd.conf.new.
 
 \label{Post-Installation}
-
 \subsection*{Post Installation}
 \index{Post Installation }
 \index{Installation!Post }
@@ -6243,11 +6106,9 @@ boxes by putting a pound sign (\#) in column one of the appropriate line.
 
 \label{index-Problems_002c-Windows-178}
 \label{index-Windows_002c-Problems-179}
-In addition to possible problems of reinstallation or upgrade on WinNT
-systems, as noted above, we have discovered the following problem: On some
-Windows systems, the domain resolution does not seem to work if you have not
-configured a DNS server in the Network section of the Control Panel. This
-problem should be apparent only when running a master or a slave
+On some Windows systems, the domain resolution does not seem to work if you
+have not configured a DNS server in the Network section of the Control Panel.
+This problem should be apparent only when running a master or a slave
 configuration. In this case, when you specify the name of the master or the
 slave machine(s) in your apcupsd.conf file, apcupsd will be unable to resolve
 the name to a valid IP address. To circumvent this problem, simply enter all
@@ -6257,20 +6118,6 @@ system (often not the case on Win32 systems).  For example, instead of using
 the directive ``MASTER my.master.com'' use something like ``MASTER
 192.168.1.54'' where you replace the IP address with your actual IP address.  
 
-Also, on WinNT systems, the PIF files in /apcupsd/bin used for starting and
-stopping apcupsd do not work. Use the services control panel instead.  
-
-On Win95 systems, there are reports that the PIF files do not work. If you
-find that to be the case, the simplest solution is to use the batch files that
-we have supplied in the c:/apcupsd/bin directory. Also, on Win95 systems, we
-have an unconfirmed report that indicates that apcupsd does not start
-automatically as a service even though the Registry has been properly updated.
-If you experience this problem, a work around is to put a shortcut to apcupsd
-in the StartUp folder.  
-
-As noted above, after an upgrade, you may need to start apcupsd several times
-before it will actually run.  
-
 On WinNT, WinXP, and Win2K systems, you can examine the System Applications
 log to which apcupsd writes Windows error messages during startup.  
 
@@ -6278,43 +6125,9 @@ Regardless of which Windows system you are running, apcupsd logs most error
 messages to
 c:\textbackslash{}apcupsd\textbackslash{}etc\textbackslash{}apcupsd\textbackslash
 {}apcupsd.events. This type error messages such as configuration file not
-found, etc are written to this file. 
+found, etc are written to this file. Note that on some systems (WinXP, possibly
+others) Apcupsd is unable to write to this file when running as a service.
 
-\label{Utility-Functions}
-
-\subsection*{Utility Functions}
-\index{Functions!Utility }
-\index{Utility Functions }
-\addcontentsline{toc}{subsection}{Utility Functions}
-
-The directory c:\textbackslash{}apcupsd\textbackslash{}bin contains six
-utility routines (actually .pif files) that you may find useful. They are: 
-
-\footnotesize
-\begin{verbatim}
-     Start
-     Stop
-     Install
-     Uninstall
-     ups-events
-     ups-status
-\end{verbatim}
-\normalsize
-
-Any of these utilities may be used on any system, with the exception of the
-Start utility, which cannot be used on WinNT and Win2000 systems. On those
-systems, the apcupsd service must always be started through the {\bf Services}
-sub-dialogue of the {\bf Control Panel}.  
-
-The {\bf Install} and {\bf Uninstall} utilities install and uninstall apcupsd
-from the system registry only. All other pieces (files) of apcupsd remain
-intact. It is not absolutely necessary for apcupsd to be installed in the
-registry as it can run as a regular program. However, if it is not installed
-in the registry, it cannot be run as a service.  
-
-The functions of {\bf Stop}, {\bf ups-events}, and {\bf ups-status} can be
-more easily invoked by right clicking on the apcupsd icon in the system tray
-and selecting the desired function from the popup menu. 
 
 \label{Disclaimer}
 
