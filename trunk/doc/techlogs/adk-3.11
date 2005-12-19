@@ -1,8 +1,59 @@
-             Technical notes on version 3.11.14
+             Technical notes on version 3.11.16
                         Adam Kropelin
 
 General:
 
+19Dec05:
+- win32: Convert Readme.TXT to DOS text format so it will be readble 
+  in Notepad (default *.txt handler on Windows). Remove version number 
+  since I'll never remember to update it. Point users to manual for 
+  detailed install instructions.
+16Dec05:
+- doc: Fix latex errors that crept in during SNMP and USB updates.
+- configure: Force NIS to enabled since libnis is required by 
+  apcaccess. Users may still disable NIS at runtime in apcupsd.conf.
+- doc: Remove references to --enable-nis and --disable-nis.
+- doc: Update Win32 section to cover nifty new NSIS installer.
+15Dec05:
+- win32: More installer fixes: Create start/stop links regardless of 
+  service or not. Remove apcupsd.events on uninstall, if user wants to.
+  Fix compile error in installation directory message text.
+- win32: A few last fixes (hopefully): WinNT and 9x need different
+  service start methods. Remove extra double-quotes around Win9x start 
+  handling because they seem to result in a bogus Exec commandline.
+14Dec05:
+- win32: Fix an uninstaller bug where apcupsd.conf was left behind 
+  even if the user chose to remove it.
+- win32: Fix uninstall so it doesn't miss any files. Change destination
+  path instructions to help prevent inoperable installations. Fix 
+  documentation and start link creation.
+24Nov05:
+- Get rid of unsupported -c (configure), -u (update battery date), 
+  and -n (rename) options.
+22Nov05:
+- configure: -mwindows is only needed for the link step, so kill
+  $WCFLAGS and let all compile steps be driven by the .c.o rule.
+- configure: Don't add ncurses libs to $LIBS, only to $POWERLIBS.
+  That prevents libncurses from being linked with every executable.
+- configure: Kill apcnisd. It requires sysv shmem and since we've 
+  eliminated that, so too must apcnisd be eliminated.
+19Nov05:
+- snmp: Initialize nfds to zero before calling snmp_select_info().
+  Fixes crash on Win32 and potential crash on other platforms.
+- win32: Build fixes: apc_defines.h -> defines.h, remove use of 
+  astr* pending future cleanup, C++ casting fixes.
+- win32: Switch to pthreads for the Main_Msg_Loop thread. This
+  seems to fix a bug where Main_Msg_Loop called do_status() which
+  attempted to take the UPS read_lock. Apparently taking pthreads 
+  locks from CreateThread threads is bad. Switching to pthreads
+  seems to fix it.
+12Nov05:
+- No need to specify mode parameter to open() when O_CREAT is not set.
+- configure: Simplify SNMP rules. Prefer net-snmp, but fall back on 
+  ucd-snmp if it is not found. Look for snmp libs in /usr/local. 
+  --enable-snmp and --enable-net-snmp act identically now.
+11Nov05:
+- Remove lingering references to getNextUps() in Cygwin build.
 06Nov05:
 - snmp: Add support for SNMP traps in powernet_snmp_ups_check_state().
 - snmp: Accept "APC_NOTRAP" as a valid DeviceVendor string, providing
