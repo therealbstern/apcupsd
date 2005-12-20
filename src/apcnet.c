@@ -704,7 +704,7 @@ static int get_data_from_master(UPSINFO *ups)
 
    if (strcmp(ups->usermagic, get_data.usermagic) == 0) {
       Dmsg0(100, "Got good data\n");
-      ups->set_online(ntohl(get_data.OnBatt));
+      ups->set_online(!ntohl(get_data.OnBatt));
       ups->set_battlow(ntohl(get_data.BattLow));
       ups->BattChg = ntohl(get_data.BattChg);
       ShutDown = ntohl(get_data.ShutDown);
