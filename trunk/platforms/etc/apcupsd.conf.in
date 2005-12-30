@@ -250,14 +250,17 @@ DATATIME 0
 # ========== Configuration statements used in updating the UPS EPROM =========
 #
 
-# UPS name, max 8 characters  -- used only during -n or --rename-ups
+#
+# These statements are used only by apctest when choosing "Set EEPROM with conf
+# file values" from the EEPROM menu. THESE STATEMENTS HAVE NO EFFECT ON APCUPSD.
+#
+
+# UPS name, max 8 characters 
 #UPSNAME UPS_IDEN
 
-# Battery date - 8 characters -- used only during -u or --update-battery-date
+# Battery date - 8 characters
 #BATTDATE mm/dd/yy
 
-#  The following items are set during -c or --configure
-#                       
 # Sensitivity to line voltage quality (H cause faster transfer to batteries)  
 # SENSITIVITY H M L        (default = H)
 #SENSITIVITY H
