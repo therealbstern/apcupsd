@@ -464,8 +464,8 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups)
 
 /* Callback invoked by SNMP library when an async event arrives */
 static int powernet_snmp_callback(
-   int operation, netsnmp_session *session, 
-   int reqid, netsnmp_pdu *pdu, void *magic)
+   int operation, snmp_session *session, 
+   int reqid, snmp_pdu *pdu, void *magic)
 {
    struct snmp_ups_internal_data *my_data =
       (struct snmp_ups_internal_data *)magic;
@@ -475,7 +475,7 @@ static int powernet_snmp_callback(
    if (reqid == 0)
       my_data->trap_received = true;
 
-   return NETSNMP_CALLBACK_OP_RECEIVED_MESSAGE;
+   return 1;
 }
 
 int powernet_snmp_ups_check_state(UPSINFO *ups)
