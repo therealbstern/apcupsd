@@ -1,13 +1,20 @@
-             Technical notes on version 3.11.16
+             Technical notes on version 3.11.17
                         Adam Kropelin
 
 General:
 
+01Jan06:
+- snmp: Remove misuse of NETSNMP_CALLBACK_OP_RECEIVED_MESSAGE. Also use
+  snmp_{session,pdu} instead of netsmp_{session,pdu} to retain 
+  compatibility with the ucd-snmp library.
+31Dec05:
+- conf: Update EEPROM section comments.
 19Dec05:
 - win32: Convert Readme.TXT to DOS text format so it will be readble 
   in Notepad (default *.txt handler on Windows). Remove version number 
   since I'll never remember to update it. Point users to manual for 
   detailed install instructions.
+- m/s: Fix sense of onbatt/online, which was reversed.
 16Dec05:
 - doc: Fix latex errors that crept in during SNMP and USB updates.
 - configure: Force NIS to enabled since libnis is required by 
