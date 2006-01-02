@@ -34,10 +34,10 @@ readfifo:  readfifo.c
 	$(CC) readfifo.c -o readfifo
 
 newslave: newslave.c $(APCLIBS)
-	$(CC) $(CFLAGS) newslave.c $(APCLIBS) -o newslave
+	$(CXX) $(CFLAGS) newslave.c $(APCLIBS) -o newslave
 
 upsapm: upsapm.c $(APCLIBS)
-	$(CC) $(CFLAGS) upsapm.c $(APCLIBS) -o upsapm
+	$(CXX) $(CFLAGS) upsapm.c $(APCLIBS) -o upsapm
 
 smartsim: smartsim.c
 	$(CC) $(CFLAGS) smartsim.c -o smartsim
