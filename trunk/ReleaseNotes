@@ -1,240 +1,79 @@
 
-          Release Notes for Apcupsd 3.10.18
+             Release Notes for Apcupsd 3.12.x
 
-NOTE: The non-pthreaded version should work in this release, but
-      has been removed in the next major release (3.12.x).
 
-Release 3.10.18 21Jul05
-* This is a bug-fix only release. There are no new features. Users with
-  USB connections are especially recommended to upgrade.
-- Fix runaway process with USB on 2.6.12 (and 2.6.11 SUSE) kernels
-- Eliminate 'control queue full' lockup with certain UPS models (CS 650,
-  RS 800, possibly others)
-- Fix HPUX crash when apccontrol is invoked
-- Fix apctest failure when DEVICE setting is blank
-- Fix shutdown of USB ES models on BSD
+Release 3.12.0 02Jan06
 
-Release 3.10.17a 22Apr05
-- Fix BSD USB driver lockups.
+MAJOR CHANGES
 
-Release 3.10.17 18Mar05
-- Fix termination of empty directives in .conf file.
-- Update default apcupsd.conf to recommend a blank DEVICE setting for USB
-  driver.
-- Add /dev/hiddev? to Linux USB driver device node search path.
-- Add Mac OS X startup script
-- Add new *BSD USB driver to support USB UPSes on FreeBSD, OpenBSD, and NetBSD.
-  THIS DRIVER IS BETA SOFTWARE AND HAS A KNOWN LOCKUP ISSUE ON FREEBSD. Please
-  keep this in mind when deciding whether or not to deploy it. PLEASE READ THE
-  "CHECKING OUT YOUR USB SUBSYSTEM (BSD)" SECTION OF THE MANUAL as it contains
-  crucial details on how to configure your system for the new driver.
-- Add BackUPS Pro shutdown code to USB driver
-- Prefer BackUPS style shutdown over SmartUPS in USB driver to resolve shutdown
-  issues on BackUPS CS models
-- Restructure USB driver to share common code
-- Fix slave mode segfault bug introduced by --killpower fixes in 3.10.16.
-- Commit kernstodo
-- Added an anonymous patch to powerflute.c and to the slack-apcupsd.in file.
-- Add Whitebox to detected systems.
-- Minor tweak to RedHat spec.in
-- Apply Carl Lindberg <lindberg@clindberg.org>'s patch
-  for apcaction.c to fix the network management card
-  shutdown.
-- Fix typo in targets.mak that prevents uninstall from working.
-- Change name of thread_terminate to apc_thread_terminate to avoid
-  conflict on AIX.
-- Put configure found SHUTDOWN in apccontrol.in
-- Figured out how to scale the pdf images, so re-did them.
-- Some minor updates to the manual, particularly the title
-  page.
+  * This is the first release following the new release numbering scheme
+    discussed last spring. The minor release number (y in x.y.z) will be
+    even for stable releases and odd for development versions. We've just
+    completed the 3.11.x development series, so 3.12.x will be the stable
+    branch with minor bug fixes incorporated into 3.12.1, 3.12.2, etc.
+    Major new features will be developed on 3.13.x and eventually 
+    released as 3.14.x.
 
-Release 3.10.16 04Nov04
-- Adam has fixed the killpower problem for USB so that the
-  USB now properly turns off the power. Nice job!
-- Converted manual from docbook to texinfo format. There is some
-  cleanup to be done, but we get an index!
-- Thanks to Adam for converting the .png images to .pdf
-- Apply patch to fix aastr... supplied by Manfred Schwarb.
-- Changed Solaris to use mailx by default at the suggestion of
-  Neil Brookins.
-- Added Adam's snoopdecode.c to examples that allows viewing
-  USB events.
-- A number of typos fixed in apccontrol files.
-- Adam fixed a race condition in killpower with --kill-on-powerfail.
-- --kill-on-powerfail disallowed for dumb UPSes since the      
-  kill power will always occur before the system has been halted.
-- Lots of doc updates.
-- Add proper platform code so that configure will create
-  the 4 platform specific apccontrol files (some were missing).
-- Apply fix from user to correct one of the shutdown
-  sequences for the Smart UPS. During the conversion to drivers
-  this was apparently mangled.
-- Added code to close all file descriptors before becoming
-  daemon unless debug turned on.
-- Add APCBATTCapBeforeRestore found by Adam to hid-ups.c
-- Update copyright in apc_struct.h
-- Take Adam's new apc_defines.h with minor modification.
-- Correct a bug reported by a user (he also had the fix) to
-  the snmp driver where Sensitivity was incorrectly reported.
-- Add astrncpy() to snmp driver.
-- Fix apcstatus.c to report Unknown for the sensitivity rather than
-  High if the sense word cannot be read or is incorrect.
-   
-Release 3.10.15 07Jul04
-- Document Mandrake USB kernel problems.
-- Fix HID_MAX_USAGES in the examples directory
-- Apply David Walser's patch for missing colors in multimon.  Reads
-  the apcupsd.css file from the sysconf directory.
-- Add EEPROM fix from Giuseppe Ghibo passed on by David Walser
+  * The non-pthreads build has been REMOVED, allowing great 
+    simplification of the code. Apcupsd now requires your platform to
+    provide a reliable pthreads library. All modern operating systems
+    include pthreads support, so this should not be a great impact. Older
+    systems may not support pthreads or may not have a reliable
+    implementation. Users of such systems can continue to use the 3.10.18
+    stable release, although no new features will be implemented there.
 
-Release 3.10.14 28Jul04
-- Add workaround from Adam for linux/hiddev.h missing define.
-- Bill King has made numerous changes to improve the code such as adding
-  consts where appropriate.
-- Add ./configure detection of nanosleep() and usleep()
-- Updates to manual including fixing man page.
-- Integrate patch for Mandrake apcupsd.in forwarded by David Walser.
-- Found another store into the ups buffer so #ifdefed it. Cannot
-  store into the ups buffer on non-pthreads systems.
-- Fiddle with apcconfig.c to correct astrncpy() problem noted by
-  Adam.
-- #ifdef code in apcaccess that tries to write in the shared memory
-  buffer.
-- Applied Adam's patch for fixing the pthreads dependencies in asys.c
-- Tweak the patch a bit hopefully so that OpenBSD will work.
-- Made a sweep through quite a few files updating the copyright, 
-  eliminating the disclaimer (now in DISCLAIMER), and adding as many
-  astrncpy() and astrncat()s as I could find. There still remain some
-  drivers and the cgi code to do.
-- Implemented true/false and bool. Started implementing it in many of
-  the files I touched.
-- Updated the net driver and did a fairly good testing of it.
-- Made apcupsd remain in the foreground when doing a kill power.
-- Eliminated some of the error messages during kill power by not
-  doing useless things.
-- Added back code to print what is happening during kill power
-  in the USB code.
-- Corrected a few of the USB error messages that could have been
-  missleading or confusing.
-- Eliminated some inappropriate usages of size_t.
-- Integrated a number of updates into the manual, particularly from
-  Adam.
-- Put wall as ${WALL} in platforms/apccontrol.in
-- If the IP address is 0.0.0.0 force it to localhost in apcaccess.
-- Integrate Thomas Habets' changes to keep connect() from blocking
-  in apcnet.c so that apcupsd can service more slaves.
-- Ensure that stdin/out/err are allocated in daemon_start() of apcuspd.c
-- Update snmp.c with bug fix from Bacula.
+  * The master-slave function should work in this release, but will be 
+    removed in the next major release (3.14.x). Please migrate master-
+    slave connections to the NIS net driver. (Note that 'NIS' in this
+    context means Apcupsd's Network Information Server, NOT Sun's NIS/YP)
+  
+  * Apcupsd now requires a C++ compiler in order to build. Only minimal
+    C++ features are used (no templates, RTTI, etc.) so even basic C++
+    compilers will be adequate. Again the only users impacted by this
+    change should be those with very old systems.
 
-Release 3.10.13 20Apr04
-- Added code to support net snmp configured with --enable-net-snmp
-  based on patch sent by Sander Siemonsma.
-- Build smtp on Unix systems.
-- Update to most current smtp and make it easier to configure
-  for apcupsd or Bacula
-- Start implementing native Win32 version.
-- Rename cmd -> ups_event and cmd_msg -> event_msg
-- Add user supplied code to make apcaccess read the conf file and
-  self configure to proper port. Thanks to Martin Flack for this
-  patch.
-- Start simplifying the Copyright and making the dates current.
-- Rework the net driver. It was really in poor shape.
-- Replace sprintf with asnprint. Replace strcpy with astrncpy
-- Apply a fix supplied by Jim Pick where syslog releases the
-  usb port and then re-attaches it to /dev/log.
-- I finally took a careful look at the old master/slave networking
-  code as well as ran it here, and it was sadly broken. Hopefully
-  this commit fixes the problems.    
-- Fix a few string functions using the new routines.
-- Added asys.c imported from Bacula, which contains a number of 
-  simple system routines such as astrncpy(), ...
+NEW FEATURES
 
-Release 3.10.12 04Mar04:
-- Apply patch from Adam that fixes OpenBSD and FreeBSD pthreads 
-  library bugs.
-- William King has made a number of commits to bring the cgi
-  html up to current xhtml standards -- many thanks.
-- Add poll time to SNMP driver, and correct header file prototyping.
-- Make usb driver sleep for 1 second then retry up to 10 times
-  if the device cannot be opened. There are two such loops so in
-  the event of failure, it will occur 20 seconds later. This
-  allows time for the hotplug program to initialize the USB devices
-  after a boot.
-- Thanks to Joseph Sacco, we have Yellow dog support -- and he
-  has tested and validated it!
-- Integrated Joseph Sacco's yellowdog patch -- some done by hand.
-- Fix a Makefile find that removes zero length files, which fails                 
-  on some systems.
-- Web site update.
-- Turned on strict prototype checking.
-- Changed start level from 20 to 60 to ensure that DNS is started. 
-  Reported by David Walser.
-- Remove some unused code in the snmp directory.
-- Cleanup some compile errors in the snmp directory.
-- Cleanup crap generated by doc book for web manual
-- Move install.xml to install.kml and implement simpler html directives in
-  docbook.  Modify Makefile to convert html back into docbook.
-- Change references to serial port in apctest to device (USB included).
-- Minor updates to the documentation from user input.
+  * GUI installer for Win32 systems (thanks, Kern!)
 
-Release 3.10.11 26Jan04:
-- Correct apccontrol script to remove extra ;; that I inadvertantly
-  left the last release -- apparently that prevented proper shutdown.
-- Updates to manual as requested by Adam and other users.
-- Fix localtime_r in configure.in as reported with patch by Adam.
-- Fixed bad html in multimoncss.c reported by an anonymous user.
-- Added new Mandrake apcupsd.spec.in submitted by David Walser.
-- Revert to using the old master/slave networking code bu default.
+  * SelfTest transfers to battery now supported by USB driver. Such 
+    transfers result in startselftest-endselftest events instead of 
+    powerout-mainsback and trigger the capture of selftest results.
 
-Release 3.10.10
-- This version has an additional fix to the USB driver based on
-  work by Adam Kropelin -- it limits the rate at which apcupsd will
-  poll the UPS for the volatile data, which in turn reduces the possiblity
-  of flooding the kernel with control messages (hide-core.c: control
-  queue full ...".
-- I added a new "offbattery" event that is only executed if the 
-  "onbattery" event was executed. This should allow users to easily
-  control what messages they get and by using the ONBATTERYDELAY the
-  time on batteries before the onbattery event is notified. The code
-  is untested, so any feedback would be appreciated.
+  * apctest supports changing Alarm behavior on USB models.
 
-Release 3.10.9
-31Dec03
-- Bartlomiej Krol found an unexpected interaction between the 6 second
-  "debounce" code and the new ONBATTERY delay time that caused the
-  USB and apcsmart drivers to sleep for a long time.
-28Dec03
-- Added upsBaiscOntrolConverveBattery change to smtp requested by
-  Kastus Shchuka (kastus@list.sourceforge.net) 
-- Move wall in killpower of apccontrol to after killpower to avoid 
-  errors stopping script.
-- Install apctest along with apcupsd.
-19Dec03
-- Added patch by Adam Kropelin that ignores invalid samples. This 
-  eliminates the need for the wait, and seems to calm the system. Apparently, 
-  even though apcupsd did not use the bad samples, it would break from the
-  wait loop, and request an update, which gave even more bad samples. With
-  Adam's patch the samples are simply dropped and we continue waiting (if 
-  appropriate).  Thanks Adam.
-18Dec03
-- Add Slackware updated patch submitted by Andrei Mamontov
-- Corrected the missing library dependencies in src/Makefile.in
-  Thanks to Reg. Clemens for pushing me a bit on this.
-24Nov03
-- Added a ONBATTERYDELAY to the conf file. This is the time in
-  seconds that apcupsd will wait after detecting a power failure
-  until it sets the onbattery state.  If you do not want to be
-  annoyed by short power outages (usually less than 10 seconds),
-  set the ONBATTERYDELAY appropriately and comment out the
-  powerout) "echo ...|wall" statement.
-- I finally got the no driver configured error. It turns out that the
-  Makefile detection of changes is all botched up. Since I don't understand
-  how the author expected it to work, I used the sledgehammer approach and
-  do a "make clean" on every ./configure.
-- Replaced apcnet.c with Howard Wilkinson's new master/slave code. If
-  anyone *really* needs the old driver, it is in src/apcnet.c.old
-- Upgraded to Cygwin 1.5.5
+  * Battery disconnect and reconnect events (USB and apcsmart drivers 
+    only)
 
-Items to note:  !!!!!
-- The default NIS port has changed from 7000 to 3551. Port 3551 has been
-  officially assigned to apcupsd by IANA.
+  * SNMP driver supports Trap catching which allows the driver to detect
+    power events more quickly. Previously the driver polled the UPS once 
+    every 60 seconds which could result in long delays before power 
+    failure was recognized. In order for trap catching to work YOU MUST 
+    CONFIGURE YOUR UPS TO SEND TRAPS AS DESCRIBED IN THE APCUPSD MANUAL.
+
+  * Win32 build includes SNMP driver support.
+
+OTHER CHANGES (See ChangeLog for detailed list)
+
+  * Code style normalization throughout the source tree
+
+  * Improve USB driver architecture to reduce CPU usage.
+
+  * Rename mainsback.in to offbattery.in so default power loss/return
+    actions are symmetrical.
+  
+  * Powerflute fixes (compile and operational fixes)
+
+  * NIS locking fix to prevent clients from reading corrupt data
+
+  * SNMP driver bug fixes and proper commlost event handling
+
+  * Many documentation improvements
+
+  * Rewrite the UPSCABLE description in apcupsd.conf to hopefully
+    eliminate the common mistake of thinking the cable model numbers are
+    listed in columns by type.
+
+  * Upgrade Cygwin support to 1.5.18 (thanks, Kern!)
+
+  * Many, many bug fixes

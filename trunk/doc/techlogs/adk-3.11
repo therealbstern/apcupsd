@@ -7,6 +7,8 @@ General:
 - snmp: Remove misuse of NETSNMP_CALLBACK_OP_RECEIVED_MESSAGE. Also use
   snmp_{session,pdu} instead of netsmp_{session,pdu} to retain 
   compatibility with the ucd-snmp library.
+- Fix compliation of examples/ files: client.c, megaclient.c, 
+  newslave.c, upsapm.c  
 31Dec05:
 - conf: Update EEPROM section comments.
 19Dec05:
