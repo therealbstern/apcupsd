@@ -25,11 +25,9 @@
 #define SERV_TCP_PORT 3551
 #define SERV_HOST_ADDR "127.0.0.1"
 
-void handle_client();
+void handle_client(FILE *fp, int sockfd, char *cmd);
 
 extern int net_errno;
-
-struct sockaddr_in tcp_serv_addr;
 
 void error_abort(char *msg)
 {
