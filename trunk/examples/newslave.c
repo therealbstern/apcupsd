@@ -81,8 +81,6 @@ int fill_buffer(int sockfd);
 
 extern int net_errno;
 
-struct sockaddr_in tcp_serv_addr;
-
 void error_abort(char *msg)
 {
    fprintf(stderr, msg);
