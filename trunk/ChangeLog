@@ -5,6 +5,21 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+----> Release 3.10.18 21Jul05
+- Fix USB lockups on 800 RS and 650 CS models by inserting a 20 ms delay
+  between control transfers.
+- bsd-usb build fix for FreeBSD-4.11
+- Fix runaway process with USB on linux-2.6.12 kernels by filtering out
+  duplicate events in pusb_ups_check_state().
+- Fix shutdown of USB ES models on BSD by writing reports using
+  CLASS_INTERFACE instead of CLASS_ENDPOINT. This mirrors the way we read
+  reports.
+- Fix apctest startup with blank DEVICE setting for USB driver
+- Fix child signal core dump on HPUX
+
+----> Release 3.10.17a 22Apr05
+- Fix BSD USB driver lockups.
+
 ----> Release 3.10.17 18Mar05
 - Fix termination of empty directives in .conf file.
 - Move docbook directory to old_documents
