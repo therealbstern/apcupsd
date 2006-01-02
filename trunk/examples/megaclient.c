@@ -39,11 +39,7 @@
 #define MAXLINE 5000
 
 
-void handle_client();
-
 extern int net_errno;
-
-struct sockaddr_in tcp_serv_addr;
 
 void error_abort(char *msg)
 {
