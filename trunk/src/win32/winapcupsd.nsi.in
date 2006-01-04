@@ -112,6 +112,7 @@ Section "Apcupsd Service" SecService
   File ..\..\platforms\cygwin\README.txt
   File ..\..\COPYING
   File ..\..\ChangeLog
+  File ..\..\ReleaseNotes
 
   SetOutPath "$INSTDIR\etc\apcupsd"
   File ..\..\platforms\cygwin\apccontrol
@@ -263,6 +264,7 @@ Section "Uninstall"
   Delete /REBOOTOK "$INSTDIR\README.txt"
   Delete /REBOOTOK "$INSTDIR\COPYING"
   Delete /REBOOTOK "$INSTDIR\ChangeLog"
+  Delete /REBOOTOK "$INSTDIR\ReleaseNotes"
   Delete /REBOOTOK "$INSTDIR\Uninstall.exe"
   Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apccontrol"
   Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apcupsd.conf.new"
