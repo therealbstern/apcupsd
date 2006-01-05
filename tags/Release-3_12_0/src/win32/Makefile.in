@@ -1,0 +1,119 @@
+#
+# makefile to build Windows specific pieces of apcupsd
+#
+# Copyright (C) 1999-2002 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
+#
+
+# Default variables
+@VARIABLES@
+# TOP source directory.
+topdir = @topdir@
+top_builddir = $(topdir)
+
+MAKENSIS="c:/Program Files/NSIS/makensis"
+
+# Include the default make targets: to be put before the all-targets: rule.
+@TARGETS@
+
+allexe = shutdown.exe popup.exe email.exe
+
+SRCS =	shutdown.c
+
+OBJS =	shutdown.o
+
+UPSOBJS = winabout.o winevents.o winservice.o winstat.o wintray.o winmain.o
+
+all-targets: winlib.a winres.res $(allexe)
+
+win32: winlib.a shutdown.exe
+
+winlib.a: $(UPSOBJS) winres.res
+	ar rc $@ $(UPSOBJS)
+	$(RANLIB) $@
+
+shutdown.o: shutdown.c
+	gcc -c $(CFLAGS) $<
+
+shutdown.exe: ${OBJS} 
+	gcc ${CFLAGS} -o shutdown ${OBJS} -luser32 -lgdi32
+
+winres.res: winres.rc apcupsd.ico winres.h online.ico onbatt.ico
+	windres $< -O coff -o $@
+
+winmain.o: winmain.cpp winups.h
+	$(CC) -c $(WCFLAGS) $(CFLAGS) $<
+
+popup.exe: popup.o
+	$(CC) ${WCFLAGS} $(CFLAGS) -o popup popup.o -luser32 -lgdi32
+
+email.o: email.c
+	gcc -c ${CFLAGS} $<
+
+email.exe: email.o libmymapi32.a
+	gcc ${CFLAGS} -L. -o email email.o -luser32 -lgdi32 -lmymapi32
+
+libmymapi32.a: mymapi32.def
+	dlltool --as=as -k --output-lib $@ --def $<
+
+clean: targetclean
+
+distclean: targetdistclean
+	$(RMF) Makefile
+	$(RMF) -rf CVS
+
+install:
+	@echo "Installing executables ..."
+	@$(INSTALL_PROGRAM) -s -m 755 popup.exe $(sbindir)/popup.exe
+	@$(INSTALL_PROGRAM) -s -m 755 shutdown.exe $(sbindir)/shutdown.exe
+	@$(INSTALL_PROGRAM) -s -m 755 email.exe $(sbindir)/email.exe
+
+# Make a Win32 binary release 
+binary-release:
+	@rm -rf wr
+	@mkdir -p wr
+	@mkdir -p wr/$(prefix) wr/$(sbindir) wr/$(sysconfdir) wr/tmp
+	@echo "Copying system binary files ..."
+	@cp $(topdir)/platforms/cygwin/bin/* wr/$(sbindir)
+	@strip $(topdir)/src/*.exe
+	@strip *.exe
+	@echo "Copying executables ..."
+	@cp -f $(topdir)/src/apcupsd.exe wr/$(sbindir)/apcupsd.exe 
+	@cp -f $(topdir)/src/smtp.exe wr/$(sbindir)/smtp.exe
+	@cp -f $(topdir)/src/apcaccess.exe wr/$(sbindir)/apcaccess.exe
+	@cp -f $(topdir)/src/apctest.exe wr/$(sbindir)/apctest.exe
+	@cp -f popup.exe wr/$(sbindir)/popup.exe
+	@cp -f shutdown.exe wr/$(sbindir)/shutdown.exe
+	@cp -f email.exe wr/$(sbindir)/email.exe
+	@echo "Copying apccontrol ..."
+	@cp -f $(topdir)/platforms/cygwin/apccontrol wr/$(sysconfdir)/apccontrol
+	@echo "Copying apcupsd.conf..."
+	@cp -f $(topdir)/platforms/etc/apcupsd.conf wr/$(sysconfdir)/apcupsd.conf
+	@echo "Copying manual ..."
+	@cp -p $(topdir)/doc/latex/manual.html wr/$(prefix)
+	@cp -p $(topdir)/doc/latex/*.png wr/$(prefix)
+	@echo "Copying examples ..."
+	@cp -rp $(topdir)/examples wr/$(prefix)
+	@cp -f $(topdir)/platforms/cygwin/examples/* wr/$(prefix)/examples
+	@cp -f $(topdir)/platforms/cygwin/README.txt wr/$(prefix)
+	@cp -f $(topdir)/platforms/cygwin/README.txt wr/$(sbindir)
+	@cp -f $(topdir)/COPYING wr/$(prefix)
+	@cp -f $(topdir)/ChangeLog wr/$(prefix)
+	@echo "dummy" >wr/tmp/dummy.txt
+	@echo "Making tar file ..."
+	@tar cfz winapcupsd-${VERSION}.tar.gz -C wr apcupsd tmp
+	@mv -f winapcupsd-${VERSION}.tar.gz $(topdir)/..
+	@rm -rf wr
+	@(cd $(topdir)/..; \
+		echo "Tar file in: `pwd`/winapcupsd-${VERSION}.tar.gz")
+
+#
+# Build installer
+#
+winapcupsd.exe:
+	@strip $(topdir)/src/*.exe
+	@strip *.exe
+	${MAKENSIS} /V2 winapcupsd.nsi
+
+
+# -----------------------------------------------------------------------
+# DO NOT DELETE THIS LINE -- make depend depends on it.
