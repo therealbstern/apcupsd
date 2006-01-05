@@ -14998,6 +14998,7 @@ TARGETS=$srcdir/autoconf/targets.mak
 
 
           ac_config_files="$ac_config_files ${GENERATE_FILES}"
+          ac_config_commands="$ac_config_commands default"
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -15539,6 +15540,7 @@ do
   "${GENERATE_FILES}" ) CONFIG_FILES="$CONFIG_FILES ${GENERATE_FILES}" ;;
   "$ac_config_links_1" ) CONFIG_LINKS="$CONFIG_LINKS $ac_config_links_1" ;;
   "default-1" ) CONFIG_COMMANDS="$CONFIG_COMMANDS default-1" ;;
+  "default" ) CONFIG_COMMANDS="$CONFIG_COMMANDS default" ;;
   "include/config.h" ) CONFIG_HEADERS="$CONFIG_HEADERS include/config.h:autoconf/config.h.in" ;;
   *) { { echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5
 echo "$as_me: error: invalid argument: $ac_config_target" >&2;}
@@ -16499,6 +16501,8 @@ echo "$as_me: executing $ac_dest commands" >&6;}
     default-1 ) case "$CONFIG_FILES" in *po/Makefile.in*)
         sed -e "/POTFILES =/r src/po/POTFILES" src/po/Makefile.in > src/po/Makefile
       esac ;;
+    default ) (echo "Doing make of dependencies"; make depend;)
+ ;;
   esac
 done
 _ACEOF
