@@ -1651,7 +1651,9 @@ AC_SUBST_FILE(VARIABLES)
 TARGETS=$srcdir/autoconf/targets.mak
 AC_SUBST_FILE(TARGETS)
 
-AC_OUTPUT([ ${GENERATE_FILES} ])
+AC_OUTPUT([ ${GENERATE_FILES} ], 
+     [(echo "Doing make of dependencies"; make depend;) ]
+)
 
 chmod 755 examples/safe.apccontrol
 make clean
