@@ -463,6 +463,7 @@ static int usb_link_check(UPSINFO *ups)
       sleep(LINK_RETRY_INTERVAL);
 
       if (my_data->fd) {
+         usb_reset(my_data->fd);
          usb_close(my_data->fd);
          my_data->fd = NULL;
          hid_dispose_report_desc(my_data->rdesc);
