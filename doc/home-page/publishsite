@@ -1,7 +1,12 @@
 #!/bin/sh
-cd /home/kern/apcupsd/k/doc/home-page
 wmk
 echo "Copying files to site"     
-sudo cp -f *.html /mnt/matou/home/www/apcupsd/public/docs/
-sudo cp -f *.gif /mnt/matou/home/www/apcupsd/public/docs/
-sudo cp -f mail16d.png /mnt/matou/home/www/apcupsd/public/docs/
+sftp -b - shell.sourceforge.net <<-END
+	cd /home/groups/a/ap/apcupsd/htdocs
+	-rm *
+	progress
+	put *.html
+	put *.gif
+	put *.png
+END
+

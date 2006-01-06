@@ -1,13 +1,13 @@
 
 <font color="#0000ff" size=+2><b>General</b></font><br>
 <a href="index.html">Apcupsd Home</a><br>
-<a href="cusage/index.html">Site Visits</a><br>
+<a href="http://sourceforge.net/project/stats/detail.php?group_id=54413&ugn=apcupsd&type=prweb">Site Visits</a><br>
 
 &nbsp;<br>
 <font color="#0000ff" size=+2><b>Documentation</b></font><br>
-<a href="3.10.x-manual/index.html">Online Manual</a><br>
-<a href="3.10.x-manual/apcupsd.pdf">PDF Manual</a><br>
-<a href="3.10.x-manual/manual.html">Single Page Manual</a><br>
+<a href="manual/index.html">Online Manual</a><br>
+<a href="manual/apcupsd.pdf">PDF Manual</a><br>
+<a href="manual/manual.html">Single Page Manual</a><br>
 
 
 &nbsp;<br>

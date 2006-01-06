@@ -26,6 +26,8 @@
 <table height=100% border="0" cellspacing="0" cellpading="4">
 <tr> <td width=12% bgcolor="#ffffff" valign="top">
 #include "menu.inc"
+<p>
+<a href="http://sourceforge.net"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=54413&amp;type=1" width="88" height="31" border="0" alt="SourceForge.net Logo" /></a>
 </td>
 <td bgcolor="#ffffff"><font size="1">&nbsp;&nbsp;&nbsp;&nbsp;</font></td>
 <td bgcolor="#ffffff" valign="top">
