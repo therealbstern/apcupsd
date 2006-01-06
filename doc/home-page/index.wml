@@ -15,6 +15,19 @@ consumption rates. Apcupsd is licensed under the GPL version 2.
 
 <h2>Recent Apcupsd Releases</h2>
 
+<h3>3.12.0 (02 January 2006) [
+<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=49059&release_id=382882">Source</a>
+&nbsp;/&nbsp;
+<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=73153&release_id=382890">Win32</a>
+]</h3>
+Highlights of this release include a GUI installer for Win32 systems,
+battery disconnect/reconnect detection for smart serial and USB
+connections, SNMP trap catching for quicker SNMP event responses, and
+numerous bug fixes. Please be sure to read the
+<a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=382882">ReleaseNotes</a> 
+to learn about the new features and for important information about
+upcoming releases.
+
 <h3>3.10.18 (21 July 2005) [
 <a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=49059&release_id=343935">Source</a>
 &nbsp;/&nbsp;
@@ -30,30 +43,6 @@ to upgrade. This version contains changes for compatibility with linux
 possibly others). Also included are minor fixes to apctest when used
 with a blank DEVICE setting (which is the recommended configuration
 for USB) and a BSD USB shutdown fix for ES models.
-
-<h3>3.10.17a (22 April 2005) [
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=49059&release_id=322777">Source</a>
-]</h3>
-This is a minor bug fix release that only affects BSD USB users (thus 
-no RPMs or Win32 binaries are supplied). This release will fix the
-BSD USB lockup bug that many users have experienced. There is no
-reason to upgrade to this release unless you are using the BSD USB
-driver; all other users may continue to use 3.10.17 (below).
-
-<h3>3.10.17 (18 March 2005) [
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=49059&release_id=314194">Source</a>
-&nbsp;/&nbsp;
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=73150&release_id=314235">RPMs</a>
-&nbsp;/&nbsp;
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=73153&release_id=314207">Win32</a>
-]</h3>
-<b>Apcupsd</b> version 3.10.17 includes the <b>beta</b> release of
-USB support for FreeBSD, OpenBSD, and NetBSD. <i>Please read
-"Checking Out Your USB Subsystem (BSD)" in the manual for details on
-how to configure these platforms for USB support and for information
-on known bugs.</i> Also included in 3.10.17 is improved support for 
-hibernating USB UPSes and a fix for the slave mode segfault bug 
-introduced in 3.10.16.
 
 <h2><a href="3.10.x-manual/index.html" target="_top">Online
 3.10.x Manual</a> or a
