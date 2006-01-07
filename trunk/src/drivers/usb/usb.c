@@ -317,8 +317,7 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
       break;
 
    case CI_Discharging:
-      if (uval->iValue)
-         ups->clear_online();
+      ups->set_online(!uval->iValue);
       Dmsg1(200, "Discharging=%d\n", uval->iValue);
       break;
 
