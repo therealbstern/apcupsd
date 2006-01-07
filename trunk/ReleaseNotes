@@ -2,6 +2,11 @@
              Release Notes for Apcupsd 3.12.x
 
 
+Release 3.12.1 06Jan06
+
+Bug fix release for USB driver. Fixes missing status report on SU 2200.
+
+
 Release 3.12.0 02Jan06
 
 MAJOR CHANGES

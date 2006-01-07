@@ -8,6 +8,15 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+CHANGES IN 3.12.1
+
+06Jan06:
+- usb: Status bits must use positive logic, so online state must be 
+  updated even if CI_Discharging=0. This fixes missing status on SU2200.
+
+
+CHANGES IN 3.12.0
+
 02Jan06:
 - doc: Update version to 3.12.x and remove ChangeLog and ReleaseNotes
   sections since it is better to fetch them directly from SourceForge
