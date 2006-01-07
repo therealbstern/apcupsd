@@ -22,8 +22,8 @@ consumption rates. Apcupsd is licensed under the GPL version 2.
 ]</h3>
 This release fixes a bug in the USB driver which caused a blank status
 field on SmartUPS 2200 models (and possibly others). Win32 binaries
-have been re-released for consistency, but only users of Linux or BSD
-USB need to upgrade.
+have been released for consistency, but only users of Linux or BSD USB
+need to upgrade.
 
 <h3>3.12.0 (02 January 2006) [
 <a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=49059&release_id=382882">Source</a>
