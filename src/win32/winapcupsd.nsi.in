@@ -97,6 +97,11 @@ Section "Apcupsd Service" SecService
   ;
   
   File \cygwin\bin\cygwin1.dll
+  File \cygwin\bin\cygiconv-2.dll
+  File \cygwin\bin\cygintl-3.dll
+  File \cygwin\bin\cygncurses-8.dll
+  File \cygwin\bin\cygreadline6.dll
+  File \cygwin\bin\sh.exe
   File ..\apcupsd.exe
   File ..\smtp.exe
   File ..\apcaccess.exe
@@ -253,6 +258,11 @@ Section "Uninstall"
 
   ; remove files and uninstaller (preserving config for now)
   Delete /REBOOTOK "$INSTDIR\bin\cygwin1.dll"
+  Delete /REBOOTOK "$INSTDIR\bin\cygiconv-2.dll"
+  Delete /REBOOTOK "$INSTDIR\bin\cygintl-3.dll"
+  Delete /REBOOTOK "$INSTDIR\bin\cygncurses-8.dll"
+  Delete /REBOOTOK "$INSTDIR\bin\cygreadline6.dll"
+  Delete /REBOOTOK "$INSTDIR\bin\sh.exe"
   Delete /REBOOTOK "$INSTDIR\bin\apcupsd.exe"
   Delete /REBOOTOK "$INSTDIR\bin\smtp.exe"
   Delete /REBOOTOK "$INSTDIR\bin\apcaccess.exe"
