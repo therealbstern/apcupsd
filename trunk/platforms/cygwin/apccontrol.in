@@ -125,9 +125,9 @@ case "$1" in
 	;;
 	endselftest)
 	;;
-	battdetach}
+	battdetach)
 	;;
-	battattach}
+	battattach)
 	;;
 	*)	echo "Usage: ${0##*/} command"
 		echo "	     Warning: this script is intended to be launched by"
