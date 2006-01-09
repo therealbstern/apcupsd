@@ -188,7 +188,7 @@ void FillEventsBox(HWND hwnd, int id_list)
    ssize_t len;
    char *buf, *p, *l;
 
-   if (!shm_OK || core_ups->event_fd > 0) {
+   if (!shm_OK || core_ups->event_fd < 0) {
       SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0,
          (LONG) "Events not available");
       return;
