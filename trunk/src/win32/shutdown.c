@@ -36,8 +36,8 @@ int main(int argc, char **argv)
        
       // Get a token for this process. 
        
-      if (!OpenProcessToken(GetCurrentProcess(), 
-	      TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken)) {
+      if (!OpenThreadToken(GetCurrentThread(), 
+	      TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, FALSE, &hToken)) {
 // Forge onward anyway in the hopes of succeeding.
 //       MessageBox(NULL, "System shutdown failed: OpenProcessToken", "shutdown", MB_OK);
 //	 exit(1);
