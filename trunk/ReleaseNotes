@@ -2,6 +2,12 @@
              Release Notes for Apcupsd 3.12.x
 
 
+Release 3.12.2 18Jan06
+
+Bug fix release for Win32 (winapcupsd). Fixes event processing on all
+Win32 platforms and fixes shutdown on WinXP systems.
+
+
 Release 3.12.1 06Jan06
 
 Bug fix release for USB driver. Fixes missing status report on SU 2200.

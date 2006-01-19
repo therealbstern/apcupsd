@@ -8,6 +8,17 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+CHANGES IN 3.12.2
+
+17Jan06:
+- win32 Use OpenThreadToken() instead of OpenProcessToken(). This makes
+  shutdown work on WinXP.
+08Jan06:
+- win32: Fix typo so Win32 event window will be populated correctly.
+- win32: Include sh.exe and requisite DLLs.
+- win32: Fix typo in battattach and battdetach cases.
+
+
 CHANGES IN 3.12.1
 
 06Jan06:
