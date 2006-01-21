@@ -200,7 +200,7 @@ install -m744 examples/make-hiddev \
 
 %files usb
 %defattr(-,root,root)
-%doc COPYING ChangeLog doc/README.* doc/developers_manual examples ../Release_Notes-%{version}-%{release}.txt
+%doc COPYING DISCLAIMER ReleaseNotes ChangeLog ../Release_Notes-%{version}-%{release}.txt
 %dir %{_sysconfdir}/apcupsd
 %dir %{_sysconfdir}/apcupsd/cgi
 %{initdir}/apcupsd
@@ -297,7 +297,7 @@ fi
 
 %files std
 %defattr(-,root,root)
-%doc COPYING ChangeLog doc/README.* doc/developers_manual examples ../Release_Notes-%{version}-%{release}.txt
+%doc COPYING DISCLAIMER ReleaseNotes ChangeLog ../Release_Notes-%{version}-%{release}.txt
 %dir %{_sysconfdir}/apcupsd
 %dir %{_sysconfdir}/apcupsd/cgi
 %{initdir}/apcupsd
@@ -391,6 +391,8 @@ fi
 %endif
 
 %changelog
+* Sat Jan 21 2006 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- release 3.12.2 update docs
 * Sun Sep 18 2005 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - Change deprecated Copyright tag to License
 * Tue Jun 07 2005 Adam Kropelin <akropel1@rochester.rr.com>
