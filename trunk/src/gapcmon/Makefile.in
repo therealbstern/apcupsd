@@ -1,0 +1,38 @@
+# Default variables
+@VARIABLES@
+# TOP source directory.
+topdir = @topdir@
+top_builddir = $(topdir)
+
+allexe = gapcmon
+
+# Include the default make targets: to be put before the all-targets: rule.
+@TARGETS@
+
+# Override elements of the standard .c.o rule since we want GTK flags.
+# Eventually we should make gapcmon.c c++ clean so we can use $(CXX) as-is.
+CXX=$(CC)
+CFLAGS=-Wall -O2 @GAPCMON_CFLAGS@
+DEFS=
+
+# gapcmon objects
+OBJS = gapcmon.o
+
+all-targets: $(allexe)
+
+gapcmon: $(OBJS)
+	$(CC) -o $@ $(OBJS) @GAPCMON_LIBS@
+
+clean: targetclean
+
+distclean: targetdistclean
+	$(RMF) gapcmon
+	$(RMF) Makefile
+	$(RMF) -r CVS
+
+install: all-targets
+
+uninstall:
+
+# -----------------------------------------------------------------------
+# DO NOT DELETE THIS LINE -- make depend depends on it.
