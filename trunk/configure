@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS ABSSRCDIR topdir TRUEPRG FALSEPRG build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP CXX CXXFLAGS ac_ct_CXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA AWK HAVE_GCC_TRUE HAVE_GCC_FALSE DEBUG DLIB DINCLUDE PTHREAD_CFLAGS PTHREAD_LFLAGS WIN32 WINLIBS APCACCESS SMTP APCTEST SHUTDOWN APCUPSD_MAIL WALL SCRIPTSHELL MAKE MAKEDEPEND RANLIB LIBTOOL ETAGS CTAGS RM CP ECHO LN SED AR MV HAVE_SUN_OS_TRUE HAVE_SUN_OS_FALSE HAVE_OSF1_OS_TRUE HAVE_OSF1_OS_FALSE HAVE_AIX_OS_TRUE HAVE_AIX_OS_FALSE HAVE_HPUX_OS_TRUE HAVE_HPUX_OS_FALSE HAVE_LINUX_OS_TRUE HAVE_LINUX_OS_FALSE HAVE_FREEBSD_OS_TRUE HAVE_FREEBSD_OS_FALSE HAVE_NETBSD_OS_TRUE HAVE_NETBSD_OS_FALSE HAVE_OPENBSD_OS_TRUE HAVE_OPENBSD_OS_FALSE HAVE_BSDI_OS_TRUE HAVE_BSDI_OS_FALSE HAVE_SGI_OS_TRUE HAVE_SGI_OS_FALSE HAVE_DARWIN_OS_TRUE HAVE_DARWIN_OS_FALSE GDHEAD INSTALL_DISTDIR UNINSTALL_DISTDIR APCSMART_DRIVER DUMB_DRIVER USB_DRIVER USB_TYPE LIBUSBHID LIBUSBHIDINC LIBUSBHIDOBJS NET_DRIVER SNMP_DRIVER TEST_DRIVER NISIP PKG_CONFIG ac_pt_PKG_CONFIG GAPCMON_CFLAGS GAPCMON_LIBS GAPCMON POMAKE INTLSUB INTLMAKE INTLTARGET POWERFLUTE POWERLIBS CGI GDINCLUDE LIBGD LIBGDOBJ CGI_IMGFMT CGIBIN PACKAGE VERSION DATE MSGFMT SET_MAKE ac_ct_RANLIB ALLOCA USE_NLS GMSGFMT XGETTEXT GENCAT USE_INCLUDED_LIBINTL CATALOGS CATOBJEXT DATADIRNAME GMOFILES INSTOBJEXT INTLDEPS INTLLIBS INTLINCLUDE INTLOBJS POFILES POSUB INCLUDE_LOCALE_H GT_NO GT_YES l MKINSTALLDIRS EXTRADEFS LIBEXTRAOBJ EXTRAOBJ DISTNAME DISTVER SERIALDEV PIDDIR LOGDIR nologdir PWRFAILDIR LOCKDIR NETPORT NISPORT UPSTYPE UPSCABLE HOST WCFLAGS WLDFLAGS LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS ABSSRCDIR topdir TRUEPRG FALSEPRG build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP CXX CXXFLAGS ac_ct_CXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA AWK HAVE_GCC_TRUE HAVE_GCC_FALSE DEBUG DLIB DINCLUDE PTHREAD_CFLAGS PTHREAD_LFLAGS WIN32 WINLIBS APCACCESS SMTP APCTEST SHUTDOWN APCUPSD_MAIL WALL SCRIPTSHELL MAKE MAKEDEPEND RANLIB LIBTOOL ETAGS CTAGS RM CP ECHO LN SED AR MV HAVE_SUN_OS_TRUE HAVE_SUN_OS_FALSE HAVE_OSF1_OS_TRUE HAVE_OSF1_OS_FALSE HAVE_AIX_OS_TRUE HAVE_AIX_OS_FALSE HAVE_HPUX_OS_TRUE HAVE_HPUX_OS_FALSE HAVE_LINUX_OS_TRUE HAVE_LINUX_OS_FALSE HAVE_FREEBSD_OS_TRUE HAVE_FREEBSD_OS_FALSE HAVE_NETBSD_OS_TRUE HAVE_NETBSD_OS_FALSE HAVE_OPENBSD_OS_TRUE HAVE_OPENBSD_OS_FALSE HAVE_BSDI_OS_TRUE HAVE_BSDI_OS_FALSE HAVE_SGI_OS_TRUE HAVE_SGI_OS_FALSE HAVE_DARWIN_OS_TRUE HAVE_DARWIN_OS_FALSE GDHEAD INSTALL_DISTDIR UNINSTALL_DISTDIR APCSMART_DRIVER DUMB_DRIVER LIBUSBHID LIBUSBHIDINC LIBUSBHIDOBJS USB_DRIVER USB_TYPE LIBUSB NET_DRIVER SNMP_DRIVER TEST_DRIVER NISIP PKG_CONFIG ac_pt_PKG_CONFIG GAPCMON_CFLAGS GAPCMON_LIBS GAPCMON POMAKE INTLSUB INTLMAKE INTLTARGET POWERFLUTE POWERLIBS CGI GDINCLUDE LIBGD LIBGDOBJ CGI_IMGFMT CGIBIN PACKAGE VERSION DATE MSGFMT SET_MAKE ac_ct_RANLIB ALLOCA USE_NLS GMSGFMT XGETTEXT GENCAT USE_INCLUDED_LIBINTL CATALOGS CATOBJEXT DATADIRNAME GMOFILES INSTOBJEXT INTLDEPS INTLLIBS INTLINCLUDE INTLOBJS POFILES POSUB INCLUDE_LOCALE_H GT_NO GT_YES l MKINSTALLDIRS EXTRADEFS LIBEXTRAOBJ EXTRAOBJ DISTNAME DISTVER SERIALDEV PIDDIR LOGDIR nologdir PWRFAILDIR LOCKDIR NETPORT NISPORT UPSTYPE UPSCABLE HOST WCFLAGS WLDFLAGS LIBOBJS LTLIBOBJS'
 ac_subst_files='VARIABLES TARGETS'
 
 # Initialize some variables set by options.
@@ -902,6 +902,7 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-libwrap=DIR      Compile in libwrap (tcp_wrappers) support
+  --with-generic-usb      Force use of generic USB driver
   --with-nisip=IP-ADDRESS Specify the IP address to bind to (default=0.0.0.0)
   --with-cgi-bin=DIR      Specify cgi-bin directory (default=/etc/apcupsd)
   --with-included-gettext use the GNU gettext library included here
@@ -10208,43 +10209,294 @@ _ACEOF
 fi;
 
 
+
+# Allow user to force USB type to generic
+GENERICUSB="no"
+
+# Check whether --with-generic-usb or --without-generic-usb was given.
+if test "${with_generic_usb+set}" = set; then
+  withval="$with_generic_usb"
+
+	GENERICUSB="yes"
+
+
+fi;
+
 # Check whether --enable-usb or --disable-usb was given.
 if test "${enable_usb+set}" = set; then
   enableval="$enable_usb"
    if test "$enableval" = "yes" ; then
-	if test $HAVE_UNAME=yes -a x`uname -s` = xLinux ; then
-		cat >>confdefs.h <<\_ACEOF
-#define HAVE_USB_DRIVER 1
-_ACEOF
-
-		USB_DRIVER="usb"
-		USB_TYPE="linux"
-
-
-	elif test $HAVE_UNAME=yes -a x`uname -s` = xFreeBSD -o \
-		  $HAVE_UNAME=yes -a x`uname -s` = xOpenBSD -o \
-		  $HAVE_UNAME=yes -a x`uname -s` = xNetBSD ; then
-		cat >>confdefs.h <<\_ACEOF
-#define HAVE_USB_DRIVER 1
-_ACEOF
-
-		USB_DRIVER="usb"
-		USB_TYPE="bsd"
-		LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
-		LIBUSBHID=libusbhid
-		LIBUSBHIDOBJS="\$(topdir)/src/libusbhid/*.o"
+	if test $GENERICUSB = "no" -a \
+	        $HAVE_UNAME=yes -a x`uname -s` = xLinux ; then
+	   USB_TYPE="linux"
+	   echo "$as_me:$LINENO: result: Using Linux USB driver." >&5
+echo "${ECHO_T}Using Linux USB driver." >&6
+	elif test $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xFreeBSD -o \
+		  $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xOpenBSD -o \
+		  $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xNetBSD ; then
+	   LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
+	   LIBUSBHID=libusbhid
+	   LIBUSBHIDOBJS="\$(topdir)/src/libusbhid/*.o"
 
 
 
 
-
+	   USB_TYPE="bsd"
+	   echo "$as_me:$LINENO: result: Using BSD USB driver." >&5
+echo "${ECHO_T}Using BSD USB driver." >&6
 	else
-		{ { echo "$as_me:$LINENO: error: Can't build USB driver on this OS ($host_os)." >&5
-echo "$as_me: error: Can't build USB driver on this OS ($host_os)." >&2;}
+
+        lib="usb"
+        func="usb_interrupt_read"
+
+        found="no"
+
+        _libs=${LIBS}
+        LIBS="${LIBS} -l$lib"
+
+        echo "$as_me:$LINENO: checking for lib$lib in <default>" >&5
+echo $ECHO_N "checking for lib$lib in <default>... $ECHO_C" >&6
+        cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char $func ();
+int
+main ()
+{
+$func ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  found="yes"; echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+
+        if test "$found" = "no" ; then
+            _ldflags=${LDFLAGS}
+
+            for opt in /usr/local/lib /opt/local/lib ; do
+                echo "$as_me:$LINENO: checking for lib$lib in $opt" >&5
+echo $ECHO_N "checking for lib$lib in $opt... $ECHO_C" >&6
+                LDFLAGS="${LDFLAGS} -L$opt"
+                cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char $func ();
+int
+main ()
+{
+$func ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  found="yes"; echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6; break
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+                LDFLAGS=${_ldflags}
+            done
+        fi
+
+        if test "$found" = "no" ; then
+            { { echo "$as_me:$LINENO: error: Cannot find lib$lib." >&5
+echo "$as_me: error: Cannot find lib$lib." >&2;}
    { (exit 1); exit 1; }; }
+        fi
+
+
+as_ac_Lib=`echo "ac_cv_lib_$lib''_$func" | $as_tr_sh`
+echo "$as_me:$LINENO: checking for $func in -l$lib" >&5
+echo $ECHO_N "checking for $func in -l$lib... $ECHO_C" >&6
+if eval "test \"\${$as_ac_Lib+set}\" = set"; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-l$lib  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char $func ();
+int
+main ()
+{
+$func ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  eval "$as_ac_Lib=yes"
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+eval "$as_ac_Lib=no"
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_Lib'}'`" >&5
+echo "${ECHO_T}`eval echo '${'$as_ac_Lib'}'`" >&6
+if test `eval echo '${'$as_ac_Lib'}'` = yes; then
+  cat >>confdefs.h <<_ACEOF
+#define `echo "HAVE_LIB$lib" | $as_tr_cpp` 1
+_ACEOF
+
+  LIBS="-l$lib $LIBS"
+
+else
+  { { echo "$as_me:$LINENO: error: Cannot find lib$lib." >&5
+echo "$as_me: error: Cannot find lib$lib." >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+        LIBS=${_libs}
+
+
+	   LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
+	   LIBUSBHID=libusbhid
+	   LIBUSBHIDOBJS="\$(topdir)/src/libusbhid/*.o"
+
+
+
+
+	   LIBUSB="-lusb"
+
+                      if test $HAVE_UNAME=yes -a x`uname -s` = xDarwin ; then
+               LIBUSB="$LIBUSB -Wl,-framework -Wl,IOKit -Wl,-framework -Wl,CoreFoundation"
+           fi
+
+	   USB_TYPE="generic"
+	   echo "$as_me:$LINENO: result: Using generic libusb USB driver." >&5
+echo "${ECHO_T}Using generic libusb USB driver." >&6
 	fi
+
+	cat >>confdefs.h <<\_ACEOF
+#define HAVE_USB_DRIVER 1
+_ACEOF
+
+	USB_DRIVER="usb"
+
+
+
+	DISPLAY_USB_DRIVER=$USB_TYPE-$USB_DRIVER
+
 	fi
 fi;
+
 
 # Check whether --enable-net or --disable-net was given.
 if test "${enable_net+set}" = set; then
@@ -15969,11 +16221,12 @@ s,@INSTALL_DISTDIR@,$INSTALL_DISTDIR,;t t
 s,@UNINSTALL_DISTDIR@,$UNINSTALL_DISTDIR,;t t
 s,@APCSMART_DRIVER@,$APCSMART_DRIVER,;t t
 s,@DUMB_DRIVER@,$DUMB_DRIVER,;t t
-s,@USB_DRIVER@,$USB_DRIVER,;t t
-s,@USB_TYPE@,$USB_TYPE,;t t
 s,@LIBUSBHID@,$LIBUSBHID,;t t
 s,@LIBUSBHIDINC@,$LIBUSBHIDINC,;t t
 s,@LIBUSBHIDOBJS@,$LIBUSBHIDOBJS,;t t
+s,@USB_DRIVER@,$USB_DRIVER,;t t
+s,@USB_TYPE@,$USB_TYPE,;t t
+s,@LIBUSB@,$LIBUSB,;t t
 s,@NET_DRIVER@,$NET_DRIVER,;t t
 s,@SNMP_DRIVER@,$SNMP_DRIVER,;t t
 s,@TEST_DRIVER@,$TEST_DRIVER,;t t
@@ -16842,7 +17095,7 @@ Configuration on `date`:
   UPSTYPE		      ${UPSTYPE}
   UPSCABLE		      ${UPSCABLE}
 
-  drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${USB_DRIVER:-no-usb} ${DISPLAY_SNMP_DRIVER:-no-snmp} ${TEST_DRIVER:-no-test}
+  drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${DISPLAY_USB_DRIVER:-no-usb} ${DISPLAY_SNMP_DRIVER:-no-snmp} ${TEST_DRIVER:-no-test}
 
   enable-master-slave:	      ${OLDNET_ENABLED}
   enable-nis:		      ${NISSRV_ENABLED}

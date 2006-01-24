@@ -29,8 +29,6 @@
  *
  */
 
-#include <sys/cdefs.h>
-
 typedef struct report_desc *report_desc_t;
 
 typedef struct hid_data *hid_data_t;
@@ -81,8 +79,6 @@ typedef struct hid_item {
 #define HID_PAGE(u) (((u) >> 16) & 0xffff)
 #define HID_USAGE(u) ((u) & 0xffff)
 
-__BEGIN_DECLS
-
 /* Obtaining a report descriptor, descr.c: */
 report_desc_t hid_get_report_desc(int file);
 report_desc_t hid_use_report_desc(unsigned char *data, unsigned int size);
@@ -105,5 +101,3 @@ int hid_parse_usage_page(const char *name);
 /* Extracting/insertion of data, data.c: */
 int hid_get_data(const void *p, const hid_item_t *h);
 void hid_set_data(void *p, const hid_item_t *h, int data);
-
-__END_DECLS

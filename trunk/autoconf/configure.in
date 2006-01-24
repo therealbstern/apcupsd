@@ -726,36 +726,101 @@ AC_HELP_STRING([--disable-dumb], [No dumb UPS driver])],
 	AC_SUBST(DUMB_DRIVER)
 	])
 
+dnl
+dnl Search for lib ($1) containing func ($2) in default path plus paths listed in opts ($3)
+dnl
+AC_DEFUN(AC_LIB_SEARCH,
+    [
+        lib="$1"
+        func="$2"
+
+        found="no"
+
+        _libs=${LIBS}
+        LIBS="${LIBS} -l$lib"
+
+        AC_MSG_CHECKING([for lib$lib in <default>])
+        AC_LINK_IFELSE([AC_LANG_CALL([], [$func])], [found="yes"; AC_MSG_RESULT([yes])], [AC_MSG_RESULT([no])])
+
+        if test "$found" = "no" ; then
+            _ldflags=${LDFLAGS}
+
+            for opt in $3 ; do
+                AC_MSG_CHECKING([for lib$lib in $opt])
+                LDFLAGS="${LDFLAGS} -L$opt"
+                AC_LINK_IFELSE([AC_LANG_CALL([], [$func])], [found="yes"; AC_MSG_RESULT([yes]); break], [AC_MSG_RESULT([no])])
+                LDFLAGS=${_ldflags}
+            done
+        fi
+
+        if test "$found" = "no" ; then
+            AC_MSG_ERROR([Cannot find lib$lib.])
+        fi
+
+        AC_CHECK_LIB($lib, $func, [], [AC_MSG_ERROR([Cannot find lib$lib.])], [])
+        LIBS=${_libs}
+    ])
+
+# Allow user to force USB type to generic
+GENERICUSB="no"
+AC_ARG_WITH(generic-usb,
+    [AC_HELP_STRING([--with-generic-usb], [Force use of generic USB driver])],
+    [
+	GENERICUSB="yes"
+    ]
+)
 
 AC_ARG_ENABLE(usb, [
 AC_HELP_STRING([--enable-usb], [Compile USB UPS code])
 AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
 	[ if test "$enableval" = "yes" ; then
-	if test $HAVE_UNAME=yes -a x`uname -s` = xLinux ; then
-		AC_DEFINE(HAVE_USB_DRIVER)
-		USB_DRIVER="usb"
-		USB_TYPE="linux"
-		AC_SUBST(USB_DRIVER)
-		AC_SUBST(USB_TYPE)
-	elif test $HAVE_UNAME=yes -a x`uname -s` = xFreeBSD -o \
-		  $HAVE_UNAME=yes -a x`uname -s` = xOpenBSD -o \
-		  $HAVE_UNAME=yes -a x`uname -s` = xNetBSD ; then
-		AC_DEFINE(HAVE_USB_DRIVER)
-		USB_DRIVER="usb"
-		USB_TYPE="bsd"
-		LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
-		LIBUSBHID=libusbhid
-		LIBUSBHIDOBJS="\$(topdir)/src/libusbhid/*.o"
-		AC_SUBST(USB_DRIVER)
-		AC_SUBST(USB_TYPE)
-		AC_SUBST(LIBUSBHID)
-		AC_SUBST(LIBUSBHIDINC)
-		AC_SUBST(LIBUSBHIDOBJS)
+	if test $GENERICUSB = "no" -a \
+	        $HAVE_UNAME=yes -a x`uname -s` = xLinux ; then
+	   USB_TYPE="linux"
+	   AC_MSG_RESULT([Using Linux USB driver.])
+	elif test $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xFreeBSD -o \
+		  $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xOpenBSD -o \
+		  $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xNetBSD ; then
+	   LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
+	   LIBUSBHID=libusbhid
+	   LIBUSBHIDOBJS="\$(topdir)/src/libusbhid/*.o"
+	   AC_SUBST(LIBUSBHID)
+	   AC_SUBST(LIBUSBHIDINC)
+	   AC_SUBST(LIBUSBHIDOBJS)
+
+	   USB_TYPE="bsd"
+	   AC_MSG_RESULT([Using BSD USB driver.])
 	else
-		AC_MSG_ERROR([Can't build USB driver on this OS ($host_os).])
+	   AC_LIB_SEARCH(usb, usb_interrupt_read, [/usr/local/lib /opt/local/lib])
+
+	   LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
+	   LIBUSBHID=libusbhid
+	   LIBUSBHIDOBJS="\$(topdir)/src/libusbhid/*.o"
+	   AC_SUBST(LIBUSBHID)
+	   AC_SUBST(LIBUSBHIDINC)
+	   AC_SUBST(LIBUSBHIDOBJS)
+
+	   LIBUSB="-lusb"
+
+           dnl Darwin needs some frameworks linked in
+           if test $HAVE_UNAME=yes -a x`uname -s` = xDarwin ; then
+               LIBUSB="$LIBUSB -Wl,-framework -Wl,IOKit -Wl,-framework -Wl,CoreFoundation"
+           fi
+
+	   USB_TYPE="generic"
+	   AC_MSG_RESULT([Using generic libusb USB driver.])
 	fi
+
+	AC_DEFINE(HAVE_USB_DRIVER)
+	USB_DRIVER="usb"
+	AC_SUBST(USB_DRIVER)
+	AC_SUBST(USB_TYPE)
+
+	DISPLAY_USB_DRIVER=$USB_TYPE-$USB_DRIVER
+
 	fi],
     [])
+AC_SUBST(LIBUSB)
 
 AC_ARG_ENABLE(net, [
 AC_HELP_STRING([--enable-net], [Compile new networking driver for slaves])
@@ -1720,7 +1785,7 @@ Configuration on `date`:
   UPSTYPE		      ${UPSTYPE}
   UPSCABLE		      ${UPSCABLE}
 
-  drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${USB_DRIVER:-no-usb} ${DISPLAY_SNMP_DRIVER:-no-snmp} ${TEST_DRIVER:-no-test}
+  drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${DISPLAY_USB_DRIVER:-no-usb} ${DISPLAY_SNMP_DRIVER:-no-snmp} ${TEST_DRIVER:-no-test}
 
   enable-master-slave:	      ${OLDNET_ENABLED}
   enable-nis:		      ${NISSRV_ENABLED}
