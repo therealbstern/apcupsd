@@ -663,6 +663,7 @@ int usb_ups_entry_point(UPSINFO *ups, int command, void *data)
       break;
 
    case DEVICE_CMD_GET_SELFTEST_MSG:
+      usleep(100000);  /* Give UPS a chance to update the value */
       return usb_update_value(ups, CI_ST_STAT);
 
    default:

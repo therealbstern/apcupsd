@@ -24,12 +24,33 @@
  */
 
 #include "apc.h"
-
 #include "hidutils.h"
-#include <dev/usb/usb.h>
-#include <dev/usb/usbhid.h>
+
+/* This sucks. Need something better here. */
+#if defined HAVE_SUN_OS
+# include "/usr/sfw/include/usb.h"     /* libusb */
+#elif defined HAVE_LINUX_OS
+# include "/usr/include/usb.h"
+#elif defined HAVE_DARWIN_OS
+# include "/opt/local/include/usb.h"
+#elif defined HAVE_CYGWIN
+# include "/cygdrive/c/Program Files/LibUSB-Win32/include/usb.h"
+#else
+# include "/usr/local/include/usb.h"
+#endif
 
 #define MAX_SANE_DESCRIPTOR_LEN 4096
+
+/* Fetch a descriptor from an interface (as opposed to from the device) */
+int usb_get_intf_descriptor(usb_dev_handle *udev, unsigned char type,
+                            unsigned char index, void *buf, int size)
+{
+   memset(buf, 0, size);
+
+   return usb_control_msg(udev, USB_ENDPOINT_IN | USB_RECIP_INTERFACE,
+                         USB_REQ_GET_DESCRIPTOR,
+                         (type << 8) + index, 0, (char*)buf, size, 1000);
+}
 
 /*
  * Fetch the report descriptor from the device given an fd for the
@@ -37,125 +58,31 @@
  * rlen out paramter and a pointer to a malloc'ed buffer containing
  * the descriptor is returned. Returns NULL on failure.
  */
-unsigned char *hidu_fetch_report_descriptor(int fd, int *rlen)
+unsigned char *hidu_fetch_report_descriptor(usb_dev_handle *fd, int *rlen)
 {
-   int rc, i, rdesclen;
-   struct usb_config_desc cdesc;
-   struct usb_full_desc fdesc;
-   struct usb_ctl_request req;
-   int len;
    unsigned char *ptr;
+   int rdesclen, i;
 
-   /*
-    * In order to fetch the report descriptor we need to first
-    * determine that descriptor's length. Unlike the other std
-    * descriptors, report descriptors are not prefixed with their
-    * length. We must instead look in the HID descriptor. This is
-    * made especially painful because for some reason we cannot
-    * request the HID descriptor directly. The length bytes come
-    * back munged when we do that (bad, FreeBSD, bad!). So instead
-    * we ask for the set of all top level descriptors and dig the
-    * HID descriptor out of there. Then we can *finally* go about
-    * asking for the report descriptor itself.
-    */
-
-   /*
-    * First, get the CONFIG descriptor alone so we can look up
-    * the length of the full descriptor set.
-    */
-   cdesc.ucd_config_index = USB_CURRENT_CONFIG_INDEX;
-   rc = ioctl(fd, USB_GET_CONFIG_DESC, &cdesc);
-   if (rc) {
-      Dmsg0(100, "Unable to get USB CONFIG descriptor.\n");
-      return NULL;
-   }
-
-   len = UGETW(cdesc.ucd_desc.wTotalLength);
-   if (!len || len > MAX_SANE_DESCRIPTOR_LEN) {
-      Dmsg1(100, "Unreasonable length %d.\n", len);
-      return NULL;
-   }
-
-   /*
-    * Now get the full set of descriptors (does not include
-    * report descriptor).
-    */
-   fdesc.ufd_size = len;
-   fdesc.ufd_data = (u_char*)malloc(len);
-   fdesc.ufd_config_index = USB_CURRENT_CONFIG_INDEX;
-   rc = ioctl(fd, USB_GET_FULL_DESC, &fdesc);
-   if (rc) {
-      Dmsg0(100, "Unable to get full descriptors.\n");
-      free(fdesc.ufd_data);
-      return NULL;
-   }
-
-   if (debug_level >= 300) {
-      printf("Full descriptors (length=%d):\n", len);
-      for (i = 0; i < len; i++)
-         printf("%02x, ", fdesc.ufd_data[i]);
-      printf("\n");
-   }
-
-   /* Search for the HID descriptor */
-   for (ptr = fdesc.ufd_data, i = 0; i < len; i += ptr[0], ptr += ptr[0])
-      if (ptr[1] == UDESC_HID)
-         break;
-
-   if (i >= len) {
-      Dmsg0(100, "Unable to locate HID descriptor.\n");
-      free(fdesc.ufd_data);
-      return NULL;
-   }
-
-   /* We expect the first additional descriptor type to be report */
-   if (ptr[6] != UDESC_REPORT) {
-      Dmsg0(100, "First extra descriptor not report.\n");
-      free(fdesc.ufd_data);
-      return NULL;
-   }
-
-   /* Finally! The report descriptor's length! */
-   rdesclen = ptr[8] << 8 | ptr[7];
-   Dmsg2(200, "Report desc len=0x%04x (%d)\n", rdesclen, rdesclen);
-
-   /* That's all we needed from the buffer */
-   free(fdesc.ufd_data);
-
-   if (!rdesclen || rdesclen > MAX_SANE_DESCRIPTOR_LEN) {
-      Dmsg1(100, "Unreasonable rdesclen %d.\n", rdesclen);
-      return NULL;
-   }
-
-   /*
-    * Now fetch the report descriptor itself. We use a raw USB request
-    * for this because the report descriptor is a class specific item.
-    */
-   req.ucr_flags = 0;
-   req.ucr_actlen = 0;
-   req.ucr_addr = 0;
-   req.ucr_data = malloc(rdesclen);
-   req.ucr_request.bmRequestType = UT_READ_INTERFACE;
-   req.ucr_request.bRequest = UR_GET_DESCRIPTOR;
-   USETW(req.ucr_request.wValue, UDESC_REPORT << 8);
-   USETW(req.ucr_request.wIndex, 0);
-   USETW(req.ucr_request.wLength, rdesclen);
-   rc = ioctl(fd, USB_DO_REQUEST, &req);
-   if (rc) {
-      Dmsg0(100, "Unable to read report descriptor.\n");
-      free(req.ucr_data);
+   ptr = (unsigned char*)malloc(MAX_SANE_DESCRIPTOR_LEN);
+   rdesclen = usb_get_intf_descriptor(fd, USB_DT_REPORT, 0, ptr, MAX_SANE_DESCRIPTOR_LEN);
+   if (rdesclen <= 0) {
+      Dmsg1(100, "Unable to get REPORT descriptor (%d).\n", rdesclen);
+      free(ptr);
       return NULL;
    }
 
    if (debug_level >= 300) {
       printf("Report descriptor (length=%d):\n", rdesclen);
-      for (i = 0; i < rdesclen; i++)
-         printf("%02x, ", ((unsigned char *)req.ucr_data)[i]);
+      for (i = 0; i < rdesclen; i++) {
+         printf("%02x, ", ptr[i]);
+         if ((i+1)%16 == 0)
+            printf("\n");
+      }
       printf("\n");
    }
 
    *rlen = rdesclen;
-   return (unsigned char *)req.ucr_data;
+   return ptr;
 }
 
 /* Push a value onto the collection stack */
@@ -271,47 +198,40 @@ int hidu_locate_item(report_desc_t rdesc, int usage, int app, int phys,
    return 0;
 }
 
+#define USB_REQ_GET_REPORT 0x01
+#define USB_REQ_SET_REPORT 0x09
+
 /*
  * Fetch a report from a device given an fd for the device's control
  * endpoint, the populated item structure describing the report, a
  * data buffer in which to store the result, and the report length.
  * Returns actual report length (in bytes) on success and -1 on failure.
  */
-int hidu_get_report(int fd, hid_item_t *item, unsigned char *data, int len)
+int hidu_get_report(usb_dev_handle *fd, hid_item_t *item, unsigned char *data, int len)
 {
-   int rc;
-   struct usb_ctl_request req;
+   int actlen, i;
 
    Dmsg4(200, "get_report: id=0x%02x, kind=%d, length=%d pos=%d\n",
       item->report_ID, item->kind, len, item->pos);
 
-   req.ucr_flags = USBD_SHORT_XFER_OK;
-   req.ucr_actlen = 0;
-   req.ucr_addr = 0;
-   req.ucr_data = data;
-   req.ucr_request.bmRequestType = UT_READ_CLASS_INTERFACE;
-   req.ucr_request.bRequest = UR_GET_REPORT;
-   USETW(req.ucr_request.wValue, ((item->kind + 1) << 8) | item->report_ID);
-   USETW(req.ucr_request.wIndex, 0);
-   USETW(req.ucr_request.wLength, len);
+   actlen = usb_control_msg( fd,
+      USB_ENDPOINT_IN | USB_TYPE_CLASS | USB_RECIP_INTERFACE,
+      USB_REQ_GET_REPORT, ((item->kind + 1) << 8) | item->report_ID,
+      0, (char*)data, len, 1000);
 
-   Dmsg2(200, "get_report: wValue=0x%04x, wLength=%d\n",
-      UGETW(req.ucr_request.wValue), UGETW(req.ucr_request.wLength));
-
-   rc = ioctl(fd, USB_DO_REQUEST, &req);
-   if (rc) {
-      Dmsg1(100, "Error getting report: %s\n", strerror(errno));
+   if (actlen <= 0) {
+      Dmsg2(100, "Error getting report: (%d) %s\n", actlen, strerror(-actlen));
       return -1;
    }
 
    if (debug_level >= 300) {
       printf("%02x: ", item->report_ID);
-      for (rc = 0; rc < req.ucr_actlen; rc++)
-         printf("%02x,", data[rc]);
+      for (i = 0; i < actlen; i++)
+         printf("%02x,", data[i]);
       printf("\n");
    }
 
-   return req.ucr_actlen;
+   return actlen;
 }
 
 /*
@@ -319,37 +239,26 @@ int hidu_get_report(int fd, hid_item_t *item, unsigned char *data, int len)
  * endpoint, the populated item structure, the data to send, and the
  * report length. Returns true on success, false on failure.
  */
-int hidu_set_report(int fd, hid_item_t *item, unsigned char *data, int len)
+int hidu_set_report(usb_dev_handle *fd, hid_item_t *item, unsigned char *data, int len)
 {
-   int rc;
-   struct usb_ctl_request req;
+   int actlen, i;
 
    Dmsg4(200, "set_report: id=0x%02x, kind=%d, length=%d pos=%d\n",
       item->report_ID, item->kind, len, item->pos);
 
    if (debug_level >= 300) {
       printf("%02x: ", item->report_ID);
-      for (rc = 0; rc < len; rc++)
-         printf("%02x,", data[rc]);
+      for (i = 0; i < len; i++)
+         printf("%02x,", data[i]);
       printf("\n");
    }
 
-   req.ucr_flags = 0;
-   req.ucr_actlen = 0;
-   req.ucr_addr = 0;
-   req.ucr_data = data;
-   req.ucr_request.bmRequestType = UT_WRITE_CLASS_INTERFACE;
-   req.ucr_request.bRequest = UR_SET_REPORT;
-   USETW(req.ucr_request.wValue, ((item->kind + 1) << 8) | item->report_ID);
-   USETW(req.ucr_request.wIndex, 0);
-   USETW(req.ucr_request.wLength, len);
-
-   Dmsg2(200, "set_report: wValue=0x%04x, wLength=%d\n",
-      UGETW(req.ucr_request.wValue), UGETW(req.ucr_request.wLength));
-
-   rc = ioctl(fd, USB_DO_REQUEST, &req);
-   if (rc) {
-      Dmsg2(100, "Error setting report: (%d) %s\n", errno, strerror(errno));
+   actlen = usb_control_msg( fd,
+      USB_ENDPOINT_OUT | USB_TYPE_CLASS | USB_RECIP_INTERFACE,
+      USB_REQ_SET_REPORT, ((item->kind + 1) << 8) | item->report_ID,
+      0, (char*)data, len, 1000);
+   if (actlen != len) {
+      Dmsg2(100, "Error setting report: (%d) %s\n", actlen, strerror(-actlen));
       return 0;
    }
 
@@ -362,32 +271,17 @@ int hidu_set_report(int fd, hid_item_t *item, unsigned char *data, int len)
  * to a static buffer containing the NUL-terminated string or NULL
  * on failure.
  */
-const char *hidu_get_string(int fd, int index)
+const char *hidu_get_string(usb_dev_handle *fd, int index)
 {
-   int rc, i;
-   struct usb_string_desc sd;
+   int rc;
    static char string[128];
 
-   sd.usd_string_index = index;
-   sd.usd_language_id = 0;
-   rc = ioctl(fd, USB_GET_STRING_DESC, &sd);
-   if (rc) {
-      Dmsg1(100, "Error fetching string descriptor: %s\n", strerror(errno));
+   rc = usb_get_string_simple(fd, index, string, sizeof(string));
+   if (rc <= 0) {
+      Dmsg2(100, "Error fetching string descriptor: (%d) %s\n", rc, strerror(-rc));
       return NULL;
    }
 
-   Dmsg1(200, "Got string of length=%d\n", sd.usd_desc.bLength);
-
-   /*
-    * Convert from wide chars to bytes...just assume it's ASCII.
-    * Length is in bytes although structure is arranged as words
-    * and there always seems to be a byte of garbage on the end.
-    * (Not sure if the garbage is an APC bug, a kernel bug, or a 
-    * bug in my understanding.)
-    */
-   for (i = 0; i < sd.usd_desc.bLength / 2 - 1 && i < sizeof(string) - 1; i++)
-      string[i] = UGETW(sd.usd_desc.bString[i]);
-
-   string[i] = '\0';
+   Dmsg1(200, "Got string of length=%d\n", rc);
    return string;
 }

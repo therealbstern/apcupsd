@@ -12,9 +12,11 @@ top_builddir = $(topdir)
 # Include the default make targets: to be put before the all-targets: rule.
 @TARGETS@
 
-apclib = libusbhid.a
+EXTRAINCS=-I.. @LIBUSBHIDINC@
 
-apclibobjs = parse.o data.o descr.o
+apclib = libpusb.a
+
+apclibobjs = generic-usb.o hidutils.o
 
 all-targets: $(apclib)
 
