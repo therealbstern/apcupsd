@@ -17,6 +17,13 @@ ABSSRCDIR=`pwd`
 AC_SUBST(ABSSRCDIR)
 AC_SUBST(topdir)
 
+VERSION=`sed -n -e 's/^.*VERSION.*"\(.*\)"$/\1/p' ${srcdir}/include/version.h`
+AC_SUBST(VERSION)dnl 
+#AC_DEFINE_UNQUOTED(VERSION, "$VERSION")
+
+DATE=`sed -n -e 's/^.*[ \t]*ADATE.*"\(.*\)"$/\1/p' ${srcdir}/include/version.h`
+AC_SUBST(DATE)dnl 
+
 dnl
 dnl These need to be searched before.
 dnl
@@ -976,6 +983,7 @@ GAPCMON_ENABLED=no
 AC_ARG_ENABLE(gapcmon, [AC_HELP_STRING([--enable-gapcmon], [Compile gapcmon application])],
 	[ if test "$enableval" = "yes" ; then
 		PKG_CHECK_MODULES(GAPCMON, gtk+-2.0 glib-2.0 >= 2.4.0 gthread-2.0 gnome-vfs-module-2.0)
+		GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DVERSION=\\\"$VERSION\\\""
 		GAPCMON_ENABLED=yes
 		GAPCMON=gapcmon
 	fi],
@@ -1021,13 +1029,6 @@ export CC
 PACKAGE=`sed -n '/PACKAGE *= *\(.*\)/s//\1/p' <Makefile.in`
 AC_DEFINE_UNQUOTED(PACKAGE, "$PACKAGE")
 AC_SUBST(PACKAGE)
-
-VERSION=`sed -n -e 's/^.*VERSION.*"\(.*\)"$/\1/p' ${srcdir}/include/version.h`
-AC_SUBST(VERSION)dnl 
-#AC_DEFINE_UNQUOTED(VERSION, "$VERSION")
-
-DATE=`sed -n -e 's/^.*[ \t]*ADATE.*"\(.*\)"$/\1/p' ${srcdir}/include/version.h`
-AC_SUBST(DATE)dnl 
 
 #
 # Languages for po translation.
