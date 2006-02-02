@@ -64,6 +64,7 @@ static void cb_config_save (GtkButton * button, gpointer gp);
 static void cb_refresh_button (GtkButton * button, gpointer gp);
 static gboolean cb_refresh_timer (gpointer gp);
 static gboolean cb_first_refresh_timer (gpointer gp);
+static gboolean cb_timer_control (gpointer gp);
 
 static gint gapc_monitor_update (PGAPC_CONFIG pcfg);
 static gint gapc_text_view_clear_buffer (GtkWidget * view);
@@ -126,7 +127,8 @@ gapc_config_save_values (PGAPC_CONFIG pcfg)
   g_return_val_if_fail (pcfg->pch_key_filename, FALSE);	/* error exit */
 
   gs_config_values = g_string_new (NULL);
-  g_string_append_printf (gs_config_values, "%s\n%d\n", pcfg->pch_host, pcfg->i_port);
+  g_string_append_printf (gs_config_values, "%s\n%d\n%f\n", 
+                          pcfg->pch_host, pcfg->i_port, pcfg->d_refresh);
 
   gioc = g_io_channel_new_file (pcfg->pch_key_filename, "w", &gerror);
   if (gerror != NULL)
@@ -218,6 +220,7 @@ gapc_config_load_values (PGAPC_CONFIG pcfg)
           g_free (pcfg->pch_host);
       pcfg->pch_host = g_strdup ("localhost");
       pcfg->i_port = 3551;
+      pcfg->d_refresh = 15;      
       return FALSE;
     }
   pch_host[gPos] = 0;
@@ -237,10 +240,27 @@ gapc_config_load_values (PGAPC_CONFIG pcfg)
       g_io_channel_shutdown (gioc, TRUE, NULL);
       g_io_channel_unref (gioc);
       pcfg->i_port = 3551;
+      pcfg->d_refresh = 15;            
       return FALSE;
     }
 
   pcfg->i_port = (gint) g_strtod (pch_port, NULL);
+
+  gresult = g_io_channel_read_line (gioc, &pch_port, &gLen, &gPos, &gerror);
+  if (gerror != NULL)
+    {
+      gapc_app_log_error ("gapc_config_load_values",
+              "read refresh value failed", gerror->message);
+      g_error_free (gerror);
+      gerror = NULL;
+
+      g_io_channel_shutdown (gioc, TRUE, NULL);
+      g_io_channel_unref (gioc);
+      pcfg->d_refresh = 15;            
+      return FALSE;
+    }
+
+  pcfg->d_refresh = g_strtod (pch_port, NULL);
 
   gresult = g_io_channel_shutdown (gioc, TRUE, &gerror);
   if (gerror != NULL)
@@ -718,7 +738,8 @@ cb_config_apply (GtkButton * button, gpointer gp)
   PGAPC_CONFIG pcfg = gp;
   gchar *pch = NULL;
   GtkEntry *ef = NULL;
-
+  gdouble  d_old_time = 0.0;
+  GtkWidget *w = NULL;
 
   /* get current value of entry-fields */
   ef = g_hash_table_lookup (pcfg->pht_Widgets, "ServerAddress");
@@ -728,10 +749,20 @@ cb_config_apply (GtkButton * button, gpointer gp)
   pch = (gchar *) gtk_entry_get_text (ef);
   pcfg->pch_host = g_strdup (pch);
 
-
   ef = g_hash_table_lookup (pcfg->pht_Widgets, "ServerPort");
   pch = (gchar *) gtk_entry_get_text (ef);
   pcfg->i_port = (gint) g_strtod (pch, NULL);
+
+  ef = g_hash_table_lookup (pcfg->pht_Widgets, "RefreshInterval");
+  d_old_time = pcfg->d_refresh;
+  pcfg->d_refresh = gtk_spin_button_get_value( GTK_SPIN_BUTTON(ef) );
+
+  if( pcfg->d_refresh != d_old_time ) /* changed ?? */
+      pcfg->b_timer_control = TRUE;
+
+  w = g_hash_table_lookup (pcfg->pht_Widgets, "StatusBar");
+  gtk_statusbar_push (GTK_STATUSBAR (w),
+			pcfg->i_info_context, "Configuration Applied...");
 
   return;
 }
@@ -763,17 +794,11 @@ static void
 cb_refresh_button (GtkButton * button, gpointer gp)
 {
   PGAPC_CONFIG pcfg = gp;
-  GtkWidget *w = NULL;
 
-  if (!pcfg->b_data_available)
-    return;
-
-  w = g_hash_table_lookup (pcfg->pht_Widgets, "StatusBar");
-  gtk_statusbar_pop (GTK_STATUSBAR (w), pcfg->i_info_context);
-  if (!gapc_monitor_update (pcfg))
-    gtk_statusbar_push (GTK_STATUSBAR (w), pcfg->i_info_context,
-			"Refresh Button Skipped...  Thread is busy");
-
+  pcfg->b_refresh_button = TRUE;
+  
+  g_timeout_add (200, cb_first_refresh_timer, pcfg);    /* one shot timer */
+  
   return;
 }
 
@@ -787,8 +812,15 @@ cb_first_refresh_timer (gpointer gp)
   PGAPC_CONFIG pcfg = gp;
   GtkWidget *w = NULL;
 
+  w = g_hash_table_lookup (pcfg->pht_Widgets, "StatusBar");
+  gtk_statusbar_pop (GTK_STATUSBAR (w), pcfg->i_info_context);
+  
   if (!pcfg->b_data_available)
+  {
+    gtk_statusbar_push (GTK_STATUSBAR (w), pcfg->i_info_context,
+            "Refresh Not Completed...  NIS/Server is Off-Line...");
     return TRUE;
+  }
 
   gdk_flush ();
   gdk_threads_enter ();
@@ -797,20 +829,37 @@ cb_first_refresh_timer (gpointer gp)
       w = g_hash_table_lookup (pcfg->pht_Widgets, "StatusBar");
       gtk_statusbar_pop (GTK_STATUSBAR (w), pcfg->i_info_context);
       gtk_statusbar_push (GTK_STATUSBAR (w), pcfg->i_info_context,
-			  "Initial Update Not Ready... Please Standby!");
+			  "Refresh Not Completed... Network Busy!");
       gdk_threads_leave ();
       return TRUE;		/* try again */
     }
 
-  w = g_hash_table_lookup (pcfg->pht_Widgets, "StatusBar");
-  gtk_statusbar_pop (GTK_STATUSBAR (w), pcfg->i_info_context);
   gtk_statusbar_push (GTK_STATUSBAR (w), pcfg->i_info_context,
-		      "Initial Update Completed...");
+		      "Refresh Completed...");
 
   gdk_threads_leave ();
   return FALSE;			/* this will terminate the timer */
 }
 
+/* 
+ * used to restart timers when interval changes.
+ */
+static gboolean cb_timer_control (gpointer gp)
+{
+  PGAPC_CONFIG pcfg = gp;
+  guint  i_new_time = 0;
+  GtkWidget *w = NULL;
+
+  pcfg->b_timer_control = FALSE;  /* reset flag */
+  i_new_time = (guint)(gdouble)(pcfg->d_refresh * 1.04) * 1000.0;
+  g_timeout_add (i_new_time, cb_refresh_timer, pcfg);
+
+  w = g_hash_table_lookup (pcfg->pht_Widgets, "StatusBar");
+  gtk_statusbar_push (GTK_STATUSBAR (w), pcfg->i_info_context,
+		      "Refresh Timer Update Completed...");
+    
+  return FALSE;
+}
 /* 
  * timer service routine for normal data display refreshs
  */
@@ -820,11 +869,25 @@ cb_refresh_timer (gpointer gp)
   PGAPC_CONFIG pcfg = gp;
   GtkWidget *w = NULL;
 
+
   if (!pcfg->b_run)
     return FALSE;
 
+  if( pcfg->b_timer_control )  /* change timers */
+  {
+      g_timeout_add (200, cb_timer_control, pcfg);
+      return FALSE;
+  }
+
+  w = g_hash_table_lookup (pcfg->pht_Widgets, "StatusBar");
+  gtk_statusbar_pop (GTK_STATUSBAR (w), pcfg->i_info_context);
+  
   if (!pcfg->b_data_available)
+  {
+    gtk_statusbar_push (GTK_STATUSBAR (w), pcfg->i_info_context,
+            "Automatic Refresh Skipped...  NIS is Off-Line...");
     return TRUE;
+  }
 
   gdk_flush ();
   gdk_threads_enter ();
@@ -902,6 +965,7 @@ gapc_create_scrolled_text_view (GtkWidget * box)
   gtk_widget_modify_font (view, font_desc);
   pango_font_description_free (font_desc);
 
+  gtk_text_view_set_editable (GTK_TEXT_VIEW (view), FALSE);
   gtk_text_view_set_left_margin (GTK_TEXT_VIEW (view), 5);
 
   return view;
@@ -918,7 +982,6 @@ gapc_parse_args (gint argc, gchar ** argv, PGAPC_CONFIG pcfg)
   gchar *pch = NULL;
   gboolean b_syntax = FALSE;
   GString *gs_parm1 = NULL, *gs_parm2 = NULL;
-
 
   gs_parm1 = g_string_new (GAPC_GROUP_KEY);
   gs_parm2 = g_string_new (GAPC_GROUP_KEY);
@@ -960,8 +1023,8 @@ gapc_parse_args (gint argc, gchar ** argv, PGAPC_CONFIG pcfg)
 
       pch = g_strstr_len (gs_parm1->str, 6, "-help");
       if ((pch != NULL) || b_syntax)
-	{
-	  g_print
+	  {
+	    g_print
 	    ("\nsyntax: gapcmon [--help] [--host server.mynetwork.net|127.0.0.1] [--port 9999]\n"
 	     "where:  --help, this message\n"
 	     "        --host, the domain name or ip address of the server\n"
@@ -969,10 +1032,10 @@ gapc_parse_args (gint argc, gchar ** argv, PGAPC_CONFIG pcfg)
 	     "        null, defaults to localhost and port 3551\n\n"
 	     "Skoona@Users.SourceForge.Net (GPL) 2006 \n\n");
 
-	  g_string_free (gs_parm1, TRUE);
-	  g_string_free (gs_parm2, TRUE);
-	  return TRUE;		/* trigger exit */
-	}
+	    g_string_free (gs_parm1, TRUE);
+	    g_string_free (gs_parm2, TRUE);
+	    return TRUE;		/* trigger exit */
+	  }
     }
 
   /* *********************************************************
@@ -990,6 +1053,9 @@ gapc_parse_args (gint argc, gchar ** argv, PGAPC_CONFIG pcfg)
       pcfg->i_port = (gint) g_strtod (pch_port, NULL);
       g_free (pch_port);
     }
+  if ( pcfg->d_refresh < GAPC_MIN_INCREMENT )
+       pcfg->d_refresh = 15;
+    
 
   g_string_free (gs_parm1, TRUE);
   g_string_free (gs_parm2, TRUE);
@@ -1004,11 +1070,16 @@ static gpointer *
 gapc_network_thread (PGAPC_CONFIG pcfg)
 {
   gint s = 0, e = 0, x = 0;
+  gulong gul_qtr = 0;
 
   while (pcfg->b_run)
     {
-      g_mutex_lock (pcfg->gm_update);
 
+      pcfg->b_refresh_button = FALSE;
+      gul_qtr = pcfg->d_refresh * 250000;
+
+      g_mutex_lock (pcfg->gm_update);
+        
       if (pcfg->b_run)
 	s = gapc_net_transaction_service (pcfg, "status", pcfg->pach_status);
 
@@ -1017,17 +1088,41 @@ gapc_network_thread (PGAPC_CONFIG pcfg)
 
       g_mutex_unlock (pcfg->gm_update);
 
-    x = s + e;
-    if ( x > 0 )
-      pcfg->b_data_available = TRUE;
-    else
-      pcfg->b_data_available = FALSE;      
+      if (pcfg->b_refresh_button) /* honor refresh button being pressed */
+          continue;        
 
+      x = s + e;
+      if ( x > 0 )
+          pcfg->b_data_available = TRUE;
+      else
+          pcfg->b_data_available = FALSE;      
 
-      if (pcfg->b_run)
-	g_usleep (GAPC_THREAD_CYCLE / 2);
-      if (pcfg->b_run)
-	g_usleep (GAPC_THREAD_CYCLE / 2);
+      if ( pcfg->b_data_available )  /* delay controls */
+         {
+           if (pcfg->b_run)
+	       g_usleep (gul_qtr);
+
+           if (pcfg->b_refresh_button)
+               continue;        
+
+           if (pcfg->b_run)
+ 	       g_usleep (gul_qtr);
+
+           if (pcfg->b_refresh_button)
+               continue;        
+
+           if (pcfg->b_run)
+	       g_usleep (gul_qtr);
+
+           if (pcfg->b_refresh_button)
+               continue;        
+
+           if (pcfg->b_run)
+	       g_usleep (gul_qtr);
+        }
+    else g_usleep (gul_qtr);
+    
+    
     }
 
   g_thread_exit (pcfg);
@@ -1047,15 +1142,15 @@ gapc_monitor_update (PGAPC_CONFIG pcfg)
   gchar *pch = NULL, *pch1 = NULL, *pch2 = NULL,
     *pch3 = NULL, *pch4 = NULL, *pch5 = NULL, *pch6 = NULL;
   gdouble dValue = 0.00, dScale = 0.0, dtmp = 0.0;
-  gchar ch_buffer[256];
+  gchar ch_buffer[GAPC_MAX_TEXT];
   PGAPC_BAR_H pbar = NULL;
 
+
   if (!pcfg->b_data_available)
-    return  FALSE;
+      return  FALSE;
 
   if (!g_mutex_trylock (pcfg->gm_update))
-    return FALSE;		/* thread must be busy */
-
+      return FALSE;		/* thread must be busy */
 
   w = g_hash_table_lookup (pcfg->pht_Widgets, "StatusPage");
   gapc_text_view_clear_buffer (GTK_WIDGET (w));
@@ -1311,13 +1406,12 @@ gapc_create_notebook_page_information (GtkWidget * notebook, PGAPC_CONFIG pcfg)
   label = gtk_frame_get_label_widget (GTK_FRAME (frame));
   gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
   gtk_table_attach (GTK_TABLE (table3), frame,
-		    /* X direction *//* Y direction */
 		    0, 1, 0, 1, GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 6, 2);
 
   pbox = gtk_hbox_new (FALSE, 4);
   gtk_container_add (GTK_CONTAINER (frame), pbox);
   lbox = gtk_vbox_new (TRUE, 0);
-  gtk_box_pack_start (GTK_BOX (pbox), lbox, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (pbox), lbox, FALSE, FALSE, 0);
   rbox = gtk_vbox_new (TRUE, 0);
   gtk_box_pack_start (GTK_BOX (pbox), rbox, TRUE, TRUE, 0);
 
@@ -1362,13 +1456,12 @@ gapc_create_notebook_page_information (GtkWidget * notebook, PGAPC_CONFIG pcfg)
   label = gtk_frame_get_label_widget (GTK_FRAME (frame));
   gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
   gtk_table_attach (GTK_TABLE (table3), frame,
-		    /* X direction *//* Y direction */
-		    0, 1, 2, 3, GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 6, 2);
+                     0, 1, 2, 3, GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 6, 2);
 
   pbox = gtk_hbox_new (FALSE, 4);
   gtk_container_add (GTK_CONTAINER (frame), pbox);
   lbox = gtk_vbox_new (TRUE, 0);
-  gtk_box_pack_start (GTK_BOX (pbox), lbox, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (pbox), lbox, FALSE, FALSE, 0);
   rbox = gtk_vbox_new (TRUE, 0);
   gtk_box_pack_start (GTK_BOX (pbox), rbox, TRUE, TRUE, 0);
 
@@ -1398,13 +1491,12 @@ gapc_create_notebook_page_information (GtkWidget * notebook, PGAPC_CONFIG pcfg)
   label = gtk_frame_get_label_widget (GTK_FRAME (frame));
   gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
   gtk_table_attach (GTK_TABLE (table3), frame,
-		    /* X direction *//* Y direction */
 		    2, 3, 2, 3, GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 6, 2);
 
   pbox = gtk_hbox_new (FALSE, 4);
   gtk_container_add (GTK_CONTAINER (frame), pbox);
   lbox = gtk_vbox_new (TRUE, 0);
-  gtk_box_pack_start (GTK_BOX (pbox), lbox, TRUE, TRUE, 0);
+  gtk_box_pack_start (GTK_BOX (pbox), lbox, FALSE, FALSE, 0);
   rbox = gtk_vbox_new (TRUE, 0);
   gtk_box_pack_start (GTK_BOX (pbox), rbox, TRUE, TRUE, 0);
 
@@ -1449,6 +1541,7 @@ gapc_create_notebook_page_configuration (GtkWidget * notebook, PGAPC_CONFIG pcfg
 {
   gint i_page = 0;
   GtkWidget *frame, *label, *table2, *entry, *button;
+  GtkAdjustment *adjustment = NULL;
   gchar ch_buffer[16];
 
   /* Create Configuration Notebook Page */
@@ -1459,45 +1552,43 @@ gapc_create_notebook_page_configuration (GtkWidget * notebook, PGAPC_CONFIG pcfg
   label = gtk_label_new ("Config");
   i_page = gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
 
-  table2 = gtk_table_new (4, 4, FALSE);
+  table2 = gtk_table_new (5, 5, TRUE);
   gtk_container_add (GTK_CONTAINER (frame), table2);
 
   label = gtk_label_new ("Server hostname or ip address:");
   entry = gtk_entry_new_with_max_length (255);
-  gtk_table_attach (GTK_TABLE (table2), label,
-		    /* X direction *//* Y direction */
-		    0, 1, 0, 1, GTK_FILL, 0, 0, 5);
-  gtk_table_attach (GTK_TABLE (table2), entry,
-		    /* X direction *//* Y direction */
-		    1, 3, 0, 1, GTK_EXPAND | GTK_FILL, 0, 2, 5);
+  gtk_table_attach (GTK_TABLE (table2), label, 0, 2, 0, 1, GTK_FILL, 0, 0, 5);
+  gtk_table_attach (GTK_TABLE (table2), entry, 2, 4, 0, 1, GTK_EXPAND | GTK_FILL, 0, 2, 5);
   gtk_misc_set_alignment ((GtkMisc *) label, 1.0, 1.0);
   gtk_entry_set_text (GTK_ENTRY (entry), pcfg->pch_host);
   g_hash_table_insert (pcfg->pht_Widgets, g_strdup ("ServerAddress"), entry);
 
 
   label = gtk_label_new ("Server port number:");
-  gtk_table_attach (GTK_TABLE (table2), label,
-		    /* X direction *//* Y direction */
-		    0, 1, 1, 2, GTK_FILL, 0, 0, 5);
+  gtk_table_attach (GTK_TABLE (table2), label, 0, 2, 1, 2, GTK_FILL, 0, 0, 5);
   entry = gtk_entry_new_with_max_length (10);
-  gtk_table_attach (GTK_TABLE (table2), entry,
-		    /* X direction *//* Y direction */
-		    1, 2, 1, 2, GTK_FILL, 0, 2, 5);
+  gtk_table_attach (GTK_TABLE (table2), entry, 2, 3, 1, 2, GTK_FILL, 0, 2, 5);
   gtk_misc_set_alignment ((GtkMisc *) label, 1.0, 1.0);
   gtk_entry_set_text (GTK_ENTRY (entry),
 		      g_ascii_dtostr (ch_buffer,
 				      sizeof (ch_buffer), (gdouble) pcfg->i_port));
   g_hash_table_insert (pcfg->pht_Widgets, g_strdup ("ServerPort"), entry);
 
+  label = gtk_label_new ("Refresh Interval in seconds:");
+  gtk_misc_set_alignment ((GtkMisc *) label, 1.0, 1.0);  
+  gtk_table_attach (GTK_TABLE (table2), label, 0, 2, 2, 3, GTK_FILL, 0, 0, 5);
+  adjustment = (GtkAdjustment *)gtk_adjustment_new (pcfg->d_refresh, 
+                                           GAPC_MIN_INCREMENT, 300, 1, 5, 5 );
+  entry = gtk_spin_button_new (adjustment, 10, 0);
+  gtk_table_attach (GTK_TABLE (table2), entry, 2, 3, 2, 3, GTK_FILL, 0, 2, 5);
+  g_hash_table_insert (pcfg->pht_Widgets, g_strdup ("RefreshInterval"), entry);
+
+
   button = gtk_button_new_from_stock (GTK_STOCK_APPLY);
-  gtk_table_attach (GTK_TABLE (table2), button,
-		    /* X direction *//* Y direction */
-		    1, 2, 3, 4, GTK_FILL, 0, 5, 5);
+  gtk_table_attach (GTK_TABLE (table2), button, 1, 2, 3, 4, GTK_FILL, 0, 5, 5);
   g_signal_connect (button, "clicked", G_CALLBACK (cb_config_apply), pcfg);
   button = gtk_button_new_from_stock (GTK_STOCK_SAVE);
-  gtk_table_attach (GTK_TABLE (table2), button,
-		    /* X direction *//* Y direction */
-		    2, 3, 3, 4, GTK_FILL, 0, 5, 5);
+  gtk_table_attach (GTK_TABLE (table2), button, 3, 4, 3, 4, GTK_FILL, 0, 5, 5);
   g_signal_connect (button, "clicked", G_CALLBACK (cb_config_save), pcfg);
 
   return i_page;
@@ -1562,7 +1653,7 @@ gapc_create_user_interface (PGAPC_CONFIG pcfg)
    */
   screen = gtk_window_get_screen (GTK_WINDOW (window));
   i_x = gdk_screen_get_width (screen);
-  i_x = (gint) ((gfloat) i_x * 0.48);
+  i_x = (gint) ((gfloat) i_x * 0.52);
   i_y = gdk_screen_get_height (screen);
   i_y = (gint) ((gfloat) i_y * 0.40);
   gtk_widget_set_size_request (window, i_x / 2, i_y);	// set minimum size
@@ -1634,7 +1725,7 @@ int
 main (int argc, char *argv[])
 {
   PGAPC_CONFIG pcfg = NULL;
-  gint i_x = 0;
+  guint i_x = 0;
   GtkWidget *window;
 
   /* 
@@ -1669,7 +1760,12 @@ main (int argc, char *argv[])
   window = gapc_create_user_interface (pcfg);
 
   /* Add a timer callback to refresh ups data 1 sec = 1/1000 */
-  g_timeout_add (GAPC_REFRESH_INCREMENT, cb_refresh_timer, pcfg);
+  if ( pcfg->d_refresh < GAPC_MIN_INCREMENT )
+      i_x = GAPC_REFRESH_INCREMENT;
+  else
+      i_x = (guint)(gdouble)(pcfg->d_refresh * 1.04) * 1000.0;
+
+  g_timeout_add (i_x, cb_refresh_timer, pcfg);
 
   g_timeout_add (200, cb_first_refresh_timer, pcfg);	/* one shot timer */
 
