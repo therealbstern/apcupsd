@@ -79,6 +79,50 @@ static const struct {
    {NULL, NULL}
 };
 
+/* Convert UPS response to enum */
+static SelfTestResult decode_testresult(char* str)
+{
+   if (!strncmp(str, "OK", 2))
+      return TEST_PASSED;
+   else if (!strncmp(str, "NO", 2))
+      return TEST_NONE;
+   else if (!strncmp(str, "BT", 2))
+      return TEST_FAILCAP;
+   else if (!strncmp(str, "NG", 2))
+      return TEST_FAILED;
+   else if (!strncmp(str, "WN", 2))
+      return TEST_WARNING;
+   else if (!strncmp(str, "IP", 2))
+      return TEST_INPROGRESS;
+   else
+      return TEST_UNKNOWN;
+}
+
+/* Convert UPS response to enum */
+static LastXferCause decode_lastxfer(char *str)
+{
+   Dmsg1(80, "Transfer reason: %s\n", str);
+
+   if (!strcmp(str, "No transfers since turnon"))
+      return XFER_NONE;
+   else if (!strcmp(str, "Automatic or explicit self test"))
+      return XFER_SELFTEST;
+   else if (!strcmp(str, "Forced by software"))
+      return XFER_FORCED;
+   else if (!strcmp(str, "Low line voltage"))
+      return XFER_UNDERVOLT;
+   else if (!strcmp(str, "High line voltage"))
+      return XFER_OVERVOLT;
+   else if (!strcmp(str, "Line voltage notch or spike"))
+      return XFER_NOTCHSPIKE;
+   else if (!strcmp(str, "Unacceptable line voltage changes"))
+      return XFER_RIPPLE;
+   else if (!strcmp(str, "Input frequency out of range"))
+      return XFER_FREQ;
+   else
+      return XFER_UNKNOWN;
+}
+
 /*
  * The remote server DEVICE entry in apcupsd.conf is
  * in the form:
@@ -534,43 +578,11 @@ int net_ups_read_volatile_data(UPSINFO *ups)
    if (GETVAR(CI_FREQ, "outputfreq"))
       ups->LineFreq = atof(answer);
 
-   if (GETVAR(CI_WHY_BATT, "lastxfer")) {
-      if (!strcmp(answer, "No transfers since turnon"))
-         ups->lastxfer = XFER_NONE;
-      else if (!strcmp(answer, "Automatic or explicit self test"))
-         ups->lastxfer = XFER_SELFTEST;
-      else if (!strcmp(answer, "Forced by software"))
-         ups->lastxfer = XFER_FORCED;
-      else if (!strcmp(answer, "Low line voltage"))
-         ups->lastxfer = XFER_UNDERVOLT;
-      else if (!strcmp(answer, "High line voltage"))
-         ups->lastxfer = XFER_OVERVOLT;
-      else if (!strcmp(answer, "Line voltage notch or spike"))
-         ups->lastxfer = XFER_NOTCHSPIKE;
-      else if (!strcmp(answer, "Unacceptable line voltage changes"))
-         ups->lastxfer = XFER_RIPPLE;
-      else if (!strcmp(answer, "Input frequency out of range"))
-         ups->lastxfer = XFER_FREQ;
-      else
-         ups->lastxfer = XFER_UNKNOWN;
-   }
+   if (GETVAR(CI_WHY_BATT, "lastxfer"))
+      ups->lastxfer = decode_lastxfer(answer);
 
-   if (GETVAR(CI_ST_STAT, "selftest")) {
-      if (!strncmp(answer, "OK", 2))
-         ups->testresult = TEST_PASSED;
-      else if (!strncmp(answer, "NO", 2))
-         ups->testresult = TEST_NONE;
-      else if (!strncmp(answer, "BT", 2))
-         ups->testresult = TEST_FAILCAP;
-      else if (!strncmp(answer, "NG", 2))
-         ups->testresult = TEST_FAILED;
-      else if (!strncmp(answer, "WN", 2))
-         ups->testresult = TEST_WARNING;
-      else if (!strncmp(answer, "IP", 2))
-         ups->testresult = TEST_INPROGRESS;
-      else
-         ups->testresult = TEST_UNKNOWN;
-   }
+   if (GETVAR(CI_ST_STAT, "selftest"))
+      ups->testresult = decode_testresult(answer);
 
    write_unlock(ups);
 
@@ -626,5 +638,43 @@ int net_ups_read_static_data(UPSINFO *ups)
 
 int net_ups_entry_point(UPSINFO *ups, int command, void *data)
 {
-   return 0;
+   char answer[200];
+
+   switch (command) {
+   case DEVICE_CMD_CHECK_SELFTEST:
+      Dmsg0(80, "Checking self test.\n");
+      /*
+       * XXX FIXME
+       *
+       * One day we will do this test inside the driver and not as an
+       * entry point.
+       */
+      /* Reason for last transfer to batteries */
+      if (GETVAR(CI_WHY_BATT, "lastxfer")) {
+         ups->lastxfer = decode_lastxfer(answer);
+         Dmsg1(80, "Transfer reason: %d\n", ups->lastxfer);
+
+         /* See if this is a self test rather than power failure */
+         if (ups->lastxfer == XFER_SELFTEST) {
+            /*
+             * set Self Test start time
+             */
+            ups->SelfTest = time(NULL);
+            Dmsg1(80, "Self Test time: %s", ctime(&ups->SelfTest));
+         }
+      }
+      break;
+
+   case DEVICE_CMD_GET_SELFTEST_MSG:
+      if (!GETVAR(CI_ST_STAT, "selftest"))
+         return FAILURE;
+
+      ups->testresult = decode_testresult(answer);
+      break;
+
+   default:
+      return FAILURE;
+   }
+
+   return SUCCESS;
 }
