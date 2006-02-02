@@ -16,6 +16,7 @@
 
 #define GAPC_MAX_ARRAY         256
 #define GAPC_MAX_TEXT          256
+#define GAPC_MIN_INCREMENT     4         /* Minimum refresh cycle seconds */
 #define GAPC_THREAD_CYCLE      15000000  /* 15 sec Network update timer 1M=1 */
 #define GAPC_REFRESH_INCREMENT 30000     /* 30 sec Display update timer 1K=1 */
 
@@ -50,6 +51,10 @@ typedef struct _GAPC_CONFIG
     
     gchar   *pch_host;
     gint     i_port;    
+    
+    gdouble  d_refresh; 
+    gboolean b_timer_control;
+    gboolean b_refresh_button;       
     
     gchar   *pach_status[GAPC_MAX_ARRAY];
     gchar   *pach_events[GAPC_MAX_ARRAY];
