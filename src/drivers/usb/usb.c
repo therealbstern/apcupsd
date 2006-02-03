@@ -137,6 +137,7 @@ const struct s_known_info known_info[] = {
    {CI_APCDelayBeforeStartup,   0xFF86007E, P_ANY,     T_UNITS,    false},  /* APCDelayBeforeStartup */
    {CI_APCDelayBeforeShutdown,  0xFF86007D, P_ANY,     T_UNITS,    false},  /* APCDelayBeforeShutdown */
    {CI_APCLineFailCause,        0xFF860052, P_ANY,     T_NONE,     true},   /* APCLineFailCause */
+   {CI_SENS,                    0xFF860061, P_ANY,     T_NONE,     false},  /* APCSensitivity */
    {CI_BUPBattCapBeforeStartup, 0x00860012, P_ANY,     T_NONE,     false},  /* BUPBattCapBeforeStartup */
    {CI_BUPDelayBeforeStartup,   0x00860076, P_ANY,     T_NONE,     false},  /* BUPDelayBeforeStartup */
    {CI_BUPSelfTest,             0x00860010, P_ANY,     T_NONE,     false},  /* BUPSelfTest */
@@ -613,6 +614,24 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
    /* Nominal battery voltage */
    case CI_NOMBATTV:
       ups->nombattv = uval->dValue;
+      break;
+
+   /* Sensitivity */
+   case CI_SENS:
+      switch (uval->iValue) {
+      case 0:
+         astrncpy(ups->sensitivity, "Low", sizeof(ups->sensitivity));
+         break;
+      case 1:
+         astrncpy(ups->sensitivity, "Medium", sizeof(ups->sensitivity));
+         break;
+      case 2:
+         astrncpy(ups->sensitivity, "High", sizeof(ups->sensitivity));
+         break;
+      default:
+         astrncpy(ups->sensitivity, "Unknown", sizeof(ups->sensitivity));
+         break;
+      }
       break;
 
    default:

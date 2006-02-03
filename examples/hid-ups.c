@@ -1,5 +1,5 @@
 /*
- * $Id: hid-ups.c,v 1.12 2005-08-31 17:07:31 adk0212 Exp $
+ * $Id: hid-ups.c,v 1.13 2006-02-03 23:41:18 adk0212 Exp $
  *
  *  Copyright (c) 2001 Vojtech Pavlik <vojtech@ucw.cz>
  *  Copyright (c) 2001 Paul Stewart <hiddev@wetlogic.net>
@@ -195,7 +195,7 @@ struct s_ups_info {
     { 0xFF860042, T_NONE,   "APC_UPS_FirmwareRevision" },
     { 0xFF860052, T_NONE,   "APCLineFailCause" },
     { 0xFF860060, T_BITS,   "APCStatusFlag" },
-    { 0xFF860061, T_NONE,   "APC860061_??????" },
+    { 0xFF860061, T_NONE,   "APCSensitivity" },
     { 0xFF860062, T_NONE,   "APC860062_SetHiTransV?" }, 
     { 0xFF860064, T_NONE,   "APC860064_SetLoTransV?" },
     { 0xFF860072, T_NONE,   "APCPanelTest" },
