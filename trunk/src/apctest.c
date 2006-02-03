@@ -85,6 +85,7 @@ static int usb_get_battery_date(void);
 static void usb_set_battery_date(void);
 static void usb_get_manf_date(void);
 static void usb_set_alarm(void);
+static void usb_set_sens(void);
 #endif
 
 static void strip_trailing_junk(char *cmd);
@@ -1623,7 +1624,8 @@ static void do_usb_testing(void)
            "5) View battery date\n"
            "6) View manufacturing date\n"
            "7) Set alarm behavior\n"
-           "8) Quit\n\n");
+           "8) Set sensitivity\n"
+           "9) Quit\n\n");
 
       cmd = get_cmd("Select function number: ");
       if (cmd) {
@@ -1652,6 +1654,9 @@ static void do_usb_testing(void)
             usb_set_alarm();
             break;
          case 8:
+            usb_set_sens();
+            break;
+         case 9:
             quit = TRUE;
             break;
          default:
@@ -1670,6 +1675,87 @@ static void do_usb_testing(void)
 }
 
 #ifdef HAVE_USB_DRIVER
+
+static void usb_set_sens(void)
+{
+   int result;
+   char* cmd;
+
+   if (!usb_read_int_from_ups(ups, CI_SENS, &result)) {
+      pmsg("\nI don't know how to control the alarm settings on your UPS.\n");
+      return;
+   }
+   
+   pmsg("Current sensitivity setting: ");
+   switch(result) {
+   case 0:
+      pmsg("LOW\n");
+      break;
+   case 1:
+      pmsg("MEDIUM\n");
+      break;
+   case 2:
+      pmsg("HIGH\n");
+      break;
+   default:
+      pmsg("UNKNOWN\n");
+      break;
+   }
+
+   while(1) {
+      pmsg("Press...\n"
+           " L for Low sensitivity\n"
+           " M for Medium sensitivity\n"
+           " H for High sensitivity\n"
+           " Q to Quit with no changes\n"
+           "Your choice: ");
+      cmd = get_cmd("Select function: ");
+      if (cmd) {
+         switch(tolower(*cmd)) {
+         case 'l':
+            usb_write_int_to_ups(ups, CI_SENS, 0, "CI_SENS");
+            break;
+         case 'm':
+            usb_write_int_to_ups(ups, CI_SENS, 1, "CI_SENS");
+            break;
+         case 'h':
+            usb_write_int_to_ups(ups, CI_SENS, 2, "CI_SENS");
+            break;
+         case 'q':
+            return;
+         default:
+            pmsg("Illegal response.\n");
+            continue;
+         }
+      } else {
+         pmsg("Illegal response.\n");
+         continue;
+      }
+      
+      break;
+   }
+   
+   /* Delay needed for readback to work */
+   sleep(1);
+
+   usb_read_int_from_ups(ups, CI_SENS, &result);
+   pmsg("New sensitivity setting: ");
+   switch(result) {
+   case 0:
+      pmsg("LOW\n");
+      break;
+   case 1:
+      pmsg("MEDIUM\n");
+      break;
+   case 2:
+      pmsg("HIGH\n");
+      break;
+   default:
+      pmsg("UNKNOWN\n");
+      break;
+   }
+   
+}
 
 static void usb_set_alarm(void)
 {
@@ -1723,6 +1809,9 @@ static void usb_set_alarm(void)
       break;
    }
    
+   /* Delay needed for readback to work */
+   sleep(1);
+
    usb_read_int_from_ups(ups, CI_DALARM, &result);
    pmsg("New alarm setting: ");
    switch(result) {
@@ -1736,7 +1825,6 @@ static void usb_set_alarm(void)
       pmsg("UNKNOWN\n");
       break;
    }
-   
 }
 
 static void usb_kill_power_test(void)
