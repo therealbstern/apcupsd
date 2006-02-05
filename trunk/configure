@@ -11388,7 +11388,7 @@ _ACEOF
 
 LD="$CXX"
 
-if test -n "$GCC"; then
+if test -n "$GCC" -a "$CFG_CYGWIN" != "yes"; then
     # Starting with GCC 3.0, you must link C++ programs against either
     # libstdc++ (shared by default), or libsupc++ (always static).  If
     # you care about binary portability between Linux distributions,
