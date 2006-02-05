@@ -32,22 +32,22 @@ all-targets: $(allexe)
 #
 
 apcupsd: $(dobjs) $(gobjs) $(WINAPC) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
-	$(CXX) $(LDFLAGS) $(WLDFLAGS) $(dobjs) $(gobjs) $(LIBS) $(WINAPC) $(WINLIBS) @LIBUSB@ -o apcupsd
+	$(LD) $(LDFLAGS) $(WLDFLAGS) $(dobjs) $(gobjs) $(LIBS) $(WINAPC) $(WINLIBS) -o apcupsd
 
 apctest: $(tobjs) $(gobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
-	$(CXX) $(LDFLAGS) $(tobjs) $(gobjs) $(LIBS) @LIBUSB@ -o apctest
+	$(LD) $(LDFLAGS) $(tobjs) $(gobjs) $(LIBS) -o apctest
 
 devicedbg: $(xobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
-	$(CXX) $(LDFLAGS) $(xobjs) $(LIBS) -o devicedbg
+	$(LD) $(LDFLAGS) $(xobjs) $(LIBS) -o devicedbg
 
 apcaccess: $(aobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
-	$(CXX) $(LDFLAGS) $(aobjs) $(LIBS) -o apcaccess
+	$(LD) $(LDFLAGS) $(aobjs) $(LIBS) -o apcaccess
  
 smtp: $(sobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
-	$(CXX) $(LDFLAGS) $(sobjs) $(LIBS) -o smtp
+	$(LD) $(LDFLAGS) $(sobjs) $(LIBS) -o smtp
  
 powerflute: $(fobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
-	$(CXX) $(LDFLAGS) $(fobjs) $(LIBS) @POWERLIBS@ -o powerflute
+	$(LD) $(LDFLAGS) $(fobjs) $(LIBS) @POWERLIBS@ -o powerflute
 
 install: install-binary
 
