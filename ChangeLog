@@ -8,6 +8,16 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+CHANGES IN 3.12.x
+
+09Feb06:
+- bsd-usb: Fix bug masking 32 bit fields. Oddly, the linux kernel had this
+  exact same bug a few months ago.
+- Introduce logf() and use it to ensure free-form debug prints make it to
+  the trace file when using -T.
+02Feb06:
+- net: Add support for selftest detection.
+
 CHANGES IN 3.12.2
 
 17Jan06:
