@@ -75,6 +75,32 @@ int debug_level = 0;
 FILE *trace_fd = NULL;
 bool trace = false;
 
+void logf(const char *fmt, ...)
+{
+   va_list arg_ptr;
+   va_start(arg_ptr, fmt);
+
+   if (trace) {
+      if (!trace_fd) {
+         char fn[200];
+         asnprintf(fn, sizeof(fn), "./apcupsd.trace");
+         trace_fd = fopen(fn, "a+");
+      }
+      if (trace_fd) {
+         vfprintf(trace_fd, fmt, arg_ptr);
+         fflush(trace_fd);
+      } else {
+         /* Some problem, turn off tracing */
+         trace = false;
+      }
+   } else {   /* not tracing */
+      vfprintf(stdout, fmt, arg_ptr);
+      fflush(stdout);
+   }
+
+   va_end(arg_ptr);
+}
+
 #define FULL_LOCATION 1
 void d_msg(const char *file, int line, int level, const char *fmt, ...)
 {
@@ -113,23 +139,7 @@ void d_msg(const char *file, int line, int level, const char *fmt, ...)
       avsnprintf(buf + i, sizeof(buf) - i, (char *)fmt, arg_ptr);
       va_end(arg_ptr);
 
-      if (trace) {
-         if (!trace_fd) {
-            char fn[200];
-            asnprintf(fn, sizeof(fn), "./apcupsd.trace");
-            trace_fd = fopen(fn, "a+");
-         }
-         if (trace_fd) {
-            fputs(buf, trace_fd);
-            fflush(trace_fd);
-         } else {
-            /* Some problem, turn off tracing */
-            trace = false;
-         }
-      } else {   /* not tracing */
-         fputs(buf, stdout);
-         fflush(stdout);
-      }
+      logf("%s", buf);
    }
 #endif
 }

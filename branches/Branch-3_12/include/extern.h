@@ -219,6 +219,7 @@ extern void wait_for_termination(int serial_pid);
 
 /* In apclog.c */
 extern void log_event(const UPSINFO *ups, int level, const char *fmt, ...);
+extern void logf(const char *fmt, ...);
 
 /* In apcnetlib.c */
 extern int net_open(char *host, char *service, int port);
