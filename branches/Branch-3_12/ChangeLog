@@ -10,6 +10,13 @@
 
 CHANGES IN 3.12.x
 
+11Feb06:
+- bsd-usb: Increase size of interrupt report buffer. This works around a 
+  problem where the UPS would deliver several interrupt reports at once, 
+  and they would not evenly fill the buffer. Since we only look at the 
+  first report in the buffer, the next time around we'd see the tail of a 
+  previous report and parse it as a new report, leading to momentary 
+  glitches of mangled data.
 09Feb06:
 - bsd-usb: Fix bug masking 32 bit fields. Oddly, the linux kernel had this
   exact same bug a few months ago.
