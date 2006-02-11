@@ -565,7 +565,7 @@ int pusb_ups_check_state(UPSINFO *ups)
 {
    int i, ci;
    int retval, value;
-   unsigned char buf[20];
+   unsigned char buf[100];
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
    struct timespec now, exit;
    struct timeval tv;
