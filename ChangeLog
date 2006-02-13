@@ -10,6 +10,9 @@
 
 CHANGES IN 3.12.x
 
+13Feb06:
+- Don't link against $(DRVLIBS) unless it is necessary. This fixes a link
+  error in apcaccess on AIX 5.1.
 11Feb06:
 - bsd-usb: Increase size of interrupt report buffer. This works around a 
   problem where the UPS would deliver several interrupt reports at once, 
