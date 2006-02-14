@@ -10,6 +10,10 @@
 
 CHANGES IN 3.12.x
 
+14Feb06:
+- apcconfig.c needs argvalue. Although it's gross, the current standard
+  appears to be to instantiate that array in each top-level C file. Follow
+  that convention in smtp.c to solve a link error on AIX 5.1.
 13Feb06:
 - Move definitions of pidfile and kill_ups_power into library modules 
   where they are used. This prevents a link error on AIX 5.1.
