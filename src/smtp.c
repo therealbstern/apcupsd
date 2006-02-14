@@ -70,6 +70,8 @@ static char *reply_addr = NULL;
 static int mailport = 25;
 static char my_hostname[MAXSTRING];
 
+/* Needed by lib/apcconfig.c */
+char argvalue[MAXSTRING];
 
 /* examine message from server */
 static void get_response(void)
