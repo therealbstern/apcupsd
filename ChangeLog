@@ -11,6 +11,8 @@
 CHANGES IN 3.12.x
 
 13Feb06:
+- Move definitions of pidfile and kill_ups_power into library modules 
+  where they are used. This prevents a link error on AIX 5.1.
 - Don't link against $(DRVLIBS) unless it is necessary. This fixes a link
   error in apcaccess on AIX 5.1.
 - apcsmart: Add debug output to track data returned by UPS.
