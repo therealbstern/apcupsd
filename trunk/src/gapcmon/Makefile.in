@@ -16,7 +16,7 @@ CFLAGS=-Wall -O2 @GAPCMON_CFLAGS@
 DEFS=
 
 # gapcmon objects
-OBJS = gapcmon.o
+OBJS = gapcmon.o gp_apcmon_core.o
 
 all-targets: $(allexe)
 

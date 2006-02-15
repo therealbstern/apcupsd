@@ -1,0 +1,90 @@
+Target Package Files
+
+REQUIRED PREFIX=/usr
+/usr/share/pixmaps/apcupsd.png
+/usr/share/pixmaps/charging.png
+/usr/share/pixmaps/online.png
+/usr/share/pixmaps/onbatt.png
+/usr/lib/bonobo/servers/gpanel_apcmon.server               "see location= ..."
+/usr/share/gnome/apps/Applications/gapcmon.desktop
+
+
+<CONFIGURE.IN Considerations>
+
+--- BEGIN Configure.in
+
+CFLAGS="-Wall -g -ansi -pedantic "
+AC_SUBST(CFLAGS)
+
+dnl Check for required glib and gtk modules 
+PKG_CHECK_MODULES(GAPC, gtk+-2.0 >= 2.4.0 glib-2.0 >= 2.4.0 gthread-2.0 gnome-vfs-module-2.0)
+AC_SUBST(GAPC_CFLAGS)
+AC_SUBST(GAPC_LIBS)
+
+PKG_CHECK_MODULES(GPANEL, gtk+-2.0 >= 2.4.0 glib-2.0 >= 2.4.0 gthread-2.0 gnome-vfs-module-2.0 libpanelapplet-2.0 libgnomeui-2.0 libbonoboui-2.0 )
+AC_SUBST(GPANEL_CFLAGS)
+AC_SUBST(GPANEL_LIBS)
+
+dnl
+dnl Not fully working yet
+dnl
+AC_ARG_ENABLE(applet,  
+[ --enable-applet  build gnome panel applet program [default=yes]], 
+enable_applet="$enableval", enable_applet="yes")
+
+AM_CONDITIONAL(ENABLE_APPLET, test "$enable_applet" = "yes")
+
+--- END Configure.in 
+
+
+
+<MAKEFILE.AM Considerations>
+
+--- BEGIN Top Level 
+
+gnomemenudir = $(libdir)/bonobo/servers
+gnomemenu_DATA = gpanel_apcmon.server
+
+Applicationsdir = $(datadir)/gnome/apps/Applications
+Applications_DATA = gapcmon.desktop
+
+pixmapdir = $(datadir)/pixmaps
+pixmap_DATA	=	pixmaps/online.png \
+				pixmaps/onbatt.png \
+				pixmaps/charging.png \
+				pixmaps/apcupsd.png
+
+gpanel_apcmondocdir = $(datadir)/doc/gapcmon
+gpanel_apcmondoc_DATA =	README \
+						COPYING \
+						AUTHORS \
+						INSTALL \
+						NEWS \						
+						ChangeLog \
+						$(Applications_DATA) \
+						$(gnomemenu_DATA)
+
+						
+EXTRA_DIST = 	$(Applications_DATA) $(gnomemenu_DATA) $(gpanel_apcmondoc_DATA) $(pixmap_DATA)
+
+INCLUDES = $(CFLAGS) $(RPM_OPT_FLAGS) -DVERSION=\"@PACKAGE_VERSION@\" 
+
+bin_PROGRAMS = gapcmon
+gapcmon_SOURCES = gapcmon.c gp_apcmon_core.c gapcmon_common.h
+gapcmon_CFLAGS = @GAPC_CFLAGS@ 
+gapcmon_LDADD = @GAPC_LIBS@ 
+
+libexec_PROGRAMS = gpanel_apcmon
+gpanel_apcmon_SOURCES = gp_apcmon.c gp_apcmon_core.c  gapcmon_common.h
+gpanel_apcmon_CFLAGS = @GPANEL_CFLAGS@ 
+gpanel_apcmon_LDADD = @GPANEL_LIBS@ 
+
+if	ENABLE_APPLET
+	_PROGRAMS = gapcmon gpanel_apcmon 
+else
+	_PROGRAMS = gapcmon	
+endif
+
+
+--- END Top Level 
+
