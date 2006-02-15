@@ -1,0 +1,7 @@
+[Desktop Entry]
+Name=APCUPSD Monitor
+Comment=Linux Monitor program for the APCUPSD.sourceforge.net package, available at gapcmon.sourceforge.net
+Exec=gapcmon
+Icon=apcupsd.png
+Terminal=0
+Type=Application
