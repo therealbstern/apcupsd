@@ -1,0 +1,93 @@
+# Default variables
+@VARIABLES@
+# TOP source directory.
+topdir = @topdir@
+top_builddir = $(topdir)
+
+if @ENABLE_GPANEL@ then
+allexe = gapcmon @GPANEL@
+else
+allexe = gapcmon
+endif
+
+# Include the default make targets: to be put before the all-targets: rule.
+@TARGETS@
+
+# Override elements of the standard .c.o rule since we want GTK flags.
+# Eventually we should make gapcmon.c c++ clean so we can use $(CXX) as-is.
+CXX=$(CC)
+CFLAGS=-Wall -O2
+DEFS=
+
+gapcmon_OBJS = gapcmon.o gp_apcmon_core.o
+gpanel_OBJS = gp_apcmon.o gp_apcmon_core.o
+pixmaps_DATA = charging.png onbatt.png online.png apcupsd.png
+
+
+all-targets: $(allexe)
+
+gapcmon: $(gapcmon_OBJS)
+	$(LD) -o $@ $(gapcmon_OBJS) @GAPCMON_LIBS@ 
+	
+gpanel_apcmon: $(gpanel_OBJS)
+	$(LD) -o $@ $(gpanel_OBJS) @GPANEL_LIBS@ 
+
+gapcmon.o: gapcmon.c 
+	$(CC) @GAPCMON_CFLAGS@ -o $@ 
+
+gp_apcmon.o: gp_apcmon.c 
+	$(CC) @GPANEL_CFLAGS@ -o $@ 
+
+gp_apcmon_core.o: gp_apcmon_core.c 
+	$(CC) @GAPCMON_CFLAGS@ -o $@ 
+
+install: install-binary
+
+install-:
+
+install-binary: $(allexe)
+	@$(ECHO) "Installing selected gapcmon versions ..."
+	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(bindir)
+	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(libexecdir)	
+	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(libdir)/bonobo/servers	
+	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(datadir)/pixmaps
+	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(datadir)/gnome/apps/Applications	
+	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(datadir)/pixmaps	
+	@$(MAKE) DESTDIR=$(DESTDIR) install-pixmaps
+	@$(MAKE) DESTDIR=$(DESTDIR) install-gapcmon
+	@$(MAKE) DESTDIR=$(DESTDIR) install-@GPANEL@
+
+install-gapcmon: gapcmon
+	@$(INSTALL_PROGRAM) -s -m 755 gapcmon@EXEEXT@	$(DESTDIR)$(bindir)/gapcmon@EXEEXT@
+	@$(INSTALL_PROGRAM) -s -m 755 gapcmon.desktop	$(DESTDIR)${datadir}/gnome/apps/Applications/gapcmon.desktop
+	
+install-gpanel_apcmon: gpanel_apcmon
+	@$(INSTALL_PROGRAM) -s -m 755 gpanel_apcmon@EXEEXT@	$(DESTDIR)$(libexecdir)/gpanel_apcmon@EXEEXT@
+	@$(INSTALL_PROGRAM) -s -m 755 gpanel_apcmon.server	$(DESTDIR)$(libdir)/bonobo/servers/gpanel_apcmon.server
+
+install-pixmaps: $(pixmaps_DATA)
+	@$(INSTALL_PROGRAM) -s -m 744 apcupsd.png	$(DESTDIR)$(datadir)/pixmaps/apcupsd.png		
+	@$(INSTALL_PROGRAM) -s -m 744 online.png	$(DESTDIR)$(datadir)/pixmaps/online.png
+	@$(INSTALL_PROGRAM) -s -m 744 onbatt.png	$(DESTDIR)$(datadir)/pixmaps/onbatt.png
+	@$(INSTALL_PROGRAM) -s -m 744 charging.png	$(DESTDIR)$(datadir)/pixmaps/charging.png
+
+uninstall:
+	@$(ECHO) "Removing gapcmon ..."
+	@$(RMF) $(DESTDIR)$(datadir)/pixmaps/apcupsd.png
+	@$(RMF) $(DESTDIR)$(datadir)/pixmaps/online.png
+	@$(RMF) $(DESTDIR)$(datadir)/pixmaps/onbatt.png
+	@$(RMF) $(DESTDIR)$(datadir)/pixmaps/charging.png			
+	@$(RMF) $(DESTDIR)$(libdir)/bonobo/servers/gpanel_apcmon.server
+	@$(RMF) $(DESTDIR)${datadir}/gnome/apps/Applications/gapcmon.desktop	
+	@$(RMF) $(DESTDIR)$(libexecdir)/gpanel_apcmon@EXEEXT@
+	@$(RMF) $(DESTDIR)$(bindir)/gapcmon@EXEEXT@
+
+clean: targetclean
+
+distclean: targetdistclean
+	$(RMF) gapcmon @GPANEL@
+	$(RMF) Makefile
+	$(RMF) -r CVS
+	
+# -----------------------------------------------------------------------
+# DO NOT DELETE THIS LINE -- make depend depends on it.
