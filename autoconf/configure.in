@@ -980,7 +980,8 @@ dnl Check for enable of gapcmon
 dnl
 GAPCMON=
 GAPCMON_ENABLED=no
-AC_ARG_ENABLE(gapcmon, [AC_HELP_STRING([--enable-gapcmon], [Compile gapcmon application])],
+AC_ARG_ENABLE(gapcmon, 
+	[AC_HELP_STRING([--enable-gapcmon], [build GTK/GUI front-end to apcupsd Program -default=no])],
 	[ if test "$enableval" = "yes" ; then
 		PKG_CHECK_MODULES(GAPCMON, gtk+-2.0 glib-2.0 >= 2.4.0 gthread-2.0 gnome-vfs-module-2.0)
 		GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DVERSION=\\\"$VERSION\\\""
@@ -990,6 +991,24 @@ AC_ARG_ENABLE(gapcmon, [AC_HELP_STRING([--enable-gapcmon], [Compile gapcmon appl
     [])
 AC_DEFINE(GAPCMON)
 AC_SUBST(GAPCMON)
+
+dnl
+dnl Check for enable of gpanel_apcmon
+dnl
+GPANEL=
+GPANEL_ENABLED=no
+AC_ARG_ENABLE(gpanel, 
+	[AC_HELP_STRING([--enable-gpanel], [build gnome panel applet front-end to apcupsd Program default=no])],
+	[ if test "$enableval" = "yes" ; then
+		PKG_CHECK_MODULES(GPANEL, gtk+-2.0 >= 2.4.0 glib-2.0 >= 2.4.0 gthread-2.0 gnome-vfs-module-2.0 libpanelapplet-2.0 libgnomeui-2.0 libbonoboui-2.0)
+		GPANEL_CFLAGS="$GPANEL_CFLAGS -DVERSION=\\\"$VERSION\\\""
+		GPANEL_ENABLED=yes
+		GPANEL=gpanel_apcmon
+	fi],
+    [])
+AC_DEFINE(GPANEL)
+AC_SUBST(GPANEL)
+
 
 dnl Default linker is g++
 LD="$CXX"
@@ -1849,6 +1868,7 @@ Configuration on `date`:
   enable-pthreads:	      ${with_pthreads}
   enable-dist-install:	      ${with_distdir}
   enable-gapcmon:	      ${GAPCMON_ENABLED}
+  enable-gpanel:	      ${GPANEL_ENABLED}  
   " > config.out
 
 cat config.out
