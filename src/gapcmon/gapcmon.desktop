@@ -1,7 +1,12 @@
 [Desktop Entry]
+Encoding=UTF-8
 Name=APCUPSD Monitor
-Comment=Linux Monitor program for the APCUPSD.sourceforge.net package, available at gapcmon.sourceforge.net
+GenericName=gapcmon
+Comment=Gtk/GUI Monitor program for (U)ninterruptible (P)ower (S)upply under the management of the APCUPSD.sourceforge.net package, also available at gapcmon.sourceforge.net
 Exec=gapcmon
 Icon=apcupsd.png
-Terminal=0
+Terminal=false
 Type=Application
+Categories=Applications;System Tools;
+Version=0.5.4
+
