@@ -4,20 +4,11 @@
 topdir = @topdir@
 top_builddir = $(topdir)
 
-
-# Subprogram selection
-
-allexe = @GAPCMON@ @GPANEL@
-
-
 # Include the default make targets: to be put before the all-targets: rule.
 @TARGETS@
 
-# Override elements of the standard .c.o rule since we want GTK flags.
-# Eventually we should make gapcmon.c c++ clean so we can use $(CXX) as-is.
-CXX=$(CC)
-CFLAGS=-Wall -O2
-DEFS=
+# Subprogram selection
+allexe = @GAPCMON@ @GPANEL@
 
 gapcmon_OBJS = gapcmon.o gp_apcmon_core.o
 gpanel_OBJS = gp_apcmon.o gp_apcmon_core.o
@@ -28,18 +19,18 @@ all-targets: $(allexe)
 
 gapcmon: $(gapcmon_OBJS)
 	$(LD) -o $@ $(gapcmon_OBJS) @GAPCMON_LIBS@ 
-	
+
 gpanel_apcmon: $(gpanel_OBJS)
 	$(LD) -o $@ $(gpanel_OBJS) @GPANEL_LIBS@ 
 
-gapcmon.o: gapcmon.c gp_apcmon_common.h
-	$(CC) @GAPCMON_CFLAGS@ -o $@ 
+gapcmon.o: gapcmon.c 
+	$(CC) -c @GAPCMON_CFLAGS@ $<
 
-gp_apcmon.o: gp_apcmon.c gp_apcmon_common.h
-	$(CC) @GPANEL_CFLAGS@ -o $@ 
+gp_apcmon.o: gp_apcmon.c 
+	$(CC) -c @GPANEL_CFLAGS@ $<
 
-gp_apcmon_core.o: gp_apcmon_core.c gp_apcmon_common.h
-	$(CC) @GAPCMON_CFLAGS@ -o $@ 
+gp_apcmon_core.o: gp_apcmon_core.c 
+	$(CC) -c @GAPCMON_CFLAGS@ $<
 
 install: install-binary
 
@@ -58,7 +49,7 @@ install-binary: $(allexe)
 	@$(MAKE) DESTDIR=$(DESTDIR) install-@GPANEL@
 
 install-gapcmon: gapcmon
-	@$(INSTALL_PROGRAM) -s -m 755 gapcmon			$(DESTDIR)$(bindir)/gapcmon@EXEEXT@
+	@$(INSTALL_PROGRAM) -s -m 755 gapcmon		$(DESTDIR)$(bindir)/gapcmon@EXEEXT@
 	@$(INSTALL_PROGRAM) -s -m 755 gapcmon.desktop	$(DESTDIR)${datadir}/gnome/apps/Applications/gapcmon.desktop
 	
 install-gpanel_apcmon: gpanel_apcmon
