@@ -10,6 +10,9 @@ top_builddir = $(topdir)
 # Subprogram selection
 allexe = @GAPCMON@ @GPANEL@
 
+# Override common CFLAGS here
+CFLAGS=-O2
+
 gapcmon_OBJS = gapcmon.o gp_apcmon_core.o
 gpanel_OBJS = gp_apcmon.o gp_apcmon_core.o
 pixmaps_DATA = charging.png onbatt.png online.png apcupsd.png
@@ -24,13 +27,13 @@ gpanel_apcmon: $(gpanel_OBJS)
 	$(LD) -o $@ $(gpanel_OBJS) @GPANEL_LIBS@ 
 
 gapcmon.o: gapcmon.c 
-	$(CC) -c @GAPCMON_CFLAGS@ $<
+	$(CC) -c $(CFLAGS) @GAPCMON_CFLAGS@ $<
 
 gp_apcmon.o: gp_apcmon.c 
-	$(CC) -c @GPANEL_CFLAGS@ $<
+	$(CC) -c $(CFLAGS) @GPANEL_CFLAGS@ $<
 
 gp_apcmon_core.o: gp_apcmon_core.c 
-	$(CC) -c @GAPCMON_CFLAGS@ $<
+	$(CC) -c $(CFLAGS) @GAPCMON_CFLAGS@ $<
 
 install: install-binary
 
