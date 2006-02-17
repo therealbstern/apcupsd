@@ -1812,7 +1812,7 @@ then
     GENERATE_FILES="$GENERATE_FILES src/gd1.2/Makefile"
 fi
 
-if test "$GAPCMON"x != ""x
+if test "$GAPCDIR"x != ""x
 then
     GENERATE_FILES="$GENERATE_FILES src/gapcmon/Makefile"
 fi
