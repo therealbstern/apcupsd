@@ -620,10 +620,6 @@ int apcsmart_ups_entry_point(UPSINFO *ups, int command, void *data)
    int retries = 5;                /* Number of retries if reason is NA (see below) */
    char ans[20];
 
-   if (ups->is_slave()) {
-      return SUCCESS;
-   }
-
    switch (command) {
    case DEVICE_CMD_SET_DUMB_MODE:
       /* Set dumb mode for a smart UPS */

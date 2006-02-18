@@ -55,7 +55,6 @@ typedef enum {
    DUMB_UPS,            /* Dumb UPS driver      */
    BK,                  /* Simple Signal        */
    SHAREBASIC,          /* Simple Signal, Share */
-   NETUPS,              /*                      */
    BKPRO,               /* SubSet Smart Signal  */
    VS,                  /* SubSet Smart Signal  */
    NBKPRO,              /* Smarter BKPRO Signal */
@@ -73,18 +72,13 @@ typedef enum {
    NO_CLASS = 0,
    STANDALONE,
    SHARESLAVE,
-   NETSLAVE,
    SHAREMASTER,
-   NETMASTER,
-   SHARENETMASTER
 } ClassMode;
 
 typedef enum {
    NO_SHARE_NET = 0,
    DISABLE,             /* Disable Share or Net UPS  */
    SHARE,               /* ShareUPS Internal         */
-   NET,                 /* NetUPS                    */
-   SHARENET             /* Share and Net, Master     */
 } ShareNetMode;
 
 typedef enum {
