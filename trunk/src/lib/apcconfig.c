@@ -84,9 +84,6 @@ static const GENINFO upsclasses[] = {
    { "standalone",     "Stand Alone",           STANDALONE },
    { "shareslave",     "ShareUPS Slave",        SHARESLAVE },
    { "sharemaster",    "ShareUPS Master",       SHAREMASTER },
-   { "netslave",       "Net Slave",             NETSLAVE },
-   { "netmaster",      "Net Master",            NETMASTER },
-   { "sharenetmaster", "ShareUPS & Net Master", SHARENETMASTER },
    { NULL,             "*invalid-ups-class*",   NO_CLASS },
 };
 
@@ -102,8 +99,6 @@ static const GENINFO logins[] = {
 static const GENINFO modes[] = {
    { "disable",  "Network & ShareUPS Disabled", DISABLE },
    { "share",    "ShareUPS",                    SHARE },
-   { "net",      "NetworkUPS",                  NET },
-   { "sharenet", "Network & ShareUPS",          SHARENET },
    { NULL,       "*invalid-ups-mode*",          NO_SHARE_NET },
 };
 
@@ -111,7 +106,6 @@ static const GENINFO types[] = {
    /* FIXME (adk): It has been long enough...time to kill these */
    { "backups",       "BackUPS",                   BK },
    { "sharebasic",    "ShareUPS Basic Port",       SHAREBASIC },
-   { "netups",        "NetUPS Virtual Basic Port", NETUPS },
    { "backupspro",    "BackUPS Pro",               BKPRO },
    { "smartvsups",    "SmartUPS VS",               VS },
    { "newbackupspro", "Smarter BackUPS Pro",       NBKPRO },
@@ -821,9 +815,6 @@ jump_into_the_loop:
 
    /* post-process the configuration stored in the ups structure */
 
-   if (ups->upsclass.type != NETSLAVE)
-      ups->usermagic[0] = '\0';
-
    /*
     * If annoy time is greater than initial delay, don't bother about
     * initial delay and set it to 0.
@@ -831,7 +822,7 @@ jump_into_the_loop:
    if (ups->annoy >= ups->annoydelay)
       ups->annoydelay = 0;
 
-   if ((ups->sharenet.type == SHAREMASTER) || (ups->sharenet.type == SHARENETMASTER)) {
+   if (ups->sharenet.type == SHAREMASTER) {
       ups->maxtime = 0;
       ups->percent = 10;
       ups->runtime = 5;

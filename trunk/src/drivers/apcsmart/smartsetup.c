@@ -49,14 +49,6 @@ int apcsmart_ups_open(UPSINFO *ups)
          "apcsmart_ups_open called twice. This shouldn't happen.");
    }
 
-   /*
-    * For a slave, we skip actually setting up the serial port
-    */
-   if (ups->is_slave()) {
-      ups->fd = -1;
-      return 1;
-   }
-
    if ((ups->fd = open(ups->device, O_RDWR | O_NOCTTY | O_NDELAY)) < 0)
       Error_abort2(_("Cannot open UPS port %s: %s\n"), ups->device, strerror(errno));
 
@@ -64,7 +56,7 @@ int apcsmart_ups_open(UPSINFO *ups)
    cmd = fcntl(ups->fd, F_GETFL, 0);
    fcntl(ups->fd, F_SETFL, cmd & ~O_NDELAY);
 
-/* Save old settings */
+   /* Save old settings */
    tcgetattr(ups->fd, &my_data->oldtio);
 
    my_data->newtio.c_cflag = DEFAULT_SPEED | CS8 | CLOCAL | CREAD;

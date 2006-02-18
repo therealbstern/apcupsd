@@ -94,7 +94,6 @@ int output_status(UPSINFO *ups, int sockfd,
    switch (ups->mode.type) {
    case BK:
    case SHAREBASIC:
-   case NETUPS:
       if (!ups->is_onbatt()) {
          s_write(ups, "LINEFAIL : OK\n");
          s_write(ups, "BATTSTAT : OK\n");
@@ -522,7 +521,6 @@ char *ups_status(int stat)
    switch (ups->mode.type) {
    case BK:
    case SHAREBASIC:
-   case NETUPS:
    case BKPRO:
    case VS:
       if (!ups->is_onbatt()) {

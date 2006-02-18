@@ -899,9 +899,6 @@ Optional Features:
   --enable-test           Compile TEST driver code
   --disable-test          No TEST driver (default)
 
-  --enable-master-slave   Compile old network master/server code
-  --disable-master-slave  No old network master/server (default)
-
   --enable-powerflute     Compile powerflute program
   --enable-gapcmon        build GTK/GUI front-end to apcupsd Program
                           -default=no
@@ -10841,19 +10838,6 @@ fi;
 
 
 
-OLDNET_ENABLED=no
-# Check whether --enable-master-slave or --disable-master-slave was given.
-if test "${enable_master_slave+set}" = set; then
-  enableval="$enable_master_slave"
-   if test "$enableval" = "yes" ; then
-       cat >>confdefs.h <<\_ACEOF
-#define HAVE_OLDNET 1
-_ACEOF
-
-       OLDNET_ENABLED=yes
-   fi
-fi;
-
 CGIBIN="/etc/apcupsd"
 
 # Check whether --with-cgi-bin or --without-cgi-bin was given.
@@ -17391,7 +17375,6 @@ Configuration on `date`:
 
   drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${DISPLAY_USB_DRIVER:-no-usb} ${DISPLAY_SNMP_DRIVER:-no-snmp} ${TEST_DRIVER:-no-test}
 
-  enable-master-slave:	      ${OLDNET_ENABLED}
   enable-nis:		      ${NISSRV_ENABLED}
   with-nisip:		      ${NISIP}
   enable-cgi:		      ${ENABLE_CGI}

@@ -200,7 +200,6 @@ const UPSDRIVER *attach_driver(UPSINFO *ups)
    switch (ups->mode.type) {
    case BK:
    case SHAREBASIC:
-   case NETUPS:
    case DUMB_UPS:
       driver_name = "dumb";
       break;

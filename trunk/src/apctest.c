@@ -292,42 +292,6 @@ int main(int argc, char *argv[])
       pmsg("sharenet.type = SHARE\n");
       break;
 
-   case NET:
-      pmsg("sharenet.type = NET\n");
-
-      switch (ups->upsclass.type) {
-      case NO_CLASS:
-         pmsg("upsclass.type = NO_CLASS\n");
-         break;
-      case STANDALONE:
-         pmsg("upsclass.type = STANDALONE\n");
-         break;
-      case SHARESLAVE:
-         pmsg("upsclass.type = SHARESLAVE\n");
-         break;
-      case SHAREMASTER:
-         pmsg("upsclass.type = SHAREMASTER\n");
-         break;
-      case SHARENETMASTER:
-         pmsg("upsclass.type = SHARENETMASTER\n");
-         break;
-      case NETSLAVE:
-         pmsg("upsclass.type = NETSLAVE\n");
-         break;
-      case NETMASTER:
-         pmsg("upsclass.type = NETMASTER\n");
-         break;
-      default:
-         pmsg("upsclass.type = DEFAULT\n");
-         break;
-      }
-      break;
-
-   case SHARENET:
-      pmsg("sharenet.type = SHARENET\n");
-      pmsg("I cannot handle sharenet.type = SHARENET\n");
-      apctest_terminate(1);
-
    default:
       pmsg("sharenet.type = DEFAULT\n");
       pmsg("I cannot handle sharenet.type = DEFAULT\n");
@@ -441,10 +405,6 @@ int main(int argc, char *argv[])
       pmsg("mode.type = SHAREBASIC\n");
       break;
 
-   case NETUPS:
-      pmsg("mode.type = NETUPS\n");
-      break;
-
    case BKPRO:
       pmsg("mode.type = BKPRO\n");
       break;
@@ -491,46 +451,8 @@ int main(int argc, char *argv[])
 
    delete_lockfile(ups);
 
-   switch (ups->sharenet.type) {
-   case DISABLE:
-   case SHARE:
-      pmsg("Setting up the port ...\n");
-      setup_device(ups);
-      break;
-
-   case NET:
-      switch (ups->upsclass.type) {
-      case NO_CLASS:
-      case STANDALONE:
-      case SHARESLAVE:
-      case SHAREMASTER:
-      case SHARENETMASTER:
-         break;
-      case NETSLAVE:
-         if (kill_ups_power)
-            Error_abort0(_("Ignoring killpower for slave\n"));
-         if (prepare_slave(ups))
-            Error_abort0(_("Error setting up slave\n"));
-         break;
-      case NETMASTER:
-         setup_device(ups);
-         if ((kill_ups_power == 0) && (prepare_master(ups)))
-            Error_abort0("Error setting up master\n");
-         break;
-      default:
-         Error_abort1(_("NET Class Error %s\n\a"), strerror(errno));
-      }
-      break;
-
-   case SHARENET:
-      setup_device(ups);
-      if ((kill_ups_power == 0) && (prepare_master(ups)))
-         Error_abort0("Error setting up master.\n");
-      break;
-
-   default:
-      Error_abort0(_("Unknown share net type\n"));
-   }
+   pmsg("Setting up the port ...\n");
+   setup_device(ups);
 
    if (kill_ups_power) {
       pmsg("apctest: bad option, I cannot do a killpower\n");

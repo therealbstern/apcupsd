@@ -134,7 +134,6 @@ static void log_data(UPSINFO *ups)
    switch (ups->mode.type) {
    case BK:
    case SHAREBASIC:
-   case NETUPS:
       if (!ups->is_onbatt()) {
          if (!ups->is_replacebatt()) {
             ptr = "OK";

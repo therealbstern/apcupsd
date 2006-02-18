@@ -274,71 +274,16 @@ int main(int argc, char *argv[])
       }
    }
 
-   switch (ups->sharenet.type) {
-   case DISABLE:
-   case SHARE:
-      setup_device(ups);
-      break;
-
-   case NET:
-      switch (ups->upsclass.type) {
-      case NO_CLASS:
-      case STANDALONE:
-      case SHARESLAVE:
-      case SHAREMASTER:
-      case SHARENETMASTER:
-         break;
-      case NETSLAVE:
-         if (kill_ups_power)
-            Error_abort0(_("Ignoring killpower for slave\n"));
-         ups->set_slave();
-         setup_device(ups);
-         if (prepare_slave(ups))
-            Error_abort0(_("Error setting up slave\n"));
-         break;
-      case NETMASTER:
-         setup_device(ups);
-         if ((kill_ups_power == 0) && (prepare_master(ups)))
-            Error_abort0("Error setting up master\n");
-         break;
-      default:
-         Error_abort1(_("NET Class Error %s\n\a"), strerror(errno));
-      }
-      break;
-
-   case SHARENET:
-      setup_device(ups);
-      if ((kill_ups_power == 0) && (prepare_master(ups)))
-         Error_abort0("Error setting up master.\n");
-      break;
-
-   default:
-      Error_abort0(_("Unknown share net type\n"));
-   }
+   setup_device(ups);
 
    if (kill_ups_power) {
-      if (!ups->is_slave())
-         kill_power(ups);
-      else
-         kill_net(ups);
-
+      kill_power(ups);
       apcupsd_terminate(0);
    }
 
    if (create_lockfile(ups) == LCKERROR) {
       Error_abort1(_("Failed to reacquire serial port lock file on device %s\n"),
          ups->device);
-   }
-
-   if (!ups->is_slave()) {
-      prep_device(ups);
-      /*
-       * This isn't a documented option but can be used
-       * for testing dumb mode on a SmartUPS if you have
-       * the proper cable.
-       */
-      if (dumb_mode_test)
-         device_entry_point(ups, DEVICE_CMD_SET_DUMB_MODE, NULL);
    }
 
    shm_OK = 1;
@@ -349,12 +294,6 @@ int main(int argc, char *argv[])
     * on write locks and up to date data in the shared structure.
     */
 
-   if (slave_count) {
-      /* we are the netmaster */
-      start_thread(ups, do_slaves, "apcmst", argv[0]);
-      Dmsg0(10, "Netmaster thread started.\n");
-   }
-
    /* Network status information server */
    if (ups->netstats) {
       start_thread(ups, do_server, "apcnis", argv[0]);
@@ -364,17 +303,9 @@ int main(int argc, char *argv[])
    log_event(ups, LOG_WARNING,
       "apcupsd " APCUPSD_RELEASE " (" ADATE ") " APCUPSD_HOST " startup succeeded");
 
-   /*
-    * If we have threads, we simply go there rather
-    * than creating a thread.
-    */
-   if (!ups->is_slave()) {
-      /* serial port reading and report generation -- apcserial.c */
-      do_device(ups);
-   } else {
-      /* we are a slave -- thus the net is our "serial port" */
-      do_net(ups);
-   }
+   /* main processing loop */
+   do_device(ups);
+
    apcupsd_terminate(0);
    return 0;                       /* to keep compiler happy */
 }
