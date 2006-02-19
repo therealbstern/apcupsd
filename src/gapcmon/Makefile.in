@@ -52,18 +52,18 @@ install-binary: $(allexe)
 	@$(MAKE) DESTDIR=$(DESTDIR) install-@GPANEL@
 
 install-gapcmon: gapcmon
-	@$(INSTALL_PROGRAM) -s -m 755 gapcmon		$(DESTDIR)$(bindir)/gapcmon@EXEEXT@
-	@$(INSTALL_PROGRAM) -s -m 755 gapcmon.desktop	$(DESTDIR)${datadir}/gnome/apps/Applications/gapcmon.desktop
+	@$(INSTALL_PROGRAM) -m 755 gapcmon		$(DESTDIR)$(bindir)/gapcmon@EXEEXT@
+	@$(INSTALL_PROGRAM) -m 755 gapcmon.desktop	$(DESTDIR)${datadir}/gnome/apps/Applications/gapcmon.desktop
 	
 install-gpanel_apcmon: gpanel_apcmon
-	@$(INSTALL_PROGRAM) -s -m 755 gpanel_apcmon		$(DESTDIR)$(libexecdir)/gpanel_apcmon@EXEEXT@
-	@$(INSTALL_PROGRAM) -s -m 755 gpanel_apcmon.server	$(DESTDIR)$(libdir)/bonobo/servers/gpanel_apcmon.server
+	@$(INSTALL_PROGRAM) -m 755 gpanel_apcmon		$(DESTDIR)$(libexecdir)/gpanel_apcmon@EXEEXT@
+	@$(INSTALL_PROGRAM) -m 755 gpanel_apcmon.server	$(DESTDIR)$(libdir)/bonobo/servers/gpanel_apcmon.server
 
 install-pixmaps: $(pixmaps_DATA)
-	@$(INSTALL_PROGRAM) -s -m 744 apcupsd.png	$(DESTDIR)$(datadir)/pixmaps/apcupsd.png		
-	@$(INSTALL_PROGRAM) -s -m 744 online.png	$(DESTDIR)$(datadir)/pixmaps/online.png
-	@$(INSTALL_PROGRAM) -s -m 744 onbatt.png	$(DESTDIR)$(datadir)/pixmaps/onbatt.png
-	@$(INSTALL_PROGRAM) -s -m 744 charging.png	$(DESTDIR)$(datadir)/pixmaps/charging.png
+	@$(INSTALL_PROGRAM) -m 744 apcupsd.png	$(DESTDIR)$(datadir)/pixmaps/apcupsd.png		
+	@$(INSTALL_PROGRAM) -m 744 online.png	$(DESTDIR)$(datadir)/pixmaps/online.png
+	@$(INSTALL_PROGRAM) -m 744 onbatt.png	$(DESTDIR)$(datadir)/pixmaps/onbatt.png
+	@$(INSTALL_PROGRAM) -m 744 charging.png	$(DESTDIR)$(datadir)/pixmaps/charging.png
 
 uninstall:
 	@$(ECHO) "Removing gapcmon ..."
