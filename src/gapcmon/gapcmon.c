@@ -215,7 +215,7 @@ extern gboolean gapc_cb_window_delete_event (GtkWidget * w, GdkEvent * event, gp
   pcfg->b_run = FALSE;
   pcfg->b_refresh_button = TRUE;
 
-  for ( i_x = 0; pcfg->i_timer_ids[i_x] < GAPC_N_TIMERS ; i_x++ )
+  for ( i_x = 0; i_x < GAPC_N_TIMERS ; i_x++ )
      g_source_remove ( pcfg->i_timer_ids[i_x] );
 
   if ( pcfg->about != NULL )
@@ -412,13 +412,6 @@ main (int argc, char *argv[])
   GtkWidget *window;
   GError *gerror = NULL;
 
-  gchar *pch_image_names[] = {
-    "/usr/share/pixmaps/online.png",
-    "/usr/share/pixmaps/onbatt.png",
-    "/usr/share/pixmaps/charging.png",
-    "/usr/share/pixmaps/apcupsd.png",
-    NULL
-  };
 
   /* 
    * Initialize GLib thread support, GnomeVFS, and GTK 
@@ -437,24 +430,9 @@ main (int argc, char *argv[])
   if (gapc_parse_args (argc, argv, pcfg))
     return 1;			/* exit if user only wanted help */
 
-  for (i_x = 0; (pch_image_names[i_x] != NULL) && (i_x < GAPC_N_ICONS); i_x++)
-    {
-      pcfg->my_icons[i_x] = gdk_pixbuf_new_from_file (pch_image_names[i_x], &gerror);
-      if (gerror != NULL)
-	  {
-	  	gchar *pch = NULL;
-
-	  	pch = g_strdup_printf ("Get Icon=%s Failed", pch_image_names[i_x]);
-	  	gapc_log_app_error ("gapc_applet_populate", pch, gerror->message);
-	  	g_error_free (gerror);
-	  	g_free (pch);
-	  	gerror = NULL;
-	  }
-    }
-
+  gapc_load_icons ( pcfg );
+  
   pcfg->b_window_visible = TRUE;
-  pcfg->i_icon_index = GAPC_ICON_DEFAULT;
-  pcfg->size = 24;
   pcfg->b_network_changed = TRUE;
 
   /* 
