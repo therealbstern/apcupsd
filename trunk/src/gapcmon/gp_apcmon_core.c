@@ -1221,6 +1221,8 @@ static gint gapc_monitor_update (PGAPC_CONFIG pcfg)
   gtk_progress_bar_set_text (GTK_PROGRESS_BAR (win), pch);
   dValue = g_strtod (pch, NULL);
   dScale = g_strtod (pch1, NULL);
+  if (dScale == 0.0)
+      dScale = ((gint)(dValue / 100) * 100) + 100.0;
   dValue /= dScale;
   gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (win), dValue);
   pbar = g_hash_table_lookup (pcfg->pht_Status, "HBar1");
@@ -1237,6 +1239,8 @@ static gint gapc_monitor_update (PGAPC_CONFIG pcfg)
   dValue = g_strtod (pch, NULL);
   dScale = g_strtod (pch1, NULL);
   dScale *= 1.2;
+  if (dScale == 0.0)
+      dScale = ((gint)(dValue / 10.0) * 10) + 10.0;
   dValue /= dScale;
   gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (win), dValue);
   pbar = g_hash_table_lookup (pcfg->pht_Status, "HBar2");
