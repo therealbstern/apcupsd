@@ -61,6 +61,7 @@
 /*
  * Shared Routines Outgoing
  */
+extern gboolean gapc_load_icons (PGAPC_CONFIG pcfg);
 extern void   gapc_log_app_error (gchar * pch_func, gchar * pch_topic, gchar * pch_emsg);
 extern void   gapc_log_net_error (gchar * pch_func, gchar * pch_topic, GnomeVFSResult result);
 extern gint   gapc_save_preferences (PGAPC_CONFIG pcfg);
@@ -84,7 +85,7 @@ extern gboolean   gapc_update_tooltip_msg (PGAPC_CONFIG pcfg);
  */
 extern gboolean   gapc_cb_window_delete_event (GtkWidget * w, GdkEvent * event, gpointer gp);
 extern gboolean   gapc_change_status_icon (PGAPC_CONFIG pcfg);
-extern void gapc_cb_button_quit (GtkButton * button, gpointer gp);
+extern void 	  gapc_cb_button_quit (GtkButton * button, gpointer gp);
 
 /*
  * Internal Routines
@@ -111,6 +112,46 @@ static gint gapc_net_send (GnomeVFSSocket * v_socket, gchar * buff, gint len);
 static void gapc_net_close (GnomeVFSInetConnection * connection, GnomeVFSSocket * v_socket);
 
 
+/*
+ * Load ICONs and set default icon
+ * return TRUE if ok, FALSE otherwise
+ */
+extern gboolean gapc_load_icons (PGAPC_CONFIG pcfg)
+{
+  guint    i_x 	   = 0;
+  GError   *gerror = NULL;
+  gboolean b_rc    = TRUE;
+  
+  gchar *pch_image_names[] = {
+    "/usr/share/pixmaps/online.png",
+    "/usr/share/pixmaps/onbatt.png",
+    "/usr/share/pixmaps/charging.png",
+    "/usr/share/pixmaps/apcupsd.png",
+    NULL
+  };
+
+  for (i_x = 0; (pch_image_names[i_x] != NULL) && (i_x < GAPC_N_ICONS); i_x++)
+    {
+      pcfg->my_icons[i_x] = gdk_pixbuf_new_from_file (pch_image_names[i_x], &gerror);
+      if (gerror != NULL)
+	  {
+	  	gchar *pch = NULL;
+
+	  	pch = g_strdup_printf ("Get Icon=%s Failed", pch_image_names[i_x]);
+	  	gapc_log_app_error ("gapc_applet_populate", pch, gerror->message);
+	  	g_error_free (gerror);
+	  	g_free (pch);
+	  	gerror = NULL;
+	  	b_rc = FALSE;
+	  }
+    }
+
+  pcfg->i_old_icon_index = GAPC_N_ICONS;
+  pcfg->i_icon_index = GAPC_ICON_DEFAULT;
+  pcfg->size = 24;  
+	
+  return b_rc;
+}
 
 /*
  * save the contents of configuration values to a file
@@ -201,7 +242,7 @@ extern gint gapc_load_preferences (PGAPC_CONFIG pcfg)
       gerror = NULL;
       g_free (pch);
       if (pcfg->pch_host != NULL)
-	g_free (pcfg->pch_host);
+	  	  g_free (pcfg->pch_host);
       pcfg->pch_host = g_strdup ("localhost");
       pcfg->i_port = 3551;
       pcfg->d_refresh = 15;
@@ -219,7 +260,7 @@ extern gint gapc_load_preferences (PGAPC_CONFIG pcfg)
       g_io_channel_shutdown (gioc, TRUE, NULL);
       g_io_channel_unref (gioc);
       if (pcfg->pch_host != NULL)
-	g_free (pcfg->pch_host);
+	 	  g_free (pcfg->pch_host);
       pcfg->pch_host = g_strdup ("localhost");
       pcfg->i_port = 3551;
       pcfg->d_refresh = 15;
@@ -228,7 +269,7 @@ extern gint gapc_load_preferences (PGAPC_CONFIG pcfg)
 
   pch_host[gPos] = 0;
   if (pcfg->pch_host != NULL)
-    g_free (pcfg->pch_host);
+	  g_free (pcfg->pch_host);
 
   pcfg->pch_host = pch_host;
 
@@ -239,7 +280,6 @@ extern gint gapc_load_preferences (PGAPC_CONFIG pcfg)
 			  "read port number failed", gerror->message);
       g_error_free (gerror);
       gerror = NULL;
-
       g_io_channel_shutdown (gioc, TRUE, NULL);
       g_io_channel_unref (gioc);
       pcfg->i_port = 3551;
@@ -256,7 +296,6 @@ extern gint gapc_load_preferences (PGAPC_CONFIG pcfg)
 			  "read refresh value failed", gerror->message);
       g_error_free (gerror);
       gerror = NULL;
-
       g_io_channel_shutdown (gioc, TRUE, NULL);
       g_io_channel_unref (gioc);
       pcfg->d_refresh = 15;
@@ -353,7 +392,9 @@ gapc_cb_h_bar_chart_exposed (GtkWidget * widget, GdkEventExpose * event, gpointe
 			TRUE,
 			&pbar->rect,
 			widget,
-			"gapc_hbar_text", (pbar->b_center_text) ? x : 6, y, playout);
+			"gapc_hbar_text", 
+			(pbar->b_center_text) ? x : 6, y, 
+			playout);
 
       g_object_unref (playout);
     }
@@ -384,7 +425,7 @@ gapc_cb_button_config_apply (GtkButton * button, gpointer gp)
   /* get current value of entry-fields */
   ef = g_hash_table_lookup (pcfg->pht_Widgets, "ServerAddress");
   if (pcfg->pch_host != NULL)
-    g_free (pcfg->pch_host);
+      g_free (pcfg->pch_host);
 
   pch = (gchar *) gtk_entry_get_text (ef);
   pcfg->pch_host = g_strdup (pch);
@@ -398,7 +439,7 @@ gapc_cb_button_config_apply (GtkButton * button, gpointer gp)
   pcfg->d_refresh = gtk_spin_button_get_value (GTK_SPIN_BUTTON (ef));
 
   if (pcfg->d_refresh != d_old_time)	/* changed ?? */
-    pcfg->b_timer_control = TRUE;
+      pcfg->b_timer_control = TRUE;
 
   if ( g_str_equal ( ch_old_host, pcfg->pch_host ) )
 	   pcfg->b_network_changed = TRUE;  /* signal new socket */
@@ -509,7 +550,9 @@ extern gboolean gapc_cb_timer_control (gpointer gp)
 
   pcfg->b_timer_control = FALSE;	/* reset flag */
   i_new_time = (guint) (gdouble) (pcfg->d_refresh * 1.04) * 1000.0;
-    g_source_remove ( pcfg->i_timer_ids[GAPC_TIMER_AUTO] );
+
+  g_source_remove ( pcfg->i_timer_ids[GAPC_TIMER_AUTO] );
+
   pcfg->i_timer_ids[GAPC_TIMER_AUTO] = 
                   g_timeout_add (i_new_time, gapc_cb_auto_refresh, pcfg);
 
@@ -535,7 +578,6 @@ extern gboolean gapc_cb_auto_refresh (gpointer gp)
 
   if (pcfg->b_timer_control)	/* change timers */
     {
-/*      g_source_remove ( pcfg->i_timer_ids[GAPC_TIMER_CONTROL] );    	*/
       pcfg->i_timer_ids[GAPC_TIMER_CONTROL] = 
                        g_timeout_add (200, gapc_cb_timer_control, pcfg);
       return FALSE;
@@ -603,7 +645,6 @@ extern void gapc_log_net_error (gchar * pch_func, gchar * pch_topic, GnomeVFSRes
   pch = g_strdup_printf ("%s(%s) emsg=%s",
 			 pch_func, pch_topic, gnome_vfs_result_to_string (result));
 
-
   g_timeout_add (100, gapc_cb_application_message, pch);
 
   return;
@@ -629,10 +670,10 @@ gapc_net_read_nbytes (GnomeVFSSocket * psocket, gchar * ptr, gint nbytes)
       result = gnome_vfs_socket_read (psocket, ptr, nleft, &nread, NULL);
 
       if (result != GNOME_VFS_OK)
-	{
-	  gapc_log_net_error ("read_nbytes", "read from network failed", result);
-	  return (-1);		/* error, or EOF */
-	}
+	  {
+	  	gapc_log_net_error ("read_nbytes", "read from network failed", result);
+	  	return (-1);		/* error, or EOF */
+	  }
 
       nread_total += nread;
       nleft -= nread;
@@ -661,10 +702,10 @@ gapc_net_write_nbytes (GnomeVFSSocket * psocket, gchar * ptr, gint nbytes)
       result = gnome_vfs_socket_write (psocket, ptr, nleft, &nwritten, NULL);
 
       if (result != GNOME_VFS_OK)
-	{
-	  gapc_log_net_error ("write_nbytes", "write to network failed", result);
-	  return (-1);		/* error */
-	}
+	  {
+	  	gapc_log_net_error ("write_nbytes", "write to network failed", result);
+	  	return (-1);		/* error */
+	  }
 
       nwritten_total += nwritten;
       nleft -= nwritten;
@@ -898,7 +939,7 @@ gapc_update_hashtable (PGAPC_CONFIG pcfg, gchar * pch_unparsed)
   pch_in = g_strdup (pch_unparsed);
   pch_end = g_strrstr (pch_in, "\n");
   if (pch_end != NULL)
-    *pch_end = 0;
+     *pch_end = 0;
 
   ilen = g_utf8_strlen (pch_in, -1);
 
@@ -1139,44 +1180,42 @@ extern gpointer *gapc_network_thread (PGAPC_CONFIG pcfg)
       g_mutex_lock (pcfg->gm_update);
 
       if (pcfg->b_run)
-	if ((s = gapc_net_transaction_service (pcfg, "status", pcfg->pach_status)))
-	  gapc_net_transaction_service (pcfg, "events", pcfg->pach_events);
+	  if ((s = gapc_net_transaction_service (pcfg, "status", pcfg->pach_status)))
+	  	   gapc_net_transaction_service (pcfg, "events", pcfg->pach_events);
 
       g_mutex_unlock (pcfg->gm_update);
 
       if (s > 0)
-	pcfg->b_data_available = TRUE;
+	 	  pcfg->b_data_available = TRUE;
       else
-	pcfg->b_data_available = FALSE;
+      	  pcfg->b_data_available = FALSE;
 
       pcfg->b_refresh_button = FALSE;
       
       if (pcfg->b_data_available)	/* delay controls */
-	{
-	  if (pcfg->b_run)
-	    g_usleep (gul_qtr);
+	  {
+	  	if (pcfg->b_run)
+	    	g_usleep (gul_qtr);
 
-	  if (pcfg->b_refresh_button)
-	    continue;
+	    if (pcfg->b_refresh_button)
+	    	continue;
 
-	  if (pcfg->b_run)
-	    g_usleep (gul_qtr);
+	  	if (pcfg->b_run)
+	    	g_usleep (gul_qtr);
 
-	  if (pcfg->b_refresh_button)
-	    continue;
+	  	if (pcfg->b_refresh_button)
+	    	continue;
 
-	  if (pcfg->b_run)
-	    g_usleep (gul_qtr);
+	  	if (pcfg->b_run)
+	    	g_usleep (gul_qtr);
 
-	  if (pcfg->b_refresh_button)
-	    continue;
+	  	if (pcfg->b_refresh_button)
+	    	continue;
 
-	  if (pcfg->b_run)
-	    g_usleep (gul_qtr);
-	}
-      else
-	g_usleep (gul_qtr * 2);	/* do the full wait */
-
+	  	if (pcfg->b_run)
+	    	g_usleep (gul_qtr);
+	  }
+      else g_usleep (gul_qtr * 2);	/* do the full wait */
 
     }
 
@@ -1391,66 +1430,66 @@ extern gint gapc_create_notebook_page_overview (GtkWidget * notebook, PGAPC_CONF
 
   /* Create the Overview Notebook Page */
   frame = gtk_frame_new ("UPS Status Overview");
-  gtk_frame_set_label_align (GTK_FRAME (frame), 0.1, 0.8);
-  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_IN);
-  gtk_container_set_border_width (GTK_CONTAINER (frame), 10);
-  label = gtk_label_new ("Overview");
+	gtk_frame_set_label_align (GTK_FRAME (frame), 0.1, 0.8);
+  	gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_IN);
+  	gtk_container_set_border_width (GTK_CONTAINER (frame), 10);
+  label  = gtk_label_new ("Overview");
   i_page = gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
 
   pbox = gtk_hbox_new (FALSE, 4);
-  gtk_container_add (GTK_CONTAINER (frame), pbox);
+  	gtk_container_add (GTK_CONTAINER (frame), pbox);
 
   lbox = gtk_vbox_new (TRUE, 2);
-  gtk_container_add (GTK_CONTAINER (pbox), lbox);
+  	gtk_container_add (GTK_CONTAINER (pbox), lbox);
   rbox = gtk_vbox_new (TRUE, 2);
-  gtk_container_add (GTK_CONTAINER (pbox), rbox);
-  gtk_container_add (GTK_CONTAINER (pbox), gtk_vbox_new (TRUE, 2));
+  	gtk_container_add (GTK_CONTAINER (pbox), rbox);
+  	gtk_container_add (GTK_CONTAINER (pbox), gtk_vbox_new (TRUE, 2));
 
   gSize = gtk_size_group_new (GTK_SIZE_GROUP_HORIZONTAL);
 
   label = gtk_label_new ("Utility AC Voltage:");
-  gtk_size_group_add_widget (gSize, label);
+  	gtk_size_group_add_widget (gSize, label);
   pbar = gtk_progress_bar_new ();
-  gtk_box_pack_start (GTK_BOX (lbox), label, FALSE, FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (rbox), pbar, TRUE, TRUE, 4);
-  gtk_misc_set_alignment ((GtkMisc *) label, 1.0, 1.0);
-  gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (pbar), 0.87);
+  	gtk_box_pack_start (GTK_BOX (lbox), label, FALSE, FALSE, 0);
+  	gtk_box_pack_start (GTK_BOX (rbox), pbar, TRUE, TRUE, 4);
+  	gtk_misc_set_alignment ((GtkMisc *) label, 1.0, 1.0);
+  	gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (pbar), 0.87);
   g_hash_table_insert (pcfg->pht_Widgets, g_strdup ("UtilityAC"), pbar);
 
   label = gtk_label_new ("Battery Voltage:");
-  gtk_size_group_add_widget (gSize, label);
+  	gtk_size_group_add_widget (gSize, label);
   pbar = gtk_progress_bar_new ();
-  gtk_box_pack_start (GTK_BOX (lbox), label, FALSE, FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (rbox), pbar, TRUE, TRUE, 4);
-  gtk_misc_set_alignment ((GtkMisc *) label, 1.0, 1.0);
-  gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (pbar), 1.0);
+  	gtk_box_pack_start (GTK_BOX (lbox), label, FALSE, FALSE, 0);
+  	gtk_box_pack_start (GTK_BOX (rbox), pbar, TRUE, TRUE, 4);
+  	gtk_misc_set_alignment ((GtkMisc *) label, 1.0, 1.0);
+  	gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (pbar), 1.0);
   g_hash_table_insert (pcfg->pht_Widgets, g_strdup ("BatteryVoltage"), pbar);
 
   label = gtk_label_new ("Battery Charge:");
-  gtk_size_group_add_widget (gSize, label);
+  	gtk_size_group_add_widget (gSize, label);
   pbar = gtk_progress_bar_new ();
-  gtk_box_pack_start (GTK_BOX (lbox), label, FALSE, FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (rbox), pbar, TRUE, TRUE, 4);
-  gtk_misc_set_alignment ((GtkMisc *) label, 1.0, 1.0);
-  gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (pbar), 1.0);
+  	gtk_box_pack_start (GTK_BOX (lbox), label, FALSE, FALSE, 0);
+  	gtk_box_pack_start (GTK_BOX (rbox), pbar, TRUE, TRUE, 4);
+  	gtk_misc_set_alignment ((GtkMisc *) label, 1.0, 1.0);
+  	gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (pbar), 1.0);
   g_hash_table_insert (pcfg->pht_Widgets, g_strdup ("BatteryCharge"), pbar);
 
   label = gtk_label_new ("UPS Load:");
-  gtk_size_group_add_widget (gSize, label);
+  	gtk_size_group_add_widget (gSize, label);
   pbar = gtk_progress_bar_new ();
-  gtk_box_pack_start (GTK_BOX (lbox), label, FALSE, FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (rbox), pbar, TRUE, TRUE, 4);
-  gtk_misc_set_alignment ((GtkMisc *) label, 1.0, 1.0);
-  gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (pbar), 0.57);
+  	gtk_box_pack_start (GTK_BOX (lbox), label, FALSE, FALSE, 0);
+  	gtk_box_pack_start (GTK_BOX (rbox), pbar, TRUE, TRUE, 4);
+  	gtk_misc_set_alignment ((GtkMisc *) label, 1.0, 1.0);
+  	gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (pbar), 0.57);
   g_hash_table_insert (pcfg->pht_Widgets, g_strdup ("UPSLoad"), pbar);
 
   label = gtk_label_new ("Time Remaining:");
-  gtk_size_group_add_widget (gSize, label);
+  	gtk_size_group_add_widget (gSize, label);
   pbar = gtk_progress_bar_new ();
-  gtk_box_pack_start (GTK_BOX (lbox), label, FALSE, FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (rbox), pbar, TRUE, TRUE, 4);
-  gtk_misc_set_alignment ((GtkMisc *) label, 1.0, 1.0);
-  gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (pbar), 1.0);
+  	gtk_box_pack_start (GTK_BOX (lbox), label, FALSE, FALSE, 0);
+  	gtk_box_pack_start (GTK_BOX (rbox), pbar, TRUE, TRUE, 4);
+  	gtk_misc_set_alignment ((GtkMisc *) label, 1.0, 1.0);
+  	gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (pbar), 1.0);
   g_hash_table_insert (pcfg->pht_Widgets, g_strdup ("TimeRemaining"), pbar);
 
   return i_page;
@@ -1464,73 +1503,73 @@ gapc_create_notebook_page_information (GtkWidget * notebook, PGAPC_CONFIG pcfg)
 
   /* Create a Notebook Page */
   table3 = gtk_table_new (4, 4, FALSE);
-  label = gtk_label_new ("Information");
+  label  = gtk_label_new ("Information");
   i_page = gtk_notebook_append_page (GTK_NOTEBOOK (notebook), table3, label);
 
   frame = gtk_frame_new ("<b><i>Software Information</i></b>");
-  gtk_frame_set_label_align (GTK_FRAME (frame), 0.1, 0.8);
-  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_OUT);
+  	gtk_frame_set_label_align (GTK_FRAME (frame), 0.1, 0.8);
+  	gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_OUT);
   label = gtk_frame_get_label_widget (GTK_FRAME (frame));
-  gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
-  gtk_table_attach (GTK_TABLE (table3), frame,
+  	gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
+  	gtk_table_attach (GTK_TABLE (table3), frame,
 		    0, 1, 0, 1, GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 6, 2);
 
   pbox = gtk_hbox_new (FALSE, 4);
-  gtk_container_add (GTK_CONTAINER (frame), pbox);
+  	gtk_container_add (GTK_CONTAINER (frame), pbox);
   lbox = gtk_vbox_new (TRUE, 0);
-  gtk_box_pack_start (GTK_BOX (pbox), lbox, FALSE, FALSE, 0);
+  	gtk_box_pack_start (GTK_BOX (pbox), lbox, FALSE, FALSE, 0);
   rbox = gtk_vbox_new (TRUE, 0);
-  gtk_box_pack_start (GTK_BOX (pbox), rbox, TRUE, TRUE, 0);
+  	gtk_box_pack_start (GTK_BOX (pbox), rbox, TRUE, TRUE, 0);
 
   label = gtk_label_new ("APCUPSD version\n"
 			 "Monitored UPS name\n"
 			 "Cable Driver type\n"
 			 "Configuration mode\n" "Last started\n" "UPS State");
-  gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_RIGHT);
-  gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
-  gtk_misc_set_alignment ((GtkMisc *) label, 1.0, 0.5);
-  gtk_box_pack_start (GTK_BOX (lbox), label, FALSE, FALSE, 0);
+  	gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
+  	gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_RIGHT);
+  	gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
+  	gtk_misc_set_alignment ((GtkMisc *) label, 1.0, 0.5);
+  	gtk_box_pack_start (GTK_BOX (lbox), label, FALSE, FALSE, 0);
 
   label = gtk_label_new ("Data Only..");
-  gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_LEFT);
-  gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
-  gtk_misc_set_alignment ((GtkMisc *) label, 0.0, 0.5);
-  gtk_box_pack_start (GTK_BOX (rbox), label, TRUE, TRUE, 0);
+  	gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
+  	gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_LEFT);
+  	gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
+  	gtk_misc_set_alignment ((GtkMisc *) label, 0.0, 0.5);
+  	gtk_box_pack_start (GTK_BOX (rbox), label, TRUE, TRUE, 0);
   g_hash_table_insert (pcfg->pht_Widgets, g_strdup ("SoftwareInformation"), label);
 
   frame = gtk_frame_new ("<b><i>UPS Metrics</i></b>");
-  gtk_frame_set_label_align (GTK_FRAME (frame), 0.1, 0.8);
-  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_OUT);
+  	gtk_frame_set_label_align (GTK_FRAME (frame), 0.1, 0.8);
+  	gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_OUT);
   label = gtk_frame_get_label_widget (GTK_FRAME (frame));
-  gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
-  gtk_table_attach (GTK_TABLE (table3), frame,
+  	gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
+  	gtk_table_attach (GTK_TABLE (table3), frame,
 		    /* X direction *//* Y direction */
 		    2, 3, 0, 1, GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 6, 2);
   gbox = gtk_vbox_new (TRUE, 2);
-  gtk_container_add (GTK_CONTAINER (frame), gbox);
+  	gtk_container_add (GTK_CONTAINER (frame), gbox);
 
-  gapc_create_h_barchart (pcfg, gbox, "HBar1", 62.8, "Value of 62.8");
-  gapc_create_h_barchart (pcfg, gbox, "HBar2", 14.8, "Value of 14.8");
-  gapc_create_h_barchart (pcfg, gbox, "HBar3", 55.8, "Value of 55.8");
-  gapc_create_h_barchart (pcfg, gbox, "HBar4", 72.8, "Value of 72.8");
-  gapc_create_h_barchart (pcfg, gbox, "HBar5", 92.8, "Value of 92.8");
+  gapc_create_h_barchart (pcfg, gbox, "HBar1", 10.8, "Waiting for refresh");
+  gapc_create_h_barchart (pcfg, gbox, "HBar2", 40.8, "Waiting for refresh");
+  gapc_create_h_barchart (pcfg, gbox, "HBar3", 80.8, "Waiting for refresh");
+  gapc_create_h_barchart (pcfg, gbox, "HBar4", 40.8, "Waiting for refresh");
+  gapc_create_h_barchart (pcfg, gbox, "HBar5", 10.8, "Waiting for refresh");
 
   frame = gtk_frame_new ("<b><i>Performance Summary</i></b>");
-  gtk_frame_set_label_align (GTK_FRAME (frame), 0.1, 0.8);
-  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_OUT);
+  	gtk_frame_set_label_align (GTK_FRAME (frame), 0.1, 0.8);
+  	gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_OUT);
   label = gtk_frame_get_label_widget (GTK_FRAME (frame));
-  gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
-  gtk_table_attach (GTK_TABLE (table3), frame,
+  	gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
+  	gtk_table_attach (GTK_TABLE (table3), frame,
 		    0, 1, 2, 3, GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 6, 2);
 
   pbox = gtk_hbox_new (FALSE, 4);
-  gtk_container_add (GTK_CONTAINER (frame), pbox);
+  	gtk_container_add (GTK_CONTAINER (frame), pbox);
   lbox = gtk_vbox_new (TRUE, 0);
-  gtk_box_pack_start (GTK_BOX (pbox), lbox, FALSE, FALSE, 0);
+  	gtk_box_pack_start (GTK_BOX (pbox), lbox, FALSE, FALSE, 0);
   rbox = gtk_vbox_new (TRUE, 0);
-  gtk_box_pack_start (GTK_BOX (pbox), rbox, TRUE, TRUE, 0);
+  	gtk_box_pack_start (GTK_BOX (pbox), rbox, TRUE, TRUE, 0);
 
   label = gtk_label_new ("Selftest running\n"
 			 "Number of transfers\n"
@@ -1538,48 +1577,48 @@ gapc_create_notebook_page_information (GtkWidget * notebook, PGAPC_CONFIG pcfg)
 			 "Last transfer to battery\n"
 			 "Last transfer off battery\n"
 			 "Time on battery\n" "Cummulative on battery");
-  gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_RIGHT);
-  gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
-  gtk_misc_set_alignment ((GtkMisc *) label, 1.0, 0.5);
-  gtk_box_pack_start (GTK_BOX (lbox), label, FALSE, FALSE, 0);
+  	gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
+  	gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_RIGHT);
+  	gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
+  	gtk_misc_set_alignment ((GtkMisc *) label, 1.0, 0.5);
+  	gtk_box_pack_start (GTK_BOX (lbox), label, FALSE, FALSE, 0);
 
   label = gtk_label_new ("Data Only..");
-  gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_LEFT);
-  gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
-  gtk_misc_set_alignment ((GtkMisc *) label, 0.0, 0.5);
-  gtk_box_pack_start (GTK_BOX (rbox), label, TRUE, TRUE, 0);
+  	gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
+  	gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_LEFT);
+  	gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
+  	gtk_misc_set_alignment ((GtkMisc *) label, 0.0, 0.5);
+  	gtk_box_pack_start (GTK_BOX (rbox), label, TRUE, TRUE, 0);
   g_hash_table_insert (pcfg->pht_Widgets, g_strdup ("PerformanceSummary"), label);
 
   frame = gtk_frame_new ("<b><i>Product Information</i></b>");
-  gtk_frame_set_label_align (GTK_FRAME (frame), 0.1, 0.8);
-  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_OUT);
+  	gtk_frame_set_label_align (GTK_FRAME (frame), 0.1, 0.8);
+  	gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_OUT);
   label = gtk_frame_get_label_widget (GTK_FRAME (frame));
-  gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
-  gtk_table_attach (GTK_TABLE (table3), frame,
+  	gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
+  	gtk_table_attach (GTK_TABLE (table3), frame,
 		    2, 3, 2, 3, GTK_EXPAND | GTK_FILL, GTK_EXPAND | GTK_FILL, 6, 2);
 
   pbox = gtk_hbox_new (FALSE, 4);
-  gtk_container_add (GTK_CONTAINER (frame), pbox);
+  	gtk_container_add (GTK_CONTAINER (frame), pbox);
   lbox = gtk_vbox_new (TRUE, 0);
-  gtk_box_pack_start (GTK_BOX (pbox), lbox, FALSE, FALSE, 0);
+  	gtk_box_pack_start (GTK_BOX (pbox), lbox, FALSE, FALSE, 0);
   rbox = gtk_vbox_new (TRUE, 0);
-  gtk_box_pack_start (GTK_BOX (pbox), rbox, TRUE, TRUE, 0);
+  	gtk_box_pack_start (GTK_BOX (pbox), rbox, TRUE, TRUE, 0);
 
   label = gtk_label_new ("Device\n" "Serial\n" "Manf date\n" "Firmware\n" "Batt date");
-  gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_RIGHT);
-  gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
-  gtk_misc_set_alignment ((GtkMisc *) label, 1.0, 0.5);
-  gtk_box_pack_start (GTK_BOX (lbox), label, FALSE, FALSE, 0);
+  	gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
+  	gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_RIGHT);
+  	gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
+  	gtk_misc_set_alignment ((GtkMisc *) label, 1.0, 0.5);
+  	gtk_box_pack_start (GTK_BOX (lbox), label, FALSE, FALSE, 0);
 
   label = gtk_label_new ("Data Only..");
-  gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_LEFT);
-  gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
-  gtk_misc_set_alignment ((GtkMisc *) label, 0.0, 0.5);
-  gtk_box_pack_start (GTK_BOX (rbox), label, TRUE, TRUE, 0);
+  	gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
+  	gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_LEFT);
+  	gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
+  	gtk_misc_set_alignment ((GtkMisc *) label, 0.0, 0.5);
+  	gtk_box_pack_start (GTK_BOX (rbox), label, TRUE, TRUE, 0);
   g_hash_table_insert (pcfg->pht_Widgets, g_strdup ("ProductInformation"), label);
 
   return i_page;
@@ -1593,8 +1632,8 @@ gapc_create_notebook_page_text_report (GtkWidget * notebook, PGAPC_CONFIG pcfg,
   gint i_page = 0;
 
   frame = gtk_frame_new (pchTitle);
-  gtk_frame_set_label_align (GTK_FRAME (frame), 0.1, 0.8);
-  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_IN);
+  	gtk_frame_set_label_align (GTK_FRAME (frame), 0.1, 0.8);
+  	gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_IN);
   label = gtk_label_new (pchTab);
   i_page = gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
   text = gapc_create_scrolled_text_view (frame);
@@ -1609,62 +1648,59 @@ gapc_create_notebook_page_configuration (GtkWidget * notebook, PGAPC_CONFIG pcfg
   gint i_page = 0;
   GtkWidget *frame, *label, *table2, *entry, *button;
   GtkAdjustment *adjustment = NULL;
-  gchar ch_buffer[16];
+  gchar ch_buffer[16], *pch = NULL;
 
   /* Create Configuration Notebook Page */
   frame = gtk_frame_new ("Configuration Options");
-  gtk_frame_set_label_align (GTK_FRAME (frame), 0.1, 0.8);
-  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_IN);
-  gtk_container_set_border_width (GTK_CONTAINER (frame), 10);
+  	gtk_frame_set_label_align (GTK_FRAME (frame), 0.1, 0.8);
+  	gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_IN);
+  	gtk_container_set_border_width (GTK_CONTAINER (frame), 10);
   label = gtk_label_new ("Config");
   i_page = gtk_notebook_append_page (GTK_NOTEBOOK (notebook), frame, label);
 
   table2 = gtk_table_new (5, 5, TRUE);
-  gtk_container_add (GTK_CONTAINER (frame), table2);
+  	gtk_container_add (GTK_CONTAINER (frame), table2);
 
   label = gtk_label_new ("Server hostname or ip address:");
   entry = gtk_entry_new_with_max_length (255);
-  gtk_table_attach (GTK_TABLE (table2), label, 0, 2, 0, 1, GTK_FILL, 0, 0, 5);
-  gtk_table_attach (GTK_TABLE (table2), entry, 2, 4, 0, 1, GTK_EXPAND | GTK_FILL, 0, 2,
-		    5);
-  gtk_misc_set_alignment ((GtkMisc *) label, 1.0, 1.0);
-  gtk_entry_set_text (GTK_ENTRY (entry), pcfg->pch_host);
+  	gtk_table_attach (GTK_TABLE (table2), label, 0, 2, 0, 1, GTK_FILL, 0, 0, 5);
+  	gtk_table_attach (GTK_TABLE (table2), entry, 2, 4, 0, 1, GTK_EXPAND | GTK_FILL, 0, 2, 5);
+	gtk_misc_set_alignment ((GtkMisc *) label, 1.0, 1.0);
+  	gtk_entry_set_text (GTK_ENTRY (entry), pcfg->pch_host);
   g_hash_table_insert (pcfg->pht_Widgets, g_strdup ("ServerAddress"), entry);
 
   label = gtk_label_new ("Server port number:");
-  gtk_table_attach (GTK_TABLE (table2), label, 0, 2, 1, 2, GTK_FILL, 0, 0, 5);
+  	gtk_table_attach (GTK_TABLE (table2), label, 0, 2, 1, 2, GTK_FILL, 0, 0, 5);
   entry = gtk_entry_new_with_max_length (10);
-  gtk_table_attach (GTK_TABLE (table2), entry, 2, 3, 1, 2, GTK_FILL, 0, 2, 5);
-  gtk_misc_set_alignment ((GtkMisc *) label, 1.0, 1.0);
-  gtk_entry_set_text (GTK_ENTRY (entry),
+  	gtk_table_attach (GTK_TABLE (table2), entry, 2, 3, 1, 2, GTK_FILL, 0, 2, 5);
+  	gtk_misc_set_alignment ((GtkMisc *) label, 1.0, 1.0);
+  	gtk_entry_set_text (GTK_ENTRY (entry),
 		      g_ascii_dtostr (ch_buffer,
 				      sizeof (ch_buffer), (gdouble) pcfg->i_port));
   g_hash_table_insert (pcfg->pht_Widgets, g_strdup ("ServerPort"), entry);
 
   label = gtk_label_new ("Refresh Interval in seconds:");
-  gtk_misc_set_alignment ((GtkMisc *) label, 1.0, 1.0);
-  gtk_table_attach (GTK_TABLE (table2), label, 0, 2, 2, 3, GTK_FILL, 0, 0, 5);
-  adjustment = (GtkAdjustment *) gtk_adjustment_new (pcfg->d_refresh,
+  	gtk_misc_set_alignment ((GtkMisc *) label, 1.0, 1.0);
+  	gtk_table_attach (GTK_TABLE (table2), label, 0, 2, 2, 3, GTK_FILL, 0, 0, 5);
+  	adjustment = (GtkAdjustment *) gtk_adjustment_new (pcfg->d_refresh,
 						     GAPC_MIN_INCREMENT, 300, 1, 5, 5);
   entry = gtk_spin_button_new (adjustment, 10, 0);
-  gtk_table_attach (GTK_TABLE (table2), entry, 2, 3, 2, 3, GTK_FILL, 0, 2, 5);
+  	gtk_table_attach (GTK_TABLE (table2), entry, 2, 3, 2, 3, GTK_FILL, 0, 2, 5);
   g_hash_table_insert (pcfg->pht_Widgets, g_strdup ("RefreshInterval"), entry);
 
 
   button = gtk_button_new_from_stock (GTK_STOCK_APPLY);
-  gtk_table_attach (GTK_TABLE (table2), button, 1, 2, 3, 4, GTK_FILL, 0, 5, 5);
-  g_signal_connect (button, "clicked", G_CALLBACK (gapc_cb_button_config_apply), pcfg);
+  	gtk_table_attach (GTK_TABLE (table2), button, 1, 2, 3, 4, GTK_FILL, 0, 5, 5);
+  	g_signal_connect (button, "clicked", G_CALLBACK (gapc_cb_button_config_apply), pcfg);
   button = gtk_button_new_from_stock (GTK_STOCK_SAVE);
-  gtk_table_attach (GTK_TABLE (table2), button, 3, 4, 3, 4, GTK_FILL, 0, 5, 5);
-  g_signal_connect (button, "clicked", G_CALLBACK (gapc_cb_button_config_save), pcfg);
+  	gtk_table_attach (GTK_TABLE (table2), button, 3, 4, 3, 4, GTK_FILL, 0, 5, 5);
+  	g_signal_connect (button, "clicked", G_CALLBACK (gapc_cb_button_config_save), pcfg);
 
-  {
-  	gchar *pch = g_strdup_printf ("Configuration filename: <b>%s</b>", pcfg->pch_key_filename);
-  	label = gtk_label_new (pch);
+  pch = g_strdup_printf ("Configuration filename: <b>%s</b>", pcfg->pch_key_filename);
+  label = gtk_label_new (pch);
     gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
     gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_LEFT);
   	gtk_table_attach (GTK_TABLE (table2), label, 0, 4, 5, 6, GTK_FILL, 0, 0, 5);
-  }
 
   return i_page;
 }

@@ -74,7 +74,10 @@ static void gapc_cb_about_dialog_response  (GtkDialog *dialog,  gint arg1,  gpoi
 static gint gapc_get_preferences (PGAPC_CONFIG pcfg);
 
 
-
+/*
+ * Create user interface
+ * not in common file because of text subsitutions
+ */
 static GtkWindow *gapc_create_user_interface (PGAPC_CONFIG pcfg)
 {
   GtkWidget *wStatus_bar;
@@ -156,6 +159,7 @@ static GtkWindow *gapc_create_user_interface (PGAPC_CONFIG pcfg)
 
 /* 
  * The about page in the information window
+ * not in common file because of text subsitutions
  */
 extern gint gapc_create_notebook_page_about (GtkWidget * notebook, PGAPC_CONFIG pcfg)
 {
@@ -178,44 +182,44 @@ extern gint gapc_create_notebook_page_about (GtkWidget * notebook, PGAPC_CONFIG 
 				GAPC_GROUP_KEY, GAPC_GROUP_TITLE);
 
   /* Create About page */
-  pbox = gtk_vbox_new (FALSE, 4);
-  label = gtk_label_new ("About");
+  pbox   = gtk_vbox_new (FALSE, 4);
+  label  = gtk_label_new ("About");
   i_page = gtk_notebook_append_page (GTK_NOTEBOOK (notebook), pbox, label);
 
   frame = gtk_frame_new (NULL);
-  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
-  gtk_box_pack_start (GTK_BOX (pbox), frame, TRUE, TRUE, 0);
+  	gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
+  	gtk_box_pack_start (GTK_BOX (pbox), frame, TRUE, TRUE, 0);
   vbox = gtk_vbox_new (FALSE, 0);
-  gtk_container_add (GTK_CONTAINER (frame), vbox);
+  	gtk_container_add (GTK_CONTAINER (frame), vbox);
 
   hbox = gtk_hbox_new (TRUE, 0);
-  gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, TRUE, 0);
+  	gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, TRUE, 0);
   frame = gtk_frame_new (NULL);
-  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_NONE);
+  	gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_NONE);
     gtk_container_add (GTK_CONTAINER (hbox), frame);
   image = gtk_image_new ();
-  gtk_container_add (GTK_CONTAINER (frame), image);
-  pixbuf = pcfg->my_icons[GAPC_ICON_DEFAULT];
+  	gtk_container_add (GTK_CONTAINER (frame), image);
+  	pixbuf = pcfg->my_icons[GAPC_ICON_DEFAULT];
   scaled = gdk_pixbuf_scale_simple (pixbuf, 100, 125, GDK_INTERP_BILINEAR);
-  gtk_image_set_from_pixbuf (GTK_IMAGE (image), scaled);
-  gtk_widget_show (image);
-  gdk_pixbuf_unref ( scaled );  
+  	gtk_image_set_from_pixbuf (GTK_IMAGE (image), scaled);
+  	gtk_widget_show (image);
+  	gdk_pixbuf_unref ( scaled );  
 
   label = gtk_label_new (about_text);
-  gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_CENTER);
-  gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
-  gtk_misc_set_alignment ((GtkMisc *) label, 0.0, 0.7); 
+  	gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
+  	gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_CENTER);
+  	gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
+  	gtk_misc_set_alignment ((GtkMisc *) label, 0.0, 0.7); 
     gtk_container_add (GTK_CONTAINER (hbox), label);
 
   mbox = gtk_vbox_new (FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (vbox), mbox, TRUE, TRUE, 0);
+  	gtk_box_pack_start (GTK_BOX (vbox), mbox, TRUE, TRUE, 0);
   label = gtk_label_new (about_msg);
-  gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_CENTER);
-  gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
-  gtk_misc_set_alignment ((GtkMisc *) label, 0.5, 0.5);
-  gtk_box_pack_start (GTK_BOX (mbox), label, TRUE, TRUE, 0);
+  	gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
+  	gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_CENTER);
+  	gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
+  	gtk_misc_set_alignment ((GtkMisc *) label, 0.5, 0.5);
+  	gtk_box_pack_start (GTK_BOX (mbox), label, TRUE, TRUE, 0);
 				
   g_free (about_text);
   g_free (about_msg);  
@@ -234,14 +238,14 @@ extern gboolean gapc_change_status_icon (PGAPC_CONFIG pcfg)
 
   g_return_val_if_fail (pcfg, FALSE);	/* error exit */
 
-/*
+
   if( pcfg->i_old_icon_index == pcfg->i_icon_index )  
       return FALSE;
-*/      
+      
   pcfg->i_old_icon_index = pcfg->i_icon_index;     /* save it for next time */
 
   if ( pcfg->i_icon_index >= GAPC_N_ICONS) 
-    pcfg->i_icon_index = GAPC_ICON_DEFAULT;
+       pcfg->i_icon_index = GAPC_ICON_DEFAULT;
 
   pixbuf = pcfg->my_icons[pcfg->i_icon_index];
   if (pixbuf)
@@ -386,8 +390,11 @@ gapc_cb_applet_destroy (GtkObject *object, gpointer gp)
   pcfg->b_run = FALSE;
   pcfg->b_refresh_button = TRUE;
 
-  for ( i_x = 0; pcfg->i_timer_ids[i_x] < GAPC_N_TIMERS ; i_x++ )
-     g_source_remove ( pcfg->i_timer_ids[i_x] );
+  for ( i_x = 0; i_x < GAPC_N_TIMERS ; i_x++ )
+     	g_source_remove ( pcfg->i_timer_ids[i_x] );
+
+  for ( i_x = 0; i_x < GAPC_N_ICONS ; i_x++ )
+     	g_object_unref ( pcfg->my_icons[i_x] );
 
   gtk_widget_destroy ( GTK_WIDGET(pcfg->window) );
 
@@ -588,14 +595,6 @@ gapc_applet_populate (PanelApplet * applet, PGAPC_CONFIG pcfg)
     "   <menuitem name=\"About Item\" verb=\"gp_apcmon_about\" _label=\"_About ...\"\n"
     "             pixtype=\"stock\" pixname=\"gnome-stock-about\"/>\n" "</popup>\n";
 
-  gchar *pch_image_names[] = {
-    "/usr/share/pixmaps/online.png",
-    "/usr/share/pixmaps/onbatt.png",
-    "/usr/share/pixmaps/charging.png",
-    "/usr/share/pixmaps/apcupsd.png",
-    NULL
-  };
-
   if (!g_thread_supported ())
     g_thread_init (NULL);
 
@@ -604,24 +603,9 @@ gapc_applet_populate (PanelApplet * applet, PGAPC_CONFIG pcfg)
 
   pcfg->gm_update = g_mutex_new ();
 
-  for (i_x = 0; (pch_image_names[i_x] != NULL) && (i_x < GAPC_N_ICONS); i_x++)
-    {
-      pcfg->my_icons[i_x] = gdk_pixbuf_new_from_file (pch_image_names[i_x], &gerror);
-      if (gerror != NULL)
-	  {
-	  	gchar *pch = NULL;
-
-	  	pch = g_strdup_printf ("Get Icon=%s Failed", pch_image_names[i_x]);
-	  	gapc_log_app_error ("gapc_applet_populate", pch, gerror->message);
-	  	g_error_free (gerror);
-	  	g_free (pch);
-	  	gerror = NULL;
-	  }
-    }
+  gapc_load_icons ( pcfg );
 
   pcfg->b_window_visible = FALSE;
-  pcfg->i_icon_index = GAPC_ICON_DEFAULT;
-  pcfg->size = 24;
   pcfg->applet = GTK_WIDGET (applet);
   pcfg->b_network_changed = TRUE;
   
