@@ -33,6 +33,7 @@
 /*
  * gp_apcmon_core.c routines
  */
+extern gboolean gapc_load_icons (PGAPC_CONFIG pcfg); 
 extern void   gapc_log_app_error (gchar * pch_func, gchar * pch_topic, gchar * pch_emsg);
 extern void   gapc_log_net_error (gchar * pch_func, gchar * pch_topic, GnomeVFSResult result);
 extern gint   gapc_save_preferences (PGAPC_CONFIG pcfg);
