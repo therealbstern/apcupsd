@@ -33,20 +33,14 @@
 /*
  * gp_apcmon_core.c routines
  */
-extern gboolean gapc_load_icons (PGAPC_CONFIG pcfg); 
-extern void   gapc_log_app_error (gchar * pch_func, gchar * pch_topic, gchar * pch_emsg);
-extern void   gapc_log_net_error (gchar * pch_func, gchar * pch_topic, GnomeVFSResult result);
-extern gint   gapc_save_preferences (PGAPC_CONFIG pcfg);
-extern gint   gapc_load_preferences (PGAPC_CONFIG pcfg);
-extern gpointer *gapc_network_thread (PGAPC_CONFIG pcfg);
-extern gboolean gapc_cb_auto_refresh (gpointer gp);
-extern gboolean gapc_cb_dedicated_one_time_refresh (gpointer gp);
-extern void gapc_cb_refresh_button (GtkButton * button, gpointer gp);
+extern gboolean   gapc_load_icons (PGAPC_CONFIG pcfg); 
+extern gint   	  gapc_save_preferences (PGAPC_CONFIG pcfg);
+extern gint   	  gapc_load_preferences (PGAPC_CONFIG pcfg);
+extern gpointer  *gapc_network_thread (PGAPC_CONFIG pcfg);
 
-extern gboolean gapc_cb_window_delete_event (GtkWidget * w, GdkEvent * event, gpointer gp);
-extern gboolean gapc_change_status_icon (PGAPC_CONFIG pcfg);
-extern gint gapc_create_notebook_page_about (GtkWidget * notebook, PGAPC_CONFIG pcfg);
-extern void gapc_cb_button_quit (GtkButton * button, gpointer gp);
+extern gboolean   gapc_cb_dedicated_one_time_refresh (gpointer gp);
+extern void 	  gapc_cb_refresh_button (GtkButton * button, gpointer gp);
+extern gboolean   gapc_cb_auto_refresh (gpointer gp);
 
 extern gint   gapc_create_notebook_page_overview (GtkWidget * notebook, PGAPC_CONFIG pcfg);
 extern gint   gapc_create_notebook_page_information (GtkWidget * notebook, PGAPC_CONFIG pcfg);
@@ -59,20 +53,19 @@ extern gint   gapc_create_notebook_page_text_report (GtkWidget * notebook, PGAPC
  */
 static GtkWindow *gapc_main_win (PGAPC_CONFIG pcfg);
 static GtkWindow *gapc_create_user_interface (PGAPC_CONFIG pcfg);
+static gboolean   gapc_applet_factory (PanelApplet * applet, const gchar * iid, gpointer data);
+static gboolean   gapc_applet_populate (PanelApplet * applet, PGAPC_CONFIG pcfg);
+static gint 	  gapc_get_preferences (PGAPC_CONFIG pcfg);
+extern gboolean   gapc_change_status_icon (PGAPC_CONFIG pcfg);
 
-static gboolean gapc_applet_factory (PanelApplet * applet, const gchar * iid,
-				     gpointer data);
-static gboolean gapc_applet_populate (PanelApplet * applet, PGAPC_CONFIG pcfg);
-static gboolean gapc_cb_toggle_main_window (GtkWidget * widget, GdkEventButton * event,
-				       gpointer gp);
-static void gapc_cb_applet_change_size (PanelApplet * applet, gint size, PGAPC_CONFIG pcfg);
-static void gapc_cb_menu_about (BonoboUIComponent * uic, gpointer gp, const gchar * verbname);
-static void gapc_cb_menu_main_window (BonoboUIComponent * uic, gpointer gp,
-				 const gchar * verbname);
-static void gapc_cb_applet_destroy (GtkObject * object, gpointer gp);
-static void gapc_cb_about_dialog_response  (GtkDialog *dialog,  gint arg1,  gpointer gp);
-
-static gint gapc_get_preferences (PGAPC_CONFIG pcfg);
+static gboolean gapc_cb_toggle_main_window (GtkWidget * widget, GdkEventButton * event, gpointer gp);
+static gboolean gapc_cb_window_delete_event (GtkWidget * w, GdkEvent * event, gpointer gp);
+static void 	gapc_cb_applet_change_size (PanelApplet * applet, gint size, PGAPC_CONFIG pcfg);
+static void 	gapc_cb_menu_about (BonoboUIComponent * uic, gpointer gp, const gchar * verbname);
+static void 	gapc_cb_menu_main_window (BonoboUIComponent * uic, gpointer gp, const gchar * verbname);
+static void 	gapc_cb_applet_destroy (GtkObject * object, gpointer gp);
+static void 	gapc_cb_about_dialog_response  (GtkDialog *dialog,  gint arg1,  gpointer gp);
+static void 	gapc_cb_button_quit (GtkButton * button, gpointer gp);
 
 
 /*
@@ -92,60 +85,56 @@ static GtkWindow *gapc_create_user_interface (PGAPC_CONFIG pcfg)
    * Create main window and display
    */
   window = GTK_WINDOW (gtk_window_new (GTK_WINDOW_TOPLEVEL));
-  gtk_container_set_border_width (GTK_CONTAINER (window), 0);
-  gtk_window_set_title (GTK_WINDOW (window), GAPC_WINDOW_TITLE );
-  gtk_window_set_type_hint ( window, GDK_WINDOW_TYPE_HINT_NORMAL );
-  gtk_window_set_destroy_with_parent (GTK_WINDOW (window), TRUE);
-  g_signal_connect (window, "delete_event", G_CALLBACK (gapc_cb_window_delete_event), pcfg);
-  gtk_window_set_icon (GTK_WINDOW(window), pcfg->my_icons[GAPC_ICON_DEFAULT]);
+  	gtk_container_set_border_width (GTK_CONTAINER (window), 0);
+  	gtk_window_set_title (GTK_WINDOW (window), GAPC_WINDOW_TITLE );
+  	gtk_window_set_type_hint ( window, GDK_WINDOW_TYPE_HINT_NORMAL );
+  	gtk_window_set_destroy_with_parent (GTK_WINDOW (window), TRUE);
+  	g_signal_connect (window, "delete_event", G_CALLBACK (gapc_cb_window_delete_event), pcfg);
+  	gtk_window_set_icon (GTK_WINDOW(window), pcfg->my_icons[GAPC_ICON_DEFAULT]);
  
   table = gtk_table_new (6, 4, FALSE);
-  gtk_container_add (GTK_CONTAINER (window), table);
+  	gtk_container_add (GTK_CONTAINER (window), table);
 
   label = gtk_label_new (GAPC_GROUP_TITLE);
-  g_hash_table_insert (pcfg->pht_Widgets, g_strdup ("TitleStatus"), label);
-  gtk_table_attach (GTK_TABLE (table), label, 0, 3, 0, 1,
+  	g_hash_table_insert (pcfg->pht_Widgets, g_strdup ("TitleStatus"), label);
+  	gtk_table_attach (GTK_TABLE (table), label, 0, 3, 0, 1,
 		    GTK_EXPAND | GTK_FILL | GTK_SHRINK, 0, 0, 5);
 
   evbox = gtk_event_box_new ();
-  gtk_table_attach (GTK_TABLE (table), evbox, 0, 3, 1, 3,
+  	gtk_table_attach (GTK_TABLE (table), evbox, 0, 3, 1, 3,
 		    GTK_EXPAND | GTK_FILL | GTK_SHRINK,
 		    GTK_EXPAND | GTK_FILL | GTK_SHRINK, 5, 0);
 
   /* Create a new notebook, place the position of the tabs */
   notebook = gtk_notebook_new ();
-  gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
-  gtk_notebook_set_scrollable (GTK_NOTEBOOK (notebook), TRUE);
-  gtk_container_add (GTK_CONTAINER (evbox), notebook);
+  	gtk_notebook_set_tab_pos (GTK_NOTEBOOK (notebook), GTK_POS_TOP);
+  	gtk_notebook_set_scrollable (GTK_NOTEBOOK (notebook), TRUE);
+  	gtk_container_add (GTK_CONTAINER (evbox), notebook);
 
   /* Create the Notebook Pages */
   gapc_create_notebook_page_overview (notebook, pcfg);
   i_page = gapc_create_notebook_page_information (notebook, pcfg);
-  gapc_create_notebook_page_text_report (notebook, pcfg, "Power Events", "Events",
-					 "EventsPage");
-  gapc_create_notebook_page_text_report (notebook, pcfg, "Full UPS Status", "Status",
-					 "StatusPage");
+  gapc_create_notebook_page_text_report (notebook, pcfg, "Power Events", "Events", "EventsPage");
+  gapc_create_notebook_page_text_report (notebook, pcfg, "Full UPS Status", "Status", "StatusPage");
   gapc_create_notebook_page_configuration (notebook, pcfg);
-  gapc_create_notebook_page_about (notebook, pcfg);
 
   /* Control buttons */
   dbutton = gtk_button_new_from_stock (GTK_STOCK_REFRESH);
-  g_signal_connect (dbutton, "clicked", G_CALLBACK (gapc_cb_refresh_button), pcfg);
-  gtk_table_attach (GTK_TABLE (table), dbutton, 0, 1, 3, 4,
-		    GTK_FILL | GTK_SHRINK, 0, 8, 2);
+  	g_signal_connect (dbutton, "clicked", G_CALLBACK (gapc_cb_refresh_button), pcfg);
+  	gtk_table_attach (GTK_TABLE (table), dbutton, 0, 1, 3, 4,
+		    GTK_FILL | GTK_SHRINK, 0, 8, 4);
 
   button = gtk_button_new_from_stock (GTK_STOCK_QUIT);
-  g_signal_connect (button, "clicked", G_CALLBACK (gapc_cb_button_quit), pcfg);
-  gtk_table_attach (GTK_TABLE (table), button, 2, 3, 3, 4,
-		    GTK_FILL | GTK_SHRINK, 0, 8, 2);
+  	g_signal_connect (button, "clicked", G_CALLBACK (gapc_cb_button_quit), pcfg);
+  	gtk_table_attach (GTK_TABLE (table), button, 2, 3, 3, 4,
+		    GTK_FILL | GTK_SHRINK, 0, 8, 4);
 
   wStatus_bar = gtk_statusbar_new ();
-  g_hash_table_insert (pcfg->pht_Widgets, g_strdup ("StatusBar"), wStatus_bar);
-  gtk_table_attach (GTK_TABLE (table), wStatus_bar, 0, 3, 4, 5,
+  	g_hash_table_insert (pcfg->pht_Widgets, g_strdup ("StatusBar"), wStatus_bar);
+  	gtk_table_attach (GTK_TABLE (table), wStatus_bar, 0, 3, 4, 5,
 		    GTK_EXPAND | GTK_FILL | GTK_SHRINK, 0, 0, 0);
 
-  pcfg->i_info_context = gtk_statusbar_get_context_id (GTK_STATUSBAR (wStatus_bar),
-						       "Informational");
+  pcfg->i_info_context = gtk_statusbar_get_context_id (GTK_STATUSBAR (wStatus_bar), "Informational");
 
   gtk_widget_realize (GTK_WIDGET (button));
 
@@ -158,75 +147,6 @@ static GtkWindow *gapc_create_user_interface (PGAPC_CONFIG pcfg)
   return GTK_WINDOW (window);
 }
 
-/* 
- * The about page in the information window
- * not in common file because of text subsitutions
- */
-extern gint gapc_create_notebook_page_about (GtkWidget * notebook, PGAPC_CONFIG pcfg)
-{
-  GtkWidget *label = NULL, *frame = NULL, *mbox = NULL,
-    *hbox = NULL, *vbox = NULL, *pbox = NULL, *image = NULL;
-  gchar *about_text = NULL;
-  gchar *about_msg = NULL;
-  GdkPixbuf *pixbuf;
-  GdkPixbuf *scaled;
-  gint i_page = 0;
-  
-  about_text = g_strdup_printf ("<b><big>%s Version %s</big></b>\n",
-				  GAPC_GROUP_TITLE, GAPC_VERSION);
-  about_msg  = g_strdup_printf ("<b>%s - gui ups monitor for APCUPSD.sourceforge.net package</b>\n"
-				"<i>http://gapcmon.sourceforge.net/</i>\n\n"
-				"Copyright \xC2\xA9 2006 James Scott, Jr.\n"
-				"skoona@users.sourceforge.net\n\n"
-				"Released under the GNU Public License\n"
-				"%s comes with ABSOLUTELY NO WARRANTY\n",
-				GAPC_GROUP_KEY, GAPC_GROUP_TITLE);
-
-  /* Create About page */
-  pbox   = gtk_vbox_new (FALSE, 4);
-  label  = gtk_label_new ("About");
-  i_page = gtk_notebook_append_page (GTK_NOTEBOOK (notebook), pbox, label);
-
-  frame = gtk_frame_new (NULL);
-  	gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
-  	gtk_box_pack_start (GTK_BOX (pbox), frame, TRUE, TRUE, 0);
-  vbox = gtk_vbox_new (FALSE, 0);
-  	gtk_container_add (GTK_CONTAINER (frame), vbox);
-
-  hbox = gtk_hbox_new (TRUE, 0);
-  	gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, TRUE, 0);
-  frame = gtk_frame_new (NULL);
-  	gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_NONE);
-    gtk_container_add (GTK_CONTAINER (hbox), frame);
-  image = gtk_image_new ();
-  	gtk_container_add (GTK_CONTAINER (frame), image);
-  	pixbuf = pcfg->my_icons[GAPC_ICON_DEFAULT];
-  scaled = gdk_pixbuf_scale_simple (pixbuf, 100, 125, GDK_INTERP_BILINEAR);
-  	gtk_image_set_from_pixbuf (GTK_IMAGE (image), scaled);
-  	gtk_widget_show (image);
-  	gdk_pixbuf_unref ( scaled );  
-
-  label = gtk_label_new (about_text);
-  	gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
-  	gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_CENTER);
-  	gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
-  	gtk_misc_set_alignment ((GtkMisc *) label, 0.0, 0.7); 
-    gtk_container_add (GTK_CONTAINER (hbox), label);
-
-  mbox = gtk_vbox_new (FALSE, 0);
-  	gtk_box_pack_start (GTK_BOX (vbox), mbox, TRUE, TRUE, 0);
-  label = gtk_label_new (about_msg);
-  	gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
-  	gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_CENTER);
-  	gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
-  	gtk_misc_set_alignment ((GtkMisc *) label, 0.5, 0.5);
-  	gtk_box_pack_start (GTK_BOX (mbox), label, TRUE, TRUE, 0);
-				
-  g_free (about_text);
-  g_free (about_msg);  
-
-  return i_page;
-}
 
 /*
  * Update the panel icon
@@ -269,7 +189,7 @@ extern gboolean gapc_change_status_icon (PGAPC_CONFIG pcfg)
 /* 
  * callback for QUIT push button on main window
  */
-extern void gapc_cb_button_quit (GtkButton * button, gpointer gp)
+static void gapc_cb_button_quit (GtkButton * button, gpointer gp)
 {
   PGAPC_CONFIG pcfg = gp;
 
@@ -283,7 +203,7 @@ extern void gapc_cb_button_quit (GtkButton * button, gpointer gp)
 /*
  * Prevent the normal window exit, just hide the window 
  */
-extern gboolean gapc_cb_window_delete_event (GtkWidget * w, GdkEvent * event, gpointer gp)
+static gboolean gapc_cb_window_delete_event (GtkWidget * w, GdkEvent * event, gpointer gp)
 {
   PGAPC_CONFIG pcfg = gp;
 
@@ -306,14 +226,14 @@ static gint gapc_get_preferences (PGAPC_CONFIG pcfg)
   g_return_val_if_fail (pcfg, FALSE);	/* error exit */
 
   if (pcfg->pch_key_filename != NULL)
-    g_free (pcfg->pch_key_filename);
+      g_free (pcfg->pch_key_filename);
 
   pcfg->pch_key_filename = g_strdup_printf (GAPC_CONFIG_FILE, g_get_home_dir (), pcfg->cb_id);
 
   i_create_file = gapc_load_preferences (pcfg);
 
   if (i_create_file != TRUE)
-    gapc_save_preferences (pcfg);
+      gapc_save_preferences (pcfg);
 
   return i_create_file;
 }
@@ -330,8 +250,7 @@ static GtkWindow * gapc_main_win (PGAPC_CONFIG pcfg)
 
   gapc_get_preferences (pcfg);
 
-  pcfg->pht_Status = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
-
+  pcfg->pht_Status  = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, g_free);
   pcfg->pht_Widgets = g_hash_table_new_full (g_str_hash, g_str_equal, g_free, NULL);
 
   /* Create an update thread to handle network io */
@@ -344,9 +263,9 @@ static GtkWindow * gapc_main_win (PGAPC_CONFIG pcfg)
 
   /* Main refresh timer calcs */
   if ( pcfg->d_refresh < GAPC_MIN_INCREMENT )
-      i_x = GAPC_REFRESH_INCREMENT;
-  else
-      i_x = (guint)(gdouble)(pcfg->d_refresh * 1.04) * 1000.0;
+       pcfg->d_refresh = GAPC_REFRESH_INCREMENT;
+      
+  i_x = (guint)(gdouble)(pcfg->d_refresh * 1.04) * 1000.0;
 
   pcfg->i_timer_ids[GAPC_TIMER_AUTO] = 
                     g_timeout_add (i_x, gapc_cb_auto_refresh, pcfg);
@@ -456,9 +375,9 @@ gapc_cb_toggle_main_window (GtkWidget * widget, GdkEventButton * event, gpointer
       pcfg->b_window_visible = !pcfg->b_window_visible;
 
       if (pcfg->b_window_visible)
-	gtk_widget_show_all (GTK_WIDGET (pcfg->window));
+		  gtk_widget_show_all (GTK_WIDGET (pcfg->window));
       else
-	gtk_widget_hide_all (GTK_WIDGET (pcfg->window));
+		  gtk_widget_hide_all (GTK_WIDGET (pcfg->window));
 
       return TRUE;
     }
@@ -474,69 +393,69 @@ gapc_cb_menu_about (BonoboUIComponent * uic, gpointer gp, const gchar * verbname
 {
   PGAPC_CONFIG pcfg = gp;
   GtkDialog *window = NULL;
-  GtkWidget *label = NULL, *button = NULL, *frame = NULL, *mbox = NULL,
-    *hbox = NULL, *vbox = NULL, *pbox = NULL, *image = NULL;
+  GtkWidget *label  = NULL, *button = NULL, *frame = NULL, *mbox  = NULL;
+  GtkWidget *hbox   = NULL, *vbox   = NULL, *image = NULL;
   gchar *about_text = NULL;
   gchar *about_msg = NULL;
-  GdkPixbuf *pixbuf;
-  GdkPixbuf *scaled;
+  GdkPixbuf *pixbuf = NULL;
+  GdkPixbuf *scaled = NULL;
 
   about_text = g_strdup_printf ("<b><big>%s Version %s</big></b>", 
     		   		GAPC_GROUP_TITLE, GAPC_VERSION);
   about_msg = g_strdup_printf (
-    "<b>%s - GNOME Applet version of an ups monitor for the APCUPSD.sourceforge.net package</b>\n"
-    "<i>http://gapcmon.sourceforge.net/</i>\n\n" "Copyright (C) 2006 James Scott, Jr.\n"
-    "skoona@users.sourceforge.net\n\n" "Released under the GNU Public License\n"
+    "<b>Applet which monitors UPSs managed by the APCUPSD.sourceforge.net package</b>\n"
+    "<i>http://gapcmon.sourceforge.net/</i>\n\n" 
+    "Copyright (C) 2006 James Scott, Jr.\n"
+    "skoona@users.sourceforge.net\n\n" 
+    "Released under the GNU Public License\n"
     "%s comes with ABSOLUTELY NO WARRANTY", 
-    GAPC_GROUP_KEY, GAPC_GROUP_TITLE );
+    GAPC_GROUP_TITLE );
 
   pcfg->about = window = GTK_DIALOG (gtk_dialog_new ());
-  gtk_window_set_title (GTK_WINDOW (window), _("About gpanel_apcmon"));
-  gtk_window_set_type_hint ( GTK_WINDOW(window), GDK_WINDOW_TYPE_HINT_DIALOG );
-  gtk_window_set_destroy_with_parent (GTK_WINDOW (window), TRUE);
-  gtk_container_set_border_width (GTK_CONTAINER (window), 6);
-  gtk_window_set_icon (GTK_WINDOW(window), pcfg->my_icons[GAPC_ICON_DEFAULT]);
+  	gtk_window_set_title (GTK_WINDOW (window), _("About gpanel_apcmon"));
+  	gtk_window_set_type_hint ( GTK_WINDOW(window), GDK_WINDOW_TYPE_HINT_DIALOG );
+  	gtk_window_set_destroy_with_parent (GTK_WINDOW (window), TRUE);
+  	gtk_container_set_border_width (GTK_CONTAINER (window), 6);
+  	gtk_window_set_icon (GTK_WINDOW(window), pcfg->my_icons[GAPC_ICON_DEFAULT]);
   
-  pbox = gtk_vbox_new (FALSE, 0);
-  gtk_box_pack_start_defaults (GTK_BOX (window->vbox), pbox);
-
   frame = gtk_frame_new (NULL);
-  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
-  gtk_box_pack_start (GTK_BOX (pbox), frame, TRUE, TRUE, 0);
+  	gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_ETCHED_OUT);
+  	gtk_box_pack_start (GTK_BOX (window->vbox), frame, TRUE, TRUE, 0);
   vbox = gtk_vbox_new (FALSE, 0);
-  gtk_container_add (GTK_CONTAINER (frame), vbox);
+  	gtk_container_add (GTK_CONTAINER (frame), vbox);
 
   hbox = gtk_hbox_new (FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, TRUE, 0);
+  	gtk_box_pack_start (GTK_BOX (vbox), hbox, FALSE, TRUE, 0);
   frame = gtk_frame_new (NULL);
-  gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_NONE);
-  gtk_box_pack_start (GTK_BOX (hbox), frame, FALSE, FALSE, 0);
+  	gtk_frame_set_shadow_type (GTK_FRAME (frame), GTK_SHADOW_NONE);
+  	gtk_box_pack_start (GTK_BOX (hbox), frame, FALSE, FALSE, 0);
   image = gtk_image_new ();
-  gtk_container_add (GTK_CONTAINER (frame), image);
-  pixbuf = pcfg->my_icons[GAPC_ICON_DEFAULT];
-  scaled = gdk_pixbuf_scale_simple (pixbuf, 100, 125, GDK_INTERP_BILINEAR);
-  gtk_image_set_from_pixbuf (GTK_IMAGE (image), scaled);
-  gtk_widget_show (image);
-  gdk_pixbuf_unref ( scaled );  
+  	gtk_misc_set_alignment ((GtkMisc *) image, 1.0, 0.5);  	  
+  	gtk_container_add (GTK_CONTAINER (frame), image);
+  	pixbuf = pcfg->my_icons[GAPC_ICON_DEFAULT];
+  	scaled = gdk_pixbuf_scale_simple (pixbuf, 75, 100, GDK_INTERP_BILINEAR);
+  	gtk_image_set_from_pixbuf (GTK_IMAGE (image), scaled);
+  	gtk_widget_show (image);
+  	gdk_pixbuf_unref ( scaled );  
 
   label = gtk_label_new (about_text);
-  gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_CENTER);
-  gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
-  gtk_misc_set_alignment ((GtkMisc *) label, 0.0, 0.5);
-  gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
+  	gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
+  	gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_CENTER);
+  	gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
+  	gtk_misc_set_alignment ((GtkMisc *) label, 0.0, 0.5);
+  	gtk_box_pack_start (GTK_BOX (hbox), label, TRUE, TRUE, 0);
 
   mbox = gtk_vbox_new (FALSE, 0);
-  gtk_box_pack_start (GTK_BOX (vbox), mbox, TRUE, TRUE, 0);
+  	gtk_box_pack_start (GTK_BOX (vbox), mbox, TRUE, TRUE, 0);
   label = gtk_label_new (about_msg);
-  gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_CENTER);
-  gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
-  gtk_misc_set_alignment ((GtkMisc *) label, 0.5, 0.5);
-  gtk_box_pack_start (GTK_BOX (mbox), label, TRUE, TRUE, 0);
+  	gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
+  	gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_CENTER);
+  	gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);
+  	gtk_misc_set_alignment ((GtkMisc *) label, 0.5, 0.5);
+  	gtk_box_pack_start (GTK_BOX (mbox), label, TRUE, TRUE, 0);
 
   button = gtk_dialog_add_button (window, GTK_STOCK_CLOSE, GTK_RESPONSE_ACCEPT);
-  g_signal_connect (window, "response", G_CALLBACK (gapc_cb_about_dialog_response), pcfg);
+  	g_signal_connect (window, "response", G_CALLBACK (gapc_cb_about_dialog_response), pcfg);
 
   gtk_widget_show_all (GTK_WIDGET (window));
 
@@ -581,8 +500,6 @@ static gboolean
 gapc_applet_populate (PanelApplet * applet, PGAPC_CONFIG pcfg)
 {
 /*  PanelAppletOrient orientation = NULL; */	
-  guint i_x = 0;
-  GError *gerror = NULL;
   const BonoboUIVerb gapc_applet_menu_verbs[] = {
     BONOBO_UI_UNSAFE_VERB ("gp_apcmon_main_window", gapc_cb_menu_main_window),
     BONOBO_UI_UNSAFE_VERB ("gp_apcmon_about", gapc_cb_menu_about),
@@ -611,19 +528,20 @@ gapc_applet_populate (PanelApplet * applet, PGAPC_CONFIG pcfg)
   pcfg->b_network_changed = TRUE;
   
   pcfg->frame = gtk_frame_new (NULL);
-  gtk_frame_set_shadow_type (GTK_FRAME (pcfg->frame), GTK_SHADOW_NONE);
-  gtk_container_add (GTK_CONTAINER (applet), pcfg->frame);
-  g_signal_connect (applet, "button_press_event", G_CALLBACK (gapc_cb_toggle_main_window),
-		    pcfg);
+  	gtk_frame_set_shadow_type (GTK_FRAME (pcfg->frame), GTK_SHADOW_NONE);
+  	gtk_container_add (GTK_CONTAINER (applet), pcfg->frame);
+  	g_signal_connect (applet, "button_press_event", G_CALLBACK (gapc_cb_toggle_main_window), pcfg);
 
   pcfg->image = gtk_image_new ();
-  gtk_container_add (GTK_CONTAINER (pcfg->frame), pcfg->image);
+  	gtk_container_add (GTK_CONTAINER (pcfg->frame), pcfg->image);
 
   pcfg->tooltips = gtk_tooltips_new ();
   gtk_tooltips_set_tip (pcfg->tooltips, GTK_WIDGET (applet), _("UPS Initializing..."), NULL);
 
   panel_applet_setup_menu (PANEL_APPLET (applet),
-			   gp_apcmon_context_menu_xml, gapc_applet_menu_verbs, pcfg);
+			   			   gp_apcmon_context_menu_xml, 
+			   			   gapc_applet_menu_verbs, 
+			   			   pcfg);
 
   g_signal_connect (applet, "change_size", G_CALLBACK (gapc_cb_applet_change_size), pcfg);
 

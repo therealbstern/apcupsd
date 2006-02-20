@@ -61,49 +61,50 @@
 /*
  * Shared Routines Outgoing
  */
-extern gboolean gapc_load_icons (PGAPC_CONFIG pcfg);
-extern void   gapc_log_app_error (gchar * pch_func, gchar * pch_topic, gchar * pch_emsg);
-extern void   gapc_log_net_error (gchar * pch_func, gchar * pch_topic, GnomeVFSResult result);
-extern gint   gapc_save_preferences (PGAPC_CONFIG pcfg);
-extern gint   gapc_load_preferences (PGAPC_CONFIG pcfg);
-extern gint   gapc_net_transaction_service (PGAPC_CONFIG pcfg, gchar * cp_cmd, gchar ** pch);
-extern GtkWindow *gapc_create_user_interface (PGAPC_CONFIG pcfg);
+extern gboolean   gapc_load_icons (PGAPC_CONFIG pcfg);
+extern gint       gapc_save_preferences (PGAPC_CONFIG pcfg);
+extern gint       gapc_load_preferences (PGAPC_CONFIG pcfg);
 extern gpointer  *gapc_network_thread (PGAPC_CONFIG pcfg);
+
 extern gboolean   gapc_cb_auto_refresh (gpointer gp);
 extern gboolean   gapc_cb_dedicated_one_time_refresh (gpointer gp);
+extern void   	  gapc_cb_refresh_button (GtkButton * button, gpointer gp);
+
 extern gint   gapc_create_notebook_page_overview (GtkWidget * notebook, PGAPC_CONFIG pcfg);
 extern gint   gapc_create_notebook_page_information (GtkWidget * notebook, PGAPC_CONFIG pcfg);
 extern gint   gapc_create_notebook_page_configuration (GtkWidget * notebook, PGAPC_CONFIG pcfg);
-extern gint   gapc_create_notebook_page_about (GtkWidget * notebook, PGAPC_CONFIG pcfg);
 extern gint   gapc_create_notebook_page_text_report (GtkWidget * notebook, PGAPC_CONFIG pcfg, gchar * pchTitle, gchar * pchTab, gchar * pchKey);
-extern void   gapc_cb_refresh_button (GtkButton * button, gpointer gp);
-extern gboolean   gapc_cb_timer_control (gpointer gp);
-extern gboolean   gapc_update_tooltip_msg (PGAPC_CONFIG pcfg);
+
 
 /*
  * Shared Routines Incoming
  */
-extern gboolean   gapc_cb_window_delete_event (GtkWidget * w, GdkEvent * event, gpointer gp);
 extern gboolean   gapc_change_status_icon (PGAPC_CONFIG pcfg);
-extern void 	  gapc_cb_button_quit (GtkButton * button, gpointer gp);
+
 
 /*
  * Internal Routines
  */
-
+static void	gapc_log_app_error (gchar * pch_func, gchar * pch_topic, gchar * pch_emsg);
+static void gapc_log_net_error (gchar * pch_func, gchar * pch_topic, GnomeVFSResult result);
 static gint gapc_monitor_update (PGAPC_CONFIG pcfg);
 static gint gapc_update_hashtable (PGAPC_CONFIG pcfg, gchar * pch_unparsed);
+static gboolean   gapc_update_tooltip_msg (PGAPC_CONFIG pcfg); 
 
-static gboolean gapc_cb_application_message (gpointer pch);
-static void gapc_cb_button_config_save (GtkButton * button, gpointer gp);
-static gboolean gapc_cb_h_bar_chart_exposed (GtkWidget * widget, GdkEventExpose * event, gpointer data);
+extern gboolean   gapc_cb_timer_control (gpointer gp);
+static gboolean   gapc_cb_application_message (gpointer pch);
+static void 	  gapc_cb_button_config_save (GtkButton * button, gpointer gp);
+static void 	  gapc_cb_button_config_apply (GtkButton * button, gpointer gp);
+static gboolean   gapc_cb_h_bar_chart_exposed (GtkWidget * widget, GdkEventExpose * event, gpointer data);
 
 static gint gapc_text_view_clear_buffer (GtkWidget * view);
 static void gapc_text_view_prepend (GtkWidget * view, gchar * s);
 static void gapc_text_view_append (GtkWidget * view, gchar * s);
+
 static GtkWidget *gapc_create_scrolled_text_view (GtkWidget * box);
 static GtkWidget *gapc_create_h_barchart (PGAPC_CONFIG pcfg, GtkWidget * vbox, gchar * pch_hbar_name, gdouble d_percent, gchar * pch_text);
 
+static gint gapc_net_transaction_service (PGAPC_CONFIG pcfg, gchar * cp_cmd, gchar ** pch);
 static GnomeVFSInetConnection *gapc_net_open (gchar * pch_host, gint i_port, gboolean *b_changed, GnomeVFSAddress **address);
 static gint gapc_net_read_nbytes (GnomeVFSSocket * psocket, gchar * ptr, gint nbytes);
 static gint gapc_net_write_nbytes (GnomeVFSSocket * psocket, gchar * ptr, gint nbytes);
@@ -405,8 +406,7 @@ gapc_cb_h_bar_chart_exposed (GtkWidget * widget, GdkEventExpose * event, gpointe
 /* 
  * callback for APPLY push button on config page
  */
-static void
-gapc_cb_button_config_apply (GtkButton * button, gpointer gp)
+static void gapc_cb_button_config_apply (GtkButton * button, gpointer gp)
 {
   PGAPC_CONFIG pcfg = gp;
   gchar *pch = NULL;
@@ -454,8 +454,7 @@ gapc_cb_button_config_apply (GtkButton * button, gpointer gp)
 /* 
  * callback for SAVE push button on config page
  */
-static void
-gapc_cb_button_config_save (GtkButton * button, gpointer gp)
+static void gapc_cb_button_config_save (GtkButton * button, gpointer gp)
 {
   PGAPC_CONFIG pcfg = gp;
   GtkWidget *w = NULL;
@@ -617,8 +616,7 @@ extern gboolean gapc_cb_auto_refresh (gpointer gp)
  *  setup a one-shot timer to handle output of message on
  *  the main thread (i.e. this may be a background thread)
  */
-void
-gapc_log_app_error (gchar * pch_func, gchar * pch_topic, gchar * pch_emsg)
+static void gapc_log_app_error (gchar * pch_func, gchar * pch_topic, gchar * pch_emsg)
 {
   gchar *pch = NULL;
 
@@ -636,7 +634,7 @@ gapc_log_app_error (gchar * pch_func, gchar * pch_topic, gchar * pch_emsg)
  *  setup a one-shot timer to handle output of message on
  *  the main thread (i.e. this is a background thread)
  */
-extern void gapc_log_net_error (gchar * pch_func, gchar * pch_topic, GnomeVFSResult result)
+static void gapc_log_net_error (gchar * pch_func, gchar * pch_topic, GnomeVFSResult result)
 {
   gchar *pch = NULL;
 
@@ -960,7 +958,7 @@ gapc_update_hashtable (PGAPC_CONFIG pcfg, gchar * pch_unparsed)
  * Manage the state icon in the panel and the associated tooltip
  * Composes the expanded tooltip message
  */
-extern gboolean gapc_update_tooltip_msg (PGAPC_CONFIG pcfg)
+static gboolean gapc_update_tooltip_msg (PGAPC_CONFIG pcfg)
 {
   gchar *pchx = NULL, *pmsg = NULL, *ptitle = NULL;
   gchar *pch1 = NULL, *pch2 = NULL, *pch3 = NULL, *pch4 = NULL, *pch5 = NULL;  
