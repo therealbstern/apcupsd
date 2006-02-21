@@ -336,16 +336,21 @@ static void daemon_start(void)
 
    /*
     * In the PRODUCTION system, we close ALL file descriptors unless
-    * debugging is on then we laeve stdin, stdout, and stderr open.
+    * debugging is on then we leave stdin, stdout, and stderr open.
     * We also take care to leave the trace fd open if tracing is on.
+    * Furthermore, if tracing we redirect stdout and stderr to the
+    * trace log.
     */
    for (i=0; i<sysconf(_SC_OPEN_MAX); i++) {
-      if (debug_level && (i == STDIN_FILENO ||
-           i == STDOUT_FILENO || i == STDERR_FILENO))
+      if (debug_level && i == STDIN_FILENO)
          continue;
       if (trace_fd && i == fileno(trace_fd))
          continue;
-
+      if (debug_level && (i == STDOUT_FILENO || i == STDERR_FILENO)) {
+         if (trace_fd)
+            dup2(fileno(trace_fd), i);
+         continue;
+      }
       close(i);
    }
 
