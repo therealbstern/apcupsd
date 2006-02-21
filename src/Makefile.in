@@ -32,12 +32,12 @@ all-targets: $(allexe)
 #
 
 apcupsd: $(dobjs) $(gobjs) $(WINAPC) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
-	$(LD) $(LDFLAGS) $(WLDFLAGS) $(dobjs) $(gobjs) $(DRVLIBS) $(LIBS) $(WINAPC) $(WINLIBS) -o apcupsd
+	$(LD) $(LDFLAGS) $(WLDFLAGS) $(dobjs) $(gobjs) $(DRVLIBS) $(LIBS) $(WINAPC) $(WINLIBS) @LIBUSB@ -o apcupsd
 
 apctest: $(tobjs) $(gobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
-	$(LD) $(LDFLAGS) $(tobjs) $(gobjs) $(DRVLIBS) $(LIBS) -o apctest
+	$(LD) $(LDFLAGS) $(tobjs) $(gobjs) $(DRVLIBS) $(LIBS) @LIBUSB@ -o apctest
 
-devicedbg: $(xobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
+devicedbg: $(xobjs) $(APCLIBS) $(INTLLIBS) 
 	$(LD) $(LDFLAGS) $(xobjs) $(LIBS) -o devicedbg
 
 apcaccess: $(aobjs) $(APCLIBS) $(INTLLIBS) 
