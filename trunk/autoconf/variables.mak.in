@@ -82,7 +82,7 @@ CPPFLAGS = @CPPFLAGS@
 
 # Libraries
 APCLIBS = $(topdir)/src/lib/libapc.a
-DRVLIBS = $(topdir)/src/drivers/libdrivers.a
+DRVLIBS = $(topdir)/src/drivers/libdrivers.a @LIBUSB@
 win32 = $(topdir)/src/win32/winmain.o $(topdir)/src/win32/winlib.a $(topdir)/src/win32/winres.res
 INTLLIBS = @INTLLIBS@
 WINAPC = $(@WIN32@)
