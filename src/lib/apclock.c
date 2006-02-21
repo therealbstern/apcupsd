@@ -149,6 +149,7 @@ static int check_stale_lockfile(UPSINFO *ups)
 /* 
  * Create serial port lock file   
  */
+int kill_ups_power = FALSE;
 int create_lockfile(UPSINFO *ups)
 {
 #ifndef HAVE_CYGWIN

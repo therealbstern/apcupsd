@@ -565,7 +565,7 @@ int pusb_ups_check_state(UPSINFO *ups)
 {
    int i, ci;
    int retval, value;
-   unsigned char buf[20];
+   unsigned char buf[100];
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
    struct timespec now, exit;
    struct timeval tv;
@@ -625,10 +625,10 @@ int pusb_ups_check_state(UPSINFO *ups)
       }
 
       if (debug_level >= 300) {
-         printf("Interrupt data: ");
+         logf("Interrupt data: ");
          for (i = 0; i < retval; i++)
-            printf("%02x, ", buf[i]);
-         printf("\n");
+            logf("%02x, ", buf[i]);
+         logf("\n");
       }
 
       write_lock(ups);

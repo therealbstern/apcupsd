@@ -51,10 +51,10 @@ int make_file(UPSINFO *ups, const char *path)
 }
 
 /* Create the pid lock file. */
+char *pidfile = APCPID;
 void make_pid_file(void)
 {
 #ifndef HAVE_CYGWIN
-   extern char *pidfile;
    pid_t pid = getpid();
    int pfd, len;
    char buf[100];
