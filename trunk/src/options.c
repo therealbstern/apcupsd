@@ -57,10 +57,9 @@ int show_version = FALSE;
 char *cfgfile = NULL;
 int terminate_on_powerfail = FALSE;
 int kill_on_powerfail = FALSE;
-int kill_ups_power = FALSE;
 int dumb_mode_test = FALSE;        /* for testing dumb mode */
 int go_background = TRUE;
-char *pidfile = APCPID;
+extern char *pidfile;
 extern bool trace;
 
 static void print_usage(char *argv[])
