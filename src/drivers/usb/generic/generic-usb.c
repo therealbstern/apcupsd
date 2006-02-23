@@ -498,7 +498,8 @@ int pusb_ups_check_state(UPSINFO *ups)
    int timeout;
    USB_VALUE uval;
    bool done = false;
-
+   int errcnt = 0;
+   
    /* Figure out when we need to exit by */
    gettimeofday(&exit, NULL);
    exit.tv_sec += ups->wait_time;
@@ -513,8 +514,6 @@ int pusb_ups_check_state(UPSINFO *ups)
          return 0;
       }
 
-      usleep(20000);
-
       Dmsg1(200, "Timeout=%d\n", timeout);
       retval = usb_interrupt_read(my_data->fd, USB_ENDPOINT_IN|1, (char*)buf, sizeof(buf), timeout);
 
@@ -527,6 +526,8 @@ int pusb_ups_check_state(UPSINFO *ups)
       } else if (retval < 0) {
          /* Hard error */
          Dmsg2(200, "usb_interrupt_read error: (%d) %s\n", retval, strerror(-retval));
+         if (errcnt++ < 5)
+            continue;
          usb_link_check(ups);      /* link is down, wait */
          return 0;
       }
