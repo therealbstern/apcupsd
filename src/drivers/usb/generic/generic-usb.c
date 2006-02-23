@@ -513,6 +513,8 @@ int pusb_ups_check_state(UPSINFO *ups)
          return 0;
       }
 
+      usleep(20000);
+
       Dmsg1(200, "Timeout=%d\n", timeout);
       retval = usb_interrupt_read(my_data->fd, USB_ENDPOINT_IN|1, (char*)buf, sizeof(buf), timeout);
 
