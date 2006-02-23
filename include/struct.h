@@ -127,28 +127,6 @@ typedef enum {
    TEST_UNKNOWN
 } SelfTestResult;
 
-/*
- * Internal selftest structure.
- * This structure is made by two variables, one for client side
- * and one for server side.
- * "activate" is the client side flag to activate a particular self
- * test. The client switch this flag to TRUE and then starts monitoring
- * the value of "status". The server (apcupsd) monitors the value of
- * "activate" and when it's true, enters the selftest state machine,
- * updating the value of "status" as the selftest proceed.
- * At the end of the selftest, apcupsd resets the value of "activate" to false
- * and leave the value of "status" to one of the possible selftest final
- * status.
- * It is important to say that the state machine rely in an array internal to
- * the UPSINFO structure so that every capable UPS can do asyncronously a
- * selftest.
- */
-typedef struct SELFTEST {
-   int activate;
-   int status;
-} SELFTEST;
-
-
 typedef struct geninfo {
    const char *name;               /* JHNC: name mustn't contain whitespace */
    const char *long_name;
@@ -392,38 +370,6 @@ class UPSINFO {
    const struct upsdriver *driver; /* UPS driver for this UPSINFO */
    void *driver_internal_data;     /* Driver private data */
 };
-
-/* Used only in apcaccess.c */
-typedef struct datainfo {
-   char apcmagic[APC_MAGIC_SIZE];
-   int update_master_config;
-   int get_master_status;
-   int slave_status;
-   int call_master_shutdown;
-   char accessmagic[ACCESS_MAGIC_SIZE];
-} DATAINFO;
-
-typedef int (HANDLER) (UPSINFO *, int, const GENINFO *, const char *);
-
-typedef struct {
-   const char *key;
-   HANDLER *handler;
-   size_t offset;
-   const GENINFO *values;
-} PAIRS;
-
-typedef struct configinfo {
-   int new_annoy;
-   int new_maxtime;
-   int new_delay;
-#ifdef __NOLOGIN
-   int new_nologin;
-#endif  /* __NOLOGIN */
-   int new_stattime;
-   int new_datatime;
-   int new_nettime;
-   int new_percent;
-} CONFIGINFO;
 
 
 /*These are needed for commands executed in apcaction.c */
