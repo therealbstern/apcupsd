@@ -98,14 +98,14 @@ static const GENINFO modes[] = {
 
 static const GENINFO types[] = {
    /* FIXME (adk): It has been long enough...time to kill these */
-   { "backups",       "BackUPS",                   DUMB_UPS },
+   { "backups",       "BackUPS",                   BK },
    { "sharebasic",    "ShareUPS Basic Port",       SHAREBASIC },
-   { "backupspro",    "BackUPS Pro",               APCSMART_UPS },
-   { "smartvsups",    "SmartUPS VS",               APCSMART_UPS },
-   { "newbackupspro", "Smarter BackUPS Pro",       APCSMART_UPS },
-   { "backupspropnp", "Smarter BackUPS Pro",       APCSMART_UPS },
-   { "smartups",      "SmartUPS",                  APCSMART_UPS },
-   { "matrixups",     "MatrixUPS",                 APCSMART_UPS },
+   { "backupspro",    "BackUPS Pro",               BKPRO },
+   { "smartvsups",    "SmartUPS VS",               VS },
+   { "newbackupspro", "Smarter BackUPS Pro",       NBKPRO },
+   { "backupspropnp", "Smarter BackUPS Pro",       NBKPRO },
+   { "smartups",      "SmartUPS",                  SMART },
+   { "matrixups",     "MatrixUPS",                 MATRIX },
    { "sharesmart",    "ShareUPS Advanced Port",    SHARESMART },
 
    /*
