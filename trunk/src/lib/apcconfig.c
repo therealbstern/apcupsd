@@ -40,12 +40,6 @@ static HANDLER start_ups, end_ups;
 
 /* ---------------------------------------------------------------------- */
 
-static const GENINFO accesses[] = {
-   { "false", "false",                 FALSE }, /* must come first */
-   { "true",  "true",                  TRUE },
-   { NULL,    "*invalid-access-mode*", FALSE },
-};
-
 static const GENINFO onoroff[] = {
    { "off", "off",                     FALSE },
    { "on",  "on",                      TRUE },
@@ -555,12 +549,6 @@ void init_ups_struct(UPSINFO *ups)
 
    ups->set_plugged();
 
-   astrncpy(ups->enable_access.name, accesses[0].name,
-      sizeof(ups->enable_access.name));
-   astrncpy(ups->enable_access.long_name, accesses[0].long_name,
-      sizeof(ups->enable_access.long_name));
-   ups->enable_access.type = accesses[0].type;
-
    astrncpy(ups->nologin.name, logins[0].name, sizeof(ups->nologin.name));
    astrncpy(ups->nologin.long_name, logins[0].long_name,
       sizeof(ups->nologin.long_name));
@@ -605,7 +593,6 @@ void init_ups_struct(UPSINFO *ups)
    ups->clear_shut_ltime();
    ups->clear_shut_emerg();
    ups->clear_shut_remote();
-   ups->remote_state = TRUE;
 
    ups->sysfac = LOG_DAEMON;
 
