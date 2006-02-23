@@ -277,12 +277,11 @@ class UPSINFO {
    char UPS_Cap[CI_MAXCI + 1];          /* TRUE if UPS has capability */
    unsigned int UPS_Cmd[CI_MAXCI + 1];  /* Command or function code */
 
-   INTERNALGENINFO cable;
-   INTERNALGENINFO enable_access;
-   INTERNALGENINFO nologin;
-   INTERNALGENINFO mode;
-   INTERNALGENINFO upsclass;
-   INTERNALGENINFO sharenet;
+   INTERNALGENINFO cable;          /* UPSCABLE directive */
+   INTERNALGENINFO nologin;        /* NOLOGON directive */
+   INTERNALGENINFO mode;           /* UPSTYPE directive */
+   INTERNALGENINFO upsclass;       /* UPSCLASS directive */
+   INTERNALGENINFO sharenet;       /* UPSMODE directive */
 
    int num_execed_children;        /* children created in execute_command() */
 
@@ -386,8 +385,6 @@ class UPSINFO {
    int lockfile;
 
    int ChangeBattCounter;          /* For UPS_REPLACEBATT, see apcaction.c */
-
-   int remote_state;
 
    pthread_mutex_t mutex;
    int refcnt;                     /* thread attach count */
