@@ -281,6 +281,8 @@ int main(int argc, char *argv[])
       apcupsd_terminate(0);
    }
 
+   prep_device(ups);
+
    if (create_lockfile(ups) == LCKERROR) {
       Error_abort1(_("Failed to reacquire serial port lock file on device %s\n"),
          ups->device);
