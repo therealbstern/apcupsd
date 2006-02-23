@@ -161,52 +161,6 @@ typedef struct internalgeninfo {
    int type;
 } INTERNALGENINFO;                 /* for assigning into upsinfo */
 
-/* Structure that contains information on each of our slaves.
- * Also, for a slave, the first slave packet is info on the
- * master.
- */
-typedef struct slaveinfo {
-   int remote_state;               /* state of master */
-   int disconnecting_slave;        /* set if old style slave */
-   int ms_errno;                   /* errno last error */
-   int socket;                     /* current open socket this slave */
-   int port;                       /* port */
-   int error;                      /* set when error message printed */
-   int errorcnt;                   /* count of errors */
-   time_t down_time;               /* time slave was set RMT_DOWN */
-   struct sockaddr_in addr;
-   char usermagic[APC_MAGIC_SIZE]; /* Old style password */
-   char name[MAXTOKENLEN];         /* master/slave domain name (or IP) */
-   char password[MAXTOKENLEN];     /* for CRAM-MD5 authentication */
-} SLAVEINFO;
-
-/* 
- * This structure is sent over the network between the    
- * master and the slaves, so we make the
- * length of character arrays a multiple of four and
- * keep the chars at the end to minimize memory alignment
- * problems. 
- */
-typedef struct netdata {
-   int32_t OnBatt;
-   int32_t BattLow;
-   int32_t BatteryUp;
-   int32_t BattChg;
-   int32_t ShutDown;
-   int32_t nettime;
-   int32_t TimeLeft;
-   int32_t ChangeBatt;
-   int32_t load;
-   int32_t timedout;
-   int32_t timelout;
-   int32_t emergencydown;
-   int32_t remote_state;
-   int32_t cap_battlev;
-   int32_t cap_runtim;
-   char apcmagic[APC_MAGIC_SIZE];
-   char usermagic[APC_MAGIC_SIZE];
-} NETDATA;
-
 
 /* No longer really needed since we do not use shared memory */
 #define UPSINFO_VERSION 12
