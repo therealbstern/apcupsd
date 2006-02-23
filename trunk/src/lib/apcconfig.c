@@ -30,6 +30,8 @@
 
 /* ---------------------------------------------------------------------- */
 
+typedef int (HANDLER) (UPSINFO *, int, const GENINFO *, const char *);
+
 static HANDLER match_int, match_range, match_str;
 static HANDLER match_facility, match_index;
 static HANDLER obsolete;
@@ -114,6 +116,13 @@ static const GENINFO types[] = {
    { "test",     "TEST UPS Driver",     TEST_UPS },
    { NULL,       "*invalid-ups-type*",  NO_UPS },
 };
+
+typedef struct {
+   const char *key;
+   HANDLER *handler;
+   size_t offset;
+   const GENINFO *values;
+} PAIRS;
 
 static const PAIRS table[] = {
 

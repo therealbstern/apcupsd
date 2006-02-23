@@ -40,7 +40,14 @@ char argvalue[MAXSTRING];
 static char *host = "localhost";
 static int port = NISPORT;
 
-DATAINFO myDATA = {
+struct {
+   char apcmagic[APC_MAGIC_SIZE];
+   int update_master_config;
+   int get_master_status;
+   int slave_status;
+   int call_master_shutdown;
+   char accessmagic[ACCESS_MAGIC_SIZE];
+} myDATA = {
    "\0",               /* data->apcmagic             */
    0,                  /* data->update_master_config */
    0,                  /* data->get_master_status    */
@@ -49,7 +56,18 @@ DATAINFO myDATA = {
    "\0"                /* data->accessmagic          */
 };
 
-CONFIGINFO myCONFIG;
+struct configinfo {
+   int new_annoy;
+   int new_maxtime;
+   int new_delay;
+#ifdef __NOLOGIN
+   int new_nologin;
+#endif  /* __NOLOGIN */
+   int new_stattime;
+   int new_datatime;
+   int new_nettime;
+   int new_percent;
+} myCONFIG;
 
 /*
  * EPROM commands and their values as parsed from the
