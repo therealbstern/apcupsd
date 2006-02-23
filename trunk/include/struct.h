@@ -427,12 +427,10 @@ class UPSINFO {
    int eventfilemax;               /* max size of eventfile in kilobytes */
    int event_fd;                   /* fd for eventfile */
 
-   int NetUpsPort;                 /* Master/slave port */
    char master_name[APC_FILENAME_MAX];
    char lockpath[APC_FILENAME_MAX];
    int lockfile;
 
-   char usermagic[APC_MAGIC_SIZE]; /* security id string */
    int ChangeBattCounter;          /* For UPS_REPLACEBATT, see apcaction.c */
 
    int remote_state;
@@ -461,7 +459,6 @@ typedef struct {
    HANDLER *handler;
    size_t offset;
    const GENINFO *values;
-   const char *help;
 } PAIRS;
 
 typedef struct configinfo {
