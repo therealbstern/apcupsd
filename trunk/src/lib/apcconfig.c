@@ -27,17 +27,11 @@
 
 #include "apc.h"
 
-/*
- * Global variables -- note, we really should have a separate
- * global file for these. For example, apcglobals.c.  
- */
-int slave_count = 0;
-SLAVEINFO slaves[MAXSLAVES];       /* Slaves description */
 
 /* ---------------------------------------------------------------------- */
 
-static HANDLER match_int, match_range, match_slave, match_str,
-   match_facility, match_index;
+static HANDLER match_int, match_range, match_str;
+static HANDLER match_facility, match_index;
 static HANDLER obsolete;
 
 #ifdef UNSUPPORTED_CODE
@@ -104,14 +98,14 @@ static const GENINFO modes[] = {
 
 static const GENINFO types[] = {
    /* FIXME (adk): It has been long enough...time to kill these */
-   { "backups",       "BackUPS",                   BK },
+   { "backups",       "BackUPS",                   DUMB_UPS },
    { "sharebasic",    "ShareUPS Basic Port",       SHAREBASIC },
-   { "backupspro",    "BackUPS Pro",               BKPRO },
-   { "smartvsups",    "SmartUPS VS",               VS },
-   { "newbackupspro", "Smarter BackUPS Pro",       NBKPRO },
-   { "backupspropnp", "Smarter BackUPS Pro",       NBKPRO },
-   { "smartups",      "SmartUPS",                  SMART },
-   { "matrixups",     "MatrixUPS",                 MATRIX },
+   { "backupspro",    "BackUPS Pro",               APCSMART_UPS },
+   { "smartvsups",    "SmartUPS VS",               APCSMART_UPS },
+   { "newbackupspro", "Smarter BackUPS Pro",       APCSMART_UPS },
+   { "backupspropnp", "Smarter BackUPS Pro",       APCSMART_UPS },
+   { "smartups",      "SmartUPS",                  APCSMART_UPS },
+   { "matrixups",     "MatrixUPS",                 APCSMART_UPS },
    { "sharesmart",    "ShareUPS Advanced Port",    SHARESMART },
 
    /*
@@ -131,154 +125,91 @@ static const PAIRS table[] = {
 
    /* General parameters */
 
-   {"UPSNAME",  match_str,   WHERE(upsname),  SIZE(upsname),
-      "UPS name"},
-   {"UPSCABLE", match_range, WHERE(cable),    cables,
-      "UPS cable type"},
-   {"UPSTYPE",  match_range, WHERE(mode),     types,
-      "UPS type"},
-   {"DEVICE",   match_str,   WHERE(device),   SIZE(device),
-      "Serial device to which the UPS is attached"},
-   {"LOCKFILE", match_str,   WHERE(lockpath), SIZE(lockpath),
-      "Lock file directory"},
+   {"UPSNAME",  match_str,   WHERE(upsname),  SIZE(upsname)},
+   {"UPSCABLE", match_range, WHERE(cable),    cables},
+   {"UPSTYPE",  match_range, WHERE(mode),     types},
+   {"DEVICE",   match_str,   WHERE(device),   SIZE(device)},
+   {"LOCKFILE", match_str,   WHERE(lockpath), SIZE(lockpath)},
 
    /* Configuration parameters used during power failures */
-   {"ANNOY",          match_int,   WHERE(annoy),       0,
-      "Time in seconds between messages requesting users to logoff"},
-   {"ANNOYDELAY",     match_int,   WHERE(annoydelay),  0,
-      "Initial delay in seconds before telling users to get off the system"},
-   {"ONBATTERYDELAY", match_int,   WHERE(onbattdelay), 0,
-      "Initial delay in seconds before reacting to a power failure"},
-   {"TIMEOUT",        match_int,   WHERE(maxtime),     0,
-      "Max. time in seconds to run on batteries"},
-   {"NOLOGON",        match_range, WHERE(nologin),     logins,
-      "Nologin policy"},
-   {"BATTERYLEVEL",   match_int,   WHERE(percent),     0,
-      "Min. battery percentage when to shutdown"},
-   {"MINUTES",        match_int,   WHERE(runtime),     0,
-      "Min. battery time in seconds remaining when to shutdown"},
-   {"KILLDELAY",      match_int,   WHERE(killdelay),   0,
-      "Delay in seconds after power failure before shutting down UPS power"},
+   {"ANNOY",          match_int,   WHERE(annoy),       0},
+   {"ANNOYDELAY",     match_int,   WHERE(annoydelay),  0},
+   {"ONBATTERYDELAY", match_int,   WHERE(onbattdelay), 0},
+   {"TIMEOUT",        match_int,   WHERE(maxtime),     0},
+   {"NOLOGON",        match_range, WHERE(nologin),     logins},
+   {"BATTERYLEVEL",   match_int,   WHERE(percent),     0},
+   {"MINUTES",        match_int,   WHERE(runtime),     0},
+   {"KILLDELAY",      match_int,   WHERE(killdelay),   0},
 
    /* Configuration parmeters for network information server */
-   {"NETSTATUS",  match_index, WHERE(netstats),   onoroff,
-      "Send status information over the network"},      /* to be deleted */
-   {"NETSERVER",  match_index, WHERE(netstats),   onoroff,
-      "Become a server for STATUS and EVENTS data on the network"},
-   {"NISIP",      match_str,   WHERE(nisip),      SIZE(nisip),
-      "TCP IP for NIS communications"},
-   {"NISPORT",    match_int,   WHERE(statusport), 0,
-      "TCP port for Network Information Server communications"},
-   {"SERVERPORT", match_int,   WHERE(statusport), 0,
-      "TCP port for NIS communications"},
+   {"NETSERVER",  match_index, WHERE(netstats),   onoroff},
+   {"NISIP",      match_str,   WHERE(nisip),      SIZE(nisip)},
+   {"NISPORT",    match_int,   WHERE(statusport), 0},
 
    /* Configuration parameters for event logging */
-   {"EVENTFILE",     match_str, WHERE(eventfile),    SIZE(eventfile),
-      "Location of temporary events file"},
-   {"EVENTSFILE",    match_str, WHERE(eventfile),    SIZE(eventfile),
-      "Location of temporary events file"},
-   {"EVENTFILEMAX",  match_int, WHERE(eventfilemax), 0,
-      "Maximum size of the events file in kilobytes"},
-   {"EVENTSFILEMAX", match_int, WHERE(eventfilemax), 0,
-      "Maximum size of the events file in kilobytes"},
+   {"EVENTFILE",     match_str, WHERE(eventfile),    SIZE(eventfile)},
+   {"EVENTSFILE",    match_str, WHERE(eventfile),    SIZE(eventfile)},
+   {"EVENTFILEMAX",  match_int, WHERE(eventfilemax), 0},
+   {"EVENTSFILEMAX", match_int, WHERE(eventfilemax), 0},
 
    /* Configuration parameters to control system logging */
-   {"FACILITY", match_facility, 0,               0,
-      "log_event facility"},
-   {"STATFILE", match_str,      WHERE(statfile), SIZE(statfile),
-      "Location of status file"},
-   {"LOGSTATS", match_index,    WHERE(logstats), onoroff,
-      "Log status information"},
-   {"STATTIME", match_int,      WHERE(stattime), 0,
-      "Time between status file updates"},
-   {"DATATIME", match_int,      WHERE(datatime), 0,
-      "Time between syslog logging events (0=disable"},
+   {"FACILITY", match_facility, 0,               0},
+   {"STATFILE", match_str,      WHERE(statfile), SIZE(statfile)},
+   {"LOGSTATS", match_index,    WHERE(logstats), onoroff},
+   {"STATTIME", match_int,      WHERE(stattime), 0},
+   {"DATATIME", match_int,      WHERE(datatime), 0},
 
    /* Values used to set UPS EPROM for --configure */
-   {"SELFTEST",     match_str, WHERE(selftest),         SIZE(selftest),
-      "Define hours between automatic self tests"},
-   {"HITRANSFER",   match_int, WHERE(hitrans),          0,
-      "High voltage transfer to UPS batteries"},
-   {"LOTRANSFER",   match_int, WHERE(lotrans),          0,
-      "Low voltage transfer to UPS batteries"},
-   {"LOWBATT",      match_int, WHERE(dlowbatt),         0,
-      "Low battery warning in minutes"},
-   {"WAKEUP",       match_int, WHERE(dwake),            0,
-      "Wake up delay in seconds"},
-   {"RETURNCHARGE", match_int, WHERE(rtnpct),           0,
-      "Percent charge required after power fail to return online"},
-   {"OUTPUTVOLTS",  match_int, WHERE(NomOutputVoltage), 0,
-      "Output Voltage when on batteries"},
-   {"SLEEP",        match_int, WHERE(dshutd),           0,
-      "Shutdown delay in seconds"},
-   {"BEEPSTATE",    match_str, WHERE(beepstate),        SIZE(beepstate),
-      "When to sound alarm after power failure"},
-   {"BATTDATE",     match_str, WHERE(battdat),          SIZE(battdat),
-      "Date of last battery replacement"},
-   {"SENSITIVITY",  match_str, WHERE(sensitivity),      SIZE(sensitivity), 
-      "Sensitivity of UPS to line voltage fluxuations"},
+   {"SELFTEST",     match_str, WHERE(selftest),         SIZE(selftest)},
+   {"HITRANSFER",   match_int, WHERE(hitrans),          0},
+   {"LOTRANSFER",   match_int, WHERE(lotrans),          0},
+   {"LOWBATT",      match_int, WHERE(dlowbatt),         0},
+   {"WAKEUP",       match_int, WHERE(dwake),            0},
+   {"RETURNCHARGE", match_int, WHERE(rtnpct),           0},
+   {"OUTPUTVOLTS",  match_int, WHERE(NomOutputVoltage), 0},
+   {"SLEEP",        match_int, WHERE(dshutd),           0},
+   {"BEEPSTATE",    match_str, WHERE(beepstate),        SIZE(beepstate)},
+   {"BATTDATE",     match_str, WHERE(battdat),          SIZE(battdat)},
+   {"SENSITIVITY",  match_str, WHERE(sensitivity),      SIZE(sensitivity)},
 
    /* Configuration statements for network sharing of the UPS */
-   {"MASTER",    match_str,   WHERE(master_name), SIZE(master_name),
-      "Master network machine"},
-   {"USERMAGIC", match_str,   WHERE(usermagic),   SIZE(usermagic),
-      "Id string for network security"},
-   {"UPSCLASS",  match_range, WHERE(upsclass),    upsclasses,
-      "UPS class"},
-   {"UPSMODE",   match_range, WHERE(sharenet),    modes,
-      "UPS mode"},
-   {"SLAVE",     match_slave, 0,                  0,
-      "Slave network machine"},
-   {"NETPORT",   match_int,   WHERE(NetUpsPort),  0,
-      "TCP socket for netups communications"},
-   {"NETTIME",   match_int,   WHERE(nettime),     0,
-      "Time between network updates"},
+   {"UPSCLASS",  match_range, WHERE(upsclass),    upsclasses},
+   {"UPSMODE",   match_range, WHERE(sharenet),    modes     },
+   {"NETTIME",   match_int,   WHERE(nettime),     0         },
 
    /*
-    * FIXME (adk): These look totally broken; they should just be removed.
-    *
-    * Obsolete configuration options: to be removed in the future.
-    * The warning string is passed into the GENINFO *field since it is
+    * Obsolete configuration options: To be removed in the future.
+    * The warning string is passed in the GENINFO* field since it is
     * not used any more for obsoleted options: we are only interested in
     * printing the message.
-    * There is a new meaning for offset field too. If TRUE will bail out,
+    * There is a new meaning for offset field, too. If TRUE will bail out,
     * if FALSE it will continue to run apcupsd. This way we can bail out
-    * if an obsolete option is too sensible to continue running apcupsd.
-    * -RF
-    *
-    * An example entry may be:
-    *
-    *   { "CONTROL",   obsolete, TRUE, (GENINFO *)
-    *      "CONTROL config option is obsolete, use /usr/lib/apcupsd/ "
-    *      "scripts instead." },
+    * if an obsolete option is too important to continue running apcupsd.
     */
-   {"CONTROL", obsolete, TRUE,
-      (GENINFO *)"CONTROL config directive is obsolete"},
-
-   {"NETACCESS", match_range, WHERE(enable_access), accesses,
-      "NETACCESS config directive is obsolete"},
+   {"CONTROL",    obsolete, TRUE,  (GENINFO *)"CONTROL config directive is obsolete"   },
+   {"NETACCESS",  obsolete, TRUE,  (GENINFO *)"NETACCESS config directive is obsolete" },
+   {"MASTER",     obsolete, TRUE,  (GENINFO *)"MASTER config directive is obsolete"    },
+   {"USERMAGIC",  obsolete, FALSE, (GENINFO *)"USERMAGIC config directive is obsolete" },
+   {"SLAVE",      obsolete, FALSE, (GENINFO *)"SLAVE config directive is obsolete"     },
+   {"NETPORT",    obsolete, FALSE, (GENINFO *)"NETPORT config directive is obsolete"   },
+   {"NETSTATUS",  obsolete, FALSE, (GENINFO *)"NETSTATUS config directive is obsolete" },
+   {"SERVERPORT", obsolete, FALSE, (GENINFO *)"SERVERPORT config directive is obsolete"},
 
    /* must be last */
-   {NULL, 0, 0, 0, NULL}
+   {NULL, 0, 0, 0}
 };
-
-void print_pairs_table(void)
-{
-   int i;
-
-   printf("Valid configuration directives:\n\n");
-
-   for (i = 0; table[i].key != NULL; i++)
-      printf("%-16s%s\n", table[i].key, table[i].help);
-}
 
 static int obsolete(UPSINFO *ups, int offset, const GENINFO * junk, const char *v)
 {
    char *msg = (char *)junk;
 
    fprintf(stderr, "%s\n", msg);
-   fprintf(stderr, _("error ignored.\n"));
-   return SUCCESS;
+   if (!offset) {
+      fprintf(stderr, _("error ignored.\n"));
+      return SUCCESS;
+   }
+   
+   return FAILURE;
 }
 
 #ifdef UNSUPPORTED_CODE
@@ -435,26 +366,6 @@ static int match_index(UPSINFO *ups, int offset, const GENINFO * vs, const char 
    return SUCCESS;
 }
 
-
-static int match_slave(UPSINFO *ups, int offset,
-   const GENINFO *junk, const char *v)
-{
-   char x[MAXSTRING];
-
-   if (!sscanf(v, "%s", x))
-      return FAILURE;
-
-   if (slave_count >= MAXSLAVES) {
-      fprintf(stderr, _("%s: Exceeded max slaves number (%d)\n"),
-         argvalue, MAXSLAVES);
-      return FAILURE;
-   }
-
-   astrncpy(slaves[slave_count].name, x, sizeof(slaves[0].name));
-   slave_count++;
-
-   return SUCCESS;
-}
 
 /*
  * FIXME (remove/replace this comment once fixed)
@@ -686,7 +597,6 @@ void init_ups_struct(UPSINFO *ups)
    astrncpy(ups->beepstate, "-1", sizeof(ups->beepstate));      /* no value */
 
    ups->nisip[0] = 0;              /* no nis IP file as default */
-   ups->NetUpsPort = 0;
 
    ups->lockfile = -1;
 
@@ -871,9 +781,6 @@ jump_into_the_loop:
       ups->lockpath[0] = 0;
       ups->lockfile = -1;
    }
-
-   if ((slave_count > 0) && ups->master_name[0])
-      error_exit(_("I can't be both MASTER and SLAVE\n"));
 
    switch (ups->nologin.type) {
    case TIMEOUT:
