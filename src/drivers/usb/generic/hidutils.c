@@ -72,13 +72,13 @@ unsigned char *hidu_fetch_report_descriptor(usb_dev_handle *fd, int *rlen)
    }
 
    if (debug_level >= 300) {
-      printf("Report descriptor (length=%d):\n", rdesclen);
+      logf("Report descriptor (length=%d):\n", rdesclen);
       for (i = 0; i < rdesclen; i++) {
-         printf("%02x, ", ptr[i]);
+         logf("%02x, ", ptr[i]);
          if ((i+1)%16 == 0)
-            printf("\n");
+            logf("\n");
       }
-      printf("\n");
+      logf("\n");
    }
 
    *rlen = rdesclen;
@@ -225,10 +225,10 @@ int hidu_get_report(usb_dev_handle *fd, hid_item_t *item, unsigned char *data, i
    }
 
    if (debug_level >= 300) {
-      printf("%02x: ", item->report_ID);
+      logf("%02x: ", item->report_ID);
       for (i = 0; i < actlen; i++)
-         printf("%02x,", data[i]);
-      printf("\n");
+         logf("%02x,", data[i]);
+      logf("\n");
    }
 
    return actlen;
@@ -247,10 +247,10 @@ int hidu_set_report(usb_dev_handle *fd, hid_item_t *item, unsigned char *data, i
       item->report_ID, item->kind, len, item->pos);
 
    if (debug_level >= 300) {
-      printf("%02x: ", item->report_ID);
+      logf("%02x: ", item->report_ID);
       for (i = 0; i < len; i++)
-         printf("%02x,", data[i]);
-      printf("\n");
+         logf("%02x,", data[i]);
+      logf("\n");
    }
 
    actlen = usb_control_msg( fd,

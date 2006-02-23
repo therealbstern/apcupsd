@@ -530,10 +530,10 @@ int pusb_ups_check_state(UPSINFO *ups)
       }
 
       if (debug_level >= 300) {
-         printf("Interrupt data: ");
+         logf("Interrupt data: ");
          for (i = 0; i < retval; i++)
-            printf("%02x, ", buf[i]);
-         printf("\n");
+            logf("%02x, ", buf[i]);
+         logf("\n");
       }
 
       write_lock(ups);
