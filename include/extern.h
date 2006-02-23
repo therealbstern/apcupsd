@@ -127,9 +127,6 @@ extern int make_file(UPSINFO *ups, const char *path);
 extern void make_pid_file(void);
 
 /* In apcconfig.c */
-extern int slave_count;
-extern SLAVEINFO slaves[MAXSLAVES];
-
 extern void init_ups_struct(UPSINFO *ups);
 extern void check_for_config(UPSINFO *ups, char *cfgfile);
 
