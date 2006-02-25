@@ -25,19 +25,7 @@
 
 #include "apc.h"
 #include "hidutils.h"
-
-/* This sucks. Need something better here. */
-#if defined HAVE_SUN_OS
-# include "/usr/sfw/include/usb.h"     /* libusb */
-#elif defined HAVE_LINUX_OS
-# include "/usr/include/usb.h"
-#elif defined HAVE_DARWIN_OS
-# include "/opt/local/include/usb.h"
-#elif defined HAVE_CYGWIN
-# include "/cygdrive/c/Program Files/LibUSB-Win32/include/usb.h"
-#else
-# include "/usr/local/include/usb.h"
-#endif
+#include "libusb.h"
 
 #define MAX_SANE_DESCRIPTOR_LEN 4096
 
