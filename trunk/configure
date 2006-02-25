@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS ABSSRCDIR topdir VERSION DATE TRUEPRG FALSEPRG build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP CXX CXXFLAGS ac_ct_CXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA AWK HAVE_GCC_TRUE HAVE_GCC_FALSE DEBUG DLIB DINCLUDE PTHREAD_CFLAGS PTHREAD_LFLAGS WIN32 WINLIBS APCACCESS SMTP APCTEST SHUTDOWN APCUPSD_MAIL WALL SCRIPTSHELL MAKE MAKEDEPEND RANLIB LIBTOOL ETAGS CTAGS RM CP ECHO LN SED AR MV HAVE_SUN_OS_TRUE HAVE_SUN_OS_FALSE HAVE_OSF1_OS_TRUE HAVE_OSF1_OS_FALSE HAVE_AIX_OS_TRUE HAVE_AIX_OS_FALSE HAVE_HPUX_OS_TRUE HAVE_HPUX_OS_FALSE HAVE_LINUX_OS_TRUE HAVE_LINUX_OS_FALSE HAVE_FREEBSD_OS_TRUE HAVE_FREEBSD_OS_FALSE HAVE_NETBSD_OS_TRUE HAVE_NETBSD_OS_FALSE HAVE_OPENBSD_OS_TRUE HAVE_OPENBSD_OS_FALSE HAVE_BSDI_OS_TRUE HAVE_BSDI_OS_FALSE HAVE_SGI_OS_TRUE HAVE_SGI_OS_FALSE HAVE_DARWIN_OS_TRUE HAVE_DARWIN_OS_FALSE GDHEAD INSTALL_DISTDIR UNINSTALL_DISTDIR APCSMART_DRIVER DUMB_DRIVER LIBUSBHID LIBUSBHIDINC LIBUSBHIDOBJS USB_DRIVER USB_TYPE LIBUSB NET_DRIVER SNMP_DRIVER TEST_DRIVER NISIP GAPCDIR GPANEL GAPCMON PKG_CONFIG ac_pt_PKG_CONFIG GAPCMON_CFLAGS GAPCMON_LIBS GPANEL_CFLAGS GPANEL_LIBS POMAKE INTLSUB INTLMAKE INTLTARGET POWERFLUTE POWERLIBS LD CGI GDINCLUDE LIBGD LIBGDOBJ CGI_IMGFMT CGIBIN PACKAGE MSGFMT SET_MAKE ac_ct_RANLIB ALLOCA USE_NLS GMSGFMT XGETTEXT GENCAT USE_INCLUDED_LIBINTL CATALOGS CATOBJEXT DATADIRNAME GMOFILES INSTOBJEXT INTLDEPS INTLLIBS INTLINCLUDE INTLOBJS POFILES POSUB INCLUDE_LOCALE_H GT_NO GT_YES l MKINSTALLDIRS EXTRADEFS LIBEXTRAOBJ EXTRAOBJ DISTNAME DISTVER SERIALDEV PIDDIR LOGDIR nologdir PWRFAILDIR LOCKDIR NETPORT NISPORT UPSTYPE UPSCABLE HOST WCFLAGS WLDFLAGS LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS ABSSRCDIR topdir VERSION DATE TRUEPRG FALSEPRG build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP CXX CXXFLAGS ac_ct_CXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA AWK HAVE_GCC_TRUE HAVE_GCC_FALSE DEBUG DLIB DINCLUDE PTHREAD_CFLAGS PTHREAD_LFLAGS WIN32 WINLIBS APCACCESS SMTP APCTEST SHUTDOWN APCUPSD_MAIL WALL SCRIPTSHELL MAKE MAKEDEPEND RANLIB LIBTOOL ETAGS CTAGS RM CP ECHO LN SED AR MV HAVE_SUN_OS_TRUE HAVE_SUN_OS_FALSE HAVE_OSF1_OS_TRUE HAVE_OSF1_OS_FALSE HAVE_AIX_OS_TRUE HAVE_AIX_OS_FALSE HAVE_HPUX_OS_TRUE HAVE_HPUX_OS_FALSE HAVE_LINUX_OS_TRUE HAVE_LINUX_OS_FALSE HAVE_FREEBSD_OS_TRUE HAVE_FREEBSD_OS_FALSE HAVE_NETBSD_OS_TRUE HAVE_NETBSD_OS_FALSE HAVE_OPENBSD_OS_TRUE HAVE_OPENBSD_OS_FALSE HAVE_BSDI_OS_TRUE HAVE_BSDI_OS_FALSE HAVE_SGI_OS_TRUE HAVE_SGI_OS_FALSE HAVE_DARWIN_OS_TRUE HAVE_DARWIN_OS_FALSE GDHEAD INSTALL_DISTDIR UNINSTALL_DISTDIR APCSMART_DRIVER DUMB_DRIVER LIBUSBHID LIBUSBHIDINC LIBUSBHIDOBJS usbcfg LIBUSB LIBUSBH USB_DRIVER USB_TYPE NET_DRIVER SNMP_DRIVER TEST_DRIVER NISIP GAPCDIR GPANEL GAPCMON PKG_CONFIG ac_pt_PKG_CONFIG GAPCMON_CFLAGS GAPCMON_LIBS GPANEL_CFLAGS GPANEL_LIBS POMAKE INTLSUB INTLMAKE INTLTARGET POWERFLUTE POWERLIBS LD CGI GDINCLUDE LIBGD LIBGDOBJ CGI_IMGFMT CGIBIN PACKAGE MSGFMT SET_MAKE ac_ct_RANLIB ALLOCA USE_NLS GMSGFMT XGETTEXT GENCAT USE_INCLUDED_LIBINTL CATALOGS CATOBJEXT DATADIRNAME GMOFILES INSTOBJEXT INTLDEPS INTLLIBS INTLINCLUDE INTLOBJS POFILES POSUB INCLUDE_LOCALE_H GT_NO GT_YES l MKINSTALLDIRS EXTRADEFS LIBEXTRAOBJ EXTRAOBJ DISTNAME DISTVER SERIALDEV PIDDIR LOGDIR nologdir PWRFAILDIR LOCKDIR NETPORT NISPORT UPSTYPE UPSCABLE HOST WCFLAGS WLDFLAGS LIBOBJS LTLIBOBJS'
 ac_subst_files='VARIABLES TARGETS'
 
 # Initialize some variables set by options.
@@ -10261,225 +10261,54 @@ echo "${ECHO_T}Using Linux USB driver." >&6
 	   echo "$as_me:$LINENO: result: Using BSD USB driver." >&5
 echo "${ECHO_T}Using BSD USB driver." >&6
 	else
-
-        lib="usb"
-        func="usb_interrupt_read"
-
-        found="no"
-
-        _libs=${LIBS}
-        LIBS="${LIBS} -l$lib"
-
-        echo "$as_me:$LINENO: checking for lib$lib in <default>" >&5
-echo $ECHO_N "checking for lib$lib in <default>... $ECHO_C" >&6
-        cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char $func ();
-int
-main ()
-{
-$func ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  found="yes"; echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-
-        if test "$found" = "no" ; then
-            _ldflags=${LDFLAGS}
-
-            for opt in /usr/local/lib /opt/local/lib ; do
-                echo "$as_me:$LINENO: checking for lib$lib in $opt" >&5
-echo $ECHO_N "checking for lib$lib in $opt... $ECHO_C" >&6
-                LDFLAGS="${LDFLAGS} -L$opt"
-                cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char $func ();
-int
-main ()
-{
-$func ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  found="yes"; echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6; break
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-                LDFLAGS=${_ldflags}
-            done
-        fi
-
-        if test "$found" = "no" ; then
-            { { echo "$as_me:$LINENO: error: Cannot find lib$lib." >&5
-echo "$as_me: error: Cannot find lib$lib." >&2;}
-   { (exit 1); exit 1; }; }
-        fi
-
-
-as_ac_Lib=`echo "ac_cv_lib_$lib''_$func" | $as_tr_sh`
-echo "$as_me:$LINENO: checking for $func in -l$lib" >&5
-echo $ECHO_N "checking for $func in -l$lib... $ECHO_C" >&6
-if eval "test \"\${$as_ac_Lib+set}\" = set"; then
+	   # Extract the first word of "libusb-config", so it can be a program name with args.
+set dummy libusb-config; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_usbcfg+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-l$lib  $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
+  case $usbcfg in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_usbcfg="$usbcfg" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_usbcfg="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
 
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char $func ();
-int
-main ()
-{
-$func ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  eval "$as_ac_Lib=yes"
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-eval "$as_ac_Lib=no"
+  ;;
+esac
 fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-echo "$as_me:$LINENO: result: `eval echo '${'$as_ac_Lib'}'`" >&5
-echo "${ECHO_T}`eval echo '${'$as_ac_Lib'}'`" >&6
-if test `eval echo '${'$as_ac_Lib'}'` = yes; then
-  cat >>confdefs.h <<_ACEOF
-#define `echo "HAVE_LIB$lib" | $as_tr_cpp` 1
-_ACEOF
+usbcfg=$ac_cv_path_usbcfg
 
-  LIBS="-l$lib $LIBS"
-
+if test -n "$usbcfg"; then
+  echo "$as_me:$LINENO: result: $usbcfg" >&5
+echo "${ECHO_T}$usbcfg" >&6
 else
-  { { echo "$as_me:$LINENO: error: Cannot find lib$lib." >&5
-echo "$as_me: error: Cannot find lib$lib." >&2;}
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+	   if test x$usbcfg = x ; then
+	      { { echo "$as_me:$LINENO: error: Cannot find libusb-config" >&5
+echo "$as_me: error: Cannot find libusb-config" >&2;}
    { (exit 1); exit 1; }; }
-fi
+	   fi
 
-        LIBS=${_libs}
+           LIBUSB=`$usbcfg --libs`
+           LIBUSBH=`$usbcfg --prefix`/include/usb.h
+
 
 
 	   LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
@@ -10488,12 +10317,6 @@ fi
 
 
 
-
-	   LIBUSB="-lusb"
-
-                      if test $HAVE_UNAME=yes -a x`uname -s` = xDarwin ; then
-               LIBUSB="$LIBUSB -Wl,-framework -Wl,IOKit -Wl,-framework -Wl,CoreFoundation"
-           fi
 
 	   USB_TYPE="generic"
 	   echo "$as_me:$LINENO: result: Using generic libusb USB driver." >&5
@@ -15722,6 +15545,12 @@ then
     src/drivers/usb/$USB_TYPE/Makefile"
 fi
 
+if test "$USB_TYPE"x = "generic"x
+then
+    GENERATE_FILES="$GENERATE_FILES \
+    src/drivers/usb/generic/libusb.h"
+fi
+
 if test "$LIBUSBHIDINC"x != ""x
 then
     GENERATE_FILES="$GENERATE_FILES src/libusbhid/Makefile"
@@ -16499,9 +16328,11 @@ s,@DUMB_DRIVER@,$DUMB_DRIVER,;t t
 s,@LIBUSBHID@,$LIBUSBHID,;t t
 s,@LIBUSBHIDINC@,$LIBUSBHIDINC,;t t
 s,@LIBUSBHIDOBJS@,$LIBUSBHIDOBJS,;t t
+s,@usbcfg@,$usbcfg,;t t
+s,@LIBUSB@,$LIBUSB,;t t
+s,@LIBUSBH@,$LIBUSBH,;t t
 s,@USB_DRIVER@,$USB_DRIVER,;t t
 s,@USB_TYPE@,$USB_TYPE,;t t
-s,@LIBUSB@,$LIBUSB,;t t
 s,@NET_DRIVER@,$NET_DRIVER,;t t
 s,@SNMP_DRIVER@,$SNMP_DRIVER,;t t
 s,@TEST_DRIVER@,$TEST_DRIVER,;t t

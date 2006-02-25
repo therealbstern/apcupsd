@@ -798,7 +798,15 @@ AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
 	   USB_TYPE="bsd"
 	   AC_MSG_RESULT([Using BSD USB driver.])
 	else
-	   AC_LIB_SEARCH(usb, usb_interrupt_read, [/usr/local/lib /opt/local/lib])
+	   AC_PATH_PROG(usbcfg, libusb-config)
+	   if test x$usbcfg = x ; then
+	      AC_MSG_ERROR(Cannot find libusb-config)
+	   fi
+
+           LIBUSB=`$usbcfg --libs`
+           LIBUSBH=`$usbcfg --prefix`/include/usb.h
+	   AC_SUBST(LIBUSB)
+	   AC_SUBST(LIBUSBH)
 
 	   LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
 	   LIBUSBHID=libusbhid
@@ -806,13 +814,6 @@ AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
 	   AC_SUBST(LIBUSBHID)
 	   AC_SUBST(LIBUSBHIDINC)
 	   AC_SUBST(LIBUSBHIDOBJS)
-
-	   LIBUSB="-lusb"
-
-           dnl Darwin needs some frameworks linked in
-           if test $HAVE_UNAME=yes -a x`uname -s` = xDarwin ; then
-               LIBUSB="$LIBUSB -Wl,-framework -Wl,IOKit -Wl,-framework -Wl,CoreFoundation"
-           fi
 
 	   USB_TYPE="generic"
 	   AC_MSG_RESULT([Using generic libusb USB driver.])
@@ -1759,6 +1760,12 @@ then
     GENERATE_FILES="$GENERATE_FILES \
     src/drivers/usb/Makefile \
     src/drivers/usb/$USB_TYPE/Makefile"
+fi
+
+if test "$USB_TYPE"x = "generic"x
+then
+    GENERATE_FILES="$GENERATE_FILES \
+    src/drivers/usb/generic/libusb.h"
 fi
 
 if test "$LIBUSBHIDINC"x != ""x
