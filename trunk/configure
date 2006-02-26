@@ -874,11 +874,11 @@ if test -n "$ac_init_help"; then
 Optional Features:
   --disable-FEATURE       do not include FEATURE (same as --enable-FEATURE=no)
   --enable-FEATURE[=ARG]  include FEATURE [ARG=yes]
+
+  --enable-all            Enable all optional modules
   --enable-cgi            Compile CGI programs
   --enable-install-distdir
                           Install distribution
-
-  --enable-all            Enable all optional modules
 
   --enable-apcsmart       Compile APC Smart UPS driver (default)
   --disable-apcsmart      No APC Smart UPS driver
@@ -9340,6 +9340,21 @@ fi
 fi
 
 
+# Check whether --enable-all or --disable-all was given.
+if test "${enable_all+set}" = set; then
+  enableval="$enable_all"
+   if test "$enableval" = "yes" ; then
+		enable_usb=yes
+		enable_net=yes
+		enable_snmp=yes
+		enable_test=yes
+		enable_powerflute=yes
+		enable_cgi=yes
+		enable_gapcmon=yes
+		enable_gpanel=yes
+	fi
+fi;
+
 #--------------------------------------------------------------------
 # Check for TCP wrapper support, code taken from Bacula KES-7Nov03
 #--------------------------------------------------------------------
@@ -10181,22 +10196,6 @@ if test "${enable_install_distdir+set}" = set; then
 fi;
 
 
-
-
-# Check whether --enable-all or --disable-all was given.
-if test "${enable_all+set}" = set; then
-  enableval="$enable_all"
-   if test "$enableval" = "yes" ; then
-		enable_usb=yes
-		enable_net=yes
-		enable_snmp=yes
-		enable_test=yes
-		enable_powerflute=yes
-		enable_cgi=yes
-		enable_gapcmon=yes
-		enable_gpanel=yes
-	fi
-fi;
 
 
 # Check whether --enable-apcsmart or --disable-apcsmart was given.
