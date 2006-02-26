@@ -698,6 +698,21 @@ AC_ARG_ENABLE(install-distdir,
 AC_SUBST(INSTALL_DISTDIR)
 AC_SUBST(UNINSTALL_DISTDIR)
 
+
+AC_ARG_ENABLE(all, [
+AC_HELP_STRING([--enable-all], [Enable all optional modules])],
+	[ if test "$enableval" = "yes" ; then
+		enable_usb=yes
+		enable_net=yes
+		enable_snmp=yes
+		enable_test=yes
+		enable_powerflute=yes
+		enable_cgi=yes
+		enable_gapcmon=yes
+		enable_gpanel=yes
+	fi], [])
+
+
 dnl	
 dnl Check for enable of drivers
 dnl
