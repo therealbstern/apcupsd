@@ -878,6 +878,8 @@ Optional Features:
   --enable-install-distdir
                           Install distribution
 
+  --enable-all            Enable all optional modules
+
   --enable-apcsmart       Compile APC Smart UPS driver (default)
   --disable-apcsmart      No APC Smart UPS driver
 
@@ -10178,6 +10180,23 @@ if test "${enable_install_distdir+set}" = set; then
 	fi
 fi;
 
+
+
+
+# Check whether --enable-all or --disable-all was given.
+if test "${enable_all+set}" = set; then
+  enableval="$enable_all"
+   if test "$enableval" = "yes" ; then
+		enable_usb=yes
+		enable_net=yes
+		enable_snmp=yes
+		enable_test=yes
+		enable_powerflute=yes
+		enable_cgi=yes
+		enable_gapcmon=yes
+		enable_gpanel=yes
+	fi
+fi;
 
 
 # Check whether --enable-apcsmart or --disable-apcsmart was given.
