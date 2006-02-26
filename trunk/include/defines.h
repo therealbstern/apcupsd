@@ -26,8 +26,6 @@
 #ifndef _DEFINES_H
 #define _DEFINES_H
 
-#define CORENAME "*Core*"
-
 #define APCCONTROL              SYSCONFDIR "/apccontrol"
 
 #ifndef APCCONF
@@ -66,21 +64,10 @@
 #define MAXSTRING               256
 #define MESSAGELEN              256
 #define MAXTOKENLEN             100
-#define MAXSLAVES               20
 #define UPSNAMELEN              100
 
 #define DEFAULT_SPEED           B2400
 
-/*
- * These are for UPS internal test routines.
- * They are all != 0 because this way there will be no
- * risk of confusing these statuses as boolean values:
- * they are all a boolean true.
- */
-#define UPS_TEST_PASSED         0x01
-#define UPS_TEST_FAILED         0x02
-#define UPS_TEST_INPROGRESS     0x03
-#define UPS_TEST_ACTIVATED      0x04
 
 /* bit values for APC UPS Status Byte (ups->Status) */
 #define UPS_calibration   0x00000001
@@ -356,11 +343,6 @@
 #define TIMER_FAST              1  /* Value for fast poll */
 #define TIMER_DUMB              5  /* for Dumb (ioctl) UPSes -- keep short */
 
-#define MASTER_TIMEOUT        120  /* master must respond in this time */
-
-/* Old net code will be obsoleted sometime. */
-#define TIMER_SLAVES            10
-
 /* Make the size of these strings the next multiple of 4 */
 #define APC_MAGIC               "apcupsd-linux-6.0"
 #define APC_MAGIC_SIZE          4 * ((sizeof(APC_MAGIC) + 3) / 4)
@@ -368,30 +350,6 @@
 #define ACCESS_MAGIC            "apcaccess-linux-4.0"
 #define ACCESS_MAGIC_SIZE       4 * ((sizeof(APC_MAGIC) + 3) / 4)
 
-/* These are the remote_state for networked master/slaves */
-
-/*
- * The first 5 are from the original protocol. Later states apply to the
- * master only and should be hidden from the slave to preserve
- * backwards compatibility
- */
-#define RMT_NOTCONNECTED        0
-#define RMT_CONNECTED           1
-#define RMT_RECONNECT           2
-#define RMT_ERROR               3
-#define RMT_DOWN                4
-
-/* Master only internal states */
-
-/* Convert these to RMT_NOTCONNECTED when sending to slave */
-#define RMT_CONNECTING1         5
-#define RMT_CONNECTING2         6
-#define RMT_CONNECTING3         7
-
-/* Convert these to RMT_RECONNECT when sending to slave */
-#define RMT_RECONNECTING1       8
-#define RMT_RECONNECTING2       9
-#define RMT_RECONNECTING3      10
 
 #define MAX_THREADS             7
 
@@ -428,17 +386,6 @@
 #define CMDOFFBATTERY    19        /* off battery power */
 #define CMDBATTDETACH    20        /* Battery disconnected */
 #define CMDBATTATTACH    21        /* Battery reconnected */
-
-/* NetCodes for numeric chatting. */
-#define NETCODENUL          100
-#define NETCODEQUIT         101
-#define NETCODERETRY        102
-#define NETCODEOK           200
-#define NETCODEURG          201
-#define NETCODENOERR        202
-#define NETCODEDONE         203
-#define NETCODEERR          300
-#define NETCODEINACT        301
 
 
 /*
