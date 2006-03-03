@@ -546,6 +546,7 @@ int main(int argc, char *argv[])
          prep_device(ups);
       }
 
+#ifdef HAVE_APCSMART_DRIVER
       /*
        * This isn't a documented option but can be used
        * for testing dumb mode on a SmartUPS if you have
@@ -560,6 +561,7 @@ int main(int argc, char *argv[])
          pmsg("Going dumb: %s\n", ans);
          mode = M_DUMB;            /* run in dumb mode */
       }
+#endif
    }
 
    shm_OK = 1;
