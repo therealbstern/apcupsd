@@ -10,6 +10,13 @@
 
 CHANGES IN 3.12.x
 
+03Mar06:
+- apctest: Fix compile error with --disable-apcsmart. Running a SmartUPS 
+  in dumb mode requires apcsmart driver. Reported by Matthew Watson 
+  <glycer67@gmail.com>.
+- Link with libsupc++ (always static) when possible to avoid reliance on
+  libstdc++. Also disable exceptions and rtti, if possible. Thanks to
+  a suggestion from Sergey Vlasov <vsu@altlinux.ru>.
 14Feb06:
 - apcconfig.c needs argvalue. Although it's gross, the current standard
   appears to be to instantiate that array in each top-level C file. Follow
