@@ -205,8 +205,10 @@ static gboolean gapc_cb_window_delete_event (GtkWidget * w, GdkEvent * event, gp
   pcfg->b_refresh_button = TRUE;
 
   for ( i_x = 0; i_x < GAPC_N_TIMERS ; i_x++ )
-        g_source_remove ( pcfg->i_timer_ids[i_x] );
-	
+  {
+        if( pcfg->i_timer_ids[i_x] != 0 )
+            g_source_remove ( pcfg->i_timer_ids[i_x] );
+  }	
   gtk_main_quit ();
   return TRUE;
 }

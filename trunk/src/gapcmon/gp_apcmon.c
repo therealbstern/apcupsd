@@ -311,7 +311,10 @@ gapc_cb_applet_destroy (GtkObject *object, gpointer gp)
   pcfg->b_refresh_button = TRUE;
 
   for ( i_x = 0; i_x < GAPC_N_TIMERS ; i_x++ )
-     	g_source_remove ( pcfg->i_timer_ids[i_x] );
+  {
+        if ( pcfg->i_timer_ids[i_x] != 0 )
+     	     g_source_remove ( pcfg->i_timer_ids[i_x] );
+  }
 
   for ( i_x = 0; i_x < GAPC_N_ICONS ; i_x++ )
      	g_object_unref ( pcfg->my_icons[i_x] );
@@ -568,9 +571,9 @@ gapc_applet_factory (PanelApplet * applet, const gchar * iid, gpointer data)
 
   if ( g_str_equal (iid, "OAFIID:gpanel_apcmonApplet") )
     {
-      guint i_instance_count = 0;
+     static  guint i_instance_count = 0;
       
-      i_instance_count = bonobo_control_life_get_count ();
+      i_instance_count++;
       pcfg = g_new0 (GAPC_CONFIG, 1);
       pcfg->cb_id = i_instance_count;
 
