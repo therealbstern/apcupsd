@@ -14,7 +14,7 @@
                 <item value="IDL:Bonobo/Control:1.0"/>
                 <item value="IDL:Bonobo/Unknown:1.0"/>
         </oaf_attribute>
-        <oaf_attribute name="name" type="string" value="gpanel_apcmon"/>
+        <oaf_attribute name="name" type="string" value="A UPS Monitor {gapnel_apcmon}"/>
         <oaf_attribute name="description" type="string" value=
         "GNOME applet to watch the activities of the apcupsd.sourceforge.net UPS management package."/>
 	<oaf_attribute name="panel:category" type="string" value="Applications"/>
