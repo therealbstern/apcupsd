@@ -3,6 +3,11 @@
 # TOP source directory.
 topdir = @topdir@
 top_builddir = $(topdir)
+bindir=$(prefix)/bin
+libdir=$(prefix)/lib
+libexecdir=$(prefix)/libexec
+datadir=$(prefix)/share
+
 
 # Include the default make targets: to be put before the all-targets: rule.
 @TARGETS@
@@ -47,9 +52,9 @@ install-binary: $(allexe)
 	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(datadir)/pixmaps
 	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(datadir)/gnome/apps/Applications	
 	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(datadir)/pixmaps	
-	@$(MAKE) DESTDIR=$(DESTDIR) install-pixmaps
-	@$(MAKE) DESTDIR=$(DESTDIR) install-@GAPCMON@
-	@$(MAKE) DESTDIR=$(DESTDIR) install-@GPANEL@
+	$(MAKE) DESTDIR=$(DESTDIR) install-pixmaps
+	$(MAKE) DESTDIR=$(DESTDIR) install-@GAPCMON@
+	$(MAKE) DESTDIR=$(DESTDIR) install-@GPANEL@
 
 install-gapcmon: gapcmon
 	$(INSTALL_PROGRAM) -m 755 gapcmon		$(DESTDIR)$(bindir)/gapcmon@EXEEXT@
