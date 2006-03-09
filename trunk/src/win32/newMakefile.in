@@ -1,0 +1,55 @@
+#
+# Makefile to build the native Win32 apcupsd
+# VC++ and tools must be on your path
+#
+#     Kern Sibbald, March 2006
+#
+
+srcdir =	.
+VPATH = 	.
+.PATH:		.
+
+# one up
+basedir = ..
+# top dir
+topdir = ../..
+# this dir relative to top dir
+thisdir = src/win32
+
+DEBUG=@DEBUG@
+
+
+NMAKE=nmake
+MAKENSIS="c:/Program Files/NSIS/makensis"
+
+first_rule: all
+
+dummy:
+
+all:  apcupsd installer
+
+
+apcupsd: dummy
+	(cd apcupsd; env MAKEFLAGS= ${NMAKE} CFG="apcupsd - Win32 Release" /f apcupsd.mak)
+
+
+installer: winapcupsd.exe
+
+#
+# Build installer
+#
+winapcupsd.exe: apcupsd
+	${MAKENSIS} /V2 newwinapcupsd.nsi
+
+
+Makefile: $(srcdir)/Makefile.in $(topdir)/config.status newwinapcupsd.nsi.in
+	cd $(topdir) \
+	  && CONFIG_FILES=$(thisdir)/$@ CONFIG_HEADERS= \
+	  $(SHELL) ./config.status
+
+clean:
+	(cd apcupsd; make clean)
+
+distclean: clean
+	rm -rf apcupsd/Release apcupsd/Debug
+	rm -f winapcupsd-*.exe
