@@ -52,6 +52,8 @@ extern DWORD            mainthreadId;
 // Main UPS server routine
 extern int ApcupsdAppMain(int service);
 
+extern void LogErrorMsg(char *msg);
+
 // Standard command-line flag definitions
 const char ApcupsdRunService[]            = "/service";
 const char ApcupsdRunServiceHelper[]      = "/servicehelper";
@@ -72,9 +74,10 @@ const char ApcupsdKillRunningCopy[]       = "/kill";
 
 const char ApcupsdShowHelp[]              = "/help";
 
+
+
 // Usage string
-#ifdef properties_implemented
-const char ApcupsdUsageText[] = "Apcupsd [/run] [/kill] [/install] [/remove] [/settings] [/defaultsettings] [/about] [/status] [/evetns]\n";
-#else
 const char ApcupsdUsageText[] = "Apcupsd [/run] [/kill] [/install] [/remove] [/about] [/status] [/events]\n";
-#endif
+
+void LogErrorMsg(char *msg, char *fname, int lineno);
+#define log_error_message(msg) LogErrorMsg((msg), __FILE__, __LINE__)
