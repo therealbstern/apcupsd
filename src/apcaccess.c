@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright (C) 2000-2004 Kern Sibbald
+ * Copyright (C) 2000-2006 Kern Sibbald
  * Copyright (C) 1996-99 Andre M. Hedrick <andre@suse.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -40,7 +40,7 @@ char argvalue[MAXSTRING];
 static char *host = "localhost";
 static int port = NISPORT;
 
-struct {
+struct s_mydata {
    char apcmagic[APC_MAGIC_SIZE];
    int update_master_config;
    int get_master_status;
