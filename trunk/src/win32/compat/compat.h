@@ -4,7 +4,7 @@
 // Copyright transferred from Raider Solutions, Inc to
 //   Kern Sibbald and John Walker by express permission.
 //
-// Copyright (C) 2004-2005 Kern Sibbald
+// Copyright (C) 2004-2006 Kern Sibbald
 //
 //   This program is free software; you can redistribute it and/or
 //   modify it under the terms of the GNU General Public License as
@@ -27,7 +27,7 @@
  * Last Modified By: Thorsten Engel
  * Last Modified On: Fri Apr 22 19:30:00 2004
  * Update Count    : 218
- * $Id: compat.h,v 1.2 2006-03-09 13:57:32 kerns Exp $
+ * $Id: compat.h,v 1.3 2006-03-12 07:54:47 kerns Exp $
  */
 
 
@@ -248,6 +248,7 @@ struct stat
 #define O_RDWR   _O_RDWR
 #define O_CREAT  _O_CREAT
 #define O_TRUNC  _O_TRUNC
+#define O_EXCL   _O_EXCL
 
 #define isascii __isascii
 #define toascii __toascii
@@ -351,7 +352,7 @@ struct sigaction {
 #ifndef HAVE_MINGW
 int stat(const char *, struct stat *);
 int ftruncate(int, off_t);
-int fstat(int, struct stat *);
+int _fstat(int, struct stat *);
 #ifdef __cplusplus
 #define access _access
 extern "C" _CRTIMP int __cdecl _access(const char *, int);
@@ -361,6 +362,7 @@ extern "C" void *  __cdecl _alloca(size_t);
 #endif //HAVE_MINGW
 
 #define getpid _getpid
+#define fstat  _fstat
 
 #define getppid() 0
 #define gethostid() 0

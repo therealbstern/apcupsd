@@ -40,39 +40,36 @@ ALL : "$(OUTDIR)\apcupsd.exe"
 
 
 CLEAN :
-        -@erase "$(INTDIR)\compat.obj"
-        -@erase "$(INTDIR)\print.obj"
-        -@erase "$(INTDIR)\winabout.obj"
-        -@erase "$(INTDIR)\winevents.obj"
-        -@erase "$(INTDIR)\winmain.obj"
-        -@erase "$(INTDIR)\winprop.obj"
-        -@erase "$(INTDIR)\winservice.obj"
-        -@erase "$(INTDIR)\winstat.obj"
-        -@erase "$(INTDIR)\wintray.obj"
-        -@erase "$(INTDIR)\winapi.obj"
-        -@erase "$(INTDIR)\action.obj"
-        -@erase "$(INTDIR)\apcnis.obj"
-        -@erase "$(INTDIR)\apcupsd.obj"
-        -@erase "$(INTDIR)\device.obj"
-        -@erase "$(INTDIR)\options.obj"
-        -@erase "$(INTDIR)\reports.obj"
-        -@erase "$(INTDIR)\drivers.obj"
-        -@erase "$(INTDIR)\apcconfig.obj"
-        -@erase "$(INTDIR)\apcerror.obj"
-        -@erase "$(INTDIR)\apcevents.obj"
-        -@erase "$(INTDIR)\apcexec.obj"
-        -@erase "$(INTDIR)\apcfile.obj"
-        -@erase "$(INTDIR)\apclist.obj"
-        -@erase "$(INTDIR)\apclock.obj"
-        -@erase "$(INTDIR)\apclog.obj"
-        -@erase "$(INTDIR)\apcsignal.obj"
-        -@erase "$(INTDIR)\apcstatus.obj"
-        -@erase "$(INTDIR)\asys.obj"
-        -@erase "$(INTDIR)\smart.obj"
-        -@erase "$(INTDIR)\smarteeprom.obj"
-        -@erase "$(INTDIR)\smartoper.obj"
-        -@erase "$(INTDIR)\smartsetup.obj"
-        -@erase "$(INTDIR)\smartsetup2.obj"
+	-@erase "$(INTDIR)\compat.obj"
+	-@erase "$(INTDIR)\print.obj"
+	-@erase "$(INTDIR)\winabout.obj"
+	-@erase "$(INTDIR)\winevents.obj"
+	-@erase "$(INTDIR)\winmain.obj"
+	-@erase "$(INTDIR)\winprop.obj"
+	-@erase "$(INTDIR)\newwinservice.obj"
+	-@erase "$(INTDIR)\winstat.obj"
+	-@erase "$(INTDIR)\wintray.obj"
+	-@erase "$(INTDIR)\winapi.obj"
+	-@erase "$(INTDIR)\action.obj"
+	-@erase "$(INTDIR)\apcnis.obj"
+	-@erase "$(INTDIR)\apcupsd.obj"
+	-@erase "$(INTDIR)\device.obj"
+	-@erase "$(INTDIR)\options.obj"
+	-@erase "$(INTDIR)\reports.obj"
+	-@erase "$(INTDIR)\drivers.obj"
+	-@erase "$(INTDIR)\apcconfig.obj"
+	-@erase "$(INTDIR)\apcerror.obj"
+	-@erase "$(INTDIR)\apcevents.obj"
+	-@erase "$(INTDIR)\apcexec.obj"
+	-@erase "$(INTDIR)\apcfile.obj"
+	-@erase "$(INTDIR)\apclibnis.obj"
+	-@erase "$(INTDIR)\apclock.obj"
+	-@erase "$(INTDIR)\apclog.obj"
+	-@erase "$(INTDIR)\apcsignal.obj"
+	-@erase "$(INTDIR)\apcstatus.obj"
+	-@erase "$(INTDIR)\newups.obj"
+	-@erase "$(INTDIR)\asys.obj"
+	-@erase "$(INTDIR)\testdriver.obj"
         -@erase "$(OUTDIR)\apcupsd.exe"
 
 "$(OUTDIR)" :
@@ -90,40 +87,37 @@ LINK32_FLAGS=rpcrt4.lib oleaut32.lib ole32.lib uuid.lib winspool.lib winmm.lib \
   wldap32.lib pthreadVCE.lib zlib.lib /nodefaultlib:libcmt.lib \
   /nologo /subsystem:windows /machine:I386 /out:"$(OUTDIR)\apcupsd.exe" /libpath:"../../../../depkgs-win32/pthreads"
 LINK32_OBJS= \
-        "$(INTDIR)\compat.obj" \
-        "$(INTDIR)\print.obj" \
-        "$(INTDIR)\winabout.obj" \
-        "$(INTDIR)\winevents.obj" \
-        "$(INTDIR)\winmain.obj" \
-        "$(INTDIR)\winprop.obj" \
-        "$(INTDIR)\winservice.obj" \
-        "$(INTDIR)\winstat.obj" \
-        "$(INTDIR)\wintray.obj" \
-        "$(INTDIR)\winapi.obj" \
-        "$(INTDIR)\action.obj" \
-        "$(INTDIR)\apcnis.obj" \
-        "$(INTDIR)\apcupsd.obj" \
-        "$(INTDIR)\device.obj" \
-        "$(INTDIR)\options.obj" \
-        "$(INTDIR)\reports.obj" \
-        "$(INTDIR)\drivers.obj" \
-        "$(INTDIR)\apcconfig.obj" \
-        "$(INTDIR)\apcerror.obj" \
-        "$(INTDIR)\apcevents.obj" \
-        "$(INTDIR)\apcexec.obj" \
-        "$(INTDIR)\apcfile.obj" \
-        "$(INTDIR)\apclist.obj" \
-        "$(INTDIR)\apclock.obj" \
-        "$(INTDIR)\apclog.obj" \
-        "$(INTDIR)\apcsignal.obj" \
-        "$(INTDIR)\apcstatus.obj" \
-        "$(INTDIR)\asys.obj" \
-        "$(INTDIR)\smart.obj" \
-        "$(INTDIR)\smarteeprom.obj" \
-        "$(INTDIR)\smartoper.obj" \
-        "$(INTDIR)\smartsetup.obj" \
-        "$(INTDIR)\smartsetup2.obj" \
-        "$(INTDIR)\apcupsd_private.res"
+	"$(INTDIR)\compat.obj" \
+	"$(INTDIR)\print.obj" \
+	"$(INTDIR)\winabout.obj" \
+	"$(INTDIR)\winevents.obj" \
+	"$(INTDIR)\winmain.obj" \
+	"$(INTDIR)\winprop.obj" \
+	"$(INTDIR)\newwinservice.obj" \
+	"$(INTDIR)\winstat.obj" \
+	"$(INTDIR)\wintray.obj" \
+	"$(INTDIR)\winapi.obj" \
+	"$(INTDIR)\action.obj" \
+	"$(INTDIR)\apcnis.obj" \
+	"$(INTDIR)\apcupsd.obj" \
+	"$(INTDIR)\device.obj" \
+	"$(INTDIR)\options.obj" \
+	"$(INTDIR)\reports.obj" \
+	"$(INTDIR)\drivers.obj" \
+	"$(INTDIR)\apcconfig.obj" \
+	"$(INTDIR)\apcerror.obj" \
+	"$(INTDIR)\apcevents.obj" \
+	"$(INTDIR)\apcexec.obj" \
+	"$(INTDIR)\apcfile.obj" \
+	"$(INTDIR)\apclibnis.obj" \
+	"$(INTDIR)\apclock.obj" \
+	"$(INTDIR)\apclog.obj" \
+	"$(INTDIR)\apcsignal.obj" \
+	"$(INTDIR)\apcstatus.obj" \
+	"$(INTDIR)\newups.obj" \
+	"$(INTDIR)\asys.obj" \
+	"$(INTDIR)\testdriver.obj" \
+        "$(INTDIR)\winres.res"
 
 "$(OUTDIR)\apcupsd.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -141,72 +135,66 @@ OutDir=.\Debug
 ALL : "$(OUTDIR)\apcupsd.exe" "$(OUTDIR)\apcupsd.bsc"
 
 CLEAN :
-        -@erase "$(INTDIR)\compat.obj
-        -@erase "$(INTDIR)\compat.sbr"
-        -@erase "$(INTDIR)\print.obj
-        -@erase "$(INTDIR)\print.sbr"
-        -@erase "$(INTDIR)\winabout.obj
-        -@erase "$(INTDIR)\winabout.sbr"
-        -@erase "$(INTDIR)\winevents.obj
-        -@erase "$(INTDIR)\winevents.sbr"
-        -@erase "$(INTDIR)\winmain.obj
-        -@erase "$(INTDIR)\winmain.sbr"
-        -@erase "$(INTDIR)\winprop.obj
-        -@erase "$(INTDIR)\winprop.sbr"
-        -@erase "$(INTDIR)\winservice.obj
-        -@erase "$(INTDIR)\winservice.sbr"
-        -@erase "$(INTDIR)\winstat.obj
-        -@erase "$(INTDIR)\winstat.sbr"
-        -@erase "$(INTDIR)\wintray.obj
-        -@erase "$(INTDIR)\wintray.sbr"
-        -@erase "$(INTDIR)\winapi.obj
-        -@erase "$(INTDIR)\winapi.sbr"
-        -@erase "$(INTDIR)\action.obj
-        -@erase "$(INTDIR)\action.sbr"
-        -@erase "$(INTDIR)\apcnis.obj
-        -@erase "$(INTDIR)\apcnis.sbr"
-        -@erase "$(INTDIR)\apcupsd.obj
-        -@erase "$(INTDIR)\apcupsd.sbr"
-        -@erase "$(INTDIR)\device.obj
-        -@erase "$(INTDIR)\device.sbr"
-        -@erase "$(INTDIR)\options.obj
-        -@erase "$(INTDIR)\options.sbr"
-        -@erase "$(INTDIR)\reports.obj
-        -@erase "$(INTDIR)\reports.sbr"
-        -@erase "$(INTDIR)\drivers.obj
-        -@erase "$(INTDIR)\drivers.sbr"
-        -@erase "$(INTDIR)\apcconfig.obj
-        -@erase "$(INTDIR)\apcconfig.sbr"
-        -@erase "$(INTDIR)\apcerror.obj
-        -@erase "$(INTDIR)\apcerror.sbr"
-        -@erase "$(INTDIR)\apcevents.obj
-        -@erase "$(INTDIR)\apcevents.sbr"
-        -@erase "$(INTDIR)\apcexec.obj
-        -@erase "$(INTDIR)\apcexec.sbr"
-        -@erase "$(INTDIR)\apcfile.obj
-        -@erase "$(INTDIR)\apcfile.sbr"
-        -@erase "$(INTDIR)\apclist.obj
-        -@erase "$(INTDIR)\apclist.sbr"
-        -@erase "$(INTDIR)\apclock.obj
-        -@erase "$(INTDIR)\apclock.sbr"
-        -@erase "$(INTDIR)\apclog.obj
-        -@erase "$(INTDIR)\apclog.sbr"
-        -@erase "$(INTDIR)\apcsignal.obj
-        -@erase "$(INTDIR)\apcsignal.sbr"
-        -@erase "$(INTDIR)\apcstatus.obj
-        -@erase "$(INTDIR)\apcstatus.sbr"
-        -@erase "$(INTDIR)\asys.obj
-        -@erase "$(INTDIR)\asys.sbr"
-        -@erase "$(INTDIR)\smart.obj
-        -@erase "$(INTDIR)\smart.sbr"
-        -@erase "$(INTDIR)\smarteeprom.obj
-        -@erase "$(INTDIR)\smarteeprom.sbr"
-        -@erase "$(INTDIR)\smartoper.obj
-        -@erase "$(INTDIR)\smartoper.sbr"
-        -@erase "$(INTDIR)\smartsetup.obj
-        -@erase "$(INTDIR)\smartsetup.sbr"
-        -@erase "$(INTDIR)\smartsetup2.obj
-        -@erase "$(INTDIR)\smartsetup2.sbr"
+	-@erase "$(INTDIR)\compat.obj
+	-@erase "$(INTDIR)\compat.sbr"
+	-@erase "$(INTDIR)\print.obj
+	-@erase "$(INTDIR)\print.sbr"
+	-@erase "$(INTDIR)\winabout.obj
+	-@erase "$(INTDIR)\winabout.sbr"
+	-@erase "$(INTDIR)\winevents.obj
+	-@erase "$(INTDIR)\winevents.sbr"
+	-@erase "$(INTDIR)\winmain.obj
+	-@erase "$(INTDIR)\winmain.sbr"
+	-@erase "$(INTDIR)\winprop.obj
+	-@erase "$(INTDIR)\winprop.sbr"
+	-@erase "$(INTDIR)\newwinservice.obj
+	-@erase "$(INTDIR)\newwinservice.sbr"
+	-@erase "$(INTDIR)\winstat.obj
+	-@erase "$(INTDIR)\winstat.sbr"
+	-@erase "$(INTDIR)\wintray.obj
+	-@erase "$(INTDIR)\wintray.sbr"
+	-@erase "$(INTDIR)\winapi.obj
+	-@erase "$(INTDIR)\winapi.sbr"
+	-@erase "$(INTDIR)\action.obj
+	-@erase "$(INTDIR)\action.sbr"
+	-@erase "$(INTDIR)\apcnis.obj
+	-@erase "$(INTDIR)\apcnis.sbr"
+	-@erase "$(INTDIR)\apcupsd.obj
+	-@erase "$(INTDIR)\apcupsd.sbr"
+	-@erase "$(INTDIR)\device.obj
+	-@erase "$(INTDIR)\device.sbr"
+	-@erase "$(INTDIR)\options.obj
+	-@erase "$(INTDIR)\options.sbr"
+	-@erase "$(INTDIR)\reports.obj
+	-@erase "$(INTDIR)\reports.sbr"
+	-@erase "$(INTDIR)\drivers.obj
+	-@erase "$(INTDIR)\drivers.sbr"
+	-@erase "$(INTDIR)\apcconfig.obj
+	-@erase "$(INTDIR)\apcconfig.sbr"
+	-@erase "$(INTDIR)\apcerror.obj
+	-@erase "$(INTDIR)\apcerror.sbr"
+	-@erase "$(INTDIR)\apcevents.obj
+	-@erase "$(INTDIR)\apcevents.sbr"
+	-@erase "$(INTDIR)\apcexec.obj
+	-@erase "$(INTDIR)\apcexec.sbr"
+	-@erase "$(INTDIR)\apcfile.obj
+	-@erase "$(INTDIR)\apcfile.sbr"
+	-@erase "$(INTDIR)\apclibnis.obj
+	-@erase "$(INTDIR)\apclibnis.sbr"
+	-@erase "$(INTDIR)\apclock.obj
+	-@erase "$(INTDIR)\apclock.sbr"
+	-@erase "$(INTDIR)\apclog.obj
+	-@erase "$(INTDIR)\apclog.sbr"
+	-@erase "$(INTDIR)\apcsignal.obj
+	-@erase "$(INTDIR)\apcsignal.sbr"
+	-@erase "$(INTDIR)\apcstatus.obj
+	-@erase "$(INTDIR)\apcstatus.sbr"
+	-@erase "$(INTDIR)\newups.obj
+	-@erase "$(INTDIR)\newups.sbr"
+	-@erase "$(INTDIR)\asys.obj
+	-@erase "$(INTDIR)\asys.sbr"
+	-@erase "$(INTDIR)\testdriver.obj
+	-@erase "$(INTDIR)\testdriver.sbr"
         -@erase "$(OUTDIR)\apcupsd.exe"
         -@erase "$(OUTDIR)\apcupsd.bsc"
 
@@ -219,39 +207,36 @@ RSC_PROJ=/l 0x409 /fo"$(INTDIR)\winres.res" /d "_DEBUG"
 BSC32=bscmake.exe
 BSC32_FLAGS=/nologo /o"$(OUTDIR)\apcupsd.bsc" 
 BSC32_SBRS= \
-        "$(INTDIR)\compat.sbr" \
-        "$(INTDIR)\print.sbr" \
-        "$(INTDIR)\winabout.sbr" \
-        "$(INTDIR)\winevents.sbr" \
-        "$(INTDIR)\winmain.sbr" \
-        "$(INTDIR)\winprop.sbr" \
-        "$(INTDIR)\winservice.sbr" \
-        "$(INTDIR)\winstat.sbr" \
-        "$(INTDIR)\wintray.sbr" \
-        "$(INTDIR)\winapi.sbr" \
-        "$(INTDIR)\action.sbr" \
-        "$(INTDIR)\apcnis.sbr" \
-        "$(INTDIR)\apcupsd.sbr" \
-        "$(INTDIR)\device.sbr" \
-        "$(INTDIR)\options.sbr" \
-        "$(INTDIR)\reports.sbr" \
-        "$(INTDIR)\drivers.sbr" \
-        "$(INTDIR)\apcconfig.sbr" \
-        "$(INTDIR)\apcerror.sbr" \
-        "$(INTDIR)\apcevents.sbr" \
-        "$(INTDIR)\apcexec.sbr" \
-        "$(INTDIR)\apcfile.sbr" \
-        "$(INTDIR)\apclist.sbr" \
-        "$(INTDIR)\apclock.sbr" \
-        "$(INTDIR)\apclog.sbr" \
-        "$(INTDIR)\apcsignal.sbr" \
-        "$(INTDIR)\apcstatus.sbr" \
-        "$(INTDIR)\asys.sbr" \
-        "$(INTDIR)\smart.sbr" \
-        "$(INTDIR)\smarteeprom.sbr" \
-        "$(INTDIR)\smartoper.sbr" \
-        "$(INTDIR)\smartsetup.sbr" \
-        "$(INTDIR)\smartsetup2.sbr" \
+	"$(INTDIR)\compat.sbr" \
+	"$(INTDIR)\print.sbr" \
+	"$(INTDIR)\winabout.sbr" \
+	"$(INTDIR)\winevents.sbr" \
+	"$(INTDIR)\winmain.sbr" \
+	"$(INTDIR)\winprop.sbr" \
+	"$(INTDIR)\newwinservice.sbr" \
+	"$(INTDIR)\winstat.sbr" \
+	"$(INTDIR)\wintray.sbr" \
+	"$(INTDIR)\winapi.sbr" \
+	"$(INTDIR)\action.sbr" \
+	"$(INTDIR)\apcnis.sbr" \
+	"$(INTDIR)\apcupsd.sbr" \
+	"$(INTDIR)\device.sbr" \
+	"$(INTDIR)\options.sbr" \
+	"$(INTDIR)\reports.sbr" \
+	"$(INTDIR)\drivers.sbr" \
+	"$(INTDIR)\apcconfig.sbr" \
+	"$(INTDIR)\apcerror.sbr" \
+	"$(INTDIR)\apcevents.sbr" \
+	"$(INTDIR)\apcexec.sbr" \
+	"$(INTDIR)\apcfile.sbr" \
+	"$(INTDIR)\apclibnis.sbr" \
+	"$(INTDIR)\apclock.sbr" \
+	"$(INTDIR)\apclog.sbr" \
+	"$(INTDIR)\apcsignal.sbr" \
+	"$(INTDIR)\apcstatus.sbr" \
+	"$(INTDIR)\newups.sbr" \
+	"$(INTDIR)\asys.sbr" \
+	"$(INTDIR)\testdriver.sbr" \
 
 "$(OUTDIR)\apcupsd.bsc" : "$(OUTDIR)" $(BSC32_SBRS)
     $(BSC32) @<<
@@ -264,40 +249,37 @@ LINK32_FLAGS=rpcrt4.lib oleaut32.lib ole32.lib uuid.lib winspool.lib winmm.lib \
   wldap32.lib pthreadVCE.lib zlib.lib /nodefaultlib:libcmtd.lib \
   /nologo /subsystem:windows /pdb:none /debug /machine:I386 /out:"$(OUTDIR)\apcupsd.exe" /libpath:"../../../../depkgs-win32/wx/lib" /libpath:"../../../../depkgs-win32/pthreads" /libpath:"../../../../depkgs-win32/zlib" 
 LINK32_OBJS= \
-        "$(INTDIR)\compat.obj" \
-        "$(INTDIR)\print.obj" \
-        "$(INTDIR)\winabout.obj" \
-        "$(INTDIR)\winevents.obj" \
-        "$(INTDIR)\winmain.obj" \
-        "$(INTDIR)\winprop.obj" \
-        "$(INTDIR)\winservice.obj" \
-        "$(INTDIR)\winstat.obj" \
-        "$(INTDIR)\wintray.obj" \
-        "$(INTDIR)\winapi.obj" \
-        "$(INTDIR)\action.obj" \
-        "$(INTDIR)\apcnis.obj" \
-        "$(INTDIR)\apcupsd.obj" \
-        "$(INTDIR)\device.obj" \
-        "$(INTDIR)\options.obj" \
-        "$(INTDIR)\reports.obj" \
-        "$(INTDIR)\drivers.obj" \
-        "$(INTDIR)\apcconfig.obj" \
-        "$(INTDIR)\apcerror.obj" \
-        "$(INTDIR)\apcevents.obj" \
-        "$(INTDIR)\apcexec.obj" \
-        "$(INTDIR)\apcfile.obj" \
-        "$(INTDIR)\apclist.obj" \
-        "$(INTDIR)\apclock.obj" \
-        "$(INTDIR)\apclog.obj" \
-        "$(INTDIR)\apcsignal.obj" \
-        "$(INTDIR)\apcstatus.obj" \
-        "$(INTDIR)\asys.obj" \
-        "$(INTDIR)\smart.obj" \
-        "$(INTDIR)\smarteeprom.obj" \
-        "$(INTDIR)\smartoper.obj" \
-        "$(INTDIR)\smartsetup.obj" \
-        "$(INTDIR)\smartsetup2.obj" \
-        "$(INTDIR)\apcupsd_private.res"
+	"$(INTDIR)\compat.obj" \
+	"$(INTDIR)\print.obj" \
+	"$(INTDIR)\winabout.obj" \
+	"$(INTDIR)\winevents.obj" \
+	"$(INTDIR)\winmain.obj" \
+	"$(INTDIR)\winprop.obj" \
+	"$(INTDIR)\newwinservice.obj" \
+	"$(INTDIR)\winstat.obj" \
+	"$(INTDIR)\wintray.obj" \
+	"$(INTDIR)\winapi.obj" \
+	"$(INTDIR)\action.obj" \
+	"$(INTDIR)\apcnis.obj" \
+	"$(INTDIR)\apcupsd.obj" \
+	"$(INTDIR)\device.obj" \
+	"$(INTDIR)\options.obj" \
+	"$(INTDIR)\reports.obj" \
+	"$(INTDIR)\drivers.obj" \
+	"$(INTDIR)\apcconfig.obj" \
+	"$(INTDIR)\apcerror.obj" \
+	"$(INTDIR)\apcevents.obj" \
+	"$(INTDIR)\apcexec.obj" \
+	"$(INTDIR)\apcfile.obj" \
+	"$(INTDIR)\apclibnis.obj" \
+	"$(INTDIR)\apclock.obj" \
+	"$(INTDIR)\apclog.obj" \
+	"$(INTDIR)\apcsignal.obj" \
+	"$(INTDIR)\apcstatus.obj" \
+	"$(INTDIR)\newups.obj" \
+	"$(INTDIR)\asys.obj" \
+	"$(INTDIR)\testdriver.obj" \
+        "$(INTDIR)\winres.res"
 
 "$(OUTDIR)\apcupsd.exe" : "$(OUTDIR)" $(DEF_FILE) $(LINK32_OBJS)
     $(LINK32) @<<
@@ -345,10 +327,10 @@ LINK32_OBJS= \
 !ENDIF 
 !ENDIF 
 
-SOURCE=..\..\apcupsd\apcupsd_private.rc
+SOURCE=..\winres.rc
 
-"$(INTDIR)\apcupsd_private.res" : $(SOURCE) "$(INTDIR)"
-        $(RSC) /l 0x409 /fo"$(INTDIR)\apcupsd_private.res" /d "NDEBUG" $(SOURCE)
+"$(INTDIR)\winres.res" : $(SOURCE) "$(INTDIR)"
+        $(RSC) /l 0x409 /fo"$(INTDIR)\winres.res" /d "NDEBUG" $(SOURCE)
 
 FILENAME=compat
 SOURCE=..\compat\compat.cpp
@@ -464,8 +446,8 @@ SOURCE=..\winprop.cpp
 
 !ENDIF 
 
-FILENAME=winservice
-SOURCE=..\winservice.cpp
+FILENAME=newwinservice
+SOURCE=..\newwinservice.cpp
 
 !IF  "$(CFG)" == "apcupsd - Win32 Release"
 
@@ -768,8 +750,8 @@ SOURCE=..\lib\apcfile.cpp
 
 !ENDIF 
 
-FILENAME=apclist
-SOURCE=..\lib\apclist.cpp
+FILENAME=apclibnis
+SOURCE=..\lib\apclibnis.cpp
 
 !IF  "$(CFG)" == "apcupsd - Win32 Release"
 
@@ -863,6 +845,25 @@ SOURCE=..\lib\apcstatus.cpp
 
 !ENDIF 
 
+FILENAME=newups
+SOURCE=..\lib\newups.cpp
+
+!IF  "$(CFG)" == "apcupsd - Win32 Release"
+
+
+"$(INTDIR)\$(FILENAME).obj" : $(SOURCE) "$(INTDIR)"
+        $(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "apcupsd - Win32 Debug"
+
+
+"$(INTDIR)\$(FILENAME).obj"     "$(INTDIR)\$(FILENAME).sbr" : $(SOURCE) "$(INTDIR)"
+        $(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
+
 FILENAME=asys
 SOURCE=..\lib\asys.cpp
 
@@ -882,8 +883,8 @@ SOURCE=..\lib\asys.cpp
 
 !ENDIF 
 
-FILENAME=smart
-SOURCE=..\lib\smart.cpp
+FILENAME=testdriver
+SOURCE=..\lib\testdriver.cpp
 
 !IF  "$(CFG)" == "apcupsd - Win32 Release"
 
@@ -901,78 +902,3 @@ SOURCE=..\lib\smart.cpp
 
 !ENDIF 
 
-FILENAME=smarteeprom
-SOURCE=..\lib\smarteeprom.cpp
-
-!IF  "$(CFG)" == "apcupsd - Win32 Release"
-
-
-"$(INTDIR)\$(FILENAME).obj" : $(SOURCE) "$(INTDIR)"
-        $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "apcupsd - Win32 Debug"
-
-
-"$(INTDIR)\$(FILENAME).obj"     "$(INTDIR)\$(FILENAME).sbr" : $(SOURCE) "$(INTDIR)"
-        $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
-
-FILENAME=smartoper
-SOURCE=..\lib\smartoper.cpp
-
-!IF  "$(CFG)" == "apcupsd - Win32 Release"
-
-
-"$(INTDIR)\$(FILENAME).obj" : $(SOURCE) "$(INTDIR)"
-        $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "apcupsd - Win32 Debug"
-
-
-"$(INTDIR)\$(FILENAME).obj"     "$(INTDIR)\$(FILENAME).sbr" : $(SOURCE) "$(INTDIR)"
-        $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
-
-FILENAME=smartsetup
-SOURCE=..\lib\smartsetup.cpp
-
-!IF  "$(CFG)" == "apcupsd - Win32 Release"
-
-
-"$(INTDIR)\$(FILENAME).obj" : $(SOURCE) "$(INTDIR)"
-        $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "apcupsd - Win32 Debug"
-
-
-"$(INTDIR)\$(FILENAME).obj"     "$(INTDIR)\$(FILENAME).sbr" : $(SOURCE) "$(INTDIR)"
-        $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 
-
-FILENAME=smartsetup2
-SOURCE=..\lib\smartsetup2.cpp
-
-!IF  "$(CFG)" == "apcupsd - Win32 Release"
-
-
-"$(INTDIR)\$(FILENAME).obj" : $(SOURCE) "$(INTDIR)"
-        $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ELSEIF  "$(CFG)" == "apcupsd - Win32 Debug"
-
-
-"$(INTDIR)\$(FILENAME).obj"     "$(INTDIR)\$(FILENAME).sbr" : $(SOURCE) "$(INTDIR)"
-        $(CPP) $(CPP_PROJ) $(SOURCE)
-
-
-!ENDIF 

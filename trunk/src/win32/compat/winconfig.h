@@ -10,6 +10,7 @@
 #ifndef __WINCONFIG_H
 #define __WINCONFIG_H
 
+#define PIDDIR "/apcupsd/etc/apcupsd"
 #define SYSCONFDIR "/apcupsd/etc/apcupsd"
 #define NOLOGDIR "/apcupsd/etc"
 

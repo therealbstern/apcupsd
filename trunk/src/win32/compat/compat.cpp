@@ -19,7 +19,7 @@
 //
 // Author          : Christopher S. Hull
 // Created On      : Sat Jan 31 15:55:00 2004
-// $Id: compat.cpp,v 1.4 2006-03-09 13:57:32 kerns Exp $
+// $Id: compat.cpp,v 1.5 2006-03-12 07:54:47 kerns Exp $
 
 //
 // It is better not to make too many unnecessary changes
@@ -494,11 +494,6 @@ int
 lstat(const char *file, struct stat *sb)
 {
    return stat(file, sb);
-}
-
-int fstat(int fd, struct stat *statp)
-{
-   return _fstat(fd, statp);
 }
 
 void
