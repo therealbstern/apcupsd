@@ -20,14 +20,11 @@
 ..\lib\apcevents
 ..\lib\apcexec
 ..\lib\apcfile
-..\lib\apclist
+..\lib\apclibnis
 ..\lib\apclock
 ..\lib\apclog
 ..\lib\apcsignal
 ..\lib\apcstatus
+..\lib\newups
 ..\lib\asys
-..\lib\smart
-..\lib\smarteeprom
-..\lib\smartoper
-..\lib\smartsetup
-..\lib\smartsetup2
+..\lib\testdriver
