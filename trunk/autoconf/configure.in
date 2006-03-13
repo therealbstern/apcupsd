@@ -812,20 +812,27 @@ AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
 	   USB_TYPE="bsd"
 	   AC_MSG_RESULT([Using BSD USB driver.])
 	else
-	   AC_PATH_PROG(usbcfg, libusb-config)
-	   if test x$usbcfg = x ; then
-	      AC_MSG_ERROR(Cannot find libusb-config)
-	   fi
+	   if test "$CFG_CYGWIN" = "yes"; then
+	      dnl Hard code paths on Win32 since LibUSB-Win32 sadly
+	      dnl does not provide libusb-config.
+              LIBUSB=-L/cygdrive/C/Program\\\ Files/LibUSB-Win32/lib/gcc\ -lusb
+              LIBUSBH=/cygdrive/C/Program\ Files/LibUSB-Win32/include/usb.h
+           else
+  	      AC_PATH_PROG(usbcfg, libusb-config)
+	      if test x$usbcfg = x ; then
+	         AC_MSG_ERROR(Cannot find libusb-config)
+	      fi
 
-           LIBUSB=`$usbcfg --libs`
-           LIBUSBH=`$usbcfg --prefix`/include/usb.h
-	   AC_SUBST(LIBUSB)
-	   AC_SUBST(LIBUSBH)
+              LIBUSB=`$usbcfg --libs`
+              LIBUSBH=`$usbcfg --prefix`/include/usb.h
+           fi
+           
+           AC_SUBST(LIBUSBH)
 
-	   LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
-	   LIBUSBHID=libusbhid
-	   LIBUSBHIDOBJS="\$(topdir)/src/libusbhid/*.o"
-	   AC_SUBST(LIBUSBHID)
+           LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
+           LIBUSBHID=libusbhid
+           LIBUSBHIDOBJS="\$(topdir)/src/libusbhid/*.o"
+           AC_SUBST(LIBUSBHID)
 	   AC_SUBST(LIBUSBHIDINC)
 	   AC_SUBST(LIBUSBHIDOBJS)
 
