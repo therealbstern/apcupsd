@@ -7,7 +7,7 @@ bindir=$(prefix)/bin
 libdir=$(prefix)/lib
 libexecdir=$(prefix)/libexec
 datadir=$(prefix)/share
-
+sysconfdir=/etc
 
 # Include the default make targets: to be put before the all-targets: rule.
 @TARGETS@
@@ -19,8 +19,8 @@ allexe = @GAPCMON@ @GPANEL@
 CFLAGS=-O2
 
 gapcmon_OBJS = gapcmon.o gp_apcmon_core.o
-gpanel_OBJS = gp_apcmon.o gp_apcmon_core.o
-pixmaps_DATA = charging.png onbatt.png online.png apcupsd.png
+gpanel_apcmon_OBJS = gpanel_apcmon.o gapcmon_gtkglgraph.o
+pixmaps_DATA = charging.png onbatt.png online.png apcupsd.png unplugged.png
 
 
 all-targets: $(allexe)
@@ -28,14 +28,17 @@ all-targets: $(allexe)
 gapcmon: $(gapcmon_OBJS)
 	$(LD) -o $@ $(gapcmon_OBJS) @GAPCMON_LIBS@ 
 
-gpanel_apcmon: $(gpanel_OBJS)
-	$(LD) -o $@ $(gpanel_OBJS) @GPANEL_LIBS@ 
+gpanel_apcmon: $(gpanel_apcmon_OBJS)
+	$(LD) -o $@ $(gpanel_apcmon_OBJS) @GPANEL_LIBS@ -lX11 -lXext -lGL -lGLU $(X_LIBS) $(X_EXTRA_LIBS)
 
 gapcmon.o: gapcmon.c 
 	$(CC) -c $(CFLAGS) @GAPCMON_CFLAGS@ $<
 
-gp_apcmon.o: gp_apcmon.c 
-	$(CC) -c $(CFLAGS) @GPANEL_CFLAGS@ $<
+gpanel_apcmon.o: gpanel_apcmon.c 
+	$(CC) -c $(CFLAGS) @GPANEL_CFLAGS@  $(X_CFLAGS) $<
+
+gapcmon_gtkglgraph.o: gapcmon_gtkglgraph.c  
+	$(CC) -c $(CFLAGS) @GPANEL_CFLAGS@  $(X_CFLAGS) $<
 
 gp_apcmon_core.o: gp_apcmon_core.c 
 	$(CC) -c $(CFLAGS) @GAPCMON_CFLAGS@ $<
@@ -51,7 +54,6 @@ install-binary: $(allexe)
 	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(libdir)/bonobo/servers	
 	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(datadir)/pixmaps
 	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(datadir)/gnome/apps/Applications	
-	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(datadir)/pixmaps	
 	$(MAKE) DESTDIR=$(DESTDIR) install-pixmaps
 	$(MAKE) DESTDIR=$(DESTDIR) install-@GAPCMON@
 	$(MAKE) DESTDIR=$(DESTDIR) install-@GPANEL@
@@ -62,24 +64,28 @@ install-gapcmon: gapcmon
 	
 install-gpanel_apcmon: gpanel_apcmon
 	$(INSTALL_PROGRAM) -m 755 gpanel_apcmon		$(DESTDIR)$(libexecdir)/gpanel_apcmon@EXEEXT@
-	@$(INSTALL_PROGRAM) -m 755 gpanel_apcmon.server	$(DESTDIR)$(libdir)/bonobo/servers/gpanel_apcmon.server
+	$(INSTALL_PROGRAM) -m 755 gpanel_apcmon.server	$(DESTDIR)$(libdir)/bonobo/servers/gpanel_apcmon.server
+	$(INSTALL_PROGRAM) -m 755 gpanel_apcmon.schemas	$(DESTDIR)$(sysconfdir)/gconf/schemas/gpanel_apcmon.schemas
 
 install-pixmaps: $(pixmaps_DATA)
 	$(INSTALL_PROGRAM) -m 744 apcupsd.png	$(DESTDIR)$(datadir)/pixmaps/apcupsd.png		
-	@$(INSTALL_PROGRAM) -m 744 online.png	$(DESTDIR)$(datadir)/pixmaps/online.png
-	@$(INSTALL_PROGRAM) -m 744 onbatt.png	$(DESTDIR)$(datadir)/pixmaps/onbatt.png
-	@$(INSTALL_PROGRAM) -m 744 charging.png	$(DESTDIR)$(datadir)/pixmaps/charging.png
+	$(INSTALL_PROGRAM) -m 744 online.png	$(DESTDIR)$(datadir)/pixmaps/online.png
+	$(INSTALL_PROGRAM) -m 744 onbatt.png	$(DESTDIR)$(datadir)/pixmaps/onbatt.png
+	$(INSTALL_PROGRAM) -m 744 charging.png	$(DESTDIR)$(datadir)/pixmaps/charging.png
+	$(INSTALL_PROGRAM) -m 744 unplugged.png	$(DESTDIR)$(datadir)/pixmaps/unplugged.png
 
 uninstall:
 	@$(ECHO) "Removing gapcmon ..."
-	@$(RMF) $(DESTDIR)$(datadir)/pixmaps/apcupsd.png
-	@$(RMF) $(DESTDIR)$(datadir)/pixmaps/online.png
-	@$(RMF) $(DESTDIR)$(datadir)/pixmaps/onbatt.png
-	@$(RMF) $(DESTDIR)$(datadir)/pixmaps/charging.png			
-	@$(RMF) $(DESTDIR)$(libdir)/bonobo/servers/gpanel_apcmon.server
-	@$(RMF) $(DESTDIR)${datadir}/gnome/apps/Applications/gapcmon.desktop	
-	@$(RMF) $(DESTDIR)$(libexecdir)/gpanel_apcmon@EXEEXT@
-	@$(RMF) $(DESTDIR)$(bindir)/gapcmon@EXEEXT@
+	$(RMF) $(DESTDIR)$(datadir)/pixmaps/apcupsd.png
+	$(RMF) $(DESTDIR)$(datadir)/pixmaps/unplugged.png
+	$(RMF) $(DESTDIR)$(datadir)/pixmaps/online.png
+	$(RMF) $(DESTDIR)$(datadir)/pixmaps/onbatt.png
+	$(RMF) $(DESTDIR)$(datadir)/pixmaps/charging.png			
+	$(RMF) $(DESTDIR)$(libdir)/bonobo/servers/gpanel_apcmon.server
+	$(RMF) $(DESTDIR)$(sysconfdir)/gconf/schemas/gpanel_apcmon.schemas
+	$(RMF) $(DESTDIR)${datadir}/gnome/apps/Applications/gapcmon.desktop	
+	$(RMF) $(DESTDIR)$(libexecdir)/gpanel_apcmon@EXEEXT@
+	$(RMF) $(DESTDIR)$(bindir)/gapcmon@EXEEXT@
 
 clean: targetclean
 
