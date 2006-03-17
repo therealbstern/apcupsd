@@ -1,39 +1,49 @@
 GAPCMON (a.k.a gapcmon, and gpanel_apcmon)
 
 	A Gtk2/GLib2 GUI application used to monitor UPS devices controlled
-by the APCUPSD package.  This program uses the NIS interface from apcupsd to
+by the APCUPSD package.  These programs use the NIS interface from apcupsd to
 collect event and status information for display to the end-user.  Because of
 this great interface, this program can be executed on any OS supported machine
 and use the network socket interface to connect back to apcupsd.  Of course
 apcupsd must be compiled with nis support (i.e. ./configure --enable-nis ).
 
 	Two programs are included for your use in the package; gapcmon is the 
-regular gtk+ application, and a gnome panel applet version called gapanel_apcmon.
+regular gtk+ application, and a gnome panel applet version called gpanel_apcmon.
 
 
 FEATURES: 
 
-  gpanel_apcmon & gapcmon
-	* icon reflects state os monitored ups system (online, onbattery, charging, not communicating)
-	* icon tooltip or titlebar text display a quick summary of the configured ups status.
-	* background thread for all network io to keep user interface very responsive.
+  gpanel_apcmon { only }
+    * Support up to 8 UPSs from each applet (enabled from Preferences dialog).
+
+  gpanel_apcmon and gapcmon { panel view or minimized view }
+	* icon reflects state of monitored ups system 
+		- where state is (online, onbattery, charging, not communicating)
+	* icon tooltip or titlebar text displays a quick summary of the ups status.
+	* background thread for all network io to keep user interface responsive.
 	{gpanel_apcmon only}
-	* right click pops panel menu with the About and Open(toggle) choices and remove-from-panel
+	* right click pops panel menu with the About, Preferences dialogs, and the
+	  remove-from-panel choices.
 	* left-click toggles the displays main information window	
 	
-  gapcmon { the main information window }
+  gpanel_apcmon and gapcmon { the main information window }
 	* notebook layout with four tabs:
-		- Overview
-			* bar chart view of key metric ( VAC, battery charge, battery voltage, ups load, time remaining )
+		- History
+			* Historical Line Graph tracking VAC, battery charge, batt voltage, 
+			  ups load, and time remaining.  Data collection for this chart is
+			  ten times the regular refresh time in seconds, and displays 40
+			  collection cycles on screen. 
 		- Information
-			* more detailed view of apcupsd current state
+			* more detailed view of apcupsd current state and ups current state
 		- Events
 			* current apcupsd events as reported by apcaccess
 		- Status
 			* current apcupsd status  as reported by apcaccess		
-		- Config 
-			* configuration page allows user to specify the hostname, port, and refresh interval in seconds
-			  of the server/workstation running apcupsd with NIS configured.
+		- Config {gapcmon only}
+			* configuration page allows user to specify the hostname, port, and 
+			  refresh interval in seconds of the server/workstation running 
+			  apcupsd with NIS configured.
+			* gpanel_apcmon provides this function through the Preferences dialog
 		- About {gapcmon only}
 			* Program version and information panel
 
@@ -46,19 +56,24 @@ REQUIREMENTS:
 
 	Gtk2/Glib-2.4 runtime support. (Created on Fedora Core 4)
 	APCUPSD installed and configured to NIS support.
-		{ apcupsd.sourceforge.net }
+		{ get at http://apcupsd.sourceforge.net  }
+		
+	X11 and openGL libraries: used for history line graph
+		{ comes with X }
 
 	* the following packages may need to be installed to build program and
 	  for runtime of binaries on some platforms.
 
-	gapcmon			{version 2.4 is minimum package level required}
+	gapcmon			{gtk version 2.4 is minimum package level required}
 		glib-devel  
 		gtk-devel
 		 
-	gpanel_apcmon	{version 2.4 is minimum package level required}
+	gpanel_apcmon	{gtk version 2.4 is minimum package level required}
 		glib-devel 
 		gtk-devel
 		gnome-panel-devel
+		gconf-editor-2.10.0-5
+		X11 Libraries		
 		
 
 DISTRIBUTION METHOD:
@@ -69,16 +84,19 @@ DISTRIBUTION METHOD:
 
 INSTALL INFO:
 	Configure Source with 
-		for gapcmon only : 
-			'# ./configure --prefix=/usr --disable-applet'
-    	for gapcmon and gpanel_apcmon : 
-    		'# ./configure --prefix=/usr --enable-applet'
+	for gapcmon only : 
+			'# ./configure --prefix=/usr --disable-gpanel'
+	for gpanel_apcmon only : 
+			'# ./configure --prefix=/usr --disable-gapcmon'
+   	for all : 
+    		'# ./configure --prefix=/usr'
     		
 	Then compile with 'make clean all', then 'sudo make install'
 	Binary RPM install with this command 'rpm -ivh gapcmon-{version}-{release}.i686.rpm'
 
-	Both method result in '/usr/bin/gapcmon' and/or '/usr/libexec/gpanel_apcmon' according to
-	your system defaults for prefix.  Note: gpanel_apcmon requires 'prefix=/usr'.
+	Both methods result in '/usr/bin/gapcmon', and '/usr/libexec/gpanel_apcmon' 
+	being installed according to your system defaults for prefix.  
+	Note: the configure step requires the parm 'prefix=/usr'.
 
 
 INSTRUCTIONS: 
@@ -88,10 +106,10 @@ INSTRUCTIONS:
 	1. right click gnome desktop panel
 	2. choose "Add to panel"
 	3. Find "gpanel_apcmon ..." press add.
-		- repeat for addition applets (i.e. if you have two ups, run two applets)
-	4. left click applet icon to bring up info window.
-		- select configure tab, enter hostname and port, choose refresh interval in seconds,
-		  press apply (for only this instance), or save ( to save in config file for later)
+	4. right click applet icon to bring up info window.
+		- select preferences menu choice,
+		- enter hostname and port, choose refresh interval in seconds,
+		- be sure to click or unclick enable to activate the selection.
 	           
   gapcmon -- Gtk Application
     
@@ -104,16 +122,7 @@ INSTRUCTIONS:
 	
 
 KNOWN BUGS:
-
-	* The same executable is actively reused for each instance of the panel applet some
-	  users have found it useful to run five or more instances.  If after a reboot you
-	  find more applets icons running than normal or expected - kill the one program process
-	  and re-add them to the panel.  
-	           
-	  example commands:
-	  	- '# ps -ef | grep gpanel_apcmon'      -- locate pid number
-	  	- '# kill pid'
-
+ None right now...
 
 MAILING LIST:
 
