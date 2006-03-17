@@ -424,7 +424,7 @@ dnl
 AC_EXEEXT			dnl Check for EXE extension.
 dnl AC_OBJEXT			dnl Check for OBJ extension.
 dnl AC_MINGW32			dnl Check for MingW32 compiler environment.
-dnl AC_PATH_XTRA			dnl Is X Window System interesting ?.
+AC_PATH_XTRA			dnl Is X Window System interesting ?.  **GAPCMON**
 AC_SYS_INTERPRETER		dnl Check for '#!' in shell scripts.
 dnl AC_SYS_LONG_FILE_NAMES		dnl Check for long file names.
 dnl AC_SYS_RESTARTABLE_SYSCALLS dnl Check interrupted syscalls will restart.
@@ -1000,7 +1000,7 @@ dnl Check for enable of gapcmon
 dnl
 GAPCMON_ENABLED=no
 AC_ARG_ENABLE(gapcmon, 
-	[AC_HELP_STRING([--enable-gapcmon], [build GTK/GUI front-end to apcupsd Program -default=no])],
+	[AC_HELP_STRING([--enable-gapcmon], [build GTK/GUI front-end to apcupsd Program default=no])],
 	[ if test "$enableval" = "yes" ; then
 		GAPCMON_ENABLED=yes
 	fi],
@@ -1036,10 +1036,10 @@ if test "$GAPCMON_ENABLED" = "yes" -o "$GPANEL_ENABLED" = "yes" ; then
 	fi
 
 	dnl
-	dnl gpanel_apcmon specifics
-	dnl
+	dnl gpanel_apcmon specifics   	** also requires AC_PATH_XTRA or X11 includes and libraries
+	dnl				** extras are handled in the Makefile.in
 	if test "$GPANEL_ENABLED" = "yes" ; then
-		PKG_CHECK_MODULES(GPANEL, gtk+-2.0 >= 2.4.0 glib-2.0 >= 2.4.0 gthread-2.0 gnome-vfs-module-2.0 libpanelapplet-2.0 libgnomeui-2.0 libbonoboui-2.0)
+		PKG_CHECK_MODULES(GPANEL, gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0 gnome-vfs-module-2.0 libpanelapplet-2.0 libgnomeui-2.0 libbonoboui-2.0)
 		GPANEL_CFLAGS="$GPANEL_CFLAGS -DVERSION=\\\"$VERSION\\\""
 		GPANEL=gpanel_apcmon
 	fi
