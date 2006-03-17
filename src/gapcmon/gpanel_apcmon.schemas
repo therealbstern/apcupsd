@@ -1,0 +1,254 @@
+<gconfschemafile>
+    <schemalist>
+      <schema> 
+      <key>/schemas/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_0/enabled</key>
+          <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_0/enabled</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_1/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_2/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_3/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_4/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_5/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_6/enabled</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_7/enabled</applyto>      
+
+          <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_0/enabled</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_1/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_2/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_3/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_4/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_5/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_6/enabled</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_7/enabled</applyto>      
+
+          <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_0/enabled</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_1/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_2/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_3/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_4/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_5/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_6/enabled</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_7/enabled</applyto>      
+
+          <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_0/enabled</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_1/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_2/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_3/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_4/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_5/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_6/enabled</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_7/enabled</applyto>      
+
+          <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_0/enabled</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_1/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_2/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_3/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_4/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_5/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_6/enabled</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_7/enabled</applyto>      
+
+          <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_0/enabled</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_1/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_2/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_3/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_4/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_5/enabled</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_6/enabled</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_7/enabled</applyto>      
+      <owner>gpanel_apcmon</owner>
+      <type>bool</type>
+      <default>FALSE</default>
+      <locale name="C">
+        <short>Flag showing that this monitor is active or enabled for instance 0</short>
+        <long>Monitor enabled flag indicating this configuration set is active or inactive</long>
+      </locale>
+    </schema>
+      <schema> 
+      <key>/schemas/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_0/host_name</key>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_0/host_name</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_1/host_name</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_2/host_name</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_3/host_name</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_4/host_name</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_5/host_name</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_6/host_name</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_7/host_name</applyto>      
+
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_0/host_name</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_1/host_name</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_2/host_name</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_3/host_name</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_4/host_name</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_5/host_name</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_6/host_name</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_7/host_name</applyto>      
+
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_0/host_name</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_1/host_name</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_2/host_name</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_3/host_name</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_4/host_name</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_5/host_name</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_6/host_name</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_7/host_name</applyto>      
+
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_0/host_name</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_1/host_name</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_2/host_name</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_3/host_name</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_4/host_name</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_5/host_name</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_6/host_name</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_7/host_name</applyto>      
+
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_0/host_name</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_1/host_name</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_2/host_name</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_3/host_name</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_4/host_name</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_5/host_name</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_6/host_name</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_7/host_name</applyto>      
+
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_0/host_name</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_1/host_name</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_2/host_name</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_3/host_name</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_4/host_name</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_5/host_name</applyto>      
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_6/host_name</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_7/host_name</applyto>      
+      <owner>gpanel_apcmon</owner>
+      <type>string</type>
+      <default>localhost</default>
+      <locale name="C">
+        <short>Domain name of machine running apcupsd for instance 0</short>
+        <long>Domain name of machine running apcupsd.sourceforge.net with the NIS interface enabled</long>
+      </locale>
+    </schema>
+      <schema>
+      <key>/schemas/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_0/port_number</key>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_0/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_1/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_2/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_3/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_4/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_5/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_6/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_7/port_number</applyto>
+
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_0/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_1/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_2/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_3/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_4/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_5/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_6/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_7/port_number</applyto>
+
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_0/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_1/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_2/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_3/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_4/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_5/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_6/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_7/port_number</applyto>
+
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_0/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_1/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_2/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_3/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_4/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_5/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_6/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_7/port_number</applyto>
+
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_0/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_1/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_2/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_3/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_4/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_5/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_6/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_7/port_number</applyto>
+
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_0/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_1/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_2/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_3/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_4/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_5/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_6/port_number</applyto>
+	      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_7/port_number</applyto>
+      <owner>gpanel_apcmon</owner>
+      <type>int</type>
+      <default>3551</default>
+      <locale name="C">
+        <short>Port number of the NIS interface for a running apcupsd program</short>
+      </locale>
+    </schema>      
+      <schema>
+      <key>/schemas/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_0/refresh_interval</key>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_0/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_1/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_2/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_3/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_4/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_5/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_6/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_0/monitor_7/refresh_interval</applyto>
+
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_0/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_1/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_2/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_3/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_4/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_5/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_6/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_1/monitor_7/refresh_interval</applyto>
+
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_0/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_1/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_2/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_3/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_4/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_5/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_6/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_2/monitor_7/refresh_interval</applyto>
+
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_0/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_1/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_2/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_3/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_4/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_5/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_6/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_3/monitor_7/refresh_interval</applyto>
+
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_0/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_1/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_2/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_3/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_4/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_5/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_6/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_4/monitor_7/refresh_interval</applyto>
+
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_0/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_1/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_2/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_3/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_4/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_5/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_6/refresh_interval</applyto>
+      <applyto>/apps/panel/applets/gpanel_apcmon/prefs/instance_5/monitor_7/refresh_interval</applyto>
+      <owner>gpanel_apcmon</owner>
+      <type>float</type>
+      <default>6.0</default>
+      <locale name="C">
+        <short>The amount of time to wait in seconds for doing a network refresh of all NIS values</short>
+      </locale>
+    </schema>      
+  </schemalist>  
+</gconfschemafile>
