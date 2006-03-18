@@ -88,6 +88,8 @@ INTLLIBS = @INTLLIBS@
 WINAPC = $(@WIN32@)
 # Hack or die: seems that cygwin doesnn't like -lgdi32 and -luser32 in deps.
 WINLIBS = @WINLIBS@
+X_LIBS = @X_LIBS@
+X_EXTRA_LIBS = @X_EXTRA_LIBS@
 
 
 # Made INCFLAGS relative to the topdir and hardcoded into the Makefiles
