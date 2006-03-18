@@ -1649,6 +1649,8 @@ static gboolean gapc_util_line_chart_create (PGAPC_HISTORY pg, GtkWidget * box)
   glg = pg->glg = GTK_GLGRAPH (gtk_glgraph_new ());
   gtk_glgraph_axis_set_mode (glg, GTKGLG_AXIS_MODE_FILL);
   gtk_container_add (GTK_CONTAINER (box), GTK_WIDGET (glg));
+  
+  gtk_widget_show(GTK_WIDGET(glg));
  
   draw = gtk_glgraph_get_drawn (glg);
   draw |= GTKGLG_D_TITLE;
@@ -2587,7 +2589,7 @@ static GtkTreeView *gapc_preferences_dialog_view (PGAPC_CONFIG pcfg,
   treeview =
           GTK_TREE_VIEW (gtk_tree_view_new_with_model (GTK_TREE_MODEL (model)));
   gtk_tree_view_set_rules_hint (GTK_TREE_VIEW (treeview), TRUE);
-  gtk_tree_view_set_search_column (GTK_TREE_VIEW (treeview), COLUMN_HOST);
+  gtk_tree_view_set_enable_search (GTK_TREE_VIEW (treeview), FALSE);
   gtk_container_add (GTK_CONTAINER (sw), GTK_WIDGET (treeview));
 
   /*
