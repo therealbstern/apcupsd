@@ -2570,7 +2570,7 @@ static GtkTreeView *gapc_preferences_dialog_view (PGAPC_CONFIG pcfg,
                                        GTK_SHADOW_ETCHED_IN);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (sw),
                                   GTK_POLICY_AUTOMATIC, GTK_POLICY_AUTOMATIC);
-  gtk_widget_set_size_request (GTK_WIDGET (sw), 440, 180);
+  gtk_widget_set_size_request (GTK_WIDGET (sw), 380, 187);
   gtk_box_pack_start (GTK_BOX (vbox), sw, TRUE, TRUE, 0);
 
   /*
