@@ -128,6 +128,7 @@ extern gboolean gapc_load_icons (PGAPC_CONFIG pcfg)
     "/usr/share/pixmaps/onbatt.png",
     "/usr/share/pixmaps/charging.png",
     "/usr/share/pixmaps/apcupsd.png",
+    "/usr/share/pixmaps/unplugged.png",    
     NULL
   };
 
@@ -139,7 +140,7 @@ extern gboolean gapc_load_icons (PGAPC_CONFIG pcfg)
 	  	gchar *pch = NULL;
 
 	  	pch = g_strdup_printf ("Get Icon=%s Failed", pch_image_names[i_x]);
-	  	gapc_log_app_error ("gapc_applet_populate", pch, gerror->message);
+	  	gapc_log_app_error ("gapc_load_icons", pch, gerror->message);
 	  	g_error_free (gerror);
 	  	g_free (pch);
 	  	gerror = NULL;
@@ -977,12 +978,22 @@ static gboolean gapc_update_tooltip_msg (PGAPC_CONFIG pcfg)
   pch1 = g_hash_table_lookup (pcfg->pht_Status, "UPSNAME");
   pch2 = g_hash_table_lookup (pcfg->pht_Status, "HOSTNAME");  
   if ( pch2 == NULL )
+  {
        pch2 = pcfg->pch_host;
+  }
   pch3 = g_hash_table_lookup (pcfg->pht_Status, "STATUS");
+  if ( pch3 == NULL )
+  {
+       pch3 = "COMMLOST";
+  } 
   pch4 = g_hash_table_lookup (pcfg->pht_Status, "NUMXFERS");
   pch5 = g_hash_table_lookup (pcfg->pht_Status, "XONBATT");  
   pch6 = g_hash_table_lookup (pcfg->pht_Status, "LINEV");
   pch7 = g_hash_table_lookup (pcfg->pht_Status, "BCHARGE");
+  if ( pch7 == NULL )
+  {
+       pch7 = "0.0";
+  } 
   pch8 = g_hash_table_lookup (pcfg->pht_Status, "LOADPCT");    
   pch9 = g_hash_table_lookup (pcfg->pht_Status, "TIMELEFT");
   pcha = g_hash_table_lookup (pcfg->pht_Status, "VERSION");
@@ -991,27 +1002,41 @@ static gboolean gapc_update_tooltip_msg (PGAPC_CONFIG pcfg)
   pchd = g_hash_table_lookup (pcfg->pht_Status, "UPSMODE");  
   pche = g_hash_table_lookup (pcfg->pht_Status, "CABLE");    
 
-  if ( pcfg->b_data_available )
+  if (pcfg->b_data_available)
   {
-	  d_value = g_strtod (pch7, NULL);
-	  pchx = NULL;
-	  if ((d_value < 99.0) && (g_strrstr (pch3, "LINE") != NULL))
-	    {
-	      pchx = " and charging...";
-	      pcfg->i_icon_index = GAPC_ICON_CHARGING;
-	    }
-	  if ( g_strrstr (pch3, "BATT") != NULL )
-	    {
-	      pchx = " on battery..." ;
-	      pcfg->i_icon_index = GAPC_ICON_ONBATT;
-	    }
+    d_value = g_strtod (pch7, NULL);
+    pchx = NULL;
+    if (g_strrstr (pch3, "COMMLOST") != NULL)
+    {
+        pchx = " cable un-plugged...";
+        pcfg->i_icon_index = GAPC_ICON_UNPLUGGED;
+        b_flag = TRUE;            
+    } else if ((d_value < 99.0) && (g_strrstr (pch3, "LINE") != NULL))
+           {
+                pchx = " and charging...";
+                pcfg->i_icon_index = GAPC_ICON_CHARGING;
+           } else if (g_strrstr (pch3, "BATT") != NULL)
+                  {
+                      pchx = " on battery...";
+                      pcfg->i_icon_index = GAPC_ICON_ONBATT;
+                  }
   }
   else
   {
-      pchx = "NOT communicating..." ;   	
-      pch3 = " ";
-      pcfg->i_icon_index = GAPC_ICON_DEFAULT;
-      b_flag = TRUE;
+    b_flag = TRUE;      
+    if (g_strrstr (pch3, "COMMLOST") != NULL)
+    {
+      pchx = " cable un-plugged...";
+      pcfg->i_icon_index = GAPC_ICON_UNPLUGGED;
+        b_flag = TRUE;                  
+    }
+    else
+    {
+        pchx = "NIS network error...";
+        pch3 = " ";
+        pcfg->i_icon_index = GAPC_ICON_DEFAULT;
+        b_flag = TRUE;                    
+    }
   }
     
   if ( b_flag )

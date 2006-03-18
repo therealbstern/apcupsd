@@ -1,4 +1,4 @@
-/* gp_apcmon.h     serial-0054-7 ***********************************************
+/* gapcmon_common.h     serial-0054-7 ******************************************
 
   Gnome applet for monitoring the apcupsd.sourceforge.net package.
   
@@ -60,6 +60,7 @@ enum
   GAPC_ICON_ONBATT,
   GAPC_ICON_CHARGING,
   GAPC_ICON_DEFAULT,
+  GAPC_ICON_UNPLUGGED,
   GAPC_N_ICONS
 } GAPC_IconType;
 
