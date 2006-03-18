@@ -315,7 +315,7 @@ static PGAPC_COLUMN gapc_preferences_column_data_init (PGAPC_CONFIG pcfg,
 static gboolean gapc_preferences_save (PGAPC_INSTANCE ppi);
 static GtkTreeModel *gapc_preferences_model_data_init (PGAPC_CONFIG pcfg);
 static gboolean gapc_preferences_model_data_load (PGAPC_INSTANCE ppi);
-static gint     gapc_preferences_model_enable_one (PGAPC_CONFIG pcfg);
+static void     gapc_preferences_model_enable_one (PGAPC_CONFIG pcfg, int which);
 
 static gboolean cb_monitor_dedicated_one_time_refresh (PGAPC_INSTANCE ppi);
 static gint     gapc_monitor_interface_count_enabled (GtkTreeModel * model);
@@ -2101,7 +2101,7 @@ static void cb_monitor_preferences_changed (GConfClient * client, guint cnxn_id,
         i_count = gapc_monitor_interface_count_enabled (ppi->prefs_model);
         if (i_count == 0)
         {
-            gapc_preferences_model_enable_one ( (PGAPC_CONFIG)ppi->gp );
+            gapc_preferences_model_enable_one ( (PGAPC_CONFIG)ppi->gp, i_monitor );
         }
         break;
       case GCONF_VALUE_FLOAT:
@@ -3245,29 +3245,33 @@ static GtkTreeModel *gapc_preferences_model_data_init (PGAPC_CONFIG pcfg)
 }
 
 /* 
- * Force enablement of the first monitor in the preference list
+ * Force enablement of the given monitor in the preference list
 */
-static gint gapc_preferences_model_enable_one ( PGAPC_CONFIG pcfg )
+static void gapc_preferences_model_enable_one ( PGAPC_CONFIG pcfg, int which )
 {
-  gboolean b_enabled = TRUE, brc = TRUE;
-  gint     i_monitor = 0;
+  gboolean valid;
+  gint     i_monitor;
   GtkTreeIter iter;
-  
-  brc= gtk_tree_model_get_iter_first (GTK_TREE_MODEL(pcfg->prefs_model), &iter);
-  gtk_tree_model_get (pcfg->prefs_model, &iter, COLUMN_ENABLED, &b_enabled,
-                      COLUMN_MONITOR, &i_monitor, -1);
 
-  i_monitor -= 1;               /* move value to zero base */
-  b_enabled = TRUE;  
+  valid = gtk_tree_model_get_iter_first (GTK_TREE_MODEL(pcfg->prefs_model), &iter);
+  while (valid)
+  {
+    gtk_tree_model_get (pcfg->prefs_model, &iter, COLUMN_MONITOR, &i_monitor, -1);
+    i_monitor -= 1;               /* move value to zero base */
 
-  /* set new value */
-  gtk_list_store_set (GTK_LIST_STORE (pcfg->prefs_model), &iter, COLUMN_ENABLED,
-                      b_enabled, -1);
+    if (i_monitor == which)
+    {
+      /* set new value */
+      gtk_list_store_set (GTK_LIST_STORE (pcfg->prefs_model), &iter, COLUMN_ENABLED,
+                          TRUE, -1);
 
-  pcfg->ppi[i_monitor].cb_enabled = TRUE;
-  gapc_preferences_save ((PGAPC_INSTANCE) & (pcfg->ppi[i_monitor]));
+      pcfg->ppi[i_monitor].cb_enabled = TRUE;
+      gapc_preferences_save ((PGAPC_INSTANCE) & (pcfg->ppi[i_monitor]));
+      break;
+    }
 
-  return i_monitor;                                           
+    valid = gtk_tree_model_iter_next(GTK_TREE_MODEL(pcfg->prefs_model), &iter);
+  }
 }
 
 /*
@@ -3294,7 +3298,7 @@ static gboolean gapc_preferences_init (PGAPC_CONFIG pcfg)
   pcfg->cb_monitors = gapc_monitor_interface_count_enabled (pcfg->prefs_model);
   if (pcfg->cb_monitors == 0)
   {
-    gapc_preferences_model_enable_one ( pcfg );
+    gapc_preferences_model_enable_one ( pcfg, 0 );
     pcfg->cb_monitors = 1;
     b_rc = TRUE;
   }
