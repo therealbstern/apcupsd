@@ -984,7 +984,7 @@ static gboolean gapc_update_tooltip_msg (PGAPC_CONFIG pcfg)
   pch3 = g_hash_table_lookup (pcfg->pht_Status, "STATUS");
   if ( pch3 == NULL )
   {
-       pch3 = "COMMLOST";
+       pch3 = "NISERROR";
   } 
   pch4 = g_hash_table_lookup (pcfg->pht_Status, "NUMXFERS");
   pch5 = g_hash_table_lookup (pcfg->pht_Status, "XONBATT");  
@@ -992,7 +992,7 @@ static gboolean gapc_update_tooltip_msg (PGAPC_CONFIG pcfg)
   pch7 = g_hash_table_lookup (pcfg->pht_Status, "BCHARGE");
   if ( pch7 == NULL )
   {
-       pch7 = "0.0";
+       pch7 = "n/a";
   } 
   pch8 = g_hash_table_lookup (pcfg->pht_Status, "LOADPCT");    
   pch9 = g_hash_table_lookup (pcfg->pht_Status, "TIMELEFT");
@@ -1063,20 +1063,22 @@ static gboolean gapc_update_tooltip_msg (PGAPC_CONFIG pcfg)
   }
             
   pmsg = g_strdup_printf (  "APCUPSD Monitor(%d)\n"
-  			   "UPS %s at %s is %s%s\n"
-    		   "----------------------------------------------------------\n"
-  			   "%s Outage[s], Last one on %s\n"
+  			   "UPS %s at %s\n"
+  			   "Status: %s%s\n"
+    		 "----------------------------------------------------------\n"
+  			   "%s Outage[s]\n"
+  			   "Last one on %s\n"
   			   "%s Utility VAC\n"			   
   			   "%s Battery Charge\n"  			   
   			   "%s UPS Load\n"  			     			   
   			   "%s Remaining\n"  			     			 
-    			   "----------------------------------------------------------\n"  			     
-  			   "APCUPSD: %s\n"  			     			   
-  			   "APCUPSD Started %s\n"  			     		
-    			   "----------------------------------------------------------\n"  			   	   
-  			   "%s UPS Model\n"  			     			   
-  			   "%s Mode \n"  			     			   
-  			   "%s Cable",
+    		 "----------------------------------------------------------\n"  			     
+  			   "Build: %s\n"  			     			   
+  			   "Start: %s\n"  			     		
+    		 "----------------------------------------------------------\n"  			   	   
+  			   "Model: %s\n"  			     			   
+  			   " Mode: %s\n"  			     			   
+  			   "Cable: %s ",
   			   pcfg->cb_id,
 			  (pch1 != NULL) ? pch1 : "unknown",
 			  (pch2 != NULL) ? pch2 : "unknown",
@@ -1506,6 +1508,7 @@ extern gint gapc_create_notebook_page_overview (GtkWidget * notebook, PGAPC_CONF
   	gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (pbar), 0.57);
   g_hash_table_insert (pcfg->pht_Widgets, g_strdup ("UPSLoad"), pbar);
 
+  
   label = gtk_label_new ("Time Remaining:");
   	gtk_size_group_add_widget (gSize, label);
   pbar = gtk_progress_bar_new ();
@@ -1514,6 +1517,7 @@ extern gint gapc_create_notebook_page_overview (GtkWidget * notebook, PGAPC_CONF
   	gtk_misc_set_alignment ((GtkMisc *) label, 1.0, 1.0);
   	gtk_progress_bar_set_fraction (GTK_PROGRESS_BAR (pbar), 1.0);
   g_hash_table_insert (pcfg->pht_Widgets, g_strdup ("TimeRemaining"), pbar);
+
 
   return i_page;
 }
