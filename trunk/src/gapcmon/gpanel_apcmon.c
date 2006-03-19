@@ -315,7 +315,7 @@ static PGAPC_COLUMN gapc_preferences_column_data_init (PGAPC_CONFIG pcfg,
 static gboolean gapc_preferences_save (PGAPC_INSTANCE ppi);
 static GtkTreeModel *gapc_preferences_model_data_init (PGAPC_CONFIG pcfg);
 static gboolean gapc_preferences_model_data_load (PGAPC_INSTANCE ppi);
-static void     gapc_preferences_model_enable_one (PGAPC_CONFIG pcfg, int which);
+static void     gapc_preferences_model_enable_one (PGAPC_CONFIG pcfg, gint which);
 
 static gboolean cb_monitor_dedicated_one_time_refresh (PGAPC_INSTANCE ppi);
 static gint     gapc_monitor_interface_count_enabled (GtkTreeModel * model);
@@ -655,12 +655,14 @@ static gboolean gapc_monitor_update_tooltip_msg (PGAPC_INSTANCE ppi)
     {
       pchx = " cable un-plugged...";
       ppi->i_icon_index = GAPC_ICON_UNPLUGGED;
+      b_flag = TRUE;                  
     }
     else
     {
         pchx = "NIS network error...";
         pch3 = " ";
         ppi->i_icon_index = GAPC_ICON_DEFAULT;
+        b_flag = TRUE;                    
     }
     for (i_series = 0; i_series < GAPC_HISTORY_CHART_SERIES; i_series++)
     {
@@ -1773,8 +1775,8 @@ static void cb_information_window_button_refresh (GtkButton * button,
     {
         gtk_statusbar_push (GTK_STATUSBAR (w), ppi->i_info_context,
                         "Refresh Failed(retry enabled): Thread is Busy...");
-        g_timeout_add (200, (GSourceFunc)cb_monitor_dedicated_one_time_refresh, ppi);
     }
+    g_timeout_add (1000, (GSourceFunc)cb_monitor_dedicated_one_time_refresh, ppi);    
   }
 
   return;
@@ -2305,7 +2307,7 @@ static gboolean cb_monitor_automatic_refresh (PGAPC_INSTANCE ppi)
         gtk_statusbar_pop (GTK_STATUSBAR (w), ppi->i_info_context);
         gtk_statusbar_push (GTK_STATUSBAR (w), ppi->i_info_context,
                             "Automatic refresh complete...");
-      }
+      }      
     }
     else
     {
@@ -2317,6 +2319,10 @@ static gboolean cb_monitor_automatic_refresh (PGAPC_INSTANCE ppi)
         gtk_statusbar_push (GTK_STATUSBAR (w), ppi->i_info_context,
                             "Automatic refresh failed! Thread is busy...");
       }
+	  gdk_flush ();
+	  gdk_threads_leave ();
+
+	  return TRUE;
     }
   }
   /*
@@ -2797,7 +2803,6 @@ static GtkWidget *gapc_information_window_create (PGAPC_INSTANCE ppi)
   GTK_WIDGET_SET_FLAGS (dbutton, GTK_CAN_DEFAULT);
   gtk_widget_grab_default (dbutton);
 
-  g_async_queue_push (pcfg->q_network, (gpointer) ppi);
   g_timeout_add (250, (GSourceFunc) cb_monitor_dedicated_one_time_refresh, ppi);
 
   return GTK_WIDGET (window);
@@ -3247,7 +3252,7 @@ static GtkTreeModel *gapc_preferences_model_data_init (PGAPC_CONFIG pcfg)
 /* 
  * Force enablement of the given monitor in the preference list
 */
-static void gapc_preferences_model_enable_one ( PGAPC_CONFIG pcfg, int which )
+static void gapc_preferences_model_enable_one ( PGAPC_CONFIG pcfg, gint which )
 {
   gboolean valid;
   gint     i_monitor;
