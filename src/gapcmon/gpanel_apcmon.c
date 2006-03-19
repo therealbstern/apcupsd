@@ -240,6 +240,7 @@ typedef struct _Monitor_Instance_Data
   GHashTable     *pht_Widgets;  /* hashtable holding wdiget ptrs  */
 
   guint           tid_automatic_refresh;
+  guint           i_netbusy_counter;
   guint           i_icon_index;
   gint            i_old_icon_index;
 
@@ -293,6 +294,9 @@ static gboolean gapc_applet_factory (PanelApplet * applet, const gchar * iid,
                                      gpointer data);
 static gboolean gapc_applet_create (PanelApplet * applet, PGAPC_CONFIG pcfg);
 static GtkWidget *gapc_applet_interface_create (PGAPC_CONFIG pcfg);
+static void     gapc_applet_interface_about_dlg (PGAPC_CONFIG pcfg );
+static void     cb_applet_interface_about_dialog_response (GtkDialog *dialog,  
+                                                       gint arg1,  gpointer gp);
 
 static gint     gapc_util_change_icons (PGAPC_INSTANCE ppi, gint size);
 static gboolean gapc_util_load_icons (PGAPC_CONFIG pcfg);
@@ -335,6 +339,7 @@ static void     cb_monitor_preferences_changed (GConfClient * client,
                                                 guint cnxn_id,
                                                 GConfEntry * entry,
                                                 PGAPC_CONFIG pcfg);
+static gboolean gapc_monitor_update_tooltip_msg (PGAPC_INSTANCE ppi);
 
 static void     cb_applet_destroy (GtkObject * object, PGAPC_CONFIG pcfg);
 static void     cb_applet_change_orientation (PanelApplet * applet, guint arg1,
@@ -403,7 +408,9 @@ static gint     gapc_net_transaction_service (PGAPC_INSTANCE ppi,
                                               gchar * cp_cmd, gchar ** pch);
 static gint     gapc_util_update_hashtable (PGAPC_INSTANCE ppi,
                                             gchar * pch_unparsed);
-static gboolean gapc_monitor_update_tooltip_msg (PGAPC_INSTANCE ppi);
+static gboolean gapc_util_hashtable_remove_default (gpointer key,
+                                             		gpointer value,
+                                             		gpointer user_data);
 static gdouble  gapc_util_point_filter_reset (PGAPC_SUMS sq);
 static gdouble  gapc_util_point_filter_set (PGAPC_SUMS sq, gdouble this_point);
 
@@ -412,7 +419,6 @@ static gdouble  gapc_util_point_filter_set (PGAPC_SUMS sq, gdouble this_point);
  * 
  * **************************************************************
 */
-
 static gboolean gapc_util_line_chart_create (PGAPC_HISTORY pg, GtkWidget * box);
 static gboolean gapc_util_line_chart_ds_init (PGAPC_HISTORY pg, gint i_series);
 static gboolean gapc_util_line_chart_toggle_legend (PGAPC_HISTORY pg);
@@ -423,9 +429,7 @@ static gboolean cb_util_line_chart_toggle_legend (GtkWidget * widget,
 
 static gint     gapc_information_history_page (PGAPC_INSTANCE ppi,
                                                GtkWidget * notebook);
-static void gapc_applet_interface_about_dlg (PGAPC_CONFIG pcfg );
-static void cb_applet_interface_about_dialog_response (GtkDialog *dialog,  
-                                                       gint arg1,  gpointer gp);
+
 /*
  * Manage about dialog destruction 
  */
@@ -599,7 +603,7 @@ static gboolean gapc_monitor_update_tooltip_msg (PGAPC_INSTANCE ppi)
   g_return_val_if_fail (ppi != NULL, TRUE);
 
   if (!g_mutex_trylock (ppi->gm_update))
-    return FALSE;               /* thread must be busy */
+    return TRUE;               /* thread must be busy */
 
   ppi->i_icon_index = GAPC_ICON_ONLINE;
 
@@ -612,7 +616,7 @@ static gboolean gapc_monitor_update_tooltip_msg (PGAPC_INSTANCE ppi)
   pch3 = g_hash_table_lookup (ppi->pht_Status, "STATUS");
   if ( pch3 == NULL )
   {
-       pch3 = "COMMLOST";
+       pch3 = "NISERROR";
   }
   pch4 = g_hash_table_lookup (ppi->pht_Status, "NUMXFERS");
   pch5 = g_hash_table_lookup (ppi->pht_Status, "XONBATT");
@@ -620,7 +624,7 @@ static gboolean gapc_monitor_update_tooltip_msg (PGAPC_INSTANCE ppi)
   pch7 = g_hash_table_lookup (ppi->pht_Status, "BCHARGE");
   if ( pch7 == NULL )
   {
-       pch7 = "0.0";
+       pch7 = "n/a";
   }
   pch8 = g_hash_table_lookup (ppi->pht_Status, "LOADPCT");
   pch9 = g_hash_table_lookup (ppi->pht_Status, "TIMELEFT");
@@ -680,15 +684,24 @@ static gboolean gapc_monitor_update_tooltip_msg (PGAPC_INSTANCE ppi)
                               (pchx != NULL) ? pchx : " ");
   }
 
-  pmsg = g_strdup_printf ("APCUPSD Monitor(%d:%d)\n" "UPS %s at %s\nis %s%s\n"
-                          "Refresh occurs every %3.1f seconds\n"
-                          "----------------------------------------------------------\n"
-                          "%s Outage[s], Last one on %s\n" "%s Utility VAC\n"
-                          "%s Battery Charge\n" "%s UPS Load\n" "%s Remaining\n"
-                          "----------------------------------------------------------\n"
-                          "Build: %s\n" "Started: %s\n"
-                          "----------------------------------------------------------\n"
-                          "%s UPS Model\n" "%s Mode \n" "%s Cable",
+  pmsg = g_strdup_printf ("APCUPSD Monitor(%d:%d)\n" 
+  						  "UPS %s at %s\n"
+  						  "Status: %s%s\n"
+                          "Refresh occurs every %3.2f seconds\n"
+                 "----------------------------------------------------------\n"
+                          "%s Outage[s]\n"
+                          "Last one on %s\n" 
+                          "%s Utility VAC\n"
+                          "%s Battery Charge\n" 
+                          "%s UPS Load\n" 
+                          "%s Remaining\n"
+                 "----------------------------------------------------------\n"
+                          "Build: %s\n" 
+                          "Started: %s\n"
+                 "----------------------------------------------------------\n"
+                          "Model: %s\n" 
+                          " Mode: %s\n" 
+                          "Cable: %s",
                           ppi->cb_instance_num, ppi->cb_monitor_num + 1,
                           (pch1 != NULL) ? pch1 : "unknown",
                           (pch2 != NULL) ? pch2 : "unknown",
@@ -1000,9 +1013,12 @@ static gint gapc_net_transaction_service (PGAPC_INSTANCE ppi, gchar * cp_cmd,
   }
 
   /* clear current data */
-  for (iflag = 0; iflag < GAPC_MAX_ARRAY - 1; iflag++)
+  for (iflag = 0; iflag < GAPC_MAX_ARRAY; iflag++)
   {
-    g_free (pch[iflag]);
+    if (pch[iflag] != NULL);
+    {
+	    g_free (pch[iflag]);
+    }
     pch[iflag] = NULL;
   }
 
@@ -1201,6 +1217,16 @@ static void gapc_util_text_view_append (GtkWidget * view, gchar * pch)
   buffer = gtk_text_view_get_buffer (GTK_TEXT_VIEW (view));
   gtk_text_buffer_get_end_iter (buffer, &iter);
   gtk_text_buffer_insert (buffer, &iter, pch, -1);
+}
+
+/*
+ * Default handler for g_hash_table_remove
+*/
+static gboolean gapc_util_hashtable_remove_default (gpointer key,
+                                             		gpointer value,
+                                             		gpointer user_data)
+{
+  return TRUE; /* causes this entry to be removed */
 }
 
 /*
@@ -1760,13 +1786,17 @@ static void cb_information_window_button_refresh (GtkButton * button,
   }
   else
   {
+  	PGAPC_CONFIG pcfg = (PGAPC_CONFIG)ppi->gp;
     GtkWidget      *w = g_hash_table_lookup (ppi->pht_Widgets, "StatusBar");
+
+    g_async_queue_push (pcfg->q_network, ppi);
 
     if ( w != NULL )
     {
         gtk_statusbar_push (GTK_STATUSBAR (w), ppi->i_info_context,
                         "Refresh Failed(retry enabled): Thread is Busy...");
     }
+
     g_timeout_add (GAPC_REFRESH_FACTOR_ONE_TIME,
                    (GSourceFunc)cb_monitor_dedicated_one_time_refresh, ppi);    
   }
@@ -2213,9 +2243,12 @@ static gboolean cb_monitor_dedicated_one_time_refresh (PGAPC_INSTANCE ppi)
       gtk_statusbar_push (GTK_STATUSBAR (w), ppi->i_info_context,
                           "Refresh Not Completed(retry enabled)... Network Busy!");
     }
-    gdk_flush ();
-    gdk_threads_leave ();
-    return TRUE;                /* try again */
+    if ( ppi->i_netbusy_counter++ % 10 )    
+    { /* Fall thru and quit after ten trys */
+      	gdk_flush ();
+	    gdk_threads_leave ();
+	    return TRUE;                /* try again */
+    }
   }
 
   if (w != NULL)
@@ -2272,7 +2305,7 @@ static gboolean cb_monitor_refresh_control (PGAPC_INSTANCE ppi)
 */
 static gboolean cb_monitor_automatic_refresh (PGAPC_INSTANCE ppi)
 {
-
+  
   g_return_val_if_fail (ppi != NULL, FALSE);
 
   if ((!ppi->b_run) || !(ppi->cb_enabled))
@@ -2311,10 +2344,12 @@ static gboolean cb_monitor_automatic_refresh (PGAPC_INSTANCE ppi)
         gtk_statusbar_push (GTK_STATUSBAR (w), ppi->i_info_context,
                             "Automatic refresh failed! Thread is busy...");
       }
-	  gdk_flush ();
-	  gdk_threads_leave ();
-
-	  return TRUE;
+      if ( ppi->i_netbusy_counter++ % 10 )
+      { /* fall thru every tenth time to queue a message */
+		  gdk_flush ();
+		  gdk_threads_leave ();
+		  return TRUE;
+      }
     }
   }
   /*
@@ -2638,13 +2673,7 @@ static GtkTreeView *gapc_preferences_dialog_view (PGAPC_CONFIG pcfg,
   gtk_tree_view_column_set_sort_column_id (column, COLUMN_MONITOR);
   gtk_tree_view_append_column (GTK_TREE_VIEW (treeview), column);
 
-  column = gtk_tree_view_column_new_with_attributes ("Host Name or IP Address",
-                                                     renderer_text, "text",
-                                                     COLUMN_HOST, NULL);
-  gtk_tree_view_column_set_sort_column_id (column, COLUMN_HOST);
-  gtk_tree_view_append_column (GTK_TREE_VIEW (treeview), column);
-
-  column = gtk_tree_view_column_new_with_attributes ("Port Number",
+  column = gtk_tree_view_column_new_with_attributes ("Port ",
                                                      renderer_int, "text",
                                                      COLUMN_PORT, NULL);
   gtk_tree_view_column_set_sort_column_id (column, COLUMN_PORT);
@@ -2653,13 +2682,19 @@ static GtkTreeView *gapc_preferences_dialog_view (PGAPC_CONFIG pcfg,
   column = gtk_tree_view_column_new_with_attributes ("Refresh", renderer_float,
                                                      "text", COLUMN_REFRESH,
                                                      NULL);
-  g_object_set_data (G_OBJECT (column), "float_format", "%3.3f");
+  g_object_set_data (G_OBJECT (column), "float_format", "%3.2f");
   gtk_tree_view_column_set_cell_data_func (column, renderer_float,
                                            cb_preferences_handle_float_format,
                                            GUINT_TO_POINTER (COLUMN_REFRESH),
                                            NULL);
 
   gtk_tree_view_column_set_sort_column_id (column, COLUMN_REFRESH);
+  gtk_tree_view_append_column (GTK_TREE_VIEW (treeview), column);
+
+  column = gtk_tree_view_column_new_with_attributes ("Host Name or IP Address",
+                                                     renderer_text, "text",
+                                                     COLUMN_HOST, NULL);
+  gtk_tree_view_column_set_sort_column_id (column, COLUMN_HOST);
   gtk_tree_view_append_column (GTK_TREE_VIEW (treeview), column);
 
   gtk_widget_show_all (sw);
@@ -3459,11 +3494,14 @@ static gboolean gapc_monitor_interface_remove (PGAPC_INSTANCE ppi)
 {
   gboolean        b_rc = TRUE;
   PGAPC_CONFIG    pcfg = (PGAPC_CONFIG) ppi->gp;
+  gint            v_index = 0;
 
   g_return_val_if_fail (ppi != NULL, FALSE);
 
   if (ppi->cb_enabled == TRUE)
     return FALSE;
+  
+  ppi->b_run = FALSE;
   
   pcfg->cb_monitors--;
 
@@ -3490,13 +3528,35 @@ static gboolean gapc_monitor_interface_remove (PGAPC_INSTANCE ppi)
   /* end History Page
    */
 
-  ppi->b_run = FALSE;
+  /*
+   * Stop monitor timer */  
   b_rc = g_source_remove (ppi->tid_automatic_refresh); /*stop timers */
 
   if (ppi->window != NULL)
   {
     gtk_widget_destroy (ppi->window);
     ppi->window = NULL;
+
+	for (v_index = 0; v_index < GAPC_MAX_ARRAY; v_index++)
+	{
+	   if (ppi->pach_events[v_index] != NULL);
+	   {
+	       g_free (ppi->pach_events[v_index]);
+	   }
+	   ppi->pach_events[v_index] = NULL;
+	   if (ppi->pach_status[v_index] != NULL);
+	   {
+	       g_free (ppi->pach_status[v_index]);
+       }
+	   ppi->pach_status[v_index] = NULL;
+	}    
+	
+	/*
+	 * empty the has tables */
+	g_hash_table_foreach_remove (ppi->pht_Status, 
+								 gapc_util_hashtable_remove_default, NULL);
+	g_hash_table_foreach_remove (ppi->pht_Widgets, 
+								 gapc_util_hashtable_remove_default, NULL);
   }
 
   gtk_widget_destroy (ppi->evbox); /* kill widgets including tooltip */
