@@ -107,6 +107,7 @@
 #define GAPC_REFRESH_INCREMENT 30000 /* 30 sec Display update timer 1K=1 */
 #define GAPC_REFRESH_FACTOR_1M 250000 /* 1-4th of usecs for network threads */
 #define GAPC_REFRESH_FACTOR_1K 1000 /* secs for visual refresh           */
+#define GAPC_REFRESH_FACTOR_ONE_TIME 500
 #define GAPC_HISTORY_CHART_PTS 40 /* Num of data points in each series */
 #define GAPC_HISTORY_CHART_SERIES 5 /* Num of data series       */
 #define GAPC_HISTORY_CHART_FACTOR_XINC 30 /* Num refreshes per collection  */
@@ -1776,7 +1777,8 @@ static void cb_information_window_button_refresh (GtkButton * button,
         gtk_statusbar_push (GTK_STATUSBAR (w), ppi->i_info_context,
                         "Refresh Failed(retry enabled): Thread is Busy...");
     }
-    g_timeout_add (1000, (GSourceFunc)cb_monitor_dedicated_one_time_refresh, ppi);    
+    g_timeout_add (GAPC_REFRESH_FACTOR_ONE_TIME,
+                   (GSourceFunc)cb_monitor_dedicated_one_time_refresh, ppi);    
   }
 
   return;
@@ -2803,7 +2805,8 @@ static GtkWidget *gapc_information_window_create (PGAPC_INSTANCE ppi)
   GTK_WIDGET_SET_FLAGS (dbutton, GTK_CAN_DEFAULT);
   gtk_widget_grab_default (dbutton);
 
-  g_timeout_add (250, (GSourceFunc) cb_monitor_dedicated_one_time_refresh, ppi);
+  g_timeout_add (GAPC_REFRESH_FACTOR_ONE_TIME, 
+                 (GSourceFunc) cb_monitor_dedicated_one_time_refresh, ppi);
 
   return GTK_WIDGET (window);
 }
@@ -3570,7 +3573,8 @@ static gboolean gapc_monitor_interface_create (PGAPC_INSTANCE ppi)
 
   gtk_widget_show_all (GTK_WIDGET (ppi->evbox));
 
-  g_timeout_add (250, (GSourceFunc) cb_monitor_dedicated_one_time_refresh, ppi);
+  g_timeout_add (GAPC_REFRESH_FACTOR_ONE_TIME, 
+  				 (GSourceFunc) cb_monitor_dedicated_one_time_refresh, ppi);
 
   return b_rc;
 }
