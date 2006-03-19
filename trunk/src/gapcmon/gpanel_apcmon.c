@@ -652,19 +652,9 @@ static gboolean gapc_monitor_update_tooltip_msg (PGAPC_INSTANCE ppi)
   else
   {
     b_flag = TRUE;      
-    if (g_strrstr (pch3, "COMMLOST") != NULL)
-    {
-      pchx = " cable un-plugged...";
-      ppi->i_icon_index = GAPC_ICON_UNPLUGGED;
-      b_flag = TRUE;                  
-    }
-    else
-    {
-        pchx = "NIS network error...";
-        pch3 = " ";
-        ppi->i_icon_index = GAPC_ICON_DEFAULT;
-        b_flag = TRUE;                    
-    }
+    pchx = "NIS network error...";
+    pch3 = " ";
+    ppi->i_icon_index = GAPC_ICON_DEFAULT;
     for (i_series = 0; i_series < GAPC_HISTORY_CHART_SERIES; i_series++)
     {
          gapc_util_point_filter_set (&(ppi->phs.sq[i_series]), 0.0);         
