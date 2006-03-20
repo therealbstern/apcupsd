@@ -12538,7 +12538,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; then
-  pkg_cv_GAPCMON_CFLAGS=`$PKG_CONFIG --cflags "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0" 2>/dev/null`
+  pkg_cv_GAPCMON_CFLAGS=`$PKG_CONFIG --cflags-only-I "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -12654,7 +12654,7 @@ if test -n "$PKG_CONFIG"; then
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; then
-  pkg_cv_GPANEL_CFLAGS=`$PKG_CONFIG --cflags "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0 gconf-2.0 libpanelapplet-2.0 libgnomeui-2.0 libbonoboui-2.0" 2>/dev/null`
+  pkg_cv_GPANEL_CFLAGS=`$PKG_CONFIG --cflags-only-I "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0 gconf-2.0 libpanelapplet-2.0 libgnomeui-2.0 libbonoboui-2.0" 2>/dev/null`
 else
   pkg_failed=yes
 fi
