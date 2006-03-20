@@ -1048,11 +1048,11 @@ if test "$GAPCMON_ENABLED" = "yes" -o "$GPANEL_ENABLED" = "yes" ; then
 	dnl Check if gnome_vfs_socket_{read,write} requires 5th argument, 'cancellation'
 	dnl
 	_cflags=${CFLAGS}
-	_ldflags=${LDFLAGS}
+	_libs=${LIBS}
 	CFLAGS="${CFLAGS} ${GAPCMON_CFLAGS}"
-	LDFLAGS="${LDFLAGS} ${GAPCMON_LDFLAGS}"
+	LIBS="${LDFLAGS} ${GAPCMON_LIBS}"
 	AC_MSG_CHECKING(if gnome_vfs_socket_read requires cancellation argument)
-	AC_COMPILE_IFELSE(
+	AC_LINK_IFELSE(
 	   AC_LANG_PROGRAM([#include <libgnomevfs/gnome-vfs.h>],
 	                   [gnome_vfs_socket_read(NULL, NULL, 0, NULL, NULL);]),
 	   AC_MSG_RESULT(yes)
@@ -1060,7 +1060,7 @@ if test "$GAPCMON_ENABLED" = "yes" -o "$GPANEL_ENABLED" = "yes" ; then
 	      GPANEL_CFLAGS="${GPANEL_CFLAGS} -DGNOMEVFS_REQUIRES_CANCELLATION",
 	   AC_MSG_RESULT(no))
 	CFLAGS=${_cflags}
-	LDFLAGS=${_lflags}
+	LIBS=${_libs}
 fi
 
 dnl Default linker is g++
