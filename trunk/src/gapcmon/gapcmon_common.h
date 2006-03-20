@@ -53,6 +53,12 @@
 #define GAPC_HOST_VALUE_DEFAULT "localhost"
 #define GAPC_PORT_VALUE_DEFAULT 3551
 
+#ifdef GNOMEVFS_REQUIRES_CANCELLATION
+# define GNOMEVFS_CANCELLATION ,NULL
+#else
+# define GNOMEVFS_CANCELLATION
+#endif
+
 /* NOTE:   GdkColor   color = {0,69*255,0,255*255}; // blue */
 enum
 {
@@ -84,7 +90,6 @@ typedef struct _GAPC_H_CHART
 typedef struct _GAPC_CONFIG
 {
   guint 			cb_id;
-  GnomeVFSAddress 	*gapc_last_address; 
   GtkWidget 	  	*applet;
   GtkWidget 	  	*image;
   GtkWidget 		*frame;
@@ -112,7 +117,6 @@ typedef struct _GAPC_CONFIG
   gboolean 			b_timer_control;	/* If true, stop running timer and restart */
   gboolean 			b_refresh_button;	/* Flag to thread to immediately service an update */
   gboolean 			b_window_visible;	/* Flag indicating if the main window is visible */
-  gboolean 			b_network_changed;	/* Flag signaling a change in host or port number  */  
   gboolean 			b_data_available;	/* Flag indicating that netowrk is online */  
 
   gchar 			*lang;

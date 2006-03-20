@@ -105,7 +105,7 @@ static GtkWidget *gapc_create_scrolled_text_view (GtkWidget * box);
 static GtkWidget *gapc_create_h_barchart (PGAPC_CONFIG pcfg, GtkWidget * vbox, gchar * pch_hbar_name, gdouble d_percent, gchar * pch_text);
 
 static gint gapc_net_transaction_service (PGAPC_CONFIG pcfg, gchar * cp_cmd, gchar ** pch);
-static GnomeVFSInetConnection *gapc_net_open (gchar * pch_host, gint i_port, gboolean *b_changed, GnomeVFSAddress **address);
+static GnomeVFSInetConnection *gapc_net_open (gchar * pch_host, gint i_port);
 static gint gapc_net_read_nbytes (GnomeVFSSocket * psocket, gchar * ptr, gint nbytes);
 static gint gapc_net_write_nbytes (GnomeVFSSocket * psocket, gchar * ptr, gint nbytes);
 static gint gapc_net_recv (GnomeVFSSocket * psocket, gchar * buff, gint maxlen);
@@ -442,9 +442,6 @@ static void gapc_cb_button_config_apply (GtkButton * button, gpointer gp)
   if (pcfg->d_refresh != d_old_time)	/* changed ?? */
       pcfg->b_timer_control = TRUE;
 
-  if ( g_str_equal ( ch_old_host, pcfg->pch_host ) )
-	   pcfg->b_network_changed = TRUE;  /* signal new socket */
-
   w = g_hash_table_lookup (pcfg->pht_Widgets, "StatusBar");
   gtk_statusbar_push (GTK_STATUSBAR (w),
 		      pcfg->i_info_context, "Configuration Applied...");  
@@ -666,7 +663,7 @@ gapc_net_read_nbytes (GnomeVFSSocket * psocket, gchar * ptr, gint nbytes)
 
   while (nleft > 0)
     {
-      result = gnome_vfs_socket_read (psocket, ptr, nleft, &nread, NULL);
+      result = gnome_vfs_socket_read (psocket, ptr, nleft, &nread GNOMEVFS_CANCELLATION);
 
       if (result != GNOME_VFS_OK)
 	  {
@@ -698,7 +695,7 @@ gapc_net_write_nbytes (GnomeVFSSocket * psocket, gchar * ptr, gint nbytes)
   nleft = nbytes;
   while (nleft > 0)
     {
-      result = gnome_vfs_socket_write (psocket, ptr, nleft, &nwritten, NULL);
+      result = gnome_vfs_socket_write (psocket, ptr, nleft, &nwritten GNOMEVFS_CANCELLATION);
 
       if (result != GNOME_VFS_OK)
 	  {
@@ -793,42 +790,19 @@ gapc_net_send (GnomeVFSSocket * v_socket, gchar * buff, gint len)
  *   if this is an issue pass routine the address of a int set to FALSE
  */
 static GnomeVFSInetConnection *
-gapc_net_open (gchar * pch_host, gint i_port, gboolean *b_changed, GnomeVFSAddress **address)
+gapc_net_open (gchar * pch_host, gint i_port)
 {
   GnomeVFSResult result = GNOME_VFS_OK;
   GnomeVFSInetConnection *connection = NULL;
 
   g_return_val_if_fail (pch_host, NULL);
 
- if ( *b_changed  )
- {
   result = gnome_vfs_inet_connection_create (&connection, pch_host, i_port, NULL);
   if (result != GNOME_VFS_OK)
     {
       gapc_log_net_error ("net_open", "create inet connection failed", result);
       return NULL;
     }
-  
-  *address = gnome_vfs_inet_connection_get_address (connection);  
-  if (*address == NULL )
-    {
-      gapc_log_net_error ("net_open", "get inet connection address", result);
-      return NULL;
-    }
-    
-  *b_changed = FALSE;    
- }
- else
- {
-  result = gnome_vfs_inet_connection_create_from_address (&connection, *address, i_port, NULL);
-  if (result != GNOME_VFS_OK)
-    {
-      gapc_log_net_error ("net_open", "reuse inet connection failed", result);
-      *b_changed = FALSE;      
-      return NULL;
-    }  
-
- }
  
   return connection;
 }
@@ -869,11 +843,9 @@ extern gint gapc_net_transaction_service (PGAPC_CONFIG pcfg, gchar * cp_cmd, gch
 
   i_port = pcfg->i_port;
   
-  v_connection = gapc_net_open (pcfg->pch_host, i_port, 
-  				&pcfg->b_network_changed, &pcfg->gapc_last_address );
+  v_connection = gapc_net_open (pcfg->pch_host, i_port );
   if (v_connection == NULL)
     {
-      pcfg->b_network_changed=TRUE;
       return 0;
     } 
   
@@ -883,7 +855,6 @@ extern gint gapc_net_transaction_service (PGAPC_CONFIG pcfg, gchar * cp_cmd, gch
       gapc_log_net_error ("transaction_service", "connect to socket for io failed",
 			  GNOME_VFS_OK);
       gnome_vfs_inet_connection_destroy (v_connection, NULL);
-      pcfg->b_network_changed=TRUE;      
       return 0;
     }
 
