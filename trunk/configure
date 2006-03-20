@@ -12755,9 +12755,9 @@ fi
 	fi
 
 				_cflags=${CFLAGS}
-	_ldflags=${LDFLAGS}
+	_libs=${LIBS}
 	CFLAGS="${CFLAGS} ${GAPCMON_CFLAGS}"
-	LDFLAGS="${LDFLAGS} ${GAPCMON_LDFLAGS}"
+	LIBS="${LDFLAGS} ${GAPCMON_LIBS}"
 	echo "$as_me:$LINENO: checking if gnome_vfs_socket_read requires cancellation argument" >&5
 echo $ECHO_N "checking if gnome_vfs_socket_read requires cancellation argument... $ECHO_C" >&6
 	cat >conftest.$ac_ext <<_ACEOF
@@ -12775,9 +12775,9 @@ gnome_vfs_socket_read(NULL, NULL, 0, NULL, NULL);
   return 0;
 }
 _ACEOF
-rm -f conftest.$ac_objext
-if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
-  (eval $ac_compile) 2>conftest.er1
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
   ac_status=$?
   grep -v '^ *+' conftest.er1 >conftest.err
   rm -f conftest.er1
@@ -12791,7 +12791,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest.$ac_objext'
+	 { ac_try='test -s conftest$ac_exeext'
   { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
   (eval $ac_try) 2>&5
   ac_status=$?
@@ -12808,9 +12808,10 @@ sed 's/^/| /' conftest.$ac_ext >&5
 echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
-rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
 	CFLAGS=${_cflags}
-	LDFLAGS=${_lflags}
+	LIBS=${_libs}
 fi
 
 LD="$CXX"
