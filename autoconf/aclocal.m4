@@ -518,7 +518,7 @@ AC_ARG_VAR([$1][_LIBS], [linker flags for $1, overriding pkg-config])dnl
 pkg_failed=no
 AC_MSG_CHECKING([for $1])
 
-_PKG_CONFIG([$1][_CFLAGS], [cflags], [$2])
+_PKG_CONFIG([$1][_CFLAGS], [cflags-only-I], [$2])
 _PKG_CONFIG([$1][_LIBS], [libs], [$2])
 
 m4_define([_PKG_TEXT], [Alternatively, you may set the environment variables $1[]_CFLAGS
