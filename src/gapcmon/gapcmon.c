@@ -421,7 +421,6 @@ extern int  main (int argc, char *argv[])
   gapc_load_icons ( pcfg );
   
   pcfg->b_window_visible = TRUE;
-  pcfg->b_network_changed = TRUE;
 
   /* 
    * Create hash table for easy access to status info and widgets

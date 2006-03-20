@@ -118,6 +118,13 @@
 #define GAPC_LINEGRAPH_YMAX 110
 #define GAPC_MAX_SERIES GAPC_HISTORY_CHART_SERIES
 
+/* This is already in gp_apcmon_common.h, but we can't include that */
+#ifdef GNOMEVFS_REQUIRES_CANCELLATION
+# define GNOMEVFS_CANCELLATION ,NULL
+#else
+# define GNOMEVFS_CANCELLATION
+#endif
+
 typedef enum _State_Icons_IDs
 {
   GAPC_ICON_ONLINE,
@@ -245,10 +252,8 @@ typedef struct _Monitor_Instance_Data
   gint            i_old_icon_index;
 
   GMutex         *gm_update;    /* Control mutex  for hashtables and pcfg */
-  GnomeVFSAddress *gapc_last_address;
 
   gboolean        b_run;
-  gboolean        b_network_changed; /* TRUE signals a change in host name */
   gboolean        b_timer_control; /* TRUE signals change in refresh interval */
   gboolean        b_refresh_button; /* Flag to thread to immediately update */
   gboolean        b_data_available; /* Flag indicating that netowrk is online */
@@ -399,9 +404,7 @@ static gint     gapc_net_recv (GnomeVFSSocket * psocket, gchar * buff,
                                gint maxlen);
 static gint     gapc_net_send (GnomeVFSSocket * v_socket, gchar * buff,
                                gint len);
-static GnomeVFSInetConnection *gapc_net_open (gchar * pch_host, gint i_port,
-                                              gboolean * b_changed,
-                                              GnomeVFSAddress ** address);
+static GnomeVFSInetConnection *gapc_net_open (gchar * pch_host, gint i_port);
 static void     gapc_net_close (GnomeVFSInetConnection * connection,
                                 GnomeVFSSocket * v_socket);
 static gint     gapc_net_transaction_service (PGAPC_INSTANCE ppi,
@@ -782,7 +785,7 @@ static gint gapc_net_read_nbytes (GnomeVFSSocket * psocket, gchar * ptr,
 
   while (nleft > 0)
   {
-    result = gnome_vfs_socket_read (psocket, ptr, nleft, &nread, NULL);
+    result = gnome_vfs_socket_read (psocket, ptr, nleft, &nread GNOMEVFS_CANCELLATION);
 
     if (result != GNOME_VFS_OK)
     {
@@ -814,7 +817,7 @@ static gint gapc_net_write_nbytes (GnomeVFSSocket * psocket, gchar * ptr,
   nleft = nbytes;
   while (nleft > 0)
   {
-    result = gnome_vfs_socket_write (psocket, ptr, nleft, &nwritten, NULL);
+    result = gnome_vfs_socket_write (psocket, ptr, nleft, &nwritten GNOMEVFS_CANCELLATION);
 
     if (result != GNOME_VFS_OK)
     {
@@ -903,49 +906,20 @@ static gint gapc_net_send (GnomeVFSSocket * v_socket, gchar * buff, gint len)
 /*
  * Open a TCP connection to the UPS network server or host:port
  * Returns -1 on error
- * Returns connection id value  -- version 2.8 maybe required for reusing addresses ---
- *   if this is an issue pass routine the address of a int set to FALSE
+ * Returns connection id value
  */
-static GnomeVFSInetConnection *gapc_net_open (gchar * pch_host, gint i_port,
-                                              gboolean * b_changed,
-                                              GnomeVFSAddress ** address)
+static GnomeVFSInetConnection *gapc_net_open (gchar * pch_host, gint i_port)
 {
   GnomeVFSResult  result = GNOME_VFS_OK;
   GnomeVFSInetConnection *connection = NULL;
 
   g_return_val_if_fail (pch_host, NULL);
 
-  if (*b_changed)
+  result = gnome_vfs_inet_connection_create (&connection, pch_host, i_port, NULL);
+  if (result != GNOME_VFS_OK)
   {
-    result = gnome_vfs_inet_connection_create (&connection, pch_host, i_port,
-                                               NULL);
-    if (result != GNOME_VFS_OK)
-    {
-      gapc_net_log_error ("net_open", "create inet connection failed", result);
-      return NULL;
-    }
-
-    *address = gnome_vfs_inet_connection_get_address (connection);
-    if (*address == NULL)
-    {
-      gapc_net_log_error ("net_open", "get inet connection address failed",
-                          result);
-      return NULL;
-    }
-
-    *b_changed = FALSE;
-  }
-  else
-  {
-    result = gnome_vfs_inet_connection_create_from_address (&connection,
-                                                            *address, i_port,
-                                                            NULL);
-    if (result != GNOME_VFS_OK)
-    {
-      gapc_net_log_error ("net_open", "reuse inet connection failed", result);
-      *b_changed = TRUE;
-      return NULL;
-    }
+    gapc_net_log_error ("net_open", "create inet connection failed", result);
+    return NULL;
   }
 
   return connection;
@@ -986,12 +960,9 @@ static gint gapc_net_transaction_service (PGAPC_INSTANCE ppi, gchar * cp_cmd,
 
   i_port = ppi->i_port;
 
-  v_connection =
-          gapc_net_open (ppi->pch_host, i_port, &ppi->b_network_changed,
-                         &ppi->gapc_last_address);
+  v_connection = gapc_net_open (ppi->pch_host, i_port);
   if (v_connection == NULL)
   {
-    ppi->b_network_changed = TRUE;
     return 0;
   }
 
@@ -1001,7 +972,6 @@ static gint gapc_net_transaction_service (PGAPC_INSTANCE ppi, gchar * cp_cmd,
     gapc_net_log_error ("transaction_service",
                         "connect to socket for io failed", GNOME_VFS_OK);
     gnome_vfs_inet_connection_destroy (v_connection, NULL);
-    ppi->b_network_changed = TRUE;
     return 0;
   }
 
@@ -2104,7 +2074,6 @@ static void cb_monitor_preferences_changed (GConfClient * client, guint cnxn_id,
       case GCONF_VALUE_STRING:
         g_free (ppi->pch_host);
         ppi->pch_host = g_strdup (gconf_value_get_string (entry->value));
-        ppi->b_network_changed = TRUE;
         break;
       case GCONF_VALUE_INT:
         ppi->i_port = gconf_value_get_int (entry->value);
@@ -3242,7 +3211,6 @@ static GtkTreeModel *gapc_preferences_model_data_init (PGAPC_CONFIG pcfg)
     ppi->b_data_available = FALSE;   
     ppi->b_window_visible = FALSE;
     ppi->b_run = FALSE;
-    ppi->b_network_changed = TRUE;
     ppi->phs.timer_id = 0;
     
     for ( h_index = 0; h_index < GAPC_HISTORY_CHART_SERIES; h_index++)
@@ -3587,7 +3555,6 @@ static gboolean gapc_monitor_interface_create (PGAPC_INSTANCE ppi)
     return FALSE;
 
   ppi->b_run = TRUE;
-  ppi->b_network_changed = TRUE;
   pcfg->cb_monitors++; 
   ppi->phs.gp = (gpointer)ppi;
   ppi->i_old_icon_index = GAPC_N_ICONS;

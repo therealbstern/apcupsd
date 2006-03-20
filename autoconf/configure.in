@@ -1025,13 +1025,13 @@ if test "$GAPCMON_ENABLED" = "yes" -o "$GPANEL_ENABLED" = "yes" ; then
 	dnl First, the stuff we need for both programs
 	dnl
 	GAPCDIR=gapcmon
-	PKG_CHECK_MODULES(GAPCMON, gtk+-2.0 glib-2.0 >= 2.4.0 gthread-2.0 gnome-vfs-module-2.0)
-	GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DVERSION=\\\"$VERSION\\\""
 
 	dnl
 	dnl gapcmon specifics
 	dnl
 	if test "$GAPCMON_ENABLED" = "yes" ; then
+		PKG_CHECK_MODULES(GAPCMON, gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0)
+		GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DVERSION=\\\"$VERSION\\\""
 		GAPCMON=gapcmon
 	fi
 
@@ -1039,10 +1039,28 @@ if test "$GAPCMON_ENABLED" = "yes" -o "$GPANEL_ENABLED" = "yes" ; then
 	dnl gpanel_apcmon specifics   	** also requires AC_PATH_XTRA or X11 includes and libraries
 	dnl				** extras are handled in the Makefile.in
 	if test "$GPANEL_ENABLED" = "yes" ; then
-		PKG_CHECK_MODULES(GPANEL, gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0 gnome-vfs-module-2.0 libpanelapplet-2.0 libgnomeui-2.0 libbonoboui-2.0)
+		PKG_CHECK_MODULES(GPANEL, gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0 gconf-2.0 libpanelapplet-2.0 libgnomeui-2.0 libbonoboui-2.0)
 		GPANEL_CFLAGS="$GPANEL_CFLAGS -DVERSION=\\\"$VERSION\\\""
 		GPANEL=gpanel_apcmon
 	fi
+
+	dnl
+	dnl Check if gnome_vfs_socket_{read,write} requires 5th argument, 'cancellation'
+	dnl
+	_cflags=${CFLAGS}
+	_ldflags=${LDFLAGS}
+	CFLAGS="${CFLAGS} ${GAPCMON_CFLAGS}"
+	LDFLAGS="${LDFLAGS} ${GAPCMON_LDFLAGS}"
+	AC_MSG_CHECKING(if gnome_vfs_socket_read requires cancellation argument)
+	AC_COMPILE_IFELSE(
+	   AC_LANG_PROGRAM([#include <libgnomevfs/gnome-vfs.h>],
+	                   [gnome_vfs_socket_read(NULL, NULL, 0, NULL, NULL);]),
+	   AC_MSG_RESULT(yes)
+	      GAPCMON_CFLAGS="${GAPCMON_CFLAGS} -DGNOMEVFS_REQUIRES_CANCELLATION"
+	      GPANEL_CFLAGS="${GPANEL_CFLAGS} -DGNOMEVFS_REQUIRES_CANCELLATION",
+	   AC_MSG_RESULT(no))
+	CFLAGS=${_cflags}
+	LDFLAGS=${_lflags}
 fi
 
 dnl Default linker is g++
