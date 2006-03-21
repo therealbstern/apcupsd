@@ -420,6 +420,9 @@ int output_status(UPSINFO *ups, int sockfd,
       if (ups->UPS_Cap[CI_NOMOUTV])
          s_write(ups, "NOMOUTV  : %03d\n", ups->NomOutputVoltage);
 
+      if (ups->UPS_Cap[CI_NOMINV])
+         s_write(ups, "NOMINV   : %03d\n", ups->NomInputVoltage);
+
       if (ups->UPS_Cap[CI_NOMBATTV])
          s_write(ups, "NOMBATTV : %5.1f\n", ups->nombattv);
 
