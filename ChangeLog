@@ -1,5 +1,5 @@
 /***************************************************************************/
-/*                     ChangeLog of Apcupsd 3.12.x                         */
+/*                     ChangeLog of Apcupsd 3.13.x                         */
 /*                                                                         */
 /*               Adam Kropelin <akropel1 at rochester dot rr dot com>      */
 /*               Kern Sibbald <kern at sibbald dot com>                    */
@@ -8,364 +8,727 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
-CHANGES IN 3.12.2
 
-17Jan06:
-- win32 Use OpenThreadToken() instead of OpenProcessToken(). This makes
-  shutdown work on WinXP.
-08Jan06:
-- win32: Fix typo so Win32 event window will be populated correctly.
-- win32: Include sh.exe and requisite DLLs.
-- win32: Fix typo in battattach and battdetach cases.
+2006-03-22 18:19  adk0212
 
+	* include/version.h:
 
-CHANGES IN 3.12.1
+	Bump version to 3.13.3.
 
-06Jan06:
-- usb: Status bits must use positive logic, so online state must be 
-  updated even if CI_Discharging=0. This fixes missing status on SU2200.
+2006-03-20 19:22  adk0212
 
+	* include/defines.h, include/struct.h, src/drivers/usb/usb.c,
+	src/lib/apcstatus.c:
 
-CHANGES IN 3.12.0
+	Add support for NOMOUTV on USB models. Add NOMINV (Nominal Input
+	Voltage) and plumb it in the USB driver. Other connection types do
+	not appear to support this datum.
 
-02Jan06:
-- doc: Update version to 3.12.x and remove ChangeLog and ReleaseNotes
-  sections since it is better to fetch them directly from SourceForge
-  or from the source tarball.
-01Jan06:
-- snmp: Remove misuse of NETSNMP_CALLBACK_OP_RECEIVED_MESSAGE. Also use
-  snmp_{session,pdu} instead of netsmp_{session,pdu} to retain 
-  compatibility with the ucd-snmp library.
-- Fix compliation of examples/ files: client.c, megaclient.c, 
-  newslave.c, upsapm.c  
-31Dec05:
-- conf: Update EEPROM section comments.
-19Dec05:
-- win32: Convert Readme.TXT to DOS text format so it will be readble 
-  in Notepad (default *.txt handler on Windows). Remove version number 
-  since I'll never remember to update it. Point users to manual for 
-  detailed install instructions.
-- m/s: Fix sense of onbatt/online, which was reversed.
-16Dec05:
-- doc: Fix latex errors that crept in during SNMP and USB updates.
-- configure: Force NIS to enabled since libnis is required by 
-  apcaccess. Users may still disable NIS at runtime in apcupsd.conf.
-- doc: Remove references to --enable-nis and --disable-nis.
-- doc: Update Win32 section to cover nifty new NSIS installer.
-15Dec05:
-- win32: More installer fixes: Create start/stop links regardless of 
-  service or not. Remove apcupsd.events on uninstall, if user wants to.
-  Fix compile error in installation directory message text.
-- win32: A few last fixes (hopefully): WinNT and 9x need different
-  service start methods. Remove extra double-quotes around Win9x start 
-  handling because they seem to result in a bogus Exec commandline.
-14Dec05:
-- win32: Fix an uninstaller bug where apcupsd.conf was left behind 
-  even if the user chose to remove it.
-- win32: Fix uninstall so it doesn't miss any files. Change destination
-  path instructions to help prevent inoperable installations. Fix 
-  documentation and start link creation.
-26Nov05
-- Update the version
-- Cleanup errors in the uninstall script
-- Remove a few MessageBoxes that annoy on Win98
-- Set default UPSTYPE to apcsmart (was smartups)
-- Add examples to installer script.
-- Try to remove all files on uninstall.
-- Add "missing" installer macro files.
-- Implement NSIS installer. It can be downloaded from:
-  http://sourceforge.net/projects/nsis/  I'm using version
-  2.0, but the latest one is 2.11
-- Create winapcupsd.nsi.in file in src/win32 directory.
-- Modify configure.in to generate winapcupsd.nsi file.
-- Remove most of the old ServiceHelper code. It is not used,
-  and creates problems on remote logins.
-- Add nagios plugin contributed by Christian Masopust.
-- Add all the new cygwin 1.5.18 binaries and the dll.
-- Eliminate some compiler warnings.
-- Make the old make binary-release work.
-- Implement a new target for building the NSIS installer.
-    ./configure (options...)
-    make
-    cd src/win32
-    make winapcupsd.exe
-24Nov05:
-- Get rid of unsupported -c (configure), -u (update battery date), 
-  and -n (rename) options.
-22Nov05:
-- configure: -mwindows is only needed for the link step, so kill
-  $WCFLAGS and let all compile steps be driven by the .c.o rule.
-- configure: Don't add ncurses libs to $LIBS, only to $POWERLIBS.
-  That prevents libncurses from being linked with every executable.
-- configure: Kill apcnisd. It requires sysv shmem and since we've 
-  eliminated that, so too must apcnisd be eliminated.
-19Nov05:
-- snmp: Initialize nfds to zero before calling snmp_select_info().
-  Fixes crash on Win32 and potential crash on other platforms.
-- win32: Build fixes: apc_defines.h -> defines.h, remove use of 
-  astr* pending future cleanup, C++ casting fixes.
-- win32: Switch to pthreads for the Main_Msg_Loop thread. This
-  seems to fix a bug where Main_Msg_Loop called do_status() which
-  attempted to take the UPS read_lock. Apparently taking pthreads 
-  locks from CreateThread threads is bad. Switching to pthreads
-  seems to fix it.
-12Nov05:
-- No need to specify mode parameter to open() when O_CREAT is not set.
-- configure: Simplify SNMP rules. Prefer net-snmp, but fall back on 
-  ucd-snmp if it is not found. Look for snmp libs in /usr/local. 
-  --enable-snmp and --enable-net-snmp act identically now.
-11Nov05:
-- Remove lingering references to getNextUps() in Cygwin build.
-06Nov05:
-- snmp: Add support for SNMP traps in powernet_snmp_ups_check_state().
-- snmp: Accept "APC_NOTRAP" as a valid DeviceVendor string, providing
-  users a way to disable SNMP trap catching.
-- docs: Document SNMP trap catching.
-- docs: Fix formatting of master/slave network errors section.
-05Nov05:
-- apctest: Remove useless deletion and recreation of lock file.
-- snmp: SNMP strings are not NUL terminated. Treat them accordingly.
-- snmp: Don't claim to support CIs that we don't populate.
-- snmp: Regenerate *-mib-mgr.c and *-mib.h files with smidump-0.4.3.
-- snmp: Fix heap corruption bug in powernet_check_comm_lost().
-- snmp: Generate events during commlost handling.
-29Oct05:
-- m/s: Convert is_ups_foo() to ups->is_foo().
-- m/s: C++ compatibility fixes.
-- Add a few set_foo(bool) methods plus a few missing is_foo() methods.
-26Oct05:
-- docs: Fix page numbers in the index.
-- docs: Fix multimon section and a few other details in the surrounding area.
-18Oct05:
-- bsd-usb: Workaround for compile failure on FreeBSD <= 4.7.
-- bsd-usb: Fix a subtle bug in pusb_ups_check_state() which was pointed out by
-  a compiler warning.
-- usb: Make all pusb_* functions return int and thus match their prototypes in
-  usb.c. Previously some functions were defined to return bool but declared
-  to return int in usb.c. This led to bizarre return value corruption on
-  FreeBSD. Eventually all boolean type returns should be bool, but that
-  change is better done all at once.
-16Oct05:
-- docs: USB updates suggested by Mark Martinec.
-- docs: Fix typo in web target.
-- docs: Fix first round of major LaTeX bugs. There are many more such as 
-  undefined references and overfull hboxes, but this is a step in the right 
-  direction.
-- docs: Second run of latex should be on apcupsd.tex not manual.tex. On its 
-  own, manual.tex is just a massive stream of syntax errors.
-- docs: Add missing \\.
-- docs: Fix undefined and redefined symbols.
-- docs: Kill blank lines after \begin{verbatim}.
-12Oct05:
-- docs: Move common latex2html flags into a variable so html and web targets do
-  not accidentally differ. (Previously -t was not specified for html target).
-  Also run apcupsd.html thru a sed script to remove references to
-  "apcupsd.html" and thus allow the file to be renamed at will. Copy
-  final html output into manual.html to maintain an archived copy of the
-  generated output.
-10Oct05:
-- Rewrite the UPSCABLE description to hopefully eliminate the common mistake
-  of thinking the cable model numbers were listed in columns by type. Also
-  clean up some of the config directive descriptions and add some blank lines
-  to improve readability.
-- docs: Fix up some links to the Win32 section.
-24Sep05:
-- Update examples/snoopdecode.c to latest version and add to Makefile.
-- Add SmartUPS serial protocol simulator 'smartsim' to examples/ directory.
-- Do not clear_onbatt_msg() when shutting down. This just causes a redundant
-  "On Battery" event.
-- apcsmart: Convert do/while loop to a regular while loop in UPSlinkCheck().
-  The do/while form is harder to read and doesn't add any value.
-- apcsmart: Remove pointless check in apcsmart_ups_get_capabilities().
-- apcsmart: Fix commlost deadlock caused when locking was added to NIS code.
-  We have to drop the UPS lock in UPSlinkCheck(), otherwise NIS is blocked 
-  until the link comes back up. Also fix timing bug which caused commlost 
-  events every 20 seconds instead of every 10 minutes. To do that, rewrite
-  the event loop to not depend on the timing behavior of getline().
-- Fix TV_DIFF_MS macro.
-- apcsmart: Fix excessive startup delay: Don't probe for commands where
-  ups->UPS_Cmd[i] == 0.
-18Sep05:
-- Be careful not to close trace_fd while daemonizing.
-- Add example {on,off}battery scripts that scale CPU frequency down to save
-  power when UPS is running on battery. Requires linux-2.6.x kernel with
-  cpufreq support and compatible CPU. Inspired by Paul Devriendt's talk
-  at OLS 2004.
-17Sep05:
-- Use fast polling when battery is disconnected. This minimizes the battery
-  reattach delay.
-- Process actions immediately after volatile poll in addition to after a
-  state check. This allows transitions caught by polling to be acted upon
-  without waiting thru another state check interval.
-- Remove debounce logic. The USB debounce code was vestigial since the big
-  USB changes went in.  The SmartUPS code actually interfered with proper
-  operation of ONBATTERYDELAY, causing powerfail and onbattery messages to be
-  generated ~2 seconds apart instead of whatever the user configured via
-  ONBATTERYDELAY.
-- USB: Fix selftest detection on RS 1500 models. Delay slightly before reading
-  APCLineFailCause because this usage apparently is not valid immediately
-  after power failure. Also disable CI_ACPresent when CI_Discharging is
-  available because the RS 1500 reports (Discharging=1 && ACPresent=1) during
-  self test, which confuses Apcupsd.
-15Sep05:
-- USB: Work around spurious BatteryPresent=1 bug in RS 1500 firmware.
-13Sep05:
-- manpage: Default STATUSPORT is 3551. Manually editing cgi is no 
-  longer required when changing the port.
-7Sep05:
-- Fix set_online(int) modifier to change both UPS_online and UPS_onbatt
-  like the regular set_online(void) does. Eliminate future ocurrences
-  of this bug by writing all set_foo(int) modifiers in terms of 
-  set_foo(void) and clear_foo(void).
-- Reorder device loop contents so do_action() is invoked early to handle
-  preexisting conditions instead of waiting thru a device_check_state()
-  period first. The overall order of operations is unchanged; only the
-  loop entrypoint has shifted.
-- Add BATTDETACH and BATTATTACH events which are triggered by changes in
-  the UPS_battpresent flag.
-- USB: Fix the battlow FIXME by performing status bit updates the way
-  the USB driver used to, namely by clearing the APC part of the status
-  word and then setting bits based on CIs. Note that this technique 
-  requires a locking change in apcstatus.c to solve the NIS race 
-  condition seen with the old USB code.
-- NIS: Lock the UPS structure for reading in output_status(). Otherwise
-  a client can get corrupt NIS data if the driver is in the middle of 
-  updating a field. This is particularly troublesome for the net driver.
-6Sep05:
-- USB: Update APCLineFailCause interpretation in USB driver with info
-  from APC.
-- Add XFER_FREQ to represent transfers due to input frequency out of
-  range.
-- Remove individual UPS_prev_onbatt and UPS_prev_battlow bits in favor
-  of a generic status bit change detection mechanism.
-3Sep05:
-- CGI: Teach multimon about NOBATT and make buffer length tracking in
-  parsefield() less prone to errors in the future.
-- USB: Make volatile data debug output consistent.
-- USB: Set status bits directly from USB data so UPSINFO follows the
-  hw state.
-2Sep05:
-- CGI: Fix a few instances of "sizeof(pointer)" caught by g++ on OpenBSD.
-1Sep05
-- SNMP: UPSINFO::G[] and UPSINFO::X[] to enum conversion.
-- CGI: Fix C++ compilation.
-- Kill unused (or nearly unused) fields from class UPSINFO. Also remove
-  unused structs while we're in the neighborhood.
-31Aug05
-- USB: Make older gcc happy by not introducing a local variable in
-  the middle of a switch statement.
-- USB: My RS 1500 models seem to return APCLineFailCause=8 for
-  transitions due to utility power failure. Update return value
-  decoding to account for this.
-- hid-ups: Name usage 0xFF860052 as APCLineFailCause.
-- Convert UPSINFO::G[] to LastXferCause enumeration and eliminate
-  the need for core code to know about last xfer CIs.
-- Kill off UPSINFO::X[], replacing it with enum SelfTestResult.
-- Add support for tracking battery presence via new NOBATT status
-  flag.
-- apctest: Add support for changing Alarm behavior on USB models.
-30Aug05
-- Rephrase comm{ok,failure} messages to not assume a serial port
-  connection.
-- USB: Add CI_APCLineFailStatus support. This allows apcupsd to
-  distinguish battery transitions due to self test from those 
-  due to utility power failure.
-- Increase self test grace period to 20 seconds (from 12) to
-  accomodate lengthy USB event hysteresis imposed by the UPS.
-- USB: Set self test result string.
-- USB: Fix excessive unlocking bug in pusb_ups_check_state().
-- NET: Fix minor copy-n-paste error in net_ups_read_volatile_data.
-23Aug05
-- USB: Use CI_RETPCT instead of CI_APCDelayBeforeStartup which is not
-  only cleaner but also causes RETPCT to be properly reported.
-18Aug05
-- Fix powerflute SIGALRM timer on Solaris by reinstalling signal
-  handler whenever the timer expires.
-15Aug05
-- Increase inter-URB delay to 20 msec as per 3.10.18.
-- Fix powerflute compilation on Solaris by preferring
-  ncurses/*.h headers over include/*.h when both
-  exist.
-- C++ fixes for compilation on Solaris.
-- BSD and Linux USB rework to report events via callback.
-08Jul05
-- Bump version number and date
-- Back-port inter-URB delay lockup fix from Branch-3_10_17
-- Significantly rework USB driver event and poll handling.
-  More cleanup to come, and BSD driver still needs update.
-26Jun05
-- Correct compiler warnings in cgi for g++ 4.0
-22Jun05
-- bsd-usb: compile fix
-- linux-usb: Filter duplicate reports in pusb_ups_check_state().
-- linux-usb: Strengthen CI <-> usage association 
-- linux-usb: Only exit event read() loop when an 'important' CI
-  is processed
-- Add a parameterized version of set_battlow() and make use of it.
-- linux-usb: Add some more 'important'-looking events
-13Jun05
-- Make /usr/share/man the default man directory.  
-- Require C++ compiler and use full path.
-12Jun05
-- Renamed:
-    apcdevice.c    device.c
-    apcreports.c   reports.c
-    apcaction.c    action.c
-- Added set_replacebatt(value) and set_shutdownimm(value)
-11Jun05
-- Renamed:
-    apc_defines.h  defines.h
-    apc_struct.h   struct.h
-    apc_drivers.h  drivers.h
-    apc_nis.h      nis.h
-    apc_extern.h   extern.h 
-- Replace all old bit set/tests with methods. There are a
-  few exceptions to this (multimon.c, ...) generally where
-  status bits from the network are being examined.
-08Jun05
-- Retroactively create my own techlog
-07Jun05
-- Rename mainsback.in to offbattery.in so default power loss/return
-  actions are symmetrical.
-- Fix bsd-usb build on FreeBSD-4.11 by allowing Makefiles to add 
-  their own include flags via EXTRAINCS.
-- Exclude HPUX from signal recursion
-06Jun05
-- Implement trace to file with -T option.
-- Convert all set/clear/test of Status to method accesses.
-  There are some inconsistencies that must be resolved.
-- Eliminate apc_version.h by combining it with version.h
-01Jun05
-- Get rid of old forking code.
-- Start conversion of Status word to method accesses.
-31May05
-- Code style normalization.
-19May05
-- C++ cleanliness fixes in libusbhid
-15May05
-- Convert the core code to be compiled by C++. Most of it was already
-  done.
-- Modify the UPSINFO structure to be a class so that I can add class
-  methods for accessing some of the variables (status bits).
-27Apr05
-- Merge hidu_set_report bug fix from Branch-3_10_17.
-24Apr05
-- Make apctest work with empty DEVICE setting for USB driver.
-22Apr05
-- Merge BSD UHCI lockup fixes from Branch-3_10_17.
-05Apr05
-- Move kes-3.10.17 to new 2005 directory (keeps techlogs cleaner).
-04Apr05
-- Remove trailing commas in enum declarations to make AIX 5.1 +
-  VACPP 6.0 happy.
-29Mar05
-- Make SNMP missing SNMP libs cause ./configure fail
-- Remove references to serial port in comms lost/restored messages
-  in apccontrol.in since in UPSes may be connected by other means
-  (USB, net, etc.).
-- More unsafe string conversions. strcpy -> astrncpy and
-  sprintf -> asnprintf.
-22Mar05
-- Convert some potentially unsafe string functions to apcupsd safe
-  versions. None of the usages were actually unsafe, but this change
-  pacifies OpenBSD and prevents future bugs.
+2006-03-20 18:22  adk0212
+
+	* autoconf/configure.in, configure:
+
+	Fix gnome_vfs_socket_read() parameter detection. We need to link
+	the test program, not just compile it.
+
+2006-03-19 19:53  adk0212
+
+	* configure, autoconf/aclocal.m4:
+
+	Only return -I CFLAGS from PKG_CHECK_MODULES. Otherwise, if the
+	library was built with a different compiler than we're running now,
+	we may pass invalid flags to it.
+
+2006-03-19 19:40  adk0212
+
+	* configure, autoconf/configure.in, src/gapcmon/gapcmon.c,
+	src/gapcmon/gapcmon_common.h, src/gapcmon/gp_apcmon_core.c,
+	src/gapcmon/gpanel_apcmon.c:
+
+	gapcmon and gpanel_apcmon portability changes. Remove use of
+	GnomeVFSAddress and b_network_changed. Detect whether
+	gnome_vfs_socket_{read,write} requires 4 arguments or 5 and adjust
+	usage accordingly.
+
+2006-03-19 02:01  skoona
+
+	* src/gapcmon/gp_apcmon_core.c:
+
+	Formatted tooltip messages 
+
+2006-03-19 01:36  skoona
+
+	* src/gapcmon/gpanel_apcmon.c:
+
+	Working on automatic and dedicated refresh timers to reduce the
+	number of network-down retries.  Changed them to only request
+	net-transaction every tenth refresh cycle if network is down.
+
+	Reordered the Preferences Panel column to make hostname the
+	rightmost.
+
+	cleaned up the format of the tooltip message.
+
+2006-03-18 21:39  adk0212
+
+	* src/gapcmon/gpanel_apcmon.c:
+
+	Fix a bug where COMMLOST was reported instead of NIS failure.
+	COMMLOST should only be reported when Apcupsd tells us to. Anything
+	else is a NIS networking failure.
+
+2006-03-18 21:09  skoona
+
+	* src/gapcmon/gpanel_apcmon.c:
+
+	Define GAPC_REFRESH_FACTOR_ONE_TIME=500 to manage any further
+	exploration of timers supporting the one_shot model.  Although we
+	want it to refresh quickly; I have to remember that is will
+	repeated until sucessful and possibly interfer with the thread its
+	waiting on.  
+
+2006-03-18 20:39  skoona
+
+	* src/gapcmon/gpanel_apcmon.c:
+
+	Fine tuning the refresh timer and queue communications to not
+	overrun the network thread.  cb_monitor_dedicated_one_time() and
+	cd_information_window_[buttom_refresh | create] changed to support
+	this objective.  Tweaked gapc_monitor_interface_count_enabled()
+	changing int which to gint which.  
+
+2006-03-18 17:28  adk0212
+
+	* src/gapcmon/gpanel_apcmon.c:
+
+	Don't allow user to disable the last monitor. When the user
+	disables the last monitor, immediately re-enable it.
+
+2006-03-17 23:36  skoona
+
+	* src/gapcmon/: gapcmon_common.h, gp_apcmon_core.c:
+
+	Implemented COMMLOST 
+
+2006-03-17 22:39  skoona
+
+	* src/gapcmon/gpanel_apcmon.c:
+
+	Restored gpanel_apcmon:gapc_preferences_view() size request to 440
+	I may have wiped it out during the last sync.  
+
+2006-03-17 22:30  skoona
+
+	* src/gapcmon/gpanel_apcmon.c:
+
+	Changed gpanel_apcmon.c to remove keyboard search in preference
+	panel.	
+
+2006-03-17 20:57  adk0212
+
+	* autoconf/variables.mak.in:
+
+	Add assignments for X_LIBS and X_EXTRA_LIBS so Makefiles can access
+	them as make variables rather than autoconf expansions.
+
+2006-03-17 19:18  adk0212
+
+	* src/gapcmon/gpanel_apcmon.c:
+
+	Tweak preferences dialog size. Increase height slightly so bottom
+	row of table is not cut off. (Hope this isn't font dependent.) Also
+	reduce width a bit so refresh column is not overly wide.
+
+2006-03-17 19:12  adk0212
+
+	* configure:
+
+	Regenerate with James's changes to configure.in.
+
+2006-03-17 14:58  skoona
+
+	* src/gapcmon/gp_apcmon.c:
+
+	gp_apcmon.c was 2 of 2 files that implemented the gpanel applet.
+	gpanel_apcmon.c is now the single and master file for this purpose.
+	 it requires: gapcmon_gtkglgraph.c|h gapcmon.c is the regular gtk
+	program and requires: gp_apcmon_core.c and gapcmon_common.h
+
+	Also, configure and make regenerated the needed scripts and all
+	seems to be working.  I would like gapcmon to default to yes,
+	during the configure, make, and make install steps; its no now.
+
+	
+
+2006-03-17 14:29  skoona
+
+	* autoconf/configure.in:
+
+	Ok, I was in the wrong dir when I committed.  This configure.in was
+	changed to add gconf2 to gpanel_apcmon's requirements and to
+	include (the commented out) AC_PATH_XTRA pulling the X incl/libs I
+	need for gpanel_apcmons opengl based linegraph.  
+
+2006-03-17 14:26  skoona
+
+	* src/gapcmon/Makefile.in:
+
+	Updated gapcmon Makefile.in to compile using new codeset.  I need
+	to regen the configure script to enable X includes and libs I
+	changed autoconf/configure.in but I don't see it in the commit
+	list.  James
+
+2006-03-17 13:42  skoona
+
+	* src/gapcmon/: ChangeLog, README, gapcmon.spec,
+	gapcmon_gtkglgraph.c, gapcmon_gtkglgraph.h, gpanel_apcmon.c,
+	gpanel_apcmon.schemas, gpanel_apcmon.server:
+
+	Adding files to support the re-written gpanel module and its
+	standalone rpm.spec file.  The file gp_mon.c is removed because of
+	potential conflicts. The updated gpanel_apcmon add significant new
+	features including a line graph charting key metrics over time, and
+	the ability to support 8 UPSs from one executable.  James
+
+2006-03-17 13:33  skoona
+
+	* src/gapcmon/unplugged.png:
+
+	Adding a icon to support the COMMLOST state in gpanel_apcmon Will
+	update gapcmon later to pickup this new state 
+
+2006-03-13 10:33  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Add support for building the generic USB driver on Win32 under
+	Cygwin.  The lib and include paths are currently hard-coded since
+	libusb-win32 does not include the libusb-config utility.
+
+2006-03-12 02:56  kerns
+
+	* src/win32/README.Win32:
+
+	Remove temp README
+
+2006-03-12 02:54  kerns
+
+	* src/win32/: apcupsd/apcupsd.mak, apcupsd/apcupsd.mak.in,
+	apcupsd/filelist, compat/compat.cpp, compat/compat.h,
+	compat/winconfig.h:
+
+	Add new win32 files
+
+2006-03-11 11:47  kerns
+
+	* src/apcaccess.c:
+
+	Correct compile warning in apcaccess.c
+
+2006-03-10 13:27  kerns
+
+	* src/win32/README.Win32:
+
+	Add first cut native win32 build doc
+
+2006-03-10 13:23  kerns
+
+	* src/win32/: README.win32, winups.h:
+
+	Add first cut native win32 build doc
+
+2006-03-10 13:06  kerns
+
+	* src/win32/README.cygwin:
+
+	Add cygwin build README
+
+2006-03-09 08:57  kerns
+
+	* src/win32/compat/: alloca.h, compat.cpp, compat.h, getopt.c,
+	getopt.h, grp.h, mswinver.h, netdb.h, print.cpp, sched.h,
+	strings.h, syslog.h, winconfig.h, netinet/in.h:
+
+	commit changes to compat
+
+2006-03-09 08:56  kerns
+
+	* src/win32/compat/: features.h, termios.h, utime.h, winsock.h:
+
+	Add new files to compat
+
+2006-03-09 08:53  kerns
+
+	* src/win32/compat/sys/: cdefs.h, ioctl.h, socket.h, stat.h,
+	termios.h, time.h, wait.h:
+
+	Add new files to sys
+
+2006-03-09 08:51  kerns
+
+	* src/win32/compat/arpa/inet.h:
+
+	Add arpa directory
+
+2006-03-09 08:50  kerns
+
+	* src/win32/: newMakefile.in, newwinservice.cpp, winapi.cpp,
+	winapi.h:
+
+	Add new src/win32 files
+
+2006-03-09 08:48  kerns
+
+	* src/win32/apcupsd/: StdAfx.cpp, StdAfx.h, apcupsd-obj.mak.in,
+	apcupsd.mak, apcupsd.mak.in, filelist, genmake.sh:
+
+	Add new files to src/win32/apcupsd
+
+2006-03-06 10:37  skoona
+
+	* src/gapcmon/: Makefile.in, gpanel_apcmon.server:
+
+	* Updating gpanel_apcmon.server and Makefile.in.  -
+	gpanel_apcmon.server updated the titles and one spelling mistake -
+	Makefile.in did not have subsitutions for bindir/libdir/datadir/etc
+	  added those subsitition.  * NOTE: A toplevel configure and make
+	install still does not install	 gapcmon and gpanel_apcmon.  
+
+2006-03-06 10:04  skoona
+
+	* src/gapcmon/gpanel_apcmon.server:
+
+	Updated internal titles in gpanel_apcmon.server (menu) file.
+	
+
+2006-03-06 09:58  skoona
+
+	* src/gapcmon/: gapcmon.c, gp_apcmon.c:
+
+	* Changed instance counter to a static in applet_factory() in
+	gp_apcmon.c   This corrects the multiple instance config issue.  *
+	Added a test around g_source_remove() to check for zero value.
+	This avoid a g_source_remove failed message at program shutdown for
+	   both gapcmon.c and gpanel_apcmon.c  James
+
+2006-02-28 18:27  adk0212
+
+	* doc/latex/Makefile:
+
+	Turn off auto-linking in latex2html and make a symlink ourselves.
+	Hard links are decidedly non-portable.
+
+2006-02-25 20:19  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Move --enable-all code to top of section so it can catch cgi.
+
+2006-02-25 20:12  adk0212
+
+	* include/defines.h:
+
+	Remove some unused definitions.
+
+2006-02-25 20:11  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Add --enable-all options for developer convenience.
+
+2006-02-25 10:37  adk0212
+
+	* configure, autoconf/configure.in,
+	src/drivers/usb/generic/generic-usb.c,
+	src/drivers/usb/generic/hidutils.c,
+	src/drivers/usb/generic/libusb.h.in:
+
+	Use libusb-config to determine libusb paths and libs. Introduce
+	libusb.h as a pseudo-header for libusb's usb.h and populate it at
+	configure time.
+
+2006-02-24 08:07  adk0212
+
+	* src/drivers/usb/generic/generic-usb.c:
+
+	Revert error counter in pusb_check_state(). The Darwin problem
+	turns out to be a bug in libusb-0.1.11.
+
+2006-02-23 18:30  adk0212
+
+	* src/drivers/usb/generic/generic-usb.c:
+
+	Remove interrupt read delay; it didn't help. This time attempt to
+	retry the read a few times instead of giving up on the first
+	failure.
+
+2006-02-22 23:39  adk0212
+
+	* src/drivers/usb/generic/generic-usb.c:
+
+	Delay 20 msec before calling usb_interrupt_read. This might fix a
+	bug on Darwin where usb_interrupt_read sometimes fails for no
+	apparent reason.
+
+2006-02-22 23:35  adk0212
+
+	* src/drivers/usb/generic/: generic-usb.c, hidutils.c:
+
+	Fix up some debug prints to use logf so they end up in the trace
+	log at the proper point.
+
+2006-02-22 21:01  adk0212
+
+	* include/version.h:
+
+	Bump version and date to 3.13.2.
+
+2006-02-22 20:56  adk0212
+
+	* include/struct.h, src/apcaccess.c, src/lib/apcconfig.c:
+
+	Move structure definitions to where they're actually used and
+	eliminate another unused struct.
+
+2006-02-22 20:49  adk0212
+
+	* include/struct.h, src/lib/apcconfig.c:
+
+	Remove UPSINFO::enable_access and UPSINFO::remote_state.
+
+2006-02-22 20:37  adk0212
+
+	* src/apcupsd.c:
+
+	Need to call prep_device() after checking for killpower.
+
+2006-02-22 20:29  adk0212
+
+	* src/lib/apcconfig.c:
+
+	Restore old style UPS type mapping; needs more thought.
+
+2006-02-22 20:20  adk0212
+
+	* include/struct.h:
+
+	Remove unused structs: SLAVEINFO, NETDATA.
+
+2006-02-22 20:17  adk0212
+
+	* include/: extern.h, struct.h:
+
+	Remove slave_count, slaves[], UPSINFO::NetUpsPort,
+	UPSINFO::usermagic[], and PAIRS::help.
+
+2006-02-22 20:16  adk0212
+
+	* src/lib/apcconfig.c:
+
+	Obsolete some master-slave related config directives. Remove config
+	directive help field since it's never used; it can be added back
+	easily if we ever decide to do something with it. Kill slave_count,
+	slaves[], NetUpsPort, usermagic[].
+
+2006-02-20 22:41  adk0212
+
+	* autoconf/variables.mak.in, src/Makefile.in:
+
+	Move @LIBUSB@ to individual rules for now.
+
+2006-02-20 20:07  adk0212
+
+	* autoconf/variables.mak.in:
+
+	Include @LIBUSB@ in $(DRVLIBS).
+
+2006-02-20 20:03  adk0212
+
+	* src/Makefile.in, src/options.c, src/smtp.c,
+	src/drivers/apcsmart/smart.c, src/drivers/net/net.c,
+	src/drivers/usb/bsd/bsd-usb.c, src/drivers/usb/bsd/hidutils.c,
+	src/lib/apcfile.c, src/lib/apclock.c, src/lib/apclog.c,
+	src/libusbhid/data.c, autoconf/variables.mak.in, include/extern.h:
+
+	Merge fixes from Branch-3_12.
+
+2006-02-20 19:54  adk0212
+
+	* src/apcupsd.c:
+
+	Redirect stdout and stderr to trace file.
+
+2006-02-19 22:46  skoona
+
+	* src/gapcmon/: gapcmon.c, gp_apcmon.c, gp_apcmon_core.c:
+
+	Reviewed static/extern call list and made corrections as needed as
+	a part of my cleanup effort.  Reformated text for readability.
+
+2006-02-19 01:42  skoona
+
+	* src/gapcmon/: Makefile.in, gapcmon.c, gp_apcmon.c:
+
+	Small tweak to apcupsd/src/gapcmon/Makefile.in to compile correct
+	gapcmon module Add new function gapc_load_icons() to extern list in
+	the two root modules
+
+2006-02-19 01:07  skoona
+
+	* src/gapcmon/: gapcmon.c, gp_apcmon.c, gp_apcmon_core.c:
+
+	Formatted the C files and consolidated the icon load functions into
+	a new routine in gp_apcmon_core.c called gapc_load_icons().  Also
+	added icon ownership release to gpanels destroy routine; gapcmon
+	did not need it.
+
+2006-02-18 22:34  skoona
+
+	* src/gapcmon/gp_apcmon_core.c:
+
+	Updated gp_apcmon_core.c to correct gtk errors when nombatt and
+	hitrans values are not present.  The routine gapc_monitor_update
+	uses these values as the scale for the chart.  I added a default
+	calc for when these values are not present.
+
+2006-02-18 21:22  skoona
+
+	* src/gapcmon/Makefile.in:
+
+	Changed apcupsd/src/gapcmon/Makefile.in to remove the -s flag from
+	icon installs.	Just removed it from everything and debug data
+	would be useful
+
+2006-02-18 14:37  adk0212
+
+	* src/: apcnet.c, apcnet.c.new, apcnet.c.old:
+
+	Remove master-slave mode code.
+
+2006-02-18 14:35  adk0212
+
+	* configure, autoconf/configure.in, include/struct.h,
+	src/Makefile.in, src/apctest.c, src/apcupsd.c, src/device.c,
+	src/reports.c, src/drivers/drivers.c, src/drivers/apcsmart/smart.c,
+	src/drivers/apcsmart/smartsetup.c, src/drivers/dumb/dumboper.c,
+	src/lib/apcconfig.c, src/lib/apcstatus.c:
+
+	First round of master-slave mode removal. Remove NETUPS, NETSLAVE,
+	NETMASTER, SHARENETMASTER, NET, and SHARENET enums. Remove some
+	uses of ups->is_slave() that are not related to the 'net' driver.
+
+2006-02-16 21:20  skoona
+
+	* .cdtproject, .project:
+
+	Removed eclipse meta files - no need to clutter up the source tree.
+
+2006-02-16 19:42  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Need to generate src/gapcmon/Makefile from Makefile.in for either
+	gapcmon or gpanel_apcmon. Not sure how it was working without this
+	change.
+
+2006-02-16 19:32  adk0212
+
+	* src/gapcmon/Makefile.in:
+
+	Enable optimization and create a place for easily adding common
+	CFLAGS.
+
+2006-02-16 19:28  adk0212
+
+	* configure, autoconf/configure.in, src/Makefile.in,
+	src/gapcmon/Makefile.in:
+
+	Fix up gapcmon and gpanel_apcmon configure and Makefiles. It was
+	quite close; only needed a few adjustments. configure.in adjusted
+	to factor out common settings between the two programs
+
+2006-02-16 12:00  skoona
+
+	* .cdtproject, .project:
+
+	Adding Eclipse IDE project file to root tree - .project and
+	.cdtproject.  They are not fully populate with all the include
+	paths now; but I will be update them as I go along: eclipse 3.1.2
+	and C/C++ plugin 3.0.2
+
+2006-02-16 11:57  skoona
+
+	* autoconf/configure.in, autoconf/configure.in.jsj,
+	src/gapcmon/Makefile.in, src/gapcmon/Makefile.in.jsj,
+	src/gapcmon/configure.notes:
+
+	Deleted my versions of configure.in, makefile.in, and notes file.
+	Incorporated the gapcmon and gpanel_apcmon changes directly into
+	autoconf/configure.in and src/gapcmon/Makefile.in.   Offline
+	testing suggest these are the needed changes to conditionally
+	enable either or sub-programs.
+
+2006-02-16 02:22  skoona
+
+	* autoconf/configure.in.jsj, src/gapcmon/Makefile.in.jsj:
+
+	second try: pushing a configure.in.jsj into autoconf directory in
+	prep for change the real configure.in and regenerating makefile and
+	configure script
+
+2006-02-16 02:21  skoona
+
+	* src/gapcmon/gapcmon.desktop:
+
+	pushing a configure.in.jsj into autoconf directory in prep for
+	change the real configure.in and regenerating makefile and
+	configure script
+
+2006-02-16 02:13  skoona
+
+	* src/gapcmon/Makefile.in:
+
+	Updated gapcmon/Makefile.in to reflect sub-packages build needs.
+	Now I need to update the configure script to support the macro
+	links
+
+2006-02-14 21:19  skoona
+
+	* src/gapcmon/README:
+
+	My starting version of a README file
+
+2006-02-14 20:58  skoona
+
+	* src/gapcmon/: Makefile.in, configure.notes:
+
+	Made a minor edit to Makefile.in to enable gapcmon to compile using
+	current configure.scripts. added a file configuration.notes to
+	communicate the full requirements of the two programs.	I need to
+	review your autobuild environment to change the generated configure
+	script and makefiles.  I need help to change Makefile.in and
+	configure script.
+
+2006-02-14 20:07  skoona
+
+	* src/gapcmon/: apcupsd.png, charging.png, gapcmon.c,
+	gapcmon.desktop, gapcmon.h, gapcmon_common.h, gp_apcmon.c,
+	gp_apcmon_core.c, gpanel_apcmon.server, onbatt.png, online.png:
+
+	Adding 4 icon files for both prorgams.	Adding the gnome .desktop
+	file and gnome panel .server files. Also adding the new source code
+	files and removing the old header file which is no longer needed.
+	There will be two binaries created for this tree;
+	gpanel_apcmon(gp_apcmon.c) and gapcmon(gapcmon.c) which will both
+	use gp_apcmon_core.c and gapcmon_common.h.  gpanel_apcmon(aka
+	gpanel) has an additional library requirement of
+	libpanelapplet-2.0, libgnomeui-2.0, libbonoboui-2.0.  These extra
+	requirements have been restricted to the gp_apcmon.c file only, so
+	gapcmon.c/gp_apcmon_core.h/gp_apcmon_common.h can be compiled with
+	the additional libraries.
+
+2006-02-05 13:33  adk0212
+
+	* configure, autoconf/configure.in:
+
+	On cygwin, link with C++ libs unconditionally.
+
+2006-02-05 13:08  adk0212
+
+	* autoconf/configure.in, autoconf/variables.mak.in,
+	src/Makefile.in, configure:
+
+	Link with libsupc++ (always static) when possible to avoid reliance
+	on libstdc++. Also disable exceptions and rtti, if possible.
+
+2006-02-03 18:42  adk0212
+
+	* include/version.h:
+
+	Bump devel version to 3.13.1.
+
+2006-02-03 18:41  adk0212
+
+	* examples/hid-ups.c, src/apctest.c, src/drivers/usb/usb.c:
+
+	Add support for getting/setting sensitivity on USB models.
+
+2006-02-02 08:03  adk0212
+
+	* src/gapcmon/: gapcmon.c, gapcmon.h:
+
+	Update from James: 1. Implemented user refresh timer control
+	allowing users to select the refresh interval in seconds.  Config
+	page was changed to reflect this.  2. Set text view in Events and
+	Status page to read-only, from editable.  3. Tweaked the label
+	layouts on the Information page to be more left aligned will
+	reduces visual jitter during updates.  4. Changed the logic for the
+	refresh button to be more immediate by reusing the initial refresh
+	timer to garauntee the refresh is completed.  5. Began review error
+	messages.  Implemented and OFF-Line message when the NIS Server is
+	not responding because apcupsd is off or going offline.  Need to
+	decide later how to update the displays during this offline state.
+	For now leaving last data refresh on screen until NIS Server
+	returns.
+
+2006-01-30 09:40  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Use apcupsd version as gapcmon version.
+
+2006-01-30 09:08  adk0212
+
+	* configure, autoconf/configure.in, src/gapcmon/gapcmon.c,
+	src/gapcmon/gapcmon.h:
+
+	gapcmon update. Requires glib-2.4 and gnome-vfs-module-2.0. Bug
+	fixes and portability improvements.
+
+2006-01-23 22:13  adk0212
+
+	* doc/techlogs/adk-3.13:
+
+	Update with generic-usb merge.
+
+2006-01-23 21:14  adk0212
+
+	* configure, autoconf/configure.in, platforms/darwin/Info.plist,
+	platforms/darwin/Makefile.in, platforms/sun/Makefile.in,
+	src/Makefile.in, src/drivers/usb/usb.c,
+	src/drivers/usb/bsd/hidutils.c, src/drivers/usb/generic/.cvsignore,
+	src/drivers/usb/generic/Makefile.in,
+	src/drivers/usb/generic/generic-usb.c,
+	src/drivers/usb/generic/hidutils.c,
+	src/drivers/usb/generic/hidutils.h, src/libusbhid/Makefile.in,
+	src/libusbhid/data.c, src/libusbhid/descr.c, src/libusbhid/parse.c,
+	src/libusbhid/usage.c, src/libusbhid/usbcompat.h,
+	src/libusbhid/usbhid.h:
+
+	Merge Branch-generic_usb to HEAD.
+
+2006-01-23 20:32  adk0212
+
+	* doc/techlogs/adk-3.13, include/version.h:
+
+	Time for another development series.
+
+2006-01-23 20:29  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Add gapcmon support via --enable-gapcmon.
+
+2006-01-23 20:27  adk0212
+
+	* autoconf/aclocal.m4:
+
+	Add PKG_CHECK_MODULES macro and others from pkg-config's pkg.m4.
+
+2006-01-23 20:26  adk0212
+
+	* src/: Makefile.in, gapcmon/Makefile.in, gapcmon/gapcmon.c,
+	gapcmon/gapcmon.h:
+
+	Add gapcmon.
+
