@@ -1,90 +1,14 @@
 
-             Release Notes for Apcupsd 3.12.x
+             Release Notes for Apcupsd 3.13.x
 
-
-Release 3.12.2 18Jan06
-
-Bug fix release for Win32 (winapcupsd). Fixes event processing on all
-Win32 platforms and fixes shutdown on WinXP systems.
-
-
-Release 3.12.1 06Jan06
-
-Bug fix release for USB driver. Fixes missing status report on SU 2200.
-
-
-Release 3.12.0 02Jan06
-
-MAJOR CHANGES
-
-  * This is the first release following the new release numbering scheme
-    discussed last spring. The minor release number (y in x.y.z) will be
-    even for stable releases and odd for development versions. We've just
-    completed the 3.11.x development series, so 3.12.x will be the stable
-    branch with minor bug fixes incorporated into 3.12.1, 3.12.2, etc.
-    Major new features will be developed on 3.13.x and eventually 
-    released as 3.14.x.
-
-  * The non-pthreads build has been REMOVED, allowing great 
-    simplification of the code. Apcupsd now requires your platform to
-    provide a reliable pthreads library. All modern operating systems
-    include pthreads support, so this should not be a great impact. Older
-    systems may not support pthreads or may not have a reliable
-    implementation. Users of such systems can continue to use the 3.10.18
-    stable release, although no new features will be implemented there.
-
-  * The master-slave function should work in this release, but will be 
-    removed in the next major release (3.14.x). Please migrate master-
-    slave connections to the NIS net driver. (Note that 'NIS' in this
-    context means Apcupsd's Network Information Server, NOT Sun's NIS/YP)
-  
-  * Apcupsd now requires a C++ compiler in order to build. Only minimal
-    C++ features are used (no templates, RTTI, etc.) so even basic C++
-    compilers will be adequate. Again the only users impacted by this
-    change should be those with very old systems.
+*DEVELOPMENT RELEASE*
 
 NEW FEATURES
 
-  * GUI installer for Win32 systems (thanks, Kern!)
-
-  * SelfTest transfers to battery now supported by USB driver. Such 
-    transfers result in startselftest-endselftest events instead of 
-    powerout-mainsback and trigger the capture of selftest results.
-
-  * apctest supports changing Alarm behavior on USB models.
-
-  * Battery disconnect and reconnect events (USB and apcsmart drivers 
-    only)
-
-  * SNMP driver supports Trap catching which allows the driver to detect
-    power events more quickly. Previously the driver polled the UPS once 
-    every 60 seconds which could result in long delays before power 
-    failure was recognized. In order for trap catching to work YOU MUST 
-    CONFIGURE YOUR UPS TO SEND TRAPS AS DESCRIBED IN THE APCUPSD MANUAL.
-
-  * Win32 build includes SNMP driver support.
-
-OTHER CHANGES (See ChangeLog for detailed list)
-
-  * Code style normalization throughout the source tree
-
-  * Improve USB driver architecture to reduce CPU usage.
-
-  * Rename mainsback.in to offbattery.in so default power loss/return
-    actions are symmetrical.
-  
-  * Powerflute fixes (compile and operational fixes)
-
-  * NIS locking fix to prevent clients from reading corrupt data
-
-  * SNMP driver bug fixes and proper commlost event handling
-
-  * Many documentation improvements
-
-  * Rewrite the UPSCABLE description in apcupsd.conf to hopefully
-    eliminate the common mistake of thinking the cable model numbers are
-    listed in columns by type.
-
-  * Upgrade Cygwin support to 1.5.18 (thanks, Kern!)
-
-  * Many, many bug fixes
+  * GUI monitoring applications, gapcmon and gpanel_apcmon, thanks to
+    James Scott, Jr. These are Gnome/GTK based applications. gapcmon is
+    a standalone app for monitoring a single UPS. gpanel_apcmon
+    integrates into a Gnome panel and can monitor up to 8 UPSes at
+    once. The status of each gpanel UPS is shown with a icon similar
+    to the Win32 tray icon in winapcupsd. Enable building of these
+    tools at compile time via --enable-gapcmon and/or --enable-gpanel.
