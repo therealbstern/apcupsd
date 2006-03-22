@@ -8,6 +8,25 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2006-03-22 18:41  adk0212
+
+	* src/Makefile.in:
+
+	Tie gapcmon into 'make install' so it gets installed along with
+	everything else.
+
+2006-03-22 18:29  adk0212
+
+	* ReleaseNotes:
+
+	Update ReleaseNotes for development release.
+
+2006-03-22 18:23  adk0212
+
+	* ChangeLog:
+
+	Update ChangeLog for 3.13.3 using cvs2cl.pl. A little more verbose,
+	but much easier than doing it by hand!
 
 2006-03-22 18:19  adk0212
 
@@ -54,7 +73,7 @@
 
 	* src/gapcmon/gp_apcmon_core.c:
 
-	Formatted tooltip messages 
+	Formatted tooltip messages James,
 
 2006-03-19 01:36  skoona
 
@@ -68,6 +87,8 @@
 	rightmost.
 
 	cleaned up the format of the tooltip message.
+
+	James, rking
 
 2006-03-18 21:39  adk0212
 
@@ -85,7 +106,7 @@
 	exploration of timers supporting the one_shot model.  Although we
 	want it to refresh quickly; I have to remember that is will
 	repeated until sucessful and possibly interfer with the thread its
-	waiting on.  
+	waiting on.  James,
 
 2006-03-18 20:39  skoona
 
@@ -95,7 +116,7 @@
 	overrun the network thread.  cb_monitor_dedicated_one_time() and
 	cd_information_window_[buttom_refresh | create] changed to support
 	this objective.  Tweaked gapc_monitor_interface_count_enabled()
-	changing int which to gint which.  
+	changing int which to gint which.  James,
 
 2006-03-18 17:28  adk0212
 
@@ -108,21 +129,21 @@
 
 	* src/gapcmon/: gapcmon_common.h, gp_apcmon_core.c:
 
-	Implemented COMMLOST 
+	Implemented COMMLOST James,
 
 2006-03-17 22:39  skoona
 
 	* src/gapcmon/gpanel_apcmon.c:
 
 	Restored gpanel_apcmon:gapc_preferences_view() size request to 440
-	I may have wiped it out during the last sync.  
+	I may have wiped it out during the last sync.  James,
 
 2006-03-17 22:30  skoona
 
 	* src/gapcmon/gpanel_apcmon.c:
 
 	Changed gpanel_apcmon.c to remove keyboard search in preference
-	panel.	
+	panel.	James,
 
 2006-03-17 20:57  adk0212
 
@@ -158,7 +179,7 @@
 	seems to be working.  I would like gapcmon to default to yes,
 	during the configure, make, and make install steps; its no now.
 
-	
+	James,
 
 2006-03-17 14:29  skoona
 
@@ -167,7 +188,7 @@
 	Ok, I was in the wrong dir when I committed.  This configure.in was
 	changed to add gconf2 to gpanel_apcmon's requirements and to
 	include (the commented out) AC_PATH_XTRA pulling the X incl/libs I
-	need for gpanel_apcmons opengl based linegraph.  
+	need for gpanel_apcmons opengl based linegraph.  James,
 
 2006-03-17 14:26  skoona
 
@@ -195,7 +216,7 @@
 	* src/gapcmon/unplugged.png:
 
 	Adding a icon to support the COMMLOST state in gpanel_apcmon Will
-	update gapcmon later to pickup this new state 
+	update gapcmon later to pickup this new state James,
 
 2006-03-13 10:33  adk0212
 
@@ -292,14 +313,14 @@
 	gpanel_apcmon.server updated the titles and one spelling mistake -
 	Makefile.in did not have subsitutions for bindir/libdir/datadir/etc
 	  added those subsitition.  * NOTE: A toplevel configure and make
-	install still does not install	 gapcmon and gpanel_apcmon.  
+	install still does not install	 gapcmon and gpanel_apcmon.  James,
 
 2006-03-06 10:04  skoona
 
 	* src/gapcmon/gpanel_apcmon.server:
 
 	Updated internal titles in gpanel_apcmon.server (menu) file.
-	
+	James,
 
 2006-03-06 09:58  skoona
 
