@@ -1,4 +1,4 @@
-/* gpanel_apcmon.c       serial-0057-3 *****************************************
+/* gpanel_apcmon.c       serial-0057-4 *****************************************
   Gnome applet for monitoring the apcupsd.sourceforge.net package.
   Copyright (C) 2006 James Scott, Jr. <skoona@users.sourceforge.net>
 
@@ -216,6 +216,7 @@ typedef struct _History_Page_Data
 
   gchar           ch_label_color[GAPC_HISTORY_CHART_SERIES+4][GAPC_MAX_ARRAY];
   gchar           ch_label_legend[GAPC_HISTORY_CHART_SERIES+4][GAPC_MAX_ARRAY];
+  gchar           ch_title[GAPC_MAX_ARRAY];
 
   gdouble         d_xinc;       /* base refresh increment for scaling x legend */
   gint32          timer_id;     /* timer id for graph update */
@@ -315,6 +316,11 @@ static GtkWidget *gapc_util_barchart_create (PGAPC_INSTANCE ppi,
                                              gchar * pch_hbar_name,
                                              gdouble d_percent,
                                              gchar * pch_text);
+static void gapc_util_container_sort_descending (PGAPC_CONFIG pcfg);
+static void gapc_util_container_sort_ascending (PGAPC_CONFIG pcfg);
+static gint  gapc_util_container_glist_compare (gconstpointer aa,
+                                                gconstpointer bb,
+                                                gpointer gp);
 
 static gboolean gapc_preferences_init (PGAPC_CONFIG pcfg);
 static GtkWidget *gapc_preferences_dialog_create (PGAPC_CONFIG pcfg);
@@ -1198,6 +1204,94 @@ static gboolean gapc_util_hashtable_remove_default (gpointer key,
 {
   return TRUE; /* causes this entry to be removed */
 }
+/* (*GCompareDataFunc) */
+static gint  gapc_util_container_glist_compare (gconstpointer aa,
+                                                gconstpointer bb,
+                                                gpointer gp)
+{
+    gint a = 0, b = 0, i_order = 0;
+
+ g_return_val_if_fail (aa != NULL, -1);
+ g_return_val_if_fail (bb != NULL, -1); 
+        
+    i_order = GPOINTER_TO_INT(gp);
+    
+    a = (gint)g_object_get_data(G_OBJECT( aa ), "control-page-order");
+    b = (gint)g_object_get_data(G_OBJECT( bb ), "control-page-order");
+
+    if ( i_order > 0 )
+    { /* ascending */
+        if ( a <  b ) { return -1; };
+        if ( a == b ) { return  0; };
+        if ( a >  b ) { return  1; };        
+    } else { /* descending */
+        if ( a <  b ) { return  1; };        
+        if ( a == b ) { return  0; };
+        if ( a >  b ) { return -1; };
+    }    
+    
+    return -1;
+}                                                
+
+/*
+ * Handle reordering the icons in the control panel
+*/
+static void gapc_util_container_sort_ascending (PGAPC_CONFIG pcfg)
+{
+  GtkWidget *child = NULL;
+  GList *children = NULL, *sorted = NULL, *item = NULL;
+  
+  g_return_if_fail ( pcfg != NULL);
+  
+  children = gtk_container_get_children ( GTK_CONTAINER(pcfg->ppbox));
+  g_return_if_fail ( children != NULL );
+  
+  sorted = g_list_sort_with_data ( children , 
+                                   gapc_util_container_glist_compare,
+                                   GINT_TO_POINTER(1)); 
+  item = g_list_first ( sorted );
+  while (item)
+  {
+    child = item->data;
+    if ((gint)g_object_get_data(G_OBJECT( child ), "control-page-order"))
+    {
+        gtk_container_remove ( GTK_CONTAINER(pcfg->ppbox), child);
+        gtk_box_pack_start ( GTK_BOX(pcfg->ppbox), child, TRUE, TRUE, 0);
+    }
+    item = g_list_next ( item );
+  }
+  g_list_free ( children );
+  g_list_free ( sorted );  
+  
+  return;
+}
+static void gapc_util_container_sort_descending (PGAPC_CONFIG pcfg)
+{
+  GtkWidget *child = NULL;
+  GList *children = NULL, *sorted = NULL, *item = NULL;
+  
+  g_return_if_fail ( pcfg != NULL);
+  
+  children = gtk_container_get_children ( GTK_CONTAINER(pcfg->ppbox));
+  g_return_if_fail ( children != NULL );
+  
+  sorted = g_list_sort_with_data ( children , 
+                                   gapc_util_container_glist_compare,
+                                   GINT_TO_POINTER(0)); 
+  item = g_list_first ( sorted );
+  while (item)
+  {
+    child = item->data;
+    if ((gint)g_object_get_data(G_OBJECT( child ), "control-page-order"))
+    {
+        gtk_container_remove ( GTK_CONTAINER(pcfg->ppbox), child);
+        gtk_box_pack_start ( GTK_BOX(pcfg->ppbox), child, TRUE, TRUE, 0);
+    }
+    item = g_list_next ( item );
+  }
+  
+  return;
+}
 
 /*
  * Events and Status Report Pages
@@ -1553,6 +1647,7 @@ static gboolean cb_util_line_chart_refresh (PGAPC_HISTORY pg)
   }
 
   gdk_threads_enter ();
+  gtk_glgraph_set_title(glg, pg->ch_title);  
   gtk_glgraph_redraw (pg->glg);
   gdk_threads_leave ();
   
@@ -1649,15 +1744,18 @@ static gboolean gapc_util_line_chart_create (PGAPC_HISTORY pg, GtkWidget * box)
   
   /* 
    * Set the graph attributes */
-  gtk_glgraph_set_title (glg,
-                         "<span foreground=\"red\"><big>"
-                         "click to toggle legend" "</big></span> ");
+  pch = g_strdup_printf("<span foreground=\"red\"><big>"
+      "Monitor[%d]" "</big></span> ", pg->cb_monitor_num + 1);
+  gtk_glgraph_set_title(glg, pch);
+  g_snprintf(pg->ch_title, GAPC_MAX_ARRAY, "%s", pch);
+  g_free(pch);
 
-  pch = g_strdup_printf ("<span foreground=\"blue\">"
-                         "<i>sampled every %3.2f seconds</i>" "</span> ",
-                         pg->d_xinc * GAPC_HISTORY_CHART_FACTOR_XINC);
-  gtk_glgraph_axis_set_label (glg, GTKGLG_AXIS_X, pch);
-  g_free (pch);
+  pch = g_strdup_printf("<span foreground=\"blue\">"
+      "<i>sampled every %3.2f seconds</i>"
+      " ... click to toggle legend"
+      "</span> ", pg->d_xinc * GAPC_HISTORY_CHART_FACTOR_XINC);
+  gtk_glgraph_axis_set_label(glg, GTKGLG_AXIS_X, pch);
+  g_free(pch);
 
   gtk_glgraph_axis_set_label (glg, GTKGLG_AXIS_Y,
                               "<span foreground=\"blue\">"
@@ -1750,8 +1848,11 @@ static void cb_information_window_button_refresh (GtkButton * button,
     GtkWidget      *w = g_hash_table_lookup (ppi->pht_Widgets, "StatusBar");
     if ( w != NULL )
     {
-        gtk_statusbar_push (GTK_STATUSBAR (w), ppi->i_info_context,
-                        "Refresh Completed!...");
+         gchar *pch1 = g_strdup_printf("Refresh action for M-%d Completed!...",
+            ppi->cb_monitor_num + 1);
+
+         gtk_statusbar_push(GTK_STATUSBAR(w), ppi->i_info_context, pch1);
+         g_free(pch1);
     }
   }
   else
@@ -1763,8 +1864,12 @@ static void cb_information_window_button_refresh (GtkButton * button,
 
     if ( w != NULL )
     {
-        gtk_statusbar_push (GTK_STATUSBAR (w), ppi->i_info_context,
-                        "Refresh Failed(retry enabled): Thread is Busy...");
+         gchar *pch1 = g_strdup_printf("Refresh action for M-%d failed!"
+            " (retry enabled):" " network thread is busy...",
+            ppi->cb_monitor_num + 1);
+
+         gtk_statusbar_push(GTK_STATUSBAR(w), ppi->i_info_context, pch1);
+         g_free(pch1);
     }
 
     g_timeout_add (GAPC_REFRESH_FACTOR_ONE_TIME,
@@ -2154,7 +2259,7 @@ static void cb_applet_change_size (PanelApplet * applet, gint size,
 }
 
 /*
- *  Menu Callback : Display About window
+ *  Panel Popup Menu Callback : Act on choices
 */
 static void cb_applet_menu_verbs (BonoboUIComponent * uic, PGAPC_CONFIG pcfg,
                                   const gchar * verbname)
@@ -2176,6 +2281,17 @@ static void cb_applet_menu_verbs (BonoboUIComponent * uic, PGAPC_CONFIG pcfg,
     pcfg->prefs_dlg = gapc_preferences_dialog_create (pcfg);
     return;
   }
+  if (g_str_equal (verbname, "gapc_ascending"))
+  {
+    gapc_util_container_sort_ascending ( pcfg);
+    return;
+  }
+  if (g_str_equal (verbname, "gapc_descending"))
+  {
+    gapc_util_container_sort_descending ( pcfg);
+    return;
+  }
+  
 
   return;
 }
@@ -2187,7 +2303,8 @@ static void cb_applet_menu_verbs (BonoboUIComponent * uic, PGAPC_CONFIG pcfg,
 static gboolean cb_monitor_dedicated_one_time_refresh (PGAPC_INSTANCE ppi)
 {
   GtkWidget      *w = NULL;
-
+  gchar *pch1 = NULL, *pch2 = NULL;
+   
   g_return_val_if_fail (ppi != NULL, FALSE);
 
   if ( (!ppi->b_run) || !(ppi->cb_enabled) )
@@ -2209,8 +2326,10 @@ static gboolean cb_monitor_dedicated_one_time_refresh (PGAPC_INSTANCE ppi)
   {
     if (w != NULL)
     {
-      gtk_statusbar_push (GTK_STATUSBAR (w), ppi->i_info_context,
-                          "Refresh Not Completed(retry enabled)... Network Busy!");
+         pch1 = g_strdup_printf("Refresh for M-%d failed! "
+            "(retry enabled)... network busy!", ppi->cb_monitor_num + 1);
+         gtk_statusbar_push(GTK_STATUSBAR(w), ppi->i_info_context, pch1);
+         g_free(pch1);
     }
     if ( ppi->i_netbusy_counter++ % 10 )    
     { /* Fall thru and quit after ten trys */
@@ -2218,12 +2337,20 @@ static gboolean cb_monitor_dedicated_one_time_refresh (PGAPC_INSTANCE ppi)
 	    gdk_threads_leave ();
 	    return TRUE;                /* try again */
     }
-  }
+  } else {
+      pch1 = g_hash_table_lookup(ppi->pht_Status, "UPSNAME");
+      pch2 = g_hash_table_lookup(ppi->pht_Status, "HOSTNAME");
+      g_snprintf(ppi->phs.ch_title, GAPC_MAX_ARRAY,
+         "<span foreground=\"blue\"><big>"
+         "%s @(M-%d) %s" "</big></span> ", pch1, ppi->cb_monitor_num + 1, pch2);
+  }  	
 
   if (w != NULL)
   {
-    gtk_statusbar_push (GTK_STATUSBAR (w), ppi->i_info_context,
-                        "One-Time Refresh Completed...");
+      pch1 = g_strdup_printf("One-Time Refresh for M-%d Completed...",
+         ppi->cb_monitor_num + 1);
+      gtk_statusbar_push(GTK_STATUSBAR(w), ppi->i_info_context, pch1);
+      g_free(pch1);
   }
   gdk_flush ();
   gdk_threads_leave ();
@@ -2257,9 +2384,13 @@ static gboolean cb_monitor_refresh_control (PGAPC_INSTANCE ppi)
     GtkWidget  *w = g_hash_table_lookup (ppi->pht_Widgets, "StatusBar");
     if ( w != NULL )
     {
-        gtk_statusbar_pop (GTK_STATUSBAR (w), ppi->i_info_context);
-        gtk_statusbar_push (GTK_STATUSBAR (w), ppi->i_info_context,
-                        "Refresh Cycle Change Completed!...");
+         gchar *pch1 = NULL;
+
+         gtk_statusbar_pop(GTK_STATUSBAR(w), ppi->i_info_context);
+         pch1 = g_strdup_printf("Refresh Cycle Change for M-%d Completed!...",
+            ppi->cb_monitor_num + 1);
+         gtk_statusbar_push(GTK_STATUSBAR(w), ppi->i_info_context, pch1);
+         g_free(pch1);
     }
   }
 
@@ -2274,7 +2405,8 @@ static gboolean cb_monitor_refresh_control (PGAPC_INSTANCE ppi)
 */
 static gboolean cb_monitor_automatic_refresh (PGAPC_INSTANCE ppi)
 {
-  
+  gchar *pch1 = NULL;
+     
   g_return_val_if_fail (ppi != NULL, FALSE);
 
   if ((!ppi->b_run) || !(ppi->cb_enabled))
@@ -2298,9 +2430,11 @@ static gboolean cb_monitor_automatic_refresh (PGAPC_INSTANCE ppi)
 
       if (w != NULL)
       {
-        gtk_statusbar_pop (GTK_STATUSBAR (w), ppi->i_info_context);
-        gtk_statusbar_push (GTK_STATUSBAR (w), ppi->i_info_context,
-                            "Automatic refresh complete...");
+            gtk_statusbar_pop(GTK_STATUSBAR(w), ppi->i_info_context);
+            pch1 = g_strdup_printf("Automatic refresh for M-%d complete...",
+               ppi->cb_monitor_num + 1);
+            gtk_statusbar_push(GTK_STATUSBAR(w), ppi->i_info_context, pch1);
+            g_free(pch1);
       }      
     }
     else
@@ -2309,9 +2443,11 @@ static gboolean cb_monitor_automatic_refresh (PGAPC_INSTANCE ppi)
 
       if (w != NULL)
       {
-        gtk_statusbar_pop (GTK_STATUSBAR (w), ppi->i_info_context);
-        gtk_statusbar_push (GTK_STATUSBAR (w), ppi->i_info_context,
-                            "Automatic refresh failed! Thread is busy...");
+            gtk_statusbar_pop(GTK_STATUSBAR(w), ppi->i_info_context);
+            pch1 = g_strdup_printf("Automatic refresh for M-%d failed!"
+               " Network thread is busy...", ppi->cb_monitor_num + 1);
+            gtk_statusbar_push(GTK_STATUSBAR(w), ppi->i_info_context, pch1);
+            g_free(pch1);
       }
       if ( ppi->i_netbusy_counter++ % 10 )
       { /* fall thru every tenth time to queue a message */
@@ -3480,19 +3616,6 @@ static gboolean gapc_monitor_interface_remove (PGAPC_INSTANCE ppi)
     g_source_remove (ppi->phs.timer_id);   
     ppi->phs.timer_id = 0;
   }
-  if ( ppi->phs.glg != NULL )
-  {  
-      if (ppi->phs.glg->tooltip_id)
-      {
-        g_source_remove (ppi->phs.glg->tooltip_id);    
-        ppi->phs.glg->tooltip_id = 0;
-      }
-      if (ppi->phs.glg->expose_id)
-      {
-        g_source_remove (ppi->phs.glg->expose_id);        
-        ppi->phs.glg->expose_id = 0;
-      }
-  }
   /* end History Page
    */
 
@@ -3507,12 +3630,12 @@ static gboolean gapc_monitor_interface_remove (PGAPC_INSTANCE ppi)
 
 	for (v_index = 0; v_index < GAPC_MAX_ARRAY; v_index++)
 	{
-	   if (ppi->pach_events[v_index] != NULL);
+	   if (ppi->pach_events[v_index] != NULL)
 	   {
 	       g_free (ppi->pach_events[v_index]);
 	   }
 	   ppi->pach_events[v_index] = NULL;
-	   if (ppi->pach_status[v_index] != NULL);
+	   if (ppi->pach_status[v_index] != NULL)
 	   {
 	       g_free (ppi->pach_status[v_index]);
        }
@@ -3560,6 +3683,8 @@ static gboolean gapc_monitor_interface_create (PGAPC_INSTANCE ppi)
   ppi->i_old_icon_index = GAPC_N_ICONS;
   ppi->i_icon_index = GAPC_ICON_DEFAULT;  
   ppi->evbox = gtk_event_box_new ();
+  g_object_set_data(G_OBJECT(ppi->evbox), "control-page-order", 
+                     GINT_TO_POINTER(ppi->cb_monitor_num + 1));    
   gtk_box_pack_start (GTK_BOX (pcfg->ppbox), ppi->evbox, TRUE, TRUE, 0);
   g_signal_connect (ppi->evbox, "button-press-event",
                     G_CALLBACK (cb_monitor_handle_icon_clicked), ppi);
@@ -3663,6 +3788,8 @@ static gboolean gapc_applet_create (PanelApplet * applet, PGAPC_CONFIG pcfg)
   const BonoboUIVerb gapc_applet_menu_verbs[] = {
     BONOBO_UI_UNSAFE_VERB ("gapc_about", cb_applet_menu_verbs),
     BONOBO_UI_UNSAFE_VERB ("gapc_preferences", cb_applet_menu_verbs),
+    BONOBO_UI_UNSAFE_VERB ("gapc_ascending", cb_applet_menu_verbs),   
+    BONOBO_UI_UNSAFE_VERB ("gapc_descending", cb_applet_menu_verbs),       
     BONOBO_UI_VERB_END          /* Popup menu on the applet */
   };
 
@@ -3673,7 +3800,14 @@ static gboolean gapc_applet_create (PanelApplet * applet, PGAPC_CONFIG pcfg)
           "   pixtype=\"stock\" pixname=\"gnome-stock-about\"/>\n"
           " <menuitem name=\"Preferences\" verb=\"gapc_preferences\""
           " _label=\"_Preferences ...\"\n"
-          "   pixtype=\"stock\" pixname=\"gtk-preferences\"/>\n" "</popup>\n";
+          "   pixtype=\"stock\" pixname=\"gtk-preferences\"/>\n" 
+          " <menuitem name=\"Ascending\" verb=\"gapc_ascending\""
+          " _label=\"Sort _ascending\"\n"
+          "   pixtype=\"stock\" pixname=\"gtk-stock-sort-ascending\"/>\n"
+          " <menuitem name=\"Descending\" verb=\"gapc_descending\""
+          " _label=\"Sort _descending\"\n"
+          "   pixtype=\"stock\" pixname=\"gtk-stock-sort-descending\"/>\n"
+          "</popup>\n";
   GtkWidget      *result = NULL;
 
   gapc_util_load_icons (pcfg);
