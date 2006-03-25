@@ -1,6 +1,6 @@
-/* gapcmon_gtkglgraph.c    serial-0057-3 ***************************************
+/* gapcmon_gtkglgraph.c    serial-0057-4 ***************************************
  *
- *  Modified from the original package called "GtkGLGraph" by Todd Goyen
+ *  Modified from the original package called "GtkGLGraph" 
  *      Thu Jun 10 22:50:18 2004
  *      Copyright  2004  Todd Goyen (GPL)
  *      tgoyen@swri.org or me@mumblelina.com
@@ -496,9 +496,42 @@ extern GtkWidget *gtk_glgraph_new (void)
 
 static void gtk_glgraph_destroy (GtkObject * object)
 {
-  /*GtkGLGraph *glg = GTK_GLGRAPH (object); */
+   GtkGLGraph *glg = NULL; 
 
-  GTK_OBJECT_CLASS (parent_class)->destroy (object);
+   g_return_if_fail (object != NULL);
+
+   glg = GTK_GLGRAPH(object);
+   
+   g_return_if_fail ( GTK_IS_GLGRAPH(glg) );
+
+   if (glg != NULL) {
+      /*
+       * Disconnect from X */
+      if (glg->dpy != NULL)
+      {
+          glXDestroyContext (glg->dpy, glg->cx);
+          glFinish();
+          glg->dpy = NULL;
+          glg->cx = NULL;          
+      }    
+      if (glg->tooltip_id) {
+         g_source_remove(glg->tooltip_id);
+         glg->tooltip_id_valid = FALSE;
+         glg->tooltip_visible = FALSE;
+         glg->tooltip_id = 0;
+      }
+      if (glg->expose_id) {
+         g_source_remove(glg->expose_id);
+         glg->expose_id = 0;
+      }      
+   }
+
+   if (GTK_OBJECT_CLASS (parent_class)->destroy)
+   {
+      (* GTK_OBJECT_CLASS(parent_class)->destroy) (object);
+   } 
+   
+ return;
 }
 
 static void gtk_glgraph_size_request (GtkWidget * widget,
