@@ -131,22 +131,38 @@ extern gboolean gapc_load_icons (PGAPC_CONFIG pcfg)
     "/usr/share/pixmaps/unplugged.png",    
     NULL
   };
+   gchar *pch_local_image_names[] = {
+      "./online.png",
+      "./onbatt.png",
+      "./charging.png",
+      "./apcupsd.png",
+      "./unplugged.png",
+      NULL
+   };
+   gchar  **pch_name = NULL;
 
-  for (i_x = 0; (pch_image_names[i_x] != NULL) && (i_x < GAPC_N_ICONS); i_x++)
-    {
-      pcfg->my_icons[i_x] = gdk_pixbuf_new_from_file (pch_image_names[i_x], &gerror);
-      if (gerror != NULL)
-	  {
-	  	gchar *pch = NULL;
+   g_return_val_if_fail(pcfg != NULL, FALSE);
+   
+   if ( g_file_test (pch_image_names[0],G_FILE_TEST_EXISTS) ) {
+        pch_name = pch_image_names;
+   } else {
+        pch_name = pch_local_image_names;        
+   }
 
-	  	pch = g_strdup_printf ("Get Icon=%s Failed", pch_image_names[i_x]);
-	  	gapc_log_app_error ("gapc_load_icons", pch, gerror->message);
-	  	g_error_free (gerror);
-	  	g_free (pch);
-	  	gerror = NULL;
-	  	b_rc = FALSE;
-	  }
-    }
+   for (i_x = 0; (pch_name[i_x] != NULL) && (i_x < GAPC_N_ICONS); i_x++) {
+      pcfg->my_icons[i_x] = gdk_pixbuf_new_from_file(pch_name[i_x], &gerror);
+
+      if (gerror != NULL) {
+         gchar *pch = NULL;
+
+         pch = g_strdup_printf("Get Icon=%s Failed", pch_name[i_x]);
+         gapc_log_app_error("gapc_util_load_icons", pch, gerror->message);
+         g_error_free(gerror);
+         g_free(pch);
+         gerror = NULL;
+         b_rc = FALSE;
+      }
+   }
 
   pcfg->i_old_icon_index = GAPC_N_ICONS;
   pcfg->i_icon_index = GAPC_ICON_DEFAULT;
