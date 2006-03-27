@@ -35,7 +35,7 @@
 
 
 /*
- * gp_apsmon_core.c routines
+ * gp_apcmon_core.c routines
  */
 extern gboolean   gapc_load_icons (PGAPC_CONFIG pcfg); 
 extern gint   	  gapc_save_preferences (PGAPC_CONFIG pcfg);
