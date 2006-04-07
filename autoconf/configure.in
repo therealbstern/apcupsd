@@ -911,7 +911,7 @@ if test -n "$GCC" -a "$CFG_CYGWIN" != "yes"; then
     # you care about binary portability between Linux distributions,
     # you need to either 1) build your own GCC with static C++ libraries
     # or 2) link using gcc and libsupc++.  We choose the latter since
-    # CUPS doesn't (currently) use any of the stdc++ library.
+    # Apcupsd doesn't (currently) use any of the stdc++ library.
     #
     # Previous versions of GCC do not have the reliance on the stdc++
     # or g++ libraries, so the extra supc++ library is not needed.
@@ -937,18 +937,20 @@ if test -n "$GCC" -a "$CFG_CYGWIN" != "yes"; then
     OLDCFLAGS="$CFLAGS"
     CFLAGS="$CFLAGS -fno-exceptions"
     AC_TRY_COMPILE(,,            
+	CPPFLAGS="$CPPFLAGS -fno-exceptions"
 	AC_MSG_RESULT(yes),
-	CFLAGS="$OLDCFLAGS"
 	AC_MSG_RESULT(no))
+    CFLAGS="$OLDCFLAGS"
 
     # See if GCC supports -fno-rtti...
     AC_MSG_CHECKING(if GCC supports -fno-rtti)
     OLDCFLAGS="$CFLAGS"
     CFLAGS="$CFLAGS -fno-rtti"
     AC_TRY_COMPILE(,,            
+	CPPFLAGS="$CPPFLAGS -fno-rtti"
 	AC_MSG_RESULT(yes),
-	CFLAGS="$OLDCFLAGS"
 	AC_MSG_RESULT(no))
+    CFLAGS="$OLDCFLAGS"
 fi
 
 AC_SUBST(POMAKE)
