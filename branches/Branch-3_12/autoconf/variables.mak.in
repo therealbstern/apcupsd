@@ -78,7 +78,6 @@ CC = @CC@
 CXX = @CXX@
 LD = @LD@
 DEFS = @EXTRADEFS@ $(LOCALDEFS)
-CPPFLAGS = @CPPFLAGS@
 
 # Libraries
 APCLIBS = $(topdir)/src/lib/libapc.a
@@ -93,7 +92,8 @@ WINLIBS = @WINLIBS@
 # Made INCFLAGS relative to the topdir and hardcoded into the Makefiles
 # For GDINCLUDE see src/cgi/Makefile.in
 INCFLAGS = $(GDINCLUDE) -I$(topdir)/include $(EXTRAINCS)
-CFLAGS = @CFLAGS@ $(CPPFLAGS) @PTHREAD_CFLAGS@ $(INCFLAGS)
+CFLAGS = @CFLAGS@ @PTHREAD_CFLAGS@ $(INCFLAGS)
+CPPFLAGS = @CPPFLAGS@ $(CFLAGS)
 LDFLAGS = @LDFLAGS@
 LIBS = $(APCLIBS) $(INTLLIBS) @PTHREAD_LFLAGS@ @LIBS@
 
