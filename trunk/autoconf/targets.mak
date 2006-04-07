@@ -30,13 +30,13 @@ all-subdirs:
 dummy:
 
 .c.o:
-	$(CXX) -c $(CFLAGS) $(DEFS) $<
+	$(CXX) -c $(CPPFLAGS) $(DEFS) $<
 
 .c.lo:
 	$(LIBTOOL) --mode=compile $(COMPILE) $<
 
 .cpp.o:
-	$(CXX) -c $(CFLAGS) $(DEFS) $<
+	$(CXX) -c $(CPPFLAGS) $(DEFS) $<
 
 .po.pox:
 	$(MAKE) DESTDIR=$(DESTDIR) $(PACKAGE).pot

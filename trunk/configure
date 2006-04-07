@@ -12888,17 +12888,18 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  echo "$as_me:$LINENO: result: yes" >&5
+  CPPFLAGS="$CPPFLAGS -fno-exceptions"
+	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-CFLAGS="$OLDCFLAGS"
-	echo "$as_me:$LINENO: result: no" >&5
+echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+    CFLAGS="$OLDCFLAGS"
 
     # See if GCC supports -fno-rtti...
     echo "$as_me:$LINENO: checking if GCC supports -fno-rtti" >&5
@@ -12942,17 +12943,18 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  echo "$as_me:$LINENO: result: yes" >&5
+  CPPFLAGS="$CPPFLAGS -fno-rtti"
+	echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-CFLAGS="$OLDCFLAGS"
-	echo "$as_me:$LINENO: result: no" >&5
+echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 fi
 rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+    CFLAGS="$OLDCFLAGS"
 fi
 
 

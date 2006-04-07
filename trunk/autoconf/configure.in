@@ -1098,18 +1098,20 @@ if test -n "$GCC" -a "$CFG_CYGWIN" != "yes"; then
     OLDCFLAGS="$CFLAGS"
     CFLAGS="$CFLAGS -fno-exceptions"
     AC_TRY_COMPILE(,,            
+	CPPFLAGS="$CPPFLAGS -fno-exceptions"
 	AC_MSG_RESULT(yes),
-	CFLAGS="$OLDCFLAGS"
 	AC_MSG_RESULT(no))
+    CFLAGS="$OLDCFLAGS"
 
     # See if GCC supports -fno-rtti...
     AC_MSG_CHECKING(if GCC supports -fno-rtti)
     OLDCFLAGS="$CFLAGS"
     CFLAGS="$CFLAGS -fno-rtti"
     AC_TRY_COMPILE(,,            
+	CPPFLAGS="$CPPFLAGS -fno-rtti"
 	AC_MSG_RESULT(yes),
-	CFLAGS="$OLDCFLAGS"
 	AC_MSG_RESULT(no))
+    CFLAGS="$OLDCFLAGS"
 fi
 
 AC_SUBST(POMAKE)
