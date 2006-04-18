@@ -1,18 +1,18 @@
 Name: gapcmon
-Version: 0.5.7
-Release: 3
+Version: 0.7.0
+Release: 0
 License: GPL
 Group: Applications/System
 Source: gapcmon-%{version}.tar.bz2
 URL: http://gapcmon.sourceforge.net/
-Provides: gapcmon gpanel_apcmon
+Provides: gapcmon
 AutoReqProv: no
 Prefix:	/usr
 BuildRoot: %{_tmppath}/%{name}-%{version}-%{release}-root-%(%{__id_u} -n)
-Summary: A gtk gui program, and a alternate gnome panel applet version to monitor the operation of UPS's being controlled by the APCUPSD package
+Summary: A gtk gui program, with support for the FreeDesktop.org notification area icons, to monitor the operation of UPS's being controlled by the APCUPSD package
 
 %description
-gapcmon and gpanel_apcmon monitor and display the status 
+gapcmon monitors and displays the status 
 of UPSs under the management of the APCUPSD package. 
 APCUPSD.sourceforge.net is required, as is the NIS api 
 of apcupsd, which may need top be compiled in. 
@@ -41,21 +41,61 @@ make "%{?_smp_mflags}" clean
 %doc %{_docdir}/gapcmon/INSTALL
 %doc %{_docdir}/gapcmon/ChangeLog
 %doc %{_docdir}/gapcmon/gapcmon.desktop
-%doc %{_docdir}/gapcmon/gpanel_apcmon.schemas
-%doc %{_docdir}/gapcmon/gpanel_apcmon.server
 %doc %{_datadir}/pixmaps/apcupsd.png
 %doc %{_datadir}/pixmaps/online.png
 %doc %{_datadir}/pixmaps/onbatt.png
 %doc %{_datadir}/pixmaps/charging.png
 %doc %{_datadir}/pixmaps/unplugged.png
-%doc %{_datadir}/gnome/apps/Applications/gapcmon.desktop
-%doc %{_libdir}/bonobo/servers/gpanel_apcmon.server
-%doc %{_sysconfdir}/gconf/schemas/gpanel_apcmon.schemas
+%doc %{_datadir}/pixmaps/gapc_prefs.png
+%doc %{_datadir}/applications/gapcmon.desktop
 %{_bindir}/gapcmon
-%{_libexecdir}/gpanel_apcmon
 
 
 %changelog
+* Tue Apr 18 2006 James Scott, Jr. <skoona@users.sourceforge.net>
+- gapc_devel (0.6.7-0) stable; urgency=normal
+- Rewrite to include desktop independant features completed.
+- This module replace all other interations of gapcmon: including
+  gapc, gpanel, gpanel_apcmon, etc.
+
+* Thu Apr 6 2006 James Scott, Jr. <skoona@users.sourceforge.net>
+- Implemented the FreeDesktop.org spec for notification_area icons
+  using modified source from gnome.cvs:libegg.
+- Added a paned window to help user manage size of icons and notebooks
+- Attempted to implement true alphabetic sort of icons labels, by adding
+  label text to main.window icons ( not working the why I would like )
+- Reviewed gdk_threads_enter() useage and removed duplicates from
+  gtkglgraph.c in response to a user bug ( no x|y-labels on chart-N+1)  
+- Several routine consolidated or parameter-ized.
+
+* Sat Apr 1 2006 James Scott, Jr. <skoona@users.sourceforge.net>
+- Implemented the tooltip in line graph history page.  Now displays
+  the colored point value under the mouse.
+- Updated the gapc_monitor_update() in gapcmon_core.c to handle
+  the 0-100 percent scale for charted data points.  LINEV uses
+  HITRANS as scale and defaults to 120:230, BATTV uses 12:24 unless 
+  NOMBATTV is present, and LOADPCT, TIMELEFT, are inversly related to
+  each other.  BCHARGE values are taken as is.
+- Updated the gapc_util_point_filter_set() in gapcmon_core.c to handle
+  out of range graphing data points by defaulting them to 108 percent
+  or zero percent.
+
+* Fri Mar 31 2006 James Scott, Jr. <skoona@users.sourceforge.net>
+- Implemented the sort_icons function to reorder dynamically
+  created monitor icons.
+- Added gtk_glgraph_unrealize() and gtk_glgraph_destroy() to
+  the gapcmon_gtkglgraph subpackage.  To fix multi-threaded
+  operations.
+- Integrated the source files into a shared arrangement.
+  gapcmon_core.[c|h] gapcmon_gtkglgraph.[c|h] and two
+  anchor files gapcmon.h and gpanel_apcmon.c
+- Added gtk_glgraph feature to gapcmon replacing the progress
+  bars on the overview page.
+- Added support for up to eight monitors to gapcmon with the 
+  full functionality of gpanel.  commandline take one value
+  the instance number, which defaults to zero.
+- Reordered preferences columns for better presentation.
+
 * Fri Mar 17 2006 James Scott, Jr. <skoona@users.sourceforge.net>
 - Implemented the none-enabled and COMMLOST program states
 

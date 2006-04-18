@@ -1,6 +1,6 @@
-/* gapcmon_gtkglgraph.c    serial-0057-4 ***************************************
+/* gapcmon_gtkglgraph.c    serial-0070-0 ***************************************
  *
- *  Modified from the original package called "GtkGLGraph" 
+ *  Modified from the original package called "GtkGLGraph" by Todd Goyen
  *      Thu Jun 10 22:50:18 2004
  *      Copyright  2004  Todd Goyen (GPL)
  *      tgoyen@swri.org or me@mumblelina.com
@@ -9,7 +9,8 @@
  * modified by James Scott, Jr.<skoona@users.sourceforge.net>
  *  March, 2006 (GPL)
  *    -  repacking for use in gapcmon.sourceforge.net
- *    -  enabled legend support and partial tooltip
+ *    -  enabled legend support and full tooltip support
+ *    -  created a unrealize() and destroy() method.
  *    -  created a example program for the library showing linegraph
 */
 
@@ -26,7 +27,8 @@
 #define HEIGHT		300
 #define PIXPERDIV	20
 #define TOOLTIP_TIMEOUT	150
-#define INSET		15.0
+/* #define INSET		15.0 */
+#define INSET       120.0
 #define TTY_BORDER	6.0
 #define TTX_BORDER	8.0
 
@@ -48,17 +50,15 @@ static guint    signals[LAST_SIGNAL] = { 0 };
 #define g_marshal_value_peek_pointer(v)  g_value_get_pointer (v)
 #define g_marshal_value_peek_object(v)   g_value_get_object (v)
 
-static GdkPixbuf *gtk_glgraph_create_rotated_flipped_text_pixbuf (GtkGLGraph *
-                                                                  glg,
+static GdkPixbuf *gtk_glgraph_create_rotated_flipped_text_pixbuf (GtkGLGraph * glg,
                                                                   PangoLayout *
                                                                   layout,
                                                                   GtkGLGraphDirection
                                                                   dir,
                                                                   gboolean
                                                                   horizontal,
-                                                                  gboolean
-                                                                  vertical);
-static gboolean gtk_glgraph_expose_timeout (GtkWidget * widget);
+                                                                  gboolean vertical);
+/* static gboolean gtk_glgraph_expose_timeout(GtkWidget * widget); */
 static gboolean gtk_glgraph_tooltip_timeout (GtkGLGraph * const glg);
 static gdouble  BiCubicR (gdouble x);
 static gint     gtk_glgraph_button_press_event (GtkWidget * widget,
@@ -73,18 +73,15 @@ static gint     gtk_glgraph_leave_notify_event (GtkWidget * widget,
                                                 GdkEventCrossing * event);
 static gint     gtk_glgraph_motion_notify_event (GtkWidget * widget,
                                                  GdkEventMotion * event);
-static guint16  rotate (guint16 data);
+/* static guint16  rotate (guint16 data); */
 static void     g_cclosure_user_marshal_VOID__OBJECT_OBJECT (GClosure * closure,
-                                                             GValue *
-                                                             return_value,
-                                                             guint
-                                                             n_param_values,
+                                                             GValue * return_value,
+                                                             guint n_param_values,
                                                              const GValue *
                                                              param_values,
                                                              gpointer
                                                              invocation_hint,
-                                                             gpointer
-                                                             marshal_data);
+                                                             gpointer marshal_data);
 static void     get_adjustments (GtkGLGraph * const glg);
 static void     gtk_glgraph_destroy (GtkObject * object);
 static void     gtk_glgraph_draw_cursor (const GtkGLGraph * glg);
@@ -94,8 +91,7 @@ static void     gtk_glgraph_draw_cursor_vertical (const GtkGLGraph * glg);
 static void     gtk_glgraph_draw_dataset (const GtkGLGraph * const glg,
                                           const GtkGLGDataSet * const glds);
 static void     gtk_glgraph_draw_dataset_surface (const GtkGLGraph * const glg,
-                                                  const GtkGLGDataSet *
-                                                  const glds);
+                                                  const GtkGLGDataSet * const glds);
 static void     gtk_glgraph_draw_dataset_xy (const GtkGLGraph * const glg,
                                              const GtkGLGDataSet * const glds);
 static void     gtk_glgraph_draw_gl_background (const GtkGLGraph * glg);
@@ -132,6 +128,7 @@ static void     gtk_glgraph_layout_calculate_offsets (GtkGLGraph * glg);
 static void     gtk_glgraph_pixbuf_update_tooltip (GtkGLGraph * const glg,
                                                    gchar * const text);
 static void     gtk_glgraph_realize (GtkWidget * widget);
+static void     gtk_glgraph_unrealize (GtkWidget * widget);
 static void     gtk_glgraph_set_color (const GtkGLGraph * const glg, gdouble z,
                                        gdouble alpha, GtkGLGraphColormap cmap,
                                        gdouble ma, gdouble mi);
@@ -144,17 +141,56 @@ static void     gtk_glgraph_size_request (GtkWidget * widget,
                                           GtkRequisition * requisition);
 static void     gtk_glgraph_update_axis_ticks (GtkGLGraph * const glg,
                                                GtkGLGraphAxis * const axis);
-static void     gtk_glgraph_value_changed (GtkAdjustment * adj,
-                                           GtkGLGraph * glg);
+static void     gtk_glgraph_value_changed (GtkAdjustment * adj, GtkGLGraph * glg);
 
 /*
  * Start of code section
 */
-extern void gtk_glgraph_axis_set_label (GtkGLGraph * glg,
-                                        GtkGLGraphAxisType axis,
+static void gtk_glgraph_unrealize (GtkWidget * widget)
+{
+  GtkGLGraph     *glg = NULL;
+
+/*   GdkWindow *window = NULL; */
+
+  g_return_if_fail (widget != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (widget));
+  g_return_if_fail (widget->window != NULL);
+
+  glg = GTK_GLGRAPH (widget);
+
+  if (GTK_WIDGET_MAPPED (widget))
+    gtk_widget_unmap (widget);
+
+  if (glg->dpy != NULL)
+  {
+    glXDestroyContext (glg->dpy, glg->cx);
+    glFinish ();
+    glg->dpy = NULL;
+    glg->cx = NULL;
+  }
+
+  GTK_WIDGET_UNSET_FLAGS (widget, GTK_MAPPED);
+
+/* SOMEHOW THESE ARE ALREADY DESTROYED AND THESE COMMAND ARE INVALID */
+/*   window = GDK_WINDOW(widget->window); */
+/*   if (window != NULL) { */
+/*      gdk_window_set_user_data(window, NULL); */
+/*      gdk_window_destroy(window); */
+/*      widget->window = NULL; */
+/*   } */
+
+  if (GTK_WIDGET_CLASS (parent_class)->unrealize)
+    (*GTK_WIDGET_CLASS (parent_class)->unrealize) (widget);
+
+  return;
+}
+
+extern void gtk_glgraph_axis_set_label (GtkGLGraph * glg, GtkGLGraphAxisType axis,
                                         const gchar * label)
 {
+
   g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
   g_return_if_fail (label != NULL);
   g_return_if_fail (g_utf8_strlen (label, -1) != 0);
 
@@ -225,6 +261,8 @@ extern const gchar *gtk_glgraph_axis_get_label (const GtkGLGraph * glg,
 {
   g_return_val_if_fail (glg != NULL, NULL);
 
+  g_return_val_if_fail (GTK_IS_GLGRAPH (glg), NULL);
+
   if (axis >= GTKGLG_AXIS_LAST)
   {
     g_printerr ("Invalid Axis\n");
@@ -234,11 +272,11 @@ extern const gchar *gtk_glgraph_axis_get_label (const GtkGLGraph * glg,
   return (glg->axes[axis].title);
 }
 
-extern void gtk_glgraph_axis_set_drawn (GtkGLGraph * glg,
-                                        GtkGLGraphAxisType axis,
+extern void gtk_glgraph_axis_set_drawn (GtkGLGraph * glg, GtkGLGraphAxisType axis,
                                         const GtkGLGDrawAxis drawn)
 {
   g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
   if (axis >= GTKGLG_AXIS_LAST)
   {
     return;
@@ -251,6 +289,7 @@ extern GtkGLGDrawAxis gtk_glgraph_axis_get_visible (GtkGLGraph * glg,
                                                     GtkGLGraphAxisType axis)
 {
   g_return_val_if_fail (glg != NULL, 0);
+  g_return_val_if_fail (GTK_IS_GLGRAPH (glg), 0);
   if (axis >= GTKGLG_AXIS_LAST)
   {
     return 0;
@@ -259,15 +298,16 @@ extern GtkGLGDrawAxis gtk_glgraph_axis_get_visible (GtkGLGraph * glg,
   return glg->axes[axis].drawn;
 }
 
-extern void gtk_glgraph_axis_set_range (GtkGLGraph * glg,
-                                        GtkGLGraphAxisType axis, gdouble * min,
-                                        gdouble * max, gint32 * major_steps,
-                                        gint32 * minor_steps, gint8 * precision)
+extern void gtk_glgraph_axis_set_range (GtkGLGraph * glg, GtkGLGraphAxisType axis,
+                                        gdouble * min, gdouble * max,
+                                        gint32 * major_steps, gint32 * minor_steps,
+                                        gint8 * precision)
 {
   gboolean        resize = FALSE;
   GtkWidget      *widget;
 
   g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
   if (axis >= GTKGLG_AXIS_LAST)
   {
     return;
@@ -308,12 +348,14 @@ extern void gtk_glgraph_axis_set_range (GtkGLGraph * glg,
   }
 }
 
-extern void gtk_glgraph_axis_get_range (GtkGLGraph * glg,
-                                        GtkGLGraphAxisType axis, gdouble * min,
-                                        gdouble * max, gint32 * major_steps,
-                                        gint32 * minor_steps, gint8 * precision)
+extern void gtk_glgraph_axis_get_range (GtkGLGraph * glg, GtkGLGraphAxisType axis,
+                                        gdouble * min, gdouble * max,
+                                        gint32 * major_steps, gint32 * minor_steps,
+                                        gint8 * precision)
 {
   g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
+
   if (axis >= GTKGLG_AXIS_LAST)
   {
     return;
@@ -344,13 +386,16 @@ extern void gtk_glgraph_axis_get_range (GtkGLGraph * glg,
 extern void gtk_glgraph_axis_set_mode (GtkGLGraph * const glg,
                                        GtkGLGraphAxisMode mode)
 {
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
   glg->mode = mode;
 }
 
-extern GtkGLGraphAxisMode gtk_glgraph_axis_get_mode (const GtkGLGraph *
-                                                     const glg)
+extern GtkGLGraphAxisMode gtk_glgraph_axis_get_mode (const GtkGLGraph * const glg)
 {
-  return glg->mode;
+  g_return_val_if_fail (glg != NULL, -1);
+  g_return_val_if_fail (GTK_IS_GLGRAPH (glg), -1);
+  return (glg->mode);
 }
 
 extern GType gtk_glgraph_get_type (void)
@@ -369,6 +414,7 @@ extern GType gtk_glgraph_get_type (void)
       sizeof (GtkGLGraph),
       0,                        /* n_preallocs */
       (GInstanceInitFunc) gtk_glgraph_init,
+      NULL
     };
     glgraph_type =
             g_type_register_static (gtk_widget_get_type (), "GtkGLGraph",
@@ -390,6 +436,7 @@ static void gtk_glgraph_class_init (GtkGLGraphClass * class)
   widget_class->size_request = gtk_glgraph_size_request;
   widget_class->expose_event = gtk_glgraph_expose;
   widget_class->realize = gtk_glgraph_realize;
+  widget_class->unrealize = gtk_glgraph_unrealize;
   widget_class->button_press_event = gtk_glgraph_button_press_event;
   widget_class->button_release_event = gtk_glgraph_button_release_event;
   widget_class->motion_notify_event = gtk_glgraph_motion_notify_event;
@@ -399,20 +446,16 @@ static void gtk_glgraph_class_init (GtkGLGraphClass * class)
   class->set_scroll_adjustments = gtk_glgraph_set_scroll_adjustments;
 
   signals[SET_SCROLL_ADJUSTMENTS] =
-          g_signal_new ("set_scroll_adjustments",
-                        G_OBJECT_CLASS_TYPE (object_class),
+          g_signal_new ("set_scroll_adjustments", G_OBJECT_CLASS_TYPE (object_class),
                         G_SIGNAL_RUN_LAST | G_SIGNAL_ACTION,
-                        G_STRUCT_OFFSET (GtkGLGraphClass,
-                                         set_scroll_adjustments), NULL, NULL,
-                        g_cclosure_user_marshal_VOID__OBJECT_OBJECT,
-                        G_TYPE_NONE, 2, GTK_TYPE_ADJUSTMENT,
-                        GTK_TYPE_ADJUSTMENT);
+                        G_STRUCT_OFFSET (GtkGLGraphClass, set_scroll_adjustments),
+                        NULL, NULL, g_cclosure_user_marshal_VOID__OBJECT_OBJECT,
+                        G_TYPE_NONE, 2, GTK_TYPE_ADJUSTMENT, GTK_TYPE_ADJUSTMENT);
   signals[CURSOR_MOVED] =
           g_signal_new ("cursor_moved", G_OBJECT_CLASS_TYPE (object_class),
                         G_SIGNAL_RUN_FIRST, G_STRUCT_OFFSET (GtkGLGraphClass,
-                                                             cursor_moved),
-                        NULL, NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE,
-                        0);
+                                                             cursor_moved), NULL,
+                        NULL, g_cclosure_marshal_VOID__VOID, G_TYPE_NONE, 0);
 
   widget_class->set_scroll_adjustments_signal = signals[SET_SCROLL_ADJUSTMENTS];
 }
@@ -420,6 +463,9 @@ static void gtk_glgraph_class_init (GtkGLGraphClass * class)
 static void gtk_glgraph_init (GtkGLGraph * glg)
 {
   gint            i;
+
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
 
   /* We double buffer opengl internally */
   gtk_widget_set_double_buffered (GTK_WIDGET (glg), FALSE);
@@ -496,42 +542,35 @@ extern GtkWidget *gtk_glgraph_new (void)
 
 static void gtk_glgraph_destroy (GtkObject * object)
 {
-   GtkGLGraph *glg = NULL; 
+  GtkGLGraph     *glg = NULL;
 
-   g_return_if_fail (object != NULL);
+  g_return_if_fail (object != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (object));
 
-   glg = GTK_GLGRAPH(object);
-   
-   g_return_if_fail ( GTK_IS_GLGRAPH(glg) );
+  glg = GTK_GLGRAPH (object);
 
-   if (glg != NULL) {
-      /*
-       * Disconnect from X */
-      if (glg->dpy != NULL)
-      {
-          glXDestroyContext (glg->dpy, glg->cx);
-          glFinish();
-          glg->dpy = NULL;
-          glg->cx = NULL;          
-      }    
-      if (glg->tooltip_id) {
-         g_source_remove(glg->tooltip_id);
-         glg->tooltip_id_valid = FALSE;
-         glg->tooltip_visible = FALSE;
-         glg->tooltip_id = 0;
-      }
-      if (glg->expose_id) {
-         g_source_remove(glg->expose_id);
-         glg->expose_id = 0;
-      }      
-   }
+  if (glg != NULL)
+  {
+    if (glg->tooltip_id)
+    {
+      g_source_remove (glg->tooltip_id);
+      glg->tooltip_id_valid = FALSE;
+      glg->tooltip_visible = FALSE;
+      glg->tooltip_id = 0;
+    }
+    if (glg->expose_id)
+    {
+      g_source_remove (glg->expose_id);
+      glg->expose_id = 0;
+    }
+    gtk_glgraph_dataset_free_all (glg);
+  }
 
-   if (GTK_OBJECT_CLASS (parent_class)->destroy)
-   {
-      (* GTK_OBJECT_CLASS(parent_class)->destroy) (object);
-   } 
-   
- return;
+  if (GTK_OBJECT_CLASS (parent_class)->destroy != NULL)
+  {
+    (*GTK_OBJECT_CLASS (parent_class)->destroy) (object);
+  }
+
 }
 
 static void gtk_glgraph_size_request (GtkWidget * widget,
@@ -542,9 +581,11 @@ static void gtk_glgraph_size_request (GtkWidget * widget,
   gint32          mi;
   gint32          ma;
 
-  glg = GTK_GLGRAPH (widget);
-
+  g_return_if_fail (widget != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (widget));
   g_return_if_fail (requisition != NULL);
+
+  glg = GTK_GLGRAPH (widget);
 
   /* Reset Border Spacings */
   gtk_glgraph_layout_calculate_offsets (glg);
@@ -572,10 +613,14 @@ static void gtk_glgraph_size_request (GtkWidget * widget,
     glg->width = requisition->width;
     glg->height = requisition->height;
   }
+
 }
 
 static void get_adjustments (GtkGLGraph * const glg)
 {
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
+
   if (glg->hadj == NULL && glg->vadj == NULL)
   {
     gtk_glgraph_set_scroll_adjustments (glg, NULL, NULL);
@@ -596,7 +641,7 @@ static void get_adjustments (GtkGLGraph * const glg)
 static void gtk_glgraph_size_allocate (GtkWidget * widget,
                                        GtkAllocation * allocation)
 {
-  GtkGLGraph     *glg;
+  GtkGLGraph     *glg = NULL;
 
   g_return_if_fail (widget != NULL);
   g_return_if_fail (GTK_IS_GLGRAPH (widget));
@@ -607,9 +652,10 @@ static void gtk_glgraph_size_allocate (GtkWidget * widget,
 
   glg = GTK_GLGRAPH (widget);
 
+  widget->allocation = *allocation;
+
   if (GTK_WIDGET_REALIZED (widget))
   {
-    widget->allocation = *allocation;
     /* Resize window */
     gdk_window_move_resize (widget->window, allocation->x, allocation->y,
                             allocation->width, allocation->height);
@@ -679,25 +725,30 @@ static void gtk_glgraph_size_allocate (GtkWidget * widget,
     /* Clamp the window to whats visible */
     gluOrtho2D (x, x + w, y, y + h);
   }
+
 }
 
-static gboolean gtk_glgraph_expose_timeout (GtkWidget * widget)
+/*
+static gboolean gtk_glgraph_expose_timeout(GtkWidget * widget)
 {
-  GtkGLGraph     *glg;
+   GtkGLGraph *glg;
 
-  glg = GTK_GLGRAPH (widget);
-    
-  glg->cursor_stipple = rotate (glg->cursor_stipple);
+   g_return_val_if_fail(widget != NULL, FALSE);
+   g_return_val_if_fail(GTK_IS_GLGRAPH(widget), FALSE);
 
-  /* Draw the cursor if asked too and it has a nonzero span */
-  if (glg->drawn & GTKGLG_D_CURSOR_BOX && glg->cx1 != glg->cx2 &&
-      glg->cy1 != glg->cy2)
-  {
-    gtk_widget_queue_draw (widget);
-  }
+   glg = GTK_GLGRAPH(widget);
 
-  return TRUE;
+   glg->cursor_stipple = rotate(glg->cursor_stipple);
+
+   --* Draw the cursor if asked too and it has a nonzero span *--
+   if (glg->drawn & GTKGLG_D_CURSOR_BOX && glg->cx1 != glg->cx2 &&
+      glg->cy1 != glg->cy2) {
+      gtk_widget_queue_draw(widget);
+   }
+
+   return TRUE;
 }
+
 
 static guint16 rotate (guint16 data)
 {
@@ -710,6 +761,7 @@ static guint16 rotate (guint16 data)
 
   return data;
 }
+*/
 
 static gint gtk_glgraph_expose (GtkWidget * widget, GdkEventExpose * event)
 {
@@ -807,11 +859,13 @@ static void gtk_glgraph_realize (GtkWidget * widget)
   GtkGLGraph     *glg;
   GdkWindowAttr   attributes;
   gint            attributes_mask;
+  GdkScreen       *screen;
 
 #ifdef G_OS_UNIX
   static gint     attributeListDbl[] =
           { GLX_RGBA, GLX_DOUBLEBUFFER, GLX_RED_SIZE, 1, GLX_GREEN_SIZE, 1,
-GLX_BLUE_SIZE, 1, None };
+    GLX_BLUE_SIZE, 1, None
+  };
 #endif /* linux */
 #ifdef G_OS_WIN32
   PIXELFORMATDESCRIPTOR pfd;
@@ -826,17 +880,18 @@ GLX_BLUE_SIZE, 1, None };
   /* OpenGL Stuff */
   /* Get display */
 #ifdef G_OS_UNIX
-  glg->dpy = GDK_DISPLAY ();
+/*   glg->dpy = GDK_DISPLAY (); */  
+  screen = gdk_screen_get_default();
+  glg->dpy = GDK_SCREEN_XDISPLAY(screen);
 
   /* Get a Double Buffer'd Visual for OpenGL */
   if (!glXQueryExtension (glg->dpy, NULL, NULL))
   {
     g_error ("glX not supported on this display, aborting...\n");
+    return;
     /* exit (1); */
   }
-  glg->vi =
-          glXChooseVisual (glg->dpy, DefaultScreen (glg->dpy),
-                           attributeListDbl);
+  glg->vi = glXChooseVisual (glg->dpy, DefaultScreen (glg->dpy), attributeListDbl);
   glg->colormap = gdk_colormap_new (gdkx_visual_get (glg->vi->visualid), FALSE);
   glg->cx = glXCreateContext (glg->dpy, glg->vi, 0, GL_TRUE);
 #endif /* linux */
@@ -858,16 +913,16 @@ GLX_BLUE_SIZE, 1, None };
   attributes.colormap = gtk_widget_get_colormap (widget);
 #endif /* WINDOWS */
   attributes.event_mask =
-          gtk_widget_get_events (widget) | GDK_EXPOSURE_MASK |
-          GDK_STRUCTURE_MASK | GDK_POINTER_MOTION_MASK | GDK_FOCUS_CHANGE_MASK |
+          gtk_widget_get_events (widget) | GDK_EXPOSURE_MASK | GDK_STRUCTURE_MASK |
+          GDK_POINTER_MOTION_MASK | GDK_FOCUS_CHANGE_MASK |
           GDK_VISIBILITY_NOTIFY_MASK | GDK_BUTTON_PRESS_MASK |
-          GDK_BUTTON_RELEASE_MASK | GDK_ENTER_NOTIFY_MASK |
-          GDK_LEAVE_NOTIFY_MASK;
+          GDK_BUTTON_RELEASE_MASK | GDK_ENTER_NOTIFY_MASK | GDK_LEAVE_NOTIFY_MASK;
   attributes_mask = GDK_WA_X | GDK_WA_Y | GDK_WA_VISUAL | GDK_WA_COLORMAP;
 
   widget->window =
-          gdk_window_new (widget->parent->window, &attributes, attributes_mask);
-  gdk_window_set_user_data (widget->window, glg);
+          gdk_window_new (gtk_widget_get_parent_window (widget), &attributes,
+                          attributes_mask);
+  gdk_window_set_user_data (widget->window, widget);
   widget->style = gtk_style_attach (widget->style, widget->window);
 
   /* Set up the OpenGL Defaults */
@@ -919,10 +974,9 @@ GLX_BLUE_SIZE, 1, None };
   pango_layout_set_alignment (glg->title_layout, PANGO_ALIGN_CENTER);
   pango_layout_set_markup (glg->title_layout, glg->title, -1);
   glg->title_pixbuf =
-          gtk_glgraph_create_rotated_flipped_text_pixbuf (glg,
-                                                          glg->title_layout,
-                                                          GTKGLG_DIRECTION_0,
-                                                          FALSE, TRUE);
+          gtk_glgraph_create_rotated_flipped_text_pixbuf (glg, glg->title_layout,
+                                                          GTKGLG_DIRECTION_0, FALSE,
+                                                          TRUE);
 
   /* Init X Axis */
   glg->axes[GTKGLG_AXIS_X].title_layout =
@@ -931,11 +985,10 @@ GLX_BLUE_SIZE, 1, None };
                            glg->axes[GTKGLG_AXIS_X].title, -1);
   glg->axes[GTKGLG_AXIS_X].pixbuf =
           gtk_glgraph_create_rotated_flipped_text_pixbuf (glg,
-                                                          glg->
-                                                          axes[GTKGLG_AXIS_X].
+                                                          glg->axes[GTKGLG_AXIS_X].
                                                           title_layout,
-                                                          GTKGLG_DIRECTION_0,
-                                                          FALSE, TRUE);
+                                                          GTKGLG_DIRECTION_0, FALSE,
+                                                          TRUE);
   gtk_glgraph_update_axis_ticks (glg, &(glg->axes[GTKGLG_AXIS_X]));
   /* Init Y Axis */
   glg->axes[GTKGLG_AXIS_Y].title_layout =
@@ -944,11 +997,10 @@ GLX_BLUE_SIZE, 1, None };
                            glg->axes[GTKGLG_AXIS_Y].title, -1);
   glg->axes[GTKGLG_AXIS_Y].pixbuf =
           gtk_glgraph_create_rotated_flipped_text_pixbuf (glg,
-                                                          glg->
-                                                          axes[GTKGLG_AXIS_Y].
+                                                          glg->axes[GTKGLG_AXIS_Y].
                                                           title_layout,
-                                                          GTKGLG_DIRECTION_90,
-                                                          TRUE, FALSE);
+                                                          GTKGLG_DIRECTION_90, TRUE,
+                                                          FALSE);
   gtk_glgraph_update_axis_ticks (glg, &(glg->axes[GTKGLG_AXIS_Y]));
   /* Init Z Axis */
   glg->axes[GTKGLG_AXIS_Z].title_layout =
@@ -957,20 +1009,27 @@ GLX_BLUE_SIZE, 1, None };
                            glg->axes[GTKGLG_AXIS_Z].title, -1);
   glg->axes[GTKGLG_AXIS_Z].pixbuf =
           gtk_glgraph_create_rotated_flipped_text_pixbuf (glg,
-                                                          glg->
-                                                          axes[GTKGLG_AXIS_Z].
+                                                          glg->axes[GTKGLG_AXIS_Z].
                                                           title_layout,
-                                                          GTKGLG_DIRECTION_270,
-                                                          TRUE, FALSE);
+                                                          GTKGLG_DIRECTION_270, TRUE,
+                                                          FALSE);
   gtk_glgraph_update_axis_ticks (glg, &(glg->axes[GTKGLG_AXIS_Z]));
 
-  glg->expose_id = g_timeout_add (150, (GSourceFunc) gtk_glgraph_expose_timeout, widget);
-  gtk_widget_queue_resize (widget);
+/* NOT NEEDED
+   glg->expose_id =
+      g_timeout_add(150, (GSourceFunc) gtk_glgraph_expose_timeout, widget);
+*/
+
+   gtk_widget_queue_resize(widget);
 }
 
 static gint gtk_glgraph_button_press_event (GtkWidget * widget,
                                             GdkEventButton * event)
 {
+
+  g_return_val_if_fail (widget != NULL, FALSE);
+  g_return_val_if_fail (GTK_IS_GLGRAPH (widget), FALSE);
+
   if (event->button == 1)
   {
     GtkGLGraph     *glg;
@@ -986,12 +1045,10 @@ static gint gtk_glgraph_button_press_event (GtkWidget * widget,
     gtk_glgraph_layout_calculate_offsets (glg);
 
     /* Figure out scaling */
-    xppu = fabs ((glg->w - glg->left -
-                  glg->right) / (glg->axes[GTKGLG_AXIS_X].max -
-                                 glg->axes[GTKGLG_AXIS_X].min));
-    yppu = fabs ((glg->h - glg->bottom -
-                  glg->top) / (glg->axes[GTKGLG_AXIS_Y].max -
-                               glg->axes[GTKGLG_AXIS_Y].min));
+    xppu = fabs ((glg->w - glg->left - glg->right) / (glg->axes[GTKGLG_AXIS_X].max -
+                                                      glg->axes[GTKGLG_AXIS_X].min));
+    yppu = fabs ((glg->h - glg->bottom - glg->top) / (glg->axes[GTKGLG_AXIS_Y].max -
+                                                      glg->axes[GTKGLG_AXIS_Y].min));
     xpo = glg->left - glg->axes[GTKGLG_AXIS_X].min * xppu;
     ypo = glg->bottom - glg->axes[GTKGLG_AXIS_Y].min * yppu;
 
@@ -1019,6 +1076,9 @@ static gint gtk_glgraph_button_press_event (GtkWidget * widget,
 static gint gtk_glgraph_button_release_event (GtkWidget * widget,
                                               GdkEventButton * event)
 {
+  g_return_val_if_fail (widget != NULL, FALSE);
+  g_return_val_if_fail (GTK_IS_GLGRAPH (widget), FALSE);
+
   if (event->button == 1)
   {
     GtkGLGraph     *glg;
@@ -1034,12 +1094,10 @@ static gint gtk_glgraph_button_release_event (GtkWidget * widget,
     gtk_glgraph_layout_calculate_offsets (glg);
 
     /* Get Scaling */
-    xppu = fabs ((glg->w - glg->left -
-                  glg->right) / (glg->axes[GTKGLG_AXIS_X].max -
-                                 glg->axes[GTKGLG_AXIS_X].min));
-    yppu = fabs ((glg->h - glg->bottom -
-                  glg->top) / (glg->axes[GTKGLG_AXIS_Y].max -
-                               glg->axes[GTKGLG_AXIS_Y].min));
+    xppu = fabs ((glg->w - glg->left - glg->right) / (glg->axes[GTKGLG_AXIS_X].max -
+                                                      glg->axes[GTKGLG_AXIS_X].min));
+    yppu = fabs ((glg->h - glg->bottom - glg->top) / (glg->axes[GTKGLG_AXIS_Y].max -
+                                                      glg->axes[GTKGLG_AXIS_Y].min));
     xpo = glg->left - glg->axes[GTKGLG_AXIS_X].min * xppu;
     ypo = glg->bottom - glg->axes[GTKGLG_AXIS_Y].min * yppu;
 
@@ -1065,9 +1123,14 @@ static gint gtk_glgraph_button_release_event (GtkWidget * widget,
 static gint gtk_glgraph_motion_notify_event (GtkWidget * widget,
                                              GdkEventMotion * event)
 {
-  GtkGLGraph     *glg;
+  GtkGLGraph     *glg = NULL;
+
+  g_return_val_if_fail (widget != NULL, FALSE);
+  g_return_val_if_fail (event != NULL, FALSE);  
+  g_return_val_if_fail (GTK_IS_GLGRAPH (widget), FALSE);
 
   glg = GTK_GLGRAPH (widget);
+  g_return_val_if_fail (glg != NULL, FALSE);  
 
   if (glg->tooltip_id_valid == TRUE)
   {
@@ -1094,12 +1157,10 @@ static gint gtk_glgraph_motion_notify_event (GtkWidget * widget,
     gtk_glgraph_layout_calculate_offsets (glg);
 
     /* Get Scaling */
-    xppu = fabs ((glg->w - glg->left -
-                  glg->right) / (glg->axes[GTKGLG_AXIS_X].max -
-                                 glg->axes[GTKGLG_AXIS_X].min));
-    yppu = fabs ((glg->h - glg->bottom -
-                  glg->top) / (glg->axes[GTKGLG_AXIS_Y].max -
-                               glg->axes[GTKGLG_AXIS_Y].min));
+    xppu = fabs ((glg->w - glg->left - glg->right) / (glg->axes[GTKGLG_AXIS_X].max -
+                                                      glg->axes[GTKGLG_AXIS_X].min));
+    yppu = fabs ((glg->h - glg->bottom - glg->top) / (glg->axes[GTKGLG_AXIS_Y].max -
+                                                      glg->axes[GTKGLG_AXIS_Y].min));
     xpo = glg->left - glg->axes[GTKGLG_AXIS_X].min * xppu;
     ypo = glg->bottom - glg->axes[GTKGLG_AXIS_Y].min * yppu;
 
@@ -1119,19 +1180,21 @@ static gint gtk_glgraph_motion_notify_event (GtkWidget * widget,
 
   glg->tooltip_id_valid = TRUE;
   glg->tooltip_id =
-          g_timeout_add (TOOLTIP_TIMEOUT,
-                         (GtkFunction) gtk_glgraph_tooltip_timeout, glg);
+          g_timeout_add (TOOLTIP_TIMEOUT, (GtkFunction) gtk_glgraph_tooltip_timeout,
+                         glg);
   glg->ttx = event->x;
   glg->tty = event->y;
 
   return FALSE;
 }
 
-
 static gint gtk_glgraph_enter_notify_event (GtkWidget * widget,
                                             GdkEventCrossing * event)
 {
   GtkGLGraph     *glg;
+
+  g_return_val_if_fail (widget != NULL, FALSE);
+  g_return_val_if_fail (GTK_IS_GLGRAPH (widget), FALSE);
 
   glg = GTK_GLGRAPH (widget);
 
@@ -1146,8 +1209,8 @@ static gint gtk_glgraph_enter_notify_event (GtkWidget * widget,
   }
   glg->tooltip_id_valid = TRUE;
   glg->tooltip_id =
-          g_timeout_add (TOOLTIP_TIMEOUT,
-                         (GtkFunction) gtk_glgraph_tooltip_timeout, glg);
+          g_timeout_add (TOOLTIP_TIMEOUT, (GtkFunction) gtk_glgraph_tooltip_timeout,
+                         glg);
   glg->ttx = event->x;
   glg->tty = event->y;
 
@@ -1158,6 +1221,9 @@ static gint gtk_glgraph_leave_notify_event (GtkWidget * widget,
                                             GdkEventCrossing * event)
 {
   GtkGLGraph     *glg;
+
+  g_return_val_if_fail (widget != NULL, FALSE);
+  g_return_val_if_fail (GTK_IS_GLGRAPH (widget), FALSE);
 
   glg = GTK_GLGRAPH (widget);
 
@@ -1177,9 +1243,12 @@ static gint gtk_glgraph_leave_notify_event (GtkWidget * widget,
 
 static gboolean gtk_glgraph_tooltip_timeout (GtkGLGraph * const glg)
 {
+  g_return_val_if_fail (glg != NULL, FALSE);
+  g_return_val_if_fail (GTK_IS_GLGRAPH (glg), FALSE);
+
   glg->tooltip_id_valid = FALSE;
   glg->tooltip_visible = TRUE;
-    
+
   gtk_widget_queue_draw (GTK_WIDGET (glg));
 
   return FALSE;
@@ -1191,6 +1260,7 @@ static void gtk_glgraph_set_scroll_adjustments (GtkGLGraph * glg,
 {
   gboolean        need_adjust = FALSE;
 
+  g_return_if_fail (glg != NULL);
   g_return_if_fail (GTK_IS_GLGRAPH (glg));
 
   /* Check or Create the Adjustments */
@@ -1216,7 +1286,7 @@ static void gtk_glgraph_set_scroll_adjustments (GtkGLGraph * glg,
   if (glg->hadj && (glg->hadj != hadj))
   {
     g_signal_handlers_disconnect_by_func (glg->hadj,
-                                       (GSourceFunc)gtk_glgraph_value_changed,
+                                          (GSourceFunc) gtk_glgraph_value_changed,
                                           glg);
     g_object_unref (glg->hadj);
   }
@@ -1224,7 +1294,7 @@ static void gtk_glgraph_set_scroll_adjustments (GtkGLGraph * glg,
   if (glg->vadj && (glg->vadj != vadj))
   {
     g_signal_handlers_disconnect_by_func (glg->vadj,
-                                      (GSourceFunc)gtk_glgraph_value_changed,
+                                          (GSourceFunc) gtk_glgraph_value_changed,
                                           glg);
     g_object_unref (glg->vadj);
   }
@@ -1262,6 +1332,9 @@ static void gtk_glgraph_value_changed (GtkAdjustment * adj, GtkGLGraph * glg)
   gint            dy = 0;
   GtkWidget      *widget;
   GLdouble        x, y, w, h;
+
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
 
   widget = GTK_WIDGET (glg);
 
@@ -1306,6 +1379,7 @@ static void gtk_glgraph_value_changed (GtkAdjustment * adj, GtkGLGraph * glg)
 extern void gtk_glgraph_set_title (GtkGLGraph * glg, const gchar * const title)
 {
   g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
   g_return_if_fail (title != NULL);
   g_return_if_fail (g_utf8_strlen (title, -1) != 0);
 
@@ -1334,15 +1408,15 @@ extern void gtk_glgraph_set_title (GtkGLGraph * glg, const gchar * const title)
 
   /* Create pixbuf */
   glg->title_pixbuf =
-          gtk_glgraph_create_rotated_flipped_text_pixbuf (glg,
-                                                          glg->title_layout,
-                                                          GTKGLG_DIRECTION_0,
-                                                          FALSE, TRUE);
+          gtk_glgraph_create_rotated_flipped_text_pixbuf (glg, glg->title_layout,
+                                                          GTKGLG_DIRECTION_0, FALSE,
+                                                          TRUE);
 }
 
 extern void gtk_glgraph_set_drawn (GtkGLGraph * glg, const GtkGLGDraw drawn)
 {
   g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
 
   glg->drawn = drawn;
 }
@@ -1350,6 +1424,7 @@ extern void gtk_glgraph_set_drawn (GtkGLGraph * glg, const GtkGLGDraw drawn)
 extern GtkGLGDraw gtk_glgraph_get_drawn (GtkGLGraph * glg)
 {
   g_return_val_if_fail (glg != NULL, 0);
+  g_return_val_if_fail (GTK_IS_GLGRAPH (glg), 0);
 
   return glg->drawn;
 }
@@ -1370,6 +1445,7 @@ extern void gtk_glgraph_set_zoom (GtkGLGraph * glg, const gdouble zoom)
 extern gdouble gtk_glgraph_get_zoom (GtkGLGraph * glg)
 {
   g_return_val_if_fail (glg != NULL, 1.0);
+  g_return_val_if_fail (GTK_IS_GLGRAPH (glg), 1.0);
 
   return (glg->zoom);
 }
@@ -1380,6 +1456,9 @@ static void gtk_glgraph_set_color (const GtkGLGraph * const glg, gdouble z,
 {
   gdouble         h, i, q, t;
   gdouble         tmp;
+
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
 
   /* Scale z from 0 to 1 */
   /* Protect from divide by 0 */
@@ -1524,6 +1603,7 @@ extern GtkGLGDataSet *gtk_glgraph_dataset_create (void)
   glds->line_color[1] = 0.0;
   glds->line_color[2] = 0.0;
   glds->line_color[3] = 1.0;
+  glds->line_color_name = g_strdup("black");
   glds->point_color[0] = 0.0;
   glds->point_color[1] = 1.0;
   glds->point_color[2] = 0.0;
@@ -1579,6 +1659,9 @@ extern void gtk_glgraph_dataset_free_all (GtkGLGraph * const glg)
   GtkGLGDataSet  *glds;
   GList          *ld;
 
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
+
   if (glg == NULL)
   {
     return;
@@ -1603,6 +1686,8 @@ extern void gtk_glgraph_dataset_free_all (GtkGLGraph * const glg)
 extern void gtk_glgraph_dataset_add (GtkGLGraph * const glg,
                                      GtkGLGDataSet * const glds)
 {
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
   if (glg == NULL)
   {
     return;
@@ -1623,6 +1708,7 @@ extern void gtk_glgraph_dataset_set_title (GtkGLGraph * const glg,
   PangoLayout    *layout;
 
   g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
   g_return_if_fail (glds != NULL);
 
   if (glds->title_pixbuf != NULL)
@@ -1640,8 +1726,8 @@ extern void gtk_glgraph_dataset_set_title (GtkGLGraph * const glg,
   pango_layout_set_markup (layout, title, -1);
   glds->title_pixbuf =
           gtk_glgraph_create_rotated_flipped_text_pixbuf (glg, layout,
-                                                          GTKGLG_DIRECTION_0,
-                                                          FALSE, TRUE);
+                                                          GTKGLG_DIRECTION_0, FALSE,
+                                                          TRUE);
   g_object_unref (G_OBJECT (layout));
 }
 
@@ -1886,6 +1972,7 @@ static gdouble BiCubicR (gdouble x)
 extern void gtk_glgraph_redraw (GtkGLGraph * const glg)
 {
   g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
 
   if (glg->queued_draw >= 1)
   {
@@ -1899,6 +1986,9 @@ extern void gtk_glgraph_redraw (GtkGLGraph * const glg)
 
 static void gtk_glgraph_draw_gl_background (const GtkGLGraph * glg)
 {
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
+
   /* Set the clear color */
   glClearColor (1.0, 1.0, 1.0, 0.0);
   /* Clear the Graph */
@@ -1908,6 +1998,7 @@ static void gtk_glgraph_draw_gl_background (const GtkGLGraph * glg)
 static void gtk_glgraph_draw_graph_box (const GtkGLGraph * glg)
 {
   g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
 
   /* Set Colour to Black */
   glColor3f (0.0, 0.0, 0.0);
@@ -1926,7 +2017,7 @@ static void gtk_glgraph_draw_tooltip (GtkGLGraph * const glg,
                                       const GtkGLGDataSet * const glds)
 {
   gdouble         xpo, xppu, ypo, yppu; /* x pixel offset, x pixels per unit, etc... */
-  gdouble         ax, ay;
+  gdouble         ax, ay; /* x array index, and y data-value */
   gint            ix, iy;
   gdouble         xspacing, yspacing;
   gchar          *buf;
@@ -1937,9 +2028,12 @@ static void gtk_glgraph_draw_tooltip (GtkGLGraph * const glg,
   gdouble         xpos, ypos;
   gdouble         xmin, xmax;
   gdouble         ttx, tty;
+  GtkGLGDataSet   *gdata = NULL;
+  GList           *find_ds = NULL;
 
   /* Make sure all the data we need exists */
   g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
   if (glds == NULL)
   {
     return;
@@ -1962,12 +2056,10 @@ static void gtk_glgraph_draw_tooltip (GtkGLGraph * const glg,
   }
 
   /* Get Scaling */
-  xppu = fabs ((glg->w - glg->left -
-                glg->right) / (glg->axes[GTKGLG_AXIS_X].max -
-                               glg->axes[GTKGLG_AXIS_X].min));
-  yppu = fabs ((glg->h - glg->bottom -
-                glg->top) / (glg->axes[GTKGLG_AXIS_Y].max -
-                             glg->axes[GTKGLG_AXIS_Y].min));
+  xppu = fabs ( (glg->w - glg->left - glg->right) / 
+                (glg->axes[GTKGLG_AXIS_X].max - glg->axes[GTKGLG_AXIS_X].min));
+  yppu = fabs ( (glg->h - glg->bottom - glg->top) / 
+                (glg->axes[GTKGLG_AXIS_Y].max - glg->axes[GTKGLG_AXIS_Y].min));
   xpo = glg->left - glg->axes[GTKGLG_AXIS_X].min * xppu;
   ypo = glg->bottom - glg->axes[GTKGLG_AXIS_Y].min * yppu;
 
@@ -1992,32 +2084,59 @@ static void gtk_glgraph_draw_tooltip (GtkGLGraph * const glg,
   yspacing = glds->y[1] - glds->y[0];
 
   /* Figure out the dataset indices */
-  /* And create a pixbuf of the z or x,y value */
-  ix = (gint) floor ((ax - glg->axes[GTKGLG_AXIS_X].min) / xspacing);
+  /* And create a pixbuf of the x,y value */
+  ix = (gint) floor ((ax - glg->axes[GTKGLG_AXIS_X].min) / xspacing) + 1;
+  iy = (gint) ix;
 
-  if (glds->graph_type == GTKGLG_TYPE_XY)
+/* *** */
+  find_ds = g_list_first (glg->datasets);
+  while (find_ds)
   {
-    iy = ix;
-    buf = g_strdup_printf ("%3.2f <b>%s</b>\n%2.0f <b>%s</b>", glds->y[iy + 1],
-                           glds->y_units, glds->x[ix + 1], glds->x_units);
+    gdata = find_ds->data;
+    find_ds = find_ds->next;
+    if ( (gdata->y[ix] >= (ay * 0.96)) && (gdata->y[ix] <= (ay * 1.04)) )
+    {
+          break; /* found it (y value) */
+    }
+    gdata = NULL;
+  }
+  
+  if ( gdata == NULL )
+  {
+       return;  /* did not find the right one */
+  }
+       
+  /* ay is y's value, ix+1 is x's value */
+  
+  if (gdata->graph_type == GTKGLG_TYPE_XY)
+  {
+    buf = g_strdup_printf ("%3.1lf%% "
+                           "<span foreground=\"%s\">"
+                           "<b>%s</b></span>\n"
+                           "%2.0d <i>%s</i>",
+                           gdata->y[iy],
+                           gdata->line_color_name, 
+                           gdata->y_units, 
+                           ix, gdata->x_units);
   }
   else
-  {
+  { /* dont care now */
     iy = (gint) floor ((ay - glg->axes[GTKGLG_AXIS_Y].min) / yspacing);
-    buf = g_strdup_printf ("%01.3f <b>in.</b>",
-                           glds->z[iy * glds->x_length + ix]);
+    buf = g_strdup_printf ("%01.3f <b>in.</b>", glds->z[iy * glds->x_length + ix]);
   }
+
   gtk_glgraph_pixbuf_update_tooltip (glg, buf);
   g_free (buf);
 
-  /* Draw Arrowhead */
-  /*glColor4f (0.0, 0.0, 0.0, 1.0);
-   * glBegin (GL_TRIANGLES);
-   * glVertex2d ((glds->x[ix]) * xppu + xpo, (glds->y[iy]) * yppu + ypo);
-   * glVertex2d ((glds->x[ix] + 0.04) * xppu + xpo, (glds->y[iy] + 0.150) * yppu + ypo);
-   * glVertex2d ((glds->x[ix] + 0.150) * xppu + xpo, (glds->y[iy] + 0.04) * yppu + ypo);
-   * glEnd (); */
-
+  /* Draw Arrowhead -- WHY the pointer is already overing this arrowhead spot */
+/*  
+  glColor4f (0.0, 0.0, 0.0, 1.0);
+  glBegin (GL_TRIANGLES);
+  glVertex2d ((gdata->x[ix]) * xppu + xpo, (gdata->y[iy]) * yppu + ypo);
+  glVertex2d ((gdata->x[ix] + 0.04) * xppu + xpo, (gdata->y[iy] + 0.150) * yppu + ypo);
+  glVertex2d ((gdata->x[ix] + 0.150) * xppu + xpo, (gdata->y[iy] + 0.04) * yppu + ypo);
+  glEnd (); 
+*/
   /* Figure out quadrant and draw appropriately */
   if (glg->tooltip_pixbuf == NULL)
   {
@@ -2095,12 +2214,14 @@ static void gtk_glgraph_draw_tooltip (GtkGLGraph * const glg,
 
   pixels = gdk_pixbuf_get_pixels (glg->tooltip_pixbuf);
   glDrawPixels (pw, ph, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid *) pixels);
+
 }
 
 static void gtk_glgraph_draw_dataset (const GtkGLGraph * const glg,
                                       const GtkGLGDataSet * const glds)
 {
   g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
   if (glds == NULL)
   {
     return;
@@ -2128,6 +2249,9 @@ static void gtk_glgraph_draw_dataset_xy (const GtkGLGraph * const glg,
   gdouble        *color;
   gint            count;
 
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
+
   if (glds->x == NULL || glds->y == NULL)
   {
     return;
@@ -2138,12 +2262,10 @@ static void gtk_glgraph_draw_dataset_xy (const GtkGLGraph * const glg,
 
   xpo = glg->left;
   ypo = glg->bottom;
-  xppu = fabs ((glg->w - glg->left -
-                glg->right) / (glg->axes[GTKGLG_AXIS_X].max -
-                               glg->axes[GTKGLG_AXIS_X].min));
-  yppu = fabs ((glg->h - glg->bottom -
-                glg->top) / (glg->axes[GTKGLG_AXIS_Y].max -
-                             glg->axes[GTKGLG_AXIS_Y].min));
+  xppu = fabs ((glg->w - glg->left - glg->right) / (glg->axes[GTKGLG_AXIS_X].max -
+                                                    glg->axes[GTKGLG_AXIS_X].min));
+  yppu = fabs ((glg->h - glg->bottom - glg->top) / (glg->axes[GTKGLG_AXIS_Y].max -
+                                                    glg->axes[GTKGLG_AXIS_Y].min));
 
   /* Draw the lines */
   if (glds->draw_lines)
@@ -2187,8 +2309,7 @@ static void gtk_glgraph_draw_dataset_xy (const GtkGLGraph * const glg,
     {
       glPushMatrix ();
       glTranslated ((x[count] - glg->axes[GTKGLG_AXIS_X].min) * xppu + xpo,
-                    (y[count] - glg->axes[GTKGLG_AXIS_Y].min) * yppu + ypo,
-                    0.0);
+                    (y[count] - glg->axes[GTKGLG_AXIS_Y].min) * yppu + ypo, 0.0);
       gluDisk (quadric, 0.0, glds->point_size * 0.5, 15, 2);
       glPopMatrix ();
     }
@@ -2206,6 +2327,9 @@ static void gtk_glgraph_draw_dataset_surface (const GtkGLGraph * const glg,
   gint            xl, yl;
   gdouble         pixel_size;
   gdouble         tempp, tempm;
+
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
 
   if (glds->zi == NULL || glds->xi == NULL || glds->yi == NULL ||
       glds->xi_length <= 0 || glds->yi_length <= 0)
@@ -2233,12 +2357,10 @@ static void gtk_glgraph_draw_dataset_surface (const GtkGLGraph * const glg,
 
   xpo = glg->left;
   ypo = glg->bottom;
-  xppu = fabs ((glg->w - glg->left -
-                glg->right) / (glg->axes[GTKGLG_AXIS_X].max -
-                               glg->axes[GTKGLG_AXIS_X].min));
-  yppu = fabs ((glg->h - glg->bottom -
-                glg->top) / (glg->axes[GTKGLG_AXIS_Y].max -
-                             glg->axes[GTKGLG_AXIS_Y].min));
+  xppu = fabs ((glg->w - glg->left - glg->right) / (glg->axes[GTKGLG_AXIS_X].max -
+                                                    glg->axes[GTKGLG_AXIS_X].min));
+  yppu = fabs ((glg->h - glg->bottom - glg->top) / (glg->axes[GTKGLG_AXIS_Y].max -
+                                                    glg->axes[GTKGLG_AXIS_Y].min));
 
   ma = glg->axes[GTKGLG_AXIS_Z].max;
   mi = glg->axes[GTKGLG_AXIS_Z].min;
@@ -2271,8 +2393,7 @@ static void gtk_glgraph_draw_dataset_surface (const GtkGLGraph * const glg,
 
     for (count2 = 0; count2 < xl; count2++)
     {
-      gtk_glgraph_set_color (glg, *(z), glds->glgcmap_alpha, glds->glgcmap, ma,
-                             mi);
+      gtk_glgraph_set_color (glg, *(z), glds->glgcmap_alpha, glds->glgcmap, ma, mi);
 
       glVertex2d ((x[count2] + pixel_size) * xppu + xpo, tempp);
       glVertex2d ((x[count2] + pixel_size) * xppu + xpo, tempm);
@@ -2294,6 +2415,7 @@ static void gtk_glgraph_draw_title (const GtkGLGraph * glg)
   gdouble         xc, yc;
 
   g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
 
   drawn = glg->drawn;
   if (!(drawn & GTKGLG_D_TITLE))
@@ -2351,6 +2473,7 @@ static void gtk_glgraph_draw_legend (const GtkGLGraph * glg)
   gboolean        b_flag = FALSE;
 
   g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
 
   drawn = glg->drawn;
   if (!(drawn & GTKGLG_D_LEGEND))
@@ -2485,8 +2608,7 @@ static void gtk_glgraph_draw_legend (const GtkGLGraph * glg)
 
       /* Draw the dataset title */
       pixels = gdk_pixbuf_get_pixels (dataset->title_pixbuf);
-      glDrawPixels (width, height, GL_RGBA, GL_UNSIGNED_BYTE,
-                    (GLvoid *) pixels);
+      glDrawPixels (width, height, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid *) pixels);
     }
   }
 
@@ -2497,6 +2619,8 @@ static void gtk_glgraph_draw_cursor (const GtkGLGraph * glg)
   GtkGLGDraw      drawn;
 
   g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
+
   drawn = glg->drawn;
 
   /* Draw what needs to be drawn */
@@ -2518,14 +2642,15 @@ static void gtk_glgraph_draw_cursor_boxes (const GtkGLGraph * glg)
 {
   gdouble         xpo, xppu, ypo, yppu; /* x pixel offset, x pixels per unit, etc... */
 
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
+
   xpo = glg->left;
   ypo = glg->bottom;
-  xppu = fabs ((glg->w - glg->left -
-                glg->right) / (glg->axes[GTKGLG_AXIS_X].max -
-                               glg->axes[GTKGLG_AXIS_X].min));
-  yppu = fabs ((glg->h - glg->bottom -
-                glg->top) / (glg->axes[GTKGLG_AXIS_Y].max -
-                             glg->axes[GTKGLG_AXIS_Y].min));
+  xppu = fabs ((glg->w - glg->left - glg->right) / (glg->axes[GTKGLG_AXIS_X].max -
+                                                    glg->axes[GTKGLG_AXIS_X].min));
+  yppu = fabs ((glg->h - glg->bottom - glg->top) / (glg->axes[GTKGLG_AXIS_Y].max -
+                                                    glg->axes[GTKGLG_AXIS_Y].min));
 
   /* draw a white box */
   glColor3f (1.0, 1.0, 1.0);
@@ -2565,6 +2690,8 @@ static void gtk_glgraph_draw_x_axis (const GtkGLGraph * glg)
   GtkGLGDrawAxis  drawn;
 
   g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
+
   drawn = glg->axes[GTKGLG_AXIS_X].drawn;
 
   if (!(drawn & GTKGLG_DA_AXIS))
@@ -2610,6 +2737,9 @@ static void gtk_glgraph_draw_x_inside_tick_marks (const GtkGLGraph * glg)
   gdouble         yt, yb, i;
   gint            j, steps;
 
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
+
   /* Figure out whats known */
   yb = glg->bottom;
   yt = glg->h - glg->top;
@@ -2634,6 +2764,9 @@ static void gtk_glgraph_draw_x_outside_tick_marks (const GtkGLGraph * glg)
   gdouble         inc;
   gdouble         yt, yb, i;
   gint            j, steps;
+
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
 
   /* Figure out whats known */
   yb = glg->bottom;
@@ -2660,6 +2793,9 @@ static void gtk_glgraph_draw_x_major_grid (const GtkGLGraph * glg)
   gdouble         yt, yb, i;
   gint            j, steps;
 
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
+
   /* Figure out whats known */
   yb = glg->bottom;
   yt = glg->h - glg->top;
@@ -2682,6 +2818,9 @@ static void gtk_glgraph_draw_x_minor_grid (const GtkGLGraph * glg)
   gdouble         inc;
   gdouble         yt, yb, i, k;
   gint            j, major_steps, minor_steps;
+
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
 
   /* Set Colour to Gray */
   glColor3f (0.7, 0.7, 0.7);
@@ -2714,6 +2853,9 @@ static void gtk_glgraph_draw_x_title (const GtkGLGraph * glg)
   gint            width, height;
   const guchar   *pixels;
   gdouble         xc, yc;
+
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
 
   if (glg->axes[GTKGLG_AXIS_X].pixbuf == NULL)
   {
@@ -2759,6 +2901,9 @@ static void gtk_glgraph_draw_x_major_tick_text (const GtkGLGraph * glg)
   const guchar   *pixels;
   gdouble         xc, yc;
 
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
+
   if (glg->axes[GTKGLG_AXIS_X].major_tick_pixbuf_list == NULL)
   {
     return;
@@ -2778,8 +2923,7 @@ static void gtk_glgraph_draw_x_major_tick_text (const GtkGLGraph * glg)
   /* Draw the x tick layout */
   for (i = glg->left, j = 0; j <= steps; i = i + inc, j++)
   {
-    pixbuf = g_list_nth_data (glg->axes[GTKGLG_AXIS_X].major_tick_pixbuf_list,
-                              j);
+    pixbuf = g_list_nth_data (glg->axes[GTKGLG_AXIS_X].major_tick_pixbuf_list, j);
     if (pixbuf == NULL)
     {
       continue;
@@ -2811,6 +2955,8 @@ static void gtk_glgraph_draw_y_axis (const GtkGLGraph * glg)
   GtkGLGDrawAxis  drawn;
 
   g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
+
   drawn = glg->axes[GTKGLG_AXIS_Y].drawn;
 
   if (!(drawn & GTKGLG_DA_AXIS))
@@ -2855,6 +3001,9 @@ static void gtk_glgraph_draw_y_inside_tick_marks (const GtkGLGraph * glg)
   gdouble         xl, xr, i;
   gint            j, steps;
 
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
+
   /* Figure out whats known */
   xl = glg->left;
   xr = glg->w - glg->right;
@@ -2879,6 +3028,9 @@ static void gtk_glgraph_draw_y_outside_tick_marks (const GtkGLGraph * glg)
   gdouble         inc;
   gdouble         xl, xr, i;
   gint            j, steps;
+
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
 
   /* Figure out whats known */
   xl = glg->left;
@@ -2905,6 +3057,9 @@ static void gtk_glgraph_draw_y_major_grid (const GtkGLGraph * glg)
   gdouble         xl, xr, i;
   gint            j, steps;
 
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
+
   /* Figure out whats known */
   xl = glg->left;
   xr = glg->w - glg->right;
@@ -2927,6 +3082,9 @@ static void gtk_glgraph_draw_y_minor_grid (const GtkGLGraph * glg)
   gdouble         inc;
   gdouble         xl, xr, i, k;
   gint            j, major_steps, minor_steps;
+
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
 
   /* Set Colour to Gray */
   glColor3f (0.7, 0.7, 0.7);
@@ -2959,6 +3117,9 @@ static void gtk_glgraph_draw_y_title (const GtkGLGraph * glg)
   gint            width, height;
   const guchar   *pixels;
   gdouble         xc, yc;
+
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
 
   if (glg->axes[GTKGLG_AXIS_Y].pixbuf == NULL)
   {
@@ -3004,6 +3165,9 @@ static void gtk_glgraph_draw_y_major_tick_text (const GtkGLGraph * glg)
   const guchar   *pixels;
   gdouble         xc, yc;
 
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
+
   if (glg->axes[GTKGLG_AXIS_Y].major_tick_pixbuf_list == NULL)
   {
     return;
@@ -3020,8 +3184,7 @@ static void gtk_glgraph_draw_y_major_tick_text (const GtkGLGraph * glg)
   /* Draw the y tick layout */
   for (i = glg->bottom, j = 0; j <= steps; i = i + inc, j++)
   {
-    pixbuf = g_list_nth_data (glg->axes[GTKGLG_AXIS_Y].major_tick_pixbuf_list,
-                              j);
+    pixbuf = g_list_nth_data (glg->axes[GTKGLG_AXIS_Y].major_tick_pixbuf_list, j);
     if (pixbuf == NULL)
     {
       continue;
@@ -3054,6 +3217,8 @@ static void gtk_glgraph_draw_z_axis (const GtkGLGraph * glg)
   GtkGLGDrawAxis  drawn;
 
   g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
+
   drawn = glg->axes[GTKGLG_AXIS_Z].drawn;
 
   if (!(drawn & GTKGLG_DA_AXIS))
@@ -3101,6 +3266,9 @@ static void gtk_glgraph_draw_z_inside_tick_marks (const GtkGLGraph * glg)
   gdouble         zl, zr, i;
   gint            j, steps;
 
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
+
   /* Figure out whats known */
   zl = glg->w - glg->z_left;
   zr = glg->w - glg->z_right;
@@ -3125,6 +3293,9 @@ static void gtk_glgraph_draw_z_outside_tick_marks (const GtkGLGraph * glg)
   gdouble         inc;
   gdouble         zl, zr, i;
   gint            j, steps;
+
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
 
   /* Figure out whats known */
   zl = glg->w - glg->z_left;
@@ -3151,6 +3322,9 @@ static void gtk_glgraph_draw_z_major_grid (const GtkGLGraph * glg)
   gdouble         zl, zr, i;
   gint            j, steps;
 
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
+
   /* Figure out whats known */
   zl = glg->w - glg->z_left;
   zr = glg->w - glg->z_right;
@@ -3173,6 +3347,9 @@ static void gtk_glgraph_draw_z_minor_grid (const GtkGLGraph * glg)
   gdouble         inc;
   gdouble         zl, zr, i, k;
   gint            j, major_steps, minor_steps;
+
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
 
   /* Set Colour to Gray */
   glColor3f (0.7, 0.7, 0.7);
@@ -3205,6 +3382,9 @@ static void gtk_glgraph_draw_z_scale (const GtkGLGraph * glg)
   gdouble         zl, zr, i;
   GtkGLGraphColormap cmap;
   gdouble         alpha;
+
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
 
   cmap = GTKGLG_COLORMAP_JET;
   alpha = 0.9;
@@ -3243,6 +3423,10 @@ static void gtk_glgraph_draw_z_scale (const GtkGLGraph * glg)
 
 static void gtk_glgraph_draw_z_graph_box (const GtkGLGraph * glg)
 {
+
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
+
   /* Set Colour to Black */
   glColor3f (0.0, 0.0, 0.0);
   glLineWidth (2.0);
@@ -3262,6 +3446,9 @@ static void gtk_glgraph_draw_z_title (const GtkGLGraph * glg)
   gint            width, height;
   const guchar   *pixels;
   gdouble         xc, yc;
+
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
 
   if (glg->axes[GTKGLG_AXIS_Z].pixbuf == NULL)
   {
@@ -3307,6 +3494,9 @@ static void gtk_glgraph_draw_z_major_tick_text (const GtkGLGraph * glg)
   const guchar   *pixels;
   gdouble         xc, yc;
 
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
+
   if (glg->axes[GTKGLG_AXIS_Z].major_tick_pixbuf_list == NULL)
   {
     return;
@@ -3323,8 +3513,7 @@ static void gtk_glgraph_draw_z_major_tick_text (const GtkGLGraph * glg)
   /* Draw the y tick layout */
   for (i = glg->bottom, j = 0; j <= steps; i = i + inc, j++)
   {
-    pixbuf = g_list_nth_data (glg->axes[GTKGLG_AXIS_Z].major_tick_pixbuf_list,
-                              j);
+    pixbuf = g_list_nth_data (glg->axes[GTKGLG_AXIS_Z].major_tick_pixbuf_list, j);
     if (pixbuf == NULL)
     {
       continue;
@@ -3358,6 +3547,9 @@ static void gtk_glgraph_layout_calculate_offsets (GtkGLGraph * glg)
   GtkGLGDrawAxis  drawn;
   GList          *datasets;
   GtkGLGDataSet  *dataset;
+
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
 
   glg->top = BORDER;
   glg->bottom = BORDER;
@@ -3396,8 +3588,8 @@ static void gtk_glgraph_layout_calculate_offsets (GtkGLGraph * glg)
     {
       if (glg->axes[GTKGLG_AXIS_X].title_layout)
       {
-        pango_layout_get_pixel_size (glg->axes[GTKGLG_AXIS_X].title_layout,
-                                     &width, &height);
+        pango_layout_get_pixel_size (glg->axes[GTKGLG_AXIS_X].title_layout, &width,
+                                     &height);
         glg->bottom += TEXT + (gdouble) height;
       }
     }
@@ -3416,8 +3608,8 @@ static void gtk_glgraph_layout_calculate_offsets (GtkGLGraph * glg)
     {
       if (glg->axes[GTKGLG_AXIS_Y].title_layout)
       {
-        pango_layout_get_pixel_size (glg->axes[GTKGLG_AXIS_Y].title_layout,
-                                     &width, &height);
+        pango_layout_get_pixel_size (glg->axes[GTKGLG_AXIS_Y].title_layout, &width,
+                                     &height);
         glg->left += TEXT + (gdouble) height;
       }
     }
@@ -3440,8 +3632,8 @@ static void gtk_glgraph_layout_calculate_offsets (GtkGLGraph * glg)
     {
       if (glg->axes[GTKGLG_AXIS_Z].title_layout)
       {
-        pango_layout_get_pixel_size (glg->axes[GTKGLG_AXIS_Z].title_layout,
-                                     &width, &height);
+        pango_layout_get_pixel_size (glg->axes[GTKGLG_AXIS_Z].title_layout, &width,
+                                     &height);
         glg->right += TEXT + (gdouble) height;
         glg->z_left += TEXT + (gdouble) height;
         glg->z_right += TEXT + (gdouble) height;
@@ -3505,6 +3697,7 @@ static void gtk_glgraph_update_axis_ticks (GtkGLGraph * const glg,
   gint            width, height;
 
   g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
 
   /* we can't handle that case */
   if (axis == NULL)
@@ -3559,16 +3752,14 @@ static void gtk_glgraph_update_axis_ticks (GtkGLGraph * const glg,
   axis->major_tick_pixbuf_list = pixbuf_list;
 }
 
-static GdkPixbuf *gtk_glgraph_create_rotated_flipped_text_pixbuf (GtkGLGraph *
-                                                                  glg,
+static GdkPixbuf *gtk_glgraph_create_rotated_flipped_text_pixbuf (GtkGLGraph * glg,
                                                                   PangoLayout *
                                                                   layout,
                                                                   GtkGLGraphDirection
                                                                   dir,
                                                                   gboolean
                                                                   horizontal,
-                                                                  gboolean
-                                                                  vertical)
+                                                                  gboolean vertical)
 {
   GdkPixmap      *norm_pixmap = NULL;
   gint            width, height;
@@ -3579,6 +3770,7 @@ static GdkPixbuf *gtk_glgraph_create_rotated_flipped_text_pixbuf (GtkGLGraph *
   gint            i, j, k, l;
 
   g_return_val_if_fail (glg != NULL, NULL);
+  g_return_val_if_fail (GTK_IS_GLGRAPH (glg), NULL);
   g_return_val_if_fail (layout != NULL, NULL);
 
   widget = GTK_WIDGET (glg);
@@ -3621,8 +3813,8 @@ static GdkPixbuf *gtk_glgraph_create_rotated_flipped_text_pixbuf (GtkGLGraph *
   norm_pixbuf = gdk_pixbuf_new (GDK_COLORSPACE_RGB, TRUE, 8, width, height);
   /* Transfer buffer from server to client */
   norm_pixbuf =
-          gdk_pixbuf_get_from_drawable (norm_pixbuf, norm_pixmap, NULL, 0, 0, 0,
-                                        0, width, height);
+          gdk_pixbuf_get_from_drawable (norm_pixbuf, norm_pixmap, NULL, 0, 0, 0, 0,
+                                        width, height);
   /* Get the raw pixel pointer of client buffer */
   norm_pix = (guint32 *) gdk_pixbuf_get_pixels (norm_pixbuf);
 
@@ -3683,8 +3875,7 @@ static GdkPixbuf *gtk_glgraph_create_rotated_flipped_text_pixbuf (GtkGLGraph *
   }
 
   /* Allocate a new client buffer with rotated memory */
-  rot_pixbuf =
-          gdk_pixbuf_new (GDK_COLORSPACE_RGB, TRUE, 8, rot_width, rot_height);
+  rot_pixbuf = gdk_pixbuf_new (GDK_COLORSPACE_RGB, TRUE, 8, rot_width, rot_height);
   /* Get its pixels */
   rot_pix = (guint32 *) gdk_pixbuf_get_pixels (rot_pixbuf);
 
@@ -3740,6 +3931,7 @@ static void gtk_glgraph_pixbuf_update_tooltip (GtkGLGraph * const glg,
   PangoLayout    *layout;
 
   g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
 
   if (glg->tooltip_pixbuf)
   {
@@ -3751,18 +3943,16 @@ static void gtk_glgraph_pixbuf_update_tooltip (GtkGLGraph * const glg,
   pango_layout_set_markup (layout, text, -1);
   glg->tooltip_pixbuf =
           gtk_glgraph_create_rotated_flipped_text_pixbuf (glg, layout,
-                                                          GTKGLG_DIRECTION_0,
-                                                          FALSE, TRUE);
+                                                          GTKGLG_DIRECTION_0, FALSE,
+                                                          TRUE);
   g_object_unref (G_OBJECT (layout));
 }
 
 static void g_cclosure_user_marshal_VOID__OBJECT_OBJECT (GClosure * closure,
                                                          GValue * return_value,
                                                          guint n_param_values,
-                                                         const GValue *
-                                                         param_values,
-                                                         gpointer
-                                                         invocation_hint,
+                                                         const GValue * param_values,
+                                                         gpointer invocation_hint,
                                                          gpointer marshal_data)
 {
   typedef void    (*GMarshalFunc_VOID__OBJECT_OBJECT) (gpointer data1,
@@ -3786,8 +3976,8 @@ static void g_cclosure_user_marshal_VOID__OBJECT_OBJECT (GClosure * closure,
     data2 = closure->data;
   }
   callback =
-          (GMarshalFunc_VOID__OBJECT_OBJECT) 
-          (marshal_data ? marshal_data : cc->callback);
+          (GMarshalFunc_VOID__OBJECT_OBJECT) (marshal_data ? marshal_data : cc->
+                                              callback);
 
   callback (data1, g_marshal_value_peek_object (param_values + 1),
             g_marshal_value_peek_object (param_values + 2), data2);
