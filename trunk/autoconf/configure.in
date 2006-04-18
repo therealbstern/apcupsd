@@ -992,28 +992,16 @@ GAPCDIR=
 GPANEL=
 GAPCMON=
 AC_SUBST(GAPCDIR)
-AC_SUBST(GPANEL)
 AC_SUBST(GAPCMON)
 
 dnl
 dnl Check for enable of gapcmon
 dnl
-GAPCMON_ENABLED=no
+GAPCMON_ENABLED=yes
 AC_ARG_ENABLE(gapcmon, 
-	[AC_HELP_STRING([--enable-gapcmon], [build GTK/GUI front-end to apcupsd Program default=no])],
+	[AC_HELP_STRING([--enable-gapcmon], [build GTK/GUI front-end to apcupsd Program default=yes])],
 	[ if test "$enableval" = "yes" ; then
 		GAPCMON_ENABLED=yes
-	fi],
-    [])
-
-dnl
-dnl Check for enable of gpanel_apcmon
-dnl
-GPANEL_ENABLED=no
-AC_ARG_ENABLE(gpanel, 
-	[AC_HELP_STRING([--enable-gpanel], [build gnome panel applet front-end to apcupsd Program default=no])],
-	[ if test "$enableval" = "yes" ; then
-		GPANEL_ENABLED=yes
 	fi],
     [])
 
@@ -1022,7 +1010,7 @@ dnl Process gapcmon and gpanel_apcmon enables
 dnl
 if test "$GAPCMON_ENABLED" = "yes" -o "$GPANEL_ENABLED" = "yes" ; then
 	dnl
-	dnl First, the stuff we need for both programs
+	dnl First, the stuff we need for only gapcmon 
 	dnl
 	GAPCDIR=gapcmon
 
@@ -1030,18 +1018,9 @@ if test "$GAPCMON_ENABLED" = "yes" -o "$GPANEL_ENABLED" = "yes" ; then
 	dnl gapcmon specifics
 	dnl
 	if test "$GAPCMON_ENABLED" = "yes" ; then
-		PKG_CHECK_MODULES(GAPCMON, gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0)
+		PKG_CHECK_MODULES(GAPCMON, gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0 gnome-vfs-module-2.0)
 		GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DVERSION=\\\"$VERSION\\\""
 		GAPCMON=gapcmon
-	fi
-
-	dnl
-	dnl gpanel_apcmon specifics   	** also requires AC_PATH_XTRA or X11 includes and libraries
-	dnl				** extras are handled in the Makefile.in
-	if test "$GPANEL_ENABLED" = "yes" ; then
-		PKG_CHECK_MODULES(GPANEL, gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0 gconf-2.0 libpanelapplet-2.0 libgnomeui-2.0 libbonoboui-2.0)
-		GPANEL_CFLAGS="$GPANEL_CFLAGS -DVERSION=\\\"$VERSION\\\""
-		GPANEL=gpanel_apcmon
 	fi
 
 	dnl
