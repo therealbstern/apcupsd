@@ -536,7 +536,6 @@ AC_HELP_STRING([--enable-all], [Enable all optional modules])],
 		enable_powerflute=yes
 		enable_cgi=yes
 		enable_gapcmon=yes
-		enable_gpanel=yes
 	fi], [])
 
 #--------------------------------------------------------------------
@@ -1008,7 +1007,7 @@ AC_ARG_ENABLE(gapcmon,
 dnl
 dnl Process gapcmon and gpanel_apcmon enables
 dnl
-if test "$GAPCMON_ENABLED" = "yes" -o "$GPANEL_ENABLED" = "yes" ; then
+if test "$GAPCMON_ENABLED" = "yes" ; then
 	dnl
 	dnl First, the stuff we need for only gapcmon 
 	dnl
@@ -1036,7 +1035,6 @@ if test "$GAPCMON_ENABLED" = "yes" -o "$GPANEL_ENABLED" = "yes" ; then
 	                   [gnome_vfs_socket_read(NULL, NULL, 0, NULL, NULL);]),
 	   AC_MSG_RESULT(yes)
 	      GAPCMON_CFLAGS="${GAPCMON_CFLAGS} -DGNOMEVFS_REQUIRES_CANCELLATION"
-	      GPANEL_CFLAGS="${GPANEL_CFLAGS} -DGNOMEVFS_REQUIRES_CANCELLATION",
 	   AC_MSG_RESULT(no))
 	CFLAGS=${_cflags}
 	LIBS=${_libs}
@@ -1907,7 +1905,6 @@ Configuration on `date`:
   enable-pthreads:	      ${with_pthreads}
   enable-dist-install:	      ${with_distdir}
   enable-gapcmon:	      ${GAPCMON_ENABLED}
-  enable-gpanel:	      ${GPANEL_ENABLED}  
   " > config.out
 
 cat config.out
