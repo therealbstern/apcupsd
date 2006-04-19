@@ -322,7 +322,7 @@ typedef struct _Icons_Sort_Data
 
 /* ************************************************************************* */
   
-#define GAPC_GLOSSARY  "<span size=\"x-large\"><b>GAPCMON</b></span>\n \
+#define GAPC_GLOSSARY  "<span size=\"xx-large\"><b>GAPCMON</b></span>\n \
 A monitor for UPS's under the management of APCUPSD.\n\n \
 When active, gapcmon provides three visual objects to interact with. \
 First is the main control.panel where monitors are defined, enabled, and listed when \
