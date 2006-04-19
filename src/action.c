@@ -484,16 +484,14 @@ void do_action(UPSINFO *ups)
       } else {                     /* not shutdown yet */
          /*
           * Did BattLow bit go high? Then the battery power is failing.
-          * Normal Power down during Power Failure
+          * Normal Power down during Power Failure: Start shutdown timer.
           */
-         if (ups->chg_battlow() && ups->is_battlow()) {
-            generate_event(ups, CMDFAILING);
-            break;
-         }
+         if (ups->chg_battlow() && ups->is_battlow())
+               ups->start_shut_lbatt = now;
 
          /*
           * Did MaxTimeOnBattery Expire?  (TIMEOUT in apcupsd.conf)
-          * Normal Power down during Power Failure
+          * Normal Power down during Power Failure: Shutdown immediately.
           */
          if ((ups->maxtime > 0) && ((now - ups->last_time_on_line) > ups->maxtime)) {
             ups->set_shut_btime();
@@ -503,14 +501,38 @@ void do_action(UPSINFO *ups)
 
          /*
           * Did Battery Charge or Runtime go below percent cutoff?
-          * Normal Power down during Power Failure
+          * Normal Power down during Power Failure: Start shutdown timer.
           */
          if (ups->UPS_Cap[CI_BATTLEV] && ups->BattChg <= ups->percent) {
-            ups->set_shut_load();
+            if (!ups->is_shut_load()) {
+               ups->set_shut_load();
+               ups->start_shut_load = now;
+            }
+         } else {
+            ups->clear_shut_load();
+         }
+
+         if (ups->UPS_Cap[CI_RUNTIM] && ups->TimeLeft <= ups->runtime) {
+            if (!ups->is_shut_ltime()) {
+               ups->set_shut_ltime();
+               ups->start_shut_ltime = now;
+            }
+         } else {
+            ups->clear_shut_ltime();
+         }
+
+         /*
+          * Check for expired shutdown timers and act on them.
+          */
+         if (ups->is_battlow() && ((now - ups->start_shut_lbatt) >= 5)) {
+            generate_event(ups, CMDFAILING);
+            break;
+         }
+         if (ups->is_shut_load() && ((now - ups->start_shut_load) >= 5)) {
             generate_event(ups, CMDLOADLIMIT);
             break;
-         } else if (ups->UPS_Cap[CI_RUNTIM] && ups->TimeLeft <= ups->runtime) {
-            ups->set_shut_ltime();
+         }
+         if (ups->is_shut_ltime() && ((now - ups->start_shut_ltime) >= 5)) {
             generate_event(ups, CMDRUNLIMIT);
             break;
          }

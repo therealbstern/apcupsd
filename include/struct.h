@@ -276,6 +276,9 @@ class UPSINFO {
    time_t last_time_nologon;
    time_t last_time_changeme;
    time_t last_master_connect_time;     /* last time master connected */
+   time_t start_shut_ltime;
+   time_t start_shut_load;
+   time_t start_shut_lbatt;
    int num_xfers;                  /* number of times on batteries */
    int cum_time_on_batt;           /* total time on batteries since startup */
    int wait_time;                  /* suggested wait time for drivers in 
