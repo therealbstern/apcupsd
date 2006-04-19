@@ -2893,6 +2893,7 @@ static gint gapc_panel_about_page (GtkNotebook * notebook, gchar * pch_pname,
 
   g_return_val_if_fail (notebook != NULL, -1);
 
+
   about_text =
           g_strdup_printf ("<b><big>%s</big>\nVersion %s</b>\n", pch_pname,
                            pch_pversion);
@@ -2944,7 +2945,7 @@ static gint gapc_panel_about_page (GtkNotebook * notebook, gchar * pch_pname,
   gtk_misc_set_alignment ((GtkMisc *) label, 0.5, 0.5);
   gtk_box_pack_start (GTK_BOX (vbox), label, TRUE, TRUE, 0);
   gtk_widget_show (label);
-
+  
   g_free (about_text);
   g_free (about_msg);
 
@@ -4318,36 +4319,36 @@ static gint gapc_monitor_text_report_page (PGAPC_MONITOR pm, GtkWidget * noteboo
 
 static gint gapc_panel_glossary_page (PGAPC_CONFIG pcfg, GtkWidget * notebook)
 {
-  GtkWidget      *scrolled, *evbox, *label;
+  GtkWidget      *scrolled, *label, *vbox;
+  GdkWindow      *parent = NULL;
   gint            i_page = 0;
   gchar          *ptext = GAPC_GLOSSARY;
   GdkColor color;
 
   gdk_color_parse ("white", &color);
 
-  evbox = gtk_event_box_new();
-  gtk_widget_modify_bg (evbox, GTK_WIDGET_STATE(evbox), &color);      
+  vbox = gtk_vbox_new(FALSE, 0);
   label = gtk_label_new ("Glossary");  
-  i_page = gtk_notebook_append_page (GTK_NOTEBOOK (notebook), evbox, label);
-  gtk_widget_show (evbox);
-  gtk_widget_modify_bg (evbox, GTK_WIDGET_STATE(evbox), &color);    
+  i_page = gtk_notebook_append_page (GTK_NOTEBOOK (notebook), vbox, label);
+  gtk_widget_show (vbox);
   
   scrolled = gtk_scrolled_window_new (NULL, NULL);
   gtk_scrolled_window_set_shadow_type (GTK_SCROLLED_WINDOW (scrolled),
                                        GTK_SHADOW_ETCHED_IN);
   gtk_scrolled_window_set_policy (GTK_SCROLLED_WINDOW (scrolled),
                                   GTK_POLICY_NEVER, GTK_POLICY_AUTOMATIC);
-  gtk_container_add (GTK_CONTAINER(evbox), scrolled);
+  gtk_container_add (GTK_CONTAINER(vbox), scrolled);
+  gtk_widget_show (GTK_WIDGET(scrolled));
 
   label = gtk_label_new (ptext);
   gtk_label_set_use_markup (GTK_LABEL (label), TRUE);
-  gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_LEFT);
+  gtk_label_set_justify (GTK_LABEL (label), GTK_JUSTIFY_FILL);
   gtk_label_set_line_wrap (GTK_LABEL (label), TRUE);  
+
   gtk_scrolled_window_add_with_viewport ( GTK_SCROLLED_WINDOW(scrolled), label);
-
-
   gtk_widget_show (label);
 
+  gtk_widget_modify_bg ( gtk_widget_get_parent(label), GTK_STATE_NORMAL, &color);
 
   return i_page;
 }
