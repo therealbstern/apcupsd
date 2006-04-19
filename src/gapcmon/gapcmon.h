@@ -1,4 +1,5 @@
-/* gapcmon.h               serial-0070-0 ************************************
+
+/* gapcmon.h               serial-0070-1 ************************************
 
   GKT+ GUI with Notification Area (System Tray) support.  Program  for 
   monitoring the apcupsd.sourceforge.net package.
@@ -43,285 +44,270 @@ G_BEGIN_DECLS
 #define GAPC_MID_GROUP_KEY   "/apps/gapcmon/monitor"
 #define GAPC_ENABLE_KEY      "/apps/gapcmon/monitor/%d/enabled"
 #define GAPC_SYSTRAY_KEY     "/apps/gapcmon/monitor/%d/use_systray"
-#define GAPC_PAGER_KEY       "/apps/gapcmon/monitor/%d/skip_pagers"  /* not used */
+#define GAPC_PAGER_KEY       "/apps/gapcmon/monitor/%d/skip_pagers"     /* not used */
 #define GAPC_PORT_KEY        "/apps/gapcmon/monitor/%d/port_number"
 #define GAPC_REFRESH_KEY     "/apps/gapcmon/monitor/%d/network_interval"
 #define GAPC_GRAPH_KEY       "/apps/gapcmon/monitor/%d/graph_interval"
 #define GAPC_HOST_KEY        "/apps/gapcmon/monitor/%d/host_name"
-#define GAPC_MAX_ARRAY 256      /* for arrays or lists */
-#define GAPC_MAX_TEXT 256       /* for strings */
-#define GAPC_ICON_SIZE 24       /* Ideal size of icons */
-#define GAPC_REFRESH_FACTOR_1K 1000 /* micro.secs for visual refresh    */
+#define GAPC_MAX_ARRAY 256         /* for arrays or lists */
+#define GAPC_MAX_TEXT 256          /* for strings */
+#define GAPC_ICON_SIZE 24          /* Ideal size of icons */
+#define GAPC_REFRESH_FACTOR_1K 1000     /* micro.secs for visual refresh    */
 #define GAPC_REFRESH_FACTOR_ONE_TIME 500
 #define GAPC_HOST_DEFAULT "localhost"
 #define GAPC_PORT_DEFAULT 3551
 #define GAPC_REFRESH_DEFAULT 8.0
-#define GAPC_REFRESH_MIN_INCREMENT 1.0 /* Minimum refresh cycle seconds */
+#define GAPC_REFRESH_MIN_INCREMENT 1.0  /* Minimum refresh cycle seconds */
 #define GAPC_LINEGRAPH_XMAX 40
 #define GAPC_LINEGRAPH_YMAX 110
 #define GAPC_LINEGRAPH_MAX_SERIES 5
-#define GAPC_LINEGRAPH_REFRESH_FACTOR 30.0 /* Num refreshes per collection  */
-
+#define GAPC_LINEGRAPH_REFRESH_FACTOR 30.0      /* Num refreshes per collection  */
 #ifdef GNOMEVFS_REQUIRES_CANCELLATION
 # define GNOMEVFS_CANCELLATION ,NULL
 #else
 # define GNOMEVFS_CANCELLATION
 #endif
-
-typedef enum _State_Icons_IDs
-{
-  GAPC_ICON_ONLINE,
-  GAPC_ICON_ONBATT,
-  GAPC_ICON_CHARGING,
-  GAPC_ICON_DEFAULT,
-  GAPC_ICON_UNPLUGGED,
-  GAPC_ICON_PREFS,
-  GAPC_N_ICONS
+   typedef enum _State_Icons_IDs {
+   GAPC_ICON_ONLINE,
+   GAPC_ICON_ONBATT,
+   GAPC_ICON_CHARGING,
+   GAPC_ICON_DEFAULT,
+   GAPC_ICON_UNPLUGGED,
+   GAPC_ICON_PREFS,
+   GAPC_N_ICONS
 } GAPC_IconType;
 
-typedef enum _Timer_IDs
-{
-  GAPC_TIMER_AUTO,
-  GAPC_TIMER_DEDICATED,
-  GAPC_TIMER_CONTROL,
-  GAPC_N_TIMERS
+typedef enum _Timer_IDs {
+   GAPC_TIMER_AUTO,
+   GAPC_TIMER_DEDICATED,
+   GAPC_TIMER_CONTROL,
+   GAPC_N_TIMERS
 } GAPC_TimerType;
 
-typedef enum _Prefs_Store_IDs
-{
-  GAPC_PREFS_MONITOR,
-  GAPC_PREFS_ENABLED,
-  GAPC_PREFS_SYSTRAY,
-  GAPC_PREFS_PORT,
-  GAPC_PREFS_REFRESH,
-  GAPC_PREFS_GRAPH,
-  GAPC_PREFS_HOST,
-  GAPC_N_PREFS_COLUMNS
+typedef enum _Prefs_Store_IDs {
+   GAPC_PREFS_MONITOR,
+   GAPC_PREFS_ENABLED,
+   GAPC_PREFS_SYSTRAY,
+   GAPC_PREFS_PORT,
+   GAPC_PREFS_REFRESH,
+   GAPC_PREFS_GRAPH,
+   GAPC_PREFS_HOST,
+   GAPC_N_PREFS_COLUMNS
 } GAPC_PrefsType;
 
-typedef enum _Monitor_Store_IDs
-{
-  GAPC_MON_MONITOR,
-  GAPC_MON_ICON,
-  GAPC_MON_STATUS,
-  GAPC_MON_POINTER,
-  GAPC_MON_UPSSTATE,
-  GAPC_N_MON_COLUMNS
+typedef enum _Monitor_Store_IDs {
+   GAPC_MON_MONITOR,
+   GAPC_MON_ICON,
+   GAPC_MON_STATUS,
+   GAPC_MON_POINTER,
+   GAPC_MON_UPSSTATE,
+   GAPC_N_MON_COLUMNS
 } GAPC_MonitorType;
 
-typedef struct _Preferences_Key_Records
-{
-  gchar           k_enabled[GAPC_MAX_TEXT];
-  gchar           k_use_systray[GAPC_MAX_TEXT];
-  gchar           k_port_number[GAPC_MAX_TEXT];
-  gchar           k_network_interval[GAPC_MAX_TEXT];
-  gchar           k_graph_interval[GAPC_MAX_TEXT];
-  gchar           k_host_name[GAPC_MAX_TEXT];
-  gchar           v_host_name[GAPC_MAX_TEXT];
-} GAPC_PKEYS   , *PGAPC_PKEYS;
+typedef struct _Preferences_Key_Records {
+   gchar k_enabled[GAPC_MAX_TEXT];
+   gchar k_use_systray[GAPC_MAX_TEXT];
+   gchar k_port_number[GAPC_MAX_TEXT];
+   gchar k_network_interval[GAPC_MAX_TEXT];
+   gchar k_graph_interval[GAPC_MAX_TEXT];
+   gchar k_host_name[GAPC_MAX_TEXT];
+   gchar v_host_name[GAPC_MAX_TEXT];
+} GAPC_PKEYS, *PGAPC_PKEYS;
 
 /* Control structure for TreeView columns and callbacks */
-typedef struct _Prefs_Column_Data
-{
-  guint           cb_id:7;      /* This is REQUIRED TO BE 1ST in struct */
-  guint           cb_monitor_num; /* monitor number 1-based */
-  guint           i_col_num;
-  GConfClient    *client;
-  GtkTreeModel   *prefs_model;  /* GtkListStore */
+typedef struct _Prefs_Column_Data {
+   guint cb_id:7;                  /* This is REQUIRED TO BE 1ST in struct */
+   guint cb_monitor_num;           /* monitor number 1-based */
+   guint i_col_num;
+   GConfClient *client;
+   GtkTreeModel *prefs_model;      /* GtkListStore */
 
 } GAPC_PREFS_COLUMN, *PGAPC_PREFS_COLUMN;
 
-typedef struct _Monitor_Column_Data
-{
-  guint           cb_id:6;      /* This is REQUIRED TO BE 1ST in struct */
-  guint           cb_monitor_num; /* monitor number 1-based */
-  guint           i_col_num;
-  GConfClient    *client;
-  GtkTreeModel   *monitor_model; /* GtkListStore */
+typedef struct _Monitor_Column_Data {
+   guint cb_id:6;                  /* This is REQUIRED TO BE 1ST in struct */
+   guint cb_monitor_num;           /* monitor number 1-based */
+   guint i_col_num;
+   GConfClient *client;
+   GtkTreeModel *monitor_model;    /* GtkListStore */
 
 } GAPC_MON_COLUMN, *PGAPC_MON_COLUMN;
 
-typedef struct _GAPC_H_CHART
-{
-  guint           cb_id:5;
-  gdouble         d_value;
-  gboolean        b_center_text;
-  gchar           c_text[GAPC_MAX_TEXT];
-  GdkRectangle    rect;
-} GAPC_BAR_H   , *PGAPC_BAR_H;
+typedef struct _GAPC_H_CHART {
+   guint cb_id:5;
+   gdouble d_value;
+   gboolean b_center_text;
+   gchar c_text[GAPC_MAX_TEXT];
+   GdkRectangle rect;
+} GAPC_BAR_H, *PGAPC_BAR_H;
 
-typedef struct _GAPC_SUM_SQUARES
-{
-  guint           cb_id:4;
-  gint            point_count;
+typedef struct _GAPC_SUM_SQUARES {
+   guint cb_id:4;
+   gint point_count;
 
-  gdouble         this_point;
-  gdouble         this_answer;
+   gdouble this_point;
+   gdouble this_answer;
 
-  gdouble         last_point;
-  gdouble         last_answer;
+   gdouble last_point;
+   gdouble last_answer;
 
-  gdouble         answer_summ;
-  gdouble         point_min;
-  gdouble         point_max;
+   gdouble answer_summ;
+   gdouble point_min;
+   gdouble point_max;
 
-  GMutex         *gm_graph;     /* Control mutex  for graphics filter */
-} GAPC_SUMS    , *PGAPC_SUMS;
+   GMutex *gm_graph;               /* Control mutex  for graphics filter */
+} GAPC_SUMS, *PGAPC_SUMS;
 
 /* * Control structure for GtkExtra Charts in Information Window */
-typedef struct _History_Page_Data
-{
-  guint           cb_id:3;      /* This is REQUIRED TO BE 1ST in struct   */
-  guint           cb_monitor_num; /* monitor number 1-based */
-  gpointer       *gp;           /* ptr back to the monitor */
-  GHashTable    **pht_Status;   /* hashtable holding status key=values COPY */
-  GHashTable    **pht_Widgets;  /* hashtable holding wdiget ptrs  COPY */
-  GtkGLGraph     *glg;          /* GtkGLGraph widget */
+typedef struct _History_Page_Data {
+   guint cb_id:3;                  /* This is REQUIRED TO BE 1ST in struct   */
+   guint cb_monitor_num;           /* monitor number 1-based */
+   gpointer *gp;                   /* ptr back to the monitor */
+   GHashTable **pht_Status;        /* hashtable holding status key=values COPY */
+   GHashTable **pht_Widgets;       /* hashtable holding wdiget ptrs  COPY */
+   GtkGLGraph *glg;                /* GtkGLGraph widget */
 
-  gchar          *xlabel;
-  gchar          *ylabel;
-  gchar          *zlabel;
+   gchar *xlabel;
+   gchar *ylabel;
+   gchar *zlabel;
 
-  gdouble         xmin;
-  gdouble         xmax;
-  gint32          xmajor_steps;
-  gint32          xminor_steps;
-  gint8           xprecision;
-  gdouble         ymin;
-  gdouble         ymax;
-  gint32          ymajor_steps;
-  gint32          yminor_steps;
-  gint8           yprecision;
+   gdouble xmin;
+   gdouble xmax;
+   gint32 xmajor_steps;
+   gint32 xminor_steps;
+   gint8 xprecision;
+   gdouble ymin;
+   gdouble ymax;
+   gint32 ymajor_steps;
+   gint32 yminor_steps;
+   gint8 yprecision;
 
-  gchar           ch_label_color[GAPC_LINEGRAPH_MAX_SERIES + 4][GAPC_MAX_TEXT];
-  gchar           ch_label_legend[GAPC_LINEGRAPH_MAX_SERIES + 4][GAPC_MAX_TEXT];
-  gchar           ch_title[GAPC_MAX_TEXT];
+   gchar ch_label_color[GAPC_LINEGRAPH_MAX_SERIES + 4][GAPC_MAX_TEXT];
+   gchar ch_label_legend[GAPC_LINEGRAPH_MAX_SERIES + 4][GAPC_MAX_TEXT];
+   gchar ch_title[GAPC_MAX_TEXT];
 
-  gdouble         d_xinc;       /* base refresh increment for scaling x legend */
-  gboolean        b_startup;    /* first point collect flag */
+   gdouble d_xinc;                 /* base refresh increment for scaling x legend */
+   gboolean b_startup;             /* first point collect flag */
 
-  GAPC_SUMS       sq[GAPC_LINEGRAPH_MAX_SERIES + 4]; /* data point collector */
+   GAPC_SUMS sq[GAPC_LINEGRAPH_MAX_SERIES + 4]; /* data point collector */
 
-} GAPC_HISTORY , *PGAPC_HISTORY;
+} GAPC_HISTORY, *PGAPC_HISTORY;
 
 /* * Control structure per active monitor icon in panel  */
-typedef struct _Monitor_Instance_Data
-{        
-  guint           cb_id:2;      /* This is REQUIRED TO BE 1ST in struct   */
+typedef struct _Monitor_Instance_Data {
+   guint cb_id:2;                  /* This is REQUIRED TO BE 1ST in struct   */
 
-  guint           cb_monitor_num; /* Begin Preference values 1-based */
-  gboolean        cb_enabled;
-  gboolean        cb_use_systray;
-  gchar          *pch_host;
-  gint            i_port;
-  gfloat         d_refresh;
-  gfloat         d_graph;      /* End Preference values */
+   guint cb_monitor_num;           /* Begin Preference values 1-based */
+   gboolean cb_enabled;
+   gboolean cb_use_systray;
+   gchar *pch_host;
+   gint i_port;
+   gfloat d_refresh;
+   gfloat d_graph;                 /* End Preference values */
 
-  gchar           ch_title_info[GAPC_MAX_TEXT];
+   gchar ch_title_info[GAPC_MAX_TEXT];
 
-  GtkWidget      *window;       /* information window   */
-  GtkWidget      *menu;         /* Popup Menu */
-  GtkWidget      *notebook;     /* information Notebook */
-  gboolean        b_visible;    /* is the info window visible */
-  guint           i_info_context; /* StatusBar message Context */
+   GtkWidget *window;              /* information window   */
+   GtkWidget *menu;                /* Popup Menu */
+   GtkWidget *notebook;            /* information Notebook */
+   gboolean b_visible;             /* is the info window visible */
+   guint i_info_context;           /* StatusBar message Context */
 
-  gboolean        b_run;        /* controller for all monitor resources */
-  GThread        *tid_thread_qwork; /* Background Thread */
-  GMutex         *gm_update;    /* Control mutex for hashtables and thread */
-  GAsyncQueue    *q_network;
-  guint           i_netbusy_counter;
-  guint           tid_automatic_refresh; /* monitor refresh timer id */
-  guint           tid_graph_refresh;
-  gboolean        b_data_available; /* Flag from thread indicating data ready */
-  gboolean        b_network_control; /* TRUE signals resolve address needed */
+   gboolean b_run;                 /* controller for all monitor resources */
+   GThread *tid_thread_qwork;      /* Background Thread */
+   GMutex *gm_update;              /* Control mutex for hashtables and thread */
+   GAsyncQueue *q_network;
+   guint i_netbusy_counter;
+   guint tid_automatic_refresh;    /* monitor refresh timer id */
+   guint tid_graph_refresh;
+   gboolean b_data_available;      /* Flag from thread indicating data ready */
+   gboolean b_network_control;     /* TRUE signals resolve address needed */
 
-  gboolean        b_timer_control; /* TRUE signals change in refresh interval */
-  gboolean        b_graph_control; /* TRUE signals change in refresh interval */
-  gboolean        b_refresh_button; /* Flag to thread to immediately update */
+   gboolean b_timer_control;       /* TRUE signals change in refresh interval */
+   gboolean b_graph_control;       /* TRUE signals change in refresh interval */
+   gboolean b_refresh_button;      /* Flag to thread to immediately update */
 
-  GHashTable     *pht_Status;   /* Private hashtable status key=values */
-  GHashTable     *pht_Widgets;  /* Private hashtable holding widget ptrs  */
+   GHashTable *pht_Status;         /* Private hashtable status key=values */
+   GHashTable *pht_Widgets;        /* Private hashtable holding widget ptrs  */
 
-  GtkTooltips    *tooltips;
-  guint           i_icon_index;
-  gint            i_old_icon_index;
-  gint            i_icon_size;
-  gint            i_icon_height;
-  gint            i_icon_width;
+   GtkTooltips *tooltips;
+   guint i_icon_index;
+   gint i_old_icon_index;
+   gint i_icon_size;
+   gint i_icon_height;
+   gint i_icon_width;
 
-  GdkPixbuf     **my_icons;
+   GdkPixbuf **my_icons;
 
-  EggTrayIcon    *tray_icon;
-  GtkWidget      *tray_image;
+   EggTrayIcon *tray_icon;
+   GtkWidget *tray_image;
 
-  GList          *data_status;  /* Holds line of status text */
-  GList          *data_events;  /* Holds line of event text */
-  gchar          *pach_status[GAPC_MAX_ARRAY]; /* Holds line of status text */
-  gchar          *pach_events[GAPC_MAX_ARRAY]; /* Holds line of event text */
+   GList *data_status;             /* Holds line of status text */
+   GList *data_events;             /* Holds line of event text */
+   gchar *pach_status[GAPC_MAX_ARRAY];  /* Holds line of status text */
+   gchar *pach_events[GAPC_MAX_ARRAY];  /* Holds line of event text */
 
-  GConfClient    *client;       /* GCONF id */
-  gpointer       *gp;           /* assumed to point to pcfg */
-  GtkTreeModel   *monitor_model; /* GtkListStore */
-  GAPC_HISTORY    phs;          /* structure for history notebook page */
+   GConfClient *client;            /* GCONF id */
+   gpointer *gp;                   /* assumed to point to pcfg */
+   GtkTreeModel *monitor_model;    /* GtkListStore */
+   GAPC_HISTORY phs;               /* structure for history notebook page */
 
-} GAPC_MONITOR , *PGAPC_MONITOR;
+} GAPC_MONITOR, *PGAPC_MONITOR;
 
 /* * Control structure for root panel object -- this is the anchor */
-typedef struct _System_Control_Data
-{
-  guint           cb_id:1;      /* This is REQUIRED TO BE 1ST in struct  */
-  GList          *cb_glist_monitors; /* assumed to point to  PGAPC_MONITOR */
-  guint           cb_last_monitor; /* last selected from icon list - 1-based */
-  gboolean        b_use_systray; /* gconf parms */
-  gboolean        b_tooltips;
-  gboolean        b_run;        /* operational flag */
-  gchar          *pch_gkeys[GAPC_N_PREFS_COLUMNS];
-  GConfClient    *client;       /* GCONF id */
-  guint           i_group_id;   /* GCONF dir notify ids - controller */
-  guint           i_prefs_id;   /* GCONF dir notify ids - prefs-view */
+typedef struct _System_Control_Data {
+   guint cb_id:1;                  /* This is REQUIRED TO BE 1ST in struct  */
+   GList *cb_glist_monitors;       /* assumed to point to  PGAPC_MONITOR */
+   guint cb_last_monitor;          /* last selected from icon list - 1-based */
+   gboolean b_use_systray;         /* gconf parms */
+   gboolean b_tooltips;
+   gboolean b_run;                 /* operational flag */
+   gchar *pch_gkeys[GAPC_N_PREFS_COLUMNS];
+   GConfClient *client;            /* GCONF id */
+   guint i_group_id;               /* GCONF dir notify ids - controller */
+   guint i_prefs_id;               /* GCONF dir notify ids - prefs-view */
 
-  GtkWidget      *window;
-  GtkWidget      *menu;         /* Popup Menu */
-  gboolean        b_visible;    /* is the info window visible */
+   GtkWidget *window;
+   GtkWidget *menu;                /* Popup Menu */
+   gboolean b_visible;             /* is the info window visible */
 
-  GtkTreeModel   *prefs_model;  /* GtkListStore */
-  GtkTreeView    *prefs_treeview;
-  GtkTreeSelection *prefs_select;
-  guint           prefs_last_monitor; /* assigning monitor numbers */
-  gint            cb_last_monitor_deleted; /* overide gconf inconsistency on kde */
+   GtkTreeModel *prefs_model;      /* GtkListStore */
+   GtkTreeView *prefs_treeview;
+   GtkTreeSelection *prefs_select;
+   guint prefs_last_monitor;       /* assigning monitor numbers */
+   gint cb_last_monitor_deleted;   /* overide gconf inconsistency on kde */
 
-  GtkTreeModel   *monitor_model; /* GtkListStore */
-  GtkTreeView    *monitor_treeview;
-  GtkTreeSelection *monitor_select;
+   GtkTreeModel *monitor_model;    /* GtkListStore */
+   GtkTreeView *monitor_treeview;
+   GtkTreeSelection *monitor_select;
 
-  GtkWidget      *image;
-  GtkTooltips    *tooltips;
+   GtkWidget *image;
+   GtkTooltips *tooltips;
 
-  EggTrayIcon    *tray_icon;
-  GtkWidget      *tray_image;
-  GtkTooltips    *tray_tooltips;
-  gint            i_icon_size;
-  gint            i_icon_height;
-  gint            i_icon_width;
+   EggTrayIcon *tray_icon;
+   GtkWidget *tray_image;
+   GtkTooltips *tray_tooltips;
+   gint i_icon_size;
+   gint i_icon_height;
+   gint i_icon_width;
 
-  GHashTable     *pht_Widgets;  /* hashtable holding widget ptrs  */
-  GHashTable     *pht_Status;   /* hashtable holding status text  */
-  guint           i_info_context; /* StatusBar Context */
-  GdkPixbuf      *my_icons[GAPC_N_ICONS + 8];
+   GHashTable *pht_Widgets;        /* hashtable holding widget ptrs  */
+   GHashTable *pht_Status;         /* hashtable holding status text  */
+   guint i_info_context;           /* StatusBar Context */
+   GdkPixbuf *my_icons[GAPC_N_ICONS + 8];
 
-} GAPC_CONFIG  , *PGAPC_CONFIG;
+} GAPC_CONFIG, *PGAPC_CONFIG;
 
-typedef struct _Icons_Sort_Data
-{
-  guint           cb_id:8;      /* This is REQUIRED TO BE 1ST in struct */
-  guint           cb_monitor_num; /* monitor number 0-based */
-  gboolean        b_ascending;
-  PGAPC_CONFIG    pcfg;
+typedef struct _Icons_Sort_Data {
+   guint cb_id:8;                  /* This is REQUIRED TO BE 1ST in struct */
+   guint cb_monitor_num;           /* monitor number 0-based */
+   gboolean b_ascending;
+   PGAPC_CONFIG pcfg;
 
-} GAPC_SORT    , *PGAPC_SORT;
+} GAPC_SORT, *PGAPC_SORT;
 
 /* ************************************************************************* */
-  
+
 #define GAPC_GLOSSARY  "<span size=\"xx-large\"><b>GAPCMON</b></span>\n \
 A monitor for UPS's under the management of APCUPSD.\n\n \
 When active, gapcmon provides three visual objects to interact with. \
@@ -398,7 +384,8 @@ A listing of the output from apcaccess showing the actual state as reported \
 by the UPS.\n\
 \n\
  "
+
 /* ************************************************************************* */
 
 G_END_DECLS
-#endif /*GAPC_H_ */
+#endif                             /*GAPC_H_ */
