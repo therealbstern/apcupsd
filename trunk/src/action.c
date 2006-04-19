@@ -486,8 +486,12 @@ void do_action(UPSINFO *ups)
           * Did BattLow bit go high? Then the battery power is failing.
           * Normal Power down during Power Failure: Start shutdown timer.
           */
-         if (ups->chg_battlow() && ups->is_battlow())
-               ups->start_shut_lbatt = now;
+         if (ups->chg_battlow() && ups->is_battlow()) {
+            Dmsg0(100, "BATTLOW shutdown\n");
+            ups->start_shut_lbatt = now;
+         }
+         if (ups->chg_battlow() && !ups->is_battlow())
+            Dmsg0(100, "BATTLOW glitch\n");
 
          /*
           * Did MaxTimeOnBattery Expire?  (TIMEOUT in apcupsd.conf)
@@ -505,19 +509,25 @@ void do_action(UPSINFO *ups)
           */
          if (ups->UPS_Cap[CI_BATTLEV] && ups->BattChg <= ups->percent) {
             if (!ups->is_shut_load()) {
+               Dmsg0(100, "CI_BATTLEV shutdown\n");
                ups->set_shut_load();
                ups->start_shut_load = now;
             }
          } else {
+            if (ups->UPS_Cap[CI_BATTLEV] && ups->is_shut_load())
+               Dmsg0(100, "CI_BATTLEV glitch\n");
             ups->clear_shut_load();
          }
 
          if (ups->UPS_Cap[CI_RUNTIM] && ups->TimeLeft <= ups->runtime) {
             if (!ups->is_shut_ltime()) {
+               Dmsg0(100, "CI_RUNTIM shutdown\n");
                ups->set_shut_ltime();
                ups->start_shut_ltime = now;
             }
          } else {
+            if (ups->UPS_Cap[CI_RUNTIM] && ups->is_shut_ltime())
+               Dmsg0(100, "CI_RUNTIM glitch\n");
             ups->clear_shut_ltime();
          }
 
