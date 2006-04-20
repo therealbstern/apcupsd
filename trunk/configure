@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS ABSSRCDIR topdir VERSION DATE TRUEPRG FALSEPRG build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP CXX CXXFLAGS ac_ct_CXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA AWK HAVE_GCC_TRUE HAVE_GCC_FALSE DEBUG DLIB DINCLUDE PTHREAD_CFLAGS PTHREAD_LFLAGS WIN32 WINLIBS APCACCESS SMTP APCTEST SHUTDOWN APCUPSD_MAIL WALL SCRIPTSHELL MAKE MAKEDEPEND RANLIB LIBTOOL ETAGS CTAGS RM CP ECHO LN SED AR MV X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS HAVE_SUN_OS_TRUE HAVE_SUN_OS_FALSE HAVE_OSF1_OS_TRUE HAVE_OSF1_OS_FALSE HAVE_AIX_OS_TRUE HAVE_AIX_OS_FALSE HAVE_HPUX_OS_TRUE HAVE_HPUX_OS_FALSE HAVE_LINUX_OS_TRUE HAVE_LINUX_OS_FALSE HAVE_FREEBSD_OS_TRUE HAVE_FREEBSD_OS_FALSE HAVE_NETBSD_OS_TRUE HAVE_NETBSD_OS_FALSE HAVE_OPENBSD_OS_TRUE HAVE_OPENBSD_OS_FALSE HAVE_BSDI_OS_TRUE HAVE_BSDI_OS_FALSE HAVE_SGI_OS_TRUE HAVE_SGI_OS_FALSE HAVE_DARWIN_OS_TRUE HAVE_DARWIN_OS_FALSE GDHEAD INSTALL_DISTDIR UNINSTALL_DISTDIR APCSMART_DRIVER DUMB_DRIVER LIBUSBHID LIBUSBHIDINC LIBUSBHIDOBJS usbcfg LIBUSBH USB_DRIVER USB_TYPE LIBUSB NET_DRIVER SNMP_DRIVER TEST_DRIVER NISIP GAPCDIR GPANEL GAPCMON PKG_CONFIG ac_pt_PKG_CONFIG GAPCMON_CFLAGS GAPCMON_LIBS GPANEL_CFLAGS GPANEL_LIBS POMAKE INTLSUB INTLMAKE INTLTARGET POWERFLUTE POWERLIBS LD CGI GDINCLUDE LIBGD LIBGDOBJ CGI_IMGFMT CGIBIN PACKAGE MSGFMT SET_MAKE ac_ct_RANLIB ALLOCA USE_NLS GMSGFMT XGETTEXT GENCAT USE_INCLUDED_LIBINTL CATALOGS CATOBJEXT DATADIRNAME GMOFILES INSTOBJEXT INTLDEPS INTLLIBS INTLINCLUDE INTLOBJS POFILES POSUB INCLUDE_LOCALE_H GT_NO GT_YES l MKINSTALLDIRS EXTRADEFS LIBEXTRAOBJ EXTRAOBJ DISTNAME DISTVER SERIALDEV PIDDIR LOGDIR nologdir PWRFAILDIR LOCKDIR NETPORT NISPORT UPSTYPE UPSCABLE HOST WCFLAGS WLDFLAGS LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS ABSSRCDIR topdir VERSION DATE TRUEPRG FALSEPRG build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP CXX CXXFLAGS ac_ct_CXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA AWK HAVE_GCC_TRUE HAVE_GCC_FALSE DEBUG DLIB DINCLUDE PTHREAD_CFLAGS PTHREAD_LFLAGS WIN32 WINLIBS APCACCESS SMTP APCTEST SHUTDOWN APCUPSD_MAIL WALL SCRIPTSHELL MAKE MAKEDEPEND RANLIB LIBTOOL ETAGS CTAGS RM CP ECHO LN SED AR MV X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS HAVE_SUN_OS_TRUE HAVE_SUN_OS_FALSE HAVE_OSF1_OS_TRUE HAVE_OSF1_OS_FALSE HAVE_AIX_OS_TRUE HAVE_AIX_OS_FALSE HAVE_HPUX_OS_TRUE HAVE_HPUX_OS_FALSE HAVE_LINUX_OS_TRUE HAVE_LINUX_OS_FALSE HAVE_FREEBSD_OS_TRUE HAVE_FREEBSD_OS_FALSE HAVE_NETBSD_OS_TRUE HAVE_NETBSD_OS_FALSE HAVE_OPENBSD_OS_TRUE HAVE_OPENBSD_OS_FALSE HAVE_BSDI_OS_TRUE HAVE_BSDI_OS_FALSE HAVE_SGI_OS_TRUE HAVE_SGI_OS_FALSE HAVE_DARWIN_OS_TRUE HAVE_DARWIN_OS_FALSE GDHEAD INSTALL_DISTDIR UNINSTALL_DISTDIR APCSMART_DRIVER DUMB_DRIVER LIBUSBHID LIBUSBHIDINC LIBUSBHIDOBJS usbcfg LIBUSBH USB_DRIVER USB_TYPE LIBUSB NET_DRIVER SNMP_DRIVER TEST_DRIVER NISIP GAPCDIR GAPCMON PKG_CONFIG ac_pt_PKG_CONFIG GAPCMON_CFLAGS GAPCMON_LIBS POMAKE INTLSUB INTLMAKE INTLTARGET POWERFLUTE POWERLIBS LD CGI GDINCLUDE LIBGD LIBGDOBJ CGI_IMGFMT CGIBIN PACKAGE MSGFMT SET_MAKE ac_ct_RANLIB ALLOCA USE_NLS GMSGFMT XGETTEXT GENCAT USE_INCLUDED_LIBINTL CATALOGS CATOBJEXT DATADIRNAME GMOFILES INSTOBJEXT INTLDEPS INTLLIBS INTLINCLUDE INTLOBJS POFILES POSUB INCLUDE_LOCALE_H GT_NO GT_YES l MKINSTALLDIRS EXTRADEFS LIBEXTRAOBJ EXTRAOBJ DISTNAME DISTVER SERIALDEV PIDDIR LOGDIR nologdir PWRFAILDIR LOCKDIR NETPORT NISPORT UPSTYPE UPSCABLE HOST WCFLAGS WLDFLAGS LIBOBJS LTLIBOBJS'
 ac_subst_files='VARIABLES TARGETS'
 
 # Initialize some variables set by options.
@@ -792,14 +792,6 @@ ac_env_GAPCMON_LIBS_set=${GAPCMON_LIBS+set}
 ac_env_GAPCMON_LIBS_value=$GAPCMON_LIBS
 ac_cv_env_GAPCMON_LIBS_set=${GAPCMON_LIBS+set}
 ac_cv_env_GAPCMON_LIBS_value=$GAPCMON_LIBS
-ac_env_GPANEL_CFLAGS_set=${GPANEL_CFLAGS+set}
-ac_env_GPANEL_CFLAGS_value=$GPANEL_CFLAGS
-ac_cv_env_GPANEL_CFLAGS_set=${GPANEL_CFLAGS+set}
-ac_cv_env_GPANEL_CFLAGS_value=$GPANEL_CFLAGS
-ac_env_GPANEL_LIBS_set=${GPANEL_LIBS+set}
-ac_env_GPANEL_LIBS_value=$GPANEL_LIBS
-ac_cv_env_GPANEL_LIBS_set=${GPANEL_LIBS+set}
-ac_cv_env_GPANEL_LIBS_value=$GPANEL_LIBS
 
 #
 # Report the --help message.
@@ -907,9 +899,7 @@ Optional Features:
 
   --enable-powerflute     Compile powerflute program
   --enable-gapcmon        build GTK/GUI front-end to apcupsd Program
-                          default=no
-  --enable-gpanel         build gnome panel applet front-end to apcupsd
-                          Program default=no
+                          default=yes
   --enable-nls            enable Native Language Support
 
 Optional Packages:
@@ -954,9 +944,6 @@ Some influential environment variables:
               C compiler flags for GAPCMON, overriding pkg-config
   GAPCMON_LIBS
               linker flags for GAPCMON, overriding pkg-config
-  GPANEL_CFLAGS
-              C compiler flags for GPANEL, overriding pkg-config
-  GPANEL_LIBS linker flags for GPANEL, overriding pkg-config
 
 Use these variables to override the choices made by `configure' or to help
 it to find libraries and programs with nonstandard names/locations.
@@ -10743,7 +10730,6 @@ if test "${enable_all+set}" = set; then
 		enable_powerflute=yes
 		enable_cgi=yes
 		enable_gapcmon=yes
-		enable_gpanel=yes
 	fi
 fi;
 
@@ -12395,8 +12381,7 @@ GAPCMON=
 
 
 
-
-GAPCMON_ENABLED=no
+GAPCMON_ENABLED=yes
 # Check whether --enable-gapcmon or --disable-gapcmon was given.
 if test "${enable_gapcmon+set}" = set; then
   enableval="$enable_gapcmon"
@@ -12405,16 +12390,7 @@ if test "${enable_gapcmon+set}" = set; then
 	fi
 fi;
 
-GPANEL_ENABLED=no
-# Check whether --enable-gpanel or --disable-gpanel was given.
-if test "${enable_gpanel+set}" = set; then
-  enableval="$enable_gpanel"
-   if test "$enableval" = "yes" ; then
-		GPANEL_ENABLED=yes
-	fi
-fi;
-
-if test "$GAPCMON_ENABLED" = "yes" -o "$GPANEL_ENABLED" = "yes" ; then
+if test "$GAPCMON_ENABLED" = "yes" ; then
 				GAPCDIR=gapcmon
 
 				if test "$GAPCMON_ENABLED" = "yes" ; then
@@ -12533,12 +12509,12 @@ if test -n "$PKG_CONFIG"; then
         pkg_cv_GAPCMON_CFLAGS="$GAPCMON_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
-    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0\"") >&5
-  ($PKG_CONFIG --exists --print-errors "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0") 2>&5
+    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0 gnome-vfs-module-2.0\"") >&5
+  ($PKG_CONFIG --exists --print-errors "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0 gnome-vfs-module-2.0") 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; then
-  pkg_cv_GAPCMON_CFLAGS=`$PKG_CONFIG --cflags-only-I "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0" 2>/dev/null`
+  pkg_cv_GAPCMON_CFLAGS=`$PKG_CONFIG --cflags-only-I "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0 gnome-vfs-module-2.0" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -12551,12 +12527,12 @@ if test -n "$PKG_CONFIG"; then
         pkg_cv_GAPCMON_LIBS="$GAPCMON_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
-    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0\"") >&5
-  ($PKG_CONFIG --exists --print-errors "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0") 2>&5
+    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0 gnome-vfs-module-2.0\"") >&5
+  ($PKG_CONFIG --exists --print-errors "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0 gnome-vfs-module-2.0") 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; then
-  pkg_cv_GAPCMON_LIBS=`$PKG_CONFIG --libs "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0" 2>/dev/null`
+  pkg_cv_GAPCMON_LIBS=`$PKG_CONFIG --libs "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0 gnome-vfs-module-2.0" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -12575,14 +12551,14 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        GAPCMON_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0"`
+	        GAPCMON_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0 gnome-vfs-module-2.0"`
         else
-	        GAPCMON_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0"`
+	        GAPCMON_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0 gnome-vfs-module-2.0"`
         fi
 	# Put the nasty error message in config.log where it belongs
 	echo "$GAPCMON_PKG_ERRORS" >&5
 
-	{ { echo "$as_me:$LINENO: error: Package requirements (gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0) were not met:
+	{ { echo "$as_me:$LINENO: error: Package requirements (gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0 gnome-vfs-module-2.0) were not met:
 
 $GAPCMON_PKG_ERRORS
 
@@ -12593,7 +12569,7 @@ Alternatively, you may set the environment variables GAPCMON_CFLAGS
 and GAPCMON_LIBS to avoid the need to call pkg-config.
 See the pkg-config man page for more details.
 " >&5
-echo "$as_me: error: Package requirements (gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0) were not met:
+echo "$as_me: error: Package requirements (gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0 gnome-vfs-module-2.0) were not met:
 
 $GAPCMON_PKG_ERRORS
 
@@ -12636,122 +12612,6 @@ echo "${ECHO_T}yes" >&6
 fi
 		GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DVERSION=\\\"$VERSION\\\""
 		GAPCMON=gapcmon
-	fi
-
-				if test "$GPANEL_ENABLED" = "yes" ; then
-
-pkg_failed=no
-echo "$as_me:$LINENO: checking for GPANEL" >&5
-echo $ECHO_N "checking for GPANEL... $ECHO_C" >&6
-
-if test -n "$PKG_CONFIG"; then
-    if test -n "$GPANEL_CFLAGS"; then
-        pkg_cv_GPANEL_CFLAGS="$GPANEL_CFLAGS"
-    else
-        if test -n "$PKG_CONFIG" && \
-    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0 gconf-2.0 libpanelapplet-2.0 libgnomeui-2.0 libbonoboui-2.0\"") >&5
-  ($PKG_CONFIG --exists --print-errors "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0 gconf-2.0 libpanelapplet-2.0 libgnomeui-2.0 libbonoboui-2.0") 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; then
-  pkg_cv_GPANEL_CFLAGS=`$PKG_CONFIG --cflags-only-I "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0 gconf-2.0 libpanelapplet-2.0 libgnomeui-2.0 libbonoboui-2.0" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
-    fi
-else
-	pkg_failed=untried
-fi
-if test -n "$PKG_CONFIG"; then
-    if test -n "$GPANEL_LIBS"; then
-        pkg_cv_GPANEL_LIBS="$GPANEL_LIBS"
-    else
-        if test -n "$PKG_CONFIG" && \
-    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0 gconf-2.0 libpanelapplet-2.0 libgnomeui-2.0 libbonoboui-2.0\"") >&5
-  ($PKG_CONFIG --exists --print-errors "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0 gconf-2.0 libpanelapplet-2.0 libgnomeui-2.0 libbonoboui-2.0") 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; then
-  pkg_cv_GPANEL_LIBS=`$PKG_CONFIG --libs "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0 gconf-2.0 libpanelapplet-2.0 libgnomeui-2.0 libbonoboui-2.0" 2>/dev/null`
-else
-  pkg_failed=yes
-fi
-    fi
-else
-	pkg_failed=untried
-fi
-
-
-
-if test $pkg_failed = yes; then
-
-if $PKG_CONFIG --atleast-pkgconfig-version 0.20; then
-        _pkg_short_errors_supported=yes
-else
-        _pkg_short_errors_supported=no
-fi
-        if test $_pkg_short_errors_supported = yes; then
-	        GPANEL_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0 gconf-2.0 libpanelapplet-2.0 libgnomeui-2.0 libbonoboui-2.0"`
-        else
-	        GPANEL_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0 gconf-2.0 libpanelapplet-2.0 libgnomeui-2.0 libbonoboui-2.0"`
-        fi
-	# Put the nasty error message in config.log where it belongs
-	echo "$GPANEL_PKG_ERRORS" >&5
-
-	{ { echo "$as_me:$LINENO: error: Package requirements (gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0 gconf-2.0 libpanelapplet-2.0 libgnomeui-2.0 libbonoboui-2.0) were not met:
-
-$GPANEL_PKG_ERRORS
-
-Consider adjusting the PKG_CONFIG_PATH environment variable if you
-installed software in a non-standard prefix.
-
-Alternatively, you may set the environment variables GPANEL_CFLAGS
-and GPANEL_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-" >&5
-echo "$as_me: error: Package requirements (gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gnome-vfs-module-2.0 gconf-2.0 libpanelapplet-2.0 libgnomeui-2.0 libbonoboui-2.0) were not met:
-
-$GPANEL_PKG_ERRORS
-
-Consider adjusting the PKG_CONFIG_PATH environment variable if you
-installed software in a non-standard prefix.
-
-Alternatively, you may set the environment variables GPANEL_CFLAGS
-and GPANEL_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-" >&2;}
-   { (exit 1); exit 1; }; }
-elif test $pkg_failed = untried; then
-	{ { echo "$as_me:$LINENO: error: The pkg-config script could not be found or is too old.  Make sure it
-is in your PATH or set the PKG_CONFIG environment variable to the full
-path to pkg-config.
-
-Alternatively, you may set the environment variables GPANEL_CFLAGS
-and GPANEL_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-
-To get pkg-config, see <http://www.freedesktop.org/software/pkgconfig>.
-See \`config.log' for more details." >&5
-echo "$as_me: error: The pkg-config script could not be found or is too old.  Make sure it
-is in your PATH or set the PKG_CONFIG environment variable to the full
-path to pkg-config.
-
-Alternatively, you may set the environment variables GPANEL_CFLAGS
-and GPANEL_LIBS to avoid the need to call pkg-config.
-See the pkg-config man page for more details.
-
-To get pkg-config, see <http://www.freedesktop.org/software/pkgconfig>.
-See \`config.log' for more details." >&2;}
-   { (exit 1); exit 1; }; }
-else
-	GPANEL_CFLAGS=$pkg_cv_GPANEL_CFLAGS
-	GPANEL_LIBS=$pkg_cv_GPANEL_LIBS
-        echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-	:
-fi
-		GPANEL_CFLAGS="$GPANEL_CFLAGS -DVERSION=\\\"$VERSION\\\""
-		GPANEL=gpanel_apcmon
 	fi
 
 				_cflags=${CFLAGS}
@@ -12800,13 +12660,12 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	      GAPCMON_CFLAGS="${GAPCMON_CFLAGS} -DGNOMEVFS_REQUIRES_CANCELLATION"
-	      GPANEL_CFLAGS="${GPANEL_CFLAGS} -DGNOMEVFS_REQUIRES_CANCELLATION"
+	   echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
 fi
 rm -f conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
@@ -17818,14 +17677,11 @@ s,@SNMP_DRIVER@,$SNMP_DRIVER,;t t
 s,@TEST_DRIVER@,$TEST_DRIVER,;t t
 s,@NISIP@,$NISIP,;t t
 s,@GAPCDIR@,$GAPCDIR,;t t
-s,@GPANEL@,$GPANEL,;t t
 s,@GAPCMON@,$GAPCMON,;t t
 s,@PKG_CONFIG@,$PKG_CONFIG,;t t
 s,@ac_pt_PKG_CONFIG@,$ac_pt_PKG_CONFIG,;t t
 s,@GAPCMON_CFLAGS@,$GAPCMON_CFLAGS,;t t
 s,@GAPCMON_LIBS@,$GAPCMON_LIBS,;t t
-s,@GPANEL_CFLAGS@,$GPANEL_CFLAGS,;t t
-s,@GPANEL_LIBS@,$GPANEL_LIBS,;t t
 s,@POMAKE@,$POMAKE,;t t
 s,@INTLSUB@,$INTLSUB,;t t
 s,@INTLMAKE@,$INTLMAKE,;t t
@@ -18697,7 +18553,6 @@ Configuration on `date`:
   enable-pthreads:	      ${with_pthreads}
   enable-dist-install:	      ${with_distdir}
   enable-gapcmon:	      ${GAPCMON_ENABLED}
-  enable-gpanel:	      ${GPANEL_ENABLED}
   " > config.out
 
 cat config.out
