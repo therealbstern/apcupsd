@@ -8,6 +8,146 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2006-04-19 22:50  adk0212
+
+	* configure:
+
+	Regenerate configure for gapcmon changes.
+
+2006-04-19 19:26  adk0212
+
+	* src/action.c:
+
+	Add debug messages for delayed shutdowns.
+
+2006-04-19 19:18  adk0212
+
+	* include/struct.h, src/action.c:
+
+	Add some hysteresis to battlow, ltime, and load shutdowns.
+
+2006-04-19 13:51  skoona
+
+	* src/gapcmon/: eggtrayicon.c, eggtrayicon.h, gapcmon.c, gapcmon.h,
+	gapcmon_gtkglgraph.c, gapcmon_gtkglgraph.h:
+
+	Applied apcupsd style formatting to all source files.  I am working
+	on managing the sorted order of monitors in the preference and
+	active list pages.  This will take a week or so.  For now I
+	consider this codeset stable and complete.  James,
+
+2006-04-19 13:21  skoona
+
+	* src/gapcmon/: gapcmon.c, gapcmon.desktop, gapcmon.h:
+
+	Changed the background color of the Glossary Page to white. via
+	gapc_panel_glossary_page().  James,
+
+2006-04-19 09:51  skoona
+
+	* autoconf/configure.in:
+
+	Made the changes needed by gapcmon.  Basically, removed all
+	references to gpanel and added gconf-2.0 to list of gapcmon
+	defines.  I always have trouble regen'ing these config files.  Let
+	me know when you redo them.  James,
+
+2006-04-18 19:41  skoona
+
+	* src/gapcmon/gapcmon.h:
+
+	Changed to #ifdef, from #ifndef for the GNOMEVFSCANCELLATION flag.
+	James,
+
+2006-04-18 19:38  skoona
+
+	* autoconf/configure.in, src/gapcmon/Makefile.in:
+
+	These are the changes I think need to be make to compile gapcmon
+	with a default of on.  It did work fine for me after regening the
+	configure script and makefiles.  James,
+
+2006-04-18 19:25  skoona
+
+	* src/gapcmon/gapc_prefs.png:
+
+	Adding the last icon file, which was missed in first update James,
+
+2006-04-18 18:40  skoona
+
+	* src/gapcmon/: ChangeLog, README, eggtrayicon.c, eggtrayicon.h,
+	gapcmon.c, gapcmon.h, gapcmon.spec, gapcmon_gtkglgraph.c,
+	gapcmon_gtkglgraph.h:
+
+	New files are now in place.  Need to update the Makefile.in and
+	configuration for one gapcmon executable removing gpanel...
+	artifacts.  James,
+
+2006-04-18 18:35  skoona
+
+	* src/gapcmon/: gapcmon_common.h, gp_apcmon_core.c,
+	gpanel_apcmon.c, gpanel_apcmon.schemas, gpanel_apcmon.server:
+
+	Starting the move to the new gapcmon interface; which has an
+	internal serial number of 0.7.0-0.  step one remove files no longer
+	needed James,
+
+2006-04-14 04:09  kerns
+
+	* src/win32/: .cvsignore, winres.rc, apcupsd/apcupsd.dep:
+
+	Update and add new files
+
+2006-04-07 18:31  adk0212
+
+	* configure, autoconf/configure.in, autoconf/targets.mak,
+	autoconf/variables.mak.in:
+
+	Separate CFLAGS and CPPFLAGS. Add C++ specific flags like -fno-rtti
+	only to CPPFLAGS.
+
+2006-03-27 12:54  skoona
+
+	* src/gapcmon/: gp_apcmon_core.c, gpanel_apcmon.c:
+
+	Ok, This time I really did put change the gapc_util_load_icons()
+	routine by adding support for looking in the current directory for
+	the icons if they were not installed.  James,
+
+2006-03-27 12:30  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Changed gapc_util_load_icons to test for installed icons and if not
+	found use local directory.  James,
+
+2006-03-24 22:32  skoona
+
+	* src/gapcmon/gapcmon_gtkglgraph.c:
+
+	Updated gtk_glgraph_destroy() to cleanup better.  It now removes
+	the expose timer and the tooltip timer.  Somethin I was doing
+	inside the gapc_monitor_interface_create() routine.  James,
+
+2006-03-24 22:08  skoona
+
+	* src/gapcmon/gpanel_apcmon.c:
+
+	Feature Update: Reorder panel Icons - Added the ability to reorder
+	the panel status Icons back into numeric sequence 1-8 or 8-1.
+	Implemented via two panel menu options Sort _Ascending and Sort
+	_Descending.  This required three new routines
+	cb_util_container_... and user-data to be attached to each icon via
+	ppi-evbox.  - Updated the Statusbar text messages to include
+	monitor number in all messages.  Also updated Graph title message
+	to include UPSNAME, HOSTNAME, and monitor #.  James,
+
+2006-03-22 18:45  adk0212
+
+	* ChangeLog:
+
+	Regen ChangeLog after fixing gapcmon install.
+
 2006-03-22 18:41  adk0212
 
 	* src/Makefile.in:
