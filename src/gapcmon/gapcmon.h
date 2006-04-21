@@ -22,6 +22,7 @@
 
 #ifndef GAPC_H_
 #define GAPC_H_
+#define GDK_WINDOWING_X11
 
 #include <gconf/gconf-client.h>
 #include <libgnomevfs/gnome-vfs.h>
@@ -73,7 +74,7 @@ G_BEGIN_DECLS
    GAPC_ICON_CHARGING,
    GAPC_ICON_DEFAULT,
    GAPC_ICON_UNPLUGGED,
-   GAPC_ICON_PREFS,
+   GAPC_ICON_NETWORKERROR,
    GAPC_N_ICONS
 } GAPC_IconType;
 
@@ -213,7 +214,8 @@ typedef struct _Monitor_Instance_Data {
    gboolean b_visible;             /* is the info window visible */
    guint i_info_context;           /* StatusBar message Context */
 
-   gboolean b_run;                 /* controller for all monitor resources */
+   gboolean b_run;                 /* controller for all monitor resources -- except thread */
+   gboolean b_thread_stop;         /* single flag to stop thread */
    GThread *tid_thread_qwork;      /* Background Thread */
    GMutex *gm_update;              /* Control mutex for hashtables and thread */
    GAsyncQueue *q_network;

@@ -18,6 +18,7 @@
 */
 #ifndef __GTK_GLGRAPH_H__
 #define __GTK_GLGRAPH_H__
+#define GDK_WINDOWING_X11
 
 #ifdef G_OS_UNIX
 #include <gdk/gdk.h>

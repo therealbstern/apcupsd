@@ -308,6 +308,8 @@ static gboolean cb_monitor_dedicated_one_time_refresh(PGAPC_MONITOR pm)
       return TRUE;                 /* thread must be busy */
    }
 
+   gdk_threads_enter();
+
    w = g_hash_table_lookup(pm->pht_Widgets, "StatusBar");
    if (w != NULL) {
       gtk_statusbar_pop(GTK_STATUSBAR(w), pm->i_info_context);
@@ -324,6 +326,8 @@ static gboolean cb_monitor_dedicated_one_time_refresh(PGAPC_MONITOR pm)
       }
       if (pm->i_netbusy_counter++ % 10) {       /* Fall thru and quit after ten trys */
          g_mutex_unlock(pm->gm_update);
+         gdk_flush();
+         gdk_threads_leave();
          return TRUE;              /* try again */
       }
    }
@@ -335,6 +339,8 @@ static gboolean cb_monitor_dedicated_one_time_refresh(PGAPC_MONITOR pm)
    }
 
    g_mutex_unlock(pm->gm_update);
+   gdk_flush();
+   gdk_threads_leave();
 
    return FALSE;                   /* this will terminate the timer */
 }
@@ -400,14 +406,13 @@ static gboolean cb_monitor_automatic_refresh(PGAPC_MONITOR pm)
       }
    }
 
-   gdk_flush();
-   gdk_threads_leave();
-
    /*
     * This is the work request to network queue */
    g_async_queue_push(pm->q_network, (gpointer) pm);
 
    g_mutex_unlock(pm->gm_update);
+   gdk_flush();
+   gdk_threads_leave();
 
    return TRUE;
 }
@@ -418,7 +423,8 @@ static gboolean cb_monitor_automatic_refresh(PGAPC_MONITOR pm)
  */
 static gboolean gapc_monitor_update_tooltip_msg(PGAPC_MONITOR pm)
 {
-   gchar *pchx = NULL, *pmsg = NULL, *ptitle = NULL, *pch5 = NULL;
+   gchar *pchx = NULL, *pmsg = NULL, *ptitle = NULL, *pch5 = NULL, *pch5a =
+      NULL, *pch5b = NULL;
    gchar *pch1 = NULL, *pch2 = NULL, *pch3 = NULL, *pch4 = NULL;
    gchar *pch6 = NULL, *pch7 = NULL, *pch8 = NULL, *pch9 = NULL;
    gchar *pchb = NULL, *pchc = NULL, *pchd = NULL, *pche = NULL;
@@ -452,9 +458,17 @@ static gboolean gapc_monitor_update_tooltip_msg(PGAPC_MONITOR pm)
       pch3 = "NISERR";
    }
    pch4 = g_hash_table_lookup(pm->pht_Status, "NUMXFERS");
+   pch5a = g_hash_table_lookup(pm->pht_Status, "TONBATT");
+   if (pch5a == NULL) {
+      pch5a = " ";
+   }
+   pch5b = g_hash_table_lookup(pm->pht_Status, "CUMONBATT");
+   if (pch5b == NULL) {
+      pch5b = " ";
+   }
    pch5 = g_hash_table_lookup(pm->pht_Status, "XONBATT");
    if (pch5 == NULL) {
-      pch5 = "0";
+      pch5 = " ";
    }
    pch6 = g_hash_table_lookup(pm->pht_Status, "LINEV");
    pch7 = g_hash_table_lookup(pm->pht_Status, "BCHARGE");
@@ -478,6 +492,7 @@ static gboolean gapc_monitor_update_tooltip_msg(PGAPC_MONITOR pm)
          b_flag = TRUE;
       } else if ((d_value < 99.0) && (g_strrstr(pch3, "LINE") != NULL)) {
          pchx = " and charging...";
+         pch3 = "CHARGING";
          pm->i_icon_index = GAPC_ICON_CHARGING;
       } else if (g_strrstr(pch3, "BATT") != NULL) {
          pchx = " on battery...";
@@ -488,7 +503,7 @@ static gboolean gapc_monitor_update_tooltip_msg(PGAPC_MONITOR pm)
       pchx = " NIS network error...";
       pch3 = "NISERR";
       g_hash_table_replace(pm->pht_Status, g_strdup("STATUS"), g_strdup(pch3));
-      pm->i_icon_index = GAPC_ICON_UNPLUGGED;
+      pm->i_icon_index = GAPC_ICON_NETWORKERROR;
       for (i_series = 0; i_series < GAPC_LINEGRAPH_MAX_SERIES; i_series++) {
          gapc_util_point_filter_set(&(pm->phs.sq[i_series]), 0.0);
       }
@@ -533,19 +548,52 @@ static gboolean gapc_monitor_update_tooltip_msg(PGAPC_MONITOR pm)
       (pchc != NULL) ? pchc : "n/a",
       (pchd != NULL) ? pchd : "n/a", (pche != NULL) ? pche : "n/a");
 
-   if (b_flag) {
-      pmview = g_strdup_printf("<span foreground=\"red\">"
+
+   switch (pm->i_icon_index) {
+   case GAPC_ICON_NETWORKERROR:
+      pmview = g_strdup_printf("<span foreground=\"red\" size=\"large\">"
+         "<b><i>%s@%s</i></b></span>\n"
+         "NIS network connection not Responding!",
+         (pch1 != NULL) ? pch1 : "unknown", (pch2 != NULL) ? pch2 : "unknown");
+      break;
+   case GAPC_ICON_UNPLUGGED:
+      pmview = g_strdup_printf("<span foreground=\"red\" size=\"large\">"
+         "<b><i>%s@%s</i></b></span>\n"
+         "%s",
+         (pch1 != NULL) ? pch1 : "unknown",
+         (pch2 != NULL) ? pch2 : "unknown", (pchx != NULL) ? pchx : " un-plugged");
+      break;
+   case GAPC_ICON_CHARGING:
+      pmview = g_strdup_printf("<span foreground=\"blue\">"
          "<b><i>%s@%s</i></b></span>\n"
          "%s Outage, Last on %s\n"
-         "%s VAC, %s Remaining\n%s Charge %s",
+         "%s VAC, %s Charge\n"
+         "%s Remaining, %s total on battery",
          (pch1 != NULL) ? pch1 : "unknown",
          (pch2 != NULL) ? pch2 : "unknown",
          (pch4 != NULL) ? pch4 : "n/a",
          (pch5 != NULL) ? pch5 : "n/a",
          (pch6 != NULL) ? pch6 : "n/a",
-         (pch9 != NULL) ? pch9 : "n/a",
-         (pch7 != NULL) ? pch7 : "n/a", (pchx != NULL) ? pchx : " ");
-   } else {
+         (pch7 != NULL) ? pch7 : "n/a",
+         (pch9 != NULL) ? pch9 : "n/a", (pch5b != NULL) ? pch5b : "n/a");
+      break;
+   case GAPC_ICON_ONBATT:
+      pmview = g_strdup_printf("<span foreground=\"yellow\">"
+         "<b><i>%s@%s</i></b></span>\n"
+         "%s Outage, Last on %s\n"
+         "%s Charge, %s total on battery\n"
+         "%s Remaining, %s on battery",
+         (pch1 != NULL) ? pch1 : "unknown",
+         (pch2 != NULL) ? pch2 : "unknown",
+         (pch4 != NULL) ? pch4 : "n/a",
+         (pch5 != NULL) ? pch5 : "n/a",
+         (pch7 != NULL) ? pch7 : "n/a",
+         (pch5b != NULL) ? pch5b : "n/a",
+         (pch9 != NULL) ? pch9 : "n/a", (pch5a != NULL) ? pch5a : "n/a ");
+      break;
+   case GAPC_ICON_ONLINE:
+   case GAPC_ICON_DEFAULT:
+   default:
       pmview = g_strdup_printf("<b><i>%s@%s</i></b>\n"
          "%s Outage, Last on %s\n"
          "%s VAC, %s Charge %s",
@@ -555,6 +603,7 @@ static gboolean gapc_monitor_update_tooltip_msg(PGAPC_MONITOR pm)
          (pch5 != NULL) ? pch5 : "n/a",
          (pch6 != NULL) ? pch6 : "n/a",
          (pch7 != NULL) ? pch7 : "n/a", (pchx != NULL) ? pchx : " ");
+      break;
    }
 
    pixbuf = pm->my_icons[pm->i_icon_index];
@@ -577,11 +626,11 @@ static gboolean gapc_monitor_update_tooltip_msg(PGAPC_MONITOR pm)
    if (b_valid) {
       if (b_flag) {
          gtk_list_store_set(GTK_LIST_STORE(pm->monitor_model), &miter,
-            GAPC_MON_STATUS, pmview, GAPC_MON_UPSSTATE, g_strdup(pch3),
+            GAPC_MON_STATUS, pmview, GAPC_MON_UPSSTATE, pch3,
             GAPC_MON_ICON, pixbuf, -1);
       } else {
          gtk_list_store_set(GTK_LIST_STORE(pm->monitor_model), &miter,
-            GAPC_MON_STATUS, pmview, GAPC_MON_UPSSTATE, g_strdup(pch3), -1);
+            GAPC_MON_STATUS, pmview, GAPC_MON_UPSSTATE, pch3, -1);
       }
    }
 
@@ -641,7 +690,13 @@ static gint gapc_monitor_update(PGAPC_MONITOR pm)
    /*
     *  compute graphic points */
    pch = g_hash_table_lookup(pm->pht_Status, "LINEV");
+   if (pch == NULL) {
+      pch = "n/a";
+   }
    pch1 = g_hash_table_lookup(pm->pht_Status, "HITRANS");
+   if (pch1 == NULL) {
+      pch1 = "n/a";
+   }
    dValue = g_strtod(pch, NULL);
    dScale = g_strtod(pch1, NULL);
    if (dScale == 0.0)
@@ -656,7 +711,13 @@ static gint gapc_monitor_update(PGAPC_MONITOR pm)
       gdk_window_invalidate_rect(w->window, &pbar->rect, FALSE);
 
    pch = g_hash_table_lookup(pm->pht_Status, "BATTV");
+   if (pch == NULL) {
+      pch = "n/a";
+   }
    pch1 = g_hash_table_lookup(pm->pht_Status, "NOMBATTV");
+   if (pch1 == NULL) {
+      pch1 = "n/a";
+   }
    dValue = g_strtod(pch, NULL);
    dScale = g_strtod(pch1, NULL);
    if (dScale == 0.0)
@@ -672,6 +733,9 @@ static gint gapc_monitor_update(PGAPC_MONITOR pm)
       gdk_window_invalidate_rect(w->window, &pbar->rect, FALSE);
 
    pch = g_hash_table_lookup(pm->pht_Status, "BCHARGE");
+   if (pch == NULL) {
+      pch = "n/a";
+   }
    dCharge = dValue = g_strtod(pch, NULL);
    dValue /= 100.0;
    gapc_util_point_filter_set(&(pm->phs.sq[3]), dValue);
@@ -683,6 +747,9 @@ static gint gapc_monitor_update(PGAPC_MONITOR pm)
       gdk_window_invalidate_rect(w->window, &pbar->rect, FALSE);
 
    pch = g_hash_table_lookup(pm->pht_Status, "LOADPCT");
+   if (pch == NULL) {
+      pch = "n/a";
+   }
    dValue = g_strtod(pch, NULL);
    dtmp = dValue /= 100.0;
    gapc_util_point_filter_set(&(pm->phs.sq[1]), dValue);
@@ -695,6 +762,9 @@ static gint gapc_monitor_update(PGAPC_MONITOR pm)
       gdk_window_invalidate_rect(w->window, &pbar->rect, FALSE);
 
    pch = g_hash_table_lookup(pm->pht_Status, "TIMELEFT");
+   if (pch == NULL) {
+      pch = "n/a";
+   }
    dValue = g_strtod(pch, NULL);
    dScale = dValue / (1 - dtmp);
    dValue /= dScale;
@@ -1026,15 +1096,12 @@ static gpointer *gapc_net_thread_qwork(PGAPC_MONITOR pm)
    g_async_queue_ref(pm->q_network);
 
    while ((pm = (PGAPC_MONITOR) g_async_queue_pop(pm->q_network))) {
-      if (!pm->b_run) {
+      if (pm->b_thread_stop) {
          break;
       }
+
       if (pm->b_run) {
          g_mutex_lock(pm->gm_update);
-         if (!pm->b_run) {         /* may have waited a while for lock */
-            g_mutex_unlock(pm->gm_update);
-            break;
-         }
          if (!pm->b_run) {         /* may have waited a while for lock */
             g_mutex_unlock(pm->gm_update);
             continue;
@@ -1055,8 +1122,6 @@ static gpointer *gapc_net_thread_qwork(PGAPC_MONITOR pm)
    }                               /* end-while */
 
    g_async_queue_unref(pm->q_network);
-
-   pm->tid_thread_qwork = NULL;
 
    g_thread_exit(GINT_TO_POINTER(1));
 
@@ -1405,7 +1470,7 @@ static gint gapc_panel_monitor_model_rec_add(PGAPC_CONFIG pcfg, PGAPC_MONITOR pm
 
    gtk_list_store_set(GTK_LIST_STORE(pcfg->monitor_model), &iter, GAPC_MON_ICON,
       pm->my_icons[pm->i_icon_index], GAPC_MON_STATUS,
-      g_strdup(pm->ch_title_info), GAPC_MON_MONITOR, pm->cb_monitor_num,
+      pm->ch_title_info, GAPC_MON_MONITOR, pm->cb_monitor_num,
       GAPC_MON_POINTER, (gpointer) pm, GAPC_MON_UPSSTATE, g_strdup(pch), -1);
 
    gtk_tree_selection_select_iter(pcfg->monitor_select, &iter);
@@ -1888,6 +1953,7 @@ static void cb_panel_prefs_handle_cell_edited(GtkCellRendererText * cell,
    gint col_number = 0, i_port = 0, i_monitor = 0, i_len = 0;
    gfloat f_refresh = 0.0, f_graph = 0.0;
    gchar ch[GAPC_MAX_TEXT], *pch = NULL;
+   gboolean b_dupped = FALSE;
 
    g_return_if_fail(pcolumn != NULL);
    g_return_if_fail(pch_new != NULL);
@@ -1918,10 +1984,9 @@ static void cb_panel_prefs_handle_cell_edited(GtkCellRendererText * cell,
             pch = g_strdup(GAPC_HOST_DEFAULT);
          } else {
             pch = pch_new;
+            b_dupped = TRUE;
          }
          gconf_client_set_string(pcolumn->client, phost, pch, NULL);
-
-/*      g_object_set ( cell, "text", pch, NULL); */
          g_free(phost);
       }
       break;
@@ -1936,9 +2001,9 @@ static void cb_panel_prefs_handle_cell_edited(GtkCellRendererText * cell,
             pch = g_strdup_printf("%d", i_port);
          } else {
             pch = pch_new;
+            b_dupped = TRUE;
          }
          gconf_client_set_int(pcolumn->client, pport, i_port, NULL);
-         g_object_set(cell, "text", pch, NULL);
          g_free(pport);
       }
       break;
@@ -1953,9 +2018,9 @@ static void cb_panel_prefs_handle_cell_edited(GtkCellRendererText * cell,
             pch = g_strdup_printf("%3.1f", f_refresh);
          } else {
             pch = pch_new;
+            b_dupped = TRUE;
          }
          gconf_client_set_float(pcolumn->client, prefresh, f_refresh, NULL);
-         g_object_set(cell, "text", pch, NULL);
          g_free(prefresh);
       }
       break;
@@ -1970,9 +2035,9 @@ static void cb_panel_prefs_handle_cell_edited(GtkCellRendererText * cell,
             pch = g_strdup_printf("%3.1f", f_graph);
          } else {
             pch = pch_new;
+            b_dupped = TRUE;
          }
          gconf_client_set_float(pcolumn->client, prefresh, f_graph, NULL);
-         g_object_set(cell, "text", pch, NULL);
          g_free(prefresh);
       }
       break;
@@ -1980,6 +2045,10 @@ static void cb_panel_prefs_handle_cell_edited(GtkCellRendererText * cell,
       g_message("Cell_Edited:Unknown key for Value(%s)\n", pch_new);
       g_object_set(cell, "text", pch_new, NULL);
       break;
+   }
+
+   if ((pch != NULL) && !b_dupped) {
+      g_free(pch);
    }
 
    return;
@@ -2338,13 +2407,34 @@ static GtkWidget *gapc_panel_monitors_model_init(PGAPC_CONFIG pcfg)
    g_object_set(G_OBJECT(renderer_text), "xalign", 0.0, NULL);
    g_object_set(G_OBJECT(renderer_text), "yalign", 0.5, NULL);
 
-   column = gtk_tree_view_column_new_with_attributes("State", renderer_icon,
-      "pixbuf", GAPC_MON_ICON, NULL);
+
+   column = gtk_tree_view_column_new();
+
+   gtk_tree_view_column_set_title(column, "Status");
+
+   gtk_tree_view_column_pack_start(column, renderer_icon, TRUE);
+
+   gtk_tree_view_column_add_attribute(column, renderer_icon, "pixbuf",
+      GAPC_MON_ICON);
+
+   gtk_tree_view_column_pack_end(column, renderer_state, FALSE);
+
+   gtk_tree_view_column_add_attribute(column, renderer_state, "markup",
+      GAPC_MON_UPSSTATE);
+
    gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
 
-   column = gtk_tree_view_column_new_with_attributes("Status", renderer_state,
-      "markup", GAPC_MON_UPSSTATE, NULL);
-   gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
+/*
+  column = gtk_tree_view_column_new_with_attributes ("State",  renderer_icon,
+                                                     "pixbuf", GAPC_MON_ICON,
+                                                     NULL);
+  gtk_tree_view_append_column (GTK_TREE_VIEW (treeview), column);
+
+  column = gtk_tree_view_column_new_with_attributes ("Status", renderer_state,
+                                                     "markup", GAPC_MON_UPSSTATE,
+                                                     NULL);
+  gtk_tree_view_append_column (GTK_TREE_VIEW (treeview), column);
+*/
 
    column = gtk_tree_view_column_new_with_attributes("Current summary ups info",
       renderer_text, "markup", GAPC_MON_STATUS, NULL);
@@ -2932,7 +3022,7 @@ static void cb_panel_preferences_gconf_changed(GConfClient * client, guint cnxn_
    gint i_value = 0, i_len = 0;
    gfloat f_value = 0.0;
    gchar *s_value = NULL, ch[GAPC_MAX_TEXT];
-   gboolean b_value = FALSE;
+   gboolean b_value = FALSE, b_flag_dupped = FALSE;
 
    gboolean b_ls_valid = FALSE;
    gboolean b_v_valid = FALSE;
@@ -3005,7 +3095,7 @@ static void cb_panel_preferences_gconf_changed(GConfClient * client, guint cnxn_
          GAPC_PREFS_ENABLED, FALSE,
          GAPC_PREFS_PORT, GAPC_PORT_DEFAULT, GAPC_PREFS_GRAPH,
          GAPC_LINEGRAPH_REFRESH_FACTOR, GAPC_PREFS_HOST,
-         g_strdup(GAPC_HOST_DEFAULT), GAPC_PREFS_REFRESH, GAPC_REFRESH_DEFAULT, -1);
+         GAPC_HOST_DEFAULT, GAPC_PREFS_REFRESH, GAPC_REFRESH_DEFAULT, -1);
 
       b_ls_valid = TRUE;
       b_add = TRUE;
@@ -3094,19 +3184,26 @@ static void cb_panel_preferences_gconf_changed(GConfClient * client, guint cnxn_
          s_value = (gchar *) gconf_value_get_string(entry->value);
          i_len = g_snprintf(ch, GAPC_MAX_TEXT, "%s", s_value);
          if (i_len < 2) {
-            g_free(s_value);
             s_value = g_strdup(GAPC_HOST_DEFAULT);
+            b_flag_dupped = TRUE;
          }
          if (!g_str_equal(s_value, ov_s_host)) {
             gtk_list_store_set(GTK_LIST_STORE(pcfg->prefs_model), &iter,
-               GAPC_PREFS_HOST, g_strdup(s_value), -1);
+               GAPC_PREFS_HOST, s_value, -1);
          }
          if ((b_m_enabled) && (b_active_valid)) {
             if (pm->pch_host != NULL) {
                g_free(pm->pch_host);
             }
-            pm->pch_host = s_value;
+            pm->pch_host = g_strdup(s_value);
             pm->b_network_control = TRUE;
+         }
+         if (b_flag_dupped) {
+            g_free(s_value);
+            b_flag_dupped = FALSE;
+         }
+         if (ov_s_host) {
+            g_free(ov_s_host);
          }
       }
    }
@@ -3260,6 +3357,7 @@ static void cb_monitor_interface_destroy(GtkWidget * widget, PGAPC_MONITOR pm)
    }
 
    if (pm->tid_thread_qwork != NULL) {
+      pm->b_thread_stop = TRUE;
       g_async_queue_push(pm->q_network, pm);
       g_thread_join(pm->tid_thread_qwork);
    }
@@ -3493,14 +3591,21 @@ static GtkWidget *gapc_main_interface_create(PGAPC_CONFIG pcfg)
    gtk_widget_show(label);
 
    /* quit Control button */
+   button = gtk_button_new_from_stock(GTK_STOCK_CLOSE);
+   g_signal_connect_swapped(button, "clicked", G_CALLBACK(gtk_widget_hide), window);
+   gtk_box_pack_end(GTK_BOX(box), button, TRUE, TRUE, 0);
+   gtk_widget_show(button);
+
+   GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
+   gtk_widget_grab_default(button);
+
+
    button = gtk_button_new_from_stock(GTK_STOCK_QUIT);
    g_signal_connect(button, "clicked", G_CALLBACK(cb_main_interface_button_quit),
       pcfg);
    gtk_box_pack_end(GTK_BOX(box), button, TRUE, TRUE, 0);
    gtk_widget_show(button);
 
-   GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
-   gtk_widget_grab_default(button);
 
    gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), i_page);
 
@@ -4030,7 +4135,6 @@ static gint gapc_monitor_text_report_page(PGAPC_MONITOR pm, GtkWidget * notebook
 static gint gapc_panel_glossary_page(PGAPC_CONFIG pcfg, GtkWidget * notebook)
 {
    GtkWidget *scrolled, *label, *vbox;
-   GdkWindow *parent = NULL;
    gint i_page = 0;
    gchar *ptext = GAPC_GLOSSARY;
    GdkColor color;
@@ -4106,7 +4210,9 @@ static GtkWidget *gapc_monitor_interface_create(PGAPC_CONFIG pcfg, gint i_monito
    pm->i_old_icon_index = GAPC_ICON_ONLINE;
    pm->tray_icon = NULL;
    pm->tray_image = NULL;
-
+   if (pm->pch_host != NULL) {
+      g_free(pm->pch_host);
+   }
    gtk_tree_model_get(GTK_TREE_MODEL(pcfg->prefs_model), iter,
       GAPC_PREFS_SYSTRAY, &(pm->cb_use_systray),
       GAPC_PREFS_PORT, &(pm->i_port),
@@ -4136,6 +4242,7 @@ static GtkWidget *gapc_monitor_interface_create(PGAPC_CONFIG pcfg, gint i_monito
    pm->q_network = g_async_queue_new();
    g_return_val_if_fail(pm->q_network != NULL, NULL);
 
+   pm->b_thread_stop = FALSE;
    pm->tid_thread_qwork =
       g_thread_create((GThreadFunc) gapc_net_thread_qwork, pm, TRUE, NULL);
 
