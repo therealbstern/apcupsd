@@ -114,6 +114,17 @@ static void cb_panel_monitor_list_activated(GtkTreeView * treeview,
    GtkTreePath * arg1, GtkTreeViewColumn * arg2, PGAPC_CONFIG pcfg);
 static gint gapc_panel_glossary_page(PGAPC_CONFIG pcfg, GtkWidget * notebook);
 
+/* Synthesize a gnomevfs_socket_set_timeout, if needed */
+#ifndef HAVE_GNOMEVFS_SOCKET_SET_TIMEOUT
+static GnomeVFSResult gnome_vfs_socket_set_timeout(
+   GnomeVFSSocket *socket,
+   GTimeVal *timeout
+#ifdef GNOMEVFS_REQUIRES_CANCELLATION
+   , GnomeVFSCancellation *cancellation
+#endif
+   ){}
+#endif
+
 /* ************************************************************************* */
 static void cb_util_popup_menu_response_exit(GtkWidget * widget, gpointer gp)
 {
