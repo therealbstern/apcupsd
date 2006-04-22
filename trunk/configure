@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS ABSSRCDIR topdir VERSION DATE TRUEPRG FALSEPRG build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP CXX CXXFLAGS ac_ct_CXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA AWK HAVE_GCC_TRUE HAVE_GCC_FALSE DEBUG DLIB DINCLUDE PTHREAD_CFLAGS PTHREAD_LFLAGS WIN32 WINLIBS APCACCESS SMTP APCTEST SHUTDOWN APCUPSD_MAIL WALL SCRIPTSHELL MAKE MAKEDEPEND RANLIB LIBTOOL ETAGS CTAGS RM CP ECHO LN SED AR MV X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS HAVE_SUN_OS_TRUE HAVE_SUN_OS_FALSE HAVE_OSF1_OS_TRUE HAVE_OSF1_OS_FALSE HAVE_AIX_OS_TRUE HAVE_AIX_OS_FALSE HAVE_HPUX_OS_TRUE HAVE_HPUX_OS_FALSE HAVE_LINUX_OS_TRUE HAVE_LINUX_OS_FALSE HAVE_FREEBSD_OS_TRUE HAVE_FREEBSD_OS_FALSE HAVE_NETBSD_OS_TRUE HAVE_NETBSD_OS_FALSE HAVE_OPENBSD_OS_TRUE HAVE_OPENBSD_OS_FALSE HAVE_BSDI_OS_TRUE HAVE_BSDI_OS_FALSE HAVE_SGI_OS_TRUE HAVE_SGI_OS_FALSE HAVE_DARWIN_OS_TRUE HAVE_DARWIN_OS_FALSE GDHEAD INSTALL_DISTDIR UNINSTALL_DISTDIR APCSMART_DRIVER DUMB_DRIVER LIBUSBHID LIBUSBHIDINC LIBUSBHIDOBJS usbcfg LIBUSBH USB_DRIVER USB_TYPE LIBUSB NET_DRIVER SNMP_DRIVER TEST_DRIVER NISIP GAPCDIR GAPCMON PKG_CONFIG ac_pt_PKG_CONFIG GAPCMON_CFLAGS GAPCMON_LIBS POMAKE INTLSUB INTLMAKE INTLTARGET POWERFLUTE POWERLIBS LD CGI GDINCLUDE LIBGD LIBGDOBJ CGI_IMGFMT CGIBIN PACKAGE MSGFMT SET_MAKE ac_ct_RANLIB ALLOCA USE_NLS GMSGFMT XGETTEXT GENCAT USE_INCLUDED_LIBINTL CATALOGS CATOBJEXT DATADIRNAME GMOFILES INSTOBJEXT INTLDEPS INTLLIBS INTLINCLUDE INTLOBJS POFILES POSUB INCLUDE_LOCALE_H GT_NO GT_YES l MKINSTALLDIRS EXTRADEFS LIBEXTRAOBJ EXTRAOBJ DISTNAME DISTVER SERIALDEV PIDDIR LOGDIR nologdir PWRFAILDIR LOCKDIR NETPORT NISPORT UPSTYPE UPSCABLE HOST WCFLAGS WLDFLAGS LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS ABSSRCDIR topdir VERSION DATE TRUEPRG FALSEPRG build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP CXX CXXFLAGS ac_ct_CXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA AWK HAVE_GCC_TRUE HAVE_GCC_FALSE DEBUG DLIB DINCLUDE PTHREAD_CFLAGS PTHREAD_LFLAGS WIN32 WINLIBS APCACCESS SMTP APCTEST SHUTDOWN APCUPSD_MAIL WALL SCRIPTSHELL MAKE MAKEDEPEND RANLIB LIBTOOL ETAGS CTAGS RM CP ECHO LN SED AR MV X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS HAVE_SUN_OS_TRUE HAVE_SUN_OS_FALSE HAVE_OSF1_OS_TRUE HAVE_OSF1_OS_FALSE HAVE_AIX_OS_TRUE HAVE_AIX_OS_FALSE HAVE_HPUX_OS_TRUE HAVE_HPUX_OS_FALSE HAVE_LINUX_OS_TRUE HAVE_LINUX_OS_FALSE HAVE_FREEBSD_OS_TRUE HAVE_FREEBSD_OS_FALSE HAVE_NETBSD_OS_TRUE HAVE_NETBSD_OS_FALSE HAVE_OPENBSD_OS_TRUE HAVE_OPENBSD_OS_FALSE HAVE_BSDI_OS_TRUE HAVE_BSDI_OS_FALSE HAVE_SGI_OS_TRUE HAVE_SGI_OS_FALSE HAVE_DARWIN_OS_TRUE HAVE_DARWIN_OS_FALSE GDHEAD INSTALL_DISTDIR UNINSTALL_DISTDIR APCSMART_DRIVER DUMB_DRIVER LIBUSBHID LIBUSBHIDINC LIBUSBHIDOBJS usbcfg LIBUSBH USB_DRIVER USB_TYPE LIBUSB NET_DRIVER SNMP_DRIVER TEST_DRIVER NISIP PKG_CONFIG ac_pt_PKG_CONFIG GAPCMON_CFLAGS GAPCMON_LIBS GAPCMON POMAKE INTLSUB INTLMAKE INTLTARGET POWERFLUTE POWERLIBS LD CGI GDINCLUDE LIBGD LIBGDOBJ CGI_IMGFMT CGIBIN PACKAGE MSGFMT SET_MAKE ac_ct_RANLIB ALLOCA USE_NLS GMSGFMT XGETTEXT GENCAT USE_INCLUDED_LIBINTL CATALOGS CATOBJEXT DATADIRNAME GMOFILES INSTOBJEXT INTLDEPS INTLLIBS INTLINCLUDE INTLOBJS POFILES POSUB INCLUDE_LOCALE_H GT_NO GT_YES l MKINSTALLDIRS EXTRADEFS LIBEXTRAOBJ EXTRAOBJ DISTNAME DISTVER SERIALDEV PIDDIR LOGDIR nologdir PWRFAILDIR LOCKDIR NETPORT NISPORT UPSTYPE UPSCABLE HOST WCFLAGS WLDFLAGS LIBOBJS LTLIBOBJS'
 ac_subst_files='VARIABLES TARGETS'
 
 # Initialize some variables set by options.
@@ -898,8 +898,7 @@ Optional Features:
   --disable-test          No TEST driver (default)
 
   --enable-powerflute     Compile powerflute program
-  --enable-gapcmon        build GTK/GUI front-end to apcupsd Program
-                          default=yes
+  --enable-gapcmon        Build GTK/GUI front-end to apcupsd default=no
   --enable-nls            enable Native Language Support
 
 Optional Packages:
@@ -12375,25 +12374,8 @@ _ACEOF
 	  fi
 fi;
 
-GAPCDIR=
-GPANEL=
 GAPCMON=
-
-
-
-GAPCMON_ENABLED=yes
-# Check whether --enable-gapcmon or --disable-gapcmon was given.
-if test "${enable_gapcmon+set}" = set; then
-  enableval="$enable_gapcmon"
-   if test "$enableval" = "yes" ; then
-		GAPCMON_ENABLED=yes
-	fi
-fi;
-
-if test "$GAPCMON_ENABLED" = "yes" ; then
-				GAPCDIR=gapcmon
-
-				if test "$GAPCMON_ENABLED" = "yes" ; then
+GAPCMON_ENABLED=no
 
 
 if test "x$ac_cv_env_PKG_CONFIG_set" != "xset"; then
@@ -12499,6 +12481,13 @@ echo "${ECHO_T}no" >&6
 	fi
 
 fi
+# Check whether --enable-gapcmon or --disable-gapcmon was given.
+if test "${enable_gapcmon+set}" = set; then
+  enableval="$enable_gapcmon"
+   if test "$enableval" = "yes" ; then
+      GAPCMON=gapcmon
+      GAPCMON_ENABLED=yes
+
 
 pkg_failed=no
 echo "$as_me:$LINENO: checking for GAPCMON" >&5
@@ -12610,17 +12599,15 @@ else
 echo "${ECHO_T}yes" >&6
 	:
 fi
-		GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DVERSION=\\\"$VERSION\\\""
-		GAPCMON=gapcmon
-	fi
+      GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DVERSION=\\\"$VERSION\\\""
 
-				_cflags=${CFLAGS}
-	_libs=${LIBS}
-	CFLAGS="${CFLAGS} ${GAPCMON_CFLAGS}"
-	LIBS="${LDFLAGS} ${GAPCMON_LIBS}"
-	echo "$as_me:$LINENO: checking if gnome_vfs_socket_read requires cancellation argument" >&5
+                        _cflags=${CFLAGS}
+      _libs=${LIBS}
+      CFLAGS="${CFLAGS} ${GAPCMON_CFLAGS}"
+      LIBS="${LDFLAGS} ${GAPCMON_LIBS}"
+      echo "$as_me:$LINENO: checking if gnome_vfs_socket_read requires cancellation argument" >&5
 echo $ECHO_N "checking if gnome_vfs_socket_read requires cancellation argument... $ECHO_C" >&6
-	cat >conftest.$ac_ext <<_ACEOF
+      cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
 cat confdefs.h >>conftest.$ac_ext
@@ -12659,19 +12646,21 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   (exit $ac_status); }; }; then
   echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
-	      GAPCMON_CFLAGS="${GAPCMON_CFLAGS} -DGNOMEVFS_REQUIRES_CANCELLATION"
-	   echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
+            GAPCMON_CFLAGS="${GAPCMON_CFLAGS} -DGNOMEVFS_REQUIRES_CANCELLATION"
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
+echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
 fi
 rm -f conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
-	CFLAGS=${_cflags}
-	LIBS=${_libs}
-fi
+      CFLAGS=${_cflags}
+      LIBS=${_libs}
+   fi
+fi;
+
 
 LD="$CXX"
 
@@ -16926,7 +16915,7 @@ then
     GENERATE_FILES="$GENERATE_FILES src/gd1.2/Makefile"
 fi
 
-if test "$GAPCDIR"x != ""x
+if test "$GAPCMON"x != ""x
 then
     GENERATE_FILES="$GENERATE_FILES src/gapcmon/Makefile"
 fi
@@ -17676,12 +17665,11 @@ s,@NET_DRIVER@,$NET_DRIVER,;t t
 s,@SNMP_DRIVER@,$SNMP_DRIVER,;t t
 s,@TEST_DRIVER@,$TEST_DRIVER,;t t
 s,@NISIP@,$NISIP,;t t
-s,@GAPCDIR@,$GAPCDIR,;t t
-s,@GAPCMON@,$GAPCMON,;t t
 s,@PKG_CONFIG@,$PKG_CONFIG,;t t
 s,@ac_pt_PKG_CONFIG@,$ac_pt_PKG_CONFIG,;t t
 s,@GAPCMON_CFLAGS@,$GAPCMON_CFLAGS,;t t
 s,@GAPCMON_LIBS@,$GAPCMON_LIBS,;t t
+s,@GAPCMON@,$GAPCMON,;t t
 s,@POMAKE@,$POMAKE,;t t
 s,@INTLSUB@,$INTLSUB,;t t
 s,@INTLMAKE@,$INTLMAKE,;t t
