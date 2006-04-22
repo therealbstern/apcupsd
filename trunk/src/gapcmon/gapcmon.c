@@ -122,7 +122,7 @@ static GnomeVFSResult gnome_vfs_socket_set_timeout(
 #ifdef GNOMEVFS_REQUIRES_CANCELLATION
    , GnomeVFSCancellation *cancellation
 #endif
-   ){}
+   ){ return GNOME_VFS_OK; }
 #endif
 
 /* ************************************************************************* */
