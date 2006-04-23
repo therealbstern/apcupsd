@@ -75,6 +75,19 @@ BuildRequires: glibc-devel >= 2.2, libjpeg-devel, libpng-devel, zlib-devel, free
 %else
 BuildRequires: glibc-devel >= 2.3
 %endif
+%if %{rh7} || %{rh8} || %{rh9} || %{fedora_core} || %{rhel3} || %{rhel4}
+BuildRequires: tetex
+BuildRequires: tetex-latex
+%endif
+%if %{suse}
+BuildRequires: tetex
+BuildRequires: latex2html
+%endif
+%if %{mdk}
+BuildRequires: tetex
+BuildRequires: latex2html
+BuildRequires: tetex-dvips
+%endif
 
 %description
 Apcupsd can be used for controlling most APC UPSes. During a
@@ -165,6 +178,11 @@ make hid-ups
 cd ../
 %endif
 
+# build pdf manual
+cd doc/latex
+make
+cd ../../
+
 %install
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 
@@ -207,7 +225,7 @@ install -m744 examples/make-hiddev \
 
 %files usb
 %defattr(-,root,root)
-%doc COPYING DISCLAIMER ReleaseNotes ChangeLog ../Release_Notes-%{version}-%{release}.txt
+%doc COPYING DISCLAIMER ReleaseNotes ChangeLog ../Release_Notes-%{version}-%{release}.txt doc/latex/apcupsd.pdf
 %dir %{_sysconfdir}/apcupsd
 %dir %{_sysconfdir}/apcupsd/cgi
 %{initdir}/apcupsd
@@ -304,7 +322,7 @@ fi
 
 %files std
 %defattr(-,root,root)
-%doc COPYING DISCLAIMER ReleaseNotes ChangeLog ../Release_Notes-%{version}-%{release}.txt
+%doc COPYING DISCLAIMER ReleaseNotes ChangeLog ../Release_Notes-%{version}-%{release}.txt doc/latex/apcupsd.pdf
 %dir %{_sysconfdir}/apcupsd
 %dir %{_sysconfdir}/apcupsd/cgi
 %{initdir}/apcupsd
@@ -398,6 +416,8 @@ fi
 %endif
 
 %changelog
+* Sun Apr 23 2006 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- add pdf manual to doc package
 * Sat Apr 22 2006 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - clean up build defines, add rhel4
 * Sat Jan 21 2006 D. Scott Barninger <barninger at fairfieldcomputers.com>
