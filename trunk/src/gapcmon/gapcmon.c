@@ -1,5 +1,5 @@
 
-/* gapcmon.c               serial-0070-1 *****************************************
+/* gapcmon.c               serial-0072-0 *****************************************
 
   GKT+ GUI with Notification Area (System Tray) support.  Program  for 
   monitoring the apcupsd.sourceforge.net package.
@@ -3407,6 +3407,8 @@ static void cb_monitor_interface_destroy(GtkWidget * widget, PGAPC_MONITOR pm)
       pm->menu = NULL;
    }
 
+   g_object_unref (pm->tooltips);
+
    g_free(pm);
    return;
 }
@@ -3447,6 +3449,8 @@ static void cb_main_interface_destroy(GtkWidget * widget, PGAPC_CONFIG pcfg)
       g_object_unref(pcfg->my_icons[x]);
    }
 
+   g_object_unref (pcfg->tooltips);
+   
    gtk_main_quit();
    return;
 }
@@ -3519,6 +3523,8 @@ static GtkWidget *gapc_main_interface_create(PGAPC_CONFIG pcfg)
    pixbuf = pcfg->my_icons[GAPC_ICON_DEFAULT];
    pcfg->b_visible = TRUE;
    pcfg->tooltips = gtk_tooltips_new();
+   g_object_ref (pcfg->tooltips);
+   g_object_ref_sink (pcfg->tooltips);   
    pcfg->b_run = TRUE;
    pcfg->cb_last_monitor_deleted = -1;
 
@@ -4182,6 +4188,8 @@ static GtkWidget *gapc_monitor_interface_create(PGAPC_CONFIG pcfg, gint i_monito
 
    pixbuf = pm->my_icons[GAPC_ICON_DEFAULT];
    pm->tooltips = gtk_tooltips_new();
+   g_object_ref (pm->tooltips);
+   g_object_ref_sink (pm->tooltips);   
    pm->gm_update = g_mutex_new();
    pm->client = pcfg->client;
    pm->i_old_icon_index = GAPC_ICON_DEFAULT;
