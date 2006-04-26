@@ -59,8 +59,7 @@ DirText "Setup will install Apcupsd ${VERSION} to the directory \
          $\n$\nDO NOT CHANGE THIS SETTING UNLESS YOU HAVE AN \
          EXISTING CYGWIN INSTALLATION."
 
-
-Section "Apcupsd Service" SecService
+Function .onInit
   ;
   ; Default INSTDIR to %SystemDrive%\apcupsd
   ;
@@ -68,8 +67,10 @@ Section "Apcupsd Service" SecService
   ${If} $0 == ''
      StrCpy $0 'c:'
   ${EndIf}
-  StrCpy $INSTDIR $0\apcupsd
+  StrCpy $INSTDIR $0\apcupsdd
+FunctionEnd
 
+Section "Apcupsd Service" SecService
   ;
   ; /cygwin on command line forces install dir to c:\cygwin\apcupsd (useful for silent install)
   ;
