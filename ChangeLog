@@ -10,6 +10,9 @@
 
 CHANGES IN 3.12.x
 
+24Apr06:
+- win32: Default install path to %SystemDrive%\apcupsd instead of assuming
+  c:\apcupsd.
 03Mar06:
 - apctest: Fix compile error with --disable-apcsmart. Running a SmartUPS 
   in dumb mode requires apcsmart driver. Reported by Matthew Watson 
