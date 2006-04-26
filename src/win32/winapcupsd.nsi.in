@@ -67,7 +67,7 @@ Function .onInit
   ${If} $0 == ''
      StrCpy $0 'c:'
   ${EndIf}
-  StrCpy $INSTDIR $0\apcupsdd
+  StrCpy $INSTDIR $0\apcupsd
 FunctionEnd
 
 Section "Apcupsd Service" SecService
