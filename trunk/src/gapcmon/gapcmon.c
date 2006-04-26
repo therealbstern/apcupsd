@@ -92,12 +92,9 @@ static gdouble gapc_util_point_filter_set(PGAPC_SUMS sq, gdouble this_point);
 static gdouble gapc_util_point_filter_reset(PGAPC_SUMS sq);
 static gboolean gapc_util_line_chart_create(PGAPC_HISTORY pg, GtkWidget * box);
 static gboolean gapc_util_line_chart_ds_init(PGAPC_HISTORY pg, gint i_series);
-static gboolean gapc_util_line_chart_toggle_legend(PGAPC_HISTORY pg);
 static gboolean cb_util_barchart_handle_exposed(GtkWidget * widget,
    GdkEventExpose * event, gpointer data);
 static gboolean cb_util_line_chart_refresh(PGAPC_HISTORY pg);
-static gboolean cb_util_line_chart_toggle_legend(GtkWidget * widget,
-   GdkEventButton * event, PGAPC_HISTORY pg);
 
 static void gapc_util_text_view_append(GtkWidget * view, gchar * pch);
 static void gapc_util_text_view_prepend(GtkWidget * view, gchar * pch);
@@ -3405,10 +3402,6 @@ static void cb_monitor_interface_destroy(GtkWidget * widget, PGAPC_MONITOR pm)
       gtk_widget_destroy(GTK_WIDGET(pm->tray_icon));
       pm->tray_icon = NULL;
       pm->tray_image = NULL;
-      if (pm->tooltips != NULL) {
-         g_free(pm->tooltips);
-         pm->tooltips = NULL;
-      }
    }
    if (pm->menu != NULL) {
       gtk_widget_destroy(GTK_WIDGET(pm->menu));
@@ -3685,8 +3678,6 @@ static gint gapc_monitor_history_page(PGAPC_MONITOR pm, GtkWidget * notebook)
    /*
     * Create Chart surface */
    if (gapc_util_line_chart_create(pphs, box)) {
-      g_signal_connect(pphs->glg, "button-press-event",
-         G_CALLBACK(cb_util_line_chart_toggle_legend), pphs);
 
       gapc_util_line_chart_ds_init(pphs, 5);
    }
@@ -3908,44 +3899,6 @@ static gboolean gapc_util_line_chart_create(PGAPC_HISTORY pg, GtkWidget * box)
       return FALSE;
 }
 
-/*
- * Attempt to make visible then invisible the chart legend
-*/
-static gboolean gapc_util_line_chart_toggle_legend(PGAPC_HISTORY pg)
-{
-   GtkGLGDraw draw;
-
-   g_return_val_if_fail(pg != NULL, FALSE);
-
-   draw = gtk_glgraph_get_drawn(pg->glg);
-   if (draw & GTKGLG_D_LEGEND) {
-      draw -= GTKGLG_D_LEGEND;
-   } else {
-      draw += GTKGLG_D_LEGEND;
-   }
-
-   gtk_glgraph_set_drawn(pg->glg, draw);
-   gtk_widget_queue_draw(GTK_WIDGET(pg->glg));
-
-   return TRUE;
-}
-
-/*
- * Handles clicked signal from eventbox underneath
- * the glgraph window.  Used to toggle the legend on/off
-*/
-static gboolean cb_util_line_chart_toggle_legend(GtkWidget * widget,
-   GdkEventButton * event, PGAPC_HISTORY pg)
-{
-   g_return_val_if_fail(pg != NULL, FALSE);
-
-   if (!((event->type == GDK_BUTTON_PRESS) && (event->button == 1)))
-      return FALSE;                /* clicked button 1 only */
-
-   gapc_util_line_chart_toggle_legend(pg);
-
-   return TRUE;
-}
 
 /*
  * Detailed Information Notebook Page
