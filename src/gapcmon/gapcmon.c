@@ -236,8 +236,7 @@ static gboolean cb_util_line_chart_refresh_control(PGAPC_MONITOR pm)
       g_timeout_add((guint) (pm->phs.d_xinc * GAPC_REFRESH_FACTOR_1K + 75),
       (GSourceFunc) cb_util_line_chart_refresh, &pm->phs);
 
-   pch = g_strdup_printf("<i>sampled every %3.1f seconds</i>"
-      " ... click to toggle legend", pm->phs.d_xinc);
+   pch = g_strdup_printf("<i>sampled every %3.1f seconds</i>", pm->phs.d_xinc);
    gtk_glgraph_axis_set_label(pm->phs.glg, GTKGLG_AXIS_X, pch);
    g_free(pch);
 
@@ -3788,7 +3787,7 @@ static gboolean gapc_util_line_chart_ds_init(PGAPC_HISTORY pg, gint i_series)
 
       glds->graph_type = GTKGLG_TYPE_XY;
       glds->y_units = g_strdup(pg->ch_label_legend[v_index]);
-      glds->x_units = g_strdup("intervals");
+      glds->x_units = g_strdup("interval");
       g_free(glds->line_color_name);    /* default is black */
       glds->line_color_name = g_strdup(pg->ch_label_color[v_index]);
 
@@ -3859,8 +3858,7 @@ static gboolean gapc_util_line_chart_create(PGAPC_HISTORY pg, GtkWidget * box)
    gtk_glgraph_set_title(glg, pg->ch_title);
 
    pch = g_strdup_printf("<span foreground=\"blue\">"
-      "<i>sampled every %3.1f seconds</i>"
-      " ... click to toggle legend" "</span> ", pg->d_xinc);
+      "<i>sampled every %3.1f seconds</i></span> ", pg->d_xinc);
    gtk_glgraph_axis_set_label(glg, GTKGLG_AXIS_X, pch);
    g_free(pch);
 
@@ -3893,10 +3891,8 @@ static gboolean gapc_util_line_chart_create(PGAPC_HISTORY pg, GtkWidget * box)
    gtk_container_add(GTK_CONTAINER(box), GTK_WIDGET(glg));
    gtk_widget_show_all(GTK_WIDGET(glg));
 
-   if (glg != NULL)
-      return TRUE;
-   else
-      return FALSE;
+
+   return TRUE;
 }
 
 
