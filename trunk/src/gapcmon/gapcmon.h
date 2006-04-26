@@ -369,10 +369,9 @@ More standard vanity, and my e-mail ID in case something breaks.\n\
 <b>HISTORICAL SUMMARY PAGE</b>\n\
 A graph showing the last 40 samples of five key data points, scaled to represent all \
 points as a percentage of that value's normal range.  A data point's value can be \
-viewed by moving the mouse over the desired point, a tooltip will appear \
-showing the color and value of the point under the pointer.  Additionally, clicking \
-anywhere on the chart toggles the chart legend.  Data points are collected periodically, \
-based on the product of graph_refresh and network_refresh in seconds.\n\
+viewed by moving the mouse over any desired point, a tooltip will appear \
+showing the color and value of all points at that interval.  Data points are collected \
+periodically, based on the product of graph_refresh times network_refresh in seconds.\n\
 \n\
 <b>DETAILED INFORMATION PAGE</b>\n\
 A more in-depth view of the monitored UPS's environmental values.  Software, product, \
