@@ -1,4 +1,3 @@
-
 /* gapcmon_gtkglgraph.c    serial-0070-1 ***************************************
  *
  *  Modified from the original package called "GtkGLGraph" by Todd Goyen
@@ -30,7 +29,7 @@
 #define TOOLTIP_TIMEOUT	150
 
 /* #define INSET		15.0 */
-#define INSET       120.0
+#define INSET       50.0
 #define TTY_BORDER	6.0
 #define TTX_BORDER	8.0
 
@@ -1867,187 +1866,207 @@ static void gtk_glgraph_draw_graph_box(const GtkGLGraph * glg)
    glEnd();
 }
 
-static void gtk_glgraph_draw_tooltip(GtkGLGraph * const glg,
-   const GtkGLGDataSet * const glds)
+static void gtk_glgraph_draw_tooltip (GtkGLGraph * const glg,
+                                      const GtkGLGDataSet * const glds)
 {
-   gdouble xpo, xppu, ypo, yppu;   /* x pixel offset, x pixels per unit, etc... */
-   gdouble ax, ay;                 /* x array index, and y data-value */
-   gint ix, iy;
-   gdouble xspacing, yspacing;
-   gchar *buf;
-   gint pw, ph;
-   gdouble x, y;
-   gdouble xc, yc;
-   const guchar *pixels;
-   gdouble xpos, ypos;
-   gdouble xmin, xmax;
-   gdouble ttx, tty;
-   GtkGLGDataSet *gdata = NULL;
-   GList *find_ds = NULL;
+  gdouble         xpo, xppu, ypo, yppu; /* x pixel offset, x pixels per unit, etc... */
+  gdouble         ax, ay; /* x array index, and y data-value */
+  gint            ix, iy;
+  gdouble         xspacing, yspacing;
+  gchar          *buf;
+  gint            pw, ph;
+  gdouble         x, y;
+  gdouble         xc, yc;
+  const guchar   *pixels;
+  gdouble         xpos, ypos;
+  gdouble         xmin, xmax;
+  gdouble         ttx, tty;
+  GtkGLGDataSet   *gdata = NULL, *pdata = NULL;
+  GList           *find_ds = NULL, *points_ds = NULL;
 
-   /* Make sure all the data we need exists */
-   g_return_if_fail(glg != NULL);
-   g_return_if_fail(GTK_IS_GLGRAPH(glg));
-   if (glds == NULL) {
-      return;
-   }
-   if (glds->x == NULL || glds->y == NULL || glds->z == NULL) {
-      return;
-   }
-   if (glds->x_length < 2 || glds->y_length < 2) {
-      return;
-   }
-   if ((glg->drawn & GTKGLG_D_TOOLTIP) == 0) {
-      return;
-   }
-   if (glg->tooltip_visible == FALSE) {
-      return;
-   }
+  /* Make sure all the data we need exists */
+  g_return_if_fail (glg != NULL);
+  g_return_if_fail (GTK_IS_GLGRAPH (glg));
+  if (glds == NULL)
+  {
+    return;
+  }
+  if (glds->x == NULL || glds->y == NULL || glds->z == NULL)
+  {
+    return;
+  }
+  if (glds->x_length < 2 || glds->y_length < 2)
+  {
+    return;
+  }
+  if ((glg->drawn & GTKGLG_D_TOOLTIP) == 0)
+  {
+    return;
+  }
+  if (glg->tooltip_visible == FALSE)
+  {
+    return;
+  }
 
-   /* Get Scaling */
-   xppu = fabs((glg->w - glg->left - glg->right) /
-      (glg->axes[GTKGLG_AXIS_X].max - glg->axes[GTKGLG_AXIS_X].min));
-   yppu = fabs((glg->h - glg->bottom - glg->top) /
-      (glg->axes[GTKGLG_AXIS_Y].max - glg->axes[GTKGLG_AXIS_Y].min));
-   xpo = glg->left - glg->axes[GTKGLG_AXIS_X].min * xppu;
-   ypo = glg->bottom - glg->axes[GTKGLG_AXIS_Y].min * yppu;
+  /* Get Scaling */
+  xppu = fabs ( (glg->w - glg->left - glg->right) / 
+                (glg->axes[GTKGLG_AXIS_X].max - glg->axes[GTKGLG_AXIS_X].min));
+  yppu = fabs ( (glg->h - glg->bottom - glg->top) / 
+                (glg->axes[GTKGLG_AXIS_Y].max - glg->axes[GTKGLG_AXIS_Y].min));
+  xpo = glg->left - glg->axes[GTKGLG_AXIS_X].min * xppu;
+  ypo = glg->bottom - glg->axes[GTKGLG_AXIS_Y].min * yppu;
 
-   /* remap ttx and tty from local window to global window and pixels to inches */
-   ttx = glg->ttx + glg->hadj->value;
-   tty = glg->tty + glg->vadj->value;
-   ax = (ttx - xpo) / xppu;
-   ay = (glg->h - tty - ypo) / yppu;
+  /* remap ttx and tty from local window to global window and pixels to inches */
+  ttx = glg->ttx + glg->hadj->value;
+  tty = glg->tty + glg->vadj->value;
+  ax = (ttx - xpo) / xppu;
+  ay = (glg->h - tty - ypo) / yppu;
 
-   /* If cursor isn't in the graph, return */
-   if (ax < glg->axes[GTKGLG_AXIS_X].min || ax > glg->axes[GTKGLG_AXIS_X].max) {
-      return;
-   }
-   if (ay < glg->axes[GTKGLG_AXIS_Y].min || ay > glg->axes[GTKGLG_AXIS_Y].max) {
-      return;
-   }
+  /* If cursor isn't in the graph, return */
+  if (ax < glg->axes[GTKGLG_AXIS_X].min || ax > glg->axes[GTKGLG_AXIS_X].max)
+  {
+    return;
+  }
+  if (ay < glg->axes[GTKGLG_AXIS_Y].min || ay > glg->axes[GTKGLG_AXIS_Y].max)
+  {
+    return;
+  }
 
-   /* Get spacing */
-   xspacing = glds->x[1] - glds->x[0];
-   yspacing = glds->y[1] - glds->y[0];
+  /* Get spacing */
+  xspacing = glds->x[1] - glds->x[0];
+  yspacing = glds->y[1] - glds->y[0];
 
-   /* Figure out the dataset indices */
-   /* And create a pixbuf of the x,y value */
-   ix = (gint) floor((ax - glg->axes[GTKGLG_AXIS_X].min) / xspacing) + 1;
-   iy = (gint) ix;
+  /* Figure out the dataset indices */
+  /* And create a pixbuf of the x,y value */
+  ix = (gint) floor ((ax - glg->axes[GTKGLG_AXIS_X].min) / xspacing) + 1;
+  iy = (gint) ix;
 
 /* *** */
-   find_ds = g_list_first(glg->datasets);
-   while (find_ds) {
-      gdata = find_ds->data;
-      find_ds = find_ds->next;
-      if ((gdata->y[ix] >= (ay * 0.96)) && (gdata->y[ix] <= (ay * 1.04))) {
-         break;                    /* found it (y value) */
-      }
-      gdata = NULL;
+  find_ds = g_list_first (glg->datasets);
+  while (find_ds)
+  {
+    gdata = find_ds->data;
+    find_ds = find_ds->next;
+    if ( (gdata->y[ix] >= (ay * 0.96)) && (gdata->y[ix] <= (ay * 1.04)) )
+    {
+          break; /* found it (y value) */
+    }
+    gdata = NULL;
+  }
+  
+  if ( gdata == NULL )
+  {
+       return;  /* did not find the right one */
+  }
+       
+  /* ay is y's value, ix+1 is x's value */
+  
+  if (gdata->graph_type == GTKGLG_TYPE_XY)
+  {
+   gchar   ch_lgnd[756];
+   gchar   ch_work[756];   
+   
+   g_snprintf( ch_lgnd, 756, "<i>     <u>{ %s %2.0d }</u></i>", gdata->x_units, ix);
+   points_ds = g_list_first (glg->datasets);
+   while (points_ds) {
+	   	pdata = points_ds->data;
+	   	points_ds = points_ds->next;
+	    g_strlcpy(ch_work, ch_lgnd, 756);    		     
+	    g_snprintf ( ch_lgnd, 756, "%s\n%3.1lf%% <span foreground=\"%s\"><b>%s</b></span>", 
+    			     ch_work, pdata->y[iy], pdata->line_color_name, pdata->y_units);
    }
 
-   if (gdata == NULL) {
-      return;                      /* did not find the right one */
-   }
+    buf =  g_strdup (ch_lgnd);
+  }
+  else
+  { /* dont care now */
+    iy = (gint) floor ((ay - glg->axes[GTKGLG_AXIS_Y].min) / yspacing);
+    buf = g_strdup_printf ("%01.3f <b>in.</b>", glds->z[iy * glds->x_length + ix]);
+  }
 
-   /* ay is y's value, ix+1 is x's value */
+  gtk_glgraph_pixbuf_update_tooltip (glg, buf);
+  g_free (buf);
 
-   if (gdata->graph_type == GTKGLG_TYPE_XY) {
-      buf = g_strdup_printf("%3.1lf%% "
-         "<span foreground=\"%s\">"
-         "<b>%s</b></span>\n"
-         "%2.0d <i>%s</i>",
-         gdata->y[iy], gdata->line_color_name, gdata->y_units, ix, gdata->x_units);
-   } else {                        /* dont care now */
-      iy = (gint) floor((ay - glg->axes[GTKGLG_AXIS_Y].min) / yspacing);
-      buf = g_strdup_printf("%01.3f <b>in.</b>", glds->z[iy * glds->x_length + ix]);
-   }
+  /* Figure out quadrant and draw appropriately */
+  if (glg->tooltip_pixbuf == NULL)
+  {
+    return;
+  }
 
-   gtk_glgraph_pixbuf_update_tooltip(glg, buf);
-   g_free(buf);
+  pw = gdk_pixbuf_get_width (glg->tooltip_pixbuf);
+  ph = gdk_pixbuf_get_height (glg->tooltip_pixbuf);
 
-   /* Draw Arrowhead -- WHY the pointer is already overing this arrowhead spot */
+  /* Determine Side */
+  /* Find on screen max and min x */
+  xmin = MAX (glg->hadj->value, glg->left);
+  xmax = MIN (glg->hadj->value + glg->hadj->page_size, glg->w - glg->right);
 
-/*  
+  if (ttx < 0.5 * (xmax + xmin))
+  {
+    /* Draw on right */
+    xpos = MIN (glg->w - glg->right, xmax) - INSET - TTX_BORDER - pw;
+  }
+  else
+  {
+    /* Draw on left */
+    xpos = MAX (glg->left, xmin) + INSET;
+  }
+  ypos = glg->h - MAX (glg->vadj->value, glg->top) - INSET - TTY_BORDER - ph;
+
+  glEnable (GL_BLEND);
+  glLineWidth (1.0);
+
+  /* Draw Black Shadow Box */
+  glColor4f (0.0, 0.0, 0.0, 0.5);
+  glBegin (GL_QUADS);
+  glVertex2d (xpos + 2.0, ypos - 2.0 + ph + TTY_BORDER);
+  glVertex2d (xpos + 2.0 + pw + TTX_BORDER, ypos - 2.0 + ph + TTY_BORDER);
+  glVertex2d (xpos + 2.0 + pw + TTX_BORDER, ypos - 2.0);
+  glVertex2d (xpos + 2.0, ypos - 2.0);
+  glEnd ();
+  glDisable (GL_BLEND);
+
+  /* Draw Black Box */
   glColor4f (0.0, 0.0, 0.0, 1.0);
-  glBegin (GL_TRIANGLES);
-  glVertex2d ((gdata->x[ix]) * xppu + xpo, (gdata->y[iy]) * yppu + ypo);
-  glVertex2d ((gdata->x[ix] + 0.04) * xppu + xpo, (gdata->y[iy] + 0.150) * yppu + ypo);
-  glVertex2d ((gdata->x[ix] + 0.150) * xppu + xpo, (gdata->y[iy] + 0.04) * yppu + ypo);
-  glEnd (); 
-*/
-   /* Figure out quadrant and draw appropriately */
-   if (glg->tooltip_pixbuf == NULL) {
-      return;
-   }
+  glBegin (GL_QUADS);
+  glVertex2d (xpos, ypos + ph + TTY_BORDER);
+  glVertex2d (xpos + pw + TTX_BORDER, ypos + ph + TTY_BORDER);
+  glVertex2d (xpos + pw + TTX_BORDER, ypos);
+  glVertex2d (xpos, ypos);
+  glEnd ();
 
-   pw = gdk_pixbuf_get_width(glg->tooltip_pixbuf);
-   ph = gdk_pixbuf_get_height(glg->tooltip_pixbuf);
+  /* Draw White Box */
+  glColor4f (1.0, 1.0, 1.0, 1.0);
+  glBegin (GL_QUADS);
+  glVertex2d (xpos + 1.0, ypos - 1.0 + ph + TTY_BORDER);
+  glVertex2d (xpos - 1.0 + pw + TTX_BORDER, ypos - 1.0 + ph + TTY_BORDER);
+  glVertex2d (xpos - 1.0 + pw + TTX_BORDER, ypos + 1.0);
+  glVertex2d (xpos + 1.0, ypos + 1.0);
+  glEnd ();
 
-   /* Determine Side */
-   /* Find on screen max and min x */
-   xmin = MAX(glg->hadj->value, glg->left);
-   xmax = MIN(glg->hadj->value + glg->hadj->page_size, glg->w - glg->right);
+  /* Draw Text */
+  xc = glg->hadj->value;
+  yc = glg->vadj->upper - glg->vadj->value - glg->vadj->page_size;
 
-   if (ttx < 0.5 * (xmax + xmin)) {
-      /* Draw on right */
-      xpos = MIN(glg->w - glg->right, xmax) - INSET - TTX_BORDER - pw;
-   } else {
-      /* Draw on left */
-      xpos = MAX(glg->left, xmin) + INSET;
-   }
-   ypos = glg->h - MAX(glg->vadj->value, glg->top) - INSET - TTY_BORDER - ph;
+  x = xpos + TTX_BORDER * 0.5;
+  y = ypos + TTY_BORDER * 0.5;
 
-   glEnable(GL_BLEND);
-   glLineWidth(1.0);
+  if (x < xc || y < yc)
+  {
+    /* Raster pos. would be invalid */
+    glRasterPos2d (xc + 0.01, yc + 0.01); /* 0.01 prevents rounding error */
+    glBitmap (0, 0, 0, 0, x - xc, y - yc, NULL);
+  }
+  else
+  {
+    glRasterPos2d (x, y);
+  }
 
-   /* Draw Black Shadow Box */
-   glColor4f(0.0, 0.0, 0.0, 0.5);
-   glBegin(GL_QUADS);
-   glVertex2d(xpos + 2.0, ypos - 2.0 + ph + TTY_BORDER);
-   glVertex2d(xpos + 2.0 + pw + TTX_BORDER, ypos - 2.0 + ph + TTY_BORDER);
-   glVertex2d(xpos + 2.0 + pw + TTX_BORDER, ypos - 2.0);
-   glVertex2d(xpos + 2.0, ypos - 2.0);
-   glEnd();
-   glDisable(GL_BLEND);
-
-   /* Draw Black Box */
-   glColor4f(0.0, 0.0, 0.0, 1.0);
-   glBegin(GL_QUADS);
-   glVertex2d(xpos, ypos + ph + TTY_BORDER);
-   glVertex2d(xpos + pw + TTX_BORDER, ypos + ph + TTY_BORDER);
-   glVertex2d(xpos + pw + TTX_BORDER, ypos);
-   glVertex2d(xpos, ypos);
-   glEnd();
-
-   /* Draw White Box */
-   glColor4f(1.0, 1.0, 1.0, 1.0);
-   glBegin(GL_QUADS);
-   glVertex2d(xpos + 1.0, ypos - 1.0 + ph + TTY_BORDER);
-   glVertex2d(xpos - 1.0 + pw + TTX_BORDER, ypos - 1.0 + ph + TTY_BORDER);
-   glVertex2d(xpos - 1.0 + pw + TTX_BORDER, ypos + 1.0);
-   glVertex2d(xpos + 1.0, ypos + 1.0);
-   glEnd();
-
-   /* Draw Text */
-   xc = glg->hadj->value;
-   yc = glg->vadj->upper - glg->vadj->value - glg->vadj->page_size;
-
-   x = xpos + TTX_BORDER * 0.5;
-   y = ypos + TTY_BORDER * 0.5;
-
-   if (x < xc || y < yc) {
-      /* Raster pos. would be invalid */
-      glRasterPos2d(xc + 0.01, yc + 0.01);      /* 0.01 prevents rounding error */
-      glBitmap(0, 0, 0, 0, x - xc, y - yc, NULL);
-   } else {
-      glRasterPos2d(x, y);
-   }
-
-   pixels = gdk_pixbuf_get_pixels(glg->tooltip_pixbuf);
-   glDrawPixels(pw, ph, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid *) pixels);
+  pixels = gdk_pixbuf_get_pixels (glg->tooltip_pixbuf);
+  glDrawPixels (pw, ph, GL_RGBA, GL_UNSIGNED_BYTE, (GLvoid *) pixels);
 
 }
+
 
 static void gtk_glgraph_draw_dataset(const GtkGLGraph * const glg,
    const GtkGLGDataSet * const glds)
