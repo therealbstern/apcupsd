@@ -8978,13 +8978,13 @@ lists.sourceforge.net\gt{}}{http://www.apcupsd.com}
 \item [{\bf How do I build Apcupsd for platform xxx?}]
    \index{How do I build Apcupsd for platform xxx? }
    The apcupsd spec file contains defines to build for several platforms: RedHat
-7.x (rh7), RedHat 8.0 (rh8), RedHat 9 (rh9), Fedora Core 1 (fc1), and Whitebox
-Enterprise Linux 3.0 (wb3).  The package build is controlled by a define set
-at the beginning of the file. These defines basically just control the
-dependancy information that gets coded into the finished rpm package.  So
-while you could technically build a package without defining a platform, or
-with an incorrect platform, and have it install and run it would not contain
-correct dependancy information for the rpm database.  The platform define may
+7.x (rh7), RedHat 8.0 (rh8), RedHat 9 (rh9), Fedora Core (fedora_core), RedHat
+Enterprise Linux and clones (rhel3 and rhel4), SuSE 9 & 10 (suse), and Mandrake (mdk).  
+The package build is controlled by a define set at the beginning of the file. 
+These defines basically just control the dependancy information that gets coded into 
+the finished rpm package.  So while you could technically build a package without 
+defining a platform, or with an incorrect platform, and have it install and run it would 
+not contain correct dependancy information for the rpm database.  The platform define may
 be edited in the spec file directly (by default all defines are set to 0 or
 ``not set'').  For example, to build the RedHat 7.x package find the line in
 the spec file which reads  
@@ -9020,7 +9020,9 @@ Alternately you may pass the define on the command line when calling rpmbuild:
 \item [{\bf How do I control whether usb support gets built?}]
    \index{How do I control whether usb support gets built? }
    By default standard serial port support will be built and the apcupsd-std
-package will be produced. To get the usb package and support either set the  
+package will be produced.  The usb package pre-configures the configuration files 
+for usb devices and installs a couple additional tools in /etc/apcupsd but the usb 
+driver is built regardless.  To get the usb package and support either set the  
 
 \footnotesize
 \begin{verbatim}
