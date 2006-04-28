@@ -1,0 +1,235 @@
+#
+# Makefile for win32 apcupsd executables
+# Using MinGW cross-compiler on GNU/Linux
+#  
+#  Modified from Bacula Makefile.in for apcupsd
+#   Kern Sibbald, April 2006
+# 
+
+# Configuration
+
+TOPDIR = @TOP_DIR@
+CROSSTOOLS = $(TOPDIR)/cross-tools
+MINGW = $(CROSSTOOLS)/mingw32
+INCLUDE_MINGW = -I $(MINGW)/mingw32/include
+INCLUDE_GCC = -I $(MINGW)/lib/gcc/mingw32/3.4.5/include
+
+DEPKGS = $(TOPDIR)/depkgs-win32
+
+INCLUDE_APC = -I ../../include -I ./compat
+INCLUDE_PTHREADS = -I $(DEPKGS)/pthreads
+INCLUDE_ICONS = -I .
+
+LIB_MINGW = $(MINGW)/mingw32/lib
+LIB_PTHREADS = $(DEPKGS)/pthreads/pthreadGCE.dll
+
+BIN_DIR = $(MINGW)/bin
+
+INCLUDES = \
+	$(INCLUDE_GCC) \
+	$(INCLUDE_MINGW) \
+	$(INCLUDE_PTHREADS) \
+	$(INCLUDE_APC) \
+	$(INCLUDE_ICONS)
+
+HAVES = \
+	-DHAVE_MINGW \
+	-DHAVE_WIN32
+
+DEFINES = \
+	-DWIN32 \
+	$(HAVES) \
+	-DCOMPILING_APCUPSD
+
+
+
+CC = $(BIN_DIR)/mingw32-g++ $(DEFINES) $(INCLUDES)
+CXX = $(BIN_DIR)/mingw32-g++ $(DEFINES) $(INCLUDES) 2>&1
+WINDRES = $(BIN_DIR)/mingw32-windres
+
+first: all
+
+OBJDIR = .
+
+######################################################################
+
+# Files in src/win32/compat
+
+OBJS_COMPAT = \
+	$(OBJDIR)/print.o \
+	$(OBJDIR)/compat.o \
+	$(OBJDIR)/getopt.o  
+
+compat.o:	./compat/compat.cpp
+	$(CXX) -c ./compat/compat.cpp -o $(OBJDIR)/compat.o
+
+getopt.o:	./compat/getopt.c
+	$(CXX) -c ./compat/getopt.c -o $(OBJDIR)/getopt.o
+
+print.o:	./compat/print.cpp
+	$(CXX) -c ./compat/print.cpp -o $(OBJDIR)/print.o
+
+######################################################################
+
+# Files in src/win32
+OBJS_WIN = \
+	$(OBJDIR)/winabout.o \
+	$(OBJDIR)/winevents.o \
+	$(OBJDIR)/winservice.o \
+	$(OBJDIR)/winstat.o \
+	$(OBJDIR)/wintray.o \
+	$(OBJDIR)/winmain.o \
+	$(OBJDIR)/winres.res
+
+winabout.o:	./winabout.cpp
+	$(CXX) -c ./winabout.cpp -o $(OBJDIR)/winabout.o
+
+winevents.o:	./winevents.cpp
+	$(CXX) -c ./winevents.cpp -o $(OBJDIR)/winevents.o
+
+winmain.o:	./winmain.cpp
+	$(CXX) -c ./winmain.cpp -o $(OBJDIR)/winmain.o
+
+winservice.o:	./winservice.cpp
+	$(CXX) -c ./winservice.cpp -o $(OBJDIR)/winservice.o
+
+winstat.o:	./winstat.cpp
+	$(CXX) -c ./winstat.cpp -o $(OBJDIR)/winstat.o
+
+wintray.o:	./wintray.cpp
+	$(CXX) -c ./wintray.cpp -o $(OBJDIR)/wintray.o
+
+# ***FIXME*** add icon dependencies
+winres.res:	./winres.rc
+	$(WINDRES) $(INCLUDE_ICONS) -O coff ./winres.rc -o $(OBJDIR)/winres.res
+
+######################################################################
+
+
+# Files files in src/lib
+
+LIB_OBJS = \
+	$(OBJDIR)/apcconfig.o \
+	$(OBJDIR)/apcerror.o \
+	$(OBJDIR)/apcevents.o \
+	$(OBJDIR)/apcexec.o \
+	$(OBJDIR)/apcfile.o \
+	$(OBJDIR)/apclibnis.o \
+	$(OBJDIR)/apclock.o \
+	$(OBJDIR)/apclog.o \
+	$(OBJDIR)/apcsignal.o \
+	$(OBJDIR)/apcstatus.o \
+	$(OBJDIR)/asys.o \
+	$(OBJDIR)/newups.o \
+	$(OBJDIR)/wincompat.o
+
+#
+# Rules for generating from ../lib
+# 
+
+apcconfig.o: ../lib/apcconfig.c
+	$(CXX) -c ../lib/apcconfig.c -o $(OBJDIR)/apcconfig.o
+
+apcerror.o: ../lib/apcerror.c
+	$(CXX) -c ../lib/apcerror.c -o $(OBJDIR)/apcerror.o
+ 
+apcevents.o: ../lib/apcevents.c
+	$(CXX) -c ../lib/apcevents.c -o $(OBJDIR)/apcevents.o
+
+apcexec.o: ../lib/apcexec.c
+	$(CXX) -c ../lib/apcexec.c -o $(OBJDIR)/apcexec.o
+
+apcfile.o: ../lib/apcfile.c
+	$(CXX) -c ../lib/apcfile.c -o $(OBJDIR)/apcfile.o
+
+apclibnis.o: ../lib/apclibnis.c
+	$(CXX) -c ../lib/apclibnis.c -o $(OBJDIR)/apclibnis.o
+
+apclock.o: ../lib/apclock.c
+	$(CXX) -c ../lib/apclock.c -o $(OBJDIR)/apclock.o
+
+apclog.o: ../lib/apclog.c
+	$(CXX) -c ../lib/apclog.c -o $(OBJDIR)/apclog.o
+
+apcsignal.o: ../lib/apcsignal.c
+	$(CXX) -c ../lib/apcsignal.c -o $(OBJDIR)/apcsignal.o
+
+apcstatus.o: ../lib/apcstatus.c
+	$(CXX) -c ../lib/apcstatus.c -o $(OBJDIR)/apcstatus.o
+
+asys.o: ../lib/asys.c
+	$(CXX) -c ../lib/asys.c -o $(OBJDIR)/asys.o
+
+newups.o: ../lib/newups.c
+	$(CXX) -c ../lib/newups.c -o $(OBJDIR)/newups.o
+
+wincompat.o: ../lib/wincompat.c
+	$(CXX) -c ../lib/wincompat.c -o $(OBJDIR)/wincompat.o
+
+
+######################################################################
+
+# Files in src/drivers
+OBJS_DRIVERS = \
+	$(OBJDIR)/drivers.o \
+	$(OBJDIR)/console.o \
+	$(OBJDIR)/console_conf.o
+
+drivers.o:  ../drivers/drivers.c
+	$(CXX) -c ../drivers/drivers.c -o $(OBJDIR)/drivers.o
+
+######################################################################
+
+# Files in src
+OBJS_SRC = \
+	$(OBJDIR)/action.o \
+	$(OBJDIR)/apcupsd.o \
+	$(OBJDIR)/apcnis.o \
+	$(OBJDIR)/device.o \
+	$(OBJDIR)/options.o \
+	$(OBJDIR)/reports.o
+
+action.o:  ../action.c
+	$(CXX) -c ../action.c -o $(OBJDIR)/action.o
+
+apcupsd.o:  ../apcupsd.c
+	$(CXX) -c ../apcupsd.c -o $(OBJDIR)/apcupsd.o
+
+apcnis.o:  ../apcnis.c
+	$(CXX) -c ../apcnis.c -o $(OBJDIR)/apcnis.o
+
+device.o:  ../device.c
+	$(CXX) -c ../device.c -o $(OBJDIR)/device.o
+
+options.o:  ../options.c
+	$(CXX) -c ../options.c -o $(OBJDIR)/options.o
+
+reports.o:  ../reports.c
+	$(CXX) -c ../reports.c -o $(OBJDIR)/reports.o
+
+
+######################################################################
+
+
+
+APC_OBJS = $(OBJS_SRC) $(LIB_OBJS) $(OBJS_COMPAT) $(OBJS_WIN) $(OBJS_DRIVERS)
+
+APC_LIBS = \
+	-L$(LIB_MINGW) \
+	$(LIB_PTHREADS) \
+	$(LIB_MINGW)/libuser32.a \
+	$(LIB_MINGW)/libgdi32.a
+
+
+# Targets
+
+all: apcupsd.exe
+
+clean:
+	rm -f $(OBJDIR)/*.o $(OBJDIR)/apcupsd.exe $(OBJDIR)/winres.res
+	rm -f pthreadGCE.dll
+
+# Link the apcupsd daemon executable ...
+apcupsd.exe: $(APC_OBJS)
+	$(CXX) $(APC_OBJS) $(APC_LIBS) -o $(OBJDIR)/apcupsd.exe
+	cp -f $(DEPKGS)/pthreads/pthreadGCE.dll .
