@@ -239,7 +239,7 @@ int avsnprintf(char *str, size_t size, const char *format, va_list ap);
 int asnprintf(char *str, size_t size, const char *fmt, ...);
 char *astrncpy(char *dest, const char *src, int maxlen);
 char *astrncat(char *dest, const char *src, int maxlen);
-struct tm *localtime_r(const time_t *timep, struct tm *tm);
+//struct tm *localtime_r(const time_t *timep, struct tm *tm);
 char *afgets(char *s, int size, FILE *fd);
 void *amalloc(size_t size);
 void *arealloc(void *buf, size_t size);
