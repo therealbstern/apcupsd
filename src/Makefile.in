@@ -9,9 +9,9 @@
 topdir = @topdir@
 top_builddir = $(topdir)
 
-subdirs = lib @LIBUSBHID@ drivers @WIN32@ @INTLSUB@ @POSUB@ @LIBGD@ @CGI@ @GAPCMON@
+subdirs = lib @LIBUSBHID@ drivers @WIN32@ @INTLSUB@ @POSUB@ @LIBGD@ @CGI@
 
-gobjs = reports.o action.o apcnis.o device.o
+gobjs = apcnet.o reports.o action.o apcnis.o device.o
 dobjs = apcupsd.o options.o
 tobjs = apctest.o options.o
 aobjs = apcaccess.o
@@ -32,12 +32,12 @@ all-targets: $(allexe)
 #
 
 apcupsd: $(dobjs) $(gobjs) $(WINAPC) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
-	$(LD) $(LDFLAGS) $(WLDFLAGS) $(dobjs) $(gobjs) $(DRVLIBS) $(LIBS) $(WINAPC) $(WINLIBS) @LIBUSB@ -o apcupsd
+	$(LD) $(LDFLAGS) $(WLDFLAGS) $(dobjs) $(gobjs) $(DRVLIBS) $(LIBS) $(WINAPC) $(WINLIBS) -o apcupsd
 
 apctest: $(tobjs) $(gobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
-	$(LD) $(LDFLAGS) $(tobjs) $(gobjs) $(DRVLIBS) $(LIBS) @LIBUSB@ -o apctest
+	$(LD) $(LDFLAGS) $(tobjs) $(gobjs) $(DRVLIBS) $(LIBS) -o apctest
 
-devicedbg: $(xobjs) $(APCLIBS) $(INTLLIBS) 
+devicedbg: $(xobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
 	$(LD) $(LDFLAGS) $(xobjs) $(LIBS) -o devicedbg
 
 apcaccess: $(aobjs) $(APCLIBS) $(INTLLIBS) 
@@ -64,7 +64,6 @@ install-binary: $(allexe)
 	@$(MAKE) DESTDIR=$(DESTDIR) install-@SMTP@
 	@$(MAKE) DESTDIR=$(DESTDIR) install-@POWERFLUTE@
 	@$(MAKE) DESTDIR=$(DESTDIR) install-@CGI@
-	@$(MAKE) DESTDIR=$(DESTDIR) install-@GAPCDIR@
 
 install-apcaccess:
 	@$(INSTALL_PROGRAM) -s -m 755 apcaccess@EXEEXT@ \
@@ -79,9 +78,6 @@ install-powerflute:
 		$(DESTDIR)$(sbindir)/powerflute@EXEEXT@
 install-cgi:
 	(cd cgi/; $(MAKE) DESTDIR=$(DESTDIR) install)
-
-install-gapcmon:
-	(cd gapcmon/; $(MAKE) DESTDIR=$(DESTDIR) install)
 
 uninstall:
 	@$(ECHO) "Removing daemons ..."

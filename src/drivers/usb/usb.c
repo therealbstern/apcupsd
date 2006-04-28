@@ -63,9 +63,7 @@ const struct s_known_info known_info[] = {
    {CI_LOAD,                    0x00840035, P_ANY,     T_UNITS,    true },  /* PercentLoad */
    {CI_ITEMP,                   0x00840036, P_BATTERY, T_UNITS,    true },  /* Temperature */
    {CI_HUMID,                   0x00840037, P_ANY,     T_UNITS,    true },  /* Humidity */
-   {CI_NOMBATTV,                0x00840040, P_BATTERY, T_UNITS,    false},  /* ConfigVoltage (battery) */
-   {CI_NOMOUTV,                 0x00840040, P_OUTPUT,  T_UNITS,    false},  /* ConfigVoltage (output) */
-   {CI_NOMINV,                  0x00840040, P_INPUT,   T_UNITS,    false},  /* ConfigVoltage (input) */
+   {CI_NOMBATTV,                0x00840040, P_ANY,     T_UNITS,    false},  /* ConfigVoltage */
    {CI_NONE,                    0x00840042, P_ANY,     T_UNITS,    false},  /* ConfigFrequency */
    {CI_NONE,                    0x00840043, P_ANY,     T_UNITS,    false},  /* ConfigApparentPower */
    {CI_LTRANS,                  0x00840053, P_ANY,     T_UNITS,    false},  /* LowVoltageTransfer */
@@ -139,7 +137,6 @@ const struct s_known_info known_info[] = {
    {CI_APCDelayBeforeStartup,   0xFF86007E, P_ANY,     T_UNITS,    false},  /* APCDelayBeforeStartup */
    {CI_APCDelayBeforeShutdown,  0xFF86007D, P_ANY,     T_UNITS,    false},  /* APCDelayBeforeShutdown */
    {CI_APCLineFailCause,        0xFF860052, P_ANY,     T_NONE,     true},   /* APCLineFailCause */
-   {CI_SENS,                    0xFF860061, P_ANY,     T_NONE,     false},  /* APCSensitivity */
    {CI_BUPBattCapBeforeStartup, 0x00860012, P_ANY,     T_NONE,     false},  /* BUPBattCapBeforeStartup */
    {CI_BUPDelayBeforeStartup,   0x00860076, P_ANY,     T_NONE,     false},  /* BUPDelayBeforeStartup */
    {CI_BUPSelfTest,             0x00860010, P_ANY,     T_NONE,     false},  /* BUPSelfTest */
@@ -613,32 +610,9 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
       ups->NomOutputVoltage = (int)uval->dValue;
       break;
 
-   /* Nominal input voltage */
-   case CI_NOMINV:
-      ups->NomInputVoltage = (int)uval->dValue;
-      break;
-
    /* Nominal battery voltage */
    case CI_NOMBATTV:
       ups->nombattv = uval->dValue;
-      break;
-
-   /* Sensitivity */
-   case CI_SENS:
-      switch (uval->iValue) {
-      case 0:
-         astrncpy(ups->sensitivity, "Low", sizeof(ups->sensitivity));
-         break;
-      case 1:
-         astrncpy(ups->sensitivity, "Medium", sizeof(ups->sensitivity));
-         break;
-      case 2:
-         astrncpy(ups->sensitivity, "High", sizeof(ups->sensitivity));
-         break;
-      default:
-         astrncpy(ups->sensitivity, "Unknown", sizeof(ups->sensitivity));
-         break;
-      }
       break;
 
    default:
@@ -689,7 +663,6 @@ int usb_ups_entry_point(UPSINFO *ups, int command, void *data)
       break;
 
    case DEVICE_CMD_GET_SELFTEST_MSG:
-      usleep(100000);  /* Give UPS a chance to update the value */
       return usb_update_value(ups, CI_ST_STAT);
 
    default:
@@ -1092,8 +1065,8 @@ int usb_report_event(UPSINFO *ups, int ci, USB_VALUE *uval)
    case CI_Discharging:
    case CI_ACPresent:
    case CI_BelowRemCapLimit:
-   case CI_BATTLEV:
-   case CI_RUNTIM:
+   case CI_RemainingCapacity:
+   case CI_RunTimeToEmpty:
    case CI_NeedReplacement:
    case CI_ShutdownImminent:
    case CI_BatteryPresent:

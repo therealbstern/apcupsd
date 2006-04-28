@@ -69,7 +69,12 @@ void setup_device(UPSINFO *ups)
    }
 
    device_setup(ups);
-   device_get_capabilities(ups);
+
+   /* Must not be called on slaves */
+   if (!ups->is_slave())
+      device_get_capabilities(ups);
+
+   return;
 }
 
 /*********************************************************************/
@@ -118,9 +123,14 @@ void kill_power(UPSINFO *ups)
            "ignored at %s:%d\n"), __FILE__, __LINE__);
    } else {
       /* We are on batteries, so do the kill_power */
-      if (ups->upsclass.type == SHAREMASTER) {
+      if ((ups->upsclass.type == SHAREMASTER) ||
+         (ups->upsclass.type == SHARENETMASTER)) {
          log_event(ups, LOG_WARNING,
             _("Waiting 30 seconds for slave(s) to shutdown."));
+         sleep(30);
+      } else if (ups->upsclass.type == NETMASTER) {
+         log_event(ups, LOG_WARNING,
+            _("Waiting 30 seconds for slave(s) to shutdown"));
          sleep(30);
       }
 

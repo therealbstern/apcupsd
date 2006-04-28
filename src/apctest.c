@@ -85,7 +85,6 @@ static int usb_get_battery_date(void);
 static void usb_set_battery_date(void);
 static void usb_get_manf_date(void);
 static void usb_set_alarm(void);
-static void usb_set_sens(void);
 #endif
 
 static void strip_trailing_junk(char *cmd);
@@ -292,6 +291,42 @@ int main(int argc, char *argv[])
       pmsg("sharenet.type = SHARE\n");
       break;
 
+   case NET:
+      pmsg("sharenet.type = NET\n");
+
+      switch (ups->upsclass.type) {
+      case NO_CLASS:
+         pmsg("upsclass.type = NO_CLASS\n");
+         break;
+      case STANDALONE:
+         pmsg("upsclass.type = STANDALONE\n");
+         break;
+      case SHARESLAVE:
+         pmsg("upsclass.type = SHARESLAVE\n");
+         break;
+      case SHAREMASTER:
+         pmsg("upsclass.type = SHAREMASTER\n");
+         break;
+      case SHARENETMASTER:
+         pmsg("upsclass.type = SHARENETMASTER\n");
+         break;
+      case NETSLAVE:
+         pmsg("upsclass.type = NETSLAVE\n");
+         break;
+      case NETMASTER:
+         pmsg("upsclass.type = NETMASTER\n");
+         break;
+      default:
+         pmsg("upsclass.type = DEFAULT\n");
+         break;
+      }
+      break;
+
+   case SHARENET:
+      pmsg("sharenet.type = SHARENET\n");
+      pmsg("I cannot handle sharenet.type = SHARENET\n");
+      apctest_terminate(1);
+
    default:
       pmsg("sharenet.type = DEFAULT\n");
       pmsg("I cannot handle sharenet.type = DEFAULT\n");
@@ -405,6 +440,10 @@ int main(int argc, char *argv[])
       pmsg("mode.type = SHAREBASIC\n");
       break;
 
+   case NETUPS:
+      pmsg("mode.type = NETUPS\n");
+      break;
+
    case BKPRO:
       pmsg("mode.type = BKPRO\n");
       break;
@@ -451,8 +490,46 @@ int main(int argc, char *argv[])
 
    delete_lockfile(ups);
 
-   pmsg("Setting up the port ...\n");
-   setup_device(ups);
+   switch (ups->sharenet.type) {
+   case DISABLE:
+   case SHARE:
+      pmsg("Setting up the port ...\n");
+      setup_device(ups);
+      break;
+
+   case NET:
+      switch (ups->upsclass.type) {
+      case NO_CLASS:
+      case STANDALONE:
+      case SHARESLAVE:
+      case SHAREMASTER:
+      case SHARENETMASTER:
+         break;
+      case NETSLAVE:
+         if (kill_ups_power)
+            Error_abort0(_("Ignoring killpower for slave\n"));
+         if (prepare_slave(ups))
+            Error_abort0(_("Error setting up slave\n"));
+         break;
+      case NETMASTER:
+         setup_device(ups);
+         if ((kill_ups_power == 0) && (prepare_master(ups)))
+            Error_abort0("Error setting up master\n");
+         break;
+      default:
+         Error_abort1(_("NET Class Error %s\n\a"), strerror(errno));
+      }
+      break;
+
+   case SHARENET:
+      setup_device(ups);
+      if ((kill_ups_power == 0) && (prepare_master(ups)))
+         Error_abort0("Error setting up master.\n");
+      break;
+
+   default:
+      Error_abort0(_("Unknown share net type\n"));
+   }
 
    if (kill_ups_power) {
       pmsg("apctest: bad option, I cannot do a killpower\n");
@@ -469,6 +546,7 @@ int main(int argc, char *argv[])
          prep_device(ups);
       }
 
+#ifdef HAVE_APCSMART_DRIVER
       /*
        * This isn't a documented option but can be used
        * for testing dumb mode on a SmartUPS if you have
@@ -483,6 +561,7 @@ int main(int argc, char *argv[])
          pmsg("Going dumb: %s\n", ans);
          mode = M_DUMB;            /* run in dumb mode */
       }
+#endif
    }
 
    shm_OK = 1;
@@ -1546,8 +1625,7 @@ static void do_usb_testing(void)
            "5) View battery date\n"
            "6) View manufacturing date\n"
            "7) Set alarm behavior\n"
-           "8) Set sensitivity\n"
-           "9) Quit\n\n");
+           "8) Quit\n\n");
 
       cmd = get_cmd("Select function number: ");
       if (cmd) {
@@ -1576,9 +1654,6 @@ static void do_usb_testing(void)
             usb_set_alarm();
             break;
          case 8:
-            usb_set_sens();
-            break;
-         case 9:
             quit = TRUE;
             break;
          default:
@@ -1597,87 +1672,6 @@ static void do_usb_testing(void)
 }
 
 #ifdef HAVE_USB_DRIVER
-
-static void usb_set_sens(void)
-{
-   int result;
-   char* cmd;
-
-   if (!usb_read_int_from_ups(ups, CI_SENS, &result)) {
-      pmsg("\nI don't know how to control the alarm settings on your UPS.\n");
-      return;
-   }
-   
-   pmsg("Current sensitivity setting: ");
-   switch(result) {
-   case 0:
-      pmsg("LOW\n");
-      break;
-   case 1:
-      pmsg("MEDIUM\n");
-      break;
-   case 2:
-      pmsg("HIGH\n");
-      break;
-   default:
-      pmsg("UNKNOWN\n");
-      break;
-   }
-
-   while(1) {
-      pmsg("Press...\n"
-           " L for Low sensitivity\n"
-           " M for Medium sensitivity\n"
-           " H for High sensitivity\n"
-           " Q to Quit with no changes\n"
-           "Your choice: ");
-      cmd = get_cmd("Select function: ");
-      if (cmd) {
-         switch(tolower(*cmd)) {
-         case 'l':
-            usb_write_int_to_ups(ups, CI_SENS, 0, "CI_SENS");
-            break;
-         case 'm':
-            usb_write_int_to_ups(ups, CI_SENS, 1, "CI_SENS");
-            break;
-         case 'h':
-            usb_write_int_to_ups(ups, CI_SENS, 2, "CI_SENS");
-            break;
-         case 'q':
-            return;
-         default:
-            pmsg("Illegal response.\n");
-            continue;
-         }
-      } else {
-         pmsg("Illegal response.\n");
-         continue;
-      }
-      
-      break;
-   }
-   
-   /* Delay needed for readback to work */
-   sleep(1);
-
-   usb_read_int_from_ups(ups, CI_SENS, &result);
-   pmsg("New sensitivity setting: ");
-   switch(result) {
-   case 0:
-      pmsg("LOW\n");
-      break;
-   case 1:
-      pmsg("MEDIUM\n");
-      break;
-   case 2:
-      pmsg("HIGH\n");
-      break;
-   default:
-      pmsg("UNKNOWN\n");
-      break;
-   }
-   
-}
 
 static void usb_set_alarm(void)
 {
@@ -1731,9 +1725,6 @@ static void usb_set_alarm(void)
       break;
    }
    
-   /* Delay needed for readback to work */
-   sleep(1);
-
    usb_read_int_from_ups(ups, CI_DALARM, &result);
    pmsg("New alarm setting: ");
    switch(result) {
@@ -1747,6 +1738,7 @@ static void usb_set_alarm(void)
       pmsg("UNKNOWN\n");
       break;
    }
+   
 }
 
 static void usb_kill_power_test(void)

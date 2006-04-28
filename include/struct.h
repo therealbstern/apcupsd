@@ -55,6 +55,7 @@ typedef enum {
    DUMB_UPS,            /* Dumb UPS driver      */
    BK,                  /* Simple Signal        */
    SHAREBASIC,          /* Simple Signal, Share */
+   NETUPS,              /*                      */
    BKPRO,               /* SubSet Smart Signal  */
    VS,                  /* SubSet Smart Signal  */
    NBKPRO,              /* Smarter BKPRO Signal */
@@ -72,13 +73,18 @@ typedef enum {
    NO_CLASS = 0,
    STANDALONE,
    SHARESLAVE,
+   NETSLAVE,
    SHAREMASTER,
+   NETMASTER,
+   SHARENETMASTER
 } ClassMode;
 
 typedef enum {
    NO_SHARE_NET = 0,
    DISABLE,             /* Disable Share or Net UPS  */
    SHARE,               /* ShareUPS Internal         */
+   NET,                 /* NetUPS                    */
+   SHARENET             /* Share and Net, Master     */
 } ShareNetMode;
 
 typedef enum {
@@ -127,6 +133,28 @@ typedef enum {
    TEST_UNKNOWN
 } SelfTestResult;
 
+/*
+ * Internal selftest structure.
+ * This structure is made by two variables, one for client side
+ * and one for server side.
+ * "activate" is the client side flag to activate a particular self
+ * test. The client switch this flag to TRUE and then starts monitoring
+ * the value of "status". The server (apcupsd) monitors the value of
+ * "activate" and when it's true, enters the selftest state machine,
+ * updating the value of "status" as the selftest proceed.
+ * At the end of the selftest, apcupsd resets the value of "activate" to false
+ * and leave the value of "status" to one of the possible selftest final
+ * status.
+ * It is important to say that the state machine rely in an array internal to
+ * the UPSINFO structure so that every capable UPS can do asyncronously a
+ * selftest.
+ */
+typedef struct SELFTEST {
+   int activate;
+   int status;
+} SELFTEST;
+
+
 typedef struct geninfo {
    const char *name;               /* JHNC: name mustn't contain whitespace */
    const char *long_name;
@@ -138,6 +166,52 @@ typedef struct internalgeninfo {
    char long_name[MAXSTRING];
    int type;
 } INTERNALGENINFO;                 /* for assigning into upsinfo */
+
+/* Structure that contains information on each of our slaves.
+ * Also, for a slave, the first slave packet is info on the
+ * master.
+ */
+typedef struct slaveinfo {
+   int remote_state;               /* state of master */
+   int disconnecting_slave;        /* set if old style slave */
+   int ms_errno;                   /* errno last error */
+   int socket;                     /* current open socket this slave */
+   int port;                       /* port */
+   int error;                      /* set when error message printed */
+   int errorcnt;                   /* count of errors */
+   time_t down_time;               /* time slave was set RMT_DOWN */
+   struct sockaddr_in addr;
+   char usermagic[APC_MAGIC_SIZE]; /* Old style password */
+   char name[MAXTOKENLEN];         /* master/slave domain name (or IP) */
+   char password[MAXTOKENLEN];     /* for CRAM-MD5 authentication */
+} SLAVEINFO;
+
+/* 
+ * This structure is sent over the network between the    
+ * master and the slaves, so we make the
+ * length of character arrays a multiple of four and
+ * keep the chars at the end to minimize memory alignment
+ * problems. 
+ */
+typedef struct netdata {
+   int32_t OnBatt;
+   int32_t BattLow;
+   int32_t BatteryUp;
+   int32_t BattChg;
+   int32_t ShutDown;
+   int32_t nettime;
+   int32_t TimeLeft;
+   int32_t ChangeBatt;
+   int32_t load;
+   int32_t timedout;
+   int32_t timelout;
+   int32_t emergencydown;
+   int32_t remote_state;
+   int32_t cap_battlev;
+   int32_t cap_runtim;
+   char apcmagic[APC_MAGIC_SIZE];
+   char usermagic[APC_MAGIC_SIZE];
+} NETDATA;
 
 
 /* No longer really needed since we do not use shared memory */
@@ -255,11 +329,12 @@ class UPSINFO {
    char UPS_Cap[CI_MAXCI + 1];          /* TRUE if UPS has capability */
    unsigned int UPS_Cmd[CI_MAXCI + 1];  /* Command or function code */
 
-   INTERNALGENINFO cable;          /* UPSCABLE directive */
-   INTERNALGENINFO nologin;        /* NOLOGON directive */
-   INTERNALGENINFO mode;           /* UPSTYPE directive */
-   INTERNALGENINFO upsclass;       /* UPSCLASS directive */
-   INTERNALGENINFO sharenet;       /* UPSMODE directive */
+   INTERNALGENINFO cable;
+   INTERNALGENINFO enable_access;
+   INTERNALGENINFO nologin;
+   INTERNALGENINFO mode;
+   INTERNALGENINFO upsclass;
+   INTERNALGENINFO sharenet;
 
    int num_execed_children;        /* children created in execute_command() */
 
@@ -276,9 +351,6 @@ class UPSINFO {
    time_t last_time_nologon;
    time_t last_time_changeme;
    time_t last_master_connect_time;     /* last time master connected */
-   time_t start_shut_ltime;
-   time_t start_shut_load;
-   time_t start_shut_lbatt;
    int num_xfers;                  /* number of times on batteries */
    int cum_time_on_batt;           /* total time on batteries since startup */
    int wait_time;                  /* suggested wait time for drivers in 
@@ -316,8 +388,7 @@ class UPSINFO {
 
    /* Items reported by smart UPS */
    /* Static items that normally do not change during UPS operation */
-   int NomOutputVoltage;           /* Nominal voltage when on batteries */
-   int NomInputVoltage;            /* Nominal input voltage */
+   int NomOutputVoltage;           /* Nominial voltage when on batteries */
    double nombattv;                /* Nominal batt. voltage -- not actual */
    int extbatts;                   /* number of external batteries attached */
    int badbatts;                   /* number of bad batteries */
@@ -362,11 +433,15 @@ class UPSINFO {
    int eventfilemax;               /* max size of eventfile in kilobytes */
    int event_fd;                   /* fd for eventfile */
 
+   int NetUpsPort;                 /* Master/slave port */
    char master_name[APC_FILENAME_MAX];
    char lockpath[APC_FILENAME_MAX];
    int lockfile;
 
+   char usermagic[APC_MAGIC_SIZE]; /* security id string */
    int ChangeBattCounter;          /* For UPS_REPLACEBATT, see apcaction.c */
+
+   int remote_state;
 
    pthread_mutex_t mutex;
    int refcnt;                     /* thread attach count */
@@ -374,6 +449,39 @@ class UPSINFO {
    const struct upsdriver *driver; /* UPS driver for this UPSINFO */
    void *driver_internal_data;     /* Driver private data */
 };
+
+/* Used only in apcaccess.c */
+typedef struct datainfo {
+   char apcmagic[APC_MAGIC_SIZE];
+   int update_master_config;
+   int get_master_status;
+   int slave_status;
+   int call_master_shutdown;
+   char accessmagic[ACCESS_MAGIC_SIZE];
+} DATAINFO;
+
+typedef int (HANDLER) (UPSINFO *, int, const GENINFO *, const char *);
+
+typedef struct {
+   const char *key;
+   HANDLER *handler;
+   size_t offset;
+   const GENINFO *values;
+   const char *help;
+} PAIRS;
+
+typedef struct configinfo {
+   int new_annoy;
+   int new_maxtime;
+   int new_delay;
+#ifdef __NOLOGIN
+   int new_nologin;
+#endif  /* __NOLOGIN */
+   int new_stattime;
+   int new_datatime;
+   int new_nettime;
+   int new_percent;
+} CONFIGINFO;
 
 
 /*These are needed for commands executed in apcaction.c */
