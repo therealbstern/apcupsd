@@ -76,8 +76,8 @@
 #include <ctype.h>
 #include <syslog.h>
 #include <limits.h>
-#include <pwd.h>
 #include <time.h>
+#include <pwd.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <setjmp.h>
