@@ -320,7 +320,7 @@ extern int debug_level;
  */
 static void daemon_start(void)
 {
-#ifndef HAVE_CYGWIN
+#if !defined(HAVE_CYGWIN) && !defined(HAVE_MINGW)
    int i, fd;
    pid_t cpid;
    mode_t oldmask;
