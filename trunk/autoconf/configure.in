@@ -17,6 +17,12 @@ ABSSRCDIR=`pwd`
 AC_SUBST(ABSSRCDIR)
 AC_SUBST(topdir)
 
+dnl go up one more level
+cd ..
+TOP_DIR=`pwd`
+cd ${topdir}
+AC_SUBST(TOP_DIR)
+
 VERSION=`sed -n -e 's/^.*VERSION.*"\(.*\)"$/\1/p' ${srcdir}/include/version.h`
 AC_SUBST(VERSION)dnl 
 #AC_DEFINE_UNQUOTED(VERSION, "$VERSION")
@@ -751,34 +757,34 @@ dnl Search for lib ($1) containing func ($2) in default path plus paths listed i
 dnl
 AC_DEFUN(AC_LIB_SEARCH,
     [
-        lib="$1"
-        func="$2"
+	lib="$1"
+	func="$2"
 
-        found="no"
+	found="no"
 
-        _libs=${LIBS}
-        LIBS="${LIBS} -l$lib"
+	_libs=${LIBS}
+	LIBS="${LIBS} -l$lib"
 
-        AC_MSG_CHECKING([for lib$lib in <default>])
-        AC_LINK_IFELSE([AC_LANG_CALL([], [$func])], [found="yes"; AC_MSG_RESULT([yes])], [AC_MSG_RESULT([no])])
+	AC_MSG_CHECKING([for lib$lib in <default>])
+	AC_LINK_IFELSE([AC_LANG_CALL([], [$func])], [found="yes"; AC_MSG_RESULT([yes])], [AC_MSG_RESULT([no])])
 
-        if test "$found" = "no" ; then
-            _ldflags=${LDFLAGS}
+	if test "$found" = "no" ; then
+	    _ldflags=${LDFLAGS}
 
-            for opt in $3 ; do
-                AC_MSG_CHECKING([for lib$lib in $opt])
-                LDFLAGS="${LDFLAGS} -L$opt"
-                AC_LINK_IFELSE([AC_LANG_CALL([], [$func])], [found="yes"; AC_MSG_RESULT([yes]); break], [AC_MSG_RESULT([no])])
-                LDFLAGS=${_ldflags}
-            done
-        fi
+	    for opt in $3 ; do
+		AC_MSG_CHECKING([for lib$lib in $opt])
+		LDFLAGS="${LDFLAGS} -L$opt"
+		AC_LINK_IFELSE([AC_LANG_CALL([], [$func])], [found="yes"; AC_MSG_RESULT([yes]); break], [AC_MSG_RESULT([no])])
+		LDFLAGS=${_ldflags}
+	    done
+	fi
 
-        if test "$found" = "no" ; then
-            AC_MSG_ERROR([Cannot find lib$lib.])
-        fi
+	if test "$found" = "no" ; then
+	    AC_MSG_ERROR([Cannot find lib$lib.])
+	fi
 
-        AC_CHECK_LIB($lib, $func, [], [AC_MSG_ERROR([Cannot find lib$lib.])], [])
-        LIBS=${_libs}
+	AC_CHECK_LIB($lib, $func, [], [AC_MSG_ERROR([Cannot find lib$lib.])], [])
+	LIBS=${_libs}
     ])
 
 # Allow user to force USB type to generic
@@ -795,7 +801,7 @@ AC_HELP_STRING([--enable-usb], [Compile USB UPS code])
 AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
 	[ if test "$enableval" = "yes" ; then
 	if test $GENERICUSB = "no" -a \
-	        $HAVE_UNAME=yes -a x`uname -s` = xLinux ; then
+		$HAVE_UNAME=yes -a x`uname -s` = xLinux ; then
 	   USB_TYPE="linux"
 	   AC_MSG_RESULT([Using Linux USB driver.])
 	elif test $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xFreeBSD -o \
@@ -814,24 +820,24 @@ AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
 	   if test "$CFG_CYGWIN" = "yes"; then
 	      dnl Hard code paths on Win32 since LibUSB-Win32 sadly
 	      dnl does not provide libusb-config.
-              LIBUSB=-L/cygdrive/C/Program\\\ Files/LibUSB-Win32/lib/gcc\ -lusb
-              LIBUSBH=/cygdrive/C/Program\ Files/LibUSB-Win32/include/usb.h
-           else
-  	      AC_PATH_PROG(usbcfg, libusb-config)
+	      LIBUSB=-L/cygdrive/C/Program\\\ Files/LibUSB-Win32/lib/gcc\ -lusb
+	      LIBUSBH=/cygdrive/C/Program\ Files/LibUSB-Win32/include/usb.h
+	   else
+	      AC_PATH_PROG(usbcfg, libusb-config)
 	      if test x$usbcfg = x ; then
-	         AC_MSG_ERROR(Cannot find libusb-config)
+		 AC_MSG_ERROR(Cannot find libusb-config)
 	      fi
 
-              LIBUSB=`$usbcfg --libs`
-              LIBUSBH=`$usbcfg --prefix`/include/usb.h
-           fi
-           
-           AC_SUBST(LIBUSBH)
+	      LIBUSB=`$usbcfg --libs`
+	      LIBUSBH=`$usbcfg --prefix`/include/usb.h
+	   fi
+	   
+	   AC_SUBST(LIBUSBH)
 
-           LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
-           LIBUSBHID=libusbhid
-           LIBUSBHIDOBJS="\$(topdir)/src/libusbhid/*.o"
-           AC_SUBST(LIBUSBHID)
+	   LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
+	   LIBUSBHID=libusbhid
+	   LIBUSBHIDOBJS="\$(topdir)/src/libusbhid/*.o"
+	   AC_SUBST(LIBUSBHID)
 	   AC_SUBST(LIBUSBHIDINC)
 	   AC_SUBST(LIBUSBHIDOBJS)
 
@@ -1011,11 +1017,11 @@ AC_ARG_ENABLE(gapcmon,
       LIBS="${LDFLAGS} ${GAPCMON_LIBS}"
       AC_MSG_CHECKING(if gnome_vfs_socket_read requires cancellation argument)
       AC_LINK_IFELSE(
-         AC_LANG_PROGRAM([#include <libgnomevfs/gnome-vfs.h>],
-                         [gnome_vfs_socket_read(NULL, NULL, 0, NULL, NULL);]),
-         AC_MSG_RESULT(yes)
-            GAPCMON_CFLAGS="${GAPCMON_CFLAGS} -DGNOMEVFS_REQUIRES_CANCELLATION",
-         AC_MSG_RESULT(no))
+	 AC_LANG_PROGRAM([#include <libgnomevfs/gnome-vfs.h>],
+			 [gnome_vfs_socket_read(NULL, NULL, 0, NULL, NULL);]),
+	 AC_MSG_RESULT(yes)
+	    GAPCMON_CFLAGS="${GAPCMON_CFLAGS} -DGNOMEVFS_REQUIRES_CANCELLATION",
+	 AC_MSG_RESULT(no))
       CFLAGS=${_cflags}
       LIBS=${_libs}
       
@@ -1028,16 +1034,16 @@ AC_ARG_ENABLE(gapcmon,
       LIBS="${LDFLAGS} ${GAPCMON_LIBS}"
       AC_MSG_CHECKING(for gnome_vfs_socket_set_timeout)
       AC_LINK_IFELSE(
-         AC_LANG_PROGRAM([#include <libgnomevfs/gnome-vfs.h>
-                          #ifdef GNOMEVFS_REQUIRES_CANCELLATION
-                          #define GNOMEVFS_CANCELLATION ,NULL
-                          #else
-                          #define GNOMEVFS_CANCELLATION
-                          #endif],
-                         [gnome_vfs_socket_set_timeout(NULL, NULL GNOMEVFS_CANCELLATION);]),
-         AC_MSG_RESULT(yes)
-            GAPCMON_CFLAGS="${GAPCMON_CFLAGS} -DHAVE_GNOMEVFS_SOCKET_SET_TIMEOUT",
-         AC_MSG_RESULT(no))
+	 AC_LANG_PROGRAM([#include <libgnomevfs/gnome-vfs.h>
+			  #ifdef GNOMEVFS_REQUIRES_CANCELLATION
+			  #define GNOMEVFS_CANCELLATION ,NULL
+			  #else
+			  #define GNOMEVFS_CANCELLATION
+			  #endif],
+			 [gnome_vfs_socket_set_timeout(NULL, NULL GNOMEVFS_CANCELLATION);]),
+	 AC_MSG_RESULT(yes)
+	    GAPCMON_CFLAGS="${GAPCMON_CFLAGS} -DHAVE_GNOMEVFS_SOCKET_SET_TIMEOUT",
+	 AC_MSG_RESULT(no))
       CFLAGS=${_cflags}
       LIBS=${_libs}
 
@@ -1063,15 +1069,15 @@ if test -n "$GCC" -a "$CFG_CYGWIN" != "yes"; then
 
     SUPC="`$CXX -print-file-name=libsupc++.a 2>/dev/null`"
     case "$SUPC" in
-    	libsupc++.a*)
+	libsupc++.a*)
 	    # Library not found, so this is and older GCC...
 	    AC_MSG_RESULT(no)
 	    ;;
 	*)
-            # This is gcc 3.x, and it knows of libsupc++, so we need it
-            LIBS="$LIBS -lsupc++"
-            LD="$CC"
-            AC_MSG_RESULT(yes)
+	    # This is gcc 3.x, and it knows of libsupc++, so we need it
+	    LIBS="$LIBS -lsupc++"
+	    LD="$CC"
+	    AC_MSG_RESULT(yes)
 	    ;;
     esac
 
@@ -1079,7 +1085,7 @@ if test -n "$GCC" -a "$CFG_CYGWIN" != "yes"; then
     AC_MSG_CHECKING(if GCC supports -fno-exceptions)
     OLDCFLAGS="$CFLAGS"
     CFLAGS="$CFLAGS -fno-exceptions"
-    AC_TRY_COMPILE(,,            
+    AC_TRY_COMPILE(,,		 
 	CPPFLAGS="$CPPFLAGS -fno-exceptions"
 	AC_MSG_RESULT(yes),
 	AC_MSG_RESULT(no))
@@ -1089,7 +1095,7 @@ if test -n "$GCC" -a "$CFG_CYGWIN" != "yes"; then
     AC_MSG_CHECKING(if GCC supports -fno-rtti)
     OLDCFLAGS="$CFLAGS"
     CFLAGS="$CFLAGS -fno-rtti"
-    AC_TRY_COMPILE(,,            
+    AC_TRY_COMPILE(,,		 
 	CPPFLAGS="$CPPFLAGS -fno-rtti"
 	AC_MSG_RESULT(yes),
 	AC_MSG_RESULT(no))
@@ -1425,6 +1431,7 @@ cygwin)
     PTHREAD_LFLAGS=""
     DFILES="\
 	src/win32/Makefile \
+	src/win32/Makefile.cygwin \
 	src/win32/winapcupsd.nsi \
 	platforms/cygwin/Makefile \
 	platforms/cygwin/apcupsd \
@@ -1752,6 +1759,7 @@ GENERATE_FILES="\
     src/Makefile \
     src/lib/Makefile \
     src/drivers/Makefile \
+    src/win32/Makefile.mingw \
     platforms/Makefile \
     platforms/apccontrol \
     platforms/etc/changeme \

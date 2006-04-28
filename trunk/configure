@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS ABSSRCDIR topdir VERSION DATE TRUEPRG FALSEPRG build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP CXX CXXFLAGS ac_ct_CXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA AWK HAVE_GCC_TRUE HAVE_GCC_FALSE DEBUG DLIB DINCLUDE PTHREAD_CFLAGS PTHREAD_LFLAGS WIN32 WINLIBS APCACCESS SMTP APCTEST SHUTDOWN APCUPSD_MAIL WALL SCRIPTSHELL MAKE MAKEDEPEND RANLIB LIBTOOL ETAGS CTAGS RM CP ECHO LN SED AR MV X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS HAVE_SUN_OS_TRUE HAVE_SUN_OS_FALSE HAVE_OSF1_OS_TRUE HAVE_OSF1_OS_FALSE HAVE_AIX_OS_TRUE HAVE_AIX_OS_FALSE HAVE_HPUX_OS_TRUE HAVE_HPUX_OS_FALSE HAVE_LINUX_OS_TRUE HAVE_LINUX_OS_FALSE HAVE_FREEBSD_OS_TRUE HAVE_FREEBSD_OS_FALSE HAVE_NETBSD_OS_TRUE HAVE_NETBSD_OS_FALSE HAVE_OPENBSD_OS_TRUE HAVE_OPENBSD_OS_FALSE HAVE_BSDI_OS_TRUE HAVE_BSDI_OS_FALSE HAVE_SGI_OS_TRUE HAVE_SGI_OS_FALSE HAVE_DARWIN_OS_TRUE HAVE_DARWIN_OS_FALSE GDHEAD INSTALL_DISTDIR UNINSTALL_DISTDIR APCSMART_DRIVER DUMB_DRIVER LIBUSBHID LIBUSBHIDINC LIBUSBHIDOBJS usbcfg LIBUSBH USB_DRIVER USB_TYPE LIBUSB NET_DRIVER SNMP_DRIVER TEST_DRIVER NISIP PKG_CONFIG ac_pt_PKG_CONFIG GAPCMON_CFLAGS GAPCMON_LIBS GAPCMON POMAKE INTLSUB INTLMAKE INTLTARGET POWERFLUTE POWERLIBS LD CGI GDINCLUDE LIBGD LIBGDOBJ CGI_IMGFMT CGIBIN PACKAGE MSGFMT SET_MAKE ac_ct_RANLIB ALLOCA USE_NLS GMSGFMT XGETTEXT GENCAT USE_INCLUDED_LIBINTL CATALOGS CATOBJEXT DATADIRNAME GMOFILES INSTOBJEXT INTLDEPS INTLLIBS INTLINCLUDE INTLOBJS POFILES POSUB INCLUDE_LOCALE_H GT_NO GT_YES l MKINSTALLDIRS EXTRADEFS LIBEXTRAOBJ EXTRAOBJ DISTNAME DISTVER SERIALDEV PIDDIR LOGDIR nologdir PWRFAILDIR LOCKDIR NETPORT NISPORT UPSTYPE UPSCABLE HOST WCFLAGS WLDFLAGS LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS ABSSRCDIR topdir TOP_DIR VERSION DATE TRUEPRG FALSEPRG build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP CXX CXXFLAGS ac_ct_CXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA AWK HAVE_GCC_TRUE HAVE_GCC_FALSE DEBUG DLIB DINCLUDE PTHREAD_CFLAGS PTHREAD_LFLAGS WIN32 WINLIBS APCACCESS SMTP APCTEST SHUTDOWN APCUPSD_MAIL WALL SCRIPTSHELL MAKE MAKEDEPEND RANLIB LIBTOOL ETAGS CTAGS RM CP ECHO LN SED AR MV X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS HAVE_SUN_OS_TRUE HAVE_SUN_OS_FALSE HAVE_OSF1_OS_TRUE HAVE_OSF1_OS_FALSE HAVE_AIX_OS_TRUE HAVE_AIX_OS_FALSE HAVE_HPUX_OS_TRUE HAVE_HPUX_OS_FALSE HAVE_LINUX_OS_TRUE HAVE_LINUX_OS_FALSE HAVE_FREEBSD_OS_TRUE HAVE_FREEBSD_OS_FALSE HAVE_NETBSD_OS_TRUE HAVE_NETBSD_OS_FALSE HAVE_OPENBSD_OS_TRUE HAVE_OPENBSD_OS_FALSE HAVE_BSDI_OS_TRUE HAVE_BSDI_OS_FALSE HAVE_SGI_OS_TRUE HAVE_SGI_OS_FALSE HAVE_DARWIN_OS_TRUE HAVE_DARWIN_OS_FALSE GDHEAD INSTALL_DISTDIR UNINSTALL_DISTDIR APCSMART_DRIVER DUMB_DRIVER LIBUSBHID LIBUSBHIDINC LIBUSBHIDOBJS usbcfg LIBUSBH USB_DRIVER USB_TYPE LIBUSB NET_DRIVER SNMP_DRIVER TEST_DRIVER NISIP PKG_CONFIG ac_pt_PKG_CONFIG GAPCMON_CFLAGS GAPCMON_LIBS GAPCMON POMAKE INTLSUB INTLMAKE INTLTARGET POWERFLUTE POWERLIBS LD CGI GDINCLUDE LIBGD LIBGDOBJ CGI_IMGFMT CGIBIN PACKAGE MSGFMT SET_MAKE ac_ct_RANLIB ALLOCA USE_NLS GMSGFMT XGETTEXT GENCAT USE_INCLUDED_LIBINTL CATALOGS CATOBJEXT DATADIRNAME GMOFILES INSTOBJEXT INTLDEPS INTLLIBS INTLINCLUDE INTLOBJS POFILES POSUB INCLUDE_LOCALE_H GT_NO GT_YES l MKINSTALLDIRS EXTRADEFS LIBEXTRAOBJ EXTRAOBJ DISTNAME DISTVER SERIALDEV PIDDIR LOGDIR nologdir PWRFAILDIR LOCKDIR NETPORT NISPORT UPSTYPE UPSCABLE HOST WCFLAGS WLDFLAGS LIBOBJS LTLIBOBJS'
 ac_subst_files='VARIABLES TARGETS'
 
 # Initialize some variables set by options.
@@ -1411,6 +1411,11 @@ ac_configure="$SHELL $ac_aux_dir/configure" # This should be Cygnus configure.
 
 ABSSRCDIR=`pwd`
 
+
+
+cd ..
+TOP_DIR=`pwd`
+cd ${topdir}
 
 
 VERSION=`sed -n -e 's/^.*VERSION.*"\(.*\)"$/\1/p' ${srcdir}/include/version.h`
@@ -11638,7 +11643,7 @@ if test "${enable_usb+set}" = set; then
   enableval="$enable_usb"
    if test "$enableval" = "yes" ; then
 	if test $GENERICUSB = "no" -a \
-	        $HAVE_UNAME=yes -a x`uname -s` = xLinux ; then
+		$HAVE_UNAME=yes -a x`uname -s` = xLinux ; then
 	   USB_TYPE="linux"
 	   echo "$as_me:$LINENO: result: Using Linux USB driver." >&5
 echo "${ECHO_T}Using Linux USB driver." >&6
@@ -11657,10 +11662,10 @@ echo "${ECHO_T}Using Linux USB driver." >&6
 echo "${ECHO_T}Using BSD USB driver." >&6
 	else
 	   if test "$CFG_CYGWIN" = "yes"; then
-	      	                    LIBUSB=-L/cygdrive/C/Program\\\ Files/LibUSB-Win32/lib/gcc\ -lusb
-              LIBUSBH=/cygdrive/C/Program\ Files/LibUSB-Win32/include/usb.h
-           else
-  	      # Extract the first word of "libusb-config", so it can be a program name with args.
+	      	      	      LIBUSB=-L/cygdrive/C/Program\\\ Files/LibUSB-Win32/lib/gcc\ -lusb
+	      LIBUSBH=/cygdrive/C/Program\ Files/LibUSB-Win32/include/usb.h
+	   else
+	      # Extract the first word of "libusb-config", so it can be a program name with args.
 set dummy libusb-config; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
@@ -11700,20 +11705,20 @@ echo "${ECHO_T}no" >&6
 fi
 
 	      if test x$usbcfg = x ; then
-	         { { echo "$as_me:$LINENO: error: Cannot find libusb-config" >&5
+		 { { echo "$as_me:$LINENO: error: Cannot find libusb-config" >&5
 echo "$as_me: error: Cannot find libusb-config" >&2;}
    { (exit 1); exit 1; }; }
 	      fi
 
-              LIBUSB=`$usbcfg --libs`
-              LIBUSBH=`$usbcfg --prefix`/include/usb.h
-           fi
+	      LIBUSB=`$usbcfg --libs`
+	      LIBUSBH=`$usbcfg --prefix`/include/usb.h
+	   fi
 
 
 
-           LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
-           LIBUSBHID=libusbhid
-           LIBUSBHIDOBJS="\$(topdir)/src/libusbhid/*.o"
+	   LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
+	   LIBUSBHID=libusbhid
+	   LIBUSBHIDOBJS="\$(topdir)/src/libusbhid/*.o"
 
 
 
@@ -12646,7 +12651,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   (exit $ac_status); }; }; then
   echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
-            GAPCMON_CFLAGS="${GAPCMON_CFLAGS} -DGNOMEVFS_REQUIRES_CANCELLATION"
+	    GAPCMON_CFLAGS="${GAPCMON_CFLAGS} -DGNOMEVFS_REQUIRES_CANCELLATION"
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
@@ -12672,11 +12677,11 @@ cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
 #include <libgnomevfs/gnome-vfs.h>
-                          #ifdef GNOMEVFS_REQUIRES_CANCELLATION
-                          #define GNOMEVFS_CANCELLATION ,NULL
-                          #else
-                          #define GNOMEVFS_CANCELLATION
-                          #endif
+			  #ifdef GNOMEVFS_REQUIRES_CANCELLATION
+			  #define GNOMEVFS_CANCELLATION ,NULL
+			  #else
+			  #define GNOMEVFS_CANCELLATION
+			  #endif
 int
 main ()
 {
@@ -12709,7 +12714,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   (exit $ac_status); }; }; then
   echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
-            GAPCMON_CFLAGS="${GAPCMON_CFLAGS} -DHAVE_GNOMEVFS_SOCKET_SET_TIMEOUT"
+	    GAPCMON_CFLAGS="${GAPCMON_CFLAGS} -DHAVE_GNOMEVFS_SOCKET_SET_TIMEOUT"
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
@@ -12744,16 +12749,16 @@ echo $ECHO_N "checking if libsupc++ is required... $ECHO_C" >&6
 
     SUPC="`$CXX -print-file-name=libsupc++.a 2>/dev/null`"
     case "$SUPC" in
-    	libsupc++.a*)
+	libsupc++.a*)
 	    # Library not found, so this is and older GCC...
 	    echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
 	    ;;
 	*)
-            # This is gcc 3.x, and it knows of libsupc++, so we need it
-            LIBS="$LIBS -lsupc++"
-            LD="$CC"
-            echo "$as_me:$LINENO: result: yes" >&5
+	    # This is gcc 3.x, and it knows of libsupc++, so we need it
+	    LIBS="$LIBS -lsupc++"
+	    LD="$CC"
+	    echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 	    ;;
     esac
@@ -16533,6 +16538,7 @@ cygwin)
     PTHREAD_LFLAGS=""
     DFILES="\
 	src/win32/Makefile \
+	src/win32/Makefile.cygwin \
 	src/win32/winapcupsd.nsi \
 	platforms/cygwin/Makefile \
 	platforms/cygwin/apcupsd \
@@ -16900,6 +16906,7 @@ GENERATE_FILES="\
     src/Makefile \
     src/lib/Makefile \
     src/drivers/Makefile \
+    src/win32/Makefile.mingw \
     platforms/Makefile \
     platforms/apccontrol \
     platforms/etc/changeme \
@@ -17629,6 +17636,7 @@ s,@ECHO_T@,$ECHO_T,;t t
 s,@LIBS@,$LIBS,;t t
 s,@ABSSRCDIR@,$ABSSRCDIR,;t t
 s,@topdir@,$topdir,;t t
+s,@TOP_DIR@,$TOP_DIR,;t t
 s,@VERSION@,$VERSION,;t t
 s,@DATE@,$DATE,;t t
 s,@TRUEPRG@,$TRUEPRG,;t t
