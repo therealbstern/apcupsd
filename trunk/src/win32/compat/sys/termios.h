@@ -65,8 +65,6 @@ POSIX commands */
 #define TIOCPKT_NOSTOP          16
 #define TIOCPKT_DOSTOP          32
 
-#define FIONBIO 0x8004667e /* To be compatible with socket version */
-
 #define CTRL(ch)        ((ch)&0x1F)
 
 #define CNUL    0

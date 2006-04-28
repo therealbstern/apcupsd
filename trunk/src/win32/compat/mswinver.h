@@ -3,24 +3,24 @@
 
 #include "winbase.h"
 
-#define MS_MAJOR_WINDOWS_3      3
-#define MS_MAJOR_WINDOWS_95     4
-#define MS_MAJOR_WINDOWS_98     4
-#define MS_MAJOR_WINDOWS_ME     4
-#define MS_MAJOR_WINDOWS_NT4    4
-#define MS_MAJOR_WINDOWS_2K     5
-#define MS_MAJOR_WINDOWS_XP     5
-#define MS_MAJOR_WINDOWS_S2003  5
+#define MS_MAJOR_WINDOWS_3	3
+#define MS_MAJOR_WINDOWS_95	4
+#define MS_MAJOR_WINDOWS_98	4
+#define MS_MAJOR_WINDOWS_ME	4
+#define MS_MAJOR_WINDOWS_NT4	4
+#define MS_MAJOR_WINDOWS_2K	5
+#define MS_MAJOR_WINDOWS_XP	5
+#define MS_MAJOR_WINDOWS_S2003	5
 
 
-#define MS_MINOR_WINDOWS_3      51
-#define MS_MINOR_WINDOWS_95     0
-#define MS_MINOR_WINDOWS_98     10
-#define MS_MINOR_WINDOWS_ME     90
-#define MS_MINOR_WINDOWS_NT4    0
-#define MS_MINOR_WINDOWS_2K     0
-#define MS_MINOR_WINDOWS_XP     1
-#define MS_MINOR_WINDOWS_S2003  2
+#define MS_MINOR_WINDOWS_3	51
+#define MS_MINOR_WINDOWS_95	0
+#define MS_MINOR_WINDOWS_98	10
+#define MS_MINOR_WINDOWS_ME	90
+#define MS_MINOR_WINDOWS_NT4	0
+#define MS_MINOR_WINDOWS_2K	0
+#define MS_MINOR_WINDOWS_XP	1
+#define MS_MINOR_WINDOWS_S2003	2
 
 
 #define _mkversion(p, m, r) (((p)<<24)|((m)<<8)|(r))
