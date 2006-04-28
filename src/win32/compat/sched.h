@@ -171,3 +171,4 @@ PTW32_DLLPORT int sched_getscheduler (pid_t pid);
 #undef PTW32_LEVEL_MAX
 
 #endif                          /* !_SCHED_H */
+

@@ -27,16 +27,12 @@
  * Last Modified By: Thorsten Engel
  * Last Modified On: Fri Apr 22 19:30:00 2004
  * Update Count    : 218
- * $Id: compat.h,v 1.3 2006-03-12 07:54:47 kerns Exp $
+ * $Id: compat.h,v 1.4 2006-04-28 16:34:53 kerns Exp $
  */
 
 
 #ifndef __COMPAT_H_
 #define __COMPAT_H_
-
-#ifndef HAVE_WIN32
-#define HAVE_WIN32 1
-#endif
 
 #if (defined _MSC_VER) && (_MSC_VER >= 1400) // VC8+
 #pragma warning(disable : 4996) // Either disable all deprecation warnings,
@@ -59,7 +55,6 @@
 #include <wincon.h>
 #include <winbase.h>
 #include <stdio.h>
-#include <stdlib.h>
 #include <stdarg.h>
 #include <conio.h>
 #include <process.h>
@@ -73,13 +68,8 @@
 #include <ctype.h>
 #include <fcntl.h>
 #include <io.h>
-#include <utime.h>
-#include <sys/time.h>
-
-#if defined HAVE_MINGW
-#include <stdint.h>
-#include <sys/stat.h>
-#endif
+#include <lmcons.h>
+#include <dirent.h>
 
 #include "getopt.h"
 
@@ -96,13 +86,16 @@ typedef UINT64 u_int64_t;
 typedef UINT64 uint64_t;
 typedef INT64 int64_t;
 typedef UINT32 uint32_t;
-typedef long int32_t;
 typedef INT64 intmax_t;
 typedef unsigned char uint8_t;
-typedef float float32_t;
 typedef unsigned short uint16_t;
 typedef signed short int16_t;
 typedef signed char int8_t;
+#ifndef HAVE_MINGW
+typedef long int32_t;
+typedef float float32_t;
+typedef double float64_t;
+#endif
 
 #ifndef HAVE_VC8
 typedef long time_t;
@@ -127,7 +120,6 @@ typedef int BOOL;
 #endif
 #endif
 
-typedef double float64_t;
 typedef UINT32 u_int32_t;
 typedef unsigned char u_int8_t;
 typedef unsigned short u_int16_t;
@@ -152,7 +144,8 @@ typedef UINT32 mode_t;
 /* #ifndef _WX_DEFS_H_  ssize_t is defined in wx/defs.h */
 typedef INT64  ssize_t;
 /* #endif */
-#endif //HAVE_MINGW
+
+#endif /* HAVE_MINGW */
 
 struct dirent {
     uint64_t    d_ino;
@@ -160,8 +153,8 @@ struct dirent {
     uint16_t    d_reclen;
     char        d_name[256];
 };
-
 typedef void DIR;
+
 
 #ifndef __cplusplus
 #ifndef true
@@ -177,12 +170,14 @@ struct timezone {
 };
 
 int strcasecmp(const char*, const char *);
-int strncasecmp(const char*, const char *, int);
 int gettimeofday(struct timeval *, struct timezone *);
 
+#ifndef ETIMEDOUT
 #define ETIMEDOUT 55
+#endif
 
 #ifndef HAVE_MINGW
+int strncasecmp(const char*, const char *, int);
 
 #ifndef _STAT_DEFINED
 struct stat
@@ -248,7 +243,6 @@ struct stat
 #define O_RDWR   _O_RDWR
 #define O_CREAT  _O_CREAT
 #define O_TRUNC  _O_TRUNC
-#define O_EXCL   _O_EXCL
 
 #define isascii __isascii
 #define toascii __toascii
@@ -257,18 +251,22 @@ struct stat
 #endif
 
 #ifndef HAVE_VC8
+#ifndef HAVE_MINGW
 int umask(int);
 off_t lseek(int, off_t, int);
 int dup2(int, int);
 int close(int fd);
-#ifndef HAVE_WXCONSOLE
+#endif
+#if !defined(HAVE_WXCONSOLE) && !defined(HAVE_MINGW)
 ssize_t read(int fd, void *, ssize_t nbytes);
 ssize_t write(int fd, const void *, ssize_t nbytes);
 #endif
 #endif
 int lchown(const char *, uid_t uid, gid_t gid);
 int chown(const char *, uid_t uid, gid_t gid);
+#ifndef HAVE_MINGW
 int chmod(const char *, mode_t mode);
+#endif
 int inet_aton(const char *cp, struct in_addr *inp);
 int kill(int pid, int signo);
 int pipe(int []);
@@ -278,7 +276,6 @@ int waitpid(int, int *, int);
 #ifndef HAVE_MINGW
 int utime(const char *filename, struct utimbuf *buf);
 int open(const char *, int, int);
-int open(const char *, int);
 #define vsnprintf __vsnprintf
 int __vsnprintf(char *s, size_t count, const char *format, va_list args);
 
@@ -303,10 +300,13 @@ int __sprintf(char *str, const char *fmt, ...);
 
 #define HAVE_OLD_SOCKOPT
 
+struct timespec;
 int readdir(unsigned int fd, struct dirent *dirp, unsigned int count);
 int nanosleep(const struct timespec*, struct timespec *);
+#ifdef xxx
 struct tm *localtime_r(const time_t *, struct tm *);
 struct tm *gmtime_r(const time_t *, struct tm *);
+#endif
 long int random(void);
 void srandom(unsigned int seed);
 int lstat(const char *, struct stat *);
@@ -348,11 +348,16 @@ struct sigaction {
 #define mkdir(p, m) win32_mkdir(p)
 #define unlink win32_unlink
 #define chdir win32_chdir
+int syslog(int, const char *, const char *);
+#ifdef LOG_DAEMON
+#define LOG_DAEMON 0
+#endif
+#ifndef LOG_ERR
+#define LOG_ERR 0
+#endif
 
 #ifndef HAVE_MINGW
 int stat(const char *, struct stat *);
-int ftruncate(int, off_t);
-int _fstat(int, struct stat *);
 #ifdef __cplusplus
 #define access _access
 extern "C" _CRTIMP int __cdecl _access(const char *, int);
@@ -362,7 +367,6 @@ extern "C" void *  __cdecl _alloca(size_t);
 #endif //HAVE_MINGW
 
 #define getpid _getpid
-#define fstat  _fstat
 
 #define getppid() 0
 #define gethostid() 0
@@ -389,27 +393,6 @@ void closelog();
 
 #ifndef INVALID_FILE_ATTRIBUTES
 #define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
-#endif
-
-/* Kludges to make compat.cpp work in apcupsd */
-#ifdef _APCUPSD
-#define POOLMEM char
-#define get_pool_memory(x) (char *)malloc(1000)
-#define free_pool_memory(x) free((char *)x)
-#define check_pool_memory_size(x, s) x
-#define ASSERT(x)
-#define bstrncat astrncat
-#define bstrncpy astrncpy
-#define bmicrosleep amicrosleep
-#define b_errno_exit (1<<28)
-#define INT32_MAX       (2147483647)
-/* ***FIXME*** */
-#define start_child_timer(x, y) (btimer_t *)1
-#define stop_child_timer(x)
-#endif
-
-#ifndef O_APPEND
-#define O_APPEND _O_APPEND
 #endif
 
 #endif /* __COMPAT_H_ */
