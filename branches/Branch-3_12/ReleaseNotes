@@ -2,6 +2,12 @@
              Release Notes for Apcupsd 3.12.x
 
 
+Release 3.12.3 26Apr06
+
+Bug fix release. Eliminates need for libstdc++ when using gcc-3 or
+higher. Also some fixes to the BSD USB driver and build fixes for
+various rare cases. See ChangeLog for full details.
+
 Release 3.12.2 18Jan06
 
 Bug fix release for Win32 (winapcupsd). Fixes event processing on all
