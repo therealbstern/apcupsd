@@ -1,0 +1,153 @@
+.TH HTML2LATEX 1 "November 1998"
+.SH NAME
+html2latex \- convert HTML files to LaTeX
+.SH DESCRIPTION
+The Perl 5 script html2latex converts an HTML file (which may contain WebEQ
+applets) into a LaTeX file.  Any WebEQ applet tags that contain WebTeX
+commands will be replaced with the equivalent LaTeX commands. 
+
+html2latex can also put images from the HTML file into the LaTeX file if you
+have an image conversion program such as ImageMagick's convert. 
+.SH USAGE
+html2latex [options] [infile] [outfile] 
+
+The HTML input file "infile" and the LaTeX output file "outfile" are dealt
+with in the following way: 
+
+infile is the name of the HTML file to parse (or "-" for  standard input)  
+If infile is missing, it defaults to "-".  
+
+outfile is the name of the file to write (or "-" for standard out).  
+If outfile is missing, it defaults to the input file name with  its extension
+replaced by ".tex" (or possibly some other string  specified in the .tag
+file), or to "-" if infile is "-". 
+.SH OPTIONS
+The options include one or more of:
+.TP
+.B \-images  
+Process images into PostScript form 
+.TP
+.B \-noimages  
+Don't process images (the default) 
+.TP
+.B \-ps  
+Same as -images 
+.TP
+.B \-nops  
+Same as -noimages 
+.TP
+.B \-home dirname 
+Specifies the directory where the image files reside.  (The default is the
+current directory.) 
+.TP
+.B \-texcomments  
+Reads in special comments which allow  the addition of LaTeX commands.  There
+are two things that are done when this option is used: 
+Extra LaTeX commands may be added by placing them in an HTML comment that
+looks like this:
+.br 
+<!--\\TeX ...your LaTeX commands here...-->
+.br
+A block of HTML commands which you do not want to be placed in the LaTeX
+output file can be removed by surrounding them with the pair of comments
+.br 
+<!--SUSPENDinTeX-->
+.br
+.pp
+  ... HTML code here will be ignored ...
+.pp
+.br
+<!--RESUMEinTeX-->
+.TP
+.B \-teximages  
+If the ALT parameter of images contains LaTeX code,  the image is replaced
+with the LaTeX. (The other images are still processed if you  use -images.)
+The first four characters of the ALT parameter should be \\TeX followed by a
+space.  The remaining characters in the parameter will be placed verbatim in
+the output LaTeX file. An example is 
+.br
+.pp
+<IMG SRC="array.gif"
+.br
+   ALT="\\TeX $begin{array}{cc}a&b\\\\c&d\\end{array}$">
+.pp
+.br
+This option also automatically sets the -texcomments flag. 
+.TP
+.B \-noinitstring 
+if you will be including the LaTeX output file  in a larger document, you can
+use -noinitstring  to supress the initial and final lines  (for example,
+\\begin{document} ) 
+.TP
+.B \-f formatfile 
+Specifies an additional .tag file to load.  This allows the user to expand
+html2latex to convert HTML tags that are not currently recognized.
+ 
+.SH ENVIRONMENT VARIABLES
+The following environment variables control the behavior of html2latex: 
+.TP
+.B HTML2FORMAT
+Gives the location of the .tag files. (Default is the directory containing
+html2latex.) 
+.TP
+.B HTML2LATEX 
+Points to a user-customized .tag file that will be processed after
+html2latex.tag.  This allows users to modify the rules for converting HTML
+tags to LaTeX. 
+.TP
+.B HTML2TEXT_PSDIR 
+Points to the name of the directory where the .eps files will be stored.
+(Default is the current directory.) 
+
+.SH EXAMPLES
+To change the HTML file input.html to the LaTeX file output.tex, use the
+command
+.pp 
+        html2latex input.html output.tex
+.pp
+
+If input.html contains images that you would like inserted in the output, add
+the \-images flag:
+.pp 
+        html2latex -images input.html output.tex
+.pp
+.br
+(This converts the GIF and JPEG images into PostScript files that are called
+by LaTeX when it processes output.tex.) 
+.P
+Convert the LaTeX file output.tex to DVI with the command:
+.pp 
+        latex output 
+.P
+.SH IMAGE CONVERSION
+By default html2latex uses "convert", part of the ImageMagick package, to
+convert any images linked by the HTML page into the EPS format which may by
+included in LaTeX files.  If you change the program, you will need to give
+the correct command format in the file html2latex-local.tag.
+.SH KNOWN BUGS AND DEFICIENCIES
+It's possible that the output file created by html2latex will cause LaTeX
+errors when you try to run latex. Some of the more common problems that
+cause this are listed here: 
+
+Complicated HTML tables and WebTeX arrays may not be converted correctly. In
+particular, nested arrays are likely to need adjustment once they are
+converted to LaTeX. 
+
+There may be many other instances where you need to tweak the LaTeX output to
+make it acceptable for the LaTeX compiler.  Sometimes html2latex will put a
+line break (preceded by a percent sign) in the middle of a LaTeX command, if
+there is no obvious place to break the line.  If too many of these line breaks
+occur, you may reduce their likelihood by increasing the value of the variable
+$htmlWidth in the file html2latex-local.tag. 
+
+Frames and background images are not understood.  
+
+This program does NOT work across the network.  The images must be on the
+system you are using to run html2latex.
+.SH AUTHORS
+The original version of html2latex was written by Davide Cervone at the
+University of Minnesota's Geometry Center.  This version was developed by
+Jeffrey Schaefer.
+  
+
+  
