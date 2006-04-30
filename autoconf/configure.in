@@ -1395,9 +1395,6 @@ SERIALDEV=/dev/ttyS0
 # define the default NIS (Network Information Server -- CGI) port
 NISPORT=3551
 
-#define the default master/slave networking port
-NETPORT=6666
-
 #
 # Now we set appropriate distribution specific
 #  variables and defaults
@@ -1441,7 +1438,6 @@ cygwin)
 debian)
     DISTVER=`cat /etc/debian_version`
     NISPORT=6543
-    NETPORT=6544
     DFILES="\
 	platforms/debian/Makefile \
 	platforms/debian/apcupsd \
@@ -1679,15 +1675,6 @@ AC_ARG_WITH(nis-port,
     ]
 )
 
-# now allow user to specify NETPORT
-AC_ARG_WITH(net-port,
-    [AC_HELP_STRING([--with-net-port=PORT], [Specify Master/slave port (default 6666 except Debian)])],
-    [
-	NETPORT="$withval";
-    ]
-)
-
-
 # now allow user to specify UPSTYPE
 AC_ARG_WITH(upstype,
     [AC_HELP_STRING([--with-upstype=TYPE], [Specify the UPS type])],
@@ -1717,7 +1704,6 @@ AC_SUBST(nologdir)
 AC_DEFINE_UNQUOTED(PWRFAILDIR, "$PWRFAILDIR")
 AC_SUBST(PWRFAILDIR)
 AC_SUBST(LOCKDIR)
-AC_SUBST(NETPORT)
 AC_SUBST(NISPORT)
 AC_DEFINE_UNQUOTED(NISPORT, $NISPORT)
 AC_SUBST(UPSTYPE)
@@ -1901,7 +1887,6 @@ Configuration on `date`:
   Shutdown Program:	      ${SHUTDOWN}
   Port/Device:		      ${SERIALDEV}
   Network Info Port (CGI):    ${NISPORT}
-  Master/slave Port:	      ${NETPORT}
   UPSTYPE		      ${UPSTYPE}
   UPSCABLE		      ${UPSCABLE}
 
