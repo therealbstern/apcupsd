@@ -576,7 +576,7 @@ void init_ups_struct(UPSINFO *ups)
    ups->percent = 10;
    ups->runtime = 5;
    ups->netstats = TRUE;
-   ups->statusport = 7000;
+   ups->statusport = NISPORT;
    ups->upsmodel[0] = 0;           /* end of string */
 
 
