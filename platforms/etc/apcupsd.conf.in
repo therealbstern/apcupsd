@@ -174,50 +174,24 @@ EVENTSFILEMAX 10
 
 #
 # ========== Configuration statements used if sharing =============
-#            a UPS and controlling it via the network              
-
-# The configuration statements below are used if you want to share one 
-# UPS to power multiple machines and have them communicate by the network.
-# Most of these items are for Master/Slave mode only, however NETTIME is
-# also used for Client/Server NIS networking with the net driver.
+#            a UPS with more than one machine
 
 # NETTIME <int>
-#   Interval (in seconds) at which the slave or client polls the master
-#   or server. This is applicable to BOTH master/slave and client/server
-#   (NIS) networking.
-#NETTIME 100
+#   Interval (in seconds) at which the NIS client polls the server.
+#NETTIME 60
 
 #
-# Remaining items are for Master/Slave networking ONLY
+# Remaining items are for ShareUPS (APC expansion card) ONLY
 #
 
-# UPSCLASS [ standalone | shareslave | sharemaster | netslave | netmaster ]
-#   Normally standalone unless you share a UPS with multiple machines.
-#   
+# UPSCLASS [ standalone | shareslave | sharemaster ]
+#   Normally standalone unless you share an UPS using an APC ShareUPS
+#   card.
 UPSCLASS standalone
 
-# UPSMODE [ disable | share | net | sharenet ]
-#   Unless you want to share the UPS (power multiple machines),
-#   this should be disable.
+# UPSMODE [ disable | share ]
+#   Normally disable unless you share an UPS using an APC ShareUPS card.
 UPSMODE disable
-
-# NETPORT <int>
-#   Port on which master/slave networking communicates.
-#NETPORT @NETPORT@
-
-# MASTER <machine-name>
-#   IP address of the master. Only applicable on slaves.
-#MASTER
-
-# SLAVE <machine-name>
-#   IP address(es) of the slave(s). Only applicable on master.
-#SLAVE slave1
-#SLAVE slave2
-
-# USERMAGIC <string>
-#   Magic string use by slaves to identify themselves. Only applicable
-#   on slaves.
-#USERMAGIC
 
 #
 # ===== Configuration statements to control apcupsd system logging ========
