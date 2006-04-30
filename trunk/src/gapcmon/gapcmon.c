@@ -3524,7 +3524,7 @@ static GtkWidget *gapc_main_interface_create(PGAPC_CONFIG pcfg)
    pcfg->b_visible = TRUE;
    pcfg->tooltips = gtk_tooltips_new();
    g_object_ref (pcfg->tooltips);
-   g_object_ref_sink (pcfg->tooltips);   
+   gtk_object_sink (GTK_OBJECT(pcfg->tooltips));   
    pcfg->b_run = TRUE;
    pcfg->cb_last_monitor_deleted = -1;
 
@@ -4189,7 +4189,7 @@ static GtkWidget *gapc_monitor_interface_create(PGAPC_CONFIG pcfg, gint i_monito
    pixbuf = pm->my_icons[GAPC_ICON_DEFAULT];
    pm->tooltips = gtk_tooltips_new();
    g_object_ref (pm->tooltips);
-   g_object_ref_sink (pm->tooltips);   
+   gtk_object_sink (GTK_OBJECT(pm->tooltips));   
    pm->gm_update = g_mutex_new();
    pm->client = pcfg->client;
    pm->i_old_icon_index = GAPC_ICON_DEFAULT;
