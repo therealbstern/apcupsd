@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright (C) 1999-2004 Kern Sibbald
+ * Copyright (C) 1999-2006 Kern Sibbald
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of version 2 of the GNU General
@@ -46,7 +46,7 @@ int trim_eventfile(UPSINFO *ups)
       return 0;
 
    maxb = ups->eventfilemax * 1024;
-   if (fstat(ups->event_fd, &statbuf) < 0)
+   if (stat(ups->eventfile, &statbuf) < 0)
       return -1;
    if (statbuf.st_size <= maxb)
       return 0;                    /* file is not yet too large - nothing to do */
@@ -172,7 +172,7 @@ goodout:
 
 #endif                             /* HAVE_NISSERVER */
 
-#ifdef HAVE_CYGWIN
+#if   defined(HAVE_CYGWIN) || defined(HAVE_MINGW)
 
 #include <windows.h>
 

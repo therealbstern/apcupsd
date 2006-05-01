@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright (C) 2000-2004 Kern Sibbald
+ * Copyright (C) 2000-2006 Kern Sibbald
  * Copyright (C) 1998-99 Brian Schau <bsc@fleggaard.dk>
  * Copyright (C) 1998-99-2000 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
  * Copyright (C) 1996-99 Andre M. Hedrick <andre@suse.com>
@@ -37,7 +37,7 @@
  * If so, and the process is no longer running,
  * blow away the lockfile.  
  */
-#ifndef HAVE_CYGWIN
+#if  !defined(HAVE_CYGWIN) && !defined(HAVE_MINGW)
 static int check_stale_lockfile(UPSINFO *ups)
 {
    char pidbuffer[12];
@@ -152,7 +152,7 @@ static int check_stale_lockfile(UPSINFO *ups)
 int kill_ups_power = FALSE;
 int create_lockfile(UPSINFO *ups)
 {
-#ifndef HAVE_CYGWIN
+#if   !defined(HAVE_CYGWIN) && !defined(HAVE_MINGW)
    char pidbuffer[12];
    int error;
 
@@ -229,7 +229,7 @@ int create_lockfile(UPSINFO *ups)
 
 void delete_lockfile(UPSINFO *ups)
 {
-#ifndef HAVE_CYGWIN
+#if  !defined(HAVE_CYGWIN) && !defined(HAVE_MINGW)
    if (ups->lockpath[0] != '\0') {
       /*
        * If lockfile is ours, close it and delete it,

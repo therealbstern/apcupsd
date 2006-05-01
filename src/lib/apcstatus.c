@@ -483,7 +483,7 @@ void stat_print(UPSINFO *ups, char *fmt, ...)
    va_end(arg_ptr);
 }
 
-#ifdef HAVE_CYGWIN
+#if   defined(HAVE_CYGWIN) || defined(HAVE_MINGW)
 
 #include <windows.h>
 

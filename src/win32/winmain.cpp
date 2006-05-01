@@ -359,10 +359,10 @@ int ApcupsdAppMain(int service)
    if (service) {
       /* Zap any left over no login file and powerfail file */
       if (unlink(NOLOGIN) != 0 && errno != ENOENT) {
-         syslog(0, "Could not unlink %s. ERR=%s\n", NOLOGIN, strerror(errno));
+         syslog(0, "Could not unlink " NOLOGIN ": ERR=%s\n", strerror(errno));
       }
       if (unlink(PWRFAIL) != 0 && errno != ENOENT) {
-         syslog(0, "Could not unlink %s. ERR=%s\n", PWRFAIL, strerror(errno));
+         syslog(0, "Could not unlink " PWRFAIL ": ERR=%s\n", strerror(errno));
       }
    }
    // Call the "real" apcupsd

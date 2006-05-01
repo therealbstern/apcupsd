@@ -27,7 +27,7 @@
  * Last Modified By: Thorsten Engel
  * Last Modified On: Fri Apr 22 19:30:00 2004
  * Update Count    : 218
- * $Id: compat.h,v 1.5 2006-05-01 11:36:01 kerns Exp $
+ * $Id: compat.h,v 1.6 2006-05-01 13:14:39 kerns Exp $
  */
 
 
@@ -382,6 +382,7 @@ int WSA_Init(void);
 
 #ifdef HAVE_MINGW
 void closelog();
+void openlog(const char *ident, int option, int facility);
 #endif //HAVE_MINGW
 
 #ifndef INVALID_FILE_ATTRIBUTES

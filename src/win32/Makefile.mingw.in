@@ -58,7 +58,8 @@ OBJDIR = .
 OBJS_COMPAT = \
 	$(OBJDIR)/print.o \
 	$(OBJDIR)/compat.o \
-	$(OBJDIR)/getopt.o  
+	$(OBJDIR)/getopt.o \
+	$(OBJDIR)/winapi.o
 
 compat.o:	./compat/compat.cpp
 	$(CXX) -c ./compat/compat.cpp -o $(OBJDIR)/compat.o
@@ -68,6 +69,10 @@ getopt.o:	./compat/getopt.c
 
 print.o:	./compat/print.cpp
 	$(CXX) -c ./compat/print.cpp -o $(OBJDIR)/print.o
+
+winapi.o:	 ./compat/winapi.c
+	$(CXX) -c ./compat/winapi.c -o $(OBJDIR)/winapi.o
+
 
 ######################################################################
 
@@ -101,7 +106,7 @@ wintray.o:	./wintray.cpp
 
 # ***FIXME*** add icon dependencies
 winres.res:	./winres.rc
-	$(WINDRES) $(INCLUDE_ICONS) -O coff ./winres.rc -o $(OBJDIR)/winres.res
+	$(WINDRES) $(INCLUDE_ICONS) -O coff winres.rc -o $(OBJDIR)/winres.res
 
 ######################################################################
 
@@ -171,9 +176,7 @@ wincompat.o: ../lib/wincompat.c
 
 # Files in src/drivers
 OBJS_DRIVERS = \
-	$(OBJDIR)/drivers.o \
-	$(OBJDIR)/console.o \
-	$(OBJDIR)/console_conf.o
+	$(OBJDIR)/drivers.o
 
 drivers.o:  ../drivers/drivers.c
 	$(CXX) -c ../drivers/drivers.c -o $(OBJDIR)/drivers.o

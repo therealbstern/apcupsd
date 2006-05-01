@@ -42,6 +42,7 @@ void init_timer(int timer, void (*fnhandler) (int))
 }
 
 /*********************************************************************/
+#ifndef HAVE_MINGW
 void init_signals(void (*handler) (int))
 {
    /* Set up signals. */
@@ -59,16 +60,19 @@ void init_signals(void (*handler) (int))
    /* I think this is not effective -RF */
    signal(SIGKILL, handler);
 }
+#endif
 
 /*********************************************************************/
 void restore_signals(void)
 {
+#ifndef HAVE_MINGW
    signal(SIGALRM, SIG_DFL);
    signal(SIGHUP, SIG_DFL);
    signal(SIGINT, SIG_DFL);
    signal(SIGTERM, SIG_DFL);
    signal(SIGCHLD, SIG_DFL);
    signal(SIGKILL, SIG_DFL);
+#endif
 }
 
 /*********************************************************************/

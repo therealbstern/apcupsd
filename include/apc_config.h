@@ -170,6 +170,17 @@
 
 #endif   /* HAVE_CYGWIN */
 
+#ifdef HAVE_MINGW
+/*
+ * ApcupsdMain is called from win32/winmain.cpp
+ * we need to eliminate "main" as an entry point,
+ * otherwise, it interferes with the Windows
+ * startup.
+ */
+#define main ApcupsdMain
+
+#endif
+
 /* If we have it, the init is not needed */
 #ifdef HAVE_SETPROCTITLE
 # undef init_proctitle

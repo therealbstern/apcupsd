@@ -36,6 +36,10 @@
 // Apcupsd and ask it to do something (show about, show status,
 // show events, ...)
 
+#ifdef HAVE_MINGW
+#include "compat.h"
+#endif
+
 #include "winhdrs.h"
 
 // Header
@@ -57,7 +61,11 @@ extern void logonfail(int ok);
 
 upsService init;
 
+#ifdef HAVE_MINGW
+extern  DWORD g_platform_id;
+#else
 DWORD g_platform_id;
+#endif
 BOOL g_impersonating_user = 0;
 
 upsService::upsService()
