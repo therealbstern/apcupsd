@@ -5,7 +5,7 @@
 // Copyright transferred from Raider Solutions, Inc to
 //   Kern Sibbald and John Walker by express permission.
 //
-//  Copyright (C) 2004-2005 Kern Sibbald
+//  Copyright (C) 2004-2006 Kern Sibbald
 //
 //  This program is free software; you can redistribute it and/or
 //  modify it under the terms of the GNU General Public License
@@ -19,14 +19,25 @@
 //
 // Author          : Christopher S. Hull
 // Created On      : Sat Jan 31 15:55:00 2004
-// $Id: compat.cpp,v 1.6 2006-04-28 16:34:53 kerns Exp $
+// $Id: compat.cpp,v 1.7 2006-05-01 11:36:01 kerns Exp $
+
+#ifdef __APCUPSD__
+
+#include "apc.h"
+#include "compat.h"
+#include "winapi.h"
+
+#else
 
 #include "bacula.h"
-#define b_errno_win32 (1<<29)
-
+#include "compat.h"
+#include "jcr.h"
+#include "../../lib/winapi.h"
 #include "vss.h"
 
-#include "../../lib/winapi.h"
+#endif
+
+#define b_errno_win32 (1<<29)
 
 
 /* to allow the usage of the original version in this file here */
@@ -42,7 +53,7 @@ extern int enable_vss;
 
 // from MicroSoft SDK (KES) is the diff between Jan 1 1601 and Jan 1 1970
 #ifdef HAVE_MINGW
-#define WIN32_FILETIME_ADJUST 0x19DB1DED53E8000ULL //Not sure it works
+#define WIN32_FILETIME_ADJUST 0x19DB1DED53E8000ULL 
 #else
 #define WIN32_FILETIME_ADJUST 0x19DB1DED53E8000I64
 #endif
@@ -98,7 +109,7 @@ make_wchar_win32_path(POOLMEM* pszUCSPath, BOOL* pBIsRawPath /*= NULL*/)
 {
    /* created 02/27/2006 Thorsten Engel
       
-      This function expects an UCS-encoded standard WCHAR in pszUCSPath and
+      This function expects an UCS-encoded standard wchar_t in pszUCSPath and
       will complete the input path to an absolue path of the form \\?\c:\path\file
 
       With this trick, it is possible to have 32K characters long paths.
@@ -112,7 +123,7 @@ make_wchar_win32_path(POOLMEM* pszUCSPath, BOOL* pBIsRawPath /*= NULL*/)
    if (!p_GetCurrentDirectoryW)
       return pszUCSPath;
    
-   WCHAR* name = (WCHAR*) pszUCSPath;
+   wchar_t * name = (wchar_t *) pszUCSPath;
 
    /* if it has already the desired form, exit without changes */
    if (wcslen(name) > 3 && wcsncmp (name, L"\\\\?\\", 4) == 0)
@@ -124,7 +135,7 @@ make_wchar_win32_path(POOLMEM* pszUCSPath, BOOL* pBIsRawPath /*= NULL*/)
 
    /* get buffer with enough size (name+max 6. wchars+1 null terminator */
    DWORD dwBufCharsNeeded = (wcslen(name)+7);
-   pwszBuf = check_pool_memory_size(pwszBuf, dwBufCharsNeeded*sizeof(WCHAR));
+   pwszBuf = check_pool_memory_size(pwszBuf, dwBufCharsNeeded*sizeof(wchar_t));
       
    /* add \\?\ to support 32K long filepaths 
       it is important to make absolute paths, so we add drive and
@@ -164,7 +175,7 @@ make_wchar_win32_path(POOLMEM* pszUCSPath, BOOL* pBIsRawPath /*= NULL*/)
    /* add 4 bytes header */
    if (bAddPrefix) {
       nParseOffset = 4;
-      wcscpy ((WCHAR*) pwszBuf,L"\\\\?\\");
+      wcscpy ((wchar_t *) pwszBuf,L"\\\\?\\");
    }
 
    /* get current path if needed */
@@ -172,8 +183,8 @@ make_wchar_win32_path(POOLMEM* pszUCSPath, BOOL* pBIsRawPath /*= NULL*/)
       dwCurDirPathSize = p_GetCurrentDirectoryW(0, NULL);
       if (dwCurDirPathSize > 0) {
          /* get directory into own buffer as it may either return c:\... or \\?\C:\.... */         
-         pwszCurDirBuf = check_pool_memory_size(pwszCurDirBuf, (dwCurDirPathSize+1)*sizeof(WCHAR));
-         p_GetCurrentDirectoryW(dwCurDirPathSize,(WCHAR*)pwszCurDirBuf);
+         pwszCurDirBuf = check_pool_memory_size(pwszCurDirBuf, (dwCurDirPathSize+1)*sizeof(wchar_t));
+         p_GetCurrentDirectoryW(dwCurDirPathSize,(wchar_t *)pwszCurDirBuf);
       }
       else
       {
@@ -186,18 +197,18 @@ make_wchar_win32_path(POOLMEM* pszUCSPath, BOOL* pBIsRawPath /*= NULL*/)
 
    /* add drive if needed */
    if (bAddDrive && !bAddCurrentPath) {
-      WCHAR szDrive[3];
+      wchar_t szDrive[3];
 
-      if (dwCurDirPathSize > 3 && wcsncmp ((LPCWSTR)pwszCurDirBuf, L"\\\\?\\", 4) == 0)
+      if (dwCurDirPathSize > 3 && wcsncmp((LPCWSTR)pwszCurDirBuf, L"\\\\?\\", 4) == 0)
          /* copy drive character */
-         wcsncpy ((WCHAR*) szDrive, (LPCWSTR)pwszCurDirBuf+4,2);          
+         wcsncpy((wchar_t *) szDrive, (LPCWSTR)pwszCurDirBuf+4,2);          
       else
          /* copy drive character */
-         wcsncpy ((WCHAR*) szDrive, (LPCWSTR)pwszCurDirBuf,2);  
+         wcsncpy((wchar_t *) szDrive, (LPCWSTR)pwszCurDirBuf,2);  
 
       szDrive[2] = 0;
             
-      wcscat ((WCHAR*) pwszBuf, szDrive);  
+      wcscat((wchar_t *) pwszBuf, szDrive);  
       nParseOffset +=2;
    }
 
@@ -205,27 +216,27 @@ make_wchar_win32_path(POOLMEM* pszUCSPath, BOOL* pBIsRawPath /*= NULL*/)
    if (bAddCurrentPath) {
       /* the 1 add. character is for the eventually added backslash */
       dwBufCharsNeeded += dwCurDirPathSize+1; 
-      pwszBuf = check_pool_memory_size(pwszBuf, dwBufCharsNeeded*sizeof(WCHAR));
+      pwszBuf = check_pool_memory_size(pwszBuf, dwBufCharsNeeded*sizeof(wchar_t));
       /* get directory into own buffer as it may either return c:\... or \\?\C:\.... */
       
       if (dwCurDirPathSize > 3 && wcsncmp ((LPCWSTR)pwszCurDirBuf, L"\\\\?\\", 4) == 0)
          /* copy complete string */
-         wcscpy ((WCHAR*) pwszBuf, (LPCWSTR)pwszCurDirBuf);          
+         wcscpy((wchar_t *) pwszBuf, (LPCWSTR)pwszCurDirBuf);          
       else
          /* append path  */
-         wcscat ((WCHAR*) pwszBuf, (LPCWSTR)pwszCurDirBuf);       
+         wcscat((wchar_t *) pwszBuf, (LPCWSTR)pwszCurDirBuf);       
 
       nParseOffset = wcslen ((LPCWSTR) pwszBuf);
 
       /* check if path ends with backslash, if not, add one */
-      if (*((WCHAR*) pwszBuf+nParseOffset-1) != L'\\') {
-         wcscat ((WCHAR*) pwszBuf, L"\\");
+      if (*((wchar_t *) pwszBuf+nParseOffset-1) != L'\\') {
+         wcscat((wchar_t *) pwszBuf, L"\\");
          nParseOffset++;
       }      
    }
 
 
-   WCHAR* win32_name = (WCHAR*) pwszBuf+nParseOffset;
+   wchar_t * win32_name = (wchar_t *)pwszBuf+nParseOffset;
 
    while (*name) {
       /* Check for Unix separator and convert to Win32 */
@@ -255,16 +266,16 @@ make_wchar_win32_path(POOLMEM* pszUCSPath, BOOL* pBIsRawPath /*= NULL*/)
    */ 
    if (g_pVSSClient && enable_vss && g_pVSSClient->IsInitialized()) {
       /* is output buffer large enough? */
-      pwszBuf = check_pool_memory_size(pwszBuf, (dwBufCharsNeeded+MAX_PATH)*sizeof(WCHAR));
+      pwszBuf = check_pool_memory_size(pwszBuf, (dwBufCharsNeeded+MAX_PATH)*sizeof(wchar_t));
       /* create temp. buffer */
-      POOLMEM* pszBuf = get_pool_memory (PM_FNAME);
-      pszBuf = check_pool_memory_size(pszBuf, (dwBufCharsNeeded+MAX_PATH)*sizeof(WCHAR));
+      POOLMEM* pszBuf = get_pool_memory(PM_FNAME);
+      pszBuf = check_pool_memory_size(pszBuf, (dwBufCharsNeeded+MAX_PATH)*sizeof(wchar_t));
       if (bAddPrefix)
          nParseOffset = 4;
       else
          nParseOffset = 0; 
-      wcsncpy  ((WCHAR*) pszBuf, (WCHAR*) pwszBuf+nParseOffset, wcslen((WCHAR*)pwszBuf)+1-nParseOffset);
-      g_pVSSClient->GetShadowPathW((WCHAR*)pszBuf,(WCHAR*)pwszBuf,dwBufCharsNeeded+MAX_PATH);
+      wcsncpy((wchar_t *) pszBuf, (wchar_t *) pwszBuf+nParseOffset, wcslen((wchar_t *)pwszBuf)+1-nParseOffset);
+      g_pVSSClient->GetShadowPathW((wchar_t *)pszBuf,(wchar_t *)pwszBuf,dwBufCharsNeeded+MAX_PATH);
       free_pool_memory(pszBuf);
    }   
 #endif
@@ -276,7 +287,7 @@ make_wchar_win32_path(POOLMEM* pszUCSPath, BOOL* pBIsRawPath /*= NULL*/)
 }
 
 int
-wchar_2_UTF8(char *pszUTF, const WCHAR *pszUCS, int cchChar)
+wchar_2_UTF8(char *pszUTF, const wchar_t *pszUCS, int cchChar)
 {
    /* the return value is the number of bytes written to the buffer.
       The number includes the byte for the null terminator. */
@@ -299,7 +310,7 @@ UTF8_2_wchar(POOLMEM **ppszUCS, const char *pszUTF)
    if (p_MultiByteToWideChar) {
       /* strlen of UTF8 +1 is enough */
       DWORD cchSize = (strlen(pszUTF)+1);
-      *ppszUCS = check_pool_memory_size(*ppszUCS, cchSize*sizeof (WCHAR));
+      *ppszUCS = check_pool_memory_size(*ppszUCS, cchSize*sizeof (wchar_t));
 
       int nRet = p_MultiByteToWideChar(CP_UTF8, 0, pszUTF, -1, (LPWSTR) *ppszUCS,cchSize);
       ASSERT (nRet > 0);
@@ -311,7 +322,7 @@ UTF8_2_wchar(POOLMEM **ppszUCS, const char *pszUTF)
 
 
 void
-wchar_win32_path(const char *name, WCHAR *win32_name)
+wchar_win32_path(const char *name, wchar_t *win32_name)
 {
     const char *fname = name;
     while (*name) {
@@ -439,10 +450,19 @@ errorString(void)
                  0,
                  NULL);
 
-   return (const char *) lpMsgBuf;
+   /* Strip any \r or \n */
+   char *rval = (char *) lpMsgBuf;
+   char *cp = strchr(rval, '\r');
+   if (cp != NULL) {
+      *cp = 0;
+   } else {
+      cp = strchr(rval, '\n');
+      if (cp != NULL)
+         *cp = 0;
+   }
+   return rval;
 }
 
-#ifndef HAVE_MINGW
 
 static int
 statDir(const char *file, struct stat *sb)
@@ -536,7 +556,7 @@ stat2(const char *file, struct stat *sb)
     char tmpbuf[1024];
     conv_unix_to_win32_path(file, tmpbuf, 1024);
 
-    DWORD attr = -1;
+    DWORD attr = (DWORD)-1;
 
     if (p_GetFileAttributesW) {
       POOLMEM* pwszBuf = get_pool_memory(PM_FNAME);
@@ -677,8 +697,6 @@ stat(const char *file, struct stat *sb)
    sb->st_ctime = cvt_ftime_to_utime(data.ftCreationTime);
    return 0;
 }
-
-#endif //HAVE_MINGW
 
 int
 lstat(const char *file, struct stat *sb)
@@ -882,7 +900,7 @@ opendir(const char *path)
 
     rval->spec = tspec;
 
-    // convert to WCHAR
+    // convert to wchar_t
     if (p_FindFirstFileW) {
       POOLMEM* pwcBuf = get_pool_memory(PM_FNAME);;
       make_win32_path_UTF8_2_wchar(&pwcBuf,rval->spec);
@@ -1146,11 +1164,11 @@ win32_getcwd(char *buf, int maxlen)
 
    if (p_GetCurrentDirectoryW) {
       POOLMEM* pwszBuf = get_pool_memory(PM_FNAME);
-      pwszBuf = check_pool_memory_size (pwszBuf, maxlen*sizeof(WCHAR));
+      pwszBuf = check_pool_memory_size (pwszBuf, maxlen*sizeof(wchar_t));
 
       n = p_GetCurrentDirectoryW(maxlen, (LPWSTR) pwszBuf);
       if (n!=0)
-         n = wchar_2_UTF8 (buf, (WCHAR*)pwszBuf, maxlen)-1;
+         n = wchar_2_UTF8 (buf, (wchar_t *)pwszBuf, maxlen)-1;
       free_pool_memory(pwszBuf);
 
    } else if (p_GetCurrentDirectoryA)
@@ -1216,7 +1234,7 @@ win32_cgets (char* buffer, int len)
    HANDLE hIn = GetStdHandle (STD_INPUT_HANDLE);
    if (hIn && (hIn != INVALID_HANDLE_VALUE) && p_WideCharToMultiByte && p_MultiByteToWideChar) {
       DWORD dwRead;
-      WCHAR wszBuf[1024];
+      wchar_t wszBuf[1024];
       char  szBuf[1024];
 
       /* nt and unicode conversion */
@@ -1251,9 +1269,9 @@ win32_cgets (char* buffer, int len)
             dwRead --;
          }
 
-         /* convert from ansii to WCHAR */
+         /* convert from ansii to wchar_t */
          p_MultiByteToWideChar(GetConsoleCP(), 0, szBuf, -1, wszBuf,1024);
-         /* convert from WCHAR to UTF-8 */
+         /* convert from wchar_t to UTF-8 */
          if (wchar_2_UTF8(buffer, wszBuf, len))
             return buffer;
       }
@@ -1315,6 +1333,7 @@ win32_unlink(const char *filename)
 
 char WIN_VERSION_LONG[64];
 char WIN_VERSION[32];
+char WIN_RAWVERSION[32];
 
 class winver {
 public:
@@ -1323,8 +1342,6 @@ public:
 
 static winver INIT;                     // cause constructor to be called before main()
 
-#include "bacula.h"
-#include "jcr.h"
 
 winver::winver(void)
 {
@@ -1338,8 +1355,11 @@ winver::winver(void)
         version = "Unknown";
         platform = "Unknown";
     }
-    else
-        switch (_mkversion(osvinfo.dwPlatformId, osvinfo.dwMajorVersion, osvinfo.dwMinorVersion))
+        const int ver = _mkversion(osvinfo.dwPlatformId,
+                                   osvinfo.dwMajorVersion,
+                                   osvinfo.dwMinorVersion);
+        snprintf(WIN_RAWVERSION, sizeof(WIN_RAWVERSION), "Windows %#08x", ver);
+         switch (ver)
         {
         case MS_WINDOWS_95: (version =  "Windows 95"); break;
         case MS_WINDOWS_98: (version =  "Windows 98"); break;
@@ -1348,7 +1368,7 @@ winver::winver(void)
         case MS_WINDOWS_2K: (version =  "Windows 2000");platform = "NT"; break;
         case MS_WINDOWS_XP: (version =  "Windows XP");platform = "NT"; break;
         case MS_WINDOWS_S2003: (version =  "Windows Server 2003");platform = "NT"; break;
-        default: version = "Windows ??"; break;
+        default: version = WIN_RAWVERSION; break;
         }
 
     bstrncpy(WIN_VERSION_LONG, version, sizeof(WIN_VERSION_LONG));
@@ -1420,12 +1440,18 @@ getArgv0(const char *cmdline)
 HANDLE
 CreateChildProcess(const char *cmdline, HANDLE in, HANDLE out, HANDLE err)
 {
+    static const char *comspec = NULL;
     PROCESS_INFORMATION piProcInfo;
     STARTUPINFOA siStartInfo;
     BOOL bFuncRetn = FALSE;
 
-    // Set up members of the PROCESS_INFORMATION structure.
+    if (comspec == NULL) {
+       comspec = getenv("COMSPEC");
+    }
+    if (comspec == NULL) // should never happen
+        return INVALID_HANDLE_VALUE;
 
+    // Set up members of the PROCESS_INFORMATION structure.
     ZeroMemory( &piProcInfo, sizeof(PROCESS_INFORMATION) );
 
     // Set up members of the STARTUPINFO structure.
@@ -1453,18 +1479,14 @@ CreateChildProcess(const char *cmdline, HANDLE in, HANDLE out, HANDLE err)
     // Create the child process.
 
     char exeFile[256];
+    int cmdLen = strlen(cmdline) + strlen(comspec) + 16;
 
-    const char *comspec = getenv("COMSPEC");
+    char *cmdLine = (char *)alloca(cmdLen);
 
-    if (comspec == NULL) // should never happen
-        return INVALID_HANDLE_VALUE;
-
-    char *cmdLine = (char *)alloca(strlen(cmdline) + strlen(comspec) + 16);
-
-    strcpy(exeFile, comspec);
-    strcpy(cmdLine, comspec);
-    strcat(cmdLine, " /c ");
-    strcat(cmdLine, cmdline);
+    bstrncpy(exeFile, comspec, sizeof(exeFile));
+    bstrncpy(cmdLine, comspec, cmdLen);
+    bstrncat(cmdLine, " /c ", cmdLen);
+    bstrncat(cmdLine, cmdline, cmdLen);
 
     // try to execute program
     bFuncRetn = CreateProcessA(exeFile,
@@ -1726,9 +1748,9 @@ int
 utime(const char *fname, struct utimbuf *times)
 {
     FILETIME acc, mod;
-    char tmpbuf[1024];
+    char tmpbuf[5000];
 
-    conv_unix_to_win32_path(fname, tmpbuf, 1024);
+    conv_unix_to_win32_path(fname, tmpbuf, 5000);
 
     cvt_utime_to_ftime(times->actime, acc);
     cvt_utime_to_ftime(times->modtime, mod);
@@ -1739,22 +1761,22 @@ utime(const char *fname, struct utimbuf *times)
       POOLMEM* pwszBuf = get_pool_memory(PM_FNAME);
       make_win32_path_UTF8_2_wchar(&pwszBuf, tmpbuf);
 
-      h = p_CreateFileW((LPCWSTR) pwszBuf,
+      h = p_CreateFileW((LPCWSTR)pwszBuf,
                         FILE_WRITE_ATTRIBUTES,
-                        FILE_SHARE_WRITE,
+                        FILE_SHARE_WRITE|FILE_SHARE_READ|FILE_SHARE_DELETE,
                         NULL,
                         OPEN_EXISTING,
-                        0,
+                        FILE_FLAG_BACKUP_SEMANTICS, // required for directories
                         NULL);
 
       free_pool_memory(pwszBuf);
     } else if (p_CreateFileA) {
       h = p_CreateFileA(tmpbuf,
                         FILE_WRITE_ATTRIBUTES,
-                        FILE_SHARE_WRITE,
+                        FILE_SHARE_WRITE|FILE_SHARE_READ|FILE_SHARE_DELETE,
                         NULL,
                         OPEN_EXISTING,
-                        0,
+                        FILE_FLAG_BACKUP_SEMANTICS, // required for directories
                         NULL);
     }
 
@@ -1867,8 +1889,7 @@ open(const char *file, int flags, int mode)
 
        foo = p_CreateFileW((LPCWSTR) pwszBuf, access, shareMode, NULL, create, msflags, NULL);
        free_pool_memory(pwszBuf);
-    }
-    else if (p_CreateFileA)
+    } else if (p_CreateFileA)
        foo = CreateFile(file, access, shareMode, NULL, create, msflags, NULL);
 
     if (INVALID_HANDLE_VALUE == foo) {
@@ -1959,3 +1980,11 @@ dup2(int, int)
 /* syslog function, added by Nicolas Boichat */
 void closelog() {}
 #endif //HAVE_MINGW
+
+/* Temp kludges ***FIXME**** */
+#ifdef __APCUPSD__
+unsigned int alarm(unsigned int seconds) 
+{
+   return 0;
+}
+#endif

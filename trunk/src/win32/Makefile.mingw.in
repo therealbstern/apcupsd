@@ -39,7 +39,7 @@ HAVES = \
 DEFINES = \
 	-DWIN32 \
 	$(HAVES) \
-	-DCOMPILING_APCUPSD
+	-D__APCUPSD__
 
 
 
