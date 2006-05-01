@@ -19,7 +19,7 @@
 //
 // Author          : Christopher S. Hull
 // Created On      : Sat Jan 31 15:55:00 2004
-// $Id: compat.cpp,v 1.7 2006-05-01 11:36:01 kerns Exp $
+// $Id: compat.cpp,v 1.8 2006-05-01 13:14:39 kerns Exp $
 
 #ifdef __APCUPSD__
 
@@ -1979,6 +1979,7 @@ dup2(int, int)
 #ifdef HAVE_MINGW
 /* syslog function, added by Nicolas Boichat */
 void closelog() {}
+void openlog(const char *ident, int option, int facility) {}  
 #endif //HAVE_MINGW
 
 /* Temp kludges ***FIXME**** */
