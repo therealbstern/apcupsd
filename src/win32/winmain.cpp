@@ -39,6 +39,7 @@
 #ifdef HAVE_MINGW
 #include "compat.h"
 #include "winconfig.h"
+#include "winapi.h"
 #undef STRICT
 #else
 #include "config.h"
@@ -344,6 +345,11 @@ int ApcupsdAppMain(int service)
    // Set this process to be the last application to be shut down.
    SetProcessShutdownParameters(0x100, 0);
 
+#ifdef HAVE_MINGW
+   InitWinAPIWrapper();
+   WSA_Init();
+#endif
+
    HWND hservwnd = FindWindow(MENU_CLASS_NAME, NULL);
    if (hservwnd != NULL) {
       // We don't allow multiple instances!
@@ -368,5 +374,8 @@ int ApcupsdAppMain(int service)
    // Call the "real" apcupsd
    ApcupsdMain(num_command_args, command_args);
    PostQuitMessage(0);
+#ifdef HAVE_MINGW
+   WSACleanup();
+#endif
    _exit(0);
 }
