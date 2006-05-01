@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright (C) 2001-2004 Kern Sibbald
+ * Copyright (C) 2001-2006 Kern Sibbald
  * Copyright (C) 1996-99 Andre M. Hedrick <andre@suse.com>
  * Copyright (C) 1999-2001 Riccardo Facchetti <riccardo@apcupsd.org>
  *

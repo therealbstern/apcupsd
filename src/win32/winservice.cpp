@@ -38,6 +38,7 @@
 
 #ifdef HAVE_MINGW
 #include "compat.h"
+#undef STRICT
 #endif
 
 #include "winhdrs.h"

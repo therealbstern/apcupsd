@@ -35,6 +35,7 @@ char msg[100];
 time_t nowtime;
 char m_char;
 char argvalue[MAXSTRING];
+int shm_OK = 0;
 
 /* Default values for contacting daemon */
 static char *host = "localhost";
@@ -284,7 +285,7 @@ static void do_pthreads_status(UPSINFO *ups, char *host, int port)
 
 /*********************************************************************/
 
-#ifdef HAVE_CYGWIN
+#if defined(HAVE_CYGWIN) || defined(HAVE_MINGW)
 #undef main
 #endif
 
@@ -295,6 +296,10 @@ int main(int argc, char **argv)
 
    char *cfgfile = APCCONF;
    struct stat cfgstat;
+
+#ifdef HAVE_MINGW
+   WSA_Init();                   /* init MS networking */
+#endif
 
    astrncpy(argvalue, argv[0], sizeof(argvalue) - 1);
 

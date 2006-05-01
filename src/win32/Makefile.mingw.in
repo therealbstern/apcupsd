@@ -34,7 +34,10 @@ INCLUDES = \
 
 HAVES = \
 	-DHAVE_MINGW \
-	-DHAVE_WIN32
+	-DHAVE_WIN32 \
+	-DHAVE_NISLIB \
+	-DHAVE_NET_DRIVER \
+	-DHAVE_TEST_DRIVER
 
 DEFINES = \
 	-DWIN32 \
@@ -180,6 +183,25 @@ drivers.o:  ../drivers/drivers.c
 
 ######################################################################
 
+# Files in src/drivers/test
+OBJS_TESTDRV = \
+	$(OBJDIR)/testdriver.o
+
+testdriver.o:  ../drivers/test/testdriver.c
+	$(CXX) -c ../drivers/test/testdriver.c -o $(OBJDIR)/testdriver.o
+
+######################################################################
+
+# Files in src/drivers/net
+OBJS_NETDRV = \
+	$(OBJDIR)/net.o
+
+net.o:	../drivers/net/net.c
+	$(CXX) -c ../drivers/net/net.c -o $(OBJDIR)/net.o
+
+######################################################################
+
+
 # Files in src
 OBJS_SRC = \
 	$(OBJDIR)/action.o \
@@ -210,9 +232,20 @@ reports.o:  ../reports.c
 
 ######################################################################
 
+# apcaccess objects
+OBJS_ACCESS = \
+	$(OBJDIR)/apcaccess.o
+
+apcaccess.o:  ../apcaccess.c
+	$(CXX) -c ../apcaccess.c -o $(OBJDIR)/apcaccess.o
+
+######################################################################
 
 
-APC_OBJS = $(OBJS_SRC) $(LIB_OBJS) $(OBJS_COMPAT) $(OBJS_WIN) $(OBJS_DRIVERS)
+
+
+APC_OBJS = $(OBJS_SRC) $(LIB_OBJS) $(OBJS_COMPAT) $(OBJS_WIN) \
+	   $(OBJS_DRIVERS) $(OBJS_TESTDRV) $(OBJS_NETDRV)
 
 APC_LIBS = \
 	-L$(LIB_MINGW) \
@@ -222,12 +255,18 @@ APC_LIBS = \
 	$(LIB_MINGW)/libwsock32.a \
 	$(LIB_MINGW)/libnetapi32.a
 
+ACCESS_OBJS = $(OBJS_ACCESS) $(LIB_OBJS) $(OBJS_COMPAT)
 
-
+ACCESS_LIBS = \
+	-L$(LIB_MINGW) \
+	$(LIB_PTHREADS) \
+	$(LIB_MINGW)/libuser32.a \
+	$(LIB_MINGW)/libwsock32.a \
+	$(LIB_MINGW)/libnetapi32.a
 
 # Targets
 
-all: apcupsd.exe
+all: apcupsd.exe apcaccess.exe
 
 clean:
 	rm -f $(OBJDIR)/*.o $(OBJDIR)/apcupsd.exe $(OBJDIR)/winres.res
@@ -236,4 +275,8 @@ clean:
 # Link the apcupsd daemon executable ...
 apcupsd.exe: $(APC_OBJS)
 	$(CXX) $(APC_OBJS) $(APC_LIBS) -o $(OBJDIR)/apcupsd.exe
+	cp -f $(DEPKGS)/pthreads/pthreadGCE.dll .
+
+apcaccess.exe: $(ACCESS_OBJS)
+	$(CXX) $(ACCESS_OBJS) $(ACCESS_LIBS) -o $(OBJDIR)/apcaccess.exe
 	cp -f $(DEPKGS)/pthreads/pthreadGCE.dll .
