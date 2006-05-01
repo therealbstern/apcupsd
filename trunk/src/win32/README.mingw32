@@ -1,6 +1,10 @@
 
-This file documents building apcupsd using the cross-tool
-on a Linux (possibly other Unix) system.
+This file documents building the native Win32 apcupsd using the
+MinGW cross compiler tools on a Linux (possibly other Unix)
+system.  The Win32 build can co-exist in in the same directory at
+the same time as a normal Linux build since all the binaries for
+Win32 are kept in src/win32.
+   
 
 The basic directory structure you need to have is:
   apcupsd                    top level directory -- any name 
@@ -17,7 +21,12 @@ The basic directory structure you need to have is:
 depkgs-win32 is released in a separate .tar.gz file that contains the
 source for the above mentioned libraries needed to build the
 Win32 apcupsd.  It can be found in the Source Forge apcupsd project
-release section (not yet).  See Kern for a copy.
+release section (not yet).  Temporarily, you can find a copy of
+this on:
+
+   www.sibbald.com/download/depkgs-win32-apcupsd.tar.gz
+
+it will detar into depkgs-win32.
 
 cross-tools is a directory that you create. There is a script, described
 below, that will download all the necessary files and build them. You need
@@ -40,7 +49,8 @@ your system as well as wget and texinfo.  There may be other dependencies.
 After building the cross-tools, you can proceed to build the depkgs-win32 
 packages, which must use the cross-tools compiler.
  
-   cd depkgs-win32
+   cd
+   cd apcupsd/depkgs-win32
    ./build-mingw32
 
 The above only needs to be done once as well as long as the cross-tools or
@@ -51,14 +61,29 @@ Finally, to build the Win32 apcupsd, do the following:
    cd apcupsd-source/src/win32
    make -f Makefile.mingw32
 
-depending on the progress I make, this will compile a lot of files,
-then bomb on something.  For example, today 01 May 2006, it stops when
-trying to compile the resource file.
+This should compile a lot of files, and finally create apcupsd.exe,
+apcaccess.exe, and pthreadGCE.dll.  You need the dll to run either 
+apcupsd.exe or apcaccess.exe.
+
+Currently, apcupsd.exe contains only the test driver and the net
+driver. Also the NIS server feature is not turned on, so you must
+ensure it is turned off in your apcupsd.conf file.
+
+If you want to change the Makefile, simply edit Makefile.mingw32.in,
+then in the top level directory, do:
+
+   make Makefiles
+
+or do any ./configure command.
 
 
 Items to be done:
-- Make it work            
-- Use syslog from apcupsd lib/wincompat.c
+- Use syslog from apcupsd lib/wincompat.c so that a dialog
+  box is used in place of syslog().
+- Get the NIS server working (low priority).
+- Implement additional drivers (USB, serial, snmp, ...)
+- Ensure that calling scripts works -- probably broken
+- General testing
 
 ============== Adam's tips ==============
 Here is the configure I'm using for the 3.12.x releases:
@@ -146,6 +171,5 @@ and do an "Update Driver..." on "American Power Conversion USB UPS
 (Apcupsd)". Select the "American Power Conversion USB UPS (Microsoft)" 
 driver from the list. After that you should be back where you started 
 and the "Batteries -> HID UPS Battery" entry should be back and the
-
 
 
