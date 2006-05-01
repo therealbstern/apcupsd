@@ -58,3 +58,94 @@ trying to compile the resource file.
 
 Items to be done:
 - Make it work            
+- Use syslog from apcupsd lib/wincompat.c
+
+============== Adam's tips ==============
+Here is the configure I'm using for the 3.12.x releases:
+
+./configure \
+       --prefix=/apcupsd \
+       --sbindir=/apcupsd/bin \
+       --sysconfdir=/apcupsd/etc/apcupsd \
+       --with-pid-dir=/apcupsd/etc/apcupsd \
+       --mandir=/apcupsd \
+       --with-cgi-bin=/apcupsd/etc/apcupsd/cgi \
+       --enable-pthreads \
+       --enable-net \
+       --enable-snmp \
+       --enable-master-slave
+
+For 3.13.x you'll want to remove the master-slave enable. Also, if you
+want to build the SNMP driver as I do, you'll nee to build NET-SNMP
+under cygwin as well. The configure line I use for that is:
+
+./configure \
+         --with-mib-modules="host agentx disman/event-mib examples/example" \
+         --with-out-mib-modules=host/hr_network \
+         --disable-agent --disable-applications
+====
+
+Date: Mon, 13 Mar 2006 19:08:45 -0500
+
+Adam Kropelin wrote:
+> I just committed changes to configure that will build the generic usb
+> driver on win32 under cygwin. There is no real magic to it; include
+> "--enable-usb" in your configure options and everything should Just
+> Work. The include and library paths to libusb are hard-coded to
+> "C:\Program Files\LibUSB-Win32" currently, so be sure to install
+> libusb-win32 in that directory (which I believe is the default).
+
+I just got it working using the libusb-win32 "device driver" instead of 
+the "filter driver". This allows us to provide our own *.inf file, 
+preempting the Windows built-in UPS driver. The missing event problem I 
+mentioned in an earlier mail is now solved and Win32 USB is working very 
+well. (Limited testing...I've only tested WinXP so far.)
+
+The only difference to use the "device driver" method is in how you 
+install libusb-win32. Eventually I believe the installer will be able to 
+install the driver automatically, but at the moment it's a manual 
+process. I've made a zip file containing the required pieces:
+<http://www.kroptech.com/~adk0212/apcupsd/apcupsd-libusb-win32.zip>
+
+The basic procedure is:
+    1. Extract zip file to <C:\Program Files\LibUSB-Win32>
+    2. ./configure apcupsd source with your favorite options 
+plus --enable-usb
+    3. Build & install apcupsd
+    4. Plug in your USB UPS and wait for Windows to recognize it
+    5. Open the Windows Device Manager and locate the "Human Interface 
+Devices" section
+    6. Locate "American Power Conversion USB UPS" under the HID section
+    7. Right-click "American Power Conversion USB UPS" and select 
+"Update driver..."
+    8. (Abbreviated) Do not allow Windows to search for a driver, 
+specify one yourself. Depending on your version of Windows, the exact 
+sequence of dialogs and options is different, but essentially you need 
+to get to the list of devices with the "Have Disk..." button. When you 
+get there, choose "Have Disk..."
+    9. Browse to <C:\Program Files\LibUSB-Win32\driver> and hit Open
+    10. Select "American Power Conversion USB UPS (Apcupsd)" and hit 
+Next
+    11. The driver should be installed.
+    12. If you examine the Device Manager tree again, you should see a 
+"LibUSB-Win32 Devices" section, under which is listed "American Power 
+Conversion USB UPS (Apcupsd)". You should NOT see "HID UPS Battery" 
+under the "Batteries" section.
+    13. Future plugging/unplugging of the UPS will be handled 
+automatically. The driver only needs to be installed once.
+    14. Edit apcupsd.conf to set...
+        UPSCABLE usb
+        UPSTYPE usb
+        DEVICE
+    15. Start apcupsd and watch the magic (or the smoke...)
+
+--Adam
+
+P.S. To get back to the Windows standard driver, go into Device Manager 
+and do an "Update Driver..." on "American Power Conversion USB UPS 
+(Apcupsd)". Select the "American Power Conversion USB UPS (Microsoft)" 
+driver from the list. After that you should be back where you started 
+and the "Batteries -> HID UPS Battery" entry should be back and the
+
+
+
