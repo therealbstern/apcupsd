@@ -13,8 +13,7 @@
  */
 
 /*
- * Copyright (C) 1999 Kern Sibbald
- * Copyright (C) 1996-99 Andre M. Hedrick <andre@suse.com>
+ * Copyright (C) 1999-2006 Kern Sibbald
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of version 2 of the GNU General
@@ -43,6 +42,17 @@ struct sockaddr_in tcp_serv_addr;  /* socket information */
 int net_errno = 0;                 /* error number -- not yet implemented */
 char *net_errmsg = NULL;           /* pointer to error message */
 char net_errbuf[256];              /* error message buffer for messages */
+
+
+#ifdef HAVE_MINGW
+#define socketRead(fd, buf, len)  recv(fd, buf, len, 0)
+#define socketWrite(fd, buf, len) send(fd, buf, len, 0)
+#define socketClose(fd)           closesocket(fd)
+#else
+#define socketRead(fd, buf, len)  read(fd, buf, len)
+#define socketWrite(fd, buf, len) write(fd, buf, len)
+#define socketClose(fd)           close(fd)
+#endif
 
 
 /*
@@ -95,7 +105,7 @@ static int read_nbytes(int fd, char *ptr, int nbytes)
             return (-1);           /* error */
          }
 #endif
-         nread = read(fd, ptr, nleft);
+         nread = socketRead(fd, ptr, nleft);
       } while (nread == -1 && (errno == EINTR || errno == EAGAIN));
 
       if (nread <= 0) {
@@ -129,7 +139,7 @@ static int write_nbytes(int fd, char *ptr, int nbytes)
        */
       fcntl(fd, F_SETFL, fcntl(fd, F_GETFL));
 #endif
-      nwritten = write(fd, ptr, nleft);
+      nwritten = socketWrite(fd, ptr, nleft);
 
       if (nwritten <= 0) {
          net_errno = errno;
@@ -297,7 +307,12 @@ void net_close(int sockfd)
  */
 int net_accept(int fd, struct sockaddr_in *cli_addr)
 {
+#ifdef HAVE_MINGW                                       
+   /* kludge because some idiot defines socklen_t as unsigned */
+   int clilen = sizeof(*cli_addr);
+#else
    socklen_t clilen = sizeof(*cli_addr);
+#endif
    int newfd;
 
 #if defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS
