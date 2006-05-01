@@ -26,7 +26,9 @@ this on:
 
    www.sibbald.com/download/depkgs-win32-apcupsd.tar.gz
 
-it will detar into depkgs-win32.
+it will detar into depkgs-win32.  Note, this version is pre-buit, so
+you can skip the ./build-mingw32 described several steps below, unless
+you want to be sure it works on your system.
 
 cross-tools is a directory that you create. There is a script, described
 below, that will download all the necessary files and build them. You need
@@ -54,7 +56,8 @@ packages, which must use the cross-tools compiler.
    ./build-mingw32
 
 The above only needs to be done once as well as long as the cross-tools or
-depkgs-win32 versions do not change.
+depkgs-win32 versions do not change. As noted above, the above step
+can be skipped if you dowload the package from www.sibbald.com...
 
 Finally, to build the Win32 apcupsd, do the following:
 
@@ -171,5 +174,4 @@ and do an "Update Driver..." on "American Power Conversion USB UPS
 (Apcupsd)". Select the "American Power Conversion USB UPS (Microsoft)" 
 driver from the list. After that you should be back where you started 
 and the "Batteries -> HID UPS Battery" entry should be back and the
-
 
