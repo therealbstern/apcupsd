@@ -1,0 +1,60 @@
+
+This file documents building apcupsd using the cross-tool
+on a Linux (possibly other Unix) system.
+
+The basic directory structure you need to have is:
+  apcupsd                    top level directory -- any name 
+    apcupsd-source           top level apcupsd source directory -- any name
+      src
+        win32                main directory where the Win32 FD is built.
+          compat             Bacula win32 emulation lib for Unix calls
+
+    dekpgs-win32             
+       pthreads              The POSIX pthreads library (third party)
+
+    cross-tools              Cross compliation tools (gcc, g++, mingw, ...)
+
+depkgs-win32 is released in a separate .tar.gz file that contains the
+source for the above mentioned libraries needed to build the
+Win32 Bacula.  It can be found in the Source Forge apcupsd project
+release section (not yet).  See Kern for a copy.
+
+cross-tools is a directory that you create. There is a script, described
+below, that will download all the necessary files and build them. You need
+only run that script once, unless we move to a new version of the tools.
+
+Now, once you have the directory structure as defined above, you do
+the following once:
+
+  cd apcupsd/apcupsd-source
+  ./configure (any standard set of config options the exact ones   
+               are not important).
+  cd src/win32
+  ./build-win32-cross-tools
+
+The above only needs to be done once unless we change the cross-tools 
+version.  In general, you can run the script multiple times with no
+problem. For it to work, you must have a valid gcc compiler installed on
+your system as well as wget and texinfo.  There may be other dependencies.
+
+After building the cross-tools, you can proceed to build the depkgs-win32 
+packages, which must use the cross-tools compiler.
+ 
+   cd depkgs-win32
+   ./build-mingw32
+
+The above only needs to be done once as well as long as the cross-tools or
+depkgs-win32 versions do not change.
+
+Finally, to build the Win32 apcupsd FD and bconsole, do the following:
+
+   cd apcupsd-source/src/win32
+   make -f Makefile.mingw32
+
+depending on the progress I make, this will compile a lot of files,
+then bomb on something.  For example, today 01 May 2006, it stops when
+trying to compile the resource file.
+
+
+Items to be done:
+- Make it work            

@@ -36,6 +36,14 @@
 
 // winmain.cpp for win32 version of apcupsd
 
+#ifdef HAVE_MINGW
+#include "compat.h"
+#include "winconfig.h"
+#undef STRICT
+#else
+#include "config.h"
+#endif
+
 ////////////////////////////
 // System headers
 #include <unistd.h>
@@ -45,7 +53,6 @@
 #include <signal.h>
 #include <pthread.h>
 #include <errno.h>
-#include "config.h"
 #include "defines.h"
 
 extern int ApcupsdMain(int argc, char **argv);

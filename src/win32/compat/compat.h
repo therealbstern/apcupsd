@@ -27,12 +27,16 @@
  * Last Modified By: Thorsten Engel
  * Last Modified On: Fri Apr 22 19:30:00 2004
  * Update Count    : 218
- * $Id: compat.h,v 1.4 2006-04-28 16:34:53 kerns Exp $
+ * $Id: compat.h,v 1.5 2006-05-01 11:36:01 kerns Exp $
  */
 
 
 #ifndef __COMPAT_H_
 #define __COMPAT_H_
+#ifndef _STAT_H
+#define _STAT_H       /* don't pull in MinGW stat.h */
+#define _STAT_DEFINED /* don't pull in MinGW stat.h */
+#endif
 
 #if (defined _MSC_VER) && (_MSC_VER >= 1400) // VC8+
 #pragma warning(disable : 4996) // Either disable all deprecation warnings,
@@ -50,6 +54,7 @@
 #include <sys/types.h>
 #include <process.h>
 #include <direct.h>
+#include <wchar.h>
 #include <winsock2.h>
 #include <windows.h>
 #include <wincon.h>
@@ -176,10 +181,6 @@ int gettimeofday(struct timeval *, struct timezone *);
 #define ETIMEDOUT 55
 #endif
 
-#ifndef HAVE_MINGW
-int strncasecmp(const char*, const char *, int);
-
-#ifndef _STAT_DEFINED
 struct stat
 {
     _dev_t      st_dev;
@@ -196,7 +197,6 @@ struct stat
     uint32_t    st_blksize;
     uint64_t    st_blocks;
 };
-#endif
 
 #undef  S_IFMT
 #define S_IFMT         0170000         /* file type mask */
@@ -219,7 +219,6 @@ struct stat
 #define S_ISCHR(x) 0
 #define S_ISBLK(x)  (((x) & S_IFMT) == S_IFBLK)
 #define S_ISFIFO(x) 0
-#endif //HAVE_MINGW
 
 #define S_IRGRP         000040
 #define S_IWGRP         000020
@@ -274,6 +273,7 @@ int fork();
 int waitpid(int, int *, int);
 
 #ifndef HAVE_MINGW
+int strncasecmp(const char*, const char *, int);
 int utime(const char *filename, struct utimbuf *buf);
 int open(const char *, int, int);
 #define vsnprintf __vsnprintf
@@ -303,19 +303,16 @@ int __sprintf(char *str, const char *fmt, ...);
 struct timespec;
 int readdir(unsigned int fd, struct dirent *dirp, unsigned int count);
 int nanosleep(const struct timespec*, struct timespec *);
-#ifdef xxx
-struct tm *localtime_r(const time_t *, struct tm *);
-struct tm *gmtime_r(const time_t *, struct tm *);
-#endif
+//struct tm *localtime_r(const time_t *, struct tm *);
+//struct tm *gmtime_r(const time_t *, struct tm *);
 long int random(void);
 void srandom(unsigned int seed);
 int lstat(const char *, struct stat *);
+int stat(const char *file, struct stat *sb);
 long pathconf(const char *, int);
 int readlink(const char *, char *, int);
 #define _PC_PATH_MAX 1
 #define _PC_NAME_MAX 2
-
-
 
 int geteuid();
 
@@ -333,11 +330,6 @@ struct group {
 struct passwd *getpwuid(uid_t);
 struct group *getgrgid(uid_t);
 
-#ifndef HAVE_MINGW
-#define R_OK 04
-#define W_OK 02
-#endif //HAVE_MINGW
-
 struct sigaction {
     int sa_flags;
     void (*sa_handler)(int);
@@ -349,7 +341,7 @@ struct sigaction {
 #define unlink win32_unlink
 #define chdir win32_chdir
 int syslog(int, const char *, const char *);
-#ifdef LOG_DAEMON
+#ifndef LOG_DAEMON
 #define LOG_DAEMON 0
 #endif
 #ifndef LOG_ERR
@@ -357,6 +349,8 @@ int syslog(int, const char *, const char *);
 #endif
 
 #ifndef HAVE_MINGW
+#define R_OK 04
+#define W_OK 02
 int stat(const char *, struct stat *);
 #ifdef __cplusplus
 #define access _access
@@ -384,7 +378,6 @@ int win32_unlink(const char *filename);
 
 char* win32_cgets (char* buffer, int len);
 
-
 int WSA_Init(void);
 
 #ifdef HAVE_MINGW
@@ -393,6 +386,25 @@ void closelog();
 
 #ifndef INVALID_FILE_ATTRIBUTES
 #define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
+#endif
+
+/* Temp kludge ***FIXME*** */
+#ifdef __APCUPSD__
+#define SIGCHLD 0
+#define SIGALRM 0
+#define SIGHUP 0
+#define SIGCHLD 0
+#define SIGPIPE 0
+unsigned int alarm(unsigned int seconds);
+#define PM_FNAME 2000
+#define PM_MESSAGE 2000
+#define get_pool_memory(x) (char *)malloc(x)
+#define free_pool_memory(x) free((char *)x)
+#define check_pool_memory_size(x, y) x
+#define ASSERT(x) 
+#define bstrncat astrncat
+#define bstrncpy astrncpy
+
 #endif
 
 #endif /* __COMPAT_H_ */
