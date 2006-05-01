@@ -58,14 +58,11 @@ OBJDIR = .
 OBJS_COMPAT = \
 	$(OBJDIR)/print.o \
 	$(OBJDIR)/compat.o \
-	$(OBJDIR)/getopt.o \
 	$(OBJDIR)/winapi.o
+
 
 compat.o:	./compat/compat.cpp
 	$(CXX) -c ./compat/compat.cpp -o $(OBJDIR)/compat.o
-
-getopt.o:	./compat/getopt.c
-	$(CXX) -c ./compat/getopt.c -o $(OBJDIR)/getopt.o
 
 print.o:	./compat/print.cpp
 	$(CXX) -c ./compat/print.cpp -o $(OBJDIR)/print.o
@@ -221,7 +218,11 @@ APC_LIBS = \
 	-L$(LIB_MINGW) \
 	$(LIB_PTHREADS) \
 	$(LIB_MINGW)/libuser32.a \
-	$(LIB_MINGW)/libgdi32.a
+	$(LIB_MINGW)/libgdi32.a \
+	$(LIB_MINGW)/libwsock32.a \
+	$(LIB_MINGW)/libnetapi32.a
+
+
 
 
 # Targets
