@@ -7,7 +7,7 @@ The basic directory structure you need to have is:
     apcupsd-source           top level apcupsd source directory -- any name
       src
         win32                main directory where the Win32 FD is built.
-          compat             Bacula win32 emulation lib for Unix calls
+          compat             win32 emulation lib for Unix calls
 
     dekpgs-win32             
        pthreads              The POSIX pthreads library (third party)
@@ -16,7 +16,7 @@ The basic directory structure you need to have is:
 
 depkgs-win32 is released in a separate .tar.gz file that contains the
 source for the above mentioned libraries needed to build the
-Win32 Bacula.  It can be found in the Source Forge apcupsd project
+Win32 apcupsd.  It can be found in the Source Forge apcupsd project
 release section (not yet).  See Kern for a copy.
 
 cross-tools is a directory that you create. There is a script, described
@@ -46,7 +46,7 @@ packages, which must use the cross-tools compiler.
 The above only needs to be done once as well as long as the cross-tools or
 depkgs-win32 versions do not change.
 
-Finally, to build the Win32 apcupsd FD and bconsole, do the following:
+Finally, to build the Win32 apcupsd, do the following:
 
    cd apcupsd-source/src/win32
    make -f Makefile.mingw32
