@@ -86,27 +86,26 @@ OBJS_WIN = \
 	$(OBJDIR)/winmain.o \
 	$(OBJDIR)/winres.res
 
-winabout.o:	./winabout.cpp
-	$(CXX) -c ./winabout.cpp -o $(OBJDIR)/winabout.o
+$(OBJDIR)/winabout.o:	  ./winabout.cpp
+	$(CXX) -c $< -o $@
 
-winevents.o:	./winevents.cpp
-	$(CXX) -c ./winevents.cpp -o $(OBJDIR)/winevents.o
+$(OBJDIR)/winevents.o:	  ./winevents.cpp
+	$(CXX) -c $< -o $@
 
-winmain.o:	./winmain.cpp
-	$(CXX) -c ./winmain.cpp -o $(OBJDIR)/winmain.o
+$(OBJDIR)/winmain.o:	  ./winmain.cpp
+	$(CXX) -c $< -o $@
 
-winservice.o:	./winservice.cpp
-	$(CXX) -c ./winservice.cpp -o $(OBJDIR)/winservice.o
+$(OBJDIR)/winservice.o:   ./winservice.cpp
+	$(CXX) -c $< -o $@
 
-winstat.o:	./winstat.cpp
-	$(CXX) -c ./winstat.cpp -o $(OBJDIR)/winstat.o
+$(OBJDIR)/winstat.o:	  ./winstat.cpp
+	$(CXX) -c $< -o $@
 
-wintray.o:	./wintray.cpp
-	$(CXX) -c ./wintray.cpp -o $(OBJDIR)/wintray.o
+$(OBJDIR)/wintray.o:	  ./wintray.cpp
+	$(CXX) -c $< -o $@
 
-# ***FIXME*** add icon dependencies
-winres.res:	./winres.rc
-	$(WINDRES) $(INCLUDE_ICONS) -O coff winres.rc -o $(OBJDIR)/winres.res
+$(OBJDIR)/winres.res:	  ./winres.rc
+	$(WINDRES) $(INCLUDE_ICONS) -O coff $< -o $@
 
 ######################################################################
 
@@ -132,44 +131,44 @@ LIB_OBJS = \
 # Rules for generating from ../lib
 # 
 
-apcconfig.o: ../lib/apcconfig.c
-	$(CXX) -c ../lib/apcconfig.c -o $(OBJDIR)/apcconfig.o
+$(OBJDIR)/apcconfig.o: ../lib/apcconfig.c
+	$(CXX) -c $< -o $@
 
-apcerror.o: ../lib/apcerror.c
-	$(CXX) -c ../lib/apcerror.c -o $(OBJDIR)/apcerror.o
+$(OBJDIR)/apcerror.o: ../lib/apcerror.c
+	$(CXX) -c $< -o $@
  
-apcevents.o: ../lib/apcevents.c
-	$(CXX) -c ../lib/apcevents.c -o $(OBJDIR)/apcevents.o
+$(OBJDIR)/apcevents.o: ../lib/apcevents.c
+	$(CXX) -c $< -o $@
 
-apcexec.o: ../lib/apcexec.c
-	$(CXX) -c ../lib/apcexec.c -o $(OBJDIR)/apcexec.o
+$(OBJDIR)/apcexec.o: ../lib/apcexec.c
+	$(CXX) -c $< -o $@
 
-apcfile.o: ../lib/apcfile.c
-	$(CXX) -c ../lib/apcfile.c -o $(OBJDIR)/apcfile.o
+$(OBJDIR)/apcfile.o: ../lib/apcfile.c
+	$(CXX) -c $< -o $@
 
-apclibnis.o: ../lib/apclibnis.c
-	$(CXX) -c ../lib/apclibnis.c -o $(OBJDIR)/apclibnis.o
+$(OBJDIR)/apclibnis.o: ../lib/apclibnis.c
+	$(CXX) -c $< -o $@
 
-apclock.o: ../lib/apclock.c
-	$(CXX) -c ../lib/apclock.c -o $(OBJDIR)/apclock.o
+$(OBJDIR)/apclock.o: ../lib/apclock.c
+	$(CXX) -c $< -o $@
 
-apclog.o: ../lib/apclog.c
-	$(CXX) -c ../lib/apclog.c -o $(OBJDIR)/apclog.o
+$(OBJDIR)/apclog.o: ../lib/apclog.c
+	$(CXX) -c $< -o $@
 
-apcsignal.o: ../lib/apcsignal.c
-	$(CXX) -c ../lib/apcsignal.c -o $(OBJDIR)/apcsignal.o
+$(OBJDIR)/apcsignal.o: ../lib/apcsignal.c
+	$(CXX) -c $< -o $@
 
-apcstatus.o: ../lib/apcstatus.c
-	$(CXX) -c ../lib/apcstatus.c -o $(OBJDIR)/apcstatus.o
+$(OBJDIR)/apcstatus.o: ../lib/apcstatus.c
+	$(CXX) -c $< -o $@
 
-asys.o: ../lib/asys.c
-	$(CXX) -c ../lib/asys.c -o $(OBJDIR)/asys.o
+$(OBJDIR)/asys.o: ../lib/asys.c
+	$(CXX) -c $< -o $@
 
-newups.o: ../lib/newups.c
-	$(CXX) -c ../lib/newups.c -o $(OBJDIR)/newups.o
+$(OBJDIR)/newups.o: ../lib/newups.c
+	$(CXX) -c $< -o $@
 
-wincompat.o: ../lib/wincompat.c
-	$(CXX) -c ../lib/wincompat.c -o $(OBJDIR)/wincompat.o
+$(OBJDIR)/wincompat.o: ../lib/wincompat.c
+	$(CXX) -c $< -o $@
 
 
 ######################################################################
@@ -178,8 +177,8 @@ wincompat.o: ../lib/wincompat.c
 OBJS_DRIVERS = \
 	$(OBJDIR)/drivers.o
 
-drivers.o:  ../drivers/drivers.c
-	$(CXX) -c ../drivers/drivers.c -o $(OBJDIR)/drivers.o
+$(OBJDIR)/drivers.o:  ../drivers/drivers.c
+	$(CXX) -c $< -o $@
 
 ######################################################################
 
@@ -187,8 +186,8 @@ drivers.o:  ../drivers/drivers.c
 OBJS_TESTDRV = \
 	$(OBJDIR)/testdriver.o
 
-testdriver.o:  ../drivers/test/testdriver.c
-	$(CXX) -c ../drivers/test/testdriver.c -o $(OBJDIR)/testdriver.o
+$(OBJDIR)/testdriver.o:  ../drivers/test/testdriver.c
+	$(CXX) -c $< -o $@
 
 ######################################################################
 
@@ -196,8 +195,8 @@ testdriver.o:  ../drivers/test/testdriver.c
 OBJS_NETDRV = \
 	$(OBJDIR)/net.o
 
-net.o:	../drivers/net/net.c
-	$(CXX) -c ../drivers/net/net.c -o $(OBJDIR)/net.o
+$(OBJDIR)/net.o:  ../drivers/net/net.c
+	$(CXX) -c $< -o $@
 
 ######################################################################
 
@@ -211,23 +210,23 @@ OBJS_SRC = \
 	$(OBJDIR)/options.o \
 	$(OBJDIR)/reports.o
 
-action.o:  ../action.c
-	$(CXX) -c ../action.c -o $(OBJDIR)/action.o
+$(OBJDIR)/action.o:  ../action.c
+	$(CXX) -c $< -o $@
 
-apcupsd.o:  ../apcupsd.c
-	$(CXX) -c ../apcupsd.c -o $(OBJDIR)/apcupsd.o
+$(OBJDIR)/apcupsd.o:  ../apcupsd.c
+	$(CXX) -c $< -o $@
 
-apcnis.o:  ../apcnis.c
-	$(CXX) -c ../apcnis.c -o $(OBJDIR)/apcnis.o
+$(OBJDIR)/apcnis.o:  ../apcnis.c
+	$(CXX) -c $< -o $@
 
-device.o:  ../device.c
-	$(CXX) -c ../device.c -o $(OBJDIR)/device.o
+$(OBJDIR)/device.o:  ../device.c
+	$(CXX) -c $< -o $@
 
-options.o:  ../options.c
-	$(CXX) -c ../options.c -o $(OBJDIR)/options.o
+$(OBJDIR)/options.o:  ../options.c
+	$(CXX) -c $< -o $@
 
-reports.o:  ../reports.c
-	$(CXX) -c ../reports.c -o $(OBJDIR)/reports.o
+$(OBJDIR)/reports.o:  ../reports.c
+	$(CXX) -c $< -o $@
 
 
 ######################################################################
@@ -236,8 +235,8 @@ reports.o:  ../reports.c
 OBJS_ACCESS = \
 	$(OBJDIR)/apcaccess.o
 
-apcaccess.o:  ../apcaccess.c
-	$(CXX) -c ../apcaccess.c -o $(OBJDIR)/apcaccess.o
+$(OBJDIR)/apcaccess.o:	../apcaccess.c
+	$(CXX) -c $< -o $@
 
 ######################################################################
 

@@ -27,7 +27,7 @@
  * Last Modified By: Thorsten Engel
  * Last Modified On: Fri Apr 22 19:30:00 2004
  * Update Count    : 218
- * $Id: compat.h,v 1.6 2006-05-01 13:14:39 kerns Exp $
+ * $Id: compat.h,v 1.7 2006-05-02 09:11:08 kerns Exp $
  */
 
 
@@ -181,6 +181,7 @@ int gettimeofday(struct timeval *, struct timezone *);
 #define ETIMEDOUT 55
 #endif
 
+#ifndef HAVE_WXCONSOLE
 struct stat
 {
     _dev_t      st_dev;
@@ -197,6 +198,8 @@ struct stat
     uint32_t    st_blksize;
     uint64_t    st_blocks;
 };
+
+#endif
 
 #undef  S_IFMT
 #define S_IFMT         0170000         /* file type mask */
