@@ -11,11 +11,6 @@
 #define __MINGWCONFIG_H
 
 
-/* Define if you want SmartAlloc debug code enabled */
-#define SMARTALLOC 1
-
-/* Define if you need function prototypes */
-#define PROTOTYPES 1
 
 /* Define if you have GCC */
 #define HAVE_GCC 1
@@ -27,24 +22,36 @@
 #define HOST "Win32"
 
 /* Define the default pid files directory. */
-#define PIDDIR "/var/run"
+#define PIDDIR "/apcupsd/etc/apcupsd"
 
 /* Define the default "log" files directory. */
-#define LOGDIR "/etc/apcupsd"
+#define LOGDIR "/apcupsd/etc/apcupsd"
 
 /* Network Information port */
 #define NISPORT 3551
 
 /* sysconfdir */
-#define SYSCONFDIR "/etc/apcupsd"
+#define SYSCONFDIR "/apcupsd/etc/apcupsd"
 
 /* Power fail dir */
-#define PWRFAILDIR "/etc/apcupsd"
+#define PWRFAILDIR "/apcupsd/etc"
 
 /* nologdirr */
-#define NOLOGDIR "/etc"
+#define NOLOGDIR "/apcupsd/etc"
 
-#define EXEEXT ""
+#define EXEEXT ".exe"
+
+/* Set if you have POSIX pthreads */
+#define HAVE_PTHREADS 1
+
+/* Set if you want NIS server support */
+#define HAVE_NISSERVER 1
+
+/* Set if you want NIS client support */
+#define HAVE_NET_DRIVER 1
+
+/* Set by configure if one of the two above are set */
+#define HAVE_NISLIB 1
 
 /* Define to 1 if utime.h exists and declares struct utimbuf.  */
 #define HAVE_UTIME_H 1
@@ -59,6 +66,12 @@
 #define HAVE_UINT64_T 1
 #define HAVE_INTMAX_T 1
 /* #undef HAVE_U_INTMAX_T */
+
+/* Define if you want SmartAlloc debug code enabled */
+#define SMARTALLOC 1
+
+/* Define if you need function prototypes */
+#define PROTOTYPES 1
 
 /* Define if you want TCP Wrappers support */
 /* #undef HAVE_LIBWRAP */
@@ -317,41 +330,6 @@
 
 /* Define to 1 if you have the `vsnprintf' function. */
 #define HAVE_VSNPRINTF 1
-
-/* Define to 1 if you have the <zlib.h> header file. */
-/*   #define HAVE_ZLIB_H 1  */
-
-/* Define to 1 if `major', `minor', and `makedev' are declared in <mkdev.h>.
-   */
-/* #undef MAJOR_IN_MKDEV */
-
-/* Define to 1 if `major', `minor', and `makedev' are declared in
-   <sysmacros.h>. */
-/* #undef MAJOR_IN_SYSMACROS */
-
-/* Define to 1 if your C compiler doesn't accept -c and -o together. */
-/* #undef NO_MINUS_C_MINUS_O */
-
-/* Define to the address where bug reports for this package should be sent. */
-#define PACKAGE_BUGREPORT ""
-
-/* Define to the full name of this package. */
-#define PACKAGE_NAME ""
-
-/* Define to the full name and version of this package. */
-#define PACKAGE_STRING ""
-
-/* Define to the one symbol short name of this package. */
-#define PACKAGE_TARNAME ""
-
-/* Define to the version of this package. */
-#define PACKAGE_VERSION ""
-
-/* Define as the return type of signal handlers (`int' or `void'). */
-#define RETSIGTYPE void
-
-/* Define to 1 if the `setpgrp' function takes no argument. */
-#define SETPGRP_VOID 1
 
 /* The size of a `char', as computed by sizeof. */
 #define SIZEOF_CHAR 1
