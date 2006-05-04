@@ -175,3 +175,10 @@ and do an "Update Driver..." on "American Power Conversion USB UPS
 driver from the list. After that you should be back where you started 
 and the "Batteries -> HID UPS Battery" entry should be back and the
 
+====  to add USB
+You should need to compile...
+
+    src/libusbhid/*.c
+    src/drivers/usb/*.c
+    src/drivers/usb/generic/*.c
+

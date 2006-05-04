@@ -162,10 +162,12 @@ void do_server(UPSINFO *ups)
    }
 
    /* Reuse old sockets */
+#ifndef HAVE_MINGW
    if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &turnon, sizeof(turnon)) < 0) {
       log_event(ups, LOG_WARNING, "Cannot set SO_REUSEADDR on socket: %s\n",
          strerror(errno));
    }
+#endif
    
    /* Bind our local address so that the client can send to us. */
    memset((char *)&serv_addr, 0, sizeof(serv_addr));
