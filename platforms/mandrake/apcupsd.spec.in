@@ -69,7 +69,7 @@ Source1:      Release_Notes-%{version}-%{release}.tar.gz
 Group:        System Environment/Daemons
 License:      GPL v2
 BuildRoot:    %{_tmppath}/%{name}-root
-BuildRequires: gd-devel, ncurses-devel
+BuildRequires: gd-devel, ncurses-devel, ghostscript
 %if %{rh7}
 BuildRequires: glibc-devel >= 2.2, libjpeg-devel, libpng-devel, zlib-devel, freetype-devel
 %else
@@ -87,6 +87,7 @@ BuildRequires: latex2html
 BuildRequires: tetex
 BuildRequires: latex2html
 BuildRequires: tetex-dvips
+BuildRequires: ghostscript-dvipdf
 %endif
 
 %description
@@ -338,6 +339,8 @@ if [ $1 = 0 ] ; then
 fi
 
 %changelog
+* Fir May 05 2006 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- update build requirments to include ghostscript
 * Sun Apr 23 2006 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - add pdf manual to doc package
 - remove redundant code for std and usb packages
