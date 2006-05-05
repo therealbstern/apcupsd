@@ -19,7 +19,7 @@
 //
 // Author          : Christopher S. Hull
 // Created On      : Sat Jan 31 15:55:00 2004
-// $Id: compat.cpp,v 1.9 2006-05-05 14:01:37 kerns Exp $
+// $Id: compat.cpp,v 1.10 2006-05-05 14:03:51 kerns Exp $
 
 #ifdef __APCUPSD__
 
@@ -826,7 +826,7 @@ gettimeofday(struct timeval *tv, struct timezone *)
 
 /* For apcupsd this is in src/lib/wincompat.c */
 #ifndef __APCUPSD__
-void syslog(int type, const char *fmt, ...) 
+extern "C" void syslog(int type, const char *fmt, ...) 
 {
 /*#ifndef HAVE_CONSOLE
     MessageBox(NULL, msg, "Bacula", MB_OK);
