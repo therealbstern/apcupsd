@@ -39,8 +39,6 @@ class upsStatus;
 #if (!defined(_win_upsStatus))
 #define _win_upsStatus
 
-// Includes
-#include "winhdrs.h"
 
 // The upsStatus class itself
 class upsStatus

@@ -38,7 +38,6 @@ class upsMenu;
 #if (!defined(_win_upsMENU))
 #define _win_upsMENU
 
-#include "winhdrs.h"
 #include <lmcons.h>
 #include "winprop.h"
 #include "winabout.h"

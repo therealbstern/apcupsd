@@ -34,7 +34,7 @@
 
 // Implementation of the About dialog!
 
-#include "winhdrs.h"
+#include <windows.h>
 
 #include "winups.h"
 #include "winabout.h"

@@ -25,7 +25,7 @@
 // by Kern E. Sibbald.  Many thanks to ATT and James Weatherall,
 // the original author, for providing an excellent template.
 //
-// Copyright (2000-2005) Kern E. Sibbald
+// Copyright (2000-2006) Kern E. Sibbald
 //     20 July 2000
 //
 
@@ -43,12 +43,13 @@
 #undef STRICT
 #else
 #include "config.h"
+extern "C" void syslog(int type, const char *fmt, ...);
 #endif
 
 ////////////////////////////
 // System headers
 #include <unistd.h>
-#include "winhdrs.h"
+#include <windows.h>
 #include <lmcons.h>
 #include <ctype.h>
 #include <signal.h>

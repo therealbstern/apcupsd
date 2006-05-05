@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright (C) 1999-2005 Kern Sibbald <kern@sibbald.com>
+ * Copyright (C) 1999-2006 Kern Sibbald <kern@sibbald.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of version 2 of the GNU General
@@ -24,7 +24,7 @@
 
 #include "apc.h"
 
-#ifdef HAVE_CYGWIN
+#if  defined(HAVE_CYGWIN) || defined(HAVE_MINGW)
 
 #include <windows.h>
 
@@ -43,7 +43,7 @@ extern UPSINFO *core_ups;
  * Actually WinNT does have a system log, but we don't use it
  * here.
  */
-void syslog(int type, const char *fmt, ...)
+extern "C" void syslog(int type, const char *fmt, ...)
 {
    UPSINFO *ups = core_ups;
    va_list arg_ptr;
@@ -88,6 +88,7 @@ void syslog(int type, const char *fmt, ...)
    }
 }
 
+#ifndef HAVE_MINGW
 struct tm *localtime_r(const time_t *timep, struct tm *tm)
 {
    static pthread_mutex_t mutex;
@@ -102,8 +103,9 @@ struct tm *localtime_r(const time_t *timep, struct tm *tm)
    P(mutex);
 
    ltm = localtime(timep);
-   if (ltm)
+   if (ltm) {
       memcpy(tm, ltm, sizeof(struct tm));
+   }
 
    V(mutex);
 
@@ -178,5 +180,6 @@ int winioctl(int fd, int func, int *addr)
 
    return EINVAL;
 }
+#endif
 
 #endif   /* HAVE_CYGWIN */

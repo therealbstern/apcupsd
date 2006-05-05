@@ -27,7 +27,7 @@
  * Last Modified By: Thorsten Engel
  * Last Modified On: Fri Apr 22 19:30:00 2004
  * Update Count    : 218
- * $Id: compat.h,v 1.7 2006-05-02 09:11:08 kerns Exp $
+ * $Id: compat.h,v 1.8 2006-05-05 14:01:37 kerns Exp $
  */
 
 
@@ -306,8 +306,6 @@ int __sprintf(char *str, const char *fmt, ...);
 struct timespec;
 int readdir(unsigned int fd, struct dirent *dirp, unsigned int count);
 int nanosleep(const struct timespec*, struct timespec *);
-//struct tm *localtime_r(const time_t *, struct tm *);
-//struct tm *gmtime_r(const time_t *, struct tm *);
 long int random(void);
 void srandom(unsigned int seed);
 int lstat(const char *, struct stat *);
@@ -343,7 +341,7 @@ struct sigaction {
 #define mkdir(p, m) win32_mkdir(p)
 #define unlink win32_unlink
 #define chdir win32_chdir
-int syslog(int, const char *, const char *);
+extern "C" void syslog(int type, const char *fmt, ...);
 #ifndef LOG_DAEMON
 #define LOG_DAEMON 0
 #endif
