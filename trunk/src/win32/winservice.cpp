@@ -39,9 +39,10 @@
 #ifdef HAVE_MINGW
 #include "compat.h"
 #undef STRICT
+#else
+extern "C" void syslog(int type, const char *fmt, ...);
 #endif
 
-#include "winhdrs.h"
 
 // Header
 

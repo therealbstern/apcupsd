@@ -31,7 +31,7 @@
 
 // WinUPS header file
 
-#include "winhdrs.h"
+#include <windows.h>
 #include "winres.h"
 
 // Application specific messages

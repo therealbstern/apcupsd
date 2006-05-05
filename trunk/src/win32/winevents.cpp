@@ -34,7 +34,7 @@
 
 // Implementation of the Events dialogue 
 
-#include "winhdrs.h"
+#include <windows.h>
 
 #include "winups.h"
 #include "winevents.h"

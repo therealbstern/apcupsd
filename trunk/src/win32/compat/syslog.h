@@ -25,7 +25,7 @@
 #define LOG_PID     0
 
 
-int syslog(int type, const char *fmt, const char *msg);
+extern "C" void syslog(int type, const char *fmt, ...);
 void openlog(const char *app, int, int);
 void closelog(void);
 

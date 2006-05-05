@@ -39,9 +39,6 @@ class upsEvents;
 #if (!defined(_win_upsEvents))
 #define _win_upsEvents
 
-// Includes
-#include "winhdrs.h"
-
 // The upsEvents class itself
 class upsEvents
 {

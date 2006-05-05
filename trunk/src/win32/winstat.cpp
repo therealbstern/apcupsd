@@ -34,7 +34,7 @@
 
 // Implementation of the Status dialog
 
-#include "winhdrs.h"
+#include <windows.h>
 
 #include "winups.h"
 #include "winstat.h"

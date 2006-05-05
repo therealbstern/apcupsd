@@ -34,7 +34,7 @@
 
 // Implementation of a system tray icon & menu for Apcupsd
 
-#include "winhdrs.h"
+#include <windows.h>
 #include "winups.h"
 #include "winservice.h"
 #include <lmcons.h>
