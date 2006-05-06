@@ -19,7 +19,7 @@
 //
 // Author          : Christopher S. Hull
 // Created On      : Sat Jan 31 15:55:00 2004
-// $Id: compat.cpp,v 1.11 2006-05-06 03:13:42 adk0212 Exp $
+// $Id: compat.cpp,v 1.12 2006-05-06 13:48:24 adk0212 Exp $
 
 #ifdef __APCUPSD__
 
@@ -2173,7 +2173,7 @@ int tcflush(int fd, int queue_selector)
 {
    HANDLE h = (HANDLE)_get_osfhandle(fd);
    DWORD flags = 0;
-   
+
    switch (queue_selector) {
    case TCIFLUSH:
       flags |= PURGE_RXCLEAR;
@@ -2184,6 +2184,7 @@ int tcflush(int fd, int queue_selector)
    case TCIOFLUSH:
       flags |= PURGE_RXCLEAR;
       flags |= PURGE_TXCLEAR;
+      break;
    }
    
    PurgeComm(h, flags);
