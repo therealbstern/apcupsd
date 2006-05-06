@@ -81,7 +81,7 @@ winapi.o:	 ./compat/winapi.c
 OBJS_WIN = \
 	$(OBJDIR)/winabout.o \
 	$(OBJDIR)/winevents.o \
-	$(OBJDIR)/winservice.o \
+	$(OBJDIR)/newwinservice.o \
 	$(OBJDIR)/winstat.o \
 	$(OBJDIR)/wintray.o \
 	$(OBJDIR)/winmain.o \
@@ -96,7 +96,7 @@ $(OBJDIR)/winevents.o:	  ./winevents.cpp
 $(OBJDIR)/winmain.o:	  ./winmain.cpp
 	$(CXX) -c $< -o $@
 
-$(OBJDIR)/winservice.o:   ./winservice.cpp
+$(OBJDIR)/newwinservice.o:   ./newwinservice.cpp
 	$(CXX) -c $< -o $@
 
 $(OBJDIR)/winstat.o:	  ./winstat.cpp
@@ -203,11 +203,11 @@ $(OBJDIR)/net.o:  ../drivers/net/net.c
 
 # Files in src/drivers/apcsmart
 OBJS_SMARTDRV = \
-        $(OBJDIR)/smart.o       \
-        $(OBJDIR)/smartoper.o   \
-        $(OBJDIR)/smartsetup.o  \
-        $(OBJDIR)/smartsetup2.o \
-        $(OBJDIR)/smarteeprom.o
+	$(OBJDIR)/smart.o	\
+	$(OBJDIR)/smartoper.o	\
+	$(OBJDIR)/smartsetup.o	\
+	$(OBJDIR)/smartsetup2.o \
+	$(OBJDIR)/smarteeprom.o
 
 $(OBJDIR)/smart.o: ../drivers/apcsmart/smart.c
 	$(CXX) -c $< -o $@
@@ -228,8 +228,8 @@ $(OBJDIR)/smarteeprom.o: ../drivers/apcsmart/smarteeprom.c
 
 # Files in src/drivers/dumb
 OBJS_DUMBDRV = \
-        $(OBJDIR)/dumboper.o   \
-        $(OBJDIR)/dumbsetup.o
+	$(OBJDIR)/dumboper.o   \
+	$(OBJDIR)/dumbsetup.o
 
 $(OBJDIR)/dumboper.o: ../drivers/dumb/dumboper.c
 	$(CXX) -c $< -o $@
@@ -283,7 +283,7 @@ $(OBJDIR)/apcaccess.o:	../apcaccess.c
 
 APC_OBJS = $(OBJS_SRC) $(LIB_OBJS) $(OBJS_COMPAT) $(OBJS_WIN) \
 	   $(OBJS_DRIVERS) $(OBJS_TESTDRV) $(OBJS_NETDRV) \
-           $(OBJS_SMARTDRV) $(OBJS_DUMBDRV)
+	   $(OBJS_SMARTDRV) $(OBJS_DUMBDRV)
 
 APC_LIBS = \
 	-L$(LIB_MINGW) \
@@ -314,6 +314,7 @@ clean:
 apcupsd.exe: $(APC_OBJS)
 	$(CXX) $(APC_OBJS) $(APC_LIBS) -o $(OBJDIR)/apcupsd.exe
 	cp -f $(DEPKGS)/pthreads/pthreadGCE.dll .
+	cp -f $(MINGW)/mingw32/bin/mingwm10.dll .
 
 apcaccess.exe: $(ACCESS_OBJS)
 	$(CXX) $(ACCESS_OBJS) $(ACCESS_LIBS) -o $(OBJDIR)/apcaccess.exe

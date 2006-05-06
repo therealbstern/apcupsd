@@ -22,7 +22,7 @@
 // the authors on vnc@uk.research.att.com for information on obtaining it.
 //
 // This file has been adapted to the Win32 version of Apcupsd
-// by Kern E. Sibbald.	Many thanks to ATT and James Weatherall,
+// by Kern E. Sibbald.  Many thanks to ATT and James Weatherall,
 // the original author, for providing an excellent template.
 //
 // Copyright (2000-2006) Kern E. Sibbald
@@ -36,17 +36,30 @@
 // Apcupsd and ask it to do something (show about, show status,
 // show events, ...)
 
-#include "winups.h"
+#ifdef HAVE_MINGW
+#include "compat.h"
+#undef STRICT
+#else
+extern "C" void syslog(int type, const char *fmt, ...);
+#endif
+
+
+// Header
+
+#include "winservice.h"
 
 #include <lmcons.h>
-#undef PASCAL
-#include "winservice.h"
+#include "winups.h"
 #include "wintray.h"
+
+// Error message logging
+void LogErrorMsg(char *message, int eventID);
+extern void logonfail(int ok);
 
 #define _(x) x
 
 void set_service_description(SC_HANDLE hSCManager, SC_HANDLE hService,
-			     LPSTR lpDesc);
+                             LPSTR lpDesc);
 
 // OS-SPECIFIC ROUTINES
 
@@ -149,29 +162,44 @@ upsService::ShowStatus()
   return TRUE;
 }
 
+// Static routine to show the Events dialog for a currently-running
+// copy of Apcupsd, (usually a servicified version.)
+
+BOOL upsService::ShowEvents()
+{
+   // Post to the Apcupsd menu window
+   if (!PostToApcupsd(MENU_EVENTS_SHOW, 0, 0)) {
+      MessageBox(NULL, "No existing instance of Apcupsd could be contacted",
+                 szAppName, MB_ICONEXCLAMATION | MB_OK);
+      return FALSE;
+   }
+   return TRUE;
+}
+
+
 // SERVICE-MODE ROUTINES
 
 // Service-mode defines:
 
 // Executable name
-#define BAC_APPNAME	       "apcupsd"
+#define UPS_APPNAME            "apcupsd"
 
 // Internal service name
-#define BAC_SERVICENAME        "Apcupsd"
+#define UPS_SERVICENAME        "Apcupsd"
 
 // Displayed service name
-#define BAC_SERVICEDISPLAYNAME "Apcupsd File Server"
+#define UPS_SERVICEDISPLAYNAME "Apcupsd File Server"
 
 // List other required serves 
-#define BAC_DEPENDENCIES __TEXT("tcpip\0afd\0+File System\0") 
+#define UPS_DEPENDENCIES __TEXT("tcpip\0afd\0+File System\0") 
 
 
 // Internal service state
-SERVICE_STATUS		g_srvstatus;	   // current status of the service
-SERVICE_STATUS_HANDLE	g_hstatus;
-DWORD			g_error = 0;
-DWORD			g_servicethread = 0;
-char*			g_errortext[256];
+SERVICE_STATUS          g_srvstatus;       // current status of the service
+SERVICE_STATUS_HANDLE   g_hstatus;
+DWORD                   g_error = 0;
+DWORD                   g_servicethread = 0;
+char*                   g_errortext[256];
 
 
 // Forward defines of internal service functions
@@ -184,7 +212,7 @@ BOOL ReportStatus(DWORD state, DWORD exitcode, DWORD waithint);
 
 // ROUTINE TO QUERY WHETHER THIS PROCESS IS RUNNING AS A SERVICE OR NOT
 
-BOOL	g_servicemode = FALSE;
+BOOL    g_servicemode = FALSE;
 
 BOOL
 upsService::RunningAsService()
@@ -216,20 +244,20 @@ upsService::ApcupsdServiceMain()
       // Obtain a handle to the kernel library
       HINSTANCE kerneldll = LoadLibrary("KERNEL32.DLL");
       if (kerneldll == NULL) {
-	 MessageBox(NULL, _("KERNEL32.DLL not found: Apcupsd service not started"), 
-	     "Apcupsd Service", MB_OK);
-	 break;
+         MessageBox(NULL, _("KERNEL32.DLL not found: Apcupsd service not started"), 
+             "Apcupsd Service", MB_OK);
+         break;
       }
 
       // And find the RegisterServiceProcess function
       DWORD (WINAPI *RegisterService)(DWORD, DWORD);
       RegisterService = (DWORD (WINAPI *)(DWORD, DWORD))
-	      GetProcAddress(kerneldll, "RegisterServiceProcess");
+              GetProcAddress(kerneldll, "RegisterServiceProcess");
       if (RegisterService == NULL) {
-	 MessageBox(NULL, _("Registry service not found: Apcupsd service not started"),
-	    "Apcupsd Service", MB_OK);
-	 log_error_message(_("Registry service not found")); 
-	 break;
+         MessageBox(NULL, _("Registry service not found: Apcupsd service not started"),
+            "Apcupsd Service", MB_OK);
+         log_error_message(_("Registry service not found")); 
+         break;
       }
       
       // Register this process with the OS as a service!
@@ -252,13 +280,13 @@ upsService::ApcupsdServiceMain()
       {
       // Create a service entry table
       SERVICE_TABLE_ENTRY dispatchTable[] = {
-	 {BAC_SERVICENAME, (LPSERVICE_MAIN_FUNCTION)ServiceMain},
-	 {NULL, NULL}
+         {UPS_SERVICENAME, (LPSERVICE_MAIN_FUNCTION)ServiceMain},
+         {NULL, NULL}
       };
 
       // Call the service control dispatcher with our entry table
       if (!StartServiceCtrlDispatcher(dispatchTable)) {
-	 log_error_message(_("StartServiceCtrlDispatcher failed."));
+         log_error_message(_("StartServiceCtrlDispatcher failed."));
       }
       break;
       } /* end case */
@@ -273,12 +301,12 @@ void WINAPI ServiceMain(DWORD argc, char **argv)
     DWORD dwThreadID;
 
     // Register the service control handler
-    g_hstatus = RegisterServiceCtrlHandler(BAC_SERVICENAME, ServiceCtrl);
+    g_hstatus = RegisterServiceCtrlHandler(UPS_SERVICENAME, ServiceCtrl);
 
     if (g_hstatus == 0) {
        log_error_message(_("RegisterServiceCtlHandler failed")); 
        MessageBox(NULL, _("Contact Register Service Handler failure"),
-	  "Apcupsd service", MB_OK);
+          "Apcupsd service", MB_OK);
        return;
     }
 
@@ -286,18 +314,18 @@ void WINAPI ServiceMain(DWORD argc, char **argv)
     g_srvstatus.dwServiceType = SERVICE_WIN32 | SERVICE_INTERACTIVE_PROCESS;
     g_srvstatus.dwServiceSpecificExitCode = 0;
 
-	// Give this status to the SCM
+        // Give this status to the SCM
     if (!ReportStatus(
-	    SERVICE_START_PENDING,	    // Service state
-	    NO_ERROR,			    // Exit code type
-	    45000)) {			    // Hint as to how long Apcupsd should have hung before you assume error
+            SERVICE_START_PENDING,          // Service state
+            NO_ERROR,                       // Exit code type
+            45000)) {                       // Hint as to how long Apcupsd should have hung before you assume error
 
-	ReportStatus(SERVICE_STOPPED, g_error,	0);
-	log_error_message(_("ReportStatus STOPPED failed 1")); 
-	return;
+        ReportStatus(SERVICE_STOPPED, g_error,  0);
+        log_error_message(_("ReportStatus STOPPED failed 1")); 
+        return;
     }
 
-	// Now start the service for real
+        // Now start the service for real
     (void)CreateThread(NULL, 0, ServiceWorkThread, NULL, 0, &dwThreadID);
     return;
 }
@@ -313,9 +341,9 @@ DWORD WINAPI ServiceWorkThread(LPVOID lpwThreadParam)
     // report the status to the service control manager.
     //
     if (!ReportStatus(
-	  SERVICE_RUNNING,	 // service state
-	  NO_ERROR,		 // exit code
-	  0)) { 		 // wait hint
+          SERVICE_RUNNING,       // service state
+          NO_ERROR,              // exit code
+          0)) {                  // wait hint
        MessageBox(NULL, _("Report Service failure"), "Apcupsd Service", MB_OK);
        log_error_message("ReportStatus RUNNING failed"); 
        return 0;
@@ -362,18 +390,18 @@ upsService::InstallService()
       sprintf(servicecmd, "\"%s\" %s -c \"%s\"", path, ApcupsdRunService, path);
       len = strlen(servicecmd) - 1;
       for ( ; len > 0; len--) {
-	 if (servicecmd[len] == '\\') {
-	    servicecmd[len] = 0;
-	    break;
-	 }
-	 servicecmd[len] = 0;
+         if (servicecmd[len] == '\\') {
+            servicecmd[len] = 0;
+            break;
+         }
+         servicecmd[len] = 0;
       }
       strcat(servicecmd, "\\apcupsd-fd.conf");
 
    } else {
       log_error_message(_("Service command length too long")); 
       MessageBox(NULL, _("Service command length too long. Service not registered."),
-	  szAppName, MB_ICONEXCLAMATION | MB_OK);
+          szAppName, MB_ICONEXCLAMATION | MB_OK);
       return 0;
    }
 
@@ -385,31 +413,31 @@ upsService::InstallService()
       // Locate the RunService registry entry
       HKEY runservices;
       if (RegCreateKey(HKEY_LOCAL_MACHINE, 
-	      "Software\\Microsoft\\Windows\\CurrentVersion\\RunServices",
-	      &runservices) != ERROR_SUCCESS) {
-	 log_error_message(_("Cannot write System Registry")); 
-	 MessageBox(NULL, _("The System Registry could not be updated - the Apcupsd service was not installed"), szAppName, MB_ICONEXCLAMATION | MB_OK);
-	 break;
+              "Software\\Microsoft\\Windows\\CurrentVersion\\RunServices",
+              &runservices) != ERROR_SUCCESS) {
+         log_error_message(_("Cannot write System Registry")); 
+         MessageBox(NULL, _("The System Registry could not be updated - the Apcupsd service was not installed"), szAppName, MB_ICONEXCLAMATION | MB_OK);
+         break;
       }
 
       // Attempt to add a Apcupsd key
       if (RegSetValueEx(runservices, szAppName, 0, REG_SZ, (unsigned char *)servicecmd, strlen(servicecmd)+1) != ERROR_SUCCESS) {
-	 RegCloseKey(runservices);
-	 log_error_message(_("Cannot add Apcupsd key to System Registry")); 
-	 MessageBox(NULL, _("The Apcupsd service could not be installed"), szAppName, MB_ICONEXCLAMATION | MB_OK);
-	 break;
+         RegCloseKey(runservices);
+         log_error_message(_("Cannot add Apcupsd key to System Registry")); 
+         MessageBox(NULL, _("The Apcupsd service could not be installed"), szAppName, MB_ICONEXCLAMATION | MB_OK);
+         break;
       }
 
       RegCloseKey(runservices);
 
       // We have successfully installed the service!
       MessageBox(NULL,
-	      _("The Apcupsd File service was successfully installed.\n"
-	      "The service may be started by double clicking on the\n"
-	      "Apcupsd \"Start\" icon and will be automatically\n"
-	      "be run the next time this machine is rebooted. "),
-	      szAppName,
-	      MB_ICONINFORMATION | MB_OK);
+              _("The Apcupsd File service was successfully installed.\n"
+              "The service may be started by double clicking on the\n"
+              "Apcupsd \"Start\" icon and will be automatically\n"
+              "be run the next time this machine is rebooted. "),
+              szAppName,
+              MB_ICONINFORMATION | MB_OK);
       break;
 
    // Windows NT, Win2K, WinXP
@@ -420,36 +448,36 @@ upsService::InstallService()
       // Open the default, local Service Control Manager database
       hsrvmanager = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
       if (hsrvmanager == NULL) {
-	 log_error_message("OpenSCManager failed"); 
-	 MessageBox(NULL,
-	    _("The Service Control Manager could not be contacted - the Apcupsd service was not installed"),
-	    szAppName, MB_ICONEXCLAMATION | MB_OK);
-	 break;
+         log_error_message("OpenSCManager failed"); 
+         MessageBox(NULL,
+            _("The Service Control Manager could not be contacted - the Apcupsd service was not installed"),
+            szAppName, MB_ICONEXCLAMATION | MB_OK);
+         break;
       }
 
       // Create an entry for the Apcupsd service
       hservice = CreateService(
-	      hsrvmanager,		      // SCManager database
-	      BAC_SERVICENAME,		      // name of service
-	      BAC_SERVICEDISPLAYNAME,	      // name to display
-	      SERVICE_ALL_ACCESS,	      // desired access
-	      SERVICE_WIN32_OWN_PROCESS | SERVICE_INTERACTIVE_PROCESS,
-								      // service type
-	      SERVICE_AUTO_START,	      // start type
-	      SERVICE_ERROR_NORMAL,	      // error control type
-	      servicecmd,		      // service's binary
-	      NULL,			      // no load ordering group
-	      NULL,			      // no tag identifier
-	      BAC_DEPENDENCIES, 	      // dependencies
-	      NULL,			      // LocalSystem account
-	      NULL);			      // no password
+              hsrvmanager,                    // SCManager database
+              UPS_SERVICENAME,                // name of service
+              UPS_SERVICEDISPLAYNAME,         // name to display
+              SERVICE_ALL_ACCESS,             // desired access
+              SERVICE_WIN32_OWN_PROCESS | SERVICE_INTERACTIVE_PROCESS,
+                                                                      // service type
+              SERVICE_AUTO_START,             // start type
+              SERVICE_ERROR_NORMAL,           // error control type
+              servicecmd,                     // service's binary
+              NULL,                           // no load ordering group
+              NULL,                           // no tag identifier
+              UPS_DEPENDENCIES,               // dependencies
+              NULL,                           // LocalSystem account
+              NULL);                          // no password
       if (hservice == NULL) {
-	 CloseServiceHandle(hsrvmanager);
-	 log_error_message("CreateService failed"); 
-	 MessageBox(NULL,
-	     _("The Apcupsd service could not be installed"),
-	      szAppName, MB_ICONEXCLAMATION | MB_OK);
-	 break;
+         CloseServiceHandle(hsrvmanager);
+         log_error_message("CreateService failed"); 
+         MessageBox(NULL,
+             _("The Apcupsd service could not be installed"),
+              szAppName, MB_ICONEXCLAMATION | MB_OK);
+         break;
       }
 
       set_service_description(hsrvmanager,hservice, 
@@ -460,19 +488,19 @@ _("Apcupsd provides shutdown of your UPS in the event of a power failure."));
 
       // Everything went fine
       MessageBox(NULL,
-	      _("The Apcupsd UPS service was successfully installed.\n"
-	      "The service may be started from the Control Panel and will\n"
-	      "automatically be run the next time this machine is rebooted."),
-	      szAppName,
-	      MB_ICONINFORMATION | MB_OK);
+              _("The Apcupsd UPS service was successfully installed.\n"
+              "The service may be started from the Control Panel and will\n"
+              "automatically be run the next time this machine is rebooted."),
+              szAppName,
+              MB_ICONINFORMATION | MB_OK);
       break;
    default:
       log_error_message("Unknown Windows System version"); 
       MessageBox(NULL, 
-		 _("Unknown Windows operating system.\n"     
-		 "Cannot install Apcupsd service.\n"),
-		 szAppName, MB_ICONEXCLAMATION | MB_OK);
-       break;	  
+                 _("Unknown Windows operating system.\n"     
+                 "Cannot install Apcupsd service.\n"),
+                 szAppName, MB_ICONEXCLAMATION | MB_OK);
+       break;     
    };
 
    return 0;
@@ -491,27 +519,27 @@ upsService::RemoveService()
       // Locate the RunService registry entry
       HKEY runservices;
       if (RegOpenKey(HKEY_LOCAL_MACHINE, 
-	      "Software\\Microsoft\\Windows\\CurrentVersion\\RunServices",
-	      &runservices) != ERROR_SUCCESS) {
-	 MessageBox(NULL, 
-	    _("Could not find registry entry.\nService probably not registerd - the Apcupsd service was not removed"), szAppName, MB_ICONEXCLAMATION | MB_OK);
+              "Software\\Microsoft\\Windows\\CurrentVersion\\RunServices",
+              &runservices) != ERROR_SUCCESS) {
+         MessageBox(NULL, 
+            _("Could not find registry entry.\nService probably not registerd - the Apcupsd service was not removed"), szAppName, MB_ICONEXCLAMATION | MB_OK);
       } else {
-	 // Attempt to delete the Apcupsd key
-	 if (RegDeleteValue(runservices, szAppName) != ERROR_SUCCESS) {
-	    RegCloseKey(runservices);
-	    MessageBox(NULL, _("Could not delete Registry key.\nThe Apcupsd service could not be removed"), szAppName, MB_ICONEXCLAMATION | MB_OK);
-	 }
+         // Attempt to delete the Apcupsd key
+         if (RegDeleteValue(runservices, szAppName) != ERROR_SUCCESS) {
+            RegCloseKey(runservices);
+            MessageBox(NULL, _("Could not delete Registry key.\nThe Apcupsd service could not be removed"), szAppName, MB_ICONEXCLAMATION | MB_OK);
+         }
 
-	 RegCloseKey(runservices);
-	 break;
+         RegCloseKey(runservices);
+         break;
       }
 
       // Try to kill any running copy of Apcupsd
       if (!KillRunningCopy()) {
-	 MessageBox(NULL,
-	     _("Apcupsd could not be contacted, probably not running"),
-	     szAppName, MB_ICONEXCLAMATION | MB_OK);
-	 break;
+         MessageBox(NULL,
+             _("Apcupsd could not be contacted, probably not running"),
+             szAppName, MB_ICONEXCLAMATION | MB_OK);
+         break;
       }
 
       // We have successfully removed the service!
@@ -525,45 +553,45 @@ upsService::RemoveService()
 
       // Open the SCM
       hsrvmanager = OpenSCManager(
-	 NULL,			 // machine (NULL == local)
-	 NULL,			 // database (NULL == default)
-	 SC_MANAGER_ALL_ACCESS	 // access required
-	 );
+         NULL,                   // machine (NULL == local)
+         NULL,                   // database (NULL == default)
+         SC_MANAGER_ALL_ACCESS   // access required
+         );
       if (hsrvmanager) {
-	 hservice = OpenService(hsrvmanager, BAC_SERVICENAME, SERVICE_ALL_ACCESS);
-	 if (hservice != NULL) {
-	    SERVICE_STATUS status;
+         hservice = OpenService(hsrvmanager, UPS_SERVICENAME, SERVICE_ALL_ACCESS);
+         if (hservice != NULL) {
+            SERVICE_STATUS status;
 
-	    // Try to stop the Apcupsd service
-	    if (ControlService(hservice, SERVICE_CONTROL_STOP, &status)) {
-	       while(QueryServiceStatus(hservice, &status)) {
-		  if (status.dwCurrentState == SERVICE_STOP_PENDING) {
-		     Sleep(1000);
-		  } else {
-		     break;
-		  }
-	       }
+            // Try to stop the Apcupsd service
+            if (ControlService(hservice, SERVICE_CONTROL_STOP, &status)) {
+               while(QueryServiceStatus(hservice, &status)) {
+                  if (status.dwCurrentState == SERVICE_STOP_PENDING) {
+                     Sleep(1000);
+                  } else {
+                     break;
+                  }
+               }
 
-	       if (status.dwCurrentState != SERVICE_STOPPED) {
-		  MessageBox(NULL, _("The Apcupsd service could not be stopped"), szAppName, MB_ICONEXCLAMATION | MB_OK);
-	       }
-	    }
+               if (status.dwCurrentState != SERVICE_STOPPED) {
+                  MessageBox(NULL, _("The Apcupsd service could not be stopped"), szAppName, MB_ICONEXCLAMATION | MB_OK);
+               }
+            }
 
-	    // Now remove the service from the SCM
-	    if(DeleteService(hservice)) {
-	       MessageBox(NULL, _("The Apcupsd service has been removed"), szAppName, MB_ICONINFORMATION | MB_OK);
-	    } else {
-	       MessageBox(NULL, _("The Apcupsd service could not be removed"), szAppName, MB_ICONEXCLAMATION | MB_OK);
-	    }
+            // Now remove the service from the SCM
+            if(DeleteService(hservice)) {
+               MessageBox(NULL, _("The Apcupsd service has been removed"), szAppName, MB_ICONINFORMATION | MB_OK);
+            } else {
+               MessageBox(NULL, _("The Apcupsd service could not be removed"), szAppName, MB_ICONEXCLAMATION | MB_OK);
+            }
 
-	    CloseServiceHandle(hservice);
-	 } else {
-	    MessageBox(NULL, _("The Apcupsd service could not be found"), szAppName, MB_ICONEXCLAMATION | MB_OK);
-	 }
+            CloseServiceHandle(hservice);
+         } else {
+            MessageBox(NULL, _("The Apcupsd service could not be found"), szAppName, MB_ICONEXCLAMATION | MB_OK);
+         }
 
-	 CloseServiceHandle(hsrvmanager);
+         CloseServiceHandle(hsrvmanager);
       } else {
-	 MessageBox(NULL, _("The SCM could not be contacted - the Apcupsd service was not removed"), szAppName, MB_ICONEXCLAMATION | MB_OK);
+         MessageBox(NULL, _("The SCM could not be contacted - the Apcupsd service was not removed"), szAppName, MB_ICONEXCLAMATION | MB_OK);
       }
       break;
    }
@@ -578,18 +606,18 @@ void WINAPI ServiceCtrl(DWORD ctrlcode)
     // What control code have we been sent?
     switch(ctrlcode) {
     case SERVICE_CONTROL_STOP:
-	// STOP : The service must stop
-	g_srvstatus.dwCurrentState = SERVICE_STOP_PENDING;
-	ServiceStop();
-	break;
+        // STOP : The service must stop
+        g_srvstatus.dwCurrentState = SERVICE_STOP_PENDING;
+        ServiceStop();
+        break;
 
     case SERVICE_CONTROL_INTERROGATE:
-	// QUERY : Service control manager just wants to know our state
-	break;
+        // QUERY : Service control manager just wants to know our state
+        break;
 
      default:
-	// Control code not recognised
-	break;
+        // Control code not recognised
+        break;
     }
 
     // Tell the control manager what we're up to.
@@ -598,8 +626,8 @@ void WINAPI ServiceCtrl(DWORD ctrlcode)
 
 // Service manager status reporting
 BOOL ReportStatus(DWORD state,
-		  DWORD exitcode,
-		  DWORD waithint)
+                  DWORD exitcode,
+                  DWORD waithint)
 {
     static DWORD checkpoint = 1;
     BOOL result = TRUE;
@@ -644,19 +672,19 @@ void LogErrorMsg(char *message, char *fname, int lineno)
    // Get the error code
    g_error = GetLastError();
    FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER|
-		 FORMAT_MESSAGE_FROM_SYSTEM,
-		 NULL,
-		 g_error,
-		 0,
-		 (LPTSTR)&msg,
-		 0,
-		 NULL);
+                 FORMAT_MESSAGE_FROM_SYSTEM,
+                 NULL,
+                 g_error,
+                 0,
+                 (LPTSTR)&msg,
+                 0,
+                 NULL);
 
    // Use event logging to log the error
-   heventsrc = RegisterEventSource(NULL, BAC_SERVICENAME);
+   heventsrc = RegisterEventSource(NULL, UPS_SERVICENAME);
 
    sprintf(msgbuff, _("\n\n%s error: %ld at %s:%d"), 
-      BAC_SERVICENAME, g_error, fname, lineno);
+      UPS_SERVICENAME, g_error, fname, lineno);
    strings[0] = msgbuff;
    strings[1] = message;
    strings[2] = msg;
@@ -665,15 +693,15 @@ void LogErrorMsg(char *message, char *fname, int lineno)
       MessageBeep(MB_OK);
 
       ReportEvent(
-	      heventsrc,	      // handle of event source
-	      EVENTLOG_ERROR_TYPE,    // event type
-	      0,		      // event category
-	      0,		      // event ID
-	      NULL,		      // current user's SID
-	      3,		      // strings in 'strings'
-	      0,		      // no bytes of raw data
-	      (const char **)strings, // array of error strings
-	      NULL);		      // no raw data
+              heventsrc,              // handle of event source
+              EVENTLOG_ERROR_TYPE,    // event type
+              0,                      // event category
+              0,                      // event ID
+              NULL,                   // current user's SID
+              3,                      // strings in 'strings'
+              0,                      // no bytes of raw data
+              (const char **)strings, // array of error strings
+              NULL);                  // no raw data
 
       DeregisterEventSource(heventsrc);
    }
@@ -682,7 +710,7 @@ void LogErrorMsg(char *message, char *fname, int lineno)
 typedef BOOL  (WINAPI * WinAPI)(SC_HANDLE, DWORD, LPVOID);
 
 void set_service_description(SC_HANDLE hSCManager, SC_HANDLE hService,
-			     LPSTR lpDesc) 
+                             LPSTR lpDesc) 
 { 
     SC_LOCK sclLock; 
     LPQUERY_SERVICE_LOCK_STATUS lpqslsBuf; 
@@ -708,33 +736,33 @@ void set_service_description(SC_HANDLE hSCManager, SC_HANDLE hService,
     if (sclLock == NULL) {
        // Exit if the database is not locked by another process. 
        if (GetLastError() != ERROR_SERVICE_DATABASE_LOCKED) {
-	  log_error_message("LockServiceDatabase"); 
-	  return;
+          log_error_message("LockServiceDatabase"); 
+          return;
        }
  
        // Allocate a buffer to get details about the lock. 
        lpqslsBuf = (LPQUERY_SERVICE_LOCK_STATUS)LocalAlloc( 
-	    LPTR, sizeof(QUERY_SERVICE_LOCK_STATUS)+256); 
+            LPTR, sizeof(QUERY_SERVICE_LOCK_STATUS)+256); 
        if (lpqslsBuf == NULL) {
-	  log_error_message("LocalAlloc"); 
-	  return;
+          log_error_message("LocalAlloc"); 
+          return;
        }
  
        // Get and print the lock status information. 
        if (!QueryServiceLockStatus( 
-	      hSCManager, 
-	      lpqslsBuf, 
-	      sizeof(QUERY_SERVICE_LOCK_STATUS)+256, 
-	      &dwBytesNeeded)) {
-	  log_error_message("QueryServiceLockStatus"); 
+              hSCManager, 
+              lpqslsBuf, 
+              sizeof(QUERY_SERVICE_LOCK_STATUS)+256, 
+              &dwBytesNeeded)) {
+          log_error_message("QueryServiceLockStatus"); 
        }
  
        if (lpqslsBuf->fIsLocked) {
-	  printf(_("Locked by: %s, duration: %ld seconds\n"), 
-		lpqslsBuf->lpLockOwner, 
-		lpqslsBuf->dwLockDuration); 
+          printf(_("Locked by: %s, duration: %ld seconds\n"), 
+                lpqslsBuf->lpLockOwner, 
+                lpqslsBuf->dwLockDuration); 
        } else {
-	  printf(_("No longer locked\n")); 
+          printf(_("No longer locked\n")); 
        }
  
        LocalFree(lpqslsBuf); 
@@ -747,9 +775,9 @@ void set_service_description(SC_HANDLE hSCManager, SC_HANDLE hService,
     sdBuf.lpDescription = lpDesc;
 
     if (!ChangeServiceDescription(
-	 hService,		     // handle to service
-	 SERVICE_CONFIG_DESCRIPTION, // change: description
-	 &sdBuf) ) {		     // value: new description
+         hService,                   // handle to service
+         SERVICE_CONFIG_DESCRIPTION, // change: description
+         &sdBuf) ) {                 // value: new description
        log_error_message("ChangeServiceConfig2");
     }
 
