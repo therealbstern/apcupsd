@@ -137,6 +137,7 @@ char *smart_poll(char cmd, UPSINFO *ups)
    if (ups->mode.type <= SHAREBASIC)
       return answer;
 
+   Dmsg2(200, "Writing char %c (%d)\n", cmd, cmd);
    write(ups->fd, &cmd, 1);
    stat = getline(answer, sizeof answer, ups);
 
@@ -199,6 +200,8 @@ int getline(char *s, int len, UPSINFO *ups)
       if (retval == 0) {
          return FAILURE;
       }
+
+      Dmsg2(200, "Read char %c (%d)\n", c, c);
 
       switch (c) {
          /*
