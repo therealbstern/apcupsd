@@ -89,6 +89,9 @@ BuildRequires: latex2html
 BuildRequires: tetex-dvips
 BuildRequires: ghostscript-dvipdf
 %endif
+%if %{fedora_core}
+BuildRequires: latex2html
+%endif
 
 %description
 Apcupsd can be used for controlling most APC UPSes. During a
@@ -339,8 +342,9 @@ if [ $1 = 0 ] ; then
 fi
 
 %changelog
-* Fir May 05 2006 D. Scott Barninger <barninger at fairfieldcomputers.com>
+* Fri May 05 2006 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - update build requirments to include ghostscript
+- update fedora_core build requirements to include latex2html
 * Sun Apr 23 2006 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - add pdf manual to doc package
 - remove redundant code for std and usb packages
