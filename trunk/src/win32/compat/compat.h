@@ -27,7 +27,7 @@
  * Last Modified By: Thorsten Engel
  * Last Modified On: Fri Apr 22 19:30:00 2004
  * Update Count    : 218
- * $Id: compat.h,v 1.8 2006-05-05 14:01:37 kerns Exp $
+ * $Id: compat.h,v 1.9 2006-05-06 03:13:42 adk0212 Exp $
  */
 
 
@@ -245,6 +245,7 @@ struct stat
 #define O_RDWR   _O_RDWR
 #define O_CREAT  _O_CREAT
 #define O_TRUNC  _O_TRUNC
+#define O_NOCTTY 0
 
 #define isascii __isascii
 #define toascii __toascii
@@ -406,7 +407,13 @@ unsigned int alarm(unsigned int seconds);
 #define ASSERT(x) 
 #define bstrncat astrncat
 #define bstrncpy astrncpy
+#define fcntl(a,b,c) 0
 
+#define TIOCMBIC  1
+#define TIOCMBIS  2
+#define TIOCM_ST  0x008
+#define TIOCM_SR  0x010
+int ioctl(int, int, ...);
 #endif
 
 #endif /* __COMPAT_H_ */

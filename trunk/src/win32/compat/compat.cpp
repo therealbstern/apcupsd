@@ -19,7 +19,7 @@
 //
 // Author          : Christopher S. Hull
 // Created On      : Sat Jan 31 15:55:00 2004
-// $Id: compat.cpp,v 1.10 2006-05-05 14:03:51 kerns Exp $
+// $Id: compat.cpp,v 1.11 2006-05-06 03:13:42 adk0212 Exp $
 
 #ifdef __APCUPSD__
 
@@ -1990,3 +1990,287 @@ unsigned int alarm(unsigned int seconds)
    return 0;
 }
 #endif
+
+/* Convert Win32 baud constants to POSIX constants */
+int posixbaud(DWORD baud)
+{
+   switch(baud) {
+   case CBR_110:
+      return B110;
+   case CBR_300:
+      return B300;
+   case CBR_600:
+      return B600;
+   case CBR_1200:
+      return B1200;
+   case CBR_2400:
+   default:
+      return B2400;
+   case CBR_4800:
+      return B4800;
+   case CBR_9600:
+      return B9600;
+   case CBR_19200:
+      return B19200;
+   case CBR_38400:
+      return B38400;
+   case CBR_57600:
+      return B57600;
+   case CBR_115200:
+      return B115200;
+   case CBR_128000:
+      return B128000;
+   case CBR_256000:
+      return B256000;
+   }
+}
+
+/* Convert POSIX baud constants to Win32 constants */
+DWORD winbaud(int baud)
+{
+   switch(baud) {
+   case B110:
+      return CBR_110;
+   case B300:
+      return CBR_300;
+   case B600:
+      return CBR_600;
+   case B1200:
+      return CBR_1200;
+   case B2400:
+   default:
+      return CBR_2400;
+   case B4800:
+      return CBR_4800;
+   case B9600:
+      return CBR_9600;
+   case B19200:
+      return CBR_19200;
+   case B38400:
+      return CBR_38400;
+   case B57600:
+      return CBR_57600;
+   case B115200:
+      return CBR_115200;
+   case B128000:
+      return CBR_128000;
+   case B256000:
+      return CBR_256000;
+   }
+}
+
+/* Convert Win32 bytesize constants to POSIX constants */
+int posixsize(BYTE size)
+{
+   switch(size) {
+   case 5:
+      return CS5;
+   case 6:
+      return CS6;
+   case 7:
+      return CS7;
+   case 8:
+   default:
+      return CS8;
+   }
+}
+
+/* Convert POSIX bytesize constants to Win32 constants */
+BYTE winsize(int size)
+{
+   switch(size) {
+   case CS5:
+      return 5;
+   case CS6:
+      return 6;
+   case CS7:
+      return 7;
+   case CS8:
+   default:
+      return 8;
+   }
+}
+
+int tcgetattr (int fd, struct termios *out)
+{
+   DCB dcb;
+   dcb.DCBlength = sizeof(DCB);
+
+   HANDLE h = (HANDLE)_get_osfhandle(fd);
+   GetCommState(h, &dcb);
+
+   memset(out, 0, sizeof(*out));
+   
+   out->c_cflag |= posixbaud(dcb.BaudRate);
+   out->c_cflag |= posixsize(dcb.ByteSize);
+
+   if (dcb.StopBits == TWOSTOPBITS)
+      out->c_cflag |= CSTOPB;
+   if (dcb.fParity) {
+      out->c_cflag |= PARENB;
+      if (dcb.Parity == ODDPARITY)
+         out->c_cflag |= PARODD;
+   }
+
+   if (!dcb.fOutxCtsFlow && !dcb.fOutxDsrFlow && !dcb.fDsrSensitivity)
+      out->c_cflag |= CLOCAL;
+      
+   if (dcb.fOutX)
+      out->c_iflag |= IXON;
+   if (dcb.fInX)
+      out->c_iflag |= IXOFF;
+
+   return 0;
+}
+
+int tcsetattr (int fd, int optional_actions, const struct termios *in)
+{
+   DCB dcb;
+   dcb.DCBlength = sizeof(DCB);
+
+   HANDLE h = (HANDLE)_get_osfhandle(fd);
+   GetCommState(h, &dcb);
+
+   dcb.fBinary = 1;
+   dcb.BaudRate = winbaud(in->c_cflag & CBAUD);
+   dcb.ByteSize = winsize(in->c_cflag & CSIZE);
+   dcb.StopBits = in->c_cflag & CSTOPB ? TWOSTOPBITS : ONESTOPBIT;
+
+   if (in->c_cflag & PARENB) {
+      dcb.fParity = 1;
+      dcb.Parity = in->c_cflag & PARODD ? ODDPARITY : EVENPARITY;
+   } else {
+      dcb.fParity = 0;
+      dcb.Parity = NOPARITY;
+   }
+
+   if (in->c_cflag & CLOCAL) {
+      dcb.fOutxCtsFlow = 0;
+      dcb.fOutxDsrFlow = 0;
+      dcb.fDsrSensitivity = 0;
+   }
+
+   dcb.fOutX = !!(in->c_iflag & IXON);
+   dcb.fInX = !!(in->c_iflag & IXOFF);
+
+   SetCommState(h, &dcb);
+
+   /* If caller wants a read() timeout, set that up */
+   if (in->c_cc[VMIN] == 0 && in->c_cc[VTIME] != 0) {
+      COMMTIMEOUTS ct;
+      ct.ReadIntervalTimeout = MAXDWORD;
+      ct.ReadTotalTimeoutMultiplier = MAXDWORD;
+      ct.ReadTotalTimeoutConstant = in->c_cc[VTIME] * 100;
+      ct.WriteTotalTimeoutMultiplier = 0;
+      ct.WriteTotalTimeoutConstant = 0;
+      SetCommTimeouts(h, &ct);
+   }
+
+   return 0;
+}
+
+int tcflush(int fd, int queue_selector)
+{
+   HANDLE h = (HANDLE)_get_osfhandle(fd);
+   DWORD flags = 0;
+   
+   switch (queue_selector) {
+   case TCIFLUSH:
+      flags |= PURGE_RXCLEAR;
+      break;
+   case TCOFLUSH:
+      flags |= PURGE_TXCLEAR;
+      break;
+   case TCIOFLUSH:
+      flags |= PURGE_RXCLEAR;
+      flags |= PURGE_TXCLEAR;
+   }
+   
+   PurgeComm(h, flags);
+   return 0;
+}
+
+int tiocmbic(int fd, int bits)
+{
+   DCB dcb;
+   dcb.DCBlength = sizeof(DCB);
+
+   HANDLE h = (HANDLE)_get_osfhandle(fd);
+   GetCommState(h, &dcb);
+   
+   if (bits & TIOCM_DTR)
+      dcb.fDtrControl = DTR_CONTROL_DISABLE;
+   if (bits & TIOCM_RTS)
+      dcb.fRtsControl = RTS_CONTROL_DISABLE;
+   if (bits & TIOCM_ST)
+      d_msg(__FILE__, __LINE__, 99, "Win32 API does not allow clearing ST\n");
+
+   SetCommState(h, &dcb);
+   return 0;
+}
+
+int tiocmbis(int fd, int bits)
+{
+   DCB dcb;
+   dcb.DCBlength = sizeof(DCB);
+
+   HANDLE h = (HANDLE)_get_osfhandle(fd);
+   GetCommState(h, &dcb);
+   
+   if (bits & TIOCM_DTR)
+      dcb.fDtrControl = DTR_CONTROL_ENABLE;
+   if (bits & TIOCM_RTS)
+      dcb.fRtsControl = RTS_CONTROL_ENABLE;
+   if (bits & TIOCM_SR)
+      d_msg(__FILE__, __LINE__, 99, "Win32 API does not allow reading ST\n");
+
+   SetCommState(h, &dcb);
+   return 0;
+}
+
+int tiocmget(int fd, int *bits)
+{
+   DWORD status;
+
+   HANDLE h = (HANDLE)_get_osfhandle(fd);
+   GetCommModemStatus(h, &status);
+
+   *bits = 0;
+
+   if (status & MS_CTS_ON)
+      *bits |= TIOCM_CTS;
+   if (status & MS_DSR_ON)
+      *bits |= TIOCM_DSR;
+   if (status & MS_RING_ON)
+      *bits |= TIOCM_RI;
+   if (status & MS_RLSD_ON)
+      *bits |= TIOCM_CD;
+   
+   return 0;
+}
+
+int ioctl(int fd, int request, ...)
+{
+   int rc;
+   va_list list;
+   va_start(list, request);
+
+   /* We only know how to emulate a few ioctls */
+   switch (request) {
+   case TIOCMBIC:
+      rc = tiocmbic(fd, *va_arg(list, int*));
+      break;
+   case TIOCMBIS:
+      rc = tiocmbis(fd, *va_arg(list, int*));
+      break;
+   case TIOCMGET:
+      rc = tiocmget(fd, va_arg(list, int*));
+      break;
+   default:
+      rc = -1;
+      break;
+   }
+
+   va_end(list);
+   return rc;
+}
