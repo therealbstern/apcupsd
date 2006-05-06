@@ -36,7 +36,9 @@ HAVES = \
 	-DHAVE_MINGW \
 	-DHAVE_WIN32 \
 	-DHAVE_NET_DRIVER \
-	-DHAVE_TEST_DRIVER
+	-DHAVE_TEST_DRIVER \
+	-DHAVE_APCSMART_DRIVER \
+	-DHAVE_DUMB_DRIVER
 
 DEFINES = \
 	-DWIN32 \
@@ -199,6 +201,43 @@ $(OBJDIR)/net.o:  ../drivers/net/net.c
 
 ######################################################################
 
+# Files in src/drivers/apcsmart
+OBJS_SMARTDRV = \
+        $(OBJDIR)/smart.o       \
+        $(OBJDIR)/smartoper.o   \
+        $(OBJDIR)/smartsetup.o  \
+        $(OBJDIR)/smartsetup2.o \
+        $(OBJDIR)/smarteeprom.o
+
+$(OBJDIR)/smart.o: ../drivers/apcsmart/smart.c
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/smartoper.o: ../drivers/apcsmart/smartoper.c
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/smartsetup.o: ../drivers/apcsmart/smartsetup.c
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/smartsetup2.o: ../drivers/apcsmart/smartsetup2.c
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/smarteeprom.o: ../drivers/apcsmart/smarteeprom.c
+	$(CXX) -c $< -o $@
+
+######################################################################
+
+# Files in src/drivers/dumb
+OBJS_DUMBDRV = \
+        $(OBJDIR)/dumboper.o   \
+        $(OBJDIR)/dumbsetup.o
+
+$(OBJDIR)/dumboper.o: ../drivers/dumb/dumboper.c
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/dumbsetup.o: ../drivers/dumb/dumbsetup.c
+	$(CXX) -c $< -o $@
+
+######################################################################
 
 # Files in src
 OBJS_SRC = \
@@ -243,7 +282,8 @@ $(OBJDIR)/apcaccess.o:	../apcaccess.c
 
 
 APC_OBJS = $(OBJS_SRC) $(LIB_OBJS) $(OBJS_COMPAT) $(OBJS_WIN) \
-	   $(OBJS_DRIVERS) $(OBJS_TESTDRV) $(OBJS_NETDRV)
+	   $(OBJS_DRIVERS) $(OBJS_TESTDRV) $(OBJS_NETDRV) \
+           $(OBJS_SMARTDRV) $(OBJS_DUMBDRV)
 
 APC_LIBS = \
 	-L$(LIB_MINGW) \
