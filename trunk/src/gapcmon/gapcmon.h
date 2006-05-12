@@ -1,5 +1,4 @@
-
-/* gapcmon.h               serial-0070-1 ************************************
+/* gapcmon.h               serial-0082-0 ************************************
 
   GKT+ GUI with Notification Area (System Tray) support.  Program  for 
   monitoring the apcupsd.sourceforge.net package.
@@ -22,12 +21,11 @@
 
 #ifndef GAPC_H_
 #define GAPC_H_
-#define GDK_WINDOWING_X11
 
 #include <gconf/gconf-client.h>
 #include <libgnomevfs/gnome-vfs.h>
 #include <libgnomevfs/gnome-vfs-inet-connection.h>
-#include "gapcmon_gtkglgraph.h"
+#include <time.h>
 #include "eggtrayicon.h"
 
 G_BEGIN_DECLS
@@ -53,6 +51,8 @@ G_BEGIN_DECLS
 #define GAPC_MAX_ARRAY 256         /* for arrays or lists */
 #define GAPC_MAX_TEXT 256          /* for strings */
 #define GAPC_ICON_SIZE 24          /* Ideal size of icons */
+#define GAPC_MAX_BUFFER  512      /* Size of a text buffer or local string */
+
 #define GAPC_REFRESH_FACTOR_1K 1000     /* micro.secs for visual refresh    */
 #define GAPC_REFRESH_FACTOR_ONE_TIME 500
 #define GAPC_HOST_DEFAULT "localhost"
@@ -63,11 +63,25 @@ G_BEGIN_DECLS
 #define GAPC_LINEGRAPH_YMAX 110
 #define GAPC_LINEGRAPH_MAX_SERIES 5
 #define GAPC_LINEGRAPH_REFRESH_FACTOR 30.0      /* Num refreshes per collection  */
+
 #ifdef GNOMEVFS_REQUIRES_CANCELLATION
 # define GNOMEVFS_CANCELLATION ,NULL
 #else
 # define GNOMEVFS_CANCELLATION
 #endif
+
+typedef enum _Control_Block_id {
+    CB_SERIES_ID,
+    CB_RANGE_ID,
+    CB_GRAPH_ID,
+    CB_HISTORY_ID,    
+    CB_MONITOR_ID,    
+    CB_CONTROL_ID,    
+    CB_COLUMN_ID,   
+    CB_SUMM_ID, 
+    CB_N_ID
+} GAPCDataID;
+
    typedef enum _State_Icons_IDs {
    GAPC_ICON_ONLINE,
    GAPC_ICON_ONBATT,
@@ -117,7 +131,7 @@ typedef struct _Preferences_Key_Records {
 
 /* Control structure for TreeView columns and callbacks */
 typedef struct _Prefs_Column_Data {
-   guint cb_id:7;                  /* This is REQUIRED TO BE 1ST in struct */
+   GAPCDataID cb_id;               /* This is REQUIRED TO BE 1ST in struct */
    guint cb_monitor_num;           /* monitor number 1-based */
    guint i_col_num;
    GConfClient *client;
@@ -126,7 +140,7 @@ typedef struct _Prefs_Column_Data {
 } GAPC_PREFS_COLUMN, *PGAPC_PREFS_COLUMN;
 
 typedef struct _Monitor_Column_Data {
-   guint cb_id:6;                  /* This is REQUIRED TO BE 1ST in struct */
+   GAPCDataID cb_id;                  /* This is REQUIRED TO BE 1ST in struct */
    guint cb_monitor_num;           /* monitor number 1-based */
    guint i_col_num;
    GConfClient *client;
@@ -135,7 +149,7 @@ typedef struct _Monitor_Column_Data {
 } GAPC_MON_COLUMN, *PGAPC_MON_COLUMN;
 
 typedef struct _GAPC_H_CHART {
-   guint cb_id:5;
+   GAPCDataID cb_id;
    gdouble d_value;
    gboolean b_center_text;
    gchar c_text[GAPC_MAX_TEXT];
@@ -143,7 +157,7 @@ typedef struct _GAPC_H_CHART {
 } GAPC_BAR_H, *PGAPC_BAR_H;
 
 typedef struct _GAPC_SUM_SQUARES {
-   guint cb_id:4;
+   GAPCDataID cb_id;
    gint point_count;
 
    gdouble this_point;
@@ -159,44 +173,90 @@ typedef struct _GAPC_SUM_SQUARES {
    GMutex *gm_graph;               /* Control mutex  for graphics filter */
 } GAPC_SUMS, *PGAPC_SUMS;
 
+typedef struct _LGRAPH_SERIES {
+    GAPCDataID  cb_id;
+    gint        i_series_id;    /* is this series number 1 2 or 3, ZERO based */
+    gint        i_point_count;  /* 1 based */
+    gint        i_max_points;   /* 1 based */
+    gchar       ch_legend_text[GAPC_MAX_TEXT];
+    gchar       ch_legend_color[GAPC_MAX_TEXT];
+    GdkColor    legend_color;
+    gdouble     d_max_value;
+    gdouble     d_min_value;
+    gdouble    *lg_point_dvalue;    /* array of doubles y values zero based, x = index */
+    GdkPoint   *point_pos;      /* last gdk position each point - recalc on evey draw */
+} LG_SERIES, *PLG_SERIES;
+
+typedef struct _LGRAPH_RANGES {
+    GAPCDataID  cb_id;
+    gint        i_inc_minor_scale_by;   /* minor increments */
+    gint        i_inc_major_scale_by;   /* major increments */
+    gint        i_min_scale;    /* minimum scale value - ex:   0 */
+    gint        i_max_scale;    /* maximum scale value - ex: 100 */
+    gint        i_num_minor;    /* number of minor points */
+    gint        i_num_major;    /* number of major points */
+    gint        i_minor_inc;    /* pixels per minor increment */
+    gint        i_major_inc;    /* pixels per major increment */
+} LG_RANGE , *PLG_RANGE;
+
+typedef struct _LG_GRAPH {
+    GAPCDataID  cb_id;
+    GtkWidget  *drawing_area;
+    GdkPixmap  *pixmap;         /* --- Backing pixmap for drawing area  --- */
+    GdkGC      *window_gc;
+    GdkGC      *box_gc;
+    GdkGC      *scale_gc;
+    GdkGC      *title_gc;
+    GdkGC      *series_gc;
+    /* data points and tooltip info */
+    gint        i_num_series;   /* 1 based */
+    GList      *lg_series;      /* double-linked list of data series PLG_SERIES */
+    GList      *lg_series_time; /* time_t of each sample */
+    gint        i_points_available;
+    gboolean    b_tooltip_active;
+    /* actual size of graph area */
+    gint        width;
+    gint        height;
+    /* buffer around all sides */
+    gint        x_border;
+    gint        y_border;
+    /* current mouse position */
+    gboolean    b_mouse_onoff;
+    GdkPoint    mouse_pos;
+    GdkModifierType mouse_state;
+    /* top/left or baseline of labels and titles */
+    gchar       ch_color_window_bg[GAPC_MAX_TEXT];
+    gchar       ch_color_chart_bg[GAPC_MAX_TEXT];
+    gchar       ch_color_title_fg[GAPC_MAX_BUFFER];
+    GdkRectangle x_label;
+    GdkRectangle y_label;
+    GdkRectangle x_title;
+    GdkRectangle x_tooltip;
+    gchar       ch_tooltip_text[GAPC_MAX_BUFFER];
+    gchar      *x_label_text;
+    gchar      *y_label_text;
+    gchar      *x_title_text;
+    /* position and area of main graph plot area */
+    GdkRectangle plot_box;
+    gchar       ch_color_scale_fg[GAPC_MAX_TEXT];
+    LG_RANGE    x_range;
+    LG_RANGE    y_range;
+} LGRAPH   , *PLGRAPH;
+
 /* * Control structure for GtkExtra Charts in Information Window */
 typedef struct _History_Page_Data {
-   guint cb_id:3;                  /* This is REQUIRED TO BE 1ST in struct   */
+   GAPCDataID cb_id;                  /* This is REQUIRED TO BE 1ST in struct   */
    guint cb_monitor_num;           /* monitor number 1-based */
    gpointer *gp;                   /* ptr back to the monitor */
-   GHashTable **pht_Status;        /* hashtable holding status key=values COPY */
-   GHashTable **pht_Widgets;       /* hashtable holding wdiget ptrs  COPY */
-   GtkGLGraph *glg;                /* GtkGLGraph widget */
-
-   gchar *xlabel;
-   gchar *ylabel;
-   gchar *zlabel;
-
-   gdouble xmin;
-   gdouble xmax;
-   gint32 xmajor_steps;
-   gint32 xminor_steps;
-   gint8 xprecision;
-   gdouble ymin;
-   gdouble ymax;
-   gint32 ymajor_steps;
-   gint32 yminor_steps;
-   gint8 yprecision;
-
-   gchar ch_label_color[GAPC_LINEGRAPH_MAX_SERIES + 4][GAPC_MAX_TEXT];
-   gchar ch_label_legend[GAPC_LINEGRAPH_MAX_SERIES + 4][GAPC_MAX_TEXT];
-   gchar ch_title[GAPC_MAX_TEXT];
-
-   gdouble d_xinc;                 /* base refresh increment for scaling x legend */
-   gboolean b_startup;             /* first point collect flag */
-
+   LGRAPH   *plg;                   /* Line Graph pointer */
    GAPC_SUMS sq[GAPC_LINEGRAPH_MAX_SERIES + 4]; /* data point collector */
-
+   gdouble d_xinc;                 /* base refresh increment for graph */
+   gboolean b_startup;
 } GAPC_HISTORY, *PGAPC_HISTORY;
 
 /* * Control structure per active monitor icon in panel  */
 typedef struct _Monitor_Instance_Data {
-   guint cb_id:2;                  /* This is REQUIRED TO BE 1ST in struct   */
+   GAPCDataID cb_id;                  /* This is REQUIRED TO BE 1ST in struct   */
 
    guint cb_monitor_num;           /* Begin Preference values 1-based */
    gboolean cb_enabled;
@@ -258,7 +318,7 @@ typedef struct _Monitor_Instance_Data {
 
 /* * Control structure for root panel object -- this is the anchor */
 typedef struct _System_Control_Data {
-   guint cb_id:1;                  /* This is REQUIRED TO BE 1ST in struct  */
+   GAPCDataID cb_id;                  /* This is REQUIRED TO BE 1ST in struct  */
    GList *cb_glist_monitors;       /* assumed to point to  PGAPC_MONITOR */
    guint cb_last_monitor;          /* last selected from icon list - 1-based */
    gboolean b_use_systray;         /* gconf parms */
@@ -299,14 +359,6 @@ typedef struct _System_Control_Data {
    GdkPixbuf *my_icons[GAPC_N_ICONS + 8];
 
 } GAPC_CONFIG, *PGAPC_CONFIG;
-
-typedef struct _Icons_Sort_Data {
-   guint cb_id:8;                  /* This is REQUIRED TO BE 1ST in struct */
-   guint cb_monitor_num;           /* monitor number 0-based */
-   gboolean b_ascending;
-   PGAPC_CONFIG pcfg;
-
-} GAPC_SORT, *PGAPC_SORT;
 
 /* ************************************************************************* */
 
@@ -371,7 +423,8 @@ A graph showing the last 40 samples of five key data points, scaled to represent
 points as a percentage of that value's normal range.  A data point's value can be \
 viewed by moving the mouse over any desired point, a tooltip will appear \
 showing the color and value of all points at that interval.  Data points are collected \
-periodically, based on the product of graph_refresh times network_refresh in seconds.\n\
+periodically, based on the product of graph_refresh times network_refresh in seconds. \
+ These tooltips can be enabled or disabled by clicking anywhere on the graph once.\n\
 \n\
 <b>DETAILED INFORMATION PAGE</b>\n\
 A more in-depth view of the monitored UPS's environmental values.  Software, product, \

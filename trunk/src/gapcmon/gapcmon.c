@@ -1,11 +1,10 @@
-
-/* gapcmon.c               serial-0072-0 *****************************************
+/* gapcmon.c               serial-0082-0 *****************************************
 
   GKT+ GUI with Notification Area (System Tray) support.  Program  for 
   monitoring the apcupsd.sourceforge.net package.
   Copyright (C) 2006 James Scott, Jr. <skoona@users.sourceforge.net>
 
-  Command Line Syntax: gapcmon [--help] [--instance [0-99]]
+  Command Line Syntax: gapcmon [--help]
 
   This program is free software; you can redistribute it and/or modify
   it under the terms of the GNU General Public License as published by
@@ -34,15 +33,15 @@
  *                          TrayIcon and InfoWindow compose a monitor
  *       * PG-n GtkNotebook Active monitor notebook with four pages; 
  *                          summary chart, detailed, eventlog, statuslog pages.
- *         - nbPage HISTORY A GtkGLGraph histogram line chart of
+ *         - nbPage HISTORY A lg_Graph histogram line chart of
  *                          LINEV, LOADPCT, BCHARGE, CUMONBATT, TIMELEFT
  *           g_timeout_add  Monitor g_timeout per monitor for data updates
  *           g_timeout_add  Monitor g_timeout per graph 1:30 collection updates
  *         - nbPage DETAILS Grouped results from the status output.
  *         - nbPage EVENTS  Current events log
  *         - nbPage STATUS  Current status log, same as APCACCESS
- * 	 * GtkTreeView	    Preferences pg: For Main app, and Monitors
- * 	 * GtkVBox          About pg: Program copyright info
+ * 	 * GtkTreeView	        Preferences pg: For Main app, and Monitors
+ * 	 * GtkVBox              About pg: Program copyright info
  * * GtkHBox                Action info
  *   - GtkLabel             Program Title line
  *   - GtkButton            Program Close button
@@ -69,13 +68,6 @@
  *  max monitors=unlimted or sizeof guint
  *  Where key is the actual keyname like enabled, host_name, port_name, or
  *  refresh_interval, etc.
- *
- *  Filename: gapcmon.schemas
- *  Install Directory: /etc/gconf/schemas/   or $(sysconfdir)/gconf/schemas/
- *  gconf-devel may be needed
- *  gconftool-2 --install-schema-file=gapcmon.schemas
- *  -- Makefile has a 'install-prefs' target to install this one-time file
- * -- however, install forces the first eight monitors to exist forever!!!
  * ************************************************************************** *
 */
 
@@ -90,8 +82,54 @@ static gint gapc_monitor_update(PGAPC_MONITOR pm);
 
 static gdouble gapc_util_point_filter_set(PGAPC_SUMS sq, gdouble this_point);
 static gdouble gapc_util_point_filter_reset(PGAPC_SUMS sq);
-static gboolean gapc_util_line_chart_create(PGAPC_HISTORY pg, GtkWidget * box);
-static gboolean gapc_util_line_chart_ds_init(PGAPC_HISTORY pg, gint i_series);
+static void lg_graph_set_chart_title (PLGRAPH plg, gchar * pch_text);
+static void lg_graph_set_y_label_text (PLGRAPH plg, gchar * pch_text);
+static void lg_graph_set_x_label_text (PLGRAPH plg, gchar * pch_text);
+
+static void lg_graph_set_chart_title_color (PLGRAPH plg, gchar * pch_color);
+static void lg_graph_set_chart_scales_color (PLGRAPH plg, gchar * pch_color);
+static void lg_graph_set_chart_window_fg_color (PLGRAPH plg, gchar * pch_color);
+static void lg_graph_set_chart_window_bg_color (PLGRAPH plg, gchar * pch_color);
+
+static PLGRAPH lg_graph_create (GtkWidget * box, gint width, gint height);
+static void lg_graph_set_ranges (PLGRAPH plg,
+                                 gint xminor_by,
+                                 gint xmajor_by,
+                                 gint x_min,
+                                 gint x_max,
+                                 gint yminor_by, gint ymajor_by, gint y_min, gint y_max);
+static void lg_graph_redraw (PLGRAPH plg);
+
+static gint lg_graph_data_series_add (PLGRAPH plg, gchar * pch_legend_text,
+                                      gchar * pch_color_text);
+static gboolean lg_graph_data_series_remove_all (PLGRAPH plg);
+static gboolean lg_graph_data_series_add_value (PLGRAPH plg, gint i_series_number,
+                                                gdouble y_value);
+static gint lg_graph_data_series_draw (PLGRAPH plg, PLG_SERIES psd);
+
+/* 
+ * Private Interfaces */
+static gint lg_graph_draw_tooltip (PLGRAPH plg);
+static gint lg_graph_data_series_draw_all (PLGRAPH plg, gboolean redraw_control);
+static void lg_graph_get_default_sizes (PLGRAPH plg, gint * width, gint * height);
+static void lg_graph_draw_x_grid_labels (PLGRAPH plg);
+static void lg_graph_draw_y_grid_labels (PLGRAPH plg);
+static gint lg_graph_draw_grid_lines (PLGRAPH plg);
+static gint lg_graph_draw_horizontal_text (PLGRAPH plg,
+                                           gchar * pch_text,
+                                           GdkRectangle * rect, gboolean redraw_control);
+static gint lg_graph_draw_vertical_text (PLGRAPH plg,
+                                         gchar * pch_text,
+                                         GdkRectangle * rect, gboolean redraw_control);
+static gint lg_graph_draw (PLGRAPH plg);
+static gint lg_graph_configure_event_cb (GtkWidget * widget,
+                                         GdkEventConfigure * event, PLGRAPH plg);
+static gint lg_graph_expose_event_cb (GtkWidget * widget, GdkEventExpose * event,
+                                      PLGRAPH plg);
+static gboolean lg_graph_motion_notify_event_cb (GtkWidget * widget, GdkEventMotion * ev,
+                                                 PLGRAPH plg);
+static gboolean lg_graph_button_press_event_cb (GtkWidget * widget, GdkEventButton * ev,
+                                                PLGRAPH plg);
 static gboolean cb_util_barchart_handle_exposed(GtkWidget * widget,
    GdkEventExpose * event, gpointer data);
 static gboolean cb_util_line_chart_refresh(PGAPC_HISTORY pg);
@@ -122,7 +160,1151 @@ static GnomeVFSResult gnome_vfs_socket_set_timeout(
    ){ return GNOME_VFS_OK; }
 #endif
 
+/* 
+ * Some small number of globals are required
+*/
+static gboolean lg_graph_debug = FALSE;
+
+
+
 /* ************************************************************************* */
+
+/*
+ * Draws one data series points to chart
+ * returns number of points processed
+*/
+static gint lg_graph_data_series_draw (PLGRAPH plg, PLG_SERIES psd)
+{
+    gint        v_index = 0;
+    GdkPoint   *point_pos = NULL;
+
+    g_return_val_if_fail (plg != NULL, -1);
+    g_return_val_if_fail (psd != NULL, -1);
+    g_return_val_if_fail (psd->point_pos != NULL, -1);
+
+    gdk_gc_set_rgb_fg_color (plg->series_gc, &psd->legend_color);
+    gdk_gc_set_line_attributes (plg->series_gc, 2,
+                                GDK_LINE_SOLID, GDK_CAP_BUTT, GDK_JOIN_MITER);
+
+    point_pos = psd->point_pos;
+
+/* trap first and only point */
+    if (psd->i_point_count == 0)
+    {
+        return 0;
+    }
+    if (psd->i_point_count == 1)
+    {
+        point_pos[0].x = plg->plot_box.x;
+        point_pos[0].y =
+            (plg->plot_box.y + plg->plot_box.height) -
+            ((psd->lg_point_dvalue[0] *
+              (gdouble) ((gdouble) plg->plot_box.height /
+                         (gdouble) plg->y_range.i_max_scale)));
+
+        gdk_draw_arc (plg->pixmap, plg->series_gc, TRUE,
+                      point_pos[0].x - 1, point_pos[0].y - 2, 3, 3, 0, 360 * 64);
+        return 1;
+    }
+
+    for (v_index = 0; v_index < psd->i_point_count; v_index++)
+    {
+        point_pos[v_index].x = plg->plot_box.x + (v_index * plg->x_range.i_minor_inc);
+        point_pos[v_index].y = (plg->plot_box.y + plg->plot_box.height) -
+            ((psd->lg_point_dvalue[v_index] *
+              (gdouble) ((gdouble) plg->plot_box.height /
+                         (gdouble) plg->y_range.i_max_scale)));
+
+        if ((v_index != 0) && (v_index < psd->i_point_count - 1))
+        {
+            gdk_draw_arc (plg->pixmap, plg->series_gc, TRUE,
+                          point_pos[v_index].x - 1,
+                          point_pos[v_index].y - 2, 3, 3, 0, 360 * 64);
+            gdk_draw_arc (plg->pixmap, plg->series_gc, FALSE,
+                          point_pos[v_index].x - 1,
+                          point_pos[v_index].y - 2, 3, 3, 0, 360 * 64);
+        }
+    }
+
+    gdk_draw_lines (plg->pixmap, plg->series_gc, point_pos, psd->i_point_count);
+
+    return v_index;
+}
+
+/*
+ * Draws all data series points to chart
+ * returns number of series processed, or -1 if not drawable
+*/
+static gint lg_graph_data_series_draw_all (PLGRAPH plg, gboolean redraw_control)
+{
+    PLG_SERIES  psd = NULL;
+    GList      *data_sets = NULL;
+    gint        v_index = 0;
+
+    g_return_val_if_fail (plg != NULL, -1);
+
+    if ( !(GTK_WIDGET_DRAWABLE (plg->drawing_area)) ) {
+        return -1;
+    }
+
+    data_sets = g_list_first (plg->lg_series);
+    while (data_sets)
+    {
+        psd = data_sets->data;
+        if (psd != NULL)
+        {                       /* found */
+            lg_graph_data_series_draw (plg, psd);
+            v_index++;
+        }
+        data_sets = g_list_next (data_sets);
+    }
+
+    if (lg_graph_debug)
+    {
+        g_print ("DrawAllDataSeries: series=%d\n", v_index);
+    }
+
+    return v_index;
+}
+
+/*
+ * Add a single value to the requested data series
+ * auto indexes the value is max is reach (appends to the end)
+*/
+static gboolean lg_graph_data_series_add_value (PLGRAPH plg, gint i_series_number,
+                                                gdouble y_value)
+{
+    PLG_SERIES  psd = NULL;
+    GList      *data_sets = NULL;
+    gint        v_index = 0, time_count = 0;
+    gboolean    b_found = FALSE;
+
+    g_return_val_if_fail (plg != NULL, FALSE);
+
+    data_sets = g_list_first (plg->lg_series);
+    while (data_sets)
+    {
+        psd = data_sets->data;
+        if (psd->i_series_id == i_series_number)
+        {                       /* found */
+            b_found = TRUE;
+            break;
+        }
+        data_sets = g_list_next (data_sets);
+    }
+
+    if (!b_found)
+    {
+        g_message ("lg_graph_data_series_add_value(%d): Invalid data series number",
+                   i_series_number);
+        return FALSE;
+    }
+
+    if (y_value >= plg->y_range.i_max_scale)
+    {
+        y_value = (gdouble) plg->y_range.i_max_scale * 0.98;
+    }
+
+    if (psd->i_point_count == psd->i_max_points + 1)
+    {
+        for (v_index = 0; v_index < psd->i_max_points; v_index++)
+        {
+            psd->lg_point_dvalue[v_index] = psd->lg_point_dvalue[v_index + 1];
+        }
+        psd->lg_point_dvalue[psd->i_max_points] = y_value;
+    }
+    else
+    {
+        psd->lg_point_dvalue[psd->i_point_count++] = y_value;
+    }
+
+    psd->d_max_value = MAX (y_value, psd->d_max_value);
+    psd->d_min_value = MIN (y_value, psd->d_min_value);
+
+    plg->i_points_available = MAX (plg->i_points_available, psd->i_point_count);
+
+    /* record current time with data points */
+    if (psd->i_series_id == plg->i_num_series - 1)
+    {
+        GList      *gl_remove = NULL;
+
+        gl_remove = g_list_first (plg->lg_series_time);
+        
+        time_count = g_list_length (plg->lg_series_time);    
+        if (time_count == psd->i_max_points + 1)
+        {
+            plg->lg_series_time =
+                g_list_remove_all (plg->lg_series_time, gl_remove->data);
+        }
+        plg->lg_series_time =
+            g_list_append (plg->lg_series_time, GINT_TO_POINTER ((time_t) time (NULL)));
+    }
+
+    if (lg_graph_debug)
+    {
+        g_print
+         ("DataSeriesAddValue: series=%d, value=%3.1lf, index=%d, count=%d, time_count=%d, max_pts=%d\n",
+          i_series_number, y_value, v_index, psd->i_point_count, time_count, psd->i_max_points);
+    }
+
+    return TRUE;
+}
+
+/*
+ * A shutdown routine
+ * destroys all the data series and any assocaited dynamic data
+*/
+static gboolean lg_graph_data_series_remove_all (PLGRAPH plg)
+{
+    PLG_SERIES  psd = NULL;
+    GList      *data_sets = NULL;
+    gint        i_count = 0;
+
+    g_return_val_if_fail (plg != NULL, FALSE);
+
+    data_sets = g_list_first (plg->lg_series);
+    while (data_sets)
+    {
+        psd = data_sets->data;
+        g_free (psd->lg_point_dvalue);
+        g_free (psd->point_pos);
+        g_free (psd);
+        data_sets = g_list_next (data_sets);
+        i_count++;
+    }
+    g_list_free (plg->lg_series);
+    g_list_free (plg->lg_series_time);
+    plg->lg_series = NULL;
+    plg->lg_series_time = NULL;
+    plg->i_num_series = 0;
+    plg->i_points_available = 0;    
+
+    if (lg_graph_debug)
+    {
+        g_print ("DataSeriesRemoveAll: series total=%d\n", i_count);
+    }
+
+    return TRUE;
+}
+
+/*
+ * allocates space for another data series
+ * returns the series number of this dataset
+*/
+static gint lg_graph_data_series_add (PLGRAPH plg, gchar * pch_legend_text,
+                                      gchar * pch_color_text)
+{
+    PLG_SERIES  psd = NULL;
+
+    g_return_val_if_fail (plg != NULL, -1);
+    g_return_val_if_fail (pch_legend_text != NULL, -1);
+    g_return_val_if_fail (pch_color_text != NULL, -1);
+
+    psd = (PLG_SERIES) g_new0 (LG_SERIES, 1);
+    g_return_val_if_fail (psd != NULL, -1);
+
+    psd->lg_point_dvalue = (gdouble *) g_new0 (gdouble, (plg->x_range.i_max_scale + 4));
+    g_return_val_if_fail (psd->lg_point_dvalue != NULL, -1);
+
+    psd->point_pos = g_new0 (GdkPoint, (plg->x_range.i_max_scale + 4));
+    g_return_val_if_fail (psd->point_pos != NULL, -1);
+
+    g_snprintf (psd->ch_legend_text, sizeof (psd->ch_legend_text), "%s", pch_legend_text);
+    psd->i_max_points = plg->x_range.i_max_scale;
+    gdk_color_parse (pch_color_text, &psd->legend_color);
+    g_snprintf (psd->ch_legend_color, sizeof (psd->ch_legend_color), "%s",
+                pch_color_text);
+    psd->cb_id = CB_SERIES_ID;
+
+    plg->lg_series = g_list_append (plg->lg_series, psd);
+    psd->i_series_id = plg->i_num_series++;
+
+    if (lg_graph_debug)
+    {
+        g_print ("DataSeriesAdd: series=%d, max_pts=%d\n",
+                 psd->i_series_id, psd->i_max_points);
+    }
+
+    return psd->i_series_id;
+}
+
+/*
+ * Set the bottom x label text 
+*/
+static void lg_graph_set_x_label_text (PLGRAPH plg, gchar * pch_text)
+{
+    g_return_if_fail (plg != NULL);
+
+    if (plg->x_label_text != NULL)
+    {
+        g_free (plg->x_label_text);
+    }
+    plg->x_label_text = g_strdup (pch_text);
+}
+static void lg_graph_set_y_label_text (PLGRAPH plg, gchar * pch_text)
+{
+    g_return_if_fail (plg != NULL);
+
+    if (plg->y_label_text != NULL)
+    {
+        g_free (plg->y_label_text);
+    }
+    plg->y_label_text = g_strdup (pch_text);
+}
+static void lg_graph_set_chart_title (PLGRAPH plg, gchar * pch_text)
+{
+    g_return_if_fail (plg != NULL);
+
+    if (plg->x_title_text != NULL)
+    {
+        g_free (plg->x_title_text);
+    }
+    plg->x_title_text = g_strdup (pch_text);
+}
+static void lg_graph_set_chart_window_bg_color (PLGRAPH plg, gchar * pch_color)
+{
+    g_return_if_fail (plg != NULL);
+    g_snprintf (plg->ch_color_window_bg, sizeof (plg->ch_color_window_bg),
+                "%s", pch_color);
+}
+static void lg_graph_set_chart_window_fg_color (PLGRAPH plg, gchar * pch_color)
+{
+    g_return_if_fail (plg != NULL);
+    g_snprintf (plg->ch_color_chart_bg, sizeof (plg->ch_color_chart_bg), "%s", pch_color);
+}
+static void lg_graph_set_chart_scales_color (PLGRAPH plg, gchar * pch_color)
+{
+    g_return_if_fail (plg != NULL);
+    g_snprintf (plg->ch_color_scale_fg, sizeof (plg->ch_color_scale_fg), "%s", pch_color);
+}
+static void lg_graph_set_chart_title_color (PLGRAPH plg, gchar * pch_color)
+{
+    g_return_if_fail (plg != NULL);
+    g_snprintf (plg->ch_color_title_fg, sizeof (plg->ch_color_title_fg), "%s", pch_color);
+}
+static void lg_graph_redraw (PLGRAPH plg)
+{
+    GdkRectangle update_rect;
+    GdkRegion  *region = NULL;
+
+    g_return_if_fail (plg != NULL);
+
+    update_rect.x = 0;
+    update_rect.y = 0;
+    update_rect.width = plg->drawing_area->allocation.width;
+    update_rect.height = plg->drawing_area->allocation.height;
+
+    /* --- And then draw it (calls expose event) --- */
+    region = gdk_region_rectangle (&update_rect);
+    gdk_window_invalidate_region (plg->drawing_area->window, region, FALSE);
+    gdk_region_destroy (region);
+}
+
+/*
+ * Toggle the legend function on off
+ * "button-press-event"
+*/
+static gboolean lg_graph_button_press_event_cb (GtkWidget * widget,
+                                                GdkEventButton * ev, PLGRAPH plg)
+{
+    g_return_val_if_fail (plg != NULL, FALSE);
+
+    if ((ev->type & GDK_BUTTON_PRESS) && (ev->button == 1))
+    {
+        plg->b_tooltip_active = plg->b_tooltip_active ? FALSE : TRUE;
+        lg_graph_redraw (plg);
+        return TRUE;
+    }
+    if ((ev->type & GDK_BUTTON_PRESS) && (ev->button == 2) && plg->b_mouse_onoff)
+    {
+        lg_graph_debug = lg_graph_debug ? FALSE : TRUE; 
+        return TRUE;        
+    }
+
+    if ((ev->type & GDK_BUTTON_PRESS) && (ev->button == 3))
+    {
+        plg->b_mouse_onoff = plg->b_mouse_onoff ? FALSE : TRUE; 
+        return TRUE;        
+    }
+
+    return FALSE;
+}
+
+/*
+ * Track the mouse pointer position
+ * "motion-notify-event"
+*/
+static gboolean lg_graph_motion_notify_event_cb (GtkWidget * widget,
+                                                 GdkEventMotion * ev, PLGRAPH plg)
+{
+    GdkModifierType state;
+    gint        x = 0, y = 0;
+
+    g_return_val_if_fail (plg != NULL, FALSE);
+
+    if (ev->is_hint)
+    {
+        gdk_window_get_pointer (ev->window, &x, &y, &state);
+    }
+    else
+    {
+        x = ev->x;
+        y = ev->y;
+        state = ev->state;
+    }
+
+    plg->mouse_pos.x = x;
+    plg->mouse_pos.y = y;
+    plg->mouse_state = state;
+
+    if ( lg_graph_draw_tooltip (plg) ) {
+      	 lg_graph_redraw (plg);
+    }
+
+    if (lg_graph_debug)
+    {
+        g_print ("mouse is at x=%d, y=%d, with a state of %d\n", x, y, state);
+    }
+
+    return FALSE;
+}
+
+/*
+ * Draw the chart x scale legend
+*/
+static void lg_graph_draw_x_grid_labels (PLGRAPH plg)
+{
+    gchar       ch_grid_label[GAPC_MAX_BUFFER];
+    gchar       ch_work[GAPC_MAX_BUFFER];
+    PangoLayout *layout = NULL;
+    PangoTabArray *p_tabs = NULL;
+    gint        x_adj = 0, x1_adj = 0, width = 0, height = 0, h_index = 0, x_scale = 0;
+
+    g_return_if_fail (plg != NULL);
+
+    g_snprintf (ch_grid_label, GAPC_MAX_BUFFER, "<small>%d</small>",
+                plg->x_range.i_max_scale);
+    layout = gtk_widget_create_pango_layout (plg->drawing_area, ch_grid_label);
+
+    pango_layout_set_markup (layout, ch_grid_label, -1);
+    pango_layout_get_pixel_size (layout, &width, &height);
+    x_adj = width / 2;
+    x1_adj = width / 4;
+
+    g_snprintf (ch_grid_label, GAPC_MAX_BUFFER, "<small>%s", "0");
+    for (h_index = plg->x_range.i_inc_major_scale_by;
+         h_index <= plg->x_range.i_max_scale;
+         h_index += plg->x_range.i_inc_major_scale_by)
+    {
+        g_strlcpy (ch_work, ch_grid_label, GAPC_MAX_BUFFER);
+        g_snprintf (ch_grid_label, GAPC_MAX_BUFFER, "%s\t%d", ch_work, h_index);
+        if (h_index < 10)
+        {
+            x_scale++;
+        }
+    }
+    g_strlcpy (ch_work, ch_grid_label, GAPC_MAX_BUFFER);
+    g_snprintf (ch_grid_label, GAPC_MAX_BUFFER, "%s</small>", ch_work);
+
+    pango_layout_set_markup (layout, ch_grid_label, -1);
+
+    if (lg_graph_debug)
+    {
+        g_print ("(%d:%d:%d)x_Labels=[%s]\n", x_adj, x1_adj, x_scale, ch_grid_label);
+    }
+
+    p_tabs = pango_tab_array_new (plg->x_range.i_num_major, TRUE);
+    for (h_index = 0; h_index <= plg->x_range.i_num_major; h_index++)
+    {
+        gint        xbase = 0;
+
+        if (h_index > x_scale)
+        {
+            xbase = (h_index * plg->x_range.i_major_inc);
+        }
+        else
+        {
+            xbase = (h_index * plg->x_range.i_major_inc) + x1_adj;
+        }
+        if (h_index == 0)
+        {
+            xbase = plg->x_range.i_major_inc + x1_adj;
+        }
+        pango_tab_array_set_tab (p_tabs, h_index, PANGO_TAB_LEFT, xbase);
+    }
+    pango_layout_set_tabs (layout, p_tabs);
+
+    pango_layout_context_changed (layout);
+
+    gdk_draw_layout (plg->pixmap,
+                     plg->scale_gc,
+                     plg->plot_box.x - x_adj,
+                     plg->plot_box.y + plg->plot_box.height, layout);
+
+    pango_tab_array_free (p_tabs);
+    g_object_unref (layout);
+
+    return;
+}
+
+/*
+ * Draw the chart y scale legend
+*/
+static void lg_graph_draw_y_grid_labels (PLGRAPH plg)
+{
+    gchar       ch_grid_label[GAPC_MAX_BUFFER];
+    gchar       ch_work[GAPC_MAX_BUFFER];
+    PangoLayout *layout = NULL;
+    gint        y_adj = 0, width = 0, height = 0, v_index = 0;
+
+    g_return_if_fail (plg != NULL);
+
+    g_snprintf (ch_grid_label, GAPC_MAX_BUFFER, "<small>%d</small>",
+                plg->y_range.i_max_scale);
+    layout = gtk_widget_create_pango_layout (plg->drawing_area, ch_grid_label);
+
+    pango_layout_set_markup (layout, ch_grid_label, -1);
+    pango_layout_get_pixel_size (layout, &width, &height);
+    y_adj = height / 2;
+
+    g_snprintf (ch_grid_label, GAPC_MAX_BUFFER, "<small>%d", plg->y_range.i_max_scale);
+    for (v_index =
+         plg->y_range.i_max_scale - plg->y_range.i_inc_major_scale_by;
+         v_index > 0; v_index -= plg->y_range.i_inc_major_scale_by)
+    {
+        g_strlcpy (ch_work, ch_grid_label, GAPC_MAX_BUFFER);
+        g_snprintf (ch_grid_label, GAPC_MAX_BUFFER, "%s\n%d", ch_work, v_index);
+    }
+    g_strlcpy (ch_work, ch_grid_label, GAPC_MAX_BUFFER);
+    g_snprintf (ch_grid_label, GAPC_MAX_BUFFER, "%s</small>", ch_work);
+
+    pango_layout_set_spacing (layout,
+                              ((plg->y_range.i_major_inc - height) * PANGO_SCALE));
+    pango_layout_set_alignment (layout, PANGO_ALIGN_RIGHT);
+    pango_layout_set_markup (layout, ch_grid_label, -1);
+
+    if (lg_graph_debug)
+    {
+        g_print ("(%d:%d)y_Labels=[%s]\n", y_adj, plg->y_range.i_major_inc,
+                 ch_grid_label);
+    }
+
+    pango_layout_context_changed (layout);
+
+    gdk_draw_layout (plg->pixmap,
+                     plg->scale_gc,
+                     plg->plot_box.x - (width * 1.2), plg->plot_box.y - y_adj, layout);
+
+    g_object_unref (layout);
+
+    return;
+}
+
+/*
+ * Draws the minor and major grid lines inside the current plot_area
+ * returns -1 on error, or TRUE;
+*/
+static gint lg_graph_draw_grid_lines (PLGRAPH plg)
+{
+    GtkWidget  *drawing_area = NULL;
+    gint        y_minor_inc = 0, y_pos = 0, y_index = 0;
+    gint        y_major_inc = 0;
+    gint        x_minor_inc = 0, x_pos = 0, x_index = 0;
+    gint        x_major_inc = 0;
+    gint        count_major = 0, count_minor = 0;
+    GdkSegment *seg_minor = NULL;
+    GdkSegment *seg_major = NULL;
+
+    g_return_val_if_fail (plg != NULL, -1);
+    g_return_val_if_fail (GTK_WIDGET_DRAWABLE (plg->drawing_area), -1);
+
+    drawing_area = plg->drawing_area;
+
+    count_major = plg->y_range.i_num_major;
+    count_minor = plg->y_range.i_num_minor;
+    y_minor_inc = plg->y_range.i_minor_inc;
+    y_major_inc = plg->y_range.i_major_inc;
+
+    if (lg_graph_debug)
+    {
+        g_print
+            ("count_major=%d, count_minor=%d, y_minor_inc=%d, y_major_inc=%d\n",
+             count_major, count_minor, y_minor_inc, y_major_inc);
+    }
+
+    seg_minor = g_new0 (GdkSegment, count_minor + 8);
+    seg_major = g_new0 (GdkSegment, count_major + 8);
+    x_pos = plg->plot_box.width;
+    y_pos = plg->plot_box.y;
+    for (y_index = 0; y_index < count_minor; y_index++)
+    {
+        seg_minor[y_index].x1 = plg->plot_box.x;
+        seg_minor[y_index].y1 = y_pos + (y_minor_inc * (y_index + 1));
+        seg_minor[y_index].x2 = plg->plot_box.x + x_pos - 2;
+        seg_minor[y_index].y2 = seg_minor[y_index].y1;
+    }
+
+    x_pos = plg->plot_box.width;
+    y_pos = plg->plot_box.y;
+    for (y_index = 0; y_index < count_major; y_index++)
+    {
+        seg_major[y_index].x1 = plg->plot_box.x;
+        seg_major[y_index].y1 = y_pos + (y_major_inc * (y_index + 1));
+        seg_major[y_index].x2 = plg->plot_box.x + x_pos - 2;
+        seg_major[y_index].y2 = seg_major[y_index].y1;
+    }
+
+    gdk_gc_set_line_attributes (plg->window_gc,
+                                1, GDK_LINE_SOLID, GDK_CAP_BUTT, GDK_JOIN_BEVEL);
+    gdk_draw_segments (plg->pixmap, plg->window_gc, seg_minor, count_minor - 1);
+
+    gdk_gc_set_line_attributes (plg->window_gc,
+                                2, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_BEVEL);
+    gdk_draw_segments (plg->pixmap, plg->window_gc, seg_major, count_major - 1);
+
+    g_free (seg_minor);
+    g_free (seg_major);
+
+    count_major = plg->x_range.i_num_major;
+    count_minor = plg->x_range.i_num_minor;
+    x_minor_inc = plg->x_range.i_minor_inc;
+    x_major_inc = plg->x_range.i_major_inc;
+
+    if (lg_graph_debug)
+    {
+        g_print
+            ("count_major=%d, count_minor=%d, x_minor_inc=%d, x_major_inc=%d\n",
+             count_major, count_minor, x_minor_inc, x_major_inc);
+    }
+
+    seg_minor = g_new0 (GdkSegment, count_minor + 8);
+    seg_major = g_new0 (GdkSegment, count_major + 8);
+    x_pos = plg->plot_box.x;
+    y_pos = plg->plot_box.height;
+    for (x_index = 0; x_index < count_minor; x_index++)
+    {
+        seg_minor[x_index].x1 = plg->plot_box.x + (x_minor_inc * (x_index + 1));
+        seg_minor[x_index].y1 = plg->plot_box.y + 2;
+        seg_minor[x_index].x2 = seg_minor[x_index].x1;
+        seg_minor[x_index].y2 = plg->plot_box.y + y_pos;
+    }
+
+    x_pos = plg->plot_box.x;
+    y_pos = plg->plot_box.height;
+    for (x_index = 0; x_index < count_major; x_index++)
+    {
+        seg_major[x_index].x1 = plg->plot_box.x + (x_major_inc * (x_index + 1));
+        seg_major[x_index].y1 = plg->plot_box.y + 2;
+        seg_major[x_index].x2 = seg_major[x_index].x1;
+        seg_major[x_index].y2 = plg->plot_box.y + y_pos;
+    }
+
+    gdk_gc_set_line_attributes (plg->window_gc,
+                                1, GDK_LINE_SOLID, GDK_CAP_BUTT, GDK_JOIN_BEVEL);
+    gdk_draw_segments (plg->pixmap, plg->window_gc, seg_minor, count_minor - 1);
+
+    gdk_gc_set_line_attributes (plg->window_gc,
+                                2, GDK_LINE_SOLID, GDK_CAP_ROUND, GDK_JOIN_BEVEL);
+    gdk_draw_segments (plg->pixmap, plg->window_gc, seg_major, count_major - 1);
+
+    g_free (seg_minor);
+    g_free (seg_major);
+
+    return TRUE;
+}
+
+/*
+ * Draws the tooltip legend message at top or bottom of chart
+ * returns the width of the text area, or -1 on error
+ * requires plg->b_tooltip_active to be TRUE, (toggled by mouse)
+*/
+static gint lg_graph_draw_tooltip (PLGRAPH plg)
+{
+    PangoLayout *layout = NULL;
+    gint        x_pos = 0, y_pos = 0, width = 0, height = 0;
+    gint        v_index = 0, x_adj = 0;
+    PLG_SERIES  psd = NULL;
+    GList      *data_sets = NULL;
+    GdkRegion  *region = NULL;
+    gboolean    b_found = FALSE;
+
+    g_return_val_if_fail (plg != NULL, -1);
+    g_return_val_if_fail (GTK_WIDGET_DRAWABLE (plg->drawing_area), -1);
+
+    if (!plg->b_tooltip_active)
+    {
+        return -1;
+    }
+    if (plg->i_points_available < 1) {
+        return -1;    	
+    }
+
+    /*
+     * Create tooltip if needed */
+    region = gdk_region_rectangle (&plg->plot_box);
+    x_adj = (plg->x_range.i_minor_inc / plg->x_range.i_inc_minor_scale_by);
+
+    /* 
+     * see if ptr is at a x-range point */
+    if (!gdk_region_point_in (region, plg->mouse_pos.x, plg->mouse_pos.y))
+    {
+        gdk_region_destroy (region);
+        return -1;
+    }
+    gdk_region_destroy (region);
+
+    for (v_index = 0; v_index <= plg->x_range.i_max_scale; v_index++)
+    {
+        x_pos = plg->plot_box.x + (v_index * x_adj);
+        if ((plg->mouse_pos.x > (x_pos - (x_adj / 3))) &&
+            (plg->mouse_pos.x < (x_pos + (x_adj / 3))))
+        {
+            if (v_index < plg->i_points_available)
+            {
+                b_found = TRUE;
+                break;
+            }
+        }
+    }
+
+    /* 
+     * All we needed was x, so now post a tooltip */
+    if (b_found)
+    {
+        gchar       ch_buffer[GAPC_MAX_BUFFER];
+        gchar       ch_work[GAPC_MAX_BUFFER];
+        gchar       ch_time_r[GAPC_MAX_TEXT];
+        gchar      *pch_time = NULL;
+        time_t      point_time;
+
+        point_time = (time_t) g_list_nth_data (plg->lg_series_time, v_index);
+
+        pch_time = ctime_r (&point_time, ch_time_r);
+
+        g_strdelimit (pch_time, "\n", ' ');
+
+        g_snprintf (ch_buffer, sizeof (ch_buffer),
+                    "<small>{ <u>sample #%d @ %s</u>}\n", v_index, pch_time);
+        data_sets = g_list_first (plg->lg_series);
+        while (data_sets)
+        {
+            psd = data_sets->data;
+            if (psd != NULL)
+            {                   /* found */
+                g_snprintf (ch_work, sizeof (ch_work), "%s", ch_buffer);
+                g_snprintf (ch_buffer, sizeof (ch_buffer),
+                            "%s{%3.0lf%% <span foreground=\"%s\">%s</span>}",
+                            ch_work,
+                            psd->lg_point_dvalue[v_index],
+                            psd->ch_legend_color, psd->ch_legend_text);
+            }
+            data_sets = g_list_next (data_sets);
+        }
+
+        g_snprintf (ch_work, sizeof (ch_work), "%s", ch_buffer);
+        g_snprintf (ch_buffer, sizeof (ch_buffer), "%s</small>", ch_work);
+        g_snprintf (plg->ch_tooltip_text, sizeof (plg->ch_tooltip_text), "%s",
+                        ch_buffer);
+    }
+
+    if (!b_found)
+    {
+        return -1;
+    }
+
+    layout = gtk_widget_create_pango_layout (plg->drawing_area, plg->ch_tooltip_text);
+    pango_layout_set_alignment (layout, PANGO_ALIGN_CENTER);
+
+    pango_layout_set_markup (layout, plg->ch_tooltip_text, -1);
+
+    pango_layout_get_pixel_size (layout, &width, &height);
+
+    x_pos = plg->x_tooltip.x + ((plg->x_tooltip.width - width) / 2);
+    y_pos = plg->x_tooltip.y + ((plg->x_tooltip.height - height) / 2);
+
+    gdk_draw_rectangle (plg->pixmap, plg->box_gc,
+                        TRUE,
+                        plg->x_tooltip.x,
+                        plg->x_tooltip.y, plg->x_tooltip.width, plg->x_tooltip.height);
+
+    gdk_draw_layout (plg->pixmap, plg->scale_gc, x_pos, y_pos, layout);
+
+    g_object_unref (layout);
+
+    if (lg_graph_debug)
+    {
+        g_print ("DrawToolTip: x=%d, y=%d Width=%d, Height=%d, Text=%s\n",
+                 x_pos, y_pos, width, height, plg->ch_tooltip_text);
+    }
+
+    return width;
+}
+
+/*
+ * Draws a label text on the Y axis
+ * sets the width, height values of the input rectangle to the size of textbox
+ * returns the height of the text area, or -1 on error
+*/
+static gint lg_graph_draw_vertical_text (PLGRAPH plg,
+                                         gchar * pch_text,
+                                         GdkRectangle * rect, gboolean redraw_control)
+{
+    PangoRenderer *renderer = NULL;
+    PangoMatrix matrix = PANGO_MATRIX_INIT;
+    PangoContext *context = NULL;
+    PangoLayout *layout = NULL;
+    gint        y_pos = 0;
+
+    g_return_val_if_fail (plg != NULL, -1);
+    g_return_val_if_fail (pch_text != NULL, -1);
+    g_return_val_if_fail (rect != NULL, -1);
+    g_return_val_if_fail (GTK_WIDGET_DRAWABLE (plg->drawing_area), -1);
+
+    if (rect->width && redraw_control)
+    {
+        gdk_draw_rectangle (plg->pixmap, plg->window_gc,
+                            TRUE, rect->x, rect->y, rect->width, rect->height);
+    }
+
+    /* Get the default renderer for the screen, and set it up for drawing  */
+    renderer = gdk_pango_renderer_get_default (gtk_widget_get_screen (plg->drawing_area));
+    gdk_pango_renderer_set_drawable (GDK_PANGO_RENDERER (renderer), plg->pixmap);
+    gdk_pango_renderer_set_gc (GDK_PANGO_RENDERER (renderer), plg->title_gc);
+
+    context = gtk_widget_get_pango_context (plg->drawing_area);
+
+    layout = pango_layout_new (context);
+    pango_layout_set_markup (layout, pch_text, -1);
+
+    pango_matrix_rotate (&matrix, 90.0);
+    pango_context_set_matrix (context, &matrix);
+
+    pango_layout_context_changed (layout);
+
+                             /* xy switched due to rotate func */
+    pango_layout_get_pixel_size (layout, &rect->height, &rect->width);  
+    y_pos = rect->y + ((plg->plot_box.height - rect->height) / 2);
+
+    gdk_draw_layout (plg->pixmap, plg->title_gc, rect->x, y_pos, layout);
+
+    /* Clean up default renderer, since it is shared */
+    gdk_pango_renderer_set_drawable (GDK_PANGO_RENDERER (renderer), NULL);
+    gdk_pango_renderer_set_gc (GDK_PANGO_RENDERER (renderer), NULL);
+    pango_context_set_matrix (context, NULL);
+
+    /* free the objects we created */
+    g_object_unref (layout);
+
+    if (lg_graph_debug)
+    {
+        g_print ("Vertical Label: x=%d, y=%d Width=%d, Height=%d Text:%s\n",
+                 rect->x, rect->y, rect->width, rect->height, pch_text);
+    }
+
+    if (redraw_control)
+    {
+        GdkRegion  *region = NULL;
+
+        region = gdk_region_rectangle (rect);
+        gdk_window_invalidate_region (plg->drawing_area->window, region, FALSE);
+        gdk_region_destroy (region);
+    }
+
+    return rect->height;
+}
+
+/*
+ * Draws a label text on the X axis
+ * sets the width, height values of the input rectangle to the size of textbox
+ * returns the width of the text area, or -1 on error
+ * redraw_control = 1 causes an expose_event, 0 or != 1 does not
+*/
+static gint lg_graph_draw_horizontal_text (PLGRAPH plg,
+                                           gchar * pch_text,
+                                           GdkRectangle * rect, gboolean redraw_control)
+{
+    PangoLayout *layout = NULL;
+    gint        x_pos = 0;
+
+    g_return_val_if_fail (plg != NULL, -1);
+    g_return_val_if_fail (pch_text != NULL, -1);
+    g_return_val_if_fail (rect != NULL, -1);
+    g_return_val_if_fail (GTK_WIDGET_DRAWABLE (plg->drawing_area), -1);
+
+    if (rect->width && redraw_control)
+    {
+        gdk_draw_rectangle (plg->pixmap, plg->window_gc,
+                            TRUE, rect->x, rect->y, rect->width, rect->height);
+    }
+
+    layout = gtk_widget_create_pango_layout (plg->drawing_area, pch_text);
+    pango_layout_set_markup (layout, pch_text, -1);
+    pango_layout_set_alignment (layout, PANGO_ALIGN_CENTER);
+
+    pango_layout_get_pixel_size (layout, &rect->width, &rect->height);
+    x_pos = rect->x + ((plg->plot_box.width - rect->width) / 2);
+
+    gdk_draw_layout (plg->pixmap, plg->title_gc, x_pos, rect->y, layout);
+
+    g_object_unref (layout);
+
+    if (lg_graph_debug)
+    {
+        g_print ("Horizontal Label: x=%d, y=%d Width=%d, Height=%d Text:%s\n",
+                 x_pos, rect->y, rect->width, rect->height, pch_text);
+
+    }
+
+    if (redraw_control)
+    {
+        GdkRegion  *region = NULL;
+
+        region = gdk_region_rectangle (rect);
+        gdk_window_invalidate_region (plg->drawing_area->window, region, FALSE);
+        gdk_region_destroy (region);
+    }
+
+    return rect->width;
+}
+
+/*
+ * Computes the size of 3 proportional charactor using default font
+*/
+static void lg_graph_get_default_sizes (PLGRAPH plg, gint * width, gint * height)
+{
+    PangoLayout *layout = NULL;
+
+    g_return_if_fail (plg != NULL);
+
+    layout = gtk_widget_create_pango_layout (plg->drawing_area, "1M5");
+
+    pango_layout_set_markup (layout, "<big><b>M5</b></big>", -1);
+
+    pango_layout_get_pixel_size (layout, width, height);
+
+    g_object_unref (layout);
+
+    if (lg_graph_debug)
+    {
+        g_print ("Default Sizing(1M5): Width=%d, Height=%d\n", *width, *height);
+    }
+
+    return;
+}
+
+/*
+ * Compute and set x-y ranges 
+*/
+static void lg_graph_set_ranges (PLGRAPH plg,
+                                 gint xminor_by,
+                                 gint xmajor_by,
+                                 gint x_min,
+                                 gint x_max,
+                                 gint yminor_by, gint ymajor_by, gint y_min, gint y_max)
+{
+    g_return_if_fail (plg != NULL);
+
+    plg->x_range.i_inc_minor_scale_by = xminor_by;  /* minimum scale value - ex:   0 */
+    plg->x_range.i_inc_major_scale_by = xmajor_by;  /* minimum scale value - ex:   0 */
+
+    plg->x_range.i_min_scale = x_min;   /* minimum scale value - ex:   0 */
+    plg->x_range.i_max_scale = x_max;   /* maximum scale value - ex: 100 */
+    plg->x_range.i_num_minor = x_max / xminor_by;   /* number of minor points */
+    plg->x_range.i_num_major = x_max / xmajor_by;   /* number of major points */
+
+    plg->y_range.i_inc_minor_scale_by = yminor_by;  /* minimum scale value - ex:   0 */
+    plg->y_range.i_inc_major_scale_by = ymajor_by;  /* minimum scale value - ex:   0 */
+
+    plg->y_range.i_min_scale = y_min;   /* minimum scale value - ex:   0 */
+    plg->y_range.i_max_scale = y_max;   /* maximum scale value - ex: 100 */
+    plg->y_range.i_num_minor = y_max / yminor_by;   /* number of minor points */
+    plg->y_range.i_num_major = y_max / ymajor_by;   /* number of major points */
+
+    return;
+}
+
+/*
+ * Repaint
+ *
+ * data - widget to repaint
+ */
+static gint lg_graph_draw (PLGRAPH plg)
+{
+    GtkWidget  *drawing_area = NULL;
+
+    g_return_val_if_fail (plg != NULL, TRUE);
+
+    drawing_area = plg->drawing_area;
+
+    if ( !(GTK_WIDGET_DRAWABLE (drawing_area)) ) {
+        return TRUE;
+    }
+
+    /* 
+     * Clear the whole area
+     */
+    gdk_draw_rectangle (plg->pixmap, plg->window_gc,
+                        TRUE, 0, 0,
+                        plg->drawing_area->allocation.width,
+                        plg->drawing_area->allocation.height);
+
+    /* 
+     * draw plot area
+     */
+    gdk_draw_rectangle (plg->pixmap,
+                        plg->box_gc,
+                        TRUE,
+                        plg->plot_box.x,
+                        plg->plot_box.y, plg->plot_box.width, plg->plot_box.height);
+
+    gdk_gc_set_line_attributes (plg->drawing_area->style->black_gc,
+                                2, GDK_LINE_SOLID, GDK_CAP_BUTT, GDK_JOIN_BEVEL);
+    gdk_draw_rectangle (plg->pixmap,
+                        plg->drawing_area->style->black_gc,
+                        FALSE,
+                        plg->plot_box.x,
+                        plg->plot_box.y, plg->plot_box.width, plg->plot_box.height);
+
+    if (lg_graph_debug)
+    {
+        g_print
+            ("Window: Width=%d, Height=%d, Plot Area x=%d y=%d width=%d, height=%d\n",
+             drawing_area->allocation.width, drawing_area->allocation.height,
+             plg->plot_box.x, plg->plot_box.y, plg->plot_box.width, plg->plot_box.height);
+    }
+
+    /*
+     * draw titles 
+     */
+    lg_graph_draw_horizontal_text (plg, plg->x_title_text, &plg->x_title, FALSE);
+
+    lg_graph_draw_horizontal_text (plg, plg->x_label_text, &plg->x_label, FALSE);
+
+    lg_graph_draw_vertical_text (plg, plg->y_label_text, &plg->y_label, FALSE);
+
+    lg_graph_draw_grid_lines (plg);
+
+    lg_graph_draw_x_grid_labels (plg);
+
+    lg_graph_draw_y_grid_labels (plg);
+
+    lg_graph_data_series_draw_all (plg, FALSE);
+
+    lg_graph_draw_tooltip (plg);
+
+    /* The entire pixmap is going to be copied
+     *     onto the window so the rect is configured 
+     *     as the size of the window.
+     */
+    lg_graph_redraw (plg);
+
+    return (FALSE);
+}
+
+/* 
+ * configure_event
+ *
+ * Create a new backing pixmap of the appropriate size 
+ * Of course, this is called whenever the window is 
+ * resized.  We have to free up things we allocated.
+ */
+static gint lg_graph_configure_event_cb (GtkWidget * widget,
+                                         GdkEventConfigure * event, PLGRAPH plg)
+{
+    GdkRectangle clip_area;
+    gint        xfactor = 0, yfactor = 0;
+
+    /* --- Free background if we created it --- */
+    if (plg->pixmap)
+    {
+        gdk_pixmap_unref (plg->pixmap);
+    }
+
+    /* --- Create a new pixmap with new size --- */
+    plg->pixmap = gdk_pixmap_new (widget->window,
+                                  widget->allocation.width,
+                                  widget->allocation.height, -1);
+
+    gdk_draw_rectangle (plg->pixmap, plg->window_gc,
+                        TRUE, 0, 0, widget->allocation.width, widget->allocation.height);
+
+    plg->width = widget->allocation.width;
+    plg->height = widget->allocation.height;
+
+    clip_area.x = 0;
+    clip_area.y = 0;
+    clip_area.width = widget->allocation.width;
+    clip_area.height = widget->allocation.height;
+
+    xfactor = MAX (plg->x_range.i_num_minor, plg->x_range.i_num_major);
+    yfactor = MAX (plg->y_range.i_num_minor, plg->y_range.i_num_major);
+
+    lg_graph_get_default_sizes (plg, &plg->x_border, &plg->y_border);
+    plg->x_border /= 4;
+    plg->y_border /= 4;
+
+    plg->x_label.x = plg->x_border * 6; /* define top-left corner of textbox */
+    plg->x_label.y = plg->height - (plg->y_border * 4) + 2;
+
+    plg->y_label.x = plg->x_border;
+    plg->y_label.y = plg->y_border * 6;
+
+    plg->x_title.x = plg->x_border * 6;
+    plg->x_title.y = 1;         /* /plg->y_border ; */
+
+    plg->x_tooltip.x = plg->x_border;
+    plg->x_tooltip.y = plg->y_border;
+    plg->x_tooltip.width = plg->width - (plg->x_border * 2);
+    plg->x_tooltip.height = plg->y_border * 7;
+
+    plg->plot_box.x = plg->x_border * 6;
+    plg->plot_box.y = plg->y_border * 6;
+    plg->plot_box.width =
+        ((gint) (plg->width - (plg->x_border * 10)) / xfactor) * xfactor;
+    plg->plot_box.height =
+        ((gint) (plg->height - (plg->y_border * 14)) / yfactor) * yfactor;
+
+    /* reposition the box according to scale-able increments */
+    plg->plot_box.x = (((gfloat) (plg->width - plg->plot_box.width) / 10.0) * 7) + 4;
+    plg->plot_box.y = (((gfloat) (plg->height - plg->plot_box.height) / 10.0) * 5) + 4;
+    plg->x_label.x = plg->x_title.x = plg->plot_box.x;
+    plg->y_label.y = plg->plot_box.y;
+
+    plg->y_range.i_minor_inc = plg->plot_box.height / plg->y_range.i_num_minor;
+    plg->y_range.i_major_inc = plg->plot_box.height / plg->y_range.i_num_major;
+
+    plg->x_range.i_minor_inc = plg->plot_box.width / plg->x_range.i_num_minor;
+    plg->x_range.i_major_inc = plg->plot_box.width / plg->x_range.i_num_major;
+
+    g_timeout_add (250, (GSourceFunc) lg_graph_draw, plg);
+
+    return TRUE;
+}
+
+/*
+ * expose_event
+ *
+ * When the window is exposed to the viewer or 
+ * the gdk_widget_draw routine is called, this 
+ * routine is called.  Copies the background pixmap
+ * to the window.
+ */
+static gint lg_graph_expose_event_cb (GtkWidget * widget, GdkEventExpose * event,
+                                      PLGRAPH plg)
+{
+
+    g_return_val_if_fail (GDK_IS_DRAWABLE (widget->window), FALSE);
+
+    /* --- Copy pixmap to the window --- */
+    gdk_draw_pixmap (widget->window,
+                     widget->style->fg_gc[GTK_WIDGET_STATE (widget)],
+                     plg->pixmap,
+                     event->area.x, event->area.y,
+                     event->area.x, event->area.y, event->area.width, event->area.height);
+
+    return FALSE;
+}
+
 static void cb_util_popup_menu_response_exit(GtkWidget * widget, gpointer gp)
 {
    PGAPC_CONFIG pcfg = NULL;
@@ -131,7 +1313,7 @@ static void cb_util_popup_menu_response_exit(GtkWidget * widget, gpointer gp)
 
    g_return_if_fail(gp != NULL);
 
-   if (((PGAPC_MONITOR) gp)->cb_id == 2) {
+   if (((PGAPC_MONITOR) gp)->cb_id == CB_MONITOR_ID) {
       /* this is a monitor struct (2) */
       pm = (PGAPC_MONITOR) gp;
       pm->b_run = FALSE;
@@ -154,7 +1336,7 @@ static void cb_util_popup_menu_response_jumpto(GtkWidget * widget, gpointer gp)
 
    g_return_if_fail(gp != NULL);
 
-   if (((PGAPC_MONITOR) gp)->cb_id == 2) {
+   if (((PGAPC_MONITOR) gp)->cb_id == CB_MONITOR_ID) {
       /* this is a monitor struct (2) */
       pm = (PGAPC_MONITOR) gp;
       window = GTK_WINDOW(pm->window);
@@ -233,11 +1415,14 @@ static gboolean cb_util_line_chart_refresh_control(PGAPC_MONITOR pm)
    pm->phs.d_xinc = pm->d_graph * pm->d_refresh;
 
    pm->tid_graph_refresh =
-      g_timeout_add((guint) (pm->phs.d_xinc * GAPC_REFRESH_FACTOR_1K + 75),
+      g_timeout_add((guint) (pm->phs.d_xinc * GAPC_REFRESH_FACTOR_1K ),
       (GSourceFunc) cb_util_line_chart_refresh, &pm->phs);
 
-   pch = g_strdup_printf("<i>sampled every %3.1f seconds</i>", pm->phs.d_xinc);
-   gtk_glgraph_axis_set_label(pm->phs.glg, GTKGLG_AXIS_X, pch);
+   pch = g_strdup_printf(
+                 "<i>sampled every %3.1f seconds</i>", 
+                 pm->phs.d_xinc);
+   lg_graph_set_x_label_text (pm->phs.plg, pch);
+
    g_free(pch);
 
    w = g_hash_table_lookup(pm->pht_Widgets, "StatusBar");
@@ -511,7 +1696,7 @@ static gboolean gapc_monitor_update_tooltip_msg(PGAPC_MONITOR pm)
       pch3 = "NISERR";
       g_hash_table_replace(pm->pht_Status, g_strdup("STATUS"), g_strdup(pch3));
       pm->i_icon_index = GAPC_ICON_NETWORKERROR;
-      for (i_series = 0; i_series < GAPC_LINEGRAPH_MAX_SERIES; i_series++) {
+      for (i_series = 0; i_series < pm->phs.plg->i_num_series; i_series++) {
          gapc_util_point_filter_set(&(pm->phs.sq[i_series]), 0.0);
       }
    }
@@ -643,8 +1828,10 @@ static gboolean gapc_monitor_update_tooltip_msg(PGAPC_MONITOR pm)
 
    if ((w = g_hash_table_lookup(pm->pht_Widgets, "TitleStatus"))) {
       gtk_label_set_markup(GTK_LABEL(w), ptitle);
-      g_snprintf(pm->phs.ch_title, GAPC_MAX_TEXT, "%s", ptitle);
+      lg_graph_set_chart_title (pm->phs.plg, ptitle);
       g_snprintf(pm->ch_title_info, GAPC_MAX_TEXT, "%s", ptitle);
+      
+      lg_graph_draw ( pm->phs.plg );
    }
 
    g_free(pmsg);
@@ -700,14 +1887,8 @@ static gint gapc_monitor_update(PGAPC_MONITOR pm)
    if (pch == NULL) {
       pch = "n/a";
    }
-   pch1 = g_hash_table_lookup(pm->pht_Status, "HITRANS");
-   if (pch1 == NULL) {
-      pch1 = "n/a";
-   }
    dValue = g_strtod(pch, NULL);
-   dScale = g_strtod(pch1, NULL);
-   if (dScale == 0.0)
-      dScale = ((gint) (dValue - 200)) ? 230 : 120;
+   dScale = (( dValue - 200 ) > 1) ? 230.0 : 120.0;
    dValue /= dScale;
    gapc_util_point_filter_set(&(pm->phs.sq[0]), dValue);
    pbar = g_hash_table_lookup(pm->pht_Status, "HBar1");
@@ -1170,18 +2351,13 @@ static gdouble gapc_util_point_filter_set(PGAPC_SUMS sq, gdouble this_point)
 {
    g_mutex_lock(sq->gm_graph);
 
-   if (this_point >= 1.10) {
-      sq->this_point = 1.08;
-   } else if (this_point < 0.01) {
-      sq->this_point = 0.0;
-   } else {
-      sq->this_point = this_point;
-   }
+   sq->this_point = this_point;
 
+   sq->this_point *= 100;
    sq->point_count++;
 
    /* some calc here */
-   sq->answer_summ += (sq->this_point * 100);
+   sq->answer_summ += sq->this_point ;
    sq->this_answer = sq->answer_summ / sq->point_count;
 
    sq->last_point = sq->this_point;
@@ -1485,12 +2661,6 @@ static gint gapc_panel_monitor_model_rec_add(PGAPC_CONFIG pcfg, PGAPC_MONITOR pm
    return TRUE;
 }
 
-/*
-"row-deleted"
-            void        user_function      (GtkTreeModel *treemodel,
-                                            GtkTreePath *arg1,
-                                            gpointer user_data);
-*/
 static gint gapc_panel_preferences_model_rec_remove(PGAPC_CONFIG pcfg)
 {
    GtkTreeIter iter, *piter = NULL;
@@ -1595,7 +2765,7 @@ static void cb_panel_systray_icon_activated(GtkPlug * plug, gpointer gp)
    g_return_if_fail(plug != NULL);
    g_return_if_fail(gp != NULL);
 
-   if (((PGAPC_MONITOR) gp)->cb_id == 2) {
+   if (((PGAPC_MONITOR) gp)->cb_id == CB_MONITOR_ID) {
       /* this is a monitor struct (2) */
       pm = (PGAPC_MONITOR) gp;
       if (pm->window != NULL) {
@@ -1613,8 +2783,6 @@ static void cb_panel_systray_icon_activated(GtkPlug * plug, gpointer gp)
 
    }
 
-/*   EggTrayIcon *sys_tray = EGG_TRAY_ICON(plug); */
-
    return;
 }
 
@@ -1629,7 +2797,7 @@ static gboolean cb_panel_systray_icon_configure(GtkWidget * widget,
    g_return_val_if_fail(gp != NULL, FALSE);
    g_return_val_if_fail(event != NULL, FALSE);
 
-   if (((PGAPC_MONITOR) gp)->cb_id == 2) {
+   if (((PGAPC_MONITOR) gp)->cb_id == CB_MONITOR_ID) {
       /* this is a monitor struct (2) */
       pm = (PGAPC_MONITOR) gp;
       pi_icon_size = &pm->i_icon_size;
@@ -1659,7 +2827,7 @@ static gboolean cb_panel_systray_icon_handle_clicked(GtkWidget * widget,
    g_return_val_if_fail(gp != NULL, FALSE);
    g_return_val_if_fail(widget != NULL, FALSE);
 
-   if (((PGAPC_MONITOR) gp)->cb_id == 2) {
+   if (((PGAPC_MONITOR) gp)->cb_id == CB_MONITOR_ID) {
       /* this is a monitor struct (2) */
       pm = (PGAPC_MONITOR) gp;
       window = pm->window;
@@ -1711,7 +2879,7 @@ static void cb_panel_systray_icon_destroy(GtkObject * object, gpointer gp)
 
    g_return_if_fail(gp != NULL);
 
-   if (((PGAPC_MONITOR) gp)->cb_id == 2) {
+   if (((PGAPC_MONITOR) gp)->cb_id == CB_MONITOR_ID) {
       /* this is a monitor struct (2) */
       pm = (PGAPC_MONITOR) gp;
       pm->tray_icon = NULL;
@@ -1752,7 +2920,7 @@ static gboolean gapc_panel_systray_icon_create(gpointer gp)
 
    g_return_val_if_fail(gp != NULL, FALSE);
 
-   if (((PGAPC_MONITOR) gp)->cb_id == 2) {
+   if (((PGAPC_MONITOR) gp)->cb_id == CB_MONITOR_ID) {
       /* this is a monitor struct (2) */
       pm = (PGAPC_MONITOR) gp;
       tray_icon = &pm->tray_icon;
@@ -1817,7 +2985,7 @@ static gboolean gapc_panel_systray_icon_remove(gpointer gp)
 
    g_return_val_if_fail(gp != NULL, FALSE);
 
-   if (((PGAPC_MONITOR) gp)->cb_id == 2) {
+   if (((PGAPC_MONITOR) gp)->cb_id == CB_MONITOR_ID) {
       /* this is a monitor struct (2) */
       pm = (PGAPC_MONITOR) gp;
       tray_icon = &pm->tray_icon;
@@ -2103,6 +3271,7 @@ static PGAPC_PREFS_COLUMN gapc_panel_prefs_col_data_init(PGAPC_CONFIG pcfg,
    pcol = g_new0(GAPC_PREFS_COLUMN, 1);
    g_return_val_if_fail(pcol != NULL, NULL);
 
+   pcol->cb_id = CB_COLUMN_ID;
    pcol->prefs_model = pcfg->prefs_model;
    pcol->i_col_num = col_num;
    pcol->client = pcfg->client;
@@ -2219,8 +3388,6 @@ static gboolean gapc_panel_preferences_data_model_load(PGAPC_CONFIG pcfg)
          GAPC_PREFS_PORT,
          v_port_number, GAPC_PREFS_REFRESH, v_network_interval,
          GAPC_PREFS_GRAPH, v_graph_interval, GAPC_PREFS_HOST, v_host_name, -1);
-
-/*    g_free (v_host_name); */
 
       /* Startup Processing */
       if (v_enabled) {
@@ -2430,18 +3597,6 @@ static GtkWidget *gapc_panel_monitors_model_init(PGAPC_CONFIG pcfg)
       GAPC_MON_UPSSTATE);
 
    gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
-
-/*
-  column = gtk_tree_view_column_new_with_attributes ("State",  renderer_icon,
-                                                     "pixbuf", GAPC_MON_ICON,
-                                                     NULL);
-  gtk_tree_view_append_column (GTK_TREE_VIEW (treeview), column);
-
-  column = gtk_tree_view_column_new_with_attributes ("Status", renderer_state,
-                                                     "markup", GAPC_MON_UPSSTATE,
-                                                     NULL);
-  gtk_tree_view_append_column (GTK_TREE_VIEW (treeview), column);
-*/
 
    column = gtk_tree_view_column_new_with_attributes("Current summary ups info",
       renderer_text, "markup", GAPC_MON_STATUS, NULL);
@@ -2866,6 +4021,7 @@ static void cb_monitor_interface_show(GtkWidget * widget, PGAPC_MONITOR pm)
 {
    g_return_if_fail(pm != NULL);
    pm->b_visible = TRUE;
+   lg_graph_draw ( pm->phs.plg );
 }
 
 static void cb_monitor_interface_hide(GtkWidget * widget, PGAPC_MONITOR pm)
@@ -3350,9 +4506,12 @@ static gboolean gapc_panel_gconf_init(PGAPC_CONFIG pcfg)
 */
 static void cb_monitor_interface_destroy(GtkWidget * widget, PGAPC_MONITOR pm)
 {
+   PGAPC_CONFIG pcfg = (PGAPC_CONFIG)pm->gp;
+   GtkWidget *sbar = NULL;
    gint h_index = 0;
 
    g_return_if_fail(pm != NULL);
+   g_return_if_fail(pcfg != NULL);   
 
    pm->b_run = FALSE;
 
@@ -3408,7 +4567,20 @@ static void cb_monitor_interface_destroy(GtkWidget * widget, PGAPC_MONITOR pm)
    }
 
    g_object_unref (pm->tooltips);
+   
+   lg_graph_data_series_remove_all ( pm->phs.plg );
 
+   sbar = g_hash_table_lookup (pcfg->pht_Widgets, "StatusBar");
+   if (sbar) {
+      gchar *pch = NULL;
+      
+      gtk_statusbar_pop(GTK_STATUSBAR(sbar), pcfg->i_info_context);
+      pch = g_strdup_printf
+         ("Monitor for %s Destroyed!...", pm->pch_host );
+      gtk_statusbar_push(GTK_STATUSBAR(sbar), pcfg->i_info_context, pch);
+      g_free(pch);
+   }
+   
    g_free(pm);
    return;
 }
@@ -3643,8 +4815,10 @@ static GtkWidget *gapc_main_interface_create(PGAPC_CONFIG pcfg)
 static gint gapc_monitor_history_page(PGAPC_MONITOR pm, GtkWidget * notebook)
 {
    PGAPC_HISTORY pphs = (PGAPC_HISTORY) & pm->phs;
+   PLGRAPH       plg = NULL;
    gint i_page = 0, i_series = 0, h_index = 0;
    GtkWidget *label = NULL, *box = NULL;
+   gchar *pch = NULL;
    gchar *pch_colors[] = { "green", "blue", "red", "yellow", "black" };
    gchar *pch_legend[] = { "LINEV", "LOADPCT", "TIMELEFT", "BCHARGE", "BATTV" };
 
@@ -3654,22 +4828,13 @@ static gint gapc_monitor_history_page(PGAPC_MONITOR pm, GtkWidget * notebook)
     * Prepare the environment */
    pphs->gp = (gpointer) pm;
    pphs->d_xinc = pm->d_refresh * pm->d_graph;
-   pphs->pht_Status = &pm->pht_Status;  /* in case they do change */
-   pphs->pht_Widgets = &pm->pht_Widgets;
+   lg_graph_debug = FALSE;
+
    for (h_index = 0; h_index < GAPC_LINEGRAPH_MAX_SERIES; h_index++) {
       if (pm->phs.sq[h_index].gm_graph != NULL) {
          g_mutex_free(pm->phs.sq[h_index].gm_graph);
       }
       pm->phs.sq[h_index].gm_graph = g_mutex_new();
-   }
-
-   if (pphs->ch_label_color[0][0] == '\0') {    /* dont re-init values */
-      for (i_series = 0; i_series < GAPC_LINEGRAPH_MAX_SERIES; i_series++) {
-         g_snprintf(pphs->ch_label_color[i_series], GAPC_MAX_ARRAY, "%s",
-            pch_colors[i_series]);
-         g_snprintf(pphs->ch_label_legend[i_series], GAPC_MAX_ARRAY, "%s",
-            pch_legend[i_series]);
-      }
    }
 
    /*
@@ -3682,13 +4847,23 @@ static gint gapc_monitor_history_page(PGAPC_MONITOR pm, GtkWidget * notebook)
 
    /*
     * Create Chart surface */
-   if (gapc_util_line_chart_create(pphs, box)) {
+   plg = pphs->plg = lg_graph_create ( box, 300, 200 );
+   if (plg != NULL) {
+       for (i_series = 0; i_series < GAPC_LINEGRAPH_MAX_SERIES; i_series++) {
+            lg_graph_data_series_add (plg, pch_legend[i_series], pch_colors[i_series]);
+       }
 
-      gapc_util_line_chart_ds_init(pphs, 5);
+       pch = g_strdup_printf(
+                 "<i>sampled every %3.1f seconds</i>", 
+                 pm->phs.d_xinc);
+       lg_graph_set_x_label_text (plg, pch);
+       g_free(pch);
+
+       lg_graph_set_chart_title (plg, pm->ch_title_info);
    }
 
    pm->tid_graph_refresh =
-      gtk_timeout_add(((guint) (pphs->d_xinc * GAPC_REFRESH_FACTOR_1K + 75)),
+      gtk_timeout_add(((guint) (pphs->d_xinc * GAPC_REFRESH_FACTOR_1K )),
       (GSourceFunc) cb_util_line_chart_refresh, pphs);
 
    /* collect one right away */
@@ -3706,17 +4881,17 @@ static gint gapc_monitor_history_page(PGAPC_MONITOR pm, GtkWidget * notebook)
 */
 static gboolean cb_util_line_chart_refresh(PGAPC_HISTORY pg)
 {
-   gint h_index = 0, i_pos = 0, i_series = 0;
-   GList *ds;
-   GtkGLGraph *glg;
-   GtkGLGDataSet *glds;
-   gboolean b_flag = FALSE;
+   gint h_index = 0;
+   PLGRAPH plg = NULL;
    PGAPC_MONITOR pm = NULL;
 
    g_return_val_if_fail(pg != NULL, FALSE);
 
    pm = (PGAPC_MONITOR) pg->gp;
+   plg = pg->plg;
+   g_return_val_if_fail(plg != NULL, FALSE);   
    g_return_val_if_fail(pm != NULL, FALSE);
+   
    if (!pm->b_run)                 /* stop this timer */
       return FALSE;
 
@@ -3725,180 +4900,124 @@ static gboolean cb_util_line_chart_refresh(PGAPC_HISTORY pg)
       return FALSE;
    }
 
-   glg = pg->glg;
-   ds = g_list_first(glg->datasets);
-
-   g_return_val_if_fail(ds != NULL, FALSE);
-
-   while (ds != NULL) {
-      glds = ds->data;
-      if (glds == NULL)
-         break;
-
-      if (glds->x_length > GAPC_LINEGRAPH_XMAX) {
-         for (h_index = 0; h_index < GAPC_LINEGRAPH_XMAX; h_index++) {
-            glds->y[h_index] = glds->y[h_index + 1];
-         }
-
-         b_flag = TRUE;
-      }
-
-      if (b_flag) {
-         i_pos = glds->x_length - 1;
-         glds->x[i_pos] = i_pos;
-         glds->y[i_pos] = gapc_util_point_filter_reset(&(pg->sq[i_series]));
-         b_flag = FALSE;
-      } else {
-         i_pos = glds->x_length++;
-         glds->y_length++;
-         glds->x[i_pos] = i_pos;
-         glds->y[i_pos] = gapc_util_point_filter_reset(&(pg->sq[i_series]));
-      }
-
-      ds = g_list_next(ds);
-      i_series++;
-   }
 
    gdk_threads_enter();
-   gtk_glgraph_set_title(glg, pg->ch_title);
-   gtk_glgraph_redraw(GTK_GLGRAPH(glg));
+   
+   for (h_index = 0; h_index < plg->i_num_series; h_index++) {
+        lg_graph_data_series_add_value (plg, h_index, 
+                                gapc_util_point_filter_reset(&(pg->sq[h_index])) );
+   }
+
+   if (plg->i_points_available >= plg->x_range.i_max_scale ) {
+       lg_graph_draw ( plg );    
+   } else {
+       lg_graph_data_series_draw_all (plg, TRUE);
+       lg_graph_redraw ( plg );
+   }
+
    gdk_flush();
    gdk_threads_leave();
 
    if (pg->b_startup) {
-      pg->b_startup = FALSE;
-      return FALSE;
+     pg->b_startup = FALSE;
+     return FALSE;
    }
+
    /* first data point collected */
    return TRUE;
 }
 
-/*
- * Initialize the requested number of data series
-*/
-static gboolean gapc_util_line_chart_ds_init(PGAPC_HISTORY pg, gint i_series)
-{
-   GtkGLGDataSet *glds;
-   gint v_index = 0;
-   GdkColor color;
-
-   g_return_val_if_fail(pg != NULL, FALSE);
-   g_return_val_if_fail(i_series <= GAPC_LINEGRAPH_MAX_SERIES, FALSE);
-
-   /* Allocate the gtkgldataset */
-   for (v_index = 0; v_index < i_series; v_index++) {
-      glds = gtk_glgraph_dataset_create();
-
-      g_return_val_if_fail(glds != NULL, FALSE);
-
-      glds->graph_type = GTKGLG_TYPE_XY;
-      glds->y_units = g_strdup(pg->ch_label_legend[v_index]);
-      glds->x_units = g_strdup("interval");
-      g_free(glds->line_color_name);    /* default is black */
-      glds->line_color_name = g_strdup(pg->ch_label_color[v_index]);
-
-      glds->x = g_new0(gdouble, GAPC_LINEGRAPH_XMAX + 4);
-      glds->y = g_new0(gdouble, GAPC_LINEGRAPH_XMAX + 4);
-
-      glds->z = g_new0(gdouble, GAPC_LINEGRAPH_XMAX + 4);
-      glds->x_length = 0;
-      glds->y_length = 0;
-      glds->z_length = 0;
-
-      gdk_color_parse(pg->ch_label_color[v_index], &color);
-      glds->line_color[0] = color.red;
-      glds->line_color[1] = color.green;
-      glds->line_color[2] = color.blue;
-      glds->line_color[3] = 1;
-
-      glds->point_color[0] = color.red;
-      glds->point_color[1] = color.green;
-      glds->point_color[2] = color.blue;
-      glds->point_color[3] = 1;
-
-      glds->glgcmap = GTKGLG_COLORMAP_JET;
-      glds->glgcmap_alpha = 0.0;
-
-      glds->draw_points = TRUE;
-      glds->draw_lines = TRUE;
-      glds->stipple_line = FALSE;
-
-      glds->line_width = 2.0;
-      glds->line_stipple = 0;
-      glds->point_size = 4.0;
-
-      gtk_glgraph_dataset_add(pg->glg, glds);
-      gtk_glgraph_dataset_set_title(pg->glg, glds, pg->ch_label_legend[v_index]);
-   }
-
-   if (v_index == i_series)
-      return TRUE;
-   else
-      return FALSE;
-}
 
 /*
- * Create a GtkGLGraph and set its attributes
+ * Create and Initialize a Line Chart
 */
-static gboolean gapc_util_line_chart_create(PGAPC_HISTORY pg, GtkWidget * box)
+static PLGRAPH lg_graph_create (GtkWidget * box, gint width, gint height)
 {
-   GtkGLGraph *glg;
-   GtkGLGDraw draw;
-   gchar *pch;
+    PLGRAPH     plg = NULL;
+    GtkWidget  *drawing_area = NULL;
+    GdkColor    color;
+    PangoFontDescription *font_desc = NULL;
 
-   g_return_val_if_fail(pg != NULL, FALSE);
+  
+    plg = g_new0 (LGRAPH, 1);
+    g_return_val_if_fail (plg != NULL, NULL);
 
-   /*
-    * Create the GtkGLGraph Object */
-   glg = pg->glg = GTK_GLGRAPH(gtk_glgraph_new());
-   gtk_glgraph_axis_set_mode(glg, GTKGLG_AXIS_MODE_FILL);
+    plg->cb_id = CB_GRAPH_ID;
+    plg->x_range.cb_id = CB_RANGE_ID;
+    plg->y_range.cb_id = CB_RANGE_ID;
+    plg->b_tooltip_active = TRUE;
+    /* 
+     * These must be set before the first drawing_area configure event 
+     */
+    lg_graph_set_chart_title  (plg, "Waiting for Update");
+    lg_graph_set_y_label_text (plg, "Precentage of 100% normal");
+    lg_graph_set_x_label_text (plg, "Waiting for Update");
 
-   draw = gtk_glgraph_get_drawn(glg);
-   draw |= (GTKGLG_D_TITLE | GTKGLG_D_TOOLTIP);
-   gtk_glgraph_set_drawn(glg, draw);
-   glg->tooltip_visible = FALSE;
-   glg->legend_in_out = TRUE;      /* put legend inside the box */
+    g_snprintf (plg->ch_tooltip_text, sizeof (plg->ch_tooltip_text), "%s",
+                "Waiting for Graphable Data...");
 
-   /*
-    * Set the graph attributes */
-   gtk_glgraph_set_title(glg, pg->ch_title);
+    lg_graph_set_chart_title_color (plg, "blue");
+    lg_graph_set_chart_scales_color (plg, "black");
+    lg_graph_set_chart_window_fg_color (plg, "light blue");
+    lg_graph_set_chart_window_bg_color (plg, "white");
 
-   pch = g_strdup_printf("<span foreground=\"blue\">"
-      "<i>sampled every %3.1f seconds</i></span> ", pg->d_xinc);
-   gtk_glgraph_axis_set_label(glg, GTKGLG_AXIS_X, pch);
-   g_free(pch);
+    /* Xminor divisions, Xmajor divisions, Xbotton scale, Xtop scale, ...y */
+    lg_graph_set_ranges (plg, 1, 2, 0, 40, 2, 10, 0, 110);
 
-   gtk_glgraph_axis_set_label(glg, GTKGLG_AXIS_Y,
-      "<span foreground=\"blue\">Percentage of 100 % normal</span> ");
+    drawing_area = plg->drawing_area = gtk_drawing_area_new ();
+    gtk_widget_set_events (drawing_area,
+                           GDK_EXPOSURE_MASK | GDK_BUTTON_PRESS_MASK |
+                           GDK_POINTER_MOTION_MASK | GDK_POINTER_MOTION_HINT_MASK);
+    gtk_drawing_area_size (GTK_DRAWING_AREA (drawing_area), width, height); 
+    gtk_box_pack_start (GTK_BOX (box), drawing_area, TRUE, TRUE, 0);
 
-   gtk_glgraph_axis_set_drawn(glg, GTKGLG_AXIS_X,
-      GTKGLG_DA_AXIS | GTKGLG_DA_MAJOR_GRID |
-      GTKGLG_DA_MINOR_GRID | GTKGLG_DA_TITLE | GTKGLG_DA_MAJOR_TICK_TEXT);
-   gtk_glgraph_axis_set_drawn(glg, GTKGLG_AXIS_Y,
-      GTKGLG_DA_AXIS | GTKGLG_DA_MAJOR_GRID |
-      GTKGLG_DA_MINOR_GRID | GTKGLG_DA_TITLE | GTKGLG_DA_MAJOR_TICK_TEXT);
-   gtk_glgraph_axis_set_drawn(glg, GTKGLG_AXIS_Z, 0);
+    font_desc = pango_font_description_from_string ("Monospace 10");
+    gtk_widget_modify_font (drawing_area, font_desc);
+    pango_font_description_free (font_desc);
 
-   pg->xmin = 0;
-   pg->xmax = GAPC_LINEGRAPH_XMAX;
-   pg->xmajor_steps = pg->xmax / 2;
-   pg->xminor_steps = 2;           /* pg->xmax; */
-   pg->xprecision = 0;
-   gtk_glgraph_axis_set_range(glg, GTKGLG_AXIS_X, &(pg->xmin), &(pg->xmax),
-      &(pg->xmajor_steps), &(pg->xminor_steps), &(pg->xprecision));
-   pg->ymin = 0.0;
-   pg->ymax = GAPC_LINEGRAPH_YMAX;
-   pg->ymajor_steps = pg->ymax / 10;
-   pg->yminor_steps = 5;           /* pg->ymajor_steps * 2; */
-   pg->yprecision = 0;
-   gtk_glgraph_axis_set_range(glg, GTKGLG_AXIS_Y, &(pg->ymin), &(pg->ymax),
-      &(pg->ymajor_steps), &(pg->yminor_steps), &(pg->yprecision));
+    gtk_widget_realize (drawing_area);
+    gtk_widget_show (drawing_area);
 
-   gtk_container_add(GTK_CONTAINER(box), GTK_WIDGET(glg));
-   gtk_widget_show_all(GTK_WIDGET(glg));
+    plg->series_gc = gdk_gc_new (drawing_area->window);
+    plg->window_gc = gdk_gc_new (drawing_area->window);
+    plg->box_gc = gdk_gc_new (drawing_area->window);
+    plg->scale_gc = gdk_gc_new (drawing_area->window);
+    plg->title_gc = gdk_gc_new (drawing_area->window);
 
+    gdk_gc_copy (plg->series_gc,
+                 drawing_area->style->fg_gc[GTK_WIDGET_STATE (drawing_area)]);
+    gdk_gc_copy (plg->window_gc,
+                 drawing_area->style->bg_gc[GTK_WIDGET_STATE (drawing_area)]);
+    gdk_gc_copy (plg->box_gc,
+                 drawing_area->style->fg_gc[GTK_WIDGET_STATE (drawing_area)]);
+    gdk_gc_copy (plg->scale_gc,
+                 drawing_area->style->fg_gc[GTK_WIDGET_STATE (drawing_area)]);
+    gdk_gc_copy (plg->title_gc,
+                 drawing_area->style->text_aa_gc[GTK_WIDGET_STATE (drawing_area)]);
 
-   return TRUE;
+    gdk_color_parse (plg->ch_color_window_bg, &color);
+    gdk_gc_set_rgb_fg_color (plg->window_gc, &color);
+
+    gdk_color_parse (plg->ch_color_chart_bg, &color);
+    gdk_gc_set_rgb_fg_color (plg->box_gc, &color);
+
+    gdk_color_parse (plg->ch_color_scale_fg, &color);
+    gdk_gc_set_rgb_fg_color (plg->scale_gc, &color);
+
+    gdk_color_parse (plg->ch_color_title_fg, &color);
+    gdk_gc_set_rgb_fg_color (plg->title_gc, &color);
+
+    /* --- Signals used to handle backing pixmap --- */
+    gtk_signal_connect (GTK_OBJECT (drawing_area), "configure_event",
+                        (GtkSignalFunc) lg_graph_configure_event_cb, plg);
+    gtk_signal_connect (GTK_OBJECT (drawing_area), "expose_event",
+                        (GtkSignalFunc) lg_graph_expose_event_cb, plg);
+    gtk_signal_connect (GTK_OBJECT (drawing_area), "motion_notify_event",
+                        (GtkSignalFunc) lg_graph_motion_notify_event_cb, plg);
+    gtk_signal_connect (GTK_OBJECT (drawing_area), "button_press_event",
+                        (GtkSignalFunc) lg_graph_button_press_event_cb, plg);
+
+    return plg;
 }
 
 
@@ -4151,22 +5270,20 @@ static GtkWidget *gapc_monitor_interface_create(PGAPC_CONFIG pcfg, gint i_monito
 
    pm = g_new0(GAPC_MONITOR, 1);
    g_return_val_if_fail(pm != NULL, NULL);
-   pm->cb_id = 2;
+   pm->cb_id = CB_MONITOR_ID;
    pm->cb_monitor_num = i_monitor;
    pm->gp = (gpointer) pcfg;
    pm->phs.gp = (gpointer) pm;
-   pm->phs.cb_id = 3;
-   pm->phs.sq[0].cb_id = 4;
-   pm->phs.sq[1].cb_id = 4;
-   pm->phs.sq[2].cb_id = 4;
-   pm->phs.sq[3].cb_id = 4;
-   pm->phs.sq[4].cb_id = 4;
+   pm->phs.cb_id = CB_HISTORY_ID;
+   pm->phs.sq[0].cb_id = CB_SUMM_ID;
+   pm->phs.sq[1].cb_id = CB_SUMM_ID;
+   pm->phs.sq[2].cb_id = CB_SUMM_ID;
+   pm->phs.sq[3].cb_id = CB_SUMM_ID;
+   pm->phs.sq[4].cb_id = CB_SUMM_ID;
 
    pm->my_icons = pcfg->my_icons;
    pm->pht_Status = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
    pm->pht_Widgets = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
-   pm->phs.pht_Status = &pm->pht_Status;
-   pm->phs.pht_Widgets = &pm->pht_Widgets;
    pm->phs.b_startup = TRUE;
 
    pm->cb_enabled = TRUE;
@@ -4196,7 +5313,6 @@ static GtkWidget *gapc_monitor_interface_create(PGAPC_CONFIG pcfg, gint i_monito
    pm->monitor_model = pcfg->monitor_model;
    g_snprintf(pm->ch_title_info, GAPC_MAX_TEXT, "%s {%s}", GAPC_WINDOW_TITLE,
       pm->pch_host);
-   g_snprintf(pm->phs.ch_title, GAPC_MAX_TEXT, "<i>%s</i>", pm->ch_title_info);
 
    if (pm->d_refresh < GAPC_REFRESH_MIN_INCREMENT) {
       pm->d_refresh = GAPC_REFRESH_DEFAULT;
@@ -4328,6 +5444,17 @@ static GtkWidget *gapc_monitor_interface_create(PGAPC_CONFIG pcfg, gint i_monito
    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
    gtk_widget_show(menu_item);
    gtk_widget_show(menu);
+   
+   sbar = g_hash_table_lookup (pcfg->pht_Widgets, "StatusBar");
+   if (sbar) {
+      gchar *pch = NULL;
+      
+      gtk_statusbar_pop(GTK_STATUSBAR(sbar), pcfg->i_info_context);
+      pch = g_strdup_printf
+         ("Monitor for %s Created!...", pm->pch_host);
+      gtk_statusbar_push(GTK_STATUSBAR(sbar), pcfg->i_info_context, pch);
+      g_free(pch);
+   }
 
    return GTK_WIDGET(window);
 }
@@ -4394,7 +5521,7 @@ extern int main(int argc, char *argv[])
    gtk_init(&argc, &argv);
 
    pcfg = g_new0(GAPC_CONFIG, 1);
-   pcfg->cb_id = 1;
+   pcfg->cb_id = CB_CONTROL_ID;
 
    /*
     * Get the instance number for this execution */

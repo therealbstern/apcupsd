@@ -18,19 +18,16 @@ allexe = @GAPCMON@
 # Override common CFLAGS here
 CFLAGS=-O2
 
-gapcmon_OBJS = gapcmon.o  gapcmon_gtkglgraph.o  eggtrayicon.o
+gapcmon_OBJS = gapcmon.o eggtrayicon.o
 pixmaps_DATA = charging.png onbatt.png online.png apcupsd.png unplugged.png
 
 all-targets: $(allexe)
 
 gapcmon: $(gapcmon_OBJS)
-	$(LD) -o $@ $(gapcmon_OBJS) @GAPCMON_LIBS@ -lX11 -lXext -lGL -lGLU $(X_LIBS) $(X_EXTRA_LIBS)
+	$(LD) -o $@ $(gapcmon_OBJS) @GAPCMON_LIBS@ -lX11 -lXext $(X_LIBS) $(X_EXTRA_LIBS)
 
 gapcmon.o: gapcmon.c 
-	$(CC) -c $(CFLAGS) @GAPCMON_CFLAGS@ $<
-
-gapcmon_gtkglgraph.o: gapcmon_gtkglgraph.c  
-	$(CC) -c $(CFLAGS) @GAPCMON_CFLAGS@  $(X_CFLAGS) $<
+	$(CC) -c $(CFLAGS) @GAPCMON_CFLAGS@ $(X_CFLAGS) $<
 
 eggtrayicon.o: eggtrayicon.c  
 	$(CC) -c $(CFLAGS) @GAPCMON_CFLAGS@  $(X_CFLAGS) $<
