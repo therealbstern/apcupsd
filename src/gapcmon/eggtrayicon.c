@@ -1,5 +1,5 @@
 
-/* eggtrayicon.c           serial-0070-1 ***************************************
+/* eggtrayicon.c           serial-0082-0 ***************************************
  * Copyright (C) 2002 Anders Carlsson <andersca@gnu.org>
  *
  * Modified by James Scott, Jr <skoona@users.sourceforge.net>
