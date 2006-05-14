@@ -27,6 +27,11 @@
 #include "apc.h"
 #include "apcsmart.h"
 
+/* Win32 needs O_BINARY; sane platforms have never heard of it */
+#ifndef O_BINARY
+#define O_BINARY 0
+#endif
+
 /*
  * This is the first routine in the driver that is called.
  */
@@ -49,7 +54,7 @@ int apcsmart_ups_open(UPSINFO *ups)
          "apcsmart_ups_open called twice. This shouldn't happen.");
    }
 
-   if ((ups->fd = open(ups->device, O_RDWR | O_NOCTTY | O_NDELAY)) < 0)
+   if ((ups->fd = open(ups->device, O_RDWR | O_NOCTTY | O_NDELAY | O_BINARY)) < 0)
       Error_abort2(_("Cannot open UPS port %s: %s\n"), ups->device, strerror(errno));
 
    /* Cancel the no delay we just set */
