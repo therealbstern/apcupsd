@@ -34,8 +34,8 @@ typedef uint8_t uDWord[4];
                      (w)[3] = (u_int8_t)((v) >> 24))
 
 struct usb_ctl_report_desc {
-        int     ucrd_size;
-        u_char  ucrd_data[1024];        /* filled data size will vary */
+        int           ucrd_size;
+        unsigned char ucrd_data[1024];        /* filled data size will vary */
 };
 
 

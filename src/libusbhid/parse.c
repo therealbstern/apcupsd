@@ -37,9 +37,9 @@
 
 #define MAXUSAGE 100
 struct hid_data {
-	u_char *start;
-	u_char *end;
-	u_char *p;
+	unsigned char *start;
+   unsigned char *end;
+   unsigned char *p;
 	hid_item_t cur;
 	unsigned int usages[MAXUSAGE];
 	int nusage;
@@ -55,7 +55,7 @@ struct hid_data {
 	 * it until we know the ID.
 	 */
 	hid_item_t savedcoll;
-	u_char hassavedcoll;
+   unsigned char hassavedcoll;
 	/*
 	 * Absolute data position (bits) for input/output/feature.
 	 *  Assumes that hid_input, hid_output and hid_feature have
