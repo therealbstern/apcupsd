@@ -476,6 +476,17 @@ static int usb_link_check(UPSINFO *ups)
    return 1;
 }
 
+/*
+ * libusb-win32, pthreads, and compat.h all have different ideas
+ * of what ETIMEDOUT is on mingw. We need to make sure we match
+ * libusb-win32's error.h in that case, so override ETIMEDOUT.
+ */
+#ifdef HAVE_MINGW
+# define LIBUSB_ETIMEDOUT   116
+#else
+# define LIBUSB_ETIMEDOUT   ETIMEDOUT
+#endif
+
 int pusb_ups_check_state(UPSINFO *ups)
 {
    int i, ci;
@@ -504,7 +515,7 @@ int pusb_ups_check_state(UPSINFO *ups)
       Dmsg1(200, "Timeout=%d\n", timeout);
       retval = usb_interrupt_read(my_data->fd, USB_ENDPOINT_IN|1, (char*)buf, sizeof(buf), timeout);
 
-      if (retval == 0 || retval == -ETIMEDOUT) {
+      if (retval == 0 || retval == -LIBUSB_ETIMEDOUT) {
          /* No events available in ups->wait_time seconds. */
          return 0;
       } else if (retval == -EINTR || retval == -EAGAIN) {
