@@ -253,6 +253,7 @@ static bool usb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
 {
    static struct timeval prev = {0};
    struct timeval now;
+   struct timespec delay;
    int diff;
 
    /*
@@ -263,8 +264,11 @@ static bool usb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
    if (prev.tv_sec) {
       gettimeofday(&now, NULL);
       diff = TV_DIFF_MS(prev, now);
-      if (diff >= 0 && diff < URB_DELAY_MS)
-          usleep((URB_DELAY_MS-diff)*1000);
+      if (diff >= 0 && diff < URB_DELAY_MS) {
+         delay.tv_sec = 0;
+         delay.tv_nsec = (URB_DELAY_MS-diff)*1000000;
+         nanosleep(&delay, NULL);
+      }
    }
    gettimeofday(&prev, NULL);
 
@@ -661,6 +665,8 @@ static bool usb_update_value(UPSINFO* ups, int ci)
 /* Process commands from the main loop */
 int usb_ups_entry_point(UPSINFO *ups, int command, void *data)
 {
+   struct timespec delay = {0, 40000000};
+
    switch (command) {
    case DEVICE_CMD_CHECK_SELFTEST:
       Dmsg0(80, "Checking self test.\n");
@@ -671,7 +677,7 @@ int usb_ups_entry_point(UPSINFO *ups, int command, void *data)
        * entry point.
        */
       /* Reason for last transfer to batteries */
-      usleep(40000);  /* Give UPS a chance to update the value */
+      nanosleep(&delay, NULL); /* Give UPS a chance to update the value */
       if (usb_update_value(ups, CI_WHY_BATT) ||
           usb_update_value(ups, CI_APCLineFailCause))
       {
@@ -689,7 +695,7 @@ int usb_ups_entry_point(UPSINFO *ups, int command, void *data)
       break;
 
    case DEVICE_CMD_GET_SELFTEST_MSG:
-      usleep(100000);  /* Give UPS a chance to update the value */
+      nanosleep(&delay, NULL); /* Give UPS a chance to update the value */
       return usb_update_value(ups, CI_ST_STAT);
 
    default:
