@@ -137,7 +137,6 @@ char *smart_poll(char cmd, UPSINFO *ups)
    if (ups->mode.type <= SHAREBASIC)
       return answer;
 
-   Dmsg2(200, "Writing char %c (%d)\n", cmd, cmd);
    write(ups->fd, &cmd, 1);
    stat = getline(answer, sizeof answer, ups);
 
@@ -162,6 +161,26 @@ int getline(char *s, int len, UPSINFO *ups)
    int ending = 0;
    char c;
    int retval;
+   int wait;
+
+   if (s != NULL)
+      wait = TIMER_FAST;   /* 1 sec, expect fast response */
+   else
+      wait = ups->wait_time;
+
+#ifdef HAVE_MINGW
+   /* Set read() timeout since we have no select() support. */
+   {
+      COMMTIMEOUTS ct;
+      HANDLE h = (HANDLE)_get_osfhandle(ups->fd);
+      ct.ReadIntervalTimeout = MAXDWORD;
+      ct.ReadTotalTimeoutMultiplier = MAXDWORD;
+      ct.ReadTotalTimeoutConstant = wait * 1000;
+      ct.WriteTotalTimeoutMultiplier = 0;
+      ct.WriteTotalTimeoutConstant = 0;
+      SetCommTimeouts(h, &ct);
+   }
+#endif
 
    while (!ending) {
 #if !defined(HAVE_CYGWIN) && !defined(HAVE_MINGW)
@@ -170,11 +189,7 @@ int getline(char *s, int len, UPSINFO *ups)
 
       FD_ZERO(&rfds);
       FD_SET(ups->fd, &rfds);
-      if (s != NULL) {
-         tv.tv_sec = TIMER_FAST;   /* 1 sec, expect fast response */
-      } else {
-         tv.tv_sec = ups->wait_time;
-      }
+      tv.tv_sec = wait;
       tv.tv_usec = 0;
 
       errno = 0;
@@ -200,8 +215,6 @@ int getline(char *s, int len, UPSINFO *ups)
       if (retval == 0) {
          return FAILURE;
       }
-
-      Dmsg2(200, "Read char %c (%d)\n", c, c);
 
       switch (c) {
          /*
