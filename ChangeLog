@@ -8,6 +8,404 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2006-05-14 19:17  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Update CVS path for new sf.net CVS deployment.
+
+2006-05-14 19:09  adk0212
+
+	* src/win32/Makefile.mingw.in:
+
+	Add USB driver and related files to build.
+
+2006-05-14 19:08  adk0212
+
+	* src/libusbhid/: parse.c, usbcompat.h:
+
+	Replace references to 'u_char' with 'unsigned char' for better
+	portability.
+
+2006-05-14 19:03  adk0212
+
+	* src/drivers/usb/usb.c:
+
+	Use nanosleep() instead of usleep() for better portability (win32).
+
+2006-05-14 19:01  adk0212
+
+	* src/drivers/usb/generic/generic-usb.c:
+
+	Ensure ETIMEDOUT matches libusb definition on win32.
+
+2006-05-14 18:56  adk0212
+
+	* src/drivers/apcsmart/smart.c:
+
+	On Win32, set read() timeout to match ups->wait_time since there is
+	no support for select().
+
+2006-05-14 18:54  adk0212
+
+	* src/drivers/apcsmart/smartsetup.c:
+
+	Open serial port in binary mode on win32.
+
+2006-05-12 11:01  skoona
+
+	* src/gapcmon/: Makefile.in, eggtrayicon.c, eggtrayicon.h,
+	gapcmon.c, gapcmon.h:
+
+	Updated gapcmon.c|h to correct the sequence of timestamps for data
+	points.  I had them ordered backwards.	James
+
+2006-05-12 10:42  skoona
+
+	* src/gapcmon/: gapcmon_gtkglgraph.c, gapcmon_gtkglgraph.h:
+
+	Removing un-needed files after sourceforge's change -- i.e. thought
+	I did this once.  James,
+
+2006-05-06 09:48  adk0212
+
+	* src/drivers/apcsmart/smart.c:
+
+	Add low level debug of tx/rx characters.
+
+2006-05-06 09:48  adk0212
+
+	* src/win32/compat/compat.cpp:
+
+	Add missing break to tcflush().
+
+2006-05-06 05:44  kerns
+
+	* src/win32/: Makefile.mingw.in, newwinservice.cpp:
+
+	Turn on newwinservice.cpp
+
+2006-05-05 23:15  adk0212
+
+	* src/drivers/apcsmart/smart.c:
+
+	select() doesn't work on MinGW.
+
+2006-05-05 23:14  adk0212
+
+	* src/win32/Makefile.mingw.in:
+
+	Add apcsmart and dumb drivers to build.
+
+2006-05-05 23:13  adk0212
+
+	* src/win32/compat/: compat.cpp, compat.h:
+
+	Emulate enough serial functions to get apcsmart and dumb drivers
+	working.
+
+2006-05-05 23:13  adk0212
+
+	* src/win32/compat/sys/termios.h:
+
+	De-Cygwin-ify this header a bit.
+
+2006-05-05 20:26  fleetworks
+
+	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
+	suse/apcupsd.spec.in:
+
+	Add latex2html requirement for fedora core builds.
+
+2006-05-05 12:30  fleetworks
+
+	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
+	suse/apcupsd.spec.in:
+
+	Add ghostscript to rpm build requires.
+
+2006-05-05 10:03  kerns
+
+	* src/win32/compat/compat.cpp:
+
+	Tweak syslog type
+
+2006-05-05 10:01  kerns
+
+	* src/: lib/wincompat.c, win32/winabout.cpp, win32/winabout.h,
+	win32/winevents.cpp, win32/winevents.h, win32/winmain.cpp,
+	win32/winprop.h, win32/winservice.cpp, win32/winservice.h,
+	win32/winstat.cpp, win32/winstat.h, win32/wintray.cpp,
+	win32/wintray.h, win32/winups.h, win32/compat/compat.cpp,
+	win32/compat/compat.h, win32/compat/syslog.h:
+
+	Remove one old Win32 header + implement syslog
+
+2006-05-04 10:47  kerns
+
+	* src/: apcnis.c, win32/Makefile.mingw.in, win32/README.mingw32,
+	win32/compat/winconfig.h:
+
+	Implement MinGW NIS server code + tweak dir locations
+
+2006-05-02 05:11  kerns
+
+	* src/win32/: Makefile.mingw.in, compat/compat.h:
+
+	Cleanup Makefile.mingw a bit, pull lastest compat.h
+
+2006-05-01 15:29  kerns
+
+	* src/win32/compat/: alloca.h, grp.h, netdb.h, strings.h,
+	sys/ioctl.h, sys/socket.h, sys/wait.h:
+
+	Update so no file is zero length
+
+2006-05-01 15:19  kerns
+
+	* src/win32/README.mingw32:
+
+	Update README.mingw32
+
+2006-05-01 15:16  kerns
+
+	* src/: apcnis.c, win32/README.mingw32:
+
+	Update README
+
+2006-05-01 13:29  kerns
+
+	* src/: apcaccess.c, drivers/drivers.c, drivers/net/net.c,
+	drivers/net/net.h, drivers/test/testdriver.c,
+	drivers/test/testdriver.h, lib/apclibnis.c,
+	win32/Makefile.mingw.in, win32/winservice.cpp:
+
+	Implement apcaccess for MinGW
+
+2006-05-01 10:29  kerns
+
+	* src/win32/README.mingw32:
+
+	Update README.mingw32 with Adam's tips
+
+2006-05-01 10:06  kerns
+
+	* src/win32/: Makefile.mingw.in, winmain.cpp:
+
+	With this the MinGW apcupsd links, but no drivers
+
+2006-05-01 09:14  kerns
+
+	* include/apc_config.h, src/lib/apcevents.c, src/lib/apcfile.c,
+	src/lib/apclock.c, src/lib/apcsignal.c, src/lib/apcstatus.c,
+	src/win32/Makefile.mingw.in, src/win32/winmain.cpp,
+	src/win32/winres.rc, src/win32/winservice.cpp,
+	src/win32/compat/compat.cpp, src/win32/compat/compat.h,
+	src/win32/compat/winapi.c, src/win32/compat/winapi.h:
+
+	More MinGW corrections
+
+2006-05-01 08:40  kerns
+
+	* src/win32/compat/: winapi.c, winapi.h:
+
+	modify files
+
+2006-05-01 07:43  kerns
+
+	* src/win32/README.mingw32:
+
+	Remove lingering references to Bacula in README
+
+2006-05-01 07:36  kerns
+
+	* src/win32/: .cvsignore, Makefile.mingw.in, README.mingw32,
+	winmain.cpp, compat/compat.cpp, compat/compat.h, compat/getopt.c,
+	compat/winapi.c, compat/winapi.h, compat/sys/stat.h:
+
+	Update MinGW build
+
+2006-04-30 19:10  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Changed g_object_ref_sink() to gtk_object_sink( GTK_OBJECT(widget)
+	); to maintain Gtk/Glib Version 2.4 standard; in gapcmon.c
+
+	James,
+
+2006-04-30 11:28  adk0212
+
+	* platforms/etc/apcupsd.conf.in:
+
+	Remove master-slave related parameters from default config.
+
+2006-04-30 11:18  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Kill NETPORT configuration parameter; master-slave is gone, so
+	NETPORT no longer serves any purpose.
+
+2006-04-30 11:12  adk0212
+
+	* src/lib/apcconfig.c:
+
+	Default NIS port to NISPORT (from configure) instead of hard-coded
+	7000.  The default should have been 3551 anyway and this will
+	prevent future foul ups.
+
+2006-04-29 15:38  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Add link for 3.12.3 RPMS.
+
+2006-04-28 19:36  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Updaate for 3.12.3 release.
+
+2006-04-28 12:44  kerns
+
+	* configure, autoconf/configure.in:
+
+	New MinGW configure
+
+2006-04-28 12:40  kerns
+
+	* src/win32/: Makefile.in, Makefile.mingw.in:
+
+	Get Makefiles correct
+
+2006-04-28 12:38  kerns
+
+	* src/: apcupsd.c, win32/Makefile.cygwin.in, win32/Makefile.in,
+	win32/build-win32-cross-tools:
+
+	MinGW ifdeffing
+
+2006-04-28 12:37  kerns
+
+	* include/: apc.h, extern.h:
+
+	MinGW include changes
+
+2006-04-28 12:34  kerns
+
+	* src/win32/compat/: alloca.h, compat.cpp, compat.h, getopt.h,
+	grp.h, mswinver.h, netdb.h, sched.h, stdint.h, strings.h,
+	winconfig.h, winhost.h, winsock.h, arpa/inet.h, netinet/in.h,
+	sys/stat.h, sys/termios.h:
+
+	Commit compat changes
+
+2006-04-26 12:22  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Fixed the destruction of tooltips for the monitors and control
+	panel, by using g_object_ref()/g_object_ref_sink() during create,
+	and at destroy time using g_object_unref().  Now everything created
+	for a monitor gets destroyed when the monitor is destroyed.
+
+	James,
+
+2006-04-26 00:20  skoona
+
+	* src/gapcmon/gapcmon.h:
+
+	edited Glossary page text to remove mention of the
+	click-to-toggle-legend.  James,
+
+2006-04-26 00:11  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Corrected the graph x-label text to remove --
+	click-to-toggle-legend -- extension. Legend feature has been
+	removed, with all-points-tooltip taking its place.  James,
+
+2006-04-26 00:02  skoona
+
+	* src/gapcmon/: gapcmon.c, gapcmon_gtkglgraph.c:
+
+	Implemented all-points-tooltip in gapcmon_gtkglgraph.c for history
+	graph Removed old click-to-show legend functionality in gapcmon.c
+	Fixed a shutdown (invalid-ptr) bug in
+	gapc_monitor_interface_destroy() where tooltip OBJECT was simply
+	freed -- removed 4 lines.  James, (noticed the define around
+	gnome_socket_vfs_timeout() in network routine)
+
+2006-04-23 09:14  fleetworks
+
+	* doc/latex/manual.tex:
+
+	Update rpm section of manual.
+
+2006-04-23 09:03  fleetworks
+
+	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
+	suse/apcupsd.spec.in:
+
+	Remove redundant code, add powerflute.
+
+2006-04-23 08:05  fleetworks
+
+	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
+	suse/apcupsd.spec.in:
+
+	Add pdf manual to doc package.
+
+2006-04-22 10:49  adk0212
+
+	* src/gapcmon/gapcmon.c:
+
+	Return a value from gnome_vfs_socket_set_timeout() stub for
+	cleanliness.
+
+2006-04-22 10:44  adk0212
+
+	* configure, autoconf/configure.in, src/gapcmon/gapcmon.c:
+
+	Check for gnome_vfs_socket_set_timeout() and stub it out if not
+	available.
+
+2006-04-22 10:08  adk0212
+
+	* configure, autoconf/configure.in, src/Makefile.in:
+
+	Simplify gapcmon configure now that we're back to a single target.
+
+2006-04-22 08:29  fleetworks
+
+	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
+	suse/apcupsd.spec.in:
+
+	clean up build defines, add rhel4
+
+2006-04-21 10:55  skoona
+
+	* src/gapcmon/: eggtrayicon.h, gapcmon.c, gapcmon.h,
+	gapcmon_gtkglgraph.h:
+
+	A. Found the bug in preferences page related to editing the
+	hostname value.     It was a double free() in
+	...preference_changed() callback routine.  B. Fine tuned the state
+	status messages in the ActiveList page.  C. Added a CLOSE button to
+	the control panel and gave it the default.  This    should help
+	avoid accidental exits.  The close button hides the cp.  D. Added a
+	b_thread_stop flag to control monitor thread shutdowns better.
+	This avoids the CRITICAL thread join message which was present at
+	times.	James
+
+2006-04-19 22:51  adk0212
+
+	* ChangeLog, include/version.h:
+
+	Update ChangeLog and version for 3.13.4 devel release.
+
 2006-04-19 22:50  adk0212
 
 	* configure:
@@ -376,7 +774,8 @@
 
 	* src/win32/: apcupsd/apcupsd.mak, apcupsd/apcupsd.mak.in,
 	apcupsd/filelist, compat/compat.cpp, compat/compat.h,
-	compat/winconfig.h:
+	compat/winconfig.h, lib/apclibnis.cpp, lib/newups.cpp,
+	lib/testdriver.cpp:
 
 	Add new win32 files
 
@@ -430,6 +829,17 @@
 	* src/win32/compat/arpa/inet.h:
 
 	Add arpa directory
+
+2006-03-09 08:50  kerns
+
+	* src/win32/lib/: action.cpp, apcconfig.cpp, apcerror.cpp,
+	apcevents.cpp, apcexec.cpp, apcfile.cpp, apclist.cpp, apclock.cpp,
+	apclog.cpp, apcnis.cpp, apcsignal.cpp, apcstatus.cpp, apcupsd.cpp,
+	asys.cpp, device.cpp, drivers.cpp, options.cpp, reports.cpp,
+	smart.cpp, smarteeprom.cpp, smartoper.cpp, smartsetup.cpp,
+	smartsetup2.cpp:
+
+	add new src/win32/lib directory
 
 2006-03-09 08:50  kerns
 
