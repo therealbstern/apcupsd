@@ -5,6 +5,8 @@
 
 NEW FEATURES
 
+  * Mingw32-based win32 port. *Alpha*
+
   * GUI monitoring applications, gapcmon and gpanel_apcmon, thanks to
     James Scott, Jr. These are Gnome/GTK based applications. gapcmon is
     a standalone app for monitoring a single UPS. gpanel_apcmon
