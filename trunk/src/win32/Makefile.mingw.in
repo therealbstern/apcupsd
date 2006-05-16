@@ -354,10 +354,10 @@ clean:
 
 # Link the apcupsd daemon executable ...
 apcupsd.exe: $(APC_OBJS)
-	$(CXX) $(APC_OBJS) $(APC_LIBS) -o $(OBJDIR)/apcupsd.exe
+	$(CXX) $(APC_OBJS) $(APC_LIBS) -mwindows -o $(OBJDIR)/apcupsd.exe
 	cp -f $(DEPKGS)/pthreads/pthreadGCE.dll .
 	cp -f $(MINGW)/mingw32/bin/mingwm10.dll .
 
 apcaccess.exe: $(ACCESS_OBJS)
-	$(CXX) $(ACCESS_OBJS) $(ACCESS_LIBS) -o $(OBJDIR)/apcaccess.exe
+	$(CXX) $(ACCESS_OBJS) $(ACCESS_LIBS) -mwindows -o $(OBJDIR)/apcaccess.exe
 	cp -f $(DEPKGS)/pthreads/pthreadGCE.dll .
