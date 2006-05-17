@@ -359,5 +359,5 @@ apcupsd.exe: $(APC_OBJS)
 	cp -f $(MINGW)/mingw32/bin/mingwm10.dll .
 
 apcaccess.exe: $(ACCESS_OBJS)
-	$(CXX) $(ACCESS_OBJS) $(ACCESS_LIBS) -mwindows -o $(OBJDIR)/apcaccess.exe
+	$(CXX) $(ACCESS_OBJS) $(ACCESS_LIBS) -o $(OBJDIR)/apcaccess.exe
 	cp -f $(DEPKGS)/pthreads/pthreadGCE.dll .
