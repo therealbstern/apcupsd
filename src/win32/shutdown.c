@@ -36,9 +36,13 @@ int main(int argc, char **argv)
       TOKEN_PRIVILEGES tkp; 
        
       // Get a token for this process. 
-       
+#ifdef HAVE_CYGWIN
       if (!OpenThreadToken(GetCurrentThread(), 
-	      TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, FALSE, &hToken)) {
+         TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, FALSE, &hToken)) {
+#else
+      if (!OpenProcessToken(GetCurrentProcess(), 
+         TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken)) {
+#endif
 // Forge onward anyway in the hopes of succeeding.
 //       MessageBox(NULL, "System shutdown failed: OpenProcessToken", "shutdown", MB_OK);
 //	 exit(1);
