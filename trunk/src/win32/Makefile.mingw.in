@@ -19,12 +19,14 @@ DEPKGS = $(TOPDIR)/depkgs-win32
 INCLUDE_APC = -I ../../include -I ./compat
 INCLUDE_PTHREADS = -I $(DEPKGS)/pthreads
 INCLUDE_LIBUSB = -I $(DEPKGS)/libusb-win32/src
+INCLUDE_NETSNMP = -I $(DEPKGS)/net-snmp/include
 INCLUDE_LIBUSBHID = -I ../libusbhid
 INCLUDE_ICONS = -I .
 
 LIB_MINGW = $(MINGW)/mingw32/lib
 LIB_PTHREADS = $(DEPKGS)/pthreads/pthreadGCE.dll
 LIB_LIBUSB = $(DEPKGS)/libusb-win32/libusb.a
+LIB_NETSNMP = $(DEPKGS)/net-snmp/snmplib/.libs/libnetsnmp.a
 
 BIN_DIR = $(MINGW)/bin
 
@@ -35,7 +37,8 @@ INCLUDES = \
 	$(INCLUDE_LIBUSB) \
 	$(INCLUDE_APC) \
 	$(INCLUDE_ICONS) \
-	$(INCLUDE_LIBUSBHID)
+	$(INCLUDE_LIBUSBHID) \
+	$(INCLUDE_NETSNMP)
 
 HAVES = \
 	-DHAVE_MINGW \
@@ -44,7 +47,9 @@ HAVES = \
 	-DHAVE_TEST_DRIVER \
 	-DHAVE_APCSMART_DRIVER \
 	-DHAVE_DUMB_DRIVER \
-	-DHAVE_USB_DRIVER
+	-DHAVE_USB_DRIVER \
+	-DHAVE_SNMP_DRIVER \
+	-DHAVE_NET_SNMP
 
 DEFINES = \
 	-DWIN32 \
@@ -280,6 +285,31 @@ $(OBJDIR)/descr.o: ../libusbhid/descr.c
 
 ######################################################################
 
+# Files in src/drivers/snmp
+OBJS_SNMPDRV = \
+	$(OBJDIR)/drv_powernet.o \
+	$(OBJDIR)/drv_rfc1628.o  \
+	$(OBJDIR)/powernet-mib-mgr.o \
+	$(OBJDIR)/rfc1628-mib-mgr.o \
+	$(OBJDIR)/snmp.o
+
+$(OBJDIR)/drv_powernet.o: ../drivers/snmp/drv_powernet.c
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/drv_rfc1628.o: ../drivers/snmp/drv_rfc1628.c
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/powernet-mib-mgr.o: ../drivers/snmp/powernet-mib-mgr.c
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/rfc1628-mib-mgr.o: ../drivers/snmp/rfc1628-mib-mgr.c
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/snmp.o: ../drivers/snmp/snmp.c
+	$(CXX) -c $< -o $@
+
+######################################################################
+
 # Files in src
 OBJS_SRC = \
 	$(OBJDIR)/action.o \
@@ -324,12 +354,14 @@ $(OBJDIR)/apcaccess.o:	../apcaccess.c
 
 APC_OBJS = $(OBJS_SRC) $(LIB_OBJS) $(OBJS_COMPAT) $(OBJS_WIN) \
 	   $(OBJS_DRIVERS) $(OBJS_TESTDRV) $(OBJS_NETDRV) \
-	   $(OBJS_SMARTDRV) $(OBJS_DUMBDRV) $(OBJS_USBDRV)
+	   $(OBJS_SMARTDRV) $(OBJS_DUMBDRV) $(OBJS_USBDRV) \
+	   $(OBJS_SNMPDRV)
 
 APC_LIBS = \
 	-L$(LIB_MINGW) \
 	$(LIB_PTHREADS) \
 	$(LIB_LIBUSB) \
+	$(LIB_NETSNMP) \
 	$(LIB_MINGW)/libuser32.a \
 	$(LIB_MINGW)/libgdi32.a \
 	$(LIB_MINGW)/libwsock32.a \
