@@ -349,7 +349,23 @@ $(OBJDIR)/apcaccess.o:	../apcaccess.c
 
 ######################################################################
 
+# shutdown objects
+OBJS_SHUT = \
+	$(OBJDIR)/shutdown.o
 
+$(OBJDIR)/shutdown.o:	./shutdown.c
+	$(CXX) -c $< -o $@
+
+######################################################################
+
+# popup objects
+OBJS_POP = \
+	$(OBJDIR)/popup.o
+
+$(OBJDIR)/popup.o:	./popup.c
+	$(CXX) -c $< -o $@
+
+######################################################################
 
 
 APC_OBJS = $(OBJS_SRC) $(LIB_OBJS) $(OBJS_COMPAT) $(OBJS_WIN) \
@@ -376,12 +392,20 @@ ACCESS_LIBS = \
 	$(LIB_MINGW)/libwsock32.a \
 	$(LIB_MINGW)/libnetapi32.a
 
+SHUT_OBJS = $(OBJS_SHUT)
+SHUT_LIBS = 
+
+POP_OBJS = $(OBJS_POP)
+POP_LIBS = 
+
 # Targets
 
-all: apcupsd.exe apcaccess.exe
+all: apcupsd.exe apcaccess.exe shutdown.exe popup.exe
 
 clean:
-	rm -f $(OBJDIR)/*.o $(OBJDIR)/apcupsd.exe $(OBJDIR)/winres.res
+	rm -f $(OBJDIR)/*.o $(OBJDIR)/apcupsd.exe $(OBJDIR)/winres.res \
+		$(OBJDIR)/apcaccess.exe $(OBJDIR)/shutdown.exe \
+		$(OBJDIR)/popup.exe
 	rm -f pthreadGCE.dll
 
 # Link the apcupsd daemon executable ...
@@ -393,3 +417,9 @@ apcupsd.exe: $(APC_OBJS)
 apcaccess.exe: $(ACCESS_OBJS)
 	$(CXX) $(ACCESS_OBJS) $(ACCESS_LIBS) -o $(OBJDIR)/apcaccess.exe
 	cp -f $(DEPKGS)/pthreads/pthreadGCE.dll .
+
+shutdown.exe: $(SHUT_OBJS)
+	$(CXX) $(SHUT_OBJS) $(SHUT_LIBS) -o $(OBJDIR)/shutdown.exe
+
+popup.exe: $(POP_OBJS)
+	$(CXX) $(POP_OBJS) $(POP_LIBS) -o $(OBJDIR)/popup.exe
