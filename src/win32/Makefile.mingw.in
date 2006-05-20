@@ -58,8 +58,8 @@ DEFINES = \
 
 
 
-CC = $(BIN_DIR)/mingw32-g++ $(DEFINES) $(INCLUDES)
-CXX = $(BIN_DIR)/mingw32-g++ $(DEFINES) $(INCLUDES) 2>&1
+CC = $(BIN_DIR)/mingw32-g++ -O2 $(DEFINES) $(INCLUDES)
+CXX = $(BIN_DIR)/mingw32-g++ -O2 $(DEFINES) $(INCLUDES) 2>&1
 WINDRES = $(BIN_DIR)/mingw32-windres
 
 first: all
