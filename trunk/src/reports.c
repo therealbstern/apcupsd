@@ -245,14 +245,14 @@ void do_reports(UPSINFO *ups)
    }
 
    /* Check if it is time to log DATA record */
-   if ((ups->datatime > 0) && (now - last_time_logging) > ups->datatime) {
-      time(&last_time_logging);
+   if ((ups->datatime > 0) && (now - last_time_logging) >= ups->datatime) {
+      last_time_logging = now;
       log_data(ups);
    }
 
    /* Check if it is time to write STATUS file */
-   if ((statusfile != NULL) && (now - last_time_status) > ups->stattime) {
-      time(&last_time_status);
+   if ((statusfile != NULL) && (now - last_time_status) >= ups->stattime) {
+      last_time_status = now;
       output_status(ups, 0, log_status_open, log_status_write, log_status_close);
    }
 
