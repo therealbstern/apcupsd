@@ -26,7 +26,9 @@
 #ifndef _DEFINES_H
 #define _DEFINES_H
 
-#define APCCONTROL              SYSCONFDIR "/apccontrol"
+#ifndef APCCONTROL
+# define APCCONTROL              SYSCONFDIR "/apccontrol"
+#endif
 
 #ifndef APCCONF
 # define APCCONF                SYSCONFDIR "/apcupsd.conf"
