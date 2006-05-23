@@ -19,7 +19,7 @@
 //
 // Author          : Christopher S. Hull
 // Created On      : Sat Jan 31 15:55:00 2004
-// $Id: compat.cpp,v 1.12 2006-05-06 13:48:24 adk0212 Exp $
+// $Id: compat.cpp,v 1.13 2006-05-23 21:53:10 adk0212 Exp $
 
 #ifdef __APCUPSD__
 
@@ -1674,11 +1674,31 @@ int
 kill(int pid, int signal)
 {
    int rval = 0;
-   if (!TerminateProcess((HANDLE)pid, (UINT) signal)) {
+   DWORD exitcode = 0;
+
+   switch (signal) {
+   case SIGTERM:
+      /* Terminate the process */
+      if (!TerminateProcess((HANDLE)pid, (UINT) signal)) {
+         rval = -1;
+         errno = b_errno_win32;
+      }
+      CloseHandle((HANDLE)pid);
+      break;
+   case 0:
+      /* Just check if process is still alive */
+      if (GetExitCodeProcess((HANDLE)pid, &exitcode) &&
+          exitcode != STILL_ACTIVE) {
+         rval = -1;
+      }
+      break;
+   default:
+      /* Don't know what to do, so just fail */
       rval = -1;
-      errno = b_errno_win32;
+      errno = EINVAL;
+      break;   
    }
-   CloseHandle((HANDLE)pid);
+
    return rval;
 }
 
