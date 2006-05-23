@@ -27,7 +27,7 @@
  * Last Modified By: Thorsten Engel
  * Last Modified On: Fri Apr 22 19:30:00 2004
  * Update Count    : 218
- * $Id: compat.h,v 1.9 2006-05-06 03:13:42 adk0212 Exp $
+ * $Id: compat.h,v 1.10 2006-05-23 21:49:09 adk0212 Exp $
  */
 
 
@@ -390,6 +390,8 @@ void openlog(const char *ident, int option, int facility);
 #ifndef INVALID_FILE_ATTRIBUTES
 #define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
 #endif
+
+void conv_unix_to_win32_path(const char *name, char *win32_name, DWORD dwSize);
 
 /* Temp kludge ***FIXME*** */
 #ifdef __APCUPSD__
