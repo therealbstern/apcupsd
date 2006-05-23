@@ -10,7 +10,8 @@
 #ifndef __MINGWCONFIG_H
 #define __MINGWCONFIG_H
 
-
+/* Override to use *.bat */
+# define APCCONTROL              SYSCONFDIR "/apccontrol.bat"
 
 /* Define if you have GCC */
 #define HAVE_GCC 1
