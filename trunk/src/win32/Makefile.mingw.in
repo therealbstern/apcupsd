@@ -419,7 +419,7 @@ apcaccess.exe: $(ACCESS_OBJS)
 	cp -f $(DEPKGS)/pthreads/pthreadGCE.dll .
 
 shutdown.exe: $(SHUT_OBJS)
-	$(CXX) $(SHUT_OBJS) $(SHUT_LIBS) -o $(OBJDIR)/shutdown.exe
+	$(CXX) $(SHUT_OBJS) $(SHUT_LIBS) -mwindows -o $(OBJDIR)/shutdown.exe
 
 popup.exe: $(POP_OBJS)
-	$(CXX) $(POP_OBJS) $(POP_LIBS) -o $(OBJDIR)/popup.exe
+	$(CXX) $(POP_OBJS) $(POP_LIBS) -mwindows -o $(OBJDIR)/popup.exe
