@@ -1,13 +1,11 @@
 [Desktop Entry]
 Encoding=UTF-8
-Version=1.0
 Type=Application
+Version=1.0
 Exec=gapcmon
-TryExec=gapcmon
-Icon=/usr/share/pixmaps/apcupsd.png
-Categories=Applications;System Tools;
-X-GNOME-DocPath=
+Icon=apcupsd.png
+Name=APCUPSD Monitor
+GenericName=gapcmon
+Comment=Gtk/GUI Monitor program for (U)ninterruptible (P)ower (S)upply under the management of the APCUPSD.sourceforge.net package, also available at gapcmon.sourceforge.net
 Terminal=false
-Name[en_US]=APCUPSD Monitor
-GenericName[en_US]=gapcmon
-Comment[en_US]=Gtk/GUI Monitor program for (U)ninterruptible (P)ower (S)upply under the management of the APCUPSD.sourceforge.net package, also available at gapcmon.sourceforge.net
+Categories=GTK;Application;System;
