@@ -922,8 +922,12 @@ static gint lg_graph_draw_tooltip (PLGRAPH plg)
     x_pos = plg->x_tooltip.x + ((plg->x_tooltip.width - width) / 2);
     y_pos = plg->x_tooltip.y + ((plg->x_tooltip.height - height) / 2);
 
-    gdk_draw_rectangle (plg->pixmap, plg->box_gc,
+    gdk_draw_rectangle (plg->pixmap, plg->window_gc, /* box_gc, */
                         TRUE,
+                        plg->x_tooltip.x,
+                        plg->x_tooltip.y, plg->x_tooltip.width, plg->x_tooltip.height);
+    gdk_draw_rectangle (plg->pixmap, plg->box_gc,
+                        FALSE,
                         plg->x_tooltip.x,
                         plg->x_tooltip.y, plg->x_tooltip.width, plg->x_tooltip.height);
 
@@ -940,6 +944,7 @@ static gint lg_graph_draw_tooltip (PLGRAPH plg)
     return width;
 }
 
+#if GTK_CHECK_VERSION(2,6,0)
 /*
  * Draws a label text on the Y axis
  * sets the width, height values of the input rectangle to the size of textbox
@@ -1012,6 +1017,91 @@ static gint lg_graph_draw_vertical_text (PLGRAPH plg,
 
     return rect->height;
 }
+#else
+static gint lg_graph_draw_vertical_text (PLGRAPH plg,
+                                         gchar * pch_text,
+                                         GdkRectangle * rect, gboolean redraw_control)
+{
+    PangoContext *context = NULL;
+    PangoLayout *layout = NULL;
+    gint        y_pos = 0;
+	GdkPixmap      *norm_pixmap = NULL;
+    gint            width, height;
+    gint            rot_width, rot_height;
+    GtkWidget      *widget;
+    GdkPixbuf      *norm_pixbuf = NULL, *rot_pixbuf = NULL;
+    guint32        *norm_pix, *rot_pix;
+    gint            i, j, k, l;
+    gint            rows, cols;
+    guint32        *row, *col;
+
+    g_return_val_if_fail (plg != NULL, -1);
+    g_return_val_if_fail (pch_text != NULL, -1);
+    g_return_val_if_fail (rect != NULL, -1);
+  g_return_val_if_fail (GTK_WIDGET_DRAWABLE (plg->drawing_area), -1);
+
+
+  context = gtk_widget_get_pango_context (plg->drawing_area);
+  layout = pango_layout_new (context);
+  pango_layout_set_markup (layout, pch_text, -1);
+  pango_layout_get_pixel_size (layout, &width, &height);
+  if (width <= 0 || height <= 0)
+  {
+    return 0;
+  }
+
+  /* Figure out the rotated width and height */
+  rect->width  = rot_width = height;
+  rect->height = rot_height = width;
+
+  norm_pixmap = gdk_pixmap_new (plg->drawing_area->window, width, height, -1);
+  gdk_draw_rectangle (norm_pixmap, plg->window_gc, TRUE, 0, 0, width, height);
+  gdk_draw_layout (norm_pixmap, plg->title_gc, 0, 0, layout);
+
+  norm_pixbuf = gdk_pixbuf_new (GDK_COLORSPACE_RGB, TRUE, 8, width, height); 
+  norm_pixbuf = gdk_pixbuf_get_from_drawable (norm_pixbuf, norm_pixmap, NULL, 
+          									  0, 0, 0, 0, width, height);
+
+  /* Get the raw pixel pointer of client buffer */
+  norm_pix = (guint32 *) gdk_pixbuf_get_pixels (norm_pixbuf);
+  
+  /* Allocate a new client buffer with rotated memory */
+  rot_pixbuf = gdk_pixbuf_new (GDK_COLORSPACE_RGB, TRUE, 8, rot_width, rot_height);
+  rot_pix = (guint32 *) gdk_pixbuf_get_pixels (rot_pixbuf);
+
+  /* Actually rotate */
+  k = 0;
+  for (j = width - 1; j >= 0; j--)
+  {
+       l = j;
+       for (i = 0; i < height; i++, k++, l += width)
+       {
+          rot_pix[k] = norm_pix[l];
+       }
+  }
+
+  /* compute a centered position on chart */
+  y_pos = rect->y + ((plg->plot_box.height - rect->height) / 2);
+
+  /* Draw it to the chart */
+  gdk_pixbuf_render_to_drawable ( rot_pixbuf,
+                        plg->pixmap,
+                        plg->title_gc,                        
+                        0, 0,
+                        rect->x -1, y_pos,
+                        rect->width, rect->height,
+                        GDK_RGB_DITHER_NONE, 0, 0);
+
+  /* Free everything */
+  g_object_unref (layout);
+  g_object_unref (G_OBJECT (norm_pixmap));
+  g_object_unref (G_OBJECT (norm_pixbuf));
+  g_object_unref (G_OBJECT (rot_pixbuf));   
+
+
+  return rect->height;
+}
+#endif
 
 /*
  * Draws a label text on the X axis
