@@ -1,3 +1,9 @@
+gapc_devel (0.7.0-1) stable; urgency=normal
+* Tue May 29 2006 James Scott, Jr. <skoona@users.sourceforge.net>
+- Rewrite lg_graph_draw_veritical_text() to remove V2.6 api.
+- Fixed gapcmon.desktop to support current gnome systems (Fedora 5) 
+  - changed the order of statements
+
 gapc_devel (0.7.0-0) stable; urgency=normal
 * Thru Apr 18 2006 James Scott, Jr. <skoona@users.sourceforge.net>
 - Rewrite to include desktop independant features completed.
