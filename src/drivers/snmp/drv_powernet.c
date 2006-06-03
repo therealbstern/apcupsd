@@ -178,6 +178,7 @@ int powernet_snmp_ups_read_static_data(UPSINFO *ups)
    if (powernet_check_comm_lost(ups) == 0)
       return 0;
 
+   data->upsBasicIdent = NULL;
    powernet_mib_mgr_get_upsBasicIdent(s, &(data->upsBasicIdent));
    if (data->upsBasicIdent) {
       SNMP_STRING(upsBasicIdent, Model, upsmodel);
@@ -185,6 +186,7 @@ int powernet_snmp_ups_read_static_data(UPSINFO *ups)
       free(data->upsBasicIdent);
    }
 
+   data->upsAdvIdent = NULL;
    powernet_mib_mgr_get_upsAdvIdent(s, &(data->upsAdvIdent));
    if (data->upsAdvIdent) {
       SNMP_STRING(upsAdvIdent, FirmwareRevision, firmrev);
@@ -193,12 +195,14 @@ int powernet_snmp_ups_read_static_data(UPSINFO *ups)
       free(data->upsAdvIdent);
    }
 
+   data->upsBasicBattery = NULL;
    powernet_mib_mgr_get_upsBasicBattery(s, &(data->upsBasicBattery));
    if (data->upsBasicBattery) {
       SNMP_STRING(upsBasicBattery, LastReplaceDate, battdat);
       free(data->upsBasicBattery);
    }
 
+   data->upsAdvBattery = NULL;
    powernet_mib_mgr_get_upsAdvBattery(s, &(data->upsAdvBattery));
    if (data->upsAdvBattery) {
       ups->extbatts = data->upsAdvBattery->__upsAdvBatteryNumOfBattPacks;
@@ -206,6 +210,7 @@ int powernet_snmp_ups_read_static_data(UPSINFO *ups)
       free(data->upsAdvBattery);
    }
 
+   data->upsAdvConfig = NULL;
    powernet_mib_mgr_get_upsAdvConfig(s, &(data->upsAdvConfig));
    if (data->upsAdvConfig) {
       ups->NomOutputVoltage = data->upsAdvConfig->__upsAdvConfigRatedOutputVoltage;
@@ -256,6 +261,7 @@ int powernet_snmp_ups_read_static_data(UPSINFO *ups)
       free(data->upsAdvConfig);
    }
 
+   data->upsAdvTest = NULL;
    powernet_mib_mgr_get_upsAdvTest(s, &(data->upsAdvTest));
    if (data->upsAdvTest) {
       switch (data->upsAdvTest->__upsAdvTestDiagnosticSchedule) {
@@ -294,9 +300,10 @@ int powernet_snmp_ups_read_static_data(UPSINFO *ups)
          ups->testresult = TEST_UNKNOWN;
          break;
       }
+
+      free(data->upsAdvTest);
    }
 
-   free(data->upsAdvTest);
    return 1;
 }
 
@@ -310,6 +317,7 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups)
    if (powernet_check_comm_lost(ups) == 0)
       return 0;
 
+   data->upsBasicBattery = NULL;
    powernet_mib_mgr_get_upsBasicBattery(s, &(data->upsBasicBattery));
    if (data->upsBasicBattery) {
       switch (data->upsBasicBattery->__upsBasicBatteryStatus) {
@@ -326,6 +334,7 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups)
       free(data->upsBasicBattery);
    }
 
+   data->upsAdvBattery = NULL;
    powernet_mib_mgr_get_upsAdvBattery(s, &(data->upsAdvBattery));
    if (data->upsAdvBattery) {
       ups->BattChg = data->upsAdvBattery->__upsAdvBatteryCapacity;
@@ -341,12 +350,14 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups)
       free(data->upsAdvBattery);
    }
 
+   data->upsBasicInput = NULL;
    powernet_mib_mgr_get_upsBasicInput(s, &(data->upsBasicInput));
    if (data->upsBasicInput) {
       ups->InputPhase = data->upsBasicInput->__upsBasicInputPhase;
       free(data->upsBasicInput);
    }
 
+   data->upsAdvInput = NULL;
    powernet_mib_mgr_get_upsAdvInput(s, &(data->upsAdvInput));
    if (data->upsAdvInput) {
       ups->LineVoltage = data->upsAdvInput->__upsAdvInputLineVoltage;
@@ -383,6 +394,7 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups)
       free(data->upsAdvInput);
    }
 
+   data->upsBasicOutput = NULL;
    powernet_mib_mgr_get_upsBasicOutput(s, &(data->upsBasicOutput));
    if (data->upsBasicOutput) {
       /* Clear the following flags: only one status will be TRUE */
@@ -421,6 +433,7 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups)
       free(data->upsBasicOutput);
    }
 
+   data->upsAdvOutput = NULL;
    powernet_mib_mgr_get_upsAdvOutput(s, &(data->upsAdvOutput));
    if (data->upsAdvOutput) {
       ups->OutputVoltage = data->upsAdvOutput->__upsAdvOutputVoltage;
@@ -430,6 +443,7 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups)
       free(data->upsAdvOutput);
    }
 
+   data->upsAdvTest = NULL;
    powernet_mib_mgr_get_upsAdvTest(s, &(data->upsAdvTest));
    if (data->upsAdvTest) {
       switch (data->upsAdvTest->__upsAdvTestDiagnosticsResults) {
