@@ -4,7 +4,7 @@
  *
  * This C file is derived from the PowerNet-MIB module.
  *
- * $Id: powernet-mib-mgr.c,v 1.7 2005-11-05 20:28:22 adk0212 Exp $
+ * $Id: powernet-mib-mgr.c,v 1.8 2006-06-03 02:03:43 adk0212 Exp $
  */
 
 #include "apc.h"
@@ -511,6 +511,7 @@ int powernet_mib_mgr_get_upsBasicIdent(struct snmp_session *s, upsBasicIdent_t *
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -566,6 +567,7 @@ int powernet_mib_mgr_get_upsAdvIdent(struct snmp_session *s, upsAdvIdent_t **ups
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -627,6 +629,7 @@ int powernet_mib_mgr_get_upsBasicBattery(struct snmp_session *s, upsBasicBattery
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -689,6 +692,7 @@ int powernet_mib_mgr_get_upsAdvBattery(struct snmp_session *s, upsAdvBattery_t *
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -760,6 +764,7 @@ int powernet_mib_mgr_get_upsBasicInput(struct snmp_session *s, upsBasicInput_t *
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -810,6 +815,7 @@ int powernet_mib_mgr_get_upsAdvInput(struct snmp_session *s, upsAdvInput_t **ups
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -877,6 +883,7 @@ int powernet_mib_mgr_get_upsBasicOutput(struct snmp_session *s, upsBasicOutput_t
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -931,6 +938,7 @@ int powernet_mib_mgr_get_upsAdvOutput(struct snmp_session *s, upsAdvOutput_t **u
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -992,6 +1000,7 @@ int powernet_mib_mgr_get_upsBasicConfig(struct snmp_session *s, upsBasicConfig_t
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -1041,6 +1050,7 @@ int powernet_mib_mgr_get_upsBasicConfigDeviceEntry(struct snmp_session *s, upsBa
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -1116,6 +1126,7 @@ int powernet_mib_mgr_get_upsAdvConfig(struct snmp_session *s, upsAdvConfig_t **u
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -1229,6 +1240,7 @@ int powernet_mib_mgr_get_upsAdvConfigDipSwitchEntry(struct snmp_session *s, upsA
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -1282,6 +1294,7 @@ int powernet_mib_mgr_get_apcUpsConfigEntry(struct snmp_session *s, apcUpsConfigE
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -1337,6 +1350,7 @@ int powernet_mib_mgr_get_upsBasicControl(struct snmp_session *s, upsBasicControl
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -1389,6 +1403,7 @@ int powernet_mib_mgr_get_upsAdvControl(struct snmp_session *s, upsAdvControl_t *
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -1471,6 +1486,7 @@ int powernet_mib_mgr_get_upsAdvTest(struct snmp_session *s, upsAdvTest_t **upsAd
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -1549,6 +1565,7 @@ int powernet_mib_mgr_get_upsComm(struct snmp_session *s, upsComm_t **upsComm)
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -1595,6 +1612,7 @@ int powernet_mib_mgr_get_upsPhaseResetValues(struct snmp_session *s, upsPhaseRes
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -1641,6 +1659,7 @@ int powernet_mib_mgr_get_upsPhaseInput(struct snmp_session *s, upsPhaseInput_t *
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -1692,6 +1711,7 @@ int powernet_mib_mgr_get_upsPhaseInputEntry(struct snmp_session *s, upsPhaseInpu
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -1774,6 +1794,7 @@ int powernet_mib_mgr_get_upsPhaseInputPhaseEntry(struct snmp_session *s, upsPhas
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -1870,6 +1891,7 @@ int powernet_mib_mgr_get_upsPhaseOutput(struct snmp_session *s, upsPhaseOutput_t
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -1919,6 +1941,7 @@ int powernet_mib_mgr_get_upsPhaseOutputEntry(struct snmp_session *s, upsPhaseOut
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -1997,6 +2020,7 @@ int powernet_mib_mgr_get_upsPhaseOutputPhaseEntry(struct snmp_session *s, upsPha
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -2131,6 +2155,7 @@ int powernet_mib_mgr_get_mUpsEnviron(struct snmp_session *s, mUpsEnviron_t **mUp
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -2192,6 +2217,7 @@ int powernet_mib_mgr_get_mUpsContact(struct snmp_session *s, mUpsContact_t **mUp
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -2242,6 +2268,7 @@ int powernet_mib_mgr_get_mUpsContactEntry(struct snmp_session *s, mUpsContactEnt
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -2309,6 +2336,7 @@ int powernet_mib_mgr_get_serialPort2Config(struct snmp_session *s, serialPort2Co
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -2355,6 +2383,7 @@ int powernet_mib_mgr_get_serialPort2Control(struct snmp_session *s, serialPort2C
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -2405,6 +2434,7 @@ int powernet_mib_mgr_get_sPDUIdent(struct snmp_session *s, sPDUIdent_t **sPDUIde
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -2478,6 +2508,7 @@ int powernet_mib_mgr_get_sPDUMasterControl(struct snmp_session *s, sPDUMasterCon
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -2538,6 +2569,7 @@ int powernet_mib_mgr_get_sPDUMasterConfig(struct snmp_session *s, sPDUMasterConf
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -2595,6 +2627,7 @@ int powernet_mib_mgr_get_sPDUOutletControl(struct snmp_session *s, sPDUOutletCon
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -2644,6 +2677,7 @@ int powernet_mib_mgr_get_sPDUOutletControlEntry(struct snmp_session *s, sPDUOutl
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -2706,6 +2740,7 @@ int powernet_mib_mgr_get_sPDUOutletConfig(struct snmp_session *s, sPDUOutletConf
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -2756,6 +2791,7 @@ int powernet_mib_mgr_get_sPDUOutletConfigEntry(struct snmp_session *s, sPDUOutle
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -2823,6 +2859,7 @@ int powernet_mib_mgr_get_sPDUIdentVM(struct snmp_session *s, sPDUIdentVM_t **sPD
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -2875,6 +2912,7 @@ int powernet_mib_mgr_get_sPDUIdentVMEntry(struct snmp_session *s, sPDUIdentVMEnt
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -2957,6 +2995,7 @@ int powernet_mib_mgr_get_sPDUMasterControlVM(struct snmp_session *s, sPDUMasterC
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -3005,6 +3044,7 @@ int powernet_mib_mgr_get_sPDUMasterControlVMEntry(struct snmp_session *s, sPDUMa
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -3062,6 +3102,7 @@ int powernet_mib_mgr_get_sPDUMasterConfigVM(struct snmp_session *s, sPDUMasterCo
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -3114,6 +3155,7 @@ int powernet_mib_mgr_get_sPDUMasterConfigVMEntry(struct snmp_session *s, sPDUMas
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -3191,6 +3233,7 @@ int powernet_mib_mgr_get_sPDUMasterStatusVM(struct snmp_session *s, sPDUMasterSt
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -3245,6 +3288,7 @@ int powernet_mib_mgr_get_sPDUMasterStatusVMEntry(struct snmp_session *s, sPDUMas
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -3336,6 +3380,7 @@ int powernet_mib_mgr_get_sPDUOutletControlVMEntry(struct snmp_session *s, sPDUOu
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -3410,6 +3455,7 @@ int powernet_mib_mgr_get_sPDUOutletConfigVMEntry(struct snmp_session *s, sPDUOut
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -3493,6 +3539,7 @@ int powernet_mib_mgr_get_sPDUOutletStatusVMEntry(struct snmp_session *s, sPDUOut
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -3566,6 +3613,7 @@ int powernet_mib_mgr_get_sPDUIdentMSP(struct snmp_session *s, sPDUIdentMSP_t **s
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -3618,6 +3666,7 @@ int powernet_mib_mgr_get_sPDUIdentMSPEntry(struct snmp_session *s, sPDUIdentMSPE
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -3700,6 +3749,7 @@ int powernet_mib_mgr_get_sPDUMasterControlMSP(struct snmp_session *s, sPDUMaster
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -3748,6 +3798,7 @@ int powernet_mib_mgr_get_sPDUMasterControlMSPEntry(struct snmp_session *s, sPDUM
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -3805,6 +3856,7 @@ int powernet_mib_mgr_get_sPDUMasterConfigMSP(struct snmp_session *s, sPDUMasterC
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -3854,6 +3906,7 @@ int powernet_mib_mgr_get_sPDUMasterConfigMSPEntry(struct snmp_session *s, sPDUMa
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -3916,6 +3969,7 @@ int powernet_mib_mgr_get_sPDUMasterStatusMSP(struct snmp_session *s, sPDUMasterS
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -3964,6 +4018,7 @@ int powernet_mib_mgr_get_sPDUMasterStatusMSPEntry(struct snmp_session *s, sPDUMa
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -4025,6 +4080,7 @@ int powernet_mib_mgr_get_sPDUOutletControlMSPEntry(struct snmp_session *s, sPDUO
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -4097,6 +4153,7 @@ int powernet_mib_mgr_get_sPDUOutletConfigMSPallEntry(struct snmp_session *s, sPD
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -4177,6 +4234,7 @@ int powernet_mib_mgr_get_sPDUOutletConfigMSPgsEntry(struct snmp_session *s, sPDU
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -4291,6 +4349,7 @@ int powernet_mib_mgr_get_sPDUOutletConfigMSPannunEntry(struct snmp_session *s, s
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -4384,6 +4443,7 @@ int powernet_mib_mgr_get_sPDUOutletConfigMSPmupsEntry(struct snmp_session *s, sP
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -4513,6 +4573,7 @@ int powernet_mib_mgr_get_sPDUOutletStatusMSPEntry(struct snmp_session *s, sPDUOu
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -4594,6 +4655,7 @@ int powernet_mib_mgr_get_dm3IdentSystem(struct snmp_session *s, dm3IdentSystem_t
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -4656,6 +4718,7 @@ int powernet_mib_mgr_get_dm3IdentSysDescriptionEntry(struct snmp_session *s, dm3
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -4714,6 +4777,7 @@ int powernet_mib_mgr_get_dm3ConfigSystem(struct snmp_session *s, dm3ConfigSystem
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -4791,6 +4855,7 @@ int powernet_mib_mgr_get_dm3ConfigSysDescriptionEntry(struct snmp_session *s, dm
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -4843,6 +4908,7 @@ int powernet_mib_mgr_get_dm3ConfigLVD(struct snmp_session *s, dm3ConfigLVD_t **d
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -4895,6 +4961,7 @@ int powernet_mib_mgr_get_dm3ConfigLVDEntry(struct snmp_session *s, dm3ConfigLVDE
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -4990,6 +5057,7 @@ int powernet_mib_mgr_get_dm3ConfigBattery(struct snmp_session *s, dm3ConfigBatte
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -5129,6 +5197,7 @@ int powernet_mib_mgr_get_dm3ConfigRectThresh(struct snmp_session *s, dm3ConfigRe
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -5201,6 +5270,7 @@ int powernet_mib_mgr_get_dm3ConfigRectAlarms(struct snmp_session *s, dm3ConfigRe
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -5308,6 +5378,7 @@ int powernet_mib_mgr_get_dm3ConfigConvThresh(struct snmp_session *s, dm3ConfigCo
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -5395,6 +5466,7 @@ int powernet_mib_mgr_get_dm3ConfigConvAlarms(struct snmp_session *s, dm3ConfigCo
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -5496,6 +5568,7 @@ int powernet_mib_mgr_get_dm3ConfigOutputRelays(struct snmp_session *s, dm3Config
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -5545,6 +5618,7 @@ int powernet_mib_mgr_get_dm3ConfigOutRlyEntry(struct snmp_session *s, dm3ConfigO
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -5607,6 +5681,7 @@ int powernet_mib_mgr_get_dm3ConfigInputRelays(struct snmp_session *s, dm3ConfigI
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -5656,6 +5731,7 @@ int powernet_mib_mgr_get_dm3ConfigInRlyEntry(struct snmp_session *s, dm3ConfigIn
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -5718,6 +5794,7 @@ int powernet_mib_mgr_get_dm3ConfigBreakers(struct snmp_session *s, dm3ConfigBrea
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -5766,6 +5843,7 @@ int powernet_mib_mgr_get_dm3ConfigBreakersEntry(struct snmp_session *s, dm3Confi
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -5823,6 +5901,7 @@ int powernet_mib_mgr_get_dm3ConfigFuses(struct snmp_session *s, dm3ConfigFuses_t
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -5871,6 +5950,7 @@ int powernet_mib_mgr_get_dm3ConfigFusesEntry(struct snmp_session *s, dm3ConfigFu
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -5933,6 +6013,7 @@ int powernet_mib_mgr_get_dm3StatusSystem(struct snmp_session *s, dm3StatusSystem
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -6005,6 +6086,7 @@ int powernet_mib_mgr_get_dm3StatusAlarms(struct snmp_session *s, dm3StatusAlarms
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -6052,6 +6134,7 @@ int powernet_mib_mgr_get_dm3StatusAlarmsEntry(struct snmp_session *s, dm3StatusA
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -6107,6 +6190,7 @@ int powernet_mib_mgr_get_dm3StatusBattery(struct snmp_session *s, dm3StatusBatte
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -6173,6 +6257,7 @@ int powernet_mib_mgr_get_dm3StatusOEM(struct snmp_session *s, dm3StatusOEM_t **d
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -6244,6 +6329,7 @@ int powernet_mib_mgr_get_dm3StatusLVD(struct snmp_session *s, dm3StatusLVD_t **d
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -6293,6 +6379,7 @@ int powernet_mib_mgr_get_dm3StatusLVDEntry(struct snmp_session *s, dm3StatusLVDE
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -6360,6 +6447,7 @@ int powernet_mib_mgr_get_dm3StatusRectifier(struct snmp_session *s, dm3StatusRec
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -6446,6 +6534,7 @@ int powernet_mib_mgr_get_dm3StatusRectEntry(struct snmp_session *s, dm3StatusRec
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -6573,6 +6662,7 @@ int powernet_mib_mgr_get_dm3StatusConverter(struct snmp_session *s, dm3StatusCon
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -6659,6 +6749,7 @@ int powernet_mib_mgr_get_dm3StatusConvEntry(struct snmp_session *s, dm3StatusCon
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -6781,6 +6872,7 @@ int powernet_mib_mgr_get_dm3StatusOutputRelays(struct snmp_session *s, dm3Status
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -6829,6 +6921,7 @@ int powernet_mib_mgr_get_dm3StatusOutRlyEntry(struct snmp_session *s, dm3StatusO
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -6886,6 +6979,7 @@ int powernet_mib_mgr_get_dm3StatusInputRelays(struct snmp_session *s, dm3StatusI
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -6934,6 +7028,7 @@ int powernet_mib_mgr_get_dm3StatusInRlyEntry(struct snmp_session *s, dm3StatusIn
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -6991,6 +7086,7 @@ int powernet_mib_mgr_get_dm3StatusBreakers(struct snmp_session *s, dm3StatusBrea
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -7039,6 +7135,7 @@ int powernet_mib_mgr_get_dm3StatusBreakersEntry(struct snmp_session *s, dm3Statu
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -7096,6 +7193,7 @@ int powernet_mib_mgr_get_dm3StatusFuses(struct snmp_session *s, dm3StatusFuses_t
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -7144,6 +7242,7 @@ int powernet_mib_mgr_get_dm3StatusFusesEntry(struct snmp_session *s, dm3StatusFu
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -7203,6 +7302,7 @@ int powernet_mib_mgr_get_powerNetSoftwareSystem(struct snmp_session *s, powerNet
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -7258,6 +7358,7 @@ int powernet_mib_mgr_get_powerNetSoftwareConfig(struct snmp_session *s, powerNet
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -7307,6 +7408,7 @@ int powernet_mib_mgr_get_powerNetSoftwareEntry(struct snmp_session *s, powerNetS
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -7374,6 +7476,7 @@ int powernet_mib_mgr_get_mconfig(struct snmp_session *s, mconfig_t **mconfig)
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -7440,6 +7543,7 @@ int powernet_mib_mgr_get_mconfigTrapReceiverEntry(struct snmp_session *s, mconfi
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -7513,6 +7617,7 @@ int powernet_mib_mgr_get_mconfigClock(struct snmp_session *s, mconfigClock_t **m
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -7566,6 +7671,7 @@ int powernet_mib_mgr_get_mcontrol(struct snmp_session *s, mcontrol_t **mcontrol)
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -7626,6 +7732,7 @@ int powernet_mib_mgr_get_mtrapargs(struct snmp_session *s, mtrapargs_t **mtrapar
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -7745,6 +7852,7 @@ int powernet_mib_mgr_get_mfiletransferStatus(struct snmp_session *s, mfiletransf
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -7791,6 +7899,7 @@ int powernet_mib_mgr_get_mfiletransferConfigSettings(struct snmp_session *s, mfi
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -7838,6 +7947,7 @@ int powernet_mib_mgr_get_mfiletransferConfigTFTP(struct snmp_session *s, mfiletr
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -7887,6 +7997,7 @@ int powernet_mib_mgr_get_mfiletransferConfigFTP(struct snmp_session *s, mfiletra
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
@@ -7946,6 +8057,7 @@ int powernet_mib_mgr_get_mfiletransferControl(struct snmp_session *s, mfiletrans
 
     peer = snmp_open(s);
     if (!peer) {
+        snmp_free_pdu(request);
         return -1;
     }
 
