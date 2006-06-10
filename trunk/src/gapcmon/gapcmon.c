@@ -1,4 +1,4 @@
-/* gapcmon.c               serial-0082-0 *****************************************
+/* gapcmon.c               serial-0082-1 *****************************************
 
   GKT+ GUI with Notification Area (System Tray) support.  Program  for 
   monitoring the apcupsd.sourceforge.net package.
@@ -148,6 +148,7 @@ static GtkWidget *gapc_monitor_interface_create(PGAPC_CONFIG pcfg, gint i_monito
 static void cb_panel_monitor_list_activated(GtkTreeView * treeview,
    GtkTreePath * arg1, GtkTreeViewColumn * arg2, PGAPC_CONFIG pcfg);
 static gint gapc_panel_glossary_page(PGAPC_CONFIG pcfg, GtkWidget * notebook);
+static gint gapc_panel_graph_property_page(PGAPC_CONFIG pcfg, GtkWidget * notebook);
 
 /* Synthesize a gnomevfs_socket_set_timeout, if needed */
 #ifndef HAVE_GNOMEVFS_SOCKET_SET_TIMEOUT
@@ -4851,6 +4852,7 @@ static GtkWidget *gapc_main_interface_create(PGAPC_CONFIG pcfg)
    /* Create the main pages */
    gapc_panel_monitor_list_page(pcfg, GTK_NOTEBOOK(notebook));
    i_page = gapc_panel_preferences_page(pcfg, GTK_NOTEBOOK(notebook));
+   gapc_panel_graph_property_page(pcfg, notebook);
    gapc_panel_glossary_page(pcfg, notebook);
    gapc_panel_about_page(GTK_NOTEBOOK(notebook), GAPC_WINDOW_TITLE, GAPC_VERSION,
       pixbuf);
@@ -5341,6 +5343,148 @@ static gint gapc_panel_glossary_page(PGAPC_CONFIG pcfg, GtkWidget * notebook)
 
    return i_page;
 }
+
+static gint gapc_panel_graph_property_page(PGAPC_CONFIG pcfg, GtkWidget * notebook)
+{
+   GtkWidget *s_frame, *w_frame, *label, *s_box, *w_box, *frame, *hbox, *pbox;
+   GtkWidget *cb_linev, *cb_loadpct, *cb_timeleft, *cb_bcharge, *cb_battv;
+   GtkWidget *cb_window, *cb_chart, *cb_text;
+   gint i_page = 0;
+   GdkColor color;
+
+   frame = gtk_frame_new(NULL);
+   gtk_container_set_border_width(GTK_CONTAINER(frame), 4);
+   gtk_frame_set_shadow_type(GTK_FRAME(frame), GTK_SHADOW_NONE);
+   label = gtk_label_new("Graph Properties");
+   i_page = gtk_notebook_append_page(GTK_NOTEBOOK(notebook), frame, label);
+   gtk_widget_show(frame);
+
+   hbox = gtk_hbox_new(FALSE, 2);
+   gtk_container_add ( GTK_CONTAINER (frame), hbox );
+   gtk_widget_show(hbox);
+   
+   s_frame = gtk_frame_new("Series Color");
+   gtk_container_set_border_width(GTK_CONTAINER(s_frame), 4);
+   gtk_frame_set_shadow_type(GTK_FRAME(s_frame), GTK_SHADOW_IN);
+   gtk_box_pack_start(GTK_BOX(hbox), s_frame, TRUE, TRUE, 0);
+   gtk_widget_show(s_frame);
+
+   s_box = gtk_vbox_new(FALSE, 0);   
+   gtk_container_add ( GTK_CONTAINER (s_frame), s_box );
+   gtk_widget_show(s_box);
+
+   pbox = gtk_hbox_new(TRUE, 4);   
+   gtk_box_pack_start(GTK_BOX(s_box), pbox, FALSE, FALSE, 0);   
+	   label = gtk_label_new("LINEV");   
+	   gtk_box_pack_start(GTK_BOX(pbox), label, FALSE, FALSE, 0);
+       gtk_widget_show(label);   
+      
+	   gdk_color_parse ("green", &color);
+	   cb_linev = gtk_color_button_new_with_color( &color);
+	   gtk_color_button_set_title (GTK_COLOR_BUTTON(cb_linev), "LINEV");
+	   gtk_box_pack_start(GTK_BOX(pbox), cb_linev, FALSE, FALSE, 0);
+	   gtk_widget_show(cb_linev);
+
+
+   pbox = gtk_hbox_new(TRUE, 4);   
+   gtk_box_pack_start(GTK_BOX(s_box), pbox, FALSE, FALSE, 0);   
+	   label = gtk_label_new("LOADPCT");   
+	   gtk_box_pack_start(GTK_BOX(pbox), label, FALSE, FALSE, 0);
+       gtk_widget_show(label);         
+
+	   gdk_color_parse ("blue", &color);
+	   cb_loadpct = gtk_color_button_new_with_color( &color);
+	   gtk_color_button_set_title (GTK_COLOR_BUTTON(cb_loadpct), "LOADPCT");
+	   gtk_box_pack_start(GTK_BOX(pbox), cb_loadpct, FALSE, FALSE, 0);
+	   gtk_widget_show(cb_loadpct);
+
+   pbox = gtk_hbox_new(TRUE, 4);   
+   gtk_box_pack_start(GTK_BOX(s_box), pbox, FALSE, FALSE, 0);   
+	   label = gtk_label_new("TIMELEFT");   
+	   gtk_box_pack_start(GTK_BOX(pbox), label, FALSE, FALSE, 0);
+       gtk_widget_show(label);         
+
+	   gdk_color_parse ("red", &color);
+	   cb_timeleft = gtk_color_button_new_with_color( &color);
+	   gtk_color_button_set_title (GTK_COLOR_BUTTON(cb_timeleft), "TIMELEFT");
+	   gtk_box_pack_start(GTK_BOX(pbox), cb_timeleft, FALSE, FALSE, 0);
+	   gtk_widget_show(cb_timeleft);
+
+   pbox = gtk_hbox_new(TRUE, 4);   
+   gtk_box_pack_start(GTK_BOX(s_box), pbox, FALSE, FALSE, 0);   
+	   label = gtk_label_new("BCHARGE");   
+	   gtk_box_pack_start(GTK_BOX(pbox), label, FALSE, FALSE, 0);
+       gtk_widget_show(label);         
+
+	   gdk_color_parse ("yellow", &color);
+	   cb_bcharge = gtk_color_button_new_with_color( &color);
+	   gtk_color_button_set_title (GTK_COLOR_BUTTON(cb_bcharge), "BCHARGE");
+	   gtk_box_pack_start(GTK_BOX(pbox), cb_bcharge, FALSE, FALSE, 0);
+	   gtk_widget_show(cb_bcharge);
+
+   pbox = gtk_hbox_new(TRUE, 4);   
+   gtk_box_pack_start(GTK_BOX(s_box), pbox, FALSE, FALSE, 0);   
+	   label = gtk_label_new("BATTV");   
+	   gtk_box_pack_start(GTK_BOX(pbox), label, FALSE, FALSE, 0);
+       gtk_widget_show(label);         
+
+	   gdk_color_parse ("black", &color);
+	   cb_battv = gtk_color_button_new_with_color( &color);
+	   gtk_color_button_set_title (GTK_COLOR_BUTTON(cb_battv), "BATTV");
+	   gtk_box_pack_start(GTK_BOX(pbox), cb_battv, FALSE, FALSE, 0);
+	   gtk_widget_show(cb_battv);
+
+   
+   w_frame = gtk_frame_new("Window Colors");
+   gtk_container_set_border_width(GTK_CONTAINER(w_frame), 4);
+   gtk_frame_set_shadow_type(GTK_FRAME(w_frame), GTK_SHADOW_IN);
+   gtk_box_pack_start(GTK_BOX(hbox), w_frame, TRUE, TRUE, 0);
+   gtk_widget_show(w_frame);
+
+   w_box = gtk_vbox_new(FALSE, 0);   
+   gtk_container_add ( GTK_CONTAINER (w_frame), w_box );
+   gtk_widget_show(w_box);
+
+   pbox = gtk_hbox_new(TRUE, 4);   
+   gtk_box_pack_start(GTK_BOX(w_box), pbox, FALSE, FALSE, 0);   
+	   label = gtk_label_new("Window Background");   
+	   gtk_box_pack_start(GTK_BOX(pbox), label, FALSE, FALSE, 0);
+       gtk_widget_show(label);         
+
+	   gdk_color_parse ("white", &color);
+	   cb_window = gtk_color_button_new_with_color( &color);
+	   gtk_color_button_set_title (GTK_COLOR_BUTTON(cb_window), "Window Background");
+	   gtk_box_pack_start(GTK_BOX(pbox), cb_window, FALSE, FALSE, 0);
+	   gtk_widget_show(cb_window);
+
+   pbox = gtk_hbox_new(TRUE, 4);   
+   gtk_box_pack_start(GTK_BOX(w_box), pbox, FALSE, FALSE, 0);   
+	   label = gtk_label_new("Chart Background");   
+	   gtk_box_pack_start(GTK_BOX(pbox), label, FALSE, FALSE, 0);
+       gtk_widget_show(label);         
+
+	   gdk_color_parse ("light blue", &color);
+	   cb_chart = gtk_color_button_new_with_color( &color);
+	   gtk_color_button_set_title (GTK_COLOR_BUTTON(cb_chart), "Chart Background");
+	   gtk_box_pack_start(GTK_BOX(pbox), cb_chart, FALSE, FALSE, 0);
+	   gtk_widget_show(cb_chart);
+
+   pbox = gtk_hbox_new(TRUE, 4);   
+   gtk_box_pack_start(GTK_BOX(w_box), pbox, FALSE, FALSE, 0);   
+	   label = gtk_label_new("Title Texts");   
+	   gtk_box_pack_start(GTK_BOX(pbox), label, FALSE, FALSE, 0);
+       gtk_widget_show(label);         
+
+	   gdk_color_parse ("black", &color);
+	   cb_text = gtk_color_button_new_with_color( &color);
+	   gtk_color_button_set_title (GTK_COLOR_BUTTON(cb_text), "Title Texts");
+	   gtk_box_pack_start(GTK_BOX(pbox), cb_text, FALSE, FALSE, 0);
+	   gtk_widget_show(cb_text);
+   
+
+   return i_page;
+}
+
 
 /*
  * Creates monitor interface with the normal panels
