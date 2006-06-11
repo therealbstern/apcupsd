@@ -40,6 +40,16 @@ G_BEGIN_DECLS
 #define GAPC_CP_GROUP_KEY    "/apps/gapcmon/controller"
 #define GAPC_CP_SYSTRAY_KEY  "/apps/gapcmon/controller/use_systray"
 #define GAPC_CP_PAGERS_KEY   "/apps/gapcmon/controller/skip_pagers"
+
+#define GAPC_COLOR_LINEV_KEY "/apps/gapcmon/controller/color_linev"
+#define GAPC_COLOR_LOADPCT_KEY "/apps/gapcmon/controller/color_loadpct"
+#define GAPC_COLOR_TIMELEFT_KEY "/apps/gapcmon/controller/color_timeleft"
+#define GAPC_COLOR_BCHARGE_KEY "/apps/gapcmon/controller/color_bcharge"
+#define GAPC_COLOR_BATTV_KEY "/apps/gapcmon/controller/color_battv"
+#define GAPC_COLOR_WINDOW_KEY "/apps/gapcmon/controller/color_window"
+#define GAPC_COLOR_CHART_KEY "/apps/gapcmon/controller/color_chart"
+#define GAPC_COLOR_TITLE_KEY "/apps/gapcmon/controller/color_title"
+
 #define GAPC_MID_GROUP_KEY   "/apps/gapcmon/monitor"
 #define GAPC_ENABLE_KEY      "/apps/gapcmon/monitor/%d/enabled"
 #define GAPC_SYSTRAY_KEY     "/apps/gapcmon/monitor/%d/use_systray"
@@ -357,6 +367,16 @@ typedef struct _System_Control_Data {
    GHashTable *pht_Status;         /* hashtable holding status text  */
    guint i_info_context;           /* StatusBar Context */
    GdkPixbuf *my_icons[GAPC_N_ICONS + 8];
+
+   /* Global graph properties */
+   GdkColor    color_linev;
+   GdkColor    color_loadpct;   
+   GdkColor    color_timeleft;   
+   GdkColor    color_bcharge;
+   GdkColor    color_battv;
+   GdkColor    color_window;
+   GdkColor    color_chart;   
+   GdkColor    color_title;   
 
 } GAPC_CONFIG, *PGAPC_CONFIG;
 
