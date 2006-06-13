@@ -4328,30 +4328,41 @@ static void cb_panel_controller_gconf_changed(GConfClient * client, guint cnxn_i
 		pcolor = NULL;
 	    if (g_str_equal(entry->key, GAPC_COLOR_LINEV_KEY)) {
 	    	pcolor = &pcfg->color_linev;
+	    	cbox = g_hash_table_lookup(pcfg->pht_Widgets, "color-linev");
 	    }
 	    if (g_str_equal(entry->key, GAPC_COLOR_LOADPCT_KEY)) {
 	    	pcolor = &pcfg->color_loadpct;
+	    	cbox = g_hash_table_lookup(pcfg->pht_Widgets, "color-loadpct");
 	    }
 	    if (g_str_equal(entry->key, GAPC_COLOR_TIMELEFT_KEY)) {
 	    	pcolor = &pcfg->color_timeleft;
+	    	cbox = g_hash_table_lookup(pcfg->pht_Widgets, "color-timeleft");
 	    }
 	    if (g_str_equal(entry->key, GAPC_COLOR_BCHARGE_KEY)) {
 	    	pcolor = &pcfg->color_bcharge;
+	    	cbox = g_hash_table_lookup(pcfg->pht_Widgets, "color-bcharge");
 	    }
 	    if (g_str_equal(entry->key, GAPC_COLOR_BATTV_KEY)) {
 	    	pcolor = &pcfg->color_battv;
+	    	cbox = g_hash_table_lookup(pcfg->pht_Widgets, "color-battv");
 	    }
 	    if (g_str_equal(entry->key, GAPC_COLOR_WINDOW_KEY)) {
 	    	pcolor = &pcfg->color_window;
+	    	cbox = g_hash_table_lookup(pcfg->pht_Widgets, "color-window");
 	    }
 	    if (g_str_equal(entry->key, GAPC_COLOR_CHART_KEY)) {
 	    	pcolor = &pcfg->color_chart;
+	    	cbox = g_hash_table_lookup(pcfg->pht_Widgets, "color-chart");
 	    }
 	    if (g_str_equal(entry->key, GAPC_COLOR_TITLE_KEY)) {
 	    	pcolor = &pcfg->color_title;
+	    	cbox = g_hash_table_lookup(pcfg->pht_Widgets, "color-title");
 	    }
-	    if (pcolor) {
+	    if ( pcolor ) {
 			gdk_color_parse (pstring, pcolor);
+	    }
+	    if ( cbox ) {
+	    	gtk_color_button_set_color (GTK_COLOR_BUTTON(cbox), pcolor);
 	    }
 	  	break;
  	case GCONF_VALUE_BOOL:
@@ -5608,7 +5619,8 @@ static gint gapc_panel_graph_property_page(PGAPC_CONFIG pcfg, GtkWidget * notebo
    gtk_box_pack_start(GTK_BOX(s_box), pbox, FALSE, FALSE, 0);   
 	   label = gtk_label_new("LINEV");   
 	   gtk_box_pack_start(GTK_BOX(pbox), label, FALSE, FALSE, 0);
-       gtk_widget_show(label);   
+       gtk_widget_show(label); 
+
       
 	   cb_linev = gtk_color_button_new_with_color( &pcfg->color_linev);
 	   gtk_color_button_set_title (GTK_COLOR_BUTTON(cb_linev), "LINEV");
@@ -5618,6 +5630,7 @@ static gint gapc_panel_graph_property_page(PGAPC_CONFIG pcfg, GtkWidget * notebo
 	   g_signal_connect ( GTK_OBJECT(cb_linev), "color-set", 
 	   					  G_CALLBACK(cb_panel_property_color_change), 
 	   					  GAPC_COLOR_LINEV_KEY);
+       g_hash_table_insert(pcfg->pht_Widgets, g_strdup("color-linev"), cb_linev);  
 
    pbox = gtk_hbox_new(TRUE, 4);   
    gtk_box_pack_start(GTK_BOX(s_box), pbox, FALSE, FALSE, 0);   
@@ -5633,7 +5646,8 @@ static gint gapc_panel_graph_property_page(PGAPC_CONFIG pcfg, GtkWidget * notebo
 	   g_signal_connect ( GTK_OBJECT(cb_loadpct), "color-set", 
 	   					  G_CALLBACK(cb_panel_property_color_change), 
 	   					  GAPC_COLOR_LOADPCT_KEY);
-
+       g_hash_table_insert(pcfg->pht_Widgets, g_strdup("color-loadpct"), cb_loadpct);  
+       
    pbox = gtk_hbox_new(TRUE, 4);   
    gtk_box_pack_start(GTK_BOX(s_box), pbox, FALSE, FALSE, 0);   
 	   label = gtk_label_new("TIMELEFT");   
@@ -5648,6 +5662,7 @@ static gint gapc_panel_graph_property_page(PGAPC_CONFIG pcfg, GtkWidget * notebo
 	   g_signal_connect ( GTK_OBJECT(cb_timeleft), "color-set", 
 	   					  G_CALLBACK(cb_panel_property_color_change), 
 	   					  GAPC_COLOR_TIMELEFT_KEY);
+       g_hash_table_insert(pcfg->pht_Widgets, g_strdup("color-timeleft"), cb_timeleft);  
 
    pbox = gtk_hbox_new(TRUE, 4);   
    gtk_box_pack_start(GTK_BOX(s_box), pbox, FALSE, FALSE, 0);   
@@ -5663,6 +5678,7 @@ static gint gapc_panel_graph_property_page(PGAPC_CONFIG pcfg, GtkWidget * notebo
 	   g_signal_connect ( GTK_OBJECT(cb_bcharge), "color-set", 
 	   					  G_CALLBACK(cb_panel_property_color_change), 
 	   					  GAPC_COLOR_BCHARGE_KEY);
+       g_hash_table_insert(pcfg->pht_Widgets, g_strdup("color-bcharge"), cb_bcharge);  
 
    pbox = gtk_hbox_new(TRUE, 4);   
    gtk_box_pack_start(GTK_BOX(s_box), pbox, FALSE, FALSE, 0);   
@@ -5678,7 +5694,7 @@ static gint gapc_panel_graph_property_page(PGAPC_CONFIG pcfg, GtkWidget * notebo
 	   g_signal_connect ( GTK_OBJECT(cb_battv), "color-set", 
 	   					  G_CALLBACK(cb_panel_property_color_change), 
 	   					  GAPC_COLOR_BATTV_KEY);
-
+       g_hash_table_insert(pcfg->pht_Widgets, g_strdup("color-battv"), cb_battv);  
    
    w_frame = gtk_frame_new("Window Colors");
    gtk_container_set_border_width(GTK_CONTAINER(w_frame), 4);
@@ -5704,6 +5720,7 @@ static gint gapc_panel_graph_property_page(PGAPC_CONFIG pcfg, GtkWidget * notebo
 	   g_signal_connect ( GTK_OBJECT(cb_window), "color-set", 
 	   					  G_CALLBACK(cb_panel_property_color_change), 
 	   					  GAPC_COLOR_WINDOW_KEY);
+       g_hash_table_insert(pcfg->pht_Widgets, g_strdup("color-window"), cb_window);  
 
    pbox = gtk_hbox_new(TRUE, 4);   
    gtk_box_pack_start(GTK_BOX(w_box), pbox, FALSE, FALSE, 0);   
@@ -5719,6 +5736,7 @@ static gint gapc_panel_graph_property_page(PGAPC_CONFIG pcfg, GtkWidget * notebo
 	   g_signal_connect ( GTK_OBJECT(cb_chart), "color-set", 
 	   					  G_CALLBACK(cb_panel_property_color_change), 
 	   					  GAPC_COLOR_CHART_KEY);
+       g_hash_table_insert(pcfg->pht_Widgets, g_strdup("color-chart"), cb_chart);  	   					  
 
    pbox = gtk_hbox_new(TRUE, 4);   
    gtk_box_pack_start(GTK_BOX(w_box), pbox, FALSE, FALSE, 0);   
@@ -5734,7 +5752,7 @@ static gint gapc_panel_graph_property_page(PGAPC_CONFIG pcfg, GtkWidget * notebo
 	   g_signal_connect ( GTK_OBJECT(cb_text), "color-set", 
 	   					  G_CALLBACK(cb_panel_property_color_change), 
 	   					  GAPC_COLOR_TITLE_KEY);
-   
+       g_hash_table_insert(pcfg->pht_Widgets, g_strdup("color-title"), cb_text);     
 
    return i_page;
 }
