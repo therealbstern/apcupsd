@@ -430,6 +430,12 @@ which either hides the window or destroys it in the case of the control panel. \
 Additionally, when use_trayicon is selected, the title of the window is removed from \
 the desktop's windowlist or taskbar.</i>\n\
 \n\n\
+<b>GRAPH PROPERTIES PAGE</b>\n\
+\n\
+Allows you to specify the colors to be used for each of the five data series on the \
+Historical Summary graph page of each monitor.   General window background colors can \
+also be specified.\n\
+\n\n\
 <b>GLOSSARY PAGE</b>\n\
 \n\
 This page of introductory text.\n\
