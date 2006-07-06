@@ -792,7 +792,6 @@ following:
        --enable-cgi \
        --with-css-dir=/var/www/docs/css \
        --with-log-dir=/etc/apcupsd \
-       --enable-pthreads \
        --enable-powerflute
 \end{verbatim}
 \normalsize
@@ -1026,14 +1025,6 @@ By default this is disabled.
    This turns on a test driver that is used only for debugging. By default it is
 disabled.  
 
-\item [{---}enable-pthreads]
-   \index{{---}enable-pthreads }
-   This option enables pthreads support causing apcupsd to be built as a threaded
-program rather than forking to create separate processes. apcupsd built in
-this fashion is more efficient that the standard version being one third the
-data size and less overhead locking and coping shared memory. This option is
-{\it highly} recommended for Windows builds.  
-
 \item [{---}with-libwrap=\lt{}path\gt{}]
    \index{{---}with-libwrap }
    This option when enabled causes apcupsd to be built with the TCP WRAPPER
@@ -1135,8 +1126,7 @@ For most systems, we recommend the following options:
 
 \footnotesize
 \begin{verbatim}
-     ./configure --prefix=/usr --sbindir=/sbin --enable-usb \
-                 --enable-pthreads
+     ./configure --prefix=/usr --sbindir=/sbin --enable-usb
 \end{verbatim}
 \normalsize
 
@@ -1145,8 +1135,7 @@ and you can optionally build and install the CGI programs as follows:
 \footnotesize
 \begin{verbatim}
      ./configure --prefix=/usr --sbindir=/sbin --enable-usb \
-                 --enable-cgi --with-cgi-bin=/home/httpd/cgi-bin \
-                 --enable-pthreads
+                 --enable-cgi --with-cgi-bin=/home/httpd/cgi-bin
 \end{verbatim}
 \normalsize
 
@@ -1316,12 +1305,7 @@ You can also find the official Debian packages on the Debian site at:
 
 \label{index-FreeBSD-36}
 \label{index-OS_002c-FreeBSD-37}
-This port is complete and is being used by several users. As of version 3.8.3,
-we do not recommend that you compile apcupsd with pthreads enabled. This is
-because the current FreeBSD implementation of pthreads runs as a single
-process, and thus is less efficient (consumes more CPU time) than the forking
-version of apcupsd. We hope to rectify this in a future version by using the
-FreeBSD LinuxThreads implementation of pthreads.  
+This port is complete and is being used by several users.
 
 On the FreeBSD OS, there is no known way for a user program to get control
 when all the disks are synced. This is needed for apcupsd to be able to issue
@@ -1330,9 +1314,6 @@ accomplish the same thing on FreeBSD systems, make sure you have a SmartUPS
 and that your UPS shutdown grace period is set sufficiently long so that you
 system will power down (usually 2 minutes), the use the {\tt
 kill-on-powerfail} option on the apcupsd command line.  
-
-Please note the concerns listed below under OpenBSD concerning the use of
-pthreads. 
 
 \label{HPUX}
 
@@ -1350,11 +1331,6 @@ We have no reports from testing this yet on version 3.8.4, but worked fine on
 \label{index-NetBSD-40}
 \label{index-OS_002c-NetBSD-41}
 Submitted during development of 3.8.2, this should be a complete distribution.
-Please read the comments on the pthreads implementation in the FreeBSD
-section above as they may apply equally to OpenBSD.  
-
-Please note the concerns listed below under OpenBSD concerning the use of
-pthreads. 
 
 \label{OpenBSD}
 
@@ -1366,27 +1342,6 @@ Ensure that you read the distributions/openbsd/README file before running
 apcupsd. There are some critical differences in how the OpenBSD implementation
 operates when the UPS batteries are exhausted. Failure to take this into
 account may result in the system not being fully halted when power is lost. 
-Please read the comments on the pthreads implementation in the FreeBSD section
-above as they may apply equally to OpenBSD.  
-
-PLEASE NOTE. Due to some deficiencies or errors in the OpenBSD pthreads
-libraries, if you build apcupsd on OpenBSD with pthread and a child program is
-launched (i.e. mail notification of events), this may cause OpenBSD to freeze
-up. The best solution is probably to build without pthread. However, in doing
-so, you must realize that the bulk of this manual assumes that pthreads is
-enabled, and thus many of the comments about apcaccess will not be applicable.
-A second solution that seems to work is to delete all calls to the email
-notification routines from apccontrol. In doing so, some users have succeeded
-in running apcupsd with pthreads.  
-
-If you want to know the technical problems with pthreads on OpenBSD, it is as
-best we can tell because the pthreads are not real kernel pthreads as on Linux
-and Solaris, but rather a user program that makes all I/O non-blocking. So
-when apcupds does I/O, the userland pthreads libarary will switch to another
-thread if it wants to run. This works fine except that when a child process is
-called and it exits, all the blocking/non-blocking statuses of the open file
-descriptors in the parent program are reset as blocking {---} this causes
-chaos and an almost immediate freezing of the program (apcupsd). 
 
 \label{Red-Hat-Systems}
 
@@ -1678,8 +1633,7 @@ options:
        --sysconfdir=/apcupsd/etc/apcupsd \
        --with-pid-dir=/apcupsd/etc/apcupsd \
        --mandir=/apcupsd \
-       --with-cgi-bin=/apcupsd/etc/apcupsd/cgi \
-       --enable-pthreads
+       --with-cgi-bin=/apcupsd/etc/apcupsd/cgi
 \end{verbatim}
 \normalsize
 
@@ -2285,45 +2239,8 @@ After you start apcupsd, execute the following command:
 \end{verbatim}
 \normalsize
 
-or the equivalent for your system. If you are running on Linux and using the
-fork()ing version of apcupsd, you should something similar to the following
-output. 
-
-\footnotesize
-\begin{verbatim}
-     4492 ?        S      0:00 apcmain       -f /etc/apcupsd/apcupsd.conf
-     4496 ?        S      0:00  \_ apcser        -f /etc/apcupsd/apcupsd.conf
-     4497 ?        S      0:00  \_ apcnis        -f /etc/apcupsd/apcupsd.conf
-\end{verbatim}
-\normalsize
-
-This indicates that apcupsd is up and running and has started the two
-(default) child processes. If you are running with the pthreaded version, now
-the default, and 2.4.x kernels, you will still see the three processes (see
-below).  However, under 2.6.x kernels, the threads do not have independent
-process ids so everything will be compressed into a single {\bf ps} line.  
-
-\begin{description}
-
-\item [apcmain]
-   \index{apcmain }
-   is the main program that waits until it receives a termination signal
-(SIGTERM) or one of the child processes dies.  
-
-\item [apcser]
-   \index{apcser }
-   is the process that manages the serial port and takes any actions (generates
-events) that are necessary as a result of a change of state of the UPS.  
-
-\item [apcnis]
-   \index{apcnis }
-   is the Network information server process that provides EVENTS and STATUS
-information over the network. This information is used by the CGI programs. 
-\end{description}
-
-If you are running on a non-Linux system, or using pthreads on a Linux system
-(recommended), your output will probably not show the names of the processes
-and will appear more like the following: 
+or the equivalent for your system. You should see something similar to
+the following output. 
 
 \footnotesize
 \begin{verbatim}
@@ -2333,6 +2250,9 @@ and will appear more like the following:
 \end{verbatim}
 \normalsize
 
+This indicates that apcupsd is up and running and has started the
+two standard threads in addition to the main thread.
+
 If you see only one instance of apcupsd running, don't worry about it as this
 is normal on most non-Linux systems, and on Linux 2.6.x kernels.  
 
@@ -2340,6 +2260,28 @@ If you do not find that apcupsd is in the above list, the most likely problem
 is a configuration file glitch.  If no messages were printed, you should check
 your system log (normally /var/log/messages where you will find one or
 messages indicating the nature of the problem. 
+
+There are three threads in apcupsd that serve the following purposes:
+
+\begin{description}
+
+\item [apcmain]
+   \index{apcmain }
+   is the main thread that waits until it receives a termination signal
+(SIGTERM) or one of the child processes dies.  
+
+\item [apcser]
+   \index{apcser }
+   is the thread that manages the serial port and takes any actions (generates
+events) that are necessary as a result of a change of state of the UPS.  
+
+\item [apcnis]
+   \index{apcnis }
+   is the Network information server thread that provides EVENTS and STATUS
+information over the network. This information is used by the CGI programs
+and the NIS client/server networking mode. 
+\end{description}
+
 
 \label{Logging-Test}
 
@@ -2393,12 +2335,9 @@ If you have installed the RPM, they will probably be in
 \label{index-Testing_002c-apcaccess-89}
 \label{index-apcaccess-Test-90}
 This test consists of running {\tt apcaccess} to see if apcupsd is properly
-updating its internal variables.  Please note that if you are running a
-pthreaded version of apcupsd, which you should be since the non-pthreaded
-version is no longer supported, (installed from rpm or {\tt \verb{--{enable-pthreads}
-on the {\tt ./configure} line), you must enable the apcupsd Network
-Information Server in your configuration file for {\bf apcaccess} to work. 
-This is done by setting: 
+updating its internal variables.  Please note that you must enable the 
+apcupsd Network Information Server in your configuration file for 
+{\bf apcaccess} to work.  This is done by setting: 
 
 \footnotesize
 \begin{verbatim}
@@ -3049,12 +2988,10 @@ command line arguments ({\bf eprom, reconfig, status, slave, shutdown}), all
 except {\bf eprom} and {\bf status} are under development and hence do not
 work reliably.  
 
-If you have built apcupsd with pthreads enabled (default), apcaccess will use
-the Network Information Server to obtain the necessary information for the
-{\bf status} and {\bf eeprom} commands. This is because in the pthreaded
-version, there is no IPC shared memory. In this case (pthreads enabled), you
-can specify a second optional argument to apcaccess in the form of host:port,
-where the :port is optional. The default is {\bf localhost:3551}. Please note
+apcaccess will use the Network Information Server to obtain the necessary
+information for the {\bf status} and {\bf eeprom} commands. You can specify
+a second optional argument to apcaccess in the form of host:port where the
+:port is optional. The default is {\bf localhost:3551}. Please note
 that in versions prior to 3.10.6, the default NIS port was 7000, so if you are
 mixing versions, you will need to take a lot of care to ensure that all
 components are using the same port.  
@@ -4339,14 +4276,6 @@ order of 0.5-1.0\%. This is higher than for Unix systems. However, compared to
 the 30\% CPU usage by APC's PowerChute (the version on the CDROM shipped with
 my UPS), apcupsd's 0.5-1.0\% is very modest.  
 
-If you configure apcupsd to run with pthreads ({\tt \verb{--{with-pthreads} on the
-{\tt ./configure} line), apcupsd will run considerably faster, otherwise said,
-it will consume less of your CPU, and it will use approximately one third of
-the memory. For example, Carl Erhorn reports that on his Solaris system,
-``With the old 3-process version, we averaged about 4.8MB of total memory
-used. With the new single process, we use only about 1.7MB! That's also a very
-good improvement.''  
-
 \item [Q:]
    \index{ Q: }
    What language is apcupsd written in?  
@@ -4542,44 +4471,6 @@ status 3, frame\# 826. What does it mean?
    It means one transfer worked (bit 0 in status) and another one (after that)
 failed (bit 1) at time frame 826. This kind of soft error is common on USB and
 if everything seems to be working, you can ignore it.  
-
-\item [Q:]
-   \index{ Q: }
-   apcnisd doesn't work. It always gives: FATAL ERROR in apcipc.c at line 497.
-attach\_shmarea: shared memory version mismatch (or UPS not yet ready to
-report)  
-
-\item [A:]
-   \index{ A: }
-   Unfortunately apcnisd does not work with pthreads enabled. You have the
-following options:  
-
-\begin{enumerate}
-\item If you build with pthreads enabled, apcnisd will not work no matter what
-   you do.  
-\item If you build with pthreads enabled, and you want to have network
-   information from apcupsd, you must set NETSERVER ON. This is the configuration
-   we recommend (i.e. using pthreads and NETSERVER ON).  
-\item If you build with pthreads disabled, you have the choice of using
-   apcnisd or the NETSERVER code. If you wish to use apcnisd, you must set
-   NETSERVER OFF  
-\item If you build with pthreads disabled, and you do not use apcnisd, you
-   must set NETSERVER ON if you wish to have network information from apcupsd.  
-   \end{enumerate}
-
-Concerning the names one sees with ``ps''.  
-
-\begin{enumerate}
-\item With pthreads enabled, on Linux machines, you will see multiple copies
-   of apcupsd running, but they will all be called apcupsd rather than apcmain,
-   apcser, ... They will still run as LWP, but we are unable to set the names on
-threads (LWP). Note, though ps shows ``multiple copies'' of apcupsd running,
-it is really one memory image but with multiple threads.  
-\item With pthreads disabled, we are able to set the child process names (at
-   least on Linux) so you will see apcmain, apcser, apcnis, ... in the ps output.
-   In this case, they are really different processes each with its own memory
-image (the code image is most likely shared).  
-\end{enumerate}
 
 \end{description}
 
@@ -5244,7 +5135,6 @@ could use the following configuration:
        --with-css-dir=/home/http/css \
        --with-log-dir=/etc/apcupsd \
        --with-serial-dev=/dev/ttyS0 \
-       --enable-pthreads \
        --with-nis-port=3551 \
        --enable-powerflute
 \end{verbatim}
@@ -5276,7 +5166,6 @@ UPS and Computer B, you could use the following configuration:
        --with-lock-dir=$HOME/apcupsd/bin \
        --with-pwrfail-dir=$HOME/apcupsd/bin \
        --with-serial-dev=/dev/ttyS1 \
-       --enable-pthreads \
        --with-nis-port=7001 \
        --disable-install-distdir
 \end{verbatim}
@@ -5387,7 +5276,6 @@ being sure to include the following options (in addition to any others you need)
      --with-serial-dev=<your-SNMP-device> \
      --with-upstype=snmp \
      --with-upscable=smart \
-     --enable-pthreads \
      --enable-snmp
 \end{verbatim}
 \normalsize
@@ -5448,15 +5336,13 @@ umount all the filesystems.
 
 With this setup your UPS operations should be safe. 
 
-\label{Alternate-Ways-To-Run-The-Network-Information-Server}
+\label{Running-The-Network-Information-Server}
 
-\section*{Alternate Ways To Run The Network Information Server}
-\index{Server!Alternate Ways To Run The Network Information }
-\index{Alternate Ways To Run The Network Information Server }
-\addcontentsline{toc}{section}{Alternate Ways To Run The Network
-Information Server}
+\section*{Running The Network Information Server}
+\index{Server!Running The Network Information }
+\index{Running The Network Information Server }
+\addcontentsline{toc}{section}{Running The Network Information Server}
 
-\label{index-NIS-alternate-was-of-running-165}
 apcupsd maintains STATUS and EVENTS data concerning the UPS and its operation.
 This information can be obtained over the network using either apcnisd or
 apcupsd's internal network information server, which is essentially the same
@@ -5466,33 +5352,19 @@ data, which the server then transmits to them.
 
 The information served to the network by this interface should not be confused
 with master/slave mode that shares a UPS between two or more computers. That
-code is described in 
-\ilink{Configuration Directives for Sharing a
+code is described in \ilink{Configuration Directives for Sharing a
 UPS}{Configuration-Directives-for-Sharing-a-UPS} of this
 documentation.  
 
-There are three different ways to run the information server depending on your
-requirements and preferences. It can be run as 1.  a standalone program, 2. a
-standalone program invoked by the inetd daemon, or 3. as a thread (or child
-process) of apcupsd (default configuration). We recommend option 3 unless you
-have specific reasons to do otherwise. Option 3 is what is configured in by
-default. 
-
-\label{Running-the-server-as-a-child-of-apcupsd}
-
-\subsection*{Running the server as a child of apcupsd}
-\index{Running the server as a child of apcupsd }
-\addcontentsline{toc}{subsection}{Running the server as a child of apcupsd}
+As of apcupsd 3.12.x, the NIS server runs only as a child of apcupsd.
+It cannot be run standalone or from INETD.
 
 This is probably the simplest way to run the network information server. To do
 so, you simply make sure the {\bf NETSERVER} directive in
 /etc/apcupsd/apcupsd.conf is {\bf on}, and then stop and restart apcupsd. It
-will automatically create the server thread (or spawn an additional child
-process named apcnis) to handle network clients. In the case where pthreads
-are enabled, a new thread will be created rather than a child process to
-handle the network information requests. Note, the above modification should
-not be necessary if you use the default apcupsd.conf, since it is already
-turned on.  
+will automatically create the server thread to handle network clients. 
+Note, the above modification should not be necessary if you use the default
+apcupsd.conf, since it is already turned on.  
 
 Although this method is simple, it affords no protection from the outside
 world accessing your network server unless you are behind a firewall. In
@@ -5506,107 +5378,6 @@ prefer to run the server this way.
 With apcupsd version 3.8.2 and later, you may enable the TCP Libwrap
 subroutines to add additional security. In this case, access to the network
 server will be controlled by the statements you put in /etc/hosts.allow. 
-
-\label{Running-apcnisd-from-INETD}
-
-\subsection*{Running apcnisd from INETD}
-\index{INETD!Running apcnisd from }
-\index{Running apcnisd from INETD }
-\addcontentsline{toc}{subsection}{Running apcnisd from INETD}
-
-This is probably the most secure and most desirable way of running the network
-information server. Unfortunately, it is a bit more complicated to set up.
-However, once running, the server remains unexecuted until a connection is
-attempted, at which point, inetd will invoke apcnisd. Once apcnisd has
-responded to the client's requests, it will exit. None of the disadvantages of
-running it standalone apply since apcnisd runs only when a client is
-requesting data. Note, running in this manner works only if you are using the
-old forking code and have pthreads explicitly turned off. The pthreads version
-of apcupsd does not support the shared memory calls that are necessary for
-apcnisd to access the internal state of apcupsd.  
-
-An additional advantage of this method of running the network information
-server is that you can call it with a TCP wrapper and thus use access control
-lists (ACL) such as hosts.allow. See the man pages for hosts.allow for more
-details.  
-
-To configure apcnisd to run from INETD, you must first put an entry in
-/etc/services as follows: 
-
-\footnotesize
-\begin{verbatim}
-     apcnisd         3551/tcp
-\end{verbatim}
-\normalsize
-
-This defines the port number (3551) and the service (TCP) that apcnisd will be
-using. This statement can go anywhere in the services file. Normally, one adds
-local changes such as these to the end of the file.  
-
-Next, you must modify /etc/inetd.conf to have the following line: 
-
-\footnotesize
-\begin{verbatim}
-     apcnisd stream  tcp     nowait  root    /usr/sbin/tcpd  /sbin/apcnisd -i
-\end{verbatim}
-\normalsize
-
-If you do not want to run the TCP wrapper, then the line should be entered as
-follows (not tested): 
-
-\footnotesize
-\begin{verbatim}
-     apcnisd stream  tcp     nowait  root    /sbin/apcnisd -i
-\end{verbatim}
-\normalsize
-
-Please check that the file locations are correct for your system. Also, note
-that the {\tt -i} option is necessary so that apcnisd knows that it was called
-by INETD. Before restarting INETD, first ensure that the {\bf NETSERVER}
-directive in /etc/apcupsd/apcupsd.conf is set to {\bf off}. This is necessary
-to prevent apcupsd from starting a child process that acts as a server. If you
-change {\bf NETSERVER}, you must stop and restart apcupsd for the
-configuration change to be effective.  
-
-Finally, you must restart INETD for it to listen on port 3551. On a Red Hat
-system, you can do so by: 
-
-\footnotesize
-\begin{verbatim}
-     /etc/rc.d/init.d/inet reload
-\end{verbatim}
-\normalsize
-
-At this point, when a client attempts to make a connection on port 3551, INETD
-will automatically invoke apcnisd. 
-
-\label{Running-apcnisd-Standalome}
-
-\subsection*{Running apcnisd Standalome}
-\index{Standalome!Running apcnisd }
-\index{Running apcnisd Standalome }
-\addcontentsline{toc}{subsection}{Running apcnisd Standalome}
-
-This is probably the least desirable of the three ways to run an apcupsd
-network information server because if apcupsd is stopped, you must also stop
-apcnisd before you can restart apcupsd. This is because apcnisd, when run
-standalone, holds the shared memory buffer by which apcnisd and apcupsd
-communicate. This prevents a new execution of apcupsd from creating it.  
-
-To execute apcnisd in standalone mode, first ensure that the {\bf NETSERVER}
-directive in {\bf /etc/apcupsd/apcupsd.conf} is set to {\bf off}. This is
-necessary to prevent apcupsd from starting a child process that acts as a
-server. Restart apcupsd normally, then: 
-
-\footnotesize
-\begin{verbatim}
-     /sbin/apcnisd
-\end{verbatim}
-\normalsize
-
-The advantage of running the network information server standalone is that if
-for some reason, a client causes the network server to crash, it will not
-affect the operation of apcupsd. 
 
 \label{apcupsd-System-Logging}
 
