@@ -165,15 +165,14 @@ big server farm.  Under those circumstances, it may not be possible or even
 desirable to pair a UPS with every single machine.  apcupsd supports some
 alternate arrangements.  
 
-The second type of configuration is a master/slave configuration, where one
-UPS powers several computers, each of which runs a copy of apcupsd.  The
-computer that controls the UPS is called the master, and the other computers
-are called slaves.  The master copy of apcupsd communicates with and controls
-the slaves via an Ethernet connection.  This type of configuration may be
-appropriate for a small cluster of machines.  Some example configuration files
-for the master and the slave machines can be found in the examples directory
-of the source distribution.  The more recent examples are in
-master.apcupsd.conf and slave.apcupsd.conf.  
+The second type of configuration is the NIS (Network Information Server)
+server and client.  In this configuration, where one UPS powers several
+computers, a copy of apcupsd running one one computer will act as a
+server while the other(s) will act as network clients which poll the
+server for information about the UPS.  Note that ``NIS" is \emph{not}
+related to Sun's directory service also called ``NIS" or ``Yellow
+Pages''.  In addition NIS server and client there is an alternative,
+depricated, master/slave network configuration.
 
 The third configuration (new with version 3.8.3), is where a single computer
 controls multiple UPSes. In this case, there are several copies of apcupsd on
@@ -803,6 +802,21 @@ manuals in /usr/man, and the configuration and script files in /etc/apcupsd.
 In addition, if your system is recognized, certain files such as the startup
 script and the system halt script will be placed in appropriate system
 directories (usually subdirectories of /etc/rc.d). 
+
+\label{Installing-on-OSX}
+\subsubsection*{Installing on OS X/Darwin}
+\index{Installation!OS~X}
+\index{OS~X!Installation}
+
+On OS X (darwin), apcupsd can be built with \texttt{configure} defaults.
+The defaults for OS~X build \texttt{{---}disable-usb}, as apcupsd cannot
+(yet) communicate properly with USB devices on OS~X\@.  Apcupsd
+\emph{may} be usable on OS~X with smartcable device, but certainly
+\emph{does} work as a NIS client or network slave.
+
+The startup information will be installed in
+\texttt{/Library/StartupItems/apcupsd} which is part of darwin's
+SystemStartup.
 
 \label{Verifying-a-Source-Installation}
 
@@ -1998,12 +2012,111 @@ is effected.
 Normally you would have many more configuration directives to completely
 customize your installation, but this example shows you the minimum required. 
 
+\label{A-Sample-NIS-Slave-Configuration-Using-the-Net-Driver}
+
+\subsection*{NIS Server/Client Configuration Using the Net Driver}
+\index{NIS Server/Client Configuration Using the Net Driver }
+\index{Driver!Sample NIS Server/Client Configuration Using the Net }
+\addcontentsline{toc}{subsection}{NIS Server/Client Configuration Using the
+Net Driver}
+
+\label{index-Example_002c-NIS-slave-81}
+\label{index-NIS-slave-conf-82}
+\label{index-Configuration_002c-NIS-slave-conf-83}
+
+NIS (Network Information Server) mode allows for communication between
+instances of apcupsd running on different hosts.  Only one of those
+hosts, the server, needs to talk to the UPS directly.  The others,
+clients, optain information about the state of the UPS by querying the
+server.  NIS is \emph{not} related to Sun's NIS/YP services.  The NIS
+client/server mode should not be confused with the (deprecated and more
+complicated) net master/slave mode.
+
+NIS clients and servers require that apcupsd be compiled with the Net
+Driver \texttt{-{}-enable-net}.  This is typically enabled by default.
+
+The NIS server is connected to the UPS and should be configured exactly
+as a standalone configuration, but with \textbf{NETSERVER} on.  In all
+other respects, the server should be configured in standalone mode.  You
+may also set the NIS server specific options \textbf{NISIP} to
+restict which IP address of the server which apcupsd listens on.  The
+default, 0.0.0.0, means to list on all of the server host's IP addresses;
+\textbf{NISPORT} (default 3551) to set which TCP port the server listens on;
+and \textbf{EVENTSFILE} and \textbf{EVENTSFILEMAX} to provide information
+about the last few events to clients.  You may also need to modify your
+firewall rules on the server's host to allow traffic to the
+\textbf{NISPORT}\@.
+
+For the NIS client computer, you will have a configuration that looks something
+like what follows.  What is important is that you get the information from an
+\textbf{ether} \textbf{UPSCABLE} with \textbf{UPSTYPE} set as
+\textbf{net} over the network and you must specify the address of a NIS
+server using \textbf{DEVICE}\@. The client apcupsd will then poll the
+NIS server specified in \textbf{DEVICE} every \textbf{NETTIME} seconds.
+
+\footnotesize
+\begin{verbatim}
+     ## apcupsd.conf v1.1 ##
+     UPSCABLE ether
+     UPSTYPE net
+     LOCKFILE /var/lock
+     DEVICE server-network-address:3551
+     UPSCLASS standalone
+     UPSMODE disable
+     NETTIME 10
+\end{verbatim}
+\normalsize
+
+The \textbf{DEVICE} is set to \texttt{server-address:port}, where
+\texttt{server-address} is the fully qualified domain name or IP address of
+the apcupsd NIS server, and TCP port is the \textbf{NISPORT} that the server
+is listening on.  The default is 3551, but older versions of apcupsd used
+port 7000.  
+
+If you set \textbf{NETTIME} too large, your slave may not see the
+change in state of the NIS server before the server has shutdown. Normally,
+you have at least 30~seconds of grace time between the time the NIS server
+decides to shutdown and the time it no longer responds. Your slave must poll
+during this interval.  
+
+Any client run using the Net driver will shutdown when its own timers
+expire or when the NIS server shuts down, whichever occurs first. This
+means that if you want the slave to shutdown before the server, you need
+only set \textbf{BATTERYLEVEL}, \textbf{MINUTES} or \textbf{TIMEOUT} on
+the client for a faster shutdown than the values defined on the NIS
+server.  This can often be useful if the slave is less important than the
+master and you wish to reduce battery power consumption so that the
+master can remain up longer during a power outage. 
+
+NIS clients work principally by reading the STATFLAG record that is sent
+by the NIS server (present in the output of apcaccess). The low 16 bits
+are the standard APC status flag, and the upper 16 bits represent the
+internal state of apcupsd, so the slave can see when the power fails and
+know when to shutdown.  
+
+It would be possible to have a client also work as a server, but that would
+increase the delay of information getting from the UPS to the secondary
+client.
+
+\subsection*{A master/slave configuration}
+\index{Configuration!Master/Slave}
+\index{Master/Slave}
+\addcontentsline{toc}{subsection}{Master/Slave Configuration}
+
+The master/slave mode is deprecated in favor of the NIS client/server
+mode.  In the master/slave mode, the master (the analog of the NIS server)
+pushes information to the slaves (the analogs of the NIS clients),
+instructing them when to shutdown.  The master must be configured with
+information about the slaves.  In addition to being more complex in both
+operation and configuration than NIS mode, the master/slave mode
+introduces some security issues that are not present in NIS mode.  See
+the section on Security Issues for more details.
+
 \label{A-Simple-Master-Configuration}
 
-\subsection*{A Simple Master Configuration}
+\subsubsection*{A Simple Master Configuration}
 \index{Configuration!Simple Master }
 \index{Simple Master Configuration }
-\addcontentsline{toc}{subsection}{Simple Master Configuration}
 
 \label{index-Configuration_002c-Master-74}
 \label{index-Master_002c-config-example-75}
@@ -2028,26 +2141,24 @@ configuration file would look like the following:
 \end{verbatim}
 \normalsize
 
-Note, the main difference from the stand alone configuration is that you have
-specified {\bf UPSCLASS netmaster} and {\bf UPSMODE net}.  In addition, you
-have specified one or more slave machines.  In this mode of networking, (as
-opposed to using the net driver as described several sections below), your
-master knows the presence of all the slaves.  They carry on a very explicit
-communication, and the slaves are explicitly notified by the master of any
-important changes such as a shutdown.  
-
-There is a simpler form of contolling slaves using the net driver with an
-apcupsd NIS server. The simpler form is much easier to configure. See: see 
-\ilink{A Sample NIS Slave Configuration Using the Net
-Driver}{A-Sample-NIS-Slave-Configuration-Using-the-Net-Driver}
-below for details. 
+The main difference from the stand alone configuration is that you
+have specified \textbf{UPSCLASS netmaster} and \textbf{UPSMODE net}.  In
+addition, you have specified one or more slave machines with
+\textbf{SLAVE}\@.  In this mode of networking, (as opposed to using the
+NIS net driver as described above), your master knows the
+presence of all the slaves.  They carry on a very explicit communication,
+and the slaves are explicitly notified by the master of any important
+changes such as a shutdown.   \textbf{NETTIME} (as with NIS mode)
+specifies the time in seconds between communication between master and
+slaves.  \textbf{NETPORT} (default: 6666) is the TCP port that is used
+for the master/slave communication.  \texttt{NETPORT} will need to be the
+same on both master and slaves.
 
 \label{A-Simple-Slave-Configuration}
 
-\subsection*{A Simple Slave Configuration}
+\subsubsection*{A Simple Slave Configuration}
 \index{Configuration!Simple Slave }
 \index{Simple Slave Configuration }
-\addcontentsline{toc}{subsection}{Simple Slave Configuration}
 
 \label{index-Slave-Configuration-77}
 \label{index-Configuration_002c-Slave-78}
@@ -2071,9 +2182,12 @@ master.  A very simple configuration file would look like the following:
 \end{verbatim}
 \normalsize
 
-The main difference from the master configuration is that you have specified
-{\bf UPSCABLE ether} and {\bf UPSCLASS netslave}.  In addition, you have
-specified a single controlling master.  
+The main difference from the master configuration is that you have
+specified \textbf{UPSCABLE ether} and \textbf{UPSCLASS netslave}.  In
+addition, you must specify a single controlling \textbf{MASTER}\@.  
+
+You may need to open up TCP port \textbf{NETPORT} on both the master and
+slave hosts' firewalls to enable communication.
 
 Please note, there are reports that you {\bf must} use {\bf UPSTYPE smartups}
 on the slave even if the master is using {\bf UPSTYPE dumb}. This is
@@ -2082,16 +2196,14 @@ apparently some bug in the new dumb driver.
 In this configuration, the shutdown will be initiated by the master. It is
 also possible to specify BATTERYLEVEL, MINUTES, and TIMEOUT configuration
 directives in the Slave machine that will cause the slave to shutdown before
-the master. This can often be useful if the slave is less important than the
-master and you wish to reduce battery power consumption so that the master can
-remain up longer during a power outage. 
+the master.
 
 \label{Variation-on-the-Master_002fSlave-Configuration}
 
-\subsection*{Variation on the Master/Slave Configuration}
+\subsubsection*{Variation on the Master/Slave Configuration}
 \index{Configuration!Variation on the Master/Slave }
 \index{Variation on the Master/Slave Configuration }
-\addcontentsline{toc}{subsection}{Variation on the Master/Slave
+\addcontentsline{toc}{subsubsection}{Variation on the Master/Slave
 Configuration}
 
 \label{index-Master_002fSlave-variation-80}
@@ -2102,46 +2214,22 @@ the Master/Slave configuration files shown above.  The only difference is
 where the slave actually receives its power.  In effect, apcupsd does not know
 or care where the power really comes from. 
 
-\label{A-Sample-NIS-Slave-Configuration-Using-the-Net-Driver}
+%%%% Differences between net master/slave and NIS server/client.
+\subsubsection*{Differences between NIS Client/Server and Master/Slave
+modes}
 
-\subsection*{A Sample NIS Slave Configuration Using the Net Driver}
-\index{Sample NIS Slave Configuration Using the Net Driver }
-\index{Driver!Sample NIS Slave Configuration Using the Net }
-\addcontentsline{toc}{subsection}{Sample NIS Slave Configuration Using the
-Net Driver}
-
-\label{index-Example_002c-NIS-slave-81}
-\label{index-NIS-slave-conf-82}
-\label{index-Configuration_002c-NIS-slave-conf-83}
-As opposed to the old master/slave mode demonstrated above, you can turn any
-computer into an NIS slave by configuring with the NIS network driver turned
-on {\tt \verb{--{enable-net}. The difference is that the NIS server has no explicit
-knowledge of the slaves. The NIS server makes its information available via
-the net (NIS), and the NIS slaves read it. When the NIS server is going to
-shutdown, it makes the information available to any NIS slave that polls it,
-but the NIS server does not explicitly call each NIS slave as is the case in
-the Master/Slave networking described several sections above.  
-
-Running in this configuration, you can use any computer with apcupsd running
-the Network Information Server (NIS) as the server.  The NIS slave simply uses
-the NIS information to decide when to shutdown.  This is a much simpler mode
-than the older master/slave code mentioned above.  
-
-The main apcupsd (NIS server) is connected to the UPS and has NIS turned on,
-but the configuration is a simple standalone as in the section {\bf A Simple
-Configuration for a SmartUPS}. It doesn't matter how the UPS is connected to
-the computer (serial, USB, ...).  
-
-For the NIS slave computer, you will have a configuration that looks something
-like what follows.  What is important is that you get the information from an
-{\bf ether} cable over the network and you must specify the address of a ``NIS
-server'' that is running NIS (not the Master/Slave networking described
-above). The NIS slave apcupsd will then poll the NIS server at the NETTIME
-interval you specify to obtain the status.  
+The difference between the NIS mode and the deprecated master/slave mode
+is that the NIS server has no explicit knowledge of the slaves. The NIS
+server makes its information available via the net (NIS), and the NIS
+slaves read it.  When the NIS server is going to shutdown, it makes the
+information available to any NIS slave that polls it, but the NIS server
+does not explicitly call each NIS slave as is the case in the
+Master/Slave networking described several sections above.  
 
 Here are a few words from Adam Kropelin concerning the difference between the
 Master/Slave networking and the NIS-based networking:  
 
+\begin{quotation}
 Think of the difference as push (Master/Slave) vs. pull (NIS-based). In the
 case of M/S, the master makes all the shutdown decisions and notifies the
 slaves when they are to shut down or when some other interesting event
@@ -2164,48 +2252,7 @@ like NIS on your firewall. My network is set up almost identically to yours
 and I chose to run the apcupsd ``master'' on a server in the DMZ and have the
 firewall just be a client of it. That way I don't have to run NIS on the
 firewall apcupsd instance. 
-
-\footnotesize
-\begin{verbatim}
-     ## apcupsd.conf v1.1 ##
-     UPSCABLE ether
-     UPSTYPE net
-     LOCKFILE /var/lock
-     DEVICE server-network-address:3551
-     UPSCLASS standalone
-     UPSMODE disable
-     NETTIME 10
-\end{verbatim}
-\normalsize
-
-where on the {\bf DEVICE} directive you replace the {\tt
-server-network-address} with the fully qualified domain name or IP address of
-a machine running apcupsd with NIS enabled (and normally, but not required,
-connected to a UPS). The :3551 that follows the NIS server address is the port
-to use. The default is 3551, but older versions of apcupsd used port 7000.  
-
-Please do not confuse this NIS server/slave mode with the old master/slave
-network configuration that is described above.  This is a master/slave setup,
-but much simpler (the NIS server does not know about the slaves), and any NIS
-server, even a slave, can act as a server to a slave that listens to it.  
-
-The {\bf NETTIME} directive defines the time interval that the slave uses to
-poll the NIS server. If you set this too large, your slave may not see the
-change in state of the NIS server before the server has shutdown. Normally,
-you have at least 30 seconds of grace time between the time the NIS server
-decides to shutdown and the time it no longer responds. Your slave must poll
-during this interval.  
-
-This mode works principally by reading the STATFLAG record that is sent by the
-NIS (present in the output of apcaccess). The low 16 bits are the standard APC
-status flag, and the upper 16 bits represent the internal state of apcupsd, so
-the slave can see when the power fails and know when to shutdown.  
-
-As with the Master/Slave configuration, any slave run using the Net driver
-will shutdown when its own timers expire or when the NIS server shuts down,
-whichever occurs first. This means that if you want the slave to shutdown
-before the server, you need only set BATTERYLEVEL, or any of the other values
-on the slave for a faster shutdown than the values defined on the NIS server. 
+\end{quotation}
 
 \label{Testing-Apcupsd}
 
@@ -3565,22 +3612,40 @@ to the original author in his project.
 
 \begin{itemize}
 \item {\bf apcupsd} runs as root.  
-\item If you have {\bf NETSERVER ON} in your apcupsd.conf file (which is the
-   deault), be aware that anyone on the network can read the status of your UPS. 
+
+\item If you have \textbf{NETSERVER ON} in your apcupsd.conf file (which is the
+   default), be aware that anyone on the network can read the status of your UPS. 
    This may or may not pose a problem. If you don't consider this information
-privileged, as is the case for me, there is little risk. In addition, if you
-have a firewall between your servers and the Internet, crackers will not have
-access to your UPS information.  Additionally, you can restrict who can access
-your apcupsd server by using inted to run the sservice and using access
-control lists with a TCP wrapper or by configuring TCP wrappers in apcupsd
-(see below for TCP Wrapper details).  
+privileged, as is the case for many, there is little risk. In addition, if you
+have a perimeter firewall or NATting router with typical settings
+only users on your local network access to your UPS information.
+You may also restrict access using using firewall settings (see below) or
+TCP Wrappers (see below).
+
 \item If you are running master/slave networking with a single UPS powering
    multiple machines, be aware that it is possible for someone to simulate the
    master and send a shutdown request to your slaves. The slaves do check that
 the network address of the machine claiming to be the master is that same as
 the address returned by DNS corresponding to the name of the master as
-specified in your configuration file. 
+specified in your configuration file.   Again, you may wish to restrict
+access  using firewall settings (see below) or TCP Wrappers (see below).
 \end{itemize}
+
+\label{Firewall-Settings}
+\subsection*{Firewall Settings}
+\label{Firewall-Settings}
+\index{Firewall Settings}
+\addcontentsline{toc}{subsubsection}{Firewall Settings}
+
+If you are running apcupsd as an NIS server, you will need to ensure that
+the clients can reach it by opening up \textbf{NISPORT} (default: TCP
+3551) on any firewall running on the server.  If you are running with a
+master/slave setup, then \textbf{NETPORT} (default: TCP 6666) will need
+to be open on both the master and the slave(s) so that they can talk to
+each other.  You may wish to configure your firewall(s) to \emph{only}
+allow connections from your local network or specifically from the
+masters, slaves, and servers as needed.
+
 
 \label{TCP-Wrappers}
 
@@ -3591,6 +3656,10 @@ specified in your configuration file.
 
 \label{index-Wrappers_002c-TCP-138}
 \label{index-TCP-wrappers-139}
+
+If your operating system does not support a host based firewall (a
+firewall running on the local machine) then you may try to get some of
+the funtionality of such a firewall with TCP~Wrappers.
 As of apcupsd version 3.8.2, TCP Wrappers are implemented if you turn them on
 when configuring ({\tt ./configure \verb{--{with-libwrap}).  With this code enabled,
 you may control who may access your apcupsd via TCP connections (the Network
@@ -8059,7 +8128,7 @@ can set it to 180, 300, or 600 seconds depending on your UPS. See the EEPROM
 \ilink{Configuring Your EEPROM}{Configuring-Your-EEPROM}) this
 manual for further details on how to change this EPROM value.  
 
-If you use the {\tt \verb{--{kill-on-powerfail} option, you run the risk of having
+If you use the \texttt{-{}-kill-on-powerfail} option, you run the risk of having
 the computer power cut before the system has shutdown. Even if the grace
 period is rather long, if something goes wrong in the shutdown, well, it is up
 to you to decide.  
@@ -8978,8 +9047,8 @@ lists.sourceforge.net\gt{}}{http://www.apcupsd.com}
 \item [{\bf How do I build Apcupsd for platform xxx?}]
    \index{How do I build Apcupsd for platform xxx? }
    The apcupsd spec file contains defines to build for several platforms: RedHat
-7.x (rh7), RedHat 8.0 (rh8), RedHat 9 (rh9), Fedora Core (fedora_core), RedHat
-Enterprise Linux and clones (rhel3 and rhel4), SuSE 9 & 10 (suse), and Mandrake (mdk).  
+7.x (rh7), RedHat 8.0 (rh8), RedHat 9 (rh9), Fedora Core (fedora\_core), RedHat
+Enterprise Linux and clones (rhel3 and rhel4), SuSE 9 \& 10 (suse), and Mandrake (mdk).  
 The package build is controlled by a define set at the beginning of the file. 
 These defines basically just control the dependancy information that gets coded into 
 the finished rpm package.  So while you could technically build a package without 
