@@ -58,7 +58,7 @@ html:
 	./translate_images.pl apcupsd.html
 	sed -e "s/HREF=\"apcupsd.html/HREF=\"/" apcupsd.html > manual.html
 	cp manual.html apcupsd.html
-	ln -s apcupsd.html index.html
+	ln -sf apcupsd.html index.html
 	rm -f *.eps
 
 web:
