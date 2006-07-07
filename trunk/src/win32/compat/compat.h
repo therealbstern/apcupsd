@@ -27,7 +27,7 @@
  * Last Modified By: Thorsten Engel
  * Last Modified On: Fri Apr 22 19:30:00 2004
  * Update Count    : 218
- * $Id: compat.h,v 1.11 2006-07-07 13:06:57 adk0212 Exp $
+ * $Id: compat.h,v 1.12 2006-07-07 14:04:49 adk0212 Exp $
  */
 
 
@@ -36,16 +36,6 @@
 #ifndef _STAT_H
 #define _STAT_H       /* don't pull in MinGW stat.h */
 #define _STAT_DEFINED /* don't pull in MinGW stat.h */
-#endif
-
-#if (defined _MSC_VER) && (_MSC_VER >= 1400) // VC8+
-#pragma warning(disable : 4996) // Either disable all deprecation warnings,
-// #define _CRT_SECURE_NO_DEPRECATE // Or just turn off warnings about the newly deprecated CRT functions.
-#define HAVE_VC8
-#endif // VC8+
-
-#if (!defined HAVE_MINGW) && (!defined HAVE_VC8) && (!defined HAVE_WXCONSOLE)
-#define __STDC__ 1
 #endif
 
 #include <stdio.h>
@@ -80,13 +70,6 @@
 
 #define HAVE_WIN32 1
 
-#ifndef HAVE_MINGW
-#ifdef HAVE_CYGWIN
-#undef HAVE_CYGWIN
-#else
-#endif //HAVE_CYGWIN
-#endif //HAVE_MINGW
-
 typedef UINT64 u_int64_t;
 typedef UINT64 uint64_t;
 typedef INT64 int64_t;
@@ -96,61 +79,24 @@ typedef unsigned char uint8_t;
 typedef unsigned short uint16_t;
 typedef signed short int16_t;
 typedef signed char int8_t;
-#ifndef HAVE_MINGW
-typedef long int32_t;
-typedef float float32_t;
-typedef double float64_t;
-#endif
-
-#ifndef HAVE_VC8
 typedef long time_t;
-#endif
 
-#if __STDC__
-#ifndef HAVE_MINGW
-typedef _dev_t dev_t;
-#ifndef HAVE_WXCONSOLE
-typedef __int64 ino_t;
-typedef __int64 off_t;          /* STDC=1 means we can define this */
-#endif
-#endif
-#else
+#if !__STDC__
 typedef long _off_t;            /* must be same as sys/types.h */
-#endif
-
-#ifndef HAVE_MINGW
-#ifndef HAVE_WXCONSOLE
-typedef int BOOL;
-#define bool BOOL
-#endif
 #endif
 
 typedef UINT32 u_int32_t;
 typedef unsigned char u_int8_t;
 typedef unsigned short u_int16_t;
 
-#ifndef HAVE_MINGW
-#undef uint32_t
-#endif
-
 void sleep(int);
 
 typedef UINT32 key_t;
 
-#ifdef HAVE_MINGW
 #ifndef uid_t
 typedef UINT32 uid_t;
 typedef UINT32 gid_t;
 #endif
-#else
-typedef UINT32 uid_t;
-typedef UINT32 gid_t;
-typedef UINT32 mode_t;
-/* #ifndef _WX_DEFS_H_  ssize_t is defined in wx/defs.h */
-typedef INT64  ssize_t;
-/* #endif */
-
-#endif /* HAVE_MINGW */
 
 struct dirent {
     uint64_t    d_ino;
@@ -198,7 +144,6 @@ struct stat
     uint32_t    st_blksize;
     uint64_t    st_blocks;
 };
-
 #endif
 
 #undef  S_IFMT
@@ -253,47 +198,13 @@ struct stat
 #define iscsym  __iscsym
 #endif
 
-#ifndef HAVE_VC8
-#ifndef HAVE_MINGW
-int umask(int);
-off_t lseek(int, off_t, int);
-int dup2(int, int);
-int close(int fd);
-#endif
-#if !defined(HAVE_WXCONSOLE) && !defined(HAVE_MINGW)
-ssize_t read(int fd, void *, ssize_t nbytes);
-ssize_t write(int fd, const void *, ssize_t nbytes);
-#endif
-#endif
 int lchown(const char *, uid_t uid, gid_t gid);
 int chown(const char *, uid_t uid, gid_t gid);
-#ifndef HAVE_MINGW
-int chmod(const char *, mode_t mode);
-#endif
 int inet_aton(const char *cp, struct in_addr *inp);
 int kill(int pid, int signo);
 int pipe(int []);
 int fork();
 int waitpid(int, int *, int);
-
-#ifndef HAVE_MINGW
-int strncasecmp(const char*, const char *, int);
-int utime(const char *filename, struct utimbuf *buf);
-int open(const char *, int, int);
-#define vsnprintf __vsnprintf
-int __vsnprintf(char *s, size_t count, const char *format, va_list args);
-
-#define vsprintf __vsprintf
-int __vsprintf(char *s, const char *format, va_list args);
-
-#define snprintf __snprintf
-int __snprintf(char *str, size_t count, const char *fmt, ...);
-
-#define sprintf __sprintf
-int __sprintf(char *str, const char *fmt, ...);
-
-#endif //HAVE_MINGW
-
 
 #define WNOHANG 0
 #define WIFEXITED(x) 0
@@ -350,18 +261,6 @@ extern "C" void syslog(int type, const char *fmt, ...);
 #define LOG_ERR 0
 #endif
 
-#ifndef HAVE_MINGW
-#define R_OK 04
-#define W_OK 02
-int stat(const char *, struct stat *);
-#ifdef __cplusplus
-#define access _access
-extern "C" _CRTIMP int __cdecl _access(const char *, int);
-int execvp(const char *, char *[]);
-extern "C" void *  __cdecl _alloca(size_t);
-#endif
-#endif //HAVE_MINGW
-
 #define getpid _getpid
 
 #define getppid() 0
@@ -382,10 +281,9 @@ char* win32_cgets (char* buffer, int len);
 
 int WSA_Init(void);
 
-#ifdef HAVE_MINGW
 void closelog();
 void openlog(const char *ident, int option, int facility);
-#endif //HAVE_MINGW
+void syslog(int type, const char *fmt, ...);
 
 #ifndef INVALID_FILE_ATTRIBUTES
 #define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
@@ -393,22 +291,12 @@ void openlog(const char *ident, int option, int facility);
 
 void conv_unix_to_win32_path(const char *name, char *win32_name, DWORD dwSize);
 
-/* Temp kludge ***FIXME*** */
-#ifdef __APCUPSD__
 #define SIGCHLD 0
 #define SIGALRM 0
 #define SIGHUP 0
 #define SIGCHLD 0
 #define SIGPIPE 0
-unsigned int alarm(unsigned int seconds);
-#define PM_FNAME 2000
-#define PM_MESSAGE 2000
-#define get_pool_memory(x) (char *)malloc(x)
-#define free_pool_memory(x) free((char *)x)
-#define check_pool_memory_size(x, y) x
-#define ASSERT(x) 
-#define bstrncat astrncat
-#define bstrncpy astrncpy
+#define alarm(a) 0
 #define fcntl(a,b,c) 0
 
 #define TIOCMBIC  1
@@ -416,7 +304,6 @@ unsigned int alarm(unsigned int seconds);
 #define TIOCM_ST  0x008
 #define TIOCM_SR  0x010
 int ioctl(int, int, ...);
-#endif
 
 /* Return the smaller of a or b */
 #define MIN(a, b) ( ((a) < (b)) ? (a) : (b) )

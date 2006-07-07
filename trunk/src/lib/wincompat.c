@@ -24,7 +24,7 @@
 
 #include "apc.h"
 
-#if  defined(HAVE_CYGWIN) || defined(HAVE_MINGW)
+#if defined(HAVE_CYGWIN)
 
 #include <windows.h>
 
@@ -43,6 +43,7 @@ extern UPSINFO *core_ups;
  * Actually WinNT does have a system log, but we don't use it
  * here.
  */
+ 
 extern "C" void syslog(int type, const char *fmt, ...)
 {
    UPSINFO *ups = core_ups;
@@ -88,7 +89,6 @@ extern "C" void syslog(int type, const char *fmt, ...)
    }
 }
 
-#ifndef HAVE_MINGW
 struct tm *localtime_r(const time_t *timep, struct tm *tm)
 {
    static pthread_mutex_t mutex;
@@ -180,6 +180,5 @@ int winioctl(int fd, int func, int *addr)
 
    return EINVAL;
 }
-#endif
 
 #endif   /* HAVE_CYGWIN */

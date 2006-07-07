@@ -638,7 +638,7 @@ void LogErrorMsg(char *message, int eventID)
                  FORMAT_MESSAGE_FROM_SYSTEM,
                  NULL, g_error, 0, (LPTSTR) & msg, 0, NULL);
 
-   syslog(0, "%s", msg);
+//   syslog(0, "%s", msg);
 
    // Use event logging to log the error
    heventsrc = RegisterEventSource(NULL, UPS_SERVICENAME);
