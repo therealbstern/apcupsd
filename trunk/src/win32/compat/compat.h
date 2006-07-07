@@ -27,7 +27,7 @@
  * Last Modified By: Thorsten Engel
  * Last Modified On: Fri Apr 22 19:30:00 2004
  * Update Count    : 218
- * $Id: compat.h,v 1.12 2006-07-07 14:04:49 adk0212 Exp $
+ * $Id: compat.h,v 1.13 2006-07-07 22:51:46 adk0212 Exp $
  */
 
 
@@ -281,8 +281,8 @@ char* win32_cgets (char* buffer, int len);
 
 int WSA_Init(void);
 
-void closelog();
-void openlog(const char *ident, int option, int facility);
+#define closelog()
+#define openlog(a,b,c)
 void syslog(int type, const char *fmt, ...);
 
 #ifndef INVALID_FILE_ATTRIBUTES
