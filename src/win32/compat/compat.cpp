@@ -19,30 +19,26 @@
 //
 // Author          : Christopher S. Hull
 // Created On      : Sat Jan 31 15:55:00 2004
-// $Id: compat.cpp,v 1.13 2006-05-23 21:53:10 adk0212 Exp $
-
-#ifdef __APCUPSD__
+// $Id: compat.cpp,v 1.14 2006-07-07 14:04:49 adk0212 Exp $
 
 #include "apc.h"
 #include "compat.h"
 #include "winapi.h"
 
-#else
-
-#include "bacula.h"
-#include "compat.h"
-#include "jcr.h"
-#include "../../lib/winapi.h"
-#include "vss.h"
-
-#endif
-
 #define b_errno_win32 (1<<29)
 
+/* apcupsd doesn't need special allocators */
+#define get_pool_memory(x) (char *)malloc(x)
+#define free_pool_memory(x) free((char *)x)
+#define check_pool_memory_size(x, y) x
+#define PM_FNAME 2000
+#define PM_MESSAGE 2000
+
+/* No assertion checking */
+#define ASSERT(x) 
 
 /* to allow the usage of the original version in this file here */
 #undef fputs
-
 
 #define USE_WIN32_COMPAT_IO 1
 #define USE_WIN32_32KPATHCONVERSION 1
@@ -52,12 +48,7 @@ extern DWORD   g_platform_id;
 extern int enable_vss;
 
 // from MicroSoft SDK (KES) is the diff between Jan 1 1601 and Jan 1 1970
-#ifdef HAVE_MINGW
 #define WIN32_FILETIME_ADJUST 0x19DB1DED53E8000ULL 
-#else
-#define WIN32_FILETIME_ADJUST 0x19DB1DED53E8000I64
-#endif
-
 #define WIN32_FILETIME_SCALE  10000000             // 100ns/second
 
 void conv_unix_to_win32_path(const char *name, char *win32_name, DWORD dwSize)
@@ -97,7 +88,7 @@ void conv_unix_to_win32_path(const char *name, char *win32_name, DWORD dwSize)
     if (g_pVSSClient && enable_vss && g_pVSSClient->IsInitialized()) {
        POOLMEM *pszBuf = get_pool_memory (PM_FNAME);
        pszBuf = check_pool_memory_size(pszBuf, dwSize);
-       bstrncpy(pszBuf, tname, strlen(tname)+1);
+       astrncpy(pszBuf, tname, strlen(tname)+1);
        g_pVSSClient->GetShadowPath(pszBuf, tname, dwSize);
        free_pool_memory(pszBuf);
     }
@@ -363,12 +354,10 @@ make_win32_path_UTF8_2_wchar(POOLMEM **pszUCS, const char *pszUTF, BOOL* pBIsRaw
    return nRet;
 }
 
-#ifndef HAVE_VC8
 int umask(int)
 {
    return 0;
 }
-#endif
 
 int chmod(const char *, mode_t)
 {
@@ -384,14 +373,6 @@ int lchown(const char *k, uid_t, gid_t)
 {
    return 0;
 }
-
-#ifdef needed
-bool fstype(const char *fname, char *fs, int fslen)
-{
-   return true;                       /* accept anything */
-}
-#endif
-
 
 long int
 random(void)
@@ -751,30 +732,6 @@ readlink(const char *, char *, int)
    return -1;
 }
 
-
-#ifndef HAVE_MINGW
-int
-strcasecmp(const char *s1, const char *s2)
-{
-   register int ch1, ch2;
-
-   if (s1==s2)
-      return 0;       /* strings are equal if same object. */
-   else if (!s1)
-      return -1;
-   else if (!s2)
-      return 1;
-   do {
-      ch1 = *s1;
-      ch2 = *s2;
-      s1++;
-      s2++;
-   } while (ch1 != 0 && tolower(ch1) == tolower(ch2));
-
-   return(ch1 - ch2);
-}
-#endif //HAVE_MINGW
-
 int
 strncasecmp(const char *s1, const char *s2, int len)
 {
@@ -823,16 +780,6 @@ gettimeofday(struct timeval *tv, struct timezone *)
     return 0;
 
 }
-
-/* For apcupsd this is in src/lib/wincompat.c */
-#ifndef __APCUPSD__
-extern "C" void syslog(int type, const char *fmt, ...) 
-{
-/*#ifndef HAVE_CONSOLE
-    MessageBox(NULL, msg, "Bacula", MB_OK);
-#endif*/
-}
-#endif
 
 struct passwd *
 getpwuid(uid_t)
@@ -895,9 +842,9 @@ opendir(const char *path)
 
     // add backslash only if there is none yet (think of c:\)
     if (tspec[strlen(tspec)-1] != '\\')
-      bstrncat(tspec, "\\*", max_len);
+      astrncat(tspec, "\\*", max_len);
     else
-      bstrncat(tspec, "*", max_len);
+      astrncat(tspec, "*", max_len);
 
     rval->spec = tspec;
 
@@ -1372,7 +1319,7 @@ winver::winver(void)
         default: version = WIN_RAWVERSION; break;
         }
 
-    bstrncpy(WIN_VERSION_LONG, version, sizeof(WIN_VERSION_LONG));
+    astrncpy(WIN_VERSION_LONG, version, sizeof(WIN_VERSION_LONG));
     snprintf(WIN_VERSION, sizeof(WIN_VERSION), "%s %d.%d.%d",
              platform, osvinfo.dwMajorVersion, osvinfo.dwMinorVersion, osvinfo.dwBuildNumber);
 
@@ -1484,10 +1431,10 @@ CreateChildProcess(const char *cmdline, HANDLE in, HANDLE out, HANDLE err)
 
     char *cmdLine = (char *)alloca(cmdLen);
 
-    bstrncpy(exeFile, comspec, sizeof(exeFile));
-    bstrncpy(cmdLine, comspec, cmdLen);
-    bstrncat(cmdLine, " /c ", cmdLen);
-    bstrncat(cmdLine, cmdline, cmdLen);
+    astrncpy(exeFile, comspec, sizeof(exeFile));
+    astrncpy(cmdLine, comspec, cmdLen);
+    astrncat(cmdLine, " /c ", cmdLen);
+    astrncat(cmdLine, cmdline, cmdLen);
 
     // try to execute program
     bFuncRetn = CreateProcessA(exeFile,
@@ -1523,152 +1470,12 @@ ErrorExit (LPCSTR lpszMessage)
     d_msg(__FILE__, __LINE__, 0, "%s", lpszMessage);
 }
 
-
-/*
-typedef struct s_bpipe {
-   pid_t worker_pid;
-   time_t worker_stime;
-   int wait;
-   btimer_t *timer_id;
-   FILE *rfd;
-   FILE *wfd;
-} BPIPE;
-*/
-
 static void
 CloseIfValid(HANDLE handle)
 {
     if (handle != INVALID_HANDLE_VALUE)
         CloseHandle(handle);
 }
-
-#ifndef HAVE_MINGW
-BPIPE *
-open_bpipe(char *prog, int wait, const char *mode)
-{
-    HANDLE hChildStdinRd, hChildStdinWr, hChildStdinWrDup,
-        hChildStdoutRd, hChildStdoutWr, hChildStdoutRdDup,
-        hInputFile;
-
-    SECURITY_ATTRIBUTES saAttr;
-
-    BOOL fSuccess;
-
-    hChildStdinRd = hChildStdinWr = hChildStdinWrDup =
-        hChildStdoutRd = hChildStdoutWr = hChildStdoutRdDup =
-        hInputFile = INVALID_HANDLE_VALUE;
-
-    BPIPE *bpipe = (BPIPE *)malloc(sizeof(BPIPE));
-    memset((void *)bpipe, 0, sizeof(BPIPE));
-
-    int mode_read = (mode[0] == 'r');
-    int mode_write = (mode[0] == 'w' || mode[1] == 'w');
-
-
-    // Set the bInheritHandle flag so pipe handles are inherited.
-
-    saAttr.nLength = sizeof(SECURITY_ATTRIBUTES);
-    saAttr.bInheritHandle = TRUE;
-    saAttr.lpSecurityDescriptor = NULL;
-
-    if (mode_read) {
-
-        // Create a pipe for the child process's STDOUT.
-        if (! CreatePipe(&hChildStdoutRd, &hChildStdoutWr, &saAttr, 0)) {
-            ErrorExit("Stdout pipe creation failed\n");
-            goto cleanup;
-        }
-        // Create noninheritable read handle and close the inheritable read
-        // handle.
-
-        fSuccess = DuplicateHandle(GetCurrentProcess(), hChildStdoutRd,
-                                   GetCurrentProcess(), &hChildStdoutRdDup , 0,
-                                   FALSE,
-                                   DUPLICATE_SAME_ACCESS);
-        if ( !fSuccess ) {
-            ErrorExit("DuplicateHandle failed");
-            goto cleanup;
-        }
-
-        CloseHandle(hChildStdoutRd);
-        hChildStdoutRd = INVALID_HANDLE_VALUE;
-    }
-
-    if (mode_write) {
-
-        // Create a pipe for the child process's STDIN.
-
-        if (!CreatePipe(&hChildStdinRd, &hChildStdinWr, &saAttr, 0)) {
-            ErrorExit("Stdin pipe creation failed\n");
-            goto cleanup;
-        }
-
-        // Duplicate the write handle to the pipe so it is not inherited.
-        fSuccess = DuplicateHandle(GetCurrentProcess(), hChildStdinWr,
-                                   GetCurrentProcess(), &hChildStdinWrDup,
-                                   0,
-                                   FALSE,                  // not inherited
-                                   DUPLICATE_SAME_ACCESS);
-        if (!fSuccess) {
-            ErrorExit("DuplicateHandle failed");
-            goto cleanup;
-        }
-
-        CloseHandle(hChildStdinWr);
-        hChildStdinWr = INVALID_HANDLE_VALUE;
-    }
-    // spawn program with redirected handles as appropriate
-    bpipe->worker_pid = (pid_t)
-        CreateChildProcess(prog,             // commandline
-                           hChildStdinRd,    // stdin HANDLE
-                           hChildStdoutWr,   // stdout HANDLE
-                           hChildStdoutWr);  // stderr HANDLE
-
-    if ((HANDLE) bpipe->worker_pid == INVALID_HANDLE_VALUE)
-        goto cleanup;
-
-    bpipe->wait = wait;
-    bpipe->worker_stime = time(NULL);
-
-    if (mode_read) {
-        CloseHandle(hChildStdoutWr); // close our write side so when
-                                     // process terminates we can
-                                     // detect eof.
-        // ugly but convert WIN32 HANDLE to FILE*
-        int rfd = _open_osfhandle((long)hChildStdoutRdDup, O_RDONLY);
-        if (rfd >= 0) {
-           bpipe->rfd = _fdopen(rfd, "r");
-        }
-    }
-    if (mode_write) {
-        CloseHandle(hChildStdinRd); // close our read side so as not
-                                    // to interfre with child's copy
-        // ugly but convert WIN32 HANDLE to FILE*
-        int wfd = _open_osfhandle((long)hChildStdinWrDup, O_WRONLY);
-        if (wfd >= 0) {
-           bpipe->wfd = _fdopen(wfd, "w");
-        }
-    }
-
-    if (wait > 0) {
-        bpipe->timer_id = start_child_timer(bpipe->worker_pid, wait);
-    }
-
-    return bpipe;
-
-cleanup:
-
-    CloseIfValid(hChildStdoutRd);
-    CloseIfValid(hChildStdoutRdDup);
-    CloseIfValid(hChildStdinWr);
-    CloseIfValid(hChildStdinWrDup);
-
-    free((void *) bpipe);
-    errno = b_errno_win32;            /* do GetLastError() for error code */
-    return NULL;
-}
-
-#endif //HAVE_MINGW
 
 int
 kill(int pid, int signal)
@@ -1702,314 +1509,43 @@ kill(int pid, int signal)
    return rval;
 }
 
-#ifndef HAVE_MINGW
-
-int
-close_bpipe(BPIPE *bpipe)
-{
-   int rval = 0;
-   int32_t remaining_wait = bpipe->wait;
-
-   if (remaining_wait == 0) {         /* wait indefinitely */
-      remaining_wait = INT32_MAX;
-   }
-   for ( ;; ) {
-      DWORD exitCode;
-      if (!GetExitCodeProcess((HANDLE)bpipe->worker_pid, &exitCode)) {
-         const char *err = errorString();
-         rval = b_errno_win32;
-         d_msg(__FILE__, __LINE__, 0,
-               "GetExitCode error %s\n", err);
-         LocalFree((void *)err);
-         break;
-      }
-      if (exitCode == STILL_ACTIVE) {
-         if (remaining_wait <= 0) {
-            rval = ETIME;             /* timed out */
-            break;
-         }
-         bmicrosleep(1, 0);           /* wait one second */
-         remaining_wait--;
-      } else if (exitCode != 0) {
-         /* Truncate exit code as it doesn't seem to be correct */
-         rval = (exitCode & 0xFF) | b_errno_exit;
-         break;
-      } else {
-         break;                       /* Shouldn't get here */
-      }
-   }
-
-   if (bpipe->timer_id) {
-       stop_child_timer(bpipe->timer_id);
-   }
-   if (bpipe->rfd) fclose(bpipe->rfd);
-   if (bpipe->wfd) fclose(bpipe->wfd);
-   free((void *)bpipe);
-   return rval;
-}
-
-int
-close_wpipe(BPIPE *bpipe)
-{
-    int stat = 1;
-
-    if (bpipe->wfd) {
-        fflush(bpipe->wfd);
-        if (fclose(bpipe->wfd) != 0) {
-            stat = 0;
-        }
-        bpipe->wfd = NULL;
-    }
-    return stat;
-}
-
-#include "findlib/find.h"
-
-int
-utime(const char *fname, struct utimbuf *times)
-{
-    FILETIME acc, mod;
-    char tmpbuf[5000];
-
-    conv_unix_to_win32_path(fname, tmpbuf, 5000);
-
-    cvt_utime_to_ftime(times->actime, acc);
-    cvt_utime_to_ftime(times->modtime, mod);
-
-    HANDLE h = INVALID_HANDLE_VALUE;
-
-    if (p_CreateFileW) {
-      POOLMEM* pwszBuf = get_pool_memory(PM_FNAME);
-      make_win32_path_UTF8_2_wchar(&pwszBuf, tmpbuf);
-
-      h = p_CreateFileW((LPCWSTR)pwszBuf,
-                        FILE_WRITE_ATTRIBUTES,
-                        FILE_SHARE_WRITE|FILE_SHARE_READ|FILE_SHARE_DELETE,
-                        NULL,
-                        OPEN_EXISTING,
-                        FILE_FLAG_BACKUP_SEMANTICS, // required for directories
-                        NULL);
-
-      free_pool_memory(pwszBuf);
-    } else if (p_CreateFileA) {
-      h = p_CreateFileA(tmpbuf,
-                        FILE_WRITE_ATTRIBUTES,
-                        FILE_SHARE_WRITE|FILE_SHARE_READ|FILE_SHARE_DELETE,
-                        NULL,
-                        OPEN_EXISTING,
-                        FILE_FLAG_BACKUP_SEMANTICS, // required for directories
-                        NULL);
-    }
-
-    if (h == INVALID_HANDLE_VALUE) {
-        const char *err = errorString();
-        d_msg(__FILE__, __LINE__, 99,
-              "Cannot open file \"%s\" for utime(): ERR=%s", tmpbuf, err);
-        LocalFree((void *)err);
-        errno = b_errno_win32;
-        return -1;
-    }
-
-    int rval = SetFileTime(h, NULL, &acc, &mod) ? 0 : -1;
-    CloseHandle(h);
-    if (rval == -1) {
-       errno = b_errno_win32;
-    }
-    return rval;
-}
-
-#if USE_WIN32_COMPAT_IO
-
-int
-open(const char *file, int flags, int mode)
-{
-   if (p_wopen) {
-      POOLMEM* pwszBuf = get_pool_memory(PM_FNAME);
-      make_win32_path_UTF8_2_wchar(&pwszBuf, file);
-
-      int nRet = p_wopen((LPCWSTR) pwszBuf, flags|_O_BINARY, mode);
-      free_pool_memory(pwszBuf);
-
-      return nRet;
-   }
-
-   return _open(file, flags|_O_BINARY, mode);
-}
-
-/*
- * Note, this works only for a file. If you want
- *   to close a socket, use closesocket().
- *   Bacula has been modified in src/lib/bnet.c
- *   to use closesocket().
- */
-#ifndef HAVE_VC8
-int
-close(int fd)
-{
-    return _close(fd);
-}
-
-#ifndef HAVE_WXCONSOLE
-ssize_t
-read(int fd, void *buf, ssize_t len)
-{
-    return _read(fd, buf, (size_t)len);
-}
-
-ssize_t
-write(int fd, const void *buf, ssize_t len)
-{
-    return _write(fd, buf, (size_t)len);
-}
-#endif
-
-
-off_t
-lseek(int fd, off_t offset, int whence)
-{
-    return (off_t)_lseeki64(fd, offset, whence);
-}
-
-int
-dup2(int fd1, int fd2)
-{
-    return _dup2(fd1, fd2);
-}
-#endif
-#else
-int
-open(const char *file, int flags, int mode)
-{
-    DWORD access = 0;
-    DWORD shareMode = 0;
-    DWORD create = 0;
-    DWORD msflags = 0;
-    HANDLE foo = INVALID_HANDLE_VALUE;
-    const char *remap = file;
-
-    if (flags & O_WRONLY) access = GENERIC_WRITE;
-    else if (flags & O_RDWR) access = GENERIC_READ|GENERIC_WRITE;
-    else access = GENERIC_READ;
-
-    if (flags & O_CREAT) create = CREATE_NEW;
-    else create = OPEN_EXISTING;
-
-    if (flags & O_TRUNC) create = TRUNCATE_EXISTING;
-
-    if (!(flags & O_EXCL))
-        shareMode = FILE_SHARE_DELETE|FILE_SHARE_READ|FILE_SHARE_WRITE;
-
-    if (flags & O_APPEND) {
-        printf("open...APPEND not implemented yet.");
-        exit(-1);
-    }
-
-    if (p_CreateFileW) {
-       POOLMEM* pwszBuf = get_pool_memory(PM_FNAME);
-       make_win32_path_UTF8_2_wchar(pwszBuf, file);
-
-       foo = p_CreateFileW((LPCWSTR) pwszBuf, access, shareMode, NULL, create, msflags, NULL);
-       free_pool_memory(pwszBuf);
-    } else if (p_CreateFileA)
-       foo = CreateFile(file, access, shareMode, NULL, create, msflags, NULL);
-
-    if (INVALID_HANDLE_VALUE == foo) {
-        errno = b_errno_win32;
-        return(int) -1;
-    }
-    return (int)foo;
-
-}
-
-
-int
-close(int fd)
-{
-    if (!CloseHandle((HANDLE)fd)) {
-        errno = b_errno_win32;
-        return -1;
-    }
-
-    return 0;
-}
-
-ssize_t
-write(int fd, const void *data, ssize_t len)
-{
-    BOOL status;
-    DWORD bwrite;
-    status = WriteFile((HANDLE)fd, data, len, &bwrite, NULL);
-    if (status) return bwrite;
-    errno = b_errno_win32;
-    return -1;
-}
-
-
-ssize_t
-read(int fd, void *data, ssize_t len)
-{
-    BOOL status;
-    DWORD bread;
-
-    status = ReadFile((HANDLE)fd, data, len, &bread, NULL);
-    if (status) return bread;
-    errno = b_errno_win32;
-    return -1;
-}
-
-off_t
-lseek(int fd, off_t offset, int whence)
-{
-    DWORD method = 0;
-    DWORD val;
-    switch (whence) {
-    case SEEK_SET :
-        method = FILE_BEGIN;
-        break;
-    case SEEK_CUR:
-        method = FILE_CURRENT;
-        break;
-    case SEEK_END:
-        method = FILE_END;
-        break;
-    default:
-        errno = EINVAL;
-        return -1;
-    }
-
-    if ((val=SetFilePointer((HANDLE)fd, (DWORD)offset, NULL, method)) == INVALID_SET_FILE_POINTER) {
-       errno = b_errno_win32;
-       return -1;
-    }
-    /* ***FIXME*** I doubt this works right */
-    return val;
-}
-
-int
-dup2(int, int)
-{
-    errno = ENOSYS;
-    return -1;
-}
-
-
-#endif
-
-#endif //HAVE_MINGW
-
-#ifdef HAVE_MINGW
-/* syslog function, added by Nicolas Boichat */
 void closelog() {}
 void openlog(const char *ident, int option, int facility) {}  
-#endif //HAVE_MINGW
 
-/* Temp kludges ***FIXME**** */
-#ifdef __APCUPSD__
-unsigned int alarm(unsigned int seconds) 
+/* Implement syslog() using Win32 Event Service */
+void syslog(int type, const char *fmt, ...)
 {
-   return 0;
+   va_list arg_ptr;
+   char message[MAXSTRING];
+   HANDLE      heventsrc;
+   char *      strings[32];
+
+   va_start(arg_ptr, fmt);
+   avsnprintf(message, sizeof(message), fmt, arg_ptr);
+   va_end(arg_ptr);
+
+   strings[0] = message;
+
+   // Use event logging to log the error
+   heventsrc = RegisterEventSource(NULL, "Apcupsd");
+
+   if (heventsrc != NULL) {
+      MessageBeep(MB_OK);
+
+      ReportEvent(
+              heventsrc,              // handle of event source
+              EVENTLOG_ERROR_TYPE,    // event type
+              0,                      // event category
+              0,                      // event ID
+              NULL,                   // current user's SID
+              1,                      // strings in 'strings'
+              0,                      // no bytes of raw data
+              (const char **)strings, // array of error strings
+              NULL);                  // no raw data
+
+      DeregisterEventSource(heventsrc);
+   }
 }
-#endif
 
 /* Convert Win32 baud constants to POSIX constants */
 int posixbaud(DWORD baud)
@@ -2117,6 +1653,11 @@ int tcgetattr (int fd, struct termios *out)
    dcb.DCBlength = sizeof(DCB);
 
    HANDLE h = (HANDLE)_get_osfhandle(fd);
+   if (h == 0) {
+      errno = EBADF;
+      return -1;
+   }
+
    GetCommState(h, &dcb);
 
    memset(out, 0, sizeof(*out));
@@ -2149,6 +1690,11 @@ int tcsetattr (int fd, int optional_actions, const struct termios *in)
    dcb.DCBlength = sizeof(DCB);
 
    HANDLE h = (HANDLE)_get_osfhandle(fd);
+   if (h == 0) {
+      errno = EBADF;
+      return -1;
+   }
+
    GetCommState(h, &dcb);
 
    dcb.fBinary = 1;
@@ -2192,6 +1738,11 @@ int tcsetattr (int fd, int optional_actions, const struct termios *in)
 int tcflush(int fd, int queue_selector)
 {
    HANDLE h = (HANDLE)_get_osfhandle(fd);
+   if (h == 0) {
+      errno = EBADF;
+      return -1;
+   }
+
    DWORD flags = 0;
 
    switch (queue_selector) {
@@ -2217,6 +1768,11 @@ int tiocmbic(int fd, int bits)
    dcb.DCBlength = sizeof(DCB);
 
    HANDLE h = (HANDLE)_get_osfhandle(fd);
+   if (h == 0) {
+      errno = EBADF;
+      return -1;
+   }
+
    GetCommState(h, &dcb);
    
    if (bits & TIOCM_DTR)
@@ -2236,6 +1792,11 @@ int tiocmbis(int fd, int bits)
    dcb.DCBlength = sizeof(DCB);
 
    HANDLE h = (HANDLE)_get_osfhandle(fd);
+   if (h == 0) {
+      errno = EBADF;
+      return -1;
+   }
+
    GetCommState(h, &dcb);
    
    if (bits & TIOCM_DTR)
@@ -2243,7 +1804,7 @@ int tiocmbis(int fd, int bits)
    if (bits & TIOCM_RTS)
       dcb.fRtsControl = RTS_CONTROL_ENABLE;
    if (bits & TIOCM_SR)
-      d_msg(__FILE__, __LINE__, 99, "Win32 API does not allow reading ST\n");
+      d_msg(__FILE__, __LINE__, 99, "Win32 API does not allow setting ST\n");
 
    SetCommState(h, &dcb);
    return 0;
@@ -2254,6 +1815,11 @@ int tiocmget(int fd, int *bits)
    DWORD status;
 
    HANDLE h = (HANDLE)_get_osfhandle(fd);
+   if (h == 0) {
+      errno = EBADF;
+      return -1;
+   }
+   
    GetCommModemStatus(h, &status);
 
    *bits = 0;
@@ -2289,6 +1855,7 @@ int ioctl(int fd, int request, ...)
       break;
    default:
       rc = -1;
+      errno = EINVAL;
       break;
    }
 

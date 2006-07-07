@@ -136,8 +136,7 @@ LIB_OBJS = \
 	$(OBJDIR)/apcsignal.o \
 	$(OBJDIR)/apcstatus.o \
 	$(OBJDIR)/asys.o \
-	$(OBJDIR)/newups.o \
-	$(OBJDIR)/wincompat.o
+	$(OBJDIR)/newups.o
 
 #
 # Rules for generating from ../lib
@@ -177,9 +176,6 @@ $(OBJDIR)/asys.o: ../lib/asys.c
 	$(CXX) -c $< -o $@
 
 $(OBJDIR)/newups.o: ../lib/newups.c
-	$(CXX) -c $< -o $@
-
-$(OBJDIR)/wincompat.o: ../lib/wincompat.c
 	$(CXX) -c $< -o $@
 
 
