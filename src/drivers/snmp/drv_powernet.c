@@ -151,22 +151,6 @@ int powernet_snmp_ups_get_capabilities(UPSINFO *ups)
    return 1;
 }
 
-#define MIN(a, b) ( ((a) < (b)) ? (a) : (b) )
-
-/*
- * Copy a string from the SNMP library structure into the UPSINFO structure.
- * Structure member names are formed by simple patterns, so allow the caller
- * to specify nice readable names and build the ugly ones ourself. Source
- * strings are NOT nul-terminated, so let astrncpy terminate them for us.
- */
-#define SNMP_STRING(oid, field, dest) \
-   do \
-   {  \
-      astrncpy(ups->dest, \
-         (const char *)data->oid->oid##field, \
-         MIN(sizeof(ups->dest), data->oid->_##oid##field##Length+1)); \
-   }  \
-   while(0)
 
 int powernet_snmp_ups_read_static_data(UPSINFO *ups)
 {
