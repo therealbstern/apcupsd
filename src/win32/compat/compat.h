@@ -27,7 +27,7 @@
  * Last Modified By: Thorsten Engel
  * Last Modified On: Fri Apr 22 19:30:00 2004
  * Update Count    : 218
- * $Id: compat.h,v 1.10 2006-05-23 21:49:09 adk0212 Exp $
+ * $Id: compat.h,v 1.11 2006-07-07 13:06:57 adk0212 Exp $
  */
 
 
@@ -417,5 +417,8 @@ unsigned int alarm(unsigned int seconds);
 #define TIOCM_SR  0x010
 int ioctl(int, int, ...);
 #endif
+
+/* Return the smaller of a or b */
+#define MIN(a, b) ( ((a) < (b)) ? (a) : (b) )
 
 #endif /* __COMPAT_H_ */

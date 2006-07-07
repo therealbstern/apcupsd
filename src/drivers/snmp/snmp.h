@@ -50,6 +50,8 @@
 #include "powernet-mib.h"
 #include "rfc1628-mib.h"
 
+#include <sys/param.h>   /* for MIN() */
+
 /*
  * Copy a string from the SNMP library structure into the UPSINFO structure.
  * Structure member names are formed by simple patterns, so allow the caller
