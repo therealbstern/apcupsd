@@ -302,7 +302,7 @@ int main(int argc, char *argv[])
       Dmsg0(10, "NIS thread started.\n");
    }
 
-   log_event(ups, LOG_WARNING,
+   log_event(ups, LOG_INFO,
       "apcupsd " APCUPSD_RELEASE " (" ADATE ") " APCUPSD_HOST " startup succeeded");
 
    /* main processing loop */
