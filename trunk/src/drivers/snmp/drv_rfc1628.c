@@ -73,13 +73,86 @@ int rfc1628_snmp_ups_get_capabilities(UPSINFO *ups)
 
 int rfc1628_snmp_ups_read_static_data(UPSINFO *ups)
 {
-   rfc_1628_check_alarms(ups);
+   struct snmp_ups_internal_data *Sid =
+      (struct snmp_ups_internal_data *)ups->driver_internal_data;
+   struct snmp_session *s = &Sid->session;
+   ups_mib_t *data = (ups_mib_t *)Sid->MIB;
+   
+   if (rfc_1628_check_alarms(ups) == 0) {
+     return 0;
+   }
+
+   data->upsIdent = NULL;
+   ups_mib_mgr_get_upsIdent(s, &(data->upsIdent));
+   if (data->upsIdent) {
+      SNMP_STRING(upsIdent, Model, upsmodel);
+      SNMP_STRING(upsIdent, Name, upsname);
+      free(data->upsIdent);
+   }
+   
    return 1;
 }
 
 int rfc1628_snmp_ups_read_volatile_data(UPSINFO *ups)
-{
-   rfc_1628_check_alarms(ups);
+{  
+   struct snmp_ups_internal_data *Sid =
+      (struct snmp_ups_internal_data *)ups->driver_internal_data;
+   struct snmp_session *s = &Sid->session;
+   ups_mib_t *data = (ups_mib_t *)Sid->MIB;
+
+   if (rfc_1628_check_alarms(ups) == 0) {
+     return 0;
+   }
+
+   data->upsBattery = NULL;
+   ups_mib_mgr_get_upsBattery(s, &(data->upsBattery));
+   if (data->upsBattery) {
+      switch (data->upsBattery->__upsBatteryStatus) {
+      case 2:
+         ups->clear_battlow();
+         break;
+      case 3:
+         ups->set_battlow();
+         break;
+      default:                    /* Unknown, assume battery is ok */
+         ups->clear_battlow();
+         break;
+      }
+
+      ups->BattChg = data->upsBattery->__upsEstimatedChargeRemaining;
+      ups->UPSTemp = data->upsBattery->__upsBatteryTemperature;
+      ups->TimeLeft = data->upsBattery->__upsEstimatedMinutesRemaining;
+
+      free(data->upsBattery);
+   }
+
+   data->upsInputEntry = NULL;
+   ups_mib_mgr_get_upsInputEntry(s, &(data->upsInputEntry));
+   if (data->upsInputEntry) {
+      ups->LineVoltage = data->upsInputEntry->__upsInputVoltage;
+      ups->LineFreq    = data->upsInputEntry->__upsInputFrequency / 10;
+
+      if (ups->LineMax < ups->LineVoltage) {
+         ups->LineMax = ups->LineVoltage;
+      }
+
+      if (ups->LineMin > ups->LineVoltage || ups->LineMin == 0) {
+         ups->LineMin = ups->LineVoltage;
+      }
+
+      free(data->upsInputEntry);
+   }
+
+   data->upsOutputEntry = NULL;
+   ups_mib_mgr_get_upsOutputEntry(s, &(data->upsOutputEntry));
+   if (data->upsOutputEntry) {
+      ups->OutputVoltage = data->upsOutputEntry->__upsOutputVoltage;
+      ups->UPSLoad 	 = data->upsOutputEntry->__upsOutputPercentLoad;
+      ups->OutputCurrent = data->upsOutputEntry->__upsOutputCurrent;
+
+      free(data->upsOutputEntry);
+   }
+
    return 1;
 }
 

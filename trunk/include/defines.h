@@ -439,5 +439,7 @@ void d_msg(const char *file, int line, int level, const char *fmt, ...);
 #define TV_DIFF_MS(a, b) \
     (((b).tv_sec - (a).tv_sec) * 1000 + ((b).tv_usec - (a).tv_usec) / 1000)
 
+/* Get the min between a and b. */
+#define MIN(a, b) ( ((a) < (b)) ? (a) : (b) )
 
 #endif   /* _DEFINES_H */
