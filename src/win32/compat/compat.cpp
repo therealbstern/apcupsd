@@ -19,7 +19,7 @@
 //
 // Author          : Christopher S. Hull
 // Created On      : Sat Jan 31 15:55:00 2004
-// $Id: compat.cpp,v 1.14 2006-07-07 14:04:49 adk0212 Exp $
+// $Id: compat.cpp,v 1.15 2006-07-07 22:51:46 adk0212 Exp $
 
 #include "apc.h"
 #include "compat.h"
@@ -1509,22 +1509,36 @@ kill(int pid, int signal)
    return rval;
 }
 
-void closelog() {}
-void openlog(const char *ident, int option, int facility) {}  
-
 /* Implement syslog() using Win32 Event Service */
 void syslog(int type, const char *fmt, ...)
 {
    va_list arg_ptr;
    char message[MAXSTRING];
-   HANDLE      heventsrc;
-   char *      strings[32];
+   HANDLE heventsrc;
+   char* strings[32];
+   WORD wtype;
 
    va_start(arg_ptr, fmt);
    avsnprintf(message, sizeof(message), fmt, arg_ptr);
    va_end(arg_ptr);
 
    strings[0] = message;
+
+   // Convert syslog type to Win32 type. This mapping is somewhat arbitrary
+   // since there are many more LOG_* types than EVENTLOG_* types.
+   switch (type) {
+   case LOG_ERR:
+   case LOG_CRIT:
+      wtype = EVENTLOG_ERROR_TYPE;
+      break;
+   case LOG_ALERT:
+   case LOG_WARNING:
+      wtype = EVENTLOG_WARNING_TYPE;
+      break;
+   default:
+      wtype = EVENTLOG_INFORMATION_TYPE;
+      break;
+   }
 
    // Use event logging to log the error
    heventsrc = RegisterEventSource(NULL, "Apcupsd");
@@ -1534,7 +1548,7 @@ void syslog(int type, const char *fmt, ...)
 
       ReportEvent(
               heventsrc,              // handle of event source
-              EVENTLOG_ERROR_TYPE,    // event type
+              wtype,                  // event type
               0,                      // event category
               0,                      // event ID
               NULL,                   // current user's SID
