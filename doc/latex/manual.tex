@@ -5216,7 +5216,7 @@ Computer B could be shutdown by the first master that signaled it to do so.
 \addcontentsline{toc}{section}{Support for SNMP UPSes}
 
 \label{index-SNMP-162}
-To run apcupsd with an SNMP UPS, you need the following things:  
+To run apcupsd with a SNMP UPS, you need the following things:  
 
 \begin{itemize}
 \item An SNMP UPS, for example a Web/SNMP (AP9716) or PowerNet SNMP (AP9605)
@@ -5227,14 +5227,208 @@ card installed into the SmartSlot.
    ucd-snmp) installed 
 \end{itemize}
 
-\label{Connecting-an-SNMP-UPS}
+\label{Planning-SNMP-Setup-Wiring}
 
-\subsection*{Connecting an SNMP UPS}
-\index{Connecting an SNMP UPS }
-\index{UPS!Connecting an SNMP }
-\addcontentsline{toc}{subsection}{Connecting an SNMP UPS}
+\subsection*{Planning and Setup for SNMP Wiring}
+\index{SNMP Wiring Setup}
+\addcontentsline{toc}{subsection}{Planning and Setup for SNMP Wiring}
+
+\label{index-SNMP_002d-Wiring-163}
+SNMP packet requests are relayed to the UPS from monitoring APCUPSD servers over
+Ethernet via a switch, hub, or router.  Protecting these Ethernet devices
+with UPS supplied power is necessary to ensure reliable SNMP communication
+during power failures.   Servers may fail to shutdown quietly during power failures
+if SNMP communication is lost.
+
+\label{Planning-SNMP-Setup-Configuration}
+
+\subsection*{Planning and Setup for SNMP Configuration}
+\index{SNMP Configuration Setup}
+\addcontentsline{toc}{subsection}{Planning and Setup for SNMP Configuration}
+To establish communication to the UPS SNMP card installed in the UPS, the
+SNMP card will need the following:
+\begin{itemize}
+\item Assign SNMP card IP Address
+\item Set SNMP card General Parameters
+\item Set SNMP card Shutdown Parameters
+\item Set SNMP card Event Trap Receivers (apcupsd-3.12.0 and later)
+\end{itemize}
+
+\subsubsection*{Assign SNMP Card IP Address}
+\index{SNMP Configure IP Address}
+\footnotesize
+\begin{verbatim}
+  	The following instructions come from the APC knowledge base:   
+\end{verbatim}
+
+\normalsize
+The Network Management Card (AP9617, AP9618, AP9619) must be configured with
+network settings before it can communicate on the network. Once the cards have been
+configured with an IP address, Subnet Mask, and Default Gateway the cards can be
+access, managed, and controlled from other computers on the network.
+
+There are two ways to configure the Network Management Card (NMC) with its
+initial settings: the (windows) Wizard and Address Resolution Protocol (ARP).
+
+1.  The wizard in included on the CD that comes with the card.  The wizard must
+run on a Windows operating system.  You can configure the card using the wizard over
+the network via FTP.  If using the wizard please note, the un-configured NMC must
+be on the same subnet as the computer running the wizard.
+
+2.  Address resolution protocol (arp) can also be used to configure the NMC.  The MAC
+Address of the NMC is needed for this method of configuration.  The MAC address is
+located on the quality assurance slip that is shipped with the NMC, and is also
+located on the white sticker on the NMC itself.  From a computer on the same
+subnet as the un-configured NMC, follow the instructions:
+
+Open up a command prompt and type the following (replacing <IPaddress> and <MacAddress>
+with the actual values):
+
+arp -s <IPaddress> <MacAddress>
+
+Next, use Ping with a size of 113 bytes to assign the IP address defined by the ARP
+command.
+
+\begin{itemize}
+\item Linux command format:   {\bf ping} <IPaddress> -s 113
+\item Windows command format: {\bf ping} <IPaddress> -l 113
+\end{itemize}
+
+
+\subsubsection*{Set SNMP card General Parameters}
+\index{SNMP Configure General Parameters}
+After the SNMP Network Management Card is configured with an IP address, the SNMP Card
+is ready for general configuration.  This is accomplished by telneting to the SNMP Card.
+
+\footnotesize
+\begin{verbatim}
+     ~$ telnet <IPaddress>
+\end{verbatim}
+\normalsize
+
+Login using "apc" for both the username and password and the following menu will display:
+
+
+
+
+
+\footnotesize
+\begin{verbatim}
+*******************************************************************************
+American Power Conversion               Network Management Card AOS      v2.6.4
+(c) Copyright 2004 All Rights Reserved  Smart-UPS & Matrix-UPS APP       v2.6.1
+-------------------------------------------------------------------------------
+Name      : 	 	                              Date : 07/03/2006	       
+Contact   :     		                      Time : 04:43:33
+Location  : 			                      User : Administrator
+Up Time   : 0 Days 01 Hours 57 Minutes                Stat : P+ N+ A+
+
+Smart-UPS 1000 named  : On Line, No Alarms Present
+
+------- Control Console -------------------------------------------------------
+
+     1- Device Manager
+     2- Network
+     3- System
+     4- Logout
+
+     <ESC>- Main Menu, <ENTER>- Refresh, <CTRL-L>- Event Log
+>
+*******************************************************************************
+\end{verbatim}
+
+
+
+
+
+
+
+\normalsize
+Select {\bf Option 2} for Network.
+Next select {\bf Option 1} for TCP/IP settings.
+
+At this point the following settings will be to be specified:
+
+\begin{itemize}
+\item Verify System IP: <IPaddress>
+\item Specify Subnet Mask:  i.e. "225.225.225.0"
+\item Specify Default Gateway
+\item Specify Host Name
+\item Specify Domain Name
+\end{itemize}
+
+Specifying these parameters will complete the General Parameters setup.  
+Additionally the SNMP Network Management Card can now be connected to from 
+a web browser for monitoring and additional configuration.
+
+
+\subsubsection*{Set SNMP card Shutdown Parameters}
+\index{SNMP Configure Shutdown Parameters}
+
+There are two shutdown parameters that must be set in the SNMP card to ensure that
+connected servers shutdown quietly.  These parameters can be set via the telnet terminal
+or the web browser interface.
+
+\begin{itemize}
+\item Shutdown Delay (sec)
+\item Return Battery Capacity (\%)
+\end{itemize}
+
+One of the draw-backs of SNMP communication to the UPS is that the Stand-alone or Primary
+server must issue the power down command to the UPS early in server halt procedure.
+This server must issue an early command to the SNMP UPS to power down before its ethernet
+service is halted.  This creates a potential problem where the UPS may kill power to any
+connected servers before these affected servers' halt scripts complete a successful shutdown.
+
+
+The SNMP {\bf Shutdown Delay} parameter is used to delay the UPS from killing power to its load
+by a prescribed period of seconds.  The delay should be long enough to ensure that the 
+Stand-alone or Primary server has enough time to successfully halt.  The prescribed time should at least
+be 180 seconds. Any additional computers connected to the SNMP UPS must not be configured
+to issue the command to initiate UPS power down.  These servers can be thought of as secondary
+stand-alone server.  The APCUPSD daemons of secondary servers should be configured to initiate server
+halt a prescribed period of time before the Primary server issues the UPS power down command.
+
+
+The {\bf Return on Battery Capacity} is useful during intermittent sequential power failures.
+This parameter insures that the UPS will not restore power to its loads until it has
+recharged it battery to a prescribed percentage. This parameter should be set to a value
+greater than value that the APCUPSD daemons configured "BATTERYLEVEL" shutdown of any
+connected servers.  This will ensure that when the UPS restores power, any additional power
+failures will successfully re-trigger a server shutdown.
+
+
+
+\subsubsection*{Configure Event Trap Receivers (apcupsd-3.12.0 and later)}
+\index{SNMP Configure Event Trap Recievers}
+
+By default, APCUPSD will poll the SNMP UPS card once per minute.  In this case,
+server notification of UPS alarms could potentially be delayed one minute.  Event trap
+catching mitigates this shortcoming.  Any UPS alarms are instantly sent to 
+prescribe servers connected SNMP UPS.  These servers are referred to as Event Trap Receivers.
+The SNMP UPS card can be configure to send event traps to a maximum of four 
+receivers that will "catch" these events.  
+
+Event trap receivers IP address can be set using a telnet terminal or web browser interface.
+
+Also, be aware that servers configured to be Event Trap Receivers should have static IP set.
+Severs obtaining IPs from DHCP server will not catch instantaneous Events if the IP address changes from
+the address set in the SNMP UPS.
+
+\label{Connecting-APCUPSD-to-a-SNMP-UPS}
+
+\subsection*{Connecting APCUPSD to a SNMP UPS}
+\index{Connecting APCUPSD to a SNMP UPS }
+\index{UPS!Connecting APCUPSD to a SNMP }
+\addcontentsline{toc}{subsection}{Connecting APCUPSD to a SNMP UPS}
 
 \label{index-SNMP_002c-Connecting-163}
+
+The previous sections describe configuration of the actual SNMP card.
+The remaining sections describe configuration of the APCUPSD to communicate
+using SNMP Protocol.
+
+
 The Simple Network Management Protocol provides an interface to connect to
 remote devices through the network. apcupsd is now capable of using the SNMP
 interface of an SNMP-enabled UPS to communicate with an UPS. Currently apcupsd
@@ -5248,7 +5442,7 @@ directive needed for this configuration is:
 \end{verbatim}
 \normalsize
 
-where the directive is made by four parts:  
+Where the directive is made by four parts:  
 
 \begin{itemize}
 \item {\bf host}: IP address of the remote UPS  
@@ -5256,9 +5450,22 @@ where the directive is made by four parts:
 \item {\bf vendor}: Kind of remote SNMP agent: ``APC'' for APC's PowerNet MIB, 
 ``APC\_NOTRAP'' for the PowerNet MIB with SNMP trap catching disabled, or "RFC"
 for the IETF's rfc1628 UPS-MIB. (Note that APC\_NOTRAP is only accepted by 
-apcupsd-3.11.14 and higher. See below for trap catching details.)
+apcupsd-3.12.0 and higher. See below for trap catching details.)
 \item {\bf community}: The read-write community string, usually ``private''
 \end{itemize}
+
+
+If more than one server is connected to the UPS the following configuration
+types still apply to SNMP enable UPS. (see \ilink{Choosing a Configuration Type}
+{Choosing-a-Configuration-Type}).  A NIS Server/Client (Master/Slave) configuration
+with multiple servers is still applicable.
+ 
+However, an alternative configuration is possible with an SNMP enabled UPS.  In
+this arrangement, all connected servers will be configured as a standalone server.
+Each will independently communicate to the UPS.  One (primary) server will be 
+chosen to manage the task of commanding the UPS to power down. All remaining
+(secondary) servers will be configured to quietly power down before the
+primary server issues the UPS power down command. 
 
 \subsection*{Building with SNMP support}
 \index{Building with SNMP support}
@@ -5288,7 +5495,7 @@ being sure to include the following options (in addition to any others you need)
 
 apcupsd-3.11.14 introduces support for SNMP trap catching with the APC
 PowerNet MIB driver. Previous versions polled the UPS status once per minute, 
-leading to significany delays before UPS state changes were recognized. With 
+leading to significant delays before UPS state changes were recognized. With 
 SNMP trap handling, apcupsd monitors the SNMP trap port and will re-poll the
 UPS whenever a trap is received. This happens, for example, when the UPS 
 switches on or off battery.
@@ -5328,13 +5535,23 @@ during powerdown do the following:
 \item Connect to your Web/SNMP card using your favorite web browser, go to the
    UPS configuration menu and change the ``Shutdown Delay'' parameter to 180
    seconds or more, depending on how much time your system shutdown requires to
-umount all the filesystems.  
-\item Change /etc/rc.d/apcupsd script adding the '{---}kill-on-powerfail' to
-   the apcupsd invocation.  
+umount all the filesystems.
+\item {\bf Option 1 (non-windows)} Edit the server halt script.  Relocate the 
+ups\_kill\_power() function higher in the shutdown sequence, primarily before
+the command to bring down the ethernet service. This is the preferred method
+for shutting down the UPS.  The UPS will power down after the prescribed
+"Shut Down Delay" time (in seconds) has elapsed.
+\item {\bf Option 2} Change /etc/rc.d/apcupsd script adding the '{---}kill-on-powerfail'
+to the apcupsd invocation.  This method is not preferred because the UPS is
+commanded to power down without delay.  This creates the potential for UPS
+powering down before the server calling for UPS power down completes its shutdown.
+However, in the case of Microsoft Windows OS, this is the only method available
+for powering down the UPS.
 \item Restart your apcupsd 
    \end{itemize}
 
 With this setup your UPS operations should be safe. 
+
 
 \label{Running-The-Network-Information-Server}
 
