@@ -19,6 +19,11 @@
 !include "util.nsh"
 
 ;
+; Use Logic Library to improve readability
+;
+!include "LogicLib.nsh"
+
+;
 ; Basics
 ;
   Name "Apcupsd"
@@ -54,6 +59,16 @@ DirText "Setup will install Apcupsd ${VERSION} to the directory \
          $\n$\nDO NOT CHANGE THIS SETTING UNLESS YOU HAVE AN \
          EXISTING CYGWIN INSTALLATION."
 
+Function .onInit
+  ;
+  ; Default INSTDIR to %SystemDrive%\apcupsd
+  ;
+  ReadEnvStr $0 SystemDrive
+  ${If} $0 == ''
+     StrCpy $0 'c:'
+  ${EndIf}
+  StrCpy $INSTDIR $0\apcupsd
+FunctionEnd
 
 Section "Apcupsd Service" SecService
   ;
