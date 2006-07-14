@@ -54,10 +54,7 @@
 
 
 DirText "Setup will install Apcupsd ${VERSION} to the directory \
-         specified below. $\n$\nNote to CYGWIN users: Please use \
-         the folder name $\"apcupsd$\" in your CYGWIN root directory. \
-         $\n$\nDO NOT CHANGE THIS SETTING UNLESS YOU HAVE AN \
-         EXISTING CYGWIN INSTALLATION."
+         specified below."
 
 Function .onInit
   ;
@@ -71,20 +68,6 @@ Function .onInit
 FunctionEnd
 
 Section "Apcupsd Service" SecService
-  ;
-  ; /cygwin on command line forces install dir to c:\cygwin\apcupsd (useful for silent install)
-  ;
-  Push "/cygwin"
-  Call ParameterGiven
-  Pop $6
-  StrCmp $6 0 NoCygwin
-  StrCpy $INSTDIR "c:\cygwin\apcupsd"
- NoCygwin:
-; IfFileExists "c:\cygwin\bin\cygwin1.dll" Cygwin ReallyNoCygwin
-;Cygwin:
-; StrCpy $INSTDIR "c:\cygwin\apcupsd"
-;ReallyNoCygwin:
-
   ; Check for existing installation
   StrCpy $7 0
   IfFileExists "$INSTDIR\etc\apcupsd\apcupsd.conf" Upgrade NoUpgrade
@@ -100,6 +83,7 @@ Section "Apcupsd Service" SecService
   SetOutPath "$INSTDIR\bin"
   CreateDirectory "$INSTDIR"
   CreateDirectory "$INSTDIR\bin"
+  CreateDirectory "$INSTDIR\driver"
   CreateDirectory "$INSTDIR\etc"
   CreateDirectory "$INSTDIR\etc\apcupsd"
   CreateDirectory "$INSTDIR\examples"
@@ -111,19 +95,20 @@ Section "Apcupsd Service" SecService
   ;       in the uninstaller!
   ;
   
-  File \cygwin\bin\cygwin1.dll
-  File \cygwin\bin\cygiconv-2.dll
-  File \cygwin\bin\cygintl-3.dll
-  File \cygwin\bin\cygncurses-8.dll
-  File \cygwin\bin\cygreadline6.dll
-  File \cygwin\bin\sh.exe
-  File ..\apcupsd.exe
-  File ..\smtp.exe
-  File ..\apcaccess.exe
-  File ..\apctest.exe
+  File mingwm10.dll
+  File pthreadGCE.dll
+  File apcupsd.exe
+;  File smtp.exe
+  File apcaccess.exe
+;  File apctest.exe
   File popup.exe 
   File shutdown.exe
-  File email.exe
+;  File email.exe
+
+  SetOutPath "$INSTDIR\driver"
+  File ..\..\platforms\mingw\apcupsd.inf
+  File ..\..\..\depkgs-win32\libusb-win32\libusb0.sys
+  File ..\..\..\depkgs-win32\libusb-win32\libusb0.dll
 
   SetOutPath "$INSTDIR\examples"
   File ..\..\examples\*
@@ -135,7 +120,7 @@ Section "Apcupsd Service" SecService
   File ..\..\ReleaseNotes
 
   SetOutPath "$INSTDIR\etc\apcupsd"
-  File ..\..\platforms\cygwin\apccontrol
+  File ..\..\platforms\mingw\apccontrol.bat
   IfFileExists "$INSTDIR\etc\apcupsd\apcupsd.conf" newconf 
   File ..\..\platforms\etc\apcupsd.conf
   goto do_service
@@ -222,8 +207,13 @@ NoReminder:
  NoStart:
 SectionEnd
 
+Section "USB Driver" SecUsbDrv
+  SetOutPath "$SYSDIR"
+  File ..\..\..\depkgs-win32\libusb-win32\libusb0.dll
+  ExecWait 'rundll32 libusb0.dll,usb_install_driver_np_rundll $INSTDIR\driver\apcupsd.inf'
+SectionEnd
 
-Section "Install Documentation" SecDoc
+Section "Documentation" SecDoc
   SetOutPath "$INSTDIR\doc"
   CreateDirectory "$INSTDIR\doc"
   File ..\..\doc\latex\manual.html
@@ -233,17 +223,20 @@ Section "Install Documentation" SecDoc
   CreateShortCut "$SMPROGRAMS\Apcupsd\Manual.lnk" "$INSTDIR\doc\manual.html"
 SectionEnd
 
+
 ;
 ; Extra Page descriptions
 ;
 
-  LangString DESC_SecService ${LANG_ENGLISH} "Install Apcupsd on this system."
-  LangString DESC_SecDoc ${LANG_ENGLISH} "Install Documentation on this system."
+LangString DESC_SecService ${LANG_ENGLISH} "Install Apcupsd on this system."
+LangString DESC_SecUsbDrv ${LANG_ENGLISH} "Install USB driver. Required if you have a USB UPS."
+LangString DESC_SecDoc ${LANG_ENGLISH} "Install Documentation on this system."
 
-  !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-    !insertmacro MUI_DESCRIPTION_TEXT ${SecService} $(DESC_SecService)
-    !insertmacro MUI_DESCRIPTION_TEXT ${SecDoc} $(DESC_SecDoc)
-  !insertmacro MUI_FUNCTION_DESCRIPTION_END
+!insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecService} $(DESC_SecService)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecUsbDrv} $(DESC_SecUsbDrv)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecDoc} $(DESC_SecDoc)
+!insertmacro MUI_FUNCTION_DESCRIPTION_END
 
 
 
@@ -272,12 +265,8 @@ Section "Uninstall"
   RMDir /REBOOTOK "$SMPROGRAMS\Apcupsd"
 
   ; remove files and uninstaller (preserving config for now)
-  Delete /REBOOTOK "$INSTDIR\bin\cygwin1.dll"
-  Delete /REBOOTOK "$INSTDIR\bin\cygiconv-2.dll"
-  Delete /REBOOTOK "$INSTDIR\bin\cygintl-3.dll"
-  Delete /REBOOTOK "$INSTDIR\bin\cygncurses-8.dll"
-  Delete /REBOOTOK "$INSTDIR\bin\cygreadline6.dll"
-  Delete /REBOOTOK "$INSTDIR\bin\sh.exe"
+  Delete /REBOOTOK "$INSTDIR\bin\mingwm10.dll"
+  Delete /REBOOTOK "$INSTDIR\bin\pthreadGCE.dll"
   Delete /REBOOTOK "$INSTDIR\bin\apcupsd.exe"
   Delete /REBOOTOK "$INSTDIR\bin\smtp.exe"
   Delete /REBOOTOK "$INSTDIR\bin\apcaccess.exe"
@@ -285,13 +274,14 @@ Section "Uninstall"
   Delete /REBOOTOK "$INSTDIR\bin\popup.exe"
   Delete /REBOOTOK "$INSTDIR\bin\shutdown.exe"
   Delete /REBOOTOK "$INSTDIR\bin\email.exe"
+  Delete /REBOOTOK "$INSTDIR\driver\*"
   Delete /REBOOTOK "$INSTDIR\examples\*"
   Delete /REBOOTOK "$INSTDIR\README.txt"
   Delete /REBOOTOK "$INSTDIR\COPYING"
   Delete /REBOOTOK "$INSTDIR\ChangeLog"
   Delete /REBOOTOK "$INSTDIR\ReleaseNotes"
   Delete /REBOOTOK "$INSTDIR\Uninstall.exe"
-  Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apccontrol"
+  Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apccontrol.bat"
   Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apcupsd.conf.new"
   Delete /REBOOTOK "$INSTDIR\doc\*"
 
@@ -303,9 +293,10 @@ Section "Uninstall"
   LeaveConfig:
   ; remove directories used
   RMDir "$INSTDIR\bin"
-  RMDir "$INSTDIR\doc"
+  RMDir "$INSTDIR\driver"
   RMDir "$INSTDIR\etc\apcupsd"
   RMDir "$INSTDIR\etc"
+  RMDir "$INSTDIR\doc"
   RMDir "$INSTDIR\examples"
   RMDir "$INSTDIR"
   RMDir "C:\tmp"
