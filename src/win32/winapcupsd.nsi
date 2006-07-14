@@ -1,12 +1,9 @@
 ; winapcupsd.nsi
 ;
 ; Adapted by Kern Sibbald for apcupsd from Bacula code
+; Further modified by Adam Kropelin
 ;
 ; Command line options:
-;
-; /cygwin     -  do cygwin install into c:\cygwin\apcupsd
-; /service    - 
-; /start
 
 !define PRODUCT "Apcupsd"
 
@@ -14,7 +11,7 @@
 ; Include the Modern UI
 ;
 !include "MUI.nsh"
-!include "params.nsh"
+;!include "params.nsh"
 !include "util.nsh"
 
 ;
@@ -31,10 +28,22 @@
   InstallDir "c:\apcupsd"
 
 ;
+; Page customization
+;
+!define MUI_FINISHPAGE_RUN
+!define MUI_FINISHPAGE_RUN_TEXT "Start Apcupsd (Be sure to edit apcupsd.conf first!)"
+!define MUI_FINISHPAGE_RUN_FUNCTION "StartApcupsd"
+!define MUI_FINISHPAGE_SHOWREADME
+!define MUI_FINISHPAGE_SHOWREADME_TEXT "View the ReleaseNotes"
+!define MUI_FINISHPAGE_SHOWREADME_FUNCTION "ShowReadme"
+!define MUI_FINISHPAGE_LINK "Visit Apcupsd Website"
+!define MUI_FINISHPAGE_LINK_LOCATION "http://www.apcupsd.com"
+
+;
 ; Pull in pages
 ;
  !insertmacro MUI_PAGE_WELCOME
-;  !insertmacro MUI_PAGE_LICENSE "License.txt"
+ !insertmacro MUI_PAGE_LICENSE "..\..\COPYING"
  !insertmacro MUI_PAGE_COMPONENTS
  !insertmacro MUI_PAGE_DIRECTORY
  !insertmacro MUI_PAGE_INSTFILES
@@ -44,8 +53,7 @@
  !insertmacro MUI_UNPAGE_CONFIRM
  !insertmacro MUI_UNPAGE_INSTFILES
  !insertmacro MUI_UNPAGE_FINISH
-
-
+ 
  !define      MUI_ABORTWARNING
 
  !insertmacro MUI_LANGUAGE "English"
@@ -54,6 +62,14 @@
 
 DirText "Setup will install Apcupsd ${VERSION} to the directory \
          specified below."
+
+Function StartApcupsd
+  ExecShell "" "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "" SW_HIDE
+FunctionEnd
+
+Function ShowReadme
+  Exec 'write "$INSTDIR\ReleaseNotes"'
+FunctionEnd
 
 Function .onInit
   ;
@@ -69,14 +85,13 @@ FunctionEnd
 Section "Apcupsd Service" SecService
   ; Check for existing installation
   StrCpy $7 0
-  IfFileExists "$INSTDIR\etc\apcupsd\apcupsd.conf" Upgrade NoUpgrade
- Upgrade:
+  ${If} ${FileExists} "$INSTDIR\etc\apcupsd\apcupsd.conf"
     StrCpy $7 1
     ; Shutdown any apcupsd that could be running
     ExecWait '"$INSTDIR\bin\apcupsd.exe" /kill'
     ; give it some time to shutdown
     Sleep 3000
- NoUpgrade:
+  ${EndIf}
 
   ; Set output path to the installation directory.
   SetOutPath "$INSTDIR\bin"
@@ -113,97 +128,67 @@ Section "Apcupsd Service" SecService
   File ..\..\examples\*
 
   SetOutPath "$INSTDIR"
-  File ..\..\platforms\cygwin\README.txt
+;  File ..\..\platforms\cygwin\README.txt
   File ..\..\COPYING
   File ..\..\ChangeLog
   File ..\..\ReleaseNotes
 
   SetOutPath "$INSTDIR\etc\apcupsd"
   File ..\..\platforms\mingw\apccontrol.bat
-  IfFileExists "$INSTDIR\etc\apcupsd\apcupsd.conf" newconf 
-  File ..\..\platforms\etc\apcupsd.conf
-  goto do_service
- newconf:
-  File /oname=apcupsd.conf.new ..\..\platforms\etc\apcupsd.conf
-       
-  ; If /service was given jump to the service install part
- do_service:
-  Push "/service"
-  Call ParameterGiven
-  Pop $5
-  StrCmp $5 1 Service
-  
-  ; If silent install and not /service don't ask questions and goto NoService...
-  IfSilent NoService
 
-  ; If already installed as service skip it too
+  ; Install apcupsd.conf as apcupsd.conf.new if apcupsd.conf already exists
+  ${If} ${FileExists} "$INSTDIR\etc\apcupsd\apcupsd.conf"
+    File /oname=apcupsd.conf.new ..\..\platforms\etc\apcupsd.conf
+  ${Else}
+    File ..\..\platforms\etc\apcupsd.conf
+  ${EndIf}
+
+  ; If already installed as service skip the option
   ReadRegDWORD $9 HKLM "Software\Apcupsd" "InstalledService"
-  StrCmp $9 "1" NoService  
-
-  ; Install as service?
-  MessageBox MB_YESNO|MB_ICONQUESTION "Do you want to install Apcupsd as a service (automatically starts with your PC)?" IDNO NoService
- Service:
-    ExecWait '"$INSTDIR\bin\apcupsd.exe" /install'
-    StrCpy $9 "1"
-    WriteRegDWORD HKLM "Software\Apcupsd" "InstalledService" "1"
- NoService:
+  ${Unless} $9 == 1
+    ; Install as service?
+    ${If} ${Cmd} 'MessageBox MB_YESNO|MB_ICONQUESTION "Do you want to install Apcupsd as a service$\n(automatically starts with your PC)?" IDYES'
+      ExecWait '"$INSTDIR\bin\apcupsd.exe" /install'
+      StrCpy $9 "1"
+      WriteRegDWORD HKLM "Software\Apcupsd" "InstalledService" "1"
+    ${EndIf}
+  ${EndUnless}
 
   ; Create Start Menu Directory
   SetShellVarContext all
   CreateDirectory "$SMPROGRAMS\Apcupsd"
 
   ; Create a start menu link to start apcupsd (possibly as a service)
-  StrCmp $9 "1" +4
-  CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe"
-  CreateShortCut "$SMPROGRAMS\Apcupsd\Stop Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "/kill"
-  Goto L2
-  Call IsNt
-  Pop $R0
-  StrCmp $R0 "false" 0 +4
-  CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "/service"
-  CreateShortCut "$SMPROGRAMS\Apcupsd\Stop Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "/kill"
-  Goto L2
-  CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$SYSDIR\net.exe" "start apcupsd" "$INSTDIR\bin\apcupsd.exe"
-  CreateShortCut "$SMPROGRAMS\Apcupsd\Stop Apcupsd.lnk" "$SYSDIR\net.exe" "stop apcupsd" "$INSTDIR\bin\apcupsd.exe"
+  ${If} $9 != 1
+    ; Not installed as a service
+    CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe"
+    CreateShortCut "$SMPROGRAMS\Apcupsd\Stop Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "/kill"
+  ${Else}
+    Call IsNt
+    Pop $R0
+    ${If} $R0 == false
+      ; Installed as a service, but not on NT
+      CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "/service"
+      CreateShortCut "$SMPROGRAMS\Apcupsd\Stop Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "/kill"
+    ${Else}
+      ; Installed as a service and we're on NT
+      CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$SYSDIR\net.exe" "start apcupsd" "$INSTDIR\bin\apcupsd.exe"
+      CreateShortCut "$SMPROGRAMS\Apcupsd\Stop Apcupsd.lnk" "$SYSDIR\net.exe" "stop apcupsd" "$INSTDIR\bin\apcupsd.exe"
+    ${EndIf}
+  ${EndIf}
 
- L2:
   ; Write the uninstall keys for Windows & create Start Menu entry
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apcupsd" "DisplayName" "Apcupsd"
   WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apcupsd" "UninstallString" '"$INSTDIR\uninstall.exe"'
   WriteUninstaller "$INSTDIR\Uninstall.exe"
   CreateShortCut "$SMPROGRAMS\Apcupsd\Uninstall Apcupsd.lnk" "$INSTDIR\Uninstall.exe"
 
-  ; Create apcupsd.conf and have the user edit it (skipped if silent)
-  IfSilent NoReminder
-  StrCmp $7 "1" NoReminder  ; skip if it is an upgrade
-  MessageBox MB_OK "Please edit the client configuration file $INSTDIR\etc\apcupsd\apcupsd.conf \
-                    to fit your installation. When you click the OK button Wordpad will open to \
-                    allow you to do this. Be sure to save your changes before closing Wordpad."
-  Exec 'write "$INSTDIR\etc\apcupsd\apcupsd.conf"'  ; spawn wordpad with the file to be edited
-NoReminder:
-
-  ; Start the client? (default skipped if silent, use /start to force starting)
-  Push "/start"
-  Call ParameterGiven
-  Pop $8
-  StrCmp $8 "1" Start
-  IfSilent NoStart
-  Call IsNt
-  Pop $R0
-  StrCmp $R0 "false" do_win98
-  MessageBox MB_YESNO|MB_ICONQUESTION  "Would you like to start Apcupsd now?" IDNO SetPerms
-  Exec 'net start apcupsd'
-  Sleep 3000
- SetPerms:
-  ; set default permissions on config file so it's not world readable
-  Exec 'cmd /C echo Y|cacls "$INSTDIR\etc\apcupsd\apcupsd.conf" /G SYSTEM:F Administrators:F'
-  goto NoStart 
- do_win98:
-  MessageBox MB_YESNO|MB_ICONQUESTION  "Would you like to start Apcupsd now?" IDNO NoStart
- Start:
-  Exec "$INSTDIR\bin\apcupsd.exe"
-  Sleep 3000
- NoStart:
+  ${If} $7 != 1
+    MessageBox MB_OK "Please edit the client configuration file $INSTDIR\etc\apcupsd\apcupsd.conf \
+                      to fit your installation. When you click the OK button Wordpad will open to \
+                      allow you to do this. Be sure to save your changes before closing Wordpad."
+    Exec 'write "$INSTDIR\etc\apcupsd\apcupsd.conf"'  ; spawn wordpad with the file to be edited
+  ${EndUnless}
 SectionEnd
 
 Section "USB Driver" SecUsbDrv
@@ -249,11 +234,11 @@ Section "Uninstall"
   ExecWait '"$INSTDIR\bin\apcupsd.exe" /kill'
 
   ReadRegDWORD $9 HKLM "Software\Apcupsd" "InstalledService"
-  StrCmp $9 "" NoService
-  ; Remove apcuspd service
-  ExecWait '"$INSTDIR\bin\apcupsd.exe" /remove'
-  NoService:
-  
+  ${If} $9 == 1
+    ; Remove apcuspd service
+    ExecWait '"$INSTDIR\bin\apcupsd.exe" /remove'
+  ${EndIf}
+
   ; remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apcupsd"
   DeleteRegKey HKLM "Software\Apcupsd"
@@ -285,11 +270,11 @@ Section "Uninstall"
   Delete /REBOOTOK "$INSTDIR\doc\*"
 
   ; Delete conf if user approves
-  MessageBox MB_YESNO|MB_ICONQUESTION "Would you like to delete the current configuration and events files?" IDNO LeaveConfig
-  Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apcupsd.conf"
-  Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apcupsd.events"
+  ${If} ${Cmd} 'MessageBox MB_YESNO|MB_ICONQUESTION "Would you like to delete the current configuration and events files?" IDYES'
+    Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apcupsd.conf"
+    Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apcupsd.events"
+  ${EndIf}
 
-  LeaveConfig:
   ; remove directories used
   RMDir "$INSTDIR\bin"
   RMDir "$INSTDIR\driver"
