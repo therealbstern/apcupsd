@@ -7,6 +7,7 @@
 # 
 
 # Configuration
+VERSION = @VERSION@
 
 TOPDIR = @TOP_DIR@
 CROSSTOOLS = $(TOPDIR)/cross-tools
@@ -422,6 +423,6 @@ shutdown.exe: $(SHUT_OBJS)
 popup.exe: $(POP_OBJS)
 	$(CXX) $(POP_OBJS) $(POP_LIBS) -mwindows -o $(OBJDIR)/popup.exe
 
-winapcupsd.exe:
+winapcupsd.exe: all
 	$(STRIP) *.exe
-	${MAKENSIS} -V2 winapcupsd.nsi
+	$(MAKENSIS) -V2 -DDEPKGS=\"$(DEPKGS)\" -DVERSION=\"$(VERSION)\" winapcupsd.nsi
