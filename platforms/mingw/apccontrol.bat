@@ -108,7 +108,7 @@ rem
 rem   %APCUPSD% /kill
 rem   ping -n 1 -w 5000 10.255.255.254 > NUL
 rem   %POPUP% "apccontrol: Doing %APCUPSD% --killpower"
-rem   %APCUPSD% -d1000 -T --killpower
+rem   %APCUPSD% --killpower
 rem   ping -n 1 -w 20000 10.255.255.254 > NUL
 rem
    %POPUP% "apccontrol: Doing %SHUTDOWN% -h now"
@@ -116,12 +116,12 @@ rem
 ) ELSE IF "%1%" == "mainsback" (
    %POPUP% "apccontrol: Power has returned..."
 ) ELSE IF "%1%" == "annoyme" (
-   %POPUP% "apccontrol: Power problems please logoff."
+   %POPUP% "apccontrol: Power problems: please logoff."
 ) ELSE IF "%1%" == "emergency" (
    %POPUP% "apccontrol: Doing %SHUTDOWN% -h now"
    %SHUTDOWN% -h now
 ) ELSE IF "%1%" == "changeme" (
-   %POPUP% "apccontrol: Emergency! UPS batteries have failedChange them NOW"
+   %POPUP% "apccontrol: Emergency! UPS batteries have failed: Change them NOW"
 ) ELSE IF "%1%" == "remotedown" (
    %POPUP% "apccontrol: Doing %SHUTDOWN% -h now"
    %SHUTDOWN% -h now
@@ -129,7 +129,6 @@ rem
    %POPUP% "apccontrol: restarting apcupsd would have been called."
 ) ELSE IF "%1%" == "startselftest" (
    CALL %POPUP% "apccontrol: startselftest."
-   CALL %POPUP% "apccontrol: DDD."
 ) ELSE IF "%1%" == "endselftest" (
    %POPUP% "apccontrol: endselftest."
 ) ELSE IF "%1%" == "battdetach" (
