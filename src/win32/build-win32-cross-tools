@@ -114,6 +114,9 @@ OPENGL_ARCHIVE="opengl-devel.tar.gz"
 DIRECTX_ARCHIVE="directx-devel.tar.gz"
 
 
+# These are the files from NSIS at sf.net
+NSIS_URL="http://heanet.dl.sourceforge.net/sourceforge/nsis"
+NSIS_ARCHIVE=nsis-2.18-src.tar.bz2
 
 #-----------------------------------------------------
 #
@@ -391,6 +394,32 @@ function install_gcc
 }
 
 
+function do_nsis
+{
+	echo Checking for SCons
+	scons --version > /dev/null 2>&1
+	if [ $? -ne 0 ]; then
+		echo Native SCons not found.
+		echo It is required for building NSIS.
+		echo Skipping NSIS.
+	else
+		echo Downloading NSIS
+		download_file "$NSIS_ARCHIVE" "$NSIS_URL"
+	        cd "$BUILDDIR"
+	        NSIS=`tar -tjf "$SRCDIR/$NSIS_ARCHIVE" | head -n 1`
+	        echo "====== NSIS ${NSIS} ========="
+	        echo "Extracting NSIS"
+		tar xjf "$SRCDIR/$NSIS_ARCHIVE"
+		echo Building and Installing NSIS
+        	cd "$NSIS"
+		scons PREFIX=$PREFIX SKIPPLUGINS=System install &> scons.log
+  	      	if test $? -ne 0; then
+			echo "make of nsis failed - log available: $NSIS/scons.log"
+			exit 1
+    		fi
+	fi
+}
+
 function final_tweaks
 {
         echo "Finalizing installation"
@@ -447,6 +476,8 @@ patch_gcc
 configure_gcc
 build_gcc
 install_gcc
+
+do_nsis
 
 final_tweaks
 
