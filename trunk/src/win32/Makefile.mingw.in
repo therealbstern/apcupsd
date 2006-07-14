@@ -61,6 +61,8 @@ DEFINES = \
 CC = $(BIN_DIR)/mingw32-g++ -O2 $(DEFINES) $(INCLUDES)
 CXX = $(BIN_DIR)/mingw32-g++ -O2 $(DEFINES) $(INCLUDES) 2>&1
 WINDRES = $(BIN_DIR)/mingw32-windres
+MAKENSIS=$(BIN_DIR)/makensis
+STRIP=$(BIN_DIR)/mingw32-strip
 
 first: all
 
@@ -419,3 +421,7 @@ shutdown.exe: $(SHUT_OBJS)
 
 popup.exe: $(POP_OBJS)
 	$(CXX) $(POP_OBJS) $(POP_LIBS) -mwindows -o $(OBJDIR)/popup.exe
+
+winapcupsd.exe:
+	$(STRIP) *.exe
+	${MAKENSIS} -V2 winapcupsd.nsi
