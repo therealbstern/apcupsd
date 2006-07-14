@@ -19,7 +19,7 @@
 //
 // Author          : Christopher S. Hull
 // Created On      : Sat Jan 31 15:55:00 2004
-// $Id: compat.cpp,v 1.15 2006-07-07 22:51:46 adk0212 Exp $
+// $Id: compat.cpp,v 1.16 2006-07-14 13:03:58 adk0212 Exp $
 
 #include "apc.h"
 #include "compat.h"
@@ -1340,8 +1340,6 @@ winver::winver(void)
 BOOL CreateChildProcess(VOID);
 VOID WriteToPipe(VOID);
 VOID ReadFromPipe(VOID);
-VOID ErrorExit(LPCSTR);
-VOID ErrMsg(LPTSTR, BOOL);
 
 /**
  * Check for a quoted path,  if an absolute path name is given and it contains
@@ -1449,7 +1447,6 @@ CreateChildProcess(const char *cmdline, HANDLE in, HANDLE out, HANDLE err)
                               &piProcInfo); // receives PROCESS_INFORMATION
 
     if (bFuncRetn == 0) {
-        ErrorExit("CreateProcess failed\n");
         const char *err = errorString();
         d_msg(__FILE__, __LINE__, 99,
               "CreateProcess(%s, %s, ...)=%s\n", exeFile, cmdLine, err);
@@ -1463,19 +1460,6 @@ CreateChildProcess(const char *cmdline, HANDLE in, HANDLE out, HANDLE err)
     return piProcInfo.hProcess;
 }
 
-
-void
-ErrorExit (LPCSTR lpszMessage)
-{
-    d_msg(__FILE__, __LINE__, 0, "%s", lpszMessage);
-}
-
-static void
-CloseIfValid(HANDLE handle)
-{
-    if (handle != INVALID_HANDLE_VALUE)
-        CloseHandle(handle);
-}
 
 int
 kill(int pid, int signal)
