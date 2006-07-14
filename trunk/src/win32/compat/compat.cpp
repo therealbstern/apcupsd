@@ -19,7 +19,7 @@
 //
 // Author          : Christopher S. Hull
 // Created On      : Sat Jan 31 15:55:00 2004
-// $Id: compat.cpp,v 1.16 2006-07-14 13:03:58 adk0212 Exp $
+// $Id: compat.cpp,v 1.17 2006-07-14 19:34:52 adk0212 Exp $
 
 #include "apc.h"
 #include "compat.h"
@@ -1503,7 +1503,9 @@ void syslog(int type, const char *fmt, ...)
    WORD wtype;
 
    va_start(arg_ptr, fmt);
-   avsnprintf(message, sizeof(message), fmt, arg_ptr);
+   message[0] = '\n';
+   message[1] = '\n';
+   avsnprintf(message+2, sizeof(message)-2, fmt, arg_ptr);
    va_end(arg_ptr);
 
    strings[0] = message;
