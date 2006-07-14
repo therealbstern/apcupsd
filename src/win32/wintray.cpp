@@ -92,7 +92,7 @@ upsMenu::upsMenu()
    SetWindowLong(m_hwnd, GWL_USERDATA, (LONG) this);
 
    // Timer to trigger icon updating
-   SetTimer(m_hwnd, 1, 5000, NULL);
+   SetTimer(m_hwnd, 1, 1000, NULL);
 
    // Load the icons for the tray
    m_online_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_ONLINE));
