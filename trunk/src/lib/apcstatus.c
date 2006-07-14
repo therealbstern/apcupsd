@@ -510,9 +510,10 @@ char *ups_status(int stat)
 
    if (!shm_OK) {
       battstat = 0;
-      astrncpy(buf, "not initialized", sizeof(buf));
-      return buf;
+      return "INITIALIZING";
    }
+
+   read_lock(ups);
 
    if (!ups->is_onbatt())
       battstat = 100;
@@ -566,6 +567,8 @@ char *ups_status(int stat)
          battstat = (int)ups->BattChg;
       break;
    }
+
+   read_unlock(ups);
 
    return buf;
 }
