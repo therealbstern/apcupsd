@@ -188,7 +188,7 @@ BOOL upsService::ShowEvents()
 #define UPS_SERVICENAME        "Apcupsd"
 
 // Displayed service name
-#define UPS_SERVICEDISPLAYNAME "Apcupsd File Server"
+#define UPS_SERVICEDISPLAYNAME "Apcupsd UPS Monitor"
 
 // List other required serves 
 #define UPS_DEPENDENCIES __TEXT("tcpip\0afd\0+File System\0") 
@@ -387,17 +387,7 @@ upsService::InstallService()
 
    // Append the service-start flag to the end of the path:
    if ((int)strlen(path) + 20 + (int)strlen(ApcupsdRunService) < pathlength) {
-      sprintf(servicecmd, "\"%s\" %s -c \"%s\"", path, ApcupsdRunService, path);
-      len = strlen(servicecmd) - 1;
-      for ( ; len > 0; len--) {
-         if (servicecmd[len] == '\\') {
-            servicecmd[len] = 0;
-            break;
-         }
-         servicecmd[len] = 0;
-      }
-      strcat(servicecmd, "\\apcupsd-fd.conf");
-
+      sprintf(servicecmd, "\"%s\" %s", path, ApcupsdRunService);
    } else {
       log_error_message(_("Service command length too long")); 
       MessageBox(NULL, _("Service command length too long. Service not registered."),
