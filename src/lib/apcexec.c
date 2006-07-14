@@ -74,7 +74,7 @@ void clean_threads(void)
    }
 }
 
-#ifdef HAVE_MINGW
+#ifndef HAVE_MINGW
 int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
 {
    char cmdline[MAXSTRING];
@@ -105,9 +105,11 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
       apccontrol, cmd.command, ups->upsname,
       !ups->is_slave(), ups->is_plugged());
 
-   /* Initialize the STARTUPINFOA struct; no special settings needed. */
+   /* Initialize the STARTUPINFOA structto hide the console window */
    memset(&startinfo, 0, sizeof(startinfo));
    startinfo.cb = sizeof(startinfo);
+   startinfo.dwFlags = STARTF_USESHOWWINDOW;
+   startinfo.wShowWindow = SW_HIDE;
 
    Dmsg2(200, "execute_command: CreateProcessA(%s, %s, ...)\n",
       comspec, cmdline);
