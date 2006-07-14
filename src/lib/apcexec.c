@@ -74,7 +74,7 @@ void clean_threads(void)
    }
 }
 
-#ifndef HAVE_MINGW
+#ifdef HAVE_MINGW
 int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
 {
    char cmdline[MAXSTRING];
