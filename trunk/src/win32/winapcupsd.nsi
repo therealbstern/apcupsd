@@ -9,7 +9,6 @@
 ; /start
 
 !define PRODUCT "Apcupsd"
-!define VERSION "@VERSION@"
 
 ;			    
 ; Include the Modern UI
@@ -107,8 +106,8 @@ Section "Apcupsd Service" SecService
 
   SetOutPath "$INSTDIR\driver"
   File ..\..\platforms\mingw\apcupsd.inf
-  File ..\..\..\depkgs-win32\libusb-win32\libusb0.sys
-  File ..\..\..\depkgs-win32\libusb-win32\libusb0.dll
+  File ${DEPKGS}\libusb-win32\libusb0.sys
+  File ${DEPKGS}\libusb-win32\libusb0.dll
 
   SetOutPath "$INSTDIR\examples"
   File ..\..\examples\*
@@ -209,7 +208,7 @@ SectionEnd
 
 Section "USB Driver" SecUsbDrv
   SetOutPath "$SYSDIR"
-  File ..\..\..\depkgs-win32\libusb-win32\libusb0.dll
+  File ${DEPKGS}\libusb-win32\libusb0.dll
   ExecWait 'rundll32 libusb0.dll,usb_install_driver_np_rundll $INSTDIR\driver\apcupsd.inf'
 SectionEnd
 
