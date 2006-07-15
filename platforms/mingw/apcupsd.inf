@@ -1,7 +1,7 @@
 [Version]
 Signature = "$Chicago$"
 provider  = %manufacturer%
-DriverVer = 11/20/2005,20051120
+DriverVer = 07/15/2006,0.1.10.2
 CatalogFile = apcupsd.cat
 
 Class = LibUsbDevices
@@ -67,19 +67,22 @@ AddService = libusb0, 0x00000002, LIBUSB.AddService
 HKR,,DevLoader,,*ntkern
 HKR,,NTMPDriver,,libusb0.sys
 
+; Older versions of this .inf file installed filter drivers. They are not
+; needed any more and must be removed
 [LIBUSB_DEV.DelReg.HW]
 HKR,,LowerFilters
 HKR,,UpperFilters
 
+; Device properties
 [LIBUSB_DEV.AddReg.HW]
-HKR,,libusb_is_device_driver, 0x00010001 ,1
+HKR,,SurpriseRemovalOK, 0x00010001, 1
 
 ;--------------------------------------------------------------------------
 ; Services
 ;--------------------------------------------------------------------------
 
 [LIBUSB.AddService]
-DisplayName    = "LibUsb-Win32 - Kernel Driver 11/20/2005, 20051120"
+DisplayName    = "LibUsb-Win32 - Kernel Driver 07/15/2006, 0.1.10.2"
 ServiceType    = 1
 StartType      = 3
 ErrorControl   = 0
