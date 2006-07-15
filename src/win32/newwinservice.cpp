@@ -680,8 +680,6 @@ void LogErrorMsg(char *message, char *fname, int lineno)
    strings[2] = msg;
 
    if (heventsrc != NULL) {
-      MessageBeep(MB_OK);
-
       ReportEvent(
               heventsrc,              // handle of event source
               EVENTLOG_ERROR_TYPE,    // event type

@@ -19,7 +19,7 @@
 //
 // Author          : Christopher S. Hull
 // Created On      : Sat Jan 31 15:55:00 2004
-// $Id: compat.cpp,v 1.17 2006-07-14 19:34:52 adk0212 Exp $
+// $Id: compat.cpp,v 1.18 2006-07-15 16:49:15 adk0212 Exp $
 
 #include "apc.h"
 #include "compat.h"
@@ -1530,8 +1530,6 @@ void syslog(int type, const char *fmt, ...)
    heventsrc = RegisterEventSource(NULL, "Apcupsd");
 
    if (heventsrc != NULL) {
-      MessageBeep(MB_OK);
-
       ReportEvent(
               heventsrc,              // handle of event source
               wtype,                  // event type
