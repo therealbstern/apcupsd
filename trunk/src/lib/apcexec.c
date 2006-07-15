@@ -101,8 +101,8 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
    conv_unix_to_win32_path(APCCONTROL, apccontrol, sizeof(apccontrol));
 
    /* Build the command line */
-   asnprintf(cmdline, sizeof(cmdline), "/c %s %s \"%s\" %d %d",
-      apccontrol, cmd.command, ups->upsname,
+   asnprintf(cmdline, sizeof(cmdline), "\"%s\" /c %s %s \"%s\" %d %d",
+      comspec, apccontrol, cmd.command, ups->upsname,
       !ups->is_slave(), ups->is_plugged());
 
    /* Initialize the STARTUPINFOA structto hide the console window */
@@ -111,11 +111,10 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
    startinfo.dwFlags = STARTF_USESHOWWINDOW;
    startinfo.wShowWindow = SW_HIDE;
 
-   Dmsg2(200, "execute_command: CreateProcessA(%s, %s, ...)\n",
-      comspec, cmdline);
+   Dmsg1(200, "execute_command: CreateProcessA(NULL, %s, ...)\n", cmdline);
 
    /* Execute the process */
-   rc = CreateProcessA(comspec,
+   rc = CreateProcessA(NULL,
                        cmdline, // command line
                        NULL, // process security attributes
                        NULL, // primary thread security attributes
@@ -126,8 +125,8 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
                        &startinfo, // STARTUPINFO pointer
                        &procinfo); // receives PROCESS_INFORMATION
    if (!rc) {
-      log_event(ups, LOG_WARNING, "execute failed: CreateProcessA(%s, %s, ...)=%d\n",
-         comspec, cmdline, GetLastError());
+      log_event(ups, LOG_WARNING, "execute failed: CreateProcessA(NULL, %s, ...)=%d\n",
+         cmdline, GetLastError());
       return FAILURE;
    }
 
