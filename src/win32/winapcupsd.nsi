@@ -33,6 +33,7 @@
 !define MUI_FINISHPAGE_RUN
 !define MUI_FINISHPAGE_RUN_TEXT "Start Apcupsd (Be sure to edit apcupsd.conf first!)"
 !define MUI_FINISHPAGE_RUN_FUNCTION "StartApcupsd"
+!define MUI_FINISHPAGE_RUN_NOTCHECKED
 !define MUI_FINISHPAGE_SHOWREADME
 !define MUI_FINISHPAGE_SHOWREADME_TEXT "View the ReleaseNotes"
 !define MUI_FINISHPAGE_SHOWREADME_FUNCTION "ShowReadme"
@@ -111,6 +112,7 @@ Section "Apcupsd Service" SecService
   
   File mingwm10.dll
   File pthreadGCE.dll
+  File ${DEPKGS}\libusb-win32\libusb0.dll
   File apcupsd.exe
 ;  File smtp.exe
   File apcaccess.exe
@@ -121,8 +123,10 @@ Section "Apcupsd Service" SecService
 
   SetOutPath "$INSTDIR\driver"
   File ..\..\platforms\mingw\apcupsd.inf
+  File ..\..\platforms\mingw\apcupsd.cat
   File ${DEPKGS}\libusb-win32\libusb0.sys
   File ${DEPKGS}\libusb-win32\libusb0.dll
+  File ..\..\platforms\mingw\install.txt
 
   SetOutPath "$INSTDIR\examples"
   File ..\..\examples\*
@@ -192,9 +196,17 @@ Section "Apcupsd Service" SecService
 SectionEnd
 
 Section "USB Driver" SecUsbDrv
-  SetOutPath "$SYSDIR"
-  File ${DEPKGS}\libusb-win32\libusb0.dll
-  ExecWait 'rundll32 libusb0.dll,usb_install_driver_np_rundll $INSTDIR\driver\apcupsd.inf'
+  Call IsNt
+  Pop $R0
+  ${If} $R0 != false
+    SetOutPath "$WINDIR\system32"
+    File ${DEPKGS}\libusb-win32\libusb0.dll
+    ExecWait 'rundll32 libusb0.dll,usb_install_driver_np_rundll $INSTDIR\driver\apcupsd.inf'
+  ${Else}
+    MessageBox MB_OK "The USB driver cannot be automatically installed on Win98 or WinMe. \
+                      Please see $INSTDIR\driver\install.txt for instructions on installing \
+                      the driver by hand."
+  ${EndIf}
 SectionEnd
 
 Section "Documentation" SecDoc
@@ -251,6 +263,7 @@ Section "Uninstall"
   ; remove files and uninstaller (preserving config for now)
   Delete /REBOOTOK "$INSTDIR\bin\mingwm10.dll"
   Delete /REBOOTOK "$INSTDIR\bin\pthreadGCE.dll"
+  Delete /REBOOTOK "$INSTDIR\bin\libusbo.dll"
   Delete /REBOOTOK "$INSTDIR\bin\apcupsd.exe"
   Delete /REBOOTOK "$INSTDIR\bin\smtp.exe"
   Delete /REBOOTOK "$INSTDIR\bin\apcaccess.exe"
@@ -258,7 +271,11 @@ Section "Uninstall"
   Delete /REBOOTOK "$INSTDIR\bin\popup.exe"
   Delete /REBOOTOK "$INSTDIR\bin\shutdown.exe"
   Delete /REBOOTOK "$INSTDIR\bin\email.exe"
-  Delete /REBOOTOK "$INSTDIR\driver\*"
+  Delete /REBOOTOK "$INSTDIR\driver\libusb0.dll"
+  Delete /REBOOTOK "$INSTDIR\driver\libusb0.sys"
+  Delete /REBOOTOK "$INSTDIR\driver\apcupsd.inf"
+  Delete /REBOOTOK "$INSTDIR\driver\apcupsd.cat"
+  Delete /REBOOTOK "$INSTDIR\driver\install.txt"
   Delete /REBOOTOK "$INSTDIR\examples\*"
   Delete /REBOOTOK "$INSTDIR\README.txt"
   Delete /REBOOTOK "$INSTDIR\COPYING"
