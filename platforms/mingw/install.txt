@@ -70,14 +70,14 @@ WINDOWS 98, 98SE, ME
        to get to the list of devices with the "Have Disk..." button. When you
        get there, choose "Have Disk..."
 
-    f. Browse to "C:\apcupsd\driver" and hit Open
+    g. Browse to "C:\apcupsd\driver" and hit Open
 
-    g. Select "American Power Conversion USB UPS (Apcupsd)" and hit
+    h. Select "American Power Conversion USB UPS (Apcupsd)" and hit
        Next.
 
-    h. The driver should be installed.
+    i. The driver should be installed.
 
-    i. If you examine the Device Manager tree again, you should see a
+    j. If you examine the Device Manager tree again, you should see a
        "LibUSB-Win32 Devices" section, under which is listed "American Power
        Conversion USB UPS (Apcupsd)".
 
