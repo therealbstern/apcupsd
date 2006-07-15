@@ -181,7 +181,6 @@ $(OBJDIR)/asys.o: ../lib/asys.c
 $(OBJDIR)/newups.o: ../lib/newups.c
 	$(CXX) -c $< -o $@
 
-
 ######################################################################
 
 # Files in src/drivers
@@ -425,4 +424,4 @@ popup.exe: $(POP_OBJS)
 
 winapcupsd.exe: all
 	$(STRIP) *.exe
-	$(MAKENSIS) -V2 -DDEPKGS=\"$(DEPKGS)\" -DVERSION=\"$(VERSION)\" winapcupsd.nsi
+	$(MAKENSIS) -V2 -DDEPKGS="$(DEPKGS)" -DVERSION="$(VERSION)" winapcupsd.nsi
