@@ -8,6 +8,452 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2006-07-15 13:58  adk0212
+
+	* include/version.h:
+
+	Update version for 3.13.6.
+
+2006-07-15 13:17  adk0212
+
+	* src/win32/shutdown.c:
+
+	Simplify code based on testing all modes on Win98 and WinXP.
+
+2006-07-15 13:15  adk0212
+
+	* src/lib/apcexec.c:
+
+	Put COMSPEC on the command line instead of listing it as the
+	application name. This is necessary for 16-bit executables like
+	command.com on Win98.
+
+2006-07-15 13:13  adk0212
+
+	* platforms/mingw/apccontrol.bat:
+
+	Rewrite for Win98 compatibility.
+
+2006-07-15 12:50  adk0212
+
+	* src/win32/Makefile.mingw.in:
+
+	Clean harder.
+
+2006-07-15 12:49  adk0212
+
+	* src/win32/winapcupsd.nsi:
+
+	Win98 compatibility updates.
+
+2006-07-15 12:49  adk0212
+
+	* src/win32/: newwinservice.cpp, compat/compat.cpp:
+
+	Don't beep when posting events; it's more annoying than useful.
+
+2006-07-15 12:12  adk0212
+
+	* platforms/mingw/install.txt:
+
+	Too many f's.
+
+2006-07-15 12:08  adk0212
+
+	* platforms/mingw/install.txt:
+
+	Fix word wrapping.
+
+2006-07-15 12:03  adk0212
+
+	* platforms/mingw/install.txt:
+
+	Instructions for installing USB driver manually.
+
+2006-07-15 10:27  adk0212
+
+	* platforms/mingw/: apcupsd.cat, apcupsd.inf:
+
+	Update to libusb-win32 snapshot 20060518.
+
+2006-07-15 10:09  adk0212
+
+	* src/win32/Makefile.mingw.in:
+
+	Fix makensis commandline.
+
+2006-07-14 19:29  adk0212
+
+	* src/win32/winapcupsd.nsi:
+
+	Misc installer updates. Improve readability by rewriting logic
+	using LogicLib. Move startup option to finish page. Add
+	ReleaseNotes and apcupsd.com link to finish page. Add license page
+	using GPL v2 from COPYING.
+
+2006-07-14 16:17  adk0212
+
+	* src/win32/: Makefile.mingw.in, winapcupsd.nsi, winapcupsd.nsi.in:
+
+	Pass DEPKGS and VERSION to makensis on the command line so we no
+	longer need to run autoconf over winapcupsd.nsi.in. Kill
+	winapcupsd.nsi.in and replace it with winapcupsd.nsi.
+
+2006-07-14 15:53  adk0212
+
+	* src/win32/wintray.cpp:
+
+	Poll once per second instead of once per 5 seconds. I'm an
+	information junkie and I want my tray icon to more closely reflect
+	reality.
+
+2006-07-14 15:52  adk0212
+
+	* src/lib/apcstatus.c:
+
+	Need to take the read_lock in ups_status() because status may be
+	changing rapidly under us. If we don't take the lock we can get
+	bogus status values.
+
+2006-07-14 15:34  adk0212
+
+	* src/win32/compat/compat.cpp:
+
+	Add some newlines at the beginning of syslog messages so they are
+	more readable in the event viewer.
+
+2006-07-14 15:31  adk0212
+
+	* src/win32/newwinservice.cpp:
+
+	Remove Bacula-isms that were breaking apcupsd service mode.
+
+2006-07-14 13:55  adk0212
+
+	* src/win32/Makefile.mingw.in:
+
+	Add NSIS target winapcupsd.exe.
+
+2006-07-14 13:54  adk0212
+
+	* src/win32/winapcupsd.nsi.in:
+
+	Update for mingw32 and add USB driver registration.
+
+2006-07-14 13:22  adk0212
+
+	* src/win32/winapcupsd.nsi.in:
+
+	Merge changes from Branch-3_12.
+
+2006-07-14 11:55  adk0212
+
+	* src/win32/build-win32-cross-tools:
+
+	Add mingw32 cross-build of NSIS. This requires a native SCons, so
+	NSIS is skipped if scons does not exist.
+
+2006-07-14 09:23  adk0212
+
+	* src/lib/apcexec.c:
+
+	Fix typo.
+
+2006-07-14 09:20  adk0212
+
+	* src/lib/apcexec.c:
+
+	Under mingw32, hide the console window in execute_command().
+	Otherwise the cmd window pops up briefly which looks
+	unprofessional.
+
+2006-07-14 09:03  adk0212
+
+	* src/win32/compat/compat.cpp:
+
+	Remove some unused crud.
+
+2006-07-14 08:31  adk0212
+
+	* platforms/mingw/apccontrol.bat:
+
+	Set to binary mode in order to preserve DOS end-of-lines. Also
+	cleanup some debug stuff I accidentally left in.
+
+2006-07-13 20:29  adk0212
+
+	* doc/latex/cables.tex:
+
+	Clean up and standardize cable descriptions.
+
+2006-07-11 20:12  adk0212
+
+	* doc/latex/Makefile:
+
+	Don't allow LaTeX errors to slip through unnoticed.
+
+2006-07-11 19:50  adk0212
+
+	* doc/latex/manual.tex:
+
+	SNMP related manual updates from Richard Broersma Jr
+	<rabroersma@yahoo.com>.
+
+2006-07-07 18:52  adk0212
+
+	* src/apcupsd.c:
+
+	Reduce severity of "startup succeeded" log message; LOG_ALERT seems
+	excessive for an expected event.
+
+2006-07-07 18:51  adk0212
+
+	* src/win32/compat/: compat.cpp, compat.h:
+
+	Map syslog levels to win32 event log levels.
+
+2006-07-07 10:04  adk0212
+
+	* src/: lib/wincompat.c, win32/Makefile.mingw.in,
+	win32/winservice.cpp, win32/compat/compat.cpp,
+	win32/compat/compat.h:
+
+	Win32 compat cleanup. Remove non-MINGW sections of compat.{h,cpp}.
+	Implement syslog() using Win32 Event Service so we no longer need
+	wincompat.c at all for MINGW builds.
+
+2006-07-07 09:06  adk0212
+
+	* include/defines.h, src/drivers/snmp/snmp.h,
+	src/win32/compat/compat.h:
+
+	Let users get the MIN() macro from sys/param.h, except on win32
+	where we have to add it to the ever-growing compat.h.
+
+2006-07-07 08:48  adk0212
+
+	* include/defines.h, src/drivers/snmp/drv_powernet.c,
+	src/drivers/snmp/drv_rfc1628.c, src/drivers/snmp/snmp.h:
+
+	RFC1628 SNMP driver updates from Moreno Carullo
+	<moreno.carullo@pulc.it>.  Add some stats fetches
+	rfc1628_snmp_ups_read_{static,volatile}_data().
+
+2006-07-06 08:36  adk0212
+
+	* doc/latex/Makefile:
+
+	Force index.html link so make won't cry if it's already there.
+
+2006-07-06 08:35  adk0212
+
+	* doc/latex/manual.tex:
+
+	Remove references to --enable-pthreads since pthreads has been
+	mandatory since 3.12.x. Update various sections accordingly.
+
+2006-07-06 08:02  adk0212
+
+	* doc/latex/: manual.tex, supportedoses.tex:
+
+	Documentation updates from Jeffrey Goldberg <jeffrey@goldmark.org>.
+	 Darwin OS/X installation, NIS master/slave info, LaTeX error
+	fixes.
+
+2006-06-13 14:14  skoona
+
+	* src/gapcmon/gapcmon.h:
+
+	Completed color choice selection for graph page.  This update adds
+	text to the Glossary Page explaining the new - graph properties -
+	page that was added.  James,
+
+2006-06-13 14:06  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Implemented gconf2 management of color choices for
+	Historical.Summary.Graph Color choices are saved between sessions,
+	and used whenever a monitor is created.  Dynamically
+	changing/updating currently active monitors will not be
+	implemented.  This user improvement is done.  James,
+
+2006-06-12 00:53  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Implemented color-change on enabled/re-enable new monitors.
+	Implemented undo button to set all colors to orig defaults.  Next;
+	Considering how to do dynamic-immediate change, and if its needed.
+	James,
+
+2006-06-11 01:32  skoona
+
+	* src/gapcmon/: gapcmon.c, gapcmon.h:
+
+	Continuing to implement graph properties.  Added the ability to
+	choose and automatically save colors choices.  Added the static
+	ability to startup with saved colors.  Next need to dynamically
+	change colors and maybe apply-default or reset.  James,
+
+2006-06-10 01:06  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Starting to add new tab called - graph properties This will allow
+	users to change graph window and data series colors.  Stable - but
+	not complete.  Should be done in a couple days James,
+
+2006-06-02 22:03  adk0212
+
+	* src/drivers/snmp/: drv_powernet.c, powernet-mib-mgr.c:
+
+	Merge forward SNMP driver memory corruption fixes from Branch-3_12.
+	Joanne reports the changes fixed the problem.
+
+2006-05-30 21:29  skoona
+
+	* src/gapcmon/ChangeLog:
+
+	Just making notes James,
+
+2006-05-30 21:25  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Used #if GTK_CHECK_VERION(2,6,0) to test for compile availability
+	of GTK/GDK Version 2.6.  If not found use a newly written routine
+	to rotate the text in a pixbuf for the vertical Yaxis chart title.
+	Since Its supposed to be Version 2.4 compatible, I suppose we could
+	drop the original code which uses gdk_pango_renderer_get_default()
+	- but I would like to keep it around.
+
+	Net: This fixes the gdk_pango_renderer_get_default() build error.
+
+	James,
+
+2006-05-24 13:44  skoona
+
+	* src/gapcmon/gapcmon.desktop:
+
+	Corrected the sequence of statements and removed [en_US] from
+	comments This re-enabled the menu icon addition in FC5, and other
+	desktops.  James,
+
+2006-05-23 18:04  adk0212
+
+	* platforms/mingw/apcupsd.inf:
+
+	Apcupsd driver INF file for libusb-win32. Matches all APC USB UPS
+	products (051d:0002) and makes them available thru libusb.
+
+2006-05-23 18:00  adk0212
+
+	* platforms/mingw/apccontrol.bat:
+
+	Initial mingw implementation of apccontrol script in (*shudder*)
+	Windows batch language.
+
+2006-05-23 17:55  adk0212
+
+	* src/lib/apcexec.c:
+
+	Add a first-cut implementation of execute_command() for Mingw.
+
+2006-05-23 17:54  adk0212
+
+	* src/win32/Makefile.mingw.in:
+
+	Link popup.exe and shutdown.exe with -mwindows so they don't hold
+	the command prompt open.
+
+2006-05-23 17:53  adk0212
+
+	* src/win32/compat/compat.cpp:
+
+	Beef up kill() emulation a bit. Instead of terminating the process
+	regardless of what signal was sent, only kill it for SIGTERM. Also
+	for signal 0, just check if the process is still alive. Any other
+	signal will result in EINVAL.
+
+2006-05-23 17:49  adk0212
+
+	* src/win32/compat/winconfig.h:
+
+	Override apccontrol path for win32.
+
+2006-05-23 17:49  adk0212
+
+	* src/win32/compat/compat.h:
+
+	Export conv_unix_to_win32_path(). It's useful to outside callers.
+
+2006-05-23 17:48  adk0212
+
+	* include/defines.h:
+
+	Allow APCCONTROL definition to be overridden by win32 compat
+	header.
+
+2006-05-22 18:27  adk0212
+
+	* src/reports.c:
+
+	Fix a bug in report generation. We need to check elapsed time for
+	>= not only >, otherwise we often mistakenly skip every other
+	report cycle.
+
+2006-05-20 14:24  adk0212
+
+	* src/win32/shutdown.c:
+
+	Revert to using OpenProcessToken() on MinGW32. Cygwin still uses
+	OpenThreadToken().
+
+2006-05-20 01:07  adk0212
+
+	* src/win32/Makefile.mingw.in:
+
+	Enable some compile optimization.
+
+2006-05-20 01:03  adk0212
+
+	* src/win32/: Makefile.mingw.in, shutdown.c:
+
+	Build shutdown.exe and popup.exe on Mingw32.
+
+2006-05-20 00:01  adk0212
+
+	* src/win32/Makefile.mingw.in:
+
+	Add SNMP driver to Mingw32 build.
+
+2006-05-18 17:53  adk0212
+
+	* src/win32/README.mingw32:
+
+	Update for latest changes.
+
+2006-05-17 18:12  adk0212
+
+	* src/win32/Makefile.mingw.in:
+
+	...but don't use -mwindows on apcaccess since we actually want to
+	see stdout from that!
+
+2006-05-16 19:24  adk0212
+
+	* src/win32/Makefile.mingw.in:
+
+	Link with -mwindows flag so apcupsd will run in the background
+	without holding a command window open.
+
+2006-05-16 19:02  adk0212
+
+	* ChangeLog, ReleaseNotes, include/version.h:
+
+	Update for 3.13.5 devel release.
+
 2006-05-14 19:17  adk0212
 
 	* doc/home-page/: index.html, index.wml:
