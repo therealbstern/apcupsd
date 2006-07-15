@@ -49,48 +49,95 @@ rem   every time that "make" is invoked if you are working with the
 rem   source files. Thus if you build from a source distribution, we
 rem   recommend you make your changes to the apccontrol.in file.
 rem
-IF EXIST %SCRIPTDIR%\%1% (
-   rem Use CALL here because event script might be a batch file itself
-   CALL %SCRIPTDIR%\%1%
-   
-   rem This is retarded. "IF ERRORLEVEL 99" means >= 99, so
-   rem we have to synthesize an == using two IFs. Ahh, the glory
-   rem of Win32 batch programming. At least they gave us a NOT op.
-   IF ERRORLEVEL 99 (
-      IF NOT ERRORLEVEL 100 (
-         rem exit code 99 means he does not want us to do default action
-         exit
-      )
-   )
-)
+IF NOT EXIST %SCRIPTDIR%\%1% GOTO :events
+
+rem Use CALL here because event script might be a batch file itself
+CALL %SCRIPTDIR%\%1%
+
+rem This is retarded. "IF ERRORLEVEL 99" means >= 99, so
+rem we have to synthesize an == using two IFs. Ahh, the glory
+rem of Windows batch programming. At least they gave us a NOT op.
+IF NOT ERRORLEVEL 99 GOTO :events
+IF NOT ERRORLEVEL 100 GOTO :done
+
+:events
 
 rem
 rem powerout, onbattery, offbattery, mainsback events occur
 rem   in that order.
 rem
 
-IF "%1%" == "commfailure" (
+IF "%1%" == "commfailure"   GOTO :commfailure
+IF "%1%" == "commok"        GOTO :commok
+IF "%1%" == "powerout"      GOTO :powerout
+IF "%1%" == "onbattery"     GOTO :onbattery
+IF "%1%" == "offbattery"    GOTO :offbattery
+IF "%1%" == "mainsback"     GOTO :mainsback
+IF "%1%" == "failing"       GOTO :failing
+IF "%1%" == "timeout"       GOTO :timeout
+IF "%1%" == "loadlimit"     GOTO :loadlimit
+IF "%1%" == "runlimit"      GOTO :runlimit
+IF "%1%" == "doshutdown"    GOTO :doshutdown
+IF "%1%" == "mainsback"     GOTO :mainsback
+IF "%1%" == "annoyme"       GOTO :annoyme
+IF "%1%" == "emergency"     GOTO :emergency
+IF "%1%" == "changeme"      GOTO :changeme
+IF "%1%" == "remotedown"    GOTO :remotedown
+IF "%1%" == "restartme"     GOTO :restartme
+IF "%1%" == "startselftest" GOTO :startselftest
+IF "%1%" == "endselftest"   GOTO :endselftest
+IF "%1%" == "battdetach"    GOTO :battdetach
+IF "%1%" == "battattach"    GOTO :battattach
+
+echo Unknown command '%1%'
+echo.
+echo Usage: %0% command
+echo.
+echo Warning: this script is intended to be launched by
+echo apcupsd and should never be launched by users.
+GOTO :done
+
+:commfailure
    %POPUP% "apccontrol: Communications with UPS lost."
-) ELSE IF "%1%" == "commok" (
+   GOTO :done
+
+:commok
    %POPUP% "apccontrol: Communciations with UPS restored."
-) ELSE IF "%1%" == "powerout" (
+   GOTO :done
+
+:powerout
    rem Normally we'd POPUP here, but that's a bit annoying on Windows,
    rem so don't popup until onbattery comes.
-) ELSE IF "%1%" == "onbattery" (
+   GOTO :done
+
+:onbattery
    %POPUP% "apccontrol: Power failure. Running on UPS batteries."
-) ELSE IF "%1%" == "offbattery" (
+   GOTO :done
+
+:offbattery
    %POPUP% "apccontrol: Power has returned. No longer running on UPS batteries."
-) ELSE IF "%1%" == "mainsback" (
-   rem ...nothing...
-) ELSE IF "%1%" == "failing" (
+   GOTO :done
+
+:mainsback
+   GOTO :done
+
+:failing
    %POPUP% "apccontrol: UPS battery power exhaused. Doing shutdown."
-) ELSE IF "%1%" == "timeout" (
+   GOTO :done
+
+:timeout
    %POPUP% "apccontrol: UPS battery runtime limit exceeded. Doing shutdown."
-) ELSE IF "%1%" == "loadlimit" (
+   GOTO :done
+
+:loadlimit
    %POPUP% "apccontrol: UPS battery discharge limit reached. Doing shutdown."
-) ELSE IF "%1%" == "runlimit" (
+   GOTO :done
+
+:runlimit
    %POPUP% "apccontrol: UPS battery runtime percent reached. Doing shutdown."
-) ELSE IF "%1%" == "doshutdown" (
+   GOTO :done
+
+:doshutdown
 rem
 rem  If you want to try to power down your UPS, uncomment
 rem    out the following lines, but be warned that if the
@@ -113,33 +160,47 @@ rem   ping -n 1 -w 20000 10.255.255.254 > NUL
 rem
    %POPUP% "apccontrol: Doing %SHUTDOWN% -h now"
    %SHUTDOWN% -h now
-) ELSE IF "%1%" == "mainsback" (
+   GOTO :done
+
+:mainsback
    %POPUP% "apccontrol: Power has returned..."
-) ELSE IF "%1%" == "annoyme" (
+   GOTO :done
+
+:annoyme
    %POPUP% "apccontrol: Power problems: please logoff."
-) ELSE IF "%1%" == "emergency" (
+   GOTO :done
+
+:emergency
    %POPUP% "apccontrol: Doing %SHUTDOWN% -h now"
    %SHUTDOWN% -h now
-) ELSE IF "%1%" == "changeme" (
+   GOTO :done
+
+:changeme
    %POPUP% "apccontrol: Emergency! UPS batteries have failed: Change them NOW"
-) ELSE IF "%1%" == "remotedown" (
+   GOTO :done
+
+:remotedown
    %POPUP% "apccontrol: Doing %SHUTDOWN% -h now"
    %SHUTDOWN% -h now
-) ELSE IF "%1%" == "restartme" (
+   GOTO :done
+
+:restartme
    %POPUP% "apccontrol: restarting apcupsd would have been called."
-) ELSE IF "%1%" == "startselftest" (
-   CALL %POPUP% "apccontrol: startselftest."
-) ELSE IF "%1%" == "endselftest" (
+   GOTO :done
+
+:startselftest
+   %POPUP% "apccontrol: startselftest."
+   GOTO :done
+
+:endselftest
    %POPUP% "apccontrol: endselftest."
-) ELSE IF "%1%" == "battdetach" (
-   rem ...nothing...
-) ELSE IF "%1%" == "battattach" (
-   rem ...nothing...
-) ELSE (
-   echo Unknown command '%1%'
-   echo.
-   echo Usage: %0% ^<command^>
-   echo.
-   echo Warning: this script is intended to be launched by
-   echo apcupsd and should never be launched by users.
-)
+   GOTO :done
+
+:battdetach
+   GOTO :done
+
+:battattach
+   GOTO :done
+
+:done
+rem That's all, folks
