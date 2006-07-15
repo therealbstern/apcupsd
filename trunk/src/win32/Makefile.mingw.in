@@ -403,8 +403,8 @@ all: apcupsd.exe apcaccess.exe shutdown.exe popup.exe
 clean:
 	rm -f $(OBJDIR)/*.o $(OBJDIR)/apcupsd.exe $(OBJDIR)/winres.res \
 		$(OBJDIR)/apcaccess.exe $(OBJDIR)/shutdown.exe \
-		$(OBJDIR)/popup.exe
-	rm -f pthreadGCE.dll
+		$(OBJDIR)/popup.exe winapcupsd*.exe
+	rm -f pthreadGCE.dll mingwm10.dll
 
 # Link the apcupsd daemon executable ...
 apcupsd.exe: $(APC_OBJS)
