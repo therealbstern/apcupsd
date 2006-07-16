@@ -49,10 +49,10 @@ rem   every time that "make" is invoked if you are working with the
 rem   source files. Thus if you build from a source distribution, we
 rem   recommend you make your changes to the apccontrol.in file.
 rem
-IF NOT EXIST %SCRIPTDIR%\%1% GOTO :events
+IF NOT EXIST %SCRIPTDIR%\%1 GOTO :events
 
 rem Use CALL here because event script might be a batch file itself
-CALL %SCRIPTDIR%\%1%
+CALL %SCRIPTDIR%\%1
 
 rem This is retarded. "IF ERRORLEVEL 99" means >= 99, so
 rem we have to synthesize an == using two IFs. Ahh, the glory
@@ -67,29 +67,29 @@ rem powerout, onbattery, offbattery, mainsback events occur
 rem   in that order.
 rem
 
-IF "%1%" == "commfailure"   GOTO :commfailure
-IF "%1%" == "commok"        GOTO :commok
-IF "%1%" == "powerout"      GOTO :powerout
-IF "%1%" == "onbattery"     GOTO :onbattery
-IF "%1%" == "offbattery"    GOTO :offbattery
-IF "%1%" == "mainsback"     GOTO :mainsback
-IF "%1%" == "failing"       GOTO :failing
-IF "%1%" == "timeout"       GOTO :timeout
-IF "%1%" == "loadlimit"     GOTO :loadlimit
-IF "%1%" == "runlimit"      GOTO :runlimit
-IF "%1%" == "doshutdown"    GOTO :doshutdown
-IF "%1%" == "mainsback"     GOTO :mainsback
-IF "%1%" == "annoyme"       GOTO :annoyme
-IF "%1%" == "emergency"     GOTO :emergency
-IF "%1%" == "changeme"      GOTO :changeme
-IF "%1%" == "remotedown"    GOTO :remotedown
-IF "%1%" == "restartme"     GOTO :restartme
-IF "%1%" == "startselftest" GOTO :startselftest
-IF "%1%" == "endselftest"   GOTO :endselftest
-IF "%1%" == "battdetach"    GOTO :battdetach
-IF "%1%" == "battattach"    GOTO :battattach
+IF "%1" == "commfailure"   GOTO :commfailure
+IF "%1" == "commok"        GOTO :commok
+IF "%1" == "powerout"      GOTO :powerout
+IF "%1" == "onbattery"     GOTO :onbattery
+IF "%1" == "offbattery"    GOTO :offbattery
+IF "%1" == "mainsback"     GOTO :mainsback
+IF "%1" == "failing"       GOTO :failing
+IF "%1" == "timeout"       GOTO :timeout
+IF "%1" == "loadlimit"     GOTO :loadlimit
+IF "%1" == "runlimit"      GOTO :runlimit
+IF "%1" == "doshutdown"    GOTO :doshutdown
+IF "%1" == "mainsback"     GOTO :mainsback
+IF "%1" == "annoyme"       GOTO :annoyme
+IF "%1" == "emergency"     GOTO :emergency
+IF "%1" == "changeme"      GOTO :changeme
+IF "%1" == "remotedown"    GOTO :remotedown
+IF "%1" == "restartme"     GOTO :restartme
+IF "%1" == "startselftest" GOTO :startselftest
+IF "%1" == "endselftest"   GOTO :endselftest
+IF "%1" == "battdetach"    GOTO :battdetach
+IF "%1" == "battattach"    GOTO :battattach
 
-echo Unknown command '%1%'
+echo Unknown command '%1'
 echo.
 echo Usage: %0% command
 echo.
