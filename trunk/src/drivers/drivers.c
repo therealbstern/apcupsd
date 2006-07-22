@@ -50,6 +50,10 @@
 # include "test/testdriver.h"
 #endif
 
+#ifdef HAVE_PCNET_DRIVER
+# include "pcnet/pcnet.h"
+#endif
+
 static const UPSDRIVER drivers[] = {
 #ifdef HAVE_DUMB_DRIVER
    { "dumb",
@@ -133,6 +137,20 @@ static const UPSDRIVER drivers[] = {
      test_ups_check_state,
      test_ups_program_eeprom,
      test_ups_entry_point },
+#endif   /* HAVE_TEST_DRIVER */
+
+#ifdef HAVE_PCNET_DRIVER
+   { "pcnet",
+     pcnet_ups_open,
+     pcnet_ups_setup,
+     pcnet_ups_close,
+     pcnet_ups_kill_power,
+     pcnet_ups_read_static_data,
+     pcnet_ups_read_volatile_data,
+     pcnet_ups_get_capabilities,
+     pcnet_ups_check_state,
+     pcnet_ups_program_eeprom,
+     pcnet_ups_entry_point },
 #endif   /* HAVE_TEST_DRIVER */
 
    /*
@@ -228,6 +246,10 @@ const UPSDRIVER *attach_driver(UPSINFO *ups)
 
    case NETWORK_UPS:
       driver_name = "net";
+      break;
+
+   case PCNET_UPS:
+      driver_name = "pcnet";
       break;
 
    default:

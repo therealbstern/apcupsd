@@ -362,5 +362,6 @@
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
 
+#define HAVE_SOCKLEN_T 1
 
 #endif /* __MINGWNCONFIG_H */

@@ -27,7 +27,7 @@
  * Last Modified By: Thorsten Engel
  * Last Modified On: Fri Apr 22 19:30:00 2004
  * Update Count    : 218
- * $Id: compat.h,v 1.13 2006-07-07 22:51:46 adk0212 Exp $
+ * $Id: compat.h,v 1.14 2006-07-22 02:40:22 adk0212 Exp $
  */
 
 
@@ -46,6 +46,7 @@
 #include <direct.h>
 #include <wchar.h>
 #include <winsock2.h>
+#include <ws2tcpip.h>
 #include <windows.h>
 #include <wincon.h>
 #include <winbase.h>

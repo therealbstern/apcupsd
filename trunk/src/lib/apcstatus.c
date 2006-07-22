@@ -155,6 +155,7 @@ int output_status(UPSINFO *ups, int sockfd,
    case DUMB_UPS:
    case NETWORK_UPS:
    case SNMP_UPS:
+   case PCNET_UPS:
       status[0] = 0;
 
       /* Now output human readable form */

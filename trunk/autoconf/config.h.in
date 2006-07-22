@@ -214,6 +214,9 @@
 /* Set if you want TEST driver */
 #undef HAVE_TEST_DRIVER
 
+/* Set if you want PCNET driver */
+#undef HAVE_PCNET_DRIVER
+
 /* Set if you want the old master/slave network code */
 #undef HAVE_OLDNET
 
