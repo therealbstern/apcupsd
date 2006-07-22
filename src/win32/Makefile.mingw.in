@@ -50,7 +50,8 @@ HAVES = \
 	-DHAVE_DUMB_DRIVER \
 	-DHAVE_USB_DRIVER \
 	-DHAVE_SNMP_DRIVER \
-	-DHAVE_NET_SNMP
+	-DHAVE_NET_SNMP \
+	-DHAVE_PCNET_DRIVER
 
 DEFINES = \
 	-DWIN32 \
@@ -197,6 +198,15 @@ OBJS_TESTDRV = \
 	$(OBJDIR)/testdriver.o
 
 $(OBJDIR)/testdriver.o:  ../drivers/test/testdriver.c
+	$(CXX) -c $< -o $@
+
+######################################################################
+
+# Files in src/drivers/pcnet
+OBJS_PCNETDRV = \
+	$(OBJDIR)/pcnet.o
+
+$(OBJDIR)/pcnet.o:  ../drivers/pcnet/pcnet.c
 	$(CXX) -c $< -o $@
 
 ######################################################################
@@ -369,7 +379,7 @@ $(OBJDIR)/popup.o:	./popup.c
 APC_OBJS = $(OBJS_SRC) $(LIB_OBJS) $(OBJS_COMPAT) $(OBJS_WIN) \
 	   $(OBJS_DRIVERS) $(OBJS_TESTDRV) $(OBJS_NETDRV) \
 	   $(OBJS_SMARTDRV) $(OBJS_DUMBDRV) $(OBJS_USBDRV) \
-	   $(OBJS_SNMPDRV)
+	   $(OBJS_SNMPDRV) $(OBJS_PCNETDRV)
 
 APC_LIBS = \
 	-L$(LIB_MINGW) \

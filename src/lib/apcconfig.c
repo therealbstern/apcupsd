@@ -114,6 +114,7 @@ static const GENINFO types[] = {
    { "snmp",     "SNMP UPS Driver",     SNMP_UPS },
    { "net",      "NETWORK UPS Driver",  NETWORK_UPS },
    { "test",     "TEST UPS Driver",     TEST_UPS },
+   { "pcnet",    "PCNET UPS Driver",    PCNET_UPS },
    { NULL,       "*invalid-ups-type*",  NO_UPS },
 };
 
