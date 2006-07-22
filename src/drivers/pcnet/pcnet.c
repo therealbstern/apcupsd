@@ -1,8 +1,19 @@
 #include "apc.h"
+#include "md5.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
 
 #define PCNET_PORT   3052
+
+typedef struct {
+   char device[MAXSTRING];             /* Copy of ups->device */
+   char *ipaddr;                       /* IP address of UPS */
+   char *user;                         /* Username */
+   char *pass;                         /* Pass phrase */
+   bool auth;                          /* Authenticate? */
+   unsigned long uptime;               /* UPS uptime counter */
+   unsigned long reboots;              /* UPS reboot counter */
+} PCNET_DATA;
 
 /* Convert UPS response to enum and string */
 static SelfTestResult decode_testresult(const char* str)
@@ -55,8 +66,6 @@ static void pcnet_process_data(UPSINFO* ups, const char *key, const char *value)
 {
    unsigned long cmd;
    int ci;
-
-   Dmsg2(200, "pcnet_process_data: key='%s' value='%s'\n", key, value);
 
    /* Make sure we have a value */
    if (*value == '\0')
@@ -263,6 +272,150 @@ static void pcnet_process_data(UPSINFO* ups, const char *key, const char *value)
    }
 }
 
+struct pair {
+   const char* key;
+   const char* value;
+};
+
+#define MAX_PAIRS 256
+
+static const char *lookup_key(char *key, struct pair table[])
+{
+   int idx;
+   const char *ret = NULL;
+
+   for (idx=0; table[idx].key; idx++) {
+      if (strcmp(key, table[idx].key) == 0) {
+         ret = table[idx].value;
+         break;
+      }
+   }
+
+   return ret;
+}
+
+static void process_packet(UPSINFO* ups, char *buf, int len)
+{
+   PCNET_DATA *my_data = (PCNET_DATA *)ups->driver_internal_data;
+   char *key, *end, *ptr, *value;
+   const char *val;
+   struct pair pairs[MAX_PAIRS];
+   md5_state_t ms;
+   md5_byte_t digest[16];
+   char hash[33];
+   int idx;
+   unsigned long uptime, reboots;
+
+   /* If there's no MD= field, drop the packet */
+   if ((ptr = strstr(buf, "MD=")) == NULL || ptr == buf)
+      return;
+
+   if (my_data->auth) {
+      /* Calculate the MD5 of the packet before messing with it */
+      md5_init(&ms);
+      md5_append(&ms, (md5_byte_t*)buf, ptr-buf);
+      md5_append(&ms, (md5_byte_t*)my_data->user, strlen(my_data->user));
+      md5_append(&ms, (md5_byte_t*)my_data->pass, strlen(my_data->pass));
+      md5_finish(&ms, digest);
+
+      /* Convert binary digest to ascii */
+      ptr = hash;
+      for (idx=0; idx<16; idx++) {
+         sprintf(ptr, "%02x", (unsigned char)digest[idx]);
+         ptr += 2;
+      }
+   }
+
+   /* Build a table of pointers to key/value pairs */
+   memset(pairs, 0, sizeof(pairs));
+   ptr = buf;
+   idx = 0;
+   while (*ptr && idx < MAX_PAIRS) {
+      /* Find the beginning of the line */
+      while (isspace(*ptr))
+         ptr++;
+      key = ptr;
+
+      /* Find the end of the line */
+      while (*ptr && *ptr != '\r' && *ptr != '\n')
+         ptr++;
+      end = ptr;
+      if (*ptr != '\0')
+         ptr++;
+
+      /* Remove trailing whitespace */
+      do {
+         *end-- = '\0';
+      } while (end >= key && isspace(*end));
+
+      Dmsg1(200, "process_packet: line='%s'\n", key);
+
+      /* Split the string */
+      if ((value = strchr(key, '=')) == NULL)
+         continue;
+      *value++ = '\0';
+
+      Dmsg2(200, "process_packet: key='%s' value='%s'\n",
+         key, value);
+
+      /* Save key/value in table */
+      pairs[idx].key = key;
+      pairs[idx].value = value;
+      idx++;
+   }
+
+   if (my_data->auth) {
+      /* Check calculated hash vs received */
+      Dmsg1(200, "process_packet: calculated=%s\n", hash);
+      val = lookup_key("MD", pairs);
+      if (!val || strcmp(hash, val)) {
+         Dmsg0(200, "process_packet: message hash failed\n");
+         return;
+      }
+      Dmsg1(200, "process_packet: message hash passed\n", val);
+   }
+
+   /*
+    * Check that uptime and/or reboots have advanced. If not,
+    * this packet could be out of order, or an attacker may
+    * be trying to replay an old packet.
+    */
+   val = lookup_key("SR", pairs);
+   if (!val) {
+      Dmsg0(200, "process_packet: Missing SR field\n");
+      return;
+   }
+   reboots = strtoul(val, NULL, 16);
+
+   val = lookup_key("SU", pairs);
+   if (!val) {
+      Dmsg0(200, "process_packet: Missing SU field\n");
+      return;
+   }
+   uptime = strtoul(val, NULL, 16);
+
+   Dmsg1(200, "process_packet: Our reboots=%d\n", my_data->reboots);
+   Dmsg1(200, "process_packet: UPS reboots=%d\n", reboots);
+   Dmsg1(200, "process_packet: Our uptime=%d\n", my_data->uptime);
+   Dmsg1(200, "process_packet: UPS uptime=%d\n", uptime);
+
+   if ((reboots == my_data->reboots && uptime <= my_data->uptime) ||
+       (reboots < my_data->reboots)) {
+      Dmsg0(200, "process_packet: Packet is out of order or replayed\n");
+      return;
+   }
+
+   my_data->reboots = reboots;
+   my_data->uptime = uptime;
+
+   write_lock(ups);
+
+   for (idx=0; pairs[idx].key; idx++)
+      pcnet_process_data(ups, pairs[idx].key, pairs[idx].value);
+
+   write_unlock(ups);
+}
+
 /*
  * Read UPS events. I.e. state changes.
  */
@@ -271,11 +424,10 @@ int pcnet_ups_check_state(UPSINFO *ups)
    struct timeval tv, now, exit;
    fd_set rfds;
    bool done = false;
-   char buf[4096];
    struct sockaddr_in from;
    socklen_t fromlen;
-   char *key, *end, *value, *ptr;
    int retval;
+   char buf[4096];
 
    /* Figure out when we need to exit by */
    gettimeofday(&exit, NULL);
@@ -345,38 +497,7 @@ int pcnet_ups_check_state(UPSINFO *ups)
          logf("\n");
       }
 
-      write_lock(ups);
-
-      ptr = buf;
-      while (*ptr) {
-         /* Find the beginning of the line */
-         while (isspace(*ptr))
-            ptr++;
-         key = ptr;
-
-         /* Find the end of the line */
-         while (*ptr && *ptr != '\r' && *ptr != '\n')
-            ptr++;
-         end = ptr;
-         if (*ptr != '\0')
-            ptr++;
-
-         /* Remove trailing whitespace */
-         do {
-            *end-- = '\0';
-         } while (end >= key && isspace(*end));
-
-         Dmsg1(200, "line='%s'\n", key);
-
-         /* Split the string */
-         if ((value = strchr(key, '=')) == NULL)
-            continue;
-         *value++ = '\0';
-
-         pcnet_process_data(ups, key, value);
-      }
-
-      write_unlock(ups);
+      process_packet(ups, buf, retval);
    }
 
    return 1;
@@ -385,8 +506,39 @@ int pcnet_ups_check_state(UPSINFO *ups)
 int pcnet_ups_open(UPSINFO *ups)
 {
    struct sockaddr_in addr;
-   
+   PCNET_DATA *my_data = (PCNET_DATA *)ups->driver_internal_data;
+   char *ptr;
+
    write_lock(ups);
+
+   if (my_data == NULL) {
+      my_data = (PCNET_DATA *)malloc(sizeof(*my_data));
+      memset(my_data, 0, sizeof(*my_data));
+      ups->driver_internal_data = my_data;
+   }
+
+   if (ups->device[0] != '\0') {
+      my_data->auth = true;
+
+      astrncpy(my_data->device, ups->device, sizeof(my_data->device));
+      ptr = my_data->device;
+
+      my_data->ipaddr = ptr;
+      ptr = strchr(ptr, ':');
+      if (ptr == NULL)
+         Error_abort0("Malformed DEVICE [ip:user:pass]\n");
+      *ptr++ = '\0';
+      
+      my_data->user = ptr;
+      ptr = strchr(ptr, ':');
+      if (ptr == NULL)
+         Error_abort0("Malformed DEVICE [ip:user:pass]\n");
+      *ptr++ = '\0';
+
+      my_data->pass = ptr;
+      if (*ptr == '\0')
+         Error_abort0("Malformed DEVICE [ip:user:pass]\n");
+   }
 
    ups->fd = socket(PF_INET, SOCK_DGRAM, 0);
    if (ups->fd == -1)
