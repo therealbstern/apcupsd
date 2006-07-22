@@ -8,6 +8,83 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2006-07-22 18:29  adk0212
+
+	* include/version.h:
+
+	Bump version to 3.13.7.
+
+2006-07-22 18:29  adk0212
+
+	* ReleaseNotes:
+
+	Update for 3.13.7 devel release.
+
+2006-07-22 17:06  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Add pcnet driver to --enable-all and to the configuration summary
+	output.
+
+2006-07-22 15:06  adk0212
+
+	* src/drivers/pcnet/pcnet.c:
+
+	Only break from interrupt loop on status packets, not on config
+	packets.
+
+2006-07-22 15:01  adk0212
+
+	* src/drivers/pcnet/pcnet.c:
+
+	Check mgmt card IP address against configuration. Exit interrupt
+	loop when a valid packet is received.
+
+2006-07-22 14:58  adk0212
+
+	* platforms/etc/apcupsd.conf.in:
+
+	Add pcnet UPSTYPE documentation.
+
+2006-07-22 11:17  adk0212
+
+	* src/drivers/pcnet/pcnet.c:
+
+	Add authentication support and packet replay detection.
+
+2006-07-22 11:14  adk0212
+
+	* include/md5.h, src/lib/Makefile.in, src/lib/md5.c,
+	src/win32/Makefile.mingw.in:
+
+	Add an MD5 implementation for use by the pcnet driver.
+
+2006-07-21 22:40  adk0212
+
+	* configure, autoconf/config.h.in, autoconf/configure.in,
+	include/struct.h, src/drivers/Makefile.in, src/drivers/drivers.c,
+	src/drivers/pcnet/Makefile.in, src/drivers/pcnet/pcnet.c,
+	src/drivers/pcnet/pcnet.h, src/lib/apcconfig.c,
+	src/lib/apcstatus.c, src/win32/Makefile.mingw.in,
+	src/win32/compat/compat.h, src/win32/compat/winconfig.h:
+
+	Add first cut of 'pcnet' driver supporting the PowerChute Network
+	Shutdown protocol.
+
+2006-07-16 14:41  adk0212
+
+	* platforms/mingw/apccontrol.bat:
+
+	Change %1% to %1 for WinXP. Discovered fixed by Hartmut Heinbach
+	<hartmut@heinbach-si.de>. Thanks!
+
+2006-07-15 14:03  adk0212
+
+	* ChangeLog:
+
+	Update ChangeLog for 3.13.6.
+
 2006-07-15 13:58  adk0212
 
 	* include/version.h:
