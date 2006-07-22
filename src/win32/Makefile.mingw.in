@@ -140,7 +140,8 @@ LIB_OBJS = \
 	$(OBJDIR)/apcsignal.o \
 	$(OBJDIR)/apcstatus.o \
 	$(OBJDIR)/asys.o \
-	$(OBJDIR)/newups.o
+	$(OBJDIR)/newups.o \
+	$(OBJDIR)/md5.o
 
 #
 # Rules for generating from ../lib
@@ -180,6 +181,9 @@ $(OBJDIR)/asys.o: ../lib/asys.c
 	$(CXX) -c $< -o $@
 
 $(OBJDIR)/newups.o: ../lib/newups.c
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/md5.o: ../lib/md5.c
 	$(CXX) -c $< -o $@
 
 ######################################################################
