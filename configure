@@ -10732,6 +10732,7 @@ if test "${enable_all+set}" = set; then
 		enable_net=yes
 		enable_snmp=yes
 		enable_test=yes
+		enable_pcnet=yes
 		enable_powerflute=yes
 		enable_cgi=yes
 		enable_gapcmon=yes
@@ -18601,7 +18602,7 @@ Configuration on `date`:
   UPSTYPE		      ${UPSTYPE}
   UPSCABLE		      ${UPSCABLE}
 
-  drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${DISPLAY_USB_DRIVER:-no-usb} ${DISPLAY_SNMP_DRIVER:-no-snmp} ${TEST_DRIVER:-no-test}
+  drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${DISPLAY_USB_DRIVER:-no-usb} ${DISPLAY_SNMP_DRIVER:-no-snmp} ${PCNET_DRIVER:-no-pcnet} ${TEST_DRIVER:-no-test}
 
   enable-nis:		      ${NISSRV_ENABLED}
   with-nisip:		      ${NISIP}
