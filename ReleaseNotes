@@ -2,15 +2,122 @@
              Release Notes for Apcupsd 3.13.x
 
 *DEVELOPMENT RELEASE*
+3.13.6 22Jul06
+
 
 NEW FEATURES
 
-  * Mingw32-based win32 port. *Alpha*
+  * Mingw32-based win32 port
+  
+  * Windows USB support
+  
+  * Mac OS X Darwin USB support
+  
+  * Solaris 10 USB support
 
-  * GUI monitoring applications, gapcmon and gpanel_apcmon, thanks to
-    James Scott, Jr. These are Gnome/GTK based applications. gapcmon is
-    a standalone app for monitoring a single UPS. gpanel_apcmon
-    integrates into a Gnome panel and can monitor up to 8 UPSes at
-    once. The status of each gpanel UPS is shown with a icon similar
-    to the Win32 tray icon in winapcupsd. Enable building of these
-    tools at compile time via --enable-gapcmon and/or --enable-gpanel.
+  * PowerChute Network Shutdown driver (--enable-pcnet)
+
+  * GUI monitoring application, gapcmon , thanks to James Scott, Jr.
+    This is a Gnome/GTK based application which integrates into most
+    desktop panels (not just Gnome). The status of each UPS is shown
+    with a icon similar to the Win32 tray icon in winapcupsd. Enable
+    building of gapcmon at compile time via --enable-gapcmon.
+
+
+NOTES
+
+Windows Port (winapcupsd)
+  * Must be installed at the root of a drive (C:\apcupsd, D:\apcupsd,
+    etc.)
+
+  * DEVICE specification for serial ports should be COM1, COM2, etc.
+
+  * Other apcupsd.conf settings are identical to standard UNIX version.
+
+  * Be sure to install USB driver if you have a USB UPS.
+
+
+Mac OS X Darwin USB Support
+
+  * To build you need gcc. I used gcc-4.0.1 from the recent 
+    Developer Tools (XCode 2.2).
+
+  * You need to install libusb-0.1.12 or later *before* building
+    apcupsd. The build is very sensitive to the location of libusb.
+    If you install it into a non-standard location (for your 
+    platform), chances are good the compiler will be unable to
+    find it.
+
+  * Configure & build apcupsd:
+  	./configure --enable-usb
+  	make
+  	sudo make install
+
+  YOU MUST REBOOT AFTER INSTALLATION OF APCUPSD.
+
+  * The 'make install' step will make a few necessary configuration 
+    changes for you. Specifically, on Darwin it will install a dummy
+    kext driver which prevents Apple's kernel drivers from exclusively
+    opening APC UPSes.
+    
+  * apcupsd.conf should be edited as usual for usb conections:
+	UPSCABLE usb
+	UPSTYPE usb
+	DEVICE
+
+
+Solaris 10 USB Support
+
+  * To build you need gcc. I used gcc-3.4.3 from the sfw package 
+    distributed on the software suppliment CD (SUNWgcc, 
+    SUNWgccruntime).
+
+  * You need to install libusb (SUNWlibusb, SUNWlibusbugen) *before*
+    building apcupsd. The build is very sensitive to the location of 
+    libusb. If you install it into a non-standard location (for your 
+    platform), chances are good the compiler will be unable to
+    find it.
+
+  * Configure & build apcupsd:
+  	./configure --enable-usb
+  	make
+  	sudo make install
+
+
+  * The 'make install' step will make a few necessary configuration 
+    changes for you. On Solaris, 'make install' will add a driver 
+    alias to map APC UPSes to the ugen driver
+
+  YOU MUST RECONFIGURE BOOT ("reboot -- -r") AFTER INSTALLING APCUPSD.
+
+  * apcupsd.conf should be edited as usual for usb conections:
+	UPSCABLE usb
+	UPSTYPE usb
+	DEVICE
+
+
+PowerChute Network Shutdown driver (pcnet)
+
+  * This driver is an alternative to SNMP for use with APC's
+    APC9617 family of network smartslot modules. It is a
+    very new driver and likely buggy, so USE WITH CARE.
+
+  * Configure and build with "./configure --enable-pcnet" to
+    build the driver.
+
+  * In apcupsd.conf set...
+
+  	UPSCABLE ether
+	UPSTYPE pcnet
+	DEVICE ipaddr:user:passphrase
+
+    ...where ipaddr is the IP address of the UPS mgmt card,
+    user is the username you configured the card with (normally
+    "apc") and passphrase is the password the card is configured
+    with.
+
+    Note that you may leave DEVICE blank and Apcupsd will accept
+    information from any PCNET UPS on the network, HOWEVER IT
+    WILL BE VERY INSECURE SINCE AN ATTACKER COULD EASILY SEND
+    PACKETS CRAFTED TO CAUSE YOUR SERVER TO SHUT DOWN. Using 
+    the ipaddr, user, and passphrase will prevent this behavior.
