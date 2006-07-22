@@ -294,7 +294,7 @@ static const char *lookup_key(char *key, struct pair table[])
    return ret;
 }
 
-static void process_packet(UPSINFO* ups, char *buf, int len)
+static bool process_packet(UPSINFO* ups, char *buf, int len)
 {
    PCNET_DATA *my_data = (PCNET_DATA *)ups->driver_internal_data;
    char *key, *end, *ptr, *value;
@@ -308,7 +308,7 @@ static void process_packet(UPSINFO* ups, char *buf, int len)
 
    /* If there's no MD= field, drop the packet */
    if ((ptr = strstr(buf, "MD=")) == NULL || ptr == buf)
-      return;
+      return false;
 
    if (my_data->auth) {
       /* Calculate the MD5 of the packet before messing with it */
@@ -348,14 +348,14 @@ static void process_packet(UPSINFO* ups, char *buf, int len)
          *end-- = '\0';
       } while (end >= key && isspace(*end));
 
-      Dmsg1(200, "process_packet: line='%s'\n", key);
+      Dmsg1(300, "process_packet: line='%s'\n", key);
 
       /* Split the string */
       if ((value = strchr(key, '=')) == NULL)
          continue;
       *value++ = '\0';
 
-      Dmsg2(200, "process_packet: key='%s' value='%s'\n",
+      Dmsg2(300, "process_packet: key='%s' value='%s'\n",
          key, value);
 
       /* Save key/value in table */
@@ -370,9 +370,23 @@ static void process_packet(UPSINFO* ups, char *buf, int len)
       val = lookup_key("MD", pairs);
       if (!val || strcmp(hash, val)) {
          Dmsg0(200, "process_packet: message hash failed\n");
-         return;
+         return false;
       }
       Dmsg1(200, "process_packet: message hash passed\n", val);
+
+      /* Check management card IP address */
+      val = lookup_key("PC", pairs);
+      if (!val) {
+         Dmsg0(200, "process_packet: Missing PC field\n");
+         return false;
+      }
+      Dmsg1(200, "process_packet: Expected IP=%s\n", my_data->ipaddr);
+      Dmsg1(200, "process_packet: Received IP=%s\n", val);
+      if (strcmp(val, my_data->ipaddr)) {
+         Dmsg2(200, "process_packet: IP address mismatch\n",
+            my_data->ipaddr, val);
+         return false;
+      }
    }
 
    /*
@@ -383,14 +397,14 @@ static void process_packet(UPSINFO* ups, char *buf, int len)
    val = lookup_key("SR", pairs);
    if (!val) {
       Dmsg0(200, "process_packet: Missing SR field\n");
-      return;
+      return false;
    }
    reboots = strtoul(val, NULL, 16);
 
    val = lookup_key("SU", pairs);
    if (!val) {
       Dmsg0(200, "process_packet: Missing SU field\n");
-      return;
+      return false;
    }
    uptime = strtoul(val, NULL, 16);
 
@@ -402,7 +416,7 @@ static void process_packet(UPSINFO* ups, char *buf, int len)
    if ((reboots == my_data->reboots && uptime <= my_data->uptime) ||
        (reboots < my_data->reboots)) {
       Dmsg0(200, "process_packet: Packet is out of order or replayed\n");
-      return;
+      return false;
    }
 
    my_data->reboots = reboots;
@@ -414,6 +428,7 @@ static void process_packet(UPSINFO* ups, char *buf, int len)
       pcnet_process_data(ups, pairs[idx].key, pairs[idx].value);
 
    write_unlock(ups);
+   return true;
 }
 
 /*
@@ -497,7 +512,7 @@ int pcnet_ups_check_state(UPSINFO *ups)
          logf("\n");
       }
 
-      process_packet(ups, buf, retval);
+      done = process_packet(ups, buf, retval);
    }
 
    return 1;
