@@ -62,18 +62,19 @@ static LastXferCause decode_lastxfer(const char *str)
    }
 }
 
-static void pcnet_process_data(UPSINFO* ups, const char *key, const char *value)
+static bool pcnet_process_data(UPSINFO* ups, const char *key, const char *value)
 {
    unsigned long cmd;
    int ci;
+   bool ret;
 
    /* Make sure we have a value */
    if (*value == '\0')
-      return;
+      return false;
 
    /* Key must be 2 hex digits */
    if (!isxdigit(key[0]) || !isxdigit(key[1]))
-      return;
+      return false;
 
    /* Convert command to CI */
    cmd = strtoul(key, NULL, 16);
@@ -83,7 +84,7 @@ static void pcnet_process_data(UPSINFO* ups, const char *key, const char *value)
 
    /* No match? */
    if (ci == CI_MAXCI)
-      return;
+      return false;
 
    /* Mark this CI as available */
    ups->UPS_Cap[ci] = true;
@@ -92,6 +93,7 @@ static void pcnet_process_data(UPSINFO* ups, const char *key, const char *value)
    ups->clear_commlost();
 
    /* Handle the data */
+   ret = true;
    switch (ci) {
       /*
        * VOLATILE DATA
@@ -268,8 +270,11 @@ static void pcnet_process_data(UPSINFO* ups, const char *key, const char *value)
       break;
    default:
       Dmsg1(100, "Unknown CI (%d)\n", ci);
+      ret = false;
       break;
    }
+   
+   return ret;
 }
 
 struct pair {
@@ -305,6 +310,7 @@ static bool process_packet(UPSINFO* ups, char *buf, int len)
    char hash[33];
    int idx;
    unsigned long uptime, reboots;
+   bool ret;
 
    /* If there's no MD= field, drop the packet */
    if ((ptr = strstr(buf, "MD=")) == NULL || ptr == buf)
@@ -424,11 +430,12 @@ static bool process_packet(UPSINFO* ups, char *buf, int len)
 
    write_lock(ups);
 
+   ret = false;
    for (idx=0; pairs[idx].key; idx++)
-      pcnet_process_data(ups, pairs[idx].key, pairs[idx].value);
+      ret |= pcnet_process_data(ups, pairs[idx].key, pairs[idx].value);
 
    write_unlock(ups);
-   return true;
+   return ret;
 }
 
 /*
