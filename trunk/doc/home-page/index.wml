@@ -14,8 +14,25 @@ consumption rates. Apcupsd is licensed under the GPL version 2.
 <p>
 
 <h2>Recent Apcupsd Releases</h2>
-
-<h3>3.12.3 (28 April 2006) [
+<h3><i><u>Development:</u></i>&nbsp;3.13.7 (22 July 2006) [
+<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=49236&release_id=434016">Source</a>
+&nbsp;/&nbsp;
+<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=73154&release_id=434017">Win32</a>
+]</h3>
+This development release rolls up a number of new features that have
+been available in various test releases for the last several months.
+<i>Keep in mind that this is a development release and may have bugs.
+Please report any problems to the
+<a href="http://lists.sourceforge.net/lists/listinfo/apcupsd-users">apcupsd-users</a>
+mailing list.</i>
+<p>
+New features include USB support for Windows, Solaris 10, and Mac OS
+X Darwin. Also new are the gapcmon GUI monitoring application, a 
+PowerChute Network Shutdown protocol (pcnet) driver, and lots of bug 
+fixes. The full
+<a href="http://sourceforge.net/project/shownotes.php?release_id=434016&group_id=54413">ReleaseNotes</a>
+are available.
+<h3><i><u>Stable:</u></i>&nbsp;3.12.3 (28 April 2006) [
 <a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=49059&release_id=413549">Source</a>
 &nbsp;/&nbsp;
 <a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=73150&release_id=413555">RPMs</a>
@@ -33,22 +50,6 @@ responses, and numerous bug fixes. Please be sure to read the
 <a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=413549">ReleaseNotes</a> 
 to learn about the new features and for important information about
 upcoming releases.
-
-<h3>3.10.18 (21 July 2005) [
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=49059&release_id=343935">Source</a>
-&nbsp;/&nbsp;
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=73150&release_id=344301">RPMs</a>
-&nbsp;/&nbsp;
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=73153&release_id=344086">Win32</a>
-]</h3>
-<b>Apcupsd</b> version 3.10.18 is a bug-fix only release; there are
-no new features. Users with USB connections are especially recommended
-to upgrade. This version contains changes for compatibility with linux
-2.6.12 kernels, and a fix for crashes on HPUX systems, a fix for
-'control queue full' lockups with certain USB models (650 CS, 800 RS,
-possibly others). Also included are minor fixes to apctest when used
-with a blank DEVICE setting (which is the recommended configuration
-for USB) and a BSD USB shutdown fix for ES models.
 
 <h2><a href="manual/index.html" target="_top">Online
 Manual</a> or a
