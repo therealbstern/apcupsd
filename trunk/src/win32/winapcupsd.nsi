@@ -263,7 +263,7 @@ Section "Uninstall"
   ; remove files and uninstaller (preserving config for now)
   Delete /REBOOTOK "$INSTDIR\bin\mingwm10.dll"
   Delete /REBOOTOK "$INSTDIR\bin\pthreadGCE.dll"
-  Delete /REBOOTOK "$INSTDIR\bin\libusbo.dll"
+  Delete /REBOOTOK "$INSTDIR\bin\libusb0.dll"
   Delete /REBOOTOK "$INSTDIR\bin\apcupsd.exe"
   Delete /REBOOTOK "$INSTDIR\bin\smtp.exe"
   Delete /REBOOTOK "$INSTDIR\bin\apcaccess.exe"
