@@ -19,7 +19,7 @@
 //
 // Author          : Christopher S. Hull
 // Created On      : Sat Jan 31 15:55:00 2004
-// $Id: compat.cpp,v 1.18 2006-07-15 16:49:15 adk0212 Exp $
+// $Id: compat.cpp,v 1.19 2006-07-24 23:03:48 adk0212 Exp $
 
 #include "apc.h"
 #include "compat.h"
@@ -1005,15 +1005,6 @@ inet_aton(const char *a, struct in_addr *inp)
    }
    inp->s_addr = htonl(acc);     /* store addr in network format */
    return 1;
-}
-
-int
-nanosleep(const struct timespec *req, struct timespec *rem)
-{
-    if (rem)
-        rem->tv_sec = rem->tv_nsec = 0;
-    Sleep((req->tv_sec * 1000) + (req->tv_nsec/100000));
-    return 0;
 }
 
 void

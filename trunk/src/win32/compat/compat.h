@@ -27,7 +27,7 @@
  * Last Modified By: Thorsten Engel
  * Last Modified On: Fri Apr 22 19:30:00 2004
  * Update Count    : 218
- * $Id: compat.h,v 1.14 2006-07-22 02:40:22 adk0212 Exp $
+ * $Id: compat.h,v 1.15 2006-07-24 23:03:48 adk0212 Exp $
  */
 
 
@@ -218,7 +218,6 @@ int waitpid(int, int *, int);
 
 struct timespec;
 int readdir(unsigned int fd, struct dirent *dirp, unsigned int count);
-int nanosleep(const struct timespec*, struct timespec *);
 long int random(void);
 void srandom(unsigned int seed);
 int lstat(const char *, struct stat *);

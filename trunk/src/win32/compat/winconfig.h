@@ -159,7 +159,7 @@
 /* #undef HAVE_MTIO_H */
 
 /* Define to 1 if you have the `nanosleep' function. */
-#define HAVE_NANOSLEEP 1
+/* #undef HAVE_NANOSLEEP */
 
 /* Define to 1 if you have the <pwd.h> header file. */
 /*#define HAVE_PWD_H 1*/
