@@ -271,7 +271,11 @@ AC_CHECK_FUNCS(
 		[AC_MSG_ERROR([cannot find required function.])]
 		)
 
-AC_CHECK_FUNCS(snprintf vsnprintf nanosleep usleep)
+AC_CHECK_FUNCS(snprintf vsnprintf)
+
+AC_CHECK_FUNCS(nanosleep usleep, [], 
+    [LIBEXTRAOBJ="$LIBEXTRAOBJ sleep.o"
+     EXTRAOBJ="$EXTRAOBJ lib/sleep.o"])
 
 AC_MSG_CHECKING([for syslog])
 

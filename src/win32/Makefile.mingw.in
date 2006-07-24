@@ -141,7 +141,8 @@ LIB_OBJS = \
 	$(OBJDIR)/apcstatus.o \
 	$(OBJDIR)/asys.o \
 	$(OBJDIR)/newups.o \
-	$(OBJDIR)/md5.o
+	$(OBJDIR)/md5.o \
+	$(OBJDIR)/sleep.o
 
 #
 # Rules for generating from ../lib
@@ -184,6 +185,9 @@ $(OBJDIR)/newups.o: ../lib/newups.c
 	$(CXX) -c $< -o $@
 
 $(OBJDIR)/md5.o: ../lib/md5.c
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/sleep.o: ../lib/sleep.c
 	$(CXX) -c $< -o $@
 
 ######################################################################

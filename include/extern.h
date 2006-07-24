@@ -234,7 +234,6 @@ extern void generic_error_out(const char *file, int line, const char *fmt, ...);
 extern void generic_error_exit(const char *fmt, ...);
 
 /* In asys.c */
-int amicrosleep(time_t sec, long usec);
 int avsnprintf(char *str, size_t size, const char *format, va_list ap);
 int asnprintf(char *str, size_t size, const char *fmt, ...);
 char *astrncpy(char *dest, const char *src, int maxlen);
@@ -247,5 +246,13 @@ void *acalloc(size_t size1, size_t size2);
 
 /* In apcwinipc.c */
 int winioctl(int fd, int func, int *addr);
+
+/* In sleep.c */
+#ifndef HAVE_NANOSLEEP
+  int nanosleep(const struct timespec *req, struct timespec *rem);
+#endif
+#ifndef HAVE_USLEEP
+  void usleep(unsigned long usec);
+#endif
 
 #endif   /* _EXTERN_H */
