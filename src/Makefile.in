@@ -64,7 +64,7 @@ install-binary: $(allexe)
 	@$(MAKE) DESTDIR=$(DESTDIR) install-@SMTP@
 	@$(MAKE) DESTDIR=$(DESTDIR) install-@POWERFLUTE@
 	@$(MAKE) DESTDIR=$(DESTDIR) install-@CGI@
-	@$(MAKE) DESTDIR=$(DESTDIR) install-@GAPCDIR@
+	@$(MAKE) DESTDIR=$(DESTDIR) install-@GAPCMON@
 
 install-apcaccess:
 	@$(INSTALL_PROGRAM) -s -m 755 apcaccess@EXEEXT@ \
