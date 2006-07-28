@@ -216,13 +216,8 @@ void do_server(UPSINFO *ups)
       arg->ups = ups;
       childpid = 0;
 
-#ifdef HAVE_CYGWIN
-      handle_client_request(arg);
-      close(newsockfd);            /* parent process */
-#else
       pthread_t tid;
       pthread_create(&tid, NULL, handle_client_request, arg);
-#endif   /* HAVE_CYGWIN */
 
    }
 }

@@ -74,13 +74,8 @@ int main(int argc, char **argv)
       TOKEN_PRIVILEGES tkp; 
 
       // Get a token for this process. 
-#ifdef HAVE_CYGWIN
-      OpenThreadToken(GetCurrentThread(), 
-         TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, FALSE, &hToken);
-#else
       OpenProcessToken(GetCurrentProcess(), 
          TOKEN_ADJUST_PRIVILEGES | TOKEN_QUERY, &hToken);
-#endif
 
       // Get the LUID for the shutdown privilege. 
 

@@ -163,7 +163,6 @@
 #undef HAVE_SUN_OS
 #undef HAVE_AIX_OS
 #undef HAVE_SGI_OS
-#undef HAVE_CYGWIN
 #undef HAVE_OSF1_OS
 #undef HAVE_OPENSERVER_OS
 #undef HAVE_DARWIN_OS

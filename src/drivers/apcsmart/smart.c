@@ -183,7 +183,7 @@ int getline(char *s, int len, UPSINFO *ups)
 #endif
 
    while (!ending) {
-#if !defined(HAVE_CYGWIN) && !defined(HAVE_MINGW)
+#if !defined(HAVE_MINGW)
       fd_set rfds;
       struct timeval tv;
 

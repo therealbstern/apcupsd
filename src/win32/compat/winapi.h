@@ -35,7 +35,7 @@
 #include <windef.h>
 #endif
 
-#if defined(HAVE_CYGWIN) || defined(HAVE_WIN32)
+#if defined(HAVE_WIN32)
 
 #ifndef POOLMEM
 typedef char POOLMEM;

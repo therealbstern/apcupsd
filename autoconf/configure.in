@@ -89,14 +89,6 @@ dnl
 dnl Sets `host_cpu', `host_vendor', and `host_os' to the current host type.
 dnl
 AC_CANONICAL_HOST		    dnl Check for host type.
-dnl Now detect if this is a cygwin environment.
-case $host_os in
-    *cygwin* ) CFG_CYGWIN=yes
-	;;
-    * ) CFG_CYGWIN=no
-	;;
-esac
-
 
 dnl
 dnl
@@ -162,23 +154,9 @@ AC_DEFINE(HAVE_PTHREADS)
 AC_SUBST(PTHREAD_CFLAGS)
 AC_SUBST(PTHREAD_LFLAGS)
 
-if test "$CFG_CYGWIN" = "yes"
-then
-    WIN32=win32
-    WINLIBS="-luser32 -lgdi32"
-    APCACCESS=apcaccess
-    SMTP=smtp
-    APCTEST=apctest
-    AC_DEFINE(HAVE_CYGWIN)
-else
-    WIN32=
-    WINLIBS=
-    APCACCESS=apcaccess
-    SMTP=smtp
-    APCTEST=apctest
-fi
-AC_SUBST(WIN32)
-AC_SUBST(WINLIBS)
+APCACCESS=apcaccess
+SMTP=smtp
+APCTEST=apctest
 AC_SUBST(APCACCESS)
 AC_SUBST(SMTP)
 AC_SUBST(APCTEST)
@@ -187,32 +165,20 @@ dnl Now check for programs
 AC_PATH_PROGS(SHUTDOWN, shutdown shutdown.bsd, no)
 if test "$SHUTDOWN" = "no"
 then
-	if test "$CFG_CYGWIN" = "no"
-	then
-	   AC_MSG_ERROR([shutdown program not found !])
-	fi
+   AC_MSG_ERROR([shutdown program not found !])
 fi
 
-if test "$CFG_CYGWIN" = "yes"
+AC_PATH_PROGS(APCUPSD_MAIL, mail, no)
+if test "$APCUPSD_MAIL" = "no"
 then
-    AC_MSG_WARN([Hardcoding APCUPSD_MAIL to /apcupsd/bin/smtp])
-    APCUPSD_MAIL='/apcupsd/bin/smtp'
-else
-    AC_PATH_PROGS(APCUPSD_MAIL, mail, no)
-    if test "$APCUPSD_MAIL" = "no"
-    then
-	AC_MSG_WARN([mail program not found !])
-	APCUPSD_MAIL=mail
-    fi
+    AC_MSG_WARN([mail program not found !])
+    APCUPSD_MAIL=mail
 fi
 
 AC_PATH_PROGS(WALL, wall, no)
 if test "$WALL" = "no"
 then
-	if test "$CFG_CYGWIN" = "no"
-	then
-	   AC_MSG_ERROR([wall program not found !])
-	fi
+   AC_MSG_ERROR([wall program not found !])
 fi
 
 AC_PATH_PROGS(SCRIPTSHELL, sh bash, no)
@@ -822,20 +788,13 @@ AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
 	   USB_TYPE="bsd"
 	   AC_MSG_RESULT([Using BSD USB driver.])
 	else
-	   if test "$CFG_CYGWIN" = "yes"; then
-	      dnl Hard code paths on Win32 since LibUSB-Win32 sadly
-	      dnl does not provide libusb-config.
-	      LIBUSB=-L/cygdrive/C/Program\\\ Files/LibUSB-Win32/lib/gcc\ -lusb
-	      LIBUSBH=/cygdrive/C/Program\ Files/LibUSB-Win32/include/usb.h
-	   else
-	      AC_PATH_PROG(usbcfg, libusb-config)
-	      if test x$usbcfg = x ; then
-		 AC_MSG_ERROR(Cannot find libusb-config)
-	      fi
-
-	      LIBUSB=`$usbcfg --libs`
-	      LIBUSBH=`$usbcfg --prefix`/include/usb.h
+	   AC_PATH_PROG(usbcfg, libusb-config)
+	   if test x$usbcfg = x ; then
+	      AC_MSG_ERROR(Cannot find libusb-config)
 	   fi
+
+	   LIBUSB=`$usbcfg --libs`
+	   LIBUSBH=`$usbcfg --prefix`/include/usb.h
 	   
 	   AC_SUBST(LIBUSBH)
 
@@ -1070,7 +1029,7 @@ AC_SUBST(GAPCMON)
 dnl Default linker is g++
 LD="$CXX"
 
-if test -n "$GCC" -a "$CFG_CYGWIN" != "yes"; then
+if test -n "$GCC"; then
     # Starting with GCC 3.0, you must link C++ programs against either
     # libstdc++ (shared by default), or libsupc++ (always static).  If
     # you care about binary portability between Linux distributions,
@@ -1345,9 +1304,6 @@ then
 elif test -f /etc/engarde-version
 then
 	DISTNAME=engarde
-elif test "$CFG_CYGWIN" = "yes"
-then
-	DISTNAME=cygwin
 else
 	DISTNAME=unknown
 fi
@@ -1398,10 +1354,6 @@ do
 	fi
 done
 
-# set Windows (cygwin) build flags to null
-WCFLAGS=
-WLDFLAGS=
-
 # set the default PWRFAILDIR
 PWRFAILDIR=${sysconfdir}
 
@@ -1430,26 +1382,6 @@ alpha)
   ;;
 bsdi)
     DISTVER=`uname -a |awk '{print $3}'`
-  ;;
-cygwin)
-    DISTVER=cygwin
-    LOCKDIR=/apcupsd/etc/apcupsd
-    SERIALDEV=/dev/com1
-    LOGDIR=/apcupsd/etc/apcupsd
-    nologdir=/apcupsd/etc
-    WLDFLAGS="-mwindows"
-    PWRFAILDIR=/apcupsd/etc	   
-    PIDDIR=/apcupsd/etc/apcupsd
-    PTHREAD_CFLAGS=""
-    PTHREAD_LFLAGS=""
-    DFILES="\
-	src/win32/Makefile \
-	src/win32/Makefile.cygwin \
-	src/win32/winapcupsd.nsi \
-	platforms/cygwin/Makefile \
-	platforms/cygwin/apcupsd \
-	platforms/cygwin/apccontrol \
-	"
   ;;
 debian)
     DISTVER=`cat /etc/debian_version`
@@ -1729,9 +1661,6 @@ AC_SUBST(UPSCABLE)
 HOST=$DISTNAME
 AC_DEFINE_UNQUOTED(HOST, "$HOST")
 AC_SUBST(HOST)
-   
-AC_SUBST(WCFLAGS)
-AC_SUBST(WLDFLAGS)
 
 dnl
 dnl Find out gcc's installation directory and include files. Used in
@@ -1762,7 +1691,7 @@ GENERATE_FILES="\
     src/Makefile \
     src/lib/Makefile \
     src/drivers/Makefile \
-    src/win32/Makefile.mingw \
+    src/win32/Makefile \
     platforms/Makefile \
     platforms/apccontrol \
     platforms/etc/changeme \
@@ -1852,13 +1781,6 @@ then
     GENERATE_FILES="$GENERATE_FILES src/gapcmon/Makefile"
 fi
 
-case $host_os in
-    *cygwin* ) CC=g++
-	;;
-    * )
-	;;
-esac
-
 dnl
 dnl Insert Makefile(s) fragments.
 VARIABLES=$srcdir/autoconf/variables.mak
@@ -1904,7 +1826,7 @@ Configuration on `date`:
   Power Fail dir	      ${PWRFAILDIR}
   Compiler:		      ${CXX} ${CXXVERSION}
   Compiler flags:	      ${CFLAGS} ${PTHREAD_FLAGS}
-  Linker flags: 	      ${WLDFLAGS} ${LDFLAGS}
+  Linker flags: 	      ${LDFLAGS}
   Host and version:	      ${DISTNAME} ${DISTVER}
   Shutdown Program:	      ${SHUTDOWN}
   Port/Device:		      ${SERIALDEV}

@@ -484,7 +484,7 @@ void stat_print(UPSINFO *ups, char *fmt, ...)
    va_end(arg_ptr);
 }
 
-#if   defined(HAVE_CYGWIN) || defined(HAVE_MINGW)
+#if defined(HAVE_WIN32)
 
 #include <windows.h>
 
@@ -600,4 +600,4 @@ void FillStatusBox(HWND hwnd, int id_list)
    output_status(ups, 0, stat_open, stat_list, stat_close);
 }
 
-#endif   /* HAVE_CYGWIN */
+#endif   /* HAVE_WIN32 */
