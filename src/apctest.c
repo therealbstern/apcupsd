@@ -206,7 +206,6 @@ void apctest_error_out(const char *file, int line, const char *fmt, ...)
    avsnprintf((char *)&buf[i], sizeof(buf) - i, (char *)fmt, arg_ptr);
    va_end(arg_ptr);
 
-   fprintf(stderr, "%s", buf);
    pmsg(buf);
 
    apctest_error_cleanup(core_ups);     /* finish the work */
