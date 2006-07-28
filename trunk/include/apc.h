@@ -85,9 +85,6 @@
 #include <netdb.h>
 #include <sys/ioctl.h>
 
-#ifdef HAVE_CYGWIN
-# include <apc_winsem.h>
-#else
 # ifdef HAVE_SYS_IPC_H
 #  include <sys/ipc.h>
 # endif
@@ -97,7 +94,6 @@
 # ifdef HAVE_SYS_SHM_H
 #  include <sys/shm.h>
 # endif
-#endif
 
 #ifdef HAVE_SYS_SOCKET_H
 # include <sys/socket.h>

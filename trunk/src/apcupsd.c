@@ -320,7 +320,7 @@ extern int debug_level;
  */
 static void daemon_start(void)
 {
-#if !defined(HAVE_CYGWIN) && !defined(HAVE_MINGW)
+#if !defined(HAVE_WIN32)
    int i, fd;
    pid_t cpid;
    mode_t oldmask;
@@ -380,5 +380,5 @@ static void daemon_start(void)
       for (i = 1; fd + i <= 2; i++)
          dup2(fd, fd + i);
    }
-#endif   /* HAVE_CYGWIN */
+#endif   /* HAVE_WIN32 */
 }

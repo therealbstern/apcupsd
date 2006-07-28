@@ -20,8 +20,7 @@ apclibobjs = @LIBEXTRAOBJ@ \
 	     apcfile.o apclibnis.o \
 	     apclock.o apclog.o apcsignal.o \
 	     apcstatus.o asys.o \
-	     newups.o wincompat.o \
-	     md5.o
+	     newups.o md5.o
 
 all-targets: $(apclib)
 

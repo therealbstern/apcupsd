@@ -233,10 +233,6 @@ void apctest_error_exit(const char *fmt, ...)
 /* Main program */
 
 /* This application must be linked as console app. */
-#ifdef HAVE_CYGWIN
-#undef main
-#endif
-
 #define M_SMART  1
 #define M_DUMB   2
 #define M_USB    3

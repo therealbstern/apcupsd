@@ -9,7 +9,7 @@
 topdir = @topdir@
 top_builddir = $(topdir)
 
-subdirs = lib @LIBUSBHID@ drivers @WIN32@ @INTLSUB@ @POSUB@ @LIBGD@ @CGI@ @GAPCMON@
+subdirs = lib @LIBUSBHID@ drivers @INTLSUB@ @POSUB@ @LIBGD@ @CGI@ @GAPCMON@
 
 gobjs = reports.o action.o apcnis.o device.o
 dobjs = apcupsd.o options.o
@@ -32,7 +32,7 @@ all-targets: $(allexe)
 #
 
 apcupsd: $(dobjs) $(gobjs) $(WINAPC) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
-	$(LD) $(LDFLAGS) $(WLDFLAGS) $(dobjs) $(gobjs) $(DRVLIBS) $(LIBS) $(WINAPC) $(WINLIBS) @LIBUSB@ -o apcupsd
+	$(LD) $(LDFLAGS) $(dobjs) $(gobjs) $(DRVLIBS) $(LIBS) @LIBUSB@ -o apcupsd
 
 apctest: $(tobjs) $(gobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
 	$(LD) $(LDFLAGS) $(tobjs) $(gobjs) $(DRVLIBS) $(LIBS) @LIBUSB@ -o apctest

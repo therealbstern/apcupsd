@@ -172,7 +172,7 @@ goodout:
 
 #endif                             /* HAVE_NISSERVER */
 
-#if   defined(HAVE_CYGWIN) || defined(HAVE_MINGW)
+#if defined(HAVE_WIN32)
 
 #include <windows.h>
 
@@ -234,4 +234,4 @@ void FillEventsBox(HWND hwnd, int id_list)
    return;
 }
 
-#endif   /* HAVE_CYGWIN */
+#endif   /* HAVE_WIN32 */

@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS ABSSRCDIR topdir TOP_DIR VERSION DATE TRUEPRG FALSEPRG build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP CXX CXXFLAGS ac_ct_CXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA AWK HAVE_GCC_TRUE HAVE_GCC_FALSE DEBUG DLIB DINCLUDE PTHREAD_CFLAGS PTHREAD_LFLAGS WIN32 WINLIBS APCACCESS SMTP APCTEST SHUTDOWN APCUPSD_MAIL WALL SCRIPTSHELL MAKE MAKEDEPEND RANLIB LIBTOOL ETAGS CTAGS RM CP ECHO LN SED AR MV X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS HAVE_SUN_OS_TRUE HAVE_SUN_OS_FALSE HAVE_OSF1_OS_TRUE HAVE_OSF1_OS_FALSE HAVE_AIX_OS_TRUE HAVE_AIX_OS_FALSE HAVE_HPUX_OS_TRUE HAVE_HPUX_OS_FALSE HAVE_LINUX_OS_TRUE HAVE_LINUX_OS_FALSE HAVE_FREEBSD_OS_TRUE HAVE_FREEBSD_OS_FALSE HAVE_NETBSD_OS_TRUE HAVE_NETBSD_OS_FALSE HAVE_OPENBSD_OS_TRUE HAVE_OPENBSD_OS_FALSE HAVE_BSDI_OS_TRUE HAVE_BSDI_OS_FALSE HAVE_SGI_OS_TRUE HAVE_SGI_OS_FALSE HAVE_DARWIN_OS_TRUE HAVE_DARWIN_OS_FALSE GDHEAD INSTALL_DISTDIR UNINSTALL_DISTDIR APCSMART_DRIVER DUMB_DRIVER LIBUSBHID LIBUSBHIDINC LIBUSBHIDOBJS usbcfg LIBUSBH USB_DRIVER USB_TYPE LIBUSB NET_DRIVER SNMP_DRIVER TEST_DRIVER PCNET_DRIVER NISIP PKG_CONFIG ac_pt_PKG_CONFIG GAPCMON_CFLAGS GAPCMON_LIBS GAPCMON POMAKE INTLSUB INTLMAKE INTLTARGET POWERFLUTE POWERLIBS LD CGI GDINCLUDE LIBGD LIBGDOBJ CGI_IMGFMT CGIBIN PACKAGE MSGFMT SET_MAKE ac_ct_RANLIB ALLOCA USE_NLS GMSGFMT XGETTEXT GENCAT USE_INCLUDED_LIBINTL CATALOGS CATOBJEXT DATADIRNAME GMOFILES INSTOBJEXT INTLDEPS INTLLIBS INTLINCLUDE INTLOBJS POFILES POSUB INCLUDE_LOCALE_H GT_NO GT_YES l MKINSTALLDIRS EXTRADEFS LIBEXTRAOBJ EXTRAOBJ DISTNAME DISTVER SERIALDEV PIDDIR LOGDIR nologdir PWRFAILDIR LOCKDIR NISPORT UPSTYPE UPSCABLE HOST WCFLAGS WLDFLAGS LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS ABSSRCDIR topdir TOP_DIR VERSION DATE TRUEPRG FALSEPRG build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP CXX CXXFLAGS ac_ct_CXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA AWK HAVE_GCC_TRUE HAVE_GCC_FALSE DEBUG DLIB DINCLUDE PTHREAD_CFLAGS PTHREAD_LFLAGS APCACCESS SMTP APCTEST SHUTDOWN APCUPSD_MAIL WALL SCRIPTSHELL MAKE MAKEDEPEND RANLIB LIBTOOL ETAGS CTAGS RM CP ECHO LN SED AR MV X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS HAVE_SUN_OS_TRUE HAVE_SUN_OS_FALSE HAVE_OSF1_OS_TRUE HAVE_OSF1_OS_FALSE HAVE_AIX_OS_TRUE HAVE_AIX_OS_FALSE HAVE_HPUX_OS_TRUE HAVE_HPUX_OS_FALSE HAVE_LINUX_OS_TRUE HAVE_LINUX_OS_FALSE HAVE_FREEBSD_OS_TRUE HAVE_FREEBSD_OS_FALSE HAVE_NETBSD_OS_TRUE HAVE_NETBSD_OS_FALSE HAVE_OPENBSD_OS_TRUE HAVE_OPENBSD_OS_FALSE HAVE_BSDI_OS_TRUE HAVE_BSDI_OS_FALSE HAVE_SGI_OS_TRUE HAVE_SGI_OS_FALSE HAVE_DARWIN_OS_TRUE HAVE_DARWIN_OS_FALSE GDHEAD INSTALL_DISTDIR UNINSTALL_DISTDIR APCSMART_DRIVER DUMB_DRIVER LIBUSBHID LIBUSBHIDINC LIBUSBHIDOBJS usbcfg LIBUSBH USB_DRIVER USB_TYPE LIBUSB NET_DRIVER SNMP_DRIVER TEST_DRIVER PCNET_DRIVER NISIP PKG_CONFIG ac_pt_PKG_CONFIG GAPCMON_CFLAGS GAPCMON_LIBS GAPCMON POMAKE INTLSUB INTLMAKE INTLTARGET POWERFLUTE POWERLIBS LD CGI GDINCLUDE LIBGD LIBGDOBJ CGI_IMGFMT CGIBIN PACKAGE MSGFMT SET_MAKE ac_ct_RANLIB ALLOCA USE_NLS GMSGFMT XGETTEXT GENCAT USE_INCLUDED_LIBINTL CATALOGS CATOBJEXT DATADIRNAME GMOFILES INSTOBJEXT INTLDEPS INTLLIBS INTLINCLUDE INTLOBJS POFILES POSUB INCLUDE_LOCALE_H GT_NO GT_YES l MKINSTALLDIRS EXTRADEFS LIBEXTRAOBJ EXTRAOBJ DISTNAME DISTVER SERIALDEV PIDDIR LOGDIR nologdir PWRFAILDIR LOCKDIR NISPORT UPSTYPE UPSCABLE HOST LIBOBJS LTLIBOBJS'
 ac_subst_files='VARIABLES TARGETS'
 
 # Initialize some variables set by options.
@@ -1590,13 +1590,6 @@ host=$ac_cv_host
 host_cpu=`echo $ac_cv_host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\1/'`
 host_vendor=`echo $ac_cv_host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\2/'`
 host_os=`echo $ac_cv_host | sed 's/^\([^-]*\)-\([^-]*\)-\(.*\)$/\3/'`
-
-		    case $host_os in
-    *cygwin* ) CFG_CYGWIN=yes
-	;;
-    * ) CFG_CYGWIN=no
-	;;
-esac
 
 
 
@@ -3623,26 +3616,9 @@ _ACEOF
 
 
 
-if test "$CFG_CYGWIN" = "yes"
-then
-    WIN32=win32
-    WINLIBS="-luser32 -lgdi32"
-    APCACCESS=apcaccess
-    SMTP=smtp
-    APCTEST=apctest
-    cat >>confdefs.h <<\_ACEOF
-#define HAVE_CYGWIN 1
-_ACEOF
-
-else
-    WIN32=
-    WINLIBS=
-    APCACCESS=apcaccess
-    SMTP=smtp
-    APCTEST=apctest
-fi
-
-
+APCACCESS=apcaccess
+SMTP=smtp
+APCTEST=apctest
 
 
 
@@ -3694,21 +3670,12 @@ test -n "$SHUTDOWN" || SHUTDOWN="no"
 
 if test "$SHUTDOWN" = "no"
 then
-	if test "$CFG_CYGWIN" = "no"
-	then
-	   { { echo "$as_me:$LINENO: error: shutdown program not found !" >&5
+   { { echo "$as_me:$LINENO: error: shutdown program not found !" >&5
 echo "$as_me: error: shutdown program not found !" >&2;}
    { (exit 1); exit 1; }; }
-	fi
 fi
 
-if test "$CFG_CYGWIN" = "yes"
-then
-    { echo "$as_me:$LINENO: WARNING: Hardcoding APCUPSD_MAIL to /apcupsd/bin/smtp" >&5
-echo "$as_me: WARNING: Hardcoding APCUPSD_MAIL to /apcupsd/bin/smtp" >&2;}
-    APCUPSD_MAIL='/apcupsd/bin/smtp'
-else
-    for ac_prog in mail
+for ac_prog in mail
 do
   # Extract the first word of "$ac_prog", so it can be a program name with args.
 set dummy $ac_prog; ac_word=$2
@@ -3753,12 +3720,11 @@ fi
 done
 test -n "$APCUPSD_MAIL" || APCUPSD_MAIL="no"
 
-    if test "$APCUPSD_MAIL" = "no"
-    then
-	{ echo "$as_me:$LINENO: WARNING: mail program not found !" >&5
+if test "$APCUPSD_MAIL" = "no"
+then
+    { echo "$as_me:$LINENO: WARNING: mail program not found !" >&5
 echo "$as_me: WARNING: mail program not found !" >&2;}
-	APCUPSD_MAIL=mail
-    fi
+    APCUPSD_MAIL=mail
 fi
 
 for ac_prog in wall
@@ -3808,12 +3774,9 @@ test -n "$WALL" || WALL="no"
 
 if test "$WALL" = "no"
 then
-	if test "$CFG_CYGWIN" = "no"
-	then
-	   { { echo "$as_me:$LINENO: error: wall program not found !" >&5
+   { { echo "$as_me:$LINENO: error: wall program not found !" >&5
 echo "$as_me: error: wall program not found !" >&2;}
    { (exit 1); exit 1; }; }
-	fi
 fi
 
 for ac_prog in sh bash
@@ -11768,11 +11731,7 @@ echo "${ECHO_T}Using Linux USB driver." >&6
 	   echo "$as_me:$LINENO: result: Using BSD USB driver." >&5
 echo "${ECHO_T}Using BSD USB driver." >&6
 	else
-	   if test "$CFG_CYGWIN" = "yes"; then
-	      	      	      LIBUSB=-L/cygdrive/C/Program\\\ Files/LibUSB-Win32/lib/gcc\ -lusb
-	      LIBUSBH=/cygdrive/C/Program\ Files/LibUSB-Win32/include/usb.h
-	   else
-	      # Extract the first word of "libusb-config", so it can be a program name with args.
+	   # Extract the first word of "libusb-config", so it can be a program name with args.
 set dummy libusb-config; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
@@ -11811,15 +11770,14 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
-	      if test x$usbcfg = x ; then
-		 { { echo "$as_me:$LINENO: error: Cannot find libusb-config" >&5
+	   if test x$usbcfg = x ; then
+	      { { echo "$as_me:$LINENO: error: Cannot find libusb-config" >&5
 echo "$as_me: error: Cannot find libusb-config" >&2;}
    { (exit 1); exit 1; }; }
-	      fi
-
-	      LIBUSB=`$usbcfg --libs`
-	      LIBUSBH=`$usbcfg --prefix`/include/usb.h
 	   fi
+
+	   LIBUSB=`$usbcfg --libs`
+	   LIBUSBH=`$usbcfg --prefix`/include/usb.h
 
 
 
@@ -12853,7 +12811,7 @@ fi;
 
 LD="$CXX"
 
-if test -n "$GCC" -a "$CFG_CYGWIN" != "yes"; then
+if test -n "$GCC"; then
     # Starting with GCC 3.0, you must link C++ programs against either
     # libstdc++ (shared by default), or libsupc++ (always static).  If
     # you care about binary portability between Linux distributions,
@@ -16565,9 +16523,6 @@ then
 elif test -f /etc/engarde-version
 then
 	DISTNAME=engarde
-elif test "$CFG_CYGWIN" = "yes"
-then
-	DISTNAME=cygwin
 else
 	DISTNAME=unknown
 fi
@@ -16609,10 +16564,6 @@ do
 	fi
 done
 
-# set Windows (cygwin) build flags to null
-WCFLAGS=
-WLDFLAGS=
-
 # set the default PWRFAILDIR
 PWRFAILDIR=${sysconfdir}
 
@@ -16641,26 +16592,6 @@ alpha)
   ;;
 bsdi)
     DISTVER=`uname -a |awk '{print $3}'`
-  ;;
-cygwin)
-    DISTVER=cygwin
-    LOCKDIR=/apcupsd/etc/apcupsd
-    SERIALDEV=/dev/com1
-    LOGDIR=/apcupsd/etc/apcupsd
-    nologdir=/apcupsd/etc
-    WLDFLAGS="-mwindows"
-    PWRFAILDIR=/apcupsd/etc
-    PIDDIR=/apcupsd/etc/apcupsd
-    PTHREAD_CFLAGS=""
-    PTHREAD_LFLAGS=""
-    DFILES="\
-	src/win32/Makefile \
-	src/win32/Makefile.cygwin \
-	src/win32/winapcupsd.nsi \
-	platforms/cygwin/Makefile \
-	platforms/cygwin/apcupsd \
-	platforms/cygwin/apccontrol \
-	"
   ;;
 debian)
     DISTVER=`cat /etc/debian_version`
@@ -16987,9 +16918,6 @@ _ACEOF
 
 
 
-
-
-
 gccinclude="."
 
 if test "$CC" = "gcc"
@@ -17010,7 +16938,7 @@ GENERATE_FILES="\
     src/Makefile \
     src/lib/Makefile \
     src/drivers/Makefile \
-    src/win32/Makefile.mingw \
+    src/win32/Makefile \
     platforms/Makefile \
     platforms/apccontrol \
     platforms/etc/changeme \
@@ -17099,13 +17027,6 @@ if test "$GAPCMON"x != ""x
 then
     GENERATE_FILES="$GENERATE_FILES src/gapcmon/Makefile"
 fi
-
-case $host_os in
-    *cygwin* ) CC=g++
-	;;
-    * )
-	;;
-esac
 
 VARIABLES=$srcdir/autoconf/variables.mak
 
@@ -17781,8 +17702,6 @@ s,@DLIB@,$DLIB,;t t
 s,@DINCLUDE@,$DINCLUDE,;t t
 s,@PTHREAD_CFLAGS@,$PTHREAD_CFLAGS,;t t
 s,@PTHREAD_LFLAGS@,$PTHREAD_LFLAGS,;t t
-s,@WIN32@,$WIN32,;t t
-s,@WINLIBS@,$WINLIBS,;t t
 s,@APCACCESS@,$APCACCESS,;t t
 s,@SMTP@,$SMTP,;t t
 s,@APCTEST@,$APCTEST,;t t
@@ -17906,8 +17825,6 @@ s,@NISPORT@,$NISPORT,;t t
 s,@UPSTYPE@,$UPSTYPE,;t t
 s,@UPSCABLE@,$UPSCABLE,;t t
 s,@HOST@,$HOST,;t t
-s,@WCFLAGS@,$WCFLAGS,;t t
-s,@WLDFLAGS@,$WLDFLAGS,;t t
 s,@LIBOBJS@,$LIBOBJS,;t t
 s,@LTLIBOBJS@,$LTLIBOBJS,;t t
 /@VARIABLES@/r $VARIABLES
@@ -18700,7 +18617,7 @@ Configuration on `date`:
   Power Fail dir	      ${PWRFAILDIR}
   Compiler:		      ${CXX} ${CXXVERSION}
   Compiler flags:	      ${CFLAGS} ${PTHREAD_FLAGS}
-  Linker flags: 	      ${WLDFLAGS} ${LDFLAGS}
+  Linker flags: 	      ${LDFLAGS}
   Host and version:	      ${DISTNAME} ${DISTVER}
   Shutdown Program:	      ${SHUTDOWN}
   Port/Device:		      ${SERIALDEV}

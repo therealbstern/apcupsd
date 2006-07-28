@@ -80,7 +80,7 @@ int apcsmart_ups_open(UPSINFO *ups)
    my_data->newtio.c_cc[VMIN] = 0;
    my_data->newtio.c_cc[VTIME] = TIMER_READ * 10;
 
-#if defined(HAVE_CYGWIN) || defined(HAVE_OSF1_OS) || \
+#if defined(HAVE_OSF1_OS) || \
     defined(HAVE_LINUX_OS) || defined(HAVE_DARWIN_OS)
    (void)cfsetospeed(&my_data->newtio, DEFAULT_SPEED);
    (void)cfsetispeed(&my_data->newtio, DEFAULT_SPEED);

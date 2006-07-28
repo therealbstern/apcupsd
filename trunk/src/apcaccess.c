@@ -285,7 +285,7 @@ static void do_pthreads_status(UPSINFO *ups, char *host, int port)
 
 /*********************************************************************/
 
-#if defined(HAVE_CYGWIN) || defined(HAVE_MINGW)
+#if defined(HAVE_MINGW)
 #undef main
 #endif
 

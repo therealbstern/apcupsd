@@ -82,11 +82,7 @@ DEFS = @EXTRADEFS@ $(LOCALDEFS)
 # Libraries
 APCLIBS = $(topdir)/src/lib/libapc.a
 DRVLIBS = $(topdir)/src/drivers/libdrivers.a
-win32 = $(topdir)/src/win32/winmain.o $(topdir)/src/win32/winlib.a $(topdir)/src/win32/winres.res
 INTLLIBS = @INTLLIBS@
-WINAPC = $(@WIN32@)
-# Hack or die: seems that cygwin doesnn't like -lgdi32 and -luser32 in deps.
-WINLIBS = @WINLIBS@
 X_LIBS = @X_LIBS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 
@@ -98,6 +94,3 @@ CFLAGS = @CFLAGS@ @PTHREAD_CFLAGS@ $(INCFLAGS)
 CPPFLAGS = @CPPFLAGS@ $(CFLAGS)
 LDFLAGS = @LDFLAGS@
 LIBS = $(APCLIBS) $(INTLLIBS) @PTHREAD_LFLAGS@ @LIBS@
-
-# Flags for windows programs
-WLDFLAGS = @WLDFLAGS@
