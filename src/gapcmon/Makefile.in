@@ -15,9 +15,6 @@ sysconfdir=/etc
 # Subprogram selection
 allexe = @GAPCMON@
 
-# Override common CFLAGS here
-CFLAGS=-O2
-
 gapcmon_OBJS = gapcmon.o eggtrayicon.o
 pixmaps_DATA = charging.png onbatt.png online.png apcupsd.png unplugged.png
 
