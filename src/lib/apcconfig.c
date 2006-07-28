@@ -301,7 +301,7 @@ static int match_range(UPSINFO *ups, int offset, const GENINFO * vs, const char 
       return FAILURE;
 
    for (; vs->name; vs++)
-      if (!strcmp(x, vs->name))
+      if (!strcasecmp(x, vs->name))
          break;
 
    t = (INTERNALGENINFO *) AT(ups, offset);
@@ -350,7 +350,7 @@ static int match_index(UPSINFO *ups, int offset, const GENINFO * vs, const char 
       return FAILURE;
 
    for (; vs->name; vs++)
-      if (!strcmp(x, vs->name))
+      if (!strcasecmp(x, vs->name))
          break;
 
    if (vs->name == NULL) {
