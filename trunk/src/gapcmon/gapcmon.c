@@ -1029,12 +1029,9 @@ static gint lg_graph_draw_vertical_text (PLGRAPH plg,
 	GdkPixmap      *norm_pixmap = NULL;
     gint            width, height;
     gint            rot_width, rot_height;
-    GtkWidget      *widget;
     GdkPixbuf      *norm_pixbuf = NULL, *rot_pixbuf = NULL;
     guint32        *norm_pix, *rot_pix;
     gint            i, j, k, l;
-    gint            rows, cols;
-    guint32        *row, *col;
 
     g_return_val_if_fail (plg != NULL, -1);
     g_return_val_if_fail (pch_text != NULL, -1);
@@ -3481,7 +3478,7 @@ static gboolean gapc_panel_preferences_data_model_load(PGAPC_CONFIG pcfg)
    gint v_port_number;
    gfloat v_network_interval;
    gfloat v_graph_interval;
-   gchar *v_host_name, *pstring;
+   gchar *v_host_name;
 
    gchar k_enabled[GAPC_MAX_TEXT];
    gchar k_use_systray[GAPC_MAX_TEXT];
@@ -4695,7 +4692,6 @@ static gboolean gapc_panel_gconf_init(PGAPC_CONFIG pcfg)
 {
    GError *gerror = NULL;
    gchar *pstring = NULL;
-   GdkColor color;
 
    g_return_val_if_fail(pcfg != NULL, FALSE);
 
@@ -5567,7 +5563,7 @@ static gint gapc_panel_graph_property_page(PGAPC_CONFIG pcfg, GtkWidget * notebo
    GtkWidget *s_frame, *w_frame, *label, *s_box, *w_box, *frame, *hbox, *pbox;
    GtkWidget *cb_linev, *cb_loadpct, *cb_timeleft, *cb_bcharge, *cb_battv;
    GtkWidget *cb_window, *cb_chart, *cb_text;
-   GtkWidget *bbox, *b_undo, *b_apply;   
+   GtkWidget *bbox, *b_undo;
    
    gint i_page = 0;
 
