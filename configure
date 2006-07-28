@@ -16793,6 +16793,7 @@ sun)
     LOCKDIR=/var/spool/locks
     LOGDIR=${sysconfdir}
     APCUPSD_MAIL=/usr/bin/mailx
+    PTHREAD_CFLAGS="-D_POSIX_PTHREAD_SEMANTICS"
     DFILES="\
        platforms/sun/Makefile \
        platforms/sun/apcupsd \
