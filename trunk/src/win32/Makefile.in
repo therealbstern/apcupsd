@@ -329,16 +329,12 @@ $(OBJDIR)/snmp.o: ../drivers/snmp/snmp.c
 # Files in src
 OBJS_SRC = \
 	$(OBJDIR)/action.o \
-	$(OBJDIR)/apcupsd.o \
 	$(OBJDIR)/apcnis.o \
 	$(OBJDIR)/device.o \
 	$(OBJDIR)/options.o \
 	$(OBJDIR)/reports.o
 
 $(OBJDIR)/action.o:  ../action.c
-	$(CXX) -c $< -o $@
-
-$(OBJDIR)/apcupsd.o:  ../apcupsd.c
 	$(CXX) -c $< -o $@
 
 $(OBJDIR)/apcnis.o:  ../apcnis.c
@@ -353,6 +349,19 @@ $(OBJDIR)/options.o:  ../options.c
 $(OBJDIR)/reports.o:  ../reports.c
 	$(CXX) -c $< -o $@
 
+# apcupsd
+OBJS_APCUPSD = \
+	$(OBJDIR)/apcupsd.o
+
+$(OBJDIR)/apcupsd.o:  ../apcupsd.c
+	$(CXX) -c $< -o $@
+
+# apctest
+OBJS_APCTEST = \
+	$(OBJDIR)/apctest.o
+
+$(OBJDIR)/apctest.o:  ../apctest.c
+	$(CXX) -c $< -o $@
 
 ######################################################################
 
@@ -387,7 +396,12 @@ $(OBJDIR)/popup.o:	./popup.c
 APC_OBJS = $(OBJS_SRC) $(LIB_OBJS) $(OBJS_COMPAT) $(OBJS_WIN) \
 	   $(OBJS_DRIVERS) $(OBJS_TESTDRV) $(OBJS_NETDRV) \
 	   $(OBJS_SMARTDRV) $(OBJS_DUMBDRV) $(OBJS_USBDRV) \
-	   $(OBJS_SNMPDRV) $(OBJS_PCNETDRV)
+	   $(OBJS_SNMPDRV) $(OBJS_PCNETDRV) $(OBJS_APCUPSD)
+
+TEST_OBJS = $(OBJS_SRC) $(LIB_OBJS) $(OBJS_COMPAT) $(OBJS_WIN) \
+	   $(OBJS_DRIVERS) $(OBJS_TESTDRV) $(OBJS_NETDRV) \
+	   $(OBJS_SMARTDRV) $(OBJS_DUMBDRV) $(OBJS_USBDRV) \
+	   $(OBJS_SNMPDRV) $(OBJS_PCNETDRV) $(OBJS_APCTEST)
 
 APC_LIBS = \
 	-L$(LIB_MINGW) \
@@ -414,9 +428,10 @@ SHUT_LIBS =
 POP_OBJS = $(OBJS_POP)
 POP_LIBS = 
 
+
 # Targets
 
-all: apcupsd.exe apcaccess.exe shutdown.exe popup.exe
+all: apcupsd.exe apcaccess.exe shutdown.exe popup.exe apctest.exe
 
 clean:
 	rm -f $(OBJDIR)/*.o $(OBJDIR)/apcupsd.exe $(OBJDIR)/winres.res \
@@ -433,6 +448,9 @@ apcupsd.exe: $(APC_OBJS)
 apcaccess.exe: $(ACCESS_OBJS)
 	$(CXX) $(ACCESS_OBJS) $(ACCESS_LIBS) -o $(OBJDIR)/apcaccess.exe
 	cp -f $(DEPKGS)/pthreads/pthreadGCE.dll .
+
+apctest.exe: $(TEST_OBJS)
+	$(CXX) $(TEST_OBJS) $(APC_LIBS) -o $(OBJDIR)/apctest.exe
 
 shutdown.exe: $(SHUT_OBJS)
 	$(CXX) $(SHUT_OBJS) $(SHUT_LIBS) -mwindows -o $(OBJDIR)/shutdown.exe
