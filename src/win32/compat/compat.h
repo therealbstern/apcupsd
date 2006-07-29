@@ -27,7 +27,7 @@
  * Last Modified By: Thorsten Engel
  * Last Modified On: Fri Apr 22 19:30:00 2004
  * Update Count    : 218
- * $Id: compat.h,v 1.16 2006-07-29 13:37:07 adk0212 Exp $
+ * $Id: compat.h,v 1.17 2006-07-29 20:27:34 adk0212 Exp $
  */
 
 
@@ -233,7 +233,7 @@ DIR *opendir(const char *name);
 int closedir(DIR *dir);
 
 struct passwd {
-    char *foo;
+    char *pw_name;
 };
 
 struct group {

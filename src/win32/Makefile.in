@@ -349,14 +349,18 @@ $(OBJDIR)/options.o:  ../options.c
 $(OBJDIR)/reports.o:  ../reports.c
 	$(CXX) -c $< -o $@
 
-# apcupsd
+######################################################################
+
+# apcupsd objects
 OBJS_APCUPSD = \
 	$(OBJDIR)/apcupsd.o
 
 $(OBJDIR)/apcupsd.o:  ../apcupsd.c
 	$(CXX) -c $< -o $@
 
-# apctest
+######################################################################
+
+# apctest objects
 OBJS_APCTEST = \
 	$(OBJDIR)/apctest.o
 
@@ -370,6 +374,15 @@ OBJS_ACCESS = \
 	$(OBJDIR)/apcaccess.o
 
 $(OBJDIR)/apcaccess.o:	../apcaccess.c
+	$(CXX) -c $< -o $@
+
+######################################################################
+
+# smtp objects
+OBJS_SMTP = \
+	$(OBJDIR)/smtp.o
+
+$(OBJDIR)/smtp.o:	../smtp.c
 	$(CXX) -c $< -o $@
 
 ######################################################################
@@ -428,15 +441,18 @@ SHUT_LIBS =
 POP_OBJS = $(OBJS_POP)
 POP_LIBS = 
 
+SMTP_OBJS = $(OBJS_SMTP) $(OBJDIR)/apclog.o $(OBJDIR)/asys.o $(OBJDIR)/apcerror.o $(OBJS_COMPAT)
+SMTP_LIBS = $(APC_LIBS)
 
 # Targets
 
-all: apcupsd.exe apcaccess.exe shutdown.exe popup.exe apctest.exe
+all: apcupsd.exe apcaccess.exe shutdown.exe popup.exe apctest.exe smtp.exe
 
 clean:
 	rm -f $(OBJDIR)/*.o $(OBJDIR)/apcupsd.exe $(OBJDIR)/winres.res \
 		$(OBJDIR)/apcaccess.exe $(OBJDIR)/shutdown.exe \
-		$(OBJDIR)/popup.exe winapcupsd*.exe
+		$(OBJDIR)/popup.exe winapcupsd*.exe $(OBJDIR)/smtp.exe \
+		$(OBJDIR)/apctest.exe
 	rm -f pthreadGCE.dll mingwm10.dll
 
 # Link the apcupsd daemon executable ...
@@ -457,6 +473,9 @@ shutdown.exe: $(SHUT_OBJS)
 
 popup.exe: $(POP_OBJS)
 	$(CXX) $(POP_OBJS) $(POP_LIBS) -mwindows -o $(OBJDIR)/popup.exe
+
+smtp.exe: $(SMTP_OBJS)
+	$(CXX) $(SMTP_OBJS) $(SMTP_LIBS) -o $(OBJDIR)/smtp.exe
 
 winapcupsd.exe: all
 	$(STRIP) *.exe
