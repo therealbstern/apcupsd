@@ -116,7 +116,7 @@ Section "Apcupsd Service" SecService
   File apcupsd.exe
 ;  File smtp.exe
   File apcaccess.exe
-;  File apctest.exe
+  File apctest.exe
   File popup.exe 
   File shutdown.exe
 ;  File email.exe
