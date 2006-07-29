@@ -119,7 +119,7 @@ Section "Apcupsd Service" SecService
   File apctest.exe
   File popup.exe 
   File shutdown.exe
-;  File email.exe
+  File email.exe
 
   SetOutPath "$INSTDIR\driver"
   File ..\..\platforms\mingw\apcupsd.inf
