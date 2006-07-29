@@ -26,8 +26,11 @@ POSIX commands */
 #define TIOCSBRK        0x5427
 #define TIOCCBRK        0x5428
 
+#define TIOCM_LE        0x001
 #define TIOCM_DTR       0x002
 #define TIOCM_RTS       0x004
+#define TIOCM_ST        0x008
+#define TIOCM_SR        0x010
 #define TIOCM_CTS       0x020
 #define TIOCM_CAR       0x040
 #define TIOCM_RNG       0x080
