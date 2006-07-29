@@ -27,7 +27,7 @@
  * Last Modified By: Thorsten Engel
  * Last Modified On: Fri Apr 22 19:30:00 2004
  * Update Count    : 218
- * $Id: compat.h,v 1.15 2006-07-24 23:03:48 adk0212 Exp $
+ * $Id: compat.h,v 1.16 2006-07-29 13:37:07 adk0212 Exp $
  */
 
 
@@ -301,9 +301,8 @@ void conv_unix_to_win32_path(const char *name, char *win32_name, DWORD dwSize);
 
 #define TIOCMBIC  1
 #define TIOCMBIS  2
-#define TIOCM_ST  0x008
-#define TIOCM_SR  0x010
 int ioctl(int, int, ...);
+
 
 /* Return the smaller of a or b */
 #define MIN(a, b) ( ((a) < (b)) ? (a) : (b) )
