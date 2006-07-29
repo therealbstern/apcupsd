@@ -114,7 +114,7 @@ Section "Apcupsd Service" SecService
   File pthreadGCE.dll
   File ${DEPKGS}\libusb-win32\libusb0.dll
   File apcupsd.exe
-;  File smtp.exe
+  File smtp.exe
   File apcaccess.exe
   File apctest.exe
   File popup.exe 
