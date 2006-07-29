@@ -61,7 +61,7 @@ DEFINES = \
 
 
 CC = $(BIN_DIR)/mingw32-g++ -O2 $(DEFINES) $(INCLUDES)
-CXX = $(BIN_DIR)/mingw32-g++ -O2 $(DEFINES) $(INCLUDES) 2>&1
+CXX = $(BIN_DIR)/mingw32-g++ -O2 $(DEFINES) $(INCLUDES)
 WINDRES = $(BIN_DIR)/mingw32-windres
 MAKENSIS=$(BIN_DIR)/makensis
 STRIP=$(BIN_DIR)/mingw32-strip
@@ -111,7 +111,7 @@ $(OBJDIR)/winevents.o:	  ./winevents.cpp
 $(OBJDIR)/winmain.o:	  ./winmain.cpp
 	$(CXX) -c $< -o $@
 
-$(OBJDIR)/newwinservice.o: ./winservice.cpp
+$(OBJDIR)/winservice.o: ./winservice.cpp
 	$(CXX) -c $< -o $@
 
 $(OBJDIR)/winstat.o:	  ./winstat.cpp
@@ -424,24 +424,11 @@ TEST_OBJS = $(OBJS_SRC) $(LIB_OBJS) $(OBJS_COMPAT) $(OBJS_WIN) \
 	   $(OBJS_SMARTDRV) $(OBJS_DUMBDRV) $(OBJS_USBDRV) \
 	   $(OBJS_SNMPDRV) $(OBJS_PCNETDRV) $(OBJS_APCTEST)
 
-APC_LIBS = \
-	-L$(LIB_MINGW) \
-	$(LIB_PTHREADS) \
-	$(LIB_LIBUSB) \
-	$(LIB_NETSNMP) \
-	$(LIB_MINGW)/libuser32.a \
-	$(LIB_MINGW)/libgdi32.a \
-	$(LIB_MINGW)/libwsock32.a \
-	$(LIB_MINGW)/libnetapi32.a
+APC_LIBS = $(LIB_PTHREADS) $(LIB_LIBUSB) $(LIB_NETSNMP) \
+	-L$(LIB_MINGW) -luser32 -lgdi32 -lwsock32 -lnetapi32
 
 ACCESS_OBJS = $(OBJS_ACCESS) $(LIB_OBJS) $(OBJS_COMPAT)
-
-ACCESS_LIBS = \
-	-L$(LIB_MINGW) \
-	$(LIB_PTHREADS) \
-	$(LIB_MINGW)/libuser32.a \
-	$(LIB_MINGW)/libwsock32.a \
-	$(LIB_MINGW)/libnetapi32.a
+ACCESS_LIBS = $(LIB_PTHREADS) -L$(LIB_MINGW) -luser32 -lwsock32 -lnetapi32
 
 SHUT_OBJS = $(OBJS_SHUT)
 SHUT_LIBS = 
@@ -453,7 +440,7 @@ SMTP_OBJS = $(OBJS_SMTP) $(OBJDIR)/apclog.o $(OBJDIR)/asys.o $(OBJDIR)/apcerror.
 SMTP_LIBS = $(APC_LIBS)
 
 EMAIL_OBJS = $(OBJS_EMAIL) $(OBJDIR)/apclog.o $(OBJDIR)/asys.o $(OBJDIR)/apcerror.o $(OBJS_COMPAT)
-EMAIL_LIBS = $(LIB_MINGW)/libwsock32.a $(LIB_MINGW)/libmapi32.a
+EMAIL_LIBS = -L$(LIB_MINGW) -lwsock32 -lmapi32
 
 # Targets
 
@@ -466,29 +453,32 @@ clean:
 		$(OBJDIR)/apctest.exe
 	rm -f pthreadGCE.dll mingwm10.dll
 
-# Link the apcupsd daemon executable ...
-apcupsd.exe: $(APC_OBJS)
-	$(CXX) $(APC_OBJS) $(APC_LIBS) -mwindows -o $(OBJDIR)/apcupsd.exe
+pthreadGCE.dll: $(DEPKGS)/pthreads/pthreadGCE.dll
 	cp -f $(DEPKGS)/pthreads/pthreadGCE.dll .
+
+mingwm10.dll: $(MINGW)/mingw32/bin/mingwm10.dll
 	cp -f $(MINGW)/mingw32/bin/mingwm10.dll .
 
-apcaccess.exe: $(ACCESS_OBJS)
-	$(CXX) $(ACCESS_OBJS) $(ACCESS_LIBS) -o $(OBJDIR)/apcaccess.exe
-	cp -f $(DEPKGS)/pthreads/pthreadGCE.dll .
+# Link the apcupsd daemon executable ...
+apcupsd.exe: $(APC_OBJS) pthreadGCE.dll mingwm10.dll
+	$(CXX) $(APC_OBJS) $(APC_LIBS) -mwindows -o $(OBJDIR)/apcupsd.exe
 
-apctest.exe: $(TEST_OBJS)
+apcaccess.exe: $(ACCESS_OBJS) pthreadGCE.dll mingwm10.dll
+	$(CXX) $(ACCESS_OBJS) $(ACCESS_LIBS) -o $(OBJDIR)/apcaccess.exe
+
+apctest.exe: $(TEST_OBJS) pthreadGCE.dll mingwm10.dll
 	$(CXX) $(TEST_OBJS) $(APC_LIBS) -o $(OBJDIR)/apctest.exe
 
-shutdown.exe: $(SHUT_OBJS)
+shutdown.exe: $(SHUT_OBJS) mingwm10.dll
 	$(CXX) $(SHUT_OBJS) $(SHUT_LIBS) -mwindows -o $(OBJDIR)/shutdown.exe
 
-popup.exe: $(POP_OBJS)
+popup.exe: $(POP_OBJS) mingwm10.dll
 	$(CXX) $(POP_OBJS) $(POP_LIBS) -mwindows -o $(OBJDIR)/popup.exe
 
-email.exe: $(EMAIL_OBJS)
+email.exe: $(EMAIL_OBJS) mingwm10.dll
 	$(CXX) $(EMAIL_OBJS) $(EMAIL_LIBS) -o $(OBJDIR)/email.exe
 
-smtp.exe: $(SMTP_OBJS)
+smtp.exe: $(SMTP_OBJS) mingwm10.dll
 	$(CXX) $(SMTP_OBJS) $(SMTP_LIBS) -o $(OBJDIR)/smtp.exe
 
 winapcupsd.exe: all
