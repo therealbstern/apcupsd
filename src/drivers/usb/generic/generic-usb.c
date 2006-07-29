@@ -611,16 +611,16 @@ int pusb_ups_open(UPSINFO *ups)
       Error_abort0(_("Cannot find UPS device --\n"
             "For a link to detailed USB trouble shooting information,\n"
             "please see <http://www.apcupsd.com/support.html>.\n"));
-
-      /*
-       * Note, we set ups->fd here so the "core" of apcupsd doesn't
-       * think we are a slave, which is what happens when it is -1.
-       * (ADK: Actually this only appears to be true for apctest as
-       * apcupsd proper uses the UPS_slave flag.)
-       * Internally, we use the fd in our own private space   
-       */
-      ups->fd = 1;
    }
+
+   /*
+    * Note, we set ups->fd here so the "core" of apcupsd doesn't
+    * think we are a slave, which is what happens when it is -1.
+    * (ADK: Actually this only appears to be true for apctest as
+    * apcupsd proper uses the UPS_slave flag.)
+    * Internally, we use the fd in our own private space   
+    */
+   ups->fd = 1;
 
    ups->clear_slave();
    write_unlock(ups);
