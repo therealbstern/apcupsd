@@ -16627,6 +16627,8 @@ gentoo)
   ;;
 hpux)
     DISTVER=`uname -r`
+    SERIALDEV=/dev/tty0p0
+    PTHREAD_CFLAGS="-D_XOPEN_SOURCE_EXTENDED -D_REENTRANT"
     DFILES="\
 	platforms/hpux/Makefile \
 	platforms/hpux/apcupsd \
