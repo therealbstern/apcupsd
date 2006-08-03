@@ -29,34 +29,34 @@ set POPUP=start /b %POPUP%
 
 rem
 rem This piece is to substitute the default behaviour with your own script,
-rem   perl, or C program.
+rem   perl, C program, etc.
 rem
-rem You can customize every single command creating an executable file (may be a
-rem   script or a compiled program) and calling it the same as the %1 parameter
-rem   passed by apcupsd to this script.
+rem You can customize any command by creating an executable file (may be a
+rem   script or a compiled program) and naming it the same as the %1 parameter
+rem   passed by apcupsd to this script. We will accept files with any extension
+rem   included in PATHEXT (*.exe, *.bat, *.cmd, etc).
 rem
 rem After executing your script, apccontrol continues with the default action.
 rem   If you do not want apccontrol to continue, exit your script with exit 
-rem   code 99. E.g. "exit 99".
+rem   code 99. E.g. "exit /b 99".
 rem
 rem WARNING: please be aware that if you add any commands before the shutdown
 rem   in the downshutdown) case and your command errors or stalls, it will
 rem   prevent your machine from being shutdown, so test, test, test to
 rem   make sure it works correctly.
 rem
-rem The apccontrol file with no extension will be rebuilt (overwritten)
-rem   every time that "make" is invoked if you are working with the
-rem   source files. Thus if you build from a source distribution, we
-rem   recommend you make your changes to the apccontrol.in file.
+rem The apccontrol.bat file will be replaced every time apcupsd is installed,
+rem   so do NOT make event modifications in this file. Instead, override the
+rem   event actions using event scripts as described above.
 rem
-IF NOT EXIST %SCRIPTDIR%\%1 GOTO :events
 
 rem Use CALL here because event script might be a batch file itself
-CALL %SCRIPTDIR%\%1
+CALL %SCRIPTDIR%\%1 2> NUL
 
-rem This is retarded. "IF ERRORLEVEL 99" means >= 99, so
-rem we have to synthesize an == using two IFs. Ahh, the glory
-rem of Windows batch programming. At least they gave us a NOT op.
+rem This is retarded. "IF ERRORLEVEL 99" means greater-than-or-
+rem equal-to 99, so we have to synthesize an == using two IFs. 
+rem Ahh, the glory of Windows batch programming. At least they 
+rem gave us a NOT op.
 IF NOT ERRORLEVEL 99 GOTO :events
 IF NOT ERRORLEVEL 100 GOTO :done
 
@@ -91,7 +91,7 @@ IF "%1" == "battattach"    GOTO :battattach
 
 echo Unknown command '%1'
 echo.
-echo Usage: %0% command
+echo Usage: %0 command
 echo.
 echo Warning: this script is intended to be launched by
 echo apcupsd and should never be launched by users.
