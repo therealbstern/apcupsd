@@ -66,8 +66,8 @@ protected:
         // Tray icon handling
         void AddTrayIcon();
         void DelTrayIcon();
-        void UpdateTrayIcon(int battstat);
-        void SendTrayMsg(DWORD msg, int battstat);
+        void UpdateTrayIcon();
+        void SendTrayMsg(DWORD msg);
 
         // Message handler for the tray window
         static LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
@@ -91,6 +91,7 @@ protected:
         HWND                    m_hwnd;
         HMENU                   m_hmenu;
         NOTIFYICONDATA          m_nid;
+        UINT                    m_balloon_timer;
 
         // The icon handles
         HICON                   m_online_icon;
