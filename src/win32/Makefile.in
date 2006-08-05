@@ -56,12 +56,13 @@ HAVES = \
 DEFINES = \
 	-DWIN32 \
 	$(HAVES) \
-	-D__APCUPSD__
+	-D__APCUPSD__ \
+	-D_WIN32_IE=0x0500
 
 
 
-CC = $(BIN_DIR)/mingw32-g++ -O2 $(DEFINES) $(INCLUDES) -D_WIN32_IE=0x0500
-CXX = $(BIN_DIR)/mingw32-g++ -O2 $(DEFINES) $(INCLUDES) -D_WIN32_IE=0x0500
+CC = $(BIN_DIR)/mingw32-g++ -O2 $(DEFINES) $(INCLUDES)
+CXX = $(BIN_DIR)/mingw32-g++ -O2 $(DEFINES) $(INCLUDES)
 WINDRES = $(BIN_DIR)/mingw32-windres
 MAKENSIS=$(BIN_DIR)/makensis
 STRIP=$(BIN_DIR)/mingw32-strip
