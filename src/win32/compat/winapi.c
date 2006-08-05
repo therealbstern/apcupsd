@@ -20,11 +20,7 @@
 
  */
 
-#ifdef __APCUPSD__
 #include "apc.h"
-#else
-#include "bacula.h"
-#endif
 
 #if defined(HAVE_WIN32)
 
@@ -33,16 +29,12 @@
 int win32_client = 1;
 
 #ifdef WIN32_VSS
-#include "vss.h"   
-#endif
-
-// init with win9x, but maybe set to NT in InitWinAPI
-DWORD  g_platform_id = VER_PLATFORM_WIN32_WINDOWS;
-#ifdef WIN32_VSS
 /* preset VSSClient to NULL */
 VSSClient *g_pVSSClient = NULL;
 #endif
 
+/* Platform version info */
+OSVERSIONINFO g_os_version_info;
 
 /* API Pointers */
 
@@ -196,23 +188,13 @@ InitWinAPIWrapper()
       FreeLibrary(hLib);
    }
 
-   // do we run on win 9x ???
-   OSVERSIONINFO osversioninfo;   
-   osversioninfo.dwOSVersionInfoSize = sizeof(osversioninfo);
-
-   DWORD dwMinorVersion;
-
    // Get the current OS version
-   if (!GetVersionEx(&osversioninfo)) {
-      g_platform_id = 0;
-      dwMinorVersion = 0;
-   } else {
-      g_platform_id = osversioninfo.dwPlatformId;
-      dwMinorVersion = osversioninfo.dwMinorVersion;
-   }
+   memset(&g_os_version_info, 0, sizeof(g_os_version_info));
+   g_os_version_info.dwOSVersionInfoSize = sizeof(g_os_version_info);
+   GetVersionEx(&g_os_version_info);
 
    /* deinitialize some routines on win95 - they're not implemented well */
-   if (g_platform_id == VER_PLATFORM_WIN32_WINDOWS) {
+   if (g_os_version_info.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS) {
       p_BackupRead = NULL;
       p_BackupWrite = NULL;
 
@@ -237,7 +219,7 @@ InitWinAPIWrapper()
 
    /* decide which vss class to initialize */
 #ifdef WIN32_VSS
-   switch (dwMinorVersion) {
+   switch (g_os_version_info.dwMinorVersion) {
       case 1: 
          g_pVSSClient = new VSSClientXP();
          atexit(VSSCleanup);

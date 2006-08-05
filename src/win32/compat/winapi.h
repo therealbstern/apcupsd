@@ -24,22 +24,20 @@
 #define __WINAPI_H
 
 #if defined(HAVE_WIN32)
-/*
- * Commented out native.h include statement, which is not distributed with the
- * free version of VC++, and which is not used in bacula.
- * 
- * #if !defined(HAVE_MINGW) // native.h not present on mingw
- * #include <native.h>
- * #endif
- */
-#include <windef.h>
-#endif
 
-#if defined(HAVE_WIN32)
+#include <windows.h>
+#include <windef.h>
+
+#ifdef WIN32_VSS
+#include "vss.h"   
+#endif
 
 #ifndef POOLMEM
 typedef char POOLMEM;
 #endif
+
+/* Platform version info */
+extern OSVERSIONINFO g_os_version_info;
 
 // unicode enabling of win 32 needs some defines and functions
 
