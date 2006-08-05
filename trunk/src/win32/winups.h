@@ -44,6 +44,9 @@
 #define WM_SRV_CLIENT_AUTHENTICATED     WM_USER+3
 #define WM_SRV_CLIENT_DISCONNECT        WM_USER+4
 
+// Message used to inform tray that a balloon tip was displayed
+#define WM_BALLOONSHOW                  WM_USER+5
+
 // Export the application details
 extern HINSTANCE        hAppInstance;
 extern const char       *szAppName;
