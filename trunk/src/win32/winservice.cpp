@@ -36,13 +36,9 @@
 // Apcupsd and ask it to do something (show about, show status,
 // show events, ...)
 
-#ifdef HAVE_MINGW
+#include "winapi.h"
 #include "compat.h"
 #undef STRICT
-#else
-extern "C" void syslog(int type, const char *fmt, ...);
-#endif
-
 
 // Header
 
@@ -61,41 +57,19 @@ extern void logonfail(int ok);
 void set_service_description(SC_HANDLE hSCManager, SC_HANDLE hService,
                              LPSTR lpDesc);
 
-// OS-SPECIFIC ROUTINES
-
-// Create an instance of the upsService class to cause the static fields to be
-// initialised properly
-
-upsService init;
-
-extern DWORD   g_platform_id;
-
-upsService::upsService()
-{
-   OSVERSIONINFO osversioninfo;
-   osversioninfo.dwOSVersionInfoSize = sizeof(osversioninfo);
-
-   // Get the current OS version
-   if (!GetVersionEx(&osversioninfo)) {
-      g_platform_id = 0;
-   } else {
-      g_platform_id = osversioninfo.dwPlatformId;
-   }
-}
-
 
 // IsWin95 - returns a BOOL indicating whether the current OS is Win95
 BOOL
 upsService::IsWin95()
 {
-   return (g_platform_id == VER_PLATFORM_WIN32_WINDOWS);
+   return (g_os_version_info.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS);
 }
 
 // IsWinNT - returns a bool indicating whether the current OS is WinNT
 BOOL
 upsService::IsWinNT()
 {
-   return (g_platform_id == VER_PLATFORM_WIN32_NT);
+   return (g_os_version_info.dwPlatformId == VER_PLATFORM_WIN32_NT);
 }
 
 // Internal routine to find the  Apcupsd menu class window and
@@ -236,7 +210,7 @@ upsService::ApcupsdServiceMain()
    g_servicemode = TRUE;
 
    // How to run as a service depends upon the OS being used
-   switch (g_platform_id) {
+   switch (g_os_version_info.dwPlatformId) {
 
    // Windows 95/98/Me
    case VER_PLATFORM_WIN32_WINDOWS:
@@ -396,7 +370,7 @@ upsService::InstallService()
    }
 
    // How to add the Apcupsd service depends upon the OS
-   switch (g_platform_id) {
+   switch (g_os_version_info.dwPlatformId) {
 
    // Windows 95/98/Me
    case VER_PLATFORM_WIN32_WINDOWS:
@@ -502,7 +476,7 @@ int
 upsService::RemoveService()
 {
    // How to remove the Apcupsd service depends upon the OS
-   switch (g_platform_id) {
+   switch (g_os_version_info.dwPlatformId) {
 
    // Windows 95/98/Me
    case VER_PLATFORM_WIN32_WINDOWS:
