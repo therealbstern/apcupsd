@@ -98,43 +98,41 @@ echo apcupsd and should never be launched by users.
 GOTO :done
 
 :commfailure
-   %POPUP% "apccontrol: Communications with UPS lost."
+   %POPUP% "Communications with UPS lost."
    GOTO :done
 
 :commok
-   %POPUP% "apccontrol: Communciations with UPS restored."
+   %POPUP% "Communciations with UPS restored."
    GOTO :done
 
 :powerout
-   rem Normally we'd POPUP here, but that's a bit annoying on Windows,
-   rem so don't popup until onbattery comes.
    GOTO :done
 
 :onbattery
-   %POPUP% "apccontrol: Power failure. Running on UPS batteries."
+   %POPUP% "Power failure. Running on UPS batteries."
    GOTO :done
 
 :offbattery
-   %POPUP% "apccontrol: Power has returned. No longer running on UPS batteries."
+   %POPUP% "Power has returned. No longer running on UPS batteries."
    GOTO :done
 
 :mainsback
    GOTO :done
 
 :failing
-   %POPUP% "apccontrol: UPS battery power exhaused. Doing shutdown."
+   %POPUP% "UPS battery power exhaused. Doing shutdown."
    GOTO :done
 
 :timeout
-   %POPUP% "apccontrol: UPS battery runtime limit exceeded. Doing shutdown."
+   %POPUP% "UPS battery runtime limit exceeded. Doing shutdown."
    GOTO :done
 
 :loadlimit
-   %POPUP% "apccontrol: UPS battery discharge limit reached. Doing shutdown."
+   %POPUP% "UPS battery discharge limit reached. Doing shutdown."
    GOTO :done
 
 :runlimit
-   %POPUP% "apccontrol: UPS battery runtime percent reached. Doing shutdown."
+   %POPUP% "UPS battery runtime percent reached. Doing shutdown."
    GOTO :done
 
 :doshutdown
@@ -154,52 +152,47 @@ rem    non-existent IP address with a given timeout.
 rem
 rem   %APCUPSD% /kill
 rem   ping -n 1 -w 5000 10.255.255.254 > NUL
-rem   %POPUP% "apccontrol: Doing %APCUPSD% --killpower"
+rem   %POPUP% "Doing %APCUPSD% --killpower"
 rem   %APCUPSD% --killpower
 rem   ping -n 1 -w 20000 10.255.255.254 > NUL
 rem
-   %POPUP% "apccontrol: Doing %SHUTDOWN% -h now"
+   %POPUP% "Doing %SHUTDOWN% -h now"
    %SHUTDOWN% -h now
    GOTO :done
 
-:mainsback
-   %POPUP% "apccontrol: Power has returned..."
-   GOTO :done
-
 :annoyme
-   %POPUP% "apccontrol: Power problems: please logoff."
+   %POPUP% "Power problems: please logoff."
    GOTO :done
 
 :emergency
-   %POPUP% "apccontrol: Doing %SHUTDOWN% -h now"
    %SHUTDOWN% -h now
    GOTO :done
 
 :changeme
-   %POPUP% "apccontrol: Emergency! UPS batteries have failed: Change them NOW"
+   %POPUP% "Emergency! UPS batteries have failed: Change them NOW"
    GOTO :done
 
 :remotedown
-   %POPUP% "apccontrol: Doing %SHUTDOWN% -h now"
    %SHUTDOWN% -h now
    GOTO :done
 
 :restartme
-   %POPUP% "apccontrol: restarting apcupsd would have been called."
    GOTO :done
 
 :startselftest
-   %POPUP% "apccontrol: startselftest."
+   %POPUP% "Self-test starting"
    GOTO :done
 
 :endselftest
-   %POPUP% "apccontrol: endselftest."
+   %POPUP% "Self-test completed"
    GOTO :done
 
 :battdetach
+   %POPUP% "Battery disconnected"
    GOTO :done
 
 :battattach
+   %POPUP% "Battery reattached"
    GOTO :done
 
 :done
