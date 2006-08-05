@@ -516,10 +516,12 @@ char *ups_status(int stat)
 
    read_lock(ups);
 
-   if (!ups->is_onbatt())
-      battstat = 100;
-   else
+   if (ups->is_onbatt_msg())
       battstat = 0;
+   else if (ups->UPS_Cap[CI_BATTLEV])
+      battstat = (int)ups->BattChg;
+   else
+      battstat = 100;
 
    astrncpy(buf, "Status not available", sizeof(buf));
 
@@ -556,7 +558,7 @@ char *ups_status(int stat)
          astrncat(buf, "BOOST ", sizeof(buf));
       if (ups->is_online())
          astrncat(buf, "ONLINE ", sizeof(buf));
-      if (ups->is_onbatt())
+      if (ups->is_onbatt_msg())
          astrncat(buf, "ON BATTERY ", sizeof(buf));
       if (ups->is_overload())
          astrncat(buf, "OVERLOAD ", sizeof(buf));
@@ -564,16 +566,24 @@ char *ups_status(int stat)
          astrncat(buf, "LOWBATT ", sizeof(buf));
       if (ups->is_replacebatt())
          astrncat(buf, "REPLACEBATT ", sizeof(buf));
-      if (!ups->is_onbatt() && ups->UPS_Cap[CI_BATTLEV])
-         battstat = (int)ups->BattChg;
+      if (!ups->is_battpresent())
+         astrncat(buf, "NOBATT ", sizeof(buf));
+
+      // This overrides the above
+      if (ups->is_commlost())
+         astrncpy(buf, "COMMLOST", sizeof(buf));
+
       break;
    }
+
+   // This overrides the above
+   if (ups->is_shutdown())
+      astrncpy(buf, "SHUTTING DOWN", sizeof(buf));
 
    read_unlock(ups);
 
    return buf;
 }
-
 
 static void stat_list(UPSINFO *ups, char *fmt, ...)
 {
