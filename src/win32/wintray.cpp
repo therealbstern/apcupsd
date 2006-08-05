@@ -34,13 +34,13 @@
 
 // Implementation of a system tray icon & menu for Apcupsd
 
+#include "apc.h"
 #include <windows.h>
 #include "winups.h"
 #include "winservice.h"
 #include <lmcons.h>
 
 // Header
-
 #include "wintray.h"
 
 // Constants
@@ -53,7 +53,7 @@ const UINT MENU_ADD_CLIENT_MSG = RegisterWindowMessage("Apcupsd.AddClient.Messag
 const char *MENU_CLASS_NAME = "Apcupsd Tray Icon";
 
 extern char *ups_status(int stat);
-
+extern OSVERSIONINFO g_os_version_info;
 extern int battstat;
 
 // Implementation
@@ -94,6 +94,9 @@ upsMenu::upsMenu()
    // Timer to trigger icon updating
    SetTimer(m_hwnd, 1, 1000, NULL);
 
+   // No balloon timer yet
+   m_balloon_timer = 0;
+
    // Load the icons for the tray
    m_online_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_ONLINE));
    m_onbatt_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_ONBATT));
@@ -109,7 +112,7 @@ upsMenu::upsMenu()
 upsMenu::~upsMenu()
 {
    // Remove the tray icon
-   SendTrayMsg(NIM_DELETE, 0);
+   SendTrayMsg(NIM_DELETE);
 
    // Destroy the loaded menu
    if (m_hmenu != NULL)
@@ -119,33 +122,37 @@ upsMenu::~upsMenu()
 void
  upsMenu::AddTrayIcon()
 {
-   SendTrayMsg(NIM_ADD, battstat);
+   SendTrayMsg(NIM_ADD);
 }
 
 void upsMenu::DelTrayIcon()
 {
-   SendTrayMsg(NIM_DELETE, 0);
+   SendTrayMsg(NIM_DELETE);
 }
 
 
-void upsMenu::UpdateTrayIcon(int battstat)
+void upsMenu::UpdateTrayIcon()
 {
    (void *)ups_status(0);
-   SendTrayMsg(NIM_MODIFY, battstat);
+   SendTrayMsg(NIM_MODIFY);
 }
 
-void upsMenu::SendTrayMsg(DWORD msg, int battstat)
+
+void upsMenu::SendTrayMsg(DWORD msg)
 {
+   char *stat;
+
    // Create the tray icon message
    m_nid.hWnd = m_hwnd;
    m_nid.cbSize = sizeof(m_nid);
    m_nid.uID = IDI_APCUPSD;        // never changes after construction
+
    /* If battstat == 0 we are on batteries, otherwise we are online
     * and the value of battstat is the percent charge.
     */
    if (battstat == 0)
       m_nid.hIcon = m_onbatt_icon;
-   else if (battstat >= 99)
+   else if (battstat >= 100)
       m_nid.hIcon = m_online_icon;
    else
       m_nid.hIcon = m_charging_icon;
@@ -153,17 +160,13 @@ void upsMenu::SendTrayMsg(DWORD msg, int battstat)
    m_nid.uFlags = NIF_ICON | NIF_MESSAGE;
    m_nid.uCallbackMessage = WM_TRAYNOTIFY;
 
+   // Get current status
+   stat = ups_status(0);
 
-   // Use resource string as tip if there is one
-   if (LoadString(hAppInstance, IDI_APCUPSD, m_nid.szTip, sizeof(m_nid.szTip))) {
-      m_nid.uFlags |= NIF_TIP;
-   }
-   // Try to add the UPS's status to the tip string, if possible
-   if (m_nid.uFlags & NIF_TIP) {
-      strncat(m_nid.szTip, " - ", (sizeof(m_nid.szTip) - 1) - strlen(m_nid.szTip));
-      strncat(m_nid.szTip, ups_status(0),
-              (sizeof(m_nid.szTip) - 1) - strlen(m_nid.szTip));
-   }
+   // Use status as normal tooltip
+   asnprintf(m_nid.szTip, sizeof(m_nid.szTip), "Apcupsd - %s", stat);
+   m_nid.uFlags |= NIF_TIP;
+
    // Send the message
    if (Shell_NotifyIcon(msg, &m_nid)) {
       EnableMenuItem(m_hmenu, ID_CLOSE, MF_ENABLED);
@@ -188,24 +191,42 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
    switch (iMsg) {
 
-   // Every five seconds, a timer message causes the icon to update
+   // Timer expired
    case WM_TIMER:
-      // *** HACK for running servicified
-      if (upsService::RunningAsService()) {
-         // Attempt to add the icon if it's not already there
-         _this->AddTrayIcon();
-         // Trigger a check of the current user
-         PostMessage(hwnd, WM_USERCHANGED, 0, 0);
+      if (wParam == 1) {
+         // *** HACK for running servicified
+         if (upsService::RunningAsService()) {
+            // Attempt to add the icon if it's not already there
+            _this->AddTrayIcon();
+            // Trigger a check of the current user
+            PostMessage(hwnd, WM_USERCHANGED, 0, 0);
+         }
+
+         // Update the icon
+         _this->UpdateTrayIcon();
+      } else if (wParam == 2) {
+         // Balloon timer expired; clear the balloon
+         KillTimer(_this->m_hwnd, _this->m_balloon_timer);
+
+         NOTIFYICONDATA nid;
+         nid.hWnd = _this->m_hwnd;
+         nid.cbSize = sizeof(nid);
+         nid.uID = IDI_APCUPSD;
+         nid.uFlags = NIF_INFO;
+         nid.uTimeout = 0;
+         nid.szInfoTitle[0] = '\0';
+         nid.szInfo[0] = '\0';
+         nid.dwInfoFlags = 0;
+
+         Shell_NotifyIcon(NIM_MODIFY, &nid);
       }
-      // Update the icon
-      _this->UpdateTrayIcon(battstat);
       break;
 
    // DEAL WITH NOTIFICATIONS FROM THE SERVER:
    case WM_SRV_CLIENT_AUTHENTICATED:
    case WM_SRV_CLIENT_DISCONNECT:
       // Adjust the icon accordingly
-      _this->UpdateTrayIcon(battstat);
+      _this->UpdateTrayIcon();
       return 0;
 
       // STANDARD MESSAGE HANDLING
@@ -219,15 +240,14 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
       case ID_STATUS:
          // Show the status dialog
          _this->m_status.Show(TRUE);
-         _this->UpdateTrayIcon(battstat);
+         _this->UpdateTrayIcon();
          break;
 
       case ID_EVENTS:
          // Show the Events dialog
          _this->m_events.Show(TRUE);
-         _this->UpdateTrayIcon(battstat);
+         _this->UpdateTrayIcon();
          break;
-
 
       case ID_KILLCLIENTS:
          // Disconnect all currently connected clients
@@ -275,6 +295,7 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
             return 0;
          }
+
          // Or was there a LMB double click?
          if (lParam == WM_LBUTTONDBLCLK) {
             // double click: execute first menu item
@@ -283,6 +304,13 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
          return 0;
       }
+
+   case WM_BALLOONSHOW:
+      // A balloon notice was shown, so set a timer to clear it
+      if (_this->m_balloon_timer != 0)
+         KillTimer(_this->m_hwnd, _this->m_balloon_timer);
+      _this->m_balloon_timer = SetTimer(_this->m_hwnd, 2, wParam, NULL);
+      return 0;
 
    case WM_CLOSE:
       break;
