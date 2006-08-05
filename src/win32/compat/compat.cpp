@@ -19,7 +19,7 @@
 //
 // Author          : Christopher S. Hull
 // Created On      : Sat Jan 31 15:55:00 2004
-// $Id: compat.cpp,v 1.19 2006-07-24 23:03:48 adk0212 Exp $
+// $Id: compat.cpp,v 1.20 2006-08-05 19:32:18 adk0212 Exp $
 
 #include "apc.h"
 #include "compat.h"
@@ -44,7 +44,6 @@
 #define USE_WIN32_32KPATHCONVERSION 1
 
 extern void d_msg(const char *file, int line, int level, const char *fmt,...);
-extern DWORD   g_platform_id;
 extern int enable_vss;
 
 // from MicroSoft SDK (KES) is the diff between Jan 1 1601 and Jan 1 1970
@@ -823,7 +822,7 @@ opendir(const char *path)
     char *tspec = (char *)malloc(max_len);
     if (tspec == NULL) return NULL;
 
-    if (g_platform_id != VER_PLATFORM_WIN32_WINDOWS) {
+    if (g_os_version_info.dwPlatformId != VER_PLATFORM_WIN32_WINDOWS) {
 #ifdef WIN32_VSS
        /* will append \\?\ at front itself */
        conv_unix_to_win32_path(path, tspec, max_len-4);
