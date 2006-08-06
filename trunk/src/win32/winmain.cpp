@@ -97,6 +97,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    char *wordPtr, *tempPtr;
    int i, quote;
 
+#ifdef HAVE_MINGW
+   InitWinAPIWrapper();
+   WSA_Init();
+#endif
+
    // Save the application instance and main thread id
    hAppInstance = hInstance;
    mainthreadId = GetCurrentThreadId();
@@ -345,11 +350,6 @@ int ApcupsdAppMain(int service)
 
    // Set this process to be the last application to be shut down.
    SetProcessShutdownParameters(0x100, 0);
-
-#ifdef HAVE_MINGW
-   InitWinAPIWrapper();
-   WSA_Init();
-#endif
 
    HWND hservwnd = FindWindow(MENU_CLASS_NAME, NULL);
    if (hservwnd != NULL) {
