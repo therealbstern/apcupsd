@@ -45,13 +45,7 @@ char net_errbuf[256];              /* error message buffer for messages */
 
 
 #ifdef HAVE_MINGW
-#define socketRead(fd, buf, len)  recv(fd, buf, len, 0)
-#define socketWrite(fd, buf, len) send(fd, buf, len, 0)
-#define socketClose(fd)           closesocket(fd)
-#else
-#define socketRead(fd, buf, len)  read(fd, buf, len)
-#define socketWrite(fd, buf, len) write(fd, buf, len)
-#define socketClose(fd)           close(fd)
+#define close(fd)           closesocket(fd)
 #endif
 
 
@@ -105,7 +99,7 @@ static int read_nbytes(int fd, char *ptr, int nbytes)
             return (-1);           /* error */
          }
 #endif
-         nread = socketRead(fd, ptr, nleft);
+         nread = recv(fd, ptr, nleft, 0);
       } while (nread == -1 && (errno == EINTR || errno == EAGAIN));
 
       if (nread <= 0) {
@@ -139,7 +133,7 @@ static int write_nbytes(int fd, char *ptr, int nbytes)
        */
       fcntl(fd, F_SETFL, fcntl(fd, F_GETFL));
 #endif
-      nwritten = socketWrite(fd, ptr, nleft);
+      nwritten = send(fd, ptr, nleft, 0);
 
       if (nwritten <= 0) {
          net_errno = errno;
@@ -278,7 +272,7 @@ int net_open(char *host, char *service, int port)
    fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFL));
 #endif
 
-   if (connect(sockfd, (struct sockaddr *)&tcp_serv_addr, sizeof(tcp_serv_addr)) < 0) {
+   if (connect(sockfd, (struct sockaddr *)&tcp_serv_addr, sizeof(tcp_serv_addr)) == -1) {
       asnprintf(net_errbuf, sizeof(net_errbuf),
          _("tcp_open: cannot connect to server %s on port %d.\n"
         "ERR=%s\n"), host, port, strerror(errno));
