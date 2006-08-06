@@ -444,8 +444,8 @@ upsService::InstallService()
          break;
       }
 
-      set_service_description(hsrvmanager,hservice, 
-_("Apcupsd provides shutdown of your UPS in the event of a power failure."));
+      set_service_description(hsrvmanager, hservice, 
+         _("Apcupsd provides shutdown of your computer in the event of a power failure."));
 
       CloseServiceHandle(hsrvmanager);
       CloseServiceHandle(hservice);
