@@ -14,6 +14,7 @@ IDI_APCUPSD             ICON    DISCARDABLE     "apcupsd.ico"
 IDI_ONLINE              ICON    DISCARDABLE     "online.ico"
 IDI_ONBATT              ICON    DISCARDABLE     "onbatt.ico"
 IDI_CHARGING            ICON    DISCARDABLE     "charging.ico"
+IDI_COMMLOST            ICON    DISCARDABLE     "commlost.ico"
 
 /////////////////////////////////////////////////////////////////////////////
 //

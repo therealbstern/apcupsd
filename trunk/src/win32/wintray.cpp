@@ -101,7 +101,8 @@ upsMenu::upsMenu()
    m_online_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_ONLINE));
    m_onbatt_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_ONBATT));
    m_charging_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_CHARGING));
-
+   m_commlost_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_COMMLOST));
+   
    // Load the popup menu
    m_hmenu = LoadMenu(hAppInstance, MAKEINTRESOURCE(IDR_TRAYMENU));
 
@@ -150,7 +151,9 @@ void upsMenu::SendTrayMsg(DWORD msg)
    /* If battstat == 0 we are on batteries, otherwise we are online
     * and the value of battstat is the percent charge.
     */
-   if (battstat == 0)
+   if (battstat == -1)
+      m_nid.hIcon = m_commlost_icon;
+   else if (battstat == 0)
       m_nid.hIcon = m_onbatt_icon;
    else if (battstat >= 100)
       m_nid.hIcon = m_online_icon;

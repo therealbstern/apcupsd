@@ -496,7 +496,7 @@ void stat_print(UPSINFO *ups, char *fmt, ...)
 
 extern int shm_OK;
 static char buf[MAXSTRING];
-int battstat = 0;
+int battstat = -1;
 static HWND dlg_hwnd = NULL;
 static int dlg_idlist = 0;
 
@@ -510,7 +510,7 @@ char *ups_status(int stat)
    UPSINFO *ups = core_ups;
 
    if (!shm_OK) {
-      battstat = 0;
+      battstat = -1;
       return "INITIALIZING";
    }
 
@@ -570,8 +570,10 @@ char *ups_status(int stat)
          astrncat(buf, "NOBATT ", sizeof(buf));
 
       // This overrides the above
-      if (ups->is_commlost())
+      if (ups->is_commlost()) {
          astrncpy(buf, "COMMLOST", sizeof(buf));
+         battstat = -1;
+      }
 
       break;
    }
