@@ -97,6 +97,7 @@ protected:
         HICON                   m_online_icon;
         HICON                   m_onbatt_icon;
         HICON                   m_charging_icon;
+        HICON                   m_commlost_icon;
 };
 
 
