@@ -516,7 +516,7 @@ char *ups_status(int stat)
 
    read_lock(ups);
 
-   if (ups->is_onbatt_msg())
+   if (ups->is_onbatt())
       battstat = 0;
    else if (ups->UPS_Cap[CI_BATTLEV])
       battstat = (int)ups->BattChg;
@@ -558,7 +558,7 @@ char *ups_status(int stat)
          astrncat(buf, "BOOST ", sizeof(buf));
       if (ups->is_online())
          astrncat(buf, "ONLINE ", sizeof(buf));
-      if (ups->is_onbatt_msg())
+      if (ups->is_onbatt())
          astrncat(buf, "ON BATTERY ", sizeof(buf));
       if (ups->is_overload())
          astrncat(buf, "OVERLOAD ", sizeof(buf));
