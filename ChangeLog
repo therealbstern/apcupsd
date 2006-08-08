@@ -8,6 +8,320 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2006-08-08 10:39  adk0212
+
+	* include/version.h:
+
+	Update version to 3.13.8.
+
+2006-08-07 19:18  adk0212
+
+	* src/lib/apcstatus.c:
+
+	Revert mistaken change from is_onbatt_msg() to is_onbatt().
+
+2006-08-07 19:13  adk0212
+
+	* src/: lib/apcstatus.c, win32/commlost.ico, win32/winres.h,
+	win32/winres.rc, win32/wintray.cpp, win32/wintray.h:
+
+	Add a new Win32 tray icon to represent the COMMLOST state.
+
+2006-08-06 19:51  adk0212
+
+	* src/lib/apclibnis.c:
+
+	Fix socket leak on Windows. We must use closesocket(), not close().
+	Also, there's no good reason that I can see to not just use
+	send/recv all the time, so remove translation of those.
+
+2006-08-05 22:57  adk0212
+
+	* src/win32/winservice.cpp:
+
+	Tweak service description. While technically true, the fact that
+	Apcupsd shuts down your _UPS_ is less important than the fact that
+	it shuts down your _computer_.
+
+2006-08-05 22:51  adk0212
+
+	* src/win32/winmain.cpp:
+
+	Initialize WinAPIWrapper and WSA early so platform version is
+	available when we need it.
+
+2006-08-05 15:56  adk0212
+
+	* platforms/mingw/apccontrol.bat:
+
+	Misc cleanups so messages look good in balloon notifications.
+
+2006-08-05 15:45  adk0212
+
+	* src/win32/Makefile.in:
+
+	Move _WIN32_IE define to $(DEFINES). That's a more appropriate
+	place for it.
+
+2006-08-05 15:42  adk0212
+
+	* src/win32/Makefile.in:
+
+	Set required IE version to 5.00; this is necessary for the expanded
+	NOTIFYICONDATA structure that allows balloon notices.
+
+2006-08-05 15:38  adk0212
+
+	* src/win32/winups.h:
+
+	Add WM_BALLOONSHOW message which indicates that a balloon
+	notifcation has been displayed by popup.c.
+
+2006-08-05 15:37  adk0212
+
+	* src/win32/popup.c:
+
+	Use balloon notification on Apcupsd tray icon when possible. Fall
+	back on previous behavior (MessageBox) when necessary.
+
+2006-08-05 15:35  adk0212
+
+	* src/win32/: wintray.cpp, wintray.h:
+
+	Add support for timing out balloon notifications since built-in
+	Windows timeout only starts ticking when window is out of focus;
+	this leads to annoyingly long balloon displays for no obvious
+	reason. Also clean up SendTrayMsg() and callers to not shadow
+	global battstat variable.
+
+2006-08-05 15:32  adk0212
+
+	* src/win32/compat/compat.cpp:
+
+	Update for global OSVERSIONINFO change.
+
+2006-08-05 15:31  adk0212
+
+	* src/win32/compat/: winapi.c, winapi.h:
+
+	Make entire OSVERSIONINFO struct available globally and properly
+	export it.
+
+2006-08-05 15:30  adk0212
+
+	* src/win32/winservice.cpp:
+
+	Remove local platform version data; it's provided by winapi.c now.
+
+2006-08-05 15:29  adk0212
+
+	* src/lib/apcstatus.c:
+
+	Cleanup and simplify windows status query.
+
+2006-08-03 19:05  adk0212
+
+	* platforms/mingw/apccontrol.bat:
+
+	Fix event override scripts so *.bat, *.exe, etc. will all be
+	accepted.
+
+2006-08-02 19:05  adk0212
+
+	* configure, autoconf/configure.in:
+
+	HP-UX changes suggested by Michael Wilder
+	<Wilder.Michael@cimcor.com>: Add some PTHREAD_CFLAGS and set
+	default serial dev to tty0p0.
+
+2006-07-29 19:39  adk0212
+
+	* src/win32/Makefile.in:
+
+	Misc cleanups.
+
+2006-07-29 19:22  adk0212
+
+	* src/win32/: Makefile.in, email.c, winapcupsd.nsi:
+
+	Make email.c build for Mingw and include it in install package.
+
+2006-07-29 16:27  adk0212
+
+	* src/win32/: Makefile.in, winapcupsd.nsi, compat/compat.h:
+
+	Build smtp executable and include it in install package.
+
+2006-07-29 16:25  adk0212
+
+	* src/smtp.c:
+
+	Rewrite for Win32 compatibility. The previous version assumed a
+	socket could be treated as a normal fd, which is a perfectly valid
+	assumption on any sane platform. But like I said, this is Win32.
+
+2006-07-29 09:39  adk0212
+
+	* src/win32/winapcupsd.nsi:
+
+	Enable inclusion of apctest.exe in winapcupsd.exe installer.
+
+2006-07-29 09:37  adk0212
+
+	* src/drivers/usb/generic/generic-usb.c:
+
+	Move ups->fd setting code to where it will actually be executed.
+	Whoops.
+
+2006-07-29 09:37  adk0212
+
+	* src/win32/Makefile.in:
+
+	Build apctest for win32.
+
+2006-07-29 09:37  adk0212
+
+	* src/win32/compat/: compat.h, sys/termios.h:
+
+	Add missing TIOCM_* modem bits to termios.h so apctest will
+	compile.
+
+2006-07-28 19:24  adk0212
+
+	* src/win32/newMakefile.in:
+
+	Unused.
+
+2006-07-28 19:14  adk0212
+
+	* src/apcnisd.c:
+
+	Remove apcnisd.c. This has been deprecated and unbuilt for over a
+	year.
+
+2006-07-28 19:11  adk0212
+
+	* include/: apc_winipc.h, apc_winsem.h:
+
+	Remove Cygwin build capability. It has been replaced by mingw32 and
+	no longer builds.
+
+2006-07-28 19:06  adk0212
+
+	* configure, autoconf/config.h.in, autoconf/configure.in,
+	autoconf/variables.mak.in, include/apc.h, include/apc_config.h,
+	src/Makefile.in, src/apcaccess.c, src/apcnis.c, src/apctest.c,
+	src/apcupsd.c, src/drivers/apcsmart/smart.c,
+	src/drivers/apcsmart/smartsetup.c, src/drivers/dumb/dumbsetup.c,
+	src/lib/Makefile.in, src/lib/apcevents.c, src/lib/apcfile.c,
+	src/lib/apclock.c, src/lib/apcsignal.c, src/lib/apcstatus.c,
+	src/win32/Makefile.cygwin.in, src/win32/Makefile.in,
+	src/win32/Makefile.mingw.in, src/win32/newwinservice.cpp,
+	src/win32/shutdown.c, src/win32/winapi.cpp, src/win32/winapi.h,
+	src/win32/winservice.cpp, src/win32/compat/winapi.c,
+	src/win32/compat/winapi.h, src/lib/wincompat.c:
+
+	Remove Cygwin build capability. It has been replaced by mingw32 and
+	no longer builds.
+
+2006-07-28 18:25  adk0212
+
+	* src/lib/apcconfig.c:
+
+	Make match_index and match_range comparisons case-insensitive.
+
+2006-07-28 18:22  adk0212
+
+	* src/apctest.c:
+
+	Don't print error messages twice.
+
+2006-07-28 18:22  adk0212
+
+	* src/device.c:
+
+	Improve lock file error message to help users figure out what
+	caused it.
+
+2006-07-28 17:47  adk0212
+
+	* src/gapcmon/gapcmon.c:
+
+	Eliminate unused variable warnings.
+
+2006-07-28 17:37  adk0212
+
+	* src/gapcmon/Makefile.in:
+
+	Don't override standard CFLAGS.
+
+2006-07-28 17:37  adk0212
+
+	* autoconf/configure.in, configure:
+
+	Solaris needs -D_POSIX_PTHREAD_SEMANTICS in order for ctime_r() to
+	obey POSIX.
+
+2006-07-27 20:19  adk0212
+
+	* platforms/darwin/Makefile.in:
+
+	Apply patch from Eric Cronin <ecronin@gizmolabs.org>: ${DESTDIR} is
+	used when making binary packages, and nothing should be installed
+	outside of it (to protect the base system and to make sure the
+	binary package includes everything).  The patch below corrects this
+	behavior for the Darwin/OSX startup item and dummy kext.
+
+2006-07-26 22:44  adk0212
+
+	* src/Makefile.in:
+
+	Apply patch from Eric Cronin <ecronin@gizmolabs.org>:
+	src/Makefile.in still has a reference to the autoconf variable
+	GAPCDIR which now goes by GAPCMON.
+
+2006-07-24 19:22  adk0212
+
+	* src/: drivers/pcnet/pcnet.c, lib/sleep.c:
+
+	Add boilerplate comments to new files.
+
+2006-07-24 19:20  adk0212
+
+	* src/lib/sleep.c:
+
+	Add nanosleep() and usleep() implementations derived from Apcupsd
+	and Bacula source.
+
+2006-07-24 19:03  adk0212
+
+	* configure, autoconf/configure.in, include/extern.h,
+	src/lib/asys.c, src/win32/Makefile.mingw.in,
+	src/win32/compat/compat.cpp, src/win32/compat/compat.h,
+	src/win32/compat/winconfig.h:
+
+	Provide generic nanosleep() and usleep() implementations in
+	lib/sleep.c.  Remove unused versions from asys.c and
+	win32/compat/compat.cpp.
+
+2006-07-23 19:25  adk0212
+
+	* src/win32/winapcupsd.nsi:
+
+	Fix type in uninstall script: libusbo.dll -> libusb0.dll
+
+2006-07-23 00:01  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Update web page with 3.13.7 release info.
+
+2006-07-22 18:31  adk0212
+
+	* ChangeLog:
+
+	Update ChangeLog for 3.13.7.
+
 2006-07-22 18:29  adk0212
 
 	* include/version.h:
