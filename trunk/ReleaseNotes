@@ -2,8 +2,29 @@
              Release Notes for Apcupsd 3.13.x
 
 *DEVELOPMENT RELEASE*
-3.13.6 22Jul06
+3.13.8 -- 08 July 2006
 
+CHANGES SINCE 3.13.7
+
+  * New features:
+      - apctest, smtp, and email executables included in Win32 installer
+      - Win32 event notices now use "balloon tips" that pop up near the
+        tray instead of a dialog in the middle of the screen. Notices
+        automatically time out after 10 seconds and are completely
+        scriptable via normal apccontrol event script mechanism.
+      - Added win32 tray icon for COMMLOST state so it is clear when
+        apcupsd has lost comms with the UPS.
+      - Removed Cygwin build capability (Yes, this is a feature!)
+
+  * Numerous bug fixes; highlights include...
+      - Solaris 10 USB build fix
+      - Darwin install fixes from Eric Cronin <ecronin@gizmolabs.org>
+      - Make apcupsd.conf settings case-insensitive
+      - Fix Win32 apccontrol.bat so event scripts are run properly
+      - Fix Win32 socket leak in NIS client & server
+
+Overall features in the 3.13.x development series are described
+below...
 
 NEW FEATURES
 
@@ -17,7 +38,7 @@ NEW FEATURES
 
   * PowerChute Network Shutdown driver (--enable-pcnet)
 
-  * GUI monitoring application, gapcmon , thanks to James Scott, Jr.
+  * GUI monitoring application, gapcmon, thanks to James Scott, Jr.
     This is a Gnome/GTK based application which integrates into most
     desktop panels (not just Gnome). The status of each UPS is shown
     with a icon similar to the Win32 tray icon in winapcupsd. Enable
