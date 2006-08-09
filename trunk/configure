@@ -16759,7 +16759,8 @@ darwin)
     LOCKDIR=/var/tmp
     DFILES="\
 	platforms/darwin/Makefile \
-	platforms/darwin/apcupsd"
+	platforms/darwin/apcupsd \
+	platforms/darwin/apccontrol"
   ;;
 unknown)
     DISTVER=unknown
