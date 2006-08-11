@@ -27,7 +27,7 @@
  * Last Modified By: Thorsten Engel
  * Last Modified On: Fri Apr 22 19:30:00 2004
  * Update Count    : 218
- * $Id: compat.h,v 1.17 2006-07-29 20:27:34 adk0212 Exp $
+ * $Id: compat.h,v 1.18 2006-08-11 23:57:05 adk0212 Exp $
  */
 
 
@@ -126,6 +126,10 @@ int gettimeofday(struct timeval *, struct timezone *);
 
 #ifndef ETIMEDOUT
 #define ETIMEDOUT 55
+#endif
+
+#ifndef EAFNOSUPPORT
+#define EAFNOSUPPORT WSAEAFNOSUPPORT
 #endif
 
 #ifndef HAVE_WXCONSOLE
@@ -302,7 +306,6 @@ void conv_unix_to_win32_path(const char *name, char *win32_name, DWORD dwSize);
 #define TIOCMBIC  1
 #define TIOCMBIS  2
 int ioctl(int, int, ...);
-
 
 /* Return the smaller of a or b */
 #define MIN(a, b) ( ((a) < (b)) ? (a) : (b) )
