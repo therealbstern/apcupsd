@@ -29,6 +29,10 @@
 
 #define PCNET_PORT   3052
 
+#ifdef HAVE_MINGW
+#define close(fd) closesocket(fd)
+#endif
+
 typedef struct {
    char device[MAXSTRING];             /* Copy of ups->device */
    char *ipaddr;                       /* IP address of UPS */
@@ -301,6 +305,22 @@ static bool pcnet_process_data(UPSINFO* ups, const char *key, const char *value)
    return ret;
 }
 
+static char *digest2ascii(md5_byte_t *digest)
+{
+   static char ascii[33];
+   char *ptr;
+   int idx;
+
+   /* Convert binary digest to ascii */
+   ptr = ascii;
+   for (idx=0; idx<16; idx++) {
+      sprintf(ptr, "%02x", (unsigned char)digest[idx]);
+      ptr += 2;
+   }
+
+   return ascii;
+}
+
 struct pair {
    const char* key;
    const char* value;
@@ -308,7 +328,7 @@ struct pair {
 
 #define MAX_PAIRS 256
 
-static const char *lookup_key(char *key, struct pair table[])
+static const char *lookup_key(const char *key, struct pair table[])
 {
    int idx;
    const char *ret = NULL;
@@ -323,22 +343,20 @@ static const char *lookup_key(char *key, struct pair table[])
    return ret;
 }
 
-static bool process_packet(UPSINFO* ups, char *buf, int len)
+static struct pair *auth_and_map_packet(UPSINFO* ups, char *buf, int len)
 {
    PCNET_DATA *my_data = (PCNET_DATA *)ups->driver_internal_data;
    char *key, *end, *ptr, *value;
-   const char *val;
-   struct pair pairs[MAX_PAIRS];
+   const char *val, *hash=NULL;
+   static struct pair pairs[MAX_PAIRS+1];
    md5_state_t ms;
    md5_byte_t digest[16];
-   char hash[33];
-   int idx;
+   unsigned int idx;
    unsigned long uptime, reboots;
-   bool ret;
 
    /* If there's no MD= field, drop the packet */
    if ((ptr = strstr(buf, "MD=")) == NULL || ptr == buf)
-      return false;
+      return NULL;
 
    if (my_data->auth) {
       /* Calculate the MD5 of the packet before messing with it */
@@ -349,11 +367,7 @@ static bool process_packet(UPSINFO* ups, char *buf, int len)
       md5_finish(&ms, digest);
 
       /* Convert binary digest to ascii */
-      ptr = hash;
-      for (idx=0; idx<16; idx++) {
-         sprintf(ptr, "%02x", (unsigned char)digest[idx]);
-         ptr += 2;
-      }
+      hash = digest2ascii(digest);
    }
 
    /* Build a table of pointers to key/value pairs */
@@ -400,7 +414,7 @@ static bool process_packet(UPSINFO* ups, char *buf, int len)
       val = lookup_key("MD", pairs);
       if (!val || strcmp(hash, val)) {
          Dmsg0(200, "process_packet: message hash failed\n");
-         return false;
+         return NULL;
       }
       Dmsg1(200, "process_packet: message hash passed\n", val);
 
@@ -408,14 +422,14 @@ static bool process_packet(UPSINFO* ups, char *buf, int len)
       val = lookup_key("PC", pairs);
       if (!val) {
          Dmsg0(200, "process_packet: Missing PC field\n");
-         return false;
+         return NULL;
       }
       Dmsg1(200, "process_packet: Expected IP=%s\n", my_data->ipaddr);
       Dmsg1(200, "process_packet: Received IP=%s\n", val);
       if (strcmp(val, my_data->ipaddr)) {
          Dmsg2(200, "process_packet: IP address mismatch\n",
             my_data->ipaddr, val);
-         return false;
+         return NULL;
       }
    }
 
@@ -427,14 +441,14 @@ static bool process_packet(UPSINFO* ups, char *buf, int len)
    val = lookup_key("SR", pairs);
    if (!val) {
       Dmsg0(200, "process_packet: Missing SR field\n");
-      return false;
+      return NULL;
    }
    reboots = strtoul(val, NULL, 16);
 
    val = lookup_key("SU", pairs);
    if (!val) {
       Dmsg0(200, "process_packet: Missing SU field\n");
-      return false;
+      return NULL;
    }
    uptime = strtoul(val, NULL, 16);
 
@@ -446,20 +460,12 @@ static bool process_packet(UPSINFO* ups, char *buf, int len)
    if ((reboots == my_data->reboots && uptime <= my_data->uptime) ||
        (reboots < my_data->reboots)) {
       Dmsg0(200, "process_packet: Packet is out of order or replayed\n");
-      return false;
+      return NULL;
    }
 
    my_data->reboots = reboots;
    my_data->uptime = uptime;
-
-   write_lock(ups);
-
-   ret = false;
-   for (idx=0; pairs[idx].key; idx++)
-      ret |= pcnet_process_data(ups, pairs[idx].key, pairs[idx].value);
-
-   write_unlock(ups);
-   return ret;
+   return pairs;
 }
 
 /*
@@ -474,6 +480,8 @@ int pcnet_ups_check_state(UPSINFO *ups)
    socklen_t fromlen;
    int retval;
    char buf[4096];
+   struct pair *map;
+   int idx;
 
    /* Figure out when we need to exit by */
    gettimeofday(&exit, NULL);
@@ -543,7 +551,16 @@ int pcnet_ups_check_state(UPSINFO *ups)
          logf("\n");
       }
 
-      done = process_packet(ups, buf, retval);
+      map = auth_and_map_packet(ups, buf, retval);
+      if (map == NULL)
+         continue;
+
+      write_lock(ups);
+
+      for (idx=0; map[idx].key; idx++)
+         done |= pcnet_process_data(ups, map[idx].key, map[idx].value);
+
+      write_unlock(ups);
    }
 
    return 1;
@@ -664,8 +681,130 @@ int pcnet_ups_read_volatile_data(UPSINFO *ups)
 
 int pcnet_ups_kill_power(UPSINFO *ups)
 {
-   /* Not implemented yet */
-   return 0;
+   PCNET_DATA *my_data = (PCNET_DATA *)ups->driver_internal_data;
+   struct sockaddr_in addr;
+   char data[1024];
+   int s, len=0, temp=0;
+   char *start;
+   const char *cs, *hash;
+   struct pair *map;
+   md5_state_t ms;
+   md5_byte_t digest[16];
+
+   /* Open a TCP stream to the UPS */
+   s = socket(PF_INET, SOCK_STREAM, 0);
+
+   memset(&addr, 0, sizeof(addr));
+   addr.sin_family = AF_INET;
+   addr.sin_port = htons(80);
+   inet_pton(AF_INET, my_data->ipaddr, &addr.sin_addr.s_addr);
+
+   if (connect(s, (sockaddr*)&addr, sizeof(addr))) {
+      Dmsg3(100, "pcnet_ups_kill_power: Unable to connect to %s:%d: %s\n",
+         my_data->ipaddr, 80, strerror(errno));
+      close(s);
+      return 0;
+   }
+
+   /* Send a simple HTTP request for "/macontrol.htm". */
+   asnprintf(data, sizeof(data),
+      "GET /macontrol.htm HTTP/1.1\r\n"
+      "Host: %s\r\n"
+      "\r\n",
+      my_data->ipaddr);
+
+   Dmsg1(200, "Request:\n---\n%s---\n", data);
+
+   if (send(s, data, strlen(data), 0) != (int)strlen(data)) {
+      Dmsg1(100, "pcnet_ups_kill_power: send failed: %s\n", strerror(errno));
+      close(s);
+      return 0;
+   }
+
+   /*
+    * Clear buffer and read data until we find the 0-length
+    * chunk. We know that AP9617 uses chunked encoding, so we
+    * can count on the 0-length chunk at the end.
+    */
+   memset(data, 0, sizeof(data));
+   do {
+      len += temp;
+      temp = recv(s, data+len, sizeof(data)-len, 0);
+   } while(temp > 0 && strstr(data, "\r\n0\r\n") == NULL);
+
+   Dmsg1(200, "Response:\n---\n%s---\n", data);
+
+   if (temp < 0) {
+      Dmsg1(100, "pcnet_ups_kill_power: recv failed: %s\n", strerror(errno));
+      close(s);
+      return 0;
+   }
+
+   /*
+    * Find "<html>" since that's where the real authenticated
+    * data begins. Everything before that is headers. 
+    */
+   start = strstr(data, "<html>");
+   if (start == NULL) {
+      Dmsg0(100, "pcnet_ups_kill_power: Malformed data\n");
+      close(s);
+      return 0;
+   }
+
+   /*
+    * Authenticate and map the packet contents. This will
+    * extract all key/value pairs and ensure the packet 
+    * authentication hash is valid.
+    */
+   map = auth_and_map_packet(ups, start, strlen(start));
+   if (map == NULL) {
+      close(s);
+      return 0;
+   }
+
+   /* Check that we got a challenge string. */
+   cs = lookup_key("CS", map);
+   if (cs == NULL) {
+      Dmsg0(200, "pcnet_ups_kill_power: Missing CS field\n");
+      close(s);
+      return 0;
+   }
+
+   /*
+    * Now construct the hash of the packet we're about to
+    * send using the challenge string from the packet we
+    * just received, plus our username and passphrase.
+    */
+   md5_init(&ms);
+   md5_append(&ms, (md5_byte_t*)"macontrol1_control_shutdown_1=1,", 32);
+   md5_append(&ms, (md5_byte_t*)cs, strlen(cs));
+   md5_append(&ms, (md5_byte_t*)my_data->user, strlen(my_data->user));
+   md5_append(&ms, (md5_byte_t*)my_data->pass, strlen(my_data->pass));
+   md5_finish(&ms, digest);
+   hash = digest2ascii(digest);
+
+   /* Send the shutdown request */
+   asnprintf(data, sizeof(data),
+      "POST /Forms/macontrol1 HTTP/1.1\r\n"
+      "Host: %s\r\n"
+      "Content-Type: application/x-www-form-urlencoded\r\n"
+      "Content-Length: 72\r\n"
+      "\r\n"
+      "macontrol1%%5fcontrol%%5fshutdown%%5f1=1%%2C%s",
+      my_data->ipaddr, hash);
+
+   Dmsg2(200, "Request: (strlen=%d)\n---\n%s---\n", strlen(data), data);
+
+   if (send(s, data, strlen(data), 0) != (int)strlen(data)) {
+      Dmsg1(100, "pcnet_ups_kill_power: send failed: %s\n", strerror(errno));
+      close(s);
+      return 0;
+   }
+
+   /* That's it, we're done. */
+   close(s);
+
+   return 1;
 }
 
 int pcnet_ups_program_eeprom(UPSINFO *ups, int command, char *data)
