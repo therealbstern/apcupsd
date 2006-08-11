@@ -287,10 +287,6 @@ int net_open(char *host, char *service, int port)
 /* Close the network connection */
 void net_close(int sockfd)
 {
-   short pktsiz = 0;
-
-   /* send EOF sentinel */
-   write_nbytes(sockfd, (char *)&pktsiz, sizeof(short));
    close(sockfd);
 }
 

@@ -205,8 +205,7 @@ void do_server(UPSINFO *ups)
        * allowed closes the connection.
        */
       if (check_wrappers(argvalue, newsockfd) == FAILURE) {
-         shutdown(newsockfd, 2);
-         close(newsockfd);
+         net_close(newsockfd);
          continue;
       }
 #endif
@@ -296,8 +295,7 @@ void *handle_client_request(void *arg)
       }
    }
 
-   shutdown(nsockfd, 2);
-   close(nsockfd);
+   net_close(nsockfd);
 
    free(arg);
    detach_ups(ups);
