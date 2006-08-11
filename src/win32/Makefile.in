@@ -143,7 +143,8 @@ LIB_OBJS = \
 	$(OBJDIR)/asys.o \
 	$(OBJDIR)/newups.o \
 	$(OBJDIR)/md5.o \
-	$(OBJDIR)/sleep.o
+	$(OBJDIR)/sleep.o \
+	$(OBJDIR)/inet_pton.o
 
 #
 # Rules for generating from ../lib
@@ -189,6 +190,9 @@ $(OBJDIR)/md5.o: ../lib/md5.c
 	$(CXX) -c $< -o $@
 
 $(OBJDIR)/sleep.o: ../lib/sleep.c
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/inet_pton.o: ../lib/inet_pton.c
 	$(CXX) -c $< -o $@
 
 ######################################################################
