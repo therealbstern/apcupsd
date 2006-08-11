@@ -139,18 +139,12 @@ void do_server(UPSINFO *ups)
 
    local_ip.s_addr = INADDR_ANY;
 
-   /*
-    * This ifdef is a bit of a kludge, but without it, we have no inet_pton,
-    * so avoid the error message.
-    */
-#ifdef HAVE_NAMESER_H
    if (ups->nisip[0]) {
       if (inet_pton(AF_INET, ups->nisip, &local_ip) != 1) {
          log_event(ups, LOG_WARNING, "Invalid NISIP specified: '%s'", ups->nisip);
          local_ip.s_addr = INADDR_ANY;
       }
    }
-#endif
 
    /* Open a TCP socket */
    for (tlog = 0; (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0; tlog -= 5 * 60) {
