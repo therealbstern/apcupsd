@@ -15,19 +15,16 @@
  */
 
 #if defined(LIBC_SCCS) && !defined(lint)
-static char rcsid[] = "$Id: inet_pton.c,v 1.6 2005-08-15 05:32:31 adk0212 Exp $";
+static char rcsid[] = "$Id: inet_pton.c,v 1.7 2006-08-12 00:00:28 adk0212 Exp $";
 #endif /* LIBC_SCCS and not lint */
 
 #include "apc.h"
-
-#ifdef HAVE_NAMESER_H
 
 #include <sys/param.h>
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
-#include <arpa/nameser.h>
 #include <string.h>
 #include <errno.h>
 
@@ -83,7 +80,7 @@ inet_pton(int af, const char *src, void *dst)
 static int
 inet_pton4(const char *src, u_char *dst)
 {
-        static const char digits[] = "0123456789";
+   static const char digits[] = "0123456789";
 	int saw_digit, octets, ch;
 	u_char tmp[NS_INADDRSZ], *tp;
 
@@ -215,12 +212,3 @@ inet_pton6(const char *src, u_char *dst)
 	return (1);
 }
 #endif /* AF_INET6 */
-
-#else
-int
-inet_pton(int af, const char *src, void *dst)
-{
-   return -1;			      /* not implemented */
-}
-
-#endif
