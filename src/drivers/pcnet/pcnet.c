@@ -693,6 +693,11 @@ int pcnet_ups_kill_power(UPSINFO *ups)
 
    /* Open a TCP stream to the UPS */
    s = socket(PF_INET, SOCK_STREAM, 0);
+   if (s == -1) {
+      Dmsg1(100, "pcnet_ups_kill_power: Unable to open socket: %s\n",
+         strerror(errno));
+      return 0;
+   }
 
    memset(&addr, 0, sizeof(addr));
    addr.sin_family = AF_INET;
@@ -815,6 +820,44 @@ int pcnet_ups_program_eeprom(UPSINFO *ups, int command, char *data)
 
 int pcnet_ups_entry_point(UPSINFO *ups, int command, void *data)
 {
-   /* Unsupported */
-   return 0;
+   int temp;
+
+   switch (command) {
+   case DEVICE_CMD_CHECK_SELFTEST:
+      Dmsg0(80, "Checking self test.\n");
+      if (ups->UPS_Cap[CI_WHY_BATT] && ups->lastxfer == XFER_SELFTEST) {
+         /*
+          * set Self Test start time
+          */
+         ups->SelfTest = time(NULL);
+         Dmsg1(80, "Self Test time: %s", ctime(&ups->SelfTest));
+      }
+      break;
+
+   case DEVICE_CMD_GET_SELFTEST_MSG:
+      /*
+       * This is a bit kludgy. The selftest result isn't available from
+       * the UPS for about 10 seconds after the selftest completes. So we
+       * invoke pcnet_ups_check_state() with a 12 second timeout, 
+       * expecting that it should get a status report before then.
+       */
+
+      /* Save current ups->wait_time and set it to 12 seconds */
+      temp = ups->wait_time;
+      ups->wait_time = 12;
+      
+      /* Let check_status wait for the result */
+      write_unlock(ups);
+      pcnet_ups_check_state(ups);
+      write_lock(ups);
+
+      /* Restore ups->wait_time */
+      ups->wait_time = temp;
+      break;
+
+   default:
+      return FAILURE;
+   }
+
+   return SUCCESS;
 }
