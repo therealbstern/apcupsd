@@ -316,7 +316,7 @@ hid_get_item_raw(hid_data_t s, hid_item_t *h)
 				c->logical_maximum = dval;
 				break;
 			case 3:
-				c->physical_maximum = dval;
+				c->physical_minimum = dval;
 				break;
 			case 4:
 				c->physical_maximum = dval;
