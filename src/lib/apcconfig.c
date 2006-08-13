@@ -388,7 +388,11 @@ static int match_str(UPSINFO *ups, int offset, const GENINFO * gen, const char *
     */
    x[0] = '\0';
 
-   if (!sscanf(v, "%s", x))
+   /*
+    * On some platforms (Darwin 10.3.x), sscanf("", "%s", buf) returns 0
+    * (failure) instead of -1 (EOF). So we explicitly check for that case.
+    */
+   if (v[0] && !sscanf(v, "%s", x))
       return FAILURE;
 
    astrncpy((char *)AT(ups, offset), x, (int)size);
