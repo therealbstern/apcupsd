@@ -384,6 +384,11 @@ AC_TYPE_SIGNAL
 AC_TYPE_SIZE_T
 AC_TYPE_UID_T
 AC_TYPE_SOCKETLEN_T
+
+dnl Not always true, but close enough for the few platforms
+dnl that are missing this (Solaris 2.5.1).
+AC_CHECK_TYPE(int32_t, int)
+
 dnl
 dnl
 dnl Check for compiler characteristics.
