@@ -51,7 +51,6 @@
 
 /* Alpha Tru64 */
 #ifdef HAVE_OSF1_OS
-# define int32_t int
 # define _SEM_SEMUN_UNDEFINED 1
 #endif
 
@@ -81,7 +80,6 @@
 #endif
 
 #ifdef HAVE_OPENSERVER_OS
-# define int32_t         int
 # define _SEM_SEMUN_UNDEFINED 1
 #endif
 
