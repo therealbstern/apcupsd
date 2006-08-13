@@ -251,8 +251,5 @@ int winioctl(int fd, int func, int *addr);
 #ifndef HAVE_NANOSLEEP
   int nanosleep(const struct timespec *req, struct timespec *rem);
 #endif
-#ifndef HAVE_USLEEP
-  void usleep(unsigned long usec);
-#endif
 
 #endif   /* _EXTERN_H */
