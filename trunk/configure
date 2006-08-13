@@ -909,7 +909,7 @@ Optional Packages:
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-x                use the X Window System
   --with-libwrap=DIR      Compile in libwrap (tcp_wrappers) support
-   --with-generic-usb      Force use of generic USB driver
+  --with-generic-usb      Force use of generic USB driver
   --with-nisip=IP-ADDRESS Specify the IP address to bind to (default=0.0.0.0)
   --with-cgi-bin=DIR      Specify cgi-bin directory (default=/etc/apcupsd)
   --with-included-gettext use the GNU gettext library included here
@@ -11779,7 +11779,7 @@ GENERICUSB="no"
 # Check whether --with-generic-usb or --without-generic-usb was given.
 if test "${with_generic_usb+set}" = set; then
   withval="$with_generic_usb"
-   GENERICUSB="yes"
+  GENERICUSB="yes"
 fi;
 
 # Check whether --enable-usb or --disable-usb was given.
