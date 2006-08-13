@@ -69,18 +69,3 @@ int nanosleep(const struct timespec *req, struct timespec *rem)
    return 0;
 }
 #endif /* HAVE_NANOSLEEP */
-
-#ifndef HAVE_USLEEP
-/*
- * This is a close approximation of usleep() for platforms that
- * do not have it.
- */
-void usleep(unsigned long usec)
-{
-   struct timespec ts;
-   
-   ts.tv_sec = usec/1000000;
-   ts.tv_nsec = usec%1000;
-   nanosleep(&ts, NULL);
-}
-#endif /* HAVE_USLEEP */
