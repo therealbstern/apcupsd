@@ -471,4 +471,4 @@
 #undef HAVE_LIBXNET
 
 #undef HAVE_NANOSLEEP
-#undef bint32_t
+#undef int32_t
