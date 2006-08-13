@@ -157,7 +157,7 @@ void do_server(UPSINFO *ups)
 
    /* Reuse old sockets */
 #ifndef HAVE_MINGW
-   if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &turnon, sizeof(turnon)) < 0) {
+   if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (void*)&turnon, sizeof(turnon)) < 0) {
       log_event(ups, LOG_WARNING, "Cannot set SO_REUSEADDR on socket: %s\n",
          strerror(errno));
    }
