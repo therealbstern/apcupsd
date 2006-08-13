@@ -27,8 +27,17 @@
 #include <sys/socket.h>
 #include <netinet/in.h>
 
+/* UPS broadcasts status packets to UDP port 3052 */
 #define PCNET_PORT   3052
 
+/*
+ * Number of seconds with no data before we declare COMMLOST.
+ * UPS should report in every 25 seconds. We allow 2 missing
+ * reports plus a fudge factor.
+ */
+#define COMMLOST_TIMEOUT   55
+
+/* Win32 needs a special close for sockets */
 #ifdef HAVE_MINGW
 #define close(fd) closesocket(fd)
 #endif
@@ -41,6 +50,7 @@ typedef struct {
    bool auth;                          /* Authenticate? */
    unsigned long uptime;               /* UPS uptime counter */
    unsigned long reboots;              /* UPS reboot counter */
+   time_t datatime;                    /* Last time we got valid data */
 } PCNET_DATA;
 
 /* Convert UPS response to enum and string */
@@ -116,9 +126,6 @@ static bool pcnet_process_data(UPSINFO* ups, const char *key, const char *value)
 
    /* Mark this CI as available */
    ups->UPS_Cap[ci] = true;
-
-   /* Have a connection now */
-   ups->clear_commlost();
 
    /* Handle the data */
    ret = true;
@@ -473,6 +480,7 @@ static struct pair *auth_and_map_packet(UPSINFO* ups, char *buf, int len)
  */
 int pcnet_ups_check_state(UPSINFO *ups)
 {
+   PCNET_DATA *my_data = (PCNET_DATA *)ups->driver_internal_data;
    struct timeval tv, now, exit;
    fd_set rfds;
    bool done = false;
@@ -496,7 +504,7 @@ int pcnet_ups_check_state(UPSINFO *ups)
          (now.tv_sec == exit.tv_sec &&
             now.tv_usec >= exit.tv_usec)) {
          /* Done already? How time flies... */
-         return 0;
+         break;
       }
 
       tv.tv_sec = exit.tv_sec - now.tv_sec;
@@ -506,22 +514,20 @@ int pcnet_ups_check_state(UPSINFO *ups)
          tv.tv_usec += 1000000;
       }
 
+      Dmsg2(100, "Waiting for %d.%d\n", tv.tv_sec, tv.tv_usec);
       FD_ZERO(&rfds);
       FD_SET(ups->fd, &rfds);
 
       retval = select(ups->fd + 1, &rfds, NULL, NULL, &tv);
 
-      switch (retval) {
-      case 0:                     /* No chars available in TIMER seconds. */
-         return 0;
-      case -1:
+      if (retval == 0) {
+         /* No chars available in TIMER seconds. */
+         break;
+      } else if (retval == -1) {
          if (errno == EINTR || errno == EAGAIN)         /* assume SIGCHLD */
             continue;
          Dmsg1(200, "select error: ERR=%s\n", strerror(errno));
-//         usb_link_check(ups);      /* link is down, wait */
          return 0;
-      default:
-         break;
       }
 
       do {
@@ -532,7 +538,7 @@ int pcnet_ups_check_state(UPSINFO *ups)
       if (retval < 0) {            /* error */
          Dmsg1(200, "recvfrom error: ERR=%s\n", strerror(errno));
 //         usb_link_check(ups);      /* notify that link is down, wait */
-         return 0;
+         break;
       }
 
       Dmsg4(200, "Packet from: %d.%d.%d.%d\n",
@@ -563,7 +569,13 @@ int pcnet_ups_check_state(UPSINFO *ups)
       write_unlock(ups);
    }
 
-   return 1;
+   /* If we successfully received a data packet, update timer. */
+   if (done) {
+      time(&my_data->datatime);
+      Dmsg1(100, "Valid data at time_t=%d\n", my_data->datatime);
+   }
+
+   return done;
 }
 
 int pcnet_ups_open(UPSINFO *ups)
@@ -619,8 +631,8 @@ int pcnet_ups_open(UPSINFO *ups)
    /* Cheat and fixup CI_UPSMODEL to match PCNET */
    ups->UPS_Cmd[CI_UPSMODEL] = 0x01;
 
-   /* Assume we have no connection until the first packet comes in */
-   ups->set_commlost();
+   /* Reset datatime to now */
+   time(&my_data->datatime);
 
    write_unlock(ups);
    return 1;
@@ -675,7 +687,29 @@ int pcnet_ups_read_static_data(UPSINFO *ups)
  */
 int pcnet_ups_read_volatile_data(UPSINFO *ups)
 {
-   /* All our data gathering is done in pcnet_ups_check_state() */
+   PCNET_DATA *my_data = (PCNET_DATA *)ups->driver_internal_data;
+   time_t now, diff;
+   
+   /*
+    * All our data gathering is done in pcnet_ups_check_state().
+    * But we do use this function to check our commlost state.
+    */
+
+   time(&now);
+   diff = now - my_data->datatime;
+
+   if (ups->is_commlost()) {
+      if (diff < COMMLOST_TIMEOUT) {
+         generate_event(ups, CMDCOMMOK);
+         ups->clear_commlost();
+      }
+   } else {
+      if (diff >= COMMLOST_TIMEOUT) {
+         generate_event(ups, CMDCOMMFAILURE);
+         ups->set_commlost();
+      }
+   }
+
    return 1;
 }
 
