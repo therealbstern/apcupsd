@@ -6,8 +6,12 @@ dnl Process this file with autoconf to produce a configure script.
 dnl Process this file with autoheader to produce a config.h.in
 dnl
 
-AC_INIT(Developers)		dnl A distinctive file to look for in srcdir. 
-AC_CONFIG_HEADER(include/config.h:autoconf/config.h.in) dnl Config header file.
+dnl A distinctive file to look for in srcdir. 
+AC_INIT(Developers)
+
+dnl Config header file.
+AC_CONFIG_HEADER(include/config.h:autoconf/config.h.in)
+
 topdir=`pwd`
 AC_CONFIG_AUX_DIR(${topdir}/autoconf)
 
@@ -24,11 +28,10 @@ cd ${topdir}
 AC_SUBST(TOP_DIR)
 
 VERSION=`sed -n -e 's/^.*VERSION.*"\(.*\)"$/\1/p' ${srcdir}/include/version.h`
-AC_SUBST(VERSION)dnl 
-#AC_DEFINE_UNQUOTED(VERSION, "$VERSION")
+AC_SUBST(VERSION)
 
 DATE=`sed -n -e 's/^.*[ \t]*ADATE.*"\(.*\)"$/\1/p' ${srcdir}/include/version.h`
-AC_SUBST(DATE)dnl 
+AC_SUBST(DATE)
 
 dnl
 dnl These need to be searched before.
@@ -48,7 +51,7 @@ then
 dnl ----------------------------------------
 dnl  SunOS defaults
 dnl ----------------------------------------
-  AC_PREFIX_DEFAULT(/opt/apcupsd)
+   AC_PREFIX_DEFAULT(/opt/apcupsd)
 dnl --exec-prefix == eprefix == prefix
 dnl --bindir == eprefix/bin
 dnl --sbindir == eprefix/sbin
@@ -56,51 +59,50 @@ dnl
 dnl If the user has not set -sysconfdir, we set our default as
 dnl /etc/opt/apcupsd
 dnl
-  if test x$sysconfdir = x'${prefix}/etc' ; then
-     sysconfdir='/etc/opt/apcupsd'
-  fi
+   if test x$sysconfdir = x'${prefix}/etc' ; then
+      sysconfdir='/etc/opt/apcupsd'
+   fi
 dnl
 dnl If the user has not set -sbindir, we set our default as /sbin
 dnl
-  if test x$sbindir = x'${exec_prefix}/sbin' ; then
-     sbindir='/etc/opt/apcupsd/sbin'
-  fi
+   if test x$sbindir = x'${exec_prefix}/sbin' ; then
+      sbindir='/etc/opt/apcupsd/sbin'
+   fi
 else
 dnl -------------------------------------------
 dnl  non Sun defaults (i.e. all other platforms  
 dnl -------------------------------------------
-  AC_PREFIX_DEFAULT(/usr)
+   AC_PREFIX_DEFAULT(/usr)
 dnl
 dnl If the user has not set -sysconfdir, we set our default as /etc/apcupsd
 dnl
-  if test x$sysconfdir = x'${prefix}/etc' ; then
-     sysconfdir='/etc/apcupsd'
-  fi
+   if test x$sysconfdir = x'${prefix}/etc' ; then
+      sysconfdir='/etc/apcupsd'
+   fi
 
 dnl
 dnl If the user has not set -sbindir, we set our default as /sbin
 dnl
-  if test x$sbindir = x'${exec_prefix}/sbin' ; then
-     sbindir='/sbin'
-  fi
+   if test x$sbindir = x'${exec_prefix}/sbin' ; then
+      sbindir='/sbin'
+   fi
 fi
 
 dnl
 dnl Sets `host_cpu', `host_vendor', and `host_os' to the current host type.
 dnl
-AC_CANONICAL_HOST		    dnl Check for host type.
+AC_CANONICAL_HOST
 
 dnl
-dnl
-dnl	Check for programs.
+dnl Check for programs.
 dnl
 
-AC_PROG_CC			dnl Determine a C compiler to use.
-AC_PROG_CPP			dnl Determine a C pre-processor to use.
-AC_PROG_CXX			dnl We require a C++ compiler now
-AC_PROG_CC_C_O			dnl Determine if C compiler support -c -o.
-AC_PROG_GCC_TRADITIONAL 	dnl Determine if ioctl() need -traditional.
-AC_PROG_INSTALL 		dnl Determine a BSD install program.
+AC_PROG_CC                 dnl Determine a C compiler to use.
+AC_PROG_CPP                dnl Determine a C pre-processor to use.
+AC_PROG_CXX                dnl We require a C++ compiler now
+AC_PROG_CC_C_O             dnl Determine if C compiler support -c -o.
+AC_PROG_GCC_TRADITIONAL    dnl Determine if ioctl() need -traditional.
+AC_PROG_INSTALL            dnl Determine a BSD install program.
 AC_PROG_AWK
 AC_ISC_POSIX
 
@@ -121,14 +123,13 @@ dnl Supply default CFLAGS, if not specified by `CFLAGS=flags ./configure'
 dnl   but only gcc has -Wall in general
 dnl
 if test x$GCC = xyes; then
-  CFLAGS=${CFLAGS-"-g -O2"}
-  CFLAGS="${CFLAGS} -Wall"
-  LDFLAGS=${LDFLAGS-"-g -O"}
+   CFLAGS=${CFLAGS-"-g -O2"}
+   CFLAGS="${CFLAGS} -Wall"
+   LDFLAGS=${LDFLAGS-"-g -O"}
 else
-  CFLAGS=${CFLAGS--O2}
-  LDFLAGS=${LDFLAGS--O}
+   CFLAGS=${CFLAGS--O2}
+   LDFLAGS=${LDFLAGS--O}
 fi
-
 
 CPPFLAGS="$CPPFLAGS"
 AC_SUBST(DEBUG)
@@ -139,7 +140,6 @@ AC_SUBST(CPPFLAGS)
 AC_SUBST(LDFLAGS)
 AC_SUBST(LIBS)
 
-
 dnl Initialize pthreads inclusion: warn PTHREAD_LFLAGS must contain only
 dnl the pthreads libraries, if needed. For linker flags, add them to
 dnl LDFLAGS.
@@ -148,9 +148,7 @@ PTHREAD_LFLAGS="-lpthread"
 with_pthreads=yes
 
 AC_MSG_CHECKING([for pthreads])
-
 AC_DEFINE(HAVE_PTHREADS)
-
 AC_SUBST(PTHREAD_CFLAGS)
 AC_SUBST(PTHREAD_LFLAGS)
 
@@ -171,8 +169,8 @@ fi
 AC_PATH_PROGS(APCUPSD_MAIL, mail, no)
 if test "$APCUPSD_MAIL" = "no"
 then
-    AC_MSG_WARN([mail program not found !])
-    APCUPSD_MAIL=mail
+   AC_MSG_WARN([mail program not found !])
+   APCUPSD_MAIL=mail
 fi
 
 AC_PATH_PROGS(WALL, wall, no)
@@ -184,7 +182,7 @@ fi
 AC_PATH_PROGS(SCRIPTSHELL, sh bash, no)
 if test "$SCRIPTSHELL" = "no"
 then
-	AC_MSG_ERROR([shell program not found !])
+   AC_MSG_ERROR([shell program not found !])
 fi
 
 dnl
@@ -194,7 +192,7 @@ dnl
 AC_PATH_PROGS(MAKE, gmake pmake make, no)
 if test "$MAKE" = "no"
 then
-	AC_MSG_ERROR([make program not found !])
+   AC_MSG_ERROR([make program not found !])
 fi
 
 AC_PATH_PROGS(MAKEDEPEND, makedepend true, :)
@@ -218,12 +216,7 @@ if test x$mandir = x'${prefix}/man' ; then
 fi
 
 
-dnl	Check for libraries.
-dnl
-dnl	Nothing to do.
-dnl
-dnl
-dnl	Check for library functions.
+dnl Check for library functions.
 dnl
 dnl for fopen and friends I check only for fprintf. If it is there I suppose
 dnl all the other function should be there.
@@ -231,11 +224,11 @@ dnl The same for open and friends: checking only for open.
 dnl and for all the other function groups.
 dnl
 AC_CHECK_FUNCS(
-		abort fork calloc getpid \
-		ioctl kill rewind select setsid signal strerror strncmp \
-		strncpy tcgetattr vfprintf setpgrp,,
-		[AC_MSG_ERROR([cannot find required function.])]
-		)
+   abort fork calloc getpid \
+   ioctl kill rewind select setsid signal strerror strncmp \
+   strncpy tcgetattr vfprintf setpgrp,,
+   [AC_MSG_ERROR([cannot find required function.])]
+)
 
 AC_CHECK_FUNCS(snprintf vsnprintf)
 
@@ -249,25 +242,23 @@ AC_SEARCH_LIBS(nanosleep, [rt posix4], AC_DEFINE(HAVE_NANOSLEEP, 1,
 AC_MSG_CHECKING([for syslog])
 
 AC_TRY_LINK(
-	[#include <syslog.h>],
-	[syslog(0, "%s", "test");], AC_MSG_RESULT([yes]),
-	  AC_CHECK_LIB(socket, std_syslog,,
-	[AC_MSG_ERROR([cannot find required function.])]
-	  )
-	  AC_TRY_LINK(
-	    [#include <syslog.h>],
-	    [syslog(0, "%s", "test");], AC_MSG_RESULT([yes]),
-	    [AC_MSG_ERROR([cannot find required function.])]
-	  )
-	)
+   [#include <syslog.h>],
+   [syslog(0, "%s", "test");],
+   AC_MSG_RESULT([yes]),
+   AC_CHECK_LIB(socket, std_syslog,,
+      [AC_MSG_ERROR([cannot find required function.])])
+   AC_TRY_LINK(
+      [#include <syslog.h>],
+      [syslog(0, "%s", "test");], AC_MSG_RESULT([yes]),
+      [AC_MSG_ERROR([cannot find required function.])])
+)
 
-AC_FUNC_STRFTIME		dnl check for strftime.
-AC_FUNC_SETPGRP 		dnl check for BSD setpgrp.
+AC_FUNC_STRFTIME     dnl check for strftime.
+AC_FUNC_SETPGRP      dnl check for BSD setpgrp.
 
-dnl
 # Under sysV68, socket and friends are provided by the C library.
 # -linet does not provide socket, but causes multiple definition
-# errors at link-time.	It is thus better to only use the C library.
+# errors at link-time.  It is thus better to only use the C library.
 # So don't add -linet to the link list unless it's necessary
 #
 # With Solaris socket and friends seem not to be in C library.
@@ -276,20 +267,20 @@ dnl
 # - RF
 #
 AC_CHECK_FUNC(socket,
-    AC_MSG_RESULT([using libc's socket]),
-    AC_CHECK_LIB(xnet,socket)
-    AC_CHECK_LIB(socket,socket)
-    AC_CHECK_LIB(inet,socket))
+   AC_MSG_RESULT([using libc's socket]),
+   AC_CHECK_LIB(xnet,socket)
+   AC_CHECK_LIB(socket,socket)
+   AC_CHECK_LIB(inet,socket))
 
 AC_CHECK_FUNC(gethostname,
-    AC_MSG_RESULT([using libc's gethostname]),
-    AC_CHECK_LIB(socket,gethostname)
-    AC_CHECK_LIB(xnet,gethostname)
-    AC_CHECK_LIB(inet,gethostname))
+   AC_MSG_RESULT([using libc's gethostname]),
+   AC_CHECK_LIB(socket,gethostname)
+   AC_CHECK_LIB(xnet,gethostname)
+   AC_CHECK_LIB(inet,gethostname))
 
-dnl# --------------------------------------------------------------------------
-dnl# Check for socklen_t
-dnl# --------------------------------------------------------------------------
+dnl --------------------------------------------------------------------------
+dnl Check for socklen_t
+dnl --------------------------------------------------------------------------
 AC_CACHE_CHECK(for socklen_t, ba_cv_header_socklen_t,
   [AC_TRY_COMPILE([
 #include <sys/types.h>
@@ -300,42 +291,42 @@ test $ba_cv_header_socklen_t = yes && AC_DEFINE(HAVE_SOCKLEN_T)
 
 # If resolver functions are not in libc check for -lnsl or -lresolv.
 AC_CHECK_FUNC(gethostbyname,
-    AC_MSG_RESULT([using libc's resolver]),
-    AC_CHECK_LIB(nsl,gethostbyname)
-    AC_CHECK_LIB(resolv,gethostbyname))
+   AC_MSG_RESULT([using libc's resolver]),
+   AC_CHECK_LIB(nsl,gethostbyname)
+   AC_CHECK_LIB(resolv,gethostbyname))
 
 # If gettext isn't in the C library, maybe there's a -lintl.
 AC_CHECK_FUNC(gettext,
-    AC_MSG_RESULT([using libc's gettext]),
-    AC_CHECK_LIB(intl,gettext))
+   AC_MSG_RESULT([using libc's gettext]),
+   AC_CHECK_LIB(intl,gettext))
 
 # The condition in this test copes with the presence of inet_addr in libc6.
 AC_CHECK_FUNC(inet_addr,
-    AC_MSG_RESULT([using libc's inet_addr]),
-    AC_CHECK_LIB(nsl,inet_addr))
+   AC_MSG_RESULT([using libc's inet_addr]),
+   AC_CHECK_LIB(nsl,inet_addr))
 
 dnl Needed by Interactive UNIX System V/386 Release 3.2
 AC_CHECK_FUNC(strchr,
-    AC_MSG_RESULT([using libc's strchr]),
-    AC_CHECK_LIB(cposix,strchr,
-    [EXTRADEFS="$EXTRADEFS -D_SYSV3"
-     LIBS="$LIBS -lcposix"]))
+   AC_MSG_RESULT([using libc's strchr]),
+   AC_CHECK_LIB(cposix,strchr,
+   [EXTRADEFS="$EXTRADEFS -D_SYSV3"
+    LIBS="$LIBS -lcposix"]))
 
 AC_CHECK_FUNC(strstr, AC_DEFINE(HAVE_STRSTR), 
-    [LIBEXTRAOBJ="$LIBEXTRAOBJ strstr.o"
-     EXTRAOBJ="$EXTRAOBJ lib/strstr.o"])
+   [LIBEXTRAOBJ="$LIBEXTRAOBJ strstr.o"
+    EXTRAOBJ="$EXTRAOBJ lib/strstr.o"])
 
 AC_CHECK_FUNC(strcasecmp, AC_DEFINE(HAVE_STRCASECMP), 
-    [LIBEXTRAOBJ="$LIBEXTRAOBJ strcasecmp.o"
-     EXTRAOBJ="$EXTRAOBJ lib/strcasecmp.o"])
-	     
+   [LIBEXTRAOBJ="$LIBEXTRAOBJ strcasecmp.o"
+    EXTRAOBJ="$EXTRAOBJ lib/strcasecmp.o"])
+        
 AC_CHECK_FUNC(memmove, AC_DEFINE(HAVE_MEMMOVE), 
-    [LIBEXTRAOBJ="$LIBEXTRAOBJ memmove.o"
-     EXTRAOBJ="$EXTRAOBJ lib/memmove.o"])
-	     
+   [LIBEXTRAOBJ="$LIBEXTRAOBJ memmove.o"
+    EXTRAOBJ="$EXTRAOBJ lib/memmove.o"])
+        
 AC_CHECK_FUNC(getopt_long, AC_DEFINE(HAVE_GETOPTLONG),
-    [LIBEXTRAOBJ="$LIBEXTRAOBJ getopt.o getopt1.o"
-     EXTRAOBJ="$EXTRAOBJ lib/getopt.o lib/getopt1.o"])
+   [LIBEXTRAOBJ="$LIBEXTRAOBJ getopt.o getopt1.o"
+    EXTRAOBJ="$EXTRAOBJ lib/getopt.o lib/getopt1.o"])
 
 AC_CHECK_FUNC(inet_pton, AC_DEFINE(HAVE_INETPTON), 
     [LIBEXTRAOBJ="$LIBEXTRAOBJ inet_pton.o"
@@ -345,34 +336,32 @@ dnl
 dnl Check for presence of localtime_r
 dnl
 AC_CHECK_FUNC(localtime_r, AC_DEFINE(HAVE_LOCALTIME_R),
-    [LIBEXTRAOBJ="$LIBEXTRAOBJ localtime_r.o"
-     EXTRAOBJ="$EXTRAOBJ lib/localtime_r.o"])
+   [LIBEXTRAOBJ="$LIBEXTRAOBJ localtime_r.o"
+    EXTRAOBJ="$EXTRAOBJ lib/localtime_r.o"])
 
 dnl
-dnl	Check for header files.
+dnl   Check for header files.
 dnl
 AC_CHECK_HEADERS(
-    arpa/inet.h ctype.h errno.h fcntl.h \
-    limits.h netdb.h netinet/in.h pwd.h signal.h \
-    stdarg.h stdio.h stdlib.h string.h strings.h sys/ioctl.h \
-    sys/socket.h sys/types.h syslog.h termios.h \
-    unistd.h
-    ,,[AC_MSG_WARN([at least 1 header file is missing. This may not compile.])]
-    )		    dnl Check for _all_ included headers.
+   arpa/inet.h ctype.h errno.h fcntl.h \
+   limits.h netdb.h netinet/in.h pwd.h signal.h \
+   stdarg.h stdio.h stdlib.h string.h strings.h sys/ioctl.h \
+   sys/socket.h sys/types.h syslog.h termios.h \
+   unistd.h
+   ,,[AC_MSG_WARN([at least 1 header file is missing. This may not compile.])])
 
 AC_CHECK_HEADERS(arpa/nameser.h,AC_DEFINE(HAVE_NAMESER_H))
 
-AC_HEADER_STAT			dnl Check for S_ISDIR and S_ISREG macros.
-AC_HEADER_TIME			dnl Check for time.h and sys/time.h.
-AC_HEADER_SYS_WAIT		dnl Check for <sys/wait.h>
-dnl AC_HEADER_STDC			dnl Check for STDC headers.
+AC_HEADER_STAT       dnl Check for S_ISDIR and S_ISREG macros.
+AC_HEADER_TIME       dnl Check for time.h and sys/time.h.
+AC_HEADER_SYS_WAIT      dnl Check for <sys/wait.h>
+
 dnl
+dnl   Check for structures.
 dnl
-dnl	Check for structures.
-dnl
-AC_STRUCT_TM			dnl Check if time.h don't define struct tm.
-AC_STRUCT_TIMEZONE		dnl Check how to have current timezone.
-dnl
+AC_STRUCT_TM         dnl Check if time.h don't define struct tm.
+AC_STRUCT_TIMEZONE      dnl Check how to have current timezone.
+
 dnl
 dnl Check for types.
 dnl
@@ -390,29 +379,19 @@ dnl that are missing this (Solaris 2.5.1).
 AC_CHECK_TYPE(int32_t, int)
 
 dnl
-dnl
 dnl Check for compiler characteristics.
 dnl
-dnl  AC_C_BIGENDIAN		     dnl XXX Needed by network code ?.
-AC_C_CONST			dnl Check const support.
-AC_C_INLINE			dnl XXX Check inline support.
-dnl AC_C_CHAR_UNSIGNED		    dnl XXX Check if char is unsigned.
-dnl AC_C_LONG_DOUBLE		dnl XXX Check long double support.
-AC_C_STRINGIZE			dnl XXX Check CPP stringize support.
-dnl AC_CHECK_SIZEOF(long)	dnl Use this construct to check for sizes.
-dnl
-dnl
+AC_C_CONST        dnl Check const support.
+AC_C_INLINE       dnl XXX Check inline support.
+AC_C_STRINGIZE       dnl XXX Check CPP stringize support.
+
 dnl
 dnl Check for system services.
 dnl
-AC_EXEEXT			dnl Check for EXE extension.
-dnl AC_OBJEXT			dnl Check for OBJ extension.
-dnl AC_MINGW32			dnl Check for MingW32 compiler environment.
-AC_PATH_XTRA			dnl Is X Window System interesting ?.  **GAPCMON**
-AC_SYS_INTERPRETER		dnl Check for '#!' in shell scripts.
-dnl AC_SYS_LONG_FILE_NAMES		dnl Check for long file names.
-dnl AC_SYS_RESTARTABLE_SYSCALLS dnl Check interrupted syscalls will restart.
-dnl
+AC_EXEEXT         dnl Check for EXE extension.
+AC_PATH_XTRA         dnl Is X Window System interesting ?.  **GAPCMON**
+AC_SYS_INTERPRETER      dnl Check for '#!' in shell scripts.
+
 dnl
 dnl UNIX variants
 dnl
@@ -421,82 +400,82 @@ AC_DEFINE_UNQUOTED(EXEEXT, "$EXEEXT")
 
 if test $HAVE_UNAME=yes -a x`uname -s` = xSunOS
 then
-	AM_CONDITIONAL(HAVE_SUN_OS, $TRUEPRG)
-	AC_DEFINE(HAVE_SUN_OS)
+   AM_CONDITIONAL(HAVE_SUN_OS, $TRUEPRG)
+   AC_DEFINE(HAVE_SUN_OS)
 else
-	AM_CONDITIONAL(HAVE_SUN_OS, $FALSEPRG)
+   AM_CONDITIONAL(HAVE_SUN_OS, $FALSEPRG)
 fi
 
 if test $HAVE_UNAME=yes -a x`uname -s` = xOSF1
 then
-	AM_CONDITIONAL(HAVE_OSF1_OS, $TRUEPRG)
-	AC_DEFINE(HAVE_OSF1_OS)
+   AM_CONDITIONAL(HAVE_OSF1_OS, $TRUEPRG)
+   AC_DEFINE(HAVE_OSF1_OS)
 else
-	AM_CONDITIONAL(HAVE_OSF1_OS, $FALSEPRG)
+   AM_CONDITIONAL(HAVE_OSF1_OS, $FALSEPRG)
 fi
 
 if test $HAVE_UNAME=yes -a x`uname -s` = xAIX
 then
-	AM_CONDITIONAL(HAVE_AIX_OS, $TRUEPRG)
-	AC_DEFINE(HAVE_AIX_OS)
+   AM_CONDITIONAL(HAVE_AIX_OS, $TRUEPRG)
+   AC_DEFINE(HAVE_AIX_OS)
 else
-	AM_CONDITIONAL(HAVE_AIX_OS, $FALSEPRG)
+   AM_CONDITIONAL(HAVE_AIX_OS, $FALSEPRG)
 fi
 
 if test $HAVE_UNAME=yes -a x`uname -s` = xHP-UX
 then
-	AM_CONDITIONAL(HAVE_HPUX_OS, $TRUEPRG)
-	AC_DEFINE(HAVE_HPUX_OS)
+   AM_CONDITIONAL(HAVE_HPUX_OS, $TRUEPRG)
+   AC_DEFINE(HAVE_HPUX_OS)
 else
-	AM_CONDITIONAL(HAVE_HPUX_OS, $FALSEPRG)
+   AM_CONDITIONAL(HAVE_HPUX_OS, $FALSEPRG)
 fi
 
 if test $HAVE_UNAME=yes -a x`uname -s` = xLinux
 then
-	AM_CONDITIONAL(HAVE_LINUX_OS, $TRUEPRG)
-	AC_DEFINE(HAVE_LINUX_OS)
+   AM_CONDITIONAL(HAVE_LINUX_OS, $TRUEPRG)
+   AC_DEFINE(HAVE_LINUX_OS)
 else
-	AM_CONDITIONAL(HAVE_LINUX_OS, $FALSEPRG)
+   AM_CONDITIONAL(HAVE_LINUX_OS, $FALSEPRG)
 fi
 
 if test $HAVE_UNAME=yes -a x`uname -s` = xFreeBSD
 then
-	AM_CONDITIONAL(HAVE_FREEBSD_OS, $TRUEPRG)
-	AC_DEFINE(HAVE_FREEBSD_OS)
+   AM_CONDITIONAL(HAVE_FREEBSD_OS, $TRUEPRG)
+   AC_DEFINE(HAVE_FREEBSD_OS)
 else
-	AM_CONDITIONAL(HAVE_FREEBSD_OS, $FALSEPRG)
+   AM_CONDITIONAL(HAVE_FREEBSD_OS, $FALSEPRG)
 fi
 
 if test $HAVE_UNAME=yes -a x`uname -s` = xNetBSD
 then
-	AM_CONDITIONAL(HAVE_NETBSD_OS, $TRUEPRG)
-	AC_DEFINE(HAVE_NETBSD_OS)
+   AM_CONDITIONAL(HAVE_NETBSD_OS, $TRUEPRG)
+   AC_DEFINE(HAVE_NETBSD_OS)
 else
-	AM_CONDITIONAL(HAVE_NETBSD_OS, $FALSEPRG)
+   AM_CONDITIONAL(HAVE_NETBSD_OS, $FALSEPRG)
 fi
 
 if test $HAVE_UNAME=yes -a x`uname -s` = xOpenBSD
 then
-	AM_CONDITIONAL(HAVE_OPENBSD_OS, $TRUEPRG)
-	AC_DEFINE(HAVE_OPENBSD_OS)
+   AM_CONDITIONAL(HAVE_OPENBSD_OS, $TRUEPRG)
+   AC_DEFINE(HAVE_OPENBSD_OS)
 else
-	AM_CONDITIONAL(HAVE_OPENBSD_OS, $FALSEPRG)
+   AM_CONDITIONAL(HAVE_OPENBSD_OS, $FALSEPRG)
 fi
 
 if test $HAVE_UNAME=yes -a x`uname -s` = xBSD/OS
 then
-	AM_CONDITIONAL(HAVE_BSDI_OS, $TRUEPRG)
-	AC_DEFINE(HAVE_BSDI_OS)
+   AM_CONDITIONAL(HAVE_BSDI_OS, $TRUEPRG)
+   AC_DEFINE(HAVE_BSDI_OS)
 else
-	AM_CONDITIONAL(HAVE_BSDI_OS, $FALSEPRG)
+   AM_CONDITIONAL(HAVE_BSDI_OS, $FALSEPRG)
 fi
 
 if test $HAVE_UNAME=yes -a x`uname -s` = xSGI
 then
-	AM_CONDITIONAL(HAVE_SGI_OS, $TRUEPRG)
-	AC_DEFINE(HAVE_SGI_OS)
+   AM_CONDITIONAL(HAVE_SGI_OS, $TRUEPRG)
+   AC_DEFINE(HAVE_SGI_OS)
 else
-	AM_CONDITIONAL(HAVE_SGI_OS, $FALSEPRG)
+   AM_CONDITIONAL(HAVE_SGI_OS, $FALSEPRG)
 fi
 
 if test $HAVE_UNAME=yes -a x`uname -s` = xDarwin
@@ -508,64 +487,61 @@ else
 fi
 
 dnl
-dnl	Check for enable particular features.
+dnl Check for enable particular features.
+dnl
 
 AC_ARG_ENABLE(all, [
 AC_HELP_STRING([--enable-all], [Enable all optional modules])],
-	[ if test "$enableval" = "yes" ; then
-		enable_usb=yes
-		enable_net=yes
-		enable_snmp=yes
-		enable_test=yes
-		enable_pcnet=yes
-		enable_powerflute=yes
-		enable_cgi=yes
-		enable_gapcmon=yes
-	fi], [])
+   [ if test "$enableval" = "yes" ; then
+      enable_usb=yes
+      enable_net=yes
+      enable_snmp=yes
+      enable_test=yes
+      enable_pcnet=yes
+      enable_powerflute=yes
+      enable_cgi=yes
+      enable_gapcmon=yes
+   fi], [])
 
 #--------------------------------------------------------------------
 # Check for TCP wrapper support, code taken from Bacula KES-7Nov03
 #--------------------------------------------------------------------
 
 AC_ARG_WITH(libwrap,
-  [AC_HELP_STRING([--with-libwrap=DIR], [Compile in libwrap (tcp_wrappers) support])],
-  [
-    if test "x$withval" != "xno" ; then
-       saved_LIBS="$LIBS"
-       LIBS="$saved_LIBS -lwrap"
-       AC_MSG_CHECKING([for libwrap])
-       AC_TRY_LINK(
-	  [ #include <tcpd.h>
-	     int deny_severity = 0;
-	     int allow_severity = 0;
-	     struct request_info *req; ],
-	  [ hosts_access(req); ],
-	  [
-	    AC_MSG_RESULT([yes])
-	    AC_DEFINE(HAVE_LIBWRAP)
-	    TCPW_MSG="yes" 
-	  ], [
-	    LIBS="$saved_LIBS -lwrap -lnsl"
-	    AC_TRY_LINK(
-	      [ #include <tcpd.h>
-		 int deny_severity = 0;
-		 int allow_severity = 0;
-		 struct request_info *req; ],
-	      [ hosts_access(req); ],
-	      [
-		 AC_MSG_RESULT([yes])
-		 AC_DEFINE(HAVE_LIBWRAP)
-		 TCPW_MSG="yes" 
-	      ],
-	      [AC_MSG_ERROR([*** libwrap missing]) ] ]
-	    )
-       )
-    fi
-  ]
+   [AC_HELP_STRING([--with-libwrap=DIR], [Compile in libwrap (tcp_wrappers) support])],
+   [
+      if test "x$withval" != "xno" ; then
+         saved_LIBS="$LIBS"
+         LIBS="$saved_LIBS -lwrap"
+         AC_MSG_CHECKING([for libwrap])
+         AC_TRY_LINK(
+            [ #include <tcpd.h>
+              int deny_severity = 0;
+              int allow_severity = 0;
+              struct request_info *req; ],
+            [ hosts_access(req); ],
+            [ AC_MSG_RESULT([yes])
+              AC_DEFINE(HAVE_LIBWRAP)
+              TCPW_MSG="yes" ],
+            [ LIBS="$saved_LIBS -lwrap -lnsl"
+              AC_TRY_LINK(
+                 [ #include <tcpd.h>
+                   int deny_severity = 0;
+                   int allow_severity = 0;
+                   struct request_info *req; ],
+                 [ hosts_access(req); ],
+                 [ AC_MSG_RESULT([yes])
+                   AC_DEFINE(HAVE_LIBWRAP)
+                   TCPW_MSG="yes" ],
+                 [AC_MSG_ERROR([*** libwrap missing]) ] ]
+              )
+         )
+      fi
+   ]
 )
 
 
-dnl	
+dnl   
 dnl Check for enable of cgi program builds
 dnl
 ENABLE_CGI="no"
@@ -576,334 +552,288 @@ LIBGDOBJ=
 CGI_IMGFMT=
 SYS_GD_FOUND=no
 AC_ARG_ENABLE(cgi,
-  [AC_HELP_STRING([--enable-cgi], [Compile CGI programs])],
-  [
-   if test "$enableval" = "yes"
-   then
-     ENABLE_CGI="yes"
-     AC_DEFINE(HAVE_NISLIB)
-	 CGI=cgi
-
-dnl
-dnl First search for system library that defines gdImagePng
-     AC_CHECK_LIB(gd, gdImagePng,
-       [
-	 AC_MSG_RESULT([using PNG file format (/usr/lib).])
-	 AC_DEFINE(SYS_IMGFMT_PNG)
-	 LIBGDOBJ="-lgd"
-	 SYS_GD_FOUND=yes
-       ], [], [])
-dnl
-dnl Second search for system library that defines gdImageGif
-     if test "${SYS_GD_FOUND}" = "no"
+   [AC_HELP_STRING([--enable-cgi], [Compile CGI programs])],
+   [ if test "$enableval" = "yes"
      then
-       AC_CHECK_LIB(gd, gdImageGif,
-	 [
-	   AC_MSG_RESULT([using GIF file format (/usr/lib).])
-	   AC_DEFINE(SYS_IMGFMT_GIF)
-	   LIBGDOBJ="-lgd"
-	   SYS_GD_FOUND=yes
-	 ], [], [])
-     fi
-dnl
-dnl Third in /usr/local search for system library that defines gdImagePng
-     if test "${SYS_GD_FOUND}" = "no"
-     then
-       _cppflags=${CPPFLAGS}
-       _ldflags=${LDFLAGS}
-       CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
-       LDFLAGS="${LDFLAGS} -L/usr/local/lib"
-dnl Destroy cached value
-       unset ac_cv_lib_gd_gdImagePng
-       AC_CHECK_LIB(gd, gdImagePng,
-	 [
-	   AC_MSG_RESULT([using PNG file format (/usr/local/lib).])
-	   AC_DEFINE(SYS_IMGFMT_PNG)
-	   LIBGDOBJ="-lgd"
-	   SYS_GD_FOUND=yes
-	 ], [], [])
-     fi
-dnl
-dnl Fourth in /usr/local search for system library that defines gdImageGif
-     if test "${SYS_GD_FOUND}" = "no"
-     then
-dnl Destroy cached value
-       unset ac_cv_lib_gd_gdImageGif
-       AC_CHECK_LIB(gd, gdImageGif,
-	 [
-	   AC_MSG_RESULT([using GIF file format (/usr/local/lib).])
-	   AC_DEFINE(SYS_IMGFMT_GIF)
-	   LIBGDOBJ="-lgd"
-	   SYS_GD_FOUND=yes
-	 ], [], [])
-     fi
-dnl
-dnl As last resort, use provided GD library v1.2
-     if test "${SYS_GD_FOUND}" = "no"
-     then
-       if test -d src/gd1.2
-       then
-	 AC_MSG_RESULT([using GIF file format (local copy of libgd).])
-	 CPPFLAGS=${_cppflags}
-	 LDFLAGS=${_ldflags}
-	 GDINCLUDE='-I$(topdir)/src/gd1.2'
-	 LIBGD=gd1.2
-	 LIBGDOBJ='$(topdir)/src/gd1.2/libgd.a'
-	 AC_DEFINE(IMGFMT_GIF)
-       else
-	AC_MSG_ERROR([Your system lacks the GD library for compiling CGI
-programs. Please download this library from
+        ENABLE_CGI="yes"
+        AC_DEFINE(HAVE_NISLIB)
+        CGI=cgi
 
-http://www.boutell.com/gd/
+        dnl
+        dnl First search for system library that defines gdImagePng
+        AC_CHECK_LIB(gd, gdImagePng,
+           [ AC_MSG_RESULT([using PNG file format (/usr/lib).])
+             AC_DEFINE(SYS_IMGFMT_PNG)
+             LIBGDOBJ="-lgd"
+             SYS_GD_FOUND=yes ],
+           [],
+           [])
 
-After building it and installing it on your system
-preferrably in /usr/lib or /usr/local/lib,
-re-run the ./configure script.
+        dnl
+        dnl Second search for system library that defines gdImageGif
+        if test "${SYS_GD_FOUND}" = "no"
+        then
+           AC_CHECK_LIB(gd, gdImageGif,
+              [ AC_MSG_RESULT([using GIF file format (/usr/lib).])
+                AC_DEFINE(SYS_IMGFMT_GIF)
+                LIBGDOBJ="-lgd"
+                SYS_GD_FOUND=yes ],
+              [],
+              [])
+        fi
 
-Alternatively you can disable the CGI support.])
-       fi
-     fi
-	 if test x$GDINCLUDE = x ; then
-	   AC_CHECK_HEADER(gd.h, [ GDHEAD= ],
-	     [
-	       AC_CHECK_HEADER(gd/gd.h, [ GDHEAD="gd/" ],
-	     [
-		AC_MSG_ERROR([Found system GD library but no header file.
-Please find the file gd.h in your system
-include directories and report its position
-to apcupsd-devel@apcupsd.com])
-	     ])
-	   ])
-	   AC_SUBST(GDHEAD)
-	 fi
-   fi
-  ])
+        dnl
+        dnl Third in /usr/local search for system library that defines gdImagePng
+        if test "${SYS_GD_FOUND}" = "no"
+        then
+           _cppflags=${CPPFLAGS}
+           _ldflags=${LDFLAGS}
+           CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
+           LDFLAGS="${LDFLAGS} -L/usr/local/lib"
 
-dnl	
+           dnl Destroy cached value
+           unset ac_cv_lib_gd_gdImagePng
+           AC_CHECK_LIB(gd, gdImagePng,
+              [ AC_MSG_RESULT([using PNG file format (/usr/local/lib).])
+                AC_DEFINE(SYS_IMGFMT_PNG)
+                LIBGDOBJ="-lgd"
+                SYS_GD_FOUND=yes ],
+              [],
+              [])
+        fi
+
+        dnl
+        dnl Fourth in /usr/local search for system library that defines gdImageGif
+        if test "${SYS_GD_FOUND}" = "no"
+        then
+           dnl Destroy cached value
+           unset ac_cv_lib_gd_gdImageGif
+           AC_CHECK_LIB(gd, gdImageGif,
+              [ AC_MSG_RESULT([using GIF file format (/usr/local/lib).])
+                AC_DEFINE(SYS_IMGFMT_GIF)
+                LIBGDOBJ="-lgd"
+                SYS_GD_FOUND=yes ],
+              [],
+              [])
+        fi
+
+        dnl
+        dnl As last resort, use provided GD library v1.2
+        if test "${SYS_GD_FOUND}" = "no"
+        then
+           if test -d src/gd1.2
+           then
+              AC_MSG_RESULT([using GIF file format (local copy of libgd).])
+              CPPFLAGS=${_cppflags}
+              LDFLAGS=${_ldflags}
+              GDINCLUDE='-I$(topdir)/src/gd1.2'
+              LIBGD=gd1.2
+              LIBGDOBJ='$(topdir)/src/gd1.2/libgd.a'
+              AC_DEFINE(IMGFMT_GIF)
+           else
+              AC_MSG_ERROR([Your system lacks the GD library for compiling CGI
+                            programs. Please download this library from
+                            http://www.boutell.com/gd/
+                            After building it and installing it on your system
+                            preferrably in /usr/lib or /usr/local/lib,
+                            re-run the ./configure script.
+                            Alternatively you can disable the CGI support.])
+           fi
+        fi
+
+        if test x$GDINCLUDE = x ; then
+           AC_CHECK_HEADER(gd.h, [ GDHEAD= ],
+              [ AC_CHECK_HEADER(gd/gd.h, [ GDHEAD="gd/" ],
+                   [ AC_MSG_ERROR([Found system GD library but no header file.
+                                   Please find the file gd.h in your system
+                                   include directories and report its position
+                                   to apcupsd-users@lists.sourceforge.net]) ])
+              ])
+      
+            AC_SUBST(GDHEAD)
+        fi
+    fi
+])
+
+dnl   
 dnl Check for enable install of distdir
 dnl
 INSTALL_DISTDIR="install-distdir"
 UNINSTALL_DISTDIR="uninstall-distdir"
 with_distdir="yes"
 AC_ARG_ENABLE(install-distdir,
-	[AC_HELP_STRING([--enable-install-distdir], [Install distribution])],
-	[ if test "$enableval" = "no" ; then
-	    INSTALL_DISTDIR=" "
-	    UNINSTALL_DISTDIR=" "
-	    with_distdir="no"
-	fi])
+   [AC_HELP_STRING([--enable-install-distdir], [Install distribution])],
+   [ if test "$enableval" = "no" ; then
+        INSTALL_DISTDIR=" "
+        UNINSTALL_DISTDIR=" "
+        with_distdir="no"
+     fi ])
 AC_SUBST(INSTALL_DISTDIR)
 AC_SUBST(UNINSTALL_DISTDIR)
 
 
-dnl	
+dnl   
 dnl Check for enable of drivers
 dnl
 AC_ARG_ENABLE(apcsmart, [
 AC_HELP_STRING([--enable-apcsmart], [Compile APC Smart UPS driver (default)])
 AC_HELP_STRING([--disable-apcsmart], [No APC Smart UPS driver])],
-	[ if test "$enableval" = "yes" ; then
-dnl
-dnl This is for C code inclusion
-	    AC_DEFINE(HAVE_APCSMART_DRIVER)
-dnl
-dnl This is for Makefile.in inside src/drivers/
-	APCSMART_DRIVER="apcsmart"
-	AC_SUBST(APCSMART_DRIVER)
-	fi],
-	[
-	    AC_DEFINE(HAVE_APCSMART_DRIVER)
-	APCSMART_DRIVER="apcsmart"
-	AC_SUBST(APCSMART_DRIVER)
-	])
+   [ if test "$enableval" = "yes" ; then
+       dnl This is for C code inclusion
+       AC_DEFINE(HAVE_APCSMART_DRIVER)
+
+       dnl This is for Makefile.in inside src/drivers/
+       APCSMART_DRIVER="apcsmart"
+       AC_SUBST(APCSMART_DRIVER)
+     fi ],
+   [ AC_DEFINE(HAVE_APCSMART_DRIVER)
+     APCSMART_DRIVER="apcsmart"
+     AC_SUBST(APCSMART_DRIVER) ])
 
 AC_ARG_ENABLE(dumb, [
 AC_HELP_STRING([--enable-dumb], [Compile dumb UPS driver (default)])
 AC_HELP_STRING([--disable-dumb], [No dumb UPS driver])],
-	[ if test "$enableval" = "yes" ; then
-	    AC_DEFINE(HAVE_DUMB_DRIVER)
-	DUMB_DRIVER="dumb"
-	AC_SUBST(DUMB_DRIVER)
-	fi],
-	[
-	    AC_DEFINE(HAVE_DUMB_DRIVER)
-	DUMB_DRIVER="dumb"
-	AC_SUBST(DUMB_DRIVER)
-	])
+   [ if test "$enableval" = "yes" ; then
+        AC_DEFINE(HAVE_DUMB_DRIVER)
+        DUMB_DRIVER="dumb"
+        AC_SUBST(DUMB_DRIVER)
+     fi],
+   [ AC_DEFINE(HAVE_DUMB_DRIVER)
+     DUMB_DRIVER="dumb"
+     AC_SUBST(DUMB_DRIVER) ])
 
-dnl
-dnl Search for lib ($1) containing func ($2) in default path plus paths listed in opts ($3)
-dnl
-AC_DEFUN(AC_LIB_SEARCH,
-    [
-	lib="$1"
-	func="$2"
-
-	found="no"
-
-	_libs=${LIBS}
-	LIBS="${LIBS} -l$lib"
-
-	AC_MSG_CHECKING([for lib$lib in <default>])
-	AC_LINK_IFELSE([AC_LANG_CALL([], [$func])], [found="yes"; AC_MSG_RESULT([yes])], [AC_MSG_RESULT([no])])
-
-	if test "$found" = "no" ; then
-	    _ldflags=${LDFLAGS}
-
-	    for opt in $3 ; do
-		AC_MSG_CHECKING([for lib$lib in $opt])
-		LDFLAGS="${LDFLAGS} -L$opt"
-		AC_LINK_IFELSE([AC_LANG_CALL([], [$func])], [found="yes"; AC_MSG_RESULT([yes]); break], [AC_MSG_RESULT([no])])
-		LDFLAGS=${_ldflags}
-	    done
-	fi
-
-	if test "$found" = "no" ; then
-	    AC_MSG_ERROR([Cannot find lib$lib.])
-	fi
-
-	AC_CHECK_LIB($lib, $func, [], [AC_MSG_ERROR([Cannot find lib$lib.])], [])
-	LIBS=${_libs}
-    ])
-
-# Allow user to force USB type to generic
+dnl Allow user to force USB type to generic
 GENERICUSB="no"
 AC_ARG_WITH(generic-usb,
-    [AC_HELP_STRING([--with-generic-usb], [Force use of generic USB driver])],
-    [
-	GENERICUSB="yes"
-    ]
-)
+   [ AC_HELP_STRING([--with-generic-usb], [Force use of generic USB driver]) ],
+   [ GENERICUSB="yes" ])
 
 AC_ARG_ENABLE(usb, [
 AC_HELP_STRING([--enable-usb], [Compile USB UPS code])
 AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
-	[ if test "$enableval" = "yes" ; then
-	if test $GENERICUSB = "no" -a \
-		$HAVE_UNAME=yes -a x`uname -s` = xLinux ; then
-	   USB_TYPE="linux"
-	   AC_MSG_RESULT([Using Linux USB driver.])
-	elif test $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xFreeBSD -o \
-		  $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xOpenBSD -o \
-		  $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xNetBSD ; then
-	   LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
-	   LIBUSBHID=libusbhid
-	   LIBUSBHIDOBJS="\$(topdir)/src/libusbhid/*.o"
-	   AC_SUBST(LIBUSBHID)
-	   AC_SUBST(LIBUSBHIDINC)
-	   AC_SUBST(LIBUSBHIDOBJS)
+   [ if test "$enableval" = "yes" ; then
+        if test $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xLinux ; then
+           USB_TYPE="linux"
+           AC_MSG_RESULT([Using Linux USB driver.])
+        elif test $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xFreeBSD -o \
+                  $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xOpenBSD -o \
+                  $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xNetBSD ; then
+           LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
+           LIBUSBHID=libusbhid
+           LIBUSBHIDOBJS="\$(topdir)/src/libusbhid/*.o"
+           AC_SUBST(LIBUSBHID)
+           AC_SUBST(LIBUSBHIDINC)
+           AC_SUBST(LIBUSBHIDOBJS)
+           USB_TYPE="bsd"
+           AC_MSG_RESULT([Using BSD USB driver.])
+        else
+           AC_PATH_PROG(usbcfg, libusb-config)
+           if test x$usbcfg = x ; then
+              AC_MSG_ERROR(Cannot find libusb-config)
+           fi
 
-	   USB_TYPE="bsd"
-	   AC_MSG_RESULT([Using BSD USB driver.])
-	else
-	   AC_PATH_PROG(usbcfg, libusb-config)
-	   if test x$usbcfg = x ; then
-	      AC_MSG_ERROR(Cannot find libusb-config)
-	   fi
+           LIBUSB=`$usbcfg --libs`
+           LIBUSBH=`$usbcfg --prefix`/include/usb.h
+      
+           AC_SUBST(LIBUSBH)
 
-	   LIBUSB=`$usbcfg --libs`
-	   LIBUSBH=`$usbcfg --prefix`/include/usb.h
-	   
-	   AC_SUBST(LIBUSBH)
+           LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
+           LIBUSBHID=libusbhid
+           LIBUSBHIDOBJS="\$(topdir)/src/libusbhid/*.o"
+           AC_SUBST(LIBUSBHID)
+           AC_SUBST(LIBUSBHIDINC)
+           AC_SUBST(LIBUSBHIDOBJS)
 
-	   LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
-	   LIBUSBHID=libusbhid
-	   LIBUSBHIDOBJS="\$(topdir)/src/libusbhid/*.o"
-	   AC_SUBST(LIBUSBHID)
-	   AC_SUBST(LIBUSBHIDINC)
-	   AC_SUBST(LIBUSBHIDOBJS)
+           USB_TYPE="generic"
+           AC_MSG_RESULT([Using generic libusb USB driver.])
+        fi
 
-	   USB_TYPE="generic"
-	   AC_MSG_RESULT([Using generic libusb USB driver.])
-	fi
+        AC_DEFINE(HAVE_USB_DRIVER)
+        USB_DRIVER="usb"
+        AC_SUBST(USB_DRIVER)
+        AC_SUBST(USB_TYPE)
 
-	AC_DEFINE(HAVE_USB_DRIVER)
-	USB_DRIVER="usb"
-	AC_SUBST(USB_DRIVER)
-	AC_SUBST(USB_TYPE)
-
-	DISPLAY_USB_DRIVER=$USB_TYPE-$USB_DRIVER
-
-	fi],
-    [])
+        DISPLAY_USB_DRIVER=$USB_TYPE-$USB_DRIVER
+     fi ],
+   [])
 AC_SUBST(LIBUSB)
 
 AC_ARG_ENABLE(net, [
 AC_HELP_STRING([--enable-net], [Compile new networking driver for slaves])
 AC_HELP_STRING([--disable-net], [No new network driver for slaves (default)])],
-	[ if test "$enableval" = "yes" ; then
-	AC_DEFINE(HAVE_NET_DRIVER)
-	AC_DEFINE(HAVE_NISLIB)
-	NET_DRIVER="net"
-	AC_SUBST(NET_DRIVER)
-	fi],
-    [])
-
+   [ if test "$enableval" = "yes" ; then
+        AC_DEFINE(HAVE_NET_DRIVER)
+        AC_DEFINE(HAVE_NISLIB)
+        NET_DRIVER="net"
+        AC_SUBST(NET_DRIVER)
+     fi ],
+   [])
 
 WANT_SNMP="no"
 AC_ARG_ENABLE(snmp, [
 AC_HELP_STRING([--enable-snmp], [Compile SNMP UPS code])
 AC_HELP_STRING([--disable-snmp], [No SNMP UPS code (default)])],
-	[ if test "$enableval" = "yes" ; then
-	    WANT_SNMP="yes"
-	  fi
-	], [])
+   [ if test "$enableval" = "yes" ; then
+        WANT_SNMP="yes"
+     fi ],
+   [])
 
 AC_ARG_ENABLE(net-snmp, [
 AC_HELP_STRING([--enable-net-snmp], [Compile NET-SNMP UPS code])
 AC_HELP_STRING([--disable-net-snmp], [No NET-SNMP UPS code (default)])],
-	[ if test "$enableval" = "yes" ; then
-	    WANT_SNMP="yes"
-	  fi
-	], [])
+   [ if test "$enableval" = "yes" ; then
+        WANT_SNMP="yes"
+     fi ],
+   [])
 
 dnl If we're building SNMP, try to find relevant libs
 if test "$WANT_SNMP" = "yes" ; then
-	dnl Check for optional crypto lib
-	AC_CHECK_LIB(crypto, EVP_DigestInit,
-	  [echo '	including crypto library for snmp.'; LIBS="$LIBS -lcrypto"],
-	  [], [])
+   dnl Check for optional crypto lib
+   AC_CHECK_LIB(crypto, EVP_DigestInit,
+      [echo '   including crypto library for snmp.'; LIBS="$LIBS -lcrypto"],
+      [],
+      [])
 
-	WANT_NET_SNMP="yes"
-	SNMP_LIB_FOUND="no"
+   WANT_NET_SNMP="yes"
+   SNMP_LIB_FOUND="no"
 
-	dnl libsnmp is often in /usr/local
-	_cppflags=${CPPFLAGS}
-	_ldflags=${LDFLAGS}
-	CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
-	LDFLAGS="${LDFLAGS} -L/usr/local/lib"
+   dnl libsnmp is often in /usr/local
+   _cppflags=${CPPFLAGS}
+   _ldflags=${LDFLAGS}
+   CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
+   LDFLAGS="${LDFLAGS} -L/usr/local/lib"
 
-	dnl Start by looking for libnetsnmp (net-snmp).
-	if test "$SNMP_LIB_FOUND" = "no" ; then
-		AC_CHECK_LIB(netsnmp, snmp_open,
-		  [LIBS="$LIBS -lnetsnmp"
-		   SNMP_LIB_FOUND="yes"], [], [])
-	fi
+   dnl Start by looking for libnetsnmp (net-snmp).
+   if test "$SNMP_LIB_FOUND" = "no" ; then
+      AC_CHECK_LIB(netsnmp, snmp_open,
+         [LIBS="$LIBS -lnetsnmp"
+          SNMP_LIB_FOUND="yes"], [], [])
+   fi
 
-	dnl If no lib yet, fall back on libsnmp (ucd-snmp)
-	if test "$SNMP_LIB_FOUND" = "no" ; then
-		WANT_NET_SNMP="no"
-		AC_CHECK_LIB(snmp, snmp_open,
-		  [LIBS="$LIBS -lsnmp"
-		   SNMP_LIB_FOUND="yes"], [], [])
-	fi
+   dnl If no lib yet, fall back on libsnmp (ucd-snmp)
+   if test "$SNMP_LIB_FOUND" = "no" ; then
+      WANT_NET_SNMP="no"
+      AC_CHECK_LIB(snmp, snmp_open,
+         [LIBS="$LIBS -lsnmp"
+          SNMP_LIB_FOUND="yes"], [], [])
+   fi
 
-	if test "$SNMP_LIB_FOUND" = "no" ; then
-	  AC_MSG_ERROR([Cannot find SNMP libraries.])
-	fi
+   if test "$SNMP_LIB_FOUND" = "no" ; then
+      AC_MSG_ERROR([Cannot find SNMP libraries.])
+   fi
 
-	dnl If we get this far, we found a valid lib
-	AC_DEFINE(HAVE_SNMP_DRIVER)
-	if test "$WANT_NET_SNMP" = "yes" ; then
-	     AC_DEFINE(HAVE_NET_SNMP)
-	     DISPLAY_SNMP_DRIVER="net-snmp"
-	else
-	     AC_DEFINE(HAVE_UCD_SNMP)
-	     DISPLAY_SNMP_DRIVER="snmp"
-	fi
+   dnl If we get this far, we found a valid lib
+   AC_DEFINE(HAVE_SNMP_DRIVER)
+   if test "$WANT_NET_SNMP" = "yes" ; then
+      AC_DEFINE(HAVE_NET_SNMP)
+      DISPLAY_SNMP_DRIVER="net-snmp"
+   else
+      AC_DEFINE(HAVE_UCD_SNMP)
+      DISPLAY_SNMP_DRIVER="snmp"
+   fi
 
-	SNMP_DRIVER="snmp"
-	AC_SUBST(SNMP_DRIVER)
+   SNMP_DRIVER="snmp"
+   AC_SUBST(SNMP_DRIVER)
 fi
 
 dnl Enable test driver
@@ -911,22 +841,22 @@ AC_ARG_ENABLE(test, [
 AC_HELP_STRING([--enable-test], [Compile TEST driver code])
 AC_HELP_STRING([--disable-test], [No TEST driver (default)])],
    [ if test "$enableval" = "yes" ; then
-	AC_DEFINE(HAVE_TEST_DRIVER)
-	TEST_DRIVER="test"
-	AC_SUBST(TEST_DRIVER)
-	fi],
-    [])
+        AC_DEFINE(HAVE_TEST_DRIVER)
+        TEST_DRIVER="test"
+        AC_SUBST(TEST_DRIVER)
+     fi],
+   [])
 
 dnl Enable pcnet driver
 AC_ARG_ENABLE(pcnet, [
 AC_HELP_STRING([--enable-pcnet], [Compile PCNET driver code])
 AC_HELP_STRING([--disable-pcnet], [No PCNET driver (default)])],
    [ if test "$enableval" = "yes" ; then
-	AC_DEFINE(HAVE_PCNET_DRIVER)
-	PCNET_DRIVER="pcnet"
-	AC_SUBST(PCNET_DRIVER)
-	fi],
-    [])
+        AC_DEFINE(HAVE_PCNET_DRIVER)
+        PCNET_DRIVER="pcnet"
+        AC_SUBST(PCNET_DRIVER)
+     fi],
+   [])
 
 dnl Force NIS to enabled since libnis is required by apcaccess.
 dnl Users may still disable NIS at runtime in apcupsd.conf.
@@ -937,42 +867,34 @@ NISSRV_ENABLED=yes
 dnl Allow setting of NISIP value
 NISIP="0.0.0.0"
 AC_ARG_WITH(nisip,
-	[AC_HELP_STRING([--with-nisip=IP-ADDRESS], [Specify the IP address to bind to (default=0.0.0.0)])],
-	[
-	   NISIP="$withval";
-	]
-)
+   [AC_HELP_STRING([--with-nisip=IP-ADDRESS], [Specify the IP address to bind to (default=0.0.0.0)])],
+   [NISIP="$withval";])
 AC_SUBST(NISIP)
 
 
 CGIBIN="/etc/apcupsd"
 AC_ARG_WITH(cgi-bin,
-	[AC_HELP_STRING([--with-cgi-bin=DIR], [Specify cgi-bin directory (default=/etc/apcupsd)])],
-	[
-	   CGIBIN="$withval";
-	]
-)
-
+   [AC_HELP_STRING([--with-cgi-bin=DIR], [Specify cgi-bin directory (default=/etc/apcupsd)])],
+   [CGIBIN="$withval";])
 
 
 dnl
-dnl	use option --enable-powerflute to compile powerflute
+dnl   use option --enable-powerflute to compile powerflute
 dnl
-AC_ARG_ENABLE(powerflute,
-	[
+AC_ARG_ENABLE(powerflute, [
 AC_HELP_STRING([--enable-powerflute], [Compile powerflute program])],
-	[ if test "$enableval" = "yes" ; then 
-	    AC_CHECK_LIB(ncurses, initscr, [POWERLIBS="-lncurses"],
-		AC_MSG_ERROR([Powerflute requires libncurses.]), [])
-	    AC_CHECK_LIB(menu, new_menu, [POWERLIBS="$POWERLIBS -lmenu"],
-		AC_MSG_ERROR([Powerflute requires libncurses.]), [])
-	    AC_CHECK_LIB(form, new_form, [POWERLIBS="$POWERLIBS -lform"],
-		AC_MSG_ERROR([Powerflute requires libncurses.]), [])
-	    AC_CHECK_LIB(panel, new_panel, [POWERLIBS="$POWERLIBS -lpanel"],
-		AC_MSG_ERROR([Powerflute requires libncurses.]), [])
-	    POWERFLUTE="powerflute"
-	    AC_DEFINE(HAVE_POWERFLUTE)
-	  fi])
+   [ if test "$enableval" = "yes" ; then 
+        AC_CHECK_LIB(ncurses, initscr, [POWERLIBS="-lncurses"],
+           AC_MSG_ERROR([Powerflute requires libncurses.]), [])
+        AC_CHECK_LIB(menu, new_menu, [POWERLIBS="$POWERLIBS -lmenu"],
+           AC_MSG_ERROR([Powerflute requires libncurses.]), [])
+        AC_CHECK_LIB(form, new_form, [POWERLIBS="$POWERLIBS -lform"],
+           AC_MSG_ERROR([Powerflute requires libncurses.]), [])
+        AC_CHECK_LIB(panel, new_panel, [POWERLIBS="$POWERLIBS -lpanel"],
+           AC_MSG_ERROR([Powerflute requires libncurses.]), [])
+        POWERFLUTE="powerflute"
+        AC_DEFINE(HAVE_POWERFLUTE)
+     fi])
 
 dnl
 dnl Check for enable of gapcmon
@@ -982,31 +904,31 @@ GAPCMON_ENABLED=no
 AC_ARG_ENABLE(gapcmon, 
    [AC_HELP_STRING([--enable-gapcmon], [Build GTK/GUI front-end to apcupsd default=no])],
    [ if test "$enableval" = "yes" ; then
-      GAPCMON=gapcmon
-      GAPCMON_ENABLED=yes
+        GAPCMON=gapcmon
+        GAPCMON_ENABLED=yes
 
-      dnl
-      dnl Check for Gnome packages
-      dnl
-      PKG_CHECK_MODULES(GAPCMON, gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0 gnome-vfs-module-2.0)
-      GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DVERSION=\\\"$VERSION\\\""
+        dnl
+        dnl Check for Gnome packages
+        dnl
+        PKG_CHECK_MODULES(GAPCMON, gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0 gnome-vfs-module-2.0)
+        GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DVERSION=\\\"$VERSION\\\""
 
-      dnl
-      dnl Check if gnome_vfs_socket_{read,write} requires 5th argument, 'cancellation'
-      dnl
-      _cflags=${CFLAGS}
-      _libs=${LIBS}
-      CFLAGS="${CFLAGS} ${GAPCMON_CFLAGS}"
-      LIBS="${LDFLAGS} ${GAPCMON_LIBS}"
-      AC_MSG_CHECKING(if gnome_vfs_socket_read requires cancellation argument)
-      AC_LINK_IFELSE(
-	 AC_LANG_PROGRAM([#include <libgnomevfs/gnome-vfs.h>],
-			 [gnome_vfs_socket_read(NULL, NULL, 0, NULL, NULL);]),
-	 AC_MSG_RESULT(yes)
-	    GAPCMON_CFLAGS="${GAPCMON_CFLAGS} -DGNOMEVFS_REQUIRES_CANCELLATION",
-	 AC_MSG_RESULT(no))
-      CFLAGS=${_cflags}
-      LIBS=${_libs}
+        dnl
+        dnl Check if gnome_vfs_socket_{read,write} requires 5th argument, 'cancellation'
+        dnl
+        _cflags=${CFLAGS}
+        _libs=${LIBS}
+        CFLAGS="${CFLAGS} ${GAPCMON_CFLAGS}"
+        LIBS="${LDFLAGS} ${GAPCMON_LIBS}"
+        AC_MSG_CHECKING(if gnome_vfs_socket_read requires cancellation argument)
+        AC_LINK_IFELSE(
+           AC_LANG_PROGRAM([#include <libgnomevfs/gnome-vfs.h>],
+                           [gnome_vfs_socket_read(NULL, NULL, 0, NULL, NULL);]),
+           [ AC_MSG_RESULT(yes)
+             GAPCMON_CFLAGS="${GAPCMON_CFLAGS} -DGNOMEVFS_REQUIRES_CANCELLATION" ],
+           AC_MSG_RESULT(no))
+        CFLAGS=${_cflags}
+        LIBS=${_libs}
       
       dnl
       dnl Check for gnome_vfs_socket_set_timeout
@@ -1016,73 +938,71 @@ AC_ARG_ENABLE(gapcmon,
       CFLAGS="${CFLAGS} ${GAPCMON_CFLAGS}"
       LIBS="${LDFLAGS} ${GAPCMON_LIBS}"
       AC_MSG_CHECKING(for gnome_vfs_socket_set_timeout)
-      AC_LINK_IFELSE(
-	 AC_LANG_PROGRAM([#include <libgnomevfs/gnome-vfs.h>
-			  #ifdef GNOMEVFS_REQUIRES_CANCELLATION
-			  #define GNOMEVFS_CANCELLATION ,NULL
-			  #else
-			  #define GNOMEVFS_CANCELLATION
-			  #endif],
-			 [gnome_vfs_socket_set_timeout(NULL, NULL GNOMEVFS_CANCELLATION);]),
-	 AC_MSG_RESULT(yes)
-	    GAPCMON_CFLAGS="${GAPCMON_CFLAGS} -DHAVE_GNOMEVFS_SOCKET_SET_TIMEOUT",
-	 AC_MSG_RESULT(no))
+         AC_LINK_IFELSE(
+            AC_LANG_PROGRAM([#include <libgnomevfs/gnome-vfs.h>
+                             #ifdef GNOMEVFS_REQUIRES_CANCELLATION
+                             #define GNOMEVFS_CANCELLATION ,NULL
+                             #else
+                             #define GNOMEVFS_CANCELLATION
+                             #endif],
+                            [gnome_vfs_socket_set_timeout(NULL, NULL GNOMEVFS_CANCELLATION);]),
+         [ AC_MSG_RESULT(yes)
+           GAPCMON_CFLAGS="${GAPCMON_CFLAGS} -DHAVE_GNOMEVFS_SOCKET_SET_TIMEOUT" ],
+         AC_MSG_RESULT(no))
       CFLAGS=${_cflags}
       LIBS=${_libs}
-
    fi],
-   [])
+  [])
 AC_SUBST(GAPCMON)
 
 dnl Default linker is g++
 LD="$CXX"
 
 if test -n "$GCC"; then
-    # Starting with GCC 3.0, you must link C++ programs against either
-    # libstdc++ (shared by default), or libsupc++ (always static).  If
-    # you care about binary portability between Linux distributions,
-    # you need to either 1) build your own GCC with static C++ libraries
-    # or 2) link using gcc and libsupc++.  We choose the latter since
-    # CUPS doesn't (currently) use any of the stdc++ library.
-    #
-    # Previous versions of GCC do not have the reliance on the stdc++
-    # or g++ libraries, so the extra supc++ library is not needed.
+   # Starting with GCC 3.0, you must link C++ programs against either
+   # libstdc++ (shared by default), or libsupc++ (always static).  If
+   # you care about binary portability between Linux distributions,
+   # you need to either 1) build your own GCC with static C++ libraries
+   # or 2) link using gcc and libsupc++.  We choose the latter since
+   # CUPS doesn't (currently) use any of the stdc++ library.
+   #
+   # Previous versions of GCC do not have the reliance on the stdc++
+   # or g++ libraries, so the extra supc++ library is not needed.
+   AC_MSG_CHECKING(if libsupc++ is required)
 
-    AC_MSG_CHECKING(if libsupc++ is required)
+   SUPC="`$CXX -print-file-name=libsupc++.a 2>/dev/null`"
+   case "$SUPC" in
+   libsupc++.a*)
+      # Library not found, so this is and older GCC...
+      AC_MSG_RESULT(no)
+      ;;
+   *)
+      # This is gcc 3.x, and it knows of libsupc++, so we need it
+      LIBS="$LIBS -lsupc++"
+      LD="$CC"
+      AC_MSG_RESULT(yes)
+      ;;
+   esac
 
-    SUPC="`$CXX -print-file-name=libsupc++.a 2>/dev/null`"
-    case "$SUPC" in
-	libsupc++.a*)
-	    # Library not found, so this is and older GCC...
-	    AC_MSG_RESULT(no)
-	    ;;
-	*)
-	    # This is gcc 3.x, and it knows of libsupc++, so we need it
-	    LIBS="$LIBS -lsupc++"
-	    LD="$CC"
-	    AC_MSG_RESULT(yes)
-	    ;;
-    esac
+   # See if GCC supports -fno-exceptions...
+   AC_MSG_CHECKING(if GCC supports -fno-exceptions)
+   OLDCFLAGS="$CFLAGS"
+   CFLAGS="$CFLAGS -fno-exceptions"
+   AC_TRY_COMPILE(,,       
+      CPPFLAGS="$CPPFLAGS -fno-exceptions"
+      AC_MSG_RESULT(yes),
+      AC_MSG_RESULT(no))
+   CFLAGS="$OLDCFLAGS"
 
-    # See if GCC supports -fno-exceptions...
-    AC_MSG_CHECKING(if GCC supports -fno-exceptions)
-    OLDCFLAGS="$CFLAGS"
-    CFLAGS="$CFLAGS -fno-exceptions"
-    AC_TRY_COMPILE(,,		 
-	CPPFLAGS="$CPPFLAGS -fno-exceptions"
-	AC_MSG_RESULT(yes),
-	AC_MSG_RESULT(no))
-    CFLAGS="$OLDCFLAGS"
-
-    # See if GCC supports -fno-rtti...
-    AC_MSG_CHECKING(if GCC supports -fno-rtti)
-    OLDCFLAGS="$CFLAGS"
-    CFLAGS="$CFLAGS -fno-rtti"
-    AC_TRY_COMPILE(,,		 
-	CPPFLAGS="$CPPFLAGS -fno-rtti"
-	AC_MSG_RESULT(yes),
-	AC_MSG_RESULT(no))
-    CFLAGS="$OLDCFLAGS"
+   # See if GCC supports -fno-rtti...
+   AC_MSG_CHECKING(if GCC supports -fno-rtti)
+   OLDCFLAGS="$CFLAGS"
+   CFLAGS="$CFLAGS -fno-rtti"
+   AC_TRY_COMPILE(,,       
+      CPPFLAGS="$CPPFLAGS -fno-rtti"
+      AC_MSG_RESULT(yes),
+      AC_MSG_RESULT(no))
+   CFLAGS="$OLDCFLAGS"
 fi
 
 AC_SUBST(POMAKE)
@@ -1128,21 +1048,21 @@ AC_SUBST(PACKAGE)
 # Languages for po translation.
 #
 # ALL_LINGUAS="ca cs da de el es et_EE eu_ES fi fo_FO fr ga_IE gr_GR hr \
-#			 hu in_ID is_IS it iw_IL ja kl_GL ko lt_LT lv_LV nl no pl \
-#			 pt ro_RO ru sk sl sr sv tr uk_UA wa zh_TW.Big5"
+#         hu in_ID is_IS it iw_IL ja kl_GL ko lt_LT lv_LV nl no pl \
+#         pt ro_RO ru sk sl sr sv tr uk_UA wa zh_TW.Big5"
 #
 # Warning: here we must list all and only the languages we have a
-#	   translation for.
+#     translation for.
 ALL_LINGUAS="fr it et_EE"
 
 AC_PATH_PROGS(MSGFMT, msgfmt, no)
 if test "$MSGFMT" = "no"
 then
-	echo 'msgfmt program not found, disabling NLS !'
-	USE_NLS=no
-	USE_INCLUDED_LIBINTL=no
+   echo 'msgfmt program not found, disabling NLS !'
+   USE_NLS=no
+   USE_INCLUDED_LIBINTL=no
 else
-	AM_GNU_GETTEXT
+   AM_GNU_GETTEXT
 fi
 
 # end i18n
@@ -1171,53 +1091,51 @@ dnl Check out the wait reality.  We have to assume sys/wait.h is present.
 AC_CHECK_FUNCS(wait waitpid wait3)
 AC_MSG_CHECKING([for union wait]);
 AC_TRY_LINK([#include <sys/types.h>
-#include <sys/wait.h>],
-		 [union wait status; int pid; pid = wait (&status);
-#ifdef WEXITSTATUS
-/* Some POSIXoid systems have both the new-style macros and the old
-   union wait type, and they do not work together.  If union wait
-   conflicts with WEXITSTATUS et al, we don't want to use it at all.  */
-if (WEXITSTATUS (status) != 0) pid = -1;
-#endif
-#ifdef HAVE_WAITPID
-/* Make sure union wait works with waitpid.  */
-pid = waitpid (-1, &status, 0);
-#endif
-],
-  [AC_DEFINE(HAVE_UNION_WAIT) AC_MSG_RESULT([yes])],
-  AC_MSG_RESULT([no]))
-
+             #include <sys/wait.h>],
+            [union wait status; int pid; pid = wait (&status);
+             #ifdef WEXITSTATUS
+                /* Some POSIXoid systems have both the new-style macros and the old
+                   union wait type, and they do not work together.  If union wait
+                   conflicts with WEXITSTATUS et al, we don't want to use it at all.  */
+                if (WEXITSTATUS (status) != 0) pid = -1;
+             #endif
+             #ifdef HAVE_WAITPID
+                /* Make sure union wait works with waitpid.  */
+                pid = waitpid (-1, &status, 0);
+             #endif
+            ],
+   [AC_DEFINE(HAVE_UNION_WAIT) AC_MSG_RESULT([yes])],
+    AC_MSG_RESULT([no]))
 
 if test "$USE_INCLUDED_LIBINTL" = "yes"
 then
-	echo 'Enabling internal libintl...'
-    INTLSUB=intl
-	INTLMAKE='cd intl; $(MAKE)'
-	INTLTARGET=$INTLLIBS
+   echo 'Enabling internal libintl...'
+   INTLSUB=intl
+   INTLMAKE='cd intl; $(MAKE)'
+   INTLTARGET=$INTLLIBS
 else
-	echo 'Disabling internal libintl...'
-    INTLSUB=
-	INTLMAKE="@echo '(internal libintl disabled)'; #"
-	INTLTARGET=intl
+   echo 'Disabling internal libintl...'
+   INTLSUB=
+   INTLMAKE="@echo '(internal libintl disabled)'; #"
+   INTLTARGET=intl
 fi
 
 if test "$USE_NLS" = "yes"
 then
-	echo 'Enabling internationalization support...'
-	POMAKE='cd po; $(MAKE)'
+   echo 'Enabling internationalization support...'
+   POMAKE='cd po; $(MAKE)'
 else
-	echo 'Disabling internationalization support...'
-	POMAKE="@echo '(NLS support disabled)'; #"
+   echo 'Disabling internationalization support...'
+   POMAKE="@echo '(NLS support disabled)'; #"
 fi
 
 if test "$ENABLE_CGI" = "yes"
 then
-	AC_CHECK_FUNCS( snprintf,,
-		[AC_MSG_ERROR([cannot find required function.])]
-		)
-	echo 'Enabling cgi program support...'
+   AC_CHECK_FUNCS( snprintf,,
+      [AC_MSG_ERROR([cannot find required function.])])
+   echo 'Enabling cgi program support...'
 else
-	echo 'Disabling cgi support...'
+   echo 'Disabling cgi support...'
 fi
 
 dnl
@@ -1225,95 +1143,92 @@ dnl Checks for powerflute
 dnl
 if test "$POWERFLUTE" = "powerflute"
 then
-	USE_POWERFLUTE=yes
+   USE_POWERFLUTE=yes
 dnl
 dnl Check if ncurses headers are present.
 dnl
-	NCH="yes"
+   NCH="yes"
 
-	AC_CHECK_HEADERS(ncurses/curses.h ncurses/menu.h ncurses/panel.h,,[NCH="no"])
-	if test "$NCH" = "no"
-	then
-		AC_CHECK_HEADERS(curses.h menu.h panel.h,,[
-			AC_MSG_ERROR([ncurses headers not found.])])
-	fi
+   AC_CHECK_HEADERS(ncurses/curses.h ncurses/menu.h ncurses/panel.h,,[NCH="no"])
+   if test "$NCH" = "no"
+   then
+      AC_CHECK_HEADERS(curses.h menu.h panel.h,,[
+         AC_MSG_ERROR([ncurses headers not found.])])
+   fi
 else
-	USE_POWERFLUTE=no
+   USE_POWERFLUTE=no
 fi
 
 
 dnl
-dnl Find out the distribution.	NOTE!!! Only determine the
+dnl Find out the distribution.   NOTE!!! Only determine the
 dnl   distribution here.  Do all additional work below.
 dnl
 
 # now allow user to specify DISTNAME
 AC_ARG_WITH(distname,
-	[AC_HELP_STRING([--with-distname=NAME], [Specify DISTNAME])],
-	[
-		DISTNAME=$withval
-	]
-)
+   [AC_HELP_STRING([--with-distname=NAME], [Specify DISTNAME])],
+   [DISTNAME=$withval])
 
 if test "x$DISTNAME" != "x"
 then
-	echo "distname set to $DISTNAME"
+   echo "distname set to $DISTNAME"
 elif test $HAVE_UNAME=yes -a x`uname -s` = xOSF1
 then
-	DISTNAME=alpha
+   DISTNAME=alpha
 elif test $HAVE_UNAME=yes -a x`uname -s` = xHP-UX
 then
-	DISTNAME=hpux
+   DISTNAME=hpux
 elif test $HAVE_UNAME=yes -a x`uname -s` = xSunOS
 then
-	DISTNAME=sun
+   DISTNAME=sun
 elif test $HAVE_UNAME=yes -a x`uname -s` = xFreeBSD
 then
-	DISTNAME=freebsd
+   DISTNAME=freebsd
 elif test $HAVE_UNAME=yes -a x`uname -s` = xNetBSD
 then
-	DISTNAME=netbsd
+   DISTNAME=netbsd
 elif test $HAVE_UNAME=yes -a x`uname -s` = xOpenBSD
 then
-	DISTNAME=openbsd
+   DISTNAME=openbsd
 elif test $HAVE_UNAME=yes -a x`uname -s` = xBSD/OS
 then
-	DISTNAME=bsdi
+   DISTNAME=bsdi
 elif test $HAVE_UNAME=yes -a x`uname -s` = xDarwin
 then
     DISTNAME=darwin
 elif test -f /etc/SuSE-release
 then
-	DISTNAME=suse
+   DISTNAME=suse
 elif test -d /etc/SuSEconfig
 then
-	DISTNAME=suse5
+   DISTNAME=suse5
 elif test -f /etc/mandrake-release
 then
     DISTNAME=mandrake
 elif test -f /etc/whitebox-release
 then
-	DISTNAME=redhat
+   DISTNAME=redhat
 elif test -f /etc/redhat-release
 then
-	DISTNAME=redhat
+   DISTNAME=redhat
 elif test -f /etc/yellowdog-release
 then
-	DISTNAME=yellowdog
+   DISTNAME=yellowdog
 elif test -f /etc/debian_version
 then
-	DISTNAME=debian
+   DISTNAME=debian
 elif test -f /etc/slackware-version
 then
-	DISTNAME=slackware
+   DISTNAME=slackware
 elif test -f /etc/gentoo-release
 then
-	DISTNAME=gentoo
+   DISTNAME=gentoo
 elif test -f /etc/engarde-version
 then
-	DISTNAME=engarde
+   DISTNAME=engarde
 else
-	DISTNAME=unknown
+   DISTNAME=unknown
 fi
 
 dnl
@@ -1338,28 +1253,28 @@ nologdir=/etc
 # Find the default directory to put the root-mode PID file in
 for PIDDIR in "/var/run" "/etc/apcupsd"
 do
-	if test -d $PIDDIR 
-	then
-		break;
-	fi
+   if test -d $PIDDIR 
+   then
+      break;
+   fi
 done
 
 # Find the default directory to put the apcupsd.events and apcupsd.status files
 for LOGDIR in "/var/log" "/etc/apcupsd"
 do
-	if test -d $LOGDIR 
-	then
-		break;
-	fi
+   if test -d $LOGDIR 
+   then
+      break;
+   fi
 done
 
 # set the default serial port lock director
 for LOCKDIR in "/var/lock" "/var/spool/locks" "/etc/apcupsd"
 do
-	if test -d $LOCKDIR
-	then
-		break;
-	fi
+   if test -d $LOCKDIR
+   then
+      break;
+   fi
 done
 
 # set the default PWRFAILDIR
@@ -1377,196 +1292,180 @@ NISPORT=3551
 #
 case "$DISTNAME" in
 alpha)
-    PTHREAD_LFLAGS="-lpthread -lexc"
-
-    DISTVER=`uname -r`
-    SERIALDEV=/dev/tty01
-    LOCKDIR=/var/spool/locks
-    LOGDIR=/etc/apcupsd
-    DFILES="\
-	platforms/alpha/apcupsd \
-	platforms/alpha/awkhaltprog \
-	platforms/alpha/Makefile"
-  ;;
+   PTHREAD_LFLAGS="-lpthread -lexc"
+   DISTVER=`uname -r`
+   SERIALDEV=/dev/tty01
+   LOCKDIR=/var/spool/locks
+   LOGDIR=/etc/apcupsd
+   DFILES="\
+      platforms/alpha/apcupsd \
+      platforms/alpha/awkhaltprog \
+      platforms/alpha/Makefile"
+   ;;
 bsdi)
-    DISTVER=`uname -a |awk '{print $3}'`
-  ;;
+   DISTVER=`uname -a |awk '{print $3}'`
+   ;;
 debian)
-    DISTVER=`cat /etc/debian_version`
-    NISPORT=6543
-    DFILES="\
-	platforms/debian/Makefile \
-	platforms/debian/apcupsd \
-	platforms/debian/ups-monitor \
-	"
-  ;;
+   DISTVER=`cat /etc/debian_version`
+   NISPORT=6543
+   DFILES="\
+      platforms/debian/Makefile \
+      platforms/debian/apcupsd \
+      platforms/debian/ups-monitor"
+   ;;
 freebsd)
-    DISTVER=`uname -a |awk '{print $3}'`
-    SERIALDEV=/dev/cuaa0
-    nologdir=/var/run
-    PWRFAILDIR=/var/run
-    LOCKDIR=/var/spool/lock
-    PTHREAD_CFLAGS="-pthread"
-    PTHREAD_LFLAGS=""
-    LDFLAGS="$LDFLAGS -pthread"
-    DFILES="\
-	platforms/freebsd/Makefile \
-	platforms/freebsd/apcupsd \
-	platforms/freebsd/apccontrol \
-	"
-  ;;
+   DISTVER=`uname -a |awk '{print $3}'`
+   SERIALDEV=/dev/cuaa0
+   nologdir=/var/run
+   PWRFAILDIR=/var/run
+   LOCKDIR=/var/spool/lock
+   PTHREAD_CFLAGS="-pthread"
+   PTHREAD_LFLAGS=""
+   LDFLAGS="$LDFLAGS -pthread"
+   DFILES="\
+      platforms/freebsd/Makefile \
+      platforms/freebsd/apcupsd \
+      platforms/freebsd/apccontrol"
+   ;;
 gentoo)
-    DISTVER=`awk '/version / {print $5}' < /etc/gentoo-release`
-    DFILES="\
-	platforms/gentoo/Makefile \
-	platforms/gentoo/apcupsd \
-	platforms/gentoo/halt \
-	"
-  ;;
+   DISTVER=`awk '/version / {print $5}' < /etc/gentoo-release`
+   DFILES="\
+      platforms/gentoo/Makefile \
+      platforms/gentoo/apcupsd \
+      platforms/gentoo/halt"
+   ;;
 hpux)
-    DISTVER=`uname -r`
-    SERIALDEV=/dev/tty0p0
-    PTHREAD_CFLAGS="-D_XOPEN_SOURCE_EXTENDED -D_REENTRANT"
-    DFILES="\
-	platforms/hpux/Makefile \
-	platforms/hpux/apcupsd \
-	platforms/hpux/halt"
-  ;;
+   DISTVER=`uname -r`
+   SERIALDEV=/dev/tty0p0
+   PTHREAD_CFLAGS="-D_XOPEN_SOURCE_EXTENDED -D_REENTRANT"
+   DFILES="\
+      platforms/hpux/Makefile \
+      platforms/hpux/apcupsd \
+      platforms/hpux/halt"
+   ;;
 netbsd)
-    DISTVER=`uname -a |awk '{print $3}'`
-    SERIALDEV=/dev/cua01
-    PTHREAD_CFLAGS="-pthread"
-    PTHREAD_LFLAGS=""
-    LDFLAGS="$LDFLAGS -pthread"
-    DFILES="\
-	platforms/netbsd/Makefile \
-	platforms/netbsd/apcupsd \
-	"
-  ;;
+   DISTVER=`uname -a |awk '{print $3}'`
+   SERIALDEV=/dev/cua01
+   PTHREAD_CFLAGS="-pthread"
+   PTHREAD_LFLAGS=""
+   LDFLAGS="$LDFLAGS -pthread"
+   DFILES="\
+      platforms/netbsd/Makefile \
+      platforms/netbsd/apcupsd"
+   ;;
 openbsd)
-    DISTVER=`uname -a |awk '{print $3}'`
-    SERIALDEV=/dev/cua01
-    LOCKDIR=/var/spool/lock
-    PTHREAD_CFLAGS="-pthread"
-    PTHREAD_LFLAGS=""
-    LDFLAGS="$LDFLAGS -pthread"
-    DFILES="\
-	platforms/openbsd/Makefile \
-	platforms/openbsd/apcupsd \
-	platforms/openbsd/apccontrol \
-	"
+   DISTVER=`uname -a |awk '{print $3}'`
+   SERIALDEV=/dev/cua01
+   LOCKDIR=/var/spool/lock
+   PTHREAD_CFLAGS="-pthread"
+   PTHREAD_LFLAGS=""
+   LDFLAGS="$LDFLAGS -pthread"
+   DFILES="\
+      platforms/openbsd/Makefile \
+      platforms/openbsd/apcupsd \
+      platforms/openbsd/apccontrol"
   ;;
 mandrake)
-    DISTVER=`cat /etc/mandrake-release | grep release |\
-		 cut -f 5 -d ' '`
-    DFILES="\
-	platforms/mandrake/Makefile \
-	platforms/mandrake/apcupsd \
-	platforms/mandrake/apcupsd.spec \
-	platforms/mandrake/awkhaltprog"
-  ;;
+   DISTVER=`cat /etc/mandrake-release | grep release | cut -f 5 -d ' '`
+   DFILES="\
+      platforms/mandrake/Makefile \
+      platforms/mandrake/apcupsd \
+      platforms/mandrake/apcupsd.spec \
+      platforms/mandrake/awkhaltprog"
+   ;;
 redhat)
    if test -f /etc/whitebox-release ; then
       f=/etc/whitebox-release
    else
       f=/etc/redhat-release
    fi
-   if test `cat $f | grep release |\
-	cut -f 3 -d ' '`x = "Enterprise"x ; then
-      DISTVER="Enterprise "`cat $f | grep release |\
-	cut -f 6 -d ' '`
+   if test `cat $f | grep release | cut -f 3 -d ' '`x = "Enterprise"x ; then
+      DISTVER="Enterprise "`cat $f | grep release | cut -f 6 -d ' '`
    else
-      DISTVER=`cat /etc/redhat-release | grep release |\
-	cut -f 5 -d ' '`
+      DISTVER=`cat /etc/redhat-release | grep release | cut -f 5 -d ' '`
    fi
    DFILES="\
-       platforms/redhat/Makefile \
-       platforms/redhat/apcupsd \
-       platforms/redhat/apcupsd.spec \
-       platforms/redhat/awkhaltprog"
-  ;;
+      platforms/redhat/Makefile \
+      platforms/redhat/apcupsd \
+      platforms/redhat/apcupsd.spec \
+      platforms/redhat/awkhaltprog"
+   ;;
 yellowdog)
-   if test `cat /etc/yellowdog-release | grep release |\
-	      cut -f 3 -d ' '`x = "Enterprise"x ; then
-      DISTVER="Enterprise "`cat /etc/yellowdog-release | grep release |\
-	       cut -f 6 -d ' '`
-   else
-       DISTVER=`cat /etc/yellowdog-release | grep release |\
-		cut -f 5 -d ' '`
+    if test `cat /etc/yellowdog-release | grep release | cut -f 3 -d ' '`x = "Enterprise"x ; then
+       DISTVER="Enterprise "`cat /etc/yellowdog-release | grep release | cut -f 6 -d ' '`
+    else
+       DISTVER=`cat /etc/yellowdog-release | grep release | cut -f 5 -d ' '`
    fi
    DFILES="\
-       platforms/yellowdog/Makefile \
-       platforms/yellowdog/apcupsd \
-       platforms/yellowdog/apcupsd.spec \
-       platforms/yellowdog/awkhaltprog"
+      platforms/yellowdog/Makefile \
+      platforms/yellowdog/apcupsd \
+      platforms/yellowdog/apcupsd.spec \
+      platforms/yellowdog/awkhaltprog"
    ;;
 engarde)
-    DISTVER=`cat /etc/engarde-release | grep ersion |\
-	     cut -f 5 -d ' '`
-    DFILES="\
-	platforms/engarde/Makefile \
-	platforms/engarde/apcupsd \
-	platforms/engarde/apcupsd.spec \
-	platforms/engarde/awkhaltprog"
-  ;;
+   DISTVER=`cat /etc/engarde-release | grep ersion | cut -f 5 -d ' '`
+   DFILES="\
+      platforms/engarde/Makefile \
+      platforms/engarde/apcupsd \
+      platforms/engarde/apcupsd.spec \
+      platforms/engarde/awkhaltprog"
+   ;;
 slackware)
-    DISTVER=`cat /etc/slackware-version`
-    DFILES="\
-	platforms/slackware/Makefile \
-	platforms/slackware/apcupsd \
-	platforms/slackware/rc6.patch" 
-  ;;
+   DISTVER=`cat /etc/slackware-version`
+   DFILES="\
+      platforms/slackware/Makefile \
+      platforms/slackware/apcupsd \
+      platforms/slackware/rc6.patch" 
+   ;;
 sun)
-    DISTVER=Solaris
-    SERIALDEV=/dev/ttya
-    PWRFAILDIR=/etc
-    PIDDIR=/var/run
-    LOCKDIR=/var/spool/locks
-    LOGDIR=${sysconfdir}
-    APCUPSD_MAIL=/usr/bin/mailx
-    PTHREAD_CFLAGS="-D_POSIX_PTHREAD_SEMANTICS"
-    DFILES="\
-       platforms/sun/Makefile \
-       platforms/sun/apcupsd \
-       platforms/sun/rc0.solaris \
-       platforms/sun/apccontrol"
-  ;;
+   DISTVER=Solaris
+   SERIALDEV=/dev/ttya
+   PWRFAILDIR=/etc
+   PIDDIR=/var/run
+   LOCKDIR=/var/spool/locks
+   LOGDIR=${sysconfdir}
+   APCUPSD_MAIL=/usr/bin/mailx
+   PTHREAD_CFLAGS="-D_POSIX_PTHREAD_SEMANTICS"
+   DFILES="\
+      platforms/sun/Makefile \
+      platforms/sun/apcupsd \
+      platforms/sun/rc0.solaris \
+      platforms/sun/apccontrol"
+   ;;
 suse)
-    DISTVER=`cat /etc/SuSE-release |grep VERSION|\
-			    cut -f 3 -d ' '`
-    DFILES="\
-	platforms/suse/Makefile \
-	platforms/suse/apcupsd \
-	platforms/suse/awkhaltprog \
-	platforms/suse/halt-setup.sh \
-	platforms/suse/halt"
+   DISTVER=`cat /etc/SuSE-release |grep VERSION| cut -f 3 -d ' '`
+   DFILES="\
+      platforms/suse/Makefile \
+      platforms/suse/apcupsd \
+      platforms/suse/awkhaltprog \
+      platforms/suse/halt-setup.sh \
+      platforms/suse/halt"
    ;;
 suse5)
-    DISTNAME=suse
-    DISTVER=5.x
-    DFILES="\
-	platforms/suse/Makefile \
-	platforms/suse/apcupsd \
-	platforms/suse/halt-setup.sh \
-	platforms/suse/halt"
-  ;;
+   DISTNAME=suse
+   DISTVER=5.x
+   DFILES="\
+      platforms/suse/Makefile \
+      platforms/suse/apcupsd \
+      platforms/suse/halt-setup.sh \
+      platforms/suse/halt"
+   ;;
 darwin)
-    DISTVER=`uname -r`
-    SERIALDEV=/dev/tty.ups
-    PIDDIR=/var/run
-    LOCKDIR=/var/tmp
-    DFILES="\
-	platforms/darwin/Makefile \
-	platforms/darwin/apcupsd \
-	platforms/darwin/apccontrol"
-  ;;
+   DISTVER=`uname -r`
+   SERIALDEV=/dev/tty.ups
+   PIDDIR=/var/run
+   LOCKDIR=/var/tmp
+   DFILES="\
+      platforms/darwin/Makefile \
+      platforms/darwin/apcupsd \
+      platforms/darwin/apccontrol"
+   ;;
 unknown)
-    DISTVER=unknown
-    DFILES="\
-	platforms/unknown/Makefile \
-	platforms/unknown/apcupsd \
-	platforms/unknown/halt \
-	"
+   DISTVER=unknown
+   DFILES="\
+      platforms/unknown/Makefile \
+      platforms/unknown/apcupsd \
+      platforms/unknown/halt"
   ;;
 *)
   AC_MSG_WARN([Something went wrong. Unknown DISTNAME $DISTNAME])
@@ -1577,80 +1476,52 @@ dnl
 dnl Allow user to set nologdir
 dnl
 AC_ARG_WITH(nologin,
-    [AC_HELP_STRING([--with-nologin=DIR], [Specify nologin file directory (default /etc)])],
-    [ nologdir="$withval"; ]
-)
+   [AC_HELP_STRING([--with-nologin=DIR], [Specify nologin file directory (default /etc)])],
+   [ nologdir="$withval"; ])
 
 # now allow the user to specify the PID directory
 AC_ARG_WITH(pid-dir,
     [AC_HELP_STRING([--with-pid-dir=DIR], [Specify PIDDIR directory (default is OS dependent)])],
-    [
-	PIDDIR="$withval";
-    ]
-)
+    [PIDDIR="$withval";])
+
 # now allow user to specify LOGDIR
 AC_ARG_WITH(log-dir,
     [AC_HELP_STRING([--with-log-dir=DIR], [Specify EVENTS and STATUS directory (default is OS dependent)])],
-    [
-	LOGDIR="$withval";
-    ]
-)
+    [LOGDIR="$withval";])
+
 # now allow user to specify LOCKDIR
 AC_ARG_WITH(lock-dir,
     [AC_HELP_STRING([--with-lock-dir=DIR], [Specify serial port lock directory (default is OS dependent)])],
-    [
-	LOCKDIR="$withval";
-    ]
-)
+    [LOCKDIR="$withval";])
+
 # now allow user to specify PWRFAILDIR
 AC_ARG_WITH(pwrfail-dir,
     [AC_HELP_STRING([--with-pwrfail-dir=DIR], [Specify power failure file directory (default is OS dependent)])],
-    [
-	PWRFAILDIR="$withval";
-    ]
-)
-
+    [PWRFAILDIR="$withval";])
 
 # now allow user to specify SERIALDEV
 AC_ARG_WITH(serial-dev,
     [AC_HELP_STRING([--with-serial-dev=DEV], [Specify serial port device])],
-    [
-	SERIALDEV="$withval";
-    ]
-)
+    [SERIALDEV="$withval";])
 
 AC_ARG_WITH(dev,
     [AC_HELP_STRING([--with-dev=DEV], [Specify port or device])],
-    [
-	SERIALDEV="$withval";
-    ]
-)
-
+    [SERIALDEV="$withval";])
 
 # now allow user to specify NISPORT
 AC_ARG_WITH(nis-port,
     [AC_HELP_STRING([--with-nis-port=PORT], [Specify NIS (CGI) port (default 3551 except Debian)])],
-    [
-	NISPORT="$withval";
-    ]
-)
+    [NISPORT="$withval";])
 
 # now allow user to specify UPSTYPE
 AC_ARG_WITH(upstype,
     [AC_HELP_STRING([--with-upstype=TYPE], [Specify the UPS type])],
-    [
-	UPSTYPE="$withval";
-    ]
-)
+    [UPSTYPE="$withval";])
 
 # now allow user to specify UPSCABLE
 AC_ARG_WITH(upscable,
     [AC_HELP_STRING([--with-upscable=CABLE], [Specify the UPS cable])],
-    [
-	UPSCABLE="$withval";
-    ]
-)
-
+    [UPSCABLE="$withval";])
 
 AC_SUBST(DISTNAME)
 AC_SUBST(DISTVER)
@@ -1683,113 +1554,113 @@ gccinclude="."
 
 if test "$CC" = "gcc"
 then
-    rm -f $srcdir/gcc.v
-    $CC -v 2> $srcdir/gcc.v
-    gccinclude=`cat $srcdir/gcc.v|grep specs|awk '{print $4}'| \
-		sed -e 's|specs|include|g'`
-    echo "gcc private include directory found."
-    rm -f $srcdir/gcc.v
+   rm -f $srcdir/gcc.v
+   $CC -v 2> $srcdir/gcc.v
+   gccinclude=`cat $srcdir/gcc.v|grep specs|awk '{print $4}'| \
+      sed -e 's|specs|include|g'`
+   echo "gcc private include directory found."
+   rm -f $srcdir/gcc.v
 fi
 
 dnl
 dnl First entry must always be "variables.mak"
 dnl
 GENERATE_FILES="\
-    autoconf/variables.mak \
-    autoconf/Makefile \
-    doc/Makefile \
-    include/Makefile \
-    src/Makefile \
-    src/lib/Makefile \
-    src/drivers/Makefile \
-    src/win32/Makefile \
-    platforms/Makefile \
-    platforms/apccontrol \
-    platforms/etc/changeme \
-    platforms/etc/commfailure \
-    platforms/etc/commok \
-    platforms/etc/offbattery \
-    platforms/etc/masterconnect \
-    platforms/etc/mastertimeout \
-    platforms/etc/onbattery \
-    platforms/etc/Makefile \
-    platforms/etc/apcupsd.conf \
-    examples/Makefile \
-    examples/safe.apccontrol \
-    Makefile \
-    $DFILES"
+   autoconf/variables.mak \
+   autoconf/Makefile \
+   doc/Makefile \
+   include/Makefile \
+   src/Makefile \
+   src/lib/Makefile \
+   src/drivers/Makefile \
+   src/win32/Makefile \
+   platforms/Makefile \
+   platforms/apccontrol \
+   platforms/etc/changeme \
+   platforms/etc/commfailure \
+   platforms/etc/commok \
+   platforms/etc/offbattery \
+   platforms/etc/masterconnect \
+   platforms/etc/mastertimeout \
+   platforms/etc/onbattery \
+   platforms/etc/Makefile \
+   platforms/etc/apcupsd.conf \
+   examples/Makefile \
+   examples/safe.apccontrol \
+   Makefile \
+   $DFILES"
 
 if test "$APCSMART_DRIVER"x != ""x
 then
-    GENERATE_FILES="$GENERATE_FILES src/drivers/apcsmart/Makefile"
+   GENERATE_FILES="$GENERATE_FILES src/drivers/apcsmart/Makefile"
 fi
 
 if test "$DUMB_DRIVER"x != ""x
 then
-    GENERATE_FILES="$GENERATE_FILES src/drivers/dumb/Makefile"
+   GENERATE_FILES="$GENERATE_FILES src/drivers/dumb/Makefile"
 fi
 
 if test "$USB_DRIVER"x != ""x
 then
-    GENERATE_FILES="$GENERATE_FILES \
-    src/drivers/usb/Makefile \
-    src/drivers/usb/$USB_TYPE/Makefile"
+   GENERATE_FILES="$GENERATE_FILES \
+   src/drivers/usb/Makefile \
+   src/drivers/usb/$USB_TYPE/Makefile"
 fi
 
 if test "$USB_TYPE"x = "generic"x
 then
-    GENERATE_FILES="$GENERATE_FILES \
-    src/drivers/usb/generic/libusb.h"
+   GENERATE_FILES="$GENERATE_FILES \
+   src/drivers/usb/generic/libusb.h"
 fi
 
 if test "$LIBUSBHIDINC"x != ""x
 then
-    GENERATE_FILES="$GENERATE_FILES src/libusbhid/Makefile"
+   GENERATE_FILES="$GENERATE_FILES src/libusbhid/Makefile"
 fi
 
 if test "$NET_DRIVER"x != ""x
 then
-    GENERATE_FILES="$GENERATE_FILES src/drivers/net/Makefile"
+   GENERATE_FILES="$GENERATE_FILES src/drivers/net/Makefile"
 fi
 
 if test "$SNMP_DRIVER"x != ""x
 then
-    GENERATE_FILES="$GENERATE_FILES src/drivers/snmp/Makefile"
+   GENERATE_FILES="$GENERATE_FILES src/drivers/snmp/Makefile"
 fi
 
 if test "$TEST_DRIVER"x != ""x
 then
-    GENERATE_FILES="$GENERATE_FILES src/drivers/test/Makefile"
+   GENERATE_FILES="$GENERATE_FILES src/drivers/test/Makefile"
 fi
 
 if test "$PCNET_DRIVER"x != ""x
 then
-    GENERATE_FILES="$GENERATE_FILES src/drivers/pcnet/Makefile"
+   GENERATE_FILES="$GENERATE_FILES src/drivers/pcnet/Makefile"
 fi
 
 if test "$USE_INCLUDED_LIBINTL" = "yes"
 then
-    GENERATE_FILES="$GENERATE_FILES src/intl/Makefile"
+   GENERATE_FILES="$GENERATE_FILES src/intl/Makefile"
 fi
 
 if test "$USE_NLS" = "yes"
 then
-    GENERATE_FILES="$GENERATE_FILES src/po/Makefile"
+   GENERATE_FILES="$GENERATE_FILES src/po/Makefile"
 fi
 
 if test "$ENABLE_CGI" = "yes"
 then
-    GENERATE_FILES="$GENERATE_FILES src/cgi/Makefile src/cgi/cgiconfig.h"
+   GENERATE_FILES="$GENERATE_FILES src/cgi/Makefile src/cgi/cgiconfig.h"
 fi
 
 if test "$LIBGD"x != ""x
 then
-    GENERATE_FILES="$GENERATE_FILES src/gd1.2/Makefile"
+   GENERATE_FILES="$GENERATE_FILES src/gd1.2/Makefile"
 fi
 
 if test "$GAPCMON"x != ""x
 then
-    GENERATE_FILES="$GENERATE_FILES src/gapcmon/Makefile"
+   GENERATE_FILES="$GENERATE_FILES src/gapcmon/Makefile"
 fi
 
 dnl
@@ -1800,8 +1671,7 @@ TARGETS=$srcdir/autoconf/targets.mak
 AC_SUBST_FILE(TARGETS)
 
 AC_OUTPUT([ ${GENERATE_FILES} ], 
-     [(echo "Doing make of dependencies"; make depend;) ]
-)
+   [(echo "Doing make of dependencies"; make depend;) ])
 
 chmod 755 examples/safe.apccontrol
 make clean
@@ -1812,7 +1682,7 @@ make clean
 #
 CXXVERSION=`${CXX} --version | tr '\n' ' ' | cut -f 3 -d ' '`
 if test "x${CXXVERSION}" = "x" ; then
-  CXXVERSION=`${CXX} --version | tr '\n' ' ' | cut -f 1 -d ' '`
+   CXXVERSION=`${CXX} --version | tr '\n' ' ' | cut -f 1 -d ' '`
 fi
 
 eval srcdir=${srcdir}
@@ -1824,40 +1694,40 @@ echo "
 
 Configuration on `date`:
 
-  Host: 		      $host -- ${DISTNAME} ${DISTVER} 
-  Apcupsd version:	      ${VERSION} (${DATE})
+  Host:                       $host -- ${DISTNAME} ${DISTVER} 
+  Apcupsd version:            ${VERSION} (${DATE})
   Source code location:       ${srcdir}
-  Install binaries:	      ${sbindir}
+  Install binaries:           ${sbindir}
   Install config files:       ${sysconfdir}
-  Install man files:	      ${mandir}
-  Nologin file in:	      ${nologdir}
-  PID directory:	      ${PIDDIR}
+  Install man files:          ${mandir}
+  Nologin file in:            ${nologdir}
+  PID directory:              ${PIDDIR}
   LOG dir (events, status)    ${LOGDIR}
   LOCK dir (for serial port)  ${LOCKDIR}
-  Power Fail dir	      ${PWRFAILDIR}
-  Compiler:		      ${CXX} ${CXXVERSION}
-  Compiler flags:	      ${CFLAGS} ${PTHREAD_FLAGS}
-  Linker flags: 	      ${LDFLAGS}
-  Host and version:	      ${DISTNAME} ${DISTVER}
-  Shutdown Program:	      ${SHUTDOWN}
-  Port/Device:		      ${SERIALDEV}
+  Power Fail dir              ${PWRFAILDIR}
+  Compiler:                   ${CXX} ${CXXVERSION}
+  Compiler flags:             ${CFLAGS} ${PTHREAD_FLAGS}
+  Linker flags:               ${LDFLAGS}
+  Host and version:           ${DISTNAME} ${DISTVER}
+  Shutdown Program:           ${SHUTDOWN}
+  Port/Device:                ${SERIALDEV}
   Network Info Port (CGI):    ${NISPORT}
-  UPSTYPE		      ${UPSTYPE}
-  UPSCABLE		      ${UPSCABLE}
+  UPSTYPE                     ${UPSTYPE}
+  UPSCABLE                    ${UPSCABLE}
 
   drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${DISPLAY_USB_DRIVER:-no-usb} ${DISPLAY_SNMP_DRIVER:-no-snmp} ${PCNET_DRIVER:-no-pcnet} ${TEST_DRIVER:-no-test}
 
-  enable-nis:		      ${NISSRV_ENABLED}
-  with-nisip:		      ${NISIP}
-  enable-cgi:		      ${ENABLE_CGI}
-  with-cgi-bin: 	      ${CGIBIN}
-  with-libwrap: 	      ${with_libwrap}
-  enable-nls:		      ${USE_NLS}
-  enable-libintl:	      ${USE_INCLUDED_LIBINTL}
-  enable-powerflute:	      ${USE_POWERFLUTE}
-  enable-pthreads:	      ${with_pthreads}
-  enable-dist-install:	      ${with_distdir}
-  enable-gapcmon:	      ${GAPCMON_ENABLED}
+  enable-nis:                 ${NISSRV_ENABLED}
+  with-nisip:                 ${NISIP}
+  enable-cgi:                 ${ENABLE_CGI}
+  with-cgi-bin:               ${CGIBIN}
+  with-libwrap:               ${with_libwrap}
+  enable-nls:                 ${USE_NLS}
+  enable-libintl:             ${USE_INCLUDED_LIBINTL}
+  enable-powerflute:          ${USE_POWERFLUTE}
+  enable-pthreads:            ${with_pthreads}
+  enable-dist-install:        ${with_distdir}
+  enable-gapcmon:             ${GAPCMON_ENABLED}
   " > config.out
 
 cat config.out
@@ -1869,11 +1739,9 @@ dnl touch ${srcdir}/include/config.h
 
 echo $PATH | grep /usr/ucb >/dev/null
 if test $? = 0 ; then
-AC_MSG_WARN([ 
-
-WARNING! You have /usr/ucb on your path. We STRONGLY recommend
-	 that you remove it and rerun configure. Otherwise
-	 apcupsd may be unable to shutdown your system.
-
-]);
+   AC_MSG_WARN([ 
+      WARNING! You have /usr/ucb on your path. We STRONGLY recommend
+         that you remove it and rerun configure. Otherwise
+         apcupsd may be unable to shutdown your system.
+   ]);
 fi
