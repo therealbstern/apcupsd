@@ -25,15 +25,6 @@
 
 #include "apc.h"
 
-/* Pickup then ignore SIGCHLD */
-void child_handler(int sig)
-{
-#if !defined(HAVE_AIX_OS) && !defined(HAVE_SGI_OS) && !defined(HAVE_HPUX_OS)
-   /* This will cause an infinite loop on AIX, IRIX, and HPUX. */
-   signal(SIGCHLD, child_handler);
-#endif
-}
-
 /*********************************************************************/
 void init_timer(int timer, void (*fnhandler) (int))
 {
@@ -51,11 +42,7 @@ void init_signals(void (*handler) (int))
    signal(SIGTERM, handler);
 
    /* Picked up via wait */
-   signal(SIGCHLD, child_handler);
    signal(SIGPIPE, SIG_IGN);
-
-   /* I think this is not effective -RF */
-   signal(SIGKILL, handler);
 }
 #endif
 
