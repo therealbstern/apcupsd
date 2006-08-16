@@ -427,7 +427,7 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
 
    /*  Ambient temperature */ 
    case CI_ATEMP:
-      ups->ambtemp = uval->dValue;
+      ups->ambtemp = uval->dValue - 273.15;      /* convert to deg C. */;
       Dmsg1(200, "ATemp = %d\n", (int)ups->ambtemp);
       break;
 
