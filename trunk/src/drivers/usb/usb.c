@@ -61,7 +61,8 @@ const struct s_known_info known_info[] = {
    {CI_NONE,                    0x00840033, P_ANY,     T_UNITS,    false},  /* ApparentPower */
    {CI_NONE,                    0x00840034, P_ANY,     T_UNITS,    false},  /* ActivePower */
    {CI_LOAD,                    0x00840035, P_ANY,     T_UNITS,    true },  /* PercentLoad */
-   {CI_ITEMP,                   0x00840036, P_BATTERY, T_UNITS,    true },  /* Temperature */
+   {CI_ITEMP,                   0x00840036, P_BATTERY, T_UNITS,    true },  /* Internal Temperature */
+   {CI_ATEMP,                   0x00840036, P_APC1,    T_UNITS,    true },  /* Ambient Temperature */
    {CI_HUMID,                   0x00840037, P_ANY,     T_UNITS,    true },  /* Humidity */
    {CI_NOMBATTV,                0x00840040, P_BATTERY, T_UNITS,    false},  /* ConfigVoltage (battery) */
    {CI_NOMOUTV,                 0x00840040, P_OUTPUT,  T_UNITS,    false},  /* ConfigVoltage (output) */
