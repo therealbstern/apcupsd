@@ -72,17 +72,6 @@ Function ShowReadme
   Exec 'write "$INSTDIR\ReleaseNotes"'
 FunctionEnd
 
-Function .onInit
-  ;
-  ; Default INSTDIR to %SystemDrive%\apcupsd
-  ;
-  ReadEnvStr $0 SystemDrive
-  ${If} $0 == ''
-     StrCpy $0 'c:'
-  ${EndIf}
-  StrCpy $INSTDIR $0\apcupsd
-FunctionEnd
-
 Section "Apcupsd Service" SecService
   ; Check for existing installation
   StrCpy $7 0
@@ -219,13 +208,38 @@ Section "Documentation" SecDoc
   CreateShortCut "$SMPROGRAMS\Apcupsd\Manual.lnk" "$INSTDIR\doc\manual.html"
 SectionEnd
 
+;
+; Initialization Callback
+;
+Function .onInit
+  ; Default INSTDIR to %SystemDrive%\apcupsd
+  ReadEnvStr $0 SystemDrive
+  ${If} $0 == ''
+     StrCpy $0 'c:'
+  ${EndIf}
+  StrCpy $INSTDIR $0\apcupsd
+  
+  ; If we're on WinNT or Win95, disable the USB driver section
+  Call GetWindowsVersion
+  Pop $0
+  StrCpy $1 $0 2
+  ${If} $1 == "NT"
+  ${OrIf} $1 == "95"
+     SectionGetFlags ${SecUsbDrv} $0
+     IntOp $1 ${SF_SELECTED} ~
+     IntOp $0 $0 & $1
+     IntOp $0 $0 | ${SF_RO}
+     SectionSetFlags ${SecUsbDrv} $0
+  ${EndIf}
+FunctionEnd
+
 
 ;
 ; Extra Page descriptions
 ;
 
 LangString DESC_SecService ${LANG_ENGLISH} "Install Apcupsd on this system."
-LangString DESC_SecUsbDrv ${LANG_ENGLISH} "Install USB driver. Required if you have a USB UPS."
+LangString DESC_SecUsbDrv ${LANG_ENGLISH} "Install USB driver. Required if you have a USB UPS. Not available on Windows 95 or NT."
 LangString DESC_SecDoc ${LANG_ENGLISH} "Install Documentation on this system."
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
