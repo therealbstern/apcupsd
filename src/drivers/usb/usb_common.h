@@ -62,32 +62,33 @@
 #define P_BATTERY 0x840012    /* Battery values */
 #define P_INPUT   0x84001a    /* Input values */
 #define P_PWSUM   0x840024    /* Power summary */
+#define P_APC1    0xff860007  /* From AP9612 environmental monitor */
    
-
 /* No Command Index, don't save this value */ 
 #define CI_NONE -1
 
-struct s_known_info {
+struct s_known_info {
    int ci;                       /* Command index */
    unsigned usage_code;          /* Usage code */
    unsigned physical;            /* Physical usage */
    int data_type;                /* Data type expected */
-   bool isvolatile;              /* Volatile data item */
+   bool isvolatile;              /* Volatile data item */
 };
-typedef struct s_usb_value {
+
+typedef struct s_usb_value {
    int value_type;               /* Type of returned value */
    double dValue;                /* Value if double */
    int iValue;                   /* Integer value */
    char *UnitName;               /* Name of units */
-   char sValue[MAXSTRING];       /* Value if string */
+   char sValue[MAXSTRING];       /* Value if string */
 } USB_VALUE;
 
-/* Check if the UPS has the given capability */ 
+/* Check if the UPS has the given capability */ 
 #define UPS_HAS_CAP(ci) (ups->UPS_Cap[ci])
 
 /* Platform-specific code needs to call back to these operations */ 
 int usb_ups_get_capabilities(UPSINFO *ups);
-int usb_ups_read_static_data(UPSINFO *ups);
+int usb_ups_read_static_data(UPSINFO *ups);
 
 /* Useful helper functions for use by platform-specific code */ 
 double pow_ten(int exponent);
