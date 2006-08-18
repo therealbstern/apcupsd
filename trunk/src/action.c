@@ -553,11 +553,8 @@ void do_action(UPSINFO *ups)
           *
           * Then the battery has failed!!!
           * Must do Emergency Shutdown NOW
-          *
-          * Or of the UPS says he is going to shutdown, do it NOW!
           */
-         if (ups->is_shutdownimm() ||
-            (ups->is_battlow() && ups->is_online())) {
+         if (ups->is_battlow() && ups->is_online()) {
             ups->set_shut_emerg();
             generate_event(ups, CMDEMERGENCY);
          }

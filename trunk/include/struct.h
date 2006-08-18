@@ -169,7 +169,6 @@ class UPSINFO {
    void clear_remtimelimit() { Status &= ~UPS_remtimelimit; };
    void clear_replacebatt() { Status &= ~UPS_replacebatt; };
    void clear_shut_btime() { Status &= ~UPS_shut_btime; };
-   void clear_shutdownimm() { Status &= ~UPS_shutdownimm; };
    void clear_shutdown() { Status &= ~UPS_shutdown; };
    void clear_shut_emerg() { Status &= ~UPS_shut_emerg; };
    void clear_shut_load() { Status &= ~UPS_shut_load; };
@@ -201,8 +200,6 @@ class UPSINFO {
    void set_replacebatt(int val) { if (val) set_replacebatt(); else clear_replacebatt(); };
    void set_shut_btime() { Status |= UPS_shut_btime; };
    void set_shut_btime(int val) { if (val) set_shut_btime(); else clear_shut_btime(); };
-   void set_shutdownimm() { Status |= UPS_shutdownimm; };
-   void set_shutdownimm(int val) { if (val) set_shutdownimm(); else clear_shutdownimm(); };
    void set_shutdown() { Status |= UPS_shutdown; };
    void set_shut_emerg() { Status |= UPS_shut_emerg; };
    void set_shut_emerg(int val) { if (val) set_shut_emerg(); else clear_shut_emerg(); };
@@ -232,7 +229,6 @@ class UPSINFO {
    bool is_plugged() const { return (Status & UPS_plugged) == UPS_plugged; };
    bool is_replacebatt() const { return (Status & UPS_replacebatt) == UPS_replacebatt; };
    bool is_shut_btime() const { return (Status & UPS_shut_btime) == UPS_shut_btime; };
-   bool is_shutdownimm() const { return (Status & UPS_shutdownimm) == UPS_shutdownimm; };
    bool is_shutdown() const { return (Status & UPS_shutdown) == UPS_shutdown; };
    bool is_shut_emerg() const { return (Status & UPS_shut_emerg) == UPS_shut_emerg; };
    bool is_shut_load() const { return (Status & UPS_shut_load) == UPS_shut_load; };
