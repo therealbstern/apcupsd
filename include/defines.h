@@ -101,7 +101,7 @@
 
 #define UPS_LOCAL_BITS (UPS_commlost|UPS_shutdown|UPS_slave|UPS_slavedown| \
             UPS_onbatt_msg|UPS_fastpoll|UPS_plugged|UPS_dev_setup| \
-            UPS_shut_load|UPS_shut_btime|UPS_shut_ltime)
+            UPS_shut_load|UPS_shut_btime|UPS_shut_ltime|UPS_shut_emerg)
 
 /*
  * CI_ is Capability or command index
