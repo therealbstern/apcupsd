@@ -155,7 +155,6 @@ class UPSINFO {
  public:
    /* Methods */
    void clear_battlow() { Status &= ~UPS_battlow; };
-   void clear_belowcaplimit() { Status &= ~UPS_belowcaplimit; };
    void clear_boost() { Status &= ~UPS_boost; };
    void clear_calibration() { Status &= ~UPS_calibration; };
    void clear_commlost() { Status &= ~UPS_commlost; };
@@ -166,7 +165,6 @@ class UPSINFO {
    void clear_online() { Status |= UPS_onbatt; Status &= ~UPS_online; };
    void clear_overload() { Status &= ~UPS_overload; };
    void clear_plugged() { Status &= ~UPS_plugged; };
-   void clear_remtimelimit() { Status &= ~UPS_remtimelimit; };
    void clear_replacebatt() { Status &= ~UPS_replacebatt; };
    void clear_shut_btime() { Status &= ~UPS_shut_btime; };
    void clear_shutdown() { Status &= ~UPS_shutdown; };
@@ -181,7 +179,6 @@ class UPSINFO {
 
    void set_battlow() { Status |= UPS_battlow; };
    void set_battlow(int val) { if (val) set_battlow(); else clear_battlow(); };
-   void set_belowcaplimit() { Status |= UPS_belowcaplimit; };
    void set_boost() { Status |= UPS_boost; };
    void set_boost(int val) { if (val) set_boost(); else clear_boost(); };
    void set_calibration() { Status |= UPS_calibration; };
@@ -195,7 +192,6 @@ class UPSINFO {
    void set_overload() { Status |= UPS_overload; };
    void set_overload(int val) { if (val) set_overload(); else clear_overload(); };
    void set_plugged() { Status |= UPS_plugged; };
-   void set_remtimelimit() { Status |= UPS_remtimelimit; };
    void set_replacebatt() { Status |= UPS_replacebatt; };
    void set_replacebatt(int val) { if (val) set_replacebatt(); else clear_replacebatt(); };
    void set_shut_btime() { Status |= UPS_shut_btime; };
