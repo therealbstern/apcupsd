@@ -86,8 +86,6 @@
 #define UPS_shutdown      0x00000200    /* Shutdown in progress */
 #define UPS_slave         0x00000400    /* Set if this is a slave */
 #define UPS_slavedown     0x00000800    /* Slave not responding */
-#define UPS_belowcaplimit 0x00002000    /* Below battery capacity limit */
-#define UPS_remtimelimit  0x00004000    /* Remaining run time limit exceeded */
 #define UPS_onbatt_msg    0x00020000    /* Set when UPS_ONBATT message is sent */
 #define UPS_fastpoll      0x00040000    /* Set on power failure to poll faster */
 #define UPS_shut_load     0x00080000    /* Set when BatLoad <= percent */
