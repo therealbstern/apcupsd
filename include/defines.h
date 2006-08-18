@@ -101,7 +101,8 @@
 #define UPS_battpresent   0x04000000    /* Indicates if battery is connected */
 
 #define UPS_LOCAL_BITS (UPS_commlost|UPS_shutdown|UPS_slave|UPS_slavedown| \
-            UPS_onbatt_msg|UPS_fastpoll|UPS_plugged|UPS_dev_setup)
+            UPS_onbatt_msg|UPS_fastpoll|UPS_plugged|UPS_dev_setup| \
+            UPS_shut_load|UPS_shut_btime|UPS_shut_ltime)
 
 /*
  * CI_ is Capability or command index
