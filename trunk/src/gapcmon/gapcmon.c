@@ -2459,14 +2459,13 @@ static gint gapc_net_transaction_service(PGAPC_MONITOR pm, gchar * cp_cmd,
 static gpointer *gapc_net_thread_qwork(PGAPC_MONITOR pm)
 {
    gint rc = 0;
-   GAsyncQueue *thread_queue = NULL;
 
    g_return_val_if_fail(pm != NULL, NULL);
    g_return_val_if_fail(pm->q_network != NULL, NULL);
 
-   thread_queue = g_async_queue_ref(pm->q_network);
+   g_async_queue_ref(pm->q_network);
 
-   while ((pm = (PGAPC_MONITOR) g_async_queue_pop(thread_queue))) {
+   while ((pm = (PGAPC_MONITOR) g_async_queue_pop(pm->q_network))) {
       if (pm->b_thread_stop) {
          break;
       }
@@ -2492,7 +2491,7 @@ static gpointer *gapc_net_thread_qwork(PGAPC_MONITOR pm)
       }
    }                               /* end-while */
 
-   g_async_queue_unref(thread_queue);
+   g_async_queue_unref(pm->q_network);
 
    g_thread_exit(GINT_TO_POINTER(1));
 
