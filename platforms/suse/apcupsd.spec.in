@@ -17,6 +17,10 @@
 #   Release_Notes-%{version}-%{release}.txt
 #
 
+# third party packagers
+%define _packager D. Scott Barninger <barninger@fairfieldcomputers.com>
+%{?contrib_packager:%define _packager %{contrib_packager}}
+
 %define rh7 0
 %{?build_rh7:%define rh7 1}
 
@@ -62,7 +66,7 @@ Version:      @VERSION@
 Release:      1
 Vendor:       APC UPS Daemon Team
 Distribution: The apcupsd Team
-Packager:     D. Scott Barninger <barninger@fairfieldcomputers.com>
+Packager:     %{_packager}
 URL:          http://www.apcupsd.com
 Source0:      http://www.spcupsd.com/%{name}-%{version}.tar.gz
 Source1:      Release_Notes-%{version}-%{release}.tar.gz
@@ -342,6 +346,8 @@ if [ $1 = 0 ] ; then
 fi
 
 %changelog
+* Sat Aug 19 2006 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- add third party packager tag
 * Fri May 05 2006 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - update build requirments to include ghostscript
 - update fedora_core build requirements to include latex2html
