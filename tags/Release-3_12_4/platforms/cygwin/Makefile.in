@@ -1,0 +1,36 @@
+# Makefile template
+#
+# Copyright (C) 1999-2002 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
+#
+
+# Default variables
+@VARIABLES@
+# TOP source directory.
+topdir = @topdir@
+top_builddir = $(topdir)
+
+# Include the default make targets: to be put before the all-targets: rule.
+@TARGETS@
+
+all-targets: Makefile
+
+install:
+	@echo "Installing system binary files ..."
+	@$(CP) -f bin/* $(sbindir)
+	@echo "Installing apccontrol ..."
+	@cp -f apccontrol $(sysconfdir)/apccontrol
+	@cp -f examples/* $(sysconfdir)/examples
+	@cp -f README.txt $(prefix)
+	@cp -f README.txt $(sbindir)
+	@cp -f $(topdir)/COPYING $(prefix)
+	@cp -f $(topdir)/ChangeLog $(prefix)
+
+uninstall:
+	@echo "Uninstalling apccontrol ..."
+	@rm -f $(sysconfdir)/apccontrol
+
+clean: targetclean
+
+distclean: targetdistclean
+	$(RMF) apccontrol apcupsd Makefile 
+	@rm -rf CVS bin/CVS examples/CVS
