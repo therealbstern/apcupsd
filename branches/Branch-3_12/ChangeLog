@@ -8,7 +8,32 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
-CHANGES IN 3.12.x
+CHANGES IN 3.12.4
+
+30May06:
+- snmp: Don't leak 'response' if snmp_open() fails. Since this file is
+  generated code (from smidump) we shouldn't modify it by hand, but in
+  this case there is no alternative. A bug report has been filed with
+  smidump folks so hopefully this code generation bug will be fixed in a
+  future smidump release.
+- snmp: Set snmp data structure pointers to NULL before calling into wrapper
+  code. The wrapper code may return in a failure case without touching the
+  pointer. If the pointer was non-NULL to begin with, we will happily try
+  to use it (even though it's invalid) and then free() it a second time.
+  Initializing to NULL prevents this.
+22May06:
+- Status and data logging can be off by one interval due to math error.
+05May06:
+- RPMs: Add latex2html requirement for fedora core builds.
+01May06:
+- doc: Escape a couple special characters.
+30Apr06:
+- Default NIS port to NISPORT (from configure) instead of hard-coded 
+  7000. The default should have been 3551 anyway and this will prevent
+  future foul-ups.
+
+
+CHANGES IN 3.12.3
 
 24Apr06:
 - win32: Default install path to %SystemDrive%\apcupsd instead of assuming
@@ -44,6 +69,7 @@ CHANGES IN 3.12.x
   the trace file when using -T.
 02Feb06:
 - net: Add support for selftest detection.
+
 
 CHANGES IN 3.12.2
 

@@ -2,11 +2,20 @@
              Release Notes for Apcupsd 3.12.x
 
 
+Release 3.12.4 19Aug06
+
+Fixes for SNMP crash in the face of network errors. Also status and data
+logging interval was often off by one period. NIS port now properly 
+defaults to 3551 or value provided by configure, not hard-coded 7000. 
+RPM specs updated for Fedora Core builds (need latex2html).
+
+
 Release 3.12.3 26Apr06
 
 Bug fix release. Eliminates need for libstdc++ when using gcc-3 or
 higher. Also some fixes to the BSD USB driver and build fixes for
 various rare cases. See ChangeLog for full details.
+
 
 Release 3.12.2 18Jan06
 
