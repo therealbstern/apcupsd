@@ -14,7 +14,7 @@ top_builddir = $(topdir)
 
 apclib = libusbhid.a
 
-apclibobjs = parse.o data.o descr.o
+apclibobjs = parse.o data.o usage.o descr.o
 
 all-targets: $(apclib)
 

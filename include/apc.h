@@ -76,8 +76,8 @@
 #include <ctype.h>
 #include <syslog.h>
 #include <limits.h>
-#include <time.h>
 #include <pwd.h>
+#include <time.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <setjmp.h>
@@ -85,6 +85,9 @@
 #include <netdb.h>
 #include <sys/ioctl.h>
 
+#ifdef HAVE_CYGWIN
+# include <apc_winsem.h>
+#else
 # ifdef HAVE_SYS_IPC_H
 #  include <sys/ipc.h>
 # endif
@@ -94,6 +97,7 @@
 # ifdef HAVE_SYS_SHM_H
 #  include <sys/shm.h>
 # endif
+#endif
 
 #ifdef HAVE_SYS_SOCKET_H
 # include <sys/socket.h>

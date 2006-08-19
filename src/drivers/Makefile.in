@@ -10,8 +10,7 @@ topdir = @topdir@
 top_builddir = $(topdir)
 
 subdirs = @APCSMART_DRIVER@ @DUMB_DRIVER@ @NET_DRIVER@ \
-          @USB_DRIVER@ @SNMP_DRIVER@ @TEST_DRIVER@ \
-          @PCNET_DRIVER@
+          @USB_DRIVER@ @SNMP_DRIVER@ @TEST_DRIVER@
 
 # Include the default make targets: to be put before the all-targets: rule.
 @TARGETS@
@@ -22,7 +21,7 @@ driversobjs = drivers.o
 
 all-targets: $(driverslib)
 
-$(driverslib): $(driversobjs) @APCSMART_DRIVER@_stamp @DUMB_DRIVER@_stamp @NET_DRIVER@_stamp @USB_DRIVER@_stamp @SNMP_DRIVER@_stamp @TEST_DRIVER@_stamp  @PCNET_DRIVER@_stamp drivers_stamp
+$(driverslib): $(driversobjs) @APCSMART_DRIVER@_stamp @DUMB_DRIVER@_stamp @NET_DRIVER@_stamp @USB_DRIVER@_stamp @SNMP_DRIVER@_stamp @TEST_DRIVER@_stamp drivers_stamp
 
 _stamp:
 
@@ -60,11 +59,6 @@ test_stamp: test/libtest.a
 	ar cru libdrivers.a test/*.o
 	@RANLIB@ $(driverslib)
 	touch test_stamp
-
-pcnet_stamp: pcnet/libpcnet.a
-	ar cru libdrivers.a pcnet/*.o
-	@RANLIB@ $(driverslib)
-	touch pcnet_stamp
 
 clean: targetclean
 	$(RMF) *_stamp

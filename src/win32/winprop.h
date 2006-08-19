@@ -44,7 +44,7 @@ class upsProperties;
 #define _win_upsPROPERTIES
 
 // Includes
-#include <windows.h>
+#include "winhdrs.h"
 
 // The upsProperties class itself
 class upsProperties

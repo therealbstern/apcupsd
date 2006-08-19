@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright (C) 2000-2006 Kern Sibbald
+ * Copyright (C) 2000-2004 Kern Sibbald
  * Copyright (C) 1996-99 Andre M. Hedrick <andre@suse.com>
  *
  * This program is free software; you can redistribute it and/or
@@ -35,20 +35,12 @@ char msg[100];
 time_t nowtime;
 char m_char;
 char argvalue[MAXSTRING];
-int shm_OK = 0;
 
 /* Default values for contacting daemon */
 static char *host = "localhost";
 static int port = NISPORT;
 
-struct s_mydata {
-   char apcmagic[APC_MAGIC_SIZE];
-   int update_master_config;
-   int get_master_status;
-   int slave_status;
-   int call_master_shutdown;
-   char accessmagic[ACCESS_MAGIC_SIZE];
-} myDATA = {
+DATAINFO myDATA = {
    "\0",               /* data->apcmagic             */
    0,                  /* data->update_master_config */
    0,                  /* data->get_master_status    */
@@ -57,18 +49,7 @@ struct s_mydata {
    "\0"                /* data->accessmagic          */
 };
 
-struct configinfo {
-   int new_annoy;
-   int new_maxtime;
-   int new_delay;
-#ifdef __NOLOGIN
-   int new_nologin;
-#endif  /* __NOLOGIN */
-   int new_stattime;
-   int new_datatime;
-   int new_nettime;
-   int new_percent;
-} myCONFIG;
+CONFIGINFO myCONFIG;
 
 /*
  * EPROM commands and their values as parsed from the
@@ -285,7 +266,7 @@ static void do_pthreads_status(UPSINFO *ups, char *host, int port)
 
 /*********************************************************************/
 
-#if defined(HAVE_MINGW)
+#ifdef HAVE_CYGWIN
 #undef main
 #endif
 
@@ -296,10 +277,6 @@ int main(int argc, char **argv)
 
    char *cfgfile = APCCONF;
    struct stat cfgstat;
-
-#ifdef HAVE_MINGW
-   WSA_Init();                   /* init MS networking */
-#endif
 
    astrncpy(argvalue, argv[0], sizeof(argvalue) - 1);
 

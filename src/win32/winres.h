@@ -6,7 +6,6 @@
 #define IDI_ONBATT                      102
 #define IDI_CHARGING                    103
 #define IDR_TRAYMENU                    104
-#define IDI_COMMLOST                    105
 
 #define IDC_LIST                        1000
 #define IDC_NONYET_LABEL                1006

@@ -27,11 +27,6 @@
 #include "apc.h"
 #include "apcsmart.h"
 
-/* Win32 needs O_BINARY; sane platforms have never heard of it */
-#ifndef O_BINARY
-#define O_BINARY 0
-#endif
-
 /*
  * This is the first routine in the driver that is called.
  */
@@ -54,14 +49,22 @@ int apcsmart_ups_open(UPSINFO *ups)
          "apcsmart_ups_open called twice. This shouldn't happen.");
    }
 
-   if ((ups->fd = open(ups->device, O_RDWR | O_NOCTTY | O_NDELAY | O_BINARY)) < 0)
+   /*
+    * For a slave, we skip actually setting up the serial port
+    */
+   if (ups->is_slave()) {
+      ups->fd = -1;
+      return 1;
+   }
+
+   if ((ups->fd = open(ups->device, O_RDWR | O_NOCTTY | O_NDELAY)) < 0)
       Error_abort2(_("Cannot open UPS port %s: %s\n"), ups->device, strerror(errno));
 
    /* Cancel the no delay we just set */
    cmd = fcntl(ups->fd, F_GETFL, 0);
    fcntl(ups->fd, F_SETFL, cmd & ~O_NDELAY);
 
-   /* Save old settings */
+/* Save old settings */
    tcgetattr(ups->fd, &my_data->oldtio);
 
    my_data->newtio.c_cflag = DEFAULT_SPEED | CS8 | CLOCAL | CREAD;
@@ -80,7 +83,7 @@ int apcsmart_ups_open(UPSINFO *ups)
    my_data->newtio.c_cc[VMIN] = 0;
    my_data->newtio.c_cc[VTIME] = TIMER_READ * 10;
 
-#if defined(HAVE_OSF1_OS) || \
+#if defined(HAVE_CYGWIN) || defined(HAVE_OSF1_OS) || \
     defined(HAVE_LINUX_OS) || defined(HAVE_DARWIN_OS)
    (void)cfsetospeed(&my_data->newtio, DEFAULT_SPEED);
    (void)cfsetispeed(&my_data->newtio, DEFAULT_SPEED);

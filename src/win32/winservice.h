@@ -42,6 +42,8 @@ class upsService;
 #if (!defined(_win_upsSERVICE))
 #define _win_upsSERVICE
 
+#include "winhdrs.h"
+
 // The NT-specific code wrapper class
 class upsService
 {

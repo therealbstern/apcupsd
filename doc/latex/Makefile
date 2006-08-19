@@ -36,10 +36,10 @@ apcupsd: texcheck tex web html dvipdf
 
 tex:
 	cp -fp ${IMAGES}/hires/*.eps .
-	latex -interaction=batchmode apcupsd.tex	# initial run
-	latex -interaction=batchmode apcupsd.tex	# build the TOC
+	-latex -interaction=batchmode apcupsd.tex	# initial run
+	-latex -interaction=batchmode apcupsd.tex	# build the TOC
 	makeindex apcupsd.idx				# build the index
-	latex -interaction=batchmode apcupsd.tex	# incorporate the index
+	-latex -interaction=batchmode apcupsd.tex	# incorporate the index
 	rm -f *.eps
 
 pdf:
@@ -53,12 +53,11 @@ html:
 	rm -f *.eps *.png
 	cp ${IMAGES}/*.eps .
 	@rm -f next.*  
-	latex2html ${L2H_COMMON_OPTS} -noauto_link -no_subdir -split 0 \
+	latex2html ${L2H_COMMON_OPTS} -no_subdir -split 0 \
 		-nonavigation apcupsd >/dev/null
 	./translate_images.pl apcupsd.html
 	sed -e "s/HREF=\"apcupsd.html/HREF=\"/" apcupsd.html > manual.html
 	cp manual.html apcupsd.html
-	ln -sf apcupsd.html index.html
 	rm -f *.eps
 
 web:

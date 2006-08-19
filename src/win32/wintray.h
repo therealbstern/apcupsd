@@ -38,6 +38,7 @@ class upsMenu;
 #if (!defined(_win_upsMENU))
 #define _win_upsMENU
 
+#include "winhdrs.h"
 #include <lmcons.h>
 #include "winprop.h"
 #include "winabout.h"
@@ -66,8 +67,8 @@ protected:
         // Tray icon handling
         void AddTrayIcon();
         void DelTrayIcon();
-        void UpdateTrayIcon();
-        void SendTrayMsg(DWORD msg);
+        void UpdateTrayIcon(int battstat);
+        void SendTrayMsg(DWORD msg, int battstat);
 
         // Message handler for the tray window
         static LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
@@ -91,13 +92,11 @@ protected:
         HWND                    m_hwnd;
         HMENU                   m_hmenu;
         NOTIFYICONDATA          m_nid;
-        UINT                    m_balloon_timer;
 
         // The icon handles
         HICON                   m_online_icon;
         HICON                   m_onbatt_icon;
         HICON                   m_charging_icon;
-        HICON                   m_commlost_icon;
 };
 
 

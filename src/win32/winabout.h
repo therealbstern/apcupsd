@@ -28,9 +28,6 @@
 // Copyright (2000) Kern E. Sibbald
 //
 
-#include <windows.h>
-#include <stdio.h>
-#include <process.h>
 
 
 // upsAbout
@@ -41,6 +38,9 @@ class upsAbout;
 
 #if (!defined(_win_upsABOUT))
 #define _win_upsABOUT
+
+// Includes
+#include "winhdrs.h"
 
 // The upsAbout class itself
 class upsAbout

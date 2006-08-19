@@ -31,7 +31,7 @@
 
 // WinUPS header file
 
-#include <windows.h>
+#include "winhdrs.h"
 #include "winres.h"
 
 // Application specific messages
@@ -44,9 +44,6 @@
 #define WM_SRV_CLIENT_AUTHENTICATED     WM_USER+3
 #define WM_SRV_CLIENT_DISCONNECT        WM_USER+4
 
-// Message used to inform tray that a balloon tip was displayed
-#define WM_BALLOONSHOW                  WM_USER+5
-
 // Export the application details
 extern HINSTANCE        hAppInstance;
 extern const char       *szAppName;
@@ -54,8 +51,6 @@ extern DWORD            mainthreadId;
 
 // Main UPS server routine
 extern int ApcupsdAppMain(int service);
-
-extern void LogErrorMsg(char *msg);
 
 // Standard command-line flag definitions
 const char ApcupsdRunService[]            = "/service";
@@ -77,10 +72,9 @@ const char ApcupsdKillRunningCopy[]       = "/kill";
 
 const char ApcupsdShowHelp[]              = "/help";
 
-
-
 // Usage string
+#ifdef properties_implemented
+const char ApcupsdUsageText[] = "Apcupsd [/run] [/kill] [/install] [/remove] [/settings] [/defaultsettings] [/about] [/status] [/evetns]\n";
+#else
 const char ApcupsdUsageText[] = "Apcupsd [/run] [/kill] [/install] [/remove] [/about] [/status] [/events]\n";
-
-void LogErrorMsg(char *msg, char *fname, int lineno);
-#define log_error_message(msg) LogErrorMsg((msg), __FILE__, __LINE__)
+#endif

@@ -131,6 +131,7 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
    switch (ups->mode.type) {
    case BK:
    case SHAREBASIC:
+   case NETUPS:
       if (my_data->sp_flags & TIOCM_DTR) {
          BattFail = true;
       } else {

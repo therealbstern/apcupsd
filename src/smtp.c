@@ -58,7 +58,8 @@ UPSINFO *core_ups = &myUPS;
 # define MAXSTRING 254
 #endif
 
-static int s;
+static FILE *sfp;
+static FILE *rfp;
 
 static char *from_addr = NULL;
 static char *cc_addr = NULL;
@@ -72,31 +73,14 @@ static char my_hostname[MAXSTRING];
 /* Needed by lib/apcconfig.c */
 char argvalue[MAXSTRING];
 
-/* like fgets(3), but for a socket */
-static char *sockgets(char *buf, int len, int s)
-{
-   int i=0;
-
-   /* Inefficient, but simple */
-   while (i < len-1) {
-      if (recv(s, buf+i, 1, 0) != 1)
-         break;
-      i++;
-      if (buf[i-1] == '\n')
-         break;
-   }
-   buf[i] = '\0';
-   return i==0 ? NULL : buf;
-}
-
 /* examine message from server */
 static void get_response(void)
 {
    char buf[MAXSTRING];
 
-   Dmsg0(50, "Calling sockgets on read socket.\n");
+   Dmsg0(50, "Calling fgets on read socket rfp.\n");
 
-   while (sockgets(buf, sizeof(buf), s)) {
+   while (fgets(buf, sizeof(buf), rfp)) {
       buf[strlen(buf) - 1] = 0;
       Dmsg2(10, "%s --> %s\n", mailhost, buf);
 
@@ -110,38 +94,20 @@ static void get_response(void)
    }
 }
 
-/* like vfprintf(3), but for a socket */
-static void vsockwrite(int s, const char *fmt, va_list ap)
-{
-   static char temp[MAXSTRING];
-
-   avsnprintf(temp, sizeof(temp), fmt, ap);
-   send(s, temp, strlen(temp), 0);
-}
-
-/* like fprintf(3), but for a socket */
-static void sockwrite(int s, const char *fmt, ...)
-{
-   va_list ap;
-
-   va_start(ap, fmt);
-   vsockwrite(s, fmt, ap);
-   va_end(ap);
-}
-
 /* say something to server and check the response */
 static void chat(char *fmt, ...)
 {
    va_list ap;
 
    va_start(ap, fmt);
-   vsockwrite(s, fmt, ap);
+   vfprintf(sfp, fmt, ap);
    if (debug_level >= 10) {
       fprintf(stdout, "%s --> ", my_hostname);
       vfprintf(stdout, fmt, ap);
    }
    va_end(ap);
 
+   fflush(sfp);
    if (debug_level >= 10)
       fflush(stdout);
 
@@ -171,7 +137,7 @@ int main(int argc, char *argv[])
    char buf[MAXSTRING];
    struct sockaddr_in sin;
    struct hostent *hp;
-   int i, ch;
+   int s, r, i, ch;
    struct passwd *pwd;
    char *cp, *p;
    time_t now = time(NULL);
@@ -240,16 +206,12 @@ int main(int argc, char *argv[])
          mailhost = "localhost";
    }
 
-#ifdef HAVE_WIN32
-   WSA_Init();
-#endif
-
    /*
     *  Find out my own host name for HELO; 
     *  if possible, get the fully qualified domain name
     */
-   if (gethostname(my_hostname, sizeof(my_hostname) - 1) == -1) {
-      Pmsg2(0, "Fatal gethostname error: %s ERR=%s\n", my_hostname, strerror(errno));
+   if (gethostname(my_hostname, sizeof(my_hostname) - 1) < 0) {
+      Pmsg1(0, "Fatal gethostname error: ERR=%s\n", strerror(errno));
       exit(1);
    }
 
@@ -310,6 +272,21 @@ hp:
 
    Dmsg0(20, "Connected\n");
 
+   if ((r = dup(s)) < 0) {
+      Pmsg1(0, "Fatal dup error: ERR=%s\n", strerror(errno));
+      exit(1);
+   }
+
+   if ((sfp = fdopen(s, "w")) == 0) {
+      Pmsg1(0, "Fatal fdopen error: ERR=%s\n", strerror(errno));
+      exit(1);
+   }
+
+   if ((rfp = fdopen(r, "r")) == 0) {
+      Pmsg1(0, "Fatal fdopen error: ERR=%s\n", strerror(errno));
+      exit(1);
+   }
+
    /* Send SMTP headers */
    get_response();                 /* banner */
    chat("helo %s\r\n", my_hostname);
@@ -327,43 +304,43 @@ hp:
    chat("data\r\n");
 
    /* Send message header */
-   sockwrite(s, "From: %s\r\n", from_addr);
+   fprintf(sfp, "From: %s\r\n", from_addr);
    if (subject)
-      sockwrite(s, "Subject: %s\r\n", subject);
+      fprintf(sfp, "Subject: %s\r\n", subject);
 
    if (reply_addr)
-      sockwrite(s, "Reply-To: %s\r\n", reply_addr);
+      fprintf(sfp, "Reply-To: %s\r\n", reply_addr);
 
    if (err_addr)
-      sockwrite(s, "Errors-To: %s\r\n", err_addr);
+      fprintf(sfp, "Errors-To: %s\r\n", err_addr);
 
    if ((pwd = getpwuid(getuid())) == 0)
-      sockwrite(s, "Sender: userid-%d@%s\r\n", (int)getuid(), my_hostname);
+      fprintf(sfp, "Sender: userid-%d@%s\r\n", (int)getuid(), my_hostname);
    else
-      sockwrite(s, "Sender: %s@%s\r\n", pwd->pw_name, my_hostname);
+      fprintf(sfp, "Sender: %s@%s\r\n", pwd->pw_name, my_hostname);
 
-   sockwrite(s, "To: %s", argv[0]);
+   fprintf(sfp, "To: %s", argv[0]);
    for (i = 1; i < argc; i++)
-      sockwrite(s, ",%s", argv[i]);
-   sockwrite(s, "\r\n");
+      fprintf(sfp, ",%s", argv[i]);
+   fprintf(sfp, "\r\n");
 
    if (cc_addr)
-      sockwrite(s, "Cc: %s\r\n", cc_addr);
+      fprintf(sfp, "Cc: %s\r\n", cc_addr);
 
    /* Add RFC822 date */
    localtime_r(&now, &tm);
    strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S %z", &tm);
-   sockwrite(s, "Date: %s\r\n", buf);
+   fprintf(sfp, "Date: %s\r\n", buf);
 
-   sockwrite(s, "\r\n");
+   fprintf(sfp, "\r\n");
 
    /* Send message body */
    while (fgets(buf, sizeof(buf), stdin)) {
       buf[strlen(buf) - 1] = 0;
       if (strcmp(buf, ".") == 0)   /* quote lone dots */
-         sockwrite(s, "..\r\n");
+         fprintf(sfp, "..\r\n");
       else                         /* pass body through unchanged */
-         sockwrite(s, "%s\r\n", buf);
+         fprintf(sfp, "%s\r\n", buf);
    }
 
    /* Send SMTP quit command */

@@ -74,72 +74,6 @@ void clean_threads(void)
    }
 }
 
-#ifdef HAVE_MINGW
-int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
-{
-   char cmdline[MAXSTRING];
-   char *comspec;
-   PROCESS_INFORMATION procinfo;
-   STARTUPINFOA startinfo;
-   BOOL rc;
-   char apccontrol[strlen(APCCONTROL)+1];
-
-   if (cmd.pid && (kill(cmd.pid, 0) == 0)) {
-      /*
-       * Command is already running. No point in running it two
-       * times.
-       */
-      return SUCCESS;
-   }
-
-   /* Find command interpreter */
-   comspec = getenv("COMSPEC");
-   if (comspec == NULL)
-      return FAILURE;
-
-   /* HACK! The APCCONTROL constant is currently using UNIX slashes */
-   conv_unix_to_win32_path(APCCONTROL, apccontrol, sizeof(apccontrol));
-
-   /* Build the command line */
-   asnprintf(cmdline, sizeof(cmdline), "\"%s\" /c %s %s \"%s\" %d %d",
-      comspec, apccontrol, cmd.command, ups->upsname,
-      !ups->is_slave(), ups->is_plugged());
-
-   /* Initialize the STARTUPINFOA structto hide the console window */
-   memset(&startinfo, 0, sizeof(startinfo));
-   startinfo.cb = sizeof(startinfo);
-   startinfo.dwFlags = STARTF_USESHOWWINDOW;
-   startinfo.wShowWindow = SW_HIDE;
-
-   Dmsg1(200, "execute_command: CreateProcessA(NULL, %s, ...)\n", cmdline);
-
-   /* Execute the process */
-   rc = CreateProcessA(NULL,
-                       cmdline, // command line
-                       NULL, // process security attributes
-                       NULL, // primary thread security attributes
-                       TRUE, // handles are inherited
-                       0,    // creation flags
-                       NULL, // use parent's environment
-                       NULL, // use parent's current directory
-                       &startinfo, // STARTUPINFO pointer
-                       &procinfo); // receives PROCESS_INFORMATION
-   if (!rc) {
-      log_event(ups, LOG_WARNING, "execute failed: CreateProcessA(NULL, %s, ...)=%d\n",
-         cmdline, GetLastError());
-      return FAILURE;
-   }
-
-   /* Extract pid */
-   cmd.pid = procinfo.dwProcessId;
-
-   /* Don't need handles */
-   CloseHandle(procinfo.hProcess);
-   CloseHandle(procinfo.hThread);
-
-   return SUCCESS;
-}
-#else
 int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
 {
    char *argv[6];
@@ -203,4 +137,3 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
 
    return SUCCESS;
 }
-#endif /* HAVE_MINGW */

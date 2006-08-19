@@ -13,7 +13,8 @@
  */
 
 /*
- * Copyright (C) 1999-2006 Kern Sibbald
+ * Copyright (C) 1999 Kern Sibbald
+ * Copyright (C) 1996-99 Andre M. Hedrick <andre@suse.com>
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of version 2 of the GNU General
@@ -42,11 +43,6 @@ struct sockaddr_in tcp_serv_addr;  /* socket information */
 int net_errno = 0;                 /* error number -- not yet implemented */
 char *net_errmsg = NULL;           /* pointer to error message */
 char net_errbuf[256];              /* error message buffer for messages */
-
-
-#ifdef HAVE_MINGW
-#define close(fd)           closesocket(fd)
-#endif
 
 
 /*
@@ -99,7 +95,7 @@ static int read_nbytes(int fd, char *ptr, int nbytes)
             return (-1);           /* error */
          }
 #endif
-         nread = recv(fd, ptr, nleft, 0);
+         nread = read(fd, ptr, nleft);
       } while (nread == -1 && (errno == EINTR || errno == EAGAIN));
 
       if (nread <= 0) {
@@ -133,7 +129,7 @@ static int write_nbytes(int fd, char *ptr, int nbytes)
        */
       fcntl(fd, F_SETFL, fcntl(fd, F_GETFL));
 #endif
-      nwritten = send(fd, ptr, nleft, 0);
+      nwritten = write(fd, ptr, nleft);
 
       if (nwritten <= 0) {
          net_errno = errno;
@@ -272,7 +268,7 @@ int net_open(char *host, char *service, int port)
    fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFL));
 #endif
 
-   if (connect(sockfd, (struct sockaddr *)&tcp_serv_addr, sizeof(tcp_serv_addr)) == -1) {
+   if (connect(sockfd, (struct sockaddr *)&tcp_serv_addr, sizeof(tcp_serv_addr)) < 0) {
       asnprintf(net_errbuf, sizeof(net_errbuf),
          _("tcp_open: cannot connect to server %s on port %d.\n"
         "ERR=%s\n"), host, port, strerror(errno));
@@ -287,6 +283,10 @@ int net_open(char *host, char *service, int port)
 /* Close the network connection */
 void net_close(int sockfd)
 {
+   short pktsiz = 0;
+
+   /* send EOF sentinel */
+   write_nbytes(sockfd, (char *)&pktsiz, sizeof(short));
    close(sockfd);
 }
 
@@ -297,12 +297,7 @@ void net_close(int sockfd)
  */
 int net_accept(int fd, struct sockaddr_in *cli_addr)
 {
-#ifdef HAVE_MINGW                                       
-   /* kludge because some idiot defines socklen_t as unsigned */
-   int clilen = sizeof(*cli_addr);
-#else
    socklen_t clilen = sizeof(*cli_addr);
-#endif
    int newfd;
 
 #if defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS

@@ -94,6 +94,7 @@ int output_status(UPSINFO *ups, int sockfd,
    switch (ups->mode.type) {
    case BK:
    case SHAREBASIC:
+   case NETUPS:
       if (!ups->is_onbatt()) {
          s_write(ups, "LINEFAIL : OK\n");
          s_write(ups, "BATTSTAT : OK\n");
@@ -155,7 +156,6 @@ int output_status(UPSINFO *ups, int sockfd,
    case DUMB_UPS:
    case NETWORK_UPS:
    case SNMP_UPS:
-   case PCNET_UPS:
       status[0] = 0;
 
       /* Now output human readable form */
@@ -421,9 +421,6 @@ int output_status(UPSINFO *ups, int sockfd,
       if (ups->UPS_Cap[CI_NOMOUTV])
          s_write(ups, "NOMOUTV  : %03d\n", ups->NomOutputVoltage);
 
-      if (ups->UPS_Cap[CI_NOMINV])
-         s_write(ups, "NOMINV   : %03d\n", ups->NomInputVoltage);
-
       if (ups->UPS_Cap[CI_NOMBATTV])
          s_write(ups, "NOMBATTV : %5.1f\n", ups->nombattv);
 
@@ -484,7 +481,7 @@ void stat_print(UPSINFO *ups, char *fmt, ...)
    va_end(arg_ptr);
 }
 
-#if defined(HAVE_WIN32)
+#ifdef HAVE_CYGWIN
 
 #include <windows.h>
 
@@ -496,7 +493,7 @@ void stat_print(UPSINFO *ups, char *fmt, ...)
 
 extern int shm_OK;
 static char buf[MAXSTRING];
-int battstat = -1;
+int battstat = 0;
 static HWND dlg_hwnd = NULL;
 static int dlg_idlist = 0;
 
@@ -510,24 +507,22 @@ char *ups_status(int stat)
    UPSINFO *ups = core_ups;
 
    if (!shm_OK) {
-      battstat = -1;
-      return "INITIALIZING";
+      battstat = 0;
+      astrncpy(buf, "not initialized", sizeof(buf));
+      return buf;
    }
 
-   read_lock(ups);
-
-   if (ups->is_onbatt())
-      battstat = 0;
-   else if (ups->UPS_Cap[CI_BATTLEV])
-      battstat = (int)ups->BattChg;
-   else
+   if (!ups->is_onbatt())
       battstat = 100;
+   else
+      battstat = 0;
 
    astrncpy(buf, "Status not available", sizeof(buf));
 
    switch (ups->mode.type) {
    case BK:
    case SHAREBASIC:
+   case NETUPS:
    case BKPRO:
    case VS:
       if (!ups->is_onbatt()) {
@@ -566,26 +561,14 @@ char *ups_status(int stat)
          astrncat(buf, "LOWBATT ", sizeof(buf));
       if (ups->is_replacebatt())
          astrncat(buf, "REPLACEBATT ", sizeof(buf));
-      if (!ups->is_battpresent())
-         astrncat(buf, "NOBATT ", sizeof(buf));
-
-      // This overrides the above
-      if (ups->is_commlost()) {
-         astrncpy(buf, "COMMLOST", sizeof(buf));
-         battstat = -1;
-      }
-
+      if (!ups->is_onbatt() && ups->UPS_Cap[CI_BATTLEV])
+         battstat = (int)ups->BattChg;
       break;
    }
 
-   // This overrides the above
-   if (ups->is_shutdown())
-      astrncpy(buf, "SHUTTING DOWN", sizeof(buf));
-
-   read_unlock(ups);
-
    return buf;
 }
+
 
 static void stat_list(UPSINFO *ups, char *fmt, ...)
 {
@@ -612,4 +595,4 @@ void FillStatusBox(HWND hwnd, int id_list)
    output_status(ups, 0, stat_open, stat_list, stat_close);
 }
 
-#endif   /* HAVE_WIN32 */
+#endif   /* HAVE_CYGWIN */

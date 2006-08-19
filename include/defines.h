@@ -26,9 +26,9 @@
 #ifndef _DEFINES_H
 #define _DEFINES_H
 
-#ifndef APCCONTROL
-# define APCCONTROL              SYSCONFDIR "/apccontrol"
-#endif
+#define CORENAME "*Core*"
+
+#define APCCONTROL              SYSCONFDIR "/apccontrol"
 
 #ifndef APCCONF
 # define APCCONF                SYSCONFDIR "/apcupsd.conf"
@@ -66,10 +66,21 @@
 #define MAXSTRING               256
 #define MESSAGELEN              256
 #define MAXTOKENLEN             100
+#define MAXSLAVES               20
 #define UPSNAMELEN              100
 
 #define DEFAULT_SPEED           B2400
 
+/*
+ * These are for UPS internal test routines.
+ * They are all != 0 because this way there will be no
+ * risk of confusing these statuses as boolean values:
+ * they are all a boolean true.
+ */
+#define UPS_TEST_PASSED         0x01
+#define UPS_TEST_FAILED         0x02
+#define UPS_TEST_INPROGRESS     0x03
+#define UPS_TEST_ACTIVATED      0x04
 
 /* bit values for APC UPS Status Byte (ups->Status) */
 #define UPS_calibration   0x00000001
@@ -86,6 +97,9 @@
 #define UPS_shutdown      0x00000200    /* Shutdown in progress */
 #define UPS_slave         0x00000400    /* Set if this is a slave */
 #define UPS_slavedown     0x00000800    /* Slave not responding */
+#define UPS_shutdownimm   0x00001000    /* Shutdown imminent */
+#define UPS_belowcaplimit 0x00002000    /* Below battery capacity limit */
+#define UPS_remtimelimit  0x00004000    /* Remaining run time limit exceeded */
 #define UPS_onbatt_msg    0x00020000    /* Set when UPS_ONBATT message is sent */
 #define UPS_fastpoll      0x00040000    /* Set on power failure to poll faster */
 #define UPS_shut_load     0x00080000    /* Set when BatLoad <= percent */
@@ -98,8 +112,7 @@
 #define UPS_battpresent   0x04000000    /* Indicates if battery is connected */
 
 #define UPS_LOCAL_BITS (UPS_commlost|UPS_shutdown|UPS_slave|UPS_slavedown| \
-            UPS_onbatt_msg|UPS_fastpoll|UPS_plugged|UPS_dev_setup| \
-            UPS_shut_load|UPS_shut_btime|UPS_shut_ltime|UPS_shut_emerg)
+            UPS_onbatt_msg|UPS_fastpoll|UPS_plugged|UPS_dev_setup)
 
 /*
  * CI_ is Capability or command index
@@ -199,58 +212,86 @@
 #define CI_ST_TIME             40       /* hours since last self test */
 #define    APC_CMD_ST_TIME        'd'
 #define CI_Manufacturer                  41
+#define    APC_CMD_MANUFACTURER           0
 #define CI_ShutdownRequested             42
+#define    APC_CMD_ShutdownRequested      0
 #define CI_ShutdownImminent              43
+#define    APC_CMD_ShutdownImminent       0
 #define CI_DelayBeforeReboot             44
+#define    APC_CMD_DelayBeforeReboot      0
 #define CI_BelowRemCapLimit              45
+#define    APC_CMD_BelowRemCapLimit       0
 #define CI_RemTimeLimitExpired           46
+#define    APC_CMD_RemTimeLimitExpired    0
 #define CI_Charging                      47
+#define    APC_CMD_Charging               0
 #define CI_Discharging                   48
+#define    APC_CMD_Discharging            0
 #define CI_RemCapLimit                   49
+#define    APC_CMD_RemCapLimit            0
 #define CI_RemTimeLimit                  50
+#define    APC_CMD_RemTimeLimit           0
 #define CI_WarningCapacityLimit          51
+#define    APC_CMD_WarningCapacityLimit   0
 #define CI_CapacityMode                  52
+#define    APC_CMD_CapacityMode           0
 #define CI_BattPackLevel                 53
+#define    APC_CMD_BattPackLevel          0
 #define CI_CycleCount                    54
+#define    APC_CMD_CycleCount             0
 #define CI_ACPresent                     55
+#define    APC_CMD_ACPresent              0
 #define CI_Boost                         56
+#define    APC_CMD_Boost                  0
 #define CI_Trim                          57
+#define    APC_CMD_Trim                   0
 #define CI_Overload                      58
+#define    APC_CMD_Overload               0
 #define CI_NeedReplacement               59
+#define    APC_CMD_NeedReplacement        0
 #define CI_BattReplaceDate               60
+#define    APC_CMD_BattReplaceDate        0
 #define CI_APCForceShutdown              61
+#define    APC_CMD_ForceShutdown          0
 #define CI_DelayBeforeShutdown           62
+#define    APC_CMD_DelayBeforeShutdown    0
 #define CI_APCDelayBeforeStartup         63
+#define    APC_CMD_DelayBeforeStartup     0
 #define CI_APCDelayBeforeShutdown        64
+#define    APC_CMD_DelayBeforeShutdown    0
 #define CI_APCLineFailCause              65
-#define CI_NOMINV                        66
+#define    APC_CMD_LineFailCause          0
 
 /* Only seen on the BackUPS Pro USB (so far) */
-#define CI_BUPBattCapBeforeStartup       67
-#define CI_BUPDelayBeforeStartup         68
-#define CI_BUPSelfTest                   69
-#define CI_BUPHibernate                  70
+#define CI_BUPBattCapBeforeStartup       66
+#define    BUP_CMD_BattCapBeforeStartup   0
+#define CI_BUPDelayBeforeStartup         67
+#define    BUP_CMD_DelayBeforeStartup     0
+#define CI_BUPSelfTest                   68
+#define    BUP_CMD_SelfTest               0
+#define CI_BUPHibernate                  69
+#define    BUP_CMD_Hibernate              0
 
 /*
  * We don't actually handle these, but use them as a signal
  * to re-examine the other UPS data items. (USB only)
  */
-#define CI_IFailure                      71  /* Internal failure */
-#define CI_PWVoltageOOR                  72  /* Power sys voltage out of range */
-#define CI_PWFrequencyOOR                73  /* Power sys frequency out of range */
-#define CI_OverCharged                   74  /* Battery overcharged */
-#define CI_OverTemp                      75  /* Over temperature */
-#define CI_CommunicationLost             76  /* USB comms with subsystem lost */
-#define CI_ChargerVoltageOOR             77  /* Charger voltage our of range */
-#define CI_ChargerCurrentOOR             78  /* Charger current our of range */
-#define CI_CurrentNotRegulated           79  /* Charger current not regulated */
-#define CI_VoltageNotRegulated           80  /* Charger voltage not regulated */
-#define CI_BatteryPresent                81  /* Battery is present */
+#define CI_IFailure                      70  /* Internal failure */
+#define CI_PWVoltageOOR                  71  /* Power sys voltage out of range */
+#define CI_PWFrequencyOOR                72  /* Power sys frequency out of range */
+#define CI_OverCharged                   73  /* Battery overcharged */
+#define CI_OverTemp                      74  /* Over temperature */
+#define CI_CommunicationLost             75  /* USB comms with subsystem lost */
+#define CI_ChargerVoltageOOR             76  /* Charger voltage our of range */
+#define CI_ChargerCurrentOOR             77  /* Charger current our of range */
+#define CI_CurrentNotRegulated           78  /* Charger current not regulated */
+#define CI_VoltageNotRegulated           79  /* Charger voltage not regulated */
+#define CI_BatteryPresent                80  /* Battery is present */
 
 /* Items below this line are not "probed" for */
-#define CI_CYCLE_EPROM         82       /* Cycle programmable EPROM values */
+#define CI_CYCLE_EPROM         81       /* Cycle programmable EPROM values */
 #define    APC_CMD_CYCLE_EPROM    '-'
-#define CI_UPS_CAPS            83       /* Get UPS capabilities (command) string */
+#define CI_UPS_CAPS            82       /* Get UPS capabilities (command) string */
 #define    APC_CMD_UPS_CAPS       'a'
 /* ^^^^^^^^^^ see below if you change this ^^^^^^ */
 
@@ -315,6 +356,11 @@
 #define TIMER_FAST              1  /* Value for fast poll */
 #define TIMER_DUMB              5  /* for Dumb (ioctl) UPSes -- keep short */
 
+#define MASTER_TIMEOUT        120  /* master must respond in this time */
+
+/* Old net code will be obsoleted sometime. */
+#define TIMER_SLAVES            10
+
 /* Make the size of these strings the next multiple of 4 */
 #define APC_MAGIC               "apcupsd-linux-6.0"
 #define APC_MAGIC_SIZE          4 * ((sizeof(APC_MAGIC) + 3) / 4)
@@ -322,6 +368,30 @@
 #define ACCESS_MAGIC            "apcaccess-linux-4.0"
 #define ACCESS_MAGIC_SIZE       4 * ((sizeof(APC_MAGIC) + 3) / 4)
 
+/* These are the remote_state for networked master/slaves */
+
+/*
+ * The first 5 are from the original protocol. Later states apply to the
+ * master only and should be hidden from the slave to preserve
+ * backwards compatibility
+ */
+#define RMT_NOTCONNECTED        0
+#define RMT_CONNECTED           1
+#define RMT_RECONNECT           2
+#define RMT_ERROR               3
+#define RMT_DOWN                4
+
+/* Master only internal states */
+
+/* Convert these to RMT_NOTCONNECTED when sending to slave */
+#define RMT_CONNECTING1         5
+#define RMT_CONNECTING2         6
+#define RMT_CONNECTING3         7
+
+/* Convert these to RMT_RECONNECT when sending to slave */
+#define RMT_RECONNECTING1       8
+#define RMT_RECONNECTING2       9
+#define RMT_RECONNECTING3      10
 
 #define MAX_THREADS             7
 
@@ -358,6 +428,17 @@
 #define CMDOFFBATTERY    19        /* off battery power */
 #define CMDBATTDETACH    20        /* Battery disconnected */
 #define CMDBATTATTACH    21        /* Battery reconnected */
+
+/* NetCodes for numeric chatting. */
+#define NETCODENUL          100
+#define NETCODEQUIT         101
+#define NETCODERETRY        102
+#define NETCODEOK           200
+#define NETCODEURG          201
+#define NETCODENOERR        202
+#define NETCODEDONE         203
+#define NETCODEERR          300
+#define NETCODEINACT        301
 
 
 /*
@@ -436,5 +517,6 @@ void d_msg(const char *file, int line, int level, const char *fmt, ...);
 /* Determine the difference, in milliseconds, between two struct timevals. */
 #define TV_DIFF_MS(a, b) \
     (((b).tv_sec - (a).tv_sec) * 1000 + ((b).tv_usec - (a).tv_usec) / 1000)
+
 
 #endif   /* _DEFINES_H */

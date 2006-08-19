@@ -25,7 +25,7 @@
 // by Kern E. Sibbald.  Many thanks to ATT and James Weatherall,
 // the original author, for providing an excellent template.
 //
-// Copyright (2000-2006) Kern E. Sibbald
+// Copyright (2000-2005) Kern E. Sibbald
 //     20 July 2000
 //
 
@@ -36,25 +36,16 @@
 
 // winmain.cpp for win32 version of apcupsd
 
-#ifdef HAVE_MINGW
-#include "compat.h"
-#include "winconfig.h"
-#include "winapi.h"
-#undef STRICT
-#else
-#include "config.h"
-extern "C" void syslog(int type, const char *fmt, ...);
-#endif
-
 ////////////////////////////
 // System headers
 #include <unistd.h>
-#include <windows.h>
+#include "winhdrs.h"
 #include <lmcons.h>
 #include <ctype.h>
 #include <signal.h>
 #include <pthread.h>
 #include <errno.h>
+#include "config.h"
 #include "defines.h"
 
 extern int ApcupsdMain(int argc, char **argv);
@@ -96,11 +87,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    char *szCmdLine = CmdLine;
    char *wordPtr, *tempPtr;
    int i, quote;
-
-#ifdef HAVE_MINGW
-   InitWinAPIWrapper();
-   WSA_Init();
-#endif
 
    // Save the application instance and main thread id
    hAppInstance = hInstance;
@@ -366,17 +352,14 @@ int ApcupsdAppMain(int service)
    if (service) {
       /* Zap any left over no login file and powerfail file */
       if (unlink(NOLOGIN) != 0 && errno != ENOENT) {
-         syslog(0, "Could not unlink " NOLOGIN ": ERR=%s\n", strerror(errno));
+         syslog(0, "Could not unlink %s. ERR=%s\n", NOLOGIN, strerror(errno));
       }
       if (unlink(PWRFAIL) != 0 && errno != ENOENT) {
-         syslog(0, "Could not unlink " PWRFAIL ": ERR=%s\n", strerror(errno));
+         syslog(0, "Could not unlink %s. ERR=%s\n", PWRFAIL, strerror(errno));
       }
    }
    // Call the "real" apcupsd
    ApcupsdMain(num_command_args, command_args);
    PostQuitMessage(0);
-#ifdef HAVE_MINGW
-   WSACleanup();
-#endif
    _exit(0);
 }

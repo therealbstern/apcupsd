@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright (C) 2001-2006 Kern Sibbald
+ * Copyright (C) 2001-2004 Kern Sibbald
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of version 2 of the GNU General
@@ -381,7 +381,8 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
 
    Dmsg2(100, "Got Status = %s 0x%x\n", answer, ups->Status);
 
-   if (masterStatus & UPS_shutdown) {
+   if (masterStatus & (UPS_shutdown | UPS_shutdownimm |
+                       UPS_belowcaplimit | UPS_remtimelimit)) {
       ups->set_shut_remote();    /* if master is shutting down so do we */
       log_event(ups, LOG_ERR, "Shutdown because NIS master is shutting down.");
       Dmsg0(100, "Set SHUT_REMOTE because of master status.\n");

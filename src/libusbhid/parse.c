@@ -26,20 +26,24 @@
  * SUCH DAMAGE.
  */
 
+#include <sys/cdefs.h>
+
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 #include <sys/time.h>
 
+#include <dev/usb/usb.h>
+#include <dev/usb/usbhid.h>
+
 #include "usbhid.h"
 #include "usbvar.h"
-#include "usbcompat.h"
 
 #define MAXUSAGE 100
 struct hid_data {
-	unsigned char *start;
-   unsigned char *end;
-   unsigned char *p;
+	u_char *start;
+	u_char *end;
+	u_char *p;
 	hid_item_t cur;
 	unsigned int usages[MAXUSAGE];
 	int nusage;
@@ -55,7 +59,7 @@ struct hid_data {
 	 * it until we know the ID.
 	 */
 	hid_item_t savedcoll;
-   unsigned char hassavedcoll;
+	u_char hassavedcoll;
 	/*
 	 * Absolute data position (bits) for input/output/feature.
 	 *  Assumes that hid_input, hid_output and hid_feature have
@@ -316,7 +320,7 @@ hid_get_item_raw(hid_data_t s, hid_item_t *h)
 				c->logical_maximum = dval;
 				break;
 			case 3:
-				c->physical_minimum = dval;
+				c->physical_maximum = dval;
 				break;
 			case 4:
 				c->physical_maximum = dval;

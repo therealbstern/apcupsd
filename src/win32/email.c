@@ -11,10 +11,9 @@
 #include   <mapi.h>
 #include   <stdio.h>
 
-#ifndef HAVE_MINGW
 extern void mainCRTStartup();
+
 void WinMainCRTStartup() { mainCRTStartup(); }
-#endif
 
 int main(int argc, char **argv)
 {

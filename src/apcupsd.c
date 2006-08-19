@@ -274,18 +274,71 @@ int main(int argc, char *argv[])
       }
    }
 
-   setup_device(ups);
+   switch (ups->sharenet.type) {
+   case DISABLE:
+   case SHARE:
+      setup_device(ups);
+      break;
 
-   if (kill_ups_power) {
-      kill_power(ups);
-      apcupsd_terminate(0);
+   case NET:
+      switch (ups->upsclass.type) {
+      case NO_CLASS:
+      case STANDALONE:
+      case SHARESLAVE:
+      case SHAREMASTER:
+      case SHARENETMASTER:
+         break;
+      case NETSLAVE:
+         if (kill_ups_power)
+            Error_abort0(_("Ignoring killpower for slave\n"));
+         ups->set_slave();
+         setup_device(ups);
+         if (prepare_slave(ups))
+            Error_abort0(_("Error setting up slave\n"));
+         break;
+      case NETMASTER:
+         setup_device(ups);
+         if ((kill_ups_power == 0) && (prepare_master(ups)))
+            Error_abort0("Error setting up master\n");
+         break;
+      default:
+         Error_abort1(_("NET Class Error %s\n\a"), strerror(errno));
+      }
+      break;
+
+   case SHARENET:
+      setup_device(ups);
+      if ((kill_ups_power == 0) && (prepare_master(ups)))
+         Error_abort0("Error setting up master.\n");
+      break;
+
+   default:
+      Error_abort0(_("Unknown share net type\n"));
    }
 
-   prep_device(ups);
+   if (kill_ups_power) {
+      if (!ups->is_slave())
+         kill_power(ups);
+      else
+         kill_net(ups);
+
+      apcupsd_terminate(0);
+   }
 
    if (create_lockfile(ups) == LCKERROR) {
       Error_abort1(_("Failed to reacquire serial port lock file on device %s\n"),
          ups->device);
+   }
+
+   if (!ups->is_slave()) {
+      prep_device(ups);
+      /*
+       * This isn't a documented option but can be used
+       * for testing dumb mode on a SmartUPS if you have
+       * the proper cable.
+       */
+      if (dumb_mode_test)
+         device_entry_point(ups, DEVICE_CMD_SET_DUMB_MODE, NULL);
    }
 
    shm_OK = 1;
@@ -296,18 +349,32 @@ int main(int argc, char *argv[])
     * on write locks and up to date data in the shared structure.
     */
 
+   if (slave_count) {
+      /* we are the netmaster */
+      start_thread(ups, do_slaves, "apcmst", argv[0]);
+      Dmsg0(10, "Netmaster thread started.\n");
+   }
+
    /* Network status information server */
    if (ups->netstats) {
       start_thread(ups, do_server, "apcnis", argv[0]);
       Dmsg0(10, "NIS thread started.\n");
    }
 
-   log_event(ups, LOG_INFO,
+   log_event(ups, LOG_WARNING,
       "apcupsd " APCUPSD_RELEASE " (" ADATE ") " APCUPSD_HOST " startup succeeded");
 
-   /* main processing loop */
-   do_device(ups);
-
+   /*
+    * If we have threads, we simply go there rather
+    * than creating a thread.
+    */
+   if (!ups->is_slave()) {
+      /* serial port reading and report generation -- apcserial.c */
+      do_device(ups);
+   } else {
+      /* we are a slave -- thus the net is our "serial port" */
+      do_net(ups);
+   }
    apcupsd_terminate(0);
    return 0;                       /* to keep compiler happy */
 }
@@ -320,7 +387,7 @@ extern int debug_level;
  */
 static void daemon_start(void)
 {
-#if !defined(HAVE_WIN32)
+#ifndef HAVE_CYGWIN
    int i, fd;
    pid_t cpid;
    mode_t oldmask;
@@ -338,21 +405,16 @@ static void daemon_start(void)
 
    /*
     * In the PRODUCTION system, we close ALL file descriptors unless
-    * debugging is on then we leave stdin, stdout, and stderr open.
+    * debugging is on then we laeve stdin, stdout, and stderr open.
     * We also take care to leave the trace fd open if tracing is on.
-    * Furthermore, if tracing we redirect stdout and stderr to the
-    * trace log.
     */
    for (i=0; i<sysconf(_SC_OPEN_MAX); i++) {
-      if (debug_level && i == STDIN_FILENO)
+      if (debug_level && (i == STDIN_FILENO ||
+           i == STDOUT_FILENO || i == STDERR_FILENO))
          continue;
       if (trace_fd && i == fileno(trace_fd))
          continue;
-      if (debug_level && (i == STDOUT_FILENO || i == STDERR_FILENO)) {
-         if (trace_fd)
-            dup2(fileno(trace_fd), i);
-         continue;
-      }
+
       close(i);
    }
 
@@ -380,5 +442,5 @@ static void daemon_start(void)
       for (i = 1; fd + i <= 2; i++)
          dup2(fd, fd + i);
    }
-#endif   /* HAVE_WIN32 */
+#endif   /* HAVE_CYGWIN */
 }

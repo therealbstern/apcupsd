@@ -4,7 +4,7 @@
  *
  * This C file is derived from the PowerNet-MIB module.
  *
- * $Id: powernet-mib-mgr.c,v 1.8 2006-06-03 02:03:43 adk0212 Exp $
+ * $Id: powernet-mib-mgr.c,v 1.7.4.1 2006-05-30 22:57:48 adk0212 Exp $
  */
 
 #include "apc.h"

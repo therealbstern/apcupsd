@@ -163,6 +163,7 @@
 #undef HAVE_SUN_OS
 #undef HAVE_AIX_OS
 #undef HAVE_SGI_OS
+#undef HAVE_CYGWIN
 #undef HAVE_OSF1_OS
 #undef HAVE_OPENSERVER_OS
 #undef HAVE_DARWIN_OS
@@ -212,9 +213,6 @@
 
 /* Set if you want TEST driver */
 #undef HAVE_TEST_DRIVER
-
-/* Set if you want PCNET driver */
-#undef HAVE_PCNET_DRIVER
 
 /* Set if you want the old master/slave network code */
 #undef HAVE_OLDNET
@@ -471,4 +469,5 @@
 #undef HAVE_LIBXNET
 
 #undef HAVE_NANOSLEEP
-#undef int32_t
+
+#undef HAVE_USLEEP

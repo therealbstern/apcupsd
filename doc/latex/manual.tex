@@ -165,14 +165,15 @@ big server farm.  Under those circumstances, it may not be possible or even
 desirable to pair a UPS with every single machine.  apcupsd supports some
 alternate arrangements.  
 
-The second type of configuration is the NIS (Network Information Server)
-server and client.  In this configuration, where one UPS powers several
-computers, a copy of apcupsd running one one computer will act as a
-server while the other(s) will act as network clients which poll the
-server for information about the UPS.  Note that ``NIS" is \emph{not}
-related to Sun's directory service also called ``NIS" or ``Yellow
-Pages''.  In addition NIS server and client there is an alternative,
-depricated, master/slave network configuration.
+The second type of configuration is a master/slave configuration, where one
+UPS powers several computers, each of which runs a copy of apcupsd.  The
+computer that controls the UPS is called the master, and the other computers
+are called slaves.  The master copy of apcupsd communicates with and controls
+the slaves via an Ethernet connection.  This type of configuration may be
+appropriate for a small cluster of machines.  Some example configuration files
+for the master and the slave machines can be found in the examples directory
+of the source distribution.  The more recent examples are in
+master.apcupsd.conf and slave.apcupsd.conf.  
 
 The third configuration (new with version 3.8.3), is where a single computer
 controls multiple UPSes. In this case, there are several copies of apcupsd on
@@ -792,6 +793,7 @@ following:
        --enable-cgi \
        --with-css-dir=/var/www/docs/css \
        --with-log-dir=/etc/apcupsd \
+       --enable-pthreads \
        --enable-powerflute
 \end{verbatim}
 \normalsize
@@ -801,21 +803,6 @@ manuals in /usr/man, and the configuration and script files in /etc/apcupsd.
 In addition, if your system is recognized, certain files such as the startup
 script and the system halt script will be placed in appropriate system
 directories (usually subdirectories of /etc/rc.d). 
-
-\label{Installing-on-OSX}
-\subsubsection*{Installing on OS X/Darwin}
-\index{Installation!OS~X}
-\index{OS~X!Installation}
-
-On OS X (darwin), apcupsd can be built with \texttt{configure} defaults.
-The defaults for OS~X build \texttt{{---}disable-usb}, as apcupsd cannot
-(yet) communicate properly with USB devices on OS~X\@.  Apcupsd
-\emph{may} be usable on OS~X with smartcable device, but certainly
-\emph{does} work as a NIS client or network slave.
-
-The startup information will be installed in
-\texttt{/Library/StartupItems/apcupsd} which is part of darwin's
-SystemStartup.
 
 \label{Verifying-a-Source-Installation}
 
@@ -1025,6 +1012,14 @@ By default this is disabled.
    This turns on a test driver that is used only for debugging. By default it is
 disabled.  
 
+\item [{---}enable-pthreads]
+   \index{{---}enable-pthreads }
+   This option enables pthreads support causing apcupsd to be built as a threaded
+program rather than forking to create separate processes. apcupsd built in
+this fashion is more efficient that the standard version being one third the
+data size and less overhead locking and coping shared memory. This option is
+{\it highly} recommended for Windows builds.  
+
 \item [{---}with-libwrap=\lt{}path\gt{}]
    \index{{---}with-libwrap }
    This option when enabled causes apcupsd to be built with the TCP WRAPPER
@@ -1126,7 +1121,8 @@ For most systems, we recommend the following options:
 
 \footnotesize
 \begin{verbatim}
-     ./configure --prefix=/usr --sbindir=/sbin --enable-usb
+     ./configure --prefix=/usr --sbindir=/sbin --enable-usb \
+                 --enable-pthreads
 \end{verbatim}
 \normalsize
 
@@ -1135,7 +1131,8 @@ and you can optionally build and install the CGI programs as follows:
 \footnotesize
 \begin{verbatim}
      ./configure --prefix=/usr --sbindir=/sbin --enable-usb \
-                 --enable-cgi --with-cgi-bin=/home/httpd/cgi-bin
+                 --enable-cgi --with-cgi-bin=/home/httpd/cgi-bin \
+                 --enable-pthreads
 \end{verbatim}
 \normalsize
 
@@ -1305,7 +1302,12 @@ You can also find the official Debian packages on the Debian site at:
 
 \label{index-FreeBSD-36}
 \label{index-OS_002c-FreeBSD-37}
-This port is complete and is being used by several users.
+This port is complete and is being used by several users. As of version 3.8.3,
+we do not recommend that you compile apcupsd with pthreads enabled. This is
+because the current FreeBSD implementation of pthreads runs as a single
+process, and thus is less efficient (consumes more CPU time) than the forking
+version of apcupsd. We hope to rectify this in a future version by using the
+FreeBSD LinuxThreads implementation of pthreads.  
 
 On the FreeBSD OS, there is no known way for a user program to get control
 when all the disks are synced. This is needed for apcupsd to be able to issue
@@ -1314,6 +1316,9 @@ accomplish the same thing on FreeBSD systems, make sure you have a SmartUPS
 and that your UPS shutdown grace period is set sufficiently long so that you
 system will power down (usually 2 minutes), the use the {\tt
 kill-on-powerfail} option on the apcupsd command line.  
+
+Please note the concerns listed below under OpenBSD concerning the use of
+pthreads. 
 
 \label{HPUX}
 
@@ -1331,6 +1336,11 @@ We have no reports from testing this yet on version 3.8.4, but worked fine on
 \label{index-NetBSD-40}
 \label{index-OS_002c-NetBSD-41}
 Submitted during development of 3.8.2, this should be a complete distribution.
+Please read the comments on the pthreads implementation in the FreeBSD
+section above as they may apply equally to OpenBSD.  
+
+Please note the concerns listed below under OpenBSD concerning the use of
+pthreads. 
 
 \label{OpenBSD}
 
@@ -1342,6 +1352,27 @@ Ensure that you read the distributions/openbsd/README file before running
 apcupsd. There are some critical differences in how the OpenBSD implementation
 operates when the UPS batteries are exhausted. Failure to take this into
 account may result in the system not being fully halted when power is lost. 
+Please read the comments on the pthreads implementation in the FreeBSD section
+above as they may apply equally to OpenBSD.  
+
+PLEASE NOTE. Due to some deficiencies or errors in the OpenBSD pthreads
+libraries, if you build apcupsd on OpenBSD with pthread and a child program is
+launched (i.e. mail notification of events), this may cause OpenBSD to freeze
+up. The best solution is probably to build without pthread. However, in doing
+so, you must realize that the bulk of this manual assumes that pthreads is
+enabled, and thus many of the comments about apcaccess will not be applicable.
+A second solution that seems to work is to delete all calls to the email
+notification routines from apccontrol. In doing so, some users have succeeded
+in running apcupsd with pthreads.  
+
+If you want to know the technical problems with pthreads on OpenBSD, it is as
+best we can tell because the pthreads are not real kernel pthreads as on Linux
+and Solaris, but rather a user program that makes all I/O non-blocking. So
+when apcupds does I/O, the userland pthreads libarary will switch to another
+thread if it wants to run. This works fine except that when a child process is
+called and it exits, all the blocking/non-blocking statuses of the open file
+descriptors in the parent program are reset as blocking {---} this causes
+chaos and an almost immediate freezing of the program (apcupsd). 
 
 \label{Red-Hat-Systems}
 
@@ -1633,7 +1664,8 @@ options:
        --sysconfdir=/apcupsd/etc/apcupsd \
        --with-pid-dir=/apcupsd/etc/apcupsd \
        --mandir=/apcupsd \
-       --with-cgi-bin=/apcupsd/etc/apcupsd/cgi
+       --with-cgi-bin=/apcupsd/etc/apcupsd/cgi \
+       --enable-pthreads
 \end{verbatim}
 \normalsize
 
@@ -1966,111 +1998,12 @@ is effected.
 Normally you would have many more configuration directives to completely
 customize your installation, but this example shows you the minimum required. 
 
-\label{A-Sample-NIS-Slave-Configuration-Using-the-Net-Driver}
-
-\subsection*{NIS Server/Client Configuration Using the Net Driver}
-\index{NIS Server/Client Configuration Using the Net Driver }
-\index{Driver!Sample NIS Server/Client Configuration Using the Net }
-\addcontentsline{toc}{subsection}{NIS Server/Client Configuration Using the
-Net Driver}
-
-\label{index-Example_002c-NIS-slave-81}
-\label{index-NIS-slave-conf-82}
-\label{index-Configuration_002c-NIS-slave-conf-83}
-
-NIS (Network Information Server) mode allows for communication between
-instances of apcupsd running on different hosts.  Only one of those
-hosts, the server, needs to talk to the UPS directly.  The others,
-clients, optain information about the state of the UPS by querying the
-server.  NIS is \emph{not} related to Sun's NIS/YP services.  The NIS
-client/server mode should not be confused with the (deprecated and more
-complicated) net master/slave mode.
-
-NIS clients and servers require that apcupsd be compiled with the Net
-Driver \texttt{-{}-enable-net}.  This is typically enabled by default.
-
-The NIS server is connected to the UPS and should be configured exactly
-as a standalone configuration, but with \textbf{NETSERVER} on.  In all
-other respects, the server should be configured in standalone mode.  You
-may also set the NIS server specific options \textbf{NISIP} to
-restict which IP address of the server which apcupsd listens on.  The
-default, 0.0.0.0, means to list on all of the server host's IP addresses;
-\textbf{NISPORT} (default 3551) to set which TCP port the server listens on;
-and \textbf{EVENTSFILE} and \textbf{EVENTSFILEMAX} to provide information
-about the last few events to clients.  You may also need to modify your
-firewall rules on the server's host to allow traffic to the
-\textbf{NISPORT}\@.
-
-For the NIS client computer, you will have a configuration that looks something
-like what follows.  What is important is that you get the information from an
-\textbf{ether} \textbf{UPSCABLE} with \textbf{UPSTYPE} set as
-\textbf{net} over the network and you must specify the address of a NIS
-server using \textbf{DEVICE}\@. The client apcupsd will then poll the
-NIS server specified in \textbf{DEVICE} every \textbf{NETTIME} seconds.
-
-\footnotesize
-\begin{verbatim}
-     ## apcupsd.conf v1.1 ##
-     UPSCABLE ether
-     UPSTYPE net
-     LOCKFILE /var/lock
-     DEVICE server-network-address:3551
-     UPSCLASS standalone
-     UPSMODE disable
-     NETTIME 10
-\end{verbatim}
-\normalsize
-
-The \textbf{DEVICE} is set to \texttt{server-address:port}, where
-\texttt{server-address} is the fully qualified domain name or IP address of
-the apcupsd NIS server, and TCP port is the \textbf{NISPORT} that the server
-is listening on.  The default is 3551, but older versions of apcupsd used
-port 7000.  
-
-If you set \textbf{NETTIME} too large, your slave may not see the
-change in state of the NIS server before the server has shutdown. Normally,
-you have at least 30~seconds of grace time between the time the NIS server
-decides to shutdown and the time it no longer responds. Your slave must poll
-during this interval.  
-
-Any client run using the Net driver will shutdown when its own timers
-expire or when the NIS server shuts down, whichever occurs first. This
-means that if you want the slave to shutdown before the server, you need
-only set \textbf{BATTERYLEVEL}, \textbf{MINUTES} or \textbf{TIMEOUT} on
-the client for a faster shutdown than the values defined on the NIS
-server.  This can often be useful if the slave is less important than the
-master and you wish to reduce battery power consumption so that the
-master can remain up longer during a power outage. 
-
-NIS clients work principally by reading the STATFLAG record that is sent
-by the NIS server (present in the output of apcaccess). The low 16 bits
-are the standard APC status flag, and the upper 16 bits represent the
-internal state of apcupsd, so the slave can see when the power fails and
-know when to shutdown.  
-
-It would be possible to have a client also work as a server, but that would
-increase the delay of information getting from the UPS to the secondary
-client.
-
-\subsection*{A master/slave configuration}
-\index{Configuration!Master/Slave}
-\index{Master/Slave}
-\addcontentsline{toc}{subsection}{Master/Slave Configuration}
-
-The master/slave mode is deprecated in favor of the NIS client/server
-mode.  In the master/slave mode, the master (the analog of the NIS server)
-pushes information to the slaves (the analogs of the NIS clients),
-instructing them when to shutdown.  The master must be configured with
-information about the slaves.  In addition to being more complex in both
-operation and configuration than NIS mode, the master/slave mode
-introduces some security issues that are not present in NIS mode.  See
-the section on Security Issues for more details.
-
 \label{A-Simple-Master-Configuration}
 
-\subsubsection*{A Simple Master Configuration}
+\subsection*{A Simple Master Configuration}
 \index{Configuration!Simple Master }
 \index{Simple Master Configuration }
+\addcontentsline{toc}{subsection}{Simple Master Configuration}
 
 \label{index-Configuration_002c-Master-74}
 \label{index-Master_002c-config-example-75}
@@ -2095,24 +2028,26 @@ configuration file would look like the following:
 \end{verbatim}
 \normalsize
 
-The main difference from the stand alone configuration is that you
-have specified \textbf{UPSCLASS netmaster} and \textbf{UPSMODE net}.  In
-addition, you have specified one or more slave machines with
-\textbf{SLAVE}\@.  In this mode of networking, (as opposed to using the
-NIS net driver as described above), your master knows the
-presence of all the slaves.  They carry on a very explicit communication,
-and the slaves are explicitly notified by the master of any important
-changes such as a shutdown.   \textbf{NETTIME} (as with NIS mode)
-specifies the time in seconds between communication between master and
-slaves.  \textbf{NETPORT} (default: 6666) is the TCP port that is used
-for the master/slave communication.  \texttt{NETPORT} will need to be the
-same on both master and slaves.
+Note, the main difference from the stand alone configuration is that you have
+specified {\bf UPSCLASS netmaster} and {\bf UPSMODE net}.  In addition, you
+have specified one or more slave machines.  In this mode of networking, (as
+opposed to using the net driver as described several sections below), your
+master knows the presence of all the slaves.  They carry on a very explicit
+communication, and the slaves are explicitly notified by the master of any
+important changes such as a shutdown.  
+
+There is a simpler form of contolling slaves using the net driver with an
+apcupsd NIS server. The simpler form is much easier to configure. See: see 
+\ilink{A Sample NIS Slave Configuration Using the Net
+Driver}{A-Sample-NIS-Slave-Configuration-Using-the-Net-Driver}
+below for details. 
 
 \label{A-Simple-Slave-Configuration}
 
-\subsubsection*{A Simple Slave Configuration}
+\subsection*{A Simple Slave Configuration}
 \index{Configuration!Simple Slave }
 \index{Simple Slave Configuration }
+\addcontentsline{toc}{subsection}{Simple Slave Configuration}
 
 \label{index-Slave-Configuration-77}
 \label{index-Configuration_002c-Slave-78}
@@ -2136,12 +2071,9 @@ master.  A very simple configuration file would look like the following:
 \end{verbatim}
 \normalsize
 
-The main difference from the master configuration is that you have
-specified \textbf{UPSCABLE ether} and \textbf{UPSCLASS netslave}.  In
-addition, you must specify a single controlling \textbf{MASTER}\@.  
-
-You may need to open up TCP port \textbf{NETPORT} on both the master and
-slave hosts' firewalls to enable communication.
+The main difference from the master configuration is that you have specified
+{\bf UPSCABLE ether} and {\bf UPSCLASS netslave}.  In addition, you have
+specified a single controlling master.  
 
 Please note, there are reports that you {\bf must} use {\bf UPSTYPE smartups}
 on the slave even if the master is using {\bf UPSTYPE dumb}. This is
@@ -2150,14 +2082,16 @@ apparently some bug in the new dumb driver.
 In this configuration, the shutdown will be initiated by the master. It is
 also possible to specify BATTERYLEVEL, MINUTES, and TIMEOUT configuration
 directives in the Slave machine that will cause the slave to shutdown before
-the master.
+the master. This can often be useful if the slave is less important than the
+master and you wish to reduce battery power consumption so that the master can
+remain up longer during a power outage. 
 
 \label{Variation-on-the-Master_002fSlave-Configuration}
 
-\subsubsection*{Variation on the Master/Slave Configuration}
+\subsection*{Variation on the Master/Slave Configuration}
 \index{Configuration!Variation on the Master/Slave }
 \index{Variation on the Master/Slave Configuration }
-\addcontentsline{toc}{subsubsection}{Variation on the Master/Slave
+\addcontentsline{toc}{subsection}{Variation on the Master/Slave
 Configuration}
 
 \label{index-Master_002fSlave-variation-80}
@@ -2168,22 +2102,46 @@ the Master/Slave configuration files shown above.  The only difference is
 where the slave actually receives its power.  In effect, apcupsd does not know
 or care where the power really comes from. 
 
-%%%% Differences between net master/slave and NIS server/client.
-\subsubsection*{Differences between NIS Client/Server and Master/Slave
-modes}
+\label{A-Sample-NIS-Slave-Configuration-Using-the-Net-Driver}
 
-The difference between the NIS mode and the deprecated master/slave mode
-is that the NIS server has no explicit knowledge of the slaves. The NIS
-server makes its information available via the net (NIS), and the NIS
-slaves read it.  When the NIS server is going to shutdown, it makes the
-information available to any NIS slave that polls it, but the NIS server
-does not explicitly call each NIS slave as is the case in the
-Master/Slave networking described several sections above.  
+\subsection*{A Sample NIS Slave Configuration Using the Net Driver}
+\index{Sample NIS Slave Configuration Using the Net Driver }
+\index{Driver!Sample NIS Slave Configuration Using the Net }
+\addcontentsline{toc}{subsection}{Sample NIS Slave Configuration Using the
+Net Driver}
+
+\label{index-Example_002c-NIS-slave-81}
+\label{index-NIS-slave-conf-82}
+\label{index-Configuration_002c-NIS-slave-conf-83}
+As opposed to the old master/slave mode demonstrated above, you can turn any
+computer into an NIS slave by configuring with the NIS network driver turned
+on {\tt \verb{--{enable-net}. The difference is that the NIS server has no explicit
+knowledge of the slaves. The NIS server makes its information available via
+the net (NIS), and the NIS slaves read it. When the NIS server is going to
+shutdown, it makes the information available to any NIS slave that polls it,
+but the NIS server does not explicitly call each NIS slave as is the case in
+the Master/Slave networking described several sections above.  
+
+Running in this configuration, you can use any computer with apcupsd running
+the Network Information Server (NIS) as the server.  The NIS slave simply uses
+the NIS information to decide when to shutdown.  This is a much simpler mode
+than the older master/slave code mentioned above.  
+
+The main apcupsd (NIS server) is connected to the UPS and has NIS turned on,
+but the configuration is a simple standalone as in the section {\bf A Simple
+Configuration for a SmartUPS}. It doesn't matter how the UPS is connected to
+the computer (serial, USB, ...).  
+
+For the NIS slave computer, you will have a configuration that looks something
+like what follows.  What is important is that you get the information from an
+{\bf ether} cable over the network and you must specify the address of a ``NIS
+server'' that is running NIS (not the Master/Slave networking described
+above). The NIS slave apcupsd will then poll the NIS server at the NETTIME
+interval you specify to obtain the status.  
 
 Here are a few words from Adam Kropelin concerning the difference between the
 Master/Slave networking and the NIS-based networking:  
 
-\begin{quotation}
 Think of the difference as push (Master/Slave) vs. pull (NIS-based). In the
 case of M/S, the master makes all the shutdown decisions and notifies the
 slaves when they are to shut down or when some other interesting event
@@ -2206,7 +2164,48 @@ like NIS on your firewall. My network is set up almost identically to yours
 and I chose to run the apcupsd ``master'' on a server in the DMZ and have the
 firewall just be a client of it. That way I don't have to run NIS on the
 firewall apcupsd instance. 
-\end{quotation}
+
+\footnotesize
+\begin{verbatim}
+     ## apcupsd.conf v1.1 ##
+     UPSCABLE ether
+     UPSTYPE net
+     LOCKFILE /var/lock
+     DEVICE server-network-address:3551
+     UPSCLASS standalone
+     UPSMODE disable
+     NETTIME 10
+\end{verbatim}
+\normalsize
+
+where on the {\bf DEVICE} directive you replace the {\tt
+server-network-address} with the fully qualified domain name or IP address of
+a machine running apcupsd with NIS enabled (and normally, but not required,
+connected to a UPS). The :3551 that follows the NIS server address is the port
+to use. The default is 3551, but older versions of apcupsd used port 7000.  
+
+Please do not confuse this NIS server/slave mode with the old master/slave
+network configuration that is described above.  This is a master/slave setup,
+but much simpler (the NIS server does not know about the slaves), and any NIS
+server, even a slave, can act as a server to a slave that listens to it.  
+
+The {\bf NETTIME} directive defines the time interval that the slave uses to
+poll the NIS server. If you set this too large, your slave may not see the
+change in state of the NIS server before the server has shutdown. Normally,
+you have at least 30 seconds of grace time between the time the NIS server
+decides to shutdown and the time it no longer responds. Your slave must poll
+during this interval.  
+
+This mode works principally by reading the STATFLAG record that is sent by the
+NIS (present in the output of apcaccess). The low 16 bits are the standard APC
+status flag, and the upper 16 bits represent the internal state of apcupsd, so
+the slave can see when the power fails and know when to shutdown.  
+
+As with the Master/Slave configuration, any slave run using the Net driver
+will shutdown when its own timers expire or when the NIS server shuts down,
+whichever occurs first. This means that if you want the slave to shutdown
+before the server, you need only set BATTERYLEVEL, or any of the other values
+on the slave for a faster shutdown than the values defined on the NIS server. 
 
 \label{Testing-Apcupsd}
 
@@ -2239,8 +2238,45 @@ After you start apcupsd, execute the following command:
 \end{verbatim}
 \normalsize
 
-or the equivalent for your system. You should see something similar to
-the following output. 
+or the equivalent for your system. If you are running on Linux and using the
+fork()ing version of apcupsd, you should something similar to the following
+output. 
+
+\footnotesize
+\begin{verbatim}
+     4492 ?        S      0:00 apcmain       -f /etc/apcupsd/apcupsd.conf
+     4496 ?        S      0:00  \_ apcser        -f /etc/apcupsd/apcupsd.conf
+     4497 ?        S      0:00  \_ apcnis        -f /etc/apcupsd/apcupsd.conf
+\end{verbatim}
+\normalsize
+
+This indicates that apcupsd is up and running and has started the two
+(default) child processes. If you are running with the pthreaded version, now
+the default, and 2.4.x kernels, you will still see the three processes (see
+below).  However, under 2.6.x kernels, the threads do not have independent
+process ids so everything will be compressed into a single {\bf ps} line.  
+
+\begin{description}
+
+\item [apcmain]
+   \index{apcmain }
+   is the main program that waits until it receives a termination signal
+(SIGTERM) or one of the child processes dies.  
+
+\item [apcser]
+   \index{apcser }
+   is the process that manages the serial port and takes any actions (generates
+events) that are necessary as a result of a change of state of the UPS.  
+
+\item [apcnis]
+   \index{apcnis }
+   is the Network information server process that provides EVENTS and STATUS
+information over the network. This information is used by the CGI programs. 
+\end{description}
+
+If you are running on a non-Linux system, or using pthreads on a Linux system
+(recommended), your output will probably not show the names of the processes
+and will appear more like the following: 
 
 \footnotesize
 \begin{verbatim}
@@ -2250,9 +2286,6 @@ the following output.
 \end{verbatim}
 \normalsize
 
-This indicates that apcupsd is up and running and has started the
-two standard threads in addition to the main thread.
-
 If you see only one instance of apcupsd running, don't worry about it as this
 is normal on most non-Linux systems, and on Linux 2.6.x kernels.  
 
@@ -2260,28 +2293,6 @@ If you do not find that apcupsd is in the above list, the most likely problem
 is a configuration file glitch.  If no messages were printed, you should check
 your system log (normally /var/log/messages where you will find one or
 messages indicating the nature of the problem. 
-
-There are three threads in apcupsd that serve the following purposes:
-
-\begin{description}
-
-\item [apcmain]
-   \index{apcmain }
-   is the main thread that waits until it receives a termination signal
-(SIGTERM) or one of the child processes dies.  
-
-\item [apcser]
-   \index{apcser }
-   is the thread that manages the serial port and takes any actions (generates
-events) that are necessary as a result of a change of state of the UPS.  
-
-\item [apcnis]
-   \index{apcnis }
-   is the Network information server thread that provides EVENTS and STATUS
-information over the network. This information is used by the CGI programs
-and the NIS client/server networking mode. 
-\end{description}
-
 
 \label{Logging-Test}
 
@@ -2335,9 +2346,12 @@ If you have installed the RPM, they will probably be in
 \label{index-Testing_002c-apcaccess-89}
 \label{index-apcaccess-Test-90}
 This test consists of running {\tt apcaccess} to see if apcupsd is properly
-updating its internal variables.  Please note that you must enable the 
-apcupsd Network Information Server in your configuration file for 
-{\bf apcaccess} to work.  This is done by setting: 
+updating its internal variables.  Please note that if you are running a
+pthreaded version of apcupsd, which you should be since the non-pthreaded
+version is no longer supported, (installed from rpm or {\tt \verb{--{enable-pthreads}
+on the {\tt ./configure} line), you must enable the apcupsd Network
+Information Server in your configuration file for {\bf apcaccess} to work. 
+This is done by setting: 
 
 \footnotesize
 \begin{verbatim}
@@ -2988,10 +3002,12 @@ command line arguments ({\bf eprom, reconfig, status, slave, shutdown}), all
 except {\bf eprom} and {\bf status} are under development and hence do not
 work reliably.  
 
-apcaccess will use the Network Information Server to obtain the necessary
-information for the {\bf status} and {\bf eeprom} commands. You can specify
-a second optional argument to apcaccess in the form of host:port where the
-:port is optional. The default is {\bf localhost:3551}. Please note
+If you have built apcupsd with pthreads enabled (default), apcaccess will use
+the Network Information Server to obtain the necessary information for the
+{\bf status} and {\bf eeprom} commands. This is because in the pthreaded
+version, there is no IPC shared memory. In this case (pthreads enabled), you
+can specify a second optional argument to apcaccess in the form of host:port,
+where the :port is optional. The default is {\bf localhost:3551}. Please note
 that in versions prior to 3.10.6, the default NIS port was 7000, so if you are
 mixing versions, you will need to take a lot of care to ensure that all
 components are using the same port.  
@@ -3549,40 +3565,22 @@ to the original author in his project.
 
 \begin{itemize}
 \item {\bf apcupsd} runs as root.  
-
-\item If you have \textbf{NETSERVER ON} in your apcupsd.conf file (which is the
-   default), be aware that anyone on the network can read the status of your UPS. 
+\item If you have {\bf NETSERVER ON} in your apcupsd.conf file (which is the
+   deault), be aware that anyone on the network can read the status of your UPS. 
    This may or may not pose a problem. If you don't consider this information
-privileged, as is the case for many, there is little risk. In addition, if you
-have a perimeter firewall or NATting router with typical settings
-only users on your local network access to your UPS information.
-You may also restrict access using using firewall settings (see below) or
-TCP Wrappers (see below).
-
+privileged, as is the case for me, there is little risk. In addition, if you
+have a firewall between your servers and the Internet, crackers will not have
+access to your UPS information.  Additionally, you can restrict who can access
+your apcupsd server by using inted to run the sservice and using access
+control lists with a TCP wrapper or by configuring TCP wrappers in apcupsd
+(see below for TCP Wrapper details).  
 \item If you are running master/slave networking with a single UPS powering
    multiple machines, be aware that it is possible for someone to simulate the
    master and send a shutdown request to your slaves. The slaves do check that
 the network address of the machine claiming to be the master is that same as
 the address returned by DNS corresponding to the name of the master as
-specified in your configuration file.   Again, you may wish to restrict
-access  using firewall settings (see below) or TCP Wrappers (see below).
+specified in your configuration file. 
 \end{itemize}
-
-\label{Firewall-Settings}
-\subsection*{Firewall Settings}
-\label{Firewall-Settings}
-\index{Firewall Settings}
-\addcontentsline{toc}{subsubsection}{Firewall Settings}
-
-If you are running apcupsd as an NIS server, you will need to ensure that
-the clients can reach it by opening up \textbf{NISPORT} (default: TCP
-3551) on any firewall running on the server.  If you are running with a
-master/slave setup, then \textbf{NETPORT} (default: TCP 6666) will need
-to be open on both the master and the slave(s) so that they can talk to
-each other.  You may wish to configure your firewall(s) to \emph{only}
-allow connections from your local network or specifically from the
-masters, slaves, and servers as needed.
-
 
 \label{TCP-Wrappers}
 
@@ -3593,10 +3591,6 @@ masters, slaves, and servers as needed.
 
 \label{index-Wrappers_002c-TCP-138}
 \label{index-TCP-wrappers-139}
-
-If your operating system does not support a host based firewall (a
-firewall running on the local machine) then you may try to get some of
-the funtionality of such a firewall with TCP~Wrappers.
 As of apcupsd version 3.8.2, TCP Wrappers are implemented if you turn them on
 when configuring ({\tt ./configure \verb{--{with-libwrap}).  With this code enabled,
 you may control who may access your apcupsd via TCP connections (the Network
@@ -4276,6 +4270,14 @@ order of 0.5-1.0\%. This is higher than for Unix systems. However, compared to
 the 30\% CPU usage by APC's PowerChute (the version on the CDROM shipped with
 my UPS), apcupsd's 0.5-1.0\% is very modest.  
 
+If you configure apcupsd to run with pthreads ({\tt \verb{--{with-pthreads} on the
+{\tt ./configure} line), apcupsd will run considerably faster, otherwise said,
+it will consume less of your CPU, and it will use approximately one third of
+the memory. For example, Carl Erhorn reports that on his Solaris system,
+``With the old 3-process version, we averaged about 4.8MB of total memory
+used. With the new single process, we use only about 1.7MB! That's also a very
+good improvement.''  
+
 \item [Q:]
    \index{ Q: }
    What language is apcupsd written in?  
@@ -4471,6 +4473,44 @@ status 3, frame\# 826. What does it mean?
    It means one transfer worked (bit 0 in status) and another one (after that)
 failed (bit 1) at time frame 826. This kind of soft error is common on USB and
 if everything seems to be working, you can ignore it.  
+
+\item [Q:]
+   \index{ Q: }
+   apcnisd doesn't work. It always gives: FATAL ERROR in apcipc.c at line 497.
+attach\_shmarea: shared memory version mismatch (or UPS not yet ready to
+report)  
+
+\item [A:]
+   \index{ A: }
+   Unfortunately apcnisd does not work with pthreads enabled. You have the
+following options:  
+
+\begin{enumerate}
+\item If you build with pthreads enabled, apcnisd will not work no matter what
+   you do.  
+\item If you build with pthreads enabled, and you want to have network
+   information from apcupsd, you must set NETSERVER ON. This is the configuration
+   we recommend (i.e. using pthreads and NETSERVER ON).  
+\item If you build with pthreads disabled, you have the choice of using
+   apcnisd or the NETSERVER code. If you wish to use apcnisd, you must set
+   NETSERVER OFF  
+\item If you build with pthreads disabled, and you do not use apcnisd, you
+   must set NETSERVER ON if you wish to have network information from apcupsd.  
+   \end{enumerate}
+
+Concerning the names one sees with ``ps''.  
+
+\begin{enumerate}
+\item With pthreads enabled, on Linux machines, you will see multiple copies
+   of apcupsd running, but they will all be called apcupsd rather than apcmain,
+   apcser, ... They will still run as LWP, but we are unable to set the names on
+threads (LWP). Note, though ps shows ``multiple copies'' of apcupsd running,
+it is really one memory image but with multiple threads.  
+\item With pthreads disabled, we are able to set the child process names (at
+   least on Linux) so you will see apcmain, apcser, apcnis, ... in the ps output.
+   In this case, they are really different processes each with its own memory
+image (the code image is most likely shared).  
+\end{enumerate}
 
 \end{description}
 
@@ -5135,6 +5175,7 @@ could use the following configuration:
        --with-css-dir=/home/http/css \
        --with-log-dir=/etc/apcupsd \
        --with-serial-dev=/dev/ttyS0 \
+       --enable-pthreads \
        --with-nis-port=3551 \
        --enable-powerflute
 \end{verbatim}
@@ -5166,6 +5207,7 @@ UPS and Computer B, you could use the following configuration:
        --with-lock-dir=$HOME/apcupsd/bin \
        --with-pwrfail-dir=$HOME/apcupsd/bin \
        --with-serial-dev=/dev/ttyS1 \
+       --enable-pthreads \
        --with-nis-port=7001 \
        --disable-install-distdir
 \end{verbatim}
@@ -5216,7 +5258,7 @@ Computer B could be shutdown by the first master that signaled it to do so.
 \addcontentsline{toc}{section}{Support for SNMP UPSes}
 
 \label{index-SNMP-162}
-To run apcupsd with a SNMP UPS, you need the following things:  
+To run apcupsd with an SNMP UPS, you need the following things:  
 
 \begin{itemize}
 \item An SNMP UPS, for example a Web/SNMP (AP9716) or PowerNet SNMP (AP9605)
@@ -5227,208 +5269,14 @@ card installed into the SmartSlot.
    ucd-snmp) installed 
 \end{itemize}
 
-\label{Planning-SNMP-Setup-Wiring}
+\label{Connecting-an-SNMP-UPS}
 
-\subsection*{Planning and Setup for SNMP Wiring}
-\index{SNMP Wiring Setup}
-\addcontentsline{toc}{subsection}{Planning and Setup for SNMP Wiring}
-
-\label{index-SNMP_002d-Wiring-163}
-SNMP packet requests are relayed to the UPS from monitoring APCUPSD servers over
-Ethernet via a switch, hub, or router.  Protecting these Ethernet devices
-with UPS supplied power is necessary to ensure reliable SNMP communication
-during power failures.   Servers may fail to shutdown quietly during power failures
-if SNMP communication is lost.
-
-\label{Planning-SNMP-Setup-Configuration}
-
-\subsection*{Planning and Setup for SNMP Configuration}
-\index{SNMP Configuration Setup}
-\addcontentsline{toc}{subsection}{Planning and Setup for SNMP Configuration}
-To establish communication to the UPS SNMP card installed in the UPS, the
-SNMP card will need the following:
-\begin{itemize}
-\item Assign SNMP card IP Address
-\item Set SNMP card General Parameters
-\item Set SNMP card Shutdown Parameters
-\item Set SNMP card Event Trap Receivers (apcupsd-3.12.0 and later)
-\end{itemize}
-
-\subsubsection*{Assign SNMP Card IP Address}
-\index{SNMP Configure IP Address}
-\footnotesize
-\begin{verbatim}
-  	The following instructions come from the APC knowledge base:   
-\end{verbatim}
-
-\normalsize
-The Network Management Card (AP9617, AP9618, AP9619) must be configured with
-network settings before it can communicate on the network. Once the cards have been
-configured with an IP address, Subnet Mask, and Default Gateway the cards can be
-access, managed, and controlled from other computers on the network.
-
-There are two ways to configure the Network Management Card (NMC) with its
-initial settings: the (windows) Wizard and Address Resolution Protocol (ARP).
-
-1.  The wizard in included on the CD that comes with the card.  The wizard must
-run on a Windows operating system.  You can configure the card using the wizard over
-the network via FTP.  If using the wizard please note, the un-configured NMC must
-be on the same subnet as the computer running the wizard.
-
-2.  Address resolution protocol (arp) can also be used to configure the NMC.  The MAC
-Address of the NMC is needed for this method of configuration.  The MAC address is
-located on the quality assurance slip that is shipped with the NMC, and is also
-located on the white sticker on the NMC itself.  From a computer on the same
-subnet as the un-configured NMC, follow the instructions:
-
-Open up a command prompt and type the following (replacing <IPaddress> and <MacAddress>
-with the actual values):
-
-arp -s <IPaddress> <MacAddress>
-
-Next, use Ping with a size of 113 bytes to assign the IP address defined by the ARP
-command.
-
-\begin{itemize}
-\item Linux command format:   {\bf ping} <IPaddress> -s 113
-\item Windows command format: {\bf ping} <IPaddress> -l 113
-\end{itemize}
-
-
-\subsubsection*{Set SNMP card General Parameters}
-\index{SNMP Configure General Parameters}
-After the SNMP Network Management Card is configured with an IP address, the SNMP Card
-is ready for general configuration.  This is accomplished by telneting to the SNMP Card.
-
-\footnotesize
-\begin{verbatim}
-     ~$ telnet <IPaddress>
-\end{verbatim}
-\normalsize
-
-Login using "apc" for both the username and password and the following menu will display:
-
-
-
-
-
-\footnotesize
-\begin{verbatim}
-*******************************************************************************
-American Power Conversion               Network Management Card AOS      v2.6.4
-(c) Copyright 2004 All Rights Reserved  Smart-UPS & Matrix-UPS APP       v2.6.1
--------------------------------------------------------------------------------
-Name      : 	 	                              Date : 07/03/2006	       
-Contact   :     		                      Time : 04:43:33
-Location  : 			                      User : Administrator
-Up Time   : 0 Days 01 Hours 57 Minutes                Stat : P+ N+ A+
-
-Smart-UPS 1000 named  : On Line, No Alarms Present
-
-------- Control Console -------------------------------------------------------
-
-     1- Device Manager
-     2- Network
-     3- System
-     4- Logout
-
-     <ESC>- Main Menu, <ENTER>- Refresh, <CTRL-L>- Event Log
->
-*******************************************************************************
-\end{verbatim}
-
-
-
-
-
-
-
-\normalsize
-Select {\bf Option 2} for Network.
-Next select {\bf Option 1} for TCP/IP settings.
-
-At this point the following settings will be to be specified:
-
-\begin{itemize}
-\item Verify System IP: <IPaddress>
-\item Specify Subnet Mask:  i.e. "225.225.225.0"
-\item Specify Default Gateway
-\item Specify Host Name
-\item Specify Domain Name
-\end{itemize}
-
-Specifying these parameters will complete the General Parameters setup.  
-Additionally the SNMP Network Management Card can now be connected to from 
-a web browser for monitoring and additional configuration.
-
-
-\subsubsection*{Set SNMP card Shutdown Parameters}
-\index{SNMP Configure Shutdown Parameters}
-
-There are two shutdown parameters that must be set in the SNMP card to ensure that
-connected servers shutdown quietly.  These parameters can be set via the telnet terminal
-or the web browser interface.
-
-\begin{itemize}
-\item Shutdown Delay (sec)
-\item Return Battery Capacity (\%)
-\end{itemize}
-
-One of the draw-backs of SNMP communication to the UPS is that the Stand-alone or Primary
-server must issue the power down command to the UPS early in server halt procedure.
-This server must issue an early command to the SNMP UPS to power down before its ethernet
-service is halted.  This creates a potential problem where the UPS may kill power to any
-connected servers before these affected servers' halt scripts complete a successful shutdown.
-
-
-The SNMP {\bf Shutdown Delay} parameter is used to delay the UPS from killing power to its load
-by a prescribed period of seconds.  The delay should be long enough to ensure that the 
-Stand-alone or Primary server has enough time to successfully halt.  The prescribed time should at least
-be 180 seconds. Any additional computers connected to the SNMP UPS must not be configured
-to issue the command to initiate UPS power down.  These servers can be thought of as secondary
-stand-alone server.  The APCUPSD daemons of secondary servers should be configured to initiate server
-halt a prescribed period of time before the Primary server issues the UPS power down command.
-
-
-The {\bf Return on Battery Capacity} is useful during intermittent sequential power failures.
-This parameter insures that the UPS will not restore power to its loads until it has
-recharged it battery to a prescribed percentage. This parameter should be set to a value
-greater than value that the APCUPSD daemons configured "BATTERYLEVEL" shutdown of any
-connected servers.  This will ensure that when the UPS restores power, any additional power
-failures will successfully re-trigger a server shutdown.
-
-
-
-\subsubsection*{Configure Event Trap Receivers (apcupsd-3.12.0 and later)}
-\index{SNMP Configure Event Trap Recievers}
-
-By default, APCUPSD will poll the SNMP UPS card once per minute.  In this case,
-server notification of UPS alarms could potentially be delayed one minute.  Event trap
-catching mitigates this shortcoming.  Any UPS alarms are instantly sent to 
-prescribe servers connected SNMP UPS.  These servers are referred to as Event Trap Receivers.
-The SNMP UPS card can be configure to send event traps to a maximum of four 
-receivers that will "catch" these events.  
-
-Event trap receivers IP address can be set using a telnet terminal or web browser interface.
-
-Also, be aware that servers configured to be Event Trap Receivers should have static IP set.
-Severs obtaining IPs from DHCP server will not catch instantaneous Events if the IP address changes from
-the address set in the SNMP UPS.
-
-\label{Connecting-APCUPSD-to-a-SNMP-UPS}
-
-\subsection*{Connecting APCUPSD to a SNMP UPS}
-\index{Connecting APCUPSD to a SNMP UPS }
-\index{UPS!Connecting APCUPSD to a SNMP }
-\addcontentsline{toc}{subsection}{Connecting APCUPSD to a SNMP UPS}
+\subsection*{Connecting an SNMP UPS}
+\index{Connecting an SNMP UPS }
+\index{UPS!Connecting an SNMP }
+\addcontentsline{toc}{subsection}{Connecting an SNMP UPS}
 
 \label{index-SNMP_002c-Connecting-163}
-
-The previous sections describe configuration of the actual SNMP card.
-The remaining sections describe configuration of the APCUPSD to communicate
-using SNMP Protocol.
-
-
 The Simple Network Management Protocol provides an interface to connect to
 remote devices through the network. apcupsd is now capable of using the SNMP
 interface of an SNMP-enabled UPS to communicate with an UPS. Currently apcupsd
@@ -5442,7 +5290,7 @@ directive needed for this configuration is:
 \end{verbatim}
 \normalsize
 
-Where the directive is made by four parts:  
+where the directive is made by four parts:  
 
 \begin{itemize}
 \item {\bf host}: IP address of the remote UPS  
@@ -5450,22 +5298,9 @@ Where the directive is made by four parts:
 \item {\bf vendor}: Kind of remote SNMP agent: ``APC'' for APC's PowerNet MIB, 
 ``APC\_NOTRAP'' for the PowerNet MIB with SNMP trap catching disabled, or "RFC"
 for the IETF's rfc1628 UPS-MIB. (Note that APC\_NOTRAP is only accepted by 
-apcupsd-3.12.0 and higher. See below for trap catching details.)
+apcupsd-3.11.14 and higher. See below for trap catching details.)
 \item {\bf community}: The read-write community string, usually ``private''
 \end{itemize}
-
-
-If more than one server is connected to the UPS the following configuration
-types still apply to SNMP enable UPS. (see \ilink{Choosing a Configuration Type}
-{Choosing-a-Configuration-Type}).  A NIS Server/Client (Master/Slave) configuration
-with multiple servers is still applicable.
- 
-However, an alternative configuration is possible with an SNMP enabled UPS.  In
-this arrangement, all connected servers will be configured as a standalone server.
-Each will independently communicate to the UPS.  One (primary) server will be 
-chosen to manage the task of commanding the UPS to power down. All remaining
-(secondary) servers will be configured to quietly power down before the
-primary server issues the UPS power down command. 
 
 \subsection*{Building with SNMP support}
 \index{Building with SNMP support}
@@ -5483,6 +5318,7 @@ being sure to include the following options (in addition to any others you need)
      --with-serial-dev=<your-SNMP-device> \
      --with-upstype=snmp \
      --with-upscable=smart \
+     --enable-pthreads \
      --enable-snmp
 \end{verbatim}
 \normalsize
@@ -5495,7 +5331,7 @@ being sure to include the following options (in addition to any others you need)
 
 apcupsd-3.11.14 introduces support for SNMP trap catching with the APC
 PowerNet MIB driver. Previous versions polled the UPS status once per minute, 
-leading to significant delays before UPS state changes were recognized. With 
+leading to significany delays before UPS state changes were recognized. With 
 SNMP trap handling, apcupsd monitors the SNMP trap port and will re-poll the
 UPS whenever a trap is received. This happens, for example, when the UPS 
 switches on or off battery.
@@ -5535,31 +5371,23 @@ during powerdown do the following:
 \item Connect to your Web/SNMP card using your favorite web browser, go to the
    UPS configuration menu and change the ``Shutdown Delay'' parameter to 180
    seconds or more, depending on how much time your system shutdown requires to
-umount all the filesystems.
-\item {\bf Option 1 (non-windows)} Edit the server halt script.  Relocate the 
-ups\_kill\_power() function higher in the shutdown sequence, primarily before
-the command to bring down the ethernet service. This is the preferred method
-for shutting down the UPS.  The UPS will power down after the prescribed
-"Shut Down Delay" time (in seconds) has elapsed.
-\item {\bf Option 2} Change /etc/rc.d/apcupsd script adding the '{---}kill-on-powerfail'
-to the apcupsd invocation.  This method is not preferred because the UPS is
-commanded to power down without delay.  This creates the potential for UPS
-powering down before the server calling for UPS power down completes its shutdown.
-However, in the case of Microsoft Windows OS, this is the only method available
-for powering down the UPS.
+umount all the filesystems.  
+\item Change /etc/rc.d/apcupsd script adding the '{---}kill-on-powerfail' to
+   the apcupsd invocation.  
 \item Restart your apcupsd 
    \end{itemize}
 
 With this setup your UPS operations should be safe. 
 
+\label{Alternate-Ways-To-Run-The-Network-Information-Server}
 
-\label{Running-The-Network-Information-Server}
+\section*{Alternate Ways To Run The Network Information Server}
+\index{Server!Alternate Ways To Run The Network Information }
+\index{Alternate Ways To Run The Network Information Server }
+\addcontentsline{toc}{section}{Alternate Ways To Run The Network
+Information Server}
 
-\section*{Running The Network Information Server}
-\index{Server!Running The Network Information }
-\index{Running The Network Information Server }
-\addcontentsline{toc}{section}{Running The Network Information Server}
-
+\label{index-NIS-alternate-was-of-running-165}
 apcupsd maintains STATUS and EVENTS data concerning the UPS and its operation.
 This information can be obtained over the network using either apcnisd or
 apcupsd's internal network information server, which is essentially the same
@@ -5569,19 +5397,33 @@ data, which the server then transmits to them.
 
 The information served to the network by this interface should not be confused
 with master/slave mode that shares a UPS between two or more computers. That
-code is described in \ilink{Configuration Directives for Sharing a
+code is described in 
+\ilink{Configuration Directives for Sharing a
 UPS}{Configuration-Directives-for-Sharing-a-UPS} of this
 documentation.  
 
-As of apcupsd 3.12.x, the NIS server runs only as a child of apcupsd.
-It cannot be run standalone or from INETD.
+There are three different ways to run the information server depending on your
+requirements and preferences. It can be run as 1.  a standalone program, 2. a
+standalone program invoked by the inetd daemon, or 3. as a thread (or child
+process) of apcupsd (default configuration). We recommend option 3 unless you
+have specific reasons to do otherwise. Option 3 is what is configured in by
+default. 
+
+\label{Running-the-server-as-a-child-of-apcupsd}
+
+\subsection*{Running the server as a child of apcupsd}
+\index{Running the server as a child of apcupsd }
+\addcontentsline{toc}{subsection}{Running the server as a child of apcupsd}
 
 This is probably the simplest way to run the network information server. To do
 so, you simply make sure the {\bf NETSERVER} directive in
 /etc/apcupsd/apcupsd.conf is {\bf on}, and then stop and restart apcupsd. It
-will automatically create the server thread to handle network clients. 
-Note, the above modification should not be necessary if you use the default
-apcupsd.conf, since it is already turned on.  
+will automatically create the server thread (or spawn an additional child
+process named apcnis) to handle network clients. In the case where pthreads
+are enabled, a new thread will be created rather than a child process to
+handle the network information requests. Note, the above modification should
+not be necessary if you use the default apcupsd.conf, since it is already
+turned on.  
 
 Although this method is simple, it affords no protection from the outside
 world accessing your network server unless you are behind a firewall. In
@@ -5595,6 +5437,107 @@ prefer to run the server this way.
 With apcupsd version 3.8.2 and later, you may enable the TCP Libwrap
 subroutines to add additional security. In this case, access to the network
 server will be controlled by the statements you put in /etc/hosts.allow. 
+
+\label{Running-apcnisd-from-INETD}
+
+\subsection*{Running apcnisd from INETD}
+\index{INETD!Running apcnisd from }
+\index{Running apcnisd from INETD }
+\addcontentsline{toc}{subsection}{Running apcnisd from INETD}
+
+This is probably the most secure and most desirable way of running the network
+information server. Unfortunately, it is a bit more complicated to set up.
+However, once running, the server remains unexecuted until a connection is
+attempted, at which point, inetd will invoke apcnisd. Once apcnisd has
+responded to the client's requests, it will exit. None of the disadvantages of
+running it standalone apply since apcnisd runs only when a client is
+requesting data. Note, running in this manner works only if you are using the
+old forking code and have pthreads explicitly turned off. The pthreads version
+of apcupsd does not support the shared memory calls that are necessary for
+apcnisd to access the internal state of apcupsd.  
+
+An additional advantage of this method of running the network information
+server is that you can call it with a TCP wrapper and thus use access control
+lists (ACL) such as hosts.allow. See the man pages for hosts.allow for more
+details.  
+
+To configure apcnisd to run from INETD, you must first put an entry in
+/etc/services as follows: 
+
+\footnotesize
+\begin{verbatim}
+     apcnisd         3551/tcp
+\end{verbatim}
+\normalsize
+
+This defines the port number (3551) and the service (TCP) that apcnisd will be
+using. This statement can go anywhere in the services file. Normally, one adds
+local changes such as these to the end of the file.  
+
+Next, you must modify /etc/inetd.conf to have the following line: 
+
+\footnotesize
+\begin{verbatim}
+     apcnisd stream  tcp     nowait  root    /usr/sbin/tcpd  /sbin/apcnisd -i
+\end{verbatim}
+\normalsize
+
+If you do not want to run the TCP wrapper, then the line should be entered as
+follows (not tested): 
+
+\footnotesize
+\begin{verbatim}
+     apcnisd stream  tcp     nowait  root    /sbin/apcnisd -i
+\end{verbatim}
+\normalsize
+
+Please check that the file locations are correct for your system. Also, note
+that the {\tt -i} option is necessary so that apcnisd knows that it was called
+by INETD. Before restarting INETD, first ensure that the {\bf NETSERVER}
+directive in /etc/apcupsd/apcupsd.conf is set to {\bf off}. This is necessary
+to prevent apcupsd from starting a child process that acts as a server. If you
+change {\bf NETSERVER}, you must stop and restart apcupsd for the
+configuration change to be effective.  
+
+Finally, you must restart INETD for it to listen on port 3551. On a Red Hat
+system, you can do so by: 
+
+\footnotesize
+\begin{verbatim}
+     /etc/rc.d/init.d/inet reload
+\end{verbatim}
+\normalsize
+
+At this point, when a client attempts to make a connection on port 3551, INETD
+will automatically invoke apcnisd. 
+
+\label{Running-apcnisd-Standalome}
+
+\subsection*{Running apcnisd Standalome}
+\index{Standalome!Running apcnisd }
+\index{Running apcnisd Standalome }
+\addcontentsline{toc}{subsection}{Running apcnisd Standalome}
+
+This is probably the least desirable of the three ways to run an apcupsd
+network information server because if apcupsd is stopped, you must also stop
+apcnisd before you can restart apcupsd. This is because apcnisd, when run
+standalone, holds the shared memory buffer by which apcnisd and apcupsd
+communicate. This prevents a new execution of apcupsd from creating it.  
+
+To execute apcnisd in standalone mode, first ensure that the {\bf NETSERVER}
+directive in {\bf /etc/apcupsd/apcupsd.conf} is set to {\bf off}. This is
+necessary to prevent apcupsd from starting a child process that acts as a
+server. Restart apcupsd normally, then: 
+
+\footnotesize
+\begin{verbatim}
+     /sbin/apcnisd
+\end{verbatim}
+\normalsize
+
+The advantage of running the network information server standalone is that if
+for some reason, a client causes the network server to crash, it will not
+affect the operation of apcupsd. 
 
 \label{apcupsd-System-Logging}
 
@@ -5805,11 +5748,11 @@ installation directory without reading the next section!}
 
 \label{index-Windows_002c-Installation-Directory-172}
 The Win32 version of apcupsd must reside in the
-c:\textbackslash{}apcupsd\textbackslash{} directory, and there must be a
-c:\textbackslash{}tmp directory on your machine. The installation will do this
-automatically, and we recommend that you do not attempt to place apcupsd in
-another directory. If you do so, you are on your own, and you will need to do
-a rebuild of the source. 
+\%SystemDrive\%\textbackslash{}apcupsd\textbackslash{} directory (\%SystemDrive\%
+is normally c:), and there must be a \%SystemDrive\%\textbackslash{}tmp \
+directory on your machine. The installation will do this automatically, and 
+we recommend that you do not attempt to place apcupsd in another directory. 
+If you do so, you are on your own, and you will need to do a rebuild of the source. 
 
 If you wish to install the package elsewhere, you will need to proceed with a
 manual installation, which is not particularly easy as you must rebuild the
@@ -8116,7 +8059,7 @@ can set it to 180, 300, or 600 seconds depending on your UPS. See the EEPROM
 \ilink{Configuring Your EEPROM}{Configuring-Your-EEPROM}) this
 manual for further details on how to change this EPROM value.  
 
-If you use the \texttt{-{}-kill-on-powerfail} option, you run the risk of having
+If you use the {\tt \verb{--{kill-on-powerfail} option, you run the risk of having
 the computer power cut before the system has shutdown. Even if the grace
 period is rather long, if something goes wrong in the shutdown, well, it is up
 to you to decide.  

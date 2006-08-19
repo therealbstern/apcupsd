@@ -161,35 +161,19 @@ int getline(char *s, int len, UPSINFO *ups)
    int ending = 0;
    char c;
    int retval;
-   int wait;
-
-   if (s != NULL)
-      wait = TIMER_FAST;   /* 1 sec, expect fast response */
-   else
-      wait = ups->wait_time;
-
-#ifdef HAVE_MINGW
-   /* Set read() timeout since we have no select() support. */
-   {
-      COMMTIMEOUTS ct;
-      HANDLE h = (HANDLE)_get_osfhandle(ups->fd);
-      ct.ReadIntervalTimeout = MAXDWORD;
-      ct.ReadTotalTimeoutMultiplier = MAXDWORD;
-      ct.ReadTotalTimeoutConstant = wait * 1000;
-      ct.WriteTotalTimeoutMultiplier = 0;
-      ct.WriteTotalTimeoutConstant = 0;
-      SetCommTimeouts(h, &ct);
-   }
-#endif
 
    while (!ending) {
-#if !defined(HAVE_MINGW)
+#ifndef HAVE_CYGWIN
       fd_set rfds;
       struct timeval tv;
 
       FD_ZERO(&rfds);
       FD_SET(ups->fd, &rfds);
-      tv.tv_sec = wait;
+      if (s != NULL) {
+         tv.tv_sec = TIMER_FAST;   /* 1 sec, expect fast response */
+      } else {
+         tv.tv_sec = ups->wait_time;
+      }
       tv.tv_usec = 0;
 
       errno = 0;
@@ -207,6 +191,7 @@ int getline(char *s, int len, UPSINFO *ups)
       default:
          break;
       }
+
 #endif
 
       do {
@@ -745,6 +730,10 @@ int apcsmart_ups_entry_point(UPSINFO *ups, int command, void *data)
 {
    int retries = 5;                /* Number of retries if reason is NA (see below) */
    char ans[20];
+
+   if (ups->is_slave()) {
+      return SUCCESS;
+   }
 
    switch (command) {
    case DEVICE_CMD_SET_DUMB_MODE:

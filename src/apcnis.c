@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright (C) 1999-2006 Kern Sibbald
+ * Copyright (C) 1999-2005 Kern Sibbald
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of version 2 of the GNU General
@@ -139,12 +139,18 @@ void do_server(UPSINFO *ups)
 
    local_ip.s_addr = INADDR_ANY;
 
+   /*
+    * This ifdef is a bit of a kludge, but without it, we have no inet_pton,
+    * so avoid the error message.
+    */
+#ifdef HAVE_NAMESER_H
    if (ups->nisip[0]) {
       if (inet_pton(AF_INET, ups->nisip, &local_ip) != 1) {
          log_event(ups, LOG_WARNING, "Invalid NISIP specified: '%s'", ups->nisip);
          local_ip.s_addr = INADDR_ANY;
       }
    }
+#endif
 
    /* Open a TCP socket */
    for (tlog = 0; (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0; tlog -= 5 * 60) {
@@ -156,12 +162,10 @@ void do_server(UPSINFO *ups)
    }
 
    /* Reuse old sockets */
-#ifndef HAVE_MINGW
-   if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, (void*)&turnon, sizeof(turnon)) < 0) {
+   if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &turnon, sizeof(turnon)) < 0) {
       log_event(ups, LOG_WARNING, "Cannot set SO_REUSEADDR on socket: %s\n",
          strerror(errno));
    }
-#endif
    
    /* Bind our local address so that the client can send to us. */
    memset((char *)&serv_addr, 0, sizeof(serv_addr));
@@ -199,7 +203,8 @@ void do_server(UPSINFO *ups)
        * allowed closes the connection.
        */
       if (check_wrappers(argvalue, newsockfd) == FAILURE) {
-         net_close(newsockfd);
+         shutdown(newsockfd, 2);
+         close(newsockfd);
          continue;
       }
 #endif
@@ -209,8 +214,13 @@ void do_server(UPSINFO *ups)
       arg->ups = ups;
       childpid = 0;
 
+#ifdef HAVE_CYGWIN
+      handle_client_request(arg);
+      close(newsockfd);            /* parent process */
+#else
       pthread_t tid;
       pthread_create(&tid, NULL, handle_client_request, arg);
+#endif   /* HAVE_CYGWIN */
 
    }
 }
@@ -289,7 +299,8 @@ void *handle_client_request(void *arg)
       }
    }
 
-   net_close(nsockfd);
+   shutdown(nsockfd, 2);
+   close(nsockfd);
 
    free(arg);
    detach_ups(ups);

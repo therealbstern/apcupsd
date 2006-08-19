@@ -51,6 +51,7 @@
 
 /* Alpha Tru64 */
 #ifdef HAVE_OSF1_OS
+# define int32_t int
 # define _SEM_SEMUN_UNDEFINED 1
 #endif
 
@@ -80,6 +81,7 @@
 #endif
 
 #ifdef HAVE_OPENSERVER_OS
+# define int32_t         int
 # define _SEM_SEMUN_UNDEFINED 1
 #endif
 
@@ -93,7 +95,71 @@
 # define SETPGRP_ARGS(x, y) x,y
 #endif
 
-#ifdef HAVE_MINGW
+/*
+ * Special "kludges" for the win32 version of
+ * apcupsd.
+ */
+#ifdef HAVE_CYGWIN
+
+/* Apparently later version of Cygwin have this */
+#define ioctl(fd, func, addr) winioctl(fd, func, addr)
+
+/* modem ioctls */
+#undef  TIOCMGET
+#define TIOCMGET ('d'<<8 | 1)
+#undef  TIOCMBIS
+#define TIOCMBIS ('d'<<8 | 2)
+#undef  TIOCMBIC
+#define TIOCMBIC ('d'<<8 | 3)
+
+/* modem lines */
+#undef  TIOCM_LE
+#undef  TIOCM_DTR
+#undef  TIOCM_RTS
+#undef  TIOCM_ST
+#undef  TIOCM_SR
+#undef  TIOCM_CTS
+#undef  TIOCM_CAR
+#undef  TIOCM_RNG
+#undef  TIOCM_DSR
+#undef  TIOCM_CD
+#undef  TIOCM_RI
+
+#define TIOCM_LE        0x001
+#define TIOCM_DTR       0x002
+#define TIOCM_RTS       0x004
+#define TIOCM_ST        0x008
+#define TIOCM_SR        0x010
+#define TIOCM_CTS       0x020
+#define TIOCM_CAR       0x040
+#define TIOCM_RNG       0x080
+#define TIOCM_DSR       0x100
+#define TIOCM_CD        TIOCM_CAR
+#define TIOCM_RI        TIOCM_RNG
+
+#undef HAVE_NAMESER_H
+
+#undef SIGTSTP
+#undef SIGTTOU
+#undef SIGTTIN
+#undef SIGSTP
+
+
+#define SHM_RDONLY 1
+
+/* no setproctitle on win32 */
+#define HAVE_SETPROCTITLE
+#define setproctitle(x)
+#define init_proctitle(x)
+
+/*
+ * Pretend that we are always root --
+ * probably should fix this on NT for administrator
+ */
+#define getuid() 0
+#define geteuid() 0
+
+
 /*
  * ApcupsdMain is called from win32/winmain.cpp
  * we need to eliminate "main" as an entry point,
@@ -102,7 +168,7 @@
  */
 #define main ApcupsdMain
 
-#endif
+#endif   /* HAVE_CYGWIN */
 
 /* If we have it, the init is not needed */
 #ifdef HAVE_SETPROCTITLE
