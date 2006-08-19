@@ -37,22 +37,24 @@ Overall new features of the 3.13.x development series include USB
 support for Windows, Solaris 10, and Mac OS X Darwin. Also new are
 the gapcmon GUI monitoring application, a PowerChute Network Shutdown 
 protocol (pcnet) driver, and lots of bug fixes. 
-<h3><i><u>Stable:</u></i>&nbsp;3.12.3 (28 April 2006) [
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=49059&release_id=413549">Source</a>
+<h3><i><u>Stable:</u></i>&nbsp;3.12.4 (19 August 2006) [
+<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=49059&release_id=440657">Source</a>
 &nbsp;/&nbsp;
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=73150&release_id=413555">RPMs</a>
+RPMs
 &nbsp;/&nbsp;
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=73153&release_id=413552">Win32</a>
+<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=73153&release_id=440658">Win32</a>
 ]</h3>
-This release eliminates need for libstdc++ when using gcc-3 or
-higher. It also contains some fixes to the BSD USB driver and 
-build fixes for various rare cases.
+This is a bug fix release which includes fixes for SNMP crash in the
+face of network errors. Also status and data logging interval was often
+off by one period. NIS port now properly defaults to 3551 or value 
+provided by configure, not hard-coded 7000. RPM specs updated for 
+Fedora Core builds (need latex2html).
 <p>
 Highlights of the 3.12.x release series include a GUI installer for 
 Win32 systems, battery disconnect/reconnect detection for smart serial
 and USB connections, SNMP trap catching for quicker SNMP event 
 responses, and numerous bug fixes. Please be sure to read the
-<a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=413549">ReleaseNotes</a> 
+<a href="http://sourceforge.net/project/shownotes.php?release_id=440658&group_id=54413">ReleaseNotes</a> 
 to learn about the new features and for important information about
 upcoming releases.
 
