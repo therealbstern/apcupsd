@@ -9107,11 +9107,19 @@ in the spec file directly or pass it to rpmbuild on the command line:
 \normalsize
 
 
-\item [{\bf other defines are used?}]
-   \index{other defines are used? }
+\item [{\bf What other defines are used?}]
+   \index{What other defines are used? }
    The only other define is for the initdir for the daemon control script. On
-RedHat systems this is set to /etc/rc.d/init.d/.  You would only need to edit
+RedHat or Mandrake systems this is set to /etc/rc.d/init.d/. On SuSE systems this is 
+set to /etc/rc.d.  You would only need to edit
 this if packaging for a platform with uses a different directory.  
+
+\item [{\bf Can I supply packages for other platforms you do not publish?}]
+   \index{Can I supply packages for other platforms you do not publish? }
+   Yes, there are tools provided for contributors to supply rpm packages for platforms 
+for which support is provided in the spec file but for which the development team 
+chooses not to release binary packages, usually due to lack of interest or lack of an 
+available platform. Please see platforms/contrib/README in the source package.  
 
 \item [{\bf I'm getting errors about not having permission when}]
    \index{I'm getting errors about not having permission when }
