@@ -9128,19 +9128,22 @@ root and, in fact, it is better practice to build rpm packages as a non-root
 user.  Apcupds packages are designed to be built by a regular user but you
 must make a few changes on your system to do this.  If you are building on
 your own system then the simplest method is to add write permissions for all
-to the build directory (/usr/src/redhat/).  To accomplish this execute the
-following command as root:  
+to the build directory (/usr/src/redhat/).  To accomplish this execute one of the
+following commands as root depending on your distribution, RedHat, SuSE or 
+Mandriva, respectively:  
 
 \footnotesize
 \begin{verbatim}
               chmod -R 777 /usr/src/redhat
+              chmod -R 777 /usr/src/packages
+              chmod -R 777 /usr/src/RPM
      
 \end{verbatim}
 \normalsize
 
 If you are working on a shared system where you can not use the method above
-then you need to recreate the /usr/src/redhat directory tree with all of it's
-subdirectories inside your home directory. Then create a file named  
+then you need to recreate the /usr/src/redhat (or other) directory tree with all 
+of it's subdirectories inside your home directory. Then create a file named  
 
 \footnotesize
 \begin{verbatim}
