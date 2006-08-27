@@ -408,6 +408,7 @@ void do_action(UPSINFO *ups)
    if (ups->is_shut_remote()) {
       ups->clear_onbatt_msg();
       generate_event(ups, CMDREMOTEDOWN);
+      write_unlock(ups);
       return;
    }
 
