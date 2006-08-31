@@ -424,6 +424,10 @@ int main(int argc, char *argv[])
       pmsg("mode.type = SHARESMART\n");
       break;
 
+   case APCSMART_UPS:
+      pmsg("mode.type = APCSMART_UPS\n");
+      break;
+
    case USB_UPS:
       pmsg("mode.type = USB_UPS\n");
       break;
