@@ -5,6 +5,9 @@
 #
 # Copyright (C) 1999-2002 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
 
+# We don't support parallelized makes
+.NOTPARALLEL:
+
 # Tell versions [3.59,3.63) of GNU make not to export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:
