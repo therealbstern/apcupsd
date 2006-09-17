@@ -116,7 +116,7 @@ DIRECTX_ARCHIVE="directx-devel.tar.gz"
 
 # These are the files from NSIS at sf.net
 NSIS_URL="http://heanet.dl.sourceforge.net/sourceforge/nsis"
-NSIS_ARCHIVE=nsis-2.19-src.tar.bz2
+NSIS_ARCHIVE=nsis-2.20-src.tar.bz2
 
 #-----------------------------------------------------
 #
