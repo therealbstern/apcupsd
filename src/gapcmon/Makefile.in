@@ -16,7 +16,7 @@ sysconfdir=/etc
 allexe = @GAPCMON@
 
 gapcmon_OBJS = gapcmon.o eggtrayicon.o
-pixmaps_DATA = charging.png onbatt.png online.png apcupsd.png unplugged.png
+pixmaps_DATA = charging.png onbatt.png online.png apcupsd.png unplugged.png gapc_prefs.png
 
 all-targets: $(allexe)
 
@@ -44,13 +44,14 @@ install-binary: $(allexe)
 install-gapcmon: gapcmon
 	$(INSTALL_PROGRAM) -m 755 gapcmon		$(DESTDIR)$(bindir)/gapcmon@EXEEXT@
 	@$(INSTALL_PROGRAM) -m 755 gapcmon.desktop	$(DESTDIR)${datadir}/applications/gapcmon.desktop
-	
+
 install-pixmaps: $(pixmaps_DATA)
-	$(INSTALL_PROGRAM) -m 744 apcupsd.png	$(DESTDIR)$(datadir)/pixmaps/apcupsd.png		
-	$(INSTALL_PROGRAM) -m 744 online.png	$(DESTDIR)$(datadir)/pixmaps/online.png
-	$(INSTALL_PROGRAM) -m 744 onbatt.png	$(DESTDIR)$(datadir)/pixmaps/onbatt.png
-	$(INSTALL_PROGRAM) -m 744 charging.png	$(DESTDIR)$(datadir)/pixmaps/charging.png
-	$(INSTALL_PROGRAM) -m 744 unplugged.png	$(DESTDIR)$(datadir)/pixmaps/unplugged.png
+	$(INSTALL_PROGRAM) -m 744 apcupsd.png		$(DESTDIR)$(datadir)/pixmaps/apcupsd.png		
+	$(INSTALL_PROGRAM) -m 744 online.png		$(DESTDIR)$(datadir)/pixmaps/online.png
+	$(INSTALL_PROGRAM) -m 744 onbatt.png		$(DESTDIR)$(datadir)/pixmaps/onbatt.png
+	$(INSTALL_PROGRAM) -m 744 charging.png		$(DESTDIR)$(datadir)/pixmaps/charging.png
+	$(INSTALL_PROGRAM) -m 744 unplugged.png		$(DESTDIR)$(datadir)/pixmaps/unplugged.png
+	$(INSTALL_PROGRAM) -m 744 gapc_prefs.png	$(DESTDIR)$(datadir)/pixmaps/gapc_prefs.png
 
 uninstall:
 	@$(ECHO) "Removing gapcmon ..."
@@ -58,7 +59,8 @@ uninstall:
 	$(RMF) $(DESTDIR)$(datadir)/pixmaps/unplugged.png
 	$(RMF) $(DESTDIR)$(datadir)/pixmaps/online.png
 	$(RMF) $(DESTDIR)$(datadir)/pixmaps/onbatt.png
-	$(RMF) $(DESTDIR)$(datadir)/pixmaps/charging.png			
+	$(RMF) $(DESTDIR)$(datadir)/pixmaps/charging.png
+	$(RMF) $(DESTDIR)${datadir}/applications/gapc_prefs.png
 	$(RMF) $(DESTDIR)${datadir}/applications/gapcmon.desktop	
 	$(RMF) $(DESTDIR)$(bindir)/gapcmon@EXEEXT@
 
