@@ -54,8 +54,8 @@ distclean: targetdistclean
 
 install: all-targets
 	@for p in $(allexe) ; do \
-	    echo $(INSTALL_PROGRAM) -s $$p $(DESTDIR)$(cgibin); \
-	    $(INSTALL_PROGRAM) -s $$p $(DESTDIR)$(cgibin); \
+	    echo $(INSTALL_PROGRAM) $(STRIP) $$p $(DESTDIR)$(cgibin); \
+	    $(INSTALL_PROGRAM) $(STRIP) $$p $(DESTDIR)$(cgibin); \
 	done
 	# don't overwrite any existing config file
 	@if test ! -f $(DESTDIR)$(sysconfdir)/apcupsd.css; then \

@@ -38,11 +38,11 @@ install-binary: $(allexe)
 	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(bindir)
 	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(datadir)/pixmaps
 	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(datadir)/applications
-	$(MAKE) DESTDIR=$(DESTDIR) install-pixmaps
-	$(MAKE) DESTDIR=$(DESTDIR) install-@GAPCMON@
+	$(MAKE) STRIP=$(STRIP) DESTDIR=$(DESTDIR) install-pixmaps
+	$(MAKE) STRIP=$(STRIP) DESTDIR=$(DESTDIR) install-@GAPCMON@
 
 install-gapcmon: gapcmon
-	$(INSTALL_PROGRAM) -m 755 gapcmon		$(DESTDIR)$(bindir)/gapcmon@EXEEXT@
+	$(INSTALL_PROGRAM) $(STRIP) -m 755 gapcmon	$(DESTDIR)$(bindir)/gapcmon@EXEEXT@
 	@$(INSTALL_PROGRAM) -m 755 gapcmon.desktop	$(DESTDIR)${datadir}/applications/gapcmon.desktop
 
 install-pixmaps: $(pixmaps_DATA)
