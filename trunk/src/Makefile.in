@@ -56,32 +56,32 @@ install-:
 install-binary: $(allexe)
 	@$(ECHO) "Installing daemons ..."
 	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(sbindir)
-	@$(INSTALL_PROGRAM) -s -m 700 apcupsd@EXEEXT@ \
+	@$(INSTALL_PROGRAM) $(STRIP) -m 700 apcupsd@EXEEXT@ \
 		$(DESTDIR)$(sbindir)/apcupsd@EXEEXT@
-	@$(INSTALL_PROGRAM) -s -m 700 apctest@EXEEXT@ \
+	@$(INSTALL_PROGRAM) $(STRIP) -m 700 apctest@EXEEXT@ \
 		$(DESTDIR)$(sbindir)/apctest@EXEEXT@
-	@$(MAKE) DESTDIR=$(DESTDIR) install-@APCACCESS@
-	@$(MAKE) DESTDIR=$(DESTDIR) install-@SMTP@
-	@$(MAKE) DESTDIR=$(DESTDIR) install-@POWERFLUTE@
-	@$(MAKE) DESTDIR=$(DESTDIR) install-@CGI@
-	@$(MAKE) DESTDIR=$(DESTDIR) install-@GAPCMON@
+	@$(MAKE) STRIP=$(STRIP) DESTDIR=$(DESTDIR) install-@APCACCESS@
+	@$(MAKE) STRIP=$(STRIP) DESTDIR=$(DESTDIR) install-@SMTP@
+	@$(MAKE) STRIP=$(STRIP) DESTDIR=$(DESTDIR) install-@POWERFLUTE@
+	@$(MAKE) STRIP=$(STRIP) DESTDIR=$(DESTDIR) install-@CGI@
+	@$(MAKE) STRIP=$(STRIP) DESTDIR=$(DESTDIR) install-@GAPCMON@
 
 install-apcaccess:
-	@$(INSTALL_PROGRAM) -s -m 755 apcaccess@EXEEXT@ \
+	@$(INSTALL_PROGRAM) $(STRIP) -m 755 apcaccess@EXEEXT@ \
 		$(DESTDIR)$(sbindir)/apcaccess@EXEEXT@
 
 install-smtp:
-	@$(INSTALL_PROGRAM) -s -m 755 smtp@EXEEXT@ \
+	@$(INSTALL_PROGRAM) $(STRIP) -m 755 smtp@EXEEXT@ \
 		$(DESTDIR)$(sbindir)/smtp@EXEEXT@
 
 install-powerflute:
-	@$(INSTALL_PROGRAM) -s -m 755 powerflute@EXEEXT@ \
+	@$(INSTALL_PROGRAM) $(STRIP) -m 755 powerflute@EXEEXT@ \
 		$(DESTDIR)$(sbindir)/powerflute@EXEEXT@
 install-cgi:
-	(cd cgi/; $(MAKE) DESTDIR=$(DESTDIR) install)
+	(cd cgi/; $(MAKE) STRIP=$(STRIP) DESTDIR=$(DESTDIR) install)
 
 install-gapcmon:
-	(cd gapcmon/; $(MAKE) DESTDIR=$(DESTDIR) install)
+	(cd gapcmon/; $(MAKE) STRIP=$(STRIP) DESTDIR=$(DESTDIR) install)
 
 uninstall:
 	@$(ECHO) "Removing daemons ..."

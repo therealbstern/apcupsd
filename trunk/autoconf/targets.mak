@@ -14,7 +14,7 @@
 .SUFFIXES: .o .lo .c .cpp .h .po .gmo .mo .cat .msg .pox
 .MAIN: all
 .PHONY: all install uninstall install- install-apcupsd install-powerflute \
-		install-cgi clean realclean distclean mostlyclean clobber
+		install-cgi install-strip clean realclean distclean mostlyclean clobber
 
 all: all-subdirs all-targets
 
@@ -217,7 +217,7 @@ install-subdirs:
 	@if test ! x"$(subdirs)" = x; then \
 	   for file in . ${subdirs}; \
 	   do \
-	       (cd $$file && if test "$$file" != "."; then $(MAKE) DESTDIR=$(DESTDIR) install; fi); \
+	       (cd $$file && if test "$$file" != "."; then $(MAKE) STRIP=$(STRIP) DESTDIR=$(DESTDIR) install; fi); \
 	   done; \
 	fi
 
@@ -228,6 +228,9 @@ uninstall-subdirs:
 	      (cd $$file && if test "$$file" != "."; then $(MAKE) DESTDIR=$(DESTDIR) uninstall; fi); \
 	   done; \
 	fi
+
+install-strip:
+	@$(MAKE) STRIP='-s' install
 
 indent:
 	(cd $(topdir) && \
