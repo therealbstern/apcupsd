@@ -233,6 +233,8 @@ void apctest_error_exit(const char *fmt, ...)
 /* Main program */
 
 /* This application must be linked as console app. */
+#undef main
+
 #define M_SMART  1
 #define M_DUMB   2
 #define M_USB    3
@@ -794,9 +796,9 @@ static void test6(void)
 
    ptime();
    print_bits(bits);
-   make_file(ups, PWRFAIL);
+   make_file(ups, ups->pwrfailpath);
    kill_power(ups);
-   unlink(PWRFAIL);
+   unlink(ups->pwrfailpath);
    ptime();
 
    pmsg("returned from kill_power function.\n");
@@ -1762,9 +1764,9 @@ static void usb_kill_power_test(void)
    ptime();
    pmsg("calling kill_power function.\n");
 
-   make_file(ups, PWRFAIL);
+   make_file(ups, ups->pwrfailpath);
    kill_power(ups);
-   unlink(PWRFAIL);
+   unlink(ups->pwrfailpath);
 
    ptime();
    pmsg("returned from kill_power function.\n");
