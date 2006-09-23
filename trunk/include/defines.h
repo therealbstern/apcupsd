@@ -26,23 +26,21 @@
 #ifndef _DEFINES_H
 #define _DEFINES_H
 
-#ifndef APCCONTROL
-# define APCCONTROL              SYSCONFDIR "/apccontrol"
+#ifndef APCCONTROL_FILE
+# define APCCONTROL_FILE        "/apccontrol"
 #endif
 
-#ifndef APCCONF
-# define APCCONF                SYSCONFDIR "/apcupsd.conf"
+#ifndef APCCONF_FILE
+# define APCCONF_FILE           "/apcupsd.conf"
 #endif
 
-#ifndef PWRFAILDIR
-# define PWRFAILDIR             SYSCONFDIR
+#ifndef PWRFAIL_FILE
+# define PWRFAIL_FILE           "/powerfail"
 #endif
 
-#ifndef PWRFAIL
-# define PWRFAIL                PWRFAILDIR "/powerfail"
+#ifndef NOLOGIN_FILE
+# define NOLOGIN_FILE            "/nologin"
 #endif
-
-#define NOLOGIN                 NOLOGDIR "/nologin"
 
 #define APCPID                  PIDDIR "/apcupsd.pid"
 
