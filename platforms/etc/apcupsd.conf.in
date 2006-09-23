@@ -77,8 +77,25 @@ DEVICE @SERIALDEV@
 
 
 # LOCKFILE <path to lockfile>
-#   Path for device lock file.
+#   Path for device lock file. Not used on Win32.
 LOCKFILE @LOCKDIR@
+
+# SCRIPTDIR <path to script directory>
+#   Directory in which apccontrol and event scripts are located.
+SCRIPTDIR @sysconfdir@
+
+# PWRFAILDIR <path to powerfail directory>
+#   Directory in which to write the powerfail flag file. This file
+#   is created when apcupsd initiates a system shutdown and is
+#   checked in the OS halt scripts to determine if a killpower
+#   (turning off UPS output power) is required.
+PWRFAILDIR @PWRFAILDIR@
+
+# NOLOGINDIR <path to nologin directory>
+#   Directory in which to write the nologin file. The existence
+#   of this flag file tells the OS to disallow new logins.
+NOLOGINDIR @nologdir@
+
 
 #
 # ======== Configuration parameters used during power failures ==========
@@ -156,10 +173,11 @@ NETSERVER on
 
 # NISIP <dotted notation ip address>
 #  IP address on which NIS server will listen for incoming connections.
-#  Default value is 0.0.0.0 that means any incoming request will be
-#  serviced but if you want it to listen to a single subnet you can
-#  set it up to that subnet address, for example 192.168.10.0
-#  Additionally you can listen for a single IP like 192.168.10.1
+#  This is useful if your server is multi-homed (has more than one
+#  network interface and IP address). Default value is 0.0.0.0 which
+#  means any incoming request will be serviced. Alternatively, you can
+#  configure this setting to any specific IP address of your server and 
+#  NIS will listen for connections only on that interface.
 NISIP @NISIP@
 
 # NISPORT <port> default is 3551 as registered with the IANA
@@ -187,6 +205,7 @@ EVENTSFILEMAX 10
 
 # NETTIME <int>
 #   Interval (in seconds) at which the NIS client polls the server.
+#   Used only when this apcupsd is a network client (UPSTYPE net).
 #NETTIME 60
 
 #
