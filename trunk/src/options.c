@@ -179,6 +179,36 @@ int parse_options(int argc, char *argv[])
       }
    }
 
+/*
+ * On Win32, if the user did not provide a -f argument to specify
+ * the location of apcupsd.conf, simulate one relative to current
+ * executable path.
+ */
+#ifdef HAVE_WIN32
+   if (cfgfile == APCCONF) {
+      /* Obtain full path of this executable */
+      char path[APC_FILENAME_MAX];
+      DWORD len = GetModuleFileName(NULL, path, sizeof(path)-1);
+      path[len] = '\0';
+      Dmsg1(200, "Exepath: %s\n", path);
+      if (len == 0) {
+         /* Failed to get path, so make an assumption */
+         asnprintf(path, sizeof(path), "C:\\apcupsd\\bin\\apcupsd.exe");
+      }
+
+      /* Remove trailing filename */
+      char *ptr = strrchr(path, '\\');
+      if (ptr)
+         *(ptr+1) = '\0';
+      else
+         path[0] = '\0';
+
+      /* Build default path "constant" relative to exe path. */
+      asnprintf(APCCONF, sizeof(APCCONF),
+         "%s..\\etc\\apcupsd%s", path, APCCONF_FILE);
+   }
+#endif
+
    if ((oneshot == TRUE) && options > 1) {
       fprintf(stderr, _("\nError: too many arguments.\n\n"));
       errflag++;

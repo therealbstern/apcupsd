@@ -150,7 +150,7 @@ void generate_event(UPSINFO *ups, int event)
  * ok = 2  => power failure
  * ok = 3  => remote shutdown
  */
-void powerfail(int ok)
+static void powerfail(int ok)
 {
    /*
     * If apcupsd terminates here, it will never get a chance to
@@ -187,14 +187,14 @@ void powerfail(int ok)
  * If called with zero, prevent users from logging in. 
  * If called with one, allow users to login.
  */
-void logonfail(int ok)
+static void logonfail(UPSINFO *ups, int ok)
 {
    int lgnfd;
 
-   unlink(NOLOGIN);
+   unlink(ups->nologinpath);
 
    if (ok == 0 &&
-       ((lgnfd = open(NOLOGIN, O_CREAT | O_WRONLY, 0644)) >= 0)) {
+       ((lgnfd = open(ups->nologinpath, O_CREAT | O_WRONLY, 0644)) >= 0)) {
       write(lgnfd, POWERFAIL, strlen(POWERFAIL));
       close(lgnfd);
    }
@@ -205,9 +205,8 @@ static void prohibit_logins(UPSINFO *ups)
    if (ups->nologin_file)
       return;                      /* already done */
 
-   make_file(ups, NOLOGIN);
+   logonfail(ups, 0);
    ups->nologin_file = true;
-   logonfail(0);
 
    log_event(ups, LOG_ALERT, _("User logins prohibited"));
 }
@@ -221,7 +220,7 @@ static void do_shutdown(UPSINFO *ups, int cmdtype)
    ups->set_shutdown();
    delete_lockfile(ups);
    ups->set_fastpoll();
-   make_file(ups, PWRFAIL);
+   make_file(ups, ups->pwrfailpath);
    prohibit_logins(ups);
 
    if (!ups->is_slave()) {
@@ -613,7 +612,7 @@ void do_action(UPSINFO *ups)
          ups->ShutDown = 0;
          ups->clear_shutdown();
          powerfail(1);
-         unlink(PWRFAIL);
+         unlink(ups->pwrfailpath);
          log_event(ups, LOG_ALERT, _("Cancelling shutdown"));
       }
 
@@ -633,7 +632,7 @@ void do_action(UPSINFO *ups)
       if (ups->nologin_file)
          log_event(ups, LOG_ALERT, _("Allowing logins"));
 
-      logonfail(1);
+      logonfail(ups, 1);
       ups->nologin_file = false;
       requested_logoff = false;
       device_entry_point(ups, DEVICE_CMD_DTR_ST_DISABLE, NULL);

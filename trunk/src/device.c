@@ -95,7 +95,7 @@ void kill_power(UPSINFO *ups)
     * above only tests UPS_onbatt flag for dumb UPSes.
     */
     
-   pwdf = fopen(PWRFAIL, "r");
+   pwdf = fopen(ups->pwrfailpath, "r");
    if ((pwdf == NULL && ups->mode.type != BK) ||
        (pwdf == NULL && ups->is_onbatt() && ups->mode.type == BK)) {
       
@@ -111,13 +111,13 @@ void kill_power(UPSINFO *ups)
 
       /* Now complain */
       log_event(ups, LOG_WARNING,
-         _("Cannot find " PWRFAIL " file.\n Killpower requested in "
+         _("Cannot find %s file.\n Killpower requested in "
            "non-power fail condition or bug.\n Killpower request "
-           "ignored at %s:%d\n"), __FILE__, __LINE__);
-      Error_abort2(
-         _("Cannot find " PWRFAIL " file.\n Killpower requested in "
+           "ignored at %s:%d\n"), ups->pwrfailpath, __FILE__, __LINE__);
+      Error_abort3(
+         _("Cannot find %s file.\n Killpower requested in "
            "non-power fail condition or bug.\n Killpower request "
-           "ignored at %s:%d\n"), __FILE__, __LINE__);
+           "ignored at %s:%d\n"), ups->pwrfailpath, __FILE__, __LINE__);
    } else {
       /* We are on batteries, so do the kill_power */
       if (ups->upsclass.type == SHAREMASTER) {

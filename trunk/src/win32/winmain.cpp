@@ -36,15 +36,9 @@
 
 // winmain.cpp for win32 version of apcupsd
 
-#ifdef HAVE_MINGW
-#include "compat.h"
-#include "winconfig.h"
+#include "apc.h"
 #include "winapi.h"
 #undef STRICT
-#else
-#include "config.h"
-extern "C" void syslog(int type, const char *fmt, ...);
-#endif
 
 ////////////////////////////
 // System headers
@@ -358,20 +352,24 @@ int ApcupsdAppMain(int service)
                  MB_OK);
       _exit(0);
    }
+
    // Create a thread to handle the Windows messages
 //  (void)CreateThread(NULL, 0, Main_Msg_Loop, NULL, 0, &dwThreadID);
    pthread_create(&tid, NULL, Main_Msg_Loop, (void *)0);
 
+#if 0
    /* If service do cleanups normally done in Unix scripts */
    if (service) {
       /* Zap any left over no login file and powerfail file */
       if (unlink(NOLOGIN) != 0 && errno != ENOENT) {
-         syslog(0, "Could not unlink " NOLOGIN ": ERR=%s\n", strerror(errno));
+         syslog(0, "Could not unlink %s: ERR=%s\n", NOLOGIN, strerror(errno));
       }
       if (unlink(PWRFAIL) != 0 && errno != ENOENT) {
-         syslog(0, "Could not unlink " PWRFAIL ": ERR=%s\n", strerror(errno));
+         syslog(0, "Could not unlink %s: ERR=%s\n", PWRFAIL, strerror(errno));
       }
    }
+#endif
+
    // Call the "real" apcupsd
    ApcupsdMain(num_command_args, command_args);
    PostQuitMessage(0);
