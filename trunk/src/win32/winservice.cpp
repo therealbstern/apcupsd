@@ -50,7 +50,6 @@
 
 // Error message logging
 void LogErrorMsg(char *message, int eventID);
-extern void logonfail(int ok);
 
 #define _(x) x
 
