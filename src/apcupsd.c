@@ -158,6 +158,15 @@ void apcupsd_error_exit(const char *fmt, ...)
    apcupsd_error_cleanup(core_ups);     /* finish the work */
 }
 
+/*
+ * ApcupsdMain is called from win32/winmain.cpp
+ * we need to eliminate "main" as an entry point,
+ * otherwise, it interferes with the Windows
+ * startup.
+ */
+#ifdef HAVE_MINGW
+# define main ApcupsdMain
+#endif
 
 /* Main program */
 int main(int argc, char *argv[])
