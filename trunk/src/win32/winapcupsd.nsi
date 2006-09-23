@@ -11,13 +11,37 @@
 ; Include the Modern UI
 ;
 !include "MUI.nsh"
-;!include "params.nsh"
 !include "util.nsh"
 
 ;
 ; Use Logic Library to improve readability
 ;
 !include "LogicLib.nsh"
+
+; Post-process apcupsd.conf.in by replacing @FOO@ tokens
+; with proper values.
+Function PostProcConfig
+  FileOpen $0 "$INSTDIR\etc\apcupsd\apcupsd.conf.in" "r"
+  FileOpen $1 "$INSTDIR\etc\apcupsd\apcupsd.conf.new" "w"
+
+  ClearErrors
+  FileRead $0 $2
+
+  ${DoUntil} ${Errors}
+    ${StrReplace} $2 "@VERSION@"    "${VERSION}"           $2
+    ${StrReplace} $2 "@sysconfdir@" "$INSTDIR\etc\apcupsd" $2
+    ${StrReplace} $2 "@PWRFAILDIR@" "$INSTDIR\etc\apcupsd" $2
+    ${StrReplace} $2 "@LOGDIR@"     "$INSTDIR\etc\apcupsd" $2
+    ${StrReplace} $2 "@nologdir@"   "$INSTDIR\etc\apcupsd" $2
+    FileWrite $1 $2
+    FileRead $0 $2
+  ${Loop}
+
+  FileClose $0
+  FileClose $1
+
+  Delete "$INSTDIR\etc\apcupsd\apcupsd.conf.in"
+FunctionEnd
 
 ;
 ; Basics
@@ -129,12 +153,16 @@ Section "Apcupsd Service" SecService
   SetOutPath "$INSTDIR\etc\apcupsd"
   File ..\..\platforms\mingw\apccontrol.bat
 
-  ; Install apcupsd.conf as apcupsd.conf.new if apcupsd.conf already exists
-  ${If} ${FileExists} "$INSTDIR\etc\apcupsd\apcupsd.conf"
-    File /oname=apcupsd.conf.new ..\..\platforms\etc\apcupsd.conf
-  ${Else}
-    File ..\..\platforms\etc\apcupsd.conf
-  ${EndIf}
+  ; Install apcupsd.conf.in
+  File ..\..\platforms\mingw\apcupsd.conf.in
+
+  ; Post-process apcupsd.conf.in into apcupsd.conf.new
+  Call PostProcConfig
+
+  ; Rename apcupsd.conf.new to apcupsd.conf if it does not already exist
+  ${Unless} ${FileExists} "$INSTDIR\etc\apcupsd\apcupsd.conf"
+    Rename apcupsd.conf.new apcupsd.conf
+  ${EndUnless}
 
   ; If already installed as service skip the option
   ReadRegDWORD $9 HKLM "Software\Apcupsd" "InstalledService"
