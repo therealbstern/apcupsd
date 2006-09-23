@@ -27,6 +27,11 @@
 
 #include "apc.h"
 
+/*
+ * We use more complicated defaults for these constants in some cases,
+ * so stick them in arrays that can be modified at runtime.
+ */
+char APCCONF[APC_FILENAME_MAX] = SYSCONFDIR APCCONF_FILE;
 
 /* ---------------------------------------------------------------------- */
 
@@ -133,7 +138,12 @@ static const PAIRS table[] = {
    {"UPSCABLE", match_range, WHERE(cable),    cables},
    {"UPSTYPE",  match_range, WHERE(mode),     types},
    {"DEVICE",   match_str,   WHERE(device),   SIZE(device)},
-   {"LOCKFILE", match_str,   WHERE(lockpath), SIZE(lockpath)},
+   
+   /* Paths */
+   {"LOCKFILE",   match_str, WHERE(lockpath),   SIZE(lockpath)},
+   {"SCRIPTDIR",  match_str, WHERE(apccontrol), SIZE(apccontrol)},
+   {"PWRFAILDIR", match_str, WHERE(pwrfailpath), SIZE(pwrfailpath)},
+   {"NOLOGINDIR", match_str, WHERE(nologinpath), SIZE(nologinpath)},
 
    /* Configuration parameters used during power failures */
    {"ANNOY",          match_int,   WHERE(annoy),       0},
@@ -146,9 +156,9 @@ static const PAIRS table[] = {
    {"KILLDELAY",      match_int,   WHERE(killdelay),   0},
 
    /* Configuration parmeters for network information server */
-   {"NETSERVER",  match_index, WHERE(netstats),   onoroff},
-   {"NISIP",      match_str,   WHERE(nisip),      SIZE(nisip)},
-   {"NISPORT",    match_int,   WHERE(statusport), 0},
+   {"NETSERVER", match_index, WHERE(netstats),   onoroff},
+   {"NISIP",     match_str,   WHERE(nisip),      SIZE(nisip)},
+   {"NISPORT",   match_int,   WHERE(statusport), 0},
 
    /* Configuration parameters for event logging */
    {"EVENTFILE",     match_str, WHERE(eventfile),    SIZE(eventfile)},
@@ -372,31 +382,29 @@ static int match_index(UPSINFO *ups, int offset, const GENINFO * vs, const char 
 
 
 /*
- * FIXME (remove/replace this comment once fixed)
- *
- * Do we ever want str to contain whitespace?
- * If so, we can't use sscanf(3)
+ * We accept strings containing internal whitespace (in order to support
+ * paths with spaces in them) but truncate after '#' since we assume it 
+ * marks a comment.
  */
 static int match_str(UPSINFO *ups, int offset, const GENINFO * gen, const char *v)
 {
    char x[MAXSTRING];
    long size = (long)gen;
 
-   /*
-    * Needed if string is empty or all whitespace; sscanf will return EOF 
-    * without modifying the destination buffer.
-    */
-   x[0] = '\0';
+   /* Copy the string so we can edit it in place */
+   astrncpy(x, v, sizeof(x));
 
-   /*
-    * On some platforms (Darwin 10.3.x), sscanf("", "%s", buf) returns 0
-    * (failure) instead of -1 (EOF). So we explicitly check for that case.
-    */
-   if (v[0] && !sscanf(v, "%s", x))
-      return FAILURE;
+   /* Remove trailing comment, if there is one */
+   char *ptr = strchr(x, '#');
+   if (ptr)
+      *ptr = '\0';
+
+   /* Remove any trailing whitespace */
+   ptr = x + strlen(x) - 1;
+   while (ptr >= x && isspace(*ptr))
+      *ptr-- = '\0';
 
    astrncpy((char *)AT(ups, offset), x, (int)size);
-   *((char *)AT(ups, (offset + (int)size) - 1)) = 0;    /* terminate string */
    return SUCCESS;
 }
 
@@ -615,6 +623,11 @@ void init_ups_struct(UPSINFO *ups)
    ups->eventfilemax = 10;         /* trim the events file at 10K as default */
    ups->event_fd = -1;             /* no file open */
 
+   /* Default paths */
+   astrncpy(ups->apccontrol, SYSCONFDIR, sizeof(ups->apccontrol));
+   astrncpy(ups->pwrfailpath, PWRFAILDIR, sizeof(ups->pwrfailpath));
+   astrncpy(ups->nologinpath, NOLOGDIR, sizeof(ups->nologinpath));
+   
    /* Initialize UPS function codes */
    ups->UPS_Cmd[CI_STATUS] = APC_CMD_STATUS;
    ups->UPS_Cmd[CI_LQUAL] = APC_CMD_LQUAL;
@@ -709,8 +722,8 @@ jump_into_the_loop:
 
       if (ParseConfig(ups, line)) {
          errors++;
-         printf("%s\n", line);
-         printf(_("Parsing error at line %d of config file %s.\n"), erpos, cfgfile);
+         Dmsg1(100, "%s\n", line);
+         Dmsg2(100, _("Parsing error at line %d of config file %s.\n"), erpos, cfgfile);
       }
    }
 
@@ -782,6 +795,14 @@ jump_into_the_loop:
       ups->lockpath[0] = 0;
       ups->lockfile = -1;
    }
+
+   /* Append filenames to paths */
+   Dmsg1(200, "After config apccontrol: \"%s\"\n", ups->apccontrol);
+   Dmsg1(200, "After config pwrfailpath: \"%s\"\n", ups->pwrfailpath);
+   Dmsg1(200, "After config nologinpath: \"%s\"\n", ups->nologinpath);
+   astrncat(ups->apccontrol, APCCONTROL_FILE, sizeof(ups->apccontrol));
+   astrncat(ups->nologinpath, NOLOGIN_FILE, sizeof(ups->nologinpath));
+   astrncat(ups->pwrfailpath, PWRFAIL_FILE, sizeof(ups->pwrfailpath));
 
    switch (ups->nologin.type) {
    case TIMEOUT:

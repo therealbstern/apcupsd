@@ -82,7 +82,6 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
    PROCESS_INFORMATION procinfo;
    STARTUPINFOA startinfo;
    BOOL rc;
-   char apccontrol[strlen(APCCONTROL)+1];
 
    if (cmd.pid && (kill(cmd.pid, 0) == 0)) {
       /*
@@ -97,12 +96,9 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
    if (comspec == NULL)
       return FAILURE;
 
-   /* HACK! The APCCONTROL constant is currently using UNIX slashes */
-   conv_unix_to_win32_path(APCCONTROL, apccontrol, sizeof(apccontrol));
-
    /* Build the command line */
    asnprintf(cmdline, sizeof(cmdline), "\"%s\" /c %s %s \"%s\" %d %d",
-      comspec, apccontrol, cmd.command, ups->upsname,
+      comspec, ups->apccontrol, cmd.command, ups->upsname,
       !ups->is_slave(), ups->is_plugged());
 
    /* Initialize the STARTUPINFOA structto hide the console window */
@@ -164,17 +160,17 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
       return FAILURE;
 
    case 0:      /* child */
-      argv[0] = APCCONTROL;        /* Shell script to execute. */
+      argv[0] = ups->apccontrol;   /* Shell script to execute. */
       argv[1] = cmd.command;       /* Parameter to script. */
       argv[2] = ups->upsname;      /* UPS name */
       argv[3] = connected;
       argv[4] = powered;
       argv[5] = (char *)NULL;
-      execv(APCCONTROL, argv);
+      execv(ups->apccontrol, argv);
 
       /* NOT REACHED */
       log_event(ups, LOG_WARNING, _("Cannot exec %s %s: %s"),
-         APCCONTROL, cmd.command, strerror(errno));
+         ups->apccontrol, cmd.command, strerror(errno));
 
       /* Child must exit if fails exec'ing. */
       exit(-1);

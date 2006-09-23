@@ -10,8 +10,11 @@
 #ifndef __MINGWCONFIG_H
 #define __MINGWCONFIG_H
 
-/* Override to use *.bat */
-# define APCCONTROL              SYSCONFDIR "/apccontrol.bat"
+/* Override to use *.bat and backslashes */
+#define APCCONTROL_FILE "\\apccontrol.bat"
+#define PWRFAIL_FILE "\\powerfail"
+#define NOLOGIN_FILE "\\nologin"
+#define APCCONF_FILE "\\apcupsd.conf"
 
 /* Define if you have GCC */
 #define HAVE_GCC 1
