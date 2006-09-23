@@ -423,14 +423,15 @@ APC_OBJS = $(OBJS_SRC) $(LIB_OBJS) $(OBJS_COMPAT) $(OBJS_WIN) \
 	   $(OBJS_DRIVERS) $(OBJS_TESTDRV) $(OBJS_NETDRV) \
 	   $(OBJS_SMARTDRV) $(OBJS_DUMBDRV) $(OBJS_USBDRV) \
 	   $(OBJS_SNMPDRV) $(OBJS_PCNETDRV) $(OBJS_APCUPSD)
+APC_LIBS = $(LIB_PTHREADS) $(LIB_LIBUSB) $(LIB_NETSNMP) \
+	-L$(LIB_MINGW) -luser32 -lgdi32 -lwsock32 -lnetapi32
 
-TEST_OBJS = $(OBJS_SRC) $(LIB_OBJS) $(OBJS_COMPAT) $(OBJS_WIN) \
+TEST_OBJS = $(OBJS_SRC) $(LIB_OBJS) $(OBJS_COMPAT) \
 	   $(OBJS_DRIVERS) $(OBJS_TESTDRV) $(OBJS_NETDRV) \
 	   $(OBJS_SMARTDRV) $(OBJS_DUMBDRV) $(OBJS_USBDRV) \
 	   $(OBJS_SNMPDRV) $(OBJS_PCNETDRV) $(OBJS_APCTEST)
-
-APC_LIBS = $(LIB_PTHREADS) $(LIB_LIBUSB) $(LIB_NETSNMP) \
-	-L$(LIB_MINGW) -luser32 -lgdi32 -lwsock32 -lnetapi32
+TEST_LIBS = $(LIB_PTHREADS) $(LIB_LIBUSB) $(LIB_NETSNMP) \
+   -L$(LIB_MINGW) -luser32 -lwsock32 -lnetapi32
 
 ACCESS_OBJS = $(OBJS_ACCESS) $(LIB_OBJS) $(OBJS_COMPAT)
 ACCESS_LIBS = $(LIB_PTHREADS) -L$(LIB_MINGW) -luser32 -lwsock32 -lnetapi32
@@ -472,7 +473,7 @@ apcaccess.exe: $(ACCESS_OBJS) pthreadGCE.dll mingwm10.dll
 	$(CXX) $(ACCESS_OBJS) $(ACCESS_LIBS) -o $(OBJDIR)/apcaccess.exe
 
 apctest.exe: $(TEST_OBJS) pthreadGCE.dll mingwm10.dll
-	$(CXX) $(TEST_OBJS) $(APC_LIBS) -o $(OBJDIR)/apctest.exe
+	$(CXX) $(TEST_OBJS) $(TEST_LIBS) -o $(OBJDIR)/apctest.exe
 
 shutdown.exe: $(SHUT_OBJS) mingwm10.dll
 	$(CXX) $(SHUT_OBJS) $(SHUT_LIBS) -mwindows -o $(OBJDIR)/shutdown.exe
