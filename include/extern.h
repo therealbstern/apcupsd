@@ -77,9 +77,6 @@ extern int do_eeprom_programming(UPSINFO *ups);
 extern int parse_options(int argc, char *argv[]);
 
 /* In apcupsd.c */
-extern void powerfail(int ok);
-extern void logonfail(int ok);
-
 extern void apc_thread_terminate(int sig);
 extern void clean_threads(void);
 extern void apcupsd_terminate(int sig);
@@ -127,6 +124,7 @@ extern int make_file(UPSINFO *ups, const char *path);
 extern void make_pid_file(void);
 
 /* In apcconfig.c */
+extern char APCCONF[APC_FILENAME_MAX];
 extern void init_ups_struct(UPSINFO *ups);
 extern void check_for_config(UPSINFO *ups, char *cfgfile);
 
