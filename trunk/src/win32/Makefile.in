@@ -521,5 +521,5 @@ gapcmon.exe: $(GAPCMON_OBJS)
 	$(CC) $(GAPCMON_OBJS) $(GAPCMON_LIBS) -mwindows -o $(OBJDIR)/gapcmon.exe
 
 winapcupsd.exe: all
-	$(STRIP) *.exe
+	$(STRIP) *.exe *.dll
 	$(MAKENSIS) -V2 -DDEPKGS="$(DEPKGS)" -DVERSION="$(VERSION)" winapcupsd.nsi
