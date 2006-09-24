@@ -19,7 +19,7 @@
 //
 // Author          : Christopher S. Hull
 // Created On      : Sat Jan 31 15:55:00 2004
-// $Id: compat.cpp,v 1.20 2006-08-05 19:32:18 adk0212 Exp $
+// $Id: compat.cpp,v 1.21 2006-09-24 18:11:04 adk0212 Exp $
 
 #include "apc.h"
 #include "compat.h"
@@ -705,13 +705,6 @@ execvp(const char *, char *[]) {
 
 int
 fork(void)
-{
-   errno = ENOSYS;
-   return -1;
-}
-
-int
-pipe(int[])
 {
    errno = ENOSYS;
    return -1;
