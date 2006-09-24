@@ -35,7 +35,7 @@ G_BEGIN_DECLS
 #define GAPC_VERSION VERSION
 #endif
 #define GAPC_PROG_NAME    "gapcmon"
-#define GAPC_GROUP_TITLE "<i>  Uninterruptible Power Supply Monitor...</i>\n  for APCUPSD"
+#define GAPC_GROUP_TITLE "<i>  Uninterruptible Power Supply Monitor</i>\n  for APCUPSD"
 #define GAPC_WINDOW_TITLE  "gapcmon: UPS Information Panels"
 #define GAPC_CP_GROUP_KEY    "/apps/gapcmon/controller"
 #define GAPC_CP_SYSTRAY_KEY  "/apps/gapcmon/controller/use_systray"

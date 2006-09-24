@@ -1601,7 +1601,7 @@ static gboolean cb_util_line_chart_refresh_control(PGAPC_MONITOR pm)
       (GSourceFunc) cb_util_line_chart_refresh, &pm->phs);
 
    pch = g_strdup_printf(
-                 "<i>sampled every %3.1f seconds</i>", 
+                 "<i>Data sampled every %3.1f seconds</i>", 
                  pm->phs.d_xinc);
    lg_graph_set_x_label_text (pm->phs.plg, pch);
 
@@ -1612,7 +1612,7 @@ static gboolean cb_util_line_chart_refresh_control(PGAPC_MONITOR pm)
    if ((pm->tid_graph_refresh != 0) && (w != NULL)) {
       gtk_statusbar_pop(GTK_STATUSBAR(w), pm->i_info_context);
       pch1 = g_strdup_printf
-         ("Graphing refresh cycle changed for host %s completed!...", pm->pch_host);
+         ("Graphing refresh cycle changed for host %s completed!", pm->pch_host);
       gtk_statusbar_push(GTK_STATUSBAR(w), pm->i_info_context, pch1);
       g_free(pch1);
 
@@ -1646,7 +1646,7 @@ static gboolean cb_monitor_refresh_control(PGAPC_MONITOR pm)
 
    if ((pm->tid_automatic_refresh != 0) && (w != NULL)) {
       gtk_statusbar_pop(GTK_STATUSBAR(w), pm->i_info_context);
-      pch1 = g_strdup_printf("Refresh Cycle Change for host %s Completed!...",
+      pch1 = g_strdup_printf("Refresh Cycle Change for host %s Completed!",
          pm->pch_host);
       gtk_statusbar_push(GTK_STATUSBAR(w), pm->i_info_context, pch1);
       g_free(pch1);
@@ -1674,8 +1674,8 @@ static gboolean cb_monitor_dedicated_one_time_refresh(PGAPC_MONITOR pm)
       w = g_hash_table_lookup(pm->pht_Widgets, "StatusBar");
       if (w != NULL) {
          gtk_statusbar_pop(GTK_STATUSBAR(w), pm->i_info_context);
-         pch1 = g_strdup_printf("Quick refresh for %s failed!"
-            " Network thread is busy...", pm->pch_host);
+         pch1 = g_strdup_printf("Quick refresh for %s failed."
+            " Network thread is busy.", pm->pch_host);
          gtk_statusbar_push(GTK_STATUSBAR(w), pm->i_info_context, pch1);
          g_free(pch1);
       }
@@ -1693,8 +1693,8 @@ static gboolean cb_monitor_dedicated_one_time_refresh(PGAPC_MONITOR pm)
 
    if (!gapc_monitor_update(pm)) {
       if (w != NULL) {
-         pch1 = g_strdup_printf("Refresh for %s failed! "
-            "(retry enabled)... network busy!", pm->pch_host);
+         pch1 = g_strdup_printf("Refresh for %s failed. "
+            "(retry enabled) network busy.", pm->pch_host);
          gtk_statusbar_push(GTK_STATUSBAR(w), pm->i_info_context, pch1);
          g_free(pch1);
       }
@@ -1707,7 +1707,7 @@ static gboolean cb_monitor_dedicated_one_time_refresh(PGAPC_MONITOR pm)
    }
 
    if (w != NULL) {
-      pch1 = g_strdup_printf("One-Time Refresh for %s Completed...", pm->pch_host);
+      pch1 = g_strdup_printf("One-Time Refresh for %s Completed.", pm->pch_host);
       gtk_statusbar_push(GTK_STATUSBAR(w), pm->i_info_context, pch1);
       g_free(pch1);
    }
@@ -1741,8 +1741,8 @@ static gboolean cb_monitor_automatic_refresh(PGAPC_MONITOR pm)
       w = g_hash_table_lookup(pm->pht_Widgets, "StatusBar");
       if (w != NULL) {
          gtk_statusbar_pop(GTK_STATUSBAR(w), pm->i_info_context);
-         pch1 = g_strdup_printf("Automatic refresh for %s failed!"
-            " Network thread is busy...", pm->pch_host);
+         pch1 = g_strdup_printf("Automatic refresh for %s failed."
+            " Network thread is busy.", pm->pch_host);
          gtk_statusbar_push(GTK_STATUSBAR(w), pm->i_info_context, pch1);
          g_free(pch1);
       }
@@ -1760,14 +1760,14 @@ static gboolean cb_monitor_automatic_refresh(PGAPC_MONITOR pm)
    if (gapc_monitor_update(pm)) {
       if (w != NULL) {
          pch1 =
-            g_strdup_printf("Automatic refresh for %s complete...", pm->pch_host);
+            g_strdup_printf("Automatic refresh for %s complete.", pm->pch_host);
          gtk_statusbar_push(GTK_STATUSBAR(w), pm->i_info_context, pch1);
          g_free(pch1);
       }
    } else {
       if (w != NULL) {
-         pch1 = g_strdup_printf("Automatic refresh for %s failed!"
-            " Network thread is busy...", pm->pch_host);
+         pch1 = g_strdup_printf("Automatic refresh for %s failed."
+            " Network thread is busy.", pm->pch_host);
          gtk_statusbar_push(GTK_STATUSBAR(w), pm->i_info_context, pch1);
          g_free(pch1);
       }
@@ -3681,11 +3681,11 @@ static GtkWidget *gapc_panel_preferences_model_init(PGAPC_CONFIG pcfg)
       "active", GAPC_PREFS_ENABLED, NULL);
    gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
 
-   column = gtk_tree_view_column_new_with_attributes("use\nTrayIcon",
+   column = gtk_tree_view_column_new_with_attributes("Use Tray\n   Icon",
       renderer_systray, "active", GAPC_PREFS_SYSTRAY, NULL);
    gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
 
-   column = gtk_tree_view_column_new_with_attributes("network\nRefresh",
+   column = gtk_tree_view_column_new_with_attributes("Network\nRefresh",
       renderer_refresh, "text", GAPC_PREFS_REFRESH, NULL);
    g_object_set_data(G_OBJECT(column), "float_format", "%3.1f");
    gtk_tree_view_column_set_cell_data_func(column, renderer_refresh,
@@ -3697,7 +3697,7 @@ static GtkWidget *gapc_panel_preferences_model_init(PGAPC_CONFIG pcfg)
       GAPC_PREFS_PORT, NULL);
    gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
 
-   column = gtk_tree_view_column_new_with_attributes("graph\nRefresh",
+   column = gtk_tree_view_column_new_with_attributes("Graph\nRefresh",
       renderer_graph, "text", GAPC_PREFS_GRAPH, NULL);
    g_object_set_data(G_OBJECT(column), "float_format", "%3.0f");
    gtk_tree_view_column_set_cell_data_func(column, renderer_graph,
@@ -3969,7 +3969,7 @@ static gint gapc_panel_monitor_list_page(PGAPC_CONFIG pcfg, GtkNotebook * notebo
    gtk_widget_show(frame);
 
    label = gtk_label_new("<span foreground=\"blue\">"
-      "<i>double-click a row to popup information window.</i>" "</span>");
+      "<i>double-click a row to popup information window</i>" "</span>");
    gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_CENTER);
 
@@ -4037,7 +4037,7 @@ static gint gapc_panel_preferences_page(PGAPC_CONFIG pcfg, GtkNotebook * noteboo
    gtk_widget_show(frame);
 
    label = gtk_label_new("<span foreground=\"blue\">"
-      "<i>double-click a columns value to change it.</i>" "</span>");
+      "<i>double-click a column's value to change it</i>" "</span>");
    gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_CENTER);
 
@@ -4857,7 +4857,7 @@ static void cb_monitor_interface_destroy(GtkWidget * widget, PGAPC_MONITOR pm)
       
       gtk_statusbar_pop(GTK_STATUSBAR(sbar), pcfg->i_info_context);
       pch = g_strdup_printf
-         ("Monitor for %s Destroyed!...", pm->pch_host );
+         ("Monitor for %s destroyed.", pm->pch_host );
       gtk_statusbar_push(GTK_STATUSBAR(sbar), pcfg->i_info_context, pch);
       g_free(pch);
    }
@@ -5147,7 +5147,7 @@ static gint gapc_monitor_history_page(PGAPC_MONITOR pm, GtkWidget * notebook)
        }
 
        pch = g_strdup_printf(
-                 "<i>sampled every %3.1f seconds</i>", 
+                 "<i>Data sampled every %3.1f seconds</i>", 
                  pm->phs.d_xinc);
        lg_graph_set_x_label_text (plg, pch);
        g_free(pch);
@@ -5247,7 +5247,7 @@ static PLGRAPH lg_graph_create (GtkWidget * box, gint width, gint height)
      * These must be set before the first drawing_area configure event 
      */
     lg_graph_set_chart_title  (plg, "Waiting for Update");
-    lg_graph_set_y_label_text (plg, "Precentage of 100% normal");
+    lg_graph_set_y_label_text (plg, "<i>Percentage of normal</i>");
     lg_graph_set_x_label_text (plg, "Waiting for Update");
 
     g_snprintf (plg->ch_tooltip_text, sizeof (plg->ch_tooltip_text), "%s",
@@ -5953,7 +5953,7 @@ static GtkWidget *gapc_monitor_interface_create(PGAPC_CONFIG pcfg, gint i_monito
       
       gtk_statusbar_pop(GTK_STATUSBAR(sbar), pcfg->i_info_context);
       pch = g_strdup_printf
-         ("Monitor for %s Created!...", pm->pch_host);
+         ("Monitor for %s created.", pm->pch_host);
       gtk_statusbar_push(GTK_STATUSBAR(sbar), pcfg->i_info_context, pch);
       g_free(pch);
    }
