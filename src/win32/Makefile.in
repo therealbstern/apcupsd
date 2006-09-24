@@ -61,7 +61,7 @@ DEFINES = \
 
 
 
-CC = $(BIN_DIR)/mingw32-g++ -O2 $(DEFINES) $(INCLUDES)
+CC = $(BIN_DIR)/mingw32-gcc -O2 $(DEFINES) $(INCLUDES)
 CXX = $(BIN_DIR)/mingw32-g++ -O2 $(DEFINES) $(INCLUDES)
 WINDRES = $(BIN_DIR)/mingw32-windres
 MAKENSIS=$(BIN_DIR)/makensis
@@ -419,6 +419,29 @@ $(OBJDIR)/email.o:	./email.c
 
 ######################################################################
 
+GAPCMON_CFLAGS=-I$(DEPKGS)/glib/include/gtk-2.0 \
+   -I$(DEPKGS)/glib/lib/gtk-2.0/include \
+   -I$(DEPKGS)/glib/include/atk-1.0 \
+   -I$(DEPKGS)/glib/include/pango-1.0 \
+   -I$(DEPKGS)/glib/include/glib-2.0 \
+   -I$(DEPKGS)/glib/lib/glib-2.0/include \
+   -I$(DEPKGS)/glib/include/gconf/2 \
+   -I$(DEPKGS)/glib/include/orbit-2.0 \
+   -I$(DEPKGS)/glib/include/gnome-vfs-2.0 \
+   -I$(DEPKGS)/glib/include/gnome-vfs-module-2.0 \
+   -I$(DEPKGS)/glib/lib/gnome-vfs-2.0/include \
+   -I$(DEPKGS)/glib/include/cairo \
+   -DGNOMEVFS_REQUIRES_CANCELLATION \
+   -mms-bitfields
+
+OBJS_GAPCMON = \
+   $(OBJDIR)/gapcmon.o
+
+$(OBJDIR)/gapcmon.o: ../gapcmon/gapcmon.c
+	$(CC) $(GAPCMON_CFLAGS) -c $< -o $@
+
+######################################################################
+
 APC_OBJS = $(OBJS_SRC) $(LIB_OBJS) $(OBJS_COMPAT) $(OBJS_WIN) \
 	   $(OBJS_DRIVERS) $(OBJS_TESTDRV) $(OBJS_NETDRV) \
 	   $(OBJS_SMARTDRV) $(OBJS_DUMBDRV) $(OBJS_USBDRV) \
@@ -447,6 +470,13 @@ SMTP_LIBS = $(APC_LIBS)
 
 EMAIL_OBJS = $(OBJS_EMAIL) $(OBJDIR)/apclog.o $(OBJDIR)/asys.o $(OBJDIR)/apcerror.o $(OBJS_COMPAT)
 EMAIL_LIBS = -L$(LIB_MINGW) -lwsock32 -lmapi32
+
+GAPCMON_OBJS = $(OBJS_GAPCMON)
+GAPCMON_LIBS = $(LIB_PTHREADS) -L$(DEPKGS)/glib/lib -Wl,--export-dynamic \
+   -lgtk-win32-2.0 -lgdk-win32-2.0 -latk-1.0 -lgdk_pixbuf-2.0 -lpangowin32-1.0 \
+   -lpango-1.0 -lgobject-2.0 -lgconf-2 -lgnomevfs-2 \
+   -lbonobo-activation -lORBit-2 -lm -lgmodule-2.0 -lgthread-2.0 \
+   -lglib-2.0
 
 # Targets
 
@@ -486,6 +516,9 @@ email.exe: $(EMAIL_OBJS) mingwm10.dll
 
 smtp.exe: $(SMTP_OBJS) mingwm10.dll
 	$(CXX) $(SMTP_OBJS) $(SMTP_LIBS) -o $(OBJDIR)/smtp.exe
+
+gapcmon.exe: $(GAPCMON_OBJS)
+	$(CC) $(GAPCMON_OBJS) $(GAPCMON_LIBS) -mwindows -o $(OBJDIR)/gapcmon.exe
 
 winapcupsd.exe: all
 	$(STRIP) *.exe
