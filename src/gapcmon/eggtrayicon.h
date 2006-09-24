@@ -25,10 +25,12 @@
 #define __EGG_TRAY_ICON_H__
 
 #include <gtk/gtkplug.h>
-#include <gdk/gdkx.h>
+
 #ifdef G_OS_WIN32
 #include <gdk/gdkwin32.h>
-#endif                             /* WINDOWS */
+#else                             /* WINDOWS */
+#include <gdk/gdkx.h>
+#endif
 
 G_BEGIN_DECLS
 #define EGG_TYPE_TRAY_ICON (egg_tray_icon_get_type ())

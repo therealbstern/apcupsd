@@ -1542,6 +1542,7 @@ static void cb_panel_property_color_change (GtkColorButton *widget, gchar *color
 */
 static gint gapc_util_change_icons(PGAPC_MONITOR pm)
 {
+#ifndef G_OS_WIN32
    GdkPixbuf *pixbuf = NULL;
    GdkPixbuf *scaled = NULL;
    GtkOrientation orientation;
@@ -1574,7 +1575,7 @@ static gint gapc_util_change_icons(PGAPC_MONITOR pm)
       if (pm->window != NULL)
          gtk_window_set_icon(GTK_WINDOW(pm->window), pixbuf);
    }
-
+#endif
    return FALSE;
 }
 
@@ -3091,6 +3092,7 @@ static void cb_panel_systray_icon_destroy(GtkObject * object, gpointer gp)
 
 static gboolean gapc_panel_systray_icon_create(gpointer gp)
 {
+#ifndef G_OS_WIN32
    PGAPC_CONFIG pcfg = NULL;
    PGAPC_MONITOR pm = NULL;
 
@@ -3153,7 +3155,7 @@ static gboolean gapc_panel_systray_icon_create(gpointer gp)
    if (tooltips != NULL) {
       gtk_tooltips_set_tip(tooltips, GTK_WIDGET(*tray_icon), pch_title, NULL);
    }
-
+#endif
    return TRUE;
 }
 
