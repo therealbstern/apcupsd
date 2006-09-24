@@ -27,7 +27,7 @@
  * Last Modified By: Thorsten Engel
  * Last Modified On: Fri Apr 22 19:30:00 2004
  * Update Count    : 218
- * $Id: compat.h,v 1.18 2006-08-11 23:57:05 adk0212 Exp $
+ * $Id: compat.h,v 1.19 2006-09-24 18:11:04 adk0212 Exp $
  */
 
 
@@ -207,7 +207,6 @@ int lchown(const char *, uid_t uid, gid_t gid);
 int chown(const char *, uid_t uid, gid_t gid);
 int inet_aton(const char *cp, struct in_addr *inp);
 int kill(int pid, int signo);
-int pipe(int []);
 int fork();
 int waitpid(int, int *, int);
 
@@ -257,7 +256,7 @@ struct sigaction {
 #define mkdir(p, m) win32_mkdir(p)
 #define unlink win32_unlink
 #define chdir win32_chdir
-extern "C" void syslog(int type, const char *fmt, ...);
+
 #ifndef LOG_DAEMON
 #define LOG_DAEMON 0
 #endif
@@ -308,6 +307,13 @@ void conv_unix_to_win32_path(const char *name, char *win32_name, DWORD dwSize);
 int ioctl(int, int, ...);
 
 /* Return the smaller of a or b */
+#ifndef MIN
 #define MIN(a, b) ( ((a) < (b)) ? (a) : (b) )
+#endif
+
+#ifndef ctime_r
+#define ctime_r( _clock, _buf ) \
+    strcpy( (_buf), ctime( (_clock) ) )
+#endif
 
 #endif /* __COMPAT_H_ */
