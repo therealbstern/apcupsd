@@ -28,11 +28,8 @@
 
 #include <gdkconfig.h>
 
-#include <gdk/gdkx.h>
+#ifndef G_OS_WIN32
 #include <X11/Xatom.h>
-
-#if defined (GDK_WINDOWING_WIN32)
-#include <gdk/gdkwin32.h>
 #endif
 
 #define _(x) x
