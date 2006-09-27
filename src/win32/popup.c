@@ -47,7 +47,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
    // Locate Apcupsd tray icon window
    HWND tray = FindWindowEx(NULL, NULL, "Apcupsd Tray Icon", NULL);
-   
+
    // Win2k and higher use balloon notification,
    // others have to use MessageBox
    OSVERSIONINFO vers;
@@ -60,20 +60,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       // Create the tray icon message
       nid.hWnd = tray;
       nid.cbSize = sizeof(nid);
-      nid.uID = IDI_APCUPSD;        // never changes after construction
+      nid.uID = IDI_APCUPSD;
 
       // Setup balloon tip with detailed status info
       snprintf(nid.szInfo, sizeof(nid.szInfo), "%s", msg);
       snprintf(nid.szInfoTitle, sizeof(nid.szInfoTitle), "%s", "Apcupsd Notice");
       nid.uFlags = NIF_INFO;
-      nid.uTimeout = 5000;
+      nid.uTimeout = 10000;
       nid.dwInfoFlags = NIIF_INFO;
 
       // Send the message
       Shell_NotifyIcon(NIM_MODIFY, &nid);
 
       // Notify apcupsd tray that a balloon was shown and
-      // ask for a 5000 msec timeout;
+      // ask for a 10000 msec timeout;
       SendNotifyMessage(tray, WM_BALLOONSHOW, 10000, 0);
    }
 
