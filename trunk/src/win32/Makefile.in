@@ -496,10 +496,7 @@ all: apcupsd.exe apcaccess.exe shutdown.exe popup.exe apctest.exe smtp.exe \
      email.exe background.exe
 
 clean:
-	rm -f $(OBJDIR)/*.o $(OBJDIR)/apcupsd.exe $(OBJDIR)/winres.res \
-		$(OBJDIR)/apcaccess.exe $(OBJDIR)/shutdown.exe \
-		$(OBJDIR)/popup.exe winapcupsd*.exe $(OBJDIR)/smtp.exe \
-		$(OBJDIR)/apctest.exe
+	rm -f $(OBJDIR)/*.o $(OBJDIR)/*.exe $(OBJDIR)/winres.res
 	rm -f pthreadGCE.dll mingwm10.dll
 
 pthreadGCE.dll: $(DEPKGS)/pthreads/pthreadGCE.dll
