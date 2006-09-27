@@ -179,33 +179,34 @@ int parse_options(int argc, char *argv[])
       }
    }
 
-/*
- * On Win32, if the user did not provide a -f argument to specify
- * the location of apcupsd.conf, simulate one relative to current
- * executable path.
- */
+/* Win32-specific dynamic path handling... */
 #ifdef HAVE_WIN32
+   extern char sbindir[MAXSTRING];
+
+   /* Obtain full path to this executable */
+   DWORD len = GetModuleFileName(NULL, sbindir, sizeof(sbindir)-1);
+   sbindir[len] = '\0';
+   Dmsg1(200, "Exepath: %s\n", sbindir);
+   if (len == 0) {
+      /* Failed to get path, so make an assumption */
+      asnprintf(sbindir, sizeof(sbindir), "C:\\apcupsd\\bin\\apcupsd.exe");
+   }
+
+   /* Strip trailing filename component */
+   char *ptr = strrchr(sbindir, '\\');
+   if (ptr)
+      *ptr = '\0';
+   else
+      sbindir[0] = '\0';
+
+   /*
+    * If the user did not provide a -f argument to specify
+    * the location of apcupsd.conf, simulate one relative to current
+    * executable path.
+    */
    if (cfgfile == APCCONF) {
-      /* Obtain full path of this executable */
-      char path[APC_FILENAME_MAX];
-      DWORD len = GetModuleFileName(NULL, path, sizeof(path)-1);
-      path[len] = '\0';
-      Dmsg1(200, "Exepath: %s\n", path);
-      if (len == 0) {
-         /* Failed to get path, so make an assumption */
-         asnprintf(path, sizeof(path), "C:\\apcupsd\\bin\\apcupsd.exe");
-      }
-
-      /* Remove trailing filename */
-      char *ptr = strrchr(path, '\\');
-      if (ptr)
-         *(ptr+1) = '\0';
-      else
-         path[0] = '\0';
-
-      /* Build default path "constant" relative to exe path. */
       asnprintf(APCCONF, sizeof(APCCONF),
-         "%s..\\etc\\apcupsd%s", path, APCCONF_FILE);
+         "%s\\..\\etc\\apcupsd%s", sbindir, APCCONF_FILE);
    }
 #endif
 
