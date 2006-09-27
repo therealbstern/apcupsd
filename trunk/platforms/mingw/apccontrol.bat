@@ -8,15 +8,12 @@ rem
 rem Assign parameters to named variables
 SET command=%1
 SET sbindir=%5
-SET sysconfdir=%6
 
 rem Strip leading and trailing quotation marks from paths.
 rem This is easily accomplished on NT, but Win95/98/ME
 rem require an evil little trick with 'FOR'.
 SET sbindir=%sbindir:"=%
 IF "%sbindir%" == "" FOR %%A IN (%5) DO SET sbindir=%%A
-SET sysconfdir=%sysconfdir:"=%
-IF "%sysconfdir%" == "" FOR %%A IN (%6) DO SET sysconfdir=%%A
 
 rem Paths to important executables
 SET APCUPSD="%sbindir%\apcupsd"
@@ -48,7 +45,7 @@ rem   event actions using event scripts as described above.
 rem
 
 rem Use CALL here because event script might be a batch file itself
-CALL "%sysconfdir%\%command%" 2> NUL
+CALL ".\%command%" 2> NUL
 
 rem This is retarded. "IF ERRORLEVEL 99" means greater-than-or-
 rem equal-to 99, so we have to synthesize an == using two IFs. 
