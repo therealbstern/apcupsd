@@ -419,6 +419,15 @@ $(OBJDIR)/email.o:	./email.c
 
 ######################################################################
 
+# background objects
+OBJS_BKG = \
+	$(OBJDIR)/background.o
+
+$(OBJDIR)/background.o:	./background.c
+	$(CXX) -c $< -o $@
+
+######################################################################
+
 GAPCMON_CFLAGS=-I$(DEPKGS)/glib/include/gtk-2.0 \
    -I$(DEPKGS)/glib/lib/gtk-2.0/include \
    -I$(DEPKGS)/glib/include/atk-1.0 \
@@ -465,6 +474,9 @@ SHUT_LIBS =
 POP_OBJS = $(OBJS_POP)
 POP_LIBS = 
 
+BKG_OBJS = $(OBJS_BKG)
+BKG_LIBS = 
+
 SMTP_OBJS = $(OBJS_SMTP) $(OBJDIR)/apclog.o $(OBJDIR)/asys.o $(OBJDIR)/apcerror.o $(OBJS_COMPAT)
 SMTP_LIBS = $(APC_LIBS)
 
@@ -480,7 +492,8 @@ GAPCMON_LIBS = $(LIB_PTHREADS) -L$(DEPKGS)/glib/lib -Wl,--export-dynamic \
 
 # Targets
 
-all: apcupsd.exe apcaccess.exe shutdown.exe popup.exe apctest.exe smtp.exe email.exe
+all: apcupsd.exe apcaccess.exe shutdown.exe popup.exe apctest.exe smtp.exe \
+     email.exe background.exe
 
 clean:
 	rm -f $(OBJDIR)/*.o $(OBJDIR)/apcupsd.exe $(OBJDIR)/winres.res \
@@ -514,6 +527,9 @@ popup.exe: $(POP_OBJS) mingwm10.dll
 email.exe: $(EMAIL_OBJS) mingwm10.dll
 	$(CXX) $(EMAIL_OBJS) $(EMAIL_LIBS) -o $(OBJDIR)/email.exe
 
+background.exe: $(BKG_OBJS) mingwm10.dll
+	$(CXX) $(BKG_OBJS) $(BKG_LIBS) -mwindows -o $(OBJDIR)/background.exe
+
 smtp.exe: $(SMTP_OBJS) mingwm10.dll
 	$(CXX) $(SMTP_OBJS) $(SMTP_LIBS) -o $(OBJDIR)/smtp.exe
 
@@ -523,3 +539,4 @@ gapcmon.exe: $(GAPCMON_OBJS)
 winapcupsd.exe: all
 	$(STRIP) *.exe *.dll
 	$(MAKENSIS) -V2 -DDEPKGS="$(DEPKGS)" -DVERSION="$(VERSION)" winapcupsd.nsi
+
