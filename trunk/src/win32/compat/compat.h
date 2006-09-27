@@ -27,7 +27,7 @@
  * Last Modified By: Thorsten Engel
  * Last Modified On: Fri Apr 22 19:30:00 2004
  * Update Count    : 218
- * $Id: compat.h,v 1.19 2006-09-24 18:11:04 adk0212 Exp $
+ * $Id: compat.h,v 1.20 2006-09-27 14:54:25 adk0212 Exp $
  */
 
 
@@ -66,6 +66,7 @@
 #include <io.h>
 #include <lmcons.h>
 #include <dirent.h>
+#include <winapi.h>
 
 #include "getopt.h"
 
