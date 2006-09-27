@@ -5,27 +5,24 @@ rem
 rem  This is the Windows apccontrol file.
 rem
 
-set prefix=\apcupsd
-set sbindir=%prefix%\bin
-set sysconfdir=%prefix%\etc\apcupsd
+rem Assign parameters to named variables
+SET command=%1
+SET sbindir=%5
+SET sysconfdir=%6
 
-set APCUPSD=%sbindir%\apcupsd
-set SHUTDOWN=%sbindir%\shutdown
-set SCRIPTDIR=%sysconfdir%
-set POPUP=%sbindir%\popup
+rem Strip leading and trailing quotation marks from paths.
+rem This is easily accomplished on NT, but Win95/98/ME
+rem require an evil little trick with 'FOR'.
+SET sbindir=%sbindir:"=%
+IF "%sbindir%" == "" FOR %%A IN (%5) DO SET sbindir=%%A
+SET sysconfdir=%sysconfdir:"=%
+IF "%sysconfdir%" == "" FOR %%A IN (%6) DO SET sysconfdir=%%A
 
-rem On WinNT and higher, we can use 'start /b' to launch POPUP
-rem in the background. Unfortunately 95, 98, and Me do not have
-rem such a capability. Ideally, POPUP should background itself
-rem and then we wouldn't have worry about this at all.
-VER | FIND " 95 " > NUL
-IF NOT ERRORLEVEL 1 GOTO nostart
-VER | FIND " 98 " > NUL
-IF NOT ERRORLEVEL 1 GOTO nostart
-VER | FIND "Millennium" > NUL
-IF NOT ERRORLEVEL 1 GOTO nostart
-set POPUP=start /b %POPUP%
-:nostart
+rem Paths to important executables
+SET APCUPSD="%sbindir%\apcupsd"
+SET SHUTDOWN="%sbindir%\shutdown"
+SET BACKGROUND="%sbindir%\background"
+SET POPUP=%BACKGROUND% "%sbindir\%popup"
 
 rem
 rem This piece is to substitute the default behaviour with your own script,
@@ -51,7 +48,7 @@ rem   event actions using event scripts as described above.
 rem
 
 rem Use CALL here because event script might be a batch file itself
-CALL %SCRIPTDIR%\%1 2> NUL
+CALL "%sysconfdir%\%command%" 2> NUL
 
 rem This is retarded. "IF ERRORLEVEL 99" means greater-than-or-
 rem equal-to 99, so we have to synthesize an == using two IFs. 
@@ -67,29 +64,29 @@ rem powerout, onbattery, offbattery, mainsback events occur
 rem   in that order.
 rem
 
-IF "%1" == "commfailure"   GOTO :commfailure
-IF "%1" == "commok"        GOTO :commok
-IF "%1" == "powerout"      GOTO :powerout
-IF "%1" == "onbattery"     GOTO :onbattery
-IF "%1" == "offbattery"    GOTO :offbattery
-IF "%1" == "mainsback"     GOTO :mainsback
-IF "%1" == "failing"       GOTO :failing
-IF "%1" == "timeout"       GOTO :timeout
-IF "%1" == "loadlimit"     GOTO :loadlimit
-IF "%1" == "runlimit"      GOTO :runlimit
-IF "%1" == "doshutdown"    GOTO :doshutdown
-IF "%1" == "mainsback"     GOTO :mainsback
-IF "%1" == "annoyme"       GOTO :annoyme
-IF "%1" == "emergency"     GOTO :emergency
-IF "%1" == "changeme"      GOTO :changeme
-IF "%1" == "remotedown"    GOTO :remotedown
-IF "%1" == "restartme"     GOTO :restartme
-IF "%1" == "startselftest" GOTO :startselftest
-IF "%1" == "endselftest"   GOTO :endselftest
-IF "%1" == "battdetach"    GOTO :battdetach
-IF "%1" == "battattach"    GOTO :battattach
+IF "%command%" == "commfailure"   GOTO :commfailure
+IF "%command%" == "commok"        GOTO :commok
+IF "%command%" == "powerout"      GOTO :powerout
+IF "%command%" == "onbattery"     GOTO :onbattery
+IF "%command%" == "offbattery"    GOTO :offbattery
+IF "%command%" == "mainsback"     GOTO :mainsback
+IF "%command%" == "failing"       GOTO :failing
+IF "%command%" == "timeout"       GOTO :timeout
+IF "%command%" == "loadlimit"     GOTO :loadlimit
+IF "%command%" == "runlimit"      GOTO :runlimit
+IF "%command%" == "doshutdown"    GOTO :doshutdown
+IF "%command%" == "mainsback"     GOTO :mainsback
+IF "%command%" == "annoyme"       GOTO :annoyme
+IF "%command%" == "emergency"     GOTO :emergency
+IF "%command%" == "changeme"      GOTO :changeme
+IF "%command%" == "remotedown"    GOTO :remotedown
+IF "%command%" == "restartme"     GOTO :restartme
+IF "%command%" == "startselftest" GOTO :startselftest
+IF "%command%" == "endselftest"   GOTO :endselftest
+IF "%command%" == "battdetach"    GOTO :battdetach
+IF "%command%" == "battattach"    GOTO :battattach
 
-echo Unknown command '%1'
+echo Unknown command '%command%'
 echo.
 echo Usage: %0 command
 echo.
@@ -197,3 +194,4 @@ rem
 
 :done
 rem That's all, folks
+

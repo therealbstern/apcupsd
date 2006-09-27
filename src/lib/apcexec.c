@@ -75,6 +75,9 @@ void clean_threads(void)
 }
 
 #ifdef HAVE_MINGW
+
+char sbindir[MAXSTRING];
+
 int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
 {
    char cmdline[MAXSTRING];
@@ -97,11 +100,21 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
       return FAILURE;
 
    /* Build the command line */
-   asnprintf(cmdline, sizeof(cmdline), "\"%s\" /c %s %s \"%s\" %d %d",
-      comspec, ups->apccontrol, cmd.command, ups->upsname,
-      !ups->is_slave(), ups->is_plugged());
+   if (g_os_version_info.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS) {
+      /* Win95/98/ME need environment size parameter and no extra quotes */
+      asnprintf(cmdline, sizeof(cmdline), 
+         "\"%s\" /E:4096 /c \"%s%s\" %s %s %d %d \"%s\" \"%s\"",
+         comspec, ups->scriptdir, APCCONTROL_FILE, cmd.command, ups->upsname,
+         !ups->is_slave(), ups->is_plugged(), sbindir, ups->scriptdir);
+   } else {
+      /* WinNT/2K/Vista need quotes around the entire sub-command */
+      asnprintf(cmdline, sizeof(cmdline), 
+         "\"%s\" /c \"\"%s%s\" %s %s %d %d \"%s\" \"%s\"\"",
+         comspec, ups->scriptdir, APCCONTROL_FILE, cmd.command, ups->upsname,
+         !ups->is_slave(), ups->is_plugged(), sbindir, ups->scriptdir);
+   }
 
-   /* Initialize the STARTUPINFOA structto hide the console window */
+   /* Initialize the STARTUPINFOA struct to hide the console window */
    memset(&startinfo, 0, sizeof(startinfo));
    startinfo.cb = sizeof(startinfo);
    startinfo.dwFlags = STARTF_USESHOWWINDOW;
@@ -140,6 +153,7 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
 {
    char *argv[6];
    char connected[20], powered[20];
+   char apccontrol[MAXSTRING];
 
    if (cmd.pid && (kill(cmd.pid, 0) == 0)) {
       /*
@@ -151,6 +165,7 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
 
    asnprintf(connected, sizeof(connected), "%d", !ups->is_slave());
    asnprintf(powered, sizeof(powered), "%d", (int)ups->is_plugged());
+   asnprintf(apccontrol, sizeof(apccontrol), "%s%s", ups->scriptdir, APCCONTROL_FILE);
 
    /* fork() and exec() */
    switch (cmd.pid = fork()) {
@@ -160,17 +175,17 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
       return FAILURE;
 
    case 0:      /* child */
-      argv[0] = ups->apccontrol;   /* Shell script to execute. */
+      argv[0] = apccontrol;        /* Shell script to execute. */
       argv[1] = cmd.command;       /* Parameter to script. */
       argv[2] = ups->upsname;      /* UPS name */
       argv[3] = connected;
       argv[4] = powered;
       argv[5] = (char *)NULL;
-      execv(ups->apccontrol, argv);
+      execv(apccontrol, argv);
 
       /* NOT REACHED */
       log_event(ups, LOG_WARNING, _("Cannot exec %s %s: %s"),
-         ups->apccontrol, cmd.command, strerror(errno));
+         apccontrol, cmd.command, strerror(errno));
 
       /* Child must exit if fails exec'ing. */
       exit(-1);

@@ -140,8 +140,8 @@ static const PAIRS table[] = {
    {"DEVICE",   match_str,   WHERE(device),   SIZE(device)},
    
    /* Paths */
-   {"LOCKFILE",   match_str, WHERE(lockpath),   SIZE(lockpath)},
-   {"SCRIPTDIR",  match_str, WHERE(apccontrol), SIZE(apccontrol)},
+   {"LOCKFILE",   match_str, WHERE(lockpath),    SIZE(lockpath)},
+   {"SCRIPTDIR",  match_str, WHERE(scriptdir),   SIZE(scriptdir)},
    {"PWRFAILDIR", match_str, WHERE(pwrfailpath), SIZE(pwrfailpath)},
    {"NOLOGINDIR", match_str, WHERE(nologinpath), SIZE(nologinpath)},
 
@@ -624,7 +624,7 @@ void init_ups_struct(UPSINFO *ups)
    ups->event_fd = -1;             /* no file open */
 
    /* Default paths */
-   astrncpy(ups->apccontrol, SYSCONFDIR, sizeof(ups->apccontrol));
+   astrncpy(ups->scriptdir, SYSCONFDIR, sizeof(ups->scriptdir));
    astrncpy(ups->pwrfailpath, PWRFAILDIR, sizeof(ups->pwrfailpath));
    astrncpy(ups->nologinpath, NOLOGDIR, sizeof(ups->nologinpath));
    
@@ -797,10 +797,9 @@ jump_into_the_loop:
    }
 
    /* Append filenames to paths */
-   Dmsg1(200, "After config apccontrol: \"%s\"\n", ups->apccontrol);
+   Dmsg1(200, "After config scriptdir: \"%s\"\n", ups->scriptdir);
    Dmsg1(200, "After config pwrfailpath: \"%s\"\n", ups->pwrfailpath);
    Dmsg1(200, "After config nologinpath: \"%s\"\n", ups->nologinpath);
-   astrncat(ups->apccontrol, APCCONTROL_FILE, sizeof(ups->apccontrol));
    astrncat(ups->nologinpath, NOLOGIN_FILE, sizeof(ups->nologinpath));
    astrncat(ups->pwrfailpath, PWRFAIL_FILE, sizeof(ups->pwrfailpath));
 

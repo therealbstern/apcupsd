@@ -359,7 +359,7 @@ class UPSINFO {
    char lockpath[APC_FILENAME_MAX];
    int lockfile;
 
-   char apccontrol[APC_FILENAME_MAX];   /* Path to apccontrol script */
+   char scriptdir[APC_FILENAME_MAX];    /* Path to apccontrol dir */
    char pwrfailpath[APC_FILENAME_MAX];  /* Path to powerfail flag file dir */
    char nologinpath[APC_FILENAME_MAX];  /* Path to nologin dir */
 
