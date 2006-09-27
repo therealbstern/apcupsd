@@ -103,15 +103,15 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
    if (g_os_version_info.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS) {
       /* Win95/98/ME need environment size parameter and no extra quotes */
       asnprintf(cmdline, sizeof(cmdline), 
-         "\"%s\" /E:4096 /c \"%s%s\" %s %s %d %d \"%s\" \"%s\"",
-         comspec, ups->scriptdir, APCCONTROL_FILE, cmd.command, ups->upsname,
-         !ups->is_slave(), ups->is_plugged(), sbindir, ups->scriptdir);
+         "\"%s\" /E:4096 /c \"%s%s\" %s %s %d %d \"%s\"",
+         comspec, ups->scriptdir, APCCONTROL_FILE, cmd.command,
+         ups->upsname, !ups->is_slave(), ups->is_plugged(), sbindir);
    } else {
       /* WinNT/2K/Vista need quotes around the entire sub-command */
       asnprintf(cmdline, sizeof(cmdline), 
-         "\"%s\" /c \"\"%s%s\" %s %s %d %d \"%s\" \"%s\"\"",
-         comspec, ups->scriptdir, APCCONTROL_FILE, cmd.command, ups->upsname,
-         !ups->is_slave(), ups->is_plugged(), sbindir, ups->scriptdir);
+         "\"%s\" /c \"\"%s%s\" %s %s %d %d \"%s\"\"",
+         comspec, ups->scriptdir, APCCONTROL_FILE, cmd.command,
+         ups->upsname, !ups->is_slave(), ups->is_plugged(), sbindir);
    }
 
    /* Initialize the STARTUPINFOA struct to hide the console window */
@@ -124,15 +124,15 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
 
    /* Execute the process */
    rc = CreateProcessA(NULL,
-                       cmdline, // command line
-                       NULL, // process security attributes
-                       NULL, // primary thread security attributes
-                       TRUE, // handles are inherited
-                       0,    // creation flags
-                       NULL, // use parent's environment
-                       NULL, // use parent's current directory
-                       &startinfo, // STARTUPINFO pointer
-                       &procinfo); // receives PROCESS_INFORMATION
+                       cmdline,        // command line
+                       NULL,           // process security attributes
+                       NULL,           // primary thread security attributes
+                       TRUE,           // handles are inherited
+                       0,              // creation flags
+                       NULL,           // use parent's environment
+                       ups->scriptdir, // working directory
+                       &startinfo,     // STARTUPINFO pointer
+                       &procinfo);     // receives PROCESS_INFORMATION
    if (!rc) {
       log_event(ups, LOG_WARNING, "execute failed: CreateProcessA(NULL, %s, ...)=%d\n",
          cmdline, GetLastError());
