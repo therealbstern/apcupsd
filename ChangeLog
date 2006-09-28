@@ -8,6 +8,567 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2006-09-28 18:15  adk0212
+
+	* src/drivers/net/net.c:
+
+	Only log tcp_open failure once per commlost event. Otherwise the
+	system log gets flooded with this message once every NETTIME
+	seconds while the server is down.
+
+2006-09-28 18:07  adk0212
+
+	* platforms/: etc/apcupsd.conf.in, mingw/apcupsd.conf.in:
+
+	Win32 tweaks to comments plus some overall comment clarifications.
+
+2006-09-27 18:42  adk0212
+
+	* platforms/mingw/apccontrol.bat, src/lib/apcexec.c:
+
+	More apccontrol fixes for Win98. It seems that command.com has a
+	128 character limit on command line length. We work around this by
+	passing only sbindir as a command line parameter and setting the
+	cwd to scriptdir.  This way apccontrol.bat can use . for scriptdir.
+	There will still be problems if the user installs apcupsd in a deep
+	directory, but we can't do much more about it. The "C:\Program
+	Files" case works now, and that'll be the most common one.
+
+2006-09-27 17:54  adk0212
+
+	* src/win32/Makefile.in:
+
+	Clean all .exe files.
+
+2006-09-27 11:00  adk0212
+
+	* src/win32/winapcupsd.nsi:
+
+	Remove background.exe when un-installing.
+
+2006-09-27 10:58  adk0212
+
+	* include/struct.h, platforms/mingw/apccontrol.bat, src/options.c,
+	src/lib/apcconfig.c, src/lib/apcexec.c:
+
+	Fix up apccontrol launch on Win32 to handle relocatable
+	installation.  apccontrol.bat now takes parameters specifying paths
+	to sbindir and scriptdir. Also fix handling of pathnames that
+	include spaces, since those will be common on Win32 with installs
+	into "C:\Program Files".
+
+2006-09-27 10:54  adk0212
+
+	* src/win32/compat/compat.h:
+
+	Include winapi.h.
+
+2006-09-27 10:53  adk0212
+
+	* src/win32/popup.c:
+
+	Fix a few harmless typos.
+
+2006-09-27 10:44  adk0212
+
+	* src/win32/: Makefile.in, background.c, winapcupsd.nsi:
+
+	Add 'background' executable, which is a simple tool that launches
+	the given command in a detached process and returns immediately. We
+	will use this in apccontrol.bat to prevent popup notices from
+	halting execution of the reset of the script.
+
+2006-09-24 14:17  adk0212
+
+	* src/win32/Makefile.in:
+
+	Strip DLLs in addition to executables before generating installer
+	package.
+
+2006-09-24 14:12  adk0212
+
+	* src/win32/Makefile.in:
+
+	Add infrastructure for building gapcmon on Win32. Note that we
+	don't build it by default since the resulting executable doesn't
+	actually _work_, but this preserves the work done so it can be
+	picked up and finished in the future.
+
+2006-09-24 14:11  adk0212
+
+	* src/win32/compat/: compat.cpp, compat.h:
+
+	Tweaks so gapcmon can build.
+
+2006-09-24 14:05  adk0212
+
+	* src/gapcmon/: eggtrayicon.c, eggtrayicon.h, gapcmon.c:
+
+	Tweaks so it will compile on win32.
+
+2006-09-24 10:20  adk0212
+
+	* src/gapcmon/: gapcmon.c, gapcmon.h:
+
+	Minor spelling and formatting cleanups.
+
+2006-09-23 14:20  adk0212
+
+	* platforms/mingw/apcupsd.conf.in:
+
+	Add a slightly customized apcupsd.conf.in for mingw32. The NSIS
+	installer will perform some substitutions on this during the
+	install process in order to make path settings match the install
+	location chosen by the user.
+
+2006-09-23 14:19  adk0212
+
+	* platforms/etc/apcupsd.conf.in:
+
+	Make SCRIPTDIR (apccontrol location), PWRFAILDIR, and NOLOGINDIR
+	configurable in apcupsd.conf.
+
+2006-09-23 14:19  adk0212
+
+	* src/win32/: util.nsh, winapcupsd.nsi:
+
+	During install, perform substitution on apcupsd.conf.in so
+	configured paths end up correct based on whatever install directory
+	the user picked.
+
+2006-09-23 14:15  adk0212
+
+	* src/: lib/apcconfig.c, lib/apcexec.c, action.c, device.c,
+	options.c, win32/winmain.cpp, win32/compat/winconfig.h:
+
+	Make SCRIPTDIR (apccontrol location), PWRFAILDIR, and NOLOGINDIR
+	configurable in apcupsd.conf. Additionally, on Win32, automatically
+	provide a default APCCONF (apcupsd.conf location) relative to
+	executable location when the user does not specify the '-f' flag.
+
+2006-09-23 14:10  adk0212
+
+	* include/: defines.h, extern.h, struct.h:
+
+	Make SCRIPTDIR (apccontrol location), PWRFAILDIR, and NOLOGINDIR
+	configurable in apcupsd.conf. Additionally, on Win32, automatically
+	provide a default APCCONF (apcupsd.conf location) relative to
+	executable location when the user does not specify the '-f' flag.
+
+2006-09-23 14:07  adk0212
+
+	* include/version.h:
+
+	Bump version.
+
+2006-09-23 14:04  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Perform substitution on SYSCONFDIR so we can use it in
+	apcupsd.conf.in.
+
+2006-09-23 13:42  adk0212
+
+	* include/apc_config.h, src/apctest.c, src/apcupsd.c:
+
+	Move main -> ApcupsdMain redefinition into apcupsd.c since that
+	change is the exception, not the rule.
+
+2006-09-23 13:39  adk0212
+
+	* src/win32/winservice.cpp:
+
+	We don't use logonfail(), so kill the extern.
+
+2006-09-23 13:38  adk0212
+
+	* src/: apctest.c, win32/Makefile.in:
+
+	Link apctest as a console app, otherwise it brings up the tray icon
+	and includes all of the service baggage.
+
+2006-09-20 20:07  adk0212
+
+	* autoconf/targets.mak, src/Makefile.in, src/cgi/Makefile.in,
+	src/gapcmon/Makefile.in:
+
+	Add 'install-strip' target to install stripped binaries. Existing
+	'install' target changed to install un-stripped binaries. This
+	behavior conforms to GNU standards and was suggested by Stanislav
+	Brabec <sbrabec@suse.cz> for improved SuSE support.
+
+2006-09-20 18:54  adk0212
+
+	* src/gapcmon/: Makefile.in, gapcmon.desktop:
+
+	Apply SuSE patches from Stanislav Brabec <sbrabec@suse.cz>.
+	apcupsd-desktop.patch: Minor fixes of the gapcmon desktop file.
+	apcupsd-icon.patch: Fixes missing icon problem in gapcmon.
+
+2006-09-20 18:53  adk0212
+
+	* src/po/: fr.po, it.po:
+
+	Apply SuSE patches from Stanislav Brabec <sbrabec@suse.cz>.
+	apcupsd-po.patch: Fixes invalid headers of some po files.
+
+2006-09-17 13:18  adk0212
+
+	* src/win32/build-win32-cross-tools:
+
+	Upgrade to nsis-2.20.
+
+2006-09-01 08:47  adk0212
+
+	* autoconf/targets.mak:
+
+	Apcupsd does not support parallel make. Add a .NOTPARALLEL target
+	to all Makefiles so folks who try to use parallel make will still
+	get a good build (albeit single-threaded) instead of piles of
+	bizarre errors.
+
+2006-08-31 19:03  adk0212
+
+	* src/apctest.c:
+
+	Add missing apcsmart type from Carl Lindberg
+	<lindberg@clindberg.org>: apctest's main() function is missing a
+	case statement for APCSMART_UPS, so a config with a UPSTYPE of
+	"apcsmart" will have an "Unknown mode.type" message printed when
+	running apctest.
+
+2006-08-28 17:22  adk0212
+
+	* src/gapcmon/gapcmon.spec:
+
+	gapcmon standalone .spec file should not be included in apcupsd
+	distribution.
+
+2006-08-27 09:38  adk0212
+
+	* src/action.c:
+
+	Unlock ups structure before returning in the is_shut_remote() case.
+
+2006-08-24 18:38  fleetworks
+
+	* doc/latex/manual.tex:
+
+	Add other build directories to rpm faq.
+
+2006-08-19 21:07  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Add link to 3.12.4 RPMs.
+
+2006-08-19 20:44  fleetworks
+
+	* doc/latex/manual.tex:
+
+	Add third party packager information.
+
+2006-08-19 19:35  fleetworks
+
+	* platforms/contrib-rpm/: README, build_rpm.sh, rpmkey.spec:
+
+	Add third party packager tools.
+
+2006-08-19 19:21  fleetworks
+
+	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
+	suse/apcupsd.spec.in:
+
+	Add third party packager tag
+
+2006-08-19 13:36  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Update for apcupsd-3.12.4 release.
+
+2006-08-18 11:52  adk0212
+
+	* include/defines.h, include/struct.h, src/drivers/net/net.c:
+
+	Remove references to UPS_belowcaplimit and UPS_remtimelimit. These
+	bits are never set, so no sense checking for them.
+
+2006-08-18 09:09  adk0212
+
+	* src/gapcmon/gapcmon.c:
+
+	Fix compile error with older glib. g_async_queue_ref() returns void
+	on older version or the argument passed in on newer versions. Just
+	ignore the return value and use the queue ptr directly each time.
+
+2006-08-18 08:58  adk0212
+
+	* include/defines.h:
+
+	Maintain UPS_shut_emerg locally, as suggested by Carl Lindberg
+	<lindberg@clindberg.org>.
+
+2006-08-18 08:54  adk0212
+
+	* include/defines.h, include/struct.h, src/drivers/net/net.c,
+	src/action.c:
+
+	Kill UPS_shutdownimm as suggested by Carl Lindberg
+	<lindberg@clindberg.org>.  No one ever sets this bit, so it makes
+	no sense to test for it.
+
+2006-08-18 08:44  adk0212
+
+	* include/defines.h:
+
+	Apply fix from Carl Lindberg <lindberg@clindberg.org>:
+	UPS_shut_load, UPS_shut_btime, and UPS_shut_ltime need to be
+	treated as local status bits. Otherwise they keep getting
+	overwritten by the master and shutdown never ocurrs.
+
+2006-08-16 11:55  adk0212
+
+	* src/win32/build-win32-cross-tools:
+
+	Update to NSIS 2.19.
+
+2006-08-16 10:14  adk0212
+
+	* src/drivers/usb/usb.c:
+
+	Convert ambient temp to Celsius.
+
+2006-08-16 09:21  adk0212
+
+	* include/version.h:
+
+	Increment version to 3.13.8b.
+
+2006-08-16 09:05  adk0212
+
+	* src/win32/util.nsh:
+
+	Enable full GetWindowsVersion function because we need it now.
+
+2006-08-16 09:05  adk0212
+
+	* src/win32/winapcupsd.nsi:
+
+	Disable selection of USB driver on WinNT and Win95.
+
+2006-08-16 08:58  adk0212
+
+	* src/drivers/usb/usb.c:
+
+	Add CI_ATEMP for ambient temp processing from AP9612 card.
+
+2006-08-16 08:57  adk0212
+
+	* src/drivers/usb/usb_common.h:
+
+	Add physical usage code for AP9612 environmental monitor. Also kill
+	DOS line endings.
+
+2006-08-14 10:52  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Fine tunning of the gasync_queue usage in gapc_thread_work(). Added
+	a correct reference to the queue and used it.  was not using it
+	before.   - minor change.
+
+2006-08-13 16:47  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Anal indentation fix.
+
+2006-08-13 16:42  adk0212
+
+	* include/apc_config.h:
+
+	Kill definitions of int32_t. These are handled by autoconf now.
+
+2006-08-13 16:41  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Clean up indentation. Indents are 3 spaces, no tabs.
+
+2006-08-13 14:52  adk0212
+
+	* src/drivers/pcnet/pcnet.c:
+
+	Add COMMLOST detection if no valid data is received for 55 seconds.
+	UPS should broadcast every 25 seconds, so 55 gives us two packets
+	plus a fudge factor.
+
+2006-08-13 13:22  adk0212
+
+	* src/lib/apcconfig.c:
+
+	Strengthen match_str() support for empty strings. On some platforms
+	(Darwin 10.3.x), sscanf("", "%s", buf) returns 0 (failure) instead
+	of -1 (EOF). So we now explicitly check for that case. Thanks to
+	Carl E.  Lindberg <lindberg@clindberg.org> for pointing this out
+	and providing a fix.
+
+2006-08-13 13:15  adk0212
+
+	* src/lib/apcsignal.c:
+
+	Remove the emtpy SIGCHLD signal handler. It has been the source of
+	numerous runaway recursions on platforms that don't want you to
+	re-arm the handler from within the handler. We could switch to
+	using sigaction(2) instead of signal(2) but that opens another can
+	of worms with regard to which platforms support it and which do
+	not. So I've opted to remove SIGCHLD handling altogether. I've
+	heard rumor that it somehow prevented zomibes, but given that it
+	took no action (besides re-arming itself) I dont see how that is
+	possible. wait(2) prevents zombies. An empty SIGCHLD hanlder is a
+	placebo. Or so I think today. Credit (blame?) to Carl E. Lindberg
+	<lindberg@clindberg.org> for pushing me over the edge on this
+	issue.
+
+2006-08-13 13:00  adk0212
+
+	* src/apcnis.c:
+
+	Platforms have differing opinions on the type of the fourth
+	argument to setsockopt(2). So just cast it to (void *) and be done.
+	Thanks to Carl E.  Lindberg <lindberg@clindberg.org> for pointing
+	this out and providing a fix.
+
+2006-08-13 12:55  adk0212
+
+	* autoconf/config.h.in:
+
+	Fix typo.
+
+2006-08-13 12:54  adk0212
+
+	* configure, autoconf/config.h.in, autoconf/configure.in:
+
+	Solaris 2.5.1 is missing int32_t. Thanks to Carl E. Lindberg
+	<lindberg@clindberg.org> for pointing this out and providing a fix.
+
+2006-08-13 12:42  adk0212
+
+	* configure, autoconf/config.h.in, autoconf/configure.in,
+	include/extern.h, src/lib/sleep.c:
+
+	Remove references to usleep(1). We ensure nanosleep(2) is available
+	and all code has previously been converted to use it. Solaris hides
+	its native nanosleep(2) in librt or libposix4, depending on
+	version, so make sure configure knows enough to look there. Thanks
+	to Carl E. Lindberg <lindberg@clindberg.org> and Dave K
+	<davek08054@gmail.com> for the info.
+
+2006-08-12 16:44  adk0212
+
+	* src/libusbhid/parse.c:
+
+	Add physical min fix from Dmitry Marakasov <amdmi3@mail.ru> as per
+	FreeBSD GNATS usb/101775:   Currently, when parsing HID report
+	descriptor, libusbhid treats   global items with both tag=3 and
+	tag=4 as `physical maximum', while   tag=3 actually is `physical
+	minimum'.
+
+2006-08-12 16:42  adk0212
+
+	* src/drivers/pcnet/pcnet.c:
+
+	Add support for self-test reporting via pcnet_ups_entry_point().
+
+2006-08-11 20:00  adk0212
+
+	* src/lib/inet_pton.c:
+
+	Remove conditional on HAVE_NAMESER_H. We don't actually need
+	<arpa/nameser.h> since we've defined all the important constants by
+	hand in defines.h.
+
+2006-08-11 19:59  adk0212
+
+	* src/apcnis.c:
+
+	Always use inet_pton(). We have our own implementation for
+	platforms that are missing it, so there's no reason to
+	conditionalize it.
+
+2006-08-11 19:57  adk0212
+
+	* src/win32/compat/compat.h:
+
+	Add EAFNOSUPPORT definition which apparently win32 errno lacks.
+
+2006-08-11 19:56  adk0212
+
+	* src/win32/Makefile.in:
+
+	Include inet_pton.c in the utils library. It's needed by the pcnet
+	driver now and Win32 doesn't have it.
+
+2006-08-11 19:15  adk0212
+
+	* src/drivers/pcnet/pcnet.c:
+
+	Implement killpower support. This requires a pseudo-HTTP
+	challenge-response sequence in order for the UPS to ensure that the
+	shutdown request is legitimate.
+
+2006-08-11 02:10  adk0212
+
+	* include/version.h:
+
+	Bump version to mark 3.13.8a.
+
+2006-08-11 02:05  adk0212
+
+	* src/: apcnis.c, lib/apclibnis.c:
+
+	Fix win32 socket leak in NIS server. All callers of net_open()
+	*must* call net_close(), not close(). Furthermore, calls to
+	shutdown() are fairly pointless since the connection is being fully
+	closed on the next line.  Lastly, remove zero length packet from
+	net_close() since callers that want it already do it themselves and
+	we have no guarantee that the socket is writable at this point
+	anyway.
+
+2006-08-09 19:07  adk0212
+
+	* configure, autoconf/configure.in, platforms/darwin/apccontrol.in:
+
+	Add support for posting event notifications via Growl on Darwin, if
+	it's available. Based on a suggestion from James Snyder
+	<jbsnyder@gmail.com> many months ago.
+
+2006-08-08 22:31  skoona
+
+	* src/gapcmon/unplugged.png:
+
+	Updated commlost icon(unplugged) to match win32 version
+
+2006-08-08 19:32  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Update home page for 3.13.8 devel release.
+
+2006-08-08 11:10  adk0212
+
+	* ReleaseNotes:
+
+	Update for 3.13.8.
+
+2006-08-08 10:51  adk0212
+
+	* ChangeLog:
+
+	Update for 3.13.8.
+
 2006-08-08 10:39  adk0212
 
 	* include/version.h:
