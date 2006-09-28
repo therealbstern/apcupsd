@@ -36,14 +36,14 @@ UPSCABLE usb
 # other UPS types, you must specify an appropriate port or address.
 #
 # UPSTYPE   DEVICE           Description
-# apcsmart  /dev/tty**       Newer serial character device,
+# apcsmart  COMx             Newer serial character device,
 #                            appropriate for SmartUPS models using
-#                            a serial cable (not USB).
+#                            a serial cable (not USB). Can be COM1,
+#                            COM2, etc.
 #
-# usb       <BLANK>          Most new UPSes are USB.
-#                            A blank DEVICE setting enables
-#                            autodetection, which is th best choice
-#                            for most installations.
+# usb       <BLANK>          Most new UPSes are USB. A blank DEVICE
+#                            setting enables autodetection, which is
+#                            the best choice for most installations.
 #
 # net       hostname:port    Network link to a master apcupsd
 #                            through apcupsd's Network Information
@@ -57,11 +57,13 @@ UPSCABLE usb
 #                            or "RFC" where APC is the powernet MIB,
 #                            "APC_NOTRAP" is powernet with SNMP trap
 #                            catching disabled, and RFC is the IETF's 
-#                            rfc1628 UPS-MIB. Port is usually 161. 
-#                            Community is "private".
+#                            rfc1628 UPS-MIB. You usually want "APC".
+#                            Port is usually 161. Community is usually
+#                            "private".
 #
-# dumb      /dev/tty**       Old serial character device for use 
-#                            with simple-signaling UPSes.
+# dumb      COMx             Old serial character device for use 
+#                            with simple-signaling UPSes. Can be COM1,
+#                            COM2, etc.
 #
 # pcnet    ipaddr:username:passphrase
 #                            PowerChute Network Shutdown protocol
@@ -69,7 +71,7 @@ UPSCABLE usb
 #                            with AP9617 family of smart slot cards.
 #                            ipaddr is the IP address of the UPS mgmt
 #                            card. username and passphrase are the
-#                            credentials for which the card is
+#                            credentials for which the card has been
 #                            configured.
 #
 UPSTYPE usb
