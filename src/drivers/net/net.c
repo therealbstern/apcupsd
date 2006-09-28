@@ -224,10 +224,12 @@ static int poll_ups(UPSINFO *ups)
 
    Dmsg2(20, "Opening connection to %s:%d\n", nid->hostname, nid->port);
    if ((nid->sockfd = net_open(nid->hostname, NULL, nid->port)) < 0) {
-      log_event(ups, LOG_ERR, "fetch_data: tcp_open failed for %s port %d",
-         nid->hostname, nid->port);
       Dmsg0(90, "Exit poll_ups 0 comm lost\n");
-      ups->set_commlost();
+      if (!ups->is_commlost()) {
+         log_event(ups, LOG_ERR, "fetch_data: tcp_open failed for %s port %d",
+            nid->hostname, nid->port);
+         ups->set_commlost();
+      }
       return 0;
    }
 
