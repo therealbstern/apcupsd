@@ -2,26 +2,35 @@
              Release Notes for Apcupsd 3.13.x
 
 *DEVELOPMENT RELEASE*
-3.13.8 -- 08 July 2006
+3.13.9 -- 28 September 2006
 
-CHANGES SINCE 3.13.7
+CHANGES SINCE 3.13.8
 
   * New features:
-      - apctest, smtp, and email executables included in Win32 installer
-      - Win32 event notices now use "balloon tips" that pop up near the
-        tray instead of a dialog in the middle of the screen. Notices
-        automatically time out after 10 seconds and are completely
-        scriptable via normal apccontrol event script mechanism.
-      - Added win32 tray icon for COMMLOST state so it is clear when
-        apcupsd has lost comms with the UPS.
-      - Removed Cygwin build capability (Yes, this is a feature!)
+      - Runtime configurable paths for apccontrol (SCRIPTDIR),
+        nologin (NOLOGINDIR) and powerfail (PWRFAILDIR). This makes
+        it possible to run multiple apcupsd instances without having
+        to compile each with custom configure options.
+      - Win32 installer (and apcupsd itself) supports installing to 
+        any directory you wish, not just C:\apcupsd.
+      - Event popup messages on Win98 do not block execution of 
+        subsequent script actions.
+      - Ambient temperature is reported for USB UPSes with a AP9612
+        SmartSlot card.
+      - pcnet driver detects COMMLOST and SelfTest events.
+      - pcnet driver supports killpower (turning off UPS output 
+        power). Thanks to Moshe Hyzon <hyzon.moshe@grantstreet.com>
+        and his employer for loaning me a AP9617 card to test with.
+      - Mac OS X Darwin apccontrol script uses Growl for notifications
+        if it is installed.
 
   * Numerous bug fixes; highlights include...
-      - Solaris 10 USB build fix
-      - Darwin install fixes from Eric Cronin <ecronin@gizmolabs.org>
-      - Make apcupsd.conf settings case-insensitive
-      - Fix Win32 apccontrol.bat so event scripts are run properly
-      - Fix Win32 socket leak in NIS client & server
+      - Win32 socket leak fix
+      - Windows NT 4.0 support is fixed
+      - Miscellaneous bug fixes from Stanislav Brabec
+        <sbrabec@suse.cz> and Carl Lindberg
+	<lindberg@clindberg.org>
+      - Lots of other fixes, see ChangeLog for details.
 
 Overall features in the 3.13.x development series are described
 below...
