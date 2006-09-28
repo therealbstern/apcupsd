@@ -48,23 +48,29 @@ runtime expires based on internal APC calculations determined by power
 consumption rates. Apcupsd is licensed under the GPL version 2.
 <p>
 <h2>Recent Apcupsd Releases</h2>
-<h3><i><u>Development:</u></i>&nbsp;3.13.8 (08 August 2006) [
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=49236&release_id=438188">Source</a>
+<h3><i><u>Development:</u></i>&nbsp;3.13.9 (28 September 2006) [
+<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=49236&release_id=451280">Source</a>
 &nbsp;/&nbsp;
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=73154&release_id=438189">Win32</a>
+<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=73154&release_id=451281">Win32</a>
 ]</h3>
 This release includes numerous bug fixes and a few new features since
-3.13.7.
+3.13.8.
 <i>Keep in mind that this is a development release and may have bugs.
 Please report any problems to the
 <a href="http://lists.sourceforge.net/lists/listinfo/apcupsd-users">apcupsd-users</a>
 mailing list.</i>
 <p>
-New features are focused on Win32 and include "balloon tip" style
-notifications, a new tray icon for the COMMLOST state, and inclusion
-of apctest, smtp, and email executables that were missing in the
-previous 3.13.x releases. The full
-<a href="http://sourceforge.net/project/shownotes.php?release_id=438188&group_id=54413">ReleaseNotes</a>
+New features: Runtime configurable paths which make it possible to
+run multiple apcupsd instances without having to compile each with
+custom configure options. Win32 installer (and apcupsd itself)
+supports installing to any directory you wish, not only C:\apcupsd.
+Event popup messages on Win98 do not block execution of
+subsequent script actions. The pcnet driver detects COMMLOST and
+SelfTest events and supports killpower. Ambient temperature is
+reported for USB UPSes with a AP9612 SmartSlot card.
+<p>
+The full
+<a href="http://sourceforge.net/project/shownotes.php?release_id=451280&group_id=54413">ReleaseNotes</a>
 are available.
 <p>
 Overall new features of the 3.13.x development series include USB
