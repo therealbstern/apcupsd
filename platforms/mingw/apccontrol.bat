@@ -148,7 +148,7 @@ rem   %APCUPSD% /kill
 rem   ping -n 1 -w 5000 10.255.255.254 > NUL
 rem   %POPUP% "Doing %APCUPSD% --killpower"
 rem   %APCUPSD% --killpower
-rem   ping -n 1 -w 20000 10.255.255.254 > NUL
+rem   ping -n 1 -w 12000 10.255.255.254 > NUL
 rem
    %POPUP% "Doing %SHUTDOWN% -h now"
    %SHUTDOWN% -h now
