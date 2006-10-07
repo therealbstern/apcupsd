@@ -186,14 +186,20 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
          ups->set_online();
       }
 
-      /* BOGUS STUFF MUST FIX IF POSSIBLE */
+/*
+
+ * Code block preserved for posterity in case I ever get a real
+ * 940-0023A cable to test. According to schematic in the apcupsd
+ * manual, SR is not connected at all. We used to treat it as a
+ * battlow indicator, but I have no evidence that it works, and
+ * some evidence that it does not.
 
       if (my_data->sp_flags & TIOCM_SR) {
-         ups->clear_online();
+         ups->set_battlow();
       } else {
-         ups->set_online();
+         ups->clear_battlow();
       }
-
+*/
       break;
 
    case APC_940_0095A:
