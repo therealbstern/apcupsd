@@ -138,8 +138,11 @@ Section "Apcupsd Service" SecService
   SetOutPath "$INSTDIR\driver"
   File ..\..\platforms\mingw\apcupsd.inf
   File ..\..\platforms\mingw\apcupsd.cat
+  File ..\..\platforms\mingw\apcupsd_x64.cat
   File ${DEPKGS}\libusb-win32\libusb0.sys
+  File ${DEPKGS}\libusb-win32\libusb0_x64.sys
   File ${DEPKGS}\libusb-win32\libusb0.dll
+  File ${DEPKGS}\libusb-win32\libusb0_x64.dll
   File ..\..\platforms\mingw\install.txt
 
   SetOutPath "$INSTDIR\examples"
@@ -316,9 +319,12 @@ Section "Uninstall"
   Delete /REBOOTOK "$INSTDIR\bin\email.exe"
   Delete /REBOOTOK "$INSTDIR\bin\background.exe"
   Delete /REBOOTOK "$INSTDIR\driver\libusb0.dll"
+  Delete /REBOOTOK "$INSTDIR\driver\libusb0_x64.dll"
   Delete /REBOOTOK "$INSTDIR\driver\libusb0.sys"
+  Delete /REBOOTOK "$INSTDIR\driver\libusb0_x64.sys"
   Delete /REBOOTOK "$INSTDIR\driver\apcupsd.inf"
   Delete /REBOOTOK "$INSTDIR\driver\apcupsd.cat"
+  Delete /REBOOTOK "$INSTDIR\driver\apcupsd_x64.cat"
   Delete /REBOOTOK "$INSTDIR\driver\install.txt"
   Delete /REBOOTOK "$INSTDIR\examples\*"
   Delete /REBOOTOK "$INSTDIR\README.txt"
