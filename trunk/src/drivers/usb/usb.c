@@ -547,8 +547,8 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
       while (isspace(*p))
          p++;
 
-      astrncpy(ups->upsmodel, uval->sValue, sizeof(ups->upsmodel));
-      astrncpy(ups->mode.long_name, uval->sValue, sizeof(ups->mode.long_name));
+      astrncpy(ups->upsmodel, p, sizeof(ups->upsmodel));
+      astrncpy(ups->mode.long_name, p, sizeof(ups->mode.long_name));
       break;
 
    /* WAKEUP_DELAY */
