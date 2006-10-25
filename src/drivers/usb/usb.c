@@ -533,11 +533,19 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
    /* model, firmware */
    case CI_UPSMODEL:
       /* Truncate Firmware info on APC Product string */
-      if ((p = strchr(uval->sValue, 'F')) && *(p + 1) == 'W' && *(p + 2) == ':') {
-         *(p - 1) = 0;
-         astrncpy(ups->firmrev, p + 4, sizeof(ups->firmrev));
+      if ((p = strstr(uval->sValue, "FW:"))) {
+         *p = '\0';           // Terminate model name
+         p += 3;              // Skip "FW:"
+         while (isspace(*p))  // Skip whitespace after "FW:"
+            p++;
+         astrncpy(ups->firmrev, p, sizeof(ups->firmrev));
          ups->UPS_Cap[CI_REVNO] = true;
       }
+
+      /* Kill leading whitespace on model name */
+      p = uval->sValue;
+      while (isspace(*p))
+         p++;
 
       astrncpy(ups->upsmodel, uval->sValue, sizeof(ups->upsmodel));
       astrncpy(ups->mode.long_name, uval->sValue, sizeof(ups->mode.long_name));
