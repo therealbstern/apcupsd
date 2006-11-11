@@ -441,6 +441,7 @@ GAPCMON_CFLAGS=-I$(DEPKGS)/glib/include/gtk-2.0 \
    -I$(DEPKGS)/glib/lib/gnome-vfs-2.0/include \
    -I$(DEPKGS)/glib/include/cairo \
    -DGNOMEVFS_REQUIRES_CANCELLATION \
+   -DHAVE_GNOMEVFS_SOCKET_SET_TIMEOUT \
    -mms-bitfields
 
 OBJS_GAPCMON = \
