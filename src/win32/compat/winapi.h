@@ -54,11 +54,6 @@ extern OSVERSIONINFO g_os_version_info;
 // "\\?\" to the path. For more information, see Naming a File.
 #define MAX_PATH_W 32767
 
-int wchar_2_UTF8(char *pszUTF, const WCHAR *pszUCS, int cchChar = MAX_PATH_UTF8);
-int UTF8_2_wchar(POOLMEM **pszUCS, const char *pszUTF);
-int make_win32_path_UTF8_2_wchar(POOLMEM **pszUCS, const char *pszUTF, BOOL* pBIsRawPath = NULL);
-
-
 /* In ADVAPI32.DLL */
 
 typedef BOOL (WINAPI * t_OpenProcessToken)(HANDLE, DWORD, PHANDLE);

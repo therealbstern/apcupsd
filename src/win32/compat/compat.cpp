@@ -19,7 +19,7 @@
 //
 // Author          : Christopher S. Hull
 // Created On      : Sat Jan 31 15:55:00 2004
-// $Id: compat.cpp,v 1.21 2006-09-24 18:11:04 adk0212 Exp $
+// $Id: compat.cpp,v 1.22 2006-11-11 17:16:38 adk0212 Exp $
 
 #include "apc.h"
 #include "compat.h"
@@ -45,6 +45,9 @@
 
 extern void d_msg(const char *file, int line, int level, const char *fmt,...);
 extern int enable_vss;
+extern int wchar_2_UTF8(char *pszUTF, const WCHAR *pszUCS, int cchChar = MAX_PATH_UTF8);
+extern int UTF8_2_wchar(POOLMEM **pszUCS, const char *pszUTF);
+extern int make_win32_path_UTF8_2_wchar(POOLMEM **pszUCS, const char *pszUTF, BOOL* pBIsRawPath = NULL);
 
 // from MicroSoft SDK (KES) is the diff between Jan 1 1601 and Jan 1 1970
 #define WIN32_FILETIME_ADJUST 0x19DB1DED53E8000ULL 
