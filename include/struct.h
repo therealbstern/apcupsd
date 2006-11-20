@@ -238,6 +238,7 @@ class UPSINFO {
    bool chg_battlow() const { return ((Status ^ PrevStatus) & UPS_battlow) == UPS_battlow; };
    bool chg_onbatt() const { return ((Status ^ PrevStatus) & UPS_onbatt) == UPS_onbatt; };
    bool chg_battpresent() const { return ((Status ^ PrevStatus) & UPS_battpresent) == UPS_battpresent; };
+   bool chg_shut_remote() const { return ((Status ^ PrevStatus) & UPS_shut_remote) == UPS_shut_remote; };
 
    /* DATA */
    char release[20];
