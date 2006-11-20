@@ -408,6 +408,7 @@ void do_action(UPSINFO *ups)
       if (ups->chg_shut_remote()) {
          generate_event(ups, CMDREMOTEDOWN);
       }
+      ups->PrevStatus = ups->Status;
       write_unlock(ups);
       return;
    }
