@@ -562,8 +562,12 @@ int powernet_snmp_ups_open(UPSINFO *ups)
    struct snmp_session *s = &my_data->session;
    struct snmp_session tmp;
 
-   /* If we're configured to not use traps, just exit */
+   /*
+    * If we're configured to not use traps, simply rename
+    * DeviceVendor to 'APC' and exit.
+    */
    if (!strcmp(my_data->DeviceVendor, "APC_NOTRAP")) {
+      my_data->DeviceVendor[3] = '\0';
       Dmsg0(100, "User requested no traps\n");
       return 1;
    }
