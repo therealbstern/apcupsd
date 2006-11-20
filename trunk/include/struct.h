@@ -141,16 +141,6 @@ typedef struct internalgeninfo {
 } INTERNALGENINFO;                 /* for assigning into upsinfo */
 
 
-/* No longer really needed since we do not use shared memory */
-#define UPSINFO_VERSION 12
-
-/*
- * There is no need to change the following, but you can if
- * you want, but it must be at least 4 characters to match
- * the length of id[4] (not counting the EOS).
- */
-#define UPSINFO_ID "UPS!"
-
 class UPSINFO {
  public:
    /* Methods */
@@ -342,7 +332,7 @@ class UPSINFO {
    int stattime;
    int datatime;
    int sysfac;
-   int nettime;                    /* Time interval for master to send to slaves */
+   int nettime;                    /* Time interval for slaves to poll master */
    int percent;                    /* shutdown when batt % less than this */
    int runtime;                    /* shutdown when runtime less than this */
    char nisip[64];                 /* IP for NIS */
