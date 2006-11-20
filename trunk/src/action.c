@@ -403,10 +403,11 @@ void do_action(UPSINFO *ups)
       }
    }
 
-   /* Must SHUTDOWN Remote System Calls */
+   /* Remote is shutting down, so must we. */
    if (ups->is_shut_remote()) {
-      ups->clear_onbatt_msg();
-      generate_event(ups, CMDREMOTEDOWN);
+      if (ups->chg_shut_remote()) {
+         generate_event(ups, CMDREMOTEDOWN);
+      }
       write_unlock(ups);
       return;
    }
