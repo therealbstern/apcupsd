@@ -151,7 +151,7 @@ static const UPSDRIVER drivers[] = {
      pcnet_ups_check_state,
      pcnet_ups_program_eeprom,
      pcnet_ups_entry_point },
-#endif   /* HAVE_TEST_DRIVER */
+#endif   /* HAVE_PCNET_DRIVER */
 
    /*
     * The NULL driver: closes the drivers list.
