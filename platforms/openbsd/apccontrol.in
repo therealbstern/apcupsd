@@ -98,7 +98,6 @@ case "$1" in
 	emergency)
 		printf "Emergency Shutdown. Possible UPS battery failure." \
 			| wall
-		${SHUTDOWN} -h now "apcupsd emergency shutdown"
 	;;
 	changeme)
 		printf "Emergency! UPS batteries have failed\nChange them NOW" \
@@ -106,7 +105,6 @@ case "$1" in
 	;;
 	remotedown)
 		printf "Remote Shutdown.\nBeginning Shutdown Sequence." | wall
-		${SHUTDOWN} -h now "apcupsd remote shutdown"
 	;;
 	restartme)
 		echo -n "Restarting APCUPSD Power Management: "
