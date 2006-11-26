@@ -112,14 +112,12 @@ case "$1" in
     ;;
     emergency)
 	echo "Emergency Shutdown. Possible battery failure on UPS ${2}." | ${WALL}
-	${SHUTDOWN} -h now "apcupsd emergency shutdown"
     ;;
     changeme)
 	echo "Emergency! Batteries have failed on UPS ${2}. Change them NOW" | ${WALL}
     ;;
     remotedown)
 	echo "Remote Shutdown. Beginning Shutdown Sequence." | ${WALL}
-	${SHUTDOWN} -h now "apcupsd remote shutdown"
     ;;
     restartme)
 	echo -n "Restarting APCUPSD Power Management: "

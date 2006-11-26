@@ -150,7 +150,6 @@ rem   %POPUP% "Doing %APCUPSD% --killpower"
 rem   %APCUPSD% --killpower
 rem   ping -n 1 -w 12000 10.255.255.254 > NUL
 rem
-   %POPUP% "Doing %SHUTDOWN% -h now"
    %SHUTDOWN% -h now
    GOTO :done
 
@@ -159,7 +158,7 @@ rem
    GOTO :done
 
 :emergency
-   %SHUTDOWN% -h now
+   %POPUP% "Emergency shutdown initiated."
    GOTO :done
 
 :changeme
@@ -167,7 +166,7 @@ rem
    GOTO :done
 
 :remotedown
-   %SHUTDOWN% -h now
+   %POPUP% "Shutdown due to master state or comms lost."
    GOTO :done
 
 :restartme
