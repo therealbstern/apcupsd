@@ -383,7 +383,7 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
 
    Dmsg2(100, "Got Status = %s 0x%x\n", answer, ups->Status);
 
-   if (masterStatus & UPS_shutdown) {
+   if (masterStatus & UPS_shutdown && !ups->is_shut_remote()) {
       ups->set_shut_remote();    /* if master is shutting down so do we */
       log_event(ups, LOG_ERR, "Shutdown because NIS master is shutting down.");
       Dmsg0(100, "Set SHUT_REMOTE because of master status.\n");
@@ -396,7 +396,7 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
     * is called once per second.
     */
    if (stat == 0 && ups->is_onbatt()) {
-      if (comm_loss++ == 4) {
+      if (comm_loss++ == 4 && !ups->is_shut_remote()) {
          ups->set_shut_remote();
          log_event(ups, LOG_ERR,
             "Shutdown because loss of comm with NIS master while on batteries.");
