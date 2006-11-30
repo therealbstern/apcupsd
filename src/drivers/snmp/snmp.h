@@ -39,6 +39,7 @@
 #else
 
 # ifdef HAVE_NET_SNMP
+#  include <net-snmp/net-snmp-config.h>
 #  include <net-snmp/library/asn1.h>
 #  include <net-snmp/library/snmp.h>
 #  include <net-snmp/library/snmp_api.h>
