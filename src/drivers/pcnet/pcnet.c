@@ -725,6 +725,13 @@ int pcnet_ups_kill_power(UPSINFO *ups)
    md5_state_t ms;
    md5_byte_t digest[16];
 
+   /* We cannot perform a killpower without authentication data */
+   if (!my_data->auth) {
+      Error_abort0("Cannot perform killpower without authentication "
+                   "data. Please set ip:user:pass for DEVICE in "
+                   "apcupsd.conf.\n");
+   }
+
    /* Open a TCP stream to the UPS */
    s = socket(PF_INET, SOCK_STREAM, 0);
    if (s == -1) {
