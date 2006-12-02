@@ -483,6 +483,7 @@ int powernet_snmp_ups_check_state(UPSINFO *ups)
    fd_set fds;
    int numfds, rc, block;
    struct timeval tmo, exit, now;
+   int sleep_time;
 
    /* Check for commlost under lock since UPS status might be changed */
    write_lock(ups);
@@ -491,15 +492,20 @@ int powernet_snmp_ups_check_state(UPSINFO *ups)
    if (rc == 0)
       return 0;
 
+   /* Allow user to reduce sleep_time using NETTIME config setting */
+   sleep_time = ups->wait_time;
+   if (ups->nettime && ups->nettime < ups->wait_time)
+      sleep_time = ups->nettime;
+
    /* If we're not doing SNMP traps, just sleep and exit */
    if (!Sid->trap_session) {
-      sleep(ups->wait_time);
+      sleep(sleep_time);
       return 1;
    }
 
    /* Figure out when we need to exit by */
    gettimeofday(&exit, NULL);
-   exit.tv_sec += ups->wait_time;
+   exit.tv_sec += sleep_time;
 
    while(1)
    {
