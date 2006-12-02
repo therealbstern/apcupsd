@@ -14,29 +14,26 @@ consumption rates. Apcupsd is licensed under the GPL version 2.
 <p>
 
 <h2>Recent Apcupsd Releases</h2>
-<h3><i><u>Development:</u></i>&nbsp;3.13.9 (28 September 2006) [
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=49236&release_id=451280">Source</a>
+<h3><i><u>Development:</u></i>&nbsp;3.13.11 (1 December 2006) [
+<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=49236&release_id=468141">Source</a>
 &nbsp;/&nbsp;
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=73154&release_id=451281">Win32</a>
+<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=73154&release_id=468142">Win32</a>
 ]</h3>
-This release includes numerous bug fixes and a few new features since 
-3.13.8.
+This release contains primarily bug fixes with a couple new features
+thrown in. The new features include Win32 USB support for x64 platforms
+and the SNMP driver now uses the NETTIME setting to control the poll 
+interval (it was previously hard-coded to 60 seconds). Notable bug
+fixes include a socket leak fix for SNMP on Win32 and a fix to the
+net mode logic for handling the case of a master shutting down
+before the slave.
+<p>
 <i>Keep in mind that this is a development release and may have bugs.
 Please report any problems to the
 <a href="http://lists.sourceforge.net/lists/listinfo/apcupsd-users">apcupsd-users</a>
 mailing list.</i>
 <p>
-New features: Runtime configurable paths which make it possible to
-run multiple apcupsd instances without having to compile each with
-custom configure options. Win32 installer (and apcupsd itself) 
-supports installing to any directory you wish, not only C:\apcupsd.
-Event popup messages on Win98 do not block execution of 
-subsequent script actions. The pcnet driver detects COMMLOST and 
-SelfTest events and supports killpower. Ambient temperature is 
-reported for USB UPSes with a AP9612 SmartSlot card. 
-<p>
 The full
-<a href="http://sourceforge.net/project/shownotes.php?release_id=451280&group_id=54413">ReleaseNotes</a>
+<a href="http://sourceforge.net/project/shownotes.php?release_id=468141&group_id=54413">ReleaseNotes</a>
 are available.
 <p>
 Overall new features of the 3.13.x development series include USB
