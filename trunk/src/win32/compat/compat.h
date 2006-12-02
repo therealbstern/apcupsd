@@ -27,7 +27,7 @@
  * Last Modified By: Thorsten Engel
  * Last Modified On: Fri Apr 22 19:30:00 2004
  * Update Count    : 218
- * $Id: compat.h,v 1.20 2006-09-27 14:54:25 adk0212 Exp $
+ * $Id: compat.h,v 1.21 2006-12-02 04:00:39 adk0212 Exp $
  */
 
 
@@ -118,9 +118,7 @@ typedef void DIR;
 #endif
 #endif
 
-struct timezone {
-    int foo;
-};
+struct timezone;
 
 int strcasecmp(const char*, const char *);
 int gettimeofday(struct timeval *, struct timezone *);

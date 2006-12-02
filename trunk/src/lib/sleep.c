@@ -36,13 +36,12 @@ int nanosleep(const struct timespec *req, struct timespec *rem)
    int stat;
 
    struct timeval tv;
-   struct timezone tz;
 
    /* Copy relative exit time */
    timeout = *req;
 
    /* Compute absolute exit time */
-   gettimeofday(&tv, &tz);
+   gettimeofday(&tv, NULL);
    timeout.tv_nsec += tv.tv_usec * 1000;
    timeout.tv_sec += tv.tv_sec;
    while (timeout.tv_nsec >= 1000000000) {
