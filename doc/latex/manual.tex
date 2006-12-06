@@ -199,10 +199,12 @@ Advanced Topics (see
 \index{USB Configuration}
 \index{Configuration!USB}
 
-Apcupsd supports USB connections on Linux, FreeBSD, OpenBSD, and NetBSD. If
-you plan to use a USB conenction, please read this section in its entirety.
-You can skip this section if your UPS has a serial (RS232-C) or Ethernet 
-interface or if you are not running one of the platforms listed above. 
+Apcupsd supports USB connections on all major operating systems: Linux,
+FreeBSD, OpenBSD, NetBSD, Windows, Solaris, and Mac OS X Darwin. If
+you plan to use a USB conenction, please read the appropriate subsection in
+its entirety. You can skip this section if your UPS has a serial (RS232-C)
+or Ethernet interface or if you are not running one of the platforms listed
+above.
 
 \subsection*{Linux USB Configuration}
 \index{Linux USB Configuration}
@@ -525,6 +527,7 @@ more seriously wrong than this manual can cover {--} find expert help.  If you
 are unable to list USB devices or drivers, you kernel may not be USB-capable
 and that needs to be fixed.
 
+
 \subsection*{BSD USB Configuration}
 \index{BSD USB Configuration}
 \index{BSD!USB Configuration}
@@ -538,12 +541,15 @@ and that needs to be fixed.
 \begin{description}
 \item [Problem]
 FreeBSD lockups: Some users have experienced lockups (apcupsd stops 
-responding) on FreeBSD systems. Recent versions of Apcupsd have addressed
+responding) on FreeBSD systems.
+\item [Solution]
+Recent versions of Apcupsd have addressed
 this issue. Please upgrade to apcupsd-3.10.18 or higher.
 
 \item [Problem]
 FreeBSD kernel panics if USB cable is unplugged while apcupsd is running. 
-This is another kernel bug and is most easily worked around by not hot- 
+\item [Solution]
+This is a kernel bug and is most easily worked around by not hot- 
 unplugging the UPS while apcupsd is running. This issue may be fixed in
 recent FreeBSD kernels.
 \end{description}
@@ -554,34 +560,20 @@ recent FreeBSD kernels.
 
 The \*BSD USB driver supports FreeBSD, OpenBSD and NetBSD. (Thanks go to 
 the \*BSD developers who kept a nearly identical interface across all 
-three platforms.)  
-
-The driver has been tested with the following platform versions: 
-
-\begin{verbatim}
-     FreeBSD-5.4     (Primary development platform)
-     FreeBSD-5.3
-     FreeBSD-4.11
-     NetBSD-2.0
-     NetBSD-1.6.2
-     OpenBSD-3.6
-\end{verbatim}
-
-FreeBSD-5.4 has had the most testing since it is the primary platform on which
-the driver is developed. The other platforms and versions have had somewhat
-less testing. The only architecture tested so far (on any platform) is i386,
-althought there is no reason to think it will not work on other archs. If you
-run the driver on a new platform version or architecture, please report your
-experience (good or bad) to the apcupsd-users mailing list.  
+three platforms.)
 
 \subsubsection*{Kernel Configuration}
 \index{BSD!USB Kernel Configuration}
 \index{USB!BSD Kernel Configuration}
 
-You will need to rebuild your kernel in order to {\bf enable the ugen driver}
-and {\bf disable the uhid driver}. uhid is not sufficient for apcupsd at this
-time and we need to prevent it from grabbing the UPS device. You should 
-{\bf make the following changes} to your kernel config file:
+FreeBSD 5.5.0 and later require no special kernel configuration. Users of
+those platforms can skip ahead to the next subsection.
+
+Users of OpenBSD, NetBSD, and FreeBSD 5.4 (and older) will need to rebuild
+the kernel in order to {\bf enable the ugen driver} and {\bf disable the 
+uhid driver}. uhid is not sufficient for apcupsd at this time and we need 
+to prevent it from grabbing the UPS device. You should {\bf make the 
+following changes} to your kernel config file:
 
 \begin{description}
 \item [FreeBSD]
@@ -667,6 +659,173 @@ where {\bf ugenN} is the ugen device name shown by usbdevs. It is probably
 a good idea to create several sets of ugen nodes in case you add more USB
 devices.
 \end{description}
+
+
+\subsection*{Windows USB Configuration}
+\index{Windows USB Configuration}
+\index{Windows!USB Configuration}
+\index{USB!Windows Configuration}
+
+\subsubsection*{Platforms and Versions}
+\index{Windows!USB Platforms and Versions}
+\index{USB!Windows Platforms and Versions}
+
+Apcupsd supports USB UPSes on Windows 98, Windows ME (untested, but
+expected to work), Windows NT 4.0, Windows 2000, Windows XP, and 
+Windows Server 2003. Windows Vista is untested at this time. 64-bit
+platforms (x64) are also supported.
+
+\subsubsection*{USB Driver Installation}
+\index{Windows!USB Driver Installation}
+\index{USB!Windows Driver Installation}
+
+USB connected UPSes on Windows require a special driver. In most cases, 
+this driver is automatically installed when you install Apcupsd. However,
+if you unchecked the "USB Driver" package during installation or if you're
+running Windows 98 or ME, you will need to install the driver manually.
+
+For detailed instructions, please see the install.txt file located in
+the driver\\ folder of your Apcupsd install.
+
+\subsubsection*{Verifying Device Detection and Driver}
+\index{Windows!Verifying USB Device Detection and Driver}
+\index{USB!Verifying Windows Device Detection and Driver}
+
+After installing Apcupsd (and the Apcupsd USB driver, if necessary),
+plug in your UPS USB cable and open the Windows Device Manager. You 
+should see a "LibUSB-Win32 Devices" section, under which is listed 
+"American Power Conversion USB UPS (Apcupsd)". You should {\bf NOT}
+see "HID UPS Battery" under the "Batteries" section.
+
+If the "LibUSB-Win32 Devices" section does not appear, check that
+your UPS is powered on and that the USB cable is connected at
+both ends. Reinstall the driver as directed above if needed.
+
+
+\subsection*{Solaris USB Configuration}
+\index{Solaris USB Configuration}
+\index{Solaris!USB Configuration}
+\index{USB!Solaris Configuration}
+
+\subsubsection*{Platforms and Versions}
+\index{Solaris!USB Platforms and Versions}
+\index{USB!Solaris Platforms and Versions}
+
+Apcupsd supports USB UPSes on Solaris 10 and higher. Both x86 and SPARC
+platforms are supported.
+
+\subsubsection*{Building Apcupsd with USB}
+\index{Solaris!Building Apcupsd with USB}
+\index{USB!Solaris Building Apcupsd}
+
+Some specific packages are necessary when building Apcupsd with USB support
+on Solaris. You must install the SUNWlibusb and SUNWlibusbugen packages
+{\bf BEFORE} attempting to build Apcupsd. These packages can be found on 
+the Solaris installation CDROMs and should be installed with the {\bf pkgadd}
+utility.
+
+You also should build using the gcc compiler and ccs make, not Sun's
+compiler. The appropriate make utility can be found in /usr/ccs/bin.
+gcc can be installed from packages included on the Solaris installation
+CDROMs.
+
+Configure and build Apcupsd normally, as described in
+\ilink{Building and Installing Apcupsd}{Building-and-Installing-Apcupsd}. Be
+sure to include the \texttt{{---}enable-usb} flag to \texttt{configure}.
+
+After building, install Apcupsd as root using '\texttt{make install}', then
+{\bf perform a reconfigure boot ('\texttt{reboot {---} -r}')}. During 
+installation, Apcupsd will automatically configure your USB subsystem to 
+attach APC USB devices to the \texttt{ugen} driver. This is a critical step
+and must be completed by a reconfigure boot. Note that the USB config changes
+will be reversed if you remove Apcupsd using '\texttt{make uninstall}'.
+
+\subsubsection*{Verifying Device Detection and Driver}
+\index{Solaris!Verifying USB Device Detection and Driver}
+\index{USB!Verifying Solaris Device Detection and Driver}
+
+After installing Apcupsd as described above and performing a reconfigure boot,
+plug in your UPS USB cable. You should see a series of dmesg log messages similar
+to the following: 
+
+\begin{verbatim}
+Dec  5 17:50:50 sunblade usba: [ID 912658 kern.info] USB 1.10 device (usb51d,2) operating at low speed (USB 1.x) on USB 1.10 root hub: input@4, ugen0 at bus address 3
+Dec  5 17:50:50 sunblade usba: [ID 349649 kern.info]    American Power Conversion Smart-UPS 1000 FW:600.1.D USB FW:1.2 AS0127232356
+Dec  5 17:50:50 sunblade genunix: [ID 936769 kern.info] ugen0 is /pci@1f,0/usb@c,3/input@4
+Dec  5 17:50:50 sunblade genunix: [ID 408114 kern.info] /pci@1f,0/usb@c,3/input@4 (ugen0) online
+\end{verbatim}
+
+Note that the {\bf ugen} driver is called out. If you do not see any dmesg entries
+related to your UPS, ensure that it is turned on and that the USB cable is connected
+at both ends. Also verify that you installed Apcupsd as root using the 
+'\texttt{make install}' command and that you performed a reconfigure boot afterward.
+
+\subsubsection*{Device Nodes}
+\index{Solaris!USB Device Nodes}
+\index{USB!Solaris Device Nodes}
+
+Apcupsd communicates with the UPS through the USB generic device, {\bf ugen}.
+The reconfigure boot performed after Apcupsd installation will ensure the
+correct device nodes are created. Once your UPS has been recognized in dmesg
+as shown above, you can check /dev/usb to see if the device nodes have appeared:
+
+\begin{verbatim}
+[user@sunblade /]$ ls /dev/usb/51d.2/*
+cntrl0      cntrl0stat  devstat     if0in1      if0in1stat
+\end{verbatim}
+
+(\texttt{51d.2} is the vendor/product id for APC UPSes.)
+
+
+\subsection*{Darwin USB Configuration}
+\index{Darwin USB Configuration}
+\index{Darwin!USB Configuration}
+\index{USB!Darwin Configuration}
+
+\subsubsection*{Platforms and Versions}
+\index{Darwin!USB Platforms and Versions}
+\index{USB!Darwin Platforms and Versions}
+
+Apcupsd supports USB UPSes on Mac OS X Darwin 10.3.x and higher. Both Intel
+and PowerPC platforms are supported.
+
+\subsubsection*{Building Apcupsd with USB}
+\index{Darwin!Building Apcupsd with USB}
+\index{USB!Darwin Building Apcupsd}
+
+Some specific packages are necessary when building Apcupsd with USB support
+on Darwin. You must install libusb-0.1.12 or higher which can be obtained
+from \elink{MacPorts}{http://www.macports.org} (formerly DarwinPorts) or 
+\elink{Fink}{http://fink.sourceforge.net}. Note that Apcupsd is
+sensitive to the install location of libusb, so beware if you change it
+from the default.
+
+Apcupsd should be built using gcc, preferably from the XCode development
+tools. Currently the maintainer is using gcc-4.0.1 from XCode 2.4. Other
+version of gcc from other sources may also work.
+
+Configure and build Apcupsd normally, as described in
+\ilink{Building and Installing Apcupsd}{Building-and-Installing-Apcupsd}.
+Be sure to include the \texttt{{---}enable-usb} flag to \texttt{configure}.
+
+After building, install Apcupsd as root using '\texttt{make install}' and
+then reboot. During installation, Apcupsd will automatically install a \
+simple dummy kext driver designed to prevent Apple's monitoring software
+from taking over the UPS. It is necessary to reboot in order to activate
+the kext. Note that this kext will be automatically removed if you
+uninstall Apcupsd using '\texttt{make uninstall}', allowing Apple's
+monitoring tool to once again access the UPS.
+
+\subsubsection*{Verifying Device Detection and Driver}
+\index{Darwin!Verifying USB Device Detection and Driver}
+\index{USB!Verifying Darwin Device Detection and Driver}
+
+After installing Apcupsd as described above and rebooting, plug in your
+UPS USB cable. You should notice that Darwin does {\bf NOT} display the
+battery monitor tool in the menu bar. You can also check Apple Menu ->
+About This Mac -> More Info... -> USB to ensure that your UPS
+appears in the list of USB devices.
+
 
 \label{Building-and-Installing-apcupsd}
 
