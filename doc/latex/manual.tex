@@ -171,8 +171,7 @@ computers, a copy of apcupsd running one one computer will act as a
 server while the other(s) will act as network clients which poll the
 server for information about the UPS.  Note that ``NIS" is \emph{not}
 related to Sun's directory service also called ``NIS" or ``Yellow
-Pages''.  In addition NIS server and client there is an alternative,
-depricated, master/slave network configuration.
+Pages''.
 
 The third configuration (new with version 3.8.3), is where a single computer
 controls multiple UPSes. In this case, there are several copies of apcupsd on
@@ -1146,12 +1145,6 @@ probably not what you want.
    This option allows you to specify where you want apcupsd to put the Cascading
 Style Sheet that goes with the multimoncss.cgi CGI program.  
 
-\item [{---}enable-master-slave]
-   \index{{---}enable-master-slave }
-   Turns on the master/slave networking code (default). This is sometimes
-referred to as the old master/slave code, and is more complicated than using
-NIS and the net driver to control Slaves (see below).  
-
 \item [{---}enable-apcsmart]
    \index{{---}enable-apcsmart }
    Turns on generation of the APC Smart driver (default).  
@@ -1162,22 +1155,27 @@ NIS and the net driver to control Slaves (see below).
 
 \item [{---}enable-usb]
    \index{{---}enable-usb }
-   Turns on generation of the Linux (only) USB driver code. By default this is
-disabled.  
+   Turns on generation of the USB driver code. By default this is disabled.  
 
 \item [{---}enable-net]
    \index{{---}enable-net }
-   Turns on generation of the NIS network driver for slaves. This is an
-alternative to old master/slave code. For the master, this code should be
-disabled. For each slave, this is the only driver needed. This driver works by
-reading the information from the the configured master using the NIS (Network
-Information Services) interface.  
+   Turns on generation of the NIS network driver for slaves. For each slave,
+this is the only driver needed. This driver works by reading the information
+from the the configured master using the NIS (Network Information Services)
+interface.  
 
 \item [{---}enable-snmp]
    \index{{---}enable-snmp }
-   Turns on generation of the SNMP driver. This driver will control the computer
-by reading the UPS information over the network assuming you are running SNMP.
-By default this is disabled.  
+   Turns on generation of the SNMP driver. This driver accesses the UPS over
+the network using SNMP. This is compatible only with UPSes equipped with an
+SNMP or Web/SNMP management card. By default this is disabled.  
+
+\item [{---}enable-pcnet]
+   \index{{---}enable-pcnet }
+   Turns on generation of the PCNET (PowerChute Network Shutdown) driver.
+This driver accesses the UPS over the network using APC's custom protocol.
+This driver can be used as an alternative to SNMP for UPSes equipped with
+a modern Web/SNMP management card. By default this is disabled.  
 
 \item [{---}enable-test]
    \index{{---}enable-test }
@@ -1389,8 +1387,7 @@ installation files:
 \item unknown (see 
    \ilink{Unknown System}{Unknown-System})  
 \item Win32 (see 
-   \ilink{Windows Systems with CYGWIN
-   Installed}{Windows-Systems-with-CYGWIN-Installed}) 
+   \ilink{Windows Systems}{Windows-Systems}) 
 \end{itemize}
 
 \label{Alpha}
@@ -1763,59 +1760,10 @@ the developers list (apcupsd-users at lists.sourceforge.net) for installation
 instructions. This directory also contains a hint file for {\it Linux From
 Scratch}, which could be helpful for other systems as well. 
 
-\label{Windows-Systems-with-CYGWIN-Installed}
-
-\subsubsection*{Windows Systems with CYGWIN Installed:}
-
-\label{index-Windows-55}
-\label{index-OS_002c-Windows-56}
-If you wish to build from the source, and if you have CYGWIN version 1.5.18 and
-GCC 3.4.4 installed, it is possible to build the Win32 version of apcupsd.
-Please don't try any other versions of CYGWIN as there were known problems.  
-
-To date, the Win32 version has only been build on a Win98 SR2 and a WinXP
-system with the above CYGWIN environment and all the available CYGWIN tools
-loaded. In addition, the builds were done running under the {\bf bash} shell.
-As time permits, we will experiment with other environments, and if any of you
-do build it from source, please let us know. The current CYGWIN environment
-was loaded using the CYGWIN setup.exe program, downloading ALL the latest
-binaries and installing them.  
-
-We recommend that you run the {\tt ./configure} command with the following
-options: 
-
-\footnotesize
-\begin{verbatim}
-     ./configure \
-       --prefix=/apcupsd \
-       --sbindir=/apcupsd/bin \
-       --sysconfdir=/apcupsd/etc/apcupsd \
-       --with-pid-dir=/apcupsd/etc/apcupsd \
-       --mandir=/apcupsd \
-       --with-cgi-bin=/apcupsd/etc/apcupsd/cgi
-\end{verbatim}
-\normalsize
-
-After which, you can do a: 
-
-\footnotesize
-\begin{verbatim}
-     make
-\end{verbatim}
-\normalsize
-
-And to install apcupsd, do: 
-
-\footnotesize
-\begin{verbatim}
-     make install
-\end{verbatim}
-\normalsize
-
-Finally, you should follow the Win32 (see 
-\ilink{Installation on Windows}{The-Windows-Version-of-apcupsd})
-installation instruction, skipping the part that describes unZipping the
-binary release. 
+\label{Windows-Systems}
+\subsubsection*{Windows Systems:}
+Appropriate scripts (actually Windows batch files) are included with the
+Apcupsd Win32 installer package.
 
 \label{After-Installation}
 
@@ -2141,9 +2089,7 @@ NIS (Network Information Server) mode allows for communication between
 instances of apcupsd running on different hosts.  Only one of those
 hosts, the server, needs to talk to the UPS directly.  The others,
 clients, optain information about the state of the UPS by querying the
-server.  NIS is \emph{not} related to Sun's NIS/YP services.  The NIS
-client/server mode should not be confused with the (deprecated and more
-complicated) net master/slave mode.
+server.  NIS is \emph{not} related to Sun's NIS/YP services.
 
 NIS clients and servers require that apcupsd be compiled with the Net
 Driver \texttt{-{}-enable-net}.  This is typically enabled by default.
@@ -2211,127 +2157,10 @@ It would be possible to have a client also work as a server, but that would
 increase the delay of information getting from the UPS to the secondary
 client.
 
-\subsection*{A master/slave configuration}
-\index{Configuration!Master/Slave}
-\index{Master/Slave}
-\addcontentsline{toc}{subsection}{Master/Slave Configuration}
+\subsubsection*{Differences between NIS Client/Server and the old 
+(now removed) Master/Slave modes}
 
-The master/slave mode is deprecated in favor of the NIS client/server
-mode.  In the master/slave mode, the master (the analog of the NIS server)
-pushes information to the slaves (the analogs of the NIS clients),
-instructing them when to shutdown.  The master must be configured with
-information about the slaves.  In addition to being more complex in both
-operation and configuration than NIS mode, the master/slave mode
-introduces some security issues that are not present in NIS mode.  See
-the section on Security Issues for more details.
-
-\label{A-Simple-Master-Configuration}
-
-\subsubsection*{A Simple Master Configuration}
-\index{Configuration!Simple Master }
-\index{Simple Master Configuration }
-
-\label{index-Configuration_002c-Master-74}
-\label{index-Master_002c-config-example-75}
-\label{index-Example_002c-Master-conf-76}
-You have a Smart UPS using the cable supplied by APC and you want it to act as
-a master for another computer, which is powered by the same UPS. A very simple
-configuration file would look like the following: 
-
-\footnotesize
-\begin{verbatim}
-     ## apcupsd.conf v1.1 ##
-     UPSCABLE smart
-     UPSTYPE smartups
-     DEVICE /dev/ttyS0
-     LOCKFILE /var/lock
-     UPSCLASS netmaster
-     UPSMODE net
-     NETTIME 10
-     NETPORT 6666
-     SLAVE slave1.mynetwork.com
-     SLAVE slave2.mynetwork.com
-\end{verbatim}
-\normalsize
-
-The main difference from the stand alone configuration is that you
-have specified \textbf{UPSCLASS netmaster} and \textbf{UPSMODE net}.  In
-addition, you have specified one or more slave machines with
-\textbf{SLAVE}\@.  In this mode of networking, (as opposed to using the
-NIS net driver as described above), your master knows the
-presence of all the slaves.  They carry on a very explicit communication,
-and the slaves are explicitly notified by the master of any important
-changes such as a shutdown.   \textbf{NETTIME} (as with NIS mode)
-specifies the time in seconds between communication between master and
-slaves.  \textbf{NETPORT} (default: 6666) is the TCP port that is used
-for the master/slave communication.  \texttt{NETPORT} will need to be the
-same on both master and slaves.
-
-\label{A-Simple-Slave-Configuration}
-
-\subsubsection*{A Simple Slave Configuration}
-\index{Configuration!Simple Slave }
-\index{Simple Slave Configuration }
-
-\label{index-Slave-Configuration-77}
-\label{index-Configuration_002c-Slave-78}
-\label{index-Example_002c-Slave-conf-79}
-You have a Smart UPS using the cable supplied by APC that is connected to the
-master machine configured above, and the master machine is running as a
-netmaster and has the address of your slave machine.  This slave machine has
-no serial port connection to the UPS, but is powered by the same UPS as the
-master.  A very simple configuration file would look like the following: 
-
-\footnotesize
-\begin{verbatim}
-     ## apcupsd.conf v1.1 ##
-     UPSCABLE ether
-     UPSTYPE smartups
-     LOCKFILE /var/lock
-     UPSCLASS netslave
-     UPSMODE net
-     NETPORT 6666
-     MASTER master.mynetwork.com
-\end{verbatim}
-\normalsize
-
-The main difference from the master configuration is that you have
-specified \textbf{UPSCABLE ether} and \textbf{UPSCLASS netslave}.  In
-addition, you must specify a single controlling \textbf{MASTER}\@.  
-
-You may need to open up TCP port \textbf{NETPORT} on both the master and
-slave hosts' firewalls to enable communication.
-
-Please note, there are reports that you {\bf must} use {\bf UPSTYPE smartups}
-on the slave even if the master is using {\bf UPSTYPE dumb}. This is
-apparently some bug in the new dumb driver.  
-
-In this configuration, the shutdown will be initiated by the master. It is
-also possible to specify BATTERYLEVEL, MINUTES, and TIMEOUT configuration
-directives in the Slave machine that will cause the slave to shutdown before
-the master.
-
-\label{Variation-on-the-Master_002fSlave-Configuration}
-
-\subsubsection*{Variation on the Master/Slave Configuration}
-\index{Configuration!Variation on the Master/Slave }
-\index{Variation on the Master/Slave Configuration }
-\addcontentsline{toc}{subsubsection}{Variation on the Master/Slave
-Configuration}
-
-\label{index-Master_002fSlave-variation-80}
-It is also possible to have a Master/Slave configuration where the Slave is
-powered by a different UPS (or any other power source), but is nevertheless
-controlled (i.e.  shutdown) by the master.  The setup would be identical to
-the Master/Slave configuration files shown above.  The only difference is
-where the slave actually receives its power.  In effect, apcupsd does not know
-or care where the power really comes from. 
-
-%%%% Differences between net master/slave and NIS server/client.
-\subsubsection*{Differences between NIS Client/Server and Master/Slave
-modes}
-
-The difference between the NIS mode and the deprecated master/slave mode
+The difference between the NIS mode and the removed master/slave mode
 is that the NIS server has no explicit knowledge of the slaves. The NIS
 server makes its information available via the net (NIS), and the NIS
 slaves read it.  When the NIS server is going to shutdown, it makes the
@@ -2339,10 +2168,6 @@ information available to any NIS slave that polls it, but the NIS server
 does not explicitly call each NIS slave as is the case in the
 Master/Slave networking described several sections above.  
 
-Here are a few words from Adam Kropelin concerning the difference between the
-Master/Slave networking and the NIS-based networking:  
-
-\begin{quotation}
 Think of the difference as push (Master/Slave) vs. pull (NIS-based). In the
 case of M/S, the master makes all the shutdown decisions and notifies the
 slaves when they are to shut down or when some other interesting event
@@ -2350,22 +2175,6 @@ happens. The slaves just do whatever the master says, whenever the master says
 to. On the other hand, with the NIS-based network config you basically
 ``publish'' the UPS status from one server and then your clients view that
 status and make their own decisions.  
-
-Personally, I like the NIS-based approach because the master knows nothing
-about the slaves, thus there are fewer configuration files to keep in sync. I
-also like the flexibility of allowing each slave to make its own decision on
-when to shut down; some of my old clunker servers take quite a long while to
-shut down. There are problems reported occasionally with the M/S approach,
-where slaves sometimes lose contact with the master or vice-versa. I know
-improvements have been made in that code, but I still like the simplicity of
-using NIS.  
-
-Another thing to think about is how you feel about running a network service
-like NIS on your firewall. My network is set up almost identically to yours
-and I chose to run the apcupsd ``master'' on a server in the DMZ and have the
-firewall just be a client of it. That way I don't have to run NIS on the
-firewall apcupsd instance. 
-\end{quotation}
 
 \label{Testing-Apcupsd}
 
@@ -3717,14 +3526,6 @@ have a perimeter firewall or NATting router with typical settings
 only users on your local network access to your UPS information.
 You may also restrict access using using firewall settings (see below) or
 TCP Wrappers (see below).
-
-\item If you are running master/slave networking with a single UPS powering
-   multiple machines, be aware that it is possible for someone to simulate the
-   master and send a shutdown request to your slaves. The slaves do check that
-the network address of the machine claiming to be the master is that same as
-the address returned by DNS corresponding to the name of the master as
-specified in your configuration file.   Again, you may wish to restrict
-access  using firewall settings (see below) or TCP Wrappers (see below).
 \end{itemize}
 
 \label{Firewall-Settings}
@@ -3735,12 +3536,9 @@ access  using firewall settings (see below) or TCP Wrappers (see below).
 
 If you are running apcupsd as an NIS server, you will need to ensure that
 the clients can reach it by opening up \textbf{NISPORT} (default: TCP
-3551) on any firewall running on the server.  If you are running with a
-master/slave setup, then \textbf{NETPORT} (default: TCP 6666) will need
-to be open on both the master and the slave(s) so that they can talk to
-each other.  You may wish to configure your firewall(s) to \emph{only}
-allow connections from your local network or specifically from the
-masters, slaves, and servers as needed.
+3551) on any firewall running on the server.  You may wish to configure
+your firewall(s) to \emph{only} allow connections from your local network
+or specifically from the masters, slaves, and servers as needed.
 
 
 \label{TCP-Wrappers}
@@ -3759,9 +3557,8 @@ the funtionality of such a firewall with TCP~Wrappers.
 As of apcupsd version 3.8.2, TCP Wrappers are implemented if you turn them on
 when configuring ({\tt ./configure \verb{--{with-libwrap}).  With this code enabled,
 you may control who may access your apcupsd via TCP connections (the Network
-Information Server, and the Master/Slave code). This control is done by
-modifying the file: /etc/hosts.allow. This code is implemented but untested.
-If you use it, please send us some feedback. 
+Information Server). This control is done by modifying the file: /etc/hosts.allow.
+This code is implemented but untested. If you use it, please send us some feedback. 
 
 \label{Configuring-Your-EEPROM}
 
@@ -4851,8 +4648,7 @@ exits.
    \index{remotedown }
    This event is generated on a slave machine when it detects either that the
 master has shutdown, or that a onbattery situation exists and the
-communications line has been severed. Despite the name, you should never
-reboot the machine {---} instead always shut it down.  
+communications line has been severed.  
 
 Does a {\tt shutdown -h now}  
 
@@ -4901,22 +4697,15 @@ action is taken.
 This is called when apcupsd determines that a self test has been completed. No
 action is taken.  
 
-\item [mastertimeout]
-   \index{mastertimeout }
-   This event is generated when a slave detects that a master has not contacted
-it in a reasonable time, or when a slave polls a master and gets no response
-in 30 seconds. This event applies only to the old master/slave networking code
-and not to the NIS server/slave mode.  
+\item [battdetach]
+   \index{battdetach}
+   This event is generated when apcupsd detects that the UPS battery has been
+disconnected.
 
-No action is taken.  
-
-\item [masterconnect]
-   \index{masterconnect }
-   This event is generated when the slave and the master reconnect. This event
-applies only to the old master/slave networking code and not to the NIS
-server/slave mode.  
-
-No action is taken. 
+\item [battattach]
+   \index{battattach}
+   This event is generated when apcupsd detects that the UPS battery has been
+reconnected after a battdetach event.  
 \end{description}
 
 To write your own routine for the {\bf powerout} action, you create shell
@@ -4933,326 +4722,6 @@ Some sample scripts (onbattery and mainsback) that email power failure
 messages can be found in /etc/apcupsd after an install or in the
 platforms/etc directory of the source code.
 
-\label{Master_002fSlave-Configurations}
-
-\section*{Master/Slave Configurations}
-\index{Configurations!Master/Slave }
-\index{Master/Slave Configurations }
-\addcontentsline{toc}{section}{Master/Slave Configurations}
-
-\label{index-Master_002fSlave-152}
-If you have two or more computers that are powered by the same UPS and they
-are connected by a network, you can configure apcupsd so that the computer
-that controls the UPS (connected by the serial port or USB port), which is
-called the master, can provide information to other machines powered by the
-UPS, called slaves. When the master detects a power failure, it will notify
-all the slaves (maximum of twenty). If the master detects that the battery is
-low, it will also notify the slave so that the slave may perform a shutdown.  
-
-In addition, in cases where you wish to keep the master up longer than the
-slave, you can configure the slave to shut down in a predetermined time after
-the UPS goes on batteries.  
-
-If a picture is worth a thousand words for you, please see 
-\ilink{Configuration types.}{Configuration-types_005f}. 
-
-\label{Configuration-Directives}
-
-\subsection*{Configuration Directives}
-\index{Directives!Configuration }
-\index{Configuration Directives }
-\addcontentsline{toc}{subsection}{Configuration Directives}
-
-\label{index-Directives-153}
-\label{index-Configuration_002c-Directives-154}
-If you are setting up a master/slave configuration, you will be required to
-make some modifications to the apcupsd.conf files after the build is done.  
-
-The minimum set of configuration directive changes needed to create a proper
-master and slave configuration files is described in the 
-\ilink{Configuration Examples}{Configuration-Examples} section of
-this manual.  
-
-The details of these directives are explained in the 
-\ilink{Configuration Directives for Sharing a
-UPS}{Configuration-Directives-for-Sharing-a-UPS} section of the
-Configuration chapter of this document.  
-
-In addition, sample master and slave configuration files can be found in the
-\lt{}src\gt{}/examples directory (apcupsd.master.conf and apcupsd.slave.conf).
-
-
-\label{Master_002fSlave-Problems}
-
-\subsection*{Master/Slave Problems}
-\index{Problems!Master/Slave }
-\index{Master/Slave Problems }
-\addcontentsline{toc}{subsection}{Master/Slave Problems}
-
-\label{index-Master_002fSlave-155}
-\label{index-Problems_002c-Master_002fslave-156}
-
-\label{Master_002fSlave-Shutdown}
-
-\subsubsection*{Master/Slave Shutdown:}
-
-For additional details of shutting down a master/slave configuration, please
-see the Master/Slave Shutdown section of the Shutdown chapter (see 
-\ilink{Shutdown Sequence
-\lt{}1\gt{}}{Shutdown-Sequence-_003c1_003e}) of the Technical
-Reference. 
-
-\label{Server_002fSlave-Networking-using-NIS-and-the-NET-Driver}
-
-\subsubsection*{Server/Slave Networking using NIS and the NET Driver:}
-
-\label{index-NIS-networking-157}
-\label{index-Net-driver-158}
-It is also possible to implement a network of NIS server/slave apcupsds using
-the new 3.10.x code and the {\bf net} driver. This mode of NIS server/slave
-networking is considerably different from the old method described at the
-beginning of this chapter. In the old code, there is a lot of configuration on
-both the master and slave side, and the master polls or sends info to the
-slave. Using the {\bf net} driver is much simpler. However, you should
-carefully check that the NIS slave does a proper shutdown. In the master/slave
-code, the master ensures the best it can that the slave is shutdown or
-notified before it shuts down itself. On the other hand, using the net driver,
-the NIS server knows nothing about the NIS slaves that may be listening and
-thus takes no special precautions to ensure that the NIS slaves receive the
-shutdown signal. Since the NIS slave reads the master's data once per second
-there should be no shutdown problems, and our experience confirms this.  This
-question can only be answered by carefully testing the shutdown.  
-
-In this NIS server/slave mode, the NIS server is a standard stand alone
-configuration except that it must have {\bf NETSERVER on} in the configuration
-file and have an {\bf NISPORT nnn} defined. Thus any apcupsd running in this
-mode then becomes the NIS server.  
-
-The NIS slave then uses the net driver to connect to the server's NIS output.
-In this mode, the NIS slave decides how often to poll the server for the NIS
-information. The NIS slave's conf file has {\bf UPSTYPE net}, which will
-invoke the ``network'' driver. By setting this machine's {\bf DEVICE} to be
-{\bf server-ip:server-NIS-port} it will automatically connect to the NIS
-server and use the server's signals to shutdown the computer.  In the example
-net slave configuration file below, the slave uses the NIS information
-provided by the computer {\bf tibs} on port {\bf 3551}. 
-
-\footnotesize
-\begin{verbatim}
-     ## apcupsd.conf v1.1 ##
-     UPSCABLE ether
-     UPSTYPE net
-     # Specify the server name:port where NIS is running
-     DEVICE tibs:3551
-     LOCKFILE /var/lock
-     BATTERYLEVEL 5
-     MINUTES 3
-     TIMEOUT 0
-     ANNOY 300
-     ANNOYDELAY 60
-     NOLOGON disable
-     EVENTSFILE /etc/apcupsd/apcupsd.events
-     UPSCLASS standalone
-     UPSMODE disable
-     #
-     # Use this to control the poll time.
-     #  the default is 60 or 1 minute
-     #
-     NETTIME 30
-\end{verbatim}
-\normalsize
-
-\label{Network-Problems-with-Master_002fSlave-or-Server_002fSlave-Configuratio%
-ns}
-
-\subsection*{Network Problems with Master/Slave or Server/Slave
-Configurations}
-\index{Network Problems with Master/Slave or Server/Slave Configurations }
-\index{Configurations!Network Problems with Master/Slave or Server/Slave }
-\addcontentsline{toc}{subsection}{Network Problems with Master/Slave or
-Server/Slave Configurations}
-
-\label{index-Problems_002c-Master_002fSlave-159}
-\label{index-Problems_002c-networking-160}
-When working with a master/slave or server/slave configurations (one UPS
-powering more than one computer), the master/server and slave communicate via
-the network. In many configurations, apcupsd is started before the network is
-initialized. In this case, it is possible that the master will be unable to
-contact the slave. On apcupsd versions prior to 3.8.0, this could cause
-apcupsd to error off. The solution to this problem is to either force apcupsd
-to be started after the network and the DNS (fiddle the symbolic links in
-/etc/rc.d), or put the names of the slave machines in your /etc/hosts file, or
-even more preferable, use IP addresses rather than machine names. On some
-configurations, you may need to use fully qualified names (host.domain.xxx)
-rather than simple host names. 
-
-\label{Error-Messages-from-a-Master-Configuration}
-
-\subsubsection*{Error Messages from a Master Configuration:}
-
-In a master/slave configuration, you can get the following error messages from
-a master. The error message is followed by a possible explanation: 
-
-\begin{description}
-\item[Cannot resolve slave name XXX]
-   \label{Cannot-resolve-slave-name-XXX}
-   \index{Errors!Cannot resolve slave name XXX}
-   \index{Cannot resolve slave name XXX}
-   \addcontentsline{toc}{subsubsection}{Cannot resolve slave name XXX}
-To contact the slave, the slave name given in the configuration file must be
-resolved to an IP address. In this case, apcupsd could not get the IP address.
-Either the slave name is incorrect, your DNS may not be working, or you have
-started apcupsd during the boot process before the network is operational. 
-
-\item[Got slave shutdown from SSS]
-   \label{Got-slave-shutdown-from-SSS}
-   \index{Errors!Got slave shutdown from SSS}
-   \index{Got slave shutdown from SSS}
-   \addcontentsline{toc}{subsubsection}{Got slave shutdown from SSS}
-This message should not be printed as it is not yet used. 
-
-\item[Cannot write to slave SSS]
-   \label{Cannot-write-to-slave-SSS}
-   \index{Errors!Cannot write to slave SSS}
-   \index{Cannot write to slave SSS}
-   \addcontentsline{toc}{subsubsection}{Cannot write to slave SSS}
-This message occurs when the master attempts to send a message to the slave
-SSS and gets an error. It indicates that either the slave machine is not
-responding (apcupsd died, the system crashed, ...) or that the network is
-down. 
-
-\item[Cannot read magic from slave SSS]
-   \label{Cannot-read-magic-from-slave-SSS}
-   \index{Errors!Cannot read magic from slave SSS}
-   \index{Cannot read magic from slave SSS}
-   \addcontentsline{toc}{subsubsection}{Cannot read magic from slave SSS}
-This message indicates that the master attempted to read the code key from the
-slave SSS and it did not match the value expected. A common cause of this
-problem is that the master and slave versions of apcupsd are not the same.
-Please be sure you are running the same version of apcupsd on all your master
-and slave machines. 
-
-\item[Connect to slave SSS failed]
-   \label{Connect-to-slave-SSS-failed}
-   \index{Connect to slave SSS failed}
-   \index{Errors!Connect to slave SSS failed}
-   \addcontentsline{toc}{subsubsection}{Connect to slave SSS failed}
-This message is logged when the master attempts to connect to slave SSS and no
-connection is accepted. The most common cause of this problem is that the
-slave copy of apcuspd is not yet ready to accept connections or is not
-running. Generally, apcupsd will retry the connection a bit later. If the
-problem is persistent, it can indicate a network problem or the slave name on
-the SLAVE directive of the master's configuration file is incorrect. 
-
-\item[Cannot open stream socket]
-   \label{Cannot-open-stream-socket}
-   \index{Errors!Cannot open stream socket}
-   \index{Cannot open stream socket}
-   \addcontentsline{toc}{subsubsection}{Cannot open stream socket}
-This indicates a fundamental networking problem on your system {--} either a
-lack of sufficient resources or you have not configured TCP/IP operations. 
-\end{description}
-
-\label{Error-Messages-from-a-Slave-Configuration}
-\subsubsection*{Error Messages from a Slave Configuration:}
-
-In a master/slave configuration, you can get the following error messages from
-a slave. The error message is followed by a possible explanation: 
-
-\begin{description}
-\item[Cannot resolve master name MMM]
-   \label{Cannot-resolve-master-name-MMM}
-   \index{Cannot resolve master name MMM}
-   \index{Errors!Cannot resolve master name MMM}
-   \addcontentsline{toc}{subsubsection}{Cannot resolve master name MMM}
-This message is logged when the slave attempts to resolve the name given on
-the MASTER configuration directive to an IP address. It probably means that
-the master name MMM is not defined, your DNS is not properly working, or you
-have started apcupsd in the boot process before the network is initialized.
-Check the name MMM, or use an explicit IP address on the MASTER configuration
-directive in the slave's configuration file. 
-
-\item[Cannot bind local address, probably already in use]
-   \label{Cannot-bind-local-address_003b-probably-already-in-use}
-   \index{Cannot bind local address, probably already in use}
-   \index{Errors!Cannot bind local address probably already in use}
-   \addcontentsline{toc}{subsubsection}{Cannot bind local address, probably 
-      already in use}
-This means that the slave has attempted to bind the port number so that it can
-listen for messages from the master. This can occur if already have a copy of
-apcupsd running, or you have previously run apcupsd in the past 5 or 10
-minutes, because occasionally the operating system will not shutdown a port
-correctly for 5 to 10 minutes after a program exits. In this case, you can
-either wait a few minutes for the problem to go away, or use a different port
-in both your master and slave configuration files. 
-
-\item[Socket accept error]
-   \label{Socket-accept-error}
-   \index{Socket accept error}
-   \index{Errors!Socket accept error}
-   \addcontentsline{toc}{subsubsection}{Socket accept error}
-The slave got an error waiting on the accept() system call. This is probably
-due to a fundamental networking problem. 
-
-\item[Unauthorized attempt from master MMM]
-   \label{Unauthorized-attempt-from-master-MMM}
-   \index{Unauthorized attempt from master MMM}
-   \index{Errors!Unauthorized attempt from master MMM}
-   \addcontentsline{toc}{subsubsection}{Unauthorized attempt from master MMM}
-The master named MMM (probably an IP address) contacted the slave but MMM is
-not the master that was listed on the MASTER configuration directive in
-/etc/apcupsd.conf, and consequently, it is not authorized to communicate with
-the slave. Please check that your MASTER and SLAVE names in your slave and
-master configuration files respectively are correct. 
-
-\item[Read failure from socket]
-   \label{Read-failure-from-socket}
-   \index{Errors!Read failure from socket}
-   \index{Read failure from socket}
-   \addcontentsline{toc}{subsubsection}{Read failure from socket}
-The slave got an error reading the socket open to the master. This indicates a
-fundamental networking problem. 
-
-\item[Bad APC magic from master: MMM]
-   \label{Bad-APC-magic-from-master_003b-MMM}
-   \index{Bad APC magic from master: MMM}
-   \index{Errors!Bad APC magic from master: MMM}
-   \addcontentsline{toc}{subsubsection}{Bad APC magic from master: MMM}
-The slave received a code key from the master that does not correspond to the
-one expected by the slave. The most common cause of this problem is that you
-are running a different version of apcupsd on the master and the slave. Please
-ensure that you are running the same version of apcupsd on all your master and
-slaves. 
-
-\item[Bad user magic from master: MMM]
-   \label{Bad-user-magic-from-master_003b-MMM}
-   \index{Errors!Bad user magic from master: MMM}
-   \index{Bad user magic from master: MMM}
-   \addcontentsline{toc}{subsubsection}{Bad user magic from master: MMM}
-This message indicates that the master and slave have previously communicated,
-but that the code key transmitted with the most recent message from the master
-does not correspond to what the slave expects. This problem is probably due to
-a network error or some other user or machine contacting the slave on the
-network port. 
-\end{description}
-
-\label{Master_002fSlave-Connection-Not-Working}
-
-\subsubsection*{Master/Slave Connection Not Working:}
-
-Master/slave problems are usually related to one of the following items:  
-
-\begin{enumerate}
-\item Improper apcupsd.conf files. A good starting point are the master/slave
-   example files in the examples subdirectory of the source.  
-\item Master or slave IP address or name incorrect. Try ping'ing each machine
-   from the other using the names or addresses that you have put in the
-   respective apcupsd.conf files.  
-\item Make sure no other program is using socket number 6666 or change the
-   NETPORT directive in both apcupsd.conf files.  
-\item Make sure you are using the same version of apcupsd on both the master
-   and slave machines.  
-   \end{enumerate}
 
 \label{Controlling-Multiple-UPSes-on-one-Machine}
 
@@ -5726,12 +5195,6 @@ code as apcnisd but compiled into apcupsd. Clients on the network make a
 connection to the information server and send requests for status or events
 data, which the server then transmits to them.  
 
-The information served to the network by this interface should not be confused
-with master/slave mode that shares a UPS between two or more computers. That
-code is described in \ilink{Configuration Directives for Sharing a
-UPS}{Configuration-Directives-for-Sharing-a-UPS} of this
-documentation.  
-
 As of apcupsd 3.12.x, the NIS server runs only as a child of apcupsd.
 It cannot be run standalone or from INETD.
 
@@ -6149,9 +5612,7 @@ slave machine(s) in your apcupsd.conf file, apcupsd will be unable to resolve
 the name to a valid IP address. To circumvent this problem, simply enter all
 machine addresses as an IP address rather than a domain name, or
 alternatively, ensure that you have a valid DNS server configured on your
-system (often not the case on Win32 systems).  For example, instead of using
-the directive ``MASTER my.master.com'' use something like ``MASTER
-192.168.1.54'' where you replace the IP address with your actual IP address.  
+system (often not the case on Win32 systems).
 
 On WinNT, WinXP, and Win2K systems, you can examine the System Applications
 log to which apcupsd writes Windows error messages during startup.  
@@ -7307,15 +6768,6 @@ before other machines to conserve battery power.  It is also useful for
 testing apcupsd because you can force a rapid shutdown by setting a small
 value (e.g.  60) and pulling the plug to the UPS.  
 
-When apcupsd is running in master mode (UPSCLASS netmaster), and a shutdown
-condition is determined, apcupsd will notify each of the slaves to perform a
-shutdown then apcupsd will sleep for 30 seconds before issuing the shutdown of
-its own computer. If you need the master to wait additional time before
-shutting down (to allow for shutdown of slower slaves or of slaves running
-software that requires more time to shutdown {--} e.g. databases), you can do
-so by adding additional sleep() commands to /etc/apcupsd/apccontrol in each
-case that causes a shutdown.  
-
 {\bf TIMEOUT}, {\bf BATTERYLEVEL}, and {\bf MINUTES} can be set together
 without problems.  apcupsd will react to the first case or test that is valid.
 Normally SmartUPS users will set {\bf TIMEOUT} to zero so that the system is
@@ -7391,51 +6843,18 @@ details.
 UPS}
 
 \label{index-Directives-Sharing-247}
-The following directives apply to the master/slave networking mode of apcupsd
-where multiple machines can be powered by the same UPS. One machine, the
-master, will have a serial port connection to the UPS, and the other machines,
-the slaves, will obtain their information via the network from the master.  
-
-Note, as of version 3.10.x, the old master/slave code is by default turned off
-in the configuration. You must explicitly enable it by including a {\tt
-\verb{--{enable-master-slave} option on your {\tt ./configure} command before
-building the source.  
-
-In addition to the old master/slave code, there is now a new network driver
-enabled with {\tt \verb{--{enable-net} (default disabled) that can be used to control
-a slave from any version of apcupsd running NIS. This is a much more flexible
-system of controlling slaves because a slave machine that also has NIS turned
-on can thus act as a master for another slave with {\tt \verb{--{enable-net} turned
-on. With this mode turned on, the slave obtains the address of the master from
-the {\bf DEVICE} directive, which takes the form {\bf hostname[:port]} as a
-consequence, none of the directives apply for this form of networking. In
-addition, for this mode to work, you must specify {\bf UPSTYPE net} so that
-the proper driver is loaded.  
-
-The remainder of this section presents directives that apply to the old
-master/slave code that must be enabled by the {\bf enable-master-slave}
-configuration option.  
+The following directives apply to sharing an UPS using a ShareUPS hardware
+module. Most users will not use this mode.
 
 \begin{description}
 
 \item [UPSCLASS \lt{}class of operation\gt{}]
    \index{UPSCLASS \lt{}class of operation\gt{} }
-   [ standalone | shareslave | sharemaster ] and [ netslave | netmaster ] are
-valid types. [ standalone | netslave | netmaster ] are tested classes. [
-shareslave | sharemaster ] classes are being tested.  
+   [ standalone | shareslave | sharemaster ] are valid types.
 
 The default is {\bf standalone} and should be used for all machines powered by
-the UPS and having a serial port connection to the UPS, but where there are no
-other computers dependent on power from the same UPS. This is the normal case.
- 
-
-Use {\bf netmaster}, if and only if you have a serial port connection to the
-UPS and there are other machines deriving power from the same UPS. This is
-required in all master configuration files.  
-
-Use {\bf netslave} if and only if you have no serial port connection to the
-UPS, but you derive power from it. This is required in all slave configuration
-files, and in this case, you will also have UPSCABLE set to ether.  
+the UPS and having a serial port or other direct connection to the UPS. 
+This is the normal case.
 
 Use {\bf shareslave} if and only if you are using a ShareUPS and connected to
 a BASIC Port with Simple Signal. This code is not fully tested.  
@@ -7443,17 +6862,12 @@ a BASIC Port with Simple Signal. This code is not fully tested.
 Use {\bf sharemaster}, if and only if you are using a ShareUPS and connected
 to the ADVANCED Port Smart Signal control. This code is not fully tested.  
 
-\item [{UPSMODE [disable | share | net | sharenet ] are valid types.}]
-   \index{UPSMODE [disable | share | net | sharenet ] are valid types. }
-   [ disable | net ] are the only known and tested classes.  
-
-[ share | sharenet ] classes are being tested.  
+\item [UPSMODE \lt{}mode of operation\gt{}]
+   \index{UPSMODE \lt{}mode of operation\gt{}}
+   [disable | share ] are valid modes.
 
 For normal standalone operations, you will set UPSMODE to disable to indicate
-that you are disabling the master/slave networking.  
-
-However, if you are using a single UPS to power several computers and you have
-configured master and slave computers, then set this value to net.  
+that you are disabling the ShareUPS support.  
 
 Use share for two or seven (2/7) additional simple signal ports on a
 SmartAccessories(tm) (internal/external box) for SmartUPSes. The share and
@@ -7465,84 +6879,6 @@ sharenet code is not fully tested.
 machines. This rate is automatically set to 1 second if the UPS goes on
 batteries and reset to your specified value when the mains power returns. A
 typical value might be 60 seconds.  
-
-\item [NETPORT \lt{}IP port number\gt{}]
-   \index{NETPORT \lt{}IP port number\gt{} }
-   This port number is used for communications in the master/slave networking
-code. Note that the master and each slave must have the same port number
-specified on the NETPORT directive in the configuration file. This port may
-also be specified during installation by using the {\tt \verb{--{with-net-port=}
-option of the {\tt ./configure} program.  
-
-The NETPORT should not be confused with the port number for the Network
-Information Server which is specified with the {\bf SERVERPORT} configuration
-directive.  
-
-\item [MASTER \lt{}name of the master\gt{} for slave machines.]
-   \index{MASTER \lt{}name of the master\gt{} for slave machines. }
-   Used in slave configuration files, this is the network name of the master
-which is authorized to send commands to this slave. In all cases (of which I
-am aware), when you specify a {\bf MASTER} directive, you will also specify
-{\bf UPSCABLE ether} since your information about the UPS will come via the
-network from a master.  
-
-The slave machine will be shutdown whichever occurs first: either at the
-request of the master when it does a shutdown or when the values you have
-specified for TIMEOUT, BATTERYLEVEL, or MINUTES expire (these should work but
-have not been fully tested). Consequently, if you want the slaves to begin
-shutting down before the master, you can do so by adjusting the values in the
-configuration file. If you want the slave to remain up until the master shuts
-down, you should set TIMEOUT, BATTERYLEVEL, and MINUTES all to zero.  
-
-For proper functioning of the slave, you must specify the same {\bf UPSTYPE}
-in the slave configuration file as is in the master configuration file.  
-
-It should be noted that the master and slaves continue to communicate over the
-network even after the master has issued a shutdown command to the slaves.
-This is because the master apcupsd continues to run until it receives the
-shutdown signal from the system. This is important to ensure that all the
-slaves have been properly notified of the shutdown.  
-
-We recommend that the machine names used on the {\bf MASTER} and {\bf SLAVE}
-directives be put in your /etc/hosts file so that apcupsd will be able to
-resolve the machine name during startup and shutdown even if DNS is not
-running. Alternatively, you can use IP addresses on the {\bf MASTER} and {\bf
-SLAVE} directives, but this is less flexible.  
-
-\item [SLAVE \lt{}name of slave(s)\gt{} used only in MASTER configuration
-   files.]
-   \index{SLAVE \lt{}name of slave(s)\gt{} used only in MASTER configuration
-files. }
-Used in master configuration files, this is the name of a slave machine that
-depends on this master. There can be a maximum of 20 slaves attached to one
-master. Thus you can specify multiple SLAVE directives in a master
-configuration file. Only one slave name can be specified per SLAVE directive,
-thus for multiple slaves, specify multiple SLAVE directives.  
-
-As noted above the master and slaves continue to communicate over the network
-even after the master has issued a shutdown command to the slaves. This is
-because the master apcupsd continues to run until it receives the shutdown
-signal from the system. This is important to ensure that all the slaves have
-been properly notified of the shutdown.  
-
-We recommend that the machine names used on the {\bf MASTER} and {\bf SLAVE}
-directives be put in your /etc/hosts file so that apcupsd will be able to
-resolve the machine name during startup and shutdown even if DNS is not
-running. Alternatively, you can use IP addresses on the {\bf MASTER} and {\bf
-SLAVE} directives, but this is less flexible.  
-
-\item [USERMAGIC \lt{} user defined magic\gt{} used only in SLAVE
-   configuration files.]
-   \index{USERMAGIC \lt{} user defined magic\gt{} used only in SLAVE
-configuration files. }
-The USERMAGIC directive is a sort of password that gives a second level of
-identification security in a slave configuration file. It is a character
-string up to 17 characters in length. It should be unique for each slave. When
-the slave makes initial contact with the master, this string is passed to the
-master. Then on each transmission from the master to the slave, the string is
-passed back to the slave, which checks that it is the correct string before
-accepting the master's information. This string should be different for each
-and every slave on the network. This directive is not required. 
 \end{description}
 
 \label{Configuration-Directives-Used-to-Set-the-UPS-EPROM}
@@ -8164,9 +7500,7 @@ created during the shutdown sequence to prevent additional users from logging
 in (see the NOLOGIN configuration directive).  
 
 Even though apcupsd has requested the system to perform a shutdown, it
-continues running. If it is a master with slaves, it will inform the slaves to
-do a shutdown. They perform their shutdown by calling {\tt
-/etc/apcupsd/apccontrol remotedown}.  
+continues running.  
 \item When the system signals apcupsd to do exit, it does so.  This is part of
    the normal system shutdown (at least on Unix and Linux systems) and the exact
    time that apcupsd receives the termination signal depends on how the shutdown
