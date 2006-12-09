@@ -113,12 +113,6 @@ case "$1" in
    ;;
    endselftest)
    ;;
-   mastertimeout)
-      printf "Warning connection to master lost." | wall -a
-   ;;
-   masterconnect)
-      printf "Connection to master established." | wall -a
-   ;;
    battdetach)
    ;;
    battattach)

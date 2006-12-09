@@ -189,8 +189,6 @@ install -m744 examples/make-hiddev \
 %config(noreplace) /etc/apcupsd/apcupsd.conf
 %config(noreplace) /etc/apcupsd/hosts.conf
 %config(noreplace) /etc/apcupsd/multimon.conf
-%config(noreplace) /etc/apcupsd/masterconnect
-%config(noreplace) /etc/apcupsd/mastertimeout
 /etc/apcupsd/make-hiddev
 /etc/apcupsd/hid-ups
 /etc/apcupsd/cgi/*
@@ -288,8 +286,6 @@ fi
 %config(noreplace) /etc/apcupsd/apcupsd.conf
 %config(noreplace) /etc/apcupsd/hosts.conf
 %config(noreplace) /etc/apcupsd/multimon.conf
-%config(noreplace) /etc/apcupsd/masterconnect
-%config(noreplace) /etc/apcupsd/mastertimeout
 /etc/apcupsd/cgi/*
 /sbin/*
 %attr(-,root,man) %{_mandir}/*/*
@@ -371,6 +367,8 @@ fi
 %endif
 
 %changelog
+* Sat Dec 09 2006 Adam Kropelin <akropel1 at rochester.rr.com>
+- Remove obsolete masterconnect and mastertimeout scripts
 * Sat Jan 17 2004 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - added build of net driver to configure
 - moved usb driver build into both packages

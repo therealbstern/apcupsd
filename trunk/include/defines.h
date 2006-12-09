@@ -351,11 +351,9 @@
 #define CMDCOMMOK        14
 #define CMDSTARTSELFTEST 15
 #define CMDENDSELFTEST   16
-#define CMDMASTERTIMEOUT 17        /* Master timed out */
-#define CMDMASTERCONN    18        /* Connect to master */
-#define CMDOFFBATTERY    19        /* off battery power */
-#define CMDBATTDETACH    20        /* Battery disconnected */
-#define CMDBATTATTACH    21        /* Battery reconnected */
+#define CMDOFFBATTERY    17        /* off battery power */
+#define CMDBATTDETACH    18        /* Battery disconnected */
+#define CMDBATTATTACH    19        /* Battery reconnected */
 
 
 /*
