@@ -1580,8 +1580,6 @@ GENERATE_FILES="\
    platforms/etc/commfailure \
    platforms/etc/commok \
    platforms/etc/offbattery \
-   platforms/etc/masterconnect \
-   platforms/etc/mastertimeout \
    platforms/etc/onbattery \
    platforms/etc/Makefile \
    platforms/etc/apcupsd.conf \

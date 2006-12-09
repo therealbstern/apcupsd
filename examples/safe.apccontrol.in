@@ -135,18 +135,6 @@ apccontrol: end self test would have been called.
 
 EOF
         ;;
-        mastertimeout)
-                wall <<EOF
-apccontrol: Warning connection from master lost.
-
-EOF
-        ;;
-        masterconnect)
-                wall <<EOF
-apccontrol: Connection from master established.
-
-EOF
-        ;;
         *)      echo "Usage: ${0##*/} command"
                 echo "       warning: this script is intended to be launched by"
                 echo "       apcupsd and should never be launched by users."

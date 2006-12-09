@@ -253,8 +253,6 @@ install -m744 examples/make-hiddev \
 %config(noreplace) %{_sysconfdir}/apcupsd/apcupsd.conf
 %config(noreplace) %{_sysconfdir}/apcupsd/hosts.conf
 %config(noreplace) %{_sysconfdir}/apcupsd/multimon.conf
-%config(noreplace) %{_sysconfdir}/apcupsd/masterconnect
-%config(noreplace) %{_sysconfdir}/apcupsd/mastertimeout
 %{_sysconfdir}/apcupsd/apcupsd.css
 %{_sysconfdir}/apcupsd/cgi/*
 /sbin/*
@@ -346,6 +344,8 @@ if [ $1 = 0 ] ; then
 fi
 
 %changelog
+* Sat Dec 09 2006 Adam Kropelin <akropel1 at rochester.rr.com>
+- Remove obsolete masterconnect and mastertimeout scripts
 * Sat Aug 19 2006 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - add third party packager tag
 * Fri May 05 2006 D. Scott Barninger <barninger at fairfieldcomputers.com>

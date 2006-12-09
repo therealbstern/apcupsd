@@ -52,8 +52,6 @@ UPSCOMMANDS ups_event[] = {
    {"commok",        0},           /* CMDCOMMOK */
    {"startselftest", 0},           /* CMDSTARTSELFTEST */
    {"endselftest",   0},           /* CMDENDSELFTEST */
-   {"mastertimeout", 0},           /* CMDMASTERTIMEOUT */
-   {"masterconnect", 0},           /* CMDMASTERCONN */
    {"offbattery",    0},           /* CMDOFFBATTERY */
    {"battdetach",    0},           /* CMDBATTDETACH */
    {"battattach",    0}            /* CMDBATTATTACH */
@@ -81,8 +79,6 @@ UPSCMDMSG event_msg[] = {
    {LOG_WARNING, N_("Communications with UPS restored.")},
    {LOG_ALERT,   N_("UPS Self Test switch to battery.")},
    {LOG_ALERT,   N_("UPS Self Test completed.")},
-   {LOG_CRIT,    N_("Master not responding.")},
-   {LOG_WARNING, N_("Connect from master.")},
    {LOG_CRIT,    N_("Mains returned. No longer on UPS batteries.")},
    {LOG_CRIT,    N_("Battery disconnected.")},
    {LOG_CRIT,    N_("Battery reattached.")}
@@ -133,8 +129,6 @@ void generate_event(UPSINFO *ups, int event)
    case CMDPOWEROUT:
    case CMDONBATTERY:
    case CMDOFFBATTERY:
-   case CMDMASTERTIMEOUT:
-   case CMDMASTERCONN:
    case CMDBATTDETACH:
    case CMDBATTATTACH:
    default:

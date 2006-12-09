@@ -143,12 +143,6 @@ case "$1" in
     ;;
     endselftest)
     ;;
-    mastertimeout)
-	echo "Warning connection from master lost." | ${WALL}
-    ;;
-    masterconnect)
-	echo "Connection from master established." | ${WALL}
-    ;;
     battdetach)
     ;;
     battattach)
