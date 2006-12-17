@@ -876,8 +876,8 @@ Optional Features:
   --enable-install-distdir
                           Install distribution
 
-  --enable-apcsmart       Compile APC Smart UPS driver (default)
-  --disable-apcsmart      No APC Smart UPS driver
+  --enable-apcsmart       Compile APC SmartUPS serial driver (default)
+  --disable-apcsmart      No APC SmartUPS serial driver
 
   --enable-dumb           Compile dumb UPS driver (default)
   --disable-dumb          No dumb UPS driver
@@ -885,8 +885,8 @@ Optional Features:
   --enable-usb            Compile USB UPS code
   --disable-usb           No USB UPS code (default)
 
-  --enable-net            Compile new networking driver for slaves
-  --disable-net           No new network driver for slaves (default)
+  --enable-net            Compile networking driver for slaves (default)
+  --disable-net           No network driver for slaves
 
   --enable-snmp           Compile SNMP UPS code
   --disable-snmp          No SNMP UPS code (default)
@@ -897,8 +897,8 @@ Optional Features:
   --enable-test           Compile TEST driver code
   --disable-test          No TEST driver (default)
 
-  --enable-pcnet          Compile PCNET driver code
-  --disable-pcnet         No PCNET driver (default)
+  --enable-pcnet          Compile PCNET driver code (default)
+  --disable-pcnet         No PCNET driver
 
   --enable-powerflute     Compile powerflute program
   --enable-gapcmon        Build GTK/GUI front-end to apcupsd default=no
@@ -11893,6 +11893,17 @@ _ACEOF
         NET_DRIVER="net"
 
      fi
+else
+   cat >>confdefs.h <<\_ACEOF
+#define HAVE_NET_DRIVER 1
+_ACEOF
+
+     cat >>confdefs.h <<\_ACEOF
+#define HAVE_NISLIB 1
+_ACEOF
+
+     NET_DRIVER="net"
+
 fi;
 
 WANT_SNMP="no"
@@ -12187,6 +12198,13 @@ _ACEOF
         PCNET_DRIVER="pcnet"
 
      fi
+else
+   cat >>confdefs.h <<\_ACEOF
+#define HAVE_PCNET_DRIVER 1
+_ACEOF
+
+     PCNET_DRIVER="pcnet"
+
 fi;
 
 cat >>confdefs.h <<\_ACEOF
