@@ -775,21 +775,23 @@ cntrl0      cntrl0stat  devstat     if0in1      if0in1stat
 
 (\texttt{51d.2} is the vendor/product id for APC UPSes.)
 
-
-\subsection*{Darwin USB Configuration}
-\index{Darwin USB Configuration}
+\label{Darwin USB Configuration}
+\subsection*{Mac OS X (Darwin) USB Configuration}
+\index{Mac OS X (Darwin) USB Configuration}
 \index{Darwin!USB Configuration}
-\index{USB!Darwin Configuration}
+\index{Mac OS X!USB Configuration}
+\index{USB!Mac OS X (Darwin) Configuration}
 
 \subsubsection*{Platforms and Versions}
 \index{Darwin!USB Platforms and Versions}
 \index{USB!Darwin Platforms and Versions}
 
-Apcupsd supports USB UPSes on Mac OS X Darwin 10.3.x and higher. Both Intel
+Apcupsd supports USB UPSes on Mac OS X (Darwin) 10.3.x and higher. Both Intel
 and PowerPC platforms are supported.
 
 \subsubsection*{Building Apcupsd with USB}
 \index{Darwin!Building Apcupsd with USB}
+\index{Mac OS X!Building Apcupsd with USB}
 \index{USB!Darwin Building Apcupsd}
 
 Some specific packages are necessary when building Apcupsd with USB support
@@ -817,6 +819,7 @@ monitoring tool to once again access the UPS.
 
 \subsubsection*{Verifying Device Detection and Driver}
 \index{Darwin!Verifying USB Device Detection and Driver}
+\index{Mac OS X!Verifying USB Device Detection and Driver}
 \index{USB!Verifying Darwin Device Detection and Driver}
 
 After installing Apcupsd as described above and rebooting, plug in your
@@ -965,11 +968,11 @@ directories (usually subdirectories of /etc/rc.d).
 \index{Installation!OS~X}
 \index{OS~X!Installation}
 
-On OS X (darwin), apcupsd can be built with \texttt{configure} defaults.
-The defaults for OS~X build \texttt{{---}disable-usb}, as apcupsd cannot
-(yet) communicate properly with USB devices on OS~X\@.  Apcupsd
-\emph{may} be usable on OS~X with smartcable device, but certainly
-\emph{does} work as a NIS client or network slave.
+On OS X (Darwin), apcupsd can be built with \texttt{configure} defaults.
+The USB driver can be enabled, as per the directions on
+\ilink{Darwin USB Configuration}{Darwin USB Configuration}.
+Apcupsd \emph{may} be usable on OS X with a smart serial device, but
+certainly \emph{does} work as a NIS client or using a USB interface.
 
 The startup information will be installed in
 \texttt{/Library/StartupItems/apcupsd} which is part of darwin's
@@ -1175,7 +1178,7 @@ SNMP or Web/SNMP management card. By default this is disabled.
    Turns on generation of the PCNET (PowerChute Network Shutdown) driver.
 This driver accesses the UPS over the network using APC's custom protocol.
 This driver can be used as an alternative to SNMP for UPSes equipped with
-a modern Web/SNMP management card. By default this is disabled.  
+a modern Web/SNMP management card.
 
 \item [{---}enable-test]
    \index{{---}enable-test }
@@ -5390,16 +5393,14 @@ log\_event() in apclog.c.
 
 The Windows version of apcupsd has been tested on Win95, Win98, WinMe, WinNT,
 WinXP, and Win2000 systems. This version of apcupsd has been built to run
-under the CYGWIN environment, which provides many of the features of Unix on
-Windows systems. It also permitted a rapid port with very few source code
-changes, which means that the Windows version is for the most part running
-code that has long proved stable on Unix systems. Even though the Win32
-version of apcupsd is a port that relies on many Unix features, it is just the
-same a true Windows program. When running, it is perfectly integrated with
-Windows and displays its icon in the system icon tray, and provides a system
-tray menu to obtain additional information on how apcupsd is running (status
-and events dialogue boxes). If so desired, it can also be stopped by using the
-system tray menu, though this should normally never be necessary.  
+natively on Windows (no Cygwin or other emulation layer needed).Even though
+the Win32 version of apcupsd is a port that relies on many Unix features, it
+is just the same a true Windows program. When running, it is perfectly 
+integrated with Windows and displays its icon in the system icon tray, and
+provides a system tray menu to obtain additional information on how apcupsd 
+is running (status and events dialogue boxes). If so desired, it can also 
+be stopped by using the system tray menu, though this should normally never
+be necessary.  
 
 Once installed apcupsd normally runs as a system service.  This means that it
 is immediately started by the operating system when the system is booted, and
@@ -5416,30 +5417,7 @@ a full GUI installer (driven by NSIS, the
 \elink{Nullsoft Scriptable Install System}{http://nsis.sourceforge.net}).
 
 Installation is very simple and straight-forward: Simply double-click the
-installer executable and follow the instructions. {\bf Do not change the
-installation directory without reading the next section!}
-
-\label{Installation-Directory}
-\subsection*{Installation Directory}
-\index{Installation Directory }
-\index{Directory!Installation }
-\addcontentsline{toc}{subsection}{Installation Directory}
-
-\label{index-Windows_002c-Installation-Directory-172}
-The Win32 version of apcupsd must reside in the
-c:\textbackslash{}apcupsd\textbackslash{} directory, and there must be a
-c:\textbackslash{}tmp directory on your machine. The installation will do this
-automatically, and we recommend that you do not attempt to place apcupsd in
-another directory. If you do so, you are on your own, and you will need to do
-a rebuild of the source. 
-
-If you wish to install the package elsewhere, you will need to proceed with a
-manual installation, which is not particularly easy as you must rebuild the
-source and change the configuration file as well.  
-
-If you have an existing CYGWIN installation, you {\bf must} change the
-installation directory to /apcupsd within your CYGWIN root directory
-(usually c:\textbackslash{}cygwin).
+installer executable and follow the instructions.
 
 \label{Configuration}
 \subsection*{Configuration}
@@ -5452,11 +5430,19 @@ the values appropriate for your site. (Subsequent installations will
 maintain your existing apcupsd.conf, so you need not edit it again unless
 there are new features or syntax changes that must be accounted for.)
 
-In most cases, no changes will be needed, but if you are not using COM1 
-for your serial port, you will need to set the {\bf DEVICE} configuration
-directive to the correct serial port. Note, if you are using WinNT or Win2000,
-the operating system may probe the port attempting to attach a serial mouse
-This will cause apcupsd to be unable to communicate with the serial port. 
+The default configuration calls for a USB connected UPS. This is the most
+common connection for modern UPSes, especially those used with Windows
+computers. All other apcupsd drivers are available (apcsmart, dumb, net,
+snmp, pcnet) and can be used simply by editing the configuration file
+UPSCABLE, UPSTYPE, and DEVICE settings as described elsewhere in this 
+manual.
+
+Note that on Windows, serial ports are specified using COM1, COM2, etc.
+notation instead of the UNIX-style /dev/tty* notation.
+
+Note also if you are using WinNT or Win2000, the operating system may 
+probe the serial port attempting to attach a serial mouse. This will cause
+apcupsd to be unable to communicate with the serial port. 
 If this happens, or out of precaution, you can edit the c:\textbackslash{}boot.ini
 file. Find the line that looks something like the following:  
 
@@ -5521,16 +5507,17 @@ hand window when you click on {\bf Services (Local)} in the left hand menu
 window.  
 
 That should complete the installation process. When the system tray icon turns
-from a battery \includegraphics{./onbatt.eps} into a plug
+from a question mark \includegraphics{./commlost.eps} into a plug
 \includegraphics{./online.eps}, right click on it and a menu will appear.
 Select the {\bf Events} item, and the Events dialogue box should appear. There
 should be no error messages. By right clicking again on the system tray plug
 and selecting the {\bf Status} item, you can verify that all the values for
 your UPS are correct.  
 
-When the UPS switches to the battery, the battery icon will reappear in the
-system tray. While the UPS is online, if the battery is not at least 99\%
-charged, the plug icon will become a plug with a lightning bolt in the middle
+When the UPS switches to the battery, the battery icon 
+\includegraphics{./onbatt.eps} will appear in the system tray. While the 
+UPS is online, if the battery is not at least 99\% charged, the plug icon 
+will become a plug with a lightning bolt in the middle 
 \includegraphics{./charging.eps} to indicate that the battery is charging. 
 
 \label{Testing}
