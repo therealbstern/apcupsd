@@ -676,8 +676,8 @@ dnl
 dnl Check for enable of drivers
 dnl
 AC_ARG_ENABLE(apcsmart, [
-AC_HELP_STRING([--enable-apcsmart], [Compile APC Smart UPS driver (default)])
-AC_HELP_STRING([--disable-apcsmart], [No APC Smart UPS driver])],
+AC_HELP_STRING([--enable-apcsmart], [Compile APC SmartUPS serial driver (default)])
+AC_HELP_STRING([--disable-apcsmart], [No APC SmartUPS serial driver])],
    [ if test "$enableval" = "yes" ; then
        dnl This is for C code inclusion
        AC_DEFINE(HAVE_APCSMART_DRIVER)
@@ -759,15 +759,18 @@ AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
 AC_SUBST(LIBUSB)
 
 AC_ARG_ENABLE(net, [
-AC_HELP_STRING([--enable-net], [Compile new networking driver for slaves])
-AC_HELP_STRING([--disable-net], [No new network driver for slaves (default)])],
+AC_HELP_STRING([--enable-net], [Compile networking driver for slaves (default)])
+AC_HELP_STRING([--disable-net], [No network driver for slaves])],
    [ if test "$enableval" = "yes" ; then
         AC_DEFINE(HAVE_NET_DRIVER)
         AC_DEFINE(HAVE_NISLIB)
         NET_DRIVER="net"
         AC_SUBST(NET_DRIVER)
      fi ],
-   [])
+   [ AC_DEFINE(HAVE_NET_DRIVER)
+     AC_DEFINE(HAVE_NISLIB)
+     NET_DRIVER="net"
+     AC_SUBST(NET_DRIVER) ])
 
 WANT_SNMP="no"
 AC_ARG_ENABLE(snmp, [
@@ -849,14 +852,16 @@ AC_HELP_STRING([--disable-test], [No TEST driver (default)])],
 
 dnl Enable pcnet driver
 AC_ARG_ENABLE(pcnet, [
-AC_HELP_STRING([--enable-pcnet], [Compile PCNET driver code])
-AC_HELP_STRING([--disable-pcnet], [No PCNET driver (default)])],
+AC_HELP_STRING([--enable-pcnet], [Compile PCNET driver code (default)])
+AC_HELP_STRING([--disable-pcnet], [No PCNET driver])],
    [ if test "$enableval" = "yes" ; then
         AC_DEFINE(HAVE_PCNET_DRIVER)
         PCNET_DRIVER="pcnet"
         AC_SUBST(PCNET_DRIVER)
      fi],
-   [])
+   [ AC_DEFINE(HAVE_PCNET_DRIVER)
+     PCNET_DRIVER="pcnet"
+     AC_SUBST(PCNET_DRIVER) ])
 
 dnl Force NIS to enabled since libnis is required by apcaccess.
 dnl Users may still disable NIS at runtime in apcupsd.conf.
