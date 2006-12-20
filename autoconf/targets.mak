@@ -13,8 +13,9 @@
 .NOEXPORT:
 .SUFFIXES: .o .lo .c .cpp .h .po .gmo .mo .cat .msg .pox
 .MAIN: all
-.PHONY: all install uninstall install- install-apcupsd install-powerflute \
-		install-cgi install-strip clean realclean distclean mostlyclean clobber
+.PHONY: all all-subdirs all-targets install uninstall install- install-apcupsd \
+		install-powerflute install-cgi install-strip clean realclean distclean \
+		mostlyclean clobber
 
 all: all-subdirs all-targets
 
