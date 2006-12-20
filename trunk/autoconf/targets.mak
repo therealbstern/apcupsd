@@ -22,10 +22,11 @@ all-subdirs:
 	@if test ! x"$(subdirs)" = x; then \
 	    for file in . ${subdirs}; \
 	    do \
-		(cd $$file && if test "$$file" != "."; then $(MAKE) DESTDIR=$(DESTDIR) all; fi); \
-		  if test "$$?" != "0"; then \
-		     break; \
-		  fi; \
+		(cd $$file; \
+		 if test "$$file" != "."; then \
+		     $(MAKE) DESTDIR=$(DESTDIR) all || exit $$?; \
+		 fi; \
+		) || exit $$?; \
 	    done; \
 	fi
 
