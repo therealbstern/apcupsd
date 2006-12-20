@@ -58,6 +58,40 @@ dummy:
 	sed -f $(topdir)/src/intl/po2msg.sed < $< > $*.msg \
 	  && rm -f $@ && $(GENCAT) $@ $*.msg					    
 
+# Library targets
+$(topdir)/src/lib/libapc.a: $(topdir)/src/lib/*.[ch]
+	@(cd $(topdir)/src/lib && $(MAKE))
+
+$(topdir)/src/drivers/libdrivers.a: $(topdir)/src/drivers/*.[ch]
+	@(cd $(topdir)/src/drivers && $(MAKE))
+
+$(topdir)/src/drivers/apcsmart/libapcsmart.a: $(topdir)/src/drivers/apcsmart/*.[ch]
+	@(cd $(topdir)/src/drivers/apcsmart && $(MAKE))
+
+$(topdir)/src/drivers/dumb/libdumb.a: $(topdir)/src/drivers/dumb/*.[ch]
+	@(cd $(topdir)/src/drivers/dumb && $(MAKE))
+
+$(topdir)/src/drivers/net/libnet.a: $(topdir)/src/drivers/net/*.[ch]
+	@(cd $(topdir)/src/drivers/net && $(MAKE))
+
+$(topdir)/src/drivers/usb/libusb.a: $(topdir)/src/drivers/usb/*.[ch]
+	@(cd $(topdir)/src/drivers/usb && $(MAKE))
+
+$(topdir)/src/drivers/snmp/libdumb.a: $(topdir)/src/drivers/snmp/*.[ch]
+	@(cd $(topdir)/src/drivers/snmp && $(MAKE))
+
+$(topdir)/src/drivers/test/libtest.a: $(topdir)/src/drivers/test/*.[ch]
+	@(cd $(topdir)/src/drivers/test && $(MAKE))
+
+$(topdir)/src/drivers/pcnet/libpcnet.a: $(topdir)/src/drivers/pcnet/*.[ch]
+	@(cd $(topdir)/src/drivers/pcnet && $(MAKE))
+
+$(topdir)/src/intl/libintl.a: $(topdir)/src/intl/*.[ch]
+	@(cd $(topdir)/src/intl && $(MAKE))
+
+$(topdir)/src/gd1.2/libgd.a: $(topdir)/src/gd1.2/*.[ch]
+	@(cd $(topdir)/src/gd1.2 && $(MAKE))
+
 # Makefile subsystem targets
 $(topdir)/autoconf/variables.mak: $(topdir)/autoconf/variables.mak.in
 	@(cd $(topdir) && \
