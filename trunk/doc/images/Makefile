@@ -33,6 +33,7 @@ IMGLST=  \
 	onbatt \
 	online \
 	status \
+	commlost \
 	thanks \
 	wininstall1 \
 	wininstall2 \
