@@ -3572,6 +3572,7 @@ static gboolean gapc_panel_preferences_data_model_load(PGAPC_CONFIG pcfg)
    while (monitors) {              /* should be the regular text key */
       gchar *pmon = NULL;
       gint i_monitor = 0;
+      GtkWidget *widget = NULL;
 
       pmon = g_strrstr((gchar *) monitors->data, "/");
       if (pmon) {
@@ -3627,7 +3628,10 @@ static gboolean gapc_panel_preferences_data_model_load(PGAPC_CONFIG pcfg)
 
       /* Startup Processing */
       if (v_enabled) {
-         gapc_monitor_interface_create(pcfg, i_monitor, &iter);
+         widget = gapc_monitor_interface_create(pcfg, i_monitor, &iter);
+         if ((widget != NULL) && !v_use_systray ) {
+              gtk_window_present( GTK_WINDOW(widget));
+         }
       }
       g_free(monitors->data);
       monitors = g_slist_next(monitors);
