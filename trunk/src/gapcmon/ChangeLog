@@ -1,3 +1,9 @@
+gapcmon (0.8.4-0) stable; urgency=normal
+* Sat Dec 30 2006 James Scott, Jr. <skoona@users.sourceforge.net>
+- Added cb_util_manage_events() to control visibility.  This
+  allows the app to startup in icon mode, if control.panel
+  use_systray is checked.
+
 gapc_devel (0.7.0-1) stable; urgency=normal
 * Tue May 29 2006 James Scott, Jr. <skoona@users.sourceforge.net>
 - Rewrite lg_graph_draw_veritical_text() to remove V2.6 api.
