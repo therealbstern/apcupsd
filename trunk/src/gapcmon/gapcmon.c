@@ -1,4 +1,4 @@
-/* gapcmon.c               serial-0082-1 *****************************************
+/* gapcmon.c               serial-0084-0 *****************************************
 
   GKT+ GUI with Notification Area (System Tray) support.  Program  for 
   monitoring the apcupsd.sourceforge.net package.
@@ -133,6 +133,9 @@ static gboolean lg_graph_button_press_event_cb (GtkWidget * widget, GdkEventButt
 static gboolean cb_util_barchart_handle_exposed(GtkWidget * widget,
    GdkEventExpose * event, gpointer data);
 static gboolean cb_util_line_chart_refresh(PGAPC_HISTORY pg);
+static gboolean cb_util_manage_iconify_event(GtkWidget *widget, 
+                                             GdkEventWindowState *event,
+                                             gpointer  gp);
 
 static void gapc_util_text_view_append(GtkWidget * view, gchar * pch);
 static void gapc_util_text_view_prepend(GtkWidget * view, gchar * pch);
@@ -169,6 +172,55 @@ static gboolean lg_graph_debug = FALSE;
 
 
 /* ************************************************************************* */
+/* "window-state-event"
+ * iconify/minimize verus hide needs this routine to manage visibility 
+*/          
+static gboolean cb_util_manage_iconify_event(GtkWidget *widget, GdkEventWindowState *event,
+                                                gpointer  gp)
+{
+   g_return_val_if_fail(gp != NULL, FALSE);
+   
+   /* iconified */
+   if ( (event->type == GDK_WINDOW_STATE) && 
+        (event->changed_mask & GDK_WINDOW_STATE_ICONIFIED) &&
+        (event->new_window_state & GDK_WINDOW_STATE_ICONIFIED) ) {
+
+
+        if ( ((PGAPC_MONITOR)gp)->cb_id == CB_MONITOR_ID) {
+              if ( event->window == GTK_WIDGET(((PGAPC_MONITOR)gp)->window)->window ) {   
+                   ((PGAPC_MONITOR)gp)->b_visible = FALSE;
+              }
+        } else {
+              if ( event->window == GTK_WIDGET(((PGAPC_CONFIG)gp)->window)->window ) {   
+                 ((PGAPC_CONFIG)gp)->b_visible = FALSE;
+              }
+        }
+
+    return TRUE;
+   }
+
+   /* un - iconified */
+   if ( (event->type == GDK_WINDOW_STATE) && 
+        (event->changed_mask & GDK_WINDOW_STATE_ICONIFIED) &&
+        !(event->new_window_state & GDK_WINDOW_STATE_ICONIFIED) ) {
+
+
+        if ( ((PGAPC_MONITOR)gp)->cb_id == CB_MONITOR_ID) {
+              if ( event->window == GTK_WIDGET(((PGAPC_MONITOR)gp)->window)->window ) {   
+                   ((PGAPC_MONITOR)gp)->b_visible = TRUE;
+              }
+        } else {
+              if ( event->window == GTK_WIDGET(((PGAPC_CONFIG)gp)->window)->window ) {   
+                 ((PGAPC_CONFIG)gp)->b_visible = TRUE;
+              }
+        }
+
+    return TRUE;
+   }
+
+
+   return FALSE;
+}
 
 /*
  * Draws one data series points to chart
@@ -3032,10 +3084,9 @@ static gboolean cb_panel_systray_icon_handle_clicked(GtkWidget * widget,
       switch (event->button) {
       case 1:
          if (b_visible) {
-            gtk_widget_hide(window);
+            gtk_window_iconify(GTK_WINDOW(window));
          } else {
-            gtk_widget_show_all(window);
-            gtk_window_present(GTK_WINDOW(window));
+            gtk_window_present_with_time(GTK_WINDOW(window), event->time);
          }
          break;
       case 2:
@@ -3915,9 +3966,8 @@ static void cb_panel_monitor_list_activated(GtkTreeView * treeview,
 
       if ((pm != NULL) && (pm->window != NULL)) {
          if (pm->b_visible) {
-            gtk_widget_hide(pm->window);
+            gtk_window_iconify(GTK_WINDOW(pm->window));
          } else {
-            gtk_widget_show_all(pm->window);
             gtk_window_present(GTK_WINDOW(pm->window));
          }
       }
@@ -4229,7 +4279,7 @@ static gboolean cb_monitor_interface_delete_event(GtkWidget * widget,
 static void cb_monitor_interface_button_close(GtkWidget * button, PGAPC_MONITOR pm)
 {
    g_return_if_fail(pm != NULL);
-   gtk_widget_hide(GTK_WIDGET(pm->window));
+   gtk_window_iconify(GTK_WINDOW(pm->window));
    return;
 }
 
@@ -4976,7 +5026,7 @@ static GtkWidget *gapc_main_interface_create(PGAPC_CONFIG pcfg)
    pcfg->pht_Status = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, g_free);
    pcfg->pht_Widgets = g_hash_table_new_full(g_str_hash, g_str_equal, g_free, NULL);
    pixbuf = pcfg->my_icons[GAPC_ICON_DEFAULT];
-   pcfg->b_visible = TRUE;
+   pcfg->b_visible = FALSE;
    pcfg->tooltips = gtk_tooltips_new();
    g_object_ref (pcfg->tooltips);
    gtk_object_sink (GTK_OBJECT(pcfg->tooltips));   
@@ -4996,6 +5046,8 @@ static GtkWidget *gapc_main_interface_create(PGAPC_CONFIG pcfg)
       G_CALLBACK(cb_main_interface_delete_event), pcfg);
    g_signal_connect(window, "show", G_CALLBACK(cb_main_interface_show), pcfg);
    g_signal_connect(window, "hide", G_CALLBACK(cb_main_interface_hide), pcfg);
+   g_signal_connect(window, "window-state-event", 
+                    G_CALLBACK(cb_util_manage_iconify_event), pcfg); 
 
    gapc_panel_systray_icon_create(pcfg);
 
@@ -5057,7 +5109,7 @@ static GtkWidget *gapc_main_interface_create(PGAPC_CONFIG pcfg)
 
    /* quit Control button */
    button = gtk_button_new_from_stock(GTK_STOCK_CLOSE);
-   g_signal_connect_swapped(button, "clicked", G_CALLBACK(gtk_widget_hide), window);
+   g_signal_connect_swapped(button, "clicked", G_CALLBACK(gtk_window_iconify), window);
    gtk_box_pack_end(GTK_BOX(box), button, TRUE, TRUE, 0);
    gtk_widget_show(button);
 
@@ -5847,6 +5899,8 @@ static GtkWidget *gapc_monitor_interface_create(PGAPC_CONFIG pcfg, gint i_monito
       G_CALLBACK(cb_monitor_interface_delete_event), pm);
    g_signal_connect(window, "show", G_CALLBACK(cb_monitor_interface_show), pm);
    g_signal_connect(window, "hide", G_CALLBACK(cb_monitor_interface_hide), pm);
+   g_signal_connect(window, "window-state-event", 
+                    G_CALLBACK(cb_util_manage_iconify_event), pm); 
 
    g_snprintf(pm->ch_title_info, GAPC_MAX_TEXT, "%s\n<b><i>{%s}</i></b>",
       GAPC_WINDOW_TITLE, pm->pch_host);
@@ -6039,7 +6093,15 @@ extern int main(int argc, char *argv[])
    gapc_panel_gconf_init(pcfg);
 
    window = gapc_main_interface_create(pcfg);
-   gtk_widget_show_all(window);
+   if (!pcfg->b_use_systray) {
+       pcfg->b_visible = TRUE;
+       g_object_set(pcfg->window, 
+                    "skip-pager-hint",   FALSE, 
+                    "skip-taskbar-hint", FALSE, 
+                    NULL);
+       gtk_window_present(GTK_WINDOW(pcfg->window));       
+   }
+   
 
    gapc_panel_gconf_watch(pcfg);
 
