@@ -3086,7 +3086,7 @@ static gboolean cb_panel_systray_icon_handle_clicked(GtkWidget * widget,
          if (b_visible) {
             gtk_window_iconify(GTK_WINDOW(window));
          } else {
-            gtk_window_present_with_time(GTK_WINDOW(window), event->time);
+            gtk_window_present(GTK_WINDOW(window));
          }
          break;
       case 2:
