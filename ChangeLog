@@ -8,6 +8,164 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2006-12-31 01:42  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Change the gtk_window_present_with_time() api to _present() to
+	maintain gtk 2.4 support guidance. (with_time was a 2.6 api)
+
+	Also, noticed that the gapcmon codeset leaves the graph.properties
+	page largely blank with no color buttons.   researching cause now
+
+	James,
+
+2006-12-30 17:38  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Changed gapc_panel_preferences_model_init() to make monitor window
+	visible if use_systray is not checked at startup.
+
+	James,
+
+2006-12-30 17:12  skoona
+
+	* src/gapcmon/ChangeLog:
+
+	Updating package files as needed.  James,
+
+2006-12-30 17:08  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Per user request: modifiy visiblity controls to not display
+	control.panel if control.panel.use_systray preference is checked or
+	true when app is first started.
+
+	Required adding a routine cb_util_manage_events() to replace the
+	gtk_widget_hide() functionality and "hide" signal.
+	gtk_window_iconify() and the "window-state-event" are now used to
+	manage visibility.
+
+	Released seperately as release 0.8.4 in gapcmon
+
+	James,
+
+2006-12-20 19:10  adk0212
+
+	* doc/images/: Makefile, image_scales:
+
+	Add commlost image.
+
+2006-12-20 18:52  adk0212
+
+	* autoconf/targets.mak:
+
+	Bring back the library targets.
+
+	As Mike Frysinger <vapier@gentoo.org> points out, "If you try to
+	build in  a subdir and the archive doesn't exist, you'll get an
+	error about make having no idea how to make "pcnet/libpcnet.a" and
+	you then have to do it by hand. With these targets, make knows
+	which directory to change into and how to generate the .a so you
+	dont have to figure it out."
+
+	However we still kill the win32 ones since those refer to the old
+	Cygwin based port which no longer exists. Also apply a patch from
+	Mike fixing up the targets for some driver libs.
+
+2006-12-20 18:29  adk0212
+
+	* autoconf/targets.mak:
+
+	Kill library targets. These are nothing but bitrot.
+
+2006-12-20 18:26  adk0212
+
+	* autoconf/targets.mak:
+
+	Add some more phony targets. From Mike Frysinger
+	<vapier@gentoo.org>.
+
+2006-12-19 20:46  adk0212
+
+	* autoconf/targets.mak:
+
+	Bail immediately when encountering an error while making subdirs.
+	From Mike Frysinger <vapier@gentoo.org>.
+
+2006-12-17 14:55  adk0212
+
+	* doc/: images/commlost.eps, images/commlost.png,
+	images/hires/commlost.eps, latex/manual.tex:
+
+	Update manual for native Win32 port and misc other changes.
+
+2006-12-17 14:51  adk0212
+
+	* src/win32/commlost.ico:
+
+	Limit icon to 8-bit color so it will draw correctly on WinNT and
+	Win98.
+
+2006-12-17 12:35  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Enable net and pcnet drivers by default. They don't require any
+	external libraries and are low overhead.
+
+2006-12-09 13:40  adk0212
+
+	* platforms/etc/: masterconnect.in, mastertimeout.in:
+
+	Remove obsolete masterconnect and mastertimeout events.
+
+2006-12-09 13:33  adk0212
+
+	* autoconf/configure.in, examples/safe.apccontrol.in,
+	include/defines.h, platforms/apccontrol.in,
+	platforms/darwin/apccontrol.in, platforms/etc/Makefile.in,
+	platforms/mandrake/apcupsd.spec.in,
+	platforms/redhat/apcupsd.spec.in, platforms/sun/apccontrol.in,
+	platforms/suse/apcupsd.spec.in,
+	platforms/yellowdog/apcupsd.spec.in, src/action.c, configure:
+
+	Remove obsolete masterconnect and mastertimeout events.
+
+2006-12-09 13:33  adk0212
+
+	* doc/latex/manual.tex:
+
+	Remove master/slave mode documentation and/or convert to NIS mode
+	docs.
+
+2006-12-05 20:58  adk0212
+
+	* doc/latex/manual.tex:
+
+	Add sections for Solaris and Darwin USB.
+
+2006-12-04 19:48  adk0212
+
+	* platforms/etc/multimon.conf:
+
+	Fix non-existent file. new-modules.txt does not exist; instead,
+	direct the user to src/cgi/upsfetch.c.
+
+2006-12-02 00:27  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Add 3.13.11 release info.
+
+2006-12-01 23:43  adk0212
+
+	* ChangeLog, ReleaseNotes, include/version.h:
+
+	Updates for 3.13.11 development release.
+
 2006-12-01 23:02  adk0212
 
 	* src/drivers/snmp/: drv_powernet.c, snmp.c:
