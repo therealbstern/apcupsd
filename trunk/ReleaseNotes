@@ -2,20 +2,14 @@
              Release Notes for Apcupsd 3.13.x
 
 *DEVELOPMENT RELEASE*
-3.13.11 -- 1 December 2006
+3.13.12 -- 15 January 2007
 
-CHANGES SINCE 3.13.9
+CHANGES SINCE 3.13.11
 
-  * New features:
-      - SNMP driver obeys NETTIME setting for poll interval.
-      - Win32 USB driver supports x64 platforms.
+  * This is primarily intended as a platform for building/testing RPMs
+    prior to the 3.14 release.
+  * Includes minor updates and bug fixes
 
-  * Numerous bug fixes; highlights include...
-      - Win32 socket leak fix for SNMP connections
-      - APC_NOTRAP mode for SNMP is fixed
-      - Net mode shutdown logic fix when master shuts down before slave
-      - Fix dumb driver handling of 940-0023A cable
-      - See ChangeLog for further details.
 
 Overall features in the 3.13.x development series are described
 below...
