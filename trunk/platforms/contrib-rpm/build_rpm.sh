@@ -20,7 +20,7 @@
 ###########################################################################################
 # script configuration section
 
-VERSION=3.12.4
+VERSION=3.13.12
 RELEASE=1
 
 # build platform for spec
@@ -51,6 +51,9 @@ SRPMDIR=
 # set to 1 to sign packages, 0 not to sign if you want to sign on another machine.
 SIGN=1
 
+# set to 1 to build gapcmon package (requires Gtk2 >= 2.4) or 0 to not build
+GAPCMON=1
+
 # to override your language shell variable uncomment and edit this
 # export LANG=en_US.UTF-8
 
@@ -60,28 +63,32 @@ SIGN=1
 
 SRPM=${SRPMDIR}apcupsd-$VERSION-$RELEASE.src.rpm
 
-echo Building standard serial packages for "$PLATFORM"...
+echo Building packages for "$PLATFORM"...
 sleep 2
-rpmbuild --rebuild --define "build_${PLATFORM} 1" \
---define "contrib_packager ${PACKAGER}" \
-${SRPM}
 
-echo Building usb packages for "$PLATFORM"...
-sleep 2
-rpmbuild --rebuild --define "build_${PLATFORM} 1" \
---define "contrib_packager ${PACKAGER}" \
---define "build_usb 1" ${SRPM}
+if [ "$GAPCMON" = "1" ]; then
+	rpmbuild --rebuild --define "build_${PLATFORM} 1" \
+	--define "contrib_packager ${PACKAGER}" \
+	--define "build_gapcmon 1" ${SRPM}
+fi
+if [ "$GAPCMON" = "0" ]; then
+	rpmbuild --rebuild --define "build_${PLATFORM} 1" \
+	--define "contrib_packager ${PACKAGER}" ${SRPM}
+fi
 
 # delete any debuginfo packages built
 rm -f ${RPMDIR}/apcupsd*debug*
 
 # copy files to cwd and rename files to final upload names
 
-mv -f ${RPMDIR}/apcupsd-std-${VERSION}-${RELEASE}.${ARCH}.rpm \
-./apcupsd-std-${VERSION}-${RELEASE}.${FILENAME}.${ARCH}.rpm
+mv -f ${RPMDIR}/apcupsd-${VERSION}-${RELEASE}.${ARCH}.rpm \
+./apcupsd-${VERSION}-${RELEASE}.${FILENAME}.${ARCH}.rpm
 
-mv -f ${RPMDIR}/apcupsd-usb-${VERSION}-${RELEASE}.${ARCH}.rpm \
-./apcupsd-usb-${VERSION}-${RELEASE}.${FILENAME}.${ARCH}.rpm
+mv -f ${RPMDIR}/apcupsd-multimon-${VERSION}-${RELEASE}.${ARCH}.rpm \
+./apcupsd-multimon-${VERSION}-${RELEASE}.${FILENAME}.${ARCH}.rpm
+
+mv -f ${RPMDIR}/apcupsd-gapcmon-${VERSION}-${RELEASE}.${ARCH}.rpm \
+./apcupsd-gapcmon-${VERSION}-${RELEASE}.${FILENAME}.${ARCH}.rpm
 
 # now sign the packages
 if [ "$SIGN" = "1" ]; then
