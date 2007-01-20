@@ -17,6 +17,17 @@
 #   Release_Notes-%{version}-%{release}.txt
 #
 
+# basic defines for every build
+%define _version @VERSION@
+%define _release 1
+
+#--------------------------------------------------------------------------
+# it should not be necessary to change anything below here for a release
+# except for patch macros in the setup section if used
+#--------------------------------------------------------------------------
+
+%define pwrfaildir @PWRFAILDIR@
+
 # third party packagers
 %define _packager D. Scott Barninger <barninger@fairfieldcomputers.com>
 %{?contrib_packager:%define _packager %{contrib_packager}}
@@ -48,22 +59,36 @@
 %define mdk 0
 %{?build_mdk:%define mdk 1}
 
-# this sets up the config files for usb but usb driver is built regardless
-%define usb 0
-%{?build_usb:%define usb 1}
-
 %if %{suse}
 %define initdir /etc/rc.d
 %else
 %define initdir /etc/rc.d/init.d
 %endif
 
-%define pwrfaildir @PWRFAILDIR@
+# set destination directories for multimon
+%define cgidir /var/www/cgi-bin
+%if %{suse}
+%define cgidir /srv/www/cgi-bin
+%endif
+
+# set ownership of files
+%define binowner root
+%define bingroup root
+%define dataowner apache
+%define datagroup apache
+%if %{suse}
+%define dataowner wwwrun
+%define datagroup www
+%endif
+
+# should we build gapcmon, requires gtk2 >= 2.4
+%define gapcmon 0
+%{?build_gapcmon:%define gapcmon 1}
 
 Summary:      APC UPS Power Control Daemon for Linux
 Name:         apcupsd
-Version:      @VERSION@
-Release:      1
+Version:      %{_version}
+Release:      %{_release}
 Vendor:       APC UPS Daemon Team
 Distribution: The apcupsd Team
 Packager:     %{_packager}
@@ -73,7 +98,7 @@ Source1:      Release_Notes-%{version}-%{release}.tar.gz
 Group:        System Environment/Daemons
 License:      GPL v2
 BuildRoot:    %{_tmppath}/%{name}-root
-BuildRequires: gd-devel, ncurses-devel, ghostscript
+BuildRequires: gd-devel, ncurses-devel, ghostscript, libstdc++-devel
 %if %{rh7}
 BuildRequires: glibc-devel >= 2.2, libjpeg-devel, libpng-devel, zlib-devel, freetype-devel
 %else
@@ -96,6 +121,23 @@ BuildRequires: ghostscript-dvipdf
 %if %{fedora_core}
 BuildRequires: latex2html
 %endif
+%if %{gapcmon}
+BuildRequires: glibc-devel, gtk2-devel >= 2.4, glib2-devel, atk-devel
+BuildRequires: libbonobo-devel, libbonoboui-devel, glitz-devel, ORBit2, pango-devel
+%endif
+%if %{suse} && %{gapcmon}
+BuildRequires: bonobo-activation, freetype2-devel, cairo-devel, fontconfig-devel
+BuildRequires: gconf2-devel, gnome-vfs2-devel, libpng-devel, xorg-x11-libs
+%endif
+%if %{fedora_core} && %{gapcmon}
+BuildRequires: freetype-devel, GConf2-devel, libX11
+%endif
+%if %{mdk} && %{gapcmon}
+BuildRequires: freetype2-devel, GConf2-devel, libxorg-x11
+%endif
+%if %{rhel4} && %{gapcmon}
+BuildRequires: freetype-devel, GConf2-devel, libX11
+%endif
 
 %description
 Apcupsd can be used for controlling most APC UPSes. During a
@@ -107,50 +149,63 @@ on internal APC calculations determined by power consumption
 rates.  If the power is restored before one of the above shutdown
 conditions is met, apcupsd will inform users about this fact.
 Some features depend on what UPS model you have (simple or smart).
-
-%if %{usb}
-%package usb
-%else
-%package std
-%endif
+This package is configured for USB but can be reconfigured for
+standard serial port UPS models. See the manual.
 
 Provides: apcupsd
+Obsoletes: apcupsd-std apcupsd-usb
 
 Requires: perl, ncurses
-%if %{fedora_core} || %{suse} || %{mdk} || %{rhel4}
-Requires: gd >= 2.0
-%else
-Requires: gd < 2.0
-%endif
 %if %{rh7}
 Requires: glibc >= 2.2, libjpeg, libpng, zlib, freetype
 %else
 Requires: glibc >= 2.3
 %endif
 
+%package multimon
 Summary:      APC UPS Power Control Daemon for Linux
-Group:        System Environment/Daemons
+Group:        Applications/Internet
 
-%if %{usb}
-%description usb
+Requires: libstdc++
+%if %{fedora_core} || %{suse} || %{mdk} || %{rhel4}
+Requires: gd >= 2.0
 %else
-%description std
+Requires: gd < 2.0
+%endif
+%if %{rh7}
+Requires: glibc >= 2.2
+%else
+Requires: glibc >= 2.3
 %endif
 
-Apcupsd can be used for controlling most APC UPSes. During a
-power failure, apcupsd will inform the users about the power
-failure and that a shutdown may occur.  If power is not restored,
-a system shutdown will follow when the battery is exausted, a
-timeout (seconds) expires, or the battery runtime expires based
-on internal APC calculations determined by power consumption
-rates.  If the power is restored before one of the above shutdown
-conditions is met, apcupsd will inform users about this fact.
-Some features depend on what UPS model you have (simple or smart).
+%description multimon
+apcupsd Network Monitoring (CGI) Programs which will give you the 
+status of your UPS or UPSes over the network.
 
-%if %{usb}
-This package is built with USB support.
-%else
-This package is built with standard serial port support.
+%if %{gapcmon}
+%package gapcmon
+Summary:      APC UPS Power Control Daemon for Linux
+Group:        Applications/System
+
+Requires: glibc, gtk2 >= 2.4, glib2, atk, libbonobo, libbonoboui, glitz, ORBit2, pango
+%endif
+
+%if %{suse} && %{gapcmon}
+Requires: bonobo-activation, freetype2, cairo, fontconfig, gconf2, gnome-vfs2, libpng, xorg-x11-libs
+%endif
+%if %{fedora_core} && %{gapcmon}
+Requires: freetype, GConf2, libX11
+%endif
+%if %{mdk} && %{gapcmon}
+Requires: freetype2, GConf2, libxorg-x11
+%endif
+%if %{rhel4} && %{gapcmon}
+Requires: freetype, GConf2, libX11
+%endif
+
+%if %{gapcmon}
+%description gapcmon
+A Gnome application to monitor the status of your UPS.
 %endif
 
 %prep
@@ -163,29 +218,26 @@ This package is built with standard serial port support.
         --prefix=%{_prefix} \
         --sbindir=/sbin \
         --sysconfdir=%{_sysconfdir}/apcupsd \
-        --with-cgi-bin=%{_sysconfdir}/apcupsd/cgi \
+        --with-cgi-bin=%{cgidir} \
         --enable-cgi \
-        --enable-pthreads \
         --enable-net \
-        --enable-master-slave \
+        --enable-pcnet \
         --enable-apcsmart \
         --enable-dumb \
         --enable-usb \
 	--enable-powerflute \
-%if %{usb}
+	%if %{gapcmon}
+	--enable-gapcmon \
+	%endif
         --with-serial-dev= \
         --with-upstype=usb \
         --with-upscable=usb 
 
-%endif
-
 make
 
-%if %{usb}
 cd examples
 make hid-ups
 cd ../
-%endif
 
 # build pdf manual
 cd doc/latex
@@ -220,29 +272,22 @@ rm $RPM_BUILD_ROOT%{initdir}/halt
 rm $RPM_BUILD_ROOT%{initdir}/halt.old
 %endif
 
-%if %{usb}
 install -m744 examples/hid-ups \
               $RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/hid-ups
 install -m744 examples/make-hiddev \
               $RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/make-hiddev
-%endif
 
 %clean
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
+rm -f $RPM_BUILD_DIR/Release_Notes-%{version}-%{release}.txt
 
-%if %{usb}
-%files usb
+%files
 %defattr(-,root,root)
 %{_sysconfdir}/apcupsd/make-hiddev
 %{_sysconfdir}/apcupsd/hid-ups
-%else
-%files std
-%defattr(-,root,root)
-%endif
 
 %doc COPYING DISCLAIMER ReleaseNotes ChangeLog ../Release_Notes-%{version}-%{release}.txt doc/latex/apcupsd.pdf
 %dir %{_sysconfdir}/apcupsd
-%dir %{_sysconfdir}/apcupsd/cgi
 %{initdir}/apcupsd
 %config(noreplace) %{_sysconfdir}/apcupsd/apccontrol
 %config(noreplace) %{_sysconfdir}/apcupsd/changeme
@@ -251,24 +296,36 @@ install -m744 examples/make-hiddev \
 %config(noreplace) %{_sysconfdir}/apcupsd/onbattery
 %config(noreplace) %{_sysconfdir}/apcupsd/offbattery
 %config(noreplace) %{_sysconfdir}/apcupsd/apcupsd.conf
-%config(noreplace) %{_sysconfdir}/apcupsd/hosts.conf
-%config(noreplace) %{_sysconfdir}/apcupsd/multimon.conf
-%{_sysconfdir}/apcupsd/apcupsd.css
-%{_sysconfdir}/apcupsd/cgi/*
+%config(noreplace) %{_sysconfdir}/apcupsd/masterconnect
+%config(noreplace) %{_sysconfdir}/apcupsd/mastertimeout
 /sbin/*
 %attr(-,root,man) %{_mandir}/*/*
 
-%if %{usb}
-%pre usb
-%else
-%pre std
+%files multimon
+%defattr(-,root,root)
+%dir %{_sysconfdir}/apcupsd
+%dir %{cgidir}
+%attr(-,%{dataowner},%{datagroup}) %{_sysconfdir}/apcupsd/apcupsd.css
+%attr(-,%{binowner},%{bingroup}) %{cgidir}/*
+%attr(-,%{dataowner},%{datagroup}) %config(noreplace) %{_sysconfdir}/apcupsd/hosts.conf
+%attr(-,%{dataowner},%{datagroup}) %config(noreplace) %{_sysconfdir}/apcupsd/multimon.conf
+
+%if %{gapcmon}
+%files gapcmon
+%defattr(-,root,root)
+%{_prefix}/bin/gapcmon
+%{_prefix}/share/applications/gapcmon.desktop
+%{_prefix}/share/pixmaps/apcupsd.png
+%{_prefix}/share/pixmaps/charging.png
+%{_prefix}/share/pixmaps/gapc_prefs.png
+%{_prefix}/share/pixmaps/onbatt.png
+%{_prefix}/share/pixmaps/online.png
+%{_prefix}/share/pixmaps/unplugged.png
 %endif
 
-%if %{usb}
-%post usb
-%else
-%post std
-%endif
+%pre
+
+%post
 
 # get rid of any 3.6.2 stuff
 rm -f /etc/rc.d/rc[0-6].d/[KS]20apcups
@@ -313,11 +370,7 @@ fi
 
 # Undo things a bit
 
-%if %{usb}
-%preun usb
-%else
-%preun std
-%endif
+%preun
 
 if [ $1 = 0 ] ; then
 
@@ -344,8 +397,13 @@ if [ $1 = 0 ] ; then
 fi
 
 %changelog
-* Sat Dec 09 2006 Adam Kropelin <akropel1 at rochester.rr.com>
-- Remove obsolete masterconnect and mastertimeout scripts
+* Sat Jan 20 2007 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- restructure for 3.14 release
+- merge std and ups packages
+- remove --enable-pthreads and --enable-master-slave
+- add --enable-pcnet
+- break out multimon into separate package
+- add gapcmon package
 * Sat Aug 19 2006 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - add third party packager tag
 * Fri May 05 2006 D. Scott Barninger <barninger at fairfieldcomputers.com>
