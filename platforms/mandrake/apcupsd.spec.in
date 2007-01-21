@@ -16,8 +16,6 @@
 #   rpm SOURCES directory, and the tar file must contain
 #   Release_Notes-%{version}-%{release}.txt
 #
-# To pass your email address as packager:
-#   --define "contrib_packager Your Name <your-email@site.org>"
 
 # basic defines for every build
 %define _version @VERSION@
@@ -125,20 +123,21 @@ BuildRequires: latex2html
 %endif
 %if %{gapcmon}
 BuildRequires: glibc-devel, gtk2-devel >= 2.4, glib2-devel, atk-devel
-BuildRequires: libbonobo-devel, libbonoboui-devel, ORBit2, pango-devel
+BuildRequires: ORBit2, pango-devel
 %endif
 %if %{suse} && %{gapcmon}
 BuildRequires: bonobo-activation, freetype2-devel, cairo-devel, fontconfig-devel
 BuildRequires: gconf2-devel, gnome-vfs2-devel, libpng-devel, glitz-devel, xorg-x11-libs
+BuildRequires: libbonobo-devel, libbonoboui-devel
 %endif
 %if %{fedora_core} && %{gapcmon}
-BuildRequires: freetype-devel, GConf2-devel
+BuildRequires: libbonobo-devel, libbonoboui-devel, freetype-devel, GConf2-devel
 %endif
 %if %{mdk} && %{gapcmon}
-BuildRequires: freetype2-devel, GConf2-devel
+BuildRequires: libbonobo2_0-devel, libbonoboui2_0-devel, freetype2-devel, libGConf2_4-devel
 %endif
 %if %{rhel4} && %{gapcmon}
-BuildRequires: freetype-devel, GConf2-devel
+BuildRequires: libbonobo-devel, libbonoboui-devel, freetype-devel, GConf2-devel
 %endif
 
 %description
