@@ -2,20 +2,22 @@
 # 
 # Select the platform by setting the define below either by command
 # line arguments,
-#  e.g.  rpmbuild -ba --define "build_rh7 1" apcupsd.spec
+#  e.g.  rpmbuild -ba --define "build_suse 1" apcupsd.spec
 # or by manually setting it to 1 in this file,
-#  e.g. %define rh7 1
+#  e.g. %define suse 1
 #
-# If you want the usb version, use:
-#  e.g.  rpmbuild -ba --define "build_usb 1" --define "build_rh7 1" apcupsd.spec
+# If you want the gapcmon package, use:
+#  e.g.  rpmbuild -ba --define "build_gapcmon 1" --define "build_suse 1" apcupsd.spec
 # or by manually setting it to 1 in this file,
-#  e.g. %define usb 1
+#  e.g. %define gapcmon 1
 #
 # Note, to build, you need:
 #   Release_Notes-%{version}-%{release}.tar.gz in your
 #   rpm SOURCES directory, and the tar file must contain
 #   Release_Notes-%{version}-%{release}.txt
 #
+# To pass your email address as packager:
+#   --define "contrib_packager Your Name <your-email@site.org>"
 
 # basic defines for every build
 %define _version @VERSION@
@@ -123,20 +125,20 @@ BuildRequires: latex2html
 %endif
 %if %{gapcmon}
 BuildRequires: glibc-devel, gtk2-devel >= 2.4, glib2-devel, atk-devel
-BuildRequires: libbonobo-devel, libbonoboui-devel, glitz-devel, ORBit2, pango-devel
+BuildRequires: libbonobo-devel, libbonoboui-devel, ORBit2, pango-devel
 %endif
 %if %{suse} && %{gapcmon}
 BuildRequires: bonobo-activation, freetype2-devel, cairo-devel, fontconfig-devel
-BuildRequires: gconf2-devel, gnome-vfs2-devel, libpng-devel, xorg-x11-libs
+BuildRequires: gconf2-devel, gnome-vfs2-devel, libpng-devel, glitz-devel, xorg-x11-libs
 %endif
 %if %{fedora_core} && %{gapcmon}
-BuildRequires: freetype-devel, GConf2-devel, libX11
+BuildRequires: freetype-devel, GConf2-devel
 %endif
 %if %{mdk} && %{gapcmon}
-BuildRequires: freetype2-devel, GConf2-devel, libxorg-x11
+BuildRequires: freetype2-devel, GConf2-devel
 %endif
 %if %{rhel4} && %{gapcmon}
-BuildRequires: freetype-devel, GConf2-devel, libX11
+BuildRequires: freetype-devel, GConf2-devel
 %endif
 
 %description
@@ -187,20 +189,20 @@ status of your UPS or UPSes over the network.
 Summary:      APC UPS Power Control Daemon for Linux
 Group:        Applications/System
 
-Requires: glibc, gtk2 >= 2.4, glib2, atk, libbonobo, libbonoboui, glitz, ORBit2, pango
+Requires: glibc, gtk2 >= 2.4, glib2, atk, libbonobo, libbonoboui, ORBit2, pango
 %endif
 
 %if %{suse} && %{gapcmon}
-Requires: bonobo-activation, freetype2, cairo, fontconfig, gconf2, gnome-vfs2, libpng, xorg-x11-libs
+Requires: bonobo-activation, freetype2, cairo, fontconfig, gconf2, gnome-vfs2, libpng, glitz, xorg-x11-libs
 %endif
 %if %{fedora_core} && %{gapcmon}
-Requires: freetype, GConf2, libX11
+Requires: freetype, GConf2
 %endif
 %if %{mdk} && %{gapcmon}
-Requires: freetype2, GConf2, libxorg-x11
+Requires: freetype2, GConf2
 %endif
 %if %{rhel4} && %{gapcmon}
-Requires: freetype, GConf2, libX11
+Requires: freetype, GConf2
 %endif
 
 %if %{gapcmon}
@@ -397,6 +399,8 @@ if [ $1 = 0 ] ; then
 fi
 
 %changelog
+* Sun Jan 21 2007 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- correct gapcmon dependancies
 * Sat Jan 20 2007 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - restructure for 3.14 release
 - merge std and ups packages
