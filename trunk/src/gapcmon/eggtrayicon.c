@@ -1,5 +1,5 @@
 
-/* eggtrayicon.c           serial-0082-0 ***************************************
+/* eggtrayicon.c           serial-0085-0 ***************************************
  * Copyright (C) 2002 Anders Carlsson <andersca@gnu.org>
  *
  * Modified by James Scott, Jr <skoona@users.sourceforge.net>
@@ -24,13 +24,17 @@
 #include <string.h>
 #include <libintl.h>
 
-#include "eggtrayicon.h"
-
 #include <gdkconfig.h>
 
-#ifndef G_OS_WIN32
+#include <gdk/gdkx.h>
 #include <X11/Xatom.h>
+
+#if defined (GDK_WINDOWING_WIN32)
+#include <gdk/gdkwin32.h>
 #endif
+
+#include "eggtrayicon.h"
+
 
 #define _(x) x
 #define N_(x) x

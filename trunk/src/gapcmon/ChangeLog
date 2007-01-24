@@ -1,3 +1,12 @@
+gapcmon (0.8.5-0) stable; urgency=normal
+* Tue Jan 23 2007 James Scott, Jr. <skoona@users.sourceforge.net>
+- Removed gnomeVFS from package which released these defined
+  gapcmon.c:#ifndef HAVE_GNOMEVFS_SOCKET_SET_TIMEOUT
+  gapcmon.c:#ifdef GNOMEVFS_REQUIRES_CANCELLATION
+- Replace gnomeVFS with GIOChannel based socket programming
+  GIOChannels were already being used in other area in gapc
+  this make the prep for porting to w32 easier.
+
 gapcmon (0.8.4-0) stable; urgency=normal
 * Sat Dec 30 2006 James Scott, Jr. <skoona@users.sourceforge.net>
 - Added cb_util_manage_events() to control visibility.  This
