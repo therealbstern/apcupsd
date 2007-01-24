@@ -1,4 +1,4 @@
-/* gapcmon.c               serial-0084-0 *****************************************
+/* gapcmon.c               serial-0085-0 *****************************************
 
   GKT+ GUI with Notification Area (System Tray) support.  Program  for 
   monitoring the apcupsd.sourceforge.net package.
@@ -52,7 +52,7 @@
  * 			    Produces direct change on application state and
  * 			    operation by monitoring changes to config values
  * ------------------------ ---------------------------------------------------
- *     + GThread  	    Network Communication via socket io using GnomeVFS.
+ *     + GThread  	    Network Communication via socket io using GIOChannels
  * 			    Communication to interface gtkthread through
  *  			    a GAsyncQueue, with additional instance mutex
  *                          - protect hash table from multi-thread access
@@ -71,7 +71,18 @@
  * ************************************************************************** *
 */
 
+#include <unistd.h>             /* close() */
+#include <sys/types.h>          /* socket() */
+#include <sys/socket.h>         /* socket() */
+#include <arpa/inet.h>          /* ntohs() */
+#include <netdb.h>              /* gethostbyname() */
+#include <errno.h>
+#include <string.h>             /* memset() */
+#include <time.h>
+
+#include <gconf/gconf-client.h>
 #include <gtk/gtk.h>
+#include "eggtrayicon.h"
 #include "gapcmon.h"
 
 static gboolean cb_monitor_dedicated_one_time_refresh(PGAPC_MONITOR pm);
@@ -133,10 +144,10 @@ static gboolean lg_graph_button_press_event_cb (GtkWidget * widget, GdkEventButt
 static gboolean cb_util_barchart_handle_exposed(GtkWidget * widget,
    GdkEventExpose * event, gpointer data);
 static gboolean cb_util_line_chart_refresh(PGAPC_HISTORY pg);
+
 static gboolean cb_util_manage_iconify_event(GtkWidget *widget, 
                                              GdkEventWindowState *event,
                                              gpointer  gp);
-
 static void gapc_util_text_view_append(GtkWidget * view, gchar * pch);
 static void gapc_util_text_view_prepend(GtkWidget * view, gchar * pch);
 static gboolean gapc_util_text_view_clear_buffer(GtkWidget * view);
@@ -153,16 +164,6 @@ static void cb_panel_monitor_list_activated(GtkTreeView * treeview,
 static gint gapc_panel_glossary_page(PGAPC_CONFIG pcfg, GtkWidget * notebook);
 static gint gapc_panel_graph_property_page(PGAPC_CONFIG pcfg, GtkWidget * notebook);
 
-/* Synthesize a gnomevfs_socket_set_timeout, if needed */
-#ifndef HAVE_GNOMEVFS_SOCKET_SET_TIMEOUT
-static GnomeVFSResult gnome_vfs_socket_set_timeout(
-   GnomeVFSSocket *socket,
-   GTimeVal *timeout
-#ifdef GNOMEVFS_REQUIRES_CANCELLATION
-   , GnomeVFSCancellation *cancellation
-#endif
-   ){ return GNOME_VFS_OK; }
-#endif
 
 /* 
  * Some small number of globals are required
@@ -170,57 +171,7 @@ static GnomeVFSResult gnome_vfs_socket_set_timeout(
 static gboolean lg_graph_debug = FALSE;
 
 
-
 /* ************************************************************************* */
-/* "window-state-event"
- * iconify/minimize verus hide needs this routine to manage visibility 
-*/          
-static gboolean cb_util_manage_iconify_event(GtkWidget *widget, GdkEventWindowState *event,
-                                                gpointer  gp)
-{
-   g_return_val_if_fail(gp != NULL, FALSE);
-   
-   /* iconified */
-   if ( (event->type == GDK_WINDOW_STATE) && 
-        (event->changed_mask & GDK_WINDOW_STATE_ICONIFIED) &&
-        (event->new_window_state & GDK_WINDOW_STATE_ICONIFIED) ) {
-
-
-        if ( ((PGAPC_MONITOR)gp)->cb_id == CB_MONITOR_ID) {
-              if ( event->window == GTK_WIDGET(((PGAPC_MONITOR)gp)->window)->window ) {   
-                   ((PGAPC_MONITOR)gp)->b_visible = FALSE;
-              }
-        } else {
-              if ( event->window == GTK_WIDGET(((PGAPC_CONFIG)gp)->window)->window ) {   
-                 ((PGAPC_CONFIG)gp)->b_visible = FALSE;
-              }
-        }
-
-    return TRUE;
-   }
-
-   /* un - iconified */
-   if ( (event->type == GDK_WINDOW_STATE) && 
-        (event->changed_mask & GDK_WINDOW_STATE_ICONIFIED) &&
-        !(event->new_window_state & GDK_WINDOW_STATE_ICONIFIED) ) {
-
-
-        if ( ((PGAPC_MONITOR)gp)->cb_id == CB_MONITOR_ID) {
-              if ( event->window == GTK_WIDGET(((PGAPC_MONITOR)gp)->window)->window ) {   
-                   ((PGAPC_MONITOR)gp)->b_visible = TRUE;
-              }
-        } else {
-              if ( event->window == GTK_WIDGET(((PGAPC_CONFIG)gp)->window)->window ) {   
-                 ((PGAPC_CONFIG)gp)->b_visible = TRUE;
-              }
-        }
-
-    return TRUE;
-   }
-
-
-   return FALSE;
-}
 
 /*
  * Draws one data series points to chart
@@ -396,7 +347,7 @@ static gboolean lg_graph_data_series_add_value (PLGRAPH plg, gint i_series_numbe
     if (lg_graph_debug)
     {
         g_print
-         ("DataSeriesAddValue: series=%d, value=%3.1lf, index=%d, count=%d, time_count=%d, max_pts=%d\n",
+         ("DataSeriesAddValue: series=%d, value=%3.1f, index=%d, count=%d, time_count=%d, max_pts=%d\n",
           i_series_number, y_value, v_index, psd->i_point_count, time_count, psd->i_max_points);
     }
 
@@ -946,7 +897,7 @@ static gint lg_graph_draw_tooltip (PLGRAPH plg)
             {                   /* found */
                 g_snprintf (ch_work, sizeof (ch_work), "%s", ch_buffer);
                 g_snprintf (ch_buffer, sizeof (ch_buffer),
-                            "%s{%3.0lf%% <span foreground=\"%s\">%s</span>}",
+                            "%s{%3.0f%% <span foreground=\"%s\">%s</span>}",
                             ch_work,
                             psd->lg_point_dvalue[v_index],
                             psd->ch_legend_color, psd->ch_legend_text);
@@ -1081,9 +1032,12 @@ static gint lg_graph_draw_vertical_text (PLGRAPH plg,
 	GdkPixmap      *norm_pixmap = NULL;
     gint            width, height;
     gint            rot_width, rot_height;
+    GtkWidget      *widget;
     GdkPixbuf      *norm_pixbuf = NULL, *rot_pixbuf = NULL;
     guint32        *norm_pix, *rot_pix;
     gint            i, j, k, l;
+    gint            rows, cols;
+    guint32        *row, *col;
 
     g_return_val_if_fail (plg != NULL, -1);
     g_return_val_if_fail (pch_text != NULL, -1);
@@ -1594,7 +1548,6 @@ static void cb_panel_property_color_change (GtkColorButton *widget, gchar *color
 */
 static gint gapc_util_change_icons(PGAPC_MONITOR pm)
 {
-#ifndef G_OS_WIN32
    GdkPixbuf *pixbuf = NULL;
    GdkPixbuf *scaled = NULL;
    GtkOrientation orientation;
@@ -1627,7 +1580,7 @@ static gint gapc_util_change_icons(PGAPC_MONITOR pm)
       if (pm->window != NULL)
          gtk_window_set_icon(GTK_WINDOW(pm->window), pixbuf);
    }
-#endif
+
    return FALSE;
 }
 
@@ -1654,7 +1607,7 @@ static gboolean cb_util_line_chart_refresh_control(PGAPC_MONITOR pm)
       (GSourceFunc) cb_util_line_chart_refresh, &pm->phs);
 
    pch = g_strdup_printf(
-                 "<i>Data sampled every %3.1f seconds</i>", 
+                 "<i>sampled every %3.1f seconds</i>", 
                  pm->phs.d_xinc);
    lg_graph_set_x_label_text (pm->phs.plg, pch);
 
@@ -1665,7 +1618,7 @@ static gboolean cb_util_line_chart_refresh_control(PGAPC_MONITOR pm)
    if ((pm->tid_graph_refresh != 0) && (w != NULL)) {
       gtk_statusbar_pop(GTK_STATUSBAR(w), pm->i_info_context);
       pch1 = g_strdup_printf
-         ("Graphing refresh cycle changed for host %s completed!", pm->pch_host);
+         ("Graphing refresh cycle changed for host %s completed!...", pm->pch_host);
       gtk_statusbar_push(GTK_STATUSBAR(w), pm->i_info_context, pch1);
       g_free(pch1);
 
@@ -1699,7 +1652,7 @@ static gboolean cb_monitor_refresh_control(PGAPC_MONITOR pm)
 
    if ((pm->tid_automatic_refresh != 0) && (w != NULL)) {
       gtk_statusbar_pop(GTK_STATUSBAR(w), pm->i_info_context);
-      pch1 = g_strdup_printf("Refresh Cycle Change for host %s Completed!",
+      pch1 = g_strdup_printf("Refresh Cycle Change for host %s Completed!...",
          pm->pch_host);
       gtk_statusbar_push(GTK_STATUSBAR(w), pm->i_info_context, pch1);
       g_free(pch1);
@@ -1727,8 +1680,8 @@ static gboolean cb_monitor_dedicated_one_time_refresh(PGAPC_MONITOR pm)
       w = g_hash_table_lookup(pm->pht_Widgets, "StatusBar");
       if (w != NULL) {
          gtk_statusbar_pop(GTK_STATUSBAR(w), pm->i_info_context);
-         pch1 = g_strdup_printf("Quick refresh for %s failed."
-            " Network thread is busy.", pm->pch_host);
+         pch1 = g_strdup_printf("Quick refresh for %s failed!"
+            " Network thread is busy...", pm->pch_host);
          gtk_statusbar_push(GTK_STATUSBAR(w), pm->i_info_context, pch1);
          g_free(pch1);
       }
@@ -1746,8 +1699,8 @@ static gboolean cb_monitor_dedicated_one_time_refresh(PGAPC_MONITOR pm)
 
    if (!gapc_monitor_update(pm)) {
       if (w != NULL) {
-         pch1 = g_strdup_printf("Refresh for %s failed. "
-            "(retry enabled) network busy.", pm->pch_host);
+         pch1 = g_strdup_printf("Refresh for %s failed! "
+            "(retry enabled)... network busy!", pm->pch_host);
          gtk_statusbar_push(GTK_STATUSBAR(w), pm->i_info_context, pch1);
          g_free(pch1);
       }
@@ -1760,7 +1713,7 @@ static gboolean cb_monitor_dedicated_one_time_refresh(PGAPC_MONITOR pm)
    }
 
    if (w != NULL) {
-      pch1 = g_strdup_printf("One-Time Refresh for %s Completed.", pm->pch_host);
+      pch1 = g_strdup_printf("One-Time Refresh for %s Completed...", pm->pch_host);
       gtk_statusbar_push(GTK_STATUSBAR(w), pm->i_info_context, pch1);
       g_free(pch1);
    }
@@ -1794,8 +1747,8 @@ static gboolean cb_monitor_automatic_refresh(PGAPC_MONITOR pm)
       w = g_hash_table_lookup(pm->pht_Widgets, "StatusBar");
       if (w != NULL) {
          gtk_statusbar_pop(GTK_STATUSBAR(w), pm->i_info_context);
-         pch1 = g_strdup_printf("Automatic refresh for %s failed."
-            " Network thread is busy.", pm->pch_host);
+         pch1 = g_strdup_printf("Automatic refresh for %s failed!"
+            " Network thread is busy...", pm->pch_host);
          gtk_statusbar_push(GTK_STATUSBAR(w), pm->i_info_context, pch1);
          g_free(pch1);
       }
@@ -1813,14 +1766,14 @@ static gboolean cb_monitor_automatic_refresh(PGAPC_MONITOR pm)
    if (gapc_monitor_update(pm)) {
       if (w != NULL) {
          pch1 =
-            g_strdup_printf("Automatic refresh for %s complete.", pm->pch_host);
+            g_strdup_printf("Automatic refresh for %s complete...", pm->pch_host);
          gtk_statusbar_push(GTK_STATUSBAR(w), pm->i_info_context, pch1);
          g_free(pch1);
       }
    } else {
       if (w != NULL) {
-         pch1 = g_strdup_printf("Automatic refresh for %s failed."
-            " Network thread is busy.", pm->pch_host);
+         pch1 = g_strdup_printf("Automatic refresh for %s failed!"
+            " Network thread is busy...", pm->pch_host);
          gtk_statusbar_push(GTK_STATUSBAR(w), pm->i_info_context, pch1);
          g_free(pch1);
       }
@@ -2246,130 +2199,59 @@ static gint gapc_monitor_update(PGAPC_MONITOR pm)
 
    return TRUE;
 }
-
-/*
- *  capture the current network related error values
- *  setup a one-shot timer to handle output of message on
- *  the main thread (i.e. this is a background thread)
+/*  sknet_util_log_msg()
+ *  capture the current application related error values
+ *  output the composed str only if debug_flag is on
  */
-static void gapc_util_log_net_error(gchar * pch_func, gchar * pch_topic,
-   GnomeVFSResult result)
+static void sknet_util_log_msg (gchar * pch_func, gchar * pch_topic, gchar * pch_emsg)
 {
-   gchar *pch = NULL;
+  if (lg_graph_debug)
+  {
+    g_print ("%s(%s) msg=%s\n", pch_func, pch_topic, pch_emsg);
+  }
 
-   g_return_if_fail(pch_func != NULL);
-
-   pch = g_strdup_printf("%s(%s) emsg=%s", pch_func, pch_topic,
-      gnome_vfs_result_to_string(result));
-
-   g_message(pch);
-
-   g_free(pch);
-
-   return;
+  return;
 }
 
 /*
- * Read nbytes from the network. It is possible that the
- * total bytes requires several read requests.
- * returns -1 on error, or number of bytes read
+ * Write nbytes to the network.
+ * It may require several writes.
  */
-static gint gapc_net_read_nbytes(GnomeVFSSocket * psocket, gchar * ptr, gint nbytes)
+static gint sknet_net_write_nbytes (GIOChannel * ioc, gchar * ptr, gsize nbytes)
 {
-   GnomeVFSResult result = GNOME_VFS_OK;
-   GnomeVFSFileSize nread = 0, nleft = 0, nread_total = 0;
+  gssize nleft = 0;
+  gsize nwritten = 0;
+  GError *gerror = NULL;
+  GIOStatus iox = 0;
+  gint ecount = 0;
 
-   g_return_val_if_fail(ptr, -1);
+  nleft = nbytes;
+  while (nleft > 0)
+  {
+    if (++ecount > 3)
+    {
+      return -1;
+    }
+    
+    iox = g_io_channel_write_chars (ioc, ptr, nleft, &nwritten, &gerror);
+    if (gerror != NULL)
+    {
+      sknet_util_log_msg ("sknet_net_write_nbytes", "error", gerror->message);
+      g_error_free (gerror);
+      return -1;
+    }
 
-   nleft = nbytes;
+    if (iox == G_IO_STATUS_AGAIN)
+    {
+      sknet_util_log_msg ("sknet_net_write_nbytes", "status again", "failing");
+      g_usleep (1000000);
+    }
 
-   while (nleft > 0) {
-      result = gnome_vfs_socket_read(psocket, ptr, nleft,
-         &nread GNOMEVFS_CANCELLATION);
+    nleft -= nwritten;
+    ptr += nwritten;
+  }   /* end-while */
 
-      if (result != GNOME_VFS_OK) {
-         gapc_util_log_net_error("read_nbytes", "read from network failed", result);
-         return (-1);              /* error, or EOF */
-      }
-
-      nread_total += nread;
-      nleft -= nread;
-      ptr += nread;
-   }
-
-   return (nread_total);           /* return >= 0 */
-}
-
-/*
- * Write nbytes to the network.  It may require several writes.
- * returns -1 on error, or number of bytes written
- */
-static gint gapc_net_write_nbytes(GnomeVFSSocket * psocket, gchar * ptr, gint nbytes)
-{
-   GnomeVFSFileSize nwritten = 0, nwritten_total = 0;
-   GnomeVFSResult result = GNOME_VFS_OK;
-   gint nleft = 0;
-
-   g_return_val_if_fail(ptr, -1);
-
-   nleft = nbytes;
-   while (nleft > 0) {
-      result = gnome_vfs_socket_write(psocket, ptr, nleft,
-         &nwritten GNOMEVFS_CANCELLATION);
-
-      if (result != GNOME_VFS_OK) {
-         gapc_util_log_net_error("write_nbytes", "write to network failed", result);
-         return (-1);              /* error */
-      }
-
-      nwritten_total += nwritten;
-      nleft -= nwritten;
-      ptr += nwritten;
-   }
-
-   return (nwritten_total);
-}
-
-/*
- * Receive a message from the other end. Each message consists of
- * two packets. The first is a header that contains the size
- * of the data that follows in the second packet.
- * Returns number of bytes read
- * Returns 0 on end of file
- * Returns -1 on hard end of file (i.e. network connection close)
- * Returns -2 on error
- */
-static gint gapc_net_recv(GnomeVFSSocket * psocket, gchar * buff, gint maxlen)
-{
-   gint nbytes = 0;
-   gshort pktsiz = 0;
-
-   g_return_val_if_fail(buff, -1);
-
-   /* get data size -- in short */
-   nbytes = gapc_net_read_nbytes(psocket, (gchar *) & pktsiz, sizeof(gshort));
-   if (nbytes < 0)
-      return -1;                   /* assume hard EOF received */
-
-   if (nbytes != sizeof(gshort))
-      return -2;
-
-   pktsiz = g_ntohs(pktsiz);       /* decode no. of bytes that follow */
-   if (pktsiz > maxlen)
-      return -2;
-
-   if (pktsiz == 0)
-      return 0;                    /* soft EOF */
-
-   /* now read the actual data */
-   nbytes = gapc_net_read_nbytes(psocket, buff, pktsiz);
-   if (nbytes < 0)
-      return -2;
-
-   if (nbytes != pktsiz)
-      return -2;
-
-   return (nbytes);                /* return actual length of message */
+  return (nbytes - nleft);
 }
 
 /*
@@ -2379,62 +2261,313 @@ static gint gapc_net_recv(GnomeVFSSocket * psocket, gchar * buff, gint maxlen)
  * Returns number of bytes sent
  * Returns -1 on error
  */
-static gint gapc_net_send(GnomeVFSSocket * v_socket, gchar * buff, gint len)
+static gint sknet_net_send (GIOChannel * ioc, gchar * buff, gsize len)
 {
-   gint rc = 0;
-   gshort pktsiz = 0;
+  gint rc = 0;
+  gshort pktsiz = 0;
 
-   g_return_val_if_fail(buff, -1);
+  /* send short containing size of data packet */
+  pktsiz = g_htons ((gshort) len);
+  rc = sknet_net_write_nbytes (ioc, (gchar *) &pktsiz, sizeof (gshort));
+  if (rc != sizeof (gshort))
+  {
+    sknet_util_log_msg ("sknet_net_send", "send message size", "failed");
+    return -1;
+  }
 
-   /* send short containing size of data packet */
-   pktsiz = g_htons((gshort) len);
-   rc = gapc_net_write_nbytes(v_socket, (gchar *) & pktsiz, sizeof(gshort));
-   if (rc != sizeof(gshort))
-      return -1;
+  /* send data packet */
+  rc = sknet_net_write_nbytes (ioc, buff, len);
+  if (rc != len)
+  {
+    sknet_util_log_msg ("sknet_net_send", "send message buffer", "failed");
+    return -1;
+  }
 
-   /* send data packet */
-   rc = gapc_net_write_nbytes(v_socket, buff, len);
-   if (rc != len)
-      return -1;
-
-   return rc;
+  return rc;
 }
 
 /*
- * Open a TCP connection to the UPS network server or host:port
- * Returns -1 on error
- * Returns connection id value
+ * Read nbytes from the network.
+ * It is possible that the total bytes requires several 
+ * read requests, which will happen automatically.
+ * Returns: count of bytes read, or -1 for error
  */
-static GnomeVFSInetConnection *gapc_net_open(gchar * pch_host, gint i_port)
+static gint sknet_net_read_nbytes (GIOChannel * ioc, gchar * ptr, gsize nbytes)
 {
-   GnomeVFSResult result = GNOME_VFS_OK;
-   GnomeVFSInetConnection *connection = NULL;
+  gsize nleft = 0;
+  gsize nread = 0;
+  GError *gerror = NULL;
+  GIOStatus iox = 0;
+  gint ecount = 0;
 
-   g_return_val_if_fail(pch_host, NULL);
+  nleft = nbytes;
+  while (nleft > 0)
+  {
+    if (++ecount > 3)
+    {
+      return -1;
+    }
+    
+    iox = g_io_channel_read_chars (ioc, ptr, nleft, &nread, &gerror);
+    if (gerror != NULL)
+    {
+      sknet_util_log_msg ("sknet_net_read_nbytes", "read error", gerror->message);
+      g_error_free (gerror);
+      return -1;
+    }
+   
+    if (iox == G_IO_STATUS_EOF)
+    {
+        sknet_util_log_msg ("sknet_net_read_nbytes", "status eof", "EOF");
+        nleft -= nread;
+        break;
+    }
 
-   result = gnome_vfs_inet_connection_create(&connection, pch_host, i_port, NULL);
-   if (result != GNOME_VFS_OK) {
-      gapc_util_log_net_error("net_open", "create inet connection failed", result);
-      return NULL;
-   }
+    if (iox == G_IO_STATUS_AGAIN)
+    {
+      sknet_util_log_msg ("sknet_net_read_nbytes", "status again", "looping");
+      g_usleep (1000000);
+    }
 
-   return connection;
+    nleft -= nread;
+    ptr += nread;
+  }                             /* end-while */
+
+  return (nbytes - nleft);      /* return >= 0 */
 }
 
-/* Close the network connection */
-static void gapc_net_close(GnomeVFSInetConnection * connection,
-   GnomeVFSSocket * v_socket)
+/* 
+ * Receive a message from the other end. Each message consists of
+ * two packets. The first is a header that contains the size
+ * of the data that follows in the second packet.
+ * Returns number of bytes read
+ * Returns 0 on end of file
+ * Returns -1 on hard end of file (i.e. network connection close)
+ * Returns -2 on error
+ */
+static gint sknet_net_recv (GIOChannel * ioc, gchar * buff, gsize maxlen)
 {
-   gshort pktsiz = 0;
+  gint nbytes = 0;
+  gshort pktsiz = 0;
 
-   if (connection == NULL)
-      return;
+  /* get data size -- in short */
+  nbytes = sknet_net_read_nbytes (ioc, (gchar *) &pktsiz, sizeof (gshort));
+  if (nbytes <= 0)
+  {
+    sknet_util_log_msg ("sknet_net_recv", "read msg_len", "failed");
+    return -1;                  /* assume hard EOF received */
+  }
+  if (nbytes != sizeof (gshort))
+  {
+    sknet_util_log_msg ("sknet_net_recv", "read short_len", "failed");
+    return -2;
+  }
 
-   /* send EOF sentinel */
-   gapc_net_write_nbytes(v_socket, (gchar *) & pktsiz, sizeof(gshort));
-   gnome_vfs_inet_connection_destroy(connection, NULL);
+  pktsiz = g_ntohs (pktsiz);    /* decode no. of bytes that follow */
+  if (pktsiz > maxlen)
+  {
+    sknet_util_log_msg ("sknet_net_recv", "msg_len gt buffer", "overflow");
+    return -2;
+  }
 
-   return;
+  if (pktsiz == 0)
+  {
+    sknet_util_log_msg ("sknet_net_recv", "Soft error", "End-of-File");
+    return 0;                   /* soft EOF */
+  }
+
+  /* now read the actual data */
+  nbytes = sknet_net_read_nbytes (ioc, buff, pktsiz);
+  if (nbytes <= 0)
+  {
+    sknet_util_log_msg ("sknet_net_recv", "read message", "failed");
+    return -2;
+  }
+  if (nbytes != pktsiz)
+  {
+    sknet_util_log_msg ("sknet_net_recv", "read incomplete", "length error");
+    return -2;
+  }
+
+  return (nbytes);              /* return actual length of message */
+}
+
+/* sknet_net_close()
+ * Close the active or error'ed socket
+*/
+static void sknet_net_close (GIOChannel *ioc, gboolean b_flush)
+{
+  int sockfd;
+  GError *gerror = NULL;
+
+  sockfd = g_io_channel_unix_get_fd (ioc);
+  g_io_channel_shutdown (ioc, b_flush, &gerror);
+  if (gerror != NULL)
+  {
+    sknet_util_log_msg ("sknet_channel_close", "error", gerror->message);
+    g_error_free (gerror);
+  }
+  g_io_channel_unref (ioc);
+  close (sockfd);
+  
+  return;
+}
+
+/*     
+ * Open a TCP connection using GIOChannels to a host
+ * Returns NULL on error, with err text in ch_error_message
+ * Returns GIOChannel ptr otherwise
+ * Affects: -psk->gip, which is a sockaddr_in address of partner host
+ *          this value is allocated and retained for the life of this program
+ *          -psk->b_network_control, if true causes the addr to be resolved again
+ *          or if false, it uses the current value - saving a dns hit/query
+ */
+static GIOChannel *sknet_net_open (PSKCOMM psk)
+{
+  GIOChannel *ioc = NULL;
+  int sockfd;
+  struct sockaddr_in *tcp_serv_addr = NULL;
+  gint   nrc = 0; 
+
+  g_return_val_if_fail (psk != NULL, NULL);
+
+  /*
+   * Allocate a new address struct if it does not exist 
+  */
+  if (psk->gip == NULL) {
+      psk->b_network_control=TRUE;
+      psk->gip = g_new0( struct sockaddr_in , 1);
+      g_return_val_if_fail (psk->gip != NULL, NULL);
+      tcp_serv_addr = (struct sockaddr_in *)psk->gip;
+  } else {
+      tcp_serv_addr = (struct sockaddr_in *)psk->gip;
+  }
+  
+  /* 
+   * Fill in the structure serv_addr with the address of
+   * the server that we want to connect with.
+   */
+  if ( psk->b_network_control ) {   
+    memset ((char *)tcp_serv_addr, 0, sizeof (struct sockaddr_in));
+    tcp_serv_addr->sin_family = AF_INET;
+    tcp_serv_addr->sin_port = g_htons (psk->i_port);
+    
+    nrc = inet_aton (psk->ch_ip_string, (struct in_addr *)&tcp_serv_addr->sin_addr.s_addr);
+    if ( nrc == 0) /* inet_aton failed */
+    {
+        gchar buff[512];
+        gint  err = 0;
+        struct hostent he,*phe;
+        
+        nrc = gethostbyname_r (psk->ch_ip_string, &he, buff, sizeof(buff), &phe, &err); 
+        if (nrc != 0)
+        {
+            sknet_util_log_msg ("sknet_net_open", "gethostbyname() failed",
+                            (gchar *) g_strerror (err));
+            g_snprintf(psk->ch_error_msg, sizeof(psk->ch_error_msg),"%s",
+                      (gchar *) g_strerror(err));
+            psk->ioc = NULL;
+            return NULL;
+        }
+        if (he.h_length != sizeof (struct in_addr) || he.h_addrtype != AF_INET)
+        {
+            sknet_util_log_msg ("sknet_net_open", "struct hostent", "argument error");
+            g_snprintf(psk->ch_error_msg, sizeof(psk->ch_error_msg),"%s","argument error");
+            psk->ioc = NULL;
+            return NULL;
+        }
+
+        tcp_serv_addr->sin_addr.s_addr = *(unsigned int *) he.h_addr;
+    } /* end if inet_addr */
+    
+  } /* end if b_network */ 
+
+
+  /* Open a TCP socket */
+  if ((sockfd = socket (AF_INET, SOCK_STREAM, 0)) < 0)
+  {
+    sknet_util_log_msg ("sknet_net_open", "socket() api failed",
+                      (gchar *) g_strerror (errno));
+    g_snprintf(psk->ch_error_msg, sizeof(psk->ch_error_msg),"%s",
+              (gchar *) g_strerror (errno));
+    psk->ioc = NULL;
+    return NULL;
+  }
+
+  /* connect to server */
+  if ((connect (sockfd, (struct sockaddr *) tcp_serv_addr, sizeof (struct sockaddr_in))) == -1)
+  {
+    sknet_util_log_msg ("sknet_net_open", "connect() api failed",
+                      (gchar *) g_strerror (errno));
+    g_snprintf(psk->ch_error_msg, sizeof(psk->ch_error_msg),"%s",
+              (gchar *) g_strerror (errno));
+
+    close (sockfd);
+    psk->b_network_control = TRUE;
+    psk->ioc = NULL;
+    return NULL;
+  }
+  
+  psk->b_network_control = FALSE;
+  
+  ioc = g_io_channel_unix_new (sockfd);
+  g_io_channel_set_encoding (ioc, NULL, NULL);
+  g_io_channel_set_buffered (ioc, FALSE);
+  
+  psk->ioc = ioc;
+  return ioc;
+}
+
+/* sknet_net_client_init()
+ * Create a control structure and set ip values
+ * for an open call.
+ * return NULL on error.
+*/
+static PSKCOMM sknet_net_client_init (gchar *pch_remote_ip, gint i_remote_port)
+{
+   PSKCOMM psk = NULL;
+
+   psk = g_new0(SKNET_COMMS, 1);
+         g_return_val_if_fail(psk != NULL, NULL);
+         
+   psk->gp_reserved = NULL;
+   psk->cb_id = 0;        /* initialize count of instances created */       
+   g_snprintf( psk->ch_ip_string, sizeof(psk->ch_ip_string), "%s", pch_remote_ip);
+   psk->i_port = i_remote_port;
+   psk->b_network_control = TRUE;
+
+   g_snprintf (psk->ch_error_msg, sizeof (psk->ch_error_msg), 
+               "client init(client ready to connect to %s:%6d", 
+               psk->ch_ip_string, psk->i_port);
+   sknet_util_log_msg ("sknet_net_client_init", psk->ch_error_msg, "Ready");
+    
+   return psk;
+}
+
+/*
+ * Close server socket if open and release internal storage
+*/
+static void sknet_net_shutdown (PSKCOMM psk)
+{
+
+    g_return_if_fail (psk != NULL);
+
+    if (psk->gp_reserved != NULL) {
+        ((PSKCOMM)psk->gp_reserved)->cb_id--;    /* decrement count of instances created */
+    } else {                                     /* or close main socket */
+            if (psk->fd_server) 
+            {
+                close (psk->fd_server);
+            }
+    }
+
+    if (psk->gip != NULL) {
+        g_free(psk->gip);
+    }
+    
+    g_free(psk);
+    
+    return;
 }
 
 /*
@@ -2443,40 +2576,24 @@ static void gapc_net_close(GnomeVFSInetConnection * connection,
  * also, refreshes status key/value pairs in hastable.
  * return error = 0,  or number of lines read from network
  */
-static gint gapc_net_transaction_service(PGAPC_MONITOR pm, gchar * cp_cmd,
-   gchar ** pch)
+static gint gapc_net_transaction_service(PGAPC_MONITOR pm, gchar * cp_cmd, gchar ** pch)
 {
-   gint n = 0, iflag = 0, i_port = 0;
-   gchar recvline[GAPC_MAX_TEXT];
-   GnomeVFSInetConnection *v_connection = NULL;
-   GnomeVFSSocket *v_socket = NULL;
-   GTimeVal timeout;
-
+   gint n = 0, iflag = 0;
+   GIOChannel   *ioc = NULL;
+   
    g_return_val_if_fail(pm, -1);
+   g_return_val_if_fail(pm->psk, -1);   
    g_return_val_if_fail(pm->pch_host, -1);
 
-   i_port = pm->i_port;
 
-   v_connection = gapc_net_open(pm->pch_host, i_port);
-   if (v_connection == NULL) {
+   ioc = sknet_net_open(pm->psk);
+   if (ioc == NULL) {
       return 0;
    }
 
-   v_socket = gnome_vfs_inet_connection_to_socket(v_connection);
-   if (v_socket == NULL) {
-      gapc_util_log_net_error("transaction_service",
-         "connect to socket for io failed", GNOME_VFS_OK);
-      gnome_vfs_inet_connection_destroy(v_connection, NULL);
-      return 0;
-   }
-
-   timeout.tv_sec = (guint) pm->d_refresh;
-   timeout.tv_usec = 0;
-   gnome_vfs_socket_set_timeout(v_socket, &timeout GNOMEVFS_CANCELLATION);
-
-   n = gapc_net_send(v_socket, cp_cmd, g_utf8_strlen(cp_cmd, -1));
+   n = sknet_net_send( ioc, cp_cmd, g_utf8_strlen(cp_cmd, -1));
    if (n < 0) {
-      gapc_net_close(v_connection, v_socket);
+      sknet_net_close( ioc, FALSE);
       return 0;
    }
 
@@ -2490,18 +2607,18 @@ static gint gapc_net_transaction_service(PGAPC_MONITOR pm, gchar * cp_cmd,
 
    iflag = 0;
    while (iflag < GAPC_MAX_ARRAY) {
-      n = gapc_net_recv(v_socket, recvline, sizeof(recvline));
+      n = sknet_net_recv(ioc, pm->psk->ch_session_message, sizeof(pm->psk->ch_session_message));
       if (n < 1)
          break;
 
-      recvline[n] = 0;
-      pch[iflag++] = g_strdup(recvline);
+      pm->psk->ch_session_message[n] = 0;
+      pch[iflag++] = g_strdup(pm->psk->ch_session_message);
 
       if (g_str_equal(cp_cmd, "status") && iflag > 1)
-         gapc_util_update_hashtable(pm, recvline);
+         gapc_util_update_hashtable(pm, pm->psk->ch_session_message);
    }
 
-   gapc_net_close(v_connection, v_socket);
+   sknet_net_close(ioc, FALSE);
 
    return iflag;                   /* count of records received */
 }
@@ -2512,13 +2629,19 @@ static gint gapc_net_transaction_service(PGAPC_MONITOR pm, gchar * cp_cmd,
 static gpointer *gapc_net_thread_qwork(PGAPC_MONITOR pm)
 {
    gint rc = 0;
+   GAsyncQueue *thread_queue = NULL;
 
    g_return_val_if_fail(pm != NULL, NULL);
    g_return_val_if_fail(pm->q_network != NULL, NULL);
 
-   g_async_queue_ref(pm->q_network);
+   thread_queue = g_async_queue_ref(pm->q_network);
 
-   while ((pm = (PGAPC_MONITOR) g_async_queue_pop(pm->q_network))) {
+   if (pm->psk == NULL) {
+       pm->psk = sknet_net_client_init (pm->pch_host, pm->i_port);
+       g_return_val_if_fail(pm->psk != NULL, NULL);
+   }
+
+   while ((pm = (PGAPC_MONITOR) g_async_queue_pop(thread_queue))) {
       if (pm->b_thread_stop) {
          break;
       }
@@ -2529,6 +2652,7 @@ static gpointer *gapc_net_thread_qwork(PGAPC_MONITOR pm)
             g_mutex_unlock(pm->gm_update);
             continue;
          }
+
          if ((rc = gapc_net_transaction_service(pm, "status", pm->pach_status))) {
             gapc_net_transaction_service(pm, "events", pm->pach_events);
          }
@@ -2544,7 +2668,12 @@ static gpointer *gapc_net_thread_qwork(PGAPC_MONITOR pm)
       }
    }                               /* end-while */
 
-   g_async_queue_unref(pm->q_network);
+   if (pm->psk != NULL) {
+       sknet_net_shutdown (pm->psk);
+       pm->psk = NULL;
+   }
+   
+   g_async_queue_unref(thread_queue);
 
    g_thread_exit(GINT_TO_POINTER(1));
 
@@ -3143,7 +3272,6 @@ static void cb_panel_systray_icon_destroy(GtkObject * object, gpointer gp)
 
 static gboolean gapc_panel_systray_icon_create(gpointer gp)
 {
-#ifndef G_OS_WIN32
    PGAPC_CONFIG pcfg = NULL;
    PGAPC_MONITOR pm = NULL;
 
@@ -3206,7 +3334,7 @@ static gboolean gapc_panel_systray_icon_create(gpointer gp)
    if (tooltips != NULL) {
       gtk_tooltips_set_tip(tooltips, GTK_WIDGET(*tray_icon), pch_title, NULL);
    }
-#endif
+
    return TRUE;
 }
 
@@ -3738,11 +3866,11 @@ static GtkWidget *gapc_panel_preferences_model_init(PGAPC_CONFIG pcfg)
       "active", GAPC_PREFS_ENABLED, NULL);
    gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
 
-   column = gtk_tree_view_column_new_with_attributes("Use Tray\n   Icon",
+   column = gtk_tree_view_column_new_with_attributes("use\nTrayIcon",
       renderer_systray, "active", GAPC_PREFS_SYSTRAY, NULL);
    gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
 
-   column = gtk_tree_view_column_new_with_attributes("Network\nRefresh",
+   column = gtk_tree_view_column_new_with_attributes("network\nRefresh",
       renderer_refresh, "text", GAPC_PREFS_REFRESH, NULL);
    g_object_set_data(G_OBJECT(column), "float_format", "%3.1f");
    gtk_tree_view_column_set_cell_data_func(column, renderer_refresh,
@@ -3754,7 +3882,7 @@ static GtkWidget *gapc_panel_preferences_model_init(PGAPC_CONFIG pcfg)
       GAPC_PREFS_PORT, NULL);
    gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
 
-   column = gtk_tree_view_column_new_with_attributes("Graph\nRefresh",
+   column = gtk_tree_view_column_new_with_attributes("graph\nRefresh",
       renderer_graph, "text", GAPC_PREFS_GRAPH, NULL);
    g_object_set_data(G_OBJECT(column), "float_format", "%3.0f");
    gtk_tree_view_column_set_cell_data_func(column, renderer_graph,
@@ -4025,7 +4153,7 @@ static gint gapc_panel_monitor_list_page(PGAPC_CONFIG pcfg, GtkNotebook * notebo
    gtk_widget_show(frame);
 
    label = gtk_label_new("<span foreground=\"blue\">"
-      "<i>double-click a row to popup information window</i>" "</span>");
+      "<i>double-click a row to popup information window.</i>" "</span>");
    gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_CENTER);
 
@@ -4093,7 +4221,7 @@ static gint gapc_panel_preferences_page(PGAPC_CONFIG pcfg, GtkNotebook * noteboo
    gtk_widget_show(frame);
 
    label = gtk_label_new("<span foreground=\"blue\">"
-      "<i>double-click a column's value to change it</i>" "</span>");
+      "<i>double-click a columns value to change it.</i>" "</span>");
    gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_CENTER);
 
@@ -4317,6 +4445,56 @@ static void cb_main_interface_hide(GtkWidget * widget, PGAPC_CONFIG pcfg)
    pcfg->b_visible = FALSE;
 }
 
+/* "window-state-event"
+ * iconify/minimize verus hide needs this routine to manage visibility 
+*/          
+static gboolean cb_util_manage_iconify_event(GtkWidget *widget, GdkEventWindowState *event,
+                                                gpointer  gp)
+{
+   g_return_val_if_fail(gp != NULL, FALSE);
+   
+   /* iconified */
+   if ( (event->type == GDK_WINDOW_STATE) && 
+        (event->changed_mask & GDK_WINDOW_STATE_ICONIFIED) &&
+        (event->new_window_state & GDK_WINDOW_STATE_ICONIFIED) ) {
+
+
+        if ( ((PGAPC_MONITOR)gp)->cb_id == CB_MONITOR_ID) {
+              if ( event->window == GTK_WIDGET(((PGAPC_MONITOR)gp)->window)->window ) {   
+                   ((PGAPC_MONITOR)gp)->b_visible = FALSE;
+              }
+        } else {
+              if ( event->window == GTK_WIDGET(((PGAPC_CONFIG)gp)->window)->window ) {   
+                 ((PGAPC_CONFIG)gp)->b_visible = FALSE;
+              }
+        }
+
+    return TRUE;
+   }
+
+   /* un - iconified */
+   if ( (event->type == GDK_WINDOW_STATE) && 
+        (event->changed_mask & GDK_WINDOW_STATE_ICONIFIED) &&
+        !(event->new_window_state & GDK_WINDOW_STATE_ICONIFIED) ) {
+
+
+        if ( ((PGAPC_MONITOR)gp)->cb_id == CB_MONITOR_ID) {
+              if ( event->window == GTK_WIDGET(((PGAPC_MONITOR)gp)->window)->window ) {   
+                   ((PGAPC_MONITOR)gp)->b_visible = TRUE;
+              }
+        } else {
+              if ( event->window == GTK_WIDGET(((PGAPC_CONFIG)gp)->window)->window ) {   
+                 ((PGAPC_CONFIG)gp)->b_visible = TRUE;
+              }
+        }
+
+    return TRUE;
+   }
+
+
+   return FALSE;
+}
+                                                                                  
 static gboolean cb_main_interface_delete_event(GtkWidget * widget, GdkEvent * event,
    PGAPC_CONFIG pcfg)
 {
@@ -4605,6 +4783,10 @@ static void cb_panel_preferences_gconf_changed(GConfClient * client, guint cnxn_
          if ((b_m_enabled) && (b_active_valid)) {
             pm->i_port = i_value;
             pm->b_network_control = TRUE;
+            if (pm->psk != NULL) {
+                pm->psk->i_port = i_value;
+                pm->psk->b_network_control = TRUE;
+            }
          }
       }
       if (g_str_equal(pkey, "network_interval")) {
@@ -4646,6 +4828,10 @@ static void cb_panel_preferences_gconf_changed(GConfClient * client, guint cnxn_
             }
             pm->pch_host = g_strdup(s_value);
             pm->b_network_control = TRUE;
+            if (pm->psk != NULL) {
+                g_snprintf(pm->psk->ch_ip_string, sizeof(pm->psk->ch_ip_string), "%s", s_value);
+                pm->psk->b_network_control = TRUE;
+            }
          }
          if (b_flag_dupped) {
             g_free(s_value);
@@ -4913,7 +5099,7 @@ static void cb_monitor_interface_destroy(GtkWidget * widget, PGAPC_MONITOR pm)
       
       gtk_statusbar_pop(GTK_STATUSBAR(sbar), pcfg->i_info_context);
       pch = g_strdup_printf
-         ("Monitor for %s destroyed.", pm->pch_host );
+         ("Monitor for %s Destroyed!...", pm->pch_host );
       gtk_statusbar_push(GTK_STATUSBAR(sbar), pcfg->i_info_context, pch);
       g_free(pch);
    }
@@ -5113,7 +5299,7 @@ static GtkWidget *gapc_main_interface_create(PGAPC_CONFIG pcfg)
 
    /* quit Control button */
    button = gtk_button_new_from_stock(GTK_STOCK_CLOSE);
-   g_signal_connect_swapped(button, "clicked", G_CALLBACK(gtk_window_iconify), window);
+   g_signal_connect_swapped(button, "clicked", G_CALLBACK(gtk_window_iconify), window);  
    gtk_box_pack_end(GTK_BOX(box), button, TRUE, TRUE, 0);
    gtk_widget_show(button);
 
@@ -5145,6 +5331,8 @@ static GtkWidget *gapc_main_interface_create(PGAPC_CONFIG pcfg)
    gtk_menu_shell_append(GTK_MENU_SHELL(menu), menu_item);
    gtk_widget_show(menu_item);
    gtk_widget_show(menu);
+
+   gtk_widget_show_all(lbox);
 
    return GTK_WIDGET(window);
 }
@@ -5205,7 +5393,7 @@ static gint gapc_monitor_history_page(PGAPC_MONITOR pm, GtkWidget * notebook)
        }
 
        pch = g_strdup_printf(
-                 "<i>Data sampled every %3.1f seconds</i>", 
+                 "<i>sampled every %3.1f seconds</i>", 
                  pm->phs.d_xinc);
        lg_graph_set_x_label_text (plg, pch);
        g_free(pch);
@@ -5305,7 +5493,7 @@ static PLGRAPH lg_graph_create (GtkWidget * box, gint width, gint height)
      * These must be set before the first drawing_area configure event 
      */
     lg_graph_set_chart_title  (plg, "Waiting for Update");
-    lg_graph_set_y_label_text (plg, "<i>Percentage of normal</i>");
+    lg_graph_set_y_label_text (plg, "Precentage of 100% normal");
     lg_graph_set_x_label_text (plg, "Waiting for Update");
 
     g_snprintf (plg->ch_tooltip_text, sizeof (plg->ch_tooltip_text), "%s",
@@ -6013,7 +6201,7 @@ static GtkWidget *gapc_monitor_interface_create(PGAPC_CONFIG pcfg, gint i_monito
       
       gtk_statusbar_pop(GTK_STATUSBAR(sbar), pcfg->i_info_context);
       pch = g_strdup_printf
-         ("Monitor for %s created.", pm->pch_host);
+         ("Monitor for %s Created!...", pm->pch_host);
       gtk_statusbar_push(GTK_STATUSBAR(sbar), pcfg->i_info_context, pch);
       g_free(pch);
    }
@@ -6072,11 +6260,10 @@ extern int main(int argc, char *argv[])
    GtkWidget *window = NULL;
 
    /*
-    * Initialize GLib thread support, GnomeVFS, and GTK
+    * Initialize GLib thread support, and GTK
     */
    g_type_init();
    g_thread_init(NULL);
-   gnome_vfs_init();
 
    gdk_threads_init();
 
@@ -6088,7 +6275,6 @@ extern int main(int argc, char *argv[])
    /*
     * Get the instance number for this execution */
    if (gapc_main_interface_parse_args(argc, argv, pcfg)) {
-      gnome_vfs_shutdown();
       return 1;                    /* exit if user only wanted help */
    }
 
@@ -6106,7 +6292,6 @@ extern int main(int argc, char *argv[])
        gtk_window_present(GTK_WINDOW(pcfg->window));       
    }
    
-
    gapc_panel_gconf_watch(pcfg);
 
    /*
@@ -6116,8 +6301,6 @@ extern int main(int argc, char *argv[])
    gtk_main();
    gdk_flush();
    gdk_threads_leave();
-
-   gnome_vfs_shutdown();
 
    return (0);
 }

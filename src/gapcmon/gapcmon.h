@@ -1,4 +1,4 @@
-/* gapcmon.h               serial-0082-0 ************************************
+/* gapcmon.h               serial-0085-0 ************************************
 
   GKT+ GUI with Notification Area (System Tray) support.  Program  for 
   monitoring the apcupsd.sourceforge.net package.
@@ -19,23 +19,21 @@
   Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.
 */
 
+
+
+
 #ifndef GAPC_H_
 #define GAPC_H_
 
-#include <gconf/gconf-client.h>
-#include <libgnomevfs/gnome-vfs.h>
-#include <libgnomevfs/gnome-vfs-inet-connection.h>
-#include <time.h>
-#include "eggtrayicon.h"
-
 G_BEGIN_DECLS
+
 #ifndef VERSION
 #define GAPC_VERSION "0.6.4-0"
 #else
 #define GAPC_VERSION VERSION
 #endif
 #define GAPC_PROG_NAME    "gapcmon"
-#define GAPC_GROUP_TITLE "<i>  Uninterruptible Power Supply Monitor</i>\n  for APCUPSD"
+#define GAPC_GROUP_TITLE "<i>  Uninterruptible Power Supply Monitor...</i>\n  for APCUPSD"
 #define GAPC_WINDOW_TITLE  "gapcmon: UPS Information Panels"
 #define GAPC_CP_GROUP_KEY    "/apps/gapcmon/controller"
 #define GAPC_CP_SYSTRAY_KEY  "/apps/gapcmon/controller/use_systray"
@@ -74,11 +72,26 @@ G_BEGIN_DECLS
 #define GAPC_LINEGRAPH_MAX_SERIES 5
 #define GAPC_LINEGRAPH_REFRESH_FACTOR 30.0      /* Num refreshes per collection  */
 
-#ifdef GNOMEVFS_REQUIRES_CANCELLATION
-# define GNOMEVFS_CANCELLATION ,NULL
-#else
-# define GNOMEVFS_CANCELLATION
-#endif
+#define SKNET_HUGE_ARRAY 4096
+#define SKNET_REG_ARRAY  1024
+#define SKNET_STR_ARRAY   256
+
+typedef struct _SKNET_Control_Data {
+  gint        cb_id;           
+  GIOChannel *ioc;                                 /* socket io channel */
+  gint        fd_server;                           /* our local server-socket */
+  gint        i_port;                              /* dest host port */   
+  gboolean    b_network_control;                   /* TRUE signals resolve address needed */
+  gchar       ch_ip_string[SKNET_STR_ARRAY];       /* dest host ip addr or dns name */
+  gchar       ch_ip_client[SKNET_STR_ARRAY];       /* incoming host ip addr or dns name */  
+  gchar       ch_ip_client_port[SKNET_STR_ARRAY];  /* incoming host ip port */  
+  gchar       ch_session_message[SKNET_HUGE_ARRAY];
+  gchar       ch_error_msg[SKNET_REG_ARRAY];
+  gpointer    gip;                                 /* struct sockaddr_in -- resolved tcp-ip address */
+  gpointer    gp_reserved;                         /*  reserved private pointer for me */  
+  gpointer    gp_user_data;                        /*  private pointer for YOU or user */
+  gint        i_byte_counter;                      /* public byte counter */  
+} SKNET_COMMS, *PSKCOMM;
 
 typedef enum _Control_Block_id {
     CB_SERIES_ID,
@@ -88,7 +101,8 @@ typedef enum _Control_Block_id {
     CB_MONITOR_ID,    
     CB_CONTROL_ID,    
     CB_COLUMN_ID,   
-    CB_SUMM_ID, 
+    CB_SUMM_ID,
+    CB_PSKCOMM_ID,      
     CB_N_ID
 } GAPCDataID;
 
@@ -323,7 +337,7 @@ typedef struct _Monitor_Instance_Data {
    gpointer *gp;                   /* assumed to point to pcfg */
    GtkTreeModel *monitor_model;    /* GtkListStore */
    GAPC_HISTORY phs;               /* structure for history notebook page */
-
+   PSKCOMM      psk;               /* communication structure */
 } GAPC_MONITOR, *PGAPC_MONITOR;
 
 /* * Control structure for root panel object -- this is the anchor */

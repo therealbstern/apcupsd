@@ -1,5 +1,5 @@
 
-/* eggtrayicon.h           serial-0082-0 ***************************************
+/* eggtrayicon.h           serial-0085-0 ***************************************
  * Copyright (C) 2002 Anders Carlsson <andersca@gnu.org>
  *
  * Modified by James Scott, Jr <skoona@users.sourceforge.net>
@@ -25,12 +25,10 @@
 #define __EGG_TRAY_ICON_H__
 
 #include <gtk/gtkplug.h>
-
+#include <gdk/gdkx.h>
 #ifdef G_OS_WIN32
 #include <gdk/gdkwin32.h>
-#else                             /* WINDOWS */
-#include <gdk/gdkx.h>
-#endif
+#endif                             /* WINDOWS */
 
 G_BEGIN_DECLS
 #define EGG_TYPE_TRAY_ICON (egg_tray_icon_get_type ())
