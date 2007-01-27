@@ -132,7 +132,7 @@ BuildRequires: latex2html
 %endif
 %if %{gapcmon}
 BuildRequires: glibc-devel, gtk2-devel >= 2.4, glib2-devel, atk-devel
-BuildRequires: ORBit2, pango-devel
+BuildRequires: ORBit2, pango-devel, pkgconfig
 %endif
 %if %{suse} && %{gapcmon}
 BuildRequires: bonobo-activation, freetype2-devel, cairo-devel, fontconfig-devel
