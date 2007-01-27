@@ -1032,12 +1032,9 @@ static gint lg_graph_draw_vertical_text (PLGRAPH plg,
 	GdkPixmap      *norm_pixmap = NULL;
     gint            width, height;
     gint            rot_width, rot_height;
-    GtkWidget      *widget;
     GdkPixbuf      *norm_pixbuf = NULL, *rot_pixbuf = NULL;
     guint32        *norm_pix, *rot_pix;
     gint            i, j, k, l;
-    gint            rows, cols;
-    guint32        *row, *col;
 
     g_return_val_if_fail (plg != NULL, -1);
     g_return_val_if_fail (pch_text != NULL, -1);
