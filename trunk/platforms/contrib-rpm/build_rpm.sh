@@ -69,10 +69,12 @@ sleep 2
 if [ "$GAPCMON" = "1" ]; then
 	rpmbuild --rebuild --define "build_${PLATFORM} 1" \
 	--define "contrib_packager ${PACKAGER}" \
+	--define "build_snmp 1" \
 	--define "build_gapcmon 1" ${SRPM}
 fi
 if [ "$GAPCMON" = "0" ]; then
 	rpmbuild --rebuild --define "build_${PLATFORM} 1" \
+	--define "build_snmp 1" \
 	--define "contrib_packager ${PACKAGER}" ${SRPM}
 fi
 
@@ -104,5 +106,7 @@ ls
 
 # changelog
 # 19 Aug 2006 initial release
+# 21 Jan 2007 add new gapcmon build switch
+# 27 Jan 2007 add new snmp build switch
 
 

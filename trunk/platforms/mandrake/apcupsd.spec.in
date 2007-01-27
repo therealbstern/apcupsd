@@ -85,6 +85,10 @@
 %define gapcmon 0
 %{?build_gapcmon:%define gapcmon 1}
 
+# should we build net-snmp driver
+%define snmp 0
+%{?build_snmp:%define snmp 1}
+
 Summary:      APC UPS Power Control Daemon for Linux
 Name:         apcupsd
 Version:      %{_version}
@@ -139,6 +143,22 @@ BuildRequires: libbonobo2_0-devel, libbonoboui2_0-devel, freetype2-devel, libGCo
 %if %{rhel4} && %{gapcmon}
 BuildRequires: libbonobo-devel, libbonoboui-devel, freetype-devel, GConf2-devel
 %endif
+%if %{snmp}
+BuildRequires: net-snmp-devel
+%endif
+
+Provides: apcupsd
+Obsoletes: apcupsd-std apcupsd-usb
+
+Requires: perl, ncurses
+%if %{rh7}
+Requires: glibc >= 2.2
+%else
+Requires: glibc >= 2.3
+%endif
+%if %{snmp}
+Requires: net-snmp
+%endif
 
 %description
 Apcupsd can be used for controlling most APC UPSes. During a
@@ -153,16 +173,6 @@ Some features depend on what UPS model you have (simple or smart).
 This package is configured for USB but can be reconfigured for
 standard serial port UPS models. See the manual.
 
-Provides: apcupsd
-Obsoletes: apcupsd-std apcupsd-usb
-
-Requires: perl, ncurses
-%if %{rh7}
-Requires: glibc >= 2.2, libjpeg, libpng, zlib, freetype
-%else
-Requires: glibc >= 2.3
-%endif
-
 %package multimon
 Summary:      APC UPS Power Control Daemon for Linux
 Group:        Applications/Internet
@@ -174,7 +184,7 @@ Requires: gd >= 2.0
 Requires: gd < 2.0
 %endif
 %if %{rh7}
-Requires: glibc >= 2.2
+Requires: glibc >= 2.2, libjpeg, libpng, zlib, freetype
 %else
 Requires: glibc >= 2.3
 %endif
@@ -229,6 +239,9 @@ A Gnome application to monitor the status of your UPS.
 	--enable-powerflute \
 	%if %{gapcmon}
 	--enable-gapcmon \
+	%endif
+	%if %{snmp}
+	--enable-net-snmp \
 	%endif
         --with-serial-dev= \
         --with-upstype=usb \
@@ -398,6 +411,9 @@ if [ $1 = 0 ] ; then
 fi
 
 %changelog
+* Sat Jan 27 2007 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- add snmp build
+- fix location of Requires for base package
 * Sun Jan 21 2007 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - correct gapcmon dependancies
 * Sat Jan 20 2007 D. Scott Barninger <barninger at fairfieldcomputers.com>

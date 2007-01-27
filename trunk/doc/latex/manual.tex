@@ -8557,7 +8557,7 @@ Alternately you may pass the define on the command line when calling rpmbuild:
 \item [{\bf How do I control whether usb support gets built?}]
    \index{How do I control whether usb support gets built? }
    Up through version 3.12, by default standard serial port support 
-was be built and the apcupsd-std package was produced.  The usb 
+was built and the apcupsd-std package was produced.  The usb 
 package pre-configured the configuration files for usb devices and 
 installed a couple additional tools in /etc/apcupsd but the usb 
 driver was built regardless.  To get the usb package and support 
@@ -8608,7 +8608,7 @@ is no longer recognized.
 
 \item [{\bf What other defines are used?}]
    \index{What other defines are used? }
-   One other define is for the initdir for the daemon control script. On
+   There is a define for the initdir for the daemon control script. On
 RedHat or Mandrake systems this is set to /etc/rc.d/init.d/. On SuSE systems this is 
 set to /etc/rc.d.  You would only need to edit this if packaging for a platform that 
 uses a different directory.
@@ -8623,6 +8623,16 @@ If you want to build the apcupsd-gapcmon package add:
      
 \end{verbatim}
 \normalsize
+
+   A third define controls whether the SNMP driver is built. If you want to build the net-snmp driver add:
+
+\footnotesize
+\begin{verbatim}
+              --define "build_snmp 1"
+     
+\end{verbatim}
+\normalsize
+
 
 \item [{\bf Can I supply packages for other platforms you do not publish?}]
    \index{Can I supply packages for other platforms you do not publish? }
