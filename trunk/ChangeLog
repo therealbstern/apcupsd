@@ -8,6 +8,19 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2007-01-27 17:27  adk0212
+
+	* ChangeLog, include/version.h:
+
+	Further updates for 3.13.12.
+
+2007-01-27 17:26  fleetworks
+
+	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
+	suse/apcupsd.spec.in:
+
+	Add pkgconfig to BuildRequires for gapcmon.
+
 2007-01-27 17:23  adk0212
 
 	* src/gapcmon/gapcmon.c:
