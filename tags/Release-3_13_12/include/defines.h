@@ -1,0 +1,436 @@
+/*
+ * defines.h
+ *
+ * Public definitions used throughout apcupsd
+ */
+
+/*
+ * Copyright (C) 1999-2005 Kern Sibbald
+ * Copyright (C) 1996-1999 Andre M. Hedrick <andre@suse.com>
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of version 2 of the GNU General
+ * Public License as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the Free
+ * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+ * MA 02111-1307, USA.
+ */
+
+#ifndef _DEFINES_H
+#define _DEFINES_H
+
+#ifndef APCCONTROL_FILE
+# define APCCONTROL_FILE        "/apccontrol"
+#endif
+
+#ifndef APCCONF_FILE
+# define APCCONF_FILE           "/apcupsd.conf"
+#endif
+
+#ifndef PWRFAIL_FILE
+# define PWRFAIL_FILE           "/powerfail"
+#endif
+
+#ifndef NOLOGIN_FILE
+# define NOLOGIN_FILE            "/nologin"
+#endif
+
+#define APCPID                  PIDDIR "/apcupsd.pid"
+
+/*
+ * These two are not to be touched: we can not be sure how the user will
+ * insert the locks directory path so we have to prepend the '/' just to be
+ * sure: is better have /blah//LCK.. than /blahLCK..
+ */
+#define APC_LOCK_PREFIX         "/LCK.."
+#define LOCK_DEFAULT            "/var/lock"
+
+/*
+ * This string should be the first line of the configuration file.
+ * Then if we change the format later, we can just change this string.
+ * Also, we could write code to use/convert out-of-date config files.
+ */
+#define APC_CONFIG_MAGIC        "## apcupsd.conf v1.1 ##"
+
+#define POWERFAIL               "POWER FAILURE\n"       /* put in nologin file */
+
+#define MAXSTRING               256
+#define MESSAGELEN              256
+#define MAXTOKENLEN             100
+#define UPSNAMELEN              100
+
+#define DEFAULT_SPEED           B2400
+
+
+/* bit values for APC UPS Status Byte (ups->Status) */
+#define UPS_calibration   0x00000001
+#define UPS_trim          0x00000002
+#define UPS_boost         0x00000004
+#define UPS_online        0x00000008
+#define UPS_onbatt        0x00000010
+#define UPS_overload      0x00000020
+#define UPS_battlow       0x00000040
+#define UPS_replacebatt   0x00000080
+
+/* Extended bit values added by apcupsd */
+#define UPS_commlost      0x00000100    /* Communications with UPS lost */
+#define UPS_shutdown      0x00000200    /* Shutdown in progress */
+#define UPS_slave         0x00000400    /* Set if this is a slave */
+#define UPS_slavedown     0x00000800    /* Slave not responding */
+#define UPS_onbatt_msg    0x00020000    /* Set when UPS_ONBATT message is sent */
+#define UPS_fastpoll      0x00040000    /* Set on power failure to poll faster */
+#define UPS_shut_load     0x00080000    /* Set when BatLoad <= percent */
+#define UPS_shut_btime    0x00100000    /* Set when time on batts > maxtime */
+#define UPS_shut_ltime    0x00200000    /* Set when TimeLeft <= runtime */
+#define UPS_shut_emerg    0x00400000    /* Set when battery power has failed */
+#define UPS_shut_remote   0x00800000    /* Set when remote shutdown */
+#define UPS_plugged       0x01000000    /* Set if computer is plugged into UPS */
+#define UPS_dev_setup     0x02000000    /* Set if UPS's driver did the setup() */
+#define UPS_battpresent   0x04000000    /* Indicates if battery is connected */
+
+#define UPS_LOCAL_BITS (UPS_commlost|UPS_shutdown|UPS_slave|UPS_slavedown| \
+            UPS_onbatt_msg|UPS_fastpoll|UPS_plugged|UPS_dev_setup| \
+            UPS_shut_load|UPS_shut_btime|UPS_shut_ltime|UPS_shut_emerg)
+
+/*
+ * CI_ is Capability or command index
+ * APC_CMD_ is the command code sent to UPS for APC Smart UPSes
+ *
+ * NOTE: the APC_CMD_s are never used in the actual code,
+ * except to initialize the UPS_Cmd[] structure. This way,
+ * we will be able to support other UPSes later. The actual
+ * command is obtained by reference to UPS_Cmd[CI_xxx]    
+ *
+ * If the command is valid for this UPS, UPS_Cap[CI_xxx]
+ * will be true.
+ */
+
+#define CI_UPSMODEL             0       /* Model number */
+#define    APC_CMD_UPSMODEL       'V'
+#define CI_STATUS               1       /* status function */
+#define    APC_CMD_STATUS         'Q'
+#define CI_LQUAL                2       /* line quality status */
+#define    APC_CMD_LQUAL          '9'
+#define CI_WHY_BATT             3       /* why transferred to battery */
+#define    APC_CMD_WHY_BATT       'G'
+#define CI_ST_STAT              4       /* self test stat */
+#define    APC_CMD_ST_STAT        'X'
+#define CI_VLINE                5       /* line voltage */
+#define    APC_CMD_VLINE          'L'
+#define CI_VMAX                 6       /* max voltage */
+#define    APC_CMD_VMAX           'M'
+#define CI_VMIN                 7       /* min line voltage */
+#define    APC_CMD_VMIN           'N'
+#define CI_VOUT                 8       /* Output voltage */
+#define    APC_CMD_VOUT           'O'
+#define CI_BATTLEV              9       /* Battery level percentage */
+#define CI_RemainingCapacity    9
+#define    APC_CMD_BATTLEV        'f'
+#define CI_VBATT               10       /* Battery voltage */
+#define    APC_CMD_VBATT          'B'
+#define CI_LOAD                11       /* UPS Load */
+#define    APC_CMD_LOAD           'P'
+#define CI_FREQ                12       /* Line Frequency */
+#define    APC_CMD_FREQ           'F'
+#define CI_RUNTIM              13       /* Est. Runtime left */
+#define CI_RunTimeToEmpty      13
+#define    APC_CMD_RUNTIM         'j'
+#define CI_ITEMP               14       /* Internal UPS temperature */
+#define    APC_CMD_ITEMP          'C'
+#define CI_DIPSW               15       /* Dip switch settings */
+#define    APC_CMD_DIPSW          '7'
+#define CI_SENS                16       /* Sensitivity */
+#define    APC_CMD_SENS           's'
+#define CI_DWAKE               17       /* Wakeup delay */
+#define    APC_CMD_DWAKE          'r'
+#define CI_DSHUTD              18       /* Shutdown delay */
+#define    APC_CMD_DSHUTD         'p'
+#define CI_LTRANS              19       /* Low transfer voltage */
+#define    APC_CMD_LTRANS         'l'
+#define CI_HTRANS              20       /* High transfer voltage */
+#define    APC_CMD_HTRANS         'u'
+#define CI_RETPCT              21       /* Return percent threshhold */
+#define    APC_CMD_RETPCT         'e'
+#define CI_DALARM              22       /* Alarm delay */
+#define    APC_CMD_DALARM         'k'
+#define CI_DLBATT              23       /* low battery warning, mins */
+#define    APC_CMD_DLBATT         'q'
+#define CI_IDEN                24       /* UPS Identification (name) */
+#define    APC_CMD_IDEN           'c'
+#define CI_STESTI              25       /* Self test interval */
+#define    APC_CMD_STESTI         'E'
+#define CI_MANDAT              26       /* Manufacture date */
+#define    APC_CMD_MANDAT         'm'
+#define CI_SERNO               27       /* serial number */
+#define    APC_CMD_SERNO          'n'
+#define CI_BATTDAT             28       /* Last battery change */
+#define    APC_CMD_BATTDAT        'x'
+#define CI_NOMBATTV            29       /* Nominal battery voltage */
+#define    APC_CMD_NOMBATTV       'g'
+#define CI_HUMID               30       /* UPS Humidity percentage */
+#define    APC_CMD_HUMID          'h'
+#define CI_REVNO               31       /* Firmware revision */
+#define    APC_CMD_REVNO          'b'
+#define CI_REG1                32       /* Register 1 */
+#define    APC_CMD_REG1           '~'
+#define CI_REG2                33       /* Register 2 */
+#define    APC_CMD_REG2           '\''
+#define CI_REG3                34       /* Register 3 */
+#define    APC_CMD_REG3           '8'
+#define CI_EXTBATTS            35       /* Number of external batteries */
+#define    APC_CMD_EXTBATTS       '>'
+#define CI_ATEMP               36       /* Ambient temp */
+#define    APC_CMD_ATEMP          't'
+#define CI_NOMOUTV             37       /* Nominal output voltage */
+#define    APC_CMD_NOMOUTV        'o'
+#define CI_BADBATTS            38       /* Number of bad battery packs */
+#define    APC_CMD_BADBATTS       '<'
+#define CI_EPROM               39       /* Valid eprom values */
+#define    APC_CMD_EPROM          0x1a
+#define CI_ST_TIME             40       /* hours since last self test */
+#define    APC_CMD_ST_TIME        'd'
+#define CI_Manufacturer                  41
+#define CI_ShutdownRequested             42
+#define CI_ShutdownImminent              43
+#define CI_DelayBeforeReboot             44
+#define CI_BelowRemCapLimit              45
+#define CI_RemTimeLimitExpired           46
+#define CI_Charging                      47
+#define CI_Discharging                   48
+#define CI_RemCapLimit                   49
+#define CI_RemTimeLimit                  50
+#define CI_WarningCapacityLimit          51
+#define CI_CapacityMode                  52
+#define CI_BattPackLevel                 53
+#define CI_CycleCount                    54
+#define CI_ACPresent                     55
+#define CI_Boost                         56
+#define CI_Trim                          57
+#define CI_Overload                      58
+#define CI_NeedReplacement               59
+#define CI_BattReplaceDate               60
+#define CI_APCForceShutdown              61
+#define CI_DelayBeforeShutdown           62
+#define CI_APCDelayBeforeStartup         63
+#define CI_APCDelayBeforeShutdown        64
+#define CI_APCLineFailCause              65
+#define CI_NOMINV                        66
+
+/* Only seen on the BackUPS Pro USB (so far) */
+#define CI_BUPBattCapBeforeStartup       67
+#define CI_BUPDelayBeforeStartup         68
+#define CI_BUPSelfTest                   69
+#define CI_BUPHibernate                  70
+
+/*
+ * We don't actually handle these, but use them as a signal
+ * to re-examine the other UPS data items. (USB only)
+ */
+#define CI_IFailure                      71  /* Internal failure */
+#define CI_PWVoltageOOR                  72  /* Power sys voltage out of range */
+#define CI_PWFrequencyOOR                73  /* Power sys frequency out of range */
+#define CI_OverCharged                   74  /* Battery overcharged */
+#define CI_OverTemp                      75  /* Over temperature */
+#define CI_CommunicationLost             76  /* USB comms with subsystem lost */
+#define CI_ChargerVoltageOOR             77  /* Charger voltage our of range */
+#define CI_ChargerCurrentOOR             78  /* Charger current our of range */
+#define CI_CurrentNotRegulated           79  /* Charger current not regulated */
+#define CI_VoltageNotRegulated           80  /* Charger voltage not regulated */
+#define CI_BatteryPresent                81  /* Battery is present */
+
+/* Items below this line are not "probed" for */
+#define CI_CYCLE_EPROM         82       /* Cycle programmable EPROM values */
+#define    APC_CMD_CYCLE_EPROM    '-'
+#define CI_UPS_CAPS            83       /* Get UPS capabilities (command) string */
+#define    APC_CMD_UPS_CAPS       'a'
+/* ^^^^^^^^^^ see below if you change this ^^^^^^ */
+
+/* set to last command index. CHANGE!!! when adding new code.  */
+/* vvvvvvvvvv change here vvvvvvvvvvvvvvvvvvvvvvv */
+#define CI_MAXCI         CI_UPS_CAPS    /* maximum UPS commands we handle */
+#define CI_MAX_CAPS      CI_BatteryPresent
+
+#define GO_ON_BATT              'W'
+#define GO_ON_LINE              'X'
+#define LIGHTS_TEST             'A'
+#define FAILURE_TEST            'U'
+
+/*
+ * Future additions for contolled discharing of batteries
+ * extend lifetimes.
+ */
+
+#define DISCHARGE               'D'
+#define CHARGE_LIM              25
+
+#define UPS_ENABLED             '?'
+#define UPS_ON_BATT             '!'
+#define UPS_ON_LINE             '$'
+#define UPS_REPLACE_BATTERY     '#'
+#define BATT_LOW                '%'
+#define BATT_OK                 '+'
+#define UPS_EPROM_CHANGE        '|'
+#define UPS_TRAILOR             ':'
+#define UPS_LF                  '\n'
+#define UPS_CR                  '\r'
+
+/* For apclock.c functions */
+#define LCKSUCCESS              0  /* lock file does not exist so go */
+#define LCKERROR                1  /* lock file not our own and error encountered */
+#define LCKEXIST                2  /* lock file is our own lock file */
+#define LCKNOLOCK               3  /* lock file not needed: APC_NET */
+
+/* Generic defines for boolean return values. */
+#define SUCCESS                 0  /* Function successfull */
+#define FAILURE                 1  /* Function failure */
+
+/* These seem unavoidable :-( */
+#ifndef TRUE
+# define TRUE                   1
+#endif
+#ifndef FALSE
+# define FALSE                  0
+#endif
+
+
+/*
+ * We have a timer for the read() for Win32.
+ * We have a timer for the select when nothing is expected,
+ *   i.e. we prefer waiting for an state change.
+ * We have a fast timer, when we are on batteries or when
+ *   we expect a response (i.e. we sent a character).
+ * And we have a timer for dumb UPSes for doing the sleep().
+ */
+#define TIMER_READ              10 /* read() timeout, max 25 sec */
+#define TIMER_SELECT            60 /* Select when not expecting anything */
+#define TIMER_FAST              1  /* Value for fast poll */
+#define TIMER_DUMB              5  /* for Dumb (ioctl) UPSes -- keep short */
+
+/* Make the size of these strings the next multiple of 4 */
+#define APC_MAGIC               "apcupsd-linux-6.0"
+#define APC_MAGIC_SIZE          4 * ((sizeof(APC_MAGIC) + 3) / 4)
+
+#define ACCESS_MAGIC            "apcaccess-linux-4.0"
+#define ACCESS_MAGIC_SIZE       4 * ((sizeof(APC_MAGIC) + 3) / 4)
+
+
+#define MAX_THREADS             7
+
+/* Find members position in the UPSINFO and GLOBALCFG structures. */
+#define WHERE(MEMBER) ((size_t) &((UPSINFO *)0)->MEMBER)
+#define AT(UPS,OFFSET) ((size_t)UPS + OFFSET)
+#define SIZE(MEMBER) ((GENINFO *)sizeof(((UPSINFO *)0)->MEMBER))
+
+
+/*
+ * These are the commands understood by the apccontrol shell script.
+ * You _must_ keep the #defines in sync with the commands[] array in
+ * action.c
+ */
+#define CMDPOWEROUT      0
+#define CMDONBATTERY     1
+#define CMDFAILING       2
+#define CMDTIMEOUT       3
+#define CMDLOADLIMIT     4
+#define CMDRUNLIMIT      5
+#define CMDDOREBOOT      6
+#define CMDDOSHUTDOWN    7
+#define CMDMAINSBACK     8
+#define CMDANNOYME       9
+#define CMDEMERGENCY     10
+#define CMDCHANGEME      11
+#define CMDREMOTEDOWN    12
+#define CMDCOMMFAILURE   13
+#define CMDCOMMOK        14
+#define CMDSTARTSELFTEST 15
+#define CMDENDSELFTEST   16
+#define CMDOFFBATTERY    17        /* off battery power */
+#define CMDBATTDETACH    18        /* Battery disconnected */
+#define CMDBATTATTACH    19        /* Battery reconnected */
+
+
+/*
+ * Simple way of handling varargs for those compilers that
+ * don't support varargs in #defines.
+ */
+#define Error_abort0(fmd) error_out(__FILE__, __LINE__, fmd)
+#define Error_abort1(fmd, arg1) error_out(__FILE__, __LINE__, fmd, arg1)
+#define Error_abort2(fmd, arg1,arg2) error_out(__FILE__, __LINE__, fmd, arg1,arg2)
+#define Error_abort3(fmd, arg1,arg2,arg3) error_out(__FILE__, __LINE__, fmd, arg1,arg2,arg3)
+#define Error_abort4(fmd, arg1,arg2,arg3,arg4) error_out(__FILE__, __LINE__, fmd, arg1,arg2,arg3,arg4)
+#define Error_abort5(fmd, arg1,arg2,arg3,arg4,arg5) error_out(__FILE__, __LINE__, fmd, arg1,arg2,arg3,arg4,arg5)
+#define Error_abort6(fmd, arg1,arg2,arg3,arg4,arg5,arg6) error_out(__FILE__, __LINE__, fmd, arg1,arg2,arg3,arg4,arg5,arg5)
+
+
+/*
+ * The digit following Dmsg and Emsg indicates the number of substitutions in
+ * the message string. We need to do this kludge because non-GNU compilers
+ * do not handle varargs #defines.
+ */
+
+/* Debug Messages that are printed */
+#ifdef DEBUG
+
+#define Dmsg0(lvl, msg)             d_msg(__FILE__, __LINE__, lvl, msg)
+#define Dmsg1(lvl, msg, a1)         d_msg(__FILE__, __LINE__, lvl, msg, a1)
+#define Dmsg2(lvl, msg, a1, a2)     d_msg(__FILE__, __LINE__, lvl, msg, a1, a2)
+#define Dmsg3(lvl, msg, a1, a2, a3) d_msg(__FILE__, __LINE__, lvl, msg, a1, a2, a3)
+#define Dmsg4(lvl, msg, arg1, arg2, arg3, arg4) d_msg(__FILE__, __LINE__, lvl, msg, arg1, arg2, arg3, arg4)
+#define Dmsg5(lvl, msg, a1, a2, a3, a4, a5) d_msg(__FILE__, __LINE__, lvl, msg, a1, a2, a3, a4, a5)
+#define Dmsg6(lvl, msg, a1, a2, a3, a4, a5, a6) d_msg(__FILE__, __LINE__, lvl, msg, a1, a2, a3, a4, a5, a6)
+#define Dmsg7(lvl, msg, a1, a2, a3, a4, a5, a6, a7) d_msg(__FILE__, __LINE__, lvl, msg, a1, a2, a3, a4, a5, a6, a7)
+#define Dmsg8(lvl, msg, a1, a2, a3, a4, a5, a6, a7, a8) d_msg(__FILE__, __LINE__, lvl, msg, a1, a2, a3, a4, a5, a6, a7, a8)
+#define Dmsg11(lvl,msg,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11) d_msg(__FILE__,__LINE__,lvl,msg,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11)
+void d_msg(const char *file, int line, int level, const char *fmt, ...);
+
+#else
+
+#define Dmsg0(lvl, msg)
+#define Dmsg1(lvl, msg, a1)
+#define Dmsg2(lvl, msg, a1, a2)
+#define Dmsg3(lvl, msg, a1, a2, a3)
+#define Dmsg4(lvl, msg, arg1, arg2, arg3, arg4)
+#define Dmsg5(lvl, msg, a1, a2, a3, a4, a5)
+#define Dmsg6(lvl, msg, a1, a2, a3, a4, a5, a6)
+#define Dmsg7(lvl, msg, a1, a2, a3, a4, a5, a6, a7)
+#define Dmsg8(lvl, msg, a1, a2, a3, a4, a5, a6, a7, a8)
+#define Dmsg11(lvl,msg,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11)
+
+#endif
+
+
+/* These probably should be subroutines */
+#define P(x) \
+   do { \
+      int errstat; \
+      if ((errstat=pthread_mutex_lock(&(x)))) \
+         error_out(__FILE__, __LINE__, "Mutex lock failure. ERR=%s\n", strerror(errstat)); \
+   } while(0)
+
+#define V(x) \
+   do { \
+      int errstat; \
+      if ((errstat=pthread_mutex_unlock(&(x)))) \
+         error_out(__FILE__, __LINE__, "Mutex unlock failure. ERR=%s\n", strerror(errstat)); \
+   } while(0)
+
+
+/* Send terminate signal to itself. */
+#define sendsig_terminate() \
+   { \
+      kill(getpid(), SIGTERM); \
+      exit(0); \
+   }
+
+/* Determine the difference, in milliseconds, between two struct timevals. */
+#define TV_DIFF_MS(a, b) \
+    (((b).tv_sec - (a).tv_sec) * 1000 + ((b).tv_usec - (a).tv_usec) / 1000)
+
+#endif   /* _DEFINES_H */
