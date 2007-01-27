@@ -8,6 +8,102 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2007-01-27 17:23  adk0212
+
+	* src/gapcmon/gapcmon.c:
+
+	Remove unused variables to quiet compiler warnings.
+
+2007-01-27 17:22  adk0212
+
+	* src/gapcmon/gapcmon.c:
+
+	Remove a 2.6-ism in gapc_net_thread_qwork().
+
+2007-01-27 12:11  fleetworks
+
+	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
+	suse/apcupsd.spec.in:
+
+	Add note on build_snmp
+
+2007-01-27 12:00  fleetworks
+
+	* doc/latex/manual.tex, platforms/contrib-rpm/build_rpm.sh,
+	platforms/mandrake/apcupsd.spec.in,
+	platforms/redhat/apcupsd.spec.in, platforms/suse/apcupsd.spec.in:
+
+	Add snmp build switch.
+
+2007-01-23 22:15  skoona
+
+	* src/gapcmon/: ChangeLog, README, eggtrayicon.c, eggtrayicon.h,
+	gapcmon.c, gapcmon.h:
+
+	GAPCMON subpackage Changes - Removed gnomeVFS from package which
+	released these defined	 gapcmon.c:#ifndef
+	HAVE_GNOMEVFS_SOCKET_SET_TIMEOUT   gapcmon.c:#ifdef
+	GNOMEVFS_REQUIRES_CANCELLATION	 ** I need to update the build
+	scripts to remove      gnomevfs from GAPCMON_CFLAGS... and these
+	defines   ** Also gnomeVFS drove most of the libbonobo... RPM
+	buildreqs
+
+	- Replace gnomeVFS with GIOChannel based socket programming
+	GIOChannels were already being used in other areas in gapc   this
+	make the prep for porting to w32 easier.
+
+	- All non-essential subsystems have been removed from gapcmon.
+	gconf, gthread, glib, pango, and gtk are all that required    other
+	than X11 libraries.  X11 libs are required to support	 the newest
+	gapcmon feature FreeDesktop.org notification icons    or
+	systray_icons.	I think I am stuck with X11 unless I want    to
+	write w32 specific code(not).
+
+	- Compile this codeset with gtk 2.6 without issue, and I assume
+	based on the amount and types of changes that gtk 2.4 minimum	is
+	still valid - i.e. it should also compile gtk on 2.4.
+
+	James,
+
+2007-01-21 12:44  fleetworks
+
+	* doc/latex/manual.tex:
+
+	Update rpm-faq for 3.14.
+
+2007-01-21 11:34  fleetworks
+
+	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
+	suse/apcupsd.spec.in:
+
+	Fix gapcmon dependancies.
+
+2007-01-21 10:48  fleetworks
+
+	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
+	suse/apcupsd.spec.in:
+
+	Fix gapcmon dependancies, update comments.
+
+2007-01-20 12:31  fleetworks
+
+	* platforms/contrib-rpm/build_rpm.sh:
+
+	Update for 3.14 spec changes.
+
+2007-01-20 11:34  fleetworks
+
+	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
+	suse/apcupsd.spec.in:
+
+	Restructure for 3.14 release
+
+2007-01-15 18:28  adk0212
+
+	* ChangeLog, ReleaseNotes, include/version.h:
+
+	Updates for 3.13.12 development release.
+
 2006-12-31 01:42  skoona
 
 	* src/gapcmon/gapcmon.c:
