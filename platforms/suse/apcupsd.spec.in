@@ -11,6 +11,11 @@
 # or by manually setting it to 1 in this file,
 #  e.g. %define gapcmon 1
 #
+# If you want the SNMP driver, use:
+#  e.g.  rpmbuild -ba --define "build_snmp 1" --define "build_suse 1" apcupsd.spec
+# or by manually setting it to 1 in this file,
+#  e.g. %define snmp 1
+#
 # Note, to build, you need:
 #   Release_Notes-%{version}-%{release}.tar.gz in your
 #   rpm SOURCES directory, and the tar file must contain
