@@ -2634,7 +2634,8 @@ static gpointer *gapc_net_thread_qwork(PGAPC_MONITOR pm)
    g_return_val_if_fail(pm != NULL, NULL);
    g_return_val_if_fail(pm->q_network != NULL, NULL);
 
-   thread_queue = g_async_queue_ref(pm->q_network);
+   g_async_queue_ref(pm->q_network);
+   thread_queue = pm->q_network;
 
    if (pm->psk == NULL) {
        pm->psk = sknet_net_client_init (pm->pch_host, pm->i_port);
