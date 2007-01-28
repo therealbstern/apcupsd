@@ -315,8 +315,6 @@ rm -f $RPM_BUILD_DIR/Release_Notes-%{version}-%{release}.txt
 %config(noreplace) %{_sysconfdir}/apcupsd/onbattery
 %config(noreplace) %{_sysconfdir}/apcupsd/offbattery
 %config(noreplace) %{_sysconfdir}/apcupsd/apcupsd.conf
-%config(noreplace) %{_sysconfdir}/apcupsd/masterconnect
-%config(noreplace) %{_sysconfdir}/apcupsd/mastertimeout
 /sbin/*
 %attr(-,root,man) %{_mandir}/*/*
 
@@ -416,6 +414,8 @@ if [ $1 = 0 ] ; then
 fi
 
 %changelog
+* Sun Jan 28 2007 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- remove /etc/apcupsd/masterconnect and mastertimeout files
 * Sat Jan 27 2007 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - add snmp build
 - fix location of Requires for base package
