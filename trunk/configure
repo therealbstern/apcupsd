@@ -12660,12 +12660,12 @@ if test -n "$PKG_CONFIG"; then
         pkg_cv_GAPCMON_CFLAGS="$GAPCMON_CFLAGS"
     else
         if test -n "$PKG_CONFIG" && \
-    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0 gnome-vfs-module-2.0\"") >&5
-  ($PKG_CONFIG --exists --print-errors "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0 gnome-vfs-module-2.0") 2>&5
+    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0\"") >&5
+  ($PKG_CONFIG --exists --print-errors "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0") 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; then
-  pkg_cv_GAPCMON_CFLAGS=`$PKG_CONFIG --cflags-only-I "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0 gnome-vfs-module-2.0" 2>/dev/null`
+  pkg_cv_GAPCMON_CFLAGS=`$PKG_CONFIG --cflags-only-I "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -12678,12 +12678,12 @@ if test -n "$PKG_CONFIG"; then
         pkg_cv_GAPCMON_LIBS="$GAPCMON_LIBS"
     else
         if test -n "$PKG_CONFIG" && \
-    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0 gnome-vfs-module-2.0\"") >&5
-  ($PKG_CONFIG --exists --print-errors "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0 gnome-vfs-module-2.0") 2>&5
+    { (echo "$as_me:$LINENO: \$PKG_CONFIG --exists --print-errors \"gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0\"") >&5
+  ($PKG_CONFIG --exists --print-errors "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0") 2>&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; then
-  pkg_cv_GAPCMON_LIBS=`$PKG_CONFIG --libs "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0 gnome-vfs-module-2.0" 2>/dev/null`
+  pkg_cv_GAPCMON_LIBS=`$PKG_CONFIG --libs "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0" 2>/dev/null`
 else
   pkg_failed=yes
 fi
@@ -12702,14 +12702,14 @@ else
         _pkg_short_errors_supported=no
 fi
         if test $_pkg_short_errors_supported = yes; then
-	        GAPCMON_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0 gnome-vfs-module-2.0"`
+	        GAPCMON_PKG_ERRORS=`$PKG_CONFIG --short-errors --errors-to-stdout --print-errors "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0"`
         else
-	        GAPCMON_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0 gnome-vfs-module-2.0"`
+	        GAPCMON_PKG_ERRORS=`$PKG_CONFIG --errors-to-stdout --print-errors "gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0"`
         fi
 	# Put the nasty error message in config.log where it belongs
 	echo "$GAPCMON_PKG_ERRORS" >&5
 
-	{ { echo "$as_me:$LINENO: error: Package requirements (gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0 gnome-vfs-module-2.0) were not met:
+	{ { echo "$as_me:$LINENO: error: Package requirements (gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0) were not met:
 
 $GAPCMON_PKG_ERRORS
 
@@ -12720,7 +12720,7 @@ Alternatively, you may set the environment variables GAPCMON_CFLAGS
 and GAPCMON_LIBS to avoid the need to call pkg-config.
 See the pkg-config man page for more details.
 " >&5
-echo "$as_me: error: Package requirements (gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0 gnome-vfs-module-2.0) were not met:
+echo "$as_me: error: Package requirements (gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0) were not met:
 
 $GAPCMON_PKG_ERRORS
 
@@ -12762,127 +12762,6 @@ echo "${ECHO_T}yes" >&6
 	:
 fi
         GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DVERSION=\\\"$VERSION\\\""
-
-                                _cflags=${CFLAGS}
-        _libs=${LIBS}
-        CFLAGS="${CFLAGS} ${GAPCMON_CFLAGS}"
-        LIBS="${LDFLAGS} ${GAPCMON_LIBS}"
-        echo "$as_me:$LINENO: checking if gnome_vfs_socket_read requires cancellation argument" >&5
-echo $ECHO_N "checking if gnome_vfs_socket_read requires cancellation argument... $ECHO_C" >&6
-        cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <libgnomevfs/gnome-vfs.h>
-int
-main ()
-{
-gnome_vfs_socket_read(NULL, NULL, 0, NULL, NULL);
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-   echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-             GAPCMON_CFLAGS="${GAPCMON_CFLAGS} -DGNOMEVFS_REQUIRES_CANCELLATION"
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-        CFLAGS=${_cflags}
-        LIBS=${_libs}
-
-                        _cflags=${CFLAGS}
-      _libs=${LIBS}
-      CFLAGS="${CFLAGS} ${GAPCMON_CFLAGS}"
-      LIBS="${LDFLAGS} ${GAPCMON_LIBS}"
-      echo "$as_me:$LINENO: checking for gnome_vfs_socket_set_timeout" >&5
-echo $ECHO_N "checking for gnome_vfs_socket_set_timeout... $ECHO_C" >&6
-         cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <libgnomevfs/gnome-vfs.h>
-                             #ifdef GNOMEVFS_REQUIRES_CANCELLATION
-                             #define GNOMEVFS_CANCELLATION ,NULL
-                             #else
-                             #define GNOMEVFS_CANCELLATION
-                             #endif
-int
-main ()
-{
-gnome_vfs_socket_set_timeout(NULL, NULL GNOMEVFS_CANCELLATION);
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-   echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-           GAPCMON_CFLAGS="${GAPCMON_CFLAGS} -DHAVE_GNOMEVFS_SOCKET_SET_TIMEOUT"
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-      CFLAGS=${_cflags}
-      LIBS=${_libs}
    fi
 fi;
 
