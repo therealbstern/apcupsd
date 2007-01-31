@@ -79,6 +79,7 @@
 #include <errno.h>
 #include <string.h>             /* memset() */
 #include <time.h>
+#include <stdlib.h>             /* malloc() */
 
 #include <gconf/gconf-client.h>
 #include <gtk/gtk.h>
@@ -163,6 +164,13 @@ static void cb_panel_monitor_list_activated(GtkTreeView * treeview,
    GtkTreePath * arg1, GtkTreeViewColumn * arg2, PGAPC_CONFIG pcfg);
 static gint gapc_panel_glossary_page(PGAPC_CONFIG pcfg, GtkWidget * notebook);
 static gint gapc_panel_graph_property_page(PGAPC_CONFIG pcfg, GtkWidget * notebook);
+
+/*
+ * Common interface to the various versions of gethostbyname_r().
+ * Implemented in gethostname.c.
+ */
+struct hostent * gethostname_re
+    (const char *host,struct hostent *hostbuf,char **tmphstbuf,size_t *hstbuflen);
 
 
 /* 
@@ -2439,7 +2447,7 @@ static GIOChannel *sknet_net_open (PSKCOMM psk)
   } else {
       tcp_serv_addr = (struct sockaddr_in *)psk->gip;
   }
-  
+
   /* 
    * Fill in the structure serv_addr with the address of
    * the server that we want to connect with.
@@ -2448,26 +2456,26 @@ static GIOChannel *sknet_net_open (PSKCOMM psk)
     memset ((char *)tcp_serv_addr, 0, sizeof (struct sockaddr_in));
     tcp_serv_addr->sin_family = AF_INET;
     tcp_serv_addr->sin_port = g_htons (psk->i_port);
-    
+
     nrc = inet_aton (psk->ch_ip_string, (struct in_addr *)&tcp_serv_addr->sin_addr.s_addr);
     if ( nrc == 0) /* inet_aton failed */
     {
-        gchar buff[512];
-        gint  err = 0;
-        struct hostent he,*phe;
-        
-        nrc = gethostbyname_r (psk->ch_ip_string, &he, buff, sizeof(buff), &phe, &err); 
-        if (nrc != 0)
+        struct hostent he, *phe;
+        char *buff;
+        size_t bufflen = 0;
+
+        phe = gethostname_re(psk->ch_ip_string, &he, &buff, &bufflen);
+        if (phe == NULL)
         {
-            sknet_util_log_msg ("sknet_net_open", "gethostbyname() failed",
-                            (gchar *) g_strerror (err));
-            g_snprintf(psk->ch_error_msg, sizeof(psk->ch_error_msg),"%s",
-                      (gchar *) g_strerror(err));
+            free(buff);
+            sknet_util_log_msg ("sknet_net_open", "gethostbyname() failed", "");
+            g_snprintf(psk->ch_error_msg, sizeof(psk->ch_error_msg), "gethostbyname() failed");
             psk->ioc = NULL;
             return NULL;
         }
         if (he.h_length != sizeof (struct in_addr) || he.h_addrtype != AF_INET)
         {
+            free(buff);
             sknet_util_log_msg ("sknet_net_open", "struct hostent", "argument error");
             g_snprintf(psk->ch_error_msg, sizeof(psk->ch_error_msg),"%s","argument error");
             psk->ioc = NULL;
@@ -2475,6 +2483,7 @@ static GIOChannel *sknet_net_open (PSKCOMM psk)
         }
 
         tcp_serv_addr->sin_addr.s_addr = *(unsigned int *) he.h_addr;
+        free(buff);
     } /* end if inet_addr */
     
   } /* end if b_network */ 
