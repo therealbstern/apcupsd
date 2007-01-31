@@ -295,7 +295,7 @@ DATATIME 0
 #    I 253 257 261 265     (default = 0 => not valid)
 #HITRANSFER 253
 
-# Battery change needed to restore power
+# Battery charge needed to restore power
 # RETURNCHARGE 00 15 50 90 (default = 15)
 #RETURNCHARGE 15
 
