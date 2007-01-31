@@ -12647,8 +12647,8 @@ fi
 if test "${enable_gapcmon+set}" = set; then
   enableval="$enable_gapcmon"
    if test "$enableval" = "yes" ; then
-        GAPCMON=gapcmon
-        GAPCMON_ENABLED=yes
+      GAPCMON=gapcmon
+      GAPCMON_ENABLED=yes
 
 
 pkg_failed=no
@@ -12761,7 +12761,345 @@ else
 echo "${ECHO_T}yes" >&6
 	:
 fi
-        GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DVERSION=\\\"$VERSION\\\""
+      GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DVERSION=\\\"$VERSION\\\""
+
+
+
+    ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+    echo "$as_me:$LINENO: checking how many arguments gethostbyname_r() takes" >&5
+echo $ECHO_N "checking how many arguments gethostbyname_r() takes... $ECHO_C" >&6
+
+    if test "${ac_cv_func_which_gethostbyname_r+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+
+
+################################################################
+
+ac_cv_func_which_gethostbyname_r=unknown
+
+#
+# ONE ARGUMENT (sanity check)
+#
+
+# This should fail, as there is no variant of gethostbyname_r() that takes
+# a single argument. If it actually compiles, then we can assume that
+# netdb.h is not declaring the function, and the compiler is thereby
+# assuming an implicit prototype. In which case, we're out of luck.
+#
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <netdb.h>
+int
+main ()
+{
+
+	    char *name = "www.gnu.org";
+	    (void)gethostbyname_r(name) /* ; */
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_func_which_gethostbyname_r=no
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+
+#
+# SIX ARGUMENTS
+# (e.g. Linux)
+#
+
+if test "$ac_cv_func_which_gethostbyname_r" = "unknown"; then
+
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <netdb.h>
+int
+main ()
+{
+
+	    char *name = "www.gnu.org";
+	    struct hostent ret, *retp;
+	    char buf[1024];
+	    int buflen = 1024;
+	    int my_h_errno;
+	    (void)gethostbyname_r(name, &ret, buf, buflen, &retp, &my_h_errno) /* ; */
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_func_which_gethostbyname_r=six
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+
+fi
+
+#
+# FIVE ARGUMENTS
+# (e.g. Solaris)
+#
+
+if test "$ac_cv_func_which_gethostbyname_r" = "unknown"; then
+
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <netdb.h>
+int
+main ()
+{
+
+	    char *name = "www.gnu.org";
+	    struct hostent ret;
+	    char buf[1024];
+	    int buflen = 1024;
+	    int my_h_errno;
+	    (void)gethostbyname_r(name, &ret, buf, buflen, &my_h_errno) /* ; */
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_func_which_gethostbyname_r=five
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+
+fi
+
+#
+# THREE ARGUMENTS
+# (e.g. AIX, HP-UX, Tru64)
+#
+
+if test "$ac_cv_func_which_gethostbyname_r" = "unknown"; then
+
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <netdb.h>
+int
+main ()
+{
+
+	    char *name = "www.gnu.org";
+	    struct hostent ret;
+	    struct hostent_data data;
+	    (void)gethostbyname_r(name, &ret, &data) /* ; */
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_func_which_gethostbyname_r=three
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+
+fi
+
+################################################################
+
+
+fi
+
+case "$ac_cv_func_which_gethostbyname_r" in
+    three)
+    echo "$as_me:$LINENO: result: three" >&5
+echo "${ECHO_T}three" >&6
+    cat >>confdefs.h <<\_ACEOF
+#define HAVE_FUNC_GETHOSTBYNAME_R_3 1
+_ACEOF
+
+    ;;
+
+    five)
+    echo "$as_me:$LINENO: result: five" >&5
+echo "${ECHO_T}five" >&6
+    cat >>confdefs.h <<\_ACEOF
+#define HAVE_FUNC_GETHOSTBYNAME_R_5 1
+_ACEOF
+
+    ;;
+
+    six)
+    echo "$as_me:$LINENO: result: six" >&5
+echo "${ECHO_T}six" >&6
+    cat >>confdefs.h <<\_ACEOF
+#define HAVE_FUNC_GETHOSTBYNAME_R_6 1
+_ACEOF
+
+    ;;
+
+    no)
+    echo "$as_me:$LINENO: result: cannot find function declaration in netdb.h" >&5
+echo "${ECHO_T}cannot find function declaration in netdb.h" >&6
+    ;;
+
+    unknown)
+    echo "$as_me:$LINENO: result: can't tell" >&5
+echo "${ECHO_T}can't tell" >&6
+    ;;
+
+    *)
+    { { echo "$as_me:$LINENO: error: internal error" >&5
+echo "$as_me: error: internal error" >&2;}
+   { (exit 1); exit 1; }; }
+    ;;
+esac
+
+ac_ext=c
+ac_cpp='$CPP $CPPFLAGS'
+ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_c_compiler_gnu
+
+
+
+
+      case "$ac_cv_func_which_gethostbyname_r" in
+         three)
+         GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_3"
+         ;;
+
+         five)
+         GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_5"
+         ;;
+
+         six)
+         GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_6"
+         ;;
+
+         *)
+         { { echo "$as_me:$LINENO: error: gapcmon requires gethostbyname_r" >&5
+echo "$as_me: error: gapcmon requires gethostbyname_r" >&2;}
+   { (exit 1); exit 1; }; }
+         ;;
+      esac
+
    fi
 fi;
 

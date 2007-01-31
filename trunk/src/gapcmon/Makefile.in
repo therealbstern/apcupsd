@@ -15,7 +15,7 @@ sysconfdir=/etc
 # Subprogram selection
 allexe = @GAPCMON@
 
-gapcmon_OBJS = gapcmon.o eggtrayicon.o
+gapcmon_OBJS = gapcmon.o eggtrayicon.o gethostname.o
 pixmaps_DATA = charging.png onbatt.png online.png apcupsd.png unplugged.png gapc_prefs.png
 
 all-targets: $(allexe)
@@ -27,7 +27,10 @@ gapcmon.o: gapcmon.c
 	$(CC) -c $(CFLAGS) @GAPCMON_CFLAGS@ $(X_CFLAGS) $<
 
 eggtrayicon.o: eggtrayicon.c  
-	$(CC) -c $(CFLAGS) @GAPCMON_CFLAGS@  $(X_CFLAGS) $<
+	$(CC) -c $(CFLAGS) @GAPCMON_CFLAGS@ $(X_CFLAGS) $<
+
+gethostname.o: gethostname.c  
+	$(CC) -c $(CFLAGS) @GAPCMON_CFLAGS@ $<
 
 install: install-binary
 
