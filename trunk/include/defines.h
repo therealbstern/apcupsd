@@ -433,4 +433,16 @@ void d_msg(const char *file, int line, int level, const char *fmt, ...);
 #define TV_DIFF_MS(a, b) \
     (((b).tv_sec - (a).tv_sec) * 1000 + ((b).tv_usec - (a).tv_usec) / 1000)
 
+/*
+ * Some platforms, like Solaris, hide MIN/MAX in an obscure header.
+ * It's easiest just to define them ourselves instead of trying to
+ * find the right thing to include.
+ */
+#ifndef MIN
+#define MIN(a,b) ( (a) < (b) ? (a) : (b) )
+#endif
+#ifndef MAX
+#define MAX(a,b) ( (a) > (b) ? (a) : (b) )
+#endif
+
 #endif   /* _DEFINES_H */
