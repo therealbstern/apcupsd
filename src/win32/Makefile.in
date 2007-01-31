@@ -436,12 +436,7 @@ GAPCMON_CFLAGS=-I$(DEPKGS)/glib/include/gtk-2.0 \
    -I$(DEPKGS)/glib/lib/glib-2.0/include \
    -I$(DEPKGS)/glib/include/gconf/2 \
    -I$(DEPKGS)/glib/include/orbit-2.0 \
-   -I$(DEPKGS)/glib/include/gnome-vfs-2.0 \
-   -I$(DEPKGS)/glib/include/gnome-vfs-module-2.0 \
-   -I$(DEPKGS)/glib/lib/gnome-vfs-2.0/include \
    -I$(DEPKGS)/glib/include/cairo \
-   -DGNOMEVFS_REQUIRES_CANCELLATION \
-   -DHAVE_GNOMEVFS_SOCKET_SET_TIMEOUT \
    -mms-bitfields
 
 OBJS_GAPCMON = \
@@ -487,9 +482,8 @@ EMAIL_LIBS = -L$(LIB_MINGW) -lwsock32 -lmapi32
 GAPCMON_OBJS = $(OBJS_GAPCMON)
 GAPCMON_LIBS = $(LIB_PTHREADS) -L$(DEPKGS)/glib/lib -Wl,--export-dynamic \
    -lgtk-win32-2.0 -lgdk-win32-2.0 -latk-1.0 -lgdk_pixbuf-2.0 -lpangowin32-1.0 \
-   -lpango-1.0 -lgobject-2.0 -lgconf-2 -lgnomevfs-2 \
-   -lbonobo-activation -lORBit-2 -lm -lgmodule-2.0 -lgthread-2.0 \
-   -lglib-2.0
+   -lpango-1.0 -lgobject-2.0 -lgconf-2 -lORBit-2 -lm -lgmodule-2.0 
+   -lgthread-2.0 -lglib-2.0
 
 # Targets
 
