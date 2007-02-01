@@ -482,7 +482,7 @@ EMAIL_LIBS = -L$(LIB_MINGW) -lwsock32 -lmapi32
 GAPCMON_OBJS = $(OBJS_GAPCMON)
 GAPCMON_LIBS = $(LIB_PTHREADS) -L$(DEPKGS)/glib/lib -Wl,--export-dynamic \
    -lgtk-win32-2.0 -lgdk-win32-2.0 -latk-1.0 -lgdk_pixbuf-2.0 -lpangowin32-1.0 \
-   -lpango-1.0 -lgobject-2.0 -lgconf-2 -lORBit-2 -lm -lgmodule-2.0 
+   -lpango-1.0 -lgobject-2.0 -lgconf-2 -lORBit-2 -lm -lgmodule-2.0 \
    -lgthread-2.0 -lglib-2.0
 
 # Targets
