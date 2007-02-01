@@ -892,11 +892,11 @@ AC_HELP_STRING([--enable-powerflute], [Compile powerflute program])],
         AC_CHECK_LIB(ncurses, initscr, [POWERLIBS="-lncurses"],
            AC_MSG_ERROR([Powerflute requires libncurses.]), [])
         AC_CHECK_LIB(menu, new_menu, [POWERLIBS="$POWERLIBS -lmenu"],
-           AC_MSG_ERROR([Powerflute requires libncurses.]), [])
+           AC_MSG_ERROR([Powerflute requires libncurses.]), [-lncurses])
         AC_CHECK_LIB(form, new_form, [POWERLIBS="$POWERLIBS -lform"],
-           AC_MSG_ERROR([Powerflute requires libncurses.]), [])
+           AC_MSG_ERROR([Powerflute requires libncurses.]), [-lncurses])
         AC_CHECK_LIB(panel, new_panel, [POWERLIBS="$POWERLIBS -lpanel"],
-           AC_MSG_ERROR([Powerflute requires libncurses.]), [])
+           AC_MSG_ERROR([Powerflute requires libncurses.]), [-lncurses])
         POWERFLUTE="powerflute"
         AC_DEFINE(HAVE_POWERFLUTE)
      fi])
@@ -919,10 +919,9 @@ AC_ARG_ENABLE(gapcmon,
       GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DVERSION=\\\"$VERSION\\\""
 
       dnl
-      dnl Figure out which gethostbyname we have
+      dnl Figure out which gethostbyname_r() variant we have
       dnl
       AX_FUNC_WHICH_GETHOSTBYNAME_R
-
       case "$ac_cv_func_which_gethostbyname_r" in
          three)
          GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_3"
