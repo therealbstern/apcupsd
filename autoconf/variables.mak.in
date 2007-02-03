@@ -81,7 +81,7 @@ DEFS = @EXTRADEFS@ $(LOCALDEFS)
 
 # Libraries
 APCLIBS = $(topdir)/src/lib/libapc.a
-DRVLIBS = $(topdir)/src/drivers/libdrivers.a
+DRVLIBS = $(topdir)/src/drivers/libdrivers.a @PTHREAD_LFLAGS@ @DRVLIBS@
 INTLLIBS = @INTLLIBS@
 X_LIBS = @X_LIBS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
@@ -93,4 +93,4 @@ INCFLAGS = $(GDINCLUDE) -I$(topdir)/include $(EXTRAINCS)
 CFLAGS = @CFLAGS@ @PTHREAD_CFLAGS@ $(INCFLAGS)
 CPPFLAGS = @CPPFLAGS@ $(CFLAGS)
 LDFLAGS = @LDFLAGS@
-LIBS = $(APCLIBS) $(INTLLIBS) @PTHREAD_LFLAGS@ @LIBS@
+LIBS = $(APCLIBS) $(INTLLIBS) @LIBS@

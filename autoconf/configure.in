@@ -139,6 +139,7 @@ AC_SUBST(CFLAGS)
 AC_SUBST(CPPFLAGS)
 AC_SUBST(LDFLAGS)
 AC_SUBST(LIBS)
+AC_SUBST(DRVLIBS)
 
 dnl Initialize pthreads inclusion: warn PTHREAD_LFLAGS must contain only
 dnl the pthreads libraries, if needed. For linker flags, add them to
@@ -793,7 +794,7 @@ dnl If we're building SNMP, try to find relevant libs
 if test "$WANT_SNMP" = "yes" ; then
    dnl Check for optional crypto lib
    AC_CHECK_LIB(crypto, EVP_DigestInit,
-      [echo '   including crypto library for snmp.'; LIBS="$LIBS -lcrypto"],
+      [echo '   including crypto library for snmp.'; DRVLIBS="$DRVLIBS -lcrypto"],
       [],
       [])
 
@@ -809,7 +810,7 @@ if test "$WANT_SNMP" = "yes" ; then
    dnl Start by looking for libnetsnmp (net-snmp).
    if test "$SNMP_LIB_FOUND" = "no" ; then
       AC_CHECK_LIB(netsnmp, snmp_open,
-         [LIBS="$LIBS -lnetsnmp"
+         [DRVLIBS="$DRVLIBS -lnetsnmp"
           SNMP_LIB_FOUND="yes"], [], [])
    fi
 
@@ -817,7 +818,7 @@ if test "$WANT_SNMP" = "yes" ; then
    if test "$SNMP_LIB_FOUND" = "no" ; then
       WANT_NET_SNMP="no"
       AC_CHECK_LIB(snmp, snmp_open,
-         [LIBS="$LIBS -lsnmp"
+         [DRVLIBS="$DRVLIBS -lsnmp"
           SNMP_LIB_FOUND="yes"], [], [])
    fi
 
