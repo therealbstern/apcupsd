@@ -31,11 +31,11 @@ all-targets: $(allexe)
 #   dependencies, but it really does little harm and avoids missing one.
 #
 
-apcupsd: $(dobjs) $(gobjs) $(WINAPC) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
-	$(LD) $(LDFLAGS) $(dobjs) $(gobjs) $(DRVLIBS) $(LIBS) @LIBUSB@ -o apcupsd
+apcupsd: $(dobjs) $(gobjs) $(WINAPC) $(APCLIBS) $(APCDRVLIBS) $(INTLLIBS) 
+	$(LD) $(LDFLAGS) $(dobjs) $(gobjs) $(APCDRVLIBS) $(DRVLIBS) $(LIBS) @LIBUSB@ -o apcupsd
 
 apctest: $(tobjs) $(gobjs) $(APCLIBS) $(DRVLIBS) $(INTLLIBS) 
-	$(LD) $(LDFLAGS) $(tobjs) $(gobjs) $(DRVLIBS) $(LIBS) @LIBUSB@ -o apctest
+	$(LD) $(LDFLAGS) $(tobjs) $(gobjs) $(APCDRVLIBS) $(DRVLIBS) $(LIBS) @LIBUSB@ -o apctest
 
 devicedbg: $(xobjs) $(APCLIBS) $(INTLLIBS) 
 	$(LD) $(LDFLAGS) $(xobjs) $(LIBS) -o devicedbg
