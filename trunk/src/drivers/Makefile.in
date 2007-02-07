@@ -22,48 +22,44 @@ driversobjs = drivers.o
 
 all-targets: $(driverslib)
 
-$(driverslib): $(driversobjs) @APCSMART_DRIVER@_stamp @DUMB_DRIVER@_stamp @NET_DRIVER@_stamp @USB_DRIVER@_stamp @SNMP_DRIVER@_stamp @TEST_DRIVER@_stamp  @PCNET_DRIVER@_stamp drivers_stamp
+@APCSMART_DRIVER@_objs = apcsmart/*.o
+@DUMB_DRIVER@_objs = dumb/*.o
+@NET_DRIVER@_objs = net/*.o
+@USB_DRIVER@_objs = usb/*.o usb/@USB_TYPE@/*.o @LIBUSBHIDOBJS@
+@SNMP_DRIVER@_objs = snmp/*.o
+@TEST_DRIVER@_objs = test/*.o
+@PCNET_DRIVER@_objs = pcnet/*.o
+_objs=
+
+$(driverslib): $(driversobjs) @APCSMART_DRIVER@_stamp @DUMB_DRIVER@_stamp @NET_DRIVER@_stamp @USB_DRIVER@_stamp @SNMP_DRIVER@_stamp @TEST_DRIVER@_stamp @PCNET_DRIVER@_stamp drivers_stamp
+	rm -f $(driverslib)
+	ar cru $(driverslib) $(driversobjs) $(@APCSMART_DRIVER@_objs) $(@DUMB_DRIVER@_objs) $(@NET_DRIVER@_objs) $(@USB_DRIVER@_objs) $(@SNMP_DRIVER@_objs) $(@TEST_DRIVER@_objs) $(@PCNET_DRIVER@_objs) 
+	@RANLIB@ $(driverslib)
 
 _stamp:
 
 drivers_stamp: drivers.c
-	ar cru $(driverslib) $(driversobjs)
-	@RANLIB@ $(driverslib)
 	touch drivers_stamp
 
 apcsmart_stamp: apcsmart/libapcsmart.a
-	ar cru libdrivers.a apcsmart/*.o
-	@RANLIB@ $(driverslib)
 	touch apcsmart_stamp
 
 dumb_stamp: dumb/libdumb.a
-	ar cru libdrivers.a dumb/*.o
-	@RANLIB@ $(driverslib)
 	touch dumb_stamp
 
 net_stamp: net/libnet.a
-	ar cru libdrivers.a net/*.o
-	@RANLIB@ $(driverslib)
 	touch net_stamp
 
 usb_stamp: usb/libusb.a
-	ar cru libdrivers.a usb/*.o usb/@USB_TYPE@/*.o @LIBUSBHIDOBJS@
-	@RANLIB@ $(driverslib)
 	touch usb_stamp
 
 snmp_stamp: snmp/libsnmp.a
-	ar cru libdrivers.a snmp/*.o
-	@RANLIB@ $(driverslib)
 	touch snmp_stamp
 
 test_stamp: test/libtest.a
-	ar cru libdrivers.a test/*.o
-	@RANLIB@ $(driverslib)
 	touch test_stamp
 
 pcnet_stamp: pcnet/libpcnet.a
-	ar cru libdrivers.a pcnet/*.o
-	@RANLIB@ $(driverslib)
 	touch pcnet_stamp
 
 clean: targetclean

@@ -21,6 +21,7 @@ apclibobjs = generic-usb.o hidutils.o
 all-targets: $(apclib)
 
 $(apclib): $(apclibobjs)
+	rm -f $(apclib)
 	ar rc $(apclib) $(apclibobjs)
 	@RANLIB@ $(apclib)
 
