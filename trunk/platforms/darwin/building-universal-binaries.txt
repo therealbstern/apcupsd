@@ -1,0 +1,22 @@
+Building APCUPSD with Universal Binary support on Mac OS X
+
+- Install latest Apple DevTools
+- Be sure to select the MacOSX10.4u (10.4 Universal) SDK when installing
+- Build dependent libraries (libusb) with UB support (see below)
+- Build APCUPSD
+
+libusb:
+ Use this configure line:
+ 
+   env CFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
+       LDFLAGS="-arch i386 -arch ppc" \
+       CXXFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
+       ./configure --disable-dependency-tracking --disable-shared
+     
+
+apcupsd:
+ Use this configure line (you can customize the --enable-xxx stuff):
+ 
+   env LD="g++ -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
+       CFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
+       ./configure --enable-usb --enable-snmp --enable-powerflute --enable-cgi
