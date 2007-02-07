@@ -21,6 +21,7 @@ apclibobjs = powernet-mib-mgr.o drv_powernet.o \
 all-targets: $(apclib)
 
 $(apclib): $(apclibobjs)
+	rm -f $(apclib)
 	ar rc $(apclib) $(apclibobjs)
 	@RANLIB@ $(apclib)
 

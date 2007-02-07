@@ -21,6 +21,7 @@ apclibobjs = bsd-usb.o hidutils.o
 all-targets: $(apclib)
 
 $(apclib): $(apclibobjs) $(topdir)/src/libusbhid/libusbhid.a
+	rm -f $(apclib)
 	ar rc $(apclib) $(apclibobjs)
 	@RANLIB@ $(apclib)
 

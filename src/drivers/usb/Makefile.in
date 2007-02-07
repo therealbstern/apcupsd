@@ -21,6 +21,7 @@ apclibobjs = usb.o
 all-targets: $(apclib)
 
 $(apclib): $(apclibobjs) @USB_TYPE@/libpusb.a
+	rm -f $(apclib)
 	ar rc $(apclib) $(apclibobjs)
 	@RANLIB@ $(apclib)
 
