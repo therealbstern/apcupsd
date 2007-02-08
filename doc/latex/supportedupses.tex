@@ -23,14 +23,13 @@ it uses to talk with its computer.
 
 \item [apcsmart]
    \index{apcsmart }
-   An APCSmart UPS and its computer also communicate through an RS232C serial
-connection, but they actually use it as a character channel (2400bps, 8 data
-bits, 1 stop bit, no parity) and pass commands back and forth in a primitive
-language (see 
-\ilink{APC smart protocol}{APC-smart-protocol}) resembling
+   An APCSmart UPS and its computer communicate through an RS232C serial
+connection. They use it as a character channel (2400bps, 8 data bits, 1 stop
+bit, no parity) and pass commands back and forth in a primitive language 
+(see \ilink{APC smart protocol}{APC-smart-protocol}) resembling
 modem-control codes.  The different APC UPSes all use closely related
 firmware, so the language doesn't vary much (later versions add more
-commands).  This class of UPS is in decline, rapidly being replaced in APC's
+commands). This class of UPS is in decline, rapidly being replaced in APC's
 product line by USB UPSes.  
 
 \item [usb]
@@ -66,6 +65,12 @@ signal lines on an RS232C serial connection.  Not much can actually be
 conveyed this way other than an order to shut down. Voltage-signaling UPSes
 are obsolete; you are unlikely to encounter one other than as legacy hardware.
 If you have a choice, we recommend you avoid simple signalling UPSes.  
+
+\item [pcnet]
+   \index{pcnet}
+   PCNET is an alternative for SNMP available on APC's AP9617 family of smart
+slot modules. The protocol is much simpler and potentially more secure than 
+SNMP.
 \end{description}
 
 The table shown below lists the APC model supported, and the possible kewords
