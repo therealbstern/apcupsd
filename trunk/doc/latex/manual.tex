@@ -978,6 +978,7 @@ The startup information will be installed in
 \texttt{/Library/StartupItems/apcupsd} which is part of darwin's
 SystemStartup.
 
+
 \label{Verifying-a-Source-Installation}
 
 \subsection*{Verifying a Source Installation}
@@ -2095,7 +2096,7 @@ clients, optain information about the state of the UPS by querying the
 server.  NIS is \emph{not} related to Sun's NIS/YP services.
 
 NIS clients and servers require that apcupsd be compiled with the Net
-Driver \texttt{-{}-enable-net}.  This is typically enabled by default.
+Driver \texttt{{---}enable-net}.  This is typically enabled by default.
 
 The NIS server is connected to the UPS and should be configured exactly
 as a standalone configuration, but with \textbf{NETSERVER} on.  In all
@@ -2179,6 +2180,60 @@ to. On the other hand, with the NIS-based network config you basically
 ``publish'' the UPS status from one server and then your clients view that
 status and make their own decisions.  
 
+
+\subsection*{PowerChute Network Shutdown Driver (PCNET)}
+\index{PowerChute Network Shutdown Driver (PCNET)}
+\index{PCNET!PowerChute Network Shutdown Driver (PCNET)}
+\addcontentsline{toc}{subsection}{PowerChute Network Shutdown Driver (PCNET)}
+
+As of 3.14, Apcupsd supports the PowerChute Network Shutdown protocol.
+This is an alternative to SNMP for use with APC's AP9617 family of 
+network smartslot modules. Note that the older AP9606 modules do \textbf{not}
+support PCNET.
+
+To enable PCNET support, configure with the \texttt{{---}enable-pcnet} flag.
+This is typically enabled by default.
+
+The required apcupsd.conf settings are straightforward:
+
+\begin{verbatim}
+     ## apcupsd.conf v1.1 ##
+     UPSCABLE ether
+     UPSTYPE pcnet
+     LOCKFILE /var/lock
+     DEVICE ipaddr:user:passphrase
+     UPSCLASS standalone
+     UPSMODE disable
+\end{verbatim}
+
+The \textbf{DEVICE} setting specifies the IP address of the UPS as well as 
+the username and authentication passphrase to use. Note that the username 
+and passphrase are \textbf{not} the Web/SNMP login credentials. They are 
+separate settings. The default username on a new card is "admin" and the 
+default passphrase is "admin user phrase". To change the passphrase, log 
+in to the Web UI and go to the UPS tab, then to PowerChute -> Configuration.
+(This assumes firmware v3.3.1. Other versions may place the setting 
+elsewhere.)
+
+Note that you may leave \textbf{DEVICE} blank and Apcupsd will accept 
+information from any PCNET UPS on the network, \textbf{however it will be 
+very insecure since an attacker could easily send packets crafted to cause 
+your server to shut down}. Using the ipaddr, user, and passphrase will \
+prevent this behavior.
+
+You may need to take steps to ensure networking stays active during your
+OS's shutdown sequence in order for the PCNET driver to power off the 
+UPS (the so-called "killpower" operation). On a Linux distro, you can use
+commands such as...
+
+\begin{verbatim}
+   chkconfig --level 0 network on
+   chkconfig --level 0 iptables on
+\end{verbatim}
+
+...to make sure networking stays up.
+
+    
 \label{Testing-Apcupsd}
 
 \section*{Testing Apcupsd}
@@ -7596,7 +7651,7 @@ can set it to 180, 300, or 600 seconds depending on your UPS. See the EEPROM
 \ilink{Configuring Your EEPROM}{Configuring-Your-EEPROM}) this
 manual for further details on how to change this EPROM value.  
 
-If you use the \texttt{-{}-kill-on-powerfail} option, you run the risk of having
+If you use the \texttt{{---}kill-on-powerfail} option, you run the risk of having
 the computer power cut before the system has shutdown. Even if the grace
 period is rather long, if something goes wrong in the shutdown, well, it is up
 to you to decide.  
