@@ -6604,7 +6604,9 @@ apcupsd automatically appends the name of the device when creating the file.
 On most systems, this directive is automatically set by the {\tt ./configure}
 program.  You may also explicitly set it during the build process by using the
 {\tt \verb{--{with-lock-dir=} option of the {\tt ./configure} program. 
+
 \end{description}
+
 
 \label{Configuration-Directives-Used-by-the-Network-Information-Server}
 
@@ -6691,6 +6693,50 @@ see the Cables (see
 
 \begin{description}
 
+\item [BATTERYLEVEL \lt{}percent of battery\gt{}]
+   \index{BATTERYLEVEL \lt{}percent of battery\gt{} }
+   If BATTERYLEVEL is specified, during a power failure, apcupsd will halt the
+system when the remaining battery charge falls below the specified percentage.
+The default is 5 percent. This directive is ignored for dumb
+(voltage-signalling) UPSes. To totally disable this counter, set {\bf
+BATTERYLEVEL -1} in your apcupsd.conf file.  
+
+\item [MINUTES \lt{}battery runtime in minutes\gt{}]
+   \index{MINUTES \lt{}battery runtime in minutes\gt{} }
+   If MINUTES is specified, during a power failure, apcupsd will shutdown the
+system when the remaining runtime on batteries as internally calculated by the
+UPS falls below the time specified. The default is 3. This directive is
+ignored for dumb (voltage-signalling) UPSes. It should be noted that some
+UPSes report an incorrect value for remaining runtime when the battery is
+fully charged. This can be checked by examining the {\bf TIMELEFT} value as
+printed in the output of an {\tt apcaccess status} command. If the value is
+zero or otherwise unreasonable, your UPS is probably broken. In this case, we
+recommend that you disable this timer by setting {\bf MINUTES -1} in your
+apcupsd.conf file.  
+
+\item [TIMEOUT \lt{}time in seconds\gt{}]
+   \index{TIMEOUT \lt{}time in seconds\gt{} }
+   After a power failure, apcupsd will halt the system when TIMEOUT seconds have
+expired.  A value of zero disables this timer. Normally for all Smart UPS
+models and dumb UPSes with cables that support low battery detection, this
+should be zero so that the shutdown time will be determined by the battery
+level and/or remaining runtime (see above) or in the case of a
+voltage-signalling UPS, when the battery is exhausted.  This command is
+required for dumb UPSes that do not provide a battery exhausted signal (only
+testing can determine this point).  For more information, see the Testing (see
+
+\ilink{Testing Apcupsd}{Testing-Apcupsd}) section of this manual. 
+This timer can also be useful if you want some slave machines to shutdown
+before other machines to conserve battery power.  It is also useful for
+testing apcupsd because you can force a rapid shutdown by setting a small
+value (e.g.  60) and pulling the plug to the UPS.  
+
+{\bf TIMEOUT}, {\bf BATTERYLEVEL}, and {\bf MINUTES} can be set together
+without problems.  apcupsd will react to the first case or test that is valid.
+Normally SmartUPS users will set {\bf TIMEOUT} to zero so that the system is
+shutdown depending on the percentage battery charge remaining ({\bf
+BATTERYLEVEL}) or the remaining battery runtime ({\bf MINUTES}).  
+
 \item [ANNOY \lt{}time in seconds\gt{}]
    \index{ANNOY \lt{}time in seconds\gt{} }
    Specify the time in seconds between messages requesting logged in users to get
@@ -6722,13 +6768,16 @@ disable}.
 [ disable | timeout | percent | minutes | always ] are valid types.  
 
 The type specified allows you define the point when apcupsd will create the
-/etc/nologin file and thus when user logins are prohibited. Once the
-/etc/nologin file is created, normal users are prevented from logging in.
+'nologin' file and thus when user logins are prohibited. Once the
+'nologin' file is created, normal users are prevented from logging in.
 Control of when this file is created is important for allowing systems with
 big UPSes to run as normally until the system administrator determines the
 need for preventing user logins. The feature also allows the system
-administrator to hold the ``ANNOY'' factor until the /etc/nologin file is
-created. The default is always if no NOLOGON directive is specified.  
+administrator to hold the ``ANNOY'' factor until the 'nologin' file is
+created. The default is always disable if no NOLOGON directive is specified.  
+
+The 'nologin' file will be created in the directory specified by the 
+NOLOGINDIR directive desribed below.
 
 As far as I can tell, the only useful types are disable and always since the
 difference in the time when the logout warning is given and shutdown occurs
@@ -6771,54 +6820,19 @@ prohibit logins when the remaining runtime is less than 3 minutes (3 X 110\% =
 This will also enable the ANNOY feature. 
 \end{description}
 
+\item [NOLOGINDIR \lt{}path to nologin dir\gt{}]
+   \index{NOLOGINDIR \lt{}path to nologin dir\gt{} }
+   This directive configures the directory into which apcupsd will write the
+nologin file, as described above for the NOLOGON directive. 
 
-\item {\bf BATTERYLEVEL \lt{}percent of battery\gt{}}
-   \index{BATTERYLEVEL \lt{}percent of battery\gt{} }
-   If BATTERYLEVEL is specified, during a power failure, apcupsd will halt the
-system when the remaining battery charge falls below the specified percentage.
-The default is 5 percent. This directive is ignored for dumb
-(voltage-signalling) UPSes. To totally disable this counter, set {\bf
-BATTERYLEVEL -1} in your apcupsd.conf file.  
-
-\item {\bf MINUTES \lt{}battery runtime in minutes\gt{}}
-   \index{MINUTES \lt{}battery runtime in minutes\gt{} }
-   If MINUTES is specified, during a power failure, apcupsd will shutdown the
-system when the remaining runtime on batteries as internally calculated by the
-UPS falls below the time specified. The default is 3. This directive is
-ignored for dumb (voltage-signalling) UPSes. It should be noted that some
-UPSes report an incorrect value for remaining runtime when the battery is
-fully charged. This can be checked by examining the {\bf TIMELEFT} value as
-printed in the output of an {\tt apcaccess status} command. If the value is
-zero or otherwise unreasonable, your UPS is probably broken. In this case, we
-recommend that you disable this timer by setting {\bf MINUTES -1} in your
-apcupsd.conf file.  
-
-\item {\bf TIMEOUT \lt{}time in seconds\gt{}}
-   \index{TIMEOUT \lt{}time in seconds\gt{} }
-   After a power failure, apcupsd will halt the system when TIMEOUT seconds have
-expired.  A value of zero disables this timer. Normally for all Smart UPS
-models and dumb UPSes with cables that support low battery detection, this
-should be zero so that the shutdown time will be determined by the battery
-level and/or remaining runtime (see above) or in the case of a
-voltage-signalling UPS, when the battery is exhausted.  This command is
-required for dumb UPSes that do not provide a battery exhausted signal (only
-testing can determine this point).  For more information, see the Testing (see
-
-\ilink{Testing Apcupsd}{Testing-Apcupsd}) section of this manual. 
-This timer can also be useful if you want some slave machines to shutdown
-before other machines to conserve battery power.  It is also useful for
-testing apcupsd because you can force a rapid shutdown by setting a small
-value (e.g.  60) and pulling the plug to the UPS.  
-
-{\bf TIMEOUT}, {\bf BATTERYLEVEL}, and {\bf MINUTES} can be set together
-without problems.  apcupsd will react to the first case or test that is valid.
-Normally SmartUPS users will set {\bf TIMEOUT} to zero so that the system is
-shutdown depending on the percentage battery charge remaining ({\bf
-BATTERYLEVEL}) or the remaining battery runtime ({\bf MINUTES}).  
+Normally, the {\tt ./configure} program will set an appropriate default 
+value for your platform, often /etc. You may also specify the 
+{\tt \verb{--{with-nologdir=} option of the {\tt./configure} program 
+to change the default at compile time.  
 
 \label{KILLDELAY-_003ctime-in-seconds_003e}
 
-\item {\bf KILLDELAY \lt{}time in seconds\gt{}}
+\item [KILLDELAY \lt{}time in seconds\gt{}]
    \index{KILLDELAY \lt{}time in seconds\gt{} }
    If killdelay is set, apcupsd will continue running after a shutdown has been
 requested, and after the specified time in seconds, apcupsd will attempt to
@@ -6831,6 +6845,28 @@ power to your computer too early, the system and the disks may not have been
 properly prepared.  In addition, apcupsd must continue running after the
 shutdown is requested, and on Unix systems, this is not normally the case as
 the system will terminate all processes during the shutdown.  
+
+\item [SCRIPTDIR \lt{}path to apccontrol dir\gt{}]
+   \index{SCRIPTDIR \lt{}path to apccontrol dir\gt{} }
+   This option configures the directory in which apccontrol and other
+event scripts are located.
+
+Normally, the {\tt ./configure} program will set an appropriate default 
+value for your platform, often /etc/apcupsd.
+
+\item [PWRFAILDIR \lt{}path to powerfail dir\gt{}]
+   \index{PWRFAILDIR \lt{}path to powerfail dir\gt{} }
+   When apcupsd shuts down your system, it creates a temporary "flag file"
+which is used by the operating system halt scripts to know if this shutdown
+is due to a power failure. This directive configures which directory the
+flag file will be written into. The chosen directory must be writable by
+the user apcupsd is running as (normally root) and must not be cleared 
+or unmounted early in the shutdown sequence.
+
+Normally, the {\tt ./configure} program will set an appropriate default 
+value for your platform, often /etc/apcupsd. You may also specify the 
+{\tt \verb{--{with-pwrfaildir=} option of the {\tt./configure} program 
+to change the default at compile time.
 \end{description}
 
 \label{Configuration-Directives-used-to-Control-System-Logging}
