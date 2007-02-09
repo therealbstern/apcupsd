@@ -8,6 +8,188 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2007-02-09 18:29  adk0212
+
+	* include/version.h:
+
+	Bump rev and date for 3.14.0 release.
+
+2007-02-09 18:28  adk0212
+
+	* ReleaseNotes:
+
+	Update ReleaseNotes for 3.14.0.
+
+2007-02-08 19:14  adk0212
+
+	* doc/latex/manual.tex:
+
+	Update docs for new config directives.
+
+2007-02-07 20:12  adk0212
+
+	* doc/latex/: apcupsd.tex, manual.tex, supportedupses.tex:
+
+	Add PCNET documentation. Misc tweaks.
+
+2007-02-06 21:45  adk0212
+
+	* platforms/darwin/building-universal-binaries.txt:
+
+	Add quick documentation of how to build Universal Binaries on Mac
+	OS X.
+
+2007-02-06 21:40  adk0212
+
+	* src/drivers/: Makefile.in, apcsmart/Makefile.in,
+	dumb/Makefile.in, net/Makefile.in, pcnet/Makefile.in,
+	snmp/Makefile.in, test/Makefile.in, usb/Makefile.in,
+	usb/bsd/Makefile.in, usb/generic/Makefile.in,
+	usb/linux/Makefile.in:
+
+	Always generate archives from scratch instead of
+	appending/replacing members. Mac OS X 'ar' does not support
+	append/replace on archives containing dual format objects.
+
+2007-02-06 21:37  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Updates to allow CXX and LD to be specified via the environment.
+
+2007-02-06 17:58  adk0212
+
+	* src/Makefile.in:
+
+	Whoops, forgot missed part of the apctest fix.
+
+2007-02-06 17:57  adk0212
+
+	* examples/rpt/Smart-UPS-1500.rpt:
+
+	Add another user-contributed hid-ups dump.
+
+2007-02-06 10:27  adk0212
+
+	* autoconf/variables.mak.in, src/Makefile.in:
+
+	Fix bug where misc lib flags were used as a dependency.
+
+2007-02-04 12:54  adk0212
+
+	* examples/rpt/: Back-UPS-BR-800.rpt, Back-UPS-CS-650.rpt,
+	Back-UPS-ES-550.rpt, Back-UPS-XS-1300-LCD.rpt:
+
+	Add some contributed hid-ups dumps.
+
+2007-02-04 12:47  adk0212
+
+	* examples/: Back-UPS-350-USB.rpt, Back-UPS-350ES.rpt,
+	Back-UPS-500-USB.rpt, Back-UPS-500ES.rpt, Back-UPS-BX-1500.status,
+	BackUPS-USB.status, BackUPS.rpt, JapaneseUPS.status,
+	PowerStack450.status, SmartUPS-USB.rpt, SmartUPS-vs-650.status,
+	SmartUPS.rpt, SmartUPS1000.status, SmartUPS1400.status,
+	SmartUPS3000.status, SmartUPS5000.status, SmartUPS600.status,
+	SmartUPS700-2.status, SmartUPS700.status, backupspro.status,
+	hid-ups.rpt, newbackupspro1.status, newbackupspro2.status,
+	rpt/Back-UPS-350-USB.rpt, rpt/Back-UPS-350ES.rpt,
+	rpt/Back-UPS-500-USB.rpt, rpt/Back-UPS-500ES.rpt, rpt/BackUPS.rpt,
+	rpt/SmartUPS-USB.rpt, rpt/SmartUPS.rpt, rpt/hid-ups.rpt,
+	status/Back-UPS-BX-1500.status, status/Back-UPS-Pro-1000.status,
+	status/BackUPS-USB.status, status/JapaneseUPS.status,
+	status/PowerStack450.status, status/SmartUPS-vs-650.status,
+	status/SmartUPS1000.status, status/SmartUPS1400.status,
+	status/SmartUPS3000.status, status/SmartUPS5000.status,
+	status/SmartUPS600.status, status/SmartUPS700-2.status,
+	status/SmartUPS700.status, status/newbackupspro1.status,
+	status/newbackupspro2.status:
+
+	Move 'status' and 'rpt' captures into their own directories.
+
+2007-02-03 16:25  adk0212
+
+	* configure, autoconf/configure.in, autoconf/variables.mak.in:
+
+	Swizzle around the library vars so executables are linked only with
+	what they actually need. This prevents, for example, libnetsnmp
+	from being linked with multimon and becoming a runtime dependency.
+
+2007-01-31 19:13  adk0212
+
+	* src/win32/Makefile.in:
+
+	Fix typo.
+
+2007-01-31 19:10  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Fix ncurses test for powerflute on BSD.
+
+2007-01-31 18:45  adk0212
+
+	* src/gapcmon/gethostname.c:
+
+	Frustratingly, there are three different variants of
+	gethostbyname_r(), which gapcmon now relies on. Add appropriate
+	autoconf magic and wrappers so that non-Linux platforms will still
+	build.
+
+2007-01-31 18:41  adk0212
+
+	* configure, autoconf/aclocal.m4, autoconf/configure.in,
+	src/gapcmon/Makefile.in, src/gapcmon/gapcmon.c:
+
+	Frustratingly, there are three different variants of
+	gethostbyname_r(), which gapcmon now relies on. Add appropriate
+	autoconf magic and wrappers so that non-Linux platforms will still
+	build.
+
+2007-01-31 18:41  adk0212
+
+	* include/defines.h:
+
+	Fix SNMP compilating on Solaris by adding our own MIN/MAX macro
+	definitions.
+
+2007-01-31 17:57  adk0212
+
+	* platforms/: etc/apcupsd.conf.in, mingw/apcupsd.conf.in:
+
+	Fix typo pointed out by Neal Macklin <neal@nrm.com>: change ->
+	charge.
+
+2007-01-30 19:33  adk0212
+
+	* configure, autoconf/configure.in, src/win32/Makefile.in:
+
+	Remove gapcmon dependency on GnomeVFS.
+
+2007-01-29 18:28  adk0212
+
+	* doc/home-page/: lists.html, lists.wml:
+
+	Minor wording tweak.
+
+2007-01-29 18:27  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Update for 3.13.12 release.
+
+2007-01-28 08:39  fleetworks
+
+	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
+	suse/apcupsd.spec.in:
+
+	Remove masterconnect and mastertimeout.
+
+2007-01-27 17:35  adk0212
+
+	* ChangeLog:
+
+	Last ChangeLog for 3.13.12, maybe.
+
 2007-01-27 17:27  adk0212
 
 	* ChangeLog, include/version.h:
