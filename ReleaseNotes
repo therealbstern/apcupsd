@@ -1,132 +1,75 @@
 
-             Release Notes for Apcupsd 3.13.x
+             Release Notes for Apcupsd 3.14.x
 
-*DEVELOPMENT RELEASE*
-3.13.12 -- 15 January 2007
+Apcupsd 3.14.x is the latest STABLE release, containing many bug fixes and
+new features over the previous 3.12.x stable series. Users of all previous
+versions are encouraged to upgrade.
 
-CHANGES SINCE 3.13.11
-
-  * This is primarily intended as a platform for building/testing RPMs
-    prior to the 3.14 release.
-  * Includes minor updates and bug fixes
+IF YOU USE THE OLD STYLE MASTER/SLAVE NETWORKING MODE, BE SURE TO READ THE
+RELEASE NOTES BELOW.
 
 
-Overall features in the 3.13.x development series are described
-below...
+3.14.0 -- 09 February 2007
 
 NEW FEATURES
 
-  * Mingw32-based win32 port
+  * USB support for 3 new platforms:
+
+  	- Windows (Win98SE, WinME, Win2000, Win2003 Server, WinXP)
+  	- Mac OS X (Darwin)
+  	- Solaris 10 (x86 and SPARC)
+
+        Please see the Apcupsd manual for details on USB configuration for the
+        new platforms.
+
+  * Native Windows port
   
-  * Windows USB support
+       The winapcupsd port has been completely rewritten to use native
+       Win32 libraries (based on MinGW32). It no longer relies on a Cygwin
+       translation layer, thus improving compatibility and performance.
+
+  * PowerChute Network Shutdown driver
   
-  * Mac OS X Darwin USB support
+       Apcupsd now supports the PowerChute Network Shutdown protocol (PCNET)
+       offered by the AP9617 family of smart slot modules. This protocol is
+       much lighter-weight than SNMP and offers better security. Please see 
+       the Apcupsd manual for details on PCNET configuration.
+
+  * GAPCMON GUI monitoring tool
   
-  * Solaris 10 USB support
+       Apcupsd is now packaged with the GAPCMON GUI monitoring application
+       thanks to James Scott, Jr. This is a Gnome/GTK based application which
+       integrates into most desktop panels (not just Gnome). It monitors one or
+       more Apcupsd instances using Apcupsd's NIS networking server. The status
+       of each UPS is shown with a icon similar to the Win32 tray icon in 
+       winapcupsd. Enable building of gapcmon at compile time via 
+       --enable-gapcmon or install the apcupsd-gapcmon RPM.
 
-  * PowerChute Network Shutdown driver (--enable-pcnet)
+  * Unreliable MASTER/SLAVE networking mode is removed
+  
+       Yes, this is a feature. The old MASTER/SLAVE mode for shutting down
+       multiple servers from one UPS has historically been unreliable and prone
+       to loss of communications or lockups. Apcupsd has long had a replacement
+       networking mode using the NIS server (NIS stands for Network Information
+       Server, and has nothing to do with Sun's NIS/YP protocol). The NIS net
+       mode is very reliable and has none of the lockup bugs that have plagued 
+       MASTER/SLAVE mode.
+       
+       In 3.14.x, MASTER/SLAVE mode has been removed and the associated 
+       configuration directives are now obsolete. Please see the Apcupsd manual
+       for a very simple NIS networking configuration to replace MASTER/SLAVE.
 
-  * GUI monitoring application, gapcmon, thanks to James Scott, Jr.
-    This is a Gnome/GTK based application which integrates into most
-    desktop panels (not just Gnome). The status of each UPS is shown
-    with a icon similar to the Win32 tray icon in winapcupsd. Enable
-    building of gapcmon at compile time via --enable-gapcmon.
+   * New configuration directives to set paths at runtime
 
+       Several new (optional) configuration directives have been added to 
+       allow overriding compiled-in paths at runtime. The directives are:
 
-NOTES
+          - SCRIPTDIR (sets location of apccontrol and event scripts)
+          - PWRFAILDIR (sets location where powerfail file will be written)
+          - NOLOGINDIR (set location where nologin file will be written)
 
-Windows Port (winapcupsd)
-  * Must be installed at the root of a drive (C:\apcupsd, D:\apcupsd,
-    etc.)
+       These directives can be used to rearrange the Apcupsd installation
+       after compiling, or to run multiple Apcupsd instances on the
+       same machine without compiling separate copies.
 
-  * DEVICE specification for serial ports should be COM1, COM2, etc.
-
-  * Other apcupsd.conf settings are identical to standard UNIX version.
-
-  * Be sure to install USB driver if you have a USB UPS.
-
-
-Mac OS X Darwin USB Support
-
-  * To build you need gcc. I used gcc-4.0.1 from the recent 
-    Developer Tools (XCode 2.2).
-
-  * You need to install libusb-0.1.12 or later *before* building
-    apcupsd. The build is very sensitive to the location of libusb.
-    If you install it into a non-standard location (for your 
-    platform), chances are good the compiler will be unable to
-    find it.
-
-  * Configure & build apcupsd:
-  	./configure --enable-usb
-  	make
-  	sudo make install
-
-  YOU MUST REBOOT AFTER INSTALLATION OF APCUPSD.
-
-  * The 'make install' step will make a few necessary configuration 
-    changes for you. Specifically, on Darwin it will install a dummy
-    kext driver which prevents Apple's kernel drivers from exclusively
-    opening APC UPSes.
-    
-  * apcupsd.conf should be edited as usual for usb conections:
-	UPSCABLE usb
-	UPSTYPE usb
-	DEVICE
-
-
-Solaris 10 USB Support
-
-  * To build you need gcc. I used gcc-3.4.3 from the sfw package 
-    distributed on the software suppliment CD (SUNWgcc, 
-    SUNWgccruntime).
-
-  * You need to install libusb (SUNWlibusb, SUNWlibusbugen) *before*
-    building apcupsd. The build is very sensitive to the location of 
-    libusb. If you install it into a non-standard location (for your 
-    platform), chances are good the compiler will be unable to
-    find it.
-
-  * Configure & build apcupsd:
-  	./configure --enable-usb
-  	make
-  	sudo make install
-
-
-  * The 'make install' step will make a few necessary configuration 
-    changes for you. On Solaris, 'make install' will add a driver 
-    alias to map APC UPSes to the ugen driver
-
-  YOU MUST RECONFIGURE BOOT ("reboot -- -r") AFTER INSTALLING APCUPSD.
-
-  * apcupsd.conf should be edited as usual for usb conections:
-	UPSCABLE usb
-	UPSTYPE usb
-	DEVICE
-
-
-PowerChute Network Shutdown driver (pcnet)
-
-  * This driver is an alternative to SNMP for use with APC's
-    APC9617 family of network smartslot modules. It is a
-    very new driver and likely buggy, so USE WITH CARE.
-
-  * Configure and build with "./configure --enable-pcnet" to
-    build the driver.
-
-  * In apcupsd.conf set...
-
-  	UPSCABLE ether
-	UPSTYPE pcnet
-	DEVICE ipaddr:user:passphrase
-
-    ...where ipaddr is the IP address of the UPS mgmt card,
-    user is the username you configured the card with (normally
-    "apc") and passphrase is the password the card is configured
-    with.
-
-    Note that you may leave DEVICE blank and Apcupsd will accept
-    information from any PCNET UPS on the network, HOWEVER IT
-    WILL BE VERY INSECURE SINCE AN ATTACKER COULD EASILY SEND
-    PACKETS CRAFTED TO CAUSE YOUR SERVER TO SHUT DOWN. Using 
-    the ipaddr, user, and passphrase will prevent this behavior.
+       See the Apcupsd manual for details on these new directives.
