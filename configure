@@ -11955,9 +11955,7 @@ fi
    WANT_NET_SNMP="yes"
    SNMP_LIB_FOUND="no"
 
-      _cppflags=${CPPFLAGS}
-   _ldflags=${LDFLAGS}
-   CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
+      CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
    LDFLAGS="${LDFLAGS} -L/usr/local/lib"
 
       if test "$SNMP_LIB_FOUND" = "no" ; then
@@ -11967,7 +11965,7 @@ if test "${ac_cv_lib_netsnmp_snmp_open+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lnetsnmp  $LIBS"
+LIBS="-lnetsnmp $DRVLIBS $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -12040,7 +12038,7 @@ if test "${ac_cv_lib_snmp_snmp_open+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lsnmp  $LIBS"
+LIBS="-lsnmp $DRVLIBS $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
