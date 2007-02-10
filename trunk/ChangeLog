@@ -8,6 +8,18 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2007-02-10 11:59  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Fix net-snmp detection bug when libcrypt is required.
+
+2007-02-09 18:31  adk0212
+
+	* ChangeLog:
+
+	Regen ChangeLog.
+
 2007-02-09 18:29  adk0212
 
 	* include/version.h:
