@@ -802,8 +802,6 @@ if test "$WANT_SNMP" = "yes" ; then
    SNMP_LIB_FOUND="no"
 
    dnl libsnmp is often in /usr/local
-   _cppflags=${CPPFLAGS}
-   _ldflags=${LDFLAGS}
    CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
    LDFLAGS="${LDFLAGS} -L/usr/local/lib"
 
@@ -811,7 +809,7 @@ if test "$WANT_SNMP" = "yes" ; then
    if test "$SNMP_LIB_FOUND" = "no" ; then
       AC_CHECK_LIB(netsnmp, snmp_open,
          [DRVLIBS="$DRVLIBS -lnetsnmp"
-          SNMP_LIB_FOUND="yes"], [], [])
+          SNMP_LIB_FOUND="yes"], [], [$DRVLIBS])
    fi
 
    dnl If no lib yet, fall back on libsnmp (ucd-snmp)
@@ -819,7 +817,7 @@ if test "$WANT_SNMP" = "yes" ; then
       WANT_NET_SNMP="no"
       AC_CHECK_LIB(snmp, snmp_open,
          [DRVLIBS="$DRVLIBS -lsnmp"
-          SNMP_LIB_FOUND="yes"], [], [])
+          SNMP_LIB_FOUND="yes"], [], [$DRVLIBS])
    fi
 
    if test "$SNMP_LIB_FOUND" = "no" ; then
