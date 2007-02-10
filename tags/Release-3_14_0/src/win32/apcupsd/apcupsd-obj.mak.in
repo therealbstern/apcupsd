@@ -1,0 +1,16 @@
+
+!IF  "$(CFG)" == "apcupsd - Win32 Release"
+
+
+"$(INTDIR)\$(FILENAME).obj" : $(SOURCE) "$(INTDIR)"
+        $(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ELSEIF  "$(CFG)" == "apcupsd - Win32 Debug"
+
+
+"$(INTDIR)\$(FILENAME).obj"     "$(INTDIR)\$(FILENAME).sbr" : $(SOURCE) "$(INTDIR)"
+        $(CPP) $(CPP_PROJ) $(SOURCE)
+
+
+!ENDIF 
