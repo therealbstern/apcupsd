@@ -3,11 +3,11 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleGetInfoString</key>
-	<string>3.14.0, www.apcupsd.org</string>
+   <string>@VERSION@, www.apcupsd.org</string>
 	<key>CFBundleIdentifier</key>
-	<string>org.apcupsd.daemon</string>
+	<string>org.apcupsd.usbshim</string>
 	<key>CFBundleShortVersionString</key>
-   <string>3.14.0</string>
+	<string>@VERSION@</string>
 	<key>IFPkgFlagAllowBackRev</key>
 	<true/>
 	<key>IFPkgFlagAuthorizationAction</key>
@@ -23,7 +23,7 @@
 	<key>IFPkgFlagInstallFat</key>
 	<false/>
 	<key>IFPkgFlagInstalledSize</key>
-	<integer>2240</integer>
+	<integer>4</integer>
 	<key>IFPkgFlagIsRequired</key>
 	<false/>
 	<key>IFPkgFlagOverwritePermissions</key>
@@ -31,7 +31,7 @@
 	<key>IFPkgFlagRelocatable</key>
 	<false/>
 	<key>IFPkgFlagRestartAction</key>
-	<string>RecommendedRestart</string>
+	<string>RequiredRestart</string>
 	<key>IFPkgFlagRootVolumeOnly</key>
 	<true/>
 	<key>IFPkgFlagUpdateInstalledLanguages</key>
