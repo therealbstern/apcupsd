@@ -9,7 +9,26 @@ IF YOU USE THE OLD STYLE MASTER/SLAVE NETWORKING MODE, BE SURE TO READ THE
 RELEASE NOTES BELOW.
 
 
-3.14.0 -- 09 February 2007
+3.14.1 -- 20 April 2007         (Maintenance Release)
+
+NEW FEATURES
+
+  * MacOS X GUI installer
+  
+BUG FIXES
+
+  * (win32) Detect when balloon tips have been disabled via a group policy
+      and fall back on the standard popup message box.
+
+  * (win32) Fix typo: "%sbindir\%popup" -> "%sbindir%\popup" in apccontrol.bat
+      Discovered by Stefan.Hegnauer@elektrobit.com.
+
+  * (all) Fix potential NIS client lockup when server disappears. Many thanks
+      to Jan Ceuleers <jan.ceuleers@computer.org> for reporting the problem
+      and gathering data to track down the cause.
+
+
+3.14.0 -- 09 February 2007      (Feature Release)
 
 NEW FEATURES
 
