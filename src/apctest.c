@@ -475,6 +475,7 @@ int main(int argc, char *argv[])
        * the proper cable.
        */
       if (dumb_mode_test) {
+#ifdef HAVE_APCSMART_DRIVER
          char ans[20];
 
          write(ups->fd, "R", 1);   /* enter dumb mode */
@@ -482,6 +483,9 @@ int main(int argc, char *argv[])
          getline(ans, sizeof(ans), ups);
          pmsg("Going dumb: %s\n", ans);
          mode = M_DUMB;            /* run in dumb mode */
+#else
+         pmsg("apcsmart not compiled: dumb mode test unavailable\n");
+#endif
       }
    }
 
