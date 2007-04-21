@@ -580,9 +580,45 @@ following changes} to your kernel config file:
 \\{\bf Disable:} uhid
 \\{\bf Enable:} ugen
 
-\item [NetBSD] (you {\bf will} lose use of USB keyboard and mouse):
+\item [NetBSD (v3.x and below)]
+(you {\bf will} lose use of USB keyboard and mouse):
 \\{\bf Disable:} uhidev, ums, wsmouse, ukbd, wskbd, uhid  
 \\{\bf Enable:} ugen
+
+\item [NetBSD (v4.0 and above)]
+You can use apcupsd on single USB port without disabling the USB
+keyboard and mouse on other ports, though all other devices will
+be disabled on the port you pick for your UPS.
+
+First, decide which hub and port you wish to use. You can
+find out the hub and port numbers for any particular physical
+connector by plugging a USB device into it and looking at the
+messages printed by the kernel; you should messages something
+like this:
+
+\begin{verbatim}
+     uxx0 at uhub0 port 1
+     uxx0: <some device name>
+\end{verbatim}
+
+To use your APC UPS on this port, configure the kernel to prefer
+attachment of the ugen driver over other drivers on this hub
+and port only, by adding a line like this to your kernel config
+file:
+
+\begin{verbatim}
+     ugen*   at uhub0 port 1 flags 1
+\end{verbatim}
+
+(The "flags 1" forces the ugen to attach instead of anything
+else detected there.)
+
+Configure and build that kernel as per the references below, and
+your UPS will now attach as a ugen device when plugged into that
+port.
+
+Don't forget to cd to /dev and "./MAKEDEV ugen1" (and 2 and so
+on) if you have more than one generic usb device on your system.
 
 \item [OpenBSD] (you {\bf will} lose use of USB keyboard and mouse):
 \\{\bf Disable:} uhidev, ums, wsmouse, ukbd, wskbd, uhid  
