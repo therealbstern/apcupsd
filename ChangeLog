@@ -8,6 +8,39 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2007-04-21 20:35  adk0212
+
+	* ReleaseNotes, include/version.h:
+
+	Final updates for 3.14.1.
+
+2007-04-21 20:24  adk0212
+
+	* doc/latex/manual.tex:
+
+	Clarify FreeBSD versions in USB kernel section.
+
+2007-04-21 19:59  adk0212
+
+	* doc/latex/manual.tex:
+
+	Add USB info for NetBSD 4.x (ugen binding can be forced on a
+	particular port). Contributed by Curt Sampson
+	<cjs@starling-software.com>.
+
+2007-04-21 19:27  adk0212
+
+	* src/apctest.c:
+
+	Fix link error with --disable-apcsmart (getline missing).  Reported
+	by Ashley M. Kirchner <ashley@pcraft.com>
+
+2007-04-18 19:33  adk0212
+
+	* ChangeLog:
+
+	Updated changelog for 3.14.1.
+
 2007-04-18 19:30  adk0212
 
 	* ReleaseNotes, include/version.h:
