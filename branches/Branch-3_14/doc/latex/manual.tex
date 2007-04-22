@@ -565,20 +565,25 @@ three platforms.)
 \index{BSD!USB Kernel Configuration}
 \index{USB!BSD Kernel Configuration}
 
-FreeBSD 5.5.0 and later require no special kernel configuration. Users of
-those platforms can skip ahead to the next subsection.
-
-Users of OpenBSD, NetBSD, and FreeBSD 5.4 (and older) will need to rebuild
-the kernel in order to {\bf enable the ugen driver} and {\bf disable the 
-uhid driver}. uhid is not sufficient for apcupsd at this time and we need 
-to prevent it from grabbing the UPS device. You should {\bf make the 
-following changes} to your kernel config file:
+Users of OpenBSD, NetBSD, and some versions of FreeBSD will need to 
+rebuild the kernel in order to {\bf enable the ugen driver} and 
+{\bf disable the uhid driver}. uhid is not sufficient for apcupsd at 
+this time and we need to prevent it from grabbing the UPS device. You 
+should {\bf make the following changes} to your kernel config file:
 
 \begin{description}
-\item [FreeBSD]
+\item [FreeBSD (v5.4 and below, v6.0)]
 (you {\bf will not} lose use of USB keyboard and mouse):
 \\{\bf Disable:} uhid
 \\{\bf Enable:} ugen
+
+\item [FreeBSD (v5.5, v6.1 and above)]
+(you {\bf will not} lose use of USB keyboard and mouse):
+\\{\bf Disable:} (nothing)
+\\{\bf Enable:} ugen
+
+This is the default configuration for a GENERIC kernel on many platforms
+so you most likely will not need to recompile.
 
 \item [NetBSD (v3.x and below)]
 (you {\bf will} lose use of USB keyboard and mouse):
