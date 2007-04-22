@@ -9,7 +9,7 @@ IF YOU USE THE OLD STYLE MASTER/SLAVE NETWORKING MODE, BE SURE TO READ THE
 RELEASE NOTES BELOW.
 
 
-3.14.1 -- 20 April 2007         (Maintenance Release)
+3.14.1 -- 22 April 2007         (Maintenance Release)
 
 NEW FEATURES
 
@@ -26,6 +26,11 @@ BUG FIXES
   * (all) Fix potential NIS client lockup when server disappears. Many thanks
       to Jan Ceuleers <jan.ceuleers@computer.org> for reporting the problem
       and gathering data to track down the cause.
+
+  * (apctest) Fix link error after configuring with --disable-apcsmart.
+
+  * (doc) Document how to force ugen binding on NetBSD 4.x.
+      Contributed by Curt Sampson <cjs@starling-software.com>.
 
 
 3.14.0 -- 09 February 2007      (Feature Release)
