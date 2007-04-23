@@ -8,6 +8,35 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2007-04-23 19:45  adk0212
+
+	* include/version.h:
+
+	Did I say "final"?
+
+2007-04-23 19:37  adk0212
+
+	* src/apctest.c:
+
+	Fix typo in error message.  Reported by Ashley M. Kirchner
+	<ashley@pcraft.com>
+
+2007-04-23 19:35  adk0212
+
+	* platforms/redhat/apcupsd.in:
+
+	Update to match Fedora Extras packaging:   - Add "force-reload"
+	aliased to "restart"   - "reload" outputs a not implemented error
+	- "status" uses the status() function to return the proper LSB
+	status	    code and runs apcaccess only if the daemon is running.
+	Contributed by Orion Poplawski <orion@cora.nwra.com>.
+
+2007-04-21 20:37  adk0212
+
+	* ChangeLog:
+
+	Update ChangeLog for 3.14.1 (again).
+
 2007-04-21 20:35  adk0212
 
 	* ReleaseNotes, include/version.h:
