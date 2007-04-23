@@ -1318,11 +1318,11 @@ static void program_smart_eeprom(void)
             break;
 
          default:
-            pmsg("Illegal response. Please enter 1-7\n");
+            pmsg("Illegal response. Please enter 1-15\n");
             break;
          }
       } else {
-         pmsg("Illegal response. Please enter 1-7\n");
+         pmsg("Illegal response. Please enter 1-15\n");
       }
    }
    ptime();
@@ -1586,11 +1586,11 @@ static void do_usb_testing(void)
             quit = TRUE;
             break;
          default:
-            pmsg("Illegal response. Please enter 1-7\n");
+            pmsg("Illegal response. Please enter 1-9\n");
             break;
          }
       } else {
-         pmsg("Illegal response. Please enter 1-7\n");
+         pmsg("Illegal response. Please enter 1-9\n");
       }
    }
    ptime();
