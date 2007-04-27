@@ -110,6 +110,30 @@ static bool pcnet_process_data(UPSINFO* ups, const char *key, const char *value)
    if (*value == '\0')
       return false;
 
+   /* Detect remote shutdown command */
+   if (strcmp(key, "SD") == 0)
+   {
+      cmd = strtoul(value, NULL, 10);
+      switch (cmd)
+      {
+      case 0:
+         Dmsg0(80, "SD: The UPS is NOT shutting down\n");
+         ups->clear_shut_remote();
+         break;
+
+      case 1:
+         Dmsg0(80, "SD: The UPS is shutting down\n");
+         ups->set_shut_remote();
+         break;
+
+      default:
+         Dmsg1(80, "Unrecognized SD value %s!\n", value);
+         break;
+      }
+ 
+      return true;
+   }
+
    /* Key must be 2 hex digits */
    if (!isxdigit(key[0]) || !isxdigit(key[1]))
       return false;
