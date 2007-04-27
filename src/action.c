@@ -74,7 +74,7 @@ UPSCMDMSG event_msg[] = {
    {LOG_ALERT,   N_("Users requested to logoff.")},
    {LOG_ALERT,   N_("Battery failure. Emergency.")},
    {LOG_CRIT,    N_("UPS battery must be replaced.")},
-   {LOG_CRIT,    N_("Remote shutdown requested")},
+   {LOG_CRIT,    N_("Remote shutdown requested.")},
    {LOG_WARNING, N_("Communications with UPS lost.")},
    {LOG_WARNING, N_("Communications with UPS restored.")},
    {LOG_ALERT,   N_("UPS Self Test switch to battery.")},
