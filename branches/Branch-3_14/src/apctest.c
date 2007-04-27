@@ -2112,7 +2112,11 @@ static void parse_eeprom_cmds(char *eprom, char locale)
 {
    char *p = eprom;
    char c, l, n, s;
+#ifdef debuggggggg
+   int i;
+#endif
 
+   ncmd = 0;
    for (;;) {
       c = *p++;
       if (c == 0)
