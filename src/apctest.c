@@ -1860,7 +1860,7 @@ static void usb_run_self_test(void)
 
    pmsg("Waiting for test to complete...");
 
-   for (timeout = 0; timeout < 20; timeout++) {
+   for (timeout = 0; timeout < 40; timeout++) {
       if (!usb_read_int_from_ups(ups, CI_ST_STAT, &result)) {
          pmsg("ERROR READING STATUS\n");
          usb_write_int_to_ups(ups, CI_ST_STAT, 3, "SelftestStatus");
@@ -1875,7 +1875,7 @@ static void usb_run_self_test(void)
       sleep(1);
    }
 
-   if (timeout == 20) {
+   if (timeout == 40) {
       pmsg("TEST DID NOT COMPLETE\n");
       usb_write_int_to_ups(ups, CI_ST_STAT, 3, "SelftestStatus");
       return;
