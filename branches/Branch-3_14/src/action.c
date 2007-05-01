@@ -447,8 +447,8 @@ void do_action(UPSINFO *ups)
       break;
 
    case st_SelfTest:
-      /* allow 20 seconds max for selftest */
-      if (now - ups->SelfTest < 20 && !ups->is_battlow())
+      /* allow 40 seconds max for selftest */
+      if (now - ups->SelfTest < 40 && !ups->is_battlow())
          break;
 
       /* Cancel self test, announce power failure */
