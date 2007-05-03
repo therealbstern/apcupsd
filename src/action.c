@@ -603,15 +603,6 @@ void do_action(UPSINFO *ups)
          generate_event(ups, CMDOFFBATTERY);
       }
 
-      if (ups->is_shutdown()) {
-         /* If we have a shutdown to cancel, do it now. */
-         ups->ShutDown = 0;
-         ups->clear_shutdown();
-         powerfail(1);
-         unlink(ups->pwrfailpath);
-         log_event(ups, LOG_ALERT, _("Cancelling shutdown"));
-      }
-
       if (ups->SelfTest) {
          ups->LastSelfTest = ups->SelfTest;
          ups->SelfTest = 0;
