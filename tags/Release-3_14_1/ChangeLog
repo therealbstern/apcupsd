@@ -1,0 +1,223 @@
+/***************************************************************************/
+/*                     ChangeLog of Apcupsd 3.14.x                         */
+/*                                                                         */
+/*               Adam Kropelin <akropel1 at rochester dot rr dot com>      */
+/*               Kern Sibbald <kern at sibbald dot com>                    */
+/*                                                                         */
+/*               http://www.apcupsd.com/                                   */
+/*               http://sourceforge.net/projects/apcupsd                   */
+/***************************************************************************/
+
+2007-05-04 19:17  adk0212
+
+	* ReleaseNotes, include/version.h:
+
+	Maybe this time...
+
+2007-05-03 18:31  adk0212
+
+	* src/action.c:
+
+	Do not attempt to cancel shutdowns. Once a shutdown has been
+	started there is no way to cleanly stop it and recover. Plus
+	deleting the powerfail file causes killpower to be skipped, leaving
+	the server shutdown and not restarted. Reported by Yvon Lafaille
+	<yvon.lafaille@yahoo.fr>.
+
+2007-05-01 20:26  adk0212
+
+	* src/drivers/usb/linux/linux-usb.c:
+
+	Rewrite device opening logic. The new logic works as follows:	 -
+	If user specifies a DEVICE, we will open that device and that
+	device	    only. There is no fallback to autodetect. This is
+	generaly what users	 expect when they explicitly give DEVICE.
+	  - If no DEVICE is specified, we autodetect as before.
+	Furthermore, if       we lose the connection to the device, we
+	prefer to re-open the same	 device again, but will restart
+	autodetection if that fails.	 - If DEVICE is specified using the
+	deprecated '[]' syntax, just do       normal autodetection as if
+	DEVICE had not been specified at all.
+
+2007-04-30 22:14  adk0212
+
+	* src/drivers/snmp/drv_powernet.c:
+
+	Disable a few CIs that SNMP cards do not support.
+
+2007-04-30 21:37  adk0212
+
+	* src/: action.c, apctest.c:
+
+	Increase self-test timeout to 40 seconds to accomodate the RS 800.
+	Contributed by Lars Randers <lars@nstec.dk>.
+
+2007-04-27 19:30  adk0212
+
+	* src/apctest.c:
+
+	Fix apctest crash. When in the EEPROM programming section of
+	apctest, if you try to print EEPROM values (item 1) more than once
+	during the same session, the program segfaults.  Contributed by
+	Ivaylo Haratcherev <I.J.Haratcherev@tudelft.nl>.
+
+2007-04-27 19:25  adk0212
+
+	* src/action.c:
+
+	Normalize shut remote message.
+
+2007-04-27 19:24  adk0212
+
+	* src/drivers/pcnet/pcnet.c:
+
+	Add support for PCNET remote shutdown (SD) signal. Contributed by
+	Ivaylo Haratcherev <I.J.Haratcherev@tudelft.nl> and Moshe Hyzon
+	<moshe.hyzon@grantstreet.com>.
+
+2007-04-23 19:47  adk0212
+
+	* ChangeLog:
+
+	Rev ChangeLog.
+
+2007-04-23 19:45  adk0212
+
+	* include/version.h:
+
+	Did I say "final"?
+
+2007-04-23 19:37  adk0212
+
+	* src/apctest.c:
+
+	Fix typo in error message.  Reported by Ashley M. Kirchner
+	<ashley@pcraft.com>
+
+2007-04-23 19:35  adk0212
+
+	* platforms/redhat/apcupsd.in:
+
+	Update to match Fedora Extras packaging:   - Add "force-reload"
+	aliased to "restart"   - "reload" outputs a not implemented error
+	- "status" uses the status() function to return the proper LSB
+	status	    code and runs apcaccess only if the daemon is running.
+	Contributed by Orion Poplawski <orion@cora.nwra.com>.
+
+2007-04-21 20:37  adk0212
+
+	* ChangeLog:
+
+	Update ChangeLog for 3.14.1 (again).
+
+2007-04-21 20:35  adk0212
+
+	* ReleaseNotes, include/version.h:
+
+	Final updates for 3.14.1.
+
+2007-04-21 20:24  adk0212
+
+	* doc/latex/manual.tex:
+
+	Clarify FreeBSD versions in USB kernel section.
+
+2007-04-21 19:59  adk0212
+
+	* doc/latex/manual.tex:
+
+	Add USB info for NetBSD 4.x (ugen binding can be forced on a
+	particular port). Contributed by Curt Sampson
+	<cjs@starling-software.com>.
+
+2007-04-21 19:27  adk0212
+
+	* src/apctest.c:
+
+	Fix link error with --disable-apcsmart (getline missing).  Reported
+	by Ashley M. Kirchner <ashley@pcraft.com>
+
+2007-04-18 19:33  adk0212
+
+	* ChangeLog:
+
+	Updated changelog for 3.14.1.
+
+2007-04-18 19:30  adk0212
+
+	* ReleaseNotes, include/version.h:
+
+	Prep for 3.14.1 release.
+
+2007-03-25 15:38  adk0212
+
+	* src/lib/apclibnis.c:
+
+	Prevent infinite hang in read_nbytes() when server disappears.
+	Many thanks to Jan Ceuleers <jan.ceuleers@computer.org> for
+	reporting the hanging and gathering data to track down the cause.
+
+2007-03-25 15:34  adk0212
+
+	* src/libusbhid/parse.c:
+
+	Remove references to int8_t and int16_t.
+
+2007-03-05 22:41  adk0212
+
+	* src/libusbhid/usbcompat.h:
+
+	Kill stdint.h include since OpenBSD does not appear to have it.
+
+2007-03-03 16:40  adk0212
+
+	* platforms/darwin/: ApcupsdDaemon.Info.plist,
+	ApcupsdDaemon.Info.plist.in, ApcupsdPkg.Info.plist,
+	ApcupsdPkg.Info.plist.in, ApcupsdUsbShim.Info.plist,
+	ApcupsdUsbShim.Info.plist.in:
+
+	Hey, genius... Archive foo.bar.in, not foo.bar.
+
+2007-03-03 16:28  adk0212
+
+	* configure:
+
+	Regen with Mac OS X installer changes.
+
+2007-03-03 16:23  adk0212
+
+	* autoconf/configure.in,
+	platforms/darwin/ApcupsdDaemon.Description.plist,
+	platforms/darwin/ApcupsdDaemon.Info.plist,
+	platforms/darwin/ApcupsdDaemon.postflight,
+	platforms/darwin/ApcupsdDaemon.preflight,
+	platforms/darwin/ApcupsdPkg.Description.plist,
+	platforms/darwin/ApcupsdPkg.Info.plist,
+	platforms/darwin/ApcupsdUsbShim.Description.plist,
+	platforms/darwin/ApcupsdUsbShim.Info.plist,
+	platforms/darwin/ApcupsdUsbShim.postflight,
+	platforms/darwin/Makefile.in, platforms/darwin/Welcome.txt:
+
+	Add binary installer support for Mac OS X.
+
+2007-02-17 12:02  adk0212
+
+	* autoconf/aclocal.m4:
+
+	Add missing newline at end of file.  Discovered by Sergey Y. Afonin
+	<asy@kraft-s.ru>.
+
+2007-02-17 12:00  adk0212
+
+	* platforms/mingw/apccontrol.bat:
+
+	Fix typo: "%sbindir\%popup" -> "%sbindir%\popup" Discovered by
+	Stefan.Hegnauer@elektrobit.com.
+
+2007-02-13 19:02  adk0212
+
+	* src/win32/popup.c:
+
+	Detect when balloon tips have been disabled via a group policy and
+	fall back on the standard popup message box.
+
