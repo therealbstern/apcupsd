@@ -74,7 +74,7 @@ UPSCMDMSG event_msg[] = {
    {LOG_ALERT,   N_("Users requested to logoff.")},
    {LOG_ALERT,   N_("Battery failure. Emergency.")},
    {LOG_CRIT,    N_("UPS battery must be replaced.")},
-   {LOG_CRIT,    N_("Remote shutdown requested")},
+   {LOG_CRIT,    N_("Remote shutdown requested.")},
    {LOG_WARNING, N_("Communications with UPS lost.")},
    {LOG_WARNING, N_("Communications with UPS restored.")},
    {LOG_ALERT,   N_("UPS Self Test switch to battery.")},
@@ -447,8 +447,8 @@ void do_action(UPSINFO *ups)
       break;
 
    case st_SelfTest:
-      /* allow 20 seconds max for selftest */
-      if (now - ups->SelfTest < 20 && !ups->is_battlow())
+      /* allow 40 seconds max for selftest */
+      if (now - ups->SelfTest < 40 && !ups->is_battlow())
          break;
 
       /* Cancel self test, announce power failure */
@@ -601,15 +601,6 @@ void do_action(UPSINFO *ups)
       if (ups->is_onbatt_msg()) {
          ups->clear_onbatt_msg();
          generate_event(ups, CMDOFFBATTERY);
-      }
-
-      if (ups->is_shutdown()) {
-         /* If we have a shutdown to cancel, do it now. */
-         ups->ShutDown = 0;
-         ups->clear_shutdown();
-         powerfail(1);
-         unlink(ups->pwrfailpath);
-         log_event(ups, LOG_ALERT, _("Cancelling shutdown"));
       }
 
       if (ups->SelfTest) {

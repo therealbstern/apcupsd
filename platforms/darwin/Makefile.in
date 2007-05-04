@@ -12,6 +12,10 @@ top_builddir = $(topdir)
 # Include the default make targets: to be put before the all-targets: rule.
 @TARGETS@
 
+# PackageMaker variables
+PACKAGEMAKER=/Developer/Tools/packagemaker
+PKGROOT=/tmp/apcupsd-pkg
+
 all-targets: Makefile
 
 install: install-exec install-@USB_DRIVER@
@@ -23,6 +27,9 @@ install-exec:
 	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)/Library/StartupItems/apcupsd
 	$(INSTALL_SCRIPT) ./apcupsd $(DESTDIR)/Library/StartupItems/apcupsd;
 	$(INSTALL_DATA) ./StartupParameters.plist $(DESTDIR)/Library/StartupItems/apcupsd;
+	chown root:wheel $(DESTDIR)/Library/StartupItems/apcupsd
+	chown root:wheel $(DESTDIR)/Library/StartupItems/apcupsd/apcupsd
+	chown root:wheel $(DESTDIR)/Library/StartupItems/apcupsd/StartupParameters.plist
 	@echo "================================================="
 	@echo " "
 	@echo "apcupsd script installation for MacOS X (Darwin) complete." 
@@ -76,6 +83,29 @@ uninstall:
 	@echo "Please REBOOT to complete uninstall." 
 	@echo " "
 	@echo "================================================="
+
+apcupsd.pkg:
+	rm -rf $(PKGROOT)
+	mkdir $(PKGROOT)
+	mkdir $(PKGROOT)/ApcupsdDaemon.Root
+	mkdir $(PKGROOT)/ApcupsdUsbShim.Root
+	mkdir $(PKGROOT)/ApcupsdDaemon.Resources
+	mkdir $(PKGROOT)/ApcupsdUsbShim.Resources
+	mkdir $(PKGROOT)/ApcupsdPkg.Resources
+	mkdir $(PKGROOT)/Packages
+	mkdir $(PKGROOT)/Apcupsd
+	( cd $(topdir) && DESTDIR=$(PKGROOT)/ApcupsdDaemon.Root make install )
+	mv $(PKGROOT)/ApcupsdDaemon.Root/System $(PKGROOT)/ApcupsdUsbShim.Root
+	cp $(topdir)/ReleaseNotes $(PKGROOT)/ApcupsdPkg.Resources/ReadMe.txt
+	cp $(topdir)/COPYING $(PKGROOT)/ApcupsdPkg.Resources/License.txt
+	cp Welcome.txt $(PKGROOT)/ApcupsdPkg.Resources
+	cp ApcupsdDaemon.preflight $(PKGROOT)/ApcupsdDaemon.Resources/preflight
+	cp ApcupsdDaemon.postflight $(PKGROOT)/ApcupsdDaemon.Resources/postflight
+	cp ApcupsdUsbShim.postflight $(PKGROOT)/ApcupsdUsbShim.Resources/postflight
+	$(PACKAGEMAKER) -build -v -p $(PKGROOT)/Packages/ApcupsdDaemon.pkg -f $(PKGROOT)/ApcupsdDaemon.Root -r $(PKGROOT)/ApcupsdDaemon.Resources -i ApcupsdDaemon.Info.plist -d ApcupsdDaemon.Description.plist
+	$(PACKAGEMAKER) -build -v -p $(PKGROOT)/Packages/ApcupsdUsbShim.pkg -f $(PKGROOT)/ApcupsdUsbShim.Root -r $(PKGROOT)/ApcupsdUsbShim.Resources -i ApcupsdUsbShim.Info.plist -d ApcupsdUsbShim.Description.plist
+	$(PACKAGEMAKER) -build -v -p $(PKGROOT)/Apcupsd/Apcupsd-$(VERSION).pkg -mi $(PKGROOT)/Packages -r $(PKGROOT)/ApcupsdPkg.Resources -i ApcupsdPkg.Info.plist -d ApcupsdPkg.Description.plist
+	hdiutil create -ov -srcfolder $(PKGROOT)/Apcupsd -volname Apcupsd-$(VERSION) Apcupsd-$(VERSION).dmg
 
 clean:
 
