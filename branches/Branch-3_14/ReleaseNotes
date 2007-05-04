@@ -9,12 +9,14 @@ IF YOU USE THE OLD STYLE MASTER/SLAVE NETWORKING MODE, BE SURE TO READ THE
 RELEASE NOTES BELOW.
 
 
-3.14.1 -- 22 April 2007         (Maintenance Release)
+3.14.1 -- 04 May 2007           (Maintenance Release)
 
 NEW FEATURES
 
   * MacOS X GUI installer
-  
+
+  * PCNET driver supports remote shutdown request from UPS web interface
+
 BUG FIXES
 
   * (win32) Detect when balloon tips have been disabled via a group policy
@@ -31,6 +33,17 @@ BUG FIXES
 
   * (doc) Document how to force ugen binding on NetBSD 4.x.
       Contributed by Curt Sampson <cjs@starling-software.com>.
+
+  * (apctest) Fix crash when displaying EEPROM values more than once.
+      Contributed by Ivaylo Haratcherev <I.J.Haratcherev@tudelft.nl>.
+
+  * Increase self-test timeout to 40 seconds to accomodate the RS 800.
+      Contributed by Lars Randers <lars@nstec.dk>.
+
+  * (linux-usb) Rewrite device opening logic to be more reliable. See 
+      ChangeLog for details.
+
+  * (apcupsd) Do not attempt to cancel shutdowns.
 
 
 3.14.0 -- 09 February 2007      (Feature Release)
