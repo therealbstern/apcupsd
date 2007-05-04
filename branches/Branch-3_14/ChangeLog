@@ -8,6 +8,79 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2007-05-04 19:17  adk0212
+
+	* ReleaseNotes, include/version.h:
+
+	Maybe this time...
+
+2007-05-03 18:31  adk0212
+
+	* src/action.c:
+
+	Do not attempt to cancel shutdowns. Once a shutdown has been
+	started there is no way to cleanly stop it and recover. Plus
+	deleting the powerfail file causes killpower to be skipped, leaving
+	the server shutdown and not restarted. Reported by Yvon Lafaille
+	<yvon.lafaille@yahoo.fr>.
+
+2007-05-01 20:26  adk0212
+
+	* src/drivers/usb/linux/linux-usb.c:
+
+	Rewrite device opening logic. The new logic works as follows:	 -
+	If user specifies a DEVICE, we will open that device and that
+	device	    only. There is no fallback to autodetect. This is
+	generaly what users	 expect when they explicitly give DEVICE.
+	  - If no DEVICE is specified, we autodetect as before.
+	Furthermore, if       we lose the connection to the device, we
+	prefer to re-open the same	 device again, but will restart
+	autodetection if that fails.	 - If DEVICE is specified using the
+	deprecated '[]' syntax, just do       normal autodetection as if
+	DEVICE had not been specified at all.
+
+2007-04-30 22:14  adk0212
+
+	* src/drivers/snmp/drv_powernet.c:
+
+	Disable a few CIs that SNMP cards do not support.
+
+2007-04-30 21:37  adk0212
+
+	* src/: action.c, apctest.c:
+
+	Increase self-test timeout to 40 seconds to accomodate the RS 800.
+	Contributed by Lars Randers <lars@nstec.dk>.
+
+2007-04-27 19:30  adk0212
+
+	* src/apctest.c:
+
+	Fix apctest crash. When in the EEPROM programming section of
+	apctest, if you try to print EEPROM values (item 1) more than once
+	during the same session, the program segfaults.  Contributed by
+	Ivaylo Haratcherev <I.J.Haratcherev@tudelft.nl>.
+
+2007-04-27 19:25  adk0212
+
+	* src/action.c:
+
+	Normalize shut remote message.
+
+2007-04-27 19:24  adk0212
+
+	* src/drivers/pcnet/pcnet.c:
+
+	Add support for PCNET remote shutdown (SD) signal. Contributed by
+	Ivaylo Haratcherev <I.J.Haratcherev@tudelft.nl> and Moshe Hyzon
+	<moshe.hyzon@grantstreet.com>.
+
+2007-04-23 19:47  adk0212
+
+	* ChangeLog:
+
+	Rev ChangeLog.
+
 2007-04-23 19:45  adk0212
 
 	* include/version.h:
