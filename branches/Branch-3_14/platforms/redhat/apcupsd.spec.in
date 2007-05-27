@@ -424,7 +424,6 @@ fi
 %changelog
 * Sun May 27 2007 Adam Kropelin <akropel1 at rochester.rr.com>
 - add support for rhel5
-- remove /etc/apcupsd/masterconnect and mastertimeout files
 * Sun Jan 28 2007 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - remove /etc/apcupsd/masterconnect and mastertimeout files
 * Sat Jan 27 2007 D. Scott Barninger <barninger at fairfieldcomputers.com>
