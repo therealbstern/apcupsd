@@ -24,13 +24,14 @@ VERSION=3.13.12
 RELEASE=1
 
 # build platform for spec
-# set to one of rh7,rh8,rh9,fedora_core,rhel3,rhel4,suse,mdk
+# set to one of rh7,rh8,rh9,fedora_core,rhel3,rhel4,rhel5,suse,mdk
 PLATFORM=suse
 
 # platform designator for file names
 # for RedHat/Fedora set to one of rh7,rh8,rh9,fc1,fc3,fc4,fc5 OR
 # for RHEL3/clones set to el3 OR
 # for RHEL4/clones set to el4 OR
+# for RHEL5/clones set to el5 OR
 # for SuSE set to su90, su91, su92, su100 or su101 OR
 # for Mandrake set to 101mdk or 20060mdk
 FILENAME=su100
@@ -108,5 +109,6 @@ ls
 # 19 Aug 2006 initial release
 # 21 Jan 2007 add new gapcmon build switch
 # 27 Jan 2007 add new snmp build switch
+# 27 May 2007 add rhel5
 
 
