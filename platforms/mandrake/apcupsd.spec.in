@@ -55,6 +55,8 @@
 %{?build_rhel3:%define rhel3 1}
 %define rhel4 0
 %{?build_rhel4:%define rhel4 1}
+%define rhel5 0
+%{?build_rhel5:%define rhel5 1}
 
 # SuSE 9.x and 10.x
 %define suse 0
@@ -127,7 +129,7 @@ BuildRequires: latex2html
 BuildRequires: tetex-dvips
 BuildRequires: ghostscript-dvipdf
 %endif
-%if %{fedora_core}
+%if %{fedora_core} || %{rhel5}
 BuildRequires: latex2html
 %endif
 %if %{gapcmon}
@@ -146,6 +148,9 @@ BuildRequires: libbonobo-devel, libbonoboui-devel, freetype-devel, GConf2-devel
 BuildRequires: libbonobo2_0-devel, libbonoboui2_0-devel, freetype2-devel, libGConf2_4-devel
 %endif
 %if %{rhel4} && %{gapcmon}
+BuildRequires: libbonobo-devel, libbonoboui-devel, freetype-devel, GConf2-devel
+%endif
+%if %{rhel5} && %{gapcmon}
 BuildRequires: libbonobo-devel, libbonoboui-devel, freetype-devel, GConf2-devel
 %endif
 %if %{snmp}
@@ -183,7 +188,7 @@ Summary:      APC UPS Power Control Daemon for Linux
 Group:        Applications/Internet
 
 Requires: libstdc++
-%if %{fedora_core} || %{suse} || %{mdk} || %{rhel4}
+%if %{fedora_core} || %{suse} || %{mdk} || %{rhel4} || %{rhel5}
 Requires: gd >= 2.0
 %else
 Requires: gd < 2.0
@@ -216,6 +221,9 @@ Requires: freetype, GConf2
 Requires: freetype2, GConf2
 %endif
 %if %{rhel4} && %{gapcmon}
+Requires: freetype, GConf2
+%endif
+%if %{rhel5} && %{gapcmon}
 Requires: freetype, GConf2
 %endif
 
@@ -414,6 +422,8 @@ if [ $1 = 0 ] ; then
 fi
 
 %changelog
+* Sun May 27 2007 Adam Kropelin <akropel1 at rochester.rr.com>
+- add support for rhel5
 * Sun Jan 28 2007 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - remove /etc/apcupsd/masterconnect and mastertimeout files
 * Sat Jan 27 2007 D. Scott Barninger <barninger at fairfieldcomputers.com>
