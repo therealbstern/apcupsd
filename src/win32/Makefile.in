@@ -95,34 +95,14 @@ winapi.o:	 ./compat/winapi.c
 
 # Files in src/win32
 OBJS_WIN = \
-	$(OBJDIR)/winabout.o \
-	$(OBJDIR)/winevents.o \
 	$(OBJDIR)/winservice.o \
-	$(OBJDIR)/winstat.o \
-	$(OBJDIR)/wintray.o \
-	$(OBJDIR)/winmain.o \
-	$(OBJDIR)/winres.res
-
-$(OBJDIR)/winabout.o:	  ./winabout.cpp
-	$(CXX) -c $< -o $@
-
-$(OBJDIR)/winevents.o:	  ./winevents.cpp
-	$(CXX) -c $< -o $@
+	$(OBJDIR)/winmain.o
 
 $(OBJDIR)/winmain.o:	  ./winmain.cpp
 	$(CXX) -c $< -o $@
 
 $(OBJDIR)/winservice.o: ./winservice.cpp
 	$(CXX) -c $< -o $@
-
-$(OBJDIR)/winstat.o:	  ./winstat.cpp
-	$(CXX) -c $< -o $@
-
-$(OBJDIR)/wintray.o:	  ./wintray.cpp
-	$(CXX) -c $< -o $@
-
-$(OBJDIR)/winres.res:	  ./winres.rc
-	$(WINDRES) $(INCLUDE_ICONS) -O coff $< -o $@
 
 ######################################################################
 
@@ -428,6 +408,35 @@ $(OBJDIR)/background.o:	./background.c
 
 ######################################################################
 
+# apctray objects
+OBJS_APT = \
+   $(OBJDIR)/apctray.o \
+   $(OBJDIR)/winabout.o \
+   $(OBJDIR)/winevents.o \
+   $(OBJDIR)/winstat.o \
+   $(OBJDIR)/apclog.o \
+   $(OBJDIR)/apclibnis.o \
+   $(OBJDIR)/asys.o \
+   $(OBJDIR)/apcerror.o \
+   $(OBJDIR)/winres.res
+
+$(OBJDIR)/winabout.o:	  ./winabout.cpp
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/winevents.o:	  ./winevents.cpp
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/apctray.o:    ./apctray.cpp
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/winstat.o:	  ./winstat.cpp
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/winres.res:	  ./winres.rc
+	$(WINDRES) $(INCLUDE_ICONS) -O coff $< -o $@
+
+######################################################################
+
 GAPCMON_CFLAGS=-I$(DEPKGS)/glib/include/gtk-2.0 \
    -I$(DEPKGS)/glib/lib/gtk-2.0/include \
    -I$(DEPKGS)/glib/include/atk-1.0 \
@@ -473,6 +482,9 @@ POP_LIBS =
 BKG_OBJS = $(OBJS_BKG)
 BKG_LIBS = 
 
+APT_OBJS = $(OBJS_APT) $(OBJS_COMPAT)
+APT_LIBS = -L$(LIB_MINGW) -luser32 -lgdi32 -lwsock32 -lnetapi32
+
 SMTP_OBJS = $(OBJS_SMTP) $(OBJDIR)/apclog.o $(OBJDIR)/asys.o $(OBJDIR)/apcerror.o $(OBJS_COMPAT)
 SMTP_LIBS = $(APC_LIBS)
 
@@ -488,7 +500,7 @@ GAPCMON_LIBS = $(LIB_PTHREADS) -L$(DEPKGS)/glib/lib -Wl,--export-dynamic \
 # Targets
 
 all: apcupsd.exe apcaccess.exe shutdown.exe popup.exe apctest.exe smtp.exe \
-     email.exe background.exe
+     email.exe background.exe apctray.exe
 
 clean:
 	rm -f $(OBJDIR)/*.o $(OBJDIR)/*.exe $(OBJDIR)/winres.res
@@ -524,6 +536,9 @@ background.exe: $(BKG_OBJS) mingwm10.dll
 
 smtp.exe: $(SMTP_OBJS) mingwm10.dll
 	$(CXX) $(SMTP_OBJS) $(SMTP_LIBS) -o $(OBJDIR)/smtp.exe
+
+apctray.exe: $(APT_OBJS) mingwm10.dll
+	$(CXX) $(APT_OBJS) $(APT_LIBS) -mwindows -o $(OBJDIR)/apctray.exe
 
 gapcmon.exe: $(GAPCMON_OBJS)
 	$(CC) $(GAPCMON_OBJS) $(GAPCMON_LIBS) -mwindows -o $(OBJDIR)/gapcmon.exe
