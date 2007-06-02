@@ -25,7 +25,7 @@ class StatMgr;
 class upsMenu
 {
 public:
-   upsMenu(HINSTANCE appinst, StatMgr *statmgr);
+   upsMenu(HINSTANCE appinst, StatMgr *statmgr, int interval);
    ~upsMenu();
 
 protected:

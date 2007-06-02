@@ -20,10 +20,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    InitWinAPIWrapper();
    WSA_Init();
 
+   // Create a StatMgr for handling UPS status queries
    StatMgr *statmgr = new StatMgr("pia", 3551);
 
-   // Create tray icon & menu if we're running as an app
-   upsMenu *menu = new upsMenu(hInstance, statmgr);
+   // Create tray icon & menu
+   upsMenu *menu = new upsMenu(hInstance, statmgr, 1000);
    if (menu == NULL) {
       PostQuitMessage(0);
    }

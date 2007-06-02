@@ -57,6 +57,7 @@ bool StatMgr::Update()
 
    unlock();
    net_close(s);
+   return true;
 }
 
 char* StatMgr::Get(const char* key)
