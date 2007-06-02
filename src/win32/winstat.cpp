@@ -105,6 +105,16 @@ void upsStatus::FillStatusBox(HWND hwnd, int id_list)
       return;
    }
 
-   SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0, (LONG)status);
+   // GetAll returns newline-separated strings. We need to send separate
+   // LB_ADDSTRING messages for each string.
+   char *tmp;
+   char *str = status;
+   while ((tmp = strchr(str, '\n')))
+   {
+      *tmp = '\0';
+      SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0, (LONG)str);
+      str = tmp + 1;
+   }
+
    free(status);
 }

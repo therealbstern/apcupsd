@@ -17,7 +17,7 @@
 #include "statmgr.h"
 
 // Implementation
-upsMenu::upsMenu(HINSTANCE appinst, StatMgr *statmgr)
+upsMenu::upsMenu(HINSTANCE appinst, StatMgr *statmgr, int interval)
    : m_about(appinst),
      m_status(appinst, statmgr),
      m_events(appinst, statmgr),
@@ -52,7 +52,7 @@ upsMenu::upsMenu(HINSTANCE appinst, StatMgr *statmgr)
    SetWindowLong(m_hwnd, GWL_USERDATA, (LONG)this);
 
    // Timer to trigger icon updating
-   SetTimer(m_hwnd, 1, 1000, NULL);
+   SetTimer(m_hwnd, 1, interval, NULL);
 
    // No balloon timer yet
    m_balloon_timer = 0;
@@ -339,4 +339,8 @@ void upsMenu::FetchStatus(int &battstat, char *statstr, int len)
    if (status & UPS_shutdown)
       astrncpy(statstr, "SHUTTING DOWN", len);
 
+   // Remove trailing space, if present
+   char *tmp = statstr + strlen(statstr) - 1;
+   while (tmp >= statstr && isspace(*tmp))
+      *tmp-- = '\0';
 }
