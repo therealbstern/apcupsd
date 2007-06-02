@@ -11,55 +11,43 @@
 #include "winres.h"
 #include "winups.h"
 
-// Application instance and name
-HINSTANCE hAppInstance;
-const char *szAppName = "Apcupsd";
-
-// Constants
-const UINT MENU_ABOUTBOX_SHOW = RegisterWindowMessage("Apcupsd.AboutBox.Show");
-const UINT MENU_STATUS_SHOW = RegisterWindowMessage("Apcupsd.Status.Show");
-const UINT MENU_EVENTS_SHOW = RegisterWindowMessage("Apcupsd.Events.Show");
-const UINT MENU_SERVICEHELPER_MSG = RegisterWindowMessage("Apcupsd.ServiceHelper.Message");
-const UINT MENU_ADD_CLIENT_MSG = RegisterWindowMessage("Apcupsd.AddClient.Message");
-const char *MENU_CLASS_NAME = "Apcupsd Tray Icon";
-
 char *ups_status(int stat);
 static int battstat = -1;
 static char buf[MAXSTRING];
 
 // Implementation
-upsMenu::upsMenu()
+upsMenu::upsMenu(HINSTANCE appinst)
+   : m_about(appinst),
+     m_status(appinst),
+     m_events(appinst)
 {
    // Create a dummy window to handle tray icon messages
    WNDCLASSEX wndclass;
-
    wndclass.cbSize = sizeof(wndclass);
    wndclass.style = 0;
    wndclass.lpfnWndProc = upsMenu::WndProc;
    wndclass.cbClsExtra = 0;
    wndclass.cbWndExtra = 0;
-   wndclass.hInstance = hAppInstance;
+   wndclass.hInstance = appinst;
    wndclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
    wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
    wndclass.hbrBackground = (HBRUSH) GetStockObject(WHITE_BRUSH);
    wndclass.lpszMenuName = (const char *)NULL;
-   wndclass.lpszClassName = MENU_CLASS_NAME;
+   wndclass.lpszClassName = APCTRAY_WINDOW_CLASS;
    wndclass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
-
    RegisterClassEx(&wndclass);
 
-   /* Create System Tray menu Window */
-   m_hwnd = CreateWindow(MENU_CLASS_NAME,
-                         MENU_CLASS_NAME,
-                         WS_OVERLAPPEDWINDOW,
-                         CW_USEDEFAULT,
-                         CW_USEDEFAULT, 200, 200, NULL, NULL, hAppInstance, NULL);
+   // Create System Tray menu Window
+   m_hwnd = CreateWindow(APCTRAY_WINDOW_CLASS, APCTRAY_WINDOW_NAME,
+                         WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
+                         CW_USEDEFAULT, 200, 200, NULL, NULL, appinst, NULL);
    if (m_hwnd == NULL) {
       PostQuitMessage(0);
       return;
    }
+
    // record which client created this window
-   SetWindowLong(m_hwnd, GWL_USERDATA, (LONG) this);
+   SetWindowLong(m_hwnd, GWL_USERDATA, (LONG)this);
 
    // Timer to trigger icon updating
    SetTimer(m_hwnd, 1, 1000, NULL);
@@ -68,13 +56,13 @@ upsMenu::upsMenu()
    m_balloon_timer = 0;
 
    // Load the icons for the tray
-   m_online_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_ONLINE));
-   m_onbatt_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_ONBATT));
-   m_charging_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_CHARGING));
-   m_commlost_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_COMMLOST));
-   
+   m_online_icon = LoadIcon(appinst, MAKEINTRESOURCE(IDI_ONLINE));
+   m_onbatt_icon = LoadIcon(appinst, MAKEINTRESOURCE(IDI_ONBATT));
+   m_charging_icon = LoadIcon(appinst, MAKEINTRESOURCE(IDI_CHARGING));
+   m_commlost_icon = LoadIcon(appinst, MAKEINTRESOURCE(IDI_COMMLOST));
+
    // Load the popup menu
-   m_hmenu = LoadMenu(hAppInstance, MAKEINTRESOURCE(IDR_TRAYMENU));
+   m_hmenu = LoadMenu(appinst, MAKEINTRESOURCE(IDR_TRAYMENU));
 
    // Install the tray icon!
    AddTrayIcon();
@@ -280,25 +268,6 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
       }
       // Tell the OS that we've handled it anyway
       return TRUE;
-
-
-   default:
-      if (iMsg == MENU_ABOUTBOX_SHOW) {
-         // External request to show our About dialog
-         PostMessage(hwnd, WM_COMMAND, MAKELONG(ID_ABOUT, 0), 0);
-         return 0;
-      }
-      if (iMsg == MENU_STATUS_SHOW) {
-         // External request to show our status
-         PostMessage(hwnd, WM_COMMAND, MAKELONG(ID_STATUS, 0), 0);
-         return 0;
-      }
-
-      if (iMsg == MENU_EVENTS_SHOW) {
-         // External request to show our Events dialogue
-         PostMessage(hwnd, WM_COMMAND, MAKELONG(ID_EVENTS, 0), 0);
-         return 0;
-      }
    }
 
    // Unknown message type
@@ -313,11 +282,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    InitWinAPIWrapper();
    WSA_Init();
 
-   // Save the application instance and main thread id
-   hAppInstance = hInstance;
-
    // Create tray icon & menu if we're running as an app
-   upsMenu *menu = new upsMenu();
+   upsMenu *menu = new upsMenu(hInstance);
    if (menu == NULL) {
       PostQuitMessage(0);
    }

@@ -60,8 +60,9 @@ extern const char *MENU_CLASS_NAME;
 class upsMenu
 {
 public:
-        upsMenu();
+        upsMenu(HINSTANCE appinst);
         ~upsMenu();
+
 protected:
         // Tray icon handling
         void AddTrayIcon();
@@ -72,20 +73,9 @@ protected:
         // Message handler for the tray window
         static LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
 
-        // Fields
-protected:
-
-        // Properties object for this server
-#ifdef properties_implemented
-        upsProperties   m_properties;
-#endif
-
-        // About dialog for this server
+        // Dialogs for About, Status, and Events
         upsAbout                m_about;
-
-        // Status dialog for this server
         upsStatus               m_status;
-
         upsEvents               m_events;
 
         HWND                    m_hwnd;

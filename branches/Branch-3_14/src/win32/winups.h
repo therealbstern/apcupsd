@@ -8,6 +8,8 @@
 // Copyright (2000) Kern E. Sibbald
 //
 
+#ifndef WINUPS_H
+#define WINUPS_H
 
 // WinUPS header file
 
@@ -34,3 +36,5 @@
 
 // Main UPS server routine - Exported by winmain for use by winservice
 extern int ApcupsdAppMain(int service);
+
+#endif // WINUPS_H
