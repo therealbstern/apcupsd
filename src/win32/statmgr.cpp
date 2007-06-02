@@ -1,6 +1,7 @@
 
 #include "statmgr.h"
 #include "apc.h"
+#include <stdarg.h>
 
 
 StatMgr::StatMgr(char *host, unsigned short port)
@@ -143,12 +144,17 @@ char *StatMgr::trim(char *str)
 char *StatMgr::sprintf_realloc_append(char *str, const char *format, ...)
 {
    va_list args;
+
    va_start(args, format);
-   
    int appendlen = vsnprintf(NULL, 0, format, args);
+   va_end(args);
+
    int oldlen = str ? strlen(str) : 0;
    char *result = (char*)realloc(str, oldlen + appendlen + 1);
+
+   va_start(args, format);
    vsprintf(result + oldlen, format, args);
+   va_end(args);
 
    return result;
 }
