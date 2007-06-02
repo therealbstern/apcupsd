@@ -14,18 +14,14 @@
 #include "winups.h"
 #include "winres.h"
 #include "wintray.h"
-
-extern char *ups_status(int stat);
-extern int battstat;
+#include "statmgr.h"
 
 // Implementation
-
-
-// Implementation
-upsMenu::upsMenu(HINSTANCE appinst)
+upsMenu::upsMenu(HINSTANCE appinst, StatMgr *statmgr)
    : m_about(appinst),
-     m_status(appinst),
-     m_events(appinst)
+     m_status(appinst, statmgr),
+     m_events(appinst, statmgr),
+     m_statmgr(statmgr)
 {
    // Create a dummy window to handle tray icon messages
    WNDCLASSEX wndclass;
@@ -96,18 +92,20 @@ void upsMenu::DelTrayIcon()
 
 void upsMenu::UpdateTrayIcon()
 {
-   (void *)ups_status(0);
    SendTrayMsg(NIM_MODIFY);
 }
 
 void upsMenu::SendTrayMsg(DWORD msg)
 {
-   char *stat;
-
    // Create the tray icon message
    m_nid.hWnd = m_hwnd;
    m_nid.cbSize = sizeof(m_nid);
    m_nid.uID = IDI_APCUPSD;        // never changes after construction
+
+   // Get current status
+   int battstat;
+   char statstr[128];
+   FetchStatus(battstat, statstr, sizeof(statstr));
 
    /* If battstat == 0 we are on batteries, otherwise we are online
     * and the value of battstat is the percent charge.
@@ -124,11 +122,8 @@ void upsMenu::SendTrayMsg(DWORD msg)
    m_nid.uFlags = NIF_ICON | NIF_MESSAGE;
    m_nid.uCallbackMessage = WM_TRAYNOTIFY;
 
-   // Get current status
-   stat = ups_status(0);
-
    // Use status as normal tooltip
-   asnprintf(m_nid.szTip, sizeof(m_nid.szTip), "Apcupsd - %s", stat);
+   asnprintf(m_nid.szTip, sizeof(m_nid.szTip), "Apcupsd - %s", statstr);
    m_nid.uFlags |= NIF_TIP;
 
    // Send the message
@@ -278,4 +273,70 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
    // Unknown message type
    return DefWindowProc(hwnd, iMsg, wParam, lParam);
+}
+
+void upsMenu::FetchStatus(int &battstat, char *statstr, int len)
+{
+   // Fetch data from the UPS
+   if (!m_statmgr->Update()) {
+      battstat = -1;
+      astrncpy(statstr, "COMMLOST", len);
+      return;
+   }
+
+   // Lookup the STATFLAG key
+   char *statflag = m_statmgr->Get("STATFLAG");
+   if (!statflag || *statflag == '\0') {
+      battstat = -1;
+      astrncpy(statstr, "COMMLOST", len);
+      free(statflag);
+      return;
+   }
+   unsigned long status = strtoul(statflag, NULL, 0);
+
+   // Lookup BCHARGE key
+   char *bcharge = m_statmgr->Get("BCHARGE");
+
+   // Determine battery charge percent
+   if (status & UPS_onbatt)
+      battstat = 0;
+   else if (bcharge && *bcharge != '\0')
+      battstat = (int)atof(bcharge);
+   else
+      battstat = 100;
+
+   free(statflag);
+   free(bcharge);
+
+   // Now output status in human readable form
+   astrncpy(statstr, "", len);
+   if (status & UPS_calibration)
+      astrncat(statstr, "CAL ", len);
+   if (status & UPS_trim)
+      astrncat(statstr, "TRIM ", len);
+   if (status & UPS_boost)
+      astrncat(statstr, "BOOST ", len);
+   if (status & UPS_online)
+      astrncat(statstr, "ONLINE ", len);
+   if (status & UPS_onbatt)
+      astrncat(statstr, "ON BATTERY ", len);
+   if (status & UPS_overload)
+      astrncat(statstr, "OVERLOAD ", len);
+   if (status & UPS_battlow)
+      astrncat(statstr, "LOWBATT ", len);
+   if (status & UPS_replacebatt)
+      astrncat(statstr, "REPLACEBATT ", len);
+   if (!status & UPS_battpresent)
+      astrncat(statstr, "NOBATT ", len);
+
+   // This overrides the above
+   if (status & UPS_commlost) {
+      astrncpy(statstr, "COMMLOST", len);
+      battstat = -1;
+   }
+
+   // This overrides the above
+   if (status & UPS_shutdown)
+      astrncpy(statstr, "SHUTTING DOWN", len);
+
 }

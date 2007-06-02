@@ -13,14 +13,14 @@
 #include <windows.h>
 #include "winevents.h"
 #include "winres.h"
-
-extern void FillEventsBox(HWND hwnd, int id_list);
+#include "statmgr.h"
 
 // Constructor/destructor
-upsEvents::upsEvents(HINSTANCE appinst)
+upsEvents::upsEvents(HINSTANCE appinst, StatMgr *statmgr)
 {
     m_dlgvisible = FALSE;
     m_appinst = appinst;
+    m_statmgr = statmgr;
 }
 
 upsEvents::~upsEvents()
@@ -65,7 +65,7 @@ BOOL CALLBACK upsEvents::DialogProc(
         // Show the dialog
         SetForegroundWindow(hwnd);
         _this->m_dlgvisible = TRUE;
-        FillEventsBox(hwnd, IDC_LIST);
+        _this->FillEventsBox(hwnd, IDC_LIST);
         return TRUE;
 
     case WM_COMMAND:
@@ -86,4 +86,18 @@ BOOL CALLBACK upsEvents::DialogProc(
     }
 
     return 0;
+}
+
+void upsEvents::FillEventsBox(HWND hwnd, int id_list)
+{
+   const char* error = "Events not available.";
+
+   char *events = m_statmgr->GetEvents();
+   if (!events || *events == '\0') {
+      SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0, (LONG)error);
+      return;
+   }
+
+   SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0, (LONG)events);
+   free(events);
 }

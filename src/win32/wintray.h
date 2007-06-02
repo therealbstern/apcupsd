@@ -18,11 +18,14 @@
 #include "winstat.h"
 #include "winevents.h"
 
+// Forward declarations
+class StatMgr;
+
 // The tray menu class itself
 class upsMenu
 {
 public:
-   upsMenu(HINSTANCE appinst);
+   upsMenu(HINSTANCE appinst, StatMgr *statmgr);
    ~upsMenu();
 
 protected:
@@ -35,6 +38,9 @@ protected:
    // Message handler for the tray window
    static LRESULT CALLBACK WndProc(
       HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
+
+   // Fetch UPS status info
+   void FetchStatus(int &battstat, char *statstr, int len);
 
    // Dialogs for About, Status, and Events
    upsAbout                m_about;
@@ -51,7 +57,9 @@ protected:
    HICON                   m_onbatt_icon;
    HICON                   m_charging_icon;
    HICON                   m_commlost_icon;
+   
+   // Manager for UPS stats
+   StatMgr                *m_statmgr;
 };
-
 
 #endif // WINTRAY_H

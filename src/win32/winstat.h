@@ -13,14 +13,15 @@
 
 #include <windows.h>
 
-// upsStatus
+// Forward declarations
+class StatMgr;
 
 // Object implementing the Status dialogue for apcupsd
 class upsStatus
 {
 public:
    // Constructor/destructor
-   upsStatus(HINSTANCE appinst);
+   upsStatus(HINSTANCE appinst, StatMgr *statmgr);
    ~upsStatus();
 
    // Initialisation
@@ -33,9 +34,12 @@ private:
    // The dialog box window proc
    static BOOL CALLBACK DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+   void FillStatusBox(HWND hwnd, int id_list);
+
    // Private data
    BOOL m_dlgvisible;
    HINSTANCE m_appinst;
+   StatMgr *m_statmgr;
 };
 
 #endif // WINSTAT_H
