@@ -13,14 +13,14 @@
 #include <windows.h>
 #include "winstat.h"
 #include "winres.h"
-
-extern void FillStatusBox(HWND hwnd, int id_list);
+#include "statmgr.h"
 
 // Constructor/destructor
-upsStatus::upsStatus(HINSTANCE appinst)
+upsStatus::upsStatus(HINSTANCE appinst, StatMgr *statmgr)
 {
     m_dlgvisible = FALSE;
     m_appinst = appinst;
+    m_statmgr = statmgr;
 }
 
 upsStatus::~upsStatus()
@@ -67,7 +67,7 @@ BOOL CALLBACK upsStatus::DialogProc(
       // Show the dialog
       SetForegroundWindow(hwnd);
       _this->m_dlgvisible = TRUE;
-      FillStatusBox(hwnd, IDC_LIST);
+      _this->FillStatusBox(hwnd, IDC_LIST);
       return TRUE;
 
     case WM_COMMAND:
@@ -88,4 +88,23 @@ BOOL CALLBACK upsStatus::DialogProc(
    }
 
    return 0;
+}
+
+void upsStatus::FillStatusBox(HWND hwnd, int id_list)
+{
+   const char* error = "Status not available.";
+
+   if (!m_statmgr->Update()) {
+      SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0, (LONG)error);
+      return;
+   }
+
+   char *status = m_statmgr->GetAll();
+   if (!status || *status == '\0') {
+      SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0, (LONG)error);
+      return;
+   }
+
+   SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0, (LONG)status);
+   free(status);
 }

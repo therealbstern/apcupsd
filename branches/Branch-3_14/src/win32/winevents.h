@@ -13,12 +13,15 @@
 
 #include <windows.h>
 
+// Forward declarations
+class StatMgr;
+
 // Object implementing the Events dialogue box for apcupsd
 class upsEvents
 {
 public:
    // Constructor/destructor
-   upsEvents(HINSTANCE appinst);
+   upsEvents(HINSTANCE appinst, StatMgr *statmgr);
    ~upsEvents();
 
    // Initialisation
@@ -32,9 +35,12 @@ private:
    static BOOL CALLBACK DialogProc(
       HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+   void FillEventsBox(HWND hwnd, int id_list);
+
    // Private data
    BOOL m_dlgvisible;
    HINSTANCE m_appinst;
+   StatMgr *m_statmgr;
 };
 
 #endif // WINEVENTS_H
