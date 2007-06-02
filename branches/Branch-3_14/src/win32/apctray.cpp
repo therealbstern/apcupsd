@@ -15,9 +15,12 @@
 
 #define CMDOPT_PORT     "/port"
 #define CMDOPT_HOST     "/host"
-#define CMDOPT_INTERVAL "/interval"
+#define CMDOPT_REFRESH  "/refresh"
+#define CMDOPT_INSTALL  "/install"
+#define CMDOPT_REMOVE   "/remove"
 
-#define USAGE_TEXT   "[/host <hostname>] [/port <port>] [/interval <sec>]"
+#define USAGE_TEXT   "[/host <hostname>] [/port <port>] [/interval <sec>] " \
+                     "[/install] [/remove]"
 
 char *GetArg(char **cmdline)
 {
@@ -48,6 +51,80 @@ char *GetArg(char **cmdline)
       *(*cmdline)++ = '\0';
 
    return ret;
+}
+
+int Install(char *host, unsigned short port, int interval)
+{
+   // Get the filename of this executable
+   char path[1024];
+   GetModuleFileName(NULL, path, sizeof(path));
+
+   // Append configuration flags
+   char cmd[1024];
+   snprintf(cmd, sizeof(cmd), "\"%s\" %s \"%s\" %s %u %s %u", path, 
+      CMDOPT_HOST, host, CMDOPT_PORT, port, CMDOPT_REFRESH, interval);
+
+   // Open registry key for auto-run programs
+   HKEY runkey;
+   if (RegCreateKey(HKEY_LOCAL_MACHINE, 
+                    "Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                    &runkey) != ERROR_SUCCESS) {
+      MessageBox(NULL, "The System Registry could not be updated.\n"
+                        "Apctray was not installed.",
+                 "Apctray", MB_ICONEXCLAMATION | MB_OK);
+      return 1;
+   }
+
+   // Attempt to add Apctray key
+   if (RegSetValueEx(runkey, "Apctray", 0, REG_SZ,
+         (unsigned char *)cmd, strlen(cmd)+1) != ERROR_SUCCESS) {
+      RegCloseKey(runkey);
+      MessageBox(NULL, "The System Registry could not be updated.\n"
+                        "Apctray was not installed.",
+                 "Apctray", MB_ICONEXCLAMATION | MB_OK);
+      return 1;
+   }
+
+   RegCloseKey(runkey);
+
+   MessageBox(NULL,
+              "Apctray was successfully installed and will automatically\n"
+              "be run the next a user logs in to this machine.",
+              "Apctray", MB_ICONINFORMATION | MB_OK);
+
+   return 0;
+}
+
+int Remove()
+{
+   // Open registry key for auto-run programs
+   HKEY runkey;
+   if (RegCreateKey(HKEY_LOCAL_MACHINE, 
+                    "Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                    &runkey) != ERROR_SUCCESS) {
+      MessageBox(NULL, "The System Registry could not be updated.\n"
+                        "Apctray was not removed.",
+                 "Apctray", MB_ICONEXCLAMATION | MB_OK);
+      return 1;
+   }
+
+   // Attempt to delete the Apctray key
+   if (RegDeleteValue(runkey, "Apctray") != ERROR_SUCCESS) {
+      RegCloseKey(runkey);
+      MessageBox(NULL, "The System Registry could not be updated.\n"
+                        "Apctray was not removed.",
+                 "Apctray", MB_ICONEXCLAMATION | MB_OK);
+      return 1;
+   }
+
+   RegCloseKey(runkey);
+
+   MessageBox(NULL,
+              "Apctray was successfully removed and will no longer\n"
+              "be run when users log on.",
+              "Apctray", MB_ICONINFORMATION | MB_OK);
+
+   return 0;
 }
 
 void Usage(const char *text1, const char* text2)
@@ -86,12 +163,16 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             return 1;
          }
          port = strtoul(arg, NULL, 0);
-      } else if (strcasecmp(arg, CMDOPT_INTERVAL) == 0) {
+      } else if (strcasecmp(arg, CMDOPT_REFRESH) == 0) {
          if (!(arg = GetArg(&opt))) {
-            Usage(CMDOPT_INTERVAL, "Option requires argument");
+            Usage(CMDOPT_REFRESH, "Option requires argument");
             return 1;
          }
          interval = strtoul(arg, NULL, 0) * 1000;
+      } else if (strcasecmp(arg, CMDOPT_INSTALL) == 0) {
+         return Install(host, port, interval);
+      } else if (strcasecmp(arg, CMDOPT_REMOVE) == 0) {
+         return Remove();
       } else {
          Usage(arg, "Unknown option");
          return 1;
