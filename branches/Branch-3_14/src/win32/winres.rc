@@ -33,6 +33,7 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&About",                      ID_ABOUT
         MENUITEM SEPARATOR
+        MENUITEM "&Remove Apctray",             ID_REMOVE
         MENUITEM "&Close Apctray",              ID_CLOSE
     END
 END
