@@ -1,95 +1,59 @@
-//  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
-//
-//  This file was part of the ups system.
-//
-//  The ups system is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
-//  USA.
-//
-// If the source code for the ups system is not available from the place 
-// whence you received this file, check http://www.uk.research.att.com/vnc or contact
-// the authors on ups@uk.research.att.com for information on obtaining it.
-//
 // This file has been adapted to the Win32 version of Apcupsd
 // by Kern E. Sibbald.  Many thanks to ATT and James Weatherall,
 // the original author, for providing an excellent template.
 //
-// Copyright (2000-2005) Kern E. Sibbald
+// Rewrite/Refactoring by Adam Kropelin
 //
-
-
-
-// Tray
+// Copyright (2007) Adam D. Kropelin
+// Copyright (2000-2005) Kern E. Sibbald
 
 // Implementation of a system tray icon & menu for Apcupsd
 
 #include "apc.h"
 #include <windows.h>
 #include "winups.h"
-#include "winservice.h"
-#include <lmcons.h>
-
-// Header
+#include "winres.h"
 #include "wintray.h"
 
-// Constants
-const UINT MENU_ABOUTBOX_SHOW = RegisterWindowMessage("Apcupsd.AboutBox.Show");
-const UINT MENU_STATUS_SHOW = RegisterWindowMessage("Apcupsd.Status.Show");
-const UINT MENU_EVENTS_SHOW = RegisterWindowMessage("Apcupsd.Events.Show");
-const UINT MENU_SERVICEHELPER_MSG =
-RegisterWindowMessage("Apcupsd.ServiceHelper.Message");
-const UINT MENU_ADD_CLIENT_MSG = RegisterWindowMessage("Apcupsd.AddClient.Message");
-const char *MENU_CLASS_NAME = "Apcupsd Tray Icon";
-
 extern char *ups_status(int stat);
-extern OSVERSIONINFO g_os_version_info;
 extern int battstat;
 
 // Implementation
 
-upsMenu::upsMenu()
+
+// Implementation
+upsMenu::upsMenu(HINSTANCE appinst)
+   : m_about(appinst),
+     m_status(appinst),
+     m_events(appinst)
 {
    // Create a dummy window to handle tray icon messages
    WNDCLASSEX wndclass;
-
    wndclass.cbSize = sizeof(wndclass);
    wndclass.style = 0;
    wndclass.lpfnWndProc = upsMenu::WndProc;
    wndclass.cbClsExtra = 0;
    wndclass.cbWndExtra = 0;
-   wndclass.hInstance = hAppInstance;
+   wndclass.hInstance = appinst;
    wndclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
    wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
    wndclass.hbrBackground = (HBRUSH) GetStockObject(WHITE_BRUSH);
    wndclass.lpszMenuName = (const char *)NULL;
-   wndclass.lpszClassName = MENU_CLASS_NAME;
+   wndclass.lpszClassName = APCTRAY_WINDOW_CLASS;
    wndclass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
-
    RegisterClassEx(&wndclass);
 
-   /* Create System Tray menu Window */
-   m_hwnd = CreateWindow(MENU_CLASS_NAME,
-                         MENU_CLASS_NAME,
-                         WS_OVERLAPPEDWINDOW,
-                         CW_USEDEFAULT,
-                         CW_USEDEFAULT, 200, 200, NULL, NULL, hAppInstance, NULL);
+   // Create System Tray menu Window
+   m_hwnd = CreateWindow(APCTRAY_WINDOW_CLASS, APCTRAY_WINDOW_NAME,
+                         WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
+                         CW_USEDEFAULT, 200, 200, NULL, NULL, appinst, NULL);
    if (m_hwnd == NULL) {
       PostQuitMessage(0);
       return;
    }
+
    // record which client created this window
-   SetWindowLong(m_hwnd, GWL_USERDATA, (LONG) this);
+   SetWindowLong(m_hwnd, GWL_USERDATA, (LONG)this);
 
    // Timer to trigger icon updating
    SetTimer(m_hwnd, 1, 1000, NULL);
@@ -98,13 +62,13 @@ upsMenu::upsMenu()
    m_balloon_timer = 0;
 
    // Load the icons for the tray
-   m_online_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_ONLINE));
-   m_onbatt_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_ONBATT));
-   m_charging_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_CHARGING));
-   m_commlost_icon = LoadIcon(hAppInstance, MAKEINTRESOURCE(IDI_COMMLOST));
-   
+   m_online_icon = LoadIcon(appinst, MAKEINTRESOURCE(IDI_ONLINE));
+   m_onbatt_icon = LoadIcon(appinst, MAKEINTRESOURCE(IDI_ONBATT));
+   m_charging_icon = LoadIcon(appinst, MAKEINTRESOURCE(IDI_CHARGING));
+   m_commlost_icon = LoadIcon(appinst, MAKEINTRESOURCE(IDI_COMMLOST));
+
    // Load the popup menu
-   m_hmenu = LoadMenu(hAppInstance, MAKEINTRESOURCE(IDR_TRAYMENU));
+   m_hmenu = LoadMenu(appinst, MAKEINTRESOURCE(IDR_TRAYMENU));
 
    // Install the tray icon!
    AddTrayIcon();
@@ -120,8 +84,7 @@ upsMenu::~upsMenu()
       DestroyMenu(m_hmenu);
 }
 
-void
- upsMenu::AddTrayIcon()
+void upsMenu::AddTrayIcon()
 {
    SendTrayMsg(NIM_ADD);
 }
@@ -131,13 +94,11 @@ void upsMenu::DelTrayIcon()
    SendTrayMsg(NIM_DELETE);
 }
 
-
 void upsMenu::UpdateTrayIcon()
 {
    (void *)ups_status(0);
    SendTrayMsg(NIM_MODIFY);
 }
-
 
 void upsMenu::SendTrayMsg(DWORD msg)
 {
@@ -173,14 +134,10 @@ void upsMenu::SendTrayMsg(DWORD msg)
    // Send the message
    if (Shell_NotifyIcon(msg, &m_nid)) {
       EnableMenuItem(m_hmenu, ID_CLOSE, MF_ENABLED);
-   } else {
-      if (!upsService::RunningAsService()) {
-         if (msg == NIM_ADD) {
-            // The tray icon couldn't be created, so use the Properties dialog
-            // as the main program window
-            PostQuitMessage(0);
-         }
-      }
+   } else if (msg == NIM_ADD) {
+      // The tray icon couldn't be created, so use the Properties dialog
+      // as the main program window
+      PostQuitMessage(0);
    }
 }
 
@@ -197,14 +154,6 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
    // Timer expired
    case WM_TIMER:
       if (wParam == 1) {
-         // *** HACK for running servicified
-         if (upsService::RunningAsService()) {
-            // Attempt to add the icon if it's not already there
-            _this->AddTrayIcon();
-            // Trigger a check of the current user
-            PostMessage(hwnd, WM_USERCHANGED, 0, 0);
-         }
-
          // Update the icon
          _this->UpdateTrayIcon();
       } else if (wParam == 2) {
@@ -225,13 +174,6 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
       }
       break;
 
-   // DEAL WITH NOTIFICATIONS FROM THE SERVER:
-   case WM_SRV_CLIENT_AUTHENTICATED:
-   case WM_SRV_CLIENT_DISCONNECT:
-      // Adjust the icon accordingly
-      _this->UpdateTrayIcon();
-      return 0;
-
       // STANDARD MESSAGE HANDLING
    case WM_CREATE:
       return 0;
@@ -250,10 +192,6 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
          // Show the Events dialog
          _this->m_events.Show(TRUE);
          _this->UpdateTrayIcon();
-         break;
-
-      case ID_KILLCLIENTS:
-         // Disconnect all currently connected clients
          break;
 
       case ID_ABOUT:
@@ -324,9 +262,8 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
       return 0;
 
    case WM_QUERYENDSESSION:
-      // Are we running as a system service?
-      // Or is the system shutting down (in which case we should check anyway!)
-      if ((!upsService::RunningAsService()) || (lParam == 0)) {
+      // Is the system shutting down
+      if (lParam == 0) {
          // No, so we are about to be killed
 
          // If there are remote connections then we should verify
@@ -334,37 +271,9 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
          // Finally, post a quit message, just in case
          PostQuitMessage(0);
-         return TRUE;
       }
       // Tell the OS that we've handled it anyway
-//    PostQuitMessage(0);
       return TRUE;
-
-
-   default:
-      if (iMsg == MENU_ABOUTBOX_SHOW) {
-         // External request to show our About dialog
-         PostMessage(hwnd, WM_COMMAND, MAKELONG(ID_ABOUT, 0), 0);
-         return 0;
-      }
-      if (iMsg == MENU_STATUS_SHOW) {
-         // External request to show our status
-         PostMessage(hwnd, WM_COMMAND, MAKELONG(ID_STATUS, 0), 0);
-         return 0;
-      }
-
-      if (iMsg == MENU_EVENTS_SHOW) {
-         // External request to show our Events dialogue
-         PostMessage(hwnd, WM_COMMAND, MAKELONG(ID_EVENTS, 0), 0);
-         return 0;
-      }
-
-      if (iMsg == MENU_ADD_CLIENT_MSG) {
-         // Add Client message.  This message includes an IP address
-         // of a listening client, to which we should connect.
-
-         return 0;
-      }
    }
 
    // Unknown message type
