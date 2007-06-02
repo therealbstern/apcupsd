@@ -56,7 +56,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
    // Locate Apcupsd tray icon window.
    // If we can't find it, we can't do a balloon tip
-   HWND tray = FindWindowEx(NULL, NULL, "Apcupsd Tray Icon", NULL);
+   HWND tray = FindWindowEx(
+      NULL, NULL, APCTRAY_WINDOW_CLASS, APCTRAY_WINDOW_NAME);
    if (!tray)
       balloon = 0;
 
