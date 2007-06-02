@@ -40,6 +40,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       delete menu;
    }
 
+   delete statmgr;
    WSACleanup();
    return 0;
 }

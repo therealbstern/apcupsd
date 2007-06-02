@@ -42,6 +42,9 @@ protected:
    // Fetch UPS status info
    void FetchStatus(int &battstat, char *statstr, int len);
 
+   // Thread to poll for UPS status changes
+   static DWORD WINAPI StatusPollThread(LPVOID param);
+
    // Dialogs for About, Status, and Events
    upsAbout                m_about;
    upsStatus               m_status;
@@ -60,6 +63,9 @@ protected:
    
    // Manager for UPS stats
    StatMgr                *m_statmgr;
+   
+   // How often to poll for status
+   int                     m_interval;
 };
 
 #endif // WINTRAY_H

@@ -21,7 +21,8 @@ upsMenu::upsMenu(HINSTANCE appinst, StatMgr *statmgr, int interval)
    : m_about(appinst),
      m_status(appinst, statmgr),
      m_events(appinst, statmgr),
-     m_statmgr(statmgr)
+     m_statmgr(statmgr),
+     m_interval(interval)
 {
    // Create a dummy window to handle tray icon messages
    WNDCLASSEX wndclass;
@@ -51,9 +52,6 @@ upsMenu::upsMenu(HINSTANCE appinst, StatMgr *statmgr, int interval)
    // record which client created this window
    SetWindowLong(m_hwnd, GWL_USERDATA, (LONG)this);
 
-   // Timer to trigger icon updating
-   SetTimer(m_hwnd, 1, interval, NULL);
-
    // No balloon timer yet
    m_balloon_timer = 0;
 
@@ -68,6 +66,10 @@ upsMenu::upsMenu(HINSTANCE appinst, StatMgr *statmgr, int interval)
 
    // Install the tray icon!
    AddTrayIcon();
+
+   // Thread to poll UPS status and update tray icon
+   DWORD tid;
+   CreateThread(NULL, 0, &upsMenu::StatusPollThread, this, 0, &tid);
 }
 
 upsMenu::~upsMenu()
@@ -127,11 +129,8 @@ void upsMenu::SendTrayMsg(DWORD msg)
    m_nid.uFlags |= NIF_TIP;
 
    // Send the message
-   if (Shell_NotifyIcon(msg, &m_nid)) {
-      EnableMenuItem(m_hmenu, ID_CLOSE, MF_ENABLED);
-   } else if (msg == NIM_ADD) {
-      // The tray icon couldn't be created, so use the Properties dialog
-      // as the main program window
+   if (!Shell_NotifyIcon(msg, &m_nid) && msg == NIM_ADD) {
+      // The tray icon couldn't be created
       PostQuitMessage(0);
    }
 }
@@ -148,10 +147,7 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
    // Timer expired
    case WM_TIMER:
-      if (wParam == 1) {
-         // Update the icon
-         _this->UpdateTrayIcon();
-      } else if (wParam == 2) {
+      if (wParam == 2) {
          // Balloon timer expired; clear the balloon
          KillTimer(_this->m_hwnd, _this->m_balloon_timer);
 
@@ -204,42 +200,39 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
    case WM_TRAYNOTIFY:
       // User has clicked on the tray icon or the menu
-      {
-         // Get the submenu to use as a pop-up menu
-         HMENU submenu = GetSubMenu(_this->m_hmenu, 0);
+      // Get the submenu to use as a pop-up menu
+      HMENU submenu = GetSubMenu(_this->m_hmenu, 0);
 
-         // What event are we responding to, RMB click?
-         if (lParam == WM_RBUTTONUP) {
-            if (submenu == NULL) {
-               return 0;
-            }
-            // Make the first menu item the default (bold font)
-            SetMenuDefaultItem(submenu, 0, TRUE);
-
-            // Get the current cursor position, to display the menu at
-            POINT mouse;
-            GetCursorPos(&mouse);
-
-            // There's a "bug"
-            // (Microsoft calls it a feature) in Windows 95 that requires calling
-            // SetForegroundWindow. To find out more, search for Q135788 in MSDN.
-            //
-            SetForegroundWindow(_this->m_nid.hWnd);
-
-            // Display the menu at the desired position
-            TrackPopupMenu(submenu, 0, mouse.x, mouse.y, 0, _this->m_nid.hWnd, NULL);
-
+      // What event are we responding to, RMB click?
+      if (lParam == WM_RBUTTONUP) {
+         if (submenu == NULL)
             return 0;
-         }
 
-         // Or was there a LMB double click?
-         if (lParam == WM_LBUTTONDBLCLK) {
-            // double click: execute first menu item
-            SendMessage(_this->m_nid.hWnd, WM_COMMAND, GetMenuItemID(submenu, 0), 0);
-         }
+         // Make the first menu item the default (bold font)
+         SetMenuDefaultItem(submenu, 0, TRUE);
+
+         // Get the current cursor position, to display the menu at
+         POINT mouse;
+         GetCursorPos(&mouse);
+
+         // There's a "bug"
+         // (Microsoft calls it a feature) in Windows 95 that requires calling
+         // SetForegroundWindow. To find out more, search for Q135788 in MSDN.
+         SetForegroundWindow(_this->m_nid.hWnd);
+
+         // Display the menu at the desired position
+         TrackPopupMenu(submenu, 0, mouse.x, mouse.y, 0, _this->m_nid.hWnd, NULL);
 
          return 0;
       }
+
+      // Or was there a LMB double click?
+      if (lParam == WM_LBUTTONDBLCLK) {
+         // double click: execute first menu item
+         SendMessage(_this->m_nid.hWnd, WM_COMMAND, GetMenuItemID(submenu, 0), 0);
+      }
+
+      return 0;
 
    case WM_BALLOONSHOW:
       // A balloon notice was shown, so set a timer to clear it
@@ -255,20 +248,6 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
       // The user wants Apcupsd to quit cleanly...
       PostQuitMessage(0);
       return 0;
-
-   case WM_QUERYENDSESSION:
-      // Is the system shutting down
-      if (lParam == 0) {
-         // No, so we are about to be killed
-
-         // If there are remote connections then we should verify
-         // that the user is happy about killing them.
-
-         // Finally, post a quit message, just in case
-         PostQuitMessage(0);
-      }
-      // Tell the OS that we've handled it anyway
-      return TRUE;
    }
 
    // Unknown message type
@@ -343,4 +322,17 @@ void upsMenu::FetchStatus(int &battstat, char *statstr, int len)
    char *tmp = statstr + strlen(statstr) - 1;
    while (tmp >= statstr && isspace(*tmp))
       *tmp-- = '\0';
+}
+
+DWORD WINAPI upsMenu::StatusPollThread(LPVOID param)
+{
+   upsMenu* _this = (upsMenu*)param;
+
+   while (1) {
+      // Delay for configured interval
+      Sleep(_this->m_interval);
+
+      // Update the tray icon
+      _this->UpdateTrayIcon();
+   }
 }
