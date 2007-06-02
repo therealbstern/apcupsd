@@ -180,13 +180,11 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
       case ID_STATUS:
          // Show the status dialog
          _this->m_status.Show(TRUE);
-         _this->UpdateTrayIcon();
          break;
 
       case ID_EVENTS:
          // Show the Events dialog
          _this->m_events.Show(TRUE);
-         _this->UpdateTrayIcon();
          break;
 
       case ID_ABOUT:
