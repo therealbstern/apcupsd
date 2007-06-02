@@ -31,9 +31,9 @@ BEGIN
         MENUITEM "&Properties",                 ID_PROPERTIES
 #endif
         MENUITEM SEPARATOR
-        MENUITEM "&About Apcupsd",              ID_ABOUT
+        MENUITEM "&About",                      ID_ABOUT
         MENUITEM SEPARATOR
-        MENUITEM "&Close Apcupsd",              ID_CLOSE
+        MENUITEM "&Close Apctray",              ID_CLOSE
     END
 END
 
@@ -130,14 +130,16 @@ BEGIN
 //  CONTROL         "\3", IDC_APCUPSDBMP,"Static",SS_ICON | SS_CENTERIMAGE |
 //                  SS_SUNKEN,7,5,73,65
     CONTROL         "a", IDB_APCUPSDBMP,"Static",SS_BITMAP|SS_SUNKEN,7,5,73,65
-    LTEXT           "Apcupsd Version " VERSION " (" ADATE ")", IDC_VERSION,90,10,239,10
-    LTEXT           "      by Kern Sibbald",IDC_NAME,90,20,239,10
+    LTEXT           "ApcTray Version " VERSION " (" ADATE ")", IDC_VERSION,90,10,239,10
+    LTEXT           "      by Adam Kropelin",IDC_NAME,90,20,239,10
     LTEXT           "For more information, see:",
                     IDC_WWW,90,40,239,10
-    LTEXT           "         www.apcupsd.com",
+    LTEXT           "      http://www.apcupsd.com",
                     IDC_WWW,90,50,239,10
-    LTEXT           "         sourceforge.net/projects/apcupsd",
+    LTEXT           "      http://sourceforge.net/projects/apcupsd",
                     IDC_WWW,90,60,239,10
+    LTEXT           "Copyright (C) 2004-2007, Adam Kropelin",
+                    IDC_COPYRIGHT,7,90,175,10
     LTEXT           "Copyright (C) 1999-2006, Kern Sibbald",
                     IDC_COPYRIGHT,7,100,175,10
     LTEXT           "Copyright (C) 1999-2002, Riccardo Facchetti",
