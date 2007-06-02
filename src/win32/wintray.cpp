@@ -16,6 +16,10 @@
 #include "wintray.h"
 #include "statmgr.h"
 
+// Remove apctray from registry autorun list
+// Defined in apctray.cpp
+extern int Remove();
+
 // Implementation
 upsMenu::upsMenu(HINSTANCE appinst, StatMgr *statmgr, int interval)
    : m_about(appinst),
@@ -195,6 +199,11 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
          PostMessage(hwnd, WM_CLOSE, 0, 0);
          break;
 
+      case ID_REMOVE:
+         // User wants to remove apctray from registry
+         Remove();
+         PostMessage(hwnd, WM_CLOSE, 0, 0);
+         break;
       }
       return 0;
 

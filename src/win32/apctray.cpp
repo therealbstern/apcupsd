@@ -102,26 +102,28 @@ int Remove()
    if (RegCreateKey(HKEY_LOCAL_MACHINE, 
                     "Software\\Microsoft\\Windows\\CurrentVersion\\Run",
                     &runkey) != ERROR_SUCCESS) {
-      MessageBox(NULL, "The System Registry could not be updated.\n"
-                        "Apctray was not removed.",
+      MessageBox(NULL, "Apctray does not appear to be installed\n"
+                       "in the system registry or you do not have\n"
+                       "permission to remove it.",
                  "Apctray", MB_ICONEXCLAMATION | MB_OK);
-      return 1;
+      return 0;
    }
 
    // Attempt to delete the Apctray key
    if (RegDeleteValue(runkey, "Apctray") != ERROR_SUCCESS) {
       RegCloseKey(runkey);
-      MessageBox(NULL, "The System Registry could not be updated.\n"
-                        "Apctray was not removed.",
+      MessageBox(NULL, "Apctray does not appear to be installed\n"
+                       "in the system registry or you do not have\n"
+                       "permission to remove it.",
                  "Apctray", MB_ICONEXCLAMATION | MB_OK);
-      return 1;
+      return 0;
    }
 
    RegCloseKey(runkey);
 
    MessageBox(NULL,
               "Apctray was successfully removed and will no longer\n"
-              "be run when users log on.",
+              "be run when users log on to this machine.",
               "Apctray", MB_ICONINFORMATION | MB_OK);
 
    return 0;

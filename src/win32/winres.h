@@ -31,6 +31,7 @@
 #define ID_STATUS                       40005
 #define ID_DEFAULT_PROPERTIES           40006
 #define ID_EVENTS                       40007
+#define ID_REMOVE                       40008
 
 #define IDD_PROPERTIES                  200
 #define IDD_ABOUT                       201
