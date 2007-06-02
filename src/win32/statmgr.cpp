@@ -129,7 +129,7 @@ char *StatMgr::ltrim(char *str)
 void StatMgr::rtrim(char *str)
 {
    char *tmp = str + strlen(str) - 1;
-   
+
    while (tmp >= str && isspace(*tmp))
       *tmp-- = '\0';
 }
@@ -144,17 +144,20 @@ char *StatMgr::trim(char *str)
 char *StatMgr::sprintf_realloc_append(char *str, const char *format, ...)
 {
    va_list args;
+   char tmp[1024];
 
    va_start(args, format);
-   int appendlen = vsnprintf(NULL, 0, format, args);
+   int rc = avsnprintf(tmp, sizeof(tmp), format, args);
    va_end(args);
 
+   // Win98 vsnprintf fails with -1 if buffer is not large enough.
+   if (rc < 0)
+      return str;
+
+   int appendlen = strlen(tmp);
    int oldlen = str ? strlen(str) : 0;
    char *result = (char*)realloc(str, oldlen + appendlen + 1);
 
-   va_start(args, format);
-   vsprintf(result + oldlen, format, args);
-   va_end(args);
-
+   memcpy(result + oldlen, tmp, appendlen+1);
    return result;
 }
