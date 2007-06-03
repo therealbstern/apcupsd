@@ -18,9 +18,10 @@
 #define CMDOPT_REFRESH  "/refresh"
 #define CMDOPT_INSTALL  "/install"
 #define CMDOPT_REMOVE   "/remove"
+#define CMDOPT_KILL     "/kill"
 
 #define USAGE_TEXT   "[/host <hostname>] [/port <port>] [/interval <sec>] " \
-                     "[/install] [/remove]"
+                     "[/install] [/remove] [/kill]"
 
 char *GetArg(char **cmdline)
 {
@@ -129,6 +130,14 @@ int Remove()
    return 0;
 }
 
+int Kill()
+{
+   HWND wnd = FindWindow(APCTRAY_WINDOW_CLASS, APCTRAY_WINDOW_NAME);
+   if (wnd)
+      PostMessage(wnd, WM_CLOSE, 0, 0);
+   return 0;
+}
+
 void Usage(const char *text1, const char* text2)
 {
    MessageBox(NULL, text1, text2, MB_OK);
@@ -175,6 +184,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
          return Install(host, port, interval);
       } else if (strcasecmp(arg, CMDOPT_REMOVE) == 0) {
          return Remove();
+      } else if (strcasecmp(arg, CMDOPT_KILL) == 0) {
+         return Kill();
       } else {
          Usage(arg, "Unknown option");
          return 1;
