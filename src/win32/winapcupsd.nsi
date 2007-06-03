@@ -62,6 +62,7 @@ FunctionEnd
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
 Page custom EditApcupsdConfEnter EditApcupsdConfExit ""
+Page custom InstallServiceEnter InstallServiceExit ""
 
 !insertmacro MUI_UNPAGE_WELCOME
 !insertmacro MUI_UNPAGE_CONFIRM
@@ -147,6 +148,72 @@ Function EditApcupsdConfExit
   ${EndIf}
 FunctionEnd
 
+Function InstallServiceEnter
+  ; Skip if apcupsd main package was not installed
+  ${If} $MainInstalled != 1
+    Abort
+  ${EndIf}
+
+  ; Configure header text and instantiate the page
+  !insertmacro MUI_HEADER_TEXT "Install/Start Service" "Install Apcupsd Service and start it."
+  !insertmacro MUI_INSTALLOPTIONS_INITDIALOG "InstallService.ini"
+  Pop $R0 ;HWND of dialog
+
+  ; Set contents of first text field
+  !insertmacro MUI_INSTALLOPTIONS_READ $R0 "InstallService.ini" "Field 1" "HWND"
+  SendMessage $R0 ${WM_SETTEXT} 0 \
+      "STR:Check this box to install Apcupsd as a service so it will \
+       automatically start each time this machine boots. Uncheck the box \
+       if you plan to start Apcupsd by hand."
+
+  ; Set contents of second text field
+  !insertmacro MUI_INSTALLOPTIONS_READ $R0 "InstallService.ini" "Field 3" "HWND"
+  SendMessage $R0 ${WM_SETTEXT} 0 \
+      "STR:Check this box to start Apcupsd now."
+
+  ; Display the page
+  !insertmacro MUI_INSTALLOPTIONS_SHOW
+FunctionEnd
+
+Function InstallServiceExit
+  ; Create Start Menu Directory
+  SetShellVarContext all
+  CreateDirectory "$SMPROGRAMS\Apcupsd"
+
+  ; Remove service
+  ExecWait '"$INSTDIR\bin\apcupsd.exe" /quiet /remove'
+  Sleep 2  ; Give remove time to complete
+
+  ; Install as service and create start menu shortcuts
+  !insertmacro MUI_INSTALLOPTIONS_READ $R1 "InstallService.ini" "Field 2" "State"
+  ${If} $R1 == 1
+    ; Install service
+    ExecWait '"$INSTDIR\bin\apcupsd.exe" /quiet /install'
+    Sleep 2  ; Give install time to complete
+    Call IsNt
+    Pop $R0
+    ${If} $R0 == false
+      ; Installed as a service, but not on NT
+      CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "/service"
+      CreateShortCut "$SMPROGRAMS\Apcupsd\Stop Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "/kill"
+    ${Else}
+      ; Installed as a service and we're on NT
+      CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$SYSDIR\net.exe" "start apcupsd" "$INSTDIR\bin\apcupsd.exe"
+      CreateShortCut "$SMPROGRAMS\Apcupsd\Stop Apcupsd.lnk" "$SYSDIR\net.exe" "stop apcupsd" "$INSTDIR\bin\apcupsd.exe"
+    ${EndIf}
+  ${Else}
+    ; Not installed as a service
+    CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe"
+    CreateShortCut "$SMPROGRAMS\Apcupsd\Stop Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "/kill"
+  ${EndIf}
+
+  ; Start Apcupsd now, if so requested
+  !insertmacro MUI_INSTALLOPTIONS_READ $R2 "InstallService.ini" "Field 4" "State"
+  ${If} $R2 == 1
+    ExecShell "" "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "" SW_HIDE
+  ${Endif}  
+FunctionEnd
+
 Section "-Startup"
   ; Check for existing installation
   ${If} ${FileExists} "$INSTDIR\etc\apcupsd\apcupsd.conf"
@@ -227,40 +294,6 @@ Section "Apcupsd Service" SecService
   ${Unless} ${FileExists} "$INSTDIR\etc\apcupsd\apcupsd.conf"
     Rename apcupsd.conf.new apcupsd.conf
   ${EndUnless}
-
-  ; If already installed as service skip the option
-  ReadRegDWORD $9 HKLM "Software\Apcupsd" "InstalledService"
-  ${Unless} $9 == 1
-    ; Install as service?
-    ${If} ${Cmd} 'MessageBox MB_YESNO|MB_ICONQUESTION "Do you want to install Apcupsd as a service$\n(automatically starts with your PC)?" IDYES'
-      ExecWait '"$INSTDIR\bin\apcupsd.exe" /install'
-      StrCpy $9 "1"
-      WriteRegDWORD HKLM "Software\Apcupsd" "InstalledService" "1"
-    ${EndIf}
-  ${EndUnless}
-
-  ; Create Start Menu Directory
-  SetShellVarContext all
-  CreateDirectory "$SMPROGRAMS\Apcupsd"
-
-  ; Create a start menu link to start apcupsd (possibly as a service)
-  ${If} $9 != 1
-    ; Not installed as a service
-    CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe"
-    CreateShortCut "$SMPROGRAMS\Apcupsd\Stop Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "/kill"
-  ${Else}
-    Call IsNt
-    Pop $R0
-    ${If} $R0 == false
-      ; Installed as a service, but not on NT
-      CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "/service"
-      CreateShortCut "$SMPROGRAMS\Apcupsd\Stop Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "/kill"
-    ${Else}
-      ; Installed as a service and we're on NT
-      CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$SYSDIR\net.exe" "start apcupsd" "$INSTDIR\bin\apcupsd.exe"
-      CreateShortCut "$SMPROGRAMS\Apcupsd\Stop Apcupsd.lnk" "$SYSDIR\net.exe" "stop apcupsd" "$INSTDIR\bin\apcupsd.exe"
-    ${EndIf}
-  ${EndIf}
 SectionEnd
 
 Section "Tray Applet" SecApctray
@@ -345,10 +378,19 @@ Function .onInit
 
   ; Extract custom pages. Automatically deleted when installer exits.
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT "EditApcupsdConf.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT "InstallService.ini"
 
   ; Nothing installed yet
   StrCpy $MainInstalled 0
   StrCpy $TrayInstalled 0
+
+  ; Check if apcupsd is already installed as a service
+  ReadRegDWORD $0 HKLM "Software\Apcupsd" "InstalledService"
+  ${If} $0 == 1
+    StrCpy $IsService 1
+  ${Else}
+    StrCpy $IsService 0
+  ${EndIf}
 FunctionEnd
 
 
@@ -381,11 +423,10 @@ Section "Uninstall"
   ExecWait '"$INSTDIR\bin\apctray.exe" /kill'
   Sleep 1
 
-  ReadRegDWORD $9 HKLM "Software\Apcupsd" "InstalledService"
-  ${If} $9 == 1
-    ; Remove apcuspd service
-    ExecWait '"$INSTDIR\bin\apcupsd.exe" /remove'
-  ${EndIf}
+  ; Remove apcuspd service and apctray
+  ExecWait '"$INSTDIR\bin\apcupsd.exe" /quiet /remove'
+  ExecWait '"$INSTDIR\bin\apctray.exe" /quiet /remove'
+  Sleep 1
 
   ; remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apcupsd"
