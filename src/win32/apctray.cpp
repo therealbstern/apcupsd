@@ -23,37 +23,6 @@
 #define USAGE_TEXT   "[/host <hostname>] [/port <port>] [/interval <sec>] " \
                      "[/install] [/remove] [/kill]"
 
-char *GetArg(char **cmdline)
-{
-   // Skip leading whitespace
-   while (isspace(**cmdline))
-      (*cmdline)++;
-
-   // Bail if there's nothing left
-   if (**cmdline == '\0')
-      return NULL;
-
-   // Find end of this argument
-   char *ret;
-   if (**cmdline == '"') {
-      // Find end of quoted argument
-      ret = ++(*cmdline);
-      while (**cmdline && **cmdline != '"')
-         (*cmdline)++;
-   } else {
-      // Find end of non-quoted argument
-      ret = *cmdline;
-      while (**cmdline && !isspace(**cmdline))
-         (*cmdline)++;
-   }
-
-   // NUL-terminate this argument
-   if (**cmdline)
-      *(*cmdline)++ = '\0';
-
-   return ret;
-}
-
 int Install(char *host, unsigned short port, int interval)
 {
    // Get the filename of this executable

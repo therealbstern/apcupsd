@@ -33,10 +33,11 @@ extern int ApcupsdMain(int argc, char **argv);
 #define ApcupsdRemoveService     "/remove"
 #define ApcupsdKillRunningCopy   "/kill"
 #define ApcupsdShowHelp          "/help"
+#define ApcupsdQuiet             "/quiet"
 
 // Usage string
 static const char *ApcupsdUsageText =
-   "apcupsd [/run] [/kill] [/install] [/remove] [/help]\n";
+   "apcupsd [/quiet] [/run] [/kill] [/install] [/remove] [/help]\n";
 
 // Application instance
 static HINSTANCE hAppInstance;
@@ -45,16 +46,15 @@ static HINSTANCE hAppInstance;
 #define MAX_COMMAND_ARGS 100
 static char *command_args[MAX_COMMAND_ARGS] = { "apcupsd", NULL };
 static int num_command_args = 1;
+static char *winargs[MAX_COMMAND_ARGS];
+static int num_winargs = 0;
 
 // WinMain parses the command line and either calls the main App
 // routine or, under NT, the main service routine.
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                    PSTR CmdLine, int iCmdShow)
 {
-   char *szCmdLine = CmdLine;
-   char *wordPtr, *tempPtr;
-   char *winarg = ApcupsdRunAsUserApp;
-   int i;
+   bool quiet = false;
 
    InitWinAPIWrapper();
    WSA_Init();
@@ -65,87 +65,70 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    /* Build Unix style argc *argv[] */
 
    /* Don't NULL command_args[0] !!! */
-   for (i = 1; i < MAX_COMMAND_ARGS; i++)
+   for (int i = 1; i < MAX_COMMAND_ARGS; i++)
       command_args[i] = NULL;
 
-   wordPtr = szCmdLine;
-   while (*wordPtr && num_command_args < MAX_COMMAND_ARGS) {
-      
-      // Skip leading whitespace
-      while (*wordPtr && isspace(*wordPtr))
-         wordPtr++;
+   // Split command line to windows and non-windows arguments
+   char *arg;
+   char *szCmdLine = CmdLine;
+   while ((arg = GetArg(&szCmdLine))) {
+      // Save the argument in appropriate list
+      if (*arg != '/' && num_command_args < MAX_COMMAND_ARGS)
+         command_args[num_command_args++] = arg;
+      else if (num_winargs < MAX_COMMAND_ARGS)
+         winargs[num_winargs++] = arg;
+   }
 
-      // Exit if there's nothing left
-      if (*wordPtr == '\0')
-         break;
+   // Default Windows argument
+   if (num_winargs == 0)
+      winargs[num_winargs++] = ApcupsdRunAsUserApp;
 
-      // Find end of this argument
-      if (*wordPtr == '"') {
-         // Find end of quoted argument
-         tempPtr = ++wordPtr;
-         while (*tempPtr && *tempPtr != '"')
-            tempPtr++;
-      } else {
-         // Find end of non-quoted argument
-         tempPtr = wordPtr;
-         while (*tempPtr && !isspace(*tempPtr))
-            tempPtr++;
+   // Act on Windows arguments...
+   for (int i = 0; i < num_winargs; i++) {
+      // /service
+      if (strcasecmp(winargs[i], ApcupsdRunService) == 0) {
+         // Run Apcupsd as a service
+         return upsService::ApcupsdServiceMain();
+      }
+      // /run  (this is the default if no command line arguments)
+      if (strcasecmp(winargs[i], ApcupsdRunAsUserApp) == 0) {
+         // Apcupsd is being run as a user-level program
+         return ApcupsdAppMain(0);
+      }
+      // /install
+      if (strcasecmp(winargs[i], ApcupsdInstallService) == 0) {
+         // Install Apcupsd as a service
+         return upsService::InstallService(quiet);
+      }
+      // /remove
+      if (strcasecmp(winargs[i], ApcupsdRemoveService) == 0) {
+         // Remove the Apcupsd service
+         return upsService::RemoveService(quiet);
+      }
+      // /kill
+      if (strcasecmp(winargs[i], ApcupsdKillRunningCopy) == 0) {
+         // Kill any already running copy of Apcupsd
+         return upsService::KillRunningCopy();
+      }
+      // /quiet
+      if (strcasecmp(winargs[i], ApcupsdQuiet) == 0) {
+         // Set quiet flag and go on to next argument
+         quiet = true;
+         continue;
+      }
+      // /help
+      if (strcasecmp(winargs[i], ApcupsdShowHelp) == 0) {
+         MessageBox(NULL, ApcupsdUsageText, "Apcupsd Usage",
+                    MB_OK | MB_ICONINFORMATION);
+         return 0;
       }
 
-      // NUL-terminate this argument
-      if (*tempPtr)
-         *(tempPtr++) = '\0';
-
-      // Save the argument
-      if (*wordPtr != '/' && (*wordPtr != '"' || *(wordPtr+1) != '/'))
-         command_args[num_command_args++] = wordPtr;
-      else
-         winarg = wordPtr;
-
-      // Onto the next argument
-      wordPtr = tempPtr;
-   }
-
-   // Act on Windows argument...
-
-   // /service
-   if (strcasecmp(winarg, ApcupsdRunService) == 0) {
-      // Run Apcupsd as a service
-      return upsService::ApcupsdServiceMain();
-   }
-   // /run  (this is the default if no command line arguments)
-   if (strcasecmp(winarg, ApcupsdRunAsUserApp) == 0) {
-      // Apcupsd is being run as a user-level program
-      return ApcupsdAppMain(0);
-   }
-   // /install
-   if (strcasecmp(winarg, ApcupsdInstallService) == 0) {
-      // Install Apcupsd as a service
-      return upsService::InstallService();
-   }
-   // /remove
-   if (strcasecmp(winarg, ApcupsdRemoveService) == 0) {
-      // Remove the Apcupsd service
-      return upsService::RemoveService();
-   }
-   // /kill
-   if (strcasecmp(winarg, ApcupsdKillRunningCopy) == 0) {
-      // Kill any already running copy of Apcupsd
-      return upsService::KillRunningCopy();
-   }
-   // /help
-   if (strcasecmp(winarg, ApcupsdShowHelp) == 0) {
+      // Unknown option: Show the usage dialog
+      MessageBox(NULL, winargs[i], "Bad Command Line Options", MB_OK);
       MessageBox(NULL, ApcupsdUsageText, "Apcupsd Usage",
                  MB_OK | MB_ICONINFORMATION);
-      return 0;
+      return 1;
    }
-
-   // Unknown option: Show the usage dialog
-   MessageBox(NULL, winarg, "Bad Command Line Options", MB_OK);
-   MessageBox(NULL, ApcupsdUsageText, "Apcupsd Usage",
-              MB_OK | MB_ICONINFORMATION);
-
-   return 1;
 }
 
 // Callback for processing Windows messages

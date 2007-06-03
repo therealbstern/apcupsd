@@ -27,7 +27,7 @@
  * Last Modified By: Thorsten Engel
  * Last Modified On: Fri Apr 22 19:30:00 2004
  * Update Count    : 218
- * $Id: compat.h,v 1.21.2.1 2007-06-01 00:11:52 adk0212 Exp $
+ * $Id: compat.h,v 1.21.2.2 2007-06-03 16:31:52 adk0212 Exp $
  */
 
 
@@ -309,5 +309,8 @@ int ioctl(int, int, ...);
 #ifndef MIN
 #define MIN(a, b) ( ((a) < (b)) ? (a) : (b) )
 #endif
+
+// Parse windows-style command line into individual arguments
+char *GetArg(char **cmdline);
 
 #endif /* __COMPAT_H_ */
