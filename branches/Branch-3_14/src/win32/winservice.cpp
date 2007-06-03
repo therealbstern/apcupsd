@@ -189,16 +189,18 @@ void upsService::ServiceStop()
 }
 
 // SERVICE INSTALL ROUTINE
-int upsService::InstallService()
+int upsService::InstallService(bool quiet)
 {
    const int MAXPATH = 2048;
 
    // Get the filename of this executable
    char path[MAXPATH];
    if (GetModuleFileName(NULL, path, MAXPATH) == 0) {
-      MessageBox(NULL,
-                 _("Unable to install Apcupsd service"), SERVICE_NAME,
-                 MB_ICONEXCLAMATION | MB_OK);
+      if (!quiet) {
+         MessageBox(NULL,
+                    _("Unable to install Apcupsd service"), SERVICE_NAME,
+                    MB_ICONEXCLAMATION | MB_OK);
+      }
       return 0;
    }
 
@@ -208,9 +210,11 @@ int upsService::InstallService()
    if (strlen(path) + 4 + strlen(ApcupsdRunService) < MAXPATH) {
       sprintf(servicecmd, "\"%s\" %s", path, ApcupsdRunService);
    } else {
-      MessageBox(NULL,
-                 _("Service command length too long. Service not registered."),
-                 SERVICE_NAME, MB_ICONEXCLAMATION | MB_OK);
+      if (!quiet) {
+         MessageBox(NULL,
+                    _("Service command length too long. Service not registered."),
+                    SERVICE_NAME, MB_ICONEXCLAMATION | MB_OK);
+      }
       return 0;
    }
 
@@ -243,12 +247,14 @@ int upsService::InstallService()
       RegCloseKey(runservices);
 
       // We have successfully installed the service!
-      MessageBox(NULL,
-                 _("The Apcupsd UPS service was successfully installed.\n"
-                   "The service may be started by double clicking on the\n"
-                   "Apcupsd \"Start\" icon and will automatically\n"
-                   "be run the next time this machine is rebooted. "),
-                 SERVICE_NAME, MB_ICONINFORMATION | MB_OK);
+      if (!quiet) {
+         MessageBox(NULL,
+                    _("The Apcupsd UPS service was successfully installed.\n"
+                      "The service may be started by double clicking on the\n"
+                      "Apcupsd \"Start\" icon and will automatically\n"
+                      "be run the next time this machine is rebooted. "),
+                    SERVICE_NAME, MB_ICONINFORMATION | MB_OK);
+      }
       break;
 
    // Windows NT, Win2K, WinXP
@@ -295,12 +301,14 @@ int upsService::InstallService()
       CloseServiceHandle(hsrvmanager);
 
       // Everything went fine
-      MessageBox(NULL,
+      if (!quiet) {
+         MessageBox(NULL,
               _("The Apcupsd UPS service was successfully installed.\n"
                 "The service may be started from the Control Panel and will\n"
                 "automatically be run the next time this machine is rebooted."),
               SERVICE_NAME,
               MB_ICONINFORMATION | MB_OK);
+      }
       break;
 
    default:
@@ -316,7 +324,7 @@ int upsService::InstallService()
 
 
 // SERVICE REMOVE ROUTINE
-int upsService::RemoveService()
+int upsService::RemoveService(bool quiet)
 {
    // How to remove the Apcupsd service depends upon the OS
    switch (g_os_version_info.dwPlatformId) {
@@ -328,17 +336,21 @@ int upsService::RemoveService()
       if (RegOpenKey(HKEY_LOCAL_MACHINE, 
               "Software\\Microsoft\\Windows\\CurrentVersion\\RunServices",
               &runservices) != ERROR_SUCCESS) {
-         MessageBox(NULL, 
-                    _("Could not find registry entry.\n"
-                      "Service probably not registerd - "
-                      "the Apcupsd service was not removed"),
-                    SERVICE_NAME, MB_ICONEXCLAMATION | MB_OK);
+         if (!quiet) {
+            MessageBox(NULL, 
+                       _("Could not find registry entry.\n"
+                         "Service probably not registerd - "
+                         "the Apcupsd service was not removed"),
+                       SERVICE_NAME, MB_ICONEXCLAMATION | MB_OK);
+         }
       } else {
          // Attempt to delete the Apcupsd key
          if (RegDeleteValue(runservices, SERVICE_NAME) != ERROR_SUCCESS) {
-            MessageBox(NULL, _("Could not delete Registry key.\n"
-                               "The Apcupsd service could not be removed"),
-                       SERVICE_NAME, MB_ICONEXCLAMATION | MB_OK);
+            if (!quiet) {
+               MessageBox(NULL, _("Could not delete Registry key.\n"
+                                  "The Apcupsd service could not be removed"),
+                          SERVICE_NAME, MB_ICONEXCLAMATION | MB_OK);
+            }
          }
 
          RegCloseKey(runservices);
@@ -347,15 +359,19 @@ int upsService::RemoveService()
 
       // Try to kill any running copy of Apcupsd
       if (!KillRunningCopy()) {
-         MessageBox(NULL,
-                    _("Apcupsd could not be contacted, probably not running"),
-                    SERVICE_NAME, MB_ICONEXCLAMATION | MB_OK);
+         if (!quiet) {
+            MessageBox(NULL,
+                       _("Apcupsd could not be contacted, probably not running"),
+                       SERVICE_NAME, MB_ICONEXCLAMATION | MB_OK);
+         }
          break;
       }
 
       // We have successfully removed the service!
-      MessageBox(NULL, _("The Apcupsd service has been removed"),
-                 SERVICE_NAME, MB_ICONINFORMATION | MB_OK);
+      if (!quiet) {
+         MessageBox(NULL, _("The Apcupsd service has been removed"),
+                    SERVICE_NAME, MB_ICONINFORMATION | MB_OK);
+      }
       break;
 
    // Windows NT, Win2K, WinXP
@@ -376,8 +392,10 @@ int upsService::RemoveService()
          hsrvmanager, SERVICE_NAME, SERVICE_ALL_ACCESS);
       if (hservice == NULL) {
          CloseServiceHandle(hsrvmanager);
-         MessageBox(NULL, _("The Apcupsd service could not be found"),
-                    SERVICE_NAME, MB_ICONEXCLAMATION | MB_OK);
+         if (!quiet) {
+            MessageBox(NULL, _("The Apcupsd service could not be found"),
+                       SERVICE_NAME, MB_ICONEXCLAMATION | MB_OK);
+         }
          break;
       }
 
@@ -399,8 +417,10 @@ int upsService::RemoveService()
                     SERVICE_NAME, MB_ICONEXCLAMATION | MB_OK);
       } else if(DeleteService(hservice)) {
          // Service successfully removed
-         MessageBox(NULL, _("The Apcupsd service has been removed"),
-                    SERVICE_NAME, MB_ICONINFORMATION | MB_OK);
+         if (!quiet) {
+            MessageBox(NULL, _("The Apcupsd service has been removed"),
+                       SERVICE_NAME, MB_ICONINFORMATION | MB_OK);
+         }
       } else {
          // Failed to remove
          MessageBox(NULL, _("The Apcupsd service could not be removed"),

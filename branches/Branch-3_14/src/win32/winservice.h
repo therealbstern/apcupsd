@@ -35,10 +35,10 @@ public:
    static int ApcupsdServiceMain();
 
    // Routine to install the Apcupsd service on the local machine
-   static int InstallService();
+   static int InstallService(bool quiet);
 
    // Routine to remove the Apcupsd service from the local machine
-   static int RemoveService();
+   static int RemoveService(bool quiet);
 
    // Stop the service
    static void ServiceStop();
