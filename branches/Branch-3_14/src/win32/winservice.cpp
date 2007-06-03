@@ -286,10 +286,12 @@ int upsService::InstallService(bool quiet)
               NULL,                           // LocalSystem account
               NULL);                          // no password
       if (hservice == NULL) {
+         if (!quiet || GetLastError() != ERROR_SERVICE_EXISTS) {
+            MessageBox(NULL,
+                       _("The Apcupsd service could not be installed"),
+                       SERVICE_NAME, MB_ICONEXCLAMATION | MB_OK);
+         }
          CloseServiceHandle(hsrvmanager);
-         MessageBox(NULL,
-                    _("The Apcupsd service could not be installed"),
-                    SERVICE_NAME, MB_ICONEXCLAMATION | MB_OK);
          break;
       }
 
