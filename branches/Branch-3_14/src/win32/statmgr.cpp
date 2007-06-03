@@ -84,7 +84,7 @@ char* StatMgr::GetAll()
 
    lock();
    for (int idx=0; idx < MAX_STATS && m_stats[idx].key; idx++) {
-      result = sprintf_realloc_append(result, "%-8s : %s\n",
+      result = sprintf_realloc_append(result, "%-9s: %s\n",
                   m_stats[idx].key, m_stats[idx].value);
    }
    unlock();
