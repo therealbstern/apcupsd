@@ -8,15 +8,17 @@
 !define PRODUCT "Apcupsd"
 
 ;			    
-; Include the Modern UI
+; Include files
 ;
 !include "MUI.nsh"
 !include "util.nsh"
-
-;
-; Use Logic Library to improve readability
-;
 !include "LogicLib.nsh"
+
+; Global variables
+Var IsService
+Var ExistingConfig
+Var MainInstalled
+Var TrayInstalled
 
 ; Post-process apcupsd.conf.in by replacing @FOO@ tokens
 ; with proper values.
@@ -52,41 +54,44 @@ FunctionEnd
   InstallDir "c:\apcupsd"
 
 ;
-; Page customization
-;
-!define MUI_FINISHPAGE_RUN
-!define MUI_FINISHPAGE_RUN_TEXT "Start Apcupsd (Be sure to edit apcupsd.conf first!)"
-!define MUI_FINISHPAGE_RUN_FUNCTION "StartApcupsd"
-!define MUI_FINISHPAGE_RUN_NOTCHECKED
-!define MUI_FINISHPAGE_SHOWREADME
-!define MUI_FINISHPAGE_SHOWREADME_TEXT "View the ReleaseNotes"
-!define MUI_FINISHPAGE_SHOWREADME_FUNCTION "ShowReadme"
-!define MUI_FINISHPAGE_LINK "Visit Apcupsd Website"
-!define MUI_FINISHPAGE_LINK_LOCATION "http://www.apcupsd.com"
-
-;
 ; Pull in pages
 ;
- !insertmacro MUI_PAGE_WELCOME
- !insertmacro MUI_PAGE_LICENSE "..\..\COPYING"
- !insertmacro MUI_PAGE_COMPONENTS
- !insertmacro MUI_PAGE_DIRECTORY
- !insertmacro MUI_PAGE_INSTFILES
- !insertmacro MUI_PAGE_FINISH
+!insertmacro MUI_PAGE_WELCOME
+!insertmacro MUI_PAGE_LICENSE "..\..\COPYING"
+!insertmacro MUI_PAGE_COMPONENTS
+!insertmacro MUI_PAGE_DIRECTORY
+!insertmacro MUI_PAGE_INSTFILES
+Page custom EditApcupsdConfEnter EditApcupsdConfExit ""
 
- !insertmacro MUI_UNPAGE_WELCOME
- !insertmacro MUI_UNPAGE_CONFIRM
- !insertmacro MUI_UNPAGE_INSTFILES
- !insertmacro MUI_UNPAGE_FINISH
+!insertmacro MUI_UNPAGE_WELCOME
+!insertmacro MUI_UNPAGE_CONFIRM
+!insertmacro MUI_UNPAGE_INSTFILES
+!insertmacro MUI_UNPAGE_FINISH
  
- !define      MUI_ABORTWARNING
+!define      MUI_ABORTWARNING
 
- !insertmacro MUI_LANGUAGE "English"
+!insertmacro MUI_LANGUAGE "English"
 
 
 
 DirText "Setup will install Apcupsd ${VERSION} to the directory \
          specified below."
+
+Function EditApcupsdConf
+    MessageBox MB_OK "Please edit the client configuration file $INSTDIR\etc\apcupsd\apcupsd.conf \
+                      to fit your installation. When you click the OK button Wordpad will open to \
+                      allow you to do this. Be sure to save your changes before closing Wordpad."
+
+    ExecWait 'write "$INSTDIR\etc\apcupsd\apcupsd.conf"'
+FunctionEnd
+
+Function InstallService
+    MessageBox MB_OK "Installing service"
+FunctionEnd
+
+Function InstallTray
+    MessageBox MB_OK "Installing service"
+FunctionEnd
 
 Function StartApcupsd
   ExecShell "" "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "" SW_HIDE
@@ -97,7 +102,59 @@ Function ShowReadme
   Exec 'write "$INSTDIR\ReleaseNotes"'
 FunctionEnd
 
+Function EditInstallPre
+FunctionEnd
+
+Function TrayPre
+FunctionEnd
+
+Function EditApcupsdConfEnter
+  ; Skip this page if config file was preexisting
+  ${If} $ExistingConfig == 1
+    Abort
+  ${EndIf}
+
+  ; Also skip if apcupsd main package was not installed
+  ${If} $MainInstalled != 1
+    Abort
+  ${EndIf}
+
+  ; Configure header text and instantiate the page
+  !insertmacro MUI_HEADER_TEXT "Edit Configuration File" "Configure Apcupsd for your UPS."
+  !insertmacro MUI_INSTALLOPTIONS_INITDIALOG "EditApcupsdConf.ini"
+  Pop $R0 ;HWND of dialog
+
+  ; Set contents of text field
+  !insertmacro MUI_INSTALLOPTIONS_READ $R0 "EditApcupsdConf.ini" "Field 1" "HWND"
+  SendMessage $R0 ${WM_SETTEXT} 0 \
+      "STR:The default configuration is suitable for UPSes connected with a USB cable. \
+       All other types of connections require editing the client configuration file, \
+       apcupsd.conf.$\r$\r\
+       Please edit $INSTDIR\etc\apcupsd\apcupsd.conf to fit your installation. \
+       When you click the Next button, Wordpad will open to allow you to do this.$\r$\r\
+       Be sure to save your changes before closing Wordpad and before continuing \
+       with the installation."
+
+  ; Display the page
+  !insertmacro MUI_INSTALLOPTIONS_SHOW
+FunctionEnd
+
+Function EditApcupsdConfExit
+  ; Launch wordpad to edit apcupsd.conf if checkbox is checked
+  !insertmacro MUI_INSTALLOPTIONS_READ $R1 "EditApcupsdConf.ini" "Field 2" "State"
+  ${If} $R1 == 1
+    ExecWait 'write "$INSTDIR\etc\apcupsd\apcupsd.conf"'
+  ${EndIf}
+FunctionEnd
+
 Section "-Startup"
+  ; Check for existing installation
+  ${If} ${FileExists} "$INSTDIR\etc\apcupsd\apcupsd.conf"
+    StrCpy $ExistingConfig 1
+  ${Else}
+    StrCpy $ExistingConfig 0
+  ${EndIf}
+
   ; Create base installation directory
   CreateDirectory "$INSTDIR"
 
@@ -109,10 +166,11 @@ Section "-Startup"
 SectionEnd
 
 Section "Apcupsd Service" SecService
+  ; We're installing the main package
+  StrCpy $MainInstalled 1
+
   ; Check for existing installation
-  StrCpy $7 0
-  ${If} ${FileExists} "$INSTDIR\etc\apcupsd\apcupsd.conf"
-    StrCpy $7 1
+  ${If} $ExistingConfig == 1
     ; Shutdown any apcupsd that could be running
     ExecWait '"$INSTDIR\bin\apcupsd.exe" /kill'
     ; give it some time to shutdown
@@ -203,19 +261,15 @@ Section "Apcupsd Service" SecService
       CreateShortCut "$SMPROGRAMS\Apcupsd\Stop Apcupsd.lnk" "$SYSDIR\net.exe" "stop apcupsd" "$INSTDIR\bin\apcupsd.exe"
     ${EndIf}
   ${EndIf}
-
-  ${If} $7 != 1
-    MessageBox MB_OK "Please edit the client configuration file $INSTDIR\etc\apcupsd\apcupsd.conf \
-                      to fit your installation. When you click the OK button Wordpad will open to \
-                      allow you to do this. Be sure to save your changes before closing Wordpad."
-    Exec 'write "$INSTDIR\etc\apcupsd\apcupsd.conf"'  ; spawn wordpad with the file to be edited
-  ${EndUnless}
 SectionEnd
 
 Section "Tray Applet" SecApctray
+  ; We're installing the apctray package
+  StrCpy $TrayInstalled 1
+
+  ; Install files
   CreateDirectory "$INSTDIR"
   CreateDirectory "$INSTDIR\bin"
-
   SetOutPath "$INSTDIR\bin"
   File apctray.exe
 
@@ -288,6 +342,13 @@ Function .onInit
      IntOp $0 $0 | ${SF_RO}
      SectionSetFlags ${SecUsbDrv} $0
   ${EndIf}
+
+  ; Extract custom pages. Automatically deleted when installer exits.
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT "EditApcupsdConf.ini"
+
+  ; Nothing installed yet
+  StrCpy $MainInstalled 0
+  StrCpy $TrayInstalled 0
 FunctionEnd
 
 
