@@ -90,11 +90,23 @@ DirText "Setup will install Apcupsd ${VERSION} to the directory \
 
 Function StartApcupsd
   ExecShell "" "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "" SW_HIDE
+  ExecShell "" "$SMPROGRAMS\Apcupsd\Apctray.lnk" "" SW_HIDE
 FunctionEnd
 
 Function ShowReadme
   Exec 'write "$INSTDIR\ReleaseNotes"'
 FunctionEnd
+
+Section "-Startup"
+  ; Create base installation directory
+  CreateDirectory "$INSTDIR"
+
+  ; Install common files
+  SetOutPath "$INSTDIR"
+  File ..\..\COPYING
+  File ..\..\ChangeLog
+  File ..\..\ReleaseNotes
+SectionEnd
 
 Section "Apcupsd Service" SecService
   ; Check for existing installation
@@ -107,9 +119,7 @@ Section "Apcupsd Service" SecService
     Sleep 3000
   ${EndIf}
 
-  ; Set output path to the installation directory.
-  SetOutPath "$INSTDIR\bin"
-  CreateDirectory "$INSTDIR"
+  ; Create installation directories
   CreateDirectory "$INSTDIR\bin"
   CreateDirectory "$INSTDIR\driver"
   CreateDirectory "$INSTDIR\etc"
@@ -117,12 +127,12 @@ Section "Apcupsd Service" SecService
   CreateDirectory "$INSTDIR\examples"
   CreateDirectory "c:\tmp"
 
-  ; Put files there
   ;
   ; NOTE: If you add new files here, be sure to remove them
   ;       in the uninstaller!
   ;
-  
+ 
+  SetOutPath "$INSTDIR\bin"
   File mingwm10.dll
   File pthreadGCE.dll
   File ${DEPKGS}\libusb-win32\libusb0.dll
@@ -148,16 +158,8 @@ Section "Apcupsd Service" SecService
   SetOutPath "$INSTDIR\examples"
   File ..\..\examples\*
 
-  SetOutPath "$INSTDIR"
-;  File ..\..\platforms\cygwin\README.txt
-  File ..\..\COPYING
-  File ..\..\ChangeLog
-  File ..\..\ReleaseNotes
-
   SetOutPath "$INSTDIR\etc\apcupsd"
   File ..\..\platforms\mingw\apccontrol.bat
-
-  ; Install apcupsd.conf.in
   File ..\..\platforms\mingw\apcupsd.conf.in
 
   ; Post-process apcupsd.conf.in into apcupsd.conf.new
@@ -202,18 +204,32 @@ Section "Apcupsd Service" SecService
     ${EndIf}
   ${EndIf}
 
-  ; Write the uninstall keys for Windows & create Start Menu entry
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apcupsd" "DisplayName" "Apcupsd"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apcupsd" "UninstallString" '"$INSTDIR\uninstall.exe"'
-  WriteUninstaller "$INSTDIR\Uninstall.exe"
-  CreateShortCut "$SMPROGRAMS\Apcupsd\Uninstall Apcupsd.lnk" "$INSTDIR\Uninstall.exe"
-
   ${If} $7 != 1
     MessageBox MB_OK "Please edit the client configuration file $INSTDIR\etc\apcupsd\apcupsd.conf \
                       to fit your installation. When you click the OK button Wordpad will open to \
                       allow you to do this. Be sure to save your changes before closing Wordpad."
     Exec 'write "$INSTDIR\etc\apcupsd\apcupsd.conf"'  ; spawn wordpad with the file to be edited
   ${EndUnless}
+SectionEnd
+
+Section "Tray Applet" SecApctray
+  CreateDirectory "$INSTDIR"
+  CreateDirectory "$INSTDIR\bin"
+
+  SetOutPath "$INSTDIR\bin"
+  File apctray.exe
+
+  ; Configure apctray to automatically start when users log in, if it's not already configured
+  ClearErrors
+  ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "Apctray"
+  ${If} ${Errors}
+    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "Apctray" '"$INSTDIR\bin\apctray.exe"'
+  ${EndIf}
+
+  ; Create start menu link for apctray
+  SetShellVarContext all
+  CreateDirectory "$SMPROGRAMS\Apcupsd"
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Apctray.lnk" "$INSTDIR\bin\apctray.exe"
 SectionEnd
 
 Section "USB Driver" SecUsbDrv
@@ -240,6 +256,15 @@ Section "Documentation" SecDoc
   CreateShortCut "$SMPROGRAMS\Apcupsd\Manual.lnk" "$INSTDIR\doc\manual.html"
 SectionEnd
 
+Section "-Finish"
+  ; Write the uninstall keys for Windows & create Start Menu entry
+  SetShellVarContext all
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apcupsd" "DisplayName" "Apcupsd"
+  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apcupsd" "UninstallString" '"$INSTDIR\uninstall.exe"'
+  WriteUninstaller "$INSTDIR\Uninstall.exe"
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Uninstall Apcupsd.lnk" "$INSTDIR\Uninstall.exe"
+SectionEnd
+
 ;
 ; Initialization Callback
 ;
@@ -250,7 +275,7 @@ Function .onInit
      StrCpy $0 'c:'
   ${EndIf}
   StrCpy $INSTDIR $0\apcupsd
-  
+
   ; If we're on WinNT or Win95, disable the USB driver section
   Call GetWindowsVersion
   Pop $0
@@ -271,11 +296,13 @@ FunctionEnd
 ;
 
 LangString DESC_SecService ${LANG_ENGLISH} "Install Apcupsd on this system."
+LangString DESC_SecApctray ${LANG_ENGLISH} "Install Apctray. Shows status icon in the system tray."
 LangString DESC_SecUsbDrv ${LANG_ENGLISH} "Install USB driver. Required if you have a USB UPS. Not available on Windows 95 or NT."
 LangString DESC_SecDoc ${LANG_ENGLISH} "Install Documentation on this system."
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${SecService} $(DESC_SecService)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecApctray} $(DESC_SecApctray)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecUsbDrv} $(DESC_SecUsbDrv)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecDoc} $(DESC_SecDoc)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
@@ -290,6 +317,8 @@ Section "Uninstall"
 
   ; Shutdown any apcupsd that could be running
   ExecWait '"$INSTDIR\bin\apcupsd.exe" /kill'
+  ExecWait '"$INSTDIR\bin\apctray.exe" /kill'
+  Sleep 1
 
   ReadRegDWORD $9 HKLM "Software\Apcupsd" "InstalledService"
   ${If} $9 == 1
@@ -300,6 +329,7 @@ Section "Uninstall"
   ; remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apcupsd"
   DeleteRegKey HKLM "Software\Apcupsd"
+  DeleteRegValue HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "Apctray"
 
   ; remove start menu items
   SetShellVarContext all
@@ -318,6 +348,7 @@ Section "Uninstall"
   Delete /REBOOTOK "$INSTDIR\bin\shutdown.exe"
   Delete /REBOOTOK "$INSTDIR\bin\email.exe"
   Delete /REBOOTOK "$INSTDIR\bin\background.exe"
+  Delete /REBOOTOK "$INSTDIR\bin\apctray.exe"
   Delete /REBOOTOK "$INSTDIR\driver\libusb0.dll"
   Delete /REBOOTOK "$INSTDIR\driver\libusb0_x64.dll"
   Delete /REBOOTOK "$INSTDIR\driver\libusb0.sys"
