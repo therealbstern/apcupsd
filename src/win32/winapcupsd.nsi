@@ -63,6 +63,7 @@ FunctionEnd
 !insertmacro MUI_PAGE_INSTFILES
 Page custom EditApcupsdConfEnter EditApcupsdConfExit ""
 Page custom InstallServiceEnter InstallServiceExit ""
+Page custom ApctrayEnter ApctrayExit ""
 
 !insertmacro MUI_UNPAGE_WELCOME
 !insertmacro MUI_UNPAGE_CONFIRM
@@ -78,35 +79,8 @@ Page custom InstallServiceEnter InstallServiceExit ""
 DirText "Setup will install Apcupsd ${VERSION} to the directory \
          specified below."
 
-Function EditApcupsdConf
-    MessageBox MB_OK "Please edit the client configuration file $INSTDIR\etc\apcupsd\apcupsd.conf \
-                      to fit your installation. When you click the OK button Wordpad will open to \
-                      allow you to do this. Be sure to save your changes before closing Wordpad."
-
-    ExecWait 'write "$INSTDIR\etc\apcupsd\apcupsd.conf"'
-FunctionEnd
-
-Function InstallService
-    MessageBox MB_OK "Installing service"
-FunctionEnd
-
-Function InstallTray
-    MessageBox MB_OK "Installing service"
-FunctionEnd
-
-Function StartApcupsd
-  ExecShell "" "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "" SW_HIDE
-  ExecShell "" "$SMPROGRAMS\Apcupsd\Apctray.lnk" "" SW_HIDE
-FunctionEnd
-
 Function ShowReadme
   Exec 'write "$INSTDIR\ReleaseNotes"'
-FunctionEnd
-
-Function EditInstallPre
-FunctionEnd
-
-Function TrayPre
 FunctionEnd
 
 Function EditApcupsdConfEnter
@@ -212,6 +186,129 @@ Function InstallServiceExit
   ${If} $R2 == 1
     ExecShell "" "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "" SW_HIDE
   ${Endif}  
+FunctionEnd
+
+Function ApctrayEnter
+  ; Skip if apctray package was not installed
+;  ${If} $TrayInstalled != 1
+;    Abort
+ ; ${EndIf}
+
+  ; Configure header text and instantiate the page
+  !insertmacro MUI_HEADER_TEXT "Configure Tray Icon" "Configure Apctray icon for your preferences."
+  !insertmacro MUI_INSTALLOPTIONS_INITDIALOG "Apctray.ini"
+  Pop $R0 ;HWND of dialog
+
+  ; Set contents of first text field
+  !insertmacro MUI_INSTALLOPTIONS_READ $R0 "Apctray.ini" "Field 1" "HWND"
+  SendMessage $R0 ${WM_SETTEXT} 0 \
+      "STR:Check this box to install the Apctray status icon in the system tray. \
+       The icon will be present for all users who log into this machine."
+
+  ; Set contents of second text field
+  !insertmacro MUI_INSTALLOPTIONS_READ $R0 "Apctray.ini" "Field 3" "HWND"
+  SendMessage $R0 ${WM_SETTEXT} 0 \
+       "STR:Check this box to modify the default tray icon settings. You might \
+        do this to monitor a non-local Apcupsd or to change the refresh interval."
+
+  ; Display the page
+  !insertmacro MUI_INSTALLOPTIONS_SHOW
+FunctionEnd
+
+Function EnDisableApctrayModify
+  ; Get passed-in state
+  Pop $R0
+
+  ; Enable/Disable Apctray parameter fields
+  !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Field 5" "HWND"
+  EnableWindow $R1 $R0
+  !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Field 5" "HWND2"
+  EnableWindow $R1 $R0
+  !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Field 7" "HWND"
+  EnableWindow $R1 $R0
+  !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Field 7" "HWND2"
+  EnableWindow $R1 $R0
+  !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Field 9" "HWND"
+  EnableWindow $R1 $R0
+  !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Field 9" "HWND2"
+  EnableWindow $R1 $R0
+
+  ; Update .ini in case someone uses the back button
+  ${If} $R0 == 1
+    !insertmacro MUI_INSTALLOPTIONS_WRITE "Apctray.ini" "Field 5" "Flags" ""
+    !insertmacro MUI_INSTALLOPTIONS_WRITE "Apctray.ini" "Field 7" "Flags" "ONLY_NUMBERS"
+    !insertmacro MUI_INSTALLOPTIONS_WRITE "Apctray.ini" "Field 9" "Flags" "ONLY_NUMBERS"
+  ${Else}
+    !insertmacro MUI_INSTALLOPTIONS_WRITE "Apctray.ini" "Field 5" "Flags" "DISABLED"
+    !insertmacro MUI_INSTALLOPTIONS_WRITE "Apctray.ini" "Field 7" "Flags" "ONLY_NUMBERS|DISABLED"
+    !insertmacro MUI_INSTALLOPTIONS_WRITE "Apctray.ini" "Field 9" "Flags" "ONLY_NUMBERS|DISABLED"
+  ${EndIf}
+FunctionEnd
+
+Function ApctrayExit
+  ; We get called when checkbox changes or next button is pressed
+  ; Figure out which this is.
+  
+  ; If user clicked "parameter" checkbox
+  !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Settings" "State"
+  ${If} $R1 == 11
+    ; Obtain desired field state
+    !insertmacro MUI_INSTALLOPTIONS_READ $R0 "Apctray.ini" "Field 11" "State"
+
+    ; Call helper to enable/disable fields
+    Push $R0
+    Call EnDisableApctrayModify
+
+    ; Return to the page
+    Abort
+  ${EndIf}
+
+  ; If user clicked "install" checkbox
+  ${If} $R1 == 2
+    !insertmacro MUI_INSTALLOPTIONS_READ $R0 "Apctray.ini" "Field 2" "State"
+    !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Field 11" "HWND"
+    EnableWindow $R1 $R0
+    !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Field 11" "HWND2"
+    EnableWindow $R1 $R0
+
+    ${If} $R0 == 1
+      !insertmacro MUI_INSTALLOPTIONS_WRITE "Apctray.ini" "Field 11" "Flags" ""
+      !insertmacro MUI_INSTALLOPTIONS_READ $R0 "Apctray.ini" "Field 11" "State"
+    ${Else}
+      !insertmacro MUI_INSTALLOPTIONS_WRITE "Apctray.ini" "Field 11" "Flags" "DISABLED"
+    ${EndIf}
+
+    ; Call helper to enable/disable parameter fields
+    Push $R0
+    Call EnDisableApctrayModify
+
+    ; Return to the page
+    Abort
+  ${EndIf}
+
+  ; Regular exit due to Next button press...
+
+  ; Fetch modified parameters, if enabled
+  !insertmacro MUI_INSTALLOPTIONS_READ $R0 "Apctray.ini" "Field 11" "State"
+  ${If} $R0 == 1
+    !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Field 5" "State"
+    StrCpy $R0 "/host $\"$R1$\" "
+    !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Field 7" "State"
+    StrCpy $R0 "$R0 /port $R1 "
+    !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Field 9" "State"
+    StrCpy $R0 "$R0 /refresh $R1"
+    MessageBox MB_OK $R0
+  ${Else}
+    StrCpy $R0 ""
+  ${EndIf}
+
+  ; Install apctray
+  !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Field 2" "State"
+  ${If} $R1 == 1
+    ExecWait '"$INSTDIR\bin\apctray.exe" $R0 /install'
+  ${Else}
+    ExecWait '"$INSTDIR\bin\apctray.exe" /remove'
+  ${EndIf}
 FunctionEnd
 
 Section "-Startup"
@@ -379,6 +476,7 @@ Function .onInit
   ; Extract custom pages. Automatically deleted when installer exits.
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT "EditApcupsdConf.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT "InstallService.ini"
+  !insertmacro MUI_INSTALLOPTIONS_EXTRACT "Apctray.ini"
 
   ; Nothing installed yet
   StrCpy $MainInstalled 0
