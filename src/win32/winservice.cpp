@@ -246,6 +246,9 @@ int upsService::InstallService(bool quiet)
 
       RegCloseKey(runservices);
 
+      // Indicate that we're installed to run as a service
+      SetServiceFlag(1);
+
       // We have successfully installed the service!
       if (!quiet) {
          MessageBox(NULL,
@@ -301,6 +304,9 @@ int upsService::InstallService(bool quiet)
 
       CloseServiceHandle(hservice);
       CloseServiceHandle(hsrvmanager);
+
+      // Indicate that we're installed to run as a service
+      SetServiceFlag(1);
 
       // Everything went fine
       if (!quiet) {
@@ -369,6 +375,9 @@ int upsService::RemoveService(bool quiet)
          break;
       }
 
+      // Indicate that we're no longer installed to run as a service
+      SetServiceFlag(0);
+
       // We have successfully removed the service!
       if (!quiet) {
          MessageBox(NULL, _("The Apcupsd service has been removed"),
@@ -418,6 +427,9 @@ int upsService::RemoveService(bool quiet)
          MessageBox(NULL, _("The Apcupsd service could not be stopped"),
                     SERVICE_NAME, MB_ICONEXCLAMATION | MB_OK);
       } else if(DeleteService(hservice)) {
+         // Indicate that we're no longer installed to run as a service
+         SetServiceFlag(0);
+
          // Service successfully removed
          if (!quiet) {
             MessageBox(NULL, _("The Apcupsd service has been removed"),
@@ -562,4 +574,15 @@ void upsService::SetServiceDescription(SC_HANDLE hService, LPSTR lpDesc)
       &sdBuf);                    // value: new description
 
    FreeLibrary(hLib);
+}
+
+void upsService::SetServiceFlag(DWORD flag)
+{
+   // Create or open HKLM\Software\Apcupsd key
+   HKEY apcupsd;
+   RegCreateKey(HKEY_LOCAL_MACHINE, "Software\\Apcupsd", &apcupsd);
+
+   // Add InstalledService value
+   RegSetValueEx(
+      apcupsd, "InstalledService", 0, REG_DWORD, (BYTE*)&flag, sizeof(flag));
 }
