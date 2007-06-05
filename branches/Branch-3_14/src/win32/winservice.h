@@ -68,6 +68,8 @@ public:
    // Set the service's description text
    static void SetServiceDescription(SC_HANDLE hService, LPSTR lpDesc);
 
+   // Set registry value to indicate if we're installed to run as a service
+   static void SetServiceFlag(DWORD flag);
 
    // INTERNAL DATA
 
