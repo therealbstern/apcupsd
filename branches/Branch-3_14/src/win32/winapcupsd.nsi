@@ -20,6 +20,12 @@ Var ExistingConfig
 Var MainInstalled
 Var TrayInstalled
 
+; Misc constants
+!define APCUPSD_WINDOW_CLASS		"apcupsd"
+!define APCUPSD_WINDOW_NAME		"apcupsd"
+!define APCTRAY_WINDOW_CLASS		"apctray"
+!define APCTRAY_WINDOW_NAME		"apctray"
+
 ; Post-process apcupsd.conf.in by replacing @FOO@ tokens
 ; with proper values.
 Function PostProcConfig
@@ -43,6 +49,34 @@ Function PostProcConfig
   FileClose $1
 
   Delete "$INSTDIR\etc\apcupsd\apcupsd.conf.in"
+FunctionEnd
+
+; Is Apcupsd running?
+Function IsApcupsdRunning
+  FindWindow $0 ${APCUPSD_WINDOW_CLASS} ${APCUPSD_WINDOW_NAME}
+FunctionEnd
+
+; Is Apctray running?
+Function IsApctrayRunning
+  FindWindow $0 ${APCTRAY_WINDOW_CLASS} ${APCTRAY_WINDOW_NAME}
+FunctionEnd
+
+; Shut down Apcuspd
+Function StopApcupsd
+   Call IsApcupsdRunning
+   ${If} $0 != 0
+      SendMessage $0 ${WM_CLOSE} 0 0 /TIMEOUT=5000
+      Sleep 2000
+   ${EndIf}
+FunctionEnd
+
+; Shut down Apctray
+Function StopApctray
+   Call IsApctrayRunning
+   ${If} $0 != 0
+      SendMessage $0 ${WM_CLOSE} 0 0 /TIMEOUT=5000
+      Sleep 2000
+   ${EndIf}
 FunctionEnd
 
 ;
@@ -130,23 +164,7 @@ Function InstallServiceEnter
 
   ; Configure header text and instantiate the page
   !insertmacro MUI_HEADER_TEXT "Install/Start Service" "Install Apcupsd Service and start it."
-  !insertmacro MUI_INSTALLOPTIONS_INITDIALOG "InstallService.ini"
-  Pop $R0 ;HWND of dialog
-
-  ; Set contents of first text field
-  !insertmacro MUI_INSTALLOPTIONS_READ $R0 "InstallService.ini" "Field 1" "HWND"
-  SendMessage $R0 ${WM_SETTEXT} 0 \
-      "STR:Check this box to install Apcupsd as a service so it will \
-       automatically start each time this machine boots. Uncheck the box \
-       if you plan to start Apcupsd by hand."
-
-  ; Set contents of second text field
-  !insertmacro MUI_INSTALLOPTIONS_READ $R0 "InstallService.ini" "Field 3" "HWND"
-  SendMessage $R0 ${WM_SETTEXT} 0 \
-      "STR:Check this box to start Apcupsd now."
-
-  ; Display the page
-  !insertmacro MUI_INSTALLOPTIONS_SHOW
+  !insertmacro MUI_INSTALLOPTIONS_DISPLAY "InstallService.ini"
 FunctionEnd
 
 Function InstallServiceExit
@@ -154,16 +172,18 @@ Function InstallServiceExit
   SetShellVarContext all
   CreateDirectory "$SMPROGRAMS\Apcupsd"
 
-  ; Remove service
-  ExecWait '"$INSTDIR\bin\apcupsd.exe" /quiet /remove'
-  Sleep 2  ; Give remove time to complete
+  ; If installed as a service already, remove it
+  ReadRegDWORD $R0 HKLM "Software\Apcupsd" "InstalledService"
+  ${If} $R0 == 1
+    ExecWait '"$INSTDIR\bin\apcupsd.exe" /quiet /remove'
+    Sleep 1000
+  ${EndIf}
 
   ; Install as service and create start menu shortcuts
   !insertmacro MUI_INSTALLOPTIONS_READ $R1 "InstallService.ini" "Field 2" "State"
   ${If} $R1 == 1
     ; Install service
-    ExecWait '"$INSTDIR\bin\apcupsd.exe" /quiet /install'
-    Sleep 2  ; Give install time to complete
+    ExecWait '"$INSTDIR\bin\apcupsd.exe" /install'
     Call IsNt
     Pop $R0
     ${If} $R0 == false
@@ -190,29 +210,21 @@ FunctionEnd
 
 Function ApctrayEnter
   ; Skip if apctray package was not installed
-;  ${If} $TrayInstalled != 1
-;    Abort
- ; ${EndIf}
+  ${If} $TrayInstalled != 1
+    Abort
+  ${EndIf}
+
+  ; If Apctray is already configured to start automatically, start it now
+  ; and skip this page
+  ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "Apctray"
+  ${If} $R0 != ""
+    Exec $R0
+    Abort
+  ${EndIf}
 
   ; Configure header text and instantiate the page
   !insertmacro MUI_HEADER_TEXT "Configure Tray Icon" "Configure Apctray icon for your preferences."
-  !insertmacro MUI_INSTALLOPTIONS_INITDIALOG "Apctray.ini"
-  Pop $R0 ;HWND of dialog
-
-  ; Set contents of first text field
-  !insertmacro MUI_INSTALLOPTIONS_READ $R0 "Apctray.ini" "Field 1" "HWND"
-  SendMessage $R0 ${WM_SETTEXT} 0 \
-      "STR:Check this box to install the Apctray status icon in the system tray. \
-       The icon will be present for all users who log into this machine."
-
-  ; Set contents of second text field
-  !insertmacro MUI_INSTALLOPTIONS_READ $R0 "Apctray.ini" "Field 3" "HWND"
-  SendMessage $R0 ${WM_SETTEXT} 0 \
-       "STR:Check this box to modify the default tray icon settings. You might \
-        do this to monitor a non-local Apcupsd or to change the refresh interval."
-
-  ; Display the page
-  !insertmacro MUI_INSTALLOPTIONS_SHOW
+  !insertmacro MUI_INSTALLOPTIONS_DISPLAY "Apctray.ini"
 FunctionEnd
 
 Function EnDisableApctrayModify
@@ -302,12 +314,12 @@ Function ApctrayExit
     StrCpy $R0 ""
   ${EndIf}
 
-  ; Install apctray
+  ; (Un)Install apctray
   !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Field 2" "State"
   ${If} $R1 == 1
+    ; Install and start
     ExecWait '"$INSTDIR\bin\apctray.exe" $R0 /install'
-  ${Else}
-    ExecWait '"$INSTDIR\bin\apctray.exe" /remove'
+    Exec '"$INSTDIR\bin\apctray.exe" $R0'
   ${EndIf}
 FunctionEnd
 
@@ -333,13 +345,8 @@ Section "Apcupsd Service" SecService
   ; We're installing the main package
   StrCpy $MainInstalled 1
 
-  ; Check for existing installation
-  ${If} $ExistingConfig == 1
-    ; Shutdown any apcupsd that could be running
-    ExecWait '"$INSTDIR\bin\apcupsd.exe" /kill'
-    ; give it some time to shutdown
-    Sleep 3000
-  ${EndIf}
+  ; Shutdown any apcupsd that might be running
+  Call StopApcupsd
 
   ; Create installation directories
   CreateDirectory "$INSTDIR\bin"
@@ -397,18 +404,14 @@ Section "Tray Applet" SecApctray
   ; We're installing the apctray package
   StrCpy $TrayInstalled 1
 
+  ; Shut down any running copy
+  Call StopApctray
+
   ; Install files
   CreateDirectory "$INSTDIR"
   CreateDirectory "$INSTDIR\bin"
   SetOutPath "$INSTDIR\bin"
   File apctray.exe
-
-  ; Configure apctray to automatically start when users log in, if it's not already configured
-  ClearErrors
-  ReadRegStr $0 HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "Apctray"
-  ${If} ${Errors}
-    WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "Apctray" '"$INSTDIR\bin\apctray.exe"'
-  ${EndIf}
 
   ; Create start menu link for apctray
   SetShellVarContext all
@@ -516,15 +519,23 @@ UninstallText "This will uninstall Apcupsd. Hit next to continue."
 
 Section "Uninstall"
 
-  ; Shutdown any apcupsd that could be running
-  ExecWait '"$INSTDIR\bin\apcupsd.exe" /kill'
-  ExecWait '"$INSTDIR\bin\apctray.exe" /kill'
-  Sleep 1
+  ; Shutdown any apcupsd & apctray that might be running
+  Call un.StopApctray
+  Call un.StopApcupsd
 
-  ; Remove apcuspd service and apctray
-  ExecWait '"$INSTDIR\bin\apcupsd.exe" /quiet /remove'
-  ExecWait '"$INSTDIR\bin\apctray.exe" /quiet /remove'
-  Sleep 1
+  ; Remove apcuspd service, if needed
+  ReadRegDWORD $R0 HKLM "Software\Apcupsd" "InstalledService"
+  ${If} $R0 == 1
+    ExecWait '"$INSTDIR\bin\apcupsd.exe" /quiet /remove'
+    Sleep 1000
+  ${EndIf}
+
+  ; Remove apctray autorun, if needed
+  ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "Apctray"
+  ${If} $R0 != ""
+    ExecWait '"$INSTDIR\bin\apctray.exe" /remove'
+    Sleep 1000
+  ${EndIf}
 
   ; remove registry keys
   DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apcupsd"
@@ -568,9 +579,12 @@ Section "Uninstall"
   Delete /REBOOTOK "$INSTDIR\doc\*"
 
   ; Delete conf if user approves
-  ${If} ${Cmd} 'MessageBox MB_YESNO|MB_ICONQUESTION "Would you like to delete the current configuration and events files?" IDYES'
-    Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apcupsd.conf"
-    Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apcupsd.events"
+  ${If} ${FileExists} "$INSTDIR\etc\apcupsd\apcupsd.conf"
+  ${OrIf} ${FileExists} "$INSTDIR\etc\apcupsd\apcupsd.events"
+    ${If} ${Cmd} 'MessageBox MB_YESNO|MB_ICONQUESTION "Would you like to delete the current configuration and events files?" IDYES'
+      Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apcupsd.conf"
+      Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apcupsd.events"
+    ${EndIf}
   ${EndIf}
 
   ; remove directories used
@@ -584,5 +598,35 @@ Section "Uninstall"
   RMDir "C:\tmp"
   
 SectionEnd
+
+; Below are duplicated for uninstaller. ANNOYING!
+
+; Is Apcupsd running?
+Function un.IsApcupsdRunning
+  FindWindow $0 ${APCUPSD_WINDOW_CLASS} ${APCUPSD_WINDOW_NAME}
+FunctionEnd
+
+; Is Apctray running?
+Function un.IsApctrayRunning
+  FindWindow $0 ${APCTRAY_WINDOW_CLASS} ${APCTRAY_WINDOW_NAME}
+FunctionEnd
+
+; Shut down Apcuspd
+Function un.StopApcupsd
+   Call un.IsApcupsdRunning
+   ${If} $0 != 0
+      SendMessage $0 ${WM_CLOSE} 0 0 /TIMEOUT=5000
+      Sleep 2000
+   ${EndIf}
+FunctionEnd
+
+; Shut down Apctray
+Function un.StopApctray
+   Call un.IsApctrayRunning
+   ${If} $0 != 0
+      SendMessage $0 ${WM_CLOSE} 0 0 /TIMEOUT=5000
+      Sleep 2000
+   ${EndIf}
+FunctionEnd
 
 ; eof
