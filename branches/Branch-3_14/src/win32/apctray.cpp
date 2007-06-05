@@ -20,19 +20,38 @@
 #define CMDOPT_REMOVE   "/remove"
 #define CMDOPT_KILL     "/kill"
 
-#define USAGE_TEXT   "[/host <hostname>] [/port <port>] [/interval <sec>] " \
-                     "[/install] [/remove] [/kill]"
+#define USAGE_TEXT   "[" CMDOPT_HOST    " <hostname>] " \
+                     "[" CMDOPT_PORT    " <port>] "     \
+                     "[" CMDOPT_REFRESH " <sec>] "      \
+                     "[" CMDOPT_INSTALL "] "            \
+                     "[" CMDOPT_REMOVE  "] "            \
+                     "[" CMDOPT_KILL    "]"
 
-int Install(char *host, unsigned short port, int interval)
+#define DEFAULT_HOST    "127.0.0.1"
+#define DEFAULT_PORT    3551
+#define DEFAULT_REFRESH 1
+
+int Install(char *host, unsigned short port, int refresh)
 {
    // Get the filename of this executable
    char path[1024];
    GetModuleFileName(NULL, path, sizeof(path));
 
+   // Build option flags only where using non-defaults
+   char hoststr[256] = "";
+   char portstr[32] = "";
+   char refstr[32] = "";
+   if (host)
+      asnprintf(hoststr, sizeof(hoststr), "%s \"%s\"", CMDOPT_HOST, host);
+   if (port)
+      asnprintf(portstr, sizeof(portstr), "%s %u", CMDOPT_PORT, port);
+   if (refresh > 0)
+      asnprintf(refstr, sizeof(refstr), "%s %u", CMDOPT_REFRESH, refresh);
+
    // Append configuration flags
    char cmd[1024];
-   snprintf(cmd, sizeof(cmd), "\"%s\" %s \"%s\" %s %u %s %u", path, 
-      CMDOPT_HOST, host, CMDOPT_PORT, port, CMDOPT_REFRESH, interval);
+   asnprintf(cmd, sizeof(cmd), "\"%s\" %s %s %s",
+      path, hoststr, portstr, refstr);
 
    // Open registry key for auto-run programs
    HKEY runkey;
@@ -59,7 +78,7 @@ int Install(char *host, unsigned short port, int interval)
 
    MessageBox(NULL,
               "Apctray was successfully installed and will automatically\n"
-              "be run the next a user logs in to this machine.",
+              "be run when users log in to this machine.",
               "Apctray", MB_ICONINFORMATION | MB_OK);
 
    return 0;
@@ -122,10 +141,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    InitWinAPIWrapper();
    WSA_Init();
 
-   // Default settings
-   char *host = "127.0.0.1";
-   unsigned short port = 3551;
-   int interval = 1000;
+   char *host = NULL;
+   unsigned short port = 0;
+   int interval = -1;
 
    // Check command line options
    char *arg;
@@ -160,6 +178,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
          return 1;
       }
    }
+
+   // Assign defaults where necessary
+   if (!host) host = DEFAULT_HOST;
+   if (!port) port = DEFAULT_PORT;
+   if (interval > 0) interval = DEFAULT_REFRESH;
 
    // Create a StatMgr for handling UPS status queries
    StatMgr *statmgr = new StatMgr(host, port);
