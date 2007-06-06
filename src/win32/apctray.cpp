@@ -166,7 +166,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             Usage(CMDOPT_REFRESH, "Option requires argument");
             return 1;
          }
-         interval = strtoul(arg, NULL, 0) * 1000;
+         interval = strtoul(arg, NULL, 0);
       } else if (strcasecmp(arg, CMDOPT_INSTALL) == 0) {
          return Install(host, port, interval);
       } else if (strcasecmp(arg, CMDOPT_REMOVE) == 0) {
@@ -182,7 +182,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    // Assign defaults where necessary
    if (!host) host = DEFAULT_HOST;
    if (!port) port = DEFAULT_PORT;
-   if (interval > 0) interval = DEFAULT_REFRESH;
+   if (interval < 1) interval = DEFAULT_REFRESH;
 
    // Create a StatMgr for handling UPS status queries
    StatMgr *statmgr = new StatMgr(host, port);
