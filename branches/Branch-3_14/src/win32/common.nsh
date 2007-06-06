@@ -15,12 +15,12 @@ Function ${UN}ShutdownApp
   ${If} $2 != 0
     SendMessage $2 ${WM_CLOSE} 0 0
     ${While} $1 > 0
-      Sleep 1000
+      Sleep 2000
       FindWindow $2 $0
       ${If} $2 == 0
         ${Break}
       ${EndIf}
-      IntOp $1 $1 - 1000
+      IntOp $1 $1 - 2000
     ${EndWhile}
   ${EndIf}
 
