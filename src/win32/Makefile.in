@@ -4,6 +4,7 @@
 #  
 #  Modified from Bacula Makefile.in for apcupsd
 #   Kern Sibbald, April 2006
+#  Further modifications by Adam Kropelin
 # 
 
 # Configuration
@@ -68,7 +69,8 @@ STRIP = $(BIN_DIR)/mingw32-strip
 
 first: all
 
-OBJDIR = .
+OBJDIR = obj
+EXEDIR = .
 
 ######################################################################
 
@@ -79,15 +81,14 @@ OBJS_COMPAT = \
 	$(OBJDIR)/compat.o \
 	$(OBJDIR)/winapi.o
 
+$(OBJDIR)/compat.o:	compat/compat.cpp
+	$(CXX) -c ./compat/compat.cpp -o $@
 
-compat.o:	./compat/compat.cpp
-	$(CXX) -c ./compat/compat.cpp -o $(OBJDIR)/compat.o
+$(OBJDIR)/print.o:	compat/print.cpp
+	$(CXX) -c ./compat/print.cpp -o $@
 
-print.o:	./compat/print.cpp
-	$(CXX) -c ./compat/print.cpp -o $(OBJDIR)/print.o
-
-winapi.o:	 ./compat/winapi.c
-	$(CXX) -c ./compat/winapi.c -o $(OBJDIR)/winapi.o
+$(OBJDIR)/winapi.o:	compat/winapi.c
+	$(CXX) -c ./compat/winapi.c -o $@
 
 
 ######################################################################
@@ -97,10 +98,10 @@ OBJS_WIN = \
 	$(OBJDIR)/winservice.o \
 	$(OBJDIR)/winmain.o
 
-$(OBJDIR)/winmain.o:	  ./winmain.cpp
+$(OBJDIR)/winmain.o:    winmain.cpp
 	$(CXX) -c $< -o $@
 
-$(OBJDIR)/winservice.o: ./winservice.cpp
+$(OBJDIR)/winservice.o: winservice.cpp
 	$(CXX) -c $< -o $@
 
 ######################################################################
@@ -375,7 +376,7 @@ $(OBJDIR)/smtp.o:	../smtp.c
 OBJS_SHUT = \
 	$(OBJDIR)/shutdown.o
 
-$(OBJDIR)/shutdown.o:	./shutdown.c
+$(OBJDIR)/shutdown.o: shutdown.c
 	$(CXX) -c $< -o $@
 
 ######################################################################
@@ -384,7 +385,7 @@ $(OBJDIR)/shutdown.o:	./shutdown.c
 OBJS_POP = \
 	$(OBJDIR)/popup.o
 
-$(OBJDIR)/popup.o:	./popup.c
+$(OBJDIR)/popup.o: popup.c
 	$(CXX) -c $< -o $@
 
 ######################################################################
@@ -393,7 +394,7 @@ $(OBJDIR)/popup.o:	./popup.c
 OBJS_EMAIL = \
 	$(OBJDIR)/email.o
 
-$(OBJDIR)/email.o:	./email.c
+$(OBJDIR)/email.o: email.c
 	$(CXX) -c $< -o $@
 
 ######################################################################
@@ -402,7 +403,7 @@ $(OBJDIR)/email.o:	./email.c
 OBJS_BKG = \
 	$(OBJDIR)/background.o
 
-$(OBJDIR)/background.o:	./background.c
+$(OBJDIR)/background.o:	background.c
 	$(CXX) -c $< -o $@
 
 ######################################################################
@@ -421,25 +422,25 @@ OBJS_APT = \
    $(OBJDIR)/winres.res \
    $(OBJDIR)/statmgr.o
 
-$(OBJDIR)/winabout.o:	  ./winabout.cpp
+$(OBJDIR)/winabout.o:  winabout.cpp
 	$(CXX) -c $< -o $@
 
-$(OBJDIR)/winevents.o:	  ./winevents.cpp
+$(OBJDIR)/winevents.o: winevents.cpp
 	$(CXX) -c $< -o $@
 
-$(OBJDIR)/apctray.o:    ./apctray.cpp
+$(OBJDIR)/apctray.o:   apctray.cpp
 	$(CXX) -c $< -o $@
 
-$(OBJDIR)/winstat.o:	  ./winstat.cpp
+$(OBJDIR)/winstat.o:	  winstat.cpp
 	$(CXX) -c $< -o $@
 
-$(OBJDIR)/wintray.o:	  ./wintray.cpp
+$(OBJDIR)/wintray.o:	  wintray.cpp
 	$(CXX) -c $< -o $@
 
-$(OBJDIR)/statmgr.o:	  ./statmgr.cpp
+$(OBJDIR)/statmgr.o:	  statmgr.cpp
 	$(CXX) -c $< -o $@
 
-$(OBJDIR)/winres.res:	  ./winres.rc
+$(OBJDIR)/winres.res:  winres.rc
 	$(WINDRES) $(INCLUDE_ICONS) -O coff $< -o $@
 
 ######################################################################
@@ -506,12 +507,15 @@ GAPCMON_LIBS = $(LIB_PTHREADS) -L$(DEPKGS)/glib/lib -Wl,--export-dynamic \
 
 # Targets
 
-all: apcupsd.exe apcaccess.exe shutdown.exe popup.exe apctest.exe smtp.exe \
+objdir:
+	mkdir -p ${OBJDIR}
+
+all: objdir apcupsd.exe apcaccess.exe shutdown.exe popup.exe apctest.exe smtp.exe \
      email.exe background.exe apctray.exe
 
 clean:
-	rm -f $(OBJDIR)/*.o $(OBJDIR)/*.exe $(OBJDIR)/winres.res
-	rm -f pthreadGCE.dll mingwm10.dll
+	rm -rf $(OBJDIR) $(EXEDIR)/*.exe
+	rm -rf pthreadGCE.dll mingwm10.dll
 
 pthreadGCE.dll: $(DEPKGS)/pthreads/pthreadGCE.dll
 	cp -f $(DEPKGS)/pthreads/pthreadGCE.dll .
@@ -521,36 +525,35 @@ mingwm10.dll: $(MINGW)/mingw32/bin/mingwm10.dll
 
 # Link the apcupsd daemon executable ...
 apcupsd.exe: $(APC_OBJS) pthreadGCE.dll mingwm10.dll
-	$(CXX) $(APC_OBJS) $(APC_LIBS) -mwindows -o $(OBJDIR)/apcupsd.exe
+	$(CXX) $(APC_OBJS) $(APC_LIBS) -mwindows -o $(EXEDIR)/apcupsd.exe
 
 apcaccess.exe: $(ACCESS_OBJS) pthreadGCE.dll mingwm10.dll
-	$(CXX) $(ACCESS_OBJS) $(ACCESS_LIBS) -o $(OBJDIR)/apcaccess.exe
+	$(CXX) $(ACCESS_OBJS) $(ACCESS_LIBS) -o $(EXEDIR)/apcaccess.exe
 
 apctest.exe: $(TEST_OBJS) pthreadGCE.dll mingwm10.dll
-	$(CXX) $(TEST_OBJS) $(TEST_LIBS) -o $(OBJDIR)/apctest.exe
+	$(CXX) $(TEST_OBJS) $(TEST_LIBS) -o $(EXEDIR)/apctest.exe
 
 shutdown.exe: $(SHUT_OBJS) mingwm10.dll
-	$(CXX) $(SHUT_OBJS) $(SHUT_LIBS) -mwindows -o $(OBJDIR)/shutdown.exe
+	$(CXX) $(SHUT_OBJS) $(SHUT_LIBS) -mwindows -o $(EXEDIR)/shutdown.exe
 
 popup.exe: $(POP_OBJS) mingwm10.dll
-	$(CXX) $(POP_OBJS) $(POP_LIBS) -mwindows -o $(OBJDIR)/popup.exe
+	$(CXX) $(POP_OBJS) $(POP_LIBS) -mwindows -o ${EXEDIR}/popup.exe
 
 email.exe: $(EMAIL_OBJS) mingwm10.dll
-	$(CXX) $(EMAIL_OBJS) $(EMAIL_LIBS) -o $(OBJDIR)/email.exe
+	$(CXX) $(EMAIL_OBJS) $(EMAIL_LIBS) -o $(EXEDIR)/email.exe
 
 background.exe: $(BKG_OBJS) mingwm10.dll
-	$(CXX) $(BKG_OBJS) $(BKG_LIBS) -mwindows -o $(OBJDIR)/background.exe
+	$(CXX) $(BKG_OBJS) $(BKG_LIBS) -mwindows -o $(EXEDIR)/background.exe
 
 smtp.exe: $(SMTP_OBJS) mingwm10.dll
-	$(CXX) $(SMTP_OBJS) $(SMTP_LIBS) -o $(OBJDIR)/smtp.exe
+	$(CXX) $(SMTP_OBJS) $(SMTP_LIBS) -o $(EXEDIR)/smtp.exe
 
 apctray.exe: $(APT_OBJS) mingwm10.dll
-	$(CXX) $(APT_OBJS) $(APT_LIBS) -mwindows -o $(OBJDIR)/apctray.exe
+	$(CXX) $(APT_OBJS) $(APT_LIBS) -mwindows -o $(EXEDIR)/apctray.exe
 
 gapcmon.exe: $(GAPCMON_OBJS)
-	$(CC) $(GAPCMON_OBJS) $(GAPCMON_LIBS) -mwindows -o $(OBJDIR)/gapcmon.exe
+	$(CC) $(GAPCMON_OBJS) $(GAPCMON_LIBS) -mwindows -o $(EXEDIR)/gapcmon.exe
 
-winapcupsd.exe: all
+winapcupsd.exe: all installer/*.nsi installer/*.nsh installer/*.ini
 	$(STRIP) *.exe *.dll
 	$(MAKENSIS) -V2 -DDEPKGS="$(DEPKGS)" -DVERSION="$(VERSION)" -DTOPDIR="${TOPDIR}" installer/winapcupsd.nsi
-
