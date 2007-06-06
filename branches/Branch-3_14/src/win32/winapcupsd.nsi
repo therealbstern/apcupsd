@@ -7,12 +7,16 @@
 
 !define PRODUCT "Apcupsd"
 
+; Not in the uninstaller section yet
+!define UN
+
 ;			    
 ; Include files
 ;
 !include "MUI.nsh"
-!include "util.nsh"
 !include "LogicLib.nsh"
+!include "util.nsh"
+!include "common.nsh"
 
 ; Global variables
 Var IsService
@@ -49,34 +53,6 @@ Function PostProcConfig
   FileClose $1
 
   Delete "$INSTDIR\etc\apcupsd\apcupsd.conf.in"
-FunctionEnd
-
-; Is Apcupsd running?
-Function IsApcupsdRunning
-  FindWindow $0 ${APCUPSD_WINDOW_CLASS} ${APCUPSD_WINDOW_NAME}
-FunctionEnd
-
-; Is Apctray running?
-Function IsApctrayRunning
-  FindWindow $0 ${APCTRAY_WINDOW_CLASS} ${APCTRAY_WINDOW_NAME}
-FunctionEnd
-
-; Shut down Apcuspd
-Function StopApcupsd
-   Call IsApcupsdRunning
-   ${If} $0 != 0
-      SendMessage $0 ${WM_CLOSE} 0 0 /TIMEOUT=5000
-      Sleep 2000
-   ${EndIf}
-FunctionEnd
-
-; Shut down Apctray
-Function StopApctray
-   Call IsApctrayRunning
-   ${If} $0 != 0
-      SendMessage $0 ${WM_CLOSE} 0 0 /TIMEOUT=5000
-      Sleep 2000
-   ${EndIf}
 FunctionEnd
 
 ;
@@ -346,7 +322,7 @@ Section "Apcupsd Service" SecService
   StrCpy $MainInstalled 1
 
   ; Shutdown any apcupsd that might be running
-  Call StopApcupsd
+  ${ShutdownApp} ${APCUPSD_WINDOW_CLASS} 5000
 
   ; Create installation directories
   CreateDirectory "$INSTDIR\bin"
@@ -405,7 +381,7 @@ Section "Tray Applet" SecApctray
   StrCpy $TrayInstalled 1
 
   ; Shut down any running copy
-  Call StopApctray
+  ${ShutdownApp} ${APCTRAY_WINDOW_CLASS} 5000
 
   ; Install files
   CreateDirectory "$INSTDIR"
@@ -515,13 +491,18 @@ LangString DESC_SecDoc ${LANG_ENGLISH} "Install Documentation on this system."
 
 ; Uninstall section
 
+; Repeat common include with uninstall flag set
+!undef UN
+!define UN un.
+!include "common.nsh"
+
 UninstallText "This will uninstall Apcupsd. Hit next to continue."
 
 Section "Uninstall"
 
   ; Shutdown any apcupsd & apctray that might be running
-  Call un.StopApctray
-  Call un.StopApcupsd
+  ${ShutdownApp} ${APCUPSD_WINDOW_CLASS} 5000
+  ${ShutdownApp} ${APCTRAY_WINDOW_CLASS} 5000
 
   ; Remove apcuspd service, if needed
   ReadRegDWORD $R0 HKLM "Software\Apcupsd" "InstalledService"
@@ -598,35 +579,5 @@ Section "Uninstall"
   RMDir "C:\tmp"
   
 SectionEnd
-
-; Below are duplicated for uninstaller. ANNOYING!
-
-; Is Apcupsd running?
-Function un.IsApcupsdRunning
-  FindWindow $0 ${APCUPSD_WINDOW_CLASS} ${APCUPSD_WINDOW_NAME}
-FunctionEnd
-
-; Is Apctray running?
-Function un.IsApctrayRunning
-  FindWindow $0 ${APCTRAY_WINDOW_CLASS} ${APCTRAY_WINDOW_NAME}
-FunctionEnd
-
-; Shut down Apcuspd
-Function un.StopApcupsd
-   Call un.IsApcupsdRunning
-   ${If} $0 != 0
-      SendMessage $0 ${WM_CLOSE} 0 0 /TIMEOUT=5000
-      Sleep 2000
-   ${EndIf}
-FunctionEnd
-
-; Shut down Apctray
-Function un.StopApctray
-   Call un.IsApctrayRunning
-   ${If} $0 != 0
-      SendMessage $0 ${WM_CLOSE} 0 0 /TIMEOUT=5000
-      Sleep 2000
-   ${EndIf}
-FunctionEnd
 
 ; eof
