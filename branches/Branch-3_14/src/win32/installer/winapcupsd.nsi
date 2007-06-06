@@ -22,6 +22,9 @@ Var ExistingConfig
 Var MainInstalled
 Var TrayInstalled
 
+; Paths
+!define WINDIR ${TOPDIR}/src/win32
+
 ; Misc constants
 !define APCUPSD_WINDOW_CLASS		"apcupsd"
 !define APCUPSD_WINDOW_NAME		"apcupsd"
@@ -41,7 +44,7 @@ InstallDir "c:\apcupsd"
 ; Pull in pages
 ;
 !insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE "..\..\COPYING"
+!insertmacro MUI_PAGE_LICENSE ${TOPDIR}/COPYING
 !insertmacro MUI_PAGE_COMPONENTS
 !insertmacro MUI_PAGE_DIRECTORY
 !insertmacro MUI_PAGE_INSTFILES
@@ -323,9 +326,9 @@ Section "-Startup"
 
   ; Install common files
   SetOutPath "$INSTDIR"
-  File ..\..\COPYING
-  File ..\..\ChangeLog
-  File ..\..\ReleaseNotes
+  File ${TOPDIR}\COPYING
+  File ${TOPDIR}\ChangeLog
+  File ${TOPDIR}\ReleaseNotes
 SectionEnd
 
 Section "Apcupsd Service" SecService
@@ -347,36 +350,36 @@ Section "Apcupsd Service" SecService
   ; NOTE: If you add new files here, be sure to remove them
   ;       in the uninstaller!
   ;
- 
+
   SetOutPath "$INSTDIR\bin"
-  File mingwm10.dll
-  File pthreadGCE.dll
+  File ${WINDIR}\mingwm10.dll
+  File ${WINDIR}\pthreadGCE.dll
   File ${DEPKGS}\libusb-win32\libusb0.dll
-  File apcupsd.exe
-  File smtp.exe
-  File apcaccess.exe
-  File apctest.exe
-  File popup.exe 
-  File shutdown.exe
-  File email.exe
-  File background.exe
+  File ${WINDIR}\apcupsd.exe
+  File ${WINDIR}\smtp.exe
+  File ${WINDIR}\apcaccess.exe
+  File ${WINDIR}\apctest.exe
+  File ${WINDIR}\popup.exe 
+  File ${WINDIR}\shutdown.exe
+  File ${WINDIR}\email.exe
+  File ${WINDIR}\background.exe
 
   SetOutPath "$INSTDIR\driver"
-  File ..\..\platforms\mingw\apcupsd.inf
-  File ..\..\platforms\mingw\apcupsd.cat
-  File ..\..\platforms\mingw\apcupsd_x64.cat
+  File ${TOPDIR}\platforms\mingw\apcupsd.inf
+  File ${TOPDIR}\platforms\mingw\apcupsd.cat
+  File ${TOPDIR}\platforms\mingw\apcupsd_x64.cat
   File ${DEPKGS}\libusb-win32\libusb0.sys
   File ${DEPKGS}\libusb-win32\libusb0_x64.sys
   File ${DEPKGS}\libusb-win32\libusb0.dll
   File ${DEPKGS}\libusb-win32\libusb0_x64.dll
-  File ..\..\platforms\mingw\install.txt
+  File ${TOPDIR}\platforms\mingw\install.txt
 
   SetOutPath "$INSTDIR\examples"
-  File ..\..\examples\*
+  File ${TOPDIR}\examples\*
 
   SetOutPath "$INSTDIR\etc\apcupsd"
-  File ..\..\platforms\mingw\apccontrol.bat
-  File ..\..\platforms\mingw\apcupsd.conf.in
+  File ${TOPDIR}\platforms\mingw\apccontrol.bat
+  File ${TOPDIR}\platforms\mingw\apcupsd.conf.in
 
   ; Post-process apcupsd.conf.in into apcupsd.conf.new
   Call PostProcConfig
@@ -398,7 +401,7 @@ Section "Tray Applet" SecApctray
   CreateDirectory "$INSTDIR"
   CreateDirectory "$INSTDIR\bin"
   SetOutPath "$INSTDIR\bin"
-  File apctray.exe
+  File ${WINDIR}\apctray.exe
 
   ; Create start menu link for apctray
   SetShellVarContext all
@@ -423,8 +426,8 @@ SectionEnd
 Section "Documentation" SecDoc
   SetOutPath "$INSTDIR\doc"
   CreateDirectory "$INSTDIR\doc"
-  File ..\..\doc\latex\manual.html
-  File ..\..\doc\latex\*.png
+  File ${TOPDIR}\doc\latex\manual.html
+  File ${TOPDIR}\doc\latex\*.png
   ; Create Start Menu entry
   SetShellVarContext all
   CreateShortCut "$SMPROGRAMS\Apcupsd\Manual.lnk" "$INSTDIR\doc\manual.html"
