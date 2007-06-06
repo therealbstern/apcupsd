@@ -337,7 +337,7 @@ DWORD WINAPI upsMenu::StatusPollThread(LPVOID param)
 
    while (1) {
       // Delay for configured interval
-      Sleep(_this->m_interval);
+      Sleep(_this->m_interval * 1000);
 
       // Update the tray icon
       _this->UpdateTrayIcon();
