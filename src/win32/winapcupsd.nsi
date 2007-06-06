@@ -3,7 +3,6 @@
 ; Adapted by Kern Sibbald for apcupsd from Bacula code
 ; Further modified by Adam Kropelin
 ;
-; Command line options:
 
 !define PRODUCT "Apcupsd"
 
@@ -19,7 +18,6 @@
 !include "common.nsh"
 
 ; Global variables
-Var IsService
 Var ExistingConfig
 Var MainInstalled
 Var TrayInstalled
@@ -29,6 +27,53 @@ Var TrayInstalled
 !define APCUPSD_WINDOW_NAME		"apcupsd"
 !define APCTRAY_WINDOW_CLASS		"apctray"
 !define APCTRAY_WINDOW_NAME		"apctray"
+
+;
+; Basics
+;
+Name "Apcupsd"
+OutFile "winapcupsd-${VERSION}.exe"
+SetCompressor lzma
+InstallDir "c:\apcupsd"
+
+
+;
+; Pull in pages
+;
+!insertmacro MUI_PAGE_WELCOME
+!insertmacro MUI_PAGE_LICENSE "..\..\COPYING"
+!insertmacro MUI_PAGE_COMPONENTS
+!insertmacro MUI_PAGE_DIRECTORY
+!insertmacro MUI_PAGE_INSTFILES
+Page custom EditApcupsdConfEnter EditApcupsdConfExit ""
+Page custom InstallServiceEnter InstallServiceExit ""
+Page custom ApctrayEnter ApctrayExit ""
+!define MUI_FINISHPAGE_SHOWREADME
+!define MUI_FINISHPAGE_SHOWREADME_TEXT "View the ReleaseNotes"
+!define MUI_FINISHPAGE_SHOWREADME_FUNCTION "ShowReadme"
+!define MUI_FINISHPAGE_LINK "Visit Apcupsd Website"
+!define MUI_FINISHPAGE_LINK_LOCATION "http://www.apcupsd.org"
+!define MUI_PAGE_CUSTOMFUNCTION_SHOW DisableBackButton
+!insertmacro MUI_PAGE_FINISH
+
+!insertmacro MUI_UNPAGE_WELCOME
+!insertmacro MUI_UNPAGE_CONFIRM
+!insertmacro MUI_UNPAGE_INSTFILES
+!insertmacro MUI_UNPAGE_FINISH
+ 
+!define      MUI_ABORTWARNING
+
+!insertmacro MUI_LANGUAGE "English"
+
+DirText "Setup will install Apcupsd ${VERSION} to the directory \
+         specified below."
+
+; Disable back button
+!define FINISH_BUTTON_ID 3
+Function DisableBackButton
+	GetDlgItem $R1 $HWNDPARENT ${FINISH_BUTTON_ID}
+	EnableWindow $R1 0
+FunctionEnd
 
 ; Post-process apcupsd.conf.in by replacing @FOO@ tokens
 ; with proper values.
@@ -54,40 +99,6 @@ Function PostProcConfig
 
   Delete "$INSTDIR\etc\apcupsd\apcupsd.conf.in"
 FunctionEnd
-
-;
-; Basics
-;
-  Name "Apcupsd"
-  OutFile "winapcupsd-${VERSION}.exe"
-  SetCompressor lzma
-  InstallDir "c:\apcupsd"
-
-;
-; Pull in pages
-;
-!insertmacro MUI_PAGE_WELCOME
-!insertmacro MUI_PAGE_LICENSE "..\..\COPYING"
-!insertmacro MUI_PAGE_COMPONENTS
-!insertmacro MUI_PAGE_DIRECTORY
-!insertmacro MUI_PAGE_INSTFILES
-Page custom EditApcupsdConfEnter EditApcupsdConfExit ""
-Page custom InstallServiceEnter InstallServiceExit ""
-Page custom ApctrayEnter ApctrayExit ""
-
-!insertmacro MUI_UNPAGE_WELCOME
-!insertmacro MUI_UNPAGE_CONFIRM
-!insertmacro MUI_UNPAGE_INSTFILES
-!insertmacro MUI_UNPAGE_FINISH
- 
-!define      MUI_ABORTWARNING
-
-!insertmacro MUI_LANGUAGE "English"
-
-
-
-DirText "Setup will install Apcupsd ${VERSION} to the directory \
-         specified below."
 
 Function ShowReadme
   Exec 'write "$INSTDIR\ReleaseNotes"'
@@ -460,14 +471,6 @@ Function .onInit
   ; Nothing installed yet
   StrCpy $MainInstalled 0
   StrCpy $TrayInstalled 0
-
-  ; Check if apcupsd is already installed as a service
-  ReadRegDWORD $0 HKLM "Software\Apcupsd" "InstalledService"
-  ${If} $0 == 1
-    StrCpy $IsService 1
-  ${Else}
-    StrCpy $IsService 0
-  ${EndIf}
 FunctionEnd
 
 
