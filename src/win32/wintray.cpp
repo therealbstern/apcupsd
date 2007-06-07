@@ -26,7 +26,9 @@ upsMenu::upsMenu(HINSTANCE appinst, StatMgr *statmgr, int interval)
      m_status(appinst, statmgr),
      m_events(appinst, statmgr),
      m_statmgr(statmgr),
-     m_interval(interval)
+     m_interval(interval),
+     m_wait(NULL),
+     m_thread(NULL)
 {
    // Create a dummy window to handle tray icon messages
    WNDCLASSEX wndclass;
@@ -71,13 +73,29 @@ upsMenu::upsMenu(HINSTANCE appinst, StatMgr *statmgr, int interval)
    // Install the tray icon!
    AddTrayIcon();
 
+   // Create a locked mutex to use for interruptible waiting
+   m_wait = CreateMutex(NULL, true, NULL);
+   if (m_wait == NULL) {
+      PostQuitMessage(0);
+      return;
+   }
+
    // Thread to poll UPS status and update tray icon
    DWORD tid;
-   CreateThread(NULL, 0, &upsMenu::StatusPollThread, this, 0, &tid);
+   m_thread = CreateThread(NULL, 0, &upsMenu::StatusPollThread, this, 0, &tid);
+   if (m_thread == NULL)
+      PostQuitMessage(0);
 }
 
 upsMenu::~upsMenu()
 {
+   // Kill status polling thread
+   if (m_thread) {
+      ReleaseMutex(m_wait);
+      if (WaitForSingleObject(m_thread, 5000) == WAIT_TIMEOUT)
+         TerminateThread(m_thread, 0);
+   }
+
    // Remove the tray icon
    SendTrayMsg(NIM_DELETE);
 
@@ -334,10 +352,13 @@ void upsMenu::FetchStatus(int &battstat, char *statstr, int len)
 DWORD WINAPI upsMenu::StatusPollThread(LPVOID param)
 {
    upsMenu* _this = (upsMenu*)param;
+   DWORD status;
 
    while (1) {
       // Delay for configured interval
-      Sleep(_this->m_interval * 1000);
+      status = WaitForSingleObject(_this->m_wait, _this->m_interval * 1000);
+      if (status != WAIT_OBJECT_0)
+         break;
 
       // Update the tray icon
       _this->UpdateTrayIcon();
