@@ -6,33 +6,39 @@
 
 StatMgr::StatMgr(char *host, unsigned short port)
    : m_host(host),
-     m_port(port)
+     m_port(port),
+     m_socket(-1)
 {
    memset(m_stats, 0, sizeof(m_stats));
+   m_mutex = CreateMutex(NULL, false, NULL);
 }
 
 StatMgr::~StatMgr()
 {
+   close();
 }
 
 bool StatMgr::Update()
 {
-   int s = net_open(m_host, NULL, m_port);
-   if (s == -1)
-      return false;
+   lock();
 
-   if (net_send(s, "status", 6) != 6) {
-      net_close(s);
+   if (m_socket == -1 && !open()) {
+      unlock();
       return false;
    }
 
-   lock();
+   if (net_send(m_socket, "status", 6) != 6) {
+      close();
+      unlock();
+      return false;
+   }
+
    memset(m_stats, 0, sizeof(m_stats));
 
    int len;
    int i = 0;
    while (i < MAX_STATS &&
-          (len = net_recv(s, m_stats[i].data, sizeof(m_stats[i].data)-1)) > 0)
+          (len = net_recv(m_socket, m_stats[i].data, sizeof(m_stats[i].data)-1)) > 0)
    {
       char *key, *value;
 
@@ -56,8 +62,13 @@ bool StatMgr::Update()
       i++;
    }
 
+   if (len == -1) {
+      close();
+      unlock();
+      return false;
+   }
+
    unlock();
-   net_close(s);
    return true;
 }
 
@@ -94,12 +105,16 @@ char* StatMgr::GetAll()
 
 char* StatMgr::GetEvents()
 {
-   int s = net_open(m_host, NULL, m_port);
-   if (s == -1)
-      return NULL;
+   lock();
 
-   if (net_send(s, "events", 6) != 6) {
-      net_close(s);
+   if (m_socket == -1 && !open()) {
+      unlock();
+      return NULL;
+   }
+
+   if (net_send(m_socket, "events", 6) != 6) {
+      close();
+      unlock();
       return NULL;
    }
 
@@ -107,14 +122,20 @@ char* StatMgr::GetEvents()
    int len;
    char temp[1024];
 
-   while ((len = net_recv(s, temp, sizeof(temp)-1)) > 0)
+   while ((len = net_recv(m_socket, temp, sizeof(temp)-1)) > 0)
    {
       temp[len] = '\0';
       rtrim(temp);
       result = sprintf_realloc_append(result, "%s\n", temp);
    }
 
-   net_close(s);
+   if (len == -1) {
+      close();
+      free(result);
+      result = NULL;
+   }
+
+   unlock();
    return result;
 }
 
@@ -160,4 +181,31 @@ char *StatMgr::sprintf_realloc_append(char *str, const char *format, ...)
 
    memcpy(result + oldlen, tmp, appendlen+1);
    return result;
+}
+
+void StatMgr::lock()
+{
+   WaitForSingleObject(m_mutex, INFINITE);
+}
+
+void StatMgr::unlock()
+{
+   ReleaseMutex(m_mutex);
+}
+
+bool StatMgr::open()
+{
+   if (m_socket != -1)
+      close();
+
+   m_socket = net_open(m_host, NULL, m_port);
+   return m_socket != -1;
+}
+
+void StatMgr::close()
+{
+   if (m_socket != -1) {
+      net_close(m_socket);
+      m_socket = -1;
+   }
 }
