@@ -357,7 +357,7 @@ DWORD WINAPI upsMenu::StatusPollThread(LPVOID param)
    while (1) {
       // Delay for configured interval
       status = WaitForSingleObject(_this->m_wait, _this->m_interval * 1000);
-      if (status != WAIT_OBJECT_0)
+      if (status != WAIT_TIMEOUT)
          break;
 
       // Update the tray icon
