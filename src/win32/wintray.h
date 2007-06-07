@@ -25,7 +25,7 @@ class StatMgr;
 class upsMenu
 {
 public:
-   upsMenu(HINSTANCE appinst, StatMgr *statmgr, int interval);
+   upsMenu(HINSTANCE appinst, char* host, unsigned long port, int refresh);
    ~upsMenu();
 
 protected:
@@ -45,26 +45,25 @@ protected:
    // Thread to poll for UPS status changes
    static DWORD WINAPI StatusPollThread(LPVOID param);
 
+   HWND                    m_hwnd;           // Window handle
+   HMENU                   m_hmenu;          // Menu handle
+   NOTIFYICONDATA          m_nid;            // Notify data for icon
+   UINT                    m_balloon_timer;  // Timer for balloon tips
+   StatMgr                *m_statmgr;        // Manager for UPS stats
+   int                     m_interval;       // How often to poll for status
+   HANDLE                  m_thread;         // Handle to status polling thread
+   HANDLE                  m_wait;           // Handle to wait mutex
+
    // Dialogs for About, Status, and Events
    upsAbout                m_about;
    upsStatus               m_status;
    upsEvents               m_events;
-
-   HWND                    m_hwnd;
-   HMENU                   m_hmenu;
-   NOTIFYICONDATA          m_nid;
-   UINT                    m_balloon_timer;
 
    // The icon handles
    HICON                   m_online_icon;
    HICON                   m_onbatt_icon;
    HICON                   m_charging_icon;
    HICON                   m_commlost_icon;
-
-   StatMgr                *m_statmgr;   // Manager for UPS stats
-   int                     m_interval;  // How often to poll for status
-   HANDLE                  m_thread;    // Handle to status polling thread
-   HANDLE                  m_wait;      // Handle to wait mutex
 };
 
 #endif // WINTRAY_H

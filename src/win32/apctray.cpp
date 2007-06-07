@@ -120,9 +120,11 @@ int Remove()
 
 int Kill()
 {
-   HWND wnd = FindWindow(APCTRAY_WINDOW_CLASS, APCTRAY_WINDOW_NAME);
-   if (wnd)
+   HWND wnd;
+   while ((wnd = FindWindow(APCTRAY_WINDOW_CLASS, NULL)) != NULL) {
       PostMessage(wnd, WM_CLOSE, 0, 0);
+      Sleep(100);
+   }
    return 0;
 }
 
@@ -184,11 +186,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    if (!port) port = DEFAULT_PORT;
    if (interval < 1) interval = DEFAULT_REFRESH;
 
-   // Create a StatMgr for handling UPS status queries
-   StatMgr *statmgr = new StatMgr(host, port);
-
    // Create tray icon & menu
-   upsMenu *menu = new upsMenu(hInstance, statmgr, interval);
+   upsMenu *menu = new upsMenu(hInstance, host, port, interval);
    if (menu == NULL) {
       PostQuitMessage(0);
    }
@@ -201,7 +200,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    }
 
    delete menu;
-   delete statmgr;
    WSACleanup();
    return 0;
 }
