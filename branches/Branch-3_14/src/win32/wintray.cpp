@@ -15,18 +15,19 @@
 #include "winres.h"
 #include "wintray.h"
 #include "statmgr.h"
+#include <arpa/inet.h>
 
 // Remove apctray from registry autorun list
 // Defined in apctray.cpp
 extern int Remove();
 
 // Implementation
-upsMenu::upsMenu(HINSTANCE appinst, StatMgr *statmgr, int interval)
-   : m_about(appinst),
-     m_status(appinst, statmgr),
-     m_events(appinst, statmgr),
-     m_statmgr(statmgr),
-     m_interval(interval),
+upsMenu::upsMenu(HINSTANCE appinst, char* host, unsigned long port, int refresh)
+   : m_statmgr(new StatMgr(host, port)),
+     m_about(appinst),
+     m_status(appinst, m_statmgr),
+     m_events(appinst, m_statmgr),
+     m_interval(refresh),
      m_wait(NULL),
      m_thread(NULL)
 {
@@ -46,10 +47,24 @@ upsMenu::upsMenu(HINSTANCE appinst, StatMgr *statmgr, int interval)
    wndclass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
    RegisterClassEx(&wndclass);
 
-   // Create System Tray menu Window
-   m_hwnd = CreateWindow(APCTRAY_WINDOW_CLASS, APCTRAY_WINDOW_NAME,
-                         WS_OVERLAPPEDWINDOW, CW_USEDEFAULT,
-                         CW_USEDEFAULT, 200, 200, NULL, NULL, appinst, NULL);
+   // Determine window title
+   char title[1024];
+   unsigned int inaddr = inet_addr(host);
+   if ((inaddr != INADDR_NONE &&
+         ((ntohl(inaddr) & 0xff000000) == 0x7f000000)) ||
+       strcasecmp(host, "localhost") == 0) {
+      // Talking to local apcupsd: Use plain title
+      astrncpy(title, APCTRAY_WINDOW_NAME, sizeof(title));
+   } else {
+      // Talking to remote apcuspd: Use annotated title
+      asnprintf(title, sizeof(title), "%s-%s:%u",
+         APCTRAY_WINDOW_NAME, host, port);
+   }
+
+   // Create System Tray menu window
+   m_hwnd = CreateWindow(APCTRAY_WINDOW_CLASS, title, WS_OVERLAPPEDWINDOW,
+                         CW_USEDEFAULT, CW_USEDEFAULT, 200, 200, NULL, NULL,
+                         appinst, NULL);
    if (m_hwnd == NULL) {
       PostQuitMessage(0);
       return;
@@ -69,6 +84,10 @@ upsMenu::upsMenu(HINSTANCE appinst, StatMgr *statmgr, int interval)
 
    // Load the popup menu
    m_hmenu = LoadMenu(appinst, MAKEINTRESOURCE(IDR_TRAYMENU));
+   if (m_hmenu == NULL) {
+      PostQuitMessage(0);
+      return;
+   }
 
    // Install the tray icon!
    AddTrayIcon();
@@ -194,7 +213,6 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
    case WM_COMMAND:
       // User has clicked an item on the tray menu
       switch (LOWORD(wParam)) {
-
       case ID_STATUS:
          // Show the status dialog
          _this->m_status.Show(TRUE);
@@ -359,6 +377,7 @@ DWORD WINAPI upsMenu::StatusPollThread(LPVOID param)
       status = WaitForSingleObject(_this->m_wait, _this->m_interval * 1000);
       if (status != WAIT_TIMEOUT)
          break;
+
 
       // Update the tray icon
       _this->UpdateTrayIcon();
