@@ -60,12 +60,11 @@ protected:
    HICON                   m_onbatt_icon;
    HICON                   m_charging_icon;
    HICON                   m_commlost_icon;
-   
-   // Manager for UPS stats
-   StatMgr                *m_statmgr;
-   
-   // How often to poll for status
-   int                     m_interval;
+
+   StatMgr                *m_statmgr;   // Manager for UPS stats
+   int                     m_interval;  // How often to poll for status
+   HANDLE                  m_thread;    // Handle to status polling thread
+   HANDLE                  m_wait;      // Handle to wait mutex
 };
 
 #endif // WINTRAY_H
