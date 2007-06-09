@@ -22,7 +22,7 @@
 
 
 StatMgr::StatMgr(char *host, unsigned short port)
-   : m_host(host),
+   : m_host(strdup(host)),
      m_port(port),
      m_socket(-1)
 {
@@ -34,6 +34,7 @@ StatMgr::~StatMgr()
 {
    lock();
    close();
+   free(m_host);
 }
 
 bool StatMgr::Update()

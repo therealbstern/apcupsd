@@ -32,6 +32,9 @@
 #define ID_DEFAULT_PROPERTIES           40006
 #define ID_EVENTS                       40007
 #define ID_REMOVE                       40008
+#define ID_REMOVEALL                    40009
+#define ID_CLOSEINST                    40010
+#define ID_NAME                         40011
 
 #define IDD_PROPERTIES                  200
 #define IDD_ABOUT                       201

@@ -15,7 +15,6 @@
 #include "winres.h"
 #include "wintray.h"
 #include "statmgr.h"
-#include <arpa/inet.h>
 
 // Remove apctray from registry autorun list
 // Defined in apctray.cpp
@@ -47,22 +46,8 @@ upsMenu::upsMenu(HINSTANCE appinst, char* host, unsigned long port, int refresh)
    wndclass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
    RegisterClassEx(&wndclass);
 
-   // Determine window title
-   char title[1024];
-   unsigned int inaddr = inet_addr(host);
-   if ((inaddr != INADDR_NONE &&
-         ((ntohl(inaddr) & 0xff000000) == 0x7f000000)) ||
-       strcasecmp(host, "localhost") == 0) {
-      // Talking to local apcupsd: Use plain title
-      astrncpy(title, APCTRAY_WINDOW_NAME, sizeof(title));
-   } else {
-      // Talking to remote apcuspd: Use annotated title
-      asnprintf(title, sizeof(title), "%s-%s:%u",
-         APCTRAY_WINDOW_NAME, host, port);
-   }
-
    // Create System Tray menu window
-   m_hwnd = CreateWindow(APCTRAY_WINDOW_CLASS, title, WS_OVERLAPPEDWINDOW,
+   m_hwnd = CreateWindow(APCTRAY_WINDOW_CLASS, "FIXME", WS_OVERLAPPEDWINDOW,
                          CW_USEDEFAULT, CW_USEDEFAULT, 200, 200, NULL, NULL,
                          appinst, NULL);
    if (m_hwnd == NULL) {
@@ -88,9 +73,6 @@ upsMenu::upsMenu(HINSTANCE appinst, char* host, unsigned long port, int refresh)
       PostQuitMessage(0);
       return;
    }
-
-   // Install the tray icon!
-   AddTrayIcon();
 
    // Create a locked mutex to use for interruptible waiting
    m_wait = CreateMutex(NULL, true, NULL);
@@ -145,10 +127,18 @@ void upsMenu::SendTrayMsg(DWORD msg)
    m_nid.cbSize = sizeof(m_nid);
    m_nid.uID = IDI_APCUPSD;        // never changes after construction
 
-   // Get current status
    int battstat;
    char statstr[128];
-   FetchStatus(battstat, statstr, sizeof(statstr));
+
+   // Get current status
+   if (msg == NIM_ADD) {
+      // Default to COMMLOST for initial add
+      battstat = -1;
+      asnprintf(statstr, sizeof(statstr), "COMMLOST");
+   } else {
+      // Fetch current UPS status
+      FetchStatus(battstat, statstr, sizeof(statstr));
+   }
 
    /* If battstat == 0 we are on batteries, otherwise we are online
     * and the value of battstat is the percent charge.
@@ -166,7 +156,7 @@ void upsMenu::SendTrayMsg(DWORD msg)
    m_nid.uCallbackMessage = WM_TRAYNOTIFY;
 
    // Use status as normal tooltip
-   asnprintf(m_nid.szTip, sizeof(m_nid.szTip), "Apcupsd - %s", statstr);
+   asnprintf(m_nid.szTip, sizeof(m_nid.szTip), "%s", statstr);
    m_nid.uFlags |= NIF_TIP;
 
    // Send the message
@@ -228,16 +218,25 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
          _this->m_about.Show(TRUE);
          break;
 
-      case ID_CLOSE:
+      case ID_CLOSEINST:
          // User selected Close from the tray menu
+         PostMessage(hwnd, WM_CLOSEINST, 0, (LPARAM)_this);
+         return 0;
+
+      case ID_CLOSE:
+         // User selected CloseAll from the tray menu
          PostMessage(hwnd, WM_CLOSE, 0, 0);
          break;
 
       case ID_REMOVE:
-         // User wants to remove apctray from registry
-         Remove();
-         PostMessage(hwnd, WM_CLOSE, 0, 0);
-         break;
+         // User selected Close from the tray menu
+         PostMessage(hwnd, WM_REMOVE, 0, (LPARAM)_this);
+         return 0;
+
+      case ID_REMOVEALL:
+         // User wants to remove all apctray instances from registry
+         PostMessage(hwnd, WM_REMOVEALL, 0, 0);
+         return 0;
       }
       return 0;
 
@@ -251,8 +250,8 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
          if (submenu == NULL)
             return 0;
 
-         // Make the first menu item the default (bold font)
-         SetMenuDefaultItem(submenu, 0, TRUE);
+         // Make the Status menu item the default (bold font)
+         SetMenuDefaultItem(submenu, ID_STATUS, false);
 
          // Get the current cursor position, to display the menu at
          POINT mouse;
@@ -271,8 +270,8 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
       // Or was there a LMB double click?
       if (lParam == WM_LBUTTONDBLCLK) {
-         // double click: execute first menu item
-         SendMessage(_this->m_nid.hWnd, WM_COMMAND, GetMenuItemID(submenu, 0), 0);
+         // double click: execute the default item
+         SendMessage(_this->m_nid.hWnd, WM_COMMAND, ID_STATUS, 0);
       }
 
       return 0;
@@ -285,10 +284,8 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
       return 0;
 
    case WM_CLOSE:
-      break;
-
    case WM_DESTROY:
-      // The user wants Apcupsd to quit cleanly...
+      // The user wants Apctray to quit cleanly...
       PostQuitMessage(0);
       return 0;
    }
@@ -372,14 +369,16 @@ DWORD WINAPI upsMenu::StatusPollThread(LPVOID param)
    upsMenu* _this = (upsMenu*)param;
    DWORD status;
 
+   // Install the tray icon
+   _this->AddTrayIcon();
+
    while (1) {
+      // Update the tray icon
+      _this->UpdateTrayIcon();
+
       // Delay for configured interval
       status = WaitForSingleObject(_this->m_wait, _this->m_interval * 1000);
       if (status != WAIT_TIMEOUT)
          break;
-
-
-      // Update the tray icon
-      _this->UpdateTrayIcon();
    }
 }

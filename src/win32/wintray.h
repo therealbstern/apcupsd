@@ -25,7 +25,7 @@ class StatMgr;
 class upsMenu
 {
 public:
-   upsMenu(HINSTANCE appinst, char* host, unsigned long port, int refresh);
+   upsMenu(HINSTANCE appinst, char *host, unsigned long port, int refresh);
    ~upsMenu();
 
 protected:
