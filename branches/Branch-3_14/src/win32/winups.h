@@ -23,6 +23,15 @@
 // Message used to inform tray that a balloon tip was displayed
 #define WM_BALLOONSHOW           WM_USER+2
 
+// Message used to close a given apctray instance
+#define WM_CLOSEINST             WM_USER+3
+
+// Message used to remove all apctray instances from the registry
+#define WM_REMOVEALL             WM_USER+4
+
+// Message used to remove specified apctray instance from the registry
+#define WM_REMOVE                WM_USER+5
+
 // Apcupsd application window constants
 #define APCUPSD_WINDOW_CLASS		"apcupsd"
 #define APCUPSD_WINDOW_NAME		"apcupsd"

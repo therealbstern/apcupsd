@@ -33,8 +33,11 @@ BEGIN
         MENUITEM SEPARATOR
         MENUITEM "&About",                      ID_ABOUT
         MENUITEM SEPARATOR
-        MENUITEM "&Remove Apctray",             ID_REMOVE
-        MENUITEM "&Close Apctray",              ID_CLOSE
+        MENUITEM "Remove This Instance",        ID_REMOVE
+        MENUITEM "Remove All Instances",        ID_REMOVEALL
+        MENUITEM SEPARATOR
+        MENUITEM "Close This Instance",         ID_CLOSEINST
+        MENUITEM "&Close All Instances",        ID_CLOSE
     END
 END
 
