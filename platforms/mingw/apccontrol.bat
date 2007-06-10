@@ -19,7 +19,7 @@ rem Paths to important executables
 SET APCUPSD="%sbindir%\apcupsd"
 SET SHUTDOWN="%sbindir%\shutdown"
 SET BACKGROUND="%sbindir%\background"
-SET POPUP=%BACKGROUND% "%sbindir\%popup"
+SET POPUP=%BACKGROUND% "%sbindir%\popup"
 
 rem
 rem This piece is to substitute the default behaviour with your own script,
