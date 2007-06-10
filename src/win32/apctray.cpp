@@ -264,9 +264,10 @@ HKEY TrayInstance::CreateInstanceKey()
 {
    // Open registry key apctray
    HKEY apctray;
-   if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Apcupsd\\Apctray",
-                    0, KEY_READ|KEY_WRITE, &apctray) != ERROR_SUCCESS) {
-      // No instances in registry
+   if (RegCreateKeyEx(HKEY_LOCAL_MACHINE, "Software\\Apcupsd\\Apctray",
+                      0, NULL, REG_OPTION_NON_VOLATILE, KEY_READ|KEY_WRITE,
+                      NULL, &apctray, NULL) != ERROR_SUCCESS) {
+      // Could not open Apctray key
       return NULL;
    }
 
@@ -512,6 +513,7 @@ void CloseInstance(upsMenu *menu)
 
    for (iter = instances.begin(); iter != instances.end(); iter++) {
       if ((*iter)->m_menu == menu) {
+         (*iter)->Destroy();
          delete *iter;
          instances.erase(iter);
          break;
@@ -600,9 +602,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       LaunchInstances();
 
       // If no instances were created from the registry,
-      // allocate a default one
-      if (instances.empty())
+      // allocate a default one and write it to the registry.
+      if (instances.empty()) {
          AllocateInstance(DEFAULT_HOST, DEFAULT_PORT, refresh, true);
+         instances.back()->Write();
+      }
    } else {
       // One or more command line options were given, so launch a single
       // instance using the specified parameters, filling in any missing
