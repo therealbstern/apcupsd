@@ -32,6 +32,9 @@
 // Message used to remove specified apctray instance from the registry
 #define WM_REMOVE                WM_USER+5
 
+// Message used to set balloon notification state
+#define WM_BNOTIFY               WM_USER+6
+
 // Apcupsd application window constants
 #define APCUPSD_WINDOW_CLASS		"apcupsd"
 #define APCUPSD_WINDOW_NAME		"apcupsd"

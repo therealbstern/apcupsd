@@ -25,8 +25,9 @@ class StatMgr;
 class upsMenu
 {
 public:
-   upsMenu(HINSTANCE appinst, char *host, unsigned long port, int refresh);
+   upsMenu(HINSTANCE appinst, char *host, unsigned long port, int refresh, bool notify);
    ~upsMenu();
+   void Destroy();
 
 protected:
    // Tray icon handling
@@ -53,6 +54,7 @@ protected:
    int                     m_interval;       // How often to poll for status
    HANDLE                  m_thread;         // Handle to status polling thread
    HANDLE                  m_wait;           // Handle to wait mutex
+   bool                    m_notify;         // Receive local notifications?
 
    // Dialogs for About, Status, and Events
    upsAbout                m_about;

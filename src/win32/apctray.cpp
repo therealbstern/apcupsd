@@ -24,10 +24,12 @@
 #define CMDOPT_QUIET    "/quiet"
 #define CMDOPT_ADD      "/add"
 #define CMDOPT_DEL      "/del"
+#define CMDOPT_NOTIFY   "/notify"
 
 #define USAGE_TEXT   "[" CMDOPT_HOST    " <hostname>] " \
                      "[" CMDOPT_PORT    " <port>] "     \
                      "[" CMDOPT_REFRESH " <sec>] "      \
+                     "[" CMDOPT_NOTIFY  "] "            \
                      "[" CMDOPT_INSTALL "] "            \
                      "[" CMDOPT_REMOVE  "] "            \
                      "[" CMDOPT_KILL    "] "            \
@@ -38,6 +40,7 @@
 #define DEFAULT_HOST    "127.0.0.1"
 #define DEFAULT_PORT    3551
 #define DEFAULT_REFRESH 1
+#define DEFAULT_NOTIFY  0
 
 
 class TrayInstance; // Forward decl
@@ -49,12 +52,34 @@ bool quiet = false;                      // Suppress user dialogs
 class TrayInstance
 {
 public:
-   TrayInstance(const char *host, unsigned short port, int refresh)
+   TrayInstance(const char *host, unsigned short port, int refresh, int notify)
       : m_host(strdup(host)),
         m_port(port),
-        m_refresh(refresh)
+        m_refresh(refresh),
+        m_notify(notify),
+        m_menu(NULL)
    {
-      m_menu = new upsMenu(appinst, m_host, m_port, m_refresh);
+      // Insert defaults where needed
+      m_host = host ? strdup(host) : strdup(DEFAULT_HOST);
+      m_port = (port > 0) ? port : DEFAULT_PORT;
+      m_refresh = (refresh > 0) ? refresh : DEFAULT_REFRESH;
+      m_notify = (notify >= 0) ? notify : DEFAULT_NOTIFY;
+   }
+
+   TrayInstance(HKEY instkey)
+      : m_menu(NULL)
+   {
+      // Read values from registry
+      m_host = RegQueryString(instkey, "host");
+      m_port = RegQueryDWORD(instkey, "port");
+      m_refresh = RegQueryDWORD(instkey, "refresh");
+      m_notify = RegQueryDWORD(instkey, "notify");
+
+      // Insert defaults where needed
+      if (!m_host) m_host = strdup(DEFAULT_HOST);
+      if (m_port < 1) m_port = DEFAULT_PORT;
+      if (m_refresh < 1) m_refresh = DEFAULT_REFRESH;
+      if (m_notify < 0) m_notify = DEFAULT_NOTIFY;
    }
 
    ~TrayInstance() {
@@ -62,9 +87,59 @@ public:
       free(m_host);
    }
 
+   void Create() {
+      m_menu = new upsMenu(appinst, m_host, m_port, m_refresh, m_notify);
+   }
+
+   void Destroy() {
+      if (m_menu)
+         m_menu->Destroy();
+   }
+
+   // Registry helpers
+   HKEY FindInstanceKey(std::string &instname);
+   HKEY CreateInstanceKey();
+   void DeleteInstanceKey();
+   DWORD RegQueryDWORD(HKEY instkey, const char *name);
+   char *RegQueryString(HKEY instance, const char *name);
+   void RegSetDWORD(HKEY instance, char *name, DWORD value);
+   void RegSetString(HKEY instance, char *name, char *value);
+
+   HKEY FindOrCreateInstanceKey() {
+      std::string instname;
+      HKEY instkey = FindInstanceKey(instname);
+
+      if (!instkey)
+         instkey = CreateInstanceKey();
+
+      return instkey;
+   }
+
+   // Set current notify state
+   void SetNotify(bool notify) {
+      m_notify = notify;
+      Write();
+   }
+
+   // Write settings back to registry
+   void Write() {
+      HKEY instkey = FindOrCreateInstanceKey();
+      if (instkey) {
+         RegSetString(instkey, "host", m_host);
+         RegSetDWORD(instkey, "port", m_port);
+         RegSetDWORD(instkey, "refresh", m_refresh);
+         RegSetDWORD(instkey, "notify", m_notify);
+         RegCloseKey(instkey);
+      }
+   }
+
+   // Instance data, cached from registry
    char *m_host;
    unsigned short m_port;
    int m_refresh;
+   bool m_notify;
+
+   // Icon/Menu for this instance
    upsMenu *m_menu;
 };
 
@@ -94,7 +169,7 @@ void NotifyUser(const char *format, ...)
    }
 }
 
-DWORD QueryInstanceDWORD(HKEY instance, const char *name)
+DWORD TrayInstance::RegQueryDWORD(HKEY instance, const char *name)
 {
    DWORD result;
    DWORD len = sizeof(result);
@@ -102,13 +177,13 @@ DWORD QueryInstanceDWORD(HKEY instance, const char *name)
    // Retrieve DWORD
    if (RegQueryValueEx(instance, name, NULL, NULL, (BYTE*)&result, &len)
          != ERROR_SUCCESS) {
-      result = 0;
+      result = (DWORD)-1;
    }
 
    return result;
 }
 
-char *QueryInstanceString(HKEY instance, const char *name)
+char *TrayInstance::RegQueryString(HKEY instance, const char *name)
 {
    // Determine string length
    DWORD len = 0;
@@ -133,17 +208,17 @@ char *QueryInstanceString(HKEY instance, const char *name)
    return data;
 }
 
-void SetInstanceDWORD(HKEY instance, char *name, DWORD value)
+void TrayInstance::RegSetDWORD(HKEY instance, char *name, DWORD value)
 {
    RegSetValueEx(instance, name, 0, REG_DWORD, (BYTE*)&value, sizeof(value));
 }
 
-void SetInstanceString(HKEY instance, char *name, char *value)
+void TrayInstance::RegSetString(HKEY instance, char *name, char *value)
 {
    RegSetValueEx(instance, name, 0, REG_SZ, (BYTE*)value, strlen(value)+1);
 }
 
-HKEY FindInstanceKey(char *host, unsigned short port, std::string &instname)
+HKEY TrayInstance::FindInstanceKey(std::string &instname)
 {
    // Open registry key apctray
    HKEY apctray;
@@ -165,9 +240,9 @@ HKEY FindInstanceKey(char *host, unsigned short port, std::string &instname)
       if (len && strncasecmp(name, "instance", 8) == 0 &&
           RegOpenKeyEx(apctray, name, 0, KEY_READ|KEY_WRITE, &instance)
              == ERROR_SUCCESS) {
-         char *testhost = QueryInstanceString(instance, "host");
-         unsigned short testport = QueryInstanceDWORD(instance, "port");
-         if (testhost && strcmp(testhost, host) == 0 && testport == port) {
+         char *testhost = RegQueryString(instance, "host");
+         unsigned short testport = RegQueryDWORD(instance, "port");
+         if (testhost && strcmp(testhost, m_host) == 0 && testport == m_port) {
             RegCloseKey(apctray);
             instname = name;
             return instance;
@@ -185,7 +260,7 @@ HKEY FindInstanceKey(char *host, unsigned short port, std::string &instname)
    return NULL;
 }
 
-HKEY CreateInstanceKey()
+HKEY TrayInstance::CreateInstanceKey()
 {
    // Open registry key apctray
    HKEY apctray;
@@ -209,6 +284,26 @@ HKEY CreateInstanceKey()
 
    RegCloseKey(apctray);
    return result;
+}
+
+void TrayInstance::DeleteInstanceKey()
+{
+   // Find the name of our instance key
+   std::string instname;
+   HKEY instkey = FindInstanceKey(instname);
+
+   if (instkey) {
+      RegCloseKey(instkey);
+
+      // Open registry key apctray
+      HKEY apctray;
+      if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Apcupsd\\Apctray",
+                       0, KEY_READ|KEY_WRITE, &apctray) == ERROR_SUCCESS) {
+         // Delete instance key
+         RegDeleteKey(apctray, instname.c_str());
+         RegCloseKey(apctray);
+      }
+   }
 }
 
 int Install()
@@ -246,36 +341,18 @@ int Install()
               "automatically run when users log on.");
 }
 
-int AddInstance(char *host, unsigned short port, int refresh)
+int AddInstance(char *host, unsigned short port, int refresh, int notify)
 {
-   // Establish defaults for missing parameters
-   if (!host) host = DEFAULT_HOST;
-   if (!port) port = DEFAULT_PORT;
-   if (refresh < 1) refresh = DEFAULT_REFRESH;
+   TrayInstance inst(host, port, refresh, notify);
+   inst.Write();
 
-   // Find existing instance or create a new one
-   std::string instname;
-   HKEY instance = FindInstanceKey(host, port, instname);
-   if (!instance) {
-      instance = CreateInstanceKey();
-      if (!instance)
-         return 1;
-   }
-
-   // Set parameters
-   SetInstanceString(instance, "host", host);
-   SetInstanceDWORD(instance, "port", port);
-   SetInstanceDWORD(instance, "refresh", refresh);
-
-   // Done
-   RegCloseKey(instance);
-
-   NotifyUser("The instance (%s:%d) was successfully created.", host, port);
+   NotifyUser("The instance (%s:%d) was successfully created.",
+      inst.m_host, inst.m_port);
 
    return 0;
 }
 
-int CountInstances(HKEY apctray)
+int RegCountInstances(HKEY apctray)
 {
    int count = 0;
 
@@ -312,21 +389,20 @@ int Remove()
 
 int DelInstance(char *host, unsigned short port)
 {
-   // Open registry key apctray
-   HKEY apctray;
-   if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Apcupsd\\Apctray",
-                    0, KEY_READ|KEY_WRITE, &apctray) != ERROR_SUCCESS) {
-      // No instances in registry
-      return 0;
-   }
-
-   HKEY instance;
-   int i = 0;
-   char name[1024];
-   DWORD len = sizeof(name);
-
    // If no host or port was specified, remove all instances
    if (!host && !port) {
+      // Open registry key apctray
+      HKEY apctray;
+      if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Apcupsd\\Apctray",
+                       0, KEY_READ|KEY_WRITE, &apctray) != ERROR_SUCCESS) {
+         // No instances in registry
+         return 0;
+      }
+
+      int i = 0;
+      char name[1024];
+      DWORD len = sizeof(name);
+
       // Iterate through all instances and delete them
       while (RegEnumKeyEx(apctray, i++, name, &len, NULL, NULL,
                           NULL, NULL) == ERROR_SUCCESS) {
@@ -338,25 +414,17 @@ int DelInstance(char *host, unsigned short port)
          len = sizeof(name);
       }
 
+      RegCloseKey(apctray);
       NotifyUser("All instances were successfully deleted.");
    } else {
-      // Establish defaults for missing parameters
-      if (!host) host = DEFAULT_HOST;
-      if (!port) port = DEFAULT_PORT;
-
-      // Find and delete the appropriate instance
-      std::string instname;
-      instance = FindInstanceKey(host, port, instname);
-      if (instance != NULL) {
-         RegCloseKey(instance);
-         RegDeleteKey(apctray, instname.c_str());
-      }
+      // Deleting a single instance: We can use TrayInstance
+      TrayInstance inst(host, port, 0, -1);
+      inst.DeleteInstanceKey();
 
       NotifyUser("The specified instance (%s:%d) was successfully deleted.",
          host, port);
    }
 
-   RegCloseKey(apctray);
    return 0;
 }
 
@@ -377,29 +445,22 @@ void Usage(const char *text1, const char* text2)
               MB_OK | MB_ICONINFORMATION);
 }
 
-void AllocateInstance(char *host, unsigned short port, int refresh)
+void AllocateInstance(char *host, unsigned short port, int refresh, int notify)
 {
-   TrayInstance *inst;
-
-   if (host && port && refresh &&
-       (inst = new TrayInstance(host, port, refresh))) {
+   TrayInstance *inst = new TrayInstance(host, port, refresh, notify);
+   if (inst) {
       instances.push_back(inst);
+      inst->Create();
    }
 }
 
-void AllocateInstance(HKEY instance)
+void AllocateInstance(HKEY instkey)
 {
-   char *host;
-   DWORD port, refresh;
-   upsMenu *menu;
-
-   host = QueryInstanceString(instance, "host");
-   port = QueryInstanceDWORD(instance, "port");
-   refresh = QueryInstanceDWORD(instance, "refresh");
-
-   AllocateInstance(host, port, refresh);
-
-   free(host);
+   TrayInstance *inst = new TrayInstance(instkey);
+   if (inst) {
+      instances.push_back(inst);
+      inst->Create();
+   }
 }
 
 void LaunchInstances()
@@ -432,6 +493,19 @@ void LaunchInstances()
    RegCloseKey(apctray);
 }
 
+TrayInstance *FindInstance(upsMenu *menu)
+{
+   std::vector<TrayInstance*>::iterator iter;
+
+   for (iter = instances.begin(); iter != instances.end(); iter++) {
+      if ((*iter)->m_menu == menu) {
+         return *iter;
+      }
+   }
+
+   return NULL;
+}
+
 void CloseInstance(upsMenu *menu)
 {
    std::vector<TrayInstance*>::iterator iter;
@@ -447,15 +521,18 @@ void CloseInstance(upsMenu *menu)
 
 void RemoveInstance(upsMenu *menu)
 {
-   std::vector<TrayInstance*>::iterator iter;
-
-   for (iter = instances.begin(); iter != instances.end(); iter++) {
-      if ((*iter)->m_menu == menu) {
-         DelInstance((*iter)->m_host, (*iter)->m_port);
-         CloseInstance(menu);
-         break;
-      }
+   TrayInstance *inst = FindInstance(menu);
+   if (inst) {
+      DelInstance(inst->m_host, inst->m_port);
+      CloseInstance(menu);
    }
+}
+
+void SetNotify(upsMenu *menu, bool notify)
+{
+   TrayInstance *inst = FindInstance(menu);
+   if (inst)
+      inst->SetNotify(notify);
 }
 
 // WinMain parses the command line and either calls the main App
@@ -473,6 +550,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    char *host = NULL;
    unsigned short port = 0;
    int refresh = 0;
+   int notify = -1;
 
    // Check command line options
    char *arg;
@@ -496,12 +574,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             return 1;
          }
          refresh = strtoul(arg, NULL, 0);
+      } else if (strcasecmp(arg, CMDOPT_NOTIFY) == 0) {
+         notify = true;
       } else if (strcasecmp(arg, CMDOPT_INSTALL) == 0) {
          return Install();
       } else if (strcasecmp(arg, CMDOPT_REMOVE) == 0) {
          return Remove();
       } else if (strcasecmp(arg, CMDOPT_ADD) == 0) {
-         return AddInstance(host, port, refresh);
+         return AddInstance(host, port, refresh, notify);
       } else if (strcasecmp(arg, CMDOPT_DEL) == 0) {
          return DelInstance(host, port);
       } else if (strcasecmp(arg, CMDOPT_KILL) == 0) {
@@ -514,8 +594,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       }
    }
 
-   if (refresh < 1) refresh = DEFAULT_REFRESH;
-
    if (!host && !port) {
       // No command line instance options were given: Launch
       // all instances specified in the registry
@@ -524,14 +602,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       // If no instances were created from the registry,
       // allocate a default one
       if (instances.empty())
-         AllocateInstance(DEFAULT_HOST, DEFAULT_PORT, refresh);
+         AllocateInstance(DEFAULT_HOST, DEFAULT_PORT, refresh, true);
    } else {
       // One or more command line options were given, so launch a single
       // instance using the specified parameters, filling in any missing
       // ones with defaults
-      if (!host) host = DEFAULT_HOST;
-      if (!port) port = DEFAULT_PORT;
-      AllocateInstance(host, port, refresh);
+      AllocateInstance(host, port, refresh, notify);
    }
 
    // Enter the Windows message handling loop until told to quit
@@ -560,12 +636,26 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             PostQuitMessage(0);
          break;
 
+      case WM_BNOTIFY:
+         // Record notify state in registry
+         SetNotify((upsMenu*)msg.lParam, msg.wParam);
+         break;
+
       default:
          DispatchMessage(&msg);
       }
    }
 
-   // Free all instances
+   // Instruct all instances to destroy
+   std::vector<TrayInstance*>::iterator iter;
+   for (iter = instances.begin();
+        iter != instances.end();
+        iter++)
+   {
+      (*iter)->Destroy();
+   }
+
+   // Free all instances. This waits for destruction to complete.
    while (!instances.empty()) {
       delete instances.back();
       instances.pop_back();
