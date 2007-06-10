@@ -18,9 +18,9 @@
 // Constructor/destructor
 upsStatus::upsStatus(HINSTANCE appinst, StatMgr *statmgr)
 {
-    m_dlgvisible = FALSE;
-    m_appinst = appinst;
-    m_statmgr = statmgr;
+   m_dlgvisible = FALSE;
+   m_appinst = appinst;
+   m_statmgr = statmgr;
 }
 
 upsStatus::~upsStatus()
@@ -30,7 +30,7 @@ upsStatus::~upsStatus()
 // Initialisation
 BOOL upsStatus::Init()
 {
-    return TRUE;
+   return TRUE;
 }
 
 // Dialog box handling functions
@@ -76,7 +76,7 @@ BOOL CALLBACK upsStatus::DialogProc(
       _this->FillStatusBox(hwnd, IDC_LIST);
       return TRUE;
 
-    case WM_COMMAND:
+   case WM_COMMAND:
       switch (LOWORD(wParam)) {
       case IDCANCEL:
       case IDOK:
@@ -123,8 +123,7 @@ void upsStatus::FillStatusBox(HWND hwnd, int id_list)
    // LB_ADDSTRING messages for each string.
    char *tmp;
    char *str = status;
-   while ((tmp = strchr(str, '\n')))
-   {
+   while ((tmp = strchr(str, '\n'))) {
       *tmp = '\0';
       SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0, (LONG)str);
       str = tmp + 1;
