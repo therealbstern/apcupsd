@@ -15,6 +15,7 @@
 #include "winres.h"
 #include "wintray.h"
 #include "statmgr.h"
+#include <string>
 
 // Implementation
 upsMenu::upsMenu(HINSTANCE appinst, char* host, unsigned long port, int refresh, bool notify)
@@ -26,7 +27,8 @@ upsMenu::upsMenu(HINSTANCE appinst, char* host, unsigned long port, int refresh,
      m_wait(NULL),
      m_thread(NULL),
      m_hmenu(NULL),
-     m_notify(notify)
+     m_notify(notify),
+     m_upsname("<unknown>")
 {
    // Create a dummy window to handle tray icon messages
    WNDCLASSEX wndclass;
@@ -145,7 +147,7 @@ void upsMenu::SendTrayMsg(DWORD msg)
    m_nid.uID = IDI_APCUPSD;        // never changes after construction
 
    int battstat = -1;
-   char statstr[128] = "";
+   std::string statstr = "";
 
    // Get current status
    switch (msg) {
@@ -154,7 +156,7 @@ void upsMenu::SendTrayMsg(DWORD msg)
       break;
    default:
       // Fetch current UPS status
-      FetchStatus(battstat, statstr, sizeof(statstr));
+      FetchStatus(battstat, statstr, m_upsname);
    }
 
    /* If battstat == 0 we are on batteries, otherwise we are online
@@ -173,7 +175,7 @@ void upsMenu::SendTrayMsg(DWORD msg)
    m_nid.uCallbackMessage = WM_TRAYNOTIFY;
 
    // Use status as normal tooltip
-   asnprintf(m_nid.szTip, sizeof(m_nid.szTip), "%s", statstr);
+   asnprintf(m_nid.szTip, sizeof(m_nid.szTip), "%s", statstr.c_str());
    m_nid.uFlags |= NIF_TIP;
 
    // Send the message
@@ -284,6 +286,10 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
          mii.fState = _this->m_notify ? MFS_CHECKED : MFS_UNCHECKED;
          SetMenuItemInfo(submenu, ID_NOTIFY, false, &mii);
 
+         // Set UPS name field
+         ModifyMenu(submenu, ID_NAME, MF_BYCOMMAND|MF_STRING, ID_NAME,
+            ("UPS: " + _this->m_upsname).c_str());
+
          // Get the current cursor position, to display the menu at
          POINT mouse;
          GetCursorPos(&mouse);
@@ -325,12 +331,12 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
    return DefWindowProc(hwnd, iMsg, wParam, lParam);
 }
 
-void upsMenu::FetchStatus(int &battstat, char *statstr, int len)
+void upsMenu::FetchStatus(int &battstat, std::string &statstr, std::string &upsname)
 {
    // Fetch data from the UPS
    if (!m_statmgr->Update()) {
       battstat = -1;
-      astrncpy(statstr, "COMMLOST", len);
+      statstr = "COMMLOST";
       return;
    }
 
@@ -338,7 +344,7 @@ void upsMenu::FetchStatus(int &battstat, char *statstr, int len)
    char *statflag = m_statmgr->Get("STATFLAG");
    if (!statflag || *statflag == '\0') {
       battstat = -1;
-      astrncpy(statstr, "COMMLOST", len);
+      statstr = "COMMLOST";
       free(statflag);
       return;
    }
@@ -358,41 +364,44 @@ void upsMenu::FetchStatus(int &battstat, char *statstr, int len)
    free(statflag);
    free(bcharge);
 
+   // Fetch UPSNAME
+   char *uname = m_statmgr->Get("UPSNAME");
+   if (uname)
+      upsname = uname;
+
    // Now output status in human readable form
-   astrncpy(statstr, "", len);
+   statstr = "";
    if (status & UPS_calibration)
-      astrncat(statstr, "CAL ", len);
+      statstr += "CAL ";
    if (status & UPS_trim)
-      astrncat(statstr, "TRIM ", len);
+      statstr += "TRIM ";
    if (status & UPS_boost)
-      astrncat(statstr, "BOOST ", len);
+      statstr += "BOOST ";
    if (status & UPS_online)
-      astrncat(statstr, "ONLINE ", len);
+      statstr += "ONLINE ";
    if (status & UPS_onbatt)
-      astrncat(statstr, "ON BATTERY ", len);
+      statstr += "ON BATTERY ";
    if (status & UPS_overload)
-      astrncat(statstr, "OVERLOAD ", len);
+      statstr += "OVERLOAD ";
    if (status & UPS_battlow)
-      astrncat(statstr, "LOWBATT ", len);
+      statstr += "LOWBATT ";
    if (status & UPS_replacebatt)
-      astrncat(statstr, "REPLACEBATT ", len);
+      statstr += "REPLACEBATT ";
    if (!status & UPS_battpresent)
-      astrncat(statstr, "NOBATT ", len);
+      statstr += "NOBATT ";
 
    // This overrides the above
    if (status & UPS_commlost) {
-      astrncpy(statstr, "COMMLOST", len);
+      statstr = "COMMLOST";
       battstat = -1;
    }
 
    // This overrides the above
    if (status & UPS_shutdown)
-      astrncpy(statstr, "SHUTTING DOWN", len);
+      statstr = "SHUTTING DOWN";
 
    // Remove trailing space, if present
-   char *tmp = statstr + strlen(statstr) - 1;
-   while (tmp >= statstr && isspace(*tmp))
-      *tmp-- = '\0';
+   statstr.resize(statstr.find_last_not_of(" ") + 1);
 }
 
 DWORD WINAPI upsMenu::StatusPollThread(LPVOID param)

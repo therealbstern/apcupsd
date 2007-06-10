@@ -64,6 +64,12 @@ BOOL CALLBACK upsStatus::DialogProc(
       SetWindowLong(hwnd, GWL_USERDATA, lParam);
       _this = (upsStatus *)lParam;
 
+      // Set listbox to a fixed pitch font
+      HFONT hfont = CreateFont(14, 0, 0, 0, FW_DONTCARE, false, false, false, 
+         DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, 
+         DEFAULT_QUALITY, FIXED_PITCH, NULL);
+      SendDlgItemMessage(hwnd, IDC_LIST, WM_SETFONT, (WPARAM)hfont, false);
+
       // Show the dialog
       SetForegroundWindow(hwnd);
       _this->m_dlgvisible = TRUE;
@@ -77,6 +83,9 @@ BOOL CALLBACK upsStatus::DialogProc(
          // Close the dialog
          EndDialog(hwnd, TRUE);
          _this->m_dlgvisible = FALSE;
+         return TRUE;
+      case ID_REFRESH:
+         _this->FillStatusBox(hwnd, IDC_LIST);
          return TRUE;
       }
       break;
@@ -94,11 +103,16 @@ void upsStatus::FillStatusBox(HWND hwnd, int id_list)
 {
    const char* error = "Status not available.";
 
+   // Clear listbox
+   SendDlgItemMessage(hwnd, IDC_LIST, LB_RESETCONTENT, 0, 0);
+
+   // Update cached copy of UPS status
    if (!m_statmgr->Update()) {
       SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0, (LONG)error);
       return;
    }
 
+   // Fetch all status items
    char *status = m_statmgr->GetAll();
    if (!status || *status == '\0') {
       SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0, (LONG)error);
