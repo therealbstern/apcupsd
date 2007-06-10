@@ -17,6 +17,7 @@
 #include "winabout.h"
 #include "winstat.h"
 #include "winevents.h"
+#include <string>
 
 // Forward declarations
 class StatMgr;
@@ -41,7 +42,7 @@ protected:
       HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
 
    // Fetch UPS status info
-   void FetchStatus(int &battstat, char *statstr, int len);
+   void FetchStatus(int &battstat, std::string &statstr, std::string &upsname);
 
    // Thread to poll for UPS status changes
    static DWORD WINAPI StatusPollThread(LPVOID param);
@@ -55,6 +56,7 @@ protected:
    HANDLE                  m_thread;         // Handle to status polling thread
    HANDLE                  m_wait;           // Handle to wait mutex
    bool                    m_notify;         // Receive local notifications?
+   std::string             m_upsname;        // Cache UPS name
 
    // Dialogs for About, Status, and Events
    upsAbout                m_about;

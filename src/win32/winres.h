@@ -36,6 +36,7 @@
 #define ID_CLOSEINST                    40010
 #define ID_NAME                         40011
 #define ID_NOTIFY                       40012
+#define ID_REFRESH                      40013
 
 #define IDD_PROPERTIES                  200
 #define IDD_ABOUT                       201
