@@ -14,6 +14,17 @@ consumption rates. Apcupsd is licensed under the GPL version 2.
 <p>
 
 <h2>Recent Apcupsd Releases</h2>
+<h3><i><u>Development:</u></i>&nbsp;3.14.2-win32beta1 (10 June 2007) [
+<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=73154&release_id=514981">Download</a>
+]</h3>
+This development release is for win32 only. It has new tray icon features 
+including Vista compatibility, monitoring of remote apcupsd instances, and
+multiple instance support (one icon for each apcupsd being monitored). See the
+<a href="http://sourceforge.net/project/shownotes.php?release_id=514981&group_id=54413">
+ReleaseNotes</a> for details.
+<p>
+Please report bugs or comments to the <a href="http://www.apcupsd.com/lists.html">
+apcupsd-users</a> mailing list.
 <h3><i><u>Stable:</u></i>&nbsp;3.14.1 (26 May 2007) [
 <a href="http://sourceforge.net/project/showfiles.php?group_id=54413">Download</a>
 ]</h3>
