@@ -16,19 +16,17 @@
 #include "wintray.h"
 #include "statmgr.h"
 
-// Remove apctray from registry autorun list
-// Defined in apctray.cpp
-extern int Remove();
-
 // Implementation
-upsMenu::upsMenu(HINSTANCE appinst, char* host, unsigned long port, int refresh)
+upsMenu::upsMenu(HINSTANCE appinst, char* host, unsigned long port, int refresh, bool notify)
    : m_statmgr(new StatMgr(host, port)),
      m_about(appinst),
      m_status(appinst, m_statmgr),
      m_events(appinst, m_statmgr),
      m_interval(refresh),
      m_wait(NULL),
-     m_thread(NULL)
+     m_thread(NULL),
+     m_hmenu(NULL),
+     m_notify(notify)
 {
    // Create a dummy window to handle tray icon messages
    WNDCLASSEX wndclass;
@@ -46,8 +44,17 @@ upsMenu::upsMenu(HINSTANCE appinst, char* host, unsigned long port, int refresh)
    wndclass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
    RegisterClassEx(&wndclass);
 
+   // If we're set to receive local apcupsd notifications, set window
+   // title to APCTRAY_WINDOW_NAME (used by popup.exe). Otherwise make 
+   // a unique window title as 'host:port'.
+   char title[1024];
+   if (notify)
+      asnprintf(title, sizeof(title), "%s", APCTRAY_WINDOW_NAME);
+   else
+      asnprintf(title, sizeof(title), "%s:%d", host, port);
+
    // Create System Tray menu window
-   m_hwnd = CreateWindow(APCTRAY_WINDOW_CLASS, "FIXME", WS_OVERLAPPEDWINDOW,
+   m_hwnd = CreateWindow(APCTRAY_WINDOW_CLASS, title, WS_OVERLAPPEDWINDOW,
                          CW_USEDEFAULT, CW_USEDEFAULT, 200, 200, NULL, NULL,
                          appinst, NULL);
    if (m_hwnd == NULL) {
@@ -74,6 +81,11 @@ upsMenu::upsMenu(HINSTANCE appinst, char* host, unsigned long port, int refresh)
       return;
    }
 
+   // Install the tray icon. Although it's tempting to let this happen
+   // on the poll thread, we do it here so its synchronous and all icons
+   // are consistently created in the same order.
+   AddTrayIcon();
+
    // Create a locked mutex to use for interruptible waiting
    m_wait = CreateMutex(NULL, true, NULL);
    if (m_wait == NULL) {
@@ -92,7 +104,6 @@ upsMenu::~upsMenu()
 {
    // Kill status polling thread
    if (m_thread) {
-      ReleaseMutex(m_wait);
       if (WaitForSingleObject(m_thread, 5000) == WAIT_TIMEOUT)
          TerminateThread(m_thread, 0);
    }
@@ -103,6 +114,12 @@ upsMenu::~upsMenu()
    // Destroy the loaded menu
    if (m_hmenu != NULL)
       DestroyMenu(m_hmenu);
+}
+
+void upsMenu::Destroy()
+{
+   if (m_wait)
+      ReleaseMutex(m_wait);
 }
 
 void upsMenu::AddTrayIcon()
@@ -127,15 +144,15 @@ void upsMenu::SendTrayMsg(DWORD msg)
    m_nid.cbSize = sizeof(m_nid);
    m_nid.uID = IDI_APCUPSD;        // never changes after construction
 
-   int battstat;
-   char statstr[128];
+   int battstat = -1;
+   char statstr[128] = "";
 
    // Get current status
-   if (msg == NIM_ADD) {
-      // Default to COMMLOST for initial add
-      battstat = -1;
-      asnprintf(statstr, sizeof(statstr), "COMMLOST");
-   } else {
+   switch (msg) {
+   case NIM_ADD:
+   case NIM_DELETE:
+      break;
+   default:
       // Fetch current UPS status
       FetchStatus(battstat, statstr, sizeof(statstr));
    }
@@ -237,6 +254,12 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
          // User wants to remove all apctray instances from registry
          PostMessage(hwnd, WM_REMOVEALL, 0, 0);
          return 0;
+
+      case ID_NOTIFY:
+         _this->m_notify = !_this->m_notify;
+         SetWindowText(hwnd, _this->m_notify ? APCTRAY_WINDOW_NAME : "Foo");
+         PostMessage(hwnd, WM_BNOTIFY, (WPARAM)_this->m_notify, (LPARAM)_this);
+         return 0;
       }
       return 0;
 
@@ -252,6 +275,14 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
          // Make the Status menu item the default (bold font)
          SetMenuDefaultItem(submenu, ID_STATUS, false);
+
+         // Set notify checkmark
+         MENUITEMINFO mii;
+         memset(&mii, 0, sizeof(mii));
+         mii.cbSize = sizeof(mii);
+         mii.fMask = MIIM_STATE;
+         mii.fState = _this->m_notify ? MFS_CHECKED : MFS_UNCHECKED;
+         SetMenuItemInfo(submenu, ID_NOTIFY, false, &mii);
 
          // Get the current cursor position, to display the menu at
          POINT mouse;
@@ -368,9 +399,6 @@ DWORD WINAPI upsMenu::StatusPollThread(LPVOID param)
 {
    upsMenu* _this = (upsMenu*)param;
    DWORD status;
-
-   // Install the tray icon
-   _this->AddTrayIcon();
 
    while (1) {
       // Update the tray icon
