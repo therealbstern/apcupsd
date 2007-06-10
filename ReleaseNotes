@@ -9,6 +9,54 @@ IF YOU USE THE OLD STYLE MASTER/SLAVE NETWORKING MODE, BE SURE TO READ THE
 RELEASE NOTES BELOW.
 
 
+3.14.2-win32beta1 -- 10 June 2007    (Maintenance Release)
+
+NEW FEATURES
+
+  * Tray icon support on Vista. Vista does not allow background services
+    to interact with the user's desktop, so winapcupsd's built-in tray
+    icon did not work.
+
+  * Tray icon is now a standalone application which is capable of
+    monitoring multiple Apcupsd instances via Apcupsd's NIS. Any Apcupsd
+    running NIS can be monitored. By default the icon monitors a single
+    apcupsd at 127.0.0.1:3551. See command line options below for adding
+    additional monitors.
+
+  * Tray icon can be installed individually (disable other packages in the
+    installer) for users who want to use the icon only.
+
+  * The win32 portions of winapcupsd have been almost entirely rewritten. 
+    The code is cleaner (mostly) and lots of unused baggage has been removed.
+
+  * Apctray command line options:
+
+       apctray.exe
+          - No parameters: Start any instances listed in registry. If no
+          instances in reg, start a default instance monitoring the local
+          machine (127.0.0.1:3551).
+
+       apctray.exe /host foo /port 3551 /add
+          - Add a monitor for the given host and port. You must restart
+          apctray for the change to take effect.
+
+       apctray.exe /host foo /port 3551 /del
+          - Remove the given monitor. You must restart Apctray for the
+          change to take effect.
+
+       apctray.exe /del
+          - Remove all monitors.
+
+       apctray.exe /install
+          - Configure apctray to start automatically.
+
+       apctray.exe /remove
+          - Do not start automatically.
+
+       apctray.exe /kill
+          - Shut down apctray
+
+
 3.14.1 -- 04 May 2007           (Maintenance Release)
 
 NEW FEATURES
