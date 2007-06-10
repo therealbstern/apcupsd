@@ -8,6 +8,388 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2007-06-10 09:34  adk0212
+
+	* src/win32/apctray.cpp:
+
+	Misc updates and small bug fixes.
+
+2007-06-10 09:33  adk0212
+
+	* src/win32/installer/: Apctray.ini, winapcupsd.nsi:
+
+	Updates for multi-instance apctray. Remove apctray parameter
+	customization option for now.
+
+2007-06-09 21:34  adk0212
+
+	* src/win32/: winres.h, winres.rc, winstat.cpp, wintray.cpp,
+	wintray.h:
+
+	More multiple instance improvements. Also add refresh button to
+	detailed status dialog.
+
+2007-06-09 20:02  adk0212
+
+	* src/win32/: apctray.cpp, winres.h, winres.rc, wintray.cpp,
+	wintray.h, winups.h:
+
+	More changes for better multiple monitor support.
+
+2007-06-09 15:47  adk0212
+
+	* src/win32/: apctray.cpp, statmgr.cpp, winres.h, winres.rc,
+	wintray.cpp, wintray.h, winups.h:
+
+	Major rework to support monitoring multiple apcupsds with a single
+	apctray instantiation. Includes basic management of monitoring
+	instances. More fancy stuff to come.
+
+2007-06-07 19:43  adk0212
+
+	* src/win32/: apctray.cpp, wintray.cpp, wintray.h,
+	installer/common.nsh:
+
+	Updates for running multiple apctray instances simultaneously and
+	properly shutting them down.
+
+2007-06-06 22:11  adk0212
+
+	* src/win32/wintray.cpp:
+
+	Fix timeout bug.
+
+2007-06-06 22:06  adk0212
+
+	* src/win32/: wintray.cpp, wintray.h:
+
+	Shutdown status polling thread cleanly.
+
+2007-06-06 22:05  adk0212
+
+	* src/win32/: statmgr.cpp, statmgr.h:
+
+	Grab lock during destruction to prevent further operations.  Also
+	add copyright blocks.
+
+2007-06-06 21:26  adk0212
+
+	* src/win32/: statmgr.cpp, statmgr.h:
+
+	Reuse sockets in StatMgr. This prevents build-up of large numbers
+	of sockets in the TIME_WAIT state. Also implement proper locking.
+
+2007-06-06 19:53  adk0212
+
+	* src/lib/apcstatus.c:
+
+	Kill FillEventsBox function and associated grunge that is no longer
+	used.
+
+2007-06-06 19:49  adk0212
+
+	* src/win32/apcupsd.rc:
+
+	Remove unused file.
+
+2007-06-06 19:48  adk0212
+
+	* src/win32/: apcupsd/StdAfx.cpp, apcupsd/StdAfx.h,
+	apcupsd/apcupsd-obj.mak.in, apcupsd/apcupsd.dep,
+	apcupsd/apcupsd.dsp, apcupsd/apcupsd.dsw, apcupsd/apcupsd.mak,
+	apcupsd/apcupsd.mak.in, apcupsd/filelist, apcupsd/genmake.sh,
+	lib/action.cpp, lib/apcconfig.cpp, lib/apcerror.cpp,
+	lib/apcevents.cpp, lib/apcexec.cpp, lib/apcfile.cpp,
+	lib/apclibnis.cpp, lib/apclist.cpp, lib/apclock.cpp,
+	lib/apclog.cpp, lib/apcnis.cpp, lib/apcsignal.cpp,
+	lib/apcstatus.cpp, lib/apcupsd.cpp, lib/asys.cpp, lib/device.cpp,
+	lib/drivers.cpp, lib/newups.cpp, lib/options.cpp, lib/reports.cpp,
+	lib/smart.cpp, lib/smarteeprom.cpp, lib/smartoper.cpp,
+	lib/smartsetup.cpp, lib/smartsetup2.cpp, lib/testdriver.cpp:
+
+	Remove unused files.
+
+2007-06-06 19:44  adk0212
+
+	* src/win32/Makefile.in:
+
+	Build object files in obj/ to reduce source dir clutter.
+
+2007-06-06 18:53  adk0212
+
+	* src/win32/: Apctray.ini, EditApcupsdConf.ini, InstallService.ini,
+	Makefile.in, common.nsh, params.nsh, util.nsh, winapcupsd.nsi,
+	installer/Apctray.ini, installer/EditApcupsdConf.ini,
+	installer/InstallService.ini, installer/common.nsh,
+	installer/params.nsh, installer/util.nsh, installer/winapcupsd.nsi:
+
+	Move installer files to installer/ directory. There are enough of
+	them now that we should stop cluttering the main win32 source dir.
+
+2007-06-06 18:29  adk0212
+
+	* src/win32/winapcupsd.nsi:
+
+	Add back in the finish page with ReleaseNotes and apcupsd.org link.
+
+2007-06-06 18:28  adk0212
+
+	* src/win32/common.nsh:
+
+	Increase sleep time to 2 seconds. 1 second was borderline.
+
+2007-06-05 20:42  adk0212
+
+	* src/win32/: common.nsh, winapcupsd.nsi:
+
+	More start/stop rework. Add new common.nsh file to be shared
+	between normal and uninstall context.
+
+2007-06-05 20:41  adk0212
+
+	* src/win32/: apctray.cpp, wintray.cpp:
+
+	Fix refresh again. Pretty soon I am going to run out of ways to
+	screw this up.
+
+2007-06-05 18:43  adk0212
+
+	* src/win32/: Apctray.ini, InstallService.ini, winapcupsd.nsi:
+
+	Many more installer updates. Move static text to page .ini files.
+	Add code to handle polite start/stop of apcupsd and apctray.
+
+2007-06-05 18:39  adk0212
+
+	* src/win32/winservice.h:
+
+	Maintain a registry flag to indicate if apcupsd is installed as a
+	service.  This used to be done by the installer, but would get out
+	of sync if the user ran 'apcupsd /install' by hand.
+
+2007-06-05 18:34  adk0212
+
+	* src/win32/winservice.cpp:
+
+	Maintain a registry flag to indicate if apcupsd is installed as a
+	service.  This used to be done by the installer, but would get out
+	of sync if the user ran 'apcupsd /install' by hand.
+
+2007-06-05 18:33  adk0212
+
+	* src/win32/apctray.cpp:
+
+	When installing, only add command line parameters if they were
+	supplied by the user. Do not add them when using default settings.
+	Also fix bug where default refresh was 1000 seconds (should be 1
+	second).
+
+2007-06-03 22:38  adk0212
+
+	* src/win32/: Apctray.ini, winapcupsd.nsi:
+
+	Add custom page for installing Apctray and configuring its
+	parameters.
+
+2007-06-03 13:05  adk0212
+
+	* src/win32/: InstallService.ini, winapcupsd.nsi:
+
+	Add custom page for installing apcupsd as a service and optionally
+	starting it instead of using popup dialogs during file install.
+
+2007-06-03 13:04  adk0212
+
+	* src/win32/EditApcupsdConf.ini:
+
+	Add definition for edit apcupsd.conf custom page.
+
+2007-06-03 12:38  adk0212
+
+	* src/win32/winservice.cpp:
+
+	Suppress service-already-exists errors when in quiet mode.
+
+2007-06-03 12:31  adk0212
+
+	* src/win32/: compat/compat.cpp, compat/compat.h, apctray.cpp,
+	winmain.cpp, winservice.cpp, winservice.h:
+
+	Move GetArg() to common library and use it from winmain and
+	apctray.  Add /quiet switch to winmain to suppress /install and
+	/remove dialogs.
+
+2007-06-03 11:35  adk0212
+
+	* src/win32/winapcupsd.nsi:
+
+	Add custom installer page for editing apcupsd.conf instead of using
+	a popup during file installation.
+
+2007-06-02 23:48  adk0212
+
+	* src/win32/build-win32-cross-tools:
+
+	Update NSIS to 2.27 for better x64 compatibility.
+
+2007-06-02 23:48  adk0212
+
+	* src/win32/winapcupsd.nsi:
+
+	Updates for apctray. Create -Startup and -Finish hidden sections
+	for common operations.
+
+2007-06-02 23:45  adk0212
+
+	* src/win32/statmgr.cpp:
+
+	Tweak spacing in GetAll() to match apcaccess format for longer
+	keys.
+
+2007-06-02 23:24  adk0212
+
+	* src/win32/apctray.cpp:
+
+	Add /kill command line option for shutting down apctray instance.
+
+2007-06-02 19:07  adk0212
+
+	* src/win32/popup.c:
+
+	Update window name used by popup.exe so it finds apctray now.
+
+2007-06-02 18:57  adk0212
+
+	* src/win32/: statmgr.cpp, wintray.cpp:
+
+	Rework sprintf_realloc_append() to account for the fact that on
+	Win98 vsnprintf() returns -1 if the string will not fit rather than
+	the number of characters required. Argh. Also remove unnecessary
+	UpdateTrayIcon() calls from wintray.c.
+
+2007-06-02 18:22  adk0212
+
+	* src/win32/: apctray.cpp, winres.h, winres.rc, wintray.cpp:
+
+	Add menu option to remove apctray from registry. All well-behaved
+	tray applets should have this!
+
+2007-06-02 18:04  adk0212
+
+	* src/win32/apctray.cpp:
+
+	Add command line options to install and remove apctray from autorun
+	list in the registry.
+
+2007-06-02 17:34  adk0212
+
+	* src/win32/apctray.cpp:
+
+	Add support for setting host, port, and refresh interval via
+	command line.
+
+2007-06-02 16:28  adk0212
+
+	* src/win32/winres.rc:
+
+	Update about box.
+
+2007-06-02 15:22  adk0212
+
+	* src/win32/: apctray.cpp, statmgr.cpp, wintray.cpp, wintray.h:
+
+	Move status polling to a thread instead of a timer so we don't
+	block the message loop while updating status. This fixes the
+	annoying pauses in GUI response. More misc cleanups and small bug
+	fixes.
+
+2007-06-02 13:46  adk0212
+
+	* src/win32/: apctray.cpp, statmgr.cpp, winevents.cpp, winstat.cpp,
+	wintray.cpp, wintray.h:
+
+	Misc fixes. apctray is working now.
+
+2007-06-02 13:23  adk0212
+
+	* src/win32/: Makefile.in, apctray.cpp, statmgr.cpp, statmgr.h,
+	winevents.cpp, winevents.h, winstat.cpp, winstat.h, wintray.cpp,
+	wintray.h:
+
+	More refactoring. Add StatMgr class to handle fetching stats from
+	the UPS using NIS. Kill global variables and move global stats and
+	events code to their proper classes.
+
+2007-06-02 11:12  adk0212
+
+	* src/win32/: Makefile.in, apctray.cpp, wintray.cpp, wintray.h:
+
+	Move modified tray menu code back to wintray.cpp. Misc cleanups to
+	wintray.
+
+2007-06-01 20:12  adk0212
+
+	* src/win32/: apctray.cpp, winabout.cpp, winabout.h, winevents.cpp,
+	winevents.h, winstat.cpp, winstat.h, wintray.h, winups.h:
+
+	Cleanup of winabout, winevents, and winstat. Everthing compiles
+	again.
+
+2007-05-31 20:11  adk0212
+
+	* src/win32/: Makefile.in, apctray.cpp, winmain.cpp,
+	winservice.cpp, winservice.h, winups.h, compat/compat.h:
+
+	First step of major win32 service and tray icon code
+	refactor/rewrite.  This is part of the changes necessary for tray
+	icon support on Vista.	Clean up winservice and winmain. Eliminate
+	lots of unused code.  Simplify code where possible. Remove tray
+	icon code from apcupsd itself.	Add apctray.cpp for standalone tray
+	icon module designed to gather status via NIS.
+
+2007-05-31 20:11  adk0212
+
+	* src/win32/build-win32-cross-tools:
+
+	Remove OpenGL and DirectX libraries, as they are not needed for
+	Apcupsd.
+
+2007-05-28 07:03  fleetworks
+
+	* platforms/: mandrake/apcupsd.spec.in, suse/apcupsd.spec.in:
+
+	RHEL5 update.
+
+2007-05-27 13:20  adk0212
+
+	* platforms/contrib-rpm/build_rpm.sh:
+
+	Add rhel5 to contrib-rpm.
+
+2007-05-27 13:17  adk0212
+
+	* platforms/redhat/apcupsd.spec.in:
+
+	Fix changelog copy-n-paste error.
+
+2007-05-27 13:15  adk0212
+
+	* platforms/redhat/apcupsd.spec.in:
+
+	Add rhel5 support in spec.
+
+2007-05-26 15:07  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Update website for 3.14.1 release.
+
+2007-05-04 19:18  adk0212
+
+	* ChangeLog:
+
+	Update ChangeLog.
+
 2007-05-04 19:17  adk0212
 
 	* ReleaseNotes, include/version.h:
