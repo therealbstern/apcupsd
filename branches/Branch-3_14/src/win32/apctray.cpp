@@ -596,6 +596,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       }
    }
 
+   // Check to see if we're already running
+   HANDLE sem = CreateSemaphore(NULL, 0, 1, "Global\\apctray");
+   if (sem == NULL || GetLastError() == ERROR_ALREADY_EXISTS) {
+      MessageBox(NULL, "Apctray is already running", "Apctray Error", MB_OK);
+      WSACleanup();
+      return 0;
+   }
+
    if (!host && !port) {
       // No command line instance options were given: Launch
       // all instances specified in the registry
