@@ -112,22 +112,15 @@ void upsStatus::FillStatusBox(HWND hwnd, int id_list)
       return;
    }
 
-   // Fetch all status items
-   char *status = m_statmgr->GetAll();
-   if (!status || *status == '\0') {
+   // Fetch status from apcupsd
+   std::vector<std::string> status;
+   if (!m_statmgr->GetAll(status) || status.empty()) {
       SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0, (LONG)error);
       return;
    }
 
-   // GetAll returns newline-separated strings. We need to send separate
-   // LB_ADDSTRING messages for each string.
-   char *tmp;
-   char *str = status;
-   while ((tmp = strchr(str, '\n'))) {
-      *tmp = '\0';
-      SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0, (LONG)str);
-      str = tmp + 1;
-   }
-
-   free(status);
+   // Add each status line to the listbox
+   for (int i = 0; i < status.size(); i++)
+      SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0,
+                         (LONG)status[i].c_str());
 }

@@ -16,10 +16,9 @@
  * MA 02111-1307, USA.
  */
 
-#include "statmgr.h"
 #include "apc.h"
+#include "statmgr.h"
 #include <stdarg.h>
-
 
 StatMgr::StatMgr(char *host, unsigned short port)
    : m_host(strdup(host)),
@@ -108,54 +107,53 @@ char* StatMgr::Get(const char* key)
    return ret;
 }
 
-char* StatMgr::GetAll()
+bool StatMgr::GetAll(std::vector<std::string> &status)
 {
-   char *result = NULL;
+   status.clear();
 
    lock();
    for (int idx=0; idx < MAX_STATS && m_stats[idx].key; idx++) {
-      result = sprintf_realloc_append(result, "%-9s: %s\n",
-                  m_stats[idx].key, m_stats[idx].value);
+      char buffer[1024];
+      asnprintf(buffer, sizeof(buffer), "%-9s: %s",
+                m_stats[idx].key, m_stats[idx].value);
+      status.push_back(buffer);
    }
    unlock();
 
-   return result;
+   return true;
 }
 
-char* StatMgr::GetEvents()
+bool StatMgr::GetEvents(std::vector<std::string> &events)
 {
    lock();
 
    if (m_socket == -1 && !open()) {
       unlock();
-      return NULL;
+      return false;
    }
 
    if (net_send(m_socket, "events", 6) != 6) {
       close();
       unlock();
-      return NULL;
+      return false;
    }
 
-   char *result = NULL;
-   int len;
-   char temp[1024];
+   events.clear();
 
+   char temp[1024];
+   int len;
    while ((len = net_recv(m_socket, temp, sizeof(temp)-1)) > 0)
    {
       temp[len] = '\0';
       rtrim(temp);
-      result = sprintf_realloc_append(result, "%s\n", temp);
+      events.push_back(temp);
    }
 
-   if (len == -1) {
+   if (len == -1)
       close();
-      free(result);
-      result = NULL;
-   }
 
    unlock();
-   return result;
+   return true;
 }
 
 char *StatMgr::ltrim(char *str)
@@ -179,27 +177,6 @@ char *StatMgr::trim(char *str)
    str = ltrim(str);
    rtrim(str);
    return str;
-}
-
-char *StatMgr::sprintf_realloc_append(char *str, const char *format, ...)
-{
-   va_list args;
-   char tmp[1024];
-
-   va_start(args, format);
-   int rc = avsnprintf(tmp, sizeof(tmp), format, args);
-   va_end(args);
-
-   // Win98 vsnprintf fails with -1 if buffer is not large enough.
-   if (rc < 0)
-      return str;
-
-   int appendlen = strlen(tmp);
-   int oldlen = str ? strlen(str) : 0;
-   char *result = (char*)realloc(str, oldlen + appendlen + 1);
-
-   memcpy(result + oldlen, tmp, appendlen+1);
-   return result;
 }
 
 void StatMgr::lock()
