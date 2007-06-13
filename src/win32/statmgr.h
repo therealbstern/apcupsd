@@ -20,6 +20,8 @@
 #define STATMGR_H
 
 #include "windows.h"
+#include <vector>
+#include <string>
 
 #define MAX_STATS 256
 #define MAX_DATA  100
@@ -34,8 +36,8 @@ public:
 
    bool Update();
    char* Get(const char* key);
-   char* GetAll();
-   char* GetEvents();
+   bool GetAll(std::vector<std::string> &events);
+   bool GetEvents(std::vector<std::string> &events);
 
 private:
 
@@ -48,8 +50,6 @@ private:
 
    void lock();
    void unlock();
-
-   char *sprintf_realloc_append(char *str, const char *format, ...);
 
    struct keyval {
       const char *key;

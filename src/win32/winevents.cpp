@@ -104,21 +104,15 @@ void upsEvents::FillEventsBox(HWND hwnd, int id_list)
    // Clear listbox
    SendDlgItemMessage(hwnd, IDC_LIST, LB_RESETCONTENT, 0, 0);
 
-   char *events = m_statmgr->GetEvents();
-   if (!events || *events == '\0') {
+   // Fetch events from apcupsd
+   std::vector<std::string> events;
+   if (!m_statmgr->GetEvents(events) || events.empty()) {
       SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0, (LONG)error);
       return;
    }
 
-   // GetAll returns newline-separated strings. We need to send separate
-   // LB_ADDSTRING messages for each string.
-   char *tmp;
-   char *str = events;
-   while ((tmp = strchr(str, '\n'))) {
-      *tmp = '\0';
-      SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0, (LONG)str);
-      str = tmp + 1;
-   }
-
-   free(events);
+   // Add each event to the listbox
+   for (int i = 0; i < events.size(); i++)
+      SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0,
+                         (LONG)events[i].c_str());
 }
