@@ -112,7 +112,9 @@ void upsEvents::FillEventsBox(HWND hwnd, int id_list)
    }
 
    // Add each event to the listbox
-   for (int i = 0; i < events.size(); i++)
+   std::vector<std::string>::reverse_iterator iter;
+   for (iter = events.rbegin(); iter != events.rend(); iter++) {
       SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0,
-                         (LONG)events[i].c_str());
+                         (LONG)(*iter).c_str());
+   }
 }
