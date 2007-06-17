@@ -1,3 +1,21 @@
+/*
+ * Copyright (C) 2007 Adam Kropelin
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of version 2 of the GNU General
+ * Public License as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the Free
+ * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+ * MA 02111-1307, USA.
+ */
+
 #include "winapi.h"
 #include <unistd.h>
 #include <windows.h>
@@ -11,6 +29,7 @@
 #include "winres.h"
 #include "winups.h"
 #include "statmgr.h"
+#include "balloonmgr.h"
 
 #include <vector>
 #include <string>
@@ -24,12 +43,10 @@
 #define CMDOPT_QUIET    "/quiet"
 #define CMDOPT_ADD      "/add"
 #define CMDOPT_DEL      "/del"
-#define CMDOPT_NOTIFY   "/notify"
 
 #define USAGE_TEXT   "[" CMDOPT_HOST    " <hostname>] " \
                      "[" CMDOPT_PORT    " <port>] "     \
                      "[" CMDOPT_REFRESH " <sec>] "      \
-                     "[" CMDOPT_NOTIFY  "] "            \
                      "[" CMDOPT_INSTALL "] "            \
                      "[" CMDOPT_REMOVE  "] "            \
                      "[" CMDOPT_KILL    "] "            \
@@ -48,22 +65,21 @@ class TrayInstance; // Forward decl
 HINSTANCE appinst;                       // Application handle
 std::vector<TrayInstance*> instances;    // List of icon/menu instances
 bool quiet = false;                      // Suppress user dialogs
+BalloonMgr *balmgr;                      // Manager for balloon tips
 
 class TrayInstance
 {
 public:
-   TrayInstance(const char *host, unsigned short port, int refresh, int notify)
+   TrayInstance(const char *host, unsigned short port, int refresh)
       : m_host(strdup(host)),
         m_port(port),
         m_refresh(refresh),
-        m_notify(notify),
         m_menu(NULL)
    {
       // Insert defaults where needed
       m_host = host ? strdup(host) : strdup(DEFAULT_HOST);
       m_port = (port > 0) ? port : DEFAULT_PORT;
       m_refresh = (refresh > 0) ? refresh : DEFAULT_REFRESH;
-      m_notify = (notify >= 0) ? notify : DEFAULT_NOTIFY;
    }
 
    TrayInstance(HKEY instkey)
@@ -73,13 +89,11 @@ public:
       m_host = RegQueryString(instkey, "host");
       m_port = RegQueryDWORD(instkey, "port");
       m_refresh = RegQueryDWORD(instkey, "refresh");
-      m_notify = RegQueryDWORD(instkey, "notify");
 
       // Insert defaults where needed
       if (!m_host) m_host = strdup(DEFAULT_HOST);
       if (m_port < 1) m_port = DEFAULT_PORT;
       if (m_refresh < 1) m_refresh = DEFAULT_REFRESH;
-      if (m_notify < 0) m_notify = DEFAULT_NOTIFY;
    }
 
    ~TrayInstance() {
@@ -87,8 +101,8 @@ public:
       free(m_host);
    }
 
-   void Create() {
-      m_menu = new upsMenu(appinst, m_host, m_port, m_refresh, m_notify);
+   void Create(BalloonMgr *balmgr) {
+      m_menu = new upsMenu(appinst, m_host, m_port, m_refresh, balmgr);
    }
 
    void Destroy() {
@@ -115,12 +129,6 @@ public:
       return instkey;
    }
 
-   // Set current notify state
-   void SetNotify(bool notify) {
-      m_notify = notify;
-      Write();
-   }
-
    // Write settings back to registry
    void Write() {
       HKEY instkey = FindOrCreateInstanceKey();
@@ -128,7 +136,6 @@ public:
          RegSetString(instkey, "host", m_host);
          RegSetDWORD(instkey, "port", m_port);
          RegSetDWORD(instkey, "refresh", m_refresh);
-         RegSetDWORD(instkey, "notify", m_notify);
          RegCloseKey(instkey);
       }
    }
@@ -137,7 +144,6 @@ public:
    char *m_host;
    unsigned short m_port;
    int m_refresh;
-   bool m_notify;
 
    // Icon/Menu for this instance
    upsMenu *m_menu;
@@ -342,9 +348,9 @@ int Install()
               "automatically run when users log on.");
 }
 
-int AddInstance(char *host, unsigned short port, int refresh, int notify)
+int AddInstance(char *host, unsigned short port, int refresh)
 {
-   TrayInstance inst(host, port, refresh, notify);
+   TrayInstance inst(host, port, refresh);
    inst.Write();
 
    NotifyUser("The instance (%s:%d) was successfully created.",
@@ -419,7 +425,7 @@ int DelInstance(char *host, unsigned short port)
       NotifyUser("All instances were successfully deleted.");
    } else {
       // Deleting a single instance: We can use TrayInstance
-      TrayInstance inst(host, port, 0, -1);
+      TrayInstance inst(host, port, 0);
       inst.DeleteInstanceKey();
 
       NotifyUser("The specified instance (%s:%d) was successfully deleted.",
@@ -446,12 +452,12 @@ void Usage(const char *text1, const char* text2)
               MB_OK | MB_ICONINFORMATION);
 }
 
-void AllocateInstance(char *host, unsigned short port, int refresh, int notify)
+void AllocateInstance(char *host, unsigned short port, int refresh)
 {
-   TrayInstance *inst = new TrayInstance(host, port, refresh, notify);
+   TrayInstance *inst = new TrayInstance(host, port, refresh);
    if (inst) {
       instances.push_back(inst);
-      inst->Create();
+      inst->Create(balmgr);
    }
 }
 
@@ -460,7 +466,7 @@ void AllocateInstance(HKEY instkey)
    TrayInstance *inst = new TrayInstance(instkey);
    if (inst) {
       instances.push_back(inst);
-      inst->Create();
+      inst->Create(balmgr);
    }
 }
 
@@ -530,13 +536,6 @@ void RemoveInstance(upsMenu *menu)
    }
 }
 
-void SetNotify(upsMenu *menu, bool notify)
-{
-   TrayInstance *inst = FindInstance(menu);
-   if (inst)
-      inst->SetNotify(notify);
-}
-
 // WinMain parses the command line and either calls the main App
 // routine or, under NT, the main service routine.
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
@@ -552,7 +551,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    char *host = NULL;
    unsigned short port = 0;
    int refresh = 0;
-   int notify = -1;
 
    // Check command line options
    char *arg;
@@ -576,14 +574,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             return 1;
          }
          refresh = strtoul(arg, NULL, 0);
-      } else if (strcasecmp(arg, CMDOPT_NOTIFY) == 0) {
-         notify = true;
       } else if (strcasecmp(arg, CMDOPT_INSTALL) == 0) {
          return Install();
       } else if (strcasecmp(arg, CMDOPT_REMOVE) == 0) {
          return Remove();
       } else if (strcasecmp(arg, CMDOPT_ADD) == 0) {
-         return AddInstance(host, port, refresh, notify);
+         return AddInstance(host, port, refresh);
       } else if (strcasecmp(arg, CMDOPT_DEL) == 0) {
          return DelInstance(host, port);
       } else if (strcasecmp(arg, CMDOPT_KILL) == 0) {
@@ -604,6 +600,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       return 0;
    }
 
+   // Create a balloon manager to handle balloon tip notifications
+   balmgr = new BalloonMgr();
+
    if (!host && !port) {
       // No command line instance options were given: Launch
       // all instances specified in the registry
@@ -612,14 +611,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       // If no instances were created from the registry,
       // allocate a default one and write it to the registry.
       if (instances.empty()) {
-         AllocateInstance(DEFAULT_HOST, DEFAULT_PORT, refresh, true);
+         AllocateInstance(DEFAULT_HOST, DEFAULT_PORT, refresh);
          instances.back()->Write();
       }
    } else {
       // One or more command line options were given, so launch a single
       // instance using the specified parameters, filling in any missing
       // ones with defaults
-      AllocateInstance(host, port, refresh, notify);
+      AllocateInstance(host, port, refresh);
    }
 
    // Enter the Windows message handling loop until told to quit
@@ -648,11 +647,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
             PostQuitMessage(0);
          break;
 
-      case WM_BNOTIFY:
-         // Record notify state in registry
-         SetNotify((upsMenu*)msg.lParam, msg.wParam);
-         break;
-
       default:
          DispatchMessage(&msg);
       }
@@ -673,6 +667,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       instances.pop_back();
    }
 
+   delete balmgr;
    WSACleanup();
    return 0;
 }

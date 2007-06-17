@@ -21,12 +21,14 @@
 
 // Forward declarations
 class StatMgr;
+class BalloonMgr;
 
 // The tray menu class itself
 class upsMenu
 {
 public:
-   upsMenu(HINSTANCE appinst, char *host, unsigned long port, int refresh, bool notify);
+   upsMenu(HINSTANCE appinst, char *host, unsigned long port,
+           int refresh, BalloonMgr *balmgr);
    ~upsMenu();
    void Destroy();
 
@@ -42,21 +44,21 @@ protected:
       HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
 
    // Fetch UPS status info
-   void FetchStatus(int &battstat, std::string &statstr, std::string &upsname);
+   bool FetchStatus(int &battstat, std::string &statstr, std::string &upsname);
 
    // Thread to poll for UPS status changes
    static DWORD WINAPI StatusPollThread(LPVOID param);
 
    HWND                    m_hwnd;           // Window handle
    HMENU                   m_hmenu;          // Menu handle
-   NOTIFYICONDATA          m_nid;            // Notify data for icon
    UINT                    m_balloon_timer;  // Timer for balloon tips
    StatMgr                *m_statmgr;        // Manager for UPS stats
    int                     m_interval;       // How often to poll for status
    HANDLE                  m_thread;         // Handle to status polling thread
    HANDLE                  m_wait;           // Handle to wait mutex
-   bool                    m_notify;         // Receive local notifications?
    std::string             m_upsname;        // Cache UPS name
+   std::string             m_laststatus;     // Cache previous status string
+   BalloonMgr             *m_balmgr;         // Balloon tip manager
 
    // Dialogs for About, Status, and Events
    upsAbout                m_about;

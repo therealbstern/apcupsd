@@ -33,8 +33,6 @@ BEGIN
         MENUITEM "&Properties",                 ID_PROPERTIES
 #endif
         MENUITEM SEPARATOR
-        MENUITEM "Receive Local Notifications", ID_NOTIFY, CHECKED 
-        MENUITEM SEPARATOR
         MENUITEM "&About",                      ID_ABOUT
         MENUITEM SEPARATOR
         MENUITEM "Remove This Instance",        ID_REMOVE
