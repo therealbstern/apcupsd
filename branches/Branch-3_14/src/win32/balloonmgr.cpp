@@ -38,9 +38,11 @@ BalloonMgr::BalloonMgr()
 
 BalloonMgr::~BalloonMgr()
 {
+   // Request thread exit
    m_exit = true;
    signal();
 
+   // Wait for thread exit and force if necessary
    if (m_thread) {
       if (WaitForSingleObject(m_thread, 5000) == WAIT_TIMEOUT)
          TerminateThread(m_thread, 0);
@@ -81,7 +83,7 @@ void BalloonMgr::signal()
 void BalloonMgr::post()
 {
    // Post balloon tip
-   Balloon &balloon = m_pending[0];
+   Balloon &balloon = m_pending.front();
    NOTIFYICONDATA nid;
    nid.hWnd = balloon.hwnd;
    nid.cbSize = sizeof(nid);
@@ -107,11 +109,11 @@ void BalloonMgr::post()
 
 void BalloonMgr::clear()
 {
-   if (m_pending.size() == 0)
+   if (m_pending.empty())
       return;  // No active balloon!?
 
    // Clear active balloon
-   Balloon &balloon = m_pending[0];
+   Balloon &balloon = m_pending.front();
    NOTIFYICONDATA nid;
    nid.hWnd = balloon.hwnd;
    nid.cbSize = sizeof(nid);
@@ -133,10 +135,12 @@ DWORD WINAPI BalloonMgr::Thread(LPVOID param)
    HANDLE handles[] = {_this->m_event, _this->m_timer};
    LARGE_INTEGER timeout;
    struct timeval now;
+   DWORD index;
+   long diff;
 
    while (1) {
       // Wait for timeout or new balloon request
-      DWORD index = WaitForMultipleObjects(
+      index = WaitForMultipleObjects(
          ARRAY_SIZE(handles), handles, false, INFINITE);
 
       // Exit if we've been asked to do so
@@ -152,32 +156,36 @@ DWORD WINAPI BalloonMgr::Thread(LPVOID param)
          // New balloon request has arrived...
 
          if (!_this->m_active) {
-            // No balloon active: Post new balloon
-            if (_this->m_pending.size() > 0) {
+            // No balloon active: Post new balloon immediately
+            if (!_this->m_pending.empty()) {
                _this->post();
                _this->m_active = true;
             }
          } else {
-            // Balloon is active: Shorten timer to minimum
+            // A balloon is active: Shorten timer to minimum
             CancelWaitableTimer(_this->m_timer);
             gettimeofday(&now, NULL);
-            long diff = TV_DIFF_MS(_this->m_time, now);
-            if (diff >= MIN_TIMEOUT)
-               timeout.QuadPart = -1;  // min timeout already expired
-            else
+            diff = TV_DIFF_MS(_this->m_time, now);
+            if (diff >= MIN_TIMEOUT) {
+               // Min timeout already expired
+               timeout.QuadPart = -1;
+            } else {
+               // Wait enough additional time to meet minimum timeout
                timeout.QuadPart = -((MIN_TIMEOUT - diff) * 10000);
+            }
             SetWaitableTimer(_this->m_timer, &timeout, 0, NULL, NULL, false);
          }
       } else {
-         // Timeout: Clear active balloon
+         // Timeout ocurred: Clear active balloon
          _this->clear();
 
          // Post next balloon if there is one
-         if (_this->m_pending.size() > 0) {
+         if (!_this->m_pending.empty()) {
             _this->post();
             _this->m_active = true;
-         } else
+         } else {
             _this->m_active = false;
+         }
       }
 
       _this->unlock();
