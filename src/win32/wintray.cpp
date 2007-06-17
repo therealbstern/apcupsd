@@ -158,8 +158,7 @@ void upsMenu::SendTrayMsg(DWORD msg)
       break; 
    default:
       // Fetch current UPS status
-      if (!FetchStatus(battstat, statstr, m_upsname))
-         return; // Exit quickly if status is not available
+      FetchStatus(battstat, statstr, m_upsname);
       break;
    }
 
