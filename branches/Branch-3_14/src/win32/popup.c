@@ -51,21 +51,22 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       szCmdLine[len-1] = 0;
    }
 
-   // Assume we're doing a balloon tip
-   int balloon = 1;
+   // Assume we're not doing a popup
+   int dopopup = 0;
 
    // Locate Apcupsd tray icon window.
-   // If we can't find it, we can't do a balloon tip
+   // If we can't find it, we will do a popup
    HWND tray = FindWindowEx(
-      NULL, NULL, APCTRAY_WINDOW_CLASS, APCTRAY_WINDOW_NAME);
+      NULL, NULL, APCTRAY_WINDOW_CLASS, NULL);
    if (!tray)
-      balloon = 0;
+      dopopup = 1;
 
    // Only Win2k and higher can use balloon notification
+   // On other systems, we do a popup.
    OSVERSIONINFO vers;
    vers.dwOSVersionInfoSize = sizeof(vers);
    if (GetVersionEx(&vers) == 0 || vers.dwMajorVersion < 5)
-      balloon = 0;
+      dopopup = 1;
 
    // Finally, check for a group policy on balloon tips
    HKEY hkey;
@@ -80,8 +81,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    if (result == ERROR_SUCCESS) {
       result = RegQueryValueEx(
          hkey, BALLOON_ENABLE_REG_KEY, NULL, &type, (BYTE*)&val, &size);
-      if (result == ERROR_SUCCESS)
-         balloon = val;
+      if (result == ERROR_SUCCESS && !val)
+         dopopup = 1;
       RegCloseKey(hkey);
    }
 
@@ -93,34 +94,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    if (result == ERROR_SUCCESS) {
       result = RegQueryValueEx(
          hkey, BALLOON_ENABLE_REG_KEY, NULL, &type, (BYTE*)&val, &size);
-      if (result == ERROR_SUCCESS)
-         balloon = val;
+      if (result == ERROR_SUCCESS && !val)
+         dopopup = 1;
       RegCloseKey(hkey);
    }
 
    // Now display the popup
-   if (balloon) {
-      NOTIFYICONDATA nid;
-
-      // Create the tray icon message
-      nid.hWnd = tray;
-      nid.cbSize = sizeof(nid);
-      nid.uID = IDI_APCUPSD;
-
-      // Setup balloon tip with detailed status info
-      snprintf(nid.szInfo, sizeof(nid.szInfo), "%s", msg);
-      snprintf(nid.szInfoTitle, sizeof(nid.szInfoTitle), "%s", "Apcupsd Notice");
-      nid.uFlags = NIF_INFO;
-      nid.uTimeout = 10000;
-      nid.dwInfoFlags = NIIF_INFO;
-
-      // Send the message
-      Shell_NotifyIcon(NIM_MODIFY, &nid);
-
-      // Notify apcupsd tray that a balloon was shown and
-      // ask for a 10000 msec timeout;
-      SendNotifyMessage(tray, WM_BALLOONSHOW, 10000, 0);
-   } else {
+   if (dopopup) {
       MessageBox(NULL, msg, "Apcupsd message", MB_OK);
    }
 
