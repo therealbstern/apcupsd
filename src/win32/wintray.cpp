@@ -176,7 +176,11 @@ void upsMenu::SendTrayMsg(DWORD msg)
 
    // Use status as normal tooltip
    nid.uFlags |= NIF_TIP;
-   asnprintf(nid.szTip, sizeof(nid.szTip), "%s", statstr.c_str());
+   if (!m_upsname.compare("UPS_IDEN") || !m_upsname.compare("<unknown>"))
+      asnprintf(nid.szTip, sizeof(nid.szTip), "%s", statstr.c_str());
+   else
+      asnprintf(nid.szTip, sizeof(nid.szTip), "%s: %s",
+                m_upsname.c_str(), statstr.c_str());
 
    // Display event in balloon tip
    if (!m_laststatus.empty() && m_laststatus.compare(statstr))
@@ -300,7 +304,7 @@ bool upsMenu::FetchStatus(int &battstat, std::string &statstr, std::string &upsn
    // Fetch data from the UPS
    if (!m_statmgr->Update()) {
       battstat = -1;
-      statstr = "COMMLOST";
+      statstr = "NETWORK ERROR";
       return false;
    }
 
@@ -308,7 +312,7 @@ bool upsMenu::FetchStatus(int &battstat, std::string &statstr, std::string &upsn
    char *statflag = m_statmgr->Get("STATFLAG");
    if (!statflag || *statflag == '\0') {
       battstat = -1;
-      statstr = "COMMLOST";
+      statstr = "ERROR";
       free(statflag);
       return false;
    }
@@ -364,6 +368,14 @@ bool upsMenu::FetchStatus(int &battstat, std::string &statstr, std::string &upsn
    // This overrides the above
    if (status & UPS_shutdown)
       statstr = "SHUTTING DOWN";
+
+   // This overrides the above
+   if (status & UPS_onbatt) {
+      char *reason = m_statmgr->Get("LASTXFER");
+      if (reason && strstr(reason, "self test"))
+         statstr = "SELFTEST";
+      free(reason);
+   }
 
    // Remove trailing space, if present
    statstr.resize(statstr.find_last_not_of(" ") + 1);
