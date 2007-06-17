@@ -147,13 +147,10 @@ DWORD WINAPI BalloonMgr::Thread(LPVOID param)
       if (_this->m_exit)
          break;
 
-      // Figure out which object was signalled
-      index -= WAIT_OBJECT_0;
-
-      _this->lock();
-
-      if (index == 0) {
-         // New balloon request has arrived...
+      switch (index) {
+      // New balloon request has arrived
+      case WAIT_OBJECT_0 + 0:
+         _this->lock();
 
          if (!_this->m_active) {
             // No balloon active: Post new balloon immediately
@@ -175,8 +172,15 @@ DWORD WINAPI BalloonMgr::Thread(LPVOID param)
             }
             SetWaitableTimer(_this->m_timer, &timeout, 0, NULL, NULL, false);
          }
-      } else {
-         // Timeout ocurred: Clear active balloon
+
+         _this->unlock();
+         break;
+
+      // Timeout ocurred
+      case WAIT_OBJECT_0 + 1:
+         _this->lock();
+
+         // Clear active balloon
          _this->clear();
 
          // Post next balloon if there is one
@@ -186,8 +190,15 @@ DWORD WINAPI BalloonMgr::Thread(LPVOID param)
          } else {
             _this->m_active = false;
          }
-      }
 
-      _this->unlock();
+         _this->unlock();
+         break;
+
+      default:
+         // Should never happen...but if it does, sleep a bit to prevent
+         // spinning.
+         Sleep(1000);
+         break;
+      }
    }
 }
