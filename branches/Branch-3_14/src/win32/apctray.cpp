@@ -593,7 +593,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    }
 
    // Check to see if we're already running
-   HANDLE sem = CreateSemaphore(NULL, 0, 1, "Global\\apctray");
+   HANDLE sem = CreateSemaphore(NULL, 0, 1, "apctray");
    if (sem == NULL || GetLastError() == ERROR_ALREADY_EXISTS) {
       NotifyUser("Apctray is already running");
       WSACleanup();
