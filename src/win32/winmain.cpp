@@ -173,7 +173,7 @@ int ApcupsdAppMain(int service)
    SetProcessShutdownParameters(0x100, 0);
 
    // Check to see if we're already running
-   HANDLE sem = CreateSemaphore(NULL, 0, 1, "Global\\apcupsd");
+   HANDLE sem = CreateSemaphore(NULL, 0, 1, "apcupsd");
    if (sem == NULL || GetLastError() == ERROR_ALREADY_EXISTS) {
       MessageBox(NULL, "Another instance of Apcupsd is already running", 
                  "Apcupsd Error", MB_OK);
