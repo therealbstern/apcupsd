@@ -29,6 +29,7 @@
  *    l   BattLow toggle
  *    x   Selftest toggle
  *    r   ReplaceBatt toggle
+ *    d   BattDetach toggle
  *    7/4 BattPct (inc/dec)   (use numeric keypad)
  *    8/5 LoadPct (inc/dec)   (use numeric keypad)
  *    9/6 TimeLeft (inc/dec)  (use numeric keypad)
@@ -71,6 +72,7 @@
 #define DEFAULT_BATTV      24.0
 #define DEFAULT_LINEV      120.0
 #define DEFAULT_OUTV       120.0
+#define DEFAULT_REG2       0x00
 
 int debug = 1;
 int ups = -1;
@@ -83,6 +85,7 @@ float timeleft = DEfAULT_TIMELEFT;
 float battv = DEFAULT_BATTV;
 float linev = DEFAULT_LINEV;
 float outv = DEFAULT_OUTV;
+unsigned char reg2 = DEFAULT_REG2;
 char xfercause[] = "O";
 char selftest[] = "OK";
 int onbatt = 0;
@@ -109,6 +112,7 @@ static void rsp_string(void* arg);
 static void rsp_float(void* arg);
 static void rsp_cmds(void* arg);
 static void rsp_status(void* arg);
+static void rsp_hex(void *arg);
 
 /* Mapping of UPS commands to response callbacks */
 struct upscmd
@@ -132,6 +136,7 @@ struct upscmd
    { 'B',    rsp_float,  &battv },
    { 'L',    rsp_float,  &linev },
    { 'O',    rsp_float,  &outv },
+   { '\'',   rsp_hex,    &reg2 },
    { '\0',   NULL,       NULL }
 };
 
@@ -145,6 +150,7 @@ static void key_inc(void* arg);
 static void key_dec(void* arg);
 static void key_selftest(void* arg);
 static void key_rebatt(void* arg);
+static void key_batdet(void *arg);
 
 /* Mapping of keyboard commands to callbacks */
 struct keycmd
@@ -167,6 +173,7 @@ struct keycmd
    { '6',  key_dec,       &timeleft },
    { 'x',  key_selftest,  NULL },
    { 'r',  key_rebatt,    NULL },
+   { 'd',  key_batdet,    NULL },
    { '\0', NULL,          NULL }
 };
 
@@ -192,6 +199,14 @@ void rsp_float(void* arg)
    char buf[20];
    
    sprintf(buf, "%03.3f\r\n", *(float*)arg);
+   wups(buf, strlen(buf));
+}
+
+void rsp_hex(void* arg)
+{
+   char buf[20];
+   
+   sprintf(buf, "%02x\r\n", *(unsigned char*)arg);
    wups(buf, strlen(buf));
 }
 
@@ -308,6 +323,14 @@ static void key_rebatt(void* arg)
    {
       rebatt = 0;
    }
+}
+
+static void key_batdet(void *arg)
+{
+   if (reg2 & 0x20)
+      reg2 &= ~0x20;
+   else
+      reg2 |= 0x20;
 }
 
 void handle_ups_cmd(char cmd)
