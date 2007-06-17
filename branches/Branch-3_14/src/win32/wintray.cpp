@@ -180,10 +180,9 @@ void upsMenu::SendTrayMsg(DWORD msg)
    asnprintf(nid.szTip, sizeof(nid.szTip), "%s", statstr.c_str());
 
    // Display event in balloon tip
-   if (m_laststatus.compare(statstr)) {
-      m_laststatus = statstr;
+   if (!m_laststatus.empty() && m_laststatus.compare(statstr))
       m_balmgr->PostBalloon(m_hwnd, m_upsname.c_str(), statstr.c_str());
-   }
+   m_laststatus = statstr;
 
    // Send the message
    if (!Shell_NotifyIcon(msg, &nid) && msg == NIM_ADD) {
