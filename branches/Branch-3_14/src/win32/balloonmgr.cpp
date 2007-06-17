@@ -82,6 +82,9 @@ void BalloonMgr::signal()
 
 void BalloonMgr::post()
 {
+   if (m_pending.empty())
+      return;  // No active balloon!?
+
    // Post balloon tip
    Balloon &balloon = m_pending.front();
    NOTIFYICONDATA nid;
