@@ -420,7 +420,8 @@ OBJS_APT = \
    $(OBJDIR)/apcerror.o \
    $(OBJDIR)/wintray.o \
    $(OBJDIR)/winres.res \
-   $(OBJDIR)/statmgr.o
+   $(OBJDIR)/statmgr.o \
+   $(OBJDIR)/balloonmgr.o
 
 $(OBJDIR)/winabout.o:  winabout.cpp
 	$(CXX) -c $< -o $@
@@ -438,6 +439,9 @@ $(OBJDIR)/wintray.o:	  wintray.cpp
 	$(CXX) -c $< -o $@
 
 $(OBJDIR)/statmgr.o:	  statmgr.cpp
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/balloonmgr.o:	balloonmgr.cpp
 	$(CXX) -c $< -o $@
 
 $(OBJDIR)/winres.res:  winres.rc
