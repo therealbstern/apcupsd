@@ -41,7 +41,6 @@ UPSCOMMANDS ups_event[] = {
    {"timeout",       0},           /* CMDTIMEOUT */
    {"loadlimit",     0},           /* CMDLOADLIMIT */
    {"runlimit",      0},           /* CMDRUNLIMIT */
-   {"doreboot",      0},           /* CMDDOREBOOT */
    {"doshutdown",    0},           /* CMDDOSHUTDOWN */
    {"mainsback",     0},           /* CMDMAINSBACK */
    {"annoyme",       0},           /* CMDANNOYME */
@@ -68,7 +67,6 @@ UPSCMDMSG event_msg[] = {
    {LOG_ALERT,   N_("Reached run time limit on batteries.")},
    {LOG_ALERT,   N_("Battery charge below low limit.")},
    {LOG_ALERT,   N_("Reached remaining time percentage limit on batteries.")},
-   {LOG_ALERT,   N_("Failed to kill the power! Attempting a REBOOT!")},
    {LOG_ALERT,   N_("Initiating system shutdown!")},
    {LOG_ALERT,   N_("Power is back. UPS running on mains.")},
    {LOG_ALERT,   N_("Users requested to logoff.")},
@@ -110,11 +108,6 @@ void generate_event(UPSINFO *ups, int event)
       log_event(ups, event_msg[CMDDOSHUTDOWN].level,
          _(event_msg[CMDDOSHUTDOWN].msg));
       do_shutdown(ups, CMDDOSHUTDOWN);
-      break;
-
-   case CMDDOREBOOT:
-      /* This should be deprecated. */
-      do_shutdown(ups, event);
       break;
 
       /* For the following, everything is already done. */
