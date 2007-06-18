@@ -27,7 +27,7 @@ class BalloonMgr;
 class upsMenu
 {
 public:
-   upsMenu(HINSTANCE appinst, char *host, unsigned long port,
+   upsMenu(HINSTANCE appinst, const char *host, unsigned long port,
            int refresh, BalloonMgr *balmgr);
    ~upsMenu();
    void Destroy();

@@ -19,10 +19,6 @@
 #include "winapi.h"
 #include <unistd.h>
 #include <windows.h>
-#include <lmcons.h>
-#include <ctype.h>
-#include <signal.h>
-#include <errno.h>
 
 #include "apc.h"
 #include "wintray.h"
@@ -57,97 +53,16 @@
 #define DEFAULT_HOST    "127.0.0.1"
 #define DEFAULT_PORT    3551
 #define DEFAULT_REFRESH 1
-#define DEFAULT_NOTIFY  0
 
+// Forward declarations
+class TrayInstance;
 
-class TrayInstance; // Forward decl
+// Global variables
+static HINSTANCE appinst;                       // Application handle
+static std::vector<TrayInstance*> instances;    // List of icon/menu instances
+static bool quiet = false;                      // Suppress user dialogs
+static BalloonMgr *balmgr;                      // Manager for balloon tips
 
-HINSTANCE appinst;                       // Application handle
-std::vector<TrayInstance*> instances;    // List of icon/menu instances
-bool quiet = false;                      // Suppress user dialogs
-BalloonMgr *balmgr;                      // Manager for balloon tips
-
-class TrayInstance
-{
-public:
-   TrayInstance(const char *host, unsigned short port, int refresh)
-      : m_host(strdup(host)),
-        m_port(port),
-        m_refresh(refresh),
-        m_menu(NULL)
-   {
-      // Insert defaults where needed
-      m_host = host ? strdup(host) : strdup(DEFAULT_HOST);
-      m_port = (port > 0) ? port : DEFAULT_PORT;
-      m_refresh = (refresh > 0) ? refresh : DEFAULT_REFRESH;
-   }
-
-   TrayInstance(HKEY instkey)
-      : m_menu(NULL)
-   {
-      // Read values from registry
-      m_host = RegQueryString(instkey, "host");
-      m_port = RegQueryDWORD(instkey, "port");
-      m_refresh = RegQueryDWORD(instkey, "refresh");
-
-      // Insert defaults where needed
-      if (!m_host) m_host = strdup(DEFAULT_HOST);
-      if (m_port < 1) m_port = DEFAULT_PORT;
-      if (m_refresh < 1) m_refresh = DEFAULT_REFRESH;
-   }
-
-   ~TrayInstance() {
-      delete m_menu;
-      free(m_host);
-   }
-
-   void Create(BalloonMgr *balmgr) {
-      m_menu = new upsMenu(appinst, m_host, m_port, m_refresh, balmgr);
-   }
-
-   void Destroy() {
-      if (m_menu)
-         m_menu->Destroy();
-   }
-
-   // Registry helpers
-   HKEY FindInstanceKey(std::string &instname);
-   HKEY CreateInstanceKey();
-   void DeleteInstanceKey();
-   DWORD RegQueryDWORD(HKEY instkey, const char *name);
-   char *RegQueryString(HKEY instance, const char *name);
-   void RegSetDWORD(HKEY instance, char *name, DWORD value);
-   void RegSetString(HKEY instance, char *name, char *value);
-
-   HKEY FindOrCreateInstanceKey() {
-      std::string instname;
-      HKEY instkey = FindInstanceKey(instname);
-
-      if (!instkey)
-         instkey = CreateInstanceKey();
-
-      return instkey;
-   }
-
-   // Write settings back to registry
-   void Write() {
-      HKEY instkey = FindOrCreateInstanceKey();
-      if (instkey) {
-         RegSetString(instkey, "host", m_host);
-         RegSetDWORD(instkey, "port", m_port);
-         RegSetDWORD(instkey, "refresh", m_refresh);
-         RegCloseKey(instkey);
-      }
-   }
-
-   // Instance data, cached from registry
-   char *m_host;
-   unsigned short m_port;
-   int m_refresh;
-
-   // Icon/Menu for this instance
-   upsMenu *m_menu;
-};
 
 void NotifyError(const char *format, ...)
 {
@@ -175,6 +90,100 @@ void NotifyUser(const char *format, ...)
    }
 }
 
+class TrayInstance
+{
+public:
+   TrayInstance(const char *host, unsigned short port, int refresh);
+   TrayInstance(HKEY instkey);
+   ~TrayInstance();
+
+   void Create(BalloonMgr *balmgr);
+   void Destroy();
+
+   // Registry helpers
+   HKEY FindInstanceKey(std::string &instname);
+   HKEY CreateInstanceKey();
+   HKEY FindOrCreateInstanceKey();
+   void DeleteInstanceKey();
+   DWORD RegQueryDWORD(HKEY instkey, const char *name);
+   std::string RegQueryString(HKEY instance, const char *name);
+   void RegSetDWORD(HKEY instance, const char *name, DWORD value);
+   void RegSetString(HKEY instance, const char *name, const char *value);
+
+   // Write settings back to registry
+   void Write();
+
+   // Instance data, cached from registry
+   std::string m_host;
+   unsigned short m_port;
+   int m_refresh;
+
+   // Icon/Menu for this instance
+   upsMenu *m_menu;
+};
+
+TrayInstance::TrayInstance(const char *host, unsigned short port, int refresh)
+   : m_menu(NULL)
+{
+   // Insert defaults where needed
+   m_host = host ? host : DEFAULT_HOST;
+   m_port = (port > 0) ? port : DEFAULT_PORT;
+   m_refresh = (refresh > 0) ? refresh : DEFAULT_REFRESH;
+}
+
+TrayInstance::TrayInstance(HKEY instkey)
+   : m_menu(NULL)
+{
+   // Read values from registry
+   m_host = RegQueryString(instkey, "host");
+   m_port = RegQueryDWORD(instkey, "port");
+   m_refresh = RegQueryDWORD(instkey, "refresh");
+
+   // Insert defaults where needed
+   if (m_host.empty()) m_host = DEFAULT_HOST;
+   if (m_port < 1) m_port = DEFAULT_PORT;
+   if (m_refresh < 1) m_refresh = DEFAULT_REFRESH;
+}
+
+TrayInstance::~TrayInstance()
+{
+   delete m_menu;
+}
+
+void TrayInstance::Create(BalloonMgr *balmgr)
+{
+   m_menu = new upsMenu(appinst, m_host.c_str(), m_port, m_refresh, balmgr);
+}
+
+void TrayInstance::Destroy()
+{
+   if (m_menu)
+      m_menu->Destroy();
+}
+
+HKEY TrayInstance::FindOrCreateInstanceKey()
+{
+   std::string instname;
+   HKEY instkey = FindInstanceKey(instname);
+
+   if (!instkey)
+      instkey = CreateInstanceKey();
+
+   return instkey;
+}
+
+// Write settings back to registry
+void TrayInstance::Write()
+{
+   HKEY instkey = FindOrCreateInstanceKey();
+   if (instkey) {
+      RegSetString(instkey, "host", m_host.c_str());
+      RegSetDWORD(instkey, "port", m_port);
+      RegSetDWORD(instkey, "refresh", m_refresh);
+      RegCloseKey(instkey);
+   }
+}
+
 DWORD TrayInstance::RegQueryDWORD(HKEY instance, const char *name)
 {
    DWORD result;
@@ -189,37 +198,26 @@ DWORD TrayInstance::RegQueryDWORD(HKEY instance, const char *name)
    return result;
 }
 
-char *TrayInstance::RegQueryString(HKEY instance, const char *name)
+std::string TrayInstance::RegQueryString(HKEY instance, const char *name)
 {
-   // Determine string length
-   DWORD len = 0;
-   BYTE dummy;
-   if (RegQueryValueEx(instance, name, NULL, NULL, &dummy, &len)
-         != ERROR_MORE_DATA) {
-      return NULL;
-   }
-
-   // Allocate storage for string
-   char *data = (char*)malloc(len);
-   if (!data)
-      return NULL;
+   char data[512]; // Arbitrary max
+   DWORD len = sizeof(data);
+   std::string result;
 
    // Retrieve string
    if (RegQueryValueEx(instance, name, NULL, NULL, (BYTE*)data, &len)
-         != ERROR_SUCCESS) {
-      free(data);
-      return NULL;
-   }
+         == ERROR_SUCCESS)
+      result = data;
 
-   return data;
+   return result;
 }
 
-void TrayInstance::RegSetDWORD(HKEY instance, char *name, DWORD value)
+void TrayInstance::RegSetDWORD(HKEY instance, const char *name, DWORD value)
 {
    RegSetValueEx(instance, name, 0, REG_DWORD, (BYTE*)&value, sizeof(value));
 }
 
-void TrayInstance::RegSetString(HKEY instance, char *name, char *value)
+void TrayInstance::RegSetString(HKEY instance, const char *name, const char *value)
 {
    RegSetValueEx(instance, name, 0, REG_SZ, (BYTE*)value, strlen(value)+1);
 }
@@ -246,14 +244,13 @@ HKEY TrayInstance::FindInstanceKey(std::string &instname)
       if (len && strncasecmp(name, "instance", 8) == 0 &&
           RegOpenKeyEx(apctray, name, 0, KEY_READ|KEY_WRITE, &instance)
              == ERROR_SUCCESS) {
-         char *testhost = RegQueryString(instance, "host");
+         std::string testhost = RegQueryString(instance, "host");
          unsigned short testport = RegQueryDWORD(instance, "port");
-         if (testhost && strcmp(testhost, m_host) == 0 && testport == m_port) {
+         if (testhost.compare(m_host) == 0 && testport == m_port) {
             RegCloseKey(apctray);
             instname = name;
             return instance;
          }
-         free(testhost);
          RegCloseKey(instance);
       }
 
@@ -354,7 +351,7 @@ int AddInstance(char *host, unsigned short port, int refresh)
    inst.Write();
 
    NotifyUser("The instance (%s:%d) was successfully created.",
-      inst.m_host, inst.m_port);
+      inst.m_host.c_str(), inst.m_port);
 
    return 0;
 }
@@ -394,7 +391,7 @@ int Remove()
    return 0;
 }
 
-int DelInstance(char *host, unsigned short port)
+int DelInstance(const char *host, unsigned short port)
 {
    // If no host or port was specified, remove all instances
    if (!host && !port) {
@@ -531,7 +528,7 @@ void RemoveInstance(upsMenu *menu)
 {
    TrayInstance *inst = FindInstance(menu);
    if (inst) {
-      DelInstance(inst->m_host, inst->m_port);
+      DelInstance(inst->m_host.c_str(), inst->m_port);
       CloseInstance(menu);
    }
 }
