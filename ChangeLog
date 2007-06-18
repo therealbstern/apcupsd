@@ -8,6 +8,159 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2007-06-17 20:19  adk0212
+
+	* src/win32/: statmgr.cpp, statmgr.h, wintray.cpp:
+
+	Change StatMgr::Get() to return a managed string.
+
+2007-06-17 20:14  adk0212
+
+	* src/win32/: apctray.cpp, statmgr.cpp, statmgr.h, wintray.cpp,
+	wintray.h:
+
+	Clean up apctray needless inlining and memory management.
+
+2007-06-17 19:49  adk0212
+
+	* src/win32/balloonmgr.cpp:
+
+	Cleanup.
+
+2007-06-17 19:47  adk0212
+
+	* src/win32/balloonmgr.cpp:
+
+	Gracefully handle unexpected return values from
+	WaitForMultipleObjects().
+
+2007-06-17 16:07  adk0212
+
+	* src/win32/popup.c:
+
+	Remove balloon notice support from popup utility. Furthermore, only
+	display popup if we're on an ancient OS, apctray is not running, or
+	balloon tips are disabled via a group policy. This way win98 and NT
+	users will still get notifications of events, as will users not
+	running apctray.
+
+2007-06-17 15:54  adk0212
+
+	* src/win32/wintray.cpp:
+
+	Misc improvements: Detect self-test and set status string
+	accordingly.  Include UPS name in tool tip, when we know it. Change
+	status string for NIS connection errors to distinguish that state
+	from COMMLOST.
+
+2007-06-17 15:19  adk0212
+
+	* src/win32/: apctray.cpp, winmain.cpp:
+
+	Windows NT doesn't like the "Global\\" prefix on semaphore names.
+
+2007-06-17 13:19  adk0212
+
+	* src/win32/wintray.cpp:
+
+	Fix bug where COMMLOST status transition was not reflected by icon.
+
+2007-06-17 13:15  adk0212
+
+	* src/win32/wintray.cpp:
+
+	Suppress initial status balloon.
+
+2007-06-17 13:12  adk0212
+
+	* src/win32/balloonmgr.cpp:
+
+	Misc cleanup.
+
+2007-06-17 12:14  adk0212
+
+	* src/win32/: Makefile.in, apctray.cpp, balloonmgr.cpp,
+	balloonmgr.h, winres.rc, wintray.cpp, wintray.h:
+
+	Completely rewrite balloon tip handling. Balloon tips are posted
+	automatically when the status text changes. This eliminates the
+	need for the clunky "Receive local notifications" setting and
+	allows us to post balloons for state changes on remote Apcupsd
+	instances. Introduce the BalloonMgr to work around Windows
+	one-balloon-at-a-time limitation. When monitoring multiple Apcupsd
+	instances it will be common to need to post multiple balloon tips
+	at once. The BalloonMgr handles posting the tips one at a time and
+	timing the active balloon out early if new ones are waiting. This
+	way all balloons will be shown, one after another.
+
+2007-06-17 09:42  adk0212
+
+	* examples/smartsim.c:
+
+	Add support for simulating battery attach/detach.
+
+2007-06-17 08:54  adk0212
+
+	* src/win32/email.c:
+
+	Fix indentation.
+
+2007-06-13 20:07  adk0212
+
+	* src/win32/winevents.cpp:
+
+	Reverse order of events in listbox so most recent is always at the
+	top.
+
+2007-06-13 18:35  adk0212
+
+	* src/win32/apctray.cpp:
+
+	Use NotifyUser when notifying about multiple instances so it obeys
+	the /quiet flag.
+
+2007-06-13 18:34  adk0212
+
+	* src/win32/apctray.cpp:
+
+	Prevent multiple instances of Apctray.
+
+2007-06-13 18:29  adk0212
+
+	* src/win32/: statmgr.cpp, statmgr.h, winstat.cpp, winevents.cpp:
+
+	Use some STL to simplify GetAll() and GetEvents() calls.
+
+2007-06-10 16:05  adk0212
+
+	* src/win32/winstat.cpp:
+
+	Fix indentation.
+
+2007-06-10 16:05  adk0212
+
+	* src/win32/winres.rc:
+
+	Add refresh button to events box.
+
+2007-06-10 16:04  adk0212
+
+	* src/win32/winevents.cpp:
+
+	Add refresh button list stats now has.
+
+2007-06-10 14:03  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Update web site for 3.14.2-beta1 release.
+
+2007-06-10 10:13  adk0212
+
+	* ChangeLog, ReleaseNotes, include/version.h:
+
+	Final updates for apcupsd-3.14.2-win32beta1 release.
+
 2007-06-10 09:34  adk0212
 
 	* src/win32/apctray.cpp:
