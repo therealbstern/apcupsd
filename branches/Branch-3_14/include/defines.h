@@ -334,27 +334,27 @@
  * You _must_ keep the #defines in sync with the commands[] array in
  * action.c
  */
-#define CMDPOWEROUT      0
-#define CMDONBATTERY     1
-#define CMDFAILING       2
-#define CMDTIMEOUT       3
-#define CMDLOADLIMIT     4
-#define CMDRUNLIMIT      5
-#define CMDDOREBOOT      6
-#define CMDDOSHUTDOWN    7
-#define CMDMAINSBACK     8
-#define CMDANNOYME       9
-#define CMDEMERGENCY     10
-#define CMDCHANGEME      11
-#define CMDREMOTEDOWN    12
-#define CMDCOMMFAILURE   13
-#define CMDCOMMOK        14
-#define CMDSTARTSELFTEST 15
-#define CMDENDSELFTEST   16
-#define CMDOFFBATTERY    17        /* off battery power */
-#define CMDBATTDETACH    18        /* Battery disconnected */
-#define CMDBATTATTACH    19        /* Battery reconnected */
-
+enum {
+   CMDPOWEROUT = 0,
+   CMDONBATTERY,
+   CMDFAILING,
+   CMDTIMEOUT,
+   CMDLOADLIMIT,
+   CMDRUNLIMIT,
+   CMDDOSHUTDOWN,
+   CMDMAINSBACK,
+   CMDANNOYME,
+   CMDEMERGENCY,
+   CMDCHANGEME,
+   CMDREMOTEDOWN,
+   CMDCOMMFAILURE,
+   CMDCOMMOK,
+   CMDSTARTSELFTEST,
+   CMDENDSELFTEST,
+   CMDOFFBATTERY,        /* off battery power */
+   CMDBATTDETACH,        /* Battery disconnected */
+   CMDBATTATTACH         /* Battery reconnected */
+};
 
 /*
  * Simple way of handling varargs for those compilers that
