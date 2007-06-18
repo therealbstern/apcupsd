@@ -9,6 +9,24 @@ IF YOU USE THE OLD STYLE MASTER/SLAVE NETWORKING MODE, BE SURE TO READ THE
 RELEASE NOTES BELOW.
 
 
+3.14.2-win32beta2 -- 18 June 2007    (Maintenance Release)
+
+  * More apctray icon improvements and bug fixes
+
+      - Redesign balloon notification infrastructure so notifications
+      are shown for status changes on any apcupsd, not just a local one.
+
+      - Handle multiple simultaneous balloons sanely even though windows
+      allows only one at a time. (Balloons are queued and displayed in
+      order.)
+
+      - Eliminate clumsy "Receive local notifications" setting since 
+      notifications are now posted for any apcupsd.
+
+      - Add refresh button to events dialog and order events in reverse
+      chronological order (most recent at the top).
+
+
 3.14.2-win32beta1 -- 10 June 2007    (Maintenance Release)
 
 NEW FEATURES
