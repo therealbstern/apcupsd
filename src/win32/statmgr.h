@@ -35,7 +35,7 @@ public:
    ~StatMgr();
 
    bool Update();
-   char* Get(const char* key);
+   std::string Get(const char* key);
    bool GetAll(std::vector<std::string> &events);
    bool GetEvents(std::vector<std::string> &events);
 

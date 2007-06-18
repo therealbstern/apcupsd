@@ -89,15 +89,15 @@ bool StatMgr::Update()
    return true;
 }
 
-char* StatMgr::Get(const char* key)
+std::string StatMgr::Get(const char* key)
 {
-   char *ret = NULL;
+   std::string ret;
 
    lock();
    for (int idx=0; idx < MAX_STATS && m_stats[idx].key; idx++) {
       if (strcmp(key, m_stats[idx].key) == 0) {
          if (m_stats[idx].value)
-            ret = strdup(m_stats[idx].value);
+            ret = m_stats[idx].value;
          break;
       }
    }
