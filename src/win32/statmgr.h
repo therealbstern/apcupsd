@@ -31,7 +31,7 @@ class StatMgr
 {
 public:
 
-   StatMgr(char *host, unsigned short port);
+   StatMgr(const char *host, unsigned short port);
    ~StatMgr();
 
    bool Update();
@@ -58,7 +58,7 @@ private:
    };
 
    keyval          m_stats[MAX_STATS];
-   char           *m_host;
+   const char     *m_host;
    unsigned short  m_port;
    int             m_socket;
    HANDLE          m_mutex;

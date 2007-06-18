@@ -21,7 +21,8 @@
 #define BALLOON_TIMEOUT 10000
 
 // Implementation
-upsMenu::upsMenu(HINSTANCE appinst, char* host, unsigned long port, int refresh, BalloonMgr *balmgr)
+upsMenu::upsMenu(HINSTANCE appinst, const char* host, unsigned long port,
+                 int refresh, BalloonMgr *balmgr)
    : m_statmgr(new StatMgr(host, port)),
      m_about(appinst),
      m_status(appinst, m_statmgr),
