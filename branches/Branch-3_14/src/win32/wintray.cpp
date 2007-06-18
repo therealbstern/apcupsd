@@ -310,34 +310,29 @@ bool upsMenu::FetchStatus(int &battstat, std::string &statstr, std::string &upsn
    }
 
    // Lookup the STATFLAG key
-   char *statflag = m_statmgr->Get("STATFLAG");
-   if (!statflag || *statflag == '\0') {
+   std::string statflag = m_statmgr->Get("STATFLAG");
+   if (statflag.empty()) {
       battstat = -1;
       statstr = "ERROR";
-      free(statflag);
       return false;
    }
-   unsigned long status = strtoul(statflag, NULL, 0);
+   unsigned long status = strtoul(statflag.c_str(), NULL, 0);
 
    // Lookup BCHARGE key
-   char *bcharge = m_statmgr->Get("BCHARGE");
+   std::string bcharge = m_statmgr->Get("BCHARGE");
 
    // Determine battery charge percent
    if (status & UPS_onbatt)
       battstat = 0;
-   else if (bcharge && *bcharge != '\0')
-      battstat = (int)atof(bcharge);
+   else if (!bcharge.empty())
+      battstat = (int)atof(bcharge.c_str());
    else
       battstat = 100;
 
    // Fetch UPSNAME
-   char *uname = m_statmgr->Get("UPSNAME");
-   if (uname)
+   std::string uname = m_statmgr->Get("UPSNAME");
+   if (!uname.empty())
       upsname = uname;
-
-   free(statflag);
-   free(bcharge);
-   free(uname);
 
    // Now output status in human readable form
    statstr = "";
@@ -372,10 +367,9 @@ bool upsMenu::FetchStatus(int &battstat, std::string &statstr, std::string &upsn
 
    // This overrides the above
    if (status & UPS_onbatt) {
-      char *reason = m_statmgr->Get("LASTXFER");
-      if (reason && strstr(reason, "self test"))
+      std::string reason = m_statmgr->Get("LASTXFER");
+      if (strstr(reason.c_str(), "self test"))
          statstr = "SELFTEST";
-      free(reason);
    }
 
    // Remove trailing space, if present
