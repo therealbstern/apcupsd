@@ -1,64 +1,45 @@
-//  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
-//
-//  This file was part of the VNC system.
-//
-//  The VNC system is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
-//  USA.
-//
-// If the source code for the VNC system is not available from the place 
-// whence you received this file, check http://www.uk.research.att.com/vnc or contact
-// the authors on vnc@uk.research.att.com for information on obtaining it.
-//
 // This file has been adapted to the Win32 version of Apcupsd
 // by Kern E. Sibbald.  Many thanks to ATT and James Weatherall,
 // the original author, for providing an excellent template.
 //
+// Rewrite/Refactoring by Adam Kropelin
+//
+// Copyright (2007) Adam D. Kropelin
 // Copyright (2000) Kern E. Sibbald
 //
 
+#ifndef WINSTAT_H
+#define WINSTAT_H
 
+#include <windows.h>
 
-// upsStatus
+// Forward declarations
+class StatMgr;
 
 // Object implementing the Status dialogue for apcupsd
-
-class upsStatus;
-
-#if (!defined(_win_upsStatus))
-#define _win_upsStatus
-
-
-// The upsStatus class itself
 class upsStatus
 {
 public:
-        // Constructor/destructor
-        upsStatus();
-        ~upsStatus();
+   // Constructor/destructor
+   upsStatus(HINSTANCE appinst, StatMgr *statmgr);
+   ~upsStatus();
 
-        // Initialisation
-        BOOL Init();
+   // Initialisation
+   BOOL Init();
 
-        // The dialog box window proc
-        static BOOL CALLBACK DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+   // General
+   void Show(BOOL show);
 
-        // General
-        void Show(BOOL show);
+private:
+   // The dialog box window proc
+   static BOOL CALLBACK DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-        // Implementation
-        BOOL m_dlgvisible;
+   void FillStatusBox(HWND hwnd, int id_list);
+
+   // Private data
+   BOOL m_dlgvisible;
+   HINSTANCE m_appinst;
+   StatMgr *m_statmgr;
 };
 
-#endif // _win_upsStatus
+#endif // WINSTAT_H

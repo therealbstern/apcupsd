@@ -475,6 +475,7 @@ int main(int argc, char *argv[])
        * the proper cable.
        */
       if (dumb_mode_test) {
+#ifdef HAVE_APCSMART_DRIVER
          char ans[20];
 
          write(ups->fd, "R", 1);   /* enter dumb mode */
@@ -482,6 +483,9 @@ int main(int argc, char *argv[])
          getline(ans, sizeof(ans), ups);
          pmsg("Going dumb: %s\n", ans);
          mode = M_DUMB;            /* run in dumb mode */
+#else
+         pmsg("apcsmart not compiled: dumb mode test unavailable\n");
+#endif
       }
    }
 
@@ -1314,11 +1318,11 @@ static void program_smart_eeprom(void)
             break;
 
          default:
-            pmsg("Illegal response. Please enter 1-7\n");
+            pmsg("Illegal response. Please enter 1-15\n");
             break;
          }
       } else {
-         pmsg("Illegal response. Please enter 1-7\n");
+         pmsg("Illegal response. Please enter 1-15\n");
       }
    }
    ptime();
@@ -1582,11 +1586,11 @@ static void do_usb_testing(void)
             quit = TRUE;
             break;
          default:
-            pmsg("Illegal response. Please enter 1-7\n");
+            pmsg("Illegal response. Please enter 1-9\n");
             break;
          }
       } else {
-         pmsg("Illegal response. Please enter 1-7\n");
+         pmsg("Illegal response. Please enter 1-9\n");
       }
    }
    ptime();
@@ -1856,7 +1860,7 @@ static void usb_run_self_test(void)
 
    pmsg("Waiting for test to complete...");
 
-   for (timeout = 0; timeout < 20; timeout++) {
+   for (timeout = 0; timeout < 40; timeout++) {
       if (!usb_read_int_from_ups(ups, CI_ST_STAT, &result)) {
          pmsg("ERROR READING STATUS\n");
          usb_write_int_to_ups(ups, CI_ST_STAT, 3, "SelftestStatus");
@@ -1871,7 +1875,7 @@ static void usb_run_self_test(void)
       sleep(1);
    }
 
-   if (timeout == 20) {
+   if (timeout == 40) {
       pmsg("TEST DID NOT COMPLETE\n");
       usb_write_int_to_ups(ups, CI_ST_STAT, 3, "SelftestStatus");
       return;
@@ -2108,7 +2112,11 @@ static void parse_eeprom_cmds(char *eprom, char locale)
 {
    char *p = eprom;
    char c, l, n, s;
+#ifdef debuggggggg
+   int i;
+#endif
 
+   ncmd = 0;
    for (;;) {
       c = *p++;
       if (c == 0)

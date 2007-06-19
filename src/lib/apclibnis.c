@@ -57,48 +57,34 @@ char net_errbuf[256];              /* error message buffer for messages */
 
 static int read_nbytes(int fd, char *ptr, int nbytes)
 {
-   int nleft, nread;
-
-#if defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS
+   int nleft, nread = 0;
+   struct timeval timeout;
    int rc;
    fd_set fds;
-#endif
 
    nleft = nbytes;
 
    while (nleft > 0) {
       do {
-#if defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS
-         /* 
-          * Work around a bug in OpenBSD & FreeBSD userspace pthreads
-          * implementations.
-          *
-          * The pthreads implementation under the hood sets O_NONBLOCK
-          * implicitly on all fds. This setting is not visible to the user
-          * application but is relied upon by the pthreads library to prevent
-          * blocking syscalls in one thread from halting all threads in the
-          * process. When a process exit()s or exec()s, the implicit
-          * O_NONBLOCK flags are removed from all fds, EVEN THOSE IT INHERITED.
-          * If another process is still using the inherited fds, there will
-          * soon be trouble.
-          *
-          * apcupsd is bitten by this issue after fork()ing a child process to
-          * run apccontrol.
-          *
-          * select() is conveniently immune to the O_NONBLOCK issue so we use
-          * that to make sure the following read() will not block.
-          */
-         do {
-            FD_ZERO(&fds);
-            FD_SET(fd, &fds);
-            rc = select(fd + 1, &fds, NULL, NULL, NULL);
-         } while (rc == -1 && (errno == EINTR || errno == EAGAIN));
+         /* Expect data from the server within 15 seconds */
+         timeout.tv_sec = 15;
+         timeout.tv_usec = 0;
 
-         if (rc < 0) {
+         FD_ZERO(&fds);
+         FD_SET(fd, &fds);
+
+         rc = select(fd + 1, &fds, NULL, NULL, &timeout);
+
+         switch (rc) {
+         case -1:
+            if (errno == EINTR || errno == EAGAIN)
+               continue;
             net_errno = errno;
-            return (-1);           /* error */
+            return -1;           /* error */
+         case 0:
+            return 0;            /* timeout */
          }
-#endif
+
          nread = recv(fd, ptr, nleft, 0);
       } while (nread == -1 && (errno == EINTR || errno == EAGAIN));
 
@@ -125,9 +111,22 @@ static int write_nbytes(int fd, char *ptr, int nbytes)
    nleft = nbytes;
    while (nleft > 0) {
 #if defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS
-      /* 
+      /*       
        * Work around a bug in OpenBSD & FreeBSD userspace pthreads
-       * implementations. Rationale is the same as described above.
+       * implementations.
+       *
+       * The pthreads implementation under the hood sets O_NONBLOCK
+       * implicitly on all fds. This setting is not visible to the user
+       * application but is relied upon by the pthreads library to prevent
+       * blocking syscalls in one thread from halting all threads in the
+       * process. When a process exit()s or exec()s, the implicit
+       * O_NONBLOCK flags are removed from all fds, EVEN THOSE IT INHERITED.
+       * If another process is still using the inherited fds, there will
+       * soon be trouble.
+       *
+       * apcupsd is bitten by this issue after fork()ing a child process to
+       * run apccontrol.
+       *
        * This seemingly-pointless fcntl() call causes the pthreads
        * library to reapply the O_NONBLOCK flag appropriately.
        */
