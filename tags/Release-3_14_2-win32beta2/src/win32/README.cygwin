@@ -1,0 +1,140 @@
+
+This document will briefly try to explain how to build the
+Cygwin version of apcupsd for Win32 systems.  We are working on
+a native Win32 build, but for the moment, the only working Win32
+version of apcupsd is built with Cygwin.
+
+The directory structure that you need to have is:
+  apcupsd               Full source, including
+                          pre-built doc source, which we
+                          do on a Unix/Linux system.
+
+
+To build it:
+- You must have Cygwin version ...18 or later installed on  
+  your system.
+- Make sure your COMSPEC is properly setup (see full dump of
+  my cygwin environment below).
+- The build is done in an rxvt window under the latest version
+  of cygwin.
+- cd apcupsd
+  ./configure (suitable options -- see below)
+  make
+  cd src/win32
+  make winapcupsd.exe
+
+Here is the script that I use under cygwin to build it:
+==== build script =========
+#!/bin/sh
+
+#  rm -rf k winapcupsd-*.tar.gz
+# cp -a k:/home/kern/apcupsd/n k
+cp kernswinconfig k
+cd k
+./kernswinconfig
+make
+cd src/win32
+make winapcupsd.exe
+VERSION=`sed -n -e 's/^.*VERSION.*"\(.*\)"$/\1/p' ../../include/version.h`
+cp -pf winapcupsd-$VERSION.exe k:/home/kern/apcupsd
+if test $? -eq 0 ; then
+   echo "Build failed ..."
+fi
+ls -l k:/home/kern/apcupsd/winapcupsd-$VERSION.exe
+======== end build script ==============
+
+=== kernswinconfig ===
+#!/bin/sh
+# This is Kern's configure script for the Win32 version of apcupsd
+./configure \
+  --prefix=/apcupsd \
+  --sbindir=/apcupsd/bin \
+  --sysconfdir=/apcupsd/etc/apcupsd \
+  --with-pid-dir=/apcupsd/etc/apcupsd \
+  --mandir=/apcupsd \
+  --with-cgi-bin=/apcupsd/etc/apcupsd/cgi \
+  --enable-master-slave \
+  --enable-net \
+  --enable-apcsmart \
+  --enable-dumb \
+  --enable-pthreads
+exit 0
+=====
+
+===== a suitable environment -- most important are INCLUDE, LIB, and PATH
+!::='::\'
+!C:='C:\cygwin\home\kern'
+ALLUSERSPROFILE='C:\Documents and Settings\All Users'
+APPDATA='C:\Documents and Settings\kern\Application Data'
+BASH=/usr/bin/bash
+BASH_ARGC=()
+BASH_ARGV=()
+BASH_LINENO=()
+BASH_SOURCE=()
+BASH_VERSINFO=([0]="3" [1]="00" [2]="16" [3]="7" [4]="release" [5]="i686-pc-cygwin")
+BASH_VERSION='3.00.16(7)-release'
+CLIENTNAME=Console
+COLORFGBG='0;default;15'
+COLORTERM=rxvt-xpm
+COMMONPROGRAMFILES='C:\Program Files\Common Files'
+COMPUTERNAME=OMALLY
+COMSPEC='C:\WINDOWS\system32\cmd.exe'
+DIRSTACK=()
+DISPLAY=:0
+EDHELP=/home/kern/bin/ed.hlp
+EDTRM=/home/kern/bin/ed.trm
+EUID=1007
+GROUPS=()
+HISTFILE=/home/kern/.bash_history
+HISTFILESIZE=500
+HISTSIZE=500
+HOME=/home/kern
+HOMEDRIVE=C:
+HOMEPATH='\Documents and Settings\kern'
+HOSTNAME=Omally
+HOSTTYPE=i686
+IFS=$' \t\n'
+INCLUDE='c:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\include;C:\Program Files\Microsoft Visual Studio .NET 2003\SDK\v1.1\include\;C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\atlmfc\include;c:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\PlatformSDK\include'
+LIB='c:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\lib;C:\Program Files\Microsoft Visual Studio .NET 2003\SDK\v1.1\Lib\;C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\PlatformSDK\Lib;C:\Program Files\Microsoft Visual Studio .NET 2003\Vc7\atlmfc\lib'
+LOGONSERVER='\\OMALLY'
+MACHTYPE=i686-pc-cygwin
+MAILCHECK=60
+NUMBER_OF_PROCESSORS=1
+OLDPWD=/home/kern
+OPTERR=1
+OPTIND=1
+OS=Windows_NT
+OSTYPE=cygwin
+PATH='/cygdrive/c/WINDOWS/system32:/cygdrive/c/WINDOWS:/cygdrive/c/WINDOWS/System32/Wbem:/cygdrive/c/Program Files/Common Files/Adaptec Shared/System:/cygdrive/c/Program Files/Microsoft Visual Studio .NET 2003/Vc7/bin:/cygdrive/c/Program Files/Microsoft Visual Studio .NET 2003/SDK/v1.1/bin:/cygdrive/c/Program Files/Microsoft Visual Studio .NET 2003/Common7/IDE:/usr/bin:/home/kern/bin:/cygdrive/c/program files/microsoft visual studio/vc98/bin:c:/cygwin/bin:/usr/bin:/home/kern/bin:/sbin:/usr/sbin::c:/cygwin/bin:/usr/bin:/home/kern/bin:/sbin:/usr/sbin:'
+PATHEXT='.COM;.EXE;.BAT;.CMD;.VBS;.VBE;.JS;.JSE;.WSF;.WSH'
+PIPESTATUS=([0]="0")
+PPID=2112
+PROCESSOR_ARCHITECTURE=x86
+PROCESSOR_IDENTIFIER='x86 Family 6 Model 13 Stepping 6, GenuineIntel'
+PROCESSOR_LEVEL=6
+PROCESSOR_REVISION=0d06
+PROGRAMFILES='C:\Program Files'
+PROMPT='$P$G'
+PS1='\e[34m\]\w\[\e[0m\]$\040'
+PS2='> '
+PS4='+ '
+PWD=/home/kern/apcupsd
+SESSIONNAME=Console
+SHELL=/bin/bash
+SHELLOPTS=braceexpand:emacs:hashall:histexpand:history:interactive-comments:monitor
+SHLVL=1
+SYSTEMDRIVE=C:
+SYSTEMROOT='C:\WINDOWS'
+TEMP=/cygdrive/c/DOCUME~1/kern/LOCALS~1/Temp
+TERM=xterm
+TMP=/cygdrive/c/DOCUME~1/kern/LOCALS~1/Temp
+UID=1007
+USERDOMAIN=OMALLY
+USERNAME=kern
+USERPROFILE='C:\Documents and Settings\kern'
+VS71COMNTOOLS='C:\Program Files\Microsoft Visual Studio .NET 2003\Common7\Tools\'
+WINDIR='C:\WINDOWS'
+WINDOWID=6815888
+WXWIN='c:\home\kern\bacula\depkgs-win32\wx'
+_=e:/
+=====
