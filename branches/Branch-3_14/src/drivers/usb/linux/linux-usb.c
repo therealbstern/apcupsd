@@ -114,20 +114,17 @@ static int open_device(const char *dev, UPSINFO *ups)
    if (fd >= 0) {
       /* Check for the UPS application HID usage */
       for (i = 0; (ret = ioctl(fd, HIDIOCAPPLICATION, i)) > 0; i++) {
-         if ((ret & 0xffff000) == (UPS_USAGE & 0xffff0000))
-            break;
-      }
-      /* If we found the UPS application usage, we're good to go */     
-      if (ret) {
-         /* Request full uref reporting from read() */
-         if (FORCE_COMPAT24 || ioctl(fd, HIDIOCSFLAG, &flaguref)) {
-            Dmsg0(100, "HIDIOCSFLAG failed; enabling linux-2.4 "
-                   "compatibility mode\n");
-            my_data->compat24 = true;
+         if ((ret & 0xffff000) == (UPS_USAGE & 0xffff0000)) {
+            /* Request full uref reporting from read() */
+            if (FORCE_COMPAT24 || ioctl(fd, HIDIOCSFLAG, &flaguref)) {
+               Dmsg0(100, "HIDIOCSFLAG failed; enabling linux-2.4 "
+                      "compatibility mode\n");
+               my_data->compat24 = true;
+            }
+            /* Successfully opened the device */
+            Dmsg1(200, "Successfully opened \"%s\"\n", dev);
+            return fd;
          }
-         /* Successfully opened the device */
-         Dmsg1(200, "Successfully opened \"%s\"\n", dev);
-         return fd;
       }
       close(fd);
    }
