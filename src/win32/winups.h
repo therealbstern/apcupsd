@@ -33,7 +33,7 @@
 #define WM_REMOVE                WM_USER+5
 
 // Message used to set balloon notification state
-#define WM_BNOTIFY               WM_USER+6
+#define WM_RESET                 WM_USER+6
 
 // Apcupsd application window constants
 #define APCUPSD_WINDOW_CLASS		"apcupsd"
