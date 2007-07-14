@@ -32,7 +32,9 @@ upsMenu::upsMenu(HINSTANCE appinst, const char* host, unsigned long port,
      m_thread(NULL),
      m_hmenu(NULL),
      m_upsname("<unknown>"),
-     m_balmgr(balmgr)
+     m_balmgr(balmgr),
+     m_host(host),
+     m_port(port)
 {
    // Create a dummy window to handle tray icon messages
    WNDCLASSEX wndclass;
@@ -265,6 +267,11 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
          // Set UPS name field
          ModifyMenu(submenu, ID_NAME, MF_BYCOMMAND|MF_STRING, ID_NAME,
             ("UPS: " + _this->m_upsname).c_str());
+
+         // Set HOST field
+         char buf[100];
+         asnprintf(buf, sizeof(buf), "HOST: %s:%d", _this->m_host, _this->m_port);
+         ModifyMenu(submenu, ID_HOST, MF_BYCOMMAND|MF_STRING, ID_HOST, buf);
 
          // Get the current cursor position, to display the menu at
          POINT mouse;
