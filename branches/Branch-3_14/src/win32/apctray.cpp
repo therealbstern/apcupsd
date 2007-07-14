@@ -310,6 +310,15 @@ void TrayInstance::DeleteInstanceKey()
    }
 }
 
+void Reset()
+{
+   HWND wnd = FindWindow(APCTRAY_WINDOW_CLASS, NULL);
+   if (wnd)
+      PostMessage(wnd, WM_RESET, 0, 0);
+
+   return;
+}
+
 int Install()
 {
    // Get the full path/filename of this executable
@@ -349,6 +358,8 @@ int AddInstance(char *host, unsigned short port, int refresh)
 {
    TrayInstance inst(host, port, refresh);
    inst.Write();
+
+   Reset();
 
    NotifyUser("The instance (%s:%d) was successfully created.",
       inst.m_host.c_str(), inst.m_port);
@@ -424,6 +435,8 @@ int DelInstance(const char *host, unsigned short port)
       // Deleting a single instance: We can use TrayInstance
       TrayInstance inst(host, port, 0);
       inst.DeleteInstanceKey();
+
+      Reset();
 
       NotifyUser("The specified instance (%s:%d) was successfully deleted.",
          host, port);
@@ -597,77 +610,90 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       return 0;
    }
 
-   // Create a balloon manager to handle balloon tip notifications
-   balmgr = new BalloonMgr();
+   bool reset;
+   do {
+      // Not resetting yet
+      reset = false;
 
-   if (!host && !port) {
-      // No command line instance options were given: Launch
-      // all instances specified in the registry
-      LaunchInstances();
+      // Create a balloon manager to handle balloon tip notifications
+      balmgr = new BalloonMgr();
 
-      // If no instances were created from the registry,
-      // allocate a default one and write it to the registry.
-      if (instances.empty()) {
-         AllocateInstance(DEFAULT_HOST, DEFAULT_PORT, refresh);
-         instances.back()->Write();
-      }
-   } else {
-      // One or more command line options were given, so launch a single
-      // instance using the specified parameters, filling in any missing
-      // ones with defaults
-      AllocateInstance(host, port, refresh);
-   }
+      if (!host && !port) {
+         // No command line instance options were given: Launch
+         // all instances specified in the registry
+         LaunchInstances();
 
-   // Enter the Windows message handling loop until told to quit
-   MSG msg;
-   while (GetMessage(&msg, NULL, 0, 0)) {
-      TranslateMessage(&msg);
-
-      switch (LOWORD(msg.message)) {
-      case WM_CLOSEINST:
-         // Close specified instance
-         CloseInstance((upsMenu*)msg.lParam);
-         if (instances.empty())
-            PostQuitMessage(0);
-         break;
-
-      case WM_REMOVEALL:
-         // Remove all instances (and close)
-         DelInstance(NULL, 0);
-         Remove();
-         PostQuitMessage(0);
-         break;
-
-      case WM_REMOVE:
-         // Remove the given instance
-         RemoveInstance((upsMenu*)msg.lParam);
+         // If no instances were created from the registry,
+         // allocate a default one and write it to the registry.
          if (instances.empty()) {
+            AllocateInstance(DEFAULT_HOST, DEFAULT_PORT, refresh);
+            instances.back()->Write();
+         }
+      } else {
+         // One or more command line options were given, so launch a single
+         // instance using the specified parameters, filling in any missing
+         // ones with defaults
+         AllocateInstance(host, port, refresh);
+      }
+
+      // Enter the Windows message handling loop until told to quit
+      MSG msg;
+      while (GetMessage(&msg, NULL, 0, 0)) {
+         TranslateMessage(&msg);
+
+         switch (LOWORD(msg.message)) {
+         case WM_CLOSEINST:
+            // Close specified instance
+            CloseInstance((upsMenu*)msg.lParam);
+            if (instances.empty())
+               PostQuitMessage(0);
+            break;
+
+         case WM_REMOVEALL:
+            // Remove all instances (and close)
+            DelInstance(NULL, 0);
             Remove();
             PostQuitMessage(0);
+            break;
+
+         case WM_REMOVE:
+            // Remove the given instance
+            RemoveInstance((upsMenu*)msg.lParam);
+            if (instances.empty()) {
+               Remove();
+               PostQuitMessage(0);
+            }
+            break;
+
+         case WM_RESET:
+            reset = true;
+            PostQuitMessage(0);
+            break;
+
+         default:
+            DispatchMessage(&msg);
          }
-         break;
-
-      default:
-         DispatchMessage(&msg);
       }
-   }
 
-   // Instruct all instances to destroy
-   std::vector<TrayInstance*>::iterator iter;
-   for (iter = instances.begin();
-        iter != instances.end();
-        iter++)
-   {
-      (*iter)->Destroy();
-   }
+      // Instruct all instances to destroy
+      std::vector<TrayInstance*>::iterator iter;
+      for (iter = instances.begin();
+           iter != instances.end();
+           iter++)
+      {
+         (*iter)->Destroy();
+      }
 
-   // Free all instances. This waits for destruction to complete.
-   while (!instances.empty()) {
-      delete instances.back();
-      instances.pop_back();
-   }
+      // Free all instances. This waits for destruction to complete.
+      while (!instances.empty()) {
+         delete instances.back();
+         instances.pop_back();
+      }
 
-   delete balmgr;
+      delete balmgr;
+   }
+   while(reset);  // Repeat if we're resetting
+
    WSACleanup();
    return 0;
 }
