@@ -634,14 +634,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       case WM_REMOVEALL:
          // Remove all instances (and close)
          DelInstance(NULL, 0);
+         Remove();
          PostQuitMessage(0);
          break;
 
       case WM_REMOVE:
          // Remove the given instance
          RemoveInstance((upsMenu*)msg.lParam);
-         if (instances.empty())
+         if (instances.empty()) {
+            Remove();
             PostQuitMessage(0);
+         }
          break;
 
       default:
