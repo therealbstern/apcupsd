@@ -26,6 +26,7 @@ BEGIN
     POPUP "tray"
     BEGIN
         MENUITEM "UPS: <unknown>",              ID_NAME, INACTIVE
+        MENUITEM "HOST: <unknown>",             ID_HOST, INACTIVE
         MENUITEM SEPARATOR
         MENUITEM "&Status",                     ID_STATUS
         MENUITEM "&Events",                     ID_EVENTS

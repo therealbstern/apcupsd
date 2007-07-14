@@ -59,6 +59,8 @@ protected:
    std::string             m_upsname;        // Cache UPS name
    std::string             m_laststatus;     // Cache previous status string
    BalloonMgr             *m_balmgr;         // Balloon tip manager
+   const char             *m_host;
+   unsigned short          m_port;
 
    // Dialogs for About, Status, and Events
    upsAbout                m_about;
