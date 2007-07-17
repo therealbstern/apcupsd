@@ -1,5 +1,5 @@
 /*
- * $Id: hid-ups.c,v 1.13 2006-02-03 23:41:18 adk0212 Exp $
+ * $Id: hid-ups.c,v 1.13.2.1 2007-07-17 22:50:25 adk0212 Exp $
  *
  *  Copyright (c) 2001 Vojtech Pavlik <vojtech@ucw.cz>
  *  Copyright (c) 2001 Paul Stewart <hiddev@wetlogic.net>
@@ -47,6 +47,7 @@
 #include <asm/types.h>
 #include <linux/hiddev.h>
 #include <errno.h>
+#include <time.h>
 
 #define PWRSTAT         "/etc/powerstatus"
 #define DEBOUNCE_TIMEOUT 15	      /* increase this if you get false alerts */
@@ -400,6 +401,7 @@ static char evdev[50];
 static int vendor = 0;
 
 int main (int argc, char **argv) {
+    time_t start_seconds;
     int fd = -1, rd, i, j, RemainingCapacity;
     struct hiddev_event ev[64];
     struct hiddev_devinfo dinfo;
@@ -583,6 +585,7 @@ foundit:
 
 #endif
 
+    start_seconds = time(NULL);
     FD_ZERO(&fdset);
     while (1) {
 	if (fd < 0) {
@@ -625,6 +628,8 @@ foundit:
 		close(fd);
 		fd = -1;
 		continue;
+	    } else {
+	    	printf("time %lu\n", time(NULL) - start_seconds);
 	    }
 
 	    for (i = 0; i < rd / sizeof(ev[0]); i++) {
