@@ -1,5 +1,5 @@
 /*
- * $Id: hid-ups.c,v 1.13.2.1 2007-07-17 22:50:25 adk0212 Exp $
+ * $Id: hid-ups.c,v 1.13.2.2 2007-07-17 22:54:25 adk0212 Exp $
  *
  *  Copyright (c) 2001 Vojtech Pavlik <vojtech@ucw.cz>
  *  Copyright (c) 2001 Paul Stewart <hiddev@wetlogic.net>
@@ -414,7 +414,7 @@ int main (int argc, char **argv) {
     if (argc < 2) {
 	struct hiddev_usage_ref uref;
          /* deal with either standard location or Red Hat's */
-         const char *hid_dirs[] = {"/dev/usb/hid", "/dev/usb",};
+         const char *hid_dirs[] = {"/dev/usb/hid", "/dev/usb","/dev"};
 	 for (i = 0; i < sizeof(hid_dirs)/sizeof(hid_dirs[0]); i++) {
 	     for (j = 0; j < 4; j++) {
                  sprintf(evdev, "%s/hiddev%d", hid_dirs[i], j);
