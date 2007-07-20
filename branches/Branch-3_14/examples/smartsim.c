@@ -30,6 +30,7 @@
  *    x   Selftest toggle
  *    r   ReplaceBatt toggle
  *    d   BattDetach toggle
+ *    c   CommFail toggle
  *    7/4 BattPct (inc/dec)   (use numeric keypad)
  *    8/5 LoadPct (inc/dec)   (use numeric keypad)
  *    9/6 TimeLeft (inc/dec)  (use numeric keypad)
@@ -95,6 +96,7 @@ int battlow = 0;
 int rebatt = 0;
 int trim = 0;
 int boost = 0;
+int commfail = 0;
 
 #define dbg(str, args...)     \
 do                            \
@@ -151,6 +153,7 @@ static void key_dec(void* arg);
 static void key_selftest(void* arg);
 static void key_rebatt(void* arg);
 static void key_batdet(void *arg);
+static void key_commfail(void *arg);
 
 /* Mapping of keyboard commands to callbacks */
 struct keycmd
@@ -174,6 +177,7 @@ struct keycmd
    { 'x',  key_selftest,  NULL },
    { 'r',  key_rebatt,    NULL },
    { 'd',  key_batdet,    NULL },
+   { 'c',  key_commfail,  NULL },
    { '\0', NULL,          NULL }
 };
 
@@ -333,9 +337,30 @@ static void key_batdet(void *arg)
       reg2 |= 0x20;
 }
 
+static void key_commfail(void *arg)
+{
+   if (commfail)
+   {
+      commfail = 0;
+      dbg("COMMFAIL disabled\n");
+   }
+   else
+   {
+      commfail = 1;
+      dbg("COMMFAIL enabled\n");
+   }
+      
+}
+
 void handle_ups_cmd(char cmd)
 {
    int x;
+
+   if (commfail)
+   {
+      dbg("<COMMFAIL>\n");
+      return;
+   }
 
    for (x=0; upscmds[x].func; x++)
    {
