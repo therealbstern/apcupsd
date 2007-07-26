@@ -72,7 +72,6 @@ IF "%command%" == "timeout"       GOTO :timeout
 IF "%command%" == "loadlimit"     GOTO :loadlimit
 IF "%command%" == "runlimit"      GOTO :runlimit
 IF "%command%" == "doshutdown"    GOTO :doshutdown
-IF "%command%" == "mainsback"     GOTO :mainsback
 IF "%command%" == "annoyme"       GOTO :annoyme
 IF "%command%" == "emergency"     GOTO :emergency
 IF "%command%" == "changeme"      GOTO :changeme
