@@ -643,6 +643,9 @@ int pcnet_ups_open(UPSINFO *ups)
    if (ups->fd == -1)
       Error_abort1(_("Cannot create socket (%d)\n"), errno);
 
+   int enable = 1;
+   setsockopt(ups->fd, SOL_SOCKET, SO_REUSEADDR, &enable, sizeof(enable));
+
    memset(&addr, 0, sizeof(addr));
    addr.sin_family = AF_INET;
    addr.sin_port = htons(PCNET_PORT);
