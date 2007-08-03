@@ -30,8 +30,6 @@
 UPSINFO *core_ups;
 UPSINFO *ups;
 
-char argvalue[MAXSTRING];
-
 int le_bit = TIOCM_LE;
 int st_bit = TIOCM_ST;
 int sr_bit = TIOCM_SR;
