@@ -67,6 +67,9 @@
 #include "apc.h"
 #include "apcsmart.h"
 
+/* How long to wait before declaring commlost */
+#define COMMLOST_TIMEOUT_MS (20*1000)
+
 /* Convert UPS response to enum and string */
 static SelfTestResult decode_testresult(char* str)
 {
@@ -131,20 +134,25 @@ int apc_enable(UPSINFO *ups)
 char *smart_poll(char cmd, UPSINFO *ups)
 {
    static char answer[2000];
-   int stat;
+   int stat, retry;
 
    *answer = 0;
    if (ups->mode.type <= SHAREBASIC)
       return answer;
 
-   write(ups->fd, &cmd, 1);
-   stat = getline(answer, sizeof answer, ups);
+   /* Don't retry Y/SM command */
+   retry = (cmd == 'Y') ? 0 : 2;
 
-   /* If nothing returned, the link is probably down */
-   if (*answer == 0 && stat == FAILURE) {
-      UPSlinkCheck(ups);           /* wait for link to come up */
-      *answer = 0;
-   }
+   do {
+      write(ups->fd, &cmd, 1);
+      stat = getline(answer, sizeof answer, ups);
+
+      /* If nothing returned, the link is probably down */
+      if (*answer == 0 && stat == FAILURE) {
+         UPSlinkCheck(ups);           /* wait for link to come up */
+         *answer = 0; /* UPSlinkCheck invokes us recursively, so clean up */
+      }
+   } while (*answer == 0 && stat == FAILURE && retry--);
 
    return answer;
 }
@@ -323,7 +331,7 @@ int getline(char *s, int len, UPSINFO *ups)
 /* Note this routine MUST be called with the UPS write lock held! */
 void UPSlinkCheck(UPSINFO *ups)
 {
-   struct timeval now, prev;
+   struct timeval now, prev, start;
    static int linkcheck = FALSE;
 
    if (linkcheck)
@@ -338,20 +346,29 @@ void UPSlinkCheck(UPSINFO *ups)
       return;
    }
 
-   ups->set_commlost();
-   tcflush(ups->fd, TCIOFLUSH);
-   generate_event(ups, CMDCOMMFAILURE);
-
    write_unlock(ups);
 
-   gettimeofday(&prev, NULL);
+   gettimeofday(&start, NULL);
+   prev = start;
+
+   tcflush(ups->fd, TCIOFLUSH);
    while (strcmp(smart_poll('Y', ups), "SM") != 0) {
-      /* Log an event every 10 minutes */
+      /* Declare commlost only if COMMLOST_TIMEOUT_MS has expired */
       gettimeofday(&now, NULL);
-      if (TV_DIFF_MS(prev, now) >= 10*60*1000) {
-         log_event(ups, event_msg[CMDCOMMFAILURE].level,
-            event_msg[CMDCOMMFAILURE].msg);
-         prev = now;
+      if (TV_DIFF_MS(start, now) >= COMMLOST_TIMEOUT_MS) {
+         /* Generate commlost event if we've not done so yet */
+         if (!ups->is_commlost()) {
+            ups->set_commlost();
+            generate_event(ups, CMDCOMMFAILURE);
+            prev = now;
+         }
+
+         /* Log an event every 10 minutes */
+         if (TV_DIFF_MS(prev, now) >= 10*60*1000) {
+            log_event(ups, event_msg[CMDCOMMFAILURE].level,
+               event_msg[CMDCOMMFAILURE].msg);
+            prev = now;
+         }
       }
 
       /*
@@ -364,11 +381,13 @@ void UPSlinkCheck(UPSINFO *ups)
       tcflush(ups->fd, TCIOFLUSH);
    }
 
-   tcflush(ups->fd, TCIOFLUSH);
-   generate_event(ups, CMDCOMMOK);
-
    write_lock(ups);
-   ups->clear_commlost();
+
+   if (ups->is_commlost()) {
+      ups->clear_commlost();
+      generate_event(ups, CMDCOMMOK);
+   }
+
    linkcheck = FALSE;
 }
 
