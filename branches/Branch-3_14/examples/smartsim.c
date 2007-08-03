@@ -22,6 +22,7 @@
  * to toggle flags and readouts. These commands can be found in the 
  * keycmds[] table. Supported keypress commands:
  *
+ *    ?   Help
  *    b   Onbattery toggle
  *    o   Overload toggle
  *    t   Trim toggle
@@ -154,6 +155,7 @@ static void key_selftest(void* arg);
 static void key_rebatt(void* arg);
 static void key_batdet(void *arg);
 static void key_commfail(void *arg);
+static void key_help(void *arg);
 
 /* Mapping of keyboard commands to callbacks */
 struct keycmd
@@ -178,6 +180,7 @@ struct keycmd
    { 'r',  key_rebatt,    NULL },
    { 'd',  key_batdet,    NULL },
    { 'c',  key_commfail,  NULL },
+   { '?',  key_help,      NULL },
    { '\0', NULL,          NULL }
 };
 
@@ -350,6 +353,24 @@ static void key_commfail(void *arg)
       dbg("COMMFAIL enabled\n");
    }
       
+}
+
+static void key_help(void *arg)
+{
+   dbg("Commands:\n");
+   dbg("?   Help\n");
+   dbg("b   Onbattery toggle\n");
+   dbg("o   Overload toggle\n");
+   dbg("t   Trim toggle\n");
+   dbg("s   Boost toggle\n");
+   dbg("l   BattLow toggle\n");
+   dbg("x   Selftest toggle\n");
+   dbg("r   ReplaceBatt toggle\n");
+   dbg("d   BattDetach toggle\n");
+   dbg("c   CommFail toggle\n");
+   dbg("7/4 BattPct (inc/dec)   (use numeric keypad)\n");
+   dbg("8/5 LoadPct (inc/dec)   (use numeric keypad)\n");
+   dbg("9/6 TimeLeft (inc/dec)  (use numeric keypad)\n");
 }
 
 void handle_ups_cmd(char cmd)
