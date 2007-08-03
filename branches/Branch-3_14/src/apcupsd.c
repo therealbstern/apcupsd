@@ -65,7 +65,6 @@
  * memory area so this is made reentrant by the shm mechanics.
  */
 UPSINFO *core_ups = NULL;
-char argvalue[MAXSTRING];
 
 static void daemon_start(void);
 
