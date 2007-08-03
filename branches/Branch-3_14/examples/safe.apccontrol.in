@@ -117,12 +117,6 @@ apccontrol: ${SHUTDOWN} for remote halt would have been called.
 
 EOF
         ;;
-        restartme)
-                wall <<EOF
-apccontrol: restarting apcupsd would have been called.
-
-EOF
-        ;;
         startselftest)
                 wall <<EOF
 apccontrol: start self test would have been called.
