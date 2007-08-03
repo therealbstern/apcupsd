@@ -58,15 +58,14 @@ case "$1" in
       printf "Communciations with UPS restored." | wall -a
    ;;
    powerout)
-      printf "Warning power loss detected." | wall -a
    ;;
    onbattery)
       printf "Power failure. Running on UPS batteries." | wall -a
    ;;
    offbattery)
+      printf "Power has returned..." | wall -a
    ;;
    mainsback)
-      printf "Power has returned..." | wall -a
    ;;
    failing)
       printf "UPS battery power exhaused. Doing shutdown.\n" | wall -a
@@ -99,15 +98,6 @@ case "$1" in
    ;;
    remotedown)
       printf "Remote Shutdown.\nBeginning Shutdown Sequence." | wall -a
-   ;;
-   restartme)
-      echo -n "Restarting APCUPSD Power Management: "
-      THEPID=`cat ${APCPID}`
-      kill ${THEPID}
-      rm -f ${APCPID}
-      rm -f ${PWRFAILDIR}/powerfail
-      `${APCUPSD}`
-      echo "apcupsd"
    ;;
    startselftest)
    ;;

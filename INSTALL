@@ -299,7 +299,6 @@ can recognize are:
 `emergency'    Begins an emercengy `shutdown' sequence.
 `changeme'     `wall' a message telling `Battery failed, change them now'.
 `remotedown'   Begins the `shutdown' sequence, called from remote.
-`restartme'    Attempt to restart the apcupsd.
 
 If for example you want to write your own routine for the `powerout' action,
 you can write your own shell script called `powerout' and put it in the lib

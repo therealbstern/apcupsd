@@ -76,7 +76,6 @@ IF "%command%" == "annoyme"       GOTO :annoyme
 IF "%command%" == "emergency"     GOTO :emergency
 IF "%command%" == "changeme"      GOTO :changeme
 IF "%command%" == "remotedown"    GOTO :remotedown
-IF "%command%" == "restartme"     GOTO :restartme
 IF "%command%" == "startselftest" GOTO :startselftest
 IF "%command%" == "endselftest"   GOTO :endselftest
 IF "%command%" == "battdetach"    GOTO :battdetach
@@ -166,9 +165,6 @@ rem
 
 :remotedown
    %POPUP% "Shutdown due to master state or comms lost."
-   GOTO :done
-
-:restartme
    GOTO :done
 
 :startselftest
