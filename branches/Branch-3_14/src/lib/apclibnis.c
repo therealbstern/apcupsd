@@ -38,7 +38,6 @@
 #define   INADDR_NONE    -1
 #endif
 
-struct sockaddr_in tcp_serv_addr;  /* socket information */
 int net_errno = 0;                 /* error number -- not yet implemented */
 char *net_errmsg = NULL;           /* pointer to error message */
 char net_errbuf[256];              /* error message buffer for messages */
@@ -228,8 +227,9 @@ int net_open(char *host, char *service, int port)
 {
    int sockfd;
    struct hostent *hp;
-   unsigned int inaddr;            /* Careful here to use unsigned int for */
-                                   /* compatibility with Alpha */
+   struct sockaddr_in tcp_serv_addr;  /* socket information */
+   unsigned int inaddr;               /* Careful here to use unsigned int for */
+                                      /* compatibility with Alpha */
 
    /* 
     * Fill in the structure serv_addr with the address of
