@@ -638,7 +638,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
       // Enter the Windows message handling loop until told to quit
       MSG msg;
-      while (GetMessage(&msg, NULL, 0, 0)) {
+      while (GetMessage(&msg, NULL, 0, 0) > 0) {
+
          TranslateMessage(&msg);
 
          switch (LOWORD(msg.message)) {
