@@ -16,24 +16,22 @@
 #include <windows.h>
 
 // Application specific messages
+enum {
+   // Message used for system tray notifications
+   WM_TRAYNOTIFY = WM_USER+1,
 
-// Message used for system tray notifications
-#define WM_TRAYNOTIFY            WM_USER+1
+   // Message used to close a given apctray instance
+   WM_CLOSEINST,
 
-// Message used to inform tray that a balloon tip was displayed
-#define WM_BALLOONSHOW           WM_USER+2
+   // Message used to remove all apctray instances from the registry
+   WM_REMOVEALL,
 
-// Message used to close a given apctray instance
-#define WM_CLOSEINST             WM_USER+3
+   // Message used to remove specified apctray instance from the registry
+   WM_REMOVE,
 
-// Message used to remove all apctray instances from the registry
-#define WM_REMOVEALL             WM_USER+4
-
-// Message used to remove specified apctray instance from the registry
-#define WM_REMOVE                WM_USER+5
-
-// Message used to set balloon notification state
-#define WM_RESET                 WM_USER+6
+   // Message used to trigger tray icon reset
+   WM_RESET
+};
 
 // Apcupsd application window constants
 #define APCUPSD_WINDOW_CLASS		"apcupsd"
