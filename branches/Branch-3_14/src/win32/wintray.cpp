@@ -36,6 +36,9 @@ upsMenu::upsMenu(HINSTANCE appinst, const char* host, unsigned long port,
      m_host(host),
      m_port(port)
 {
+   // Determine message id for "TaskbarCreate" message
+   m_tbcreated_msg = RegisterWindowMessage("TaskbarCreated");
+
    // Create a dummy window to handle tray icon messages
    WNDCLASSEX wndclass;
    wndclass.cbSize = sizeof(wndclass);
@@ -67,9 +70,6 @@ upsMenu::upsMenu(HINSTANCE appinst, const char* host, unsigned long port,
 
    // record which client created this window
    SetWindowLong(m_hwnd, GWL_USERDATA, (LONG)this);
-
-   // No balloon timer yet
-   m_balloon_timer = 0;
 
    // Load the icons for the tray
    m_online_icon = LoadIcon(appinst, MAKEINTRESOURCE(IDI_ONLINE));
@@ -144,6 +144,7 @@ void upsMenu::SendTrayMsg(DWORD msg)
 {
    // Create the tray icon message
    NOTIFYICONDATA nid;
+   memset(&nid, 0, sizeof(nid));
    nid.hWnd = m_hwnd;
    nid.cbSize = sizeof(nid);
    nid.uID = IDI_APCUPSD;
@@ -205,11 +206,12 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
    // from a newsgroup to get the pseudo-this.
    upsMenu *_this = (upsMenu *) GetWindowLong(hwnd, GWL_USERDATA);
 
-   switch (iMsg) {
+   // During creation, we are called before the WindowLong has been set.
+   // Just use default processing in that case since _this is not valid.   
+   if (!_this)
+      return DefWindowProc(hwnd, iMsg, wParam, lParam);
 
-   // Standard message handling
-   case WM_CREATE:
-      return 0;
+   switch (iMsg) {
 
    // User has clicked an item on the tray menu
    case WM_COMMAND:
@@ -301,6 +303,15 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
    case WM_DESTROY:
       PostQuitMessage(0);
       return 0;
+
+   default:
+      if (iMsg == _this->m_tbcreated_msg) {
+         // Explorer has restarted so we need to redraw the tray icon.
+         // We purposely kick this out to the main loop instead of handling it
+         // ourself so the icons are redrawn in a consistent order.
+         PostMessage(hwnd, WM_RESET, 0, 0);
+      }
+      break;
    }
 
    // Unknown message type
