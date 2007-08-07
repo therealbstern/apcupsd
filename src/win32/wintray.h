@@ -51,7 +51,6 @@ protected:
 
    HWND                    m_hwnd;           // Window handle
    HMENU                   m_hmenu;          // Menu handle
-   UINT                    m_balloon_timer;  // Timer for balloon tips
    StatMgr                *m_statmgr;        // Manager for UPS stats
    int                     m_interval;       // How often to poll for status
    HANDLE                  m_thread;         // Handle to status polling thread
@@ -61,6 +60,7 @@ protected:
    BalloonMgr             *m_balmgr;         // Balloon tip manager
    const char             *m_host;
    unsigned short          m_port;
+   UINT                    m_tbcreated_msg;  // Id of TaskbarCreated message
 
    // Dialogs for About, Status, and Events
    upsAbout                m_about;
