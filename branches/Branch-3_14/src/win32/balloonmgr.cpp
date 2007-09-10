@@ -26,11 +26,12 @@
 #define ARRAY_SIZE(x) ( sizeof(x) / sizeof((x)[0]) )
 
 BalloonMgr::BalloonMgr()
+   : m_exit(false),
+     m_active(false)
 {
    m_mutex = CreateMutex(NULL, false, NULL);
    m_event = CreateEvent(NULL, false, false, NULL);
    m_timer = CreateWaitableTimer(NULL, false, NULL);
-   m_exit = m_active = false;
 
    DWORD tid;
    m_thread = CreateThread(NULL, 0, &BalloonMgr::Thread, this, 0, &tid);
@@ -98,9 +99,9 @@ void BalloonMgr::post()
    nid.dwInfoFlags = NIIF_INFO;
    Shell_NotifyIcon(NIM_MODIFY, &nid);
 
-   // Set a timeout to clear the ballon
+   // Set a timeout to clear the balloon
    LARGE_INTEGER timeout;
-   if (m_pending.size() > 1)  // More ballons pending: use minimum timeout
+   if (m_pending.size() > 1)  // More balloons pending: use minimum timeout
       timeout.QuadPart = -(MIN_TIMEOUT * 10000);
    else  // No other balloons pending: Use maximum timeout
       timeout.QuadPart = -(MAX_TIMEOUT * 10000);
