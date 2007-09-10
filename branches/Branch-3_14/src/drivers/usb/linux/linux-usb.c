@@ -639,7 +639,7 @@ int pusb_ups_close(UPSINFO *ups)
  */
 int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_info)
 {
-   int rtype[2] = { HID_REPORT_TYPE_FEATURE, HID_REPORT_TYPE_INPUT };
+   int rtype[2] = { HID_REPORT_TYPE_INPUT, HID_REPORT_TYPE_FEATURE };
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
    struct hiddev_report_info rinfo;
    struct hiddev_field_info finfo;
