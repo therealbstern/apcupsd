@@ -177,12 +177,8 @@ int ApcupsdAppMain(int service)
    if (sem == NULL || GetLastError() == ERROR_ALREADY_EXISTS) {
       MessageBox(NULL, "Another instance of Apcupsd is already running", 
                  "Apcupsd Error", MB_OK);
-      _exit(0);
+      return 0;
    }
-
-   // Create a thread on which to run apcupsd UNIX main loop
-   pthread_t tid;
-   pthread_create(&tid, NULL, ApcupsdMain, (void *)GetCurrentThreadId());
 
    // Dummy window class
    WNDCLASSEX wndclass;
@@ -198,20 +194,27 @@ int ApcupsdAppMain(int service)
    wndclass.lpszMenuName = NULL;
    wndclass.lpszClassName = APCUPSD_WINDOW_CLASS;
    wndclass.hIconSm = NULL;
-   RegisterClassEx(&wndclass);
+   if (RegisterClassEx(&wndclass) == 0)
+      return 0;
 
    // Create dummy window so we can receive Windows messages
-   CreateWindow(APCUPSD_WINDOW_CLASS,  // class
-                APCUPSD_WINDOW_NAME,   // name/title
-                0,                     // style
-                0,                     // X pos
-                0,                     // Y pos
-                0,                     // width
-                0,                     // height
-                NULL,                  // parent
-                NULL,                  // menu
-                hAppInstance,          // app instance
-                NULL);                 // create param
+   if (CreateWindow(APCUPSD_WINDOW_CLASS,  // class
+                    APCUPSD_WINDOW_NAME,   // name/title
+                    0,                     // style
+                    0,                     // X pos
+                    0,                     // Y pos
+                    0,                     // width
+                    0,                     // height
+                    NULL,                  // parent
+                    NULL,                  // menu
+                    hAppInstance,          // app instance
+                    NULL                   // create param
+                   ) == NULL)
+       return 0;
+
+   // Create a thread on which to run apcupsd UNIX main loop
+   pthread_t tid;
+   pthread_create(&tid, NULL, ApcupsdMain, (void *)GetCurrentThreadId());
 
    // Now enter the Windows message handling loop until told to quit
    MSG msg;
