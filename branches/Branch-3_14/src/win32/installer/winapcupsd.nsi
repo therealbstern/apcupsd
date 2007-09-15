@@ -217,92 +217,17 @@ Function ApctrayEnter
   !insertmacro MUI_INSTALLOPTIONS_DISPLAY "Apctray.ini"
 FunctionEnd
 
-;Function EnDisableApctrayModify
-  ; Get passed-in state
-  ; Pop $R0
-
-  ; Enable/Disable Apctray parameter fields
-  ; !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Field 5" "HWND"
-  ; EnableWindow $R1 $R0
-  ; !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Field 5" "HWND2"
-  ; EnableWindow $R1 $R0
-  ; !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Field 7" "HWND"
-  ; EnableWindow $R1 $R0
-  ; !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Field 7" "HWND2"
-  ; EnableWindow $R1 $R0
-  ; !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Field 9" "HWND"
-  ; EnableWindow $R1 $R0
-  ; !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Field 9" "HWND2"
-  ; EnableWindow $R1 $R0
-
-  ; Update .ini in case someone uses the back button
-  ; ${If} $R0 == 1
-    ; !insertmacro MUI_INSTALLOPTIONS_WRITE "Apctray.ini" "Field 5" "Flags" ""
-    ; !insertmacro MUI_INSTALLOPTIONS_WRITE "Apctray.ini" "Field 7" "Flags" "ONLY_NUMBERS"
-    ; !insertmacro MUI_INSTALLOPTIONS_WRITE "Apctray.ini" "Field 9" "Flags" "ONLY_NUMBERS"
-  ; ${Else}
-    ; !insertmacro MUI_INSTALLOPTIONS_WRITE "Apctray.ini" "Field 5" "Flags" "DISABLED"
-    ; !insertmacro MUI_INSTALLOPTIONS_WRITE "Apctray.ini" "Field 7" "Flags" "ONLY_NUMBERS|DISABLED"
-    ; !insertmacro MUI_INSTALLOPTIONS_WRITE "Apctray.ini" "Field 9" "Flags" "ONLY_NUMBERS|DISABLED"
-  ; ${EndIf}
-; FunctionEnd
-
 Function ApctrayExit
   ; We get called when checkbox changes or next button is pressed
   ; Figure out which this is.
-  
-;  ; If user clicked "parameter" checkbox
-;  !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Settings" "State"
-;  ${If} $R1 == 11
-;    ; Obtain desired field state
-;    !insertmacro MUI_INSTALLOPTIONS_READ $R0 "Apctray.ini" "Field 11" "State"
-;
-;    ; Call helper to enable/disable fields
-;    Push $R0
-;    Call EnDisableApctrayModify
-;
-;    ; Return to the page
-;    Abort
-;  ${EndIf}
-;
-;  ; If user clicked "install" checkbox
-;  ${If} $R1 == 2
-;    !insertmacro MUI_INSTALLOPTIONS_READ $R0 "Apctray.ini" "Field 2" "State"
-;    !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Field 11" "HWND"
-;    EnableWindow $R1 $R0
-;    !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Field 11" "HWND2"
-;    EnableWindow $R1 $R0
-;
-;    ${If} $R0 == 1
-;      !insertmacro MUI_INSTALLOPTIONS_WRITE "Apctray.ini" "Field 11" "Flags" ""
-;      !insertmacro MUI_INSTALLOPTIONS_READ $R0 "Apctray.ini" "Field 11" "State"
-;    ${Else}
-;      !insertmacro MUI_INSTALLOPTIONS_WRITE "Apctray.ini" "Field 11" "Flags" "DISABLED"
-;    ${EndIf}
-;
-;    ; Call helper to enable/disable parameter fields
-;    Push $R0
-;    Call EnDisableApctrayModify
-;
-;    ; Return to the page
-;    Abort
-;  ${EndIf}
+
+  !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Settings" "State"
+  ${If} $R1 == 2
+    ; Return to the page
+    Abort
+  ${EndIf}
 
   ; Regular exit due to Next button press...
-
-;  ; Fetch modified parameters, if enabled
-;  !insertmacro MUI_INSTALLOPTIONS_READ $R0 "Apctray.ini" "Field 11" "State"
-;  ${If} $R0 == 1
-;    !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Field 5" "State"
-;    StrCpy $R0 "/host $\"$R1$\" "
-;    !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Field 7" "State"
-;    StrCpy $R0 "$R0 /port $R1 "
-;    !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Field 9" "State"
-;    StrCpy $R0 "$R0 /refresh $R1"
-;    MessageBox MB_OK $R0
-;  ${Else}
-;    StrCpy $R0 ""
-;  ${EndIf}
 
   ; (Un)Install apctray
   !insertmacro MUI_INSTALLOPTIONS_READ $R1 "Apctray.ini" "Field 2" "State"
@@ -335,8 +260,9 @@ Section "Apcupsd Service" SecService
   ; We're installing the main package
   StrCpy $MainInstalled 1
 
-  ; Shutdown any apcupsd that might be running
+  ; Shutdown any apcupsd or apctray that might be running
   ${ShutdownApp} ${APCUPSD_WINDOW_CLASS} 5000
+  ${ShutdownApp} ${APCTRAY_WINDOW_CLASS} 5000
 
   ; Create installation directories
   CreateDirectory "$INSTDIR\bin"
@@ -514,14 +440,12 @@ Section "Uninstall"
   ReadRegDWORD $R0 HKLM "Software\Apcupsd" "InstalledService"
   ${If} $R0 == 1
     ExecWait '"$INSTDIR\bin\apcupsd.exe" /quiet /remove'
-    Sleep 1000
   ${EndIf}
 
   ; Remove apctray autorun, if needed
   ReadRegStr $R0 HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "Apctray"
   ${If} $R0 != ""
-    ExecWait '"$INSTDIR\bin\apctray.exe" /remove'
-    Sleep 1000
+    ExecWait '"$INSTDIR\bin\apctray.exe" /quiet /remove'
   ${EndIf}
 
   ; remove registry keys
