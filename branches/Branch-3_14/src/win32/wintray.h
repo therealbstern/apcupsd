@@ -61,6 +61,7 @@ protected:
    const char             *m_host;
    unsigned short          m_port;
    UINT                    m_tbcreated_msg;  // Id of TaskbarCreated message
+   HINSTANCE               m_appinst;        // Application instance handle
 
    // Dialogs for About, Status, and Events
    upsAbout                m_about;

@@ -33,6 +33,7 @@ StatMgr::~StatMgr()
 {
    lock();
    close();
+   CloseHandle(m_mutex);
 }
 
 bool StatMgr::Update()

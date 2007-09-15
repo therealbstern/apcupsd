@@ -47,9 +47,9 @@ BalloonMgr::~BalloonMgr()
    if (m_thread) {
       if (WaitForSingleObject(m_thread, 5000) == WAIT_TIMEOUT)
          TerminateThread(m_thread, 0);
+      CloseHandle(m_thread);
    }
 
-   CloseHandle(m_thread);
    CloseHandle(m_mutex);
    CloseHandle(m_event);
    CloseHandle(m_timer);

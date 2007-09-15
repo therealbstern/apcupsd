@@ -34,7 +34,9 @@ upsMenu::upsMenu(HINSTANCE appinst, const char* host, unsigned long port,
      m_upsname("<unknown>"),
      m_balmgr(balmgr),
      m_host(host),
-     m_port(port)
+     m_port(port),
+     m_appinst(appinst),
+     m_hwnd(NULL)
 {
    // Determine message id for "TaskbarCreate" message
    m_tbcreated_msg = RegisterWindowMessage("TaskbarCreated");
@@ -109,18 +111,35 @@ upsMenu::~upsMenu()
    if (m_thread) {
       if (WaitForSingleObject(m_thread, 5000) == WAIT_TIMEOUT)
          TerminateThread(m_thread, 0);
+      CloseHandle(m_thread);
    }
 
+   // Destroy the mutex
+   if (m_wait != NULL)
+      CloseHandle(m_wait);
+
+   // Destroy the status manager
+   delete m_statmgr;
+
    // Remove the tray icon
-   SendTrayMsg(NIM_DELETE);
+   DelTrayIcon();
+
+   // Destroy the window
+   if (m_hwnd != NULL)
+      DestroyWindow(m_hwnd);
 
    // Destroy the loaded menu
    if (m_hmenu != NULL)
       DestroyMenu(m_hmenu);
+
+   // Unregister the window class
+   UnregisterClass(APCTRAY_WINDOW_CLASS, m_appinst);
 }
 
 void upsMenu::Destroy()
 {
+   // Trigger status poll thread to shut down. We will wait for
+   // the thread to exit later in our destructor.
    if (m_wait)
       ReleaseMutex(m_wait);
 }
@@ -300,7 +319,6 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
    // The user wants Apctray to quit cleanly...
    case WM_CLOSE:
-   case WM_DESTROY:
       PostQuitMessage(0);
       return 0;
 
