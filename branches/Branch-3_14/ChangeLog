@@ -8,6 +8,269 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2007-09-15 10:48  adk0212
+
+	* src/win32/installer/: Apctray.ini, winapcupsd.nsi:
+
+	Remove commented-out code.
+
+2007-09-15 10:48  adk0212
+
+	* src/win32/winmain.cpp:
+
+	Misc cleanup.
+
+2007-09-15 10:48  adk0212
+
+	* src/win32/: balloonmgr.cpp, statmgr.cpp, wintray.cpp, wintray.h:
+
+	Fix handle leaks when adding/deleting instances.
+
+2007-09-10 19:35  adk0212
+
+	* src/win32/build-win32-cross-tools:
+
+	Update NSIS to 2.30.
+
+2007-09-10 19:31  adk0212
+
+	* include/version.h:
+
+	Bump version to 3.14.2.
+
+2007-09-10 19:09  adk0212
+
+	* src/drivers/usb/: bsd/bsd-usb.c, generic/generic-usb.c,
+	linux/linux-usb.c:
+
+	Prefer FEATURE reports over INPUT reports when searching for
+	usages. This will fix compatiblity with BackUPS LCD models which
+	have present but non- functional INPUT reports. It may break
+	compatibility with other models, so fingers are crossed.
+
+2007-09-10 19:08  adk0212
+
+	* src/win32/balloonmgr.cpp:
+
+	Minor cleanup and spelling fix.
+
+2007-08-28 19:57  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Address g++ linker vs. libsupc++ differently: Default linker to gcc
+	if none is specified. This avoids overriding LD= passed to
+	configure since if the user asks for an explicit LD we really
+	should honor it (and it's needed for building universal binaries on
+	OS X).
+
+2007-08-28 19:02  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Remove dependency on libc++ (again). Must use gcc as linker when
+	using libsupc++ since g++ automatically links against full libc++.
+
+2007-08-25 15:01  adk0212
+
+	* src/lib/newups.c:
+
+	Fix race between attach_ups() and detach_ups() which could result
+	in the UPSINFO structure being freed prematurely. Thanks to James
+	Abbott <j.abbott@imperial.ac.uk> for running many tests to help me
+	find this bug.
+
+2007-08-23 18:43  adk0212
+
+	* platforms/etc/multimon.conf:
+
+	Correct multimon.conf humidity monitoring.  Problem fixed by
+	Patrick Frei.  Reference:
+	https://bugzilla.novell.com/show_bug.cgi?id=199834
+
+2007-08-06 20:17  adk0212
+
+	* src/win32/apctray.cpp:
+
+	Exit apctray if GetMessage() returns an error.
+
+2007-08-06 20:16  adk0212
+
+	* src/win32/winups.h:
+
+	Use enum for application-defined messages.
+
+2007-08-06 20:16  adk0212
+
+	* src/win32/: wintray.cpp, wintray.h:
+
+	Redraw tray icons politely after an Explorer crash.
+
+2007-08-05 17:31  adk0212
+
+	* src/lib/apclibnis.c:
+
+	Fix bug with multi-threaded net_open() calls. net_open() was using
+	a global buffer for the destination address. Yikes! Bug manifestied
+	itself in apctray with multiple monitors occasionally (and
+	timing-dependently) pointing to the wrong UPS.
+
+2007-08-03 15:08  adk0212
+
+	* src/: apctest.c, apcupsd.c, lib/apcconfig.c:
+
+	More argvalue to its primary user, apcconfig.c.
+
+2007-08-03 15:08  adk0212
+
+	* src/drivers/pcnet/pcnet.c:
+
+	Remove SO_REUSEADDR; we'd only need this for TCP. Set SO_BROADCAST
+	since some platforms (Windows) seem to require it in order to
+	receive broadcast packets. (Most platforms use it only to enable
+	*sending* broadcasts.)
+
+2007-08-03 14:41  adk0212
+
+	* src/lib/apcexec.c:
+
+	Don't leak unnecessary descriptors to child when execing
+	apccontrol.
+
+2007-08-03 13:52  adk0212
+
+	* doc/latex/manual.tex:
+
+	Documentation updates: Fix up udev info for modern Linux distros.
+	Update Windows section for apctray.
+
+2007-08-03 11:49  adk0212
+
+	* src/drivers/apcsmart/smart.c:
+
+	Wait 20 seconds before declaring COMMLOST. This is necessary when
+	using a smart serial cable on an UPS with an SNMP monitoring card
+	installed. The SNMP card appears to disrupt serial comms for
+	several seconds when interesting events are in progress.
+
+2007-08-03 11:47  adk0212
+
+	* examples/smartsim.c:
+
+	Add command help key since I can never remember what the keycodes
+	are.
+
+2007-08-03 11:20  adk0212
+
+	* INSTALL, doc/latex/manual.tex, examples/safe.apccontrol.in,
+	platforms/apccontrol.in, platforms/darwin/apccontrol.in,
+	platforms/freebsd/apccontrol.in, platforms/mingw/apccontrol.bat,
+	platforms/openbsd/apccontrol.in, platforms/sun/apccontrol.in:
+
+	apccontrol cleanups: powerout and mainsback should not wall; that
+	is done by onbattery/offbattery under the control of
+	ONBATTERYDELAY. Also remove obsolete 'restartme' event from scripts
+	and documentation.
+
+2007-08-03 11:17  adk0212
+
+	* src/apcaccess.c:
+
+	Remove lots of obsolete code. 'status' is now the only supported
+	option.
+
+2007-08-01 19:05  adk0212
+
+	* src/drivers/pcnet/pcnet.c:
+
+	Enable SO_REUSEADDR on pcnet socket to prevent false EADDRINUSE
+	after quick restarts.
+
+2007-07-26 16:36  adk0212
+
+	* platforms/mingw/apccontrol.bat:
+
+	Remove duplicate line. Noticed by David P. Mott <dpmott@sep.com>.
+
+2007-07-20 12:17  adk0212
+
+	* examples/smartsim.c:
+
+	Add support for simulating comm failure.
+
+2007-07-17 18:54  adk0212
+
+	* examples/hid-ups.c:
+
+	Include /dev in hiddev search.
+
+2007-07-17 18:50  adk0212
+
+	* examples/hid-ups.c:
+
+	Report time delta from start of program when displaying events.
+	Contributed by David Fries <david@fries.net>.
+
+2007-07-16 20:28  adk0212
+
+	* src/drivers/usb/usb.c:
+
+	Add workaround for broken BackUPS Pro model that returns certain
+	reports encoded in ASCII. Based on a patch from David Fries
+	<David@Fries.net>.
+
+2007-07-14 13:26  adk0212
+
+	* src/win32/: apctray.cpp, winups.h:
+
+	Add/remove tray icons on the fly as instances are added or deleted.
+
+2007-07-14 13:05  adk0212
+
+	* src/win32/: winres.h, winres.rc, wintray.cpp, wintray.h:
+
+	Add HOST field showing hostname:port to context menu.
+
+2007-07-14 13:04  adk0212
+
+	* src/win32/build-win32-cross-tools:
+
+	Update NSIS to version 2.29.
+
+2007-07-14 12:53  adk0212
+
+	* src/win32/apctray.cpp:
+
+	Disable autorun when last instance removed.
+
+2007-07-01 14:30  adk0212
+
+	* src/drivers/snmp/snmp.c:
+
+	Fix SNMP port selection. Newer versions of Net-SNMP appear to
+	ignore the session remote_port setting. The only way to override
+	the default port is to include it in the peername string.
+
+2007-06-29 18:18  adk0212
+
+	* src/drivers/usb/linux/linux-usb.c:
+
+	Fix linux-usb device detection bug when multiple hiddev nodes are
+	present.  Fixes Fedora Bugzilla #245864:
+	<https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=245864>
+
+2007-06-19 20:43  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Update for 3.14.2-win32beta2 release.
+
+2007-06-18 20:23  adk0212
+
+	* ChangeLog:
+
+	Regen ChangeLog after committing forgotten files.
+
 2007-06-18 19:49  adk0212
 
 	* include/defines.h:
@@ -274,23 +537,6 @@
 	* src/win32/apcupsd.rc:
 
 	Remove unused file.
-
-2007-06-06 19:48  adk0212
-
-	* src/win32/: apcupsd/StdAfx.cpp, apcupsd/StdAfx.h,
-	apcupsd/apcupsd-obj.mak.in, apcupsd/apcupsd.dep,
-	apcupsd/apcupsd.dsp, apcupsd/apcupsd.dsw, apcupsd/apcupsd.mak,
-	apcupsd/apcupsd.mak.in, apcupsd/filelist, apcupsd/genmake.sh,
-	lib/action.cpp, lib/apcconfig.cpp, lib/apcerror.cpp,
-	lib/apcevents.cpp, lib/apcexec.cpp, lib/apcfile.cpp,
-	lib/apclibnis.cpp, lib/apclist.cpp, lib/apclock.cpp,
-	lib/apclog.cpp, lib/apcnis.cpp, lib/apcsignal.cpp,
-	lib/apcstatus.cpp, lib/apcupsd.cpp, lib/asys.cpp, lib/device.cpp,
-	lib/drivers.cpp, lib/newups.cpp, lib/options.cpp, lib/reports.cpp,
-	lib/smart.cpp, lib/smarteeprom.cpp, lib/smartoper.cpp,
-	lib/smartsetup.cpp, lib/smartsetup2.cpp, lib/testdriver.cpp:
-
-	Remove unused files.
 
 2007-06-06 19:44  adk0212
 
