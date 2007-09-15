@@ -19,7 +19,7 @@ rem Paths to important executables
 SET APCUPSD="%sbindir%\apcupsd"
 SET SHUTDOWN="%sbindir%\shutdown"
 SET BACKGROUND="%sbindir%\background"
-SET POPUP=%BACKGROUND% "%sbindir\%popup"
+SET POPUP=%BACKGROUND% "%sbindir%\popup"
 
 rem
 rem This piece is to substitute the default behaviour with your own script,
@@ -72,12 +72,10 @@ IF "%command%" == "timeout"       GOTO :timeout
 IF "%command%" == "loadlimit"     GOTO :loadlimit
 IF "%command%" == "runlimit"      GOTO :runlimit
 IF "%command%" == "doshutdown"    GOTO :doshutdown
-IF "%command%" == "mainsback"     GOTO :mainsback
 IF "%command%" == "annoyme"       GOTO :annoyme
 IF "%command%" == "emergency"     GOTO :emergency
 IF "%command%" == "changeme"      GOTO :changeme
 IF "%command%" == "remotedown"    GOTO :remotedown
-IF "%command%" == "restartme"     GOTO :restartme
 IF "%command%" == "startselftest" GOTO :startselftest
 IF "%command%" == "endselftest"   GOTO :endselftest
 IF "%command%" == "battdetach"    GOTO :battdetach
@@ -167,9 +165,6 @@ rem
 
 :remotedown
    %POPUP% "Shutdown due to master state or comms lost."
-   GOTO :done
-
-:restartme
    GOTO :done
 
 :startselftest

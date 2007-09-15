@@ -1,104 +1,78 @@
-//  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
-//
-//  This file is part of the VNC system.
-//
-//  The VNC system is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
-//  USA.
-//
-// If the source code for the VNC system is not available from the place 
-// whence you received this file, check http://www.uk.research.att.com/vnc or contact
-// the authors on vnc@uk.research.att.com for information on obtaining it.
 // This file has been adapted to the Win32 version of Apcupsd
 // by Kern E. Sibbald.  Many thanks to ATT and James Weatherall,
 // the original author, for providing an excellent template.
 //
-// Copyright (2000) Kern E. Sibbald
+// Rewrite/Refactoring by Adam Kropelin
 //
+// Copyright (2007) Adam D. Kropelin
+// Copyright (2000) Kern E. Sibbald
 
-
-
-// winMenu
 
 // This class handles creation of a system-tray icon & menu
 
-class upsMenu;
+#ifndef WINTRAY_H
+#define WINTRAY_H
 
-#if (!defined(_win_upsMENU))
-#define _win_upsMENU
-
-#include <lmcons.h>
-#include "winprop.h"
+#include <windows.h>
 #include "winabout.h"
 #include "winstat.h"
 #include "winevents.h"
+#include <string>
 
-// Constants
-#ifdef properties_implemented
-extern const UINT MENU_PROPERTIES_SHOW;
-extern const UINT MENU_DEFAULT_PROPERTIES_SHOW;
-#endif
-extern const UINT MENU_ABOUTBOX_SHOW;
-extern const UINT MENU_STATUS_SHOW;
-extern const UINT MENU_EVENTS_SHOW;
-extern const UINT MENU_SERVICEHELPER_MSG;
-extern const UINT MENU_ADD_CLIENT_MSG;
-extern const char *MENU_CLASS_NAME;
+// Forward declarations
+class StatMgr;
+class BalloonMgr;
 
 // The tray menu class itself
 class upsMenu
 {
 public:
-        upsMenu();
-        ~upsMenu();
+   upsMenu(HINSTANCE appinst, const char *host, unsigned long port,
+           int refresh, BalloonMgr *balmgr);
+   ~upsMenu();
+   void Destroy();
+
 protected:
-        // Tray icon handling
-        void AddTrayIcon();
-        void DelTrayIcon();
-        void UpdateTrayIcon();
-        void SendTrayMsg(DWORD msg);
+   // Tray icon handling
+   void AddTrayIcon();
+   void DelTrayIcon();
+   void UpdateTrayIcon();
+   void SendTrayMsg(DWORD msg);
 
-        // Message handler for the tray window
-        static LRESULT CALLBACK WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
+   // Message handler for the tray window
+   static LRESULT CALLBACK WndProc(
+      HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
 
-        // Fields
-protected:
+   // Fetch UPS status info
+   bool FetchStatus(int &battstat, std::string &statstr, std::string &upsname);
 
-        // Properties object for this server
-#ifdef properties_implemented
-        upsProperties   m_properties;
-#endif
+   // Thread to poll for UPS status changes
+   static DWORD WINAPI StatusPollThread(LPVOID param);
 
-        // About dialog for this server
-        upsAbout                m_about;
+   HWND                    m_hwnd;           // Window handle
+   HMENU                   m_hmenu;          // Menu handle
+   StatMgr                *m_statmgr;        // Manager for UPS stats
+   int                     m_interval;       // How often to poll for status
+   HANDLE                  m_thread;         // Handle to status polling thread
+   HANDLE                  m_wait;           // Handle to wait mutex
+   std::string             m_upsname;        // Cache UPS name
+   std::string             m_laststatus;     // Cache previous status string
+   BalloonMgr             *m_balmgr;         // Balloon tip manager
+   const char             *m_host;
+   unsigned short          m_port;
+   UINT                    m_tbcreated_msg;  // Id of TaskbarCreated message
+   HINSTANCE               m_appinst;        // Application instance handle
 
-        // Status dialog for this server
-        upsStatus               m_status;
+   // Dialogs for About, Status, and Events
+   upsAbout                m_about;
+   upsStatus               m_status;
+   upsEvents               m_events;
 
-        upsEvents               m_events;
-
-        HWND                    m_hwnd;
-        HMENU                   m_hmenu;
-        NOTIFYICONDATA          m_nid;
-        UINT                    m_balloon_timer;
-
-        // The icon handles
-        HICON                   m_online_icon;
-        HICON                   m_onbatt_icon;
-        HICON                   m_charging_icon;
-        HICON                   m_commlost_icon;
+   // The icon handles
+   HICON                   m_online_icon;
+   HICON                   m_onbatt_icon;
+   HICON                   m_charging_icon;
+   HICON                   m_commlost_icon;
 };
 
-
-#endif
+#endif // WINTRAY_H

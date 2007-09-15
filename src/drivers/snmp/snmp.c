@@ -58,10 +58,16 @@ static int initialize_device_data(UPSINFO *ups)
       log_event(ups, LOG_ERR, "Wrong port for SNMP driver.");
       exit(1);
    }
-   *cp = '\0';
+
+   /*
+    * Note that we purposely keep :port as part of peername. Newer
+    * versions of Net-SNMP appear to ignore sess->remote_port and you
+    * can only specify a port number by including it in the peername.
+    * Older versions also appear to be able to cope with :port
+    * appended to peername.
+    */
 
    port_num = cp + 1;
-
    cp = strchr(port_num, ':');
    if (cp == NULL) {
       log_event(ups, LOG_ERR, "Wrong vendor for SNMP driver.");

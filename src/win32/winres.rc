@@ -25,15 +25,22 @@ IDR_TRAYMENU MENU DISCARDABLE
 BEGIN
     POPUP "tray"
     BEGIN
+        MENUITEM "UPS: <unknown>",              ID_NAME, INACTIVE
+        MENUITEM "HOST: <unknown>",             ID_HOST, INACTIVE
+        MENUITEM SEPARATOR
         MENUITEM "&Status",                     ID_STATUS
         MENUITEM "&Events",                     ID_EVENTS
 #ifdef properties_implemented
         MENUITEM "&Properties",                 ID_PROPERTIES
 #endif
         MENUITEM SEPARATOR
-        MENUITEM "&About Apcupsd",              ID_ABOUT
+        MENUITEM "&About",                      ID_ABOUT
         MENUITEM SEPARATOR
-        MENUITEM "&Close Apcupsd",              ID_CLOSE
+        MENUITEM "Remove This Instance",        ID_REMOVE
+        MENUITEM "Remove All Instances",        ID_REMOVEALL
+        MENUITEM SEPARATOR
+        MENUITEM "Close This Instance",         ID_CLOSEINST
+        MENUITEM "&Close All Instances",        ID_CLOSE
     END
 END
 
@@ -130,14 +137,16 @@ BEGIN
 //  CONTROL         "\3", IDC_APCUPSDBMP,"Static",SS_ICON | SS_CENTERIMAGE |
 //                  SS_SUNKEN,7,5,73,65
     CONTROL         "a", IDB_APCUPSDBMP,"Static",SS_BITMAP|SS_SUNKEN,7,5,73,65
-    LTEXT           "Apcupsd Version " VERSION " (" ADATE ")", IDC_VERSION,90,10,239,10
-    LTEXT           "      by Kern Sibbald",IDC_NAME,90,20,239,10
+    LTEXT           "ApcTray Version " VERSION " (" ADATE ")", IDC_VERSION,90,10,239,10
+    LTEXT           "      by Adam Kropelin",IDC_NAME,90,20,239,10
     LTEXT           "For more information, see:",
                     IDC_WWW,90,40,239,10
-    LTEXT           "         www.apcupsd.com",
+    LTEXT           "      http://www.apcupsd.com",
                     IDC_WWW,90,50,239,10
-    LTEXT           "         sourceforge.net/projects/apcupsd",
+    LTEXT           "      http://sourceforge.net/projects/apcupsd",
                     IDC_WWW,90,60,239,10
+    LTEXT           "Copyright (C) 2004-2007, Adam Kropelin",
+                    IDC_COPYRIGHT,7,90,175,10
     LTEXT           "Copyright (C) 1999-2006, Kern Sibbald",
                     IDC_COPYRIGHT,7,100,175,10
     LTEXT           "Copyright (C) 1999-2002, Riccardo Facchetti",
@@ -157,10 +166,11 @@ IDD_STATUS DIALOG DISCARDABLE  0, 0, 261, 244
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | 
     WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "Apcupsd Status"
-FONT 8, "Courier New"
+FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "&OK",IDOK,205,5,51,15
-    LISTBOX         IDC_LIST, 2, 2, 200, 240, WS_VSCROLL | WS_BORDER
+    DEFPUSHBUTTON   "&Refresh", ID_REFRESH, 205, 25,  51,  15
+    DEFPUSHBUTTON   "&OK",      IDOK,       205, 5,   51,  15
+    LISTBOX                     IDC_LIST,   2,   2,  200, 240, WS_VSCROLL | WS_BORDER
 END
 
 /////////////////////////////////////////////////////////////////////////////
@@ -172,8 +182,9 @@ IDD_EVENTS DIALOG DISCARDABLE  0, 0, 411, 204
 STYLE DS_MODALFRAME | DS_3DLOOK | DS_CENTER | WS_MINIMIZEBOX | WS_POPUP | 
     WS_VISIBLE | WS_CAPTION | WS_SYSMENU
 CAPTION "Apcupsd Events"
-FONT 8, "Courier New"
+FONT 8, "MS Sans Serif"
 BEGIN
-    DEFPUSHBUTTON   "&OK",IDOK,355,5,51,15
-    LISTBOX         IDC_LIST, 2, 2, 350, 200, WS_VSCROLL | WS_HSCROLL | WS_BORDER
+    DEFPUSHBUTTON   "&Refresh", ID_REFRESH, 355, 25,  51,  15
+    DEFPUSHBUTTON   "&OK",      IDOK,       355,  5,  51,  15
+    LISTBOX         IDC_LIST,               2,    2, 350, 200, WS_VSCROLL | WS_HSCROLL | WS_BORDER
 END

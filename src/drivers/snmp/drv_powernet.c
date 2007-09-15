@@ -141,7 +141,11 @@ int powernet_snmp_ups_get_capabilities(UPSINFO *ups)
       if (i != CI_NOMBATTV &&
           i != CI_HUMID    &&
           i != CI_ATEMP    &&
-          i != CI_VBATT)
+          i != CI_VBATT    &&
+          i != CI_NOMINV   &&
+          i != CI_REG1     &&
+          i != CI_REG2     &&
+          i != CI_REG3)
          ups->UPS_Cap[i] = TRUE;
    }
 
@@ -322,7 +326,6 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups)
    powernet_mib_mgr_get_upsAdvBattery(s, &(data->upsAdvBattery));
    if (data->upsAdvBattery) {
       ups->BattChg = data->upsAdvBattery->__upsAdvBatteryCapacity;
-      ups->UPSTemp = data->upsAdvBattery->__upsAdvBatteryTemperature;
       ups->UPSTemp = data->upsAdvBattery->__upsAdvBatteryTemperature;
       ups->TimeLeft = data->upsAdvBattery->__upsAdvBatteryRunTimeRemaining / 6000;
 

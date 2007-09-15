@@ -98,19 +98,39 @@ static void reinitialize_private_structure(UPSINFO *ups)
    }
 }
 
-/* 
- * See if the USB device speaks UPS language
+/*
+ * Internal routine to attempt device open.
  */
-static int find_usb_application(UPSINFO *ups)
+static int open_device(const char *dev, UPSINFO *ups)
 {
-   int i, ret;
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
+   int flaguref = HIDDEV_FLAG_UREF;
+   int fd, ret, i;
 
-   for (i = 0; (ret = ioctl(my_data->fd, HIDIOCAPPLICATION, i)) > 0; i++) {
-      if ((ret & 0xffff000) == (UPS_USAGE & 0xffff0000))
-         return 1;
+   Dmsg1(200, "Attempting to open \"%s\"\n", dev);
+
+   /* Open the device port */
+   fd = open(dev, O_RDWR | O_NOCTTY);
+   if (fd >= 0) {
+      /* Check for the UPS application HID usage */
+      for (i = 0; (ret = ioctl(fd, HIDIOCAPPLICATION, i)) > 0; i++) {
+         if ((ret & 0xffff000) == (UPS_USAGE & 0xffff0000)) {
+            /* Request full uref reporting from read() */
+            if (FORCE_COMPAT24 || ioctl(fd, HIDIOCSFLAG, &flaguref)) {
+               Dmsg0(100, "HIDIOCSFLAG failed; enabling linux-2.4 "
+                      "compatibility mode\n");
+               my_data->compat24 = true;
+            }
+            /* Successfully opened the device */
+            Dmsg1(200, "Successfully opened \"%s\"\n", dev);
+            return fd;
+         }
+      }
+      close(fd);
    }
-   return 0;
+
+   /* Failed to open the device */
+   return -1;
 }
 
 /*
@@ -121,15 +141,11 @@ static int find_usb_application(UPSINFO *ups)
  */
 static int open_usb_device(UPSINFO *ups)
 {
-   char *p, *q, *r;
-   int start, end;
-   char name[MAXSTRING];
    char devname[MAXSTRING];
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
    const char *hiddev[] =
       { "/dev/usb/hiddev", "/dev/usb/hid/hiddev", "/dev/hiddev", NULL };
    int i, j, k;
-   int flaguref = HIDDEV_FLAG_UREF;
 
    /*
     * Note, we set ups->fd here so the "core" of apcupsd doesn't
@@ -147,121 +163,60 @@ static int open_usb_device(UPSINFO *ups)
    if (ups->device[0] == 0)
       goto auto_detect;
 
-   if (my_data->orig_device[0] == 0)
-      astrncpy(my_data->orig_device, ups->device, sizeof(my_data->orig_device));
-
-   astrncpy(name, my_data->orig_device, sizeof(name));
-   p = strchr(name, '[');
-   if (p) {                        /* range specified */
-      q = strchr(p + 1, '-');
-      if (q) {
-         *q++ = 0;                 /* terminate first number */
-         r = strchr(q, ']');
-      } else {
-         r = NULL;
-      }
-
-      if (!q || !r)
-         Error_abort0("Bad DEVICE configuration range specifed.\n");
-
-      *r = 0;                      /* terminate second number */
-      start = atoi(p + 1);         /* scan first number */
-      end = atoi(q);               /* scan second number */
-
-      if (start > end || start < 0)
-         Error_abort0("Bad DEVICE configuration range specifed.\n");
-
-      /* Concatenate %d */
-      *p++ = '%';
-      *p++ = 'd';
-      *p++ = 0;
-   } else {
-      start = end = 1;
+   /*
+    * Also if specified device includes deprecated '[]' notation,
+    * just use the automatic search.
+    */
+   if (strchr(ups->device, '[') &&
+       strchr(ups->device, ']'))
+   {
+      my_data->orig_device[0] = 0;
+      goto auto_detect;
    }
 
+   /*
+    * If we get here we know the user specified a device or we are
+    * trying to re-open a device that previously was open.
+    */
+ 
+   /* Retry 10 times */
    for (i = 0; i < 10; i++) {
-      for (; start <= end; start++) {
-         asnprintf(devname, sizeof(devname), name, start);
-
-         /* Open the device port */
-         if ((my_data->fd = open(devname, O_RDWR | O_NOCTTY)) < 0)
-            continue;
-
-         if (!find_usb_application(ups)) {
-            close(my_data->fd);
-            my_data->fd = -1;
-            continue;
-         }
-
-         /* Request full uref reporting from read() */
-         if (FORCE_COMPAT24 || ioctl(my_data->fd, HIDIOCSFLAG, &flaguref)) {
-            Dmsg0(100, "HIDIOCSFLAG failed; enabling linux-2.4 "
-                       "compatibility mode\n");
-            my_data->compat24 = true;
-         }
-
-         break;
-      }
-
-      if (my_data->fd >= 0) {
-         astrncpy(ups->device, devname, sizeof(ups->device));
+      my_data->fd = open_device(ups->device, ups);
+      if (my_data->fd != -1)
          return 1;
-      }
-
       sleep(1);
    }
+
    /*
-    * If the above device specified by the user fails, fall through
-    * here and look in predefined places for the device.
+    * If user-specified device could not be opened, fail.
+    */
+   if (my_data->orig_device[0] != 0)
+      return 0;
+
+   /*
+    * If we get here we failed to re-open a previously auto-detected
+    * device. We will fall thru and restart autodetection...
     */
 
-/*
- * Come here if no device name is given or we failed to open the
- * device specified.
- *
- * Here we try to autodetect the UPS in the standard places.
- *
- */
- auto_detect:
-
+auto_detect:
+ 
    for (i = 0; i < 10; i++) {           /* try 10 times */
       for (j = 0; hiddev[j]; j++) {     /* loop over known device names */
          for (k = 0; k < 16; k++) {     /* loop over devices */
             asnprintf(devname, sizeof(devname), "%s%d", hiddev[j], k);
-
-            /* Open the device port */
-            if ((my_data->fd = open(devname, O_RDWR | O_NOCTTY)) < 0) {
-               continue;
+            my_data->fd = open_device(devname, ups);
+            if (my_data->fd != -1) {
+               /* Successful open, save device name and return */
+               astrncpy(ups->device, devname, sizeof(ups->device));
+               return 1;
             }
-
-            if (!find_usb_application(ups)) {
-               close(my_data->fd);
-               my_data->fd = -1;
-               continue;
-            }
-
-            /* Request full uref reporting from read() */
-            if (FORCE_COMPAT24 || ioctl(my_data->fd, HIDIOCSFLAG, &flaguref)) {
-               Dmsg0(100, "HIDIOCSFLAG failed; enabling linux-2.4 "
-                          "compatibility mode\n");
-               my_data->compat24 = true;
-            }
-
-            goto auto_opened;
          }
       }
-      sleep(1);                    /* wait a bit */
+      sleep(1);
    }
 
- auto_opened:
-
-   if (my_data->fd >= 0) {
-      astrncpy(ups->device, devname, sizeof(ups->device));
-      return 1;
-   } else {
-      ups->device[0] = 0;
-      return 0;
-   }
+   ups->device[0] = '\0';
+   return 0;
 }
 
 /* 
@@ -684,7 +639,7 @@ int pusb_ups_close(UPSINFO *ups)
  */
 int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_info)
 {
-   int rtype[2] = { HID_REPORT_TYPE_FEATURE, HID_REPORT_TYPE_INPUT };
+   int rtype[2] = { HID_REPORT_TYPE_INPUT, HID_REPORT_TYPE_FEATURE };
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
    struct hiddev_report_info rinfo;
    struct hiddev_field_info finfo;

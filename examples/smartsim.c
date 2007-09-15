@@ -22,6 +22,7 @@
  * to toggle flags and readouts. These commands can be found in the 
  * keycmds[] table. Supported keypress commands:
  *
+ *    ?   Help
  *    b   Onbattery toggle
  *    o   Overload toggle
  *    t   Trim toggle
@@ -29,6 +30,8 @@
  *    l   BattLow toggle
  *    x   Selftest toggle
  *    r   ReplaceBatt toggle
+ *    d   BattDetach toggle
+ *    c   CommFail toggle
  *    7/4 BattPct (inc/dec)   (use numeric keypad)
  *    8/5 LoadPct (inc/dec)   (use numeric keypad)
  *    9/6 TimeLeft (inc/dec)  (use numeric keypad)
@@ -71,6 +74,7 @@
 #define DEFAULT_BATTV      24.0
 #define DEFAULT_LINEV      120.0
 #define DEFAULT_OUTV       120.0
+#define DEFAULT_REG2       0x00
 
 int debug = 1;
 int ups = -1;
@@ -83,6 +87,7 @@ float timeleft = DEfAULT_TIMELEFT;
 float battv = DEFAULT_BATTV;
 float linev = DEFAULT_LINEV;
 float outv = DEFAULT_OUTV;
+unsigned char reg2 = DEFAULT_REG2;
 char xfercause[] = "O";
 char selftest[] = "OK";
 int onbatt = 0;
@@ -92,6 +97,7 @@ int battlow = 0;
 int rebatt = 0;
 int trim = 0;
 int boost = 0;
+int commfail = 0;
 
 #define dbg(str, args...)     \
 do                            \
@@ -109,6 +115,7 @@ static void rsp_string(void* arg);
 static void rsp_float(void* arg);
 static void rsp_cmds(void* arg);
 static void rsp_status(void* arg);
+static void rsp_hex(void *arg);
 
 /* Mapping of UPS commands to response callbacks */
 struct upscmd
@@ -132,6 +139,7 @@ struct upscmd
    { 'B',    rsp_float,  &battv },
    { 'L',    rsp_float,  &linev },
    { 'O',    rsp_float,  &outv },
+   { '\'',   rsp_hex,    &reg2 },
    { '\0',   NULL,       NULL }
 };
 
@@ -145,6 +153,9 @@ static void key_inc(void* arg);
 static void key_dec(void* arg);
 static void key_selftest(void* arg);
 static void key_rebatt(void* arg);
+static void key_batdet(void *arg);
+static void key_commfail(void *arg);
+static void key_help(void *arg);
 
 /* Mapping of keyboard commands to callbacks */
 struct keycmd
@@ -167,6 +178,9 @@ struct keycmd
    { '6',  key_dec,       &timeleft },
    { 'x',  key_selftest,  NULL },
    { 'r',  key_rebatt,    NULL },
+   { 'd',  key_batdet,    NULL },
+   { 'c',  key_commfail,  NULL },
+   { '?',  key_help,      NULL },
    { '\0', NULL,          NULL }
 };
 
@@ -192,6 +206,14 @@ void rsp_float(void* arg)
    char buf[20];
    
    sprintf(buf, "%03.3f\r\n", *(float*)arg);
+   wups(buf, strlen(buf));
+}
+
+void rsp_hex(void* arg)
+{
+   char buf[20];
+   
+   sprintf(buf, "%02x\r\n", *(unsigned char*)arg);
    wups(buf, strlen(buf));
 }
 
@@ -310,9 +332,56 @@ static void key_rebatt(void* arg)
    }
 }
 
+static void key_batdet(void *arg)
+{
+   if (reg2 & 0x20)
+      reg2 &= ~0x20;
+   else
+      reg2 |= 0x20;
+}
+
+static void key_commfail(void *arg)
+{
+   if (commfail)
+   {
+      commfail = 0;
+      dbg("COMMFAIL disabled\n");
+   }
+   else
+   {
+      commfail = 1;
+      dbg("COMMFAIL enabled\n");
+   }
+      
+}
+
+static void key_help(void *arg)
+{
+   dbg("Commands:\n");
+   dbg("?   Help\n");
+   dbg("b   Onbattery toggle\n");
+   dbg("o   Overload toggle\n");
+   dbg("t   Trim toggle\n");
+   dbg("s   Boost toggle\n");
+   dbg("l   BattLow toggle\n");
+   dbg("x   Selftest toggle\n");
+   dbg("r   ReplaceBatt toggle\n");
+   dbg("d   BattDetach toggle\n");
+   dbg("c   CommFail toggle\n");
+   dbg("7/4 BattPct (inc/dec)   (use numeric keypad)\n");
+   dbg("8/5 LoadPct (inc/dec)   (use numeric keypad)\n");
+   dbg("9/6 TimeLeft (inc/dec)  (use numeric keypad)\n");
+}
+
 void handle_ups_cmd(char cmd)
 {
    int x;
+
+   if (commfail)
+   {
+      dbg("<COMMFAIL>\n");
+      return;
+   }
 
    for (x=0; upscmds[x].func; x++)
    {

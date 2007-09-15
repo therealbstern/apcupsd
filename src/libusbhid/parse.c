@@ -154,9 +154,9 @@ hid_get_item_raw(hid_data_t s, hid_item_t *h)
 		REPORT_SAVED_COLL;
 		if (c->logical_minimum >= c->logical_maximum) {
 			if (s->logminsize == 1)
-				c->logical_minimum =(int8_t)c->logical_minimum;
+				c->logical_minimum =(signed char)c->logical_minimum;
 			else if (s->logminsize == 2)
-				c->logical_minimum =(int16_t)c->logical_minimum;
+				c->logical_minimum =(signed short)c->logical_minimum;
 		}
 		if (s->multi < s->multimax) {
 			c->usage = s->usages[min(s->multi, s->nusage-1)];
