@@ -419,13 +419,13 @@ int output_status(UPSINFO *ups, int sockfd,
          s_write(ups, "BATTDATE : %s\n", ups->battdat);
 
       if (ups->UPS_Cap[CI_NOMOUTV])
-         s_write(ups, "NOMOUTV  : %03d\n", ups->NomOutputVoltage);
+         s_write(ups, "NOMOUTV  : %03d Volts\n", ups->NomOutputVoltage);
 
       if (ups->UPS_Cap[CI_NOMINV])
-         s_write(ups, "NOMINV   : %03d\n", ups->NomInputVoltage);
+         s_write(ups, "NOMINV   : %03d Volts\n", ups->NomInputVoltage);
 
       if (ups->UPS_Cap[CI_NOMBATTV])
-         s_write(ups, "NOMBATTV : %5.1f\n", ups->nombattv);
+         s_write(ups, "NOMBATTV : %5.1f Volts\n", ups->nombattv);
 
       if (ups->UPS_Cap[CI_NOMPOWER])
          s_write(ups, "NOMPOWER : %d Watts\n", ups->NomPower);
