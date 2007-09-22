@@ -427,6 +427,9 @@ int output_status(UPSINFO *ups, int sockfd,
       if (ups->UPS_Cap[CI_NOMBATTV])
          s_write(ups, "NOMBATTV : %5.1f\n", ups->nombattv);
 
+      if (ups->UPS_Cap[CI_NOMPOWER])
+         s_write(ups, "NOMPOWER : %d Watts\n", ups->NomPower);
+
       if (ups->UPS_Cap[CI_HUMID])
          s_write(ups, "HUMIDITY : %5.1f\n", ups->humidity);
 

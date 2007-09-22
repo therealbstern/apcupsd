@@ -78,6 +78,7 @@ const struct s_known_info known_info[] = {
    {CI_NOMINV,                  0x00840040, P_INPUT,   T_UNITS,    false},  /* ConfigVoltage (input) */
    {CI_NONE,                    0x00840042, P_ANY,     T_UNITS,    false},  /* ConfigFrequency */
    {CI_NONE,                    0x00840043, P_ANY,     T_UNITS,    false},  /* ConfigApparentPower */
+   {CI_NOMPOWER,                0x00840044, P_ANY,     T_UNITS,    false},  /* ConfigActivePower */
    {CI_LTRANS,                  0x00840053, P_ANY,     T_UNITS,    false},  /* LowVoltageTransfer */
    {CI_HTRANS,                  0x00840054, P_ANY,     T_UNITS,    false},  /* HighVoltageTransfer */
    {CI_DelayBeforeReboot,       0x00840055, P_ANY,     T_UNITS,    false},  /* DelayBeforeReboot */
@@ -269,7 +270,8 @@ static bool usb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
 int usb_ups_get_capabilities(UPSINFO *ups)
 {
    int rc;
-   
+
+   /* Run platform-specific capabilities code */   
    rc = pusb_ups_get_capabilities(ups, known_info);
    if (!rc)
       return 0;
@@ -282,8 +284,19 @@ int usb_ups_get_capabilities(UPSINFO *ups)
    if (ups->UPS_Cap[CI_Discharging])
       ups->UPS_Cap[CI_ACPresent] = false;
 
-   /* Detect broken BackUPS Pro model */
+   /*
+    * Disable CI_NOMPOWER if UPS does not report it accurately.
+    * Several models appear to always return 0 for this value.
+    */
    USB_VALUE uval;
+   if (ups->UPS_Cap[CI_NOMPOWER] &&
+       (!usb_get_value(ups, CI_NOMPOWER, &uval) ||
+        ((int)uval.dValue == 0))) {
+      Dmsg0(100, "NOMPOWER disabled due to invalid reading from UPS\n");
+      ups->UPS_Cap[CI_NOMPOWER] = false;
+   }
+
+   /* Detect broken BackUPS Pro model */
    quirk_old_backups_pro = false;
    if (ups->UPS_Cap[CI_UPSMODEL] && usb_get_value(ups, CI_UPSMODEL, &uval)) {
       Dmsg1(250, "Checking for BackUPS Pro quirk \"%s\"\n", uval.sValue);
@@ -712,6 +725,11 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
    /* Nominal battery voltage */
    case CI_NOMBATTV:
       ups->nombattv = uval->dValue;
+      break;
+
+   /* Nominal power */
+   case CI_NOMPOWER:
+      ups->NomPower = (int)uval->dValue;
       break;
 
    /* Sensitivity */

@@ -173,6 +173,7 @@ enum {
    CI_APCDelayBeforeShutdown,   
    CI_APCLineFailCause,         
    CI_NOMINV,                   
+   CI_NOMPOWER,
 
    /* Only seen on the BackUPS Pro USB (so far) */
    CI_BUPBattCapBeforeStartup,  
