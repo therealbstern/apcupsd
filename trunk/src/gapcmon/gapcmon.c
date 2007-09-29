@@ -2254,34 +2254,42 @@ static gint sknet_net_write_nbytes (GIOChannel * ioc, gchar * ptr, gsize nbytes)
   gssize nleft = 0;
   gsize nwritten = 0;
   GError *gerror = NULL;
-  GIOStatus iox = 0;
-  gint ecount = 0;
+  GIOStatus ios = 0;
+  gboolean b_eof = TRUE;
 
   nleft = nbytes;
-  while (nleft > 0)
+
+  do
   {
-    if (++ecount > 3)
+    b_eof = FALSE;
+    ios = g_io_channel_write_chars (ioc, ptr, nleft, &nwritten, &gerror);
+    switch (ios)
     {
-      return -1;
-    }
-    
-    iox = g_io_channel_write_chars (ioc, ptr, nleft, &nwritten, &gerror);
-    if (gerror != NULL)
-    {
-      sknet_util_log_msg ("sknet_net_write_nbytes", "error", gerror->message);
+    case G_IO_STATUS_ERROR:
+      sknet_util_log_msg ("sknet_net_write_nbytes", "G_IO_STATUS_ERROR", gerror->message);
       g_error_free (gerror);
       return -1;
+      break;
+    case G_IO_STATUS_AGAIN:
+      sknet_util_log_msg ("sknet_net_write_nbytes", "G_IO_STATUS_AGAIN", "aborted");
+      g_usleep (500000);
+      break;
+    case G_IO_STATUS_EOF:
+      sknet_util_log_msg ("sknet_net_write_nbytes", "G_IO_STATUS_EOF", "ok");
+      return 0;
+      break;
+    case G_IO_STATUS_NORMAL:
+      break;
+    default:
+      sknet_util_log_msg ("sknet_net_write_nbytes", "unknown state", "aborted");
+      b_eof = TRUE;
+      return 0;
+      break;
     }
-
-    if (iox == G_IO_STATUS_AGAIN)
-    {
-      sknet_util_log_msg ("sknet_net_write_nbytes", "status again", "failing");
-      g_usleep (1000000);
-    }
-
     nleft -= nwritten;
     ptr += nwritten;
-  }   /* end-while */
+  }
+  while ((nleft > 0) && (b_eof != TRUE));
 
   return (nbytes - nleft);
 }
@@ -2329,41 +2337,42 @@ static gint sknet_net_read_nbytes (GIOChannel * ioc, gchar * ptr, gsize nbytes)
   gsize nleft = 0;
   gsize nread = 0;
   GError *gerror = NULL;
-  GIOStatus iox = 0;
-  gint ecount = 0;
+  GIOStatus ios = 0;
+  gboolean b_eof = FALSE;
 
   nleft = nbytes;
-  while (nleft > 0)
+
+  do
   {
-    if (++ecount > 3)
+    b_eof = FALSE;
+    ios = g_io_channel_read_chars (ioc, ptr, nleft, &nread, &gerror);
+    switch (ios)
     {
-      return -1;
-    }
-    
-    iox = g_io_channel_read_chars (ioc, ptr, nleft, &nread, &gerror);
-    if (gerror != NULL)
-    {
-      sknet_util_log_msg ("sknet_net_read_nbytes", "read error", gerror->message);
+    case G_IO_STATUS_ERROR:
+      sknet_util_log_msg ("sknet_net_read_nbytes", "G_IO_STATUS_ERROR", gerror->message);
       g_error_free (gerror);
       return -1;
+      break;
+    case G_IO_STATUS_AGAIN:
+      sknet_util_log_msg ("sknet_net_read_nbytes", "G_IO_STATUS_AGAIN", "aborted");
+      g_usleep (500000);
+      break;
+    case G_IO_STATUS_EOF:
+      sknet_util_log_msg ("sknet_net_read_nbytes", "G_IO_STATUS_EOF", "ok");
+      return 0;
+      break;
+    case G_IO_STATUS_NORMAL:
+      break;
+    default:
+      sknet_util_log_msg ("sknet_net_read_nbytes", "unknown state", "aborted");
+      b_eof = TRUE;
+      return 0;
+      break;
     }
-   
-    if (iox == G_IO_STATUS_EOF)
-    {
-        sknet_util_log_msg ("sknet_net_read_nbytes", "status eof", "EOF");
-        nleft -= nread;
-        break;
-    }
-
-    if (iox == G_IO_STATUS_AGAIN)
-    {
-      sknet_util_log_msg ("sknet_net_read_nbytes", "status again", "looping");
-      g_usleep (1000000);
-    }
-
     nleft -= nread;
     ptr += nread;
-  }                             /* end-while */
+  }
+  while ((nleft > 0) && (b_eof != TRUE));
 
   return (nbytes - nleft);      /* return >= 0 */
 }
