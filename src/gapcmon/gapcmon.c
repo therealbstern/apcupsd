@@ -1813,9 +1813,9 @@ static gboolean gapc_monitor_update_tooltip_msg(PGAPC_MONITOR pm)
    gchar *pch1 = NULL, *pch2 = NULL, *pch3 = NULL, *pch4 = NULL;
    gchar *pch6 = NULL, *pch7 = NULL, *pch8 = NULL, *pch9 = NULL;
    gchar *pchb = NULL, *pchc = NULL, *pchd = NULL, *pche = NULL;
-   gchar *pcha = NULL, *pmview = NULL;
+   gchar *pcha = NULL, *pmview = NULL, *pch_watt = NULL;
    GtkWidget *w = NULL;
-   gdouble d_value = 0.0;
+   gdouble d_value = 0.0, d_watt =0.0, d_loadpct = 0.0;
    gboolean b_flag = FALSE, b_valid = FALSE;
    gint i_series = 0;
    GtkTreeIter miter;
@@ -1861,6 +1861,17 @@ static gboolean gapc_monitor_update_tooltip_msg(PGAPC_MONITOR pm)
       pch7 = "n/a";
    }
    pch8 = g_hash_table_lookup(pm->pht_Status, "LOADPCT");
+   if ( pch8 != NULL ) {
+     d_loadpct = g_strtod (pch8, NULL);
+     d_loadpct /= 100.0;
+   }
+   pch_watt = g_hash_table_lookup(pm->pht_Status, "NOMPOWER");
+   if ( pch_watt != NULL ) {
+     d_watt = g_strtod (pch_watt, NULL);
+   } else {
+     d_watt = d_loadpct * pm->i_watt;
+   }
+
    pch9 = g_hash_table_lookup(pm->pht_Status, "TIMELEFT");
    pcha = g_hash_table_lookup(pm->pht_Status, "VERSION");
    pchb = g_hash_table_lookup(pm->pht_Status, "STARTTIME");
@@ -1912,7 +1923,10 @@ static gboolean gapc_monitor_update_tooltip_msg(PGAPC_MONITOR pm)
       "Refresh occurs every %3.1f seconds\n"
       "----------------------------------------------------------\n"
       "%s Outage[s]\n" "Last on %s\n" "%s Utility VAC\n"
-      "%s Battery Charge\n" "%s UPS Load\n" "%s Remaining\n"
+      "%s Battery Charge\n" 
+      "%s UPS Load\n" 
+      "%3.0f of %d watts\n"
+      "%s Remaining\n"
       "----------------------------------------------------------\n"
       "Build: %s\n" "Started: %s\n"
       "----------------------------------------------------------\n"
@@ -1927,6 +1941,7 @@ static gboolean gapc_monitor_update_tooltip_msg(PGAPC_MONITOR pm)
       (pch6 != NULL) ? pch6 : "n/a",
       (pch7 != NULL) ? pch7 : "n/a",
       (pch8 != NULL) ? pch8 : "n/a",
+      d_watt, pm->i_watt,
       (pch9 != NULL) ? pch9 : "n/a",
       (pcha != NULL) ? pcha : "n/a",
       (pchb != NULL) ? pchb : "n/a",
@@ -1953,41 +1968,47 @@ static gboolean gapc_monitor_update_tooltip_msg(PGAPC_MONITOR pm)
          "<b><i>%s@%s</i></b></span>\n"
          "%s Outage, Last on %s\n"
          "%s VAC, %s Charge\n"
-         "%s Remaining, %s total on battery",
+         "%s Remaining, %s total on battery, %3.0f of %d watts",
          (pch1 != NULL) ? pch1 : "unknown",
          (pch2 != NULL) ? pch2 : "unknown",
          (pch4 != NULL) ? pch4 : "n/a",
          (pch5 != NULL) ? pch5 : "n/a",
          (pch6 != NULL) ? pch6 : "n/a",
          (pch7 != NULL) ? pch7 : "n/a",
-         (pch9 != NULL) ? pch9 : "n/a", (pch5b != NULL) ? pch5b : "n/a");
+         (pch9 != NULL) ? pch9 : "n/a", 
+         (pch5b != NULL) ? pch5b : "n/a",
+         d_watt, pm->i_watt);
       break;
    case GAPC_ICON_ONBATT:
       pmview = g_strdup_printf("<span foreground=\"yellow\">"
          "<b><i>%s@%s</i></b></span>\n"
          "%s Outage, Last on %s\n"
          "%s Charge, %s total on battery\n"
-         "%s Remaining, %s on battery",
+         "%s Remaining, %s on battery, %3.0f of %d watts",
          (pch1 != NULL) ? pch1 : "unknown",
          (pch2 != NULL) ? pch2 : "unknown",
          (pch4 != NULL) ? pch4 : "n/a",
          (pch5 != NULL) ? pch5 : "n/a",
          (pch7 != NULL) ? pch7 : "n/a",
          (pch5b != NULL) ? pch5b : "n/a",
-         (pch9 != NULL) ? pch9 : "n/a", (pch5a != NULL) ? pch5a : "n/a ");
+         (pch9 != NULL) ? pch9 : "n/a", 
+         (pch5a != NULL) ? pch5a : "n/a ",
+         d_watt, pm->i_watt);
       break;
    case GAPC_ICON_ONLINE:
    case GAPC_ICON_DEFAULT:
    default:
       pmview = g_strdup_printf("<b><i>%s@%s</i></b>\n"
          "%s Outage, Last on %s\n"
-         "%s VAC, %s Charge %s",
+         "%s VAC, %s Charge %s %3.0f of %d watts",
          (pch1 != NULL) ? pch1 : "unknown",
          (pch2 != NULL) ? pch2 : "unknown",
          (pch4 != NULL) ? pch4 : "n/a",
          (pch5 != NULL) ? pch5 : "n/a",
          (pch6 != NULL) ? pch6 : "n/a",
-         (pch7 != NULL) ? pch7 : "n/a", (pchx != NULL) ? pchx : " ");
+         (pch7 != NULL) ? pch7 : "n/a", 
+         (pchx != NULL) ? pchx : " ",
+         d_watt, pm->i_watt);
       break;
    }
 
@@ -2043,9 +2064,9 @@ static gint gapc_monitor_update(PGAPC_MONITOR pm)
 {
    gint i_x = 0;
    GtkWidget *win = NULL, *w = NULL;
-   gchar *pch = NULL, *pch1 = NULL, *pch2 = NULL, *pch3 = NULL, *pch4 =
-      NULL, *pch5 = NULL, *pch6 = NULL;
-   gdouble dValue = 0.00, dScale = 0.0, dtmp = 0.0, dCharge = 0.0;
+   gchar *pch = NULL, *pch1 = NULL, *pch2 = NULL, *pch3 = NULL, *pch4 = NULL;
+   gchar *pch_watt = NULL, *pch5 = NULL, *pch6 = NULL;
+   gdouble dValue = 0.00, dScale = 0.0, dtmp = 0.0, dCharge = 0.0, d_loadpct = 0.0, d_watt = 0.0;
    gchar ch_buffer[GAPC_MAX_TEXT];
    PGAPC_BAR_H pbar = NULL;
 
@@ -2132,7 +2153,7 @@ static gint gapc_monitor_update(PGAPC_MONITOR pm)
       pch = "n/a";
    }
    dValue = g_strtod(pch, NULL);
-   dtmp = dValue /= 100.0;
+   d_loadpct = dtmp = dValue /= 100.0;
    gapc_util_point_filter_set(&(pm->phs.sq[1]), dValue);
    pbar = g_hash_table_lookup(pm->pht_Status, "HBar4");
    pbar->d_value = (dValue > 1.0) ? 1.0 : dValue;
@@ -2195,11 +2216,17 @@ static gint gapc_monitor_update(PGAPC_MONITOR pm)
    pch2 = g_hash_table_lookup(pm->pht_Status, "MANDATE");
    pch3 = g_hash_table_lookup(pm->pht_Status, "FIRMWARE");
    pch4 = g_hash_table_lookup(pm->pht_Status, "BATTDATE");
+   pch_watt = g_hash_table_lookup(pm->pht_Status, "NOMPOWER");
+   if (pch_watt != NULL) {
+    d_watt = g_strtod (pch_watt, NULL);
+   } else {
+    d_watt = d_loadpct * pm->i_watt;
+   }
    g_snprintf(ch_buffer, sizeof(ch_buffer),
-      "<span foreground=\"blue\">" "%s\n%s\n%s\n%s\n%s" "</span>",
+      "<span foreground=\"blue\">" "%s\n%s\n%s\n%s\n%s\n%3.0f of %d" "</span>",
       (pch != NULL) ? pch : "N/A", (pch1 != NULL) ? pch1 : "N/A",
       (pch2 != NULL) ? pch2 : "N/A", (pch3 != NULL) ? pch3 : "N/A",
-      (pch4 != NULL) ? pch4 : "N/A");
+      (pch4 != NULL) ? pch4 : "N/A", d_watt, pm->i_watt);
    gtk_label_set_markup(GTK_LABEL(win), ch_buffer);
 
    return TRUE;
@@ -3552,6 +3579,23 @@ static void cb_panel_prefs_handle_cell_edited(GtkCellRendererText * cell,
          g_free(pport);
       }
       break;
+   case GAPC_PREFS_WATT:
+      {
+         gchar *pport = g_strdup_printf(GAPC_WATT_KEY, i_monitor);
+
+         i_port = (gint) g_strtod(pch_new, NULL);
+
+         if (i_port == 0) {
+            i_port = GAPC_WATT_DEFAULT;
+            pch = g_strdup_printf("%d", i_port);
+         } else {
+            pch = pch_new;
+            b_dupped = TRUE;
+         }
+         gconf_client_set_int(pcolumn->client, pport, i_port, NULL);
+         g_free(pport);
+      }
+      break;
    case GAPC_PREFS_REFRESH:
       {
          gchar *prefresh = g_strdup_printf(GAPC_REFRESH_KEY, i_monitor);
@@ -3664,6 +3708,7 @@ static gboolean gapc_panel_preferences_data_model_load(PGAPC_CONFIG pcfg)
    gboolean v_enabled;
    gboolean v_use_systray;
    gint v_port_number;
+   gint v_watt_number;   
    gfloat v_network_interval;
    gfloat v_graph_interval;
    gchar *v_host_name;
@@ -3674,6 +3719,7 @@ static gboolean gapc_panel_preferences_data_model_load(PGAPC_CONFIG pcfg)
    gchar k_network_interval[GAPC_MAX_TEXT];
    gchar k_graph_interval[GAPC_MAX_TEXT];
    gchar k_host_name[GAPC_MAX_TEXT];
+   gchar k_watt_number[GAPC_MAX_TEXT];   
 
    g_return_val_if_fail(pcfg != NULL, FALSE);
    g_return_val_if_fail(pcfg->client != NULL, FALSE);
@@ -3725,6 +3771,8 @@ static gboolean gapc_panel_preferences_data_model_load(PGAPC_CONFIG pcfg)
          "use_systray");
       g_snprintf(k_port_number, GAPC_MAX_TEXT, "%s/%s", (gchar *) monitors->data,
          "port_number");
+      g_snprintf(k_watt_number, GAPC_MAX_TEXT, "%s/%s", (gchar *) monitors->data,
+         "ups_wattage");
       g_snprintf(k_network_interval, GAPC_MAX_TEXT, "%s/%s",
          (gchar *) monitors->data, "network_interval");
       g_snprintf(k_graph_interval, GAPC_MAX_TEXT, "%s/%s", (gchar *) monitors->data,
@@ -3737,6 +3785,10 @@ static gboolean gapc_panel_preferences_data_model_load(PGAPC_CONFIG pcfg)
       v_port_number = gconf_client_get_int(pcfg->client, k_port_number, NULL);
       if (v_port_number == 0) {
          v_port_number = GAPC_PORT_DEFAULT;
+      }
+      v_watt_number = gconf_client_get_int(pcfg->client, k_watt_number, NULL);
+      if (v_watt_number == 0) {
+         v_watt_number = GAPC_WATT_DEFAULT;
       }
       v_network_interval =
          gconf_client_get_float(pcfg->client, k_network_interval, NULL);
@@ -3755,11 +3807,15 @@ static gboolean gapc_panel_preferences_data_model_load(PGAPC_CONFIG pcfg)
 
       gtk_list_store_append(GTK_LIST_STORE(pcfg->prefs_model), &iter);
       gtk_list_store_set(GTK_LIST_STORE(pcfg->prefs_model), &iter,
-         GAPC_PREFS_MONITOR, i_monitor, GAPC_PREFS_SYSTRAY,
-         v_use_systray, GAPC_PREFS_ENABLED, v_enabled,
-         GAPC_PREFS_PORT,
-         v_port_number, GAPC_PREFS_REFRESH, v_network_interval,
-         GAPC_PREFS_GRAPH, v_graph_interval, GAPC_PREFS_HOST, v_host_name, -1);
+         GAPC_PREFS_MONITOR, i_monitor, 
+         GAPC_PREFS_SYSTRAY, v_use_systray, 
+         GAPC_PREFS_ENABLED, v_enabled,
+         GAPC_PREFS_PORT, v_port_number, 
+         GAPC_PREFS_REFRESH, v_network_interval,
+         GAPC_PREFS_GRAPH, v_graph_interval, 
+         GAPC_PREFS_HOST, v_host_name, 
+         GAPC_PREFS_WATT, v_watt_number, 
+         -1);
 
       /* Startup Processing */
       if (v_enabled) {
@@ -3788,10 +3844,10 @@ static GtkWidget *gapc_panel_preferences_model_init(PGAPC_CONFIG pcfg)
    GtkTreeModel *model = NULL;
    GtkTreeViewColumn *column = NULL;
    GtkCellRenderer *renderer_enabled = NULL, *renderer_systray = NULL,
-      *renderer_port = NULL, *renderer_refresh = NULL,
+      *renderer_port = NULL, *renderer_watt = NULL, *renderer_refresh = NULL,
       *renderer_graph = NULL, *renderer_host = NULL, *anyrndr = NULL;
    PGAPC_PREFS_COLUMN col_enabled = NULL, col_systray = NULL, col_port = NULL,
-      col_refresh = NULL, col_graph = NULL, col_host = NULL;
+      col_refresh = NULL, col_graph = NULL, col_host = NULL, col_watt = NULL;
 
    g_return_val_if_fail(pcfg != NULL, NULL);
 
@@ -3800,13 +3856,15 @@ static GtkWidget *gapc_panel_preferences_model_init(PGAPC_CONFIG pcfg)
       return GTK_WIDGET(pcfg->prefs_treeview);
 
    /* Create the model -- this column order and that of the enum must match */
-   model = GTK_TREE_MODEL(gtk_list_store_new(GAPC_N_PREFS_COLUMNS, G_TYPE_INT,  /* Monitor base-1 */
+   model = GTK_TREE_MODEL(gtk_list_store_new(GAPC_N_PREFS_COLUMNS, 
+         G_TYPE_INT,  /* Monitor base-1 */
          G_TYPE_BOOLEAN,           /* enabled */
          G_TYPE_BOOLEAN,           /* systray icon */
          G_TYPE_INT,               /* Port  */
          G_TYPE_FLOAT,             /* network Refresh */
          G_TYPE_FLOAT,             /* graph Refresh */
-         G_TYPE_STRING             /* Host  */
+         G_TYPE_STRING,            /* Host  */
+         G_TYPE_INT                /* Wattage  */
       ));
    /* store it for later */
    pcfg->prefs_model = model;
@@ -3820,11 +3878,11 @@ static GtkWidget *gapc_panel_preferences_model_init(PGAPC_CONFIG pcfg)
    gtk_tree_view_set_rules_hint(GTK_TREE_VIEW(treeview), TRUE);
    gtk_tree_view_set_enable_search(GTK_TREE_VIEW(treeview), FALSE);
 
-
    /* allocate control struct for viewable columns */
    col_enabled = gapc_panel_prefs_col_data_init(pcfg, GAPC_PREFS_ENABLED);
    col_systray = gapc_panel_prefs_col_data_init(pcfg, GAPC_PREFS_SYSTRAY);
    col_port = gapc_panel_prefs_col_data_init(pcfg, GAPC_PREFS_PORT);
+   col_watt = gapc_panel_prefs_col_data_init(pcfg, GAPC_PREFS_WATT);
    col_refresh = gapc_panel_prefs_col_data_init(pcfg, GAPC_PREFS_REFRESH);
    col_graph = gapc_panel_prefs_col_data_init(pcfg, GAPC_PREFS_GRAPH);
    col_host = gapc_panel_prefs_col_data_init(pcfg, GAPC_PREFS_HOST);
@@ -3833,6 +3891,7 @@ static GtkWidget *gapc_panel_preferences_model_init(PGAPC_CONFIG pcfg)
    renderer_enabled = gtk_cell_renderer_toggle_new();
    renderer_systray = gtk_cell_renderer_toggle_new();
    renderer_port = gtk_cell_renderer_text_new();
+   renderer_watt = gtk_cell_renderer_text_new();
    renderer_refresh = gtk_cell_renderer_text_new();
    renderer_graph = gtk_cell_renderer_text_new();
    renderer_host = gtk_cell_renderer_text_new();
@@ -3840,6 +3899,7 @@ static GtkWidget *gapc_panel_preferences_model_init(PGAPC_CONFIG pcfg)
 
    /* set renderers attributes */
    g_object_set(G_OBJECT(renderer_port), "xalign", 0.5, "editable", TRUE, NULL);
+   g_object_set(G_OBJECT(renderer_watt), "xalign", 0.5, "editable", TRUE, NULL);
    g_object_set(G_OBJECT(renderer_graph), "xalign", 0.5, "editable", TRUE, NULL);
    g_object_set(G_OBJECT(renderer_refresh), "xalign", 0.5, "editable", TRUE, NULL);
    g_object_set(G_OBJECT(renderer_host), "editable", TRUE, NULL);
@@ -3858,6 +3918,9 @@ static GtkWidget *gapc_panel_preferences_model_init(PGAPC_CONFIG pcfg)
    gtk_signal_connect_full(GTK_OBJECT(renderer_port), "edited",
       G_CALLBACK(cb_panel_prefs_handle_cell_edited), NULL,
       col_port, g_free, FALSE, TRUE);
+   gtk_signal_connect_full(GTK_OBJECT(renderer_watt), "edited",
+      G_CALLBACK(cb_panel_prefs_handle_cell_edited), NULL,
+      col_watt, g_free, FALSE, TRUE);
    gtk_signal_connect_full(GTK_OBJECT(renderer_refresh), "edited",
       G_CALLBACK(cb_panel_prefs_handle_cell_edited), NULL,
       col_refresh, g_free, FALSE, TRUE);
@@ -3894,6 +3957,10 @@ static GtkWidget *gapc_panel_preferences_model_init(PGAPC_CONFIG pcfg)
    g_object_set_data(G_OBJECT(column), "float_format", "%3.0f");
    gtk_tree_view_column_set_cell_data_func(column, renderer_graph,
       cb_panel_prefs_handle_float_format, GUINT_TO_POINTER(GAPC_PREFS_GRAPH), NULL);
+   gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
+
+   column = gtk_tree_view_column_new_with_attributes("Rated\nWattage", renderer_watt, "text",
+      GAPC_PREFS_WATT, NULL);
    gtk_tree_view_append_column(GTK_TREE_VIEW(treeview), column);
 
    column = gtk_tree_view_column_new_with_attributes("Host Name or IP Address",
@@ -4647,6 +4714,7 @@ static void cb_panel_preferences_gconf_changed(GConfClient * client, guint cnxn_
 
    gboolean ov_b_tray = FALSE;
    gint ov_i_port = 0;
+   gint ov_i_watt = 0;
    gfloat ov_f_graph = 0.0;
    gfloat ov_f_refresh = 0.0;
    gchar *ov_s_host = NULL;
@@ -4696,9 +4764,10 @@ static void cb_panel_preferences_gconf_changed(GConfClient * client, guint cnxn_
          GAPC_PREFS_ENABLED, &b_m_enabled,
          GAPC_PREFS_SYSTRAY, &ov_b_tray,
          GAPC_PREFS_PORT, &ov_i_port,
+         GAPC_PREFS_WATT, &ov_i_watt,
          GAPC_PREFS_GRAPH, &ov_f_graph,
-         GAPC_PREFS_REFRESH, &ov_f_refresh, GAPC_PREFS_HOST, &ov_s_host, -1);
-
+         GAPC_PREFS_REFRESH, &ov_f_refresh, 
+         GAPC_PREFS_HOST, &ov_s_host, -1);
    }
    if (entry->value != NULL) {
       pch_value = (gchar *) gconf_value_to_string(entry->value);
@@ -4725,11 +4794,15 @@ static void cb_panel_preferences_gconf_changed(GConfClient * client, guint cnxn_
    if (!b_ls_valid && b_v_valid && b_k_valid) { /* add new rec if keys valid -nfound */
       gtk_list_store_append(GTK_LIST_STORE(pcfg->prefs_model), &iter);
       gtk_list_store_set(GTK_LIST_STORE(pcfg->prefs_model), &iter,
-         GAPC_PREFS_MONITOR, i_monitor, GAPC_PREFS_SYSTRAY, FALSE,
+         GAPC_PREFS_MONITOR, i_monitor, 
+         GAPC_PREFS_SYSTRAY, FALSE,
          GAPC_PREFS_ENABLED, FALSE,
-         GAPC_PREFS_PORT, GAPC_PORT_DEFAULT, GAPC_PREFS_GRAPH,
-         GAPC_LINEGRAPH_REFRESH_FACTOR, GAPC_PREFS_HOST,
-         GAPC_HOST_DEFAULT, GAPC_PREFS_REFRESH, GAPC_REFRESH_DEFAULT, -1);
+         GAPC_PREFS_PORT, GAPC_PORT_DEFAULT, 
+         GAPC_PREFS_GRAPH, GAPC_LINEGRAPH_REFRESH_FACTOR, 
+         GAPC_PREFS_HOST, GAPC_HOST_DEFAULT, 
+         GAPC_PREFS_REFRESH, GAPC_REFRESH_DEFAULT, 
+         GAPC_PREFS_WATT, GAPC_WATT_DEFAULT, 
+         -1);
 
       b_ls_valid = TRUE;
       b_add = TRUE;
@@ -4794,6 +4867,16 @@ static void cb_panel_preferences_gconf_changed(GConfClient * client, guint cnxn_
                 pm->psk->i_port = i_value;
                 pm->psk->b_network_control = TRUE;
             }
+         }
+      }
+      if (g_str_equal(pkey, "ups_wattage")) {
+         i_value = gconf_value_get_int(entry->value);
+         if (i_value != ov_i_watt) {
+            gtk_list_store_set(GTK_LIST_STORE(pcfg->prefs_model), &iter,
+               GAPC_PREFS_WATT, i_value, -1);
+         }
+         if ( pm != NULL ) {
+              pm->i_watt = i_value;
          }
       }
       if (g_str_equal(pkey, "network_interval")) {
@@ -5720,7 +5803,7 @@ static gint gapc_monitor_information_page(PGAPC_MONITOR pm, GtkWidget * notebook
    gtk_widget_show(rbox);
 
    label = gtk_label_new("Device\n" "Serial\n" "Manf date\n" "Firmware\n"
-      "Batt date");
+      "Batt date\n" "Wattage");
    gtk_label_set_use_markup(GTK_LABEL(label), TRUE);
    gtk_label_set_justify(GTK_LABEL(label), GTK_JUSTIFY_RIGHT);
    gtk_label_set_line_wrap(GTK_LABEL(label), TRUE);
@@ -6054,9 +6137,11 @@ static GtkWidget *gapc_monitor_interface_create(PGAPC_CONFIG pcfg, gint i_monito
    gtk_tree_model_get(GTK_TREE_MODEL(pcfg->prefs_model), iter,
       GAPC_PREFS_SYSTRAY, &(pm->cb_use_systray),
       GAPC_PREFS_PORT, &(pm->i_port),
+      GAPC_PREFS_WATT, &(pm->i_watt),
       GAPC_PREFS_GRAPH, &(pm->d_graph),
       GAPC_PREFS_HOST, &(pm->pch_host),
-      GAPC_PREFS_REFRESH, &(pm->d_refresh), GAPC_PREFS_MONITOR, &z_monitor, -1);
+      GAPC_PREFS_REFRESH, &(pm->d_refresh), 
+      GAPC_PREFS_MONITOR, &z_monitor, -1);
 
    pixbuf = pm->my_icons[GAPC_ICON_DEFAULT];
    pm->tooltips = gtk_tooltips_new();
