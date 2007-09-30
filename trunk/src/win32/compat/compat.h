@@ -27,7 +27,7 @@
  * Last Modified By: Thorsten Engel
  * Last Modified On: Fri Apr 22 19:30:00 2004
  * Update Count    : 218
- * $Id: compat.h,v 1.21 2006-12-02 04:00:39 adk0212 Exp $
+ * $Id: compat.h,v 1.22 2007-09-30 19:49:49 adk0212 Exp $
  */
 
 
@@ -310,9 +310,7 @@ int ioctl(int, int, ...);
 #define MIN(a, b) ( ((a) < (b)) ? (a) : (b) )
 #endif
 
-#ifndef ctime_r
-#define ctime_r( _clock, _buf ) \
-    strcpy( (_buf), ctime( (_clock) ) )
-#endif
+// Parse windows-style command line into individual arguments
+char *GetArg(char **cmdline);
 
 #endif /* __COMPAT_H_ */

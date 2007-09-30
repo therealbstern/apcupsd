@@ -1,86 +1,50 @@
-//  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
-//
-//  This file was part of the VNC system.
-//
-//  The VNC system is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
-//  USA.
-//
-// If the source code for the VNC system is not available from the place 
-// whence you received this file, check http://www.uk.research.att.com/vnc or contact
-// the authors on vnc@uk.research.att.com for information on obtaining it.
-//
 // This file has been adapted to the Win32 version of Apcupsd
 // by Kern E. Sibbald.  Many thanks to ATT and James Weatherall,
 // the original author, for providing an excellent template.
 //
+// Rewrite/Refactoring by Adam Kropelin
+//
+// Copyright (2007) Adam D. Kropelin
 // Copyright (2000) Kern E. Sibbald
 //
 
+#ifndef WINUPS_H
+#define WINUPS_H
 
 // WinUPS header file
 
 #include <windows.h>
-#include "winres.h"
 
 // Application specific messages
+enum {
+   // Message used for system tray notifications
+   WM_TRAYNOTIFY = WM_USER+1,
 
-// Message used for system tray notifications
-#define WM_TRAYNOTIFY                   WM_USER+1
+   // Message used to close a given apctray instance
+   WM_CLOSEINST,
 
-// Messages used for the server object to notify windows of things
-#define WM_SRV_CLIENT_CONNECT           WM_USER+2
-#define WM_SRV_CLIENT_AUTHENTICATED     WM_USER+3
-#define WM_SRV_CLIENT_DISCONNECT        WM_USER+4
+   // Message used to remove all apctray instances from the registry
+   WM_REMOVEALL,
 
-// Message used to inform tray that a balloon tip was displayed
-#define WM_BALLOONSHOW                  WM_USER+5
+   // Message used to remove specified apctray instance from the registry
+   WM_REMOVE,
 
-// Export the application details
-extern HINSTANCE        hAppInstance;
-extern const char       *szAppName;
-extern DWORD            mainthreadId;
+   // Message used to trigger tray icon reset
+   WM_RESET
+};
 
-// Main UPS server routine
+// Apcupsd application window constants
+#define APCUPSD_WINDOW_CLASS		"apcupsd"
+#define APCUPSD_WINDOW_NAME		"apcupsd"
+
+// apctray window constants
+#define APCTRAY_WINDOW_CLASS		"apctray"
+#define APCTRAY_WINDOW_NAME		"apctray"
+
+// Command line option to start in service mode
+#define ApcupsdRunService        "/service"
+
+// Main UPS server routine - Exported by winmain for use by winservice
 extern int ApcupsdAppMain(int service);
 
-extern void LogErrorMsg(char *msg);
-
-// Standard command-line flag definitions
-const char ApcupsdRunService[]            = "/service";
-const char ApcupsdRunServiceHelper[]      = "/servicehelper";
-const char ApcupsdRunAsUserApp[]          = "/run";
-
-const char ApcupsdInstallService[]        = "/install";
-const char ApcupsdRemoveService[]         = "/remove";
-
-#ifdef properties_implemented
-const char ApcupsdShowProperties[]        = "/settings";
-const char ApcupsdShowDefaultProperties[] = "/defaultsettings";
-#endif
-
-const char ApcupsdShowAbout[]             = "/about";
-const char ApcupsdShowStatus[]            = "/status";
-const char ApcupsdShowEvents[]            = "/events";
-const char ApcupsdKillRunningCopy[]       = "/kill";
-
-const char ApcupsdShowHelp[]              = "/help";
-
-
-
-// Usage string
-const char ApcupsdUsageText[] = "Apcupsd [/run] [/kill] [/install] [/remove] [/about] [/status] [/events]\n";
-
-void LogErrorMsg(char *msg, char *fname, int lineno);
-#define log_error_message(msg) LogErrorMsg((msg), __FILE__, __LINE__)
+#endif // WINUPS_H

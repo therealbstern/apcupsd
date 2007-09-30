@@ -41,7 +41,6 @@ UPSCOMMANDS ups_event[] = {
    {"timeout",       0},           /* CMDTIMEOUT */
    {"loadlimit",     0},           /* CMDLOADLIMIT */
    {"runlimit",      0},           /* CMDRUNLIMIT */
-   {"doreboot",      0},           /* CMDDOREBOOT */
    {"doshutdown",    0},           /* CMDDOSHUTDOWN */
    {"mainsback",     0},           /* CMDMAINSBACK */
    {"annoyme",       0},           /* CMDANNOYME */
@@ -68,13 +67,12 @@ UPSCMDMSG event_msg[] = {
    {LOG_ALERT,   N_("Reached run time limit on batteries.")},
    {LOG_ALERT,   N_("Battery charge below low limit.")},
    {LOG_ALERT,   N_("Reached remaining time percentage limit on batteries.")},
-   {LOG_ALERT,   N_("Failed to kill the power! Attempting a REBOOT!")},
    {LOG_ALERT,   N_("Initiating system shutdown!")},
    {LOG_ALERT,   N_("Power is back. UPS running on mains.")},
    {LOG_ALERT,   N_("Users requested to logoff.")},
    {LOG_ALERT,   N_("Battery failure. Emergency.")},
    {LOG_CRIT,    N_("UPS battery must be replaced.")},
-   {LOG_CRIT,    N_("Remote shutdown requested")},
+   {LOG_CRIT,    N_("Remote shutdown requested.")},
    {LOG_WARNING, N_("Communications with UPS lost.")},
    {LOG_WARNING, N_("Communications with UPS restored.")},
    {LOG_ALERT,   N_("UPS Self Test switch to battery.")},
@@ -110,11 +108,6 @@ void generate_event(UPSINFO *ups, int event)
       log_event(ups, event_msg[CMDDOSHUTDOWN].level,
          _(event_msg[CMDDOSHUTDOWN].msg));
       do_shutdown(ups, CMDDOSHUTDOWN);
-      break;
-
-   case CMDDOREBOOT:
-      /* This should be deprecated. */
-      do_shutdown(ups, event);
       break;
 
       /* For the following, everything is already done. */
@@ -447,8 +440,8 @@ void do_action(UPSINFO *ups)
       break;
 
    case st_SelfTest:
-      /* allow 20 seconds max for selftest */
-      if (now - ups->SelfTest < 20 && !ups->is_battlow())
+      /* allow 40 seconds max for selftest */
+      if (now - ups->SelfTest < 40 && !ups->is_battlow())
          break;
 
       /* Cancel self test, announce power failure */
@@ -601,15 +594,6 @@ void do_action(UPSINFO *ups)
       if (ups->is_onbatt_msg()) {
          ups->clear_onbatt_msg();
          generate_event(ups, CMDOFFBATTERY);
-      }
-
-      if (ups->is_shutdown()) {
-         /* If we have a shutdown to cancel, do it now. */
-         ups->ShutDown = 0;
-         ups->clear_shutdown();
-         powerfail(1);
-         unlink(ups->pwrfailpath);
-         log_event(ups, LOG_ALERT, _("Cancelling shutdown"));
       }
 
       if (ups->SelfTest) {

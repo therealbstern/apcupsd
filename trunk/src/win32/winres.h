@@ -31,6 +31,13 @@
 #define ID_STATUS                       40005
 #define ID_DEFAULT_PROPERTIES           40006
 #define ID_EVENTS                       40007
+#define ID_REMOVE                       40008
+#define ID_REMOVEALL                    40009
+#define ID_CLOSEINST                    40010
+#define ID_NAME                         40011
+#define ID_NOTIFY                       40012
+#define ID_REFRESH                      40013
+#define ID_HOST                         40014
 
 #define IDD_PROPERTIES                  200
 #define IDD_ABOUT                       201

@@ -72,14 +72,14 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
       phys = known_info[i].physical;
 
       if (ci != CI_NONE && !ups->UPS_Cap[ci]) {
-         /* Prefer feature items, but try input if feature fails */
+         /* Prefer input items, but try feature if input fails */
          rc = hidu_locate_item(
                my_data->rdesc,
                known_info[i].usage_code,     /* Match usage code */
                -1,                           /* Don't care about application */
                (phys == P_ANY) ? -1 : phys,  /* Match physical usage */
                -1,                           /* Don't care about logical */
-               HID_KIND_FEATURE,             /* Match feature type */
+               HID_KIND_INPUT,               /* Match feature type */
                &item);
 
          if (!rc) {
@@ -89,7 +89,7 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
                   -1,                           /* Don't care about application */
                   (phys == P_ANY) ? -1 : phys,  /* Match physical usage */
                   -1,                           /* Don't care about logical */
-                  HID_KIND_INPUT,               /* Match feature type */
+                  HID_KIND_FEATURE,             /* Match feature type */
                   &item);
          }
 

@@ -439,50 +439,57 @@ device nodes for you, so you will have to make them yourself. Check /dev,
 /dev/usb, and /dev/usb/hiddev and if you  cannot find the hiddev{\it N} nodes,
 run (as root) the examples/make-hiddev script from the apcupsd source distribution.
 
-To complicate things more, many Linux flavors running 2.6 kernels such as
-Fedora FC3 use the udev utility, which dynamically creates the devices in /dev
+Modern Linux distributions using the 2.6 kernel create device nodes dynamically
 on the fly as they are needed. It is basically a hotplug system, giving a lot
 more power to the user to determine what happens when a device is probed or 
 opened. It is also a lot more complicated.  
 
-Some default udev rule sets do not include rules for creating hiddev nodes.
-The bottom line for apcupsd on such a system is that if the
-hiddev{\it N} is not created when you plug in your UPS, apcupsd will terminate
-with an error. The solution to the problem is to add a rule to the udev rules
-file.  On Fedora FC3, this file is found in /etc/udev/rules.d/50-udev.rules.
-Start by adding the following line:
+Some early 2.6 distributions (Fedora Core 3, for one) do not include hiddev
+rules in their default udev rule set. The bottom line for apcupsd on such a 
+system is that if the hiddev{\it N} is not created when you plug in your UPS,
+apcupsd will terminate with an error. The solution to the problem is to add 
+a rule to the udev rules file. On Fedora FC3, this file is found in 
+/etc/udev/rules.d/50-udev.rules. Start by adding the following line:
 
 \begin{verbatim}
      BUS="usb", SYSFS{idVendor}="051d", NAME="usb/hiddev%n"
 \end{verbatim}
 
+({\bf Note that this rule uses obsolete udev syntax and is specific to FC3
+and other distributions of similar vintage.})
+
 Then either reboot your system, or unplug and replug your UPS and then restart
 apcupsd. At that point a /dev/usb/hiddev{\it N} node should appear and apcupsd
-should work fine.  You can use: 
+should work fine.
+
+If you have several UPSes or you just want to give your UPS a fixed name, you
+can use rules like the following: 
+
+\begin{verbatim}
+     KERNEL=="hiddev*", SYSFS{serial}=="JB0319033692", SYMLINK="ups0"
+     KERNEL=="hiddev*", SYSFS{serial}=="JB0320004845", SYMLINK="ups1"
+\end{verbatim}
+
+({\bf Note that this rule uses modern udev syntax and is appropriate
+only for more recent distros such as RHEL4 and FC4.})
+
+Replace the serial number in quotes with the one that corresponds to
+your UPS. Then whenever you plug in your UPS a symlink called ups0, ups1, etc.
+will be created pointing to the correct hiddev node. This technique is highly
+recommended if you have more than one UPS connected to the same server since
+rearranging your USB cables or even upgrading the kernel can affect the order
+in which devices are detected and thus change which hiddev node corresponds
+to which UPS. If you use the symlink-by-serial-number approach the link
+will always point to the correct device node.
+
+You can use...
 
 \begin{verbatim}
      udevinfo -a -p /sys/class/usb/hiddev0/
 \end{verbatim}
 
-to get more information on the fields that can be matched.
+...to get more information on the fields that can be matched besides serial number.
 
-You can also create a more generic rule that creates nodes for any device
-using the hiddev driver, not just APC UPSes:
-
-\begin{verbatim}
-     KERNEL="hiddev*", NAME="usb/hiddev%n"
-\end{verbatim}
-
-If you have several UPSes or you just want to give your UPS a fixed name, you
-can use: 
-
-\begin{verbatim}
-     BUS="usb", SYSFS{serial}="AS0123456789", NAME="usb/ups0"
-\end{verbatim}
-
-where you replace the serial number in quotes with the one that correspnds to
-your UPS. Then whenever you plug in your UPS it will be given a device node
-called usb/ups0.
 
 An additional device-node-related problem is the use of dynamic minors. Some
 distributions, such as Mandrake 10, ship with a kernel having
@@ -565,24 +572,65 @@ three platforms.)
 \index{BSD!USB Kernel Configuration}
 \index{USB!BSD Kernel Configuration}
 
-FreeBSD 5.5.0 and later require no special kernel configuration. Users of
-those platforms can skip ahead to the next subsection.
-
-Users of OpenBSD, NetBSD, and FreeBSD 5.4 (and older) will need to rebuild
-the kernel in order to {\bf enable the ugen driver} and {\bf disable the 
-uhid driver}. uhid is not sufficient for apcupsd at this time and we need 
-to prevent it from grabbing the UPS device. You should {\bf make the 
-following changes} to your kernel config file:
+Users of OpenBSD, NetBSD, and some versions of FreeBSD will need to 
+rebuild the kernel in order to {\bf enable the ugen driver} and 
+{\bf disable the uhid driver}. uhid is not sufficient for apcupsd at 
+this time and we need to prevent it from grabbing the UPS device. You 
+should {\bf make the following changes} to your kernel config file:
 
 \begin{description}
-\item [FreeBSD]
+\item [FreeBSD (v5.4 and below, v6.0)]
 (you {\bf will not} lose use of USB keyboard and mouse):
 \\{\bf Disable:} uhid
 \\{\bf Enable:} ugen
 
-\item [NetBSD] (you {\bf will} lose use of USB keyboard and mouse):
+\item [FreeBSD (v5.5, v6.1 and above)]
+(you {\bf will not} lose use of USB keyboard and mouse):
+\\{\bf Disable:} (nothing)
+\\{\bf Enable:} ugen
+
+This is the default configuration for a GENERIC kernel on many platforms
+so you most likely will not need to recompile.
+
+\item [NetBSD (v3.x and below)]
+(you {\bf will} lose use of USB keyboard and mouse):
 \\{\bf Disable:} uhidev, ums, wsmouse, ukbd, wskbd, uhid  
 \\{\bf Enable:} ugen
+
+\item [NetBSD (v4.0 and above)]
+You can use apcupsd on single USB port without disabling the USB
+keyboard and mouse on other ports, though all other devices will
+be disabled on the port you pick for your UPS.
+
+First, decide which hub and port you wish to use. You can
+find out the hub and port numbers for any particular physical
+connector by plugging a USB device into it and looking at the
+messages printed by the kernel; you should messages something
+like this:
+
+\begin{verbatim}
+     uxx0 at uhub0 port 1
+     uxx0: <some device name>
+\end{verbatim}
+
+To use your APC UPS on this port, configure the kernel to prefer
+attachment of the ugen driver over other drivers on this hub
+and port only, by adding a line like this to your kernel config
+file:
+
+\begin{verbatim}
+     ugen*   at uhub0 port 1 flags 1
+\end{verbatim}
+
+(The "flags 1" forces the ugen to attach instead of anything
+else detected there.)
+
+Configure and build that kernel as per the references below, and
+your UPS will now attach as a ugen device when plugged into that
+port.
+
+Don't forget to cd to /dev and "./MAKEDEV ugen1" (and 2 and so
+on) if you have more than one generic usb device on your system.
 
 \item [OpenBSD] (you {\bf will} lose use of USB keyboard and mouse):
 \\{\bf Disable:} uhidev, ums, wsmouse, ukbd, wskbd, uhid  
@@ -4249,14 +4297,7 @@ for more details.
 
 \item [A:]
    \index{ A: }
-   With release 3.8.0, apcupsd now runs on Win95/98, WinMe, WinNT, and Win2000
-machines. All features of the Unix versions of apcupsd are implemented. The
-UPS EEPROM programming features of apcupsd have not been tested under Windows.
-Version 3.8.0 does not support simple signaling UPSes (BackUPS, etc). Version
-3.8.1 does support most simple signaling UPSes, but not all cables (due to
-deficiencies in the Windows serial port API). Please note that we have had
-reports that apcupsd does not work properly on the WinXP system. If you have
-any information on this, please email us.  
+   Yes.  
 
 \item [Q:]
    \index{ Q: }
@@ -4434,46 +4475,6 @@ file that will be called before doing the commands in apccontrol. Your script
 file must have the same name as the appropriate case statement in apccontrol;
 it must be executable; and it must be in the same directory as apccontrol.  
 
-\item [Q:]
-   \index{ Q: }
-   I have Win2k Advanced server, and when starting the service, get: Could not
-start the Apcupsd Server service on Local Computer. Error 1067: The process
-terminated unexpectedly  
-
-\item [A:]
-   \index{ A: }
-   The most common error causing your problem is an incorrect serial port
-specification on your DEVICE directive. It should be:  
-
-\footnotesize
-\begin{verbatim}
-          DEVICE /dev/com2
-     
-\end{verbatim}
-\normalsize
-
-On WinNT machines, and probably Win2000 machines you MUST use /dev/com2 unless
-you modify the behavior of the boot process to prevent Windows from probing
-the port. This is documented in our manual for WinNT. Although I imagine it is
-the same for Win2000, I am not sure.  
-
-The second most common problem is bad placement of the files i.e. you did not
-install them in c:\textbackslash{}apcupsd Unfortunately for the current
-release, this path is ``hard coded'' into the binaries.  
-
-The third most common problem is that you did not run the setup.bat script
-after loading the files. This is necessary to install apcupsd as a service.  
-
-If all the above fails, try starting apcupsd by hand inside a CYGWIN rxvt
-window if you use an rxvt window rather than a DOS window, you will see many
-more of the error messages.  
-
-In addition, most of the apcupsd startup errors are reported in:
-c:\textbackslash{}apcupsd\textbackslash{}etc\textbackslash{}apcupsd\textbackslash
-{}apcupsd.events  
-
-Many error messages associated with Windows services will be reported in the
-Windows System Log.  
 
 \item [Q:]
    \index{ Q: }
@@ -4709,12 +4710,6 @@ master has shutdown, or that a onbattery situation exists and the
 communications line has been severed.  
 
 Does a {\tt shutdown -h now}  
-
-\item [restartme]
-   \index{restartme }
-   This event is depreciated and should not be used.  
-
-Terminates the currently running apcupsd and then restarts it.  
 
 \item [runlimit]
    \index{runlimit }
@@ -5448,14 +5443,12 @@ log\_event() in apclog.c.
 
 The Windows version of apcupsd has been tested on Win95, Win98, WinMe, WinNT,
 WinXP, and Win2000 systems. This version of apcupsd has been built to run
-natively on Windows (no Cygwin or other emulation layer needed).Even though
+natively on Windows (no Cygwin or other emulation layer needed). Even though
 the Win32 version of apcupsd is a port that relies on many Unix features, it
 is just the same a true Windows program. When running, it is perfectly 
 integrated with Windows and displays its icon in the system icon tray, and
 provides a system tray menu to obtain additional information on how apcupsd 
-is running (status and events dialogue boxes). If so desired, it can also 
-be stopped by using the system tray menu, though this should normally never
-be necessary.  
+is running (status and events dialogue boxes).
 
 Once installed apcupsd normally runs as a system service.  This means that it
 is immediately started by the operating system when the system is booted, and
@@ -5575,8 +5568,51 @@ UPS is online, if the battery is not at least 99\% charged, the plug icon
 will become a plug with a lightning bolt in the middle 
 \includegraphics{./charging.eps} to indicate that the battery is charging. 
 
-\label{Testing}
 
+\label{Apctray}
+\subsection*{Apctray}
+\index{Apctray}
+\addcontentsline{toc}{subsection}{Apctray}
+Starting with version 3.14.2, the tray icon is provided by a separate 
+program called 'apctray'. This cleanly separates the user interface
+from the daemon (service) and is required for tray icon support on Windows
+Vista. Note that if you close or disable the tray icon this does {\bf not}
+stop or disable the apcupsd service which will continue to monitor the UPS
+and shutdown the computer when appropriate. To stop or disable the service,
+use the service control panel.
+
+apctray has the capability of monitoring multiple apcupsd instances using
+apcupsd's Network Information Server (NIS). It will create a new icon for 
+each instance being monitored. By default, apctray monitors the local 
+apcupsd (localhost on port 3551). To add additional monitors, use the
+command line "/add" command as follows:
+
+\begin{verbatim}
+     apctray /host myserver /add
+\end{verbatim}
+
+To specify a non-default port, include the /port switch:
+
+\begin{verbatim}
+     apctray /host myserver /port 1234 /add
+\end{verbatim}
+
+To remove a monitor from the tray, right-click the tray icon and choose
+"Remove this instance" or run the add command again with the "/del" switch
+instead of "/add". Note that deleting the last monitor also configures
+apctray to not start by default. Using "/add" to create a new monitor
+will enable automatic startup again. To close a monitor temporarily,
+right-click the tray icon and choose "Close this instance".
+
+apctray can be installed standalone (without apcupsd) if you wish to use
+it only to monitor remote apcupsd instances. This can be convenient for
+keeping an eye on a room full of UPSes from your desktop. Download and
+run the normal apcupsd installer and simply uncheck all components except
+apctray. Then use the "/add" command described above to add as many
+monitors as you wish.
+
+
+\label{Testing}
 \subsection*{Testing}
 \index{Testing }
 \addcontentsline{toc}{subsection}{Testing}
@@ -5595,7 +5631,9 @@ c:\textbackslash{}apcupsd\textbackslash{}etc\textbackslash{}apcupsd\textbackslas
 {}apcupsd.events where apcupsd normally logs its events, and you will
 generally find more detailed information on why the program is not working.
 The most common cause of problems is either improper configuration of the
-cable type, or an incorrect address for the serial port. 
+cable type, or an incorrect address for the serial port. Additionally, check
+the application event log, if you're running a platform that supports it such
+as Windows 2000 or XP.
 
 \label{Upgrading}
 \subsection*{Upgrading}
@@ -5621,21 +5659,11 @@ file, the new apcupsd.conf will be installed as apcupsd.conf.new.
 
 \label{index-Windows_002c-Post-Installation-177}
 After installing apcupsd and before running it, you should check the contents
-of two files to ensure that it is configured properly for your system. The
-first is
+of the config file
 c:\textbackslash{}apcupsd\textbackslash{}etc\textbackslash{}apcupsd\textbackslash
 {}apcupsd.conf. You will probably need to change your UPSCABLE directive, your
 UPSTYPE and possibly your DEVICE directives. Please refer to the configuration
 section of this manual for more details.  
-
-The second file that you should examine is
-c:\textbackslash{}apcupsd\textbackslash{}etc\textbackslash{}apcupsd\textbackslash
-{}apccontrol. This file is called by apcupsd when events (power loss, etc) are
-generated. It permits the user to program handling the event. In particular,
-it permits the user to be notified of the events. For the Win32 version, each
-event is programmed to display a Windows popup dialogue box. If your machine
-is mostly unattended, you may want to comment out some of these popup dialogue
-boxes by putting a pound sign (\#) in column one of the appropriate line. 
 
 \label{Problem-Areas}
 
@@ -5648,13 +5676,12 @@ boxes by putting a pound sign (\#) in column one of the appropriate line.
 \label{index-Windows_002c-Problems-179}
 On some Windows systems, the domain resolution does not seem to work if you
 have not configured a DNS server in the Network section of the Control Panel.
-This problem should be apparent only when running a master or a slave
-configuration. In this case, when you specify the name of the master or the
-slave machine(s) in your apcupsd.conf file, apcupsd will be unable to resolve
-the name to a valid IP address. To circumvent this problem, simply enter all
-machine addresses as an IP address rather than a domain name, or
-alternatively, ensure that you have a valid DNS server configured on your
-system (often not the case on Win32 systems).
+This problem should be apparent only when running a slave configuration. In 
+this case, when you specify the name of the master in your apcupsd.conf file,
+apcupsd will be unable to resolve the name to a valid IP address. To 
+circumvent this problem, simply enter the address as an IP address rather 
+than a hostname, or alternatively, ensure that you have a valid DNS server
+configured on your system.
 
 On WinNT, WinXP, and Win2K systems, you can examine the System Applications
 log to which apcupsd writes Windows error messages during startup.  
@@ -5666,18 +5693,6 @@ c:\textbackslash{}apcupsd\textbackslash{}etc\textbackslash{}apcupsd\textbackslas
 found, etc are written to this file. Note that on some systems (WinXP, possibly
 others) Apcupsd is unable to write to this file when running as a service.
 
-
-\label{Disclaimer}
-
-\subsection*{Disclaimer}
-\index{Disclaimer }
-\addcontentsline{toc}{subsection}{Disclaimer}
-
-\label{index-Disclaimer-180}
-Some of the features such as EEPROM programming have not been exhaustively
-tested on Win32 systems. If at all possible, we recommend not to use it as a
-network master on Win95, Win98, and WinMe due to the instability of those
-operating systems.  
 
 Some items to note:  
 
@@ -5900,22 +5915,6 @@ It is important to note that under normal circumstances the user should never
 need to use these options as they are normally handled by the system
 automatically once apcupsd is installed. However, you may note these options
 in some of the .pif files that have been created for your use. 
-
-\label{Building-the-Win32-Version-from-the-Source}
-
-\subsection*{Building the Win32 Version from the Source}
-\index{Building the Win32 Version from the Source }
-\index{Source!Building the Win32 Version from the }
-\addcontentsline{toc}{subsection}{Building the Win32 Version from the
-Source}
-
-\label{index-Windows_002c-Building-187}
-\label{index-Building_002c-Windows-188}
-If you have the source code, follow the standard procedures for building
-apcupsd on Unix in 
-\ilink{Building and Installing
-apcupsd}{Building-and-Installing-apcupsd} of this manual. Please
-don't forget to look at the system specifics for CYGWIN. 
 
 \label{Installation-on-Serial_002dLine-UPSes}
 

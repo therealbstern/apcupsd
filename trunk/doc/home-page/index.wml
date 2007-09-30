@@ -14,32 +14,40 @@ consumption rates. Apcupsd is licensed under the GPL version 2.
 <p>
 
 <h2>Recent Apcupsd Releases</h2>
-<h3><i><u>Stable:</u></i>&nbsp;3.14.0 (9 February 2007) [
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=49059&release_id=485633">Source</a>
-&nbsp;/&nbsp;
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=73150&release_id=485663">RPMs</a>
-&nbsp;/&nbsp;
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=73153&release_id=485635">Win32</a>
+<h3><i><u>Stable:</u></i>&nbsp;3.14.2 (15 September 2007) [
+<a href="http://sourceforge.net/project/showfiles.php?group_id=54413">Download</a>
 ]</h3>
-Apcupsd 3.14.0 is the latest stable release, containing many bug fixes and
+While technically a "bug fix" release, 3.14.2 includes a major new feature for
+win32 users in addition to several bug fixes applicable to all platforms.
+<p>
+The new win32 feature is 'apctray', a desktop tray icon tool for 
+monitoring apcupsd instances (any instance, not just those running on 
+Windows). This qualifies as a "bug fix" because it solves the missing 
+tray icon problem on Windows Vista, but it goes much further, allowing 
+you to monitor remote apcupsd instances (via apcupsd's NIS) and even 
+supports multiple tray icons for watching several apcupsds at once.
+<p>
+See the <a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=511394">
+ReleaseNotes</a> for full details.
+<p>
+Apcupsd 3.14.2 is the latest stable release, containing many bug fixes and
 new features over the previous 3.12.x stable series. Users of all previous
 versions are encouraged to upgrade.
 <p>
 <i>If you use the old style master/slave networking mode, be sure to read the
-release notes.</i>
+<a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=511394">
+release notes</a>.</i>
 <p>
-<b><u>New Features:</u></b>
+<b><u>New Features in the 3.14.x series:</u></b>
 <ul>
 <li>USB support for new platforms: Windows, Mac OS X, Solaris 10
 <li>Native Windows port
+<li>Improved tray icon support on Win32 (monitor multiple remote instances)
 <li>PowerChute Network Shutdown driver
 <li>GAPCMON GUI monitoring tool
 <li>Unreliable MASTER/SLAVE networking mode is removed
 <li>New configuration directives to set paths at runtime
 </ul>
-<p>
-See the <a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=485633">
-ReleaseNotes</a> for full details.
 <h3><i><u>Previous Stable:</u></i>&nbsp;3.12.4 (19 August 2006) [
 <a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=49059&release_id=440657">Source</a>
 &nbsp;/&nbsp;

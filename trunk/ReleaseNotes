@@ -6,10 +6,136 @@ new features over the previous 3.12.x stable series. Users of all previous
 versions are encouraged to upgrade.
 
 IF YOU USE THE OLD STYLE MASTER/SLAVE NETWORKING MODE, BE SURE TO READ THE
-RELEASE NOTES BELOW.
+3.14.0 RELEASE NOTES BELOW.
+
+3.14.2 -- 15 September 2007          (Maintenance Release)
 
 
-3.14.0 -- 09 February 2007
+NEW FEATURES
+
+  * Tray icon support on Vista. Vista does not allow background services
+    to interact with the user's desktop, so winapcupsd's built-in tray
+    icon did not work.
+
+  * Tray icon is now a standalone application "apctray" which is capable of
+    monitoring multiple Apcupsd instances via Apcupsd's NIS. Any Apcupsd
+    running NIS can be monitored. By default the icon monitors a single
+    apcupsd at 127.0.0.1:3551. See command line options below for adding
+    additional monitors.
+
+  * Tray icon can be installed individually (disable other packages in the
+    installer) for users who want to use the icon only.
+
+  * Apctray command line options:
+
+       apctray.exe
+          - No parameters: Start any instances listed in registry. If no
+          instances in reg, start a default instance monitoring the local
+          machine (127.0.0.1:3551).
+
+       apctray.exe /host foo /port 3551 /add
+          - Add a monitor for the given host and port.
+
+       apctray.exe /host foo /port 3551 /del
+          - Remove the given monitor.
+
+       apctray.exe /del
+          - Remove all monitors.
+
+       apctray.exe /install
+          - Configure apctray to start automatically.
+
+       apctray.exe /remove
+          - Do not start automatically.
+
+       apctray.exe /kill
+          - Shut down apctray
+
+BUG FIXES
+
+  * The win32 portions of winapcupsd have been almost entirely rewritten. 
+    The code is cleaner (mostly) and lots of unused baggage has been removed.
+
+  * USB fix for BackUPS LCD series. This fix carries a risk of breaking other
+    models, but test results are positive so far.
+  
+  * Fix linux-usb device detection bug when multiple hiddev nodes are
+    present.  Fixes Fedora Bugzilla #245864:
+    <https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=245864>
+  
+  * Fix SNMP port selection when using SNMP driver
+
+
+  * Add workaround for broken BackUPS Pro model that returns certain
+    reports encoded in ASCII. Based on a patch from David Fries
+    <David@Fries.net>.
+
+  * apcsmart: Wait 20 seconds before declaring COMMLOST. This is necessary
+    when using a smart serial cable on an UPS with an SNMP monitoring card
+    installed. The SNMP card appears to disrupt serial comms for several 
+    seconds when interesting events are in progress.
+
+  * Documentation updates: Fix up udev info for modern Linux distros.
+    Update Windows section for apctray.
+
+  * Don't leak unnecessary descriptors to child when execing apccontrol.
+
+  * Fix bug with multi-threaded net_open() calls. net_open() was using
+    a global buffer for the destination address. Yikes! Bug manifestied
+    itself in apctray with multiple monitors occasionally (and
+    timing-dependently) pointing to the wrong UPS.
+
+  * Correct multimon.conf humidity monitoring.  Problem fixed by
+    Patrick Frei.  Reference:
+    https://bugzilla.novell.com/show_bug.cgi?id=199834
+
+  * Fix race between attach_ups() and detach_ups() which could result
+    in the UPSINFO structure being freed prematurely. Thanks to James
+    Abbott <j.abbott@imperial.ac.uk> for running many tests to help me
+    find this bug.
+
+  * Remove dependency on libc++ (again). Must use gcc as linker when
+    using libsupc++ since g++ automatically links against full libc++.
+
+
+3.14.1 -- 04 May 2007           (Maintenance Release)
+
+NEW FEATURES
+
+  * MacOS X GUI installer
+
+  * PCNET driver supports remote shutdown request from UPS web interface
+
+BUG FIXES
+
+  * (win32) Detect when balloon tips have been disabled via a group policy
+      and fall back on the standard popup message box.
+
+  * (win32) Fix typo: "%sbindir\%popup" -> "%sbindir%\popup" in apccontrol.bat
+      Discovered by Stefan.Hegnauer@elektrobit.com.
+
+  * (all) Fix potential NIS client lockup when server disappears. Many thanks
+      to Jan Ceuleers <jan.ceuleers@computer.org> for reporting the problem
+      and gathering data to track down the cause.
+
+  * (apctest) Fix link error after configuring with --disable-apcsmart.
+
+  * (doc) Document how to force ugen binding on NetBSD 4.x.
+      Contributed by Curt Sampson <cjs@starling-software.com>.
+
+  * (apctest) Fix crash when displaying EEPROM values more than once.
+      Contributed by Ivaylo Haratcherev <I.J.Haratcherev@tudelft.nl>.
+
+  * Increase self-test timeout to 40 seconds to accomodate the RS 800.
+      Contributed by Lars Randers <lars@nstec.dk>.
+
+  * (linux-usb) Rewrite device opening logic to be more reliable. See 
+      ChangeLog for details.
+
+  * (apcupsd) Do not attempt to cancel shutdowns.
+
+
+3.14.0 -- 09 February 2007      (Feature Release)
 
 NEW FEATURES
 

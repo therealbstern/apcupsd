@@ -175,6 +175,14 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
       return FAILURE;
 
    case 0:      /* child */
+      /* Don't leak unnecessary fds to child */
+      for (int i=0; i<sysconf(_SC_OPEN_MAX); i++) {
+         if (i != STDIN_FILENO && i != STDOUT_FILENO && i != STDERR_FILENO) {
+            if (close(i) == 0)
+               Dmsg1(200, "exec closed fd %d\n", i);
+         }
+      }
+
       argv[0] = apccontrol;        /* Shell script to execute. */
       argv[1] = cmd.command;       /* Parameter to script. */
       argv[2] = ups->upsname;      /* UPS name */

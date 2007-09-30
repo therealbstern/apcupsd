@@ -1,5 +1,5 @@
 /***************************************************************************/
-/*                     ChangeLog of Apcupsd 3.13.x                         */
+/*                     ChangeLog of Apcupsd 3.14.x                         */
 /*                                                                         */
 /*               Adam Kropelin <akropel1 at rochester dot rr dot com>      */
 /*               Kern Sibbald <kern at sibbald dot com>                    */
@@ -8,3330 +8,1027 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
-2007-02-10 11:59  adk0212
+2007-09-15 10:48  adk0212
 
-	* configure, autoconf/configure.in:
+	* src/win32/installer/: Apctray.ini, winapcupsd.nsi:
 
-	Fix net-snmp detection bug when libcrypt is required.
+	Remove commented-out code.
 
-2007-02-09 18:31  adk0212
-
-	* ChangeLog:
-
-	Regen ChangeLog.
-
-2007-02-09 18:29  adk0212
-
-	* include/version.h:
-
-	Bump rev and date for 3.14.0 release.
-
-2007-02-09 18:28  adk0212
-
-	* ReleaseNotes:
-
-	Update ReleaseNotes for 3.14.0.
-
-2007-02-08 19:14  adk0212
-
-	* doc/latex/manual.tex:
-
-	Update docs for new config directives.
-
-2007-02-07 20:12  adk0212
-
-	* doc/latex/: apcupsd.tex, manual.tex, supportedupses.tex:
-
-	Add PCNET documentation. Misc tweaks.
-
-2007-02-06 21:45  adk0212
-
-	* platforms/darwin/building-universal-binaries.txt:
-
-	Add quick documentation of how to build Universal Binaries on Mac
-	OS X.
-
-2007-02-06 21:40  adk0212
-
-	* src/drivers/: Makefile.in, apcsmart/Makefile.in,
-	dumb/Makefile.in, net/Makefile.in, pcnet/Makefile.in,
-	snmp/Makefile.in, test/Makefile.in, usb/Makefile.in,
-	usb/bsd/Makefile.in, usb/generic/Makefile.in,
-	usb/linux/Makefile.in:
-
-	Always generate archives from scratch instead of
-	appending/replacing members. Mac OS X 'ar' does not support
-	append/replace on archives containing dual format objects.
-
-2007-02-06 21:37  adk0212
-
-	* configure, autoconf/configure.in:
-
-	Updates to allow CXX and LD to be specified via the environment.
-
-2007-02-06 17:58  adk0212
-
-	* src/Makefile.in:
-
-	Whoops, forgot missed part of the apctest fix.
-
-2007-02-06 17:57  adk0212
-
-	* examples/rpt/Smart-UPS-1500.rpt:
-
-	Add another user-contributed hid-ups dump.
-
-2007-02-06 10:27  adk0212
-
-	* autoconf/variables.mak.in, src/Makefile.in:
-
-	Fix bug where misc lib flags were used as a dependency.
-
-2007-02-04 12:54  adk0212
-
-	* examples/rpt/: Back-UPS-BR-800.rpt, Back-UPS-CS-650.rpt,
-	Back-UPS-ES-550.rpt, Back-UPS-XS-1300-LCD.rpt:
-
-	Add some contributed hid-ups dumps.
-
-2007-02-04 12:47  adk0212
-
-	* examples/: Back-UPS-350-USB.rpt, Back-UPS-350ES.rpt,
-	Back-UPS-500-USB.rpt, Back-UPS-500ES.rpt, Back-UPS-BX-1500.status,
-	BackUPS-USB.status, BackUPS.rpt, JapaneseUPS.status,
-	PowerStack450.status, SmartUPS-USB.rpt, SmartUPS-vs-650.status,
-	SmartUPS.rpt, SmartUPS1000.status, SmartUPS1400.status,
-	SmartUPS3000.status, SmartUPS5000.status, SmartUPS600.status,
-	SmartUPS700-2.status, SmartUPS700.status, backupspro.status,
-	hid-ups.rpt, newbackupspro1.status, newbackupspro2.status,
-	rpt/Back-UPS-350-USB.rpt, rpt/Back-UPS-350ES.rpt,
-	rpt/Back-UPS-500-USB.rpt, rpt/Back-UPS-500ES.rpt, rpt/BackUPS.rpt,
-	rpt/SmartUPS-USB.rpt, rpt/SmartUPS.rpt, rpt/hid-ups.rpt,
-	status/Back-UPS-BX-1500.status, status/Back-UPS-Pro-1000.status,
-	status/BackUPS-USB.status, status/JapaneseUPS.status,
-	status/PowerStack450.status, status/SmartUPS-vs-650.status,
-	status/SmartUPS1000.status, status/SmartUPS1400.status,
-	status/SmartUPS3000.status, status/SmartUPS5000.status,
-	status/SmartUPS600.status, status/SmartUPS700-2.status,
-	status/SmartUPS700.status, status/newbackupspro1.status,
-	status/newbackupspro2.status:
-
-	Move 'status' and 'rpt' captures into their own directories.
-
-2007-02-03 16:25  adk0212
-
-	* configure, autoconf/configure.in, autoconf/variables.mak.in:
-
-	Swizzle around the library vars so executables are linked only with
-	what they actually need. This prevents, for example, libnetsnmp
-	from being linked with multimon and becoming a runtime dependency.
-
-2007-01-31 19:13  adk0212
-
-	* src/win32/Makefile.in:
-
-	Fix typo.
-
-2007-01-31 19:10  adk0212
-
-	* configure, autoconf/configure.in:
-
-	Fix ncurses test for powerflute on BSD.
-
-2007-01-31 18:45  adk0212
-
-	* src/gapcmon/gethostname.c:
-
-	Frustratingly, there are three different variants of
-	gethostbyname_r(), which gapcmon now relies on. Add appropriate
-	autoconf magic and wrappers so that non-Linux platforms will still
-	build.
-
-2007-01-31 18:41  adk0212
-
-	* configure, autoconf/aclocal.m4, autoconf/configure.in,
-	src/gapcmon/Makefile.in, src/gapcmon/gapcmon.c:
-
-	Frustratingly, there are three different variants of
-	gethostbyname_r(), which gapcmon now relies on. Add appropriate
-	autoconf magic and wrappers so that non-Linux platforms will still
-	build.
-
-2007-01-31 18:41  adk0212
-
-	* include/defines.h:
-
-	Fix SNMP compilating on Solaris by adding our own MIN/MAX macro
-	definitions.
-
-2007-01-31 17:57  adk0212
-
-	* platforms/: etc/apcupsd.conf.in, mingw/apcupsd.conf.in:
-
-	Fix typo pointed out by Neal Macklin <neal@nrm.com>: change ->
-	charge.
-
-2007-01-30 19:33  adk0212
-
-	* configure, autoconf/configure.in, src/win32/Makefile.in:
-
-	Remove gapcmon dependency on GnomeVFS.
-
-2007-01-29 18:28  adk0212
-
-	* doc/home-page/: lists.html, lists.wml:
-
-	Minor wording tweak.
-
-2007-01-29 18:27  adk0212
-
-	* doc/home-page/: index.html, index.wml:
-
-	Update for 3.13.12 release.
-
-2007-01-28 08:39  fleetworks
-
-	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
-	suse/apcupsd.spec.in:
-
-	Remove masterconnect and mastertimeout.
-
-2007-01-27 17:35  adk0212
-
-	* ChangeLog:
-
-	Last ChangeLog for 3.13.12, maybe.
-
-2007-01-27 17:27  adk0212
-
-	* ChangeLog, include/version.h:
-
-	Further updates for 3.13.12.
-
-2007-01-27 17:26  fleetworks
-
-	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
-	suse/apcupsd.spec.in:
-
-	Add pkgconfig to BuildRequires for gapcmon.
-
-2007-01-27 17:23  adk0212
-
-	* src/gapcmon/gapcmon.c:
-
-	Remove unused variables to quiet compiler warnings.
-
-2007-01-27 17:22  adk0212
-
-	* src/gapcmon/gapcmon.c:
-
-	Remove a 2.6-ism in gapc_net_thread_qwork().
-
-2007-01-27 12:11  fleetworks
-
-	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
-	suse/apcupsd.spec.in:
-
-	Add note on build_snmp
-
-2007-01-27 12:00  fleetworks
-
-	* doc/latex/manual.tex, platforms/contrib-rpm/build_rpm.sh,
-	platforms/mandrake/apcupsd.spec.in,
-	platforms/redhat/apcupsd.spec.in, platforms/suse/apcupsd.spec.in:
-
-	Add snmp build switch.
-
-2007-01-23 22:15  skoona
-
-	* src/gapcmon/: ChangeLog, README, eggtrayicon.c, eggtrayicon.h,
-	gapcmon.c, gapcmon.h:
-
-	GAPCMON subpackage Changes - Removed gnomeVFS from package which
-	released these defined	 gapcmon.c:#ifndef
-	HAVE_GNOMEVFS_SOCKET_SET_TIMEOUT   gapcmon.c:#ifdef
-	GNOMEVFS_REQUIRES_CANCELLATION	 ** I need to update the build
-	scripts to remove      gnomevfs from GAPCMON_CFLAGS... and these
-	defines   ** Also gnomeVFS drove most of the libbonobo... RPM
-	buildreqs
-
-	- Replace gnomeVFS with GIOChannel based socket programming
-	GIOChannels were already being used in other areas in gapc   this
-	make the prep for porting to w32 easier.
-
-	- All non-essential subsystems have been removed from gapcmon.
-	gconf, gthread, glib, pango, and gtk are all that required    other
-	than X11 libraries.  X11 libs are required to support	 the newest
-	gapcmon feature FreeDesktop.org notification icons    or
-	systray_icons.	I think I am stuck with X11 unless I want    to
-	write w32 specific code(not).
-
-	- Compile this codeset with gtk 2.6 without issue, and I assume
-	based on the amount and types of changes that gtk 2.4 minimum	is
-	still valid - i.e. it should also compile gtk on 2.4.
-
-	James,
-
-2007-01-21 12:44  fleetworks
-
-	* doc/latex/manual.tex:
-
-	Update rpm-faq for 3.14.
-
-2007-01-21 11:34  fleetworks
-
-	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
-	suse/apcupsd.spec.in:
-
-	Fix gapcmon dependancies.
-
-2007-01-21 10:48  fleetworks
-
-	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
-	suse/apcupsd.spec.in:
-
-	Fix gapcmon dependancies, update comments.
-
-2007-01-20 12:31  fleetworks
-
-	* platforms/contrib-rpm/build_rpm.sh:
-
-	Update for 3.14 spec changes.
-
-2007-01-20 11:34  fleetworks
-
-	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
-	suse/apcupsd.spec.in:
-
-	Restructure for 3.14 release
-
-2007-01-15 18:28  adk0212
-
-	* ChangeLog, ReleaseNotes, include/version.h:
-
-	Updates for 3.13.12 development release.
-
-2006-12-31 01:42  skoona
-
-	* src/gapcmon/gapcmon.c:
-
-	Change the gtk_window_present_with_time() api to _present() to
-	maintain gtk 2.4 support guidance. (with_time was a 2.6 api)
-
-	Also, noticed that the gapcmon codeset leaves the graph.properties
-	page largely blank with no color buttons.   researching cause now
-
-	James,
-
-2006-12-30 17:38  skoona
-
-	* src/gapcmon/gapcmon.c:
-
-	Changed gapc_panel_preferences_model_init() to make monitor window
-	visible if use_systray is not checked at startup.
-
-	James,
-
-2006-12-30 17:12  skoona
-
-	* src/gapcmon/ChangeLog:
-
-	Updating package files as needed.  James,
-
-2006-12-30 17:08  skoona
-
-	* src/gapcmon/gapcmon.c:
-
-	Per user request: modifiy visiblity controls to not display
-	control.panel if control.panel.use_systray preference is checked or
-	true when app is first started.
-
-	Required adding a routine cb_util_manage_events() to replace the
-	gtk_widget_hide() functionality and "hide" signal.
-	gtk_window_iconify() and the "window-state-event" are now used to
-	manage visibility.
-
-	Released seperately as release 0.8.4 in gapcmon
-
-	James,
-
-2006-12-20 19:10  adk0212
-
-	* doc/images/: Makefile, image_scales:
-
-	Add commlost image.
-
-2006-12-20 18:52  adk0212
-
-	* autoconf/targets.mak:
-
-	Bring back the library targets.
-
-	As Mike Frysinger <vapier@gentoo.org> points out, "If you try to
-	build in  a subdir and the archive doesn't exist, you'll get an
-	error about make having no idea how to make "pcnet/libpcnet.a" and
-	you then have to do it by hand. With these targets, make knows
-	which directory to change into and how to generate the .a so you
-	dont have to figure it out."
-
-	However we still kill the win32 ones since those refer to the old
-	Cygwin based port which no longer exists. Also apply a patch from
-	Mike fixing up the targets for some driver libs.
-
-2006-12-20 18:29  adk0212
-
-	* autoconf/targets.mak:
-
-	Kill library targets. These are nothing but bitrot.
-
-2006-12-20 18:26  adk0212
-
-	* autoconf/targets.mak:
-
-	Add some more phony targets. From Mike Frysinger
-	<vapier@gentoo.org>.
-
-2006-12-19 20:46  adk0212
-
-	* autoconf/targets.mak:
-
-	Bail immediately when encountering an error while making subdirs.
-	From Mike Frysinger <vapier@gentoo.org>.
-
-2006-12-17 14:55  adk0212
-
-	* doc/: images/commlost.eps, images/commlost.png,
-	images/hires/commlost.eps, latex/manual.tex:
-
-	Update manual for native Win32 port and misc other changes.
-
-2006-12-17 14:51  adk0212
-
-	* src/win32/commlost.ico:
-
-	Limit icon to 8-bit color so it will draw correctly on WinNT and
-	Win98.
-
-2006-12-17 12:35  adk0212
-
-	* configure, autoconf/configure.in:
-
-	Enable net and pcnet drivers by default. They don't require any
-	external libraries and are low overhead.
-
-2006-12-09 13:40  adk0212
-
-	* platforms/etc/: masterconnect.in, mastertimeout.in:
-
-	Remove obsolete masterconnect and mastertimeout events.
-
-2006-12-09 13:33  adk0212
-
-	* autoconf/configure.in, examples/safe.apccontrol.in,
-	include/defines.h, platforms/apccontrol.in,
-	platforms/darwin/apccontrol.in, platforms/etc/Makefile.in,
-	platforms/mandrake/apcupsd.spec.in,
-	platforms/redhat/apcupsd.spec.in, platforms/sun/apccontrol.in,
-	platforms/suse/apcupsd.spec.in,
-	platforms/yellowdog/apcupsd.spec.in, src/action.c, configure:
-
-	Remove obsolete masterconnect and mastertimeout events.
-
-2006-12-09 13:33  adk0212
-
-	* doc/latex/manual.tex:
-
-	Remove master/slave mode documentation and/or convert to NIS mode
-	docs.
-
-2006-12-05 20:58  adk0212
-
-	* doc/latex/manual.tex:
-
-	Add sections for Solaris and Darwin USB.
-
-2006-12-04 19:48  adk0212
-
-	* platforms/etc/multimon.conf:
-
-	Fix non-existent file. new-modules.txt does not exist; instead,
-	direct the user to src/cgi/upsfetch.c.
-
-2006-12-02 00:27  adk0212
-
-	* doc/home-page/: index.html, index.wml:
-
-	Add 3.13.11 release info.
-
-2006-12-01 23:43  adk0212
-
-	* ChangeLog, ReleaseNotes, include/version.h:
-
-	Updates for 3.13.11 development release.
-
-2006-12-01 23:02  adk0212
-
-	* src/drivers/snmp/: drv_powernet.c, snmp.c:
-
-	Fix APC_NOTRAP mode (for real this time) and use NETTIME setting to
-	set polling interval.
-
-2006-12-01 23:00  adk0212
-
-	* src/: lib/sleep.c, win32/compat/compat.h:
-
-	Remove local definition of struct timezone. It's not needed and
-	conflicts with net-snmp.
-
-2006-11-30 18:30  adk0212
-
-	* src/drivers/pcnet/pcnet.c:
-
-	Fix crash in pcnet driver when attempting killpower with a blank
-	DEVICE setting.
-
-2006-11-30 17:46  adk0212
-
-	* src/drivers/snmp/snmp.h:
-
-	Compile fix for net-snmp-5.3.1 in Fedora Development. Contributed
-	by Orion Poplawski <orion@cora.nwra.com>.
-
-2006-11-26 10:01  adk0212
-
-	* include/version.h:
-
-	Update version to 3.13.10b.
-
-2006-11-26 09:55  adk0212
-
-	* platforms/: apccontrol.in, darwin/apccontrol.in,
-	freebsd/apccontrol.in, mingw/apccontrol.bat, openbsd/apccontrol.in,
-	sun/apccontrol.in:
-
-	Do not perform a shutdown in apccontrol for the emergency or
-	remotedown events because apcupsd throws a doshutdown in those
-	cases already.
-
-2006-11-26 09:31  adk0212
-
-	* src/drivers/net/net.c:
-
-	Minor cleanup: Log message about shutdown cause from action.c not
-	net.c.
-
-2006-11-20 16:45  adk0212
-
-	* include/version.h:
-
-	Mark 3.13.10a.
-
-2006-11-20 16:45  adk0212
-
-	* src/action.c:
-
-	Need to update ups->PrevStatus when returning early.
-
-2006-11-20 10:19  adk0212
-
-	* include/struct.h:
-
-	Fix comment, remove unused definitions.
-
-2006-11-20 08:29  adk0212
-
-	* src/drivers/drivers.c:
-
-	Fix copy-n-paste error in comment.
-
-2006-11-20 08:24  adk0212
-
-	* include/version.h:
-
-	Bump version to 3.13.10.
-
-2006-11-20 08:23  adk0212
-
-	* src/action.c, include/struct.h:
-
-	Fix ups_shut_remote handling. We should only trigger the event when
-	ups_shut_remote changes state, not every time through the loop.
-
-2006-11-20 08:20  adk0212
-
-	* src/drivers/snmp/drv_powernet.c:
-
-	Fix APC_NOTRAP handling. We must rename APC_NOTRAP to APC after
-	detecting it because the rest of the SNMP driver expects APC.
-
-2006-11-11 12:16  adk0212
-
-	* src/win32/compat/: compat.cpp, winapi.h:
-
-	Move C++ prototypes to compat.cpp, the only place they are needed.
-	This allows C code (like gapcmon) to safely include winapi.h.
-
-2006-11-11 12:14  adk0212
-
-	* src/win32/Makefile.in:
-
-	On win32 gapcmon should be built with
-	HAVE_GNOMEVFS_SOCKET_SET_TIMEOUT.
-
-2006-10-25 18:58  adk0212
-
-	* src/drivers/usb/usb.c:
-
-	Really kill leading whitespace this time...
-
-2006-10-25 18:53  adk0212
-
-	* src/drivers/usb/usb.c:
-
-	Don't drop first character of firmware rev string. Also harden
-	parsing a bit against bogus model or firmware strings.
-
-2006-10-18 19:34  adk0212
-
-	* platforms/mingw/apcupsd.inf, platforms/mingw/apcupsd_x64.cat,
-	src/win32/winapcupsd.nsi:
-
-	Update for libub-win32 x64 components.
-
-2006-10-11 14:12  adk0212
-
-	* platforms/: etc/apcupsd.conf.in, mingw/apcupsd.conf.in:
-
-	Update NISIP comment with loopback info.
-
-2006-10-07 11:36  adk0212
-
-	* src/drivers/dumb/dumboper.c:
-
-	Fix 940-0023A cable logic to use SR to set battlow, not onbatt.
-	This fixes a mistake introduced in rev 1.13 of this file. After
-	fixing the code block, disable it because I have no evidence that
-	SR is actually connected on this cable. The schematic in the
-	apcupsd manual does not show any connection to SR and one user has
-	reported false battlow triggers using this cable.
-
-2006-10-05 18:25  adk0212
-
-	* platforms/mingw/apccontrol.bat:
-
-	Reduce delay after killpower from 20 sec to 12 sec. We can't go
-	much lower since a dumb UPS killpower requires a minimum of 10
-	seconds.
-
-2006-10-05 17:59  adk0212
-
-	* platforms/sun/Makefile.in:
-
-	Fix apcupsd.conf path as pointed out by Steven R. Loomis
-	<srl@monkey.sbay.org>
-
-2006-09-28 19:30  adk0212
-
-	* doc/home-page/: index.html, index.wml:
-
-	Update for 3.13.9 release.
-
-2006-09-28 18:43  adk0212
-
-	* ChangeLog, ReleaseNotes, include/version.h:
-
-	Updates for 3.13.9 release.
-
-2006-09-28 18:15  adk0212
-
-	* src/drivers/net/net.c:
-
-	Only log tcp_open failure once per commlost event. Otherwise the
-	system log gets flooded with this message once every NETTIME
-	seconds while the server is down.
-
-2006-09-28 18:07  adk0212
-
-	* platforms/: etc/apcupsd.conf.in, mingw/apcupsd.conf.in:
-
-	Win32 tweaks to comments plus some overall comment clarifications.
-
-2006-09-27 18:42  adk0212
-
-	* platforms/mingw/apccontrol.bat, src/lib/apcexec.c:
-
-	More apccontrol fixes for Win98. It seems that command.com has a
-	128 character limit on command line length. We work around this by
-	passing only sbindir as a command line parameter and setting the
-	cwd to scriptdir.  This way apccontrol.bat can use . for scriptdir.
-	There will still be problems if the user installs apcupsd in a deep
-	directory, but we can't do much more about it. The "C:\Program
-	Files" case works now, and that'll be the most common one.
-
-2006-09-27 17:54  adk0212
-
-	* src/win32/Makefile.in:
-
-	Clean all .exe files.
-
-2006-09-27 11:00  adk0212
-
-	* src/win32/winapcupsd.nsi:
-
-	Remove background.exe when un-installing.
-
-2006-09-27 10:58  adk0212
-
-	* include/struct.h, platforms/mingw/apccontrol.bat, src/options.c,
-	src/lib/apcconfig.c, src/lib/apcexec.c:
-
-	Fix up apccontrol launch on Win32 to handle relocatable
-	installation.  apccontrol.bat now takes parameters specifying paths
-	to sbindir and scriptdir. Also fix handling of pathnames that
-	include spaces, since those will be common on Win32 with installs
-	into "C:\Program Files".
-
-2006-09-27 10:54  adk0212
-
-	* src/win32/compat/compat.h:
-
-	Include winapi.h.
-
-2006-09-27 10:53  adk0212
-
-	* src/win32/popup.c:
-
-	Fix a few harmless typos.
-
-2006-09-27 10:44  adk0212
-
-	* src/win32/: Makefile.in, background.c, winapcupsd.nsi:
-
-	Add 'background' executable, which is a simple tool that launches
-	the given command in a detached process and returns immediately. We
-	will use this in apccontrol.bat to prevent popup notices from
-	halting execution of the reset of the script.
-
-2006-09-24 14:17  adk0212
-
-	* src/win32/Makefile.in:
-
-	Strip DLLs in addition to executables before generating installer
-	package.
-
-2006-09-24 14:12  adk0212
-
-	* src/win32/Makefile.in:
-
-	Add infrastructure for building gapcmon on Win32. Note that we
-	don't build it by default since the resulting executable doesn't
-	actually _work_, but this preserves the work done so it can be
-	picked up and finished in the future.
-
-2006-09-24 14:11  adk0212
-
-	* src/win32/compat/: compat.cpp, compat.h:
-
-	Tweaks so gapcmon can build.
-
-2006-09-24 14:05  adk0212
-
-	* src/gapcmon/: eggtrayicon.c, eggtrayicon.h, gapcmon.c:
-
-	Tweaks so it will compile on win32.
-
-2006-09-24 10:20  adk0212
-
-	* src/gapcmon/: gapcmon.c, gapcmon.h:
-
-	Minor spelling and formatting cleanups.
-
-2006-09-23 14:20  adk0212
-
-	* platforms/mingw/apcupsd.conf.in:
-
-	Add a slightly customized apcupsd.conf.in for mingw32. The NSIS
-	installer will perform some substitutions on this during the
-	install process in order to make path settings match the install
-	location chosen by the user.
-
-2006-09-23 14:19  adk0212
-
-	* platforms/etc/apcupsd.conf.in:
-
-	Make SCRIPTDIR (apccontrol location), PWRFAILDIR, and NOLOGINDIR
-	configurable in apcupsd.conf.
-
-2006-09-23 14:19  adk0212
-
-	* src/win32/: util.nsh, winapcupsd.nsi:
-
-	During install, perform substitution on apcupsd.conf.in so
-	configured paths end up correct based on whatever install directory
-	the user picked.
-
-2006-09-23 14:15  adk0212
-
-	* src/: lib/apcconfig.c, lib/apcexec.c, action.c, device.c,
-	options.c, win32/winmain.cpp, win32/compat/winconfig.h:
-
-	Make SCRIPTDIR (apccontrol location), PWRFAILDIR, and NOLOGINDIR
-	configurable in apcupsd.conf. Additionally, on Win32, automatically
-	provide a default APCCONF (apcupsd.conf location) relative to
-	executable location when the user does not specify the '-f' flag.
-
-2006-09-23 14:10  adk0212
-
-	* include/: defines.h, extern.h, struct.h:
-
-	Make SCRIPTDIR (apccontrol location), PWRFAILDIR, and NOLOGINDIR
-	configurable in apcupsd.conf. Additionally, on Win32, automatically
-	provide a default APCCONF (apcupsd.conf location) relative to
-	executable location when the user does not specify the '-f' flag.
-
-2006-09-23 14:07  adk0212
-
-	* include/version.h:
-
-	Bump version.
-
-2006-09-23 14:04  adk0212
-
-	* configure, autoconf/configure.in:
-
-	Perform substitution on SYSCONFDIR so we can use it in
-	apcupsd.conf.in.
-
-2006-09-23 13:42  adk0212
-
-	* include/apc_config.h, src/apctest.c, src/apcupsd.c:
-
-	Move main -> ApcupsdMain redefinition into apcupsd.c since that
-	change is the exception, not the rule.
-
-2006-09-23 13:39  adk0212
-
-	* src/win32/winservice.cpp:
-
-	We don't use logonfail(), so kill the extern.
-
-2006-09-23 13:38  adk0212
-
-	* src/: apctest.c, win32/Makefile.in:
-
-	Link apctest as a console app, otherwise it brings up the tray icon
-	and includes all of the service baggage.
-
-2006-09-20 20:07  adk0212
-
-	* autoconf/targets.mak, src/Makefile.in, src/cgi/Makefile.in,
-	src/gapcmon/Makefile.in:
-
-	Add 'install-strip' target to install stripped binaries. Existing
-	'install' target changed to install un-stripped binaries. This
-	behavior conforms to GNU standards and was suggested by Stanislav
-	Brabec <sbrabec@suse.cz> for improved SuSE support.
-
-2006-09-20 18:54  adk0212
-
-	* src/gapcmon/: Makefile.in, gapcmon.desktop:
-
-	Apply SuSE patches from Stanislav Brabec <sbrabec@suse.cz>.
-	apcupsd-desktop.patch: Minor fixes of the gapcmon desktop file.
-	apcupsd-icon.patch: Fixes missing icon problem in gapcmon.
-
-2006-09-20 18:53  adk0212
-
-	* src/po/: fr.po, it.po:
-
-	Apply SuSE patches from Stanislav Brabec <sbrabec@suse.cz>.
-	apcupsd-po.patch: Fixes invalid headers of some po files.
-
-2006-09-17 13:18  adk0212
-
-	* src/win32/build-win32-cross-tools:
-
-	Upgrade to nsis-2.20.
-
-2006-09-01 08:47  adk0212
-
-	* autoconf/targets.mak:
-
-	Apcupsd does not support parallel make. Add a .NOTPARALLEL target
-	to all Makefiles so folks who try to use parallel make will still
-	get a good build (albeit single-threaded) instead of piles of
-	bizarre errors.
-
-2006-08-31 19:03  adk0212
-
-	* src/apctest.c:
-
-	Add missing apcsmart type from Carl Lindberg
-	<lindberg@clindberg.org>: apctest's main() function is missing a
-	case statement for APCSMART_UPS, so a config with a UPSTYPE of
-	"apcsmart" will have an "Unknown mode.type" message printed when
-	running apctest.
-
-2006-08-28 17:22  adk0212
-
-	* src/gapcmon/gapcmon.spec:
-
-	gapcmon standalone .spec file should not be included in apcupsd
-	distribution.
-
-2006-08-27 09:38  adk0212
-
-	* src/action.c:
-
-	Unlock ups structure before returning in the is_shut_remote() case.
-
-2006-08-24 18:38  fleetworks
-
-	* doc/latex/manual.tex:
-
-	Add other build directories to rpm faq.
-
-2006-08-19 21:07  adk0212
-
-	* doc/home-page/: index.html, index.wml:
-
-	Add link to 3.12.4 RPMs.
-
-2006-08-19 20:44  fleetworks
-
-	* doc/latex/manual.tex:
-
-	Add third party packager information.
-
-2006-08-19 19:35  fleetworks
-
-	* platforms/contrib-rpm/: README, build_rpm.sh, rpmkey.spec:
-
-	Add third party packager tools.
-
-2006-08-19 19:21  fleetworks
-
-	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
-	suse/apcupsd.spec.in:
-
-	Add third party packager tag
-
-2006-08-19 13:36  adk0212
-
-	* doc/home-page/: index.html, index.wml:
-
-	Update for apcupsd-3.12.4 release.
-
-2006-08-18 11:52  adk0212
-
-	* include/defines.h, include/struct.h, src/drivers/net/net.c:
-
-	Remove references to UPS_belowcaplimit and UPS_remtimelimit. These
-	bits are never set, so no sense checking for them.
-
-2006-08-18 09:09  adk0212
-
-	* src/gapcmon/gapcmon.c:
-
-	Fix compile error with older glib. g_async_queue_ref() returns void
-	on older version or the argument passed in on newer versions. Just
-	ignore the return value and use the queue ptr directly each time.
-
-2006-08-18 08:58  adk0212
-
-	* include/defines.h:
-
-	Maintain UPS_shut_emerg locally, as suggested by Carl Lindberg
-	<lindberg@clindberg.org>.
-
-2006-08-18 08:54  adk0212
-
-	* include/defines.h, include/struct.h, src/drivers/net/net.c,
-	src/action.c:
-
-	Kill UPS_shutdownimm as suggested by Carl Lindberg
-	<lindberg@clindberg.org>.  No one ever sets this bit, so it makes
-	no sense to test for it.
-
-2006-08-18 08:44  adk0212
-
-	* include/defines.h:
-
-	Apply fix from Carl Lindberg <lindberg@clindberg.org>:
-	UPS_shut_load, UPS_shut_btime, and UPS_shut_ltime need to be
-	treated as local status bits. Otherwise they keep getting
-	overwritten by the master and shutdown never ocurrs.
-
-2006-08-16 11:55  adk0212
-
-	* src/win32/build-win32-cross-tools:
-
-	Update to NSIS 2.19.
-
-2006-08-16 10:14  adk0212
-
-	* src/drivers/usb/usb.c:
-
-	Convert ambient temp to Celsius.
-
-2006-08-16 09:21  adk0212
-
-	* include/version.h:
-
-	Increment version to 3.13.8b.
-
-2006-08-16 09:05  adk0212
-
-	* src/win32/util.nsh:
-
-	Enable full GetWindowsVersion function because we need it now.
-
-2006-08-16 09:05  adk0212
-
-	* src/win32/winapcupsd.nsi:
-
-	Disable selection of USB driver on WinNT and Win95.
-
-2006-08-16 08:58  adk0212
-
-	* src/drivers/usb/usb.c:
-
-	Add CI_ATEMP for ambient temp processing from AP9612 card.
-
-2006-08-16 08:57  adk0212
-
-	* src/drivers/usb/usb_common.h:
-
-	Add physical usage code for AP9612 environmental monitor. Also kill
-	DOS line endings.
-
-2006-08-14 10:52  skoona
-
-	* src/gapcmon/gapcmon.c:
-
-	Fine tunning of the gasync_queue usage in gapc_thread_work(). Added
-	a correct reference to the queue and used it.  was not using it
-	before.   - minor change.
-
-2006-08-13 16:47  adk0212
-
-	* configure, autoconf/configure.in:
-
-	Anal indentation fix.
-
-2006-08-13 16:42  adk0212
-
-	* include/apc_config.h:
-
-	Kill definitions of int32_t. These are handled by autoconf now.
-
-2006-08-13 16:41  adk0212
-
-	* configure, autoconf/configure.in:
-
-	Clean up indentation. Indents are 3 spaces, no tabs.
-
-2006-08-13 14:52  adk0212
-
-	* src/drivers/pcnet/pcnet.c:
-
-	Add COMMLOST detection if no valid data is received for 55 seconds.
-	UPS should broadcast every 25 seconds, so 55 gives us two packets
-	plus a fudge factor.
-
-2006-08-13 13:22  adk0212
-
-	* src/lib/apcconfig.c:
-
-	Strengthen match_str() support for empty strings. On some platforms
-	(Darwin 10.3.x), sscanf("", "%s", buf) returns 0 (failure) instead
-	of -1 (EOF). So we now explicitly check for that case. Thanks to
-	Carl E.  Lindberg <lindberg@clindberg.org> for pointing this out
-	and providing a fix.
-
-2006-08-13 13:15  adk0212
-
-	* src/lib/apcsignal.c:
-
-	Remove the emtpy SIGCHLD signal handler. It has been the source of
-	numerous runaway recursions on platforms that don't want you to
-	re-arm the handler from within the handler. We could switch to
-	using sigaction(2) instead of signal(2) but that opens another can
-	of worms with regard to which platforms support it and which do
-	not. So I've opted to remove SIGCHLD handling altogether. I've
-	heard rumor that it somehow prevented zomibes, but given that it
-	took no action (besides re-arming itself) I dont see how that is
-	possible. wait(2) prevents zombies. An empty SIGCHLD hanlder is a
-	placebo. Or so I think today. Credit (blame?) to Carl E. Lindberg
-	<lindberg@clindberg.org> for pushing me over the edge on this
-	issue.
-
-2006-08-13 13:00  adk0212
-
-	* src/apcnis.c:
-
-	Platforms have differing opinions on the type of the fourth
-	argument to setsockopt(2). So just cast it to (void *) and be done.
-	Thanks to Carl E.  Lindberg <lindberg@clindberg.org> for pointing
-	this out and providing a fix.
-
-2006-08-13 12:55  adk0212
-
-	* autoconf/config.h.in:
-
-	Fix typo.
-
-2006-08-13 12:54  adk0212
-
-	* configure, autoconf/config.h.in, autoconf/configure.in:
-
-	Solaris 2.5.1 is missing int32_t. Thanks to Carl E. Lindberg
-	<lindberg@clindberg.org> for pointing this out and providing a fix.
-
-2006-08-13 12:42  adk0212
-
-	* configure, autoconf/config.h.in, autoconf/configure.in,
-	include/extern.h, src/lib/sleep.c:
-
-	Remove references to usleep(1). We ensure nanosleep(2) is available
-	and all code has previously been converted to use it. Solaris hides
-	its native nanosleep(2) in librt or libposix4, depending on
-	version, so make sure configure knows enough to look there. Thanks
-	to Carl E. Lindberg <lindberg@clindberg.org> and Dave K
-	<davek08054@gmail.com> for the info.
-
-2006-08-12 16:44  adk0212
-
-	* src/libusbhid/parse.c:
-
-	Add physical min fix from Dmitry Marakasov <amdmi3@mail.ru> as per
-	FreeBSD GNATS usb/101775:   Currently, when parsing HID report
-	descriptor, libusbhid treats   global items with both tag=3 and
-	tag=4 as `physical maximum', while   tag=3 actually is `physical
-	minimum'.
-
-2006-08-12 16:42  adk0212
-
-	* src/drivers/pcnet/pcnet.c:
-
-	Add support for self-test reporting via pcnet_ups_entry_point().
-
-2006-08-11 20:00  adk0212
-
-	* src/lib/inet_pton.c:
-
-	Remove conditional on HAVE_NAMESER_H. We don't actually need
-	<arpa/nameser.h> since we've defined all the important constants by
-	hand in defines.h.
-
-2006-08-11 19:59  adk0212
-
-	* src/apcnis.c:
-
-	Always use inet_pton(). We have our own implementation for
-	platforms that are missing it, so there's no reason to
-	conditionalize it.
-
-2006-08-11 19:57  adk0212
-
-	* src/win32/compat/compat.h:
-
-	Add EAFNOSUPPORT definition which apparently win32 errno lacks.
-
-2006-08-11 19:56  adk0212
-
-	* src/win32/Makefile.in:
-
-	Include inet_pton.c in the utils library. It's needed by the pcnet
-	driver now and Win32 doesn't have it.
-
-2006-08-11 19:15  adk0212
-
-	* src/drivers/pcnet/pcnet.c:
-
-	Implement killpower support. This requires a pseudo-HTTP
-	challenge-response sequence in order for the UPS to ensure that the
-	shutdown request is legitimate.
-
-2006-08-11 02:10  adk0212
-
-	* include/version.h:
-
-	Bump version to mark 3.13.8a.
-
-2006-08-11 02:05  adk0212
-
-	* src/: apcnis.c, lib/apclibnis.c:
-
-	Fix win32 socket leak in NIS server. All callers of net_open()
-	*must* call net_close(), not close(). Furthermore, calls to
-	shutdown() are fairly pointless since the connection is being fully
-	closed on the next line.  Lastly, remove zero length packet from
-	net_close() since callers that want it already do it themselves and
-	we have no guarantee that the socket is writable at this point
-	anyway.
-
-2006-08-09 19:07  adk0212
-
-	* configure, autoconf/configure.in, platforms/darwin/apccontrol.in:
-
-	Add support for posting event notifications via Growl on Darwin, if
-	it's available. Based on a suggestion from James Snyder
-	<jbsnyder@gmail.com> many months ago.
-
-2006-08-08 22:31  skoona
-
-	* src/gapcmon/unplugged.png:
-
-	Updated commlost icon(unplugged) to match win32 version
-
-2006-08-08 19:32  adk0212
-
-	* doc/home-page/: index.html, index.wml:
-
-	Update home page for 3.13.8 devel release.
-
-2006-08-08 11:10  adk0212
-
-	* ReleaseNotes:
-
-	Update for 3.13.8.
-
-2006-08-08 10:51  adk0212
-
-	* ChangeLog:
-
-	Update for 3.13.8.
-
-2006-08-08 10:39  adk0212
-
-	* include/version.h:
-
-	Update version to 3.13.8.
-
-2006-08-07 19:18  adk0212
-
-	* src/lib/apcstatus.c:
-
-	Revert mistaken change from is_onbatt_msg() to is_onbatt().
-
-2006-08-07 19:13  adk0212
-
-	* src/: lib/apcstatus.c, win32/commlost.ico, win32/winres.h,
-	win32/winres.rc, win32/wintray.cpp, win32/wintray.h:
-
-	Add a new Win32 tray icon to represent the COMMLOST state.
-
-2006-08-06 19:51  adk0212
-
-	* src/lib/apclibnis.c:
-
-	Fix socket leak on Windows. We must use closesocket(), not close().
-	Also, there's no good reason that I can see to not just use
-	send/recv all the time, so remove translation of those.
-
-2006-08-05 22:57  adk0212
-
-	* src/win32/winservice.cpp:
-
-	Tweak service description. While technically true, the fact that
-	Apcupsd shuts down your _UPS_ is less important than the fact that
-	it shuts down your _computer_.
-
-2006-08-05 22:51  adk0212
+2007-09-15 10:48  adk0212
 
 	* src/win32/winmain.cpp:
 
-	Initialize WinAPIWrapper and WSA early so platform version is
-	available when we need it.
+	Misc cleanup.
 
-2006-08-05 15:56  adk0212
+2007-09-15 10:48  adk0212
 
-	* platforms/mingw/apccontrol.bat:
+	* src/win32/: balloonmgr.cpp, statmgr.cpp, wintray.cpp, wintray.h:
 
-	Misc cleanups so messages look good in balloon notifications.
+	Fix handle leaks when adding/deleting instances.
 
-2006-08-05 15:45  adk0212
-
-	* src/win32/Makefile.in:
-
-	Move _WIN32_IE define to $(DEFINES). That's a more appropriate
-	place for it.
-
-2006-08-05 15:42  adk0212
-
-	* src/win32/Makefile.in:
-
-	Set required IE version to 5.00; this is necessary for the expanded
-	NOTIFYICONDATA structure that allows balloon notices.
-
-2006-08-05 15:38  adk0212
-
-	* src/win32/winups.h:
-
-	Add WM_BALLOONSHOW message which indicates that a balloon
-	notifcation has been displayed by popup.c.
-
-2006-08-05 15:37  adk0212
-
-	* src/win32/popup.c:
-
-	Use balloon notification on Apcupsd tray icon when possible. Fall
-	back on previous behavior (MessageBox) when necessary.
-
-2006-08-05 15:35  adk0212
-
-	* src/win32/: wintray.cpp, wintray.h:
-
-	Add support for timing out balloon notifications since built-in
-	Windows timeout only starts ticking when window is out of focus;
-	this leads to annoyingly long balloon displays for no obvious
-	reason. Also clean up SendTrayMsg() and callers to not shadow
-	global battstat variable.
-
-2006-08-05 15:32  adk0212
-
-	* src/win32/compat/compat.cpp:
-
-	Update for global OSVERSIONINFO change.
-
-2006-08-05 15:31  adk0212
-
-	* src/win32/compat/: winapi.c, winapi.h:
-
-	Make entire OSVERSIONINFO struct available globally and properly
-	export it.
-
-2006-08-05 15:30  adk0212
-
-	* src/win32/winservice.cpp:
-
-	Remove local platform version data; it's provided by winapi.c now.
-
-2006-08-05 15:29  adk0212
-
-	* src/lib/apcstatus.c:
-
-	Cleanup and simplify windows status query.
-
-2006-08-03 19:05  adk0212
-
-	* platforms/mingw/apccontrol.bat:
-
-	Fix event override scripts so *.bat, *.exe, etc. will all be
-	accepted.
-
-2006-08-02 19:05  adk0212
-
-	* configure, autoconf/configure.in:
-
-	HP-UX changes suggested by Michael Wilder
-	<Wilder.Michael@cimcor.com>: Add some PTHREAD_CFLAGS and set
-	default serial dev to tty0p0.
-
-2006-07-29 19:39  adk0212
-
-	* src/win32/Makefile.in:
-
-	Misc cleanups.
-
-2006-07-29 19:22  adk0212
-
-	* src/win32/: Makefile.in, email.c, winapcupsd.nsi:
-
-	Make email.c build for Mingw and include it in install package.
-
-2006-07-29 16:27  adk0212
-
-	* src/win32/: Makefile.in, winapcupsd.nsi, compat/compat.h:
-
-	Build smtp executable and include it in install package.
-
-2006-07-29 16:25  adk0212
-
-	* src/smtp.c:
-
-	Rewrite for Win32 compatibility. The previous version assumed a
-	socket could be treated as a normal fd, which is a perfectly valid
-	assumption on any sane platform. But like I said, this is Win32.
-
-2006-07-29 09:39  adk0212
-
-	* src/win32/winapcupsd.nsi:
-
-	Enable inclusion of apctest.exe in winapcupsd.exe installer.
-
-2006-07-29 09:37  adk0212
-
-	* src/drivers/usb/generic/generic-usb.c:
-
-	Move ups->fd setting code to where it will actually be executed.
-	Whoops.
-
-2006-07-29 09:37  adk0212
-
-	* src/win32/Makefile.in:
-
-	Build apctest for win32.
-
-2006-07-29 09:37  adk0212
-
-	* src/win32/compat/: compat.h, sys/termios.h:
-
-	Add missing TIOCM_* modem bits to termios.h so apctest will
-	compile.
-
-2006-07-28 19:24  adk0212
-
-	* src/win32/newMakefile.in:
-
-	Unused.
-
-2006-07-28 19:14  adk0212
-
-	* src/apcnisd.c:
-
-	Remove apcnisd.c. This has been deprecated and unbuilt for over a
-	year.
-
-2006-07-28 19:11  adk0212
-
-	* include/: apc_winipc.h, apc_winsem.h:
-
-	Remove Cygwin build capability. It has been replaced by mingw32 and
-	no longer builds.
-
-2006-07-28 19:06  adk0212
-
-	* configure, autoconf/config.h.in, autoconf/configure.in,
-	autoconf/variables.mak.in, include/apc.h, include/apc_config.h,
-	src/Makefile.in, src/apcaccess.c, src/apcnis.c, src/apctest.c,
-	src/apcupsd.c, src/drivers/apcsmart/smart.c,
-	src/drivers/apcsmart/smartsetup.c, src/drivers/dumb/dumbsetup.c,
-	src/lib/Makefile.in, src/lib/apcevents.c, src/lib/apcfile.c,
-	src/lib/apclock.c, src/lib/apcsignal.c, src/lib/apcstatus.c,
-	src/win32/Makefile.cygwin.in, src/win32/Makefile.in,
-	src/win32/Makefile.mingw.in, src/win32/newwinservice.cpp,
-	src/win32/shutdown.c, src/win32/winapi.cpp, src/win32/winapi.h,
-	src/win32/winservice.cpp, src/win32/compat/winapi.c,
-	src/win32/compat/winapi.h, src/lib/wincompat.c:
-
-	Remove Cygwin build capability. It has been replaced by mingw32 and
-	no longer builds.
-
-2006-07-28 18:25  adk0212
-
-	* src/lib/apcconfig.c:
-
-	Make match_index and match_range comparisons case-insensitive.
-
-2006-07-28 18:22  adk0212
-
-	* src/apctest.c:
-
-	Don't print error messages twice.
-
-2006-07-28 18:22  adk0212
-
-	* src/device.c:
-
-	Improve lock file error message to help users figure out what
-	caused it.
-
-2006-07-28 17:47  adk0212
-
-	* src/gapcmon/gapcmon.c:
-
-	Eliminate unused variable warnings.
-
-2006-07-28 17:37  adk0212
-
-	* src/gapcmon/Makefile.in:
-
-	Don't override standard CFLAGS.
-
-2006-07-28 17:37  adk0212
-
-	* autoconf/configure.in, configure:
-
-	Solaris needs -D_POSIX_PTHREAD_SEMANTICS in order for ctime_r() to
-	obey POSIX.
-
-2006-07-27 20:19  adk0212
-
-	* platforms/darwin/Makefile.in:
-
-	Apply patch from Eric Cronin <ecronin@gizmolabs.org>: ${DESTDIR} is
-	used when making binary packages, and nothing should be installed
-	outside of it (to protect the base system and to make sure the
-	binary package includes everything).  The patch below corrects this
-	behavior for the Darwin/OSX startup item and dummy kext.
-
-2006-07-26 22:44  adk0212
-
-	* src/Makefile.in:
-
-	Apply patch from Eric Cronin <ecronin@gizmolabs.org>:
-	src/Makefile.in still has a reference to the autoconf variable
-	GAPCDIR which now goes by GAPCMON.
-
-2006-07-24 19:22  adk0212
-
-	* src/: drivers/pcnet/pcnet.c, lib/sleep.c:
-
-	Add boilerplate comments to new files.
-
-2006-07-24 19:20  adk0212
-
-	* src/lib/sleep.c:
-
-	Add nanosleep() and usleep() implementations derived from Apcupsd
-	and Bacula source.
-
-2006-07-24 19:03  adk0212
-
-	* configure, autoconf/configure.in, include/extern.h,
-	src/lib/asys.c, src/win32/Makefile.mingw.in,
-	src/win32/compat/compat.cpp, src/win32/compat/compat.h,
-	src/win32/compat/winconfig.h:
-
-	Provide generic nanosleep() and usleep() implementations in
-	lib/sleep.c.  Remove unused versions from asys.c and
-	win32/compat/compat.cpp.
-
-2006-07-23 19:25  adk0212
-
-	* src/win32/winapcupsd.nsi:
-
-	Fix type in uninstall script: libusbo.dll -> libusb0.dll
-
-2006-07-23 00:01  adk0212
-
-	* doc/home-page/: index.html, index.wml:
-
-	Update web page with 3.13.7 release info.
-
-2006-07-22 18:31  adk0212
-
-	* ChangeLog:
-
-	Update ChangeLog for 3.13.7.
-
-2006-07-22 18:29  adk0212
-
-	* include/version.h:
-
-	Bump version to 3.13.7.
-
-2006-07-22 18:29  adk0212
-
-	* ReleaseNotes:
-
-	Update for 3.13.7 devel release.
-
-2006-07-22 17:06  adk0212
-
-	* configure, autoconf/configure.in:
-
-	Add pcnet driver to --enable-all and to the configuration summary
-	output.
-
-2006-07-22 15:06  adk0212
-
-	* src/drivers/pcnet/pcnet.c:
-
-	Only break from interrupt loop on status packets, not on config
-	packets.
-
-2006-07-22 15:01  adk0212
-
-	* src/drivers/pcnet/pcnet.c:
-
-	Check mgmt card IP address against configuration. Exit interrupt
-	loop when a valid packet is received.
-
-2006-07-22 14:58  adk0212
-
-	* platforms/etc/apcupsd.conf.in:
-
-	Add pcnet UPSTYPE documentation.
-
-2006-07-22 11:17  adk0212
-
-	* src/drivers/pcnet/pcnet.c:
-
-	Add authentication support and packet replay detection.
-
-2006-07-22 11:14  adk0212
-
-	* include/md5.h, src/lib/Makefile.in, src/lib/md5.c,
-	src/win32/Makefile.mingw.in:
-
-	Add an MD5 implementation for use by the pcnet driver.
-
-2006-07-21 22:40  adk0212
-
-	* configure, autoconf/config.h.in, autoconf/configure.in,
-	include/struct.h, src/drivers/Makefile.in, src/drivers/drivers.c,
-	src/drivers/pcnet/Makefile.in, src/drivers/pcnet/pcnet.c,
-	src/drivers/pcnet/pcnet.h, src/lib/apcconfig.c,
-	src/lib/apcstatus.c, src/win32/Makefile.mingw.in,
-	src/win32/compat/compat.h, src/win32/compat/winconfig.h:
-
-	Add first cut of 'pcnet' driver supporting the PowerChute Network
-	Shutdown protocol.
-
-2006-07-16 14:41  adk0212
-
-	* platforms/mingw/apccontrol.bat:
-
-	Change %1% to %1 for WinXP. Discovered fixed by Hartmut Heinbach
-	<hartmut@heinbach-si.de>. Thanks!
-
-2006-07-15 14:03  adk0212
-
-	* ChangeLog:
-
-	Update ChangeLog for 3.13.6.
-
-2006-07-15 13:58  adk0212
-
-	* include/version.h:
-
-	Update version for 3.13.6.
-
-2006-07-15 13:17  adk0212
-
-	* src/win32/shutdown.c:
-
-	Simplify code based on testing all modes on Win98 and WinXP.
-
-2006-07-15 13:15  adk0212
-
-	* src/lib/apcexec.c:
-
-	Put COMSPEC on the command line instead of listing it as the
-	application name. This is necessary for 16-bit executables like
-	command.com on Win98.
-
-2006-07-15 13:13  adk0212
-
-	* platforms/mingw/apccontrol.bat:
-
-	Rewrite for Win98 compatibility.
-
-2006-07-15 12:50  adk0212
-
-	* src/win32/Makefile.mingw.in:
-
-	Clean harder.
-
-2006-07-15 12:49  adk0212
-
-	* src/win32/winapcupsd.nsi:
-
-	Win98 compatibility updates.
-
-2006-07-15 12:49  adk0212
-
-	* src/win32/: newwinservice.cpp, compat/compat.cpp:
-
-	Don't beep when posting events; it's more annoying than useful.
-
-2006-07-15 12:12  adk0212
-
-	* platforms/mingw/install.txt:
-
-	Too many f's.
-
-2006-07-15 12:08  adk0212
-
-	* platforms/mingw/install.txt:
-
-	Fix word wrapping.
-
-2006-07-15 12:03  adk0212
-
-	* platforms/mingw/install.txt:
-
-	Instructions for installing USB driver manually.
-
-2006-07-15 10:27  adk0212
-
-	* platforms/mingw/: apcupsd.cat, apcupsd.inf:
-
-	Update to libusb-win32 snapshot 20060518.
-
-2006-07-15 10:09  adk0212
-
-	* src/win32/Makefile.mingw.in:
-
-	Fix makensis commandline.
-
-2006-07-14 19:29  adk0212
-
-	* src/win32/winapcupsd.nsi:
-
-	Misc installer updates. Improve readability by rewriting logic
-	using LogicLib. Move startup option to finish page. Add
-	ReleaseNotes and apcupsd.com link to finish page. Add license page
-	using GPL v2 from COPYING.
-
-2006-07-14 16:17  adk0212
-
-	* src/win32/: Makefile.mingw.in, winapcupsd.nsi, winapcupsd.nsi.in:
-
-	Pass DEPKGS and VERSION to makensis on the command line so we no
-	longer need to run autoconf over winapcupsd.nsi.in. Kill
-	winapcupsd.nsi.in and replace it with winapcupsd.nsi.
-
-2006-07-14 15:53  adk0212
-
-	* src/win32/wintray.cpp:
-
-	Poll once per second instead of once per 5 seconds. I'm an
-	information junkie and I want my tray icon to more closely reflect
-	reality.
-
-2006-07-14 15:52  adk0212
-
-	* src/lib/apcstatus.c:
-
-	Need to take the read_lock in ups_status() because status may be
-	changing rapidly under us. If we don't take the lock we can get
-	bogus status values.
-
-2006-07-14 15:34  adk0212
-
-	* src/win32/compat/compat.cpp:
-
-	Add some newlines at the beginning of syslog messages so they are
-	more readable in the event viewer.
-
-2006-07-14 15:31  adk0212
-
-	* src/win32/newwinservice.cpp:
-
-	Remove Bacula-isms that were breaking apcupsd service mode.
-
-2006-07-14 13:55  adk0212
-
-	* src/win32/Makefile.mingw.in:
-
-	Add NSIS target winapcupsd.exe.
-
-2006-07-14 13:54  adk0212
-
-	* src/win32/winapcupsd.nsi.in:
-
-	Update for mingw32 and add USB driver registration.
-
-2006-07-14 13:22  adk0212
-
-	* src/win32/winapcupsd.nsi.in:
-
-	Merge changes from Branch-3_12.
-
-2006-07-14 11:55  adk0212
+2007-09-10 19:35  adk0212
 
 	* src/win32/build-win32-cross-tools:
 
-	Add mingw32 cross-build of NSIS. This requires a native SCons, so
-	NSIS is skipped if scons does not exist.
+	Update NSIS to 2.30.
 
-2006-07-14 09:23  adk0212
-
-	* src/lib/apcexec.c:
-
-	Fix typo.
-
-2006-07-14 09:20  adk0212
-
-	* src/lib/apcexec.c:
-
-	Under mingw32, hide the console window in execute_command().
-	Otherwise the cmd window pops up briefly which looks
-	unprofessional.
-
-2006-07-14 09:03  adk0212
-
-	* src/win32/compat/compat.cpp:
-
-	Remove some unused crud.
-
-2006-07-14 08:31  adk0212
-
-	* platforms/mingw/apccontrol.bat:
-
-	Set to binary mode in order to preserve DOS end-of-lines. Also
-	cleanup some debug stuff I accidentally left in.
-
-2006-07-13 20:29  adk0212
-
-	* doc/latex/cables.tex:
-
-	Clean up and standardize cable descriptions.
-
-2006-07-11 20:12  adk0212
-
-	* doc/latex/Makefile:
-
-	Don't allow LaTeX errors to slip through unnoticed.
-
-2006-07-11 19:50  adk0212
-
-	* doc/latex/manual.tex:
-
-	SNMP related manual updates from Richard Broersma Jr
-	<rabroersma@yahoo.com>.
-
-2006-07-07 18:52  adk0212
-
-	* src/apcupsd.c:
-
-	Reduce severity of "startup succeeded" log message; LOG_ALERT seems
-	excessive for an expected event.
-
-2006-07-07 18:51  adk0212
-
-	* src/win32/compat/: compat.cpp, compat.h:
-
-	Map syslog levels to win32 event log levels.
-
-2006-07-07 10:04  adk0212
-
-	* src/: lib/wincompat.c, win32/Makefile.mingw.in,
-	win32/winservice.cpp, win32/compat/compat.cpp,
-	win32/compat/compat.h:
-
-	Win32 compat cleanup. Remove non-MINGW sections of compat.{h,cpp}.
-	Implement syslog() using Win32 Event Service so we no longer need
-	wincompat.c at all for MINGW builds.
-
-2006-07-07 09:06  adk0212
-
-	* include/defines.h, src/drivers/snmp/snmp.h,
-	src/win32/compat/compat.h:
-
-	Let users get the MIN() macro from sys/param.h, except on win32
-	where we have to add it to the ever-growing compat.h.
-
-2006-07-07 08:48  adk0212
-
-	* include/defines.h, src/drivers/snmp/drv_powernet.c,
-	src/drivers/snmp/drv_rfc1628.c, src/drivers/snmp/snmp.h:
-
-	RFC1628 SNMP driver updates from Moreno Carullo
-	<moreno.carullo@pulc.it>.  Add some stats fetches
-	rfc1628_snmp_ups_read_{static,volatile}_data().
-
-2006-07-06 08:36  adk0212
-
-	* doc/latex/Makefile:
-
-	Force index.html link so make won't cry if it's already there.
-
-2006-07-06 08:35  adk0212
-
-	* doc/latex/manual.tex:
-
-	Remove references to --enable-pthreads since pthreads has been
-	mandatory since 3.12.x. Update various sections accordingly.
-
-2006-07-06 08:02  adk0212
-
-	* doc/latex/: manual.tex, supportedoses.tex:
-
-	Documentation updates from Jeffrey Goldberg <jeffrey@goldmark.org>.
-	 Darwin OS/X installation, NIS master/slave info, LaTeX error
-	fixes.
-
-2006-06-13 14:14  skoona
-
-	* src/gapcmon/gapcmon.h:
-
-	Completed color choice selection for graph page.  This update adds
-	text to the Glossary Page explaining the new - graph properties -
-	page that was added.  James,
-
-2006-06-13 14:06  skoona
-
-	* src/gapcmon/gapcmon.c:
-
-	Implemented gconf2 management of color choices for
-	Historical.Summary.Graph Color choices are saved between sessions,
-	and used whenever a monitor is created.  Dynamically
-	changing/updating currently active monitors will not be
-	implemented.  This user improvement is done.  James,
-
-2006-06-12 00:53  skoona
-
-	* src/gapcmon/gapcmon.c:
-
-	Implemented color-change on enabled/re-enable new monitors.
-	Implemented undo button to set all colors to orig defaults.  Next;
-	Considering how to do dynamic-immediate change, and if its needed.
-	James,
-
-2006-06-11 01:32  skoona
-
-	* src/gapcmon/: gapcmon.c, gapcmon.h:
-
-	Continuing to implement graph properties.  Added the ability to
-	choose and automatically save colors choices.  Added the static
-	ability to startup with saved colors.  Next need to dynamically
-	change colors and maybe apply-default or reset.  James,
-
-2006-06-10 01:06  skoona
-
-	* src/gapcmon/gapcmon.c:
-
-	Starting to add new tab called - graph properties This will allow
-	users to change graph window and data series colors.  Stable - but
-	not complete.  Should be done in a couple days James,
-
-2006-06-02 22:03  adk0212
-
-	* src/drivers/snmp/: drv_powernet.c, powernet-mib-mgr.c:
-
-	Merge forward SNMP driver memory corruption fixes from Branch-3_12.
-	Joanne reports the changes fixed the problem.
-
-2006-05-30 21:29  skoona
-
-	* src/gapcmon/ChangeLog:
-
-	Just making notes James,
-
-2006-05-30 21:25  skoona
-
-	* src/gapcmon/gapcmon.c:
-
-	Used #if GTK_CHECK_VERION(2,6,0) to test for compile availability
-	of GTK/GDK Version 2.6.  If not found use a newly written routine
-	to rotate the text in a pixbuf for the vertical Yaxis chart title.
-	Since Its supposed to be Version 2.4 compatible, I suppose we could
-	drop the original code which uses gdk_pango_renderer_get_default()
-	- but I would like to keep it around.
-
-	Net: This fixes the gdk_pango_renderer_get_default() build error.
-
-	James,
-
-2006-05-24 13:44  skoona
-
-	* src/gapcmon/gapcmon.desktop:
-
-	Corrected the sequence of statements and removed [en_US] from
-	comments This re-enabled the menu icon addition in FC5, and other
-	desktops.  James,
-
-2006-05-23 18:04  adk0212
-
-	* platforms/mingw/apcupsd.inf:
-
-	Apcupsd driver INF file for libusb-win32. Matches all APC USB UPS
-	products (051d:0002) and makes them available thru libusb.
-
-2006-05-23 18:00  adk0212
-
-	* platforms/mingw/apccontrol.bat:
-
-	Initial mingw implementation of apccontrol script in (*shudder*)
-	Windows batch language.
-
-2006-05-23 17:55  adk0212
-
-	* src/lib/apcexec.c:
-
-	Add a first-cut implementation of execute_command() for Mingw.
-
-2006-05-23 17:54  adk0212
-
-	* src/win32/Makefile.mingw.in:
-
-	Link popup.exe and shutdown.exe with -mwindows so they don't hold
-	the command prompt open.
-
-2006-05-23 17:53  adk0212
-
-	* src/win32/compat/compat.cpp:
-
-	Beef up kill() emulation a bit. Instead of terminating the process
-	regardless of what signal was sent, only kill it for SIGTERM. Also
-	for signal 0, just check if the process is still alive. Any other
-	signal will result in EINVAL.
-
-2006-05-23 17:49  adk0212
-
-	* src/win32/compat/winconfig.h:
-
-	Override apccontrol path for win32.
-
-2006-05-23 17:49  adk0212
-
-	* src/win32/compat/compat.h:
-
-	Export conv_unix_to_win32_path(). It's useful to outside callers.
-
-2006-05-23 17:48  adk0212
-
-	* include/defines.h:
-
-	Allow APCCONTROL definition to be overridden by win32 compat
-	header.
-
-2006-05-22 18:27  adk0212
-
-	* src/reports.c:
-
-	Fix a bug in report generation. We need to check elapsed time for
-	>= not only >, otherwise we often mistakenly skip every other
-	report cycle.
-
-2006-05-20 14:24  adk0212
-
-	* src/win32/shutdown.c:
-
-	Revert to using OpenProcessToken() on MinGW32. Cygwin still uses
-	OpenThreadToken().
-
-2006-05-20 01:07  adk0212
-
-	* src/win32/Makefile.mingw.in:
-
-	Enable some compile optimization.
-
-2006-05-20 01:03  adk0212
-
-	* src/win32/: Makefile.mingw.in, shutdown.c:
-
-	Build shutdown.exe and popup.exe on Mingw32.
-
-2006-05-20 00:01  adk0212
-
-	* src/win32/Makefile.mingw.in:
-
-	Add SNMP driver to Mingw32 build.
-
-2006-05-18 17:53  adk0212
-
-	* src/win32/README.mingw32:
-
-	Update for latest changes.
-
-2006-05-17 18:12  adk0212
-
-	* src/win32/Makefile.mingw.in:
-
-	...but don't use -mwindows on apcaccess since we actually want to
-	see stdout from that!
-
-2006-05-16 19:24  adk0212
-
-	* src/win32/Makefile.mingw.in:
-
-	Link with -mwindows flag so apcupsd will run in the background
-	without holding a command window open.
-
-2006-05-16 19:02  adk0212
-
-	* ChangeLog, ReleaseNotes, include/version.h:
-
-	Update for 3.13.5 devel release.
-
-2006-05-14 19:17  adk0212
-
-	* doc/home-page/: index.html, index.wml:
-
-	Update CVS path for new sf.net CVS deployment.
-
-2006-05-14 19:09  adk0212
-
-	* src/win32/Makefile.mingw.in:
-
-	Add USB driver and related files to build.
-
-2006-05-14 19:08  adk0212
-
-	* src/libusbhid/: parse.c, usbcompat.h:
-
-	Replace references to 'u_char' with 'unsigned char' for better
-	portability.
-
-2006-05-14 19:03  adk0212
-
-	* src/drivers/usb/usb.c:
-
-	Use nanosleep() instead of usleep() for better portability (win32).
-
-2006-05-14 19:01  adk0212
-
-	* src/drivers/usb/generic/generic-usb.c:
-
-	Ensure ETIMEDOUT matches libusb definition on win32.
-
-2006-05-14 18:56  adk0212
-
-	* src/drivers/apcsmart/smart.c:
-
-	On Win32, set read() timeout to match ups->wait_time since there is
-	no support for select().
-
-2006-05-14 18:54  adk0212
-
-	* src/drivers/apcsmart/smartsetup.c:
-
-	Open serial port in binary mode on win32.
-
-2006-05-12 11:01  skoona
-
-	* src/gapcmon/: Makefile.in, eggtrayicon.c, eggtrayicon.h,
-	gapcmon.c, gapcmon.h:
-
-	Updated gapcmon.c|h to correct the sequence of timestamps for data
-	points.  I had them ordered backwards.	James
-
-2006-05-12 10:42  skoona
-
-	* src/gapcmon/: gapcmon_gtkglgraph.c, gapcmon_gtkglgraph.h:
-
-	Removing un-needed files after sourceforge's change -- i.e. thought
-	I did this once.  James,
-
-2006-05-06 09:48  adk0212
-
-	* src/drivers/apcsmart/smart.c:
-
-	Add low level debug of tx/rx characters.
-
-2006-05-06 09:48  adk0212
-
-	* src/win32/compat/compat.cpp:
-
-	Add missing break to tcflush().
-
-2006-05-06 05:44  kerns
-
-	* src/win32/: Makefile.mingw.in, newwinservice.cpp:
-
-	Turn on newwinservice.cpp
-
-2006-05-05 23:15  adk0212
-
-	* src/drivers/apcsmart/smart.c:
-
-	select() doesn't work on MinGW.
-
-2006-05-05 23:14  adk0212
-
-	* src/win32/Makefile.mingw.in:
-
-	Add apcsmart and dumb drivers to build.
-
-2006-05-05 23:13  adk0212
-
-	* src/win32/compat/: compat.cpp, compat.h:
-
-	Emulate enough serial functions to get apcsmart and dumb drivers
-	working.
-
-2006-05-05 23:13  adk0212
-
-	* src/win32/compat/sys/termios.h:
-
-	De-Cygwin-ify this header a bit.
-
-2006-05-05 20:26  fleetworks
-
-	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
-	suse/apcupsd.spec.in:
-
-	Add latex2html requirement for fedora core builds.
-
-2006-05-05 12:30  fleetworks
-
-	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
-	suse/apcupsd.spec.in:
-
-	Add ghostscript to rpm build requires.
-
-2006-05-05 10:03  kerns
-
-	* src/win32/compat/compat.cpp:
-
-	Tweak syslog type
-
-2006-05-05 10:01  kerns
-
-	* src/: lib/wincompat.c, win32/winabout.cpp, win32/winabout.h,
-	win32/winevents.cpp, win32/winevents.h, win32/winmain.cpp,
-	win32/winprop.h, win32/winservice.cpp, win32/winservice.h,
-	win32/winstat.cpp, win32/winstat.h, win32/wintray.cpp,
-	win32/wintray.h, win32/winups.h, win32/compat/compat.cpp,
-	win32/compat/compat.h, win32/compat/syslog.h:
-
-	Remove one old Win32 header + implement syslog
-
-2006-05-04 10:47  kerns
-
-	* src/: apcnis.c, win32/Makefile.mingw.in, win32/README.mingw32,
-	win32/compat/winconfig.h:
-
-	Implement MinGW NIS server code + tweak dir locations
-
-2006-05-02 05:11  kerns
-
-	* src/win32/: Makefile.mingw.in, compat/compat.h:
-
-	Cleanup Makefile.mingw a bit, pull lastest compat.h
-
-2006-05-01 15:29  kerns
-
-	* src/win32/compat/: alloca.h, grp.h, netdb.h, strings.h,
-	sys/ioctl.h, sys/socket.h, sys/wait.h:
-
-	Update so no file is zero length
-
-2006-05-01 15:19  kerns
-
-	* src/win32/README.mingw32:
-
-	Update README.mingw32
-
-2006-05-01 15:16  kerns
-
-	* src/: apcnis.c, win32/README.mingw32:
-
-	Update README
-
-2006-05-01 13:29  kerns
-
-	* src/: apcaccess.c, drivers/drivers.c, drivers/net/net.c,
-	drivers/net/net.h, drivers/test/testdriver.c,
-	drivers/test/testdriver.h, lib/apclibnis.c,
-	win32/Makefile.mingw.in, win32/winservice.cpp:
-
-	Implement apcaccess for MinGW
-
-2006-05-01 10:29  kerns
-
-	* src/win32/README.mingw32:
-
-	Update README.mingw32 with Adam's tips
-
-2006-05-01 10:06  kerns
-
-	* src/win32/: Makefile.mingw.in, winmain.cpp:
-
-	With this the MinGW apcupsd links, but no drivers
-
-2006-05-01 09:14  kerns
-
-	* include/apc_config.h, src/lib/apcevents.c, src/lib/apcfile.c,
-	src/lib/apclock.c, src/lib/apcsignal.c, src/lib/apcstatus.c,
-	src/win32/Makefile.mingw.in, src/win32/winmain.cpp,
-	src/win32/winres.rc, src/win32/winservice.cpp,
-	src/win32/compat/compat.cpp, src/win32/compat/compat.h,
-	src/win32/compat/winapi.c, src/win32/compat/winapi.h:
-
-	More MinGW corrections
-
-2006-05-01 08:40  kerns
-
-	* src/win32/compat/: winapi.c, winapi.h:
-
-	modify files
-
-2006-05-01 07:43  kerns
-
-	* src/win32/README.mingw32:
-
-	Remove lingering references to Bacula in README
-
-2006-05-01 07:36  kerns
-
-	* src/win32/: .cvsignore, Makefile.mingw.in, README.mingw32,
-	winmain.cpp, compat/compat.cpp, compat/compat.h, compat/getopt.c,
-	compat/winapi.c, compat/winapi.h, compat/sys/stat.h:
-
-	Update MinGW build
-
-2006-04-30 19:10  skoona
-
-	* src/gapcmon/gapcmon.c:
-
-	Changed g_object_ref_sink() to gtk_object_sink( GTK_OBJECT(widget)
-	); to maintain Gtk/Glib Version 2.4 standard; in gapcmon.c
-
-	James,
-
-2006-04-30 11:28  adk0212
-
-	* platforms/etc/apcupsd.conf.in:
-
-	Remove master-slave related parameters from default config.
-
-2006-04-30 11:18  adk0212
-
-	* configure, autoconf/configure.in:
-
-	Kill NETPORT configuration parameter; master-slave is gone, so
-	NETPORT no longer serves any purpose.
-
-2006-04-30 11:12  adk0212
-
-	* src/lib/apcconfig.c:
-
-	Default NIS port to NISPORT (from configure) instead of hard-coded
-	7000.  The default should have been 3551 anyway and this will
-	prevent future foul ups.
-
-2006-04-29 15:38  adk0212
-
-	* doc/home-page/: index.html, index.wml:
-
-	Add link for 3.12.3 RPMS.
-
-2006-04-28 19:36  adk0212
-
-	* doc/home-page/: index.html, index.wml:
-
-	Updaate for 3.12.3 release.
-
-2006-04-28 12:44  kerns
-
-	* configure, autoconf/configure.in:
-
-	New MinGW configure
-
-2006-04-28 12:40  kerns
-
-	* src/win32/: Makefile.in, Makefile.mingw.in:
-
-	Get Makefiles correct
-
-2006-04-28 12:38  kerns
-
-	* src/: apcupsd.c, win32/Makefile.cygwin.in, win32/Makefile.in,
-	win32/build-win32-cross-tools:
-
-	MinGW ifdeffing
-
-2006-04-28 12:37  kerns
-
-	* include/: apc.h, extern.h:
-
-	MinGW include changes
-
-2006-04-28 12:34  kerns
-
-	* src/win32/compat/: alloca.h, compat.cpp, compat.h, getopt.h,
-	grp.h, mswinver.h, netdb.h, sched.h, stdint.h, strings.h,
-	winconfig.h, winhost.h, winsock.h, arpa/inet.h, netinet/in.h,
-	sys/stat.h, sys/termios.h:
-
-	Commit compat changes
-
-2006-04-26 12:22  skoona
-
-	* src/gapcmon/gapcmon.c:
-
-	Fixed the destruction of tooltips for the monitors and control
-	panel, by using g_object_ref()/g_object_ref_sink() during create,
-	and at destroy time using g_object_unref().  Now everything created
-	for a monitor gets destroyed when the monitor is destroyed.
-
-	James,
-
-2006-04-26 00:20  skoona
-
-	* src/gapcmon/gapcmon.h:
-
-	edited Glossary page text to remove mention of the
-	click-to-toggle-legend.  James,
-
-2006-04-26 00:11  skoona
-
-	* src/gapcmon/gapcmon.c:
-
-	Corrected the graph x-label text to remove --
-	click-to-toggle-legend -- extension. Legend feature has been
-	removed, with all-points-tooltip taking its place.  James,
-
-2006-04-26 00:02  skoona
-
-	* src/gapcmon/: gapcmon.c, gapcmon_gtkglgraph.c:
-
-	Implemented all-points-tooltip in gapcmon_gtkglgraph.c for history
-	graph Removed old click-to-show legend functionality in gapcmon.c
-	Fixed a shutdown (invalid-ptr) bug in
-	gapc_monitor_interface_destroy() where tooltip OBJECT was simply
-	freed -- removed 4 lines.  James, (noticed the define around
-	gnome_socket_vfs_timeout() in network routine)
-
-2006-04-23 09:14  fleetworks
-
-	* doc/latex/manual.tex:
-
-	Update rpm section of manual.
-
-2006-04-23 09:03  fleetworks
-
-	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
-	suse/apcupsd.spec.in:
-
-	Remove redundant code, add powerflute.
-
-2006-04-23 08:05  fleetworks
-
-	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
-	suse/apcupsd.spec.in:
-
-	Add pdf manual to doc package.
-
-2006-04-22 10:49  adk0212
-
-	* src/gapcmon/gapcmon.c:
-
-	Return a value from gnome_vfs_socket_set_timeout() stub for
-	cleanliness.
-
-2006-04-22 10:44  adk0212
-
-	* configure, autoconf/configure.in, src/gapcmon/gapcmon.c:
-
-	Check for gnome_vfs_socket_set_timeout() and stub it out if not
-	available.
-
-2006-04-22 10:08  adk0212
-
-	* configure, autoconf/configure.in, src/Makefile.in:
-
-	Simplify gapcmon configure now that we're back to a single target.
-
-2006-04-22 08:29  fleetworks
-
-	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
-	suse/apcupsd.spec.in:
-
-	clean up build defines, add rhel4
-
-2006-04-21 10:55  skoona
-
-	* src/gapcmon/: eggtrayicon.h, gapcmon.c, gapcmon.h,
-	gapcmon_gtkglgraph.h:
-
-	A. Found the bug in preferences page related to editing the
-	hostname value.     It was a double free() in
-	...preference_changed() callback routine.  B. Fine tuned the state
-	status messages in the ActiveList page.  C. Added a CLOSE button to
-	the control panel and gave it the default.  This    should help
-	avoid accidental exits.  The close button hides the cp.  D. Added a
-	b_thread_stop flag to control monitor thread shutdowns better.
-	This avoids the CRITICAL thread join message which was present at
-	times.	James
-
-2006-04-19 22:51  adk0212
-
-	* ChangeLog, include/version.h:
-
-	Update ChangeLog and version for 3.13.4 devel release.
-
-2006-04-19 22:50  adk0212
-
-	* configure:
-
-	Regenerate configure for gapcmon changes.
-
-2006-04-19 19:26  adk0212
-
-	* src/action.c:
-
-	Add debug messages for delayed shutdowns.
-
-2006-04-19 19:18  adk0212
-
-	* include/struct.h, src/action.c:
-
-	Add some hysteresis to battlow, ltime, and load shutdowns.
-
-2006-04-19 13:51  skoona
-
-	* src/gapcmon/: eggtrayicon.c, eggtrayicon.h, gapcmon.c, gapcmon.h,
-	gapcmon_gtkglgraph.c, gapcmon_gtkglgraph.h:
-
-	Applied apcupsd style formatting to all source files.  I am working
-	on managing the sorted order of monitors in the preference and
-	active list pages.  This will take a week or so.  For now I
-	consider this codeset stable and complete.  James,
-
-2006-04-19 13:21  skoona
-
-	* src/gapcmon/: gapcmon.c, gapcmon.desktop, gapcmon.h:
-
-	Changed the background color of the Glossary Page to white. via
-	gapc_panel_glossary_page().  James,
-
-2006-04-19 09:51  skoona
-
-	* autoconf/configure.in:
-
-	Made the changes needed by gapcmon.  Basically, removed all
-	references to gpanel and added gconf-2.0 to list of gapcmon
-	defines.  I always have trouble regen'ing these config files.  Let
-	me know when you redo them.  James,
-
-2006-04-18 19:41  skoona
-
-	* src/gapcmon/gapcmon.h:
-
-	Changed to #ifdef, from #ifndef for the GNOMEVFSCANCELLATION flag.
-	James,
-
-2006-04-18 19:38  skoona
-
-	* autoconf/configure.in, src/gapcmon/Makefile.in:
-
-	These are the changes I think need to be make to compile gapcmon
-	with a default of on.  It did work fine for me after regening the
-	configure script and makefiles.  James,
-
-2006-04-18 19:25  skoona
-
-	* src/gapcmon/gapc_prefs.png:
-
-	Adding the last icon file, which was missed in first update James,
-
-2006-04-18 18:40  skoona
-
-	* src/gapcmon/: ChangeLog, README, eggtrayicon.c, eggtrayicon.h,
-	gapcmon.c, gapcmon.h, gapcmon.spec, gapcmon_gtkglgraph.c,
-	gapcmon_gtkglgraph.h:
-
-	New files are now in place.  Need to update the Makefile.in and
-	configuration for one gapcmon executable removing gpanel...
-	artifacts.  James,
-
-2006-04-18 18:35  skoona
-
-	* src/gapcmon/: gapcmon_common.h, gp_apcmon_core.c,
-	gpanel_apcmon.c, gpanel_apcmon.schemas, gpanel_apcmon.server:
-
-	Starting the move to the new gapcmon interface; which has an
-	internal serial number of 0.7.0-0.  step one remove files no longer
-	needed James,
-
-2006-04-14 04:09  kerns
-
-	* src/win32/: .cvsignore, winres.rc, apcupsd/apcupsd.dep:
-
-	Update and add new files
-
-2006-04-07 18:31  adk0212
-
-	* configure, autoconf/configure.in, autoconf/targets.mak,
-	autoconf/variables.mak.in:
-
-	Separate CFLAGS and CPPFLAGS. Add C++ specific flags like -fno-rtti
-	only to CPPFLAGS.
-
-2006-03-27 12:54  skoona
-
-	* src/gapcmon/: gp_apcmon_core.c, gpanel_apcmon.c:
-
-	Ok, This time I really did put change the gapc_util_load_icons()
-	routine by adding support for looking in the current directory for
-	the icons if they were not installed.  James,
-
-2006-03-27 12:30  skoona
-
-	* src/gapcmon/gapcmon.c:
-
-	Changed gapc_util_load_icons to test for installed icons and if not
-	found use local directory.  James,
-
-2006-03-24 22:32  skoona
-
-	* src/gapcmon/gapcmon_gtkglgraph.c:
-
-	Updated gtk_glgraph_destroy() to cleanup better.  It now removes
-	the expose timer and the tooltip timer.  Somethin I was doing
-	inside the gapc_monitor_interface_create() routine.  James,
-
-2006-03-24 22:08  skoona
-
-	* src/gapcmon/gpanel_apcmon.c:
-
-	Feature Update: Reorder panel Icons - Added the ability to reorder
-	the panel status Icons back into numeric sequence 1-8 or 8-1.
-	Implemented via two panel menu options Sort _Ascending and Sort
-	_Descending.  This required three new routines
-	cb_util_container_... and user-data to be attached to each icon via
-	ppi-evbox.  - Updated the Statusbar text messages to include
-	monitor number in all messages.  Also updated Graph title message
-	to include UPSNAME, HOSTNAME, and monitor #.  James,
-
-2006-03-22 18:45  adk0212
-
-	* ChangeLog:
-
-	Regen ChangeLog after fixing gapcmon install.
-
-2006-03-22 18:41  adk0212
-
-	* src/Makefile.in:
-
-	Tie gapcmon into 'make install' so it gets installed along with
-	everything else.
-
-2006-03-22 18:29  adk0212
-
-	* ReleaseNotes:
-
-	Update ReleaseNotes for development release.
-
-2006-03-22 18:23  adk0212
-
-	* ChangeLog:
-
-	Update ChangeLog for 3.13.3 using cvs2cl.pl. A little more verbose,
-	but much easier than doing it by hand!
-
-2006-03-22 18:19  adk0212
+2007-09-10 19:31  adk0212
 
 	* include/version.h:
 
-	Bump version to 3.13.3.
+	Bump version to 3.14.2.
 
-2006-03-20 19:22  adk0212
+2007-09-10 19:09  adk0212
 
-	* include/defines.h, include/struct.h, src/drivers/usb/usb.c,
-	src/lib/apcstatus.c:
+	* src/drivers/usb/: bsd/bsd-usb.c, generic/generic-usb.c,
+	linux/linux-usb.c:
 
-	Add support for NOMOUTV on USB models. Add NOMINV (Nominal Input
-	Voltage) and plumb it in the USB driver. Other connection types do
-	not appear to support this datum.
+	Prefer FEATURE reports over INPUT reports when searching for
+	usages. This will fix compatiblity with BackUPS LCD models which
+	have present but non- functional INPUT reports. It may break
+	compatibility with other models, so fingers are crossed.
 
-2006-03-20 18:22  adk0212
+2007-09-10 19:08  adk0212
 
-	* autoconf/configure.in, configure:
+	* src/win32/balloonmgr.cpp:
 
-	Fix gnome_vfs_socket_read() parameter detection. We need to link
-	the test program, not just compile it.
+	Minor cleanup and spelling fix.
 
-2006-03-19 19:53  adk0212
-
-	* configure, autoconf/aclocal.m4:
-
-	Only return -I CFLAGS from PKG_CHECK_MODULES. Otherwise, if the
-	library was built with a different compiler than we're running now,
-	we may pass invalid flags to it.
-
-2006-03-19 19:40  adk0212
-
-	* configure, autoconf/configure.in, src/gapcmon/gapcmon.c,
-	src/gapcmon/gapcmon_common.h, src/gapcmon/gp_apcmon_core.c,
-	src/gapcmon/gpanel_apcmon.c:
-
-	gapcmon and gpanel_apcmon portability changes. Remove use of
-	GnomeVFSAddress and b_network_changed. Detect whether
-	gnome_vfs_socket_{read,write} requires 4 arguments or 5 and adjust
-	usage accordingly.
-
-2006-03-19 02:01  skoona
-
-	* src/gapcmon/gp_apcmon_core.c:
-
-	Formatted tooltip messages James,
-
-2006-03-19 01:36  skoona
-
-	* src/gapcmon/gpanel_apcmon.c:
-
-	Working on automatic and dedicated refresh timers to reduce the
-	number of network-down retries.  Changed them to only request
-	net-transaction every tenth refresh cycle if network is down.
-
-	Reordered the Preferences Panel column to make hostname the
-	rightmost.
-
-	cleaned up the format of the tooltip message.
-
-	James, rking
-
-2006-03-18 21:39  adk0212
-
-	* src/gapcmon/gpanel_apcmon.c:
-
-	Fix a bug where COMMLOST was reported instead of NIS failure.
-	COMMLOST should only be reported when Apcupsd tells us to. Anything
-	else is a NIS networking failure.
-
-2006-03-18 21:09  skoona
-
-	* src/gapcmon/gpanel_apcmon.c:
-
-	Define GAPC_REFRESH_FACTOR_ONE_TIME=500 to manage any further
-	exploration of timers supporting the one_shot model.  Although we
-	want it to refresh quickly; I have to remember that is will
-	repeated until sucessful and possibly interfer with the thread its
-	waiting on.  James,
-
-2006-03-18 20:39  skoona
-
-	* src/gapcmon/gpanel_apcmon.c:
-
-	Fine tuning the refresh timer and queue communications to not
-	overrun the network thread.  cb_monitor_dedicated_one_time() and
-	cd_information_window_[buttom_refresh | create] changed to support
-	this objective.  Tweaked gapc_monitor_interface_count_enabled()
-	changing int which to gint which.  James,
-
-2006-03-18 17:28  adk0212
-
-	* src/gapcmon/gpanel_apcmon.c:
-
-	Don't allow user to disable the last monitor. When the user
-	disables the last monitor, immediately re-enable it.
-
-2006-03-17 23:36  skoona
-
-	* src/gapcmon/: gapcmon_common.h, gp_apcmon_core.c:
-
-	Implemented COMMLOST James,
-
-2006-03-17 22:39  skoona
-
-	* src/gapcmon/gpanel_apcmon.c:
-
-	Restored gpanel_apcmon:gapc_preferences_view() size request to 440
-	I may have wiped it out during the last sync.  James,
-
-2006-03-17 22:30  skoona
-
-	* src/gapcmon/gpanel_apcmon.c:
-
-	Changed gpanel_apcmon.c to remove keyboard search in preference
-	panel.	James,
-
-2006-03-17 20:57  adk0212
-
-	* autoconf/variables.mak.in:
-
-	Add assignments for X_LIBS and X_EXTRA_LIBS so Makefiles can access
-	them as make variables rather than autoconf expansions.
-
-2006-03-17 19:18  adk0212
-
-	* src/gapcmon/gpanel_apcmon.c:
-
-	Tweak preferences dialog size. Increase height slightly so bottom
-	row of table is not cut off. (Hope this isn't font dependent.) Also
-	reduce width a bit so refresh column is not overly wide.
-
-2006-03-17 19:12  adk0212
-
-	* configure:
-
-	Regenerate with James's changes to configure.in.
-
-2006-03-17 14:58  skoona
-
-	* src/gapcmon/gp_apcmon.c:
-
-	gp_apcmon.c was 2 of 2 files that implemented the gpanel applet.
-	gpanel_apcmon.c is now the single and master file for this purpose.
-	 it requires: gapcmon_gtkglgraph.c|h gapcmon.c is the regular gtk
-	program and requires: gp_apcmon_core.c and gapcmon_common.h
-
-	Also, configure and make regenerated the needed scripts and all
-	seems to be working.  I would like gapcmon to default to yes,
-	during the configure, make, and make install steps; its no now.
-
-	James,
-
-2006-03-17 14:29  skoona
-
-	* autoconf/configure.in:
-
-	Ok, I was in the wrong dir when I committed.  This configure.in was
-	changed to add gconf2 to gpanel_apcmon's requirements and to
-	include (the commented out) AC_PATH_XTRA pulling the X incl/libs I
-	need for gpanel_apcmons opengl based linegraph.  James,
-
-2006-03-17 14:26  skoona
-
-	* src/gapcmon/Makefile.in:
-
-	Updated gapcmon Makefile.in to compile using new codeset.  I need
-	to regen the configure script to enable X includes and libs I
-	changed autoconf/configure.in but I don't see it in the commit
-	list.  James
-
-2006-03-17 13:42  skoona
-
-	* src/gapcmon/: ChangeLog, README, gapcmon.spec,
-	gapcmon_gtkglgraph.c, gapcmon_gtkglgraph.h, gpanel_apcmon.c,
-	gpanel_apcmon.schemas, gpanel_apcmon.server:
-
-	Adding files to support the re-written gpanel module and its
-	standalone rpm.spec file.  The file gp_mon.c is removed because of
-	potential conflicts. The updated gpanel_apcmon add significant new
-	features including a line graph charting key metrics over time, and
-	the ability to support 8 UPSs from one executable.  James
-
-2006-03-17 13:33  skoona
-
-	* src/gapcmon/unplugged.png:
-
-	Adding a icon to support the COMMLOST state in gpanel_apcmon Will
-	update gapcmon later to pickup this new state James,
-
-2006-03-13 10:33  adk0212
+2007-08-28 19:57  adk0212
 
 	* configure, autoconf/configure.in:
 
-	Add support for building the generic USB driver on Win32 under
-	Cygwin.  The lib and include paths are currently hard-coded since
-	libusb-win32 does not include the libusb-config utility.
+	Address g++ linker vs. libsupc++ differently: Default linker to gcc
+	if none is specified. This avoids overriding LD= passed to
+	configure since if the user asks for an explicit LD we really
+	should honor it (and it's needed for building universal binaries on
+	OS X).
 
-2006-03-12 02:56  kerns
+2007-08-28 19:02  adk0212
 
-	* src/win32/README.Win32:
+	* configure, autoconf/configure.in:
 
-	Remove temp README
+	Remove dependency on libc++ (again). Must use gcc as linker when
+	using libsupc++ since g++ automatically links against full libc++.
 
-2006-03-12 02:54  kerns
+2007-08-25 15:01  adk0212
 
-	* src/win32/: apcupsd/apcupsd.mak, apcupsd/apcupsd.mak.in,
-	apcupsd/filelist, compat/compat.cpp, compat/compat.h,
-	compat/winconfig.h, lib/apclibnis.cpp, lib/newups.cpp,
-	lib/testdriver.cpp:
+	* src/lib/newups.c:
 
-	Add new win32 files
+	Fix race between attach_ups() and detach_ups() which could result
+	in the UPSINFO structure being freed prematurely. Thanks to James
+	Abbott <j.abbott@imperial.ac.uk> for running many tests to help me
+	find this bug.
 
-2006-03-11 11:47  kerns
+2007-08-23 18:43  adk0212
+
+	* platforms/etc/multimon.conf:
+
+	Correct multimon.conf humidity monitoring.  Problem fixed by
+	Patrick Frei.  Reference:
+	https://bugzilla.novell.com/show_bug.cgi?id=199834
+
+2007-08-06 20:17  adk0212
+
+	* src/win32/apctray.cpp:
+
+	Exit apctray if GetMessage() returns an error.
+
+2007-08-06 20:16  adk0212
+
+	* src/win32/winups.h:
+
+	Use enum for application-defined messages.
+
+2007-08-06 20:16  adk0212
+
+	* src/win32/: wintray.cpp, wintray.h:
+
+	Redraw tray icons politely after an Explorer crash.
+
+2007-08-05 17:31  adk0212
+
+	* src/lib/apclibnis.c:
+
+	Fix bug with multi-threaded net_open() calls. net_open() was using
+	a global buffer for the destination address. Yikes! Bug manifestied
+	itself in apctray with multiple monitors occasionally (and
+	timing-dependently) pointing to the wrong UPS.
+
+2007-08-03 15:08  adk0212
+
+	* src/: apctest.c, apcupsd.c, lib/apcconfig.c:
+
+	More argvalue to its primary user, apcconfig.c.
+
+2007-08-03 15:08  adk0212
+
+	* src/drivers/pcnet/pcnet.c:
+
+	Remove SO_REUSEADDR; we'd only need this for TCP. Set SO_BROADCAST
+	since some platforms (Windows) seem to require it in order to
+	receive broadcast packets. (Most platforms use it only to enable
+	*sending* broadcasts.)
+
+2007-08-03 14:41  adk0212
+
+	* src/lib/apcexec.c:
+
+	Don't leak unnecessary descriptors to child when execing
+	apccontrol.
+
+2007-08-03 13:52  adk0212
+
+	* doc/latex/manual.tex:
+
+	Documentation updates: Fix up udev info for modern Linux distros.
+	Update Windows section for apctray.
+
+2007-08-03 11:49  adk0212
+
+	* src/drivers/apcsmart/smart.c:
+
+	Wait 20 seconds before declaring COMMLOST. This is necessary when
+	using a smart serial cable on an UPS with an SNMP monitoring card
+	installed. The SNMP card appears to disrupt serial comms for
+	several seconds when interesting events are in progress.
+
+2007-08-03 11:47  adk0212
+
+	* examples/smartsim.c:
+
+	Add command help key since I can never remember what the keycodes
+	are.
+
+2007-08-03 11:20  adk0212
+
+	* INSTALL, doc/latex/manual.tex, examples/safe.apccontrol.in,
+	platforms/apccontrol.in, platforms/darwin/apccontrol.in,
+	platforms/freebsd/apccontrol.in, platforms/mingw/apccontrol.bat,
+	platforms/openbsd/apccontrol.in, platforms/sun/apccontrol.in:
+
+	apccontrol cleanups: powerout and mainsback should not wall; that
+	is done by onbattery/offbattery under the control of
+	ONBATTERYDELAY. Also remove obsolete 'restartme' event from scripts
+	and documentation.
+
+2007-08-03 11:17  adk0212
 
 	* src/apcaccess.c:
 
-	Correct compile warning in apcaccess.c
+	Remove lots of obsolete code. 'status' is now the only supported
+	option.
 
-2006-03-10 13:27  kerns
+2007-08-01 19:05  adk0212
 
-	* src/win32/README.Win32:
+	* src/drivers/pcnet/pcnet.c:
 
-	Add first cut native win32 build doc
+	Enable SO_REUSEADDR on pcnet socket to prevent false EADDRINUSE
+	after quick restarts.
 
-2006-03-10 13:23  kerns
+2007-07-26 16:36  adk0212
 
-	* src/win32/: README.win32, winups.h:
+	* platforms/mingw/apccontrol.bat:
 
-	Add first cut native win32 build doc
+	Remove duplicate line. Noticed by David P. Mott <dpmott@sep.com>.
 
-2006-03-10 13:06  kerns
+2007-07-20 12:17  adk0212
 
-	* src/win32/README.cygwin:
+	* examples/smartsim.c:
 
-	Add cygwin build README
+	Add support for simulating comm failure.
 
-2006-03-09 08:57  kerns
+2007-07-17 18:54  adk0212
 
-	* src/win32/compat/: alloca.h, compat.cpp, compat.h, getopt.c,
-	getopt.h, grp.h, mswinver.h, netdb.h, print.cpp, sched.h,
-	strings.h, syslog.h, winconfig.h, netinet/in.h:
+	* examples/hid-ups.c:
 
-	commit changes to compat
+	Include /dev in hiddev search.
 
-2006-03-09 08:56  kerns
+2007-07-17 18:50  adk0212
 
-	* src/win32/compat/: features.h, termios.h, utime.h, winsock.h:
+	* examples/hid-ups.c:
 
-	Add new files to compat
+	Report time delta from start of program when displaying events.
+	Contributed by David Fries <david@fries.net>.
 
-2006-03-09 08:53  kerns
+2007-07-16 20:28  adk0212
 
-	* src/win32/compat/sys/: cdefs.h, ioctl.h, socket.h, stat.h,
-	termios.h, time.h, wait.h:
+	* src/drivers/usb/usb.c:
 
-	Add new files to sys
+	Add workaround for broken BackUPS Pro model that returns certain
+	reports encoded in ASCII. Based on a patch from David Fries
+	<David@Fries.net>.
 
-2006-03-09 08:51  kerns
+2007-07-14 13:26  adk0212
 
-	* src/win32/compat/arpa/inet.h:
+	* src/win32/: apctray.cpp, winups.h:
 
-	Add arpa directory
+	Add/remove tray icons on the fly as instances are added or deleted.
 
-2006-03-09 08:50  kerns
+2007-07-14 13:05  adk0212
 
-	* src/win32/lib/: action.cpp, apcconfig.cpp, apcerror.cpp,
-	apcevents.cpp, apcexec.cpp, apcfile.cpp, apclist.cpp, apclock.cpp,
-	apclog.cpp, apcnis.cpp, apcsignal.cpp, apcstatus.cpp, apcupsd.cpp,
-	asys.cpp, device.cpp, drivers.cpp, options.cpp, reports.cpp,
-	smart.cpp, smarteeprom.cpp, smartoper.cpp, smartsetup.cpp,
-	smartsetup2.cpp:
+	* src/win32/: winres.h, winres.rc, wintray.cpp, wintray.h:
 
-	add new src/win32/lib directory
+	Add HOST field showing hostname:port to context menu.
 
-2006-03-09 08:50  kerns
+2007-07-14 13:04  adk0212
 
-	* src/win32/: newMakefile.in, newwinservice.cpp, winapi.cpp,
-	winapi.h:
+	* src/win32/build-win32-cross-tools:
 
-	Add new src/win32 files
+	Update NSIS to version 2.29.
 
-2006-03-09 08:48  kerns
+2007-07-14 12:53  adk0212
 
-	* src/win32/apcupsd/: StdAfx.cpp, StdAfx.h, apcupsd-obj.mak.in,
-	apcupsd.mak, apcupsd.mak.in, filelist, genmake.sh:
+	* src/win32/apctray.cpp:
 
-	Add new files to src/win32/apcupsd
+	Disable autorun when last instance removed.
 
-2006-03-06 10:37  skoona
+2007-07-01 14:30  adk0212
 
-	* src/gapcmon/: Makefile.in, gpanel_apcmon.server:
+	* src/drivers/snmp/snmp.c:
 
-	* Updating gpanel_apcmon.server and Makefile.in.  -
-	gpanel_apcmon.server updated the titles and one spelling mistake -
-	Makefile.in did not have subsitutions for bindir/libdir/datadir/etc
-	  added those subsitition.  * NOTE: A toplevel configure and make
-	install still does not install	 gapcmon and gpanel_apcmon.  James,
+	Fix SNMP port selection. Newer versions of Net-SNMP appear to
+	ignore the session remote_port setting. The only way to override
+	the default port is to include it in the peername string.
 
-2006-03-06 10:04  skoona
+2007-06-29 18:18  adk0212
 
-	* src/gapcmon/gpanel_apcmon.server:
+	* src/drivers/usb/linux/linux-usb.c:
 
-	Updated internal titles in gpanel_apcmon.server (menu) file.
-	James,
+	Fix linux-usb device detection bug when multiple hiddev nodes are
+	present.  Fixes Fedora Bugzilla #245864:
+	<https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=245864>
 
-2006-03-06 09:58  skoona
+2007-06-19 20:43  adk0212
 
-	* src/gapcmon/: gapcmon.c, gp_apcmon.c:
+	* doc/home-page/: index.html, index.wml:
 
-	* Changed instance counter to a static in applet_factory() in
-	gp_apcmon.c   This corrects the multiple instance config issue.  *
-	Added a test around g_source_remove() to check for zero value.
-	This avoid a g_source_remove failed message at program shutdown for
-	   both gapcmon.c and gpanel_apcmon.c  James
+	Update for 3.14.2-win32beta2 release.
 
-2006-02-28 18:27  adk0212
+2007-06-18 20:23  adk0212
 
-	* doc/latex/Makefile:
+	* ChangeLog:
 
-	Turn off auto-linking in latex2html and make a symlink ourselves.
-	Hard links are decidedly non-portable.
+	Regen ChangeLog after committing forgotten files.
 
-2006-02-25 20:19  adk0212
-
-	* configure, autoconf/configure.in:
-
-	Move --enable-all code to top of section so it can catch cgi.
-
-2006-02-25 20:12  adk0212
+2007-06-18 19:49  adk0212
 
 	* include/defines.h:
 
-	Remove some unused definitions.
+	Change CMD* definitions to enumeration.
 
-2006-02-25 20:11  adk0212
+2007-06-18 19:49  adk0212
 
-	* configure, autoconf/configure.in:
+	* src/action.c:
 
-	Add --enable-all options for developer convenience.
+	Remove unused CMDDOREBOOT.
 
-2006-02-25 10:37  adk0212
+2007-06-18 19:47  adk0212
 
-	* configure, autoconf/configure.in,
-	src/drivers/usb/generic/generic-usb.c,
-	src/drivers/usb/generic/hidutils.c,
-	src/drivers/usb/generic/libusb.h.in:
+	* src/lib/apcevents.c:
 
-	Use libusb-config to determine libusb paths and libs. Introduce
-	libusb.h as a pseudo-header for libusb's usb.h and populate it at
-	configure time.
+	Remove unused code.
 
-2006-02-24 08:07  adk0212
+2007-06-18 19:45  adk0212
 
-	* src/drivers/usb/generic/generic-usb.c:
+	* ChangeLog:
 
-	Revert error counter in pusb_check_state(). The Darwin problem
-	turns out to be a bug in libusb-0.1.11.
+	Regen ChangeLog for 3.14.2-win32beta2.
 
-2006-02-23 18:30  adk0212
+2007-06-18 19:38  adk0212
 
-	* src/drivers/usb/generic/generic-usb.c:
+	* ReleaseNotes, include/version.h:
 
-	Remove interrupt read delay; it didn't help. This time attempt to
-	retry the read a few times instead of giving up on the first
-	failure.
+	Update for 3.14.2-win32beta2 release.
 
-2006-02-22 23:39  adk0212
+2007-06-17 20:19  adk0212
 
-	* src/drivers/usb/generic/generic-usb.c:
+	* src/win32/: statmgr.cpp, statmgr.h, wintray.cpp:
 
-	Delay 20 msec before calling usb_interrupt_read. This might fix a
-	bug on Darwin where usb_interrupt_read sometimes fails for no
-	apparent reason.
+	Change StatMgr::Get() to return a managed string.
 
-2006-02-22 23:35  adk0212
+2007-06-17 20:14  adk0212
 
-	* src/drivers/usb/generic/: generic-usb.c, hidutils.c:
+	* src/win32/: apctray.cpp, statmgr.cpp, statmgr.h, wintray.cpp,
+	wintray.h:
 
-	Fix up some debug prints to use logf so they end up in the trace
-	log at the proper point.
+	Clean up apctray needless inlining and memory management.
 
-2006-02-22 21:01  adk0212
+2007-06-17 19:49  adk0212
+
+	* src/win32/balloonmgr.cpp:
+
+	Cleanup.
+
+2007-06-17 19:47  adk0212
+
+	* src/win32/balloonmgr.cpp:
+
+	Gracefully handle unexpected return values from
+	WaitForMultipleObjects().
+
+2007-06-17 16:07  adk0212
+
+	* src/win32/popup.c:
+
+	Remove balloon notice support from popup utility. Furthermore, only
+	display popup if we're on an ancient OS, apctray is not running, or
+	balloon tips are disabled via a group policy. This way win98 and NT
+	users will still get notifications of events, as will users not
+	running apctray.
+
+2007-06-17 15:54  adk0212
+
+	* src/win32/wintray.cpp:
+
+	Misc improvements: Detect self-test and set status string
+	accordingly.  Include UPS name in tool tip, when we know it. Change
+	status string for NIS connection errors to distinguish that state
+	from COMMLOST.
+
+2007-06-17 15:19  adk0212
+
+	* src/win32/: apctray.cpp, winmain.cpp:
+
+	Windows NT doesn't like the "Global\\" prefix on semaphore names.
+
+2007-06-17 13:19  adk0212
+
+	* src/win32/wintray.cpp:
+
+	Fix bug where COMMLOST status transition was not reflected by icon.
+
+2007-06-17 13:15  adk0212
+
+	* src/win32/wintray.cpp:
+
+	Suppress initial status balloon.
+
+2007-06-17 13:12  adk0212
+
+	* src/win32/balloonmgr.cpp:
+
+	Misc cleanup.
+
+2007-06-17 12:14  adk0212
+
+	* src/win32/: Makefile.in, apctray.cpp, balloonmgr.cpp,
+	balloonmgr.h, winres.rc, wintray.cpp, wintray.h:
+
+	Completely rewrite balloon tip handling. Balloon tips are posted
+	automatically when the status text changes. This eliminates the
+	need for the clunky "Receive local notifications" setting and
+	allows us to post balloons for state changes on remote Apcupsd
+	instances. Introduce the BalloonMgr to work around Windows
+	one-balloon-at-a-time limitation. When monitoring multiple Apcupsd
+	instances it will be common to need to post multiple balloon tips
+	at once. The BalloonMgr handles posting the tips one at a time and
+	timing the active balloon out early if new ones are waiting. This
+	way all balloons will be shown, one after another.
+
+2007-06-17 09:42  adk0212
+
+	* examples/smartsim.c:
+
+	Add support for simulating battery attach/detach.
+
+2007-06-17 08:54  adk0212
+
+	* src/win32/email.c:
+
+	Fix indentation.
+
+2007-06-13 20:07  adk0212
+
+	* src/win32/winevents.cpp:
+
+	Reverse order of events in listbox so most recent is always at the
+	top.
+
+2007-06-13 18:35  adk0212
+
+	* src/win32/apctray.cpp:
+
+	Use NotifyUser when notifying about multiple instances so it obeys
+	the /quiet flag.
+
+2007-06-13 18:34  adk0212
+
+	* src/win32/apctray.cpp:
+
+	Prevent multiple instances of Apctray.
+
+2007-06-13 18:29  adk0212
+
+	* src/win32/: statmgr.cpp, statmgr.h, winstat.cpp, winevents.cpp:
+
+	Use some STL to simplify GetAll() and GetEvents() calls.
+
+2007-06-10 16:05  adk0212
+
+	* src/win32/winstat.cpp:
+
+	Fix indentation.
+
+2007-06-10 16:05  adk0212
+
+	* src/win32/winres.rc:
+
+	Add refresh button to events box.
+
+2007-06-10 16:04  adk0212
+
+	* src/win32/winevents.cpp:
+
+	Add refresh button list stats now has.
+
+2007-06-10 14:03  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Update web site for 3.14.2-beta1 release.
+
+2007-06-10 10:13  adk0212
+
+	* ChangeLog, ReleaseNotes, include/version.h:
+
+	Final updates for apcupsd-3.14.2-win32beta1 release.
+
+2007-06-10 09:34  adk0212
+
+	* src/win32/apctray.cpp:
+
+	Misc updates and small bug fixes.
+
+2007-06-10 09:33  adk0212
+
+	* src/win32/installer/: Apctray.ini, winapcupsd.nsi:
+
+	Updates for multi-instance apctray. Remove apctray parameter
+	customization option for now.
+
+2007-06-09 21:34  adk0212
+
+	* src/win32/: winres.h, winres.rc, winstat.cpp, wintray.cpp,
+	wintray.h:
+
+	More multiple instance improvements. Also add refresh button to
+	detailed status dialog.
+
+2007-06-09 20:02  adk0212
+
+	* src/win32/: apctray.cpp, winres.h, winres.rc, wintray.cpp,
+	wintray.h, winups.h:
+
+	More changes for better multiple monitor support.
+
+2007-06-09 15:47  adk0212
+
+	* src/win32/: apctray.cpp, statmgr.cpp, winres.h, winres.rc,
+	wintray.cpp, wintray.h, winups.h:
+
+	Major rework to support monitoring multiple apcupsds with a single
+	apctray instantiation. Includes basic management of monitoring
+	instances. More fancy stuff to come.
+
+2007-06-07 19:43  adk0212
+
+	* src/win32/: apctray.cpp, wintray.cpp, wintray.h,
+	installer/common.nsh:
+
+	Updates for running multiple apctray instances simultaneously and
+	properly shutting them down.
+
+2007-06-06 22:11  adk0212
+
+	* src/win32/wintray.cpp:
+
+	Fix timeout bug.
+
+2007-06-06 22:06  adk0212
+
+	* src/win32/: wintray.cpp, wintray.h:
+
+	Shutdown status polling thread cleanly.
+
+2007-06-06 22:05  adk0212
+
+	* src/win32/: statmgr.cpp, statmgr.h:
+
+	Grab lock during destruction to prevent further operations.  Also
+	add copyright blocks.
+
+2007-06-06 21:26  adk0212
+
+	* src/win32/: statmgr.cpp, statmgr.h:
+
+	Reuse sockets in StatMgr. This prevents build-up of large numbers
+	of sockets in the TIME_WAIT state. Also implement proper locking.
+
+2007-06-06 19:53  adk0212
+
+	* src/lib/apcstatus.c:
+
+	Kill FillEventsBox function and associated grunge that is no longer
+	used.
+
+2007-06-06 19:49  adk0212
+
+	* src/win32/apcupsd.rc:
+
+	Remove unused file.
+
+2007-06-06 19:44  adk0212
+
+	* src/win32/Makefile.in:
+
+	Build object files in obj/ to reduce source dir clutter.
+
+2007-06-06 18:53  adk0212
+
+	* src/win32/: Apctray.ini, EditApcupsdConf.ini, InstallService.ini,
+	Makefile.in, common.nsh, params.nsh, util.nsh, winapcupsd.nsi,
+	installer/Apctray.ini, installer/EditApcupsdConf.ini,
+	installer/InstallService.ini, installer/common.nsh,
+	installer/params.nsh, installer/util.nsh, installer/winapcupsd.nsi:
+
+	Move installer files to installer/ directory. There are enough of
+	them now that we should stop cluttering the main win32 source dir.
+
+2007-06-06 18:29  adk0212
+
+	* src/win32/winapcupsd.nsi:
+
+	Add back in the finish page with ReleaseNotes and apcupsd.org link.
+
+2007-06-06 18:28  adk0212
+
+	* src/win32/common.nsh:
+
+	Increase sleep time to 2 seconds. 1 second was borderline.
+
+2007-06-05 20:42  adk0212
+
+	* src/win32/: common.nsh, winapcupsd.nsi:
+
+	More start/stop rework. Add new common.nsh file to be shared
+	between normal and uninstall context.
+
+2007-06-05 20:41  adk0212
+
+	* src/win32/: apctray.cpp, wintray.cpp:
+
+	Fix refresh again. Pretty soon I am going to run out of ways to
+	screw this up.
+
+2007-06-05 18:43  adk0212
+
+	* src/win32/: Apctray.ini, InstallService.ini, winapcupsd.nsi:
+
+	Many more installer updates. Move static text to page .ini files.
+	Add code to handle polite start/stop of apcupsd and apctray.
+
+2007-06-05 18:39  adk0212
+
+	* src/win32/winservice.h:
+
+	Maintain a registry flag to indicate if apcupsd is installed as a
+	service.  This used to be done by the installer, but would get out
+	of sync if the user ran 'apcupsd /install' by hand.
+
+2007-06-05 18:34  adk0212
+
+	* src/win32/winservice.cpp:
+
+	Maintain a registry flag to indicate if apcupsd is installed as a
+	service.  This used to be done by the installer, but would get out
+	of sync if the user ran 'apcupsd /install' by hand.
+
+2007-06-05 18:33  adk0212
+
+	* src/win32/apctray.cpp:
+
+	When installing, only add command line parameters if they were
+	supplied by the user. Do not add them when using default settings.
+	Also fix bug where default refresh was 1000 seconds (should be 1
+	second).
+
+2007-06-03 22:38  adk0212
+
+	* src/win32/: Apctray.ini, winapcupsd.nsi:
+
+	Add custom page for installing Apctray and configuring its
+	parameters.
+
+2007-06-03 13:05  adk0212
+
+	* src/win32/: InstallService.ini, winapcupsd.nsi:
+
+	Add custom page for installing apcupsd as a service and optionally
+	starting it instead of using popup dialogs during file install.
+
+2007-06-03 13:04  adk0212
+
+	* src/win32/EditApcupsdConf.ini:
+
+	Add definition for edit apcupsd.conf custom page.
+
+2007-06-03 12:38  adk0212
+
+	* src/win32/winservice.cpp:
+
+	Suppress service-already-exists errors when in quiet mode.
+
+2007-06-03 12:31  adk0212
+
+	* src/win32/: compat/compat.cpp, compat/compat.h, apctray.cpp,
+	winmain.cpp, winservice.cpp, winservice.h:
+
+	Move GetArg() to common library and use it from winmain and
+	apctray.  Add /quiet switch to winmain to suppress /install and
+	/remove dialogs.
+
+2007-06-03 11:35  adk0212
+
+	* src/win32/winapcupsd.nsi:
+
+	Add custom installer page for editing apcupsd.conf instead of using
+	a popup during file installation.
+
+2007-06-02 23:48  adk0212
+
+	* src/win32/build-win32-cross-tools:
+
+	Update NSIS to 2.27 for better x64 compatibility.
+
+2007-06-02 23:48  adk0212
+
+	* src/win32/winapcupsd.nsi:
+
+	Updates for apctray. Create -Startup and -Finish hidden sections
+	for common operations.
+
+2007-06-02 23:45  adk0212
+
+	* src/win32/statmgr.cpp:
+
+	Tweak spacing in GetAll() to match apcaccess format for longer
+	keys.
+
+2007-06-02 23:24  adk0212
+
+	* src/win32/apctray.cpp:
+
+	Add /kill command line option for shutting down apctray instance.
+
+2007-06-02 19:07  adk0212
+
+	* src/win32/popup.c:
+
+	Update window name used by popup.exe so it finds apctray now.
+
+2007-06-02 18:57  adk0212
+
+	* src/win32/: statmgr.cpp, wintray.cpp:
+
+	Rework sprintf_realloc_append() to account for the fact that on
+	Win98 vsnprintf() returns -1 if the string will not fit rather than
+	the number of characters required. Argh. Also remove unnecessary
+	UpdateTrayIcon() calls from wintray.c.
+
+2007-06-02 18:22  adk0212
+
+	* src/win32/: apctray.cpp, winres.h, winres.rc, wintray.cpp:
+
+	Add menu option to remove apctray from registry. All well-behaved
+	tray applets should have this!
+
+2007-06-02 18:04  adk0212
+
+	* src/win32/apctray.cpp:
+
+	Add command line options to install and remove apctray from autorun
+	list in the registry.
+
+2007-06-02 17:34  adk0212
+
+	* src/win32/apctray.cpp:
+
+	Add support for setting host, port, and refresh interval via
+	command line.
+
+2007-06-02 16:28  adk0212
+
+	* src/win32/winres.rc:
+
+	Update about box.
+
+2007-06-02 15:22  adk0212
+
+	* src/win32/: apctray.cpp, statmgr.cpp, wintray.cpp, wintray.h:
+
+	Move status polling to a thread instead of a timer so we don't
+	block the message loop while updating status. This fixes the
+	annoying pauses in GUI response. More misc cleanups and small bug
+	fixes.
+
+2007-06-02 13:46  adk0212
+
+	* src/win32/: apctray.cpp, statmgr.cpp, winevents.cpp, winstat.cpp,
+	wintray.cpp, wintray.h:
+
+	Misc fixes. apctray is working now.
+
+2007-06-02 13:23  adk0212
+
+	* src/win32/: Makefile.in, apctray.cpp, statmgr.cpp, statmgr.h,
+	winevents.cpp, winevents.h, winstat.cpp, winstat.h, wintray.cpp,
+	wintray.h:
+
+	More refactoring. Add StatMgr class to handle fetching stats from
+	the UPS using NIS. Kill global variables and move global stats and
+	events code to their proper classes.
+
+2007-06-02 11:12  adk0212
+
+	* src/win32/: Makefile.in, apctray.cpp, wintray.cpp, wintray.h:
+
+	Move modified tray menu code back to wintray.cpp. Misc cleanups to
+	wintray.
+
+2007-06-01 20:12  adk0212
+
+	* src/win32/: apctray.cpp, winabout.cpp, winabout.h, winevents.cpp,
+	winevents.h, winstat.cpp, winstat.h, wintray.h, winups.h:
+
+	Cleanup of winabout, winevents, and winstat. Everthing compiles
+	again.
+
+2007-05-31 20:11  adk0212
+
+	* src/win32/: Makefile.in, apctray.cpp, winmain.cpp,
+	winservice.cpp, winservice.h, winups.h, compat/compat.h:
+
+	First step of major win32 service and tray icon code
+	refactor/rewrite.  This is part of the changes necessary for tray
+	icon support on Vista.	Clean up winservice and winmain. Eliminate
+	lots of unused code.  Simplify code where possible. Remove tray
+	icon code from apcupsd itself.	Add apctray.cpp for standalone tray
+	icon module designed to gather status via NIS.
+
+2007-05-31 20:11  adk0212
+
+	* src/win32/build-win32-cross-tools:
+
+	Remove OpenGL and DirectX libraries, as they are not needed for
+	Apcupsd.
+
+2007-05-28 07:03  fleetworks
+
+	* platforms/: mandrake/apcupsd.spec.in, suse/apcupsd.spec.in:
+
+	RHEL5 update.
+
+2007-05-27 13:20  adk0212
+
+	* platforms/contrib-rpm/build_rpm.sh:
+
+	Add rhel5 to contrib-rpm.
+
+2007-05-27 13:17  adk0212
+
+	* platforms/redhat/apcupsd.spec.in:
+
+	Fix changelog copy-n-paste error.
+
+2007-05-27 13:15  adk0212
+
+	* platforms/redhat/apcupsd.spec.in:
+
+	Add rhel5 support in spec.
+
+2007-05-26 15:07  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Update website for 3.14.1 release.
+
+2007-05-04 19:18  adk0212
+
+	* ChangeLog:
+
+	Update ChangeLog.
+
+2007-05-04 19:17  adk0212
+
+	* ReleaseNotes, include/version.h:
+
+	Maybe this time...
+
+2007-05-03 18:31  adk0212
+
+	* src/action.c:
+
+	Do not attempt to cancel shutdowns. Once a shutdown has been
+	started there is no way to cleanly stop it and recover. Plus
+	deleting the powerfail file causes killpower to be skipped, leaving
+	the server shutdown and not restarted. Reported by Yvon Lafaille
+	<yvon.lafaille@yahoo.fr>.
+
+2007-05-01 20:26  adk0212
+
+	* src/drivers/usb/linux/linux-usb.c:
+
+	Rewrite device opening logic. The new logic works as follows:	 -
+	If user specifies a DEVICE, we will open that device and that
+	device	    only. There is no fallback to autodetect. This is
+	generaly what users	 expect when they explicitly give DEVICE.
+	  - If no DEVICE is specified, we autodetect as before.
+	Furthermore, if       we lose the connection to the device, we
+	prefer to re-open the same	 device again, but will restart
+	autodetection if that fails.	 - If DEVICE is specified using the
+	deprecated '[]' syntax, just do       normal autodetection as if
+	DEVICE had not been specified at all.
+
+2007-04-30 22:14  adk0212
+
+	* src/drivers/snmp/drv_powernet.c:
+
+	Disable a few CIs that SNMP cards do not support.
+
+2007-04-30 21:37  adk0212
+
+	* src/: action.c, apctest.c:
+
+	Increase self-test timeout to 40 seconds to accomodate the RS 800.
+	Contributed by Lars Randers <lars@nstec.dk>.
+
+2007-04-27 19:30  adk0212
+
+	* src/apctest.c:
+
+	Fix apctest crash. When in the EEPROM programming section of
+	apctest, if you try to print EEPROM values (item 1) more than once
+	during the same session, the program segfaults.  Contributed by
+	Ivaylo Haratcherev <I.J.Haratcherev@tudelft.nl>.
+
+2007-04-27 19:25  adk0212
+
+	* src/action.c:
+
+	Normalize shut remote message.
+
+2007-04-27 19:24  adk0212
+
+	* src/drivers/pcnet/pcnet.c:
+
+	Add support for PCNET remote shutdown (SD) signal. Contributed by
+	Ivaylo Haratcherev <I.J.Haratcherev@tudelft.nl> and Moshe Hyzon
+	<moshe.hyzon@grantstreet.com>.
+
+2007-04-23 19:47  adk0212
+
+	* ChangeLog:
+
+	Rev ChangeLog.
+
+2007-04-23 19:45  adk0212
 
 	* include/version.h:
 
-	Bump version and date to 3.13.2.
+	Did I say "final"?
 
-2006-02-22 20:56  adk0212
+2007-04-23 19:37  adk0212
 
-	* include/struct.h, src/apcaccess.c, src/lib/apcconfig.c:
+	* src/apctest.c:
 
-	Move structure definitions to where they're actually used and
-	eliminate another unused struct.
+	Fix typo in error message.  Reported by Ashley M. Kirchner
+	<ashley@pcraft.com>
 
-2006-02-22 20:49  adk0212
+2007-04-23 19:35  adk0212
 
-	* include/struct.h, src/lib/apcconfig.c:
+	* platforms/redhat/apcupsd.in:
 
-	Remove UPSINFO::enable_access and UPSINFO::remote_state.
+	Update to match Fedora Extras packaging:   - Add "force-reload"
+	aliased to "restart"   - "reload" outputs a not implemented error
+	- "status" uses the status() function to return the proper LSB
+	status	    code and runs apcaccess only if the daemon is running.
+	Contributed by Orion Poplawski <orion@cora.nwra.com>.
 
-2006-02-22 20:37  adk0212
+2007-04-21 20:37  adk0212
 
-	* src/apcupsd.c:
+	* ChangeLog:
 
-	Need to call prep_device() after checking for killpower.
+	Update ChangeLog for 3.14.1 (again).
 
-2006-02-22 20:29  adk0212
+2007-04-21 20:35  adk0212
 
-	* src/lib/apcconfig.c:
+	* ReleaseNotes, include/version.h:
 
-	Restore old style UPS type mapping; needs more thought.
+	Final updates for 3.14.1.
 
-2006-02-22 20:20  adk0212
+2007-04-21 20:24  adk0212
 
-	* include/struct.h:
+	* doc/latex/manual.tex:
 
-	Remove unused structs: SLAVEINFO, NETDATA.
+	Clarify FreeBSD versions in USB kernel section.
 
-2006-02-22 20:17  adk0212
+2007-04-21 19:59  adk0212
 
-	* include/: extern.h, struct.h:
+	* doc/latex/manual.tex:
 
-	Remove slave_count, slaves[], UPSINFO::NetUpsPort,
-	UPSINFO::usermagic[], and PAIRS::help.
+	Add USB info for NetBSD 4.x (ugen binding can be forced on a
+	particular port). Contributed by Curt Sampson
+	<cjs@starling-software.com>.
 
-2006-02-22 20:16  adk0212
+2007-04-21 19:27  adk0212
 
-	* src/lib/apcconfig.c:
+	* src/apctest.c:
 
-	Obsolete some master-slave related config directives. Remove config
-	directive help field since it's never used; it can be added back
-	easily if we ever decide to do something with it. Kill slave_count,
-	slaves[], NetUpsPort, usermagic[].
+	Fix link error with --disable-apcsmart (getline missing).  Reported
+	by Ashley M. Kirchner <ashley@pcraft.com>
 
-2006-02-20 22:41  adk0212
+2007-04-18 19:33  adk0212
 
-	* autoconf/variables.mak.in, src/Makefile.in:
+	* ChangeLog:
 
-	Move @LIBUSB@ to individual rules for now.
+	Updated changelog for 3.14.1.
 
-2006-02-20 20:07  adk0212
+2007-04-18 19:30  adk0212
 
-	* autoconf/variables.mak.in:
+	* ReleaseNotes, include/version.h:
 
-	Include @LIBUSB@ in $(DRVLIBS).
+	Prep for 3.14.1 release.
 
-2006-02-20 20:03  adk0212
+2007-03-25 15:38  adk0212
 
-	* src/Makefile.in, src/options.c, src/smtp.c,
-	src/drivers/apcsmart/smart.c, src/drivers/net/net.c,
-	src/drivers/usb/bsd/bsd-usb.c, src/drivers/usb/bsd/hidutils.c,
-	src/lib/apcfile.c, src/lib/apclock.c, src/lib/apclog.c,
-	src/libusbhid/data.c, autoconf/variables.mak.in, include/extern.h:
+	* src/lib/apclibnis.c:
 
-	Merge fixes from Branch-3_12.
+	Prevent infinite hang in read_nbytes() when server disappears.
+	Many thanks to Jan Ceuleers <jan.ceuleers@computer.org> for
+	reporting the hanging and gathering data to track down the cause.
 
-2006-02-20 19:54  adk0212
+2007-03-25 15:34  adk0212
 
-	* src/apcupsd.c:
+	* src/libusbhid/parse.c:
 
-	Redirect stdout and stderr to trace file.
+	Remove references to int8_t and int16_t.
 
-2006-02-19 22:46  skoona
+2007-03-05 22:41  adk0212
 
-	* src/gapcmon/: gapcmon.c, gp_apcmon.c, gp_apcmon_core.c:
+	* src/libusbhid/usbcompat.h:
 
-	Reviewed static/extern call list and made corrections as needed as
-	a part of my cleanup effort.  Reformated text for readability.
+	Kill stdint.h include since OpenBSD does not appear to have it.
 
-2006-02-19 01:42  skoona
+2007-03-03 16:40  adk0212
 
-	* src/gapcmon/: Makefile.in, gapcmon.c, gp_apcmon.c:
+	* platforms/darwin/: ApcupsdDaemon.Info.plist,
+	ApcupsdDaemon.Info.plist.in, ApcupsdPkg.Info.plist,
+	ApcupsdPkg.Info.plist.in, ApcupsdUsbShim.Info.plist,
+	ApcupsdUsbShim.Info.plist.in:
 
-	Small tweak to apcupsd/src/gapcmon/Makefile.in to compile correct
-	gapcmon module Add new function gapc_load_icons() to extern list in
-	the two root modules
+	Hey, genius... Archive foo.bar.in, not foo.bar.
 
-2006-02-19 01:07  skoona
+2007-03-03 16:28  adk0212
 
-	* src/gapcmon/: gapcmon.c, gp_apcmon.c, gp_apcmon_core.c:
+	* configure:
 
-	Formatted the C files and consolidated the icon load functions into
-	a new routine in gp_apcmon_core.c called gapc_load_icons().  Also
-	added icon ownership release to gpanels destroy routine; gapcmon
-	did not need it.
+	Regen with Mac OS X installer changes.
 
-2006-02-18 22:34  skoona
+2007-03-03 16:23  adk0212
 
-	* src/gapcmon/gp_apcmon_core.c:
-
-	Updated gp_apcmon_core.c to correct gtk errors when nombatt and
-	hitrans values are not present.  The routine gapc_monitor_update
-	uses these values as the scale for the chart.  I added a default
-	calc for when these values are not present.
-
-2006-02-18 21:22  skoona
-
-	* src/gapcmon/Makefile.in:
-
-	Changed apcupsd/src/gapcmon/Makefile.in to remove the -s flag from
-	icon installs.	Just removed it from everything and debug data
-	would be useful
-
-2006-02-18 14:37  adk0212
-
-	* src/: apcnet.c, apcnet.c.new, apcnet.c.old:
-
-	Remove master-slave mode code.
-
-2006-02-18 14:35  adk0212
-
-	* configure, autoconf/configure.in, include/struct.h,
-	src/Makefile.in, src/apctest.c, src/apcupsd.c, src/device.c,
-	src/reports.c, src/drivers/drivers.c, src/drivers/apcsmart/smart.c,
-	src/drivers/apcsmart/smartsetup.c, src/drivers/dumb/dumboper.c,
-	src/lib/apcconfig.c, src/lib/apcstatus.c:
-
-	First round of master-slave mode removal. Remove NETUPS, NETSLAVE,
-	NETMASTER, SHARENETMASTER, NET, and SHARENET enums. Remove some
-	uses of ups->is_slave() that are not related to the 'net' driver.
-
-2006-02-16 21:20  skoona
-
-	* .cdtproject, .project:
-
-	Removed eclipse meta files - no need to clutter up the source tree.
-
-2006-02-16 19:42  adk0212
-
-	* configure, autoconf/configure.in:
-
-	Need to generate src/gapcmon/Makefile from Makefile.in for either
-	gapcmon or gpanel_apcmon. Not sure how it was working without this
-	change.
-
-2006-02-16 19:32  adk0212
-
-	* src/gapcmon/Makefile.in:
-
-	Enable optimization and create a place for easily adding common
-	CFLAGS.
-
-2006-02-16 19:28  adk0212
-
-	* configure, autoconf/configure.in, src/Makefile.in,
-	src/gapcmon/Makefile.in:
-
-	Fix up gapcmon and gpanel_apcmon configure and Makefiles. It was
-	quite close; only needed a few adjustments. configure.in adjusted
-	to factor out common settings between the two programs
-
-2006-02-16 12:00  skoona
-
-	* .cdtproject, .project:
-
-	Adding Eclipse IDE project file to root tree - .project and
-	.cdtproject.  They are not fully populate with all the include
-	paths now; but I will be update them as I go along: eclipse 3.1.2
-	and C/C++ plugin 3.0.2
-
-2006-02-16 11:57  skoona
-
-	* autoconf/configure.in, autoconf/configure.in.jsj,
-	src/gapcmon/Makefile.in, src/gapcmon/Makefile.in.jsj,
-	src/gapcmon/configure.notes:
-
-	Deleted my versions of configure.in, makefile.in, and notes file.
-	Incorporated the gapcmon and gpanel_apcmon changes directly into
-	autoconf/configure.in and src/gapcmon/Makefile.in.   Offline
-	testing suggest these are the needed changes to conditionally
-	enable either or sub-programs.
-
-2006-02-16 02:22  skoona
-
-	* autoconf/configure.in.jsj, src/gapcmon/Makefile.in.jsj:
-
-	second try: pushing a configure.in.jsj into autoconf directory in
-	prep for change the real configure.in and regenerating makefile and
-	configure script
-
-2006-02-16 02:21  skoona
-
-	* src/gapcmon/gapcmon.desktop:
-
-	pushing a configure.in.jsj into autoconf directory in prep for
-	change the real configure.in and regenerating makefile and
-	configure script
-
-2006-02-16 02:13  skoona
-
-	* src/gapcmon/Makefile.in:
-
-	Updated gapcmon/Makefile.in to reflect sub-packages build needs.
-	Now I need to update the configure script to support the macro
-	links
-
-2006-02-14 21:19  skoona
-
-	* src/gapcmon/README:
-
-	My starting version of a README file
-
-2006-02-14 20:58  skoona
-
-	* src/gapcmon/: Makefile.in, configure.notes:
-
-	Made a minor edit to Makefile.in to enable gapcmon to compile using
-	current configure.scripts. added a file configuration.notes to
-	communicate the full requirements of the two programs.	I need to
-	review your autobuild environment to change the generated configure
-	script and makefiles.  I need help to change Makefile.in and
-	configure script.
-
-2006-02-14 20:07  skoona
-
-	* src/gapcmon/: apcupsd.png, charging.png, gapcmon.c,
-	gapcmon.desktop, gapcmon.h, gapcmon_common.h, gp_apcmon.c,
-	gp_apcmon_core.c, gpanel_apcmon.server, onbatt.png, online.png:
-
-	Adding 4 icon files for both prorgams.	Adding the gnome .desktop
-	file and gnome panel .server files. Also adding the new source code
-	files and removing the old header file which is no longer needed.
-	There will be two binaries created for this tree;
-	gpanel_apcmon(gp_apcmon.c) and gapcmon(gapcmon.c) which will both
-	use gp_apcmon_core.c and gapcmon_common.h.  gpanel_apcmon(aka
-	gpanel) has an additional library requirement of
-	libpanelapplet-2.0, libgnomeui-2.0, libbonoboui-2.0.  These extra
-	requirements have been restricted to the gp_apcmon.c file only, so
-	gapcmon.c/gp_apcmon_core.h/gp_apcmon_common.h can be compiled with
-	the additional libraries.
-
-2006-02-05 13:33  adk0212
-
-	* configure, autoconf/configure.in:
-
-	On cygwin, link with C++ libs unconditionally.
-
-2006-02-05 13:08  adk0212
-
-	* autoconf/configure.in, autoconf/variables.mak.in,
-	src/Makefile.in, configure:
-
-	Link with libsupc++ (always static) when possible to avoid reliance
-	on libstdc++. Also disable exceptions and rtti, if possible.
-
-2006-02-03 18:42  adk0212
-
-	* include/version.h:
-
-	Bump devel version to 3.13.1.
-
-2006-02-03 18:41  adk0212
-
-	* examples/hid-ups.c, src/apctest.c, src/drivers/usb/usb.c:
-
-	Add support for getting/setting sensitivity on USB models.
-
-2006-02-02 08:03  adk0212
-
-	* src/gapcmon/: gapcmon.c, gapcmon.h:
-
-	Update from James: 1. Implemented user refresh timer control
-	allowing users to select the refresh interval in seconds.  Config
-	page was changed to reflect this.  2. Set text view in Events and
-	Status page to read-only, from editable.  3. Tweaked the label
-	layouts on the Information page to be more left aligned will
-	reduces visual jitter during updates.  4. Changed the logic for the
-	refresh button to be more immediate by reusing the initial refresh
-	timer to garauntee the refresh is completed.  5. Began review error
-	messages.  Implemented and OFF-Line message when the NIS Server is
-	not responding because apcupsd is off or going offline.  Need to
-	decide later how to update the displays during this offline state.
-	For now leaving last data refresh on screen until NIS Server
-	returns.
-
-2006-01-30 09:40  adk0212
-
-	* configure, autoconf/configure.in:
-
-	Use apcupsd version as gapcmon version.
-
-2006-01-30 09:08  adk0212
-
-	* configure, autoconf/configure.in, src/gapcmon/gapcmon.c,
-	src/gapcmon/gapcmon.h:
-
-	gapcmon update. Requires glib-2.4 and gnome-vfs-module-2.0. Bug
-	fixes and portability improvements.
-
-2006-01-23 22:13  adk0212
-
-	* doc/techlogs/adk-3.13:
-
-	Update with generic-usb merge.
-
-2006-01-23 21:14  adk0212
-
-	* configure, autoconf/configure.in, platforms/darwin/Info.plist,
-	platforms/darwin/Makefile.in, platforms/sun/Makefile.in,
-	src/Makefile.in, src/drivers/usb/usb.c,
-	src/drivers/usb/bsd/hidutils.c, src/drivers/usb/generic/.cvsignore,
-	src/drivers/usb/generic/Makefile.in,
-	src/drivers/usb/generic/generic-usb.c,
-	src/drivers/usb/generic/hidutils.c,
-	src/drivers/usb/generic/hidutils.h, src/libusbhid/Makefile.in,
-	src/libusbhid/data.c, src/libusbhid/descr.c, src/libusbhid/parse.c,
-	src/libusbhid/usage.c, src/libusbhid/usbcompat.h,
-	src/libusbhid/usbhid.h:
-
-	Merge Branch-generic_usb to HEAD.
-
-2006-01-23 20:32  adk0212
-
-	* doc/techlogs/adk-3.13, include/version.h:
-
-	Time for another development series.
-
-2006-01-23 20:29  adk0212
-
-	* configure, autoconf/configure.in:
-
-	Add gapcmon support via --enable-gapcmon.
-
-2006-01-23 20:27  adk0212
+	* autoconf/configure.in,
+	platforms/darwin/ApcupsdDaemon.Description.plist,
+	platforms/darwin/ApcupsdDaemon.Info.plist,
+	platforms/darwin/ApcupsdDaemon.postflight,
+	platforms/darwin/ApcupsdDaemon.preflight,
+	platforms/darwin/ApcupsdPkg.Description.plist,
+	platforms/darwin/ApcupsdPkg.Info.plist,
+	platforms/darwin/ApcupsdUsbShim.Description.plist,
+	platforms/darwin/ApcupsdUsbShim.Info.plist,
+	platforms/darwin/ApcupsdUsbShim.postflight,
+	platforms/darwin/Makefile.in, platforms/darwin/Welcome.txt:
+
+	Add binary installer support for Mac OS X.
+
+2007-02-17 12:02  adk0212
 
 	* autoconf/aclocal.m4:
 
-	Add PKG_CHECK_MODULES macro and others from pkg-config's pkg.m4.
+	Add missing newline at end of file.  Discovered by Sergey Y. Afonin
+	<asy@kraft-s.ru>.
 
-2006-01-23 20:26  adk0212
+2007-02-17 12:00  adk0212
 
-	* src/: Makefile.in, gapcmon/Makefile.in, gapcmon/gapcmon.c,
-	gapcmon/gapcmon.h:
+	* platforms/mingw/apccontrol.bat:
 
-	Add gapcmon.
+	Fix typo: "%sbindir\%popup" -> "%sbindir%\popup" Discovered by
+	Stefan.Hegnauer@elektrobit.com.
+
+2007-02-13 19:02  adk0212
+
+	* src/win32/popup.c:
+
+	Detect when balloon tips have been disabled via a group policy and
+	fall back on the standard popup message box.
 

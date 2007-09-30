@@ -302,6 +302,7 @@ class UPSINFO {
    /* Static items that normally do not change during UPS operation */
    int NomOutputVoltage;           /* Nominal voltage when on batteries */
    int NomInputVoltage;            /* Nominal input voltage */
+   int NomPower;                   /* Nominal power (watts) */
    double nombattv;                /* Nominal batt. voltage -- not actual */
    int extbatts;                   /* number of external batteries attached */
    int badbatts;                   /* number of bad batteries */

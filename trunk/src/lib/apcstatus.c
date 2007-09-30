@@ -419,13 +419,16 @@ int output_status(UPSINFO *ups, int sockfd,
          s_write(ups, "BATTDATE : %s\n", ups->battdat);
 
       if (ups->UPS_Cap[CI_NOMOUTV])
-         s_write(ups, "NOMOUTV  : %03d\n", ups->NomOutputVoltage);
+         s_write(ups, "NOMOUTV  : %03d Volts\n", ups->NomOutputVoltage);
 
       if (ups->UPS_Cap[CI_NOMINV])
-         s_write(ups, "NOMINV   : %03d\n", ups->NomInputVoltage);
+         s_write(ups, "NOMINV   : %03d Volts\n", ups->NomInputVoltage);
 
       if (ups->UPS_Cap[CI_NOMBATTV])
-         s_write(ups, "NOMBATTV : %5.1f\n", ups->nombattv);
+         s_write(ups, "NOMBATTV : %5.1f Volts\n", ups->nombattv);
+
+      if (ups->UPS_Cap[CI_NOMPOWER])
+         s_write(ups, "NOMPOWER : %d Watts\n", ups->NomPower);
 
       if (ups->UPS_Cap[CI_HUMID])
          s_write(ups, "HUMIDITY : %5.1f\n", ups->humidity);
@@ -483,133 +486,3 @@ void stat_print(UPSINFO *ups, char *fmt, ...)
    vfprintf(stdout, (char *)fmt, arg_ptr);
    va_end(arg_ptr);
 }
-
-#if defined(HAVE_WIN32)
-
-#include <windows.h>
-
-/*
- * What follows are routines that are called by the Windows
- * C++ routines to get status information.
- * They are used for the info bubble on the system tray.
- */
-
-extern int shm_OK;
-static char buf[MAXSTRING];
-int battstat = -1;
-static HWND dlg_hwnd = NULL;
-static int dlg_idlist = 0;
-
-/*
- * Return a UPS status string. For this cut, we return simply
- * the Online/OnBattery status. The stat flag is intended to
- * be used to retrieve additional status strings.
- */
-char *ups_status(int stat)
-{
-   UPSINFO *ups = core_ups;
-
-   if (!shm_OK) {
-      battstat = -1;
-      return "INITIALIZING";
-   }
-
-   read_lock(ups);
-
-   if (ups->is_onbatt())
-      battstat = 0;
-   else if (ups->UPS_Cap[CI_BATTLEV])
-      battstat = (int)ups->BattChg;
-   else
-      battstat = 100;
-
-   astrncpy(buf, "Status not available", sizeof(buf));
-
-   switch (ups->mode.type) {
-   case BK:
-   case SHAREBASIC:
-   case BKPRO:
-   case VS:
-      if (!ups->is_onbatt()) {
-         astrncpy(buf, "ONLINE", sizeof(buf));
-      } else {
-         astrncpy(buf, "ON BATTERY", sizeof(buf));
-      }
-      break;
-
-   case NBKPRO:
-   case SMART:
-   case SHARESMART:
-   case MATRIX:
-   case APCSMART_UPS:
-   case USB_UPS:
-   case TEST_UPS:
-   case DUMB_UPS:
-   case NETWORK_UPS:
-   case SNMP_UPS:
-      buf[0] = 0;
-
-      /* Now output human readable form */
-      if (ups->is_calibration())
-         astrncat(buf, "CAL ", sizeof(buf));
-      if (ups->is_trim())
-         astrncat(buf, "TRIM ", sizeof(buf));
-      if (ups->is_boost())
-         astrncat(buf, "BOOST ", sizeof(buf));
-      if (ups->is_online())
-         astrncat(buf, "ONLINE ", sizeof(buf));
-      if (ups->is_onbatt())
-         astrncat(buf, "ON BATTERY ", sizeof(buf));
-      if (ups->is_overload())
-         astrncat(buf, "OVERLOAD ", sizeof(buf));
-      if (ups->is_battlow())
-         astrncat(buf, "LOWBATT ", sizeof(buf));
-      if (ups->is_replacebatt())
-         astrncat(buf, "REPLACEBATT ", sizeof(buf));
-      if (!ups->is_battpresent())
-         astrncat(buf, "NOBATT ", sizeof(buf));
-
-      // This overrides the above
-      if (ups->is_commlost()) {
-         astrncpy(buf, "COMMLOST", sizeof(buf));
-         battstat = -1;
-      }
-
-      break;
-   }
-
-   // This overrides the above
-   if (ups->is_shutdown())
-      astrncpy(buf, "SHUTTING DOWN", sizeof(buf));
-
-   read_unlock(ups);
-
-   return buf;
-}
-
-static void stat_list(UPSINFO *ups, char *fmt, ...)
-{
-   va_list arg_ptr;
-   int len;
-
-   va_start(arg_ptr, fmt);
-   avsnprintf(buf, sizeof(buf), (char *)fmt, arg_ptr);
-   va_end(arg_ptr);
-   len = strlen(buf);
-
-   while (len > 0 && (buf[len - 1] == '\n' || buf[len - 1] == '\r'))
-      buf[--len] = 0;
-
-   SendDlgItemMessage(dlg_hwnd, dlg_idlist, LB_ADDSTRING, 0, (LONG) buf);
-}
-
-void FillStatusBox(HWND hwnd, int id_list)
-{
-   UPSINFO *ups = core_ups;
-
-   dlg_hwnd = hwnd;
-   dlg_idlist = id_list;
-   output_status(ups, 0, stat_open, stat_list, stat_close);
-}
-
-#endif   /* HAVE_WIN32 */

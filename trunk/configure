@@ -3542,7 +3542,7 @@ fi
 fi
 
 if test x$LD = x ; then
-   LD="$CXX"
+   LD="$CC"
 fi
 
 if test x$GCC = xyes; then
@@ -16981,13 +16981,18 @@ suse5)
    ;;
 darwin)
    DISTVER=`uname -r`
-   SERIALDEV=/dev/tty.ups
+   SERIALDEV=
+   UPSTYPE=usb
+   UPSCABLE=usb
    PIDDIR=/var/run
    LOCKDIR=/var/tmp
    DFILES="\
       platforms/darwin/Makefile \
       platforms/darwin/apcupsd \
-      platforms/darwin/apccontrol"
+      platforms/darwin/apccontrol \
+      platforms/darwin/ApcupsdDaemon.Info.plist \
+      platforms/darwin/ApcupsdPkg.Info.plist \
+      platforms/darwin/ApcupsdUsbShim.Info.plist"
    ;;
 unknown)
    DISTVER=unknown
