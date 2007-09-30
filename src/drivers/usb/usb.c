@@ -41,6 +41,15 @@ int pusb_write_int_to_ups(UPSINFO *ups, int ci, int value, char *name);
 int pusb_read_int_from_ups(UPSINFO *ups, int ci, int *value);
 
 /*
+ * A certain semi-ancient BackUPS Pro model breaks the USB spec in a
+ * particularly creative way: Some reports read back in ASCII instead of
+ * binary. And one value that should be in seconds is returned in minutes
+ * instead, just for fun. We detect and work around the breakage.
+ */
+#define QUIRK_OLD_BACKUPS_PRO_MODEL_STRING "BackUPS Pro 500 FW:16.3.D USB FW:4"
+static bool quirk_old_backups_pro = false;
+
+/*
  * This table is used when walking through the USB reports to see
  * what information found in the UPS that we want. If the usage_code 
  * and the physical code match, then we make an entry in the command
@@ -69,6 +78,7 @@ const struct s_known_info known_info[] = {
    {CI_NOMINV,                  0x00840040, P_INPUT,   T_UNITS,    false},  /* ConfigVoltage (input) */
    {CI_NONE,                    0x00840042, P_ANY,     T_UNITS,    false},  /* ConfigFrequency */
    {CI_NONE,                    0x00840043, P_ANY,     T_UNITS,    false},  /* ConfigApparentPower */
+   {CI_NOMPOWER,                0x00840044, P_ANY,     T_UNITS,    false},  /* ConfigActivePower */
    {CI_LTRANS,                  0x00840053, P_ANY,     T_UNITS,    false},  /* LowVoltageTransfer */
    {CI_HTRANS,                  0x00840054, P_ANY,     T_UNITS,    false},  /* HighVoltageTransfer */
    {CI_DelayBeforeReboot,       0x00840055, P_ANY,     T_UNITS,    false},  /* DelayBeforeReboot */
@@ -199,25 +209,6 @@ const struct s_known_info known_info[] = {
  * Operations that must be handled by platform-specific code
  */
 
-int usb_ups_get_capabilities(UPSINFO *ups)
-{
-   int rc;
-   
-   rc = pusb_ups_get_capabilities(ups, known_info);
-   if (!rc)
-      return 0;
-
-   /*
-    * If the hardware supports CI_Discharging, ignore CI_ACPresent.
-    * Some hardware (RS 1500, possibly others) reports confusing
-    * values for these during self test. (Discharging=1 && ACPresent=1)
-    */
-   if (ups->UPS_Cap[CI_Discharging])
-      ups->UPS_Cap[CI_ACPresent] = false;
-
-   return 1;
-}
-
 int usb_ups_check_state(UPSINFO *ups)
 {
    return pusb_ups_check_state(ups);
@@ -276,6 +267,48 @@ static bool usb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
    return pusb_get_value(ups, ci, uval);
 }
 
+int usb_ups_get_capabilities(UPSINFO *ups)
+{
+   int rc;
+
+   /* Run platform-specific capabilities code */   
+   rc = pusb_ups_get_capabilities(ups, known_info);
+   if (!rc)
+      return 0;
+
+   /*
+    * If the hardware supports CI_Discharging, ignore CI_ACPresent.
+    * Some hardware (RS 1500, possibly others) reports confusing
+    * values for these during self test. (Discharging=1 && ACPresent=1)
+    */
+   if (ups->UPS_Cap[CI_Discharging])
+      ups->UPS_Cap[CI_ACPresent] = false;
+
+   /*
+    * Disable CI_NOMPOWER if UPS does not report it accurately.
+    * Several models appear to always return 0 for this value.
+    */
+   USB_VALUE uval;
+   if (ups->UPS_Cap[CI_NOMPOWER] &&
+       (!usb_get_value(ups, CI_NOMPOWER, &uval) ||
+        ((int)uval.dValue == 0))) {
+      Dmsg0(100, "NOMPOWER disabled due to invalid reading from UPS\n");
+      ups->UPS_Cap[CI_NOMPOWER] = false;
+   }
+
+   /* Detect broken BackUPS Pro model */
+   quirk_old_backups_pro = false;
+   if (ups->UPS_Cap[CI_UPSMODEL] && usb_get_value(ups, CI_UPSMODEL, &uval)) {
+      Dmsg1(250, "Checking for BackUPS Pro quirk \"%s\"\n", uval.sValue);
+      if (!strcmp(uval.sValue, QUIRK_OLD_BACKUPS_PRO_MODEL_STRING)) {
+         quirk_old_backups_pro = true;
+         Dmsg0(100, "BackUPS Pro quirk enabled\n");
+      }
+   }
+
+   return 1;
+}
+
 
 /*
  * Operations that are not supported
@@ -295,6 +328,57 @@ int usb_ups_program_eeprom(UPSINFO *ups, int command, char *data)
 
 /*
  * Given a CI and a raw uval, update the UPSINFO structure with the
+ * new value. Special handling for certain BackUPS Pro reports.
+ *
+ * Thanks to David Fries <David@Fries.net> for this code.
+ */
+static bool usb_process_value_bup(UPSINFO* ups, int ci, USB_VALUE* uval)
+{
+   int val = (int)uval->dValue;
+   char digits[] = { (val>>16) & 0xff, (val>>8) & 0xff, val & 0xff, 0 };
+
+   /* UPS_RUNTIME_LEFT */
+   if(ci == CI_RUNTIM)
+   {
+      ups->TimeLeft = uval->dValue; /* already minutes */
+      Dmsg1(200, "TimeLeft = %d\n", (int)ups->TimeLeft);
+      return true;
+   }
+
+   /* Bail if this value doesn't look to be ASCII encoded */
+   if(!isdigit(digits[0]) || !isdigit(digits[1]) || !isdigit(digits[2]))
+      return false;
+
+   switch(ci)
+   {
+   /* UPS_LOAD */
+   case CI_LOAD:
+      ups->UPSLoad = atoi(digits);
+      Dmsg1(200, "UPSLoad = %d\n", (int)ups->UPSLoad);
+      return true;
+
+   /* LOW_TRANSFER_LEVEL */
+   case CI_LTRANS:
+      ups->lotrans = atoi(digits);
+      return true;
+
+   /* HIGH_TRANSFER_LEVEL */
+   case CI_HTRANS:
+      ups->hitrans = atoi(digits);
+      return true;
+
+   /* LINE_FREQ */
+   case CI_FREQ:
+      ups->LineFreq = atoi(digits);
+      return true;
+
+   default:
+      return false;
+   }
+}
+
+/*
+ * Given a CI and a raw uval, update the UPSINFO structure with the
  * new value.
  */
 static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
@@ -302,6 +386,13 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
    int v, yy, mm, dd;
    char *p;
    static int bpcnt = 0;
+
+   /*
+    * If BackUPS Pro quirk is enabled, try special decoding. If special decode
+    * fails, we continue with the normal protocol.
+    */
+   if (quirk_old_backups_pro && usb_process_value_bup(ups, ci, uval))
+      return;
 
    /*
     * ADK FIXME: This switch statement is really excessive. Consider
@@ -634,6 +725,11 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
    /* Nominal battery voltage */
    case CI_NOMBATTV:
       ups->nombattv = uval->dValue;
+      break;
+
+   /* Nominal power */
+   case CI_NOMPOWER:
+      ups->NomPower = (int)uval->dValue;
       break;
 
    /* Sensitivity */

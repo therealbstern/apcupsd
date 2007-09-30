@@ -101,166 +101,170 @@
 
 /*
  * CI_ is Capability or command index
+ *
+ * If the command is valid for this UPS, UPS_Cap[CI_xxx]
+ * will be true.
+ */
+enum { 
+   CI_UPSMODEL = 0,                /* Model number */
+   CI_STATUS,                      /* status function */
+   CI_LQUAL,                       /* line quality status */
+   CI_WHY_BATT,                    /* why transferred to battery */
+   CI_ST_STAT,                     /* self test stat */
+   CI_VLINE,                       /* line voltage */
+   CI_VMAX,                        /* max voltage */
+   CI_VMIN,                        /* min line voltage */
+   CI_VOUT,                        /* Output voltage */
+   CI_BATTLEV,                     /* Battery level percentage */
+   CI_VBATT,                       /* Battery voltage */
+   CI_LOAD,                        /* UPS Load */
+   CI_FREQ,                        /* Line Frequency */
+   CI_RUNTIM,                      /* Est. Runtime left */
+   CI_ITEMP,                       /* Internal UPS temperature */
+   CI_DIPSW,                       /* Dip switch settings */
+   CI_SENS,                        /* Sensitivity */
+   CI_DWAKE,                       /* Wakeup delay */
+   CI_DSHUTD,                      /* Shutdown delay */
+   CI_LTRANS,                      /* Low transfer voltage */
+   CI_HTRANS,                      /* High transfer voltage */
+   CI_RETPCT,                      /* Return percent threshhold */
+   CI_DALARM,                      /* Alarm delay */
+   CI_DLBATT,                      /* low battery warning, mins */
+   CI_IDEN,                        /* UPS Identification (name) */
+   CI_STESTI,                      /* Self test interval */
+   CI_MANDAT,                      /* Manufacture date */
+   CI_SERNO,                       /* serial number */
+   CI_BATTDAT,                     /* Last battery change */
+   CI_NOMBATTV,                    /* Nominal battery voltage */
+   CI_HUMID,                       /* UPS Humidity percentage */
+   CI_REVNO,                       /* Firmware revision */
+   CI_REG1,                        /* Register 1 */
+   CI_REG2,                        /* Register 2 */
+   CI_REG3,                        /* Register 3 */
+   CI_EXTBATTS,                    /* Number of external batteries */
+   CI_ATEMP,                       /* Ambient temp */
+   CI_NOMOUTV,                     /* Nominal output voltage */
+   CI_BADBATTS,                    /* Number of bad battery packs */
+   CI_EPROM,                       /* Valid eprom values */
+   CI_ST_TIME,                     /* hours since last self test */
+   CI_Manufacturer,             
+   CI_ShutdownRequested,        
+   CI_ShutdownImminent,         
+   CI_DelayBeforeReboot,        
+   CI_BelowRemCapLimit,         
+   CI_RemTimeLimitExpired,      
+   CI_Charging,                 
+   CI_Discharging,              
+   CI_RemCapLimit,              
+   CI_RemTimeLimit,             
+   CI_WarningCapacityLimit,     
+   CI_CapacityMode,             
+   CI_BattPackLevel,            
+   CI_CycleCount,               
+   CI_ACPresent,                
+   CI_Boost,                    
+   CI_Trim,                     
+   CI_Overload,                 
+   CI_NeedReplacement,          
+   CI_BattReplaceDate,          
+   CI_APCForceShutdown,         
+   CI_DelayBeforeShutdown,      
+   CI_APCDelayBeforeStartup,    
+   CI_APCDelayBeforeShutdown,   
+   CI_APCLineFailCause,         
+   CI_NOMINV,                   
+   CI_NOMPOWER,
+
+   /* Only seen on the BackUPS Pro USB (so far) */
+   CI_BUPBattCapBeforeStartup,  
+   CI_BUPDelayBeforeStartup,    
+   CI_BUPSelfTest,              
+   CI_BUPHibernate,             
+
+   /*
+    * We don't actually handle these, but use them as a signal
+    * to re-examine the other UPS data items. (USB only)
+    */
+   CI_IFailure,                    /* Internal failure */
+   CI_PWVoltageOOR,                /* Power sys voltage out of range */
+   CI_PWFrequencyOOR,              /* Power sys frequency out of range */
+   CI_OverCharged,                 /* Battery overcharged */
+   CI_OverTemp,                    /* Over temperature */
+   CI_CommunicationLost,           /* USB comms with subsystem lost */
+   CI_ChargerVoltageOOR,           /* Charger voltage our of range */
+   CI_ChargerCurrentOOR,           /* Charger current our of range */
+   CI_CurrentNotRegulated,         /* Charger current not regulated */
+   CI_VoltageNotRegulated,         /* Charger voltage not regulated */
+   CI_BatteryPresent,              /* Battery is present */
+   CI_LAST_PROBE,                  /* MUST BE LAST IN SECTION */
+
+   /* Items below this line are not "probed" for */
+   CI_CYCLE_EPROM,                 /* Cycle programmable EPROM values */
+   CI_UPS_CAPS,                    /* Get UPS capabilities (command) string */
+   CI_LAST                         /* MUST BE LAST */
+};
+
+#define CI_MAXCI         (CI_LAST-1)    /* maximum UPS commands we handle */
+#define CI_MAX_CAPS      (CI_LAST_PROBE-1)
+
+#define CI_RemainingCapacity    CI_BATTLEV
+#define CI_RunTimeToEmpty       CI_RUNTIM
+
+/*
  * APC_CMD_ is the command code sent to UPS for APC Smart UPSes
  *
  * NOTE: the APC_CMD_s are never used in the actual code,
  * except to initialize the UPS_Cmd[] structure. This way,
  * we will be able to support other UPSes later. The actual
  * command is obtained by reference to UPS_Cmd[CI_xxx]    
- *
- * If the command is valid for this UPS, UPS_Cap[CI_xxx]
- * will be true.
  */
-
-#define CI_UPSMODEL             0       /* Model number */
 #define    APC_CMD_UPSMODEL       'V'
-#define CI_STATUS               1       /* status function */
 #define    APC_CMD_STATUS         'Q'
-#define CI_LQUAL                2       /* line quality status */
 #define    APC_CMD_LQUAL          '9'
-#define CI_WHY_BATT             3       /* why transferred to battery */
 #define    APC_CMD_WHY_BATT       'G'
-#define CI_ST_STAT              4       /* self test stat */
 #define    APC_CMD_ST_STAT        'X'
-#define CI_VLINE                5       /* line voltage */
 #define    APC_CMD_VLINE          'L'
-#define CI_VMAX                 6       /* max voltage */
 #define    APC_CMD_VMAX           'M'
-#define CI_VMIN                 7       /* min line voltage */
 #define    APC_CMD_VMIN           'N'
-#define CI_VOUT                 8       /* Output voltage */
 #define    APC_CMD_VOUT           'O'
-#define CI_BATTLEV              9       /* Battery level percentage */
-#define CI_RemainingCapacity    9
 #define    APC_CMD_BATTLEV        'f'
-#define CI_VBATT               10       /* Battery voltage */
 #define    APC_CMD_VBATT          'B'
-#define CI_LOAD                11       /* UPS Load */
 #define    APC_CMD_LOAD           'P'
-#define CI_FREQ                12       /* Line Frequency */
 #define    APC_CMD_FREQ           'F'
-#define CI_RUNTIM              13       /* Est. Runtime left */
-#define CI_RunTimeToEmpty      13
 #define    APC_CMD_RUNTIM         'j'
-#define CI_ITEMP               14       /* Internal UPS temperature */
 #define    APC_CMD_ITEMP          'C'
-#define CI_DIPSW               15       /* Dip switch settings */
 #define    APC_CMD_DIPSW          '7'
-#define CI_SENS                16       /* Sensitivity */
 #define    APC_CMD_SENS           's'
-#define CI_DWAKE               17       /* Wakeup delay */
 #define    APC_CMD_DWAKE          'r'
-#define CI_DSHUTD              18       /* Shutdown delay */
 #define    APC_CMD_DSHUTD         'p'
-#define CI_LTRANS              19       /* Low transfer voltage */
 #define    APC_CMD_LTRANS         'l'
-#define CI_HTRANS              20       /* High transfer voltage */
 #define    APC_CMD_HTRANS         'u'
-#define CI_RETPCT              21       /* Return percent threshhold */
 #define    APC_CMD_RETPCT         'e'
-#define CI_DALARM              22       /* Alarm delay */
 #define    APC_CMD_DALARM         'k'
-#define CI_DLBATT              23       /* low battery warning, mins */
 #define    APC_CMD_DLBATT         'q'
-#define CI_IDEN                24       /* UPS Identification (name) */
 #define    APC_CMD_IDEN           'c'
-#define CI_STESTI              25       /* Self test interval */
 #define    APC_CMD_STESTI         'E'
-#define CI_MANDAT              26       /* Manufacture date */
 #define    APC_CMD_MANDAT         'm'
-#define CI_SERNO               27       /* serial number */
 #define    APC_CMD_SERNO          'n'
-#define CI_BATTDAT             28       /* Last battery change */
 #define    APC_CMD_BATTDAT        'x'
-#define CI_NOMBATTV            29       /* Nominal battery voltage */
 #define    APC_CMD_NOMBATTV       'g'
-#define CI_HUMID               30       /* UPS Humidity percentage */
 #define    APC_CMD_HUMID          'h'
-#define CI_REVNO               31       /* Firmware revision */
 #define    APC_CMD_REVNO          'b'
-#define CI_REG1                32       /* Register 1 */
 #define    APC_CMD_REG1           '~'
-#define CI_REG2                33       /* Register 2 */
 #define    APC_CMD_REG2           '\''
-#define CI_REG3                34       /* Register 3 */
 #define    APC_CMD_REG3           '8'
-#define CI_EXTBATTS            35       /* Number of external batteries */
 #define    APC_CMD_EXTBATTS       '>'
-#define CI_ATEMP               36       /* Ambient temp */
 #define    APC_CMD_ATEMP          't'
-#define CI_NOMOUTV             37       /* Nominal output voltage */
 #define    APC_CMD_NOMOUTV        'o'
-#define CI_BADBATTS            38       /* Number of bad battery packs */
 #define    APC_CMD_BADBATTS       '<'
-#define CI_EPROM               39       /* Valid eprom values */
 #define    APC_CMD_EPROM          0x1a
-#define CI_ST_TIME             40       /* hours since last self test */
 #define    APC_CMD_ST_TIME        'd'
-#define CI_Manufacturer                  41
-#define CI_ShutdownRequested             42
-#define CI_ShutdownImminent              43
-#define CI_DelayBeforeReboot             44
-#define CI_BelowRemCapLimit              45
-#define CI_RemTimeLimitExpired           46
-#define CI_Charging                      47
-#define CI_Discharging                   48
-#define CI_RemCapLimit                   49
-#define CI_RemTimeLimit                  50
-#define CI_WarningCapacityLimit          51
-#define CI_CapacityMode                  52
-#define CI_BattPackLevel                 53
-#define CI_CycleCount                    54
-#define CI_ACPresent                     55
-#define CI_Boost                         56
-#define CI_Trim                          57
-#define CI_Overload                      58
-#define CI_NeedReplacement               59
-#define CI_BattReplaceDate               60
-#define CI_APCForceShutdown              61
-#define CI_DelayBeforeShutdown           62
-#define CI_APCDelayBeforeStartup         63
-#define CI_APCDelayBeforeShutdown        64
-#define CI_APCLineFailCause              65
-#define CI_NOMINV                        66
-
-/* Only seen on the BackUPS Pro USB (so far) */
-#define CI_BUPBattCapBeforeStartup       67
-#define CI_BUPDelayBeforeStartup         68
-#define CI_BUPSelfTest                   69
-#define CI_BUPHibernate                  70
-
-/*
- * We don't actually handle these, but use them as a signal
- * to re-examine the other UPS data items. (USB only)
- */
-#define CI_IFailure                      71  /* Internal failure */
-#define CI_PWVoltageOOR                  72  /* Power sys voltage out of range */
-#define CI_PWFrequencyOOR                73  /* Power sys frequency out of range */
-#define CI_OverCharged                   74  /* Battery overcharged */
-#define CI_OverTemp                      75  /* Over temperature */
-#define CI_CommunicationLost             76  /* USB comms with subsystem lost */
-#define CI_ChargerVoltageOOR             77  /* Charger voltage our of range */
-#define CI_ChargerCurrentOOR             78  /* Charger current our of range */
-#define CI_CurrentNotRegulated           79  /* Charger current not regulated */
-#define CI_VoltageNotRegulated           80  /* Charger voltage not regulated */
-#define CI_BatteryPresent                81  /* Battery is present */
-
-/* Items below this line are not "probed" for */
-#define CI_CYCLE_EPROM         82       /* Cycle programmable EPROM values */
 #define    APC_CMD_CYCLE_EPROM    '-'
-#define CI_UPS_CAPS            83       /* Get UPS capabilities (command) string */
 #define    APC_CMD_UPS_CAPS       'a'
-/* ^^^^^^^^^^ see below if you change this ^^^^^^ */
-
-/* set to last command index. CHANGE!!! when adding new code.  */
-/* vvvvvvvvvv change here vvvvvvvvvvvvvvvvvvvvvvv */
-#define CI_MAXCI         CI_UPS_CAPS    /* maximum UPS commands we handle */
-#define CI_MAX_CAPS      CI_BatteryPresent
-
-#define GO_ON_BATT              'W'
-#define GO_ON_LINE              'X'
-#define LIGHTS_TEST             'A'
-#define FAILURE_TEST            'U'
+#define    GO_ON_BATT             'W'
+#define    GO_ON_LINE             'X'
+#define    LIGHTS_TEST            'A'
+#define    FAILURE_TEST           'U'
 
 /*
  * Future additions for contolled discharing of batteries
@@ -334,27 +338,27 @@
  * You _must_ keep the #defines in sync with the commands[] array in
  * action.c
  */
-#define CMDPOWEROUT      0
-#define CMDONBATTERY     1
-#define CMDFAILING       2
-#define CMDTIMEOUT       3
-#define CMDLOADLIMIT     4
-#define CMDRUNLIMIT      5
-#define CMDDOREBOOT      6
-#define CMDDOSHUTDOWN    7
-#define CMDMAINSBACK     8
-#define CMDANNOYME       9
-#define CMDEMERGENCY     10
-#define CMDCHANGEME      11
-#define CMDREMOTEDOWN    12
-#define CMDCOMMFAILURE   13
-#define CMDCOMMOK        14
-#define CMDSTARTSELFTEST 15
-#define CMDENDSELFTEST   16
-#define CMDOFFBATTERY    17        /* off battery power */
-#define CMDBATTDETACH    18        /* Battery disconnected */
-#define CMDBATTATTACH    19        /* Battery reconnected */
-
+enum {
+   CMDPOWEROUT = 0,
+   CMDONBATTERY,
+   CMDFAILING,
+   CMDTIMEOUT,
+   CMDLOADLIMIT,
+   CMDRUNLIMIT,
+   CMDDOSHUTDOWN,
+   CMDMAINSBACK,
+   CMDANNOYME,
+   CMDEMERGENCY,
+   CMDCHANGEME,
+   CMDREMOTEDOWN,
+   CMDCOMMFAILURE,
+   CMDCOMMOK,
+   CMDSTARTSELFTEST,
+   CMDENDSELFTEST,
+   CMDOFFBATTERY,        /* off battery power */
+   CMDBATTDETACH,        /* Battery disconnected */
+   CMDBATTATTACH         /* Battery reconnected */
+};
 
 /*
  * Simple way of handling varargs for those compilers that

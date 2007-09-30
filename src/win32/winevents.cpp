@@ -1,50 +1,26 @@
-//  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
-//
-//  This file was part of the VNC system.
-//
-//  The VNC system is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
-//  USA.
-//
-// If the source code for the VNC system is not available from the place 
-// whence you received this file, check http://www.uk.research.att.com/vnc or contact
-// the authors on vnc@uk.research.att.com for information on obtaining it.
-//
 // This file has been adapted to the Win32 version of Apcupsd
 // by Kern E. Sibbald.  Many thanks to ATT and James Weatherall,
 // the original author, for providing an excellent template.
 //
-// Copyright (2000-2003) Kern E. Sibbald
+// Rewrite/Refactoring by Adam Kropelin
 //
-
-
-
-// winEvents.cpp
+// Copyright (2007) Adam D. Kropelin
+// Copyright (2000) Kern E. Sibbald
+//
 
 // Implementation of the Events dialogue 
 
 #include <windows.h>
-
-#include "winups.h"
 #include "winevents.h"
-
-extern void FillEventsBox(HWND hwnd, int id_list);
+#include "winres.h"
+#include "statmgr.h"
 
 // Constructor/destructor
-upsEvents::upsEvents()
+upsEvents::upsEvents(HINSTANCE appinst, StatMgr *statmgr)
 {
-    m_dlgvisible = FALSE;
+   m_dlgvisible = FALSE;
+   m_appinst = appinst;
+   m_statmgr = statmgr;
 }
 
 upsEvents::~upsEvents()
@@ -52,19 +28,17 @@ upsEvents::~upsEvents()
 }
 
 // Initialisation
-BOOL
-upsEvents::Init()
+BOOL upsEvents::Init()
 {
-    return TRUE;
+   return TRUE;
 }
 
 // Dialog box handling functions
-void
-upsEvents::Show(BOOL show)
+void upsEvents::Show(BOOL show)
 {
    if (show) {
       if (!m_dlgvisible) {
-         DialogBoxParam(hAppInstance,
+         DialogBoxParam(m_appinst,
                         MAKEINTRESOURCE(IDD_EVENTS),
                         NULL,
                         (DLGPROC)DialogProc,
@@ -73,45 +47,74 @@ upsEvents::Show(BOOL show)
    }
 }
 
-BOOL CALLBACK
-upsEvents::DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+BOOL CALLBACK upsEvents::DialogProc(
+   HWND hwnd,
+   UINT uMsg,
+   WPARAM wParam,
+   LPARAM lParam)
 {
-    // We use the dialog-box's USERDATA to store a _this pointer
-    // This is set only once WM_INITDIALOG has been recieved, though!
-    upsEvents *_this = (upsEvents *)GetWindowLong(hwnd, GWL_USERDATA);
+   // We use the dialog-box's USERDATA to store a _this pointer
+   // This is set only once WM_INITDIALOG has been recieved, though!
+   upsEvents *_this = (upsEvents *)GetWindowLong(hwnd, GWL_USERDATA);
 
-    switch (uMsg) {
-    case WM_INITDIALOG:
-        SetWindowLong(hwnd, GWL_USERDATA, lParam);
-        _this = (upsEvents *) lParam;
+   switch (uMsg) {
+   case WM_INITDIALOG:
+      SetWindowLong(hwnd, GWL_USERDATA, lParam);
+      _this = (upsEvents *) lParam;
 
-        // Show the dialog
-        SetForegroundWindow(hwnd);
+      // Set listbox to a fixed pitch font
+      HFONT hfont = CreateFont(14, 0, 0, 0, FW_DONTCARE, false, false, false, 
+         DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, 
+         DEFAULT_QUALITY, FIXED_PITCH, NULL);
+      SendDlgItemMessage(hwnd, IDC_LIST, WM_SETFONT, (WPARAM)hfont, false);
 
-        _this->m_dlgvisible = TRUE;
+      // Show the dialog
+      SetForegroundWindow(hwnd);
+      _this->m_dlgvisible = TRUE;
+      _this->FillEventsBox(hwnd, IDC_LIST);
+      return TRUE;
 
-        FillEventsBox(hwnd, IDC_LIST);
+   case WM_COMMAND:
+      switch (LOWORD(wParam)) {
+      case IDCANCEL:
+      case IDOK:
+         // Close the dialog
+         EndDialog(hwnd, TRUE);
+         _this->m_dlgvisible = FALSE;
+         return TRUE;
+      case ID_REFRESH:
+         _this->FillEventsBox(hwnd, IDC_LIST);
+         return TRUE;
+      }
+      break;
 
-        return TRUE;
+   case WM_DESTROY:
+      EndDialog(hwnd, FALSE);
+      _this->m_dlgvisible = FALSE;
+      return TRUE;
+   }
 
-    case WM_COMMAND:
-        switch (LOWORD(wParam)) {
-        case IDCANCEL:
-        case IDOK:
-            // Close the dialog
-            EndDialog(hwnd, TRUE);
+   return 0;
+}
 
-            _this->m_dlgvisible = FALSE;
+void upsEvents::FillEventsBox(HWND hwnd, int id_list)
+{
+   const char* error = "Events not available.";
 
-            return TRUE;
-        }
+   // Clear listbox
+   SendDlgItemMessage(hwnd, IDC_LIST, LB_RESETCONTENT, 0, 0);
 
-        break;
+   // Fetch events from apcupsd
+   std::vector<std::string> events;
+   if (!m_statmgr->GetEvents(events) || events.empty()) {
+      SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0, (LONG)error);
+      return;
+   }
 
-    case WM_DESTROY:
-        EndDialog(hwnd, FALSE);
-        _this->m_dlgvisible = FALSE;
-        return TRUE;
-    }
-    return 0;
+   // Add each event to the listbox
+   std::vector<std::string>::reverse_iterator iter;
+   for (iter = events.rbegin(); iter != events.rend(); iter++) {
+      SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0,
+                         (LONG)(*iter).c_str());
+   }
 }

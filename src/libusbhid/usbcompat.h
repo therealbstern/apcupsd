@@ -8,9 +8,6 @@
 #ifndef _USBCOMPAT_H
 #define _USBCOMPAT_H
 
-#include <stdint.h>
-#include <sys/types.h>
-
 /* From /usr/include/dev/usb/usb.h */
 
 /*
@@ -19,19 +16,19 @@
  * and endian problem and should always be used to access non-byte
  * values.
  */
-typedef uint8_t uByte;
-typedef uint8_t uWord[2];
-typedef uint8_t uDWord[4];
+typedef unsigned char uByte;
+typedef unsigned char uWord[2];
+typedef unsigned char uDWord[4];
 
-#define USETW2(w,h,l) ((w)[0] = (u_int8_t)(l), (w)[1] = (u_int8_t)(h))
+#define USETW2(w,h,l) ((w)[0] = (unsigned char)(l), (w)[1] = (unsigned char)(h))
 
 #define UGETW(w) ((w)[0] | ((w)[1] << 8))
-#define USETW(w,v) ((w)[0] = (u_int8_t)(v), (w)[1] = (u_int8_t)((v) >> 8))
+#define USETW(w,v) ((w)[0] = (unsigned char)(v), (w)[1] = (unsigned char)((v) >> 8))
 #define UGETDW(w) ((w)[0] | ((w)[1] << 8) | ((w)[2] << 16) | ((w)[3] << 24))
-#define USETDW(w,v) ((w)[0] = (u_int8_t)(v), \
-                     (w)[1] = (u_int8_t)((v) >> 8), \
-                     (w)[2] = (u_int8_t)((v) >> 16), \
-                     (w)[3] = (u_int8_t)((v) >> 24))
+#define USETDW(w,v) ((w)[0] = (unsigned char)(v), \
+                     (w)[1] = (unsigned char)((v) >> 8), \
+                     (w)[2] = (unsigned char)((v) >> 16), \
+                     (w)[3] = (unsigned char)((v) >> 24))
 
 struct usb_ctl_report_desc {
         int           ucrd_size;

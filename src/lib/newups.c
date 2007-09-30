@@ -68,10 +68,13 @@ UPSINFO *attach_ups(UPSINFO *ups)
 
 void detach_ups(UPSINFO *ups)
 {
+   P(ups->mutex);
    ups->refcnt--;
    if (ups->refcnt == 0) {
       destroy_ups(ups);
+      return; // no unlock since mutex has been destroyed
    }
+   V(ups->mutex);
 }
 
 void destroy_ups(UPSINFO *ups)

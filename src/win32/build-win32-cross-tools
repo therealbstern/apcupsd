@@ -110,13 +110,13 @@ W32API_ARCHIVE="w32api-3.7.tar.gz"
 
 SDL_URL="http://www.libsdl.org/extras/win32/common"
 
-OPENGL_ARCHIVE="opengl-devel.tar.gz"
-DIRECTX_ARCHIVE="directx-devel.tar.gz"
+OPENGL_ARCHIVE=""
+DIRECTX_ARCHIVE=""
 
 
 # These are the files from NSIS at sf.net
 NSIS_URL="http://heanet.dl.sourceforge.net/sourceforge/nsis"
-NSIS_ARCHIVE=nsis-2.20-src.tar.bz2
+NSIS_ARCHIVE=nsis-2.30-src.tar.bz2
 
 #-----------------------------------------------------
 #

@@ -23,11 +23,10 @@ int main(int argc, char **argv)
    MapiRecipDesc recip;
    char addr[100];
    MapiMessage emsg = {0, 
-     "Apcupsd message",               /* default subject */
-     "No text specified.\n",          /* default message text */
-     NULL, NULL, NULL, 0, NULL,
-     1, &recip, 0, NULL};
-
+      "Apcupsd message",               /* default subject */
+      "No text specified.\n",          /* default message text */
+      NULL, NULL, NULL, 0, NULL,
+      1, &recip, 0, NULL};
 
    recip.ulReserved = 0;
    recip.ulRecipClass = MAPI_TO;
@@ -38,16 +37,16 @@ int main(int argc, char **argv)
 
    for (i=1; i<argc; i++) {
       if (strcmp(argv[i], "-s") == 0) {        /* Subject */
-	 if (++i < argc)
-	    emsg.lpszSubject = argv[i];
+         if (++i < argc)
+            emsg.lpszSubject = argv[i];
       } else if (strcmp(argv[i], "-m") == 0) { /* Message text */
-	 if (++i < argc)
-	    emsg.lpszNoteText = argv[i];
+         if (++i < argc)
+            emsg.lpszNoteText = argv[i];
       } else {				       /* address */
          strncpy(addr, "SMTP:", sizeof(addr));
-	 strncat(addr, argv[i], sizeof(addr));
-	 recip.lpszAddress = addr;
-	 recip.lpszName = argv[i];
+         strncat(addr, argv[i], sizeof(addr));
+         recip.lpszAddress = addr;
+         recip.lpszName = argv[i];
       }
    }
 

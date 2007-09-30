@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple Computer//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IFPkgDescriptionDescription</key>
+   <string>Apcupsd is used for power mangement and controlling APC's UPS models on Unix and Windows platforms. Apcupsd works with most of APC's Smart-UPS models as well as most simple signalling models such a Back-UPS, and BackUPS-Office. During a power failure, apcupsd will inform the users about the power failure and that a shutdown may occur. If power is not restored, a system shutdown will follow when the battery is exhausted, a timeout (seconds) expires, or runtime expires based on internal APC calculations determined by power consumption rates. Apcupsd is licensed under the GPL version 2.</string>
+	<key>IFPkgDescriptionTitle</key>
+	<string>Apcupsd</string>
+</dict>
+</plist>

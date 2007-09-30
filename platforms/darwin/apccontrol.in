@@ -83,15 +83,14 @@ case "$1" in
 #   in that order.
 #
     powerout)
-	echo "Power loss detected on UPS ${2}" | ${WALL}
     ;;
     onbattery)
 	echo "Power failure on UPS ${2}. Running on batteries." | ${WALL}
     ;;
     offbattery)
+	echo "Power has returned on UPS ${2}..." | ${WALL}
     ;;
     mainsback)
-	echo "Power has returned on UPS ${2}..." | ${WALL}
 	if [ -f @PWRFAILDIR@/powerfail ] ; then
 	   printf "Continuing with shutdown."  | ${WALL}
 	fi
@@ -127,17 +126,6 @@ case "$1" in
     ;;
     remotedown)
 	echo "Remote Shutdown. Beginning Shutdown Sequence." | ${WALL}
-    ;;
-    restartme)
-	echo -n "Restarting APCUPSD Power Management: "
-	THEPID=`cat ${APCPID}`
-	kill ${THEPID}
-	rm -f ${APCPID}
-	rm -f @PWRFAILDIR@/powerfail
-	rm -f @nologdir@/nologin
-	sleep 5
-	`${APCUPSD}`
-	echo "apcupsd"
     ;;
     startselftest)
     ;;

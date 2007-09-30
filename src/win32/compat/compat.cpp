@@ -19,7 +19,7 @@
 //
 // Author          : Christopher S. Hull
 // Created On      : Sat Jan 31 15:55:00 2004
-// $Id: compat.cpp,v 1.22 2006-11-11 17:16:38 adk0212 Exp $
+// $Id: compat.cpp,v 1.23 2007-09-30 19:49:49 adk0212 Exp $
 
 #include "apc.h"
 #include "compat.h"
@@ -1845,4 +1845,36 @@ int ioctl(int fd, int request, ...)
 
    va_end(list);
    return rc;
+}
+
+// Parse windows-style command line into individual arguments
+char *GetArg(char **cmdline)
+{
+   // Skip leading whitespace
+   while (isspace(**cmdline))
+      (*cmdline)++;
+
+   // Bail if there's nothing left
+   if (**cmdline == '\0')
+      return NULL;
+
+   // Find end of this argument
+   char *ret;
+   if (**cmdline == '"') {
+      // Find end of quoted argument
+      ret = ++(*cmdline);
+      while (**cmdline && **cmdline != '"')
+         (*cmdline)++;
+   } else {
+      // Find end of non-quoted argument
+      ret = *cmdline;
+      while (**cmdline && !isspace(**cmdline))
+         (*cmdline)++;
+   }
+
+   // NUL-terminate this argument
+   if (**cmdline)
+      *(*cmdline)++ = '\0';
+
+   return ret;
 }

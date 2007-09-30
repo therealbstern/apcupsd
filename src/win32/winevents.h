@@ -1,63 +1,46 @@
-//  Copyright (C) 1999 AT&T Laboratories Cambridge. All Rights Reserved.
-//
-//  This file was part of the VNC system.
-//
-//  The VNC system is free software; you can redistribute it and/or modify
-//  it under the terms of the GNU General Public License as published by
-//  the Free Software Foundation; either version 2 of the License, or
-//  (at your option) any later version.
-//
-//  This program is distributed in the hope that it will be useful,
-//  but WITHOUT ANY WARRANTY; without even the implied warranty of
-//  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-//  GNU General Public License for more details.
-//
-//  You should have received a copy of the GNU General Public License
-//  along with this program; if not, write to the Free Software
-//  Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307,
-//  USA.
-//
-// If the source code for the VNC system is not available from the place 
-// whence you received this file, check http://www.uk.research.att.com/vnc or contact
-// the authors on vnc@uk.research.att.com for information on obtaining it.
-//
 // This file has been adapted to the Win32 version of Apcupsd
 // by Kern E. Sibbald.  Many thanks to ATT and James Weatherall,
 // the original author, for providing an excellent template.
 //
+// Rewrite/Refactoring by Adam Kropelin
+//
+// Copyright (2007) Adam D. Kropelin
 // Copyright (2000) Kern E. Sibbald
 //
 
+#ifndef WINEVENTS_H
+#define WINEVENTS_H
 
+#include <windows.h>
 
-// upsEvents
+// Forward declarations
+class StatMgr;
 
 // Object implementing the Events dialogue box for apcupsd
-
-class upsEvents;
-
-#if (!defined(_win_upsEvents))
-#define _win_upsEvents
-
-// The upsEvents class itself
 class upsEvents
 {
 public:
-        // Constructor/destructor
-        upsEvents();
-        ~upsEvents();
+   // Constructor/destructor
+   upsEvents(HINSTANCE appinst, StatMgr *statmgr);
+   ~upsEvents();
 
-        // Initialisation
-        BOOL Init();
+   // Initialisation
+   BOOL Init();
 
-        // The dialog box window proc
-        static BOOL CALLBACK DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+   // General
+   void Show(BOOL show);
 
-        // General
-        void Show(BOOL show);
+private:
+   // The dialog box window proc
+   static BOOL CALLBACK DialogProc(
+      HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-        // Implementation
-        BOOL m_dlgvisible;
+   void FillEventsBox(HWND hwnd, int id_list);
+
+   // Private data
+   BOOL m_dlgvisible;
+   HINSTANCE m_appinst;
+   StatMgr *m_statmgr;
 };
 
-#endif // _win_upsEvents
+#endif // WINEVENTS_H

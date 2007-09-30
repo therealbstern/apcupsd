@@ -27,6 +27,8 @@
 
 #include "apc.h"
 
+char argvalue[MAXSTRING];
+
 /*
  * We use more complicated defaults for these constants in some cases,
  * so stick them in arrays that can be modified at runtime.
