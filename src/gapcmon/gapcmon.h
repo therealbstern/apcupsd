@@ -28,7 +28,7 @@
 G_BEGIN_DECLS
 
 #ifndef VERSION
-#define GAPC_VERSION "0.6.4-0"
+#define GAPC_VERSION "0.8.6-0"
 #else
 #define GAPC_VERSION VERSION
 #endif
@@ -56,6 +56,7 @@ G_BEGIN_DECLS
 #define GAPC_REFRESH_KEY     "/apps/gapcmon/monitor/%d/network_interval"
 #define GAPC_GRAPH_KEY       "/apps/gapcmon/monitor/%d/graph_interval"
 #define GAPC_HOST_KEY        "/apps/gapcmon/monitor/%d/host_name"
+#define GAPC_WATT_KEY        "/apps/gapcmon/monitor/%d/ups_wattage"
 #define GAPC_MAX_ARRAY 256         /* for arrays or lists */
 #define GAPC_MAX_TEXT 256          /* for strings */
 #define GAPC_ICON_SIZE 24          /* Ideal size of icons */
@@ -65,6 +66,7 @@ G_BEGIN_DECLS
 #define GAPC_REFRESH_FACTOR_ONE_TIME 500
 #define GAPC_HOST_DEFAULT "localhost"
 #define GAPC_PORT_DEFAULT 3551
+#define GAPC_WATT_DEFAULT 600
 #define GAPC_REFRESH_DEFAULT 8.0
 #define GAPC_REFRESH_MIN_INCREMENT 1.0  /* Minimum refresh cycle seconds */
 #define GAPC_LINEGRAPH_XMAX 40
@@ -131,6 +133,7 @@ typedef enum _Prefs_Store_IDs {
    GAPC_PREFS_REFRESH,
    GAPC_PREFS_GRAPH,
    GAPC_PREFS_HOST,
+   GAPC_PREFS_WATT,
    GAPC_N_PREFS_COLUMNS
 } GAPC_PrefsType;
 
@@ -287,6 +290,7 @@ typedef struct _Monitor_Instance_Data {
    gboolean cb_use_systray;
    gchar *pch_host;
    gint i_port;
+   gint i_watt;                    /* rated wattage of UPS*/   
    gfloat d_refresh;
    gfloat d_graph;                 /* End Preference values */
 
