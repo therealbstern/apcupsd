@@ -2271,7 +2271,7 @@ static gint sknet_net_write_nbytes (GIOChannel * ioc, gchar * ptr, gsize nbytes)
       return -1;
       break;
     case G_IO_STATUS_AGAIN:
-      sknet_util_log_msg ("sknet_net_write_nbytes", "G_IO_STATUS_AGAIN", "aborted");
+      sknet_util_log_msg ("sknet_net_write_nbytes", "G_IO_STATUS_AGAIN", "retry enabled");
       g_usleep (500000);
       break;
     case G_IO_STATUS_EOF:
@@ -2634,7 +2634,7 @@ static gint gapc_net_transaction_service(PGAPC_MONITOR pm, gchar * cp_cmd, gchar
    }
 
    n = sknet_net_send( ioc, cp_cmd, g_utf8_strlen(cp_cmd, -1));
-   if (n < 0) {
+   if (n <= 0) {
       sknet_net_close( ioc, FALSE);
       return 0;
    }
@@ -2681,7 +2681,10 @@ static gpointer *gapc_net_thread_qwork(PGAPC_MONITOR pm)
 
    if (pm->psk == NULL) {
        pm->psk = sknet_net_client_init (pm->pch_host, pm->i_port);
-       g_return_val_if_fail(pm->psk != NULL, NULL);
+       if (pm->psk == NULL) {
+            g_async_queue_unref(thread_queue);
+            g_thread_exit(GINT_TO_POINTER(0));
+       }
    }
 
    while ((pm = (PGAPC_MONITOR) g_async_queue_pop(thread_queue))) {
