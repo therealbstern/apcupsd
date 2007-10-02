@@ -716,6 +716,7 @@ AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
         if test $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xLinux ; then
            USB_TYPE="linux"
            AC_MSG_RESULT([Using Linux USB driver.])
+           AC_DEFINE(HAVE_LINUX_USB)
         elif test $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xFreeBSD -o \
                   $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xOpenBSD -o \
                   $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xNetBSD ; then
@@ -727,6 +728,7 @@ AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
            AC_SUBST(LIBUSBHIDOBJS)
            USB_TYPE="bsd"
            AC_MSG_RESULT([Using BSD USB driver.])
+           AC_DEFINE(HAVE_BSD_USB)
         else
            AC_PATH_PROG(usbcfg, libusb-config)
            if test x$usbcfg = x ; then
@@ -747,6 +749,7 @@ AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
 
            USB_TYPE="generic"
            AC_MSG_RESULT([Using generic libusb USB driver.])
+           AC_DEFINE(HAVE_GENERIC_USB)
         fi
 
         AC_DEFINE(HAVE_USB_DRIVER)

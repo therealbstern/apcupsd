@@ -27,7 +27,7 @@
 #include "apc.h"
 #include "apcsmart.h"
 
-int apcsmart_ups_kill_power(UPSINFO *ups)
+bool ApcSmartDriver::KillPower()
 {
    char response[32];
    int shutdown_delay = 0;
@@ -36,12 +36,12 @@ int apcsmart_ups_kill_power(UPSINFO *ups)
 
    response[0] = '\0';
 
-   a = ups->UPS_Cmd[CI_DSHUTD];    /* shutdown delay */
-   write(ups->fd, &a, 1);
-   getline(response, sizeof(response), ups);
+   a = _ups->UPS_Cmd[CI_DSHUTD];    /* shutdown delay */
+   write(_ups->fd, &a, 1);
+   getline(response, sizeof(response));
    shutdown_delay = (int)atof(response);
    a = 'S';                        /* ask for soft shutdown */
-   write(ups->fd, &a, 1);
+   write(_ups->fd, &a, 1);
 
    /*
     * Check whether the UPS has acknowledged the power-off command.
@@ -51,15 +51,15 @@ int apcsmart_ups_kill_power(UPSINFO *ups)
     * operator intervention.  w.p.
     */
    sleep(5);
-   getline(response, sizeof response, ups);
+   getline(response, sizeof response);
    if (strcmp(response, "OK") == 0) {
       if (shutdown_delay > 0)
-         log_event(ups, LOG_WARNING,
+         log_event(_ups, LOG_WARNING,
             "UPS will power off after %d seconds ...\n", shutdown_delay);
       else
-         log_event(ups, LOG_WARNING,
+         log_event(_ups, LOG_WARNING,
             "UPS will power off after the configured delay  ...\n");
-      log_event(ups, LOG_WARNING,
+      log_event(_ups, LOG_WARNING,
          _("Please power off your UPS before rebooting your computer ...\n"));
    } else {
       /*
@@ -68,27 +68,27 @@ int apcsmart_ups_kill_power(UPSINFO *ups)
        */
       a = '@';                     /* Shutdown now */
       sleep(1);
-      write(ups->fd, &a, 1);
+      write(_ups->fd, &a, 1);
       sleep(1);
       a = '0';
-      write(ups->fd, &a, 1);
+      write(_ups->fd, &a, 1);
       sleep(1);
       a = '0';
-      write(ups->fd, &a, 1);
+      write(_ups->fd, &a, 1);
       sleep(1);
       a = '0';
-      write(ups->fd, &a, 1);
+      write(_ups->fd, &a, 1);
 
-      getline(response, sizeof(response), ups);
+      getline(response, sizeof(response));
       if ((strcmp(response, "OK") == 0) || (strcmp(response, "*") == 0)) {
          if (shutdown_delay > 0) {
-            log_event(ups, LOG_WARNING,
+            log_event(_ups, LOG_WARNING,
                "UPS will power off after %d seconds ...\n", shutdown_delay);
          } else {
-            log_event(ups, LOG_WARNING,
+            log_event(_ups, LOG_WARNING,
                "UPS will power off after the configured delay  ...\n");
          }
-         log_event(ups, LOG_WARNING,
+         log_event(_ups, LOG_WARNING,
             _("Please power off your UPS before rebooting your computer ...\n"));
       } else {
          errflag++;
@@ -97,34 +97,34 @@ int apcsmart_ups_kill_power(UPSINFO *ups)
 
    if (errflag) {
       a = '@';
-      write(ups->fd, &a, 1);
+      write(_ups->fd, &a, 1);
       sleep(1);
       a = '0';
-      write(ups->fd, &a, 1);
+      write(_ups->fd, &a, 1);
       sleep(1);
       a = '0';
-      write(ups->fd, &a, 1);
+      write(_ups->fd, &a, 1);
       sleep(1);
 
-      if ((ups->mode.type == BKPRO) || (ups->mode.type == VS)) {
+      if ((_ups->mode.type == BKPRO) || (_ups->mode.type == VS)) {
          a = '1';
-         log_event(ups, LOG_WARNING,
+         log_event(_ups, LOG_WARNING,
             _("BackUPS Pro and SmartUPS v/s sleep for 6 min"));
       } else {
          a = '0';
       }
-      write(ups->fd, &a, 1);
+      write(_ups->fd, &a, 1);
 
-      getline(response, sizeof(response), ups);
+      getline(response, sizeof(response));
       if ((strcmp(response, "OK") == 0) || (strcmp(response, "*") == 0)) {
          if (shutdown_delay > 0) {
-            log_event(ups, LOG_WARNING,
+            log_event(_ups, LOG_WARNING,
                "UPS will power off after %d seconds ...\n", shutdown_delay);
          } else {
-            log_event(ups, LOG_WARNING,
+            log_event(_ups, LOG_WARNING,
                "UPS will power off after the configured delay  ...\n");
          }
-         log_event(ups, LOG_WARNING,
+         log_event(_ups, LOG_WARNING,
             _("Please power off your UPS before rebooting your computer ...\n"));
          errflag = 0;
       } else {
@@ -135,20 +135,20 @@ int apcsmart_ups_kill_power(UPSINFO *ups)
    if (errflag) {
       /* And yet another method !!! */
       a = 'K';
-      write(ups->fd, &a, 1);
+      write(_ups->fd, &a, 1);
       sleep(2);
-      write(ups->fd, &a, 1);
-      getline(response, sizeof response, ups);
+      write(_ups->fd, &a, 1);
+      getline(response, sizeof response);
       if ((strcmp(response, "*") == 0) || (strcmp(response, "OK") == 0) ||
-         (ups->mode.type >= BKPRO)) {
+         (_ups->mode.type >= BKPRO)) {
          if (shutdown_delay > 0) {
-            log_event(ups, LOG_WARNING,
+            log_event(_ups, LOG_WARNING,
                "UPS will power off after %d seconds ...\n", shutdown_delay);
          } else {
-            log_event(ups, LOG_WARNING,
+            log_event(_ups, LOG_WARNING,
                "UPS will power off after the configured delay  ...\n");
          }
-         log_event(ups, LOG_WARNING,
+         log_event(_ups, LOG_WARNING,
             _("Please power off your UPS before rebooting your computer ...\n"));
          errflag = 0;
       } else {
@@ -157,9 +157,9 @@ int apcsmart_ups_kill_power(UPSINFO *ups)
    }
 
    if (errflag) {
-      log_event(ups, LOG_WARNING, _("Unexpected error!\n"));
-      log_event(ups, LOG_WARNING, _("UPS in unstable state\n"));
-      log_event(ups, LOG_WARNING,
+      log_event(_ups, LOG_WARNING, _("Unexpected error!\n"));
+      log_event(_ups, LOG_WARNING, _("UPS in unstable state\n"));
+      log_event(_ups, LOG_WARNING,
          _("You MUST power off your UPS before rebooting!!!\n"));
       return 0;
    }
@@ -167,7 +167,7 @@ int apcsmart_ups_kill_power(UPSINFO *ups)
    return 1;
 }
 
-int apcsmart_ups_check_state(UPSINFO *ups)
+bool ApcSmartDriver::CheckState()
 {
-   return getline(NULL, 0, ups) == SUCCESS ? 1 : 0;
+   return getline(NULL, 0) == SUCCESS;
 }

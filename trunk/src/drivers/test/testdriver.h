@@ -25,19 +25,26 @@
 #ifndef _TESTDRIVER_H
 #define _TESTDRIVER_H
 
-/*********************************************************************/
-/* Function ProtoTypes                                               */
-/*********************************************************************/
+#include "drivers.h"
 
-extern int test_ups_get_capabilities(UPSINFO *ups);
-extern int test_ups_read_volatile_data(UPSINFO *ups);
-extern int test_ups_read_static_data(UPSINFO *ups);
-extern int test_ups_kill_power(UPSINFO *ups);
-extern int test_ups_check_state(UPSINFO *ups);
-extern int test_ups_open(UPSINFO *ups);
-extern int test_ups_close(UPSINFO *ups);
-extern int test_ups_setup(UPSINFO *ups);
-extern int test_ups_program_eeprom(UPSINFO *ups, int command, char *data);
-extern int test_ups_entry_point(UPSINFO *ups, int command, void *data);
+class TestDriver: public UpsDriver
+{
+public:
+
+   TestDriver(UPSINFO *ups) : UpsDriver(ups, "test") {}
+   virtual ~TestDriver() {}
+
+   // Subclasses must implement these methods
+   virtual bool Open();
+   virtual bool GetCapabilities();
+   virtual bool ReadVolatileData();
+   virtual bool ReadStaticData();
+   virtual bool CheckState();
+   virtual bool Close();
+
+private:
+
+   bool open_test_device();
+};
 
 #endif   /* _TEST_DRIVER_H */

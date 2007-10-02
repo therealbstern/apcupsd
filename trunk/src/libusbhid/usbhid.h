@@ -29,6 +29,9 @@
  *
  */
 
+#ifndef _USBHID_H
+#define _USBHID_H
+
 typedef struct report_desc *report_desc_t;
 
 typedef struct hid_data *hid_data_t;
@@ -101,3 +104,5 @@ int hid_parse_usage_page(const char *name);
 /* Extracting/insertion of data, data.c: */
 int hid_get_data(const void *p, const hid_item_t *h);
 void hid_set_data(void *p, const hid_item_t *h, int data);
+
+#endif // _USBHID_H

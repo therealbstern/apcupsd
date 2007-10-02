@@ -23,7 +23,7 @@
  */
 
 #include "apc.h"
-#include "md5.h"
+#include "pcnet.h"
 #include <sys/socket.h>
 #include <netinet/in.h>
 
@@ -42,19 +42,8 @@
 #define close(fd) closesocket(fd)
 #endif
 
-typedef struct {
-   char device[MAXSTRING];             /* Copy of ups->device */
-   char *ipaddr;                       /* IP address of UPS */
-   char *user;                         /* Username */
-   char *pass;                         /* Pass phrase */
-   bool auth;                          /* Authenticate? */
-   unsigned long uptime;               /* UPS uptime counter */
-   unsigned long reboots;              /* UPS reboot counter */
-   time_t datatime;                    /* Last time we got valid data */
-} PCNET_DATA;
-
 /* Convert UPS response to enum and string */
-static SelfTestResult decode_testresult(const char* str)
+SelfTestResult PcnetDriver::decode_testresult(const char* str)
 {
    /*
     * Responses are:
@@ -74,7 +63,7 @@ static SelfTestResult decode_testresult(const char* str)
 }
 
 /* Convert UPS response to enum and string */
-static LastXferCause decode_lastxfer(const char *str)
+LastXferCause PcnetDriver::decode_lastxfer(const char *str)
 {
    Dmsg1(80, "Transfer reason: %c\n", *str);
 
@@ -100,7 +89,7 @@ static LastXferCause decode_lastxfer(const char *str)
    }
 }
 
-static bool pcnet_process_data(UPSINFO* ups, const char *key, const char *value)
+bool PcnetDriver::process_data(const char *key, const char *value)
 {
    unsigned long cmd;
    int ci;
@@ -118,12 +107,12 @@ static bool pcnet_process_data(UPSINFO* ups, const char *key, const char *value)
       {
       case 0:
          Dmsg0(80, "SD: The UPS is NOT shutting down\n");
-         ups->clear_shut_remote();
+         _ups->clear_shut_remote();
          break;
 
       case 1:
          Dmsg0(80, "SD: The UPS is shutting down\n");
-         ups->set_shut_remote();
+         _ups->set_shut_remote();
          break;
 
       default:
@@ -141,7 +130,7 @@ static bool pcnet_process_data(UPSINFO* ups, const char *key, const char *value)
    /* Convert command to CI */
    cmd = strtoul(key, NULL, 16);
    for (ci=0; ci<CI_MAXCI; ci++)
-      if (ups->UPS_Cmd[ci] == cmd)
+      if (_ups->UPS_Cmd[ci] == cmd)
          break;
 
    /* No match? */
@@ -149,7 +138,7 @@ static bool pcnet_process_data(UPSINFO* ups, const char *key, const char *value)
       return false;
 
    /* Mark this CI as available */
-   ups->UPS_Cap[ci] = true;
+   _ups->UPS_Cap[ci] = true;
 
    /* Handle the data */
    ret = true;
@@ -159,88 +148,88 @@ static bool pcnet_process_data(UPSINFO* ups, const char *key, const char *value)
        */
    case CI_STATUS:
       Dmsg1(80, "Got CI_STATUS: %s\n", value);
-      ups->Status &= ~0xFF;        /* clear APC byte */
-      ups->Status |= strtoul(value, NULL, 16) & 0xFF;  /* set APC byte */
+      _ups->Status &= ~0xFF;        /* clear APC byte */
+      _ups->Status |= strtoul(value, NULL, 16) & 0xFF;  /* set APC byte */
       break;
    case CI_LQUAL:
       Dmsg1(80, "Got CI_LQUAL: %s\n", value);
-      strncpy(ups->linequal, value, sizeof(ups->linequal));
+      strncpy(_ups->linequal, value, sizeof(_ups->linequal));
       break;
    case CI_WHY_BATT:
       Dmsg1(80, "Got CI_WHY_BATT: %s\n", value);
-      ups->lastxfer = decode_lastxfer(value);
+      _ups->lastxfer = decode_lastxfer(value);
       break;
    case CI_ST_STAT:
       Dmsg1(80, "Got CI_ST_STAT: %s\n", value);
-      ups->testresult = decode_testresult(value);
+      _ups->testresult = decode_testresult(value);
       break;
    case CI_VLINE:
       Dmsg1(80, "Got CI_VLINE: %s\n", value);
-      ups->LineVoltage = atof(value);
+      _ups->LineVoltage = atof(value);
       break;
    case CI_VMIN:
       Dmsg1(80, "Got CI_VMIN: %s\n", value);
-      ups->LineMin = atof(value);
+      _ups->LineMin = atof(value);
       break;
    case CI_VMAX:
       Dmsg1(80, "Got CI_VMAX: %s\n", value);
-      ups->LineMax = atof(value);
+      _ups->LineMax = atof(value);
       break;
    case CI_VOUT:
       Dmsg1(80, "Got CI_VOUT: %s\n", value);
-      ups->OutputVoltage = atof(value);
+      _ups->OutputVoltage = atof(value);
       break;
    case CI_BATTLEV:
       Dmsg1(80, "Got CI_BATTLEV: %s\n", value);
-      ups->BattChg = atof(value);
+      _ups->BattChg = atof(value);
       break;
    case CI_VBATT:
       Dmsg1(80, "Got CI_VBATT: %s\n", value);
-      ups->BattVoltage = atof(value);
+      _ups->BattVoltage = atof(value);
       break;
    case CI_LOAD:
       Dmsg1(80, "Got CI_LOAD: %s\n", value);
-      ups->UPSLoad = atof(value);
+      _ups->UPSLoad = atof(value);
       break;
    case CI_FREQ:
       Dmsg1(80, "Got CI_FREQ: %s\n", value);
-      ups->LineFreq = atof(value);
+      _ups->LineFreq = atof(value);
       break;
    case CI_RUNTIM:
       Dmsg1(80, "Got CI_RUNTIM: %s\n", value);
-      ups->TimeLeft = atof(value);
+      _ups->TimeLeft = atof(value);
       break;
    case CI_ITEMP:
       Dmsg1(80, "Got CI_ITEMP: %s\n", value);
-      ups->UPSTemp = atof(value);
+      _ups->UPSTemp = atof(value);
       break;
    case CI_DIPSW:
       Dmsg1(80, "Got CI_DIPSW: %s\n", value);
-      ups->dipsw = strtoul(value, NULL, 16);
+      _ups->dipsw = strtoul(value, NULL, 16);
       break;
    case CI_REG1:
       Dmsg1(80, "Got CI_REG1: %s\n", value);
-      ups->reg1 = strtoul(value, NULL, 16);
+      _ups->reg1 = strtoul(value, NULL, 16);
       break;
    case CI_REG2:
-      ups->reg2 = strtoul(value, NULL, 16);
-      ups->set_battpresent(!(ups->reg2 & 0x20));
+      _ups->reg2 = strtoul(value, NULL, 16);
+      _ups->set_battpresent(!(_ups->reg2 & 0x20));
       break;
    case CI_REG3:
       Dmsg1(80, "Got CI_REG3: %s\n", value);
-      ups->reg3 = strtoul(value, NULL, 16);
+      _ups->reg3 = strtoul(value, NULL, 16);
       break;
    case CI_HUMID:
       Dmsg1(80, "Got CI_HUMID: %s\n", value);
-      ups->humidity = atof(value);
+      _ups->humidity = atof(value);
       break;
    case CI_ATEMP:
       Dmsg1(80, "Got CI_ATEMP: %s\n", value);
-      ups->ambtemp = atof(value);
+      _ups->ambtemp = atof(value);
       break;
    case CI_ST_TIME:
       Dmsg1(80, "Got CI_ST_TIME: %s\n", value);
-      ups->LastSTTime = atof(value);
+      _ups->LastSTTime = atof(value);
       break;
       
       /*
@@ -248,84 +237,84 @@ static bool pcnet_process_data(UPSINFO* ups, const char *key, const char *value)
        */
    case CI_SENS:
       Dmsg1(80, "Got CI_SENS: %s\n", value);
-      strncpy(ups->sensitivity, value, sizeof(ups->sensitivity));
+      strncpy(_ups->sensitivity, value, sizeof(_ups->sensitivity));
       break;
    case CI_DWAKE:
       Dmsg1(80, "Got CI_DWAKE: %s\n", value);
-      ups->dwake = (int)atof(value);
+      _ups->dwake = (int)atof(value);
       break;
    case CI_DSHUTD:
       Dmsg1(80, "Got CI_DSHUTD: %s\n", value);
-      ups->dshutd = (int)atof(value);
+      _ups->dshutd = (int)atof(value);
       break;
    case CI_LTRANS:
       Dmsg1(80, "Got CI_LTRANS: %s\n", value);
-      ups->lotrans = (int)atof(value);
+      _ups->lotrans = (int)atof(value);
       break;
    case CI_HTRANS:
       Dmsg1(80, "Got CI_HTRANS: %s\n", value);
-      ups->hitrans = (int)atof(value);
+      _ups->hitrans = (int)atof(value);
       break;
    case CI_RETPCT:
       Dmsg1(80, "Got CI_RETPCT: %s\n", value);
-      ups->rtnpct = (int)atof(value);
+      _ups->rtnpct = (int)atof(value);
       break;
    case CI_DALARM:
       Dmsg1(80, "Got CI_DALARM: %s\n", value);
-      strncpy(ups->beepstate, value, sizeof(ups->beepstate));
+      strncpy(_ups->beepstate, value, sizeof(_ups->beepstate));
       break;
    case CI_DLBATT:
       Dmsg1(80, "Got CI_DLBATT: %s\n", value);
-      ups->dlowbatt = (int)atof(value);
+      _ups->dlowbatt = (int)atof(value);
       break;
    case CI_IDEN:
       Dmsg1(80, "Got CI_IDEN: %s\n", value);
-      if (ups->upsname[0] == 0)
-         strncpy(ups->upsname, value, sizeof(ups->upsname));
+      if (_ups->upsname[0] == 0)
+         strncpy(_ups->upsname, value, sizeof(_ups->upsname));
       break;
    case CI_STESTI:
       Dmsg1(80, "Got CI_STESTI: %s\n", value);
-      strncpy(ups->selftest, value, sizeof(ups->selftest));
+      strncpy(_ups->selftest, value, sizeof(_ups->selftest));
       break;
    case CI_MANDAT:
       Dmsg1(80, "Got CI_MANDAT: %s\n", value);
-      strncpy(ups->birth, value, sizeof(ups->birth));
+      strncpy(_ups->birth, value, sizeof(_ups->birth));
       break;
    case CI_SERNO:
       Dmsg1(80, "Got CI_SERNO: %s\n", value);
-      strncpy(ups->serial, value, sizeof(ups->serial));
+      strncpy(_ups->serial, value, sizeof(_ups->serial));
       break;
    case CI_BATTDAT:
       Dmsg1(80, "Got CI_BATTDAT: %s\n", value);
-      strncpy(ups->battdat, value, sizeof(ups->battdat));
+      strncpy(_ups->battdat, value, sizeof(_ups->battdat));
       break;
    case CI_NOMOUTV:
       Dmsg1(80, "Got CI_NOMOUTV: %s\n", value);
-      ups->NomOutputVoltage = (int)atof(value);
+      _ups->NomOutputVoltage = (int)atof(value);
       break;
    case CI_NOMBATTV:
       Dmsg1(80, "Got CI_NOMBATTV: %s\n", value);
-      ups->nombattv = atof(value);
+      _ups->nombattv = atof(value);
       break;
    case CI_REVNO:
       Dmsg1(80, "Got CI_REVNO: %s\n", value);
-      strncpy(ups->firmrev, value, sizeof(ups->firmrev));
+      strncpy(_ups->firmrev, value, sizeof(_ups->firmrev));
       break;
    case CI_EXTBATTS:
       Dmsg1(80, "Got CI_EXTBATTS: %s\n", value);
-      ups->extbatts = (int)atof(value);
+      _ups->extbatts = (int)atof(value);
       break;
    case CI_BADBATTS:
       Dmsg1(80, "Got CI_BADBATTS: %s\n", value);
-      ups->badbatts = (int)atof(value);
+      _ups->badbatts = (int)atof(value);
       break;
    case CI_UPSMODEL:
       Dmsg1(80, "Got CI_UPSMODEL: %s\n", value);
-      strncpy(ups->upsmodel, value, sizeof(ups->upsmodel));
+      strncpy(_ups->upsmodel, value, sizeof(_ups->upsmodel));
       break;
    case CI_EPROM:
       Dmsg1(80, "Got CI_EPROM: %s\n", value);
-      strncpy(ups->eprom, value, sizeof(ups->eprom));
+      strncpy(_ups->eprom, value, sizeof(_ups->eprom));
       break;
    default:
       Dmsg1(100, "Unknown CI (%d)\n", ci);
@@ -336,7 +325,7 @@ static bool pcnet_process_data(UPSINFO* ups, const char *key, const char *value)
    return ret;
 }
 
-static char *digest2ascii(md5_byte_t *digest)
+char *PcnetDriver::digest2ascii(md5_byte_t *digest)
 {
    static char ascii[33];
    char *ptr;
@@ -352,14 +341,9 @@ static char *digest2ascii(md5_byte_t *digest)
    return ascii;
 }
 
-struct pair {
-   const char* key;
-   const char* value;
-};
-
 #define MAX_PAIRS 256
 
-static const char *lookup_key(const char *key, struct pair table[])
+const char *PcnetDriver::lookup_key(const char *key, struct pair table[])
 {
    int idx;
    const char *ret = NULL;
@@ -374,9 +358,8 @@ static const char *lookup_key(const char *key, struct pair table[])
    return ret;
 }
 
-static struct pair *auth_and_map_packet(UPSINFO* ups, char *buf, int len)
+PcnetDriver::pair *PcnetDriver::auth_and_map_packet(char *buf, int len)
 {
-   PCNET_DATA *my_data = (PCNET_DATA *)ups->driver_internal_data;
    char *key, *end, *ptr, *value;
    const char *val, *hash=NULL;
    static struct pair pairs[MAX_PAIRS+1];
@@ -389,12 +372,12 @@ static struct pair *auth_and_map_packet(UPSINFO* ups, char *buf, int len)
    if ((ptr = strstr(buf, "MD=")) == NULL || ptr == buf)
       return NULL;
 
-   if (my_data->auth) {
+   if (_auth) {
       /* Calculate the MD5 of the packet before messing with it */
       md5_init(&ms);
       md5_append(&ms, (md5_byte_t*)buf, ptr-buf);
-      md5_append(&ms, (md5_byte_t*)my_data->user, strlen(my_data->user));
-      md5_append(&ms, (md5_byte_t*)my_data->pass, strlen(my_data->pass));
+      md5_append(&ms, (md5_byte_t*)_user, strlen(_user));
+      md5_append(&ms, (md5_byte_t*)_pass, strlen(_pass));
       md5_finish(&ms, digest);
 
       /* Convert binary digest to ascii */
@@ -439,7 +422,7 @@ static struct pair *auth_and_map_packet(UPSINFO* ups, char *buf, int len)
       idx++;
    }
 
-   if (my_data->auth) {
+   if (_auth) {
       /* Check calculated hash vs received */
       Dmsg1(200, "process_packet: calculated=%s\n", hash);
       val = lookup_key("MD", pairs);
@@ -455,11 +438,11 @@ static struct pair *auth_and_map_packet(UPSINFO* ups, char *buf, int len)
          Dmsg0(200, "process_packet: Missing PC field\n");
          return NULL;
       }
-      Dmsg1(200, "process_packet: Expected IP=%s\n", my_data->ipaddr);
+      Dmsg1(200, "process_packet: Expected IP=%s\n", _ipaddr);
       Dmsg1(200, "process_packet: Received IP=%s\n", val);
-      if (strcmp(val, my_data->ipaddr)) {
+      if (strcmp(val, _ipaddr)) {
          Dmsg2(200, "process_packet: IP address mismatch\n",
-            my_data->ipaddr, val);
+            _ipaddr, val);
          return NULL;
       }
    }
@@ -483,28 +466,27 @@ static struct pair *auth_and_map_packet(UPSINFO* ups, char *buf, int len)
    }
    uptime = strtoul(val, NULL, 16);
 
-   Dmsg1(200, "process_packet: Our reboots=%d\n", my_data->reboots);
+   Dmsg1(200, "process_packet: Our reboots=%d\n", _reboots);
    Dmsg1(200, "process_packet: UPS reboots=%d\n", reboots);
-   Dmsg1(200, "process_packet: Our uptime=%d\n", my_data->uptime);
+   Dmsg1(200, "process_packet: Our uptime=%d\n", _uptime);
    Dmsg1(200, "process_packet: UPS uptime=%d\n", uptime);
 
-   if ((reboots == my_data->reboots && uptime <= my_data->uptime) ||
-       (reboots < my_data->reboots)) {
+   if ((reboots == _reboots && uptime <= _uptime) ||
+       (reboots < _reboots)) {
       Dmsg0(200, "process_packet: Packet is out of order or replayed\n");
       return NULL;
    }
 
-   my_data->reboots = reboots;
-   my_data->uptime = uptime;
+   _reboots = reboots;
+   _uptime = uptime;
    return pairs;
 }
 
 /*
  * Read UPS events. I.e. state changes.
  */
-int pcnet_ups_check_state(UPSINFO *ups)
+bool PcnetDriver::CheckState()
 {
-   PCNET_DATA *my_data = (PCNET_DATA *)ups->driver_internal_data;
    struct timeval tv, now, exit;
    fd_set rfds;
    bool done = false;
@@ -517,7 +499,7 @@ int pcnet_ups_check_state(UPSINFO *ups)
 
    /* Figure out when we need to exit by */
    gettimeofday(&exit, NULL);
-   exit.tv_sec += ups->wait_time;
+   exit.tv_sec += _ups->wait_time;
 
    while (!done) {
 
@@ -540,9 +522,9 @@ int pcnet_ups_check_state(UPSINFO *ups)
 
       Dmsg2(100, "Waiting for %d.%d\n", tv.tv_sec, tv.tv_usec);
       FD_ZERO(&rfds);
-      FD_SET(ups->fd, &rfds);
+      FD_SET(_ups->fd, &rfds);
 
-      retval = select(ups->fd + 1, &rfds, NULL, NULL, &tv);
+      retval = select(_ups->fd + 1, &rfds, NULL, NULL, &tv);
 
       if (retval == 0) {
          /* No chars available in TIMER seconds. */
@@ -556,7 +538,7 @@ int pcnet_ups_check_state(UPSINFO *ups)
 
       do {
          fromlen = sizeof(from);
-         retval = recvfrom(ups->fd, buf, sizeof(buf)-1, 0, (struct sockaddr*)&from, &fromlen);
+         retval = recvfrom(_ups->fd, buf, sizeof(buf)-1, 0, (struct sockaddr*)&from, &fromlen);
       } while (retval == -1 && (errno == EAGAIN || errno == EINTR));
 
       if (retval < 0) {            /* error */
@@ -581,117 +563,109 @@ int pcnet_ups_check_state(UPSINFO *ups)
          logf("\n");
       }
 
-      map = auth_and_map_packet(ups, buf, retval);
+      map = auth_and_map_packet(buf, retval);
       if (map == NULL)
          continue;
 
-      write_lock(ups);
+      write_lock(_ups);
 
       for (idx=0; map[idx].key; idx++)
-         done |= pcnet_process_data(ups, map[idx].key, map[idx].value);
+         done |= process_data(map[idx].key, map[idx].value);
 
-      write_unlock(ups);
+      write_unlock(_ups);
    }
 
    /* If we successfully received a data packet, update timer. */
    if (done) {
-      time(&my_data->datatime);
-      Dmsg1(100, "Valid data at time_t=%d\n", my_data->datatime);
+      time(&_datatime);
+      Dmsg1(100, "Valid data at time_t=%d\n", _datatime);
    }
 
    return done;
 }
 
-int pcnet_ups_open(UPSINFO *ups)
+bool PcnetDriver::Open()
 {
    struct sockaddr_in addr;
-   PCNET_DATA *my_data = (PCNET_DATA *)ups->driver_internal_data;
    char *ptr;
 
-   write_lock(ups);
+   write_lock(_ups);
 
-   if (my_data == NULL) {
-      my_data = (PCNET_DATA *)malloc(sizeof(*my_data));
-      memset(my_data, 0, sizeof(*my_data));
-      ups->driver_internal_data = my_data;
-   }
+   _device[0] = '\0';
+   _ipaddr = _user = _pass = NULL;
+   _auth = false;
+   _uptime = _reboots = 0;
 
-   if (ups->device[0] != '\0') {
-      my_data->auth = true;
+   if (_ups->device[0] != '\0') {
+      _auth = true;
 
-      astrncpy(my_data->device, ups->device, sizeof(my_data->device));
-      ptr = my_data->device;
+      astrncpy(_device, _ups->device, sizeof(_device));
+      ptr = _device;
 
-      my_data->ipaddr = ptr;
+      _ipaddr = ptr;
       ptr = strchr(ptr, ':');
       if (ptr == NULL)
          Error_abort0("Malformed DEVICE [ip:user:pass]\n");
       *ptr++ = '\0';
       
-      my_data->user = ptr;
+      _user = ptr;
       ptr = strchr(ptr, ':');
       if (ptr == NULL)
          Error_abort0("Malformed DEVICE [ip:user:pass]\n");
       *ptr++ = '\0';
 
-      my_data->pass = ptr;
+      _pass = ptr;
       if (*ptr == '\0')
          Error_abort0("Malformed DEVICE [ip:user:pass]\n");
    }
 
-   ups->fd = socket(PF_INET, SOCK_DGRAM, 0);
-   if (ups->fd == -1)
+   _ups->fd = socket(PF_INET, SOCK_DGRAM, 0);
+   if (_ups->fd == -1)
       Error_abort1(_("Cannot create socket (%d)\n"), errno);
 
    int enable = 1;
-   setsockopt(ups->fd, SOL_SOCKET, SO_BROADCAST, (const char*)&enable, sizeof(enable));
+   setsockopt(_ups->fd, SOL_SOCKET, SO_BROADCAST, (const char*)&enable, sizeof(enable));
 
    memset(&addr, 0, sizeof(addr));
    addr.sin_family = AF_INET;
    addr.sin_port = htons(PCNET_PORT);
    addr.sin_addr.s_addr = INADDR_ANY;
-   if (bind(ups->fd, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
-      close(ups->fd);
+   if (bind(_ups->fd, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
+      close(_ups->fd);
       Error_abort1(_("Cannot bind socket (%d)\n"), errno);
    }
 
    /* Cheat and fixup CI_UPSMODEL to match PCNET */
-   ups->UPS_Cmd[CI_UPSMODEL] = 0x01;
+   _ups->UPS_Cmd[CI_UPSMODEL] = 0x01;
 
    /* Reset datatime to now */
-   time(&my_data->datatime);
+   time(&_datatime);
 
-   write_unlock(ups);
-   return 1;
+   write_unlock(_ups);
+   return true;
 }
 
-int pcnet_ups_setup(UPSINFO *ups)
+bool PcnetDriver::Close()
 {
-   /* Seems that there is nothing to do. */
-   return 1;
-}
+   write_lock(_ups);
 
-int pcnet_ups_close(UPSINFO *ups)
-{
-   write_lock(ups);
-   
-   close(ups->fd);
-   ups->fd = -1;
+   close(_ups->fd);
+   _ups->fd = -1;
 
-   write_unlock(ups);
-   return 1;
+   write_unlock(_ups);
+   return true;
 }
 
 /*
  * Setup capabilities structure for UPS
  */
-int pcnet_ups_get_capabilities(UPSINFO *ups)
+bool PcnetDriver::GetCapabilities()
 {
    /*
     * Unfortunately, we don't know capabilities until we
     * receive the first broadcast status message.
     */
-   return 1;
+   return true;
 }
 
 /*
@@ -700,10 +674,10 @@ int pcnet_ups_get_capabilities(UPSINFO *ups)
  *
  * This routine is called once when apcupsd is starting
  */
-int pcnet_ups_read_static_data(UPSINFO *ups)
+bool PcnetDriver::ReadStaticData()
 {
    /* All our data gathering is done in pcnet_ups_check_state() */
-   return 1;
+   return true;
 }
 
 /*
@@ -712,9 +686,8 @@ int pcnet_ups_read_static_data(UPSINFO *ups)
  * This routine is called once every N seconds to get
  * a current idea of what the UPS is doing.
  */
-int pcnet_ups_read_volatile_data(UPSINFO *ups)
+bool PcnetDriver::ReadVolatileData()
 {
-   PCNET_DATA *my_data = (PCNET_DATA *)ups->driver_internal_data;
    time_t now, diff;
    
    /*
@@ -723,26 +696,25 @@ int pcnet_ups_read_volatile_data(UPSINFO *ups)
     */
 
    time(&now);
-   diff = now - my_data->datatime;
+   diff = now - _datatime;
 
-   if (ups->is_commlost()) {
+   if (_ups->is_commlost()) {
       if (diff < COMMLOST_TIMEOUT) {
-         generate_event(ups, CMDCOMMOK);
-         ups->clear_commlost();
+         generate_event(_ups, CMDCOMMOK);
+         _ups->clear_commlost();
       }
    } else {
       if (diff >= COMMLOST_TIMEOUT) {
-         generate_event(ups, CMDCOMMFAILURE);
-         ups->set_commlost();
+         generate_event(_ups, CMDCOMMFAILURE);
+         _ups->set_commlost();
       }
    }
 
-   return 1;
+   return true;
 }
 
-int pcnet_ups_kill_power(UPSINFO *ups)
+bool PcnetDriver::KillPower()
 {
-   PCNET_DATA *my_data = (PCNET_DATA *)ups->driver_internal_data;
    struct sockaddr_in addr;
    char data[1024];
    int s, len=0, temp=0;
@@ -753,7 +725,7 @@ int pcnet_ups_kill_power(UPSINFO *ups)
    md5_byte_t digest[16];
 
    /* We cannot perform a killpower without authentication data */
-   if (!my_data->auth) {
+   if (!_auth) {
       Error_abort0("Cannot perform killpower without authentication "
                    "data. Please set ip:user:pass for DEVICE in "
                    "apcupsd.conf.\n");
@@ -764,19 +736,19 @@ int pcnet_ups_kill_power(UPSINFO *ups)
    if (s == -1) {
       Dmsg1(100, "pcnet_ups_kill_power: Unable to open socket: %s\n",
          strerror(errno));
-      return 0;
+      return false;
    }
 
    memset(&addr, 0, sizeof(addr));
    addr.sin_family = AF_INET;
    addr.sin_port = htons(80);
-   inet_pton(AF_INET, my_data->ipaddr, &addr.sin_addr.s_addr);
+   inet_pton(AF_INET, _ipaddr, &addr.sin_addr.s_addr);
 
    if (connect(s, (sockaddr*)&addr, sizeof(addr))) {
       Dmsg3(100, "pcnet_ups_kill_power: Unable to connect to %s:%d: %s\n",
-         my_data->ipaddr, 80, strerror(errno));
+         _ipaddr, 80, strerror(errno));
       close(s);
-      return 0;
+      return false;
    }
 
    /* Send a simple HTTP request for "/macontrol.htm". */
@@ -784,14 +756,14 @@ int pcnet_ups_kill_power(UPSINFO *ups)
       "GET /macontrol.htm HTTP/1.1\r\n"
       "Host: %s\r\n"
       "\r\n",
-      my_data->ipaddr);
+      _ipaddr);
 
    Dmsg1(200, "Request:\n---\n%s---\n", data);
 
    if (send(s, data, strlen(data), 0) != (int)strlen(data)) {
       Dmsg1(100, "pcnet_ups_kill_power: send failed: %s\n", strerror(errno));
       close(s);
-      return 0;
+      return false;
    }
 
    /*
@@ -829,10 +801,10 @@ int pcnet_ups_kill_power(UPSINFO *ups)
     * extract all key/value pairs and ensure the packet 
     * authentication hash is valid.
     */
-   map = auth_and_map_packet(ups, start, strlen(start));
+   map = auth_and_map_packet(start, strlen(start));
    if (map == NULL) {
       close(s);
-      return 0;
+      return false;
    }
 
    /* Check that we got a challenge string. */
@@ -840,7 +812,7 @@ int pcnet_ups_kill_power(UPSINFO *ups)
    if (cs == NULL) {
       Dmsg0(200, "pcnet_ups_kill_power: Missing CS field\n");
       close(s);
-      return 0;
+      return false;
    }
 
    /*
@@ -851,8 +823,8 @@ int pcnet_ups_kill_power(UPSINFO *ups)
    md5_init(&ms);
    md5_append(&ms, (md5_byte_t*)"macontrol1_control_shutdown_1=1,", 32);
    md5_append(&ms, (md5_byte_t*)cs, strlen(cs));
-   md5_append(&ms, (md5_byte_t*)my_data->user, strlen(my_data->user));
-   md5_append(&ms, (md5_byte_t*)my_data->pass, strlen(my_data->pass));
+   md5_append(&ms, (md5_byte_t*)_user, strlen(_user));
+   md5_append(&ms, (md5_byte_t*)_pass, strlen(_pass));
    md5_finish(&ms, digest);
    hash = digest2ascii(digest);
 
@@ -864,41 +836,35 @@ int pcnet_ups_kill_power(UPSINFO *ups)
       "Content-Length: 72\r\n"
       "\r\n"
       "macontrol1%%5fcontrol%%5fshutdown%%5f1=1%%2C%s",
-      my_data->ipaddr, hash);
+      _ipaddr, hash);
 
    Dmsg2(200, "Request: (strlen=%d)\n---\n%s---\n", strlen(data), data);
 
    if (send(s, data, strlen(data), 0) != (int)strlen(data)) {
       Dmsg1(100, "pcnet_ups_kill_power: send failed: %s\n", strerror(errno));
       close(s);
-      return 0;
+      return false;
    }
 
    /* That's it, we're done. */
    close(s);
 
-   return 1;
+   return true;
 }
 
-int pcnet_ups_program_eeprom(UPSINFO *ups, int command, char *data)
-{
-   /* Unsupported */
-   return 0;
-}
-
-int pcnet_ups_entry_point(UPSINFO *ups, int command, void *data)
+bool PcnetDriver::EntryPoint(int command, void *data)
 {
    int temp;
 
    switch (command) {
    case DEVICE_CMD_CHECK_SELFTEST:
       Dmsg0(80, "Checking self test.\n");
-      if (ups->UPS_Cap[CI_WHY_BATT] && ups->lastxfer == XFER_SELFTEST) {
+      if (_ups->UPS_Cap[CI_WHY_BATT] && _ups->lastxfer == XFER_SELFTEST) {
          /*
           * set Self Test start time
           */
-         ups->SelfTest = time(NULL);
-         Dmsg1(80, "Self Test time: %s", ctime(&ups->SelfTest));
+         _ups->SelfTest = time(NULL);
+         Dmsg1(80, "Self Test time: %s", ctime(&_ups->SelfTest));
       }
       break;
 
@@ -910,22 +876,22 @@ int pcnet_ups_entry_point(UPSINFO *ups, int command, void *data)
        * expecting that it should get a status report before then.
        */
 
-      /* Save current ups->wait_time and set it to 12 seconds */
-      temp = ups->wait_time;
-      ups->wait_time = 12;
-      
-      /* Let check_status wait for the result */
-      write_unlock(ups);
-      pcnet_ups_check_state(ups);
-      write_lock(ups);
+      /* Save current _ups->wait_time and set it to 12 seconds */
+      temp = _ups->wait_time;
+      _ups->wait_time = 12;
 
-      /* Restore ups->wait_time */
-      ups->wait_time = temp;
+      /* Let check_status wait for the result */
+      write_unlock(_ups);
+      CheckState();
+      write_lock(_ups);
+
+      /* Restore _ups->wait_time */
+      _ups->wait_time = temp;
       break;
 
    default:
-      return FAILURE;
+      return false;
    }
 
-   return SUCCESS;
+   return true;
 }

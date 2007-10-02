@@ -25,26 +25,20 @@
 #include "apc.h"
 #include "apcsmart.h"
 
-static void change_ups_battery_date(UPSINFO *ups, char *newdate);
-static void change_ups_name(UPSINFO *ups, char *newname);
-static void change_extended(UPSINFO *ups);
-static int change_ups_eeprom_item(UPSINFO *ups, char *title, char cmd,
-   char *setting);
-
 
 /*********************************************************************/
-int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
+bool ApcSmartDriver::ProgramEeprom(int command, char *data)
 {
    char setting[20];
 
-   setup_device(ups);
-   apcsmart_ups_get_capabilities(ups);
+   setup_device(_ups);
+   GetCapabilities();
 
    switch (command) {
    case CI_BATTDAT:               /* change battery date */
-      if (ups->UPS_Cap[CI_BATTDAT]) {
+      if (_ups->UPS_Cap[CI_BATTDAT]) {
          printf(_("Attempting to update UPS battery date ...\n"));
-         change_ups_battery_date(ups, data);
+         change_ups_battery_date(data);
       } else {
          printf(_("UPS battery date configuration not supported by this UPS.\n"));
          return 0;
@@ -52,9 +46,9 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
       break;
 
    case CI_IDEN:
-      if (ups->UPS_Cap[CI_IDEN]) {
+      if (_ups->UPS_Cap[CI_IDEN]) {
          printf(_("Attempting to rename UPS ...\n"));
-         change_ups_name(ups, data);
+         change_ups_name(data);
       } else {
          printf(_("UPS name configuration not supported by this UPS.\n"));
          return 0;
@@ -63,9 +57,9 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
 
       /* SENSITIVITY */
    case CI_SENS:
-      if (ups->UPS_Cap[CI_SENS]) {
+      if (_ups->UPS_Cap[CI_SENS]) {
          asnprintf(setting, sizeof(setting), "%.1s", data);
-         change_ups_eeprom_item(ups, "sensitivity", ups->UPS_Cmd[CI_SENS], setting);
+         change_ups_eeprom_item("sensitivity", _ups->UPS_Cmd[CI_SENS], setting);
       } else {
          printf(_("UPS sensitivity configuration not supported by this UPS.\n"));
          return 0;
@@ -74,9 +68,9 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
 
       /* ALARM_STATUS */
    case CI_DALARM:
-      if (ups->UPS_Cap[CI_DALARM]) {
+      if (_ups->UPS_Cap[CI_DALARM]) {
          asnprintf(setting, sizeof(setting), "%.1s", data);
-         change_ups_eeprom_item(ups, "alarm status", ups->UPS_Cmd[CI_DALARM],
+         change_ups_eeprom_item("alarm status", _ups->UPS_Cmd[CI_DALARM],
             setting);
       } else {
          printf(_("UPS alarm status configuration not supported by this UPS.\n"));
@@ -86,10 +80,10 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
 
       /* LOWBATT_SHUTDOWN_LEVEL */
    case CI_DLBATT:
-      if (ups->UPS_Cap[CI_DLBATT]) {
+      if (_ups->UPS_Cap[CI_DLBATT]) {
          asnprintf(setting, sizeof(setting), "%02d", (int)atoi(data));
-         change_ups_eeprom_item(ups, "low battery warning delay",
-            ups->UPS_Cmd[CI_DLBATT], setting);
+         change_ups_eeprom_item("low battery warning delay",
+            _ups->UPS_Cmd[CI_DLBATT], setting);
       } else {
          printf(
             _("UPS low battery warning configuration not supported by this UPS.\n"));
@@ -99,9 +93,9 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
 
       /* WAKEUP_DELAY */
    case CI_DWAKE:
-      if (ups->UPS_Cap[CI_DWAKE]) {
+      if (_ups->UPS_Cap[CI_DWAKE]) {
          asnprintf(setting, sizeof(setting), "%03d", (int)atoi(data));
-         change_ups_eeprom_item(ups, "wakeup delay", ups->UPS_Cmd[CI_DWAKE],
+         change_ups_eeprom_item("wakeup delay", _ups->UPS_Cmd[CI_DWAKE],
             setting);
       } else {
          printf(_("UPS wakeup delay configuration not supported by this UPS.\n"));
@@ -112,9 +106,9 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
 
       /* SLEEP_DELAY */
    case CI_DSHUTD:
-      if (ups->UPS_Cap[CI_DSHUTD]) {
+      if (_ups->UPS_Cap[CI_DSHUTD]) {
          asnprintf(setting, sizeof(setting), "%03d", (int)atoi(data));
-         change_ups_eeprom_item(ups, "shutdown delay", ups->UPS_Cmd[CI_DSHUTD],
+         change_ups_eeprom_item("shutdown delay", _ups->UPS_Cmd[CI_DSHUTD],
             setting);
       } else {
          printf(_("UPS shutdown delay configuration not supported by this UPS.\n"));
@@ -124,10 +118,10 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
 
       /* LOW_TRANSFER_LEVEL */
    case CI_LTRANS:
-      if (ups->UPS_Cap[CI_LTRANS]) {
+      if (_ups->UPS_Cap[CI_LTRANS]) {
          asnprintf(setting, sizeof(setting), "%03d", (int)atoi(data));
-         change_ups_eeprom_item(ups, "lower transfer voltage",
-            ups->UPS_Cmd[CI_LTRANS], setting);
+         change_ups_eeprom_item("lower transfer voltage",
+            _ups->UPS_Cmd[CI_LTRANS], setting);
       } else {
          printf(
             _("UPS low transfer voltage configuration not supported by this UPS.\n"));
@@ -137,10 +131,10 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
 
       /* HIGH_TRANSFER_LEVEL */
    case CI_HTRANS:
-      if (ups->UPS_Cap[CI_HTRANS]) {
+      if (_ups->UPS_Cap[CI_HTRANS]) {
          asnprintf(setting, sizeof(setting), "%03d", (int)atoi(data));
-         change_ups_eeprom_item(ups, "high transfer voltage",
-            ups->UPS_Cmd[CI_HTRANS], setting);
+         change_ups_eeprom_item("high transfer voltage",
+            _ups->UPS_Cmd[CI_HTRANS], setting);
       } else {
          printf(
             _("UPS high transfer voltage configuration not supported by this UPS.\n"));
@@ -150,10 +144,10 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
 
       /* UPS_BATT_CAP_RETURN */
    case CI_RETPCT:
-      if (ups->UPS_Cap[CI_RETPCT]) {
+      if (_ups->UPS_Cap[CI_RETPCT]) {
          asnprintf(setting, sizeof(setting), "%02d", (int)atoi(data));
-         change_ups_eeprom_item(ups, "return threshold percent",
-            ups->UPS_Cmd[CI_RETPCT], setting);
+         change_ups_eeprom_item("return threshold percent",
+            _ups->UPS_Cmd[CI_RETPCT], setting);
       } else {
          printf(
             _("UPS return threshold configuration not supported by this UPS.\n"));
@@ -163,14 +157,14 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
 
       /* UPS_SELFTEST */
    case CI_STESTI:
-      if (ups->UPS_Cap[CI_STESTI]) {
+      if (_ups->UPS_Cap[CI_STESTI]) {
          asnprintf(setting, sizeof(setting), "%.3s", data);
          /* Make sure "ON" is 3 characters */
          if (setting[2] == 0) {
             setting[2] = ' ';
             setting[3] = 0;
          }
-         change_ups_eeprom_item(ups, "self test interval", ups->UPS_Cmd[CI_STESTI],
+         change_ups_eeprom_item("self test interval", _ups->UPS_Cmd[CI_STESTI],
             setting);
       } else {
          printf(
@@ -181,10 +175,10 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
 
       /* OUTPUT_VOLTAGE */
    case CI_NOMOUTV:
-      if (ups->UPS_Cap[CI_NOMOUTV]) {
+      if (_ups->UPS_Cap[CI_NOMOUTV]) {
          asnprintf(setting, sizeof(setting), "%03d", (int)atoi(data));
-         change_ups_eeprom_item(ups, "output voltage on batteries",
-            ups->UPS_Cmd[CI_NOMOUTV], setting);
+         change_ups_eeprom_item("output voltage on batteries",
+            _ups->UPS_Cmd[CI_NOMOUTV], setting);
       } else {
          printf(
             _("UPS output voltage on batteries configuration not supported by this UPS.\n"));
@@ -196,14 +190,14 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
    case -1:                       /* old style from .conf file */
 
       printf(_("Attempting to configure UPS ...\n"));
-      change_extended(ups);        /* set new values in UPS */
+      change_extended();        /* set new values in UPS */
 
       printf("\nReading updated UPS configuration ...\n\n");
-      device_read_volatile_data(ups);
-      device_read_static_data(ups);
+      ReadVolatileData();
+      ReadStaticData();
 
       /* Print report of status */
-      output_status(ups, 0, stat_open, stat_print, stat_close);
+      output_status(_ups, 0, stat_open, stat_print, stat_close);
       break;
 
    default:
@@ -216,13 +210,13 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
 }
 
 /*********************************************************************/
-static void change_ups_name(UPSINFO *ups, char *newname)
+void ApcSmartDriver::change_ups_name(char *newname)
 {
    char *n;
    char response[32];
    char name[10];
-   char a = ups->UPS_Cmd[CI_CYCLE_EPROM];
-   char c = ups->UPS_Cmd[CI_IDEN];
+   char a = _ups->UPS_Cmd[CI_CYCLE_EPROM];
+   char c = _ups->UPS_Cmd[CI_IDEN];
    int i;
    int j = strlen(newname);
 
@@ -244,45 +238,45 @@ static void change_ups_name(UPSINFO *ups, char *newname)
    }
 
    /* Ask for name */
-   write(ups->fd, &c, 1);          /* c = 'c' */
-   getline(response, sizeof(response), ups);
+   write(_ups->fd, &c, 1);          /* c = 'c' */
+   getline(response, sizeof(response));
    fprintf(stderr, "The old UPS name is: %s\n", response);
 
    /* Tell UPS we will change name */
-   write(ups->fd, &a, 1);          /* a = '-' */
+   write(_ups->fd, &a, 1);          /* a = '-' */
    sleep(1);
 
    n = name;
    for (i = 0; i < 8; i++) {
-      write(ups->fd, n++, 1);
+      write(_ups->fd, n++, 1);
       sleep(1);
    }
 
    /* Expect OK after successful name change */
    *response = 0;
-   getline(response, sizeof(response), ups);
+   getline(response, sizeof(response));
    if (strcmp(response, "OK") != 0) {
       fprintf(stderr, "\nError changing UPS name\n");
    }
 
-   ups->upsname[0] = '\0';
-   smart_poll(ups->UPS_Cmd[CI_IDEN], ups);
-   astrncpy(ups->upsname, smart_poll(ups->UPS_Cmd[CI_IDEN], ups),
-      sizeof(ups->upsname));
+   _ups->upsname[0] = '\0';
+   smart_poll(_ups->UPS_Cmd[CI_IDEN]);
+   astrncpy(_ups->upsname, smart_poll(_ups->UPS_Cmd[CI_IDEN]),
+      sizeof(_ups->upsname));
 
-   fprintf(stderr, "The new UPS name is: %s\n", ups->upsname);
+   fprintf(stderr, "The new UPS name is: %s\n", _ups->upsname);
 }
 
 /*
  * Update date battery replaced
  */
-static void change_ups_battery_date(UPSINFO *ups, char *newdate)
+void ApcSmartDriver::change_ups_battery_date(char *newdate)
 {
    char *n;
    char response[32];
    char battdat[9];
-   char a = ups->UPS_Cmd[CI_CYCLE_EPROM];
-   char c = ups->UPS_Cmd[CI_BATTDAT];
+   char a = _ups->UPS_Cmd[CI_CYCLE_EPROM];
+   char c = _ups->UPS_Cmd[CI_BATTDAT];
    int i;
    int j = strlen(newdate);
 
@@ -296,50 +290,49 @@ static void change_ups_battery_date(UPSINFO *ups, char *newdate)
    astrncpy(battdat, newdate, sizeof(battdat));
 
    /* Ask for battdat */
-   write(ups->fd, &c, 1);          /* c = 'x' */
-   getline(response, sizeof(response), ups);
+   write(_ups->fd, &c, 1);          /* c = 'x' */
+   getline(response, sizeof(response));
    fprintf(stderr, "The old UPS battery date is: %s\n", response);
 
    /* Tell UPS we will change battdat */
-   write(ups->fd, &a, 1);          /* a = '-' */
+   write(_ups->fd, &a, 1);          /* a = '-' */
    sleep(1);
 
    n = battdat;
    for (i = 0; i < 8; i++) {
-      write(ups->fd, n++, 1);
+      write(_ups->fd, n++, 1);
       sleep(1);
    }
 
    /* Expect OK after successful battdat change */
    *response = 0;
-   getline(response, sizeof(response), ups);
+   getline(response, sizeof(response));
    if (strcmp(response, "OK") != 0) {
       fprintf(stderr, "\nError changing UPS battery date\n");
    }
 
-   ups->battdat[0] = '\0';
-   smart_poll(ups->UPS_Cmd[CI_BATTDAT], ups);
-   astrncpy(ups->battdat, smart_poll(ups->UPS_Cmd[CI_BATTDAT], ups),
-      sizeof(ups->battdat));
+   _ups->battdat[0] = '\0';
+   smart_poll(_ups->UPS_Cmd[CI_BATTDAT]);
+   astrncpy(_ups->battdat, smart_poll(_ups->UPS_Cmd[CI_BATTDAT]),
+      sizeof(_ups->battdat));
 
-   fprintf(stderr, "The new UPS battery date is: %s\n", ups->battdat);
+   fprintf(stderr, "The new UPS battery date is: %s\n", _ups->battdat);
 }
 
 /*********************************************************************/
-static int change_ups_eeprom_item(UPSINFO *ups, char *title, char cmd,
-   char *setting)
+int ApcSmartDriver::change_ups_eeprom_item(char *title, char cmd, char *setting)
 {
    char response[32];
    char response1[32];
    char oldvalue[32];
    char lastvalue[32];
    char allvalues[256];
-   char a = ups->UPS_Cmd[CI_CYCLE_EPROM];
+   char a = _ups->UPS_Cmd[CI_CYCLE_EPROM];
    int i;
 
    /* Ask for old value */
-   write(ups->fd, &cmd, 1);
-   if (getline(oldvalue, sizeof(oldvalue), ups) == FAILURE) {
+   write(_ups->fd, &cmd, 1);
+   if (getline(oldvalue, sizeof(oldvalue)) == FAILURE) {
       fprintf(stderr, "Could not get old value of %s.\n", title);
       return FAILURE;
    }
@@ -355,9 +348,9 @@ static int change_ups_eeprom_item(UPSINFO *ups, char *title, char cmd,
    astrncpy(lastvalue, oldvalue, sizeof(lastvalue));
 
    /* Try a second time to ensure that it is a stable value */
-   write(ups->fd, &cmd, 1);
+   write(_ups->fd, &cmd, 1);
    *response = 0;
-   getline(response, sizeof(response), ups);
+   getline(response, sizeof(response));
    if (strcmp(oldvalue, response) != 0) {
       fprintf(stderr, "\nEEPROM value of %s is not stable\n", title);
       return FAILURE;
@@ -368,15 +361,15 @@ static int change_ups_eeprom_item(UPSINFO *ups, char *title, char cmd,
     * to the UPS MUST be to query the old value.   
     */
    for (i = 0; i < 10; i++) {
-      write(ups->fd, &cmd, 1);
-      getline(response1, sizeof(response1), ups);
+      write(_ups->fd, &cmd, 1);
+      getline(response1, sizeof(response1));
 
       /* Tell UPS to cycle to next value */
-      write(ups->fd, &a, 1);       /* a = '-' */
+      write(_ups->fd, &a, 1);       /* a = '-' */
 
       /* Expect OK after successful change */
       *response = 0;
-      getline(response, sizeof(response), ups);
+      getline(response, sizeof(response));
       if (strcmp(response, "OK") != 0) {
          fprintf(stderr, "\nError changing UPS %s\n", title);
          fprintf(stderr, "Got %s instead of OK\n\n", response);
@@ -385,15 +378,15 @@ static int change_ups_eeprom_item(UPSINFO *ups, char *title, char cmd,
       }
 
       /* get cycled value */
-      write(ups->fd, &cmd, 1);
-      getline(response1, sizeof(response1), ups);
+      write(_ups->fd, &cmd, 1);
+      getline(response1, sizeof(response1));
 
       /* get cycled value again */
-      write(ups->fd, &cmd, 1);
-      if (getline(response, sizeof(response), ups) == FAILURE ||
+      write(_ups->fd, &cmd, 1);
+      if (getline(response, sizeof(response)) == FAILURE ||
          strcmp(response1, response) != 0) {
          fprintf(stderr, "Error cycling values.\n");
-         getline(response, sizeof(response), ups);      /* eat any garbage */
+         getline(response, sizeof(response));      /* eat any garbage */
          return FAILURE;
       }
       if (strcmp(setting, response) == 0) {
@@ -419,7 +412,7 @@ static int change_ups_eeprom_item(UPSINFO *ups, char *title, char cmd,
 
    fprintf(stderr, "Unable to change %s to: %s\n", title, setting);
    fprintf(stderr, "Permitted values are: %s\n", allvalues);
-   getline(response, sizeof(response), ups);    /* eat any garbage */
+   getline(response, sizeof(response));    /* eat any garbage */
 
    return FAILURE;
 }
@@ -428,11 +421,11 @@ static int change_ups_eeprom_item(UPSINFO *ups, char *title, char cmd,
 /*
  * Set new values in EEPROM memmory.  Change the UPS EEPROM.
  */
-static void change_extended(UPSINFO *ups)
+void ApcSmartDriver::change_extended()
 {
    char setting[20];
 
-   apcsmart_ups_get_capabilities(ups);
+   GetCapabilities();
 
    /*
     * Note, a value of -1 in the variable at the beginning
@@ -442,74 +435,74 @@ static void change_extended(UPSINFO *ups)
     */
 
    /* SENSITIVITY */
-   if (ups->UPS_Cap[CI_SENS] && strcmp(ups->sensitivity, "-1") != 0) {
-      asnprintf(setting, sizeof(setting), "%.1s", ups->sensitivity);
-      change_ups_eeprom_item(ups, "sensitivity", ups->UPS_Cmd[CI_SENS], setting);
+   if (_ups->UPS_Cap[CI_SENS] && strcmp(_ups->sensitivity, "-1") != 0) {
+      asnprintf(setting, sizeof(setting), "%.1s", _ups->sensitivity);
+      change_ups_eeprom_item("sensitivity", _ups->UPS_Cmd[CI_SENS], setting);
    }
 
    /* WAKEUP_DELAY */
-   if (ups->UPS_Cap[CI_DWAKE] && ups->dwake != -1) {
-      asnprintf(setting, sizeof(setting), "%03d", (int)ups->dwake);
-      change_ups_eeprom_item(ups, "wakeup delay", ups->UPS_Cmd[CI_DWAKE], setting);
+   if (_ups->UPS_Cap[CI_DWAKE] && _ups->dwake != -1) {
+      asnprintf(setting, sizeof(setting), "%03d", (int)_ups->dwake);
+      change_ups_eeprom_item("wakeup delay", _ups->UPS_Cmd[CI_DWAKE], setting);
    }
 
    /* SLEEP_DELAY */
-   if (ups->UPS_Cap[CI_DSHUTD] && ups->dshutd != -1) {
-      asnprintf(setting, sizeof(setting), "%03d", (int)ups->dshutd);
-      change_ups_eeprom_item(ups, "shutdown delay", ups->UPS_Cmd[CI_DSHUTD],
+   if (_ups->UPS_Cap[CI_DSHUTD] && _ups->dshutd != -1) {
+      asnprintf(setting, sizeof(setting), "%03d", (int)_ups->dshutd);
+      change_ups_eeprom_item("shutdown delay", _ups->UPS_Cmd[CI_DSHUTD],
          setting);
    }
 
    /* LOW_TRANSFER_LEVEL */
-   if (ups->UPS_Cap[CI_LTRANS] && ups->lotrans != -1) {
-      asnprintf(setting, sizeof(setting), "%03d", (int)ups->lotrans);
-      change_ups_eeprom_item(ups, "lower transfer voltage",
-         ups->UPS_Cmd[CI_LTRANS], setting);
+   if (_ups->UPS_Cap[CI_LTRANS] && _ups->lotrans != -1) {
+      asnprintf(setting, sizeof(setting), "%03d", (int)_ups->lotrans);
+      change_ups_eeprom_item("lower transfer voltage",
+         _ups->UPS_Cmd[CI_LTRANS], setting);
    }
 
    /* HIGH_TRANSFER_LEVEL */
-   if (ups->UPS_Cap[CI_HTRANS] && ups->hitrans != -1) {
-      asnprintf(setting, sizeof(setting), "%03d", (int)ups->hitrans);
-      change_ups_eeprom_item(ups, "upper transfer voltage",
-         ups->UPS_Cmd[CI_HTRANS], setting);
+   if (_ups->UPS_Cap[CI_HTRANS] && _ups->hitrans != -1) {
+      asnprintf(setting, sizeof(setting), "%03d", (int)_ups->hitrans);
+      change_ups_eeprom_item("upper transfer voltage",
+         _ups->UPS_Cmd[CI_HTRANS], setting);
    }
 
    /* UPS_BATT_CAP_RETURN */
-   if (ups->UPS_Cap[CI_RETPCT] && ups->rtnpct != -1) {
-      asnprintf(setting, sizeof(setting), "%02d", (int)ups->rtnpct);
-      change_ups_eeprom_item(ups, "return threshold percent",
-         ups->UPS_Cmd[CI_RETPCT], setting);
+   if (_ups->UPS_Cap[CI_RETPCT] && _ups->rtnpct != -1) {
+      asnprintf(setting, sizeof(setting), "%02d", (int)_ups->rtnpct);
+      change_ups_eeprom_item("return threshold percent",
+         _ups->UPS_Cmd[CI_RETPCT], setting);
    }
 
    /* ALARM_STATUS */
-   if (ups->UPS_Cap[CI_DALARM] && strcmp(ups->beepstate, "-1") != 0) {
-      asnprintf(setting, sizeof(setting), "%.1s", ups->beepstate);
-      change_ups_eeprom_item(ups, "alarm delay", ups->UPS_Cmd[CI_DALARM], setting);
+   if (_ups->UPS_Cap[CI_DALARM] && strcmp(_ups->beepstate, "-1") != 0) {
+      asnprintf(setting, sizeof(setting), "%.1s", _ups->beepstate);
+      change_ups_eeprom_item("alarm delay", _ups->UPS_Cmd[CI_DALARM], setting);
    }
 
    /* LOWBATT_SHUTDOWN_LEVEL */
-   if (ups->UPS_Cap[CI_DLBATT] && ups->dlowbatt != -1) {
-      asnprintf(setting, sizeof(setting), "%02d", (int)ups->dlowbatt);
-      change_ups_eeprom_item(ups, "low battery warning delay",
-         ups->UPS_Cmd[CI_DLBATT], setting);
+   if (_ups->UPS_Cap[CI_DLBATT] && _ups->dlowbatt != -1) {
+      asnprintf(setting, sizeof(setting), "%02d", (int)_ups->dlowbatt);
+      change_ups_eeprom_item("low battery warning delay",
+         _ups->UPS_Cmd[CI_DLBATT], setting);
    }
 
    /* UPS_SELFTEST */
-   if (ups->UPS_Cap[CI_STESTI] && strcmp(ups->selftest, "-1") != 0) {
-      asnprintf(setting, sizeof(setting), "%.3s", ups->selftest);
+   if (_ups->UPS_Cap[CI_STESTI] && strcmp(_ups->selftest, "-1") != 0) {
+      asnprintf(setting, sizeof(setting), "%.3s", _ups->selftest);
       /* Make sure "ON" is 3 characters */
       if (setting[2] == 0) {
          setting[2] = ' ';
          setting[3] = 0;
       }
       change_ups_eeprom_item(
-         ups, "self test interval", ups->UPS_Cmd[CI_STESTI], setting);
+         "self test interval", _ups->UPS_Cmd[CI_STESTI], setting);
    }
 
    /* OUTPUT_VOLTAGE */
-   if (ups->UPS_Cap[CI_NOMOUTV] && ups->NomOutputVoltage != -1) {
-      asnprintf(setting, sizeof(setting), "%03d", (int)ups->NomOutputVoltage);
-      change_ups_eeprom_item(ups, "output voltage on batteries",
-         ups->UPS_Cmd[CI_NOMOUTV], setting);
+   if (_ups->UPS_Cap[CI_NOMOUTV] && _ups->NomOutputVoltage != -1) {
+      asnprintf(setting, sizeof(setting), "%03d", (int)_ups->NomOutputVoltage);
+      change_ups_eeprom_item("output voltage on batteries",
+         _ups->UPS_Cmd[CI_NOMOUTV], setting);
    }
 }

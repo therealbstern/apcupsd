@@ -472,3 +472,6 @@
 
 #undef HAVE_NANOSLEEP
 #undef int32_t
+#undef HAVE_LINUX_USB
+#undef HAVE_BSD_USB
+#undef HAVE_GENERIC_USB
