@@ -367,4 +367,9 @@
 
 #define HAVE_SOCKLEN_T 1
 
+/* Choose USB driver */
+#undef HAVE_LINUX_USB
+#define HAVE_GENERIC_USB
+#undef HAVE_BSD_USB
+
 #endif /* __MINGWNCONFIG_H */

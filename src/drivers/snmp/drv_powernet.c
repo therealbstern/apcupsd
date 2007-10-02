@@ -25,17 +25,14 @@
 
 #include "apc.h"
 #include "snmp.h"
-#include "snmp_private.h"
 
-static int powernet_check_comm_lost(UPSINFO *ups)
+bool SnmpDriver::powernet_check_comm_lost()
 {
    struct timeval now;
    static struct timeval prev;
-   struct snmp_ups_internal_data *Sid =
-      (struct snmp_ups_internal_data *)ups->driver_internal_data;
-   struct snmp_session *s = &Sid->session;
-   powernet_mib_t *data = (powernet_mib_t *)Sid->MIB;
-   int ret = 1;
+   struct snmp_session *s = &_session;
+   powernet_mib_t *data = (powernet_mib_t *)_MIB;
+   bool ret = true;
 
    /*
     * Check the Ethernet COMMLOST first, then check the
@@ -45,26 +42,26 @@ static int powernet_check_comm_lost(UPSINFO *ups)
    if (powernet_mib_mgr_get_upsComm(s, &(data->upsComm)) < 0 ||
        (data->upsComm && data->upsComm->__upsCommStatus == 2)) {
 
-      if (!ups->is_commlost()) {
-         generate_event(ups, CMDCOMMFAILURE);
-         ups->set_commlost();
+      if (!_ups->is_commlost()) {
+         generate_event(_ups, CMDCOMMFAILURE);
+         _ups->set_commlost();
          gettimeofday(&prev, NULL);
       }
 
       /* Log an event every 10 minutes */
       gettimeofday(&now, NULL);
       if (TV_DIFF_MS(prev, now) >= 10*60*1000) {
-         log_event(ups, event_msg[CMDCOMMFAILURE].level,
+         log_event(_ups, event_msg[CMDCOMMFAILURE].level,
             event_msg[CMDCOMMFAILURE].msg);
          prev = now;
       }
 
-      ret = 0;
+      ret = false;
    }
-   else if (ups->is_commlost())
+   else if (_ups->is_commlost())
    {
-      generate_event(ups, CMDCOMMOK);
-      ups->clear_commlost();
+      generate_event(_ups, CMDCOMMOK);
+      _ups->clear_commlost();
    }
 
    if (data->upsComm)
@@ -74,14 +71,12 @@ static int powernet_check_comm_lost(UPSINFO *ups)
 }
 
 
-int powernet_snmp_kill_ups_power(UPSINFO *ups)
+bool SnmpDriver::powernet_snmp_kill_ups_power()
 {
    /* Was 1} change submitted by Kastus Shchuka (kastus@lists.sourceforge.net) 10Dec03 */
    oid upsBasicControlConserveBattery[] =
       { 1, 3, 6, 1, 4, 1, 318, 1, 1, 1, 6, 1, 1, 0 };
-   struct snmp_ups_internal_data *Sid =
-      (struct snmp_ups_internal_data *)ups->driver_internal_data;
-   struct snmp_session *s = &Sid->session;
+   struct snmp_session *s = &_session;
    struct snmp_session *peer;
    struct snmp_pdu *request, *response;
    int status;
@@ -98,26 +93,26 @@ int powernet_snmp_kill_ups_power(UPSINFO *ups)
     */
    if (snmp_add_var(request, upsBasicControlConserveBattery,
          sizeof(upsBasicControlConserveBattery) / sizeof(oid), 'i', "2")) {
-      return 0;
+      return false;
    }
 
    peer = snmp_open(s);
 
    if (!peer) {
       Dmsg0(0, "Can not open the SNMP connection.\n");
-      return 0;
+      return false;
    }
 
    status = snmp_synch_response(peer, request, &response);
 
    if (status != STAT_SUCCESS) {
       Dmsg0(0, "Unable to communicate with UPS.\n");
-      return 0;
+      return false;
    }
 
    if (response->errstat != SNMP_ERR_NOERROR) {
       Dmsg1(0, "Unable to kill UPS power: can not set SNMP variable (%d).\n", response->errstat);
-      return 0;
+      return false;
    }
 
    if (response)
@@ -125,18 +120,16 @@ int powernet_snmp_kill_ups_power(UPSINFO *ups)
 
    snmp_close(peer);
 
-   return 1;
+   return true;
 }
 
-int powernet_snmp_ups_get_capabilities(UPSINFO *ups)
+bool SnmpDriver::powernet_snmp_ups_get_capabilities()
 {
-   int i = 0;
-
    /*
     * Assume that an UPS with Web/SNMP card has all the capabilities,
     * minus a few.
     */
-   for (i = 0; i <= CI_MAX_CAPS; i++)
+   for (int i = 0; i <= CI_MAX_CAPS; i++)
    {
       if (i != CI_NOMBATTV &&
           i != CI_HUMID    &&
@@ -146,25 +139,23 @@ int powernet_snmp_ups_get_capabilities(UPSINFO *ups)
           i != CI_REG1     &&
           i != CI_REG2     &&
           i != CI_REG3)
-         ups->UPS_Cap[i] = TRUE;
+         _ups->UPS_Cap[i] = TRUE;
    }
 
-   if (powernet_check_comm_lost(ups) == 0)
-      return 0;
+   if (powernet_check_comm_lost() == 0)
+      return false;
 
-   return 1;
+   return true;
 }
 
 
-int powernet_snmp_ups_read_static_data(UPSINFO *ups)
+bool SnmpDriver::powernet_snmp_ups_read_static_data()
 {
-   struct snmp_ups_internal_data *Sid = 
-      (struct snmp_ups_internal_data *)ups->driver_internal_data;
-   struct snmp_session *s = &Sid->session;
-   powernet_mib_t *data = (powernet_mib_t *)Sid->MIB;
+   struct snmp_session *s = &_session;
+   powernet_mib_t *data = (powernet_mib_t *)_MIB;
 
-   if (powernet_check_comm_lost(ups) == 0)
-      return 0;
+   if (powernet_check_comm_lost() == 0)
+      return false;
 
    data->upsBasicIdent = NULL;
    powernet_mib_mgr_get_upsBasicIdent(s, &(data->upsBasicIdent));
@@ -193,59 +184,59 @@ int powernet_snmp_ups_read_static_data(UPSINFO *ups)
    data->upsAdvBattery = NULL;
    powernet_mib_mgr_get_upsAdvBattery(s, &(data->upsAdvBattery));
    if (data->upsAdvBattery) {
-      ups->extbatts = data->upsAdvBattery->__upsAdvBatteryNumOfBattPacks;
-      ups->badbatts = data->upsAdvBattery->__upsAdvBatteryNumOfBadBattPacks;
+      _ups->extbatts = data->upsAdvBattery->__upsAdvBatteryNumOfBattPacks;
+      _ups->badbatts = data->upsAdvBattery->__upsAdvBatteryNumOfBadBattPacks;
       free(data->upsAdvBattery);
    }
 
    data->upsAdvConfig = NULL;
    powernet_mib_mgr_get_upsAdvConfig(s, &(data->upsAdvConfig));
    if (data->upsAdvConfig) {
-      ups->NomOutputVoltage = data->upsAdvConfig->__upsAdvConfigRatedOutputVoltage;
-      ups->hitrans = data->upsAdvConfig->__upsAdvConfigHighTransferVolt;
-      ups->lotrans = data->upsAdvConfig->__upsAdvConfigLowTransferVolt;
+      _ups->NomOutputVoltage = data->upsAdvConfig->__upsAdvConfigRatedOutputVoltage;
+      _ups->hitrans = data->upsAdvConfig->__upsAdvConfigHighTransferVolt;
+      _ups->lotrans = data->upsAdvConfig->__upsAdvConfigLowTransferVolt;
       switch (data->upsAdvConfig->__upsAdvConfigAlarm) {
       case 1:
          if (data->upsAdvConfig->__upsAdvConfigAlarmTimer / 100 < 30)
-            astrncpy(ups->beepstate, "0 Seconds", sizeof(ups->beepstate));
+            astrncpy(_ups->beepstate, "0 Seconds", sizeof(_ups->beepstate));
          else
-            astrncpy(ups->beepstate, "Timed", sizeof(ups->beepstate));
+            astrncpy(_ups->beepstate, "Timed", sizeof(_ups->beepstate));
          break;
       case 2:
-         astrncpy(ups->beepstate, "LowBatt", sizeof(ups->beepstate));
+         astrncpy(_ups->beepstate, "LowBatt", sizeof(_ups->beepstate));
          break;
       case 3:
-         astrncpy(ups->beepstate, "NoAlarm", sizeof(ups->beepstate));
+         astrncpy(_ups->beepstate, "NoAlarm", sizeof(_ups->beepstate));
          break;
       default:
-         astrncpy(ups->beepstate, "Timed", sizeof(ups->beepstate));
+         astrncpy(_ups->beepstate, "Timed", sizeof(_ups->beepstate));
          break;
       }
 
-      ups->rtnpct = data->upsAdvConfig->__upsAdvConfigMinReturnCapacity;
+      _ups->rtnpct = data->upsAdvConfig->__upsAdvConfigMinReturnCapacity;
 
       switch (data->upsAdvConfig->__upsAdvConfigSensitivity) {
       case 1:
-         astrncpy(ups->sensitivity, "Auto", sizeof(ups->sensitivity));
+         astrncpy(_ups->sensitivity, "Auto", sizeof(_ups->sensitivity));
          break;
       case 2:
-         astrncpy(ups->sensitivity, "Low", sizeof(ups->sensitivity));
+         astrncpy(_ups->sensitivity, "Low", sizeof(_ups->sensitivity));
          break;
       case 3:
-         astrncpy(ups->sensitivity, "Medium", sizeof(ups->sensitivity));
+         astrncpy(_ups->sensitivity, "Medium", sizeof(_ups->sensitivity));
          break;
       case 4:
-         astrncpy(ups->sensitivity, "High", sizeof(ups->sensitivity));
+         astrncpy(_ups->sensitivity, "High", sizeof(_ups->sensitivity));
          break;
       default:
-         astrncpy(ups->sensitivity, "Unknown", sizeof(ups->sensitivity));
+         astrncpy(_ups->sensitivity, "Unknown", sizeof(_ups->sensitivity));
          break;
       }
 
       /* Data in Timeticks (1/100th sec). */
-      ups->dlowbatt = data->upsAdvConfig->__upsAdvConfigLowBatteryRunTime / 6000;
-      ups->dwake = data->upsAdvConfig->__upsAdvConfigReturnDelay / 100;
-      ups->dshutd = data->upsAdvConfig->__upsAdvConfigShutoffDelay / 100;
+      _ups->dlowbatt = data->upsAdvConfig->__upsAdvConfigLowBatteryRunTime / 6000;
+      _ups->dwake = data->upsAdvConfig->__upsAdvConfigReturnDelay / 100;
+      _ups->dshutd = data->upsAdvConfig->__upsAdvConfigShutoffDelay / 100;
       free(data->upsAdvConfig);
    }
 
@@ -254,69 +245,67 @@ int powernet_snmp_ups_read_static_data(UPSINFO *ups)
    if (data->upsAdvTest) {
       switch (data->upsAdvTest->__upsAdvTestDiagnosticSchedule) {
       case 1:
-         astrncpy(ups->selftest, "unknown", sizeof(ups->selftest));
+         astrncpy(_ups->selftest, "unknown", sizeof(_ups->selftest));
          break;
       case 2:
-         astrncpy(ups->selftest, "biweekly", sizeof(ups->selftest));
+         astrncpy(_ups->selftest, "biweekly", sizeof(_ups->selftest));
          break;
       case 3:
-         astrncpy(ups->selftest, "weekly", sizeof(ups->selftest));
+         astrncpy(_ups->selftest, "weekly", sizeof(_ups->selftest));
          break;
       case 4:
-         astrncpy(ups->selftest, "atTurnOn", sizeof(ups->selftest));
+         astrncpy(_ups->selftest, "atTurnOn", sizeof(_ups->selftest));
          break;
       case 5:
-         astrncpy(ups->selftest, "never", sizeof(ups->selftest));
+         astrncpy(_ups->selftest, "never", sizeof(_ups->selftest));
          break;
       default:
-         astrncpy(ups->selftest, "unknown", sizeof(ups->selftest));
+         astrncpy(_ups->selftest, "unknown", sizeof(_ups->selftest));
          break;
       }
 
       switch (data->upsAdvTest->__upsAdvTestDiagnosticsResults) {
       case 1:  /* Passed */
-         ups->testresult = TEST_PASSED;
+         _ups->testresult = TEST_PASSED;
          break;
       case 2:  /* Failed */
       case 3:  /* Invalid test */
-         ups->testresult = TEST_FAILED;
+         _ups->testresult = TEST_FAILED;
          break;
       case 4:  /* Test in progress */
-         ups->testresult = TEST_INPROGRESS;
+         _ups->testresult = TEST_INPROGRESS;
          break;
       default:
-         ups->testresult = TEST_UNKNOWN;
+         _ups->testresult = TEST_UNKNOWN;
          break;
       }
 
       free(data->upsAdvTest);
    }
 
-   return 1;
+   return true;
 }
 
-int powernet_snmp_ups_read_volatile_data(UPSINFO *ups)
+bool SnmpDriver::powernet_snmp_ups_read_volatile_data()
 {
-   struct snmp_ups_internal_data *Sid =
-      (struct snmp_ups_internal_data *)ups->driver_internal_data;
-   struct snmp_session *s = &Sid->session;
-   powernet_mib_t *data = (powernet_mib_t *)Sid->MIB;
+   struct snmp_session *s = &_session;
+   powernet_mib_t *data = (powernet_mib_t *)_MIB;
 
-   if (powernet_check_comm_lost(ups) == 0)
-      return 0;
+   if (powernet_check_comm_lost() == 0)
+      return false;
 
    data->upsBasicBattery = NULL;
    powernet_mib_mgr_get_upsBasicBattery(s, &(data->upsBasicBattery));
    if (data->upsBasicBattery) {
       switch (data->upsBasicBattery->__upsBasicBatteryStatus) {
       case 2:
-         ups->clear_battlow();
+         _ups->clear_battlow();
          break;
       case 3:
-         ups->set_battlow();
+         _ups->set_battlow();
          break;
       default:                    /* Unknown, assume battery is ok */
-         ups->clear_battlow();
+         _ups->clear_battlow();
          break;
       }
       free(data->upsBasicBattery);
@@ -325,14 +314,14 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups)
    data->upsAdvBattery = NULL;
    powernet_mib_mgr_get_upsAdvBattery(s, &(data->upsAdvBattery));
    if (data->upsAdvBattery) {
-      ups->BattChg = data->upsAdvBattery->__upsAdvBatteryCapacity;
-      ups->UPSTemp = data->upsAdvBattery->__upsAdvBatteryTemperature;
-      ups->TimeLeft = data->upsAdvBattery->__upsAdvBatteryRunTimeRemaining / 6000;
+      _ups->BattChg = data->upsAdvBattery->__upsAdvBatteryCapacity;
+      _ups->UPSTemp = data->upsAdvBattery->__upsAdvBatteryTemperature;
+      _ups->TimeLeft = data->upsAdvBattery->__upsAdvBatteryRunTimeRemaining / 6000;
 
       if (data->upsAdvBattery->__upsAdvBatteryReplaceIndicator == 2)
-         ups->set_replacebatt();
+         _ups->set_replacebatt();
       else
-         ups->clear_replacebatt();
+         _ups->clear_replacebatt();
 
       free(data->upsAdvBattery);
    }
@@ -340,42 +329,42 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups)
    data->upsBasicInput = NULL;
    powernet_mib_mgr_get_upsBasicInput(s, &(data->upsBasicInput));
    if (data->upsBasicInput) {
-      ups->InputPhase = data->upsBasicInput->__upsBasicInputPhase;
+      _ups->InputPhase = data->upsBasicInput->__upsBasicInputPhase;
       free(data->upsBasicInput);
    }
 
    data->upsAdvInput = NULL;
    powernet_mib_mgr_get_upsAdvInput(s, &(data->upsAdvInput));
    if (data->upsAdvInput) {
-      ups->LineVoltage = data->upsAdvInput->__upsAdvInputLineVoltage;
-      ups->LineMax = data->upsAdvInput->__upsAdvInputMaxLineVoltage;
-      ups->LineMin = data->upsAdvInput->__upsAdvInputMinLineVoltage;
-      ups->LineFreq = data->upsAdvInput->__upsAdvInputFrequency;
+      _ups->LineVoltage = data->upsAdvInput->__upsAdvInputLineVoltage;
+      _ups->LineMax = data->upsAdvInput->__upsAdvInputMaxLineVoltage;
+      _ups->LineMin = data->upsAdvInput->__upsAdvInputMinLineVoltage;
+      _ups->LineFreq = data->upsAdvInput->__upsAdvInputFrequency;
       switch (data->upsAdvInput->__upsAdvInputLineFailCause) {
       case 1:
-         ups->lastxfer = XFER_NONE;
+         _ups->lastxfer = XFER_NONE;
          break;
       case 2:  /* High line voltage */
-         ups->lastxfer = XFER_OVERVOLT;
+         _ups->lastxfer = XFER_OVERVOLT;
          break;
       case 3:  /* Brownout */
       case 4:  /* Blackout */
-         ups->lastxfer = XFER_UNDERVOLT;
+         _ups->lastxfer = XFER_UNDERVOLT;
          break;
       case 5:  /* Small sag */
       case 6:  /* Deep sag */
       case 7:  /* Small spike */
       case 8:  /* Deep spike */
-         ups->lastxfer = XFER_NOTCHSPIKE;
+         _ups->lastxfer = XFER_NOTCHSPIKE;
          break;
       case 9:
-         ups->lastxfer = XFER_SELFTEST;
+         _ups->lastxfer = XFER_SELFTEST;
          break;
       case 10:
-         ups->lastxfer = XFER_RIPPLE;
+         _ups->lastxfer = XFER_RIPPLE;
          break;
       default:
-         ups->lastxfer = XFER_UNKNOWN;
+         _ups->lastxfer = XFER_UNKNOWN;
          break;
       }
       free(data->upsAdvInput);
@@ -385,25 +374,25 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups)
    powernet_mib_mgr_get_upsBasicOutput(s, &(data->upsBasicOutput));
    if (data->upsBasicOutput) {
       /* Clear the following flags: only one status will be TRUE */
-      Dmsg1(99, "Status before clearing: 0x%08x\n", ups->Status);
-      ups->clear_online();
-      ups->clear_onbatt();
-      ups->clear_boost();
-      ups->clear_trim();
-      Dmsg1(99, "Status after clearing: 0x%08x\n", ups->Status);
+      Dmsg1(99, "Status before clearing: 0x%08x\n", _ups->Status);
+      _ups->clear_online();
+      _ups->clear_onbatt();
+      _ups->clear_boost();
+      _ups->clear_trim();
+      Dmsg1(99, "Status after clearing: 0x%08x\n", _ups->Status);
 
       switch (data->upsBasicOutput->__upsBasicOutputStatus) {
       case 2:
-         ups->set_online();
+         _ups->set_online();
          break;
       case 3:
-         ups->set_onbatt();
+         _ups->set_onbatt();
          break;
       case 4:
-         ups->set_boost();
+         _ups->set_boost();
          break;
       case 12:
-         ups->set_trim();
+         _ups->set_trim();
          break;
       case 1:                     /* unknown */
       case 5:                     /* timed sleeping */
@@ -416,17 +405,17 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups)
       default:                    /* unknown */
          break;
       }
-      ups->OutputPhase = data->upsBasicOutput->__upsBasicOutputPhase;
+      _ups->OutputPhase = data->upsBasicOutput->__upsBasicOutputPhase;
       free(data->upsBasicOutput);
    }
 
    data->upsAdvOutput = NULL;
    powernet_mib_mgr_get_upsAdvOutput(s, &(data->upsAdvOutput));
    if (data->upsAdvOutput) {
-      ups->OutputVoltage = data->upsAdvOutput->__upsAdvOutputVoltage;
-      ups->OutputFreq = data->upsAdvOutput->__upsAdvOutputFrequency;
-      ups->UPSLoad = data->upsAdvOutput->__upsAdvOutputLoad;
-      ups->OutputCurrent = data->upsAdvOutput->__upsAdvOutputCurrent;
+      _ups->OutputVoltage = data->upsAdvOutput->__upsAdvOutputVoltage;
+      _ups->OutputFreq = data->upsAdvOutput->__upsAdvOutputFrequency;
+      _ups->UPSLoad = data->upsAdvOutput->__upsAdvOutputLoad;
+      _ups->OutputCurrent = data->upsAdvOutput->__upsAdvOutputCurrent;
       free(data->upsAdvOutput);
    }
 
@@ -435,75 +424,72 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups)
    if (data->upsAdvTest) {
       switch (data->upsAdvTest->__upsAdvTestDiagnosticsResults) {
       case 1:  /* Passed */
-         ups->testresult = TEST_PASSED;
+         _ups->testresult = TEST_PASSED;
          break;
       case 2:  /* Failed */
       case 3:  /* Invalid test */
-         ups->testresult = TEST_FAILED;
+         _ups->testresult = TEST_FAILED;
          break;
       case 4:  /* Test in progress */
-         ups->testresult = TEST_INPROGRESS;
+         _ups->testresult = TEST_INPROGRESS;
          break;
       default:
-         ups->testresult = TEST_UNKNOWN;
+         _ups->testresult = TEST_UNKNOWN;
          break;
       }
 
       /* Not implemented. Needs transform date(mm/dd/yy)->hours. */
-      // ups->LastSTTime = data->upsAdvTest->upsAdvTestLastDiagnosticsDate;
+      // _ups->LastSTTime = data->upsAdvTest->upsAdvTestLastDiagnosticsDate;
 
       if (data->upsAdvTest->__upsAdvTestCalibrationResults == 3)
-         ups->set_calibration();
+         _ups->set_calibration();
       else
-         ups->clear_calibration();
+         _ups->clear_calibration();
 
       free(data->upsAdvTest);
    }
 
-   return 1;
+   return true;
 }
 
 /* Callback invoked by SNMP library when an async event arrives */
-static int powernet_snmp_callback(
+int SnmpDriver::powernet_snmp_callback(
    int operation, snmp_session *session, 
    int reqid, snmp_pdu *pdu, void *magic)
 {
-   struct snmp_ups_internal_data *my_data =
-      (struct snmp_ups_internal_data *)magic;
+   SnmpDriver *_this = (SnmpDriver*)magic;
 
    Dmsg1(100, "powernet_snmp_callback: %d\n", reqid);
 
    if (reqid == 0)
-      my_data->trap_received = true;
+      _this->_trap_received = true;
 
-   return 1;
+   return true;
 }
 
-int powernet_snmp_ups_check_state(UPSINFO *ups)
+bool SnmpDriver::powernet_snmp_ups_check_state()
 {
-   struct snmp_ups_internal_data *Sid =
-      (struct snmp_ups_internal_data *)ups->driver_internal_data;
    fd_set fds;
    int numfds, rc, block;
    struct timeval tmo, exit, now;
    int sleep_time;
 
    /* Check for commlost under lock since UPS status might be changed */
-   write_lock(ups);
-   rc = powernet_check_comm_lost(ups);
-   write_unlock(ups);
+   write_lock(_ups);
+   rc = powernet_check_comm_lost();
+   write_unlock(_ups);
    if (rc == 0)
-      return 0;
+      return false;
 
    /* Allow user to reduce sleep_time using NETTIME config setting */
-   sleep_time = ups->wait_time;
-   if (ups->nettime && ups->nettime < ups->wait_time)
-      sleep_time = ups->nettime;
+   sleep_time = _ups->wait_time;
+   if (_ups->nettime && _ups->nettime < _ups->wait_time)
+      sleep_time = _ups->nettime;
 
    /* If we're not doing SNMP traps, just sleep and exit */
-   if (!Sid->trap_session) {
+   if (!_trap_session) {
       sleep(sleep_time);
-      return 1;
+      return true;
    }
 
    /* Figure out when we need to exit by */
@@ -548,37 +534,35 @@ int powernet_snmp_ups_check_state(UPSINFO *ups)
             continue;            /* assume SIGCHLD */
 
          Dmsg1(200, "select error: ERR=%s\n", strerror(errno));
-         return 0;
+         return false;
 
       default: /* Data available */
          /* Reset trap flag and run callback processing */
-         Sid->trap_received = false;
+         _trap_received = false;
          snmp_read(&fds);
 
          /* If callback processing set the flag, we got a trap */
-         if (Sid->trap_received)
-            return 1;
+         if (_trap_received)
+            return true;
 
          break;
       }
    }
 }
 
-int powernet_snmp_ups_open(UPSINFO *ups)
+bool SnmpDriver::powernet_snmp_ups_open()
 {
-   struct snmp_ups_internal_data *my_data =
-      (struct snmp_ups_internal_data *)ups->driver_internal_data;
-   struct snmp_session *s = &my_data->session;
+   struct snmp_session *s = &_session;
    struct snmp_session tmp;
 
    /*
     * If we're configured to not use traps, simply rename
     * DeviceVendor to 'APC' and exit.
     */
-   if (!strcmp(my_data->DeviceVendor, "APC_NOTRAP")) {
-      my_data->DeviceVendor[3] = '\0';
+   if (!strcmp(_DeviceVendor, "APC_NOTRAP")) {
+      _DeviceVendor[3] = '\0';
       Dmsg0(100, "User requested no traps\n");
-      return 1;
+      return true;
    }
 
    /* Trap session is a copy of client session with some tweaks */
@@ -586,17 +570,17 @@ int powernet_snmp_ups_open(UPSINFO *ups)
    tmp.peername = "0.0.0.0:162";   /* Listen to snmptrap port on all interfaces */
    tmp.local_port = 1;             /* We're a server, not a client */
    tmp.callback = powernet_snmp_callback;
-   tmp.callback_magic = my_data;
+   tmp.callback_magic = this;
 
    /*
     * Open the trap session and store it in my_data.
     * It's ok if this fails; the code will fall back to polling.
     */
-   my_data->trap_session = snmp_open(&tmp);
-   if (!my_data->trap_session) {
+   _trap_session = snmp_open(&tmp);
+   if (!_trap_session) {
       Dmsg0(100, "Trap session failed to open\n");
-      return 1;
+      return true;
    }
 
-   return 1;
+   return true;
 }

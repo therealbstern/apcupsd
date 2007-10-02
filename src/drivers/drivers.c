@@ -54,172 +54,22 @@
 # include "pcnet/pcnet.h"
 #endif
 
-static const UPSDRIVER drivers[] = {
-#ifdef HAVE_DUMB_DRIVER
-   { "dumb",
-     dumb_ups_open,
-     dumb_ups_setup,
-     dumb_ups_close,
-     dumb_ups_kill_power,
-     dumb_ups_read_static_data,
-     dumb_ups_read_volatile_data,
-     dumb_ups_get_capabilities,
-     dumb_ups_read_volatile_data,
-     dumb_ups_program_eeprom,
-     dumb_ups_entry_point },
-#endif   /* HAVE_DUMB_DRIVER */
-
-#ifdef HAVE_APCSMART_DRIVER
-   { "apcsmart",
-     apcsmart_ups_open,
-     apcsmart_ups_setup,
-     apcsmart_ups_close,
-     apcsmart_ups_kill_power,
-     apcsmart_ups_read_static_data,
-     apcsmart_ups_read_volatile_data,
-     apcsmart_ups_get_capabilities,
-     apcsmart_ups_check_state,
-     apcsmart_ups_program_eeprom,
-     apcsmart_ups_entry_point },
-#endif   /* HAVE_APCSMART_DRIVER */
-
-#ifdef HAVE_NET_DRIVER
-   { "net",
-     net_ups_open,
-     net_ups_setup,
-     net_ups_close,
-     net_ups_kill_power,
-     net_ups_read_static_data,
-     net_ups_read_volatile_data,
-     net_ups_get_capabilities,
-     net_ups_check_state,
-     net_ups_program_eeprom,
-     net_ups_entry_point },
-#endif   /* HAVE_NET_DRIVER */
-
-#ifdef HAVE_USB_DRIVER
-   { "usb",
-     usb_ups_open,
-     usb_ups_setup,
-     usb_ups_close,
-     usb_ups_kill_power,
-     usb_ups_read_static_data,
-     usb_ups_read_volatile_data,
-     usb_ups_get_capabilities,
-     usb_ups_check_state,
-     usb_ups_program_eeprom,
-     usb_ups_entry_point },
-#endif   /* HAVE_USB_DRIVER */
-
-#ifdef HAVE_SNMP_DRIVER
-   { "snmp",
-     snmp_ups_open,
-     snmp_ups_setup,
-     snmp_ups_close,
-     snmp_ups_kill_power,
-     snmp_ups_read_static_data,
-     snmp_ups_read_volatile_data,
-     snmp_ups_get_capabilities,
-     snmp_ups_check_state,
-     snmp_ups_program_eeprom,
-     snmp_ups_entry_point },
-#endif   /* HAVE_SNMP_DRIVER */
-
-#ifdef HAVE_TEST_DRIVER
-   { "test",
-     test_ups_open,
-     test_ups_setup,
-     test_ups_close,
-     test_ups_kill_power,
-     test_ups_read_static_data,
-     test_ups_read_volatile_data,
-     test_ups_get_capabilities,
-     test_ups_check_state,
-     test_ups_program_eeprom,
-     test_ups_entry_point },
-#endif   /* HAVE_TEST_DRIVER */
-
-#ifdef HAVE_PCNET_DRIVER
-   { "pcnet",
-     pcnet_ups_open,
-     pcnet_ups_setup,
-     pcnet_ups_close,
-     pcnet_ups_kill_power,
-     pcnet_ups_read_static_data,
-     pcnet_ups_read_volatile_data,
-     pcnet_ups_get_capabilities,
-     pcnet_ups_check_state,
-     pcnet_ups_program_eeprom,
-     pcnet_ups_entry_point },
-#endif   /* HAVE_PCNET_DRIVER */
-
-   /*
-    * The NULL driver: closes the drivers list.
-    */
-   { NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL }
-};
-
-/*
- * This is the glue between UPSDRIVER and UPSINFO.
- * It returns an UPSDRIVER pointer that may be null if something
- * went wrong.
- */
-static const UPSDRIVER *helper_attach_driver(UPSINFO *ups, const char *drvname)
-{
-   int i;
-
-   write_lock(ups);
-
-   Dmsg1(99, "Looking for driver: %s\n", drvname);
-   ups->driver = NULL;
-
-   for (i = 0; drivers[i].driver_name; i++) {
-      Dmsg1(99, "Driver %s is configured.\n", drivers[i].driver_name);
-      if (strcasecmp(drivers[i].driver_name, drvname) == 0) {
-         ups->driver = &drivers[i];
-         Dmsg1(20, "Driver %s found and attached.\n", drivers[i].driver_name);
-         break;
-      }
-   }
-
-   if (!ups->driver) {
-      printf("\nApcupsd driver %s not found.\n"
-             "The available apcupsd drivers are:\n", drvname);
-
-      for (i = 0; drivers[i].driver_name; i++)
-         printf("%s\n", drivers[i].driver_name);
-
-      printf("\n");
-      printf("Most likely, you need to add --enable-%s "
-             "to your ./configure options.\n\n", drvname);
-   }
-
-   write_unlock(ups);
-
-   Dmsg1(99, "Driver ptr=0x%x\n", ups->driver);
-   return ups->driver;
-}
-
-const UPSDRIVER *attach_driver(UPSINFO *ups)
+void attach_driver(UPSINFO *ups)
 {
    char *driver_name = NULL;
 
+   write_lock(ups);
+
    /* Attach the correct driver. */
    switch (ups->mode.type) {
+
    case BK:
    case SHAREBASIC:
    case DUMB_UPS:
       driver_name = "dumb";
+#ifdef HAVE_DUMB_DRIVER
+      ups->driver = new DumbDriver(ups);
+#endif
       break;
 
    case BKPRO:
@@ -230,34 +80,89 @@ const UPSDRIVER *attach_driver(UPSINFO *ups)
    case SHARESMART:
    case APCSMART_UPS:
       driver_name = "apcsmart";
+#ifdef HAVE_APCSMART_DRIVER
+      ups->driver = new ApcSmartDriver(ups);
+#endif
       break;
 
    case USB_UPS:
       driver_name = "usb";
+#if defined(HAVE_LINUX_USB)
+      ups->driver = new LinuxUsbDriver(ups);
+#elif defined(HAVE_GENERIC_USB)
+      ups->driver = new GenericUsbDriver(ups);
+#elif defined(HAVE_BSD_USB)
+      ups->driver = new BsdUsbDriver(ups);
+#endif
+
       break;
 
    case SNMP_UPS:
       driver_name = "snmp";
+#ifdef HAVE_SNMP_DRIVER
+      ups->driver = new SnmpDriver(ups);
+#endif
       break;
 
    case TEST_UPS:
       driver_name = "test";
+#ifdef HAVE_TEST_DRIVER
+      ups->driver = new TestDriver(ups);
+#endif
       break;
 
    case NETWORK_UPS:
       driver_name = "net";
+#ifdef HAVE_NET_DRIVER
+      ups->driver = new NetDriver(ups);
+#endif
       break;
 
    case PCNET_UPS:
       driver_name = "pcnet";
+#ifdef HAVE_PCNET_DRIVER
+      ups->driver = new PcnetDriver(ups);
+#endif
       break;
 
    default:
    case NO_UPS:
+      driver_name = "[unknown]";
       Dmsg1(000, "Warning: no UPS driver found (ups->mode.type=%d).\n",
          ups->mode.type);
       break;
    }
 
-   return driver_name ? helper_attach_driver(ups, driver_name) : NULL;
+   if (!ups->driver) {
+      printf("\nApcupsd driver %s not found.\n"
+             "The available apcupsd drivers are:\n", driver_name);
+
+#ifdef HAVE_DUMB_DRIVER
+      printf("dumb\n");
+#endif
+#ifdef HAVE_APCSMART_DRIVER
+      printf("apcsmart\n");
+#endif
+#ifdef HAVE_USB_DRIVER
+      printf("usb\n");
+#endif
+#ifdef HAVE_SNMP_DRIVER
+      printf("snmp\n");
+#endif
+#ifdef HAVE_TEST_DRIVER
+      printf("test\n");
+#endif
+#ifdef HAVE_NET_DRIVER
+      printf("net\n");
+#endif
+#ifdef HAVE_PCNET_DRIVER
+      printf("pcnet\n");
+#endif
+
+      printf("\n");
+      printf("Most likely, you need to add --enable-%s "
+             "to your ./configure options.\n\n", driver_name);
+   }
+
+   write_unlock(ups);
 }
