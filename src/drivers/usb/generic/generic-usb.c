@@ -26,6 +26,16 @@
 #include "generic-usb.h"
 #include "hidutils.h"
 
+// Statics used to coordinate first time libusb init
+amutex GenericUsbDriver::_mutex("genericusb");
+bool GenericUsbDriver::_init = false;
+
+/*
+ * When we are traversing the USB reports given by the UPS and we find
+ * an entry corresponding to an entry in the known_info table,
+ * we make the following usb_info entry in the info table of our
+ * private data.
+ */
 struct GenericUsbDriver::usb_info {
    unsigned usage_code;            /* usage code wanted */
    unsigned unit_exponent;         /* exponent */
@@ -41,8 +51,18 @@ GenericUsbDriver::GenericUsbDriver(UPSINFO *ups)
    : UsbDriver(ups)
 {
    memset(_info, 0, sizeof(_info));
+
+   /* Initialize libusb */
+   _mutex.lock();
+   if (!_init) {
+      Dmsg0(200, "Initializing libusb\n");
+      usb_set_debug(debug_level/100);
+      usb_init();
+      _init = true;
+   }
+   _mutex.unlock();
 }
- 
+
 bool GenericUsbDriver::SubclassGetCapabilities()
 {
    int i, rc, ci, phys;
@@ -79,7 +99,6 @@ bool GenericUsbDriver::SubclassGetCapabilities()
 
          if (rc) {
             _ups->UPS_Cap[ci] = true;
-            _ups->UPS_Cmd[ci] = _known_info[i].usage_code;
 
             info = (usb_info *)malloc(sizeof(usb_info));
             if (!info) {
@@ -269,7 +288,6 @@ void GenericUsbDriver::reinitialize()
    }
 
    _fd = NULL;
-   _orig_device[0] = '\0';
    _linkcheck = false;
 }
 
@@ -353,10 +371,6 @@ bool GenericUsbDriver::open_usb_device()
    int i;
    struct usb_bus* bus;
    struct usb_device* dev;
-
-   /* Initialize libusb */
-   Dmsg0(200, "Initializing libusb\n");
-   usb_init();
 
    /* Enumerate usb busses and devices */
    i = usb_find_busses();
@@ -562,14 +576,8 @@ bool GenericUsbDriver::SubclassCheckState()
  */
 bool GenericUsbDriver::SubclassOpen()
 {
-   /* Set libusb debug level */
-   usb_set_debug(debug_level/100);
-
    write_lock(_ups);
    reinitialize();
-
-   if (_orig_device[0] == 0)
-      astrncpy(_orig_device, _ups->device, sizeof(_orig_device));
 
    if (!open_usb_device()) {
       write_unlock(_ups);

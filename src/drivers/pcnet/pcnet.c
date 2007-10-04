@@ -42,6 +42,23 @@
 #define close(fd) closesocket(fd)
 #endif
 
+/* Constructor */
+PcnetDriver::PcnetDriver(UPSINFO *ups)
+   : UpsDriver(ups, "pcnet")
+{
+   _cmdmap = GetSmartCmdMap();
+
+   // Fixup CI_UPSMODEL to match PCNET
+   // Other commands map directly.
+   _cmdmap[CI_UPSMODEL] = 0x01;
+}
+
+/* Destructor */
+PcnetDriver::~PcnetDriver()
+{
+   delete [] _cmdmap;
+}
+
 /* Convert UPS response to enum and string */
 SelfTestResult PcnetDriver::decode_testresult(const char* str)
 {
@@ -130,7 +147,7 @@ bool PcnetDriver::process_data(const char *key, const char *value)
    /* Convert command to CI */
    cmd = strtoul(key, NULL, 16);
    for (ci=0; ci<CI_MAXCI; ci++)
-      if (_ups->UPS_Cmd[ci] == cmd)
+      if (_cmdmap[ci] == cmd)
          break;
 
    /* No match? */
@@ -634,9 +651,6 @@ bool PcnetDriver::Open()
       close(_ups->fd);
       Error_abort1(_("Cannot bind socket (%d)\n"), errno);
    }
-
-   /* Cheat and fixup CI_UPSMODEL to match PCNET */
-   _ups->UPS_Cmd[CI_UPSMODEL] = 0x01;
 
    /* Reset datatime to now */
    time(&_datatime);

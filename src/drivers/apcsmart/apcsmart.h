@@ -29,8 +29,8 @@ class ApcSmartDriver: public UpsDriver
 {
 public:
 
-   ApcSmartDriver(UPSINFO *ups) : UpsDriver(ups, "apcsmart") {}
-   virtual ~ApcSmartDriver() {}
+   ApcSmartDriver(UPSINFO *ups);
+   virtual ~ApcSmartDriver();
 
    // Subclasses must implement these methods
    virtual bool Open();
@@ -68,6 +68,8 @@ private:
 
    struct termios _oldtio;
    struct termios _newtio;
+
+   int *_cmdmap;
 };
 
 #endif   /* _APCSMART_H */

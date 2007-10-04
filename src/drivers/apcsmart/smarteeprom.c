@@ -59,7 +59,7 @@ bool ApcSmartDriver::ProgramEeprom(int command, char *data)
    case CI_SENS:
       if (_ups->UPS_Cap[CI_SENS]) {
          asnprintf(setting, sizeof(setting), "%.1s", data);
-         change_ups_eeprom_item("sensitivity", _ups->UPS_Cmd[CI_SENS], setting);
+         change_ups_eeprom_item("sensitivity", _cmdmap[CI_SENS], setting);
       } else {
          printf(_("UPS sensitivity configuration not supported by this UPS.\n"));
          return 0;
@@ -70,7 +70,7 @@ bool ApcSmartDriver::ProgramEeprom(int command, char *data)
    case CI_DALARM:
       if (_ups->UPS_Cap[CI_DALARM]) {
          asnprintf(setting, sizeof(setting), "%.1s", data);
-         change_ups_eeprom_item("alarm status", _ups->UPS_Cmd[CI_DALARM],
+         change_ups_eeprom_item("alarm status", _cmdmap[CI_DALARM],
             setting);
       } else {
          printf(_("UPS alarm status configuration not supported by this UPS.\n"));
@@ -83,7 +83,7 @@ bool ApcSmartDriver::ProgramEeprom(int command, char *data)
       if (_ups->UPS_Cap[CI_DLBATT]) {
          asnprintf(setting, sizeof(setting), "%02d", (int)atoi(data));
          change_ups_eeprom_item("low battery warning delay",
-            _ups->UPS_Cmd[CI_DLBATT], setting);
+            _cmdmap[CI_DLBATT], setting);
       } else {
          printf(
             _("UPS low battery warning configuration not supported by this UPS.\n"));
@@ -95,7 +95,7 @@ bool ApcSmartDriver::ProgramEeprom(int command, char *data)
    case CI_DWAKE:
       if (_ups->UPS_Cap[CI_DWAKE]) {
          asnprintf(setting, sizeof(setting), "%03d", (int)atoi(data));
-         change_ups_eeprom_item("wakeup delay", _ups->UPS_Cmd[CI_DWAKE],
+         change_ups_eeprom_item("wakeup delay", _cmdmap[CI_DWAKE],
             setting);
       } else {
          printf(_("UPS wakeup delay configuration not supported by this UPS.\n"));
@@ -108,7 +108,7 @@ bool ApcSmartDriver::ProgramEeprom(int command, char *data)
    case CI_DSHUTD:
       if (_ups->UPS_Cap[CI_DSHUTD]) {
          asnprintf(setting, sizeof(setting), "%03d", (int)atoi(data));
-         change_ups_eeprom_item("shutdown delay", _ups->UPS_Cmd[CI_DSHUTD],
+         change_ups_eeprom_item("shutdown delay", _cmdmap[CI_DSHUTD],
             setting);
       } else {
          printf(_("UPS shutdown delay configuration not supported by this UPS.\n"));
@@ -121,7 +121,7 @@ bool ApcSmartDriver::ProgramEeprom(int command, char *data)
       if (_ups->UPS_Cap[CI_LTRANS]) {
          asnprintf(setting, sizeof(setting), "%03d", (int)atoi(data));
          change_ups_eeprom_item("lower transfer voltage",
-            _ups->UPS_Cmd[CI_LTRANS], setting);
+            _cmdmap[CI_LTRANS], setting);
       } else {
          printf(
             _("UPS low transfer voltage configuration not supported by this UPS.\n"));
@@ -134,7 +134,7 @@ bool ApcSmartDriver::ProgramEeprom(int command, char *data)
       if (_ups->UPS_Cap[CI_HTRANS]) {
          asnprintf(setting, sizeof(setting), "%03d", (int)atoi(data));
          change_ups_eeprom_item("high transfer voltage",
-            _ups->UPS_Cmd[CI_HTRANS], setting);
+            _cmdmap[CI_HTRANS], setting);
       } else {
          printf(
             _("UPS high transfer voltage configuration not supported by this UPS.\n"));
@@ -147,7 +147,7 @@ bool ApcSmartDriver::ProgramEeprom(int command, char *data)
       if (_ups->UPS_Cap[CI_RETPCT]) {
          asnprintf(setting, sizeof(setting), "%02d", (int)atoi(data));
          change_ups_eeprom_item("return threshold percent",
-            _ups->UPS_Cmd[CI_RETPCT], setting);
+            _cmdmap[CI_RETPCT], setting);
       } else {
          printf(
             _("UPS return threshold configuration not supported by this UPS.\n"));
@@ -164,7 +164,7 @@ bool ApcSmartDriver::ProgramEeprom(int command, char *data)
             setting[2] = ' ';
             setting[3] = 0;
          }
-         change_ups_eeprom_item("self test interval", _ups->UPS_Cmd[CI_STESTI],
+         change_ups_eeprom_item("self test interval", _cmdmap[CI_STESTI],
             setting);
       } else {
          printf(
@@ -178,7 +178,7 @@ bool ApcSmartDriver::ProgramEeprom(int command, char *data)
       if (_ups->UPS_Cap[CI_NOMOUTV]) {
          asnprintf(setting, sizeof(setting), "%03d", (int)atoi(data));
          change_ups_eeprom_item("output voltage on batteries",
-            _ups->UPS_Cmd[CI_NOMOUTV], setting);
+            _cmdmap[CI_NOMOUTV], setting);
       } else {
          printf(
             _("UPS output voltage on batteries configuration not supported by this UPS.\n"));
@@ -215,8 +215,8 @@ void ApcSmartDriver::change_ups_name(char *newname)
    char *n;
    char response[32];
    char name[10];
-   char a = _ups->UPS_Cmd[CI_CYCLE_EPROM];
-   char c = _ups->UPS_Cmd[CI_IDEN];
+   char a = _cmdmap[CI_CYCLE_EPROM];
+   char c = _cmdmap[CI_IDEN];
    int i;
    int j = strlen(newname);
 
@@ -260,8 +260,8 @@ void ApcSmartDriver::change_ups_name(char *newname)
    }
 
    _ups->upsname[0] = '\0';
-   smart_poll(_ups->UPS_Cmd[CI_IDEN]);
-   astrncpy(_ups->upsname, smart_poll(_ups->UPS_Cmd[CI_IDEN]),
+   smart_poll(_cmdmap[CI_IDEN]);
+   astrncpy(_ups->upsname, smart_poll(_cmdmap[CI_IDEN]),
       sizeof(_ups->upsname));
 
    fprintf(stderr, "The new UPS name is: %s\n", _ups->upsname);
@@ -275,8 +275,8 @@ void ApcSmartDriver::change_ups_battery_date(char *newdate)
    char *n;
    char response[32];
    char battdat[9];
-   char a = _ups->UPS_Cmd[CI_CYCLE_EPROM];
-   char c = _ups->UPS_Cmd[CI_BATTDAT];
+   char a = _cmdmap[CI_CYCLE_EPROM];
+   char c = _cmdmap[CI_BATTDAT];
    int i;
    int j = strlen(newdate);
 
@@ -312,8 +312,8 @@ void ApcSmartDriver::change_ups_battery_date(char *newdate)
    }
 
    _ups->battdat[0] = '\0';
-   smart_poll(_ups->UPS_Cmd[CI_BATTDAT]);
-   astrncpy(_ups->battdat, smart_poll(_ups->UPS_Cmd[CI_BATTDAT]),
+   smart_poll(_cmdmap[CI_BATTDAT]);
+   astrncpy(_ups->battdat, smart_poll(_cmdmap[CI_BATTDAT]),
       sizeof(_ups->battdat));
 
    fprintf(stderr, "The new UPS battery date is: %s\n", _ups->battdat);
@@ -327,7 +327,7 @@ int ApcSmartDriver::change_ups_eeprom_item(char *title, char cmd, char *setting)
    char oldvalue[32];
    char lastvalue[32];
    char allvalues[256];
-   char a = _ups->UPS_Cmd[CI_CYCLE_EPROM];
+   char a = _cmdmap[CI_CYCLE_EPROM];
    int i;
 
    /* Ask for old value */
@@ -437,19 +437,19 @@ void ApcSmartDriver::change_extended()
    /* SENSITIVITY */
    if (_ups->UPS_Cap[CI_SENS] && strcmp(_ups->sensitivity, "-1") != 0) {
       asnprintf(setting, sizeof(setting), "%.1s", _ups->sensitivity);
-      change_ups_eeprom_item("sensitivity", _ups->UPS_Cmd[CI_SENS], setting);
+      change_ups_eeprom_item("sensitivity", _cmdmap[CI_SENS], setting);
    }
 
    /* WAKEUP_DELAY */
    if (_ups->UPS_Cap[CI_DWAKE] && _ups->dwake != -1) {
       asnprintf(setting, sizeof(setting), "%03d", (int)_ups->dwake);
-      change_ups_eeprom_item("wakeup delay", _ups->UPS_Cmd[CI_DWAKE], setting);
+      change_ups_eeprom_item("wakeup delay", _cmdmap[CI_DWAKE], setting);
    }
 
    /* SLEEP_DELAY */
    if (_ups->UPS_Cap[CI_DSHUTD] && _ups->dshutd != -1) {
       asnprintf(setting, sizeof(setting), "%03d", (int)_ups->dshutd);
-      change_ups_eeprom_item("shutdown delay", _ups->UPS_Cmd[CI_DSHUTD],
+      change_ups_eeprom_item("shutdown delay", _cmdmap[CI_DSHUTD],
          setting);
    }
 
@@ -457,34 +457,34 @@ void ApcSmartDriver::change_extended()
    if (_ups->UPS_Cap[CI_LTRANS] && _ups->lotrans != -1) {
       asnprintf(setting, sizeof(setting), "%03d", (int)_ups->lotrans);
       change_ups_eeprom_item("lower transfer voltage",
-         _ups->UPS_Cmd[CI_LTRANS], setting);
+         _cmdmap[CI_LTRANS], setting);
    }
 
    /* HIGH_TRANSFER_LEVEL */
    if (_ups->UPS_Cap[CI_HTRANS] && _ups->hitrans != -1) {
       asnprintf(setting, sizeof(setting), "%03d", (int)_ups->hitrans);
       change_ups_eeprom_item("upper transfer voltage",
-         _ups->UPS_Cmd[CI_HTRANS], setting);
+         _cmdmap[CI_HTRANS], setting);
    }
 
    /* UPS_BATT_CAP_RETURN */
    if (_ups->UPS_Cap[CI_RETPCT] && _ups->rtnpct != -1) {
       asnprintf(setting, sizeof(setting), "%02d", (int)_ups->rtnpct);
       change_ups_eeprom_item("return threshold percent",
-         _ups->UPS_Cmd[CI_RETPCT], setting);
+         _cmdmap[CI_RETPCT], setting);
    }
 
    /* ALARM_STATUS */
    if (_ups->UPS_Cap[CI_DALARM] && strcmp(_ups->beepstate, "-1") != 0) {
       asnprintf(setting, sizeof(setting), "%.1s", _ups->beepstate);
-      change_ups_eeprom_item("alarm delay", _ups->UPS_Cmd[CI_DALARM], setting);
+      change_ups_eeprom_item("alarm delay", _cmdmap[CI_DALARM], setting);
    }
 
    /* LOWBATT_SHUTDOWN_LEVEL */
    if (_ups->UPS_Cap[CI_DLBATT] && _ups->dlowbatt != -1) {
       asnprintf(setting, sizeof(setting), "%02d", (int)_ups->dlowbatt);
       change_ups_eeprom_item("low battery warning delay",
-         _ups->UPS_Cmd[CI_DLBATT], setting);
+         _cmdmap[CI_DLBATT], setting);
    }
 
    /* UPS_SELFTEST */
@@ -496,13 +496,13 @@ void ApcSmartDriver::change_extended()
          setting[3] = 0;
       }
       change_ups_eeprom_item(
-         "self test interval", _ups->UPS_Cmd[CI_STESTI], setting);
+         "self test interval", _cmdmap[CI_STESTI], setting);
    }
 
    /* OUTPUT_VOLTAGE */
    if (_ups->UPS_Cap[CI_NOMOUTV] && _ups->NomOutputVoltage != -1) {
       asnprintf(setting, sizeof(setting), "%03d", (int)_ups->NomOutputVoltage);
       change_ups_eeprom_item("output voltage on batteries",
-         _ups->UPS_Cmd[CI_NOMOUTV], setting);
+         _cmdmap[CI_NOMOUTV], setting);
    }
 }

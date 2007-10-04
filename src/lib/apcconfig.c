@@ -629,51 +629,6 @@ void init_ups_struct(UPSINFO *ups)
    astrncpy(ups->scriptdir, SYSCONFDIR, sizeof(ups->scriptdir));
    astrncpy(ups->pwrfailpath, PWRFAILDIR, sizeof(ups->pwrfailpath));
    astrncpy(ups->nologinpath, NOLOGDIR, sizeof(ups->nologinpath));
-   
-   /* Initialize UPS function codes */
-   ups->UPS_Cmd[CI_STATUS] = APC_CMD_STATUS;
-   ups->UPS_Cmd[CI_LQUAL] = APC_CMD_LQUAL;
-   ups->UPS_Cmd[CI_WHY_BATT] = APC_CMD_WHY_BATT;
-   ups->UPS_Cmd[CI_ST_STAT] = APC_CMD_ST_STAT;
-   ups->UPS_Cmd[CI_VLINE] = APC_CMD_VLINE;
-   ups->UPS_Cmd[CI_VMAX] = APC_CMD_VMAX;
-   ups->UPS_Cmd[CI_VMIN] = APC_CMD_VMIN;
-   ups->UPS_Cmd[CI_VOUT] = APC_CMD_VOUT;
-   ups->UPS_Cmd[CI_BATTLEV] = APC_CMD_BATTLEV;
-   ups->UPS_Cmd[CI_VBATT] = APC_CMD_VBATT;
-   ups->UPS_Cmd[CI_LOAD] = APC_CMD_LOAD;
-   ups->UPS_Cmd[CI_FREQ] = APC_CMD_FREQ;
-   ups->UPS_Cmd[CI_RUNTIM] = APC_CMD_RUNTIM;
-   ups->UPS_Cmd[CI_ITEMP] = APC_CMD_ITEMP;
-   ups->UPS_Cmd[CI_DIPSW] = APC_CMD_DIPSW;
-   ups->UPS_Cmd[CI_SENS] = APC_CMD_SENS;
-   ups->UPS_Cmd[CI_DWAKE] = APC_CMD_DWAKE;
-   ups->UPS_Cmd[CI_DSHUTD] = APC_CMD_DSHUTD;
-   ups->UPS_Cmd[CI_LTRANS] = APC_CMD_LTRANS;
-   ups->UPS_Cmd[CI_HTRANS] = APC_CMD_HTRANS;
-   ups->UPS_Cmd[CI_RETPCT] = APC_CMD_RETPCT;
-   ups->UPS_Cmd[CI_DALARM] = APC_CMD_DALARM;
-   ups->UPS_Cmd[CI_DLBATT] = APC_CMD_DLBATT;
-   ups->UPS_Cmd[CI_IDEN] = APC_CMD_IDEN;
-   ups->UPS_Cmd[CI_STESTI] = APC_CMD_STESTI;
-   ups->UPS_Cmd[CI_MANDAT] = APC_CMD_MANDAT;
-   ups->UPS_Cmd[CI_SERNO] = APC_CMD_SERNO;
-   ups->UPS_Cmd[CI_BATTDAT] = APC_CMD_BATTDAT;
-   ups->UPS_Cmd[CI_NOMBATTV] = APC_CMD_NOMBATTV;
-   ups->UPS_Cmd[CI_HUMID] = APC_CMD_HUMID;
-   ups->UPS_Cmd[CI_REVNO] = APC_CMD_REVNO;
-   ups->UPS_Cmd[CI_REG1] = APC_CMD_REG1;
-   ups->UPS_Cmd[CI_REG2] = APC_CMD_REG2;
-   ups->UPS_Cmd[CI_REG3] = APC_CMD_REG3;
-   ups->UPS_Cmd[CI_EXTBATTS] = APC_CMD_EXTBATTS;
-   ups->UPS_Cmd[CI_ATEMP] = APC_CMD_ATEMP;
-   ups->UPS_Cmd[CI_UPSMODEL] = APC_CMD_UPSMODEL;
-   ups->UPS_Cmd[CI_NOMOUTV] = APC_CMD_NOMOUTV;
-   ups->UPS_Cmd[CI_BADBATTS] = APC_CMD_BADBATTS;
-   ups->UPS_Cmd[CI_EPROM] = APC_CMD_EPROM;
-   ups->UPS_Cmd[CI_ST_TIME] = APC_CMD_ST_TIME;
-   ups->UPS_Cmd[CI_CYCLE_EPROM] = APC_CMD_CYCLE_EPROM;
-   ups->UPS_Cmd[CI_UPS_CAPS] = APC_CMD_UPS_CAPS;
 }
 
 void check_for_config(UPSINFO *ups, char *cfgfile)

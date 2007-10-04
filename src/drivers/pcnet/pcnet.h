@@ -14,8 +14,8 @@ class PcnetDriver: public UpsDriver
 {
 public:
 
-   PcnetDriver(UPSINFO *ups) : UpsDriver(ups, "pcnet") {}
-   virtual ~PcnetDriver() {}
+   PcnetDriver(UPSINFO *ups);
+   virtual ~PcnetDriver();
 
    // Subclasses must implement these methods
    virtual bool Open();
@@ -53,6 +53,7 @@ private:
    unsigned long _uptime;              /* UPS uptime counter */
    unsigned long _reboots;             /* UPS reboot counter */
    time_t _datatime;                   /* Last time we got valid data */
+   int *_cmdmap;                       /* Map of CI to command code */
 };
 
 #endif   /* _PCNET_H */
