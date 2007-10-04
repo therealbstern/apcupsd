@@ -317,14 +317,6 @@ enum {
 #define TIMER_FAST              1  /* Value for fast poll */
 #define TIMER_DUMB              5  /* for Dumb (ioctl) UPSes -- keep short */
 
-/* Make the size of these strings the next multiple of 4 */
-#define APC_MAGIC               "apcupsd-linux-6.0"
-#define APC_MAGIC_SIZE          4 * ((sizeof(APC_MAGIC) + 3) / 4)
-
-#define ACCESS_MAGIC            "apcaccess-linux-4.0"
-#define ACCESS_MAGIC_SIZE       4 * ((sizeof(APC_MAGIC) + 3) / 4)
-
-
 #define MAX_THREADS             7
 
 /* Find members position in the UPSINFO and GLOBALCFG structures. */

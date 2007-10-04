@@ -36,7 +36,7 @@ bool ApcSmartDriver::KillPower()
 
    response[0] = '\0';
 
-   a = _ups->UPS_Cmd[CI_DSHUTD];    /* shutdown delay */
+   a = _cmdmap[CI_DSHUTD];    /* shutdown delay */
    write(_ups->fd, &a, 1);
    getline(response, sizeof(response));
    shutdown_delay = (int)atof(response);

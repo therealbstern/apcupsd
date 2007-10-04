@@ -239,7 +239,6 @@ class UPSINFO {
 
    /* UPS capability array and codes */
    char UPS_Cap[CI_MAXCI + 1];          /* TRUE if UPS has capability */
-   unsigned int UPS_Cmd[CI_MAXCI + 1];  /* Command or function code */
 
    INTERNALGENINFO cable;          /* UPSCABLE directive */
    INTERNALGENINFO nologin;        /* NOLOGON directive */

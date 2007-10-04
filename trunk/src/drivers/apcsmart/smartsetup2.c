@@ -137,7 +137,7 @@ void ApcSmartDriver::get_apc_model()
    }
 
    response[0] = '\0';
-   astrncpy(response, smart_poll(_ups->UPS_Cmd[CI_UPSMODEL]), sizeof(response));
+   astrncpy(response, smart_poll(_cmdmap[CI_UPSMODEL]), sizeof(response));
 
    if (strlen(response)) {
       cp = get_apc_model_V_codes(response);
@@ -147,7 +147,7 @@ void ApcSmartDriver::get_apc_model()
    }
 
    response[0] = '\0';
-   astrncpy(response, smart_poll(_ups->UPS_Cmd[CI_REVNO]), sizeof(response));
+   astrncpy(response, smart_poll(_cmdmap[CI_REVNO]), sizeof(response));
 
    if (strlen(response)) {
       fprintf(stderr, "\n%s: 'b' %s", argvalue,
@@ -167,7 +167,7 @@ bool ApcSmartDriver::GetCapabilities()
    int i;
 
    /* Get UPS capabilities string */
-   astrncpy(caps, smart_poll(_ups->UPS_Cmd[CI_UPS_CAPS]), sizeof(caps));
+   astrncpy(caps, smart_poll(_cmdmap[CI_UPS_CAPS]), sizeof(caps));
    if (strlen(caps) && (strcmp(caps, "NA") != 0)) {
       _ups->UPS_Cap[CI_UPS_CAPS] = TRUE;
 
@@ -195,10 +195,10 @@ bool ApcSmartDriver::GetCapabilities()
     * capability.
     */
    for (i = 0; i <= CI_MAX_CAPS; i++) {
-      if (_ups->UPS_Cmd[i] == 0)
+      if (_cmdmap[i] == 0)
          continue;
-      if (!cmds || strchr(cmds, _ups->UPS_Cmd[i]) != NULL) {
-         astrncpy(answer, smart_poll(_ups->UPS_Cmd[i]), sizeof(answer));
+      if (!cmds || strchr(cmds, _cmdmap[i]) != NULL) {
+         astrncpy(answer, smart_poll(_cmdmap[i]), sizeof(answer));
          if (*answer && (strcmp(answer, "NA") != 0)) {
             _ups->UPS_Cap[i] = true;
          }

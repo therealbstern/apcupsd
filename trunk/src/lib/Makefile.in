@@ -15,12 +15,10 @@ top_builddir = $(topdir)
 apclib = libapc.a
 
 apclibobjs = @LIBEXTRAOBJ@ \
-	     apcconfig.o apcerror.o \
-	     apcevents.o apcexec.o \
-	     apcfile.o apclibnis.o \
-	     apclock.o apclog.o apcsignal.o \
-	     apcstatus.o asys.o \
-	     newups.o md5.o
+   apcconfig.o apcerror.o apcevents.o apcexec.o \
+   apcfile.o apclibnis.o apclock.o apclog.o apcsignal.o \
+   apcstatus.o asys.o newups.o md5.o amutex.o astring.o \
+   autil.o smartcmd.o
 
 all-targets: $(apclib)
 
