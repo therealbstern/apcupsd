@@ -79,7 +79,7 @@ typedef struct s_usb_value {
    int value_type;               /* Type of returned value */
    double dValue;                /* Value if double */
    int iValue;                   /* Integer value */
-   char *UnitName;               /* Name of units */
+   const char *UnitName;         /* Name of units */
    char sValue[MAXSTRING];       /* Value if string */
 } USB_VALUE;
 

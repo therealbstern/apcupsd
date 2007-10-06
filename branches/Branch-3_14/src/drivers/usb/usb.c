@@ -37,7 +37,7 @@ int pusb_ups_close(UPSINFO *ups);
 int pusb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval);
 int pusb_ups_check_state(UPSINFO *ups);
 int pusb_ups_setup(UPSINFO *ups);
-int pusb_write_int_to_ups(UPSINFO *ups, int ci, int value, char *name);
+int pusb_write_int_to_ups(UPSINFO *ups, int ci, int value, const char *name);
 int pusb_read_int_from_ups(UPSINFO *ups, int ci, int *value);
 
 /*
@@ -229,7 +229,7 @@ int usb_ups_setup(UPSINFO *ups)
    return pusb_ups_setup(ups);
 }
 
-int usb_write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
+int usb_write_int_to_ups(UPSINFO *ups, int ci, int value, const char *name)
 {
    return pusb_write_int_to_ups(ups, ci, value, name);
 }
@@ -314,7 +314,7 @@ int usb_ups_get_capabilities(UPSINFO *ups)
  * Operations that are not supported
  */
 
-int usb_ups_program_eeprom(UPSINFO *ups, int command, char *data)
+int usb_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
 {
    /* We don't support this for USB */
    return 0;
@@ -890,7 +890,7 @@ int usb_ups_read_static_data(UPSINFO *ups)
 
 int usb_ups_kill_power(UPSINFO *ups)
 {
-   char *func;
+   const char *func;
    int shutdown = 0;
    int val;
 

@@ -51,7 +51,7 @@ extern int net_ups_check_state(UPSINFO *ups);
 extern int net_ups_open(UPSINFO *ups);
 extern int net_ups_close(UPSINFO *ups);
 extern int net_ups_setup(UPSINFO *ups);
-extern int net_ups_program_eeprom(UPSINFO *ups, int command, char *data);
+extern int net_ups_program_eeprom(UPSINFO *ups, int command, const char *data);
 extern int net_ups_entry_point(UPSINFO *ups, int command, void *data);
 
 #endif   /* _NET_H */

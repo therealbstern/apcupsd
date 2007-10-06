@@ -212,7 +212,7 @@ static const UPSDRIVER *helper_attach_driver(UPSINFO *ups, const char *drvname)
 
 const UPSDRIVER *attach_driver(UPSINFO *ups)
 {
-   char *driver_name = NULL;
+   const char *driver_name = NULL;
 
    /* Attach the correct driver. */
    switch (ups->mode.type) {

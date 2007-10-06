@@ -25,15 +25,15 @@
 #include "apc.h"
 #include "apcsmart.h"
 
-static void change_ups_battery_date(UPSINFO *ups, char *newdate);
-static void change_ups_name(UPSINFO *ups, char *newname);
+static void change_ups_battery_date(UPSINFO *ups, const char *newdate);
+static void change_ups_name(UPSINFO *ups, const char *newname);
 static void change_extended(UPSINFO *ups);
-static int change_ups_eeprom_item(UPSINFO *ups, char *title, char cmd,
-   char *setting);
+static int change_ups_eeprom_item(UPSINFO *ups, const char *title, const char cmd,
+   const char *setting);
 
 
 /*********************************************************************/
-int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
+int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
 {
    char setting[20];
 
@@ -216,7 +216,7 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data)
 }
 
 /*********************************************************************/
-static void change_ups_name(UPSINFO *ups, char *newname)
+static void change_ups_name(UPSINFO *ups, const char *newname)
 {
    char *n;
    char response[32];
@@ -276,7 +276,7 @@ static void change_ups_name(UPSINFO *ups, char *newname)
 /*
  * Update date battery replaced
  */
-static void change_ups_battery_date(UPSINFO *ups, char *newdate)
+static void change_ups_battery_date(UPSINFO *ups, const char *newdate)
 {
    char *n;
    char response[32];
@@ -326,8 +326,8 @@ static void change_ups_battery_date(UPSINFO *ups, char *newdate)
 }
 
 /*********************************************************************/
-static int change_ups_eeprom_item(UPSINFO *ups, char *title, char cmd,
-   char *setting)
+static int change_ups_eeprom_item(UPSINFO *ups, const char *title, const char cmd,
+   const char *setting)
 {
    char response[32];
    char response1[32];

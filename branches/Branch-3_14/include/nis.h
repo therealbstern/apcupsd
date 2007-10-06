@@ -22,7 +22,7 @@
 
 extern struct sockaddr_in tcp_serv_addr;        /* socket information */
 extern int net_errno;              /* error number -- not yet implemented */
-extern char *net_errmsg;           /* pointer to error message */
+extern const char *net_errmsg;     /* pointer to error message */
 extern char net_errbuf[256];       /* error message buffer for messages */
 
 /* 
@@ -44,7 +44,7 @@ int net_recv(int sockfd, char *buff, int maxlen);
  * Returns number of bytes sent
  * Returns -1 on error
  */
-int net_send(int sockfd, char *buff, int len);
+int net_send(int sockfd, const char *buff, int len);
 
 /*     
  * Open a TCP connection to the UPS network server
@@ -52,7 +52,7 @@ int net_send(int sockfd, char *buff, int len);
  * Returns -1 on error
  * Returns socket file descriptor otherwise
  */
-int net_open(char *host, char *service, int port);
+int net_open(const char *host, char *service, int port);
 
 /* Close the network connection */
 void net_close(int sockfd);

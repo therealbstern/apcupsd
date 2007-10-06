@@ -203,7 +203,7 @@ int snmp_ups_get_capabilities(UPSINFO *ups)
    return ret;
 }
 
-int snmp_ups_program_eeprom(UPSINFO *ups, int command, char *data)
+int snmp_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
 {
    return 0;
 }

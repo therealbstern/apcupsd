@@ -207,7 +207,7 @@ int test_ups_kill_power(UPSINFO *ups)
    return 0;
 }
 
-int test_ups_program_eeprom(UPSINFO *ups, int command, char *data)
+int test_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
 {
    return 0;
 }

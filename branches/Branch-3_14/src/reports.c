@@ -98,7 +98,7 @@ static int log_status_close(UPSINFO *ups, int fd)
  * Log one line of the status file;
  * also send it to system log
  */
-static void log_status_write(UPSINFO *ups, char *fmt, ...)
+static void log_status_write(UPSINFO *ups, const char *fmt, ...)
 {
    va_list ap;
    char buf[MAXSTRING];
@@ -124,7 +124,7 @@ static void log_status_write(UPSINFO *ups, char *fmt, ...)
  */
 static void log_data(UPSINFO *ups)
 {
-   char *ptr;
+   const char *ptr;
    char msg[MAXSTRING];
    static int toggle = 0;
 

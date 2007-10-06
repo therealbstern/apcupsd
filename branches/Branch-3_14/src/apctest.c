@@ -64,7 +64,7 @@ static void program_smart_eeprom(void);
 static void print_eeprom_values(UPSINFO *ups);
 static void smart_ttymode(void);
 static void parse_eeprom_cmds(char *eprom, char locale);
-int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, char *data);
+int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, const char *data);
 static void print_valid_eeprom_values(UPSINFO *ups);
 #endif
 
@@ -87,7 +87,7 @@ static void usb_set_sens(void);
 #endif
 
 static void strip_trailing_junk(char *cmd);
-static char *get_cmd(char *prompt);
+static char *get_cmd(const char *prompt);
 static int write_file(char *buf);
 
 
@@ -103,7 +103,7 @@ static int test5_done = 0;
 int shm_OK = 0;
 
 /* Print a message, and also write it to an output file */
-static void pmsg(char *fmt, ...)
+static void pmsg(const char *fmt, ...)
 {
    char buf[3000];
    va_list arg_ptr;
@@ -1980,7 +1980,7 @@ static void usb_get_manf_date(void)
 #endif
 
 /* Get next input command from the terminal */
-static char *get_cmd(char *prompt)
+static char *get_cmd(const char *prompt)
 {
    static char cmd[1000];
 
@@ -2033,8 +2033,8 @@ static UPSINFO eeprom_ups;
  */
 static struct {
    char cmd;
-   char *config_directive;
-   char *descript;
+   const char *config_directive;
+   const char *descript;
    char type;
    int *data;
 } cmd_table[] = {

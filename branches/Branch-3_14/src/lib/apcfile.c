@@ -51,7 +51,7 @@ int make_file(UPSINFO *ups, const char *path)
 }
 
 /* Create the pid lock file. */
-char *pidfile = APCPID;
+const char *pidfile = APCPID;
 void make_pid_file(void)
 {
 #if !defined(HAVE_WIN32)

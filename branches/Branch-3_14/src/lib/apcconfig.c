@@ -414,7 +414,7 @@ static int match_facility(UPSINFO *ups, int offset,
    const GENINFO *junk, const char *v)
 {
    const struct {
-      char *fn;
+      const char *fn;
       int fi;
    } facnames[] = {
       {"daemon", LOG_DAEMON},

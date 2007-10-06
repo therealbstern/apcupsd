@@ -880,7 +880,7 @@ int pcnet_ups_kill_power(UPSINFO *ups)
    return 1;
 }
 
-int pcnet_ups_program_eeprom(UPSINFO *ups, int command, char *data)
+int pcnet_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
 {
    /* Unsupported */
    return 0;
