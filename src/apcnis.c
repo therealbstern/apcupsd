@@ -99,7 +99,7 @@ static int status_close(UPSINFO *ups, int nsockfd)
  * Buffer up the status messages so that they can be sent
  * by the status_close() routine over the network.
  */
-static void status_write(UPSINFO *ups, char *fmt, ...)
+static void status_write(UPSINFO *ups, const char *fmt, ...)
 {
    va_list ap;
    int i;

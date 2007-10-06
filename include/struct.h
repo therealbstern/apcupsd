@@ -365,15 +365,15 @@ class UPSINFO {
 };
 
 
-/*These are needed for commands executed in apcaction.c */
+/*These are needed for commands executed in action.c */
 typedef struct {
-   char *command;
+   const char *command;
    int pid;
 } UPSCOMMANDS;
 
 typedef struct s_cmd_msg {
    int level;
-   char *msg;
+   const char *msg;
 } UPSCMDMSG;
 
 #endif   /* _STRUCT_H */

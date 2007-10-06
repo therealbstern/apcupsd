@@ -26,7 +26,7 @@
 #include "apcsmart.h"
 
 /*********************************************************************/
-static char *get_apc_model_V_codes(const char *s, UPSINFO *ups)
+static const char *get_apc_model_V_codes(const char *s, UPSINFO *ups)
 {
 
    switch (s[0]) {
@@ -119,7 +119,7 @@ static char *get_apc_model_b_codes(const char *s, UPSINFO *ups)
 void get_apc_model(UPSINFO *ups)
 {
    char response[32];
-   char *cp;
+   const char *cp;
    unsigned char b;
    int i;
 

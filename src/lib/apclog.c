@@ -110,7 +110,7 @@ void d_msg(const char *file, int line, int level, const char *fmt, ...)
    va_list arg_ptr;
    bool details = true;
    struct timeval now;
-   char *my_name = "apcupsd";
+   const char *my_name = "apcupsd";
    static struct timeval start = {0,0};
 
    if (start.tv_sec == 0 && start.tv_usec == 0)

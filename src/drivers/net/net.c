@@ -169,7 +169,7 @@ static int initialize_device_data(UPSINFO *ups)
  * Returns -1 if network problem
  *   answer has "N/A" if host is not available or network error
  */
-static int getupsvar(UPSINFO *ups, char *request, char *answer, int anslen)
+static int getupsvar(UPSINFO *ups, const char *request, char *answer, int anslen)
 {
    struct driver_data *nid = (struct driver_data *)ups->driver_internal_data;
    int i;
@@ -491,7 +491,7 @@ int net_ups_get_capabilities(UPSINFO *ups)
    return 1;
 }
 
-int net_ups_program_eeprom(UPSINFO *ups, int command, char *data)
+int net_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
 {
    return 0;
 }

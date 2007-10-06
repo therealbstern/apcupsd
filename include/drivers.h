@@ -99,7 +99,7 @@ typedef struct upsdriver {
    int (*read_ups_volatile_data) (UPSINFO *ups);
    int (*get_ups_capabilities) (UPSINFO *ups);
    int (*check_ups_state) (UPSINFO *ups);
-   int (*ups_program_eeprom) (UPSINFO *ups, int command, char *data);
+   int (*ups_program_eeprom) (UPSINFO *ups, int command, const char *data);
    int (*ups_entry_point) (UPSINFO *ups, int command, void *data);
 } UPSDRIVER;
 

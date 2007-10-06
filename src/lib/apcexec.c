@@ -27,12 +27,12 @@
 #include "apc.h"
 
 static pthread_t thread_id[MAX_THREADS];
-static char *thread_name[MAX_THREADS];
+static const char *thread_name[MAX_THREADS];
 static int num_threads = 0;
 
 /* Start a "real" POSIX thread */
 int start_thread(UPSINFO *ups, void (*action) (UPSINFO * ups),
-   char *proctitle, char *argv0)
+   const char *proctitle, char *argv0)
 {
    pthread_t tid;
    int status, t_index;
@@ -151,7 +151,7 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
 #else
 int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
 {
-   char *argv[6];
+   const char *argv[6];
    char connected[20], powered[20];
    char apccontrol[MAXSTRING];
 
@@ -188,8 +188,8 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
       argv[2] = ups->upsname;      /* UPS name */
       argv[3] = connected;
       argv[4] = powered;
-      argv[5] = (char *)NULL;
-      execv(apccontrol, argv);
+      argv[5] = NULL;
+      execv(apccontrol, (char **)argv);
 
       /* NOT REACHED */
       log_event(ups, LOG_WARNING, _("Cannot exec %s %s: %s"),
