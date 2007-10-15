@@ -1,5 +1,5 @@
 /*
- * autil.h
+ * autil.cpp
  *
  * Common helper routines for a* classes.
  */
