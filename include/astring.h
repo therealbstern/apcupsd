@@ -36,6 +36,7 @@ public:
    bool operator!=(const char *rhs) const { return !(*this == rhs); }
    bool operator!=(const astring &rhs) const { return !(*this == rhs); }
 
+   operator const char *() { return _data; }
    const char *str() const { return _data; }
 
    void rtrim();
