@@ -147,7 +147,7 @@ bool PcnetDriver::process_data(const char *key, const char *value)
    /* Convert command to CI */
    cmd = strtoul(key, NULL, 16);
    for (ci=0; ci<CI_MAXCI; ci++)
-      if (_cmdmap[ci] == cmd)
+      if (_cmdmap[ci] == (int)cmd)
          break;
 
    /* No match? */
@@ -358,31 +358,24 @@ char *PcnetDriver::digest2ascii(md5_byte_t *digest)
    return ascii;
 }
 
-#define MAX_PAIRS 256
-
-const char *PcnetDriver::lookup_key(const char *key, struct pair table[])
+const char *PcnetDriver::lookup_key(const char *key, amap<astring, astring> *map)
 {
-   int idx;
    const char *ret = NULL;
-
-   for (idx=0; table[idx].key; idx++) {
-      if (strcmp(key, table[idx].key) == 0) {
-         ret = table[idx].value;
-         break;
-      }
-   }
+   amap<astring, astring>::iterator iter;
+   iter = map->find(key);
+   if (iter != map->end())
+      ret = iter.value();
 
    return ret;
 }
 
-PcnetDriver::pair *PcnetDriver::auth_and_map_packet(char *buf, int len)
+amap<astring, astring> *PcnetDriver::auth_and_map_packet(char *buf, int len)
 {
    char *key, *end, *ptr, *value;
    const char *val, *hash=NULL;
-   static struct pair pairs[MAX_PAIRS+1];
+   amap<astring, astring> *map;
    md5_state_t ms;
    md5_byte_t digest[16];
-   unsigned int idx;
    unsigned long uptime, reboots;
 
    /* If there's no MD= field, drop the packet */
@@ -402,10 +395,9 @@ PcnetDriver::pair *PcnetDriver::auth_and_map_packet(char *buf, int len)
    }
 
    /* Build a table of pointers to key/value pairs */
-   memset(pairs, 0, sizeof(pairs));
+   map = new amap<astring, astring>();
    ptr = buf;
-   idx = 0;
-   while (*ptr && idx < MAX_PAIRS) {
+   while (*ptr) {
       /* Find the beginning of the line */
       while (isspace(*ptr))
          ptr++;
@@ -433,26 +425,26 @@ PcnetDriver::pair *PcnetDriver::auth_and_map_packet(char *buf, int len)
       Dmsg2(300, "process_packet: key='%s' value='%s'\n",
          key, value);
 
-      /* Save key/value in table */
-      pairs[idx].key = key;
-      pairs[idx].value = value;
-      idx++;
+      /* Save key/value in map */
+      (*map)[key] = value;
    }
 
    if (_auth) {
       /* Check calculated hash vs received */
       Dmsg1(200, "process_packet: calculated=%s\n", hash);
-      val = lookup_key("MD", pairs);
+      val = lookup_key("MD", map);
       if (!val || strcmp(hash, val)) {
          Dmsg0(200, "process_packet: message hash failed\n");
+         delete map;
          return NULL;
       }
       Dmsg1(200, "process_packet: message hash passed\n", val);
 
       /* Check management card IP address */
-      val = lookup_key("PC", pairs);
+      val = lookup_key("PC", map);
       if (!val) {
          Dmsg0(200, "process_packet: Missing PC field\n");
+         delete map;
          return NULL;
       }
       Dmsg1(200, "process_packet: Expected IP=%s\n", _ipaddr);
@@ -460,6 +452,7 @@ PcnetDriver::pair *PcnetDriver::auth_and_map_packet(char *buf, int len)
       if (strcmp(val, _ipaddr)) {
          Dmsg2(200, "process_packet: IP address mismatch\n",
             _ipaddr, val);
+         delete map;
          return NULL;
       }
    }
@@ -469,16 +462,18 @@ PcnetDriver::pair *PcnetDriver::auth_and_map_packet(char *buf, int len)
     * this packet could be out of order, or an attacker may
     * be trying to replay an old packet.
     */
-   val = lookup_key("SR", pairs);
+   val = lookup_key("SR", map);
    if (!val) {
       Dmsg0(200, "process_packet: Missing SR field\n");
+      delete map;
       return NULL;
    }
    reboots = strtoul(val, NULL, 16);
 
-   val = lookup_key("SU", pairs);
+   val = lookup_key("SU", map);
    if (!val) {
       Dmsg0(200, "process_packet: Missing SU field\n");
+      delete map;
       return NULL;
    }
    uptime = strtoul(val, NULL, 16);
@@ -491,12 +486,13 @@ PcnetDriver::pair *PcnetDriver::auth_and_map_packet(char *buf, int len)
    if ((reboots == _reboots && uptime <= _uptime) ||
        (reboots < _reboots)) {
       Dmsg0(200, "process_packet: Packet is out of order or replayed\n");
+      delete map;
       return NULL;
    }
 
    _reboots = reboots;
    _uptime = uptime;
-   return pairs;
+   return map;
 }
 
 /*
@@ -511,8 +507,7 @@ bool PcnetDriver::CheckState()
    socklen_t fromlen;
    int retval;
    char buf[4096];
-   struct pair *map;
-   int idx;
+   amap<astring, astring> *map;
 
    /* Figure out when we need to exit by */
    gettimeofday(&exit, NULL);
@@ -586,10 +581,13 @@ bool PcnetDriver::CheckState()
 
       write_lock(_ups);
 
-      for (idx=0; map[idx].key; idx++)
-         done |= process_data(map[idx].key, map[idx].value);
+      amap<astring, astring>::iterator iter;
+      for (iter = map->begin(); iter != map->end(); ++iter)
+         done |= process_data(iter.key(), iter.value());
 
       write_unlock(_ups);
+
+      delete map;
    }
 
    /* If we successfully received a data packet, update timer. */
@@ -734,7 +732,7 @@ bool PcnetDriver::KillPower()
    int s, len=0, temp=0;
    char *start;
    const char *cs, *hash;
-   struct pair *map;
+   amap<astring, astring> *map;
    md5_state_t ms;
    md5_byte_t digest[16];
 
@@ -826,6 +824,7 @@ bool PcnetDriver::KillPower()
    if (cs == NULL) {
       Dmsg0(200, "pcnet_ups_kill_power: Missing CS field\n");
       close(s);
+      delete map;
       return false;
    }
 
@@ -841,6 +840,9 @@ bool PcnetDriver::KillPower()
    md5_append(&ms, (md5_byte_t*)_pass, strlen(_pass));
    md5_finish(&ms, digest);
    hash = digest2ascii(digest);
+
+   /* No longer need the map */
+   delete map;
 
    /* Send the shutdown request */
    asnprintf(data, sizeof(data),

@@ -9,6 +9,8 @@
 
 #include "drivers.h"
 #include "md5.h"
+#include "amap.h"
+#include "astring.h"
 
 class PcnetDriver: public UpsDriver
 {
@@ -32,18 +34,13 @@ public:
 
 private:
 
-   struct pair {
-      const char* key;
-      const char* value;
-   };
-
    static SelfTestResult decode_testresult(const char* str);
    static LastXferCause decode_lastxfer(const char *str);
    static char *digest2ascii(md5_byte_t *digest);
-   static const char *lookup_key(const char *key, struct pair table[]);
+   static const char *lookup_key(const char *key, amap<astring, astring> *map);
 
    bool process_data(const char *key, const char *value);
-   pair *auth_and_map_packet(char *buf, int len);
+   amap<astring, astring> *auth_and_map_packet(char *buf, int len);
 
    char _device[MAXSTRING];            /* Copy of ups->device */
    char *_ipaddr;                      /* IP address of UPS */
