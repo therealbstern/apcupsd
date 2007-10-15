@@ -1,5 +1,5 @@
 /*
- * astring.h
+ * astring.cpp
  *
  * Simple string management class. Like STL, but lighter.
  */

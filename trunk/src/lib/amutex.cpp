@@ -1,5 +1,5 @@
 /*
- * amutex.h
+ * amutex.cpp
  *
  * Simple mutex wrapper class.
  */
