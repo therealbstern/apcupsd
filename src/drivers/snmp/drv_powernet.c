@@ -567,8 +567,8 @@ bool SnmpDriver::powernet_snmp_ups_open()
 
    /* Trap session is a copy of client session with some tweaks */
    tmp = *s;
-   tmp.peername = "0.0.0.0:162";   /* Listen to snmptrap port on all interfaces */
-   tmp.local_port = 1;             /* We're a server, not a client */
+   tmp.peername = (char*)"0.0.0.0:162";  /* Listen to snmptrap port on all interfaces */
+   tmp.local_port = 1;                   /* We're a server, not a client */
    tmp.callback = powernet_snmp_callback;
    tmp.callback_magic = this;
 

@@ -56,7 +56,7 @@
 
 void attach_driver(UPSINFO *ups)
 {
-   char *driver_name = NULL;
+   const char *driver_name = NULL;
 
    write_lock(ups);
 

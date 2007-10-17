@@ -104,9 +104,9 @@ int checkhost(const char *check)
  * Note: XHTML added the meta character &apos;, but for backwards compatibility
  * with HTML 4.0, output it as &#39;
  */
-void html_puts(char *str)
+void html_puts(const char *str)
 {
-    unsigned char *p = (unsigned char *)str;
+    const unsigned char *p = (const unsigned char *)str;
     while (*p != '\0') {
         if (*p >= 0x7f) {
             printf ("&#%d;", (int) *p);

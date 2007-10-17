@@ -27,7 +27,7 @@
 /* Send the full status of the UPS to the client. */
 int output_status(UPSINFO *ups, int sockfd,
    void s_open(UPSINFO *ups),
-   void s_write(UPSINFO *ups, char *fmt, ...),
+   void s_write(UPSINFO *ups, const char *fmt, ...),
    int s_close(UPSINFO *ups, int sockfd))
 {
    char datetime[MAXSTRING];
@@ -478,7 +478,7 @@ int stat_close(UPSINFO *ups, int fd)
    return 0;
 }
 
-void stat_print(UPSINFO *ups, char *fmt, ...)
+void stat_print(UPSINFO *ups, const char *fmt, ...)
 {
    va_list arg_ptr;
 

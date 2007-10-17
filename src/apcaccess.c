@@ -25,14 +25,14 @@
 
 #include "apc.h"
 
-extern char *net_errmsg;
+extern const char *net_errmsg;
 
 /* Default values for contacting daemon */
-static char *host = "localhost";
+static const char *host = "localhost";
 static int port = NISPORT;
 
 /* Get and print status from apcupsd NIS server */
-static void do_pthreads_status(char *host, int port)
+static void do_pthreads_status(const char *host, int port)
 {
    int sockfd, n;
    char recvline[MAXSTRING + 1];

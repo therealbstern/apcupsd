@@ -48,6 +48,21 @@
 /* Enable this to force Linux 2.4 compatability mode */
 #define FORCE_COMPAT24  false
 
+/*
+ * When we are traversing the USB reports given by the UPS and we
+ * find an entry corresponding to an entry in the known_info table
+ * above, we make the following USB_INFO entry in the info table
+ * of our private data.
+ */
+struct LinuxUsbDriver::usb_info {
+   unsigned physical;              /* physical value wanted */
+   unsigned unit_exponent;         /* exponent */
+   unsigned unit;                  /* units */
+   int data_type;                  /* data type */
+   int ci;                         /* which CI does this usage represent? */
+   struct hiddev_usage_ref uref;   /* usage reference */
+};
+
 LinuxUsbDriver::LinuxUsbDriver(UPSINFO *ups)
    : UsbDriver(ups)
 {
@@ -331,30 +346,6 @@ bool LinuxUsbDriver::populate_uval(usb_info *info, usb_value *uval)
    return true;
 }
 
-/*
- * Get a field value
- */
-bool LinuxUsbDriver::SubclassGetValue(int ci, usb_value *uval)
-{
-   struct hiddev_report_info rinfo;
-   usb_info *info;
-
-   if (!_ups->UPS_Cap[ci] || !_info[ci])
-      return false;                /* UPS does not have capability */
-
-   /* Fetch the new value from the UPS */
-   info = _info[ci];       /* point to our info structure */
-   rinfo.report_type = info->uref.report_type;
-   rinfo.report_id = info->uref.report_id;
-   if (ioctl(_fd, HIDIOCGREPORT, &rinfo) < 0)   /* update Report */
-      return false;
-
-   if (ioctl(_fd, HIDIOCGUSAGE, &info->uref) < 0)       /* update UPS value */
-      return false;
-
-   /* Process the updated value */
-   return populate_uval(info, uval);
-}
 
 /*
  * Find the usb_info structure used for tracking a given usage. Searching
@@ -391,6 +382,31 @@ LinuxUsbDriver::usb_info *LinuxUsbDriver::find_info_by_ucode(unsigned int ucode)
    }
 
    return NULL;
+}
+
+/*
+ * Get a field value
+ */
+bool LinuxUsbDriver::SubclassGetValue(int ci, usb_value *uval)
+{
+   struct hiddev_report_info rinfo;
+   usb_info *info;
+
+   if (!_ups->UPS_Cap[ci] || !_info[ci])
+      return false;                /* UPS does not have capability */
+
+   /* Fetch the new value from the UPS */
+   info = _info[ci];       /* point to our info structure */
+   rinfo.report_type = info->uref.report_type;
+   rinfo.report_id = info->uref.report_id;
+   if (ioctl(_fd, HIDIOCGREPORT, &rinfo) < 0)   /* update Report */
+      return false;
+
+   if (ioctl(_fd, HIDIOCGUSAGE, &info->uref) < 0)       /* update UPS value */
+      return false;
+
+   /* Process the updated value */
+   return populate_uval(info, uval);
 }
 
 /*
@@ -671,7 +687,7 @@ bool LinuxUsbDriver::SubclassReadIntFromUps(int ci, int *value)
    return true;
 }
 
-bool LinuxUsbDriver::SubclassWriteIntToUps(int ci, int value, char *name)
+bool LinuxUsbDriver::SubclassWriteIntToUps(int ci, int value, const char *name)
 {
    struct hiddev_report_info rinfo;
    usb_info *info;

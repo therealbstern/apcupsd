@@ -48,10 +48,10 @@ public:
 
    // We provide default do-nothing implementations
    // for these methods since not all drivers need them.
-   virtual bool KillPower()                            { return false; }
-   virtual bool Setup()                                { return true;  }
-   virtual bool ProgramEeprom(int command, char *data) { return false; }
-   virtual bool EntryPoint(int command, void *data)    { return false; }
+   virtual bool KillPower()                                  { return false; }
+   virtual bool Setup()                                      { return true;  }
+   virtual bool ProgramEeprom(int command, const char *data) { return false; }
+   virtual bool EntryPoint(int command, void *data)          { return false; }
 
    const char *driver_name;
 

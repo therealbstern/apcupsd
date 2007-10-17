@@ -54,7 +54,7 @@ private:
    static LastXferCause decode_lastxfer(char *str);
 
    bool initialize_device_data();
-   bool getupsvar(char *request, char *answer, int anslen);
+   bool getupsvar(const char *request, char *answer, int anslen);
    bool poll_ups();
    bool fill_status_buffer();
    bool get_ups_status_flag(int fill);

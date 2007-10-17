@@ -81,7 +81,7 @@ UPSINFO *ups = NULL;
 char argvalue[MAXSTRING];
 
 /* Default values for contacting daemon */
-static char *host = "localhost";
+static const char *host = "localhost";
 static int port = NISPORT;
 
 
@@ -90,7 +90,7 @@ static int port = NISPORT;
  * to get a raw upsinfo buffer.  This code does not support
  * mixing machines of different types.
  */
-static void get_raw_upsinfo(UPSINFO *ups, char *host, int port)
+static void get_raw_upsinfo(UPSINFO *ups, const char *host, int port)
 {
    int sockfd, n;
 
@@ -152,7 +152,7 @@ void init_timer(int timer, void (*fnhandler) (int))
    alarm(timer);
 }
 
-char *xlate_history(LastXferCause code)
+const char *xlate_history(LastXferCause code)
 {
    switch (code) {
    case XFER_NONE:

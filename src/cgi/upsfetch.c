@@ -44,8 +44,8 @@ static char errmsg[200];
  *    and floating point values.
  */
 static const struct {   
-   char *request;
-   char *upskeyword;
+   const char *request;
+   const char *upskeyword;
    int nfields;
 } cmdtrans[] = {
    {"model",      "MODEL",    0},
@@ -216,7 +216,7 @@ int getupsvar(const char *host, const char *request,
     char *answer, size_t anslen) 
 {
     int i;
-    char *stat_match = NULL;
+    const char *stat_match = NULL;
     char *find;
     int nfields = 0;
      

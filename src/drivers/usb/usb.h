@@ -54,7 +54,7 @@ protected:
       int value_type;               /* Type of returned value */
       double dValue;                /* Value if double */
       int iValue;                   /* Integer value */
-      char *UnitName;               /* Name of units */
+      const char *UnitName;         /* Name of units */
       char sValue[MAXSTRING];       /* Value if string */
    };
 
@@ -64,7 +64,7 @@ protected:
    virtual bool SubclassClose() = 0;
    virtual bool SubclassCheckState() = 0;
    virtual bool SubclassGetValue(int ci, usb_value *uval) = 0;
-   virtual bool SubclassWriteIntToUps(int ci, int value, char *name) = 0;
+   virtual bool SubclassWriteIntToUps(int ci, int value, const char *name) = 0;
    virtual bool SubclassReadIntFromUps(int ci, int *value) = 0;
 
    // Upcalls from derived class to UsbDriver base class
@@ -87,7 +87,7 @@ private:
    bool process_value_bup(int ci, usb_value* uval);
    bool update_value(int ci);
    void process_value(int ci, usb_value* uval);
-   bool write_int_to_ups(int ci, int value, char *name)
+   bool write_int_to_ups(int ci, int value, const char *name)
       { return SubclassWriteIntToUps(ci, value, name); }
    bool read_int_from_ups(int ci, int *value)
       { return SubclassReadIntFromUps(ci, value); }

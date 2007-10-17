@@ -48,7 +48,7 @@ static void do_ambtempf (const char *monhost, const char *suffix);
 static void do_utility (const char *monhost, const char *suffix);
 
 static const struct {
-        char    *name;
+        const char *name;
         void    (*func)(const char *monhost, const char *suffix);
 }       fields[] =
 {
@@ -114,7 +114,7 @@ void parsearg(const char *var, const char *value)
     }
 }
 
-static void report_error(char *str) 
+static void report_error(const char *str) 
 {
     printf("<p>%s</p>\n", str);
     html_finish();
@@ -149,7 +149,7 @@ static void do_system(const char *monhost, const char *suffix)
 static void do_status(const char *monhost, const char *suffix)
 {
     char    status[64], *stat, stattxt[128], temp[128];
-    char    *class_type;
+    const char *class_type;
     int     i, severity;
     long    ups_status;
 

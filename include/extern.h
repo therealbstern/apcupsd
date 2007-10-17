@@ -157,10 +157,10 @@ extern int check_wrappers(char *av, int newsock);
 
 /* In apcstatus.c */
 extern int output_status(UPSINFO *ups, int fd, void s_open(UPSINFO * ups),
-   void s_write(UPSINFO *ups, char *fmt, ...), int s_close(UPSINFO * ups, int fd));
+   void s_write(UPSINFO *ups, const char *fmt, ...), int s_close(UPSINFO * ups, int fd));
 extern void stat_open(UPSINFO *ups);
 extern int stat_close(UPSINFO *ups, int fd);
-extern void stat_print(UPSINFO *ups, char *fmt, ...);
+extern void stat_print(UPSINFO *ups, const char *fmt, ...);
 
 
 /* In apcevents.c */
@@ -189,7 +189,7 @@ extern void init_thread_signals(void);
 extern void restore_signals(void);
 extern void sleep_forever(void);
 
-/* In aups.c */
+/* In newups.c */
 extern UPSINFO *new_ups(void);
 extern UPSINFO *attach_ups(UPSINFO *ups);
 extern void detach_ups(UPSINFO *ups);
@@ -201,14 +201,14 @@ extern void destroy_ups(UPSINFO *ups);
 #define write_unlock(ups) _write_unlock(__FILE__, __LINE__, (ups))
 #define read_lock(ups) _read_lock(__FILE__, __LINE__, (ups))
 
-extern void _read_lock(char *file, int line, UPSINFO *ups);
-extern void _read_unlock(char *file, int line, UPSINFO *ups);
-extern void _write_lock(char *file, int line, UPSINFO *ups);
-extern void _write_unlock(char *file, int line, UPSINFO *ups);
+extern void _read_lock(const char *file, int line, UPSINFO *ups);
+extern void _read_unlock(const char *file, int line, UPSINFO *ups);
+extern void _write_lock(const char *file, int line, UPSINFO *ups);
+extern void _write_unlock(const char *file, int line, UPSINFO *ups);
 
 /* In apcexec.c */
 extern int start_thread(UPSINFO *ups, void (*action) (UPSINFO * ups),
-   char *proctitle, char *argv0);
+   const char *proctitle, char *argv0);
 extern int execute_command(UPSINFO *ups, UPSCOMMANDS cmd);
 extern void wait_for_termination(int serial_pid);
 
@@ -217,9 +217,9 @@ extern void log_event(const UPSINFO *ups, int level, const char *fmt, ...);
 extern void logf(const char *fmt, ...);
 
 /* In apcnetlib.c */
-extern int net_open(char *host, char *service, int port);
+extern int net_open(const char *host, char *service, int port);
 extern void net_close(int sockfd);
-extern int net_send(int sockfd, char *buff, int len);
+extern int net_send(int sockfd, const char *buff, int len);
 extern int net_recv(int sockfd, char *buff, int maxlen);
 
 /* In apclist.c */

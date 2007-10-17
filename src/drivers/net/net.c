@@ -170,7 +170,7 @@ bool NetDriver::initialize_device_data()
  * Returns -1 if network problem
  *   answer has "N/A" if host is not available or network error
  */
-bool NetDriver::getupsvar(char *request, char *answer, int anslen)
+bool NetDriver::getupsvar(const char *request, char *answer, int anslen)
 {
    int i;
    const char *stat_match = NULL;
