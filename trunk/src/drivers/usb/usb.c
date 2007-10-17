@@ -831,7 +831,7 @@ bool UsbDriver::ReadStaticData()
 
 bool UsbDriver::KillPower()
 {
-   char *func;
+   const char *func;
    int shutdown = 0;
    int val;
 

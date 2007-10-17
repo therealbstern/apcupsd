@@ -26,7 +26,7 @@
 #include "apcsmart.h"
 
 /*********************************************************************/
-char *ApcSmartDriver::get_apc_model_V_codes(const char *s)
+const char *ApcSmartDriver::get_apc_model_V_codes(const char *s)
 {
    switch (s[0]) {
    case '0':
@@ -117,7 +117,7 @@ char *ApcSmartDriver::get_apc_model_b_codes(const char *s)
 void ApcSmartDriver::get_apc_model()
 {
    char response[32];
-   char *cp;
+   const char *cp;
    unsigned char b;
    int i;
 

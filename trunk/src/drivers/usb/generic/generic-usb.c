@@ -27,8 +27,7 @@
 #include "hidutils.h"
 
 // Statics used to coordinate first time libusb init
-amutex GenericUsbDriver::_mutex("genericusb");
-bool GenericUsbDriver::_init = false;
+bool GenericUsbDriver::_libusbinit = false;
 
 /*
  * When we are traversing the USB reports given by the UPS and we find
@@ -53,78 +52,12 @@ GenericUsbDriver::GenericUsbDriver(UPSINFO *ups)
    memset(_info, 0, sizeof(_info));
 
    /* Initialize libusb */
-   _mutex.lock();
-   if (!_init) {
+   if (!_libusbinit) {
       Dmsg0(200, "Initializing libusb\n");
       usb_set_debug(debug_level/100);
       usb_init();
-      _init = true;
+      _libusbinit = true;
    }
-   _mutex.unlock();
-}
-
-bool GenericUsbDriver::SubclassGetCapabilities()
-{
-   int i, rc, ci, phys;
-   hid_item_t item;
-   usb_info *info;
-
-   write_lock(_ups);
-
-   for (i = 0; _known_info[i].usage_code; i++) {
-      ci = _known_info[i].ci;
-      phys = _known_info[i].physical;
-
-      if (ci != CI_NONE && !_ups->UPS_Cap[ci]) {
-         /* Prefer input items, but try feature if input fails */
-         rc = hidu_locate_item(
-               _rdesc,
-               _known_info[i].usage_code,    /* Match usage code */
-               -1,                           /* Don't care about application */
-               (phys == P_ANY) ? -1 : phys,  /* Match physical usage */
-               -1,                           /* Don't care about logical */
-               HID_KIND_INPUT,               /* Match feature type */
-               &item);
-
-         if (!rc) {
-            rc = hidu_locate_item(
-                  _rdesc,
-                  _known_info[i].usage_code,    /* Match usage code */
-                  -1,                           /* Don't care about application */
-                  (phys == P_ANY) ? -1 : phys,  /* Match physical usage */
-                  -1,                           /* Don't care about logical */
-                  HID_KIND_FEATURE,             /* Match feature type */
-                  &item);
-         }
-
-         if (rc) {
-            _ups->UPS_Cap[ci] = true;
-
-            info = (usb_info *)malloc(sizeof(usb_info));
-            if (!info) {
-               write_unlock(_ups);
-               Error_abort0(_("Out of memory.\n"));
-            }
-
-            _info[ci] = info;
-            info->ci = ci;
-            info->usage_code = item.usage;
-            info->unit_exponent = item.unit_exponent;
-            info->unit = item.unit;
-            info->data_type = _known_info[i].data_type;
-            memcpy(&info->item, &item, sizeof(item));
-            info->report_len = hid_report_size( /* +1 for report id */
-               _rdesc, item.kind, item.report_ID) + 1;
-            Dmsg5(200, "Got ci=%d, rpt=%d (len=%d), usage=0x%x (len=%d)\n",
-               ci, item.report_ID, info->report_len,
-               _known_info[i].usage_code, item.report_size);
-         }
-      }
-   }
-
-   _ups->UPS_Cap[CI_STATUS] = true; /* we always have status flag */
-   write_unlock(_ups);
-   return true;
 }
 
 bool GenericUsbDriver::populate_uval(
@@ -217,58 +150,6 @@ bool GenericUsbDriver::populate_uval(
 
    memcpy(uval, &val, sizeof(*uval));
    return true;   
-}
-
-/*
- * Get a field value
- */
-bool GenericUsbDriver::SubclassGetValue(int ci, usb_value *uval)
-{
-   usb_info *info = _info[ci];
-   unsigned char data[20];
-   int len;
-
-   /*
-    * Note we need to check info since CI_STATUS is always true
-    * even when the UPS doesn't directly support that CI.
-    */
-   if (!UPS_HAS_CAP(ci) || !info)
-      return false;                /* UPS does not have capability */
-
-   /*
-    * Clear the destination buffer. In the case of a short transfer (see
-    * below) this will increase the likelihood of extracting the correct
-    * value in spite of the missing data.
-    */
-   memset(data, 0, sizeof(data));
-
-   /* Fetch the proper report */
-   len = hidu_get_report(_fd, &info->item, data, info->report_len);
-   if (len == -1)
-      return false;
-
-   /*
-    * Some UPSes seem to have broken firmware that sends a different number
-    * of bytes (usually fewer) than the report descriptor specifies. On
-    * UHCI controllers under *BSD, this can lead to random lockups. To
-    * reduce the likelihood of a lockup, we adjust our expected length to
-    * match the actual as soon as a mismatch is detected, so future
-    * transfers will have the proper lengths from the outset. NOTE that
-    * the data returned may not be parsed properly (since the parsing is
-    * necessarily based on the report descriptor) but given that HID
-    * reports are in little endian byte order and we cleared the buffer
-    * above, chances are good that we will actually extract the right
-    * value in spite of the UPS's brokenness.
-    */
-   if (info->report_len != len) {
-      Dmsg4(100, "Report length mismatch, fixing "
-         "(id=%d, ci=%d, expected=%d, actual=%d)\n",
-         info->item.report_ID, ci, info->report_len, len);
-      info->report_len = len;
-   }
-
-   /* Populate a uval struct using the raw report data */
-   return populate_uval(info, data, uval);
 }
 
 void GenericUsbDriver::reinitialize()
@@ -471,6 +352,122 @@ bool GenericUsbDriver::usb_link_check()
 }
 
 /*
+ * Get a field value
+ */
+bool GenericUsbDriver::SubclassGetValue(int ci, usb_value *uval)
+{
+   usb_info *info = _info[ci];
+   unsigned char data[20];
+   int len;
+
+   /*
+    * Note we need to check info since CI_STATUS is always true
+    * even when the UPS doesn't directly support that CI.
+    */
+   if (!UPS_HAS_CAP(ci) || !info)
+      return false;                /* UPS does not have capability */
+
+   /*
+    * Clear the destination buffer. In the case of a short transfer (see
+    * below) this will increase the likelihood of extracting the correct
+    * value in spite of the missing data.
+    */
+   memset(data, 0, sizeof(data));
+
+   /* Fetch the proper report */
+   len = hidu_get_report(_fd, &info->item, data, info->report_len);
+   if (len == -1)
+      return false;
+
+   /*
+    * Some UPSes seem to have broken firmware that sends a different number
+    * of bytes (usually fewer) than the report descriptor specifies. On
+    * UHCI controllers under *BSD, this can lead to random lockups. To
+    * reduce the likelihood of a lockup, we adjust our expected length to
+    * match the actual as soon as a mismatch is detected, so future
+    * transfers will have the proper lengths from the outset. NOTE that
+    * the data returned may not be parsed properly (since the parsing is
+    * necessarily based on the report descriptor) but given that HID
+    * reports are in little endian byte order and we cleared the buffer
+    * above, chances are good that we will actually extract the right
+    * value in spite of the UPS's brokenness.
+    */
+   if (info->report_len != len) {
+      Dmsg4(100, "Report length mismatch, fixing "
+         "(id=%d, ci=%d, expected=%d, actual=%d)\n",
+         info->item.report_ID, ci, info->report_len, len);
+      info->report_len = len;
+   }
+
+   /* Populate a uval struct using the raw report data */
+   return populate_uval(info, data, uval);
+}
+
+bool GenericUsbDriver::SubclassGetCapabilities()
+{
+   int i, rc, ci, phys;
+   hid_item_t item;
+   usb_info *info;
+
+   write_lock(_ups);
+
+   for (i = 0; _known_info[i].usage_code; i++) {
+      ci = _known_info[i].ci;
+      phys = _known_info[i].physical;
+
+      if (ci != CI_NONE && !_ups->UPS_Cap[ci]) {
+         /* Prefer input items, but try feature if input fails */
+         rc = hidu_locate_item(
+               _rdesc,
+               _known_info[i].usage_code,    /* Match usage code */
+               -1,                           /* Don't care about application */
+               (phys == P_ANY) ? -1 : phys,  /* Match physical usage */
+               -1,                           /* Don't care about logical */
+               HID_KIND_INPUT,               /* Match feature type */
+               &item);
+
+         if (!rc) {
+            rc = hidu_locate_item(
+                  _rdesc,
+                  _known_info[i].usage_code,    /* Match usage code */
+                  -1,                           /* Don't care about application */
+                  (phys == P_ANY) ? -1 : phys,  /* Match physical usage */
+                  -1,                           /* Don't care about logical */
+                  HID_KIND_FEATURE,             /* Match feature type */
+                  &item);
+         }
+
+         if (rc) {
+            _ups->UPS_Cap[ci] = true;
+
+            info = (usb_info *)malloc(sizeof(usb_info));
+            if (!info) {
+               write_unlock(_ups);
+               Error_abort0(_("Out of memory.\n"));
+            }
+
+            _info[ci] = info;
+            info->ci = ci;
+            info->usage_code = item.usage;
+            info->unit_exponent = item.unit_exponent;
+            info->unit = item.unit;
+            info->data_type = _known_info[i].data_type;
+            memcpy(&info->item, &item, sizeof(item));
+            info->report_len = hid_report_size( /* +1 for report id */
+               _rdesc, item.kind, item.report_ID) + 1;
+            Dmsg5(200, "Got ci=%d, rpt=%d (len=%d), usage=0x%x (len=%d)\n",
+               ci, item.report_ID, info->report_len,
+               _known_info[i].usage_code, item.report_size);
+         }
+      }
+   }
+
+   _ups->UPS_Cap[CI_STATUS] = true; /* we always have status flag */
+   write_unlock(_ups);
+   return true;
+}
+
+/*
  * libusb-win32, pthreads, and compat.h all have different ideas
  * of what ETIMEDOUT is on mingw. We need to make sure we match
  * libusb-win32's error.h in that case, so override ETIMEDOUT.
@@ -617,7 +614,7 @@ bool GenericUsbDriver::SubclassReadIntFromUps(int ci, int *value)
    return true;
 }
 
-bool GenericUsbDriver::SubclassWriteIntToUps(int ci, int value, char *name)
+bool GenericUsbDriver::SubclassWriteIntToUps(int ci, int value, const char *name)
 {
    usb_info *info;
    int old_value, new_value;

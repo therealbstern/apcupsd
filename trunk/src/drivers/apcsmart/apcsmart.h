@@ -44,7 +44,7 @@ public:
    // for these methods since not all drivers need them.
    virtual bool KillPower();
    virtual bool Setup();
-   virtual bool ProgramEeprom(int command, char *data);
+   virtual bool ProgramEeprom(int command, const char *data);
    virtual bool EntryPoint(int command, void *data);
 
 private:
@@ -57,12 +57,12 @@ private:
    int getline(char *s, int len);
    void UPSlinkCheck();
 
-   void change_ups_battery_date(char *newdate);
-   void change_ups_name(char *newname);
+   void change_ups_battery_date(const char *newdate);
+   void change_ups_name(const char *newname);
    void change_extended();
-   int change_ups_eeprom_item(char *title, char cmd, char *setting);
+   int change_ups_eeprom_item(const char *title, char cmd, const char *setting);
 
-   char *get_apc_model_V_codes(const char *s);
+   const char *get_apc_model_V_codes(const char *s);
    char *get_apc_model_b_codes(const char *s);   
    void get_apc_model();
 

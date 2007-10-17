@@ -27,7 +27,7 @@
 
 
 /*********************************************************************/
-bool ApcSmartDriver::ProgramEeprom(int command, char *data)
+bool ApcSmartDriver::ProgramEeprom(int command, const char *data)
 {
    char setting[20];
 
@@ -210,7 +210,7 @@ bool ApcSmartDriver::ProgramEeprom(int command, char *data)
 }
 
 /*********************************************************************/
-void ApcSmartDriver::change_ups_name(char *newname)
+void ApcSmartDriver::change_ups_name(const char *newname)
 {
    char *n;
    char response[32];
@@ -270,7 +270,7 @@ void ApcSmartDriver::change_ups_name(char *newname)
 /*
  * Update date battery replaced
  */
-void ApcSmartDriver::change_ups_battery_date(char *newdate)
+void ApcSmartDriver::change_ups_battery_date(const char *newdate)
 {
    char *n;
    char response[32];
@@ -320,7 +320,8 @@ void ApcSmartDriver::change_ups_battery_date(char *newdate)
 }
 
 /*********************************************************************/
-int ApcSmartDriver::change_ups_eeprom_item(char *title, char cmd, char *setting)
+int ApcSmartDriver::change_ups_eeprom_item(
+   const char *title, char cmd, const char *setting)
 {
    char response[32];
    char response1[32];

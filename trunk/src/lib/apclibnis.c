@@ -39,7 +39,7 @@
 #endif
 
 int net_errno = 0;                 /* error number -- not yet implemented */
-char *net_errmsg = NULL;           /* pointer to error message */
+const char *net_errmsg = NULL;     /* pointer to error message */
 char net_errbuf[256];              /* error message buffer for messages */
 
 
@@ -103,7 +103,7 @@ static int read_nbytes(int fd, char *ptr, int nbytes)
  * Write nbytes to the network.
  * It may require several writes.
  */
-static int write_nbytes(int fd, char *ptr, int nbytes)
+static int write_nbytes(int fd, const char *ptr, int nbytes)
 {
    int nleft, nwritten;
 
@@ -195,7 +195,7 @@ int net_recv(int sockfd, char *buff, int maxlen)
  * Returns number of bytes sent
  * Returns -1 on error
  */
-int net_send(int sockfd, char *buff, int len)
+int net_send(int sockfd, const char *buff, int len)
 {
    int rc;
    short pktsiz;
@@ -223,7 +223,7 @@ int net_send(int sockfd, char *buff, int len)
  * Returns -1 on error
  * Returns socket file descriptor otherwise
  */
-int net_open(char *host, char *service, int port)
+int net_open(const char *host, char *service, int port)
 {
    int sockfd;
    struct hostent *hp;
