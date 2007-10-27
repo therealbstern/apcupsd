@@ -84,6 +84,7 @@ static void usb_set_battery_date(void);
 static void usb_get_manf_date(void);
 static void usb_set_alarm(void);
 static void usb_set_sens(void);
+static void usb_set_xferv(int lowhigh);
 #endif
 
 static void strip_trailing_junk(char *cmd);
@@ -1541,15 +1542,17 @@ static void do_usb_testing(void)
 
    while (!quit) {
       pmsg("\n"
-           "1) Test kill UPS power\n"
-           "2) Perform self-test\n"
-           "3) Read last self-test result\n"
-           "4) Change battery date\n"
-           "5) View battery date\n"
-           "6) View manufacturing date\n"
-           "7) Set alarm behavior\n"
-           "8) Set sensitivity\n"
-           "9) Quit\n\n");
+           "1)  Test kill UPS power\n"
+           "2)  Perform self-test\n"
+           "3)  Read last self-test result\n"
+           "4)  Change battery date\n"
+           "5)  View battery date\n"
+           "6)  View manufacturing date\n"
+           "7)  Set alarm behavior\n"
+           "8)  Set sensitivity\n"
+           "9)  Set low transfer voltage\n"
+           "10) Set high transfer voltage\n"
+           "11) Quit\n\n");
 
       cmd = get_cmd("Select function number: ");
       if (cmd) {
@@ -1581,14 +1584,20 @@ static void do_usb_testing(void)
             usb_set_sens();
             break;
          case 9:
+            usb_set_xferv(0);
+            break;
+         case 10:
+            usb_set_xferv(1);
+            break;
+         case 11:
             quit = TRUE;
             break;
          default:
-            pmsg("Illegal response. Please enter 1-9\n");
+            pmsg("Illegal response. Please enter 1-11\n");
             break;
          }
       } else {
-         pmsg("Illegal response. Please enter 1-9\n");
+         pmsg("Illegal response. Please enter 1-11\n");
       }
    }
    ptime();
@@ -1599,6 +1608,60 @@ static void do_usb_testing(void)
 }
 
 #ifdef HAVE_USB_DRIVER
+
+static void usb_set_xferv(int lowhigh)
+{
+   int result;
+   char* cmd;
+   const char *text;
+   int ci;
+
+   if (lowhigh) {
+      text = "HIGH";
+      ci = CI_HTRANS;
+   } else {
+      text = "LOW";
+      ci = CI_LTRANS;
+   }
+
+   if (!usb_read_int_from_ups(ups, ci, &result)) {
+      pmsg("\nI don't know how to control the %s transfer voltage "
+         " settings on your UPS.\n", text);
+      return;
+   }
+
+   int newval;
+   do {
+      pmsg("Current %s transfer voltage setting: %d Volts\n", text, result);
+
+      pmsg("Enter new %s transfer voltage (0 to cancel): ", text);
+      cmd = get_cmd("");
+      newval = atoi(cmd);
+
+      // Check for exit
+      if (newval == 0)
+         return;
+
+      // Write new value
+      usb_write_int_to_ups(ups, ci, newval, text);
+
+      // Give write a chance to work, then read new value
+      sleep(1);
+      result = 0;
+      usb_read_int_from_ups(ups, ci, &result);
+
+      if (result != newval) {
+         pmsg("FAILED to set new %s transfer voltage.\n\n"
+              "This is probably because you entered a value that is out-of-range\n"
+              "for your UPS. The acceptable range of values varies based on UPS\n"
+              "model. The UPS has probably set the value as close as possible to\n"
+              "what you requested.\n\n", text);
+      }
+   }
+   while (result != newval);
+
+   pmsg("New %s transfer voltage setting: %d Volts\n", text, result);
+}
 
 static void usb_set_sens(void)
 {
@@ -1678,7 +1741,6 @@ static void usb_set_sens(void)
       pmsg("UNKNOWN\n");
       break;
    }
-   
 }
 
 static void usb_set_alarm(void)
