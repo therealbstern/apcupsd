@@ -792,9 +792,9 @@ int pusb_write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
 
       old_value = hid_get_data(rpt + 1, &info->item);
 
-      hid_set_data(rpt + 1, &info->item, value);
+      hid_set_data(rpt + 1, &info->witem, value);
 
-      if (!hidu_set_report(my_data->fd, &info->item, rpt, info->report_len)) {
+      if (!hidu_set_report(my_data->fd, &info->witem, rpt, info->report_len)) {
          Dmsg1(000, "set_report for kill power function %s failed.\n", name);
          return false;
       }
