@@ -62,7 +62,8 @@ typedef struct s_usb_info {
    unsigned unit;                  /* units */
    int data_type;                  /* data type */
    int ci;                         /* which CI does this usage represent? */
-   struct hiddev_usage_ref uref;   /* usage reference */
+   struct hiddev_usage_ref uref;   /* usage reference (read) */
+   struct hiddev_usage_ref wuref;  /* usage reference (write) */
 } USB_INFO;
 
 /*
@@ -339,6 +340,10 @@ static bool populate_uval(UPSINFO *ups, USB_INFO *info, USB_VALUE *uval)
          val.dValue = info->uref.value;
       else
          val.dValue = ((double)info->uref.value) * pow_ten(exponent);
+
+      // Store a (possibly truncated) copy of the floating point value in the
+      // integer field as well.
+      val.iValue = (int)val.dValue;
 
       Dmsg4(200, "Def val=%d exp=%d dVal=%f ci=%d\n", info->uref.value,
          exponent, val.dValue, info->ci);
@@ -691,28 +696,46 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
                   int ci = known_info[k].ci;
 
                   if (ci != CI_NONE &&
-                      !ups->UPS_Cap[ci] &&
                       uref.usage_code == known_info[k].usage_code &&
                       (known_info[k].physical == P_ANY ||
                          known_info[k].physical == finfo.physical)) {
-                     ups->UPS_Cap[ci] = true;
-                     info = (USB_INFO *)malloc(sizeof(USB_INFO));
 
+                     // If we do not have any data saved for this report yet,
+                     // allocate an USB_INFO and populate the read uref.
+                     info = my_data->info[ci];
                      if (!info) {
-                        write_unlock(ups);
-                        Error_abort0(_("Out of memory.\n"));
+                        ups->UPS_Cap[ci] = true;
+                        info = (USB_INFO *)malloc(sizeof(USB_INFO));
+
+                        if (!info) {
+                           write_unlock(ups);
+                           Error_abort0(_("Out of memory.\n"));
+                        }
+
+                        my_data->info[ci] = info;
+                        memset(info, 0, sizeof(*info));
+                        info->ci = ci;
+                        info->physical = finfo.physical;
+                        info->unit_exponent = finfo.unit_exponent;
+                        info->unit = finfo.unit;
+                        info->data_type = known_info[k].data_type;
+                        memcpy(&info->uref, &uref, sizeof(uref));
+
+                        Dmsg3(200, "Got READ ci=%d, usage=0x%x, rpt=%d\n",
+                           ci, known_info[k].usage_code, uref.report_id);
                      }
 
-                     my_data->info[ci] = info;
-                     info->ci = ci;
-                     info->physical = finfo.physical;
-                     info->unit_exponent = finfo.unit_exponent;
-                     info->unit = finfo.unit;
-                     info->data_type = known_info[k].data_type;
-                     memcpy(&info->uref, &uref, sizeof(uref));
+                     // If this is a FEATURE report and we haven't set the
+                     // write uref yet, place it in the write uref (possibly in
+                     // addition to placing it in the read uref above).
+                     if (rinfo.report_type == HID_REPORT_TYPE_FEATURE &&
+                         info->wuref.report_id == 0) {
+                        memcpy(&info->wuref, &uref, sizeof(uref));
 
-                     Dmsg2(200, "Got ci=%d, usage=0x%x\n", ci,
-                        known_info[k].usage_code);
+                        Dmsg3(200, "Got WRITE ci=%d, usage=0x%x, rpt=%d\n",
+                           ci, known_info[k].usage_code, uref.report_id);
+                     }
+
                      break;
                   }
                }
@@ -746,7 +769,9 @@ int pusb_write_int_to_ups(UPSINFO *ups, int ci, int value, const char *name)
    USB_INFO *info;
    int old_value, new_value;
 
-   if (ups->UPS_Cap[ci] && my_data->info[ci]) {
+   // Make sure we have a writable uref for this CI
+   if (ups->UPS_Cap[ci] && my_data->info[ci] &&
+       my_data->info[ci]->wuref.report_id) {
       info = my_data->info[ci];    /* point to our info structure */
       rinfo.report_type = info->uref.report_type;
       rinfo.report_id = info->uref.report_id;
@@ -759,19 +784,21 @@ int pusb_write_int_to_ups(UPSINFO *ups, int ci, int value, const char *name)
       }
 
       /* Get UPS value */
-      if (ioctl(my_data->fd, HIDIOCGUSAGE, &info->uref) < 0) {
+      if (ioctl(my_data->fd, HIDIOCGUSAGE, &info->wuref) < 0) {
          Dmsg2(000, "HIDIOCGUSAGE for function %s failed. ERR=%s\n",
             name, strerror(errno));
          return false;
       }
       old_value = info->uref.value;
 
-      info->uref.value = value;
-      Dmsg3(100, "SUSAGE type=%d id=%d index=%d\n", info->uref.report_type,
-         info->uref.report_id, info->uref.field_index);
+      info->wuref.value = value;
+      rinfo.report_type = info->wuref.report_type;
+      rinfo.report_id = info->wuref.report_id;
+      Dmsg3(100, "SUSAGE type=%d id=%d index=%d\n", info->wuref.report_type,
+         info->wuref.report_id, info->wuref.field_index);
 
       /* Update UPS value */
-      if (ioctl(my_data->fd, HIDIOCSUSAGE, &info->uref) < 0) {
+      if (ioctl(my_data->fd, HIDIOCSUSAGE, &info->wuref) < 0) {
          Dmsg2(000, "HIDIOCSUSAGE for function %s failed. ERR=%s\n",
             name, strerror(errno));
          return false;
@@ -790,6 +817,9 @@ int pusb_write_int_to_ups(UPSINFO *ups, int ci, int value, const char *name)
        * device, which is important since we need to make sure it
        * happens before subsequent reports are sent.
        */
+
+      rinfo.report_type = info->uref.report_type;
+      rinfo.report_id = info->uref.report_id;
 
       /* Get report */
       if (ioctl(my_data->fd, HIDIOCGREPORT, &rinfo) < 0) {
