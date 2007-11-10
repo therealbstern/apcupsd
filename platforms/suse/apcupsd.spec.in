@@ -24,7 +24,7 @@
 
 # basic defines for every build
 %define _version @VERSION@
-%define _release 1
+%define _release 2
 
 #--------------------------------------------------------------------------
 # it should not be necessary to change anything below here for a release
@@ -65,6 +65,10 @@
 # Mandrake and Mandriva
 %define mdk 0
 %{?build_mdk:%define mdk 1}
+
+%if ! %{suse}
+%define suse_version 0
+%endif
 
 %if %{suse}
 %define initdir /etc/rc.d
@@ -119,8 +123,13 @@ BuildRequires: glibc-devel >= 2.3
 BuildRequires: tetex
 BuildRequires: tetex-latex
 %endif
-%if %{suse}
+%if %{suse_version} == 900 || %{suse_version} == 910 || %{suse_version} == 920 || %{suse_version} == 930 || %{suse_version} == 1000 || %{suse_version} == 1010 || %{suse_version} == 1020 
 BuildRequires: tetex
+BuildRequires: latex2html
+%endif
+%if %{suse_version} == 1030
+BuildRequires: texlive-latex
+BuildRequires: texlive-bin-latex
 BuildRequires: latex2html
 %endif
 %if %{mdk}
@@ -422,6 +431,8 @@ if [ $1 = 0 ] ; then
 fi
 
 %changelog
+* Sat Nov 10 2007 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- SuSE 10.3 replaces tetex with texlive-latex package
 * Sun May 27 2007 Adam Kropelin <akropel1 at rochester.rr.com>
 - add support for rhel5
 * Sun Jan 28 2007 D. Scott Barninger <barninger at fairfieldcomputers.com>
