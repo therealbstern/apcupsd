@@ -23,8 +23,8 @@
 #
 
 # basic defines for every build
-%define _version @VERSION@
-%define _release 2
+%define _version 3.14.3
+%define _release 1
 
 #--------------------------------------------------------------------------
 # it should not be necessary to change anything below here for a release
@@ -32,6 +32,7 @@
 #--------------------------------------------------------------------------
 
 %define pwrfaildir @PWRFAILDIR@
+%define halpolicydir /usr/share/hal/fdi/policy/20thirdparty
 
 # third party packagers
 %define _packager D. Scott Barninger <barninger@fairfieldcomputers.com>
@@ -285,6 +286,7 @@ cd ../../
 
 mkdir -p $RPM_BUILD_ROOT%{initdir}
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/cgi
+mkdir -p $RPM_BUILD_ROOT%{halpolicydir}
 
 make \
         DESTDIR=$RPM_BUILD_ROOT \
@@ -313,6 +315,9 @@ install -m744 examples/hid-ups \
 install -m744 examples/make-hiddev \
               $RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/make-hiddev
 
+install -m644 platforms/80-apcupsd-ups-policy.fdi \
+              $RPM_BUILD_ROOT%{halpolicydir}/
+
 %clean
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 rm -f $RPM_BUILD_DIR/Release_Notes-%{version}-%{release}.txt
@@ -321,7 +326,7 @@ rm -f $RPM_BUILD_DIR/Release_Notes-%{version}-%{release}.txt
 %defattr(-,root,root)
 %{_sysconfdir}/apcupsd/make-hiddev
 %{_sysconfdir}/apcupsd/hid-ups
-
+%{halpolicydir}/80-apcupsd-ups-policy.fdi
 %doc COPYING DISCLAIMER ReleaseNotes ChangeLog ../Release_Notes-%{version}-%{release}.txt doc/latex/apcupsd.pdf
 %dir %{_sysconfdir}/apcupsd
 %{initdir}/apcupsd
@@ -431,6 +436,8 @@ if [ $1 = 0 ] ; then
 fi
 
 %changelog
+* Sat Nov 17 2007 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- add hal policy file
 * Sat Nov 10 2007 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - SuSE 10.3 replaces tetex with texlive-latex package
 * Sun May 27 2007 Adam Kropelin <akropel1 at rochester.rr.com>
