@@ -23,7 +23,7 @@
 #
 
 # basic defines for every build
-%define _version 3.14.3
+%define _version @VERSION@
 %define _release 1
 
 #--------------------------------------------------------------------------
