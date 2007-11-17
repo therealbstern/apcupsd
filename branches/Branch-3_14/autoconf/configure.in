@@ -504,6 +504,30 @@ AC_HELP_STRING([--enable-all], [Enable all optional modules])],
       enable_gapcmon=yes
    fi], [])
 
+dnl
+dnl halpolicydir configuration
+dnl
+
+dnl Establish defaults
+if test $HAVE_UNAME=yes -a x`uname -s` = xLinux ; then
+   HALPOLICYDIR="/usr/share/hal/fdi/policy/20thirdparty"
+else
+   HALPOLICYDIR="no"
+fi
+
+dnl Allow user override
+AC_ARG_WITH(halpolicydir,
+   [AC_HELP_STRING([--with-halpolicydir=DIR], [HAL policy directory (default is platform dependent)])],
+   HALPOLICYDIR=$withval)
+
+dnl Report result
+if test "x$HALPOLICYDIR" != "xno" ; then
+   AC_MSG_RESULT([Using halpolicydir=$HALPOLICYDIR])
+else
+   AC_MSG_RESULT([Will not install HAL policy file])
+fi
+AC_SUBST(HALPOLICYDIR)
+
 #--------------------------------------------------------------------
 # Check for TCP wrapper support, code taken from Bacula KES-7Nov03
 #--------------------------------------------------------------------
