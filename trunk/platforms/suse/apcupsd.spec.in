@@ -268,6 +268,7 @@ A Gnome application to monitor the status of your UPS.
 	%endif
         --with-serial-dev= \
         --with-upstype=usb \
+	--with-halpolicydir=%{halpolicydir} \
         --with-upscable=usb 
 
 make
@@ -286,7 +287,7 @@ cd ../../
 
 mkdir -p $RPM_BUILD_ROOT%{initdir}
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/cgi
-mkdir -p $RPM_BUILD_ROOT%{halpolicydir}
+#mkdir -p $RPM_BUILD_ROOT%{halpolicydir}
 
 make \
         DESTDIR=$RPM_BUILD_ROOT \
@@ -315,8 +316,9 @@ install -m744 examples/hid-ups \
 install -m744 examples/make-hiddev \
               $RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/make-hiddev
 
-install -m644 platforms/80-apcupsd-ups-policy.fdi \
-              $RPM_BUILD_ROOT%{halpolicydir}/
+# this should be done by make
+#install -m644 platforms/80-apcupsd-ups-policy.fdi \
+#              $RPM_BUILD_ROOT%{halpolicydir}/
 
 %clean
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
