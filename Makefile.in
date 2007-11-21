@@ -30,6 +30,10 @@ install-directories: install-dir@CGI@
 	      $(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(sysconfdir); \
 	      chmod 755 $(DESTDIR)$(sysconfdir); \
 	fi
+	@if [ ! -d $(DESTDIR)@HALPOLICYDIR@ ] ; then \
+	      $(SHELL) $(MKINSTALLDIRS) $(DESTDIR)@HALPOLICYDIR@; \
+	      chmod 755 $(DESTDIR)@HALPOLICYDIR@; \
+	fi
 
 install-dir: dummy
 
