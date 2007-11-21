@@ -226,15 +226,12 @@ static int poll_ups(UPSINFO *ups)
    if ((nid->sockfd = net_open(nid->hostname, NULL, nid->port)) < 0) {
       Dmsg0(90, "Exit poll_ups 0 comm lost\n");
       if (!ups->is_commlost()) {
-         log_event(ups, LOG_ERR, "fetch_data: tcp_open failed for %s port %d",
-            nid->hostname, nid->port);
          ups->set_commlost();
       }
       return 0;
    }
 
    if (net_send(nid->sockfd, "status", 6) != 6) {
-      log_event(ups, LOG_ERR, "fill_buffer: write error on socket.");
       net_close(nid->sockfd);
       Dmsg0(90, "Exit poll_ups 0 no status flag\n");
       ups->set_commlost();
@@ -274,8 +271,8 @@ static bool fill_status_buffer(UPSINFO *ups)
 {
    struct driver_data *nid = (struct driver_data *)ups->driver_internal_data;
    time_t now;
-   int tlog;
-   bool comm_err = false;
+   static time_t tlog = 0;
+   static bool comm_err = false;
 
    /* Poll or fill the buffer maximum one time per second */
    now = time(NULL);
@@ -284,40 +281,36 @@ static bool fill_status_buffer(UPSINFO *ups)
       return true;
    }
 
-   for (tlog = 0; !poll_ups(ups); tlog -= SLEEP_TIME) {
-      if (tlog <= 0) {
-         /* log every 10 minutes */
-         tlog = 10 * 60;
-
-         log_event(ups, event_msg[CMDCOMMFAILURE].level,
-            event_msg[CMDCOMMFAILURE].msg);
-
-         /* generate event once */
-         if (!comm_err)
-            execute_command(ups, ups_event[CMDCOMMFAILURE]);
+   if (!poll_ups(ups)) {
+      /* generate event once */
+      if (!comm_err) {
+         execute_command(ups, ups_event[CMDCOMMFAILURE]);
+         comm_err = true;
       }
 
-      sleep(SLEEP_TIME);
-      comm_err = true;
-      ups->set_commlost();
-   }
-
-   if (comm_err) {
-      generate_event(ups, CMDCOMMOK);
-      nid->last_fill_time = time(NULL);
+      /* log every 10 minutes */
+      if (now - tlog >= 10 * 60) {
+         tlog = now;
+         log_event(ups, event_msg[CMDCOMMFAILURE].level,
+            event_msg[CMDCOMMFAILURE].msg);
+      }
    } else {
+      if (comm_err) {
+         generate_event(ups, CMDCOMMOK);
+         tlog = 0;
+         comm_err = false;
+      }
+
       nid->last_fill_time = now;
+
+      if (!nid->got_caps)
+         net_ups_get_capabilities(ups);
+
+      if (nid->got_caps && !nid->got_static_data)
+         net_ups_read_static_data(ups);
    }
 
-   ups->clear_commlost();
-
-   if (!nid->got_caps)
-      net_ups_get_capabilities(ups);
-
-   if (nid->got_caps && !nid->got_static_data)
-      net_ups_read_static_data(ups);
-
-   return true;
+   return !comm_err;
 }
 
 static int get_ups_status_flag(UPSINFO *ups, int fill)
@@ -353,7 +346,6 @@ static int get_ups_status_flag(UPSINFO *ups, int fill)
    write_lock(ups);
    answer[0] = 0;
    if (!getupsvar(ups, "status", answer, sizeof(answer))) {
-      log_event(ups, LOG_ERR, "getupsvar: failed for " "status" ".");
       Dmsg0(100, "HEY!!! Couldn't get status flag.\n");
       stat = 0;
       masterStatus = 0;
