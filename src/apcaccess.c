@@ -56,6 +56,7 @@ static int do_pthreads_status(const char *host, int port)
    }
 
    net_close(sockfd);
+   return 0;
 }
 
 /*********************************************************************/
