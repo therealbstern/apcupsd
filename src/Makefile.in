@@ -13,12 +13,13 @@ subdirs = lib @LIBUSBHID@ drivers @INTLSUB@ @POSUB@ @LIBGD@ @CGI@ @GAPCMON@
 
 gobjs = reports.o action.o apcnis.o device.o
 dobjs = apcupsd.o options.o
+tobjs = apctest.o options.o
 aobjs = apcaccess.o
 sobjs = smtp.o
 fobjs = powerflute.o
 xobjs = devicedbg.o options.o action.o
 
-allexe = apcupsd @APCACCESS@ @SMTP@ @POWERFLUTE@
+allexe = apcupsd @APCTEST@ @APCACCESS@ @SMTP@ @POWERFLUTE@
 
 # Include the default make targets: to be put before the all-targets: rule.
 @TARGETS@
@@ -32,6 +33,9 @@ all-targets: $(allexe)
 
 apcupsd: $(dobjs) $(gobjs) $(WINAPC) $(APCLIBS) $(APCDRVLIBS) $(INTLLIBS) 
 	$(LD) $(LDFLAGS) $(dobjs) $(gobjs) $(APCDRVLIBS) $(DRVLIBS) $(LIBS) @LIBUSB@ -o apcupsd
+
+apctest: $(tobjs) $(gobjs) $(APCLIBS) $(APCDRVLIBS) $(INTLLIBS) 
+	$(LD) $(LDFLAGS) $(tobjs) $(gobjs) $(APCDRVLIBS) $(DRVLIBS) $(LIBS) @LIBUSB@ -o apctest
 
 devicedbg: $(xobjs) $(APCLIBS) $(INTLLIBS) 
 	$(LD) $(LDFLAGS) $(xobjs) $(LIBS) -o devicedbg
@@ -54,6 +58,8 @@ install-binary: $(allexe)
 	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)$(sbindir)
 	@$(INSTALL_PROGRAM) $(STRIP) -m 700 apcupsd@EXEEXT@ \
 		$(DESTDIR)$(sbindir)/apcupsd@EXEEXT@
+	@$(INSTALL_PROGRAM) $(STRIP) -m 700 apctest@EXEEXT@ \
+		$(DESTDIR)$(sbindir)/apctest@EXEEXT@
 	@$(MAKE) STRIP=$(STRIP) DESTDIR=$(DESTDIR) install-@APCACCESS@
 	@$(MAKE) STRIP=$(STRIP) DESTDIR=$(DESTDIR) install-@SMTP@
 	@$(MAKE) STRIP=$(STRIP) DESTDIR=$(DESTDIR) install-@POWERFLUTE@
@@ -81,6 +87,7 @@ uninstall:
 	@$(ECHO) "Removing daemons ..."
 	@$(RMF) $(DESTDIR)$(sbindir)/apcupsd@EXEEXT@
 	@$(RMF) $(DESTDIR)$(sbindir)/apcaccess@EXEEXT@
+	@$(RMF) $(DESTDIR)$(sbindir)/apctest@EXEEXT@
 	@$(RMF) $(DESTDIR)$(sbindir)/powerflute@EXEEXT@
 
 clean: targetclean

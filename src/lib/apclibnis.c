@@ -42,9 +42,20 @@ int net_errno = 0;                 /* error number -- not yet implemented */
 const char *net_errmsg = NULL;     /* pointer to error message */
 char net_errbuf[256];              /* error message buffer for messages */
 
-
+/* Some Win32 specific screwery */
 #ifdef HAVE_MINGW
-#define close(fd)           closesocket(fd)
+
+#define close(fd)             closesocket(fd)
+#define ioctl(s,p,v)          ioctlsocket((s),(p),(u_long*)(v))
+#define getsockopt(s,l,o,d,z) getsockopt((s),(l),(o),(char*)(d),(z))
+#define EINPROGRESS           WSAEWOULDBLOCK
+
+#undef errno
+#define errno   WSAGetLastError()
+
+#undef h_errno
+#define h_errno WSAGetLastError()
+
 #endif
 
 
@@ -225,7 +236,9 @@ int net_send(int sockfd, const char *buff, int len)
  */
 int net_open(const char *host, char *service, int port)
 {
-   int sockfd;
+   int nonblock = 1;
+   int block = 0;
+   int sockfd, rc;
    struct hostent *hp;
    struct sockaddr_in tcp_serv_addr;  /* socket information */
    unsigned int inaddr;               /* Careful here to use unsigned int for */
@@ -242,25 +255,18 @@ int net_open(const char *host, char *service, int port)
    if ((inaddr = inet_addr(host)) != INADDR_NONE) {
       tcp_serv_addr.sin_addr.s_addr = inaddr;
    } else {
-      if ((hp = gethostbyname(host)) == NULL) {
-         net_errmsg = "tcp_open: hostname error\n";
-         return -1;
-      }
+      if ((hp = gethostbyname(host)) == NULL)
+         return -h_errno;
 
-      if (hp->h_length != sizeof(inaddr) || hp->h_addrtype != AF_INET) {
-         net_errmsg = "tcp_open: funny gethostbyname value\n";
-         return -1;
-      }
+      if (hp->h_length != sizeof(inaddr) || hp->h_addrtype != AF_INET)
+         return -EINVAL;
 
       tcp_serv_addr.sin_addr.s_addr = *(unsigned int *)hp->h_addr;
    }
 
-
    /* Open a TCP socket */
-   if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-      net_errmsg = "tcp_open: cannot open stream socket\n";
-      return -1;
-   }
+   if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+      return -errno;
 
    /* connect to server */
 #if defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS
@@ -271,13 +277,67 @@ int net_open(const char *host, char *service, int port)
    fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFL));
 #endif
 
-   if (connect(sockfd, (struct sockaddr *)&tcp_serv_addr, sizeof(tcp_serv_addr)) == -1) {
-      asnprintf(net_errbuf, sizeof(net_errbuf),
-         _("tcp_open: cannot connect to server %s on port %d.\n"
-        "ERR=%s\n"), host, port, strerror(errno));
-      net_errmsg = net_errbuf;
+   /* Set socket to non-blocking mode */
+   if (ioctl(sockfd, FIONBIO, &nonblock) != 0) {
       close(sockfd);
-      return -1;
+      return -errno;
+   }
+
+   /* Initiate connection attempt */
+   rc = connect(sockfd, (struct sockaddr *)&tcp_serv_addr, sizeof(tcp_serv_addr));
+   if (rc == -1 && errno != EINPROGRESS) {
+      close(sockfd);
+      return -errno;
+   }
+
+   /* If connection is in progress, wait for it to complete */
+   if (rc == -1) {
+      struct timeval timeout;
+      fd_set fds;
+      int err;
+      socklen_t errlen = sizeof(err);
+
+      do {
+         /* Expect connection within 5 seconds */
+         timeout.tv_sec = 5;
+         timeout.tv_usec = 0;
+         FD_ZERO(&fds);
+         FD_SET(sockfd, &fds);
+
+         /* Wait for connection to complete */
+         rc = select(sockfd + 1, NULL, &fds, NULL, &timeout);
+         switch (rc) {
+         case -1: /* select error */
+            if (errno == EINTR || errno == EAGAIN)
+               continue;
+            close(sockfd);
+            return -errno;
+         case 0: /* timeout */
+            close(sockfd);
+            return -ETIMEDOUT;
+         }
+      }
+      while (rc == -1 && (errno == EINTR || errno == EAGAIN));
+
+      /* Connection completed? Check error status. */
+      if (getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &err, &errlen) == -1) {
+         close(sockfd);
+         return -errno;
+      }
+      if (errlen != sizeof(err)) {
+         close(sockfd);
+         return -EINVAL;
+      }
+      if (err) {
+         close(sockfd);
+         return -err;
+      }
+   }
+
+   /* Connection completed successfully. Set socket back to blocking mode. */
+   if (ioctl(sockfd, FIONBIO, &block) != 0) {
+      close(sockfd);
+      return -errno;
    }
 
    return sockfd;

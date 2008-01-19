@@ -8,7 +8,7 @@
 
 /*
  * Copyright (C) 2001-2004 Kern Sibbald
- * Copyright (C) 2004-2007 Adam Kropelin
+ * Copyright (C) 2004-2005 Adam Kropelin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of version 2 of the GNU General
@@ -30,6 +30,16 @@
 #include "usb_common.h"
 #include <math.h>
 
+/* Implemented in platform-specific code */
+int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_info);
+int pusb_ups_open(UPSINFO *ups);
+int pusb_ups_close(UPSINFO *ups);
+int pusb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval);
+int pusb_ups_check_state(UPSINFO *ups);
+int pusb_ups_setup(UPSINFO *ups);
+int pusb_write_int_to_ups(UPSINFO *ups, int ci, int value, const char *name);
+int pusb_read_int_from_ups(UPSINFO *ups, int ci, int *value);
+
 /*
  * A certain semi-ancient BackUPS Pro model breaks the USB spec in a
  * particularly creative way: Some reports read back in ASCII instead of
@@ -37,6 +47,7 @@
  * instead, just for fun. We detect and work around the breakage.
  */
 #define QUIRK_OLD_BACKUPS_PRO_MODEL_STRING "BackUPS Pro 500 FW:16.3.D USB FW:4"
+static bool quirk_old_backups_pro = false;
 
 /*
  * This table is used when walking through the USB reports to see
@@ -47,7 +58,7 @@
  * with ci == CI_NONE are not used, for the moment, they are
  * retained just so they are not forgotten.
  */
-const UsbDriver::known_info UsbDriver::_known_info[] = {
+const struct s_known_info known_info[] = {
    /*  Page 0x84 is the Power Device Page */
    /* CI                        USAGE       PHYS       TYPE        VOLATILE? */
    {CI_NONE,                    0x00840001, P_ANY,     T_INDEX,    false},  /* iName */
@@ -193,18 +204,46 @@ const UsbDriver::known_info UsbDriver::_known_info[] = {
  * iModel                          0xffff00f0
  */
 
-bool UsbDriver::Open()
+
+/*
+ * Operations that must be handled by platform-specific code
+ */
+
+int usb_ups_check_state(UPSINFO *ups)
 {
-   _last_urb_time.tv_sec = 0;
-   _last_urb_time.tv_usec = 0;
-   _batt_present_count = 0;
-   return SubclassOpen();
+   return pusb_ups_check_state(ups);
+}
+
+int usb_ups_open(UPSINFO *ups)
+{
+   return pusb_ups_open(ups);
+}
+
+int usb_ups_close(UPSINFO *ups)
+{
+   return pusb_ups_close(ups);
+}
+
+int usb_ups_setup(UPSINFO *ups)
+{
+   return pusb_ups_setup(ups);
+}
+
+int usb_write_int_to_ups(UPSINFO *ups, int ci, int value, const char *name)
+{
+   return pusb_write_int_to_ups(ups, ci, value, name);
+}
+
+int usb_read_int_from_ups(UPSINFO *ups, int ci, int *value)
+{
+   return pusb_read_int_from_ups(ups, ci, value);
 }
 
 /* Fetch the given CI from the UPS */
 #define URB_DELAY_MS 20
-bool UsbDriver::get_value(int ci, usb_value *uval)
+static bool usb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
 {
+   static struct timeval prev = {0};
    struct timeval now;
    struct timespec delay;
    int diff;
@@ -214,60 +253,71 @@ bool UsbDriver::get_value(int ci, usb_value *uval)
     * control transfers are issued too quickly, so we throttle a
     * bit here.
     */
-   if (_last_urb_time.tv_sec) {
+   if (prev.tv_sec) {
       gettimeofday(&now, NULL);
-      diff = TV_DIFF_MS(_last_urb_time, now);
+      diff = TV_DIFF_MS(prev, now);
       if (diff >= 0 && diff < URB_DELAY_MS) {
          delay.tv_sec = 0;
          delay.tv_nsec = (URB_DELAY_MS-diff)*1000000;
          nanosleep(&delay, NULL);
       }
    }
-   gettimeofday(&_last_urb_time, NULL);
+   gettimeofday(&prev, NULL);
 
-   return SubclassGetValue(ci, uval);
+   return pusb_get_value(ups, ci, uval);
 }
 
-bool UsbDriver::GetCapabilities()
+int usb_ups_get_capabilities(UPSINFO *ups)
 {
-   bool rc;
+   int rc;
 
    /* Run platform-specific capabilities code */   
-   rc = SubclassGetCapabilities();
+   rc = pusb_ups_get_capabilities(ups, known_info);
    if (!rc)
-      return false;
+      return 0;
 
    /*
     * If the hardware supports CI_Discharging, ignore CI_ACPresent.
     * Some hardware (RS 1500, possibly others) reports confusing
     * values for these during self test. (Discharging=1 && ACPresent=1)
     */
-   if (_ups->UPS_Cap[CI_Discharging])
-      _ups->UPS_Cap[CI_ACPresent] = false;
+   if (ups->UPS_Cap[CI_Discharging])
+      ups->UPS_Cap[CI_ACPresent] = false;
 
    /*
     * Disable CI_NOMPOWER if UPS does not report it accurately.
     * Several models appear to always return 0 for this value.
     */
-   usb_value uval;
-   if (_ups->UPS_Cap[CI_NOMPOWER] &&
-       (!get_value(CI_NOMPOWER, &uval) ||
+   USB_VALUE uval;
+   if (ups->UPS_Cap[CI_NOMPOWER] &&
+       (!usb_get_value(ups, CI_NOMPOWER, &uval) ||
         ((int)uval.dValue == 0))) {
       Dmsg0(100, "NOMPOWER disabled due to invalid reading from UPS\n");
-      _ups->UPS_Cap[CI_NOMPOWER] = false;
+      ups->UPS_Cap[CI_NOMPOWER] = false;
    }
 
    /* Detect broken BackUPS Pro model */
-   _quirk_old_backups_pro = false;
-   if (_ups->UPS_Cap[CI_UPSMODEL] && get_value(CI_UPSMODEL, &uval)) {
+   quirk_old_backups_pro = false;
+   if (ups->UPS_Cap[CI_UPSMODEL] && usb_get_value(ups, CI_UPSMODEL, &uval)) {
       Dmsg1(250, "Checking for BackUPS Pro quirk \"%s\"\n", uval.sValue);
       if (!strcmp(uval.sValue, QUIRK_OLD_BACKUPS_PRO_MODEL_STRING)) {
-         _quirk_old_backups_pro = true;
+         quirk_old_backups_pro = true;
          Dmsg0(100, "BackUPS Pro quirk enabled\n");
       }
    }
 
-   return true;
+   return 1;
+}
+
+
+/*
+ * Operations that are not supported
+ */
+
+int usb_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
+{
+   /* We don't support this for USB */
+   return 0;
 }
 
 
@@ -282,7 +332,7 @@ bool UsbDriver::GetCapabilities()
  *
  * Thanks to David Fries <David@Fries.net> for this code.
  */
-bool UsbDriver::process_value_bup(int ci, usb_value* uval)
+static bool usb_process_value_bup(UPSINFO* ups, int ci, USB_VALUE* uval)
 {
    int val = (int)uval->dValue;
    char digits[] = { (val>>16) & 0xff, (val>>8) & 0xff, val & 0xff, 0 };
@@ -290,8 +340,8 @@ bool UsbDriver::process_value_bup(int ci, usb_value* uval)
    /* UPS_RUNTIME_LEFT */
    if(ci == CI_RUNTIM)
    {
-      _ups->TimeLeft = uval->dValue; /* already minutes */
-      Dmsg1(200, "TimeLeft = %d\n", (int)_ups->TimeLeft);
+      ups->TimeLeft = uval->dValue; /* already minutes */
+      Dmsg1(200, "TimeLeft = %d\n", (int)ups->TimeLeft);
       return true;
    }
 
@@ -303,23 +353,23 @@ bool UsbDriver::process_value_bup(int ci, usb_value* uval)
    {
    /* UPS_LOAD */
    case CI_LOAD:
-      _ups->UPSLoad = atoi(digits);
-      Dmsg1(200, "UPSLoad = %d\n", (int)_ups->UPSLoad);
+      ups->UPSLoad = atoi(digits);
+      Dmsg1(200, "UPSLoad = %d\n", (int)ups->UPSLoad);
       return true;
 
    /* LOW_TRANSFER_LEVEL */
    case CI_LTRANS:
-      _ups->lotrans = atoi(digits);
+      ups->lotrans = atoi(digits);
       return true;
 
    /* HIGH_TRANSFER_LEVEL */
    case CI_HTRANS:
-      _ups->hitrans = atoi(digits);
+      ups->hitrans = atoi(digits);
       return true;
 
    /* LINE_FREQ */
    case CI_FREQ:
-      _ups->LineFreq = atoi(digits);
+      ups->LineFreq = atoi(digits);
       return true;
 
    default:
@@ -331,16 +381,17 @@ bool UsbDriver::process_value_bup(int ci, usb_value* uval)
  * Given a CI and a raw uval, update the UPSINFO structure with the
  * new value.
  */
-void UsbDriver::process_value(int ci, usb_value* uval)
+static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
 {
    int v, yy, mm, dd;
    char *p;
+   static int bpcnt = 0;
 
    /*
     * If BackUPS Pro quirk is enabled, try special decoding. If special decode
     * fails, we continue with the normal protocol.
     */
-   if (_quirk_old_backups_pro && process_value_bup(ci, uval))
+   if (quirk_old_backups_pro && usb_process_value_bup(ups, ci, uval))
       return;
 
    /*
@@ -353,145 +404,145 @@ void UsbDriver::process_value(int ci, usb_value* uval)
    {
    /* UPS_STATUS -- this is the most important status for apcupsd */
    case CI_STATUS:
-      _ups->Status &= ~0xff;
-      _ups->Status |= uval->iValue & 0xff;
-      Dmsg1(200, "Status=0x%08x\n", _ups->Status);
+      ups->Status &= ~0xff;
+      ups->Status |= uval->iValue & 0xff;
+      Dmsg1(200, "Status=0x%08x\n", ups->Status);
       break;
 
    case CI_ACPresent:
       if (uval->iValue)
-         _ups->set_online();
+         ups->set_online();
       Dmsg1(200, "ACPresent=%d\n", uval->iValue);
       break;
 
    case CI_Discharging:
-      _ups->set_online(!uval->iValue);
+      ups->set_online(!uval->iValue);
       Dmsg1(200, "Discharging=%d\n", uval->iValue);
       break;
 
    case CI_BelowRemCapLimit:
       if (uval->iValue)
-         _ups->set_battlow();
+         ups->set_battlow();
       Dmsg1(200, "BelowRemCapLimit=%d\n", uval->iValue);
       break;
 
    case CI_RemTimeLimitExpired:
       if (uval->iValue)
-         _ups->set_battlow();
+         ups->set_battlow();
       Dmsg1(200, "RemTimeLimitExpired=%d\n", uval->iValue);
       break;
 
    case CI_ShutdownImminent:
       if (uval->iValue)
-         _ups->set_battlow();
+         ups->set_battlow();
       Dmsg1(200, "ShutdownImminent=%d\n", uval->iValue);
       break;
 
    case CI_Boost:
       if (uval->iValue)
-         _ups->set_boost();
+         ups->set_boost();
       Dmsg1(200, "Boost=%d\n", uval->iValue);
       break;
 
    case CI_Trim:
       if (uval->iValue)
-         _ups->set_trim();
+         ups->set_trim();
       Dmsg1(200, "Trim=%d\n", uval->iValue);
       break;
 
    case CI_Overload:
       if (uval->iValue)
-         _ups->set_overload();
+         ups->set_overload();
       Dmsg1(200, "Overload=%d\n", uval->iValue);
       break;
 
    case CI_NeedReplacement:
       if (uval->iValue)
-         _ups->set_replacebatt(uval->iValue);
+         ups->set_replacebatt(uval->iValue);
       Dmsg1(200, "ReplaceBatt=%d\n", uval->iValue);
       break;
 
    /* LINE_VOLTAGE */
    case CI_VLINE:
-      _ups->LineVoltage = uval->dValue;
-      Dmsg1(200, "LineVoltage = %d\n", (int)_ups->LineVoltage);
+      ups->LineVoltage = uval->dValue;
+      Dmsg1(200, "LineVoltage = %d\n", (int)ups->LineVoltage);
       break;
 
    /* OUTPUT_VOLTAGE */
    case CI_VOUT:
-      _ups->OutputVoltage = uval->dValue;
-      Dmsg1(200, "OutputVoltage = %d\n", (int)_ups->OutputVoltage);
+      ups->OutputVoltage = uval->dValue;
+      Dmsg1(200, "OutputVoltage = %d\n", (int)ups->OutputVoltage);
       break;
 
    /* BATT_FULL Battery level percentage */
    case CI_BATTLEV:
-      _ups->BattChg = uval->dValue;
-      Dmsg1(200, "BattCharge = %d\n", (int)_ups->BattChg);
+      ups->BattChg = uval->dValue;
+      Dmsg1(200, "BattCharge = %d\n", (int)ups->BattChg);
       break;
 
    /* BATT_VOLTAGE */
    case CI_VBATT:
-      _ups->BattVoltage = uval->dValue;
-      Dmsg1(200, "BattVoltage = %d\n", (int)_ups->BattVoltage);
+      ups->BattVoltage = uval->dValue;
+      Dmsg1(200, "BattVoltage = %d\n", (int)ups->BattVoltage);
       break;
 
    /* UPS_LOAD */
    case CI_LOAD:
-      _ups->UPSLoad = uval->dValue;
-      Dmsg1(200, "UPSLoad = %d\n", (int)_ups->UPSLoad);
+      ups->UPSLoad = uval->dValue;
+      Dmsg1(200, "UPSLoad = %d\n", (int)ups->UPSLoad);
       break;
 
    /* LINE_FREQ */
    case CI_FREQ:
-      _ups->LineFreq = uval->dValue;
-      Dmsg1(200, "LineFreq = %d\n", (int)_ups->LineFreq);
+      ups->LineFreq = uval->dValue;
+      Dmsg1(200, "LineFreq = %d\n", (int)ups->LineFreq);
       break;
 
    /* UPS_RUNTIME_LEFT */
    case CI_RUNTIM:
-      _ups->TimeLeft = uval->dValue / 60; /* convert to minutes */
-      Dmsg1(200, "TimeLeft = %d\n", (int)_ups->TimeLeft);
+      ups->TimeLeft = uval->dValue / 60; /* convert to minutes */
+      Dmsg1(200, "TimeLeft = %d\n", (int)ups->TimeLeft);
       break;
 
    /* UPS_TEMP */
    case CI_ITEMP:
-      _ups->UPSTemp = uval->dValue - 273.15;      /* convert to deg C. */
-      Dmsg1(200, "ITemp = %d\n", (int)_ups->UPSTemp);
+      ups->UPSTemp = uval->dValue - 273.15;      /* convert to deg C. */
+      Dmsg1(200, "ITemp = %d\n", (int)ups->UPSTemp);
       break;
 
    /*  Humidity percentage */ 
    case CI_HUMID:
-      _ups->humidity = uval->dValue;
-      Dmsg1(200, "Humidity = %d\n", (int)_ups->humidity);
+      ups->humidity = uval->dValue;
+      Dmsg1(200, "Humidity = %d\n", (int)ups->humidity);
       break;
 
    /*  Ambient temperature */ 
    case CI_ATEMP:
-      _ups->ambtemp = uval->dValue - 273.15;      /* convert to deg C. */;
-      Dmsg1(200, "ATemp = %d\n", (int)_ups->ambtemp);
+      ups->ambtemp = uval->dValue - 273.15;      /* convert to deg C. */;
+      Dmsg1(200, "ATemp = %d\n", (int)ups->ambtemp);
       break;
 
    /* Self test results */
    case CI_ST_STAT:
       switch (uval->iValue) {
       case 1:  /* Passed */
-         _ups->testresult = TEST_PASSED;
+         ups->testresult = TEST_PASSED;
          break;
       case 2:  /* Warning */
-         _ups->testresult = TEST_WARNING;
+         ups->testresult = TEST_WARNING;
          break;
       case 3:  /* Error */
       case 4:  /* Aborted */
-         _ups->testresult = TEST_FAILED;
+         ups->testresult = TEST_FAILED;
          break;
       case 5:  /* In progress */
-         _ups->testresult = TEST_INPROGRESS;
+         ups->testresult = TEST_INPROGRESS;
          break;
       case 6:  /* None */
-         _ups->testresult = TEST_NONE;
+         ups->testresult = TEST_NONE;
          break;
       default:
-         _ups->testresult = TEST_UNKNOWN;
+         ups->testresult = TEST_UNKNOWN;
          break;
       }
       break;
@@ -501,36 +552,36 @@ void UsbDriver::process_value(int ci, usb_value* uval)
       Dmsg1(100, "CI_APCLineFailCause=%d\n", uval->iValue);
       switch (uval->iValue) {
       case 0:  /* No transfers have ocurred */
-         _ups->lastxfer = XFER_NONE;
+         ups->lastxfer = XFER_NONE;
          break;
       case 2:  /* High line voltage */
-         _ups->lastxfer = XFER_OVERVOLT;
+         ups->lastxfer = XFER_OVERVOLT;
          break;
       case 3:  /* Ripple */
-         _ups->lastxfer = XFER_RIPPLE;
+         ups->lastxfer = XFER_RIPPLE;
          break;
       case 1:  /* Low line voltage */
       case 4:  /* notch, spike, or blackout */
       case 8:  /* Notch or blackout */
       case 9:  /* Spike or blackout */
-         _ups->lastxfer = XFER_UNDERVOLT;
+         ups->lastxfer = XFER_UNDERVOLT;
          break;
       case 6:  /* DelayBeforeShutdown or APCDelayBeforeShutdown */
       case 10: /* Graceful shutdown by accessories */
-         _ups->lastxfer = XFER_FORCED;
+         ups->lastxfer = XFER_FORCED;
          break;
       case 7: /* Input frequency out of range */
-         _ups->lastxfer = XFER_FREQ;
+         ups->lastxfer = XFER_FREQ;
          break;
       case 5:  /* Self Test or Discharge Calibration commanded thru */
                /* Test usage, front button, or 2 week self test */
       case 11: /* Test usage invoked */
       case 12: /* Front button initiated self test */
       case 13: /* 2 week self test */
-         _ups->lastxfer = XFER_SELFTEST;
+         ups->lastxfer = XFER_SELFTEST;
          break;
       default:
-         _ups->lastxfer = XFER_UNKNOWN;
+         ups->lastxfer = XFER_UNKNOWN;
          break;
       }
       break;
@@ -545,21 +596,29 @@ void UsbDriver::process_value(int ci, usb_value* uval)
        * at least twice in a row. The down side of this approach
        * is that legitimate BATTATTCH events are unnecessarily
        * delayed. C'est la vie.
+       *
+       * ADK FIXME: 'bpcnt' should be kept in the UPS structure
+       * in order to allow multiple UPSes to be managed by this
+       * driver. To avoid bloating UPSINFO with USB-specific
+       * junk we really need a USB private structure akin to
+       * USB_INFO in the platform specific drivers. The URB 
+       * delay timer in usb_get_value() could also live in such
+       * a structure.
        */
       if (uval->iValue) {
-         if (_batt_present_count++)
-            _ups->set_battpresent();
+         if (bpcnt++)
+            ups->set_battpresent();
       } else {
-         _batt_present_count = 0;
-         _ups->clear_battpresent();
+         bpcnt = 0;
+         ups->clear_battpresent();
       }
       Dmsg1(200, "BatteryPresent=%d\n", uval->iValue);
       break;
 
    /* UPS_NAME */
    case CI_IDEN:
-      if (_ups->upsname[0] == 0 && uval->sValue[0] != 0)
-         astrncpy(_ups->upsname, uval->sValue, sizeof(_ups->upsname));
+      if (ups->upsname[0] == 0 && uval->sValue[0] != 0)
+         astrncpy(ups->upsname, uval->sValue, sizeof(ups->upsname));
       break;
 
    /* model, firmware */
@@ -570,8 +629,8 @@ void UsbDriver::process_value(int ci, usb_value* uval)
          p += 3;              // Skip "FW:"
          while (isspace(*p))  // Skip whitespace after "FW:"
             p++;
-         astrncpy(_ups->firmrev, p, sizeof(_ups->firmrev));
-         _ups->UPS_Cap[CI_REVNO] = true;
+         astrncpy(ups->firmrev, p, sizeof(ups->firmrev));
+         ups->UPS_Cap[CI_REVNO] = true;
       }
 
       /* Kill leading whitespace on model name */
@@ -579,50 +638,50 @@ void UsbDriver::process_value(int ci, usb_value* uval)
       while (isspace(*p))
          p++;
 
-      astrncpy(_ups->upsmodel, p, sizeof(_ups->upsmodel));
-      astrncpy(_ups->mode.long_name, p, sizeof(_ups->mode.long_name));
+      astrncpy(ups->upsmodel, p, sizeof(ups->upsmodel));
+      astrncpy(ups->mode.long_name, p, sizeof(ups->mode.long_name));
       break;
 
    /* WAKEUP_DELAY */
    case CI_DWAKE:
-      _ups->dwake = (int)uval->dValue;
+      ups->dwake = (int)uval->dValue;
       break;
 
    /* SLEEP_DELAY */
    case CI_DSHUTD:
-      _ups->dshutd = (int)uval->dValue;
+      ups->dshutd = (int)uval->dValue;
       break;
 
    /* LOW_TRANSFER_LEVEL */
    case CI_LTRANS:
-      _ups->lotrans = (int)uval->dValue;
+      ups->lotrans = (int)uval->dValue;
       break;
 
    /* HIGH_TRANSFER_LEVEL */
    case CI_HTRANS:
-      _ups->hitrans = (int)uval->dValue;
+      ups->hitrans = (int)uval->dValue;
       break;
 
    /* UPS_BATT_CAP_RETURN */
    case CI_RETPCT:
-      _ups->rtnpct = (int)uval->dValue;
+      ups->rtnpct = (int)uval->dValue;
       break;
 
    /* LOWBATT_SHUTDOWN_LEVEL */
    case CI_DLBATT:
-      _ups->dlowbatt = (int)uval->dValue;
+      ups->dlowbatt = (int)uval->dValue;
       break;
 
    /* UPS_MANUFACTURE_DATE */
    case CI_MANDAT:
-      asnprintf(_ups->birth, sizeof(_ups->birth), "%4d-%02d-%02d",
+      asnprintf(ups->birth, sizeof(ups->birth), "%4d-%02d-%02d",
          (uval->iValue >> 9) + 1980, (uval->iValue >> 5) & 0xF,
          uval->iValue & 0x1F);
       break;
 
    /* Last UPS_BATTERY_REPLACE */
    case CI_BATTDAT:
-      asnprintf(_ups->battdat, sizeof(_ups->battdat), "%4d-%02d-%02d",
+      asnprintf(ups->battdat, sizeof(ups->battdat), "%4d-%02d-%02d",
          (uval->iValue >> 9) + 1980, (uval->iValue >> 5) & 0xF,
          uval->iValue & 0x1F);
       break;
@@ -635,58 +694,58 @@ void UsbDriver::process_value(int ci, usb_value* uval)
       dd = ((v >> 4) & 0xF) * 10 + (v & 0xF);
       v >>= 8;
       mm = ((v >> 4) & 0xF) * 10 + (v & 0xF);
-      asnprintf(_ups->battdat, sizeof(_ups->battdat), "%4d-%02d-%02d", yy, mm, dd);
+      asnprintf(ups->battdat, sizeof(ups->battdat), "%4d-%02d-%02d", yy, mm, dd);
       break;
 
    /* UPS_SERIAL_NUMBER */
    case CI_SERNO:
-      astrncpy(_ups->serial, uval->sValue, sizeof(_ups->serial));
+      astrncpy(ups->serial, uval->sValue, sizeof(ups->serial));
 
       /*
        * If serial number has garbage, trash it.
        */
-      for (p = _ups->serial; *p; p++) {
+      for (p = ups->serial; *p; p++) {
          if (*p < ' ' || *p > 'z') {
-            *_ups->serial = 0;
-            _ups->UPS_Cap[CI_SERNO] = false;
+            *ups->serial = 0;
+            ups->UPS_Cap[CI_SERNO] = false;
          }
       }
       break;
 
    /* Nominal output voltage when on batteries */
    case CI_NOMOUTV:
-      _ups->NomOutputVoltage = (int)uval->dValue;
+      ups->NomOutputVoltage = (int)uval->dValue;
       break;
 
    /* Nominal input voltage */
    case CI_NOMINV:
-      _ups->NomInputVoltage = (int)uval->dValue;
+      ups->NomInputVoltage = (int)uval->dValue;
       break;
 
    /* Nominal battery voltage */
    case CI_NOMBATTV:
-      _ups->nombattv = uval->dValue;
+      ups->nombattv = uval->dValue;
       break;
 
    /* Nominal power */
    case CI_NOMPOWER:
-      _ups->NomPower = (int)uval->dValue;
+      ups->NomPower = (int)uval->dValue;
       break;
 
    /* Sensitivity */
    case CI_SENS:
       switch (uval->iValue) {
       case 0:
-         astrncpy(_ups->sensitivity, "Low", sizeof(_ups->sensitivity));
+         astrncpy(ups->sensitivity, "Low", sizeof(ups->sensitivity));
          break;
       case 1:
-         astrncpy(_ups->sensitivity, "Medium", sizeof(_ups->sensitivity));
+         astrncpy(ups->sensitivity, "Medium", sizeof(ups->sensitivity));
          break;
       case 2:
-         astrncpy(_ups->sensitivity, "High", sizeof(_ups->sensitivity));
+         astrncpy(ups->sensitivity, "High", sizeof(ups->sensitivity));
          break;
       default:
-         astrncpy(_ups->sensitivity, "Unknown", sizeof(_ups->sensitivity));
+         astrncpy(ups->sensitivity, "Unknown", sizeof(ups->sensitivity));
          break;
       }
       break;
@@ -697,19 +756,19 @@ void UsbDriver::process_value(int ci, usb_value* uval)
 }
 
 /* Fetch the given CI from the UPS and update the UPSINFO structure */
-bool UsbDriver::update_value(int ci)
+static bool usb_update_value(UPSINFO* ups, int ci)
 {
-   usb_value uval;
+   USB_VALUE uval;
 
-   if (!get_value(ci, &uval))
+   if (!usb_get_value(ups, ci, &uval))
       return false;
       
-   process_value(ci, &uval);
+   usb_process_value(ups, ci, &uval);
    return true;
 }
 
 /* Process commands from the main loop */
-bool UsbDriver::EntryPoint(int command, void *data)
+int usb_ups_entry_point(UPSINFO *ups, int command, void *data)
 {
    struct timespec delay = {0, 40000000};
 
@@ -724,31 +783,31 @@ bool UsbDriver::EntryPoint(int command, void *data)
        */
       /* Reason for last transfer to batteries */
       nanosleep(&delay, NULL); /* Give UPS a chance to update the value */
-      if (update_value(CI_WHY_BATT) ||
-          update_value(CI_APCLineFailCause))
+      if (usb_update_value(ups, CI_WHY_BATT) ||
+          usb_update_value(ups, CI_APCLineFailCause))
       {
-         Dmsg1(80, "Transfer reason: %d\n", _ups->lastxfer);
+         Dmsg1(80, "Transfer reason: %d\n", ups->lastxfer);
 
          /* See if this is a self test rather than power failure */
-         if (_ups->lastxfer == XFER_SELFTEST) {
+         if (ups->lastxfer == XFER_SELFTEST) {
             /*
              * set Self Test start time
              */
-            _ups->SelfTest = time(NULL);
-            Dmsg1(80, "Self Test time: %s", ctime(&_ups->SelfTest));
+            ups->SelfTest = time(NULL);
+            Dmsg1(80, "Self Test time: %s", ctime(&ups->SelfTest));
          }
       }
       break;
 
    case DEVICE_CMD_GET_SELFTEST_MSG:
       nanosleep(&delay, NULL); /* Give UPS a chance to update the value */
-      return update_value(CI_ST_STAT);
+      return usb_update_value(ups, CI_ST_STAT);
 
    default:
-      return false;
+      return FAILURE;
    }
 
-   return true;
+   return SUCCESS;
 }
 
 /*
@@ -757,9 +816,9 @@ bool UsbDriver::EntryPoint(int command, void *data)
  * This routine is called once every N seconds to get a current
  * idea of what the UPS is doing.
  */
-bool UsbDriver::ReadVolatileData()
+int usb_ups_read_volatile_data(UPSINFO *ups)
 {
-   time_t last_poll = _ups->poll_time;
+   time_t last_poll = ups->poll_time;
    time_t now = time(NULL);
 
    Dmsg0(200, "Enter usb_ups_read_volatile_data\n");
@@ -769,25 +828,25 @@ bool UsbDriver::ReadVolatileData()
     * MAX_VOLATILE_POLL_RATE seconds. This prevents flailing around
     * too much if the UPS state is rapidly changing while on mains.
     */
-   if (_ups->is_onbatt() && last_poll &&
+   if (ups->is_onbatt() && last_poll &&
        (now - last_poll < MAX_VOLATILE_POLL_RATE)) {
       return 1;
    }
 
-   write_lock(_ups);
-   _ups->poll_time = now;           /* save time stamp */
+   write_lock(ups);
+   ups->poll_time = now;           /* save time stamp */
 
    /* Clear APC status bits; let the various CIs set them again */
-   _ups->Status &= ~0xFF;
+   ups->Status &= ~0xFF;
 
    /* Loop through all known data, polling those marked volatile */
-   for (int i=0; _known_info[i].usage_code; i++) {
-      if (_known_info[i].isvolatile && _known_info[i].ci != CI_NONE)
-         update_value(_known_info[i].ci);
+   for (int i=0; known_info[i].usage_code; i++) {
+      if (known_info[i].isvolatile && known_info[i].ci != CI_NONE)
+         usb_update_value(ups, known_info[i].ci);
    }
 
-   write_unlock(_ups);
-   return true;
+   write_unlock(ups);
+   return 1;
 }
 
 /*
@@ -796,18 +855,18 @@ bool UsbDriver::ReadVolatileData()
  *
  * This routine is called once when apcupsd is starting.
  */
-bool UsbDriver::ReadStaticData()
+int usb_ups_read_static_data(UPSINFO *ups)
 {
-   write_lock(_ups);
+   write_lock(ups);
 
    /* Loop through all known data, polling those marked non-volatile */
-   for (int i=0; _known_info[i].usage_code; i++) {
-      if (!_known_info[i].isvolatile && _known_info[i].ci != CI_NONE)
-         update_value(_known_info[i].ci);
+   for (int i=0; known_info[i].usage_code; i++) {
+      if (!known_info[i].isvolatile && known_info[i].ci != CI_NONE)
+         usb_update_value(ups, known_info[i].ci);
    }
 
-   write_unlock(_ups);
-   return true;
+   write_unlock(ups);
+   return 1;
 }
 
 /*
@@ -829,7 +888,7 @@ bool UsbDriver::ReadStaticData()
  */
 #define STARTUP_PERCENT 0
 
-bool UsbDriver::KillPower()
+int usb_ups_kill_power(UPSINFO *ups)
 {
    const char *func;
    int shutdown = 0;
@@ -852,7 +911,7 @@ bool UsbDriver::KillPower()
     */
    if (UPS_HAS_CAP(CI_RETPCT)) {
       func = "CI_RETPCT";
-      if (!write_int_to_ups(CI_RETPCT, STARTUP_PERCENT, func))
+      if (!usb_write_int_to_ups(ups, CI_RETPCT, STARTUP_PERCENT, func))
          Dmsg1(100, "Unable to set %s (not an error)\n", func);
    }
 
@@ -869,17 +928,17 @@ bool UsbDriver::KillPower()
     * this out.
     */
    if (UPS_HAS_CAP(CI_BUPBattCapBeforeStartup)) {
-      if (read_int_from_ups(CI_BUPBattCapBeforeStartup, &val)) {
+      if (pusb_read_int_from_ups(ups, CI_BUPBattCapBeforeStartup, &val)) {
          func = "CI_BUPBattCapBeforeStartup";
          switch (val) {
          case 0x3930:             /* 90% */
-            write_int_to_ups(CI_BUPBattCapBeforeStartup, 2, func);
+            pusb_write_int_to_ups(ups, CI_BUPBattCapBeforeStartup, 2, func);
             /* Falls thru... */
          case 0x3630:             /* 60% */
-            write_int_to_ups(CI_BUPBattCapBeforeStartup, 2, func);
+            pusb_write_int_to_ups(ups, CI_BUPBattCapBeforeStartup, 2, func);
             /* Falls thru... */
          case 0x3135:             /* 15% */
-            write_int_to_ups(CI_BUPBattCapBeforeStartup, 2, func);
+            pusb_write_int_to_ups(ups, CI_BUPBattCapBeforeStartup, 2, func);
             /* Falls thru... */
          case 0x3030:             /* 00% */
             break;
@@ -901,7 +960,7 @@ bool UsbDriver::KillPower()
     */
    if (UPS_HAS_CAP(CI_APCDelayBeforeStartup)) {
       func = "CI_APCDelayBeforeStartup";
-      if (!write_int_to_ups(CI_APCDelayBeforeStartup, STARTUP_DELAY, func)) {
+      if (!usb_write_int_to_ups(ups, CI_APCDelayBeforeStartup, STARTUP_DELAY, func)) {
          Dmsg1(100, "Unable to set %s (not an error)\n", func);
       }
    }
@@ -918,17 +977,17 @@ bool UsbDriver::KillPower()
     * this out.
     */
    if (UPS_HAS_CAP(CI_BUPDelayBeforeStartup)) {
-      if (read_int_from_ups(CI_BUPDelayBeforeStartup, &val)) {
+      if (pusb_read_int_from_ups(ups, CI_BUPDelayBeforeStartup, &val)) {
          func = "CI_BUPDelayBeforeStartup";
          switch (val) {
          case 0x363030:           /* 600 sec */
-            write_int_to_ups(CI_BUPDelayBeforeStartup, 2, func);
+            pusb_write_int_to_ups(ups, CI_BUPDelayBeforeStartup, 2, func);
             /* Falls thru... */
          case 0x333030:           /* 300 sec */
-            write_int_to_ups(CI_BUPDelayBeforeStartup, 2, func);
+            pusb_write_int_to_ups(ups, CI_BUPDelayBeforeStartup, 2, func);
             /* Falls thru... */
          case 0x313830:           /* 180 sec */
-            write_int_to_ups(CI_BUPDelayBeforeStartup, 2, func);
+            pusb_write_int_to_ups(ups, CI_BUPDelayBeforeStartup, 2, func);
             /* Falls thru... */
          case 0x3630:             /* 60 sec */
             break;
@@ -949,7 +1008,7 @@ bool UsbDriver::KillPower()
    if (!shutdown && UPS_HAS_CAP(CI_APCDelayBeforeShutdown)) {
       Dmsg0(000, "UPS appears to support BackUPS style shutdown.\n");
       func = "CI_APCDelayBeforeShutdown";
-      if (!write_int_to_ups(CI_APCDelayBeforeShutdown,
+      if (!usb_write_int_to_ups(ups, CI_APCDelayBeforeShutdown,
             SHUTDOWN_DELAY, func)) {
          Dmsg1(000, "Kill power function \"%s\" failed.\n", func);
       } else {
@@ -969,15 +1028,15 @@ bool UsbDriver::KillPower()
    if (!shutdown && UPS_HAS_CAP(CI_DWAKE) && UPS_HAS_CAP(CI_DelayBeforeShutdown)) {
       Dmsg0(000, "UPS appears to support SmartUPS style shutdown.\n");
       func = "CI_DWAKE";
-      if (!write_int_to_ups(CI_DWAKE, SHUTDOWN_DELAY + 4, func)) {
+      if (!usb_write_int_to_ups(ups, CI_DWAKE, SHUTDOWN_DELAY + 4, func)) {
          Dmsg1(000, "Kill power function \"%s\" failed.\n", func);
       } else {
          func = "CI_DelayBeforeShutdown";
-         if (!write_int_to_ups(CI_DelayBeforeShutdown,
+         if (!usb_write_int_to_ups(ups, CI_DelayBeforeShutdown,
                SHUTDOWN_DELAY, func)) {
             Dmsg1(000, "Kill power function \"%s\" failed.\n", func);
             /* reset prev timer */
-            write_int_to_ups(CI_DWAKE, -1, "CI_DWAKE");  
+            usb_write_int_to_ups(ups, CI_DWAKE, -1, "CI_DWAKE");  
          } else {
             shutdown = 1;
          }
@@ -999,13 +1058,13 @@ bool UsbDriver::KillPower()
    if (!shutdown && UPS_HAS_CAP(CI_BUPHibernate) && UPS_HAS_CAP(CI_BUPSelfTest)) {
       Dmsg0(000, "UPS appears to support BackUPS Pro style shutdown.\n");
       func = "CI_BUPHibernate";
-      if (!write_int_to_ups(CI_BUPHibernate, 1, func)) {
+      if (!pusb_write_int_to_ups(ups, CI_BUPHibernate, 1, func)) {
          Dmsg1(000, "Kill power function \"%s\" failed.\n", func);
       } else {
          func = "CI_BUPSelfTest";
-         if (!write_int_to_ups(CI_BUPSelfTest, 1, func)) {
+         if (!pusb_write_int_to_ups(ups, CI_BUPSelfTest, 1, func)) {
             Dmsg1(000, "Kill power function \"%s\" failed.\n", func);
-            write_int_to_ups(CI_BUPHibernate, 0, "CI_BUPHibernate");
+            pusb_write_int_to_ups(ups, CI_BUPHibernate, 0, "CI_BUPHibernate");
          } else {
             shutdown = 1;
          }
@@ -1033,7 +1092,7 @@ bool UsbDriver::KillPower()
       Dmsg0(000, "UPS appears to support DelayBeforeReboot style shutdown.\n");
 
       func = "CI_DelayBeforeReboot";
-      if (!write_int_to_ups(CI_DelayBeforeReboot, SHUTDOWN_DELAY, func))
+      if (!usb_write_int_to_ups(ups, CI_DelayBeforeReboot, SHUTDOWN_DELAY, func))
          Dmsg1(000, "Kill power function \"%s\" failed.\n", func);
       else
          shutdown = 1;
@@ -1052,7 +1111,7 @@ bool UsbDriver::KillPower()
       Dmsg0(000, "UPS appears to support ForceShutdown style shutdown.\n");
 
       func = "CI_APCForceShutdown";
-      if (!write_int_to_ups(CI_APCForceShutdown, 1, func))
+      if (!usb_write_int_to_ups(ups, CI_APCForceShutdown, 1, func))
          Dmsg1(000, "Kill power function \"%s\" failed.\n", func);
       else
          shutdown = 1;
@@ -1069,7 +1128,7 @@ bool UsbDriver::KillPower()
       Dmsg0(000, "UPS appears to support DelayBeforeShutdown style shutdown.\n");
 
       func = "CI_DelayBeforeShutdown";
-      if (!write_int_to_ups(CI_DelayBeforeShutdown, SHUTDOWN_DELAY, func))
+      if (!usb_write_int_to_ups(ups, CI_DelayBeforeShutdown, SHUTDOWN_DELAY, func))
          Dmsg1(000, "Kill power function \"%s\" failed.\n", func);
       else
          shutdown = 1;
@@ -1109,7 +1168,7 @@ bool UsbDriver::KillPower()
  * Helper functions for use by platform specific code
  */
 
-double UsbDriver::pow_ten(int exponent)
+double pow_ten(int exponent)
 {
    int i;
    double val = 1;
@@ -1128,13 +1187,13 @@ double UsbDriver::pow_ten(int exponent)
 }
 
 /* Called by platform-specific code to report an interrupt event */
-bool UsbDriver::report_event(int ci, usb_value *uval)
+int usb_report_event(UPSINFO *ups, int ci, USB_VALUE *uval)
 {
    Dmsg2(200, "USB driver reported event ci=%d, val=%f\n",
       ci, uval->dValue);
 
    /* Got an event: go process it */
-   process_value(ci, uval);
+   usb_process_value(ups, ci, uval);
 
    switch (ci) {
    /*

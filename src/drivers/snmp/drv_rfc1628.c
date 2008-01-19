@@ -25,11 +25,14 @@
 
 #include "apc.h"
 #include "snmp.h"
+#include "snmp_private.h"
 
-bool SnmpDriver::rfc_1628_check_alarms()
+static int rfc_1628_check_alarms(UPSINFO *ups)
 {
-   struct snmp_session *s = &_session;
-   ups_mib_t *data = (ups_mib_t *)_MIB;
+   struct snmp_ups_internal_data *Sid =
+      (struct snmp_ups_internal_data *)ups->driver_internal_data;
+   struct snmp_session *s = &Sid->session;
+   ups_mib_t *data = (ups_mib_t *)Sid->MIB;
 
    /*
     * Check the Ethernet COMMLOST first, then check the
@@ -37,42 +40,47 @@ bool SnmpDriver::rfc_1628_check_alarms()
     * alarms.
     */
    if (ups_mib_mgr_get_upsAlarmEntry(s, &(data->upsAlarmEntry)) == -1) {
-      _ups->set_commlost();
+      ups->set_commlost();
       free(data->upsAlarmEntry);
-      return false;
+      return 0;
    } else {
-      _ups->clear_commlost();
+      ups->clear_commlost();
    }
 
    free(data->upsAlarmEntry);
-   return true;
+   return 1;
 }
 
-bool SnmpDriver::rfc1628_snmp_kill_ups_power()
+int rfc1628_snmp_kill_ups_power(UPSINFO *ups)
 {
-   return false;
+   return 0;
 }
 
-bool SnmpDriver::rfc1628_snmp_ups_get_capabilities()
+int rfc1628_snmp_ups_get_capabilities(UPSINFO *ups)
 {
+   int i = 0;
+
    /*
     * Assume that an UPS with SNMP control has all the capabilities.
     * We know that the RFC1628 doesn't even implement some of the
     * capabilities. We do this way for sake of simplicity.
     */
-   for (int i = 0; i <= CI_MAX_CAPS; i++)
-      _ups->UPS_Cap[i] = TRUE;
+   for (i = 0; i <= CI_MAX_CAPS; i++)
+      ups->UPS_Cap[i] = TRUE;
 
-   return true;
+   return 1;
 }
 
-bool SnmpDriver::rfc1628_snmp_ups_read_static_data()
+int rfc1628_snmp_ups_read_static_data(UPSINFO *ups)
 {
-   struct snmp_session *s = &_session;
-   ups_mib_t *data = (ups_mib_t *)_MIB;
+   struct snmp_ups_internal_data *Sid =
+      (struct snmp_ups_internal_data *)ups->driver_internal_data;
+   struct snmp_session *s = &Sid->session;
+   ups_mib_t *data = (ups_mib_t *)Sid->MIB;
    
-   if (rfc_1628_check_alarms() == 0)
-     return false;
+   if (rfc_1628_check_alarms(ups) == 0) {
+     return 0;
+   }
 
    data->upsIdent = NULL;
    ups_mib_mgr_get_upsIdent(s, &(data->upsIdent));
@@ -81,36 +89,39 @@ bool SnmpDriver::rfc1628_snmp_ups_read_static_data()
       SNMP_STRING(upsIdent, Name, upsname);
       free(data->upsIdent);
    }
-
-   return true;
+   
+   return 1;
 }
 
-bool SnmpDriver::rfc1628_snmp_ups_read_volatile_data()
+int rfc1628_snmp_ups_read_volatile_data(UPSINFO *ups)
 {  
-   struct snmp_session *s = &_session;
-   ups_mib_t *data = (ups_mib_t *)_MIB;
+   struct snmp_ups_internal_data *Sid =
+      (struct snmp_ups_internal_data *)ups->driver_internal_data;
+   struct snmp_session *s = &Sid->session;
+   ups_mib_t *data = (ups_mib_t *)Sid->MIB;
 
-   if (rfc_1628_check_alarms() == 0)
-     return false;
+   if (rfc_1628_check_alarms(ups) == 0) {
+     return 0;
+   }
 
    data->upsBattery = NULL;
    ups_mib_mgr_get_upsBattery(s, &(data->upsBattery));
    if (data->upsBattery) {
       switch (data->upsBattery->__upsBatteryStatus) {
       case 2:
-         _ups->clear_battlow();
+         ups->clear_battlow();
          break;
       case 3:
-         _ups->set_battlow();
+         ups->set_battlow();
          break;
       default:                    /* Unknown, assume battery is ok */
-         _ups->clear_battlow();
+         ups->clear_battlow();
          break;
       }
 
-      _ups->BattChg = data->upsBattery->__upsEstimatedChargeRemaining;
-      _ups->UPSTemp = data->upsBattery->__upsBatteryTemperature;
-      _ups->TimeLeft = data->upsBattery->__upsEstimatedMinutesRemaining;
+      ups->BattChg = data->upsBattery->__upsEstimatedChargeRemaining;
+      ups->UPSTemp = data->upsBattery->__upsBatteryTemperature;
+      ups->TimeLeft = data->upsBattery->__upsEstimatedMinutesRemaining;
 
       free(data->upsBattery);
    }
@@ -118,15 +129,15 @@ bool SnmpDriver::rfc1628_snmp_ups_read_volatile_data()
    data->upsInputEntry = NULL;
    ups_mib_mgr_get_upsInputEntry(s, &(data->upsInputEntry));
    if (data->upsInputEntry) {
-      _ups->LineVoltage = data->upsInputEntry->__upsInputVoltage;
-      _ups->LineFreq    = data->upsInputEntry->__upsInputFrequency / 10;
+      ups->LineVoltage = data->upsInputEntry->__upsInputVoltage;
+      ups->LineFreq    = data->upsInputEntry->__upsInputFrequency / 10;
 
-      if (_ups->LineMax < _ups->LineVoltage) {
-         _ups->LineMax = _ups->LineVoltage;
+      if (ups->LineMax < ups->LineVoltage) {
+         ups->LineMax = ups->LineVoltage;
       }
 
-      if (_ups->LineMin > _ups->LineVoltage || _ups->LineMin == 0) {
-         _ups->LineMin = _ups->LineVoltage;
+      if (ups->LineMin > ups->LineVoltage || ups->LineMin == 0) {
+         ups->LineMin = ups->LineVoltage;
       }
 
       free(data->upsInputEntry);
@@ -135,24 +146,24 @@ bool SnmpDriver::rfc1628_snmp_ups_read_volatile_data()
    data->upsOutputEntry = NULL;
    ups_mib_mgr_get_upsOutputEntry(s, &(data->upsOutputEntry));
    if (data->upsOutputEntry) {
-      _ups->OutputVoltage = data->upsOutputEntry->__upsOutputVoltage;
-      _ups->UPSLoad 	 = data->upsOutputEntry->__upsOutputPercentLoad;
-      _ups->OutputCurrent = data->upsOutputEntry->__upsOutputCurrent;
+      ups->OutputVoltage = data->upsOutputEntry->__upsOutputVoltage;
+      ups->UPSLoad 	 = data->upsOutputEntry->__upsOutputPercentLoad;
+      ups->OutputCurrent = data->upsOutputEntry->__upsOutputCurrent;
 
       free(data->upsOutputEntry);
    }
 
-   return true;
+   return 1;
 }
 
-bool SnmpDriver::rfc1628_snmp_ups_check_state()
+int rfc1628_snmp_ups_check_state(UPSINFO *ups)
 {
    /* Wait the required amount of time before bugging the device. */
-   sleep(_ups->wait_time);
+   sleep(ups->wait_time);
 
-   write_lock(_ups);
-   rfc_1628_check_alarms();
-   write_unlock(_ups);
+   write_lock(ups);
+   rfc_1628_check_alarms(ups);
+   write_unlock(ups);
 
-   return true;
+   return 1;
 }

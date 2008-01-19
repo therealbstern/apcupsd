@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS ABSSRCDIR topdir TOP_DIR VERSION DATE TRUEPRG FALSEPRG build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP CXX CXXFLAGS ac_ct_CXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA AWK HAVE_GCC_TRUE HAVE_GCC_FALSE DEBUG DLIB DINCLUDE DRVLIBS PTHREAD_CFLAGS PTHREAD_LFLAGS APCACCESS SMTP APCTEST SHUTDOWN APCUPSD_MAIL WALL SCRIPTSHELL MAKE MAKEDEPEND RANLIB LIBTOOL ETAGS CTAGS RM CP ECHO LN SED AR MV X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS HAVE_SUN_OS_TRUE HAVE_SUN_OS_FALSE HAVE_OSF1_OS_TRUE HAVE_OSF1_OS_FALSE HAVE_AIX_OS_TRUE HAVE_AIX_OS_FALSE HAVE_HPUX_OS_TRUE HAVE_HPUX_OS_FALSE HAVE_LINUX_OS_TRUE HAVE_LINUX_OS_FALSE HAVE_FREEBSD_OS_TRUE HAVE_FREEBSD_OS_FALSE HAVE_NETBSD_OS_TRUE HAVE_NETBSD_OS_FALSE HAVE_OPENBSD_OS_TRUE HAVE_OPENBSD_OS_FALSE HAVE_BSDI_OS_TRUE HAVE_BSDI_OS_FALSE HAVE_SGI_OS_TRUE HAVE_SGI_OS_FALSE HAVE_DARWIN_OS_TRUE HAVE_DARWIN_OS_FALSE GDHEAD INSTALL_DISTDIR UNINSTALL_DISTDIR APCSMART_DRIVER DUMB_DRIVER LIBUSBHID LIBUSBHIDINC LIBUSBHIDOBJS usbcfg LIBUSBH USB_DRIVER USB_TYPE LIBUSB NET_DRIVER SNMP_DRIVER TEST_DRIVER PCNET_DRIVER NISIP PKG_CONFIG ac_pt_PKG_CONFIG GAPCMON_CFLAGS GAPCMON_LIBS GAPCMON POMAKE INTLSUB INTLMAKE INTLTARGET POWERFLUTE POWERLIBS LD CGI GDINCLUDE LIBGD LIBGDOBJ CGI_IMGFMT CGIBIN SYSCONFDIR PACKAGE MSGFMT SET_MAKE ac_ct_RANLIB ALLOCA USE_NLS GMSGFMT XGETTEXT GENCAT USE_INCLUDED_LIBINTL CATALOGS CATOBJEXT DATADIRNAME GMOFILES INSTOBJEXT INTLDEPS INTLLIBS INTLINCLUDE INTLOBJS POFILES POSUB INCLUDE_LOCALE_H GT_NO GT_YES l MKINSTALLDIRS EXTRADEFS LIBEXTRAOBJ EXTRAOBJ DISTNAME DISTVER SERIALDEV PIDDIR LOGDIR nologdir PWRFAILDIR LOCKDIR NISPORT UPSTYPE UPSCABLE HOST LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS ABSSRCDIR topdir TOP_DIR VERSION DATE TRUEPRG FALSEPRG build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP CXX CXXFLAGS ac_ct_CXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA AWK HAVE_GCC_TRUE HAVE_GCC_FALSE DEBUG DLIB DINCLUDE DRVLIBS PTHREAD_CFLAGS PTHREAD_LFLAGS APCACCESS SMTP APCTEST SHUTDOWN APCUPSD_MAIL WALL SCRIPTSHELL MAKE MAKEDEPEND RANLIB LIBTOOL ETAGS CTAGS RM CP ECHO LN SED AR MV X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS HAVE_SUN_OS_TRUE HAVE_SUN_OS_FALSE HAVE_OSF1_OS_TRUE HAVE_OSF1_OS_FALSE HAVE_AIX_OS_TRUE HAVE_AIX_OS_FALSE HAVE_HPUX_OS_TRUE HAVE_HPUX_OS_FALSE HAVE_LINUX_OS_TRUE HAVE_LINUX_OS_FALSE HAVE_FREEBSD_OS_TRUE HAVE_FREEBSD_OS_FALSE HAVE_NETBSD_OS_TRUE HAVE_NETBSD_OS_FALSE HAVE_OPENBSD_OS_TRUE HAVE_OPENBSD_OS_FALSE HAVE_BSDI_OS_TRUE HAVE_BSDI_OS_FALSE HAVE_SGI_OS_TRUE HAVE_SGI_OS_FALSE HAVE_DARWIN_OS_TRUE HAVE_DARWIN_OS_FALSE HALPOLICYDIR GDHEAD INSTALL_DISTDIR UNINSTALL_DISTDIR APCSMART_DRIVER DUMB_DRIVER LIBUSBHID LIBUSBHIDINC LIBUSBHIDOBJS usbcfg LIBUSBH USB_DRIVER USB_TYPE LIBUSB NET_DRIVER SNMP_DRIVER TEST_DRIVER PCNET_DRIVER NISIP PKG_CONFIG ac_pt_PKG_CONFIG GAPCMON_CFLAGS GAPCMON_LIBS GAPCMON POMAKE INTLSUB INTLMAKE INTLTARGET POWERFLUTE POWERLIBS LD CGI GDINCLUDE LIBGD LIBGDOBJ CGI_IMGFMT CGIBIN SYSCONFDIR PACKAGE MSGFMT SET_MAKE ac_ct_RANLIB ALLOCA USE_NLS GMSGFMT XGETTEXT GENCAT USE_INCLUDED_LIBINTL CATALOGS CATOBJEXT DATADIRNAME GMOFILES INSTOBJEXT INTLDEPS INTLLIBS INTLINCLUDE INTLOBJS POFILES POSUB INCLUDE_LOCALE_H GT_NO GT_YES l MKINSTALLDIRS EXTRADEFS LIBEXTRAOBJ EXTRAOBJ DISTNAME DISTVER SERIALDEV PIDDIR LOGDIR nologdir PWRFAILDIR LOCKDIR NISPORT UPSTYPE UPSCABLE HOST LIBOBJS LTLIBOBJS'
 ac_subst_files='VARIABLES TARGETS'
 
 # Initialize some variables set by options.
@@ -908,6 +908,7 @@ Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-x                use the X Window System
+  --with-halpolicydir=DIR HAL policy directory (default is platform dependent)
   --with-libwrap=DIR      Compile in libwrap (tcp_wrappers) support
   --with-generic-usb      Force use of generic USB driver
   --with-nisip=IP-ADDRESS Specify the IP address to bind to (default=0.0.0.0)
@@ -10865,6 +10866,29 @@ if test "${enable_all+set}" = set; then
    fi
 fi;
 
+
+if test $HAVE_UNAME=yes -a x`uname -s` = xLinux ; then
+   HALPOLICYDIR="/usr/share/hal/fdi/policy/20thirdparty"
+else
+   HALPOLICYDIR="no"
+fi
+
+
+# Check whether --with-halpolicydir or --without-halpolicydir was given.
+if test "${with_halpolicydir+set}" = set; then
+  withval="$with_halpolicydir"
+  HALPOLICYDIR=$withval
+fi;
+
+if test "x$HALPOLICYDIR" != "xno" ; then
+   echo "$as_me:$LINENO: result: Using halpolicydir=$HALPOLICYDIR" >&5
+echo "${ECHO_T}Using halpolicydir=$HALPOLICYDIR" >&6
+else
+   echo "$as_me:$LINENO: result: Will not install HAL policy file" >&5
+echo "${ECHO_T}Will not install HAL policy file" >&6
+fi
+
+
 #--------------------------------------------------------------------
 # Check for TCP wrapper support, code taken from Bacula KES-7Nov03
 #--------------------------------------------------------------------
@@ -11749,10 +11773,6 @@ if test "${enable_usb+set}" = set; then
            USB_TYPE="linux"
            echo "$as_me:$LINENO: result: Using Linux USB driver." >&5
 echo "${ECHO_T}Using Linux USB driver." >&6
-           cat >>confdefs.h <<\_ACEOF
-#define HAVE_LINUX_USB 1
-_ACEOF
-
         elif test $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xFreeBSD -o \
                   $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xOpenBSD -o \
                   $GENERICUSB = "no" -a $HAVE_UNAME=yes -a x`uname -s` = xNetBSD ; then
@@ -11765,10 +11785,6 @@ _ACEOF
            USB_TYPE="bsd"
            echo "$as_me:$LINENO: result: Using BSD USB driver." >&5
 echo "${ECHO_T}Using BSD USB driver." >&6
-           cat >>confdefs.h <<\_ACEOF
-#define HAVE_BSD_USB 1
-_ACEOF
-
         else
            # Extract the first word of "libusb-config", so it can be a program name with args.
 set dummy libusb-config; ac_word=$2
@@ -11830,10 +11846,6 @@ echo "$as_me: error: Cannot find libusb-config" >&2;}
            USB_TYPE="generic"
            echo "$as_me:$LINENO: result: Using generic libusb USB driver." >&5
 echo "${ECHO_T}Using generic libusb USB driver." >&6
-           cat >>confdefs.h <<\_ACEOF
-#define HAVE_GENERIC_USB 1
-_ACEOF
-
         fi
 
         cat >>confdefs.h <<\_ACEOF
@@ -17965,6 +17977,7 @@ s,@HAVE_SGI_OS_TRUE@,$HAVE_SGI_OS_TRUE,;t t
 s,@HAVE_SGI_OS_FALSE@,$HAVE_SGI_OS_FALSE,;t t
 s,@HAVE_DARWIN_OS_TRUE@,$HAVE_DARWIN_OS_TRUE,;t t
 s,@HAVE_DARWIN_OS_FALSE@,$HAVE_DARWIN_OS_FALSE,;t t
+s,@HALPOLICYDIR@,$HALPOLICYDIR,;t t
 s,@GDHEAD@,$GDHEAD,;t t
 s,@INSTALL_DISTDIR@,$INSTALL_DISTDIR,;t t
 s,@UNINSTALL_DISTDIR@,$UNINSTALL_DISTDIR,;t t

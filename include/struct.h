@@ -26,8 +26,6 @@
 #ifndef _STRUCT_H
 #define _STRUCT_H
 
-class UpsDriver;
-
 typedef enum {
    NO_CABLE = 0,        /* Default Disable            */
    CUSTOM_SIMPLE,       /* SIMPLE cable simple        */
@@ -239,6 +237,7 @@ class UPSINFO {
 
    /* UPS capability array and codes */
    char UPS_Cap[CI_MAXCI + 1];          /* TRUE if UPS has capability */
+   unsigned int UPS_Cmd[CI_MAXCI + 1];  /* Command or function code */
 
    INTERNALGENINFO cable;          /* UPSCABLE directive */
    INTERNALGENINFO nologin;        /* NOLOGON directive */
@@ -361,7 +360,8 @@ class UPSINFO {
    pthread_mutex_t mutex;
    int refcnt;                     /* thread attach count */
 
-   UpsDriver *driver;             /* UPS driver for this UPSINFO */
+   const struct upsdriver *driver; /* UPS driver for this UPSINFO */
+   void *driver_internal_data;     /* Driver private data */
 };
 
 

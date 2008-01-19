@@ -22,8 +22,8 @@ all-targets: Makefile
 #
 install-distdir:
 	(cd $(DISTNAME); \
-	     $(MAKE) "DISTNAME=$(DISTNAME)" "DISTVER=$(DISTVER)" \
-		 DESTDIR=$(DESTDIR) install);
+	   $(MAKE) "DISTNAME=$(DISTNAME)" "DISTVER=$(DISTVER)" \
+	      DESTDIR=$(DESTDIR) install);
 
 install: @INSTALL_DISTDIR@
 	@echo "Installing apccontrol script..."
@@ -32,24 +32,28 @@ install: @INSTALL_DISTDIR@
 	   echo " Found old apccontrol moving it to $(DESTDIR)$(sysconfdir)/apccontrol.orig"; \
 	fi 
 	@if test -f ./$(DISTNAME)/apccontrol; then \
-	     $(INSTALL_SCRIPT) -m 744 ./$(DISTNAME)/apccontrol \
-		$(DESTDIR)$(sysconfdir)/apccontrol; \
+	   $(INSTALL_SCRIPT) -m 744 ./$(DISTNAME)/apccontrol $(DESTDIR)$(sysconfdir)/apccontrol; \
 	else \
-	     $(INSTALL_SCRIPT) -m 744 ./apccontrol \
-		$(DESTDIR)$(sysconfdir)/apccontrol; \
+	   $(INSTALL_SCRIPT) -m 744 ./apccontrol $(DESTDIR)$(sysconfdir)/apccontrol; \
 	fi
 	(cd etc/; $(MAKE) DESTDIR=$(DESTDIR) install)
+	@if test "x@HALPOLICYDIR@" != "xno" -a "x@HALPOLICYDIR@" != "x" ; then \
+	   $(INSTALL_DATA) -m 644 ./80-apcupsd-ups-policy.fdi $(DESTDIR)@HALPOLICYDIR@ ; \
+	fi
 
 #
 # uninstall symlinks before removing the boot script etc etc
 #
 uninstall-distdir:
 	(cd $(DISTNAME); \
-	    $(MAKE) "DISTNAME=$(DISTNAME)" "DISTVER=$(DISTVER)" \
-	       DESTDIR=$(DESTDIR) uninstall);
+	   $(MAKE) "DISTNAME=$(DISTNAME)" "DISTVER=$(DISTVER)" \
+	      DESTDIR=$(DESTDIR) uninstall);
 
 uninstall: @UNINSTALL_DISTDIR@
 	$(RMF) $(DESTDIR)$(sysconfdir)/apccontrol
+	@if test "x@HALPOLICYDIR@" != "xno" -a "x@HALPOLICYDIR@" != "x" ; then \
+	   $(RMF) "$(DESTDIR)@HALPOLICYDIR@/80-apcupsd-ups-policy.fdi" ; \
+	fi
 
 clean: targetclean
 

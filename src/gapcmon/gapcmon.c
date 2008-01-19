@@ -2680,11 +2680,11 @@ static gpointer *gapc_net_thread_qwork(PGAPC_MONITOR pm)
    thread_queue = pm->q_network;
 
    if (pm->psk == NULL) {
-       pm->psk = sknet_net_client_init (pm->pch_host, pm->i_port);
-       if (pm->psk == NULL) {
-            g_async_queue_unref(thread_queue);
-            g_thread_exit(GINT_TO_POINTER(0));
-       }
+      pm->psk = sknet_net_client_init (pm->pch_host, pm->i_port);
+      if (pm->psk == NULL) {
+         g_async_queue_unref(thread_queue);
+         g_thread_exit(GINT_TO_POINTER(0));
+      }
    }
 
    while ((pm = (PGAPC_MONITOR) g_async_queue_pop(thread_queue))) {
