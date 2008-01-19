@@ -8,8 +8,34 @@ versions are encouraged to upgrade.
 IF YOU USE THE OLD STYLE MASTER/SLAVE NETWORKING MODE, BE SURE TO READ THE
 3.14.0 RELEASE NOTES BELOW.
 
-3.14.2 -- 15 September 2007          (Maintenance Release)
 
+3.14.3 -- 20 January 2008            (Maintenance Release)
+
+NEW FEATURES
+
+  * A HAL policy file is automatically installed on Linux systems to disable
+    the hald-addon-hid-ups module which conflicts with apcupsd's control of
+    USB UPSes. The file is automatically removed when apcupsd is uninstalled.
+
+BUG FIXES
+
+  * Add support for Nominal Power (aka Configured Active Power) reading.  
+    Credit to Lars Randers <lars@nstec.dk> for most of the code.
+
+  * Add units to NOMINV, NOMOUTV, and NOMBATTV stats.
+
+  * Eliminate "warning: deprecated conversion from string constant to
+    'char*'" warnings emitted from gcc-4.2.1 (earlier versions with
+    -Wwrite-strings). Contributed by Steve Yarmie <tribhuvanji@gmail.com>.
+
+  * Fix killpower and eeprom settings bug on USB modules introduced when 
+    INPUT reports were prioritized over FEATURE reports.
+
+  * Fix bugs that could cause NIS-net driver to get stuck waiting for
+    comms to be restored instead of shutting down.
+
+
+3.14.2 -- 15 September 2007          (Maintenance Release)
 
 NEW FEATURES
 
@@ -64,7 +90,6 @@ BUG FIXES
     <https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=245864>
   
   * Fix SNMP port selection when using SNMP driver
-
 
   * Add workaround for broken BackUPS Pro model that returns certain
     reports encoded in ASCII. Based on a patch from David Fries
