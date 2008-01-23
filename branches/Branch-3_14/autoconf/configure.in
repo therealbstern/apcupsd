@@ -1315,7 +1315,6 @@ bsdi)
    ;;
 debian)
    DISTVER=`cat /etc/debian_version`
-   NISPORT=6543
    DFILES="\
       platforms/debian/Makefile \
       platforms/debian/apcupsd \
