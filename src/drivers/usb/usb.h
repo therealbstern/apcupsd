@@ -83,8 +83,32 @@ protected:
 
 private:
 
+   // Data handling callback functions
+   void configure_callbacks();
+   void process_bool(int ci, usb_value *uval);
+   void process_string(int ci, usb_value *uval);
+   void process_volts(int ci, usb_value *uval);
+   void process_percent(int ci, usb_value *uval);
+   void process_freq(int ci, usb_value *uval);
+   void process_power(int ci, usb_value *uval);
+   void process_date(int ci, usb_value *uval);
+   void process_date_bcd(int ci, usb_value *uval);
+   void process_model(int ci, usb_value *uval);
+   void process_selftest(int ci, usb_value *uval);
+   void process_sensitivity(int ci, usb_value *uval);
+   void process_battpresent(int ci, usb_value *uval);
+   void process_whybatt(int ci, usb_value *uval);
+   void process_timesecs(int ci, usb_value *uval);
+   void process_temp(int ci, usb_value *uval);
+   void process_status(int ci, usb_value *uval);
+   void process_timemins(int ci, usb_value *uval);
+   void process_alarm(int ci, usb_value *uval);
+   void process_asciivolts(int ci, usb_value *uval);
+   void process_asciipct(int ci, usb_value *uval);
+   void process_asciifreq(int ci, usb_value *uval);
+
+   // Misc helpers
    bool get_value(int ci, usb_value *uval);
-   bool process_value_bup(int ci, usb_value* uval);
    bool update_value(int ci);
    void process_value(int ci, usb_value* uval);
    bool write_int_to_ups(int ci, int value, const char *name)
@@ -92,9 +116,15 @@ private:
    bool read_int_from_ups(int ci, int *value)
       { return SubclassReadIntFromUps(ci, value); }
 
-   bool _quirk_old_backups_pro;     // Enable old BackUPS Pro quirk
+   // Thread body function
+   virtual void body();
+
    int _batt_present_count;         // Battery present count
-   struct timeval _last_urb_time;
+   struct timeval _last_urb_time;   // Last time we talked to the UPS
+
+   // Data-handling callback array
+   typedef void (UsbDriver::*DataCallback)(int, usb_value*);
+   DataCallback _callbacks[CI_MAXCI + 1];
 };
 
 /* Max rate to update volatile data */

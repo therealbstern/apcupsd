@@ -76,7 +76,14 @@ bool ApcSmartDriver::Open()
    tcsetattr(_ups->fd, TCSANOW, &_newtio);
    tcflush(_ups->fd, TCIFLUSH);
 
-   return true;
+   // Perform initial configuration and discovery
+   bool rc = Setup() && GetCapabilities() && ReadStaticData();
+
+   // If all is well so far, start monitoring thread
+   if (rc)
+      run();
+
+   return rc;
 }
 
 /*
@@ -148,4 +155,24 @@ bool ApcSmartDriver::Setup()
 
  out:
    return true;
+}
+
+void ApcSmartDriver::body()
+{
+   _ups->wait_time = 60;
+   while (1)
+   {
+      // Repeat ReadVolatileData() until no interrupts are issued during it.
+      // Normally this means we simply run it once. But if an async event
+      // ocurrs during the call, we will poll again to ensure we pick up
+      // whatever status has changed before going into CheckState().
+      do {
+         _interrupt = false;
+         ReadVolatileData();
+      } while (_interrupt);
+
+      // No more async events, sleep until another one comes in or until
+      // it is time to poll again.
+      CheckState();
+   }
 }

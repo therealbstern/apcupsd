@@ -26,6 +26,8 @@
 #ifndef _STRUCT_H
 #define _STRUCT_H
 
+#include "UpsValue.h"
+
 class UpsDriver;
 
 typedef enum {
@@ -146,18 +148,18 @@ typedef struct internalgeninfo {
 class UPSINFO {
  public:
    /* Methods */
-   void clear_battlow() { Status &= ~UPS_battlow; };
-   void clear_boost() { Status &= ~UPS_boost; };
-   void clear_calibration() { Status &= ~UPS_calibration; };
+//   void clear_battlow() { Status &= ~UPS_battlow; };
+//   void clear_boost() { Status &= ~UPS_boost; };
+//   void clear_calibration() { Status &= ~UPS_calibration; };
    void clear_commlost() { Status &= ~UPS_commlost; };
    void clear_dev_setup() { Status &= ~UPS_dev_setup; };
    void clear_fastpoll() { Status &= ~UPS_fastpoll; };
    void clear_onbatt_msg() { Status &= ~UPS_onbatt_msg; };
-   void clear_onbatt() { Status &= ~UPS_onbatt; };
-   void clear_online() { Status |= UPS_onbatt; Status &= ~UPS_online; };
-   void clear_overload() { Status &= ~UPS_overload; };
+//   void clear_onbatt() { Status &= ~UPS_onbatt; };
+//   void clear_online() { Status |= UPS_onbatt; Status &= ~UPS_online; };
+//   void clear_overload() { Status &= ~UPS_overload; };
    void clear_plugged() { Status &= ~UPS_plugged; };
-   void clear_replacebatt() { Status &= ~UPS_replacebatt; };
+//   void clear_replacebatt() { Status &= ~UPS_replacebatt; };
    void clear_shut_btime() { Status &= ~UPS_shut_btime; };
    void clear_shutdown() { Status &= ~UPS_shutdown; };
    void clear_shut_emerg() { Status &= ~UPS_shut_emerg; };
@@ -166,26 +168,26 @@ class UPSINFO {
    void clear_shut_remote() { Status &= ~UPS_shut_remote; };
    void clear_slavedown() { Status &= ~UPS_slavedown; };
    void clear_slave() { Status &= ~UPS_slave; };
-   void clear_trim() { Status &= ~UPS_trim; };
-   void clear_battpresent() {Status &= ~UPS_battpresent; };
+//   void clear_trim() { Status &= ~UPS_trim; };
+//   void clear_battpresent() {Status &= ~UPS_battpresent; };
 
-   void set_battlow() { Status |= UPS_battlow; };
-   void set_battlow(int val) { if (val) set_battlow(); else clear_battlow(); };
-   void set_boost() { Status |= UPS_boost; };
-   void set_boost(int val) { if (val) set_boost(); else clear_boost(); };
-   void set_calibration() { Status |= UPS_calibration; };
+//   void set_battlow() { Status |= UPS_battlow; };
+//   void set_battlow(int val) { if (val) set_battlow(); else clear_battlow(); };
+//   void set_boost() { Status |= UPS_boost; };
+//   void set_boost(int val) { if (val) set_boost(); else clear_boost(); };
+//   void set_calibration() { Status |= UPS_calibration; };
    void set_commlost() { Status |= UPS_commlost; };
    void set_dev_setup() { Status |= UPS_dev_setup; };
    void set_fastpoll() { Status |= UPS_fastpoll; };
    void set_onbatt_msg() { Status |= UPS_onbatt_msg; };
-   void set_onbatt() { Status |= UPS_onbatt; };
-   void set_online() { Status |= UPS_online; Status &= ~UPS_onbatt; };
-   void set_online(int val) { if (val) set_online(); else clear_online(); };
-   void set_overload() { Status |= UPS_overload; };
-   void set_overload(int val) { if (val) set_overload(); else clear_overload(); };
+//   void set_onbatt() { Status |= UPS_onbatt; };
+//   void set_online() { Status |= UPS_online; Status &= ~UPS_onbatt; };
+//   void set_online(int val) { if (val) set_online(); else clear_online(); };
+//   void set_overload() { Status |= UPS_overload; };
+//   void set_overload(int val) { if (val) set_overload(); else clear_overload(); };
    void set_plugged() { Status |= UPS_plugged; };
-   void set_replacebatt() { Status |= UPS_replacebatt; };
-   void set_replacebatt(int val) { if (val) set_replacebatt(); else clear_replacebatt(); };
+//   void set_replacebatt() { Status |= UPS_replacebatt; };
+//   void set_replacebatt(int val) { if (val) set_replacebatt(); else clear_replacebatt(); };
    void set_shut_btime() { Status |= UPS_shut_btime; };
    void set_shut_btime(int val) { if (val) set_shut_btime(); else clear_shut_btime(); };
    void set_shutdown() { Status |= UPS_shutdown; };
@@ -199,23 +201,17 @@ class UPSINFO {
    void set_slavedown() { Status |= UPS_slavedown; };
    void set_slavedown(int val) { if (val) set_slavedown(); else clear_slavedown(); };
    void set_slave() { Status |= UPS_slave; };
-   void set_trim() { Status |= UPS_trim; };
-   void set_trim(int val) { if (val) set_trim(); else clear_trim(); };
-   void set_battpresent() { Status |= UPS_battpresent; };
-   void set_battpresent(int val) { if (val) set_battpresent(); else clear_battpresent(); };
+//   void set_trim() { Status |= UPS_trim; };
+//   void set_trim(int val) { if (val) set_trim(); else clear_trim(); };
+//   void set_battpresent() { Status |= UPS_battpresent; };
+//   void set_battpresent(int val) { if (val) set_battpresent(); else clear_battpresent(); };
 
-   bool is_battlow() const { return (Status & UPS_battlow) == UPS_battlow; };
-   bool is_boost() const { return (Status & UPS_boost) == UPS_boost; };
-   bool is_calibration() const { return (Status & UPS_calibration) == UPS_calibration; };
+//   bool is_calibration() const { return (Status & UPS_calibration) == UPS_calibration; };
    bool is_commlost() const { return (Status & UPS_commlost) == UPS_commlost; };
    bool is_dev_setup() const { return (Status & UPS_dev_setup) == UPS_dev_setup; };
    bool is_fastpoll() const { return (Status & UPS_fastpoll) == UPS_fastpoll; };
-   bool is_onbatt() const { return (Status & UPS_onbatt) == UPS_onbatt; };
    bool is_onbatt_msg() const { return (Status & UPS_onbatt_msg) == UPS_onbatt_msg; };
-   bool is_online() const { return (Status & UPS_online) == UPS_online; };
-   bool is_overload() const { return (Status & UPS_overload) == UPS_overload; };
    bool is_plugged() const { return (Status & UPS_plugged) == UPS_plugged; };
-   bool is_replacebatt() const { return (Status & UPS_replacebatt) == UPS_replacebatt; };
    bool is_shut_btime() const { return (Status & UPS_shut_btime) == UPS_shut_btime; };
    bool is_shutdown() const { return (Status & UPS_shutdown) == UPS_shutdown; };
    bool is_shut_emerg() const { return (Status & UPS_shut_emerg) == UPS_shut_emerg; };
@@ -224,13 +220,21 @@ class UPSINFO {
    bool is_shut_remote() const { return (Status & UPS_shut_remote) == UPS_shut_remote; };
    bool is_slave() const { return (Status & UPS_slave) == UPS_slave; };
    bool is_slavedown() const { return (Status & UPS_slavedown) == UPS_slavedown; };
-   bool is_trim() const { return (Status & UPS_trim) == UPS_trim; };
-   bool is_battpresent() const { return (Status & UPS_battpresent) == UPS_battpresent; };
 
-   bool chg_battlow() const { return ((Status ^ PrevStatus) & UPS_battlow) == UPS_battlow; };
-   bool chg_onbatt() const { return ((Status ^ PrevStatus) & UPS_onbatt) == UPS_onbatt; };
-   bool chg_battpresent() const { return ((Status ^ PrevStatus) & UPS_battpresent) == UPS_battpresent; };
-   bool chg_shut_remote() const { return ((Status ^ PrevStatus) & UPS_shut_remote) == UPS_shut_remote; };
+   bool is_battlow() const { return info.getbool(CI_BattLow); }
+   bool is_boost() const { return info.getbool(CI_Boost); }
+   bool is_onbatt() const { return info.getbool(CI_Discharging); }
+   bool is_online() const { return !is_onbatt(); }
+   bool is_overload() const { return info.getbool(CI_Overload); }
+   bool is_replacebatt() const { return info.getbool(CI_NeedReplacement); }
+   bool is_trim() const { return info.getbool(CI_Trim); }
+   bool is_battpresent() const { return info.getbool(CI_BatteryPresent); }
+
+//   bool chg_battlow() const { return ((Status ^ PrevStatus) & UPS_battlow) == UPS_battlow; };
+//   bool chg_onbatt() const { return ((Status ^ PrevStatus) & UPS_onbatt) == UPS_onbatt; };
+//   bool chg_battpresent() const { return ((Status ^ PrevStatus) & UPS_battpresent) == UPS_battpresent; };
+//   bool chg_shut_remote() const { return ((Status ^ PrevStatus) & UPS_shut_remote) == UPS_shut_remote; };
+
 
    /* DATA */
    char release[20];
@@ -271,6 +275,10 @@ class UPSINFO {
 
    /* Items reported by smart UPS */
    /* Volatile items -- i.e. they change with the state of the UPS */
+   int32_t Status;                 /* UPS status (Bitmapped) */
+//   int32_t PrevStatus;             /* Previous UPS status */
+   char upsname[UPSNAMELEN];       /* UPS internal name */
+#if 0
    char linequal[8];               /* Line quality */
    unsigned int reg1;              /* register 1 */
    unsigned int reg2;              /* register 2 */
@@ -292,8 +300,6 @@ class UPSINFO {
    double UPSTemp;                 /* UPS internal temperature */
    double BattVoltage;             /* Actual Battery voltage -- about 24V */
    double LastSTTime;              /* hours since last self test -- not yet implemented */
-   int32_t Status;                 /* UPS status (Bitmapped) */
-   int32_t PrevStatus;             /* Previous UPS status */
    double TimeLeft;                /* Est. time UPS can run on batt. */
    double humidity;                /* Humidity */
    double ambtemp;                 /* Ambient temperature */
@@ -318,11 +324,10 @@ class UPSINFO {
    char battdat[20];               /* battery installation date */
    char selftest[9];               /* selftest interval as ASCII */
    char firmrev[20];               /* firmware revision */
-   char upsname[UPSNAMELEN];       /* UPS internal name */
    char upsmodel[20];              /* ups model number */
    char sensitivity[8];            /* sensitivity to line fluxuations */
    char beepstate[8];              /* when to beep on power failure. */
-
+#endif
    /* Items specified from config file */
    int annoy;
    int maxtime;
@@ -362,6 +367,7 @@ class UPSINFO {
    int refcnt;                     /* thread attach count */
 
    UpsDriver *driver;             /* UPS driver for this UPSINFO */
+   UpsInfo info;
 };
 
 
@@ -375,5 +381,57 @@ typedef struct s_cmd_msg {
    int level;
    const char *msg;
 } UPSCMDMSG;
+
+#include "atimer.h"
+#include "athread.h"
+
+class UpsStateMachine: public athread
+{
+public:
+
+   UpsStateMachine(UPSINFO *ups);
+   ~UpsStateMachine();
+   
+   void Start();
+
+private:
+
+   bool HandleEventStateAny(UpsDatum &event);
+   void HandleEventStateIdle(UpsDatum &event);
+   void HandleEventStatePowerfail(UpsDatum &event);
+   void HandleEventStateOnbatt(UpsDatum &event);
+   void HandleEventStateShutdownDebounce(UpsDatum &event) {}
+   void HandleEventStateShutdown(UpsDatum &event)         {}
+   void HandleEventStateSelftest(UpsDatum &event);
+
+   void EnterStateIdle()             {}
+   void EnterStatePowerfail();
+   void EnterStateOnbatt();
+   void EnterStateShutdownDebounce() {}
+   void EnterStateShutdown();
+   void EnterStateSelftest();
+
+   virtual void body();
+   static void TimerTimeout(void *arg);
+
+   enum State
+   {
+      STATE_IDLE,
+      STATE_POWERFAIL,
+      STATE_ONBATT,
+      STATE_SHUTDOWN_DEBOUNCE,
+      STATE_SHUTDOWN,
+      STATE_SELFTEST
+   };
+
+   void ChangeState(State newstate);
+   static const char *StateToText(State state);
+   void TransitionShutdown(int cmd);
+
+   UPSINFO *_ups;
+   State _state;
+   atimer _timer;
+   int _sdowncmd;
+};
 
 #endif   /* _STRUCT_H */

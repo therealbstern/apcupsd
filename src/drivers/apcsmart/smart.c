@@ -63,6 +63,15 @@
 /* How long to wait before declaring commlost */
 #define COMMLOST_TIMEOUT_MS (20*1000)
 
+/* Async events */
+enum {
+   EVENT_ONBATT,
+   EVENT_ONLINE,
+   EVENT_REPLACEBATT,
+   EVENT_BATTLOW,
+   EVENT_BATTOK
+};
+
 /* Constructor */
 ApcSmartDriver::ApcSmartDriver(UPSINFO *ups)
    : UpsDriver(ups, "apcsmart")
@@ -252,50 +261,14 @@ int ApcSmartDriver::getline(char *s, int len)
           * and not wait for a string completion.
           */
       case UPS_ON_BATT:           /* UPS_ON_BATT = '!'   */
-         if (s == NULL)
-            write_lock(_ups);
-         _ups->clear_online();
-         Dmsg0(80, "Got UPS ON BATT.\n");
-         if (s == NULL) {
-            write_unlock(_ups);
-            ending = 1;
-         }
-         break;
       case UPS_REPLACE_BATTERY:   /* UPS_REPLACE_BATTERY = '#'   */
-         if (s == NULL)
-            write_lock(_ups);
-         _ups->set_replacebatt();
-         Dmsg0(80, "Got UPS REPLACE_BATT.\n");
-         if (s == NULL) {
-            write_unlock(_ups);
-            ending = 1;
-         }
-         break;
       case UPS_ON_LINE:           /* UPS_ON_LINE = '$'   */
-         if (s == NULL)
-            write_lock(_ups);
-         _ups->set_online();
-         Dmsg0(80, "Got UPS ON LINE.\n");
-         if (s == NULL) {
-            write_unlock(_ups);
-            ending = 1;
-         }
-         break;
       case BATT_LOW:              /* BATT_LOW    = '%'   */
-         if (s == NULL)
-            write_lock(_ups);
-         _ups->set_battlow();
-         Dmsg0(80, "Got UPS BATT_LOW.\n");
-         if (s == NULL) {
-            write_unlock(_ups);
-            ending = 1;
-         }
-         break;
       case BATT_OK:               /* BATT_OK     = '+'   */
          if (s == NULL)
             write_lock(_ups);
-         _ups->clear_battlow();
-         Dmsg0(80, "Got UPS BATT_OK.\n");
+         _interrupt = true;
+         Dmsg1(80, "Got event: %c.\n", c);
          if (s == NULL) {
             write_unlock(_ups);
             ending = 1;
@@ -304,6 +277,7 @@ int ApcSmartDriver::getline(char *s, int len)
 
       case UPS_EPROM_CHANGE:      /* UPS_EPROM_CHANGE = '|' */
       case UPS_TRAILOR:           /* UPS_TRAILOR = ':'      */
+         Dmsg1(80, "Got EEEVENT: %c\n", c);
          break;
 
          /* NOTE: The UPS terminates what it sends to us
@@ -322,7 +296,7 @@ int ApcSmartDriver::getline(char *s, int len)
                s[i++] = c;
             else
                ending = 1;         /* no more room in buffer */
-         }
+         } else { Dmsg1(80, "Got EVENT: %c\n", c); }
          break;
       }
    }
@@ -419,12 +393,11 @@ bool ApcSmartDriver::ReadVolatileData()
 
    _ups->poll_time = time(NULL);    /* save time stamp */
 
-   /* UPS_STATUS */
-   if (_ups->UPS_Cap[CI_STATUS]) {
-      char status[10];
-      int retries = 5;             /* Number of retries on status read */
+   /* SmartUPS always has CI_STATUS */
+   char status[10];
+   int retries = 5;             /* Number of retries on status read */
 
-    again:
+   do {
       answer = smart_poll(_cmdmap[CI_STATUS]);
       Dmsg1(80, "Got CI_STATUS: %s\n", answer);
       strncpy(status, answer, sizeof(status));
@@ -434,168 +407,203 @@ bool ApcSmartDriver::ReadVolatileData()
        * is in a state where it still didn't updated its internal status
        * register. In this case retry to read the register. To be sure
        * not to get stuck here, we retry only 5 times.
-       *
-       * XXX
-       *
-       * If this fails, apcupsd may not be able to detect a status
-       * change and will have unpredictable behavior. This will be fixed
-       * once we will handle correctly the own apcupsd Status word.
        */
-      if (status[0] == 'S' && status[1] == 'M' && (retries-- > 0))
-         goto again;
+    } while(status[0] == 'S' && status[1] == 'M' && (retries-- > 0));
 
-      _ups->Status &= ~0xFF;        /* clear APC byte */
-      _ups->Status |= strtoul(status, NULL, 16) & 0xFF;  /* set APC byte */
+   unsigned long statval = strtoul(status, NULL, 16);
+
+   // If we're about to transition to battery, check if this is a selftest.
+   // This must be done before posting battery status, and is accomplished by
+   // reading CI_WHY_BATT. Some UPSes are slow to change CI_WHY_BATT, so we 
+   // are patient and read it a few times.
+   bool prev = _ups->info.get(CI_Discharging);
+   bool cur = statval & UPS_onbatt;
+   if (!prev && cur && _ups->UPS_Cap[CI_WHY_BATT]) {
+      int retries = 5, lastxfer;
+      do {
+         lastxfer = decode_lastxfer(smart_poll(_cmdmap[CI_WHY_BATT]));
+         _ups->info.update(CI_WHY_BATT, lastxfer);
+         if (lastxfer == XFER_NA)
+            sleep(1);
+      } while (lastxfer == XFER_NA && (retries-- > 0));
+      _selftest = (lastxfer == XFER_SELFTEST);
+   } else if (!cur) {
+      // If we're not on battery, we're not in a selftest
+      _selftest = false;
    }
 
-   /* ONBATT_STATUS_FLAG -- line quality */
+   // Results of last self test. Must be done before posting battery status.
+   if (_selftest) {
+      _ups->info.update(CI_ST_STAT, TEST_INPROGRESS);
+   } else if (_ups->UPS_Cap[CI_ST_STAT]) {
+      answer = smart_poll(_cmdmap[CI_ST_STAT]);
+      Dmsg1(80, "Got CI_ST_STAT: %s\n", answer);
+      _ups->info.update(CI_ST_STAT, (long)decode_testresult(answer));
+   }
+
+//#define UPS_calibration   0x00000001
+   // Basic battery status
+   _ups->info.update(CI_Trim, statval & UPS_trim);
+   _ups->info.update(CI_Boost, statval & UPS_boost);
+   _ups->info.update(CI_ACPresent, statval & UPS_online);
+   _ups->info.update(CI_Discharging, statval & UPS_onbatt);
+   _ups->info.update(CI_Overload, statval & UPS_overload);
+   _ups->info.update(CI_BattLow, statval & UPS_battlow);
+   _ups->info.update(CI_NeedReplacement, statval & UPS_replacebatt);
+
+   /* Line quality */
    if (_ups->UPS_Cap[CI_LQUAL]) {
       answer = smart_poll(_cmdmap[CI_LQUAL]);
       Dmsg1(80, "Got CI_LQUAL: %s\n", answer);
-      strncpy(_ups->linequal, answer, sizeof(_ups->linequal));
+      _ups->info.update(CI_LQUAL, answer);
+//      strncpy(_ups->linequal, answer, sizeof(_ups->linequal));
    }
 
    /* Reason for last transfer to batteries */
    if (_ups->UPS_Cap[CI_WHY_BATT]) {
       answer = smart_poll(_cmdmap[CI_WHY_BATT]);
       Dmsg1(80, "Got CI_WHY_BATT: %s\n", answer);
-      _ups->lastxfer = decode_lastxfer(answer);
-      /*
-       * XXX
-       *
-       * See if this is a self test rather than power failure
-       * But not now !
-       * When we will be ready we will copy the code below inside
-       * the driver entry point, for performing this check inside the
-       * driver.
-       */
-   }
-
-   /* Results of last self test */
-   if (_ups->UPS_Cap[CI_ST_STAT]) {
-      answer = smart_poll(_cmdmap[CI_ST_STAT]);
-      Dmsg1(80, "Got CI_ST_STAT: %s\n", answer);
-      _ups->testresult = decode_testresult(answer);
+//      _ups->lastxfer = decode_lastxfer(answer);
+      _ups->info.update(CI_WHY_BATT, (long)decode_lastxfer(answer));
    }
 
    /* LINE_VOLTAGE */
    if (_ups->UPS_Cap[CI_VLINE]) {
       answer = smart_poll(_cmdmap[CI_VLINE]);
       Dmsg1(80, "Got CI_VLINE: %s\n", answer);
-      _ups->LineVoltage = atof(answer);
+//      _ups->LineVoltage = atof(answer);
+      _ups->info.update(CI_VLINE, (long)(atof(answer) * 1000.0));
    }
 
    /* UPS_LINE_MAX */
    if (_ups->UPS_Cap[CI_VMAX]) {
       answer = smart_poll(_cmdmap[CI_VMAX]);
       Dmsg1(80, "Got CI_VMAX: %s\n", answer);
-      _ups->LineMax = atof(answer);
+//      _ups->LineMax = atof(answer);
+      _ups->info.update(CI_VMAX, (long)(atof(answer) * 1000.0));
    }
 
    /* UPS_LINE_MIN */
    if (_ups->UPS_Cap[CI_VMIN]) {
       answer = smart_poll(_cmdmap[CI_VMIN]);
       Dmsg1(80, "Got CI_VMIN: %s\n", answer);
-      _ups->LineMin = atof(answer);
+//      _ups->LineMin = atof(answer);
+      _ups->info.update(CI_VMIN, (long)(atof(answer) * 1000.0));
    }
 
    /* OUTPUT_VOLTAGE */
    if (_ups->UPS_Cap[CI_VOUT]) {
       answer = smart_poll(_cmdmap[CI_VOUT]);
       Dmsg1(80, "Got CI_VOUT: %s\n", answer);
-      _ups->OutputVoltage = atof(answer);
+//      _ups->OutputVoltage = atof(answer);
+      _ups->info.update(CI_VOUT, (long)(atof(answer) * 1000.0));
    }
 
    /* BATT_FULL Battery level percentage */
    if (_ups->UPS_Cap[CI_BATTLEV]) {
       answer = smart_poll(_cmdmap[CI_BATTLEV]);
       Dmsg1(80, "Got CI_BATTLEV: %s\n", answer);
-      _ups->BattChg = atof(answer);
+//      _ups->BattChg = atof(answer);
+      _ups->info.update(CI_BATTLEV, (long)(atof(answer) * 10.0));
    }
 
    /* BATT_VOLTAGE */
    if (_ups->UPS_Cap[CI_VBATT]) {
       answer = smart_poll(_cmdmap[CI_VBATT]);
       Dmsg1(80, "Got CI_VBATT: %s\n", answer);
-      _ups->BattVoltage = atof(answer);
+//      _ups->BattVoltage = atof(answer);
+      _ups->info.update(CI_VBATT, (long)(atof(answer) * 1000.0));
    }
 
    /* UPS_LOAD */
    if (_ups->UPS_Cap[CI_LOAD]) {
       answer = smart_poll(_cmdmap[CI_LOAD]);
       Dmsg1(80, "Got CI_LOAD: %s\n", answer);
-      _ups->UPSLoad = atof(answer);
+//      _ups->UPSLoad = atof(answer);
+      _ups->info.update(CI_LOAD, (long)(atof(answer) * 10.0));
    }
 
    /* LINE_FREQ */
    if (_ups->UPS_Cap[CI_FREQ]) {
       answer = smart_poll(_cmdmap[CI_FREQ]);
       Dmsg1(80, "Got CI_FREQ: %s\n", answer);
-      _ups->LineFreq = atof(answer);
+//      _ups->LineFreq = atof(answer);
+      _ups->info.update(CI_FREQ, (long)(atof(answer) * 10.0));
    }
 
    /* UPS_RUNTIME_LEFT */
    if (_ups->UPS_Cap[CI_RUNTIM]) {
       answer = smart_poll(_cmdmap[CI_RUNTIM]);
       Dmsg1(80, "Got CI_RUNTIM: %s\n", answer);
-      _ups->TimeLeft = atof(answer);
+//      _ups->TimeLeft = atof(answer);
+      _ups->info.update(CI_RUNTIM, (long)(atof(answer) * 60.0));
    }
 
    /* UPS_TEMP */
    if (_ups->UPS_Cap[CI_ITEMP]) {
       answer = smart_poll(_cmdmap[CI_ITEMP]);
       Dmsg1(80, "Got CI_ITEMP: %s\n", answer);
-      _ups->UPSTemp = atof(answer);
+//      _ups->UPSTemp = atof(answer);
+      _ups->info.update(CI_ITEMP, (long)(atof(answer) * 10.0));
    }
 
    /* DIP_SWITCH_SETTINGS */
    if (_ups->UPS_Cap[CI_DIPSW]) {
       answer = smart_poll(_cmdmap[CI_DIPSW]);
       Dmsg1(80, "Got CI_DIPSW: %s\n", answer);
-      _ups->dipsw = strtoul(answer, NULL, 16);
+//      _ups->dipsw = strtoul(answer, NULL, 16);
+      _ups->info.update(CI_DIPSW, (long)(strtoul(answer, NULL, 16) & 0xFF));
    }
 
    /* Register 1 */
    if (_ups->UPS_Cap[CI_REG1]) {
       answer = smart_poll(_cmdmap[CI_REG1]);
       Dmsg1(80, "Got CI_REG1: %s\n", answer);
-      _ups->reg1 = strtoul(answer, NULL, 16);
+//      _ups->reg1 = strtoul(answer, NULL, 16);
+      _ups->info.update(CI_REG1, (long)(strtoul(answer, NULL, 16) & 0xFF));
    }
 
    /* Register 2 */
    if (_ups->UPS_Cap[CI_REG2]) {
       answer = smart_poll(_cmdmap[CI_REG2]);
       Dmsg1(80, "Got CI_REG2: %s\n", answer);
-      _ups->reg2 = strtoul(answer, NULL, 16);
-      _ups->set_battpresent(!(_ups->reg2 & 0x20));
+//      _ups->reg2 = strtoul(answer, NULL, 16);
+//      _ups->set_battpresent(!(_ups->reg2 & 0x20));
+      long tmp = strtoul(answer, NULL, 16) & 0xFF;
+      _ups->info.update(CI_REG2, tmp);
+      _ups->info.update(CI_BatteryPresent, !(tmp & 0x20));
    }
 
    /* Register 3 */
    if (_ups->UPS_Cap[CI_REG3]) {
       answer = smart_poll(_cmdmap[CI_REG3]);
       Dmsg1(80, "Got CI_REG3: %s\n", answer);
-      _ups->reg3 = strtoul(answer, NULL, 16);
+//      _ups->reg3 = strtoul(answer, NULL, 16);
+      _ups->info.update(CI_REG3, (long)(strtoul(answer, NULL, 16) & 0xFF));
    }
 
    /* Humidity percentage */
    if (_ups->UPS_Cap[CI_HUMID]) {
       answer = smart_poll(_cmdmap[CI_HUMID]);
       Dmsg1(80, "Got CI_HUMID: %s\n", answer);
-      _ups->humidity = atof(answer);
+//      _ups->humidity = atof(answer);
+      _ups->info.update(CI_HUMID, (long)(atof(answer) * 10.0));
    }
 
    /* Ambient temperature */
    if (_ups->UPS_Cap[CI_ATEMP]) {
       answer = smart_poll(_cmdmap[CI_ATEMP]);
       Dmsg1(80, "Got CI_ATEMP: %s\n", answer);
-      _ups->ambtemp = atof(answer);
+//      _ups->ambtemp = atof(answer);
+      _ups->info.update(CI_ATEMP, (long)(atof(answer) * 10.0));
    }
 
    /* Hours since self test */
    if (_ups->UPS_Cap[CI_ST_TIME]) {
       answer = smart_poll(_cmdmap[CI_ST_TIME]);
       Dmsg1(80, "Got CI_ST_TIME: %s\n", answer);
-      _ups->LastSTTime = atof(answer);
+//      _ups->LastSTTime = atof(answer);
+      _ups->info.update(CI_ST_TIME, (long)(atof(answer) * 60.0));
    }
 
    write_unlock(_ups);
@@ -625,150 +633,170 @@ bool ApcSmartDriver::ReadStaticData()
    if (_ups->UPS_Cap[CI_SENS]) {
       answer = smart_poll(_cmdmap[CI_SENS]);
       Dmsg1(80, "Got CI_SENS: %s\n", answer);
-      strncpy(_ups->sensitivity, answer, sizeof(_ups->sensitivity));
+//      strncpy(_ups->sensitivity, answer, sizeof(_ups->sensitivity));
+      _ups->info.update(CI_SENS, answer);
    }
 
    /* WAKEUP_DELAY */
    if (_ups->UPS_Cap[CI_DWAKE]) {
       answer = smart_poll(_cmdmap[CI_DWAKE]);
       Dmsg1(80, "Got CI_DWAKE: %s\n", answer);
-      _ups->dwake = (int)atof(answer);
+//      _ups->dwake = (int)atof(answer);
+      _ups->info.update(CI_DWAKE, (long)(atof(answer) * 60.0));
    }
 
    /* SLEEP_DELAY */
    if (_ups->UPS_Cap[CI_DSHUTD]) {
       answer = smart_poll(_cmdmap[CI_DSHUTD]);
       Dmsg1(80, "Got CI_DSHUTD: %s\n", answer);
-      _ups->dshutd = (int)atof(answer);
+//      _ups->dshutd = (int)atof(answer);
+      _ups->info.update(CI_DSHUTD, (long)(atof(answer) * 60.0));
    }
 
    /* LOW_TRANSFER_LEVEL */
    if (_ups->UPS_Cap[CI_LTRANS]) {
       answer = smart_poll(_cmdmap[CI_LTRANS]);
       Dmsg1(80, "Got CI_LTRANS: %s\n", answer);
-      _ups->lotrans = (int)atof(answer);
+//      _ups->lotrans = (int)atof(answer);
+      _ups->info.update(CI_LTRANS, (long)(atof(answer) * 1000.0));
    }
 
    /* HIGH_TRANSFER_LEVEL */
    if (_ups->UPS_Cap[CI_HTRANS]) {
       answer = smart_poll(_cmdmap[CI_HTRANS]);
       Dmsg1(80, "Got CI_HTRANS: %s\n", answer);
-      _ups->hitrans = (int)atof(answer);
+//      _ups->hitrans = (int)atof(answer);
+      _ups->info.update(CI_HTRANS, (long)(atof(answer) * 1000.0));
    }
 
    /* UPS_BATT_CAP_RETURN */
    if (_ups->UPS_Cap[CI_RETPCT]) {
       answer = smart_poll(_cmdmap[CI_RETPCT]);
       Dmsg1(80, "Got CI_RETPCT: %s\n", answer);
-      _ups->rtnpct = (int)atof(answer);
+//      _ups->rtnpct = (int)atof(answer);
+      _ups->info.update(CI_RETPCT, (long)(atof(answer) * 10.0));
    }
 
    /* ALARM_STATUS */
    if (_ups->UPS_Cap[CI_DALARM]) {
       answer = smart_poll(_cmdmap[CI_DALARM]);
       Dmsg1(80, "Got CI_DALARM: %s\n", answer);
-      strncpy(_ups->beepstate, answer, sizeof(_ups->beepstate));
+//      strncpy(_ups->beepstate, answer, sizeof(_ups->beepstate));
+      _ups->info.update(CI_DALARM, answer);
    }
 
    /* LOWBATT_SHUTDOWN_LEVEL */
    if (_ups->UPS_Cap[CI_DLBATT]) {
       answer = smart_poll(_cmdmap[CI_DLBATT]);
       Dmsg1(80, "Got CI_DLBATT: %s\n", answer);
-      _ups->dlowbatt = (int)atof(answer);
+//      _ups->dlowbatt = (int)atof(answer);
+      _ups->info.update(CI_DLBATT, (long)(atof(answer) * 10.0));
    }
 
    /* UPS_NAME */
    if (_ups->upsname[0] == 0 && _ups->UPS_Cap[CI_IDEN]) {
       answer = smart_poll(_cmdmap[CI_IDEN]);
       Dmsg1(80, "Got CI_IDEN: %s\n", answer);
-      strncpy(_ups->upsname, answer, sizeof(_ups->upsname));
+//      strncpy(_ups->upsname, answer, sizeof(_ups->upsname));
+      _ups->info.update(CI_IDEN, answer);
    }
 
    /* UPS_SELFTEST */
    if (_ups->UPS_Cap[CI_STESTI]) {
       answer = smart_poll(_cmdmap[CI_STESTI]);
       Dmsg1(80, "Got CI_STESTI: %s\n", answer);
-      strncpy(_ups->selftest, answer, sizeof(_ups->selftest));
+//      strncpy(_ups->selftest, answer, sizeof(_ups->selftest));
+      _ups->info.update(CI_STESTI, answer);
    }
 
    /* UPS_MANUFACTURE_DATE */
    if (_ups->UPS_Cap[CI_MANDAT]) {
       answer = smart_poll(_cmdmap[CI_MANDAT]);
       Dmsg1(80, "Got CI_MANDAT: %s\n", answer);
-      strncpy(_ups->birth, answer, sizeof(_ups->birth));
+//      strncpy(_ups->birth, answer, sizeof(_ups->birth));
+      _ups->info.update(CI_MANDAT, answer);
    }
 
    /* UPS_SERIAL_NUMBER */
    if (_ups->UPS_Cap[CI_SERNO]) {
       answer = smart_poll(_cmdmap[CI_SERNO]);
       Dmsg1(80, "Got CI_SERNO: %s\n", answer);
-      strncpy(_ups->serial, answer, sizeof(_ups->serial));
+//      strncpy(_ups->serial, answer, sizeof(_ups->serial));
+      _ups->info.update(CI_SERNO, answer);
    }
 
    /* UPS_BATTERY_REPLACE */
    if (_ups->UPS_Cap[CI_BATTDAT]) {
       answer = smart_poll(_cmdmap[CI_BATTDAT]);
       Dmsg1(80, "Got CI_BATTDAT: %s\n", answer);
-      strncpy(_ups->battdat, answer, sizeof(_ups->battdat));
+//      strncpy(_ups->battdat, answer, sizeof(_ups->battdat));
+      _ups->info.update(CI_BATTDAT, answer);
    }
 
    /* Nominal output voltage when on batteries */
    if (_ups->UPS_Cap[CI_NOMOUTV]) {
       answer = smart_poll(_cmdmap[CI_NOMOUTV]);
       Dmsg1(80, "Got CI_NOMOUTV: %s\n", answer);
-      _ups->NomOutputVoltage = (int)atof(answer);
+//      _ups->NomOutputVoltage = (int)atof(answer);
+      _ups->info.update(CI_NOMOUTV, (long)(atof(answer) * 1000.0));
    }
 
    /* Nominal battery voltage */
    if (_ups->UPS_Cap[CI_NOMBATTV]) {
       answer = smart_poll(_cmdmap[CI_NOMBATTV]);
       Dmsg1(80, "Got CI_NOMBATTV: %s\n", answer);
-      _ups->nombattv = atof(answer);
+//      _ups->nombattv = atof(answer);
+      _ups->info.update(CI_NOMBATTV, (long)(atof(answer) * 1000.0));
    }
 
    /* Firmware revision */
    if (_ups->UPS_Cap[CI_REVNO]) {
       answer = smart_poll(_cmdmap[CI_REVNO]);
       Dmsg1(80, "Got CI_REVNO: %s\n", answer);
-      strncpy(_ups->firmrev, answer, sizeof(_ups->firmrev));
+//      strncpy(_ups->firmrev, answer, sizeof(_ups->firmrev));
+      _ups->info.update(CI_REVNO, answer);
    }
 
    /* Number of external batteries installed */
    if (_ups->UPS_Cap[CI_EXTBATTS]) {
       answer = smart_poll(_cmdmap[CI_EXTBATTS]);
       Dmsg1(80, "Got CI_EXTBATTS: %s\n", answer);
-      _ups->extbatts = (int)atof(answer);
+//      _ups->extbatts = (int)atof(answer);
+      _ups->info.update(CI_EXTBATTS, (long)atof(answer));
    }
 
    /* Number of bad batteries installed */
    if (_ups->UPS_Cap[CI_BADBATTS]) {
       answer = smart_poll(_cmdmap[CI_BADBATTS]);
       Dmsg1(80, "Got CI_BADBATTS: %s\n", answer);
-      _ups->badbatts = (int)atof(answer);
+//      _ups->badbatts = (int)atof(answer);
+      _ups->info.update(CI_BADBATTS, (long)atof(answer));
    }
 
    /* Old firmware revision */
    if (_ups->UPS_Cap[CI_UPSMODEL]) {
       answer = smart_poll(_cmdmap[CI_UPSMODEL]);
       Dmsg1(80, "Got CI_UPSMODEL: %s\n", answer);
-      strncpy(_ups->upsmodel, answer, sizeof(_ups->upsmodel));
+//      strncpy(_ups->upsmodel, answer, sizeof(_ups->upsmodel));
+      _ups->info.update(CI_UPSMODEL, answer);
    }
 
    /* EPROM Capabilities */
    if (_ups->UPS_Cap[CI_EPROM]) {
       answer = smart_poll(_cmdmap[CI_EPROM]);
       Dmsg1(80, "Got CI_EPROM: %s\n", answer);
-      strncpy(_ups->eprom, answer, sizeof(_ups->eprom));
+//      strncpy(_ups->eprom, answer, sizeof(_ups->eprom));
+      _ups->info.update(CI_EPROM, answer);
    }
 
    get_apc_model();
 
-   return SUCCESS;
+   return true;
 }
 
 bool ApcSmartDriver::EntryPoint(int command, void *data)
 {
-   int retries = 5;                /* Number of retries if reason is NA (see below) */
+//   int retries = 5;                /* Number of retries if reason is NA (see below) */
    char ans[20];
 
    switch (command) {
@@ -779,7 +807,7 @@ bool ApcSmartDriver::EntryPoint(int command, void *data)
       getline(ans, sizeof(ans));
       printf("Going dumb: %s\n", ans);
       break;
-
+#if 0
    case DEVICE_CMD_GET_SELFTEST_MSG:
       /* Results of last self test */
       if (_ups->UPS_Cap[CI_ST_STAT]) {
@@ -824,7 +852,7 @@ bool ApcSmartDriver::EntryPoint(int command, void *data)
          }
       }
       break;
-
+#endif
    default:
       return FAILURE;
       break;

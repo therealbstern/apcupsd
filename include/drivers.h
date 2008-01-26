@@ -26,12 +26,14 @@
 #ifndef _DRIVERS_H
 #define _DRIVERS_H
 
+#include "athread.h"
+
 // Forward declaration
 class UPSINFO;
 
 // Base class for UPS drivers. Driver implementations inherit
 // from this class and override appropriate methods as needed.
-class UpsDriver
+class UpsDriver: public athread
 {
 public:
    UpsDriver(UPSINFO *ups, const char *name)
@@ -56,6 +58,7 @@ public:
    const char *driver_name;
 
 protected:
+
    UPSINFO *_ups;
 };
 

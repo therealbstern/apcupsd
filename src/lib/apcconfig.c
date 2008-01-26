@@ -175,19 +175,6 @@ static const PAIRS table[] = {
    {"STATTIME", match_int,      WHERE(stattime), 0},
    {"DATATIME", match_int,      WHERE(datatime), 0},
 
-   /* Values used to set UPS EPROM for --configure */
-   {"SELFTEST",     match_str, WHERE(selftest),         SIZE(selftest)},
-   {"HITRANSFER",   match_int, WHERE(hitrans),          0},
-   {"LOTRANSFER",   match_int, WHERE(lotrans),          0},
-   {"LOWBATT",      match_int, WHERE(dlowbatt),         0},
-   {"WAKEUP",       match_int, WHERE(dwake),            0},
-   {"RETURNCHARGE", match_int, WHERE(rtnpct),           0},
-   {"OUTPUTVOLTS",  match_int, WHERE(NomOutputVoltage), 0},
-   {"SLEEP",        match_int, WHERE(dshutd),           0},
-   {"BEEPSTATE",    match_str, WHERE(beepstate),        SIZE(beepstate)},
-   {"BATTDATE",     match_str, WHERE(battdat),          SIZE(battdat)},
-   {"SENSITIVITY",  match_str, WHERE(sensitivity),      SIZE(sensitivity)},
-
    /* Configuration statements for network sharing of the UPS */
    {"UPSCLASS",  match_range, WHERE(upsclass),    upsclasses},
    {"UPSMODE",   match_range, WHERE(sharenet),    modes     },
@@ -210,6 +197,19 @@ static const PAIRS table[] = {
    {"NETPORT",    obsolete, FALSE, (GENINFO *)"NETPORT config directive is obsolete"   },
    {"NETSTATUS",  obsolete, FALSE, (GENINFO *)"NETSTATUS config directive is obsolete" },
    {"SERVERPORT", obsolete, FALSE, (GENINFO *)"SERVERPORT config directive is obsolete"},
+
+   /* Obsolete EEPROM options */
+   {"SELFTEST",     obsolete, FALSE, (GENINFO *)"SELFTEST config directive is obsolete"    },
+   {"HITRANSFER",   obsolete, FALSE, (GENINFO *)"HITRANSFER config directive is obsolete"  },
+   {"LOTRANSFER",   obsolete, FALSE, (GENINFO *)"LOTRANSFER config directive is obsolete"  },
+   {"LOWBATT",      obsolete, FALSE, (GENINFO *)"LOWBATT config directive is obsolete"     },
+   {"WAKEUP",       obsolete, FALSE, (GENINFO *)"WAKEUP config directive is obsolete"      },
+   {"RETURNCHARGE", obsolete, FALSE, (GENINFO *)"RETURNCHARGE config directive is obsolete"},
+   {"OUTPUTVOLTS",  obsolete, FALSE, (GENINFO *)"OUTPUTVOLTS config directive is obsolete" },
+   {"SLEEP",        obsolete, FALSE, (GENINFO *)"SLEEP config directive is obsolete"       },
+   {"BEEPSTATE",    obsolete, FALSE, (GENINFO *)"BEEPSTATE config directive is obsolete"   },
+   {"BATTDATE",     obsolete, FALSE, (GENINFO *)"BATTDATE config directive is obsolete"    },
+   {"SENSITIVITY",  obsolete, FALSE, (GENINFO *)"SENSITIVITY config directive is obsolete" },
 
    /* must be last */
    {NULL, 0, 0, 0}
@@ -592,22 +592,6 @@ void init_ups_struct(UPSINFO *ups)
    ups->runtime = 5;
    ups->netstats = TRUE;
    ups->statusport = NISPORT;
-   ups->upsmodel[0] = 0;           /* end of string */
-
-
-   /* EPROM values that can be changed with config directives */
-
-   astrncpy(ups->sensitivity, "-1", sizeof(ups->sensitivity));  /* no value */
-   ups->dwake = -1;
-   ups->dshutd = -1;
-   astrncpy(ups->selftest, "-1", sizeof(ups->selftest));        /* no value */
-   ups->lotrans = -1;
-   ups->hitrans = -1;
-   ups->rtnpct = -1;
-   ups->dlowbatt = -1;
-   ups->NomOutputVoltage = -1;
-   astrncpy(ups->beepstate, "-1", sizeof(ups->beepstate));      /* no value */
-
    ups->nisip[0] = 0;              /* no nis IP file as default */
 
    ups->lockfile = -1;

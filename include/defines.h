@@ -104,10 +104,17 @@
  *
  * If the command is valid for this UPS, UPS_Cap[CI_xxx]
  * will be true.
+ *
+ * Units:
+ *    Voltage       - millivolts
+ *    Relative Time - seconds
+ *    Percent       - 0.1 percent
+ *    Temperature   - 0.1 degrees C
+ *    Frequency     - 0.1 Hz
+ *    Power         - 0.1 Watt
  */
 enum { 
    CI_UPSMODEL = 0,                /* Model number */
-   CI_STATUS,                      /* status function */
    CI_LQUAL,                       /* line quality status */
    CI_WHY_BATT,                    /* why transferred to battery */
    CI_ST_STAT,                     /* self test stat */
@@ -171,9 +178,10 @@ enum {
    CI_DelayBeforeShutdown,      
    CI_APCDelayBeforeStartup,    
    CI_APCDelayBeforeShutdown,   
-   CI_APCLineFailCause,         
    CI_NOMINV,                   
    CI_NOMPOWER,
+   CI_BatteryPresent,              /* Battery is present */
+   CI_BattLow,
 
    /* Only seen on the BackUPS Pro USB (so far) */
    CI_BUPBattCapBeforeStartup,  
@@ -195,12 +203,12 @@ enum {
    CI_ChargerCurrentOOR,           /* Charger current our of range */
    CI_CurrentNotRegulated,         /* Charger current not regulated */
    CI_VoltageNotRegulated,         /* Charger voltage not regulated */
-   CI_BatteryPresent,              /* Battery is present */
    CI_LAST_PROBE,                  /* MUST BE LAST IN SECTION */
 
    /* Items below this line are not "probed" for */
    CI_CYCLE_EPROM,                 /* Cycle programmable EPROM values */
    CI_UPS_CAPS,                    /* Get UPS capabilities (command) string */
+   CI_STATUS,                      /* status function */
    CI_LAST                         /* MUST BE LAST */
 };
 
@@ -320,9 +328,9 @@ enum {
 #define MAX_THREADS             7
 
 /* Find members position in the UPSINFO and GLOBALCFG structures. */
-#define WHERE(MEMBER) ((size_t) &((UPSINFO *)0)->MEMBER)
+#define WHERE(MEMBER) (((size_t) &((UPSINFO *)8)->MEMBER)-8)
 #define AT(UPS,OFFSET) ((size_t)UPS + OFFSET)
-#define SIZE(MEMBER) ((GENINFO *)sizeof(((UPSINFO *)0)->MEMBER))
+#define SIZE(MEMBER) ((GENINFO *)sizeof(((UPSINFO *)8)->MEMBER))
 
 
 /*
@@ -440,5 +448,8 @@ void d_msg(const char *file, int line, int level, const char *fmt, ...);
 #ifndef MAX
 #define MAX(a,b) ( (a) > (b) ? (a) : (b) )
 #endif
+
+/* Determine number of elements in array */
+#define ARRAY_SIZE(a) ( sizeof(a) / sizeof((a)[0]) )
 
 #endif   /* _DEFINES_H */
