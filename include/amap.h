@@ -24,8 +24,9 @@
 
 #ifndef __AMAP_H
 #define __AMAP_H
- 
+
 #include "alist.h"
+#include "aiter.h"
 
 template <class K, class V>
 class amap
@@ -36,7 +37,7 @@ private:
    {
       keyval() {}
       keyval(const K& key) : _key(key) {}
-      bool operator==(const keyval &rhs) { return _key == rhs._key; }
+      bool operator==(const keyval &rhs) const { return _key == rhs._key; }
       K _key;
       V _val;
    };
@@ -46,14 +47,11 @@ public:
    V& operator[](const K& key)
    {
       typename alist<keyval>::iterator iter = _map.find(key);
-      if (iter != _map.end())
-         return (*iter)._val;
-      _map.append(keyval(key));
-      return _map.last()._val;
+      return (iter == _map.end()) ? _map.append(key)._val : (*iter)._val;
    }
 
-   bool contains(const K& key) { return _map.find(key) != _map.end();  }
-   bool empty() { return _map.empty(); }
+   bool contains(const K& key) const { return _map.find(key) == _map.end(); }
+   bool empty() const { return _map.empty(); }
 
    class iterator
    {
@@ -76,15 +74,46 @@ public:
       iterator &operator=(const iterator &rhs)
          { if (&rhs != this) _iter = rhs._iter; return *this;}
 
-   private:
+   protected:
       friend class amap;
-      iterator(typename alist<keyval>::iterator iter) : _iter(iter) {}
+      iterator(const typename alist<keyval>::iterator &iter) : _iter(iter) {}
       typename alist<keyval>::iterator _iter;
+   };
+
+   class const_iterator
+   {
+   public:
+      const_iterator() {}
+      const_iterator(const const_iterator &rhs) : _iter(rhs._iter) {}
+
+      const_iterator &operator++() { ++_iter; return *this; }
+      const_iterator operator++(int) { const_iterator tmp(_iter); ++(*this); return tmp; }
+      const_iterator &operator--() { --_iter; return *this; }
+      const_iterator operator--(int) { const_iterator tmp(_iter); --(*this); return tmp; }
+
+      const V& value() const { return (*_iter)._val; }
+      const K& key() const { return (*_iter)._key; }
+      const V& operator*() const { return value(); }
+
+      bool operator==(const const_iterator &rhs) const { return _iter == rhs._iter; }
+      bool operator!=(const const_iterator &rhs) const { return !(*this == rhs); }
+
+      const_iterator &operator=(const const_iterator &rhs)
+         { if (&rhs != this) _iter = rhs._iter; return *this;}
+
+   protected:
+      friend class amap;
+      const_iterator(const typename alist<keyval>::const_iterator &iter) : _iter(iter) {}
+      typename alist<keyval>::const_iterator _iter;
    };
 
    iterator end() { return iterator(_map.end()); }
    iterator begin() { return iterator(_map.begin()); }
+   const_iterator end() const { return _map.end(); }
+   const_iterator begin() const { return _map.begin(); }
+
    iterator find(const K& key) { return iterator(_map.find(key)); }
+   const_iterator find(const K& key) const { return _map.find(key); }
 
 private:
 

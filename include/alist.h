@@ -26,6 +26,7 @@
 #define __ALIST_H
 
 #include <stdlib.h>
+#include "aiter.h"
 
 template <class T> class alist
 {
@@ -77,7 +78,7 @@ public:
    bool empty() const { return _size <= 0; }
    int size() const { return _size; }
 
-   void append(const T& elem)
+   T& append(const T& elem)
    {
       node *nd = new node(elem);
       if (_tail)
@@ -86,9 +87,10 @@ public:
          _head = nd;
       _tail = nd;
       _size++;
+      return *_tail;
    }
 
-   void prepend(const T& elem)
+   T& prepend(const T& elem)
    {
       node *nd = new node(elem);
       if (_head)
@@ -97,17 +99,17 @@ public:
          _tail = nd;
       _head = nd;
       _size++;
+      return *_head;
    }
 
    void remove_first() { if (!empty()) remove(_head); }
    void remove_last()  { if (!empty()) remove(_tail); }
-
    void clear() { while (!empty()) remove(_head); }
 
    class iterator
    {
    public:
-      iterator() {}
+      iterator() : _node(NULL) {}
       iterator(const iterator &rhs) : _node(rhs._node) {}
 
       iterator &operator++() { _node = _node->next(); return *this; }
@@ -116,6 +118,7 @@ public:
       iterator operator--(int) { iterator tmp(_node); --(*this); return tmp; }
 
       T& operator*() { return *_node; }
+      const T& operator*() const { return *_node; }
 
       bool operator==(const iterator &rhs) const { return _node == rhs._node; }
       bool operator!=(const iterator &rhs) const { return !(*this == rhs); }
@@ -129,8 +132,12 @@ public:
       node *_node;
    };
 
-   iterator begin() const { return iterator(_head); }
-   iterator end() const { return iterator(NULL); }
+   typedef ::const_iterator<iterator, T> const_iterator;
+
+   iterator begin() { return iterator(_head); }
+   iterator end() { return iterator(NULL); }
+   const_iterator begin() const { return iterator(_head); }
+   const_iterator end() const { return iterator(NULL); }
 
    iterator remove(iterator iter) {
       if (iter == _head) _head = iter._node->next();
@@ -143,6 +150,13 @@ public:
 
    iterator find(const T& needle) {
       iterator iter;
+      for (iter = begin(); iter != end(); ++iter)
+         if (*iter == needle) break;
+      return iter;
+   }
+
+   const_iterator find(const T& needle) const {
+      const_iterator iter;
       for (iter = begin(); iter != end(); ++iter)
          if (*iter == needle) break;
       return iter;
