@@ -53,3 +53,106 @@ int *GetSmartCmdMap()
 
    return cmdmap;
 }
+
+const char *CItoString(int ci)
+{
+   switch (ci)
+   {
+      case CI_UPSMODEL:                return "UPSMODEL";
+      case CI_LQUAL:                   return "LQUAL";
+      case CI_WHY_BATT:                return "WHY_BATT";
+      case CI_ST_STAT:                 return "ST_STAT";
+      case CI_VLINE:                   return "VLINE";
+      case CI_VMAX:                    return "VMAX";
+      case CI_VMIN:                    return "VMIN";
+      case CI_VOUT:                    return "VOUT";
+      case CI_BATTLEV:                 return "BATTLEV";
+      case CI_VBATT:                   return "VBATT";
+      case CI_LOAD:                    return "LOAD";
+      case CI_FREQ:                    return "FREQ";
+      case CI_RUNTIM:                  return "RUNTIM";
+      case CI_ITEMP:                   return "ITEMP";
+      case CI_DIPSW:                   return "DIPSW";
+      case CI_SENS:                    return "SENS";
+      case CI_DWAKE:                   return "DWAKE";
+      case CI_DSHUTD:                  return "DSHUTD";
+      case CI_LTRANS:                  return "LTRANS";
+      case CI_HTRANS:                  return "HTRANS";
+      case CI_RETPCT:                  return "RETPCT";
+      case CI_DALARM:                  return "DALARM";
+      case CI_DLBATT:                  return "DLBATT";
+      case CI_IDEN:                    return "IDEN";
+      case CI_STESTI:                  return "STESTI";
+      case CI_MANDAT:                  return "MANDAT";
+      case CI_SERNO:                   return "SERNO";
+      case CI_BATTDAT:                 return "BATTDAT";
+      case CI_NOMBATTV:                return "NOMBATTV";
+      case CI_HUMID:                   return "HUMID";
+      case CI_REVNO:                   return "REVNO";
+      case CI_REG1:                    return "REG1";
+      case CI_REG2:                    return "REG2";
+      case CI_REG3:                    return "REG3";
+      case CI_EXTBATTS:                return "EXTBATTS";
+      case CI_ATEMP:                   return "ATEMP";
+      case CI_NOMOUTV:                 return "NOMOUTV";
+      case CI_BADBATTS:                return "BADBATTS";
+      case CI_EPROM:                   return "EPROM";
+      case CI_ST_TIME:                 return "ST_TIME";
+      case CI_Manufacturer:            return "Manufacturer";
+      case CI_ShutdownRequested:       return "ShutdownRequested";
+      case CI_ShutdownImminent:        return "ShutdownImminent";
+      case CI_DelayBeforeReboot:       return "DelayBeforeReboot";
+      case CI_BelowRemCapLimit:        return "BelowRemCapLimit";
+      case CI_RemTimeLimitExpired:     return "RemTimeLimitExpired";
+      case CI_Charging:                return "Charging";
+      case CI_Discharging:             return "Discharging";
+      case CI_RemCapLimit:             return "RemCapLimit";
+      case CI_RemTimeLimit:            return "RemTimeLimit";
+      case CI_WarningCapacityLimit:    return "WarningCapacityLimit";
+      case CI_CapacityMode:            return "CapacityMode";
+      case CI_BattPackLevel:           return "BattPackLevel";
+      case CI_CycleCount:              return "CycleCount";
+      case CI_ACPresent:               return "ACPresent";
+      case CI_Boost:                   return "Boost";
+      case CI_Trim:                    return "Trim";
+      case CI_Overload:                return "Overload";
+      case CI_NeedReplacement:         return "NeedReplacement";
+      case CI_BattReplaceDate:         return "BattReplaceDate";
+      case CI_APCForceShutdown:        return "APCForceShutdown";
+      case CI_DelayBeforeShutdown:     return "DelayBeforeShutdown";
+      case CI_APCDelayBeforeStartup:   return "APCDelayBeforeStartup";
+      case CI_APCDelayBeforeShutdown:  return "APCDelayBeforeShutdown";
+      case CI_NOMINV:                  return "NOMINV";
+      case CI_NOMPOWER:                return "NOMPOWER";
+      case CI_BatteryPresent:          return "BatteryPresent";
+      case CI_BattLow:                 return "BattLow";
+
+      /* Only seen on the BackUPS Pro USB (so far) */
+      case CI_BUPBattCapBeforeStartup: return "BUPBattCapBeforeStartup";
+      case CI_BUPDelayBeforeStartup:   return "BUPDelayBeforeStartup";
+      case CI_BUPSelfTest:             return "BUPSelfTest";
+      case CI_BUPHibernate:            return "BUPHibernate";
+
+      /*
+       * We don't actually handle these, but use them as a signal
+       * to re-examine the other UPS data items. (USB only)
+       */
+      case CI_IFailure:                return "IFailure";
+      case CI_PWVoltageOOR:            return "PWVoltageOOR";
+      case CI_PWFrequencyOOR:          return "PWFrequencyOOR";
+      case CI_OverCharged:             return "OverCharged";
+      case CI_OverTemp:                return "OverTemp";
+      case CI_CommunicationLost:       return "CommunicationLost";
+      case CI_ChargerVoltageOOR:       return "ChargerVoltageOOR";
+      case CI_ChargerCurrentOOR:       return "ChargerCurrentOOR";
+      case CI_CurrentNotRegulated:     return "CurrentNotRegulated";
+      case CI_VoltageNotRegulated:     return "VoltageNotRegulated";
+
+      /* Items below this line are not "probed" for */
+      case CI_CYCLE_EPROM:             return "CYCLE_EPROM";
+      case CI_UPS_CAPS:                return "UPS_CAPS";
+      case CI_STATUS:                  return "STATUS";
+
+      default:                         return "UNKNOWN";
+   }
+}

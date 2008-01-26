@@ -31,8 +31,8 @@ class astring
 {
 public:
 
-   astring() : _data(NULL) { assign(""); }
-   astring(const char *str) : _data(NULL) { assign(str); }
+   astring()                   : _data(NULL) { assign(""); }
+   astring(const char *str)    : _data(NULL) { assign(str); }
    astring(const astring &str) : _data(NULL) { assign(str._data); }
    ~astring() { delete [] _data; }
 
@@ -59,7 +59,7 @@ public:
    bool operator!=(const char *rhs) const { return !(*this == rhs); }
    bool operator!=(const astring &rhs) const { return !(*this == rhs); }
 
-   operator const char *() { return _data; }
+   operator const char *() const { return _data; }
    const char *str() const { return _data; }
 
    void rtrim();

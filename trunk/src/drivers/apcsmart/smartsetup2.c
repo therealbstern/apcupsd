@@ -205,5 +205,5 @@ bool ApcSmartDriver::GetCapabilities()
       }
    }
 
-   return 1;
+   return true;
 }

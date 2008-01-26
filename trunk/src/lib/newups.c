@@ -35,19 +35,15 @@ UPSINFO *new_ups()
    int stat;
    UPSINFO *ups;
 
-   ups = (UPSINFO *) malloc(sizeof(UPSINFO));
+   ups = new UPSINFO();
    if (!ups)
       Error_abort0(_("Could not allocate ups memory\n"));
 
-   memset(ups, 0, sizeof(UPSINFO));
    if ((stat = pthread_mutex_init(&ups->mutex, NULL)) != 0) {
       Error_abort1("Could not create pthread mutex. ERR=%s\n", strerror(stat));
       free(ups);
       return NULL;
    }
-
-   /* Most drivers do not support this, so preset it to true */
-   ups->set_battpresent();
 
    ups->refcnt = 1;
    return ups;
@@ -81,7 +77,7 @@ void destroy_ups(UPSINFO *ups)
 {
    pthread_mutex_destroy(&ups->mutex);
    if (ups->refcnt == 0) {
-      free(ups);
+      delete ups;
    }
 }
 

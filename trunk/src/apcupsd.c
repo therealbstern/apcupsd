@@ -289,7 +289,7 @@ int main(int argc, char *argv[])
       apcupsd_terminate(0);
    }
 
-   prep_device(ups);
+//   prep_device(ups);
 
    if (create_lockfile(ups) == LCKERROR) {
       Error_abort1(_("Failed to reacquire serial port lock file on device %s\n"),
@@ -314,8 +314,14 @@ int main(int argc, char *argv[])
       "apcupsd " APCUPSD_RELEASE " (" ADATE ") " APCUPSD_HOST " startup succeeded");
 
    /* main processing loop */
-   do_device(ups);
+//   do_device(ups);
+   UpsStateMachine *sm = new UpsStateMachine(ups);
+   sm->Start();
 
+   // Need something better, obviously
+   while (1)
+      sleep(10);
+   
    apcupsd_terminate(0);
    return 0;                       /* to keep compiler happy */
 }

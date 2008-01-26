@@ -285,8 +285,8 @@ bool LinuxUsbDriver::populate_uval(usb_info *info, usb_value *uval)
       astrncpy(val.sValue, sdesc.value, sizeof(val.sValue));
       val.value_type = V_STRING;
 
-      Dmsg4(200, "Def val=%d exp=%d sVal=\"%s\" ci=%d\n", info->uref.value,
-         exponent, val.sValue, info->ci);
+      Dmsg4(200, "Def val=%d exp=%d sVal=\"%s\" ci=%s\n", info->uref.value,
+         exponent, val.sValue, CItoString(info->ci));
    } else if (info->data_type == T_UNITS) {
       val.value_type = V_DOUBLE;
       switch (info->unit) {
@@ -326,8 +326,8 @@ bool LinuxUsbDriver::populate_uval(usb_info *info, usb_value *uval)
       else
          val.dValue = ((double)info->uref.value) * pow_ten(exponent);
 
-      Dmsg4(200, "Def val=%d exp=%d dVal=%f ci=%d\n", info->uref.value,
-         exponent, val.dValue, info->ci);
+      Dmsg4(200, "Def val=%d exp=%d dVal=%f ci=%s\n", info->uref.value,
+         exponent, val.dValue, CItoString(info->ci));
    } else {                        /* should be T_NONE */
       val.UnitName = "";
       val.value_type = V_INTEGER;
@@ -338,8 +338,8 @@ bool LinuxUsbDriver::populate_uval(usb_info *info, usb_value *uval)
       else
          val.dValue = ((double)info->uref.value) * pow_ten(exponent);
 
-      Dmsg4(200, "Def val=%d exp=%d dVal=%f ci=%d\n", info->uref.value,
-         exponent, val.dValue, info->ci);
+      Dmsg4(200, "Def val=%d exp=%d dVal=%f ci=%s\n", info->uref.value,
+         exponent, val.dValue, CItoString(info->ci));
    }
 
    memcpy(uval, &val, sizeof(*uval));
@@ -514,7 +514,7 @@ bool LinuxUsbDriver::SubclassCheckState()
       }
 
       write_lock(_ups);
-
+#if 0
       /* Ignore events whose value is unchanged */
       if (info->uref.value == uref.value) {
          Dmsg3(200, "Ignoring unchanged value (rpt=%d, usg=0x%08x, val=%d)\n",
@@ -522,7 +522,7 @@ bool LinuxUsbDriver::SubclassCheckState()
          write_unlock(_ups);
          continue;
       }
-
+#endif
       /* Update tracked value */
       Dmsg3(200, "Processing changed value (rpt=%d, usg=0x%08x, val=%d)\n",
          uref.report_id, uref.usage_code, uref.value);
@@ -660,7 +660,7 @@ bool LinuxUsbDriver::SubclassGetCapabilities()
                      info->data_type = _known_info[k].data_type;
                      memcpy(&info->uref, &uref, sizeof(uref));
 
-                     Dmsg2(200, "Got ci=%d, usage=0x%x\n", ci,
+                     Dmsg2(200, "Got ci=%s, usage=0x%x\n", CItoString(ci),
                         _known_info[k].usage_code);
                      break;
                   }
@@ -671,7 +671,6 @@ bool LinuxUsbDriver::SubclassGetCapabilities()
       }
    }
 
-   _ups->UPS_Cap[CI_STATUS] = true; /* we have status flag */
    write_unlock(_ups);
    return true;
 }

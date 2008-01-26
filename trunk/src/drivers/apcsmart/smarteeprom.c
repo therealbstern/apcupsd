@@ -310,13 +310,14 @@ void ApcSmartDriver::change_ups_battery_date(const char *newdate)
    if (strcmp(response, "OK") != 0) {
       fprintf(stderr, "\nError changing UPS battery date\n");
    }
-
+#if 0
    _ups->battdat[0] = '\0';
    smart_poll(_cmdmap[CI_BATTDAT]);
    astrncpy(_ups->battdat, smart_poll(_cmdmap[CI_BATTDAT]),
       sizeof(_ups->battdat));
 
    fprintf(stderr, "The new UPS battery date is: %s\n", _ups->battdat);
+#endif
 }
 
 /*********************************************************************/
@@ -434,7 +435,7 @@ void ApcSmartDriver::change_extended()
     * in /etc/apcupsd/apcupsd.conf. Consequently, if no value
     * was given, we won't attept to change it.
     */
-
+#if 0
    /* SENSITIVITY */
    if (_ups->UPS_Cap[CI_SENS] && strcmp(_ups->sensitivity, "-1") != 0) {
       asnprintf(setting, sizeof(setting), "%.1s", _ups->sensitivity);
@@ -506,4 +507,5 @@ void ApcSmartDriver::change_extended()
       change_ups_eeprom_item("output voltage on batteries",
          _cmdmap[CI_NOMOUTV], setting);
    }
+#endif
 }

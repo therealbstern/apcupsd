@@ -100,7 +100,9 @@ public:
    }
 
    void remove_first() { if (!empty()) remove(_head); }
-   void remove_last() { if (!empty()) remove(_tail); }
+   void remove_last()  { if (!empty()) remove(_tail); }
+
+   void clear() { while (!empty()) remove(_head); }
 
    class iterator
    {

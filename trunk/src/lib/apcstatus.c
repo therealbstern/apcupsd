@@ -24,6 +24,8 @@
 
 #include "apc.h"
 
+#define DBGLN() do { Dmsg2(100, "%s:%d\n", __FILE__, __LINE__); } while(0)
+
 /* Send the full status of the UPS to the client. */
 int output_status(UPSINFO *ups, int sockfd,
    void s_open(UPSINFO *ups),
@@ -36,6 +38,7 @@ int output_status(UPSINFO *ups, int sockfd,
    int time_on_batt;
    struct tm tm;
    char status[100];
+   unsigned long statflag;
 
    s_open(ups);
 
@@ -159,9 +162,9 @@ int output_status(UPSINFO *ups, int sockfd,
       status[0] = 0;
 
       /* Now output human readable form */
-      if (ups->is_calibration())
-         astrncat(status, "CAL ", sizeof(status));
-
+//      if (ups->is_calibration())
+//         astrncat(status, "CAL ", sizeof(status));
+DBGLN();
       if (ups->is_trim())
          astrncat(status, "TRIM ", sizeof(status));
 
@@ -202,34 +205,42 @@ int output_status(UPSINFO *ups, int sockfd,
       s_write(ups, "STATUS   : %s\n", status);
 
       if (ups->UPS_Cap[CI_VLINE])
-         s_write(ups, "LINEV    : %05.1f Volts\n", ups->LineVoltage);
+         s_write(ups, "LINEV    : %03d.%03d Volts\n",
+            ups->info.get(CI_VLINE) / 1000, ups->info.get(CI_VLINE) % 1000);
       else
          Dmsg0(20, "NO CI_VLINE\n");
 
       if (ups->UPS_Cap[CI_LOAD])
-         s_write(ups, "LOADPCT  : %5.1f Percent Load Capacity\n", ups->UPSLoad);
+         s_write(ups, "LOADPCT  : %03d.%1d Percent Load Capacity\n",
+            ups->info.get(CI_LOAD) / 10, ups->info.get(CI_LOAD) % 10);
 
       if (ups->UPS_Cap[CI_BATTLEV])
-         s_write(ups, "BCHARGE  : %05.1f Percent\n", ups->BattChg);
+         s_write(ups, "BCHARGE  : %03d.%1d Percent\n",
+            ups->info.get(CI_BATTLEV) / 10, ups->info.get(CI_BATTLEV) % 10);
 
+DBGLN();
       if (ups->UPS_Cap[CI_RUNTIM])
-         s_write(ups, "TIMELEFT : %5.1f Minutes\n", ups->TimeLeft);
+         s_write(ups, "TIMELEFT : %3d.%1d Minutes\n",
+            ups->info.get(CI_RUNTIM) / 60, ups->info.get(CI_RUNTIM) % 60);
 
-      s_write(ups, "MBATTCHG : %d Percent\n", ups->percent);
-      s_write(ups, "MINTIMEL : %d Minutes\n", ups->runtime);
-      s_write(ups, "MAXTIME  : %d Seconds\n", ups->maxtime);
+//      s_write(ups, "MBATTCHG : %d Percent\n", ups->percent);
+//      s_write(ups, "MINTIMEL : %d Minutes\n", ups->runtime);
+//      s_write(ups, "MAXTIME  : %d Seconds\n", ups->maxtime);
 
       if (ups->UPS_Cap[CI_VMAX])
-         s_write(ups, "MAXLINEV : %05.1f Volts\n", ups->LineMax);
+         s_write(ups, "MAXLINEV : %03d.%03d Volts\n",
+            ups->info.get(CI_VMAX) / 1000, ups->info.get(CI_VMAX) % 1000);
 
       if (ups->UPS_Cap[CI_VMIN])
-         s_write(ups, "MINLINEV : %05.1f Volts\n", ups->LineMin);
+         s_write(ups, "MINLINEV : %03d.%03d Volts\n",
+            ups->info.get(CI_VMIN) / 1000, ups->info.get(CI_VMIN) % 1000);
 
       if (ups->UPS_Cap[CI_VOUT])
-         s_write(ups, "OUTPUTV  : %05.1f Volts\n", ups->OutputVoltage);
+         s_write(ups, "OUTPUTV  : %03d.%03d Volts\n",
+            ups->info.get(CI_VOUT) / 1000, ups->info.get(CI_VOUT) % 1000);
 
       if (ups->UPS_Cap[CI_SENS]) {
-         switch ((*ups).sensitivity[0]) {
+         switch (ups->info.get(CI_SENS).strval()[0]) {
          case 'A':                /* Matrix only */
             s_write(ups, "SENSE    : Auto Adjust\n");
             break;
@@ -248,29 +259,32 @@ int output_status(UPSINFO *ups, int sockfd,
          }
       }
 
+DBGLN();
       if (ups->UPS_Cap[CI_DWAKE])
-         s_write(ups, "DWAKE    : %03d Seconds\n", ups->dwake);
+         s_write(ups, "DWAKE    : %03d Seconds\n", ups->info.get(CI_DWAKE).lval());
 
       if (ups->UPS_Cap[CI_DSHUTD])
-         s_write(ups, "DSHUTD   : %03d Seconds\n", ups->dshutd);
+         s_write(ups, "DSHUTD   : %03d Seconds\n", ups->info.get(CI_DSHUTD).lval());
 
       if (ups->UPS_Cap[CI_DLBATT])
-         s_write(ups, "DLOWBATT : %02d Minutes\n", ups->dlowbatt);
+         s_write(ups, "DLOWBATT : %02d Minutes\n", ups->info.get(CI_DLBATT)/60);
 
       if (ups->UPS_Cap[CI_LTRANS])
-         s_write(ups, "LOTRANS  : %03d.0 Volts\n", ups->lotrans);
+         s_write(ups, "LOTRANS  : %03d.0 Volts\n", ups->info.get(CI_LTRANS)/1000);
 
       if (ups->UPS_Cap[CI_HTRANS])
-         s_write(ups, "HITRANS  : %03d.0 Volts\n", ups->hitrans);
+         s_write(ups, "HITRANS  : %03d.0 Volts\n", ups->info.get(CI_HTRANS)/1000);
 
       if (ups->UPS_Cap[CI_RETPCT])
-         s_write(ups, "RETPCT   : %03d.0 Percent\n", ups->rtnpct);
+         s_write(ups, "RETPCT   : %03d.0 Percent\n", ups->info.get(CI_RETPCT)/10);
 
       if (ups->UPS_Cap[CI_ITEMP])
-         s_write(ups, "ITEMP    : %04.1f C Internal\n", ups->UPSTemp);
+         s_write(ups, "ITEMP    : %02d.%1d C Internal\n",
+            ups->info.get(CI_ITEMP) / 10, ups->info.get(CI_ITEMP) % 10);
 
+DBGLN();
       if (ups->UPS_Cap[CI_DALARM]) {
-         switch ((*ups).beepstate[0]) {
+         switch (ups->info.get(CI_DALARM).strval()[0]) {
          case 'T':
             s_write(ups, "ALARMDEL : 30 seconds\n");
             break;
@@ -288,15 +302,21 @@ int output_status(UPSINFO *ups, int sockfd,
             break;
          }
       }
+DBGLN();
 
       if (ups->UPS_Cap[CI_VBATT])
-         s_write(ups, "BATTV    : %04.1f Volts\n", ups->BattVoltage);
+         s_write(ups, "BATTV    : %02d.%1d Volts\n",
+            ups->info.get(CI_VBATT) / 1000,
+            (ups->info.get(CI_VBATT) % 1000) / 100);
 
+DBGLN();
       if (ups->UPS_Cap[CI_FREQ])
-         s_write(ups, "LINEFREQ : %03.1f Hz\n", ups->LineFreq);
+         s_write(ups, "LINEFREQ : %02d.%1d Hz\n",
+            ups->info.get(CI_FREQ) / 10, (ups->info.get(CI_FREQ) % 10));
 
+DBGLN();
       /* Output cause of last transfer to batteries */
-      switch (ups->lastxfer) {
+      switch (ups->info.get(CI_WHY_BATT)) {
       case XFER_NONE:
          s_write(ups, "LASTXFER : No transfers since turnon\n");
          break;
@@ -330,6 +350,7 @@ int output_status(UPSINFO *ups, int sockfd,
          break;
       }
 
+DBGLN();
       s_write(ups, "NUMXFERS : %d\n", ups->num_xfers);
       if (ups->num_xfers > 0) {
          localtime_r(&ups->last_onbatt_time, &tm);
@@ -359,7 +380,7 @@ int output_status(UPSINFO *ups, int sockfd,
       }
 
       /* Status of last self test */
-      switch (ups->testresult) {
+      switch (ups->info.get(CI_ST_STAT)) {
       case TEST_NONE:
          s_write(ups, "SELFTEST : NO\n");
          break;
@@ -389,14 +410,32 @@ int output_status(UPSINFO *ups, int sockfd,
          /* UPS doesn't report this data */
          break;
       }
+DBGLN();
 
       /* Self test interval */
       if (ups->UPS_Cap[CI_STESTI])
-         s_write(ups, "STESTI   : %s\n", ups->selftest);
+         s_write(ups, "STESTI   : %s\n", ups->info.get(CI_STESTI).strval());
 
       /* output raw bits */
-      s_write(ups, "STATFLAG : 0x%08X Status Flag\n", ups->Status);
-
+      statflag = ups->Status;
+      if (ups->is_onbatt())
+         statflag |= UPS_onbatt;
+      if (ups->is_online())
+         statflag |= UPS_online;
+      if (ups->is_trim())
+         statflag |= UPS_trim;
+      if (ups->is_boost())
+         statflag |= UPS_boost;
+      if (ups->is_overload())
+         statflag |= UPS_overload;
+      if (ups->is_battlow())
+         statflag |= UPS_battlow;
+      if (ups->is_replacebatt())
+         statflag |= UPS_replacebatt;
+      if (ups->is_battpresent())
+         statflag |= UPS_battpresent;
+      s_write(ups, "STATFLAG : 0x%08X Status Flag\n", statflag);
+/*
       if (ups->UPS_Cap[CI_DIPSW])
          s_write(ups, "DIPSW    : 0x%02X Dip Switch\n", ups->dipsw);
 
@@ -408,47 +447,53 @@ int output_status(UPSINFO *ups, int sockfd,
 
       if (ups->UPS_Cap[CI_REG3])
          s_write(ups, "REG3     : 0x%02X Register 3\n", ups->reg3);
-
+*/
       if (ups->UPS_Cap[CI_MANDAT])
-         s_write(ups, "MANDATE  : %s\n", ups->birth);
+         s_write(ups, "MANDATE  : %s\n", ups->info.get(CI_MANDAT).strval());
 
       if (ups->UPS_Cap[CI_SERNO])
-         s_write(ups, "SERIALNO : %s\n", ups->serial);
+         s_write(ups, "SERIALNO : %s\n", ups->info.get(CI_SERNO).strval());
 
-      if (ups->UPS_Cap[CI_BATTDAT] || ups->UPS_Cap[CI_BattReplaceDate])
-         s_write(ups, "BATTDATE : %s\n", ups->battdat);
+//      if (ups->UPS_Cap[CI_BATTDAT] || ups->UPS_Cap[CI_BattReplaceDate])
+//         s_write(ups, "BATTDATE : %s\n", ups->battdat);
 
       if (ups->UPS_Cap[CI_NOMOUTV])
-         s_write(ups, "NOMOUTV  : %03d Volts\n", ups->NomOutputVoltage);
+         s_write(ups, "NOMOUTV  : %03d Volts\n", ups->info.get(CI_NOMOUTV) / 1000);
 
       if (ups->UPS_Cap[CI_NOMINV])
-         s_write(ups, "NOMINV   : %03d Volts\n", ups->NomInputVoltage);
+         s_write(ups, "NOMINV   : %03d Volts\n", ups->info.get(CI_NOMINV) / 1000);
 
       if (ups->UPS_Cap[CI_NOMBATTV])
-         s_write(ups, "NOMBATTV : %5.1f Volts\n", ups->nombattv);
+         s_write(ups, "NOMBATTV : %03d.%1d Volts\n", 
+            ups->info.get(CI_NOMBATTV) / 1000,
+            (ups->info.get(CI_NOMBATTV) % 1000) / 100);
 
       if (ups->UPS_Cap[CI_NOMPOWER])
-         s_write(ups, "NOMPOWER : %d Watts\n", ups->NomPower);
+         s_write(ups, "NOMPOWER : %d Watts\n", ups->info.get(CI_NOMPOWER) / 10);
+DBGLN();
 
       if (ups->UPS_Cap[CI_HUMID])
-         s_write(ups, "HUMIDITY : %5.1f\n", ups->humidity);
+         s_write(ups, "HUMIDITY : %3d.%1d\n",
+            ups->info.get(CI_HUMID) / 10, ups->info.get(CI_HUMID) % 10);
 
       if (ups->UPS_Cap[CI_ATEMP])
-         s_write(ups, "AMBTEMP  : %5.1f\n", ups->ambtemp);
+         s_write(ups, "AMBTEMP  : %3d.%1d\n",
+            ups->info.get(CI_ATEMP) / 10, ups->info.get(CI_ATEMP) % 10);
 
       if (ups->UPS_Cap[CI_EXTBATTS])
-         s_write(ups, "EXTBATTS : %d\n", ups->extbatts);
+         s_write(ups, "EXTBATTS : %d\n", ups->info.get(CI_EXTBATTS).lval());
 
       if (ups->UPS_Cap[CI_BADBATTS])
-         s_write(ups, "BADBATTS : %d\n", ups->badbatts);
+         s_write(ups, "BADBATTS : %d\n", ups->info.get(CI_BADBATTS).lval());
 
       if (ups->UPS_Cap[CI_REVNO])
-         s_write(ups, "FIRMWARE : %s\n", ups->firmrev);
+         s_write(ups, "FIRMWARE : %s\n", ups->info.get(CI_REVNO).strval());
 
       if (ups->UPS_Cap[CI_UPSMODEL])
-         s_write(ups, "APCMODEL : %s\n", ups->upsmodel);
+         s_write(ups, "APCMODEL : %s\n", ups->info.get(CI_UPSMODEL).strval());
 
       break;
+DBGLN();
 
    default:
       break;

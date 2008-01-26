@@ -18,7 +18,7 @@ sobjs = smtp.o
 fobjs = powerflute.o
 xobjs = devicedbg.o options.o action.o
 
-allexe = apcupsd @APCACCESS@ @SMTP@ @POWERFLUTE@
+allexe = apcupsd @APCACCESS@ @POWERFLUTE@
 
 # Include the default make targets: to be put before the all-targets: rule.
 @TARGETS@

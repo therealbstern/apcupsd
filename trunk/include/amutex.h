@@ -36,8 +36,12 @@ public:
    ~amutex();
 
    // Basic lock/unlock are inlined for efficiency
-   inline void lock() { pthread_mutex_lock(&_mutex); }
-   inline void unlock() { pthread_mutex_unlock(&_mutex); }
+   // We play some games to make these operations appear const so they can
+   // be used by const objects.
+   inline void lock() const
+      { pthread_mutex_lock(const_cast<pthread_mutex_t *>(&_mutex)); }
+   inline void unlock() const
+      { pthread_mutex_unlock(const_cast<pthread_mutex_t *>(&_mutex)); }
 
    // Timed lock is out-of-line because of size
    bool lock(int msec);

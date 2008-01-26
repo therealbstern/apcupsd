@@ -66,10 +66,14 @@ private:
    char *get_apc_model_b_codes(const char *s);   
    void get_apc_model();
 
+   // Implementation of thread body
+   virtual void body();
+
    struct termios _oldtio;
    struct termios _newtio;
-
    int *_cmdmap;
+   bool _interrupt;
+   bool _selftest;
 };
 
 #endif   /* _APCSMART_H */

@@ -167,7 +167,7 @@ static void log_data(UPSINFO *ups)
          log_event(ups, LOG_INFO, "LINEFAIL:DOWN BATTSTAT:%s", ptr);
       }
 
-      switch (ups->lastxfer) {
+      switch (ups->info.get(CI_WHY_BATT).strval()[0]) {
       case XFER_NONE:
          ptr = "POWER UP";
          break;
@@ -204,6 +204,8 @@ static void log_data(UPSINFO *ups)
    case SNMP_UPS:
    case APCSMART_UPS:
       toggle = !toggle;            /* flip bit */
+#warning FIXME!!!!
+#if 0
       log_event(ups, LOG_INFO,
          "%05.1f,%05.1f,%05.1f,%05.2f,%05.2f,%04.1f,%04.1f,%05.1f,%05.1f,%05.1f,%05.1f,%d",
          ups->LineMin,
@@ -214,6 +216,7 @@ static void log_data(UPSINFO *ups)
          ups->UPSLoad,
          ups->UPSTemp,
          ups->ambtemp, ups->humidity, ups->LineVoltage, ups->BattChg, toggle);
+#endif
       break;
    default:
       break;
