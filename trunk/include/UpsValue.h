@@ -111,7 +111,7 @@ public:
    void update(int ci, const UpsValue &val)
    {
       _mutex.lock();
-      if (!avail(ci) || _values[ci] != val)
+      if (!_values.contains(ci) || _values[ci] != val)
       {
          _values[ci] = val;
          notify(ci, val);
@@ -130,7 +130,7 @@ public:
    bool get(int ci, UpsValue &val)
    {
       _mutex.lock();
-      bool result = avail(ci);
+      bool result = _values.contains(ci);
       if (result)
          val = _values[ci];
       _mutex.unlock();
