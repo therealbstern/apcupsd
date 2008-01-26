@@ -1,5 +1,7 @@
+#include "amap.h"
 #include "astring.h"
 #include "amutex.h"
+#include "aqueue.h"
 #include "defines.h"
 
 class UpsValue
@@ -93,7 +95,6 @@ struct UpsDatum
    UpsDatum() {}
 };
 
-#include <aqueue.h>
 
 class UpsInfo
 {
@@ -101,12 +102,7 @@ public:
 
    UpsInfo() : _mutex("UpsInfo")
    {
-      // No CIs available yet
-      for (unsigned int i=0; i < ARRAY_SIZE(_avail); i++)
-         _avail[i] = false;
-
       // By default assume battery is connected
-      _avail[CI_BatteryPresent] = true;
       _values[CI_BatteryPresent] = true;
    }
 
@@ -115,31 +111,30 @@ public:
    void update(int ci, const UpsValue &val)
    {
       _mutex.lock();
-      if (!_avail[ci] || _values[ci] != val)
+      if (!avail(ci) || _values[ci] != val)
       {
-         _avail[ci] = true;
          _values[ci] = val;
          notify(ci, val);
       }
       _mutex.unlock();
    }
 
-   bool avail(int ci)
+   bool avail(int ci) const
    {
       _mutex.lock();
-      bool avail = _avail[ci];
+      bool result = _values.contains(ci);
       _mutex.unlock();
-      return avail;
+      return result;
    }
 
    bool get(int ci, UpsValue &val)
    {
       _mutex.lock();
-      bool avail = _avail[ci];
-      if (avail)
+      bool result = avail(ci);
+      if (result)
          val = _values[ci];
       _mutex.unlock();
-      return avail;
+      return result;
    }
 
    UpsValue &get(int ci)
@@ -153,7 +148,8 @@ public:
    bool getbool(int ci) const
    {
       _mutex.lock();
-      bool result = _avail[ci] && _values[ci].lval();
+      amap<int, UpsValue>::const_iterator iter = _values.find(ci);
+      bool result = iter != _values.end() && (*iter).lval();
       _mutex.unlock();
       return result;
    }
@@ -165,8 +161,7 @@ private:
    void notify(int ci, const UpsValue &val)
       { UpsDatum datum(ci, val); _notifs.enqueue(datum); }
 
-   amutex _mutex;
-   bool _avail[CI_MAXCI + 1];
-   UpsValue _values[CI_MAXCI + 1];
+   mutable amutex _mutex;
+   amap<int, UpsValue> _values;
    aqueue<UpsDatum> _notifs;
 };
