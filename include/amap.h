@@ -50,7 +50,7 @@ public:
       return (iter == _map.end()) ? _map.append(key)._val : (*iter)._val;
    }
 
-   bool contains(const K& key) const { return _map.find(key) == _map.end(); }
+   bool contains(const K& key) const { return _map.find(key) != _map.end(); }
    bool empty() const { return _map.empty(); }
 
    class iterator
