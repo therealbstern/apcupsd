@@ -499,8 +499,6 @@ int net_ups_check_state(UPSINFO *ups)
    int sleep_time;
 
    sleep_time = ups->wait_time;
-   if (ups->nettime && ups->nettime < ups->wait_time)
-      sleep_time = ups->nettime;
 
    Dmsg1(100, "Sleep %d secs.\n", sleep_time);
    sleep(sleep_time);
