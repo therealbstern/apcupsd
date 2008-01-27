@@ -24,6 +24,7 @@
 
 extern char statbuf[4096];
 extern size_t statlen;
+extern char errmsg[200];
 
 /* Read data into memory buffer to be used by getupsvar() */
 int fetch_events (const char *host);
