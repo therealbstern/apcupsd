@@ -33,7 +33,7 @@ char statbuf[4096];
 size_t  statlen = 0;
 
 static char last_host[256] = "";
-static char errmsg[200];
+char errmsg[200] = "";
 
 /* List of variables that can be read by getupsvar()   
  * First field is that name given to getupsvar(),
@@ -116,8 +116,7 @@ static int fetch_data(const char *host)
    }
    if ((sockfd = net_open(lhost, NULL, nis_port)) < 0) {
       (void) snprintf(errmsg, sizeof (errmsg),
-          "upsfetch: tcp_open failed for %s port %d", lhost, nis_port);
-      net_errmsg = errmsg;
+         "upsfetch: tcp_open failed for %s port %d", lhost, nis_port);
       return 0;
    }
 
@@ -157,14 +156,13 @@ int fetch_events(const char *host)
    if ((sockfd = net_open(lhost, NULL, nis_port)) < 0) {
       (void) snprintf(errmsg, sizeof(errmsg),
           "upsfetch: tcp_open failed for %s port %d", lhost, nis_port);
-      net_errmsg = errmsg;
-      (void) fputs(net_errmsg, stdout);
+      (void) fputs(errmsg, stdout);
       return 0;
    }
 
    if (net_send(sockfd, "events", 6) != 6) {
-      net_errmsg = "fill_buffer: write error on socket\n";
-      (void) fputs(net_errmsg, stdout);
+      sprintf(errmsg, "fill_buffer: write error on socket\n");
+      (void) fputs(errmsg, stdout);
       return 0;
    }
    /*
@@ -266,7 +264,7 @@ static int fill_buffer(int sockfd)
    statbuf[0] = '\0';
    statlen = 0;
    if (net_send(sockfd, "status", 6) != 6) {
-      net_errmsg = "fill_buffer: write error on socket\n";
+      sprintf(errmsg, "fill_buffer: write error on socket\n");
       return 0;
    }
 

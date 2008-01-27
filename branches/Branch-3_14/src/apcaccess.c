@@ -25,8 +25,6 @@
 
 #include "apc.h"
 
-extern const char *net_errmsg;
-
 /* Default values for contacting daemon */
 static const char *host = "localhost";
 static int port = NISPORT;
@@ -38,7 +36,7 @@ static int do_pthreads_status(const char *host, int port)
    char recvline[MAXSTRING + 1];
 
    if ((sockfd = net_open(host, NULL, port)) < 0) {
-      fprintf(stderr, "Error contacting host %s port %d: %s\n",
+      fprintf(stderr, "Error contacting apcupsd @ %s:%d: %s\n",
          host, port, strerror(-sockfd));
       return 1;
    }
@@ -51,7 +49,9 @@ static int do_pthreads_status(const char *host, int port)
    }
 
    if (n < 0) {
-      fprintf(stderr, net_errmsg);
+      fprintf(stderr, "Error reading status from apcupsd @ %s:%d: %s\n",
+         host, port, strerror(-n));
+      net_close(sockfd);
       return 1;
    }
 
