@@ -782,7 +782,7 @@ int pusb_write_int_to_ups(UPSINFO *ups, int ci, int value, const char *name)
    int old_value, new_value;
    unsigned char rpt[20];
 
-   if (ups->UPS_Cap[ci] && my_data->info[ci]) {
+   if (ups->UPS_Cap[ci] && my_data->info[ci] && my_data->info[ci]->witem.report_ID) {
       info = my_data->info[ci];    /* point to our info structure */
 
       if (hidu_get_report(my_data->fd, &info->item, rpt, info->report_len) < 1) {
