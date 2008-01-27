@@ -27,6 +27,20 @@
 
 #include <pthread.h>
 #include "astring.h"
+#include "apc.h"
+
+// Wrappers for debug trace
+#define LOCK(m)                                                  \
+   do {                                                          \
+      Dmsg3(500, "lock 0x%p @ %s:%d\n", &m, __FILE__, __LINE__); \
+      m.lock();                                                  \
+   } while(0)
+
+#define UNLOCK(m)                                                  \
+   do {                                                            \
+      Dmsg3(500, "unlock 0x%p @ %s:%d\n", &m, __FILE__, __LINE__); \
+      m.unlock();                                                  \
+   } while(0)
 
 class amutex
 {
