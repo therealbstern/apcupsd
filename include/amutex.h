@@ -27,7 +27,6 @@
 
 #include <pthread.h>
 #include "astring.h"
-#include "apc.h"
 
 class amutex
 {
