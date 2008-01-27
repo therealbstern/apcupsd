@@ -110,47 +110,47 @@ public:
 
    void update(int ci, const UpsValue &val)
    {
-      _mutex.lock();
+      LOCK(_mutex);
       if (!_values.contains(ci) || _values[ci] != val)
       {
          _values[ci] = val;
          notify(ci, val);
       }
-      _mutex.unlock();
+      UNLOCK(_mutex);
    }
 
    bool avail(int ci) const
    {
-      _mutex.lock();
+      LOCK(_mutex);
       bool result = _values.contains(ci);
-      _mutex.unlock();
+      UNLOCK(_mutex);
       return result;
    }
 
    bool get(int ci, UpsValue &val)
    {
-      _mutex.lock();
+      LOCK(_mutex);
       bool result = _values.contains(ci);
       if (result)
          val = _values[ci];
-      _mutex.unlock();
+      UNLOCK(_mutex);
       return result;
    }
 
    UpsValue &get(int ci)
    {
-      _mutex.lock();
+      LOCK(_mutex);
       UpsValue &val = _values[ci];
-      _mutex.unlock();
+      UNLOCK(_mutex);
       return val;
    }
 
    bool getbool(int ci) const
    {
-      _mutex.lock();
+      LOCK(_mutex);
       amap<int, UpsValue>::const_iterator iter = _values.find(ci);
       bool result = iter != _values.end() && (*iter).lval();
-      _mutex.unlock();
+      UNLOCK(_mutex);
       return result;
    }
 
