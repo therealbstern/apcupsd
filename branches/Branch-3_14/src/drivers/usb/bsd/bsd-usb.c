@@ -351,9 +351,9 @@ static int usb_link_check(UPSINFO *ups)
 
 int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_info)
 {
-   int i, rc, ci, phys;
+   int i, ci, phys, input, feature;
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
-   hid_item_t item;
+   hid_item_t item, witem;
    USB_INFO *info;
 
    write_lock(ups);
@@ -375,13 +375,13 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
 
          /* Try to find a FEATURE report containing this usage */
          feature = hidu_locate_item(
-               my_data->rdesc,
-               known_info[i].usage_code,     /* Match usage code */
-               -1,                           /* Don't care about application */
-               (phys == P_ANY) ? -1 : phys,  /* Match physical usage */
-               -1,                           /* Don't care about logical */
-               HID_KIND_FEATURE,             /* Match feature type */
-               &witem);
+            my_data->rdesc,
+            known_info[i].usage_code,     /* Match usage code */
+            -1,                           /* Don't care about application */
+            (phys == P_ANY) ? -1 : phys,  /* Match physical usage */
+            -1,                           /* Don't care about logical */
+            HID_KIND_FEATURE,             /* Match feature type */
+            &witem);
 
          // If we did not find an INPUT report, but did find a FEATURE report,
          // use the FEATURE report as the INPUT report.
@@ -506,7 +506,7 @@ static bool populate_uval(UPSINFO *ups, USB_INFO *info, unsigned char *data, USB
 
       // Store a (possibly truncated) copy of the floating point value in the
       // integer field as well.
-      val.iValue = val.dValue;
+      val.iValue = (int)val.dValue;
 
       Dmsg4(200, "Def val=%d exp=%d dVal=%f ci=%d\n", info->value,
          exponent, val.dValue, info->ci);
@@ -775,7 +775,7 @@ int pusb_read_int_from_ups(UPSINFO *ups, int ci, int *value)
    return true;
 }
 
-int pusb_write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
+int pusb_write_int_to_ups(UPSINFO *ups, int ci, int value, const char *name)
 {
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
    USB_INFO *info;
