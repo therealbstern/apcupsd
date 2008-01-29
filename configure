@@ -13073,6 +13073,10 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
          GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_6"
          ;;
 
+         no)
+         GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_0"
+         ;;
+
          *)
          { { echo "$as_me:$LINENO: error: gapcmon requires gethostbyname_r" >&5
 echo "$as_me: error: gapcmon requires gethostbyname_r" >&2;}
