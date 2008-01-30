@@ -75,6 +75,7 @@
 #include <sys/types.h>          /* socket() */
 #include <sys/socket.h>         /* socket() */
 #include <arpa/inet.h>          /* ntohs() */
+#include <netinet/in.h>         /* sockaddr_in */
 #include <netdb.h>              /* gethostbyname() */
 #include <errno.h>
 #include <string.h>             /* memset() */
