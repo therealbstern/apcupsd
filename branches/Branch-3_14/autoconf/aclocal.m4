@@ -721,36 +721,3 @@ AC_LANG_POP(C)
 
 ]) dnl end AC_DEFUN
 
-
-AC_DEFUN([FUNC_WHICH_CTIME_R], [
-
-    AC_MSG_CHECKING(for ctime_r)
-     if test -z "$ac_cv_ctime_args"; then
-         AC_TRY_COMPILE(
-         [#include <time.h>],
-         [
-             time_t clock;
-             char buf[26];
-             ctime_r(&clock, buf);
-         ], ac_cv_ctime_args=2)
-
-         AC_TRY_COMPILE(
-         [#include <time.h>],
-         [
-             time_t clock;
-             char buf[26];
-             ctime_r(&clock, buf, 26);
-         ], ac_cv_ctime_args=3)
-     fi
-     if test -z "$ac_cv_ctime_args"; then
-         AC_MSG_RESULT(no)
-     else
-         if test "$ac_cv_ctime_args" = 2; then
-             AC_DEFINE(HAVE_FUNC_CTIME_R_2)
-         elif test "$ac_cv_ctime_args" = 3; then
-             AC_DEFINE(HAVE_FUNC_CTIME_R_3)
-         fi
-         AC_MSG_RESULT([yes, and it takes $ac_cv_ctime_args arguments])
-     fi 
- 
-]) dnl end AC_DEFUN

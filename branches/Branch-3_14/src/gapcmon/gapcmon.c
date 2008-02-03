@@ -173,11 +173,6 @@ static gint gapc_panel_graph_property_page(PGAPC_CONFIG pcfg, GtkWidget * notebo
 struct hostent * gethostname_re
     (const char *host,struct hostent *hostbuf,char **tmphstbuf,size_t *hstbuflen);
 
-/* Adjust for systems with 2-argument ctime_r() */
-#ifdef HAVE_FUNC_CTIME_R_2
-#define ctime_r(a,b,c)  ctime_r(a,b)
-#endif
-
 /* 
  * Some small number of globals are required
 */
@@ -896,7 +891,7 @@ static gint lg_graph_draw_tooltip (PLGRAPH plg)
 
         point_time = (time_t) g_list_nth_data (plg->lg_series_time, v_index);
 
-        pch_time = ctime_r (&point_time, ch_time_r, sizeof(ch_time_r));
+        pch_time = ctime_r (&point_time, ch_time_r);
 
         g_strdelimit (pch_time, "\n", ' ');
 

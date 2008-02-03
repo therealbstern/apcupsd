@@ -967,24 +967,6 @@ AC_ARG_ENABLE(gapcmon,
          ;;
       esac
 
-      dnl
-      dnl Figure out which ctime_r() variant we have
-      dnl
-      FUNC_WHICH_CTIME_R
-      case "$ac_cv_ctime_args" in
-         2)
-         GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_CTIME_R_2"
-         ;;
-
-         3)
-         GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_CTIME_R_3"
-         ;;
-
-         *)
-         AC_MSG_ERROR([gapcmon requires ctime_r])
-         ;;
-      esac
-
    fi],
   [])
 AC_SUBST(GAPCMON)
