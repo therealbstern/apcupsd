@@ -242,6 +242,13 @@ Requires: freetype, GConf2
 A Gnome application to monitor the status of your UPS.
 %endif
 
+# SuSE turns off stripping of binaries by default. In order to get
+# stripped packages we must generate debug package. RedHat and Mandriva
+# turn debug packages on by default but strip binaries regardless.
+%if %{suse}
+%debug_package
+%endif
+
 %prep
 
 %setup -b 1
@@ -438,6 +445,8 @@ if [ $1 = 0 ] ; then
 fi
 
 %changelog
+* Sun Feb 03 2008 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- add debug package to strip suse
 * Sat Nov 17 2007 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - add hal policy file
 * Sat Nov 10 2007 D. Scott Barninger <barninger at fairfieldcomputers.com>
