@@ -13084,6 +13084,145 @@ echo "$as_me: error: gapcmon requires gethostbyname_r" >&2;}
          ;;
       esac
 
+
+
+    echo "$as_me:$LINENO: checking for ctime_r" >&5
+echo $ECHO_N "checking for ctime_r... $ECHO_C" >&6
+     if test -z "$ac_cv_ctime_args"; then
+         cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <time.h>
+int
+main ()
+{
+
+             time_t clock;
+             char buf[26];
+             ctime_r(&clock, buf);
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_ctime_args=2
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+
+         cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+#include <time.h>
+int
+main ()
+{
+
+             time_t clock;
+             char buf[26];
+             ctime_r(&clock, buf, 26);
+
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext
+if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
+  (eval $ac_compile) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest.$ac_objext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_ctime_args=3
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+fi
+rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
+     fi
+     if test -z "$ac_cv_ctime_args"; then
+         echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+     else
+         if test "$ac_cv_ctime_args" = 2; then
+             cat >>confdefs.h <<\_ACEOF
+#define HAVE_FUNC_CTIME_R_2 1
+_ACEOF
+
+         elif test "$ac_cv_ctime_args" = 3; then
+             cat >>confdefs.h <<\_ACEOF
+#define HAVE_FUNC_CTIME_R_3 1
+_ACEOF
+
+         fi
+         echo "$as_me:$LINENO: result: yes, and it takes $ac_cv_ctime_args arguments" >&5
+echo "${ECHO_T}yes, and it takes $ac_cv_ctime_args arguments" >&6
+     fi
+
+
+      case "$ac_cv_ctime_args" in
+         2)
+         GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_CTIME_R_2"
+         ;;
+
+         3)
+         GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_CTIME_R_3"
+         ;;
+
+         *)
+         { { echo "$as_me:$LINENO: error: gapcmon requires ctime_r" >&5
+echo "$as_me: error: gapcmon requires ctime_r" >&2;}
+   { (exit 1); exit 1; }; }
+         ;;
+      esac
+
    fi
 fi;
 
