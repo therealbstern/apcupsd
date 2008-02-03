@@ -34,6 +34,12 @@
 #endif
 
 /*
+ * Solaris needs BSD_COMP set in order to get FIONBIO
+ * For simplicity, we set it across the board.
+ */
+#define BSD_COMP
+
+/*
  * Note, on the Alpha, we must include stdarg to get
  * the GNU version before stdio or we get multiple
  * definitions. This order could probably be used
