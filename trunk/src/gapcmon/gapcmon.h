@@ -28,10 +28,15 @@
 G_BEGIN_DECLS
 
 #ifndef VERSION
-#define GAPC_VERSION "0.8.6-0"
+#define GAPC_VERSION "0.8.7-0"
 #else
 #define GAPC_VERSION VERSION
 #endif
+
+#ifndef ICON_DIR
+#define ICON_DIR "/usr"
+#endif
+
 #define GAPC_PROG_NAME    "gapcmon"
 #define GAPC_GROUP_TITLE "<i>  Uninterruptible Power Supply Monitor...</i>\n  for APCUPSD"
 #define GAPC_WINDOW_TITLE  "gapcmon: UPS Information Panels"

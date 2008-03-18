@@ -1,3 +1,11 @@
+gapc_devel (0.8.7-0) stable; urgency=normal
+* Tue Mar 18 2008 James Scott, Jr. <skoona@users.sourceforge.net>
+- Removed close() fron sknet_net_close() api.  g_io_channel_shutdown()
+  handled the close and shutdown of the socket.  second close was
+  actually closing an active socket from another thread (i.e. reuse #)
+- Added ICON_DIR to compiler makefiles to support load_icons
+  ability to find icons at run-time.
+
 gapcmon (0.8.5-0) stable; urgency=normal
 * Tue Jan 23 2007 James Scott, Jr. <skoona@users.sourceforge.net>
 - Removed gnomeVFS from package which released these defined

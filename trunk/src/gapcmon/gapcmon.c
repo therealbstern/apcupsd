@@ -2256,6 +2256,8 @@ static gint sknet_net_write_nbytes (GIOChannel * ioc, gchar * ptr, gsize nbytes)
   GError *gerror = NULL;
   GIOStatus ios = 0;
   gboolean b_eof = TRUE;
+  gchar  ch[SKNET_STR_ARRAY];
+  gchar  *pmsg = ptr;
 
   nleft = nbytes;
 
@@ -2290,6 +2292,10 @@ static gint sknet_net_write_nbytes (GIOChannel * ioc, gchar * ptr, gsize nbytes)
     ptr += nwritten;
   }
   while ((nleft > 0) && (b_eof != TRUE));
+
+  g_snprintf (ch, sizeof(ch), "wrote{%s} %d bytes from channel=%d", 
+              pmsg, nwritten, g_io_channel_unix_get_fd(ioc));
+  sknet_util_log_msg ("sknet_net_write_nbytes", "Normal Exit", ch);
 
   return (nbytes - nleft);
 }
@@ -2339,6 +2345,7 @@ static gint sknet_net_read_nbytes (GIOChannel * ioc, gchar * ptr, gsize nbytes)
   GError *gerror = NULL;
   GIOStatus ios = 0;
   gboolean b_eof = FALSE;
+  gchar  ch[SKNET_STR_ARRAY];
 
   nleft = nbytes;
 
@@ -2355,11 +2362,11 @@ static gint sknet_net_read_nbytes (GIOChannel * ioc, gchar * ptr, gsize nbytes)
       break;
     case G_IO_STATUS_AGAIN:
       sknet_util_log_msg ("sknet_net_read_nbytes", "G_IO_STATUS_AGAIN", "aborted");
-      g_usleep (500000);
+      g_usleep (100000);
       break;
     case G_IO_STATUS_EOF:
       sknet_util_log_msg ("sknet_net_read_nbytes", "G_IO_STATUS_EOF", "ok");
-      return 0;
+      return 0; 
       break;
     case G_IO_STATUS_NORMAL:
       break;
@@ -2374,6 +2381,10 @@ static gint sknet_net_read_nbytes (GIOChannel * ioc, gchar * ptr, gsize nbytes)
   }
   while ((nleft > 0) && (b_eof != TRUE));
 
+  g_snprintf (ch, sizeof(ch), "read %d bytes from channel=%d", 
+              nread, g_io_channel_unix_get_fd(ioc));
+  sknet_util_log_msg ("sknet_net_read_nbytes", "Normal Exit", ch);
+  
   return (nbytes - nleft);      /* return >= 0 */
 }
 
@@ -2390,6 +2401,7 @@ static gint sknet_net_recv (GIOChannel * ioc, gchar * buff, gsize maxlen)
 {
   gint nbytes = 0;
   gshort pktsiz = 0;
+  gchar  ch[SKNET_STR_ARRAY];
 
   /* get data size -- in short */
   nbytes = sknet_net_read_nbytes (ioc, (gchar *) &pktsiz, sizeof (gshort));
@@ -2413,7 +2425,8 @@ static gint sknet_net_recv (GIOChannel * ioc, gchar * buff, gsize maxlen)
 
   if (pktsiz == 0)
   {
-    sknet_util_log_msg ("sknet_net_recv", "Soft error", "End-of-File");
+    g_snprintf(ch, sizeof(ch),"Soft Error on ioc=%d", g_io_channel_unix_get_fd(ioc));
+    sknet_util_log_msg ("sknet_net_recv", ch, "No message available");
     return 0;                   /* soft EOF */
   }
 
@@ -2440,16 +2453,20 @@ static void sknet_net_close (GIOChannel *ioc, gboolean b_flush)
 {
   int sockfd;
   GError *gerror = NULL;
-
+  GIOStatus  ios = 0;
+  
   sockfd = g_io_channel_unix_get_fd (ioc);
-  g_io_channel_shutdown (ioc, b_flush, &gerror);
+  ios = g_io_channel_shutdown (ioc, b_flush, &gerror);
   if (gerror != NULL)
   {
     sknet_util_log_msg ("sknet_channel_close", "error", gerror->message);
     g_error_free (gerror);
   }
+  if (ios != G_IO_STATUS_NORMAL) {
+      g_message ("net_close: g_io_channel_shutdown(%d) failed with %d", sockfd, ios);      
+  }
+
   g_io_channel_unref (ioc);
-  close (sockfd);
   
   return;
 }
@@ -2622,6 +2639,7 @@ static gint gapc_net_transaction_service(PGAPC_MONITOR pm, gchar * cp_cmd, gchar
 {
    gint n = 0, iflag = 0;
    GIOChannel   *ioc = NULL;
+   gchar  ch[SKNET_STR_ARRAY];
    
    g_return_val_if_fail(pm, -1);
    g_return_val_if_fail(pm->psk, -1);   
@@ -2633,9 +2651,13 @@ static gint gapc_net_transaction_service(PGAPC_MONITOR pm, gchar * cp_cmd, gchar
       return 0;
    }
 
+   g_snprintf (ch, sizeof(ch), "%s Monitor=%d on Channel=%d", 
+               pm->pch_host, pm->cb_monitor_num, g_io_channel_unix_get_fd(ioc));
+   sknet_util_log_msg ("gapc_net_transaction_service", "Entrance", ch);
+   
    n = sknet_net_send( ioc, cp_cmd, g_utf8_strlen(cp_cmd, -1));
    if (n <= 0) {
-      sknet_net_close( ioc, FALSE);
+      sknet_net_close( ioc, TRUE);
       return 0;
    }
 
@@ -2660,7 +2682,9 @@ static gint gapc_net_transaction_service(PGAPC_MONITOR pm, gchar * cp_cmd, gchar
          gapc_util_update_hashtable(pm, pm->psk->ch_session_message);
    }
 
-   sknet_net_close(ioc, FALSE);
+   sknet_net_close(ioc, TRUE);
+
+   sknet_util_log_msg ("gapc_net_transaction_service", "Exit", ch);
 
    return iflag;                   /* count of records received */
 }
@@ -2680,11 +2704,11 @@ static gpointer *gapc_net_thread_qwork(PGAPC_MONITOR pm)
    thread_queue = pm->q_network;
 
    if (pm->psk == NULL) {
-       pm->psk = sknet_net_client_init (pm->pch_host, pm->i_port);
-       if (pm->psk == NULL) {
-            g_async_queue_unref(thread_queue);
-            g_thread_exit(GINT_TO_POINTER(0));
-       }
+      pm->psk = sknet_net_client_init (pm->pch_host, pm->i_port);
+      if (pm->psk == NULL) {
+         g_async_queue_unref(thread_queue);
+         g_thread_exit(GINT_TO_POINTER(0));
+      }
    }
 
    while ((pm = (PGAPC_MONITOR) g_async_queue_pop(thread_queue))) {
@@ -2699,7 +2723,8 @@ static gpointer *gapc_net_thread_qwork(PGAPC_MONITOR pm)
             continue;
          }
 
-         if ((rc = gapc_net_transaction_service(pm, "status", pm->pach_status))) {
+         rc = gapc_net_transaction_service(pm, "status", pm->pach_status);
+         if (rc > 0) {
             gapc_net_transaction_service(pm, "events", pm->pach_events);
          }
          g_mutex_unlock(pm->gm_update);
@@ -4080,7 +4105,7 @@ static gboolean gapc_util_load_icons(PGAPC_CONFIG pcfg)
    gchar pch_file[GAPC_MAX_ARRAY];
    gchar *pch_2 = "./";
    gchar *pch_3 = "../pixmaps/";
-   gchar *pch_4 = "/usr/share/pixmaps/";
+   gchar *pch_4 = NULL;
    gchar *pch_image_names[] = {
       "online.png",
       "onbatt.png",
@@ -4092,6 +4117,9 @@ static gboolean gapc_util_load_icons(PGAPC_CONFIG pcfg)
    };
 
    g_return_val_if_fail(pcfg != NULL, FALSE);
+
+   /* build system path for icons */
+   pch_4 = g_strconcat (ICON_DIR, "/share/pixmaps/", NULL);
 
    i_x = 0;
    while (i_x == 0) {
@@ -4124,7 +4152,8 @@ static gboolean gapc_util_load_icons(PGAPC_CONFIG pcfg)
    if (i_x == 0) {
       gapc_util_log_app_msg("gapc_util_load_icons", "Unable to find icons",
          "--load failed!");
-      return FALSE;
+     g_free (pch_4);
+     return FALSE;
    }
 
    for (x = 0; (pch_image_names[x] != NULL) && (x < GAPC_N_ICONS); x++) {
@@ -4165,6 +4194,7 @@ static gboolean gapc_util_load_icons(PGAPC_CONFIG pcfg)
       }
    }
 
+   g_free (pch_4);
    return b_rc;
 }
 
@@ -5459,7 +5489,7 @@ static gint gapc_monitor_history_page(PGAPC_MONITOR pm, GtkWidget * notebook)
     * Prepare the environment */
    pphs->gp = (gpointer) pm;
    pphs->d_xinc = pm->d_refresh * pm->d_graph;
-   lg_graph_debug = FALSE;
+   /* lg_graph_debug = FALSE; */
 
    for (h_index = 0; h_index < GAPC_LINEGRAPH_MAX_SERIES; h_index++) {
       if (pm->phs.sq[h_index].gm_graph != NULL) {
