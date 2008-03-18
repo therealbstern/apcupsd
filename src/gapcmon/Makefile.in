@@ -24,7 +24,7 @@ gapcmon: $(gapcmon_OBJS)
 	$(LD) -o $@ $(gapcmon_OBJS) @GAPCMON_LIBS@ -lX11 -lXext $(X_LIBS) $(X_EXTRA_LIBS)
 
 gapcmon.o: gapcmon.c 
-	$(CC) -c $(CFLAGS) @GAPCMON_CFLAGS@ $(X_CFLAGS) $<
+	$(CC) -c $(CFLAGS) @GAPCMON_CFLAGS@ -DICON_DIR=\"$(DESTDIR)$(prefix)\" $(X_CFLAGS) $<
 
 eggtrayicon.o: eggtrayicon.c  
 	$(CC) -c $(CFLAGS) @GAPCMON_CFLAGS@ $(X_CFLAGS) $<
