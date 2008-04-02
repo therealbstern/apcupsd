@@ -25,16 +25,11 @@ MAKE = @MAKE@
 SHELL = @SHELL@
 RANLIB = @RANLIB@
 AR = @AR@
-LIBTOOL = @LIBTOOL@
 INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 MKINSTALLDIRS = @MKINSTALLDIRS@
-ETAGS = @ETAGS@
-CTAGS = @CTAGS@
-GENCAT = @GENCAT@
-MSGFMT = @MSGFMT@
 
 
 # Files and directories (paths)
@@ -58,7 +53,7 @@ VPATH = /usr/lib:/usr/local/lib
 srcdir = @srcdir@
 
 # Absolute top srcdir
-abssrcdir = @ABSSRCDIR@
+abstopdir = @ABSSRCDIR@
 
 # Directory in which to install.
 sbindir = @sbindir@
@@ -81,17 +76,37 @@ DEFS = @EXTRADEFS@ $(LOCALDEFS)
 
 # Libraries
 APCLIBS = $(topdir)/src/lib/libapc.a
-APCDRVLIBS = $(topdir)/src/drivers/libdrivers.a
+APCDRVLIBS = $(topdir)/src/drivers/libdrivers.a @APCDRVLIBS@
 DRVLIBS = @PTHREAD_LFLAGS@ @DRVLIBS@
-INTLLIBS = @INTLLIBS@
 X_LIBS = @X_LIBS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 
-
-# Made INCFLAGS relative to the topdir and hardcoded into the Makefiles
-# For GDINCLUDE see src/cgi/Makefile.in
-INCFLAGS = $(GDINCLUDE) -I$(topdir)/include $(EXTRAINCS)
+INCFLAGS = -I$(topdir)/include $(EXTRAINCS)
 CFLAGS = @CFLAGS@ @PTHREAD_CFLAGS@ $(INCFLAGS)
 CPPFLAGS = @CPPFLAGS@ $(CFLAGS)
 LDFLAGS = @LDFLAGS@
-LIBS = $(APCLIBS) $(INTLLIBS) @LIBS@
+LIBS = @LIBS@
+LIBGD = @GD_LIBS@
+POWERLIBS = @POWERLIBS@
+GAPCMON_CFLAGS = @GAPCMON_CFLAGS@
+GAPCMON_LIBS = @GAPCMON_LIBS@
+LIBEXTRAOBJ = @LIBEXTRAOBJ@
+
+# Driver and package enable flags
+SMARTDRV   := @APCSMART_DRIVER@
+DUMBDRV    := @DUMB_DRIVER@
+USBDRV     := @USB_DRIVER@
+NETDRV     := @NET_DRIVER@
+PCNETDRV   := @PCNET_DRIVER@
+SNMPDRV    := @SNMP_DRIVER@
+TESTDRV    := @TEST_DRIVER@
+USBTYPE    := @USB_TYPE@
+CGIDIR     := @CGI@
+USBHIDDIR  := @LIBUSBHID@
+POWERFLUTE := @POWERFLUTE@
+GAPCMON    := @GAPCMON@
+
+OBJDIR = .obj
+DEPDIR = .deps
+df = $(DEPDIR)/$(*F)
+DEVNULL := >/dev/null 2>&1
