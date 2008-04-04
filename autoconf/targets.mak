@@ -61,7 +61,7 @@ all-targets:
 clean:
 	$(V)find . -depth \
 	  \( -name $(OBJDIR) -o -name $(DEPDIR) -o -name \*.a \) \
-          -exec echo "  CLEAN "\{\} \; -exec rm -r \{\} \;
+          -exec echo "  CLEAN" \{\} \; -exec rm -r \{\} \;
 
 # Template rule to build a subdirectory
 .PHONY: %_DIR
