@@ -10,7 +10,7 @@ SRCS = $(wildcard *.c)
 CXX = $(CC)
 CFLAGS += $(GAPCMON_CFLAGS)
 CPPFLAGS = $(CFLAGS)
-LIBS = $(GAPCMON_LIBS) $(X_LIBS) -lX11 -lXext
+LIBS := $(GAPCMON_LIBS) $(X_LIBS) -lX11 -lXext $(LIBS)
 
 all-targets: gapcmon
 
