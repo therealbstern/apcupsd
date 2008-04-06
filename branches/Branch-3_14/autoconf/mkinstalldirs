@@ -19,7 +19,7 @@ for file in ${1+"$@"} ; do
      esac
 
      if test ! -d "$pathcomp"; then
-        echo "mkdir $pathcomp" 1>&2
+#       echo "mkdir $pathcomp" 1>&2
         mkdir "$pathcomp" || errstatus=$?
      fi
 

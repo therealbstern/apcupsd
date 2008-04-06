@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS ABSSRCDIR topdir TOP_DIR VERSION DATE TRUEPRG FALSEPRG build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP CXX CXXFLAGS ac_ct_CXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA AWK HAVE_GCC_TRUE HAVE_GCC_FALSE DEBUG DLIB DINCLUDE DRVLIBS APCDRVLIBS PTHREAD_CFLAGS PTHREAD_LFLAGS APCACCESS SMTP APCTEST SHUTDOWN APCUPSD_MAIL WALL SCRIPTSHELL RANLIB RM CP ECHO LN SED AR MV X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS HALPOLICYDIR GDHEAD INSTALL_DISTDIR UNINSTALL_DISTDIR APCSMART_DRIVER DUMB_DRIVER LIBUSBHID LIBUSBHIDINC usbcfg LIBUSBH USB_DRIVER USB_TYPE NET_DRIVER SNMP_DRIVER TEST_DRIVER PCNET_DRIVER NISIP PKG_CONFIG ac_pt_PKG_CONFIG GAPCMON_CFLAGS GAPCMON_LIBS GAPCMON POWERFLUTE POWERLIBS MAKE LD CGI GD_LIBS CGIBIN SYSCONFDIR MKINSTALLDIRS EXTRADEFS LIBEXTRAOBJ EXTRAOBJ DISTNAME DISTVER SERIALDEV PIDDIR LOGDIR nologdir PWRFAILDIR LOCKDIR NISPORT UPSTYPE UPSCABLE HOST LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS ABSSRCDIR topdir TOP_DIR VERSION DATE TRUEPRG FALSEPRG build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP CXX CXXFLAGS ac_ct_CXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA AWK HAVE_GCC_TRUE HAVE_GCC_FALSE DEBUG DLIB DINCLUDE DRVLIBS APCDRVLIBS PTHREAD_CFLAGS PTHREAD_LFLAGS APCACCESS SMTP APCTEST SHUTDOWN APCUPSD_MAIL WALL SCRIPTSHELL RANLIB RM CP ECHO LN SED AR MV X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS HALPOLICYDIR GDHEAD APCSMART_DRIVER DUMB_DRIVER LIBUSBHID LIBUSBHIDINC usbcfg LIBUSBH USB_DRIVER USB_TYPE NET_DRIVER SNMP_DRIVER TEST_DRIVER PCNET_DRIVER NISIP PKG_CONFIG ac_pt_PKG_CONFIG GAPCMON_CFLAGS GAPCMON_LIBS GAPCMON POWERFLUTE POWERLIBS MAKE LD CGI GD_LIBS CGIBIN SYSCONFDIR MKINSTALLDIRS EXTRADEFS LIBEXTRAOBJ EXTRAOBJ DISTDIR DISTNAME DISTVER SERIALDEV PIDDIR LOGDIR nologdir PWRFAILDIR LOCKDIR NISPORT UPSTYPE UPSCABLE HOST LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -873,8 +873,6 @@ Optional Features:
 
   --enable-all            Enable all optional modules
   --enable-cgi            Compile CGI programs
-  --enable-install-distdir
-                          Install distribution
 
   --enable-apcsmart       Compile APC SmartUPS serial driver (default)
   --disable-apcsmart      No APC SmartUPS serial driver
@@ -902,6 +900,8 @@ Optional Features:
 
   --enable-powerflute     Compile powerflute program
   --enable-gapcmon        Build GTK/GUI front-end to apcupsd default=no
+  --enable-install-distdir
+                          Install distribution
 
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
@@ -10558,21 +10558,6 @@ fi
 
 fi;
 
-INSTALL_DISTDIR="install-distdir"
-UNINSTALL_DISTDIR="uninstall-distdir"
-with_distdir="yes"
-# Check whether --enable-install-distdir or --disable-install-distdir was given.
-if test "${enable_install_distdir+set}" = set; then
-  enableval="$enable_install_distdir"
-   if test "$enableval" = "no" ; then
-        INSTALL_DISTDIR=" "
-        UNINSTALL_DISTDIR=" "
-        with_distdir="no"
-     fi
-fi;
-
-
-
 
 # Check whether --enable-apcsmart or --disable-apcsmart was given.
 if test "${enable_apcsmart+set}" = set; then
@@ -12807,6 +12792,18 @@ else
    DISTNAME=unknown
 fi
 
+DISTDIR=$DISTNAME
+with_distdir="yes"
+# Check whether --enable-install-distdir or --disable-install-distdir was given.
+if test "${enable_install_distdir+set}" = set; then
+  enableval="$enable_install_distdir"
+   if test "$enableval" = "no" ; then
+        DISTDIR=""
+        with_distdir="no"
+     fi
+fi;
+
+
 
 # Define the default UPS
 UPSTYPE=apcsmart
@@ -13869,8 +13866,6 @@ s,@X_LIBS@,$X_LIBS,;t t
 s,@X_EXTRA_LIBS@,$X_EXTRA_LIBS,;t t
 s,@HALPOLICYDIR@,$HALPOLICYDIR,;t t
 s,@GDHEAD@,$GDHEAD,;t t
-s,@INSTALL_DISTDIR@,$INSTALL_DISTDIR,;t t
-s,@UNINSTALL_DISTDIR@,$UNINSTALL_DISTDIR,;t t
 s,@APCSMART_DRIVER@,$APCSMART_DRIVER,;t t
 s,@DUMB_DRIVER@,$DUMB_DRIVER,;t t
 s,@LIBUSBHID@,$LIBUSBHID,;t t
@@ -13901,6 +13896,7 @@ s,@MKINSTALLDIRS@,$MKINSTALLDIRS,;t t
 s,@EXTRADEFS@,$EXTRADEFS,;t t
 s,@LIBEXTRAOBJ@,$LIBEXTRAOBJ,;t t
 s,@EXTRAOBJ@,$EXTRAOBJ,;t t
+s,@DISTDIR@,$DISTDIR,;t t
 s,@DISTNAME@,$DISTNAME,;t t
 s,@DISTVER@,$DISTVER,;t t
 s,@SERIALDEV@,$SERIALDEV,;t t

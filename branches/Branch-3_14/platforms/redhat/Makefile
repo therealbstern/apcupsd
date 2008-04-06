@@ -1,0 +1,51 @@
+topdir:=../..
+
+SUBDIRS =
+include $(topdir)/autoconf/targets.mak
+
+all-install: install-redhat
+all-uninstall: uninstall-redhat
+
+install-redhat:
+   # unlink old rc script (if not doing a DESTDIR install)
+	$(if $(DESTDIR),,$(V)/sbin/chkconfig --del apcupsd)
+   # install new rc script
+	$(call MKDIR,/etc/rc.d/init.d)
+	$(call INSTDATA,744,apcupsd,/etc/rc.d/init.d)
+   # link new rc script (if not doing a DESTDIR install)
+	$(if $(DESTDIR),,$(V)/sbin/chkconfig --add apcupsd)
+   # save old halt script
+	@echo "  CP  " /etc/rc.d/init.d/halt =\> $(DESTDIR)/etc/rc.d/init.d/halt.old
+	$(V)cp -f /etc/rc.d/init.d/halt $(DESTDIR)/etc/rc.d/init.d/halt.old
+   # insert apcupsd callout into halt script
+	@echo "  AWK " $(DESTDIR)/etc/rc.d/init.d/halt
+	$(V)awk -f awkhaltprog $(DESTDIR)/etc/rc.d/init.d/halt.old >$(DESTDIR)/etc/rc.d/init.d/halt
+	$(V)chmod 744 $(DESTDIR)/etc/rc.d/init.d/halt
+	@echo "================================================="
+	@echo " "
+	@echo "apcupsd script installation for RedHat $(DISTVER) complete." 
+	@echo " "
+	@echo "You should now edit  /etc/apcupsd/apcupsd.conf  to correspond"
+	@echo "to your setup then start the apcupsd daemon with:"
+	@echo " "
+	@echo "/etc/rc.d/init.d/apcupsd start"
+	@echo " "
+	@echo "thereafter when you reboot, it will be stopped and started"
+	@echo "automatically."
+	@echo " "
+	@echo "Please check that your halt script in:"
+	@echo "    /etc/rc.d/init.d/halt"
+	@echo "was properly updated (see installation section of manual)"
+	@echo " "
+	@echo "================================================="
+
+uninstall-redhat:
+   # unlink old rc script (if not doing a DESTDIR install)
+	$(if $(DESTDIR),,$(V)/sbin/chkconfig --del apcupsd)
+	$(call UNINST,/etc/rc.d/init.d/apcupsd)
+	@echo "  CP  " $(DESTDIR)/etc/rc.d/init.d/halt.old =\> $(DESTDIR)/etc/rc.d/init.d/halt
+	$(V)cp -f $(DESTDIR)/etc/rc.d/init.d/halt.old $(DESTDIR)/etc/rc.d/init.d/halt
+	$(call UNINST,/etc/rc.d/init.d/halt.old)
+
+# Include dependencies
+-include $(SRCS:%.c=$(DEPDIR)/%.P)
