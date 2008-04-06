@@ -67,6 +67,17 @@ manext = 8
 # Manual directory
 mandir=@mandir@
 
+# User binary directory
+bindir = @bindir@
+
+# Read-only arch independent data
+datadir = @datadir@
+
+# Directory for HAL policy file
+HALPOLICYDIR = @HALPOLICYDIR@
+
+# Distribution-specific source directory
+DISTDIR = @DISTDIR@
 
 # Compilation macros.
 CC = @CC@

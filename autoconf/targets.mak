@@ -56,6 +56,36 @@ all: all-subdirs
 all-targets:
 	@#
 
+# standard install target: Depends on subdirs to force recursion,
+# then reinvokes make to install local targets. Same logic as 'all'.
+.PHONY: install
+install: all-subdirs
+	$(VV)+$(MAKE) $(NPD) all-install
+
+# 'all-install' is extended by lower-level Makefile. It minimally
+# depends on all targets being built. Lower-level Makefile adds install
+# actions and other dependencies, if needed.
+.PHONY: all-install
+all-install: all-targets
+
+# no-op targets for use by lower-level Makefiles when a particular
+# component is not being installed.
+.PHONY: install- uninstall-
+install-:
+uninstall-:
+
+# standard uninstall target: Depends on subdirs to force recursion,
+# then reinvokes make to uninstall local targets. Same logic as 'install'.
+.PHONY: uninstall
+uninstall: all-subdirs
+	$(VV)+$(MAKE) $(NPD) all-uninstall
+
+# 'all-uninstall' is extended by lower-level Makefiles to perform 
+# any required uninstall actions.
+.PHONY: all-uninstall
+all-uninstall:
+	@#
+
 # Typical clean target: Remove all objects and dependency files.
 .PHONY: clean
 clean:
@@ -109,4 +139,49 @@ define ARCHIVE
 	$(VV)rm -f $(1)
 	$(V)$(AR) rc $(1) $(2)
 	$(V)$(RANLIB) $(1)
+endef
+
+# Rule to create a directory during install
+define MKDIR
+   $(if $(wildcard $(DESTDIR)$(1)),, \
+      @echo "  MKDIR" $(DESTDIR)$(1))
+   $(if $(wildcard $(DESTDIR)$(1)),, \
+     $(V)$(MKINSTALLDIRS) $(DESTDIR)$(1))
+endef
+
+# Install a program file, given mode, src, and dest
+define INSTPROG
+   @echo "  INST " $(2) =\> $(DESTDIR)$(3)
+   $(V)$(INSTALL_PROGRAM) $(STRIP) -m $(1) $(2) $(DESTDIR)$(3)
+endef
+
+# Install a data file, given mode, src, and dest
+define INSTDATA
+   @echo "  INST " $(2) =\> $(DESTDIR)$(3) ;
+   $(V)$(INSTALL_DATA) -m $(1) $(2) $(DESTDIR)$(3) ;
+endef
+
+# Install a data file, given mode, src, and dest.
+# Existing dest file is preserved; new file is named *.new if dest exists.
+define INSTNEW
+   @echo "  INST " $(notdir $(2)) =\> $(DESTDIR)$(3)/$(notdir $(2))$(if $(wildcard $(DESTDIR)$(3)/$(notdir $(2))),.new,)
+   $(V)$(INSTALL_DATA) -m $(1) $(2) $(DESTDIR)$(3)/$(notdir $(2))$(if $(wildcard $(DESTDIR)$(3)/$(notdir $(2))),.new,)
+endef
+
+# Install a data file, given mode, src, and dest.
+# Existing dest file is renamed to *.orig if it exists.
+define INSTORIG
+   $(if $(wildcard $(DESTDIR)$(3)/$(notdir $(2))), \
+      @echo "  MV   " $(DESTDIR)$(3)/$(notdir $(2)) =\> \
+         $(DESTDIR)$(3)/$(notdir $(2)).orig,)
+   $(if $(wildcard $(DESTDIR)$(3)/$(notdir $(2))), \
+      $(V)mv $(DESTDIR)$(3)/$(notdir $(2)) $(DESTDIR)$(3)/$(notdir $(2)).orig,)
+   @echo "  INST " $(notdir $(2)) =\> $(DESTDIR)$(3)/$(notdir $(2))
+   $(V)$(INSTALL_SCRIPT) -m $(1) $(2) $(DESTDIR)$(3) ;
+endef
+
+# Uninstall a file
+define UNINST
+   @echo "  RM   " $(DESTDIR)$(1)
+   $(V)$(RMF) $(DESTDIR)$(1)
 endef

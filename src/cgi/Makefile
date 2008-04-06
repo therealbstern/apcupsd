@@ -30,5 +30,31 @@ upsfstats.cgi: $(common_obj) $(upsfstats_obj) $(APCLIBS)
 upsimage.cgi: $(common_obj) $(upsimage_obj) $(APCLIBS)
 	$(LINK) $(LIBGD)
 
+all-install: install-cgi
+all-uninstall: uninstall-cgi
+
+install-cgi:
+	$(call MKDIR,$(cgibin))
+	$(call INSTPROG,755,multimon.cgi,$(cgibin))
+	$(call INSTPROG,755,upsstats.cgi,$(cgibin))
+	$(call INSTPROG,755,upsfstats.cgi,$(cgibin))
+	$(call INSTPROG,755,upsimage.cgi,$(cgibin))
+	$(call MKDIR,$(sysconfdir))
+	$(call INSTNEW,644,apcupsd.css,$(sysconfdir))
+	$(call INSTNEW,644,$(topdir)/platforms/etc/hosts.conf,$(sysconfdir))
+	$(call INSTNEW,644,$(topdir)/platforms/etc/multimon.conf,$(sysconfdir))
+
+uninstall-cgi:
+	$(call UNINST,$(cgibin)/multimon.cgi)
+	$(call UNINST,$(cgibin)/upsstats.cgi)
+	$(call UNINST,$(cgibin)/upsfstats.cgi)
+	$(call UNINST,$(cgibin)/upsimage.cgi)
+	$(call UNINST,$(sysconfdir)/apcupsd.css)
+	$(call UNINST,$(sysconfdir)/apcupsd.css.new)
+	$(call UNINST,$(sysconfdir)/hosts.conf)
+	$(call UNINST,$(sysconfdir)/hosts.conf.new)
+	$(call UNINST,$(sysconfdir)/multimon.conf)
+	$(call UNINST,$(sysconfdir)/multimon.conf.new)
+
 # Include dependencies
 -include $(SRCS:%.c=$(DEPDIR)/%.P)

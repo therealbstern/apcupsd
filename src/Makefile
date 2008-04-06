@@ -41,5 +41,27 @@ smtp: $(smtp_obj) $(APCLIBS)
 powerflute: $(powerflute_obj) $(APCLIBS)
 	$(LINK) $(POWERLIBS)
 
+all-install: install-base install-$(POWERFLUTE)
+all-uninstall: uninstall-base uninstall-$(POWERFLUTE)
+
+install-base:
+	$(call MKDIR,$(sbindir))
+	$(call INSTPROG,700,apcupsd,$(sbindir)/apcupsd)
+	$(call INSTPROG,700,apctest,$(sbindir)/apctest)
+	$(call INSTPROG,755,apcaccess,$(sbindir)/apcaccess)
+	$(call INSTPROG,755,smtp,$(sbindir)/smtp)
+
+install-powerflute:
+	$(call INSTPROG,755,powerflute,$(sbindir)/powerflute)
+
+uninstall-base:
+	$(call UNINST,$(sbindir)/apcupsd)
+	$(call UNINST,$(sbindir)/apctest)
+	$(call UNINST,$(sbindir)/apcaccess)
+	$(call UNINST,$(sbindir)/smtp)
+
+uninstall-powerflute:
+	$(call UNINST,$(sbindir)/powerflute)
+
 # Include dependencies
 -include $(SRCS:%.c=$(DEPDIR)/%.P)
