@@ -1,35 +1,22 @@
-# Makefile template
-#
-# Copyright (C) 1999-2002 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
-#
+topdir:=../..
 
-# Default variables
-@VARIABLES@
-# TOP source directory.
-topdir = @topdir@
-top_builddir = $(topdir)
-
-# Include the default make targets: to be put before the all-targets: rule.
-@TARGETS@
+SUBDIRS =
+include $(topdir)/autoconf/targets.mak
 
 # PackageMaker variables
 PACKAGEMAKER=/Developer/Tools/packagemaker
 PKGROOT=/tmp/apcupsd-pkg
 
-all-targets: Makefile
+all-install: install-darwin install-$(USBDRV)
+all-uninstall: uninstall-darwin
 
-install: install-exec install-@USB_DRIVER@
-
-install-:
-
-install-exec:
-	@echo "Installing apcupsd startup script..."
-	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)/Library/StartupItems/apcupsd
-	$(INSTALL_SCRIPT) ./apcupsd $(DESTDIR)/Library/StartupItems/apcupsd;
-	$(INSTALL_DATA) ./StartupParameters.plist $(DESTDIR)/Library/StartupItems/apcupsd;
-	chown root:wheel $(DESTDIR)/Library/StartupItems/apcupsd
-	chown root:wheel $(DESTDIR)/Library/StartupItems/apcupsd/apcupsd
-	chown root:wheel $(DESTDIR)/Library/StartupItems/apcupsd/StartupParameters.plist
+install-darwin:
+	$(call MKDIR,/Library/StartupItems/apcupsd)
+	$(call INSTDATA,744,apcupsd,/Library/StartupItems/apcupsd)
+	$(call INSTDATA,444,StartupParameters.plist,/Library/StartupItems/apcupsd)
+	-$(V)chown root:wheel $(DESTDIR)/Library/StartupItems/apcupsd
+	-$(V)chown root:wheel $(DESTDIR)/Library/StartupItems/apcupsd/apcupsd
+	-$(V)chown root:wheel $(DESTDIR)/Library/StartupItems/apcupsd/StartupParameters.plist
 	@echo "================================================="
 	@echo " "
 	@echo "apcupsd script installation for MacOS X (Darwin) complete." 
@@ -55,17 +42,15 @@ install-exec:
 	@echo "================================================="
 
 install-usb:
-	@echo "Installing ApcupsdDummy.kext driver..."
-	@$(SHELL) $(MKINSTALLDIRS) $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext/Contents
-	cp ./Info.plist $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext/Contents
-	chown root:wheel $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext
-	chown root:wheel $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext/Contents
-	chown root:wheel $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext/Contents/Info.plist
-	chmod 755 $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext
-	chmod 755 $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext/Contents
-	chmod 644 $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext/Contents/Info.plist
-	rm -f $(DESTDIR)/System/Library/Extensions.mkext
-	rm -f $(DESTDIR)/System/Library/Extensions.kextcache
+	$(call MKDIR,/System/Library/Extensions/ApcupsdDummy.kext/Contents)
+	-$(V)chown root:wheel $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext
+	-$(V)chown root:wheel $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext/Contents
+	$(V)chmod 755 $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext
+	$(V)chmod 755 $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext/Contents
+	$(call INSTDATA,644,Info.plist,/System/Library/Extensions/ApcupsdDummy.kext/Contents)
+	-$(V)chown root:wheel $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext/Contents/Info.plist
+	$(call UNINST,/System/Library/Extensions.mkext)
+	$(call UNINST,/System/Library/Extensions.kextcache)
 	@echo "================================================="
 	@echo " "
 	@echo "Driver installation complete." 
@@ -73,11 +58,11 @@ install-usb:
 	@echo " "
 	@echo "================================================="
 
-uninstall:
-	rm -rf $(DESTDIR)/Library/StartupItems/apcupsd
-	rm -rf $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext
-	rm -f $(DESTDIR)/System/Library/Extensions.mkext
-	rm -f $(DESTDIR)/System/Library/Extensions.kextcache
+uninstall-darwin:
+	$(call UNINST,/Library/StartupItems/apcupsd)
+	$(call UNINST,/System/Library/Extensions/ApcupsdDummy.kext)
+	$(call UNINST,/System/Library/Extensions.mkext)
+	$(call UNINST,/System/Library/Extensions.kextcache)
 	@echo "================================================="
 	@echo " "
 	@echo "Please REBOOT to complete uninstall." 
@@ -107,8 +92,5 @@ apcupsd.pkg:
 	$(PACKAGEMAKER) -build -v -p $(PKGROOT)/Apcupsd/Apcupsd-$(VERSION).pkg -mi $(PKGROOT)/Packages -r $(PKGROOT)/ApcupsdPkg.Resources -i ApcupsdPkg.Info.plist -d ApcupsdPkg.Description.plist
 	hdiutil create -ov -srcfolder $(PKGROOT)/Apcupsd -volname Apcupsd-$(VERSION) Apcupsd-$(VERSION).dmg
 
-clean:
-
-distclean:
-	@rm -f apcupsd Makefile
-	@rm -rf CVS
+# Include dependencies
+-include $(SRCS:%.c=$(DEPDIR)/%.P)

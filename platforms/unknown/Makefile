@@ -1,35 +1,24 @@
-# Makefile template
-#
-# Copyright (C) 1999-2002 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
-#
+topdir:=../..
 
-# Default variables
-@VARIABLES@
-# TOP source directory.
-topdir = @topdir@
-top_builddir = $(topdir)
+SUBDIRS =
+include $(topdir)/autoconf/targets.mak
 
-# Include the default make targets: to be put before the all-targets: rule.
-@TARGETS@
+all-install: install-unknown
+all-uninstall: uninstall-unknown
 
-all-targets: Makefile
-
-install:
+install-unknown:
 	@echo "Unknown distribution"
 	@echo "You have to manually install apcupsd boot script and"
 	@echo "halt script for clean emergency shutdown."
 	@echo "Please contribute your distribution install to apcupsd team."
 	@echo "I'm sorry: you are on your own."
 
-uninstall:
+uninstall-unknown:
 	@echo "Unknown distribution"
 	@echo "You have to manually uninstall apcupsd boot script and"
 	@echo "halt script."
 	@echo "Please contribute your distribution install to apcupsd team."
 	@echo "I'm sorry: you are on your own."
 
-clean:
-
-distclean:
-	@rm -f apcupsd Makefile
-	@rm -rf CVS
+# Include dependencies
+-include $(SRCS:%.c=$(DEPDIR)/%.P)

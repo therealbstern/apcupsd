@@ -3,47 +3,47 @@ topdir:=../..
 SUBDIRS =
 include $(topdir)/autoconf/targets.mak
 
-all-install: install-redhat
-all-uninstall: uninstall-redhat
+all-install: install-engarde
+all-uninstall: uninstall-engarde
 
-install-redhat:
+install-engarde:
    # unlink old rc script (if not doing a DESTDIR install)
 	$(if $(DESTDIR),,$(V)/sbin/chkconfig --del apcupsd)
    # install new rc script
-	$(call MKDIR,/etc/rc.d/init.d)
-	$(call INSTDATA,744,apcupsd,/etc/rc.d/init.d)
+	$(call MKDIR,/etc/init.d)
+	$(call INSTDATA,744,apcupsd,/etc/init.d)
    # link new rc script (if not doing a DESTDIR install)
 	$(if $(DESTDIR),,$(V)/sbin/chkconfig --add apcupsd)
    # save old halt script
-	$(call COPY,/etc/rc.d/init.d/halt,/etc/rc.d/init.d/halt.old)
+	$(call COPY,/etc/init.d/halt,/etc/init.d/halt.old)
    # insert apcupsd callout into halt script
-	@echo "  AWK  " $(DESTDIR)/etc/rc.d/init.d/halt
-	$(V)awk -f awkhaltprog $(DESTDIR)/etc/rc.d/init.d/halt.old >$(DESTDIR)/etc/rc.d/init.d/halt
-	$(V)chmod 744 $(DESTDIR)/etc/rc.d/init.d/halt
+	@echo "  AWK  " $(DESTDIR)/etc/init.d/halt
+	$(V)awk -f awkhaltprog $(DESTDIR)/etc/init.d/halt.old >$(DESTDIR)/etc/init.d/halt
+	$(V)chmod 744 $(DESTDIR)/etc/init.d/halt
 	@echo "================================================="
 	@echo " "
-	@echo "apcupsd script installation for RedHat $(DISTVER) complete." 
+	@echo "apcupsd script installation for Engarde Secure Linux complete." 
 	@echo " "
 	@echo "You should now edit  /etc/apcupsd/apcupsd.conf  to correspond"
 	@echo "to your setup then start the apcupsd daemon with:"
 	@echo " "
-	@echo "/etc/rc.d/init.d/apcupsd start"
+	@echo "/etc/init.d/apcupsd start"
 	@echo " "
 	@echo "thereafter when you reboot, it will be stopped and started"
 	@echo "automatically."
 	@echo " "
 	@echo "Please check that your halt script in:"
-	@echo "    /etc/rc.d/init.d/halt"
+	@echo "    /etc/init.d/halt"
 	@echo "was properly updated (see installation section of manual)"
 	@echo " "
 	@echo "================================================="
 
-uninstall-redhat:
+uninstall-engarde:
    # unlink old rc script (if not doing a DESTDIR install)
 	$(if $(DESTDIR),,$(V)/sbin/chkconfig --del apcupsd)
-	$(call UNINST,/etc/rc.d/init.d/apcupsd)
-	$(call COPY,$(DESTDIR)/etc/rc.d/init.d/halt.old,/etc/rc.d/init.d/halt)
-	$(call UNINST,/etc/rc.d/init.d/halt.old)
+	$(call UNINST,/etc/init.d/apcupsd)
+	$(call COPY,$(DESTDIR)/etc/init.d/halt.old,/etc/init.d/halt)
+	$(call UNINST,/etc/init.d/halt.old)
 
 # Include dependencies
 -include $(SRCS:%.c=$(DEPDIR)/%.P)

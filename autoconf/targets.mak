@@ -180,6 +180,18 @@ define INSTORIG
    $(V)$(INSTALL_SCRIPT) -m $(1) $(2) $(DESTDIR)$(3) ;
 endef
 
+# Make a symlink
+define SYMLINK
+   @echo "  LN   " $(DESTDIR)/$(2) -\> $(1)
+   $(V)ln -sf $(1) $(DESTDIR)/$(2)
+endef
+
+# Copy a file
+define COPY
+   @echo "  CP   " $(1) =\> $(DESTDIR)/$(2)
+   $(V)cp -f $(1) $(DESTDIR)/$(2)
+endef
+
 # Uninstall a file
 define UNINST
    @echo "  RM   " $(DESTDIR)$(1)
