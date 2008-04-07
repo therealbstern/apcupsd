@@ -1210,7 +1210,6 @@ redhat)
       DISTVER=`cat /etc/redhat-release | grep release | cut -f 5 -d ' '`
    fi
    DFILES="\
-      platforms/redhat/Makefile \
       platforms/redhat/apcupsd \
       platforms/redhat/apcupsd.spec \
       platforms/redhat/awkhaltprog"

@@ -9609,7 +9609,7 @@ case $host in
       HALPOLICYDIR="/usr/share/hal/fdi/policy/20thirdparty"
       ;;
    *)
-      HALPOLICYDIR="no"
+      HALPOLICYDIR=""
       ;;
 esac
 
@@ -9620,7 +9620,7 @@ if test "${with_halpolicydir+set}" = set; then
   HALPOLICYDIR=$withval
 fi;
 
-if test "x$HALPOLICYDIR" != "xno" ; then
+if test "x$HALPOLICYDIR" != "x" ; then
    echo "$as_me:$LINENO: result: Using halpolicydir=$HALPOLICYDIR" >&5
 echo "${ECHO_T}Using halpolicydir=$HALPOLICYDIR" >&6
 else
@@ -12948,7 +12948,6 @@ redhat)
       DISTVER=`cat /etc/redhat-release | grep release | cut -f 5 -d ' '`
    fi
    DFILES="\
-      platforms/redhat/Makefile \
       platforms/redhat/apcupsd \
       platforms/redhat/apcupsd.spec \
       platforms/redhat/awkhaltprog"
