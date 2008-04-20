@@ -2438,19 +2438,24 @@ static gint sknet_net_recv (GIOChannel * ioc, gchar * buff, gsize maxlen)
 */
 static void sknet_net_close (GIOChannel *ioc, gboolean b_flush)
 {
-  int sockfd;
-  GError *gerror = NULL;
+    int sockfd =0;
+    GError *gerror = NULL;
+    GIOStatus  ios = G_IO_STATUS_NORMAL;
+    
+    sockfd = g_io_channel_unix_get_fd (ioc);
+    ios = g_io_channel_shutdown (ioc, b_flush, &gerror);
+    if (gerror != NULL)
+    {
+      sknet_util_log_msg ("sknet_channel_close", "error", gerror->message);
+      g_error_free (gerror);
+    }
+    if (ios != G_IO_STATUS_NORMAL) {
+        g_message ("net_close: g_io_channel_shutdown(%d) failed with %d", sockfd, ios);      
+    }
 
-  sockfd = g_io_channel_unix_get_fd (ioc);
-  g_io_channel_shutdown (ioc, b_flush, &gerror);
-  if (gerror != NULL)
-  {
-    sknet_util_log_msg ("sknet_channel_close", "error", gerror->message);
-    g_error_free (gerror);
-  }
-  g_io_channel_unref (ioc);
-  close (sockfd);
-  
+    g_io_channel_unref (ioc);
+    
+
   return;
 }
 
@@ -2635,7 +2640,7 @@ static gint gapc_net_transaction_service(PGAPC_MONITOR pm, gchar * cp_cmd, gchar
 
    n = sknet_net_send( ioc, cp_cmd, g_utf8_strlen(cp_cmd, -1));
    if (n <= 0) {
-      sknet_net_close( ioc, FALSE);
+      sknet_net_close( ioc, TRUE);
       return 0;
    }
 
@@ -2660,7 +2665,7 @@ static gint gapc_net_transaction_service(PGAPC_MONITOR pm, gchar * cp_cmd, gchar
          gapc_util_update_hashtable(pm, pm->psk->ch_session_message);
    }
 
-   sknet_net_close(ioc, FALSE);
+   sknet_net_close(ioc, TRUE);
 
    return iflag;                   /* count of records received */
 }
@@ -4073,99 +4078,104 @@ static GtkWidget *gapc_panel_monitors_model_init(PGAPC_CONFIG pcfg)
 */
 static gboolean gapc_util_load_icons(PGAPC_CONFIG pcfg)
 {
-   guint i_x = 0, x = 0;
-   GError *gerror = NULL;
-   GdkPixbuf *pixbuf = NULL;
-   gboolean b_rc = TRUE;
-   gchar pch_file[GAPC_MAX_ARRAY];
-   gchar *pch_2 = "./";
-   gchar *pch_3 = "../pixmaps/";
-   gchar *pch_4 = "/usr/share/pixmaps/";
-   gchar *pch_image_names[] = {
-      "online.png",
-      "onbatt.png",
-      "charging.png",
-      "apcupsd.png",
-      "unplugged.png",
-      "gapc_prefs.png",
-      NULL
-   };
+    guint i_x = 0, x = 0;
+    GError *gerror = NULL;
+    GdkPixbuf *pixbuf = NULL;
+    gboolean b_rc = TRUE;
+    gchar pch_file[GAPC_MAX_ARRAY];
+    gchar *pch_2 = "./";
+    gchar *pch_3 = "../pixmaps/";
+    gchar *pch_4 = NULL;
+    gchar *pch_image_names[] = {
+       "online.png",
+       "onbatt.png",
+       "charging.png",
+       "apcupsd.png",
+       "unplugged.png",
+       "gapc_prefs.png",
+       NULL
+    };
 
-   g_return_val_if_fail(pcfg != NULL, FALSE);
+    g_return_val_if_fail(pcfg != NULL, FALSE);
 
-   i_x = 0;
-   while (i_x == 0) {
-      if (g_file_test(pch_image_names[0], G_FILE_TEST_EXISTS)) {
-         i_x = 1;
-         break;
-      }
+    /* build system path for icons */
+    pch_4 = g_strconcat (ICON_DIR, "/pixmaps/", NULL);
 
-      g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s%s", pch_2, pch_image_names[0]);
-      if (g_file_test(pch_file, G_FILE_TEST_EXISTS)) {
-         i_x = 2;
-         break;
-      }
+    i_x = 0;
+    while (i_x == 0) {
+       if (g_file_test(pch_image_names[0], G_FILE_TEST_EXISTS)) {
+          i_x = 1;
+          break;
+       }
 
-      g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s%s", pch_3, pch_image_names[0]);
-      if (g_file_test(pch_file, G_FILE_TEST_EXISTS)) {
-         i_x = 3;
-         break;
-      }
+       g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s%s", pch_2, pch_image_names[0]);
+       if (g_file_test(pch_file, G_FILE_TEST_EXISTS)) {
+          i_x = 2;
+          break;
+       }
 
-      g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s%s", pch_4, pch_image_names[0]);
-      if (g_file_test(pch_file, G_FILE_TEST_EXISTS)) {
-         i_x = 4;
-         break;
-      }
+       g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s%s", pch_3, pch_image_names[0]);
+       if (g_file_test(pch_file, G_FILE_TEST_EXISTS)) {
+          i_x = 3;
+          break;
+       }
 
-      break;
-   }
+       g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s%s", pch_4, pch_image_names[0]);
+       if (g_file_test(pch_file, G_FILE_TEST_EXISTS)) {
+          i_x = 4;
+          break;
+       }
 
-   if (i_x == 0) {
-      gapc_util_log_app_msg("gapc_util_load_icons", "Unable to find icons",
-         "--load failed!");
+       break;
+    }
+
+    if (i_x == 0) {
+       gapc_util_log_app_msg("gapc_util_load_icons", "Unable to find icons",
+          "--load failed!");
+      g_free (pch_4);
       return FALSE;
-   }
+    }
 
-   for (x = 0; (pch_image_names[x] != NULL) && (x < GAPC_N_ICONS); x++) {
-      switch (i_x) {
-      case 1:
-         g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s", pch_image_names[x]);
-         break;
-      case 2:
-         g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s%s", pch_2, pch_image_names[x]);
-         break;
-      case 3:
-         g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s%s", pch_3, pch_image_names[x]);
-         break;
-      case 4:
-         g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s%s", pch_4, pch_image_names[x]);
-         break;
-      default:
-         g_return_val_if_reached(FALSE);
-         break;
-      }
+    for (x = 0; (pch_image_names[x] != NULL) && (x < GAPC_N_ICONS); x++) {
+       switch (i_x) {
+       case 1:
+          g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s", pch_image_names[x]);
+          break;
+       case 2:
+          g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s%s", pch_2, pch_image_names[x]);
+          break;
+       case 3:
+          g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s%s", pch_3, pch_image_names[x]);
+          break;
+       case 4:
+          g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s%s", pch_4, pch_image_names[x]);
+          break;
+       default:
+          g_return_val_if_reached(FALSE);
+          break;
+       }
 
-      pixbuf = gdk_pixbuf_new_from_file(pch_file, &gerror);
-      if (gerror != NULL) {
-         gchar *pch = NULL;
+       pixbuf = gdk_pixbuf_new_from_file(pch_file, &gerror);
+       if (gerror != NULL) {
+          gchar *pch = NULL;
 
-         pch = g_strdup_printf("Get Icon=%s Failed", pch_file);
-         gapc_util_log_app_msg("gapc_util_load_icons", pch, gerror->message);
-         g_error_free(gerror);
-         g_free(pch);
-         gerror = NULL;
-         b_rc = FALSE;
-         pcfg->my_icons[x] = NULL;
-      } else {
-         pcfg->my_icons[x] =
-            gdk_pixbuf_scale_simple(pixbuf, GAPC_ICON_SIZE, GAPC_ICON_SIZE,
-            GDK_INTERP_BILINEAR);
-         g_object_unref(pixbuf);
-      }
-   }
+          pch = g_strdup_printf("Get Icon=%s Failed", pch_file);
+          gapc_util_log_app_msg("gapc_util_load_icons", pch, gerror->message);
+          g_error_free(gerror);
+          g_free(pch);
+          gerror = NULL;
+          b_rc = FALSE;
+          pcfg->my_icons[x] = NULL;
+       } else {
+          pcfg->my_icons[x] =
+             gdk_pixbuf_scale_simple(pixbuf, GAPC_ICON_SIZE, GAPC_ICON_SIZE,
+             GDK_INTERP_BILINEAR);
+          g_object_unref(pixbuf);
+       }
+    }
 
-   return b_rc;
+    g_free (pch_4);
+    return b_rc;
 }
 
 /* 
