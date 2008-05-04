@@ -13179,6 +13179,7 @@ GENERATE_FILES="\
    platforms/etc/onbattery \
    platforms/etc/apcupsd.conf \
    examples/safe.apccontrol \
+   src/win32/Makefile \
    $DFILES"
 
 if test "$USB_TYPE"x = "generic"x
