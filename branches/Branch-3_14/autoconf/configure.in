@@ -386,7 +386,6 @@ AC_HELP_STRING([--enable-all], [Enable all optional modules])],
       enable_snmp=yes
       enable_test=yes
       enable_pcnet=yes
-      enable_powerflute=yes
       enable_cgi=yes
       enable_gapcmon=yes
    fi], [])
@@ -770,20 +769,20 @@ AC_ARG_WITH(cgi-bin,
 dnl
 dnl   use option --enable-powerflute to compile powerflute
 dnl
-AC_ARG_ENABLE(powerflute, [
-AC_HELP_STRING([--enable-powerflute], [Compile powerflute program])],
-   [ if test "$enableval" = "yes" ; then 
-        AC_CHECK_LIB(ncurses, initscr, [POWERLIBS="-lncurses"],
-           AC_MSG_ERROR([Powerflute requires libncurses.]), [])
-        AC_CHECK_LIB(menu, new_menu, [POWERLIBS="$POWERLIBS -lmenu"],
-           AC_MSG_ERROR([Powerflute requires libncurses.]), [-lncurses])
-        AC_CHECK_LIB(form, new_form, [POWERLIBS="$POWERLIBS -lform"],
-           AC_MSG_ERROR([Powerflute requires libncurses.]), [-lncurses])
-        AC_CHECK_LIB(panel, new_panel, [POWERLIBS="$POWERLIBS -lpanel"],
-           AC_MSG_ERROR([Powerflute requires libncurses.]), [-lncurses])
-        POWERFLUTE="powerflute"
-        AC_DEFINE(HAVE_POWERFLUTE)
-     fi])
+dnl AC_ARG_ENABLE(powerflute, [
+dnl AC_HELP_STRING([--enable-powerflute], [Compile powerflute program])],
+dnl    [ if test "$enableval" = "yes" ; then 
+dnl         AC_CHECK_LIB(ncurses, initscr, [POWERLIBS="-lncurses"],
+dnl            AC_MSG_ERROR([Powerflute requires libncurses.]), [])
+dnl         AC_CHECK_LIB(menu, new_menu, [POWERLIBS="$POWERLIBS -lmenu"],
+dnl            AC_MSG_ERROR([Powerflute requires libncurses.]), [-lncurses])
+dnl         AC_CHECK_LIB(form, new_form, [POWERLIBS="$POWERLIBS -lform"],
+dnl            AC_MSG_ERROR([Powerflute requires libncurses.]), [-lncurses])
+dnl         AC_CHECK_LIB(panel, new_panel, [POWERLIBS="$POWERLIBS -lpanel"],
+dnl            AC_MSG_ERROR([Powerflute requires libncurses.]), [-lncurses])
+dnl         POWERFLUTE="powerflute"
+dnl        AC_DEFINE(HAVE_POWERFLUTE)
+dnl     fi])
 
 dnl
 dnl Check for enable of gapcmon
