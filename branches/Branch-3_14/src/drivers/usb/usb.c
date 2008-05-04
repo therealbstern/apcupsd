@@ -715,11 +715,15 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
    /* Nominal output voltage when on batteries */
    case CI_NOMOUTV:
       ups->NomOutputVoltage = (int)uval->dValue;
+      while (ups->NomOutputVoltage > 1000)
+         ups->NomOutputVoltage /= 10; // Some UPSes get the units wrong
       break;
 
    /* Nominal input voltage */
    case CI_NOMINV:
       ups->NomInputVoltage = (int)uval->dValue;
+      while (ups->NomInputVoltage > 1000)
+         ups->NomInputVoltage /= 10; // Some UPSes get the units wrong
       break;
 
    /* Nominal battery voltage */
