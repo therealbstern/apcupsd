@@ -1867,7 +1867,8 @@ static gboolean gapc_monitor_update_tooltip_msg(PGAPC_MONITOR pm)
    }
    pch_watt = g_hash_table_lookup(pm->pht_Status, "NOMPOWER");
    if ( pch_watt != NULL ) {
-     d_watt = g_strtod (pch_watt, NULL);
+     pm->i_watt = g_strtod (pch_watt, NULL);
+     d_watt = d_loadpct * pm->i_watt;
    } else {
      d_watt = d_loadpct * pm->i_watt;
    }
@@ -2218,7 +2219,8 @@ static gint gapc_monitor_update(PGAPC_MONITOR pm)
    pch4 = g_hash_table_lookup(pm->pht_Status, "BATTDATE");
    pch_watt = g_hash_table_lookup(pm->pht_Status, "NOMPOWER");
    if (pch_watt != NULL) {
-    d_watt = g_strtod (pch_watt, NULL);
+    pm->i_watt = g_strtod (pch_watt, NULL);
+    d_watt = d_loadpct * pm->i_watt;
    } else {
     d_watt = d_loadpct * pm->i_watt;
    }
