@@ -197,3 +197,17 @@ define UNINST
    @echo "  RM   " $(DESTDIR)$(1)
    $(V)$(RMF) $(DESTDIR)$(1)
 endef
+
+# Announce distro install
+define DISTINST
+   @echo "------------------------------------------------------------"
+   @echo "$(1) distribution installation"
+   @echo "------------------------------------------------------------"
+endef
+
+# Announce distro uninstall
+define DISTUNINST
+   @echo "------------------------------------------------------------"
+   @echo "$(1) distribution uninstall"
+   @echo "------------------------------------------------------------"
+endef
