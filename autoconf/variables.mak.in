@@ -31,53 +31,24 @@ INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 MKINSTALLDIRS = @MKINSTALLDIRS@
 
-
 # Files and directories (paths)
-#
-# Commond prefix for machine-independent installed files.
 prefix = @prefix@
-
-# Commond prefix for machine-dependent installed files.
 exec_prefix = @exec_prefix@
-
-# system configuration directory.
 sysconfdir = @sysconfdir@
-
-# cgi-bin install directory.
 cgibin = @CGIBIN@
-
-# Ultrix 2.2 make doesn't expand the value of VPATH.
 VPATH = /usr/lib:/usr/local/lib
-
-# source directory where this Makefile is placed.
 srcdir = @srcdir@
-
-# Absolute top srcdir
 abstopdir = @ABSSRCDIR@
-
-# Directory in which to install.
 sbindir = @sbindir@
-
-# Directory for pid files.
 piddir = @PIDDIR@
-
-# Manual extension
 manext = 8
-
-# Manual directory
 mandir=@mandir@
-
-# User binary directory
 bindir = @bindir@
-
-# Read-only arch independent data
 datadir = @datadir@
-
-# Directory for HAL policy file
 HALPOLICYDIR = @HALPOLICYDIR@
-
-# Distribution-specific source directory
 DISTDIR = @DISTDIR@
+PWRFAILDIR = @PWRFAILDIR@
+LOCKDIR = @LOCKDIR@
 
 # Compilation macros.
 CC = @CC@
