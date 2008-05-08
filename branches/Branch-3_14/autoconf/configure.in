@@ -1124,8 +1124,7 @@ alpha)
    LOGDIR=/etc/apcupsd
    DFILES="\
       platforms/alpha/apcupsd \
-      platforms/alpha/awkhaltprog \
-      platforms/alpha/Makefile"
+      platforms/alpha/awkhaltprog"
    ;;
 bsdi)
    DISTVER=`uname -a |awk '{print $3}'`
@@ -1133,7 +1132,6 @@ bsdi)
 debian)
    DISTVER=`cat /etc/debian_version`
    DFILES="\
-      platforms/debian/Makefile \
       platforms/debian/apcupsd \
       platforms/debian/ups-monitor"
    ;;
@@ -1147,14 +1145,12 @@ freebsd)
    PTHREAD_LFLAGS=""
    LDFLAGS="$LDFLAGS -pthread"
    DFILES="\
-      platforms/freebsd/Makefile \
       platforms/freebsd/apcupsd \
       platforms/freebsd/apccontrol"
    ;;
 gentoo)
    DISTVER=`awk '/version / {print $5}' < /etc/gentoo-release`
    DFILES="\
-      platforms/gentoo/Makefile \
       platforms/gentoo/apcupsd \
       platforms/gentoo/halt"
    ;;
@@ -1163,7 +1159,6 @@ hpux)
    SERIALDEV=/dev/tty0p0
    PTHREAD_CFLAGS="-D_XOPEN_SOURCE_EXTENDED -D_REENTRANT"
    DFILES="\
-      platforms/hpux/Makefile \
       platforms/hpux/apcupsd \
       platforms/hpux/halt"
    ;;
@@ -1174,7 +1169,6 @@ netbsd)
    PTHREAD_LFLAGS=""
    LDFLAGS="$LDFLAGS -pthread"
    DFILES="\
-      platforms/netbsd/Makefile \
       platforms/netbsd/apcupsd"
    ;;
 openbsd)
@@ -1185,14 +1179,12 @@ openbsd)
    PTHREAD_LFLAGS=""
    LDFLAGS="$LDFLAGS -pthread"
    DFILES="\
-      platforms/openbsd/Makefile \
       platforms/openbsd/apcupsd \
       platforms/openbsd/apccontrol"
   ;;
 mandrake)
    DISTVER=`cat /etc/mandrake-release | grep release | cut -f 5 -d ' '`
    DFILES="\
-      platforms/mandrake/Makefile \
       platforms/mandrake/apcupsd \
       platforms/mandrake/apcupsd.spec \
       platforms/mandrake/awkhaltprog"
@@ -1220,7 +1212,6 @@ yellowdog)
        DISTVER=`cat /etc/yellowdog-release | grep release | cut -f 5 -d ' '`
    fi
    DFILES="\
-      platforms/yellowdog/Makefile \
       platforms/yellowdog/apcupsd \
       platforms/yellowdog/apcupsd.spec \
       platforms/yellowdog/awkhaltprog"
@@ -1228,7 +1219,6 @@ yellowdog)
 engarde)
    DISTVER=`cat /etc/engarde-release | grep ersion | cut -f 5 -d ' '`
    DFILES="\
-      platforms/engarde/Makefile \
       platforms/engarde/apcupsd \
       platforms/engarde/apcupsd.spec \
       platforms/engarde/awkhaltprog"
@@ -1236,7 +1226,6 @@ engarde)
 slackware)
    DISTVER=`cat /etc/slackware-version`
    DFILES="\
-      platforms/slackware/Makefile \
       platforms/slackware/apcupsd \
       platforms/slackware/rc6.patch" 
    ;;
@@ -1250,7 +1239,6 @@ sun)
    APCUPSD_MAIL=/usr/bin/mailx
    PTHREAD_CFLAGS="-D_POSIX_PTHREAD_SEMANTICS"
    DFILES="\
-      platforms/sun/Makefile \
       platforms/sun/apcupsd \
       platforms/sun/rc0.solaris \
       platforms/sun/apccontrol"
@@ -1258,7 +1246,6 @@ sun)
 suse)
    DISTVER=`cat /etc/SuSE-release |grep VERSION| cut -f 3 -d ' '`
    DFILES="\
-      platforms/suse/Makefile \
       platforms/suse/apcupsd \
       platforms/suse/awkhaltprog \
       platforms/suse/halt-setup.sh \
@@ -1268,7 +1255,6 @@ suse5)
    DISTNAME=suse
    DISTVER=5.x
    DFILES="\
-      platforms/suse/Makefile \
       platforms/suse/apcupsd \
       platforms/suse/halt-setup.sh \
       platforms/suse/halt"
@@ -1281,7 +1267,6 @@ darwin)
    PIDDIR=/var/run
    LOCKDIR=/var/tmp
    DFILES="\
-      platforms/darwin/Makefile \
       platforms/darwin/apcupsd \
       platforms/darwin/apccontrol \
       platforms/darwin/ApcupsdDaemon.Info.plist \
@@ -1291,7 +1276,6 @@ darwin)
 unknown)
    DISTVER=unknown
    DFILES="\
-      platforms/unknown/Makefile \
       platforms/unknown/apcupsd \
       platforms/unknown/halt"
   ;;
