@@ -4,7 +4,7 @@ SUBDIRS = lib drivers $(CGIDIR) $(USBHIDDIR) $(GAPCMON)
 include $(topdir)/autoconf/targets.mak
 
 # Force cgi/ to build after lib/
-# Necessary for parallel make since cgi links agains libapc.a
+# Necessary for parallel make since cgi links against libapc.a
 cgi_DIR: lib_DIR
 
 common_srcs     := options.c device.c reports.c action.c
@@ -44,14 +44,14 @@ powerflute: $(powerflute_obj) $(APCLIBS)
 all-install: install-base install-$(POWERFLUTE)
 all-uninstall: uninstall-base uninstall-$(POWERFLUTE)
 
-install-base:
+install-base: apcupsd apctest apcaccess smtp
 	$(call MKDIR,$(sbindir))
 	$(call INSTPROG,700,apcupsd,$(sbindir)/apcupsd)
 	$(call INSTPROG,700,apctest,$(sbindir)/apctest)
 	$(call INSTPROG,755,apcaccess,$(sbindir)/apcaccess)
 	$(call INSTPROG,755,smtp,$(sbindir)/smtp)
 
-install-powerflute:
+install-powerflute: powerflute
 	$(call INSTPROG,755,powerflute,$(sbindir)/powerflute)
 
 uninstall-base:
