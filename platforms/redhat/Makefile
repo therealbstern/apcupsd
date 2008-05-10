@@ -7,6 +7,7 @@ all-install: install-redhat
 all-uninstall: uninstall-redhat
 
 install-redhat:
+	$(call DISTINST,RedHat)
    # unlink old rc script (if not doing a DESTDIR install)
 	$(if $(DESTDIR),,$(V)/sbin/chkconfig --del apcupsd)
    # install new rc script
@@ -39,6 +40,7 @@ install-redhat:
 	@echo "================================================="
 
 uninstall-redhat:
+	$(call DISTUNINST,RedHat)
    # unlink old rc script (if not doing a DESTDIR install)
 	$(if $(DESTDIR),,$(V)/sbin/chkconfig --del apcupsd)
 	$(call UNINST,/etc/rc.d/init.d/apcupsd)
