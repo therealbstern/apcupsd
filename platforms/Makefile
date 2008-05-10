@@ -1,3 +1,5 @@
+.NOTPARALLEL:
+
 topdir:=..
 
 SUBDIRS = etc $(DISTDIR)
