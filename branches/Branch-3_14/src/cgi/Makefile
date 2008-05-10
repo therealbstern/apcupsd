@@ -33,7 +33,7 @@ upsimage.cgi: $(common_obj) $(upsimage_obj) $(APCLIBS)
 all-install: install-cgi
 all-uninstall: uninstall-cgi
 
-install-cgi:
+install-cgi: all-targets
 	$(call MKDIR,$(cgibin))
 	$(call INSTPROG,755,multimon.cgi,$(cgibin))
 	$(call INSTPROG,755,upsstats.cgi,$(cgibin))
