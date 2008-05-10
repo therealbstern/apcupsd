@@ -11,6 +11,7 @@ all-install: install-darwin install-$(USBDRV)
 all-uninstall: uninstall-darwin
 
 install-darwin:
+	$(call DISTINST,Darwin Mac OS X)
 	$(call MKDIR,/Library/StartupItems/apcupsd)
 	$(call INSTDATA,744,apcupsd,/Library/StartupItems/apcupsd)
 	$(call INSTDATA,444,StartupParameters.plist,/Library/StartupItems/apcupsd)
@@ -59,6 +60,7 @@ install-usb:
 	@echo "================================================="
 
 uninstall-darwin:
+	$(call DISTUNINST,Darwin Mac OS X)
 	$(call UNINST,/Library/StartupItems/apcupsd)
 	$(call UNINST,/System/Library/Extensions/ApcupsdDummy.kext)
 	$(call UNINST,/System/Library/Extensions.mkext)

@@ -7,6 +7,7 @@ all-install: install-engarde
 all-uninstall: uninstall-engarde
 
 install-engarde:
+	$(call DISTINST,engarde)
    # unlink old rc script (if not doing a DESTDIR install)
 	$(if $(DESTDIR),,$(V)/sbin/chkconfig --del apcupsd)
    # install new rc script
@@ -39,6 +40,7 @@ install-engarde:
 	@echo "================================================="
 
 uninstall-engarde:
+	$(call DISTUNINST,engarde)
    # unlink old rc script (if not doing a DESTDIR install)
 	$(if $(DESTDIR),,$(V)/sbin/chkconfig --del apcupsd)
 	$(call UNINST,/etc/init.d/apcupsd)
