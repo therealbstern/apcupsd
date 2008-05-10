@@ -7,6 +7,7 @@ all-install: install-alpha
 all-uninstall: uninstall-alpha
 
 install-alpha:
+	$(call DISTINST,alpha)
 	$(call MKDIR,/sbin/init.d)
 	$(call INSTDATA,744,apcupsd,/sbin/init.d/apcupsd)
 	$(call MKDIR,/sbin/rc2.d)
@@ -40,6 +41,7 @@ install-alpha:
 	@echo "================================================="
 
 uninstall-alpha:
+	$(call DISTUNINST,alpha)
 	$(call UNINST,/sbin/rc2.d/K56apcupsd)
 	$(call UNINST,/sbin/rc2.d/S56apcupsd)
 	$(call UNINST,/sbin/rc3.d/K56apcupsd)
