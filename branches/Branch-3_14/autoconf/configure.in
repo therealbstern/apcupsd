@@ -1247,9 +1247,7 @@ suse)
    DISTVER=`cat /etc/SuSE-release |grep VERSION| cut -f 3 -d ' '`
    DFILES="\
       platforms/suse/apcupsd \
-      platforms/suse/awkhaltprog \
-      platforms/suse/halt-setup.sh \
-      platforms/suse/halt"
+      platforms/suse/awkhaltprog"
    ;;
 suse5)
    DISTNAME=suse
