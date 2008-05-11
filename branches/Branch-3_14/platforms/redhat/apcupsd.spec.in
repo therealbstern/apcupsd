@@ -266,7 +266,6 @@ A Gnome application to monitor the status of your UPS.
         --enable-apcsmart \
         --enable-dumb \
         --enable-usb \
-	--enable-powerflute \
 	%if %{gapcmon}
 	--enable-gapcmon \
 	%endif
@@ -445,6 +444,8 @@ if [ $1 = 0 ] ; then
 fi
 
 %changelog
+* Sun May 11 2008 Adam Kropelin <akropel1 at rochester.rr.com>
+- remove powerflute
 * Sun Feb 03 2008 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - add debug package to strip suse
 * Sat Nov 17 2007 D. Scott Barninger <barninger at fairfieldcomputers.com>
