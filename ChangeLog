@@ -8,6 +8,420 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2008-05-11 16:23  adk0212
+
+	* ABOUT-NLS:
+
+	Remove unused file.
+
+2008-05-11 10:24  adk0212
+
+	* platforms/darwin/building-universal-binaries.txt:
+
+	Update Mac OS X universal binary build instructions.
+
+2008-05-11 10:10  adk0212
+
+	* platforms/: Makefile, alpha/Makefile, darwin/Makefile,
+	debian/Makefile, engarde/Makefile, etc/Makefile, redhat/Makefile:
+
+	Remove unnecessary dependency includes.
+
+2008-05-11 09:56  adk0212
+
+	* include/Makefile.in, src/libusbhid/Makefile.in:
+
+	Remove some obsolete Makefile.in
+
+2008-05-11 09:56  adk0212
+
+	* examples/: Makefile, Makefile.in, client.c, megaclient.c,
+	readfifo.c, smartsim.c, snoopdecode.c:
+
+	New Makefile for examples/ and source fixes to build with C++
+	compiler.
+
+2008-05-10 20:10  adk0212
+
+	* autoconf/targets.mak:
+
+	Micor cleanups: Rename 'INST' to 'COPY'. Remove extraneous
+	semicolons.
+
+2008-05-10 20:07  adk0212
+
+	* autoconf/targets.mak, src/Makefile, src/cgi/Makefile,
+	src/gapcmon/Makefile:
+
+	Better solution for install ordering. Invoke make explicitly to
+	build targets and then again to perform the install. This is just
+	an extension of the same trick used to force 'all' to build subdirs
+	before local targets.
+
+2008-05-10 13:54  adk0212
+
+	* src/: Makefile, cgi/Makefile, gapcmon/Makefile:
+
+	Fix parallel 'make install' from an unbuilt tree. Requires manually
+	making install-* depend on all-targets. I'd prefer this be done
+	automatically but I cannot find a way that works (yet).
+
+2008-05-10 11:19  adk0212
+
+	* platforms/Makefile:
+
+	Do not perform platform install in parallel.
+
+2008-05-10 11:18  adk0212
+
+	* Makefile:
+
+	Recurse into platforms/ after src/.
+
+2008-05-10 10:52  adk0212
+
+	* platforms/alpha/Makefile:
+
+	Install banners for alpha.
+
+2008-05-10 10:51  adk0212
+
+	* platforms/: darwin/Makefile, debian/Makefile, engarde/Makefile,
+	redhat/Makefile:
+
+	Add banners to 'make install'.
+
+2008-05-10 10:47  adk0212
+
+	* autoconf/targets.mak:
+
+	Tweak install/uninstall banner spacing.
+
+2008-05-10 10:47  adk0212
+
+	* platforms/: unifix/Makefile, unifix/Makefile.in,
+	yellowdog/Makefile, yellowdog/Makefile.in:
+
+	'make install' support for unifix and yellowdog.
+
+2008-05-09 20:04  adk0212
+
+	* configure, autoconf/configure.in, platforms/suse/Makefile,
+	platforms/suse/Makefile.in, platforms/suse/Makefile.in.old,
+	platforms/suse/apcupsd.in.old, platforms/suse/apcupsd.spec.in.old,
+	platforms/suse/halt-setup.sh.in, platforms/suse/halt.in,
+	platforms/suse/rc.config.sh:
+
+	'make install' support for SuSE. Plus remove some bitrotted
+	platform files for SuSE 8.x.
+
+2008-05-09 19:39  adk0212
+
+	* platforms/sun/: Makefile, Makefile.in:
+
+	'make install' support for sun.
+
+2008-05-08 19:37  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Do not autogenerate platform/*/Makefile any more.
+
+2008-05-08 19:36  adk0212
+
+	* autoconf/targets.mak:
+
+	Add install/uninstall banner macros.
+
+2008-05-08 19:36  adk0212
+
+	* autoconf/variables.mak.in:
+
+	Add some path variables needed by platform install scripts.
+
+2008-05-08 19:35  adk0212
+
+	* platforms/: gentoo/Makefile, gentoo/Makefile.in, hpux/Makefile,
+	hpux/Makefile.in, mandrake/Makefile, mandrake/Makefile.in,
+	slackware/Makefile, slackware/Makefile.in, unknown/Makefile:
+
+	'make install' support for gentoo, hpux, mandrake, slackware.
+
+2008-05-08 18:57  adk0212
+
+	* platforms/: freebsd/Makefile, freebsd/Makefile.in,
+	netbsd/Makefile, netbsd/Makefile.in, openbsd/Makefile,
+	openbsd/Makefile.in:
+
+	'make install' support for *BSD
+
+2008-05-06 20:16  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Corrected the use of NOMPOWER and the calc of current usage amount
+
+2008-05-04 11:30  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Remove powerflute option from configure. Powerflute has been broken
+	for several releases after the removal of rawupsstats support from
+	NIS
+
+2008-05-04 11:13  adk0212
+
+	* src/drivers/usb/usb.c:
+
+	Add a heuristic to fix up incorrect NOMINV or NOMOUTV. Some UPSes
+	(RS 500) report decivolts instead of volts. Reported by Kirill S.
+	Bychkov <yason@linklevel.net>.
+
+2008-05-04 10:43  adk0212
+
+	* src/win32/build-win32-cross-tools:
+
+	Update to NSIS 2.37.
+
+2008-05-04 10:43  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Add win32/Makefile to generate list. Necessary since we're not
+	rewriting the win32 Makefile stuff yet.
+
+2008-04-20 19:03  skoona
+
+	* src/gapcmon/: ChangeLog, Makefile, gapcmon.c, gapcmon.h:
+
+
+	- Removed close() fron sknet_net_close() api.
+	g_io_channel_shutdown()   handled the close and shutdown of the
+	socket.  second close was   actually closing an active socket from
+	another thread (i.e. reuse #)	discovered on a quad-core platform.
+
+	- Added ICON_DIR to compiler makefiles to support _load_icons
+	ability to find icons at run-time.  $(datadir) is passed into
+	ICON_DIR; its assumed datadir include $(DISTDIR).  This change
+	was pointed out by Kirill S. Bychkov in Feb/2008.
+
+	James,
+
+2008-04-19 10:12  adk0212
+
+	* examples/safe.apccontrol.in:
+
+	Remove mention of serial port since there are many other comms
+	types now.
+
+2008-04-07 19:03  adk0212
+
+	* autoconf/targets.mak, autoconf/variables.mak.in,
+	platforms/alpha/Makefile, platforms/alpha/Makefile.in,
+	platforms/darwin/Makefile, platforms/darwin/Makefile.in,
+	platforms/debian/Makefile, platforms/debian/Makefile.in,
+	platforms/engarde/Makefile, platforms/engarde/Makefile.in,
+	platforms/redhat/Makefile, platforms/unknown/Makefile,
+	platforms/unknown/Makefile.in:
+
+	Add 'make install' support for alpha, darwin, debian, engarde, and
+	unknown.  Also misc fixes to existing install support.
+
+2008-04-06 20:24  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Don't autogenerate redhat Makefile.
+
+2008-04-06 19:35  adk0212
+
+	* src/: drivers/Makefile.in, drivers/apcsmart/Makefile.in,
+	drivers/dumb/Makefile.in, drivers/net/Makefile.in,
+	drivers/pcnet/Makefile.in, drivers/snmp/Makefile.in,
+	drivers/test/Makefile.in, drivers/usb/Makefile.in,
+	drivers/usb/bsd/Makefile.in, drivers/usb/generic/Makefile.in,
+	drivers/usb/linux/Makefile.in, gd1.2/Makefile.in, gd1.2/README,
+	gd1.2/demoin.gif, gd1.2/gd.c, gd1.2/gd.h, gd1.2/gddemo.c,
+	gd1.2/gdfontg.c, gd1.2/gdfontg.h, gd1.2/gdfontl.c, gd1.2/gdfontl.h,
+	gd1.2/gdfontmb.c, gd1.2/gdfontmb.h, gd1.2/gdfonts.c,
+	gd1.2/gdfonts.h, gd1.2/gdfontt.c, gd1.2/gdfontt.h, gd1.2/giftogd.c,
+	gd1.2/index.html, gd1.2/mathmake.c, gd1.2/mtables.c,
+	gd1.2/webgif.c, intl/ChangeLog, intl/Makefile.in, intl/VERSION,
+	intl/bindtextdom.c, intl/cat-compat.c, intl/dcgettext.c,
+	intl/dgettext.c, intl/explodename.c, intl/finddomain.c,
+	intl/gettext.c, intl/gettext.h, intl/gettextP.h,
+	intl/hash-string.h, intl/intl-compat.c, intl/l10nflist.c,
+	intl/libgettext.h, intl/linux-msg.sed, intl/loadinfo.h,
+	intl/loadmsgcat.c, intl/localealias.c, intl/po2tbl.sed.in,
+	intl/textdomain.c, intl/xopen-msg.sed, lib/Makefile.in,
+	po/Makefile.in, po/POTFILES.in, po/apcupsd.pot, po/ca.po,
+	po/cat-id-tbl.c, po/cs.po, po/da.po, po/de.po, po/el.po, po/es.po,
+	po/et_EE.po, po/eu_ES.po, po/fi.po, po/fo_FO.po, po/fr.po,
+	po/ga_IE.po, po/gr_GR.po, po/hr.po, po/hu.po, po/in_ID.po,
+	po/is.po, po/is_IS.po, po/is_is.po, po/it.po, po/iw_IL.po,
+	po/ja.po, po/kl_GL.po, po/ko.po, po/lt_LT.po, po/lv_LV.po,
+	po/nl.po, po/no.po, po/pl.po, po/pt.po, po/ro_RO.po, po/ru.po,
+	po/sk.po, po/sl.po, po/sr.po, po/stamp-cat-id, po/sv.po, po/tr.po,
+	po/uk_UA.po, po/wa.po, po/zh_TW.Big5.po:
+
+	Remove unused files: Various Makefile.in, gd1.2/, intl/, po/.
+
+2008-04-06 19:09  adk0212
+
+	* autoconf/Makefile.in:
+
+	Remove unused file.
+
+2008-04-06 19:07  adk0212
+
+	* Makefile.in, configure, autoconf/configure.in,
+	autoconf/mkinstalldirs, autoconf/targets.mak,
+	autoconf/variables.mak.in, platforms/Makefile,
+	platforms/Makefile.in, platforms/etc/Makefile,
+	platforms/etc/Makefile.in, platforms/redhat/Makefile,
+	platforms/redhat/Makefile.in, src/Makefile, src/Makefile.in,
+	src/cgi/Makefile, src/cgi/Makefile.in, src/gapcmon/Makefile,
+	src/gapcmon/Makefile.in:
+
+	First round of 'make install' implementation. Basic
+	install/uninstall is working. Only platform implemented so far is
+	redhat.
+
+2008-04-04 19:11  adk0212
+
+	* autoconf/targets.mak:
+
+	Fix clean output on Solaris.
+
+2008-04-04 19:01  adk0212
+
+	* configure, autoconf/configure.in, src/gapcmon/Makefile:
+
+	Fix gapcmon build on OpenSolaris. On OpenSolaris, gethostbyname_r()
+	is in libnsl. Also fix up some tests in configure to use
+	AC_SEARCH_LIBS. Thanks to James Dean <jgmdean@gmail.com> for
+	loaning me an ssh login on his OpenSolaris box.
+
+2008-04-02 18:55  adk0212
+
+	* Makefile, configure, autoconf/aclocal.m4, autoconf/configure.in,
+	autoconf/targets.mak, autoconf/variables.mak.in, src/Makefile,
+	src/cgi/Makefile, src/drivers/Makefile,
+	src/drivers/apcsmart/Makefile, src/drivers/dumb/Makefile,
+	src/drivers/net/Makefile, src/drivers/pcnet/Makefile,
+	src/drivers/snmp/Makefile, src/drivers/test/Makefile,
+	src/drivers/usb/Makefile, src/drivers/usb/bsd/Makefile,
+	src/drivers/usb/generic/Makefile, src/drivers/usb/linux/Makefile,
+	src/gapcmon/Makefile, src/lib/Makefile, src/libusbhid/Makefile:
+
+	Add new make system - configure and build works (including
+	dependencies and parallel make) - 'make install' not yet
+	implemented - i18n support removed - included libgd support removed
+	- obsolete Makefile.in files will remain until 'make install' is
+	complete
+
+2008-02-06 17:53  adk0212
+
+	* platforms/80-apcupsd-ups-policy.fdi:
+
+	Fix hal policy file syntax. For some reason this blatantly
+	incorrect file actually works on RHEL5 (hal-0.5.8). Thanks to
+	Andrew Telford <a.telford@ieee.org> for correcting it.
+
+2008-02-03 16:37  adk0212
+
+	* autoconf/aclocal.m4, autoconf/configure.in,
+	src/gapcmon/gapcmon.c:
+
+	Revert ctime_r() change. It is not actually necessary.
+
+2008-02-03 15:48  adk0212
+
+	* configure, autoconf/aclocal.m4, autoconf/configure.in,
+	src/gapcmon/gapcmon.c:
+
+	Fix gapcmon compile error on Solaris: Multiple variants of
+	ctime_r().
+
+2008-02-03 15:32  adk0212
+
+	* include/apc.h:
+
+	Fix libapcnis.c compile error on Solaris.
+
+2008-02-03 12:19  fleetworks
+
+	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
+	suse/apcupsd.spec.in:
+
+	Add debug package to strip suse.
+
+2008-01-29 19:01  adk0212
+
+	* src/gapcmon/gapcmon.c:
+
+	Fix build on OpenBSD: Need to include netinet/in.h for struct
+	sockaddr_in.
+
+2008-01-28 21:14  adk0212
+
+	* configure, autoconf/configure.in, src/gapcmon/gethostname.c:
+
+	Add fake (not thread-safe) gethostbyname_r() for platforms that
+	don't have it. I'm looking at you, OpenBSD.
+
+2008-01-27 12:00  adk0212
+
+	* doc/latex/manual.tex, include/struct.h,
+	platforms/etc/apcupsd.conf.in, platforms/mingw/apcupsd.conf.in,
+	src/device.c, src/drivers/net/net.c,
+	src/drivers/snmp/drv_powernet.c, src/lib/apcconfig.c:
+
+	Add POLLTIME directive to control UPS polling interval. NETTIME is
+	accepted as a synonym for compatibility with old config files.
+
+2008-01-27 11:22  adk0212
+
+	* src/lib/apclibnis.c, src/powerflute.c, src/cgi/multimon.c,
+	src/cgi/upsfetch.c, src/cgi/upsfetch.h, include/nis.h,
+	src/apcaccess.c:
+
+	Sanify net error handling. All net library functions now return
+	-errno on failure. Kill off global net_errno and net_errmsg.
+	Improve apcaccess error messages.
+
+2008-01-27 09:56  adk0212
+
+	* src/drivers/usb/bsd/bsd-usb.c:
+
+	Another missing update.
+
+2008-01-27 09:49  adk0212
+
+	* src/drivers/usb/bsd/bsd-usb.c:
+
+	Fix compile errors from incomplete input vs feature report
+	conversion.
+
+2008-01-22 20:10  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Debian is now using the standard NIS port, 3551.  Contributed by
+	imacat <imacat@mail.imacat.idv.tw>
+
+2008-01-20 14:58  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Update web site for 3.14.3.
+
+2008-01-19 16:48  adk0212
+
+	* ChangeLog, ReleaseNotes, include/version.h:
+
+	Updates for 3.14.3 release.
+
 2008-01-19 13:43  adk0212
 
 	* src/gapcmon/gapcmon.c:
