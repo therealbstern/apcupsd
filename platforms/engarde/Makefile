@@ -47,5 +47,3 @@ uninstall-engarde:
 	$(call COPY,$(DESTDIR)/etc/init.d/halt.old,/etc/init.d/halt)
 	$(call UNINST,/etc/init.d/halt.old)
 
-# Include dependencies
--include $(SRCS:%.c=$(DEPDIR)/%.P)

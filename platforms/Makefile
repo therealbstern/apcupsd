@@ -20,5 +20,3 @@ uninstall-platform:
 	$(call UNINST,$(sysconfdir)/apccontrol)
 	$(if $(HALPOLICYDIR),$(call UNINST,$(HALPOLICYDIR)/80-apcupsd-ups-policy.fdi))
 
-# Include dependencies
--include $(SRCS:%.c=$(DEPDIR)/%.P)

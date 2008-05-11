@@ -47,5 +47,3 @@ uninstall-redhat:
 	$(call COPY,$(DESTDIR)/etc/rc.d/init.d/halt.old,/etc/rc.d/init.d/halt)
 	$(call UNINST,/etc/rc.d/init.d/halt.old)
 
-# Include dependencies
--include $(SRCS:%.c=$(DEPDIR)/%.P)

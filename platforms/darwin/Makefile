@@ -94,5 +94,3 @@ apcupsd.pkg:
 	$(PACKAGEMAKER) -build -v -p $(PKGROOT)/Apcupsd/Apcupsd-$(VERSION).pkg -mi $(PKGROOT)/Packages -r $(PKGROOT)/ApcupsdPkg.Resources -i ApcupsdPkg.Info.plist -d ApcupsdPkg.Description.plist
 	hdiutil create -ov -srcfolder $(PKGROOT)/Apcupsd -volname Apcupsd-$(VERSION) Apcupsd-$(VERSION).dmg
 
-# Include dependencies
--include $(SRCS:%.c=$(DEPDIR)/%.P)

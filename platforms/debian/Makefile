@@ -27,5 +27,3 @@ uninstall-debian:
 	$(if $(DESTDIR),,$(V)/usr/sbin/update-rc.d apcupsd remove)
 	$(call UNINST,/etc/init.d/ups-monitor)
 
-# Include dependencies
--include $(SRCS:%.c=$(DEPDIR)/%.P)
