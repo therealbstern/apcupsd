@@ -51,5 +51,3 @@ uninstall-alpha:
 	$(V)grep -v "###apcupsd###" $(DESTDIR)/sbin/rc0.old >$(DESTDIR)/sbin/rc0
 	$(V)chmod 744 $(DESTDIR)/sbin/rc0
 
-# Include dependencies
--include $(SRCS:%.c=$(DEPDIR)/%.P)

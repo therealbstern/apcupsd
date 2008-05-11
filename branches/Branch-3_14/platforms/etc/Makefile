@@ -17,5 +17,3 @@ install-etc:
 
 uninstall-etc:
 
-# Include dependencies
--include $(SRCS:%.c=$(DEPDIR)/%.P)
