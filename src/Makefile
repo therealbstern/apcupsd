@@ -44,14 +44,14 @@ powerflute: $(powerflute_obj) $(APCLIBS)
 all-install: install-base install-$(POWERFLUTE)
 all-uninstall: uninstall-base uninstall-$(POWERFLUTE)
 
-install-base: apcupsd apctest apcaccess smtp
+install-base:
 	$(call MKDIR,$(sbindir))
 	$(call INSTPROG,700,apcupsd,$(sbindir)/apcupsd)
 	$(call INSTPROG,700,apctest,$(sbindir)/apctest)
 	$(call INSTPROG,755,apcaccess,$(sbindir)/apcaccess)
 	$(call INSTPROG,755,smtp,$(sbindir)/smtp)
 
-install-powerflute: powerflute
+install-powerflute:
 	$(call INSTPROG,755,powerflute,$(sbindir)/powerflute)
 
 uninstall-base:

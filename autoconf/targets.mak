@@ -56,17 +56,17 @@ all: all-subdirs
 all-targets:
 	@#
 
-# standard install target: Depends on subdirs to force recursion,
-# then reinvokes make to install local targets. Same logic as 'all'.
+# standard install target: Same logic as 'all'.
 .PHONY: install
 install: all-subdirs
+	$(VV)+$(MAKE) $(NPD) all-targets
 	$(VV)+$(MAKE) $(NPD) all-install
 
-# 'all-install' is extended by lower-level Makefile. It minimally
-# depends on all targets being built. Lower-level Makefile adds install
-# actions and other dependencies, if needed.
+# 'all-install' is extended by lower-level Makefile to perform any
+# required install actions.
 .PHONY: all-install
-all-install: all-targets
+all-install:
+	@#
 
 # no-op targets for use by lower-level Makefiles when a particular
 # component is not being installed.

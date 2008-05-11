@@ -20,7 +20,7 @@ gapcmon: $(OBJS)
 all-install: install-gapcmon
 all-uninstall: uninstall-gapcmon
 
-install-gapcmon: all-targets
+install-gapcmon:
 	$(call MKDIR,$(bindir))
 	$(call MKDIR,$(datadir)/pixmaps)
 	$(call MKDIR,$(datadir)/applications)
