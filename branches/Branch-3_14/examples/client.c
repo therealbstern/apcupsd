@@ -27,8 +27,6 @@
 
 void handle_client(FILE *fp, int sockfd, char *cmd);
 
-extern int net_errno;
-
 void error_abort(char *msg)
 {
    fprintf(stderr, msg);
@@ -103,7 +101,7 @@ void handle_client(FILE *fp, int sockfd, char *cmd)
       }
       if (n < 0) {
 	 char msg[200];
-         sprintf(msg, "handle_client: net_recv error: %s\n", strerror(net_errno));
+         sprintf(msg, "handle_client: net_recv error: %s\n", strerror(-n));
 	 error_abort(msg);
      }
    }
