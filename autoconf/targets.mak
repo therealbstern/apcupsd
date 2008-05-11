@@ -151,20 +151,20 @@ endef
 
 # Install a program file, given mode, src, and dest
 define INSTPROG
-   @echo "  INST " $(2) =\> $(DESTDIR)$(3)
+   @echo "  COPY " $(2) =\> $(DESTDIR)$(3)
    $(V)$(INSTALL_PROGRAM) $(STRIP) -m $(1) $(2) $(DESTDIR)$(3)
 endef
 
 # Install a data file, given mode, src, and dest
 define INSTDATA
-   @echo "  INST " $(2) =\> $(DESTDIR)$(3) ;
-   $(V)$(INSTALL_DATA) -m $(1) $(2) $(DESTDIR)$(3) ;
+   @echo "  COPY " $(2) =\> $(DESTDIR)$(3)
+   $(V)$(INSTALL_DATA) -m $(1) $(2) $(DESTDIR)$(3)
 endef
 
 # Install a data file, given mode, src, and dest.
 # Existing dest file is preserved; new file is named *.new if dest exists.
 define INSTNEW
-   @echo "  INST " $(notdir $(2)) =\> $(DESTDIR)$(3)/$(notdir $(2))$(if $(wildcard $(DESTDIR)$(3)/$(notdir $(2))),.new,)
+   @echo "  COPY " $(notdir $(2)) =\> $(DESTDIR)$(3)/$(notdir $(2))$(if $(wildcard $(DESTDIR)$(3)/$(notdir $(2))),.new,)
    $(V)$(INSTALL_DATA) -m $(1) $(2) $(DESTDIR)$(3)/$(notdir $(2))$(if $(wildcard $(DESTDIR)$(3)/$(notdir $(2))),.new,)
 endef
 
@@ -176,8 +176,8 @@ define INSTORIG
          $(DESTDIR)$(3)/$(notdir $(2)).orig,)
    $(if $(wildcard $(DESTDIR)$(3)/$(notdir $(2))), \
       $(V)mv $(DESTDIR)$(3)/$(notdir $(2)) $(DESTDIR)$(3)/$(notdir $(2)).orig,)
-   @echo "  INST " $(notdir $(2)) =\> $(DESTDIR)$(3)/$(notdir $(2))
-   $(V)$(INSTALL_SCRIPT) -m $(1) $(2) $(DESTDIR)$(3) ;
+   @echo "  COPY " $(notdir $(2)) =\> $(DESTDIR)$(3)/$(notdir $(2))
+   $(V)$(INSTALL_SCRIPT) -m $(1) $(2) $(DESTDIR)$(3)
 endef
 
 # Make a symlink
