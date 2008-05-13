@@ -978,9 +978,8 @@ file.
 
 Other configuration options can be used to set up the installation of HTML
 documentation and optional modules, notably the CGI interface that enables the
-UPS state to be queried via the Web and the optional powerflute curses-based
-control panel.  Still others enable features such as thread support.  You will
-find a complete reference later in this chapter.  
+UPS state to be queried via the Web.  You will find a complete reference later
+in this chapter.  
 
 In general, you will probably want to supply a more elaborate {\tt configure}
 statement to ensure that the modules you want are built and that everything is
@@ -1000,8 +999,7 @@ following:
        --with-cgi-bin=/var/www/cgi-bin \
        --enable-cgi \
        --with-css-dir=/var/www/docs/css \
-       --with-log-dir=/etc/apcupsd \
-       --enable-powerflute
+       --with-log-dir=/etc/apcupsd
 \end{verbatim}
 \normalsize
 
@@ -1169,14 +1167,6 @@ be unmounted during a shutdown and thus may prevent the {\tt halt} script from
 calling apcupsd to turn off the UPS power. Though your data will be protected,
 in this case, your system will probably not be automatically rebooted when the
 power returns.  
-
-\label{index-options_002c-_002d_002d_002denable_002dpowerflute-28}
-
-\item [{---}enable-powerflute]
-   \index{{---}enable-powerflute }
-   This option enables the building of the powerflute executable, which is a
-ncurses based program to monitor the UPS. This program is not necessary for
-the proper execution of apcupsd.  
 
 \label{index-options_002c-_002d_002d_002denable_002dcgi-29}
 
@@ -4814,8 +4804,7 @@ could use the following configuration:
        --with-css-dir=/home/http/css \
        --with-log-dir=/etc/apcupsd \
        --with-serial-dev=/dev/ttyS0 \
-       --with-nis-port=3551 \
-       --enable-powerflute
+       --with-nis-port=3551
 \end{verbatim}
 \normalsize
 
