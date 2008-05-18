@@ -11,8 +11,8 @@ install-suse:
    # unlink old rc script (if not doing a DESTDIR install)
 	$(if $(DESTDIR),,$(V)/sbin/chkconfig --del apcupsd)
    # install new rc script
-	$(call MKDIR,/etc/rc.d/init.d)
-	$(call INSTDATA,744,apcupsd,/etc/rc.d/init.d)
+	$(call MKDIR,/etc/rc.d)
+	$(call INSTDATA,744,apcupsd,/etc/rc.d)
    # save old halt script
 	$(call COPY,/etc/rc.d/halt,/etc/rc.d/halt.old)
    # insert apcupsd callout into halt script
