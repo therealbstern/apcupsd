@@ -46,7 +46,7 @@
 #include "apc.h"
 
 /* Forward referenced function */
-//static int device_wait_time(UPSINFO *ups);
+static int device_wait_time(UPSINFO *ups);
 
 /*********************************************************************/
 void setup_device(UPSINFO *ups)
@@ -70,8 +70,8 @@ void setup_device(UPSINFO *ups)
                      "  please stop it and run this program again.\n"));
    }
 
-//   device_setup(ups);
-//   device_get_capabilities(ups);
+   device_setup(ups);
+   device_get_capabilities(ups);
 }
 
 /*********************************************************************/
@@ -165,7 +165,6 @@ void kill_power(UPSINFO *ups)
    }
 }
 
-#if 0
 /*
  * After the device is initialized, we come here
  * to read all the information we can about the UPS.
@@ -255,7 +254,7 @@ static int device_wait_time(UPSINFO *ups)
    if (ups->is_fastpoll() || !ups->is_battpresent())
       wait_time = TIMER_FAST;
    else
-      wait_time = TIMER_SELECT;    /* normally 60 seconds */
+      wait_time = ups->polltime;    /* normally 60 seconds */
 
    /* Make sure we do data and stats when asked */
    if (ups->datatime && ups->datatime < wait_time)
@@ -270,4 +269,3 @@ static int device_wait_time(UPSINFO *ups)
 
    return wait_time;
 }
-#endif

@@ -26,7 +26,7 @@
 
 #include "apc.h"
 
-static const char *const shortoptions = "b?RtTVf:d:pP:k";
+static char *const shortoptions = "b?RtTVf:d:pP:k";
 
 enum {
    OPT_NOARG,

@@ -27,7 +27,7 @@
 #include "apc.h"
 #include "apcsmart.h"
 
-bool ApcSmartDriver::KillPower()
+int apcsmart_ups_kill_power(UPSINFO *ups)
 {
    char response[32];
    int shutdown_delay = 0;
@@ -36,12 +36,12 @@ bool ApcSmartDriver::KillPower()
 
    response[0] = '\0';
 
-   a = _cmdmap[CI_DSHUTD];    /* shutdown delay */
-   write(_ups->fd, &a, 1);
-   getline(response, sizeof(response));
+   a = ups->UPS_Cmd[CI_DSHUTD];    /* shutdown delay */
+   write(ups->fd, &a, 1);
+   getline(response, sizeof(response), ups);
    shutdown_delay = (int)atof(response);
    a = 'S';                        /* ask for soft shutdown */
-   write(_ups->fd, &a, 1);
+   write(ups->fd, &a, 1);
 
    /*
     * Check whether the UPS has acknowledged the power-off command.
@@ -51,15 +51,15 @@ bool ApcSmartDriver::KillPower()
     * operator intervention.  w.p.
     */
    sleep(5);
-   getline(response, sizeof response);
+   getline(response, sizeof response, ups);
    if (strcmp(response, "OK") == 0) {
       if (shutdown_delay > 0)
-         log_event(_ups, LOG_WARNING,
+         log_event(ups, LOG_WARNING,
             "UPS will power off after %d seconds ...\n", shutdown_delay);
       else
-         log_event(_ups, LOG_WARNING,
+         log_event(ups, LOG_WARNING,
             "UPS will power off after the configured delay  ...\n");
-      log_event(_ups, LOG_WARNING,
+      log_event(ups, LOG_WARNING,
          _("Please power off your UPS before rebooting your computer ...\n"));
    } else {
       /*
@@ -68,27 +68,27 @@ bool ApcSmartDriver::KillPower()
        */
       a = '@';                     /* Shutdown now */
       sleep(1);
-      write(_ups->fd, &a, 1);
+      write(ups->fd, &a, 1);
       sleep(1);
       a = '0';
-      write(_ups->fd, &a, 1);
+      write(ups->fd, &a, 1);
       sleep(1);
       a = '0';
-      write(_ups->fd, &a, 1);
+      write(ups->fd, &a, 1);
       sleep(1);
       a = '0';
-      write(_ups->fd, &a, 1);
+      write(ups->fd, &a, 1);
 
-      getline(response, sizeof(response));
+      getline(response, sizeof(response), ups);
       if ((strcmp(response, "OK") == 0) || (strcmp(response, "*") == 0)) {
          if (shutdown_delay > 0) {
-            log_event(_ups, LOG_WARNING,
+            log_event(ups, LOG_WARNING,
                "UPS will power off after %d seconds ...\n", shutdown_delay);
          } else {
-            log_event(_ups, LOG_WARNING,
+            log_event(ups, LOG_WARNING,
                "UPS will power off after the configured delay  ...\n");
          }
-         log_event(_ups, LOG_WARNING,
+         log_event(ups, LOG_WARNING,
             _("Please power off your UPS before rebooting your computer ...\n"));
       } else {
          errflag++;
@@ -97,34 +97,34 @@ bool ApcSmartDriver::KillPower()
 
    if (errflag) {
       a = '@';
-      write(_ups->fd, &a, 1);
+      write(ups->fd, &a, 1);
       sleep(1);
       a = '0';
-      write(_ups->fd, &a, 1);
+      write(ups->fd, &a, 1);
       sleep(1);
       a = '0';
-      write(_ups->fd, &a, 1);
+      write(ups->fd, &a, 1);
       sleep(1);
 
-      if ((_ups->mode.type == BKPRO) || (_ups->mode.type == VS)) {
+      if ((ups->mode.type == BKPRO) || (ups->mode.type == VS)) {
          a = '1';
-         log_event(_ups, LOG_WARNING,
+         log_event(ups, LOG_WARNING,
             _("BackUPS Pro and SmartUPS v/s sleep for 6 min"));
       } else {
          a = '0';
       }
-      write(_ups->fd, &a, 1);
+      write(ups->fd, &a, 1);
 
-      getline(response, sizeof(response));
+      getline(response, sizeof(response), ups);
       if ((strcmp(response, "OK") == 0) || (strcmp(response, "*") == 0)) {
          if (shutdown_delay > 0) {
-            log_event(_ups, LOG_WARNING,
+            log_event(ups, LOG_WARNING,
                "UPS will power off after %d seconds ...\n", shutdown_delay);
          } else {
-            log_event(_ups, LOG_WARNING,
+            log_event(ups, LOG_WARNING,
                "UPS will power off after the configured delay  ...\n");
          }
-         log_event(_ups, LOG_WARNING,
+         log_event(ups, LOG_WARNING,
             _("Please power off your UPS before rebooting your computer ...\n"));
          errflag = 0;
       } else {
@@ -135,20 +135,20 @@ bool ApcSmartDriver::KillPower()
    if (errflag) {
       /* And yet another method !!! */
       a = 'K';
-      write(_ups->fd, &a, 1);
+      write(ups->fd, &a, 1);
       sleep(2);
-      write(_ups->fd, &a, 1);
-      getline(response, sizeof response);
+      write(ups->fd, &a, 1);
+      getline(response, sizeof response, ups);
       if ((strcmp(response, "*") == 0) || (strcmp(response, "OK") == 0) ||
-         (_ups->mode.type >= BKPRO)) {
+         (ups->mode.type >= BKPRO)) {
          if (shutdown_delay > 0) {
-            log_event(_ups, LOG_WARNING,
+            log_event(ups, LOG_WARNING,
                "UPS will power off after %d seconds ...\n", shutdown_delay);
          } else {
-            log_event(_ups, LOG_WARNING,
+            log_event(ups, LOG_WARNING,
                "UPS will power off after the configured delay  ...\n");
          }
-         log_event(_ups, LOG_WARNING,
+         log_event(ups, LOG_WARNING,
             _("Please power off your UPS before rebooting your computer ...\n"));
          errflag = 0;
       } else {
@@ -157,9 +157,9 @@ bool ApcSmartDriver::KillPower()
    }
 
    if (errflag) {
-      log_event(_ups, LOG_WARNING, _("Unexpected error!\n"));
-      log_event(_ups, LOG_WARNING, _("UPS in unstable state\n"));
-      log_event(_ups, LOG_WARNING,
+      log_event(ups, LOG_WARNING, _("Unexpected error!\n"));
+      log_event(ups, LOG_WARNING, _("UPS in unstable state\n"));
+      log_event(ups, LOG_WARNING,
          _("You MUST power off your UPS before rebooting!!!\n"));
       return 0;
    }
@@ -167,7 +167,7 @@ bool ApcSmartDriver::KillPower()
    return 1;
 }
 
-bool ApcSmartDriver::CheckState()
+int apcsmart_ups_check_state(UPSINFO *ups)
 {
-   return getline(NULL, 0) == SUCCESS;
+   return getline(NULL, 0, ups) == SUCCESS ? 1 : 0;
 }

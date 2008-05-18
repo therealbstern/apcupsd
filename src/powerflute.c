@@ -95,7 +95,7 @@ static void get_raw_upsinfo(UPSINFO *ups, const char *host, int port)
    int sockfd, n;
 
    if ((sockfd = net_open(host, NULL, port)) < 0)
-      Error_abort0(net_errmsg);
+      Error_abort0(strerror(-sockfd));
 
    net_send(sockfd, "rawupsinfo", 10);
 
