@@ -8,6 +8,49 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2008-05-18 13:12  adk0212
+
+	* Makefile, doc/Makefile, doc/Makefile.in:
+
+	Add 'make install' support for man pages.
+
+2008-05-12 20:09  adk0212
+
+	* platforms/: README, install-symlinks.sh:
+
+	Remove obsolete files.
+
+2008-05-12 20:06  adk0212
+
+	* Developers, doc/latex/manual.tex:
+
+	Update contributors list. This is probably still way out of date.
+
+2008-05-12 20:01  adk0212
+
+	* doc/latex/manual.tex:
+
+	Remove references to powerflute.
+
+2008-05-11 18:34  adk0212
+
+	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
+	suse/apcupsd.spec.in:
+
+	Remove --with-powerflute flag from specs.
+
+2008-05-11 18:18  adk0212
+
+	* ChangeLog.old:
+
+	Remove old changelog.
+
+2008-05-11 17:00  adk0212
+
+	* ChangeLog, ReleaseNotes, include/version.h:
+
+	Prep for 3.14.4 test release.
+
 2008-05-11 16:23  adk0212
 
 	* ABOUT-NLS:
