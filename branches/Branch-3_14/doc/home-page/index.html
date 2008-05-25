@@ -48,18 +48,24 @@ runtime expires based on internal APC calculations determined by power
 consumption rates. Apcupsd is licensed under the GPL version 2.
 <p>
 <h2>Recent Apcupsd Releases</h2>
-<h3><i><u>Stable:</u></i>&nbsp;3.14.3 (20 January 2008) [
+<h3><i><u>Stable:</u></i>&nbsp;3.14.4 (20 May 2008) [
 <a href="http://sourceforge.net/project/showfiles.php?group_id=54413">Download</a>
 ]</h3>
-3.14.3 fixes several bugs since 3.14.2 and includes a policy
-file which prevents the HAL-based USB UPS monitor included in recent Linux
-distros from interfering with apcupsd. (Only APC UPSes are blacklisted in
-the policy and the file is removed when apcupsd is uninstalled.)
+3.14.4 fixes several bugs since 3.14.3 and includes a rewrite of the build
+scripts (Makefiles). The build system now has reliable dependencies, support
+for parallel builds, and pretty-printed output. A new apcupsd.conf directive,
+POLLTIME, has been added to allow tuning of the interval at which apcupsd
+polls the UPS for status.
 <p>
-See the <a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=570036">
+Some unmaintained features (powerflute, internationalization, built-in libgd)
+have been removed in this release. Please see the
+<a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=600731">
+ReleaseNotes</a> for explanation and rationale.
+<p>
+See the <a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=600731">
 ReleaseNotes</a> for full details.
 <p>
-Apcupsd 3.14.3 is the latest stable release, containing many bug fixes and
+Apcupsd 3.14.4 is the latest stable release, containing many bug fixes and
 new features over the previous 3.12.x stable series. Users of all previous
 versions are encouraged to upgrade.
 <p>
@@ -76,6 +82,8 @@ release notes</a>.</i>
 <li>GAPCMON GUI monitoring tool
 <li>Unreliable MASTER/SLAVE networking mode is removed
 <li>New configuration directives to set paths at runtime
+<li>New configuration directive to set UPS polling interval (POLLTIME)
+<li>New Makefiles supporting dependencies and parallel build
 </ul>
 <h3><i><u>Previous Stable:</u></i>&nbsp;3.12.4 (19 August 2006) [
 <a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=49059&release_id=440657">Source</a>
