@@ -25,8 +25,6 @@
 
 #include "apc.h"
 
-extern const char *net_errmsg;
-
 /* Default values for contacting daemon */
 static const char *host = "localhost";
 static int port = NISPORT;
@@ -37,8 +35,11 @@ static void do_pthreads_status(const char *host, int port)
    int sockfd, n;
    char recvline[MAXSTRING + 1];
 
-   if ((sockfd = net_open(host, NULL, port)) < 0)
-      Error_abort0(net_errmsg);
+   if ((sockfd = net_open(host, NULL, port)) < 0) {
+      fprintf(stderr, "Error contacting apcupsd @ %s:%d: %s\n",
+         host, port, strerror(-sockfd));
+      return 1;
+   }
 
    net_send(sockfd, "status", 6);
 
@@ -47,10 +48,15 @@ static void do_pthreads_status(const char *host, int port)
       fputs(recvline, stdout);
    }
 
-   if (n < 0)
-      Error_abort0(net_errmsg);
+   if (n < 0) {
+      fprintf(stderr, "Error reading status from apcupsd @ %s:%d: %s\n",
+         host, port, strerror(-n));
+      net_close(sockfd);
+      return 1;
+   }
 
    net_close(sockfd);
+   return 0;
 }
 
 /*********************************************************************/
@@ -74,7 +80,8 @@ int main(int argc, char **argv)
       if (strcmp(argv[1], "status") == 0) {
          mode = 2;
       } else {
-         Error_abort1(_("Unknown command %s\n"), argv[1]);
+         fprintf(stderr, "Unknown command %s\n", argv[1]);
+         return 1;
       }
    }
 
@@ -94,11 +101,11 @@ int main(int argc, char **argv)
 
    switch (mode) {
    case 2:       /* status */
-      do_pthreads_status(host, port);
-      break;
+      return do_pthreads_status(host, port);
 
    default:
-      Error_abort0(_("Strange mode\n"));
+      fprintf(stderr, "Strange mode %d\n", mode);
+      return 1;
    }
 
    return 0;

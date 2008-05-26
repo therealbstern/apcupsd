@@ -1,233 +1,213 @@
-# General targets for Makefile(s) subsystem.
-# In this file we will put everything that need to be
-# shared betweek all the Makefile(s).
-# This file must be included at the beginning of every Makefile
-#
-# Copyright (C) 1999-2002 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
+# Pull in autoconf variables
+include $(topdir)/autoconf/variables.mak
 
-# We don't support parallelized makes
-.NOTPARALLEL:
+# Now that we have autoconf vars, overwrite $(topdir) with absolute path 
+# version instead of relative version we inherited. The easy way to do this 
+# would be to use $(abspath $(topdir)), but abspath is a gmake-3.81 feature.
+# So we let autoconf figure it out for us.
+topdir := $(abstopdir)
 
-# Tell versions [3.59,3.63) of GNU make not to export all variables.
-# Otherwise a system limit (for SysV at least) may be exceeded.
-.NOEXPORT:
-.SUFFIXES: .o .lo .c .cpp .h .po .gmo .mo .cat .msg .pox
-.MAIN: all
-.PHONY: all all-subdirs all-targets install uninstall install- install-apcupsd \
-		install-powerflute install-cgi install-strip clean realclean distclean \
-		mostlyclean clobber
+# Older (pre-3.79) gmake does not have $(CURDIR)
+ifeq ($(CURDIR),)
+  CURDIR := $(shell pwd)
+endif
 
-all: all-subdirs all-targets
+# By default we do pretty-printing only
+V := @
+VV := @
+NPD := --no-print-directory
 
-all-subdirs:
-	@if test ! x"$(subdirs)" = x; then \
-	    for file in . ${subdirs}; \
-	    do \
-		(cd $$file; \
-		 if test "$$file" != "."; then \
-		     $(MAKE) DESTDIR=$(DESTDIR) all || exit $$?; \
-		 fi; \
-		) || exit $$?; \
-	    done; \
-	fi
+# Check verbose flag
+ifeq ($(strip $(VERBOSE)),1)
+  V:=
+  NPD :=
+endif
+ifeq ($(strip $(VERBOSE)),2)
+  V:=
+  VV:=
+  NPD :=
+endif
 
-# Standard compilation targets
-dummy:
+# Relative path to this dir from $(topdir)
+RELDIR := $(patsubst /%,%,$(subst $(topdir),,$(CURDIR)))
+ifneq ($(strip $(RELDIR)),)
+  RELDIR := $(RELDIR)/
+endif
 
-.c.o:
-	$(CXX) -c $(CPPFLAGS) $(DEFS) $<
+# Convert a list of sources to a list of objects in OBJDIR
+SRC2OBJ = $(foreach obj,$(1:.c=.o),$(dir $(obj))$(OBJDIR)/$(notdir $(obj)))
 
-.c.lo:
-	$(LIBTOOL) --mode=compile $(COMPILE) $<
+# All objects, derived from all sources
+OBJS = $(call SRC2OBJ,$(SRCS))
 
-.cpp.o:
-	$(CXX) -c $(CPPFLAGS) $(DEFS) $<
+# Default target: Build all subdirs, then reinvoke make to build local 
+# targets. This is a little gross, but necessary to force make to build 
+# subdirs first when running in parallel via 'make -jN'. Hopefully I will 
+# discover a cleaner way to solve this someday.
+.PHONY: all
+all: all-subdirs
+	$(VV)+$(MAKE) $(NPD) all-targets
 
-.po.pox:
-	$(MAKE) DESTDIR=$(DESTDIR) $(PACKAGE).pot
-	$(MSGMERGE) $< $(srcdir)/$(PACKAGE).pot -o $*.pox
- 
-.po.mo:
-	$(MSGFMT) -o $@ $<
- 
-.po.gmo:
-	file=$(srcdir)/`echo $* | sed 's,.*/,,'`.gmo \
-	  && rm -f $$file && $(GMSGFMT) -o $$file $<
- 
-.po.cat:
-	sed -f $(topdir)/src/intl/po2msg.sed < $< > $*.msg \
-	  && rm -f $@ && $(GENCAT) $@ $*.msg					    
+# 'all-targets' is supplied by lower level Makefile. It represents
+# all targets to be built at that level. We list it here with a do-nothing
+# action in order to suppress the "Nothing to do for all-targets" message
+# when all targets are up to date.
+.PHONY: all-targets
+all-targets:
+	@#
 
-# Library targets
-$(topdir)/src/lib/libapc.a: $(topdir)/src/lib/*.[ch]
-	@(cd $(topdir)/src/lib && $(MAKE))
+# standard install target: Same logic as 'all'.
+.PHONY: install
+install: all-subdirs
+	$(VV)+$(MAKE) $(NPD) all-targets
+	$(VV)+$(MAKE) $(NPD) all-install
 
-$(topdir)/src/drivers/libdrivers.a: $(topdir)/src/drivers/*.[ch]
-	@(cd $(topdir)/src/drivers && $(MAKE))
+# 'all-install' is extended by lower-level Makefile to perform any
+# required install actions.
+.PHONY: all-install
+all-install:
+	@#
 
-$(topdir)/src/drivers/apcsmart/libapcsmart.a: $(topdir)/src/drivers/apcsmart/*.[ch]
-	@(cd $(topdir)/src/drivers/apcsmart && $(MAKE))
+# no-op targets for use by lower-level Makefiles when a particular
+# component is not being installed.
+.PHONY: install- uninstall-
+install-:
+uninstall-:
 
-$(topdir)/src/drivers/dumb/libdumb.a: $(topdir)/src/drivers/dumb/*.[ch]
-	@(cd $(topdir)/src/drivers/dumb && $(MAKE))
+# standard uninstall target: Depends on subdirs to force recursion,
+# then reinvokes make to uninstall local targets. Same logic as 'install'.
+.PHONY: uninstall
+uninstall: all-subdirs
+	$(VV)+$(MAKE) $(NPD) all-uninstall
 
-$(topdir)/src/drivers/net/libnet.a: $(topdir)/src/drivers/net/*.[ch]
-	@(cd $(topdir)/src/drivers/net && $(MAKE))
+# 'all-uninstall' is extended by lower-level Makefiles to perform 
+# any required uninstall actions.
+.PHONY: all-uninstall
+all-uninstall:
+	@#
 
-$(topdir)/src/drivers/usb/libusb.a: $(topdir)/src/drivers/usb/*.[ch]
-	@(cd $(topdir)/src/drivers/usb && $(MAKE))
+# Typical clean target: Remove all objects and dependency files.
+.PHONY: clean
+clean:
+	$(V)find . -depth \
+	  \( -name $(OBJDIR) -o -name $(DEPDIR) -o -name \*.a \) \
+          -exec echo "  CLEAN" \{\} \; -exec rm -r \{\} \;
 
-$(topdir)/src/drivers/snmp/libdumb.a: $(topdir)/src/drivers/snmp/*.[ch]
-	@(cd $(topdir)/src/drivers/snmp && $(MAKE))
+# Template rule to build a subdirectory
+.PHONY: %_DIR
+%_DIR:
+	@echo "       " $(RELDIR)$*
+	$(VV)+$(MAKE) -C $* $(NPD) $(MAKECMDGOALS)
 
-$(topdir)/src/drivers/test/libtest.a: $(topdir)/src/drivers/test/*.[ch]
-	@(cd $(topdir)/src/drivers/test && $(MAKE))
+# Collective all-subdirs target depends on subdir rule
+.PHONY: all-subdirs
+all-subdirs: $(foreach subdir,$(SUBDIRS),$(subdir)_DIR)
 
-$(topdir)/src/drivers/pcnet/libpcnet.a: $(topdir)/src/drivers/pcnet/*.[ch]
-	@(cd $(topdir)/src/drivers/pcnet && $(MAKE))
+# How to build dependencies
+MAKEDEPEND = $(CC) -M $(CFLAGS) $< > $(df).d
+ifeq ($(strip $(NODEPS)),)
+  define DEPENDS
+	if test ! -d $(DEPDIR); then mkdir -p $(DEPDIR); fi; \
+	  $(MAKEDEPEND); \
+	  echo -n $(OBJDIR)/ > $(df).P; \
+	  sed -e 's/#.*//' -e '/^$$/ d' < $(df).d >> $(df).P; \
+	  sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
+	      -e '/^$$/ d' -e 's/$$/ :/' < $(df).d >> $(df).P; \
+	  rm -f $(df).d
+  endef
+else
+  DEPENDS :=
+endif
 
-$(topdir)/src/intl/libintl.a: $(topdir)/src/intl/*.[ch]
-	@(cd $(topdir)/src/intl && $(MAKE))
+# Rule to build *.o from *.c and generate dependencies for it
+$(OBJDIR)/%.o: %.c
+	@echo "  CXX  " $(RELDIR)$<
+	$(VV)if test ! -d $(OBJDIR); then mkdir -p $(OBJDIR); fi
+	$(V)$(CXX) $(CPPFLAGS) -c -o $@ $<
+	$(VV)$(DEPENDS)
 
-$(topdir)/src/gd1.2/libgd.a: $(topdir)/src/gd1.2/*.[ch]
-	@(cd $(topdir)/src/gd1.2 && $(MAKE))
+# Rule to link an executable
+define LINK
+	@echo "  LD   " $(RELDIR)$@
+	$(V)$(LD) $(LDFLAGS) $^ -o $@ $(LIBS)
+endef
 
-# Makefile subsystem targets
-$(topdir)/autoconf/variables.mak: $(topdir)/autoconf/variables.mak.in
-	@(cd $(topdir) && \
-	SINGLE_MAKEFILE=yes \
-	CONFIG_FILES=./autoconf/variables.mak \
-	CONFIG_HEADERS= $(SHELL) ./config.status)
+# Rule to generate an archive (library)
+MAKELIB=$(call ARCHIVE,$@,$(OBJS))
+define ARCHIVE
+	@echo "  AR   " $(RELDIR)$(1)
+	$(VV)rm -f $(1)
+	$(V)$(AR) rc $(1) $(2)
+	$(V)$(RANLIB) $(1)
+endef
 
-Makefiles:
-	@(cd $(topdir) && \
-	$(SHELL) ./config.status)
+# Rule to create a directory during install
+define MKDIR
+   $(if $(wildcard $(DESTDIR)$(1)),, \
+      @echo "  MKDIR" $(DESTDIR)$(1))
+   $(if $(wildcard $(DESTDIR)$(1)),, \
+     $(V)$(MKINSTALLDIRS) $(DESTDIR)$(1))
+endef
 
-Makefile: $(srcdir)/Makefile.in $(topdir)/config.status \
-			$(topdir)/autoconf/variables.mak $(topdir)/autoconf/targets.mak
-	@$(abssrcdir)/autoconf/rebuild-makefile.sh $(abssrcdir)
-	@echo "You can ignore any makedepend error messages"
-	@$(MAKE) DESTDIR=$(DESTDIR) single-depend
+# Install a program file, given mode, src, and dest
+define INSTPROG
+   @echo "  COPY " $(2) =\> $(DESTDIR)$(3)
+   $(V)$(INSTALL_PROGRAM) $(STRIP) -m $(1) $(2) $(DESTDIR)$(3)
+endef
 
-# Configuration targets
+# Install a data file, given mode, src, and dest
+define INSTDATA
+   @echo "  COPY " $(2) =\> $(DESTDIR)$(3)
+   $(V)$(INSTALL_DATA) -m $(1) $(2) $(DESTDIR)$(3)
+endef
 
-configure:  $(topdir)/autoconf/configure.in $(topdir)/autoconf/aclocal.m4 \
-			$(topdir)/autoconf/acconfig.h $(topdir)/autoconf/config.h.in
-	cd $(topdir);
-	$(RMF) config.cache config.log config.out config.status include/config.h
-	autoconf --prepend-include=$(topdir)/autoconf \
-	autoconf/configure.in > configure
-	chmod 755 configure
+# Install a data file, given mode, src, and dest.
+# Existing dest file is preserved; new file is named *.new if dest exists.
+define INSTNEW
+   @echo "  COPY " $(notdir $(2)) =\> $(DESTDIR)$(3)/$(notdir $(2))$(if $(wildcard $(DESTDIR)$(3)/$(notdir $(2))),.new,)
+   $(V)$(INSTALL_DATA) -m $(1) $(2) $(DESTDIR)$(3)/$(notdir $(2))$(if $(wildcard $(DESTDIR)$(3)/$(notdir $(2))),.new,)
+endef
 
-$(topdir)/autoconf/config.h.in: $(topdir)/autoconf/configure.in \
-		$(topdir)/autoconf/acconfig.h
-#	cd $(srcdir);
-#	autoheader --prepend-include=$(srcdir)/autoconf \
-#	autoconf/configure.in > autoconf/config.h.in
-#	chmod 644 autoconf/config.h.in
+# Install a data file, given mode, src, and dest.
+# Existing dest file is renamed to *.orig if it exists.
+define INSTORIG
+   $(if $(wildcard $(DESTDIR)$(3)/$(notdir $(2))), \
+      @echo "  MV   " $(DESTDIR)$(3)/$(notdir $(2)) =\> \
+         $(DESTDIR)$(3)/$(notdir $(2)).orig,)
+   $(if $(wildcard $(DESTDIR)$(3)/$(notdir $(2))), \
+      $(V)mv $(DESTDIR)$(3)/$(notdir $(2)) $(DESTDIR)$(3)/$(notdir $(2)).orig,)
+   @echo "  COPY " $(notdir $(2)) =\> $(DESTDIR)$(3)/$(notdir $(2))
+   $(V)$(INSTALL_SCRIPT) -m $(1) $(2) $(DESTDIR)$(3)
+endef
 
-$(topdir)/config.status:
-	@if test -x $(topdir)/config.status; then \
-		(cd $(topdir) && \
-		$(SHELL) ./config.status --recheck); \
-	else \
-		(cd $(topdir) && \
-		$(SHELL) ./configure); \
-	fi
+# Make a symlink
+define SYMLINK
+   @echo "  LN   " $(DESTDIR)/$(2) -\> $(1)
+   $(V)ln -sf $(1) $(DESTDIR)/$(2)
+endef
 
-clean-subdirs:
-	@if test ! x"$(subdirs)" = x; then \
-		for file in . ${subdirs}; \
-		do \
-			(cd $$file && if test "$$file" != "."; then $(MAKE) clean; fi); \
-		done; \
-	fi
+# Copy a file
+define COPY
+   @echo "  CP   " $(1) =\> $(DESTDIR)/$(2)
+   $(V)cp -f $(1) $(DESTDIR)/$(2)
+endef
 
-distclean-subdirs:
-	@if test ! x"$(subdirs)" = x; then \
-		for file in . ${subdirs}; \
-		do \
-			(cd $$file && if test "$$file" != "."; then $(MAKE) distclean; fi); \
-		done; \
-	fi
+# Uninstall a file
+define UNINST
+   @echo "  RM   " $(DESTDIR)$(1)
+   $(V)$(RMF) $(DESTDIR)$(1)
+endef
 
-targetclean: clean-subdirs
-	$(RMF) *.o *.lo *.a core core.* .*~ *~ *.bak
-	$(RMF) *.exe *.res *.cgi
-	$(RMF) 1 2 3 4 ID TAGS *.orig $(allexe)
+# Announce distro install
+define DISTINST
+   @echo "  ------------------------------------------------------------"
+   @echo "  $(1) distribution installation"
+   @echo "  ------------------------------------------------------------"
+endef
 
-targetdistclean: clean distclean-subdirs
-
-mostlyclean: clean
-realclean: distclean
-clobber: distclean
-
-# Semi-automatic generation of dependencies:
-# Use gcc if possible because X11 `makedepend' doesn't work on all systems
-# and it also includes system headers.
-# Also test for the presence of source files: if not present, do nothing.
-depend:
-	@if test "`$(topdir)/autoconf/has-c-files.sh`" = "no"; then \
-		$(ECHO) "Nothing to do for depend."; \
-	else \
-		$(MAKE) real-depend; \
-	fi
-	@if test ! x"$(subdirs)" = x; then \
-		for file in . ${subdirs}; \
-		do \
-			(cd $$file && if test "$$file" != "."; then $(MAKE) depend; fi); \
-		done; \
-	fi
-
-single-depend:
-	@if test "`$(topdir)/autoconf/has-c-files.sh`" = "no"; then \
-		$(ECHO) "Nothing to do for depend."; \
-	else \
-		$(MAKE) real-depend; \
-	fi
-
-real-depend:
-	@$(RMF) Makefile.bak
-	@if test `basename "$(CXX)"` = "g++" ; then \
-	   $(MV) Makefile Makefile.bak; \
-	   $(SED) "/^# DO NOT DELETE THIS LINE/,$$ d" Makefile.bak > Makefile; \
-	   $(ECHO) "# DO NOT DELETE THIS LINE -- make depend depends on it." >> Makefile; \
-	   $(CXX) -S -M $(CPPFLAGS) $(INCFLAGS) *.c >> Makefile; \
-	else \
-	   makedepend -- $(CFLAGS) -- $(INCFLAGS) *.c; \
-	fi 
-	@if test -f Makefile ; then \
-	    $(RMF) Makefile.bak; \
-	else \
-	   $(MV) Makefile.bak Makefile; \
-	   echo -e "Something went wrong with the make depend!\n\a\a\a\a"; \
-	fi
-
-install-subdirs:
-	@if test ! x"$(subdirs)" = x; then \
-	   for file in . ${subdirs}; \
-	   do \
-	       (cd $$file && if test "$$file" != "."; then $(MAKE) STRIP=$(STRIP) DESTDIR=$(DESTDIR) install; fi); \
-	   done; \
-	fi
-
-uninstall-subdirs:
-	@if test ! x"$(subdirs)" = x; then \
-	   for file in . ${subdirs}; \
-	   do \
-	      (cd $$file && if test "$$file" != "."; then $(MAKE) DESTDIR=$(DESTDIR) uninstall; fi); \
-	   done; \
-	fi
-
-install-strip:
-	@$(MAKE) STRIP='-s' install
-
-indent:
-	(cd $(topdir) && \
-		find . \( -name '*.c' -o -name '*.h' -o -name '*.cpp' \) \
-			-exec ./scripts/format_code {} \;)
-
-TAGS:
-	(cd $(topdir) && $(ETAGS) `find . \( -name \*.c -o -name \*.h \)`)
-tags:
-	(cd $(topdir) && $(CTAGS) `find . \( -name \*.c -o -name \*.h \)`)
+# Announce distro uninstall
+define DISTUNINST
+   @echo "  ------------------------------------------------------------"
+   @echo "  $(1) distribution uninstall"
+   @echo "  ------------------------------------------------------------"
+endef

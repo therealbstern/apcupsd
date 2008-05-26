@@ -75,6 +75,7 @@
 #include <sys/types.h>          /* socket() */
 #include <sys/socket.h>         /* socket() */
 #include <arpa/inet.h>          /* ntohs() */
+#include <netinet/in.h>         /* sockaddr_in */
 #include <netdb.h>              /* gethostbyname() */
 #include <errno.h>
 #include <string.h>             /* memset() */
@@ -171,7 +172,6 @@ static gint gapc_panel_graph_property_page(PGAPC_CONFIG pcfg, GtkWidget * notebo
  */
 struct hostent * gethostname_re
     (const char *host,struct hostent *hostbuf,char **tmphstbuf,size_t *hstbuflen);
-
 
 /* 
  * Some small number of globals are required
@@ -1867,7 +1867,8 @@ static gboolean gapc_monitor_update_tooltip_msg(PGAPC_MONITOR pm)
    }
    pch_watt = g_hash_table_lookup(pm->pht_Status, "NOMPOWER");
    if ( pch_watt != NULL ) {
-     d_watt = g_strtod (pch_watt, NULL);
+     pm->i_watt = g_strtod (pch_watt, NULL);
+     d_watt = d_loadpct * pm->i_watt;
    } else {
      d_watt = d_loadpct * pm->i_watt;
    }
@@ -2218,7 +2219,8 @@ static gint gapc_monitor_update(PGAPC_MONITOR pm)
    pch4 = g_hash_table_lookup(pm->pht_Status, "BATTDATE");
    pch_watt = g_hash_table_lookup(pm->pht_Status, "NOMPOWER");
    if (pch_watt != NULL) {
-    d_watt = g_strtod (pch_watt, NULL);
+    pm->i_watt = g_strtod (pch_watt, NULL);
+    d_watt = d_loadpct * pm->i_watt;
    } else {
     d_watt = d_loadpct * pm->i_watt;
    }
@@ -2256,8 +2258,6 @@ static gint sknet_net_write_nbytes (GIOChannel * ioc, gchar * ptr, gsize nbytes)
   GError *gerror = NULL;
   GIOStatus ios = 0;
   gboolean b_eof = TRUE;
-  gchar  ch[SKNET_STR_ARRAY];
-  gchar  *pmsg = ptr;
 
   nleft = nbytes;
 
@@ -2292,10 +2292,6 @@ static gint sknet_net_write_nbytes (GIOChannel * ioc, gchar * ptr, gsize nbytes)
     ptr += nwritten;
   }
   while ((nleft > 0) && (b_eof != TRUE));
-
-  g_snprintf (ch, sizeof(ch), "wrote{%s} %d bytes from channel=%d", 
-              pmsg, nwritten, g_io_channel_unix_get_fd(ioc));
-  sknet_util_log_msg ("sknet_net_write_nbytes", "Normal Exit", ch);
 
   return (nbytes - nleft);
 }
@@ -2345,7 +2341,6 @@ static gint sknet_net_read_nbytes (GIOChannel * ioc, gchar * ptr, gsize nbytes)
   GError *gerror = NULL;
   GIOStatus ios = 0;
   gboolean b_eof = FALSE;
-  gchar  ch[SKNET_STR_ARRAY];
 
   nleft = nbytes;
 
@@ -2362,11 +2357,11 @@ static gint sknet_net_read_nbytes (GIOChannel * ioc, gchar * ptr, gsize nbytes)
       break;
     case G_IO_STATUS_AGAIN:
       sknet_util_log_msg ("sknet_net_read_nbytes", "G_IO_STATUS_AGAIN", "aborted");
-      g_usleep (100000);
+      g_usleep (500000);
       break;
     case G_IO_STATUS_EOF:
       sknet_util_log_msg ("sknet_net_read_nbytes", "G_IO_STATUS_EOF", "ok");
-      return 0; 
+      return 0;
       break;
     case G_IO_STATUS_NORMAL:
       break;
@@ -2381,10 +2376,6 @@ static gint sknet_net_read_nbytes (GIOChannel * ioc, gchar * ptr, gsize nbytes)
   }
   while ((nleft > 0) && (b_eof != TRUE));
 
-  g_snprintf (ch, sizeof(ch), "read %d bytes from channel=%d", 
-              nread, g_io_channel_unix_get_fd(ioc));
-  sknet_util_log_msg ("sknet_net_read_nbytes", "Normal Exit", ch);
-  
   return (nbytes - nleft);      /* return >= 0 */
 }
 
@@ -2401,7 +2392,6 @@ static gint sknet_net_recv (GIOChannel * ioc, gchar * buff, gsize maxlen)
 {
   gint nbytes = 0;
   gshort pktsiz = 0;
-  gchar  ch[SKNET_STR_ARRAY];
 
   /* get data size -- in short */
   nbytes = sknet_net_read_nbytes (ioc, (gchar *) &pktsiz, sizeof (gshort));
@@ -2425,8 +2415,7 @@ static gint sknet_net_recv (GIOChannel * ioc, gchar * buff, gsize maxlen)
 
   if (pktsiz == 0)
   {
-    g_snprintf(ch, sizeof(ch),"Soft Error on ioc=%d", g_io_channel_unix_get_fd(ioc));
-    sknet_util_log_msg ("sknet_net_recv", ch, "No message available");
+    sknet_util_log_msg ("sknet_net_recv", "Soft error", "End-of-File");
     return 0;                   /* soft EOF */
   }
 
@@ -2451,23 +2440,24 @@ static gint sknet_net_recv (GIOChannel * ioc, gchar * buff, gsize maxlen)
 */
 static void sknet_net_close (GIOChannel *ioc, gboolean b_flush)
 {
-  int sockfd;
-  GError *gerror = NULL;
-  GIOStatus  ios = 0;
-  
-  sockfd = g_io_channel_unix_get_fd (ioc);
-  ios = g_io_channel_shutdown (ioc, b_flush, &gerror);
-  if (gerror != NULL)
-  {
-    sknet_util_log_msg ("sknet_channel_close", "error", gerror->message);
-    g_error_free (gerror);
-  }
-  if (ios != G_IO_STATUS_NORMAL) {
-      g_message ("net_close: g_io_channel_shutdown(%d) failed with %d", sockfd, ios);      
-  }
+    int sockfd =0;
+    GError *gerror = NULL;
+    GIOStatus  ios = G_IO_STATUS_NORMAL;
+    
+    sockfd = g_io_channel_unix_get_fd (ioc);
+    ios = g_io_channel_shutdown (ioc, b_flush, &gerror);
+    if (gerror != NULL)
+    {
+      sknet_util_log_msg ("sknet_channel_close", "error", gerror->message);
+      g_error_free (gerror);
+    }
+    if (ios != G_IO_STATUS_NORMAL) {
+        g_message ("net_close: g_io_channel_shutdown(%d) failed with %d", sockfd, ios);      
+    }
 
-  g_io_channel_unref (ioc);
-  
+    g_io_channel_unref (ioc);
+    
+
   return;
 }
 
@@ -2639,7 +2629,6 @@ static gint gapc_net_transaction_service(PGAPC_MONITOR pm, gchar * cp_cmd, gchar
 {
    gint n = 0, iflag = 0;
    GIOChannel   *ioc = NULL;
-   gchar  ch[SKNET_STR_ARRAY];
    
    g_return_val_if_fail(pm, -1);
    g_return_val_if_fail(pm->psk, -1);   
@@ -2651,10 +2640,6 @@ static gint gapc_net_transaction_service(PGAPC_MONITOR pm, gchar * cp_cmd, gchar
       return 0;
    }
 
-   g_snprintf (ch, sizeof(ch), "%s Monitor=%d on Channel=%d", 
-               pm->pch_host, pm->cb_monitor_num, g_io_channel_unix_get_fd(ioc));
-   sknet_util_log_msg ("gapc_net_transaction_service", "Entrance", ch);
-   
    n = sknet_net_send( ioc, cp_cmd, g_utf8_strlen(cp_cmd, -1));
    if (n <= 0) {
       sknet_net_close( ioc, TRUE);
@@ -2683,8 +2668,6 @@ static gint gapc_net_transaction_service(PGAPC_MONITOR pm, gchar * cp_cmd, gchar
    }
 
    sknet_net_close(ioc, TRUE);
-
-   sknet_util_log_msg ("gapc_net_transaction_service", "Exit", ch);
 
    return iflag;                   /* count of records received */
 }
@@ -2723,8 +2706,7 @@ static gpointer *gapc_net_thread_qwork(PGAPC_MONITOR pm)
             continue;
          }
 
-         rc = gapc_net_transaction_service(pm, "status", pm->pach_status);
-         if (rc > 0) {
+         if ((rc = gapc_net_transaction_service(pm, "status", pm->pach_status))) {
             gapc_net_transaction_service(pm, "events", pm->pach_events);
          }
          g_mutex_unlock(pm->gm_update);
@@ -4098,104 +4080,104 @@ static GtkWidget *gapc_panel_monitors_model_init(PGAPC_CONFIG pcfg)
 */
 static gboolean gapc_util_load_icons(PGAPC_CONFIG pcfg)
 {
-   guint i_x = 0, x = 0;
-   GError *gerror = NULL;
-   GdkPixbuf *pixbuf = NULL;
-   gboolean b_rc = TRUE;
-   gchar pch_file[GAPC_MAX_ARRAY];
-   gchar *pch_2 = "./";
-   gchar *pch_3 = "../pixmaps/";
-   gchar *pch_4 = NULL;
-   gchar *pch_image_names[] = {
-      "online.png",
-      "onbatt.png",
-      "charging.png",
-      "apcupsd.png",
-      "unplugged.png",
-      "gapc_prefs.png",
-      NULL
-   };
+    guint i_x = 0, x = 0;
+    GError *gerror = NULL;
+    GdkPixbuf *pixbuf = NULL;
+    gboolean b_rc = TRUE;
+    gchar pch_file[GAPC_MAX_ARRAY];
+    gchar *pch_2 = "./";
+    gchar *pch_3 = "../pixmaps/";
+    gchar *pch_4 = NULL;
+    gchar *pch_image_names[] = {
+       "online.png",
+       "onbatt.png",
+       "charging.png",
+       "apcupsd.png",
+       "unplugged.png",
+       "gapc_prefs.png",
+       NULL
+    };
 
-   g_return_val_if_fail(pcfg != NULL, FALSE);
+    g_return_val_if_fail(pcfg != NULL, FALSE);
 
-   /* build system path for icons */
-   pch_4 = g_strconcat (ICON_DIR, "/share/pixmaps/", NULL);
+    /* build system path for icons */
+    pch_4 = g_strconcat (ICON_DIR, "/pixmaps/", NULL);
 
-   i_x = 0;
-   while (i_x == 0) {
-      if (g_file_test(pch_image_names[0], G_FILE_TEST_EXISTS)) {
-         i_x = 1;
-         break;
-      }
+    i_x = 0;
+    while (i_x == 0) {
+       if (g_file_test(pch_image_names[0], G_FILE_TEST_EXISTS)) {
+          i_x = 1;
+          break;
+       }
 
-      g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s%s", pch_2, pch_image_names[0]);
-      if (g_file_test(pch_file, G_FILE_TEST_EXISTS)) {
-         i_x = 2;
-         break;
-      }
+       g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s%s", pch_2, pch_image_names[0]);
+       if (g_file_test(pch_file, G_FILE_TEST_EXISTS)) {
+          i_x = 2;
+          break;
+       }
 
-      g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s%s", pch_3, pch_image_names[0]);
-      if (g_file_test(pch_file, G_FILE_TEST_EXISTS)) {
-         i_x = 3;
-         break;
-      }
+       g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s%s", pch_3, pch_image_names[0]);
+       if (g_file_test(pch_file, G_FILE_TEST_EXISTS)) {
+          i_x = 3;
+          break;
+       }
 
-      g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s%s", pch_4, pch_image_names[0]);
-      if (g_file_test(pch_file, G_FILE_TEST_EXISTS)) {
-         i_x = 4;
-         break;
-      }
+       g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s%s", pch_4, pch_image_names[0]);
+       if (g_file_test(pch_file, G_FILE_TEST_EXISTS)) {
+          i_x = 4;
+          break;
+       }
 
-      break;
-   }
+       break;
+    }
 
-   if (i_x == 0) {
-      gapc_util_log_app_msg("gapc_util_load_icons", "Unable to find icons",
-         "--load failed!");
-     g_free (pch_4);
-     return FALSE;
-   }
+    if (i_x == 0) {
+       gapc_util_log_app_msg("gapc_util_load_icons", "Unable to find icons",
+          "--load failed!");
+      g_free (pch_4);
+      return FALSE;
+    }
 
-   for (x = 0; (pch_image_names[x] != NULL) && (x < GAPC_N_ICONS); x++) {
-      switch (i_x) {
-      case 1:
-         g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s", pch_image_names[x]);
-         break;
-      case 2:
-         g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s%s", pch_2, pch_image_names[x]);
-         break;
-      case 3:
-         g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s%s", pch_3, pch_image_names[x]);
-         break;
-      case 4:
-         g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s%s", pch_4, pch_image_names[x]);
-         break;
-      default:
-         g_return_val_if_reached(FALSE);
-         break;
-      }
+    for (x = 0; (pch_image_names[x] != NULL) && (x < GAPC_N_ICONS); x++) {
+       switch (i_x) {
+       case 1:
+          g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s", pch_image_names[x]);
+          break;
+       case 2:
+          g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s%s", pch_2, pch_image_names[x]);
+          break;
+       case 3:
+          g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s%s", pch_3, pch_image_names[x]);
+          break;
+       case 4:
+          g_snprintf(pch_file, GAPC_MAX_ARRAY, "%s%s", pch_4, pch_image_names[x]);
+          break;
+       default:
+          g_return_val_if_reached(FALSE);
+          break;
+       }
 
-      pixbuf = gdk_pixbuf_new_from_file(pch_file, &gerror);
-      if (gerror != NULL) {
-         gchar *pch = NULL;
+       pixbuf = gdk_pixbuf_new_from_file(pch_file, &gerror);
+       if (gerror != NULL) {
+          gchar *pch = NULL;
 
-         pch = g_strdup_printf("Get Icon=%s Failed", pch_file);
-         gapc_util_log_app_msg("gapc_util_load_icons", pch, gerror->message);
-         g_error_free(gerror);
-         g_free(pch);
-         gerror = NULL;
-         b_rc = FALSE;
-         pcfg->my_icons[x] = NULL;
-      } else {
-         pcfg->my_icons[x] =
-            gdk_pixbuf_scale_simple(pixbuf, GAPC_ICON_SIZE, GAPC_ICON_SIZE,
-            GDK_INTERP_BILINEAR);
-         g_object_unref(pixbuf);
-      }
-   }
+          pch = g_strdup_printf("Get Icon=%s Failed", pch_file);
+          gapc_util_log_app_msg("gapc_util_load_icons", pch, gerror->message);
+          g_error_free(gerror);
+          g_free(pch);
+          gerror = NULL;
+          b_rc = FALSE;
+          pcfg->my_icons[x] = NULL;
+       } else {
+          pcfg->my_icons[x] =
+             gdk_pixbuf_scale_simple(pixbuf, GAPC_ICON_SIZE, GAPC_ICON_SIZE,
+             GDK_INTERP_BILINEAR);
+          g_object_unref(pixbuf);
+       }
+    }
 
-   g_free (pch_4);
-   return b_rc;
+    g_free (pch_4);
+    return b_rc;
 }
 
 /* 
@@ -5489,7 +5471,7 @@ static gint gapc_monitor_history_page(PGAPC_MONITOR pm, GtkWidget * notebook)
     * Prepare the environment */
    pphs->gp = (gpointer) pm;
    pphs->d_xinc = pm->d_refresh * pm->d_graph;
-   /* lg_graph_debug = FALSE; */
+   lg_graph_debug = FALSE;
 
    for (h_index = 0; h_index < GAPC_LINEGRAPH_MAX_SERIES; h_index++) {
       if (pm->phs.sq[h_index].gm_graph != NULL) {

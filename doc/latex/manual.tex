@@ -978,9 +978,8 @@ file.
 
 Other configuration options can be used to set up the installation of HTML
 documentation and optional modules, notably the CGI interface that enables the
-UPS state to be queried via the Web and the optional powerflute curses-based
-control panel.  Still others enable features such as thread support.  You will
-find a complete reference later in this chapter.  
+UPS state to be queried via the Web.  You will find a complete reference later
+in this chapter.  
 
 In general, you will probably want to supply a more elaborate {\tt configure}
 statement to ensure that the modules you want are built and that everything is
@@ -1000,8 +999,7 @@ following:
        --with-cgi-bin=/var/www/cgi-bin \
        --enable-cgi \
        --with-css-dir=/var/www/docs/css \
-       --with-log-dir=/etc/apcupsd \
-       --enable-powerflute
+       --with-log-dir=/etc/apcupsd
 \end{verbatim}
 \normalsize
 
@@ -1169,14 +1167,6 @@ be unmounted during a shutdown and thus may prevent the {\tt halt} script from
 calling apcupsd to turn off the UPS power. Though your data will be protected,
 in this case, your system will probably not be automatically rebooted when the
 power returns.  
-
-\label{index-options_002c-_002d_002d_002denable_002dpowerflute-28}
-
-\item [{---}enable-powerflute]
-   \index{{---}enable-powerflute }
-   This option enables the building of the powerflute executable, which is a
-ncurses based program to monitor the UPS. This program is not necessary for
-the proper execution of apcupsd.  
 
 \label{index-options_002c-_002d_002d_002denable_002dcgi-29}
 
@@ -1497,14 +1487,11 @@ You can also find the official Debian packages on the Debian site at:
 
 \begin{itemize}
 \item 
-   \elink{http://packages.debian.org/stable/admin/apcupsd.html}{http://packages.d%
-   ebian.org/stable/admin/apcupsd.html}  
+   \elink{http://packages.debian.org/stable/apcupsd}{http://packages.debian.org/stable/apcupsd}  
 \item 
-   \elink{http://packages.debian.org/testing/admin/apcupsd.html}{http://packages.%
-   debian.org/testing/admin/apcupsd.html}  
+   \elink{http://packages.debian.org/testing/apcupsd}{http://packages.debian.org/testing/apcupsd}  
 \item 
-   \elink{http://packages.debian.org/unstable/admin/apcupsd.html}{http://packages%
-   .debian.org/unstable/admin/apcupsd.html} 
+   \elink{http://packages.debian.org/unstable/apcupsd}{http://packages.debian.org/unstable/apcupsd}  
 \end{itemize}
 
 \label{FreeBSD}
@@ -2163,7 +2150,8 @@ like what follows.  What is important is that you get the information from an
 \textbf{ether} \textbf{UPSCABLE} with \textbf{UPSTYPE} set as
 \textbf{net} over the network and you must specify the address of a NIS
 server using \textbf{DEVICE}\@. The client apcupsd will then poll the
-NIS server specified in \textbf{DEVICE} every \textbf{NETTIME} seconds.
+NIS server specified in \textbf{DEVICE} every \textbf{POLLTIME} seconds
+(formerly \textbf{NETTIME}).
 
 \footnotesize
 \begin{verbatim}
@@ -2174,7 +2162,7 @@ NIS server specified in \textbf{DEVICE} every \textbf{NETTIME} seconds.
      DEVICE server-network-address:3551
      UPSCLASS standalone
      UPSMODE disable
-     NETTIME 10
+     POLLTIME 10
 \end{verbatim}
 \normalsize
 
@@ -2184,7 +2172,7 @@ the apcupsd NIS server, and TCP port is the \textbf{NISPORT} that the server
 is listening on.  The default is 3551, but older versions of apcupsd used
 port 7000.  
 
-If you set \textbf{NETTIME} too large, your slave may not see the
+If you set \textbf{POLLTIME} too large, your slave may not see the
 change in state of the NIS server before the server has shutdown. Normally,
 you have at least 30~seconds of grace time between the time the NIS server
 decides to shutdown and the time it no longer responds. Your slave must poll
@@ -4816,8 +4804,7 @@ could use the following configuration:
        --with-css-dir=/home/http/css \
        --with-log-dir=/etc/apcupsd \
        --with-serial-dev=/dev/ttyS0 \
-       --with-nis-port=3551 \
-       --enable-powerflute
+       --with-nis-port=3551
 \end{verbatim}
 \normalsize
 
@@ -6593,6 +6580,17 @@ hostname:vendor:community}. Please see the SNMP chapter (see
 \ilink{Support for SNMP UPSes}{Support-for-SNMP-UPSes}) in this
 manual for more details.  
 
+\item [POLLTIME \lt{}time in seconds\gt{}]
+   \index{POLLTIME \lt{}time in seconds\gt{} }
+The interval, in seconds, at which apcupsd polls the UPS for status. This rate
+is automatically set to 1 second if the UPS goes on batteries and reset to your
+specified value when the mains power returns. This setting applies both to 
+directly-attached UPSes (UPSTYPE apcsmart, usb, dumb) and networked UPSes 
+(UPSTYPE net, snmp). Lowering this setting will improve apcupsd's 
+responsiveness to certain events at the cost of higher CPU utilization. 
+The default of 60 is appropriate for most situations. This directive was 
+formerly known as {\bf NETTIME}.
+
 \item [LOCKFILE \lt{}path to lockfile\gt{}]
    \index{LOCKFILE \lt{}path to lockfile\gt{} }
    This option tells apcupsd where to create a lockfile for the USB or serial
@@ -6950,12 +6948,6 @@ Use share for two or seven (2/7) additional simple signal ports on a
 SmartAccessories(tm) (internal/external box) for SmartUPSes. The share and
 sharenet code is not fully tested.  
 
-\item [NETTIME \lt{}time in seconds\gt{}]
-   \index{NETTIME \lt{}time in seconds\gt{} }
-   The interval in seconds that the master uses to send information to slave
-machines. This rate is automatically set to 1 second if the UPS goes on
-batteries and reset to your specified value when the mains power returns. A
-typical value might be 60 seconds.  
 \end{description}
 
 \label{Configuration-Directives-Used-to-Set-the-UPS-EPROM}
@@ -8799,19 +8791,19 @@ of software for UPSmanagement.
 
 \item [Current Code Maintainer and Project Manager:]
    \index{Current Code Maintainer and Project Manager: }
-   Kern Sibbald (kern at sibbald dot com)  
+   Adam Kropelin (akropel1 at rochester dot rr dot com)  
 
 \item [RPM Packager:]
    \index{RPM Packager: }
    D. Scott Barninger (barninger at fairfieldcomputers dot com)  
 
-\item [Super USB bug fixer:]
-   \index{Super USB bug fixer: }
-   Adam Kropelin (akropel1 at rochester dot rr dot com)  
-
 \item [CGI and HTML fixer:]
    \index{CGI and HTML fixer: }
    William King (wrking at dadaboom dot com)  
+
+\item [Former Project Manager:]
+   \index{Former Project Manager: }
+   Kern Sibbald (kern at sibbald dot com)  
 
 \item [Project Starter and Former Code Maintainer:]
    \index{Project Starter and Former Code Maintainer: }

@@ -8,8 +8,105 @@ versions are encouraged to upgrade.
 IF YOU USE THE OLD STYLE MASTER/SLAVE NETWORKING MODE, BE SURE TO READ THE
 3.14.0 RELEASE NOTES BELOW.
 
-3.14.2 -- 15 September 2007          (Maintenance Release)
 
+3.14.4 -- 18 May 2008                (Maintenance Release)
+
+MAJOR CHANGES
+
+  * Build system rewrite: All Makefiles have been rewritten from scratch.
+    Improvements include reliable dependencies, support for parallel make,
+    elimination of Makefile.in -> Makefile conversion, consistent use of
+    DESTDIR during 'make install', and pretty-printed output during builds.
+    
+    NEW BUILD SYSTEM NOTES
+      - GNU make is required. The configure script checks for this and tells
+        you how to invokve it (on some platforms it is 'gmake' instead of 
+        'make').
+      - Output during build is pretty-printed by default. To see more details,
+        use 'make VERBOSE=1' for output similar to the old build system. For
+        even more verbosity, use 'make VERBOSE=2'.
+      - Parallel builds work well. If you have a multiprocessor (or multicore)
+        system, try 'make -j<number-of-processors>' for the fastest possible
+        build.
+
+  * Built-in version of libgd for multimon cgi has been removed. The version
+    previously included in apcupsd was old and likely had security issues.
+    It is safer to use libgd from the target system. Therefore, your system
+    must provide libgd if you choose to build cgi now. Generally this is 
+    easy to achieve by installing a vendor-supplied package.
+
+  * Removal of NLS support: The NLS code was terribly bit-rotted with many
+    non-internationalized messages and almost every translated message was
+    incorrect. At this point the maintenance burden of keeping NLS support
+    building was deemed too high considering the small benefit it was able 
+    to provide.
+
+  * Powerflute has been disabled. It has been broken for the last several 
+    releases because it relied on an untrushworthy source of UPS status
+    (rawupsstats) which was itself removed. Powerflute could be converted to
+    use the standard NIS status mechanism and its source code remains in
+    the tree in case someone has the desire to contribute this code.
+
+NEW FEATURES
+
+  * Add POLLTIME directive to control UPS polling interval. This directive
+    specifies the number of seconds to delay between polling the UPS for
+    status. Previously, NETTIME allowed this to be adjusted for network
+    connections only (snmp, pcnet, nis-net). POLLTIME configures the delay
+    for all connection types. NETTIME is accepted as a synonym for 
+    compatibility with old config files.
+
+BUG FIXES
+
+  * gapcmon: Corrected the use of NOMPOWER and the calc of current usage
+    amount. Thanks to James Scott Jr <skoona@verizon.net>.
+
+  * Add a heuristic to fix up incorrect NOMINV or NOMOUTV. Some UPSes
+    (RS 500) report decivolts instead of volts. Reported by Kirill S.
+    Bychkov <yason@linklevel.net>.
+
+  * Various build fixes on Solaris and OpenSolaris. Thanks to James Dean
+    <jgmdean@gmail.com> for loaning me an ssh login on his OpenSolaris box.
+
+  * Fix hal policy file syntax. For some reason this blatantly	incorrect 
+    file actually works on RHEL5 (hal-0.5.8). Thanks to Andrew Telford 
+    <a.telford@ieee.org> for correcting it.
+
+  * Fix gapcmon build on OpenBSD.
+
+  * Fix BSD USB driver build.
+
+  * Fix default NIS port on Debian. Debian is now using the standard NIS 
+    port, 3551.  Contributed by imacat <imacat@mail.imacat.idv.tw>
+
+
+3.14.3 -- 20 January 2008            (Maintenance Release)
+
+NEW FEATURES
+
+  * A HAL policy file is automatically installed on Linux systems to disable
+    the hald-addon-hid-ups module which conflicts with apcupsd's control of
+    USB UPSes. The file is automatically removed when apcupsd is uninstalled.
+
+BUG FIXES
+
+  * Add support for Nominal Power (aka Configured Active Power) reading.  
+    Credit to Lars Randers <lars@nstec.dk> for most of the code.
+
+  * Add units to NOMINV, NOMOUTV, and NOMBATTV stats.
+
+  * Eliminate "warning: deprecated conversion from string constant to
+    'char*'" warnings emitted from gcc-4.2.1 (earlier versions with
+    -Wwrite-strings). Contributed by Steve Yarmie <tribhuvanji@gmail.com>.
+
+  * Fix killpower and eeprom settings bug on USB models introduced when 
+    INPUT reports were prioritized over FEATURE reports.
+
+  * Fix bugs that could cause NIS-net driver to get stuck waiting for
+    comms to be restored instead of shutting down.
+
+
+3.14.2 -- 15 September 2007          (Maintenance Release)
 
 NEW FEATURES
 
@@ -64,7 +161,6 @@ BUG FIXES
     <https://bugzilla.redhat.com/bugzilla/show_bug.cgi?id=245864>
   
   * Fix SNMP port selection when using SNMP driver
-
 
   * Add workaround for broken BackUPS Pro model that returns certain
     reports encoded in ASCII. Based on a patch from David Fries

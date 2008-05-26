@@ -70,3 +70,12 @@ struct hostent * gethostname_re (const char *host,struct hostent *hostbuf,char *
 	return hostbuf;
 }
 #endif
+#ifdef HAVE_FUNC_GETHOSTBYNAME_R_0
+#warning WARNING! Your system does not have a thread-safe DNS resolver (gethostbyname_r)!
+#warning WARNING! Name service lookups may be corrupted. Consider switching to 
+#warning WARNING! a more thread-friendly platform.
+struct hostent * gethostname_re (const char *host,struct hostent *hostbuf,char **tmphstbuf,size_t *hstbuflen)
+{
+	return gethostbyname(host);
+}
+#endif

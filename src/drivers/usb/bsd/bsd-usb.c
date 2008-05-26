@@ -49,7 +49,8 @@ typedef struct s_usb_info {
    unsigned unit_exponent;         /* exponent */
    unsigned unit;                  /* units */
    int data_type;                  /* data type */
-   hid_item_t item;                /* HID item */
+   hid_item_t item;                /* HID item (read) */
+   hid_item_t witem;               /* HID item (write) */
    int report_len;                 /* Length of containing report */
    int ci;                         /* which CI does this usage represent? */
    int value;                      /* Previous value of this item */
@@ -350,9 +351,9 @@ static int usb_link_check(UPSINFO *ups)
 
 int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_info)
 {
-   int i, rc, ci, phys;
+   int i, ci, phys, input, feature;
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
-   hid_item_t item;
+   hid_item_t item, witem;
    USB_INFO *info;
 
    write_lock(ups);
@@ -361,49 +362,68 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
       ci = known_info[i].ci;
       phys = known_info[i].physical;
 
-      if (ci != CI_NONE && !ups->UPS_Cap[ci]) {
-         /* Prefer input items, but try feature if input fails */
-         rc = hidu_locate_item(
-               my_data->rdesc,
-               known_info[i].usage_code,     /* Match usage code */
-               -1,                           /* Don't care about application */
-               (phys == P_ANY) ? -1 : phys,  /* Match physical usage */
-               -1,                           /* Don't care about logical */
-               HID_KIND_INPUT,               /* Match feature type */
-               &item);
+      if (ci != CI_NONE && !my_data->info[ci]) {
+         /* Try to find an INPUT report containing this usage */
+         input = hidu_locate_item(
+            my_data->rdesc,
+            known_info[i].usage_code,     /* Match usage code */
+            -1,                           /* Don't care about application */
+            (phys == P_ANY) ? -1 : phys,  /* Match physical usage */
+            -1,                           /* Don't care about logical */
+            HID_KIND_INPUT,               /* Match feature type */
+            &item);
 
-         if (!rc) {
-            rc = hidu_locate_item(
-                  my_data->rdesc,
-                  known_info[i].usage_code,     /* Match usage code */
-                  -1,                           /* Don't care about application */
-                  (phys == P_ANY) ? -1 : phys,  /* Match physical usage */
-                  -1,                           /* Don't care about logical */
-                  HID_KIND_FEATURE,             /* Match feature type */
-                  &item);
+         /* Try to find a FEATURE report containing this usage */
+         feature = hidu_locate_item(
+            my_data->rdesc,
+            known_info[i].usage_code,     /* Match usage code */
+            -1,                           /* Don't care about application */
+            (phys == P_ANY) ? -1 : phys,  /* Match physical usage */
+            -1,                           /* Don't care about logical */
+            HID_KIND_FEATURE,             /* Match feature type */
+            &witem);
+
+         // If we did not find an INPUT report, but did find a FEATURE report,
+         // use the FEATURE report as the INPUT report.
+         if (!input && feature) {
+            memcpy(&item, &witem, sizeof(item));
+            input = feature;
          }
 
-         if (rc) {
-            ups->UPS_Cap[ci] = true;
-            ups->UPS_Cmd[ci] = known_info[i].usage_code;
+         // Bail if we have no input report at this point
+         if (!input)
+            continue;
 
-            info = (USB_INFO *)malloc(sizeof(USB_INFO));
-            if (!info) {
-               write_unlock(ups);
-               Error_abort0(_("Out of memory.\n"));
-            }
+         ups->UPS_Cap[ci] = true;
+         ups->UPS_Cmd[ci] = known_info[i].usage_code;
 
-            my_data->info[ci] = info;
-            info->ci = ci;
-            info->usage_code = item.usage;
-            info->unit_exponent = item.unit_exponent;
-            info->unit = item.unit;
-            info->data_type = known_info[i].data_type;
-            memcpy(&info->item, &item, sizeof(item));
-            info->report_len = hid_report_size( /* +1 for report id */
-               my_data->rdesc, item.kind, item.report_ID) + 1;
-            Dmsg3(200, "Got ci=%d, usage=0x%x (len=%d)\n", ci,
-               known_info[i].usage_code, item.report_size);
+         info = (USB_INFO *)malloc(sizeof(USB_INFO));
+         if (!info) {
+            write_unlock(ups);
+            Error_abort0(_("Out of memory.\n"));
+         }
+
+         // Use INPUT report as the main readable report
+         my_data->info[ci] = info;
+         memset(info, 0, sizeof(*info));
+         info->ci = ci;
+         info->usage_code = item.usage;
+         info->unit_exponent = item.unit_exponent;
+         info->unit = item.unit;
+         info->data_type = known_info[i].data_type;
+         memcpy(&info->item, &item, sizeof(item));
+         info->report_len = hid_report_size( /* +1 for report id */
+            my_data->rdesc, item.kind, item.report_ID) + 1;
+         Dmsg6(200, "Got READ ci=%d, rpt=%d (len=%d), usage=0x%x (len=%d), kind=0x%02x\n",
+            ci, item.report_ID, info->report_len,
+            known_info[i].usage_code, item.report_size, item.kind);
+
+         // If we have a FEATURE report, use that as the writable report
+         if (feature) {
+            memcpy(&info->witem, &witem, sizeof(item));
+            Dmsg6(200, "Got WRITE ci=%d, rpt=%d (len=%d), usage=0x%x (len=%d), kind=0x%02x\n",
+               ci, witem.report_ID, info->report_len,
+               known_info[i].usage_code, witem.report_size, witem.kind);               
          }
       }
    }
@@ -483,6 +503,10 @@ static bool populate_uval(UPSINFO *ups, USB_INFO *info, unsigned char *data, USB
          val.dValue = info->value;
       else
          val.dValue = ((double)info->value) * pow_ten(exponent);
+
+      // Store a (possibly truncated) copy of the floating point value in the
+      // integer field as well.
+      val.iValue = (int)val.dValue;
 
       Dmsg4(200, "Def val=%d exp=%d dVal=%f ci=%d\n", info->value,
          exponent, val.dValue, info->ci);
@@ -751,14 +775,14 @@ int pusb_read_int_from_ups(UPSINFO *ups, int ci, int *value)
    return true;
 }
 
-int pusb_write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
+int pusb_write_int_to_ups(UPSINFO *ups, int ci, int value, const char *name)
 {
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
    USB_INFO *info;
    int old_value, new_value;
    unsigned char rpt[20];
 
-   if (ups->UPS_Cap[ci] && my_data->info[ci]) {
+   if (ups->UPS_Cap[ci] && my_data->info[ci] && my_data->info[ci]->witem.report_ID) {
       info = my_data->info[ci];    /* point to our info structure */
 
       if (hidu_get_report(my_data->fd, &info->item, rpt, info->report_len) < 1) {
@@ -768,9 +792,9 @@ int pusb_write_int_to_ups(UPSINFO *ups, int ci, int value, char *name)
 
       old_value = hid_get_data(rpt + 1, &info->item);
 
-      hid_set_data(rpt + 1, &info->item, value);
+      hid_set_data(rpt + 1, &info->witem, value);
 
-      if (!hidu_set_report(my_data->fd, &info->item, rpt, info->report_len)) {
+      if (!hidu_set_report(my_data->fd, &info->witem, rpt, info->report_len)) {
          Dmsg1(000, "set_report for kill power function %s failed.\n", name);
          return false;
       }

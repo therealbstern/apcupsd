@@ -339,7 +339,7 @@ class UPSINFO {
    int stattime;
    int datatime;
    int sysfac;
-   int nettime;                    /* Time interval for slaves to poll master */
+   int polltime;                   /* Time interval to poll the UPS */
    int percent;                    /* shutdown when batt % less than this */
    int runtime;                    /* shutdown when runtime less than this */
    char nisip[64];                 /* IP for NIS */

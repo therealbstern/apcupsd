@@ -3,7 +3,7 @@ gapc_devel (0.8.7-0) stable; urgency=normal
 - Removed close() fron sknet_net_close() api.  g_io_channel_shutdown()
   handled the close and shutdown of the socket.  second close was
   actually closing an active socket from another thread (i.e. reuse #)
-- Added ICON_DIR to compiler makefiles to support load_icons
+- Added ICON_DIR to compiler makefiles to support _load_icons
   ability to find icons at run-time.
 
 gapcmon (0.8.5-0) stable; urgency=normal

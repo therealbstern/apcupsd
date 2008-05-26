@@ -370,7 +370,7 @@ static void getinfo(char *monhost)
     if (getupsvar(monhost, "date", tmpbuf, sizeof(tmpbuf)) <= 0) {
         printf ("<td class=\"Fault\">%s</td>\n", desc);
         printf ("<td colspan=\"%d\" class=\"Fault\">Not available: %s</td></tr>\n",
-                 numfields - 1, net_errmsg);
+                 numfields - 1, errmsg);
         return;
     }
 

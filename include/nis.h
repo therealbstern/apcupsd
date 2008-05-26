@@ -20,11 +20,6 @@
  * MA 02111-1307, USA.
  */
 
-extern struct sockaddr_in tcp_serv_addr;        /* socket information */
-extern int net_errno;              /* error number -- not yet implemented */
-extern const char *net_errmsg;     /* pointer to error message */
-extern char net_errbuf[256];       /* error message buffer for messages */
-
 /* 
  * Receive a message from the other end. Each message consists of
  * two packets. The first is a header that contains the size

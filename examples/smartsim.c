@@ -111,18 +111,18 @@ do                            \
 while(0)
 
 /* Response callbacks */
-static void rsp_string(void* arg);
-static void rsp_float(void* arg);
-static void rsp_cmds(void* arg);
-static void rsp_status(void* arg);
-static void rsp_hex(void *arg);
+static void rsp_string(const void* arg);
+static void rsp_float(const void* arg);
+static void rsp_cmds(const void* arg);
+static void rsp_status(const void* arg);
+static void rsp_hex(const void *arg);
 
 /* Mapping of UPS commands to response callbacks */
 struct upscmd
 {
    char cmd;
-   void (*func)(void*);
-   void* arg;
+   void (*func)(const void*);
+   const void* arg;
 } upscmds[] =
 {
    { 'Y',    rsp_string, "SM" },
@@ -146,22 +146,22 @@ struct upscmd
 /* The alert characters we support */
 const char alerts[] = "!$%+#";
 
-static void key_toggle(void* arg);
-static void key_onbatt(void* arg);
-static void key_battlow(void* arg);
-static void key_inc(void* arg);
-static void key_dec(void* arg);
-static void key_selftest(void* arg);
-static void key_rebatt(void* arg);
-static void key_batdet(void *arg);
-static void key_commfail(void *arg);
-static void key_help(void *arg);
+static void key_toggle(const void* arg);
+static void key_onbatt(const void* arg);
+static void key_battlow(const void* arg);
+static void key_inc(const void* arg);
+static void key_dec(const void* arg);
+static void key_selftest(const void* arg);
+static void key_rebatt(const void* arg);
+static void key_batdet(const void *arg);
+static void key_commfail(const void *arg);
+static void key_help(const void *arg);
 
 /* Mapping of keyboard commands to callbacks */
 struct keycmd
 {
    char key;
-   void (*func)(void*);
+   void (*func)(const void*);
    void* arg;
 } keycmds[] =
 {
@@ -195,13 +195,13 @@ void wups(const char* str, int len)
    write(ups, str, len);
 }
 
-void rsp_string(void* arg)
+void rsp_string(const void* arg)
 {
-   wups(arg, strlen(arg));
+   wups((char*)arg, strlen((char*)arg));
    wups("\r\n", 2);
 }
 
-void rsp_float(void* arg)
+void rsp_float(const void* arg)
 {
    char buf[20];
    
@@ -209,7 +209,7 @@ void rsp_float(void* arg)
    wups(buf, strlen(buf));
 }
 
-void rsp_hex(void* arg)
+void rsp_hex(const void* arg)
 {
    char buf[20];
    
@@ -217,7 +217,7 @@ void rsp_hex(void* arg)
    wups(buf, strlen(buf));
 }
 
-void rsp_cmds(void* arg)
+void rsp_cmds(const void* arg)
 {
    int x;
    
@@ -235,7 +235,7 @@ void rsp_cmds(void* arg)
    wups("\r\n", 2);
 }
 
-void rsp_status(void* arg)
+void rsp_status(const void* arg)
 {
    char buf[20];
    
@@ -251,12 +251,12 @@ void rsp_status(void* arg)
    wups(buf, strlen(buf));
 }
 
-static void key_toggle(void* arg)
+static void key_toggle(const void* arg)
 {
    *(int *)arg = !*(int *)arg;
 }
 
-static void key_onbatt(void* arg)
+static void key_onbatt(const void* arg)
 {
    if (!onbatt)
    {
@@ -279,7 +279,7 @@ static void key_onbatt(void* arg)
    }
 }
 
-static void key_battlow(void* arg)
+static void key_battlow(const void* arg)
 {
    if (!battlow)
    {
@@ -297,19 +297,19 @@ static void key_battlow(void* arg)
    }
 }
 
-static void key_inc(void* arg)
+static void key_inc(const void* arg)
 {
    *(float*)arg += 1;
    dbg("%3.3f\n", *(float*)arg);
 }
 
-static void key_dec(void* arg)
+static void key_dec(const void* arg)
 {
    *(float*)arg -= 1;
    dbg("%3.3f\n", *(float*)arg);
 }
 
-static void key_selftest(void* arg)
+static void key_selftest(const void* arg)
 {
    key_onbatt(NULL);
 
@@ -317,7 +317,7 @@ static void key_selftest(void* arg)
       xfercause[0] = 'S';
 }
 
-static void key_rebatt(void* arg)
+static void key_rebatt(const void* arg)
 {
    if (!rebatt)
    {
@@ -332,7 +332,7 @@ static void key_rebatt(void* arg)
    }
 }
 
-static void key_batdet(void *arg)
+static void key_batdet(const void *arg)
 {
    if (reg2 & 0x20)
       reg2 &= ~0x20;
@@ -340,7 +340,7 @@ static void key_batdet(void *arg)
       reg2 |= 0x20;
 }
 
-static void key_commfail(void *arg)
+static void key_commfail(const void *arg)
 {
    if (commfail)
    {
@@ -355,7 +355,7 @@ static void key_commfail(void *arg)
       
 }
 
-static void key_help(void *arg)
+static void key_help(const void *arg)
 {
    dbg("Commands:\n");
    dbg("?   Help\n");

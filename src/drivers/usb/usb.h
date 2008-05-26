@@ -107,6 +107,9 @@ private:
    void process_asciipct(int ci, usb_value *uval);
    void process_asciifreq(int ci, usb_value *uval);
 
+   // Fixup functions for UPS bug workarounds
+   void fixup_nomv(int ci, usb_value *uval);
+
    // Misc helpers
    bool get_value(int ci, usb_value *uval);
    bool update_value(int ci);
@@ -123,8 +126,9 @@ private:
    struct timeval _last_urb_time;   // Last time we talked to the UPS
 
    // Data-handling callback array
-   typedef void (UsbDriver::*DataCallback)(int, usb_value*);
-   DataCallback _callbacks[CI_MAXCI + 1];
+   typedef void (UsbDriver::*Callback)(int, usb_value*);
+   Callback _callbacks[CI_MAXCI + 1];
+   Callback _fixups[CI_MAXCI + 1];
 };
 
 /* Max rate to update volatile data */

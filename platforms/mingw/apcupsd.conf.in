@@ -77,6 +77,14 @@ UPSCABLE usb
 UPSTYPE usb
 DEVICE
 
+# POLLTIME <int>
+#   Interval (in seconds) at which apcupsd polls the UPS for status. This
+#   setting applies both to directly-attached UPSes (UPSTYPE apcsmart, usb, 
+#   dumb) and networked UPSes (UPSTYPE net, snmp). Lowering this setting
+#   will improve apcupsd's responsiveness to certain events at the cost of
+#   higher CPU utilization. The default of 60 is appropriate for most
+#   situations.
+#POLLTIME 60
 
 # SCRIPTDIR <path to script directory>
 #   Directory in which apccontrol and event scripts are located.
@@ -202,11 +210,6 @@ EVENTSFILEMAX 10
 #
 # ========== Configuration statements used if sharing =============
 #            a UPS with more than one machine
-
-# NETTIME <int>
-#   Interval (in seconds) at which the NIS client polls the server.
-#   Used only when this apcupsd is a network client (UPSTYPE net).
-#NETTIME 60
 
 #
 # Remaining items are for ShareUPS (APC expansion card) ONLY

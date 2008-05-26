@@ -190,12 +190,12 @@ unsigned long get_hex_value()
 	return strtoul(ptr+2, NULL, 16);
 }
 
-char* parse_data_dump(int len)
+unsigned char* parse_data_dump(int len)
 {
 	int count = 0;
 	char* ptr= NULL;
 	
-	char* data = malloc(len);	
+	unsigned char* data = (unsigned char *)malloc(len);	
 	if (!data)
 		return NULL;
 		
@@ -310,7 +310,7 @@ void free_urb(struct urb* urb)
 
 void print_urb(struct urb* urb)
 {
-	int x;
+	unsigned int x;
 	printf("[%08d ms] %05d %c ", urb->time, urb->seq,
 		(urb->dir == DIR_TO_DEVICE) ? '>' : (urb->dir == DIR_FROM_DEVICE) ? '<' : '?');
 		
@@ -400,7 +400,7 @@ void add_report(struct urb* urb)
 		return;
 	}
 
-	rpt = malloc(sizeof(*rpt));
+	rpt = (struct rpt*)malloc(sizeof(*rpt));
 	memset(rpt, 0, sizeof(*rpt));
 
 	rpt->id = id;
@@ -424,7 +424,7 @@ int check_and_update_report(struct urb* urb)
 
 	free(rpt->data);
 	rpt->len = urb->len-1;
-	rpt->data = malloc(rpt->len);
+	rpt->data = (unsigned char *)malloc(rpt->len);
 	memcpy(rpt->data, urb->data+1, rpt->len);
 
 	return 1;
@@ -434,7 +434,7 @@ void display_report(struct urb* urb)
 {
 	unsigned long data = 0;
 	char buf[9];
-	int n;
+	unsigned int n;
 
 	n = printf( "[%04d s] %05d %c %s 0x%02x (%03u) ",
 		urb->time/1000, urb->seq, urb->func == FUNC_BULK_TXFER ? '*' : ' ',
