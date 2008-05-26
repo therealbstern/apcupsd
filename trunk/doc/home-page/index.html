@@ -48,28 +48,23 @@ runtime expires based on internal APC calculations determined by power
 consumption rates. Apcupsd is licensed under the GPL version 2.
 <p>
 <h2>Recent Apcupsd Releases</h2>
-<h3><i><u>Stable:</u></i>&nbsp;3.14.2 (15 September 2007) [
+<h3><i><u>Stable:</u></i>&nbsp;3.14.3 (20 January 2008) [
 <a href="http://sourceforge.net/project/showfiles.php?group_id=54413">Download</a>
 ]</h3>
-While technically a "bug fix" release, 3.14.2 includes a major new feature for
-win32 users in addition to several bug fixes applicable to all platforms.
+3.14.3 fixes several bugs since 3.14.2 and includes a policy
+file which prevents the HAL-based USB UPS monitor included in recent Linux
+distros from interfering with apcupsd. (Only APC UPSes are blacklisted in
+the policy and the file is removed when apcupsd is uninstalled.)
 <p>
-The new win32 feature is 'apctray', a desktop tray icon tool for
-monitoring apcupsd instances (any instance, not just those running on
-Windows). This qualifies as a "bug fix" because it solves the missing
-tray icon problem on Windows Vista, but it goes much further, allowing
-you to monitor remote apcupsd instances (via apcupsd's NIS) and even
-supports multiple tray icons for watching several apcupsds at once.
-<p>
-See the <a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=511394">
+See the <a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=570036">
 ReleaseNotes</a> for full details.
 <p>
-Apcupsd 3.14.2 is the latest stable release, containing many bug fixes and
+Apcupsd 3.14.3 is the latest stable release, containing many bug fixes and
 new features over the previous 3.12.x stable series. Users of all previous
 versions are encouraged to upgrade.
 <p>
 <i>If you use the old style master/slave networking mode, be sure to read the
-<a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=511394">
+<a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=570036">
 release notes</a>.</i>
 <p>
 <b><u>New Features in the 3.14.x series:</u></b>

@@ -22,13 +22,13 @@ EOF
         ;;
         commfailure)
                 wall <<EOF
-apccontrol: Warning serial port communications with UPS lost.
+apccontrol: Communications with UPS lost.
 
 EOF
         ;;
         commok)
                 wall <<EOF
-apccontrol: Serial communciations with UPS restored.
+apccontrol: Communciations with UPS restored.
 
 EOF
         ;;

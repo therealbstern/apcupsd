@@ -291,6 +291,18 @@ bool UsbDriver::GetCapabilities()
       _callbacks[CI_NOMPOWER] = NULL;
    }
 
+   /*
+    * Disable CI_NOMPOWER if UPS does not report it accurately.
+    * Several models appear to always return 0 for this value.
+    */
+   USB_VALUE uval;
+   if (ups->UPS_Cap[CI_NOMPOWER] &&
+       (!usb_get_value(ups, CI_NOMPOWER, &uval) ||
+        ((int)uval.dValue == 0))) {
+      Dmsg0(100, "NOMPOWER disabled due to invalid reading from UPS\n");
+      ups->UPS_Cap[CI_NOMPOWER] = false;
+   }
+
    /* Detect broken BackUPS Pro model */
    if (_ups->UPS_Cap[CI_UPSMODEL] && get_value(CI_UPSMODEL, &uval)) {
       Dmsg1(250, "Checking for BackUPS Pro quirk \"%s\"\n", uval.sValue);
@@ -311,6 +323,7 @@ void UsbDriver::configure_callbacks()
 {
    // Clear callback array
    memset(_callbacks, 0, sizeof(_callbacks));
+   memset(_fixups, 0, sizeof(_fixups));
 
    // Establish callbacks appropriate for most models
    _callbacks[CI_STATUS] = &UsbDriver::process_status;
@@ -351,6 +364,10 @@ void UsbDriver::configure_callbacks()
    _callbacks[CI_NOMPOWER] = &UsbDriver::process_power;
    _callbacks[CI_SENS] = &UsbDriver::process_sensitivity;
    _callbacks[CI_DALARM] = &UsbDriver::process_alarm;
+
+   // Install fixups
+   _fixups[CI_NOMOUTV] = &UsbDriver::fixup_nomv;
+   _fixups[CI_NOMINV] = &UsbDriver::fixup_nomv;
 }
 
 void UsbDriver::process_bool(int ci, usb_value *uval)
@@ -632,8 +649,24 @@ void UsbDriver::process_asciifreq(int ci, usb_value *uval)
    _ups->info.update(ci, atoi(digits) * 10);
 }
 
+void UsbDriver::fixup_nomv(int ci, usb_value *uval)
+{
+   // Some UPSes report NOMINV/NOMOUTV in units of finer granularity
+   // than expected (volts). Scale reading down to sane voltage.
+   while (uval->dValue > 1000)
+      uval->dValue /= 10;
+}
+
 void UsbDriver::process_value(int ci, usb_value *uval)
 {
+   // Invoke any necessary fixup first
+   if (_fixups[ci])
+   {
+      Dmsg1(100, "Invoking fixup for %s\n", CItoString(ci));
+      (this->*_fixups[ci])(ci, uval);
+   }
+
+   // Now invoke data processing callback
    if (_callbacks[ci]) {
       (this->*_callbacks[ci])(ci, uval);
       UpsValue val;

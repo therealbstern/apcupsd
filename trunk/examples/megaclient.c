@@ -39,8 +39,6 @@
 #define MAXLINE 5000
 
 
-extern int net_errno;
-
 void error_abort(char *msg)
 {
    fprintf(stderr, msg);
@@ -94,7 +92,7 @@ int main(int argc, char *argv[])
       }
       if (n < 0) {
 	 char msg[200];
-         sprintf(msg, "handle_client: net_recv error: %s\n", strerror(net_errno));
+         sprintf(msg, "handle_client: net_recv error: %s\n", strerror(-n));
 	 error_abort(msg);
       }
       if ( (i % 100) == 0) { 
@@ -124,7 +122,7 @@ int main(int argc, char *argv[])
       }
       if (n < 0) {
 	 char msg[200];
-         sprintf(msg, "handle_client: net_recv error: %s\n", strerror(net_errno));
+         sprintf(msg, "handle_client: net_recv error: %s\n", strerror(-n));
 	 error_abort(msg);
       }
       if ( (i % 100) == 0) { 

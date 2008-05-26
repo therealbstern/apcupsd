@@ -140,7 +140,8 @@ static const PAIRS table[] = {
    {"UPSCABLE", match_range, WHERE(cable),    cables},
    {"UPSTYPE",  match_range, WHERE(mode),     types},
    {"DEVICE",   match_str,   WHERE(device),   SIZE(device)},
-   
+   {"POLLTIME", match_int,   WHERE(polltime), 0},
+
    /* Paths */
    {"LOCKFILE",   match_str, WHERE(lockpath),    SIZE(lockpath)},
    {"SCRIPTDIR",  match_str, WHERE(scriptdir),   SIZE(scriptdir)},
@@ -178,7 +179,7 @@ static const PAIRS table[] = {
    /* Configuration statements for network sharing of the UPS */
    {"UPSCLASS",  match_range, WHERE(upsclass),    upsclasses},
    {"UPSMODE",   match_range, WHERE(sharenet),    modes     },
-   {"NETTIME",   match_int,   WHERE(nettime),     0         },
+   {"NETTIME",   match_int,   WHERE(polltime),    0         },
 
    /*
     * Obsolete configuration options: To be removed in the future.
@@ -587,7 +588,7 @@ void init_ups_struct(UPSINFO *ups)
 
    ups->stattime = 0;
    ups->datatime = 0;
-   ups->nettime = 60;
+   ups->polltime = 60;
    ups->percent = 10;
    ups->runtime = 5;
    ups->netstats = TRUE;

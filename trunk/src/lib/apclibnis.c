@@ -38,13 +38,20 @@
 #define   INADDR_NONE    -1
 #endif
 
-int net_errno = 0;                 /* error number -- not yet implemented */
-const char *net_errmsg = NULL;     /* pointer to error message */
-char net_errbuf[256];              /* error message buffer for messages */
-
-
+/* Some Win32 specific screwery */
 #ifdef HAVE_MINGW
-#define close(fd)           closesocket(fd)
+
+#define close(fd)             closesocket(fd)
+#define ioctl(s,p,v)          ioctlsocket((s),(p),(u_long*)(v))
+#define getsockopt(s,l,o,d,z) getsockopt((s),(l),(o),(char*)(d),(z))
+#define EINPROGRESS           WSAEWOULDBLOCK
+
+#undef errno
+#define errno   WSAGetLastError()
+
+#undef h_errno
+#define h_errno WSAGetLastError()
+
 #endif
 
 
@@ -78,25 +85,24 @@ static int read_nbytes(int fd, char *ptr, int nbytes)
          case -1:
             if (errno == EINTR || errno == EAGAIN)
                continue;
-            net_errno = errno;
-            return -1;           /* error */
+            return -errno;       /* error */
          case 0:
-            return 0;            /* timeout */
+            return -ETIMEDOUT;   /* timeout */
          }
 
          nread = recv(fd, ptr, nleft, 0);
       } while (nread == -1 && (errno == EINTR || errno == EAGAIN));
 
-      if (nread <= 0) {
-         net_errno = errno;
-         return (nread);           /* error, or EOF */
-      }
+      if (nread == 0)
+         return 0;               /* EOF */
+      if (nread < 0)
+         return -errno;          /* error */
 
       nleft -= nread;
       ptr += nread;
    }
 
-   return (nbytes - nleft);        /* return >= 0 */
+   return nbytes - nleft;        /* return >= 0 */
 }
 
 /*
@@ -133,16 +139,14 @@ static int write_nbytes(int fd, const char *ptr, int nbytes)
 #endif
       nwritten = send(fd, ptr, nleft, 0);
 
-      if (nwritten <= 0) {
-         net_errno = errno;
-         return (nwritten);        /* error */
-      }
+      if (nwritten <= 0)
+         return -errno;       /* error */
 
       nleft -= nwritten;
       ptr += nwritten;
    }
 
-   return (nbytes - nleft);
+   return nbytes - nleft;
 }
 
 /* 
@@ -162,30 +166,24 @@ int net_recv(int sockfd, char *buff, int maxlen)
    /* get data size -- in short */
    if ((nbytes = read_nbytes(sockfd, (char *)&pktsiz, sizeof(short))) <= 0) {
       /* probably pipe broken because client died */
-      return -1;                   /* assume hard EOF received */
+      return nbytes;               /* assume hard EOF received */
    }
    if (nbytes != sizeof(short))
-      return -2;
+      return -EINVAL;
 
    pktsiz = ntohs(pktsiz);         /* decode no. of bytes that follow */
-   if (pktsiz > maxlen) {
-      net_errmsg = "net_recv: record length too large\n";
-      return -2;
-   }
+   if (pktsiz > maxlen)
+      return -EINVAL;
    if (pktsiz == 0)
       return 0;                    /* soft EOF */
 
    /* now read the actual data */
-   if ((nbytes = read_nbytes(sockfd, buff, pktsiz)) <= 0) {
-      net_errmsg = "net_recv: read_nbytes error\n";
-      return -2;
-   }
-   if (nbytes != pktsiz) {
-      net_errmsg = "net_recv: error in read_nbytes\n";
-      return -2;
-   }
+   if ((nbytes = read_nbytes(sockfd, buff, pktsiz)) <= 0)
+      return nbytes;
+   if (nbytes != pktsiz)
+      return -EINVAL;
 
-   return (nbytes);                /* return actual length of message */
+   return nbytes;                /* return actual length of message */
 }
 
 /*
@@ -203,17 +201,17 @@ int net_send(int sockfd, const char *buff, int len)
    /* send short containing size of data packet */
    pktsiz = htons((short)len);
    rc = write_nbytes(sockfd, (char *)&pktsiz, sizeof(short));
-   if (rc != sizeof(short)) {
-      net_errmsg = "net_send: write_nbytes error of length prefix\n";
-      return -1;
-   }
+   if (rc <= 0)
+      return rc;
+   if (rc != sizeof(short))
+      return -EINVAL;
 
    /* send data packet */
    rc = write_nbytes(sockfd, buff, len);
-   if (rc != len) {
-      net_errmsg = "net_send: write_nbytes error\n";
-      return -1;
-   }
+   if (rc <= 0)
+      return rc;
+   if (rc != len)
+      return -EINVAL;
 
    return rc;
 }
@@ -225,7 +223,9 @@ int net_send(int sockfd, const char *buff, int len)
  */
 int net_open(const char *host, char *service, int port)
 {
-   int sockfd;
+   int nonblock = 1;
+   int block = 0;
+   int sockfd, rc;
    struct hostent *hp;
    struct sockaddr_in tcp_serv_addr;  /* socket information */
    unsigned int inaddr;               /* Careful here to use unsigned int for */
@@ -242,25 +242,18 @@ int net_open(const char *host, char *service, int port)
    if ((inaddr = inet_addr(host)) != INADDR_NONE) {
       tcp_serv_addr.sin_addr.s_addr = inaddr;
    } else {
-      if ((hp = gethostbyname(host)) == NULL) {
-         net_errmsg = "tcp_open: hostname error\n";
-         return -1;
-      }
+      if ((hp = gethostbyname(host)) == NULL)
+         return -h_errno;
 
-      if (hp->h_length != sizeof(inaddr) || hp->h_addrtype != AF_INET) {
-         net_errmsg = "tcp_open: funny gethostbyname value\n";
-         return -1;
-      }
+      if (hp->h_length != sizeof(inaddr) || hp->h_addrtype != AF_INET)
+         return -EINVAL;
 
       tcp_serv_addr.sin_addr.s_addr = *(unsigned int *)hp->h_addr;
    }
 
-
    /* Open a TCP socket */
-   if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0) {
-      net_errmsg = "tcp_open: cannot open stream socket\n";
-      return -1;
-   }
+   if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+      return -errno;
 
    /* connect to server */
 #if defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS
@@ -271,13 +264,67 @@ int net_open(const char *host, char *service, int port)
    fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFL));
 #endif
 
-   if (connect(sockfd, (struct sockaddr *)&tcp_serv_addr, sizeof(tcp_serv_addr)) == -1) {
-      asnprintf(net_errbuf, sizeof(net_errbuf),
-         _("tcp_open: cannot connect to server %s on port %d.\n"
-        "ERR=%s\n"), host, port, strerror(errno));
-      net_errmsg = net_errbuf;
+   /* Set socket to non-blocking mode */
+   if (ioctl(sockfd, FIONBIO, &nonblock) != 0) {
       close(sockfd);
-      return -1;
+      return -errno;
+   }
+
+   /* Initiate connection attempt */
+   rc = connect(sockfd, (struct sockaddr *)&tcp_serv_addr, sizeof(tcp_serv_addr));
+   if (rc == -1 && errno != EINPROGRESS) {
+      close(sockfd);
+      return -errno;
+   }
+
+   /* If connection is in progress, wait for it to complete */
+   if (rc == -1) {
+      struct timeval timeout;
+      fd_set fds;
+      int err;
+      socklen_t errlen = sizeof(err);
+
+      do {
+         /* Expect connection within 5 seconds */
+         timeout.tv_sec = 5;
+         timeout.tv_usec = 0;
+         FD_ZERO(&fds);
+         FD_SET(sockfd, &fds);
+
+         /* Wait for connection to complete */
+         rc = select(sockfd + 1, NULL, &fds, NULL, &timeout);
+         switch (rc) {
+         case -1: /* select error */
+            if (errno == EINTR || errno == EAGAIN)
+               continue;
+            close(sockfd);
+            return -errno;
+         case 0: /* timeout */
+            close(sockfd);
+            return -ETIMEDOUT;
+         }
+      }
+      while (rc == -1 && (errno == EINTR || errno == EAGAIN));
+
+      /* Connection completed? Check error status. */
+      if (getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &err, &errlen) == -1) {
+         close(sockfd);
+         return -errno;
+      }
+      if (errlen != sizeof(err)) {
+         close(sockfd);
+         return -EINVAL;
+      }
+      if (err) {
+         close(sockfd);
+         return -err;
+      }
+   }
+
+   /* Connection completed successfully. Set socket back to blocking mode. */
+   if (ioctl(sockfd, FIONBIO, &block) != 0) {
+      close(sockfd);
+      return -errno;
    }
 
    return sockfd;
@@ -322,18 +369,14 @@ int net_accept(int fd, struct sockaddr_in *cli_addr)
          rc = select(fd + 1, &fds, NULL, NULL, NULL);
       } while (rc == -1 && (errno == EINTR || errno == EAGAIN));
 
-      if (rc < 0) {
-         net_errno = errno;
-         return (-1);              /* error */
-      }
+      if (rc < 0)
+         return -errno;              /* error */
 #endif
       newfd = accept(fd, (struct sockaddr *)cli_addr, &clilen);
    } while (newfd == -1 && (errno == EINTR || errno == EAGAIN));
 
-   if (newfd < 0) {
-      net_errno = errno;
-      return (-1);                 /* error */
-   }
+   if (newfd < 0)
+      return -errno;                 /* error */
 
    return newfd;
 }

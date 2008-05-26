@@ -215,8 +215,7 @@ bool NetDriver::getupsvar(const char *request, char *answer, int anslen)
 
 bool NetDriver::poll_ups()
 {
-   int n;
-   bool stat = true;
+   int n, stat = 1;
    char buf[1000];
 
    _statbuf[0] = 0;
@@ -226,19 +225,16 @@ bool NetDriver::poll_ups()
    if ((_sockfd = net_open(_hostname, NULL, _port)) < 0) {
       Dmsg0(90, "Exit poll_ups 0 comm lost\n");
       if (!_ups->is_commlost()) {
-         log_event(_ups, LOG_ERR, "fetch_data: tcp_open failed for %s port %d",
-            _hostname, _port);
          _ups->set_commlost();
       }
-      return false;
+      return 0;
    }
 
    if (net_send(_sockfd, "status", 6) != 6) {
-      log_event(_ups, LOG_ERR, "fill_buffer: write error on socket.");
       net_close(_sockfd);
       Dmsg0(90, "Exit poll_ups 0 no status flag\n");
       _ups->set_commlost();
-      return false;
+      return 0;
    }
 
    Dmsg0(99, "===============\n");
@@ -250,7 +246,7 @@ bool NetDriver::poll_ups()
    Dmsg0(99, "===============\n");
 
    if (n < 0) {
-      stat = false;
+      stat = 0;
       Dmsg0(90, "Exit poll_ups 0 bad stat net_recv\n");
       _ups->set_commlost();
    } else {
@@ -273,8 +269,8 @@ bool NetDriver::poll_ups()
 bool NetDriver::fill_status_buffer()
 {
    time_t now;
-   int tlog;
-   bool comm_err = false;
+   static time_t tlog = 0;
+   static bool comm_err = false;
 
    /* Poll or fill the buffer maximum one time per second */
    now = time(NULL);
@@ -283,40 +279,36 @@ bool NetDriver::fill_status_buffer()
       return true;
    }
 
-   for (tlog = 0; !poll_ups(); tlog -= SLEEP_TIME) {
-      if (tlog <= 0) {
-         /* log every 10 minutes */
-         tlog = 10 * 60;
-
-         log_event(_ups, event_msg[CMDCOMMFAILURE].level,
-            event_msg[CMDCOMMFAILURE].msg);
-
-         /* generate event once */
-         if (!comm_err)
-            execute_command(_ups, ups_event[CMDCOMMFAILURE]);
+   if (!poll_ups()) {
+      /* generate event once */
+      if (!comm_err) {
+         execute_command(_ups, ups_event[CMDCOMMFAILURE]);
+         comm_err = true;
       }
 
-      sleep(SLEEP_TIME);
-      comm_err = true;
-      _ups->set_commlost();
-   }
-
-   if (comm_err) {
-      generate_event(_ups, CMDCOMMOK);
-      _last_fill_time = time(NULL);
+      /* log every 10 minutes */
+      if (now - tlog >= 10 * 60) {
+         tlog = now;
+         log_event(_ups, event_msg[CMDCOMMFAILURE].level,
+            event_msg[CMDCOMMFAILURE].msg);
+      }
    } else {
+      if (comm_err) {
+         generate_event(_ups, CMDCOMMOK);
+         tlog = 0;
+         comm_err = false;
+      }
+
       _last_fill_time = now;
+
+      if (!_got_caps)
+         GetCapabilities();
+
+      if (_got_caps && !_got_static_data)
+         ReadStaticData();
    }
 
-   _ups->clear_commlost();
-
-   if (!_got_caps)
-      GetCapabilities();
-
-   if (_got_caps && !_got_static_data)
-      ReadStaticData();
-
-   return true;
+   return !comm_err;
 }
 
 bool NetDriver::get_ups_status_flag(int fill)
@@ -350,7 +342,6 @@ bool NetDriver::get_ups_status_flag(int fill)
    write_lock(_ups);
    answer[0] = 0;
    if (!getupsvar("status", answer, sizeof(answer))) {
-      log_event(_ups, LOG_ERR, "getupsvar: failed for " "status" ".");
       Dmsg0(100, "HEY!!! Couldn't get status flag.\n");
       stat = false;
       masterStatus = 0;
@@ -466,9 +457,7 @@ bool NetDriver::CheckState()
 {
    int sleep_time;
 
-   sleep_time = _ups->wait_time;
-   if (_ups->nettime && _ups->nettime < _ups->wait_time)
-      sleep_time = _ups->nettime;
+   sleep_time = ups->wait_time;
 
    Dmsg1(100, "Sleep %d secs.\n", sleep_time);
    sleep(sleep_time);

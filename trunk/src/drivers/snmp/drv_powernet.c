@@ -481,10 +481,7 @@ bool SnmpDriver::powernet_snmp_ups_check_state()
    if (rc == 0)
       return false;
 
-   /* Allow user to reduce sleep_time using NETTIME config setting */
-   sleep_time = _ups->wait_time;
-   if (_ups->nettime && _ups->nettime < _ups->wait_time)
-      sleep_time = _ups->nettime;
+   sleep_time = ups->wait_time;
 
    /* If we're not doing SNMP traps, just sleep and exit */
    if (!_trap_session) {

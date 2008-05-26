@@ -18,60 +18,37 @@ CP = @CP@
 MV = @MV@
 ECHO = @ECHO@
 RM = @RM@
-RMF = $(RM) -f
+RMF = $(RM) -rf
 LN = @LN@
 SED = @SED@
 MAKE = @MAKE@
 SHELL = @SHELL@
 RANLIB = @RANLIB@
 AR = @AR@
-LIBTOOL = @LIBTOOL@
 INSTALL = @INSTALL@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 MKINSTALLDIRS = @MKINSTALLDIRS@
-ETAGS = @ETAGS@
-CTAGS = @CTAGS@
-GENCAT = @GENCAT@
-MSGFMT = @MSGFMT@
-
 
 # Files and directories (paths)
-#
-# Commond prefix for machine-independent installed files.
 prefix = @prefix@
-
-# Commond prefix for machine-dependent installed files.
 exec_prefix = @exec_prefix@
-
-# system configuration directory.
 sysconfdir = @sysconfdir@
-
-# cgi-bin install directory.
 cgibin = @CGIBIN@
-
-# Ultrix 2.2 make doesn't expand the value of VPATH.
 VPATH = /usr/lib:/usr/local/lib
-
-# source directory where this Makefile is placed.
 srcdir = @srcdir@
-
-# Absolute top srcdir
-abssrcdir = @ABSSRCDIR@
-
-# Directory in which to install.
+abstopdir = @ABSSRCDIR@
 sbindir = @sbindir@
-
-# Directory for pid files.
 piddir = @PIDDIR@
-
-# Manual extension
 manext = 8
-
-# Manual directory
 mandir=@mandir@
-
+bindir = @bindir@
+datadir = @datadir@
+HALPOLICYDIR = @HALPOLICYDIR@
+DISTDIR = @DISTDIR@
+PWRFAILDIR = @PWRFAILDIR@
+LOCKDIR = @LOCKDIR@
 
 # Compilation macros.
 CC = @CC@
@@ -81,17 +58,37 @@ DEFS = @EXTRADEFS@ $(LOCALDEFS)
 
 # Libraries
 APCLIBS = $(topdir)/src/lib/libapc.a
-APCDRVLIBS = $(topdir)/src/drivers/libdrivers.a
+APCDRVLIBS = $(topdir)/src/drivers/libdrivers.a @APCDRVLIBS@
 DRVLIBS = @PTHREAD_LFLAGS@ @DRVLIBS@
-INTLLIBS = @INTLLIBS@
 X_LIBS = @X_LIBS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 
-
-# Made INCFLAGS relative to the topdir and hardcoded into the Makefiles
-# For GDINCLUDE see src/cgi/Makefile.in
-INCFLAGS = $(GDINCLUDE) -I$(topdir)/include $(EXTRAINCS)
+INCFLAGS = -I$(topdir)/include $(EXTRAINCS)
 CFLAGS = @CFLAGS@ @PTHREAD_CFLAGS@ $(INCFLAGS)
 CPPFLAGS = @CPPFLAGS@ $(CFLAGS)
 LDFLAGS = @LDFLAGS@
-LIBS = $(APCLIBS) $(INTLLIBS) @LIBS@
+LIBS = @LIBS@
+LIBGD = @GD_LIBS@
+POWERLIBS = @POWERLIBS@
+GAPCMON_CFLAGS = @GAPCMON_CFLAGS@
+GAPCMON_LIBS = @GAPCMON_LIBS@
+LIBEXTRAOBJ = @LIBEXTRAOBJ@
+
+# Driver and package enable flags
+SMARTDRV   := @APCSMART_DRIVER@
+DUMBDRV    := @DUMB_DRIVER@
+USBDRV     := @USB_DRIVER@
+NETDRV     := @NET_DRIVER@
+PCNETDRV   := @PCNET_DRIVER@
+SNMPDRV    := @SNMP_DRIVER@
+TESTDRV    := @TEST_DRIVER@
+USBTYPE    := @USB_TYPE@
+CGIDIR     := @CGI@
+USBHIDDIR  := @LIBUSBHID@
+POWERFLUTE := @POWERFLUTE@
+GAPCMON    := @GAPCMON@
+
+OBJDIR = .obj
+DEPDIR = .deps
+df = $(DEPDIR)/$(*F)
+DEVNULL := >/dev/null 2>&1
