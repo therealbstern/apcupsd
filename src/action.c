@@ -25,6 +25,7 @@
  */
 
 #include "apc.h"
+#include "statemachine.h"
 
 extern int kill_on_powerfail;
 static void do_shutdown(UPSINFO *ups, int cmdtype);

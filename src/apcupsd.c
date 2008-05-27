@@ -58,6 +58,7 @@
  */
 
 #include "apc.h"
+#include "statemachine.h"
 
 /*
  * myUPS is a structure that need to be defined in _all_ the forked processes.

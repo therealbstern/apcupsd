@@ -425,8 +425,6 @@ int ApcSmartDriver::change_ups_eeprom_item(
  */
 void ApcSmartDriver::change_extended()
 {
-   char setting[20];
-
    GetCapabilities();
 
    /*
@@ -436,6 +434,8 @@ void ApcSmartDriver::change_extended()
     * was given, we won't attept to change it.
     */
 #if 0
+   char setting[20];
+
    /* SENSITIVITY */
    if (_ups->UPS_Cap[CI_SENS] && strcmp(_ups->sensitivity, "-1") != 0) {
       asnprintf(setting, sizeof(setting), "%.1s", _ups->sensitivity);
