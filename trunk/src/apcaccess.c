@@ -30,7 +30,7 @@ static const char *host = "localhost";
 static int port = NISPORT;
 
 /* Get and print status from apcupsd NIS server */
-static void do_pthreads_status(const char *host, int port)
+static int do_pthreads_status(const char *host, int port)
 {
    int sockfd, n;
    char recvline[MAXSTRING + 1];
