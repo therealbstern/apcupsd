@@ -1,3 +1,6 @@
+#ifndef __UPSVALUE_H_
+#define __UPSVALUE_H_
+
 #include "amap.h"
 #include "astring.h"
 #include "amutex.h"
@@ -165,3 +168,5 @@ private:
    amap<int, UpsValue> _values;
    aqueue<UpsDatum> _notifs;
 };
+
+#endif // __UPSVALUE__H_

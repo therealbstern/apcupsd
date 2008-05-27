@@ -37,8 +37,6 @@
 # undef main
 # define my_name_is(x, y, z)
 # define bstrdup(x) strdup(x)
-UPSINFO myUPS;
-UPSINFO *core_ups = &myUPS;
 
 # define Pmsg2 Dmsg2
 # define Pmsg1 Dmsg1

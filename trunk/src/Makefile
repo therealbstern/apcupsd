@@ -24,7 +24,7 @@ powerflute_obj  := $(call SRC2OBJ,$(powerflute_srcs))
 SRCS = $(common_srcs) $(apcupsd_srcs) $(apcaccess_srcs) \
        $(apctest_srcs) $(smtp_srcs) $(powerflute_srcs)
 
-all-targets: apcupsd apcaccess apctest smtp $(POWERFLUTE)
+all-targets: apcupsd apcaccess smtp $(POWERFLUTE) #apctest
 
 apcupsd: $(common_obj) $(apcupsd_obj) $(APCDRVLIBS) $(APCLIBS)
 	$(LINK) $(DRVLIBS)
