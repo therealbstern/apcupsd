@@ -34,11 +34,17 @@ ifneq ($(strip $(RELDIR)),)
   RELDIR := $(RELDIR)/
 endif
 
+# Strip extensions
+STRIPEXT = $(foreach file,$(1),$(basename $(file)))
+
 # Convert a list of sources to a list of objects in OBJDIR
-SRC2OBJ = $(foreach obj,$(1:.c=.o),$(dir $(obj))$(OBJDIR)/$(notdir $(obj)))
+SRC2OBJ = $(foreach obj,$(call STRIPEXT,$(1)),$(dir $(obj))$(OBJDIR)/$(notdir $(obj)).o)
 
 # All objects, derived from all sources
 OBJS = $(call SRC2OBJ,$(SRCS))
+
+# Dependency files, derived from all sources
+DEPS = $(foreach dep,$(call STRIPEXT,$(SRCS)),$(DEPDIR)/$(dep).P)
 
 # Default target: Build all subdirs, then reinvoke make to build local 
 # targets. This is a little gross, but necessary to force make to build 
@@ -121,6 +127,13 @@ endif
 
 # Rule to build *.o from *.c and generate dependencies for it
 $(OBJDIR)/%.o: %.c
+	@echo "  CXX  " $(RELDIR)$<
+	$(VV)if test ! -d $(OBJDIR); then mkdir -p $(OBJDIR); fi
+	$(V)$(CXX) $(CPPFLAGS) -c -o $@ $<
+	$(VV)$(DEPENDS)
+
+# Rule to build *.o from *.cpp and generate dependencies for it
+$(OBJDIR)/%.o: %.cpp
 	@echo "  CXX  " $(RELDIR)$<
 	$(VV)if test ! -d $(OBJDIR); then mkdir -p $(OBJDIR); fi
 	$(V)$(CXX) $(CPPFLAGS) -c -o $@ $<

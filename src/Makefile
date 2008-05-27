@@ -64,4 +64,4 @@ uninstall-powerflute:
 	$(call UNINST,$(sbindir)/powerflute)
 
 # Include dependencies
--include $(SRCS:%.c=$(DEPDIR)/%.P)
+-include $(DEPS)
