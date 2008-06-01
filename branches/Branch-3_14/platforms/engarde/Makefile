@@ -9,7 +9,7 @@ all-uninstall: uninstall-engarde
 install-engarde:
 	$(call DISTINST,engarde)
    # unlink old rc script (if not doing a DESTDIR install)
-	$(if $(DESTDIR),,$(V)/sbin/chkconfig --del apcupsd)
+	$(if $(DESTDIR),,$(V)if /sbin/chkconfig --list apcupsd >/dev/null 2>&1 ; then /sbin/chkconfig --del apcupsd ; fi)
    # install new rc script
 	$(call MKDIR,/etc/init.d)
 	$(call INSTDATA,744,apcupsd,/etc/init.d)
@@ -42,8 +42,8 @@ install-engarde:
 uninstall-engarde:
 	$(call DISTUNINST,engarde)
    # unlink old rc script (if not doing a DESTDIR install)
-	$(if $(DESTDIR),,$(V)/sbin/chkconfig --del apcupsd)
-	$(call UNINST,/etc/init.d/apcupsd)
-	$(call COPY,$(DESTDIR)/etc/init.d/halt.old,/etc/init.d/halt)
-	$(call UNINST,/etc/init.d/halt.old)
+	-$(if $(DESTDIR),,$(V)if /sbin/chkconfig --list apcupsd >/dev/null 2>&1 ; then /sbin/chkconfig --del apcupsd ; fi)
+	-$(call UNINST,/etc/init.d/apcupsd)
+	-$(call COPY,$(DESTDIR)/etc/init.d/halt.old,/etc/init.d/halt)
+	-$(call UNINST,/etc/init.d/halt.old)
 

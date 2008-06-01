@@ -9,7 +9,7 @@ all-uninstall: uninstall-yellowdog
 install-yellowdog:
 	$(call DISTINST,Yellowdog)
    # unlink old rc script (if not doing a DESTDIR install)
-	$(if $(DESTDIR),,$(V)/sbin/chkconfig --del apcupsd)
+	$(if $(DESTDIR),,$(V)if /sbin/chkconfig --list apcupsd >/dev/null 2>&1 ; then /sbin/chkconfig --del apcupsd ; fi)
    # install new rc script
 	$(call MKDIR,/etc/rc.d/init.d)
 	$(call INSTDATA,744,apcupsd,/etc/rc.d/init.d)
@@ -42,7 +42,7 @@ install-yellowdog:
 uninstall-yellowdog:
 	$(call DISTUNINST,Yellowdog)
    # unlink old rc script (if not doing a DESTDIR install)
-	$(if $(DESTDIR),,$(V)/sbin/chkconfig --del apcupsd)
-	$(call UNINST,/etc/rc.d/init.d/apcupsd)
-	$(call COPY,$(DESTDIR)/etc/rc.d/init.d/halt.old,/etc/rc.d/init.d/halt)
-	$(call UNINST,/etc/rc.d/init.d/halt.old)
+	-$(if $(DESTDIR),,$(V)if /sbin/chkconfig --list apcupsd >/dev/null 2>&1 ; then /sbin/chkconfig --del apcupsd ; fi)
+	-$(call UNINST,/etc/rc.d/init.d/apcupsd)
+	-$(call COPY,$(DESTDIR)/etc/rc.d/init.d/halt.old,/etc/rc.d/init.d/halt)
+	-$(call UNINST,/etc/rc.d/init.d/halt.old)

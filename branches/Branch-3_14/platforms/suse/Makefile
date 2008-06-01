@@ -9,7 +9,7 @@ all-uninstall: uninstall-suse
 install-suse:
 	$(call DISTINST,SuSE)
    # unlink old rc script (if not doing a DESTDIR install)
-	$(if $(DESTDIR),,$(V)/sbin/chkconfig --del apcupsd)
+	$(if $(DESTDIR),,$(V)if /sbin/chkconfig --list apcupsd >/dev/null 2>&1 ; then /sbin/chkconfig --del apcupsd ; fi)
    # install new rc script
 	$(call MKDIR,/etc/rc.d)
 	$(call INSTDATA,744,apcupsd,/etc/rc.d)
@@ -39,7 +39,7 @@ install-suse:
 
 uninstall-suse:
    # unlink old rc script (if not doing a DESTDIR install)
-	$(if $(DESTDIR),,$(V)/sbin/chkconfig --del apcupsd)
-	$(call UNINST,/etc/rc.d/apcupsd)
-	$(call COPY,$(DESTDIR)/etc/rc.d/halt.old,/etc/rc.d/halt)
-	$(call UNINST,/etc/rc.d/halt.old)
+	-$(if $(DESTDIR),,$(V)if /sbin/chkconfig --list apcupsd >/dev/null 2>&1 ; then /sbin/chkconfig --del apcupsd ; fi)
+	-$(call UNINST,/etc/rc.d/apcupsd)
+	-$(call COPY,$(DESTDIR)/etc/rc.d/halt.old,/etc/rc.d/halt)
+	-$(call UNINST,/etc/rc.d/halt.old)
