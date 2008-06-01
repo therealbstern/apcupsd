@@ -9,7 +9,7 @@ all-uninstall: uninstall-mandrake
 install-mandrake:
 	$(call DISTINST,Mandrake)
    # unlink old rc script (if not doing a DESTDIR install)
-	$(if $(DESTDIR),,$(V)/sbin/chkconfig --del apcupsd)
+	$(if $(DESTDIR),,$(V)if /sbin/chkconfig --list apcupsd >/dev/null 2>&1 ; then /sbin/chkconfig --del apcupsd ; fi)
    # install new rc script
 	$(call MKDIR,/etc/rc.d/init.d)
 	$(call INSTDATA,744,apcupsd,/etc/rc.d/init.d)
@@ -33,5 +33,5 @@ install-mandrake:
 uninstall-mandrake:
 	$(call DISTUNINST,Mandrake)
    # unlink old rc script (if not doing a DESTDIR install)
-	$(if $(DESTDIR),,$(V)/sbin/chkconfig --del apcupsd)
-	$(call UNINST,/etc/rc.d/init.d/apcupsd)
+	-$(if $(DESTDIR),,$(V)if /sbin/chkconfig --list apcupsd >/dev/null 2>&1 ; then /sbin/chkconfig --del apcupsd ; fi)
+	-$(call UNINST,/etc/rc.d/init.d/apcupsd)

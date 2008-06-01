@@ -42,12 +42,11 @@ install-alpha:
 
 uninstall-alpha:
 	$(call DISTUNINST,alpha)
-	$(call UNINST,/sbin/rc2.d/K56apcupsd)
-	$(call UNINST,/sbin/rc2.d/S56apcupsd)
-	$(call UNINST,/sbin/rc3.d/K56apcupsd)
-	$(call UNINST,/sbin/rc3.d/S56apcupsd)
-	$(call UNINST,/sbin/init.d/apcupsd)
+	-$(call UNINST,/sbin/rc2.d/K56apcupsd)
+	-$(call UNINST,/sbin/rc2.d/S56apcupsd)
+	-$(call UNINST,/sbin/rc3.d/K56apcupsd)
+	-$(call UNINST,/sbin/rc3.d/S56apcupsd)
+	-$(call UNINST,/sbin/init.d/apcupsd)
 	$(call COPY,/sbin/rc0,/sbin/rc0.old)
 	$(V)grep -v "###apcupsd###" $(DESTDIR)/sbin/rc0.old >$(DESTDIR)/sbin/rc0
 	$(V)chmod 744 $(DESTDIR)/sbin/rc0
-

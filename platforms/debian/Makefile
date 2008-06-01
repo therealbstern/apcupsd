@@ -23,7 +23,7 @@ install-debian:
 
 uninstall-debian:
 	$(call DISTUNINST,debian)
-	$(call UNINST,/etc/init.d/apcupsd)
-	$(if $(DESTDIR),,$(V)/usr/sbin/update-rc.d apcupsd remove)
-	$(call UNINST,/etc/init.d/ups-monitor)
+	-$(call UNINST,/etc/init.d/apcupsd)
+	-$(if $(DESTDIR),,$(V)/usr/sbin/update-rc.d apcupsd remove)
+	-$(call UNINST,/etc/init.d/ups-monitor)
 
