@@ -467,7 +467,6 @@ AC_ARG_ENABLE(cgi,
    [ if test "$enableval" = "yes"
      then
         ENABLE_CGI="yes"
-        AC_DEFINE(HAVE_NISLIB)
         CGI=cgi
 
         dnl
@@ -648,12 +647,10 @@ AC_HELP_STRING([--enable-net], [Compile networking driver for slaves (default)])
 AC_HELP_STRING([--disable-net], [No network driver for slaves])],
    [ if test "$enableval" = "yes" ; then
         AC_DEFINE(HAVE_NET_DRIVER)
-        AC_DEFINE(HAVE_NISLIB)
         NET_DRIVER="net"
         AC_SUBST(NET_DRIVER)
      fi ],
    [ AC_DEFINE(HAVE_NET_DRIVER)
-     AC_DEFINE(HAVE_NISLIB)
      NET_DRIVER="net"
      AC_SUBST(NET_DRIVER) ])
 

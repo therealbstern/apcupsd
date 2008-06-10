@@ -9770,10 +9770,6 @@ if test "${enable_cgi+set}" = set; then
    if test "$enableval" = "yes"
      then
         ENABLE_CGI="yes"
-        cat >>confdefs.h <<\_ACEOF
-#define HAVE_NISLIB 1
-_ACEOF
-
         CGI=cgi
 
                         echo "$as_me:$LINENO: checking for gdImagePng in -lgd" >&5
@@ -10713,20 +10709,12 @@ if test "${enable_net+set}" = set; then
 #define HAVE_NET_DRIVER 1
 _ACEOF
 
-        cat >>confdefs.h <<\_ACEOF
-#define HAVE_NISLIB 1
-_ACEOF
-
         NET_DRIVER="net"
 
      fi
 else
    cat >>confdefs.h <<\_ACEOF
 #define HAVE_NET_DRIVER 1
-_ACEOF
-
-     cat >>confdefs.h <<\_ACEOF
-#define HAVE_NISLIB 1
 _ACEOF
 
      NET_DRIVER="net"
