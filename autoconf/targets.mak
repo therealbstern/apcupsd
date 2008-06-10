@@ -91,12 +91,12 @@ all-uninstall:
 clean:
 	$(V)find . -depth \
 	  \( -name $(OBJDIR) -o -name $(DEPDIR) -o -name \*.a \) \
-          -exec echo "  CLEAN" \{\} \; -exec rm -r \{\} \;
+          -exec $(ECHO) "  CLEAN" \{\} \; -exec rm -r \{\} \;
 
 # Template rule to build a subdirectory
 .PHONY: %_DIR
 %_DIR:
-	@echo "       " $(RELDIR)$*
+	@$(ECHO) "       " $(RELDIR)$*
 	$(VV)+$(MAKE) -C $* $(NPD) $(MAKECMDGOALS)
 
 # Collective all-subdirs target depends on subdir rule
@@ -109,7 +109,7 @@ ifeq ($(strip $(NODEPS)),)
   define DEPENDS
 	if test ! -d $(DEPDIR); then mkdir -p $(DEPDIR); fi; \
 	  $(MAKEDEPEND); \
-	  echo -n $(OBJDIR)/ > $(df).P; \
+	  $(ECHO) -n $(OBJDIR)/ > $(df).P; \
 	  sed -e 's/#.*//' -e '/^$$/ d' < $(df).d >> $(df).P; \
 	  sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
 	      -e '/^$$/ d' -e 's/$$/ :/' < $(df).d >> $(df).P; \
@@ -121,21 +121,21 @@ endif
 
 # Rule to build *.o from *.c and generate dependencies for it
 $(OBJDIR)/%.o: %.c
-	@echo "  CXX  " $(RELDIR)$<
+	@$(ECHO) "  CXX  " $(RELDIR)$<
 	$(VV)if test ! -d $(OBJDIR); then mkdir -p $(OBJDIR); fi
 	$(V)$(CXX) $(CPPFLAGS) -c -o $@ $<
 	$(VV)$(DEPENDS)
 
 # Rule to link an executable
 define LINK
-	@echo "  LD   " $(RELDIR)$@
+	@$(ECHO) "  LD   " $(RELDIR)$@
 	$(V)$(LD) $(LDFLAGS) $^ -o $@ $(LIBS)
 endef
 
 # Rule to generate an archive (library)
 MAKELIB=$(call ARCHIVE,$@,$(OBJS))
 define ARCHIVE
-	@echo "  AR   " $(RELDIR)$(1)
+	@$(ECHO) "  AR   " $(RELDIR)$(1)
 	$(VV)rm -f $(1)
 	$(V)$(AR) rc $(1) $(2)
 	$(V)$(RANLIB) $(1)
@@ -144,27 +144,27 @@ endef
 # Rule to create a directory during install
 define MKDIR
    $(if $(wildcard $(DESTDIR)$(1)),, \
-      @echo "  MKDIR" $(DESTDIR)$(1))
+      @$(ECHO) "  MKDIR" $(DESTDIR)$(1))
    $(if $(wildcard $(DESTDIR)$(1)),, \
      $(V)$(MKINSTALLDIRS) $(DESTDIR)$(1))
 endef
 
 # Install a program file, given mode, src, and dest
 define INSTPROG
-   @echo "  COPY " $(2) =\> $(DESTDIR)$(3)
+   @$(ECHO) "  COPY " $(2) =\> $(DESTDIR)$(3)
    $(V)$(INSTALL_PROGRAM) $(STRIP) -m $(1) $(2) $(DESTDIR)$(3)
 endef
 
 # Install a data file, given mode, src, and dest
 define INSTDATA
-   @echo "  COPY " $(2) =\> $(DESTDIR)$(3)
+   @$(ECHO) "  COPY " $(2) =\> $(DESTDIR)$(3)
    $(V)$(INSTALL_DATA) -m $(1) $(2) $(DESTDIR)$(3)
 endef
 
 # Install a data file, given mode, src, and dest.
 # Existing dest file is preserved; new file is named *.new if dest exists.
 define INSTNEW
-   @echo "  COPY " $(notdir $(2)) =\> $(DESTDIR)$(3)/$(notdir $(2))$(if $(wildcard $(DESTDIR)$(3)/$(notdir $(2))),.new,)
+   @$(ECHO) "  COPY " $(notdir $(2)) =\> $(DESTDIR)$(3)/$(notdir $(2))$(if $(wildcard $(DESTDIR)$(3)/$(notdir $(2))),.new,)
    $(V)$(INSTALL_DATA) -m $(1) $(2) $(DESTDIR)$(3)/$(notdir $(2))$(if $(wildcard $(DESTDIR)$(3)/$(notdir $(2))),.new,)
 endef
 
@@ -172,42 +172,42 @@ endef
 # Existing dest file is renamed to *.orig if it exists.
 define INSTORIG
    $(if $(wildcard $(DESTDIR)$(3)/$(notdir $(2))), \
-      @echo "  MV   " $(DESTDIR)$(3)/$(notdir $(2)) =\> \
+      @$(ECHO) "  MV   " $(DESTDIR)$(3)/$(notdir $(2)) =\> \
          $(DESTDIR)$(3)/$(notdir $(2)).orig,)
    $(if $(wildcard $(DESTDIR)$(3)/$(notdir $(2))), \
       $(V)mv $(DESTDIR)$(3)/$(notdir $(2)) $(DESTDIR)$(3)/$(notdir $(2)).orig,)
-   @echo "  COPY " $(notdir $(2)) =\> $(DESTDIR)$(3)/$(notdir $(2))
+   @$(ECHO) "  COPY " $(notdir $(2)) =\> $(DESTDIR)$(3)/$(notdir $(2))
    $(V)$(INSTALL_SCRIPT) -m $(1) $(2) $(DESTDIR)$(3)
 endef
 
 # Make a symlink
 define SYMLINK
-   @echo "  LN   " $(DESTDIR)/$(2) -\> $(1)
+   @$(ECHO) "  LN   " $(DESTDIR)/$(2) -\> $(1)
    $(V)ln -sf $(1) $(DESTDIR)/$(2)
 endef
 
 # Copy a file
 define COPY
-   @echo "  CP   " $(1) =\> $(DESTDIR)/$(2)
+   @$(ECHO) "  CP   " $(1) =\> $(DESTDIR)/$(2)
    $(V)cp -f $(1) $(DESTDIR)/$(2)
 endef
 
 # Uninstall a file
 define UNINST
-   @echo "  RM   " $(DESTDIR)$(1)
+   @$(ECHO) "  RM   " $(DESTDIR)$(1)
    $(V)$(RMF) $(DESTDIR)$(1)
 endef
 
 # Announce distro install
 define DISTINST
-   @echo "  ------------------------------------------------------------"
-   @echo "  $(1) distribution installation"
-   @echo "  ------------------------------------------------------------"
+   @$(ECHO) "  ------------------------------------------------------------"
+   @$(ECHO) "  $(1) distribution installation"
+   @$(ECHO) "  ------------------------------------------------------------"
 endef
 
 # Announce distro uninstall
 define DISTUNINST
-   @echo "  ------------------------------------------------------------"
-   @echo "  $(1) distribution uninstall"
-   @echo "  ------------------------------------------------------------"
+   @$(ECHO) "  ------------------------------------------------------------"
+   @$(ECHO) "  $(1) distribution uninstall"
+   @$(ECHO) "  ------------------------------------------------------------"
 endef
