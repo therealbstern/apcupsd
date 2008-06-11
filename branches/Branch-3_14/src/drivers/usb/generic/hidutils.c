@@ -49,7 +49,7 @@ int usb_get_intf_descriptor(usb_dev_handle *udev, unsigned char type,
 unsigned char *hidu_fetch_report_descriptor(usb_dev_handle *fd, int *rlen)
 {
    unsigned char *ptr;
-   int rdesclen, i;
+   int rdesclen;
 
    ptr = (unsigned char*)malloc(MAX_SANE_DESCRIPTOR_LEN);
    rdesclen = usb_get_intf_descriptor(fd, USB_DT_REPORT, 0, ptr, MAX_SANE_DESCRIPTOR_LEN);
@@ -59,15 +59,8 @@ unsigned char *hidu_fetch_report_descriptor(usb_dev_handle *fd, int *rlen)
       return NULL;
    }
 
-   if (debug_level >= 300) {
-      logf("Report descriptor (length=%d):\n", rdesclen);
-      for (i = 0; i < rdesclen; i++) {
-         logf("%02x, ", ptr[i]);
-         if ((i+1)%16 == 0)
-            logf("\n");
-      }
-      logf("\n");
-   }
+   Dmsg0(300, "Report descriptor:\n");
+   hex_dump(300, ptr, rdesclen);
 
    *rlen = rdesclen;
    return ptr;
@@ -197,7 +190,7 @@ int hidu_locate_item(report_desc_t rdesc, int usage, int app, int phys,
  */
 int hidu_get_report(usb_dev_handle *fd, hid_item_t *item, unsigned char *data, int len)
 {
-   int actlen, i;
+   int actlen;
 
    Dmsg4(200, "get_report: id=0x%02x, kind=%d, length=%d pos=%d\n",
       item->report_ID, item->kind, len, item->pos);
@@ -212,12 +205,7 @@ int hidu_get_report(usb_dev_handle *fd, hid_item_t *item, unsigned char *data, i
       return -1;
    }
 
-   if (debug_level >= 300) {
-      logf("%02x: ", item->report_ID);
-      for (i = 0; i < actlen; i++)
-         logf("%02x,", data[i]);
-      logf("\n");
-   }
+   hex_dump(300, data, actlen);
 
    return actlen;
 }
@@ -229,17 +217,11 @@ int hidu_get_report(usb_dev_handle *fd, hid_item_t *item, unsigned char *data, i
  */
 int hidu_set_report(usb_dev_handle *fd, hid_item_t *item, unsigned char *data, int len)
 {
-   int actlen, i;
+   int actlen;
 
    Dmsg4(200, "set_report: id=0x%02x, kind=%d, length=%d pos=%d\n",
       item->report_ID, item->kind, len, item->pos);
-
-   if (debug_level >= 300) {
-      logf("%02x: ", item->report_ID);
-      for (i = 0; i < len; i++)
-         logf("%02x,", data[i]);
-      logf("\n");
-   }
+   hex_dump(300, data, len);
 
    actlen = usb_control_msg( fd,
       USB_ENDPOINT_OUT | USB_TYPE_CLASS | USB_RECIP_INTERFACE,
