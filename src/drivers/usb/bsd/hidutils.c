@@ -90,12 +90,8 @@ unsigned char *hidu_fetch_report_descriptor(int fd, int *rlen)
       return NULL;
    }
 
-   if (debug_level >= 300) {
-      logf("Full descriptors (length=%d):\n", len);
-      for (i = 0; i < len; i++)
-         logf("%02x, ", fdesc.ufd_data[i]);
-      logf("\n");
-   }
+   Dmsg0(300, "Full descriptors:\n");
+   hex_dump(300, fdesc.ufd_data, len);
 
    /* Search for the HID descriptor */
    for (ptr = fdesc.ufd_data, i = 0; i < len; i += ptr[0], ptr += ptr[0])
@@ -147,12 +143,8 @@ unsigned char *hidu_fetch_report_descriptor(int fd, int *rlen)
       return NULL;
    }
 
-   if (debug_level >= 300) {
-      logf("Report descriptor (length=%d):\n", rdesclen);
-      for (i = 0; i < rdesclen; i++)
-         logf("%02x, ", ((unsigned char *)req.ucr_data)[i]);
-      logf("\n");
-   }
+   Dmsg0(300, "Report descriptor:\n");
+   hex_dump(300, req.ucr_data, rdesclen);
 
    *rlen = rdesclen;
    return (unsigned char *)req.ucr_data;
@@ -304,12 +296,7 @@ int hidu_get_report(int fd, hid_item_t *item, unsigned char *data, int len)
       return -1;
    }
 
-   if (debug_level >= 300) {
-      logf("%02x: ", item->report_ID);
-      for (rc = 0; rc < req.ucr_actlen; rc++)
-         logf("%02x,", data[rc]);
-      logf("\n");
-   }
+   hex_dump(300, data, req.ucr_actlen);
 
    return req.ucr_actlen;
 }
@@ -326,13 +313,7 @@ int hidu_set_report(int fd, hid_item_t *item, unsigned char *data, int len)
 
    Dmsg4(200, "set_report: id=0x%02x, kind=%d, length=%d pos=%d\n",
       item->report_ID, item->kind, len, item->pos);
-
-   if (debug_level >= 300) {
-      logf("%02x: ", item->report_ID);
-      for (rc = 0; rc < len; rc++)
-         logf("%02x,", data[rc]);
-      logf("\n");
-   }
+   hex_dump(300, data, len);
 
    req.ucr_flags = 0;
    req.ucr_actlen = 0;
