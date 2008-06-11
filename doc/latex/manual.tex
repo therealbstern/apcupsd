@@ -2245,16 +2245,18 @@ The required apcupsd.conf settings are straightforward:
 The \textbf{DEVICE} setting specifies the IP address of the UPS as well as 
 the username and authentication passphrase to use. Note that the username 
 and passphrase are \textbf{not} the Web/SNMP login credentials. They are 
-separate settings. The default username on a new card is "admin" and the 
+separate settings. The default username on a new card is "apc" and the 
 default passphrase is "admin user phrase". To change the passphrase, log 
 in to the Web UI and go to the UPS tab, then to PowerChute -> Configuration.
 (This assumes firmware v3.3.1. Other versions may place the setting 
-elsewhere.)
+elsewhere.) {\bf The password must be a minimum of 15 characters long.} 
+The web UI will silently ignore shorter passwords and does not give an error 
+message. There is no apparent way to change the username.
 
 Note that you may leave \textbf{DEVICE} blank and Apcupsd will accept 
 information from any PCNET UPS on the network, \textbf{however it will be 
 very insecure since an attacker could easily send packets crafted to cause 
-your server to shut down}. Using the ipaddr, user, and passphrase will \
+your server to shut down}. Using the ipaddr, user, and passphrase will
 prevent this behavior.
 
 You may need to take steps to ensure networking stays active during your
