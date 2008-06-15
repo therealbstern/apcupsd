@@ -103,13 +103,24 @@ clean:
 .PHONY: all-subdirs
 all-subdirs: $(foreach subdir,$(SUBDIRS),$(subdir)_DIR)
 
+# Echo with no newline
+# Pipline here is silly, but should be more portable 
+# than 'echo -n' or 'echo ...\c'. Cannot use autoconf
+# to figure this out since 'make install' may be run
+# with root's shell when ./configure was run with user's 
+# shell. Could also use 'printf' but not certain how
+# universal that is.
+define ECHO_N
+	$(ECHO) $(1) | tr -d '\n'
+endef
+
 # How to build dependencies
 MAKEDEPEND = $(CC) -M $(CFLAGS) $< > $(df).d
 ifeq ($(strip $(NODEPS)),)
   define DEPENDS
 	if test ! -d $(DEPDIR); then mkdir -p $(DEPDIR); fi; \
 	  $(MAKEDEPEND); \
-	  $(ECHO) -n $(OBJDIR)/ > $(df).P; \
+	  $(call ECHO_N,$(OBJDIR)/) > $(df).P; \
 	  sed -e 's/#.*//' -e '/^$$/ d' < $(df).d >> $(df).P; \
 	  sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
 	      -e '/^$$/ d' -e 's/$$/ :/' < $(df).d >> $(df).P; \
