@@ -211,3 +211,12 @@ define DISTUNINST
    @$(ECHO) "  $(1) distribution uninstall"
    @$(ECHO) "  ------------------------------------------------------------"
 endef
+
+# If DESTDIR is set, we do no chkconfig processing
+ifeq ($(DESTDIR),)
+define CHKCFG
+    $(if $(wildcard $(2)),@$(ECHO) "  CKCFG" $(1):$(2))
+    $(if $(wildcard $(2)),$(V)$(CHKCONFIG) --$(1) apcupsd)
+endef
+endif
+
