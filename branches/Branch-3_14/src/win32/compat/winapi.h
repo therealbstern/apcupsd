@@ -36,8 +36,23 @@
 typedef char POOLMEM;
 #endif
 
+// OS version enumeration
+// Keep these in order so >= comparisons work
+typedef enum
+{
+   WINDOWS_95,
+   WINDOWS_98,
+   WINDOWS_ME,
+   WINDOWS_NT,
+   WINDOWS_2000,
+   WINDOWS_XP,
+   WINDOWS_2003,
+   WINDOWS_VISTA
+} OSVERSION;
+
 /* Platform version info */
 extern OSVERSIONINFO g_os_version_info;
+extern OSVERSION g_os_version;
 
 // unicode enabling of win 32 needs some defines and functions
 
