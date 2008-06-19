@@ -35,6 +35,7 @@ VSSClient *g_pVSSClient = NULL;
 
 /* Platform version info */
 OSVERSIONINFO g_os_version_info;
+OSVERSION g_os_version;
 
 /* API Pointers */
 
@@ -192,6 +193,66 @@ InitWinAPIWrapper()
    memset(&g_os_version_info, 0, sizeof(g_os_version_info));
    g_os_version_info.dwOSVersionInfoSize = sizeof(g_os_version_info);
    GetVersionEx(&g_os_version_info);
+
+   // Convert OS version to ordered enumeration
+   if (g_os_version_info.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
+   {
+      // VER_PLATFORM_WIN32_WINDOWS...
+      //
+      //   WINDOWS 95: 4.0
+      //   WINDOWS 98: 4.10
+      //   WINDOWS ME: 4.90
+      //
+      switch (g_os_version_info.dwMinorVersion)
+      {
+      case 0:
+         g_os_version = WINDOWS_95;
+         break;
+      case 10:
+         g_os_version = WINDOWS_98;
+         break;
+      default:
+      case 90:
+         g_os_version = WINDOWS_ME;
+         break;
+      }
+   }
+   else // if (g_os_version_info.dwPlatformId == VER_PLATFORM_WIN32_NT)
+   {
+      // VER_PLATFORM_WIN32_NT...
+      //
+      //   WINDOWS NT:    4.0
+      //   WINDOWS 2000:  5.0
+      //   WINDOWS XP:    5.1
+      //   WINDOWS 2003:  5.2
+      //   WINDOWS VISTA: 6.0
+      //
+      switch (g_os_version_info.dwMajorVersion)
+      {
+      case 4:
+         g_os_version = WINDOWS_NT;
+         break;
+      case 5:
+         switch (g_os_version_info.dwMinorVersion)
+         {
+         case 0:
+            g_os_version = WINDOWS_2000;
+            break;
+         case 1:
+            g_os_version = WINDOWS_XP;
+            break;
+         default:
+         case 2:
+            g_os_version = WINDOWS_2003;
+            break;
+         }
+         break;
+      default:
+      case 6:
+         g_os_version = WINDOWS_VISTA;
+         break;
+      }
+   }
 
    /* deinitialize some routines on win95 - they're not implemented well */
    if (g_os_version_info.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS) {

@@ -56,12 +56,6 @@ public:
 
    // SUPPORT FUNCTIONS
 
-   // Post a message to Apcupsd message loop
-   static BOOL PostToApcupsd(UINT message, WPARAM wParam, LPARAM lParam);
-
-   // Routine to kill any other running copy of Apcupsd
-   static BOOL KillRunningCopy();
-
    // Report status to the SCM
    static BOOL ReportStatus(DWORD state, DWORD exitcode, DWORD waithint);
 
@@ -71,6 +65,13 @@ public:
    // Set registry value to indicate if we're installed to run as a service
    static void SetServiceFlag(DWORD flag);
 
+   // Stop an NT service with the given handle
+   static BOOL StopNTService(SC_HANDLE hservice);
+
+   // Open the Apcupsd NT service
+   static SC_HANDLE OpenNTService();
+
+   
    // INTERNAL DATA
 
    static SERVICE_STATUS         m_srvstatus;
