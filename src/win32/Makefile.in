@@ -77,15 +77,11 @@ EXEDIR = .
 # Files in src/win32/compat
 
 OBJS_COMPAT = \
-	$(OBJDIR)/print.o \
 	$(OBJDIR)/compat.o \
 	$(OBJDIR)/winapi.o
 
 $(OBJDIR)/compat.o:	compat/compat.cpp
 	$(CXX) -c ./compat/compat.cpp -o $@
-
-$(OBJDIR)/print.o:	compat/print.cpp
-	$(CXX) -c ./compat/print.cpp -o $@
 
 $(OBJDIR)/winapi.o:	compat/winapi.c
 	$(CXX) -c ./compat/winapi.c -o $@
