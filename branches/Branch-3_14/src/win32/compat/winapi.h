@@ -27,6 +27,8 @@
 
 #include <windows.h>
 #include <windef.h>
+#include <accctrl.h>
+#include <aclapi.h>
 
 #ifdef WIN32_VSS
 #include "vss.h"   
@@ -175,5 +177,7 @@ extern VSSClient* g_pVSSClient;
 
 void InitWinAPIWrapper();
 #endif
+
+bool GrantAccess(HANDLE h, ACCESS_MASK access, TRUSTEE_TYPE type, LPTSTR name);
 
 #endif /* __WINAPI_H */

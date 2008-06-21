@@ -310,13 +310,20 @@ void TrayInstance::DeleteInstanceKey()
    }
 }
 
-void Reset()
+void PostToApctray(DWORD msg)
 {
    HWND wnd = FindWindow(APCTRAY_WINDOW_CLASS, NULL);
    if (wnd)
-      PostMessage(wnd, WM_RESET, 0, 0);
+      PostMessage(wnd, msg, 0, 0);
+   CloseHandle(wnd);
+}
 
-   return;
+void Reset()
+{
+   // On Win2K and newer, apctray monitors the registry so they 
+   // do not need this message to be posted. Older platforms need it.
+   if (g_os_version < WINDOWS_2000)
+      PostToApctray(WM_RESET);
 }
 
 int Install()
@@ -447,11 +454,18 @@ int DelInstance(const char *host, unsigned short port)
 
 int Kill()
 {
-   HWND wnd;
-   while ((wnd = FindWindow(APCTRAY_WINDOW_CLASS, NULL)) != NULL) {
-      PostMessage(wnd, WM_CLOSE, 0, 0);
-      Sleep(100);
+   PostToApctray(WM_CLOSE);
+
+   if (g_os_version >= WINDOWS_2000)
+   {
+      HANDLE evt = OpenEvent(EVENT_MODIFY_STATE, FALSE, APCTRAY_STOP_EVENT_NAME);
+      if (evt != NULL)
+      {
+         SetEvent(evt);
+         CloseHandle(evt);
+      }
    }
+
    return 0;
 }
 
@@ -546,6 +560,57 @@ void RemoveInstance(upsMenu *menu)
    }
 }
 
+// This thread runs on Windows 2000 and higher. It monitors the registry
+// for changes in apctray instances (/add & /del) and also looks for the
+// global exit event to be signaled (/kill).
+bool runthread = false;
+HANDLE regevt = NULL;
+DWORD WINAPI EventThread(LPVOID param)
+{
+   // Create global exit event and allow Adminstrator access to it so any
+   // member of the Administrators group can signal it.
+   HANDLE exitevt = CreateEvent(NULL, TRUE, FALSE, APCTRAY_STOP_EVENT_NAME);
+   GrantAccess(exitevt, EVENT_MODIFY_STATE, TRUSTEE_IS_GROUP, "Administrators");
+
+   // Create local event for watching the registry
+   regevt = CreateEvent(NULL, FALSE, FALSE, NULL);
+
+   // Open registry key to be watched
+   HKEY hkey;
+   RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Apcupsd\\Apctray",
+                0, KEY_READ|KEY_WRITE, &hkey);
+
+   // Request asynchronous registry watch
+   DWORD filter = REG_NOTIFY_CHANGE_NAME | REG_NOTIFY_CHANGE_LAST_SET;
+   RegNotifyChangeKeyValue(hkey, TRUE, filter, regevt, TRUE);
+
+   // Wait for either event to be signaled
+   HANDLE hnds[] = { exitevt, regevt };
+   while (runthread)
+   {
+      DWORD rc = WaitForMultipleObjects(2, hnds, FALSE, INFINITE);
+      if (!runthread || rc == WAIT_FAILED)
+         break;
+
+      switch (rc-WAIT_OBJECT_0)
+      {
+      case 0:  // Global exit event
+         runthread = false;
+         PostToApctray(WM_CLOSE);
+         break;
+      case 1:  // Registry change event
+         PostToApctray(WM_RESET);
+         RegNotifyChangeKeyValue(hkey, TRUE, filter, regevt, TRUE);
+         break;
+      }
+   }
+
+   RegCloseKey(hkey);
+   CloseHandle(regevt);
+   CloseHandle(exitevt);
+   return 0;
+}
+
 // WinMain parses the command line and either calls the main App
 // routine or, under NT, the main service routine.
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
@@ -603,11 +668,21 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    }
 
    // Check to see if we're already running
-   HANDLE sem = CreateSemaphore(NULL, 0, 1, "apctray");
+   const char *semname = g_os_version < WINDOWS_2000 ?
+      "apctray" : "Local\\apctray";
+   HANDLE sem = CreateSemaphore(NULL, 0, 1, semname);
    if (sem == NULL || GetLastError() == ERROR_ALREADY_EXISTS) {
       NotifyUser("Apctray is already running");
       WSACleanup();
       return 0;
+   }
+
+   // On Win2K and above we spawn a thread to watch for registry changes
+   // or exit requests.
+   HANDLE evtthread;
+   if (g_os_version >= WINDOWS_2000) {
+      runthread = true;
+      evtthread = CreateThread(NULL, 0, EventThread, NULL, 0, NULL);
    }
 
    bool reset;
@@ -694,6 +769,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       delete balmgr;
    }
    while(reset);  // Repeat if we're resetting
+
+   // Wait for event thread to exit cleanly
+   if (g_os_version >= WINDOWS_2000) {
+      runthread = false;
+      SetEvent(regevt); // Kick regevt to wake up thread
+      if (WaitForSingleObject(evtthread, 5000) == WAIT_TIMEOUT)
+         TerminateThread(evtthread, 0);
+      CloseHandle(evtthread);
+   }
 
    WSACleanup();
    return 0;

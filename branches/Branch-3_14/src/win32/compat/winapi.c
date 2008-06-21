@@ -299,3 +299,45 @@ InitWinAPIWrapper()
 int win32_client = 0;
 
 #endif
+
+
+// Add the requested access to the given kernel object handle
+bool GrantAccess(HANDLE h, ACCESS_MASK access, TRUSTEE_TYPE type, LPTSTR name)
+{
+   DWORD rc;
+
+   // Obtain current DACL from object
+   ACL *dacl;
+   SECURITY_DESCRIPTOR *sd;
+   rc = GetSecurityInfo(h, SE_KERNEL_OBJECT, DACL_SECURITY_INFORMATION, 
+                        NULL, NULL, &dacl, NULL, &sd);
+   if (rc != ERROR_SUCCESS)
+      return false;
+
+   // Add requested access to DACL
+   EXPLICIT_ACCESS ea;
+   ea.grfAccessPermissions = access;
+   ea.grfAccessMode = GRANT_ACCESS;
+   ea.grfInheritance = NO_INHERITANCE;
+   ea.Trustee.pMultipleTrustee = FALSE;
+   ea.Trustee.MultipleTrusteeOperation = NO_MULTIPLE_TRUSTEE;
+   ea.Trustee.TrusteeForm = TRUSTEE_IS_NAME;
+   ea.Trustee.TrusteeType = type;
+   ea.Trustee.ptstrName = name;
+   ACL *newdacl;
+   rc = SetEntriesInAcl(1, &ea, dacl, &newdacl);
+   if (rc != ERROR_SUCCESS) {
+      LocalFree(sd);
+      return false;
+   }
+
+   // Set new DACL on object
+   rc = SetSecurityInfo(h, SE_KERNEL_OBJECT, DACL_SECURITY_INFORMATION, 
+                        NULL, NULL, newdacl, NULL);
+
+   // Done with structs
+   LocalFree(newdacl);
+   LocalFree(sd);
+
+   return rc == ERROR_SUCCESS;
+}
