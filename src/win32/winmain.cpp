@@ -17,8 +17,6 @@
 #include <pthread.h>
 #include <errno.h>
 #include "defines.h"
-#include "accctrl.h"
-#include "aclapi.h"
 
 // Apcupsd UNIX main entrypoint
 extern int ApcupsdMain(int argc, char **argv);
@@ -192,47 +190,6 @@ void *ApcupsdMain(LPVOID lpwThreadParam)
 
    // In case apcupsd returns, terminate application
    ApcupsdTerminate();
-}
-
-// Add the requested access to the given kernel object handle
-static bool GrantAccess(HANDLE h, ACCESS_MASK access, TRUSTEE_TYPE type, LPTSTR name)
-{
-   DWORD rc;
-
-   // Obtain current DACL from object
-   ACL *dacl;
-   SECURITY_DESCRIPTOR *sd;
-   rc = GetSecurityInfo(h, SE_KERNEL_OBJECT, DACL_SECURITY_INFORMATION, 
-                        NULL, NULL, &dacl, NULL, &sd);
-   if (rc != ERROR_SUCCESS)
-      return false;
-
-   // Add requested access to DACL
-   EXPLICIT_ACCESS ea;
-   ea.grfAccessPermissions = access;
-   ea.grfAccessMode = GRANT_ACCESS;
-   ea.grfInheritance = NO_INHERITANCE;
-   ea.Trustee.pMultipleTrustee = FALSE;
-   ea.Trustee.MultipleTrusteeOperation = NO_MULTIPLE_TRUSTEE;
-   ea.Trustee.TrusteeForm = TRUSTEE_IS_NAME;
-   ea.Trustee.TrusteeType = type;
-   ea.Trustee.ptstrName = name;
-   ACL *newdacl;
-   rc = SetEntriesInAcl(1, &ea, dacl, &newdacl);
-   if (rc != ERROR_SUCCESS) {
-      LocalFree(sd);
-      return false;
-   }
-
-   // Set new DACL on object
-   rc = SetSecurityInfo(h, SE_KERNEL_OBJECT, DACL_SECURITY_INFORMATION, 
-                        NULL, NULL, newdacl, NULL);
-
-   // Done with structs
-   LocalFree(newdacl);
-   LocalFree(sd);
-
-   return rc == ERROR_SUCCESS;
 }
 
 // Wait for exit signal on WinNT and below. This code creates a hidden
