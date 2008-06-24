@@ -91,7 +91,7 @@ all-uninstall:
 clean:
 	$(V)find . -depth \
 	  \( -name $(OBJDIR) -o -name $(DEPDIR) -o -name \*.a \) \
-          -exec $(ECHO) "  CLEAN" \{\} \; -exec rm -r \{\} \;
+          -exec $(ECHO) "  CLEAN" \{\} \; -exec $(RMF) \{\} \;
 
 # Template rule to build a subdirectory
 .PHONY: %_DIR
@@ -121,10 +121,10 @@ ifeq ($(strip $(NODEPS)),)
 	if test ! -d $(DEPDIR); then mkdir -p $(DEPDIR); fi; \
 	  $(MAKEDEPEND); \
 	  $(call ECHO_N,$(OBJDIR)/) > $(df).P; \
-	  sed -e 's/#.*//' -e '/^$$/ d' < $(df).d >> $(df).P; \
-	  sed -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
-	      -e '/^$$/ d' -e 's/$$/ :/' < $(df).d >> $(df).P; \
-	  rm -f $(df).d
+	  $(SED) -e 's/#.*//' -e '/^$$/ d' < $(df).d >> $(df).P; \
+	  $(SED) -e 's/#.*//' -e 's/^[^:]*: *//' -e 's/ *\\$$//' \
+	         -e '/^$$/ d' -e 's/$$/ :/' < $(df).d >> $(df).P; \
+	  $(RMF) $(df).d
   endef
 else
   DEPENDS :=
@@ -147,7 +147,7 @@ endef
 MAKELIB=$(call ARCHIVE,$@,$(OBJS))
 define ARCHIVE
 	@$(ECHO) "  AR   " $(RELDIR)$(1)
-	$(VV)rm -f $(1)
+	$(VV)$(RMF) $(1)
 	$(V)$(AR) rc $(1) $(2)
 	$(V)$(RANLIB) $(1)
 endef
@@ -186,7 +186,7 @@ define INSTORIG
       @$(ECHO) "  MV   " $(DESTDIR)$(3)/$(notdir $(2)) =\> \
          $(DESTDIR)$(3)/$(notdir $(2)).orig,)
    $(if $(wildcard $(DESTDIR)$(3)/$(notdir $(2))), \
-      $(V)mv $(DESTDIR)$(3)/$(notdir $(2)) $(DESTDIR)$(3)/$(notdir $(2)).orig,)
+      $(V)$(MV) $(DESTDIR)$(3)/$(notdir $(2)) $(DESTDIR)$(3)/$(notdir $(2)).orig,)
    @$(ECHO) "  COPY " $(notdir $(2)) =\> $(DESTDIR)$(3)/$(notdir $(2))
    $(V)$(INSTALL_SCRIPT) -m $(1) $(2) $(DESTDIR)$(3)
 endef
@@ -194,13 +194,13 @@ endef
 # Make a symlink
 define SYMLINK
    @$(ECHO) "  LN   " $(DESTDIR)/$(2) -\> $(1)
-   $(V)ln -sf $(1) $(DESTDIR)/$(2)
+   $(V)$(LN) -sf $(1) $(DESTDIR)/$(2)
 endef
 
 # Copy a file
 define COPY
    @$(ECHO) "  CP   " $(1) =\> $(DESTDIR)/$(2)
-   $(V)cp -f $(1) $(DESTDIR)/$(2)
+   $(V)$(CP) -f $(1) $(DESTDIR)/$(2)
 endef
 
 # Uninstall a file
