@@ -19,12 +19,12 @@ NPD := --no-print-directory
 
 # Check verbose flag
 ifeq ($(strip $(VERBOSE)),1)
-  V:=
+  V :=
   NPD :=
 endif
 ifeq ($(strip $(VERBOSE)),2)
-  V:=
-  VV:=
+  V :=
+  VV :=
   NPD :=
 endif
 
