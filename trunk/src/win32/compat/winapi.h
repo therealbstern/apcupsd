@@ -23,21 +23,28 @@
 #ifndef __WINAPI_H
 #define __WINAPI_H
 
-#if defined(HAVE_WIN32)
-
 #include <windows.h>
 #include <windef.h>
+#include <accctrl.h>
+#include <aclapi.h>
 
-#ifdef WIN32_VSS
-#include "vss.h"   
-#endif
-
-#ifndef POOLMEM
-typedef char POOLMEM;
-#endif
+// OS version enumeration
+// Keep these in order so >= comparisons work
+typedef enum
+{
+   WINDOWS_95,
+   WINDOWS_98,
+   WINDOWS_ME,
+   WINDOWS_NT,
+   WINDOWS_2000,
+   WINDOWS_XP,
+   WINDOWS_2003,
+   WINDOWS_VISTA
+} OSVERSION;
 
 /* Platform version info */
 extern OSVERSIONINFO g_os_version_info;
+extern OSVERSION g_os_version;
 
 // unicode enabling of win 32 needs some defines and functions
 
@@ -65,100 +72,33 @@ extern t_OpenProcessToken      p_OpenProcessToken;
 extern t_AdjustTokenPrivileges p_AdjustTokenPrivileges;
 extern t_LookupPrivilegeValue  p_LookupPrivilegeValue;
 
-/* In MSVCRT.DLL */
-typedef int (__cdecl * t_wunlink) (const wchar_t *);
-typedef int (__cdecl * t_wmkdir) (const wchar_t *);
-typedef int (__cdecl * t_wopen)  (const wchar_t *, int, ...);
-
-extern t_wunlink   p_wunlink;
-extern t_wmkdir    p_wmkdir;
-extern t_wopen     p_wopen;
-
 /* In KERNEL32.DLL */
 typedef BOOL (WINAPI * t_GetFileAttributesExA)(LPCSTR, GET_FILEEX_INFO_LEVELS,
        LPVOID);
-typedef BOOL (WINAPI * t_GetFileAttributesExW)(LPCWSTR, GET_FILEEX_INFO_LEVELS,
-       LPVOID);
-
 typedef DWORD (WINAPI * t_GetFileAttributesA)(LPCSTR);
-typedef DWORD (WINAPI * t_GetFileAttributesW)(LPCWSTR);
 typedef BOOL (WINAPI * t_SetFileAttributesA)(LPCSTR, DWORD);
-typedef BOOL (WINAPI * t_SetFileAttributesW)(LPCWSTR, DWORD);
-
 typedef HANDLE (WINAPI * t_CreateFileA) (LPCSTR, DWORD ,DWORD, LPSECURITY_ATTRIBUTES,
         DWORD , DWORD, HANDLE);
-typedef HANDLE (WINAPI * t_CreateFileW) (LPCWSTR, DWORD ,DWORD, LPSECURITY_ATTRIBUTES,
-        DWORD , DWORD, HANDLE);
-
 typedef BOOL (WINAPI * t_CreateDirectoryA) (LPCSTR, LPSECURITY_ATTRIBUTES);
-typedef BOOL (WINAPI * t_CreateDirectoryW) (LPCWSTR, LPSECURITY_ATTRIBUTES);
-
 typedef BOOL (WINAPI * t_SetProcessShutdownParameters)(DWORD, DWORD);
-typedef BOOL (WINAPI * t_BackupRead)(HANDLE,LPBYTE,DWORD,LPDWORD,BOOL,BOOL,LPVOID*);
-typedef BOOL (WINAPI * t_BackupWrite)(HANDLE,LPBYTE,DWORD,LPDWORD,BOOL,BOOL,LPVOID*);
-
-typedef int (WINAPI * t_WideCharToMultiByte) (UINT CodePage, DWORD , LPCWSTR, int,
-                                              LPSTR, int, LPCSTR, LPBOOL);
-
-typedef int (WINAPI * t_MultiByteToWideChar) (UINT, DWORD, LPCSTR, int, LPWSTR, int);
 typedef HANDLE (WINAPI * t_FindFirstFileA) (LPCSTR, LPWIN32_FIND_DATAA);
-typedef HANDLE (WINAPI * t_FindFirstFileW) (LPCWSTR, LPWIN32_FIND_DATAW);
-
 typedef BOOL (WINAPI * t_FindNextFileA) (HANDLE, LPWIN32_FIND_DATAA);
-typedef BOOL (WINAPI * t_FindNextFileW) (HANDLE, LPWIN32_FIND_DATAW);
-
 typedef BOOL (WINAPI * t_SetCurrentDirectoryA) (LPCSTR);
-typedef BOOL (WINAPI * t_SetCurrentDirectoryW) (LPCWSTR);
-
 typedef DWORD (WINAPI * t_GetCurrentDirectoryA) (DWORD, LPSTR);
-typedef DWORD (WINAPI * t_GetCurrentDirectoryW) (DWORD, LPWSTR);
-
-typedef BOOL (WINAPI * t_GetVolumePathNameW) (LPCWSTR, LPWSTR, DWORD);
-typedef BOOL (WINAPI * t_GetVolumeNameForVolumeMountPointW) (LPCWSTR, LPWSTR, DWORD);
   
 extern t_GetFileAttributesA   p_GetFileAttributesA;
-extern t_GetFileAttributesW   p_GetFileAttributesW;
-
 extern t_GetFileAttributesExA   p_GetFileAttributesExA;
-extern t_GetFileAttributesExW   p_GetFileAttributesExW;
-
 extern t_SetFileAttributesA   p_SetFileAttributesA;
-extern t_SetFileAttributesW   p_SetFileAttributesW;
-
 extern t_CreateFileA   p_CreateFileA;
-extern t_CreateFileW   p_CreateFileW;
-
 extern t_CreateDirectoryA   p_CreateDirectoryA;
-extern t_CreateDirectoryW   p_CreateDirectoryW;
-
 extern t_SetProcessShutdownParameters p_SetProcessShutdownParameters;
-extern t_BackupRead         p_BackupRead;
-extern t_BackupWrite        p_BackupWrite;
-
-extern t_WideCharToMultiByte p_WideCharToMultiByte;
-extern t_MultiByteToWideChar p_MultiByteToWideChar;
-
 extern t_FindFirstFileA p_FindFirstFileA;
-extern t_FindFirstFileW p_FindFirstFileW;
-
 extern t_FindNextFileA p_FindNextFileA;
-extern t_FindNextFileW p_FindNextFileW;
-
 extern t_SetCurrentDirectoryA p_SetCurrentDirectoryA;
-extern t_SetCurrentDirectoryW p_SetCurrentDirectoryW;
-
 extern t_GetCurrentDirectoryA p_GetCurrentDirectoryA;
-extern t_GetCurrentDirectoryW p_GetCurrentDirectoryW;
-
-extern t_GetVolumePathNameW p_GetVolumePathNameW;
-extern t_GetVolumeNameForVolumeMountPointW p_GetVolumeNameForVolumeMountPointW;
-          
-#ifdef WIN32_VSS
-class  VSSClient;
-extern VSSClient* g_pVSSClient;
-#endif
 
 void InitWinAPIWrapper();
-#endif
+
+bool GrantAccess(HANDLE h, ACCESS_MASK access, TRUSTEE_TYPE type, LPTSTR name);
 
 #endif /* __WINAPI_H */

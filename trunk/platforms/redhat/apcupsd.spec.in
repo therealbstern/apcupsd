@@ -372,6 +372,11 @@ rm -f $RPM_BUILD_DIR/Release_Notes-%{version}-%{release}.txt
 
 %pre
 
+# are we upgrading?
+if [ -s %{_sysconfdir}/apcupsd/apcupsd.conf ];then
+	UPGRADE=Y
+fi
+
 %post
 
 # get rid of any 3.6.2 stuff
@@ -415,6 +420,11 @@ awk '# Stuff left over from a previous apcupsd, remove it
 chmod 744 %{initdir}/halt
 fi
 
+# restart the daemon if we are upgrading
+if [ "$UPGRADE" = "Y" ];then
+	%{initdir}/apcupsd restart
+fi
+
 # Undo things a bit
 
 %preun
@@ -444,6 +454,8 @@ if [ $1 = 0 ] ; then
 fi
 
 %changelog
+* Sat May 31 2008 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- add check for upgrade and restart daemon
 * Sun May 11 2008 Adam Kropelin <akropel1 at rochester.rr.com>
 - remove powerflute
 * Sun Feb 03 2008 D. Scott Barninger <barninger at fairfieldcomputers.com>

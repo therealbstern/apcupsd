@@ -21,74 +21,26 @@
  */
 
 #include "apc.h"
-
-#if defined(HAVE_WIN32)
-
 #include "winapi.h"
-
-int win32_client = 1;
-
-#ifdef WIN32_VSS
-/* preset VSSClient to NULL */
-VSSClient *g_pVSSClient = NULL;
-#endif
 
 /* Platform version info */
 OSVERSIONINFO g_os_version_info;
+OSVERSION g_os_version;
 
 /* API Pointers */
-
 t_OpenProcessToken      p_OpenProcessToken = NULL;
 t_AdjustTokenPrivileges p_AdjustTokenPrivileges = NULL;
 t_LookupPrivilegeValue  p_LookupPrivilegeValue = NULL;
-
 t_SetProcessShutdownParameters p_SetProcessShutdownParameters = NULL;
-
 t_CreateFileA   p_CreateFileA = NULL;
-t_CreateFileW   p_CreateFileW = NULL;
 t_CreateDirectoryA   p_CreateDirectoryA;
-t_CreateDirectoryW   p_CreateDirectoryW;
-
-t_wunlink p_wunlink = NULL;
-t_wmkdir p_wmkdir = NULL;
-t_wopen p_wopen = NULL;
-
 t_GetFileAttributesA    p_GetFileAttributesA = NULL;
-t_GetFileAttributesW    p_GetFileAttributesW = NULL;
-
 t_GetFileAttributesExA  p_GetFileAttributesExA = NULL;
-t_GetFileAttributesExW  p_GetFileAttributesExW = NULL;
-
 t_SetFileAttributesA    p_SetFileAttributesA = NULL;
-t_SetFileAttributesW    p_SetFileAttributesW = NULL;
-t_BackupRead            p_BackupRead = NULL;
-t_BackupWrite           p_BackupWrite = NULL;
-t_WideCharToMultiByte p_WideCharToMultiByte = NULL;
-t_MultiByteToWideChar p_MultiByteToWideChar = NULL;
-
 t_FindFirstFileA p_FindFirstFileA = NULL;
-t_FindFirstFileW p_FindFirstFileW = NULL;
-
 t_FindNextFileA p_FindNextFileA = NULL;
-t_FindNextFileW p_FindNextFileW = NULL;
-
 t_SetCurrentDirectoryA p_SetCurrentDirectoryA = NULL;
-t_SetCurrentDirectoryW p_SetCurrentDirectoryW = NULL;
-
 t_GetCurrentDirectoryA p_GetCurrentDirectoryA = NULL;
-t_GetCurrentDirectoryW p_GetCurrentDirectoryW = NULL;
-
-t_GetVolumePathNameW p_GetVolumePathNameW = NULL;
-t_GetVolumeNameForVolumeMountPointW p_GetVolumeNameForVolumeMountPointW = NULL;
-
-#ifdef WIN32_VSS
-void 
-VSSCleanup()
-{
-   if (g_pVSSClient)
-      delete (g_pVSSClient);
-}
-#endif
 
 void 
 InitWinAPIWrapper() 
@@ -98,82 +50,32 @@ InitWinAPIWrapper()
       /* create file calls */
       p_CreateFileA = (t_CreateFileA)
           GetProcAddress(hLib, "CreateFileA");
-      p_CreateFileW = (t_CreateFileW)
-          GetProcAddress(hLib, "CreateFileW");      
 
       p_CreateDirectoryA = (t_CreateDirectoryA)
           GetProcAddress(hLib, "CreateDirectoryA");
-      p_CreateDirectoryW = (t_CreateDirectoryW)
-          GetProcAddress(hLib, "CreateDirectoryW");      
 
       /* attribute calls */
       p_GetFileAttributesA = (t_GetFileAttributesA)
           GetProcAddress(hLib, "GetFileAttributesA");
-      p_GetFileAttributesW = (t_GetFileAttributesW)
-          GetProcAddress(hLib, "GetFileAttributesW");
       p_GetFileAttributesExA = (t_GetFileAttributesExA)
           GetProcAddress(hLib, "GetFileAttributesExA");
-      p_GetFileAttributesExW = (t_GetFileAttributesExW)
-          GetProcAddress(hLib, "GetFileAttributesExW");
       p_SetFileAttributesA = (t_SetFileAttributesA)
           GetProcAddress(hLib, "SetFileAttributesA");
-      p_SetFileAttributesW = (t_SetFileAttributesW)
-          GetProcAddress(hLib, "SetFileAttributesW");
       /* process calls */
       p_SetProcessShutdownParameters = (t_SetProcessShutdownParameters)
           GetProcAddress(hLib, "SetProcessShutdownParameters");
-      /* backup calls */
-      p_BackupRead = (t_BackupRead)
-          GetProcAddress(hLib, "BackupRead");
-      p_BackupWrite = (t_BackupWrite)
-          GetProcAddress(hLib, "BackupWrite");
-      /* char conversion calls */
-      p_WideCharToMultiByte = (t_WideCharToMultiByte)
-          GetProcAddress(hLib, "WideCharToMultiByte");
-      p_MultiByteToWideChar = (t_MultiByteToWideChar)
-          GetProcAddress(hLib, "MultiByteToWideChar");
 
       /* find files */
       p_FindFirstFileA = (t_FindFirstFileA)
           GetProcAddress(hLib, "FindFirstFileA"); 
-      p_FindFirstFileW = (t_FindFirstFileW)
-          GetProcAddress(hLib, "FindFirstFileW");       
       p_FindNextFileA = (t_FindNextFileA)
           GetProcAddress(hLib, "FindNextFileA");
-      p_FindNextFileW = (t_FindNextFileW)
-          GetProcAddress(hLib, "FindNextFileW");
       /* set and get directory */
       p_SetCurrentDirectoryA = (t_SetCurrentDirectoryA)
           GetProcAddress(hLib, "SetCurrentDirectoryA");
-      p_SetCurrentDirectoryW = (t_SetCurrentDirectoryW)
-          GetProcAddress(hLib, "SetCurrentDirectoryW");       
       p_GetCurrentDirectoryA = (t_GetCurrentDirectoryA)
           GetProcAddress(hLib, "GetCurrentDirectoryA");
-      p_GetCurrentDirectoryW = (t_GetCurrentDirectoryW)
-          GetProcAddress(hLib, "GetCurrentDirectoryW");      
 
-      /* some special stuff we need for VSS
-         but statically linkage doesn't work on Win 9x */
-      p_GetVolumePathNameW = (t_GetVolumePathNameW)
-          GetProcAddress(hLib, "GetVolumePathNameW");
-      p_GetVolumeNameForVolumeMountPointW = (t_GetVolumeNameForVolumeMountPointW)
-          GetProcAddress(hLib, "GetVolumeNameForVolumeMountPointW");
-    
-      FreeLibrary(hLib);
-   }
-   
-   hLib = LoadLibraryA("MSVCRT.DLL");
-   if (hLib) {
-      /* unlink */
-      p_wunlink = (t_wunlink)
-      GetProcAddress(hLib, "_wunlink");
-      /* wmkdir */
-      p_wmkdir = (t_wmkdir)
-      GetProcAddress(hLib, "_wmkdir");
-      /* wopen */
-      p_wopen = (t_wopen)
-      GetProcAddress(hLib, "_wopen");
-        
       FreeLibrary(hLib);
    }
    
@@ -193,48 +95,104 @@ InitWinAPIWrapper()
    g_os_version_info.dwOSVersionInfoSize = sizeof(g_os_version_info);
    GetVersionEx(&g_os_version_info);
 
-   /* deinitialize some routines on win95 - they're not implemented well */
-   if (g_os_version_info.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS) {
-      p_BackupRead = NULL;
-      p_BackupWrite = NULL;
-
-      p_CreateFileW = NULL;          
-      p_GetFileAttributesW = NULL;          
-      p_GetFileAttributesExW = NULL;
-          
-      p_SetFileAttributesW = NULL;
-                
-      p_FindFirstFileW = NULL;
-      p_FindNextFileW = NULL;
-      p_SetCurrentDirectoryW = NULL;
-      p_GetCurrentDirectoryW = NULL;
-
-      p_wunlink = NULL;
-      p_wmkdir = NULL;
-      p_wopen = NULL;
-
-      p_GetVolumePathNameW = NULL;
-      p_GetVolumeNameForVolumeMountPointW = NULL;
-   }   
-
-   /* decide which vss class to initialize */
-#ifdef WIN32_VSS
-   switch (g_os_version_info.dwMinorVersion) {
-      case 1: 
-         g_pVSSClient = new VSSClientXP();
-         atexit(VSSCleanup);
+   // Convert OS version to ordered enumeration
+   if (g_os_version_info.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS)
+   {
+      // VER_PLATFORM_WIN32_WINDOWS...
+      //
+      //   WINDOWS 95: 4.0
+      //   WINDOWS 98: 4.10
+      //   WINDOWS ME: 4.90
+      //
+      switch (g_os_version_info.dwMinorVersion)
+      {
+      case 0:
+         g_os_version = WINDOWS_95;
          break;
-      case 2: 
-         g_pVSSClient = new VSSClient2003();
-         atexit(VSSCleanup);
+      case 10:
+         g_os_version = WINDOWS_98;
          break;
+      default:
+      case 90:
+         g_os_version = WINDOWS_ME;
+         break;
+      }
    }
-#endif /* WIN32_VSS */
+   else // if (g_os_version_info.dwPlatformId == VER_PLATFORM_WIN32_NT)
+   {
+      // VER_PLATFORM_WIN32_NT...
+      //
+      //   WINDOWS NT:    4.0
+      //   WINDOWS 2000:  5.0
+      //   WINDOWS XP:    5.1
+      //   WINDOWS 2003:  5.2
+      //   WINDOWS VISTA: 6.0
+      //
+      switch (g_os_version_info.dwMajorVersion)
+      {
+      case 4:
+         g_os_version = WINDOWS_NT;
+         break;
+      case 5:
+         switch (g_os_version_info.dwMinorVersion)
+         {
+         case 0:
+            g_os_version = WINDOWS_2000;
+            break;
+         case 1:
+            g_os_version = WINDOWS_XP;
+            break;
+         default:
+         case 2:
+            g_os_version = WINDOWS_2003;
+            break;
+         }
+         break;
+      default:
+      case 6:
+         g_os_version = WINDOWS_VISTA;
+         break;
+      }
+   }
 }
 
-#else
+// Add the requested access to the given kernel object handle
+bool GrantAccess(HANDLE h, ACCESS_MASK access, TRUSTEE_TYPE type, LPTSTR name)
+{
+   DWORD rc;
 
-/* Not Windows */
-int win32_client = 0;
+   // Obtain current DACL from object
+   ACL *dacl;
+   SECURITY_DESCRIPTOR *sd;
+   rc = GetSecurityInfo(h, SE_KERNEL_OBJECT, DACL_SECURITY_INFORMATION, 
+                        NULL, NULL, &dacl, NULL, &sd);
+   if (rc != ERROR_SUCCESS)
+      return false;
 
-#endif
+   // Add requested access to DACL
+   EXPLICIT_ACCESS ea;
+   ea.grfAccessPermissions = access;
+   ea.grfAccessMode = GRANT_ACCESS;
+   ea.grfInheritance = NO_INHERITANCE;
+   ea.Trustee.pMultipleTrustee = FALSE;
+   ea.Trustee.MultipleTrusteeOperation = NO_MULTIPLE_TRUSTEE;
+   ea.Trustee.TrusteeForm = TRUSTEE_IS_NAME;
+   ea.Trustee.TrusteeType = type;
+   ea.Trustee.ptstrName = name;
+   ACL *newdacl;
+   rc = SetEntriesInAcl(1, &ea, dacl, &newdacl);
+   if (rc != ERROR_SUCCESS) {
+      LocalFree(sd);
+      return false;
+   }
+
+   // Set new DACL on object
+   rc = SetSecurityInfo(h, SE_KERNEL_OBJECT, DACL_SECURITY_INFORMATION, 
+                        NULL, NULL, newdacl, NULL);
+
+   // Done with structs
+   LocalFree(newdacl);
+   LocalFree(sd);
+
+   return rc == ERROR_SUCCESS;
+}

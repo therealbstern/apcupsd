@@ -374,3 +374,25 @@ AC_DEFUN(
       AC_MSG_ERROR([Could not find GNU make]) ;
    fi ; ]
 )
+
+dnl
+dnl AC_PATH_PROGS but fail with an error if none can be found
+dnl
+AC_DEFUN(
+   [AC_REQ_PATH_PROGS],
+   [AC_PATH_PROGS($1,$2,)
+    if test "$$1" = "" ; then
+       AC_ERROR(Missing required tool; need any one of: $2)
+    fi
+   ])
+
+dnl
+dnl AC_PATH_PROG but fail with an error if it cannot be found
+dnl
+AC_DEFUN(
+   [AC_REQ_PATH_PROG],
+   [AC_PATH_PROG($1,$2,)
+    if test "$$1" = "" ; then
+       AC_ERROR(Missing required tool: $2)
+    fi
+   ])

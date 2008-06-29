@@ -61,10 +61,10 @@ install-usb:
 
 uninstall-darwin:
 	$(call DISTUNINST,Darwin Mac OS X)
-	$(call UNINST,/Library/StartupItems/apcupsd)
-	$(call UNINST,/System/Library/Extensions/ApcupsdDummy.kext)
-	$(call UNINST,/System/Library/Extensions.mkext)
-	$(call UNINST,/System/Library/Extensions.kextcache)
+	-$(call UNINST,/Library/StartupItems/apcupsd)
+	-$(call UNINST,/System/Library/Extensions/ApcupsdDummy.kext)
+	-$(call UNINST,/System/Library/Extensions.mkext)
+	-$(call UNINST,/System/Library/Extensions.kextcache)
 	@echo "================================================="
 	@echo " "
 	@echo "Please REBOOT to complete uninstall." 

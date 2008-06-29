@@ -34,7 +34,7 @@ install-slackware:
 
 uninstall-slackware:
 	$(call DISTUNINST,Slackware)
-	$(call UNINST,/etc/rc.d/rc.apcupsd)
+	-$(call UNINST,/etc/rc.d/rc.apcupsd)
 	$(VV)-rcfile=/etc/rc.d/rc.6; \
 	grep -q $(sysconfdir)/apccontrol $$rcfile; \
 	if [ $$? -eq 0 ]; then \

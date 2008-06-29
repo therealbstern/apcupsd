@@ -3622,14 +3622,13 @@ fi
 
   test -n "$SHUTDOWN" && break
 done
-test -n "$SHUTDOWN" || SHUTDOWN="no"
 
-if test "$SHUTDOWN" = "no"
-then
-   { { echo "$as_me:$LINENO: error: shutdown program not found !" >&5
-echo "$as_me: error: shutdown program not found !" >&2;}
+    if test "$SHUTDOWN" = "" ; then
+       { { echo "$as_me:$LINENO: error: Missing required tool; need any one of: shutdown shutdown.bsd" >&5
+echo "$as_me: error: Missing required tool; need any one of: shutdown shutdown.bsd" >&2;}
    { (exit 1); exit 1; }; }
-fi
+    fi
+
 
 for ac_prog in mail
 do
@@ -3726,14 +3725,12 @@ fi
 
   test -n "$WALL" && break
 done
-test -n "$WALL" || WALL="no"
 
-if test "$WALL" = "no"
-then
-   { { echo "$as_me:$LINENO: error: wall program not found !" >&5
-echo "$as_me: error: wall program not found !" >&2;}
+    if test "$WALL" = "" ; then
+       { { echo "$as_me:$LINENO: error: Missing required tool; need any one of: wall" >&5
+echo "$as_me: error: Missing required tool; need any one of: wall" >&2;}
    { (exit 1); exit 1; }; }
-fi
+    fi
 
 for ac_prog in sh bash
 do
@@ -3778,14 +3775,13 @@ fi
 
   test -n "$SCRIPTSHELL" && break
 done
-test -n "$SCRIPTSHELL" || SCRIPTSHELL="no"
 
-if test "$SCRIPTSHELL" = "no"
-then
-   { { echo "$as_me:$LINENO: error: shell program not found !" >&5
-echo "$as_me: error: shell program not found !" >&2;}
+    if test "$SCRIPTSHELL" = "" ; then
+       { { echo "$as_me:$LINENO: error: Missing required tool; need any one of: sh bash" >&5
+echo "$as_me: error: Missing required tool; need any one of: sh bash" >&2;}
    { (exit 1); exit 1; }; }
-fi
+    fi
+
 
 echo "$as_me:$LINENO: checking for GNU make" >&5
 echo $ECHO_N "checking for GNU make... $ECHO_C" >&6
@@ -3854,12 +3850,15 @@ fi
 
   test -n "$RANLIB" && break
 done
-test -n "$RANLIB" || RANLIB=":"
 
-for ac_prog in rm
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
+    if test "$RANLIB" = "" ; then
+       { { echo "$as_me:$LINENO: error: Missing required tool; need any one of: ranlib true" >&5
+echo "$as_me: error: Missing required tool; need any one of: ranlib true" >&2;}
+   { (exit 1); exit 1; }; }
+    fi
+
+# Extract the first word of "rm", so it can be a program name with args.
+set dummy rm; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
 if test "${ac_cv_path_RM+set}" = set; then
@@ -3897,13 +3896,14 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
-  test -n "$RM" && break
-done
+    if test "$RM" = "" ; then
+       { { echo "$as_me:$LINENO: error: Missing required tool: rm" >&5
+echo "$as_me: error: Missing required tool: rm" >&2;}
+   { (exit 1); exit 1; }; }
+    fi
 
-for ac_prog in cp
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
+# Extract the first word of "cp", so it can be a program name with args.
+set dummy cp; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
 if test "${ac_cv_path_CP+set}" = set; then
@@ -3941,13 +3941,14 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
-  test -n "$CP" && break
-done
+    if test "$CP" = "" ; then
+       { { echo "$as_me:$LINENO: error: Missing required tool: cp" >&5
+echo "$as_me: error: Missing required tool: cp" >&2;}
+   { (exit 1); exit 1; }; }
+    fi
 
-for ac_prog in echo
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
+# Extract the first word of "echo", so it can be a program name with args.
+set dummy echo; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
 if test "${ac_cv_path_ECHO+set}" = set; then
@@ -3985,13 +3986,14 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
-  test -n "$ECHO" && break
-done
+    if test "$ECHO" = "" ; then
+       { { echo "$as_me:$LINENO: error: Missing required tool: echo" >&5
+echo "$as_me: error: Missing required tool: echo" >&2;}
+   { (exit 1); exit 1; }; }
+    fi
 
-for ac_prog in ln
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
+# Extract the first word of "ln", so it can be a program name with args.
+set dummy ln; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
 if test "${ac_cv_path_LN+set}" = set; then
@@ -4029,13 +4031,14 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
-  test -n "$LN" && break
-done
+    if test "$LN" = "" ; then
+       { { echo "$as_me:$LINENO: error: Missing required tool: ln" >&5
+echo "$as_me: error: Missing required tool: ln" >&2;}
+   { (exit 1); exit 1; }; }
+    fi
 
-for ac_prog in sed
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
+# Extract the first word of "sed", so it can be a program name with args.
+set dummy sed; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
 if test "${ac_cv_path_SED+set}" = set; then
@@ -4073,13 +4076,14 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
-  test -n "$SED" && break
-done
+    if test "$SED" = "" ; then
+       { { echo "$as_me:$LINENO: error: Missing required tool: sed" >&5
+echo "$as_me: error: Missing required tool: sed" >&2;}
+   { (exit 1); exit 1; }; }
+    fi
 
-for ac_prog in ar
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
+# Extract the first word of "ar", so it can be a program name with args.
+set dummy ar; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
 if test "${ac_cv_path_AR+set}" = set; then
@@ -4117,13 +4121,14 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
-  test -n "$AR" && break
-done
+    if test "$AR" = "" ; then
+       { { echo "$as_me:$LINENO: error: Missing required tool: ar" >&5
+echo "$as_me: error: Missing required tool: ar" >&2;}
+   { (exit 1); exit 1; }; }
+    fi
 
-for ac_prog in mv
-do
-  # Extract the first word of "$ac_prog", so it can be a program name with args.
-set dummy $ac_prog; ac_word=$2
+# Extract the first word of "mv", so it can be a program name with args.
+set dummy mv; ac_word=$2
 echo "$as_me:$LINENO: checking for $ac_word" >&5
 echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
 if test "${ac_cv_path_MV+set}" = set; then
@@ -4161,8 +4166,11 @@ else
 echo "${ECHO_T}no" >&6
 fi
 
-  test -n "$MV" && break
-done
+    if test "$MV" = "" ; then
+       { { echo "$as_me:$LINENO: error: Missing required tool: mv" >&5
+echo "$as_me: error: Missing required tool: mv" >&2;}
+   { (exit 1); exit 1; }; }
+    fi
 
 
 # -------------------------------------------------------------------------
@@ -9770,10 +9778,6 @@ if test "${enable_cgi+set}" = set; then
    if test "$enableval" = "yes"
      then
         ENABLE_CGI="yes"
-        cat >>confdefs.h <<\_ACEOF
-#define HAVE_NISLIB 1
-_ACEOF
-
         CGI=cgi
 
                         echo "$as_me:$LINENO: checking for gdImagePng in -lgd" >&5
@@ -10713,20 +10717,12 @@ if test "${enable_net+set}" = set; then
 #define HAVE_NET_DRIVER 1
 _ACEOF
 
-        cat >>confdefs.h <<\_ACEOF
-#define HAVE_NISLIB 1
-_ACEOF
-
         NET_DRIVER="net"
 
      fi
 else
    cat >>confdefs.h <<\_ACEOF
 #define HAVE_NET_DRIVER 1
-_ACEOF
-
-     cat >>confdefs.h <<\_ACEOF
-#define HAVE_NISLIB 1
 _ACEOF
 
      NET_DRIVER="net"
