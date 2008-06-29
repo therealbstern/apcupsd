@@ -14,5 +14,5 @@ install-gentoo:
 
 uninstall-gentoo:
 	$(call DISTUNINST,gentoo)
-	$(call UNINST,/etc/init.d/apcupsd)
+	-$(call UNINST,/etc/init.d/apcupsd)
 #	$(call UNINST,/etc/init.d/halt)

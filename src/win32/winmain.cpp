@@ -108,7 +108,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       // /kill
       if (strcasecmp(winargs[i], ApcupsdKillRunningCopy) == 0) {
          // Kill any already running copy of Apcupsd
-         return upsService::KillRunningCopy();
+         ApcupsdTerminate();
+         return 0;
       }
       // /quiet
       if (strcasecmp(winargs[i], ApcupsdQuiet) == 0) {
@@ -132,7 +133,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
 }
 
 // Callback for processing Windows messages
-LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+static LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
    switch (uMsg)
    {
@@ -147,9 +148,39 @@ LRESULT CALLBACK WindowProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
    }
 }
 
+static void PostToApcupsd(UINT message, WPARAM wParam, LPARAM lParam)
+{
+  // Locate the hidden Apcupsd window
+  HWND hservwnd = FindWindowEx(NULL, NULL, APCUPSD_WINDOW_CLASS, APCUPSD_WINDOW_NAME);
+  if (hservwnd == NULL)
+     return;
+
+  // Post the message to Apcupsd
+  PostMessage(hservwnd, message, wParam, lParam);
+}
+
+void ApcupsdTerminate()
+{
+   // Old versions of apcupsd and modern versions running on WinNT and
+   // earlier need to receive a window message.
+   PostToApcupsd(WM_CLOSE, 0, 0);
+
+   // New apcupsd on Win2K and above listen for an event to be signaled.
+   // This allows stopping apcupsd instances running under LocalSystem
+   // and those started on other desktops.
+   if (g_os_version >= WINDOWS_2000)
+   {
+      HANDLE evt = OpenEvent(EVENT_MODIFY_STATE, FALSE, APCUPSD_STOP_EVENT_NAME);
+      if (evt != NULL)
+      {
+         SetEvent(evt);
+         CloseHandle(evt);
+      }
+   }
+}
+
 // Called as a thread from ApcupsdAppMain()
 // Here we invoke apcupsd UNIX main loop
-//
 void *ApcupsdMain(LPVOID lpwThreadParam)
 {
    pthread_detach(pthread_self());
@@ -157,29 +188,15 @@ void *ApcupsdMain(LPVOID lpwThreadParam)
    // Call the "real" apcupsd
    ApcupsdMain(num_command_args, command_args);
 
-   // In case apcupsd returns
-   DWORD main_tid = (DWORD)lpwThreadParam;
-   PostThreadMessage(main_tid, WM_QUIT, 0, 0);
+   // In case apcupsd returns, terminate application
+   ApcupsdTerminate();
 }
 
-// This is the main routine for Apcupsd when running as an application
-// (under Windows 95 or Windows NT)
-// Under NT, Apcupsd can also run as a service.  The ApcupsdServerMain routine,
-// defined in the upsService header, is used instead when running as a service.
-
-int ApcupsdAppMain(int service)
+// Wait for exit signal on WinNT and below. This code creates a hidden
+// window and waits for a WM_CLOSE window message to be delivered. We only
+// use this on ancient platforms that do not support named events.
+static void WaitForExit()
 {
-   // Set this process to be the last application to be shut down.
-   SetProcessShutdownParameters(0x100, 0);
-
-   // Check to see if we're already running
-   HANDLE sem = CreateSemaphore(NULL, 0, 1, "apcupsd");
-   if (sem == NULL || GetLastError() == ERROR_ALREADY_EXISTS) {
-      MessageBox(NULL, "Another instance of Apcupsd is already running", 
-                 "Apcupsd Error", MB_OK);
-      return 0;
-   }
-
    // Dummy window class
    WNDCLASSEX wndclass;
    wndclass.cbSize = sizeof(wndclass);
@@ -195,33 +212,98 @@ int ApcupsdAppMain(int service)
    wndclass.lpszClassName = APCUPSD_WINDOW_CLASS;
    wndclass.hIconSm = NULL;
    if (RegisterClassEx(&wndclass) == 0)
-      return 0;
+      return;
 
    // Create dummy window so we can receive Windows messages
-   if (CreateWindow(APCUPSD_WINDOW_CLASS,  // class
-                    APCUPSD_WINDOW_NAME,   // name/title
-                    0,                     // style
-                    0,                     // X pos
-                    0,                     // Y pos
-                    0,                     // width
-                    0,                     // height
-                    NULL,                  // parent
-                    NULL,                  // menu
-                    hAppInstance,          // app instance
-                    NULL                   // create param
-                   ) == NULL)
-       return 0;
+   HWND hwnd = CreateWindow(APCUPSD_WINDOW_CLASS,  // class
+                            APCUPSD_WINDOW_NAME,   // name/title
+                            0,                     // style
+                            0,                     // X pos
+                            0,                     // Y pos
+                            0,                     // width
+                            0,                     // height
+                            NULL,                  // parent
+                            NULL,                  // menu
+                            hAppInstance,          // app instance
+                            NULL );                // create param
+   if (hwnd == NULL)
+      return;
+
+   // Now enter the Windows message handling loop until told to quit
+   MSG msg;
+   if (g_os_version < WINDOWS_2000)
+   {
+      // On older systems, all we can do is wait for a window message
+      // and process it. We'll automatically exit if we get WM_QUIT.
+      while (GetMessage(&msg, NULL, 0, 0))
+      {
+         TranslateMessage(&msg);
+         DispatchMessage(&msg);
+      }
+   }
+   else
+   {
+      // On newer platforms, we wait for a WM_QUIT window message as above,
+      // or for a named event to be signaled. This code creates an event,
+      // grants access to all users in the Adminstrators group, then waits
+      // for the event to be signaled. We prefer this method on modern 
+      // platforms since it allows terminating an apcupsd running in another
+      // session. We still do the window message thing, too, for backwards
+      // compatibility.
+
+      // Create event to signal shutdown
+      HANDLE hevt = CreateEvent(NULL, TRUE, FALSE, APCUPSD_STOP_EVENT_NAME);
+
+      // Add EVENT_MODIFY_STATE permission for Administrators group
+      GrantAccess(hevt, EVENT_MODIFY_STATE, TRUSTEE_IS_GROUP, "Administrators");
+
+      DWORD rc;
+      do
+      {
+         // Wait for a message to arrive or for the stop event to be signaled
+         rc = MsgWaitForMultipleObjects(1, &hevt, FALSE, INFINITE, QS_ALLEVENTS);
+
+         // Stop event was signaled or major error: Time to exit
+         if (rc != WAIT_OBJECT_0+1)
+            break;
+
+         // Message must be ready: fetch and translate it
+         while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
+         {
+            TranslateMessage(&msg);
+            DispatchMessage(&msg);
+         }
+      }
+      while(LOWORD(msg.message) != WM_QUIT);
+
+      CloseHandle(hevt);
+   }
+
+   DestroyWindow(hwnd);
+}
+
+// This is the main routine for Apcupsd. It spawns a thread to run the
+// UNIX apcupsd back end and waits to be told to exit.
+int ApcupsdAppMain(int service)
+{
+   // Set this process to be the last application to be shut down.
+   SetProcessShutdownParameters(0x100, 0);
+
+   // Check to see if we're already running
+   HANDLE sem = CreateSemaphore(NULL, 0, 1, "apcupsd");
+   if (sem == NULL || GetLastError() == ERROR_ALREADY_EXISTS) {
+      MessageBox(NULL, "Another instance of Apcupsd is already running", 
+                 "Apcupsd Error", MB_OK);
+      return 0;
+   }
 
    // Create a thread on which to run apcupsd UNIX main loop
    pthread_t tid;
    pthread_create(&tid, NULL, ApcupsdMain, (void *)GetCurrentThreadId());
 
-   // Now enter the Windows message handling loop until told to quit
-   MSG msg;
-   while (GetMessage(&msg, NULL, 0, 0)) {
-      TranslateMessage(&msg);
-      DispatchMessage(&msg);
-   }
+   // Wait for exit request.
+   WaitForExit();
 
    pthread_kill(tid, SIGTERM);
+   return 0;
 }

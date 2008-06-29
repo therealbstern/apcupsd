@@ -9,7 +9,7 @@ all-uninstall: uninstall-suse
 install-suse:
 	$(call DISTINST,SuSE)
    # unlink old rc script (if not doing a DESTDIR install)
-	$(if $(DESTDIR),,$(V)/sbin/chkconfig --del apcupsd)
+	$(call CHKCFG,del,/etc/rc.d/apcupsd)
    # install new rc script
 	$(call MKDIR,/etc/rc.d)
 	$(call INSTDATA,744,apcupsd,/etc/rc.d)
@@ -20,7 +20,7 @@ install-suse:
 	$(V)awk -f awkhaltprog $(DESTDIR)/etc/rc.d/halt.old >$(DESTDIR)/etc/rc.d/halt
 	$(V)chmod 744 $(DESTDIR)/etc/rc.d/halt
    # link new rc script (if not doing a DESTDIR install)
-	$(if $(DESTDIR),,$(V)/sbin/chkconfig --add apcupsd)
+	$(call CHKCFG,add,/etc/rc.d/apcupsd)
 	@echo "================================================="
 	@echo "apcupsd script installation for SuSE $(DISTVER) complete." 
 	@echo " "
@@ -39,7 +39,7 @@ install-suse:
 
 uninstall-suse:
    # unlink old rc script (if not doing a DESTDIR install)
-	$(if $(DESTDIR),,$(V)/sbin/chkconfig --del apcupsd)
-	$(call UNINST,/etc/rc.d/apcupsd)
-	$(call COPY,$(DESTDIR)/etc/rc.d/halt.old,/etc/rc.d/halt)
-	$(call UNINST,/etc/rc.d/halt.old)
+	-$(call CHKCFG,del,/etc/rc.d/apcupsd)
+	-$(call UNINST,/etc/rc.d/apcupsd)
+	-$(call COPY,$(DESTDIR)/etc/rc.d/halt.old,/etc/rc.d/halt)
+	-$(call UNINST,/etc/rc.d/halt.old)

@@ -49,7 +49,7 @@ install-netbsd:
 
 uninstall-netbsd:
 	$(call DISTUNINST,NetBSD)
-	$(call UNINST,/etc/rc.apcupsd)
+	-$(call UNINST,/etc/rc.apcupsd)
 	$(VV)-today="`date +%Y%m%d%H%M`"; \
 	for f in $(DESTDIR)/etc/rc.local $(DESTDIR)/etc/rc.shutdown; do \
 		grep -q '# TAG_APCUPSD' $$f; \

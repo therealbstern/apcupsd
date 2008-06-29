@@ -143,3 +143,33 @@ void d_msg(const char *file, int line, int level, const char *fmt, ...)
    }
 #endif
 }
+
+void hex_dump(int level, void *data, unsigned int len)
+{
+   unsigned int pos = 0;
+   unsigned char *dat = (unsigned char *)data;
+   char temp[16*3+1];
+   char temp2[8+2+16*3+1+16+1];
+   char *ptr;
+
+   if (debug_level < level)
+      return;
+
+   Dmsg2(level, "Dumping %d bytes @ 0x%08x\n", len, data);
+   while (pos < len)
+   {
+      int num = MIN(16, len-pos);
+      ptr = temp;
+      for (int i=0; i < num; i++)
+         ptr += sprintf(ptr, "%02x ", dat[pos+i]);
+
+      ptr = temp2;
+      ptr += sprintf(temp2, "%08x  %-48s ", pos, temp);
+
+      for (int i=0; i < num; i++)
+         ptr += sprintf(ptr, "%c", isgraph(dat[pos+i]) ? dat[pos+i] : '.');
+
+      Dmsg1(level, "%s\n", temp2);
+      pos += num;
+   }
+}

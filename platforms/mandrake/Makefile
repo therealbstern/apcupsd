@@ -9,12 +9,12 @@ all-uninstall: uninstall-mandrake
 install-mandrake:
 	$(call DISTINST,Mandrake)
    # unlink old rc script (if not doing a DESTDIR install)
-	$(if $(DESTDIR),,$(V)/sbin/chkconfig --del apcupsd)
+	$(call CHKCFG,del,/etc/rc.d/init.d/apcupsd)
    # install new rc script
 	$(call MKDIR,/etc/rc.d/init.d)
 	$(call INSTDATA,744,apcupsd,/etc/rc.d/init.d)
    # link new rc script (if not doing a DESTDIR install)
-	$(if $(DESTDIR),,$(V)/sbin/chkconfig --add apcupsd)
+	$(call CHKCFG,add,/etc/rc.d/init.d/apcupsd)
    # mandrake halt script already handles apcupsd so no patching necessary
 	@echo "================================================="
 	@echo " "
@@ -33,5 +33,5 @@ install-mandrake:
 uninstall-mandrake:
 	$(call DISTUNINST,Mandrake)
    # unlink old rc script (if not doing a DESTDIR install)
-	$(if $(DESTDIR),,$(V)/sbin/chkconfig --del apcupsd)
-	$(call UNINST,/etc/rc.d/init.d/apcupsd)
+	-$(call CHKCFG,del,/etc/rc.d/init.d/apcupsd)
+	-$(call UNINST,/etc/rc.d/init.d/apcupsd)

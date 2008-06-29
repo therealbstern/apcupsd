@@ -27,7 +27,7 @@
  * Last Modified By: Thorsten Engel
  * Last Modified On: Fri Apr 22 19:30:00 2004
  * Update Count    : 218
- * $Id: compat.h,v 1.22 2007-09-30 19:49:49 adk0212 Exp $
+ * $Id: compat.h,v 1.23 2008-06-29 15:36:53 adk0212 Exp $
  */
 
 
@@ -68,8 +68,6 @@
 #include <dirent.h>
 #include <winapi.h>
 
-#include "getopt.h"
-
 #define HAVE_WIN32 1
 
 typedef UINT64 u_int64_t;
@@ -91,24 +89,6 @@ typedef UINT32 u_int32_t;
 typedef unsigned char u_int8_t;
 typedef unsigned short u_int16_t;
 
-void sleep(int);
-
-typedef UINT32 key_t;
-
-#ifndef uid_t
-typedef UINT32 uid_t;
-typedef UINT32 gid_t;
-#endif
-
-struct dirent {
-    uint64_t    d_ino;
-    uint32_t    d_off;
-    uint16_t    d_reclen;
-    char        d_name[256];
-};
-typedef void DIR;
-
-
 #ifndef __cplusplus
 #ifndef true
 #define true 1
@@ -118,11 +98,6 @@ typedef void DIR;
 #endif
 #endif
 
-struct timezone;
-
-int strcasecmp(const char*, const char *);
-int gettimeofday(struct timeval *, struct timezone *);
-
 #ifndef ETIMEDOUT
 #define ETIMEDOUT 55
 #endif
@@ -131,7 +106,6 @@ int gettimeofday(struct timeval *, struct timezone *);
 #define EAFNOSUPPORT WSAEAFNOSUPPORT
 #endif
 
-#ifndef HAVE_WXCONSOLE
 struct stat
 {
     _dev_t      st_dev;
@@ -148,7 +122,6 @@ struct stat
     uint32_t    st_blksize;
     uint64_t    st_blocks;
 };
-#endif
 
 #undef  S_IFMT
 #define S_IFMT         0170000         /* file type mask */
@@ -202,37 +175,37 @@ struct stat
 #define iscsym  __iscsym
 #endif
 
-int lchown(const char *, uid_t uid, gid_t gid);
-int chown(const char *, uid_t uid, gid_t gid);
-int inet_aton(const char *cp, struct in_addr *inp);
-int kill(int pid, int signo);
-int fork();
-int waitpid(int, int *, int);
 
+//******************************************************************************
+// Sockets
+//******************************************************************************
 #define WNOHANG 0
 #define WIFEXITED(x) 0
 #define WEXITSTATUS(x) x
 #define WIFSIGNALED(x) 0
-#define SIGKILL 9
-#define SIGUSR2 9999
-
 #define HAVE_OLD_SOCKOPT
+int WSA_Init(void);
+int inet_aton(const char *cp, struct in_addr *inp);
 
+//******************************************************************************
+// Time
+//******************************************************************************
 struct timespec;
-int readdir(unsigned int fd, struct dirent *dirp, unsigned int count);
-long int random(void);
-void srandom(unsigned int seed);
-int lstat(const char *, struct stat *);
-int stat(const char *file, struct stat *sb);
-long pathconf(const char *, int);
-int readlink(const char *, char *, int);
-#define _PC_PATH_MAX 1
-#define _PC_NAME_MAX 2
+void sleep(int);
+struct timezone;
+int strcasecmp(const char*, const char *);
+int gettimeofday(struct timeval *, struct timezone *);
+#define alarm(a) 0
 
+//******************************************************************************
+// User/Password
+//******************************************************************************
 int geteuid();
 
-DIR *opendir(const char *name);
-int closedir(DIR *dir);
+#ifndef uid_t
+typedef UINT32 uid_t;
+typedef UINT32 gid_t;
+#endif
 
 struct passwd {
     char *pw_name;
@@ -242,20 +215,60 @@ struct group {
     char *foo;
 };
 
-struct passwd *getpwuid(uid_t);
-struct group *getgrgid(uid_t);
+#define getpwuid(x) NULL
+#define getgrgid(x) NULL
+#define getuid() 0
+#define getgid() 0
 
+//******************************************************************************
+// File/Path
+//******************************************************************************
+int lstat(const char *, struct stat *);
+int stat(const char *file, struct stat *sb);
+int readlink(const char *, char *, int);
+int lchown(const char *, uid_t uid, gid_t gid);
+int chown(const char *, uid_t uid, gid_t gid);
+#define fcntl(a,b,c) 0
+
+#define _PC_PATH_MAX 1
+#define _PC_NAME_MAX 2
+long pathconf(const char *, int);
+
+#ifndef INVALID_FILE_ATTRIBUTES
+#define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
+#endif
+
+//******************************************************************************
+// Signals
+//******************************************************************************
 struct sigaction {
     int sa_flags;
     void (*sa_handler)(int);
 };
 #define sigfillset(x)
 #define sigaction(a, b, c)
+int kill(int pid, int signo);
 
-#define mkdir(p, m) win32_mkdir(p)
-#define unlink win32_unlink
-#define chdir win32_chdir
+#define SIGKILL 9
+#define SIGUSR2 9999
+#define SIGCHLD 0
+#define SIGALRM 0
+#define SIGHUP 0
+#define SIGCHLD 0
+#define SIGPIPE 0
 
+//******************************************************************************
+// Process
+//******************************************************************************
+#define getpid _getpid
+#define getppid() 0
+#define gethostid() 0
+int fork();
+int waitpid(int, int *, int);
+
+//******************************************************************************
+// Logging
+//******************************************************************************
 #ifndef LOG_DAEMON
 #define LOG_DAEMON 0
 #endif
@@ -263,47 +276,22 @@ struct sigaction {
 #define LOG_ERR 0
 #endif
 
-#define getpid _getpid
-
-#define getppid() 0
-#define gethostid() 0
-#define getuid() 0
-#define getgid() 0
-
-#define getcwd win32_getcwd
-#define chdir win32_chdir
-#define fputs win32_fputs
-char *win32_getcwd(char *buf, int maxlen);
-int win32_chdir(const char *buf);
-int win32_mkdir(const char *buf);
-int win32_fputs(const char *string, FILE *stream);
-int win32_unlink(const char *filename);
-
-char* win32_cgets (char* buffer, int len);
-
-int WSA_Init(void);
-
 #define closelog()
 #define openlog(a,b,c)
 void syslog(int type, const char *fmt, ...);
 
-#ifndef INVALID_FILE_ATTRIBUTES
-#define INVALID_FILE_ATTRIBUTES ((DWORD)-1)
-#endif
-
-void conv_unix_to_win32_path(const char *name, char *win32_name, DWORD dwSize);
-
-#define SIGCHLD 0
-#define SIGALRM 0
-#define SIGHUP 0
-#define SIGCHLD 0
-#define SIGPIPE 0
-#define alarm(a) 0
-#define fcntl(a,b,c) 0
-
+//******************************************************************************
+// Ioctl
+//******************************************************************************
 #define TIOCMBIC  1
 #define TIOCMBIS  2
 int ioctl(int, int, ...);
+
+//******************************************************************************
+// Misc
+//******************************************************************************
+long int random(void);
+void srandom(unsigned int seed);
 
 /* Return the smaller of a or b */
 #ifndef MIN

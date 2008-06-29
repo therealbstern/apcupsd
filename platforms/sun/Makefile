@@ -45,10 +45,10 @@ install-usb:
 
 uninstall-sun:
 	$(call DISTUNINST,Sun)
-	$(call UNINST,/etc/rc0.d/K21apcupsd)
-	$(call UNINST,/etc/rc1.d/S89apcupsd)
-	$(call UNINST,/etc/rc2.d/S89apcupsd)
-	$(call UNINST,/etc/init.d/apcupsd)
+	-$(call UNINST,/etc/rc0.d/K21apcupsd)
+	-$(call UNINST,/etc/rc1.d/S89apcupsd)
+	-$(call UNINST,/etc/rc2.d/S89apcupsd)
+	-$(call UNINST,/etc/init.d/apcupsd)
 
 uninstall-usb:
 	@echo "Removing ugen binding (errors are safe to ignore)..."

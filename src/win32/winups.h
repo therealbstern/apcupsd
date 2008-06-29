@@ -44,7 +44,14 @@ enum {
 // Command line option to start in service mode
 #define ApcupsdRunService        "/service"
 
+// Names of various global events
+#define APCUPSD_STOP_EVENT_NAME  "Global\\ApcupsdStopEvent"
+#define APCTRAY_STOP_EVENT_NAME  "Global\\ApctrayStopEvent"
+
 // Main UPS server routine - Exported by winmain for use by winservice
 extern int ApcupsdAppMain(int service);
+
+// Stop apcupsd - Exported by winmain for use by winservice
+extern void ApcupsdTerminate();
 
 #endif // WINUPS_H

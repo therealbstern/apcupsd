@@ -161,11 +161,7 @@ AC_SUBST(SMTP)
 AC_SUBST(APCTEST)
 
 dnl Now check for programs
-AC_PATH_PROGS(SHUTDOWN, shutdown shutdown.bsd, no)
-if test "$SHUTDOWN" = "no"
-then
-   AC_MSG_ERROR([shutdown program not found !])
-fi
+AC_REQ_PATH_PROGS(SHUTDOWN, shutdown shutdown.bsd)
 
 AC_PATH_PROGS(APCUPSD_MAIL, mail, no)
 if test "$APCUPSD_MAIL" = "no"
@@ -174,27 +170,18 @@ then
    APCUPSD_MAIL=mail
 fi
 
-AC_PATH_PROGS(WALL, wall, no)
-if test "$WALL" = "no"
-then
-   AC_MSG_ERROR([wall program not found !])
-fi
-
-AC_PATH_PROGS(SCRIPTSHELL, sh bash, no)
-if test "$SCRIPTSHELL" = "no"
-then
-   AC_MSG_ERROR([shell program not found !])
-fi
+AC_REQ_PATH_PROGS(WALL, wall)
+AC_REQ_PATH_PROGS(SCRIPTSHELL, sh bash)
 
 AC_PROG_GMAKE
-AC_PATH_PROGS(RANLIB, ranlib true, :)
-AC_PATH_PROGS(RM, rm)
-AC_PATH_PROGS(CP, cp)
-AC_PATH_PROGS(ECHO, echo)
-AC_PATH_PROGS(LN, ln)
-AC_PATH_PROGS(SED, sed)
-AC_PATH_PROGS(AR, ar)
-AC_PATH_PROGS(MV, mv)
+AC_REQ_PATH_PROGS(RANLIB, ranlib true)
+AC_REQ_PATH_PROG(RM, rm)
+AC_REQ_PATH_PROG(CP, cp)
+AC_REQ_PATH_PROG(ECHO, echo)
+AC_REQ_PATH_PROG(LN, ln)
+AC_REQ_PATH_PROG(SED, sed)
+AC_REQ_PATH_PROG(AR, ar)
+AC_REQ_PATH_PROG(MV, mv)
 
 # -------------------------------------------------------------------------
 #  If the user has not set --mandir, we default to /usr/share/man
@@ -467,7 +454,6 @@ AC_ARG_ENABLE(cgi,
    [ if test "$enableval" = "yes"
      then
         ENABLE_CGI="yes"
-        AC_DEFINE(HAVE_NISLIB)
         CGI=cgi
 
         dnl
@@ -648,12 +634,10 @@ AC_HELP_STRING([--enable-net], [Compile networking driver for slaves (default)])
 AC_HELP_STRING([--disable-net], [No network driver for slaves])],
    [ if test "$enableval" = "yes" ; then
         AC_DEFINE(HAVE_NET_DRIVER)
-        AC_DEFINE(HAVE_NISLIB)
         NET_DRIVER="net"
         AC_SUBST(NET_DRIVER)
      fi ],
    [ AC_DEFINE(HAVE_NET_DRIVER)
-     AC_DEFINE(HAVE_NISLIB)
      NET_DRIVER="net"
      AC_SUBST(NET_DRIVER) ])
 

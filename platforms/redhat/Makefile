@@ -9,12 +9,12 @@ all-uninstall: uninstall-redhat
 install-redhat:
 	$(call DISTINST,RedHat)
    # unlink old rc script (if not doing a DESTDIR install)
-	$(if $(DESTDIR),,$(V)/sbin/chkconfig --del apcupsd)
+	$(call CHKCFG,del,/etc/rc.d/init.d/apcupsd)
    # install new rc script
 	$(call MKDIR,/etc/rc.d/init.d)
 	$(call INSTDATA,744,apcupsd,/etc/rc.d/init.d)
    # link new rc script (if not doing a DESTDIR install)
-	$(if $(DESTDIR),,$(V)/sbin/chkconfig --add apcupsd)
+	$(call CHKCFG,add,/etc/rc.d/init.d/apcupsd)
    # save old halt script
 	$(call COPY,/etc/rc.d/init.d/halt,/etc/rc.d/init.d/halt.old)
    # insert apcupsd callout into halt script
@@ -42,8 +42,8 @@ install-redhat:
 uninstall-redhat:
 	$(call DISTUNINST,RedHat)
    # unlink old rc script (if not doing a DESTDIR install)
-	$(if $(DESTDIR),,$(V)/sbin/chkconfig --del apcupsd)
-	$(call UNINST,/etc/rc.d/init.d/apcupsd)
-	$(call COPY,$(DESTDIR)/etc/rc.d/init.d/halt.old,/etc/rc.d/init.d/halt)
-	$(call UNINST,/etc/rc.d/init.d/halt.old)
+	-$(call CHKCFG,del,/etc/rc.d/init.d/apcupsd)
+	-$(call UNINST,/etc/rc.d/init.d/apcupsd)
+	-$(call COPY,$(DESTDIR)/etc/rc.d/init.d/halt.old,/etc/rc.d/init.d/halt)
+	-$(call UNINST,/etc/rc.d/init.d/halt.old)
 

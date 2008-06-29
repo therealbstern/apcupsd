@@ -568,12 +568,7 @@ bool PcnetDriver::CheckState()
       /* Ensure the packet is nul-terminated */
       buf[retval] = '\0';
 
-      if (debug_level >= 300) {
-         logf("Interrupt data: ");
-         for (int i = 0; i <= retval; i++)
-            logf("%02x, ", buf[i]);
-         logf("\n");
-      }
+      hex_dump(300, buf, retval);
 
       map = auth_and_map_packet(buf, retval);
       if (map == NULL)

@@ -40,24 +40,6 @@ typedef DWORD (* RegisterServiceProcessFunc)(DWORD, DWORD);
 // List other required serves 
 #define SERVICE_DEPENDENCIES __TEXT("tcpip\0afd\0+File System\0") 
 
-
-BOOL upsService::PostToApcupsd(UINT message, WPARAM wParam, LPARAM lParam)
-{
-  // Locate the hidden Apcupsd window
-  HWND hservwnd = FindWindow(APCUPSD_WINDOW_CLASS, APCUPSD_WINDOW_NAME);
-  if (hservwnd == NULL)
-     return FALSE;
-
-  // Post the message to Apcupsd
-  PostMessage(hservwnd, message, wParam, lParam);
-  return TRUE;
-}
-
-BOOL upsService::KillRunningCopy()
-{
-   return PostToApcupsd(WM_CLOSE, 0, 0);
-}
-
 // SERVICE MAIN ROUTINE
 int upsService::ApcupsdServiceMain()
 {
@@ -178,14 +160,10 @@ DWORD WINAPI upsService::ServiceWorkThread(LPVOID lpwThreadParam)
     return 0;
 }
 
-// SERVICE STOP ROUTINE - post a quit message to the relevant thread
-// NT/Win2K/WinXP ONLY !!!
+// SERVICE STOP ROUTINE - NT/Win2K/WinXP ONLY !!!
 void upsService::ServiceStop()
 {
-   // Post a quit message to the main service thread
-   if (m_servicethread != 0) {
-      PostThreadMessage(m_servicethread, WM_QUIT, 0, 0);
-   }
+   ApcupsdTerminate();
 }
 
 // SERVICE INSTALL ROUTINE
@@ -366,14 +344,7 @@ int upsService::RemoveService(bool quiet)
       }
 
       // Try to kill any running copy of Apcupsd
-      if (!KillRunningCopy()) {
-         if (!quiet) {
-            MessageBox(NULL,
-                       _("Apcupsd could not be contacted, probably not running"),
-                       SERVICE_NAME, MB_ICONEXCLAMATION | MB_OK);
-         }
-         break;
-      }
+      ApcupsdTerminate();
 
       // Indicate that we're no longer installed to run as a service
       SetServiceFlag(0);
@@ -387,46 +358,14 @@ int upsService::RemoveService(bool quiet)
 
    // Windows NT, Win2K, WinXP
    case VER_PLATFORM_WIN32_NT:
-      // Open the SCM
-      SC_HANDLE hsrvmanager = OpenSCManager(
-         NULL,                   // machine (NULL == local)
-         NULL,                   // database (NULL == default)
-         SC_MANAGER_ALL_ACCESS); // access required
-      if (hsrvmanager == NULL) {
-         MessageBox(NULL, _("The SCM could not be contacted - "
-                            "the Apcupsd service was not removed"),
-                    SERVICE_NAME, MB_ICONEXCLAMATION | MB_OK);
-         break;
-      }
-
-      SC_HANDLE hservice = OpenService(
-         hsrvmanager, SERVICE_NAME, SERVICE_ALL_ACCESS);
-      if (hservice == NULL) {
-         CloseServiceHandle(hsrvmanager);
-         if (!quiet) {
-            MessageBox(NULL, _("The Apcupsd service could not be found"),
-                       SERVICE_NAME, MB_ICONEXCLAMATION | MB_OK);
-         }
-         break;
-      }
-
-      // Try to stop the Apcupsd service
-      SERVICE_STATUS status;
-      if (ControlService(hservice, SERVICE_CONTROL_STOP, &status)) {
-         while(QueryServiceStatus(hservice, &status)) {
-            if (status.dwCurrentState == SERVICE_STOP_PENDING) {
-               Sleep(1000);
-            } else {
-               break;
-            }
-         }
-      }
-
-      if (status.dwCurrentState != SERVICE_STOPPED) {
+      SC_HANDLE hservice = OpenNTService();
+      if (!StopNTService(hservice)) {
          // Service could not be stopped
          MessageBox(NULL, _("The Apcupsd service could not be stopped"),
                     SERVICE_NAME, MB_ICONEXCLAMATION | MB_OK);
-      } else if(DeleteService(hservice)) {
+      }
+
+      if(DeleteService(hservice)) {
          // Indicate that we're no longer installed to run as a service
          SetServiceFlag(0);
 
@@ -442,10 +381,9 @@ int upsService::RemoveService(bool quiet)
       }
 
       CloseServiceHandle(hservice);
-      CloseServiceHandle(hsrvmanager);
-
       break;
    }
+
    return 0;
 }
 
@@ -585,4 +523,41 @@ void upsService::SetServiceFlag(DWORD flag)
    // Add InstalledService value
    RegSetValueEx(
       apcupsd, "InstalledService", 0, REG_DWORD, (BYTE*)&flag, sizeof(flag));
+}
+
+BOOL upsService::StopNTService(SC_HANDLE hservice)
+{
+   // Try to stop the Apcupsd service
+   SERVICE_STATUS status;
+   status.dwCurrentState = SERVICE_RUNNING;
+   if (ControlService(hservice, SERVICE_CONTROL_STOP, &status)) {
+      while(QueryServiceStatus(hservice, &status)) {
+         if (status.dwCurrentState == SERVICE_STOP_PENDING) {
+            Sleep(1000);
+         } else {
+            break;
+         }
+      }
+   }
+
+   return status.dwCurrentState == SERVICE_STOPPED;
+}
+
+SC_HANDLE upsService::OpenNTService()
+{
+   // Open the SCM
+   SC_HANDLE hscm = OpenSCManager(
+      NULL,                   // machine (NULL == local)
+      NULL,                   // database (NULL == default)
+      SC_MANAGER_ALL_ACCESS); // access required
+   if (hscm == NULL) {
+      return NULL;
+   }
+
+   // Open the service
+   SC_HANDLE hservice = OpenService(hscm, SERVICE_NAME, SERVICE_ALL_ACCESS);
+
+   // Close SCM and return service handle
+   CloseServiceHandle(hscm);
+   return hservice;
 }
