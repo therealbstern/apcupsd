@@ -25,11 +25,11 @@
 #ifndef _STATEMACHINE_H
 #define _STATEMACHINE_H
 
+#include "apc.h"
 #include "UpsValue.h"
 #include "atimer.h"
 #include "athread.h"
 
-class UPSINFO;
 
 class UpsStateMachine: public athread
 {
@@ -37,47 +37,114 @@ public:
 
    UpsStateMachine(UPSINFO *ups);
    ~UpsStateMachine();
-   
+
    void Start();
 
 private:
 
-   bool HandleEventStateAny(UpsDatum &event);
-   void HandleEventStateIdle(UpsDatum &event);
-   void HandleEventStatePowerfail(UpsDatum &event);
-   void HandleEventStateOnbatt(UpsDatum &event);
-   void HandleEventStateShutdownDebounce(UpsDatum &event) {}
-   void HandleEventStateShutdown(UpsDatum &event)         {}
-   void HandleEventStateSelftest(UpsDatum &event);
-
-   void EnterStateIdle()             {}
-   void EnterStatePowerfail();
-   void EnterStateOnbatt();
-   void EnterStateShutdownDebounce() {}
-   void EnterStateShutdown();
-   void EnterStateSelftest();
-
-   virtual void body();
-   static void TimerTimeout(void *arg);
-
-   enum State
+  enum State
    {
       STATE_IDLE,
       STATE_POWERFAIL,
       STATE_ONBATT,
-      STATE_SHUTDOWN_DEBOUNCE,
-      STATE_SHUTDOWN,
-      STATE_SELFTEST
+      STATE_SELFTEST,
+      STATE_SHUTDOWN_LOADLIMIT,
+      STATE_SHUTDOWN_RUNLIMIT,
+      STATE_SHUTDOWN_BATTLOW,
+      NUM_STATES // MUST BE LAST
    };
 
-   void ChangeState(State newstate);
+   class BaseState
+   {
+   public:
+      virtual void OnEvent(UpsDatum &event) = 0;
+      virtual void OnEnter() = 0;
+      virtual void OnExit() = 0;
+
+   protected:
+      BaseState(UpsStateMachine &parent) : _parent(parent) {}
+      virtual ~BaseState() {}
+      void ChangeState(State newstate) { _parent.ChangeState(newstate); }
+      UpsStateMachine &_parent;
+   };
+
+   class StateIdle: public BaseState
+   {
+   public:
+      StateIdle(UpsStateMachine &parent) : BaseState(parent) {}
+      virtual ~StateIdle() {}
+      virtual void OnEvent(UpsDatum &event);
+      virtual void OnEnter();
+      virtual void OnExit();
+   };
+
+   class StatePowerfail: public BaseState, public atimer::client
+   {
+   public:
+      StatePowerfail(UpsStateMachine &parent)
+         : BaseState(parent), _timer(*this) {}
+      virtual ~StatePowerfail() {}
+      virtual void OnEvent(UpsDatum &event);
+      virtual void OnEnter();
+      virtual void OnExit();
+      virtual void HandleTimeout(int id);
+   private:
+      atimer _timer;
+   };
+
+   class StateOnbatt: public BaseState, public atimer::client
+   {
+   public:
+      StateOnbatt(UpsStateMachine &parent)
+         : BaseState(parent), _timer(*this) {}
+      virtual ~StateOnbatt() {}
+      virtual void OnEvent(UpsDatum &event);
+      virtual void OnEnter();
+      virtual void OnExit();
+      virtual void HandleTimeout(int id);
+   private:
+      atimer _timer;
+   };
+
+   class StateSelftest: public BaseState, public atimer::client
+   {
+   public:
+      StateSelftest(UpsStateMachine &parent)
+         : BaseState(parent), _timer(*this) {}
+      virtual ~StateSelftest() {}
+      virtual void OnEvent(UpsDatum &event);
+      virtual void OnEnter();
+      virtual void OnExit();
+      virtual void HandleTimeout(int id);
+   private:
+      atimer _timer;
+   };
+
+   class StateShutdown: public BaseState
+   {
+   public:
+      StateShutdown(UpsStateMachine &parent, int cmd)
+         : BaseState(parent), _sdowncmd(cmd) {}
+      virtual ~StateShutdown() {}
+      virtual void OnEvent(UpsDatum &event);
+      virtual void OnEnter();
+      virtual void OnExit();
+   private:
+      int _sdowncmd;
+   };
+
+   // All state classes are friends
+   friend class BaseState;
+
+   virtual void body();
+
+   bool HandleEventStateAny(UpsDatum &event);
    static const char *StateToText(State state);
-   void TransitionShutdown(int cmd);
+   void ChangeState(State newstate);
 
    UPSINFO *_ups;
+   BaseState *_states[NUM_STATES];
    State _state;
-   atimer _timer;
-   int _sdowncmd;
 };
 
 #endif   /* _STATEMACHINE_H */

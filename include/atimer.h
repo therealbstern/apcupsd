@@ -8,9 +8,16 @@ class atimer: public athread
 {
 public:
 
-   typedef void (*CallbackFunc)(void *arg);
+   class client
+   {
+   public:
+      virtual void HandleTimeout(int id) = 0;
+   protected:
+      client() {}
+      virtual ~client() {}
+   };
 
-   atimer(CallbackFunc callback, void *arg);
+   atimer(client &cli, int id = 0);
    ~atimer();
 
    void start(unsigned long msec);
@@ -20,8 +27,8 @@ private:
 
    virtual void body();
 
-   CallbackFunc _callback;
-   void *_arg;
+   client &_client;
+   int _id;
    pthread_mutex_t _mutex;
    pthread_cond_t _condvar;
    bool _started;

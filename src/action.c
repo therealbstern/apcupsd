@@ -653,9 +653,19 @@ void do_action(UPSINFO *ups)
 
 UpsStateMachine::UpsStateMachine(UPSINFO *ups)
    : _ups(ups),
-     _state(STATE_IDLE),
-     _timer(&UpsStateMachine::TimerTimeout, this)
+     _state(STATE_IDLE)
 {
+   // Populate state array
+   _states[STATE_IDLE] = new StateIdle(*this);
+   _states[STATE_POWERFAIL] = new StatePowerfail(*this);
+   _states[STATE_ONBATT] = new StateOnbatt(*this);
+   _states[STATE_SELFTEST] = new StateSelftest(*this);
+   _states[STATE_SHUTDOWN_LOADLIMIT] = new StateShutdown(*this, CMDLOADLIMIT);
+   _states[STATE_SHUTDOWN_RUNLIMIT] = new StateShutdown(*this, CMDRUNLIMIT);
+   _states[STATE_SHUTDOWN_BATTLOW] = new StateShutdown(*this, CMDFAILING);
+
+   // Enter initial state
+   _states[_state]->OnEnter();
 }
 
 UpsStateMachine::~UpsStateMachine()
@@ -667,12 +677,39 @@ void UpsStateMachine::Start()
    run();
 }
 
+void UpsStateMachine::ChangeState(UpsStateMachine::State newstate)
+{
+   Dmsg2(100, "UpsStateMachine::ChangeState current=%s, new=%s\n",
+      StateToText(_state), StateToText(newstate));
+
+   // Exit current state and enter new state
+   _states[_state]->OnExit();
+   _state = newstate;
+   _states[_state]->OnEnter();
+}
+
+const char *UpsStateMachine::StateToText(UpsStateMachine::State state)
+{
+   switch (state)
+   {
+   case STATE_IDLE:               return "IDLE";
+   case STATE_POWERFAIL:          return "POWERFAIL";
+   case STATE_ONBATT:             return "ONBATT";
+   case STATE_SHUTDOWN_LOADLIMIT: return "SHUTDOWN_LOADLIMIT";
+   case STATE_SHUTDOWN_RUNLIMIT:  return "SHUTDOWN_RUNLIMIT";
+   case STATE_SHUTDOWN_BATTLOW:   return "SHUTDOWN_BATTLOW";
+   case STATE_SELFTEST:           return "SELFTEST";
+   default:                       return "UNKNOWN";
+   }
+}
+
 void UpsStateMachine::body()
 {
    UpsDatum event;
 
    while (1)
    {
+      // Wait for an event to arrive
       _ups->info.pend(event);
 
       Dmsg3(100, "UpsStateMachine dequeued %s=%s in state=%s\n",
@@ -683,29 +720,7 @@ void UpsStateMachine::body()
          continue;
 
       // Run state-specific event handling
-      switch (_state)
-      {
-      case STATE_IDLE:
-         HandleEventStateIdle(event);
-         break;
-      case STATE_POWERFAIL:
-         HandleEventStatePowerfail(event);
-         break;
-      case STATE_ONBATT:
-         HandleEventStateOnbatt(event);
-         break;
-      case STATE_SHUTDOWN_DEBOUNCE:
-         HandleEventStateShutdownDebounce(event);
-         break;
-      case STATE_SHUTDOWN:
-         HandleEventStateShutdown(event);
-         break;
-      case STATE_SELFTEST:
-         HandleEventStateSelftest(event);
-         break;
-      default:
-         break;
-      }
+      _states[_state]->OnEvent(event);
    }
 }
 
@@ -724,7 +739,14 @@ bool UpsStateMachine::HandleEventStateAny(UpsDatum &event)
    return false;
 }
 
-void UpsStateMachine::HandleEventStateIdle(UpsDatum &event)
+//******************************************************************************
+// IDLE
+//******************************************************************************
+void UpsStateMachine::StateIdle::OnEnter()
+{
+}
+
+void UpsStateMachine::StateIdle::OnEvent(UpsDatum &event)
 {
    switch (event.ci)
    {
@@ -733,9 +755,9 @@ void UpsStateMachine::HandleEventStateIdle(UpsDatum &event)
       {
          // We're running on battery, transition to POWERFAIL
          time_t now = time(NULL);
-         _ups->last_time_on_line = now;
-         _ups->last_onbatt_time = now;
-         _ups->num_xfers++;
+         _parent._ups->last_time_on_line = now;
+         _parent._ups->last_onbatt_time = now;
+         _parent._ups->num_xfers++;
 
          ChangeState(STATE_POWERFAIL);
       }
@@ -749,230 +771,207 @@ void UpsStateMachine::HandleEventStateIdle(UpsDatum &event)
    }
 }
 
-void UpsStateMachine::HandleEventStateSelftest(UpsDatum &event)
+void UpsStateMachine::StateIdle::OnExit()
 {
-   if (event.ci == CI_ST_STAT && event.value.lval() != TEST_INPROGRESS)
-   {
-      _timer.stop();
-
-      log_event(_ups, LOG_ALERT, _("UPS Self Test completed: %s"),
-         testresult_to_string((SelfTestResult)event.value.lval()));
-      execute_command(_ups, ups_event[CMDENDSELFTEST]);
-
-      ChangeState(STATE_IDLE);
-   }
 }
 
-void UpsStateMachine::HandleEventStatePowerfail(UpsDatum &event)
+//******************************************************************************
+// POWERFAIL
+//******************************************************************************
+void UpsStateMachine::StatePowerfail::OnEnter()
 {
-   time_t now;
-
-   switch (event.ci)
-   {
-   case CI_Discharging:
-      if (!event.value)
-      {
-         // No longer discharging; transition back to IDLE
-         now = time(NULL);
-         _timer.stop();
-         generate_event(_ups, CMDMAINSBACK);
-         _ups->last_offbatt_time = now;
-         _ups->cum_time_on_batt += (now - _ups->last_onbatt_time);
-         ChangeState(STATE_IDLE);
-      }
-      break;
-   }
-}
-
-void UpsStateMachine::HandleEventStateOnbatt(UpsDatum &event)
-{
-   time_t now;
-
-   switch (event.ci)
-   {
-   case CI_Discharging:
-      if (!event.value)
-      {
-         // No longer discharging; transition back to IDLE
-         now = time(NULL);
-         _timer.stop();
-         generate_event(_ups, CMDOFFBATTERY);
-         generate_event(_ups, CMDMAINSBACK);
-         _ups->last_offbatt_time = now;
-         _ups->cum_time_on_batt += (now - _ups->last_onbatt_time);
-         ChangeState(STATE_IDLE);
-      }
-      break;
-   case CI_BATTLEV: // Shutdown due to battery charge percent?
-      if ((event.value / 10) <= _ups->percent)
-      {
-         _sdowncmd = CMDLOADLIMIT;
-         ChangeState(STATE_SHUTDOWN);
-      }
-      break;
-   case CI_RUNTIM:  // Shutdown due to runtime remaining?
-      if ((event.value / 60) <= _ups->runtime)
-      {
-         _sdowncmd = CMDRUNLIMIT;
-         ChangeState(STATE_SHUTDOWN);
-      }
-      break;
-   case CI_BattLow: // Shutdown due to LowBatt signal?
-      if (event.value)
-      {
-         _sdowncmd = CMDFAILING;
-         ChangeState(STATE_SHUTDOWN);
-      }
-      break;
-   }
-}
-
-void UpsStateMachine::TimerTimeout(void *arg)
-{
-   UpsStateMachine *_this = (UpsStateMachine *)arg;
-   State _state = _this->_state;
-   int &_sdowncmd = _this->_sdowncmd;
-   UPSINFO *_ups = _this->_ups;
-
-   if (_state == STATE_POWERFAIL)
-   {
-      // ONBATTERYDELAY timer has fired, transition to ONBATTERY
-      _this->ChangeState(STATE_ONBATT);
-   }
-   else if (_state == STATE_ONBATT)
-   {
-      // Max time on battery timer has fired, transition to SHUTDOWN
-      _sdowncmd = CMDRUNLIMIT;
-      _this->ChangeState(STATE_SHUTDOWN);
-   }
-   else if (_state == STATE_SELFTEST)
-   {
-      // We've exceeded the maximum selftest time, transition to ONBATTERY
-      // if we're still running on battery. Otherwise we just didn't get the
-      // test result for some reason, so just go back to IDLE.
-      if (_ups->is_onbatt())
-      {
-         Dmsg0(80, "UPS Self Test timeout, fall-thru to On Battery.\n");
-         _this->ChangeState(STATE_ONBATT);
-      }
-      else
-      {
-         Dmsg0(80, "UPS Self Test timeout, CI_ST_STAT not reported.\n");
-
-         log_event(_ups, LOG_ALERT, _("UPS Self Test completed: TIMEOUT"));
-         execute_command(_ups, ups_event[CMDENDSELFTEST]);
-
-         _this->ChangeState(STATE_IDLE);
-      }
-   }
-}
-
-void UpsStateMachine::EnterStateSelftest()
-{
-   generate_event(_ups, CMDSTARTSELFTEST);
-
-   // Grab current time as last selftest time
-   time_t now = time(NULL);
-   _ups->LastSelfTest = now;
-
-   // Set a timer to take us to POWERFAIL if the selftest does not complete
-   _timer.start(MAX_SELFTEST_TIME_MSEC);
-}
-
-void UpsStateMachine::EnterStatePowerfail()
-{
-   generate_event(_ups, CMDPOWEROUT);
+   generate_event(_parent._ups, CMDPOWEROUT);
 
    time_t now = time(NULL);
-   _ups->last_time_nologon = _ups->last_time_annoy = now;
+   _parent._ups->last_time_nologon = _parent._ups->last_time_annoy = now;
 
    // Enable DTR on dumb UPSes with CUSTOM_SIMPLE cable
-   device_entry_point(_ups, DEVICE_CMD_DTR_ENABLE, NULL);
+   device_entry_point(_parent._ups, DEVICE_CMD_DTR_ENABLE, NULL);
 
    // Set a timer to take us to OnBattery after ONBATTERYDELAY
    // If delay is <= 0, timer will fire immediately
-   _timer.start(_ups->onbattdelay * 1000);
+   _timer.start(_parent._ups->onbattdelay * 1000);
 }
 
-void UpsStateMachine::EnterStateOnbatt()
+void UpsStateMachine::StatePowerfail::OnEvent(UpsDatum &event)
 {
-   generate_event(_ups, CMDONBATTERY);
+   time_t now;
+
+   switch (event.ci)
+   {
+   case CI_Discharging:
+      if (!event.value)
+      {
+         // No longer discharging; transition back to IDLE
+         now = time(NULL);
+         _timer.stop();
+         generate_event(_parent._ups, CMDMAINSBACK);
+         _parent._ups->last_offbatt_time = now;
+         _parent._ups->cum_time_on_batt += (now - _parent._ups->last_onbatt_time);
+         ChangeState(STATE_IDLE);
+      }
+      break;
+   }
+}
+
+void UpsStateMachine::StatePowerfail::OnExit()
+{
+}
+
+void UpsStateMachine::StatePowerfail::HandleTimeout(int id)
+{
+   // ONBATTERYDELAY timer has fired, transition to ONBATTERY
+   ChangeState(STATE_ONBATT);
+}
+
+//******************************************************************************
+// ONBATT
+//******************************************************************************
+void UpsStateMachine::StateOnbatt::OnEnter()
+{
+   generate_event(_parent._ups, CMDONBATTERY);
 
    // Check current state of various shutdown triggers and transition 
    // immediately to SHUTDOWN if necessary.
 
    UpsValue value;
-   if (_ups->info.get(CI_BATTLEV, value) && (value / 10) <= _ups->percent)
+   if (_parent._ups->info.get(CI_BATTLEV, value) && (value / 10) <= _parent._ups->percent)
    {
-      _sdowncmd = CMDLOADLIMIT;
-      ChangeState(STATE_SHUTDOWN);
+      ChangeState(STATE_SHUTDOWN_LOADLIMIT);
    }
-   else if (_ups->info.get(CI_RUNTIM, value) && (value / 60) <= _ups->runtime)
+   else if (_parent._ups->info.get(CI_RUNTIM, value) && (value / 60) <= _parent._ups->runtime)
    {
-      _sdowncmd = CMDRUNLIMIT;
-      ChangeState(STATE_SHUTDOWN);
+      ChangeState(STATE_SHUTDOWN_RUNLIMIT);
    }
-   else if (_ups->info.get(CI_BattLow, value) && value)
+   else if (_parent._ups->info.get(CI_BattLow, value) && value)
    {
-      _sdowncmd = CMDFAILING;
-      ChangeState(STATE_SHUTDOWN);
+      ChangeState(STATE_SHUTDOWN_BATTLOW);
    }
    else
    {
       // No transition to SHUTDOWN needed yet.
       // Set timer to trigger on TIMEOUT (max time on battery) expiration.
-      if (_ups->maxtime > 0)
-         _timer.start(_ups->maxtime * 1000);
+      if (_parent._ups->maxtime > 0)
+         _timer.start(_parent._ups->maxtime * 1000);
    }
 }
 
-void UpsStateMachine::EnterStateShutdown()
+void UpsStateMachine::StateOnbatt::OnEvent(UpsDatum &event)
 {
-//   generate_event(_ups, cmd);
-}
+   time_t now;
 
-void UpsStateMachine::ChangeState(UpsStateMachine::State newstate)
-{
-   Dmsg2(100, "UpsStateMachine::ChangeState current=%s, new=%s\n",
-      StateToText(_state), StateToText(newstate));
-
-   _state = newstate;
-
-   switch (newstate)
+   switch (event.ci)
    {
-      case STATE_IDLE:
-         EnterStateIdle();
-         break;
-      case STATE_POWERFAIL:
-         EnterStatePowerfail();
-         break;
-      case STATE_ONBATT:
-         EnterStateOnbatt();
-         break;
-      case STATE_SHUTDOWN_DEBOUNCE:
-         EnterStateShutdownDebounce();
-         break;
-      case STATE_SHUTDOWN:
-         EnterStateShutdown();
-         break;
-      case STATE_SELFTEST:
-         EnterStateSelftest();
-         break;
-      default:
-         break;
+   case CI_Discharging:
+      if (!event.value)
+      {
+         // No longer discharging; transition back to IDLE
+         now = time(NULL);
+         _timer.stop();
+         generate_event(_parent._ups, CMDOFFBATTERY);
+         generate_event(_parent._ups, CMDMAINSBACK);
+         _parent._ups->last_offbatt_time = now;
+         _parent._ups->cum_time_on_batt += (now - _parent._ups->last_onbatt_time);
+         ChangeState(STATE_IDLE);
+      }
+      break;
+   case CI_BATTLEV: // Shutdown due to battery charge percent?
+      if ((event.value / 10) <= _parent._ups->percent)
+      {
+         ChangeState(STATE_SHUTDOWN_LOADLIMIT);
+      }
+      break;
+   case CI_RUNTIM:  // Shutdown due to runtime remaining?
+      if ((event.value / 60) <= _parent._ups->runtime)
+      {
+         ChangeState(STATE_SHUTDOWN_RUNLIMIT);
+      }
+      break;
+   case CI_BattLow: // Shutdown due to LowBatt signal?
+      if (event.value)
+      {
+         ChangeState(STATE_SHUTDOWN_BATTLOW);
+      }
+      break;
    }
 }
 
-const char *UpsStateMachine::StateToText(UpsStateMachine::State state)
+void UpsStateMachine::StateOnbatt::OnExit()
 {
-   switch (state)
+}
+
+void UpsStateMachine::StateOnbatt::HandleTimeout(int id)
+{
+   // Max time on battery timer has fired, transition to SHUTDOWN
+   ChangeState(STATE_SHUTDOWN_RUNLIMIT);
+}
+
+//******************************************************************************
+// SELFTEST
+//******************************************************************************
+void UpsStateMachine::StateSelftest::OnEnter()
+{
+   generate_event(_parent._ups, CMDSTARTSELFTEST);
+
+   // Grab current time as last selftest time
+   time_t now = time(NULL);
+   _parent._ups->LastSelfTest = now;
+
+   // Set a timer to take us to POWERFAIL if the selftest does not complete
+   _timer.start(MAX_SELFTEST_TIME_MSEC);
+}
+
+void UpsStateMachine::StateSelftest::OnEvent(UpsDatum &event)
+{
+   if (event.ci == CI_ST_STAT && event.value.lval() != TEST_INPROGRESS)
    {
-   case STATE_IDLE:              return "IDLE";
-   case STATE_POWERFAIL:         return "POWERFAIL";
-   case STATE_ONBATT:            return "ONBATT";
-   case STATE_SHUTDOWN_DEBOUNCE: return "SHUTDOWN_DEBOUNCE";
-   case STATE_SHUTDOWN:          return "SHUTDOWN";
-   case STATE_SELFTEST:          return "SELFTEST";
-   default:                      return "UNKNOWN";
+      _timer.stop();
+
+      log_event(_parent._ups, LOG_ALERT, _("UPS Self Test completed: %s"),
+         testresult_to_string((SelfTestResult)event.value.lval()));
+      execute_command(_parent._ups, ups_event[CMDENDSELFTEST]);
+
+      ChangeState(STATE_IDLE);
    }
+}
+
+void UpsStateMachine::StateSelftest::OnExit()
+{
+}
+
+void UpsStateMachine::StateSelftest::HandleTimeout(int id)
+{
+   // We've exceeded the maximum selftest time, transition to ONBATTERY
+   // if we're still running on battery. Otherwise we just didn't get the
+   // test result for some reason, so just go back to IDLE.
+   if (_parent._ups->is_onbatt())
+   {
+      Dmsg0(80, "UPS Self Test timeout, fall-thru to On Battery.\n");
+      ChangeState(STATE_ONBATT);
+   }
+   else
+   {
+      Dmsg0(80, "UPS Self Test timeout, CI_ST_STAT not reported.\n");
+
+      log_event(_parent._ups, LOG_ALERT, _("UPS Self Test completed: TIMEOUT"));
+      execute_command(_parent._ups, ups_event[CMDENDSELFTEST]);
+
+      ChangeState(STATE_IDLE);
+   }
+}
+
+//******************************************************************************
+// SHUTDOWN
+//******************************************************************************
+void UpsStateMachine::StateShutdown::OnEnter()
+{
+//   generate_event(_parent._ups, _sdowncmd);
+}
+
+void UpsStateMachine::StateShutdown::OnEvent(UpsDatum &event)
+{
+}
+
+void UpsStateMachine::StateShutdown::OnExit()
+{
 }
