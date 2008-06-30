@@ -2,9 +2,9 @@
 #include "autil.h"
 #include <errno.h>
 
-atimer::atimer(CallbackFunc callback, void *arg)
-   : _callback(callback),
-     _arg(arg),
+atimer::atimer(client &cli, int id)
+   : _client(cli),
+     _id(id),
      _started(false)
 {
    pthread_mutex_init(&_mutex, NULL);
@@ -67,7 +67,7 @@ void atimer::body()
 
          // Unlock around callback to allow restart
          pthread_mutex_unlock(&_mutex);
-         _callback(_arg);
+         _client.HandleTimeout(_id);
          pthread_mutex_lock(&_mutex);
       }
       else if (rc != 0)
