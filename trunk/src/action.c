@@ -666,10 +666,37 @@ UpsStateMachine::UpsStateMachine(UPSINFO *ups)
 
    // Enter initial state
    _states[_state]->OnEnter();
+
+   // Register for UPSINFO to feed us events
+   _ups->info.regclient(this);
 }
 
 UpsStateMachine::~UpsStateMachine()
 {
+   // Signal thread to exit
+   EventQuit *event = new EventQuit();
+   _events.enqueue(event);
+
+   // Wait for thread termination
+   join();
+
+   // Unregister for UPSINFO events
+   _ups->info.unregclient(this);
+
+   // Free any remaining events
+   BaseEvent *tmp = NULL;
+   while (!_events.empty())
+   {
+      _events.dequeue(tmp);
+      delete tmp;
+   }
+
+   // Free state classes
+   for (unsigned int i=0; i < ARRAY_SIZE(_states); i++)
+   {
+      delete _states[i];
+      _states[i] = NULL;
+   }
 }
 
 void UpsStateMachine::Start()
@@ -677,6 +704,9 @@ void UpsStateMachine::Start()
    run();
 }
 
+// Callback from one of our state classes requesting that we
+// change the current state. Invoke exit/enter handlers for
+// current and new states.
 void UpsStateMachine::ChangeState(UpsStateMachine::State newstate)
 {
    Dmsg2(100, "UpsStateMachine::ChangeState current=%s, new=%s\n",
@@ -703,36 +733,71 @@ const char *UpsStateMachine::StateToText(UpsStateMachine::State state)
    }
 }
 
+// Callback from timer indicating that a timer expired.
+// Post an event for this timer and let task loop act on it.
+void UpsStateMachine::HandleTimeout(int id)
+{
+   EventTimeout *event = new EventTimeout(id);
+   _events.enqueue(event);
+}
+
+// Callback from UpsInfo database indicating a new datum
+// has arrived. Post an event for this datum and let the
+// task loop act on it.
+void UpsStateMachine::HandleUpsDatum(const UpsDatum &datum)
+{
+   EventUpsDatum *event = new EventUpsDatum(datum);
+   _events.enqueue(event);
+}
+
+// Main task loop: Dequeues events and processes them thru
+// the state machine.
 void UpsStateMachine::body()
 {
-   UpsDatum event;
-
-   while (1)
+   bool quit = false;
+   while (!quit)
    {
       // Wait for an event to arrive
-      _ups->info.pend(event);
+      BaseEvent *event;
+      if (!_events.dequeue(event))
+         break;
 
-      Dmsg3(100, "UpsStateMachine dequeued %s=%s in state=%s\n",
-         CItoString(event.ci), event.value.format().str(), StateToText(_state));
+      if (event->type() == EVENT_UPSDATUM)
+      {
+         const UpsDatum &datum = ((EventUpsDatum *)event)->datum();
 
-      // Run global event handling and loop around if event is consumed
-      if (HandleEventStateAny(event))
-         continue;
+         Dmsg3(100, "UpsStateMachine dequeued %s=%s in state=%s\n",
+            CItoString(datum.ci), datum.value.format().str(),
+            StateToText(_state));
 
-      // Run state-specific event handling
-      _states[_state]->OnEvent(event);
+         // Invoke "any state" handler, and if that does not consume
+         // the event, call the handler for the current state.
+         if (!HandleEventStateAny(datum))
+            _states[_state]->OnEvent(datum);
+      }
+      else if (event->type() == EVENT_TIMEOUT)
+      {
+         // Invoke the timeout handler for the current state.
+         int id = ((EventTimeout *)event)->id();
+         _states[_state]->OnTimeout(id);
+      }
+      else if (event->type() == EVENT_QUIT)
+      {
+         // We've been asked to exit
+         quit = true;
+      }
+
+      // Event was dynamically allocated before being pushed
+      // onto the queue. We have to deallocate when done with it.
+      delete event;
    }
 }
 
-bool UpsStateMachine::HandleEventStateAny(UpsDatum &event)
+bool UpsStateMachine::HandleEventStateAny(const UpsDatum &event)
 {
    if (event.ci == CI_BatteryPresent)
    {
-      if (event.value)
-         generate_event(_ups, CMDBATTATTACH);
-      else
-         generate_event(_ups, CMDBATTDETACH);
-
+      generate_event(_ups, event.value ? CMDBATTATTACH : CMDBATTDETACH);
       return true;
    }
 
@@ -746,7 +811,7 @@ void UpsStateMachine::StateIdle::OnEnter()
 {
 }
 
-void UpsStateMachine::StateIdle::OnEvent(UpsDatum &event)
+void UpsStateMachine::StateIdle::OnEvent(const UpsDatum &event)
 {
    switch (event.ci)
    {
@@ -775,6 +840,10 @@ void UpsStateMachine::StateIdle::OnExit()
 {
 }
 
+void UpsStateMachine::StateIdle::OnTimeout(int id)
+{
+}
+
 //******************************************************************************
 // POWERFAIL
 //******************************************************************************
@@ -793,7 +862,7 @@ void UpsStateMachine::StatePowerfail::OnEnter()
    _timer.start(_parent._ups->onbattdelay * 1000);
 }
 
-void UpsStateMachine::StatePowerfail::OnEvent(UpsDatum &event)
+void UpsStateMachine::StatePowerfail::OnEvent(const UpsDatum &event)
 {
    time_t now;
 
@@ -818,8 +887,12 @@ void UpsStateMachine::StatePowerfail::OnExit()
 {
 }
 
-void UpsStateMachine::StatePowerfail::HandleTimeout(int id)
+void UpsStateMachine::StatePowerfail::OnTimeout(int id)
 {
+   // Only expect one timer id. Anything else is a stale event.
+   if (id != TIMER_POWERFAIL)
+      return;
+
    // ONBATTERYDELAY timer has fired, transition to ONBATTERY
    ChangeState(STATE_ONBATT);
 }
@@ -856,7 +929,7 @@ void UpsStateMachine::StateOnbatt::OnEnter()
    }
 }
 
-void UpsStateMachine::StateOnbatt::OnEvent(UpsDatum &event)
+void UpsStateMachine::StateOnbatt::OnEvent(const UpsDatum &event)
 {
    time_t now;
 
@@ -900,8 +973,12 @@ void UpsStateMachine::StateOnbatt::OnExit()
 {
 }
 
-void UpsStateMachine::StateOnbatt::HandleTimeout(int id)
+void UpsStateMachine::StateOnbatt::OnTimeout(int id)
 {
+   // Only expect one timer id. Anything else is a stale event.
+   if (id != TIMER_ONBATT)
+      return;
+
    // Max time on battery timer has fired, transition to SHUTDOWN
    ChangeState(STATE_SHUTDOWN_RUNLIMIT);
 }
@@ -921,7 +998,7 @@ void UpsStateMachine::StateSelftest::OnEnter()
    _timer.start(MAX_SELFTEST_TIME_MSEC);
 }
 
-void UpsStateMachine::StateSelftest::OnEvent(UpsDatum &event)
+void UpsStateMachine::StateSelftest::OnEvent(const UpsDatum &event)
 {
    if (event.ci == CI_ST_STAT && event.value.lval() != TEST_INPROGRESS)
    {
@@ -939,8 +1016,12 @@ void UpsStateMachine::StateSelftest::OnExit()
 {
 }
 
-void UpsStateMachine::StateSelftest::HandleTimeout(int id)
+void UpsStateMachine::StateSelftest::OnTimeout(int id)
 {
+   // Only expect one timer id. Anything else is a stale event.
+   if (id != TIMER_SELFTEST)
+      return;
+
    // We've exceeded the maximum selftest time, transition to ONBATTERY
    // if we're still running on battery. Otherwise we just didn't get the
    // test result for some reason, so just go back to IDLE.
@@ -968,10 +1049,14 @@ void UpsStateMachine::StateShutdown::OnEnter()
 //   generate_event(_parent._ups, _sdowncmd);
 }
 
-void UpsStateMachine::StateShutdown::OnEvent(UpsDatum &event)
+void UpsStateMachine::StateShutdown::OnEvent(const UpsDatum &event)
 {
 }
 
 void UpsStateMachine::StateShutdown::OnExit()
+{
+}
+
+void UpsStateMachine::StateShutdown::OnTimeout(int id)
 {
 }

@@ -103,6 +103,15 @@ class UpsInfo
 {
 public:
 
+   class Client
+   {
+   public:
+      virtual void HandleUpsDatum(const UpsDatum &datum) = 0;
+   protected:
+      Client() {}
+      virtual ~Client() {}
+   };
+
    UpsInfo() : _mutex("UpsInfo")
    {
       // By default assume battery is connected
@@ -110,6 +119,22 @@ public:
    }
 
    ~UpsInfo() {}
+
+   void regclient(Client *client)
+   {
+      LOCK(_mutex);
+      _clients.append(client);
+      UNLOCK(_mutex);
+   }
+
+   void unregclient(Client *client)
+   {
+      LOCK(_mutex);
+      alist<Client *>::iterator iter = _clients.find(client);
+      if (iter != _clients.end())
+         _clients.remove(iter);
+      UNLOCK(_mutex);
+   }
 
    void update(int ci, const UpsValue &val)
    {
@@ -157,16 +182,24 @@ public:
       return result;
    }
 
-   bool pend(UpsDatum &val) { return _notifs.dequeue(val); }
-
 private:
 
    void notify(int ci, const UpsValue &val)
-      { UpsDatum datum(ci, val); _notifs.enqueue(datum); }
+   {
+      UpsDatum datum(ci, val);
+
+      alist<Client *>::iterator iter;
+      for (iter = _clients.begin();
+           iter != _clients.end();
+           iter++)
+      {
+         (*iter)->HandleUpsDatum(datum);
+      }
+   }
 
    mutable amutex _mutex;
    amap<int, UpsValue> _values;
-   aqueue<UpsDatum> _notifs;
+   alist<Client *> _clients;
 };
 
 #endif // __UPSVALUE__H_
