@@ -44,7 +44,7 @@ public:
 private:
 
    // **************************************************************************
-   // EVENTS
+   // EVENT CLASSES
    // **************************************************************************
    
    enum EventType
@@ -91,28 +91,20 @@ private:
    };
 
    // **************************************************************************
-   // STATES
+   // STATE CLASSES
    // **************************************************************************
 
-   // States in the state machine
-   enum State
-   {
-      STATE_IDLE,
-      STATE_POWERFAIL,
-      STATE_ONBATT,
-      STATE_SELFTEST,
-      STATE_SHUTDOWN_LOADLIMIT,
-      STATE_SHUTDOWN_RUNLIMIT,
-      STATE_SHUTDOWN_BATTLOW,
-      NUM_STATES // MUST BE LAST
-   };
-
-   // Timer IDs shared amongst the state classes
+   // Timer IDs shared amongst the state classes.
+   // These should be unique across the state classes so stale
+   // timer events can be identified and ignored.
    enum
    {
-      TIMER_ONBATT,
       TIMER_POWERFAIL,
       TIMER_SELFTEST,
+      TIMER_ONBATT_TIMELIMIT,
+      TIMER_ONBATT_BATTLOW,
+      TIMER_ONBATT_RUNLIMIT,
+      TIMER_ONBATT_LOADLIMIT,
    };
 
    friend class BaseState;
@@ -126,7 +118,7 @@ private:
       virtual void OnTimeout(int id) = 0;
    protected:
       BaseState(UpsStateMachine &parent) : _parent(parent) {}
-      void ChangeState(State newstate) { _parent.ChangeState(newstate); }
+      void ChangeState(int newstate) { _parent.ChangeState(newstate); }
       UpsStateMachine &_parent;
    };
 
@@ -160,14 +152,22 @@ private:
    {
    public:
       StateOnbatt(UpsStateMachine &parent)
-         : BaseState(parent), _timer(parent, TIMER_ONBATT) {}
+         : BaseState(parent),
+           _timer_timelimit(parent, TIMER_ONBATT_TIMELIMIT),
+           _timer_battlow(parent, TIMER_ONBATT_BATTLOW),
+           _timer_loadlimit(parent, TIMER_ONBATT_LOADLIMIT),
+           _timer_runlimit(parent, TIMER_ONBATT_RUNLIMIT) {}
       virtual ~StateOnbatt() {}
       virtual void OnEvent(const UpsDatum &event);
       virtual void OnEnter();
       virtual void OnExit();
       virtual void OnTimeout(int id);
    private:
-      atimer _timer;
+      void CheckShutdown();
+      atimer _timer_timelimit;
+      atimer _timer_battlow;
+      atimer _timer_loadlimit;
+      atimer _timer_runlimit;
    };
 
    class StateSelftest: public BaseState
@@ -198,16 +198,29 @@ private:
       int _sdowncmd;
    };
 
+   // States in the state machine
+   enum
+   {
+      STATE_IDLE,
+      STATE_POWERFAIL,
+      STATE_ONBATT,
+      STATE_SELFTEST,
+      STATE_SHUTDOWN_LOADLIMIT,
+      STATE_SHUTDOWN_RUNLIMIT,
+      STATE_SHUTDOWN_BATTLOW,
+      NUM_STATES // MUST BE LAST
+   };
+
    virtual void body();
    bool HandleEventStateAny(const UpsDatum &event);
-   static const char *StateToText(State state);
-   void ChangeState(State newstate);
+   static const char *StateToText(int state);
+   void ChangeState(int newstate);
    virtual void HandleTimeout(int id);
    virtual void HandleUpsDatum(const UpsDatum &datum);
 
    UPSINFO *_ups;
    BaseState *_states[NUM_STATES];
-   State _state;
+   int _state;
    aqueue<BaseEvent*> _events;
 };
 

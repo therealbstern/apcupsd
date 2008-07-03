@@ -707,7 +707,7 @@ void UpsStateMachine::Start()
 // Callback from one of our state classes requesting that we
 // change the current state. Invoke exit/enter handlers for
 // current and new states.
-void UpsStateMachine::ChangeState(UpsStateMachine::State newstate)
+void UpsStateMachine::ChangeState(int newstate)
 {
    Dmsg2(100, "UpsStateMachine::ChangeState current=%s, new=%s\n",
       StateToText(_state), StateToText(newstate));
@@ -718,7 +718,7 @@ void UpsStateMachine::ChangeState(UpsStateMachine::State newstate)
    _states[_state]->OnEnter();
 }
 
-const char *UpsStateMachine::StateToText(UpsStateMachine::State state)
+const char *UpsStateMachine::StateToText(int state)
 {
    switch (state)
    {
@@ -904,29 +904,13 @@ void UpsStateMachine::StateOnbatt::OnEnter()
 {
    generate_event(_parent._ups, CMDONBATTERY);
 
-   // Check current state of various shutdown triggers and transition 
-   // immediately to SHUTDOWN if necessary.
+   // Check current state of various shutdown triggers and begin
+   // timers to transition to SHUTDOWN if necessary.
+   CheckShutdown();
 
-   UpsValue value;
-   if (_parent._ups->info.get(CI_BATTLEV, value) && (value / 10) <= _parent._ups->percent)
-   {
-      ChangeState(STATE_SHUTDOWN_LOADLIMIT);
-   }
-   else if (_parent._ups->info.get(CI_RUNTIM, value) && (value / 60) <= _parent._ups->runtime)
-   {
-      ChangeState(STATE_SHUTDOWN_RUNLIMIT);
-   }
-   else if (_parent._ups->info.get(CI_BattLow, value) && value)
-   {
-      ChangeState(STATE_SHUTDOWN_BATTLOW);
-   }
-   else
-   {
-      // No transition to SHUTDOWN needed yet.
-      // Set timer to trigger on TIMEOUT (max time on battery) expiration.
-      if (_parent._ups->maxtime > 0)
-         _timer.start(_parent._ups->maxtime * 1000);
-   }
+   // Set timer to trigger on TIMEOUT (max time on battery) expiration.
+   if (_parent._ups->maxtime > 0)
+      _timer_timelimit.start(_parent._ups->maxtime * 1000);
 }
 
 void UpsStateMachine::StateOnbatt::OnEvent(const UpsDatum &event)
@@ -940,7 +924,6 @@ void UpsStateMachine::StateOnbatt::OnEvent(const UpsDatum &event)
       {
          // No longer discharging; transition back to IDLE
          now = time(NULL);
-         _timer.stop();
          generate_event(_parent._ups, CMDOFFBATTERY);
          generate_event(_parent._ups, CMDMAINSBACK);
          _parent._ups->last_offbatt_time = now;
@@ -949,38 +932,69 @@ void UpsStateMachine::StateOnbatt::OnEvent(const UpsDatum &event)
       }
       break;
    case CI_BATTLEV: // Shutdown due to battery charge percent?
-      if ((event.value / 10) <= _parent._ups->percent)
-      {
-         ChangeState(STATE_SHUTDOWN_LOADLIMIT);
-      }
-      break;
    case CI_RUNTIM:  // Shutdown due to runtime remaining?
-      if ((event.value / 60) <= _parent._ups->runtime)
-      {
-         ChangeState(STATE_SHUTDOWN_RUNLIMIT);
-      }
-      break;
    case CI_BattLow: // Shutdown due to LowBatt signal?
-      if (event.value)
-      {
-         ChangeState(STATE_SHUTDOWN_BATTLOW);
-      }
+      CheckShutdown();
       break;
    }
 }
 
 void UpsStateMachine::StateOnbatt::OnExit()
 {
+   // Stop all timers that might be running
+   _timer_timelimit.stop();
+   _timer_runlimit.stop();
+   _timer_battlow.stop();
+   _timer_loadlimit.stop();
 }
 
 void UpsStateMachine::StateOnbatt::OnTimeout(int id)
 {
-   // Only expect one timer id. Anything else is a stale event.
-   if (id != TIMER_ONBATT)
-      return;
+   switch (id)
+   {
+   case TIMER_ONBATT_TIMELIMIT:
+   case TIMER_ONBATT_RUNLIMIT:
+      ChangeState(STATE_SHUTDOWN_RUNLIMIT);
+      break;
+   case TIMER_ONBATT_BATTLOW:
+      ChangeState(STATE_SHUTDOWN_BATTLOW);
+      break;
+   case TIMER_ONBATT_LOADLIMIT:
+      ChangeState(STATE_SHUTDOWN_LOADLIMIT);
+      break;
+   default:
+      break;   // State timer from another state
+   }
+}
 
-   // Max time on battery timer has fired, transition to SHUTDOWN
-   ChangeState(STATE_SHUTDOWN_RUNLIMIT);
+void UpsStateMachine::StateOnbatt::CheckShutdown()
+{
+   // Check to see if we need to start any of our shutdown timers.
+   // (Starting a timer that is already started has no effect.)
+   //
+   // We use timers instead of immediately transitioning to SHUTDOWN
+   // in order to provide some "debounce" of the shutdown trigger.
+   // For example, BATTLOW can be signaled briefly when first transitioning
+   // on battery, and we do not want to shutdown unless it persists for
+   // a few seconds.
+
+   UpsValue value;
+   if (_parent._ups->info.get(CI_BATTLEV, value) &&
+       (value / 10) <= _parent._ups->percent)
+   {
+      _timer_loadlimit.start(5000);
+   }
+
+   if (_parent._ups->info.get(CI_RUNTIM, value) &&
+       (value / 60) <= _parent._ups->runtime)
+   {
+      _timer_runlimit.start(5000);
+   }
+
+   if (_parent._ups->info.get(CI_BattLow, value) && value)
+   {
+      _timer_battlow.start(5000);
+   }
 }
 
 //******************************************************************************
