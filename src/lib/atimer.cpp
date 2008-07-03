@@ -20,11 +20,8 @@ atimer::~atimer()
 
 void atimer::start(unsigned long timeout)
 {
-   stop();
-
    pthread_mutex_lock(&_mutex);
 
-   // Re-check _started flag since unlocked stop() above might have raced
    if (!_started)
    {
       calc_abstimeout(timeout, &_abstimeout);
