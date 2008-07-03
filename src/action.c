@@ -650,6 +650,7 @@ void do_action(UPSINFO *ups)
 #endif
 
 #define MAX_SELFTEST_TIME_MSEC   40000
+#define SHUTDOWN_DEBOUNCE_MSEC   5000
 
 UpsStateMachine::UpsStateMachine(UPSINFO *ups)
    : _ups(ups),
@@ -963,7 +964,7 @@ void UpsStateMachine::StateOnbatt::OnTimeout(int id)
       ChangeState(STATE_SHUTDOWN_LOADLIMIT);
       break;
    default:
-      break;   // State timer from another state
+      break;   // Stale timer from another state
    }
 }
 
@@ -982,18 +983,18 @@ void UpsStateMachine::StateOnbatt::CheckShutdown()
    if (_parent._ups->info.get(CI_BATTLEV, value) &&
        (value / 10) <= _parent._ups->percent)
    {
-      _timer_loadlimit.start(5000);
+      _timer_loadlimit.start(SHUTDOWN_DEBOUNCE_MSEC);
    }
 
    if (_parent._ups->info.get(CI_RUNTIM, value) &&
        (value / 60) <= _parent._ups->runtime)
    {
-      _timer_runlimit.start(5000);
+      _timer_runlimit.start(SHUTDOWN_DEBOUNCE_MSEC);
    }
 
    if (_parent._ups->info.get(CI_BattLow, value) && value)
    {
-      _timer_battlow.start(5000);
+      _timer_battlow.start(SHUTDOWN_DEBOUNCE_MSEC);
    }
 }
 
