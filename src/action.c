@@ -5,6 +5,7 @@
  */
 
 /*
+ * Copyright (C) 2007-2008 Adam Kropelin
  * Copyright (C) 2000-2004 Kern Sibbald
  * Copyright (C) 1996-1999 Andre M. Hedrick <andre@suse.com>
  * Copyright (C) 1999-2000 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
@@ -664,12 +665,6 @@ UpsStateMachine::UpsStateMachine(UPSINFO *ups)
    _states[STATE_SHUTDOWN_LOADLIMIT] = new StateShutdown(*this, CMDLOADLIMIT);
    _states[STATE_SHUTDOWN_RUNLIMIT] = new StateShutdown(*this, CMDRUNLIMIT);
    _states[STATE_SHUTDOWN_BATTLOW] = new StateShutdown(*this, CMDFAILING);
-
-   // Enter initial state
-   _states[_state]->OnEnter();
-
-   // Register for UPSINFO to feed us events
-   _ups->info.regclient(this);
 }
 
 UpsStateMachine::~UpsStateMachine()
@@ -702,6 +697,13 @@ UpsStateMachine::~UpsStateMachine()
 
 void UpsStateMachine::Start()
 {
+   // Enter initial state
+   _states[_state]->OnEnter();
+
+   // Register for UPSINFO to feed us events
+   _ups->info.regclient(this);
+
+   // Start event processing thread
    run();
 }
 
@@ -774,7 +776,7 @@ void UpsStateMachine::body()
          // Invoke "any state" handler, and if that does not consume
          // the event, call the handler for the current state.
          if (!HandleEventStateAny(datum))
-            _states[_state]->OnEvent(datum);
+            _states[_state]->OnDatum(datum);
       }
       else if (event->type() == EVENT_TIMEOUT)
       {
@@ -810,9 +812,13 @@ bool UpsStateMachine::HandleEventStateAny(const UpsDatum &event)
 //******************************************************************************
 void UpsStateMachine::StateIdle::OnEnter()
 {
+   // If we're already running on battery go straight to POWERFAIL
+   UpsValue value;
+   if (_parent._ups->info.get(CI_Discharging, value) && value)
+      ChangeState(STATE_POWERFAIL);
 }
 
-void UpsStateMachine::StateIdle::OnEvent(const UpsDatum &event)
+void UpsStateMachine::StateIdle::OnDatum(const UpsDatum &event)
 {
    switch (event.ci)
    {
@@ -820,11 +826,6 @@ void UpsStateMachine::StateIdle::OnEvent(const UpsDatum &event)
       if (event.value)
       {
          // We're running on battery, transition to POWERFAIL
-         time_t now = time(NULL);
-         _parent._ups->last_time_on_line = now;
-         _parent._ups->last_onbatt_time = now;
-         _parent._ups->num_xfers++;
-
          ChangeState(STATE_POWERFAIL);
       }
       break;
@@ -850,10 +851,14 @@ void UpsStateMachine::StateIdle::OnTimeout(int id)
 //******************************************************************************
 void UpsStateMachine::StatePowerfail::OnEnter()
 {
-   generate_event(_parent._ups, CMDPOWEROUT);
-
    time_t now = time(NULL);
-   _parent._ups->last_time_nologon = _parent._ups->last_time_annoy = now;
+   _parent._ups->last_time_on_line = now;
+   _parent._ups->last_onbatt_time = now;
+   _parent._ups->last_time_nologon = now;
+   _parent._ups->last_time_annoy = now;
+   _parent._ups->num_xfers++;
+
+   generate_event(_parent._ups, CMDPOWEROUT);
 
    // Enable DTR on dumb UPSes with CUSTOM_SIMPLE cable
    device_entry_point(_parent._ups, DEVICE_CMD_DTR_ENABLE, NULL);
@@ -863,7 +868,7 @@ void UpsStateMachine::StatePowerfail::OnEnter()
    _timer.start(_parent._ups->onbattdelay * 1000);
 }
 
-void UpsStateMachine::StatePowerfail::OnEvent(const UpsDatum &event)
+void UpsStateMachine::StatePowerfail::OnDatum(const UpsDatum &event)
 {
    time_t now;
 
@@ -914,7 +919,7 @@ void UpsStateMachine::StateOnbatt::OnEnter()
       _timer_timelimit.start(_parent._ups->maxtime * 1000);
 }
 
-void UpsStateMachine::StateOnbatt::OnEvent(const UpsDatum &event)
+void UpsStateMachine::StateOnbatt::OnDatum(const UpsDatum &event)
 {
    time_t now;
 
@@ -1013,7 +1018,7 @@ void UpsStateMachine::StateSelftest::OnEnter()
    _timer.start(MAX_SELFTEST_TIME_MSEC);
 }
 
-void UpsStateMachine::StateSelftest::OnEvent(const UpsDatum &event)
+void UpsStateMachine::StateSelftest::OnDatum(const UpsDatum &event)
 {
    if (event.ci == CI_ST_STAT && event.value.lval() != TEST_INPROGRESS)
    {
@@ -1064,7 +1069,7 @@ void UpsStateMachine::StateShutdown::OnEnter()
 //   generate_event(_parent._ups, _sdowncmd);
 }
 
-void UpsStateMachine::StateShutdown::OnEvent(const UpsDatum &event)
+void UpsStateMachine::StateShutdown::OnDatum(const UpsDatum &event)
 {
 }
 

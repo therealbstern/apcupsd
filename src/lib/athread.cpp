@@ -20,7 +20,7 @@ bool athread::run()
 
    pthread_attr_setinheritsched(&attr, inherit);
 
-   int rc = pthread_create(&_pid, &attr, &athread::springboard, this);
+   int rc = pthread_create(&_tid, &attr, &athread::springboard, this);
    if (rc == 0)
       _running = true;
 
@@ -38,5 +38,5 @@ void *athread::springboard(void *arg)
 
 bool athread::join()
 {
-   return pthread_join(_pid, NULL) == 0;
+   return pthread_join(_tid, NULL) == 0;
 }
