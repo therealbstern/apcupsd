@@ -54,16 +54,20 @@ private:
       EVENT_QUIT,
    };
 
+   // Every Event has a type. Other attributes are added by derived classes.
+   // This is runtime type inference (RTTI) without C++ lib overhead.
    class BaseEvent
    {
    public:
       EventType type() const { return _type; }
+      virtual ~BaseEvent() {}
    protected:
       BaseEvent(EventType type) : _type(type) {}
    private:
       EventType _type;
    };
 
+   // An event containing an UpsDatum
    class EventUpsDatum: public BaseEvent
    {
    public:
@@ -74,6 +78,7 @@ private:
       UpsDatum _datum;
    };
 
+   // An event indicating a timer expired
    class EventTimeout: public BaseEvent
    {
    public:
@@ -84,6 +89,7 @@ private:
       int _id;
    };
 
+   // An event indicating the state machine should exit
    class EventQuit: public BaseEvent
    {
    public:
@@ -107,12 +113,14 @@ private:
       TIMER_ONBATT_LOADLIMIT,
    };
 
+   // All states must provide handlers for enter, exit, UpsDatum, and timeout.
+   // Parent class must provide a method to change between states.
    friend class BaseState;
    class BaseState
    {
    public:
       virtual ~BaseState() {}
-      virtual void OnEvent(const UpsDatum &event) = 0;
+      virtual void OnDatum(const UpsDatum &event) = 0;
       virtual void OnEnter() = 0;
       virtual void OnExit() = 0;
       virtual void OnTimeout(int id) = 0;
@@ -122,25 +130,27 @@ private:
       UpsStateMachine &_parent;
    };
 
+   // IDLE state: Nothing interesting happening yet. We monitor for on-battery
+   // events and transition to POWERFAIL if we get one.
    class StateIdle: public BaseState
    {
    public:
       StateIdle(UpsStateMachine &parent)
          : BaseState(parent) {}
-      virtual ~StateIdle() {}
-      virtual void OnEvent(const UpsDatum &event);
+      virtual void OnDatum(const UpsDatum &event);
       virtual void OnEnter();
       virtual void OnExit();
       virtual void OnTimeout(int id);
    };
 
+   // POWERFAIL: AC utility power has failed. Here we wait until the 
+   // ONBATTERYDELAY has passed, then transition to ONBATT.
    class StatePowerfail: public BaseState
    {
    public:
       StatePowerfail(UpsStateMachine &parent)
          : BaseState(parent), _timer(parent, TIMER_POWERFAIL) {}
-      virtual ~StatePowerfail() {}
-      virtual void OnEvent(const UpsDatum &event);
+      virtual void OnDatum(const UpsDatum &event);
       virtual void OnEnter();
       virtual void OnExit();
       virtual void OnTimeout(int id);
@@ -148,6 +158,14 @@ private:
       atimer _timer;
    };
 
+   // ONBATT: We are on battery and waiting for a shutdown trigger
+   // to fire. We will shut down under any one of four conditions:
+   // 1: We've been on battery for TIMEOUT seconds.
+   // 2: The UPS asserts the Low Battery indicator
+   // 3: The runtime remaining drops below MINUTES
+   // 4: The remaining battery charge drops below PERCENT
+   // The last 3 conditions are subject to a 5 second "debounce" to
+   // prevent temporary conditions from triggering a premature shutdown.
    class StateOnbatt: public BaseState
    {
    public:
@@ -157,8 +175,7 @@ private:
            _timer_battlow(parent, TIMER_ONBATT_BATTLOW),
            _timer_loadlimit(parent, TIMER_ONBATT_LOADLIMIT),
            _timer_runlimit(parent, TIMER_ONBATT_RUNLIMIT) {}
-      virtual ~StateOnbatt() {}
-      virtual void OnEvent(const UpsDatum &event);
+      virtual void OnDatum(const UpsDatum &event);
       virtual void OnEnter();
       virtual void OnExit();
       virtual void OnTimeout(int id);
@@ -170,13 +187,16 @@ private:
       atimer _timer_runlimit;
    };
 
+   // SELFTEST: We are on battery but this is only a test. Just
+   // wait for the self test to end and gather the results. However,
+   // if the test lasts "too long" we transition to ONBATT just in
+   // case this is an actual power failure.
    class StateSelftest: public BaseState
    {
    public:
       StateSelftest(UpsStateMachine &parent)
          : BaseState(parent), _timer(parent, TIMER_SELFTEST) {}
-      virtual ~StateSelftest() {}
-      virtual void OnEvent(const UpsDatum &event);
+      virtual void OnDatum(const UpsDatum &event);
       virtual void OnEnter();
       virtual void OnExit();
       virtual void OnTimeout(int id);
@@ -184,13 +204,16 @@ private:
       atimer _timer;
    };
 
+   // SHUTDOWN_*: We've decided to shut down the computer. This state
+   // is initialized with a shutdown type corresponding to one of the 
+   // four triggers described above in the ONBATT state. This way one
+   // state class implementation can serve 4 different states.
    class StateShutdown: public BaseState
    {
    public:
       StateShutdown(UpsStateMachine &parent, int cmd)
          : BaseState(parent), _sdowncmd(cmd) {}
-      virtual ~StateShutdown() {}
-      virtual void OnEvent(const UpsDatum &event);
+      virtual void OnDatum(const UpsDatum &event);
       virtual void OnEnter();
       virtual void OnExit();
       virtual void OnTimeout(int id);

@@ -124,15 +124,6 @@ public:
    {
       LOCK(_mutex);
       _clients.append(client);
-      // Notify client of all pre-existing values
-      amap<int, UpsValue>::iterator iter;
-      for (iter = _values.begin();
-           iter != _values.end();
-           iter++)
-      {
-         UpsDatum datum(iter.key(), iter.value());
-         client->HandleUpsDatum(datum);
-      }
       UNLOCK(_mutex);
    }
 

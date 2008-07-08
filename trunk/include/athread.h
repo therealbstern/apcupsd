@@ -24,7 +24,7 @@ protected:
 
    static const int PRIORITY_INHERIT;
 
-   pthread_t _pid;
+   pthread_t _tid;
    int _prio;
    bool _running;
 };
