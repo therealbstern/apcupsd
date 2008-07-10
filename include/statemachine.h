@@ -105,12 +105,12 @@ private:
    // timer events can be identified and ignored.
    enum
    {
-      TIMER_POWERFAIL,
       TIMER_SELFTEST,
       TIMER_ONBATT_TIMELIMIT,
       TIMER_ONBATT_BATTLOW,
       TIMER_ONBATT_RUNLIMIT,
       TIMER_ONBATT_LOADLIMIT,
+      TIMER_ONBATT_EVENT,
    };
 
    // All states must provide handlers for enter, exit, UpsDatum, and timeout.
@@ -143,21 +143,6 @@ private:
       virtual void OnTimeout(int id);
    };
 
-   // POWERFAIL: AC utility power has failed. Here we wait until the 
-   // ONBATTERYDELAY has passed, then transition to ONBATT.
-   class StatePowerfail: public BaseState
-   {
-   public:
-      StatePowerfail(UpsStateMachine &parent)
-         : BaseState(parent), _timer(parent, TIMER_POWERFAIL) {}
-      virtual void OnDatum(const UpsDatum &event);
-      virtual void OnEnter();
-      virtual void OnExit();
-      virtual void OnTimeout(int id);
-   private:
-      atimer _timer;
-   };
-
    // ONBATT: We are on battery and waiting for a shutdown trigger
    // to fire. We will shut down under any one of four conditions:
    // 1: We've been on battery for TIMEOUT seconds.
@@ -174,7 +159,8 @@ private:
            _timer_timelimit(parent, TIMER_ONBATT_TIMELIMIT),
            _timer_battlow(parent, TIMER_ONBATT_BATTLOW),
            _timer_loadlimit(parent, TIMER_ONBATT_LOADLIMIT),
-           _timer_runlimit(parent, TIMER_ONBATT_RUNLIMIT) {}
+           _timer_runlimit(parent, TIMER_ONBATT_RUNLIMIT),
+           _timer_onbatt(parent, TIMER_ONBATT_EVENT) {}
       virtual void OnDatum(const UpsDatum &event);
       virtual void OnEnter();
       virtual void OnExit();
@@ -185,6 +171,8 @@ private:
       atimer _timer_battlow;
       atimer _timer_loadlimit;
       atimer _timer_runlimit;
+      atimer _timer_onbatt;
+      bool _onbattery_posted;
    };
 
    // SELFTEST: We are on battery but this is only a test. Just
@@ -225,7 +213,6 @@ private:
    enum
    {
       STATE_IDLE,
-      STATE_POWERFAIL,
       STATE_ONBATT,
       STATE_SELFTEST,
       STATE_SHUTDOWN_LOADLIMIT,

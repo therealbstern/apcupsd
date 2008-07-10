@@ -659,7 +659,6 @@ UpsStateMachine::UpsStateMachine(UPSINFO *ups)
 {
    // Populate state array
    _states[STATE_IDLE] = new StateIdle(*this);
-   _states[STATE_POWERFAIL] = new StatePowerfail(*this);
    _states[STATE_ONBATT] = new StateOnbatt(*this);
    _states[STATE_SELFTEST] = new StateSelftest(*this);
    _states[STATE_SHUTDOWN_LOADLIMIT] = new StateShutdown(*this, CMDLOADLIMIT);
@@ -726,7 +725,6 @@ const char *UpsStateMachine::StateToText(int state)
    switch (state)
    {
    case STATE_IDLE:               return "IDLE";
-   case STATE_POWERFAIL:          return "POWERFAIL";
    case STATE_ONBATT:             return "ONBATT";
    case STATE_SHUTDOWN_LOADLIMIT: return "SHUTDOWN_LOADLIMIT";
    case STATE_SHUTDOWN_RUNLIMIT:  return "SHUTDOWN_RUNLIMIT";
@@ -815,7 +813,7 @@ void UpsStateMachine::StateIdle::OnEnter()
    // If we're already running on battery go straight to POWERFAIL
    UpsValue value;
    if (_parent._ups->info.get(CI_Discharging, value) && value)
-      ChangeState(STATE_POWERFAIL);
+      ChangeState(STATE_ONBATT);
 }
 
 void UpsStateMachine::StateIdle::OnDatum(const UpsDatum &event)
@@ -826,7 +824,7 @@ void UpsStateMachine::StateIdle::OnDatum(const UpsDatum &event)
       if (event.value)
       {
          // We're running on battery, transition to POWERFAIL
-         ChangeState(STATE_POWERFAIL);
+         ChangeState(STATE_ONBATT);
       }
       break;
    case CI_ST_STAT:
@@ -847,9 +845,9 @@ void UpsStateMachine::StateIdle::OnTimeout(int id)
 }
 
 //******************************************************************************
-// POWERFAIL
+// ONBATT
 //******************************************************************************
-void UpsStateMachine::StatePowerfail::OnEnter()
+void UpsStateMachine::StateOnbatt::OnEnter()
 {
    time_t now = time(NULL);
    _parent._ups->last_time_on_line = now;
@@ -858,57 +856,16 @@ void UpsStateMachine::StatePowerfail::OnEnter()
    _parent._ups->last_time_annoy = now;
    _parent._ups->num_xfers++;
 
+   // Throw powerout event immediately
    generate_event(_parent._ups, CMDPOWEROUT);
+
+   // Set a timer to post onbattery event after configured delay.
+   // If delay is <= 0, timer will fire immediately
+   _onbattery_posted = false;
+   _timer_onbatt.start(_parent._ups->onbattdelay * 1000);
 
    // Enable DTR on dumb UPSes with CUSTOM_SIMPLE cable
    device_entry_point(_parent._ups, DEVICE_CMD_DTR_ENABLE, NULL);
-
-   // Set a timer to take us to OnBattery after ONBATTERYDELAY
-   // If delay is <= 0, timer will fire immediately
-   _timer.start(_parent._ups->onbattdelay * 1000);
-}
-
-void UpsStateMachine::StatePowerfail::OnDatum(const UpsDatum &event)
-{
-   time_t now;
-
-   switch (event.ci)
-   {
-   case CI_Discharging:
-      if (!event.value)
-      {
-         // No longer discharging; transition back to IDLE
-         now = time(NULL);
-         _timer.stop();
-         generate_event(_parent._ups, CMDMAINSBACK);
-         _parent._ups->last_offbatt_time = now;
-         _parent._ups->cum_time_on_batt += (now - _parent._ups->last_onbatt_time);
-         ChangeState(STATE_IDLE);
-      }
-      break;
-   }
-}
-
-void UpsStateMachine::StatePowerfail::OnExit()
-{
-}
-
-void UpsStateMachine::StatePowerfail::OnTimeout(int id)
-{
-   // Only expect one timer id. Anything else is a stale event.
-   if (id != TIMER_POWERFAIL)
-      return;
-
-   // ONBATTERYDELAY timer has fired, transition to ONBATTERY
-   ChangeState(STATE_ONBATT);
-}
-
-//******************************************************************************
-// ONBATT
-//******************************************************************************
-void UpsStateMachine::StateOnbatt::OnEnter()
-{
-   generate_event(_parent._ups, CMDONBATTERY);
 
    // Check current state of various shutdown triggers and begin
    // timers to transition to SHUTDOWN if necessary.
@@ -921,19 +878,19 @@ void UpsStateMachine::StateOnbatt::OnEnter()
 
 void UpsStateMachine::StateOnbatt::OnDatum(const UpsDatum &event)
 {
-   time_t now;
-
    switch (event.ci)
    {
    case CI_Discharging:
       if (!event.value)
       {
-         // No longer discharging; transition back to IDLE
-         now = time(NULL);
-         generate_event(_parent._ups, CMDOFFBATTERY);
-         generate_event(_parent._ups, CMDMAINSBACK);
+         time_t now = time(NULL);
          _parent._ups->last_offbatt_time = now;
          _parent._ups->cum_time_on_batt += (now - _parent._ups->last_onbatt_time);
+
+         // No longer discharging; post events and transition back to IDLE
+         if (_onbattery_posted)
+            generate_event(_parent._ups, CMDOFFBATTERY);
+         generate_event(_parent._ups, CMDMAINSBACK);
          ChangeState(STATE_IDLE);
       }
       break;
@@ -952,12 +909,17 @@ void UpsStateMachine::StateOnbatt::OnExit()
    _timer_runlimit.stop();
    _timer_battlow.stop();
    _timer_loadlimit.stop();
+   _timer_onbatt.stop();
 }
 
 void UpsStateMachine::StateOnbatt::OnTimeout(int id)
 {
    switch (id)
    {
+   case TIMER_ONBATT_EVENT:
+      _onbattery_posted = true;
+      generate_event(_parent._ups, CMDONBATTERY);
+      break;
    case TIMER_ONBATT_TIMELIMIT:
    case TIMER_ONBATT_RUNLIMIT:
       ChangeState(STATE_SHUTDOWN_RUNLIMIT);
