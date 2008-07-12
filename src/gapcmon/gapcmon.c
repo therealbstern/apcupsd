@@ -3345,6 +3345,7 @@ static gboolean gapc_panel_systray_icon_create(gpointer gp)
       pixbuf = pm->my_icons[GAPC_ICON_DEFAULT];
 
       if (!pm->cb_use_systray) {
+          g_object_set(pm->window, "skip-pager-hint", FALSE, "skip-taskbar-hint", FALSE, NULL);
          return FALSE;
       }
 
