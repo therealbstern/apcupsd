@@ -3266,7 +3266,7 @@ static gboolean cb_panel_systray_icon_handle_clicked(GtkWidget * widget,
       switch (event->button) {
       case 1:
          if (b_visible) {
-            gtk_window_iconify(GTK_WINDOW(window));
+            gtk_widget_hide(GTK_WIDGET(window));
          } else {
             gtk_window_present(GTK_WINDOW(window));
          }
@@ -4196,7 +4196,7 @@ static void cb_panel_monitor_list_activated(GtkTreeView * treeview,
 
       if ((pm != NULL) && (pm->window != NULL)) {
          if (pm->b_visible) {
-            gtk_window_iconify(GTK_WINDOW(pm->window));
+            gtk_widget_hide(GTK_WIDGET(pm->window));
          } else {
             gtk_window_present(GTK_WINDOW(pm->window));
          }
@@ -4509,7 +4509,7 @@ static gboolean cb_monitor_interface_delete_event(GtkWidget * widget,
 static void cb_monitor_interface_button_close(GtkWidget * button, PGAPC_MONITOR pm)
 {
    g_return_if_fail(pm != NULL);
-   gtk_window_iconify(GTK_WINDOW(pm->window));
+   gtk_widget_hide(GTK_WIDGET(pm->window));
    return;
 }
 
@@ -4552,11 +4552,10 @@ static gboolean cb_util_manage_iconify_event(GtkWidget *widget, GdkEventWindowSt
    g_return_val_if_fail(gp != NULL, FALSE);
    
    /* iconified */
-   if ( (event->type == GDK_WINDOW_STATE) && 
-        (event->changed_mask & GDK_WINDOW_STATE_ICONIFIED) &&
-        (event->new_window_state & GDK_WINDOW_STATE_ICONIFIED) ) {
-
-
+   if ((event->type == GDK_WINDOW_STATE) && (
+      ((event->changed_mask & GDK_WINDOW_STATE_ICONIFIED) && (event->new_window_state & GDK_WINDOW_STATE_ICONIFIED)) ||
+      ((event->changed_mask & GDK_WINDOW_STATE_WITHDRAWN) && (event->new_window_state & GDK_WINDOW_STATE_WITHDRAWN)) 
+                                           )){
         if ( ((PGAPC_MONITOR)gp)->cb_id == CB_MONITOR_ID) {
               if ( event->window == GTK_WIDGET(((PGAPC_MONITOR)gp)->window)->window ) {   
                    ((PGAPC_MONITOR)gp)->b_visible = FALSE;
@@ -4571,11 +4570,10 @@ static gboolean cb_util_manage_iconify_event(GtkWidget *widget, GdkEventWindowSt
    }
 
    /* un - iconified */
-   if ( (event->type == GDK_WINDOW_STATE) && 
-        (event->changed_mask & GDK_WINDOW_STATE_ICONIFIED) &&
-        !(event->new_window_state & GDK_WINDOW_STATE_ICONIFIED) ) {
-
-
+   if ((event->type == GDK_WINDOW_STATE) &&   ( 
+      ((event->changed_mask & GDK_WINDOW_STATE_ICONIFIED) && !(event->new_window_state & GDK_WINDOW_STATE_ICONIFIED)) || 
+      ((event->changed_mask & GDK_WINDOW_STATE_WITHDRAWN) && !(event->new_window_state & GDK_WINDOW_STATE_WITHDRAWN)))
+                                              ) {
         if ( ((PGAPC_MONITOR)gp)->cb_id == CB_MONITOR_ID) {
               if ( event->window == GTK_WIDGET(((PGAPC_MONITOR)gp)->window)->window ) {   
                    ((PGAPC_MONITOR)gp)->b_visible = TRUE;
@@ -5413,7 +5411,7 @@ static GtkWidget *gapc_main_interface_create(PGAPC_CONFIG pcfg)
 
    /* quit Control button */
    button = gtk_button_new_from_stock(GTK_STOCK_CLOSE);
-   g_signal_connect_swapped(button, "clicked", G_CALLBACK(gtk_window_iconify), window);  
+   g_signal_connect_swapped(button, "clicked", G_CALLBACK(gtk_widget_hide), GTK_WIDGET(window));  
    gtk_box_pack_end(GTK_BOX(box), button, TRUE, TRUE, 0);
    gtk_widget_show(button);
 
