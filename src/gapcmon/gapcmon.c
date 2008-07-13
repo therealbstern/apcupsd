@@ -1,4 +1,4 @@
-/* gapcmon.c               serial-0085-0 *****************************************
+/* gapcmon.c               serial-0088-0 *****************************************
 
   GKT+ GUI with Notification Area (System Tray) support.  Program  for 
   monitoring the apcupsd.sourceforge.net package.

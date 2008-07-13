@@ -1,4 +1,14 @@
-gapc_devel (0.8.7-0) stable; urgency=normal
+gapcmon (0.8.8-0) stable; urgency=normal
+* Sat Jul 12 2008 James Scott, Jr. <skoona@users.sourceforge.net>
+- Removed GTK_STOCK_CLOSE buttons from all windows in response to a
+  KDE issue, where KDEs window manager has now decided to ignore
+  gtk_window_iconify() api calls.  gtk_widget_hide() is being
+  in place of _iconify() however, the close buttons where stranded
+  because using _hide at that level could and did cause one or more
+  window to be hidden with no tasklist or pager entry to restore
+  it with.
+
+gapcmon (0.8.7-0) stable; urgency=normal
 * Tue Mar 18 2008 James Scott, Jr. <skoona@users.sourceforge.net>
 - Removed close() fron sknet_net_close() api.  g_io_channel_shutdown()
   handled the close and shutdown of the socket.  second close was
