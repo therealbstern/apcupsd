@@ -4506,12 +4506,14 @@ static gboolean cb_monitor_interface_delete_event(GtkWidget * widget,
 /*
  * Handle the close button action from the information window
 */
+/*
 static void cb_monitor_interface_button_close(GtkWidget * button, PGAPC_MONITOR pm)
 {
    g_return_if_fail(pm != NULL);
    gtk_widget_hide(GTK_WIDGET(pm->window));
    return;
 }
+*/
 
 /*
  * Handle the refresh button action from the information window
@@ -5409,6 +5411,7 @@ static GtkWidget *gapc_main_interface_create(PGAPC_CONFIG pcfg)
    gtk_widget_show(label);
 
    /* quit Control button */
+/*   
    button = gtk_button_new_from_stock(GTK_STOCK_CLOSE);
    g_signal_connect_swapped(button, "clicked", G_CALLBACK(gtk_widget_hide), GTK_WIDGET(window));  
    gtk_box_pack_end(GTK_BOX(box), button, TRUE, TRUE, 0);
@@ -5416,7 +5419,7 @@ static GtkWidget *gapc_main_interface_create(PGAPC_CONFIG pcfg)
 
    GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
    gtk_widget_grab_default(button);
-
+*/
 
    button = gtk_button_new_from_stock(GTK_STOCK_QUIT);
    g_signal_connect(button, "clicked", G_CALLBACK(cb_main_interface_button_quit),
@@ -6268,21 +6271,22 @@ static GtkWidget *gapc_monitor_interface_create(PGAPC_CONFIG pcfg, gint i_monito
    gtk_widget_show(label);
    g_hash_table_insert(pm->pht_Widgets, g_strdup("TitleStatus"), label);
 
-   /* quit Control button */
+   /* refresh Control button */
    button = gtk_button_new_from_stock(GTK_STOCK_REFRESH);
    GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
    g_signal_connect(button, "clicked",
       G_CALLBACK(cb_monitor_interface_button_refresh), pm);
-   gtk_box_pack_start(GTK_BOX(box), button, TRUE, TRUE, 0);
+   gtk_box_pack_end(GTK_BOX(box), button, TRUE, TRUE, 0);
    gtk_widget_show(button);
    gtk_widget_grab_default(button);
 
+/*
    button = gtk_button_new_from_stock(GTK_STOCK_CLOSE);
    g_signal_connect(button, "clicked",
       G_CALLBACK(cb_monitor_interface_button_close), pm);
    gtk_box_pack_end(GTK_BOX(box), button, TRUE, TRUE, 0);
    gtk_widget_show(button);
-
+*/
    gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 0);
 
    gapc_panel_monitor_model_rec_add(pcfg, pm);
