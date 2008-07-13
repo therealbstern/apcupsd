@@ -2483,7 +2483,7 @@ static GIOChannel *sknet_net_open (PSKCOMM psk)
    * Allocate a new address struct if it does not exist 
   */
   if (psk->gip == NULL) {
-      psk->b_network_control=TRUE;
+      psk->b_network_control=TRUE;      
       psk->gip = g_new0( struct sockaddr_in , 1);
       g_return_val_if_fail (psk->gip != NULL, NULL);
       tcp_serv_addr = (struct sockaddr_in *)psk->gip;
@@ -3345,7 +3345,6 @@ static gboolean gapc_panel_systray_icon_create(gpointer gp)
       pixbuf = pm->my_icons[GAPC_ICON_DEFAULT];
 
       if (!pm->cb_use_systray) {
-          g_object_set(pm->window, "skip-pager-hint", FALSE, "skip-taskbar-hint", FALSE, NULL);
          return FALSE;
       }
 
@@ -4587,7 +4586,6 @@ static gboolean cb_util_manage_iconify_event(GtkWidget *widget, GdkEventWindowSt
 
     return TRUE;
    }
-
 
    return FALSE;
 }
