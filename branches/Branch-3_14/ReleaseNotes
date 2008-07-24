@@ -9,6 +9,32 @@ IF YOU USE THE OLD STYLE MASTER/SLAVE NETWORKING MODE, BE SURE TO READ THE
 3.14.0 RELEASE NOTES BELOW.
 
 
+3.14.5 -- 24 July 2008               (Maintenance Release)
+
+BUG FIXES
+
+  * gapcmon: Iconify fixes for KDE
+
+  * Fix LOWBATT glitch handling bug that could cause us to act on a 
+    LOWBATT signal immediately instead of waiting for the debounce time.
+
+  * apctray: Improve multiple instance behavior for /add, /del, and
+    /kill on modern platforms (Win2K and newer).
+
+  * Support shutting down apcupsd instances running in other sessions
+    (such as terminal services or remote desktop sessions).
+
+  * Makefile: 'make install' fixes for first install on RedHat/SuSE.
+
+  * docs: PCNET minimum password length is 15 chars, default username 
+    is 'apc', no known way to change the username.
+
+  * Makefile: Fix dependency build errors on Darwin and other platforms.
+    ('echo -n' is not portable; use 'tr' to strip newline instead)
+
+  * RPMs: Automatically restart apcupsd when upgrading
+
+
 3.14.4 -- 18 May 2008                (Maintenance Release)
 
 MAJOR CHANGES
