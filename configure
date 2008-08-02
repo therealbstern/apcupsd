@@ -9786,7 +9786,7 @@ if test "${ac_cv_lib_gd_gdImagePng+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lgd  $LIBS"
+LIBS="-lgd ${X_LIBS} $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -9864,7 +9864,7 @@ if test "${ac_cv_lib_gd_gdImageGif+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lgd  $LIBS"
+LIBS="-lgd ${X_LIBS} $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -9937,9 +9937,9 @@ fi
 
                         if test "${SYS_GD_FOUND}" = "no"
         then
-           _cppflags=${CPPFLAGS}
+           _cflags=${CFLAGS}
            _ldflags=${LDFLAGS}
-           CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
+           CFLAGS="${CPPFLAGS} -I/usr/local/include"
            LDFLAGS="${LDFLAGS} -L/usr/local/lib"
 
                       unset ac_cv_lib_gd_gdImagePng
@@ -9949,7 +9949,7 @@ if test "${ac_cv_lib_gd_gdImagePng+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lgd  $LIBS"
+LIBS="-lgd ${X_LIBS} $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -10029,7 +10029,7 @@ if test "${ac_cv_lib_gd_gdImageGif+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lgd  $LIBS"
+LIBS="-lgd ${X_LIBS} $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
