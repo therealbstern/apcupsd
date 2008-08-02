@@ -464,7 +464,7 @@ AC_ARG_ENABLE(cgi,
              GD_LIBS="-lgd"
              SYS_GD_FOUND=yes ],
            [],
-           [])
+           [${X_LIBS}])
 
         dnl
         dnl Second search for system library that defines gdImageGif
@@ -476,16 +476,16 @@ AC_ARG_ENABLE(cgi,
                 GD_LIBS="-lgd"
                 SYS_GD_FOUND=yes ],
               [],
-              [])
+              [${X_LIBS}])
         fi
 
         dnl
         dnl Third in /usr/local search for system library that defines gdImagePng
         if test "${SYS_GD_FOUND}" = "no"
         then
-           _cppflags=${CPPFLAGS}
+           _cflags=${CFLAGS}
            _ldflags=${LDFLAGS}
-           CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
+           CFLAGS="${CPPFLAGS} -I/usr/local/include"
            LDFLAGS="${LDFLAGS} -L/usr/local/lib"
 
            dnl Destroy cached value
@@ -496,7 +496,7 @@ AC_ARG_ENABLE(cgi,
                 GD_LIBS="-lgd"
                 SYS_GD_FOUND=yes ],
               [],
-              [])
+              [${X_LIBS}])
         fi
 
         dnl
@@ -511,7 +511,7 @@ AC_ARG_ENABLE(cgi,
                 GD_LIBS="-lgd"
                 SYS_GD_FOUND=yes ],
               [],
-              [])
+              [${X_LIBS}])
         fi
 
         if test "${SYS_GD_FOUND}" = "no"
