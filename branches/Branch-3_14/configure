@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS ABSSRCDIR topdir TOP_DIR VERSION DATE TRUEPRG FALSEPRG build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP CXX CXXFLAGS ac_ct_CXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA AWK HAVE_GCC_TRUE HAVE_GCC_FALSE DEBUG DLIB DINCLUDE DRVLIBS APCDRVLIBS PTHREAD_CFLAGS PTHREAD_LFLAGS APCACCESS SMTP APCTEST SHUTDOWN APCUPSD_MAIL WALL SCRIPTSHELL RANLIB RM CP ECHO LN SED AR MV X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS HALPOLICYDIR GDHEAD APCSMART_DRIVER DUMB_DRIVER LIBUSBHID LIBUSBHIDINC usbcfg LIBUSBH USB_DRIVER USB_TYPE NET_DRIVER SNMP_DRIVER TEST_DRIVER PCNET_DRIVER NISIP PKG_CONFIG ac_pt_PKG_CONFIG GAPCMON_CFLAGS GAPCMON_LIBS GAPCMON POWERFLUTE POWERLIBS MAKE LD CGI GD_LIBS CGIBIN SYSCONFDIR MKINSTALLDIRS EXTRADEFS LIBEXTRAOBJ EXTRAOBJ DISTDIR DISTNAME DISTVER SERIALDEV PIDDIR LOGDIR nologdir PWRFAILDIR LOCKDIR NISPORT UPSTYPE UPSCABLE HOST LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS ABSSRCDIR topdir TOP_DIR VERSION DATE TRUEPRG FALSEPRG build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP CXX CXXFLAGS ac_ct_CXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA AWK HAVE_GCC_TRUE HAVE_GCC_FALSE DEBUG DRVLIBS APCDRVLIBS PTHREAD_CFLAGS PTHREAD_LFLAGS APCACCESS SMTP APCTEST SHUTDOWN APCUPSD_MAIL WALL SCRIPTSHELL RANLIB RM CP ECHO LN SED AR MV X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS HALPOLICYDIR GDHEAD APCSMART_DRIVER DUMB_DRIVER LIBUSBHID LIBUSBHIDINC usbcfg LIBUSBH USB_DRIVER USB_TYPE NET_DRIVER SNMP_DRIVER TEST_DRIVER PCNET_DRIVER NISIP PKG_CONFIG ac_pt_PKG_CONFIG GAPCMON_CFLAGS GAPCMON_LIBS GAPCMON POWERFLUTE POWERLIBS MAKE LD CGI GD_LIBS CGIBIN SYSCONFDIR MKINSTALLDIRS EXTRADEFS LIBEXTRAOBJ EXTRAOBJ DISTDIR DISTNAME DISTVER SERIALDEV PIDDIR LOGDIR nologdir PWRFAILDIR LOCKDIR NISPORT UPSTYPE UPSCABLE HOST LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -3541,17 +3541,6 @@ if test x$LD = x ; then
    LD="$CC"
 fi
 
-if test x$GCC = xyes; then
-   CFLAGS=${CFLAGS-"-g -O2"}
-   CFLAGS="${CFLAGS} -Wall"
-   LDFLAGS=${LDFLAGS-"-g -O"}
-else
-   CFLAGS=${CFLAGS--O2}
-   LDFLAGS=${LDFLAGS--O}
-fi
-
-CPPFLAGS="$CPPFLAGS"
-
 
 
 
@@ -3791,7 +3780,7 @@ else
   _cv_gnu_make_command='' ;
             for a in "$MAKE" make gmake gnumake ; do
          if test -z "$a" ; then continue ; fi ;
-         if  ( sh -c "$a --version" 2> /dev/null | grep GNU  2>&1 > /dev/null ) ; then
+         if  (sh -c "$a --version" 2> /dev/null | grep GNU  2>&1 > /dev/null ) ; then
             _cv_gnu_make_command=$a ;
             break;
          fi
@@ -8223,7 +8212,7 @@ ac_x_header_dirs='
 /usr/openwin/share/include'
 
 if test "$ac_x_includes" = no; then
-  # Guess where to find include files, by looking for Xlib.h.
+  # Guess where to find include files, by looking for Intrinsic.h.
   # First, try using that file with no special directory specified.
   cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
@@ -8231,7 +8220,7 @@ _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-#include <X11/Xlib.h>
+#include <X11/Intrinsic.h>
 _ACEOF
 if { (eval echo "$as_me:$LINENO: \"$ac_cpp conftest.$ac_ext\"") >&5
   (eval $ac_cpp conftest.$ac_ext) 2>conftest.er1
@@ -8258,7 +8247,7 @@ else
 sed 's/^/| /' conftest.$ac_ext >&5
 
   for ac_dir in $ac_x_header_dirs; do
-  if test -r "$ac_dir/X11/Xlib.h"; then
+  if test -r "$ac_dir/X11/Intrinsic.h"; then
     ac_x_includes=$ac_dir
     break
   fi
@@ -8272,18 +8261,18 @@ if test "$ac_x_libraries" = no; then
   # See if we find them without any special options.
   # Don't add to $LIBS permanently.
   ac_save_LIBS=$LIBS
-  LIBS="-lX11 $LIBS"
+  LIBS="-lXt $LIBS"
   cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-#include <X11/Xlib.h>
+#include <X11/Intrinsic.h>
 int
 main ()
 {
-XrmInitialize ()
+XtMalloc (0)
   ;
   return 0;
 }
@@ -9937,9 +9926,7 @@ fi
 
                         if test "${SYS_GD_FOUND}" = "no"
         then
-           _cflags=${CFLAGS}
-           _ldflags=${LDFLAGS}
-           CFLAGS="${CPPFLAGS} -I/usr/local/include"
+           CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
            LDFLAGS="${LDFLAGS} -L/usr/local/lib"
 
                       unset ac_cv_lib_gd_gdImagePng
@@ -11660,8 +11647,8 @@ echo "${ECHO_T}yes" >&6
    # See if GCC supports -fno-exceptions...
    echo "$as_me:$LINENO: checking if GCC supports -fno-exceptions" >&5
 echo $ECHO_N "checking if GCC supports -fno-exceptions... $ECHO_C" >&6
-   OLDCFLAGS="$CFLAGS"
-   CFLAGS="$CFLAGS -fno-exceptions"
+   OLDCXXFLAGS="$CXXFLAGS"
+   CXXFLAGS="$CXXFLAGS -fno-exceptions"
    cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -11699,8 +11686,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  CPPFLAGS="$CPPFLAGS -fno-exceptions"
-      echo "$as_me:$LINENO: result: yes" >&5
+  echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 else
   echo "$as_me: failed program was:" >&5
@@ -11708,15 +11694,15 @@ sed 's/^/| /' conftest.$ac_ext >&5
 
 echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
+      CXXFLAGS="$OLDCXXFLAGS"
 fi
 rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
-   CFLAGS="$OLDCFLAGS"
 
    # See if GCC supports -fno-rtti...
    echo "$as_me:$LINENO: checking if GCC supports -fno-rtti" >&5
 echo $ECHO_N "checking if GCC supports -fno-rtti... $ECHO_C" >&6
-   OLDCFLAGS="$CFLAGS"
-   CFLAGS="$CFLAGS -fno-rtti"
+   OLDCXXFLAGS="$CXXFLAGS"
+   CXXFLAGS="$CXXFLAGS -fno-rtti"
    cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -11754,8 +11740,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  CPPFLAGS="$CPPFLAGS -fno-rtti"
-      echo "$as_me:$LINENO: result: yes" >&5
+  echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 else
   echo "$as_me: failed program was:" >&5
@@ -11763,9 +11748,13 @@ sed 's/^/| /' conftest.$ac_ext >&5
 
 echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
+      CXXFLAGS="$OLDCXXFLAGS"
 fi
 rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
-   CFLAGS="$OLDCFLAGS"
+
+   # Use -Wall on gcc only
+   CFLAGS="$CFLAGS -Wall"
+   CXXFLAGS="$CXXFLAGS -Wall"
 fi
 
 
@@ -13515,8 +13504,6 @@ s,@AWK@,$AWK,;t t
 s,@HAVE_GCC_TRUE@,$HAVE_GCC_TRUE,;t t
 s,@HAVE_GCC_FALSE@,$HAVE_GCC_FALSE,;t t
 s,@DEBUG@,$DEBUG,;t t
-s,@DLIB@,$DLIB,;t t
-s,@DINCLUDE@,$DINCLUDE,;t t
 s,@DRVLIBS@,$DRVLIBS,;t t
 s,@APCDRVLIBS@,$APCDRVLIBS,;t t
 s,@PTHREAD_CFLAGS@,$PTHREAD_CFLAGS,;t t
@@ -14112,7 +14099,7 @@ Configuration on `date`:
   LOCK dir (for serial port)  ${LOCKDIR}
   Power Fail dir              ${PWRFAILDIR}
   Compiler:                   ${CXX} ${CXXVERSION}
-  Compiler flags:             ${CFLAGS} ${PTHREAD_FLAGS}
+  Compiler flags:             ${CPPFLAGS} ${CXXFLAGS} ${PTHREAD_FLAGS}
   Linker:                     ${LD}
   Linker flags:               ${LDFLAGS}
   Host and version:           ${DISTNAME} ${DISTVER}

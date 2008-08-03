@@ -115,7 +115,7 @@ define ECHO_N
 endef
 
 # How to build dependencies
-MAKEDEPEND = $(CC) -M $(CFLAGS) $< > $(df).d
+MAKEDEPEND = $(CC) -M $(CPPFLAGS) $< > $(df).d
 ifeq ($(strip $(NODEPS)),)
   define DEPENDS
 	if test ! -d $(DEPDIR); then mkdir -p $(DEPDIR); fi; \
@@ -134,7 +134,7 @@ endif
 $(OBJDIR)/%.o: %.c
 	@$(ECHO) "  CXX  " $(RELDIR)$<
 	$(VV)if test ! -d $(OBJDIR); then mkdir -p $(OBJDIR); fi
-	$(V)$(CXX) $(CPPFLAGS) -c -o $@ $<
+	$(V)$(CXX) $(CXXFLAGS) -c -o $@ $<
 	$(VV)$(DEPENDS)
 
 # Rule to link an executable
