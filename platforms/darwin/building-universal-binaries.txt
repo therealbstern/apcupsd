@@ -29,8 +29,8 @@ apcupsd:
        CXXFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc -mmacosx-version-min=10.4" \
        ./configure --enable-usb --enable-snmp 
 
-   make NODEPS=1
+   make
 
    # Optional steps to build install package
    cd platforms/darwin
-   make apcupsd.pkg
+   sudo make apcupsd.pkg
