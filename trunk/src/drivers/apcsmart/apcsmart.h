@@ -43,6 +43,7 @@ public:
    // We provide default do-nothing implementations
    // for these methods since not all drivers need them.
    virtual bool KillPower();
+   virtual bool Shutdown();
    virtual bool Setup();
    virtual bool ProgramEeprom(int command, const char *data);
    virtual bool EntryPoint(int command, void *data);
@@ -52,8 +53,13 @@ private:
    static SelfTestResult decode_testresult(char* str);
    static LastXferCause decode_lastxfer(char *str);
 
+   bool ShutdownWithDelay(int shutdown_delay);
+   int GetShutdownDelay();
+   void WarnShutdown(int shutdown_delay);
+
    int apc_enable();
    char *smart_poll(char cmd);
+   int writechar(char a) {return write(_ups->fd, &a, 1);}
    int getline(char *s, int len);
    void UPSlinkCheck();
 
