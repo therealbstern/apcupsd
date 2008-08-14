@@ -64,7 +64,8 @@ extern int update_battery_date;
 extern int debug_level;
 extern int rename_ups;
 extern int terminate_on_powerfail;
-extern int kill_ups_power;
+extern int hibernate_ups;
+extern int shutdown_ups;
 extern int dumb_mode_test;
 extern int go_background;
 
@@ -86,7 +87,8 @@ extern void make_pid(void);
 /* In apcdevice.c */
 void setup_device(UPSINFO *ups);
 extern void setup_serial(UPSINFO *ups);
-extern void kill_power(UPSINFO *ups);
+extern void initiate_hibernate(UPSINFO *ups);
+extern void initiate_shutdown(UPSINFO *ups);
 extern void save_dumb_status(UPSINFO *ups);
 extern int check_serial(UPSINFO *ups);
 extern void prep_device(UPSINFO *ups);

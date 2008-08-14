@@ -26,7 +26,7 @@
 
 #include "apc.h"
 
-static const char *const shortoptions = "b?RtTVf:d:pP:k";
+static const char *const shortoptions = "b?RtTVf:d:pP:ks";
 
 enum {
    OPT_NOARG,
@@ -34,7 +34,8 @@ enum {
    OPT_VERSION,
    OPT_CFGFILE,
    OPT_DEBUG,
-   OPT_KILLPWR,
+   OPT_HIBERNATE,
+   OPT_SHUTDOWN,
    OPT_TERMONPWRFAIL,
    OPT_KILLONPWRFAIL,
    OPT_PIDFILE
@@ -45,7 +46,9 @@ static const struct option longoptions[] = {
    {"version",             no_argument,       NULL, OPT_VERSION},
    {"config-file",         required_argument, NULL, OPT_CFGFILE},
    {"debug",               required_argument, NULL, OPT_DEBUG},
-   {"killpower",           no_argument,       NULL, OPT_KILLPWR},
+   {"killpower",           no_argument,       NULL, OPT_HIBERNATE},
+   {"hibernate",           no_argument,       NULL, OPT_HIBERNATE},
+   {"shutdown",            no_argument,       NULL, OPT_SHUTDOWN},
    {"term-on-powerfail",   no_argument,       NULL, OPT_TERMONPWRFAIL},
    {"kill-on-powerfail",   no_argument,       NULL, OPT_KILLONPWRFAIL},
    {"pid-file",            required_argument, NULL, OPT_PIDFILE},
@@ -66,16 +69,17 @@ static void print_usage(char *argv[])
 {
    printf(_("usage: apcupsd [options]\n"
          "  Options are as follows:\n"
-         "  -b,                       don't go into background\n"
-         "  -d, --debug <level>       set debug level (>0)\n"
-         "  -f, --config-file <file>  load specified config file\n"
-         "  -k, --killpower           attempt to power down UPS [*]\n"
-         "  -p, --kill-on-powerfail   power down UPS on powerfail\n"
-         "  -R,                       put SmartUPS into dumb mode\n"
-         "  -t, --term-on-powerfail   terminate when battery power fails\n"
-         "  -T                        send debug to ./apcupsd.trace\n"
-         "  -V, --version             display version info\n"
-         "  -?, --help                display this help\n"
+         "  -b,                           don't go into background\n"
+         "  -d, --debug <level>           set debug level (>0)\n"
+         "  -f, --config-file <file>      load specified config file\n"
+         "  -k, --killpower, --hibernate  put UPS into hibernation mode [*]\n"
+         "  -s, --shutdown                turn off UPS completely [*]\n"
+         "  -p, --kill-on-powerfail       hibernate UPS on powerfail\n"
+         "  -R,                           put SmartUPS into dumb mode\n"
+         "  -t, --term-on-powerfail       terminate when battery power fails\n"
+         "  -T                            send debug to ./apcupsd.trace\n"
+         "  -V, --version                 display version info\n"
+         "  -?, --help                    display this help\n"
          "\n"
          "  [*] Only one parameter of this kind and apcupsd must not already be running.\n"
          "\n"
@@ -168,8 +172,13 @@ int parse_options(int argc, char *argv[])
          trace = true;
          break;
       case 'k':
-      case OPT_KILLPWR:
-         kill_ups_power = TRUE;
+      case OPT_HIBERNATE:
+         hibernate_ups = TRUE;
+         oneshot = TRUE;
+         break;
+      case 's':
+      case OPT_SHUTDOWN:
+         shutdown_ups = TRUE;
          oneshot = TRUE;
          break;
       case '?':

@@ -264,7 +264,7 @@ int main(int argc, char *argv[])
    ups->start_time = time(NULL);
    delete_lockfile(ups);
 
-   if (!kill_ups_power && go_background) {
+   if (!hibernate_ups && !shutdown_ups && go_background) {
       daemon_start();
 
       /* Reopen log file, closed during becoming daemon */
@@ -274,8 +274,8 @@ int main(int argc, char *argv[])
    make_pid_file();
    init_signals(apcupsd_terminate);
 
-   /* Create temp events file if we are not doing a killpower */
-   if (!kill_ups_power && ups->eventfile[0] != 0) {
+   /* Create temp events file if we are not doing a hibernate or shutdown */
+   if (!hibernate_ups && !shutdown_ups && ups->eventfile[0] != 0) {
       ups->event_fd = open(ups->eventfile, O_RDWR | O_CREAT | O_APPEND, 0644);
       if (ups->event_fd < 0) {
          log_event(ups, LOG_WARNING, "Could not open events file %s: %s\n",
@@ -285,8 +285,13 @@ int main(int argc, char *argv[])
 
    setup_device(ups);
 
-   if (kill_ups_power) {
-      kill_power(ups);
+   if (hibernate_ups) {
+      initiate_hibernate(ups);
+      apcupsd_terminate(0);
+   }
+   
+   if (shutdown_ups) {
+      initiate_shutdown(ups);
       apcupsd_terminate(0);
    }
 

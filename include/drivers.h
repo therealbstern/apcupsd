@@ -51,6 +51,7 @@ public:
    // We provide default do-nothing implementations
    // for these methods since not all drivers need them.
    virtual bool KillPower()                                  { return false; }
+   virtual bool Shutdown()                                   { return false; }
    virtual bool Setup()                                      { return true;  }
    virtual bool ProgramEeprom(int command, const char *data) { return false; }
    virtual bool EntryPoint(int command, void *data)          { return false; }
@@ -83,7 +84,11 @@ protected:
  *   This function always returns.
  *
  * kill_power()
- *   Kills the UPS power.
+ *   Put the UPS into hibernation mode, killing output power.
+ *   This function always returns.
+ *
+ * shutdown()
+ *   Turn off the UPS completely.
  *   This function always returns.
  *
  * read_ups_static_data()
@@ -138,6 +143,10 @@ protected:
 #define device_kill_power(ups) \
    do { \
       if (ups->driver) ups->driver->KillPower(); \
+   } while(0)
+#define device_shutdown(ups) \
+   do { \
+      if (ups->driver) ups->driver->Shutdown(); \
    } while(0)
 #define device_read_static_data(ups) \
    do { \

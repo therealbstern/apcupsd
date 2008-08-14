@@ -33,6 +33,7 @@
  *    device_setup(ups)
  *    device_close(ups)
  *    device_kill_power(ups)
+ *    device_shutdown(ups)
  *    device_read_static_data(ups)
  *    device_read_volatile_data(ups)
  *    device_get_capabilities(ups) 
@@ -75,7 +76,7 @@ void setup_device(UPSINFO *ups)
 }
 
 /*********************************************************************/
-void kill_power(UPSINFO *ups)
+void initiate_hibernate(UPSINFO *ups)
 {
    FILE *pwdf;
    int killcount;
@@ -163,6 +164,13 @@ void kill_power(UPSINFO *ups)
          device_kill_power(ups);
       }
    }
+}
+
+/*********************************************************************/
+void initiate_shutdown(UPSINFO *ups)
+{
+   log_event(ups, LOG_WARNING, _("Attempting to shutdown the UPS!"));
+   device_shutdown(ups);
 }
 
 #if 0

@@ -221,7 +221,7 @@ static void do_shutdown(UPSINFO *ups, int cmdtype)
        * the shutdown command is given (the execute_command below).
        */
       if (kill_on_powerfail)
-         kill_power(ups);
+         initiate_hibernate(ups);
    }
 
    /* Now execute the shutdown command */

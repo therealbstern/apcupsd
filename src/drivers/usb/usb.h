@@ -46,6 +46,7 @@ public:
 
    // Optional methods
    virtual bool KillPower();
+   virtual bool Shutdown();
    virtual bool EntryPoint(int command, void *data);
 
 protected:
