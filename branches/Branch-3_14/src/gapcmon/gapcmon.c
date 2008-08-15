@@ -2543,6 +2543,21 @@ static GIOChannel *sknet_net_open (PSKCOMM psk)
     return NULL;
   }
 
+  {
+  struct timeval tv;
+  int rcx = 0;
+  tv.tv_sec = 0;
+  tv.tv_usec = 200;
+  
+  rcx = setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO | SO_SNDTIMEO, 
+                   &tv, (socklen_t) sizeof(struct timeval));
+   if (rcx == -1) {
+       sknet_util_log_msg ("sknet_net_open", "setsockopt(200ms) failed!",
+                       (gchar *) g_strerror (errno));
+   }
+  
+  }
+  
   /* connect to server */
   if ((connect (sockfd, (struct sockaddr *) tcp_serv_addr, sizeof (struct sockaddr_in))) == -1)
   {
