@@ -26,7 +26,7 @@
 
 #include "apc.h"
 
-static const char *const shortoptions = "b?RtTVf:d:pP:k";
+static const char *const shortoptions = "bhRtTVf:d:pP:k";
 
 enum {
    OPT_NOARG,
@@ -75,7 +75,7 @@ static void print_usage(char *argv[])
          "  -t, --term-on-powerfail   terminate when battery power fails\n"
          "  -T                        send debug to ./apcupsd.trace\n"
          "  -V, --version             display version info\n"
-         "  -?, --help                display this help\n"
+         "  -h, --help                display this help\n"
          "\n"
          "  [*] Only one parameter of this kind and apcupsd must not already be running.\n"
          "\n"
@@ -172,7 +172,7 @@ int parse_options(int argc, char *argv[])
          kill_ups_power = TRUE;
          oneshot = TRUE;
          break;
-      case '?':
+      case 'h':
       case OPT_HELP:
       default:
          errflag++;
