@@ -458,8 +458,6 @@ int main(int argc, char *argv[])
       apctest_terminate(0);
    }
 
-   make_pid_file();
-
    init_signals(apctest_terminate);
 
    if (ups->fd != -1) {
