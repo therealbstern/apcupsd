@@ -146,6 +146,6 @@ ACKNOWLEDGMENTS & CONTRIBUTORS
  Thanks is also due to Wesley Terrell for maintaining
  the Debian packages.
 
- Thanks to Jason Hale for maintaining the BSD packages
+ Thanks to Jason Hale for maintaining the FreeBSD packages
  and two key patches; transparency support of KDE for
  systray icons, and sockaddr_in include guidance.
