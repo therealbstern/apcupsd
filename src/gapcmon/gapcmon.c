@@ -74,6 +74,7 @@
 #include <unistd.h>             /* close() */
 #include <sys/types.h>          /* socket() */
 #include <sys/socket.h>         /* socket() */
+#include <netinet/in.h>         /* sockaddr_in */
 #include <arpa/inet.h>          /* ntohs() */
 #include <netinet/in.h>         /* sockaddr_in */
 #include <netdb.h>              /* gethostbyname() */
