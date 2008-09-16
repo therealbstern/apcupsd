@@ -1,6 +1,6 @@
 gapcmon (0.9.0) stable; urgency=normal
 * Mon Sep 15 2008 James Scott, Jr. <skoona@users.sourceforge.net>
-- Housekeeping, applying maintainer patches for BSD & KDE effects
+- Housekeeping, applying maintainer patches for FreeBSD & KDE effects
 - eggtrayicon.c transparency patches by Jason Hale (bsdkaffee)
 - gapcmon.c sockaddr_in include patch by Jason Hale (bsdkaffee)
 
