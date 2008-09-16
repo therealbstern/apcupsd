@@ -2548,7 +2548,7 @@ static GIOChannel *sknet_net_open (PSKCOMM psk)
   struct timeval tv;
   int rcx = 0;
   tv.tv_sec = 0;
-  tv.tv_usec = 200;
+  tv.tv_usec = 200000;
   
   rcx = setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO | SO_SNDTIMEO, 
                    &tv, (socklen_t) sizeof(struct timeval));
