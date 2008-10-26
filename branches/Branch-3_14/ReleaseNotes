@@ -9,9 +9,22 @@ IF YOU USE THE OLD STYLE MASTER/SLAVE NETWORKING MODE, BE SURE TO READ THE
 3.14.0 RELEASE NOTES BELOW.
 
 
-3.14.5 -- 24 July 2008               (Maintenance Release)
+3.14.5 -- 26 October 2008            (Maintenance Release)
 
 BUG FIXES
+
+  * docs: Document the /refresh switch for apctray.
+
+  * apctest: Do not create pid file. There is little reason for it
+    since apctest is a command-line tool, not a daemon. Plus nothing
+    ever deletes the file so it interferes with apcupsd operation.
+
+  * gapcmon: Network connect timeout fix.
+
+  * Fix a few unsafe uses of sprintf and strcat.
+
+  * Makefile: Fix cgi build on OpenBSD. libgd on OpenBSD requires X_LIBS 
+    for libfreetype and libfontconfig.
 
   * gapcmon: Iconify fixes for KDE
 
