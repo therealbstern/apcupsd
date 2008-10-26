@@ -8,6 +8,147 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2008-10-20 18:19  adk0212
+
+	* src/win32/build-win32-cross-tools:
+
+	Update to nsis-2.40.
+
+2008-10-20 18:18  adk0212
+
+	* doc/latex/manual.tex:
+
+	Document the /refresh switch for apctray.
+
+2008-09-16 00:58  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Corrected the timebase on the sockopts(0 api call.  I intended to
+	set the timeout for two tenths of a second, instead I set it for
+	200 usec.  The results was un-stability and frequently dropped
+	session on my quad-core; dual and single cores didn't seem to be
+	bothered.  Now is it set for 200000 usec as I originally intended.
+
+	James,
+
+2008-09-16 00:34  skoona
+
+	* src/gapcmon/: ChangeLog, README:
+
+	Corrected person references, FreeBSD is the platform Jason Hale
+	maintains
+
+2008-09-16 00:23  skoona
+
+	* src/gapcmon/: ChangeLog, README, eggtrayicon.c, gapcmon.c:
+
+	Applied two patches 1. eggtrayicon.c -- applies background
+	transparency when in systray mode to systray icon.  2. gapcmon.c --
+	Add include for BSD sockaddr_in, no impact on other platforms.
+	Note: Socket timeout timers were shortened in a prior update
+
+	James,
+
+2008-09-10 18:34  adk0212
+
+	* src/apctest.c:
+
+	Do not create pid file in apctest. There is little reason for it
+	since apctest is a command-line tool, not a daemon. Plus nothing
+	ever deletes the file so it interferes with apcupsd operation.
+	Reported by Eddie Atherton <stunnel@attglobal.net>
+
+2008-09-09 17:51  adk0212
+
+	* src/options.c:
+
+	Change -? to -h for the sake of consistency with other software.
+	Contributed by Thomas Pfaff <thomas.arnesen.pfaff@gmail.com>
+
+2008-08-17 11:01  adk0212
+
+	* platforms/darwin/Makefile:
+
+	Work around PackageMaker bug in XCode-2.5.
+
+2008-08-17 10:43  adk0212
+
+	* platforms/darwin/building-universal-binaries.txt:
+
+	Update Darwin universal binary instructions.
+
+2008-08-15 01:24  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Added setsockopt() to sknet_open() to resolve timeout related
+	issue.	I set it to 200ms initially, need to test a bet before
+	releasing.  James,
+
+2008-08-03 16:24  adk0212
+
+	* platforms/darwin/building-universal-binaries.txt:
+
+	A convenient side-effect of the flags split is that deps now work
+	correctly during a universal binary build.
+
+2008-08-03 12:51  adk0212
+
+	* src/cgi/upsfetch.c:
+
+	Fix a few unsafe uses of sprintf and strcat. Although OpenBSD warns
+	about several more, these other instances are demonstrably correct
+	as-written and are therefore unchanged.
+
+2008-08-03 11:13  adk0212
+
+	* platforms/darwin/building-universal-binaries.txt:
+
+	Update Darwin build instructions for CPPFLAGS/CFLAGS/CXXFLAGS
+	split.
+
+2008-08-03 11:00  adk0212
+
+	* src/gapcmon/Makefile:
+
+	gapcmon build fixes for new CPPFLAGS/CFLAGS/CXXFLAGS split.
+
+2008-08-03 10:51  adk0212
+
+	* configure:
+
+	Regen configure script on Linux. OpenBSD autoconf searches for X11
+	differently (and possibly incorrectly).
+
+2008-08-03 10:48  adk0212
+
+	* configure, autoconf/configure.in, autoconf/targets.mak,
+	autoconf/variables.mak.in:
+
+	Fix configure warnings for gd.h by properly splitting compiler
+	flags versus preprocessor flags. CFLAGS=C compiler flags,
+	CXXFLAGS=C++ compiler flags, CPPFLAGS=C preprocessor flags.
+
+2008-08-02 19:13  adk0212
+
+	* configure:
+
+	Regen configure script from configure.in.
+
+2008-08-02 19:11  adk0212
+
+	* autoconf/configure.in, src/cgi/Makefile:
+
+	Fix cgi build on OpenBSD. libgd on OpenBSD requires X_LIBS for
+	libfreetype and libfontconfig.
+
+2008-07-25 10:17  adk0212
+
+	* ChangeLog:
+
+	Update ChangeLog after win32 exit fix.
+
 2008-07-25 09:18  adk0212
 
 	* src/win32/winmain.cpp:
