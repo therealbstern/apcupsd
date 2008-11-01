@@ -8,20 +8,6 @@
 #
 APCPID=@PIDDIR@/apcupsd.pid
 
-if test -f /etc/whitebox-release ; then
-   f=/etc/whitebox-release
-else
-   f=/etc/redhat-release
-fi
-if test `cat $f | grep release |\
-     cut -f 3 -d ' '`x = "Enterprise"x ; then
-   DISTVER="Enterprise "`cat $f | grep release |\
-     cut -f 6 -d ' '`
-else
-   DISTVER=`cat /etc/redhat-release | grep release |\
-     cut -f 5 -d ' '`
-fi
-
 # Source function libarary
 . /etc/rc.d/init.d/functions
 
