@@ -58,7 +58,6 @@
  */
 
 #include "apc.h"
-#include "statemachine.h"
 
 /*
  * myUPS is a structure that need to be defined in _all_ the forked processes.
@@ -264,7 +263,7 @@ int main(int argc, char *argv[])
    ups->start_time = time(NULL);
    delete_lockfile(ups);
 
-   if (!hibernate_ups && !shutdown_ups && go_background) {
+   if (!kill_ups_power && go_background) {
       daemon_start();
 
       /* Reopen log file, closed during becoming daemon */
@@ -274,8 +273,8 @@ int main(int argc, char *argv[])
    make_pid_file();
    init_signals(apcupsd_terminate);
 
-   /* Create temp events file if we are not doing a hibernate or shutdown */
-   if (!hibernate_ups && !shutdown_ups && ups->eventfile[0] != 0) {
+   /* Create temp events file if we are not doing a killpower */
+   if (!kill_ups_power && ups->eventfile[0] != 0) {
       ups->event_fd = open(ups->eventfile, O_RDWR | O_CREAT | O_APPEND, 0644);
       if (ups->event_fd < 0) {
          log_event(ups, LOG_WARNING, "Could not open events file %s: %s\n",
@@ -285,17 +284,12 @@ int main(int argc, char *argv[])
 
    setup_device(ups);
 
-   if (hibernate_ups) {
-      initiate_hibernate(ups);
-      apcupsd_terminate(0);
-   }
-   
-   if (shutdown_ups) {
-      initiate_shutdown(ups);
+   if (kill_ups_power) {
+      kill_power(ups);
       apcupsd_terminate(0);
    }
 
-//   prep_device(ups);
+   prep_device(ups);
 
    if (create_lockfile(ups) == LCKERROR) {
       Error_abort1(_("Failed to reacquire serial port lock file on device %s\n"),
@@ -320,14 +314,8 @@ int main(int argc, char *argv[])
       "apcupsd " APCUPSD_RELEASE " (" ADATE ") " APCUPSD_HOST " startup succeeded");
 
    /* main processing loop */
-//   do_device(ups);
-   UpsStateMachine *sm = new UpsStateMachine(ups);
-   sm->Start();
+   do_device(ups);
 
-   // Need something better, obviously
-   while (1)
-      sleep(10);
-   
    apcupsd_terminate(0);
    return 0;                       /* to keep compiler happy */
 }

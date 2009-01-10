@@ -3,9 +3,9 @@ GAPCMON (a.k.a gapcmon, and gpanel_apcmon)
 	A Gtk2/GLib2 GUI application used to monitor UPS devices controlled
 by the APCUPSD package.  The program uses the NIS interface from apcupsd to
 collect event and status information for display to the end-user.  Because of
-this great interface, this program can be executed on any OS supported machine
+this great (NIS) interface, this program can be executed on any OS supported machine
 and use the network socket interface to connect back to apcupsd.  Of course
-apcupsd must be compiled with nis support (i.e. ./configure --enable-nis ).
+apcupsd must be compiled with NIS support (i.e. ./configure --enable-nis ).
 
 	One program is included for your use in this package; gapcmon is a 
 regular gtk+ application.
@@ -26,9 +26,7 @@ FEATURES:
 		- where state is (online, onbattery, charging, not communicating, no cable)
 	* right click popup menu with "JumpTo" window and "Quit" window menu choices.
     * Chart support popup tooltip for data point under the mouse pointer, showing
-      dataseries name and value.
-    * Chart legend of the colors for each data point can be toggled on or off by
-      clicking anywhere on the chart once.
+      dataseries name, color, time, and value.
     * Configuration of the tcpi/ip hostname, tcp port number, and whether that
       monitor is current enabled is provided via a central Preferences page.
 	* background thread for all network io to keep user interface responsive.
@@ -59,6 +57,9 @@ FEATURES:
 			* configuration page allows user to specify the hostname, port, and 
 			  refresh interval in seconds of the server/workstation running 
 			  apcupsd with NIS configured.
+		- Graph Properties
+			* Alloww user to choose the color of each data series used in the
+ 			  History graph on monitor windows.
 		- Glossary
 			* Quick help text
 		- About 
@@ -66,12 +67,9 @@ FEATURES:
 
 REQUIREMENTS:
 
-	Gtk2/Glib-2.4 runtime support. (Created on Fedora Core 4)
+	Gtk2/Glib-2.4 runtime support. 
 	APCUPSD installed and configured to NIS support.
 		{ get at http://apcupsd.sourceforge.net  }
-		
-	X11 and openGL libraries: used for history line graph
-		{ comes with X }
 
 	* the following packages may need to be installed to build program and
 	  for runtime of binaries on some platforms.
@@ -79,7 +77,6 @@ REQUIREMENTS:
 	gapcmon			{gtk version 2.4 is minimum package level required}
 		glib-devel  
 		gtk-devel
-		X11 Libraries		
 		gconf2
 						 		
 
@@ -88,6 +85,7 @@ DISTRIBUTION METHOD:
 	Source RPM	gapcmon-{version}-{release}.src.rpm
 	Binary RPM	gapcmon-{version}-{release}.i686.rpm
 	Source tar	gapcmon-{version}.tar.bz2
+	Debian Package	gapcmon-{version}.deb  (sometimes available)
 
 INSTALL INFO:
 	Configure Source with 
@@ -114,18 +112,18 @@ INSTRUCTIONS:
 		- be sure to click or unclick enable to activate the selection.
 
 KNOWN BUGS:
- Occasionally a segfault may occur when editing the hostname in the preferences page.
+ NONE: ...
 
 MAILING LIST:
 
- http://sourceforge.net/projects/apcupsd,   choose the 'users mailing list'
- 	apcupsd-users-request@lists.sourceforge.net
- 											
+ http://sourceforge.net/projects/apcupsd,   choose the 'users mailing list' apcupsd-users-request@lists.sourceforge.net
  http://sourceforge.net/projects/gapcmon,   choose the 'Help Forum'
+
 
 WEB SITE:
 
- http://apcupsd.sourceforge.net/  or  http://gapcmon.sourceforge.net/  
+ http://www.apcupsd.com/  or  http://gapcmon.sourceforge.net/  
+
 
 CVS CHECKOUT:
 
@@ -144,5 +142,10 @@ ACKNOWLEDGMENTS & CONTRIBUTORS
 
  Thanks goes to project team creating and 
  maintaining APCUPSD.
+ 
+ Thanks is also due to Wesley Terrell for maintaining
+ the Debian packages.
 
- 	
+ Thanks to Jason Hale for maintaining the FreeBSD packages
+ and two key patches; transparency support of KDE for
+ systray icons, and sockaddr_in include guidance.

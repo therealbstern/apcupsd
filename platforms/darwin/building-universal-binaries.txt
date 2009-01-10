@@ -3,12 +3,12 @@ Building APCUPSD with Universal Binary support on Mac OS X
 - Install Apple DevTools
 - XCode 3 on Leopard builds the binaries ok, but packaging fails due
   to what appears to be a packagemaker bug.
-- XCode 2 works well for both building and packaging. The result will
+- XCode 2.x works well for both building and packaging. The result will
   run on both 10.4 and 10.5.
 - If using XCode 2, be sure to select the MacOSX10.4u (10.4 Universal) 
   SDK when installing
 - Build dependent libraries (libusb) with UB support (see below)
-- Build APCUPSD with NODEPS=1
+- Build APCUPSD 
 - Build install package, if desired
 
 
@@ -17,6 +17,7 @@ libusb:
  
    env CFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
        LDFLAGS="-arch i386 -arch ppc -mmacosx-version-min=10.4" \
+       CPPFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk" \
        CXXFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
        ./configure --disable-dependency-tracking --disable-shared
 
@@ -25,11 +26,13 @@ apcupsd:
  Use these commands (you can customize the --enable-xxx stuff):
  
    env LD="g++ -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc -mmacosx-version-min=10.4" \
+       CPPFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk" \
        CFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc -mmacosx-version-min=10.4" \
+       CXXFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc -mmacosx-version-min=10.4" \
        ./configure --enable-usb --enable-snmp 
 
-   make NODEPS=1
+   make
 
    # Optional steps to build install package
    cd platforms/darwin
-   make apcupsd.pkg
+   sudo make apcupsd.pkg

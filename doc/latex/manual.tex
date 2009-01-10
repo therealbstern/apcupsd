@@ -5593,6 +5593,16 @@ apctray to not start by default. Using "/add" to create a new monitor
 will enable automatic startup again. To close a monitor temporarily,
 right-click the tray icon and choose "Close this instance".
 
+apctray also aupports the "/refresh" switch which allows you to specify
+the interval (in seconds) at which apctray will poll the apcupsd NIS for
+status. If you do not specify "/refresh", the default is 1 second. For 
+example, this command will add a monitor configured to refresh every 15 
+seconds:
+
+\begin{verbatim}
+     apctray /host myserver /refresh 15 /add
+\end{verbatim}
+
 apctray can be installed standalone (without apcupsd) if you wish to use
 it only to monitor remote apcupsd instances. This can be convenient for
 keeping an eye on a room full of UPSes from your desktop. Download and

@@ -34,17 +34,11 @@ ifneq ($(strip $(RELDIR)),)
   RELDIR := $(RELDIR)/
 endif
 
-# Strip extensions
-STRIPEXT = $(foreach file,$(1),$(basename $(file)))
-
 # Convert a list of sources to a list of objects in OBJDIR
-SRC2OBJ = $(foreach obj,$(call STRIPEXT,$(1)),$(dir $(obj))$(OBJDIR)/$(notdir $(obj)).o)
+SRC2OBJ = $(foreach obj,$(1:.c=.o),$(dir $(obj))$(OBJDIR)/$(notdir $(obj)))
 
 # All objects, derived from all sources
 OBJS = $(call SRC2OBJ,$(SRCS))
-
-# Dependency files, derived from all sources
-DEPS = $(foreach dep,$(call STRIPEXT,$(SRCS)),$(DEPDIR)/$(dep).P)
 
 # Default target: Build all subdirs, then reinvoke make to build local 
 # targets. This is a little gross, but necessary to force make to build 
@@ -121,7 +115,7 @@ define ECHO_N
 endef
 
 # How to build dependencies
-MAKEDEPEND = $(CC) -M $(CFLAGS) $< > $(df).d
+MAKEDEPEND = $(CC) -M $(CPPFLAGS) $< > $(df).d
 ifeq ($(strip $(NODEPS)),)
   define DEPENDS
 	if test ! -d $(DEPDIR); then mkdir -p $(DEPDIR); fi; \
@@ -140,14 +134,7 @@ endif
 $(OBJDIR)/%.o: %.c
 	@$(ECHO) "  CXX  " $(RELDIR)$<
 	$(VV)if test ! -d $(OBJDIR); then mkdir -p $(OBJDIR); fi
-	$(V)$(CXX) $(CPPFLAGS) -c -o $@ $<
-	$(VV)$(DEPENDS)
-
-# Rule to build *.o from *.cpp and generate dependencies for it
-$(OBJDIR)/%.o: %.cpp
-	@$(ECHO) "  CXX  " $(RELDIR)$<
-	$(VV)if test ! -d $(OBJDIR); then mkdir -p $(OBJDIR); fi
-	$(V)$(CXX) $(CPPFLAGS) -c -o $@ $<
+	$(V)$(CXX) $(CXXFLAGS) -c -o $@ $<
 	$(VV)$(DEPENDS)
 
 # Rule to link an executable
@@ -243,3 +230,4 @@ define CHKCFG
     $(if $(wildcard $(2)),$(V)$(CHKCONFIG) --$(1) apcupsd)
 endef
 endif
+

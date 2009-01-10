@@ -149,8 +149,7 @@ static int check_stale_lockfile(UPSINFO *ups)
 /* 
  * Create serial port lock file   
  */
-int hibernate_ups = FALSE;
-int shutdown_ups = FALSE;
+int kill_ups_power = FALSE;
 int create_lockfile(UPSINFO *ups)
 {
 #if !defined(HAVE_WIN32)
@@ -158,11 +157,11 @@ int create_lockfile(UPSINFO *ups)
    int error;
 
    /*
-    * If this is a hibernate or shutdown execution, we are
-    * probably running with the filesystems read-only, so
-    * don't try to create the lock file. 
+    * If this is a powerkill execution, we are probably running
+    * with the filesystems read-only, so don't try to create
+    * the lock file. 
     */
-   if (hibernate_ups || shutdown_ups)
+   if (kill_ups_power)
       return LCKSUCCESS;
 
    switch (error = check_stale_lockfile(ups)) {

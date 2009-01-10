@@ -33,7 +33,6 @@
  *    device_setup(ups)
  *    device_close(ups)
  *    device_kill_power(ups)
- *    device_shutdown(ups)
  *    device_read_static_data(ups)
  *    device_read_volatile_data(ups)
  *    device_get_capabilities(ups) 
@@ -47,7 +46,7 @@
 #include "apc.h"
 
 /* Forward referenced function */
-//static int device_wait_time(UPSINFO *ups);
+static int device_wait_time(UPSINFO *ups);
 
 /*********************************************************************/
 void setup_device(UPSINFO *ups)
@@ -71,12 +70,12 @@ void setup_device(UPSINFO *ups)
                      "  please stop it and run this program again.\n"));
    }
 
-//   device_setup(ups);
-//   device_get_capabilities(ups);
+   device_setup(ups);
+   device_get_capabilities(ups);
 }
 
 /*********************************************************************/
-void initiate_hibernate(UPSINFO *ups)
+void kill_power(UPSINFO *ups)
 {
    FILE *pwdf;
    int killcount;
@@ -166,14 +165,6 @@ void initiate_hibernate(UPSINFO *ups)
    }
 }
 
-/*********************************************************************/
-void initiate_shutdown(UPSINFO *ups)
-{
-   log_event(ups, LOG_WARNING, _("Attempting to shutdown the UPS!"));
-   device_shutdown(ups);
-}
-
-#if 0
 /*
  * After the device is initialized, we come here
  * to read all the information we can about the UPS.
@@ -278,4 +269,3 @@ static int device_wait_time(UPSINFO *ups)
 
    return wait_time;
 }
-#endif

@@ -8,6 +8,420 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2008-11-10 19:14  adk0212
+
+	* examples/nagios_plugin_check_apcupsd.c:
+
+	Compile fixes for nagios plugin.  Contributed by Ronald J. Yacketta
+	<yacketrj@potsdam.edu>
+
+2008-11-01 11:03  adk0212
+
+	* platforms/redhat/apcupsd.in:
+
+	Remove unused DISTVER code.  Contributed by Miloň Papežík
+	<mmp@secure-it.cz>
+
+2008-10-26 10:25  adk0212
+
+	* ChangeLog, ReleaseNotes, include/version.h:
+
+	Prep for 3.14.5 release (again)
+
+2008-10-20 18:19  adk0212
+
+	* src/win32/build-win32-cross-tools:
+
+	Update to nsis-2.40.
+
+2008-10-20 18:18  adk0212
+
+	* doc/latex/manual.tex:
+
+	Document the /refresh switch for apctray.
+
+2008-09-16 00:58  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Corrected the timebase on the sockopts(0 api call.  I intended to
+	set the timeout for two tenths of a second, instead I set it for
+	200 usec.  The results was un-stability and frequently dropped
+	session on my quad-core; dual and single cores didn't seem to be
+	bothered.  Now is it set for 200000 usec as I originally intended.
+
+	James,
+
+2008-09-16 00:34  skoona
+
+	* src/gapcmon/: ChangeLog, README:
+
+	Corrected person references, FreeBSD is the platform Jason Hale
+	maintains
+
+2008-09-16 00:23  skoona
+
+	* src/gapcmon/: ChangeLog, README, eggtrayicon.c, gapcmon.c:
+
+	Applied two patches 1. eggtrayicon.c -- applies background
+	transparency when in systray mode to systray icon.  2. gapcmon.c --
+	Add include for BSD sockaddr_in, no impact on other platforms.
+	Note: Socket timeout timers were shortened in a prior update
+
+	James,
+
+2008-09-10 18:34  adk0212
+
+	* src/apctest.c:
+
+	Do not create pid file in apctest. There is little reason for it
+	since apctest is a command-line tool, not a daemon. Plus nothing
+	ever deletes the file so it interferes with apcupsd operation.
+	Reported by Eddie Atherton <stunnel@attglobal.net>
+
+2008-09-09 17:51  adk0212
+
+	* src/options.c:
+
+	Change -? to -h for the sake of consistency with other software.
+	Contributed by Thomas Pfaff <thomas.arnesen.pfaff@gmail.com>
+
+2008-08-17 11:01  adk0212
+
+	* platforms/darwin/Makefile:
+
+	Work around PackageMaker bug in XCode-2.5.
+
+2008-08-17 10:43  adk0212
+
+	* platforms/darwin/building-universal-binaries.txt:
+
+	Update Darwin universal binary instructions.
+
+2008-08-15 01:24  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Added setsockopt() to sknet_open() to resolve timeout related
+	issue.	I set it to 200ms initially, need to test a bet before
+	releasing.  James,
+
+2008-08-03 16:24  adk0212
+
+	* platforms/darwin/building-universal-binaries.txt:
+
+	A convenient side-effect of the flags split is that deps now work
+	correctly during a universal binary build.
+
+2008-08-03 12:51  adk0212
+
+	* src/cgi/upsfetch.c:
+
+	Fix a few unsafe uses of sprintf and strcat. Although OpenBSD warns
+	about several more, these other instances are demonstrably correct
+	as-written and are therefore unchanged.
+
+2008-08-03 11:13  adk0212
+
+	* platforms/darwin/building-universal-binaries.txt:
+
+	Update Darwin build instructions for CPPFLAGS/CFLAGS/CXXFLAGS
+	split.
+
+2008-08-03 11:00  adk0212
+
+	* src/gapcmon/Makefile:
+
+	gapcmon build fixes for new CPPFLAGS/CFLAGS/CXXFLAGS split.
+
+2008-08-03 10:51  adk0212
+
+	* configure:
+
+	Regen configure script on Linux. OpenBSD autoconf searches for X11
+	differently (and possibly incorrectly).
+
+2008-08-03 10:48  adk0212
+
+	* configure, autoconf/configure.in, autoconf/targets.mak,
+	autoconf/variables.mak.in:
+
+	Fix configure warnings for gd.h by properly splitting compiler
+	flags versus preprocessor flags. CFLAGS=C compiler flags,
+	CXXFLAGS=C++ compiler flags, CPPFLAGS=C preprocessor flags.
+
+2008-08-02 19:13  adk0212
+
+	* configure:
+
+	Regen configure script from configure.in.
+
+2008-08-02 19:11  adk0212
+
+	* autoconf/configure.in, src/cgi/Makefile:
+
+	Fix cgi build on OpenBSD. libgd on OpenBSD requires X_LIBS for
+	libfreetype and libfontconfig.
+
+2008-07-25 10:17  adk0212
+
+	* ChangeLog:
+
+	Update ChangeLog after win32 exit fix.
+
+2008-07-25 09:18  adk0212
+
+	* src/win32/winmain.cpp:
+
+	Fix handling of old-style exit requests (WM_QUIT message to hidden
+	window).  Apparently PeekMessage() is not sufficient, so go back to
+	using GetMessage and spawn a separate thread to watch for the
+	global exit event.
+
+2008-07-24 16:29  adk0212
+
+	* ChangeLog, ReleaseNotes, include/version.h:
+
+	Prep for 3.14.5 release.
+
+2008-07-24 16:12  adk0212
+
+	* src/win32/installer/winapcupsd.nsi:
+
+	Save $INSTDIR in registry for future use. Also remove examples/
+	directory from install package since almost nothing in there
+	applies to win32.
+
+2008-07-24 16:10  adk0212
+
+	* examples/: slave.apcupsd.conf, master.apcupsd.conf:
+
+	Remove another obsolete sample config.
+
+2008-07-24 16:08  adk0212
+
+	* examples/: apcupsd.master.conf, apcupsd.slave.conf:
+
+	Remove obsolete configuration examples.
+
+2008-07-12 22:51  skoona
+
+	* src/gapcmon/: ChangeLog, gapcmon.c:
+
+	Update the ChangeLog
+
+2008-07-12 22:32  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Fix two of two: KDE issue, because of the _iconify() api issue,
+	_hide() was chosen.  _ hide() presents a useability issue where its
+	possible hide all windows in such a way that no artifact is visible
+	for you to use to restore a window.
+
+	This is caused by the use of gtk_widget_hide() instead of
+	gtk_window_iconify(); thus the only solution is to remove the close
+	buttons off both the main window and all monitor windows.  Its the
+	close button that presents the active-but-no-window effect.
+
+	Problem Cause: KDE Window Manager Behaviour Changed --
+	gtk_window_iconify() ignored.  Problem Resolved: Removed Close
+	Button from all windows.		   Switched to
+	gtk_widget_hide() to manage window visibility.
+
+	James,
+
+2008-07-12 20:23  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Part two of the kde fix failed.  Icon-mode works fine.	Window mode
+	can find itself without a takslist entry and effecctively invisible
+	with no way to recall the active program.
+
+2008-07-12 15:13  adk0212
+
+	* src/win32/build-win32-cross-tools:
+
+	Update to nsis-2.38
+
+2008-07-12 13:53  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Part two of two parts -- kde iconify fix
+
+2008-07-12 12:54  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Part one of two parts -- kde iconify fix
+
+2008-06-29 11:12  adk0212
+
+	* src/action.c:
+
+	Fix bug in LOWBATT glitch handling. We must examine LOWBATT for
+	changes every time thru the status loop, not just during the
+	OnBattery state.  Otherwise we can miss the initial LOWBATT
+	assertion, which defeats the glitch rejection logic.
+
+2008-06-24 19:24  adk0212
+
+	* autoconf/targets.mak:
+
+	Silly spacing fix.
+
+2008-06-24 19:22  adk0212
+
+	* configure, autoconf/aclocal.m4, autoconf/configure.in,
+	autoconf/targets.mak:
+
+	Fail configure if required tools are not found. Fix targets.mak to
+	reference a few more tools by variable instead of hardcoded name.
+
+2008-06-21 17:04  adk0212
+
+	* src/win32/: Makefile.in, compat/compat.cpp, compat/compat.h,
+	compat/getopt.c, compat/getopt.h, compat/print.cpp,
+	compat/winapi.c, compat/winapi.h:
+
+	Clean up win32 compat. Remove unused functions and files. Remove
+	wide char support. Organize compat.h.
+
+2008-06-21 14:43  adk0212
+
+	* src/win32/: apctray.cpp, winmain.cpp, winups.h, compat/winapi.c,
+	compat/winapi.h:
+
+	Improve apctray multiple instance behavior for /add, /del, and
+	/kill on modern platforms (Win2K and newer). Monitor registry for
+	changes caused by /add and /del and automatically reset when a
+	change is detected. Also ensure /kill will terminate all apctray
+	instances, even those running in other sessions.
+
+2008-06-19 18:23  adk0212
+
+	* src/win32/: winmain.cpp, winservice.cpp, winservice.h, winups.h,
+	compat/winapi.c, compat/winapi.h:
+
+	Support shutting down apcupsd instances running in other sessions
+	(such as terminal services or remote desktop sessions).
+
+2008-06-15 14:11  adk0212
+
+	* autoconf/targets.mak:
+
+	Use 'tr' to strip trailing newline from 'echo' instead of 'echo
+	-n'.
+
+2008-06-15 09:15  adk0212
+
+	* platforms/: yellowdog/Makefile, engarde/Makefile,
+	mandrake/Makefile:
+
+	Update install to use new CHKCFG macro.
+
+2008-06-15 09:10  adk0212
+
+	* platforms/redhat/Makefile:
+
+	Update redhat to use new CHKCFG macro.
+
+2008-06-15 09:04  adk0212
+
+	* src/options.c:
+
+	Fix harmless but annoying compiler warning on suse.
+
+2008-06-15 09:03  adk0212
+
+	* autoconf/targets.mak, autoconf/variables.mak.in,
+	platforms/suse/Makefile:
+
+	Fix 'make install' on suse. Sadly, suse's chkconfig always returns
+	success for --list even when the service does not exist. So we add
+	a more sophisticated chkconfig handler which tests for existence of
+	the init script manually, then invokes chkconfig. The whole thing
+	is hidden behind a macro. Also add CHKCONFIG definition (currently
+	always /sbin/chkconfig) in case we someday encounter a distro that
+	hides it elsewhere.
+
+2008-06-11 07:47  adk0212
+
+	* doc/latex/manual.tex:
+
+	Update PCNET info: minimum password length is 15 chars, default
+	username is 'apc', no known way to change the username.
+
+2008-06-11 07:39  adk0212
+
+	* include/extern.h, src/drivers/pcnet/pcnet.c, src/lib/apclog.c,
+	src/drivers/usb/bsd/hidutils.c, src/drivers/usb/generic/hidutils.c:
+
+	Add a hex dump function and use it from pcnet and usb drivers
+	instead of manually coding ugly loops.
+
+2008-06-11 07:20  adk0212
+
+	* src/drivers/pcnet/packets/: README, packet0.dat, packet1.dat,
+	packet2.dat:
+
+	Add captured packets for testing PCNET driver.
+
+2008-06-09 21:22  adk0212
+
+	* autoconf/targets.mak:
+
+	Use $(ECHO). Important for 'echo -n' on some platforms, and we
+	might as well use it everywhere we use 'echo'. Thanks to Jeremy
+	Daniel <Jeremy.Daniel@brunel.ac.uk> for finding and fixing this on
+	Mac OS X.
+
+2008-06-09 21:16  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Remove conditional HAVE_NISLIB settings. HAVE_NISLIB is set already
+	set unconditionally.
+
+2008-06-01 17:57  adk0212
+
+	* doc/home-page/index.html, platforms/alpha/Makefile,
+	platforms/darwin/Makefile, platforms/debian/Makefile,
+	platforms/engarde/Makefile, platforms/freebsd/Makefile,
+	platforms/gentoo/Makefile, platforms/mandrake/Makefile,
+	platforms/netbsd/Makefile, platforms/openbsd/Makefile,
+	platforms/redhat/Makefile, platforms/slackware/Makefile,
+	platforms/sun/Makefile, platforms/suse/Makefile,
+	platforms/yellowdog/Makefile:
+
+	Fix first install failure on redhat and suse. We were
+	unconditionally running 'chkconfig --del apcupsd' which failed if
+	apcupsd was not already installed. Now we check 'chkconfig --list
+	apcupsd' first to see if chkconfig believes apcupsd is installed.
+	Make same fix in uninstall. Also change most uninstall steps to
+	allow failure. This facilitates the best- effort uninstall of an
+	aborted or otherwise botched install.
+
+2008-05-31 08:42  fleetworks
+
+	* platforms/: redhat/apcupsd.spec.in, suse/apcupsd.spec.in:
+
+	Add restart of daemon on upgrade.
+
+2008-05-25 14:46  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Update for 3.14.4 release.
+
+2008-05-18 14:21  adk0212
+
+	* ChangeLog:
+
+	Update ChangeLog.
+
 2008-05-18 14:18  adk0212
 
 	* platforms/suse/Makefile:
