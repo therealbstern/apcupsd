@@ -8,6 +8,26 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2008-11-10 19:14  adk0212
+
+	* examples/nagios_plugin_check_apcupsd.c:
+
+	Compile fixes for nagios plugin.  Contributed by Ronald J. Yacketta
+	<yacketrj@potsdam.edu>
+
+2008-11-01 11:03  adk0212
+
+	* platforms/redhat/apcupsd.in:
+
+	Remove unused DISTVER code.  Contributed by Miloň Papežík
+	<mmp@secure-it.cz>
+
+2008-10-26 10:25  adk0212
+
+	* ChangeLog, ReleaseNotes, include/version.h:
+
+	Prep for 3.14.5 release (again)
+
 2008-10-20 18:19  adk0212
 
 	* src/win32/build-win32-cross-tools:
