@@ -14,26 +14,21 @@ consumption rates. Apcupsd is licensed under the GPL version 2.
 <p>
 
 <h2>Recent Apcupsd Releases</h2>
-<h3><i><u>Stable:</u></i>&nbsp;3.14.4 (20 May 2008) [
+<h3><i><u>Stable:</u></i>&nbsp;3.14.5 (11 January 2008) [
 <a href="http://sourceforge.net/project/showfiles.php?group_id=54413">Download</a>
 ]</h3>
-3.14.4 fixes several bugs since 3.14.3 and includes a rewrite of the build
-scripts (Makefiles). The build system now has reliable dependencies, support
-for parallel builds, and pretty-printed output. A new apcupsd.conf directive, 
-POLLTIME, has been added to allow tuning of the interval at which apcupsd 
-polls the UPS for status.
-<p>
-Some unmaintained features (powerflute, internationalization, built-in libgd) 
-have been removed in this release. Please see the 
-<a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=600731">
-ReleaseNotes</a> for explanation and rationale.
+3.14.5 fixes several bugs since 3.14.4, the most important of which
+solves an issue with 'make install' on RedHat- and SuSE-based systems. 
+No new features were added in this release. Please see the 
+<a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=653092">
+ReleaseNotes</a> for details.
 <p>
 Apcupsd 3.14.4 is the latest stable release, containing many bug fixes and
 new features over the previous 3.12.x stable series. Users of all previous
 versions are encouraged to upgrade.
 <p>
 <i>If you use the old style master/slave networking mode, be sure to read the
-<a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=600731">
+<a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=653092">
 release notes</a>.</i>
 <p>
 <b><u>New Features in the 3.14.x series:</u></b>
