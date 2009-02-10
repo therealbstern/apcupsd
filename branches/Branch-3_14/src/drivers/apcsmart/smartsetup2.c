@@ -139,7 +139,9 @@ void get_apc_model(UPSINFO *ups)
    }
 
    response[0] = '\0';
+   write_lock(ups);
    astrncpy(response, smart_poll(ups->UPS_Cmd[CI_UPSMODEL], ups), sizeof(response));
+   write_unlock(ups);
 
    if (strlen(response)) {
       cp = get_apc_model_V_codes(response, ups);
@@ -149,7 +151,9 @@ void get_apc_model(UPSINFO *ups)
    }
 
    response[0] = '\0';
+   write_lock(ups);
    astrncpy(response, smart_poll(ups->UPS_Cmd[CI_REVNO], ups), sizeof(response));
+   write_unlock(ups);
 
    if (strlen(response)) {
       fprintf(stderr, "\n%s: 'b' %s", argvalue,
@@ -167,6 +171,8 @@ int apcsmart_ups_get_capabilities(UPSINFO *ups)
    char answer[1000];              /* keep this big to handle big string */
    char caps[1000], *cmds, *p;
    int i;
+
+   write_lock(ups);
 
    /* Get UPS capabilities string */
    astrncpy(caps, smart_poll(ups->UPS_Cmd[CI_UPS_CAPS], ups), sizeof(caps));
@@ -206,6 +212,8 @@ int apcsmart_ups_get_capabilities(UPSINFO *ups)
          }
       }
    }
+
+   write_unlock(ups);
 
    return 1;
 }
