@@ -592,9 +592,9 @@ int apcsmart_ups_read_volatile_data(UPSINFO *ups)
       ups->LastSTTime = atof(answer);
    }
 
-   write_unlock(ups);
-
    apc_enable(ups);                /* reenable APC serial UPS */
+
+   write_unlock(ups);
 
    return SUCCESS;
 }
