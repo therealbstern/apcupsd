@@ -649,7 +649,7 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
    struct hiddev_report_info rinfo;
    struct hiddev_field_info finfo;
    struct hiddev_usage_ref uref;
-   int i, j, k, n;
+   unsigned int i, j, k, n;
 
    if (ioctl(my_data->fd, HIDIOCINITREPORT, 0) < 0)
       Error_abort1("Cannot init USB HID report. ERR=%s\n", strerror(errno));
@@ -660,12 +660,12 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
     * Walk through all available reports and determine
     * what information we can use.
     */
-   for (n = 0; n < (int)sizeof(rtype); n++) {
+   for (n = 0; n < sizeof(rtype)/sizeof(*rtype); n++) {
       rinfo.report_type = rtype[n];
       rinfo.report_id = HID_REPORT_ID_FIRST;
 
       while (ioctl(my_data->fd, HIDIOCGREPORTINFO, &rinfo) >= 0) {
-         for (i = 0; i < (int)rinfo.num_fields; i++) {
+         for (i = 0; i < rinfo.num_fields; i++) {
             memset(&finfo, 0, sizeof(finfo));
             finfo.report_type = rinfo.report_type;
             finfo.report_id = rinfo.report_id;
@@ -675,7 +675,7 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
                continue;
 
             memset(&uref, 0, sizeof(uref));
-            for (j = 0; j < (int)finfo.maxusage; j++) {
+            for (j = 0; j < finfo.maxusage; j++) {
                uref.report_type = finfo.report_type;
                uref.report_id = finfo.report_id;
                uref.field_index = i;
