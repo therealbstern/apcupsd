@@ -86,10 +86,10 @@ int main(int argc, char **argv)
    }
 
    if (argc > 2) {                 /* assume host:port */
-      char *p;
+      char *p = argv[2];
 
-      host = argv[2];
-      p = strchr(host, ':');
+      host = p;
+      p = strchr(p, ':');
       if (p) {
          *p++ = 0;
          port = atoi(p);
