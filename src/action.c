@@ -219,7 +219,7 @@ static void do_shutdown(UPSINFO *ups, int cmdtype)
        * the shutdown command is given (the execute_command below).
        */
       if (kill_on_powerfail)
-         kill_power(ups);
+         initiate_hibernate(ups);
    }
 
    /* Now execute the shutdown command */
@@ -482,7 +482,7 @@ void do_action(UPSINFO *ups)
       if (ups->is_shutdown()) {
          if (ups->killdelay && now - ups->ShutDown >= ups->killdelay) {
             if (!ups->is_slave())
-               kill_power(ups);
+               initiate_hibernate(ups);
             ups->ShutDown = now;   /* wait a bit before doing again */
             ups->set_shutdown();
          }

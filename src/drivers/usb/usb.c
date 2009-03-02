@@ -895,15 +895,15 @@ int usb_ups_read_static_data(UPSINFO *ups)
 int usb_ups_kill_power(UPSINFO *ups)
 {
    const char *func;
-   int shutdown = 0;
+   int hibernate = 0;
    int val;
 
    Dmsg0(200, "Enter usb_ups_kill_power\n");
 
    /*
-    * We try various different ways to shutdown the UPS (i.e.
-    * killpower). Some of these commands are not supported on all 
-    * UPSes, but that should cause no harm.
+    * We try various different ways to put the UPS into hibernation
+    * mode (i.e. killpower). Some of these commands are not supported
+    * on all UPSes, but that should cause no harm.
     */
 
    /*
@@ -1004,24 +1004,24 @@ int usb_ups_kill_power(UPSINFO *ups)
    }
 
    /*
-    * BackUPS shutdown
+    * BackUPS hibernate
     *
     * Alternately, if APCDelayBeforeShutdown is available, setting 
     * it will start a countdown after which the UPS will hibernate.
     */
-   if (!shutdown && UPS_HAS_CAP(CI_APCDelayBeforeShutdown)) {
-      Dmsg0(000, "UPS appears to support BackUPS style shutdown.\n");
+   if (!hibernate && UPS_HAS_CAP(CI_APCDelayBeforeShutdown)) {
+      Dmsg0(000, "UPS appears to support BackUPS style hibernate.\n");
       func = "CI_APCDelayBeforeShutdown";
       if (!usb_write_int_to_ups(ups, CI_APCDelayBeforeShutdown,
             SHUTDOWN_DELAY, func)) {
          Dmsg1(000, "Kill power function \"%s\" failed.\n", func);
       } else {
-         shutdown = 1;
+         hibernate = 1;
       }
    }
 
    /*
-    * SmartUPS shutdown
+    * SmartUPS hibernate
     *
     * If both DWAKE and DelayBeforeShutdown are available, trigger
     * a hibernate by writing DWAKE a few seconds longer than 
@@ -1029,8 +1029,8 @@ int usb_ups_kill_power(UPSINFO *ups)
     * DelayBeforeShutdown starts both timers ticking down and the
     * UPS will hibernate when DelayBeforeShutdown hits zero.
     */
-   if (!shutdown && UPS_HAS_CAP(CI_DWAKE) && UPS_HAS_CAP(CI_DelayBeforeShutdown)) {
-      Dmsg0(000, "UPS appears to support SmartUPS style shutdown.\n");
+   if (!hibernate && UPS_HAS_CAP(CI_DWAKE) && UPS_HAS_CAP(CI_DelayBeforeShutdown)) {
+      Dmsg0(000, "UPS appears to support SmartUPS style hibernate.\n");
       func = "CI_DWAKE";
       if (!usb_write_int_to_ups(ups, CI_DWAKE, SHUTDOWN_DELAY + 4, func)) {
          Dmsg1(000, "Kill power function \"%s\" failed.\n", func);
@@ -1042,7 +1042,7 @@ int usb_ups_kill_power(UPSINFO *ups)
             /* reset prev timer */
             usb_write_int_to_ups(ups, CI_DWAKE, -1, "CI_DWAKE");  
          } else {
-            shutdown = 1;
+            hibernate = 1;
          }
       }
    }
@@ -1059,8 +1059,8 @@ int usb_ups_kill_power(UPSINFO *ups)
     * Credit goes to John Zielinski <grim@undead.cc> for figuring 
     * this out.
     */
-   if (!shutdown && UPS_HAS_CAP(CI_BUPHibernate) && UPS_HAS_CAP(CI_BUPSelfTest)) {
-      Dmsg0(000, "UPS appears to support BackUPS Pro style shutdown.\n");
+   if (!hibernate && UPS_HAS_CAP(CI_BUPHibernate) && UPS_HAS_CAP(CI_BUPSelfTest)) {
+      Dmsg0(000, "UPS appears to support BackUPS Pro style hibernate.\n");
       func = "CI_BUPHibernate";
       if (!pusb_write_int_to_ups(ups, CI_BUPHibernate, 1, func)) {
          Dmsg1(000, "Kill power function \"%s\" failed.\n", func);
@@ -1070,14 +1070,14 @@ int usb_ups_kill_power(UPSINFO *ups)
             Dmsg1(000, "Kill power function \"%s\" failed.\n", func);
             pusb_write_int_to_ups(ups, CI_BUPHibernate, 0, "CI_BUPHibernate");
          } else {
-            shutdown = 1;
+            hibernate = 1;
          }
       }
    }
 
    /*
     * All UPSes tested so far are covered by one of the above cases. 
-    * However, there are a couple other ways to shutdown.
+    * However, there are a some other ways to hibernate.
     */
 
    /*
@@ -1092,14 +1092,14 @@ int usb_ups_kill_power(UPSINFO *ups)
     * behavior described here DOES NOT comply with the standard set
     * out in the HID Usage Tables for Power Devices spec. 
     */
-   if (!shutdown && UPS_HAS_CAP(CI_DelayBeforeReboot)) {
-      Dmsg0(000, "UPS appears to support DelayBeforeReboot style shutdown.\n");
+   if (!hibernate && UPS_HAS_CAP(CI_DelayBeforeReboot)) {
+      Dmsg0(000, "UPS appears to support DelayBeforeReboot style hibernate.\n");
 
       func = "CI_DelayBeforeReboot";
       if (!usb_write_int_to_ups(ups, CI_DelayBeforeReboot, SHUTDOWN_DELAY, func))
          Dmsg1(000, "Kill power function \"%s\" failed.\n", func);
       else
-         shutdown = 1;
+         hibernate = 1;
    }
 
    /*
@@ -1111,22 +1111,38 @@ int usb_ups_kill_power(UPSINFO *ups)
     * BackUPS models support this in addition to the preferred 
     * BackUPS method above. It's included here "just in case".
     */
-   if (!shutdown && UPS_HAS_CAP(CI_APCForceShutdown)) {
-      Dmsg0(000, "UPS appears to support ForceShutdown style shutdown.\n");
+   if (!hibernate && UPS_HAS_CAP(CI_APCForceShutdown)) {
+      Dmsg0(000, "UPS appears to support ForceShutdown style hibernate.\n");
 
       func = "CI_APCForceShutdown";
       if (!usb_write_int_to_ups(ups, CI_APCForceShutdown, 1, func))
          Dmsg1(000, "Kill power function \"%s\" failed.\n", func);
       else
-         shutdown = 1;
+         hibernate = 1;
    }
 
+   if (!hibernate) {
+      Dmsg0(000, "Couldn't put UPS into hibernation mode. Attempting shutdown.\n");
+      hibernate = usb_ups_shutdown(ups);
+   }
+
+   Dmsg0(200, "Leave usb_ups_kill_power\n");
+   return hibernate;
+}
+
+int usb_ups_shutdown(UPSINFO *ups)
+{
+   const char *func;
+   int shutdown = 0;
+
+   Dmsg0(200, "Enter usb_ups_shutdown\n");
+
    /*
-    * Misc method C
+    * Complete shutdown
     *
-    * This one seems to turn the UPS off completely after a given 
-    * delay. The only way to power the UPS back on is to manually hit
-    * the power button.
+    * This method turns off the UPS off completely after a given delay. 
+    * The only way to power the UPS back on is to manually hit the
+    * power button.
     */
    if (!shutdown && UPS_HAS_CAP(CI_DelayBeforeShutdown)) {
       Dmsg0(000, "UPS appears to support DelayBeforeShutdown style shutdown.\n");
@@ -1163,10 +1179,9 @@ int usb_ups_kill_power(UPSINFO *ups)
     *     server to the UPS.
     */
 
-   Dmsg0(200, "Leave usb_ups_kill_power\n");
+   Dmsg0(200, "Leave usb_ups_shutdown\n");
    return shutdown;
 }
-
 
 /*
  * Helper functions for use by platform specific code

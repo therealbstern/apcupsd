@@ -157,6 +157,11 @@ char *smart_poll(char cmd, UPSINFO *ups)
    return answer;
 }
 
+int writechar(char a, UPSINFO *ups)
+{
+  return write(ups->fd, &a, 1);
+}
+
 /*
  * If s == NULL we are just waiting on FD for status changes.
  * If s != NULL we are asking the UPS to tell us the value of something.

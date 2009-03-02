@@ -36,6 +36,7 @@ extern int usb_ups_get_capabilities(UPSINFO *ups);
 extern int usb_ups_read_volatile_data(UPSINFO *ups);
 extern int usb_ups_read_static_data(UPSINFO *ups);
 extern int usb_ups_kill_power(UPSINFO *ups);
+extern int usb_ups_shutdown(UPSINFO *ups);
 extern int usb_ups_check_state(UPSINFO *ups);
 extern int usb_ups_open(UPSINFO *ups);
 extern int usb_ups_close(UPSINFO *ups);

@@ -47,7 +47,11 @@
  *   This function always returns.
  *
  * kill_power()
- *   Kills the UPS power.
+ *   Put the UPS into hibernation mode, killing output power.
+ *   This function always returns.
+ *
+ * shutdown()
+ *   Turn off the UPS completely.
  *   This function always returns.
  *
  * read_ups_static_data()
@@ -95,6 +99,7 @@ typedef struct upsdriver {
    int (*setup) (UPSINFO *ups);
    int (*close) (UPSINFO *ups);
    int (*kill_power) (UPSINFO *ups);
+   int (*shutdown) (UPSINFO *ups);
    int (*read_ups_static_data) (UPSINFO *ups);
    int (*read_ups_volatile_data) (UPSINFO *ups);
    int (*get_ups_capabilities) (UPSINFO *ups);
@@ -119,6 +124,17 @@ typedef struct upsdriver {
 #define device_kill_power(ups) \
    do { \
       if (ups->driver) ups->driver->kill_power(ups); \
+   } while(0)
+#define device_shutdown(ups) \
+   do { \
+      if (ups->driver) { \
+         if (ups->driver->shutdown) { \
+            ups->driver->shutdown(ups); \
+         } else { \
+            Dmsg1(000, "Power off not supported for %s driver\n", \
+                       ups->driver->driver_name); \
+         } \
+      } \
    } while(0)
 #define device_read_static_data(ups) \
    do { \
