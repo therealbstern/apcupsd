@@ -32,16 +32,10 @@ int apcsmart_ups_kill_power(UPSINFO *ups)
    char response[32];
    int shutdown_delay = 0;
    int errflag = 0;
-   char a;
 
    response[0] = '\0';
-
-   a = ups->UPS_Cmd[CI_DSHUTD];    /* shutdown delay */
-   write(ups->fd, &a, 1);
-   getline(response, sizeof(response), ups);
-   shutdown_delay = (int)atof(response);
-   a = 'S';                        /* ask for soft shutdown */
-   write(ups->fd, &a, 1);
+   shutdown_delay = apcsmart_ups_get_shutdown_delay(ups);
+   writechar('S', ups);            /* ask for soft shutdown */
 
    /*
     * Check whether the UPS has acknowledged the power-off command.
@@ -53,79 +47,47 @@ int apcsmart_ups_kill_power(UPSINFO *ups)
    sleep(5);
    getline(response, sizeof response, ups);
    if (strcmp(response, "OK") == 0) {
-      if (shutdown_delay > 0)
-         log_event(ups, LOG_WARNING,
-            "UPS will power off after %d seconds ...\n", shutdown_delay);
-      else
-         log_event(ups, LOG_WARNING,
-            "UPS will power off after the configured delay  ...\n");
-      log_event(ups, LOG_WARNING,
-         _("Please power off your UPS before rebooting your computer ...\n"));
+      apcsmart_ups_warn_shutdown(ups, shutdown_delay);
    } else {
       /*
        * Experiments show that the UPS needs delays between chars
        * to accept this command.
        */
-      a = '@';                     /* Shutdown now */
+
+      sleep(1);                    /* Shutdown now */
+      writechar('@', ups);
       sleep(1);
-      write(ups->fd, &a, 1);
+      writechar('0', ups);
       sleep(1);
-      a = '0';
-      write(ups->fd, &a, 1);
-      sleep(1);
-      a = '0';
-      write(ups->fd, &a, 1);
-      sleep(1);
-      a = '0';
-      write(ups->fd, &a, 1);
+      writechar('0', ups);
 
       getline(response, sizeof(response), ups);
       if ((strcmp(response, "OK") == 0) || (strcmp(response, "*") == 0)) {
-         if (shutdown_delay > 0) {
-            log_event(ups, LOG_WARNING,
-               "UPS will power off after %d seconds ...\n", shutdown_delay);
-         } else {
-            log_event(ups, LOG_WARNING,
-               "UPS will power off after the configured delay  ...\n");
-         }
-         log_event(ups, LOG_WARNING,
-            _("Please power off your UPS before rebooting your computer ...\n"));
+         apcsmart_ups_warn_shutdown(ups, shutdown_delay);
       } else {
          errflag++;
       }
    }
 
    if (errflag) {
-      a = '@';
-      write(ups->fd, &a, 1);
+      writechar('@', ups);
       sleep(1);
-      a = '0';
-      write(ups->fd, &a, 1);
+      writechar('0', ups);
       sleep(1);
-      a = '0';
-      write(ups->fd, &a, 1);
+      writechar('0', ups);
       sleep(1);
 
       if ((ups->mode.type == BKPRO) || (ups->mode.type == VS)) {
-         a = '1';
          log_event(ups, LOG_WARNING,
             _("BackUPS Pro and SmartUPS v/s sleep for 6 min"));
+         writechar('1', ups);
       } else {
-         a = '0';
+         writechar('0', ups);
       }
-      write(ups->fd, &a, 1);
 
       getline(response, sizeof(response), ups);
       if ((strcmp(response, "OK") == 0) || (strcmp(response, "*") == 0)) {
-         if (shutdown_delay > 0) {
-            log_event(ups, LOG_WARNING,
-               "UPS will power off after %d seconds ...\n", shutdown_delay);
-         } else {
-            log_event(ups, LOG_WARNING,
-               "UPS will power off after the configured delay  ...\n");
-         }
-         log_event(ups, LOG_WARNING,
-            _("Please power off your UPS before rebooting your computer ...\n"));
+         apcsmart_ups_warn_shutdown(ups, shutdown_delay);
          errflag = 0;
       } else {
          errflag++;
@@ -133,38 +95,65 @@ int apcsmart_ups_kill_power(UPSINFO *ups)
    }
 
    if (errflag) {
-      /* And yet another method !!! */
-      a = 'K';
-      write(ups->fd, &a, 1);
-      sleep(2);
-      write(ups->fd, &a, 1);
-      getline(response, sizeof response, ups);
-      if ((strcmp(response, "*") == 0) || (strcmp(response, "OK") == 0) ||
-         (ups->mode.type >= BKPRO)) {
-         if (shutdown_delay > 0) {
-            log_event(ups, LOG_WARNING,
-               "UPS will power off after %d seconds ...\n", shutdown_delay);
-         } else {
-            log_event(ups, LOG_WARNING,
-               "UPS will power off after the configured delay  ...\n");
-         }
-         log_event(ups, LOG_WARNING,
-            _("Please power off your UPS before rebooting your computer ...\n"));
-         errflag = 0;
-      } else {
-         errflag++;
-      }
+      return apcsmart_ups_shutdown_with_delay(ups, shutdown_delay);
    }
 
-   if (errflag) {
+   return 1;
+}
+
+int apcsmart_ups_shutdown(UPSINFO *ups)
+{
+   return apcsmart_ups_shutdown_with_delay(ups, apcsmart_ups_get_shutdown_delay(ups));
+}
+
+int apcsmart_ups_shutdown_with_delay(UPSINFO *ups, int shutdown_delay)
+{
+   char response[32];
+
+   /*
+    * K K command
+    *
+    * This method should turn the UPS off completely according to this article:
+    * http://nam-en.apc.com/cgi-bin/nam_en.cfg/php/enduser/std_adp.php?p_faqid=604
+    */
+
+   writechar('K', ups);
+   sleep(2);
+   writechar('K', ups);
+   getline(response, sizeof response, ups);
+   if ((strcmp(response, "*") == 0) || (strcmp(response, "OK") == 0) ||
+      (ups->mode.type >= BKPRO)) {
+      apcsmart_ups_warn_shutdown(ups, shutdown_delay);
+      return 1;
+   } else {
       log_event(ups, LOG_WARNING, _("Unexpected error!\n"));
       log_event(ups, LOG_WARNING, _("UPS in unstable state\n"));
       log_event(ups, LOG_WARNING,
          _("You MUST power off your UPS before rebooting!!!\n"));
       return 0;
    }
+}
 
-   return 1;
+void apcsmart_ups_warn_shutdown(UPSINFO *ups, int shutdown_delay)
+{
+   if (shutdown_delay > 0) {
+      log_event(ups, LOG_WARNING,
+         "UPS will power off after %d seconds ...\n", shutdown_delay);
+   } else {
+      log_event(ups, LOG_WARNING,
+         "UPS will power off after the configured delay  ...\n");
+   }
+   log_event(ups, LOG_WARNING,
+      _("Please power off your UPS before rebooting your computer ...\n"));
+}
+
+int apcsmart_ups_get_shutdown_delay(UPSINFO *ups)
+{
+   char response[32];
+
+   writechar(ups->UPS_Cmd[CI_DSHUTD], ups);
+   getline(response, sizeof(response), ups);
+   return (int)atof(response);
 }
 
 int apcsmart_ups_check_state(UPSINFO *ups)

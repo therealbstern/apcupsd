@@ -87,10 +87,21 @@ Turns on debugging output.
 Specifies the location of the configuration file.  The default
 is: /etc/apcupsd/apcupsd.conf
 .TP
-.B \-k --killpower
-Attempt to turn the UPS off. This option is normally only
-used by the daemon itself to shut the UPS off after a
-system shutdown has completed.
+.B \-k --killpower --hibernate
+Put the UPS into hibernation during a power outage.
+In the hibernation state, the UPS turns off output power and waits
+for input power to be restored.  Once input power is restored,
+the UPS will return to the ONLINE state and restore output power
+when it's healthy enough to do so (battery charge is above
+RETURNCHARGE threshold, etc).  This option is normally only
+used by the daemon itself to hibernate the UPS after a
+system shutdown has completed due to a power failure.
+Note that some UPS models may not support the hibernation
+state and will instead power off when given this command.
+.TP
+.B \-o --power-off
+Turn the UPS off completely.  Once the UPS is powered off, the only way
+to turn it back on is to press the power button.
 .TP
 .B \-V --version
 Prints the apcupsd version number and the help.
