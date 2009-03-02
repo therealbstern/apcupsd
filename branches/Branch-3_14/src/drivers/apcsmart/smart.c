@@ -137,6 +137,8 @@ char *smart_poll(char cmd, UPSINFO *ups)
    int stat, retry;
 
    *answer = 0;
+   if (ups->fd == -1)
+      return answer;
    if (ups->mode.type <= SHAREBASIC)
       return answer;
 
@@ -214,6 +216,8 @@ int getline(char *s, int len, UPSINFO *ups)
       case -1:
          if (errno == EINTR || errno == EAGAIN) {       /* assume SIGCHLD */
             continue;
+         } else if (errno == EBADF) {
+            return FAILURE;               /* We're probably shutting down */
          }
          Error_abort1("Select error on UPS FD. %s\n", strerror(errno));
          break;
