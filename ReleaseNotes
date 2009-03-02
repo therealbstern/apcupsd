@@ -9,6 +9,29 @@ IF YOU USE THE OLD STYLE MASTER/SLAVE NETWORKING MODE, BE SURE TO READ THE
 3.14.0 RELEASE NOTES BELOW.
 
 
+3.14.6 -- 5 March 2009               (Maintenance Release)
+
+NEW FEATURES
+
+  * Add support for turning the UPS off completely. This complements existing
+    hibernate (aka killpower) functionality. Turn-off is implemented for
+    apcsmart and USB drivers, subject to support for the relevant commands in
+    the UPS itself. Contributed by Keith Campbell <campbell@econnectix.com>.
+
+BUG FIXES
+
+  * apcsmart: Deadlock fixes during comms failures. Contributed by Keith 
+    Campbell <campbell@econnectix.com>
+
+  * linux-usb: Fix out-of-bounds array access. Contributed by David Fries 
+    <david@fries.net>
+
+  * Fix build with gcc-4.4. Contributed by Michal Hlavinka <mhlavink@redhat.com>
+  
+  * apcsmart: Fix crash during process shutdown (SIGTERM). Contributed by 
+    Andrey Sharandakov <ash.ashway@gmail.com>
+
+
 3.14.5 -- 26 October 2008            (Maintenance Release)
 
 BUG FIXES

@@ -8,6 +8,90 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2009-03-02 17:52  adk0212
+
+	* src/drivers/apcsmart/smart.c:
+
+	Workaround for crash during process shutdown.  Contributed by
+	Andrey Sharandakov <ash.ashway@gmail.com>
+
+2009-03-02 17:48  adk0212
+
+	* doc/apcupsd.man, include/drivers.h, include/extern.h,
+	src/action.c, src/apctest.c, src/apcupsd.c, src/device.c,
+	src/options.c, src/drivers/drivers.c,
+	src/drivers/apcsmart/apcsmart.h, src/drivers/apcsmart/smart.c,
+	src/drivers/apcsmart/smartoper.c, src/drivers/usb/usb.c,
+	src/drivers/usb/usb.h, src/lib/apclock.c:
+
+	Add support for turning the UPS off completely. This complements
+	existing hibernate (aka killpower) functionality. Turn-off is
+	implemented for apcsmart and USB drivers, subject to support for
+	the relevant commands in the UPS itself. Contributed by Keith
+	Campbell <campbell@econnectix.com>.
+
+2009-03-01 10:03  adk0212
+
+	* src/apcaccess.c:
+
+	Fix build with gcc-4.4. Contributed by Michal Hlavinka
+	<mhlavink@redhat.com>.
+
+2009-02-14 16:35  adk0212
+
+	* src/drivers/usb/linux/linux-usb.c:
+
+	Fix number of array entries which was causing a buffer overflow.
+	Contributed by David Fries <david@fries.net>.  Also change loop
+	counters to unsigned, eliminating a new warning introduced by the
+	above change plus allowing removal of unnecessary casts to int.
+
+2009-02-10 18:39  adk0212
+
+	* src/drivers/apcsmart/: smart.c, smartsetup2.c:
+
+	Fix some deadlocks in the case of a comm failure when smart_poll()
+	is called without holding the UPS lock. Contributed by Keith
+	Campbell <campbell@econnectix.com>:
+
+	On one of our machines, apcupsd 3.14.5 (using a smart serial cable)
+	would occasionally not finish starting up.  Running strace revealed
+	that it was stuck in deadlock on a futex() system call.
+
+	I've traced this to some poorly written code inside the apcsmart
+	driver.  Inside smart.c there is a UPSlinkCheck() function which
+	according to the documentation must be called with the UPS lock
+	held (ugh).  smart_poll() calls the UPSlinkCheck() function (but
+	only in a rarely followed error handling branch), so therefore it
+	must also be called with the lock held.  The problem is, many
+	things call smart_poll() but some call it without the lock, and
+	other with the lock.  I've put locks around a few smart_poll()
+	calls in smartsetup2.c which corrected the problem I was seeing.
+
+2009-01-15 17:57  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Year++ h/t Kirill S. Bychkov <yason@linklevel.net>
+
+2009-01-14 18:00  adk0212
+
+	* doc/: home-page/publishsite, latex/publishdoc:
+
+	Update publish scripts for sf.net changes
+
+2009-01-14 17:49  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Update for 3.14.5 release.
+
+2009-01-10 15:02  adk0212
+
+	* ChangeLog, include/version.h:
+
+	3.14.5 for real this time.
+
 2008-11-10 19:14  adk0212
 
 	* examples/nagios_plugin_check_apcupsd.c:
