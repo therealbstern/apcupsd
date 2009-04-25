@@ -231,8 +231,6 @@ class UPSINFO {
    bool chg_shut_remote() const { return ((Status ^ PrevStatus) & UPS_shut_remote) == UPS_shut_remote; };
 
    /* DATA */
-   char release[20];
-
    int fd;                         /* UPS device node file descriptor */
 
    /* UPS capability array and codes */

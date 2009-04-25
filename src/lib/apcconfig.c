@@ -567,9 +567,6 @@ static int ParseConfig(UPSINFO *ups, char *line)
  */
 void init_ups_struct(UPSINFO *ups)
 {
-   /* put some basic information for sanity checks */
-   astrncpy(ups->release, APCUPSD_RELEASE, sizeof(ups->release));
-
    ups->fd = -1;
 
    ups->set_plugged();
