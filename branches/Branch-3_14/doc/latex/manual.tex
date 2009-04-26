@@ -564,8 +564,8 @@ recent FreeBSD kernels.
 \index{BSD!USB Platforms and Versions}
 \index{USB!BSD Platforms and Versions}
 
-The \*BSD USB driver supports FreeBSD, OpenBSD and NetBSD. (Thanks go to 
-the \*BSD developers who kept a nearly identical interface across all 
+The *BSD USB driver supports FreeBSD, OpenBSD and NetBSD. (Thanks go to 
+the *BSD developers who kept a nearly identical interface across all 
 three platforms.)
 
 \subsubsection*{Kernel Configuration}
@@ -2143,13 +2143,13 @@ default, 0.0.0.0, means to list on all of the server host's IP addresses;
 and \textbf{EVENTSFILE} and \textbf{EVENTSFILEMAX} to provide information
 about the last few events to clients.  You may also need to modify your
 firewall rules on the server's host to allow traffic to the
-\textbf{NISPORT}\@.
+\textbf{NISPORT}.
 
 For the NIS client computer, you will have a configuration that looks something
 like what follows.  What is important is that you get the information from an
 \textbf{ether} \textbf{UPSCABLE} with \textbf{UPSTYPE} set as
 \textbf{net} over the network and you must specify the address of a NIS
-server using \textbf{DEVICE}\@. The client apcupsd will then poll the
+server using \textbf{DEVICE}. The client apcupsd will then poll the
 NIS server specified in \textbf{DEVICE} every \textbf{POLLTIME} seconds
 (formerly \textbf{NETTIME}).
 
@@ -8002,7 +8002,7 @@ and second Z} & {N/A} & {
 {a} & {Show protocol version.alert messages.valid commands (delimited by
 periods)} & {
 ``3.!\$\%+?=\#|.\^{}A\^{}N\^{}Z+-789\lt
-{}@ABCDEFGKLMNOPQRSUVWXYZ'abcefgjklmnopqrsuvzy\~{}\^{}?'' -
+{}@ABCDEFGKLMNOPQRSUVWXYZ'abcefgjklmnopqrsuvzy~{}^{}?'' -
 Link-Level.alert-messages.commands} & { 
  } \\
 {b} & {Firmware revision} & {``50.9.D'' - 50 = SKU (variable length), 9 =
@@ -8080,7 +8080,7 @@ hour (after 'r' time)} & {Matrix/3rd gen UPS: ``OK'', others ``*''} & {
 {0x7f (DEL key)} & {Abort shutdown - use to abort @, S, K{---}K} & {``OK''} &
 { 
  } \\
-{\~{}} & {Register \#1} & {See below} & { 
+{~{}} & {Register \#1} & {See below} & { 
  } \\
 {'} & {Register \#2} & {See below} & { 
  } \\
