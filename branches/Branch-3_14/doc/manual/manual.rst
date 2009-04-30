@@ -29,7 +29,7 @@ at http://www.apcupsd.com
 
 .. contents:: Table of Contents
    :local:
-   :depth: 2
+   :depth: 3
 
 How To Use This Manual
 ======================
@@ -54,7 +54,7 @@ serial-line UPS, you'll have to read about serial installation (see
 details about administration for unusual situations (such as a
 master/slave or multi-UPS setup) you'll need to read the section on
 advanced topics (see `Advanced topics`_). Finally,
-there is a Technical Reference (see `Technical Reference`_}) section which 
+there is a Technical Reference (see `Technical Reference`_) section which 
 gives full detailson things like configuration file directives and 
 event-logging formats.
 
@@ -148,8 +148,7 @@ set up and running as painlessly as possible.
    anything else you think might be helpful.
 
 #. Read the manual sections on
-   `Monitoring and Tuning your UPS`_ and
-   `Maintaining Your UPS`_ your UPS.
+   `Monitoring and Tuning your UPS`_ and `Maintaining Your UPS`_.
 
 
 {supportedoses}
@@ -582,7 +581,7 @@ file:
     | **Enable:** ugen
 
 *FreeBSD (v5.5, v6.1 and above)*
-    | (you **will not** lose use of USB keyboard and mouse):
+    | (you **will not** lose use of USB keyboard and mouse)
     | **Disable:** (nothing)
     | **Enable:** ugen
 
@@ -590,7 +589,7 @@ file:
     platforms so you most likely will not need to recompile.
 
 *NetBSD (v3.x and below)*
-    | (you **will** lose use of USB keyboard and mouse):
+    | (you **will** lose use of USB keyboard and mouse)
     | **Disable:** uhidev, ums, wsmouse, ukbd, wskbd, uhid
     | **Enable:** ugen
 
@@ -4966,6 +4965,8 @@ Please ensure that if you are running gpm that it is not configured
 with a serial port mouse on the same serial port.
 
 
+.. include:: cables.rst
+
 
 Recalibrating the UPS Runtime
 =============================
@@ -6163,7 +6164,7 @@ OTHER PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN
 ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
 
 
-Appencides
+Appendices
 ==========
 
 Interpreting /proc/bus/usb (linux-2.4)
