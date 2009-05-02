@@ -2527,37 +2527,19 @@ see the `Shutdown Sequence`_ section of this manual.
 apctest
 -------
 
-`Purposeful error to force me to deal with this section`_
-
 ``apctest`` is a program that allows you to talk
 directly to your UPS and run certain low-level tests, display all
 know values from the UPS's EEPROM, perform a battery runtime
 calibration, program the EEPROM (serial connection only), and enter
-in TTY mode with the UPS. Here we describe how to use it for a USB
-or apcsmart UPS; see {Using apctest on Serial-Line
-UPSses}{Using-apctest-on-Serial\_002dLine-UPSses} for a description
-of how to use it with a voltage-signalling UPS.
+in TTY mode with the UPS. Here we describe how to use it for a SmartUPS.
+The menus and optiosn for USB and simple signaling UPSes are different
+but mostly self-explanator.
 
-Shutdown apcupsd if it is running. Make sure your {
-/etc/apcupsd/apcupsd.conf} file has { UPSTYPE smart} and {
-UPSCABLE} has one of the smart cables that are supported.
+Shutdown apcupsd if it is running. Make sure your
+``/etc/apcupsd/apcupsd.conf`` file has ``UPSTYPE apcsmart`` and 
+``UPSCABLE`` has one of the smart cables that are supported.
 
-Normally apctest will have been built but not installed, so you
-must execute it from the apcupsd-source/src directory. You can
-explicitly build it on Unix with:
-
-::
-
-         cd <apcupsd-source-directory>
-         make apctest
-         ./apctest
-
-or on Windows systems with:
-
-::
-
-         make apctestwin32
-         ./apctest
+Run apctest by invoking it with no arguments.
 
 It will read your installed apcupsd.conf configuration (so it knows
 where to find the UPS) and then it will present you with the
@@ -2619,18 +2601,17 @@ Item 4 can be used to restart the monitoring of a Battery
 Calibration if you should some how become disconnected during the
 test.
 
-Item 5 is used to program the EEPROM. Please see the {Configuration
-Directives Used to Set the UPS
-EPROM}{Configuration-Directives-Used-to-Set-the-UPS-EPROM} chapter
-of this manual for the details.
+Item 5 is used to program the EEPROM. Please see the `Configuration
+Directives Used to Set the UPS EEPROM`_ chapter of this manual for the
+details.
 
 Item 6 will initiate a direct communication between your terminal
-and the UPS at which point, you can enter raw UPS commands. Please
+and the UPS, at which point you can enter raw UPS commands. Please
 be aware that you should be careful what commands you enter because
 you can cause your UPS to suddenly shutdown, or you can modify the
 EEPROM in a way to disable your UPS. The details of the raw Smart
-mode UPS commands can be found in the UPS Bible (see {APC smart
-protocol}{APC-smart-protocol}) chapter of this manual.
+mode UPS commands can be found in the `APC Smart Protocol`_
+chapter of this manual.
 
 Item 7 will terminate apctest.
 
