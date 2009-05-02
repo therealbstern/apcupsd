@@ -75,8 +75,8 @@ UPSCMDMSG event_msg[] = {
    {LOG_CRIT,    N_("Remote shutdown requested.")},
    {LOG_WARNING, N_("Communications with UPS lost.")},
    {LOG_WARNING, N_("Communications with UPS restored.")},
-   {LOG_ALERT,   N_("UPS Self Test switch to battery.")},
-   {LOG_ALERT,   N_("UPS Self Test completed.")},
+   {LOG_WARNING, N_("UPS Self Test switch to battery.")},
+   {LOG_WARNING, N_("UPS Self Test completed.")},
    {LOG_CRIT,    N_("Mains returned. No longer on UPS batteries.")},
    {LOG_CRIT,    N_("Battery disconnected.")},
    {LOG_CRIT,    N_("Battery reattached.")}
