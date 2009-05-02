@@ -192,11 +192,13 @@ Platform Support
 - Windows 98/ME/2000 [2]_
 - Windows XP/Vista (including 64 bit) [1]_ [2]_
 - Windows Server 2003/2008 (including 64 bit) [2]_ [5]_
+- Windows 7 [2]_
 
 **OTHERS**
 
 - Mac OS X Darwin [1]_ [2]_
-- Solaris
+- Solaris 8/9 [4]_
+- Solaris 10
 - NetBSD
 - FreeBSD
 - OpenBSD
