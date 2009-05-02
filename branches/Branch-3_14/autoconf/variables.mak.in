@@ -42,7 +42,6 @@ srcdir = @srcdir@
 abstopdir = @ABSSRCDIR@
 sbindir = @sbindir@
 piddir = @PIDDIR@
-manext = 8
 mandir=@mandir@
 bindir = @bindir@
 datadir = @datadir@
