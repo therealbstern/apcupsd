@@ -27,9 +27,13 @@ version 2. Please see the file COPYING in the main source directory.*
 For more information on the project, please visit the main web site 
 at http://www.apcupsd.com 
 
+---------------------------------------------------------------------------
+
 .. contents:: Table of Contents
    :local:
    :depth: 3
+
+---------------------------------------------------------------------------
 
 How To Use This Manual
 ======================
