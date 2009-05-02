@@ -154,11 +154,63 @@ set up and running as painlessly as possible.
 #. Read the manual sections on
    `Monitoring and Tuning your UPS`_ and `Maintaining Your UPS`_.
 
+Supported Operating Systems
+---------------------------
 
-{supportedoses}
+apcupsd supports many UNIX-like operating systems as well as several
+variants of Windows. Due to lack of API standardization, USB support is not
+available on every platform. See `Platform Support`_ below for details.
 
-{supportedupses}
+In general it is recommended to obtain a prebuilt package for your platform.
+Given how apcupsd must integrate into the shutdown mechanism of the
+operating system and the rate at which such mechanisms are changed by
+vendors, the platform ports in the apcupsd tree may become out of date. In
+some cases, binary packages are provided by the apcupsd team (RedHat,
+Mandriva, SuSE, Windows, Mac OS X). For other platforms it is recommended to
+check your vendor's package repository and third party repositories for
+recent binary packages. Note that some vendors continue to distribute
+ancient versions of apcupsd with known defects. These packages should *not* be
+used.
 
+Platform Support
+~~~~~~~~~~~~~~~~
+
+**LINUX**
+
+- RedHat [1]_ [2]_
+- SuSE [2]_
+- Mandriva/Mandrake [2]_
+- Debian [3]_
+- Slackware [3]_
+- Engarde [3]_
+- Yellowdog [3]_
+- Gentoo [3]_
+
+**WINDOWS**
+
+- Windows NT 4 [2]_ [4]_
+- Windows 98/ME/2000 [2]_
+- Windows XP/Vista (including 64 bit) [1]_ [2]_
+- Windows Server 2003/2008 (including 64 bit) [2]_ [5]_
+
+**OTHERS**
+
+- Mac OS X Darwin [1]_ [2]_
+- Solaris
+- NetBSD
+- FreeBSD
+- OpenBSD
+- HPUX [3]_ [4]_
+- Unifix [3]_ [4]_
+- QNX [4]_
+
+.. [1] Platforms on which apcupsd is regularly developed and tested
+.. [2] Platforms for which apcupsd team distributes binary packages
+.. [3] Port included in apcupsd source tree but may be out of date,
+       unmaintained, aor broken.
+.. [4] USB not supported
+.. [5] USB not supported in 64 bit mode due to Microsoft disallowing loading of
+       unsigned drivers
 
 Choosing a Configuration Type
 -----------------------------
