@@ -231,3 +231,22 @@ define CHKCFG
 endef
 endif
 
+# How to massage dependency list from rst2html
+ifeq ($(strip $(NODEPS)),)
+  define RSTDEPENDS
+	  $(ECHO) $@: $< \\ > $(df).P;                             \
+	  $(SED) -e '$$q' -e 's/^.*$$/& \\/' < $(df).d >> $(df).P; \
+	  $(ECHO) $<: >> $(df).P;                                  \
+	  $(SED) -e 's/^.*$$/&:/' < $(df).d >> $(df).P;            \
+	  $(RMF) $(df).d
+  endef
+else
+  RSTDEPENDS :=
+endif
+
+# Build *.html from *.rst and generate dependencies for it
+%.html: %.rst
+	@$(ECHO) "  HTML " $<
+	$(VV)if test ! -d $(DEPDIR); then mkdir -p $(DEPDIR); fi;
+	$(V)$(RST2HTML) $(RST2HTMLOPTS) $< $@
+	$(VV)$(RSTDEPENDS)

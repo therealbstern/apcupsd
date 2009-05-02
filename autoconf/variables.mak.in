@@ -31,6 +31,7 @@ INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 MKINSTALLDIRS = @MKINSTALLDIRS@
 CHKCONFIG = /sbin/chkconfig
+RST2HTML := rst2html
 
 # Files and directories (paths)
 prefix = @prefix@
@@ -73,6 +74,7 @@ POWERLIBS = @POWERLIBS@
 GAPCMON_CFLAGS = @GAPCMON_CFLAGS@
 GAPCMON_LIBS = @GAPCMON_LIBS@
 LIBEXTRAOBJ = @LIBEXTRAOBJ@
+RST2HTMLOPTS = --field-name-limit=0 --generator --time --record-dependencies=$(df).d
 
 # Driver and package enable flags
 SMARTDRV   := @APCSMART_DRIVER@
