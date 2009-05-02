@@ -214,6 +214,69 @@ Platform Support
 .. [5] USB not supported in 64 bit mode due to Microsoft disallowing loading of
        unsigned drivers
 
+Supported UPSes and Cables
+--------------------------
+
+apcupsd supports nearly every APC brand UPS model in existence and enough
+different cable types to connect to all of them.
+
+The ``UPSTYPE <keyword>`` field is the value you will put in
+your /etc/apcupsd/apcupd.conf file to tell apcupsd what type of UPS
+you have. We'll describe the possible values here, because they're
+a good way to explain your UPS's single most important interface
+property: the kind of protocol it uses to talk with its
+computer.
+
+apcsmart 
+    An APCSmart UPS and its computer communicate
+    through an RS232C serial connection. They use it as a character
+    channel (2400bps, 8 data bits, 1 stop bit, no parity) and pass
+    commands back and forth in a primitive language resembling 
+    modem-control codes. The
+    different APC UPSes all use closely related firmware, so the
+    language doesn't vary much (later versions add more commands). This
+    class of UPS is in decline, rapidly being replaced in APC's product
+    line by USB UPSes.
+
+usb
+    A USB UPS speaks a universal well defined control
+    language over a USB wire. Most of APC's lineup now uses this method
+    as of late 2003, and it seems likely to completely take over in
+    their low- and middle range. Other manufacturers (Belkin,
+    Tripp-Lite, etc.) are moving the same way, though with a different
+    control protocol for each manufacturer. As long as USB hardware can
+    be mass-produced more cheaply than an Ethernet card, most UPSes are
+    likely to go this design route. Please note that even if you have a
+    USB UPS, if you use a serial cable with it (as can be supplied by
+    APC), you will need to configure your UPS as ``apcsmart`` rather
+    than ``usb``.
+
+net
+    This is the keyword to specify if you are using your
+    UPS in Slave mode (i.e. the machine is not directly connected to
+    the UPS, but to another machine which is), and it is connected to
+    the Master via an ethernet connection. You must have apcupsd's
+    Network Information Services NIS turned on for this mode to work.
+
+snmp
+    SNMP UPSes communicate via an Ethernet NIC and
+    firmware that speaks Simple Network Management Protocol.
+
+dumb
+    A dumb or voltage-signaling UPS and its computer
+    communicate through the control lines (not the data lines) on an RS232C 
+    serial connection. Not much can actually be conveyed this way other than
+    an order to shut down. Voltage-signaling UPSes are obsolete; you
+    are unlikely to encounter one other than as legacy hardware. If you
+    have a choice, we recommend you avoid simple signalling UPSes.
+
+pcnet
+    PCNET is an alternative for SNMP available on APC's
+    AP9617 family of smart slot modules. The protocol is much simpler
+    and potentially more secure than SNMP.
+
+
+
 Choosing a Configuration Type
 -----------------------------
 
