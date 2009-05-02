@@ -2547,30 +2547,29 @@ following output:
 
 ::
 
-         2003-07-07 11:19:21 apctest 3.10.6 (07 July 2003) redhat
-         Checking configuration ...
-         Attached to driver: apcsmart
-         sharenet.type = DISABLE
-         cable.type = CUSTOM_SMART
-         
-         You are using a SMART cable type, so I'm entering SMART test mode
-         mode.type = SMART
-         Setting up serial port ...
-         Creating serial port lock file ...
-         Hello, this is the apcupsd Cable Test program.
-         This part of apctest is for testing Smart UPSes.
-         Please select the function you want to perform.
-         
-         1) Query the UPS for all known values
-         2) Perform a Battery Runtime Calibration
-         3) Abort Battery Calibration
-         4) Monitor Battery Calibration progress
-         5) Program EEPROM
-         6) Enter TTY mode communicating with UPS
-         7) Quit
-         
-         Select function number: 1
-         
+    2003-07-07 11:19:21 apctest 3.10.6 (07 July 2003) redhat
+    Checking configuration ...
+    Attached to driver: apcsmart
+    sharenet.type = DISABLE
+    cable.type = CUSTOM_SMART
+
+    You are using a SMART cable type, so I'm entering SMART test mode
+    mode.type = SMART
+    Setting up serial port ...
+    Creating serial port lock file ...
+    Hello, this is the apcupsd Cable Test program.
+    This part of apctest is for testing Smart UPSes.
+    Please select the function you want to perform.
+
+    1) Query the UPS for all known values
+    2) Perform a Battery Runtime Calibration
+    3) Abort Battery Calibration
+    4) Monitor Battery Calibration progress
+    5) Program EEPROM
+    6) Enter TTY mode communicating with UPS
+    7) Quit
+
+    Select function number: 1
 
 Item 1 will probe the UPS for all values known to apcupsd and
 present them in rather raw format. This output can be useful for
@@ -5371,21 +5370,21 @@ charge remaining (``BATTERYLEVEL``) or the remaining battery runtime
 
         *timeout* specifies that apcupsd should prohibit logins
         after the UPS is on batteries for 90% of the time specified on the
-        { TIMEOUT} configuration directive. Note! Normally you don't want
+        ``TIMEOUT`` configuration directive. Note! Normally you don't want
         to specify a TIMEOUT value, so this option is probably not too
         useful (KES).
 
         *percent* specifies that apcupsd should prohibit logins
         when the remaining battery charge percentage reaches 110% or less
-        than the value specified on the { BATTERYLEVEL} configuration
-        directive. Thus if the { BATTERYLEVEL} is specified as 15, apcupsd
+        than the value specified on the ``BATTERYLEVEL`` configuration
+        directive. Thus if the ``BATTERYLEVEL`` is specified as 15, apcupsd
         will prohibit logins when the battery charge drops below 16% (15% X
         110% = 16%).
 
         *minutes* specifies that apcupsd should prohibit logins
         when the remaining runtime in minutes reaches 110% or less than the
-        value specified on the { MINUTES} configuration directive. Thus if
-        { MINUTES} is set to 3, apcupsd will prohibit logins when the
+        value specified on the ``MINUTES`` configuration directive. Thus if
+        ``MINUTES`` is set to 3, apcupsd will prohibit logins when the
         remaining runtime is less than 3 minutes (3 X 110% = 3).
 
         *always* causes apcupsd to immediately prohibit logins
@@ -5500,6 +5499,102 @@ hardware module. Most users will not use this mode.
     Use ``share`` for two or seven additional simple signal ports on
     a SmartAccessories(tm) (internal/external box) for SmartUPSes. The
     share and sharenet code is not fully tested.
+
+
+Configuration Directives Used to Set the UPS EPROM
+--------------------------------------------------
+
+*These directives have no effect on the operation of apcupsd but are
+reserved for use by apctest when bulk programming the values of the
+UPS EEPROM configuration variables in a Smart-UPS model.*
+
+**UPSNAME** *<string>*
+
+    Name of UPS. Maximum of 8 characters.
+
+**BATTDATE** [ *mm/dd/yy* | *dd/mm/yy* ]
+
+    Last battery replacement date. Maximum of 8 characters.
+
+**SENSITIVITY** [ *H* | *M* | *L* ]
+
+    H : High (most sensitive setting)
+    M : Medium
+    L : Low (least sensitive setting)
+
+**WAKEUP** [ *000* | *060* | *180* | *300* ]
+
+    The time delay in seconds that the UPS waits after the return of utility 
+    power before "waking up" and restoring power to the connected equipment.
+
+**SLEEP** [ *020* | *180* | *300* | *600* ]
+
+    The time delay in seconds for which the UPS waits or "sleeps" after it 
+    receives a request to power off the connected system.
+
+**LOTRANSFER** *<voltage>*
+
+    Low line voltage causing transfer to battery power or activation of 
+    SmartBoost.  Allowable values depend on the last letter of the firmware 
+    or APCMODEL.  Typical values are::
+
+          D  106  103  100  097
+          M  177  172  168  182
+          A  092  090  088  086
+          I  208  204  200  196
+
+    where D = domestic (USA), M = Canada, A = Asia and I = International.
+
+**HITRANSFER** *<voltage>*
+
+    High line voltage causing transfer to battery power or activation of 
+    SmartTrim.  Allowable values depend on the last letter of the firmware 
+    or APCMODEL.  Typical values are::
+
+        D  127  130  133  136
+        M  229  234  239  224
+        A  108  110  112  114
+        I  253  257  261  265
+
+    where D = domestic (USA), M = Canada, A = Asia and I = International.
+
+**RETURNCHARGE** [ *00* | *15* | *50* | *90* ]
+
+    Percentage of battery charge needed for the UPS to restore power to the
+    connected equipment.
+
+**BEEPSTATE** [ *0* | *T* | *L* | *N* ]
+
+    Alarm delay.
+    
+    ::
+
+        0 : Zero delay after power fails.
+        T : When power fails plus 30 seconds.
+        L : When low battery occurs.
+        N : Never.
+
+**LOWBATT** *<minutes>*
+
+    Low battery warning occurs when the specified number of minutes remains 
+    before the UPS estimates battery power will be exhausted.
+
+**OUTPUTVOLTS** *<voltage>*
+
+    UPS nominal output voltage when running on battery.  Allowable values 
+    depend on the last letter of the firmware or APCMODEL.  Typical values are::
+
+        D  115
+        M  208
+        A  100
+        I  230  240  220  225
+
+    where D = domestic (USA), M = Canada, A = Asia and I = International.
+
+**SELFTEST** [ *336* | *168* | *ON* | *OFF* ]
+
+    Self test interval in hours (336 = 2 weeks, 168 = 1 week, 
+    ON = at power on, OFF = never).
 
 
 apcupsd Status Logging
