@@ -481,6 +481,7 @@ $         Return from line fail - UPS back on line power, only sent if a !
           models.
 ========= ======================================================================
 
+
 Register 1
 ----------
 
@@ -542,7 +543,6 @@ Bit Meaning when bit=1
 6   Bypass relay malfunction
 7   Normal operating temperature exceeded
 === ============================================================================
-
 
 
 Interpretation of the Old Firmware Revision
@@ -701,9 +701,9 @@ Programming the UPS EEPROM
 There are at this time a maximum of 12 different values that can be
 programmed into the UPS EEPROM. They are:
 
-==== ======= ==================================
+==== ======= ===================================================================
 Item Command Meaning
-==== ======= ==================================
+==== ======= ===================================================================
 1.   c       The UPS Id or name
 2.   x       The last date the batteries were replaced
 3.   u       The Upper Transfer Voltage
@@ -716,7 +716,7 @@ Item Command Meaning
 10.  k       The Alarm Delay
 11.  r       The Wakeup Delay
 12.  E       The Automatic Self Test Interval
-==== ======= ==================================
+==== ======= ===================================================================
 
 The first two cases (Ident and Batt date) are somewhat special in
 that you tell the UPS you want to change the value, then you supply
