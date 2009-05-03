@@ -250,3 +250,9 @@ endif
 	$(VV)if test ! -d $(DEPDIR); then mkdir -p $(DEPDIR); fi;
 	$(V)$(RST2HTML) $(RST2HTMLOPTS) $< $@
 	$(VV)$(RSTDEPENDS)
+
+# Build *.pdf from *.rst
+%.pdf: %.rst
+	@$(ECHO) "  PDF  " $<
+	$(V)$(RST2PDF) $(RST2PDFOPTS) -o $@ $<
+
