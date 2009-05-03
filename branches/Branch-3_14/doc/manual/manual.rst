@@ -6105,7 +6105,7 @@ the same script:
 
 ::
 
-    path>/apcupsd stop
+    <path>/apcupsd stop
 
 Windows Considerations
 ----------------------
