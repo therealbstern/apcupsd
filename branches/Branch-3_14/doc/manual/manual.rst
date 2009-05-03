@@ -48,7 +48,7 @@ Linux, Unix, or Windows, you are reading the right document.
 This manual is divided into parts which increase in technical depth
 as they go. If you have just bought a state-of-the-art smart UPS
 with a USB or Ethernet interface, and you are running a current
-version of Red Hat or SUSE Linux (8.0 or later), then apcupsd is
+version of Red Hat or SUSE Linux, then apcupsd is
 very nearly plug-and-play and you will have to read only the `Basic
 User's Guide`_.
 
@@ -56,10 +56,10 @@ If your operating system is older, or if you have an old-fashioned
 serial-line UPS, you'll have to read about serial installation (see
 `Installation: Serial-Line UPSes`_). If you need more
 details about administration for unusual situations (such as a
-master/slave or multi-UPS setup) you'll need to read the section on
-advanced topics (see `Advanced topics`_). Finally,
-there is a Technical Reference (see `Technical Reference`_) section which 
-gives full detailson things like configuration file directives and 
+master/slave or multi-UPS setup) you'll need to read the sections on
+those topics as well. Finally,
+there are a number of technical reference sections which 
+gives full details on things like configuration file directives and 
 event-logging formats.
 
 You should begin by reading the Quick Start (see `Quick Start for
@@ -101,26 +101,21 @@ set up and running as painlessly as possible.
    and install step.
 
 #. If you have a UPS designed to communicate via SNMP over
-   Ethernet, that is also a relatively easy installation. It's in
-   Advanced Topics (see `Advanced topics`_) mainly
-   because it's an unusual situation.
+   Ethernet, that is also a relatively easy installation. Details
+   are provided in `Support for SNMP UPSes`_.
 
 #. If you have a UPS that communicates via an RS232C serial
    interface and it is a SmartUPS, then things are relatively simple,
    otherwise, your life is about to get interesting.
 
-   
    #. If you have a vendor-supplied cable, find out what cable type
       you have by looking on the flat ends of the cable for a number,
-      such as 940-0020A, stamped in the plastic. Check the cables column
-      of the table of types (see {type\_table}{type\_005ftable}) to see
-      if it's a supported type.
+      such as 940-0020A, stamped in the plastic. 
 
    #. If you don't have a vendor-supplied cable, or your type is not
       supported, you may have to build one yourself (see
       `Cables`_). Here is hoping you are good with a soldering
       iron!
-
 
 #. Now you are ready to read the Building and Installing (see
    `Building and Installing apcupsd`_)
@@ -141,13 +136,14 @@ set up and running as painlessly as possible.
    the instructions in the Testing (see `Testing
    Apcupsd`_) section.
 
-#. If you run into problems, read the Troubleshooting (see
-   `Troubleshooting Your Installation`_) section of this
-   manual.
+#. If you run into problems, check the apcupsd users' email list
+   archive for similar problems. This is an excellent resource with
+   answers to all sorts of questions. See 
+   http://sourceforge.net/mailarchive/forum.php?forum_name=apcupsd-users.
 
-#. If you still need help, send a message to the developer's email
-   list {apcupsd-users at lists.sourceforge.net}{mailto:apcupsd-users
-   at lists.sourceforge.net} describing your problem, what version of
+#. If you still need help, send a message to the apcupsd users' email
+   list (mailto:apcupsd-users@lists.sourceforge.net) describing your 
+   problem, what version of
    apcupsd you are using, what operating system you are using, and
    anything else you think might be helpful.
 
@@ -317,8 +313,8 @@ Configuration types
 |image|
 
 If you decide to set up one of these more complex configurations,
-see the Advanced Topics (see `Advanced topics`_)
-section for details.
+see the dedicated section on that particular configuration.
+
 
 USB Configuration
 =================
@@ -3493,8 +3489,8 @@ known bugs and solutions.
     voltage-signalling UPS. If you have a apcsmart UPS, we
     recommend building a Custom Smart cable. (see `Smart-Custom Cable for
     SmartUPSes`_) If you have a voltage-signaling UPS, we recommend that 
-    you build a Custom Simple cable. (see `Voltage-Signalling Cable for "dumb"
-    UPSes`_)
+    you build a Custom Simple cable. (see `Simple-Custom Voltage-Signalling 
+    Cable for "dumb" UPSes`_)
 
 :Question:
     How much CPU resources does apcupsd use?
@@ -5029,8 +5025,16 @@ Once you are sure that serial port communications is working,
 proceed to the next test.
 
 
-Determining Which Voltage-Signaling Cable You Have
---------------------------------------------------
+Once you have established serial communications
+-----------------------------------------------
+
+Once you have established that apcupsd can talk
+to the UPS over the serial part, go do the series of functional
+tests described in the main Testing section (see `Testing Apcupsd`_).
+
+
+Troubleshooting Serial Line communications
+------------------------------------------
 
 *The most frequently encountered problem with voltage-signalling
 UPSes (e.g. BackUPS 650) is that you have incorrectly specified
@@ -5044,15 +5048,6 @@ For simple signaling UPSes, you should **not** use ``simple`` in the
 cable specification (i.e. ``UPSCABLE simple``) unless you have made
 the cable yourself according to the wiring diagram given in the
 cables chapter of this manual.
-
-
-Once you have established serial communications
------------------------------------------------
-
-Once you have established that apcupsd can talk
-to the UPS over the serial part, go do the series of functional
-tests described in the main Testing section (see `Testing Apcupsd`_).
-
 
 Bizarre Intermittent Behavior:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -5501,8 +5496,8 @@ hardware module. Most users will not use this mode.
     share and sharenet code is not fully tested.
 
 
-Configuration Directives Used to Set the UPS EPROM
---------------------------------------------------
+Configuration Directives Used to Set the UPS EEPROM
+---------------------------------------------------
 
 *These directives have no effect on the operation of apcupsd but are
 reserved for use by apctest when bulk programming the values of the
