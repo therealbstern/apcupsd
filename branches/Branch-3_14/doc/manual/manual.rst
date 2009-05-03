@@ -6119,6 +6119,8 @@ Please see the `Killpower under Windows`_ chapter of this manual for
 conderations pertaining to shutdown and killpower on Windows.
 
 
+.. include:: smartprotocol.rst
+
 
 Apcupsd RPM Packaging FAQ
 =========================
