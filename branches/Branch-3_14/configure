@@ -9580,6 +9580,10 @@ _ACEOF
 #define HAVE_DARWIN_OS 1
 _ACEOF
   ;;
+   *-*-nto*)     cat >>confdefs.h <<\_ACEOF
+#define HAVE_QNX_OS 1
+_ACEOF
+     ;;
 esac
 
 
@@ -12441,6 +12445,9 @@ then
 elif test $HAVE_UNAME=yes -a x`uname -s` = xDarwin
 then
     DISTNAME=darwin
+elif test $HAVE_UNAME=yes -a x`uname -s` = xQNX
+then
+   DISTNAME=qnx
 elif test -f /etc/SuSE-release
 then
    DISTNAME=suse
@@ -12692,6 +12699,14 @@ darwin)
       platforms/darwin/ApcupsdDaemon.Info.plist \
       platforms/darwin/ApcupsdPkg.Info.plist \
       platforms/darwin/ApcupsdUsbShim.Info.plist"
+   ;;
+qnx)
+   PTHREAD_LFLAGS=""
+   DISTVER=`uname -r`
+   SERIALDEV=/dev/ser1
+   DFILES="\
+      platforms/qnx/apcupsd \
+      platforms/qnx/apccontrol"
    ;;
 unknown)
    DISTVER=unknown

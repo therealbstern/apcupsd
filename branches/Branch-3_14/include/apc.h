@@ -129,6 +129,11 @@
 # include <sys/modem.h>
 #endif
 
+#ifdef HAVE_QNX_OS
+# include <spawn.h>
+# include <sys/procmgr.h>
+#endif
+
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
