@@ -247,12 +247,19 @@ endif
 # Build *.html from *.rst and generate dependencies for it
 %.html: %.rst
 	@$(ECHO) "  HTML " $<
+ifneq ($(strip $(RST2HTML)),)
 	$(VV)if test ! -d $(DEPDIR); then mkdir -p $(DEPDIR); fi;
 	$(V)$(RST2HTML) $(RST2HTMLOPTS) $< $@
 	$(VV)$(RSTDEPENDS)
+else
+	@$(ECHO) "--> Not building HTML due to missing rst2html"
+endif
 
 # Build *.pdf from *.rst
 %.pdf: %.rst
 	@$(ECHO) "  PDF  " $<
+ifneq ($(strip $(RST2PDF)),)
 	$(V)$(RST2PDF) $(RST2PDFOPTS) -o $@ $<
-
+else
+	@$(ECHO) "--> Not building PDF due to missing rst2pdf"
+endif
