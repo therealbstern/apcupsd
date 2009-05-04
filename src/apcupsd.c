@@ -338,6 +338,7 @@ static void daemon_start(void)
    pid_t cpid;
    mode_t oldmask;
 
+#ifndef HAVE_QNX_OS
    if ((cpid = fork()) < 0)
       Error_abort0("Cannot fork to become daemon\n");
    else if (cpid > 0)
@@ -345,6 +346,15 @@ static void daemon_start(void)
 
    /* Child continues */
    setsid();                       /* become session leader */
+#else
+   if (procmgr_daemon(EXIT_SUCCESS, PROCMGR_DAEMON_NOCHDIR
+                                    | PROCMGR_DAEMON_NOCLOSE
+                                    | PROCMGR_DAEMON_NODEVNULL
+                                    | PROCMGR_DAEMON_KEEPUMASK) == -1)
+   {
+      Error_abort0("Couldn't become daemon\n");
+   }
+#endif   /* HAVE_QNX_OS */
 
    /* Call closelog() to close syslog file descriptor */
    closelog();

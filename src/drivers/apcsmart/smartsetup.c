@@ -71,7 +71,8 @@ int apcsmart_ups_open(UPSINFO *ups)
 
 #if defined(HAVE_OPENBSD_OS) || \
     defined(HAVE_FREEBSD_OS) || \
-    defined(HAVE_NETBSD_OS)
+    defined(HAVE_NETBSD_OS) || \
+    defined(HAVE_QNX_OS)
    my_data->newtio.c_ispeed = DEFAULT_SPEED;    /* Set input speed */
    my_data->newtio.c_ospeed = DEFAULT_SPEED;    /* Set output speed */
 #endif   /* __openbsd__ || __freebsd__ || __netbsd__  */

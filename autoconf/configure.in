@@ -344,6 +344,7 @@ case $host in
    *-*-bsdi*)    AC_DEFINE(HAVE_BSDI_OS)    ;;
    *-*-irix*)    AC_DEFINE(HAVE_SGI_OS)     ;;
    *-*-darwin*)  AC_DEFINE(HAVE_DARWIN_OS)  ;;
+   *-*-nto*)     AC_DEFINE(HAVE_QNX_OS)     ;;
 esac
 
 dnl
@@ -978,6 +979,9 @@ then
 elif test $HAVE_UNAME=yes -a x`uname -s` = xDarwin
 then
     DISTNAME=darwin
+elif test $HAVE_UNAME=yes -a x`uname -s` = xQNX
+then
+   DISTNAME=qnx
 elif test -f /etc/SuSE-release
 then
    DISTNAME=suse
@@ -1239,6 +1243,14 @@ darwin)
       platforms/darwin/ApcupsdDaemon.Info.plist \
       platforms/darwin/ApcupsdPkg.Info.plist \
       platforms/darwin/ApcupsdUsbShim.Info.plist"
+   ;;
+qnx)
+   PTHREAD_LFLAGS=""
+   DISTVER=`uname -r`
+   SERIALDEV=/dev/ser1
+   DFILES="\
+      platforms/qnx/apcupsd \
+      platforms/qnx/apccontrol"
    ;;
 unknown)
    DISTVER=unknown
