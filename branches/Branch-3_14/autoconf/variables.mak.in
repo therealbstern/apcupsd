@@ -31,8 +31,8 @@ INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 MKINSTALLDIRS = @MKINSTALLDIRS@
 CHKCONFIG = /sbin/chkconfig
-RST2HTML := rst2html
-RST2PDF := rst2pdf
+RST2HTML := @RST2HTML@
+RST2PDF := @RST2PDF@
 
 # Files and directories (paths)
 prefix = @prefix@
