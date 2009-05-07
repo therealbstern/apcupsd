@@ -35,6 +35,30 @@ at http://www.apcupsd.com
 
 ---------------------------------------------------------------------------
 
+Important Legal Disclaimer
+==========================
+
+No person should rely on the contents of the APCUPSD Manual ("the manual") 
+without first obtaining advice from APC Technical Support.
+
+The manual is provided on the terms and understanding that:
+
+   1. the authors, contributors and editors are not responsible for the 
+      results of any actions taken on the basis of information in the manual, 
+      nor for any error in or omission from the manual; and
+   2. the authors, contributors and editors are not engaged in rendering 
+      technical or other advice or services. 
+
+The the authors, contributors and editors, expressly disclaim all and any 
+liability and responsibility to any person, whether a reader of the manual 
+or not, in respect of anything, and of the consequences of anything, done or 
+omitted to be done by any such person in reliance, whether wholly or partially, 
+on the whole or any part of the contents of the manual. Without limiting the 
+generality of the above, no author, contributor or editor shall have any 
+responsibility for any act or omission of any other author, contributor or 
+editor. 
+
+
 How To Use This Manual
 ======================
 
@@ -142,13 +166,12 @@ set up and running as painlessly as possible.
    http://sourceforge.net/mailarchive/forum.php?forum_name=apcupsd-users.
 
 #. If you still need help, send a message to the apcupsd users' email
-   list (mailto:apcupsd-users@lists.sourceforge.net) describing your 
+   list (apcupsd-users@lists.sourceforge.net) describing your 
    problem, what version of
    apcupsd you are using, what operating system you are using, and
    anything else you think might be helpful.
 
-#. Read the manual sections on
-   `Monitoring and Tuning your UPS`_ and `Maintaining Your UPS`_.
+#. Read the manual section on `Monitoring and Tuning your UPS`_.
 
 Supported Operating Systems
 ---------------------------
@@ -1715,7 +1738,7 @@ which it has specific installation programs, it will set the
 Operating System to ``unknown`` and will use the incomplete
 installation scripts that are in ``platforms/unknown``. You
 will be on your own, or you can ask the developers list
-(apcupsd-users at lists.sourceforge.net) for installation
+(apcupsd-users@lists.sourceforge.net) for installation
 instructions. This directory also contains a hint file for Linux
 From Scratch, which could be helpful for other systems as well.
 
@@ -2992,10 +3015,10 @@ the web server, and access the cgi using something like:
 CGI Credits
 ~~~~~~~~~~~
 
-Many thanks go to Russell Kroll rkroll at exploits.org who wrote
+Many thanks go to Russell Kroll rkroll@exploits.org who wrote
 the CGI programs to work with his UPS Monitoring system named
 Network UPS Tools (NUT). Thanks
-also to Jonathan Benson jbenson at technologist.com for initially
+also to Jonathan Benson jbenson@technologist.com for initially
 adapting the upsstatus.cgi program to work with apcupsd.
 
 We have enhanced the bar graph program and hope that our changes
@@ -3076,372 +3099,7 @@ Note that USB connections will show a difference set of options than
 smart serial connections.
 
 
-Maintaining Your UPS
-====================
-
-If you have your UPS long enough, you will
-probably have battery problems. Below, you will find some
-suggestions for replacing batteries. One *important* note of
-caution: at least one user purchased one of the non-APC batteries
-noted below and found out that they would not fit into his unit.
-This required cutting and soldering and other very undesirable
-things, so be extremely careful in measuring the batteries
-including every millimeter of the terminal connections which can
-cause problems.
-
-Although you can do a hot swap of your batteries while the computer
-is running, it may not be very satisfactory because the unit will
-not know that the batteries have been swapped and apcupsd will
-continue to show Low Battery. To correct this situation, you must
-do a discharge and recharge of the battery followed by a battery
-recalibration using apctest. At that point the battery should be
-calibrated better. As noted below, Carl has found that it takes
-several discharge/charges before the runtime calibration is
-accurate. Take care not to discharge your battery too much as it
-tends to shorten the battery life.
-
-
-What Various People Have to Say about Batteries
------------------------------------------------
-
-Here is what John Walker has to say about APC UPS batteries:
-
-    I thought I'd pass on some information I've obtained which you'll
-    probably eventually need. Besides, by writing it down I'll be able
-    to find it the next time. I started installing mine in 1995-1996.
-    Lead-acid batteries have a finite life even if not subjected to
-    deep discharge cycles. For the batteries used by APC, this is
-    typically four to six years. As part of the self-test cycle, the
-    UPS measures the voltage of the battery at full charge (which falls
-    as the battery ages), and if it's below about 90% of the value for
-    a new battery, it sets off the "Replace battery" alarm, which it
-    repeats every day. [on apcupsd versions prior to 3.8.0, this
-    message is sent once, on version 3.8.0, it is sent every 9 hours -
-    KES]. You will occasionally get a false alarm. It's a good idea if
-    you get an alarm to repeat the self-test the next day and see if
-    the alarm goes away. If the alarm is persistent, you need to
-    replace the batteries, which can be done without powering down the
-    UPS or load-you just open up the battery door, take out the old
-    batteries, and hook up the new ones.
-
-    APC makes "Replacement Battery Units" for each of the SmartUPS
-    models, but they sell them directly only in the U.S.
-
-    It's best to wait until the low battery alarm before ordering a
-    replacement-keeping batteries on the shelf reduces their life
-    unless you keep them fully charged.
-
-
-And Andre Hendrick says:
-
-    [For replacement batteries] You need to goto you your local Yamaha
-    SeaDoo shop. There are 35 AMP Hour deep cycle marine batteries that
-    are direct replacements. These are gel-cel and will double the
-    runtime and/or cut your recharge time in half.
-
-    ::
-
-                  Jet Works
-                  1587 Monrovia Ave.
-                  Newport Beach CA 9266?
-                  Tel: +1 714 548-5259
-                  
-                  J-W Batteries, Inc.
-                  Tel: +1 714 548-4017
-                  
-                  WPS 49-1200
-                  GEL-CELL KB-35 BATTERY
-             
-
-    For those that do not know what this means........ I found the best
-    battery for APCC UPS products that use In the two systems below:
-
-    ::
-
-                  SMART-UPS 3000 10.9% is running at 327W runs for 47.0 min.
-                  Smart-UPS 1250 22.3% is running at 279W runs for 54.0 min.
-                  
-                  APCUPSD UPS Network Monitor
-                  Thu Jan 18 21:55:36 PST 2001
-                  System Model Status Battery Chg Utility UPS Load UPS Temp Batt. Run Time Data
-                  Linux ATA Development SMART-UPS 3000 ONLINE
-                                      100.0 % 120.2 VAC 10.9 % 36.9 C 47.0 min. All data
-                  Linux ATA Development II APC Smart-UPS 1250 ONLINE
-                                      100.0 % 119.6 VAC 22.3 % 45.9 C 54.0 min. All data
-             
-
-    Look at the numbers and see that these batteries are better and
-    have more total running energy than standard ones.
-
-    ::
-
-                  SMART-UPS 3000 10.9% is running at 327W runs for 47.0 min.
-                  Smart-UPS 1250 22.3% is running at 279W runs for 54.0 min.
-                  
-                  APCUPSD UPS Network Monitor
-                  Thu Jan 18 22:00:45 PST 2001
-                  System Model Status Battery Chg Utility UPS Load UPS Temp Batt. Run Time Data
-                  Linux ATA Development SMART-UPS 3000 ONLINE
-                                      100.0 % 120.2 VAC 19.2 % 36.9 C 27.0 min. All data
-                  Linux ATA Development II APC Smart-UPS 1250 ONLINE
-                                      100.0 % 119.6 VAC 21.8 % 45.9 C 55.0 min. All data
-                  
-                  SMART-UPS 3000 19.2% is running at 576W runs for 27.0 min.
-                  Smart-UPS 1250 21.8% is running at 273W runs for 55.0 min.
-                  Smart-UPS 1250 46.1% is running at 576W runs for 26.0 min.
-                  
-             
-
-    Kind of cool.
-
-    The 1250 can outrun the 3000 by a factor of two under identical
-    percentages, or run head to head for the same time.
-
-    SMART-UPS 3000 is a 48V based or 4 batteries. Smart-UPS 1250 is a
-    24V based or 2 batteries.
-
-    Cheers,
-
-    Andre Hedrick
-    Linux ATA Development
-             
-
-
-Finally, here is what Carl Erhorn has to say about batteries:
-
-    Hi, Folks.
-
-    Well, Kern was absolutely right. The problem with my UPS was
-    batteries. It was unexpected though, because there was no
-    indication of a bad battery right up until the UPS failed
-    entirely.
-
-    For those who might encounter the same thing, and don't know what's
-    happening (I didn't either), here's what happened.
-
-    A week or so ago, I turned on one of my SmartUPS 700-NET models.
-    The load is a small dual P-III unix server (Solaris 8, X86) and a
-    4MM tape drive. During the normal selftest that runs when you first
-    turn on any APC UPS, the UPS 'freaked out'. The alarm stuttered at
-    about 4 or 5 beeps per second, and all the panel lights flashed
-    spasmodically, as if something was loose inside the UPS.
-
-    I turned off the UPS and it's load, then turned the UPS on again.
-    This time, everything seemed fine. I booted the system that was
-    attached, and there were no problems. The status monitor showed 9
-    minutes runtime (which indicates fairly low capacity), but the
-    batteries showed fully charged. I began to suspect a bad inverter
-    in the UPS.
-
-    However, Kern told me that he suspected the batteries. So I took
-    the UPS offline, put an old SU-600 in it's place (just barely big
-    enough to handle the startup peaks - I get an 'overload' lamp lit
-    for about 2 seconds during boot), and checked out the batteries.
-    They did indicate that they were near the end of life, so I ordered
-    a replacement set. Those came in on Friday, and after the initial
-    charge, a complete charge/discharge cycle to recalibrate the UPS,
-    and some testing, I put it back in service.
-
-    Surprise! (Or maybe not?) Kern was right - there is nothing wrong
-    with the inverter or the charging circuit, and the new cells fixed
-    everything.
-
-    What confused me is that there was no 'replace battery' indication
-    from the UPS, even when it failed, plus a fair amount of runtime
-    indicated with a full charge. So if you see such behavior on one of
-    your UPS models, it makes sense to replace the batteries, even if
-    there is no indication that the batteries have failed yet.
-
-    One of the things I learned during this process is that the UPS
-    internal calibration will lose accuracy over the life of the
-    battery. I always do a recalibrate when I install new cells, but
-    rarely do it after that, as it's time-consuming, and you really
-    can't use the system attached to the UPS while doing it. Since my
-    systems are almost constantly in use, it's a pain to schedule a
-    recal, and I tend to put it off. This time it bit me. I'd suggest
-    that folks do a recal at least once every six months. It will make
-    your runtime estimates much more accurate, and also allows you to
-    keep track of the state of your batteries.
-
-    For those who don't know how to do this, here's what you do. This
-    proceedure should not be confused with the 'Recalibrate' feature in
-    the APC PowerchutePlus software. They do not do the same thing.
-
-    From APC's web site:
-
-    Perform a Runtime Calibration. This is a manual procedure and
-    should not be confused with the runtime calibration performed
-    through PowerChute plus. The batteries inside of the Smart-UPS are
-    controlled by a microprocessor within the UPS. Sometimes it is
-    necessary to reset this microprocessor, especially after the
-    installation of new batteries. Stop the PowerChute plus software
-    from running and disconnect the serial cable. There must be at
-    least a 30% load attached to the UPS during this procedure, but the
-    process will cause the UPS to shut off and cut power to its
-    outlets. Therefore, attach a non-critical load to the UPS and then
-    force the UPS on battery by disconnecting it from utility power.
-    Allow the unit to run on battery until it turns off completely.
-    Make sure a 30% load is present! Plug the UPS back into the wall
-    outlet and allow it to recharge (it will recharge more quickly
-    turned off and with no load present). Once the unit has recharged,
-    the "runtime remaining" calculation should be more accurate.
-    Remember that if the unit is an older model, then the runtime will
-    not improve significantly.
-
-    Background:
-
-    An APC Smart-UPS has a microprocessor which calculates runtime
-    primarily based on the load attached to the UPS and on its battery
-    capacity. On the right side of the front display panel there is a
-    vertical graph of five LEDs. Each LED is an indication of battery
-    charge in increments of twenty percent: 20, 40, 60, 80, 100%
-    (bottom to top). For example, if the battery charge is 99%, then
-    only four of the five LEDs are illuminated.
-
-    To ensure that an operating system receives a graceful shutdown
-    when using PowerChute plus or a SmartSlot accessory, an alert is
-    generated by the Smart-UPS indicating that the UPS has reached a
-    low battery condition. The alert is audible (rapid beeping), visual
-    (flashing battery LED or LEDs), and readable through the graphical
-    interface of PowerChute plus software (or a native UPS shutdown
-    program within a particular operating system.) In order to
-    calculate this "low battery condition," all Smart-UPS products have
-    a preconfigured low battery signal warning time of two minutes
-    (this is the factory default setting). There are a total of four
-    user-changeable settings: 2, 5, 7, or 10 minutes. If the low
-    battery signal warning time is set for 2 minutes, then the alerts
-    will activate simultaneously two minutes prior to shutdown.
-    Similarly, if the total runtime for a particular UPS is 30 minutes
-    with a low battery signal warning time set at 10 minutes, then the
-    UPS will run on battery for 20 minutes before the low battery alert
-    begins.
-
-    Total runtime is primarily based on two factors, battery capacity
-    and UPS load. UPS load and runtime on battery are inversely
-    proportional: as load increases, battery runtime decreases and vice
-    versa. When utility power is lost, the UPS begins discharging the
-    battery in order to support the attached load. Once power returns,
-    the Smart-UPS will automatically begin to recharge its battery.
-
-    My comments on this proceedure:
-
-    I believe this proceedure works for all APC models that calulate
-    runtime, not just the SmartUPS. It's important that you load the
-    UPS to 30% of the UPS capacity, as reported by apcupsd or another
-    UPS monitor program. I've found that normal house lamps of
-    different wattages allow me to adjust the load to almost exactly
-    what I want, which is between 30% and 35% of the UPS capacity. This
-    is critical te getting an accurate reading (according to the APC
-    web documents). Always bring the UPS to 100% charge first, as
-    indicated by the front panel lamps, or your UPS monitoring
-    software.
-
-    Set the UPS shutdown time to 2 minutes, all other settings to
-    nominal, and disconnect the serial port cable from the UPS before
-    running the recalibration. If you leave a monitoring program
-    running through the serial port, it will turn the UPS off early,
-    and you don't want to do that during a recalibration run. When the
-    run is complete, and the UPS turns off, you can reattach the serial
-    cable, and the normal loads, and recharge the batteries normally.
-    If you think you might have a power outage during the recharge
-    time, allow the UPS to recharge to 20% or so (indicated by the
-    panel lamps) before trying to use the computer system. This will
-    allow the UPS to handle short dropouts while it recharges. Of
-    course, if you can leave the computer off during the recharge time,
-    the UPS will recharge much faster.
-
-    As an aside, when the batteries failed, my total runtime at 100%
-    charge and an idle state was 9 minutes, which is pretty bad. I
-    replaced the batteries with extended capacity cells, which add
-    about 15% to the stock capacity. Now, after two complete charge/
-    discharge cycles, 100% charge shows the available runtime to be 42
-    minutes on the system when it's idle, and 33 minutes when the
-    system is very busy. The differences are due to the load of the
-    computer, when the disks are busy, and the cpus are not in a halted
-    state (my system halts the cpus when they are idle, to save power
-    and lower heat, as do other OS like Linux), when compared to an
-    idle state. Apcupsd indicates the load is about 27% when idle, and
-    as much as 37% when heavily loaded.
-
-    I've found that two charge/discharge cycles result in a more
-    accurate recalibration when installing new cells. It appears that
-    some batteries need to be put through a couple of complete cycles
-    before they reach their full capacity. I've also noticed that the
-    full-charge voltage is different for each battery until they have
-    been through two cycles. On the initial charge of my new batteries,
-    the 100% charge voltage on the two cells was almost .5 VDC apart.
-    After two complete cycles, the batteries measure within .01 VDC of
-    each other!
-
-    I hope this information helps anyone who might encounter the
-    problem I saw, and also shows folks how to recal their batteries.
-    If you haven't done a complete recalibration in a year or two, I'd
-    recommend it, so that you have warning of a low battery instead of
-    what happened to me.
-
-    Regards,
-
-    --Carl
-
-
-Where Carl Suggests You Get Batteries
--------------------------------------
-
-    Hi, Folks.
-
-    I'm just replacing the batteries in one of my SmartUPS models, and
-    it occurs to me that some of you may not know about the place I get
-    them from. I have no relationship with this company, other than as
-    a customer, but I feel they know what they are doing, their prices
-    are fair, and they have some interesting batteries available that
-    you can't obtain from APC.
-
-    These are the reasons I use them, and I thought this information
-    might be useful to the US list members. They will ship outside of
-    the US. If you have questions, you can contact them through the
-    email address listed on their web pages. They have always responded
-    pretty quickly to my questions.
-
-    The company is called Battery Wholesale Distributors, and they are
-    located in Georgetown, Texas. If you have questions, you can reach
-    them by phone at (800) 365-8444, 9:00AM to 5:00PM (their local
-    time), Monday through Friday. I've gotten email from them on the
-    weekends, although the office is not open then.
-
-    I won't post prices, as you can get current pricing from their web
-    site. They have an entire section dedicated to APC replacement
-    batteries, and it's easy to find what you need. You can order over
-    the web, or by phone. They accept all the usual credit cards.
-
-    The web site (as you might guess) is:
-    {www.batterywholesale.com}{http://www.batterywholesale.com}
-
-    The thing I really like is that they have found manufacturers who
-    make batteries in the standard case sizes, but have additional
-    capacity over the original batteries shipped with the APC UPS
-    models. Often, the difference is as much as 15% or so, and this can
-    result in additional runtime. It's a nice upgrade for a minor
-    increase in price.
-
-    They are also 'green-aware', in that they encourage you to recycle
-    your old batteries, and will accept the old batteries back from you
-    if you cannot find a local place that recycles them. You pay the
-    shipping, but I think other than that, there is no charge. I've
-    never done this, as I have a battery retailer just down the street
-    who will accept my old batteries.
-
-    Anyway, if you didn't know about these folks, put the info aside
-    where you can find it when you need replacement batteries. I won't
-    make any guarantees, but I've been very pleased with their
-    products, service, and pricing. I hope you find them as helpful to
-    you as I do. I've been dealing with them since about 1994, and have
-    never been disappointed. The owner of the place also is very good
-    on technical issues, so if you have questions on their products, he
-    can get as technical as you need to go.
-
-    Regards,
-
-    --Carl
+.. include:: maintaining_ups.rst
              
 
 Frequently-Asked Questions
@@ -5572,7 +5230,8 @@ UPS EEPROM configuration variables in a Smart-UPS model.*
 **LOWBATT** *<minutes>*
 
     Low battery warning occurs when the specified number of minutes remains 
-    before the UPS estimates battery power will be exhausted.
+    before the UPS estimates battery power will be exhausted. There are four
+    user-changeable settings: 2, 5, 7, or 10 minutes
 
 **OUTPUTVOLTS** *<voltage>*
 
@@ -6280,82 +5939,56 @@ Contributors
 ------------
 
 **Current Code Maintainer and Project Manager**
-    Adam Kropelin (akropel1 at rochester dot rr dot com)
+    Adam Kropelin (akropel1@rochester.rr.com)
 
 **RPM Packager**
-    D. Scott Barninger (barninger at fairfieldcomputers dot com)
+    D. Scott Barninger (barninger@fairfieldcomputers.com)
 
 **CGI and HTML fixer**
-    William King (wrking at dadaboom dot com)
+    William King (wrking@dadaboom.com)
 
 **Former Project Manager**
-    Kern Sibbald (kern at sibbald dot com)
+    Kern Sibbald (kern@sibbald.com)
 
 **Project Starter and Former Code Maintainer**
-    Andre Hedrick (andre at linux-ide.org)
+    Andre Hedrick (andre@linux-ide.org)
 
 **Former Code Maintainer and Project Manager**
-    Riccardo Facchetti (riccardo at master.oasi.gpa.it)
+    Riccardo Facchetti (riccardo@master.oasi.gpa.it)
 
 **Serial Communications**
-    Andre Hedrick (andre at linux-ide.org)
+    Andre Hedrick (andre@linux-ide.org)
 
 **2.0 User's Manual**
-    Eric S. Raymond (esr at thyrsus.com)
+    Eric S. Raymond (esr@thyrsus.com)
 
 **Alpha Port**
-    Kern Sibbald (kern at sibbald dot com)
-    J. Rochate (jrochate at ualg.pt) testing and machine loan
+    Kern Sibbald (kern@sibbald.com)
+    J. Rochate (jrochate@ualg.pt) testing and machine loan
 
 **Caldera**
-    John Pinner (john at clocksoft.com)
+    John Pinner (john@clocksoft.com)
 
 **HP-UX Port**
-    Carl Erhorn (Carl\_Erhorn at hyperion.com)
-    Robert K Nelson (rnelson at airflowsciences.com)
+    Carl Erhorn (Carl_Erhorn@hyperion.com)
+    Robert K Nelson (rnelson@airflowsciences.com)
 
 **SOLARIS Port**
-    Carl Erhorn (Carl\_Erhorn at hyperion.com)
+    Carl Erhorn (Carl_Erhorn@hyperion.com)
 
 **OpenBSD Port**
-    Devin Reade (gdr at gno.org)
+    Devin Reade (gdr@gno.org)
 
 **NetBSD Port**
-    Neil Darlow (neil at darlow.co.uk)
+    Neil Darlow (neil@darlow.co.uk)
 
 **Win32 Port**
-    Kern Sibbald (kern at sibbald dot com)
-    Paul Z. Stagner (paul.stagner at charterco.com) testing
+    Kern Sibbald (kern@sibbald.com)
+    Paul Z. Stagner (paul.stagner@charterco.com) testing
 
 **WEB Interfaces**
-    Kern Sibbald (kern at sibbald dot com)
-    Joseph Acosta (joeja at mindspring.com)
-
-
-Disclaimer: NO WARRANTY
------------------------
-
-BECAUSE THE PROGRAM IS LICENSED FREE OF
-CHARGE, THERE IS NO WARRANTY FOR THE PROGRAM, TO THE EXTENT
-PERMITTED BY APPLICABLE LAW. EXCEPT WHEN OTHERWISE STATED IN
-WRITING THE COPYRIGHT HOLDERS AND/OR OTHER PARTIES PROVIDE THE
-PROGRAM "AS IS" WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESSED OR
-IMPLIED, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF
-MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE. THE ENTIRE
-RISK AS TO THE QUALITY AND PERFORMANCE OF THE PROGRAM IS WITH YOU.
-SHOULD THE PROGRAM PROVE DEFECTIVE, YOU ASSUME THE COST OF ALL
-NECESSARY SERVICING, REPAIR OR CORRECTION.
-
-IN NO EVENT UNLESS REQUIRED BY APPLICABLE LAW OR AGREED TO IN
-WRITING WILL ANY COPYRIGHT HOLDER, OR ANY OTHER PARTY WHO MAY
-MODIFY AND/OR REDISTRIBUTE THE PROGRAM AS PERMITTED ABOVE, BE
-LIABLE TO YOU FOR DAMAGES, INCLUDING ANY GENERAL, SPECIAL,
-INCIDENTAL OR CONSEQUENTIAL DAMAGES ARISING OUT OF THE USE OR
-INABILITY TO USE THE PROGRAM (INCLUDING BUT NOT LIMITED TO LOSS OF
-DATA OR DATA BEING RENDERED INACCURATE OR LOSSES SUSTAINED BY YOU
-OR THIRD PARTIES OR A FAILURE OF THE PROGRAM TO OPERATE WITH ANY
-OTHER PROGRAMS), EVEN IF SUCH HOLDER OR OTHER PARTY HAS BEEN
-ADVISED OF THE POSSIBILITY OF SUCH DAMAGES.
+    Kern Sibbald (kern@sibbald.com)
+    Joseph Acosta (joeja@mindspring.com)
 
 
 Appendices

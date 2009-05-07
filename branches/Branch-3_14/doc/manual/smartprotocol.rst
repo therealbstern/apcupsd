@@ -68,8 +68,8 @@ for "not available", otherwise the response is given in the
 |         |            |                |Black Back-UPS Pros                   |
 +---------+------------+----------------+--------------------------------------+
 |^Z       |Permitted   |*long string*   |Gives the EEPROM permitted values for |
-|         |EEPROM      |                |your model. See below for details.    |
-|         |Values      |                |                                      |
+|         |EEPROM      |                |your model. See `EEPROM Values`_ for  |
+|         |Values      |                |details.                              |
 +---------+------------+----------------+--------------------------------------+
 |A        |Front panel |Light show +    |Also sounds the beeper for 2 seconds  |
 |         |test        |"OK"            |                                      |
@@ -136,7 +136,7 @@ for "not available", otherwise the response is given in the
 |P        |Power load  |023.5           |Relative to capacity of the UPS.      |
 |         |%           |                |                                      |
 +---------+------------+----------------+--------------------------------------+
-|Q        |Status flags|08              |Bitmapped, see status flags below     |
+|Q        |Status flags|08              |Bitmapped, see `status bits`_ below   |
 +---------+------------+----------------+--------------------------------------+
 |R        |Turn dumb   |BYE             |Only on 3rd gen SmartUPS, SmartUPS    | 
 |         |            |                |v/s, BackUPS Pro. Must sent enter     |
@@ -146,12 +146,12 @@ for "not available", otherwise the response is given in the
 |         |shutdown    |                |UPS goes online when power returns.   |
 |         |            |                |Only works when on battery.           |
 +---------+------------+----------------+--------------------------------------+
-|U        |Simulate    |!, then $       |See async notifier section for info   |
+|U        |Simulate    |!, then $       |See `Alert messages`_ section for info|
 |         |power       |                |on ! and $.                           |
 |         |failure     |                |                                      |
 +---------+------------+----------------+--------------------------------------+
-|V        |Old firmware|"GWD" or "IWI"  |The last character indicates the      |
-|         |revision    |                |locale (Domestic, International)      |
+|V        |Old firmware|"GWD" or "IWI"  |See `Interpretation of the Old        |
+|         |revision    |                |Firmware Revision`_                   |
 +---------+------------+----------------+--------------------------------------+
 |W        |Self test   |OK              |Tests battery, like pushing button on |
 |         |            |                |the front panel. Results stored in "X"|
@@ -180,8 +180,11 @@ for "not available", otherwise the response is given in the
 |         |            |                |- Alert messages (aka async notifiers)|
 |         |            |                |- Valid commands                      |
 +---------+------------+----------------+--------------------------------------+
-|b        |Firmware    |50.9.D          |Decoding the example:                 |
-|         |revision    |                |                                      |
+|b        |Firmware    |50.9.D          |See `Interpretation of the New        |
+|         |revision    |                |Firmware Revision`_.                  |
+|         |            |                |                                      |
+|         |            |                |Decoding the example:                 |
+|         |            |                |                                      |
 |         |            |                |- 50 = SKU (variable length)          | 
 |         |            |                |- 9 = firmware revision               |
 |         |            |                |- D = country code (D=USA,            |
@@ -306,12 +309,12 @@ for "not available", otherwise the response is given in the
 |0x7f     |Abort       |OK              |Use to abort @, S, K                  |
 |         |shutdown    |                |                                      |
 +---------+------------+----------------+--------------------------------------+
-|~        |Register #1 |*see below*     |See register 1 table                  |
+|~        |Register #1 |*see below*     |See `Register 1`_ table               |
 +---------+------------+----------------+--------------------------------------+
-|'        |Register #2 |*see below*     |See register 2 table                  |
+|'        |Register #2 |*see below*     |See `Register 2`_ table               |
 +---------+------------+----------------+--------------------------------------+
-|0        |Battery     |                |Set to A0 on SmartUPS 1000 with new   |
-|         |constant    |                |battery                               |
+|0        |Battery     |                |See `Resetting the UPS Battery        |
+|         |constant    |                |Constant`_                            |
 +---------+------------+----------------+--------------------------------------+
 |4        |*???*       |                |Prints 35 on SmartUPS 1000            |
 +---------+------------+----------------+--------------------------------------+
@@ -319,10 +322,10 @@ for "not available", otherwise the response is given in the
 +---------+------------+----------------+--------------------------------------+
 |6        |*???*       |                |Prints F9 on SmartUPS 1000            |
 +---------+------------+----------------+--------------------------------------+
-|7        |DIP switch  |                |See below                             |
+|7        |DIP switch  |                |See `Dip switch info`_                |
 |         |positions   |                |                                      |
 +---------+------------+----------------+--------------------------------------+
-|8        |Register #3 |*see below*     |See register 3 table                  |
+|8        |Register #3 |*see below*     |See `Register 3`_ table               |
 +---------+------------+----------------+--------------------------------------+
 |9        |Line quality|FF              |Possible values:                      |
 |         |            |                |                                      |
@@ -398,6 +401,7 @@ for "not available", otherwise the response is given in the
 
 
 Dip switch info
+---------------
 
 === ====== =====================================================================
 Bit Switch Option when bit=1
@@ -445,41 +449,52 @@ These single character messages are sent by the UPS any time there
 is an Alert condition. All other responses indicated above are sent
 by the UPS only in response to a query or action command.
 
-========= ======================================================================
-Character Description
-========= ======================================================================
-!         Line Fail - sent when the UPS goes on-battery, repeated every 30 
-          seconds until low battery condition reached. Sometimes occurs more 
-          than once in the first 30 seconds.
-$         Return from line fail - UPS back on line power, only sent if a ! 
-          has been sent.
-%         Low battery - Sent to indicate low battery, but not on SmartUPS v/s
-          or BackUPS Pro models
-\+        Return from low battery - Sent when the battery has been recharged 
-          to some level only if a % has been sent previously
-?         Abnormal condition - sent for conditions such as "shutdown due to 
-          overload" or "shutdown due to low battery capacity". Also occurs 
-          within 10 minutes of turnon.
-=         Return from abnormal condition - Sent when the UPS returns from an 
-          abnormal condition where ? was sent, but not a turn-on. Not 
-          implemented on SmartUPS v/s or BackUPS Pro models.
-\*        About to turn off - Sent when the UPS is about to switch off the load.
-          No commands are processed after this character is sent. Not 
-          implemented on SmartUPS v/s, BackUPS Pro, or 3rd generation SmartUPS 
-          models.
-#         Replace battery - Sent when the UPS detects that the battery needs 
-          to be replaced. Sent every 5 hours until a new battery test is run or
-          the UPS is shut off. Not implemented on SmartUPS v/s or BackUPS Pro 
-          models.
-&         Check alarm register for fault (Measure-UPS) - sent to signal that
-          temp or humidity out of set limits. Also sent when one of the contact 
-          closures changes states. Sent every 2 minutes, stops when the alarm 
-          conditions are reset. Only sent for alarms enabled with I. Cause of 
-          alarm may be determined with J. Not on SmartUPS v/s or BackUPS Pro.
-\|        Variable change in EEPROM - Sent whenever any EEPROM variable is 
-          changed. Only supported on Matrix UPS and 3rd generation SmartUPS 
-          models.
-========= ======================================================================
+========= ============= ========================================================
+Character Meaning       Description
+========= ============= ========================================================
+!         Line Fail     Sent when the UPS goes on-battery, repeated  every 30
+                        seconds until low battery condition reached. Sometimes 
+                        occurs more than once in the first 30 seconds.
+
+$         Return from   UPS back on line power. Only sent if a ! has been sent
+          line fail     previously.
+                                
+%         Low battery   Sent to indicate low battery. Not implemented on 
+                        SmartUPS v/s or BackUPS Pro models
+
+\+        Return from   Sent when the battery has been recharged to some level
+          low batt      Only sent if a % has been sent previously.
+
+?         Abnormal      Sent for conditions such as "shutdown due to overload"
+          condition     or "shutdown due to low battery  capacity". Also occurs 
+                        within 10 minutes of turnon.
+
+=         Return from   Sent when the UPS returns from an abnormal condition
+          abnormal      where ? was sent, but not a turn-on. Not implemented on
+          condition     SmartUPS v/s or BackUPS Pro models.
+
+\*        About to      Sent when the UPS is about to switch off the load. No
+          turn off      commands are processed after this character is sent. Not
+                        implemented on SmartUPS v/s, BackUPS Pro, or 3rd 
+                        generation SmartUPS models.
+
+#         Replace       Sent when the UPS detects that the battery needs to be
+          battery       replaced. Sent every 5 hours until a new battery test is
+                        run or the UPS is shut off. Not implemented on SmartUPS 
+                        v/s or BackUPS Pro models.
+
+&         Check alarm   Sent to signal that temp or humidity out of set limits.
+          register      Also sent when one of the contact closures changes 
+          for fault     state. Sent every 2 minutes until the alarm conditions
+          (Measure-UPS) are reset. Only sent for alarms enabled with I. Cause of
+                        alarm may be determined with J. Not implemented on 
+                        SmartUPS v/s or BackUPS Pro.
+
+\|        Variable 
+          change in     Sent whenever any EEPROM variable is changed. Only
+          EEPROM        supported on Matrix UPS and 3rd generation SmartUPS 
+                        models.
+========= ============= ========================================================
 
 
 Register 1
