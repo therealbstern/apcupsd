@@ -716,22 +716,22 @@ Programming the UPS EEPROM
 There are at this time a maximum of 12 different values that can be
 programmed into the UPS EEPROM. They are:
 
-==== ======= ===================================================================
-Item Command Meaning
-==== ======= ===================================================================
-1.   c       The UPS Id or name
-2.   x       The last date the batteries were replaced
-3.   u       The Upper Transfer Voltage
-4.   l       The Lower Transfer Voltage
-5.   e       The Return Battery Charge Percentage
-6.   o       The Output Voltage when on Batteries
-7.   s       The Sensitivity to Line Quality
-8.   p       The Shutdown Grace Delay
-9.   q       The Low Battery Warning Delay
-10.  k       The Alarm Delay
-11.  r       The Wakeup Delay
-12.  E       The Automatic Self Test Interval
-==== ======= ===================================================================
+======= ========================================================================
+Command Meaning
+======= ========================================================================
+c       The UPS Id or name
+x       The last date the batteries were replaced
+u       The Upper Transfer Voltage
+l       The Lower Transfer Voltage
+e       The Return Battery Charge Percentage
+o       The Output Voltage when on Batteries
+s       The Sensitivity to Line Quality
+p       The Shutdown Grace Delay
+q       The Low Battery Warning Delay
+k       The Alarm Delay
+r       The Wakeup Delay
+E       The Automatic Self Test Interval
+======= ========================================================================
 
 The first two cases (Ident and Batt date) are somewhat special in
 that you tell the UPS you want to change the value, then you supply
