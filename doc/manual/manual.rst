@@ -1,6 +1,6 @@
-|logo|
-
 .. title:: APCUPSD User Manual
+
+.. image:: ./apcupsd.png
 
 ===================
 APCUPSD User Manual
@@ -333,7 +333,7 @@ Here is a diagram that summarizes the possibilities:
 Configuration types
 -------------------
 
-|image|
+.. image:: ./main_configs.png
 
 If you decide to set up one of these more complex configurations,
 see the dedicated section on that particular configuration.
@@ -2906,7 +2906,8 @@ monitors multiple UPSes at the same time. A typical output of
 multimon.cgi as displayed in your Web browser might look like the
 following:
 
-|image1|
+.. image:: ./multimon.png
+   :align: center
 
 The machines monitored as well as the values and their column
 headings are all configurable (see /etc/apcupsd/hosts.conf and
@@ -2919,7 +2920,8 @@ By clicking on the ``system`` name in the multimon.cgi display, you will
 invoke upsstats.cgi for the specified system, which will produce a bar
 graph display of three of the monitored values. For example,
 
-|image2|
+.. image:: ./status.png
+   :align: center
 
 You can display different bar graphs by selecting different
 variables from the drop down menus at the top of each of the three
@@ -4221,7 +4223,7 @@ On Windows NT/2000/XP, you may alternatively go to the Control
 Panel, open the Services folder, select Apcupsd UPS Server, and
 then click on the **Start** button as shown below:
 
-|image3|
+.. image:: ./wininstall6.png
 
 If the Services dialog reports a problem, it is normally because
 your DEVICE statement does not contain the correct serial port
@@ -5926,7 +5928,7 @@ Apcupsd RPM Packaging FAQ
 Credits
 =======
 
-|thanks-image|
+.. image:: ./thanks.png
 
 The success of apcupsd is due to the many people that helped in
 development, testing and in many other ways.
@@ -6777,16 +6779,10 @@ Interpretation of /proc/bus/usb info on 2.6 kernels:
                                   ### END ###
 
 
-.. |image| image:: ./main_configs.png
-.. |image1| image:: ./multimon.png
-.. |image2| image:: ./status.png
-.. |image3| image:: ./wininstall6.png
 .. |image4| image:: ./commlost.png
 .. |image5| image:: ./online.png
 .. |image6| image:: ./onbatt.png
 .. |image7| image:: ./charging.png
-.. |thanks-image| image:: ./thanks.png
-.. |logo| image:: ./apcupsd.png
 .. |date| date:: %B %e, %Y
 .. |time| date:: %T
 .. |(C)| unicode:: 0xA9 .. copyright sign
