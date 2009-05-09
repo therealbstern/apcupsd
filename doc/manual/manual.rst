@@ -372,8 +372,8 @@ Known Linux USB Issues
 **Problem**
     Mandrake 10.0 and 10.1 systems with high security mode
     enabled (running kernel-secure kernel) use static device nodes but
-    still assign USB minor numbers dynamically. This is evidenced by {
-    hiddev0: USB HID v1.10 Device [...]} instead of { hiddev96: ...} in
+    still assign USB minor numbers dynamically. This is evidenced by
+    ``hiddev0: USB HID v1.10 Device [...]`` instead of ``hiddev96: ...`` in
     dmesg log.
 
 **Workaround**
@@ -382,7 +382,7 @@ Known Linux USB Issues
 
 **Problem**
     USB driver linux-usb.c fails to compile, reporting errors
-    about { HID_MAX_USAGES undefined}. This is due to a defect in the
+    about ``HID_MAX_USAGES undefined``. This is due to a defect in the
     linux kernel hiddev.h header file on 2.6.5 and higher kernels.
 
 **Workaround**
@@ -1242,7 +1242,7 @@ by the master.
 Configure Options
 -----------------
 
-All the available { configure} options can be printed by entering:
+All the available ``configure`` options can be printed by entering:
 
 ::
 
@@ -1267,7 +1267,7 @@ to customize your installation.
     The default is /sbin. You may
     be tempted to place the executable files in /usr/sbin or
     /usr/local/sbin. Please use caution here as these directories may
-    be unmounted during a shutdown and thus may prevent the { halt}
+    be unmounted during a shutdown and thus may prevent the ``halt``
     script from calling apcupsd to turn off the UPS power. Though your
     data will be protected, in this case, your system will probably not
     be automatically rebooted when the power returns
@@ -1963,8 +1963,8 @@ for more information. The cable number is normally stamped in the
 plastic at one end of the cable. If you specify the wrong cable, it
 is very likely that at the first power failure, your computer will
 be immediately shutdown. This is an unfortunate consequence of the
-dumb signaling mode. To avoid this, first replace {
-/etc/apcupsd/apccontrol} with { safe.apccontrol} found in the
+dumb signaling mode. To avoid this, first replace
+/etc/apcupsd/apccontrol with safe.apccontrol found in the
 examples directory, then test until everything works correctly.
 Once you have the correct cable, be sure to remember to reinstall
 the correct apccontrol file and test that your computer is
@@ -2531,7 +2531,7 @@ wait for your UPS to power itself off, or power if off manually
 before restarting your computer. On my system, the UPS is
 configured as at the factory to have a 180 second grace period
 before shutting off the power. During this type of testing, 180
-seconds { seems} like an eternity, so please take care to either
+seconds *seems* like an eternity, so please take care to either
 wait or manually power off your UPS. To determine what grace period
 is programmed into your UPS EEPROM, run '``apcaccess eprom``' and look
 at the "Shutdown grace delay".
@@ -3116,7 +3116,7 @@ known bugs and solutions.
     control. For a long time APC wanted to keep other people from
     talking to its UPSes so it could lock out potential competition for
     its PowerChute software. Scrambling the leads on its serial cables
-    was a cheap way to accomplish this {-} in fact, they tended to be
+    was a cheap way to accomplish this -- in fact, they tended to be
     wired so that if you tried a straight-through cable, opening a
     serial link to the UPS would be interpreted as a shutdown command!
 
@@ -3315,8 +3315,7 @@ where:
 
 *ups-name*
     is the name of the UPS as specified in the
-    configuration file (not the name in the EEPROM). For version 3.8.2,
-    this is always set to { Default}
+    configuration file (not the name in the EEPROM).
 
 *connected*
     is 1 if apcupsd is connected to the UPS
@@ -4079,10 +4078,10 @@ In order to ensure that the data logged to syslog() can be directed
 to different files, I have assigned syslog() levels to each of our
 four types of data as follows:
 
-#. 1. DEBUG logging has level LOG_DEBUG
-#. 2. DATA logging has level LOG_INFO
-#. 3. STATUS logging has level LOG_NOTICE
-#. 4. EVENTS logging has levels LOG_WARNING, LOG_ERR, LOG_CRIT, and LOG_ALERT
+#. DEBUG logging has level LOG_DEBUG
+#. DATA logging has level LOG_INFO
+#. STATUS logging has level LOG_NOTICE
+#. EVENTS logging has levels LOG_WARNING, LOG_ERR, LOG_CRIT, and LOG_ALERT
 
 It should be noted that more work needs to be done on the precise
 definitions of each of the levels for EVENTS logging. Currently, it
@@ -4518,7 +4517,7 @@ If you have a UPS that communicates via
 serial port, you need to do two things before you can even think
 about configuring the software. First, you need to figure out
 whether it's a dumb (voltage-signalling) UPS or speaks the apcsmart
-protocol (see this discussion (see {upstypes}{upstypes})). Second,
+protocol. Second,
 if you have an interface cable from APC, you need to figure out
 what kind it is. If you don't have such a cable, you need to build
 one. A straight-through serial cable won't work.
@@ -4572,8 +4571,8 @@ because it is completely quiescent when there are no commands being
 passed, and the command repertoire doesn't include any self-tests.
 
 Because it is easy to configure a serial cable incorrectly in such
-a way as to cause premature shutdowns of the UPS power, we {
-strongly} recommend, especially for voltage- signaling (dumb)
+a way as to cause premature shutdowns of the UPS power, we
+*strongly* recommend, especially for voltage- signaling (dumb)
 UPSes, that you do most of the initial testing with your computer
 plugged into the wall rather than your UPS. Thus if the UPS power
 is suddenly shut off, your computer will continue to run. We also
@@ -4863,7 +4862,7 @@ for ``UPSCABLE usb``).
     Please note that although the directive name is LOCKFILE, you are
     actually specifying the lock file path. apcupsd automatically
     appends the name of the device when creating the file. On most
-    systems, this directive is automatically set by the { ./configure}
+    systems, this directive is automatically set by the ``./configure``
     program. You may also explicitly set it during the build process by
     using the ``--with-lock-dir=`` option of the ``configure`` program.
 
@@ -4982,8 +4981,8 @@ charge remaining (``BATTERYLEVEL``) or the remaining battery runtime
     send a wall message on Unix systems and a popup message in
     Windows.
 
-    The value of ``ANNOYDELAY`` must be greater than the value of {
-    ANNOY} in order to receive annoy messages (this doesn't make sense,
+    The value of ``ANNOYDELAY`` must be greater than the value of
+    ``ANNOY`` in order to receive annoy messages (this doesn't make sense,
     and means that the default values do not generate annoy messages:
     KES).
 
@@ -5748,7 +5747,7 @@ your system is rebooted. This normally occurs because the startup
 script apcupsd is linked into the appropriate places in /etc/rc.d.
 On most Linux systems, there is a program called chkconfig(8) that
 will automatically link the startup script. This program is invoked
-by the { make install} scripts, or it is explicitly done for those
+by the ``make install`` scripts, or it is explicitly done for those
 systems that do not have chkconfig(8). If this is not the case, you
 can either link it in appropriately yourself or explicitly call it
 from your rc.local file. The appropriate manual way to startup
