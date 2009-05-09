@@ -64,7 +64,7 @@ How To Use This Manual
 
 This is the manual for apcupsd, a
 daemon for communicating with UPSes (Uninterruptible Power
-Supplies) made by American Power Corporation (APC). If you have an
+Supplies) made by American Power Conversion Corporation (APC). If you have an
 APC-made UPS, whether sold under the APC nameplate or OEMed (for example, the HP
 PowerTrust 2997A), and you want you get it working with a computer running
 Linux, Unix, or Windows, you are reading the right document.
