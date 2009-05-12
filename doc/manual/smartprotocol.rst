@@ -81,7 +81,7 @@ for "not available", otherwise the response is given in the
 |C        |Internal    |036.0           |Units are degrees C                   |
 |         |Temperature |                |                                      |
 +---------+------------+----------------+--------------------------------------+
-|D        |Runtime     | !, then $      |Runs until battery is below 25% (35%  |
+|D        |Runtime     |!, then $       |Runs until battery is below 25% (35%  |
 |         |calibration |                |for Matrix) Updates the 'j' values.   |
 |         |            |                |Only works at 100% battery charge. Can|
 |         |            |                |be aborted with a second "D"          |
@@ -139,7 +139,7 @@ for "not available", otherwise the response is given in the
 |Q        |Status flags|08              |Bitmapped, see `status bits`_ below   |
 +---------+------------+----------------+--------------------------------------+
 |R        |Turn dumb   |BYE             |Only on 3rd gen SmartUPS, SmartUPS    | 
-|         |            |                |v/s, BackUPS Pro. Must sent enter     |
+|         |            |                |v/s, BackUPS Pro. Must send enter     |
 |         |            |                |smart mode command to resume comms.   |
 +---------+------------+----------------+--------------------------------------+
 |S        |Soft        |OK              |Command executes after grace period.  |
@@ -271,16 +271,16 @@ for "not available", otherwise the response is given in the
 |         |            |                |- L = lowest                          |
 |         |            |                |- A = autoadjust (Matrix only)        |
 +---------+------------+----------------+--------------------------------------+
+|t        |Measure-UPS |80.5            |Degrees C. Only works on models with  |
+|         |ambient     |                |the Measure-UPS SmartSlot card .      |
+|         |temperature |                |                                      |
++---------+------------+----------------+--------------------------------------+
 |u        |Upper       |132             |Writable variable. UPS goes on battery|
 |         |transfer    |                |when voltage rises above this point.  |
 |         |voltage     |                |                                      |
 +---------+------------+----------------+--------------------------------------+
 |v        |Measure-UPS |4Kx             |Firmware information for Measure-UPS  |
 |         |firmware    |                |board                                 |
-+---------+------------+----------------+--------------------------------------+
-|t        |Measure-UPS |80.5            |Degrees C. Only works on models with  |
-|         |ambient     |                |the Measure-UPS SmartSlot card .      |
-|         |temperature |                |                                      |
 +---------+------------+----------------+--------------------------------------+
 |x        |Last battery|11/29/96        |Writable variable. Holds whatever the |
 |         |change date |                |user set in it. Eight characters.     |
@@ -490,10 +490,9 @@ $         Return from   UPS back on line power. Only sent if a ! has been sent
                         alarm may be determined with J. Not implemented on 
                         SmartUPS v/s or BackUPS Pro.
 
-\|        Variable 
-          change in     Sent whenever any EEPROM variable is changed. Only
-          EEPROM        supported on Matrix UPS and 3rd generation SmartUPS 
-                        models.
+\|        Variable      Sent whenever any EEPROM variable is changed. Only
+          change in     supported on Matrix UPS and 3rd generation SmartUPS 
+          EEPROM        models.
 ========= ============= ========================================================
 
 
@@ -507,7 +506,7 @@ bits 6 and 7. Other models do not respond.
 Bit Meaning when bit=1
 === ============================================================================
 0   In wakeup mode (typically lasts < 2s)
-1   In bypass mode due to internal fault - see register 2 or 3
+1   In bypass mode due to internal fault (see `Register 2`_ or `Register 3`_)
 2   Going to bypass mode due to command
 3   In bypass mode due to command
 4   Returning from bypass mode
@@ -552,7 +551,7 @@ Bit Meaning when bit=1
 0   Output unpowered due to shutdown by low battery
 1   Unable to transfer to battery due to overload
 2   Main relay malfunction - UPS turned off
-3   In sleep mode from @ (maybe others)
+3   In sleep mode from @ command (maybe others)
 4   In shutdown mode from S command
 5   Battery charger failure
 6   Bypass relay malfunction
