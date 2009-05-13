@@ -27,10 +27,10 @@ sufficient to remove any hydrogen, so special ventilation is not required.
 Battery Life
 ------------
 
-Most brand name UPS batteries should last 3-5 years. Some APC Back UPS models 
+Most brand name UPS batteries should last 3-5 years. Some APC Back-UPS models 
 may have a shorter battery life expectancy. Refer to the user's manual of your 
 APC Back-UPS to determine the exact battery life expectancy or contact APC
-support.
+Technical Support.
 
 Below are some APC guidelines for ensuring optimum battery life expectancy:
 
@@ -40,7 +40,7 @@ Below are some APC guidelines for ensuring optimum battery life expectancy:
 
 3. Only perform runtime calibrations on your UPS one or two times a year, if necessary. Some of our customers want to check their systems to verify that their runtime is sufficient. However, consistently performing these calibrations can significantly decrease the life expectancy of your battery.   
 
-4. Do not store batteries for extended periods of time. New batteries can be stored for 6 to 12 months from date of purchase. After this period, the battery should be used or it will lose a great deal of its charge . It is not advisable to store batteries that have already been in use.
+4. Do not store batteries for extended periods of time. New batteries can be stored for 6 to 12 months from date of purchase. After this period, the battery should be used or it will lose a great deal of its charge. It is not advisable to store batteries that have already been in use.
 
 5. Do not exceed 80 percent of a UPS unit's rated capacity due to the reduction in run time. When you increase your load, your runtime decreases. In the event of a utility power failure, a UPS loaded to full capacity will drain and discharge it's battery quickly and will decrease the life expectancy.
 
@@ -117,7 +117,7 @@ genuine replacement APC batteries.
 
 - APC batteries are supported by APC
 - APC batteries come with all the necessary hardware
-- APC batteries come as pre-made packs
+- APC batteries come as pre-made cartridges 
 - APC batteries will physically fit your UPS
 
 **APC Battery Cons**
@@ -134,7 +134,7 @@ There are also pros and cons to purchasing third party batteries.
 **Third Party Battery Cons**
 
 - You will need to recycle your battery hardware (cables, connectors etc)
-- You will need to create your own battery packs (with doublesided tape)
+- You will need to create your own battery cartridges (with doublesided tape)
 - You will need to ensure the third party battery is the right physical size
 - You will need to ensure the third party battery is the right capacity
 - Use of a third party battery will void APC's Equipment Protection Policy
@@ -175,11 +175,13 @@ UPS notice that the battery has been replaced.
 
 2. If after a self-test, the UPS does not detect that the battery has been
 replaced, you can use apctest to do a soft battery runtime calibration.
-For details of doing this, refer to the "Runtime Calibrfation" section below.
+For details of doing this, refer to the "Soft" Runtime Calibration section
+below.
 
 3. If after the soft battery runtime recalibration, the UPS does not detect
-that the battery has been replaced, you will need to do a hard battery runtime 
-calibration.
+that the battery has been replaced, you will need to do a manual battery
+runtime calibration. For details of doing this, refer to the "Manual" Runtime 
+Calibration section below.
 
 "Soft" Runtime Calibration 
 --------------------------
@@ -193,8 +195,8 @@ failure occurs. Frequent calibrations reduce the life of batteries. APC
 recommends performing a runtime calibration only annually, semiannually, or 
 whenever the load on the UPS is increased.
 
-In order to perform a runtime calibration it is necessary to wait for the UPS 
-to recharge its batteries to 100% capacity. Once this has been done, 
+In order to perform a "soft" runtime calibration it is necessary to wait for 
+the UPS to recharge its batteries to 100% capacity. Once this has been done, 
 you can then initiate a runtime calibration through apctest.
 
 APC Documentation Notes:
@@ -219,7 +221,7 @@ When doing a runtime calibration with "older" batteries, APC Technical Support
 reoommend doing a complete discharge and recharge first.
 
 If you have "dumb" UPS (aka simple signalling) like a Back-UPS, then your only 
-option is to do a manual runtime calibration (see below).
+option is to do a manual runtime calibration.
 
 "Manual" Runtime Calibration
 ----------------------------
