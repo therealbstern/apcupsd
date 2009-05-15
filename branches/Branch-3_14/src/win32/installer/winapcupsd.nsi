@@ -353,8 +353,8 @@ SectionEnd
 Section "Documentation" SecDoc
   SetOutPath "$INSTDIR\doc"
   CreateDirectory "$INSTDIR\doc"
-  File ${TOPDIR}\doc\latex\manual.html
-  File ${TOPDIR}\doc\latex\*.png
+  File ${TOPDIR}\doc\manual\manual.html
+  File ${TOPDIR}\doc\manual\*.png
   ; Create Start Menu entry
   SetShellVarContext all
   CreateShortCut "$SMPROGRAMS\Apcupsd\Manual.lnk" "$INSTDIR\doc\manual.html"
