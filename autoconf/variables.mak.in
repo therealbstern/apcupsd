@@ -76,7 +76,7 @@ GAPCMON_CFLAGS = @GAPCMON_CFLAGS@
 GAPCMON_LIBS = @GAPCMON_LIBS@
 LIBEXTRAOBJ = @LIBEXTRAOBJ@
 RST2HTMLOPTS = --field-name-limit=0 --generator --time --no-footnote-backlinks --record-dependencies=$(df).d
-RST2PDFOPTS = 
+RST2PDFOPTS = --no-footnote-backlinks
 
 # Driver and package enable flags
 SMARTDRV   := @APCSMART_DRIVER@
