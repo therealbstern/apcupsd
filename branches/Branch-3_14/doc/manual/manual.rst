@@ -5938,7 +5938,7 @@ Contributors
     Adam Kropelin (akropel1@rochester.rr.com)
 
 **RPM Packager**
-    D. Scott Barninger (barninger@fairfieldcomputers.com)
+    D\. Scott Barninger (barninger@fairfieldcomputers.com)
 
 **CGI and HTML fixer**
     William King (wrking@dadaboom.com)
