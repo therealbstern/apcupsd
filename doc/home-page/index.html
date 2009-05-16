@@ -17,9 +17,8 @@
 <a href="http://sourceforge.net/project/stats/detail.php?group_id=54413&ugn=apcupsd&type=prweb">Site Visits</a><br>
 &nbsp;<br>
 <font color="#0000ff" size="+2"><b>Documentation</b></font><br>
-<a href="manual/index.html">Online Manual</a><br>
-<a href="manual/apcupsd.pdf">PDF Manual</a><br>
-<a href="manual/manual.html">Single Page Manual</a><br>
+<a href="manual/manual.html">Online Manual</a><br>
+<a href="manual/manual.pdf">PDF Manual</a><br>
 &nbsp;<br>
 <font color="#0000ff" size="+2"><b>Support</b></font><br>
 <a href="lists.html">Email Lists</a><br>
@@ -50,21 +49,26 @@ runtime expires based on internal APC calculations determined by power
 consumption rates. Apcupsd is licensed under the GPL version 2.
 <p>
 <h2>Recent Apcupsd Releases</h2>
-<h3><i><u>Stable:</u></i>&nbsp;3.14.5 (11 January 2009) [
+<h3><i><u>Stable:</u></i>&nbsp;3.14.6 (16 May 2009) [
 <a href="http://sourceforge.net/project/showfiles.php?group_id=54413">Download</a>
 ]</h3>
-3.14.5 fixes several bugs since 3.14.4, the most important of which
-solves an issue with 'make install' on RedHat- and SuSE-based systems.
-No new features were added in this release. Please see the
-<a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=653092">
+Release 3.14.6 includes several new features as well as a number of bug fixes.
+Among the new features is a major update to the user manual. The source document
+is now formatted in reStructuredText which makes updates very easy.
+We also have brand new manpages for all major apcupsd components, courtesy of
+Trevor Roydhouse. Support for the QNX operating system was contributed by
+Mikhail Gruzdev, and support for shutting the UPS off completely
+(as opposed to hibernating) was contributed for this release by Keith Campbell.
+A number of bug fixes are included as well. Please see the
+<a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=683099">
 ReleaseNotes</a> for details.
 <p>
-Apcupsd 3.14.4 is the latest stable release, containing many bug fixes and
+Apcupsd 3.14.6 is the latest stable release, containing many bug fixes and
 new features over the previous 3.12.x stable series. Users of all previous
 versions are encouraged to upgrade.
 <p>
 <i>If you use the old style master/slave networking mode, be sure to read the
-<a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=653092">
+<a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=683099">
 release notes</a>.</i>
 <p>
 <b><u>New Features in the 3.14.x series:</u></b>
@@ -78,6 +82,8 @@ release notes</a>.</i>
 <li>New configuration directives to set paths at runtime
 <li>New configuration directive to set UPS polling interval (POLLTIME)
 <li>New Makefiles supporting dependencies and parallel build
+<li>Updated documentation
+<li>Support for the QNX operating system
 </ul>
 <h3><i><u>Previous Stable:</u></i>&nbsp;3.12.4 (19 August 2006) [
 <a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=49059&release_id=440657">Source</a>
@@ -99,20 +105,16 @@ responses, and numerous bug fixes. Please be sure to read the
 <a href="http://sourceforge.net/project/shownotes.php?release_id=440658&group_id=54413">ReleaseNotes</a>
 to learn about the new features and for important information about
 upcoming releases.
-<h2><a href="manual/index.html" target="_top">Online
-Manual</a> or a
-<a href="manual/apcupsd.pdf" target="_top">PDF Version of
+<h2><a href="manual/manual.html" target="_top">Online Manual</a> or a
+<a href="manual/manual.pdf" target="_top">PDF Version of
 the Manual</a> </h2> If you want to learn a bit more about
 <b>apcupsd</b>, you can browse the
-<a href="manual/index.html" target="_top">manual online</a>.
-If you have any corrections/comments to the manual, please send them to me at:
-kern (at) sibbald (dot) com. For bug reports and
+<a href="manual/manual.html" target="_top">manual online</a>.
+If you have any corrections/comments to the manual, please send them to
+the apcupsd-users mailing list (see below). For bug reports and
 developer contact, please see below.
 If you want a pdf copy of the manual, you can find it
-<a href="manual/apcupsd.pdf" target="_top">here</a>,
-and finally, if you want one big manual in a single html file,
-it can be found
-<a href="manual/manual.html" target="_top">here</a>.
+<a href="manual/manual.pdf" target="_top">here</a>.
 <h2>Bugs and Email Support</h2>
 Please don't email me directly, it is much better to address bug reports
 and questions to the
