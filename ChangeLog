@@ -8,6 +8,316 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2009-05-15 19:44  adk0212
+
+	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
+	suse/apcupsd.spec.in:
+
+	changes for new user manual location and format
+
+2009-05-15 19:32  adk0212
+
+	* doc/manual/publishdoc:
+
+	Add script to publish the manual to the web site.
+
+2009-05-15 19:23  adk0212
+
+	* doc/manual/manual.html:
+
+	Keep a preformatted copy of the user manual in CVS to ease tool
+	dependencies for packagers.
+
+2009-05-15 19:07  adk0212
+
+	* src/win32/installer/winapcupsd.nsi:
+
+	Update for new user manual location.
+
+2009-05-15 18:43  adk0212
+
+	* doc/manual/manual.rst:
+
+	Fix Scott's name being misinterpreted as an enumerated (elettered?)
+	list.
+
+2009-05-13 19:49  adk0212
+
+	* doc/manual/maintaining_ups.rst:
+
+	Applied updates from Trevor Roydhouse <trev@sentry.org>
+
+2009-05-12 19:45  adk0212
+
+	* doc/manual/manual.rst:
+
+	Remove Linux /proc/bus/usb text files from appendix. They're a ton
+	of baggage for not much gain.
+
+2009-05-12 19:35  adk0212
+
+	* doc/manual/smartprotocol.rst:
+
+	Minor formatting and typo fixes to smart protocol docs.
+
+2009-05-09 09:04  adk0212
+
+	* doc/manual/manual.rst:
+
+	Fix some {} style markup I missed on the first pass.
+
+2009-05-09 08:50  adk0212
+
+	* doc/manual/manual.rst:
+
+	Fix expansion of APC acronym.
+
+2009-05-07 21:10  adk0212
+
+	* doc/manual/: manual.rst, smartprotocol.rst:
+
+	Some tweaks for better compatibility with rst2pdf.
+
+2009-05-06 21:51  adk0212
+
+	* doc/manual/: maintaining_ups.rst, manual.rst, smartprotocol.rst:
+
+	Several updates to the manual. Replace existing section on UPS
+	maintenance with a new one contributed by Trevor Roydhouse
+	<trev@sentry.org>. Replace old disclaimer with a new one, also from
+	Trev. Add some hyperlinks in the smart protocol section. Clean up
+	some table formatting in that section as well.
+
+2009-05-06 21:50  adk0212
+
+	* doc/manual/apcupsd.png:
+
+	Noninterlaced version of logo for compatibility with rst2pdf.
+
+2009-05-05 17:51  adk0212
+
+	* doc/apcupsd.conf.5:
+
+	Add allowable settings for LOWBATT. From Trevor Roydhouse
+	<trev@sentry.org>
+
+2009-05-04 18:21  adk0212
+
+	* configure, autoconf/configure.in, autoconf/targets.mak,
+	autoconf/variables.mak.in:
+
+	Autodetect locations of rst2pdf and rst2html. Politely skip
+	typesetting each format if the generator is not available.
+
+2009-05-04 18:20  adk0212
+
+	* platforms/qnx/: Makefile, apccontrol.in, apcupsd.in:
+
+	Add support for QNX. Tested on QNX 6.3.2. Contributed by Mikhail
+	Gruzdev <michail.gruzdev@gmail.com>
+
+2009-05-04 18:03  adk0212
+
+	* configure, autoconf/acconfig.h, autoconf/config.h.in,
+	autoconf/configure.in, include/apc.h, src/apcupsd.c,
+	src/drivers/apcsmart/smartsetup.c, src/lib/apcexec.c:
+
+	Add support for QNX. Tested on QNX 6.3.2. Contributed by Mikhail
+	Gruzdev <michail.gruzdev@gmail.com>
+
+2009-05-04 17:56  adk0212
+
+	* examples/index.php:
+
+	s/batteryload/load/. Contributed by Mikhail Gruzdev
+	<michail.gruzdev@gmail.com>
+
+2009-05-03 17:56  adk0212
+
+	* autoconf/targets.mak, autoconf/variables.mak.in,
+	doc/manual/Makefile:
+
+	Generate PDF manual automatically.
+
+2009-05-03 17:55  adk0212
+
+	* doc/manual/manual.rst:
+
+	Fix typo.
+
+2009-05-03 13:31  adk0212
+
+	* doc/manual/manual.rst:
+
+	Fix broken references. Now formats cleanly with no errors or
+	warnings.
+
+2009-05-03 12:31  adk0212
+
+	* doc/manual/smartprotocol.rst:
+
+	Minor tweaks to spacing, etc.
+
+2009-05-03 12:27  adk0212
+
+	* doc/manual/: manual.rst, smartprotocol.rst:
+
+	Rejuvinate smart protocol section and add it back in. Merged with
+	updates from NUT site.
+
+2009-05-02 19:46  adk0212
+
+	* doc/manual/manual.rst:
+
+	Add EEPROM configuration directives. Text stolen shamelessly from
+	Trevor's apcupsd.conf(5).
+
+2009-05-02 19:30  adk0212
+
+	* doc/manual/manual.rst:
+
+	Minor fixes to apctest section. This needs major updates
+	eventually.
+
+2009-05-02 19:20  adk0212
+
+	* doc/manual/manual.rst:
+
+	Bring in a shortened version of the supportedupses text.
+
+2009-05-02 18:37  adk0212
+
+	* doc/manual/manual.rst:
+
+	Add Windows 7. Split Solaris into 8/9 (no USB) and 10 (USB
+	supported).
+
+2009-05-02 18:30  adk0212
+
+	* doc/manual/manual.rst:
+
+	Rewrite and add in supported operating systems section.
+
+2009-05-02 18:29  adk0212
+
+	* autoconf/variables.mak.in:
+
+	Don't generate backrefs for footnotes; they make the footnotes hard
+	to read.
+
+2009-05-02 12:11  adk0212
+
+	* doc/manual/manual.rst:
+
+	Surround TOC with transition dividers to help set it apart. I wish
+	the text for the TOC title were rendered larger. Need to
+	investigate alternate stylesheets.
+
+2009-05-02 12:00  adk0212
+
+	* autoconf/targets.mak, autoconf/variables.mak.in,
+	doc/manual/Makefile:
+
+	Add preliminary Makefile support for rst2html. Dependencies are
+	working.  Not tied in to top-level make yet since not everyone will
+	have rst2html.	'make clean' not working yet. Need to figure out
+	what to do about that.
+
+2009-05-02 10:30  adk0212
+
+	* src/action.c:
+
+	Change log level of UPS self-test messages to WARNING from ALERT.
+	Given that self-test messages are routine, they do not belong at
+	LOG_ALERT.  Contributed by Dave Ewart <davee@ceu.ox.ac.uk>.
+
+2009-05-02 10:21  adk0212
+
+	* autoconf/variables.mak.in, doc/Makefile:
+
+	Install manpages as part of 'make install'.
+
+2009-05-02 10:05  adk0212
+
+	* doc/apcupsd.man:
+
+	Remove one leftover old manpage.
+
+2009-05-02 10:04  adk0212
+
+	* doc/: apcaccess.8, apccontrol.8, apctest.8, apctest.man,
+	apcupsd.8, apcupsd.conf.5:
+
+	Replace old manpages with shiny new ones, courtesy of Trevor
+	Roydhousea <trev@sentry.org>. Many thanks, Trev!
+
+2009-04-30 19:20  adk0212
+
+	* doc/manual/: cables.rst, manual.rst:
+
+	Minor updates plus clean up and add back in the cables section.
+
+2009-04-26 19:12  adk0212
+
+	* doc/manual/: apcupsd.png, charging.png, commlost.png,
+	main_configs.png, manual.rst, multimon.png, onbatt.png, online.png,
+	smartprotocol.rst, status.png, thanks.png, wininstall6.png:
+
+	First pass at converting apcupsd user manual to reStructuredText.
+	Initial conversion via Pandoc, then lots of hand editing. It's in
+	pretty good shape now. Need to fix up external files.
+
+2009-04-25 11:04  adk0212
+
+	* src/apcupsd.c:
+
+	Make startup success message appear in logs again.  From Trevor
+	Roydhouse <trev@sentry.org>: apcupsd stopped printing startup
+	success messages at some point. Looking through the code it is
+	because it was decided that the LOG_INFO facility level should only
+	be used for data file logging and so it filters out other uses.
+	Unfortunately the startup message is set to that level. Changing
+	the startup message to LOG_WARNING works and is consistent with the
+	normal shutdown message facility level.
+
+2009-04-25 10:58  adk0212
+
+	* src/lib/apcconfig.c:
+
+	Remove EVENTFILE, EVENTFILEMAX config directives. These were
+	replaced by the plural versions that are in use today (EVENTSFILE,
+	EVENTSFILEMAX) almost 10 years ago. It's time to kill the old
+	names.	(h/t Trevor Roydhouse <trev@sentry.org>)
+
+2009-04-25 10:47  adk0212
+
+	* src/options.c:
+
+	Add -P,--pid-file to -h output. Update copyright.  (h/t Trevor
+	Roydhouse <trev@sentry.org>)
+
+2009-04-25 10:45  adk0212
+
+	* examples/nagios_plugin_check_apcupsd.c, examples/newslave.c,
+	include/struct.h, src/cgi/upsfetch.c, src/drivers/net/net.c,
+	src/lib/apcconfig.c, src/lib/apcstatus.c:
+
+	RELEASE is merely a subset of VERSION. Remove RELEASE.	(h/t Trevor
+	Roydhouse <trev@sentry.org>)
+
+2009-03-19 19:18  adk0212
+
+	* doc/home-page/: bugs.html, index.html, license.html, lists.html,
+	support.html, systems.html, template.inc:
+
+	Update sf.net logo per new guidelines.
+
+2009-03-02 18:16  adk0212
+
+	* ChangeLog, ReleaseNotes, include/version.h:
+
+	Pseudo-prep for 3.14.6
+
 2009-03-02 17:52  adk0212
 
 	* src/drivers/apcsmart/smart.c:
@@ -76,7 +386,7 @@
 
 2009-01-14 18:00  adk0212
 
-	* doc/: home-page/publishsite, latex/publishdoc:
+	* doc/home-page/publishsite:
 
 	Update publish scripts for sf.net changes
 
@@ -117,12 +427,6 @@
 	* src/win32/build-win32-cross-tools:
 
 	Update to nsis-2.40.
-
-2008-10-20 18:18  adk0212
-
-	* doc/latex/manual.tex:
-
-	Document the /refresh switch for apctray.
 
 2008-09-16 00:58  skoona
 
@@ -431,13 +735,6 @@
 	always /sbin/chkconfig) in case we someday encounter a distro that
 	hides it elsewhere.
 
-2008-06-11 07:47  adk0212
-
-	* doc/latex/manual.tex:
-
-	Update PCNET info: minimum password length is 15 chars, default
-	username is 'apc', no known way to change the username.
-
 2008-06-11 07:39  adk0212
 
 	* include/extern.h, src/drivers/pcnet/pcnet.c, src/lib/apclog.c,
@@ -539,15 +836,9 @@
 
 2008-05-12 20:06  adk0212
 
-	* Developers, doc/latex/manual.tex:
+	* Developers:
 
 	Update contributors list. This is probably still way out of date.
-
-2008-05-12 20:01  adk0212
-
-	* doc/latex/manual.tex:
-
-	Remove references to powerflute.
 
 2008-05-11 18:34  adk0212
 
@@ -932,10 +1223,10 @@
 
 2008-01-27 12:00  adk0212
 
-	* doc/latex/manual.tex, include/struct.h,
-	platforms/etc/apcupsd.conf.in, platforms/mingw/apcupsd.conf.in,
-	src/device.c, src/drivers/net/net.c,
-	src/drivers/snmp/drv_powernet.c, src/lib/apcconfig.c:
+	* include/struct.h, platforms/etc/apcupsd.conf.in,
+	platforms/mingw/apcupsd.conf.in, src/device.c,
+	src/drivers/net/net.c, src/drivers/snmp/drv_powernet.c,
+	src/lib/apcconfig.c:
 
 	Add POLLTIME directive to control UPS polling interval. NETTIME is
 	accepted as a synonym for compatibility with old config files.
@@ -1080,13 +1371,6 @@
 
 	Add policy file to disable hald-addon-hid-ups. Automatically
 	install and uninstall this policy on Redhat systems.
-
-2007-11-13 18:23  adk0212
-
-	* doc/latex/manual.tex:
-
-	Fix debian package URLs. Found by Chris Reeves
-	<chris@astro.ex.ac.uk>.
 
 2007-11-10 08:17  fleetworks
 
@@ -1322,13 +1606,6 @@
 	Don't leak unnecessary descriptors to child when execing
 	apccontrol.
 
-2007-08-03 13:52  adk0212
-
-	* doc/latex/manual.tex:
-
-	Documentation updates: Fix up udev info for modern Linux distros.
-	Update Windows section for apctray.
-
 2007-08-03 11:49  adk0212
 
 	* src/drivers/apcsmart/smart.c:
@@ -1347,10 +1624,10 @@
 
 2007-08-03 11:20  adk0212
 
-	* INSTALL, doc/latex/manual.tex, examples/safe.apccontrol.in,
-	platforms/apccontrol.in, platforms/darwin/apccontrol.in,
-	platforms/freebsd/apccontrol.in, platforms/mingw/apccontrol.bat,
-	platforms/openbsd/apccontrol.in, platforms/sun/apccontrol.in:
+	* INSTALL, examples/safe.apccontrol.in, platforms/apccontrol.in,
+	platforms/darwin/apccontrol.in, platforms/freebsd/apccontrol.in,
+	platforms/mingw/apccontrol.bat, platforms/openbsd/apccontrol.in,
+	platforms/sun/apccontrol.in:
 
 	apccontrol cleanups: powerout and mainsback should not wall; that
 	is done by onbattery/offbattery under the control of
@@ -2111,20 +2388,6 @@
 	* ReleaseNotes, include/version.h:
 
 	Final updates for 3.14.1.
-
-2007-04-21 20:24  adk0212
-
-	* doc/latex/manual.tex:
-
-	Clarify FreeBSD versions in USB kernel section.
-
-2007-04-21 19:59  adk0212
-
-	* doc/latex/manual.tex:
-
-	Add USB info for NetBSD 4.x (ugen binding can be forced on a
-	particular port). Contributed by Curt Sampson
-	<cjs@starling-software.com>.
 
 2007-04-21 19:27  adk0212
 

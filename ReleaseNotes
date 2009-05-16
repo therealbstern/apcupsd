@@ -9,14 +9,30 @@ IF YOU USE THE OLD STYLE MASTER/SLAVE NETWORKING MODE, BE SURE TO READ THE
 3.14.0 RELEASE NOTES BELOW.
 
 
-3.14.6 -- 5 March 2009               (Maintenance Release)
+3.14.6 -- 16 May 2009                (Maintenance Release)
 
 NEW FEATURES
 
-  * Add support for turning the UPS off completely. This complements existing
-    hibernate (aka killpower) functionality. Turn-off is implemented for
-    apcsmart and USB drivers, subject to support for the relevant commands in
-    the UPS itself. Contributed by Keith Campbell <campbell@econnectix.com>.
+  * Major updates to the User Manual. Rewritten battery maintenance section 
+    courtesy of Trevor Roydhouse <trev@sentry.org>. Many other updates
+    including the SmartUPS protocol and OS support sections. Furthermore,
+    the manual is now formatted in reStructuredText
+    (http://docutils.sourceforge.net/rst.html) and as a result is very 
+    easy to update. (The only down side is the multi-page HTML version is 
+    no longer available; the HTML version is all on a single page.)
+
+  * New manpages for apcupsd, apcupsd.conf, apctest, apcaccess, and 
+    apccontrol. Many thanks to Trevor Roydhouse <trev@sentry.org> for the
+    hard work!
+
+  * Support for QNX. Tested on QNX 6.3.2. Contributed by Mikhail
+    Gruzdev <michail.gruzdev@gmail.com>
+
+  * Add support for turning the UPS off completely. This complements 
+    existing hibernate (aka killpower) functionality. Turn-off is 
+    implemented for apcsmart and USB drivers, subject to support for the 
+    relevant commands in the UPS itself. Contributed by Keith Campbell 
+    <campbell@econnectix.com>.
 
 BUG FIXES
 
@@ -30,6 +46,8 @@ BUG FIXES
   
   * apcsmart: Fix crash during process shutdown (SIGTERM). Contributed by 
     Andrey Sharandakov <ash.ashway@gmail.com>
+
+  * Several other minor fixes and improvements. See ChangeLog for details.
 
 
 3.14.5 -- 26 October 2008            (Maintenance Release)
