@@ -9,6 +9,86 @@ IF YOU USE THE OLD STYLE MASTER/SLAVE NETWORKING MODE, BE SURE TO READ THE
 3.14.0 RELEASE NOTES BELOW.
 
 
+3.14.6 -- 16 May 2009                (Maintenance Release)
+
+NEW FEATURES
+
+  * Major updates to the User Manual. Rewritten battery maintenance section 
+    courtesy of Trevor Roydhouse <trev@sentry.org>. Many other updates
+    including the SmartUPS protocol and OS support sections. Furthermore,
+    the manual is now formatted in reStructuredText
+    (http://docutils.sourceforge.net/rst.html) and as a result is very 
+    easy to update. (The only down side is the multi-page HTML version is 
+    no longer available; the HTML version is all on a single page.)
+
+  * New manpages for apcupsd, apcupsd.conf, apctest, apcaccess, and 
+    apccontrol. Many thanks to Trevor Roydhouse <trev@sentry.org> for the
+    hard work!
+
+  * Support for QNX. Tested on QNX 6.3.2. Contributed by Mikhail
+    Gruzdev <michail.gruzdev@gmail.com>
+
+  * Add support for turning the UPS off completely. This complements 
+    existing hibernate (aka killpower) functionality. Turn-off is 
+    implemented for apcsmart and USB drivers, subject to support for the 
+    relevant commands in the UPS itself. Contributed by Keith Campbell 
+    <campbell@econnectix.com>.
+
+BUG FIXES
+
+  * apcsmart: Deadlock fixes during comms failures. Contributed by Keith 
+    Campbell <campbell@econnectix.com>
+
+  * linux-usb: Fix out-of-bounds array access. Contributed by David Fries 
+    <david@fries.net>
+
+  * Fix build with gcc-4.4. Contributed by Michal Hlavinka <mhlavink@redhat.com>
+  
+  * apcsmart: Fix crash during process shutdown (SIGTERM). Contributed by 
+    Andrey Sharandakov <ash.ashway@gmail.com>
+
+  * Several other minor fixes and improvements. See ChangeLog for details.
+
+
+3.14.5 -- 26 October 2008            (Maintenance Release)
+
+BUG FIXES
+
+  * docs: Document the /refresh switch for apctray.
+
+  * apctest: Do not create pid file. There is little reason for it
+    since apctest is a command-line tool, not a daemon. Plus nothing
+    ever deletes the file so it interferes with apcupsd operation.
+
+  * gapcmon: Network connect timeout fix.
+
+  * Fix a few unsafe uses of sprintf and strcat.
+
+  * Makefile: Fix cgi build on OpenBSD. libgd on OpenBSD requires X_LIBS 
+    for libfreetype and libfontconfig.
+
+  * gapcmon: Iconify fixes for KDE
+
+  * Fix LOWBATT glitch handling bug that could cause us to act on a 
+    LOWBATT signal immediately instead of waiting for the debounce time.
+
+  * apctray: Improve multiple instance behavior for /add, /del, and
+    /kill on modern platforms (Win2K and newer).
+
+  * Support shutting down apcupsd instances running in other sessions
+    (such as terminal services or remote desktop sessions).
+
+  * Makefile: 'make install' fixes for first install on RedHat/SuSE.
+
+  * docs: PCNET minimum password length is 15 chars, default username 
+    is 'apc', no known way to change the username.
+
+  * Makefile: Fix dependency build errors on Darwin and other platforms.
+    ('echo -n' is not portable; use 'tr' to strip newline instead)
+
+  * RPMs: Automatically restart apcupsd when upgrading
+
+
 3.14.4 -- 18 May 2008                (Maintenance Release)
 
 MAJOR CHANGES

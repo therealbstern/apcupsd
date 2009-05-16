@@ -179,6 +179,7 @@ extern void do_reports(UPSINFO *ups);
 
 /* In apcsmart.c */
 extern int apc_enable(UPSINFO *ups);
+extern int writechar(char a, UPSINFO *ups);
 extern int getline(char *s, int len, UPSINFO *ups);
 extern void UPSlinkCheck(UPSINFO *ups);
 extern char *smart_poll(char cmd, UPSINFO *ups);
@@ -252,9 +253,5 @@ int winioctl(int fd, int func, int *addr);
 #ifndef HAVE_NANOSLEEP
   int nanosleep(const struct timespec *req, struct timespec *rem);
 #endif
-
-/* In smartcmd.c */
-int *GetSmartCmdMap();
-const char *CItoString(int ci);
 
 #endif   /* _EXTERN_H */

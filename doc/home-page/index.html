@@ -32,7 +32,9 @@
 <a href="http://prdownloads.sourceforge.net/apcupsd">All Downloads</a><br>
 <a href="http://sourceforge.net/cvs/?group_id=54413">CVS</a><br>
 <p>
-<a href="http://sourceforge.net"><img src="http://sflogo.sourceforge.net/sflogo.php?group_id=54413&amp;type=1" width="88" height="31" border="0" alt="SourceForge.net Logo"></a>
+<a href="http://sourceforge.net/projects/apcupsd">
+<img src="http://sflogo.sourceforge.net/sflogo.php?group_id=54413&type=11" border="0" width="120" height="30" alt="SourceForge.net Logo">
+</a>
 </td>
 <td bgcolor="#ffffff"><font size="1">&nbsp;&nbsp;&nbsp;&nbsp;</font></td>
 <td bgcolor="#ffffff" valign="top">
@@ -48,23 +50,21 @@ runtime expires based on internal APC calculations determined by power
 consumption rates. Apcupsd is licensed under the GPL version 2.
 <p>
 <h2>Recent Apcupsd Releases</h2>
-<h3><i><u>Stable:</u></i>&nbsp;3.14.3 (20 January 2008) [
+<h3><i><u>Stable:</u></i>&nbsp;3.14.5 (11 January 2009) [
 <a href="http://sourceforge.net/project/showfiles.php?group_id=54413">Download</a>
 ]</h3>
-3.14.3 fixes several bugs since 3.14.2 and includes a policy
-file which prevents the HAL-based USB UPS monitor included in recent Linux
-distros from interfering with apcupsd. (Only APC UPSes are blacklisted in
-the policy and the file is removed when apcupsd is uninstalled.)
+3.14.5 fixes several bugs since 3.14.4, the most important of which
+solves an issue with 'make install' on RedHat- and SuSE-based systems.
+No new features were added in this release. Please see the
+<a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=653092">
+ReleaseNotes</a> for details.
 <p>
-See the <a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=570036">
-ReleaseNotes</a> for full details.
-<p>
-Apcupsd 3.14.3 is the latest stable release, containing many bug fixes and
+Apcupsd 3.14.4 is the latest stable release, containing many bug fixes and
 new features over the previous 3.12.x stable series. Users of all previous
 versions are encouraged to upgrade.
 <p>
 <i>If you use the old style master/slave networking mode, be sure to read the
-<a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=570036">
+<a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=653092">
 release notes</a>.</i>
 <p>
 <b><u>New Features in the 3.14.x series:</u></b>
@@ -76,6 +76,8 @@ release notes</a>.</i>
 <li>GAPCMON GUI monitoring tool
 <li>Unreliable MASTER/SLAVE networking mode is removed
 <li>New configuration directives to set paths at runtime
+<li>New configuration directive to set UPS polling interval (POLLTIME)
+<li>New Makefiles supporting dependencies and parallel build
 </ul>
 <h3><i><u>Previous Stable:</u></i>&nbsp;3.12.4 (19 August 2006) [
 <a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=49059&release_id=440657">Source</a>

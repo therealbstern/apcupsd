@@ -7,4 +7,4 @@ SRCS = $(wildcard *.c)
 all-targets: $(OBJS)
 
 # Include dependencies
--include $(DEPS)
+-include $(SRCS:%.c=$(DEPDIR)/%.P)

@@ -31,6 +31,8 @@ INSTALL_DATA = @INSTALL_DATA@
 INSTALL_SCRIPT = @INSTALL_SCRIPT@
 MKINSTALLDIRS = @MKINSTALLDIRS@
 CHKCONFIG = /sbin/chkconfig
+RST2HTML := @RST2HTML@
+RST2PDF := @RST2PDF@
 
 # Files and directories (paths)
 prefix = @prefix@
@@ -42,7 +44,6 @@ srcdir = @srcdir@
 abstopdir = @ABSSRCDIR@
 sbindir = @sbindir@
 piddir = @PIDDIR@
-manext = 8
 mandir=@mandir@
 bindir = @bindir@
 datadir = @datadir@
@@ -64,9 +65,9 @@ DRVLIBS = @PTHREAD_LFLAGS@ @DRVLIBS@
 X_LIBS = @X_LIBS@
 X_EXTRA_LIBS = @X_EXTRA_LIBS@
 
-INCFLAGS = -I$(topdir)/include $(EXTRAINCS)
-CFLAGS = @CFLAGS@ @PTHREAD_CFLAGS@ $(INCFLAGS)
-CPPFLAGS = @CPPFLAGS@ $(CFLAGS)
+CPPFLAGS = @CPPFLAGS@ -I$(topdir)/include $(EXTRAINCS)
+CFLAGS = $(CPPFLAGS) @CFLAGS@ @PTHREAD_CFLAGS@
+CXXFLAGS = $(CPPFLAGS) @CXXFLAGS@ @PTHREAD_CFLAGS@
 LDFLAGS = @LDFLAGS@
 LIBS = @LIBS@
 LIBGD = @GD_LIBS@
@@ -74,6 +75,8 @@ POWERLIBS = @POWERLIBS@
 GAPCMON_CFLAGS = @GAPCMON_CFLAGS@
 GAPCMON_LIBS = @GAPCMON_LIBS@
 LIBEXTRAOBJ = @LIBEXTRAOBJ@
+RST2HTMLOPTS = --field-name-limit=0 --generator --time --no-footnote-backlinks --record-dependencies=$(df).d
+RST2PDFOPTS = --no-footnote-backlinks
 
 # Driver and package enable flags
 SMARTDRV   := @APCSMART_DRIVER@

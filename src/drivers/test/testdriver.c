@@ -23,63 +23,69 @@
  */
 
 #include "apc.h"
-#include "testdriver.h"
 
 /*
  */
-bool TestDriver::open_test_device()
+static int open_test_device(UPSINFO *ups)
 {
-   _ups->fd = 1;
-   return true;
+   ups->fd = 1;
+   return 1;
 }
 
 
 /*
  * Read UPS events. I.e. state changes.
  */
-bool TestDriver::CheckState()
+int test_ups_check_state(UPSINFO *ups)
 {
-   sleep(_ups->wait_time);
-   return true;
+   return 1;
 }
 
 /*
  * Open test port
  */
-bool TestDriver::Open()
+int test_ups_open(UPSINFO *ups)
 {
-   write_lock(_ups);
+   write_lock(ups);
 
-   if (!open_test_device())
-      Error_abort1(_("Cannot open UPS device %s\n"), _ups->device);
+   if (!open_test_device(ups))
+      Error_abort1(_("Cannot open UPS device %s\n"), ups->device);
 
-   _ups->clear_slave();
-   write_unlock(_ups);
-   return true;
+   ups->clear_slave();
+   write_unlock(ups);
+   return 1;
 }
 
-bool TestDriver::Close()
+int test_ups_setup(UPSINFO *ups)
 {
-   write_lock(_ups);
+   /* Seems that there is nothing to do. */
+   return 1;
+}
+
+int test_ups_close(UPSINFO *ups)
+{
+   write_lock(ups);
    
    /* Seems that there is nothing to do. */
-   _ups->fd = -1;
+   ups->fd = -1;
 
-   write_unlock(_ups);
-   return true;
+   write_unlock(ups);
+   return 1;
 }
 
 /*
  * Setup capabilities structure for UPS
  */
-bool TestDriver::GetCapabilities()
+int test_ups_get_capabilities(UPSINFO *ups)
 {
-   write_lock(_ups);
-   for (int k = 0; k <= CI_MAX_CAPS; k++)
-      _ups->UPS_Cap[k] = TRUE;
+   int k;
 
-   write_unlock(_ups);
-   return true;
+   write_lock(ups);
+   for (k = 0; k <= CI_MAX_CAPS; k++)
+      ups->UPS_Cap[k] = TRUE;
+
+   write_unlock(ups);
+   return 1;
 }
 
 /*
@@ -88,51 +94,51 @@ bool TestDriver::GetCapabilities()
  *
  * This routine is called once when apcupsd is starting
  */
-bool TestDriver::ReadStaticData()
+int test_ups_read_static_data(UPSINFO *ups)
 {
-   write_lock(_ups);
+   write_lock(ups);
    /* UPS_NAME */
 
    /* model, firmware */
-   astrncpy(_ups->upsmodel, "Test Driver", sizeof(_ups->upsmodel));
-   astrncpy(_ups->firmrev, "Rev 1.0", sizeof(_ups->firmrev));
-   astrncpy(_ups->selftest, "336", sizeof(_ups->selftest));
+   astrncpy(ups->upsmodel, "Test Driver", sizeof(ups->upsmodel));
+   astrncpy(ups->firmrev, "Rev 1.0", sizeof(ups->firmrev));
+   astrncpy(ups->selftest, "336", sizeof(ups->selftest));
 
    /* WAKEUP_DELAY */
-   _ups->dwake = 2 * 60;
+   ups->dwake = 2 * 60;
 
    /* SLEEP_DELAY */
-   _ups->dshutd = 2 * 60;
+   ups->dshutd = 2 * 60;
 
    /* LOW_TRANSFER_LEVEL */
-   _ups->lotrans = 190;
+   ups->lotrans = 190;
 
    /* HIGH_TRANSFER_LEVEL */
-   _ups->hitrans = 240;
+   ups->hitrans = 240;
 
    /* UPS_BATT_CAP_RETURN */
-   _ups->rtnpct = 15;
+   ups->rtnpct = 15;
 
    /* LOWBATT_SHUTDOWN_LEVEL */
-   _ups->dlowbatt = 2;
+   ups->dlowbatt = 2;
 
    /* UPS_MANUFACTURE_DATE */
-   astrncpy(_ups->birth, "2001-09-21", sizeof(_ups->birth));
+   astrncpy(ups->birth, "2001-09-21", sizeof(ups->birth));
 
    /* Last UPS_BATTERY_REPLACE */
-   astrncpy(_ups->battdat, "2001-09-21", sizeof(_ups->battdat));
+   astrncpy(ups->battdat, "2001-09-21", sizeof(ups->battdat));
 
    /* UPS_SERIAL_NUMBER */
-   astrncpy(_ups->serial, "NO-123456", sizeof(_ups->serial));
+   astrncpy(ups->serial, "NO-123456", sizeof(ups->serial));
 
    /* Nominal output voltage when on batteries */
-   _ups->NomOutputVoltage = 230;
+   ups->NomOutputVoltage = 230;
 
    /* Nominal battery voltage */
-   _ups->nombattv = (double)12;
+   ups->nombattv = (double)12;
 
-   write_unlock(_ups);
-   return true;
+   write_unlock(ups);
+   return 1;
 }
 
 /*
@@ -141,56 +147,72 @@ bool TestDriver::ReadStaticData()
  * This routine is called once every 5 seconds to get
  * a current idea of what the UPS is doing.
  */
-bool TestDriver::ReadVolatileData()
+int test_ups_read_volatile_data(UPSINFO *ups)
 {
    /* save time stamp */
-   time(&_ups->poll_time);
+   time(&ups->poll_time);
 
-   write_lock(_ups);
+   write_lock(ups);
 
    /* UPS_STATUS -- this is the most important status for apcupsd */
 
    /* No APC Status value, well, fabricate one */
-   _ups->Status = 0;
+   ups->Status = 0;
 
-   _ups->set_online();
+   ups->set_online();
 
    /* LINE_VOLTAGE */
-   _ups->LineVoltage = 229.5;
-   _ups->LineMin = 225.0;
-   _ups->LineMax = 230.0;
+   ups->LineVoltage = 229.5;
+   ups->LineMin = 225.0;
+   ups->LineMax = 230.0;
 
    /* OUTPUT_VOLTAGE */
-   _ups->OutputVoltage = 228.5;
+   ups->OutputVoltage = 228.5;
 
    /* BATT_FULL Battery level percentage */
-   _ups->BattChg = 100;
+   ups->BattChg = 100;
 
    /* BATT_VOLTAGE */
-   _ups->BattVoltage = 12.5;
+   ups->BattVoltage = 12.5;
 
    /* UPS_LOAD */
-   _ups->UPSLoad = 40.5;
+   ups->UPSLoad = 40.5;
 
    /* LINE_FREQ */
-   _ups->LineFreq = 50;
+   ups->LineFreq = 50;
 
    /* UPS_RUNTIME_LEFT */
-   _ups->TimeLeft = ((double)20 * 60);   /* seconds */
+   ups->TimeLeft = ((double)20 * 60);   /* seconds */
 
    /* UPS_TEMP */
-   _ups->UPSTemp = 32.4;
+   ups->UPSTemp = 32.4;
 
    /*  Humidity percentage */
-   _ups->humidity = 50.1;
+   ups->humidity = 50.1;
 
    /*  Ambient temperature */
-   _ups->ambtemp = 22.5;
+   ups->ambtemp = 22.5;
 
    /* Self test results */
-   _ups->testresult = TEST_PASSED;
+   ups->testresult = TEST_PASSED;
 
-   write_unlock(_ups);
+   write_unlock(ups);
 
-   return true;
+   return 1;
+}
+
+int test_ups_kill_power(UPSINFO *ups)
+{
+   /* Not implemented yet */
+   return 0;
+}
+
+int test_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
+{
+   return 0;
+}
+
+int test_ups_entry_point(UPSINFO *ups, int command, void *data)
+{
+   return 0;
 }

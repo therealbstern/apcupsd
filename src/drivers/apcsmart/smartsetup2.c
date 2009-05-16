@@ -26,8 +26,9 @@
 #include "apcsmart.h"
 
 /*********************************************************************/
-const char *ApcSmartDriver::get_apc_model_V_codes(const char *s)
+static const char *get_apc_model_V_codes(const char *s, UPSINFO *ups)
 {
+
    switch (s[0]) {
    case '0':
       return ("APC Matrix-UPS 3000");
@@ -83,12 +84,13 @@ const char *ApcSmartDriver::get_apc_model_V_codes(const char *s)
       break;
    }
 
-   return (_ups->mode.long_name);
+   return (ups->mode.long_name);
 }
 
 /*********************************************************************/
-char *ApcSmartDriver::get_apc_model_b_codes(const char *s)
+static char *get_apc_model_b_codes(const char *s, UPSINFO *ups)
 {
+
    /*
     * New Firmware revison and model ID String in NN.M.D format,
     * where...
@@ -110,11 +112,11 @@ char *ApcSmartDriver::get_apc_model_b_codes(const char *s)
     *
     *    D == Domestic; I == International; ...
     */
-   return _ups->mode.long_name;
+   return ups->mode.long_name;
 }
 
 /*********************************************************************/
-void ApcSmartDriver::get_apc_model()
+void get_apc_model(UPSINFO *ups)
 {
    char response[32];
    const char *cp;
@@ -125,33 +127,37 @@ void ApcSmartDriver::get_apc_model()
 
    for (i = 0; i < 4; i++) {
       b = 0x01;
-      write(_ups->fd, &b, 1);
+      write(ups->fd, &b, 1);
       sleep(1);
    }
-   getline(response, sizeof response);
+   getline(response, sizeof response, ups);
 
    if (strlen(response)) {
-      _ups->mode.long_name[0] = '\0';
-      asnprintf(_ups->mode.long_name, sizeof(_ups->mode.long_name), "%s", response);
+      ups->mode.long_name[0] = '\0';
+      asnprintf(ups->mode.long_name, sizeof(ups->mode.long_name), "%s", response);
       return;
    }
 
    response[0] = '\0';
-   astrncpy(response, smart_poll(_cmdmap[CI_UPSMODEL]), sizeof(response));
+   write_lock(ups);
+   astrncpy(response, smart_poll(ups->UPS_Cmd[CI_UPSMODEL], ups), sizeof(response));
+   write_unlock(ups);
 
    if (strlen(response)) {
-      cp = get_apc_model_V_codes(response);
-      if (cp != _ups->mode.long_name)
-         asnprintf(_ups->mode.long_name, sizeof(_ups->mode.long_name), "%s", cp);
+      cp = get_apc_model_V_codes(response, ups);
+      if (cp != ups->mode.long_name)
+         asnprintf(ups->mode.long_name, sizeof(ups->mode.long_name), "%s", cp);
       return;
    }
 
    response[0] = '\0';
-   astrncpy(response, smart_poll(_cmdmap[CI_REVNO]), sizeof(response));
+   write_lock(ups);
+   astrncpy(response, smart_poll(ups->UPS_Cmd[CI_REVNO], ups), sizeof(response));
+   write_unlock(ups);
 
    if (strlen(response)) {
       fprintf(stderr, "\n%s: 'b' %s", argvalue,
-         get_apc_model_b_codes(response));
+         get_apc_model_b_codes(response, ups));
    }
 }
 
@@ -160,16 +166,18 @@ void ApcSmartDriver::get_apc_model()
  * This subroutine polls the APC Smart UPS to find out 
  * what capabilities it has.          
  */
-bool ApcSmartDriver::GetCapabilities()
+int apcsmart_ups_get_capabilities(UPSINFO *ups)
 {
    char answer[1000];              /* keep this big to handle big string */
    char caps[1000], *cmds, *p;
    int i;
 
+   write_lock(ups);
+
    /* Get UPS capabilities string */
-   astrncpy(caps, smart_poll(_cmdmap[CI_UPS_CAPS]), sizeof(caps));
+   astrncpy(caps, smart_poll(ups->UPS_Cmd[CI_UPS_CAPS], ups), sizeof(caps));
    if (strlen(caps) && (strcmp(caps, "NA") != 0)) {
-      _ups->UPS_Cap[CI_UPS_CAPS] = TRUE;
+      ups->UPS_Cap[CI_UPS_CAPS] = TRUE;
 
       /* skip version */
       for (p = caps; *p && *p != '.'; p++)
@@ -182,7 +190,7 @@ bool ApcSmartDriver::GetCapabilities()
       cmds = p;                    /* point to commands */
       if (!*cmds) {                /* oops, none */
          cmds = NULL;
-         _ups->UPS_Cap[CI_UPS_CAPS] = FALSE;
+         ups->UPS_Cap[CI_UPS_CAPS] = FALSE;
       }
    } else {
       cmds = NULL;                 /* No commands string */
@@ -195,15 +203,17 @@ bool ApcSmartDriver::GetCapabilities()
     * capability.
     */
    for (i = 0; i <= CI_MAX_CAPS; i++) {
-      if (_cmdmap[i] == 0)
+      if (ups->UPS_Cmd[i] == 0)
          continue;
-      if (!cmds || strchr(cmds, _cmdmap[i]) != NULL) {
-         astrncpy(answer, smart_poll(_cmdmap[i]), sizeof(answer));
+      if (!cmds || strchr(cmds, ups->UPS_Cmd[i]) != NULL) {
+         astrncpy(answer, smart_poll(ups->UPS_Cmd[i], ups), sizeof(answer));
          if (*answer && (strcmp(answer, "NA") != 0)) {
-            _ups->UPS_Cap[i] = true;
+            ups->UPS_Cap[i] = true;
          }
       }
    }
 
-   return true;
+   write_unlock(ups);
+
+   return 1;
 }
