@@ -8,6 +8,33 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2009-05-16 09:05  fleetworks
+
+	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
+	suse/apcupsd.spec.in:
+
+	Comment out latex build.
+
+2009-05-15 20:13  adk0212
+
+	* ChangeLog, ReleaseNotes, include/version.h:
+
+	Prep for 3.14.6 release (again).
+
+2009-05-15 20:13  adk0212
+
+	* src/cgi/upsfetch.c:
+
+	Fix miscalculated length. Noticed by Stacy Millions
+	<stacy@Millions.Ca>
+
+2009-05-15 19:57  adk0212
+
+	* autoconf/variables.mak.in:
+
+	Add --no-footnote-backlinks to RST2PDF options. It's now supported
+	in rst2pdf SVN trunk.
+
 2009-05-15 19:44  adk0212
 
 	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
