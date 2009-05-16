@@ -262,9 +262,9 @@ make hid-ups
 cd ../
 
 # build pdf manual
-cd doc/latex
-make
-cd ../../
+#cd doc/latex
+#make
+#cd ../../
 
 %install
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
@@ -432,6 +432,8 @@ if [ $1 = 0 ] ; then
 fi
 
 %changelog
+* Sat May 16 2009 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- comment out latex build
 * Fri May 15 2009 Adam Kropelin <akropel1 at rochester.rr.com>
 - changes for new user manual location and format
 * Sat May 31 2008 D. Scott Barninger <barninger at fairfieldcomputers.com>
