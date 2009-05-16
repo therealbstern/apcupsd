@@ -5,9 +5,8 @@
 
 &nbsp;<br>
 <font color="#0000ff" size=+2><b>Documentation</b></font><br>
-<a href="manual/index.html">Online Manual</a><br>
-<a href="manual/apcupsd.pdf">PDF Manual</a><br>
-<a href="manual/manual.html">Single Page Manual</a><br>
+<a href="manual/manual.html">Online Manual</a><br>
+<a href="manual/manual.pdf">PDF Manual</a><br>
 
 
 &nbsp;<br>
