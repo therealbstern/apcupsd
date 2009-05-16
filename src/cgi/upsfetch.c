@@ -271,7 +271,7 @@ static int fill_buffer(int sockfd)
    while ((n = net_recv(sockfd, buf, sizeof(buf)-1)) > 0) {
       buf[n] = '\0';
       strncat(statbuf, buf, sizeof(statbuf)-statlen-1);
-      statlen += strlen(statbuf);
+      statlen = strlen(statbuf);
    }
    if (n < 0)
       stat = 0;
