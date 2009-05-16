@@ -118,25 +118,10 @@ if test x$LD = x ; then
    LD="$CC"
 fi
 
-dnl
-dnl Supply default CFLAGS, if not specified by `CFLAGS=flags ./configure'
-dnl   but only gcc has -Wall in general
-dnl
-if test x$GCC = xyes; then
-   CFLAGS=${CFLAGS-"-g -O2"}
-   CFLAGS="${CFLAGS} -Wall"
-   LDFLAGS=${LDFLAGS-"-g -O"}
-else
-   CFLAGS=${CFLAGS--O2}
-   LDFLAGS=${LDFLAGS--O}
-fi
-
-CPPFLAGS="$CPPFLAGS"
 AC_SUBST(DEBUG)
-AC_SUBST(DLIB)
-AC_SUBST(DINCLUDE)
 AC_SUBST(CFLAGS)
 AC_SUBST(CPPFLAGS)
+AC_SUBST(CXXFLAGS)
 AC_SUBST(LDFLAGS)
 AC_SUBST(LIBS)
 AC_SUBST(DRVLIBS)
@@ -182,6 +167,9 @@ AC_REQ_PATH_PROG(LN, ln)
 AC_REQ_PATH_PROG(SED, sed)
 AC_REQ_PATH_PROG(AR, ar)
 AC_REQ_PATH_PROG(MV, mv)
+
+AC_PATH_PROG(RST2HTML, rst2html,)
+AC_PATH_PROG(RST2PDF, rst2pdf,)
 
 # -------------------------------------------------------------------------
 #  If the user has not set --mandir, we default to /usr/share/man
@@ -359,6 +347,7 @@ case $host in
    *-*-bsdi*)    AC_DEFINE(HAVE_BSDI_OS)    ;;
    *-*-irix*)    AC_DEFINE(HAVE_SGI_OS)     ;;
    *-*-darwin*)  AC_DEFINE(HAVE_DARWIN_OS)  ;;
+   *-*-nto*)     AC_DEFINE(HAVE_QNX_OS)     ;;
 esac
 
 dnl
@@ -464,7 +453,7 @@ AC_ARG_ENABLE(cgi,
              GD_LIBS="-lgd"
              SYS_GD_FOUND=yes ],
            [],
-           [])
+           [${X_LIBS}])
 
         dnl
         dnl Second search for system library that defines gdImageGif
@@ -476,15 +465,13 @@ AC_ARG_ENABLE(cgi,
                 GD_LIBS="-lgd"
                 SYS_GD_FOUND=yes ],
               [],
-              [])
+              [${X_LIBS}])
         fi
 
         dnl
         dnl Third in /usr/local search for system library that defines gdImagePng
         if test "${SYS_GD_FOUND}" = "no"
         then
-           _cppflags=${CPPFLAGS}
-           _ldflags=${LDFLAGS}
            CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
            LDFLAGS="${LDFLAGS} -L/usr/local/lib"
 
@@ -496,7 +483,7 @@ AC_ARG_ENABLE(cgi,
                 GD_LIBS="-lgd"
                 SYS_GD_FOUND=yes ],
               [],
-              [])
+              [${X_LIBS}])
         fi
 
         dnl
@@ -511,7 +498,7 @@ AC_ARG_ENABLE(cgi,
                 GD_LIBS="-lgd"
                 SYS_GD_FOUND=yes ],
               [],
-              [])
+              [${X_LIBS}])
         fi
 
         if test "${SYS_GD_FOUND}" = "no"
@@ -842,23 +829,25 @@ if test -n "$GCC"; then
 
    # See if GCC supports -fno-exceptions...
    AC_MSG_CHECKING(if GCC supports -fno-exceptions)
-   OLDCFLAGS="$CFLAGS"
-   CFLAGS="$CFLAGS -fno-exceptions"
+   OLDCXXFLAGS="$CXXFLAGS"
+   CXXFLAGS="$CXXFLAGS -fno-exceptions"
    AC_TRY_COMPILE(,,       
-      CPPFLAGS="$CPPFLAGS -fno-exceptions"
       AC_MSG_RESULT(yes),
-      AC_MSG_RESULT(no))
-   CFLAGS="$OLDCFLAGS"
+      AC_MSG_RESULT(no)
+      CXXFLAGS="$OLDCXXFLAGS")
 
    # See if GCC supports -fno-rtti...
    AC_MSG_CHECKING(if GCC supports -fno-rtti)
-   OLDCFLAGS="$CFLAGS"
-   CFLAGS="$CFLAGS -fno-rtti"
+   OLDCXXFLAGS="$CXXFLAGS"
+   CXXFLAGS="$CXXFLAGS -fno-rtti"
    AC_TRY_COMPILE(,,       
-      CPPFLAGS="$CPPFLAGS -fno-rtti"
       AC_MSG_RESULT(yes),
-      AC_MSG_RESULT(no))
-   CFLAGS="$OLDCFLAGS"
+      AC_MSG_RESULT(no)
+      CXXFLAGS="$OLDCXXFLAGS")
+
+   # Use -Wall on gcc only
+   CFLAGS="$CFLAGS -Wall"
+   CXXFLAGS="$CXXFLAGS -Wall"
 fi
 
 AC_SUBST(POWERFLUTE)
@@ -879,6 +868,8 @@ AC_SUBST(GD_LIBS)
 AC_SUBST(CGIBIN)
 AC_DEFINE_UNQUOTED(SYSCONFDIR, "$sysconfdir")
 AC_SUBST(SYSCONFDIR)
+AC_SUBST(RST2HTML)
+AC_SUBST(RST2PDF)
 
 dnl Export makedepend and CC for later use in this script.
 PROG_MAKEDEPEND=$MAKEDEPEND
@@ -993,6 +984,9 @@ then
 elif test $HAVE_UNAME=yes -a x`uname -s` = xDarwin
 then
     DISTNAME=darwin
+elif test $HAVE_UNAME=yes -a x`uname -s` = xQNX
+then
+   DISTNAME=qnx
 elif test -f /etc/SuSE-release
 then
    DISTNAME=suse
@@ -1255,6 +1249,14 @@ darwin)
       platforms/darwin/ApcupsdPkg.Info.plist \
       platforms/darwin/ApcupsdUsbShim.Info.plist"
    ;;
+qnx)
+   PTHREAD_LFLAGS=""
+   DISTVER=`uname -r`
+   SERIALDEV=/dev/ser1
+   DFILES="\
+      platforms/qnx/apcupsd \
+      platforms/qnx/apccontrol"
+   ;;
 unknown)
    DISTVER=unknown
    DFILES="\
@@ -1418,7 +1420,7 @@ Configuration on `date`:
   LOCK dir (for serial port)  ${LOCKDIR}
   Power Fail dir              ${PWRFAILDIR}
   Compiler:                   ${CXX} ${CXXVERSION}
-  Compiler flags:             ${CFLAGS} ${PTHREAD_FLAGS}
+  Compiler flags:             ${CPPFLAGS} ${CXXFLAGS} ${PTHREAD_FLAGS}
   Linker:                     ${LD}
   Linker flags:               ${LDFLAGS}
   Host and version:           ${DISTNAME} ${DISTVER}

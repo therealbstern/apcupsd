@@ -5,7 +5,7 @@
  */
 
 /*
- * Copyright (C) 2005-2007 Adam Kropelin
+ * Copyright (C) 2005 Adam Kropelin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of version 2 of the GNU General
@@ -23,49 +23,132 @@
  */
 
 #include "apc.h"
-#include "generic-usb.h"
+#include "../usb_common.h"
 #include "hidutils.h"
-
-// Statics used to coordinate first time libusb init
-bool GenericUsbDriver::_libusbinit = false;
+#include "libusb.h"
 
 /*
  * When we are traversing the USB reports given by the UPS and we find
- * an entry corresponding to an entry in the known_info table,
- * we make the following usb_info entry in the info table of our
+ * an entry corresponding to an entry in the known_info table above,
+ * we make the following USB_INFO entry in the info table of our
  * private data.
  */
-struct GenericUsbDriver::usb_info {
+typedef struct s_usb_info {
    unsigned usage_code;            /* usage code wanted */
    unsigned unit_exponent;         /* exponent */
    unsigned unit;                  /* units */
    int data_type;                  /* data type */
-   hid_item_t item;                /* HID item */
+   hid_item_t item;                /* HID item (for read) */
+   hid_item_t witem;               /* HID item (for write) */
    int report_len;                 /* Length of containing report */
    int ci;                         /* which CI does this usage represent? */
    int value;                      /* Previous value of this item */
-};
+} USB_INFO;
 
-GenericUsbDriver::GenericUsbDriver(UPSINFO *ups)
-   : UsbDriver(ups)
+/*
+ * This "private" structure is returned to us in the driver private
+ * field, and allows us to get to all the info we keep on each UPS.
+ * The info field is malloced for each command we want and the UPS
+ * has.
+ */
+typedef struct s_usb_data {
+   usb_dev_handle *fd;             /* Our UPS control pipe fd when open */
+   char orig_device[MAXSTRING];    /* Original port specification */
+   short vendor;                   /* UPS vendor id */
+   report_desc_t rdesc;            /* Device's report descrptor */
+   USB_INFO *info[CI_MAXCI + 1];   /* Info pointers for each command */
+} USB_DATA;
+
+int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_info)
 {
-   memset(_info, 0, sizeof(_info));
+   int i, input, feature, ci, phys;
+   USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
+   hid_item_t item, witem;
+   USB_INFO *info;
 
-   /* Initialize libusb */
-   if (!_libusbinit) {
-      Dmsg0(200, "Initializing libusb\n");
-      usb_set_debug(debug_level/100);
-      usb_init();
-      _libusbinit = true;
+   write_lock(ups);
+
+   for (i = 0; known_info[i].usage_code; i++) {
+      ci = known_info[i].ci;
+      phys = known_info[i].physical;
+
+      if (ci != CI_NONE && !my_data->info[ci]) {
+         /* Try to find an INPUT report containing this usage */
+         input = hidu_locate_item(
+            my_data->rdesc,
+            known_info[i].usage_code,     /* Match usage code */
+            -1,                           /* Don't care about application */
+            (phys == P_ANY) ? -1 : phys,  /* Match physical usage */
+            -1,                           /* Don't care about logical */
+            HID_KIND_INPUT,               /* Match feature type */
+            &item);
+
+         /* Try to find a FEATURE report containing this usage */
+         feature = hidu_locate_item(
+               my_data->rdesc,
+               known_info[i].usage_code,     /* Match usage code */
+               -1,                           /* Don't care about application */
+               (phys == P_ANY) ? -1 : phys,  /* Match physical usage */
+               -1,                           /* Don't care about logical */
+               HID_KIND_FEATURE,             /* Match feature type */
+               &witem);
+
+         // If we did not find an INPUT report, but did find a FEATURE report,
+         // use the FEATURE report as the INPUT report.
+         if (!input && feature) {
+            memcpy(&item, &witem, sizeof(item));
+            input = feature;
+         }
+
+         // Bail if we have no input report at this point
+         if (!input)
+            continue;
+
+         ups->UPS_Cap[ci] = true;
+         ups->UPS_Cmd[ci] = known_info[i].usage_code;
+
+         info = (USB_INFO *)malloc(sizeof(USB_INFO));
+         if (!info) {
+            write_unlock(ups);
+            Error_abort0(_("Out of memory.\n"));
+         }
+
+         // Use INPUT report as the main readable report
+         my_data->info[ci] = info;
+         memset(info, 0, sizeof(*info));
+         info->ci = ci;
+         info->usage_code = item.usage;
+         info->unit_exponent = item.unit_exponent;
+         info->unit = item.unit;
+         info->data_type = known_info[i].data_type;
+         memcpy(&info->item, &item, sizeof(item));
+         info->report_len = hid_report_size( /* +1 for report id */
+            my_data->rdesc, item.kind, item.report_ID) + 1;
+         Dmsg6(200, "Got READ ci=%d, rpt=%d (len=%d), usage=0x%x (len=%d), kind=0x%02x\n",
+            ci, item.report_ID, info->report_len,
+            known_info[i].usage_code, item.report_size, item.kind);
+
+         // If we have a FEATURE report, use that as the writable report
+         if (feature) {
+            memcpy(&info->witem, &witem, sizeof(item));
+            Dmsg6(200, "Got WRITE ci=%d, rpt=%d (len=%d), usage=0x%x (len=%d), kind=0x%02x\n",
+               ci, witem.report_ID, info->report_len,
+               known_info[i].usage_code, witem.report_size, witem.kind);               
+         }
+      }
    }
+
+   ups->UPS_Cap[CI_STATUS] = true; /* we always have status flag */
+   write_unlock(ups);
+   return 1;
 }
 
-bool GenericUsbDriver::populate_uval(
-   usb_info *info, unsigned char *data, usb_value *uval)
+static bool populate_uval(UPSINFO *ups, USB_INFO *info, unsigned char *data, USB_VALUE *uval)
 {
+   USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
    const char *str;
    int exponent;
-   usb_value val;
+   USB_VALUE val;
 
    /* data+1 skips the report tag byte */
    info->value = hid_get_data(data+1, &info->item);
@@ -78,7 +161,7 @@ bool GenericUsbDriver::populate_uval(
       if (info->value == 0)
          return false;
 
-      str = hidu_get_string(_fd, info->value);
+      str = hidu_get_string(my_data->fd, info->value);
       if (!str)
          return false;
 
@@ -131,6 +214,10 @@ bool GenericUsbDriver::populate_uval(
       else
          val.dValue = ((double)info->value) * pow_ten(exponent);
 
+      // Store a (possibly truncated) copy of the floating point value in the
+      // integer field as well.
+      val.iValue = (int)val.dValue;
+
       Dmsg4(200, "Def val=%d exp=%d dVal=%f ci=%d\n", info->value,
          exponent, val.dValue, info->ci);
    } else {                        /* should be T_NONE */
@@ -152,211 +239,13 @@ bool GenericUsbDriver::populate_uval(
    return true;   
 }
 
-void GenericUsbDriver::reinitialize()
-{
-   Dmsg0(200, "Reinitializing private structure.\n");
-
-   /*
-    * We are being reinitialized, so clear the Cap
-    *   array, and release previously allocated memory.
-    */
-   for (int k = 0; k <= CI_MAXCI; k++) {
-      _ups->UPS_Cap[k] = false;
-      if (_info[k] != NULL) {
-         free(_info[k]);
-         _info[k] = NULL;
-      }
-   }
-
-   _fd = NULL;
-   _linkcheck = false;
-}
-
-bool GenericUsbDriver::init_device(struct usb_device *dev)
-{
-   usb_dev_handle *fd;
-   int rc;
-   unsigned char* rdesc;
-   int rdesclen;
-
-   /* Open the device with libusb */
-   fd = usb_open(dev);
-   if (!fd) {
-      Dmsg0(100, "Unable to open device.\n");
-      return false;
-   }
-
-#ifdef LIBUSB_HAS_DETACH_KERNEL_DRIVER_NP
-   /*
-    * Attempt to detach the kernel driver so we can drive
-    * this device from userspace.
-    */
-   rc = usb_detach_kernel_driver_np(fd, 0);
-   Dmsg1(200, "Kernel detach returned %d\n", rc);
-#endif
-
-   /* Choose config #1 */
-   rc = usb_set_configuration(fd, 1);
-   if (rc) {
-      usb_close(fd);
-      Dmsg2(100, "Unable to set configuration (%d) %s.\n", rc, usb_strerror());
-      return false;
-   }
-
-   /* Claim the interface */
-   rc = usb_claim_interface(fd, 0);
-   if (rc) {
-      usb_close(fd);
-      Dmsg2(100, "Unable to claim interface (%d) %s.\n", rc, usb_strerror());
-      return false;
-   }
-
-   /* Fetch the report descritor */
-   rdesc = hidu_fetch_report_descriptor(fd, &rdesclen);
-   if (!rdesc) {
-      usb_close(fd);
-      Dmsg0(100, "Unable to fetch report descriptor.\n");
-      return false;
-   }
-
-   /* Initialize hid parser with this descriptor */
-   _rdesc = hid_use_report_desc(rdesc, rdesclen);
-   free(rdesc);
-   if (!_rdesc) {
-      usb_close(fd);
-      Dmsg0(100, "Unable to init parser with report descriptor.\n");
-      return false;
-   }
-
-   /* Does this device have an UPS application collection? */
-   if (!hidu_locate_item(
-         _rdesc,
-         UPS_USAGE,             /* Match usage code */
-         -1,                    /* Don't care about application */
-         -1,                    /* Don't care about physical usage */
-         -1,                    /* Don't care about logical */
-         HID_KIND_COLLECTION,   /* Match collection type */
-         NULL)) {
-      hid_dispose_report_desc(_rdesc);
-      usb_close(fd);
-      Dmsg0(100, "Device does not have an UPS application collection.\n");
-      return false;
-   }
-
-   _fd = fd;
-   return true;
-}
-
-bool GenericUsbDriver::open_usb_device()
-{
-   int i;
-   struct usb_bus* bus;
-   struct usb_device* dev;
-
-   /* Enumerate usb busses and devices */
-   i = usb_find_busses();
-   Dmsg1(200, "Found %d USB busses\n", i);
-   i = usb_find_devices();
-   Dmsg1(200, "Found %d USB devices\n", i);
-
-   /* Iterate over all devices, checking for idVendor=APC */
-   bus = usb_get_busses();
-   while (bus)
-   {
-      dev = bus->devices;
-      while (dev)
-      {
-         Dmsg4(200, "%s:%s - %04x:%04x\n",
-            bus->dirname, dev->filename, 
-            dev->descriptor.idVendor, dev->descriptor.idProduct);
-
-         if (dev->descriptor.idVendor == VENDOR_APC) {
-            Dmsg2(200, "Trying device %s:%s\n", bus->dirname, dev->filename);
-            if (init_device(dev)) {
-               /* Successfully found and initialized an UPS */
-               astrncpy(_ups->device, bus->dirname, sizeof(_ups->device));
-               astrncat(_ups->device, ":", sizeof(_ups->device));
-               astrncat(_ups->device, dev->filename, sizeof(_ups->device));
-               return true;
-            }
-         }
-
-         dev = dev->next;
-      }
-      
-      bus = bus->next;
-   }
-
-   /* Failed to find an UPS */
-   _ups->device[0] = 0;
-   return false;
-}
-
-/* 
- * Called if there is an ioctl() or read() error, we close() and
- * re open() the port since the device was probably unplugged.
- */
-bool GenericUsbDriver::usb_link_check()
-{
-   bool comm_err = true;
-   int tlog;
-   bool once = true;
-
-   if (_linkcheck)
-      return false;
-
-   _linkcheck = true;               /* prevent recursion */
-
-   _ups->set_commlost();
-   Dmsg0(200, "link_check comm lost\n");
-
-   /* Don't warn until we try to get it at least 2 times and fail */
-   for (tlog = LINK_RETRY_INTERVAL * 2; comm_err; tlog -= (LINK_RETRY_INTERVAL)) {
-
-      if (tlog <= 0) {
-         tlog = 10 * 60;           /* notify every 10 minutes */
-         log_event(_ups, event_msg[CMDCOMMFAILURE].level,
-                   event_msg[CMDCOMMFAILURE].msg);
-         if (once) {               /* execute script once */
-            execute_command(_ups, ups_event[CMDCOMMFAILURE]);
-            once = false;
-         }
-      }
-
-      /* Retry every LINK_RETRY_INTERVAL seconds */
-      sleep(LINK_RETRY_INTERVAL);
-
-      if (_fd) {
-         usb_reset(_fd);
-         usb_close(_fd);
-         _fd = NULL;
-         hid_dispose_report_desc(_rdesc);
-         reinitialize();
-      }
-
-      if (open_usb_device() && SubclassGetCapabilities() && ReadStaticData()) {
-         comm_err = false;
-      } else {
-         continue;
-      }
-   }
-
-   if (!comm_err) {
-      generate_event(_ups, CMDCOMMOK);
-      _ups->clear_commlost();
-      Dmsg0(200, "link check comm OK.\n");
-   }
-
-   _linkcheck = false;
-   return true;
-}
-
 /*
  * Get a field value
  */
-bool GenericUsbDriver::SubclassGetValue(int ci, usb_value *uval)
+int pusb_get_value(UPSINFO *ups, int ci, USB_VALUE *uval)
 {
-   usb_info *info = _info[ci];
+   USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
+   USB_INFO *info = my_data->info[ci];
    unsigned char data[20];
    int len;
 
@@ -375,7 +264,7 @@ bool GenericUsbDriver::SubclassGetValue(int ci, usb_value *uval)
    memset(data, 0, sizeof(data));
 
    /* Fetch the proper report */
-   len = hidu_get_report(_fd, &info->item, data, info->report_len);
+   len = hidu_get_report(my_data->fd, &info->item, data, info->report_len);
    if (len == -1)
       return false;
 
@@ -400,71 +289,214 @@ bool GenericUsbDriver::SubclassGetValue(int ci, usb_value *uval)
    }
 
    /* Populate a uval struct using the raw report data */
-   return populate_uval(info, data, uval);
+   return populate_uval(ups, info, data, uval);
 }
 
-bool GenericUsbDriver::SubclassGetCapabilities()
+static void reinitialize_private_structure(UPSINFO *ups)
 {
-   int i, rc, ci, phys;
-   hid_item_t item;
-   usb_info *info;
+   USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
+   int k;
 
-   write_lock(_ups);
+   Dmsg0(200, "Reinitializing private structure.\n");
+   /*
+    * We are being reinitialized, so clear the Cap
+    *   array, and release previously allocated memory.
+    */
+   for (k = 0; k <= CI_MAXCI; k++) {
+      ups->UPS_Cap[k] = false;
+      if (my_data->info[k] != NULL) {
+         free(my_data->info[k]);
+         my_data->info[k] = NULL;
+      }
+   }
+}
 
-   for (i = 0; _known_info[i].usage_code; i++) {
-      ci = _known_info[i].ci;
-      phys = _known_info[i].physical;
+int init_device(UPSINFO *ups, struct usb_device *dev)
+{
+   USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
+   usb_dev_handle *fd;
+   int rc;
+   unsigned char* rdesc;
+   int rdesclen;
 
-      if (ci != CI_NONE && !_ups->UPS_Cap[ci]) {
-         /* Prefer input items, but try feature if input fails */
-         rc = hidu_locate_item(
-               _rdesc,
-               _known_info[i].usage_code,    /* Match usage code */
-               -1,                           /* Don't care about application */
-               (phys == P_ANY) ? -1 : phys,  /* Match physical usage */
-               -1,                           /* Don't care about logical */
-               HID_KIND_INPUT,               /* Match feature type */
-               &item);
+   /* Open the device with libusb */
+   fd = usb_open(dev);
+   if (!fd) {
+      Dmsg0(100, "Unable to open device.\n");
+      return 0;
+   }
 
-         if (!rc) {
-            rc = hidu_locate_item(
-                  _rdesc,
-                  _known_info[i].usage_code,    /* Match usage code */
-                  -1,                           /* Don't care about application */
-                  (phys == P_ANY) ? -1 : phys,  /* Match physical usage */
-                  -1,                           /* Don't care about logical */
-                  HID_KIND_FEATURE,             /* Match feature type */
-                  &item);
-         }
+#ifdef LIBUSB_HAS_DETACH_KERNEL_DRIVER_NP
+   /*
+    * Attempt to detach the kernel driver so we can drive
+    * this device from userspace.
+    */
+   rc = usb_detach_kernel_driver_np(fd, 0);
+   Dmsg1(200, "Kernel detach returned %d\n", rc);
+#endif
 
-         if (rc) {
-            _ups->UPS_Cap[ci] = true;
+   /* Choose config #1 */
+   rc = usb_set_configuration(fd, 1);
+   if (rc) {
+      usb_close(fd);
+      Dmsg2(100, "Unable to set configuration (%d) %s.\n", rc, usb_strerror());
+      return 0;
+   }
 
-            info = (usb_info *)malloc(sizeof(usb_info));
-            if (!info) {
-               write_unlock(_ups);
-               Error_abort0(_("Out of memory.\n"));
+   /* Claim the interface */
+   rc = usb_claim_interface(fd, 0);
+   if (rc) {
+      usb_close(fd);
+      Dmsg2(100, "Unable to claim interface (%d) %s.\n", rc, usb_strerror());
+      return 0;
+   }
+
+   /* Fetch the report descritor */
+   rdesc = hidu_fetch_report_descriptor(fd, &rdesclen);
+   if (!rdesc) {
+      usb_close(fd);
+      Dmsg0(100, "Unable to fetch report descriptor.\n");
+      return 0;
+   }
+
+   /* Initialize hid parser with this descriptor */
+   my_data->rdesc = hid_use_report_desc(rdesc, rdesclen);
+   free(rdesc);
+   if (!my_data->rdesc) {
+      usb_close(fd);
+      Dmsg0(100, "Unable to init parser with report descriptor.\n");
+      return 0;
+   }
+
+   /* Does this device have an UPS application collection? */
+   if (!hidu_locate_item(
+         my_data->rdesc,
+         UPS_USAGE,             /* Match usage code */
+         -1,                    /* Don't care about application */
+         -1,                    /* Don't care about physical usage */
+         -1,                    /* Don't care about logical */
+         HID_KIND_COLLECTION,   /* Match collection type */
+         NULL)) {
+      hid_dispose_report_desc(my_data->rdesc);
+      usb_close(fd);
+      Dmsg0(100, "Device does not have an UPS application collection.\n");
+      return 0;
+   }
+
+   my_data->vendor = dev->descriptor.idVendor;
+   my_data->fd = fd;
+   return 1;
+}
+
+int open_usb_device(UPSINFO *ups)
+{
+   int i;
+   struct usb_bus* bus;
+   struct usb_device* dev;
+
+   /* Initialize libusb */
+   Dmsg0(200, "Initializing libusb\n");
+   usb_init();
+
+   /* Enumerate usb busses and devices */
+   i = usb_find_busses();
+   Dmsg1(200, "Found %d USB busses\n", i);
+   i = usb_find_devices();
+   Dmsg1(200, "Found %d USB devices\n", i);
+
+   /* Iterate over all devices, checking for idVendor=APC */
+   bus = usb_get_busses();
+   while (bus)
+   {
+      dev = bus->devices;
+      while (dev)
+      {
+         Dmsg4(200, "%s:%s - %04x:%04x\n",
+            bus->dirname, dev->filename, 
+            dev->descriptor.idVendor, dev->descriptor.idProduct);
+
+         if (dev->descriptor.idVendor == VENDOR_APC) {
+            Dmsg2(200, "Trying device %s:%s\n", bus->dirname, dev->filename);
+            if (init_device(ups, dev)) {
+               /* Successfully found and initialized an UPS */
+               astrncpy(ups->device, bus->dirname, sizeof(ups->device));
+               astrncat(ups->device, ":", sizeof(ups->device));
+               astrncat(ups->device, dev->filename, sizeof(ups->device));
+               return 1;
             }
-
-            _info[ci] = info;
-            info->ci = ci;
-            info->usage_code = item.usage;
-            info->unit_exponent = item.unit_exponent;
-            info->unit = item.unit;
-            info->data_type = _known_info[i].data_type;
-            memcpy(&info->item, &item, sizeof(item));
-            info->report_len = hid_report_size( /* +1 for report id */
-               _rdesc, item.kind, item.report_ID) + 1;
-            Dmsg5(200, "Got ci=%d, rpt=%d (len=%d), usage=0x%x (len=%d)\n",
-               ci, item.report_ID, info->report_len,
-               _known_info[i].usage_code, item.report_size);
          }
+
+         dev = dev->next;
+      }
+      
+      bus = bus->next;
+   }
+
+   /* Failed to find an UPS */
+   ups->device[0] = 0;
+   return 0;
+}
+
+/* 
+ * Called if there is an ioctl() or read() error, we close() and
+ * re open() the port since the device was probably unplugged.
+ */
+static int usb_link_check(UPSINFO *ups)
+{
+   bool comm_err = true;
+   int tlog;
+   bool once = true;
+   USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
+   static bool linkcheck = false;
+
+   if (linkcheck)
+      return 0;
+
+   linkcheck = true;               /* prevent recursion */
+
+   ups->set_commlost();
+   Dmsg0(200, "link_check comm lost\n");
+
+   /* Don't warn until we try to get it at least 2 times and fail */
+   for (tlog = LINK_RETRY_INTERVAL * 2; comm_err; tlog -= (LINK_RETRY_INTERVAL)) {
+
+      if (tlog <= 0) {
+         tlog = 10 * 60;           /* notify every 10 minutes */
+         log_event(ups, event_msg[CMDCOMMFAILURE].level,
+                   event_msg[CMDCOMMFAILURE].msg);
+         if (once) {               /* execute script once */
+            execute_command(ups, ups_event[CMDCOMMFAILURE]);
+            once = false;
+         }
+      }
+
+      /* Retry every LINK_RETRY_INTERVAL seconds */
+      sleep(LINK_RETRY_INTERVAL);
+
+      if (my_data->fd) {
+         usb_reset(my_data->fd);
+         usb_close(my_data->fd);
+         my_data->fd = NULL;
+         hid_dispose_report_desc(my_data->rdesc);
+         reinitialize_private_structure(ups);
+      }
+
+      if (open_usb_device(ups) && usb_ups_get_capabilities(ups) &&
+         usb_ups_read_static_data(ups)) {
+         comm_err = false;
+      } else {
+         continue;
       }
    }
 
-   _ups->UPS_Cap[CI_STATUS] = true; /* we always have status flag */
-   write_unlock(_ups);
-   return true;
+   if (!comm_err) {
+      generate_event(ups, CMDCOMMOK);
+      ups->clear_commlost();
+      Dmsg0(200, "link check comm OK.\n");
+   }
+
+   linkcheck = false;
+   return 1;
 }
 
 /*
@@ -478,19 +510,20 @@ bool GenericUsbDriver::SubclassGetCapabilities()
 # define LIBUSB_ETIMEDOUT   ETIMEDOUT
 #endif
 
-bool GenericUsbDriver::SubclassCheckState()
+int pusb_ups_check_state(UPSINFO *ups)
 {
    int i, ci;
    int retval, value;
    unsigned char buf[20];
+   USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
    struct timeval now, exit;
    int timeout;
-   usb_value uval;
+   USB_VALUE uval;
    bool done = false;
 
    /* Figure out when we need to exit by */
    gettimeofday(&exit, NULL);
-   exit.tv_sec += _ups->wait_time;
+   exit.tv_sec += ups->wait_time;
 
    while (!done) {
 
@@ -499,23 +532,23 @@ bool GenericUsbDriver::SubclassCheckState()
       timeout = TV_DIFF_MS(now, exit);
       if (timeout <= 0) {
          /* Done already? How time flies... */
-         return false;
+         return 0;
       }
 
       Dmsg1(200, "Timeout=%d\n", timeout);
-      retval = usb_interrupt_read(_fd, USB_ENDPOINT_IN|1, (char*)buf, sizeof(buf), timeout);
+      retval = usb_interrupt_read(my_data->fd, USB_ENDPOINT_IN|1, (char*)buf, sizeof(buf), timeout);
 
       if (retval == 0 || retval == -LIBUSB_ETIMEDOUT) {
-         /* No events available in _ups->wait_time seconds. */
-         return false;
+         /* No events available in ups->wait_time seconds. */
+         return 0;
       } else if (retval == -EINTR || retval == -EAGAIN) {
          /* assume SIGCHLD */
          continue;
       } else if (retval < 0) {
          /* Hard error */
          Dmsg2(200, "usb_interrupt_read error: (%d) %s\n", retval, strerror(-retval));
-         usb_link_check();      /* link is down, wait */
-         return false;
+         usb_link_check(ups);      /* link is down, wait */
+         return 0;
       }
 
       if (debug_level >= 300) {
@@ -525,19 +558,19 @@ bool GenericUsbDriver::SubclassCheckState()
          logf("\n");
       }
 
-      write_lock(_ups);
+      write_lock(ups);
 
       /*
        * Iterate over all CIs, firing off events for any that are
        * affected by this report.
        */
       for (ci=0; ci<CI_MAXCI; ci++) {
-         if (_ups->UPS_Cap[ci] && _info[ci] &&
-             _info[ci]->item.report_ID == buf[0]) {
+         if (ups->UPS_Cap[ci] && my_data->info[ci] &&
+             my_data->info[ci]->item.report_ID == buf[0]) {
 
             /* Ignore this event if the value has not changed */
-            value = hid_get_data(buf+1, &_info[ci]->item);
-            if (_info[ci]->value == value) {
+            value = hid_get_data(buf+1, &my_data->info[ci]->item);
+            if (my_data->info[ci]->value == value) {
                Dmsg3(200, "Ignoring unchanged value (ci=%d, rpt=%d, val=%d)\n",
                   ci, buf[0], value);
                continue;
@@ -547,8 +580,8 @@ bool GenericUsbDriver::SubclassCheckState()
                ci, buf[0], value);
 
             /* Populate a uval and report it to the upper layer */
-            populate_uval(_info[ci], buf, &uval);
-            if (report_event(ci, &uval)) {
+            populate_uval(ups, my_data->info[ci], buf, &uval);
+            if (usb_report_event(ups, ci, &uval)) {
                /*
                 * The upper layer considers this an important event,
                 * so we will return after processing any remaining
@@ -559,7 +592,7 @@ bool GenericUsbDriver::SubclassCheckState()
          }
       }
 
-      write_unlock(_ups);
+      write_unlock(ups);
    }
    
    return true;
@@ -571,73 +604,108 @@ bool GenericUsbDriver::SubclassCheckState()
  * This is called once by the core code and is the first 
  * routine called.
  */
-bool GenericUsbDriver::SubclassOpen()
+int pusb_ups_open(UPSINFO *ups)
 {
-   write_lock(_ups);
-   reinitialize();
+   USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
 
-   if (!open_usb_device()) {
-      write_unlock(_ups);
+   /* Set libusb debug level */
+   usb_set_debug(debug_level/100);
+
+   write_lock(ups);
+   if (my_data == NULL) {
+      my_data = (USB_DATA *)malloc(sizeof(USB_DATA));
+      if (my_data == NULL) {
+         log_event(ups, LOG_ERR, "Out of memory.");
+         write_unlock(ups);
+         exit(1);
+      }
+
+      memset(my_data, 0, sizeof(USB_DATA));
+      ups->driver_internal_data = my_data;
+   } else {
+      reinitialize_private_structure(ups);
+   }
+
+   if (my_data->orig_device[0] == 0)
+      astrncpy(my_data->orig_device, ups->device, sizeof(my_data->orig_device));
+
+   if (!open_usb_device(ups)) {
+      write_unlock(ups);
       Error_abort0(_("Cannot find UPS device --\n"
             "For a link to detailed USB trouble shooting information,\n"
             "please see <http://www.apcupsd.com/support.html>.\n"));
    }
 
    /*
-    * Note, we set _ups->fd here so the "core" of apcupsd doesn't
+    * Note, we set ups->fd here so the "core" of apcupsd doesn't
     * think we are a slave, which is what happens when it is -1.
     * (ADK: Actually this only appears to be true for apctest as
     * apcupsd proper uses the UPS_slave flag.)
     * Internally, we use the fd in our own private space   
     */
-   _ups->fd = 1;
+   ups->fd = 1;
 
-   _ups->clear_slave();
-   write_unlock(_ups);
-   return true;
+   ups->clear_slave();
+   write_unlock(ups);
+   return 1;
 }
 
-bool GenericUsbDriver::SubclassClose()
+int pusb_ups_close(UPSINFO *ups)
 {
    /* Should we be politely closing fds here or anything? */
-   return true;
+   write_lock(ups);
+
+   if (ups->driver_internal_data) {
+      free(ups->driver_internal_data);
+      ups->driver_internal_data = NULL;
+   }
+
+   write_unlock(ups);
+   return 1;
 }
 
-bool GenericUsbDriver::SubclassReadIntFromUps(int ci, int *value)
+int pusb_ups_setup(UPSINFO *ups)
 {
-   usb_value val;
+   /* Nothing to do */
+   return 1;
+}
 
-   if (!SubclassGetValue(ci, &val))
+int pusb_read_int_from_ups(UPSINFO *ups, int ci, int *value)
+{
+   USB_VALUE val;
+
+   if (!pusb_get_value(ups, ci, &val))
       return false;
 
    *value = val.iValue;
    return true;
 }
 
-bool GenericUsbDriver::SubclassWriteIntToUps(int ci, int value, const char *name)
+int pusb_write_int_to_ups(UPSINFO *ups, int ci, int value, const char *name)
 {
-   usb_info *info;
+   USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
+   USB_INFO *info;
    int old_value, new_value;
    unsigned char rpt[20];
 
-   if (_ups->UPS_Cap[ci] && _info[ci]) {
-      info = _info[ci];    /* point to our info structure */
+   if (ups->UPS_Cap[ci] && my_data->info[ci] && my_data->info[ci]->witem.report_ID) {
+      info = my_data->info[ci];    /* point to our info structure */
 
-      if (hidu_get_report(_fd, &info->item, rpt, info->report_len) < 1) {
+      if (hidu_get_report(my_data->fd, &info->item, rpt, info->report_len) < 1) {
          Dmsg1(000, "get_report for kill power function %s failed.\n", name);
          return false;
       }
 
       old_value = hid_get_data(rpt + 1, &info->item);
 
-      hid_set_data(rpt + 1, &info->item, value);
+      hid_set_data(rpt + 1, &info->witem, value);
 
-      if (!hidu_set_report(_fd, &info->item, rpt, info->report_len)) {
+      if (!hidu_set_report(my_data->fd, &info->witem, rpt, info->report_len)) {
          Dmsg1(000, "set_report for kill power function %s failed.\n", name);
          return false;
       }
 
-      if (hidu_get_report(_fd, &info->item, rpt, info->report_len) < 1) {
+      if (hidu_get_report(my_data->fd, &info->item, rpt, info->report_len) < 1) {
          Dmsg1(000, "get_report for kill power function %s failed.\n", name);
          return false;
       }

@@ -78,7 +78,7 @@ static const struct {
    {"lastxfer",   "LASTXFER", 0},          /* reason for last xfer to batteries */
    {"selftest",   "SELFTEST", 1},          /* results of last self test */
    {"laststest",  "LASTSTEST", 0},
-   {"release",    "RELEASE",  1},
+   {"version",    "VERSION",  1},
    {"upsname",    "UPSNAME",  1},
    {"lowbatt",    "DLOWBATT", 1},          /* low battery power off delay */
    {"battpct",    "BCHARGE",  1},
@@ -154,15 +154,15 @@ int fetch_events(const char *host)
       nis_port = atoi(p);
    }
    if ((sockfd = net_open(lhost, NULL, nis_port)) < 0) {
-      (void) snprintf(errmsg, sizeof(errmsg),
+      snprintf(errmsg, sizeof(errmsg),
           "upsfetch: tcp_open failed for %s port %d", lhost, nis_port);
-      (void) fputs(errmsg, stdout);
+      fputs(errmsg, stdout);
       return 0;
    }
 
    if (net_send(sockfd, "events", 6) != 6) {
-      sprintf(errmsg, "fill_buffer: write error on socket\n");
-      (void) fputs(errmsg, stdout);
+      snprintf(errmsg, sizeof(errmsg), "fill_buffer: write error on socket\n");
+      fputs(errmsg, stdout);
       return 0;
    }
    /*
@@ -264,17 +264,17 @@ static int fill_buffer(int sockfd)
    statbuf[0] = '\0';
    statlen = 0;
    if (net_send(sockfd, "status", 6) != 6) {
-      sprintf(errmsg, "fill_buffer: write error on socket\n");
+      snprintf(errmsg, sizeof(errmsg), "fill_buffer: write error on socket\n");
       return 0;
    }
 
    while ((n = net_recv(sockfd, buf, sizeof(buf)-1)) > 0) {
       buf[n] = '\0';
-      strcat(statbuf, buf);
+      strncat(statbuf, buf, sizeof(statbuf)-statlen-1);
+      statlen = strlen(statbuf);
    }
    if (n < 0)
       stat = 0;
 
-   statlen = strlen(statbuf);
    return stat;
 }

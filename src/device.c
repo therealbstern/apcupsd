@@ -47,7 +47,7 @@
 #include "apc.h"
 
 /* Forward referenced function */
-//static int device_wait_time(UPSINFO *ups);
+static int device_wait_time(UPSINFO *ups);
 
 /*********************************************************************/
 void setup_device(UPSINFO *ups)
@@ -71,8 +71,8 @@ void setup_device(UPSINFO *ups)
                      "  please stop it and run this program again.\n"));
    }
 
-//   device_setup(ups);
-//   device_get_capabilities(ups);
+   device_setup(ups);
+   device_get_capabilities(ups);
 }
 
 /*********************************************************************/
@@ -173,7 +173,6 @@ void initiate_shutdown(UPSINFO *ups)
    device_shutdown(ups);
 }
 
-#if 0
 /*
  * After the device is initialized, we come here
  * to read all the information we can about the UPS.
@@ -278,4 +277,3 @@ static int device_wait_time(UPSINFO *ups)
 
    return wait_time;
 }
-#endif

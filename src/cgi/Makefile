@@ -28,7 +28,7 @@ upsfstats.cgi: $(common_obj) $(upsfstats_obj) $(APCLIBS)
 	$(LINK)
 
 upsimage.cgi: $(common_obj) $(upsimage_obj) $(APCLIBS)
-	$(LINK) $(LIBGD)
+	$(LINK) $(X_LIBS) $(LIBGD)
 
 all-install: install-cgi
 all-uninstall: uninstall-cgi
@@ -57,4 +57,4 @@ uninstall-cgi:
 	$(call UNINST,$(sysconfdir)/multimon.conf.new)
 
 # Include dependencies
--include $(DEPS)
+-include $(SRCS:%.c=$(DEPDIR)/%.P)

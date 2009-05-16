@@ -26,7 +26,7 @@
 
 #include "apc.h"
 
-static const char *const shortoptions = "b?RtTVf:d:pP:ks";
+static const char *const shortoptions = "bhRtTVf:d:pP:ko";
 
 enum {
    OPT_NOARG,
@@ -35,7 +35,7 @@ enum {
    OPT_CFGFILE,
    OPT_DEBUG,
    OPT_HIBERNATE,
-   OPT_SHUTDOWN,
+   OPT_POWEROFF,
    OPT_TERMONPWRFAIL,
    OPT_KILLONPWRFAIL,
    OPT_PIDFILE
@@ -48,7 +48,7 @@ static const struct option longoptions[] = {
    {"debug",               required_argument, NULL, OPT_DEBUG},
    {"killpower",           no_argument,       NULL, OPT_HIBERNATE},
    {"hibernate",           no_argument,       NULL, OPT_HIBERNATE},
-   {"shutdown",            no_argument,       NULL, OPT_SHUTDOWN},
+   {"power-off",           no_argument,       NULL, OPT_POWEROFF},
    {"term-on-powerfail",   no_argument,       NULL, OPT_TERMONPWRFAIL},
    {"kill-on-powerfail",   no_argument,       NULL, OPT_KILLONPWRFAIL},
    {"pid-file",            required_argument, NULL, OPT_PIDFILE},
@@ -73,17 +73,18 @@ static void print_usage(char *argv[])
          "  -d, --debug <level>           set debug level (>0)\n"
          "  -f, --config-file <file>      load specified config file\n"
          "  -k, --killpower, --hibernate  put UPS into hibernation mode [*]\n"
-         "  -s, --shutdown                turn off UPS completely [*]\n"
+         "  -o, --power-off               turn off UPS completely [*]\n"
+         "  -P, --pid-file                specify name of PID file\n"
          "  -p, --kill-on-powerfail       hibernate UPS on powerfail\n"
          "  -R,                           put SmartUPS into dumb mode\n"
          "  -t, --term-on-powerfail       terminate when battery power fails\n"
          "  -T                            send debug to ./apcupsd.trace\n"
          "  -V, --version                 display version info\n"
-         "  -?, --help                    display this help\n"
+         "  -h, --help                    display this help\n"
          "\n"
          "  [*] Only one parameter of this kind and apcupsd must not already be running.\n"
          "\n"
-         "Copyright (C) 2004-2005 Adam Kropelin\n"
+         "Copyright (C) 2004-2009 Adam Kropelin\n"
          "Copyright (C) 1999-2005 Kern Sibbald\n"
          "Copyright (C) 1996-1999 Andre Hedrick\n"
          "Copyright (C) 1999-2001 Riccardo Facchetti\n"
@@ -176,12 +177,12 @@ int parse_options(int argc, char *argv[])
          hibernate_ups = TRUE;
          oneshot = TRUE;
          break;
-      case 's':
-      case OPT_SHUTDOWN:
+      case 'o':
+      case OPT_POWEROFF:
          shutdown_ups = TRUE;
          oneshot = TRUE;
          break;
-      case '?':
+      case 'h':
       case OPT_HELP:
       default:
          errflag++;

@@ -27,16 +27,15 @@
 #include "apc.h"
 #include "apcsmart.h"
 
-bool ApcSmartDriver::KillPower()
+int apcsmart_ups_kill_power(UPSINFO *ups)
 {
    char response[32];
    int shutdown_delay = 0;
    int errflag = 0;
 
    response[0] = '\0';
-   shutdown_delay = GetShutdownDelay();
-   
-   writechar('S');                 /* ask for soft shutdown */
+   shutdown_delay = apcsmart_ups_get_shutdown_delay(ups);
+   writechar('S', ups);            /* ask for soft shutdown */
 
    /*
     * Check whether the UPS has acknowledged the power-off command.
@@ -46,9 +45,9 @@ bool ApcSmartDriver::KillPower()
     * operator intervention.  w.p.
     */
    sleep(5);
-   getline(response, sizeof response);
+   getline(response, sizeof response, ups);
    if (strcmp(response, "OK") == 0) {
-      WarnShutdown(shutdown_delay);
+      apcsmart_ups_warn_shutdown(ups, shutdown_delay);
    } else {
       /*
        * Experiments show that the UPS needs delays between chars
@@ -56,41 +55,39 @@ bool ApcSmartDriver::KillPower()
        */
 
       sleep(1);                    /* Shutdown now */
-      writechar('@');
+      writechar('@', ups);
       sleep(1);
-      writechar('0');
+      writechar('0', ups);
       sleep(1);
-      writechar('0');
-      sleep(1);
-      writechar('0');
+      writechar('0', ups);
 
-      getline(response, sizeof(response));
+      getline(response, sizeof(response), ups);
       if ((strcmp(response, "OK") == 0) || (strcmp(response, "*") == 0)) {
-         WarnShutdown(shutdown_delay);
+         apcsmart_ups_warn_shutdown(ups, shutdown_delay);
       } else {
          errflag++;
       }
    }
 
    if (errflag) {
-      writechar('@');
+      writechar('@', ups);
       sleep(1);
-      writechar('0');
+      writechar('0', ups);
       sleep(1);
-      writechar('0');
+      writechar('0', ups);
       sleep(1);
 
-      if ((_ups->mode.type == BKPRO) || (_ups->mode.type == VS)) {
-         log_event(_ups, LOG_WARNING,
+      if ((ups->mode.type == BKPRO) || (ups->mode.type == VS)) {
+         log_event(ups, LOG_WARNING,
             _("BackUPS Pro and SmartUPS v/s sleep for 6 min"));
-         writechar('1');
+         writechar('1', ups);
       } else {
-         writechar('0');
+         writechar('0', ups);
       }
 
-      getline(response, sizeof(response));
+      getline(response, sizeof(response), ups);
       if ((strcmp(response, "OK") == 0) || (strcmp(response, "*") == 0)) {
-         WarnShutdown(shutdown_delay);
+         apcsmart_ups_warn_shutdown(ups, shutdown_delay);
          errflag = 0;
       } else {
          errflag++;
@@ -98,68 +95,68 @@ bool ApcSmartDriver::KillPower()
    }
 
    if (errflag) {
-      return ShutdownWithDelay(shutdown_delay);
+      return apcsmart_ups_shutdown_with_delay(ups, shutdown_delay);
    }
-   
+
    return 1;
 }
 
-bool ApcSmartDriver::Shutdown()
+int apcsmart_ups_shutdown(UPSINFO *ups)
 {
-   return ShutdownWithDelay(GetShutdownDelay());
+   return apcsmart_ups_shutdown_with_delay(ups, apcsmart_ups_get_shutdown_delay(ups));
 }
 
-bool ApcSmartDriver::ShutdownWithDelay(int shutdown_delay)
+int apcsmart_ups_shutdown_with_delay(UPSINFO *ups, int shutdown_delay)
 {
    char response[32];
-      
+
    /*
     * K K command
     *
     * This method should turn the UPS off completely according to this article:
     * http://nam-en.apc.com/cgi-bin/nam_en.cfg/php/enduser/std_adp.php?p_faqid=604
     */
-   
-   writechar('K');
+
+   writechar('K', ups);
    sleep(2);
-   writechar('K');
-   getline(response, sizeof response);
+   writechar('K', ups);
+   getline(response, sizeof response, ups);
    if ((strcmp(response, "*") == 0) || (strcmp(response, "OK") == 0) ||
-      (_ups->mode.type >= BKPRO)) {
-      WarnShutdown(shutdown_delay);
+      (ups->mode.type >= BKPRO)) {
+      apcsmart_ups_warn_shutdown(ups, shutdown_delay);
       return 1;
    } else {
-      log_event(_ups, LOG_WARNING, _("Unexpected error!\n"));
-      log_event(_ups, LOG_WARNING, _("UPS in unstable state\n"));
-      log_event(_ups, LOG_WARNING,
+      log_event(ups, LOG_WARNING, _("Unexpected error!\n"));
+      log_event(ups, LOG_WARNING, _("UPS in unstable state\n"));
+      log_event(ups, LOG_WARNING,
          _("You MUST power off your UPS before rebooting!!!\n"));
       return 0;
    }
 }
 
-void ApcSmartDriver::WarnShutdown(int shutdown_delay)
+void apcsmart_ups_warn_shutdown(UPSINFO *ups, int shutdown_delay)
 {
    if (shutdown_delay > 0) {
-      log_event(_ups, LOG_WARNING,
+      log_event(ups, LOG_WARNING,
          "UPS will power off after %d seconds ...\n", shutdown_delay);
    } else {
-      log_event(_ups, LOG_WARNING,
+      log_event(ups, LOG_WARNING,
          "UPS will power off after the configured delay  ...\n");
    }
-   log_event(_ups, LOG_WARNING,
+   log_event(ups, LOG_WARNING,
       _("Please power off your UPS before rebooting your computer ...\n"));
 }
 
-int ApcSmartDriver::GetShutdownDelay()
+int apcsmart_ups_get_shutdown_delay(UPSINFO *ups)
 {
    char response[32];
 
-   writechar(_cmdmap[CI_DSHUTD]);
-   getline(response, sizeof(response));
+   writechar(ups->UPS_Cmd[CI_DSHUTD], ups);
+   getline(response, sizeof(response), ups);
    return (int)atof(response);
 }
 
-bool ApcSmartDriver::CheckState()
+int apcsmart_ups_check_state(UPSINFO *ups)
 {
-   return getline(NULL, 0) == SUCCESS;
+   return getline(NULL, 0, ups) == SUCCESS ? 1 : 0;
 }

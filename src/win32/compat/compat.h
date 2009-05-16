@@ -27,7 +27,7 @@
  * Last Modified By: Thorsten Engel
  * Last Modified On: Fri Apr 22 19:30:00 2004
  * Update Count    : 218
- * $Id: compat.h,v 1.23 2008-06-29 15:36:53 adk0212 Exp $
+ * $Id: compat.h,v 1.21.2.3 2008-06-21 21:04:15 adk0212 Exp $
  */
 
 

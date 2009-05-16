@@ -68,7 +68,7 @@ if (file_exists($statusfile_location)) {
 	$load = floatval($dumbvar[1]);
 	if ($load > 75) {
 		$loadbg = $badcolour;
-	} else if ($batteryload > 25) {
+	} else if ($load > 25) {
 		$loadbg = $warncolour;
 	} else $loadbg = $goodcolour;
 

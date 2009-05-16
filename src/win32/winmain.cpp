@@ -192,9 +192,36 @@ void *ApcupsdMain(LPVOID lpwThreadParam)
    ApcupsdTerminate();
 }
 
+// This thread runs on Windows 2000 and higher. It monitors for the
+// global exit event to be signaled (/kill).
+bool runthread = false;
+HANDLE exitevt = NULL;
+DWORD WINAPI EventThread(LPVOID param)
+{
+   // Create global exit event and allow Adminstrator access to it so any
+   // member of the Administrators group can signal it.
+   exitevt = CreateEvent(NULL, TRUE, FALSE, APCUPSD_STOP_EVENT_NAME);
+   GrantAccess(exitevt, EVENT_MODIFY_STATE, TRUSTEE_IS_GROUP, "Administrators");
+
+   // Wait for event to be signaled
+   while (runthread)
+   {
+      DWORD rc = WaitForSingleObject(exitevt, INFINITE);
+      if (!runthread || rc != WAIT_OBJECT_0)
+         break;
+
+      // Global exit event signaled
+      runthread = false;
+      PostToApcupsd(WM_CLOSE, 0, 0);
+   }
+
+   CloseHandle(exitevt);
+   return 0;
+}
+
 // Wait for exit signal on WinNT and below. This code creates a hidden
-// window and waits for a WM_CLOSE window message to be delivered. We only
-// use this on ancient platforms that do not support named events.
+// window and waits for a WM_CLOSE window message to be delivered. On
+// modern platforms, we also monitor a global event.
 static void WaitForExit()
 {
    // Dummy window class
@@ -229,54 +256,28 @@ static void WaitForExit()
    if (hwnd == NULL)
       return;
 
+   // On Win2K and above we spawn a thread to watch for exit requests.
+   HANDLE evtthread;
+   if (g_os_version >= WINDOWS_2000) {
+      runthread = true;
+      evtthread = CreateThread(NULL, 0, EventThread, NULL, 0, NULL);
+   }
+
    // Now enter the Windows message handling loop until told to quit
    MSG msg;
-   if (g_os_version < WINDOWS_2000)
+   while (GetMessage(&msg, NULL, 0, 0))
    {
-      // On older systems, all we can do is wait for a window message
-      // and process it. We'll automatically exit if we get WM_QUIT.
-      while (GetMessage(&msg, NULL, 0, 0))
-      {
-         TranslateMessage(&msg);
-         DispatchMessage(&msg);
-      }
+      TranslateMessage(&msg);
+      DispatchMessage(&msg);
    }
-   else
-   {
-      // On newer platforms, we wait for a WM_QUIT window message as above,
-      // or for a named event to be signaled. This code creates an event,
-      // grants access to all users in the Adminstrators group, then waits
-      // for the event to be signaled. We prefer this method on modern 
-      // platforms since it allows terminating an apcupsd running in another
-      // session. We still do the window message thing, too, for backwards
-      // compatibility.
 
-      // Create event to signal shutdown
-      HANDLE hevt = CreateEvent(NULL, TRUE, FALSE, APCUPSD_STOP_EVENT_NAME);
-
-      // Add EVENT_MODIFY_STATE permission for Administrators group
-      GrantAccess(hevt, EVENT_MODIFY_STATE, TRUSTEE_IS_GROUP, "Administrators");
-
-      DWORD rc;
-      do
-      {
-         // Wait for a message to arrive or for the stop event to be signaled
-         rc = MsgWaitForMultipleObjects(1, &hevt, FALSE, INFINITE, QS_ALLEVENTS);
-
-         // Stop event was signaled or major error: Time to exit
-         if (rc != WAIT_OBJECT_0+1)
-            break;
-
-         // Message must be ready: fetch and translate it
-         while(PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
-         {
-            TranslateMessage(&msg);
-            DispatchMessage(&msg);
-         }
-      }
-      while(LOWORD(msg.message) != WM_QUIT);
-
-      CloseHandle(hevt);
+   // Wait for event thread to exit cleanly
+   if (g_os_version >= WINDOWS_2000) {
+      runthread = false;
+      SetEvent(exitevt); // Kick exitevt to wake up thread
+      if (WaitForSingleObject(evtthread, 5000) == WAIT_TIMEOUT)
+         TerminateThread(evtthread, 0);
+      CloseHandle(evtthread);
    }
 
    DestroyWindow(hwnd);

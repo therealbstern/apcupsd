@@ -167,6 +167,20 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
    asnprintf(powered, sizeof(powered), "%d", (int)ups->is_plugged());
    asnprintf(apccontrol, sizeof(apccontrol), "%s%s", ups->scriptdir, APCCONTROL_FILE);
 
+#ifdef HAVE_QNX_OS
+   /* fork() is supported only in single-threaded applications */
+   argv[0] = apccontrol;        /* Shell script to execute. */
+   argv[1] = cmd.command;       /* Parameter to script. */
+   argv[2] = ups->upsname;      /* UPS name */
+   argv[3] = connected;
+   argv[4] = powered;
+   argv[5] = NULL;
+   if (spawnv(P_NOWAIT, apccontrol, (char * const *)argv) == -1) {
+      log_event(ups, LOG_WARNING, _("execute: cannot spawn(). ERR=%s"),
+         strerror(errno));
+      return FAILURE;
+   }
+#else
    /* fork() and exec() */
    switch (cmd.pid = fork()) {
    case -1:     /* error */
@@ -219,6 +233,7 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
 
       break;
    }
+#endif /* HAVE_QNX_OS */
 
    return SUCCESS;
 }

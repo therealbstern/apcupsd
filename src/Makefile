@@ -24,7 +24,7 @@ powerflute_obj  := $(call SRC2OBJ,$(powerflute_srcs))
 SRCS = $(common_srcs) $(apcupsd_srcs) $(apcaccess_srcs) \
        $(apctest_srcs) $(smtp_srcs) $(powerflute_srcs)
 
-all-targets: apcupsd apcaccess smtp $(POWERFLUTE) #apctest
+all-targets: apcupsd apcaccess apctest smtp $(POWERFLUTE)
 
 apcupsd: $(common_obj) $(apcupsd_obj) $(APCDRVLIBS) $(APCLIBS)
 	$(LINK) $(DRVLIBS)
@@ -64,4 +64,4 @@ uninstall-powerflute:
 	$(call UNINST,$(sbindir)/powerflute)
 
 # Include dependencies
--include $(DEPS)
+-include $(SRCS:%.c=$(DEPDIR)/%.P)
