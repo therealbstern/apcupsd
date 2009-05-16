@@ -1,0 +1,145 @@
+
+#include "template.inc" name=Apcupsd
+
+<H1 >Apcupsd a daemon for controlling APC UPSes</H1>
+<P><B>Apcupsd </B>can be used for power mangement and controlling most
+of APC's UPS models on Unix and Windows machines.  Apcupsd works with
+most of APC's Smart-UPS models as well as most simple signalling models
+such a Back-UPS, and BackUPS-Office.  During a power failure,
+<B>apcupsd</B> will inform the users about the power failure and that a
+shutdown may occur.  If power is not restored, a system shutdown will
+follow when the battery is exhausted, a timeout (seconds) expires, or
+runtime expires based on internal APC calculations determined by power
+consumption rates. Apcupsd is licensed under the GPL version 2.
+<p>
+
+<h2>Recent Apcupsd Releases</h2>
+<h3><i><u>Stable:</u></i>&nbsp;3.14.5 (11 January 2009) [
+<a href="http://sourceforge.net/project/showfiles.php?group_id=54413">Download</a>
+]</h3>
+3.14.5 fixes several bugs since 3.14.4, the most important of which
+solves an issue with 'make install' on RedHat- and SuSE-based systems. 
+No new features were added in this release. Please see the 
+<a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=653092">
+ReleaseNotes</a> for details.
+<p>
+Apcupsd 3.14.4 is the latest stable release, containing many bug fixes and
+new features over the previous 3.12.x stable series. Users of all previous
+versions are encouraged to upgrade.
+<p>
+<i>If you use the old style master/slave networking mode, be sure to read the
+<a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=653092">
+release notes</a>.</i>
+<p>
+<b><u>New Features in the 3.14.x series:</u></b>
+<ul>
+<li>USB support for new platforms: Windows, Mac OS X, Solaris 10
+<li>Native Windows port
+<li>Improved tray icon support on Win32 (monitor multiple remote instances)
+<li>PowerChute Network Shutdown driver
+<li>GAPCMON GUI monitoring tool
+<li>Unreliable MASTER/SLAVE networking mode is removed
+<li>New configuration directives to set paths at runtime
+<li>New configuration directive to set UPS polling interval (POLLTIME)
+<li>New Makefiles supporting dependencies and parallel build
+</ul>
+<h3><i><u>Previous Stable:</u></i>&nbsp;3.12.4 (19 August 2006) [
+<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=49059&release_id=440657">Source</a>
+&nbsp;/&nbsp;
+<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=73150&release_id=440720">RPMs</a>
+&nbsp;/&nbsp;
+<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=73153&release_id=440658">Win32</a>
+]</h3>
+This is a bug fix release which includes fixes for SNMP crash in the
+face of network errors. Also status and data logging interval was often
+off by one period. NIS port now properly defaults to 3551 or value 
+provided by configure, not hard-coded 7000. RPM specs updated for 
+Fedora Core builds (need latex2html).
+<p>
+Highlights of the 3.12.x release series include a GUI installer for 
+Win32 systems, battery disconnect/reconnect detection for smart serial
+and USB connections, SNMP trap catching for quicker SNMP event 
+responses, and numerous bug fixes. Please be sure to read the
+<a href="http://sourceforge.net/project/shownotes.php?release_id=440658&group_id=54413">ReleaseNotes</a> 
+to learn about the new features and for important information about
+upcoming releases.
+
+<h2><a href="manual/index.html" target="_top">Online
+Manual</a> or a
+<a href="manual/apcupsd.pdf" target="_top">PDF Version of
+the Manual</a> </h2> If you want to learn a bit more about
+<b>apcupsd</b>, you can browse the
+<a href="manual/index.html" target="_top">manual online</a>. 
+If you have any corrections/comments to the manual, please send them to me at:
+kern (at) sibbald (dot) com. For bug reports and
+developer contact, please see below.
+If you want a pdf copy of the manual, you can find it
+<a href="manual/apcupsd.pdf" target="_top">here</a>,
+and finally, if you want one big manual in a single html file,
+it can be found 
+<a href="manual/manual.html" target="_top">here</a>.
+
+<h2>Bugs and Email Support</h2>
+Please don't email me directly, it is much better to address bug reports
+and questions to the 
+<a href="http://lists.sourceforge.net/lists/subscribe/apcupsd-users">
+user's mailing list</a>, to which you must 
+be subscribed, otherwise your email regrettably goes down
+the bit bucket -- you can blame the spammers for that. See the
+<a href="lists.html">Email Lists page</a> for links and how to subscribe.
+
+<h2>Release Notification and User's Email List</h2>
+<p>If you want to be notified by email when new releases are available, please
+sign up for the apcupsd-announce mailing list. This is easily accomplished by
+following the instructions at: 
+<a href="http://lists.sourceforge.net/lists/subscribe/apcupsd-announce">
+http://lists.sourceforge.net/lists/subscribe/apcupsd-announce</a>.
+<p>If you would like to receive the user's email, please visit the
+following site and follow the instructions:
+<a href="http://lists.sourceforge.net/lists/subscribe/apcupsd-users">
+http://lists.sourceforge.net/lists/subscribe/apcupsd-users</a>.
+
+<h2><a href="http://matou.sibbald.com/cgi-bin/multimon.cgi" target="_top">Apcupsd Network Information</a></h2>
+To see my Linux/Windows APC UPSes running with
+<b>apcupsd</b> in real-time, just 
+<a href="http://matou.sibbald.com/cgi-bin/multimon.cgi" target="_top">click here</a>.
+
+<h2>Other Software for Apcupsd</h2>
+David Ranch has developed some very interesting graphing support for APC
+UPSes, which works with <b>apcupsd</b>.  Using <b>apcupsd's</b> logging
+capabilities, David provides setup instructions and scripts to produce
+high quality, daily PDF graphs of all the important UPS power conditions. 
+To learn more about this, please visit <a
+target="_top"
+href="http://www.ecst.csuchico.edu/~dranch/LINUX/TrinityOS/cHTML/TrinityOS-c-36.html">
+his site</a>.
+
+<h2>APC</h2>
+If you want to know more about APC products for protecting your computer,
+you can find it at the <a href="http://www.apc.com">APC Home Site</a>.
+
+<h2><a href="http://sourceforge.net/projects/apcupsd">
+Apcupsd Hosted on Source Forge</a></h2>
+We have moved the release of source and binaries (downloads) to Source
+Forge for several reasons: 1.  Lack of manpower to maintain several
+sites, 2.  The excellent Open Software Development services offered by
+Source Forge.  In addition to hosting all our new releases, the Source
+Forge site has a <a href="http://sourceforge.net/cvs/?group_id=54413">
+CVS repository</a> where you can find the very latest development
+software.  Please visit it and become familiar with how it works.
+<p>
+If you wish to get a copy of the latest CVS code, you can do so
+by doing:
+<p>
+<pre>  cvs -d:pserver:anonymous@apcupsd.cvs.sourceforge.net:/cvsroot/apcupsd login</pre>
+(Press ENTER when prompted for a password)
+<pre>  cvs -z3 -d:pserver:anonymous@apcupsd.cvs.sourceforge.net:/cvsroot/apcupsd co apcupsd</pre>
+<p>
+The above will put a copy of the current CVS into the directory named apcupsd 
+(better make sure it does not exist before issuing the command).
+<p>
+Thereafter to get the latest code, simply:
+<pre>
+  cd apcupsd
+  cvs -z3 update -Pd
+</pre>

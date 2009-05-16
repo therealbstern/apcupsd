@@ -1,0 +1,46 @@
+#! /bin/sh
+#
+# apcupsd      This shell script takes care of starting and stopping
+#              the apcupsd UPS monitoring daemon for Windows systems.
+#
+#
+
+APCPID=@PIDDIR@/apcupsd.pid
+
+return="  Done."
+
+
+case "$1" in
+    start)
+        rm -f /etc/apcupsd/powerfail
+        rm -f /etc/apcupsd/nologin
+        rm -f /etc/apcupsd/LCK*.com*
+        rm -f /etc/nologin
+        echo -n "Starting apcupsd power management"
+        /bin/apcupsd -t& || return="  Failed."
+        echo -e "$return"
+    ;;
+    stop)
+        echo -n "Stopping apcupsd power management"
+        if [ -f ${APCPID} ]; then
+                THEPID=`cat ${APCPID}`
+                /bin/kill -TERM ${THEPID} || return=" Failed."
+                rm -f ${APCPID}
+        else
+                return=" Failed."
+        fi
+        echo -e "$return"
+    ;;
+    restart)
+       $0 stop
+       $0 start
+    ;;
+    status)
+       /bin/apcaccess status
+    ;;
+    *)
+    echo "Usage: $0 {start|stop|restart|status}"
+    exit 1
+esac
+
+exit 0
