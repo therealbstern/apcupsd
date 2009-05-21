@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
    }
    strcpy(hostname, msg);
 
-   if (getupsvar(host, port, "release", msg, sizeof(msg)) <= 0) {
+   if (getupsvar(host, port, "version", msg, sizeof(msg)) <= 0) {
        printf("Error getting variable\n");
        exit(1);
    }
