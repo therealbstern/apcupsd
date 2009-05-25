@@ -1,4 +1,4 @@
-/* gapcmon.c               serial-0085-0 *****************************************
+/* gapcmon.c               serial-0088-0 *****************************************
 
   GKT+ GUI with Notification Area (System Tray) support.  Program  for 
   monitoring the apcupsd.sourceforge.net package.
@@ -74,6 +74,7 @@
 #include <unistd.h>             /* close() */
 #include <sys/types.h>          /* socket() */
 #include <sys/socket.h>         /* socket() */
+#include <netinet/in.h>         /* sockaddr_in */
 #include <arpa/inet.h>          /* ntohs() */
 #include <netinet/in.h>         /* sockaddr_in */
 #include <netdb.h>              /* gethostbyname() */
@@ -2483,7 +2484,7 @@ static GIOChannel *sknet_net_open (PSKCOMM psk)
    * Allocate a new address struct if it does not exist 
   */
   if (psk->gip == NULL) {
-      psk->b_network_control=TRUE;
+      psk->b_network_control=TRUE;      
       psk->gip = g_new0( struct sockaddr_in , 1);
       g_return_val_if_fail (psk->gip != NULL, NULL);
       tcp_serv_addr = (struct sockaddr_in *)psk->gip;
@@ -2543,6 +2544,21 @@ static GIOChannel *sknet_net_open (PSKCOMM psk)
     return NULL;
   }
 
+  {
+  struct timeval tv;
+  int rcx = 0;
+  tv.tv_sec = 0;
+  tv.tv_usec = 200000;
+  
+  rcx = setsockopt(sockfd, SOL_SOCKET, SO_RCVTIMEO | SO_SNDTIMEO, 
+                   &tv, (socklen_t) sizeof(struct timeval));
+   if (rcx == -1) {
+       sknet_util_log_msg ("sknet_net_open", "setsockopt(200ms) failed!",
+                       (gchar *) g_strerror (errno));
+   }
+  
+  }
+  
   /* connect to server */
   if ((connect (sockfd, (struct sockaddr *) tcp_serv_addr, sizeof (struct sockaddr_in))) == -1)
   {
@@ -3266,7 +3282,7 @@ static gboolean cb_panel_systray_icon_handle_clicked(GtkWidget * widget,
       switch (event->button) {
       case 1:
          if (b_visible) {
-            gtk_window_iconify(GTK_WINDOW(window));
+            gtk_widget_hide(GTK_WIDGET(window));
          } else {
             gtk_window_present(GTK_WINDOW(window));
          }
@@ -4196,7 +4212,7 @@ static void cb_panel_monitor_list_activated(GtkTreeView * treeview,
 
       if ((pm != NULL) && (pm->window != NULL)) {
          if (pm->b_visible) {
-            gtk_window_iconify(GTK_WINDOW(pm->window));
+            gtk_widget_hide(GTK_WIDGET(pm->window));
          } else {
             gtk_window_present(GTK_WINDOW(pm->window));
          }
@@ -4506,12 +4522,14 @@ static gboolean cb_monitor_interface_delete_event(GtkWidget * widget,
 /*
  * Handle the close button action from the information window
 */
+/*
 static void cb_monitor_interface_button_close(GtkWidget * button, PGAPC_MONITOR pm)
 {
    g_return_if_fail(pm != NULL);
-   gtk_window_iconify(GTK_WINDOW(pm->window));
+   gtk_widget_hide(GTK_WIDGET(pm->window));
    return;
 }
+*/
 
 /*
  * Handle the refresh button action from the information window
@@ -4552,11 +4570,10 @@ static gboolean cb_util_manage_iconify_event(GtkWidget *widget, GdkEventWindowSt
    g_return_val_if_fail(gp != NULL, FALSE);
    
    /* iconified */
-   if ( (event->type == GDK_WINDOW_STATE) && 
-        (event->changed_mask & GDK_WINDOW_STATE_ICONIFIED) &&
-        (event->new_window_state & GDK_WINDOW_STATE_ICONIFIED) ) {
-
-
+   if ((event->type == GDK_WINDOW_STATE) && (
+      ((event->changed_mask & GDK_WINDOW_STATE_ICONIFIED) && (event->new_window_state & GDK_WINDOW_STATE_ICONIFIED)) ||
+      ((event->changed_mask & GDK_WINDOW_STATE_WITHDRAWN) && (event->new_window_state & GDK_WINDOW_STATE_WITHDRAWN)) 
+                                           )){
         if ( ((PGAPC_MONITOR)gp)->cb_id == CB_MONITOR_ID) {
               if ( event->window == GTK_WIDGET(((PGAPC_MONITOR)gp)->window)->window ) {   
                    ((PGAPC_MONITOR)gp)->b_visible = FALSE;
@@ -4571,11 +4588,10 @@ static gboolean cb_util_manage_iconify_event(GtkWidget *widget, GdkEventWindowSt
    }
 
    /* un - iconified */
-   if ( (event->type == GDK_WINDOW_STATE) && 
-        (event->changed_mask & GDK_WINDOW_STATE_ICONIFIED) &&
-        !(event->new_window_state & GDK_WINDOW_STATE_ICONIFIED) ) {
-
-
+   if ((event->type == GDK_WINDOW_STATE) &&   ( 
+      ((event->changed_mask & GDK_WINDOW_STATE_ICONIFIED) && !(event->new_window_state & GDK_WINDOW_STATE_ICONIFIED)) || 
+      ((event->changed_mask & GDK_WINDOW_STATE_WITHDRAWN) && !(event->new_window_state & GDK_WINDOW_STATE_WITHDRAWN)))
+                                              ) {
         if ( ((PGAPC_MONITOR)gp)->cb_id == CB_MONITOR_ID) {
               if ( event->window == GTK_WIDGET(((PGAPC_MONITOR)gp)->window)->window ) {   
                    ((PGAPC_MONITOR)gp)->b_visible = TRUE;
@@ -4588,7 +4604,6 @@ static gboolean cb_util_manage_iconify_event(GtkWidget *widget, GdkEventWindowSt
 
     return TRUE;
    }
-
 
    return FALSE;
 }
@@ -5412,14 +5427,15 @@ static GtkWidget *gapc_main_interface_create(PGAPC_CONFIG pcfg)
    gtk_widget_show(label);
 
    /* quit Control button */
+/*   
    button = gtk_button_new_from_stock(GTK_STOCK_CLOSE);
-   g_signal_connect_swapped(button, "clicked", G_CALLBACK(gtk_window_iconify), window);  
+   g_signal_connect_swapped(button, "clicked", G_CALLBACK(gtk_widget_hide), GTK_WIDGET(window));  
    gtk_box_pack_end(GTK_BOX(box), button, TRUE, TRUE, 0);
    gtk_widget_show(button);
 
    GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
    gtk_widget_grab_default(button);
-
+*/
 
    button = gtk_button_new_from_stock(GTK_STOCK_QUIT);
    g_signal_connect(button, "clicked", G_CALLBACK(cb_main_interface_button_quit),
@@ -6271,21 +6287,22 @@ static GtkWidget *gapc_monitor_interface_create(PGAPC_CONFIG pcfg, gint i_monito
    gtk_widget_show(label);
    g_hash_table_insert(pm->pht_Widgets, g_strdup("TitleStatus"), label);
 
-   /* quit Control button */
+   /* refresh Control button */
    button = gtk_button_new_from_stock(GTK_STOCK_REFRESH);
    GTK_WIDGET_SET_FLAGS(button, GTK_CAN_DEFAULT);
    g_signal_connect(button, "clicked",
       G_CALLBACK(cb_monitor_interface_button_refresh), pm);
-   gtk_box_pack_start(GTK_BOX(box), button, TRUE, TRUE, 0);
+   gtk_box_pack_end(GTK_BOX(box), button, TRUE, TRUE, 0);
    gtk_widget_show(button);
    gtk_widget_grab_default(button);
 
+/*
    button = gtk_button_new_from_stock(GTK_STOCK_CLOSE);
    g_signal_connect(button, "clicked",
       G_CALLBACK(cb_monitor_interface_button_close), pm);
    gtk_box_pack_end(GTK_BOX(box), button, TRUE, TRUE, 0);
    gtk_widget_show(button);
-
+*/
    gtk_notebook_set_current_page(GTK_NOTEBOOK(notebook), 0);
 
    gapc_panel_monitor_model_rec_add(pcfg, pm);

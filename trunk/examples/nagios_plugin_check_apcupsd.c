@@ -73,7 +73,7 @@ static struct {
    {"lastxfer",   "LASTXFER", 0},          /* reason for last xfer to batteries */
    {"selftest",   "SELFTEST", 1},          /* results of last self test */
    {"laststest",  "LASTSTEST", 0},
-   {"release",    "RELEASE",  1},
+   {"version",    "VERSION",  1},
    {"upsname",    "UPSNAME",  1},
    {"lowbatt",    "DLOWBATT", 1},          /* low battery power off delay */
    {"battpct",    "BCHARGE",  1},
@@ -143,6 +143,7 @@ int main(int argc, char *argv[])
    if (getupsvar(host, port, "upsname", msg, sizeof(msg)) <= 0) {
        printf("%scannot get upsname from UPS-Server\n", S_NAGIOS_CRITICAL);
        exit(NAGIOS_CRITICAL);
+   }
    strcpy(upsname, msg);
 
    if (getupsvar(host, port, "status", msg, sizeof(msg)) <= 0) {
@@ -151,57 +152,57 @@ int main(int argc, char *argv[])
    }
    iStatus = strtol(msg, 0, 16);
    status[0] = '\0';
-   if (iStatus & UPS_CALIBRATION) {
+   if (iStatus & UPS_calibration) {
       strcat(status, "CALIBRATION ");
       retVal = NAGIOS_OK;
       strcpy(sStatus, S_NAGIOS_OK);
    }
-   if (iStatus & UPS_SMARTTRIM) {
+   if (iStatus & UPS_trim) {
       strcat(status, "SMART TRIM ");
       retVal = NAGIOS_OK;
       strcpy(sStatus, S_NAGIOS_OK);
    }
-   if (iStatus & UPS_SMARTBOOST) {
+   if (iStatus & UPS_boost) {
       strcat(status, "SMART BOOST ");
       retVal = NAGIOS_OK;
       strcpy(sStatus, S_NAGIOS_OK);
    }
-   if (iStatus & UPS_ONLINE) {
+   if (iStatus & UPS_online) {
       strcat(status, "ONLINE ");
       retVal = NAGIOS_OK;
       strcpy(sStatus, S_NAGIOS_OK);
    }
-   if (iStatus & UPS_ONBATT) {
+   if (iStatus & UPS_onbatt) {
       strcat(status, "ON BATTERY ");
       retVal = NAGIOS_WARNING;
       strcpy(sStatus, S_NAGIOS_WARNING);
    }
-   if (iStatus & UPS_OVERLOAD) {
+   if (iStatus & UPS_overload) {
       strcat(status, "OVERLOADED ");
       retVal = NAGIOS_CRITICAL;
       strcpy(sStatus, S_NAGIOS_CRITICAL);
    }
-   if (iStatus & UPS_BATTLOW) {
+   if (iStatus & UPS_battlow) {
       strcat(status, "BATTERY LOW ");
       retVal = NAGIOS_CRITICAL;
       strcpy(sStatus, S_NAGIOS_CRITICAL);
    }
-   if (iStatus & UPS_REPLACEBATT) {
+   if (iStatus & UPS_replacebatt) {
       strcat(status, "REPLACE BATTERY ");
       retVal = NAGIOS_WARNING;
       strcpy(sStatus, S_NAGIOS_WARNING);
    }
-   if (iStatus & UPS_COMMLOST) {
+   if (iStatus & UPS_commlost) {
       strcat(status, "COMMUNICATION LOST ");
       retVal = NAGIOS_CRITICAL;
       strcpy(sStatus, S_NAGIOS_CRITICAL);
    }
-   if (iStatus & UPS_SHUTDOWN) {
+   if (iStatus & UPS_shutdown) {
       strcat(status, "SHUTDOWN ");
       retVal = NAGIOS_OK;
       strcpy(sStatus, S_NAGIOS_OK);
    }
-   if (iStatus & UPS_SLAVE) {
+   if (iStatus & UPS_slave) {
       strcat(status, "SLAVE ");
       retVal = NAGIOS_OK;
       strcpy(sStatus, S_NAGIOS_OK);

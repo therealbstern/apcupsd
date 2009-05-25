@@ -267,7 +267,7 @@ int main(int argc, char **argv)
      html_puts (answer);
      fputs ("\n", stdout);
 
-     getupsvar (monhost, "release", answer, sizeof(answer));
+     getupsvar (monhost, "version", answer, sizeof(answer));
      fputs ("   APCUPSD: Version ", stdout);
      html_puts (answer);
      fputs ("\n", stdout);

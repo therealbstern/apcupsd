@@ -152,6 +152,8 @@ char *ApcSmartDriver::smart_poll(char cmd)
    int stat, retry;
 
    *answer = 0;
+   if (_ups->fd == -1)
+      return answer;
    if (_ups->mode.type <= SHAREBASIC)
       return answer;
 
@@ -170,6 +172,11 @@ char *ApcSmartDriver::smart_poll(char cmd)
    } while (*answer == 0 && stat == FAILURE && retry--);
 
    return answer;
+}
+
+int writechar(char a, UPSINFO *ups)
+{
+  return write(ups->fd, &a, 1);
 }
 
 /*
@@ -224,6 +231,8 @@ int ApcSmartDriver::getline(char *s, int len)
       case -1:
          if (errno == EINTR || errno == EAGAIN) {       /* assume SIGCHLD */
             continue;
+         } else if (errno == EBADF) {
+            return FAILURE;               /* We're probably shutting down */
          }
          Error_abort1("Select error on UPS FD. %s\n", strerror(errno));
          break;
@@ -606,9 +615,9 @@ bool ApcSmartDriver::ReadVolatileData()
       _ups->info.update(CI_ST_TIME, (long)(atof(answer) * 60.0));
    }
 
-   write_unlock(_ups);
-
    apc_enable();                /* reenable APC serial UPS */
+
+   write_unlock(_ups);
 
    return SUCCESS;
 }

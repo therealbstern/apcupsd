@@ -291,18 +291,6 @@ bool UsbDriver::GetCapabilities()
       _callbacks[CI_NOMPOWER] = NULL;
    }
 
-   /*
-    * Disable CI_NOMPOWER if UPS does not report it accurately.
-    * Several models appear to always return 0 for this value.
-    */
-   USB_VALUE uval;
-   if (ups->UPS_Cap[CI_NOMPOWER] &&
-       (!usb_get_value(ups, CI_NOMPOWER, &uval) ||
-        ((int)uval.dValue == 0))) {
-      Dmsg0(100, "NOMPOWER disabled due to invalid reading from UPS\n");
-      ups->UPS_Cap[CI_NOMPOWER] = false;
-   }
-
    /* Detect broken BackUPS Pro model */
    if (_ups->UPS_Cap[CI_UPSMODEL] && get_value(CI_UPSMODEL, &uval)) {
       Dmsg1(250, "Checking for BackUPS Pro quirk \"%s\"\n", uval.sValue);

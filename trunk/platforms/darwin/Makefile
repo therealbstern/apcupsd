@@ -71,6 +71,9 @@ uninstall-darwin:
 	@echo " "
 	@echo "================================================="
 
+# NOTE: The seeminly-pointless "PWD=`pwd`" stuff below is to work around
+# a packagemaker bug in XCode-2.5.
+# <http://lists.apple.com/archives/Installer-dev/2007/Jun/msg00061.html>
 apcupsd.pkg:
 	rm -rf $(PKGROOT)
 	mkdir $(PKGROOT)
@@ -89,8 +92,8 @@ apcupsd.pkg:
 	cp ApcupsdDaemon.preflight $(PKGROOT)/ApcupsdDaemon.Resources/preflight
 	cp ApcupsdDaemon.postflight $(PKGROOT)/ApcupsdDaemon.Resources/postflight
 	cp ApcupsdUsbShim.postflight $(PKGROOT)/ApcupsdUsbShim.Resources/postflight
-	$(PACKAGEMAKER) -build -v -p $(PKGROOT)/Packages/ApcupsdDaemon.pkg -f $(PKGROOT)/ApcupsdDaemon.Root -r $(PKGROOT)/ApcupsdDaemon.Resources -i ApcupsdDaemon.Info.plist -d ApcupsdDaemon.Description.plist
-	$(PACKAGEMAKER) -build -v -p $(PKGROOT)/Packages/ApcupsdUsbShim.pkg -f $(PKGROOT)/ApcupsdUsbShim.Root -r $(PKGROOT)/ApcupsdUsbShim.Resources -i ApcupsdUsbShim.Info.plist -d ApcupsdUsbShim.Description.plist
-	$(PACKAGEMAKER) -build -v -p $(PKGROOT)/Apcupsd/Apcupsd-$(VERSION).pkg -mi $(PKGROOT)/Packages -r $(PKGROOT)/ApcupsdPkg.Resources -i ApcupsdPkg.Info.plist -d ApcupsdPkg.Description.plist
+	PWD=`pwd` $(PACKAGEMAKER) -build -v -p $(PKGROOT)/Packages/ApcupsdDaemon.pkg -f $(PKGROOT)/ApcupsdDaemon.Root -r $(PKGROOT)/ApcupsdDaemon.Resources -i ApcupsdDaemon.Info.plist -d ApcupsdDaemon.Description.plist
+	PWD=`pwd` $(PACKAGEMAKER) -build -v -p $(PKGROOT)/Packages/ApcupsdUsbShim.pkg -f $(PKGROOT)/ApcupsdUsbShim.Root -r $(PKGROOT)/ApcupsdUsbShim.Resources -i ApcupsdUsbShim.Info.plist -d ApcupsdUsbShim.Description.plist
+	PWD=`pwd` $(PACKAGEMAKER) -build -v -p $(PKGROOT)/Apcupsd/Apcupsd-$(VERSION).pkg -mi $(PKGROOT)/Packages -r $(PKGROOT)/ApcupsdPkg.Resources -i ApcupsdPkg.Info.plist -d ApcupsdPkg.Description.plist
 	hdiutil create -ov -srcfolder $(PKGROOT)/Apcupsd -volname Apcupsd-$(VERSION) Apcupsd-$(VERSION).dmg
 

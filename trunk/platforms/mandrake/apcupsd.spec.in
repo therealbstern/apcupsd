@@ -120,28 +120,6 @@ BuildRequires: glibc-devel >= 2.2, libjpeg-devel, libpng-devel, zlib-devel, free
 %else
 BuildRequires: glibc-devel >= 2.3
 %endif
-%if ! %{suse} && ! %{mdk}
-BuildRequires: tetex
-BuildRequires: tetex-latex
-%endif
-%if %{suse_version} == 900 || %{suse_version} == 910 || %{suse_version} == 920 || %{suse_version} == 930 || %{suse_version} == 1000 || %{suse_version} == 1010 || %{suse_version} == 1020 
-BuildRequires: tetex
-BuildRequires: latex2html
-%endif
-%if %{suse_version} == 1030
-BuildRequires: texlive-latex
-BuildRequires: texlive-bin-latex
-BuildRequires: latex2html
-%endif
-%if %{mdk}
-BuildRequires: tetex
-BuildRequires: latex2html
-BuildRequires: tetex-dvips
-BuildRequires: ghostscript-dvipdf
-%endif
-%if %{fedora_core} || %{rhel5}
-BuildRequires: latex2html
-%endif
 %if %{gapcmon}
 BuildRequires: glibc-devel, gtk2-devel >= 2.4, glib2-devel, atk-devel
 BuildRequires: ORBit2, pango-devel, pkgconfig
@@ -284,9 +262,9 @@ make hid-ups
 cd ../
 
 # build pdf manual
-cd doc/latex
-make
-cd ../../
+#cd doc/latex
+#make
+#cd ../../
 
 %install
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
@@ -335,7 +313,7 @@ rm -f $RPM_BUILD_DIR/Release_Notes-%{version}-%{release}.txt
 %{_sysconfdir}/apcupsd/make-hiddev
 %{_sysconfdir}/apcupsd/hid-ups
 %{halpolicydir}/80-apcupsd-ups-policy.fdi
-%doc COPYING DISCLAIMER ReleaseNotes ChangeLog ../Release_Notes-%{version}-%{release}.txt doc/latex/apcupsd.pdf
+%doc COPYING DISCLAIMER ReleaseNotes ChangeLog ../Release_Notes-%{version}-%{release}.txt doc/manual/manual.html doc/manual/*.png
 %dir %{_sysconfdir}/apcupsd
 %{initdir}/apcupsd
 %config(noreplace) %{_sysconfdir}/apcupsd/apccontrol
@@ -371,6 +349,11 @@ rm -f $RPM_BUILD_DIR/Release_Notes-%{version}-%{release}.txt
 %endif
 
 %pre
+
+# are we upgrading?
+if [ -s %{_sysconfdir}/apcupsd/apcupsd.conf ];then
+	UPGRADE=Y
+fi
 
 %post
 
@@ -415,6 +398,11 @@ awk '# Stuff left over from a previous apcupsd, remove it
 chmod 744 %{initdir}/halt
 fi
 
+# restart the daemon if we are upgrading
+if [ "$UPGRADE" = "Y" ];then
+	%{initdir}/apcupsd restart
+fi
+
 # Undo things a bit
 
 %preun
@@ -444,6 +432,12 @@ if [ $1 = 0 ] ; then
 fi
 
 %changelog
+* Sat May 16 2009 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- comment out latex build
+* Fri May 15 2009 Adam Kropelin <akropel1 at rochester.rr.com>
+- changes for new user manual location and format
+* Sat May 31 2008 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- add check for upgrade and restart daemon
 * Sun May 11 2008 Adam Kropelin <akropel1 at rochester.rr.com>
 - remove powerflute
 * Sun Feb 03 2008 D. Scott Barninger <barninger at fairfieldcomputers.com>

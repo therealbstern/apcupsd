@@ -8,8 +8,8 @@ SRCS = $(wildcard *.c)
 # files are built with a C++ compiler. At some point we'll rename all *.c
 # files in the rest of the tree to *.cpp and some of this can then go away.
 CXX = $(CC)
-CFLAGS += $(GAPCMON_CFLAGS) -DICON_DIR=\"$(datadir)\"
-CPPFLAGS = $(CFLAGS)
+CPPFLAGS += $(GAPCMON_CFLAGS) -DICON_DIR=\"$(datadir)\"
+CXXFLAGS = $(CFLAGS)
 LIBS := $(GAPCMON_LIBS) $(X_LIBS) -lX11 -lXext $(LIBS)
 
 all-targets: gapcmon

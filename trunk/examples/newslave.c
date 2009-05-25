@@ -64,7 +64,7 @@ static struct {
    {"lastxfer",   "LASTXFER", 0},          /* reason for last xfer to batteries */
    {"selftest",   "SELFTEST", 1},          /* results of last self test */
    {"laststest",  "LASTSTEST", 0},
-   {"release",    "RELEASE",  1},
+   {"version",    "VERSION",  1},
    {"upsname",    "UPSNAME",  1},
    {"lowbatt",    "DLOWBATT", 1},          /* low battery power off delay */
    {"battpct",    "BCHARGE",  1},
@@ -115,7 +115,7 @@ int main(int argc, char *argv[])
    }
    strcpy(hostname, msg);
 
-   if (getupsvar(host, port, "release", msg, sizeof(msg)) <= 0) {
+   if (getupsvar(host, port, "version", msg, sizeof(msg)) <= 0) {
        printf("Error getting variable\n");
        exit(1);
    }

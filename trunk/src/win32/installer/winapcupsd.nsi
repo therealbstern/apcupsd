@@ -240,11 +240,15 @@ FunctionEnd
 
 Section "-Startup"
   ; Check for existing installation
+  ; In the future we should check for existing HKLM\Software\Apcupsd\InstDir
   ${If} ${FileExists} "$INSTDIR\etc\apcupsd\apcupsd.conf"
     StrCpy $ExistingConfig 1
   ${Else}
     StrCpy $ExistingConfig 0
   ${EndIf}
+
+  ; Save the new install path in the registry
+  WriteRegStr HKLM "Software\Apcupsd\" "InstDir" "$INSTDIR"
 
   ; Create base installation directory
   CreateDirectory "$INSTDIR"
@@ -300,9 +304,6 @@ Section "Apcupsd Service" SecService
   File ${DEPKGS}\libusb-win32\libusb0_x64.dll
   File ${TOPDIR}\platforms\mingw\install.txt
 
-  SetOutPath "$INSTDIR\examples"
-  File ${TOPDIR}\examples\*
-
   SetOutPath "$INSTDIR\etc\apcupsd"
   File ${TOPDIR}\platforms\mingw\apccontrol.bat
   File ${TOPDIR}\platforms\mingw\apcupsd.conf.in
@@ -352,8 +353,8 @@ SectionEnd
 Section "Documentation" SecDoc
   SetOutPath "$INSTDIR\doc"
   CreateDirectory "$INSTDIR\doc"
-  File ${TOPDIR}\doc\latex\manual.html
-  File ${TOPDIR}\doc\latex\*.png
+  File ${TOPDIR}\doc\manual\manual.html
+  File ${TOPDIR}\doc\manual\*.png
   ; Create Start Menu entry
   SetShellVarContext all
   CreateShortCut "$SMPROGRAMS\Apcupsd\Manual.lnk" "$INSTDIR\doc\manual.html"
