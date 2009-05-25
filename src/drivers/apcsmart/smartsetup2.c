@@ -137,7 +137,9 @@ void ApcSmartDriver::get_apc_model()
    }
 
    response[0] = '\0';
+   write_lock(_ups);
    astrncpy(response, smart_poll(_cmdmap[CI_UPSMODEL]), sizeof(response));
+   write_unlock(_ups);
 
    if (strlen(response)) {
       cp = get_apc_model_V_codes(response);
@@ -147,7 +149,9 @@ void ApcSmartDriver::get_apc_model()
    }
 
    response[0] = '\0';
+   write_lock(_ups);
    astrncpy(response, smart_poll(_cmdmap[CI_REVNO]), sizeof(response));
+   write_unlock(_ups);
 
    if (strlen(response)) {
       fprintf(stderr, "\n%s: 'b' %s", argvalue,
@@ -165,6 +169,8 @@ bool ApcSmartDriver::GetCapabilities()
    char answer[1000];              /* keep this big to handle big string */
    char caps[1000], *cmds, *p;
    int i;
+
+   write_lock(_ups);
 
    /* Get UPS capabilities string */
    astrncpy(caps, smart_poll(_cmdmap[CI_UPS_CAPS]), sizeof(caps));
@@ -204,6 +210,8 @@ bool ApcSmartDriver::GetCapabilities()
          }
       }
    }
+
+   write_unlock(_ups);
 
    return true;
 }

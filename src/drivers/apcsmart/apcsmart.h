@@ -72,6 +72,10 @@ private:
    char *get_apc_model_b_codes(const char *s);   
    void get_apc_model();
 
+   bool ups_shutdown_with_delay(UPSINFO *ups, int shutdown_delay);
+   bool ups_get_shutdown_delay(UPSINFO *ups);
+   void ups_warn_shutdown(UPSINFO *ups, int shutdown_delay);
+
    // Implementation of thread body
    virtual void body();
 

@@ -237,8 +237,6 @@ class UPSINFO {
 
 
    /* DATA */
-   char release[20];
-
    int fd;                         /* UPS device node file descriptor */
 
    /* UPS capability array and codes */

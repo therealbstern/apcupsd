@@ -77,8 +77,8 @@ UPSCMDMSG event_msg[] = {
    {LOG_CRIT,    N_("Remote shutdown requested.")},
    {LOG_WARNING, N_("Communications with UPS lost.")},
    {LOG_WARNING, N_("Communications with UPS restored.")},
-   {LOG_ALERT,   N_("UPS Self Test switch to battery.")},
-   {LOG_ALERT,   N_("UPS Self Test completed.")},
+   {LOG_WARNING, N_("UPS Self Test switch to battery.")},
+   {LOG_WARNING, N_("UPS Self Test completed.")},
    {LOG_CRIT,    N_("Mains returned. No longer on UPS batteries.")},
    {LOG_CRIT,    N_("Battery disconnected.")},
    {LOG_CRIT,    N_("Battery reattached.")}
@@ -413,6 +413,22 @@ void do_action(UPSINFO *ups)
          generate_event(ups, CMDBATTDETACH);
    }
 
+   /*
+    * Did BattLow bit go high? If so, start the battlow shutdown
+    * timer. We will only act on this timer if we switch to battery
+    * (or are already on battery). It is possible that this event occurs
+    * at the same time as or even slightly before we switch to battery.
+    * Therefore we must check it every time we get new status.
+    */
+   if (ups->chg_battlow()) {
+      if (ups->is_battlow()) {
+         Dmsg0(100, "BATTLOW asserted\n");
+         ups->start_shut_lbatt = now;
+      } else {
+         Dmsg0(100, "BATTLOW glitch\n");
+      }
+   }
+
    state = get_state(ups, now);
    switch (state) {
    case st_OnMains:
@@ -471,22 +487,11 @@ void do_action(UPSINFO *ups)
       if (ups->is_shutdown()) {
          if (ups->killdelay && now - ups->ShutDown >= ups->killdelay) {
             if (!ups->is_slave())
-               kill_power(ups);
+               initiate_hibernate(ups);
             ups->ShutDown = now;   /* wait a bit before doing again */
             ups->set_shutdown();
          }
       } else {                     /* not shutdown yet */
-         /*
-          * Did BattLow bit go high? Then the battery power is failing.
-          * Normal Power down during Power Failure: Start shutdown timer.
-          */
-         if (ups->chg_battlow() && ups->is_battlow()) {
-            Dmsg0(100, "BATTLOW shutdown\n");
-            ups->start_shut_lbatt = now;
-         }
-         if (ups->chg_battlow() && !ups->is_battlow())
-            Dmsg0(100, "BATTLOW glitch\n");
-
          /*
           * Did MaxTimeOnBattery Expire?  (TIMEOUT in apcupsd.conf)
           * Normal Power down during Power Failure: Shutdown immediately.

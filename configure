@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS ABSSRCDIR topdir TOP_DIR VERSION DATE TRUEPRG FALSEPRG build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP CXX CXXFLAGS ac_ct_CXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA AWK HAVE_GCC_TRUE HAVE_GCC_FALSE DEBUG DLIB DINCLUDE DRVLIBS APCDRVLIBS PTHREAD_CFLAGS PTHREAD_LFLAGS APCACCESS SMTP APCTEST SHUTDOWN APCUPSD_MAIL WALL SCRIPTSHELL RANLIB RM CP ECHO LN SED AR MV X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS HALPOLICYDIR GDHEAD APCSMART_DRIVER DUMB_DRIVER LIBUSBHID LIBUSBHIDINC usbcfg LIBUSBH USB_DRIVER USB_TYPE NET_DRIVER SNMP_DRIVER TEST_DRIVER PCNET_DRIVER NISIP PKG_CONFIG ac_pt_PKG_CONFIG GAPCMON_CFLAGS GAPCMON_LIBS GAPCMON POWERFLUTE POWERLIBS MAKE LD CGI GD_LIBS CGIBIN SYSCONFDIR MKINSTALLDIRS EXTRADEFS LIBEXTRAOBJ EXTRAOBJ DISTDIR DISTNAME DISTVER SERIALDEV PIDDIR LOGDIR nologdir PWRFAILDIR LOCKDIR NISPORT UPSTYPE UPSCABLE HOST LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS ABSSRCDIR topdir TOP_DIR VERSION DATE TRUEPRG FALSEPRG build build_cpu build_vendor build_os host host_cpu host_vendor host_os CC CFLAGS LDFLAGS CPPFLAGS ac_ct_CC EXEEXT OBJEXT CPP CXX CXXFLAGS ac_ct_CXX EGREP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA AWK HAVE_GCC_TRUE HAVE_GCC_FALSE DEBUG DRVLIBS APCDRVLIBS PTHREAD_CFLAGS PTHREAD_LFLAGS APCACCESS SMTP APCTEST SHUTDOWN APCUPSD_MAIL WALL SCRIPTSHELL RANLIB RM CP ECHO LN SED AR MV RST2HTML RST2PDF X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS HALPOLICYDIR GDHEAD APCSMART_DRIVER DUMB_DRIVER LIBUSBHID LIBUSBHIDINC usbcfg LIBUSBH USB_DRIVER USB_TYPE NET_DRIVER SNMP_DRIVER TEST_DRIVER PCNET_DRIVER NISIP PKG_CONFIG ac_pt_PKG_CONFIG GAPCMON_CFLAGS GAPCMON_LIBS GAPCMON POWERFLUTE POWERLIBS MAKE LD CGI GD_LIBS CGIBIN SYSCONFDIR MKINSTALLDIRS EXTRADEFS LIBEXTRAOBJ EXTRAOBJ DISTDIR DISTNAME DISTVER SERIALDEV PIDDIR LOGDIR nologdir PWRFAILDIR LOCKDIR NISPORT UPSTYPE UPSCABLE HOST LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -3541,17 +3541,6 @@ if test x$LD = x ; then
    LD="$CC"
 fi
 
-if test x$GCC = xyes; then
-   CFLAGS=${CFLAGS-"-g -O2"}
-   CFLAGS="${CFLAGS} -Wall"
-   LDFLAGS=${LDFLAGS-"-g -O"}
-else
-   CFLAGS=${CFLAGS--O2}
-   LDFLAGS=${LDFLAGS--O}
-fi
-
-CPPFLAGS="$CPPFLAGS"
-
 
 
 
@@ -4171,6 +4160,85 @@ fi
 echo "$as_me: error: Missing required tool: mv" >&2;}
    { (exit 1); exit 1; }; }
     fi
+
+
+# Extract the first word of "rst2html", so it can be a program name with args.
+set dummy rst2html; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_RST2HTML+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $RST2HTML in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_RST2HTML="$RST2HTML" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_RST2HTML="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  ;;
+esac
+fi
+RST2HTML=$ac_cv_path_RST2HTML
+
+if test -n "$RST2HTML"; then
+  echo "$as_me:$LINENO: result: $RST2HTML" >&5
+echo "${ECHO_T}$RST2HTML" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
+
+# Extract the first word of "rst2pdf", so it can be a program name with args.
+set dummy rst2pdf; ac_word=$2
+echo "$as_me:$LINENO: checking for $ac_word" >&5
+echo $ECHO_N "checking for $ac_word... $ECHO_C" >&6
+if test "${ac_cv_path_RST2PDF+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  case $RST2PDF in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_RST2PDF="$RST2PDF" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if $as_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_RST2PDF="$as_dir/$ac_word$ac_exec_ext"
+    echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+
+  ;;
+esac
+fi
+RST2PDF=$ac_cv_path_RST2PDF
+
+if test -n "$RST2PDF"; then
+  echo "$as_me:$LINENO: result: $RST2PDF" >&5
+echo "${ECHO_T}$RST2PDF" >&6
+else
+  echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+fi
 
 
 # -------------------------------------------------------------------------
@@ -9591,6 +9659,10 @@ _ACEOF
 #define HAVE_DARWIN_OS 1
 _ACEOF
   ;;
+   *-*-nto*)     cat >>confdefs.h <<\_ACEOF
+#define HAVE_QNX_OS 1
+_ACEOF
+     ;;
 esac
 
 
@@ -9786,7 +9858,7 @@ if test "${ac_cv_lib_gd_gdImagePng+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lgd  $LIBS"
+LIBS="-lgd ${X_LIBS} $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -9864,7 +9936,7 @@ if test "${ac_cv_lib_gd_gdImageGif+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lgd  $LIBS"
+LIBS="-lgd ${X_LIBS} $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -9937,8 +10009,6 @@ fi
 
                         if test "${SYS_GD_FOUND}" = "no"
         then
-           _cppflags=${CPPFLAGS}
-           _ldflags=${LDFLAGS}
            CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
            LDFLAGS="${LDFLAGS} -L/usr/local/lib"
 
@@ -9949,7 +10019,7 @@ if test "${ac_cv_lib_gd_gdImagePng+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lgd  $LIBS"
+LIBS="-lgd ${X_LIBS} $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -10029,7 +10099,7 @@ if test "${ac_cv_lib_gd_gdImageGif+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
 else
   ac_check_lib_save_LIBS=$LIBS
-LIBS="-lgd  $LIBS"
+LIBS="-lgd ${X_LIBS} $LIBS"
 cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -11660,8 +11730,8 @@ echo "${ECHO_T}yes" >&6
    # See if GCC supports -fno-exceptions...
    echo "$as_me:$LINENO: checking if GCC supports -fno-exceptions" >&5
 echo $ECHO_N "checking if GCC supports -fno-exceptions... $ECHO_C" >&6
-   OLDCFLAGS="$CFLAGS"
-   CFLAGS="$CFLAGS -fno-exceptions"
+   OLDCXXFLAGS="$CXXFLAGS"
+   CXXFLAGS="$CXXFLAGS -fno-exceptions"
    cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -11699,8 +11769,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  CPPFLAGS="$CPPFLAGS -fno-exceptions"
-      echo "$as_me:$LINENO: result: yes" >&5
+  echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 else
   echo "$as_me: failed program was:" >&5
@@ -11708,15 +11777,15 @@ sed 's/^/| /' conftest.$ac_ext >&5
 
 echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
+      CXXFLAGS="$OLDCXXFLAGS"
 fi
 rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
-   CFLAGS="$OLDCFLAGS"
 
    # See if GCC supports -fno-rtti...
    echo "$as_me:$LINENO: checking if GCC supports -fno-rtti" >&5
 echo $ECHO_N "checking if GCC supports -fno-rtti... $ECHO_C" >&6
-   OLDCFLAGS="$CFLAGS"
-   CFLAGS="$CFLAGS -fno-rtti"
+   OLDCXXFLAGS="$CXXFLAGS"
+   CXXFLAGS="$CXXFLAGS -fno-rtti"
    cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
@@ -11754,8 +11823,7 @@ if { (eval echo "$as_me:$LINENO: \"$ac_compile\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  CPPFLAGS="$CPPFLAGS -fno-rtti"
-      echo "$as_me:$LINENO: result: yes" >&5
+  echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
 else
   echo "$as_me: failed program was:" >&5
@@ -11763,9 +11831,13 @@ sed 's/^/| /' conftest.$ac_ext >&5
 
 echo "$as_me:$LINENO: result: no" >&5
 echo "${ECHO_T}no" >&6
+      CXXFLAGS="$OLDCXXFLAGS"
 fi
 rm -f conftest.err conftest.$ac_objext conftest.$ac_ext
-   CFLAGS="$OLDCFLAGS"
+
+   # Use -Wall on gcc only
+   CFLAGS="$CFLAGS -Wall"
+   CXXFLAGS="$CXXFLAGS -Wall"
 fi
 
 
@@ -11787,6 +11859,8 @@ fi
 cat >>confdefs.h <<_ACEOF
 #define SYSCONFDIR "$sysconfdir"
 _ACEOF
+
+
 
 
 
@@ -12452,6 +12526,9 @@ then
 elif test $HAVE_UNAME=yes -a x`uname -s` = xDarwin
 then
     DISTNAME=darwin
+elif test $HAVE_UNAME=yes -a x`uname -s` = xQNX
+then
+   DISTNAME=qnx
 elif test -f /etc/SuSE-release
 then
    DISTNAME=suse
@@ -12703,6 +12780,14 @@ darwin)
       platforms/darwin/ApcupsdDaemon.Info.plist \
       platforms/darwin/ApcupsdPkg.Info.plist \
       platforms/darwin/ApcupsdUsbShim.Info.plist"
+   ;;
+qnx)
+   PTHREAD_LFLAGS=""
+   DISTVER=`uname -r`
+   SERIALDEV=/dev/ser1
+   DFILES="\
+      platforms/qnx/apcupsd \
+      platforms/qnx/apccontrol"
    ;;
 unknown)
    DISTVER=unknown
@@ -13515,8 +13600,6 @@ s,@AWK@,$AWK,;t t
 s,@HAVE_GCC_TRUE@,$HAVE_GCC_TRUE,;t t
 s,@HAVE_GCC_FALSE@,$HAVE_GCC_FALSE,;t t
 s,@DEBUG@,$DEBUG,;t t
-s,@DLIB@,$DLIB,;t t
-s,@DINCLUDE@,$DINCLUDE,;t t
 s,@DRVLIBS@,$DRVLIBS,;t t
 s,@APCDRVLIBS@,$APCDRVLIBS,;t t
 s,@PTHREAD_CFLAGS@,$PTHREAD_CFLAGS,;t t
@@ -13536,6 +13619,8 @@ s,@LN@,$LN,;t t
 s,@SED@,$SED,;t t
 s,@AR@,$AR,;t t
 s,@MV@,$MV,;t t
+s,@RST2HTML@,$RST2HTML,;t t
+s,@RST2PDF@,$RST2PDF,;t t
 s,@X_CFLAGS@,$X_CFLAGS,;t t
 s,@X_PRE_LIBS@,$X_PRE_LIBS,;t t
 s,@X_LIBS@,$X_LIBS,;t t
@@ -14112,7 +14197,7 @@ Configuration on `date`:
   LOCK dir (for serial port)  ${LOCKDIR}
   Power Fail dir              ${PWRFAILDIR}
   Compiler:                   ${CXX} ${CXXVERSION}
-  Compiler flags:             ${CFLAGS} ${PTHREAD_FLAGS}
+  Compiler flags:             ${CPPFLAGS} ${CXXFLAGS} ${PTHREAD_FLAGS}
   Linker:                     ${LD}
   Linker flags:               ${LDFLAGS}
   Host and version:           ${DISTNAME} ${DISTVER}

@@ -176,15 +176,4 @@ private:
 /* Check if the UPS has the given capability */ 
 #define UPS_HAS_CAP(ci) (_ups->UPS_Cap[ci])
 
-/* Include headers for platform-specific drivers */
-#ifdef HAVE_LINUX_USB
-#include "linux/linux-usb.h"
-#endif
-#ifdef HAVE_GENERIC_USB
-#include "generic/generic-usb.h"
-#endif
-#ifdef HAVE_BSD_USB
-#include "linux/bsd-usb.h"
-#endif
-
 #endif  /* _USB_H */

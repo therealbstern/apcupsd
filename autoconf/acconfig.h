@@ -136,6 +136,7 @@
 #undef HAVE_OSF1_OS
 #undef HAVE_OPENSERVER_OS
 #undef HAVE_DARWIN_OS
+#undef HAVE_QNX_OS
 
 /* Compiler */
 #undef HAVE_GCC

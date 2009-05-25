@@ -453,12 +453,10 @@ int main(int argc, char *argv[])
    pmsg("Setting up the port ...\n");
    setup_device(ups);
 
-   if (kill_ups_power) {
+   if (hibernate_ups) {
       pmsg("apctest: bad option, I cannot do a killpower\n");
       apctest_terminate(0);
    }
-
-   make_pid_file();
 
    init_signals(apctest_terminate);
 
@@ -799,7 +797,7 @@ static void test6(void)
    ptime();
    print_bits(bits);
    make_file(ups, ups->pwrfailpath);
-   kill_power(ups);
+   initiate_hibernate(ups);
    unlink(ups->pwrfailpath);
    ptime();
 
@@ -1828,7 +1826,7 @@ static void usb_kill_power_test(void)
    pmsg("calling kill_power function.\n");
 
    make_file(ups, ups->pwrfailpath);
-   kill_power(ups);
+   initiate_hibernate(ups);
    unlink(ups->pwrfailpath);
 
    ptime();

@@ -34,8 +34,8 @@ bool ApcSmartDriver::KillPower()
    int errflag = 0;
 
    response[0] = '\0';
+
    shutdown_delay = GetShutdownDelay();
-   
    writechar('S');                 /* ask for soft shutdown */
 
    /*

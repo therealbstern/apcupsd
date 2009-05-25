@@ -35,7 +35,7 @@
 #define HID_MAX_USAGES 1024
 
 #include "apc.h"
-#include "../usb.h"
+#include "linux-usb.h"
 
 /* RHEL has an out-of-date hiddev.h */
 #ifndef HIDIOCGFLAG
@@ -593,7 +593,7 @@ bool LinuxUsbDriver::SubclassGetCapabilities()
    struct hiddev_report_info rinfo;
    struct hiddev_field_info finfo;
    struct hiddev_usage_ref uref;
-   int i, j, k, n;
+   unsigned int i, j, k, n;
 
    if (ioctl(_fd, HIDIOCINITREPORT, 0) < 0)
       Error_abort1("Cannot init USB HID report. ERR=%s\n", strerror(errno));
@@ -604,12 +604,12 @@ bool LinuxUsbDriver::SubclassGetCapabilities()
     * Walk through all available reports and determine
     * what information we can use.
     */
-   for (n = 0; n < (int)sizeof(rtype); n++) {
+   for (n = 0; n < sizeof(rtype)/sizeof(*rtype); n++) {
       rinfo.report_type = rtype[n];
       rinfo.report_id = HID_REPORT_ID_FIRST;
 
       while (ioctl(_fd, HIDIOCGREPORTINFO, &rinfo) >= 0) {
-         for (i = 0; i < (int)rinfo.num_fields; i++) {
+         for (i = 0; i < rinfo.num_fields; i++) {
             memset(&finfo, 0, sizeof(finfo));
             finfo.report_type = rinfo.report_type;
             finfo.report_id = rinfo.report_id;
@@ -619,7 +619,7 @@ bool LinuxUsbDriver::SubclassGetCapabilities()
                continue;
 
             memset(&uref, 0, sizeof(uref));
-            for (j = 0; j < (int)finfo.maxusage; j++) {
+            for (j = 0; j < finfo.maxusage; j++) {
                uref.report_type = finfo.report_type;
                uref.report_id = finfo.report_id;
                uref.field_index = i;

@@ -59,7 +59,7 @@ const struct NetDriver::cmdtrans NetDriver::_cmdtrans[] =
    {"nombattv",   "NOMBATTV", 1},
    {"outputfreq", "LINEFREQ", 1},
    {"outputv",    "OUTPUTV",  1},
-   {"release",    "RELEASE",  1},
+   {"version",    "VERSION",  1},
    {"retpct",     "RETPCT",   1},      /* min batt to turn on UPS */
    {"runtime",    "TIMELEFT", 1},
    {"selftest",   "SELFTEST", 1},      /* results of last self test */
