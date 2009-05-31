@@ -5,7 +5,7 @@ The APC UPS
 protocol was originally analyzed by Pavel Korensky with additions
 from Andre H. Hendrick beginning in 1995, and we want to give
 credit for good, hard work, where credit is due. After having said
-that, you will see that Steven Freed built much of the orginal
+that, you will see that Steven Freed built much of the original
 apcupsd information file.
 
 The start of this chapter of the apcupsd manual in HTML format was
@@ -605,7 +605,7 @@ Interpretation of the New Firmware Revision
 
 ::
 
-    New Firmware revison and model ID String in NN.M.L is the format
+    New Firmware revision and model ID String in NN.M.L is the format
 
         where NN == UPS ID Code.
             12 == Back-UPS Pro 650
