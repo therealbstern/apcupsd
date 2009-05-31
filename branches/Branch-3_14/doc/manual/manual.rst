@@ -147,7 +147,7 @@ set up and running as painlessly as possible.
    installing from an RPM or some other form of binary package, this
    step will probably consist of executing a single command.
 
-#. Tweak your /etc/apcupsd/apcupd.conf file as necessary. Often it
+#. Tweak your /etc/apcupsd/apcupsd.conf file as necessary. Often it
    will not be.
 
 #. Change the BIOS settings (see `Arranging for Reboot on
@@ -240,7 +240,7 @@ apcupsd supports nearly every APC brand UPS model in existence and enough
 different cable types to connect to all of them.
 
 The ``UPSTYPE <keyword>`` field is the value you will put in
-your /etc/apcupsd/apcupd.conf file to tell apcupsd what type of UPS
+your /etc/apcupsd/apcupsd.conf file to tell apcupsd what type of UPS
 you have. We'll describe the possible values here, because they're
 a good way to explain your UPS's single most important interface
 property: the kind of protocol it uses to talk with its
@@ -5886,7 +5886,7 @@ Apcupsd RPM Packaging FAQ
 **I'm getting errors about not having permission when I try to build the packages. Do I need to be root?**
     No, you do not need to be root
     and, in fact, it is better practice to build rpm packages as a
-    non-root user. Apcupds packages are designed to be built by a
+    non-root user. Apcupsd's packages are designed to be built by a
     regular user but you must make a few changes on your system to do
     this. If you are building on your own system then the simplest
     method is to add write permissions for all to the build directory
