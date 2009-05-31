@@ -9,7 +9,7 @@
 
 /*
 :Author: David Goodger (goodger@python.org)
-:Id: $Id: manual.html,v 1.1.2.2 2009-05-31 15:13:48 adk0212 Exp $
+:Id: $Id: manual.html,v 1.1.2.3 2009-05-31 16:14:48 adk0212 Exp $
 :Copyright: This stylesheet has been placed in the public domain.
 
 Default cascading style sheet for the HTML output of Docutils.
@@ -297,7 +297,7 @@ ul.auto-toc {
 <p><strong>Apcupsd is a UPS control system that permits orderly shutdown of your
 computer in the event of a power failure.</strong></p>
 <div class="line-block">
-<div class="line">May 31, 2009 11:12:35</div>
+<div class="line">May 31, 2009 12:13:01</div>
 <div class="line">This manual documents apcupsd version 3.14.x</div>
 <div class="line">Copyright © 2004-2009 Adam Kropelin</div>
 <div class="line">Copyright © 1999-2005 Kern Sibbald</div>
@@ -473,7 +473,7 @@ at <a class="reference external" href="http://www.apcupsd.com">http://www.apcups
 </li>
 <li><a class="reference internal" href="#connecting-apcupsd-to-a-snmp-ups" id="id159">Connecting APCUPSD to a SNMP UPS</a></li>
 <li><a class="reference internal" href="#building-with-snmp-support" id="id160">Building with SNMP support</a></li>
-<li><a class="reference internal" href="#snp-trap-catching" id="id161">SNP Trap Catching</a></li>
+<li><a class="reference internal" href="#snmp-trap-catching" id="id161">SNMP Trap Catching</a></li>
 <li><a class="reference internal" href="#known-problems" id="id162">Known Problems</a></li>
 </ul>
 </li>
@@ -557,7 +557,7 @@ at <a class="reference external" href="http://www.apcupsd.com">http://www.apcups
 <li><a class="reference internal" href="#logging-the-status-information" id="id224">Logging the STATUS Information</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#the-shutown-sequence-and-its-discontents" id="id225">The Shutown Sequence and its Discontents</a><ul>
+<li><a class="reference internal" href="#the-shutdown-sequence-and-its-discontents" id="id225">The Shutdown Sequence and its Discontents</a><ul>
 <li><a class="reference internal" href="#shutdown-sequence" id="id226">Shutdown Sequence</a></li>
 <li><a class="reference internal" href="#shutdown-problems" id="id227">Shutdown Problems</a></li>
 <li><a class="reference internal" href="#master-slave-shutdown" id="id228">Master/Slave Shutdown</a></li>
@@ -772,7 +772,7 @@ used.</p>
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
 <tr><td class="label">[3]</td><td>Port included in apcupsd source tree but may be out of date,
-unmaintained, aor broken.</td></tr>
+unmaintained, or broken.</td></tr>
 </tbody>
 </table>
 <table class="docutils footnote" frame="void" id="id29" rules="none">
@@ -885,7 +885,7 @@ see the dedicated section on that particular configuration.</p>
 <h2><a class="toc-backref" href="#id56">USB Configuration</a></h2>
 <p>Apcupsd supports USB connections on all major operating systems:
 Linux, FreeBSD, OpenBSD, NetBSD, Windows, Solaris, and Mac OS X
-Darwin. If you plan to use a USB conenction, please read the
+Darwin. If you plan to use a USB connection, please read the
 appropriate subsection in its entirety. You can skip this section
 if your UPS has a serial (RS232-C) or Ethernet interface or if you
 are not running one of the platforms listed above.</p>
@@ -1759,7 +1759,7 @@ be changed at any later time.</td></tr>
 </tr>
 <tr><td>&nbsp;</td><td>This option allows
 you to specify where apcupsd will create the serial port lock file.
-The default is systemdependent but usually /var/lock. This option
+The default is system-dependent but usually /var/lock. This option
 simply sets the appropriate path in the apcupsd.conf file, which
 can be changed at any later time.</td></tr>
 <tr><td class="option-group" colspan="2">
@@ -2345,7 +2345,7 @@ the minimum required.</p>
 <p>NIS (Network Information Server) mode allows for communication
 between instances of apcupsd running on different hosts. Only one
 of those hosts, the server, needs to talk to the UPS directly. The
-others, clients, optain information about the state of the UPS by
+others, clients, obtain information about the state of the UPS by
 querying the server. NIS is <em>not</em> related to Sun's NIS/YP
 services.</p>
 <p>NIS clients and servers require that apcupsd be compiled with the
@@ -2354,7 +2354,7 @@ Net Driver <tt class="docutils literal"><span class="pre">--enable-net</span></t
 exactly as a standalone configuration, but with <tt class="docutils literal"><span class="pre">NETSERVER</span> <span class="pre">on</span></tt>.
 In all other respects, the server should be configured in
 standalone mode. You may also set the NIS server specific options
-<tt class="docutils literal"><span class="pre">NISIP</span></tt> to restict which IP address of the server which apcupsd
+<tt class="docutils literal"><span class="pre">NISIP</span></tt> to restrict which IP address of the server which apcupsd
 listens on. The default, 0.0.0.0, means to list on all of the
 server host's IP addresses; <tt class="docutils literal"><span class="pre">NISPORT</span></tt> (default 3551) to set which
 TCP port the server listens on; and <tt class="docutils literal"><span class="pre">EVENTSFILE</span></tt> and
@@ -2807,8 +2807,8 @@ directly to your UPS and run certain low-level tests, display all
 know values from the UPS's EEPROM, perform a battery runtime
 calibration, program the EEPROM (serial connection only), and enter
 in TTY mode with the UPS. Here we describe how to use it for a SmartUPS.
-The menus and optiosn for USB and simple signaling UPSes are different
-but mostly self-explanator.</p>
+The menus and options for USB and simple signaling UPSes are different
+but mostly self-explanatory.</p>
 <p>Shutdown apcupsd if it is running. Make sure your
 <tt class="docutils literal"><span class="pre">/etc/apcupsd/apcupsd.conf</span></tt> file has <tt class="docutils literal"><span class="pre">UPSTYPE</span> <span class="pre">apcsmart</span></tt> and
 <tt class="docutils literal"><span class="pre">UPSCABLE</span></tt> has one of the smart cables that are supported.</p>
@@ -2994,7 +2994,7 @@ generated within apcupsd, control is passed to the script
 apccontrol normally found in /etc/apcupsd/apccontrol. The event
 name, and a number of other important parameters are passed to the
 script.</p>
-<p>The major function of the apccontrol script is to performa a
+<p>The major function of the apccontrol script is to perform a
 shutdown of the system (as well as the killpower operation). In
 addition, another major task for this script is to notify you by
 email when certain events such as powerfail occur.</p>
@@ -3236,7 +3236,7 @@ servers as needed.</p>
 <h4><a class="toc-backref" href="#id135">TCP Wrappers</a></h4>
 <p>If your operating system does not support a host based firewall (a
 firewall running on the local machine) then you may try to get some
-of the funtionality of such a firewall with TCP Wrappers. As of
+of the functionality of such a firewall with TCP Wrappers. As of
 apcupsd version 3.8.2, TCP Wrappers are implemented if you turn
 them on when configuring <tt class="docutils literal"><span class="pre">./configure</span> <span class="pre">--with-libwrap</span></tt>. With
 this code enabled, you may control who may access your apcupsd via
@@ -3822,7 +3822,7 @@ some decisions that usually result in one or more calls to the
 script located in <tt class="docutils literal"><span class="pre">/etc/apcupsd/apccontrol</span></tt>. The <tt class="docutils literal"><span class="pre">apccontrol</span></tt> file
 is a shell script that acts on the first argument that apcupsd
 passes to it. These actions are set up by default to sane behavior
-for all psituations apcupsd is likely to detect from the UPS.
+for all situations apcupsd is likely to detect from the UPS.
 However, you can change the apccontrol behavior for every single
 action.</p>
 <p>To customize, so create a file with the same name as the action,
@@ -3832,7 +3832,7 @@ which is passed as a command line argument. Put your script in the
 temporary events file (<tt class="docutils literal"><span class="pre">/etc/apcupsd/apcupsd.events</span></tt>), and they also
 generate a call to <tt class="docutils literal"><span class="pre">/etc/apcupsd/apccontrol</span></tt> which in turn will call
 any scripts you have placed in the <tt class="docutils literal"><span class="pre">/etc/apcupsd</span></tt> directory.</p>
-<p>Normally, <tt class="docutils literal"><span class="pre">/etc/apcupsd/acpcontrol</span></tt> is called only by apcupsd.
+<p>Normally, <tt class="docutils literal"><span class="pre">/etc/apcupsd/apccontrol</span></tt> is called only by apcupsd.
 Consequently, you should not invoke it directly. However, it is
 important to understand how it functions, and in some cases, you
 may want to change the messages that it prints using <tt class="docutils literal"><span class="pre">wall</span></tt>. We
@@ -3956,7 +3956,7 @@ return only if the onbattery event has been generated.</p>
 <dt><strong>mainsback</strong></dt>
 <dd><p class="first">This event is generated when the mains
 power returns after a powerout condition. The shutdown event may or
-may not have been generated depending on the paramaters you have
+may not have been generated depending on the parameters you have
 defined and the length of the power outage.</p>
 <p class="last"><em>Default:</em> nothing</p>
 </dd>
@@ -3971,7 +3971,7 @@ been severed.</p>
 <dd><p class="first">This event is generated when the <tt class="docutils literal"><span class="pre">MINUTES</span></tt>
 value defined in the apcupsd.conf file expires while in a power
 fail condition. The <tt class="docutils literal"><span class="pre">MINUTES</span></tt> is the remaining runtime as internally
-calculated by the UPS and monitored by apcuspd. After completing this
+calculated by the UPS and monitored by apcupsd. After completing this
 event, apcupsd will immediately initiate a <tt class="docutils literal"><span class="pre">doshutdown</span></tt> event.</p>
 <p class="last"><em>Default:</em> <tt class="docutils literal"><span class="pre">wall</span></tt> a message</p>
 </dd>
@@ -3979,7 +3979,7 @@ event, apcupsd will immediately initiate a <tt class="docutils literal"><span cl
 <dd><p class="first">This event is generated when the <tt class="docutils literal"><span class="pre">TIMEOUT</span></tt> value
 defined in the apcupsd.conf file expires while in a power fail
 condition. It indicates that the total time in a power failure has
-been exeeded and the machine should be shutdown. After completing this
+been exceeded and the machine should be shutdown. After completing this
 event, apcupsd will immediately initiate a <tt class="docutils literal"><span class="pre">doshutdown</span></tt> event.</p>
 <p class="last"><em>Default:</em> <tt class="docutils literal"><span class="pre">wall</span></tt> a message</p>
 </dd>
@@ -4022,7 +4022,7 @@ machines.</p>
 apcupsd on the UPS server for each UPS to be controlled. That is, you install
 a single copy of apcupsd but launch it multiple times using different
 configuration files and scripts. (Older versions of apcupsd required you to
-actually compile the daemon multiple times with different <tt class="docutils literal"><span class="pre">configre</span></tt> options.
+actually compile the daemon multiple times with different <tt class="docutils literal"><span class="pre">configure</span></tt> options.
 This is no longer required, as all necessary adjustments can be made in
 <tt class="docutils literal"><span class="pre">apcupsd.conf</span></tt>.)</p>
 <p>Additionally, you will run one instance of apcupsd on each of the machines
@@ -4124,7 +4124,7 @@ else
      cut -f 5 -d ' '`
 fi
 
-# Source function libarary
+# Source function library
 . /etc/rc.d/init.d/functions
 
 case &quot;$1&quot; in
@@ -4410,8 +4410,8 @@ to include the following options (in addition to any others you need) on the
 ./configure --enable-snmp
 </pre>
 </div>
-<div class="section" id="snp-trap-catching">
-<h3><a class="toc-backref" href="#id161">SNP Trap Catching</a></h3>
+<div class="section" id="snmp-trap-catching">
+<h3><a class="toc-backref" href="#id161">SNMP Trap Catching</a></h3>
 <p>apcupsd-3.11.14 introduces support for SNMP trap catching with the
 APC PowerNet MIB driver. Previous versions polled the UPS status
 once per minute, leading to significant delays before UPS state
@@ -4640,13 +4640,13 @@ multi(0)disk(0)rdisk(0)partition(1)\WINNT=&quot;Windows NT Workstation Version 4
 </pre>
 <p>...where the only thing you have changed is to append to the end of
 the line. This addition will prevent the operating system from
-interferring with apcupsd</p>
+interfering with apcupsd</p>
 </div>
 <div class="section" id="starting-apcupsd-on-windows">
 <h3><a class="toc-backref" href="#id172">Starting Apcupsd on Windows</a></h3>
 <p>The installer will give you an opportunity start the Apcupsd
 service immediately. If you choose to start it manually, you may do
-so by selecting the &quot;Start Apcuspd&quot; link from the Start-&gt;Programs-&gt;Apcupsd
+so by selecting the &quot;Start Apcupsd&quot; link from the Start-&gt;Programs-&gt;Apcupsd
 folder.</p>
 <p>On Windows NT/2000/XP, you may alternatively go to the Control
 Panel, open the Services folder, select Apcupsd UPS Server, and
@@ -4710,7 +4710,7 @@ monitor also configures apctray to not start by default. Using
 <tt class="docutils literal"><span class="pre">/add</span></tt> to create a new monitor will enable automatic startup again.
 To close a monitor temporarily, right-click the tray icon and
 choose &quot;Close this instance&quot;.</p>
-<p>apctray also aupports the <tt class="docutils literal"><span class="pre">/refresh</span></tt> switch which allows you to
+<p>apctray also supports the <tt class="docutils literal"><span class="pre">/refresh</span></tt> switch which allows you to
 specify the interval (in seconds) at which apctray will poll the
 apcupsd NIS for status. If you do not specify <tt class="docutils literal"><span class="pre">/refresh</span></tt>, the
 default is 1 second. For example, this command will add a monitor
@@ -4885,7 +4885,7 @@ addition, the following Windows only options are implemented:</p>
 <tbody valign="top">
 <tr><td class="option-group">
 <kbd><span class="option">/service</span></kbd></td>
-<td>Start apcupsdas a service</td></tr>
+<td>Start apcupsd as a service</td></tr>
 <tr><td class="option-group">
 <kbd><span class="option">/run</span></kbd></td>
 <td>Run the apcupsd application</td></tr>
@@ -5045,7 +5045,7 @@ serial port support.</li>
 <p>The first thing to do is to look at your log file, usually
 /var/log/messages because apcupsd writes more detailed information
 to the log file whenever there is an error.</p>
-<p>If you have a UPS that uses apcsmart protcol, you can manually test the
+<p>If you have a UPS that uses apcsmart protocol, you can manually test the
 serial communications with the UPS by starting a serial port communications
 program (such as minicom, tip, or cu) with the settings 2400 8N1 (2400 baud,
 8 data bits, no parity, 1 stop bit). Be extremely careful what you send to
@@ -6243,12 +6243,12 @@ feature also allows the system administrator to hold the &quot;ANNOY&quot;
 factor until the 'nologin' file is created. The default is always
 disable if no <tt class="docutils literal"><span class="pre">NOLOGON</span></tt> directive is specified.</p>
 <p>The 'nologin' file will be created in the directory specified by
-the <tt class="docutils literal"><span class="pre">NOLOGINDIR</span></tt> directive desribed below.</p>
+the <tt class="docutils literal"><span class="pre">NOLOGINDIR</span></tt> directive described below.</p>
 <p>As far as I can tell, the only useful types are disable and always
 since the difference in the time when the logout warning is given
 and shutdown occurs for the other types is very short (KES).</p>
 <blockquote class="last">
-<p><em>disable</em> revents apcupsd from creating the nologin
+<p><em>disable</em> prevents apcupsd from creating the nologin
 file. Consequently, any user can login during a power failure
 condition. Also, the ANNOY feature is disabled so users will not be
 warned to logoff the system.</p>
@@ -6470,7 +6470,7 @@ as well.</p>
 of information on each line output. Because not all UPSes supply
 the same information, the output varies based on the type of UPS
 that you are using. In general, if the information is not available
-for your UPS, the line will be missing enturely or the data portion of
+for your UPS, the line will be missing entirely or the data portion of
 the output record will contain an <tt class="docutils literal"><span class="pre">N/A</span></tt> indicating that the information
 is not available.</p>
 <p>Status logging consists of periodically logging ALL available
@@ -6622,7 +6622,7 @@ immediate emergency shutdown.</dd>
 have after a power off condition before the UPS will restore power
 to your equipment.</dd>
 <dt><strong>ITEMP</strong></dt>
-<dd>Tnternal UPS temperature as supplied by the UPS.</dd>
+<dd>Internal UPS temperature as supplied by the UPS.</dd>
 <dt><strong>ALARMDEL</strong></dt>
 <dd>The delay period for the UPS alarm.</dd>
 <dt><strong>BATTV</strong></dt>
@@ -6716,8 +6716,8 @@ strongly recommend that you use apcaccess or the CGI interface to
 get this information.</p>
 </div>
 </div>
-<div class="section" id="the-shutown-sequence-and-its-discontents">
-<h2><a class="toc-backref" href="#id225">The Shutown Sequence and its Discontents</a></h2>
+<div class="section" id="the-shutdown-sequence-and-its-discontents">
+<h2><a class="toc-backref" href="#id225">The Shutdown Sequence and its Discontents</a></h2>
 <div class="section" id="shutdown-sequence">
 <h3><a class="toc-backref" href="#id226">Shutdown Sequence</a></h3>
 <p>If you experienced so problems with the testing procedures, or if
@@ -6728,7 +6728,7 @@ shutdown process.</p>
 <ul>
 <li><p class="first">apcupsd detects that there is a power problem and it calls
 <tt class="docutils literal"><span class="pre">/etc/apcupsd/apccontrol</span> <span class="pre">powerout</span></tt>. By default this event
-does nothing, but it can be overriden to notify users, etc.</p>
+does nothing, but it can be overridden to notify users, etc.</p>
 </li>
 <li><p class="first">After the configured <tt class="docutils literal"><span class="pre">ONBATTERYDELAY</span></tt>, apcupsd
 calls <tt class="docutils literal"><span class="pre">/etc/apcupsd/apccontrol</span> <span class="pre">onbattery</span></tt>, which normally sends a
@@ -6881,7 +6881,7 @@ the same script:</p>
 <div class="section" id="windows-considerations">
 <h3><a class="toc-backref" href="#id230">Windows Considerations</a></h3>
 <p>Please see the <a class="reference internal" href="#killpower-under-windows">Killpower under Windows</a> chapter of this manual for
-conderations pertaining to shutdown and killpower on Windows.</p>
+considerations pertaining to shutdown and killpower on Windows.</p>
 </div>
 </div>
 <div class="section" id="apc-smart-protocol">
@@ -8140,10 +8140,10 @@ RedHat 9 (rh9), Fedora Core (fedora_core), RedHat Enterprise Linux
 and clones (rhel3 and rhel4), SuSE 9 &amp; 10 (suse), and Mandrake
 (mdk). The package build is controlled by a define set at the
 beginning of the file. These defines basically just control the
-dependancy information that gets coded into the finished rpm
+dependency information that gets coded into the finished rpm
 package. So while you could technically build a package without
 defining a platform, or with an incorrect platform, and have it
-install and run it would not contain correct dependancy information
+install and run it would not contain correct dependency information
 for the rpm database. The platform define may be edited in the spec
 file directly (by default all defines are set to 0 or &quot;not set&quot;).
 For example, to build the RedHat 7.x package find the line in the
@@ -8253,8 +8253,8 @@ add the following line:</p>
 <img alt="./thanks.png" src="./thanks.png" />
 <p>The success of apcupsd is due to the many people that helped in
 development, testing and in many other ways.</p>
-<p>Thank all the developers that worked hard to make APCUPSDone of the
-best piece of software for UPSmanagement.</p>
+<p>Thank all the developers that worked hard to make APCUPSD one of the
+best piece of software for UPS management.</p>
 <div class="section" id="contributors">
 <h3><a class="toc-backref" href="#id247">Contributors</a></h3>
 <dl class="docutils">
@@ -8301,7 +8301,7 @@ Joseph Acosta (<a class="reference external" href="mailto:joeja&#64;mindspring.c
 </div>
 <div class="footer">
 <hr class="footer" />
-Generated on: 2009-05-31 15:12 UTC.
+Generated on: 2009-05-31 16:13 UTC.
 Generated by <a class="reference external" href="http://docutils.sourceforge.net/">Docutils</a> from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> source.
 
 </div>
