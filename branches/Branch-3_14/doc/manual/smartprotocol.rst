@@ -171,7 +171,7 @@ for "not available", otherwise the response is given in the
 +---------+------------+----------------+--------------------------------------+
 |Z        |Shutdown    |n/a             |Send twice with > 1.5s delay between  |
 |         |immediately |                |chars. UPS switches load off          |
-|         |            |                |immediately (no grade period)         |
+|         |            |                |immediately (no grace period)         |
 +---------+------------+----------------+--------------------------------------+
 |a        |Protocol    |*long string*   |Returns three main sections delimited |
 |         |info        |                |by periods:                           |
