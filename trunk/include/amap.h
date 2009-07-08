@@ -44,6 +44,9 @@ private:
 
 public:
 
+   amap() {}
+   ~amap() {}
+
    V& operator[](const K& key)
    {
       typename alist<keyval>::iterator iter = _map.find(key);
@@ -120,6 +123,10 @@ private:
    // Should really use a hash table for efficient random lookups,
    // but for now we'll take the easy route and use alist.
    alist<keyval> _map;
+
+   // Prevent use
+   amap(const amap<K,V> &rhs);
+   amap<K,V> &operator=(const amap<K,V> &rhs);
 };
 
 #endif // __AMAP_H

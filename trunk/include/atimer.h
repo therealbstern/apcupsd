@@ -33,6 +33,10 @@ private:
    pthread_cond_t _condvar;
    bool _started;
    struct timespec _abstimeout;
+
+   // Prevent use
+   atimer(const atimer &rhs);
+   atimer &operator=(const atimer &rhs);
 };
 
 #endif // __ATIMER_H
