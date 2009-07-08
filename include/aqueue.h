@@ -78,6 +78,10 @@ private:
    pthread_mutex_t _mutex;
    pthread_cond_t _condvar;
    alist<T> _queue;
+
+   // Prevent use
+   aqueue(const aqueue<T> &rhs);
+   aqueue<T> &operator=(const aqueue<T> &rhs);
 };
 
 #endif

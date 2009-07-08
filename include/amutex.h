@@ -62,6 +62,10 @@ private:
 
    static const char *DEFAULT_NAME;
    static const int TIMEOUT_FOREVER;
+
+   // Prevent use
+   amutex(const amutex &rhs);
+   amutex &operator=(const amutex &rhs);
 };
 
 #endif
