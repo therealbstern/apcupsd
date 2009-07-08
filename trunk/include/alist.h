@@ -65,8 +65,10 @@ private:
 public:
 
    alist() : _head(NULL), _tail(NULL), _size(0) {}
+   alist(const alist<T> &rhs) : _head(NULL), _tail(NULL), _size(0)
+      { append(rhs); }
 
-   ~alist()
+   virtual ~alist()
    {
       while (!empty()) remove(begin());
       _size = 0;
@@ -100,6 +102,36 @@ public:
       _head = nd;
       _size++;
       return *_head;
+   }
+
+   T& append(const alist<T>& rhs)
+   {
+      if (&rhs != this)
+      {
+         for(const_iterator iter = rhs.begin();
+             iter != rhs.end();
+             ++iter)
+         {
+            append(*iter);
+         }
+      }
+      return *_tail;
+   }
+
+   alist<T>& operator+=(const alist<T>& rhs)
+   {
+      append(rhs);
+      return *this;
+   }
+
+   alist<T>& operator=(const alist<T>& rhs)
+   {
+      if (&rhs != this)
+      {
+         clear();
+         append(rhs);
+      }
+      return *this;
    }
 
    void remove_first() { if (!empty()) remove(_head); }
