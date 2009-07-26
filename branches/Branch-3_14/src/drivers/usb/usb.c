@@ -143,7 +143,8 @@ const struct s_known_info known_info[] = {
    {CI_NONE,                    0xFF860005, P_ANY,     T_NONE,     false},  /* APCGeneralCollection */
    {CI_APCForceShutdown,        0xFF86007C, P_ANY,     T_NONE,     false},  /* APCForceShutdown */
    {CI_NONE,                    0xFF860072, P_ANY,     T_NONE,     false},  /* APCPanelTest */
-   {CI_BattReplaceDate,         0xFF860016, P_ANY,     T_APCDATE,  false},  /* APCBattReplaceDate */
+// Removed the below due to all recent UPSes having the same garbage in this field
+// {CI_BattReplaceDate,         0xFF860016, P_ANY,     T_APCDATE,  false},  /* APCBattReplaceDate */
    {CI_NONE,                    0xFF860042, P_ANY,     T_NONE,     false},  /* APC_UPS_FirmwareRevision */
    {CI_NONE,                    0xFF860079, P_ANY,     T_NONE,     false},  /* APC_USB_FirmwareRevision */
    {CI_RETPCT,                  0xFF860019, P_ANY,     T_CAPACITY, false},  /* APCBattCapBeforeStartup */
