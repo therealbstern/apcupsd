@@ -49,8 +49,20 @@ int dumb_ups_open(UPSINFO *ups)
          "apcsmart_ups_open called twice. This shouldn't happen.");
    }
 
-   if ((ups->fd = open(ups->device, O_RDWR | O_NOCTTY | O_NDELAY)) < 0)
-      Error_abort2(_("Cannot open UPS port %s: %s\n"), ups->device, strerror(errno));
+   char *opendev = ups->device;
+
+#ifdef HAVE_MINGW
+   // On Win32 add \\.\ UNC prefix to COMx in order to correctly address
+   // ports >= COM10.
+   char device[MAXSTRING];
+   if (!strnicmp(ups->device, "COM", 3)) {
+      snprintf(device, sizeof(device), "\\\\.\\%s", ups->device);
+      opendev = device;
+   }
+#endif
+
+   if ((ups->fd = open(opendev, O_RDWR | O_NOCTTY | O_NDELAY)) < 0)
+      Error_abort2(_("Cannot open UPS port %s: %s\n"), opendev, strerror(errno));
 
    /* Cancel the no delay we just set */
    cmd = fcntl(ups->fd, F_GETFL, 0);
