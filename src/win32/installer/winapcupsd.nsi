@@ -159,8 +159,9 @@ FunctionEnd
 
 Function InstallServiceExit
   ; Create Start Menu Directory
-  SetShellVarContext all
   CreateDirectory "$SMPROGRAMS\Apcupsd"
+  ; Create start menu link for configuring apcupsd
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Edit Configuration File.lnk" "write" "$INSTDIR\etc\apcupsd\apcupsd.conf"
 
   ; If installed as a service already, remove it
   ReadRegDWORD $R0 HKLM "Software\Apcupsd" "InstalledService"
@@ -239,6 +240,8 @@ Function ApctrayExit
 FunctionEnd
 
 Section "-Startup"
+  SetShellVarContext all
+
   ; Check for existing installation
   ; In the future we should check for existing HKLM\Software\Apcupsd\InstDir
   ${If} ${FileExists} "$INSTDIR\etc\apcupsd\apcupsd.conf"
@@ -330,7 +333,6 @@ Section "Tray Applet" SecApctray
   File ${WINDIR}\apctray.exe
 
   ; Create start menu link for apctray
-  SetShellVarContext all
   CreateDirectory "$SMPROGRAMS\Apcupsd"
   CreateShortCut "$SMPROGRAMS\Apcupsd\Apctray.lnk" "$INSTDIR\bin\apctray.exe"
 SectionEnd
@@ -377,9 +379,16 @@ Section "Documentation" SecDoc
   CreateDirectory "$INSTDIR\doc"
   File ${TOPDIR}\doc\manual\manual.html
   File ${TOPDIR}\doc\manual\*.png
+  File ${TOPDIR}\doc\*.txt
+
   ; Create Start Menu entry
-  SetShellVarContext all
-  CreateShortCut "$SMPROGRAMS\Apcupsd\Manual.lnk" "$INSTDIR\doc\manual.html"
+  CreateDirectory "$SMPROGRAMS\Apcupsd\Documentation"
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\Apcupsd User Manual.lnk"     "$INSTDIR\doc\manual.html"
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\apcupsd Reference.lnk"       "write" "$INSTDIR\doc\apcupsd.man.txt"
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\apcaccess Reference.lnk"     "write" "$INSTDIR\doc\apcaccess.man.txt"
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\apctest Reference.lnk"       "write" "$INSTDIR\doc\apctest.man.txt"
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\apccontrol Reference.lnk"    "write" "$INSTDIR\doc\apccontrol.man.txt"
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\Configuration Reference.lnk" "write" "$INSTDIR\doc\apcupsd.conf.man.txt"
 SectionEnd
 
 Section "-Finish"
@@ -480,8 +489,7 @@ Section "Uninstall"
 
   ; remove start menu items
   SetShellVarContext all
-  Delete /REBOOTOK "$SMPROGRAMS\Apcupsd\*"
-  RMDir /REBOOTOK "$SMPROGRAMS\Apcupsd"
+  RMDir /r /REBOOTOK "$SMPROGRAMS\Apcupsd"
 
   ; remove files and uninstaller (preserving config for now)
   Delete /REBOOTOK "$INSTDIR\bin\mingwm10.dll"
