@@ -97,11 +97,9 @@ dnl
 dnl Check for programs.
 dnl
 
+AC_PROG_CXX                dnl We require a C++ compiler now
 AC_PROG_CC                 dnl Determine a C compiler to use.
 AC_PROG_CPP                dnl Determine a C pre-processor to use.
-AC_PROG_CXX                dnl We require a C++ compiler now
-AC_PROG_CC_C_O             dnl Determine if C compiler support -c -o.
-AC_PROG_GCC_TRADITIONAL    dnl Determine if ioctl() need -traditional.
 AC_PROG_INSTALL            dnl Determine a BSD install program.
 AC_PROG_AWK
 AC_ISC_POSIX
