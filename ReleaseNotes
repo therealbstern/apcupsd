@@ -9,6 +9,26 @@ IF YOU USE THE OLD STYLE MASTER/SLAVE NETWORKING MODE, BE SURE TO READ THE
 3.14.0 RELEASE NOTES BELOW.
 
 
+3.14.7 -- 31 July 2009               (Maintenance Release)
+
+NEW FEATURES
+
+  * Multimon CGI programs are included with the Windows binary package
+
+BUG FIXES
+
+  * Windows COM ports above COM9 now work without user needing to manually
+    add \\.\ UNC prefix in apcupsd.conf
+
+  * Fix configure script not noticing when C++ compiler is missing
+
+  * Fix for battery date (BATTDAT) displaying invalid values on USB models
+
+  * Fix version reporting in cgi and examples
+
+  * Misc documentation fixes for typos, etc.
+
+
 3.14.6 -- 16 May 2009                (Maintenance Release)
 
 NEW FEATURES

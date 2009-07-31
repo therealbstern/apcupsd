@@ -8,6 +8,152 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2009-07-31 16:19  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Fix configure not noticing when C++ compiler does not exist.
+	Annoyingly, only the first of AC_PROG_CXX and AC_PROG_CC actually
+	error out if the conpiler does not exist. The second one just
+	quietly sets a default and keeps going. Temporary fix is to just
+	move CXX detection to be first since that's the compiler we really
+	need.
+
+2009-07-31 15:35  adk0212
+
+	* doc/manual/: manual.html, manual.rst:
+
+	Document multimon cgi programs for Windows.
+
+2009-07-31 11:34  adk0212
+
+	* autoconf/targets.mak:
+
+	Add support for formatting manpages into plain text
+
+2009-07-31 11:33  adk0212
+
+	* src/win32/installer/winapcupsd.nsi:
+
+	Include plain text manpages in windows install. Organize
+	documentation and provide start menu shortcuts. Also add a shortcut
+	for editing the config file.
+
+2009-07-31 11:33  adk0212
+
+	* doc/Makefile:
+
+	Format manpages into plain text.
+
+2009-07-31 10:22  adk0212
+
+	* src/win32/installer/winapcupsd.nsi:
+
+	Add CGI scripts to Windows installer.
+
+2009-07-31 10:22  adk0212
+
+	* src/win32/Makefile.in:
+
+	Build CGI programs for WIN32.
+
+2009-07-31 10:21  adk0212
+
+	* src/win32/: apctray.cpp, winmain.cpp:
+
+	Remove manual calls to WSA_Init(). It's done automatically in
+	libnis now.
+
+2009-07-31 10:20  adk0212
+
+	* src/win32/compat/: compat.cpp, netcompat.c:
+
+	Split network-related compat functions into their own file so users
+	don't have to link in all of compat.cpp.
+
+2009-07-31 10:18  adk0212
+
+	* src/lib/apclibnis.c:
+
+	Automatically invoke WSA_Init() during static initialization on
+	WIN32.
+
+2009-07-31 10:16  adk0212
+
+	* src/cgi/upsimage.c:
+
+	Set stdout to binary mode on WIN32 to prevent corruption of image
+	data.
+
+2009-07-26 10:50  adk0212
+
+	* src/drivers/: apcsmart/smartsetup.c, dumb/dumbsetup.c:
+
+	Automatically add \\.\ UNC prefix to COMx device name on Windows.
+	This allows selection of ports above COM9.
+
+2009-07-26 10:42  adk0212
+
+	* src/drivers/usb/usb.c:
+
+	Remove CI_BattReplaceDate because it does not seem to be populated
+	on any modern UPS. CI_BATTDAT works just fine.
+
+2009-06-07 21:15  adk0212
+
+	* src/win32/build-win32-cross-tools:
+
+	Update to NSIS-2.45.
+
+2009-06-02 20:45  adk0212
+
+	* doc/manual/: manual.html, smartprotocol.rst:
+
+	Fix typo.
+
+2009-05-31 12:18  adk0212
+
+	* doc/manual/: maintaining_ups.rst, manual.html, smartprotocol.rst:
+
+	Spell check.
+
+2009-05-31 12:14  adk0212
+
+	* doc/manual/: manual.html, manual.rst:
+
+	Spell check.
+
+2009-05-31 11:13  adk0212
+
+	* doc/manual/: manual.html, manual.rst:
+
+	Fix a few "apcupd" typos.
+
+2009-05-20 20:43  adk0212
+
+	* examples/newslave.c, src/cgi/upsstats.c:
+
+	Fix UPS version in CGI stats and examples.
+
+2009-05-16 12:46  adk0212
+
+	* doc/home-page/: bugs.html, index.html, index.wml, license.html,
+	lists.html, menu.inc, support.html, systems.html:
+
+	Update web site for 3.14.6 release.
+
+2009-05-16 12:46  adk0212
+
+	* doc/manual/publishdoc:
+
+	Update script
+
+2009-05-16 10:07  adk0212
+
+	* ChangeLog:
+
+	Final prep for 3.14.6. Locked and loaded.
+
 2009-05-16 09:05  fleetworks
 
 	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
