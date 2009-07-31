@@ -46,14 +46,15 @@
 #define getsockopt(s,l,o,d,z) getsockopt((s),(l),(o),(char*)(d),(z))
 #define EINPROGRESS           WSAEWOULDBLOCK
 
+int dummy = WSA_Init();
+
 #undef errno
 #define errno   WSAGetLastError()
 
 #undef h_errno
 #define h_errno WSAGetLastError()
 
-#endif
-
+#endif // HAVE_MINGW
 
 /*
  * Read nbytes from the network.
