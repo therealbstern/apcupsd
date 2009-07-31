@@ -263,3 +263,9 @@ ifneq ($(strip $(RST2PDF)),)
 else
 	@$(ECHO) "--> Not building PDF due to missing rst2pdf"
 endif
+
+# Format a manpage into plain text
+define MANIFY
+	@$(ECHO) "  MAN  " $(1) -\> $(2)
+	$(V)man ./$(1) | col -b > $(2)
+endef
