@@ -617,7 +617,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                    PSTR CmdLine, int iCmdShow)
 {
    InitWinAPIWrapper();
-   WSA_Init();
 
    // Publicize application handle
    appinst = hInstance;
