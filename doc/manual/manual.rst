@@ -2806,9 +2806,7 @@ Setting up and Testing the CGI Programs
 Before using multimon and the other CGI programs, first ensure that
 apcupsd is configured to run the Network Information Server. This
 is done by setting ``NETSERVER on`` in /etc/apcupsd/apcupsd.conf.
-This switch is on by default. If you are unsure of its state, see
-the section at the end of this chapter concerning the Client test
-program.
+This switch is on by default.
 
 Next you must edit the hosts file /etc/apcupsd/hosts.conf and at
 the end, add the name of the hosts you want to monitor and a label
@@ -2892,6 +2890,34 @@ You should get something similar to the screen shot shown below.
 If you wish additional control over the colors, type faces, and
 sizes of the multimon output, you may simply edit the apcupsd.css
 file to specify the styles you prefer.
+
+Using the CGI Programs on Windows
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The CGI programs compiled for Windows are included in the Windows package 
+starting with apcupsd-3.14.7. 
+
+The CGI programs included with the Windows package are intended 
+to be run on Windows. If your web server is running on Linux or another
+operating system, you will need to obtain binary packages for that platform 
+(or build them from source) instead. The windows build of the CGI programs has 
+been tested with the Apache web server for Win32. They should also work with MS 
+Internet Information Server (IIS).
+
+To use the programs, copy the contents of the ``cgi/`` directory from your 
+apcupsd installation directory to the ``cgi-bin/`` directory of your web server.
+Consult your web server's documentation for how to enable CGI programs to be
+executed. Sometimes special security settings are required.
+
+Configure the hosts.conf file as described above. The programs expect to find 
+the ``hosts.conf`` file and the ``apcupsd.css`` file in the directory 
+``\apcupsd\etc\apcupsd`` on the same drive letter as the web server's 
+``cgi-bin`` directory. If you installed apcupsd into ``C:\apcupsd`` (the 
+default) and your web server's ``cgi-bin/`` directory is also located on the 
+``C:`` drive, no further changes are necessary. If you installed apcupsd into a 
+different directory or your web server ``cgi-bin`` is on another drive, you will 
+need to relocate ``hosts.conf`` and ``apcupsd.css`` from the apcupsd install 
+location to ``\apcupsd\etc\apcupsd`` on the appropriate drive.
 
 multimon.cgi
 ~~~~~~~~~~~~
@@ -3014,8 +3040,8 @@ CGI Credits
 
 Many thanks go to Russell Kroll rkroll@exploits.org who wrote
 the CGI programs to work with his UPS Monitoring system named
-Network UPS Tools (NUT). Thanks
-also to Jonathan Benson jbenson@technologist.com for initially
+Network UPS Tools (NUT). Thanks also to Jonathan Benson 
+jbenson@technologist.com for initially
 adapting the upsstatus.cgi program to work with apcupsd.
 
 We have enhanced the bar graph program and hope that our changes
