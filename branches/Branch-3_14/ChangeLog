@@ -8,6 +8,33 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2009-08-01 10:41  fleetworks
+
+	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
+	suse/apcupsd.spec.in:
+
+	3.14.7 spec update
+
+2009-08-01 08:18  adk0212
+
+	* src/win32/: README.cygwin, README.win32:
+
+	Remove obsolete files
+
+2009-08-01 08:01  adk0212
+
+	* configure, autoconf/config.h.in, autoconf/configure.in,
+	autoconf/variables.mak.in, src/Makefile, src/powerflute.c,
+	src/win32/compat/compat.h, src/win32/compat/sys/ioctl.h:
+
+	Remove remnants of powerflute
+
+2009-07-31 16:23  adk0212
+
+	* ChangeLog, ReleaseNotes, include/version.h:
+
+	Prep for 3.14.7 release
+
 2009-07-31 16:19  adk0212
 
 	* configure, autoconf/configure.in:
