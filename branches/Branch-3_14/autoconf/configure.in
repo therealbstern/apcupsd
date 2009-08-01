@@ -734,25 +734,6 @@ AC_ARG_WITH(cgi-bin,
    [AC_HELP_STRING([--with-cgi-bin=DIR], [Specify cgi-bin directory (default=/etc/apcupsd)])],
    [CGIBIN="$withval";])
 
-
-dnl
-dnl   use option --enable-powerflute to compile powerflute
-dnl
-dnl AC_ARG_ENABLE(powerflute, [
-dnl AC_HELP_STRING([--enable-powerflute], [Compile powerflute program])],
-dnl    [ if test "$enableval" = "yes" ; then 
-dnl         AC_CHECK_LIB(ncurses, initscr, [POWERLIBS="-lncurses"],
-dnl            AC_MSG_ERROR([Powerflute requires libncurses.]), [])
-dnl         AC_CHECK_LIB(menu, new_menu, [POWERLIBS="$POWERLIBS -lmenu"],
-dnl            AC_MSG_ERROR([Powerflute requires libncurses.]), [-lncurses])
-dnl         AC_CHECK_LIB(form, new_form, [POWERLIBS="$POWERLIBS -lform"],
-dnl            AC_MSG_ERROR([Powerflute requires libncurses.]), [-lncurses])
-dnl         AC_CHECK_LIB(panel, new_panel, [POWERLIBS="$POWERLIBS -lpanel"],
-dnl            AC_MSG_ERROR([Powerflute requires libncurses.]), [-lncurses])
-dnl         POWERFLUTE="powerflute"
-dnl        AC_DEFINE(HAVE_POWERFLUTE)
-dnl     fi])
-
 dnl
 dnl Check for enable of gapcmon
 dnl
@@ -869,11 +850,6 @@ AC_SUBST(SYSCONFDIR)
 AC_SUBST(RST2HTML)
 AC_SUBST(RST2PDF)
 
-dnl Export makedepend and CC for later use in this script.
-PROG_MAKEDEPEND=$MAKEDEPEND
-export PROG_MAKEDEPEND
-export CC
-
 dnl If the AC_CONFIG_AUX_DIR macro for autoconf is used we will probably
 dnl find the mkinstalldirs script in another subdir than ($topdir).
 dnl Try to locate it.
@@ -922,28 +898,6 @@ then
 else
    echo 'Disabling cgi support...'
 fi
-
-dnl
-dnl Checks for powerflute
-dnl
-if test "$POWERFLUTE" = "powerflute"
-then
-   USE_POWERFLUTE=yes
-dnl
-dnl Check if ncurses headers are present.
-dnl
-   NCH="yes"
-
-   AC_CHECK_HEADERS(ncurses/curses.h ncurses/menu.h ncurses/panel.h,,[NCH="no"])
-   if test "$NCH" = "no"
-   then
-      AC_CHECK_HEADERS(curses.h menu.h panel.h,,[
-         AC_MSG_ERROR([ncurses headers not found.])])
-   fi
-else
-   USE_POWERFLUTE=no
-fi
-
 
 dnl
 dnl Find out the distribution.   NOTE!!! Only determine the
@@ -1435,7 +1389,6 @@ Configuration on `date`:
   enable-cgi:                 ${ENABLE_CGI}
   with-cgi-bin:               ${CGIBIN}
   with-libwrap:               ${with_libwrap}
-  enable-powerflute:          ${USE_POWERFLUTE}
   enable-pthreads:            ${with_pthreads}
   enable-dist-install:        ${with_distdir}
   enable-gapcmon:             ${GAPCMON_ENABLED}

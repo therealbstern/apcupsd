@@ -27,7 +27,7 @@
  * Last Modified By: Thorsten Engel
  * Last Modified On: Fri Apr 22 19:30:00 2004
  * Update Count    : 218
- * $Id: compat.h,v 1.21.2.3 2008-06-21 21:04:15 adk0212 Exp $
+ * $Id: compat.h,v 1.21.2.4 2009-08-01 12:01:59 adk0212 Exp $
  */
 
 
@@ -279,13 +279,6 @@ int waitpid(int, int *, int);
 #define closelog()
 #define openlog(a,b,c)
 void syslog(int type, const char *fmt, ...);
-
-//******************************************************************************
-// Ioctl
-//******************************************************************************
-#define TIOCMBIC  1
-#define TIOCMBIS  2
-int ioctl(int, int, ...);
 
 //******************************************************************************
 // Misc
