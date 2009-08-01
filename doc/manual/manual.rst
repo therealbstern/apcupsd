@@ -147,7 +147,7 @@ set up and running as painlessly as possible.
    installing from an RPM or some other form of binary package, this
    step will probably consist of executing a single command.
 
-#. Tweak your /etc/apcupsd/apcupd.conf file as necessary. Often it
+#. Tweak your /etc/apcupsd/apcupsd.conf file as necessary. Often it
    will not be.
 
 #. Change the BIOS settings (see `Arranging for Reboot on
@@ -228,7 +228,7 @@ Platform Support
 .. [1] Platforms on which apcupsd is regularly developed and tested
 .. [2] Platforms for which apcupsd team distributes binary packages
 .. [3] Port included in apcupsd source tree but may be out of date,
-       unmaintained, aor broken.
+       unmaintained, or broken.
 .. [4] USB not supported
 .. [5] USB not supported in 64 bit mode due to Microsoft disallowing loading of
        unsigned drivers
@@ -240,7 +240,7 @@ apcupsd supports nearly every APC brand UPS model in existence and enough
 different cable types to connect to all of them.
 
 The ``UPSTYPE <keyword>`` field is the value you will put in
-your /etc/apcupsd/apcupd.conf file to tell apcupsd what type of UPS
+your /etc/apcupsd/apcupsd.conf file to tell apcupsd what type of UPS
 you have. We'll describe the possible values here, because they're
 a good way to explain your UPS's single most important interface
 property: the kind of protocol it uses to talk with its
@@ -344,7 +344,7 @@ USB Configuration
 
 Apcupsd supports USB connections on all major operating systems:
 Linux, FreeBSD, OpenBSD, NetBSD, Windows, Solaris, and Mac OS X
-Darwin. If you plan to use a USB conenction, please read the
+Darwin. If you plan to use a USB connection, please read the
 appropriate subsection in its entirety. You can skip this section
 if your UPS has a serial (RS232-C) or Ethernet interface or if you
 are not running one of the platforms listed above.
@@ -1313,7 +1313,7 @@ to customize your installation.
     be changed at any later time.
 --with-lock-dir=path  This option allows
     you to specify where apcupsd will create the serial port lock file.
-    The default is systemdependent but usually /var/lock. This option
+    The default is system-dependent but usually /var/lock. This option
     simply sets the appropriate path in the apcupsd.conf file, which
     can be changed at any later time.
 --with-pwrfail-dir=path  This option
@@ -1991,7 +1991,7 @@ NIS Server/Client Configuration Using the Net Driver
 NIS (Network Information Server) mode allows for communication
 between instances of apcupsd running on different hosts. Only one
 of those hosts, the server, needs to talk to the UPS directly. The
-others, clients, optain information about the state of the UPS by
+others, clients, obtain information about the state of the UPS by
 querying the server. NIS is *not* related to Sun's NIS/YP
 services.
 
@@ -2002,7 +2002,7 @@ The NIS server is connected to the UPS and should be configured
 exactly as a standalone configuration, but with ``NETSERVER on``.
 In all other respects, the server should be configured in
 standalone mode. You may also set the NIS server specific options
-``NISIP`` to restict which IP address of the server which apcupsd
+``NISIP`` to restrict which IP address of the server which apcupsd
 listens on. The default, 0.0.0.0, means to list on all of the
 server host's IP addresses; ``NISPORT`` (default 3551) to set which
 TCP port the server listens on; and ``EVENTSFILE`` and
@@ -2546,8 +2546,8 @@ directly to your UPS and run certain low-level tests, display all
 know values from the UPS's EEPROM, perform a battery runtime
 calibration, program the EEPROM (serial connection only), and enter
 in TTY mode with the UPS. Here we describe how to use it for a SmartUPS.
-The menus and optiosn for USB and simple signaling UPSes are different
-but mostly self-explanator.
+The menus and options for USB and simple signaling UPSes are different
+but mostly self-explanatory.
 
 Shutdown apcupsd if it is running. Make sure your
 ``/etc/apcupsd/apcupsd.conf`` file has ``UPSTYPE apcsmart`` and 
@@ -2766,7 +2766,7 @@ apccontrol normally found in /etc/apcupsd/apccontrol. The event
 name, and a number of other important parameters are passed to the
 script.
 
-The major function of the apccontrol script is to performa a
+The major function of the apccontrol script is to perform a
 shutdown of the system (as well as the killpower operation). In
 addition, another major task for this script is to notify you by
 email when certain events such as powerfail occur.
@@ -2806,9 +2806,7 @@ Setting up and Testing the CGI Programs
 Before using multimon and the other CGI programs, first ensure that
 apcupsd is configured to run the Network Information Server. This
 is done by setting ``NETSERVER on`` in /etc/apcupsd/apcupsd.conf.
-This switch is on by default. If you are unsure of its state, see
-the section at the end of this chapter concerning the Client test
-program.
+This switch is on by default.
 
 Next you must edit the hosts file /etc/apcupsd/hosts.conf and at
 the end, add the name of the hosts you want to monitor and a label
@@ -2892,6 +2890,34 @@ You should get something similar to the screen shot shown below.
 If you wish additional control over the colors, type faces, and
 sizes of the multimon output, you may simply edit the apcupsd.css
 file to specify the styles you prefer.
+
+Using the CGI Programs on Windows
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The CGI programs compiled for Windows are included in the Windows package 
+starting with apcupsd-3.14.7. 
+
+The CGI programs included with the Windows package are intended 
+to be run on Windows. If your web server is running on Linux or another
+operating system, you will need to obtain binary packages for that platform 
+(or build them from source) instead. The windows build of the CGI programs has 
+been tested with the Apache web server for Win32. They should also work with MS 
+Internet Information Server (IIS).
+
+To use the programs, copy the contents of the ``cgi/`` directory from your 
+apcupsd installation directory to the ``cgi-bin/`` directory of your web server.
+Consult your web server's documentation for how to enable CGI programs to be
+executed. Sometimes special security settings are required.
+
+Configure the hosts.conf file as described above. The programs expect to find 
+the ``hosts.conf`` file and the ``apcupsd.css`` file in the directory 
+``\apcupsd\etc\apcupsd`` on the same drive letter as the web server's 
+``cgi-bin`` directory. If you installed apcupsd into ``C:\apcupsd`` (the 
+default) and your web server's ``cgi-bin/`` directory is also located on the 
+``C:`` drive, no further changes are necessary. If you installed apcupsd into a 
+different directory or your web server ``cgi-bin`` is on another drive, you will 
+need to relocate ``hosts.conf`` and ``apcupsd.css`` from the apcupsd install 
+location to ``\apcupsd\etc\apcupsd`` on the appropriate drive.
 
 multimon.cgi
 ~~~~~~~~~~~~
@@ -3014,8 +3040,8 @@ CGI Credits
 
 Many thanks go to Russell Kroll rkroll@exploits.org who wrote
 the CGI programs to work with his UPS Monitoring system named
-Network UPS Tools (NUT). Thanks
-also to Jonathan Benson jbenson@technologist.com for initially
+Network UPS Tools (NUT). Thanks also to Jonathan Benson 
+jbenson@technologist.com for initially
 adapting the upsstatus.cgi program to work with apcupsd.
 
 We have enhanced the bar graph program and hope that our changes
@@ -3054,7 +3080,7 @@ TCP Wrappers
 
 If your operating system does not support a host based firewall (a
 firewall running on the local machine) then you may try to get some
-of the funtionality of such a firewall with TCP Wrappers. As of
+of the functionality of such a firewall with TCP Wrappers. As of
 apcupsd version 3.8.2, TCP Wrappers are implemented if you turn
 them on when configuring ``./configure --with-libwrap``. With
 this code enabled, you may control who may access your apcupsd via
@@ -3254,7 +3280,7 @@ some decisions that usually result in one or more calls to the
 script located in ``/etc/apcupsd/apccontrol``. The ``apccontrol`` file
 is a shell script that acts on the first argument that apcupsd
 passes to it. These actions are set up by default to sane behavior
-for all psituations apcupsd is likely to detect from the UPS.
+for all situations apcupsd is likely to detect from the UPS.
 However, you can change the apccontrol behavior for every single
 action.
 
@@ -3267,7 +3293,7 @@ temporary events file (``/etc/apcupsd/apcupsd.events``), and they also
 generate a call to ``/etc/apcupsd/apccontrol`` which in turn will call
 any scripts you have placed in the ``/etc/apcupsd`` directory.
 
-Normally, ``/etc/apcupsd/acpcontrol`` is called only by apcupsd.
+Normally, ``/etc/apcupsd/apccontrol`` is called only by apcupsd.
 Consequently, you should not invoke it directly. However, it is
 important to understand how it functions, and in some cases, you
 may want to change the messages that it prints using ``wall``. We
@@ -3414,7 +3440,7 @@ The following *event* names are supported:
 **mainsback**
     This event is generated when the mains
     power returns after a powerout condition. The shutdown event may or
-    may not have been generated depending on the paramaters you have
+    may not have been generated depending on the parameters you have
     defined and the length of the power outage.
 
     *Default:* nothing
@@ -3431,7 +3457,7 @@ The following *event* names are supported:
     This event is generated when the ``MINUTES``
     value defined in the apcupsd.conf file expires while in a power
     fail condition. The ``MINUTES`` is the remaining runtime as internally
-    calculated by the UPS and monitored by apcuspd. After completing this 
+    calculated by the UPS and monitored by apcupsd. After completing this 
     event, apcupsd will immediately initiate a ``doshutdown`` event.
 
     *Default:* ``wall`` a message
@@ -3440,7 +3466,7 @@ The following *event* names are supported:
     This event is generated when the ``TIMEOUT`` value
     defined in the apcupsd.conf file expires while in a power fail
     condition. It indicates that the total time in a power failure has
-    been exeeded and the machine should be shutdown. After completing this 
+    been exceeded and the machine should be shutdown. After completing this 
     event, apcupsd will immediately initiate a ``doshutdown`` event.
 
     *Default:* ``wall`` a message
@@ -3489,7 +3515,7 @@ Apcupsd can work quite well in this environment by running one instance of
 apcupsd on the UPS server for each UPS to be controlled. That is, you install 
 a single copy of apcupsd but launch it multiple times using different 
 configuration files and scripts. (Older versions of apcupsd required you to 
-actually compile the daemon multiple times with different ``configre`` options. 
+actually compile the daemon multiple times with different ``configure`` options. 
 This is no longer required, as all necessary adjustments can be made in 
 ``apcupsd.conf``.) 
 
@@ -3608,7 +3634,7 @@ standard apcupsd redhat rc script:
          cut -f 5 -d ' '`
     fi
 
-    # Source function libarary
+    # Source function library
     . /etc/rc.d/init.d/functions
 
     case "$1" in
@@ -3923,8 +3949,8 @@ to include the following options (in addition to any others you need) on the
          ./configure --enable-snmp
 
 
-SNP Trap Catching
------------------
+SNMP Trap Catching
+------------------
 
 apcupsd-3.11.14 introduces support for SNMP trap catching with the
 APC PowerNet MIB driver. Previous versions polled the UPS status
@@ -4203,14 +4229,14 @@ look similar to...
 
 ...where the only thing you have changed is to append to the end of
 the line. This addition will prevent the operating system from
-interferring with apcupsd
+interfering with apcupsd
 
 Starting Apcupsd on Windows
 ---------------------------
 
 The installer will give you an opportunity start the Apcupsd
 service immediately. If you choose to start it manually, you may do
-so by selecting the "Start Apcuspd" link from the Start->Programs->Apcupsd 
+so by selecting the "Start Apcupsd" link from the Start->Programs->Apcupsd 
 folder.
 
 On Windows NT/2000/XP, you may alternatively go to the Control
@@ -4288,7 +4314,7 @@ monitor also configures apctray to not start by default. Using
 To close a monitor temporarily, right-click the tray icon and
 choose "Close this instance".
 
-apctray also aupports the ``/refresh`` switch which allows you to
+apctray also supports the ``/refresh`` switch which allows you to
 specify the interval (in seconds) at which apctray will poll the
 apcupsd NIS for status. If you do not specify ``/refresh``, the
 default is 1 second. For example, this command will add a monitor
@@ -4487,7 +4513,7 @@ signaled with a minus (``-``), or a minus minus (``--``). All the
 standard apcupsd options can be used on the Windows version. In
 addition, the following Windows only options are implemented:
 
-/service     Start apcupsdas a service
+/service     Start apcupsd as a service
 /run         Run the apcupsd application
 /install     Install apcupsd as a service in the system registry
 /remove      Uninstall apcupsd from the system registry
@@ -4664,7 +4690,7 @@ The first thing to do is to look at your log file, usually
 /var/log/messages because apcupsd writes more detailed information
 to the log file whenever there is an error.
 
-If you have a UPS that uses apcsmart protcol, you can manually test the 
+If you have a UPS that uses apcsmart protocol, you can manually test the 
 serial communications with the UPS by starting a serial port communications 
 program (such as minicom, tip, or cu) with the settings 2400 8N1 (2400 baud, 
 8 data bits, no parity, 1 stop bit). Be extremely careful what you send to
@@ -5006,13 +5032,13 @@ charge remaining (``BATTERYLEVEL``) or the remaining battery runtime
     disable if no ``NOLOGON`` directive is specified.
 
     The 'nologin' file will be created in the directory specified by
-    the ``NOLOGINDIR`` directive desribed below.
+    the ``NOLOGINDIR`` directive described below.
 
     As far as I can tell, the only useful types are disable and always
     since the difference in the time when the logout warning is given
     and shutdown occurs for the other types is very short (KES).
 
-        *disable* revents apcupsd from creating the nologin
+        *disable* prevents apcupsd from creating the nologin
         file. Consequently, any user can login during a power failure
         condition. Also, the ANNOY feature is disabled so users will not be
         warned to logoff the system.
@@ -5262,7 +5288,7 @@ STATUS output is in ASCII format with a single data value or piece
 of information on each line output. Because not all UPSes supply
 the same information, the output varies based on the type of UPS
 that you are using. In general, if the information is not available
-for your UPS, the line will be missing enturely or the data portion of 
+for your UPS, the line will be missing entirely or the data portion of 
 the output record will contain an ``N/A`` indicating that the information 
 is not available.
 
@@ -5452,7 +5478,7 @@ The meaning of the above variables are:
     to your equipment.
 
 **ITEMP**
-    Tnternal UPS temperature as supplied by the UPS.
+    Internal UPS temperature as supplied by the UPS.
 
 **ALARMDEL**
     The delay period for the UPS alarm.
@@ -5579,8 +5605,8 @@ get this information.
 
 
 
-The Shutown Sequence and its Discontents
-========================================
+The Shutdown Sequence and its Discontents
+=========================================
 
 Shutdown Sequence
 -----------------
@@ -5594,7 +5620,7 @@ The shutdown sequence is as follows:
 
 -  apcupsd detects that there is a power problem and it calls 
    ``/etc/apcupsd/apccontrol powerout``. By default this event
-   does nothing, but it can be overriden to notify users, etc.
+   does nothing, but it can be overridden to notify users, etc.
 
 -  After the configured ``ONBATTERYDELAY``, apcupsd
    calls ``/etc/apcupsd/apccontrol onbattery``, which normally sends a
@@ -5766,7 +5792,7 @@ Windows Considerations
 ----------------------
 
 Please see the `Killpower under Windows`_ chapter of this manual for
-conderations pertaining to shutdown and killpower on Windows.
+considerations pertaining to shutdown and killpower on Windows.
 
 
 .. include:: smartprotocol.rst
@@ -5782,10 +5808,10 @@ Apcupsd RPM Packaging FAQ
     and clones (rhel3 and rhel4), SuSE 9 & 10 (suse), and Mandrake
     (mdk). The package build is controlled by a define set at the
     beginning of the file. These defines basically just control the
-    dependancy information that gets coded into the finished rpm
+    dependency information that gets coded into the finished rpm
     package. So while you could technically build a package without
     defining a platform, or with an incorrect platform, and have it
-    install and run it would not contain correct dependancy information
+    install and run it would not contain correct dependency information
     for the rpm database. The platform define may be edited in the spec
     file directly (by default all defines are set to 0 or "not set").
     For example, to build the RedHat 7.x package find the line in the
@@ -5886,7 +5912,7 @@ Apcupsd RPM Packaging FAQ
 **I'm getting errors about not having permission when I try to build the packages. Do I need to be root?**
     No, you do not need to be root
     and, in fact, it is better practice to build rpm packages as a
-    non-root user. Apcupds packages are designed to be built by a
+    non-root user. Apcupsd's packages are designed to be built by a
     regular user but you must make a few changes on your system to do
     this. If you are building on your own system then the simplest
     method is to add write permissions for all to the build directory
@@ -5927,8 +5953,8 @@ Credits
 The success of apcupsd is due to the many people that helped in
 development, testing and in many other ways.
 
-Thank all the developers that worked hard to make APCUPSDone of the
-best piece of software for UPSmanagement.
+Thank all the developers that worked hard to make APCUPSD one of the
+best piece of software for UPS management.
 
 
 Contributors

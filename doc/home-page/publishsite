@@ -1,7 +1,7 @@
 #!/bin/sh
 wmk
 echo "Copying files to site"     
-sftp -b - shell.sourceforge.net <<-END
+sftp -b - web.sourceforge.net <<-END
 	cd /home/groups/a/ap/apcupsd/htdocs
 	-rm *
 	progress

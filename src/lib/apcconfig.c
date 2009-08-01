@@ -174,6 +174,19 @@ static const PAIRS table[] = {
    {"STATTIME", match_int,      WHERE(stattime), 0},
    {"DATATIME", match_int,      WHERE(datatime), 0},
 
+   /* Values used to set UPS EPROM for --configure */
+   {"SELFTEST",     match_str, WHERE(selftest),         SIZE(selftest)},
+   {"HITRANSFER",   match_int, WHERE(hitrans),          0},
+   {"LOTRANSFER",   match_int, WHERE(lotrans),          0},
+   {"LOWBATT",      match_int, WHERE(dlowbatt),         0},
+   {"WAKEUP",       match_int, WHERE(dwake),            0},
+   {"RETURNCHARGE", match_int, WHERE(rtnpct),           0},
+   {"OUTPUTVOLTS",  match_int, WHERE(NomOutputVoltage), 0},
+   {"SLEEP",        match_int, WHERE(dshutd),           0},
+   {"BEEPSTATE",    match_str, WHERE(beepstate),        SIZE(beepstate)},
+   {"BATTDATE",     match_str, WHERE(battdat),          SIZE(battdat)},
+   {"SENSITIVITY",  match_str, WHERE(sensitivity),      SIZE(sensitivity)},
+
    /* Configuration statements for network sharing of the UPS */
    {"UPSCLASS",  match_range, WHERE(upsclass),    upsclasses},
    {"UPSMODE",   match_range, WHERE(sharenet),    modes     },
@@ -196,19 +209,6 @@ static const PAIRS table[] = {
    {"NETPORT",    obsolete, FALSE, (GENINFO *)"NETPORT config directive is obsolete"   },
    {"NETSTATUS",  obsolete, FALSE, (GENINFO *)"NETSTATUS config directive is obsolete" },
    {"SERVERPORT", obsolete, FALSE, (GENINFO *)"SERVERPORT config directive is obsolete"},
-
-   /* Obsolete EEPROM options */
-   {"SELFTEST",     obsolete, FALSE, (GENINFO *)"SELFTEST config directive is obsolete"    },
-   {"HITRANSFER",   obsolete, FALSE, (GENINFO *)"HITRANSFER config directive is obsolete"  },
-   {"LOTRANSFER",   obsolete, FALSE, (GENINFO *)"LOTRANSFER config directive is obsolete"  },
-   {"LOWBATT",      obsolete, FALSE, (GENINFO *)"LOWBATT config directive is obsolete"     },
-   {"WAKEUP",       obsolete, FALSE, (GENINFO *)"WAKEUP config directive is obsolete"      },
-   {"RETURNCHARGE", obsolete, FALSE, (GENINFO *)"RETURNCHARGE config directive is obsolete"},
-   {"OUTPUTVOLTS",  obsolete, FALSE, (GENINFO *)"OUTPUTVOLTS config directive is obsolete" },
-   {"SLEEP",        obsolete, FALSE, (GENINFO *)"SLEEP config directive is obsolete"       },
-   {"BEEPSTATE",    obsolete, FALSE, (GENINFO *)"BEEPSTATE config directive is obsolete"   },
-   {"BATTDATE",     obsolete, FALSE, (GENINFO *)"BATTDATE config directive is obsolete"    },
-   {"SENSITIVITY",  obsolete, FALSE, (GENINFO *)"SENSITIVITY config directive is obsolete" },
 
    /* must be last */
    {NULL, 0, 0, 0}
@@ -588,6 +588,22 @@ void init_ups_struct(UPSINFO *ups)
    ups->runtime = 5;
    ups->netstats = TRUE;
    ups->statusport = NISPORT;
+   ups->upsmodel[0] = 0;           /* end of string */
+
+
+   /* EPROM values that can be changed with config directives */
+
+   astrncpy(ups->sensitivity, "-1", sizeof(ups->sensitivity));  /* no value */
+   ups->dwake = -1;
+   ups->dshutd = -1;
+   astrncpy(ups->selftest, "-1", sizeof(ups->selftest));        /* no value */
+   ups->lotrans = -1;
+   ups->hitrans = -1;
+   ups->rtnpct = -1;
+   ups->dlowbatt = -1;
+   ups->NomOutputVoltage = -1;
+   astrncpy(ups->beepstate, "-1", sizeof(ups->beepstate));      /* no value */
+
    ups->nisip[0] = 0;              /* no nis IP file as default */
 
    ups->lockfile = -1;
@@ -609,6 +625,51 @@ void init_ups_struct(UPSINFO *ups)
    astrncpy(ups->scriptdir, SYSCONFDIR, sizeof(ups->scriptdir));
    astrncpy(ups->pwrfailpath, PWRFAILDIR, sizeof(ups->pwrfailpath));
    astrncpy(ups->nologinpath, NOLOGDIR, sizeof(ups->nologinpath));
+   
+   /* Initialize UPS function codes */
+   ups->UPS_Cmd[CI_STATUS] = APC_CMD_STATUS;
+   ups->UPS_Cmd[CI_LQUAL] = APC_CMD_LQUAL;
+   ups->UPS_Cmd[CI_WHY_BATT] = APC_CMD_WHY_BATT;
+   ups->UPS_Cmd[CI_ST_STAT] = APC_CMD_ST_STAT;
+   ups->UPS_Cmd[CI_VLINE] = APC_CMD_VLINE;
+   ups->UPS_Cmd[CI_VMAX] = APC_CMD_VMAX;
+   ups->UPS_Cmd[CI_VMIN] = APC_CMD_VMIN;
+   ups->UPS_Cmd[CI_VOUT] = APC_CMD_VOUT;
+   ups->UPS_Cmd[CI_BATTLEV] = APC_CMD_BATTLEV;
+   ups->UPS_Cmd[CI_VBATT] = APC_CMD_VBATT;
+   ups->UPS_Cmd[CI_LOAD] = APC_CMD_LOAD;
+   ups->UPS_Cmd[CI_FREQ] = APC_CMD_FREQ;
+   ups->UPS_Cmd[CI_RUNTIM] = APC_CMD_RUNTIM;
+   ups->UPS_Cmd[CI_ITEMP] = APC_CMD_ITEMP;
+   ups->UPS_Cmd[CI_DIPSW] = APC_CMD_DIPSW;
+   ups->UPS_Cmd[CI_SENS] = APC_CMD_SENS;
+   ups->UPS_Cmd[CI_DWAKE] = APC_CMD_DWAKE;
+   ups->UPS_Cmd[CI_DSHUTD] = APC_CMD_DSHUTD;
+   ups->UPS_Cmd[CI_LTRANS] = APC_CMD_LTRANS;
+   ups->UPS_Cmd[CI_HTRANS] = APC_CMD_HTRANS;
+   ups->UPS_Cmd[CI_RETPCT] = APC_CMD_RETPCT;
+   ups->UPS_Cmd[CI_DALARM] = APC_CMD_DALARM;
+   ups->UPS_Cmd[CI_DLBATT] = APC_CMD_DLBATT;
+   ups->UPS_Cmd[CI_IDEN] = APC_CMD_IDEN;
+   ups->UPS_Cmd[CI_STESTI] = APC_CMD_STESTI;
+   ups->UPS_Cmd[CI_MANDAT] = APC_CMD_MANDAT;
+   ups->UPS_Cmd[CI_SERNO] = APC_CMD_SERNO;
+   ups->UPS_Cmd[CI_BATTDAT] = APC_CMD_BATTDAT;
+   ups->UPS_Cmd[CI_NOMBATTV] = APC_CMD_NOMBATTV;
+   ups->UPS_Cmd[CI_HUMID] = APC_CMD_HUMID;
+   ups->UPS_Cmd[CI_REVNO] = APC_CMD_REVNO;
+   ups->UPS_Cmd[CI_REG1] = APC_CMD_REG1;
+   ups->UPS_Cmd[CI_REG2] = APC_CMD_REG2;
+   ups->UPS_Cmd[CI_REG3] = APC_CMD_REG3;
+   ups->UPS_Cmd[CI_EXTBATTS] = APC_CMD_EXTBATTS;
+   ups->UPS_Cmd[CI_ATEMP] = APC_CMD_ATEMP;
+   ups->UPS_Cmd[CI_UPSMODEL] = APC_CMD_UPSMODEL;
+   ups->UPS_Cmd[CI_NOMOUTV] = APC_CMD_NOMOUTV;
+   ups->UPS_Cmd[CI_BADBATTS] = APC_CMD_BADBATTS;
+   ups->UPS_Cmd[CI_EPROM] = APC_CMD_EPROM;
+   ups->UPS_Cmd[CI_ST_TIME] = APC_CMD_ST_TIME;
+   ups->UPS_Cmd[CI_CYCLE_EPROM] = APC_CMD_CYCLE_EPROM;
+   ups->UPS_Cmd[CI_UPS_CAPS] = APC_CMD_UPS_CAPS;
 }
 
 void check_for_config(UPSINFO *ups, char *cfgfile)

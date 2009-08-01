@@ -57,4 +57,4 @@ uninstall-cgi:
 	$(call UNINST,$(sysconfdir)/multimon.conf.new)
 
 # Include dependencies
--include $(DEPS)
+-include $(SRCS:%.c=$(DEPDIR)/%.P)

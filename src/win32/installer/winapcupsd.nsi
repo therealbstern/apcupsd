@@ -159,8 +159,9 @@ FunctionEnd
 
 Function InstallServiceExit
   ; Create Start Menu Directory
-  SetShellVarContext all
   CreateDirectory "$SMPROGRAMS\Apcupsd"
+  ; Create start menu link for configuring apcupsd
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Edit Configuration File.lnk" "write" "$INSTDIR\etc\apcupsd\apcupsd.conf"
 
   ; If installed as a service already, remove it
   ReadRegDWORD $R0 HKLM "Software\Apcupsd" "InstalledService"
@@ -239,6 +240,8 @@ Function ApctrayExit
 FunctionEnd
 
 Section "-Startup"
+  SetShellVarContext all
+
   ; Check for existing installation
   ; In the future we should check for existing HKLM\Software\Apcupsd\InstDir
   ${If} ${FileExists} "$INSTDIR\etc\apcupsd\apcupsd.conf"
@@ -273,7 +276,6 @@ Section "Apcupsd Service" SecService
   CreateDirectory "$INSTDIR\driver"
   CreateDirectory "$INSTDIR\etc"
   CreateDirectory "$INSTDIR\etc\apcupsd"
-  CreateDirectory "$INSTDIR\examples"
   CreateDirectory "c:\tmp"
 
   ;
@@ -284,7 +286,7 @@ Section "Apcupsd Service" SecService
   SetOutPath "$INSTDIR\bin"
   File ${WINDIR}\mingwm10.dll
   File ${WINDIR}\pthreadGCE.dll
-  File ${DEPKGS}\libusb-win32\libusb0.dll
+  File ${DEPKGS}\lib\libusb0.dll
   File ${WINDIR}\apcupsd.exe
   File ${WINDIR}\smtp.exe
   File ${WINDIR}\apcaccess.exe
@@ -298,10 +300,10 @@ Section "Apcupsd Service" SecService
   File ${TOPDIR}\platforms\mingw\apcupsd.inf
   File ${TOPDIR}\platforms\mingw\apcupsd.cat
   File ${TOPDIR}\platforms\mingw\apcupsd_x64.cat
-  File ${DEPKGS}\libusb-win32\libusb0.sys
-  File ${DEPKGS}\libusb-win32\libusb0_x64.sys
-  File ${DEPKGS}\libusb-win32\libusb0.dll
-  File ${DEPKGS}\libusb-win32\libusb0_x64.dll
+  File ${DEPKGS}\bin\libusb0.sys
+  File ${DEPKGS}\bin\libusb0_x64.sys
+  File ${DEPKGS}\lib\libusb0.dll
+  File ${DEPKGS}\lib\libusb0_x64.dll
   File ${TOPDIR}\platforms\mingw\install.txt
 
   SetOutPath "$INSTDIR\etc\apcupsd"
@@ -331,9 +333,31 @@ Section "Tray Applet" SecApctray
   File ${WINDIR}\apctray.exe
 
   ; Create start menu link for apctray
-  SetShellVarContext all
   CreateDirectory "$SMPROGRAMS\Apcupsd"
   CreateShortCut "$SMPROGRAMS\Apcupsd\Apctray.lnk" "$INSTDIR\bin\apctray.exe"
+SectionEnd
+
+Section "Multimon CGI programs" SecMultimon
+  CreateDirectory "$INSTDIR"
+  CreateDirectory "$INSTDIR\cgi"
+  CreateDirectory "$INSTDIR\etc"
+  CreateDirectory "$INSTDIR\etc\apcupsd"
+
+  SetOutPath "$INSTDIR\cgi"
+  File ${WINDIR}\multimon.cgi
+  File ${WINDIR}\upsstats.cgi
+  File ${WINDIR}\upsfstats.cgi
+  File ${WINDIR}\upsimage.cgi
+  File ${WINDIR}\mingwm10.dll
+
+  SetOutPath "$INSTDIR\etc\apcupsd"
+  File ${TOPDIR}\src\cgi\apcupsd.css
+  File /oname=hosts.conf.new ${TOPDIR}\platforms\etc\hosts.conf
+
+  ; Rename hosts.conf.new to hosts.conf if it does not already exist
+  ${Unless} ${FileExists} "$INSTDIR\etc\apcupsd\hosts.conf"
+    Rename hosts.conf.new hosts.conf
+  ${EndUnless}
 SectionEnd
 
 Section "USB Driver" SecUsbDrv
@@ -341,7 +365,7 @@ Section "USB Driver" SecUsbDrv
   Pop $R0
   ${If} $R0 != false
     SetOutPath "$WINDIR\system32"
-    File ${DEPKGS}\libusb-win32\libusb0.dll
+    File ${DEPKGS}\lib\libusb0.dll
     ExecWait 'rundll32 libusb0.dll,usb_install_driver_np_rundll $INSTDIR\driver\apcupsd.inf'
   ${Else}
     MessageBox MB_OK "The USB driver cannot be automatically installed on Win98 or WinMe. \
@@ -355,9 +379,16 @@ Section "Documentation" SecDoc
   CreateDirectory "$INSTDIR\doc"
   File ${TOPDIR}\doc\manual\manual.html
   File ${TOPDIR}\doc\manual\*.png
+  File ${TOPDIR}\doc\*.txt
+
   ; Create Start Menu entry
-  SetShellVarContext all
-  CreateShortCut "$SMPROGRAMS\Apcupsd\Manual.lnk" "$INSTDIR\doc\manual.html"
+  CreateDirectory "$SMPROGRAMS\Apcupsd\Documentation"
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\Apcupsd User Manual.lnk"     "$INSTDIR\doc\manual.html"
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\apcupsd Reference.lnk"       "write" "$INSTDIR\doc\apcupsd.man.txt"
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\apcaccess Reference.lnk"     "write" "$INSTDIR\doc\apcaccess.man.txt"
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\apctest Reference.lnk"       "write" "$INSTDIR\doc\apctest.man.txt"
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\apccontrol Reference.lnk"    "write" "$INSTDIR\doc\apccontrol.man.txt"
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\Configuration Reference.lnk" "write" "$INSTDIR\doc\apcupsd.conf.man.txt"
 SectionEnd
 
 Section "-Finish"
@@ -412,10 +443,12 @@ LangString DESC_SecService ${LANG_ENGLISH} "Install Apcupsd on this system."
 LangString DESC_SecApctray ${LANG_ENGLISH} "Install Apctray. Shows status icon in the system tray."
 LangString DESC_SecUsbDrv ${LANG_ENGLISH} "Install USB driver. Required if you have a USB UPS. Not available on Windows 95 or NT."
 LangString DESC_SecDoc ${LANG_ENGLISH} "Install Documentation on this system."
+LangString DESC_SecMultimon ${LANG_ENGLISH} "Install MULTIMON cgi scripts for web-based monitoring."
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
   !insertmacro MUI_DESCRIPTION_TEXT ${SecService} $(DESC_SecService)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecApctray} $(DESC_SecApctray)
+  !insertmacro MUI_DESCRIPTION_TEXT ${SecMultimon} $(DESC_SecMultimon)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecUsbDrv} $(DESC_SecUsbDrv)
   !insertmacro MUI_DESCRIPTION_TEXT ${SecDoc} $(DESC_SecDoc)
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
@@ -456,8 +489,7 @@ Section "Uninstall"
 
   ; remove start menu items
   SetShellVarContext all
-  Delete /REBOOTOK "$SMPROGRAMS\Apcupsd\*"
-  RMDir /REBOOTOK "$SMPROGRAMS\Apcupsd"
+  RMDir /r /REBOOTOK "$SMPROGRAMS\Apcupsd"
 
   ; remove files and uninstaller (preserving config for now)
   Delete /REBOOTOK "$INSTDIR\bin\mingwm10.dll"
@@ -480,7 +512,6 @@ Section "Uninstall"
   Delete /REBOOTOK "$INSTDIR\driver\apcupsd.cat"
   Delete /REBOOTOK "$INSTDIR\driver\apcupsd_x64.cat"
   Delete /REBOOTOK "$INSTDIR\driver\install.txt"
-  Delete /REBOOTOK "$INSTDIR\examples\*"
   Delete /REBOOTOK "$INSTDIR\README.txt"
   Delete /REBOOTOK "$INSTDIR\COPYING"
   Delete /REBOOTOK "$INSTDIR\ChangeLog"
@@ -488,7 +519,14 @@ Section "Uninstall"
   Delete /REBOOTOK "$INSTDIR\Uninstall.exe"
   Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apccontrol.bat"
   Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apcupsd.conf.new"
+  Delete /REBOOTOK "$INSTDIR\etc\apcupsd\hosts.conf.new"
   Delete /REBOOTOK "$INSTDIR\doc\*"
+  Delete /REBOOTOK "$INSTDIR\cgi\multimon.cgi"
+  Delete /REBOOTOK "$INSTDIR\cgi\upsstats.cgi"
+  Delete /REBOOTOK "$INSTDIR\cgi\upsfstats.cgi"
+  Delete /REBOOTOK "$INSTDIR\cgi\upsimage.cgi"
+  Delete /REBOOTOK "$INSTDIR\cgi\mingwm10.dll"
+  Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apcupsd.css"
 
   ; Delete conf if user approves
   ${If} ${FileExists} "$INSTDIR\etc\apcupsd\apcupsd.conf"
@@ -496,11 +534,13 @@ Section "Uninstall"
     ${If} ${Cmd} 'MessageBox MB_YESNO|MB_ICONQUESTION "Would you like to delete the current configuration and events files?" IDYES'
       Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apcupsd.conf"
       Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apcupsd.events"
+      Delete /REBOOTOK "$INSTDIR\etc\apcupsd\hosts.conf"
     ${EndIf}
   ${EndIf}
 
   ; remove directories used
   RMDir "$INSTDIR\bin"
+  RMDir "$INSTDIR\cgi"
   RMDir "$INSTDIR\driver"
   RMDir "$INSTDIR\etc\apcupsd"
   RMDir "$INSTDIR\etc"

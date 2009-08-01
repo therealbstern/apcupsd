@@ -44,4 +44,4 @@ uninstall-gapcmon:
 	$(call UNINST,$(bindir)/gapcmon)
 
 # Include dependencies
--include $(DEPS)
+-include $(SRCS:%.c=$(DEPDIR)/%.P)

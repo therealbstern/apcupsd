@@ -254,8 +254,4 @@ int winioctl(int fd, int func, int *addr);
   int nanosleep(const struct timespec *req, struct timespec *rem);
 #endif
 
-/* In smartcmd.c */
-int *GetSmartCmdMap();
-const char *CItoString(int ci);
-
 #endif   /* _EXTERN_H */
