@@ -8,6 +8,10 @@
 <a href="manual/manual.html">Online Manual</a><br>
 <a href="manual/manual.pdf">PDF Manual</a><br>
 
+&nbsp;<br>
+<font color="#0000ff" size=+2><b>Downloads</b></font><br>
+<a href="dl.php">Current Version</a><br>
+<a href="http://prdownloads.sourceforge.net/apcupsd">All Downloads</a><br>
 
 &nbsp;<br>
 <font color="#0000ff" size=+2><b>Support</b></font><br>
@@ -18,6 +22,4 @@
 &nbsp;<br>
 <font color="#0000ff" size=+2><b>SourceForge</b></font><br>
 <a href="http://sourceforge.net/projects/apcupsd">Project Page</a><br>
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413">Current Downloads</a><br>
-<a href="http://prdownloads.sourceforge.net/apcupsd">All Downloads</a><br>
 <a href="http://sourceforge.net/cvs/?group_id=54413">CVS</a><br>
