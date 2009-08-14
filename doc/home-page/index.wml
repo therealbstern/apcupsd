@@ -14,9 +14,7 @@ consumption rates. Apcupsd is licensed under the GPL version 2.
 <p>
 
 <h2>Recent Apcupsd Releases</h2>
-<h3><i><u>Stable:</u></i>&nbsp;3.14.7 (1 August 2009) [
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413">Download</a>
-]</h3>
+<h3><i><u>Stable:</u></i>&nbsp;3.14.7 (1 August 2009) [&nbsp;<a href="dl.php">Download</a>&nbsp;]</h3>
 Release 3.14.7 now includes the Multimon CGI programs build for Windows as part
 of the Windows package. It has a fix for the battery date (BATTDAT) showing 
 an invalid value on certain USB models as well as few other minor bug fixes. 
@@ -46,13 +44,8 @@ release notes</a>.</i>
 <li>Updated documentation
 <li>Support for the QNX operating system
 </ul>
-<h3><i><u>Previous Stable:</u></i>&nbsp;3.12.4 (19 August 2006) [
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=49059&release_id=440657">Source</a>
-&nbsp;/&nbsp;
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=73150&release_id=440720">RPMs</a>
-&nbsp;/&nbsp;
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=73153&release_id=440658">Win32</a>
-]</h3>
+<h3><i><u>Previous Stable:</u></i>&nbsp;3.12.4 (19 August 2006) 
+[&nbsp;<a href="dl.php?version=3.12.4">Download</a>&nbsp;]</h3>
 This is a bug fix release which includes fixes for SNMP crash in the
 face of network errors. Also status and data logging interval was often
 off by one period. NIS port now properly defaults to 3551 or value 
@@ -63,7 +56,7 @@ Highlights of the 3.12.x release series include a GUI installer for
 Win32 systems, battery disconnect/reconnect detection for smart serial
 and USB connections, SNMP trap catching for quicker SNMP event 
 responses, and numerous bug fixes. Please be sure to read the
-<a href="http://sourceforge.net/project/shownotes.php?release_id=440658&group_id=54413">ReleaseNotes</a> 
+<a href="https://sourceforge.net/project/shownotes.php?release_id=440658&group_id=54413">ReleaseNotes</a> 
 to learn about the new features and for important information about
 upcoming releases.
 
