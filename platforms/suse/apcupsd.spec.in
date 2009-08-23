@@ -261,17 +261,11 @@ cd examples
 make hid-ups
 cd ../
 
-# build pdf manual
-#cd doc/latex
-#make
-#cd ../../
-
 %install
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 
 mkdir -p $RPM_BUILD_ROOT%{initdir}
 mkdir -p $RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/cgi
-#mkdir -p $RPM_BUILD_ROOT%{halpolicydir}
 
 make \
         DESTDIR=$RPM_BUILD_ROOT \
@@ -300,9 +294,26 @@ install -m744 examples/hid-ups \
 install -m744 examples/make-hiddev \
               $RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/make-hiddev
 
-# this should be done by make
-#install -m644 platforms/80-apcupsd-ups-policy.fdi \
-#              $RPM_BUILD_ROOT%{halpolicydir}/
+%define rh_platform 0
+%{?build_fedora_core:%define rh_platform 1}
+%{?build_rhel3:%define rh_platform 1}
+%{?build_rhel4:%define rh_platform 1}
+%{?build_rhel5:%define rh_platform 1}
+
+%if %{rh_platform} && %{gapcmon}
+mkdir -p $RPM_BUILD_ROOT%{_prefix}/share/autostart
+mkdir -p $RPM_BUILD_ROOT%{_prefix}/share/gnome/autostart
+cp $RPM_BUILD_ROOT%{_prefix}/share/applications/gapcmon.desktop $RPM_BUILD_ROOT%{_prefix}/share/autostart/
+cp $RPM_BUILD_ROOT%{_prefix}/share/applications/gapcmon.desktop $RPM_BUILD_ROOT%{_prefix}/share/gnome/autostart/
+%endif
+
+%if %{suse} && %{gapcmon}
+mkdir -p $RPM_BUILD_ROOT/opt/kde3/share/autostart
+mkdir -p $RPM_BUILD_ROOT%{_prefix}/share/gnome/autostart
+cp $RPM_BUILD_ROOT%{_prefix}/share/applications/gapcmon.desktop $RPM_BUILD_ROOT/opt/kde3/share/autostart/
+cp $RPM_BUILD_ROOT%{_prefix}/share/applications/gapcmon.desktop $RPM_BUILD_ROOT%{_prefix}/share/gnome/autostart/
+%endif
+
 
 %clean
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
@@ -347,13 +358,14 @@ rm -f $RPM_BUILD_DIR/Release_Notes-%{version}-%{release}.txt
 %{_prefix}/share/pixmaps/online.png
 %{_prefix}/share/pixmaps/unplugged.png
 %endif
-
-%pre
-
-# are we upgrading?
-if [ -s %{_sysconfdir}/apcupsd/apcupsd.conf ];then
-	UPGRADE=Y
-fi
+%if %{gapcmon} && %{rh_platform}
+%{_prefix}/share/autostart/gapcmon.desktop
+%{_prefix}/share/gnome/autostart/gapcmon.desktop
+%endif
+%if %{gapcmon} && %{suse}
+/opt/kde3/share/autostart/gapcmon.desktop
+%{_prefix}/share/gnome/autostart/gapcmon.desktop
+%endif
 
 %post
 
@@ -399,7 +411,7 @@ chmod 744 %{initdir}/halt
 fi
 
 # restart the daemon if we are upgrading
-if [ "$UPGRADE" = "Y" ];then
+if [ "$1" -ge "2" ] ; then
 	%{initdir}/apcupsd restart
 fi
 
@@ -407,7 +419,7 @@ fi
 
 %preun
 
-if [ $1 = 0 ] ; then
+if [ "$1" = 0 ] ; then
 
         # remove startup links
         /sbin/chkconfig --del apcupsd
@@ -432,6 +444,10 @@ if [ $1 = 0 ] ; then
 fi
 
 %changelog
+* Sun Aug 23 2009 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- add gapcmon to autostart directories
+* Sat Aug 01 2009 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- fix restart on upgrade using $1 variable. remove previously commented out code
 * Sat May 16 2009 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - comment out latex build
 * Fri May 15 2009 Adam Kropelin <akropel1 at rochester.rr.com>
