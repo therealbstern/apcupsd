@@ -60,6 +60,9 @@ static const struct {
    {"mintimel",   "MINTIMEL", 1},
    {"model",      "MODEL",    0},
    {"nombattv",   "NOMBATTV", 1},
+   {"nominv",     "NOMINV",   1},
+   {"nomoutv",    "NOMOUTV",  1},
+   {"nompower",   "NOMPOWER", 1},
    {"outputfreq", "LINEFREQ", 1},
    {"outputv",    "OUTPUTV",  1},
    {"version",    "VERSION",  1},
@@ -473,6 +476,9 @@ int net_ups_get_capabilities(UPSINFO *ups)
       ups->UPS_Cap[CI_SERNO] = getupsvar(ups, "serialno", answer, sizeof(answer));
       ups->UPS_Cap[CI_BATTDAT] = getupsvar(ups, "battdate", answer, sizeof(answer));
       ups->UPS_Cap[CI_NOMBATTV] = getupsvar(ups, "nombattv", answer, sizeof(answer));
+      ups->UPS_Cap[CI_NOMINV] = getupsvar(ups, "nominv", answer, sizeof(answer));
+      ups->UPS_Cap[CI_NOMOUTV] = getupsvar(ups, "nomoutv", answer, sizeof(answer));
+      ups->UPS_Cap[CI_NOMPOWER] = getupsvar(ups, "nompower", answer, sizeof(answer));
       ups->UPS_Cap[CI_REVNO] = getupsvar(ups, "firmware", answer, sizeof(answer));
       nid->got_caps = true;
    } else {
@@ -614,6 +620,15 @@ int net_ups_read_static_data(UPSINFO *ups)
 
       if (GETVAR(CI_NOMBATTV, "nombattv"))
          ups->nombattv = atof(answer);
+
+      if (GETVAR(CI_NOMINV, "nominv"))
+         ups->NomInputVoltage = (int)atof(answer);
+
+      if (GETVAR(CI_NOMOUTV, "nomoutv"))
+         ups->NomOutputVoltage = (int)atof(answer);
+
+      if (GETVAR(CI_NOMPOWER, "nompower"))
+         ups->NomPower = (int)atof(answer);
 
       if (GETVAR(CI_REVNO, "firmware"))
          astrncpy(ups->firmrev, answer, sizeof(ups->firmrev));
