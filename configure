@@ -12308,10 +12308,7 @@ darwin)
    LOCKDIR=/var/tmp
    DFILES="\
       platforms/darwin/apcupsd \
-      platforms/darwin/apccontrol \
-      platforms/darwin/ApcupsdDaemon.Info.plist \
-      platforms/darwin/ApcupsdPkg.Info.plist \
-      platforms/darwin/ApcupsdUsbShim.Info.plist"
+      platforms/darwin/apccontrol"
    ;;
 qnx)
    PTHREAD_LFLAGS=""

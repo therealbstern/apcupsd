@@ -1,5 +1,12 @@
 #!/bin/sh
 
+# Fix permissions on /Library/StartupItems/apcupsd since packagemaker
+# insists on getting them wrong
+chmod 0755 /Library/StartupItems/apcupsd
+
+# Ensure kext cache is rebuilt
+touch /System/Library/Extensions
+
 if [ -f /etc/apcupsd/apcupsd.conf.SAVE ] ; then
 	# Appears to be an upgrade, so move user's original apcupsd.conf
 	# back into place and save new one as apcupsd.conf.new.
