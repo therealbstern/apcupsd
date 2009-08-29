@@ -4,7 +4,7 @@ SUBDIRS =
 include $(topdir)/autoconf/targets.mak
 
 # PackageMaker variables
-PACKAGEMAKER=/Developer/Tools/packagemaker
+PACKAGEMAKER=/Developer/usr/bin/packagemaker
 PKGROOT=/tmp/apcupsd-pkg
 
 all-install: install-darwin install-$(USBDRV)
@@ -71,29 +71,19 @@ uninstall-darwin:
 	@echo " "
 	@echo "================================================="
 
-# NOTE: The seeminly-pointless "PWD=`pwd`" stuff below is to work around
-# a packagemaker bug in XCode-2.5.
-# <http://lists.apple.com/archives/Installer-dev/2007/Jun/msg00061.html>
 apcupsd.pkg:
 	rm -rf $(PKGROOT)
 	mkdir $(PKGROOT)
-	mkdir $(PKGROOT)/ApcupsdDaemon.Root
-	mkdir $(PKGROOT)/ApcupsdUsbShim.Root
-	mkdir $(PKGROOT)/ApcupsdDaemon.Resources
-	mkdir $(PKGROOT)/ApcupsdUsbShim.Resources
-	mkdir $(PKGROOT)/ApcupsdPkg.Resources
-	mkdir $(PKGROOT)/Packages
+	mkdir $(PKGROOT)/Apcupsd.Resources
+	mkdir $(PKGROOT)/Apcupsd.Scripts
+	mkdir $(PKGROOT)/Apcupsd.Root
 	mkdir $(PKGROOT)/Apcupsd
-	( cd $(topdir) && DESTDIR=$(PKGROOT)/ApcupsdDaemon.Root make install )
-	mv $(PKGROOT)/ApcupsdDaemon.Root/System $(PKGROOT)/ApcupsdUsbShim.Root
-	cp $(topdir)/ReleaseNotes $(PKGROOT)/ApcupsdPkg.Resources/ReadMe.txt
-	cp $(topdir)/COPYING $(PKGROOT)/ApcupsdPkg.Resources/License.txt
-	cp Welcome.txt $(PKGROOT)/ApcupsdPkg.Resources
-	cp ApcupsdDaemon.preflight $(PKGROOT)/ApcupsdDaemon.Resources/preflight
-	cp ApcupsdDaemon.postflight $(PKGROOT)/ApcupsdDaemon.Resources/postflight
-	cp ApcupsdUsbShim.postflight $(PKGROOT)/ApcupsdUsbShim.Resources/postflight
-	PWD=`pwd` $(PACKAGEMAKER) -build -v -p $(PKGROOT)/Packages/ApcupsdDaemon.pkg -f $(PKGROOT)/ApcupsdDaemon.Root -r $(PKGROOT)/ApcupsdDaemon.Resources -i ApcupsdDaemon.Info.plist -d ApcupsdDaemon.Description.plist
-	PWD=`pwd` $(PACKAGEMAKER) -build -v -p $(PKGROOT)/Packages/ApcupsdUsbShim.pkg -f $(PKGROOT)/ApcupsdUsbShim.Root -r $(PKGROOT)/ApcupsdUsbShim.Resources -i ApcupsdUsbShim.Info.plist -d ApcupsdUsbShim.Description.plist
-	PWD=`pwd` $(PACKAGEMAKER) -build -v -p $(PKGROOT)/Apcupsd/Apcupsd-$(VERSION).pkg -mi $(PKGROOT)/Packages -r $(PKGROOT)/ApcupsdPkg.Resources -i ApcupsdPkg.Info.plist -d ApcupsdPkg.Description.plist
+	( cd $(topdir) && DESTDIR=$(PKGROOT)/Apcupsd.Root make install )
+	cp $(topdir)/ReleaseNotes $(PKGROOT)/Apcupsd.Resources/ReadMe.txt
+	cp $(topdir)/COPYING $(PKGROOT)/Apcupsd.Resources/License.txt
+	cp Welcome.txt $(PKGROOT)/Apcupsd.Resources
+	cp ApcupsdDaemon.preflight $(PKGROOT)/Apcupsd.Scripts/preflight
+	cp ApcupsdDaemon.postflight $(PKGROOT)/Apcupsd.Scripts/postflight
+	$(PACKAGEMAKER) -v --no-relocate --root $(PKGROOT)/Apcupsd.Root --info ApcupsdDaemon.Info.plist --resources $(PKGROOT)/Apcupsd.Resources --scripts $(PKGROOT)/Apcupsd.Scripts --id com.apcupsd.apcupsd --root-volume-only --target 10.4 --version $(VERSION) --out $(PKGROOT)/Apcupsd/Apcupsd-$(VERSION).pkg
 	hdiutil create -ov -srcfolder $(PKGROOT)/Apcupsd -volname Apcupsd-$(VERSION) Apcupsd-$(VERSION).dmg
 
