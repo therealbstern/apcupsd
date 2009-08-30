@@ -1,16 +1,41 @@
+10.4+ Compatibility builds from XCode 3.x
+
+- Install XCode-3.x (tested on 3.2) and be sure to select the 10.4 SDK
+
+- Build dependent libs (libusb, libpng, libgd)
+
+   CPPFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4" \
+     LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4" \
+     CC=gcc-4.0 CXX=g++-4.0 ./configure \
+     --prefix=/Developer/SDKs/MacOSX10.4u.sdk/usr/local --disable-shared
+   make
+   sudo make install
+
+- Build apcupsd
+
+   CPPFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4" \
+     LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4" \
+     CC=gcc-4.0 CXX=g++-4.0 ./configure \
+     --enable-usb --enable-cgi --enable-snmp
+   make
+
+- Build binary package
+
+   cd platforms/darwin
+   sudo make apcupsd.pkg
+
+-------------------------------------------------------------------------------
+
 Building APCUPSD with Universal Binary support on Mac OS X
+(This is somewhat outdated now. Preserved for historical interest.
 
 - Install Apple DevTools
-- XCode 3 on Leopard builds the binaries ok, but packaging fails due
-  to what appears to be a packagemaker bug.
-- XCode 2.x works well for both building and packaging. The result will
-  run on both 10.4 and 10.5.
-- If using XCode 2, be sure to select the MacOSX10.4u (10.4 Universal) 
-  SDK when installing
+- XCode-2.x and XCode-3.x will both build the binaries ok, but the
+  packaging only works on XCode-3.x
+- Be sure to select the MacOSX10.4u (10.4 Universal) SDK when installing
 - Build dependent libraries (libusb) with UB support (see below)
-- Build APCUPSD 
+- Build APCUPSD
 - Build install package, if desired
-
 
 libusb:
  Use this configure line:
@@ -20,7 +45,6 @@ libusb:
        CPPFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk" \
        CXXFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
        ./configure --disable-dependency-tracking --disable-shared
-
 
 apcupsd:
  Use these commands (you can customize the --enable-xxx stuff):
