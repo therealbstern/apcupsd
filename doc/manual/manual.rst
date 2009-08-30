@@ -950,18 +950,22 @@ Mac OS X (Darwin) USB Configuration
 Platforms and Versions
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Apcupsd supports USB UPSes on Mac OS X (Darwin) 10.3.x and higher.
+Apcupsd supports USB UPSes on Mac OS X (Darwin) 10.4.x and higher.
 Both Intel and PowerPC platforms are supported.
 
 Building Apcupsd with USB
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Some specific packages are necessary when building Apcupsd with USB
-support on Darwin. You must install libusb-0.1.12 or higher which
+support on Darwin. You must install libusb-0.1.12 which
 can be obtained from MacPorts (http://www.macports.org) (formerly
-DarwinPorts) or Fink (http://fink.sourceforge.net). Note that
-Apcupsd is sensitive to the install location of libusb, so beware
-if you change it from the default.
+DarwinPorts) or Fink (http://fink.sourceforge.net) or downloaded and built
+by hand (http://www.libusb.org). *You must not use 
+libusb-1.x or higher (apcupsd does not support the new 1.0 APIs) nor 
+any version earlier than 0.1.12 (earlier versions have a bug that apcupsd
+triggers). Generally that means you must use exactly 0.1.12.* Note that 
+Apcupsd is sensitive to the install location of libusb, so beware if you 
+change it from the default.
 
 Apcupsd should be built using gcc, preferably from the XCode
 development tools. Currently the maintainer is using gcc-4.0.1 from
