@@ -915,6 +915,49 @@ static void do_smart_testing(void)
 #ifdef HAVE_APCSMART_DRIVER
 static void smart_ttymode(void)
 {
+#ifdef HAVE_MINGW
+   // This is crap. Windows has no sane way (that I can find) to watch two
+   // fds for activity from a single thread without involving the overly
+   // complex "overlapped" io junk. So we will resort to polling.
+
+   // Save any existing timeouts on the UPS fd
+   HANDLE hnd = (HANDLE)_get_osfhandle(ups->fd);
+   COMMTIMEOUTS orig_ups_ct;
+   GetCommTimeouts(hnd, &orig_ups_ct);
+
+   // Reset UPS fd timeout to 50 msec
+   COMMTIMEOUTS ct;
+   ct.ReadIntervalTimeout = MAXDWORD;
+   ct.ReadTotalTimeoutMultiplier = 0;
+   ct.ReadTotalTimeoutConstant = 50;
+   ct.WriteTotalTimeoutMultiplier = 0;
+   ct.WriteTotalTimeoutConstant = 0;
+   SetCommTimeouts(hnd, &ct);
+
+   pmsg("Enter an ESC character (or ctl-[) to exit.\n\n");
+
+   char ch;
+   while (1)
+   {
+      // Waits up to 50 msec for a char from the UPS
+      if (read(ups->fd, &ch, 1) == 1)
+         putch(ch);
+
+      // Check if keyboard key was hit and read it (only Windows would
+      // have a function dedicated to checking if a key has been pressed!)
+      if (kbhit())
+      {
+         ch = getch();
+         if (ch == 0x1b)
+            break;
+         else
+            write(ups->fd, &ch, 1);
+      }
+   }
+
+   // Restore original timeouts on UPS fd
+   SetCommTimeouts(hnd, &orig_ups_ct);
+#else
    char ch;
    struct termios t, old_term_params;
    fd_set rfds;
@@ -969,6 +1012,7 @@ static void smart_ttymode(void)
    }
 
    tcsetattr(0, TCSANOW, &old_term_params);
+#endif
 }
 
 
