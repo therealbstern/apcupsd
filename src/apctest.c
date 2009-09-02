@@ -85,6 +85,7 @@ static void usb_get_manf_date(void);
 static void usb_set_alarm(void);
 static void usb_set_sens(void);
 static void usb_set_xferv(int lowhigh);
+static void usb_calibration();
 #endif
 
 static void strip_trailing_junk(char *cmd);
@@ -1594,7 +1595,8 @@ static void do_usb_testing(void)
            "8)  Set sensitivity\n"
            "9)  Set low transfer voltage\n"
            "10) Set high transfer voltage\n"
-           "11) Quit\n\n");
+           "11) Perform battery calibration\n"
+           "12) Quit\n\n");
 
       cmd = get_cmd("Select function number: ");
       if (cmd) {
@@ -1632,6 +1634,9 @@ static void do_usb_testing(void)
             usb_set_xferv(1);
             break;
          case 11:
+            usb_calibration();
+            break;
+         case 12:
             quit = TRUE;
             break;
          default:
@@ -1913,30 +1918,24 @@ static void usb_get_self_test_result(void)
    }
 }
 
-static void usb_run_self_test(void)
+static bool usb_clear_test_result()
 {
-   int result;
-   int timeout;
+   int timeout, result;
 
-   pmsg("\nThis test instructs the UPS to perform a self-test\n"
-        "operation and reports the result when the test completes.\n");
+   pmsg("Clearing previous self test result...");
 
-   if (!usb_read_int_from_ups(ups, CI_ST_STAT, &result)) {
-      pmsg("\nI don't know how to run a self test on your UPS\n"
-           "or your UPS does not support self test.\n");
-      return;
-   }
+   // abort battery calibration in case it's in progress
+   usb_write_int_to_ups(ups, CI_ST_STAT, 3, "SelftestStatus");
 
-   pmsg("\nClearing previous self test result...");
    if (!usb_write_int_to_ups(ups, CI_ST_STAT, 0, "SelftestStatus")) {
       pmsg("FAILED\n");
-      return;
+      return false;
    }
 
    for (timeout = 0; timeout < 10; timeout++) {
       if (!usb_read_int_from_ups(ups, CI_ST_STAT, &result)) {
          pmsg("FAILED\n");
-         return;
+         return false;
       }
 
       if (result == 6) {
@@ -1949,8 +1948,28 @@ static void usb_run_self_test(void)
 
    if (timeout == 10) {
       pmsg("FAILED\n");
+      return false;
+   }
+   
+   return true;
+}
+
+static void usb_run_self_test(void)
+{
+   int result;
+   int timeout;
+
+   pmsg("\nThis test instructs the UPS to perform a self-test\n"
+        "operation and reports the result when the test completes.\n\n");
+
+   if (!usb_read_int_from_ups(ups, CI_ST_STAT, &result)) {
+      pmsg("I don't know how to run a self test on your UPS\n"
+           "or your UPS does not support self test.\n");
       return;
    }
+
+   if (!usb_clear_test_result())
+      return;
 
    pmsg("Initiating self test...");
    if (!usb_write_int_to_ups(ups, CI_ST_STAT, 1, "SelftestStatus")) {
@@ -2079,6 +2098,142 @@ static void usb_get_manf_date(void)
     */
    pmsg("Manufacturing date: %02u/%02u/%04u\n",
       (result & 0x1e0) >> 5, result & 0x1f, 1980 + ((result & 0xfe00) >> 9));
+}
+
+static void usb_calibration()
+{
+   int result;
+   int aborted;
+   int ilastbl;
+
+   if (!ups->UPS_Cap[CI_ST_STAT] || 
+       !ups->UPS_Cap[CI_BATTLEV] ||
+       !ups->UPS_Cap[CI_LOAD]) {
+      pmsg("\nI don't know how to run a battery calibration on your UPS\n"
+             "or your UPS does not support battery calibration\n");
+      return;
+   }
+
+   pmsg("This test instructs the UPS to perform a battery calibration\n"
+        "operation and reports the result when the process completes.\n"
+        "The battery level must be at 100%% and the load must be at least\n"
+        "10%% to begin this test.\n\n");
+
+   if (!usb_read_int_from_ups(ups, CI_BATTLEV, &result)) {
+      pmsg("Failed to read current battery level\n");
+      return;
+   }
+
+   if (result == 100) {
+      pmsg("Battery level is %d%% -- OK\n", result);
+   }
+   else {
+      pmsg("Battery level %d%% is insufficient to run test.\n", result);
+      return;
+   }
+
+   if (!usb_read_int_from_ups(ups, CI_LOAD, &result)) {
+      pmsg("Failed to read current load level\n");
+      return;
+   }
+
+   if (result >= 10) {
+      pmsg("Load level is %d%% -- OK\n", result);
+   }
+   else {
+      pmsg("Load level %d%% is insufficient to run test.\n", result);
+      return;
+   }
+
+   if (!usb_clear_test_result())
+      return;
+
+   pmsg("\nThe battery calibration should automatically end\n"
+          "when the battery level drops below about 25%%.\n"
+          "This process can take minutes or hours, depending on\n"
+          "the size of your UPS and the load attached.\n\n");
+
+   pmsg("Initiating battery calibration...");
+   if (!usb_write_int_to_ups(ups, CI_ST_STAT, 2, "SelftestStatus")) {
+      pmsg("FAILED\n");
+      return;
+   }
+
+   pmsg("INITIATED\n\n");
+
+   pmsg("Waiting for calibration to complete...\n"
+        "To abort the calibration, press ENTER.\n");
+
+	ilastbl = 0;
+   while (1) {
+#ifndef HAVE_MINGW
+      fd_set rfds;
+      struct timeval tv;
+      FD_ZERO(&rfds);
+      FD_SET(STDIN_FILENO, &rfds);
+      tv.tv_sec = 10;
+      tv.tv_usec = 0;
+
+      aborted = select(STDIN_FILENO+1, &rfds, NULL, NULL, &tv) == 1;
+      if (aborted) {
+         while (fgetc(stdin) != '\n')
+            ;
+      }
+#else
+      aborted = false;
+      for (int i = 0; i < 100 && !aborted; i++) {
+         while (kbhit() && !aborted)
+            aborted = getch() == '\r';
+         if (!aborted)
+         {
+            struct timespec ts;
+            ts.tv_sec = 0;
+            ts.tv_nsec = 100000000;
+            nanosleep(&ts, NULL);
+         }
+      }
+#endif
+
+      if (aborted) {
+         pmsg("\n\nUser input detected; aborting calibration...");
+         if (!usb_write_int_to_ups(ups, CI_ST_STAT, 3, "SelftestStatus")) {
+            pmsg("FAILED\n");
+         }
+         else {
+            pmsg("ABORTED\n");
+         }
+         return;
+      }
+         
+      if (!usb_read_int_from_ups(ups, CI_ST_STAT, &result)) {
+         pmsg("\n\nError reading status; aborting calibration...");
+         if (!usb_write_int_to_ups(ups, CI_ST_STAT, 3, "SelftestStatus")) {
+            pmsg("FAILED\n");
+         }
+         else {
+            pmsg("ABORTED\n");
+         }
+         return;
+      }
+
+      if (result != 5) {
+         pmsg("\nCALIBRATION COMPLETED\n");
+         break;
+      }
+
+      // Output the battery level
+      if (usb_read_int_from_ups(ups, CI_BATTLEV, &result)) {
+         if (ilastbl == result)
+            pmsg(".");
+         else
+            pmsg("\nBattery level: %d%%", result);
+         ilastbl = result;
+	   }
+      else
+         pmsg(".");
+   }
+
+   usb_get_self_test_result();
 }
 
 #endif
