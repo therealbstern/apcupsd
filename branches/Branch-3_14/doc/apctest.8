@@ -92,7 +92,24 @@ activates SmartBoost.
 .Ss Option 10) Set high transfer voltage
 Sets the high voltage level at which the UPS switches to battery or 
 activates SmartTrim.
-.Ss Option 11) Quit
+.Ss Option 11) Perform battery calibration
+This performs a battery runtime calibration. This can only
+be performed if your battery is charged to 100% of capacity. 
+The runtime calibration discharges the UPS battery to 
+approximately 25% of capacity. The exact percentage depends on 
+the UPS model.
+.Pp
+The advantage of doing this calibration is that the UPS will
+recalibrate the remaining runtime counter that it maintains
+and therefore report a more accurate estimated runtime.
+As batteries age, they tend to hold less charge, so the UPS's
+internal runtime counter may not be accurate after several
+years. 
+.Pp
+It is recommended that battery runtime calibration be performed
+annually. Performing it too often shortens the lifetime of the
+UPS batteries. 
+.Ss Option 12) Quit
 Exits from the program.
 .Sh SERIAL PORT (SMART PROTOCOL MODE)
 When using a UPS operating in APC smart protocol mode (eg a Smart-UPS)
