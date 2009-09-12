@@ -1,8 +1,18 @@
 10.4+ Compatibility builds from XCode 3.x
 
-- Install XCode-3.x (tested on 3.2) and be sure to select the 10.4 SDK
+- Install XCode-3.x (tested on 3.1 with 10.5 and 3.2 with 10.6) 
+  * Be sure to select the 10.4 SDK
 
 - Build dependent libs (libusb, libpng, libgd)
+  * If you have X11 installed (it's an option when installing Mac OS X; check
+    for the existence of /usr/X11/lib to see if you have it), the libgd build 
+    will end up with dependencies on various dylibs found only in the X11 
+    install. This means the cgi programs won't run on systems where X11 is not 
+    installed (even though they don't actually *use* any X11 functionality). 
+    To make the most compatible Apcupsd possible, ensure libgd's ./configure 
+    does not find the X11 libs. I opted to reinstall the OS on my build machine 
+    with the X11 package deselected. You can probably just temporarily rename 
+    /usr/X11, however, to get the same effect.
 
    CPPFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4" \
      LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4" \
@@ -15,6 +25,7 @@
 
    CPPFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4" \
      LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4" \
+     PATH=$PATH:/Developer/SDKs/MacOSX10.4u.sdk/usr/local/bin \
      CC=gcc-4.0 CXX=g++-4.0 ./configure \
      --enable-usb --enable-cgi --enable-snmp
    make
