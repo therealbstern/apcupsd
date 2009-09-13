@@ -43,6 +43,13 @@ Instructions:
    sudo make install
 
   libgd (depends on libpng, so build/install that first):
+  * gd-2.0.35 has a configure bug where you have to do this twice! After the
+    first configure, when you invoke make, the build system complains about a
+    missing aclocal-1.9 and repeats the configure for you...and gets it wrong. 
+    So you have to wait for the bogus reconfigure and make to finish, then
+    configure again the right way, make clean, and make. If you fail to do this
+    it will probably still build, but you'll end up with dependencies on a
+    bunch of X11 libs that you don't want.
 
    CPPFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4" \
      LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -arch i386 -arch ppc" \
@@ -52,6 +59,9 @@ Instructions:
      --prefix=/Developer/SDKs/MacOSX10.4u.sdk/usr/local --disable-shared \
      --disable-dependency-tracking --without-fontconfig --without-freetype \
      --without-x
+   make
+   <rerun same configure from above)
+   make clean
    make
    sudo make install
 
