@@ -18,13 +18,18 @@ To build the most compatible apcupsd binary package possible, we must...
 
 Instructions:
 
-- Install XCode-3.x (tested on 3.1 with 10.5 and 3.2 with 10.6) 
+- Install XCode-3.1 (requires Mac OS 10.5)
   * Be sure to select the 10.4 SDK when installing
   * After installing, check if /Developer/SDKs/MacOSX10.4u.sdk/usr/local/lib
     is a symlink to /usr/local/lib. If so, remove it.
-  * This procedure will NOT work on older versions of XCode
+  * This procedure CANNOT be done with XCode-3.2 since Apple dropped support 
+    for PPC platforms in XCode-3.2.
 
 - Build dependent libs (libusb, libpng, libgd)
+  * Tested with libusb-0.1.12, libpng-1.2.40, and gd-2.0.35
+  * "Fat" libs will be installed into /Developer/SDKs/MacOSX10.4u.sdk/usr/local 
+    so they will not conflict with other libraries you may have installed on 
+    your build system.
 
   libpng & libusb:
 
@@ -34,8 +39,8 @@ Instructions:
      CC=gcc-4.0 CXX=g++-4.0 ./configure \
      --prefix=/Developer/SDKs/MacOSX10.4u.sdk/usr/local --disable-shared \
      --disable-dependency-tracking
-  make
-  sudo make install
+   make
+   sudo make install
 
   libgd (depends on libpng, so build/install that first):
 
@@ -47,8 +52,8 @@ Instructions:
      --prefix=/Developer/SDKs/MacOSX10.4u.sdk/usr/local --disable-shared \
      --disable-dependency-tracking --without-fontconfig --without-freetype \
      --without-x
-  make
-  sudo make install
+   make
+   sudo make install
 
 - Build apcupsd
 
