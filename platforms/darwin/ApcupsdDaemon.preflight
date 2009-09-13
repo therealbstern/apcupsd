@@ -4,12 +4,3 @@
 if [ -f /etc/apcupsd/apcupsd.conf ] ; then
 	cp -p /etc/apcupsd/apcupsd.conf /etc/apcupsd/apcupsd.conf.SAVE
 fi
-
-# PackageMaker gets the permissions on ApcupsdDummy.kext wrong
-# and postflight is too late to fix them (10.6 will already have 
-# complained), so create the directory if it does not already exist
-# and set the correct permissions now.
-if [ ! -e /System/Library/Extensions/ApcupsdDummy.kext ] ; then
-	mkdir /System/Library/Extensions/ApcupsdDummy.kext
-	chmod 755 /System/Library/Extensions/ApcupsdDummy.kext
-fi

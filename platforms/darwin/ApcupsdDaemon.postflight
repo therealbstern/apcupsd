@@ -1,9 +1,5 @@
 #!/bin/sh
 
-# Fix permissions on /Library/StartupItems/apcupsd since packagemaker
-# insists on getting them wrong
-chmod 0755 /Library/StartupItems/apcupsd
-
 # Ensure kext cache is rebuilt
 touch /System/Library/Extensions
 

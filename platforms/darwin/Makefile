@@ -18,6 +18,7 @@ install-darwin:
 	-$(V)chown root:wheel $(DESTDIR)/Library/StartupItems/apcupsd
 	-$(V)chown root:wheel $(DESTDIR)/Library/StartupItems/apcupsd/apcupsd
 	-$(V)chown root:wheel $(DESTDIR)/Library/StartupItems/apcupsd/StartupParameters.plist
+	$(call INSTDATA,755,apcupsd-uninstall,/sbin)
 	@echo "================================================="
 	@echo " "
 	@echo "apcupsd script installation for MacOS X (Darwin) complete." 
@@ -65,6 +66,7 @@ uninstall-darwin:
 	-$(call UNINST,/System/Library/Extensions/ApcupsdDummy.kext)
 	-$(call UNINST,/System/Library/Extensions.mkext)
 	-$(call UNINST,/System/Library/Extensions.kextcache)
+	-$(call UNINST,/sbin/apcupsd-uninstall)
 	@echo "================================================="
 	@echo " "
 	@echo "Please REBOOT to complete uninstall." 
@@ -84,6 +86,10 @@ apcupsd.pkg:
 	cp Welcome.txt $(PKGROOT)/Apcupsd.Resources
 	cp ApcupsdDaemon.preflight $(PKGROOT)/Apcupsd.Scripts/preflight
 	cp ApcupsdDaemon.postflight $(PKGROOT)/Apcupsd.Scripts/postflight
-	$(PACKAGEMAKER) -v --no-relocate --root $(PKGROOT)/Apcupsd.Root --info ApcupsdDaemon.Info.plist --resources $(PKGROOT)/Apcupsd.Resources --scripts $(PKGROOT)/Apcupsd.Scripts --id com.apcupsd.apcupsd --root-volume-only --target 10.4 --version $(VERSION) --out $(PKGROOT)/Apcupsd/Apcupsd-$(VERSION).pkg
+	chown root:admin $(PKGROOT)/Apcupsd.Root/Library
+	chmod 1775 $(PKGROOT)/Apcupsd.Root/Library
+	$(PACKAGEMAKER) -v --no-recommend --no-relocate --root $(PKGROOT)/Apcupsd.Root \
+	   --info ApcupsdDaemon.Info.plist --resources $(PKGROOT)/Apcupsd.Resources \
+	   --scripts $(PKGROOT)/Apcupsd.Scripts --id com.apcupsd.apcupsd --root-volume-only \
+           --target 10.4 --version $(VERSION) --out $(PKGROOT)/Apcupsd/Apcupsd-$(VERSION).pkg
 	hdiutil create -ov -srcfolder $(PKGROOT)/Apcupsd -volname Apcupsd-$(VERSION) Apcupsd-$(VERSION).dmg
-
