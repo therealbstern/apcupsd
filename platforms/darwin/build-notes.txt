@@ -1,31 +1,60 @@
-10.4+ Compatibility builds from XCode 3.x
+10.4+ Universal Binary Builds from XCode 3.x
+
+The information in this file is for those who wish to build an apcupsd binary 
+package to run on machines other than the machine on which it was built. If you 
+are building apcupsd for use on the same machine as the one you are building it 
+on, you do not have to do any of this. In that case, just install dependent 
+libs such as libgd and libusb binaries from Fink or MacPorts (or build from 
+source) with no special treatment needed.
+
+To build the most compatible apcupsd binary package possible, we must...
+
+* Build universal binaries to support PPC and Intel platforms (so-called "fat"
+  binaries)
+* Build all dependent libraries static to ensure no extra dylibs are needed on
+  the taget machine
+* Target the MacOS 10.4 "Universal" SDK to ensure the binaries will run on all
+  platforms >= 10.4
+
+Instructions:
 
 - Install XCode-3.x (tested on 3.1 with 10.5 and 3.2 with 10.6) 
-  * Be sure to select the 10.4 SDK
+  * Be sure to select the 10.4 SDK when installing
+  * After installing, check if /Developer/SDKs/MacOSX10.4u.sdk/usr/local/lib
+    is a symlink to /usr/local/lib. If so, remove it.
+  * This procedure will NOT work on older versions of XCode
 
 - Build dependent libs (libusb, libpng, libgd)
-  * If you have X11 installed (it's an option when installing Mac OS X; check
-    for the existence of /usr/X11/lib to see if you have it), the libgd build 
-    will end up with dependencies on various dylibs found only in the X11 
-    install. This means the cgi programs won't run on systems where X11 is not 
-    installed (even though they don't actually *use* any X11 functionality). 
-    To make the most compatible Apcupsd possible, ensure libgd's ./configure 
-    does not find the X11 libs. I opted to reinstall the OS on my build machine 
-    with the X11 package deselected. You can probably just temporarily rename 
-    /usr/X11, however, to get the same effect.
+
+  libpng & libusb:
 
    CPPFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4" \
-     LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4" \
+     LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -arch i386 -arch ppc" \
+     CFLAGS="-arch i386 -arch ppc" CXXFLAGS="-arch i386 -arch ppc" \
      CC=gcc-4.0 CXX=g++-4.0 ./configure \
-     --prefix=/Developer/SDKs/MacOSX10.4u.sdk/usr/local --disable-shared
-   make
-   sudo make install
+     --prefix=/Developer/SDKs/MacOSX10.4u.sdk/usr/local --disable-shared \
+     --disable-dependency-tracking
+  make
+  sudo make install
+
+  libgd (depends on libpng, so build/install that first):
+
+   CPPFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4" \
+     LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -arch i386 -arch ppc" \
+     CFLAGS="-arch i386 -arch ppc" CXXFLAGS="-arch i386 -arch ppc" \
+     PATH="/Developer/SDKs/MacOSX10.4u.sdk/usr/local/bin:$PATH" \
+     CC=gcc-4.0 CXX=g++-4.0 ./configure \
+     --prefix=/Developer/SDKs/MacOSX10.4u.sdk/usr/local --disable-shared \
+     --disable-dependency-tracking --without-fontconfig --without-freetype \
+     --without-x
+  make
+  sudo make install
 
 - Build apcupsd
 
    CPPFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4" \
      LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4" \
-     PATH=$PATH:/Developer/SDKs/MacOSX10.4u.sdk/usr/local/bin \
+     PATH="$PATH:/Developer/SDKs/MacOSX10.4u.sdk/usr/local/bin" \
      CC=gcc-4.0 CXX=g++-4.0 ./configure \
      --enable-usb --enable-cgi --enable-snmp
    make
@@ -35,39 +64,4 @@
    cd platforms/darwin
    sudo make apcupsd.pkg
 
--------------------------------------------------------------------------------
-
-Building APCUPSD with Universal Binary support on Mac OS X
-(This is somewhat outdated now. Preserved for historical interest.
-
-- Install Apple DevTools
-- XCode-2.x and XCode-3.x will both build the binaries ok, but the
-  packaging only works on XCode-3.x
-- Be sure to select the MacOSX10.4u (10.4 Universal) SDK when installing
-- Build dependent libraries (libusb) with UB support (see below)
-- Build APCUPSD
-- Build install package, if desired
-
-libusb:
- Use this configure line:
- 
-   env CFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
-       LDFLAGS="-arch i386 -arch ppc -mmacosx-version-min=10.4" \
-       CPPFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk" \
-       CXXFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc" \
-       ./configure --disable-dependency-tracking --disable-shared
-
-apcupsd:
- Use these commands (you can customize the --enable-xxx stuff):
- 
-   env LD="g++ -isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc -mmacosx-version-min=10.4" \
-       CPPFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk" \
-       CFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc -mmacosx-version-min=10.4" \
-       CXXFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -arch i386 -arch ppc -mmacosx-version-min=10.4" \
-       ./configure --enable-usb --enable-snmp 
-
-   make
-
-   # Optional steps to build install package
-   cd platforms/darwin
-   sudo make apcupsd.pkg
+The resulting binary package is found in platforms/darwin/Apcupsd-<version>.dmg
