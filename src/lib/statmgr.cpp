@@ -203,3 +203,80 @@ void StatMgr::close()
       m_socket = -1;
    }
 }
+
+bool StatMgr::GetSummary(int &battstat, astring &statstr, astring &upsname)
+{
+   // Fetch data from the UPS
+   if (!Update()) {
+      battstat = -1;
+      statstr = "NETWORK ERROR";
+      return false;
+   }
+
+   // Lookup the STATFLAG key
+   astring statflag = Get("STATFLAG");
+   if (statflag.empty()) {
+      battstat = -1;
+      statstr = "ERROR";
+      return false;
+   }
+   unsigned long status = strtoul(statflag, NULL, 0);
+
+   // Lookup BCHARGE key
+   astring bcharge = Get("BCHARGE");
+
+   // Determine battery charge percent
+   if (status & UPS_onbatt)
+      battstat = 0;
+   else if (!bcharge.empty())
+      battstat = (int)atof(bcharge);
+   else
+      battstat = 100;
+
+   // Fetch UPSNAME
+   astring uname = Get("UPSNAME");
+   if (!uname.empty())
+      upsname = uname;
+
+   // Now output status in human readable form
+   statstr = "";
+   if (status & UPS_calibration)
+      statstr += "CAL ";
+   if (status & UPS_trim)
+      statstr += "TRIM ";
+   if (status & UPS_boost)
+      statstr += "BOOST ";
+   if (status & UPS_online)
+      statstr += "ONLINE ";
+   if (status & UPS_onbatt)
+      statstr += "ONBATT ";
+   if (status & UPS_overload)
+      statstr += "OVERLOAD ";
+   if (status & UPS_battlow)
+      statstr += "LOWBATT ";
+   if (status & UPS_replacebatt)
+      statstr += "REPLACEBATT ";
+   if (!(status & UPS_battpresent))
+      statstr += "NOBATT ";
+
+   // This overrides the above
+   if (status & UPS_commlost) {
+      statstr = "COMMLOST";
+      battstat = -1;
+   }
+
+   // This overrides the above
+   if (status & UPS_shutdown)
+      statstr = "SHUTTING DOWN";
+
+   // This overrides the above
+   if (status & UPS_onbatt) {
+      astring reason = Get("LASTXFER");
+      if (strstr(reason, "self test"))
+         statstr = "SELFTEST";
+   }
+
+   // Remove trailing space, if present
+   statstr.rtrim();
+   return true;
+}
