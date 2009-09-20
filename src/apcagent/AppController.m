@@ -381,12 +381,12 @@
    NSNumber *col = [aTableColumn identifier];
    NSString *ret;
 
-   // Copy value under lock so we don't worry about life cycle
+   // Lookup and retain value under lock
    [mutex lock];
    if ([col intValue] == 0)
-      ret = [NSString stringWithString:[keys objectAtIndex:rowIndex]];
+      ret = [[[keys objectAtIndex:rowIndex] retain] autorelease];
    else
-      ret = [NSString stringWithString:[values objectAtIndex:rowIndex]];
+      ret = [[[values objectAtIndex:rowIndex] retain] autorelease];
    [mutex unlock];
 
    return ret;
@@ -444,9 +444,9 @@
 {
    NSString *ret;
 
-   // Copy value under lock so we don't worry about life cycle
+   // Lookup and retain value under lock
    [mutex lock];
-   ret = [NSString stringWithString:[strings objectAtIndex:rowIndex]];
+   ret = [[[strings objectAtIndex:rowIndex] retain] autorelease];
    [mutex unlock];
 
    return ret;
