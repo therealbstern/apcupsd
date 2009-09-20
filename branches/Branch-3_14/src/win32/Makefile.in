@@ -122,7 +122,13 @@ LIB_OBJS = \
 	$(OBJDIR)/newups.o \
 	$(OBJDIR)/md5.o \
 	$(OBJDIR)/sleep.o \
-	$(OBJDIR)/inet_pton.o
+	$(OBJDIR)/inet_pton.o \
+   $(OBJDIR)/statmgr.o \
+   $(OBJDIR)/amutex.o \
+   $(OBJDIR)/athread.o \
+   $(OBJDIR)/astring.o \
+   $(OBJDIR)/atimer.o \
+   $(OBJDIR)/autil.o
 
 #
 # Rules for generating from ../lib
@@ -171,6 +177,24 @@ $(OBJDIR)/sleep.o: ../lib/sleep.c
 	$(CXX) -c $< -o $@
 
 $(OBJDIR)/inet_pton.o: ../lib/inet_pton.c
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/statmgr.o:	  ../lib/statmgr.cpp
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/amutex.o:	  ../lib/amutex.cpp
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/athread.o:	  ../lib/athread.cpp
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/astring.o:	  ../lib/astring.cpp
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/atimer.o:	  ../lib/atimer.cpp
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/autil.o:	  ../lib/autil.cpp
 	$(CXX) -c $< -o $@
 
 ######################################################################
@@ -418,7 +442,6 @@ OBJS_APT = \
    $(OBJDIR)/apcerror.o \
    $(OBJDIR)/wintray.o \
    $(OBJDIR)/winres.res \
-   $(OBJDIR)/statmgr.o \
    $(OBJDIR)/balloonmgr.o
 
 $(OBJDIR)/winabout.o:  winabout.cpp
@@ -434,9 +457,6 @@ $(OBJDIR)/winstat.o:	  winstat.cpp
 	$(CXX) -c $< -o $@
 
 $(OBJDIR)/wintray.o:	  wintray.cpp
-	$(CXX) -c $< -o $@
-
-$(OBJDIR)/statmgr.o:	  statmgr.cpp
 	$(CXX) -c $< -o $@
 
 $(OBJDIR)/balloonmgr.o:	balloonmgr.cpp
@@ -513,8 +533,8 @@ POP_LIBS =
 BKG_OBJS = $(OBJS_BKG)
 BKG_LIBS = 
 
-APT_OBJS = $(OBJS_APT) $(OBJS_COMPAT)
-APT_LIBS = -L$(LIB_MINGW) -luser32 -lgdi32 -lwsock32 -lnetapi32
+APT_OBJS = $(OBJS_APT) $(OBJS_COMPAT) $(OBJDIR)/astring.o $(OBJDIR)/statmgr.o $(OBJDIR)/amutex.o
+APT_LIBS = -L$(LIB_MINGW) -luser32 -lgdi32 -lwsock32 -lnetapi32 $(LIB_PTHREADS)
 
 SMTP_OBJS = $(OBJS_SMTP) $(OBJDIR)/apclog.o $(OBJDIR)/asys.o $(OBJDIR)/apcerror.o $(OBJS_COMPAT)
 SMTP_LIBS = $(APC_LIBS)

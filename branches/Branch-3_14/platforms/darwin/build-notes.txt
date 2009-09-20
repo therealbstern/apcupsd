@@ -75,7 +75,7 @@ Instructions:
      --enable-usb --enable-cgi --enable-snmp
    make
 
-- Build binary package
+- Build apcupsd binary package
 
    cd platforms/darwin
    sudo make apcupsd.pkg

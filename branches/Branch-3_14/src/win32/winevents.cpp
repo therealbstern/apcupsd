@@ -105,16 +105,16 @@ void upsEvents::FillEventsBox(HWND hwnd, int id_list)
    SendDlgItemMessage(hwnd, IDC_LIST, LB_RESETCONTENT, 0, 0);
 
    // Fetch events from apcupsd
-   std::vector<std::string> events;
+   alist<astring> events;
    if (!m_statmgr->GetEvents(events) || events.empty()) {
       SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0, (LONG)error);
       return;
    }
 
    // Add each event to the listbox
-   std::vector<std::string>::reverse_iterator iter;
-   for (iter = events.rbegin(); iter != events.rend(); iter++) {
+   alist<astring>::const_iterator iter;
+   for (iter = events.begin(); iter != events.end(); ++iter) {
       SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0,
-                         (LONG)(*iter).c_str());
+                         (LONG)(*iter).str());
    }
 }
