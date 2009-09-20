@@ -7,4 +7,4 @@ all-targets: $(OBJS)
 EXTRAINCS += -I$(topdir)/src/libusbhid
 
 # Include dependencies
--include $(SRCS:%.c=$(DEPDIR)/%.P)
+-include $(DEPS)
