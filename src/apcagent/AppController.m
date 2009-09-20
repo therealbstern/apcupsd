@@ -25,6 +25,9 @@
 #import "AppController.h"
 #import "statmgr.h"
 
+//******************************************************************************
+// CLASS AppController
+//******************************************************************************
 @implementation AppController
 
 #define HOSTNAME_PREF_KEY @"host"
@@ -303,7 +306,7 @@
 
 -(IBAction)events:(id)sender
 {
-   // Force app to foreground and move key focus to status window
+   // Force app to foreground and move key focus to events window
    [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
    [eventsWindow makeKeyAndOrderFront:self];
 
@@ -313,6 +316,9 @@
 
 @end
 
+//******************************************************************************
+// CLASS StatusTableDataSource
+//******************************************************************************
 @implementation StatusTableDataSource
 
 - (id) init
@@ -380,6 +386,9 @@
 
 @end
 
+//******************************************************************************
+// CLASS EventsTableDataSource
+//******************************************************************************
 @implementation EventsTableDataSource
 
 - (id) init
