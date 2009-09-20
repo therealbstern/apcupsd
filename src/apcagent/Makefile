@@ -10,7 +10,7 @@ all-targets: apcagent MainMenu.nib apcagent.app
 apcagent: $(OBJS)
 	$(LINK)
 
-apcagent.app: apcagent MainMenu.nib Info.plist PkgInfo InfoPlist.strings \
+apcagent.app: apcagent MainMenu.nib Info.plist PkgInfo \
               $(topdir)/doc/images/commlost.png \
               $(topdir)/doc/images/charging.png \
               $(topdir)/doc/images/onbatt.png \
