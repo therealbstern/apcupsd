@@ -124,6 +124,7 @@ class StatMgr;
 
 -(IBAction)status:(id)sender;
 -(IBAction)events:(id)sender;
+-(IBAction)about:(id)sender;
 
 - (void)timerHandler:(NSTimer*)theTimer;
 
