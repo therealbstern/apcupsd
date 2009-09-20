@@ -311,6 +311,17 @@
    [timer fire];
 }
 
+-(IBAction)about:(id)sender;
+{
+   // Normally we'd just wire the about button directly to NSApp 
+   // orderFrontStandardAboutPanel. However, since we're a status item without
+   // a main window we need to bring ourself to the foreground or else the
+   // about box will be buried behind whatever window the user has active at
+   // the time. So we'll force ourself active, then call out to NSApp.
+   [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
+   [[NSApplication sharedApplication] orderFrontStandardAboutPanel:self];
+}
+
 @end
 
 //******************************************************************************
