@@ -16,7 +16,6 @@
 #include "wintray.h"
 #include "statmgr.h"
 #include "balloonmgr.h"
-#include <string>
 
 #define BALLOON_TIMEOUT 10000
 
@@ -171,7 +170,7 @@ void upsMenu::SendTrayMsg(DWORD msg)
    nid.uCallbackMessage = WM_TRAYNOTIFY;
 
    int battstat = -1;
-   std::string statstr;
+   astring statstr;
 
    // Get current status
    switch (msg) {
@@ -199,15 +198,15 @@ void upsMenu::SendTrayMsg(DWORD msg)
 
    // Use status as normal tooltip
    nid.uFlags |= NIF_TIP;
-   if (!m_upsname.compare("UPS_IDEN") || !m_upsname.compare("<unknown>"))
-      asnprintf(nid.szTip, sizeof(nid.szTip), "%s", statstr.c_str());
+   if (m_upsname == "UPS_IDEN" || m_upsname == "<unknown>")
+      asnprintf(nid.szTip, sizeof(nid.szTip), "%s", statstr.str());
    else
       asnprintf(nid.szTip, sizeof(nid.szTip), "%s: %s",
-                m_upsname.c_str(), statstr.c_str());
+                m_upsname.str(), statstr.str());
 
    // Display event in balloon tip
-   if (!m_laststatus.empty() && m_laststatus.compare(statstr))
-      m_balmgr->PostBalloon(m_hwnd, m_upsname.c_str(), statstr.c_str());
+   if (!m_laststatus.empty() && m_laststatus != statstr)
+      m_balmgr->PostBalloon(m_hwnd, m_upsname, statstr);
    m_laststatus = statstr;
 
    // Send the message
@@ -287,7 +286,7 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
          // Set UPS name field
          ModifyMenu(submenu, ID_NAME, MF_BYCOMMAND|MF_STRING, ID_NAME,
-            ("UPS: " + _this->m_upsname).c_str());
+            ("UPS: " + _this->m_upsname).str());
 
          // Set HOST field
          char buf[100];
@@ -336,7 +335,7 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
    return DefWindowProc(hwnd, iMsg, wParam, lParam);
 }
 
-bool upsMenu::FetchStatus(int &battstat, std::string &statstr, std::string &upsname)
+bool upsMenu::FetchStatus(int &battstat, astring &statstr, astring &upsname)
 {
    // Fetch data from the UPS
    if (!m_statmgr->Update()) {
@@ -346,27 +345,27 @@ bool upsMenu::FetchStatus(int &battstat, std::string &statstr, std::string &upsn
    }
 
    // Lookup the STATFLAG key
-   std::string statflag = m_statmgr->Get("STATFLAG");
+   astring statflag = m_statmgr->Get("STATFLAG");
    if (statflag.empty()) {
       battstat = -1;
       statstr = "ERROR";
       return false;
    }
-   unsigned long status = strtoul(statflag.c_str(), NULL, 0);
+   unsigned long status = strtoul(statflag, NULL, 0);
 
    // Lookup BCHARGE key
-   std::string bcharge = m_statmgr->Get("BCHARGE");
+   astring bcharge = m_statmgr->Get("BCHARGE");
 
    // Determine battery charge percent
    if (status & UPS_onbatt)
       battstat = 0;
    else if (!bcharge.empty())
-      battstat = (int)atof(bcharge.c_str());
+      battstat = (int)atof(bcharge);
    else
       battstat = 100;
 
    // Fetch UPSNAME
-   std::string uname = m_statmgr->Get("UPSNAME");
+   astring uname = m_statmgr->Get("UPSNAME");
    if (!uname.empty())
       upsname = uname;
 
@@ -403,13 +402,13 @@ bool upsMenu::FetchStatus(int &battstat, std::string &statstr, std::string &upsn
 
    // This overrides the above
    if (status & UPS_onbatt) {
-      std::string reason = m_statmgr->Get("LASTXFER");
-      if (strstr(reason.c_str(), "self test"))
+      astring reason = m_statmgr->Get("LASTXFER");
+      if (strstr(reason, "self test"))
          statstr = "SELFTEST";
    }
 
    // Remove trailing space, if present
-   statstr.resize(statstr.find_last_not_of(" ") + 1);
+   statstr.rtrim();
    return true;
 }
 

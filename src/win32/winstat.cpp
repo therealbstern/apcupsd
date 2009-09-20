@@ -113,14 +113,15 @@ void upsStatus::FillStatusBox(HWND hwnd, int id_list)
    }
 
    // Fetch status from apcupsd
-   std::vector<std::string> status;
+   alist<astring> status;
    if (!m_statmgr->GetAll(status) || status.empty()) {
       SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0, (LONG)error);
       return;
    }
 
    // Add each status line to the listbox
-   for (int i = 0; i < status.size(); i++)
+   alist<astring>::const_iterator iter;
+   for (iter = status.begin(); iter != status.end(); ++iter)
       SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0,
-                         (LONG)status[i].c_str());
+                         (LONG)(*iter).str());
 }

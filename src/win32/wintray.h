@@ -17,7 +17,7 @@
 #include "winabout.h"
 #include "winstat.h"
 #include "winevents.h"
-#include <string>
+#include "astring.h"
 
 // Forward declarations
 class StatMgr;
@@ -44,7 +44,7 @@ protected:
       HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
 
    // Fetch UPS status info
-   bool FetchStatus(int &battstat, std::string &statstr, std::string &upsname);
+   bool FetchStatus(int &battstat, astring &statstr, astring &upsname);
 
    // Thread to poll for UPS status changes
    static DWORD WINAPI StatusPollThread(LPVOID param);
@@ -55,8 +55,8 @@ protected:
    int                     m_interval;       // How often to poll for status
    HANDLE                  m_thread;         // Handle to status polling thread
    HANDLE                  m_wait;           // Handle to wait mutex
-   std::string             m_upsname;        // Cache UPS name
-   std::string             m_laststatus;     // Cache previous status string
+   astring                 m_upsname;        // Cache UPS name
+   astring                 m_laststatus;     // Cache previous status string
    BalloonMgr             *m_balmgr;         // Balloon tip manager
    const char             *m_host;
    unsigned short          m_port;
