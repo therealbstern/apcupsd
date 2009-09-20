@@ -17,12 +17,18 @@
 	<key>CFBundleSignature</key>
 	<string>????</string>
 	<key>CFBundleVersion</key>
-	<string>1.0</string>
+	<string>__VERSION__</string>
 	<key>LSUIElement</key>
 	<true/>
 	<key>NSMainNibFile</key>
 	<string>MainMenu</string>
 	<key>NSPrincipalClass</key>
 	<string>NSApplication</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>© 2009 Adam Kropelin (GPLv2)</string>
+	<key>CFBundleGetInfoString</key>
+	<string>__VERSION__, © 2009 Adam Kropelin (GPLv2)</string>
+	<key>CFBundleShortVersionString</key>
+	<string>__VERSION__</string>
 </dict>
 </plist>
