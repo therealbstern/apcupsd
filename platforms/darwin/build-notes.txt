@@ -68,7 +68,8 @@ Instructions:
 - Build apcupsd
 
    CPPFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4" \
-     LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4" \
+     LDFLAGS="-isysroot /Developer/SDKs/MacOSX10.4u.sdk -mmacosx-version-min=10.4 -arch i386 -arch ppc" \
+     CFLAGS="-arch i386 -arch ppc" CXXFLAGS="-arch i386 -arch ppc" \
      PATH="$PATH:/Developer/SDKs/MacOSX10.4u.sdk/usr/local/bin" \
      CC=gcc-4.0 CXX=g++-4.0 ./configure \
      --enable-usb --enable-cgi --enable-snmp
