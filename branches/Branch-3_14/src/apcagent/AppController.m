@@ -34,6 +34,10 @@
 #define PORT_PREF_KEY     @"port"
 #define REFRESH_PREF_KEY  @"refresh"
 
+#define DEFAULT_HOSTNAME  @"127.0.0.1"
+#define DEFAULT_PORT      3551
+#define DEFAULT_REFRESH   5
+
 - (void) awakeFromNib{
 
    // Load images
@@ -67,9 +71,9 @@
    // Establish default preferences
    NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
    NSDictionary *defaults = [NSDictionary dictionaryWithObjectsAndKeys:
-       @"devbox3", HOSTNAME_PREF_KEY, 
-       [NSNumber numberWithInt:3551], PORT_PREF_KEY, 
-       [NSNumber numberWithInt:1], REFRESH_PREF_KEY, 
+       DEFAULT_HOSTNAME,                         HOSTNAME_PREF_KEY, 
+       [NSNumber numberWithInt:DEFAULT_PORT],    PORT_PREF_KEY, 
+       [NSNumber numberWithInt:DEFAULT_REFRESH], REFRESH_PREF_KEY, 
        nil];
    [prefs registerDefaults:defaults];
 
@@ -211,6 +215,7 @@
     [timer invalidate];
     [timer release];
     [statusDataSource release];
+    [eventsDataSource release];
     [configMutex release];
     [super dealloc];
 }
@@ -378,12 +383,11 @@
    objectValueForTableColumn:(NSTableColumn *)aTableColumn 
    row:(int)rowIndex
 {
-   NSNumber *col = [aTableColumn identifier];
    NSString *ret;
 
    // Lookup and retain value under lock
    [mutex lock];
-   if ([col intValue] == 0)
+   if ([[aTableColumn identifier] intValue] == 0)
       ret = [[[keys objectAtIndex:rowIndex] retain] autorelease];
    else
       ret = [[[values objectAtIndex:rowIndex] retain] autorelease];
