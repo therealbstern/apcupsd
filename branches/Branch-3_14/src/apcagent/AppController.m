@@ -49,12 +49,9 @@
 
    // Create our status item
    statusItem = [[[NSStatusBar systemStatusBar] statusItemWithLength:
-                  NSSquareStatusItemLength] retain];
-
-   // Default to the commlost image
+                  NSVariableStatusItemLength] retain];
+   [statusItem setHighlightMode:YES];
    [statusItem setImage:commlostImage];
-
-   // Setup menu
    [statusItem setMenu:statusMenu];
 
    // Setup status table control
