@@ -53,4 +53,4 @@ uninstall-base:
 	$(call UNINST,$(sbindir)/smtp)
 
 # Include dependencies
--include $(SRCS:%.c=$(DEPDIR)/%.P)
+-include $(DEPS)

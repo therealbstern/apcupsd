@@ -9,4 +9,4 @@ libusbhid.a: $(OBJS)
 	$(MAKELIB)
 
 # Include dependencies
--include $(SRCS:%.c=$(DEPDIR)/%.P)
+-include $(DEPS)

@@ -14,4 +14,5 @@ $(TARGETS): %: $(call SRC2OBJ,%.c) $(APCLIBS)
 	$(LINK)
 
 # Include dependencies
--include $(SRCS:%.c=$(DEPDIR)/%.P)
+-include $(DEPS)
+
