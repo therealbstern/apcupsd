@@ -21,10 +21,10 @@ apcagent.app: apcagent MainMenu.nib Info.plist PkgInfo InfoPlist.strings \
 	$(V)$(MKINSTALLDIRS) apcagent.app/Contents/Resources
 	$(V)$(MKINSTALLDIRS) apcagent.app/Contents/Resources/English.lproj
 	$(V)$(INSTALL_PROGRAM) $(STRIP) -m 755 apcagent apcagent.app/Contents/MacOS
-	$(V)$(INSTALL_DATA) -m 644 Info.plist apcagent.app/Contents
+	$(V)$(SED) -e "s/__VERSION__/${VERSION}/" Info.plist > /tmp/Info.plist.out
+	$(V)$(INSTALL_DATA) -m 644 /tmp/Info.plist.out apcagent.app/Contents/Info.plist
 	$(V)$(INSTALL_DATA) -m 644 PkgInfo apcagent.app/Contents
 	$(V)$(INSTALL_DATA) -m 644 MainMenu.nib apcagent.app/Contents/Resources/English.lproj
-	$(V)$(INSTALL_DATA) -m 644 InfoPlist.strings apcagent.app/Contents/Resources/English.lproj
 	$(V)$(INSTALL_DATA) -m 644 $(topdir)/doc/images/commlost.png apcagent.app/Contents/Resources
 	$(V)$(INSTALL_DATA) -m 644 $(topdir)/doc/images/charging.png apcagent.app/Contents/Resources
 	$(V)$(INSTALL_DATA) -m 644 $(topdir)/doc/images/onbatt.png apcagent.app/Contents/Resources
