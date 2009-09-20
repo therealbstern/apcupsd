@@ -180,7 +180,7 @@ void upsMenu::SendTrayMsg(DWORD msg)
       break; 
    default:
       // Fetch current UPS status
-      FetchStatus(battstat, statstr, m_upsname);
+      m_statmgr->GetSummary(battstat, statstr, m_upsname);
       break;
    }
 
@@ -333,83 +333,6 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
    // Unknown message type
    return DefWindowProc(hwnd, iMsg, wParam, lParam);
-}
-
-bool upsMenu::FetchStatus(int &battstat, astring &statstr, astring &upsname)
-{
-   // Fetch data from the UPS
-   if (!m_statmgr->Update()) {
-      battstat = -1;
-      statstr = "NETWORK ERROR";
-      return false;
-   }
-
-   // Lookup the STATFLAG key
-   astring statflag = m_statmgr->Get("STATFLAG");
-   if (statflag.empty()) {
-      battstat = -1;
-      statstr = "ERROR";
-      return false;
-   }
-   unsigned long status = strtoul(statflag, NULL, 0);
-
-   // Lookup BCHARGE key
-   astring bcharge = m_statmgr->Get("BCHARGE");
-
-   // Determine battery charge percent
-   if (status & UPS_onbatt)
-      battstat = 0;
-   else if (!bcharge.empty())
-      battstat = (int)atof(bcharge);
-   else
-      battstat = 100;
-
-   // Fetch UPSNAME
-   astring uname = m_statmgr->Get("UPSNAME");
-   if (!uname.empty())
-      upsname = uname;
-
-   // Now output status in human readable form
-   statstr = "";
-   if (status & UPS_calibration)
-      statstr += "CAL ";
-   if (status & UPS_trim)
-      statstr += "TRIM ";
-   if (status & UPS_boost)
-      statstr += "BOOST ";
-   if (status & UPS_online)
-      statstr += "ONLINE ";
-   if (status & UPS_onbatt)
-      statstr += "ONBATT ";
-   if (status & UPS_overload)
-      statstr += "OVERLOAD ";
-   if (status & UPS_battlow)
-      statstr += "LOWBATT ";
-   if (status & UPS_replacebatt)
-      statstr += "REPLACEBATT ";
-   if (!(status & UPS_battpresent))
-      statstr += "NOBATT ";
-
-   // This overrides the above
-   if (status & UPS_commlost) {
-      statstr = "COMMLOST";
-      battstat = -1;
-   }
-
-   // This overrides the above
-   if (status & UPS_shutdown)
-      statstr = "SHUTTING DOWN";
-
-   // This overrides the above
-   if (status & UPS_onbatt) {
-      astring reason = m_statmgr->Get("LASTXFER");
-      if (strstr(reason, "self test"))
-         statstr = "SELFTEST";
-   }
-
-   // Remove trailing space, if present
-   statstr.rtrim();
-   return true;
 }
 
 DWORD WINAPI upsMenu::StatusPollThread(LPVOID param)
