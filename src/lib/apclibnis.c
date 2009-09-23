@@ -140,8 +140,14 @@ static int write_nbytes(int fd, const char *ptr, int nbytes)
 #endif
       nwritten = send(fd, ptr, nleft, 0);
 
-      if (nwritten <= 0)
-         return -errno;       /* error */
+      switch (nwritten) {
+      case -1:
+         if (errno == EINTR || errno == EAGAIN)
+            continue;
+         return -errno;           /* error */
+      case 0:
+         return nbytes - nleft;   /* EOF */
+      }
 
       nleft -= nwritten;
       ptr += nwritten;
@@ -231,6 +237,17 @@ int net_open(const char *host, char *service, int port)
    struct sockaddr_in tcp_serv_addr;  /* socket information */
    unsigned int inaddr;               /* Careful here to use unsigned int for */
                                       /* compatibility with Alpha */
+
+#ifndef HAVE_MINGW
+   // Every platform has their own magic way to avoid getting a SIGPIPE
+   // when writing to a stream socket where the remote end has closed. 
+   // This method one work pretty much everywhere which avoids the mess
+   // of figuring out which incantation this platform supports. (Excepting
+   // for win32 which doesn't support signals at all.)
+   struct sigaction sa;
+   sa.sa_handler = SIG_IGN;
+   sigaction(SIGPIPE, &sa, NULL);
+#endif
 
    /* 
     * Fill in the structure serv_addr with the address of
