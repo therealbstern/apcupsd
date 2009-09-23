@@ -3,11 +3,11 @@ include $(topdir)/autoconf/targets.mak
 
 SRCS = $(wildcard *.m)
 
-LIBS := -Wl,-framework -Wl,Cocoa $(APCLIBS) $(LIBS)
+LIBS := -Wl,-framework -Wl,Cocoa $(LIBS)
 
 all-targets: apcagent MainMenu.nib apcagent.app
 
-apcagent: $(OBJS)
+apcagent: $(OBJS) $(APCLIBS)
 	$(LINK)
 
 apcagent.app: apcagent MainMenu.nib Info.plist PkgInfo \
