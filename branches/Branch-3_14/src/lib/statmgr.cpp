@@ -192,7 +192,7 @@ bool StatMgr::open()
    if (m_socket != -1)
       close();
 
-   m_socket = net_open((char*)m_host, NULL, m_port);
+   m_socket = net_open(m_host, NULL, m_port);
    return m_socket != -1;
 }
 
