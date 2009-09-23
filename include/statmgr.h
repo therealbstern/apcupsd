@@ -60,7 +60,7 @@ private:
    };
 
    keyval          m_stats[MAX_STATS];
-   const char     *m_host;
+   astring         m_host;
    unsigned short  m_port;
    int             m_socket;
    amutex          m_mutex;
