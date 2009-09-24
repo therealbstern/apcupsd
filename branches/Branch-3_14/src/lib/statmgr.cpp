@@ -78,7 +78,7 @@ bool StatMgr::Update()
       i++;
    }
 
-   if (len == -1) {
+   if (i == 0 || len == -1) {
       close();
       unlock();
       return false;
@@ -206,8 +206,9 @@ void StatMgr::close()
 
 bool StatMgr::GetSummary(int &battstat, astring &statstr, astring &upsname)
 {
-   // Fetch data from the UPS
-   if (!Update()) {
+   // Fetch data from the UPS. Rretry once if it fails, probably because 
+   // apcupsd timed out the connection due to inactivity.
+   if (!Update() && !Update()) {
       battstat = -1;
       statstr = "NETWORK ERROR";
       return false;
