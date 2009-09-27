@@ -36,7 +36,7 @@ apcagent.app: apcagent MainMenu.nib Info.plist PkgInfo \
 #	$(V)$(INSTALL_DATA) -m 644 "Growl Registration Ticket.growlRegDict.plist" "apcagent.app/Contents/Resources/Growl Registration Ticket.growlRegDict"
 
 apcagent.dmg: apcagent.app
-	hdiutil create -srcfolder apcagent.app apcagent.dmg
+	hdiutil create -ov -srcfolder apcagent.app apcagent.dmg
 
 # Include dependencies
 -include $(DEPS)
