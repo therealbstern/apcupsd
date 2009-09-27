@@ -28,23 +28,9 @@
 
 @implementation InstanceManager
 
-- (InstanceManager *)init
-{
-   self = [super init];
-   if (!self) return nil;
-
-   instmap = [[NSMutableDictionary alloc] init];
-   nib = [[NSNib alloc] initWithNibNamed:@"MainMenu" bundle:nil];
-
-   return self;
-}
-
-- (void)dealloc
-{
-   [nib release];
-   [instmap release];
-   [super dealloc];
-}
+//******************************************************************************
+// PRIVATE helper methods
+//******************************************************************************
 
 -(NSURL*)appURL
 {
@@ -82,6 +68,11 @@
    return i;
 }
 
+-(BOOL)isStartAtLogin
+{
+   return [self loginItemIndex] != -1;
+}
+
 - (void) instantiateMonitor:(InstanceConfig*)config
 {
    // Instantiate the NIB for this monitor
@@ -99,6 +90,30 @@
          break;
       }
    }
+}
+
+//******************************************************************************
+// PUBLIC methods
+//******************************************************************************
+
+- (InstanceManager *)init
+{
+   self = [super init];
+   if (!self) return nil;
+
+   instmap = [[NSMutableDictionary alloc] init];
+   nib = [[NSNib alloc] initWithNibNamed:@"MainMenu" bundle:nil];
+
+   [self loginItemIndex];
+
+   return self;
+}
+
+- (void)dealloc
+{
+   [nib release];
+   [instmap release];
+   [super dealloc];
 }
 
 - (void) createMonitors
@@ -179,6 +194,21 @@
 
    // Terminate the app
    [[NSApplication sharedApplication] terminate:self];
+}
+
+-(IBAction)startAtLogin:(id)sender
+{
+   int idx = [self loginItemIndex];
+   if (idx != -1)
+   {
+      LIAERemove(idx);
+      [sender setState:NSOffState];
+   }
+   else
+   {
+      LIAEAddURLAtEnd((CFURLRef)[self appURL], NO);
+      [sender setState:NSOnState];
+   }
 }
 
 @end

@@ -8,9 +8,9 @@
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="504"/>
+			<integer value="566"/>
 			<integer value="467"/>
-			<integer value="450"/>
+			<integer value="504"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -106,6 +106,14 @@
 					<object class="NSMenuItem" id="397353145">
 						<reference key="NSMenu" ref="1067686793"/>
 						<string key="NSTitle">Preferences...</string>
+						<string key="NSKeyEquiv"/>
+						<int key="NSMnemonicLoc">2147483647</int>
+						<reference key="NSOnImage" ref="1038029775"/>
+						<reference key="NSMixedImage" ref="999270328"/>
+					</object>
+					<object class="NSMenuItem" id="636482607">
+						<reference key="NSMenu" ref="1067686793"/>
+						<string key="NSTitle">Start at login</string>
 						<string key="NSKeyEquiv"/>
 						<int key="NSMnemonicLoc">2147483647</int>
 						<reference key="NSOnImage" ref="1038029775"/>
@@ -795,7 +803,7 @@
 				<string key="NSWindowContentMaxSize">{3.40282e+38, 3.40282e+38}</string>
 				<string key="NSWindowContentMinSize">{455, 271}</string>
 				<object class="NSView" key="NSWindowView" id="519980486">
-					<reference key="NSNextResponder"/>
+					<nil key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<object class="NSMutableArray" key="NSSubviews">
 						<bool key="EncodedWithXMLCoder">YES</bool>
@@ -814,7 +822,6 @@
 											<int key="NSvFlags">256</int>
 											<string key="NSFrameSize">{413, 229}</string>
 											<reference key="NSSuperview" ref="444671824"/>
-											<reference key="NSWindow"/>
 											<bool key="NSEnabled">YES</bool>
 											<object class="_NSCornerView" key="NSCornerView">
 												<nil key="NSNextResponder"/>
@@ -866,7 +873,6 @@
 									</object>
 									<string key="NSFrame">{{1, 1}, {413, 229}}</string>
 									<reference key="NSSuperview" ref="313106365"/>
-									<reference key="NSWindow"/>
 									<reference key="NSNextKeyView" ref="612562650"/>
 									<reference key="NSDocView" ref="612562650"/>
 									<reference key="NSBGColor" ref="889076014"/>
@@ -877,7 +883,6 @@
 									<int key="NSvFlags">-2147483392</int>
 									<string key="NSFrame">{{399, 0}, {15, 215}}</string>
 									<reference key="NSSuperview" ref="313106365"/>
-									<reference key="NSWindow"/>
 									<reference key="NSTarget" ref="313106365"/>
 									<string key="NSAction">_doScroller:</string>
 									<double key="NSPercent">9.953704e-01</double>
@@ -887,7 +892,6 @@
 									<int key="NSvFlags">-2147483392</int>
 									<string key="NSFrame">{{1, 215}, {398, 15}}</string>
 									<reference key="NSSuperview" ref="313106365"/>
-									<reference key="NSWindow"/>
 									<int key="NSsFlags">1</int>
 									<reference key="NSTarget" ref="313106365"/>
 									<string key="NSAction">_doScroller:</string>
@@ -896,7 +900,6 @@
 							</object>
 							<string key="NSFrame">{{20, 20}, {415, 231}}</string>
 							<reference key="NSSuperview" ref="519980486"/>
-							<reference key="NSWindow"/>
 							<reference key="NSNextKeyView" ref="444671824"/>
 							<int key="NSsFlags">562</int>
 							<reference key="NSVScroller" ref="715887077"/>
@@ -906,8 +909,6 @@
 						</object>
 					</object>
 					<string key="NSFrameSize">{455, 271}</string>
-					<reference key="NSSuperview"/>
-					<reference key="NSWindow"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1280, 1002}}</string>
 				<string key="NSMinSize">{455, 293}</string>
@@ -1220,6 +1221,22 @@
 					</object>
 					<int key="connectionID">635</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">startAtLogin:</string>
+						<reference key="source" ref="1021"/>
+						<reference key="destination" ref="636482607"/>
+					</object>
+					<int key="connectionID">637</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">startAtLogin</string>
+						<reference key="source" ref="1032324030"/>
+						<reference key="destination" ref="636482607"/>
+					</object>
+					<int key="connectionID">638</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -1274,6 +1291,7 @@
 							<reference ref="540739063"/>
 							<reference ref="397353145"/>
 							<reference ref="588357473"/>
+							<reference ref="636482607"/>
 						</object>
 						<reference key="parent" ref="1049"/>
 						<string key="objectName">StatusItem</string>
@@ -1857,6 +1875,11 @@
 						<reference key="object" ref="588357473"/>
 						<reference key="parent" ref="1067686793"/>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">636</int>
+						<reference key="object" ref="636482607"/>
+						<reference key="parent" ref="1067686793"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -1972,6 +1995,7 @@
 					<string>631.IBPluginDependency</string>
 					<string>633.IBPluginDependency</string>
 					<string>634.IBPluginDependency</string>
+					<string>636.IBPluginDependency</string>
 				</object>
 				<object class="NSMutableArray" key="dict.values">
 					<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1979,7 +2003,7 @@
 					<string>com.apple.InterfaceBuilderKit</string>
 					<string>com.apple.InterfaceBuilderKit</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{433, 723}, {195, 243}}</string>
+					<string>{{433, 703}, {195, 263}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -2007,9 +2031,9 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{146, 285}, {456, 468}}</string>
+					<string>{{137, 136}, {456, 468}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
-					<string>{{146, 285}, {456, 468}}</string>
+					<string>{{137, 136}, {456, 468}}</string>
 					<reference ref="6"/>
 					<reference ref="6"/>
 					<boolean value="YES" id="5"/>
@@ -2084,6 +2108,7 @@
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="unlocalizedProperties">
@@ -2106,7 +2131,7 @@
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">635</int>
+			<int key="maxID">638</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptionsV3.1+">
@@ -2145,6 +2170,7 @@
 							<string>eventsWindow</string>
 							<string>popupText</string>
 							<string>popupWindow</string>
+							<string>startAtLogin</string>
 							<string>statusBatteryBar</string>
 							<string>statusBatteryText</string>
 							<string>statusGrid</string>
@@ -2167,6 +2193,7 @@
 							<string>NSWindow</string>
 							<string>NSTextField</string>
 							<string>NSWindow</string>
+							<string>NSMenuItem</string>
 							<string>NSLevelIndicator</string>
 							<string>NSTextField</string>
 							<string>NSTableView</string>
@@ -2195,9 +2222,11 @@
 							<string>add:</string>
 							<string>remove:</string>
 							<string>removeAll:</string>
+							<string>startAtLogin:</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>

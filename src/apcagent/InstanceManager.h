@@ -36,7 +36,9 @@
 -(IBAction)remove:(id)sender;
 -(IBAction)add:(id)sender;
 -(IBAction)removeAll:(id)sender;
+-(IBAction)startAtLogin:(id)sender;
 
 - (void) createMonitors;
+-(BOOL)isStartAtLogin;
 
 @end

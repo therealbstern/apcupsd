@@ -69,6 +69,7 @@ class StatMgr;
    IBOutlet NSMenu *statusMenu;
    IBOutlet NSMenuItem *upsName;
    IBOutlet NSMenuItem *upsHost;
+   IBOutlet NSMenuItem *startAtLogin;
 
    // The config window and its controls
    IBOutlet NSWindow *configWindow;
@@ -147,5 +148,7 @@ NSString *lastStatus;
 - (void)timerHandler:(NSTimer*)theTimer;
 
 - (void)activateWithConfig:(InstanceConfig*)cfg manager:(InstanceManager*)mgr;
+
+- (void)menuNeedsUpdate:(NSMenu *)menu;
 
 @end
