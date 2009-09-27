@@ -378,6 +378,11 @@
    [[NSStatusBar systemStatusBar] removeStatusItem:statusItem];
 }
 
+- (void)menuNeedsUpdate:(NSMenu *)menu
+{
+   [startAtLogin setState:([manager isStartAtLogin] ? NSOnState : NSOffState)];
+}
+
 @end
 
 //******************************************************************************
