@@ -43,6 +43,12 @@
 	Change History (most recent first):
 
 $Log: not supported by cvs2svn $
+Revision 1.1.2.1  2009/09/27 18:37:10  adk0212
+Add UPS and HOST info to top of menu a'la apctray on win32. Automatically
+add user login item when apcagent is started for the first time. Remove
+login item when last monitor is removed. Add menu option to remove all
+monitors at once. Reorder menu items slightly.
+
 Revision 1.1  2005/09/27 12:29:26  eskimo1
 First checked in.
 
@@ -280,6 +286,27 @@ static void CFQRelease(CFTypeRef cf)
     }
 }
 
+// ADK: Coercing to typeUTF8Text does not work on 10.4 apparently (so much for
+// LoginItemsAE.c being universal) so employ a solution from Jake Sprouse. 
+// http://jakesprouse.net/2007/03/28/debugging-apples-loginitemsaec-on-intel-macs
+static int ConvertPathEncoding(UInt8 *path, int pathlen, int bufsize, int src_cftype, int dest_cftype)
+{
+	int ret = 0;
+	CFStringRef cfpath = CFStringCreateWithBytes(NULL, path, pathlen, src_cftype, FALSE);
+	if (cfpath == NULL) {
+		ret = -1;
+	}
+	else {
+		int len = CFStringGetLength(cfpath);
+		Size actualLen;
+		CFStringGetBytes(cfpath, CFRangeMake(0, len), dest_cftype, 0, false,
+			path, bufsize, &actualLen);
+		CFRelease(cfpath);
+		ret = (int)actualLen;
+	}
+	return ret;
+}
+
 static OSStatus CreateCFArrayFromAEDescList(
 	const AEDescList *	descList, 
 	CFArrayRef *		itemsPtr
@@ -344,7 +371,10 @@ static OSStatus CreateCFArrayFromAEDescList(
 			err = AEGetNthDesc(descList, itemIndex, typeAERecord, &junkKeyword, &thisItem);
 
 			// Extract the path and create a CFURL.
-
+// ADK: Coercing to typeUTF8Text does not work on 10.4 apparently (so much for
+// LoginItemsAE.c being universal) so employ a solution from Jake Sprouse. 
+// http://jakesprouse.net/2007/03/28/debugging-apples-loginitemsaec-on-intel-macs
+#ifdef ORIGINAL_APPLE_CODE
 			if (err == noErr) {
 				err = AEGetKeyPtr(
 					&thisItem, 
@@ -356,6 +386,24 @@ static OSStatus CreateCFArrayFromAEDescList(
 					&thisPathSize
 				);
 			}
+#else
+			if (err == noErr) {
+				err = AEGetKeyPtr(
+					&thisItem, 
+					propPath, 
+					typeUnicodeText, 
+					&junkType, 
+					thisPath, 
+					sizeof(thisPath) - 1, 		// to ensure that we can always add null terminator
+					&thisPathSize
+				);
+			}
+			if (err == noErr) {
+					thisPathSize = ConvertPathEncoding(
+					thisPath, thisPathSize, sizeof(thisPath) - 1, 
+					kCFStringEncodingUnicode, kCFStringEncodingUTF8);
+			}
+#endif
 			if (err == noErr) {
 				thisPath[thisPathSize] = 0;
 				
@@ -695,13 +743,24 @@ extern OSStatus LIAEAddRefAtEnd(const FSRef *item, Boolean hideIt)
 		// System Events complains if you pass it typeUTF8Text directly, so 
 		// we do the conversion from typeUTF8Text to typeUnicodeText on our 
 		// side of the world.
-		
+// ADK: Coercing to typeUTF8Text does not work on 10.4 apparently (so much for
+// LoginItemsAE.c being universal) so employ a solution from Jake Sprouse. 
+// http://jakesprouse.net/2007/03/28/debugging-apples-loginitemsaec-on-intel-macs
+#ifdef ORIGINAL_APPLE_CODE
 		if (err == noErr) {
 			err = AECoercePtr(typeUTF8Text, path, (Size) strlen(path), typeUnicodeText, &pathDesc);
 		}
 		if (err == noErr) {
 			err = AEPutKeyDesc(&properties, propPath, &pathDesc);
 		}
+#else
+		if (err == noErr) {
+			int len = ConvertPathEncoding(
+            (UInt8*)path, strlen(path), sizeof(path), 
+            kCFStringEncodingUTF8, kCFStringEncodingUnicode);
+			err = AEPutKeyPtr(&properties, propPath, typeUnicodeText, path, len);
+		}
+#endif
 		if (err == noErr) {
 			err = AEPutKeyPtr(&properties, propHidden, typeBoolean, &hideIt, sizeof(hideIt));
 		}
