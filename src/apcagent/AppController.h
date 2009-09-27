@@ -23,8 +23,10 @@
  */
 
 #import <Cocoa/Cocoa.h>
-#import <alist.h>
-#import <astring.h>
+#import "alist.h"
+#import "astring.h"
+#import "InstanceManager.h"
+#import "InstanceConfig.h"
 
 class StatMgr;
 
@@ -57,6 +59,7 @@ class StatMgr;
    row:(int)rowIndex;
 @end
 
+
 @interface AppController: NSObject
 {
    // Status item shown in the status bar
@@ -85,6 +88,10 @@ class StatMgr;
    IBOutlet NSWindow *eventsWindow;
    IBOutlet NSTableView *eventsGrid;
 
+   // The popup window and its controls
+   IBOutlet NSWindow *popupWindow;
+   IBOutlet NSTextField *popupText;
+
    // Icon images
    NSImage      *commlostImage;
    NSImage      *chargingImage;
@@ -93,9 +100,8 @@ class StatMgr;
 
    // User-configurable settings and a lock to protect them
    NSLock *configMutex;
-   NSString *host;
-   int port;
-   int refresh;
+   InstanceConfig *config;
+   InstanceManager *manager;
 
    // Copy of settings used to detect changes
    NSString *prevHost;
@@ -112,11 +118,18 @@ class StatMgr;
    EventsTableDataSource *eventsDataSource;
    bool updateEvents;
 
+NSString *lastStatus;
+
    // Timer for UPS polling
    NSTimer *timer;
 
    // C++ object which handles polling the UPS
    StatMgr *statmgr;
+
+   // Runloop variables
+   BOOL running;
+   CFRunLoopRef runLoop;
+   NSConditionLock *condLock;
 }
 
 -(IBAction)config:(id)sender;
@@ -126,6 +139,11 @@ class StatMgr;
 -(IBAction)events:(id)sender;
 -(IBAction)about:(id)sender;
 
+-(NSString *)id;
+-(void)close;
+
 - (void)timerHandler:(NSTimer*)theTimer;
+
+- (void)activateWithConfig:(InstanceConfig*)cfg manager:(InstanceManager*)mgr;
 
 @end

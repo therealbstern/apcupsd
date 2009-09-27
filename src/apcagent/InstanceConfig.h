@@ -1,5 +1,5 @@
 /*
- * main.m
+ * InstanceConfig.h
  *
  * Apcupsd monitoring applet for Mac OS X
  */
@@ -23,12 +23,33 @@
  */
 
 #import <Cocoa/Cocoa.h>
-#import "InstanceManager.h"
 
-int main(int argc, char *argv[])
+#define INSTANCES_PREF_KEY @"Instances"
+#define ID_PREF_KEY        @"id"
+#define HOSTNAME_PREF_KEY  @"host"
+#define PORT_PREF_KEY      @"port"
+#define REFRESH_PREF_KEY   @"refresh"
+
+@interface InstanceConfig: NSObject
 {
-   NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
-   [[[InstanceManager alloc] init] createMonitors];
-   [p release]; // run is never coming back, so free the pool now
-	[[NSApplication sharedApplication] run];
+   NSMutableDictionary *config;
 }
+
++ (InstanceConfig*)configWithDictionary:(NSDictionary*)dict;
++ (InstanceConfig*) configWithDefaults;
++ (void) removeConfigWithId:(NSString*)id;
+- (void)dealloc;
+
+- (NSString *)host;
+- (int)port;
+- (int)refresh;
+- (NSString *)id;
+
+- (void)setHost:(NSString *)host;
+- (void)setPort:(int)port;
+- (void)setRefresh:(int)refresh;
+
+- (void)save;
+
+@end
+

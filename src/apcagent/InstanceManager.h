@@ -1,5 +1,5 @@
 /*
- * main.m
+ * InstanceManager.h
  *
  * Apcupsd monitoring applet for Mac OS X
  */
@@ -22,13 +22,20 @@
  * MA 02111-1307, USA.
  */
 
-#import <Cocoa/Cocoa.h>
-#import "InstanceManager.h"
+#import "InstanceConfig.h"
 
-int main(int argc, char *argv[])
+@interface InstanceManager: NSObject
 {
-   NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
-   [[[InstanceManager alloc] init] createMonitors];
-   [p release]; // run is never coming back, so free the pool now
-	[[NSApplication sharedApplication] run];
+   NSMutableDictionary *instmap;
+   NSNib *nib;
 }
+
+- (InstanceManager *)init;
+- (void)dealloc;
+
+-(IBAction)remove:(id)sender;
+-(IBAction)add:(id)sender;
+
+- (void) createMonitors;
+
+@end

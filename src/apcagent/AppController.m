@@ -30,16 +30,8 @@
 //******************************************************************************
 @implementation AppController
 
-#define HOSTNAME_PREF_KEY @"host"
-#define PORT_PREF_KEY     @"port"
-#define REFRESH_PREF_KEY  @"refresh"
-
-#define DEFAULT_HOSTNAME  @"127.0.0.1"
-#define DEFAULT_PORT      3551
-#define DEFAULT_REFRESH   5
-
-- (void) awakeFromNib{
-
+- (void)awakeFromNib
+{
    // Load images
    NSBundle *bundle = [NSBundle mainBundle];
    chargingImage = [[NSImage alloc] initWithContentsOfFile:
@@ -60,46 +52,47 @@
 
    // Setup status table control
    statusDataSource = [[StatusTableDataSource alloc] init];
-   [[[statusGrid tableColumns] objectAtIndex:0] setIdentifier:[NSNumber numberWithInt:0]];
-   [[[statusGrid tableColumns] objectAtIndex:1] setIdentifier:[NSNumber numberWithInt:1]];
    [statusGrid setDataSource:statusDataSource];
 
    // Setup events table control
    eventsDataSource = [[EventsTableDataSource alloc] init];
    [eventsGrid setDataSource:eventsDataSource];
+}
 
-   // Establish default preferences
-   NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-   NSDictionary *defaults = [NSDictionary dictionaryWithObjectsAndKeys:
-       DEFAULT_HOSTNAME,                         HOSTNAME_PREF_KEY, 
-       [NSNumber numberWithInt:DEFAULT_PORT],    PORT_PREF_KEY, 
-       [NSNumber numberWithInt:DEFAULT_REFRESH], REFRESH_PREF_KEY, 
-       nil];
-   [prefs registerDefaults:defaults];
-
-   // Lookup preferences
-   configMutex = [[NSLock alloc] init];
-   host = [[prefs stringForKey:HOSTNAME_PREF_KEY] retain];
-   port = [prefs integerForKey:PORT_PREF_KEY];
-   refresh = [prefs integerForKey:REFRESH_PREF_KEY];
+- (void)activateWithConfig:(InstanceConfig*)cfg manager:(InstanceManager*)mgr
+{
+   manager = [mgr retain];
 
    // Save copies of preferences so worker can tell what changed
-   prevHost = [host retain];
-   prevPort = port;
-   prevRefresh = refresh;
+   configMutex = [[NSLock alloc] init];
+   config = [cfg retain];
+   prevHost = [[config host] retain];
+   prevPort = [config port];
+   prevRefresh = [config refresh];
    statmgr = NULL;
+   lastStatus = [@"" retain];
 
    // Create timer object used by the thread
-   timer = [[NSTimer timerWithTimeInterval:refresh target:self 
+   timer = [[NSTimer timerWithTimeInterval:[config refresh] target:self 
             selector:@selector(timerHandler:) userInfo:nil repeats:YES] retain];
 
    // Start worker thread to handle polling UPS for status
-   [NSThread detachNewThreadSelector:@selector(thread:) toTarget:self withObject:nil];
+   running = YES;
+   condLock = [[NSConditionLock alloc] initWithCondition:1];
+   [NSThread detachNewThreadSelector:@selector(thread:) 
+                                     toTarget:self 
+                                     withObject:nil];
 }
 
 - (void) thread:(id)arg
 {
    NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
+
+   // Hold this lock while we're running to prevent release of the object
+   [condLock lockWhenCondition:1];
+
+   // Publicise our CFRunLoop reference so main thread can stop us
+   runLoop = [[NSRunLoop currentRunLoop] getCFRunLoop];
 
    // Add periodic timer to the runloop
    [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
@@ -107,24 +100,37 @@
    // Fire timer once immediately to get the first data sample ASAP
    [timer fire];
 
-   // Enter the run loop...forever
-   [[NSRunLoop currentRunLoop] run];
+   // Invoke the runloop until we're asked to exit
+   while (running)
+   {
+      [[NSRunLoop currentRunLoop] runMode:NSDefaultRunLoopMode 
+                                  beforeDate:[NSDate distantFuture]];
+   }
 
+   // All done...clean up
+   [timer invalidate];
+   [timer release];
+   delete statmgr;
    [p release];
+
+   // Signal that we've completed
+   [condLock unlockWithCondition:0];
 }
 
 - (void)timerHandler:(NSTimer*)theTimer
 {
    // Reinitialize the StatMgr if host or port setting changes
    [configMutex lock];
-   if (!statmgr || ![prevHost isEqualToString:host] || prevPort != port)
+   if (!statmgr || 
+       ![prevHost isEqualToString:[config host]] || 
+       prevPort != [config port])
    {
       [statusItem setImage:commlostImage];
       delete statmgr;
-      statmgr = new StatMgr([host UTF8String], port);
+      statmgr = new StatMgr([[config host] UTF8String], [config port]);
       [prevHost release];
-      prevHost = [host retain];
-      prevPort = port;
+      prevHost = [[config host] retain];
+      prevPort = [config port];
    }
    [configMutex unlock];
 
@@ -190,15 +196,27 @@
       [eventsDataSource populate:eventStrings];
       [eventsGrid reloadData];
    }
+#if 0
+   // Display event in a popup window
+   NSString *newStatus = [NSString stringWithCString:statstr];
+   if ([lastStatus length] && ![lastStatus isEqualToString:newStatus])
+   {
+      [popupText setStringValue:[NSString stringWithFormat:@"%s: %s",
+         upsname.str(), statstr.str()]];
+      [popupWindow orderFront:self];
+   }
 
+   [lastStatus release];
+   lastStatus = [newStatus retain];
+#endif
    // If refresh interval changed, invalidate old timer and start a new one
    [configMutex lock];
-   if (prevRefresh != refresh)
+   if (prevRefresh != [config refresh])
    {
-      prevRefresh = refresh;
+      prevRefresh = [config refresh];
       [theTimer invalidate];
       [theTimer release];
-      timer = [[NSTimer timerWithTimeInterval:refresh target:self 
+      timer = [[NSTimer timerWithTimeInterval:[config refresh] target:self 
                selector:@selector(timerHandler:) userInfo:nil repeats:YES] retain];
       [[NSRunLoop currentRunLoop] addTimer:timer forMode:NSDefaultRunLoopMode];
    }
@@ -206,26 +224,30 @@
 }
 
 - (void) dealloc {
-    [chargingImage release];
-    [commlostImage release];
-    [onlineImage release];
-    [onbattImage release];
-    [host release];
-    [prevHost release];
-    [timer invalidate];
-    [timer release];
-    [statusDataSource release];
-    [eventsDataSource release];
-    [configMutex release];
-    [super dealloc];
+   NSLog(@"%s:%d", __FUNCTION__, __LINE__);
+   [chargingImage release];
+   [commlostImage release];
+   [onlineImage release];
+   [onbattImage release];
+
+   [prevHost release];
+   [lastStatus release];
+
+   [statusDataSource release];
+   [eventsDataSource release];
+   [configMutex release];
+   [condLock release];
+   [manager release];
+   [statusItem release];
+   [super dealloc];
 }
 
 -(IBAction)config:(id)sender;
 {
    // Copy current settings into config window
-   [configHost setStringValue:host];
-   [configPort setIntValue:port];
-   [configRefresh setIntValue:refresh];
+   [configHost setStringValue:[config host]];
+   [configPort setIntValue:[config port]];
+   [configRefresh setIntValue:[config refresh]];
 
    // Force app to foreground and move key focus to config window
    [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
@@ -276,17 +298,11 @@
    {
       // Grab new settings from window controls
       [configMutex lock];
-      [host release];
-      host = [[configHost stringValue] retain];
-      port = [configPort intValue];
-      refresh = [configRefresh intValue];
+      [config setHost:[configHost stringValue]];
+      [config setPort:[configPort intValue]];
+      [config setRefresh:[configRefresh intValue]];
+      [config save];
       [configMutex unlock];
-
-      // Save new preferences
-      NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
-      [prefs setObject:host forKey:HOSTNAME_PREF_KEY];
-      [prefs setInteger:port forKey:PORT_PREF_KEY];
-      [prefs setInteger:refresh forKey:REFRESH_PREF_KEY];
 
       // Hide window
       [configWindow orderOut:self];
@@ -325,6 +341,27 @@
    // the time. So we'll force ourself active, then call out to NSApp.
    [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
    [[NSApplication sharedApplication] orderFrontStandardAboutPanel:self];
+}
+
+-(NSString *)id
+{
+   return [config id];
+}
+
+-(void)close
+{
+   NSLog(@"%s:%d", __FUNCTION__, __LINE__);
+
+   // Stop the runloop and wait for it to complete
+   // Using a lock to wait for thread termination is silly, but Apple's 
+   // lousy threading API gives us no 'join'.
+   running = NO;
+   CFRunLoopStop(runLoop);
+   [condLock lockWhenCondition:0];
+   [condLock unlockWithCondition:0];
+
+   // Remove the icon from the status bar
+   [[NSStatusBar systemStatusBar] removeStatusItem:statusItem];
 }
 
 @end
