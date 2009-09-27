@@ -157,9 +157,19 @@
       tooltip.format("%s: %s", upsname.str(), statstr.str());
    [statusItem setToolTip:[NSString stringWithCString:tooltip]];
 
+   // Update menu with UPS name and host
+   if (upsname.empty())
+      upsname = "<unknown>";
+   [upsName setTitle:[NSString stringWithFormat:@"UPS: %s",upsname.str()]];
+   [upsHost setTitle:[NSString stringWithFormat:@"HOST: %@:%d",[config host],[config port]]];
+
    // Update status window, but only if it's visible (optimization)
    if ([statusWindow isVisible])
    {
+      // Set window title to include UPS name
+      [statusWindow setTitle:
+         [NSString stringWithFormat:@"Status for UPS: %s",upsname.str()]];
+
       // Update raw status table
       alist<astring> stats;
       statmgr->GetAll(stats);
@@ -190,6 +200,10 @@
    // Update events window, but only if it's visible (optimization)
    if ([eventsWindow isVisible])
    {
+      // Set window title to include UPS name
+      [eventsWindow setTitle:
+         [NSString stringWithFormat:@"Events for UPS: %s",upsname.str()]];
+
       // Fetch current events from the UPS
       alist<astring> eventStrings;
       statmgr->GetEvents(eventStrings);

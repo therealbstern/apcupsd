@@ -30,5 +30,5 @@ int main(int argc, char *argv[])
    NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
    [[[InstanceManager alloc] init] createMonitors];
    [p release]; // run is never coming back, so free the pool now
-	[[NSApplication sharedApplication] run];
+   [[NSApplication sharedApplication] run];
 }

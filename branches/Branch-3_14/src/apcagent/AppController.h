@@ -67,6 +67,8 @@ class StatMgr;
 
    // The menu attached to the status item
    IBOutlet NSMenu *statusMenu;
+   IBOutlet NSMenuItem *upsName;
+   IBOutlet NSMenuItem *upsHost;
 
    // The config window and its controls
    IBOutlet NSWindow *configWindow;

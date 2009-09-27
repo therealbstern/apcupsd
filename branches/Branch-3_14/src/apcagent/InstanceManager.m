@@ -24,7 +24,7 @@
 
 #import "InstanceConfig.h"
 #import "AppController.h"
-
+#include "LoginItemsAE.h"
 
 @implementation InstanceManager
 
@@ -44,6 +44,42 @@
    [nib release];
    [instmap release];
    [super dealloc];
+}
+
+-(NSURL*)appURL
+{
+   // Get application URL (10.4 lacks NSBundle::bundleURL so get the path
+   // and then convert to a file URL)
+   return [NSURL fileURLWithPath:[[NSBundle mainBundle] bundlePath]];
+}
+
+-(int)loginItemIndex
+{
+   // Fetch current user login items
+   NSArray *loginItems = NULL;
+   OSStatus stat = LIAECopyLoginItems((CFArrayRef*)&loginItems);
+
+   // Search list for our URL
+   unsigned int i;
+   if (stat == 0)
+   {
+      NSURL *appUrl = [self appURL];
+      for (i = 0; i < [loginItems count]; i++)
+      {
+         NSURL *url = [[loginItems objectAtIndex:i] objectForKey:(NSString*)kLIAEURL];
+         if ([url isEqual:appUrl])
+            break;
+      }
+
+      if (i == [loginItems count])
+         i = -1;
+
+      [loginItems release];
+   }
+   else
+      i = -1;
+
+   return i;
 }
 
 - (void) instantiateMonitor:(InstanceConfig*)config
@@ -79,6 +115,11 @@
       config = [InstanceConfig configWithDefaults];
       [config save];
       instances = [prefs arrayForKey:INSTANCES_PREF_KEY];
+
+      // Add login item if not already there
+      int idx = [self loginItemIndex];
+      if (idx == -1)
+         LIAEAddURLAtEnd((CFURLRef)[self appURL], NO);
    }
 
    // Instantiate monitors
@@ -122,7 +163,22 @@
 
    // If all instances have been removed, terminate the app
    if ([instmap count] == 0)
-      [[NSApplication sharedApplication] terminate:self];
+      [self removeAll:sender];
+}
+
+-(IBAction)removeAll:(id)sender
+{
+   // Remove all instances from preferences
+   NSUserDefaults *prefs = [NSUserDefaults standardUserDefaults];
+   [prefs removeObjectForKey:INSTANCES_PREF_KEY];
+
+   // Remove user login item
+   int idx = [self loginItemIndex];
+   if (idx != -1)
+      LIAERemove(idx);
+
+   // Terminate the app
+   [[NSApplication sharedApplication] terminate:self];
 }
 
 @end
