@@ -35,6 +35,7 @@
 
 -(IBAction)remove:(id)sender;
 -(IBAction)add:(id)sender;
+-(IBAction)removeAll:(id)sender;
 
 - (void) createMonitors;
 
