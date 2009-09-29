@@ -24,6 +24,7 @@
 
 #import "AppController.h"
 #import "statmgr.h"
+#import <Growl/Growl.h>
 
 //******************************************************************************
 // CLASS AppController
@@ -132,6 +133,8 @@
       prevHost = [[config host] retain];
       prevPort = [config port];
    }
+   BOOL doPopup = [config popups];
+   NSString *id = [config id];
    [configMutex unlock];
 
    // Grab updated status info from apcupsd
@@ -150,12 +153,13 @@
       [statusItem setImage:chargingImage];   
 
    // Update tooltip with status and UPS name
-   astring tooltip;
+   NSString *tooltip;
    if (upsname == "UPS_IDEN" || upsname.empty())
-      tooltip = statstr;
+      tooltip = [NSString stringWithCString:statstr];
    else
-      tooltip.format("%s: %s", upsname.str(), statstr.str());
-   [statusItem setToolTip:[NSString stringWithCString:tooltip]];
+      tooltip = [NSString stringWithFormat:
+                 @"%s: %s", upsname.str(), statstr.str()];
+   [statusItem setToolTip:tooltip];
 
    // Update menu with UPS name and host
    if (upsname.empty())
@@ -210,19 +214,48 @@
       [eventsDataSource populate:eventStrings];
       [eventsGrid reloadData];
    }
-#if 0
-   // Display event in a popup window
+
+   // If status has changed, display a popup window
    NSString *newStatus = [NSString stringWithCString:statstr];
-   if ([lastStatus length] && ![lastStatus isEqualToString:newStatus])
+   if (doPopup && [lastStatus length] && 
+       ![lastStatus isEqualToString:newStatus])
    {
-      [popupText setStringValue:[NSString stringWithFormat:@"%s: %s",
-         upsname.str(), statstr.str()]];
-      [popupWindow orderFront:self];
+      // Determine severity based on keywords in the status string
+      NSString *severity;
+      if ([newStatus rangeOfString:@"ONBATT"].length ||
+          [newStatus rangeOfString:@"LOWBATT"].length ||
+          [newStatus rangeOfString:@"SHUTTING DOWN"].length ||
+          [newStatus rangeOfString:@"COMMLOST"].length)
+      {
+         severity = @"ApcupsdCritical";
+      }
+      else if ([newStatus rangeOfString:@"ONLINE"].length ||
+               [newStatus rangeOfString:@"OVERLOAD"].length ||
+               [newStatus rangeOfString:@"REPLACEBATT"].length)
+      {
+         severity = @"ApcupsdWarning";
+      }
+      else
+      {
+         severity = @"ApcupsdInfo";
+      }
+
+      // Post the popup to Growl
+      [GrowlApplicationBridge
+         notifyWithTitle:@"Apcupsd Event"
+         description:tooltip
+         notificationName:severity
+         iconData:[[statusItem image] TIFFRepresentation]
+         priority:0
+         isSticky:NO
+         clickContext:nil
+         identifier:id];
    }
 
+   // Save status for comparison next time
    [lastStatus release];
    lastStatus = [newStatus retain];
-#endif
+
    // If refresh interval changed, invalidate old timer and start a new one
    [configMutex lock];
    if (prevRefresh != [config refresh])
@@ -262,6 +295,39 @@
    [configHost setStringValue:[config host]];
    [configPort setIntValue:[config port]];
    [configRefresh setIntValue:[config refresh]];
+
+   if ([GrowlApplicationBridge isGrowlInstalled])
+   {
+      [configPopups setEnabled:YES];
+      [configPopups setIntValue:[config popups]];
+
+      if ([GrowlApplicationBridge isGrowlRunning])
+      {
+         [growlLabel setStringValue:
+            @"Growl is installed and running. Popups will be displayed if "
+             "enabled here and may be further configured in the Growl "
+             "preferences pane in System Preferences."];
+         [growlLabel setTextColor:[NSColor controlTextColor]];
+      }
+      else
+      {
+         [growlLabel setStringValue:
+            @"Growl does not appear to be running. Popups will not be "
+             "displayed. Growl can be started in the Growl preferences "
+             "pane in System Preferences."];
+         [growlLabel setTextColor:[NSColor redColor]];
+      }
+   }
+   else
+   {
+      [growlLabel setStringValue:
+         @"This feature requires Growl (http://www.growl.info). "
+          "Growl does not appear to be installed. Please install "
+          "Growl to enable popups."];
+      [growlLabel setTextColor:[NSColor redColor]];
+      [configPopups setEnabled:NO];
+      [configPopups setIntValue:0];
+   }
 
    // Force app to foreground and move key focus to config window
    [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
@@ -315,6 +381,11 @@
       [config setHost:[configHost stringValue]];
       [config setPort:[configPort intValue]];
       [config setRefresh:[configRefresh intValue]];
+
+      // Only change popups config if Growl is installed
+      if ([GrowlApplicationBridge isGrowlInstalled])
+         [config setPopups:[configPopups intValue]];
+
       [config save];
       [configMutex unlock];
 

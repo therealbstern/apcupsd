@@ -29,6 +29,7 @@
 #define HOSTNAME_PREF_KEY  @"host"
 #define PORT_PREF_KEY      @"port"
 #define REFRESH_PREF_KEY   @"refresh"
+#define POPUPS_PREF_KEY    @"popups"
 
 @interface InstanceConfig: NSObject
 {
@@ -43,11 +44,13 @@
 - (NSString *)host;
 - (int)port;
 - (int)refresh;
+- (BOOL)popups;
 - (NSString *)id;
 
 - (void)setHost:(NSString *)host;
 - (void)setPort:(int)port;
 - (void)setRefresh:(int)refresh;
+- (void)setPopups:(BOOL)popupsEnabled;
 
 - (void)save;
 
