@@ -28,6 +28,7 @@
 #define DEFAULT_HOSTNAME   @"127.0.0.1"
 #define DEFAULT_PORT       3551
 #define DEFAULT_REFRESH    5
+#define DEFAULT_POPUPS     YES
 
 @implementation InstanceConfig
 
@@ -48,6 +49,7 @@
    [cfg->config setObject:DEFAULT_HOSTNAME forKey:HOSTNAME_PREF_KEY];
    [cfg->config setObject:[NSNumber numberWithInt:DEFAULT_PORT] forKey:PORT_PREF_KEY];
    [cfg->config setObject:[NSNumber numberWithInt:DEFAULT_REFRESH] forKey:REFRESH_PREF_KEY];
+   [cfg->config setObject:[NSNumber numberWithBool:DEFAULT_POPUPS] forKey:POPUPS_PREF_KEY];
 
    return cfg;
 }
@@ -97,6 +99,11 @@
    return [(NSNumber*)[config objectForKey:REFRESH_PREF_KEY] intValue];
 }
 
+- (BOOL)popups
+{
+   return [(NSNumber*)[config objectForKey:POPUPS_PREF_KEY] boolValue];
+}
+
 - (NSString *)id
 {
    return [[[config objectForKey:ID_PREF_KEY] retain] autorelease];
@@ -115,6 +122,11 @@
 - (void)setRefresh:(int)refresh;
 {
    [config setObject:[NSNumber numberWithInt:refresh] forKey:REFRESH_PREF_KEY];
+}
+
+- (void)setPopups:(BOOL)popupsEnabled;
+{
+   [config setObject:[NSNumber numberWithBool:popupsEnabled] forKey:POPUPS_PREF_KEY];
 }
 
 - (void) save

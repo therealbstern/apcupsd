@@ -76,6 +76,8 @@ class StatMgr;
    IBOutlet NSTextField *configHost;
    IBOutlet NSTextField *configPort;
    IBOutlet NSTextField *configRefresh;
+   IBOutlet NSTextField *growlLabel;
+   IBOutlet NSButton *configPopups;
 
    // The status window and its controls
    IBOutlet NSWindow *statusWindow;
@@ -90,10 +92,6 @@ class StatMgr;
    // The events window and its controls
    IBOutlet NSWindow *eventsWindow;
    IBOutlet NSTableView *eventsGrid;
-
-   // The popup window and its controls
-   IBOutlet NSWindow *popupWindow;
-   IBOutlet NSTextField *popupText;
 
    // Icon images
    NSImage      *commlostImage;
