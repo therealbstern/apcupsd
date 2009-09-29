@@ -1,11 +1,12 @@
 topdir:=..
 
-SUBDIRS = lib drivers $(CGIDIR) $(USBHIDDIR) $(GAPCMON)
+SUBDIRS = lib drivers $(CGIDIR) $(USBHIDDIR) $(GAPCMON) $(APCAGENT)
 include $(topdir)/autoconf/targets.mak
 
-# Force cgi/ to build after lib/
-# Necessary for parallel make since cgi links against libapc.a
+# Force cgi/ and apcagent/ to build after lib/
+# Necessary for parallel make since they link against libapc.a
 cgi_DIR: lib_DIR
+apcagent_DIR: lib_DIR
 
 common_srcs     := options.c device.c reports.c action.c
 apcupsd_srcs    := apcupsd.c apcnis.c

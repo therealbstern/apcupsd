@@ -732,6 +732,7 @@ PKG_CONFIG
 GAPCMON_CFLAGS
 GAPCMON_LIBS
 GAPCMON
+APCAGENT
 POWERFLUTE
 POWERLIBS
 MAKE
@@ -1379,7 +1380,8 @@ Optional Features:
 
   --enable-pcnet          Compile PCNET driver code (default)
   --disable-pcnet         No PCNET driver
-  --enable-gapcmon        Build GTK/GUI front-end to apcupsd default=no
+  --enable-gapcmon        Build GTK/GUI front-end to apcupsd (default=no)
+  --enable-apcagent       Build menubar app for Mac OS X (default=no)
   --enable-install-distdir
                           Install distribution
 
@@ -5436,7 +5438,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 else
   ac_cv_header_stdc=no
 fi
-rm -f -r conftest*
+rm -f conftest*
 
 fi
 
@@ -5457,7 +5459,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 else
   ac_cv_header_stdc=no
 fi
-rm -f -r conftest*
+rm -f conftest*
 
 fi
 
@@ -7707,7 +7709,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 else
   ac_cv_type_uid_t=no
 fi
-rm -f -r conftest*
+rm -f conftest*
 
 fi
 { echo "$as_me:$LINENO: result: $ac_cv_type_uid_t" >&5
@@ -7812,7 +7814,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 else
   ac_cv_type_getgroups=int
 fi
-rm -f -r conftest*
+rm -f conftest*
 
 fi
 fi
@@ -8153,7 +8155,7 @@ if (eval "$ac_cpp conftest.$ac_ext") 2>&5 |
 else
   ac_cv_type_uid_t=no
 fi
-rm -f -r conftest*
+rm -f conftest*
 
 fi
 { echo "$as_me:$LINENO: result: $ac_cv_type_uid_t" >&5
@@ -8382,7 +8384,7 @@ _ACEOF
       eval "ac_im_$ac_var=\`\${MAKE-make} $ac_var 2>/dev/null | sed -n 's/^$ac_var=//p'\`"
     done
     # Open Windows xmkmf reportedly sets LIBDIR instead of USRLIBDIR.
-    for ac_extension in a so sl dylib la dll; do
+    for ac_extension in a so sl; do
       if test ! -f "$ac_im_usrlibdir/libX11.$ac_extension" &&
 	 test -f "$ac_im_libdir/libX11.$ac_extension"; then
 	ac_im_usrlibdir=$ac_im_libdir; break
@@ -8535,7 +8537,7 @@ sed 's/^/| /' conftest.$ac_ext >&5
 for ac_dir in `echo "$ac_x_includes $ac_x_header_dirs" | sed s/include/lib/g`
 do
   # Don't even attempt the hair of trying to link an X program!
-  for ac_extension in a so sl dylib la dll; do
+  for ac_extension in a so sl; do
     if test -r "$ac_dir/libX11.$ac_extension"; then
       ac_x_libraries=$ac_dir
       break 2
@@ -11710,6 +11712,34 @@ fi
 
 
 
+APCAGENT=
+APCAGENT_ENABLED=no
+# Check whether --enable-apcagent was given.
+if test "${enable_apcagent+set}" = set; then
+  enableval=$enable_apcagent;  if test "$enableval" = "yes" ; then
+      case $host in
+      *-*-darwin*)
+         APCAGENT=apcagent
+         APCAGENT_ENABLED=yes
+         ;;
+      *)
+         { { echo "$as_me:$LINENO: error: apcagent can only be built on Mac OS X" >&5
+echo "$as_me: error: apcagent can only be built on Mac OS X" >&2;}
+   { (exit 1); exit 1; }; }
+         ;;
+      esac
+   fi
+else
+  case $host in
+   *-*-darwin*)
+      APCAGENT=apcagent
+      APCAGENT_ENABLED=yes
+      ;;
+   esac
+fi
+
+
+
 if test -n "$GCC"; then
    # Starting with GCC 3.0, you must link C++ programs against either
    # libstdc++ (shared by default), or libsupc++ (always static).  If
@@ -13383,6 +13413,7 @@ PKG_CONFIG!$PKG_CONFIG$ac_delim
 GAPCMON_CFLAGS!$GAPCMON_CFLAGS$ac_delim
 GAPCMON_LIBS!$GAPCMON_LIBS$ac_delim
 GAPCMON!$GAPCMON$ac_delim
+APCAGENT!$APCAGENT$ac_delim
 POWERFLUTE!$POWERFLUTE$ac_delim
 POWERLIBS!$POWERLIBS$ac_delim
 MAKE!$MAKE$ac_delim
@@ -13412,7 +13443,7 @@ LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 47; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 48; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5
@@ -13895,6 +13926,7 @@ Configuration on `date`:
   enable-pthreads:            ${with_pthreads}
   enable-dist-install:        ${with_distdir}
   enable-gapcmon:             ${GAPCMON_ENABLED}
+  enable-apcagent:            ${APCAGENT_ENABLED}
   " > config.out
 
 cat config.out
