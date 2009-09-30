@@ -226,7 +226,7 @@ endef
 # Copy a file
 define COPY
    @$(ECHO) "  CP   " $(1) =\> $(DESTDIR)/$(2)
-   $(V)$(CP) -f $(1) $(DESTDIR)/$(2)
+   $(V)$(CP) -fR $(1) $(DESTDIR)/$(2)
 endef
 
 # Uninstall a file

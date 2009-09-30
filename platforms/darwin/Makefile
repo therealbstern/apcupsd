@@ -88,6 +88,9 @@ apcupsd.pkg:
 	cp ApcupsdDaemon.postflight $(PKGROOT)/Apcupsd.Scripts/postflight
 	chown root:admin $(PKGROOT)/Apcupsd.Root/Library
 	chmod 1775 $(PKGROOT)/Apcupsd.Root/Library
+	chown root $(PKGROOT)/Apcupsd.Root/Applications
+	chgrp admin $(PKGROOT)/Apcupsd.Root/Applications
+	chmod 775 $(PKGROOT)/Apcupsd.Root/Applications
 	$(PACKAGEMAKER) -v --no-recommend --no-relocate --root $(PKGROOT)/Apcupsd.Root \
 	   --info ApcupsdDaemon.Info.plist --resources $(PKGROOT)/Apcupsd.Resources \
 	   --scripts $(PKGROOT)/Apcupsd.Scripts --id com.apcupsd.apcupsd --root-volume-only \
