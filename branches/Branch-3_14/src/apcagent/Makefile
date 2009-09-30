@@ -2,8 +2,6 @@ topdir:=../..
 include $(topdir)/autoconf/targets.mak
 
 SRCS = $(wildcard *.m) $(wildcard *.c)
-
-LIBS := -Wl,-framework -Wl,Cocoa $(LIBS)
 LIBS := -Wl,-framework -Wl,Cocoa -Wl,-framework -Wl,Growl $(LIBS)
 
 all-targets: apcagent MainMenu.nib apcagent.app
@@ -31,11 +29,21 @@ apcagent.app: apcagent MainMenu.nib Info.plist PkgInfo growl.plist \
 	$(V)$(INSTALL_DATA) -m 644 $(topdir)/doc/images/charging.png apcagent.app/Contents/Resources
 	$(V)$(INSTALL_DATA) -m 644 $(topdir)/doc/images/onbatt.png apcagent.app/Contents/Resources
 	$(V)$(INSTALL_DATA) -m 644 $(topdir)/doc/images/online.png apcagent.app/Contents/Resources
-	$(V)cp -r /Developer/SDKs/MacOSX10.4u.sdk/System/Library/Frameworks/Growl.framework apcagent.app/Contents/Frameworks
+	$(V)cp -R /Developer/SDKs/MacOSX10.4u.sdk/System/Library/Frameworks/Growl.framework apcagent.app/Contents/Frameworks
 	$(V)$(INSTALL_DATA) -m 644 growl.plist apcagent.app/Contents/Resources/Growl\ Registration\ Ticket.growlRegDict
 
 apcagent.dmg: apcagent.app
 	hdiutil create -ov -srcfolder apcagent.app apcagent.dmg
+
+all-install: install-apcagent
+all-uninstall: uninstall-apcagent
+
+install-apcagent:
+	$(call MKDIR,/Applications)
+	$(call COPY,apcagent.app,Applications)
+
+uninstall-apcagent:
+	$(call UNINST,/Applications/apcagent.app)
 
 # Include dependencies
 -include $(DEPS)
