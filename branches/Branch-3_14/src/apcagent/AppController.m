@@ -240,6 +240,10 @@
          severity = @"ApcupsdInfo";
       }
 
+      // Register w/ Growl in case it wasn't installed when we started
+      // or user removed Apcagent from Growl preferences.
+      [GrowlApplicationBridge setGrowlDelegate:@""];
+
       // Post the popup to Growl
       [GrowlApplicationBridge
          notifyWithTitle:@"Apcupsd Event"
