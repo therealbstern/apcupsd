@@ -22,7 +22,7 @@
 
 #include "apc.h"
 #include "wintray.h"
-#include "winres.h"
+#include "resource.h"
 #include "winups.h"
 #include "statmgr.h"
 #include "balloonmgr.h"

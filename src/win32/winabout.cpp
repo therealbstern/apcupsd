@@ -12,7 +12,7 @@
 
 #include <windows.h>
 #include "winabout.h"
-#include "winres.h"
+#include "resource.h"
 
 // Constructor/destructor
 upsAbout::upsAbout(HINSTANCE appinst)

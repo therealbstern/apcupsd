@@ -7,7 +7,7 @@
  *   July MM  
  */
 #include "windows.h"
-#include "winres.h"
+#include "resource.h"
 #include "winups.h"
 #include <stdio.h>
 

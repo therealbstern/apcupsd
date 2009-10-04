@@ -18,7 +18,7 @@
 
 #include "apc.h"
 #include "balloonmgr.h"
-#include "winres.h"
+#include "resource.h"
 
 #define MAX_TIMEOUT 10000
 #define MIN_TIMEOUT 2000

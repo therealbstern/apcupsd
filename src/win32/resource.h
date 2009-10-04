@@ -1,0 +1,40 @@
+#ifndef IDC_STATIC
+#define IDC_STATIC (-1)
+#endif
+
+#define IDI_APCUPSD                             100
+#define IDI_ONLINE                              101
+#define IDI_ONBATT                              102
+#define IDI_CHARGING                            103
+#define IDR_TRAYMENU                            104
+#define IDI_COMMLOST                            105
+#define IDB_APCUPSDBMP                          106
+#define IDD_ABOUT                               201
+#define IDD_STATUS                              202
+#define IDD_EVENTS                              203
+#define IDC_LIST                                1000
+#define IDC_WWW1                                1000
+#define IDC_WWW2                                1001
+#define IDC_COPYRIGHT1                          1002
+#define IDC_COPYRIGHT2                          1003
+#define IDC_COPYRIGHT3                          1004
+#define IDC_STATUSGRID                          1004
+#define IDC_BATTERY                             1005
+#define IDC_STATUS                              1006
+#define IDC_RUNTIME                             1007
+#define IDC_LOAD                                1008
+#define IDC_VERSION                             1017
+#define IDC_NAME                                1018
+#define IDC_WWW                                 1022
+#define IDC_COPYRIGHT                           1023
+#define IDC_TRADEMARK                           1036
+#define ID_CLOSE                                40002
+#define ID_ABOUT                                40004
+#define ID_STATUS                               40005
+#define ID_EVENTS                               40007
+#define ID_REMOVE                               40008
+#define ID_REMOVEALL                            40009
+#define ID_CLOSEINST                            40010
+#define ID_NAME                                 40011
+#define ID_REFRESH                              40013
+#define ID_HOST                                 40014
