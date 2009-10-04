@@ -29,17 +29,17 @@ public:
 
    // General
    void Show(BOOL show);
+   void FillStatusBox();
 
 private:
    // The dialog box window proc
    static BOOL CALLBACK DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-   void FillStatusBox(HWND hwnd, int id_list);
-
    // Private data
-   BOOL m_dlgvisible;
+   HWND m_hwnd;
    HINSTANCE m_appinst;
    StatMgr *m_statmgr;
+   RECT m_rect;
 };
 
 #endif // WINSTAT_H

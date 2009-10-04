@@ -12,7 +12,7 @@
 
 #include <windows.h>
 #include "winevents.h"
-#include "winres.h"
+#include "resource.h"
 #include "statmgr.h"
 
 // Constructor/destructor

@@ -12,7 +12,7 @@
 #include "apc.h"
 #include <windows.h>
 #include "winups.h"
-#include "winres.h"
+#include "resource.h"
 #include "wintray.h"
 #include "statmgr.h"
 #include "balloonmgr.h"
@@ -48,12 +48,12 @@ upsMenu::upsMenu(HINSTANCE appinst, const char* host, unsigned long port,
    wndclass.cbClsExtra = 0;
    wndclass.cbWndExtra = 0;
    wndclass.hInstance = appinst;
-   wndclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
+   wndclass.hIcon = LoadIcon(NULL, MAKEINTRESOURCE(IDI_APPLICATION));
    wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
    wndclass.hbrBackground = (HBRUSH) GetStockObject(WHITE_BRUSH);
    wndclass.lpszMenuName = (const char *)NULL;
    wndclass.lpszClassName = APCTRAY_WINDOW_CLASS;
-   wndclass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
+   wndclass.hIconSm = LoadIcon(NULL, MAKEINTRESOURCE(IDI_APPLICATION));
    RegisterClassEx(&wndclass);
 
    // Make unique window title as 'host:port'.
@@ -343,6 +343,8 @@ DWORD WINAPI upsMenu::StatusPollThread(LPVOID param)
    while (1) {
       // Update the tray icon
       _this->UpdateTrayIcon();
+
+      _this->m_status.FillStatusBox();
 
       // Delay for configured interval
       status = WaitForSingleObject(_this->m_wait, _this->m_interval * 1000);

@@ -122,17 +122,19 @@ astring &astring::operator+(const char rhs)
    return *this;
 }
 
-void astring::rtrim()
+astring &astring::rtrim()
 {
    while (_len >= 1 && isspace(_data[_len-1]))
       _data[--_len] = '\0';
+   return *this;
 }
 
-void astring::ltrim()
+astring &astring::ltrim()
 {
    size_t trim = strspn(_data, " \t\r\n");
    memmove(_data, _data+trim, _len-trim+1);
    _len -= trim;
+   return *this;
 }
 
 void astring::realloc(unsigned int newsize)
@@ -155,4 +157,37 @@ void astring::assign(const char *str, int len)
    _data = new char[_len+1];
    strncpy(_data, str, _len);
    _data[_len] = '\0';
+}
+
+astring astring::substr(int start, int len) const
+{
+   astring ret;
+
+   if (start > _len)
+      return ret;
+
+   if (start < 0)
+   {
+      start += _len;
+      if (start < 0)
+         start = 0;
+   }
+
+   if (len < 0)
+   {
+      len = _len-start;
+      if (len < 0)
+         len = 0;
+   }
+
+   ret.assign(_data+start, len);
+   return ret;
+}
+
+int astring::strchr(char ch) const
+{
+   char *tmp = ::strchr(_data, ch);
+   if (!tmp)
+      return -1;
+   return tmp-_data;
 }
