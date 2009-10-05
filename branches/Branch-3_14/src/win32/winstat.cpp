@@ -11,10 +11,11 @@
 // Implementation of the Status dialog
 
 #include <windows.h>
+#include <commctrl.h>
 #include "winstat.h"
 #include "resource.h"
 #include "statmgr.h"
-#include <commctrl.h>
+#include "meter.h"
 
 // Constructor/destructor
 upsStatus::upsStatus(HINSTANCE appinst, StatMgr *statmgr) :
@@ -37,8 +38,10 @@ BOOL upsStatus::Init()
 // Dialog box handling functions
 void upsStatus::Show(BOOL show)
 {
-   if (show) {
-      if (!m_hwnd) {
+   if (show)
+   {
+      if (!m_hwnd)
+      {
          DialogBoxParam(m_appinst,
                         MAKEINTRESOURCE(IDD_STATUS),
                         NULL,
@@ -54,17 +57,36 @@ BOOL CALLBACK upsStatus::DialogProc(
    WPARAM wParam,
    LPARAM lParam)
 {
-   // We use the dialog-box's USERDATA to store a _this pointer
-   // This is set only once WM_INITDIALOG has been recieved, though!
-   upsStatus *_this = (upsStatus *)GetWindowLong(hwnd, GWL_USERDATA);
+   upsStatus *_this;
 
-   switch (uMsg) {
-   case WM_INITDIALOG:
-      // Retrieve the Dialog box parameter and use it as a pointer
-      // to the calling vncProperties object
+   // Retrieve virtual 'this' pointer. When we come in here the first time for
+   // the WM_INITDIALOG message, the pointer is in lParam. We then store it in
+   // the user data so it can be retrieved on future calls.
+   if (uMsg == WM_INITDIALOG)
+   {
+      // Set dialog user data to our "this" pointer which comes in via lParam.
+      // On subsequent calls, this will be retrieved by the code below.
       SetWindowLong(hwnd, GWL_USERDATA, lParam);
       _this = (upsStatus *)lParam;
+   }
+   else
+   {
+      // We've previously been initialized, so retrieve pointer from user data
+      _this = (upsStatus *)GetWindowLong(hwnd, GWL_USERDATA);
+   }
 
+   // Call thru to non-static member function
+   return _this->DialogProcess(hwnd, uMsg, wParam, lParam);
+}
+
+BOOL upsStatus::DialogProcess(
+   HWND hwnd,
+   UINT uMsg,
+   WPARAM wParam,
+   LPARAM lParam)
+{
+   switch (uMsg) {
+   case WM_INITDIALOG:
       // Add columns to listview control
       LVCOLUMN lvc;
       lvc.mask = LVCF_SUBITEM;
@@ -76,21 +98,25 @@ BOOL CALLBACK upsStatus::DialogProc(
       // Silly: Save initial window size for use as minimum size. There's 
       // probably some programmatic way to fetch this from the resource when
       // we need it, but I can't find it. So we'll save it at runtime.
-      GetWindowRect(hwnd, &_this->m_rect);
+      GetWindowRect(hwnd, &m_rect);
 
       // Save a copy of our window handle for later use
-      _this->m_hwnd = hwnd;
+      m_hwnd = hwnd;
+
+      // Initialize control wrappers
+      _bmeter = new Meter(hwnd, IDC_BATTERY, 25, 15);
+      _lmeter = new Meter(hwnd, IDC_LOAD, 75, 90);
 
       // Show the dialog
-      _this->FillStatusBox();
+      FillStatusBox();
       SetForegroundWindow(hwnd);
       return TRUE;
 
    case WM_GETMINMAXINFO:
       // Restrict minimum size to initial window size
       MINMAXINFO *mmi = (MINMAXINFO*)lParam;
-      mmi->ptMinTrackSize.x = _this->m_rect.right - _this->m_rect.left;
-      mmi->ptMinTrackSize.y = _this->m_rect.bottom - _this->m_rect.top;
+      mmi->ptMinTrackSize.x = m_rect.right - m_rect.left;
+      mmi->ptMinTrackSize.y = m_rect.bottom - m_rect.top;
       return TRUE;
 
    case WM_SIZE:
@@ -122,16 +148,17 @@ BOOL CALLBACK upsStatus::DialogProc(
       switch (LOWORD(wParam)) {
       case IDCANCEL:
       case IDOK:
-         // Close the dialog
-         _this->m_hwnd = NULL;
          EndDialog(hwnd, TRUE);
          return TRUE;
       }
       break;
 
    case WM_DESTROY:
-      _this->m_hwnd = NULL;
-      EndDialog(hwnd, FALSE);
+      _mutex.lock();
+      m_hwnd = NULL;
+      delete _bmeter;
+      delete _lmeter;
+      _mutex.unlock();
       return TRUE;
    }
 
@@ -140,15 +167,21 @@ BOOL CALLBACK upsStatus::DialogProc(
 
 void upsStatus::FillStatusBox()
 {
-   const char* error = "Status not available.";
+   char str[128];
 
    // Bail if window is not open
+   _mutex.lock();
    if (!m_hwnd)
+   {
+      _mutex.unlock();
       return;
+   }
 
    // Fetch full status from apcupsd
    alist<astring> status;
-   if (!m_statmgr->GetAll(status) || status.empty()) {
+   if (!m_statmgr->GetAll(status) || status.empty())
+   {
+      _mutex.unlock();
       return;
    }
 
@@ -179,17 +212,34 @@ void upsStatus::FillStatusBox()
       // existing item at this position or an update if an item already exists.
       lvi.iItem = count;
       lvi.iSubItem = 0;
-      lvi.pszText = (char*)key.str();
       if (count >= num)
+      {
+         lvi.pszText = (char*)key.str();
          SendDlgItemMessage(m_hwnd, IDC_STATUSGRID, LVM_INSERTITEM, 0, (LONG)&lvi);
+      }
       else
-         SendDlgItemMessage(m_hwnd, IDC_STATUSGRID, LVM_SETITEMTEXT, count, (LONG)&lvi);
+      {
+         lvi.pszText = str;
+         lvi.cchTextMax = sizeof(str);
+         SendDlgItemMessage(m_hwnd, IDC_STATUSGRID, LVM_GETITEMTEXT, count, (LONG)&lvi);
+         if (key != str)
+         {
+            lvi.pszText = (char*)key.str();
+            SendDlgItemMessage(m_hwnd, IDC_STATUSGRID, LVM_SETITEMTEXT, count, (LONG)&lvi);
+         }
+      }
 
       // Set subitem (right column). This is always an update since the item
       // itself is guaranteed to exist by the code above.
       lvi.iSubItem = 1;
-      lvi.pszText = (char*)value.str();
-      SendDlgItemMessage(m_hwnd, IDC_STATUSGRID, LVM_SETITEMTEXT, count, (LONG)&lvi);
+      lvi.pszText = str;
+      lvi.cchTextMax = sizeof(str);
+      SendDlgItemMessage(m_hwnd, IDC_STATUSGRID, LVM_GETITEMTEXT, count, (LONG)&lvi);
+      if (value != str)
+      {
+         lvi.pszText = (char*)value.str();
+         SendDlgItemMessage(m_hwnd, IDC_STATUSGRID, LVM_SETITEMTEXT, count, (LONG)&lvi);
+      }
 
       // On to the next item
       count++;
@@ -207,24 +257,28 @@ void upsStatus::FillStatusBox()
    SendDlgItemMessage(m_hwnd, IDC_STATUSGRID, LVM_SETCOLUMNWIDTH, 1, LVSCW_AUTOSIZE);
 
    // Update battery
-   astring charge = m_statmgr->Get("BCHARGE");
-   SendDlgItemMessage(m_hwnd, IDC_BATTERY, PBM_SETPOS, atoi(charge), 0);
+   _bmeter->Set(atoi(m_statmgr->Get("BCHARGE")));
 
    // Update load
-   astring load = m_statmgr->Get("LOADPCT");
-   SendDlgItemMessage(m_hwnd, IDC_LOAD, PBM_SETPOS, atoi(load), 0);
+   _lmeter->Set(atoi(m_statmgr->Get("LOADPCT")));
 
    // Update status
    astring stat = m_statmgr->Get("STATUS");
-   SendDlgItemMessage(m_hwnd, IDC_STATUS, WM_SETTEXT, 0, (LONG)stat.str());
+   SendDlgItemMessage(m_hwnd, IDC_STATUS, WM_GETTEXT, sizeof(str), (LONG)str);
+   if (stat != str)
+      SendDlgItemMessage(m_hwnd, IDC_STATUS, WM_SETTEXT, 0, (LONG)stat.str());
 
    // Update runtime
    astring runtime = m_statmgr->Get("TIMELEFT");
    runtime = runtime.substr(0, runtime.strchr(' '));
-   SendDlgItemMessage(m_hwnd, IDC_RUNTIME, WM_SETTEXT, 0, (LONG)runtime.str());
+   SendDlgItemMessage(m_hwnd, IDC_RUNTIME, WM_GETTEXT, sizeof(str), (LONG)str);
+   if (runtime != str)
+      SendDlgItemMessage(m_hwnd, IDC_RUNTIME, WM_SETTEXT, 0, (LONG)runtime.str());
 
    // Update title bar
    astring name;
    name.format("Status for UPS: %s", m_statmgr->Get("UPSNAME").str());
    SendMessage(m_hwnd, WM_SETTEXT, 0, (LONG)name.str());
+
+   _mutex.unlock();
 }
