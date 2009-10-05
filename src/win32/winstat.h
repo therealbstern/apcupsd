@@ -12,9 +12,11 @@
 #define WINSTAT_H
 
 #include <windows.h>
+#include "amutex.h"
 
 // Forward declarations
 class StatMgr;
+class Meter;
 
 // Object implementing the Status dialogue for apcupsd
 class upsStatus
@@ -34,12 +36,16 @@ public:
 private:
    // The dialog box window proc
    static BOOL CALLBACK DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+   BOOL DialogProcess(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
    // Private data
    HWND m_hwnd;
    HINSTANCE m_appinst;
    StatMgr *m_statmgr;
    RECT m_rect;
+   Meter *_bmeter;
+   Meter *_lmeter;
+   amutex _mutex;
 };
 
 #endif // WINSTAT_H
