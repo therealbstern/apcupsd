@@ -4,7 +4,7 @@
 //
 // Rewrite/Refactoring by Adam Kropelin
 //
-// Copyright (2007) Adam D. Kropelin
+// Copyright (2009) Adam D. Kropelin
 // Copyright (2000) Kern E. Sibbald
 //
 
