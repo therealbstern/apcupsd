@@ -93,13 +93,16 @@ BOOL upsStatus::DialogProcess(
       // we need it, but I can't find it. So we'll save it at runtime.
       GetWindowRect(hwnd, &m_rect);
 
-      // Save a copy of our window handle for later use
-      m_hwnd = hwnd;
-
       // Initialize control wrappers
       _bmeter = new Meter(hwnd, IDC_BATTERY, 25, 15);
       _lmeter = new Meter(hwnd, IDC_LOAD, 75, 90);
       _grid = new ListView(hwnd, IDC_STATUSGRID, 2);
+
+      // Save a copy of our window handle for later use.
+      // Important to do this AFTER everything needed by FillStatusBox() is
+      // initialized and ready to go since that function may be called at any
+      // time from the wintray timer thread.
+      m_hwnd = hwnd;
 
       // Show the dialog
       FillStatusBox();
@@ -157,7 +160,7 @@ BOOL upsStatus::DialogProcess(
       return TRUE;
    }
 
-   return 0;
+   return FALSE;
 }
 
 void upsStatus::FillStatusBox()
