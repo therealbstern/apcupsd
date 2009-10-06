@@ -17,6 +17,7 @@
 // Forward declarations
 class StatMgr;
 class Meter;
+class ListView;
 
 // Object implementing the Status dialogue for apcupsd
 class upsStatus
@@ -45,6 +46,7 @@ private:
    RECT m_rect;
    Meter *_bmeter;
    Meter *_lmeter;
+   ListView *_grid;
    amutex _mutex;
 };
 
