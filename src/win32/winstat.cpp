@@ -16,6 +16,7 @@
 #include "resource.h"
 #include "statmgr.h"
 #include "meter.h"
+#include "listview.h"
 
 // Constructor/destructor
 upsStatus::upsStatus(HINSTANCE appinst, StatMgr *statmgr) :
@@ -87,14 +88,6 @@ BOOL upsStatus::DialogProcess(
 {
    switch (uMsg) {
    case WM_INITDIALOG:
-      // Add columns to listview control
-      LVCOLUMN lvc;
-      lvc.mask = LVCF_SUBITEM;
-      lvc.iSubItem = 0;
-      SendDlgItemMessage(hwnd, IDC_STATUSGRID, LVM_INSERTCOLUMN, 0, (LONG)&lvc);
-      lvc.iSubItem = 1;
-      SendDlgItemMessage(hwnd, IDC_STATUSGRID, LVM_INSERTCOLUMN, 1, (LONG)&lvc);
-
       // Silly: Save initial window size for use as minimum size. There's 
       // probably some programmatic way to fetch this from the resource when
       // we need it, but I can't find it. So we'll save it at runtime.
@@ -106,6 +99,7 @@ BOOL upsStatus::DialogProcess(
       // Initialize control wrappers
       _bmeter = new Meter(hwnd, IDC_BATTERY, 25, 15);
       _lmeter = new Meter(hwnd, IDC_LOAD, 75, 90);
+      _grid = new ListView(hwnd, IDC_STATUSGRID, 2);
 
       // Show the dialog
       FillStatusBox();
@@ -193,10 +187,8 @@ void upsStatus::FillStatusBox()
    // put and only the items that change are redrawn.
 
    // Get current item count and prepare to update the listview
-   int num = SendDlgItemMessage(m_hwnd, IDC_STATUSGRID, LVM_GETITEMCOUNT, 0, 0);
+   int num = _grid->NumItems();
    int count = 0;
-   LVITEM lvi;
-   lvi.mask = LVIF_TEXT;
 
    // Add each status line to the listview
    alist<astring>::const_iterator iter;
@@ -210,36 +202,14 @@ void upsStatus::FillStatusBox()
 
       // Set main item (left column). This will be an insert if there is no
       // existing item at this position or an update if an item already exists.
-      lvi.iItem = count;
-      lvi.iSubItem = 0;
       if (count >= num)
-      {
-         lvi.pszText = (char*)key.str();
-         SendDlgItemMessage(m_hwnd, IDC_STATUSGRID, LVM_INSERTITEM, 0, (LONG)&lvi);
-      }
+         _grid->AppendItem(key);
       else
-      {
-         lvi.pszText = str;
-         lvi.cchTextMax = sizeof(str);
-         SendDlgItemMessage(m_hwnd, IDC_STATUSGRID, LVM_GETITEMTEXT, count, (LONG)&lvi);
-         if (key != str)
-         {
-            lvi.pszText = (char*)key.str();
-            SendDlgItemMessage(m_hwnd, IDC_STATUSGRID, LVM_SETITEMTEXT, count, (LONG)&lvi);
-         }
-      }
+         _grid->UpdateItem(count, 0, key);
 
       // Set subitem (right column). This is always an update since the item
       // itself is guaranteed to exist by the code above.
-      lvi.iSubItem = 1;
-      lvi.pszText = str;
-      lvi.cchTextMax = sizeof(str);
-      SendDlgItemMessage(m_hwnd, IDC_STATUSGRID, LVM_GETITEMTEXT, count, (LONG)&lvi);
-      if (value != str)
-      {
-         lvi.pszText = (char*)value.str();
-         SendDlgItemMessage(m_hwnd, IDC_STATUSGRID, LVM_SETITEMTEXT, count, (LONG)&lvi);
-      }
+      _grid->UpdateItem(count, 1, value);
 
       // On to the next item
       count++;
@@ -248,13 +218,10 @@ void upsStatus::FillStatusBox()
    // Remove any leftover items that are no longer needed. This is needed for
    // when apcupsd suddenly emits fewer status items, such as when COMMLOST.
    while (count < num)
-      SendDlgItemMessage(m_hwnd, IDC_STATUSGRID, LVM_DELETEITEM, count++, 0);
+      _grid->DeleteItem(count++);
 
-   // Autosize listview columns. We have to do this AFTER populating them.
-   // I wish the autosize-ness was sticky, but we seem to need to do it every
-   // time we change the listview contents.
-   SendDlgItemMessage(m_hwnd, IDC_STATUSGRID, LVM_SETCOLUMNWIDTH, 0, LVSCW_AUTOSIZE);
-   SendDlgItemMessage(m_hwnd, IDC_STATUSGRID, LVM_SETCOLUMNWIDTH, 1, LVSCW_AUTOSIZE);
+   // Autosize listview columns
+   _grid->Autosize();
 
    // Update battery
    _bmeter->Set(atoi(m_statmgr->Get("BCHARGE")));
