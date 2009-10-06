@@ -443,7 +443,8 @@ OBJS_APT = \
    $(OBJDIR)/wintray.o \
    $(OBJDIR)/winres.res \
    $(OBJDIR)/balloonmgr.o \
-   $(OBJDIR)/meter.o
+   $(OBJDIR)/meter.o \
+   $(OBJDIR)/listview.o
 
 $(OBJDIR)/winabout.o:  winabout.cpp
 	$(CXX) -c $< -o $@
@@ -464,6 +465,9 @@ $(OBJDIR)/balloonmgr.o:	balloonmgr.cpp
 	$(CXX) -c $< -o $@
 
 $(OBJDIR)/meter.o:	meter.cpp
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/listview.o:	listview.cpp
 	$(CXX) -c $< -o $@
 
 $(OBJDIR)/winres.res:  winres.rc
