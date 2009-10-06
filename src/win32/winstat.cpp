@@ -152,6 +152,7 @@ BOOL upsStatus::DialogProcess(
       m_hwnd = NULL;
       delete _bmeter;
       delete _lmeter;
+      delete _grid;
       _mutex.unlock();
       return TRUE;
    }
