@@ -168,7 +168,7 @@ void upsMenu::SendTrayMsg(DWORD msg)
    nid.cbSize = sizeof(nid);
    nid.uID = IDI_APCUPSD;
    nid.uFlags = NIF_ICON | NIF_MESSAGE;
-   nid.uCallbackMessage = WM_TRAYNOTIFY;
+   nid.uCallbackMessage = WM_APCTRAY_NOTIFY;
 
    int battstat = -1;
    astring statstr;
@@ -235,39 +235,39 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
    // User has clicked an item on the tray menu
    case WM_COMMAND:
       switch (LOWORD(wParam)) {
-      case ID_STATUS:
+      case IDM_STATUS:
          // Show the status dialog
          _this->m_status.Show(TRUE);
          break;
 
-      case ID_EVENTS:
+      case IDM_EVENTS:
          // Show the Events dialog
          _this->m_events.Show(TRUE);
          break;
 
-      case ID_ABOUT:
+      case IDM_ABOUT:
          // Show the About box
          _this->m_about.Show(TRUE);
          break;
 
-      case ID_CLOSEINST:
-         // User selected Close from the tray menu
-         PostMessage(hwnd, WM_CLOSEINST, 0, (LPARAM)_this);
-         return 0;
-
-      case ID_CLOSE:
+      case IDM_EXIT:
          // User selected CloseAll from the tray menu
          PostMessage(hwnd, WM_CLOSE, 0, 0);
          break;
 
-      case ID_REMOVE:
+      case IDM_REMOVE:
          // User selected Close from the tray menu
-         PostMessage(hwnd, WM_REMOVE, 0, (LPARAM)_this);
+         PostMessage(hwnd, WM_APCTRAY_REMOVE, 0, (LPARAM)(_this->m_id.str()));
          return 0;
 
-      case ID_REMOVEALL:
+      case IDM_REMOVEALL:
          // User wants to remove all apctray instances from registry
-         PostMessage(hwnd, WM_REMOVEALL, 0, 0);
+         PostMessage(hwnd, WM_APCTRAY_REMOVEALL, 0, 0);
+         return 0;
+
+      case IDM_ADD:
+         // User selected Close from the tray menu
+         PostMessage(hwnd, WM_APCTRAY_ADD, 0, 0);
          return 0;
 
       case IDM_CONFIG:
@@ -276,7 +276,7 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
       return 0;
 
    // User has clicked on the tray icon or the menu
-   case WM_TRAYNOTIFY:
+   case WM_APCTRAY_NOTIFY:
       // Get the submenu to use as a pop-up menu
       HMENU submenu = GetSubMenu(_this->m_hmenu, 0);
 
@@ -286,16 +286,16 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
             return 0;
 
          // Make the Status menu item the default (bold font)
-         SetMenuDefaultItem(submenu, ID_STATUS, false);
+         SetMenuDefaultItem(submenu, IDM_STATUS, false);
 
          // Set UPS name field
-         ModifyMenu(submenu, ID_NAME, MF_BYCOMMAND|MF_STRING, ID_NAME,
+         ModifyMenu(submenu, IDM_NAME, MF_BYCOMMAND|MF_STRING, IDM_NAME,
             ("UPS: " + _this->m_upsname).str());
 
          // Set HOST field
          char buf[100];
          asnprintf(buf, sizeof(buf), "HOST: %s:%d", _this->m_host, _this->m_port);
-         ModifyMenu(submenu, ID_HOST, MF_BYCOMMAND|MF_STRING, ID_HOST, buf);
+         ModifyMenu(submenu, IDM_HOST, MF_BYCOMMAND|MF_STRING, IDM_HOST, buf);
 
          // Get the current cursor position, to display the menu at
          POINT mouse;
@@ -315,7 +315,7 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
       // Or was there a LMB double click?
       if (lParam == WM_LBUTTONDBLCLK) {
          // double click: execute the default item
-         SendMessage(_this->m_hwnd, WM_COMMAND, ID_STATUS, 0);
+         SendMessage(_this->m_hwnd, WM_COMMAND, IDM_STATUS, 0);
       }
 
       return 0;
@@ -330,13 +330,18 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
          // Explorer has restarted so we need to redraw the tray icon.
          // We purposely kick this out to the main loop instead of handling it
          // ourself so the icons are redrawn in a consistent order.
-         PostMessage(hwnd, WM_RESET, 0, 0);
+         PostMessage(hwnd, WM_APCTRAY_RESET, 0, 0);
       }
       break;
    }
 
    // Unknown message type
    return DefWindowProc(hwnd, iMsg, wParam, lParam);
+}
+
+void upsMenu::Redraw()
+{
+   AddTrayIcon();
 }
 
 DWORD WINAPI upsMenu::StatusPollThread(LPVOID param)

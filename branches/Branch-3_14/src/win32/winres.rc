@@ -23,20 +23,20 @@ IDR_TRAYMENU MENU
 {
     POPUP "tray"
     {
-        MENUITEM "UPS: <unknown>", ID_NAME, INACTIVE
-        MENUITEM "HOST: <unknown>", ID_HOST, INACTIVE
+        MENUITEM "UPS: <unknown>", IDM_NAME, INACTIVE
+        MENUITEM "HOST: <unknown>", IDM_HOST, INACTIVE
         MENUITEM SEPARATOR
-        MENUITEM "&Status", ID_STATUS
-        MENUITEM "&Events", ID_EVENTS
+        MENUITEM "&Status", IDM_STATUS
+        MENUITEM "&Events", IDM_EVENTS
+        MENUITEM SEPARATOR
         MENUITEM "Configure...", IDM_CONFIG
         MENUITEM SEPARATOR
-        MENUITEM "&About", ID_ABOUT
+        MENUITEM "Add Monitor", IDM_ADD
+        MENUITEM "Remove Monitor", IDM_REMOVE
+        MENUITEM "Remove All Monitors", IDM_REMOVEALL
         MENUITEM SEPARATOR
-        MENUITEM "Remove This Instance", ID_REMOVE
-        MENUITEM "Remove All Instances", ID_REMOVEALL
-        MENUITEM SEPARATOR
-        MENUITEM "Close This Instance", ID_CLOSEINST
-        MENUITEM "&Close All Instances", ID_CLOSE
+        MENUITEM "&About", IDM_ABOUT
+        MENUITEM "Exit", IDM_EXIT
     }
 }
 

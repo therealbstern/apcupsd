@@ -31,7 +31,7 @@ public:
            int refresh, BalloonMgr *balmgr, const char *id);
    ~upsMenu();
    void Destroy();
-   astring id() { return m_id; }
+   void Redraw();
 
 protected:
    // Tray icon handling

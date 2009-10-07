@@ -18,19 +18,19 @@
 // Application specific messages
 enum {
    // Message used for system tray notifications
-   WM_TRAYNOTIFY = WM_USER+1,
-
-   // Message used to close a given apctray instance
-   WM_CLOSEINST,
+   WM_APCTRAY_NOTIFY = WM_USER+1,
 
    // Message used to remove all apctray instances from the registry
-   WM_REMOVEALL,
+   WM_APCTRAY_REMOVEALL,
 
    // Message used to remove specified apctray instance from the registry
-   WM_REMOVE,
+   WM_APCTRAY_REMOVE,
 
-   // Message used to trigger tray icon reset
-   WM_RESET
+   // Messages used to trigger redraw of tray icons
+   WM_APCTRAY_RESET,
+
+   // Message used to add a new apctray instance
+   WM_APCTRAY_ADD
 };
 
 // Apcupsd application window constants

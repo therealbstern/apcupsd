@@ -33,6 +33,14 @@ InstanceManager::InstanceManager(HINSTANCE appinst) :
 
 InstanceManager::~InstanceManager()
 {
+   // Destroy all instances
+   while (!_instances.empty())
+   {
+      alist<InstanceConfig>::iterator inst = _instances.begin();
+      inst->menu->Destroy();
+      delete inst->menu;
+      _instances.remove(inst);
+   }
 }
 
 void InstanceManager::CreateMonitors()
@@ -40,12 +48,12 @@ void InstanceManager::CreateMonitors()
    alist<InstanceConfig> unsorted;
    InstanceConfig config;
 
-   // Open registry key apctray
+   // Open registry key for instance configs
    HKEY apctray;
    if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, INSTANCES_KEY, 0, KEY_READ, &apctray)
          == ERROR_SUCCESS)
    {
-      // Iterate though all apctray instance keys, reading the config for each 
+      // Iterate though all instance keys, reading the config for each 
       // instance into a list.
       int i = 0;
       char name[128];
@@ -67,7 +75,7 @@ void InstanceManager::CreateMonitors()
          lowest = unsorted.begin();
          for (iter = unsorted.begin(); iter != unsorted.end(); ++iter)
          {
-            if ((*iter).order < (*lowest).order)
+            if (iter->order < lowest->order)
                lowest = iter;
          }
 
@@ -84,7 +92,6 @@ void InstanceManager::CreateMonitors()
       config.port = DEFAULT_PORT;
       config.refresh = DEFAULT_REFRESH;
       config.id = CreateId();
-      config.order = 0;
       _instances.append(config);
       Write();
    }
@@ -93,9 +100,9 @@ void InstanceManager::CreateMonitors()
    alist<InstanceConfig>::iterator iter;
    for (iter = _instances.begin(); iter != _instances.end(); ++iter)
    {
-      (*iter).menu = new upsMenu(
-         _appinst, (*iter).host, (*iter).port, (*iter).refresh, 
-         &_balmgr, (*iter).id);
+      iter->menu = new upsMenu(
+         _appinst, iter->host, iter->port, iter->refresh, 
+         &_balmgr, iter->id);
    }
 }
 
@@ -141,8 +148,7 @@ void InstanceManager::Write()
       while (RegEnumKeyEx(apctray, i++, name, &len, NULL, NULL,
                           NULL, NULL) == ERROR_SUCCESS)
       {
-         if (len && strncasecmp(name, "instance", 8) == 0)
-            ids.append(name);
+         ids.append(name);
          len = sizeof(name);
       }
 
@@ -168,11 +174,11 @@ void InstanceManager::Write()
    for (iter = _instances.begin(); iter != _instances.end(); ++iter)
    {
       // No apctray key (and therefore no instances) yet. Create the key.
-      if (RegCreateKey(apctray, (*iter).id, &instkey) == ERROR_SUCCESS)
+      if (RegCreateKey(apctray, iter->id, &instkey) == ERROR_SUCCESS)
       {
-         RegSetString(instkey, "host", (*iter).host);
-         RegSetDWORD(instkey, "port", (*iter).port);
-         RegSetDWORD(instkey, "refresh", (*iter).refresh);
+         RegSetString(instkey, "host", iter->host);
+         RegSetDWORD(instkey, "port", iter->port);
+         RegSetDWORD(instkey, "refresh", iter->refresh);
          RegSetDWORD(instkey, "order", count);
          RegCloseKey(instkey);
          count++;
@@ -186,22 +192,24 @@ alist<InstanceConfig>::iterator InstanceManager::FindInstance(const char *id)
    alist<InstanceConfig>::iterator iter;
    for (iter = _instances.begin(); iter != _instances.end(); ++iter)
    {
-      if ((*iter).id == id)
+      if (iter->id == id)
          return iter;
    }
    return _instances.end();
 }
 
-void InstanceManager::RemoveInstance(const char *id)
+int InstanceManager::RemoveInstance(const char *id)
 {
    alist<InstanceConfig>::iterator inst = FindInstance(id);
    if (inst != _instances.end())
    {
-      (*inst).menu->Destroy();
-      delete (*inst).menu;
+      inst->menu->Destroy();
+      delete inst->menu;
       _instances.remove(inst);
       Write();
    }
+
+   return _instances.size();
 }
 
 void InstanceManager::AddInstance()
@@ -211,7 +219,6 @@ void InstanceManager::AddInstance()
    config.port = DEFAULT_PORT;
    config.refresh = DEFAULT_REFRESH;
    config.id = CreateId();
-   config.order = 0;
    config.menu = new upsMenu(
       _appinst, config.host, config.port, config.refresh, 
       &_balmgr, config.id);
@@ -228,11 +235,24 @@ void InstanceManager::UpdateInstance(
    alist<InstanceConfig>::iterator inst = FindInstance(id);
    if (inst != _instances.end())
    {
-      (*inst).host = host;
-      (*inst).port = port;
-      (*inst).refresh = refresh;
+      inst->host = host;
+      inst->port = port;
+      inst->refresh = refresh;
       Write();
    }
+}
+
+void InstanceManager::RemoveAll()
+{
+   while (!_instances.empty())
+      RemoveInstance(_instances.begin()->id);
+}
+
+void InstanceManager::ResetInstances()
+{
+   alist<InstanceConfig>::iterator iter;
+   for (iter = _instances.begin(); iter != _instances.end(); ++iter)
+      iter->menu->Redraw();
 }
 
 astring InstanceManager::CreateId()
