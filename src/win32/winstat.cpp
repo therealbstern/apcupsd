@@ -142,7 +142,8 @@ BOOL upsStatus::DialogProcess(
    }
 
    case WM_COMMAND:
-      switch (LOWORD(wParam)) {
+      switch (LOWORD(wParam))
+      {
       case IDCANCEL:
       case IDOK:
          EndDialog(hwnd, TRUE);
@@ -165,8 +166,6 @@ BOOL upsStatus::DialogProcess(
 
 void upsStatus::FillStatusBox()
 {
-   char str[128];
-
    // Bail if window is not open
    _mutex.lock();
    if (!m_hwnd)
@@ -234,6 +233,7 @@ void upsStatus::FillStatusBox()
    _lmeter->Set(atoi(m_statmgr->Get("LOADPCT")));
 
    // Update status
+   char str[128];
    astring stat = m_statmgr->Get("STATUS");
    SendDlgItemMessage(m_hwnd, IDC_STATUS, WM_GETTEXT, sizeof(str), (LONG)str);
    if (stat != str)

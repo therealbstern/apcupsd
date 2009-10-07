@@ -18,8 +18,8 @@
 
 #include <windows.h>
 #include <commctrl.h>
-#include "listview.h"
 #include <limits.h>
+#include "listview.h"
 
 ListView::ListView(HWND hwnd, UINT id, int cols) :
    _cols(cols)

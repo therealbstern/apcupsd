@@ -444,7 +444,8 @@ OBJS_APT = \
    $(OBJDIR)/winres.res \
    $(OBJDIR)/balloonmgr.o \
    $(OBJDIR)/meter.o \
-   $(OBJDIR)/listview.o
+   $(OBJDIR)/listview.o \
+   $(OBJDIR)/instmgr.o
 
 $(OBJDIR)/winabout.o:  winabout.cpp
 	$(CXX) -c $< -o $@
@@ -468,6 +469,9 @@ $(OBJDIR)/meter.o:	meter.cpp
 	$(CXX) -c $< -o $@
 
 $(OBJDIR)/listview.o:	listview.cpp
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/instmgr.o:	instmgr.cpp
 	$(CXX) -c $< -o $@
 
 $(OBJDIR)/winres.res:  winres.rc
@@ -542,7 +546,7 @@ BKG_OBJS = $(OBJS_BKG)
 BKG_LIBS = 
 
 APT_OBJS = $(OBJS_APT) $(OBJS_COMPAT) $(OBJDIR)/astring.o $(OBJDIR)/statmgr.o $(OBJDIR)/amutex.o
-APT_LIBS = -L$(LIB_MINGW) -luser32 -lgdi32 -lwsock32 -lnetapi32 $(LIB_PTHREADS)
+APT_LIBS = -L$(LIB_MINGW) -luser32 -lgdi32 -lwsock32 -lnetapi32 -lrpcrt4 $(LIB_PTHREADS)
 
 SMTP_OBJS = $(OBJS_SMTP) $(OBJDIR)/apclog.o $(OBJDIR)/asys.o $(OBJDIR)/apcerror.o $(OBJS_COMPAT)
 SMTP_LIBS = $(APC_LIBS)

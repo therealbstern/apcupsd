@@ -2,7 +2,6 @@
 #define IDC_STATIC (-1)
 #endif
 
-#define IDI_APCUPSD                             100
 #define IDI_ONLINE                              101
 #define IDI_ONBATT                              102
 #define IDI_CHARGING                            103
@@ -12,6 +11,7 @@
 #define IDD_ABOUT                               201
 #define IDD_STATUS                              202
 #define IDD_EVENTS                              203
+#define IDD_CONFIG                              205
 #define IDC_LIST                                1000
 #define IDC_WWW1                                1000
 #define IDC_WWW2                                1001
@@ -28,6 +28,8 @@
 #define IDC_WWW                                 1022
 #define IDC_COPYRIGHT                           1023
 #define IDC_TRADEMARK                           1036
+#define IDI_APCUPSD                             40000
+#define IDM_CONFIG                              40000
 #define ID_CLOSE                                40002
 #define ID_ABOUT                                40004
 #define ID_STATUS                               40005
@@ -38,3 +40,7 @@
 #define ID_NAME                                 40011
 #define ID_REFRESH                              40013
 #define ID_HOST                                 40014
+#define IDC_HOSTNAME                            40020
+#define IDC_PORT                                40021
+#define IDC_REFRESH                             40022
+#define IDC_POPUPS                              40023
