@@ -28,9 +28,10 @@ class upsMenu
 {
 public:
    upsMenu(HINSTANCE appinst, const char *host, unsigned long port,
-           int refresh, BalloonMgr *balmgr);
+           int refresh, BalloonMgr *balmgr, const char *id);
    ~upsMenu();
    void Destroy();
+   astring id() { return m_id; }
 
 protected:
    // Tray icon handling
@@ -62,6 +63,7 @@ protected:
    unsigned short          m_port;
    UINT                    m_tbcreated_msg;  // Id of TaskbarCreated message
    HINSTANCE               m_appinst;        // Application instance handle
+   astring                 m_id;
 
    // Dialogs for About, Status, and Events
    upsAbout                m_about;

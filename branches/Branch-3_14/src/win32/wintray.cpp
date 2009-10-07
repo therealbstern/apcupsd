@@ -21,7 +21,7 @@
 
 // Implementation
 upsMenu::upsMenu(HINSTANCE appinst, const char* host, unsigned long port,
-                 int refresh, BalloonMgr *balmgr)
+                 int refresh, BalloonMgr *balmgr, const char *id)
    : m_statmgr(new StatMgr(host, port)),
      m_about(appinst),
      m_status(appinst, m_statmgr),
@@ -35,7 +35,8 @@ upsMenu::upsMenu(HINSTANCE appinst, const char* host, unsigned long port,
      m_host(host),
      m_port(port),
      m_appinst(appinst),
-     m_hwnd(NULL)
+     m_hwnd(NULL),
+     m_id(id)
 {
    // Determine message id for "TaskbarCreate" message
    m_tbcreated_msg = RegisterWindowMessage("TaskbarCreated");
@@ -48,12 +49,12 @@ upsMenu::upsMenu(HINSTANCE appinst, const char* host, unsigned long port,
    wndclass.cbClsExtra = 0;
    wndclass.cbWndExtra = 0;
    wndclass.hInstance = appinst;
-   wndclass.hIcon = LoadIcon(NULL, MAKEINTRESOURCE(IDI_APPLICATION));
+   wndclass.hIcon = LoadIcon(NULL, IDI_APPLICATION);
    wndclass.hCursor = LoadCursor(NULL, IDC_ARROW);
    wndclass.hbrBackground = (HBRUSH) GetStockObject(WHITE_BRUSH);
    wndclass.lpszMenuName = (const char *)NULL;
    wndclass.lpszClassName = APCTRAY_WINDOW_CLASS;
-   wndclass.hIconSm = LoadIcon(NULL, MAKEINTRESOURCE(IDI_APPLICATION));
+   wndclass.hIconSm = LoadIcon(NULL, IDI_APPLICATION);
    RegisterClassEx(&wndclass);
 
    // Make unique window title as 'host:port'.
@@ -268,6 +269,9 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
          // User wants to remove all apctray instances from registry
          PostMessage(hwnd, WM_REMOVEALL, 0, 0);
          return 0;
+
+      case IDM_CONFIG:
+         return 0;
       }
       return 0;
 
@@ -344,6 +348,7 @@ DWORD WINAPI upsMenu::StatusPollThread(LPVOID param)
       // Update the tray icon
       _this->UpdateTrayIcon();
 
+      // Update the status dialog
       _this->m_status.FillStatusBox();
 
       // Delay for configured interval
