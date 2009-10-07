@@ -29,6 +29,9 @@ class upsMenu;
 
 struct InstanceConfig
 {
+   InstanceConfig() : menu(NULL), order(0) {}
+   ~InstanceConfig() {}
+
    astring id;
    astring host;
    unsigned int port;
@@ -46,9 +49,11 @@ public:
    const alist<InstanceConfig> &Instances() { return _instances; }
 
    void CreateMonitors();
-   void RemoveInstance(const char *id);
+   int RemoveInstance(const char *id);
    void AddInstance();
    void UpdateInstance( const char *id, const char *host, int port, int refresh);
+   void RemoveAll();
+   void ResetInstances();
 
 private:
 

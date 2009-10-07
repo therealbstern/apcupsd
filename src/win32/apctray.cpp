@@ -83,14 +83,6 @@ void PostToApctray(DWORD msg)
    CloseHandle(wnd);
 }
 
-void Reset()
-{
-   // On Win2K and newer, apctray monitors the registry so they 
-   // do not need this message to be posted. Older platforms need it.
-   if (g_os_version < WINDOWS_2000)
-      PostToApctray(WM_RESET);
-}
-
 int Install()
 {
    // Get the full path/filename of this executable
@@ -203,10 +195,6 @@ DWORD WINAPI EventThread(LPVOID param)
          runthread = false;
          PostToApctray(WM_CLOSE);
          break;
-      case 1:  // Registry change event
-         PostToApctray(WM_RESET);
-         RegNotifyChangeKeyValue(hkey, TRUE, filter, regevt, TRUE);
-         break;
       }
    }
 
@@ -286,84 +274,42 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    }
 */
    InstanceManager instmgr(appinst);
-   bool reset;
-   do {
-      // Not resetting yet
-      reset = false;
-/*
-      // Create a balloon manager to handle balloon tip notifications
-      balmgr = new BalloonMgr();
+   instmgr.CreateMonitors();
 
-      // No command line instance options were given: Launch
-      // all instances specified in the registry
-      LaunchInstances();
+   // Enter the Windows message handling loop until told to quit
+   MSG msg;
+   while (GetMessage(&msg, NULL, 0, 0) > 0) {
 
-      // If no instances were created from the registry,
-      // allocate a default one and write it to the registry.
-      if (instances.empty())
-         AllocateInstance(DEFAULT_HOST, DEFAULT_PORT, refresh);
-*/
-      instmgr.CreateMonitors();
+      TranslateMessage(&msg);
 
-      // Enter the Windows message handling loop until told to quit
-      MSG msg;
-      while (GetMessage(&msg, NULL, 0, 0) > 0) {
+      switch (LOWORD(msg.message)) {
+      case WM_APCTRAY_REMOVEALL:
+         // Remove all instances (and close)
+         instmgr.RemoveAll();
+         PostQuitMessage(0);
+         break;
 
-         TranslateMessage(&msg);
-/*
-         switch (LOWORD(msg.message)) {
-//         case WM_CLOSEINST:
-            // Close specified instance
-//            CloseInstance((upsMenu*)msg.lParam, false);
-//            if (instances.empty())
-//               PostQuitMessage(0);
-//            break;
-
-         case WM_REMOVEALL:
-            // Remove all instances (and close)
-            RemoveAllInstances();
+      case WM_APCTRAY_REMOVE:
+         // Remove the given instance and exit if there are no more instances
+         if (instmgr.RemoveInstance((const char *)msg.lParam) == 0)
             PostQuitMessage(0);
-            break;
+         break;
 
-         case WM_REMOVE:
-            // Remove the given instance
-            CloseInstance((upsMenu*)msg.lParam, true);
-            if (instances.empty()) {
-               Remove();
-               PostQuitMessage(0);
-            }
-            break;
+      case WM_APCTRAY_ADD:
+         // Remove the given instance and exit if there are no more instances
+         instmgr.AddInstance();
+         break;
 
-         case WM_RESET:
-            reset = true;
-            PostQuitMessage(0);
-            break;
+      case WM_APCTRAY_RESET:
+         // Redraw icons due to explorer exit/restart
+         instmgr.ResetInstances();
+         break;
 
-         default:
-*/
-            DispatchMessage(&msg);
-//         }
+      default:
+         DispatchMessage(&msg);
       }
-/*
-      // Instruct all instances to destroy
-      std::vector<TrayInstance*>::iterator iter;
-      for (iter = instances.begin();
-           iter != instances.end();
-           iter++)
-      {
-         (*iter)->Destroy();
-      }
-
-      // Free all instances. This waits for destruction to complete.
-      while (!instances.empty()) {
-         delete instances.back();
-         instances.pop_back();
-      }
-
-      delete balmgr;
-*/
    }
-   while(reset);  // Repeat if we're resetting
+
 /*
    // Wait for event thread to exit cleanly
    if (g_os_version >= WINDOWS_2000) {
