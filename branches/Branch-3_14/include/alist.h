@@ -41,6 +41,7 @@ private:
                  if (_next) _next->_prev = _prev; }
 
       operator T&() { return _elem; }
+      T& operator*() { return _elem; }
 
       void next(node *link) { link->_next = _next;
                               link->_prev = this;
@@ -151,6 +152,8 @@ public:
 
       T& operator*() { return *_node; }
       const T& operator*() const { return *_node; }
+      T* operator->() { return &(**_node); }
+      const T* operator->() const { return &(**_node); }
 
       bool operator==(const iterator &rhs) const { return _node == rhs._node; }
       bool operator!=(const iterator &rhs) const { return !(*this == rhs); }
