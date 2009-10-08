@@ -96,8 +96,7 @@ upsMenu::upsMenu(HINSTANCE appinst, MonitorConfig &mcfg, BalloonMgr *balmgr,
    }
 
    // Thread to poll UPS status and update tray icon
-   DWORD tid;
-   m_thread = CreateThread(NULL, 0, &upsMenu::StatusPollThread, this, 0, &tid);
+   m_thread = CreateThread(NULL, 0, &upsMenu::StatusPollThread, this, 0, NULL);
    if (m_thread == NULL)
       PostQuitMessage(0);
 }
@@ -251,12 +250,12 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
          break;
 
       case IDM_EXIT:
-         // User selected CloseAll from the tray menu
+         // User selected Exit from the tray menu
          PostMessage(hwnd, WM_CLOSE, 0, 0);
          break;
 
       case IDM_REMOVE:
-         // User selected Close from the tray menu
+         // User selected Remove from the tray menu
          PostMessage(hwnd, WM_APCTRAY_REMOVE, 0, (LPARAM)(_this->m_config.id.str()));
          break;
 
@@ -266,11 +265,12 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
          break;
 
       case IDM_ADD:
-         // User selected Close from the tray menu
+         // User selected Add from the tray menu
          PostMessage(hwnd, WM_APCTRAY_ADD, 0, 0);
          break;
 
       case IDM_CONFIG:
+         // User selected Config from the tray menu
          _this->m_configdlg.Show(_this->m_config);
          break;
       }
@@ -302,9 +302,9 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
          POINT mouse;
          GetCursorPos(&mouse);
 
-         // There's a "bug"
-         // (Microsoft calls it a feature) in Windows 95 that requires calling
-         // SetForegroundWindow. To find out more, search for Q135788 in MSDN.
+         // There's a "bug" (Microsoft calls it a feature) in Windows 95 that 
+         // requires calling SetForegroundWindow. To find out more, search for 
+         // Q135788 in MSDN.
          SetForegroundWindow(_this->m_hwnd);
 
          // Display the menu at the desired position
@@ -347,7 +347,14 @@ void upsMenu::Redraw()
 
 void upsMenu::Reconfigure(const MonitorConfig &mcfg)
 {
+   // Update config (lock to ensure statmgr is not in use)
+   m_mutex.lock();
    m_config = mcfg;
+   delete m_statmgr;
+   m_statmgr = new StatMgr(mcfg.host, mcfg.port);
+   m_mutex.unlock();
+
+   // Kick poll thread so it updates immediately
    ReleaseSemaphore(m_wait, 1, NULL);
 }
 
@@ -358,11 +365,11 @@ DWORD WINAPI upsMenu::StatusPollThread(LPVOID param)
 
    while (_this->m_runthread)
    {
-      // Update the tray icon
+      // Update the tray icon and status dialog
+      _this->m_mutex.lock();
       _this->UpdateTrayIcon();
-
-      // Update the status dialog
       _this->m_status.FillStatusBox();
+      _this->m_mutex.unlock();
 
       // Delay for configured interval
       status = WaitForSingleObject(_this->m_wait, _this->m_config.refresh * 1000);

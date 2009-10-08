@@ -37,12 +37,14 @@ public:
 private:
    // The dialog box window proc
    static BOOL CALLBACK DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+   BOOL DialogProcess(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
    // Private data
    HWND m_hwnd;
    HINSTANCE m_appinst;
    InstanceManager *m_instmgr;
    MonitorConfig m_config;
+   bool m_hostvalid, m_portvalid, m_refreshvalid;
 };
 
 #endif // WINCONFIG_H
