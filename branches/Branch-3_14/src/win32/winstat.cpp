@@ -212,7 +212,10 @@ void upsStatus::FillStatusBox()
    // Remove any leftover items that are no longer needed. This is needed for
    // when apcupsd suddenly emits fewer status items, such as when COMMLOST.
    while (count < num)
-      _grid->DeleteItem(count++);
+   {
+      _grid->DeleteItem(count);
+      num--;
+   }
 
    // Autosize listview columns
    _grid->Autosize();
