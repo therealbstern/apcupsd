@@ -42,6 +42,9 @@ void upsConfig::Show(MonitorConfig &mcfg)
    if (!m_hwnd)
    {
       m_config = mcfg;
+      m_hostvalid = true;
+      m_portvalid = true;
+      m_refreshvalid = true;
 
       DialogBoxParam(m_appinst,
                      MAKEINTRESOURCE(IDD_CONFIG),
@@ -57,27 +60,47 @@ BOOL CALLBACK upsConfig::DialogProc(
    WPARAM wParam,
    LPARAM lParam)
 {
-   // We use the dialog-box's USERDATA to store a _this pointer
-   // This is set only once WM_INITDIALOG has been recieved, though!
-   upsConfig *_this = (upsConfig *)GetWindowLong(hwnd, GWL_USERDATA);
+   upsConfig *_this;
+
+   // Retrieve virtual 'this' pointer. When we come in here the first time for
+   // the WM_INITDIALOG message, the pointer is in lParam. We then store it in
+   // the user data so it can be retrieved on future calls.
+   if (uMsg == WM_INITDIALOG)
+   {
+      // Set dialog user data to our "this" pointer which comes in via lParam.
+      // On subsequent calls, this will be retrieved by the code below.
+      SetWindowLong(hwnd, GWL_USERDATA, lParam);
+      _this = (upsConfig *)lParam;
+   }
+   else
+   {
+      // We've previously been initialized, so retrieve pointer from user data
+      _this = (upsConfig *)GetWindowLong(hwnd, GWL_USERDATA);
+   }
+
+   // Call thru to non-static member function
+   return _this->DialogProcess(hwnd, uMsg, wParam, lParam);
+}
+
+BOOL upsConfig::DialogProcess(
+   HWND hwnd,
+   UINT uMsg,
+   WPARAM wParam,
+   LPARAM lParam)
+{
+   char tmp[256] = {0};
 
    switch (uMsg) {
    case WM_INITDIALOG:
-      // Set dialog user data to our "this" pointer which comes in via lParam.
-      // On subsequent calls, this will be retrieved by the code above.
-      SetWindowLong(hwnd, GWL_USERDATA, lParam);
-      _this = (upsConfig *)lParam;
-
       // Save a copy of our window handle for later use
-      _this->m_hwnd = hwnd;
+      m_hwnd = hwnd;
 
       // Update fields
       SendDlgItemMessage(hwnd, IDC_HOSTNAME, WM_SETTEXT, 0,
-         (LONG)_this->m_config.host.str());
-      char tmp[128];
-      snprintf(tmp, sizeof(tmp), "%d", _this->m_config.port);
+         (LONG)m_config.host.str());
+      snprintf(tmp, sizeof(tmp), "%d", m_config.port);
       SendDlgItemMessage(hwnd, IDC_PORT, WM_SETTEXT, 0, (LONG)tmp);
-      snprintf(tmp, sizeof(tmp), "%d", _this->m_config.refresh);
+      snprintf(tmp, sizeof(tmp), "%d", m_config.refresh);
       SendDlgItemMessage(hwnd, IDC_REFRESH, WM_SETTEXT, 0, (LONG)tmp);
 
       // Show the dialog
@@ -88,15 +111,31 @@ BOOL CALLBACK upsConfig::DialogProc(
       switch (LOWORD(wParam)) {
       case IDOK:
       {
-         char tmp[128];
          SendDlgItemMessage(hwnd, IDC_HOSTNAME, WM_GETTEXT, sizeof(tmp), (LONG)tmp);
-         _this->m_config.host = tmp;
+         astring host(tmp);
+         host.trim();
+         m_hostvalid = !host.empty();
+
          SendDlgItemMessage(hwnd, IDC_PORT, WM_GETTEXT, sizeof(tmp), (LONG)tmp);
-         _this->m_config.port = atoi(tmp);
+         int port = atoi(tmp);
+         m_portvalid = (port >= 1 && port <= 65535);
+
          SendDlgItemMessage(hwnd, IDC_REFRESH, WM_GETTEXT, sizeof(tmp), (LONG)tmp);
-         _this->m_config.refresh = atoi(tmp);
-         _this->m_instmgr->UpdateInstance(_this->m_config);
-         EndDialog(hwnd, TRUE);
+         int refresh = atoi(tmp);
+         m_refreshvalid = (refresh >= 1);
+
+         if (m_hostvalid && m_portvalid && m_refreshvalid)
+         {
+            m_config.host = host;
+            m_config.port = port;
+            m_config.refresh = refresh;
+            m_instmgr->UpdateInstance(m_config);
+            EndDialog(hwnd, TRUE);
+         }
+         else
+         {
+            RedrawWindow(hwnd, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
+         }
          return TRUE;
       }
 
@@ -107,8 +146,25 @@ BOOL CALLBACK upsConfig::DialogProc(
       }
       break;
 
+   case WM_CTLCOLOREDIT:
+   {
+      HWND hhost = GetDlgItem(hwnd, IDC_HOSTNAME);
+      HWND hport = GetDlgItem(hwnd, IDC_PORT);
+      HWND hrefresh = GetDlgItem(hwnd, IDC_REFRESH);
+
+      // Set edit control background red if data was invalid
+      if (((HWND)lParam == hhost    && !m_hostvalid) ||
+          ((HWND)lParam == hport    && !m_portvalid) ||
+          ((HWND)lParam == hrefresh && !m_refreshvalid))
+      {
+         SetBkColor((HDC)wParam, RGB(255,0,0));
+         return (BOOL)CreateSolidBrush(RGB(255,0,0));
+      }
+      return FALSE;
+   }
+
    case WM_DESTROY:
-      _this->m_hwnd = NULL;
+      m_hwnd = NULL;
       return TRUE;
    }
 

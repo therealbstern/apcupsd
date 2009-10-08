@@ -20,6 +20,7 @@
 #include "winconfig.h"
 #include "astring.h"
 #include "instmgr.h"
+#include "amutex.h"
 
 // Forward declarations
 class StatMgr;
@@ -65,6 +66,7 @@ protected:
    HINSTANCE               m_appinst;        // Application instance handle
    MonitorConfig           m_config;         // Configuration (host, port, etc.)
    bool                    m_runthread;      // Run the poll thread?
+   amutex                  m_mutex;          // Lock to protect statmgr
 
    // Dialogs for About, Status, Config, and Events
    upsAbout                m_about;
