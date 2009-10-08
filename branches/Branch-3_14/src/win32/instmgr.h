@@ -27,17 +27,12 @@
 
 class upsMenu;
 
-struct InstanceConfig
+struct MonitorConfig
 {
-   InstanceConfig() : menu(NULL), order(0) {}
-   ~InstanceConfig() {}
-
    astring id;
    astring host;
    unsigned int port;
    unsigned int refresh;
-   unsigned int order;
-   upsMenu *menu;
 };
 
 class InstanceManager
@@ -46,16 +41,24 @@ public:
    InstanceManager(HINSTANCE appinst);
    ~InstanceManager();
 
-   const alist<InstanceConfig> &Instances() { return _instances; }
-
    void CreateMonitors();
    int RemoveInstance(const char *id);
    void AddInstance();
-   void UpdateInstance( const char *id, const char *host, int port, int refresh);
+   void UpdateInstance(const MonitorConfig &mcfg);
    void RemoveAll();
    void ResetInstances();
 
 private:
+
+   struct InstanceConfig
+   {
+      InstanceConfig() : menu(NULL), order(0) {}
+      ~InstanceConfig() {}
+
+      MonitorConfig mcfg;
+      unsigned int order;
+      upsMenu *menu;
+   };
 
    void Write();
    InstanceConfig ReadConfig(HKEY key, const char *id);

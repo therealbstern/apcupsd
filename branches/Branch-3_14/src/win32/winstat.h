@@ -27,11 +27,8 @@ public:
    upsStatus(HINSTANCE appinst, StatMgr *statmgr);
    ~upsStatus();
 
-   // Initialisation
-   BOOL Init();
-
    // General
-   void Show(BOOL show);
+   void Show();
    void FillStatusBox();
 
 private:

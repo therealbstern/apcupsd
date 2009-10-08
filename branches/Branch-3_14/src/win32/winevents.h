@@ -24,11 +24,8 @@ public:
    upsEvents(HINSTANCE appinst, StatMgr *statmgr);
    ~upsEvents();
 
-   // Initialisation
-   BOOL Init();
-
    // General
-   void Show(BOOL show);
+   void Show();
 
 private:
    // The dialog box window proc

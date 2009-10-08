@@ -27,23 +27,16 @@ upsEvents::~upsEvents()
 {
 }
 
-// Initialisation
-BOOL upsEvents::Init()
-{
-   return TRUE;
-}
-
 // Dialog box handling functions
-void upsEvents::Show(BOOL show)
+void upsEvents::Show()
 {
-   if (show) {
-      if (!m_dlgvisible) {
-         DialogBoxParam(m_appinst,
-                        MAKEINTRESOURCE(IDD_EVENTS),
-                        NULL,
-                        (DLGPROC)DialogProc,
-                        (LONG)this);
-      }
+   if (!m_dlgvisible)
+   {
+      DialogBoxParam(m_appinst,
+                     MAKEINTRESOURCE(IDD_EVENTS),
+                     NULL,
+                     (DLGPROC)DialogProc,
+                     (LONG)this);
    }
 }
 

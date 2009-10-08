@@ -88,10 +88,10 @@ void InstanceManager::CreateMonitors()
    if (_instances.empty())
    {
       InstanceConfig config;
-      config.host = DEFAULT_HOST;
-      config.port = DEFAULT_PORT;
-      config.refresh = DEFAULT_REFRESH;
-      config.id = CreateId();
+      config.mcfg.host = DEFAULT_HOST;
+      config.mcfg.port = DEFAULT_PORT;
+      config.mcfg.refresh = DEFAULT_REFRESH;
+      config.mcfg.id = CreateId();
       _instances.append(config);
       Write();
    }
@@ -99,33 +99,29 @@ void InstanceManager::CreateMonitors()
    // Loop thru sorted instance list and create an upsMenu for each
    alist<InstanceConfig>::iterator iter;
    for (iter = _instances.begin(); iter != _instances.end(); ++iter)
-   {
-      iter->menu = new upsMenu(
-         _appinst, iter->host, iter->port, iter->refresh, 
-         &_balmgr, iter->id);
-   }
+      iter->menu = new upsMenu(_appinst, iter->mcfg, &_balmgr, this);
 }
 
-InstanceConfig InstanceManager::ReadConfig(HKEY key, const char *id)
+InstanceManager::InstanceConfig InstanceManager::ReadConfig(HKEY key, const char *id)
 {
    InstanceConfig config;
-   config.id = id;
+   config.mcfg.id = id;
 
    // Read instance config from registry
    HKEY subkey;
    if (RegOpenKeyEx(key, id, 0, KEY_READ, &subkey) == ERROR_SUCCESS)
    {
-      config.host = RegQueryString(subkey, "host");
-      config.port = RegQueryDWORD(subkey, "port");
-      config.refresh = RegQueryDWORD(subkey, "refresh");
+      config.mcfg.host = RegQueryString(subkey, "host");
+      config.mcfg.port = RegQueryDWORD(subkey, "port");
+      config.mcfg.refresh = RegQueryDWORD(subkey, "refresh");
       config.order = RegQueryDWORD(subkey, "order");
       RegCloseKey(subkey);
    }
 
    // Apply defaults as necessary
-   if (config.host.empty()) config.host = DEFAULT_HOST;
-   if (config.port < 1)     config.port = DEFAULT_PORT;
-   if (config.refresh < 1)  config.refresh = DEFAULT_REFRESH;
+   if (config.mcfg.host.empty()) config.mcfg.host = DEFAULT_HOST;
+   if (config.mcfg.port < 1)     config.mcfg.port = DEFAULT_PORT;
+   if (config.mcfg.refresh < 1)  config.mcfg.refresh = DEFAULT_REFRESH;
 
    return config;
 }
@@ -174,11 +170,11 @@ void InstanceManager::Write()
    for (iter = _instances.begin(); iter != _instances.end(); ++iter)
    {
       // No apctray key (and therefore no instances) yet. Create the key.
-      if (RegCreateKey(apctray, iter->id, &instkey) == ERROR_SUCCESS)
+      if (RegCreateKey(apctray, iter->mcfg.id, &instkey) == ERROR_SUCCESS)
       {
-         RegSetString(instkey, "host", iter->host);
-         RegSetDWORD(instkey, "port", iter->port);
-         RegSetDWORD(instkey, "refresh", iter->refresh);
+         RegSetString(instkey, "host", iter->mcfg.host);
+         RegSetDWORD(instkey, "port", iter->mcfg.port);
+         RegSetDWORD(instkey, "refresh", iter->mcfg.refresh);
          RegSetDWORD(instkey, "order", count);
          RegCloseKey(instkey);
          count++;
@@ -187,12 +183,13 @@ void InstanceManager::Write()
    RegCloseKey(apctray);
 }
 
-alist<InstanceConfig>::iterator InstanceManager::FindInstance(const char *id)
+alist<InstanceManager::InstanceConfig>::iterator 
+   InstanceManager::FindInstance(const char *id)
 {
    alist<InstanceConfig>::iterator iter;
    for (iter = _instances.begin(); iter != _instances.end(); ++iter)
    {
-      if (iter->id == id)
+      if (iter->mcfg.id == id)
          return iter;
    }
    return _instances.end();
@@ -215,29 +212,22 @@ int InstanceManager::RemoveInstance(const char *id)
 void InstanceManager::AddInstance()
 {
    InstanceConfig config;
-   config.host = DEFAULT_HOST;
-   config.port = DEFAULT_PORT;
-   config.refresh = DEFAULT_REFRESH;
-   config.id = CreateId();
-   config.menu = new upsMenu(
-      _appinst, config.host, config.port, config.refresh, 
-      &_balmgr, config.id);
+   config.mcfg.host = DEFAULT_HOST;
+   config.mcfg.port = DEFAULT_PORT;
+   config.mcfg.refresh = DEFAULT_REFRESH;
+   config.mcfg.id = CreateId();
+   config.menu = new upsMenu(_appinst, config.mcfg, &_balmgr, this);
    _instances.append(config);
    Write();
 }
 
-void InstanceManager::UpdateInstance(
-   const char *id, 
-   const char *host, 
-   int port, 
-   int refresh)
+void InstanceManager::UpdateInstance(const MonitorConfig &mcfg)
 {
-   alist<InstanceConfig>::iterator inst = FindInstance(id);
+   alist<InstanceConfig>::iterator inst = FindInstance(mcfg.id);
    if (inst != _instances.end())
    {
-      inst->host = host;
-      inst->port = port;
-      inst->refresh = refresh;
+      inst->mcfg = mcfg;
+      inst->menu->Reconfigure(mcfg);
       Write();
    }
 }
@@ -245,7 +235,7 @@ void InstanceManager::UpdateInstance(
 void InstanceManager::RemoveAll()
 {
    while (!_instances.empty())
-      RemoveInstance(_instances.begin()->id);
+      RemoveInstance(_instances.begin()->mcfg.id);
 }
 
 void InstanceManager::ResetInstances()

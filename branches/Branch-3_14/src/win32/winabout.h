@@ -21,11 +21,8 @@ public:
    upsAbout(HINSTANCE appinst);
    ~upsAbout();
 
-   // Initialisation
-   BOOL Init();
-
    // General
-   void Show(BOOL show);
+   void Show();
 
 private:
    // The dialog box window proc

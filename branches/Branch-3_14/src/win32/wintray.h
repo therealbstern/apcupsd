@@ -17,7 +17,9 @@
 #include "winabout.h"
 #include "winstat.h"
 #include "winevents.h"
+#include "winconfig.h"
 #include "astring.h"
+#include "instmgr.h"
 
 // Forward declarations
 class StatMgr;
@@ -27,11 +29,12 @@ class BalloonMgr;
 class upsMenu
 {
 public:
-   upsMenu(HINSTANCE appinst, const char *host, unsigned long port,
-           int refresh, BalloonMgr *balmgr, const char *id);
+   upsMenu(HINSTANCE appinst, MonitorConfig &mcfg, BalloonMgr *balmgr,
+           InstanceManager *instmgr);
    ~upsMenu();
    void Destroy();
    void Redraw();
+   void Reconfigure(const MonitorConfig &mcfg);
 
 protected:
    // Tray icon handling
@@ -53,21 +56,20 @@ protected:
    HWND                    m_hwnd;           // Window handle
    HMENU                   m_hmenu;          // Menu handle
    StatMgr                *m_statmgr;        // Manager for UPS stats
-   int                     m_interval;       // How often to poll for status
    HANDLE                  m_thread;         // Handle to status polling thread
    HANDLE                  m_wait;           // Handle to wait mutex
    astring                 m_upsname;        // Cache UPS name
    astring                 m_laststatus;     // Cache previous status string
    BalloonMgr             *m_balmgr;         // Balloon tip manager
-   const char             *m_host;
-   unsigned short          m_port;
    UINT                    m_tbcreated_msg;  // Id of TaskbarCreated message
    HINSTANCE               m_appinst;        // Application instance handle
-   astring                 m_id;
+   MonitorConfig           m_config;         // Configuration (host, port, etc.)
+   bool                    m_runthread;      // Run the poll thread?
 
-   // Dialogs for About, Status, and Events
+   // Dialogs for About, Status, Config, and Events
    upsAbout                m_about;
    upsStatus               m_status;
+   upsConfig               m_configdlg;
    upsEvents               m_events;
 
    // The icon handles

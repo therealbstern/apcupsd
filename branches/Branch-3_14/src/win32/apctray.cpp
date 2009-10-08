@@ -28,18 +28,12 @@
 #include "astring.h"
 #include "instmgr.h"
 
-#define CMDOPT_PORT     "/port"
-#define CMDOPT_HOST     "/host"
-#define CMDOPT_REFRESH  "/refresh"
 #define CMDOPT_INSTALL  "/install"
 #define CMDOPT_REMOVE   "/remove"
 #define CMDOPT_KILL     "/kill"
 #define CMDOPT_QUIET    "/quiet"
 
-#define USAGE_TEXT   "[" CMDOPT_HOST    " <hostname>] " \
-                     "[" CMDOPT_PORT    " <port>] "     \
-                     "[" CMDOPT_REFRESH " <sec>] "      \
-                     "[" CMDOPT_INSTALL "] "            \
+#define USAGE_TEXT   "[" CMDOPT_INSTALL "] "            \
                      "[" CMDOPT_REMOVE  "] "            \
                      "[" CMDOPT_KILL    "] "            \
                      "[" CMDOPT_QUIET   "]"
@@ -223,25 +217,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    char *arg;
    char *opt = CmdLine;
    while ((arg = GetArg(&opt))) {
-      if (strcasecmp(arg, CMDOPT_HOST) == 0) {
-         if (!(arg = GetArg(&opt))) {
-            Usage(CMDOPT_HOST, "Option requires string argument");
-            return 1;
-         }
-         host = arg;
-      } else if (strcasecmp(arg, CMDOPT_PORT) == 0) {
-         if (!(arg = GetArg(&opt))) {
-            Usage(CMDOPT_PORT, "Option requires integer argument");
-            return 1;
-         }
-         port = strtoul(arg, NULL, 0);
-      } else if (strcasecmp(arg, CMDOPT_REFRESH) == 0) {
-         if (!(arg = GetArg(&opt))) {
-            Usage(CMDOPT_REFRESH, "Option requires integer argument");
-            return 1;
-         }
-         refresh = strtoul(arg, NULL, 0);
-      } else if (strcasecmp(arg, CMDOPT_INSTALL) == 0) {
+      if (strcasecmp(arg, CMDOPT_INSTALL) == 0) {
          return Install();
       } else if (strcasecmp(arg, CMDOPT_REMOVE) == 0) {
          return Remove();
