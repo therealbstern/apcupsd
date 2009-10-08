@@ -25,23 +25,16 @@ upsAbout::~upsAbout()
 {
 }
 
-// Initialisation
-BOOL upsAbout::Init()
-{
-   return TRUE;
-}
-
 // Dialog box handling functions
-void upsAbout::Show(BOOL show)
+void upsAbout::Show()
 {
-   if (show) {
-      if (!m_dlgvisible) {
-         DialogBoxParam(m_appinst,
-                        MAKEINTRESOURCE(IDD_ABOUT), 
-                        NULL,
-                       (DLGPROC) DialogProc,
-                       (LONG) this);
-      }
+   if (!m_dlgvisible)
+   {
+      DialogBoxParam(m_appinst,
+                     MAKEINTRESOURCE(IDD_ABOUT), 
+                     NULL,
+                    (DLGPROC) DialogProc,
+                    (LONG) this);
    }
 }
 

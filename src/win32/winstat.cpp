@@ -30,25 +30,16 @@ upsStatus::~upsStatus()
 {
 }
 
-// Initialisation
-BOOL upsStatus::Init()
-{
-   return TRUE;
-}
-
 // Dialog box handling functions
-void upsStatus::Show(BOOL show)
+void upsStatus::Show()
 {
-   if (show)
+   if (!m_hwnd)
    {
-      if (!m_hwnd)
-      {
-         DialogBoxParam(m_appinst,
-                        MAKEINTRESOURCE(IDD_STATUS),
-                        NULL,
-                        (DLGPROC)DialogProc,
-                        (LONG)this);
-      }
+      DialogBoxParam(m_appinst,
+                     MAKEINTRESOURCE(IDD_STATUS),
+                     NULL,
+                     (DLGPROC)DialogProc,
+                     (LONG)this);
    }
 }
 

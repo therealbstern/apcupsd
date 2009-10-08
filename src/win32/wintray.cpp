@@ -17,26 +17,23 @@
 #include "statmgr.h"
 #include "balloonmgr.h"
 
-#define BALLOON_TIMEOUT 10000
-
 // Implementation
-upsMenu::upsMenu(HINSTANCE appinst, const char* host, unsigned long port,
-                 int refresh, BalloonMgr *balmgr, const char *id)
-   : m_statmgr(new StatMgr(host, port)),
+upsMenu::upsMenu(HINSTANCE appinst, MonitorConfig &mcfg, BalloonMgr *balmgr,
+                 InstanceManager *instmgr)
+   : m_statmgr(new StatMgr(mcfg.host, mcfg.port)),
      m_about(appinst),
      m_status(appinst, m_statmgr),
      m_events(appinst, m_statmgr),
-     m_interval(refresh),
+     m_configdlg(appinst, instmgr),
      m_wait(NULL),
      m_thread(NULL),
      m_hmenu(NULL),
      m_upsname("<unknown>"),
      m_balmgr(balmgr),
-     m_host(host),
-     m_port(port),
      m_appinst(appinst),
      m_hwnd(NULL),
-     m_id(id)
+     m_config(mcfg),
+     m_runthread(true)
 {
    // Determine message id for "TaskbarCreate" message
    m_tbcreated_msg = RegisterWindowMessage("TaskbarCreated");
@@ -59,7 +56,7 @@ upsMenu::upsMenu(HINSTANCE appinst, const char* host, unsigned long port,
 
    // Make unique window title as 'host:port'.
    char title[1024];
-   asnprintf(title, sizeof(title), "%s:%d", host, port);
+   asnprintf(title, sizeof(title), "%s:%d", mcfg.host.str(), mcfg.port);
 
    // Create System Tray menu window
    m_hwnd = CreateWindow(APCTRAY_WINDOW_CLASS, title, WS_OVERLAPPEDWINDOW,
@@ -91,8 +88,8 @@ upsMenu::upsMenu(HINSTANCE appinst, const char* host, unsigned long port,
    // are consistently created in the same order.
    AddTrayIcon();
 
-   // Create a locked mutex to use for interruptible waiting
-   m_wait = CreateMutex(NULL, true, NULL);
+   // Create a semaphore to use for interruptible waiting
+   m_wait = CreateSemaphore(NULL, 0, 1, NULL);
    if (m_wait == NULL) {
       PostQuitMessage(0);
       return;
@@ -141,7 +138,10 @@ void upsMenu::Destroy()
    // Trigger status poll thread to shut down. We will wait for
    // the thread to exit later in our destructor.
    if (m_wait)
-      ReleaseMutex(m_wait);
+   {
+      m_runthread = false;
+      ReleaseSemaphore(m_wait, 1, NULL);
+   }
 }
 
 void upsMenu::AddTrayIcon()
@@ -237,17 +237,17 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
       switch (LOWORD(wParam)) {
       case IDM_STATUS:
          // Show the status dialog
-         _this->m_status.Show(TRUE);
+         _this->m_status.Show();
          break;
 
       case IDM_EVENTS:
          // Show the Events dialog
-         _this->m_events.Show(TRUE);
+         _this->m_events.Show();
          break;
 
       case IDM_ABOUT:
          // Show the About box
-         _this->m_about.Show(TRUE);
+         _this->m_about.Show();
          break;
 
       case IDM_EXIT:
@@ -257,21 +257,22 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
       case IDM_REMOVE:
          // User selected Close from the tray menu
-         PostMessage(hwnd, WM_APCTRAY_REMOVE, 0, (LPARAM)(_this->m_id.str()));
-         return 0;
+         PostMessage(hwnd, WM_APCTRAY_REMOVE, 0, (LPARAM)(_this->m_config.id.str()));
+         break;
 
       case IDM_REMOVEALL:
          // User wants to remove all apctray instances from registry
          PostMessage(hwnd, WM_APCTRAY_REMOVEALL, 0, 0);
-         return 0;
+         break;
 
       case IDM_ADD:
          // User selected Close from the tray menu
          PostMessage(hwnd, WM_APCTRAY_ADD, 0, 0);
-         return 0;
+         break;
 
       case IDM_CONFIG:
-         return 0;
+         _this->m_configdlg.Show(_this->m_config);
+         break;
       }
       return 0;
 
@@ -294,7 +295,7 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
          // Set HOST field
          char buf[100];
-         asnprintf(buf, sizeof(buf), "HOST: %s:%d", _this->m_host, _this->m_port);
+         asnprintf(buf, sizeof(buf), "HOST: %s:%d", _this->m_config.host.str(), _this->m_config.port);
          ModifyMenu(submenu, IDM_HOST, MF_BYCOMMAND|MF_STRING, IDM_HOST, buf);
 
          // Get the current cursor position, to display the menu at
@@ -344,12 +345,19 @@ void upsMenu::Redraw()
    AddTrayIcon();
 }
 
+void upsMenu::Reconfigure(const MonitorConfig &mcfg)
+{
+   m_config = mcfg;
+   ReleaseSemaphore(m_wait, 1, NULL);
+}
+
 DWORD WINAPI upsMenu::StatusPollThread(LPVOID param)
 {
    upsMenu* _this = (upsMenu*)param;
    DWORD status;
 
-   while (1) {
+   while (_this->m_runthread)
+   {
       // Update the tray icon
       _this->UpdateTrayIcon();
 
@@ -357,8 +365,6 @@ DWORD WINAPI upsMenu::StatusPollThread(LPVOID param)
       _this->m_status.FillStatusBox();
 
       // Delay for configured interval
-      status = WaitForSingleObject(_this->m_wait, _this->m_interval * 1000);
-      if (status != WAIT_TIMEOUT)
-         break;
+      status = WaitForSingleObject(_this->m_wait, _this->m_config.refresh * 1000);
    }
 }
