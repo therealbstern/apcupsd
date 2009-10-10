@@ -7,7 +7,6 @@
 #define IDI_CHARGING                            103
 #define IDR_TRAYMENU                            104
 #define IDI_COMMLOST                            105
-#define IDB_APCUPSDBMP                          106
 #define IDD_ABOUT                               201
 #define IDD_STATUS                              202
 #define IDD_EVENTS                              203
@@ -23,8 +22,6 @@
 #define IDC_STATUS                              1006
 #define IDC_RUNTIME                             1007
 #define IDC_LOAD                                1008
-#define IDC_VERSION                             1017
-#define IDC_NAME                                1018
 #define IDC_WWW                                 1022
 #define IDC_COPYRIGHT                           1023
 #define IDC_TRADEMARK                           1036
@@ -45,3 +42,4 @@
 #define IDC_PORT                                40021
 #define IDC_REFRESH                             40022
 #define IDC_POPUPS                              40023
+#define IDC_VERSION                             40024
