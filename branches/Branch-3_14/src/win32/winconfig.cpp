@@ -95,7 +95,8 @@ BOOL upsConfig::DialogProcess(
       // Save a copy of our window handle for later use
       m_hwnd = hwnd;
 
-      // Fetch handles for all controls
+      // Fetch handles for all controls. We'll use these multiple times later
+      // so it makes sense to cache them.
       m_hhost = GetDlgItem(hwnd, IDC_HOSTNAME);
       m_hport = GetDlgItem(hwnd, IDC_PORT);
       m_hrefresh = GetDlgItem(hwnd, IDC_REFRESH);
@@ -118,22 +119,27 @@ BOOL upsConfig::DialogProcess(
       switch (LOWORD(wParam)) {
       case IDOK:
       {
+         // Fetch and validate hostname
          SendMessage(m_hhost, WM_GETTEXT, sizeof(tmp), (LONG)tmp);
          astring host(tmp);
          m_hostvalid = !host.trim().empty();
 
+         // Fetch and validate port
          SendMessage(m_hport, WM_GETTEXT, sizeof(tmp), (LONG)tmp);
          int port = atoi(tmp);
          m_portvalid = (port >= 1 && port <= 65535);
 
+         // Fetch and validate refresh
          SendMessage(m_hrefresh, WM_GETTEXT, sizeof(tmp), (LONG)tmp);
          int refresh = atoi(tmp);
          m_refreshvalid = (refresh >= 1);
 
+         // Fetch popups on/off
          bool popups = SendMessage(m_hpopups, BM_GETCHECK, 0, 0) == BST_CHECKED;
 
          if (m_hostvalid && m_portvalid && m_refreshvalid)
          {
+            // Config is valid: Save it and close the dialog
             m_config.host = host;
             m_config.port = port;
             m_config.refresh = refresh;
@@ -143,6 +149,12 @@ BOOL upsConfig::DialogProcess(
          }
          else
          {
+            // Set keyboard focus to first invalid field
+            if (!m_hostvalid)      SetFocus(m_hhost);
+            else if (!m_portvalid) SetFocus(m_hport);
+            else                   SetFocus(m_hrefresh);
+
+            // Force redraw to get background color change
             RedrawWindow(hwnd, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
          }
          return TRUE;
