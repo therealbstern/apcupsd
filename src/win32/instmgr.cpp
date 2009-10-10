@@ -20,11 +20,17 @@
 #include "wintray.h"
 #include <stdio.h>
 
-const char *InstanceManager::DEFAULT_HOST = "127.0.0.1";
-const unsigned int InstanceManager::DEFAULT_PORT = 3551;
-const unsigned int InstanceManager::DEFAULT_REFRESH = 5;
 const char *InstanceManager::INSTANCES_KEY =
    "Software\\Apcupsd\\Apctray\\instances";
+
+const MonitorConfig InstanceManager::DEFAULT_CONFIG =
+{
+   "",            // id
+   "127.0.0.1",   // host
+   3551,          // port
+   5,             // refresh
+   true           // popups
+};
 
 InstanceManager::InstanceManager(HINSTANCE appinst) :
    _appinst(appinst)
@@ -88,9 +94,7 @@ void InstanceManager::CreateMonitors()
    if (_instances.empty())
    {
       InstanceConfig config;
-      config.mcfg.host = DEFAULT_HOST;
-      config.mcfg.port = DEFAULT_PORT;
-      config.mcfg.refresh = DEFAULT_REFRESH;
+      config.mcfg = DEFAULT_CONFIG;
       config.mcfg.id = CreateId();
       _instances.append(config);
       Write();
@@ -105,23 +109,20 @@ void InstanceManager::CreateMonitors()
 InstanceManager::InstanceConfig InstanceManager::ReadConfig(HKEY key, const char *id)
 {
    InstanceConfig config;
+   config.mcfg = DEFAULT_CONFIG;
    config.mcfg.id = id;
 
    // Read instance config from registry
    HKEY subkey;
    if (RegOpenKeyEx(key, id, 0, KEY_READ, &subkey) == ERROR_SUCCESS)
    {
-      config.mcfg.host = RegQueryString(subkey, "host");
-      config.mcfg.port = RegQueryDWORD(subkey, "port");
-      config.mcfg.refresh = RegQueryDWORD(subkey, "refresh");
-      config.order = RegQueryDWORD(subkey, "order");
+      RegQueryString(subkey, "host", config.mcfg.host);
+      RegQueryDWORD(subkey, "port", config.mcfg.port);
+      RegQueryDWORD(subkey, "refresh", config.mcfg.refresh);
+      RegQueryDWORD(subkey, "popups", config.mcfg.popups);
+      RegQueryDWORD(subkey, "order", config.order);
       RegCloseKey(subkey);
    }
-
-   // Apply defaults as necessary
-   if (config.mcfg.host.empty()) config.mcfg.host = DEFAULT_HOST;
-   if (config.mcfg.port < 1)     config.mcfg.port = DEFAULT_PORT;
-   if (config.mcfg.refresh < 1)  config.mcfg.refresh = DEFAULT_REFRESH;
 
    return config;
 }
@@ -175,6 +176,7 @@ void InstanceManager::Write()
          RegSetString(instkey, "host", iter->mcfg.host);
          RegSetDWORD(instkey, "port", iter->mcfg.port);
          RegSetDWORD(instkey, "refresh", iter->mcfg.refresh);
+         RegSetDWORD(instkey, "popups", iter->mcfg.popups);
          RegSetDWORD(instkey, "order", count);
          RegCloseKey(instkey);
          count++;
@@ -212,9 +214,7 @@ int InstanceManager::RemoveInstance(const char *id)
 void InstanceManager::AddInstance()
 {
    InstanceConfig config;
-   config.mcfg.host = DEFAULT_HOST;
-   config.mcfg.port = DEFAULT_PORT;
-   config.mcfg.refresh = DEFAULT_REFRESH;
+   config.mcfg = DEFAULT_CONFIG;
    config.mcfg.id = CreateId();
    config.menu = new upsMenu(_appinst, config.mcfg, &_balmgr, this);
    _instances.append(config);
@@ -262,27 +262,27 @@ astring InstanceManager::CreateId()
    return uuidstr;
 }
 
-DWORD InstanceManager::RegQueryDWORD(HKEY hkey, const char *name)
+bool InstanceManager::RegQueryDWORD(HKEY hkey, const char *name, DWORD &result)
 {
-   DWORD result;
-   DWORD len = sizeof(result);
+   DWORD data;
+   DWORD len = sizeof(data);
    DWORD type;
 
    // Retrieve DWORD
-   if (RegQueryValueEx(hkey, name, NULL, &type, (BYTE*)&result, &len)
-         != ERROR_SUCCESS || type != REG_DWORD)
+   if (RegQueryValueEx(hkey, name, NULL, &type, (BYTE*)&data, &len)
+         == ERROR_SUCCESS && type == REG_DWORD)
    {
-      result = 0;
+      result = data;
+      return true;
    }
 
-   return result;
+   return false;
 }
 
-astring InstanceManager::RegQueryString(HKEY hkey, const char *name)
+bool InstanceManager::RegQueryString(HKEY hkey, const char *name, astring &result)
 {
    char data[512]; // Arbitrary max
    DWORD len = sizeof(data);
-   astring result;
    DWORD type;
 
    // Retrieve string
@@ -290,9 +290,10 @@ astring InstanceManager::RegQueryString(HKEY hkey, const char *name)
          == ERROR_SUCCESS && type == REG_SZ)
    {
       result = data;
+      return true;
    }
 
-   return result;
+   return false;
 }
 
 void InstanceManager::RegSetDWORD(HKEY hkey, const char *name, DWORD value)

@@ -95,13 +95,20 @@ BOOL upsConfig::DialogProcess(
       // Save a copy of our window handle for later use
       m_hwnd = hwnd;
 
-      // Update fields
-      SendDlgItemMessage(hwnd, IDC_HOSTNAME, WM_SETTEXT, 0,
-         (LONG)m_config.host.str());
+      // Fetch handles for all controls
+      m_hhost = GetDlgItem(hwnd, IDC_HOSTNAME);
+      m_hport = GetDlgItem(hwnd, IDC_PORT);
+      m_hrefresh = GetDlgItem(hwnd, IDC_REFRESH);
+      m_hpopups = GetDlgItem(hwnd, IDC_POPUPS);
+
+      // Initialize fields with current config settings
+      SendMessage(m_hhost, WM_SETTEXT, 0, (LONG)m_config.host.str());
       snprintf(tmp, sizeof(tmp), "%d", m_config.port);
-      SendDlgItemMessage(hwnd, IDC_PORT, WM_SETTEXT, 0, (LONG)tmp);
+      SendMessage(m_hport, WM_SETTEXT, 0, (LONG)tmp);
       snprintf(tmp, sizeof(tmp), "%d", m_config.refresh);
-      SendDlgItemMessage(hwnd, IDC_REFRESH, WM_SETTEXT, 0, (LONG)tmp);
+      SendMessage(m_hrefresh, WM_SETTEXT, 0, (LONG)tmp);
+      SendMessage(m_hpopups, BM_SETCHECK, 
+         m_config.popups ? BST_CHECKED : BST_UNCHECKED, 0);
 
       // Show the dialog
       SetForegroundWindow(hwnd);
@@ -111,24 +118,26 @@ BOOL upsConfig::DialogProcess(
       switch (LOWORD(wParam)) {
       case IDOK:
       {
-         SendDlgItemMessage(hwnd, IDC_HOSTNAME, WM_GETTEXT, sizeof(tmp), (LONG)tmp);
+         SendMessage(m_hhost, WM_GETTEXT, sizeof(tmp), (LONG)tmp);
          astring host(tmp);
-         host.trim();
-         m_hostvalid = !host.empty();
+         m_hostvalid = !host.trim().empty();
 
-         SendDlgItemMessage(hwnd, IDC_PORT, WM_GETTEXT, sizeof(tmp), (LONG)tmp);
+         SendMessage(m_hport, WM_GETTEXT, sizeof(tmp), (LONG)tmp);
          int port = atoi(tmp);
          m_portvalid = (port >= 1 && port <= 65535);
 
-         SendDlgItemMessage(hwnd, IDC_REFRESH, WM_GETTEXT, sizeof(tmp), (LONG)tmp);
+         SendMessage(m_hrefresh, WM_GETTEXT, sizeof(tmp), (LONG)tmp);
          int refresh = atoi(tmp);
          m_refreshvalid = (refresh >= 1);
+
+         bool popups = SendMessage(m_hpopups, BM_GETCHECK, 0, 0) == BST_CHECKED;
 
          if (m_hostvalid && m_portvalid && m_refreshvalid)
          {
             m_config.host = host;
             m_config.port = port;
             m_config.refresh = refresh;
+            m_config.popups = popups;
             m_instmgr->UpdateInstance(m_config);
             EndDialog(hwnd, TRUE);
          }
@@ -148,14 +157,10 @@ BOOL upsConfig::DialogProcess(
 
    case WM_CTLCOLOREDIT:
    {
-      HWND hhost = GetDlgItem(hwnd, IDC_HOSTNAME);
-      HWND hport = GetDlgItem(hwnd, IDC_PORT);
-      HWND hrefresh = GetDlgItem(hwnd, IDC_REFRESH);
-
       // Set edit control background red if data was invalid
-      if (((HWND)lParam == hhost    && !m_hostvalid) ||
-          ((HWND)lParam == hport    && !m_portvalid) ||
-          ((HWND)lParam == hrefresh && !m_refreshvalid))
+      if (((HWND)lParam == m_hhost    && !m_hostvalid) ||
+          ((HWND)lParam == m_hport    && !m_portvalid) ||
+          ((HWND)lParam == m_hrefresh && !m_refreshvalid))
       {
          SetBkColor((HDC)wParam, RGB(255,0,0));
          return (BOOL)CreateSolidBrush(RGB(255,0,0));
