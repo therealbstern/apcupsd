@@ -10,13 +10,6 @@
 
 
 //
-// Bitmap resources
-//
-IDB_APCUPSDBMP     BITMAP         "apcupsd.bmp"
-
-
-
-//
 // Menu resources
 //
 IDR_TRAYMENU MENU
@@ -51,17 +44,15 @@ CAPTION "About Apcupsd"
 FONT 8, "MS Sans Serif"
 {
     DEFPUSHBUTTON   "OK", IDOK, 190, 120, 50, 15
-    CONTROL         "a", IDB_APCUPSDBMP, WC_STATIC, SS_BITMAP | SS_SUNKEN, 7, 5, 73, 65
-    LTEXT           "ApcTray Version", IDC_VERSION, 90, 10, 239, 10, SS_LEFT
-    LTEXT           "      by Adam Kropelin", IDC_NAME, 90, 20, 239, 10, SS_LEFT
-    LTEXT           "For more information, see:", IDC_WWW, 90, 40, 239, 10, SS_LEFT
-    LTEXT           "      http://www.apcupsd.com", IDC_WWW1, 90, 50, 239, 10, SS_LEFT
-    LTEXT           "      http://sourceforge.net/projects/apcupsd", IDC_WWW2, 90, 60, 239, 10, SS_LEFT
-    LTEXT           "Copyright (C) 2004-2007, Adam Kropelin", IDC_COPYRIGHT, 7, 90, 175, 10, SS_LEFT
+    LTEXT           "For more information, see:", IDC_WWW, 90, 40, 145, 10, SS_LEFT
+    LTEXT           "http://www.apcupsd.org", IDC_WWW1, 100, 50, 79, 8, SS_LEFT
+    LTEXT           "http://sourceforge.net/projects/apcupsd", IDC_WWW2, 100, 60, 130, 8, SS_LEFT
+    LTEXT           "Copyright (C) 2004-2009, Adam Kropelin", IDC_COPYRIGHT, 7, 90, 126, 8, SS_LEFT
     LTEXT           "Copyright (C) 1999-2006, Kern Sibbald", IDC_COPYRIGHT1, 7, 100, 175, 10, SS_LEFT
     LTEXT           "Copyright (C) 1999-2002, Riccardo Facchetti", IDC_COPYRIGHT2, 7, 110, 175, 10, SS_LEFT
     LTEXT           "Copyright (C) 1996-1999, André M. Hedrick", IDC_COPYRIGHT3, 7, 120, 175, 10, SS_LEFT
     LTEXT           "Licensed under GNU GPL 2.0.", IDC_TRADEMARK, 7, 130, 175, 10, SS_LEFT
+    LTEXT           "A.B.C", IDC_VERSION, 90, 10, 141, 8, SS_LEFT
 }
 
 
