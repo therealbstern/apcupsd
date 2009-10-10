@@ -205,7 +205,7 @@ void upsMenu::SendTrayMsg(DWORD msg)
                 m_upsname.str(), statstr.str());
 
    // Display event in balloon tip
-   if (!m_laststatus.empty() && m_laststatus != statstr)
+   if (m_config.popups && !m_laststatus.empty() && m_laststatus != statstr)
       m_balmgr->PostBalloon(m_hwnd, m_upsname, statstr);
    m_laststatus = statstr;
 

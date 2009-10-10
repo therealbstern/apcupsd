@@ -31,8 +31,9 @@ struct MonitorConfig
 {
    astring id;
    astring host;
-   unsigned int port;
-   unsigned int refresh;
+   DWORD port;
+   DWORD refresh;
+   DWORD popups;
 };
 
 class InstanceManager
@@ -56,7 +57,7 @@ private:
       ~InstanceConfig() {}
 
       MonitorConfig mcfg;
-      unsigned int order;
+      DWORD order;
       upsMenu *menu;
    };
 
@@ -65,15 +66,13 @@ private:
    alist<InstanceConfig>::iterator FindInstance(const char *id);
    astring CreateId();
 
-   DWORD RegQueryDWORD(HKEY key, const char *name);
-   astring RegQueryString(HKEY key, const char *name);
+   bool RegQueryDWORD(HKEY hkey, const char *name, DWORD &result);
+   bool RegQueryString(HKEY key, const char *name, astring &result);
    void RegSetDWORD(HKEY key, const char *name, DWORD value);
    void RegSetString(HKEY key, const char *name, const char *value);
 
    static const char *INSTANCES_KEY;
-   static const char *DEFAULT_HOST;
-   static const unsigned int DEFAULT_PORT;
-   static const unsigned int DEFAULT_REFRESH;
+   static const MonitorConfig DEFAULT_CONFIG;
 
    alist<InstanceConfig> _instances;
    HINSTANCE _appinst;

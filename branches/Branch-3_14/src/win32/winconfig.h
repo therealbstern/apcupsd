@@ -44,6 +44,7 @@ private:
    HINSTANCE m_appinst;
    InstanceManager *m_instmgr;
    MonitorConfig m_config;
+   HWND m_hhost, m_hport, m_hrefresh, m_hpopups;
    bool m_hostvalid, m_portvalid, m_refreshvalid;
 };
 
