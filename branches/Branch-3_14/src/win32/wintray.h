@@ -47,6 +47,7 @@ protected:
    // Message handler for the tray window
    static LRESULT CALLBACK WndProc(
       HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
+   LRESULT WndProcess(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
 
    // Fetch UPS status info
    bool FetchStatus(int &battstat, astring &statstr, astring &upsname);
@@ -56,6 +57,7 @@ protected:
 
    HWND                    m_hwnd;           // Window handle
    HMENU                   m_hmenu;          // Menu handle
+   HMENU                   m_hsubmenu;       // Submenu handle
    StatMgr                *m_statmgr;        // Manager for UPS stats
    HANDLE                  m_thread;         // Handle to status polling thread
    HANDLE                  m_wait;           // Handle to wait mutex
@@ -69,6 +71,7 @@ protected:
    amutex                  m_mutex;          // Lock to protect statmgr
    WPARAM                  m_generation;
    bool                    m_reconfig;
+   InstanceManager        *m_instmgr;
 
    // Dialogs for About, Status, Config, and Events
    upsAbout                m_about;

@@ -28,6 +28,7 @@ upsMenu::upsMenu(HINSTANCE appinst, MonitorConfig &mcfg, BalloonMgr *balmgr,
      m_wait(NULL),
      m_thread(NULL),
      m_hmenu(NULL),
+     m_hsubmenu(NULL),
      m_upsname("<unknown>"),
      m_balmgr(balmgr),
      m_appinst(appinst),
@@ -35,7 +36,8 @@ upsMenu::upsMenu(HINSTANCE appinst, MonitorConfig &mcfg, BalloonMgr *balmgr,
      m_config(mcfg),
      m_runthread(true),
      m_generation(0),
-     m_reconfig(true)
+     m_reconfig(true),
+     m_instmgr(instmgr)
 {
    // Determine message id for "TaskbarCreate" message
    m_tbcreated_msg = RegisterWindowMessage("TaskbarCreated");
@@ -84,6 +86,7 @@ upsMenu::upsMenu(HINSTANCE appinst, MonitorConfig &mcfg, BalloonMgr *balmgr,
       PostQuitMessage(0);
       return;
    }
+   m_hsubmenu = GetSubMenu(m_hmenu, 0);
 
    // Install the tray icon. Although it's tempting to let this happen
    // on the poll thread, we do it here so its synchronous and all icons
@@ -210,7 +213,7 @@ void upsMenu::SendTrayMsg(DWORD msg)
    }
 }
 
-// Process window messages
+// Process window messages (static springboard)
 LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
    // This is a static method, so we don't know which instantiation we're 
@@ -220,9 +223,16 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
    // During creation, we are called before the WindowLong has been set.
    // Just use default processing in that case since _this is not valid.   
-   if (!_this)
+   if (_this)
+      return _this->WndProcess(hwnd, iMsg, wParam, lParam);
+   else
       return DefWindowProc(hwnd, iMsg, wParam, lParam);
+   
+}
 
+// Process window messages
+LRESULT upsMenu::WndProcess(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
+{
    switch (iMsg) {
 
    // User has clicked an item on the tray menu
@@ -230,19 +240,21 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
       switch (LOWORD(wParam)) {
       case IDM_STATUS:
          // Show the status dialog
-         _this->m_status.Show();
+         m_status.Show();
          // Wake the poll thread to refresh the status ASAP
-         ReleaseSemaphore(_this->m_wait, 1, NULL);
+         ReleaseSemaphore(m_wait, 1, NULL);
          break;
 
       case IDM_EVENTS:
          // Show the Events dialog
-         _this->m_events.Show();
+         m_events.Show();
+         // Wake the poll thread to refresh the status ASAP
+         ReleaseSemaphore(m_wait, 1, NULL);
          break;
 
       case IDM_ABOUT:
          // Show the About box
-         _this->m_about.Show();
+         m_about.Show();
          break;
 
       case IDM_EXIT:
@@ -252,7 +264,7 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
       case IDM_REMOVE:
          // User selected Remove from the tray menu
-         PostMessage(hwnd, WM_APCTRAY_REMOVE, 0, (LPARAM)(_this->m_config.id.str()));
+         PostMessage(hwnd, WM_APCTRAY_REMOVE, 0, (LPARAM)(m_config.id.str()));
          break;
 
       case IDM_REMOVEALL:
@@ -267,32 +279,49 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
       case IDM_CONFIG:
          // User selected Config from the tray menu
-         _this->m_configdlg.Show(_this->m_config);
+         m_configdlg.Show(m_config);
          break;
+
+      case IDM_AUTOSTART:
+      {
+         MENUITEMINFO mii;
+         mii.cbSize = sizeof(MENUITEMINFO);
+         mii.fMask = MIIM_STATE;
+         GetMenuItemInfo(m_hsubmenu, IDM_AUTOSTART, FALSE, &mii);
+         mii.fState ^= (MFS_CHECKED | MFS_UNCHECKED);
+         SetMenuItemInfo(m_hsubmenu, IDM_AUTOSTART, FALSE, &mii);
+         m_instmgr->SetAutoStart(mii.fState & MFS_CHECKED);
+         break;
+      }
+
       }
       return 0;
 
    // User has clicked on the tray icon or the menu
    case WM_APCTRAY_NOTIFY:
-      // Get the submenu to use as a pop-up menu
-      HMENU submenu = GetSubMenu(_this->m_hmenu, 0);
 
       // What event are we responding to, RMB click?
       if (lParam == WM_RBUTTONUP) {
-         if (submenu == NULL)
-            return 0;
 
          // Make the Status menu item the default (bold font)
-         SetMenuDefaultItem(submenu, IDM_STATUS, false);
+         SetMenuDefaultItem(m_hsubmenu, IDM_STATUS, false);
 
          // Set UPS name field
-         ModifyMenu(submenu, IDM_NAME, MF_BYCOMMAND|MF_STRING, IDM_NAME,
-            ("UPS: " + _this->m_upsname).str());
+         ModifyMenu(m_hsubmenu, IDM_NAME, MF_BYCOMMAND|MF_STRING, IDM_NAME,
+            ("UPS: " + m_upsname).str());
 
          // Set HOST field
          char buf[100];
-         asnprintf(buf, sizeof(buf), "HOST: %s:%d", _this->m_config.host.str(), _this->m_config.port);
-         ModifyMenu(submenu, IDM_HOST, MF_BYCOMMAND|MF_STRING, IDM_HOST, buf);
+         asnprintf(buf, sizeof(buf), "HOST: %s:%d", m_config.host.str(), m_config.port);
+         ModifyMenu(m_hsubmenu, IDM_HOST, MF_BYCOMMAND|MF_STRING, IDM_HOST, buf);
+
+         // Set autostart field
+         MENUITEMINFO mii;
+         mii.cbSize = sizeof(MENUITEMINFO);
+         mii.fMask = MIIM_STATE;
+         mii.fState = MFS_ENABLED | 
+            m_instmgr->IsAutoStart() ? MFS_CHECKED : MFS_UNCHECKED;
+         SetMenuItemInfo(m_hsubmenu, IDM_AUTOSTART, FALSE, &mii);
 
          // Get the current cursor position, to display the menu at
          POINT mouse;
@@ -301,10 +330,10 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
          // There's a "bug" (Microsoft calls it a feature) in Windows 95 that 
          // requires calling SetForegroundWindow. To find out more, search for 
          // Q135788 in MSDN.
-         SetForegroundWindow(_this->m_hwnd);
+         SetForegroundWindow(m_hwnd);
 
          // Display the menu at the desired position
-         TrackPopupMenu(submenu, 0, mouse.x, mouse.y, 0, _this->m_hwnd, NULL);
+         TrackPopupMenu(m_hsubmenu, 0, mouse.x, mouse.y, 0, m_hwnd, NULL);
 
          return 0;
       }
@@ -312,7 +341,7 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
       // Or was there a LMB double click?
       if (lParam == WM_LBUTTONDBLCLK) {
          // double click: execute the default item
-         SendMessage(_this->m_hwnd, WM_COMMAND, IDM_STATUS, 0);
+         SendMessage(m_hwnd, WM_COMMAND, IDM_STATUS, 0);
       }
 
       return 0;
@@ -323,11 +352,11 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
       return 0;
 
    default:
-      if (iMsg == _this->m_tbcreated_msg) {
+      if (iMsg == m_tbcreated_msg) {
          // Explorer has restarted so we need to redraw the tray icon.
          // We purposely kick this out to the main loop instead of handling it
          // ourself so the icons are redrawn in a consistent order.
-         PostMessage(hwnd, WM_APCTRAY_RESET, _this->m_generation++, 0);
+         PostMessage(hwnd, WM_APCTRAY_RESET, m_generation++, 0);
       }
       break;
    }

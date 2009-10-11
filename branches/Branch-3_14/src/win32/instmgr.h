@@ -48,6 +48,8 @@ public:
    void UpdateInstance(const MonitorConfig &mcfg);
    void RemoveAll();
    void ResetInstances();
+   bool IsAutoStart();
+   void SetAutoStart(bool start);
 
 private:
 
