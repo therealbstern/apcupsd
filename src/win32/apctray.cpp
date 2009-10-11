@@ -249,6 +249,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       evtthread = CreateThread(NULL, 0, EventThread, NULL, 0, NULL);
    }
 */
+   WPARAM generation = 0;
    InstanceManager instmgr(appinst);
    instmgr.CreateMonitors();
 
@@ -277,8 +278,20 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
          break;
 
       case WM_APCTRAY_RESET:
-         // Redraw icons due to explorer exit/restart
-         instmgr.ResetInstances();
+         // Redraw tray icons due to explorer exit/restart
+         // We'll get a RESET message from each tray icon but we only want
+         // to act on the first one. Check the generation and only perform the
+         // reset if the generation matches.
+         if (msg.wParam == generation)
+         {
+            // Bump generation so we ignore redundant reset commands
+            generation++;
+            // Delay while other tray icons refresh. This prevents our icons
+            // from being scattered across the tray.
+            sleep(2);
+            // Now command the instances to reset
+            instmgr.ResetInstances();
+         }
          break;
 
       default:
