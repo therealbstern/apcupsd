@@ -68,6 +68,7 @@ protected:
    bool                    m_runthread;      // Run the poll thread?
    amutex                  m_mutex;          // Lock to protect statmgr
    WPARAM                  m_generation;
+   bool                    m_reconfig;
 
    // Dialogs for About, Status, Config, and Events
    upsAbout                m_about;

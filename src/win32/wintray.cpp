@@ -20,7 +20,7 @@
 // Implementation
 upsMenu::upsMenu(HINSTANCE appinst, MonitorConfig &mcfg, BalloonMgr *balmgr,
                  InstanceManager *instmgr)
-   : m_statmgr(new StatMgr(mcfg.host, mcfg.port)),
+   : m_statmgr(NULL),
      m_about(appinst),
      m_status(appinst, m_statmgr),
      m_events(appinst, m_statmgr),
@@ -34,7 +34,8 @@ upsMenu::upsMenu(HINSTANCE appinst, MonitorConfig &mcfg, BalloonMgr *balmgr,
      m_hwnd(NULL),
      m_config(mcfg),
      m_runthread(true),
-     m_generation(0)
+     m_generation(0),
+     m_reconfig(true)
 {
    // Determine message id for "TaskbarCreate" message
    m_tbcreated_msg = RegisterWindowMessage("TaskbarCreated");
@@ -340,11 +341,10 @@ void upsMenu::Redraw()
 
 void upsMenu::Reconfigure(const MonitorConfig &mcfg)
 {
-   // Update config (lock to ensure statmgr is not in use)
+   // Indicate that a config change is pending
    m_mutex.lock();
    m_config = mcfg;
-   delete m_statmgr;
-   m_statmgr = new StatMgr(mcfg.host, mcfg.port);
+   m_reconfig = true;
    m_mutex.unlock();
 
    // Kick poll thread so it updates immediately
@@ -358,11 +358,20 @@ DWORD WINAPI upsMenu::StatusPollThread(LPVOID param)
 
    while (_this->m_runthread)
    {
-      // Update the tray icon and status dialog
+      // Act on pending config change
       _this->m_mutex.lock();
+      if (_this->m_reconfig)
+      {
+         // Recreate statmgr with new config
+         delete _this->m_statmgr;
+         _this->m_statmgr = new StatMgr(_this->m_config.host, _this->m_config.port);
+         _this->m_reconfig = false;
+      }
+      _this->m_mutex.unlock();
+
+      // Update the tray icon and status dialog
       _this->UpdateTrayIcon();
       _this->m_status.FillStatusBox();
-      _this->m_mutex.unlock();
 
       // Delay for configured interval
       status = WaitForSingleObject(_this->m_wait, _this->m_config.refresh * 1000);
