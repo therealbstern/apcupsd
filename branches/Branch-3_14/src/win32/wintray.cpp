@@ -104,15 +104,12 @@ upsMenu::upsMenu(HINSTANCE appinst, MonitorConfig &mcfg, BalloonMgr *balmgr,
 upsMenu::~upsMenu()
 {
    // Kill status polling thread
-   if (m_thread) {
-      if (WaitForSingleObject(m_thread, 5000) == WAIT_TIMEOUT)
-         TerminateThread(m_thread, 0);
-      CloseHandle(m_thread);
-   }
+   if (WaitForSingleObject(m_thread, 10000) == WAIT_TIMEOUT)
+      TerminateThread(m_thread, 0);
+   CloseHandle(m_thread);
 
    // Destroy the mutex
-   if (m_wait != NULL)
-      CloseHandle(m_wait);
+   CloseHandle(m_wait);
 
    // Destroy the status manager
    delete m_statmgr;
@@ -121,12 +118,10 @@ upsMenu::~upsMenu()
    DelTrayIcon();
 
    // Destroy the window
-   if (m_hwnd != NULL)
-      DestroyWindow(m_hwnd);
+   DestroyWindow(m_hwnd);
 
    // Destroy the loaded menu
-   if (m_hmenu != NULL)
-      DestroyMenu(m_hmenu);
+   DestroyMenu(m_hmenu);
 
    // Unregister the window class
    UnregisterClass(APCTRAY_WINDOW_CLASS, m_appinst);
@@ -136,11 +131,8 @@ void upsMenu::Destroy()
 {
    // Trigger status poll thread to shut down. We will wait for
    // the thread to exit later in our destructor.
-   if (m_wait)
-   {
-      m_runthread = false;
-      ReleaseSemaphore(m_wait, 1, NULL);
-   }
+   m_runthread = false;
+   ReleaseSemaphore(m_wait, 1, NULL);
 }
 
 void upsMenu::AddTrayIcon()
