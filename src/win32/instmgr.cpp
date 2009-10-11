@@ -165,12 +165,12 @@ void InstanceManager::Write()
    // Write out instances. Our instance list is in sorted order but may
    // have gaps in the numbering, so regenerate 'order' value, ignoring what's
    // in the InstanceConfig.order field.
-   HKEY instkey;
    int count = 0;
    alist<InstanceConfig>::iterator iter;
    for (iter = _instances.begin(); iter != _instances.end(); ++iter)
    {
-      // No apctray key (and therefore no instances) yet. Create the key.
+      // Create the instance and populate it
+      HKEY instkey;
       if (RegCreateKey(apctray, iter->mcfg.id, &instkey) == ERROR_SUCCESS)
       {
          RegSetString(instkey, "host", iter->mcfg.host);
