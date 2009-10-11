@@ -12,32 +12,37 @@
 #define WINEVENTS_H
 
 #include <windows.h>
+#include "amutex.h"
 
 // Forward declarations
 class StatMgr;
+class ListView;
 
 // Object implementing the Events dialogue box for apcupsd
 class upsEvents
 {
 public:
    // Constructor/destructor
-   upsEvents(HINSTANCE appinst, StatMgr *statmgr);
+   upsEvents(HINSTANCE appinst);
    ~upsEvents();
 
    // General
    void Show();
+   void Update(StatMgr *statmgr);
 
 private:
    // The dialog box window proc
    static BOOL CALLBACK DialogProc(
       HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-   void FillEventsBox(HWND hwnd, int id_list);
+   BOOL CALLBACK DialogProcess(
+      HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
    // Private data
-   BOOL m_dlgvisible;
+   HWND m_hwnd;
    HINSTANCE m_appinst;
-   StatMgr *m_statmgr;
+   ListView *_events;
+   amutex _mutex;
+   RECT m_rect;
 };
 
 #endif // WINEVENTS_H

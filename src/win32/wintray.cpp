@@ -22,8 +22,8 @@ upsMenu::upsMenu(HINSTANCE appinst, MonitorConfig &mcfg, BalloonMgr *balmgr,
                  InstanceManager *instmgr)
    : m_statmgr(NULL),
      m_about(appinst),
-     m_status(appinst, m_statmgr),
-     m_events(appinst, m_statmgr),
+     m_status(appinst),
+     m_events(appinst),
      m_configdlg(appinst, instmgr),
      m_wait(NULL),
      m_thread(NULL),
@@ -231,6 +231,8 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
       case IDM_STATUS:
          // Show the status dialog
          _this->m_status.Show();
+         // Wake the poll thread to refresh the status ASAP
+         ReleaseSemaphore(_this->m_wait, 1, NULL);
          break;
 
       case IDM_EVENTS:
@@ -371,7 +373,8 @@ DWORD WINAPI upsMenu::StatusPollThread(LPVOID param)
 
       // Update the tray icon and status dialog
       _this->UpdateTrayIcon();
-      _this->m_status.FillStatusBox();
+      _this->m_status.Update(_this->m_statmgr);
+      _this->m_events.Update(_this->m_statmgr);
 
       // Delay for configured interval
       status = WaitForSingleObject(_this->m_wait, _this->m_config.refresh * 1000);

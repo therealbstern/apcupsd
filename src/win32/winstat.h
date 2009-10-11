@@ -24,12 +24,12 @@ class upsStatus
 {
 public:
    // Constructor/destructor
-   upsStatus(HINSTANCE appinst, StatMgr *statmgr);
+   upsStatus(HINSTANCE appinst);
    ~upsStatus();
 
    // General
    void Show();
-   void FillStatusBox();
+   void Update(StatMgr *statmgr);
 
 private:
    // The dialog box window proc
@@ -39,7 +39,6 @@ private:
    // Private data
    HWND m_hwnd;
    HINSTANCE m_appinst;
-   StatMgr *m_statmgr;
    RECT m_rect;
    Meter *_bmeter;
    Meter *_lmeter;
