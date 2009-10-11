@@ -23,6 +23,7 @@ IDR_TRAYMENU MENU
         MENUITEM "&Events", IDM_EVENTS
         MENUITEM SEPARATOR
         MENUITEM "Configure...", IDM_CONFIG
+        MENUITEM "Start Automatically", IDM_AUTOSTART
         MENUITEM SEPARATOR
         MENUITEM "Add Monitor", IDM_ADD
         MENUITEM "Remove Monitor", IDM_REMOVE

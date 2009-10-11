@@ -262,6 +262,60 @@ astring InstanceManager::CreateId()
    return uuidstr;
 }
 
+bool InstanceManager::IsAutoStart()
+{
+   HKEY hkey;
+   if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, 
+                    "Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                    0, KEY_READ, &hkey) != ERROR_SUCCESS)
+      return false;
+
+   astring path;
+   RegQueryString(hkey, "Apctray", path);
+   RegCloseKey(hkey);
+
+   return !path.empty();
+}
+
+void InstanceManager::SetAutoStart(bool start)
+{
+   HKEY runkey;
+   if (start)
+   {
+      // Get the full path/filename of this executable
+      char path[1024];
+      GetModuleFileName(NULL, path, sizeof(path));
+
+      // Add double quotes
+      char cmd[1024];
+      snprintf(cmd, sizeof(cmd), "\"%s\"", path);
+
+      // Open registry key for auto-run programs
+      if (RegCreateKey(HKEY_LOCAL_MACHINE, 
+                       "Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                       &runkey) != ERROR_SUCCESS)
+      {
+         return;
+      }
+
+      // Add apctray key
+      RegSetString(runkey, "Apctray", cmd);
+   }
+   else
+   {
+      // Open registry key apctray
+      HKEY runkey;
+      if (RegOpenKeyEx(HKEY_LOCAL_MACHINE, 
+                       "Software\\Microsoft\\Windows\\CurrentVersion\\Run",
+                       0, KEY_READ|KEY_WRITE, &runkey) == ERROR_SUCCESS)
+      {
+         RegDeleteValue(runkey, "Apctray");
+      }
+   }
+
+   RegCloseKey(runkey);
+}
+
 bool InstanceManager::RegQueryDWORD(HKEY hkey, const char *name, DWORD &result)
 {
    DWORD data;

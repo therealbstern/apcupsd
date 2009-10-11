@@ -33,7 +33,7 @@
 #define IDM_STATUS                              40005
 #define IDM_REMOVEALL                           40006
 #define IDM_EVENTS                              40007
-#define IDM_CLOSEINST                           40008
+#define IDM_AUTOSTART                           40008
 #define IDM_NAME                                40009
 #define IDM_HOST                                40010
 #define IDC_HOSTNAME                            40020
