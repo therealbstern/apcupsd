@@ -233,11 +233,12 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 // Process window messages
 LRESULT upsMenu::WndProcess(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
-   switch (iMsg) {
-
+   switch (iMsg)
+   {
    // User has clicked an item on the tray menu
    case WM_COMMAND:
-      switch (LOWORD(wParam)) {
+      switch (LOWORD(wParam))
+      {
       case IDM_STATUS:
          // Show the status dialog
          m_status.Show();
@@ -301,8 +302,8 @@ LRESULT upsMenu::WndProcess(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
    case WM_APCTRAY_NOTIFY:
 
       // What event are we responding to, RMB click?
-      if (lParam == WM_RBUTTONUP) {
-
+      if (lParam == WM_RBUTTONUP)
+      {
          // Make the Status menu item the default (bold font)
          SetMenuDefaultItem(m_hsubmenu, IDM_STATUS, false);
 
@@ -334,12 +335,10 @@ LRESULT upsMenu::WndProcess(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 
          // Display the menu at the desired position
          TrackPopupMenu(m_hsubmenu, 0, mouse.x, mouse.y, 0, m_hwnd, NULL);
-
-         return 0;
       }
-
       // Or was there a LMB double click?
-      if (lParam == WM_LBUTTONDBLCLK) {
+      else if (lParam == WM_LBUTTONDBLCLK)
+      {
          // double click: execute the default item
          SendMessage(m_hwnd, WM_COMMAND, IDM_STATUS, 0);
       }
@@ -352,7 +351,8 @@ LRESULT upsMenu::WndProcess(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
       return 0;
 
    default:
-      if (iMsg == m_tbcreated_msg) {
+      if (iMsg == m_tbcreated_msg)
+      {
          // Explorer has restarted so we need to redraw the tray icon.
          // We purposely kick this out to the main loop instead of handling it
          // ourself so the icons are redrawn in a consistent order.
@@ -385,7 +385,6 @@ void upsMenu::Reconfigure(const MonitorConfig &mcfg)
 DWORD WINAPI upsMenu::StatusPollThread(LPVOID param)
 {
    upsMenu* _this = (upsMenu*)param;
-   DWORD status;
 
    while (_this->m_runthread)
    {
@@ -406,6 +405,6 @@ DWORD WINAPI upsMenu::StatusPollThread(LPVOID param)
       _this->m_events.Update(_this->m_statmgr);
 
       // Delay for configured interval
-      status = WaitForSingleObject(_this->m_wait, _this->m_config.refresh * 1000);
+      WaitForSingleObject(_this->m_wait, _this->m_config.refresh * 1000);
    }
 }
