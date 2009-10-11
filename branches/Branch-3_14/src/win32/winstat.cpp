@@ -19,10 +19,9 @@
 #include "listview.h"
 
 // Constructor/destructor
-upsStatus::upsStatus(HINSTANCE appinst, StatMgr *statmgr) :
+upsStatus::upsStatus(HINSTANCE appinst) :
    m_hwnd(NULL),
-   m_appinst(appinst),
-   m_statmgr(statmgr)
+   m_appinst(appinst)
 {
 }
 
@@ -96,7 +95,6 @@ BOOL upsStatus::DialogProcess(
       m_hwnd = hwnd;
 
       // Show the dialog
-      FillStatusBox();
       SetForegroundWindow(hwnd);
       return TRUE;
 
@@ -155,7 +153,7 @@ BOOL upsStatus::DialogProcess(
    return FALSE;
 }
 
-void upsStatus::FillStatusBox()
+void upsStatus::Update(StatMgr *statmgr)
 {
    // Bail if window is not open
    _mutex.lock();
@@ -167,7 +165,7 @@ void upsStatus::FillStatusBox()
 
    // Fetch full status from apcupsd
    alist<astring> status;
-   if (!m_statmgr->GetAll(status) || status.empty())
+   if (!statmgr->GetAll(status) || status.empty())
    {
       _mutex.unlock();
       return;
@@ -221,20 +219,20 @@ void upsStatus::FillStatusBox()
    _grid->Autosize();
 
    // Update battery
-   _bmeter->Set(atoi(m_statmgr->Get("BCHARGE")));
+   _bmeter->Set(atoi(statmgr->Get("BCHARGE")));
 
    // Update load
-   _lmeter->Set(atoi(m_statmgr->Get("LOADPCT")));
+   _lmeter->Set(atoi(statmgr->Get("LOADPCT")));
 
    // Update status
    char str[128];
-   astring stat = m_statmgr->Get("STATUS");
+   astring stat = statmgr->Get("STATUS");
    SendDlgItemMessage(m_hwnd, IDC_STATUS, WM_GETTEXT, sizeof(str), (LONG)str);
    if (stat != str)
       SendDlgItemMessage(m_hwnd, IDC_STATUS, WM_SETTEXT, 0, (LONG)stat.str());
 
    // Update runtime
-   astring runtime = m_statmgr->Get("TIMELEFT");
+   astring runtime = statmgr->Get("TIMELEFT");
    runtime = runtime.substr(0, runtime.strchr(' '));
    SendDlgItemMessage(m_hwnd, IDC_RUNTIME, WM_GETTEXT, sizeof(str), (LONG)str);
    if (runtime != str)
@@ -242,7 +240,7 @@ void upsStatus::FillStatusBox()
 
    // Update title bar
    astring name;
-   name.format("Status for UPS: %s", m_statmgr->Get("UPSNAME").str());
+   name.format("Status for UPS: %s", statmgr->Get("UPSNAME").str());
    SendMessage(m_hwnd, WM_SETTEXT, 0, (LONG)name.str());
 
    _mutex.unlock();

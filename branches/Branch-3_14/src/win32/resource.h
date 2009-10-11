@@ -11,7 +11,6 @@
 #define IDD_STATUS                              202
 #define IDD_EVENTS                              203
 #define IDD_CONFIG                              205
-#define IDC_LIST                                1000
 #define IDC_WWW1                                1000
 #define IDC_WWW2                                1001
 #define IDC_COPYRIGHT1                          1002
@@ -37,9 +36,9 @@
 #define IDM_CLOSEINST                           40008
 #define IDM_NAME                                40009
 #define IDM_HOST                                40010
-#define ID_REFRESH                              40013
 #define IDC_HOSTNAME                            40020
 #define IDC_PORT                                40021
 #define IDC_REFRESH                             40022
 #define IDC_POPUPS                              40023
 #define IDC_VERSION                             40024
+#define IDC_LIST                                40025
