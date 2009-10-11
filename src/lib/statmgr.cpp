@@ -38,54 +38,60 @@ bool StatMgr::Update()
 {
    lock();
 
-   if (m_socket == -1 && !open()) {
-      unlock();
-      return false;
-   }
-
-   if (net_send(m_socket, "status", 6) != 6) {
-      close();
-      unlock();
-      return false;
-   }
-
-   memset(m_stats, 0, sizeof(m_stats));
-
-   int len;
-   int i = 0;
-   while (i < MAX_STATS &&
-          (len = net_recv(m_socket, m_stats[i].data, sizeof(m_stats[i].data)-1)) > 0)
+   int tries;
+   for (tries = 2; tries; tries--)
    {
-      char *key, *value;
-
-      // NUL-terminate the string
-      m_stats[i].data[len] = '\0';
-
-      // Find separator
-      value = strchr(m_stats[i].data, ':');
-
-      // Trim whitespace from value
-      if (value) {
-         *value++ = '\0';
-         value = trim(value);
+      if (m_socket == -1 && !open()) {
+         // Hard failure: bail immediately
+         unlock();
+         return false;
       }
- 
-      // Trim whitespace from key;
-      key = trim(m_stats[i].data);
 
-      m_stats[i].key = key;
-      m_stats[i].value = value;
-      i++;
-   }
+      if (net_send(m_socket, "status", 6) != 6) {
+         // Soft failure: close and try again
+         close();
+         continue;
+      }
 
-   if (i == 0 || len == -1) {
+      memset(m_stats, 0, sizeof(m_stats));
+
+      int len;
+      int i = 0;
+      while (i < MAX_STATS &&
+             (len = net_recv(m_socket, m_stats[i].data, sizeof(m_stats[i].data)-1)) > 0)
+      {
+         char *key, *value;
+
+         // NUL-terminate the string
+         m_stats[i].data[len] = '\0';
+
+         // Find separator
+         value = strchr(m_stats[i].data, ':');
+
+         // Trim whitespace from value
+         if (value) {
+            *value++ = '\0';
+            value = trim(value);
+         }
+
+         // Trim whitespace from key;
+         key = trim(m_stats[i].data);
+
+         m_stats[i].key = key;
+         m_stats[i].value = value;
+         i++;
+      }
+
+      // Good update, bail now
+      if (i > 0 && len == 0)
+         break;
+
+      // Soft failure: close and try again
       close();
-      unlock();
-      return false;
    }
 
    unlock();
-   return true;
+   return tries > 0;
 }
 
 astring StatMgr::Get(const char* key)
@@ -206,9 +212,8 @@ void StatMgr::close()
 
 bool StatMgr::GetSummary(int &battstat, astring &statstr, astring &upsname)
 {
-   // Fetch data from the UPS. Rretry once if it fails, probably because 
-   // apcupsd timed out the connection due to inactivity.
-   if (!Update() && !Update()) {
+   // Fetch data from the UPS
+   if (!Update()) {
       battstat = -1;
       statstr = "NETWORK ERROR";
       return false;
