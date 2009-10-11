@@ -33,7 +33,8 @@ upsMenu::upsMenu(HINSTANCE appinst, MonitorConfig &mcfg, BalloonMgr *balmgr,
      m_appinst(appinst),
      m_hwnd(NULL),
      m_config(mcfg),
-     m_runthread(true)
+     m_runthread(true),
+     m_generation(0)
 {
    // Determine message id for "TaskbarCreate" message
    m_tbcreated_msg = RegisterWindowMessage("TaskbarCreated");
@@ -323,7 +324,7 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
          // Explorer has restarted so we need to redraw the tray icon.
          // We purposely kick this out to the main loop instead of handling it
          // ourself so the icons are redrawn in a consistent order.
-         PostMessage(hwnd, WM_APCTRAY_RESET, 0, 0);
+         PostMessage(hwnd, WM_APCTRAY_RESET, _this->m_generation++, 0);
       }
       break;
    }
