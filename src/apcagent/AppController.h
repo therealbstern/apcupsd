@@ -32,13 +32,13 @@ class StatMgr;
 
 @interface StatusTableDataSource: NSObject
 {
-   NSLock *mutex;
-   NSMutableArray *keys;
-   NSMutableArray *values;
+   NSLock *_mutex;
+   NSMutableArray *_keys;
+   NSMutableArray *_values;
 }
 
 - (id) init;
-- (void)populate:(alist<astring> &)stats;
+- (void)populate:(alist<astring> &)keys values:(alist<astring> &)values;
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView;
 - (id)tableView:(NSTableView *)aTableView 
    objectValueForTableColumn:(NSTableColumn *)aTableColumn 
