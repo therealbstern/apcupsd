@@ -143,7 +143,7 @@ IDI_ONLINE         ICON           "online.ico"
 VS_VERSION_INFO VERSIONINFO
     FILEVERSION     3,8,0,0
     PRODUCTVERSION  3,8,0,0
-    FILEOS          VOS_UNKNOWN
+    FILEOS          VOS__WINDOWS32
     FILETYPE        VFT_UNKNOWN
 {
     BLOCK "StringFileInfo"
