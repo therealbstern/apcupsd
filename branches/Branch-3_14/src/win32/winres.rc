@@ -141,8 +141,8 @@ IDI_ONLINE         ICON           "online.ico"
 // Version Information resources
 //
 VS_VERSION_INFO VERSIONINFO
-    FILEVERSION     3,8,0,0
-    PRODUCTVERSION  3,8,0,0
+    FILEVERSION     0,0,0,0
+    PRODUCTVERSION  0,0,0,0
     FILEOS          VOS__WINDOWS32
     FILETYPE        VFT_UNKNOWN
 {
@@ -152,13 +152,13 @@ VS_VERSION_INFO VERSIONINFO
         {
             VALUE "CompanyName", "Apcupsd Team"
             VALUE "FileDescription", "Tray icon applet for apcupsd"
-            VALUE "FileVersion", "3.14.7"
-            VALUE "InternalName", "Apcupsd"
+            VALUE "FileVersion", "$VERSION"
+            VALUE "InternalName", "apctray"
             VALUE "LegalCopyright", "Copyright 2007-2009 Adam Kropelin"
             VALUE "LegalTrademarks", "Licensed under GNU GPL 2.0"
             VALUE "OriginalFilename", "apctray.exe"
             VALUE "ProductName", "apctray"
-            VALUE "ProductVersion", "3.14.7"
+            VALUE "ProductVersion", "$VERSION"
         }
     }
     BLOCK "VarFileInfo"

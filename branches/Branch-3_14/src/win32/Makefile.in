@@ -478,8 +478,15 @@ $(OBJDIR)/instmgr.o:	instmgr.cpp
 $(OBJDIR)/winconfig.o:	winconfig.cpp
 	$(CXX) -c $< -o $@
 
+# Windows resource file formatted version (a,b,c,d)
+COMMA := ,
+RCVERSION = $(subst .,$(COMMA),$(VERSION).0)
+
 $(OBJDIR)/winres.res:  winres.rc
-	$(WINDRES) $(INCLUDE_ICONS) -O coff $< -o $@
+	sed -e "s/\$$VERSION/$(VERSION)/" \
+       -e "s/FILEVERSION.*/FILEVERSION     $(RCVERSION)/" \
+       -e "s/PRODUCTVERSION.*/PRODUCTVERSION  $(RCVERSION)/" $< | \
+   $(WINDRES) $(INCLUDE_ICONS) -O coff -o $@
 
 ######################################################################
 
