@@ -4,7 +4,7 @@
 //
 // Rewrite/Refactoring by Adam Kropelin
 //
-// Copyright (2007) Adam D. Kropelin
+// Copyright (2009) Adam D. Kropelin
 // Copyright (2000) Kern E. Sibbald
 //
 
@@ -17,13 +17,14 @@
 // Forward declarations
 class StatMgr;
 class ListView;
+class upsMenu;
 
 // Object implementing the Events dialogue box for apcupsd
 class upsEvents
 {
 public:
    // Constructor/destructor
-   upsEvents(HINSTANCE appinst);
+   upsEvents(HINSTANCE appinst, upsMenu *menu);
    ~upsEvents();
 
    // General
@@ -43,6 +44,7 @@ private:
    ListView *_events;
    amutex _mutex;
    RECT m_rect;
+   upsMenu *_menu;
 };
 
 #endif // WINEVENTS_H

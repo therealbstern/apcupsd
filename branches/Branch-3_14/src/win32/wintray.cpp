@@ -22,8 +22,8 @@ upsMenu::upsMenu(HINSTANCE appinst, MonitorConfig &mcfg, BalloonMgr *balmgr,
                  InstanceManager *instmgr)
    : m_statmgr(NULL),
      m_about(appinst),
-     m_status(appinst),
-     m_events(appinst),
+     m_status(appinst, this),
+     m_events(appinst, this),
      m_configdlg(appinst, instmgr),
      m_wait(NULL),
      m_thread(NULL),
@@ -242,15 +242,11 @@ LRESULT upsMenu::WndProcess(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
       case IDM_STATUS:
          // Show the status dialog
          m_status.Show();
-         // Wake the poll thread to refresh the status ASAP
-         ReleaseSemaphore(m_wait, 1, NULL);
          break;
 
       case IDM_EVENTS:
          // Show the Events dialog
          m_events.Show();
-         // Wake the poll thread to refresh the status ASAP
-         ReleaseSemaphore(m_wait, 1, NULL);
          break;
 
       case IDM_ABOUT:
@@ -378,7 +374,12 @@ void upsMenu::Reconfigure(const MonitorConfig &mcfg)
    m_reconfig = true;
    m_mutex.unlock();
 
-   // Kick poll thread so it updates immediately
+   Refresh();
+}
+
+void upsMenu::Refresh()
+{
+   // Wake the poll thread to refresh the status ASAP
    ReleaseSemaphore(m_wait, 1, NULL);
 }
 

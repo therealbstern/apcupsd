@@ -4,7 +4,7 @@
 //
 // Rewrite/Refactoring by Adam Kropelin
 //
-// Copyright (2007) Adam D. Kropelin
+// Copyright (2009) Adam D. Kropelin
 // Copyright (2000) Kern E. Sibbald
 //
 
@@ -15,11 +15,13 @@
 #include "resource.h"
 #include "statmgr.h"
 #include "listview.h"
+#include "wintray.h"
 
 // Constructor/destructor
-upsEvents::upsEvents(HINSTANCE appinst) :
+upsEvents::upsEvents(HINSTANCE appinst, upsMenu *menu) :
    m_appinst(appinst),
-   m_hwnd(NULL)
+   m_hwnd(NULL),
+   _menu(menu)
 {
 }
 
@@ -81,10 +83,17 @@ BOOL upsEvents::DialogProcess(
       // we need it, but I can't find it. So we'll save it at runtime.
       GetWindowRect(hwnd, &m_rect);
 
-      m_hwnd = hwnd;
+      // Initialize control wrappers
       _events = new ListView(hwnd, IDC_LIST, 1);
 
+      // Save a copy of our window handle for later use.
+      // Important to do this AFTER everything needed by Update() is
+      // initialized and ready to go since that function may be called at any
+      // time from the wintray timer thread.
+      m_hwnd = hwnd;
+
       // Show the dialog
+      _menu->Refresh();
       SetForegroundWindow(hwnd);
       return TRUE;
 
