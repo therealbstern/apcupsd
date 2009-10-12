@@ -37,7 +37,7 @@ public:
 
    bool Update();
    astring Get(const char* key);
-   bool GetAll(alist<astring> &events);
+   bool GetAll(alist<astring> &keys, alist<astring> &values);
    bool GetEvents(alist<astring> &events);
    bool GetSummary(int &battstat, astring &statstr, astring &upsname);
 
