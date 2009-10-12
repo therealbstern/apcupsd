@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2007 Adam Kropelin
+ * Copyright (C) 2009 Adam Kropelin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of version 2 of the GNU General

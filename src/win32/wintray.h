@@ -36,6 +36,7 @@ public:
    void Destroy();
    void Redraw();
    void Reconfigure(const MonitorConfig &mcfg);
+   void Refresh();
 
 protected:
    // Tray icon handling

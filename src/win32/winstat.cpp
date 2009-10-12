@@ -17,11 +17,13 @@
 #include "statmgr.h"
 #include "meter.h"
 #include "listview.h"
+#include "wintray.h"
 
 // Constructor/destructor
-upsStatus::upsStatus(HINSTANCE appinst) :
+upsStatus::upsStatus(HINSTANCE appinst, upsMenu *menu) :
    m_hwnd(NULL),
-   m_appinst(appinst)
+   m_appinst(appinst),
+   _menu(menu)
 {
 }
 
@@ -95,6 +97,7 @@ BOOL upsStatus::DialogProcess(
       m_hwnd = hwnd;
 
       // Show the dialog
+      _menu->Refresh();
       SetForegroundWindow(hwnd);
       return TRUE;
 

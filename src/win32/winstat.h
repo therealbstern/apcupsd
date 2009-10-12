@@ -18,13 +18,14 @@
 class StatMgr;
 class Meter;
 class ListView;
+class upsMenu;
 
 // Object implementing the Status dialogue for apcupsd
 class upsStatus
 {
 public:
    // Constructor/destructor
-   upsStatus(HINSTANCE appinst);
+   upsStatus(HINSTANCE appinst, upsMenu *menu);
    ~upsStatus();
 
    // General
@@ -44,6 +45,7 @@ private:
    Meter *_lmeter;
    ListView *_grid;
    amutex _mutex;
+   upsMenu *_menu;
 };
 
 #endif // WINSTAT_H
