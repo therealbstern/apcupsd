@@ -20,6 +20,8 @@
 #define __LISTVIEW_H
 
 #include <windows.h>
+#include "astring.h"
+#include "alist.h"
 
 class ListView
 {
@@ -32,6 +34,7 @@ public:
    int NumItems();
    void Autosize();
    void DeleteItem(int item);
+   void UpdateAll(alist<astring>* data[]);
 
 private:
    HWND _hwnd;

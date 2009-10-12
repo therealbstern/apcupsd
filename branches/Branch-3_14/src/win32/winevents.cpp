@@ -168,42 +168,9 @@ void upsEvents::Update(StatMgr *statmgr)
       return;
    }
 
-   // The simple way to update the listview would be to remove all items and
-   // then add them again. However, that causes the control to flicker and the
-   // scrollbar to reset to the top every time, which makes it pretty much
-   // unusable. To prevent that, we update the items in-place, adding new ones
-   // and removing unused ones as necessary. That way the scroll position stays
-   // put and only the items that change are redrawn.
-
-   // Get current item count and prepare to update the listview
-   int num = _events->NumItems();
-   int count = 0;
-
-   // Add each status line to the listview
-   alist<astring>::const_iterator iter;
-   for (iter = events.begin(); iter != events.end(); ++iter)
-   {
-      // Set main item (left column). This will be an insert if there is no
-      // existing item at this position or an update if an item already exists.
-      if (count >= num)
-         _events->AppendItem(*iter);
-      else
-         _events->UpdateItem(count, 0, *iter);
-
-      // On to the next item
-      count++;
-   }
-
-   // Remove any leftover items that are no longer needed. This is needed for
-   // when apcupsd suddenly emits fewer status items, such as when COMMLOST.
-   while (count < num)
-   {
-      _events->DeleteItem(count);
-      num--;
-   }
-
-   // Autosize listview columns
-   _events->Autosize();
+   // Update listview
+   alist<astring> *data[] = {&events};
+   _events->UpdateAll(data);
 
    _mutex.unlock();
 }

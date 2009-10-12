@@ -174,52 +174,24 @@ void upsStatus::Update(StatMgr *statmgr)
       return;
    }
 
-   // The simple way to update the listview would be to remove all items and
-   // then add them again. However, that causes the control to flicker and the
-   // scrollbar to reset to the top every time, which makes it pretty much
-   // unusable. To prevent that, we update the items in-place, adding new ones
-   // and removing unused ones as necessary. That way the scroll position stays
-   // put and only the items that change are redrawn.
-
-   // Get current item count and prepare to update the listview
-   int num = _grid->NumItems();
-   int count = 0;
-
-   // Add each status line to the listview
+   // Split "key: value" string into separate strings
+   // (Eventually statmgr should do this for us)
+   alist<astring> keys, values;
    alist<astring>::const_iterator iter;
    for (iter = status.begin(); iter != status.end(); ++iter)
    {
-      // Split "key: value" string into separate strings
-      // (Eventually statmgr should do this for us)
       int idx = (*iter).strchr(':');
+
       astring key = (*iter).substr(0, idx).trim();
+      keys.append(key);
+
       astring value = (*iter).substr(idx+1).trim();
-
-      // Set main item (left column). This will be an insert if there is no
-      // existing item at this position or an update if an item already exists.
-      if (count >= num)
-         _grid->AppendItem(key);
-      else
-         _grid->UpdateItem(count, 0, key);
-
-      // Set subitem (right column). This is always an update since the item
-      // itself is guaranteed to exist by the code above.
-      _grid->UpdateItem(count, 1, value);
-
-      // On to the next item
-      count++;
+      values.append(value);
    }
 
-   // Remove any leftover items that are no longer needed. This is needed for
-   // when apcupsd suddenly emits fewer status items, such as when COMMLOST.
-   while (count < num)
-   {
-      _grid->DeleteItem(count);
-      num--;
-   }
-
-   // Autosize listview columns
-   _grid->Autosize();
+   // Update listview
+   alist<astring>* data[] = {&keys, &values};
+   _grid->UpdateAll(data);
 
    // Update battery
    _bmeter->Set(atoi(statmgr->Get("BCHARGE")));

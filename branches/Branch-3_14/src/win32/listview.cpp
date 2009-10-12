@@ -80,3 +80,52 @@ void ListView::DeleteItem(int item)
 {
    SendMessage(_hwnd, LVM_DELETEITEM, item, 0);
 }
+
+void ListView::UpdateAll(alist<astring>* data[])
+{
+   // The simple way to update the listview would be to remove all items and
+   // then add them again. However, that causes the control to flicker and the
+   // scrollbar to reset to the top every time, which makes it pretty much
+   // unusable. To prevent that, we update the items in-place, adding new ones
+   // and removing unused ones as necessary. That way the scroll position stays
+   // put and only the items that change are redrawn.
+
+   // Get current item count and prepare to update the listview
+   int num = NumItems();
+   int count = 0;
+
+   // Add each line to the listview
+   alist<astring>::const_iterator iter;
+   for (iter = data[0]->begin(); iter != data[0]->end(); ++iter)
+   {
+      // Set main item (leftmost column). This will be an insert if there is no 
+      // existing item at this position or an update if an item already exists.
+      if (count >= num)
+         AppendItem(*iter);
+      else
+         UpdateItem(count, count, *iter);
+
+      // On to the next item
+      count++;
+   }
+
+   // Remove any leftover items that are no longer needed.
+   while (count < num)
+   {
+      DeleteItem(count);
+      num--;
+   }
+
+   // Update remaining columns. This is always an update since main item
+   // (leftmost column) is guaranteed to exist by code above.
+   for (int i = 1; i < _cols; i++)
+   {
+      int count = 0;
+      alist<astring>::const_iterator iter;
+      for (iter = data[i]->begin(); iter != data[i]->end(); ++iter)
+         UpdateItem(count++, i, *iter);
+   }
+
+   // Autosize listview columns
+   Autosize();
+}
