@@ -167,26 +167,11 @@ void upsStatus::Update(StatMgr *statmgr)
    }
 
    // Fetch full status from apcupsd
-   alist<astring> status;
-   if (!statmgr->GetAll(status) || status.empty())
+   alist<astring> keys, values;
+   if (!statmgr->GetAll(keys, values) || keys.empty())
    {
       _mutex.unlock();
       return;
-   }
-
-   // Split "key: value" string into separate strings
-   // (Eventually statmgr should do this for us)
-   alist<astring> keys, values;
-   alist<astring>::const_iterator iter;
-   for (iter = status.begin(); iter != status.end(); ++iter)
-   {
-      int idx = (*iter).strchr(':');
-
-      astring key = (*iter).substr(0, idx).trim();
-      keys.append(key);
-
-      astring value = (*iter).substr(idx+1).trim();
-      values.append(value);
    }
 
    // Update listview

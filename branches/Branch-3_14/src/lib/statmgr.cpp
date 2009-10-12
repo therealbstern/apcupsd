@@ -111,16 +111,16 @@ astring StatMgr::Get(const char* key)
    return ret;
 }
 
-bool StatMgr::GetAll(alist<astring> &status)
+bool StatMgr::GetAll(alist<astring> &keys, alist<astring> &values)
 {
-   status.clear();
+   keys.clear();
+   values.clear();
 
    lock();
-   for (int idx=0; idx < MAX_STATS && m_stats[idx].key; idx++) {
-      char buffer[1024];
-      asnprintf(buffer, sizeof(buffer), "%-9s: %s",
-                m_stats[idx].key, m_stats[idx].value);
-      status.append(buffer);
+   for (int idx=0; idx < MAX_STATS && m_stats[idx].key; idx++)
+   {
+      keys.append(m_stats[idx].key);
+      values.append(m_stats[idx].value);
    }
    unlock();
 
