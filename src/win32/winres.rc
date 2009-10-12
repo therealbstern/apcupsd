@@ -150,15 +150,14 @@ VS_VERSION_INFO VERSIONINFO
     {
         BLOCK "040904e0"
         {
-            VALUE "Comments", "by Kern Sibbald"
             VALUE "CompanyName", "Apcupsd Team"
-            VALUE "FileDescription", "APC UPS daemon for Win32"
+            VALUE "FileDescription", "Tray icon applet for apcupsd"
             VALUE "FileVersion", "3.14.7"
             VALUE "InternalName", "Apcupsd"
-            VALUE "LegalCopyright", "Copyright Kern Sibbald, 1999-2006"
+            VALUE "LegalCopyright", "Copyright 2007-2009 Adam Kropelin"
             VALUE "LegalTrademarks", "Licensed under GNU GPL 2.0"
-            VALUE "OriginalFilename", "apcupsd.exe"
-            VALUE "ProductName", "APCUPSD - Win32 Version"
+            VALUE "OriginalFilename", "apctray.exe"
+            VALUE "ProductName", "apctray"
             VALUE "ProductVersion", "3.14.7"
         }
     }
