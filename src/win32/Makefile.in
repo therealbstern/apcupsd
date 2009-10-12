@@ -479,8 +479,8 @@ $(OBJDIR)/winconfig.o:	winconfig.cpp
 	$(CXX) -c $< -o $@
 
 # Windows resource file formatted version (a,b,c,d)
-COMMA := ,
-RCVERSION = $(subst .,$(COMMA),$(VERSION).0)
+comma := ,
+RCVERSION = $(subst .,$(comma),$(VERSION).0)
 
 $(OBJDIR)/winres.res:  winres.rc
 	sed -e "s/\$$VERSION/$(VERSION)/" \
