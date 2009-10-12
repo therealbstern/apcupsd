@@ -21,8 +21,8 @@
 
 // Constructor/destructor
 upsStatus::upsStatus(HINSTANCE appinst, upsMenu *menu) :
-   m_hwnd(NULL),
-   m_appinst(appinst),
+   _hwnd(NULL),
+   _appinst(appinst),
    _menu(menu)
 {
 }
@@ -34,9 +34,9 @@ upsStatus::~upsStatus()
 // Dialog box handling functions
 void upsStatus::Show()
 {
-   if (!m_hwnd)
+   if (!_hwnd)
    {
-      DialogBoxParam(m_appinst,
+      DialogBoxParam(_appinst,
                      MAKEINTRESOURCE(IDD_STATUS),
                      NULL,
                      (DLGPROC)DialogProc,
@@ -83,7 +83,7 @@ BOOL upsStatus::DialogProcess(
       // Silly: Save initial window size for use as minimum size. There's 
       // probably some programmatic way to fetch this from the resource when
       // we need it, but I can't find it. So we'll save it at runtime.
-      GetWindowRect(hwnd, &m_rect);
+      GetWindowRect(hwnd, &_rect);
 
       // Initialize control wrappers
       _bmeter = new Meter(hwnd, IDC_BATTERY, 25, 15);
@@ -94,7 +94,7 @@ BOOL upsStatus::DialogProcess(
       // Important to do this AFTER everything needed by FillStatusBox() is
       // initialized and ready to go since that function may be called at any
       // time from the wintray timer thread.
-      m_hwnd = hwnd;
+      _hwnd = hwnd;
 
       // Show the dialog
       _menu->Refresh();
@@ -104,8 +104,8 @@ BOOL upsStatus::DialogProcess(
    case WM_GETMINMAXINFO:
       // Restrict minimum size to initial window size
       MINMAXINFO *mmi = (MINMAXINFO*)lParam;
-      mmi->ptMinTrackSize.x = m_rect.right - m_rect.left;
-      mmi->ptMinTrackSize.y = m_rect.bottom - m_rect.top;
+      mmi->ptMinTrackSize.x = _rect.right - _rect.left;
+      mmi->ptMinTrackSize.y = _rect.bottom - _rect.top;
       return TRUE;
 
    case WM_SIZE:
@@ -145,7 +145,7 @@ BOOL upsStatus::DialogProcess(
 
    case WM_DESTROY:
       _mutex.lock();
-      m_hwnd = NULL;
+      _hwnd = NULL;
       delete _bmeter;
       delete _lmeter;
       delete _grid;
@@ -160,7 +160,7 @@ void upsStatus::Update(StatMgr *statmgr)
 {
    // Bail if window is not open
    _mutex.lock();
-   if (!m_hwnd)
+   if (!_hwnd)
    {
       _mutex.unlock();
       return;
@@ -187,21 +187,21 @@ void upsStatus::Update(StatMgr *statmgr)
    // Update status
    char str[128];
    astring stat = statmgr->Get("STATUS");
-   SendDlgItemMessage(m_hwnd, IDC_STATUS, WM_GETTEXT, sizeof(str), (LONG)str);
+   SendDlgItemMessage(_hwnd, IDC_STATUS, WM_GETTEXT, sizeof(str), (LONG)str);
    if (stat != str)
-      SendDlgItemMessage(m_hwnd, IDC_STATUS, WM_SETTEXT, 0, (LONG)stat.str());
+      SendDlgItemMessage(_hwnd, IDC_STATUS, WM_SETTEXT, 0, (LONG)stat.str());
 
    // Update runtime
    astring runtime = statmgr->Get("TIMELEFT");
    runtime = runtime.substr(0, runtime.strchr(' '));
-   SendDlgItemMessage(m_hwnd, IDC_RUNTIME, WM_GETTEXT, sizeof(str), (LONG)str);
+   SendDlgItemMessage(_hwnd, IDC_RUNTIME, WM_GETTEXT, sizeof(str), (LONG)str);
    if (runtime != str)
-      SendDlgItemMessage(m_hwnd, IDC_RUNTIME, WM_SETTEXT, 0, (LONG)runtime.str());
+      SendDlgItemMessage(_hwnd, IDC_RUNTIME, WM_SETTEXT, 0, (LONG)runtime.str());
 
    // Update title bar
    astring name;
    name.format("Status for UPS: %s", statmgr->Get("UPSNAME").str());
-   SendMessage(m_hwnd, WM_SETTEXT, 0, (LONG)name.str());
+   SendMessage(_hwnd, WM_SETTEXT, 0, (LONG)name.str());
 
    _mutex.unlock();
 }

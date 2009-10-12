@@ -40,12 +40,12 @@ private:
    BOOL DialogProcess(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
    // Private data
-   HWND m_hwnd;
-   HINSTANCE m_appinst;
-   InstanceManager *m_instmgr;
-   MonitorConfig m_config;
-   HWND m_hhost, m_hport, m_hrefresh, m_hpopups;
-   bool m_hostvalid, m_portvalid, m_refreshvalid;
+   HWND _hwnd;
+   HINSTANCE _appinst;
+   InstanceManager *_instmgr;
+   MonitorConfig _config;
+   HWND _hhost, _hport, _hrefresh, _hpopups;
+   bool _hostvalid, _portvalid, _refreshvalid;
 };
 
 #endif // WINCONFIG_H

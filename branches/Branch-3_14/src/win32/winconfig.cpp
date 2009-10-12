@@ -26,9 +26,9 @@
 
 // Constructor/destructor
 upsConfig::upsConfig(HINSTANCE appinst, InstanceManager *instmgr) :
-   m_hwnd(NULL),
-   m_appinst(appinst),
-   m_instmgr(instmgr)
+   _hwnd(NULL),
+   _appinst(appinst),
+   _instmgr(instmgr)
 {
 }
 
@@ -39,14 +39,14 @@ upsConfig::~upsConfig()
 // Dialog box handling functions
 void upsConfig::Show(MonitorConfig &mcfg)
 {
-   if (!m_hwnd)
+   if (!_hwnd)
    {
-      m_config = mcfg;
-      m_hostvalid = true;
-      m_portvalid = true;
-      m_refreshvalid = true;
+      _config = mcfg;
+      _hostvalid = true;
+      _portvalid = true;
+      _refreshvalid = true;
 
-      DialogBoxParam(m_appinst,
+      DialogBoxParam(_appinst,
                      MAKEINTRESOURCE(IDD_CONFIG),
                      NULL,
                      (DLGPROC)DialogProc,
@@ -93,23 +93,23 @@ BOOL upsConfig::DialogProcess(
    switch (uMsg) {
    case WM_INITDIALOG:
       // Save a copy of our window handle for later use
-      m_hwnd = hwnd;
+      _hwnd = hwnd;
 
       // Fetch handles for all controls. We'll use these multiple times later
       // so it makes sense to cache them.
-      m_hhost = GetDlgItem(hwnd, IDC_HOSTNAME);
-      m_hport = GetDlgItem(hwnd, IDC_PORT);
-      m_hrefresh = GetDlgItem(hwnd, IDC_REFRESH);
-      m_hpopups = GetDlgItem(hwnd, IDC_POPUPS);
+      _hhost = GetDlgItem(hwnd, IDC_HOSTNAME);
+      _hport = GetDlgItem(hwnd, IDC_PORT);
+      _hrefresh = GetDlgItem(hwnd, IDC_REFRESH);
+      _hpopups = GetDlgItem(hwnd, IDC_POPUPS);
 
       // Initialize fields with current config settings
-      SendMessage(m_hhost, WM_SETTEXT, 0, (LONG)m_config.host.str());
-      snprintf(tmp, sizeof(tmp), "%d", m_config.port);
-      SendMessage(m_hport, WM_SETTEXT, 0, (LONG)tmp);
-      snprintf(tmp, sizeof(tmp), "%d", m_config.refresh);
-      SendMessage(m_hrefresh, WM_SETTEXT, 0, (LONG)tmp);
-      SendMessage(m_hpopups, BM_SETCHECK, 
-         m_config.popups ? BST_CHECKED : BST_UNCHECKED, 0);
+      SendMessage(_hhost, WM_SETTEXT, 0, (LONG)_config.host.str());
+      snprintf(tmp, sizeof(tmp), "%d", _config.port);
+      SendMessage(_hport, WM_SETTEXT, 0, (LONG)tmp);
+      snprintf(tmp, sizeof(tmp), "%d", _config.refresh);
+      SendMessage(_hrefresh, WM_SETTEXT, 0, (LONG)tmp);
+      SendMessage(_hpopups, BM_SETCHECK, 
+         _config.popups ? BST_CHECKED : BST_UNCHECKED, 0);
 
       // Show the dialog
       SetForegroundWindow(hwnd);
@@ -120,39 +120,39 @@ BOOL upsConfig::DialogProcess(
       case IDOK:
       {
          // Fetch and validate hostname
-         SendMessage(m_hhost, WM_GETTEXT, sizeof(tmp), (LONG)tmp);
+         SendMessage(_hhost, WM_GETTEXT, sizeof(tmp), (LONG)tmp);
          astring host(tmp);
-         m_hostvalid = !host.trim().empty();
+         _hostvalid = !host.trim().empty();
 
          // Fetch and validate port
-         SendMessage(m_hport, WM_GETTEXT, sizeof(tmp), (LONG)tmp);
+         SendMessage(_hport, WM_GETTEXT, sizeof(tmp), (LONG)tmp);
          int port = atoi(tmp);
-         m_portvalid = (port >= 1 && port <= 65535);
+         _portvalid = (port >= 1 && port <= 65535);
 
          // Fetch and validate refresh
-         SendMessage(m_hrefresh, WM_GETTEXT, sizeof(tmp), (LONG)tmp);
+         SendMessage(_hrefresh, WM_GETTEXT, sizeof(tmp), (LONG)tmp);
          int refresh = atoi(tmp);
-         m_refreshvalid = (refresh >= 1);
+         _refreshvalid = (refresh >= 1);
 
          // Fetch popups on/off
-         bool popups = SendMessage(m_hpopups, BM_GETCHECK, 0, 0) == BST_CHECKED;
+         bool popups = SendMessage(_hpopups, BM_GETCHECK, 0, 0) == BST_CHECKED;
 
-         if (m_hostvalid && m_portvalid && m_refreshvalid)
+         if (_hostvalid && _portvalid && _refreshvalid)
          {
             // Config is valid: Save it and close the dialog
-            m_config.host = host;
-            m_config.port = port;
-            m_config.refresh = refresh;
-            m_config.popups = popups;
-            m_instmgr->UpdateInstance(m_config);
+            _config.host = host;
+            _config.port = port;
+            _config.refresh = refresh;
+            _config.popups = popups;
+            _instmgr->UpdateInstance(_config);
             EndDialog(hwnd, TRUE);
          }
          else
          {
             // Set keyboard focus to first invalid field
-            if (!m_hostvalid)      SetFocus(m_hhost);
-            else if (!m_portvalid) SetFocus(m_hport);
-            else                   SetFocus(m_hrefresh);
+            if (!_hostvalid)      SetFocus(_hhost);
+            else if (!_portvalid) SetFocus(_hport);
+            else                   SetFocus(_hrefresh);
 
             // Force redraw to get background color change
             RedrawWindow(hwnd, NULL, NULL, RDW_INTERNALPAINT|RDW_INVALIDATE);
@@ -170,9 +170,9 @@ BOOL upsConfig::DialogProcess(
    case WM_CTLCOLOREDIT:
    {
       // Set edit control background red if data was invalid
-      if (((HWND)lParam == m_hhost    && !m_hostvalid) ||
-          ((HWND)lParam == m_hport    && !m_portvalid) ||
-          ((HWND)lParam == m_hrefresh && !m_refreshvalid))
+      if (((HWND)lParam == _hhost    && !_hostvalid) ||
+          ((HWND)lParam == _hport    && !_portvalid) ||
+          ((HWND)lParam == _hrefresh && !_refreshvalid))
       {
          SetBkColor((HDC)wParam, RGB(255,0,0));
          return (BOOL)CreateSolidBrush(RGB(255,0,0));
@@ -181,7 +181,7 @@ BOOL upsConfig::DialogProcess(
    }
 
    case WM_DESTROY:
-      m_hwnd = NULL;
+      _hwnd = NULL;
       return TRUE;
    }
 
