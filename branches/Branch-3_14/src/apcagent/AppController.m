@@ -175,9 +175,9 @@
          [NSString stringWithFormat:@"Status for UPS: %s",upsname.str()]];
 
       // Update raw status table
-      alist<astring> stats;
-      statmgr->GetAll(stats);
-      [statusDataSource populate:stats];
+      alist<astring> keys, values;
+      statmgr->GetAll(keys, values);
+      [statusDataSource populate:keys values:values];
       [statusGrid reloadData];
 
       // Update status text
@@ -469,44 +469,41 @@
 {
    if ((self = [super init]))
    {
-      mutex = [[NSLock alloc] init];
-      keys = [[NSMutableArray alloc] init];
-      values = [[NSMutableArray alloc] init];
+      _mutex = [[NSLock alloc] init];
+      _keys = [[NSMutableArray alloc] init];
+      _values = [[NSMutableArray alloc] init];
    }
    return self;
 }
 
 - (void) dealloc
 {
-   [keys release];
-   [values release];
-   [mutex release];
+   [_keys release];
+   [_values release];
+   [_mutex release];
    [super dealloc];
 }
 
-- (void)populate:(alist<astring> &)stats
+- (void)populate:(alist<astring> &)keys values:(alist<astring> &)values
 {
-   [mutex lock];
-   [keys removeAllObjects];
-   [values removeAllObjects];
+   [_mutex lock];
+   [_keys removeAllObjects];
+   [_values removeAllObjects];
 
    alist<astring>::const_iterator iter;
-   for (iter = stats.begin(); iter != stats.end(); ++iter)
-   {
-      NSString *data = [NSString stringWithCString:*iter];
-      NSString *key = [data substringToIndex:9];
-      NSString *value = [data substringFromIndex:10];
-      [keys addObject:key];
-      [values addObject:value];
-   }
-   [mutex unlock];
+   for (iter = keys.begin(); iter != keys.end(); ++iter)
+      [_keys addObject:[NSString stringWithCString:*iter]];
+   for (iter = values.begin(); iter != values.end(); ++iter)
+      [_values addObject:[NSString stringWithCString:*iter]];
+
+   [_mutex unlock];
 }
 
 - (int)numberOfRowsInTableView:(NSTableView *)aTableView
 {
-   [mutex lock];
-   int count = [keys count];
-   [mutex unlock];
+   [_mutex lock];
+   int count = [_keys count];
+   [_mutex unlock];
    return count;
 }
 
@@ -517,12 +514,12 @@
    NSString *ret;
 
    // Lookup and retain value under lock
-   [mutex lock];
+   [_mutex lock];
    if ([[aTableColumn identifier] intValue] == 0)
-      ret = [[[keys objectAtIndex:rowIndex] retain] autorelease];
+      ret = [[[_keys objectAtIndex:rowIndex] retain] autorelease];
    else
-      ret = [[[values objectAtIndex:rowIndex] retain] autorelease];
-   [mutex unlock];
+      ret = [[[_values objectAtIndex:rowIndex] retain] autorelease];
+   [_mutex unlock];
 
    return ret;
 }
