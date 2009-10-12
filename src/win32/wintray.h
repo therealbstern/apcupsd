@@ -56,35 +56,35 @@ protected:
    // Thread to poll for UPS status changes
    static DWORD WINAPI StatusPollThread(LPVOID param);
 
-   HWND                    m_hwnd;           // Window handle
-   HMENU                   m_hmenu;          // Menu handle
-   HMENU                   m_hsubmenu;       // Submenu handle
-   StatMgr                *m_statmgr;        // Manager for UPS stats
-   HANDLE                  m_thread;         // Handle to status polling thread
-   HANDLE                  m_wait;           // Handle to wait mutex
-   astring                 m_upsname;        // Cache UPS name
-   astring                 m_laststatus;     // Cache previous status string
-   BalloonMgr             *m_balmgr;         // Balloon tip manager
-   UINT                    m_tbcreated_msg;  // Id of TaskbarCreated message
-   HINSTANCE               m_appinst;        // Application instance handle
-   MonitorConfig           m_config;         // Configuration (host, port, etc.)
-   bool                    m_runthread;      // Run the poll thread?
-   amutex                  m_mutex;          // Lock to protect statmgr
-   WPARAM                  m_generation;
-   bool                    m_reconfig;
-   InstanceManager        *m_instmgr;
+   HWND                    _hwnd;           // Window handle
+   HMENU                   _hmenu;          // Menu handle
+   HMENU                   _hsubmenu;       // Submenu handle
+   StatMgr                *_statmgr;        // Manager for UPS stats
+   HANDLE                  _thread;         // Handle to status polling thread
+   HANDLE                  _wait;           // Handle to wait mutex
+   astring                 _upsname;        // Cache UPS name
+   astring                 _laststatus;     // Cache previous status string
+   BalloonMgr             *_balmgr;         // Balloon tip manager
+   UINT                    _tbcreated_msg;  // Id of TaskbarCreated message
+   HINSTANCE               _appinst;        // Application instance handle
+   MonitorConfig           _config;         // Configuration (host, port, etc.)
+   bool                    _runthread;      // Run the poll thread?
+   amutex                  _mutex;          // Lock to protect statmgr
+   WPARAM                  _generation;
+   bool                    _reconfig;
+   InstanceManager        *_instmgr;
 
    // Dialogs for About, Status, Config, and Events
-   upsAbout                m_about;
-   upsStatus               m_status;
-   upsConfig               m_configdlg;
-   upsEvents               m_events;
+   upsAbout                _about;
+   upsStatus               _status;
+   upsConfig               _configdlg;
+   upsEvents               _events;
 
    // The icon handles
-   HICON                   m_online_icon;
-   HICON                   m_onbatt_icon;
-   HICON                   m_charging_icon;
-   HICON                   m_commlost_icon;
+   HICON                   _online_icon;
+   HICON                   _onbatt_icon;
+   HICON                   _charging_icon;
+   HICON                   _commlost_icon;
 };
 
 #endif // WINTRAY_H

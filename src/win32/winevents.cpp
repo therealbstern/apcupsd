@@ -19,8 +19,8 @@
 
 // Constructor/destructor
 upsEvents::upsEvents(HINSTANCE appinst, upsMenu *menu) :
-   m_appinst(appinst),
-   m_hwnd(NULL),
+   _appinst(appinst),
+   _hwnd(NULL),
    _menu(menu)
 {
 }
@@ -32,9 +32,9 @@ upsEvents::~upsEvents()
 // Dialog box handling functions
 void upsEvents::Show()
 {
-   if (!m_hwnd)
+   if (!_hwnd)
    {
-      DialogBoxParam(m_appinst,
+      DialogBoxParam(_appinst,
                      MAKEINTRESOURCE(IDD_EVENTS),
                      NULL,
                      (DLGPROC)DialogProc,
@@ -81,7 +81,7 @@ BOOL upsEvents::DialogProcess(
       // Silly: Save initial window size for use as minimum size. There's 
       // probably some programmatic way to fetch this from the resource when
       // we need it, but I can't find it. So we'll save it at runtime.
-      GetWindowRect(hwnd, &m_rect);
+      GetWindowRect(hwnd, &_rect);
 
       // Initialize control wrappers
       _events = new ListView(hwnd, IDC_LIST, 1);
@@ -90,7 +90,7 @@ BOOL upsEvents::DialogProcess(
       // Important to do this AFTER everything needed by Update() is
       // initialized and ready to go since that function may be called at any
       // time from the wintray timer thread.
-      m_hwnd = hwnd;
+      _hwnd = hwnd;
 
       // Show the dialog
       _menu->Refresh();
@@ -100,8 +100,8 @@ BOOL upsEvents::DialogProcess(
    case WM_GETMINMAXINFO:
       // Restrict minimum size to initial window size
       MINMAXINFO *mmi = (MINMAXINFO*)lParam;
-      mmi->ptMinTrackSize.x = m_rect.right - m_rect.left;
-      mmi->ptMinTrackSize.y = m_rect.bottom - m_rect.top;
+      mmi->ptMinTrackSize.x = _rect.right - _rect.left;
+      mmi->ptMinTrackSize.y = _rect.bottom - _rect.top;
       return TRUE;
 
    case WM_SIZE:
@@ -141,7 +141,7 @@ BOOL upsEvents::DialogProcess(
 
    case WM_DESTROY:
       _mutex.lock();
-      m_hwnd = NULL;
+      _hwnd = NULL;
       delete _events;
       _mutex.unlock();
       return TRUE;
@@ -154,7 +154,7 @@ void upsEvents::Update(StatMgr *statmgr)
 {
    // Bail if window is not open
    _mutex.lock();
-   if (!m_hwnd)
+   if (!_hwnd)
    {
       _mutex.unlock();
       return;

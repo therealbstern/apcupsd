@@ -19,8 +19,8 @@
 // Constructor/destructor
 upsAbout::upsAbout(HINSTANCE appinst)
 {
-   m_dlgvisible = FALSE;
-   m_appinst = appinst;
+   _dlgvisible = FALSE;
+   _appinst = appinst;
 }
 
 upsAbout::~upsAbout()
@@ -30,9 +30,9 @@ upsAbout::~upsAbout()
 // Dialog box handling functions
 void upsAbout::Show()
 {
-   if (!m_dlgvisible)
+   if (!_dlgvisible)
    {
-      DialogBoxParam(m_appinst,
+      DialogBoxParam(_appinst,
                      MAKEINTRESOURCE(IDD_ABOUT), 
                      NULL,
                     (DLGPROC) DialogProc,
@@ -63,7 +63,7 @@ BOOL CALLBACK upsAbout::DialogProc(
       snprintf(tmp, sizeof(tmp), "Apctray %s (%s)", VERSION, ADATE);
       SendDlgItemMessage(hwnd, IDC_VERSION, WM_SETTEXT, 0, (LONG)tmp);
       SetForegroundWindow(hwnd);
-      _this->m_dlgvisible = TRUE;
+      _this->_dlgvisible = TRUE;
       return TRUE;
 
    case WM_COMMAND:
@@ -73,14 +73,14 @@ BOOL CALLBACK upsAbout::DialogProc(
       case IDOK:
          // Close the dialog
          EndDialog(hwnd, TRUE);
-         _this->m_dlgvisible = FALSE;
+         _this->_dlgvisible = FALSE;
          return TRUE;
       }
       break;
 
    case WM_DESTROY:
        EndDialog(hwnd, FALSE);
-       _this->m_dlgvisible = FALSE;
+       _this->_dlgvisible = FALSE;
        return TRUE;
    }
 

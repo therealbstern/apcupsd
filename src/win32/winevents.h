@@ -39,11 +39,11 @@ private:
       HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
    // Private data
-   HWND m_hwnd;
-   HINSTANCE m_appinst;
+   HWND _hwnd;
+   HINSTANCE _appinst;
    ListView *_events;
    amutex _mutex;
-   RECT m_rect;
+   RECT _rect;
    upsMenu *_menu;
 };
 

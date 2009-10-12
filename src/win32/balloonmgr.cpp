@@ -26,33 +26,33 @@
 #define ARRAY_SIZE(x) ( sizeof(x) / sizeof((x)[0]) )
 
 BalloonMgr::BalloonMgr()
-   : m_exit(false),
-     m_active(false)
+   : _exit(false),
+     _active(false)
 {
-   m_mutex = CreateMutex(NULL, false, NULL);
-   m_event = CreateEvent(NULL, false, false, NULL);
-   m_timer = CreateWaitableTimer(NULL, false, NULL);
+   _mutex = CreateMutex(NULL, false, NULL);
+   _event = CreateEvent(NULL, false, false, NULL);
+   _timer = CreateWaitableTimer(NULL, false, NULL);
 
    DWORD tid;
-   m_thread = CreateThread(NULL, 0, &BalloonMgr::Thread, this, 0, &tid);
+   _thread = CreateThread(NULL, 0, &BalloonMgr::Thread, this, 0, &tid);
 }
 
 BalloonMgr::~BalloonMgr()
 {
    // Request thread exit
-   m_exit = true;
+   _exit = true;
    signal();
 
    // Wait for thread exit and force if necessary
-   if (m_thread) {
-      if (WaitForSingleObject(m_thread, 5000) == WAIT_TIMEOUT)
-         TerminateThread(m_thread, 0);
-      CloseHandle(m_thread);
+   if (_thread) {
+      if (WaitForSingleObject(_thread, 5000) == WAIT_TIMEOUT)
+         TerminateThread(_thread, 0);
+      CloseHandle(_thread);
    }
 
-   CloseHandle(m_mutex);
-   CloseHandle(m_event);
-   CloseHandle(m_timer);
+   CloseHandle(_mutex);
+   CloseHandle(_event);
+   CloseHandle(_timer);
 }
 
 void BalloonMgr::PostBalloon(HWND hwnd, const char *title, const char *text)
@@ -60,7 +60,7 @@ void BalloonMgr::PostBalloon(HWND hwnd, const char *title, const char *text)
    lock();
 
    Balloon balloon = {hwnd, title, text};
-   m_pending.push_back(balloon);
+   _pending.push_back(balloon);
    signal();
 
    unlock();
@@ -68,26 +68,26 @@ void BalloonMgr::PostBalloon(HWND hwnd, const char *title, const char *text)
 
 void BalloonMgr::lock()
 {
-   WaitForSingleObject(m_mutex, INFINITE);
+   WaitForSingleObject(_mutex, INFINITE);
 }
 
 void BalloonMgr::unlock()
 {
-   ReleaseMutex(m_mutex);
+   ReleaseMutex(_mutex);
 }
 
 void BalloonMgr::signal()
 {
-   SetEvent(m_event);
+   SetEvent(_event);
 }
 
 void BalloonMgr::post()
 {
-   if (m_pending.empty())
+   if (_pending.empty())
       return;  // No active balloon!?
 
    // Post balloon tip
-   Balloon &balloon = m_pending.front();
+   Balloon &balloon = _pending.front();
    NOTIFYICONDATA nid;
    nid.hWnd = balloon.hwnd;
    nid.cbSize = sizeof(nid);
@@ -101,23 +101,23 @@ void BalloonMgr::post()
 
    // Set a timeout to clear the balloon
    LARGE_INTEGER timeout;
-   if (m_pending.size() > 1)  // More balloons pending: use minimum timeout
+   if (_pending.size() > 1)  // More balloons pending: use minimum timeout
       timeout.QuadPart = -(MIN_TIMEOUT * 10000);
    else  // No other balloons pending: Use maximum timeout
       timeout.QuadPart = -(MAX_TIMEOUT * 10000);
-   SetWaitableTimer(m_timer, &timeout, 0, NULL, NULL, false);
+   SetWaitableTimer(_timer, &timeout, 0, NULL, NULL, false);
 
    // Remember the time at which we started the timer
-   gettimeofday(&m_time, NULL);
+   gettimeofday(&_time, NULL);
 }
 
 void BalloonMgr::clear()
 {
-   if (m_pending.empty())
+   if (_pending.empty())
       return;  // No active balloon!?
 
    // Clear active balloon
-   Balloon &balloon = m_pending.front();
+   Balloon &balloon = _pending.front();
    NOTIFYICONDATA nid;
    nid.hWnd = balloon.hwnd;
    nid.cbSize = sizeof(nid);
@@ -130,13 +130,13 @@ void BalloonMgr::clear()
    Shell_NotifyIcon(NIM_MODIFY, &nid);
 
    // Remove vector entry for active balloon
-   m_pending.erase(m_pending.begin());
+   _pending.erase(_pending.begin());
 }
 
 DWORD WINAPI BalloonMgr::Thread(LPVOID param)
 {
    BalloonMgr *_this = (BalloonMgr*)param;
-   HANDLE handles[] = {_this->m_event, _this->m_timer};
+   HANDLE handles[] = {_this->_event, _this->_timer};
    LARGE_INTEGER timeout;
    struct timeval now;
    DWORD index;
@@ -148,7 +148,7 @@ DWORD WINAPI BalloonMgr::Thread(LPVOID param)
          ARRAY_SIZE(handles), handles, false, INFINITE);
 
       // Exit if we've been asked to do so
-      if (_this->m_exit)
+      if (_this->_exit)
          break;
 
       switch (index) {
@@ -156,17 +156,17 @@ DWORD WINAPI BalloonMgr::Thread(LPVOID param)
       case WAIT_OBJECT_0 + 0:
          _this->lock();
 
-         if (!_this->m_active) {
+         if (!_this->_active) {
             // No balloon active: Post new balloon immediately
-            if (!_this->m_pending.empty()) {
+            if (!_this->_pending.empty()) {
                _this->post();
-               _this->m_active = true;
+               _this->_active = true;
             }
          } else {
             // A balloon is active: Shorten timer to minimum
-            CancelWaitableTimer(_this->m_timer);
+            CancelWaitableTimer(_this->_timer);
             gettimeofday(&now, NULL);
-            diff = TV_DIFF_MS(_this->m_time, now);
+            diff = TV_DIFF_MS(_this->_time, now);
             if (diff >= MIN_TIMEOUT) {
                // Min timeout already expired
                timeout.QuadPart = -1;
@@ -174,7 +174,7 @@ DWORD WINAPI BalloonMgr::Thread(LPVOID param)
                // Wait enough additional time to meet minimum timeout
                timeout.QuadPart = -((MIN_TIMEOUT - diff) * 10000);
             }
-            SetWaitableTimer(_this->m_timer, &timeout, 0, NULL, NULL, false);
+            SetWaitableTimer(_this->_timer, &timeout, 0, NULL, NULL, false);
          }
 
          _this->unlock();
@@ -188,11 +188,11 @@ DWORD WINAPI BalloonMgr::Thread(LPVOID param)
          _this->clear();
 
          // Post next balloon if there is one
-         if (!_this->m_pending.empty()) {
+         if (!_this->_pending.empty()) {
             _this->post();
-            _this->m_active = true;
+            _this->_active = true;
          } else {
-            _this->m_active = false;
+            _this->_active = false;
          }
 
          _this->unlock();

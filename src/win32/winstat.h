@@ -38,9 +38,9 @@ private:
    BOOL DialogProcess(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
    // Private data
-   HWND m_hwnd;
-   HINSTANCE m_appinst;
-   RECT m_rect;
+   HWND _hwnd;
+   HINSTANCE _appinst;
+   RECT _rect;
    Meter *_bmeter;
    Meter *_lmeter;
    ListView *_grid;

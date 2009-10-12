@@ -30,8 +30,8 @@ private:
       HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
    // Private data
-   BOOL m_dlgvisible;
-   HINSTANCE m_appinst;
+   BOOL _dlgvisible;
+   HINSTANCE _appinst;
 };
 
 #endif // WINABOUT_H
