@@ -645,6 +645,12 @@ AC_HELP_STRING([--disable-net-snmp], [No NET-SNMP UPS code (default)])],
 
 dnl If we're building SNMP, try to find relevant libs
 if test "$WANT_SNMP" = "yes" ; then
+   dnl Check for optional crypto lib
+   AC_CHECK_LIB(crypto, EVP_DigestInit,
+      [DRVLIBS="$DRVLIBS -lcrypto"],
+      [],
+      [])
+
    WANT_NET_SNMP="yes"
    SNMP_LIB_FOUND="no"
 
@@ -655,7 +661,7 @@ if test "$WANT_SNMP" = "yes" ; then
    dnl Start by looking for libnetsnmp (net-snmp).
    if test "$SNMP_LIB_FOUND" = "no" ; then
       AC_CHECK_LIB(netsnmp, snmp_open,
-         [DRVLIBS="$DRVLIBS -Wl,-Bstatic -lnetsnmp -Wl,-Bdynamic -ldl"
+         [DRVLIBS="$DRVLIBS -lnetsnmp"
           SNMP_LIB_FOUND="yes"], [], [$DRVLIBS])
    fi
 
@@ -663,19 +669,13 @@ if test "$WANT_SNMP" = "yes" ; then
    if test "$SNMP_LIB_FOUND" = "no" ; then
       WANT_NET_SNMP="no"
       AC_CHECK_LIB(snmp, snmp_open,
-         [DRVLIBS="$DRVLIBS -Wl,-Bstatic -lsnmp -Wl,-Bdynamic -ldl"
+         [DRVLIBS="$DRVLIBS -lsnmp"
           SNMP_LIB_FOUND="yes"], [], [$DRVLIBS])
    fi
 
    if test "$SNMP_LIB_FOUND" = "no" ; then
       AC_MSG_ERROR([Cannot find SNMP libraries.])
    fi
-
-   dnl Check for optional crypto lib
-   AC_CHECK_LIB(crypto, EVP_DigestInit,
-      [DRVLIBS="$DRVLIBS -Wl,-Bstatic -lcrypto -Wl,-Bdynamic"],
-      [],
-      [])
 
    dnl If we get this far, we found a valid lib
    AC_DEFINE(HAVE_SNMP_DRIVER)
