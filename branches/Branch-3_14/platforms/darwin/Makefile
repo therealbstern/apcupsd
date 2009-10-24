@@ -95,4 +95,4 @@ apcupsd.pkg:
 	   --info ApcupsdDaemon.Info.plist --resources $(PKGROOT)/Apcupsd.Resources \
 	   --scripts $(PKGROOT)/Apcupsd.Scripts --id com.apcupsd.apcupsd --root-volume-only \
            --target 10.4 --version $(VERSION) --out $(PKGROOT)/Apcupsd/Apcupsd-$(VERSION).pkg
-	hdiutil create -ov -srcfolder $(PKGROOT)/Apcupsd -volname Apcupsd-$(VERSION) Apcupsd-$(VERSION).dmg
+	hdiutil create -ov -fs HFS+ -srcfolder $(PKGROOT)/Apcupsd -volname Apcupsd-$(VERSION) Apcupsd-$(VERSION).dmg
