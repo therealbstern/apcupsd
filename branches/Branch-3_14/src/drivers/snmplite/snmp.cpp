@@ -1,0 +1,536 @@
+/*
+ * snmp.cpp
+ *
+ * SNMP client interface
+ */
+
+/*
+ * Copyright (C) 2009 Adam Kropelin
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of version 2 of the GNU General
+ * Public License as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the Free
+ * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+ * MA 02111-1307, USA.
+ */
+
+#include "snmp.h"
+#include "asn.h"
+
+#include <errno.h>
+#include <netdb.h>
+#include <stdio.h>
+#include <unistd.h>
+#include <arpa/inet.h>
+#include <sys/socket.h>
+#include <sys/time.h>
+#include <sys/types.h>
+#include <sys/ioctl.h>
+
+#ifdef __WIN32__
+#define close(x) closesocket(x)
+#endif
+
+using namespace Snmp;
+
+SnmpEngine::SnmpEngine() :
+   _socket(-1),
+   _reqid(0)
+{
+}
+
+SnmpEngine::~SnmpEngine()
+{
+   close(_socket);
+}
+
+bool SnmpEngine::Open(const char *host, unsigned short port, const char *comm)
+{
+   // In case we are already open
+   close(_socket);
+
+   // Remember new community name
+   _community = comm;
+
+   // Generate starting request id
+   struct timeval now;
+   gettimeofday(&now, NULL);
+   _reqid = now.tv_usec;
+
+   // Look up destination address
+   memset(&_destaddr, 0, sizeof(_destaddr));
+   _destaddr.sin_family = AF_INET;
+   _destaddr.sin_port = htons(port);
+
+   unsigned int inaddr = inet_addr(host);
+   if (inaddr != INADDR_NONE) 
+   {
+      _destaddr.sin_addr.s_addr = inaddr;
+   }
+   else
+   {
+      struct hostent *hp = gethostbyname(host);
+      if (hp == NULL)
+         return false;
+
+      if (hp->h_length != sizeof(inaddr) || hp->h_addrtype != AF_INET)
+         return false;
+
+      _destaddr.sin_addr.s_addr = *(unsigned int *)hp->h_addr;
+   }
+
+   // Get a UDP socket
+   _socket = socket(PF_INET, SOCK_DGRAM, 0);
+   if (_socket == -1)
+   {
+      perror("socket");
+      return false;
+   }
+
+   // Bind to rx on any interface
+   struct sockaddr_in addr;
+   memset(&addr, 0, sizeof(addr));
+   addr.sin_family = AF_INET;
+   addr.sin_port = htons(1234); //0;
+   addr.sin_addr.s_addr = INADDR_ANY;
+   int rc = bind(_socket, (struct sockaddr*)&addr, sizeof(addr));
+   if (rc == -1)
+   {
+      perror("bind");
+      return false;
+   }
+
+   return true;
+}
+
+void SnmpEngine::Close()
+{
+   close(_socket);
+   _socket = -1;
+}
+
+bool SnmpEngine::Get(int oid[], Variable *data)
+{
+   OidVar oidvar = { oid };
+   alist<OidVar> oids;
+   oids.append(oidvar);
+
+   bool ret = Get(oids);
+   *data = (*oids.begin()).data;
+
+   return ret;
+}
+
+bool SnmpEngine::Get(alist<OidVar> &oids)
+{
+   bool ret = false;
+   int i = 0;
+
+   // Start with a request with no varbinds
+   VbListMessage req(GET_REQUEST, _community, _reqid++);
+
+   // Append one varbind for each oidvar from the caller
+   alist<OidVar>::iterator iter;
+   for (iter = oids.begin(); iter != oids.end(); ++iter)
+      req.Append((*iter).oid);
+
+   // Send the request
+   if (!issue(&req))
+      return false;
+
+   // Wait for a response
+   VbListMessage *rsp = (VbListMessage*)rspwait(10000);
+   if (!rsp)
+      return false;
+
+   // Check error status
+   VbListMessage &response = *rsp;
+   if (response.ErrorStatus())
+      goto out;
+
+   // Verify response varbind size
+   if (response.Size() != oids.size())
+      goto out;
+
+   // Copy varbind data into caller's oidvars
+   // Check that each oid matches the client's list
+   for (iter = oids.begin(); iter != oids.end(); ++iter)
+   {
+      if (response[i].Oid() != (*iter).oid ||
+          !response[i].Extract(&(*iter).data))
+      {
+         goto out;
+      }
+      i++;
+   }
+
+   ret = true;
+
+out:
+   delete rsp;
+   return ret;
+}
+
+bool SnmpEngine::issue(Message *msg)
+{
+   // Marshal the data
+   unsigned char data[8192];
+   int buflen = sizeof(data);
+   unsigned char *buffer = data;
+   if (!msg->Marshal(buffer, buflen))
+      return false;
+
+   // Send data to destination
+   int datalen = buffer - data;
+   int rc = sendto(_socket, data, datalen, 0, 
+                   (struct sockaddr*)&_destaddr, sizeof(_destaddr));
+   if (rc != datalen)
+   {
+      perror("sendto");
+      return false;
+   }
+
+   return true;
+}
+
+Message *SnmpEngine::rspwait(unsigned int msec)
+{
+   static unsigned char data[8192];
+   struct sockaddr_in fromaddr;
+
+   // Calculate exit time
+   struct timeval exittime;
+   gettimeofday(&exittime, NULL);
+   exittime.tv_usec += msec * 1000;
+   while (exittime.tv_usec >= 1000000)
+   {
+      exittime.tv_usec -= 1000000;
+      exittime.tv_sec++;
+   }
+
+   while(1)
+   {
+      // See if we've run out of time
+      struct timeval now;
+      gettimeofday(&now, NULL);
+      if (now.tv_sec > exittime.tv_sec ||
+          (now.tv_sec == exittime.tv_sec &&
+           now.tv_usec >= exittime.tv_usec))
+         return NULL;
+
+      // Calculate new timeout
+      struct timeval timeout;
+      timeout.tv_sec = exittime.tv_sec - now.tv_sec;
+      timeout.tv_usec = exittime.tv_usec - now.tv_usec;
+      while (timeout.tv_usec < 0)
+      {
+         timeout.tv_usec += 1000000;
+         timeout.tv_sec--;
+      }
+
+      // Wait for a datagram to arrive
+      fd_set fds;
+      FD_ZERO(&fds);
+      FD_SET(_socket, &fds);
+      int rc = select(_socket+1, &fds, NULL, NULL, &timeout);
+      if (rc == -1)
+      {
+         if (errno == EAGAIN || errno == EINTR)
+            continue;
+         return NULL;
+      }
+
+      // Timeout
+      if (rc == 0)
+         return NULL;
+
+      // Read datagram
+      socklen_t fromlen = sizeof(fromaddr);
+      rc = recvfrom(_socket, data, sizeof(data), 0, 
+                    (struct sockaddr*)&fromaddr, &fromlen);
+      if (rc == -1)
+      {
+         if (errno == EAGAIN || errno == EINTR)
+            continue;
+         return NULL;
+      }
+
+      // Ignore packet if it's not from our agent
+      if (fromaddr.sin_addr.s_addr != _destaddr.sin_addr.s_addr)
+         continue;
+
+      // Got a packet from our agent: decode it
+      unsigned char *buffer = data;
+      int buflen = rc;
+      Message *msg = Message::Demarshal(buffer, buflen);
+      if (!msg)
+         continue;
+
+      // Check message type
+      if (msg->Type() != GET_RESPONSE)
+      {
+         printf("Unhandled SNMP message type: %02x\n", msg->Type());
+         delete msg;
+         continue;
+      }
+
+      // Check request id
+      VbListMessage *vblm = (VbListMessage*)msg;
+      if (vblm->RequestId() != _reqid-1)
+      {
+         delete msg;
+         continue;
+      }
+
+      return vblm;
+   }
+}
+
+// *****************************************************************************
+// VarBind
+// *****************************************************************************
+
+VarBind::VarBind(int oid[], Variable *data)
+{
+   _oid = new AsnObjectId(oid);
+
+   if (data)
+   {
+   /*
+      switch (data->type)
+      {
+      case INTEGER32:
+         _data = new AsnInteger(data->i32);
+         break;
+      case UNSIGNED32:
+      case TIMETICKS:
+      case COUNTER:
+      case GAUGE:
+         _data = new AsnInteger(data->u32);
+         break;
+      case DISPLAYSTRING:
+         _data = new AsnOctetString(data->str);
+         break;
+      case NULLL:
+      default:
+         _data = new AsnNull();
+         break;
+      }
+      */
+   }
+   else
+   {
+      _data = new AsnNull();
+   }
+}
+
+VarBind::VarBind(AsnSequence &seq)
+{
+   if (seq.Size() == 2 && 
+       seq[0]->IsObjectId())
+   {
+      _oid = seq[0]->copy()->AsObjectId();
+      _data = seq[1]->copy();
+   }
+   else
+   {
+      _oid = new AsnObjectId();
+      _data = new AsnNull();
+   }
+}
+
+VarBind::~VarBind()
+{
+   delete _data;
+   delete _oid;
+}
+
+bool VarBind::Extract(Variable *out)
+{
+   if (_data->IsInteger())
+   {
+      out->i32 = _data->AsInteger()->IntValue();
+      out->u32 = _data->AsInteger()->UintValue();
+   }
+   else if (_data->IsOctetString())
+   {
+      out->str = *_data->AsOctetString();
+   }
+   else
+   {
+      printf("Unsupported AsnObject::AsnType: %d\n", _data->Type());
+      return false;
+   }
+   return true;
+}
+
+AsnSequence *VarBind::GetAsn()
+{
+   AsnSequence *seq = new AsnSequence();
+   seq->Append(_oid->copy());
+   seq->Append(_data->copy());
+   return seq;
+}
+
+// *****************************************************************************
+// VarBindList
+// *****************************************************************************
+
+VarBindList::VarBindList(AsnSequence &seq)
+{
+   for (unsigned int i = 0; i < seq.Size(); i++)
+   {
+      if (seq[i]->IsSequence())
+         _vblist.append(new VarBind(*seq[i]->AsSequence()));
+   }
+}
+
+VarBindList::VarBindList(int oid[], Variable *data)
+{
+   if (oid)
+      _vblist.append(new VarBind(oid, data));
+}
+
+VarBindList::~VarBindList()
+{
+   for (unsigned int i = 0; i < _vblist.size(); i++)
+      delete _vblist[i];
+}
+
+void VarBindList::Append(int oid[], Variable *data)
+{
+   _vblist.append(new VarBind(oid, data));
+}
+
+AsnSequence *VarBindList::GetAsn()
+{
+   AsnSequence *seq = new AsnSequence();
+   for (unsigned int i = 0; i < _vblist.size(); i++)
+      seq->Append(_vblist[i]->GetAsn());
+   return seq;
+}
+
+// *****************************************************************************
+// VbListMessage
+// *****************************************************************************
+VbListMessage *VbListMessage::CreateFromSequence(
+   PduType type, const char *community, AsnSequence &seq)
+{
+   // Verify format: We should have 4 parts.
+   if (seq.Size() != 4 ||
+       !seq[0]->IsInteger() ||  // request-id
+       !seq[1]->IsInteger() ||  // error-status
+       !seq[2]->IsInteger() ||  // error-index
+       !seq[3]->IsSequence())   // variable-bindings
+      return NULL;
+
+   // Extract data
+   return new VbListMessage(type, community, seq);
+}
+
+VbListMessage::VbListMessage(PduType type, const char *community, AsnSequence &seq) :
+   Message(type, community)
+{
+   // Format was already verified in CreateFromSequence()
+   _reqid = seq[0]->AsInteger()->IntValue();
+   _errstatus = seq[1]->AsInteger()->IntValue();
+   _errindex = seq[2]->AsInteger()->IntValue();
+   _vblist = new VarBindList(*seq[3]->AsSequence());
+}
+
+VbListMessage::VbListMessage(PduType type, const char *community, int reqid,
+                             int oid[], Variable *data) :
+   Message(type, community),
+   _reqid(reqid),
+   _errstatus(0),
+   _errindex(0),
+   _vblist(new VarBindList(oid, data))
+{
+}
+
+void VbListMessage::Append(int oid[], Variable *data)
+{
+   _vblist->Append(oid, data);
+}
+
+AsnSequence *VbListMessage::GetAsn()
+{
+   AsnSequence *seq = new AsnSequence((AsnObject::AsnIdentifier)_type);
+   seq->Append(new AsnInteger(_reqid));
+   seq->Append(new AsnInteger(_errstatus));
+   seq->Append(new AsnInteger(_errindex));
+   seq->Append(_vblist->GetAsn());
+   return seq;
+}
+
+// *****************************************************************************
+// Message
+// *****************************************************************************
+Message *Message::Demarshal(unsigned char *&buffer, int &buflen)
+{
+   Message *ret = NULL;
+   astring community;
+   PduType type;
+
+   AsnObject *obj = AsnObject::Demarshal(buffer, buflen);
+   if (!obj)
+      return NULL;
+
+   // Data demarshalled okay. Now walk the object tree to parse the message.
+
+   // Top-level object should be a sequence of length 3
+   AsnSequence &seq = *(AsnSequence*)obj;
+   if (!obj->IsSequence() || seq.Size() != 3)
+      goto error;
+
+   // First item in sequence is an integer specifying SNMP version
+   if (!seq[0]->IsInteger() ||
+       seq[0]->AsInteger()->IntValue() != SNMP_VERSION_1)
+      goto error;
+
+   // Second item is the community string
+   if (!seq[1]->IsOctetString())
+      goto error;
+   community = *seq[1]->AsOctetString();
+
+   // Third is another sequence containing the PDU
+   type = (PduType)seq[2]->Type();
+   switch (type)
+   {
+   case GET_REQUEST:
+   case GETNEXT_REQUEST:
+   case GET_RESPONSE:
+      ret = (Message*)VbListMessage::CreateFromSequence(
+         type, community, *seq[2]->AsSequence());
+      break;
+   case TRAP:
+      // Implement me
+      break;
+   default:
+      break;
+   }
+
+error:
+   delete obj;
+   return ret;
+}
+
+bool Message::Marshal(unsigned char *&buffer, int &buflen)
+{
+   AsnSequence *seq = new AsnSequence();
+   seq->Append(new AsnInteger(SNMP_VERSION_1));
+   seq->Append(new AsnOctetString(_community));
+   seq->Append(GetAsn());
+
+   bool ret = seq->Marshal(buffer, buflen);
+   delete seq;
+   return ret;
+}

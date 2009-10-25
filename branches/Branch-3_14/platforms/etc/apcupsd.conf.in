@@ -60,6 +60,13 @@ UPSCABLE @UPSCABLE@
 #                            Port is usually 161. Community is usually
 #                            "private".
 #
+# snmplite  hostname:port:vendor:community
+#                            Same as SNMP above but does not require
+#                            the net-snmp library. Eventually this will
+#                            replace the snmp driver. Currently only APC 
+#                            vendor MIB is supported. Trap catching and
+#                            killpower are not yet supported.
+#
 # dumb      /dev/tty**       Old serial character device for use 
 #                            with simple-signaling UPSes.
 #
