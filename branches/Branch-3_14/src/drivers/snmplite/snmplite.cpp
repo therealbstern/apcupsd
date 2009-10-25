@@ -212,8 +212,7 @@ static void snmplite_ups_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
 
    case CI_ITEMP:
       Dmsg1(80, "Got CI_ITEMP: %d\n", data.u32);
-      // MIB says degC, but appears to be degC*10
-      ups->UPSTemp = data.u32 / 10;
+      ups->UPSTemp = data.u32;
       break;
 
    case CI_ATEMP:
@@ -464,6 +463,56 @@ static void snmplite_ups_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
          astrncpy(ups->sensitivity, "Unknown", sizeof(ups->sensitivity));
          break;
       }
+      break;
+
+   case CI_REVNO:
+      Dmsg1(80, "Got CI_REVNO: %s\n", data.str.str());
+      astrncpy(ups->firmrev, data.str, sizeof(ups->firmrev));
+      break;
+
+   case CI_EXTBATTS:
+      Dmsg1(80, "Got CI_EXTBATTS: %d\n", data.u32);
+      ups->extbatts = data.u32;
+      break;
+   
+   case CI_BADBATTS:
+      Dmsg1(80, "Got CI_BADBATTS: %d\n", data.u32);
+      ups->badbatts = data.u32;
+      break;
+
+   case CI_DLBATT:
+      Dmsg1(80, "Got CI_DLBATT: %d\n", data.u32);
+      ups->dlowbatt = data.u32 / TIMETICKS_TO_SECS / SECS_TO_MINS;
+      break;
+
+   case CI_STESTI:
+      Dmsg1(80, "Got CI_STESTI: %d\n", data.u32);
+      switch (data.u32) {
+      case 2:
+         astrncpy(ups->selftest, "336", sizeof(ups->selftest));
+         break;
+      case 3:
+         astrncpy(ups->selftest, "168", sizeof(ups->selftest));
+         break;
+      case 4:
+         astrncpy(ups->selftest, "ON", sizeof(ups->selftest));
+         break;
+      case 1:
+      case 5:
+      default:
+         astrncpy(ups->selftest, "OFF", sizeof(ups->selftest));
+         break;
+      }
+      break;
+
+   case CI_VMIN:
+      Dmsg1(80, "Got CI_VMIN: %d\n", data.u32);
+      ups->LineMin = data.u32;
+      break;
+
+   case CI_VMAX:
+      Dmsg1(80, "Got CI_VMAX: %d\n", data.u32);
+      ups->LineMax = data.u32;
       break;
    }
 }
