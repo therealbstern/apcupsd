@@ -135,7 +135,7 @@ bool SnmpEngine::Get(alist<OidVar> &oids)
    int i = 0;
 
    // Start with a request with no varbinds
-   VbListMessage req(GET_REQUEST, _community, _reqid++);
+   VbListMessage req(Asn::GET_REQ_PDU, _community, _reqid++);
 
    // Append one varbind for each oidvar from the caller
    alist<OidVar>::iterator iter;
@@ -275,7 +275,7 @@ Message *SnmpEngine::rspwait(unsigned int msec)
          continue;
 
       // Check message type
-      if (msg->Type() != GET_RESPONSE)
+      if (msg->Type() != Asn::GET_RSP_PDU)
       {
          printf("Unhandled SNMP message type: %02x\n", msg->Type());
          delete msg;
@@ -300,7 +300,7 @@ Message *SnmpEngine::rspwait(unsigned int msec)
 
 VarBind::VarBind(int oid[], Variable *data)
 {
-   _oid = new AsnObjectId(oid);
+   _oid = new Asn::ObjectId(oid);
 
    if (data)
    {
@@ -308,31 +308,31 @@ VarBind::VarBind(int oid[], Variable *data)
       switch (data->type)
       {
       case INTEGER32:
-         _data = new AsnInteger(data->i32);
+         _data = new Asn::Integer(data->i32);
          break;
       case UNSIGNED32:
       case TIMETICKS:
       case COUNTER:
       case GAUGE:
-         _data = new AsnInteger(data->u32);
+         _data = new Asn::Integer(data->u32);
          break;
       case DISPLAYSTRING:
-         _data = new AsnOctetString(data->str);
+         _data = new Asn::OctetString(data->str);
          break;
       case NULLL:
       default:
-         _data = new AsnNull();
+         _data = new Asn::Null();
          break;
       }
       */
    }
    else
    {
-      _data = new AsnNull();
+      _data = new Asn::Null();
    }
 }
 
-VarBind::VarBind(AsnSequence &seq)
+VarBind::VarBind(Asn::Sequence &seq)
 {
    if (seq.Size() == 2 && 
        seq[0]->IsObjectId())
@@ -342,8 +342,8 @@ VarBind::VarBind(AsnSequence &seq)
    }
    else
    {
-      _oid = new AsnObjectId();
-      _data = new AsnNull();
+      _oid = new Asn::ObjectId();
+      _data = new Asn::Null();
    }
 }
 
@@ -366,15 +366,15 @@ bool VarBind::Extract(Variable *out)
    }
    else
    {
-      printf("Unsupported AsnObject::AsnType: %d\n", _data->Type());
+      printf("Unsupported Asn::Object::AsnType: %d\n", _data->Type());
       return false;
    }
    return true;
 }
 
-AsnSequence *VarBind::GetAsn()
+Asn::Sequence *VarBind::GetAsn()
 {
-   AsnSequence *seq = new AsnSequence();
+   Asn::Sequence *seq = new Asn::Sequence();
    seq->Append(_oid->copy());
    seq->Append(_data->copy());
    return seq;
@@ -384,7 +384,7 @@ AsnSequence *VarBind::GetAsn()
 // VarBindList
 // *****************************************************************************
 
-VarBindList::VarBindList(AsnSequence &seq)
+VarBindList::VarBindList(Asn::Sequence &seq)
 {
    for (unsigned int i = 0; i < seq.Size(); i++)
    {
@@ -410,9 +410,9 @@ void VarBindList::Append(int oid[], Variable *data)
    _vblist.append(new VarBind(oid, data));
 }
 
-AsnSequence *VarBindList::GetAsn()
+Asn::Sequence *VarBindList::GetAsn()
 {
-   AsnSequence *seq = new AsnSequence();
+   Asn::Sequence *seq = new Asn::Sequence();
    for (unsigned int i = 0; i < _vblist.size(); i++)
       seq->Append(_vblist[i]->GetAsn());
    return seq;
@@ -422,7 +422,7 @@ AsnSequence *VarBindList::GetAsn()
 // VbListMessage
 // *****************************************************************************
 VbListMessage *VbListMessage::CreateFromSequence(
-   PduType type, const char *community, AsnSequence &seq)
+   Asn::Identifier type, const char *community, Asn::Sequence &seq)
 {
    // Verify format: We should have 4 parts.
    if (seq.Size() != 4 ||
@@ -436,7 +436,7 @@ VbListMessage *VbListMessage::CreateFromSequence(
    return new VbListMessage(type, community, seq);
 }
 
-VbListMessage::VbListMessage(PduType type, const char *community, AsnSequence &seq) :
+VbListMessage::VbListMessage(Asn::Identifier type, const char *community, Asn::Sequence &seq) :
    Message(type, community)
 {
    // Format was already verified in CreateFromSequence()
@@ -446,7 +446,7 @@ VbListMessage::VbListMessage(PduType type, const char *community, AsnSequence &s
    _vblist = new VarBindList(*seq[3]->AsSequence());
 }
 
-VbListMessage::VbListMessage(PduType type, const char *community, int reqid,
+VbListMessage::VbListMessage(Asn::Identifier type, const char *community, int reqid,
                              int oid[], Variable *data) :
    Message(type, community),
    _reqid(reqid),
@@ -461,12 +461,12 @@ void VbListMessage::Append(int oid[], Variable *data)
    _vblist->Append(oid, data);
 }
 
-AsnSequence *VbListMessage::GetAsn()
+Asn::Sequence *VbListMessage::GetAsn()
 {
-   AsnSequence *seq = new AsnSequence((AsnObject::AsnIdentifier)_type);
-   seq->Append(new AsnInteger(_reqid));
-   seq->Append(new AsnInteger(_errstatus));
-   seq->Append(new AsnInteger(_errindex));
+   Asn::Sequence *seq = new Asn::Sequence(_type);
+   seq->Append(new Asn::Integer(_reqid));
+   seq->Append(new Asn::Integer(_errstatus));
+   seq->Append(new Asn::Integer(_errindex));
    seq->Append(_vblist->GetAsn());
    return seq;
 }
@@ -478,40 +478,44 @@ Message *Message::Demarshal(unsigned char *&buffer, int &buflen)
 {
    Message *ret = NULL;
    astring community;
-   PduType type;
+   Asn::Identifier type;
 
-   AsnObject *obj = AsnObject::Demarshal(buffer, buflen);
+   Asn::Object *obj = Asn::Object::Demarshal(buffer, buflen);
    if (!obj)
       return NULL;
 
    // Data demarshalled okay. Now walk the object tree to parse the message.
-
+printf("%s:%d\n", __func__, __LINE__);
    // Top-level object should be a sequence of length 3
-   AsnSequence &seq = *(AsnSequence*)obj;
+   Asn::Sequence &seq = *(Asn::Sequence*)obj;
    if (!obj->IsSequence() || seq.Size() != 3)
       goto error;
+printf("%s:%d\n", __func__, __LINE__);
 
    // First item in sequence is an integer specifying SNMP version
    if (!seq[0]->IsInteger() ||
        seq[0]->AsInteger()->IntValue() != SNMP_VERSION_1)
       goto error;
+printf("%s:%d\n", __func__, __LINE__);
 
    // Second item is the community string
    if (!seq[1]->IsOctetString())
       goto error;
    community = *seq[1]->AsOctetString();
 
+printf("%s:%d\n", __func__, __LINE__);
    // Third is another sequence containing the PDU
-   type = (PduType)seq[2]->Type();
+   type = seq[2]->Type();
    switch (type)
    {
-   case GET_REQUEST:
-   case GETNEXT_REQUEST:
-   case GET_RESPONSE:
+   case Asn::GET_REQ_PDU:
+   case Asn::GETNEXT_REQ_PDU:
+   case Asn::GET_RSP_PDU:
+printf("%s:%d\n", __func__, __LINE__);
       ret = (Message*)VbListMessage::CreateFromSequence(
          type, community, *seq[2]->AsSequence());
       break;
-   case TRAP:
+   case Asn::TRAP_PDU:
       // Implement me
       break;
    default:
@@ -525,9 +529,9 @@ error:
 
 bool Message::Marshal(unsigned char *&buffer, int &buflen)
 {
-   AsnSequence *seq = new AsnSequence();
-   seq->Append(new AsnInteger(SNMP_VERSION_1));
-   seq->Append(new AsnOctetString(_community));
+   Asn::Sequence *seq = new Asn::Sequence();
+   seq->Append(new Asn::Integer(SNMP_VERSION_1));
+   seq->Append(new Asn::OctetString(_community));
    seq->Append(GetAsn());
 
    bool ret = seq->Marshal(buffer, buflen);

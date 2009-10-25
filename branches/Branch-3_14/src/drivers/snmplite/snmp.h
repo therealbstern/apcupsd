@@ -36,25 +36,6 @@ namespace Snmp
    // **************************************************************************
    // Types
    // **************************************************************************
-   enum PduType
-   {
-      GET_REQUEST     = AsnObject::CONSTRUCTED | AsnObject::CONTEXT_SPECIFIC | 0,
-      GETNEXT_REQUEST = AsnObject::CONSTRUCTED | AsnObject::CONTEXT_SPECIFIC | 1,
-      GET_RESPONSE    = AsnObject::CONSTRUCTED | AsnObject::CONTEXT_SPECIFIC | 2,
-      TRAP            = AsnObject::CONSTRUCTED | AsnObject::CONTEXT_SPECIFIC | 3,
-   };
-
-   enum SnmpType
-   {
-      NULLL,
-      INTEGER32,
-      UNSIGNED32,
-      TIMETICKS,
-      COUNTER,
-      GAUGE,
-      DISPLAYSTRING,
-   };
-
    struct Variable
    {
 //      SnmpType type;
@@ -70,17 +51,17 @@ namespace Snmp
    {
    public:
       VarBind(int oid[], Variable *data = NULL);
-      VarBind(AsnSequence &seq);
+      VarBind(Asn::Sequence &seq);
       ~VarBind();
 
       bool Extract(Variable *data);
-      AsnObjectId &Oid() { return *_oid; }
+      Asn::ObjectId &Oid() { return *_oid; }
 
-      AsnSequence *GetAsn();
+      Asn::Sequence *GetAsn();
 
    private:
-      AsnObjectId *_oid;
-      AsnObject *_data;
+      Asn::ObjectId *_oid;
+      Asn::Object *_data;
 
       VarBind(const VarBind &rhs);
       VarBind &operator=(const VarBind &rhs);
@@ -93,7 +74,7 @@ namespace Snmp
    {
    public:
       VarBindList() {}
-      VarBindList(AsnSequence &seq);
+      VarBindList(Asn::Sequence &seq);
       VarBindList(int oid[], Variable *data = NULL);
       ~VarBindList();
 
@@ -102,7 +83,7 @@ namespace Snmp
       unsigned int Size() const { return _vblist.size(); }
       VarBind *operator[](unsigned int idx) { return _vblist[idx]; }
 
-      AsnSequence *GetAsn();
+      Asn::Sequence *GetAsn();
 
    private:
       aarray<VarBind *> _vblist;
@@ -119,20 +100,20 @@ namespace Snmp
    public:
       virtual ~Message() {}
 
-      PduType Type() const      { return _type; }
-      astring Community() const { return _community; }
+      Asn::Identifier Type() const { return _type; }
+      astring Community() const    { return _community; }
 
       static Message *Demarshal(unsigned char *&buffer, int &buflen);
       bool Marshal(unsigned char *&buffer, int &buflen);
 
    protected:
       Message() {}
-      Message(PduType type, const char *community) : 
+      Message(Asn::Identifier type, const char *community) : 
          _type(type), _community(community) {}
       static const int SNMP_VERSION_1 = 0;
-      virtual AsnSequence *GetAsn() = 0;
+      virtual Asn::Sequence *GetAsn() = 0;
 
-      PduType _type;
+      Asn::Identifier _type;
       astring _community;
    };
 
@@ -142,7 +123,7 @@ namespace Snmp
    class VbListMessage: public Message
    {
    public:
-      VbListMessage(PduType type, const char *community, int reqid, 
+      VbListMessage(Asn::Identifier type, const char *community, int reqid, 
                     int oid[] = NULL, Variable *data = NULL);
       virtual ~VbListMessage() { delete _vblist; }
 
@@ -155,11 +136,11 @@ namespace Snmp
       VarBind &operator[](unsigned int idx) { return *((*_vblist)[idx]); }
 
       static VbListMessage *CreateFromSequence(
-         PduType type, const char *community, AsnSequence &seq);
+         Asn::Identifier type, const char *community, Asn::Sequence &seq);
 
    protected:
-      VbListMessage(PduType type, const char *community, AsnSequence &seq);
-      virtual AsnSequence *GetAsn();
+      VbListMessage(Asn::Identifier type, const char *community, Asn::Sequence &seq);
+      virtual Asn::Sequence *GetAsn();
 
       int _reqid;
       int _errstatus;

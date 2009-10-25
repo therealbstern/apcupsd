@@ -28,225 +28,243 @@
 #include "astring.h"
 #include "alist.h"
 
-class AsnInteger;
-class AsnObjectId;
-class AsnOctetString;
-class AsnSequence;
-
-// *****************************************************************************
-// AsnObject
-// *****************************************************************************
-class AsnObject
+namespace Asn
 {
-public:
-
-   typedef unsigned char AsnIdentifier;
-
    // Class field
-   static const unsigned char CLASS            = 0xC0;
-   static const unsigned char UNIVERSAL        = 0x00;
-   static const unsigned char APPLICATION      = 0x40;
-   static const unsigned char CONTEXT_SPECIFIC = 0x80;
-   static const unsigned char PRIVATE          = 0xC0;
+   static const unsigned char CLASS           = 0xC0;
+   static const unsigned char UNIVERSAL       = 0x00;
+   static const unsigned char APPLICATION     = 0x40;
+   static const unsigned char CONTEXT         = 0x80;
+   static const unsigned char PRIVATE         = 0xC0;
 
    // Primitive/Constructed field
-   static const unsigned char CONSTRUCTED      = 0x20;
-   static const unsigned char PRIMITIVE        = 0x00;
+   static const unsigned char CONSTRUCTED     = 0x20;
+   static const unsigned char PRIMITIVE       = 0x00;
 
    // Tag field
-   static const unsigned char TAG              = 0x1f;
-   static const unsigned char INTEGER          = 0x02;   // ASN
-   static const unsigned char BITSTRING        = 0x03;   // ASN
-   static const unsigned char OCTETSTRING      = 0x04;   // ASN
-   static const unsigned char NULLL            = 0x05;   // ASN
-   static const unsigned char OBJECTID         = 0x06;   // ASN
-   static const unsigned char SEQUENCE         = 0x10;   // ASN
-   static const unsigned char SET              = 0x11;   // ASN
-   static const unsigned char IPADDRESS        = 0x00;   // SNMP (application)
-   static const unsigned char COUNTER          = 0x01;   // SNMP (application)
-   static const unsigned char GAUGE            = 0x02;   // SNMP (application)
-   static const unsigned char TIMETICKS        = 0x03;   // SNMP (application)
+   static const unsigned char TAG             = 0x1f;
 
-   AsnObject(AsnIdentifier type): _type(type) {}
-   virtual ~AsnObject() {}
+   // Built-in types from ASN.1
+   typedef unsigned char Identifier;
+   static const Identifier INTEGER         = UNIVERSAL | PRIMITIVE   | 0x02;
+   static const Identifier BITSTRING       = UNIVERSAL | PRIMITIVE   | 0x03;
+   static const Identifier OCTETSTRING     = UNIVERSAL | PRIMITIVE   | 0x04;
+   static const Identifier NULLL           = UNIVERSAL | PRIMITIVE   | 0x05;
+   static const Identifier OBJECTID        = UNIVERSAL | PRIMITIVE   | 0x06;
+   static const Identifier SEQUENCE        = UNIVERSAL | CONSTRUCTED | 0x10;
 
-   AsnIdentifier Type() const { return _type; }
+   // SNMP-specific types
+   static const Identifier IPADDRESS       = APPLICATION | PRIMITIVE | 0x00;
+   static const Identifier COUNTER         = APPLICATION | PRIMITIVE | 0x01;
+   static const Identifier GAUGE           = APPLICATION | PRIMITIVE | 0x02;
+   static const Identifier TIMETICKS       = APPLICATION | PRIMITIVE | 0x03;
+   static const Identifier GET_REQ_PDU     = CONTEXT | CONSTRUCTED | 0x00;
+   static const Identifier GETNEXT_REQ_PDU = CONTEXT | CONSTRUCTED | 0x01;
+   static const Identifier GET_RSP_PDU     = CONTEXT | CONSTRUCTED | 0x02;
+   static const Identifier TRAP_PDU        = CONTEXT | CONSTRUCTED | 0x03;
 
-   static AsnObject *Demarshal(unsigned char *&buffer, int &buflen);
-   virtual bool Marshal(unsigned char *&buffer, int &buflen) const = 0;
+   // **************************************************************************
+   // Forward declarations
+   // **************************************************************************
+   class Integer;
+   class ObjectId;
+   class OctetString;
+   class Sequence;
 
-   virtual AsnObject *copy() const = 0;
+   // **************************************************************************
+   // Object
+   // **************************************************************************
+   class Object
+   {
+   public:
 
-   AsnInteger *AsInteger()         { return (AsnInteger*)this;     }
-   AsnObjectId *AsObjectId()       { return (AsnObjectId*)this;    }
-   AsnOctetString *AsOctetString() { return (AsnOctetString*)this; }
-   AsnSequence *AsSequence()       { return (AsnSequence*)this;    }
+      Object(Identifier type): _type(type) {}
+      virtual ~Object() {}
 
-   bool IsPrimitive()   { return (_type & CONSTRUCTED) == PRIMITIVE; }
-   bool IsInteger()     { return IsPrimitive() && (_type & TAG) == INTEGER; }
-   bool IsObjectId()    { return IsPrimitive() && (_type & TAG) == OBJECTID; }
-   bool IsOctetString() { return IsPrimitive() && (_type & TAG) == OCTETSTRING; }
-   bool IsSequence()    { return !IsPrimitive(); }
+      Identifier Type() const { return _type; }
 
-protected:
+      static Object *Demarshal(unsigned char *&buffer, int &buflen);
+      virtual bool Marshal(unsigned char *&buffer, int &buflen) const = 0;
 
-   virtual bool demarshal(unsigned char *&buffer, int &buflen) = 0;
-   bool marshalType(unsigned char *&buffer, int &buflen) const;
-   bool marshalLength(unsigned int len, unsigned char *&buffer, int &buflen) const;
-   bool demarshalLength(unsigned char *&buffer, int &buflen, int &vallen);
+      virtual Object *copy() const = 0;
 
-   AsnIdentifier _type;
+      Integer *AsInteger()         { return (Integer*)this;     }
+      ObjectId *AsObjectId()       { return (ObjectId*)this;    }
+      OctetString *AsOctetString() { return (OctetString*)this; }
+      Sequence *AsSequence()       { return (Sequence*)this;    }
+
+      virtual bool IsInteger()     { return false; }
+      virtual bool IsObjectId()    { return false; }
+      virtual bool IsOctetString() { return false; }
+      virtual bool IsSequence()    { return false; }
+
+   protected:
+
+      virtual bool demarshal(unsigned char *&buffer, int &buflen) = 0;
+      bool marshalType(unsigned char *&buffer, int &buflen) const;
+      bool marshalLength(unsigned int len, unsigned char *&buffer, int &buflen) const;
+      bool demarshalLength(unsigned char *&buffer, int &buflen, int &vallen);
+
+      Identifier _type;
+   };
+
+   // **************************************************************************
+   // Integer
+   // **************************************************************************
+   class Integer: public Object
+   {
+   public:
+
+      Integer(Identifier id = INTEGER) : 
+         Object(id), _value(0), _signed(false) {}
+
+      Integer(int value) : 
+         Object(INTEGER), _value(value), _signed(value < 0) {}
+
+      virtual ~Integer() {}
+
+      unsigned int UintValue() const { return _value; }
+      int IntValue() const { return (int)_value; }
+
+      Integer &operator=(int value)
+         { _value = value; _signed = value < 0; return *this; }
+      Integer &operator=(unsigned int value)
+         { _value = value; _signed = false; return *this; }
+
+      virtual Object *copy() const { return new Integer(*this); }
+
+      virtual bool Marshal(unsigned char *&buffer, int &buflen) const;
+
+      virtual bool IsInteger() { return true; }
+
+   protected:
+
+      virtual bool demarshal(unsigned char *&buffer, int &buflen);
+
+      unsigned int _value;
+      bool _signed;
+   };
+
+   // **************************************************************************
+   // OctetString
+   // **************************************************************************
+   class OctetString: public Object
+   {
+   public:
+
+      OctetString() : Object(OCTETSTRING), _data(NULL), _len(0) {}
+      OctetString(const char *value);
+      OctetString(const unsigned char *value, unsigned int len);
+      virtual ~OctetString() { delete [] _data; }
+
+      OctetString(const OctetString &rhs);
+      OctetString &operator=(const OctetString &rhs);
+      virtual Object *copy() const { return new OctetString(*this); }
+
+      const unsigned char *Value() const { return _data; }
+      const unsigned int Length() const  { return _len; }
+
+      operator const char *() const { return (const char *)_data; }
+
+      virtual bool Marshal(unsigned char *&buffer, int &buflen) const;
+
+      virtual bool IsOctetString() { return true; }
+
+   protected:
+
+      virtual bool demarshal(unsigned char *&buffer, int &buflen);
+
+      void assign(const unsigned char *data, unsigned int len);
+
+      unsigned char *_data;
+      unsigned int _len;
+   };
+
+   // **************************************************************************
+   // ObjectId
+   // **************************************************************************
+   class ObjectId: public Object
+   {
+   public:
+
+      ObjectId() : Object(OBJECTID), _value(NULL), _count(0) {}
+      ObjectId(const int oid[]);
+      virtual ~ObjectId() { delete [] _value; }
+
+      ObjectId(const ObjectId &rhs);
+      ObjectId &operator=(const ObjectId &rhs);
+      ObjectId &operator=(const int oid[]);
+      virtual Object *copy() const { return new ObjectId(*this); }
+
+      bool operator==(const ObjectId &rhs) const;
+      bool operator==(const int oid[]) const;
+      bool operator!=(const ObjectId &rhs) const { return !(*this == rhs); }
+      bool operator!=(const int oid[]) const        { return !(*this == oid); }
+
+      virtual bool Marshal(unsigned char *&buffer, int &buflen) const;
+
+      virtual bool IsObjectId() { return true; }
+
+   protected:
+
+      virtual bool demarshal(unsigned char *&buffer, int &buflen);
+      int numbits(unsigned int num) const;
+      void assign(const int oid[]);
+      void assign(const int oid[], unsigned int count);
+
+      int *_value;
+      unsigned int _count;
+   };
+
+   // **************************************************************************
+   // Null
+   // **************************************************************************
+   class Null: public Object
+   {
+   public:
+
+      Null() : Object(NULLL) {}
+      virtual ~Null() {}
+
+      virtual Object *copy() const { return new Null(*this); }
+
+      virtual bool Marshal(unsigned char *&buffer, int &buflen) const;
+
+   protected:
+
+      virtual bool demarshal(unsigned char *&buffer, int &buflen);
+   };
+
+   // **************************************************************************
+   // Sequence
+   // **************************************************************************
+   class Sequence: public Object
+   {
+   public:
+
+      Sequence(Identifier type = SEQUENCE);
+      virtual ~Sequence();
+
+      Sequence(const Sequence &rhs);
+      Sequence &operator=(const Sequence &rhs);
+      virtual Object *copy() const { return new Sequence(*this); }
+
+      unsigned int Size() { return _size; }
+      Object *operator[](unsigned int idx);
+      void Append(Object *obj);
+
+      virtual bool Marshal(unsigned char *&buffer, int &buflen) const;
+
+      virtual bool IsSequence() { return true; }
+
+   protected:
+
+      virtual bool demarshal(unsigned char *&buffer, int &buflen);
+      void assign(const Sequence &rhs);
+      void clear();
+
+      Object **_data;
+      unsigned int _size;
+   };
 };
-
-// *****************************************************************************
-// AsnInteger
-// *****************************************************************************
-class AsnInteger: public AsnObject
-{
-public:
-
-   AsnInteger() : 
-      AsnObject(INTEGER), _value(0), _signed(false)         {}
-   AsnInteger(unsigned int value) :
-      AsnObject(INTEGER), _value(value), _signed(false)     {}
-   AsnInteger(int value) :
-      AsnObject(INTEGER), _value(value), _signed(value < 0) {}
-   virtual ~AsnInteger() {}
-
-   unsigned int UintValue() const { return _value; }
-   int IntValue() const { return (int)_value; }
-
-   AsnInteger &operator=(int value)
-      { _value = value; _signed = value < 0; return *this; }
-   AsnInteger &operator=(unsigned int value)
-      { _value = value; _signed = false; return *this; }
-
-   virtual AsnObject *copy() const { return new AsnInteger(*this); }
-
-   virtual bool Marshal(unsigned char *&buffer, int &buflen) const;
-
-protected:
-
-   virtual bool demarshal(unsigned char *&buffer, int &buflen);
-
-   unsigned int _value;
-   bool _signed;
-};
-
-// *****************************************************************************
-// AsnOctetString
-// *****************************************************************************
-class AsnOctetString: public AsnObject
-{
-public:
-
-   AsnOctetString() : AsnObject(OCTETSTRING), _data(NULL), _len(0) {}
-   AsnOctetString(const char *value);
-   AsnOctetString(const unsigned char *value, unsigned int len);
-   virtual ~AsnOctetString() { delete [] _data; }
-
-   AsnOctetString(const AsnOctetString &rhs);
-   AsnOctetString &operator=(const AsnOctetString &rhs);
-   virtual AsnObject *copy() const { return new AsnOctetString(*this); }
-
-   const unsigned char *Value() const { return _data; }
-   const unsigned int Length() const  { return _len; }
-
-   operator const char *() const { return (const char *)_data; }
-
-   virtual bool Marshal(unsigned char *&buffer, int &buflen) const;
-
-protected:
-
-   virtual bool demarshal(unsigned char *&buffer, int &buflen);
-
-   void assign(const unsigned char *data, unsigned int len);
-
-   unsigned char *_data;
-   unsigned int _len;
-};
-
-// *****************************************************************************
-// AsnObjectId
-// *****************************************************************************
-class AsnObjectId: public AsnObject
-{
-public:
-
-   AsnObjectId() : AsnObject(OBJECTID), _value(NULL), _count(0) {}
-   AsnObjectId(const int oid[]);
-   virtual ~AsnObjectId() { delete [] _value; }
-
-   AsnObjectId(const AsnObjectId &rhs);
-   AsnObjectId &operator=(const AsnObjectId &rhs);
-   AsnObjectId &operator=(const int oid[]);
-   virtual AsnObject *copy() const { return new AsnObjectId(*this); }
-
-   bool operator==(const AsnObjectId &rhs) const;
-   bool operator==(const int oid[]) const;
-   bool operator!=(const AsnObjectId &rhs) const { return !(*this == rhs); }
-   bool operator!=(const int oid[]) const        { return !(*this == oid); }
-
-   virtual bool Marshal(unsigned char *&buffer, int &buflen) const;
-
-protected:
-
-   virtual bool demarshal(unsigned char *&buffer, int &buflen);
-   int numbits(unsigned int num) const;
-   void assign(const int oid[]);
-   void assign(const int oid[], unsigned int count);
-
-   int *_value;
-   unsigned int _count;
-};
-
-// *****************************************************************************
-// AsnNull
-// *****************************************************************************
-class AsnNull: public AsnObject
-{
-public:
-
-   AsnNull() : AsnObject(NULLL) {}
-   virtual ~AsnNull() {}
-
-   virtual AsnObject *copy() const { return new AsnNull(*this); }
-
-   virtual bool Marshal(unsigned char *&buffer, int &buflen) const;
-
-protected:
-
-   virtual bool demarshal(unsigned char *&buffer, int &buflen);
-};
-
-// *****************************************************************************
-// AsnSequence
-// *****************************************************************************
-class AsnSequence: public AsnObject
-{
-public:
-
-   AsnSequence(AsnIdentifier type = CONSTRUCTED|SEQUENCE);
-   virtual ~AsnSequence();
-
-   AsnSequence(const AsnSequence &rhs);
-   AsnSequence &operator=(const AsnSequence &rhs);
-   virtual AsnObject *copy() const { return new AsnSequence(*this); }
-
-   unsigned int Size() { return _size; }
-   AsnObject *operator[](unsigned int idx);
-   void Append(AsnObject *obj);
-
-   virtual bool Marshal(unsigned char *&buffer, int &buflen) const;
-
-protected:
-
-   virtual bool demarshal(unsigned char *&buffer, int &buflen);
-   void assign(const AsnSequence &rhs);
-   void clear();
-
-   AsnObject **_data;
-   unsigned int _size;
-};
-
 #endif
