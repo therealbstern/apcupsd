@@ -35,6 +35,8 @@ struct snmplite_ups_internal_data
    unsigned short port;                /* Remote port, usually 161 */
    char *community;                    /* Community name */
    Snmp::SnmpEngine *snmp;
+   int error_count;
+   time_t commlost_time;
 };
 
 int snmplite_ups_open(UPSINFO *ups)
@@ -157,7 +159,8 @@ int snmplite_ups_get_capabilities(UPSINFO *ups)
 
    write_unlock(ups);
 
-   return 1;
+   // Succeed if we found CI_STATUS
+   return ups->UPS_Cap[CI_STATUS];
 }
 
 int snmplite_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
@@ -538,10 +541,7 @@ static int snmplite_ups_update_cis(UPSINFO *ups, bool dynamic)
 
    // Issue the query, bail if it fails
    if (!sid->snmp->Get(oids))
-   {
-      write_unlock(ups);
       return 0;
-   }
 
    // Walk the OID map again to correlate results with CIs.
    // Invoke the update function to set the values.
@@ -561,10 +561,57 @@ static int snmplite_ups_update_cis(UPSINFO *ups, bool dynamic)
 
 int snmplite_ups_read_volatile_data(UPSINFO *ups)
 {
+   struct snmplite_ups_internal_data *sid =
+      (struct snmplite_ups_internal_data *)ups->driver_internal_data;
+
    write_lock(ups);
+
    int ret = snmplite_ups_update_cis(ups, true);
+
+   time_t now = time(NULL);
    if (ret)
-      ups->poll_time = time(NULL);    /* save time stamp */
+   {
+      // Successful query
+      sid->error_count = 0;
+      ups->poll_time = now;    /* save time stamp */
+
+      // If we were commlost, we're not any more
+      if (ups->is_commlost())
+      {
+         ups->clear_commlost();
+         generate_event(ups, CMDCOMMOK);
+      }
+   }
+   else
+   {
+      // Query failed. Close and reopen SNMP to help recover.
+      sid->snmp->Close();
+      sid->snmp->Open(sid->host, sid->port, sid->community);
+
+      if (ups->is_commlost())
+      {
+         // We already know we're commlost.
+         // Log an event every 10 minutes.
+         if ((now - sid->commlost_time) >= 10*60)
+         {
+            sid->commlost_time = now;
+            log_event(ups, event_msg[CMDCOMMFAILURE].level,
+               event_msg[CMDCOMMFAILURE].msg);            
+         }
+      }
+      else
+      {
+         // Check to see if we've hit enough errors to declare commlost.
+         // If we have, set commlost flag and log an event.
+         if (++sid->error_count >= 3)
+         {
+            sid->commlost_time = now;
+            ups->set_commlost();
+            generate_event(ups, CMDCOMMFAILURE);
+         }
+      }
+   }
+
    write_unlock(ups);
    return ret;
 }
