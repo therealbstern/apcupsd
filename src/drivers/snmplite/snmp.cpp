@@ -22,18 +22,9 @@
  * MA 02111-1307, USA.
  */
 
+#include "apc.h"
 #include "snmp.h"
 #include "asn.h"
-
-#include <errno.h>
-#include <netdb.h>
-#include <stdio.h>
-#include <unistd.h>
-#include <arpa/inet.h>
-#include <sys/socket.h>
-#include <sys/time.h>
-#include <sys/types.h>
-#include <sys/ioctl.h>
 
 #ifdef __WIN32__
 #define close(x) closesocket(x)
@@ -190,7 +181,7 @@ bool SnmpEngine::issue(Message *msg)
 
    // Send data to destination
    int datalen = buffer - data;
-   int rc = sendto(_socket, data, datalen, 0, 
+   int rc = sendto(_socket, (char*)data, datalen, 0, 
                    (struct sockaddr*)&_destaddr, sizeof(_destaddr));
    if (rc != datalen)
    {
@@ -254,7 +245,7 @@ Message *SnmpEngine::rspwait(unsigned int msec)
 
       // Read datagram
       socklen_t fromlen = sizeof(fromaddr);
-      rc = recvfrom(_socket, data, sizeof(data), 0, 
+      rc = recvfrom(_socket, (char*)data, sizeof(data), 0, 
                     (struct sockaddr*)&fromaddr, &fromlen);
       if (rc == -1)
       {
