@@ -53,7 +53,8 @@ HAVES = \
 	-DHAVE_USB_DRIVER \
 	-DHAVE_SNMP_DRIVER \
 	-DHAVE_NET_SNMP \
-	-DHAVE_PCNET_DRIVER
+	-DHAVE_PCNET_DRIVER \
+	-DHAVE_SNMPLITE_DRIVER
 
 DEFINES = \
 	-DWIN32 \
@@ -333,6 +334,27 @@ $(OBJDIR)/snmp.o: ../drivers/snmp/snmp.c
 
 ######################################################################
 
+# Files in src/drivers/snmp
+OBJS_SNMPLITEDRV = \
+	$(OBJDIR)/snmplite.o \
+	$(OBJDIR)/mib.o \
+	$(OBJDIR)/asn.o  \
+	$(OBJDIR)/snmpeng.o
+
+$(OBJDIR)/snmplite.o: ../drivers/snmplite/snmplite.cpp
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/mib.o: ../drivers/snmplite/mib.cpp
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/asn.o: ../drivers/snmplite/asn.cpp
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/snmpeng.o: ../drivers/snmplite/snmp.cpp
+	$(CXX) -c $< -o $@
+
+######################################################################
+
 # Files in src
 OBJS_SRC = \
 	$(OBJDIR)/action.o \
@@ -532,14 +554,14 @@ $(OBJDIR)/upsimage.o: ../cgi/upsimage.c
 
 APC_OBJS = $(OBJS_SRC) $(LIB_OBJS) $(OBJS_COMPAT) $(OBJS_WIN) \
 	   $(OBJS_DRIVERS) $(OBJS_TESTDRV) $(OBJS_NETDRV) \
-	   $(OBJS_SMARTDRV) $(OBJS_DUMBDRV) $(OBJS_USBDRV) \
+	   $(OBJS_SMARTDRV) $(OBJS_DUMBDRV) $(OBJS_USBDRV) $(OBJS_SNMPLITEDRV) \
 	   $(OBJS_SNMPDRV) $(OBJS_PCNETDRV) $(OBJS_APCUPSD)
 APC_LIBS = $(LIB_PTHREADS) $(LIB_LIBUSB) $(LIB_NETSNMP) \
 	-L$(LIB_MINGW) -luser32 -lgdi32 -lwsock32 -lnetapi32
 
 TEST_OBJS = $(OBJS_SRC) $(LIB_OBJS) $(OBJS_COMPAT) \
 	   $(OBJS_DRIVERS) $(OBJS_TESTDRV) $(OBJS_NETDRV) \
-	   $(OBJS_SMARTDRV) $(OBJS_DUMBDRV) $(OBJS_USBDRV) \
+	   $(OBJS_SMARTDRV) $(OBJS_DUMBDRV) $(OBJS_USBDRV) $(OBJS_SNMPLITEDRV) \
 	   $(OBJS_SNMPDRV) $(OBJS_PCNETDRV) $(OBJS_APCTEST)
 TEST_LIBS = $(LIB_PTHREADS) $(LIB_LIBUSB) $(LIB_NETSNMP) \
    -L$(LIB_MINGW) -luser32 -lwsock32 -lnetapi32
