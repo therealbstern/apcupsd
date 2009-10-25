@@ -128,8 +128,6 @@ bool snmplite_ups_check_ci(int ci, Snmp::Variable &data)
    // to always send zeros.
    switch (ci)
    {
-   case CI_HUMID:
-   case CI_ATEMP:
    case CI_NOMBATTV:
       return data.u32 != 0;
    }
