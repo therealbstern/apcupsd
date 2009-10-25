@@ -431,10 +431,10 @@ int output_status(UPSINFO *ups, int sockfd,
          s_write(ups, "NOMPOWER : %d Watts\n", ups->NomPower);
 
       if (ups->UPS_Cap[CI_HUMID])
-         s_write(ups, "HUMIDITY : %5.1f\n", ups->humidity);
+         s_write(ups, "HUMIDITY : %5.1f Percent\n", ups->humidity);
 
       if (ups->UPS_Cap[CI_ATEMP])
-         s_write(ups, "AMBTEMP  : %5.1f\n", ups->ambtemp);
+         s_write(ups, "AMBTEMP  : %5.1f C\n", ups->ambtemp);
 
       if (ups->UPS_Cap[CI_EXTBATTS])
          s_write(ups, "EXTBATTS : %d\n", ups->extbatts);
