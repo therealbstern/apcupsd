@@ -337,14 +337,70 @@ static void snmplite_ups_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       break;
 
    case CI_STATUS:
-      Dmsg1(80, "Got CI_STATUS: %s\n", data.str.str());
-      (data.str[1] == '1') ? ups->clear_online()    : ups->set_online();
-      (data.str[2] == '1') ? ups->set_battlow()     : ups->clear_battlow();
-      (data.str[4] == '1') ? ups->set_replacebatt() : ups->clear_replacebatt();
-      (data.str[6] == '1') ? ups->set_boost()       : ups->clear_boost();
-      (data.str[7] == '1') ? ups->set_trim()        : ups->clear_trim();
-      (data.str[8] == '1') ? ups->set_overload()    : ups->clear_overload();
-      (data.str[9] == '1') ? ups->set_calibration() : ups->clear_calibration();
+      Dmsg1(80, "Got CI_STATUS: %d\n", data.u32);
+      /* Clear the following flags: only one status will be TRUE */
+      ups->clear_online();
+      ups->clear_onbatt();
+      ups->clear_boost();
+      ups->clear_trim();
+      switch (data.u32) {
+      case 2:
+         ups->set_online();
+         break;
+      case 3:
+         ups->set_onbatt();
+         break;
+      case 4:
+         ups->set_online();
+         ups->set_boost();
+         break;
+      case 12:
+         ups->set_online();
+         ups->set_trim();
+         break;
+      case 1:                     /* unknown */
+      case 5:                     /* timed sleeping */
+      case 6:                     /* software bypass */
+      case 7:                     /* UPS off */
+      case 8:                     /* UPS rebooting */
+      case 9:                     /* switched bypass */
+      case 10:                    /* hardware failure bypass */
+      case 11:                    /* sleeping until power returns */
+      default:                    /* unknown */
+         break;
+      }
+      break;
+
+   case CI_NeedReplacement:
+      Dmsg1(80, "Got CI_NeedReplacement: %d\n", data.u32);
+      if (data.u32 == 2)
+         ups->set_replacebatt();
+      else
+         ups->clear_replacebatt();
+      break;
+
+   case CI_LowBattery:
+      Dmsg1(80, "Got CI_LowBattery: %d\n", data.u32);
+      if (data.u32 == 3)
+         ups->set_battlow();
+      else
+         ups->clear_battlow();
+      break;
+
+   case CI_Calibration:
+      Dmsg1(80, "Got CI_Calibration: %d\n", data.u32);
+      if (data.u32 == 3)
+         ups->set_calibration();
+      else
+         ups->clear_calibration();
+      break;
+
+   case CI_Overload:
+      Dmsg1(80, "Got CI_Overload: %c\n", data.str[8]);
+      if (data.str[8] == '1')
+         ups->set_overload();
+      else
+         ups->clear_overload();
       break;
 
    case CI_DSHUTD:
