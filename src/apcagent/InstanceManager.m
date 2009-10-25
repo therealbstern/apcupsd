@@ -68,11 +68,6 @@
    return i;
 }
 
--(BOOL)isStartAtLogin
-{
-   return [self loginItemIndex] != -1;
-}
-
 - (void) instantiateMonitor:(InstanceConfig*)config
 {
    // Instantiate the NIB for this monitor
@@ -194,6 +189,11 @@
 
    // Terminate the app
    [[NSApplication sharedApplication] terminate:self];
+}
+
+-(BOOL)isStartAtLogin
+{
+   return [self loginItemIndex] != -1;
 }
 
 -(IBAction)startAtLogin:(id)sender
