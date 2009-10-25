@@ -112,7 +112,9 @@ bool Object::marshalLength(unsigned int len, unsigned char *&buffer, int &buflen
       return false;
    buflen -= 5;
 
-   // We always use long form with 4 bytes for simplicity
+   // We always use long form with 4 bytes for simplicity. This allows a
+   // Sequence to leave space in the marshaling buffer and then come back
+   // and fill in the length after the content has been marshalled.
    *buffer++ = 0x84;
    *buffer++ = (len >> 24) & 0xff;
    *buffer++ = (len >> 16) & 0xff;
