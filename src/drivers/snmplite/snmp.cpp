@@ -147,7 +147,7 @@ bool SnmpEngine::Get(alist<OidVar> &oids)
       return false;
 
    // Wait for a response
-   VbListMessage *rsp = (VbListMessage*)rspwait(10000);
+   VbListMessage *rsp = (VbListMessage*)rspwait(1000);
    if (!rsp)
       return false;
 
@@ -485,25 +485,22 @@ Message *Message::Demarshal(unsigned char *&buffer, int &buflen)
       return NULL;
 
    // Data demarshalled okay. Now walk the object tree to parse the message.
-printf("%s:%d\n", __func__, __LINE__);
+
    // Top-level object should be a sequence of length 3
    Asn::Sequence &seq = *(Asn::Sequence*)obj;
    if (!obj->IsSequence() || seq.Size() != 3)
       goto error;
-printf("%s:%d\n", __func__, __LINE__);
 
    // First item in sequence is an integer specifying SNMP version
    if (!seq[0]->IsInteger() ||
        seq[0]->AsInteger()->IntValue() != SNMP_VERSION_1)
       goto error;
-printf("%s:%d\n", __func__, __LINE__);
 
    // Second item is the community string
    if (!seq[1]->IsOctetString())
       goto error;
    community = *seq[1]->AsOctetString();
 
-printf("%s:%d\n", __func__, __LINE__);
    // Third is another sequence containing the PDU
    type = seq[2]->Type();
    switch (type)
@@ -511,7 +508,6 @@ printf("%s:%d\n", __func__, __LINE__);
    case Asn::GET_REQ_PDU:
    case Asn::GETNEXT_REQ_PDU:
    case Asn::GET_RSP_PDU:
-printf("%s:%d\n", __func__, __LINE__);
       ret = (Message*)VbListMessage::CreateFromSequence(
          type, community, *seq[2]->AsSequence());
       break;
