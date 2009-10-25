@@ -31,18 +31,14 @@
 namespace Asn
 {
    // Class field
-   static const unsigned char CLASS           = 0xC0;
-   static const unsigned char UNIVERSAL       = 0x00;
-   static const unsigned char APPLICATION     = 0x40;
-   static const unsigned char CONTEXT         = 0x80;
-   static const unsigned char PRIVATE         = 0xC0;
+   static const unsigned char UNIVERSAL    = 0x00;
+   static const unsigned char APPLICATION  = 0x40;
+   static const unsigned char CONTEXT      = 0x80;
+   static const unsigned char PRIVATE      = 0xC0;
 
    // Primitive/Constructed field
-   static const unsigned char CONSTRUCTED     = 0x20;
-   static const unsigned char PRIMITIVE       = 0x00;
-
-   // Tag field
-   static const unsigned char TAG             = 0x1f;
+   static const unsigned char CONSTRUCTED  = 0x20;
+   static const unsigned char PRIMITIVE    = 0x00;
 
    // Built-in types from ASN.1
    typedef unsigned char Identifier;
@@ -54,14 +50,14 @@ namespace Asn
    static const Identifier SEQUENCE        = UNIVERSAL | CONSTRUCTED | 0x10;
 
    // SNMP-specific types
-   static const Identifier IPADDRESS       = APPLICATION | PRIMITIVE | 0x00;
-   static const Identifier COUNTER         = APPLICATION | PRIMITIVE | 0x01;
-   static const Identifier GAUGE           = APPLICATION | PRIMITIVE | 0x02;
-   static const Identifier TIMETICKS       = APPLICATION | PRIMITIVE | 0x03;
-   static const Identifier GET_REQ_PDU     = CONTEXT | CONSTRUCTED | 0x00;
-   static const Identifier GETNEXT_REQ_PDU = CONTEXT | CONSTRUCTED | 0x01;
-   static const Identifier GET_RSP_PDU     = CONTEXT | CONSTRUCTED | 0x02;
-   static const Identifier TRAP_PDU        = CONTEXT | CONSTRUCTED | 0x03;
+   static const Identifier IPADDRESS       = APPLICATION | PRIMITIVE   | 0x00;
+   static const Identifier COUNTER         = APPLICATION | PRIMITIVE   | 0x01;
+   static const Identifier GAUGE           = APPLICATION | PRIMITIVE   | 0x02;
+   static const Identifier TIMETICKS       = APPLICATION | PRIMITIVE   | 0x03;
+   static const Identifier GET_REQ_PDU     = CONTEXT     | CONSTRUCTED | 0x00;
+   static const Identifier GETNEXT_REQ_PDU = CONTEXT     | CONSTRUCTED | 0x01;
+   static const Identifier GET_RSP_PDU     = CONTEXT     | CONSTRUCTED | 0x02;
+   static const Identifier TRAP_PDU        = CONTEXT     | CONSTRUCTED | 0x03;
 
    // **************************************************************************
    // Forward declarations
@@ -84,9 +80,6 @@ namespace Asn
       Identifier Type() const { return _type; }
 
       static Object *Demarshal(unsigned char *&buffer, int &buflen);
-      virtual bool Marshal(unsigned char *&buffer, int &buflen) const = 0;
-
-      virtual Object *copy() const = 0;
 
       Integer *AsInteger()         { return (Integer*)this;     }
       ObjectId *AsObjectId()       { return (ObjectId*)this;    }
@@ -97,6 +90,9 @@ namespace Asn
       virtual bool IsObjectId()    { return false; }
       virtual bool IsOctetString() { return false; }
       virtual bool IsSequence()    { return false; }
+
+      virtual bool Marshal(unsigned char *&buffer, int &buflen) const = 0;
+      virtual Object *copy() const = 0;
 
    protected:
 
@@ -132,9 +128,7 @@ namespace Asn
          { _value = value; _signed = false; return *this; }
 
       virtual Object *copy() const { return new Integer(*this); }
-
       virtual bool Marshal(unsigned char *&buffer, int &buflen) const;
-
       virtual bool IsInteger() { return true; }
 
    protected:
@@ -159,15 +153,14 @@ namespace Asn
 
       OctetString(const OctetString &rhs);
       OctetString &operator=(const OctetString &rhs);
-      virtual Object *copy() const { return new OctetString(*this); }
 
       const unsigned char *Value() const { return _data; }
       const unsigned int Length() const  { return _len; }
 
       operator const char *() const { return (const char *)_data; }
 
+      virtual Object *copy() const { return new OctetString(*this); }
       virtual bool Marshal(unsigned char *&buffer, int &buflen) const;
-
       virtual bool IsOctetString() { return true; }
 
    protected:
@@ -194,15 +187,14 @@ namespace Asn
       ObjectId(const ObjectId &rhs);
       ObjectId &operator=(const ObjectId &rhs);
       ObjectId &operator=(const int oid[]);
-      virtual Object *copy() const { return new ObjectId(*this); }
 
       bool operator==(const ObjectId &rhs) const;
       bool operator==(const int oid[]) const;
       bool operator!=(const ObjectId &rhs) const { return !(*this == rhs); }
       bool operator!=(const int oid[]) const        { return !(*this == oid); }
 
+      virtual Object *copy() const { return new ObjectId(*this); }
       virtual bool Marshal(unsigned char *&buffer, int &buflen) const;
-
       virtual bool IsObjectId() { return true; }
 
    protected:
@@ -227,7 +219,6 @@ namespace Asn
       virtual ~Null() {}
 
       virtual Object *copy() const { return new Null(*this); }
-
       virtual bool Marshal(unsigned char *&buffer, int &buflen) const;
 
    protected:
@@ -247,14 +238,13 @@ namespace Asn
 
       Sequence(const Sequence &rhs);
       Sequence &operator=(const Sequence &rhs);
-      virtual Object *copy() const { return new Sequence(*this); }
 
       unsigned int Size() { return _size; }
       Object *operator[](unsigned int idx);
       void Append(Object *obj);
 
+      virtual Object *copy() const { return new Sequence(*this); }
       virtual bool Marshal(unsigned char *&buffer, int &buflen) const;
-
       virtual bool IsSequence() { return true; }
 
    protected:
