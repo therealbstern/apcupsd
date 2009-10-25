@@ -236,7 +236,7 @@ bool Integer::demarshal(unsigned char *&buffer, int &buflen)
    if (*buffer & 0x80)
    {
       // Start with all 1s so result will be sign-extended
-      _value = -1;
+      _value = (unsigned int)-1;
       _signed = true;
    }
    else

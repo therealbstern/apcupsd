@@ -25,11 +25,11 @@
 #ifndef __SNMP_H
 #define __SNMP_H
 
+#include "apc.h"
 #include "astring.h"
 #include "aarray.h"
 #include "alist.h"
 #include "asn.h"
-#include <netinet/ip.h> 
 
 namespace Snmp
 {
