@@ -79,7 +79,7 @@ public:
    T& last() { return *_tail; }
 
    bool empty() const { return _size <= 0; }
-   int size() const { return _size; }
+   unsigned int size() const { return _size; }
 
    T& append(const T& elem)
    {
@@ -200,7 +200,7 @@ public:
 private:
 
    node *_head, *_tail;
-   int _size;
+   unsigned int _size;
 };
 
 #endif
