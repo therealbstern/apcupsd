@@ -26,18 +26,20 @@
 #include <stdlib.h>
 #include <stdio.h>
 
+using namespace Asn;
+
 void debug(const char *foo, int indent)
 {
-//   while (indent--)
-//      printf(" ");
-//   printf("%s\n", foo);
+   while (indent--)
+      printf(" ");
+   printf("%s\n", foo);
 }
 
 // *****************************************************************************
-// AsnObject
+// Object
 // *****************************************************************************
 
-AsnObject *AsnObject::Demarshal(unsigned char *&buffer, int &buflen)
+Object *Object::Demarshal(unsigned char *&buffer, int &buflen)
 {
    static int indent = 0;
 
@@ -46,66 +48,48 @@ AsnObject *AsnObject::Demarshal(unsigned char *&buffer, int &buflen)
       return NULL;
 
    // Extract type code from stream
-   AsnIdentifier type = (AsnIdentifier)*buffer++;
+   Identifier type = (Identifier)*buffer++;
    buflen--;
 
    // Create proper object based on type code
-   AsnObject *obj;
+   Object *obj;
 
-   // Assume all construced types are sequences
-   if (type & CONSTRUCTED)
+   switch (type)
    {
+   case INTEGER:
+   case COUNTER:
+   case GAUGE:
+   case TIMETICKS:
+      debug("INTEGER", indent);
+      obj = new Integer(type);
+      break;
+   case OCTETSTRING:
+   case IPADDRESS:
+      debug("OCTETESTRING", indent);
+      obj = new OctetString();
+      break;
+   case OBJECTID:
+      debug("OBJECTID", indent);
+      obj = new ObjectId();
+      break;
+   case NULLL:
+      debug("NULLL", indent);
+      obj = new Null();
+      break;
+   case SEQUENCE:
+   case GET_REQ_PDU:
+   case GETNEXT_REQ_PDU:
+   case GET_RSP_PDU:
+   case TRAP_PDU:
       debug("SEQUENCE", indent);
       indent += 2;
-      obj = new AsnSequence(type);
-   }
-   else if ((type & CLASS) == APPLICATION)
-   {
-      switch (type & TAG)
-      {
-      case COUNTER:
-      case GAUGE:
-      case TIMETICKS:
-         debug("COUNTER/GAUGE/TIMETICKS", indent);
-         obj = new AsnInteger();
-         break;
-      case IPADDRESS:
-         debug("IPADDRESS", indent);
-         obj = new AsnOctetString();
-         break;
-      default:
-         printf("UNKNOWN APPLICATION type=0x%02x\n", type);
-         debug("UNKNOWN", indent);
-         obj = NULL;
-         break;      
-      }
-   }
-   else
-   {
-      switch (type & TAG)
-      {
-      case INTEGER:
-         debug("INTEGER", indent);
-         obj = new AsnInteger();
-         break;
-      case OCTETSTRING:
-         debug("OCTETESTRING", indent);
-         obj = new AsnOctetString();
-         break;
-      case OBJECTID:
-         debug("OBJECTID", indent);
-         obj = new AsnObjectId();
-         break;
-      case NULLL:
-         debug("NULLL", indent);
-         obj = new AsnNull();
-         break;
-      default:
-         printf("UNKNOWN ASN type=0x%02x\n", type);
-         debug("UNKNOWN", indent);
-         obj = NULL;
-         break;
-      }
+      obj = new Sequence(type);
+      break;      
+   default:
+      printf("UNKNOWN ASN type=0x%02x\n", type);
+      debug("UNKNOWN", indent);
+      obj = NULL;
+      break;      
    }
 
    // Have the object demarshal itself from the stream
@@ -121,7 +105,7 @@ AsnObject *AsnObject::Demarshal(unsigned char *&buffer, int &buflen)
    return obj;
 }
 
-bool AsnObject::marshalLength(unsigned int len, unsigned char *&buffer, int &buflen) const
+bool Object::marshalLength(unsigned int len, unsigned char *&buffer, int &buflen) const
 {
    // Bail if not enough space for data
    if (buflen < 5)
@@ -138,7 +122,7 @@ bool AsnObject::marshalLength(unsigned int len, unsigned char *&buffer, int &buf
    return true;
 }
 
-bool AsnObject::marshalType(unsigned char *&buffer, int &buflen) const
+bool Object::marshalType(unsigned char *&buffer, int &buflen) const
 {
    // Fail if not enough room for data
    if (buflen < 1)
@@ -150,7 +134,7 @@ bool AsnObject::marshalType(unsigned char *&buffer, int &buflen) const
    return true;
 }
 
-bool AsnObject::demarshalLength(unsigned char *&buffer, int &buflen, int &vallen)
+bool Object::demarshalLength(unsigned char *&buffer, int &buflen, int &vallen)
 {
    // Must have at least one byte to work with
    if (buflen < 1)
@@ -184,10 +168,10 @@ bool AsnObject::demarshalLength(unsigned char *&buffer, int &buflen, int &vallen
 }
 
 // *****************************************************************************
-// AsnInteger
+// Integer
 // *****************************************************************************
 
-bool AsnInteger::Marshal(unsigned char *&buffer, int &buflen) const
+bool Integer::Marshal(unsigned char *&buffer, int &buflen) const
 {
    // Marshal the type code
    if (!marshalType(buffer, buflen))
@@ -237,7 +221,7 @@ bool AsnInteger::Marshal(unsigned char *&buffer, int &buflen) const
    return true;
 }
 
-bool AsnInteger::demarshal(unsigned char *&buffer, int &buflen)
+bool Integer::demarshal(unsigned char *&buffer, int &buflen)
 {
    // Unmarshal the data length
    int datalen;
@@ -272,38 +256,38 @@ bool AsnInteger::demarshal(unsigned char *&buffer, int &buflen)
 }
 
 // *****************************************************************************
-// AsnOctetString
+// OctetString
 // *****************************************************************************
 
-AsnOctetString::AsnOctetString(const char *value) :
-   AsnObject(OCTETSTRING),
+OctetString::OctetString(const char *value) :
+   Object(OCTETSTRING),
    _data(NULL)
 {
    assign((const unsigned char *)value, strlen(value));
 }
 
-AsnOctetString::AsnOctetString(const unsigned char *value, unsigned int len) :
-   AsnObject(OCTETSTRING),
+OctetString::OctetString(const unsigned char *value, unsigned int len) :
+   Object(OCTETSTRING),
    _data(NULL)
 {
    assign(value, len);
 }
 
-AsnOctetString::AsnOctetString(const AsnOctetString &rhs) :
-   AsnObject(OCTETSTRING),
+OctetString::OctetString(const OctetString &rhs) :
+   Object(OCTETSTRING),
    _data(NULL)
 {
    assign(rhs._data, rhs._len);
 }
 
-AsnOctetString &AsnOctetString::operator=(const AsnOctetString &rhs)
+OctetString &OctetString::operator=(const OctetString &rhs)
 {
    if (&rhs != this)
       assign(rhs._data, rhs._len);
    return *this;
 }
 
-bool AsnOctetString::Marshal(unsigned char *&buffer, int &buflen) const
+bool OctetString::Marshal(unsigned char *&buffer, int &buflen) const
 {
    // Marshal the type code
    if (!marshalType(buffer, buflen))
@@ -325,7 +309,7 @@ bool AsnOctetString::Marshal(unsigned char *&buffer, int &buflen) const
    return true;
 }
 
-bool AsnOctetString::demarshal(unsigned char *&buffer, int &buflen)
+bool OctetString::demarshal(unsigned char *&buffer, int &buflen)
 {
    // Unmarshal the data length
    int datalen;
@@ -343,7 +327,7 @@ bool AsnOctetString::demarshal(unsigned char *&buffer, int &buflen)
    return true;
 }
 
-void AsnOctetString::assign(const unsigned char *data, unsigned int len)
+void OctetString::assign(const unsigned char *data, unsigned int len)
 {
    delete [] _data;
    _data = new unsigned char[len+1];
@@ -353,38 +337,38 @@ void AsnOctetString::assign(const unsigned char *data, unsigned int len)
 }
 
 // *****************************************************************************
-// AsnObjectId
+// ObjectId
 // *****************************************************************************
 
-AsnObjectId::AsnObjectId(const int oid[]) :
-   AsnObject(OBJECTID),
+ObjectId::ObjectId(const int oid[]) :
+   Object(OBJECTID),
    _value(NULL)
 {
    assign(oid);
 }
 
-AsnObjectId::AsnObjectId(const AsnObjectId &rhs) :
-   AsnObject(OBJECTID),
+ObjectId::ObjectId(const ObjectId &rhs) :
+   Object(OBJECTID),
    _value(NULL)
 {
    assign(rhs._value, rhs._count);
 }
 
-AsnObjectId &AsnObjectId::operator=(const AsnObjectId &rhs)
+ObjectId &ObjectId::operator=(const ObjectId &rhs)
 {
    if (&rhs != this)
       assign(rhs._value, _count);
    return *this;
 }
 
-AsnObjectId &AsnObjectId::operator=(const int oid[])
+ObjectId &ObjectId::operator=(const int oid[])
 {
    if (oid != _value)
       assign(oid);
    return *this;
 }
 
-void AsnObjectId::assign(const int oid[])
+void ObjectId::assign(const int oid[])
 {
    unsigned int count = 0;
    while (oid[count] != -1)
@@ -392,7 +376,7 @@ void AsnObjectId::assign(const int oid[])
    assign(oid, count);
 }
 
-void AsnObjectId::assign(const int oid[], unsigned int count)
+void ObjectId::assign(const int oid[], unsigned int count)
 {
    delete [] _value;
    _value = NULL;
@@ -404,7 +388,7 @@ void AsnObjectId::assign(const int oid[], unsigned int count)
    }
 }
 
-bool AsnObjectId::operator==(const AsnObjectId &rhs) const
+bool ObjectId::operator==(const ObjectId &rhs) const
 {
    if (_count != rhs._count)
       return false;
@@ -418,7 +402,7 @@ bool AsnObjectId::operator==(const AsnObjectId &rhs) const
    return true;
 }
 
-bool AsnObjectId::operator==(const int oid[]) const
+bool ObjectId::operator==(const int oid[]) const
 {
    unsigned int i;
    for (i = 0; i < _count && oid[i] != -1; i++)
@@ -430,7 +414,7 @@ bool AsnObjectId::operator==(const int oid[]) const
    return i == _count && oid[i] == -1;
 }
 
-int AsnObjectId::numbits(unsigned int num) const
+int ObjectId::numbits(unsigned int num) const
 {
    if (num == 0)
       return 1;
@@ -444,7 +428,7 @@ int AsnObjectId::numbits(unsigned int num) const
    return log;
 }
 
-bool AsnObjectId::Marshal(unsigned char *&buffer, int &buflen) const
+bool ObjectId::Marshal(unsigned char *&buffer, int &buflen) const
 {
    // Protect from trying to marshal an empty object
    if (!_value || _count < 2)
@@ -500,7 +484,7 @@ bool AsnObjectId::Marshal(unsigned char *&buffer, int &buflen) const
    return true;
 }
 
-bool AsnObjectId::demarshal(unsigned char *&buffer, int &buflen)
+bool ObjectId::demarshal(unsigned char *&buffer, int &buflen)
 {
    // Unmarshal the data length
    int datalen;
@@ -546,10 +530,10 @@ bool AsnObjectId::demarshal(unsigned char *&buffer, int &buflen)
 }
 
 // *****************************************************************************
-// AsnNull
+// Null
 // *****************************************************************************
 
-bool AsnNull::Marshal(unsigned char *&buffer, int &buflen) const
+bool Null::Marshal(unsigned char *&buffer, int &buflen) const
 {
    // Marshal the type code
    if (!marshalType(buffer, buflen))
@@ -562,7 +546,7 @@ bool AsnNull::Marshal(unsigned char *&buffer, int &buflen) const
    return true;
 }
 
-bool AsnNull::demarshal(unsigned char *&buffer, int &buflen)
+bool Null::demarshal(unsigned char *&buffer, int &buflen)
 {
    // Unmarshal the data length
    int datalen;
@@ -570,29 +554,29 @@ bool AsnNull::demarshal(unsigned char *&buffer, int &buflen)
 }
 
 // *****************************************************************************
-// AsnSequence
+// Sequence
 // *****************************************************************************
 
-AsnSequence::AsnSequence(AsnIdentifier type) : 
-   AsnObject(type), 
+Sequence::Sequence(Identifier type) : 
+   Object(type), 
    _data(NULL), 
    _size(0)
 {
 }
 
-AsnSequence::~AsnSequence()
+Sequence::~Sequence()
 {
    clear();
 }
 
-AsnSequence::AsnSequence(const AsnSequence &rhs) :
-   AsnObject(rhs._type),
+Sequence::Sequence(const Sequence &rhs) :
+   Object(rhs._type),
    _data(NULL)
 {
    assign(rhs);
 }
 
-void AsnSequence::clear()
+void Sequence::clear()
 {
    for (unsigned int i = 0; i < _size; i++)
       delete _data[i];
@@ -600,7 +584,7 @@ void AsnSequence::clear()
    _size = 0;
 }
 
-bool AsnSequence::Marshal(unsigned char *&buffer, int &buflen) const
+bool Sequence::Marshal(unsigned char *&buffer, int &buflen) const
 {
    // Marshal the type code
    if (!marshalType(buffer, buflen))
@@ -627,7 +611,7 @@ bool AsnSequence::Marshal(unsigned char *&buffer, int &buflen) const
    return true;
 }
 
-bool AsnSequence::demarshal(unsigned char *&buffer, int &buflen)
+bool Sequence::demarshal(unsigned char *&buffer, int &buflen)
 {
    // Free any existing data
    clear();
@@ -644,7 +628,7 @@ bool AsnSequence::demarshal(unsigned char *&buffer, int &buflen)
    unsigned char *start = buffer;
    while (datalen)
    {
-      AsnObject *obj = AsnObject::Demarshal(buffer, datalen);
+      Object *obj = Object::Demarshal(buffer, datalen);
       if (!obj)
          return false;
       Append(obj);
@@ -654,37 +638,37 @@ bool AsnSequence::demarshal(unsigned char *&buffer, int &buflen)
    return true;
 }
 
-void AsnSequence::Append(AsnObject *obj)
+void Sequence::Append(Object *obj)
 {
    // realloc ... not efficient, but easy
-   AsnObject **tmp = new AsnObject *[_size+1];
+   Object **tmp = new Object *[_size+1];
    memcpy(tmp, _data, _size * sizeof(_data[0]));
    tmp[_size++] = obj;
    delete [] _data;
    _data = tmp;
 }
 
-AsnObject *AsnSequence::operator[](unsigned int idx)
+Object *Sequence::operator[](unsigned int idx)
 {
    if (idx >= _size)
       return NULL;
    return _data[idx];
 }
 
-AsnSequence &AsnSequence::operator=(const AsnSequence &rhs)
+Sequence &Sequence::operator=(const Sequence &rhs)
 {
    if (this != &rhs)
       assign(rhs);
    return *this;
 }
 
-void AsnSequence::assign(const AsnSequence &rhs)
+void Sequence::assign(const Sequence &rhs)
 {
    clear();
 
    _type = rhs._type;
    _size = rhs._size;
-   _data = new AsnObject *[_size];
+   _data = new Object *[_size];
 
    for (unsigned int i = 0; i < _size; i++)
       _data[i] = rhs._data[i]->copy();
