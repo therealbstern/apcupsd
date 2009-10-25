@@ -125,9 +125,11 @@ int snmplite_ups_setup(UPSINFO *ups)
 bool snmplite_ups_check_ci(int ci, Snmp::Variable &data)
 {
    // Sanity check a few values that SNMP UPSes claim to report but seem
-   // to always send zeros.
+   // to always come back as zeros.
    switch (ci)
    {
+   // SmartUPS 1000 is returning 0 for this via SNMP so screen it out
+   // in case this is a common issue.
    case CI_NOMBATTV:
       return data.u32 != 0;
    }
