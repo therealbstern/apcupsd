@@ -174,6 +174,8 @@ enum {
    CI_APCLineFailCause,         
    CI_NOMINV,                   
    CI_NOMPOWER,
+   CI_LowBattery,
+   CI_Calibration,
 
    /* Only seen on the BackUPS Pro USB (so far) */
    CI_BUPBattCapBeforeStartup,  
