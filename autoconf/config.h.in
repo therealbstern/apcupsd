@@ -209,6 +209,9 @@
 /* Set if you want SNMP support */
 #undef HAVE_SNMP_DRIVER
 
+/* Set if you want SNMP Lite support */
+#undef HAVE_SNMPLITE_DRIVER
+
 #undef HAVE_UCD_SNMP
 #undef HAVE_NET_SNMP
 

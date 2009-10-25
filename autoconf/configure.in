@@ -46,6 +46,11 @@ dnl
 PATH=$PATH:/bin:/sbin:/etc:/usr/bin:/usr/bin/X11:/usr/sbin:/usr/local/bin:/usr/local/sbin
 export PATH
 
+
+dnl Interesting things are often in /usr/local
+CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
+LDFLAGS="${LDFLAGS} -L/usr/local/lib64 -L/usr/local/lib"
+
 if test $HAVE_UNAME=yes -a x`uname -s` = xSunOS
 then
 dnl ----------------------------------------
@@ -68,6 +73,10 @@ dnl
    if test x$sbindir = x'${exec_prefix}/sbin' ; then
       sbindir='/etc/opt/apcupsd/sbin'
    fi
+
+   dnl Solaris often has interesting things in /usr/sfw
+   CPPFLAGS="${CPPFLAGS} -I/usr/sfw/include"
+   LDFLAGS="${LDFLAGS} -L/usr/sfw/lib"
 else
 dnl -------------------------------------------
 dnl  non Sun defaults (i.e. all other platforms  
@@ -358,6 +367,7 @@ AC_HELP_STRING([--enable-all], [Enable all optional modules])],
       enable_usb=yes
       enable_net=yes
       enable_snmp=yes
+      enable_snmplite=yes
       enable_test=yes
       enable_pcnet=yes
       enable_cgi=yes
@@ -626,6 +636,16 @@ AC_HELP_STRING([--disable-net], [No network driver for slaves])],
      NET_DRIVER="net"
      AC_SUBST(NET_DRIVER) ])
 
+AC_ARG_ENABLE(snmplite, [
+AC_HELP_STRING([--enable-snmplite], [Compile SNMP-Lite driver])
+AC_HELP_STRING([--disable-snmplite], [No SNMP-Lite driver (default)])],
+   [ if test "$enableval" = "yes" ; then
+        AC_DEFINE(HAVE_SNMPLITE_DRIVER)
+        SNMPLITE_DRIVER="snmplite"
+        AC_SUBST(SNMPLITE_DRIVER)        
+     fi ],
+   [])
+
 WANT_SNMP="no"
 AC_ARG_ENABLE(snmp, [
 AC_HELP_STRING([--enable-snmp], [Compile SNMP UPS code])
@@ -645,11 +665,6 @@ AC_HELP_STRING([--disable-net-snmp], [No NET-SNMP UPS code (default)])],
 
 dnl If we're building SNMP, try to find relevant libs
 if test "$WANT_SNMP" = "yes" ; then
-   dnl Check for optional crypto lib
-   AC_CHECK_LIB(crypto, EVP_DigestInit,
-      [DRVLIBS="$DRVLIBS -lcrypto"],
-      [],
-      [])
 
    WANT_NET_SNMP="yes"
    SNMP_LIB_FOUND="no"
@@ -658,19 +673,16 @@ if test "$WANT_SNMP" = "yes" ; then
    CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
    LDFLAGS="${LDFLAGS} -L/usr/local/lib"
 
+   dnl Optional crypto library, sometimes needed by libnetsnmp
+   AC_CHECK_LIB_STATIC(crypto, EVP_DigestInit, SNMPLIBS, -ldl, [])
+
    dnl Start by looking for libnetsnmp (net-snmp).
-   if test "$SNMP_LIB_FOUND" = "no" ; then
-      AC_CHECK_LIB(netsnmp, snmp_open,
-         [DRVLIBS="$DRVLIBS -lnetsnmp"
-          SNMP_LIB_FOUND="yes"], [], [$DRVLIBS])
-   fi
+   AC_CHECK_LIB_STATIC(netsnmp, snmp_open, SNMPLIBS, [], SNMP_LIB_FOUND="yes")
 
    dnl If no lib yet, fall back on libsnmp (ucd-snmp)
    if test "$SNMP_LIB_FOUND" = "no" ; then
       WANT_NET_SNMP="no"
-      AC_CHECK_LIB(snmp, snmp_open,
-         [DRVLIBS="$DRVLIBS -lsnmp"
-          SNMP_LIB_FOUND="yes"], [], [$DRVLIBS])
+      AC_CHECK_LIB_STATIC(snmp, snmp_open, SNMPLIBS, [], SNMP_LIB_FOUND="yes")
    fi
 
    if test "$SNMP_LIB_FOUND" = "no" ; then
@@ -678,6 +690,7 @@ if test "$WANT_SNMP" = "yes" ; then
    fi
 
    dnl If we get this far, we found a valid lib
+   DRVLIBS="${DRVLIBS} ${SNMPLIBS}"
    AC_DEFINE(HAVE_SNMP_DRIVER)
    if test "$WANT_NET_SNMP" = "yes" ; then
       AC_DEFINE(HAVE_NET_SNMP)
@@ -1405,7 +1418,7 @@ Configuration on `date`:
   UPSTYPE                     ${UPSTYPE}
   UPSCABLE                    ${UPSCABLE}
 
-  drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${DISPLAY_USB_DRIVER:-no-usb} ${DISPLAY_SNMP_DRIVER:-no-snmp} ${PCNET_DRIVER:-no-pcnet} ${TEST_DRIVER:-no-test}
+  drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${DISPLAY_USB_DRIVER:-no-usb} ${DISPLAY_SNMP_DRIVER:-no-snmp} ${SNMPLITE_DRIVER:-no-snmplite} ${PCNET_DRIVER:-no-pcnet} ${TEST_DRIVER:-no-test}
 
   enable-nis:                 ${NISSRV_ENABLED}
   with-nisip:                 ${NISIP}

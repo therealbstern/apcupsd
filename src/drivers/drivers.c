@@ -46,6 +46,10 @@
 # include "snmp/snmp.h"
 #endif
 
+#ifdef HAVE_SNMPLITE_DRIVER
+# include "snmplite/snmplite.h"
+#endif
+
 #ifdef HAVE_TEST_DRIVER
 # include "test/testdriver.h"
 #endif
@@ -129,6 +133,21 @@ static const UPSDRIVER drivers[] = {
      snmp_ups_program_eeprom,
      snmp_ups_entry_point },
 #endif   /* HAVE_SNMP_DRIVER */
+
+#ifdef HAVE_SNMPLITE_DRIVER
+   { "snmplite",
+     snmplite_ups_open,
+     snmplite_ups_setup,
+     snmplite_ups_close,
+     snmplite_ups_kill_power,
+     NULL,
+     snmplite_ups_read_static_data,
+     snmplite_ups_read_volatile_data,
+     snmplite_ups_get_capabilities,
+     snmplite_ups_check_state,
+     snmplite_ups_program_eeprom,
+     snmplite_ups_entry_point },
+#endif   /* HAVE_SNMPLITE_DRIVER */
 
 #ifdef HAVE_TEST_DRIVER
    { "test",
@@ -246,6 +265,10 @@ const UPSDRIVER *attach_driver(UPSINFO *ups)
 
    case SNMP_UPS:
       driver_name = "snmp";
+      break;
+
+   case SNMPLITE_UPS:
+      driver_name = "snmplite";
       break;
 
    case TEST_UPS:

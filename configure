@@ -311,7 +311,7 @@ ac_includes_default="\
 # include <unistd.h>
 #endif"
 
-ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS ABSSRCDIR topdir TOP_DIR VERSION DATE TRUEPRG FALSEPRG build build_cpu build_vendor build_os host host_cpu host_vendor host_os CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT CC CFLAGS ac_ct_CC CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA AWK HAVE_GCC_TRUE HAVE_GCC_FALSE DEBUG DRVLIBS APCDRVLIBS PTHREAD_CFLAGS PTHREAD_LFLAGS APCACCESS SMTP APCTEST SHUTDOWN APCUPSD_MAIL WALL SCRIPTSHELL RANLIB RM CP ECHO LN SED AR MV RST2HTML RST2PDF EGREP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS HALPOLICYDIR GDHEAD APCSMART_DRIVER DUMB_DRIVER LIBUSBHID LIBUSBHIDINC usbcfg LIBUSBH USB_DRIVER USB_TYPE NET_DRIVER SNMP_DRIVER TEST_DRIVER PCNET_DRIVER NISIP PKG_CONFIG ac_pt_PKG_CONFIG GAPCMON_CFLAGS GAPCMON_LIBS GAPCMON APCAGENT POWERFLUTE POWERLIBS MAKE LD CGI GD_LIBS CGIBIN SYSCONFDIR MKINSTALLDIRS EXTRADEFS LIBEXTRAOBJ EXTRAOBJ DISTDIR DISTNAME DISTVER SERIALDEV PIDDIR LOGDIR nologdir PWRFAILDIR LOCKDIR NISPORT UPSTYPE UPSCABLE HOST LIBOBJS LTLIBOBJS'
+ac_subst_vars='SHELL PATH_SEPARATOR PACKAGE_NAME PACKAGE_TARNAME PACKAGE_VERSION PACKAGE_STRING PACKAGE_BUGREPORT exec_prefix prefix program_transform_name bindir sbindir libexecdir datadir sysconfdir sharedstatedir localstatedir libdir includedir oldincludedir infodir mandir build_alias host_alias target_alias DEFS ECHO_C ECHO_N ECHO_T LIBS ABSSRCDIR topdir TOP_DIR VERSION DATE TRUEPRG FALSEPRG build build_cpu build_vendor build_os host host_cpu host_vendor host_os CXX CXXFLAGS LDFLAGS CPPFLAGS ac_ct_CXX EXEEXT OBJEXT CC CFLAGS ac_ct_CC CPP INSTALL_PROGRAM INSTALL_SCRIPT INSTALL_DATA AWK HAVE_GCC_TRUE HAVE_GCC_FALSE DEBUG DRVLIBS APCDRVLIBS PTHREAD_CFLAGS PTHREAD_LFLAGS APCACCESS SMTP APCTEST SHUTDOWN APCUPSD_MAIL WALL SCRIPTSHELL RANLIB RM CP ECHO LN SED AR MV RST2HTML RST2PDF EGREP X_CFLAGS X_PRE_LIBS X_LIBS X_EXTRA_LIBS HALPOLICYDIR GDHEAD APCSMART_DRIVER DUMB_DRIVER LIBUSBHID LIBUSBHIDINC usbcfg LIBUSBH USB_DRIVER USB_TYPE NET_DRIVER SNMPLITE_DRIVER SNMP_DRIVER TEST_DRIVER PCNET_DRIVER NISIP PKG_CONFIG ac_pt_PKG_CONFIG GAPCMON_CFLAGS GAPCMON_LIBS GAPCMON APCAGENT POWERFLUTE POWERLIBS MAKE LD CGI GD_LIBS CGIBIN SYSCONFDIR MKINSTALLDIRS EXTRADEFS LIBEXTRAOBJ EXTRAOBJ DISTDIR DISTNAME DISTVER SERIALDEV PIDDIR LOGDIR nologdir PWRFAILDIR LOCKDIR NISPORT UPSTYPE UPSCABLE HOST LIBOBJS LTLIBOBJS'
 ac_subst_files=''
 
 # Initialize some variables set by options.
@@ -885,6 +885,9 @@ Optional Features:
 
   --enable-net            Compile networking driver for slaves (default)
   --disable-net           No network driver for slaves
+
+  --enable-snmplite       Compile SNMP-Lite driver
+  --disable-snmplite      No SNMP-Lite driver (default)
 
   --enable-snmp           Compile SNMP UPS code
   --disable-snmp          No SNMP UPS code (default)
@@ -1520,6 +1523,10 @@ test -n "$FALSEPRG" || FALSEPRG=":"
 PATH=$PATH:/bin:/sbin:/etc:/usr/bin:/usr/bin/X11:/usr/sbin:/usr/local/bin:/usr/local/sbin
 export PATH
 
+
+CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
+LDFLAGS="${LDFLAGS} -L/usr/local/lib64 -L/usr/local/lib"
+
 if test $HAVE_UNAME=yes -a x`uname -s` = xSunOS
 then
 
@@ -1529,6 +1536,9 @@ then
    if test x$sbindir = x'${exec_prefix}/sbin' ; then
       sbindir='/etc/opt/apcupsd/sbin'
    fi
+
+      CPPFLAGS="${CPPFLAGS} -I/usr/sfw/include"
+   LDFLAGS="${LDFLAGS} -L/usr/sfw/lib"
 else
 
    if test x$sysconfdir = x'${prefix}/etc' ; then
@@ -9536,6 +9546,7 @@ if test "${enable_all+set}" = set; then
       enable_usb=yes
       enable_net=yes
       enable_snmp=yes
+      enable_snmplite=yes
       enable_test=yes
       enable_pcnet=yes
       enable_cgi=yes
@@ -10662,6 +10673,19 @@ _ACEOF
 
 fi;
 
+# Check whether --enable-snmplite or --disable-snmplite was given.
+if test "${enable_snmplite+set}" = set; then
+  enableval="$enable_snmplite"
+   if test "$enableval" = "yes" ; then
+        cat >>confdefs.h <<\_ACEOF
+#define HAVE_SNMPLITE_DRIVER 1
+_ACEOF
+
+        SNMPLITE_DRIVER="snmplite"
+
+     fi
+fi;
+
 WANT_SNMP="no"
 # Check whether --enable-snmp or --disable-snmp was given.
 if test "${enable_snmp+set}" = set; then
@@ -10680,74 +10704,6 @@ if test "${enable_net_snmp+set}" = set; then
 fi;
 
 if test "$WANT_SNMP" = "yes" ; then
-      echo "$as_me:$LINENO: checking for EVP_DigestInit in -lcrypto" >&5
-echo $ECHO_N "checking for EVP_DigestInit in -lcrypto... $ECHO_C" >&6
-if test "${ac_cv_lib_crypto_EVP_DigestInit+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lcrypto  $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char EVP_DigestInit ();
-int
-main ()
-{
-EVP_DigestInit ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  ac_cv_lib_crypto_EVP_DigestInit=yes
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-ac_cv_lib_crypto_EVP_DigestInit=no
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-echo "$as_me:$LINENO: result: $ac_cv_lib_crypto_EVP_DigestInit" >&5
-echo "${ECHO_T}$ac_cv_lib_crypto_EVP_DigestInit" >&6
-if test $ac_cv_lib_crypto_EVP_DigestInit = yes; then
-  DRVLIBS="$DRVLIBS -lcrypto"
-fi
-
 
    WANT_NET_SNMP="yes"
    SNMP_LIB_FOUND="no"
@@ -10755,32 +10711,21 @@ fi
       CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
    LDFLAGS="${LDFLAGS} -L/usr/local/lib"
 
-      if test "$SNMP_LIB_FOUND" = "no" ; then
-      echo "$as_me:$LINENO: checking for snmp_open in -lnetsnmp" >&5
-echo $ECHO_N "checking for snmp_open in -lnetsnmp... $ECHO_C" >&6
-if test "${ac_cv_lib_netsnmp_snmp_open+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lnetsnmp $DRVLIBS $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
+      echo "$as_me:$LINENO: checking for EVP_DigestInit in -lcrypto" >&5
+echo $ECHO_N "checking for EVP_DigestInit in -lcrypto... $ECHO_C" >&6
+    _libs=${LIBS}
+    LIBS="${LIBS} -Wl,-Bstatic -lcrypto -Wl,-Bdynamic -ldl $SNMPLIBS"
+    cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char snmp_open ();
+int EVP_DigestInit(void);
 int
 main ()
 {
-snmp_open ();
+(void)EVP_DigestInit()
   ;
   return 0;
 }
@@ -10807,53 +10752,198 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  ac_cv_lib_netsnmp_snmp_open=yes
+  echo "$as_me:$LINENO: result: yes (static)" >&5
+echo "${ECHO_T}yes (static)" >&6
+        SNMPLIBS="-Wl,-Bstatic -lcrypto -Wl,-Bdynamic -ldl $SNMPLIBS"
+
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-ac_cv_lib_netsnmp_snmp_open=no
+LIBS="-lcrypto -ldl $SNMPLIBS"
+        cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+int EVP_DigestInit(void);
+int
+main ()
+{
+(void)EVP_DigestInit()
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+            SNMPLIBS="-lcrypto -ldl $SNMPLIBS"
+
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+
 fi
 rm -f conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-echo "$as_me:$LINENO: result: $ac_cv_lib_netsnmp_snmp_open" >&5
-echo "${ECHO_T}$ac_cv_lib_netsnmp_snmp_open" >&6
-if test $ac_cv_lib_netsnmp_snmp_open = yes; then
-  DRVLIBS="$DRVLIBS -lnetsnmp"
-          SNMP_LIB_FOUND="yes"
-fi
 
-   fi
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+     LIBS=${_libs}
+
+
+      echo "$as_me:$LINENO: checking for snmp_open in -lnetsnmp" >&5
+echo $ECHO_N "checking for snmp_open in -lnetsnmp... $ECHO_C" >&6
+    _libs=${LIBS}
+    LIBS="${LIBS} -Wl,-Bstatic -lnetsnmp -Wl,-Bdynamic  $SNMPLIBS"
+    cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+int snmp_open(void);
+int
+main ()
+{
+(void)snmp_open()
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  echo "$as_me:$LINENO: result: yes (static)" >&5
+echo "${ECHO_T}yes (static)" >&6
+        SNMPLIBS="-Wl,-Bstatic -lnetsnmp -Wl,-Bdynamic  $SNMPLIBS"
+        SNMP_LIB_FOUND="yes"
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+LIBS="-lnetsnmp  $SNMPLIBS"
+        cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+int snmp_open(void);
+int
+main ()
+{
+(void)snmp_open()
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+            SNMPLIBS="-lnetsnmp  $SNMPLIBS"
+            SNMP_LIB_FOUND="yes"
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+     LIBS=${_libs}
+
 
       if test "$SNMP_LIB_FOUND" = "no" ; then
       WANT_NET_SNMP="no"
       echo "$as_me:$LINENO: checking for snmp_open in -lsnmp" >&5
 echo $ECHO_N "checking for snmp_open in -lsnmp... $ECHO_C" >&6
-if test "${ac_cv_lib_snmp_snmp_open+set}" = set; then
-  echo $ECHO_N "(cached) $ECHO_C" >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lsnmp $DRVLIBS $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
+    _libs=${LIBS}
+    LIBS="${LIBS} -Wl,-Bstatic -lsnmp -Wl,-Bdynamic  $SNMPLIBS"
+    cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-
-/* Override any gcc2 internal prototype to avoid an error.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-/* We use char because int might match the return type of a gcc2
-   builtin and then its argument prototype would still apply.  */
-char snmp_open ();
+int snmp_open(void);
 int
 main ()
 {
-snmp_open ();
+(void)snmp_open()
   ;
   return 0;
 }
@@ -10880,23 +10970,71 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  ac_cv_lib_snmp_snmp_open=yes
+  echo "$as_me:$LINENO: result: yes (static)" >&5
+echo "${ECHO_T}yes (static)" >&6
+        SNMPLIBS="-Wl,-Bstatic -lsnmp -Wl,-Bdynamic  $SNMPLIBS"
+        SNMP_LIB_FOUND="yes"
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-ac_cv_lib_snmp_snmp_open=no
+LIBS="-lsnmp  $SNMPLIBS"
+        cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+int snmp_open(void);
+int
+main ()
+{
+(void)snmp_open()
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  echo "$as_me:$LINENO: result: yes" >&5
+echo "${ECHO_T}yes" >&6
+            SNMPLIBS="-lsnmp  $SNMPLIBS"
+            SNMP_LIB_FOUND="yes"
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+
 fi
 rm -f conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
+
 fi
-echo "$as_me:$LINENO: result: $ac_cv_lib_snmp_snmp_open" >&5
-echo "${ECHO_T}$ac_cv_lib_snmp_snmp_open" >&6
-if test $ac_cv_lib_snmp_snmp_open = yes; then
-  DRVLIBS="$DRVLIBS -lsnmp"
-          SNMP_LIB_FOUND="yes"
-fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+     LIBS=${_libs}
 
    fi
 
@@ -10906,7 +11044,8 @@ echo "$as_me: error: Cannot find SNMP libraries." >&2;}
    { (exit 1); exit 1; }; }
    fi
 
-      cat >>confdefs.h <<\_ACEOF
+      DRVLIBS="${DRVLIBS} ${SNMPLIBS}"
+   cat >>confdefs.h <<\_ACEOF
 #define HAVE_SNMP_DRIVER 1
 _ACEOF
 
@@ -13194,6 +13333,7 @@ s,@LIBUSBH@,$LIBUSBH,;t t
 s,@USB_DRIVER@,$USB_DRIVER,;t t
 s,@USB_TYPE@,$USB_TYPE,;t t
 s,@NET_DRIVER@,$NET_DRIVER,;t t
+s,@SNMPLITE_DRIVER@,$SNMPLITE_DRIVER,;t t
 s,@SNMP_DRIVER@,$SNMP_DRIVER,;t t
 s,@TEST_DRIVER@,$TEST_DRIVER,;t t
 s,@PCNET_DRIVER@,$PCNET_DRIVER,;t t
@@ -13766,7 +13906,7 @@ Configuration on `date`:
   UPSTYPE                     ${UPSTYPE}
   UPSCABLE                    ${UPSCABLE}
 
-  drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${DISPLAY_USB_DRIVER:-no-usb} ${DISPLAY_SNMP_DRIVER:-no-snmp} ${PCNET_DRIVER:-no-pcnet} ${TEST_DRIVER:-no-test}
+  drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${DISPLAY_USB_DRIVER:-no-usb} ${DISPLAY_SNMP_DRIVER:-no-snmp} ${SNMPLITE_DRIVER:-no-snmplite} ${PCNET_DRIVER:-no-pcnet} ${TEST_DRIVER:-no-test}
 
   enable-nis:                 ${NISSRV_ENABLED}
   with-nisip:                 ${NISIP}
