@@ -140,7 +140,7 @@ static const UPSDRIVER drivers[] = {
      snmplite_ups_setup,
      snmplite_ups_close,
      snmplite_ups_kill_power,
-     NULL,
+     snmplite_ups_shutdown,
      snmplite_ups_read_static_data,
      snmplite_ups_read_volatile_data,
      snmplite_ups_get_capabilities,

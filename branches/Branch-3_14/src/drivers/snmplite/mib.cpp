@@ -26,52 +26,60 @@
 #include "snmplite.h"
 #include "oids.h"
 
+using namespace Asn;
+
 struct CiOidMap CiOidMap[] =
 {
-//  CI                  OID                              dynamic?
-   {CI_UPSMODEL,        upsBasicIdentModel,              false},
-   {CI_SERNO,           upsAdvIdentSerialNumber,         false},
-   {CI_IDEN,            upsBasicIdentName,               false},
-   {CI_REVNO,           upsAdvIdentFirmwareRevision,     false},
-   {CI_MANDAT,          upsAdvIdentDateOfManufacture,    false},
-   {CI_BATTDAT,         upsBasicBatteryLastReplaceDate,  false},
-   {CI_NOMBATTV,        upsAdvBatteryNominalVoltage,     false},
-   {CI_NOMOUTV,         upsAdvConfigRatedOutputVoltage,  false},
-   {CI_LTRANS,          upsAdvConfigLowTransferVolt,     false},
-   {CI_HTRANS,          upsAdvConfigHighTransferVolt,    false},
-   {CI_DWAKE,           upsAdvConfigReturnDelay,         false},
-   {CI_DALARM,          upsAdvConfigAlarm,               false},
-   {CI_DLBATT,          upsAdvConfigLowBatteryRunTime,   false},
-   {CI_DSHUTD,          upsAdvConfigShutoffDelay,        false},
-   {CI_RETPCT,          upsAdvConfigMinReturnCapacity,   false},
-   {CI_SENS,            upsAdvConfigSensitivity,         false},
-   {CI_EXTBATTS,        upsAdvBatteryNumOfBattPacks,     false},
-   {CI_STESTI,          upsAdvTestDiagnosticSchedule,    false},
-   {CI_VLINE,           upsAdvInputLineVoltage,          true },
-   {CI_VOUT,            upsAdvOutputVoltage,             true },
-   {CI_VBATT,           upsAdvBatteryActualVoltage,      true },
-   {CI_FREQ,            upsAdvInputFrequency,            true },
-   {CI_LOAD,            upsAdvOutputLoad,                true },
-   {CI_ITEMP,           upsAdvBatteryTemperature,        true },
-   {CI_ATEMP,           mUpsEnvironAmbientTemperature,   true },
-   {CI_HUMID,           mUpsEnvironRelativeHumidity,     true },
-   {CI_ST_STAT,         upsAdvTestDiagnosticsResults,    true },
-   {CI_BATTLEV,         upsAdvBatteryCapacity,           true },
-   {CI_RUNTIM,          upsAdvBatteryRunTimeRemaining,   true },
-   {CI_WHY_BATT,        upsAdvInputLineFailCause,        true },
-   {CI_BADBATTS,        upsAdvBatteryNumOfBadBattPacks,  true },
-   {CI_VMIN,            upsAdvInputMinLineVoltage,       true },
-   {CI_VMAX,            upsAdvInputMaxLineVoltage,       true },
+//  CI                  OID                              type         dynamic?
+   {CI_UPSMODEL,        upsBasicIdentModel,              OCTETSTRING, false},
+   {CI_SERNO,           upsAdvIdentSerialNumber,         OCTETSTRING, false},
+   {CI_IDEN,            upsBasicIdentName,               OCTETSTRING, false},
+   {CI_REVNO,           upsAdvIdentFirmwareRevision,     OCTETSTRING, false},
+   {CI_MANDAT,          upsAdvIdentDateOfManufacture,    OCTETSTRING, false},
+   {CI_BATTDAT,         upsBasicBatteryLastReplaceDate,  OCTETSTRING, false},
+   {CI_NOMBATTV,        upsAdvBatteryNominalVoltage,     INTEGER,     false},
+   {CI_NOMOUTV,         upsAdvConfigRatedOutputVoltage,  INTEGER,     false},
+   {CI_LTRANS,          upsAdvConfigLowTransferVolt,     INTEGER,     false},
+   {CI_HTRANS,          upsAdvConfigHighTransferVolt,    INTEGER,     false},
+   {CI_DWAKE,           upsAdvConfigReturnDelay,         TIMETICKS,   false},
+   {CI_DALARM,          upsAdvConfigAlarm,               INTEGER,     false},
+   {CI_DLBATT,          upsAdvConfigLowBatteryRunTime,   TIMETICKS,   false},
+   {CI_DSHUTD,          upsAdvConfigShutoffDelay,        TIMETICKS,   false},
+   {CI_RETPCT,          upsAdvConfigMinReturnCapacity,   INTEGER,     false},
+   {CI_SENS,            upsAdvConfigSensitivity,         INTEGER,     false},
+   {CI_EXTBATTS,        upsAdvBatteryNumOfBattPacks,     INTEGER,     false},
+   {CI_STESTI,          upsAdvTestDiagnosticSchedule,    INTEGER,     false},
+   {CI_VLINE,           upsAdvInputLineVoltage,          GAUGE,       true },
+   {CI_VOUT,            upsAdvOutputVoltage,             GAUGE,       true },
+   {CI_VBATT,           upsAdvBatteryActualVoltage,      INTEGER,     true },
+   {CI_FREQ,            upsAdvInputFrequency,            GAUGE,       true },
+   {CI_LOAD,            upsAdvOutputLoad,                GAUGE,       true },
+   {CI_ITEMP,           upsAdvBatteryTemperature,        GAUGE,       true },
+   {CI_ATEMP,           mUpsEnvironAmbientTemperature,   GAUGE,       true },
+   {CI_HUMID,           mUpsEnvironRelativeHumidity,     GAUGE,       true },
+   {CI_ST_STAT,         upsAdvTestDiagnosticsResults,    INTEGER,     true },
+   {CI_BATTLEV,         upsAdvBatteryCapacity,           GAUGE,       true },
+   {CI_RUNTIM,          upsAdvBatteryRunTimeRemaining,   TIMETICKS,   true },
+   {CI_WHY_BATT,        upsAdvInputLineFailCause,        INTEGER,     true },
+   {CI_BADBATTS,        upsAdvBatteryNumOfBadBattPacks,  INTEGER,     true },
+   {CI_VMIN,            upsAdvInputMinLineVoltage,       GAUGE,       true },
+   {CI_VMAX,            upsAdvInputMaxLineVoltage,       GAUGE,       true },
 
    // These 5 collectively are used to obtain the data for CI_STATUS.
    // All bits are available in upsBasicStateOutputState at once but 
    // the old AP960x cards do not appear to support that OID, so we use 
    // it only for the overload flag which is not available elsewhere.
-   {CI_STATUS,          upsBasicOutputStatus,            true },
-   {CI_NeedReplacement, upsAdvBatteryReplaceIndicator,   true },
-   {CI_LowBattery,      upsBasicBatteryStatus,           true },
-   {CI_Calibration,     upsAdvTestCalibrationResults,    true },
-   {CI_Overload,        upsBasicStateOutputState,        true },
+   {CI_STATUS,          upsBasicOutputStatus,            INTEGER,     true },
+   {CI_NeedReplacement, upsAdvBatteryReplaceIndicator,   INTEGER,     true },
+   {CI_LowBattery,      upsBasicBatteryStatus,           INTEGER,     true },
+   {CI_Calibration,     upsAdvTestCalibrationResults,    INTEGER,     true },
+   {CI_Overload,        upsBasicStateOutputState,        OCTETSTRING, true },
 
    {-1, NULL, false}   /* END OF TABLE */
 };
+
+// The OID used to issue the killpower (hibernate) command
+const int *KillPowerOid = upsBasicControlConserveBattery;
+
+// The OID used to issue the shutdown command
+const int *ShutdownOid = upsAdvControlUpsOff;
