@@ -190,8 +190,19 @@ int snmplite_ups_shutdown(UPSINFO *ups)
 
 int snmplite_ups_check_state(UPSINFO *ups)
 {
-   // SNMP trap catching goes here...
-   sleep(ups->wait_time);
+   struct snmplite_ups_internal_data *sid =
+      (struct snmplite_ups_internal_data *)ups->driver_internal_data;
+
+   // Simple trap handling: Any valid trap causes us to return and thus
+   // new data will be fetched from the UPS.
+   Snmp::TrapMessage *trap = sid->snmp->TrapWait(ups->wait_time * 1000);
+   if (trap)
+   {
+      Dmsg2(80, "Got TRAP: generic=%d, specific=%d\n", 
+         trap->Generic(), trap->Specific());
+      delete trap;
+   }
+
    return 1;
 }
 

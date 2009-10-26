@@ -41,12 +41,14 @@ SnmpEngine::SnmpEngine() :
 SnmpEngine::~SnmpEngine()
 {
    close(_socket);
+   close(_trapsock);
 }
 
 bool SnmpEngine::Open(const char *host, unsigned short port, const char *comm)
 {
    // In case we are already open
    close(_socket);
+   close(_trapsock);
 
    // Remember new community name
    _community = comm;
@@ -90,9 +92,27 @@ bool SnmpEngine::Open(const char *host, unsigned short port, const char *comm)
    struct sockaddr_in addr;
    memset(&addr, 0, sizeof(addr));
    addr.sin_family = AF_INET;
-   addr.sin_port = htons(1234); //0;
+   addr.sin_port = htons(0);
    addr.sin_addr.s_addr = INADDR_ANY;
    int rc = bind(_socket, (struct sockaddr*)&addr, sizeof(addr));
+   if (rc == -1)
+   {
+      perror("bind");
+      return false;
+   }
+
+   _trapsock = socket(PF_INET, SOCK_DGRAM, 0);
+   if (_socket == -1)
+   {
+      perror("socket");
+      return false;
+   }
+
+   memset(&addr, 0, sizeof(addr));
+   addr.sin_family = AF_INET;
+   addr.sin_port = htons(162);
+   addr.sin_addr.s_addr = INADDR_ANY;
+   rc = bind(_trapsock, (struct sockaddr*)&addr, sizeof(addr));
    if (rc == -1)
    {
       perror("bind");
@@ -106,6 +126,8 @@ void SnmpEngine::Close()
 {
    close(_socket);
    _socket = -1;
+   close(_trapsock);
+   _trapsock = -1;
 }
 
 bool SnmpEngine::Set(const int oid[], Variable *data)
@@ -193,6 +215,11 @@ out:
    return ret;
 }
 
+TrapMessage *SnmpEngine::TrapWait(unsigned int msec)
+{
+   return (TrapMessage*)rspwait(msec, true);
+}
+
 bool SnmpEngine::issue(Message *msg)
 {
    // Marshal the data
@@ -215,10 +242,12 @@ bool SnmpEngine::issue(Message *msg)
    return true;
 }
 
-Message *SnmpEngine::rspwait(unsigned int msec)
+Message *SnmpEngine::rspwait(unsigned int msec, bool trap)
 {
    static unsigned char data[8192];
    struct sockaddr_in fromaddr;
+
+   int sock = trap ? _trapsock : _socket;
 
    // Calculate exit time
    struct timeval exittime;
@@ -253,8 +282,8 @@ Message *SnmpEngine::rspwait(unsigned int msec)
       // Wait for a datagram to arrive
       fd_set fds;
       FD_ZERO(&fds);
-      FD_SET(_socket, &fds);
-      int rc = select(_socket+1, &fds, NULL, NULL, &timeout);
+      FD_SET(sock, &fds);
+      int rc = select(sock+1, &fds, NULL, NULL, &timeout);
       if (rc == -1)
       {
          if (errno == EAGAIN || errno == EINTR)
@@ -268,7 +297,7 @@ Message *SnmpEngine::rspwait(unsigned int msec)
 
       // Read datagram
       socklen_t fromlen = sizeof(fromaddr);
-      rc = recvfrom(_socket, (char*)data, sizeof(data), 0, 
+      rc = recvfrom(sock, (char*)data, sizeof(data), 0, 
                     (struct sockaddr*)&fromaddr, &fromlen);
       if (rc == -1)
       {
@@ -289,22 +318,22 @@ Message *SnmpEngine::rspwait(unsigned int msec)
          continue;
 
       // Check message type
-      if (msg->Type() != Asn::GET_RSP_PDU)
+      if (trap && msg->Type() == Asn::TRAP_PDU)
+      {
+         return msg;
+      }
+      else if (!trap && msg->Type() == Asn::GET_RSP_PDU &&
+               ((VbListMessage *)msg)->RequestId() == _reqid-1)
+      {
+         return msg;
+      }
+      else
       {
          printf("Unhandled SNMP message type: %02x\n", msg->Type());
-         delete msg;
-         continue;
       }
 
-      // Check request id
-      VbListMessage *vblm = (VbListMessage*)msg;
-      if (vblm->RequestId() != _reqid-1)
-      {
-         delete msg;
-         continue;
-      }
-
-      return vblm;
+      // Throw it out and try again
+      delete msg;
    }
 }
 
@@ -526,7 +555,8 @@ Message *Message::Demarshal(unsigned char *&buffer, int &buflen)
          type, community, *seq[2]->AsSequence());
       break;
    case Asn::TRAP_PDU:
-      // Implement me
+      ret = (Message*)TrapMessage::CreateFromSequence(
+         type, community, *seq[2]->AsSequence());
       break;
    default:
       break;
@@ -547,4 +577,35 @@ bool Message::Marshal(unsigned char *&buffer, int &buflen)
    bool ret = seq->Marshal(buffer, buflen);
    delete seq;
    return ret;
+}
+
+// *****************************************************************************
+// TrapMessage
+// *****************************************************************************
+TrapMessage *TrapMessage::CreateFromSequence(
+   Asn::Identifier type, const char *community, Asn::Sequence &seq)
+{
+   // Verify format: We should have 6 parts.
+   if (seq.Size() != 6 ||
+       !seq[0]->IsObjectId() ||     // enterprise
+       !seq[1]->IsOctetString() ||  // agent-addr
+       !seq[2]->IsInteger() ||      // generic-trap
+       !seq[3]->IsInteger() ||      // specific-trap
+       !seq[4]->IsInteger() ||      // time-stamp
+       !seq[5]->IsSequence())       // variable-bindings
+      return NULL;
+
+   // Extract data
+   return new TrapMessage(type, community, seq);
+}
+
+TrapMessage::TrapMessage(Asn::Identifier type, const char *community, Asn::Sequence &seq) :
+   Message(type, community)
+{
+   // Format was already verified in CreateFromSequence()
+   _enterprise = seq[0]->copy()->AsObjectId();
+   _generic = seq[2]->AsInteger()->IntValue();
+   _specific = seq[3]->AsInteger()->IntValue();
+   _timestamp = seq[4]->AsInteger()->UintValue();
+   _vblist = new VarBindList(*seq[5]->AsSequence());
 }
