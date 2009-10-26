@@ -38,7 +38,7 @@ namespace Snmp
    // **************************************************************************
    struct Variable
    {
-//      SnmpType type;
+      Asn::Identifier type;
       int i32;
       unsigned int u32;
       astring str;
@@ -50,7 +50,7 @@ namespace Snmp
    class VarBind
    {
    public:
-      VarBind(int oid[], Variable *data = NULL);
+      VarBind(const int oid[], Variable *data = NULL);
       VarBind(Asn::Sequence &seq);
       ~VarBind();
 
@@ -75,10 +75,10 @@ namespace Snmp
    public:
       VarBindList() {}
       VarBindList(Asn::Sequence &seq);
-      VarBindList(int oid[], Variable *data = NULL);
+      VarBindList(const int oid[], Variable *data = NULL);
       ~VarBindList();
 
-      void Append(int oid[], Variable *data = NULL);
+      void Append(const int oid[], Variable *data = NULL);
 
       unsigned int Size() const { return _vblist.size(); }
       VarBind *operator[](unsigned int idx) { return _vblist[idx]; }
@@ -124,14 +124,14 @@ namespace Snmp
    {
    public:
       VbListMessage(Asn::Identifier type, const char *community, int reqid, 
-                    int oid[] = NULL, Variable *data = NULL);
+                    const int oid[] = NULL, Variable *data = NULL);
       virtual ~VbListMessage() { delete _vblist; }
 
       int RequestId()       { return _reqid;     }
       int ErrorStatus()     { return _errstatus; }
       int ErrorIndex()      { return _errindex;  }
 
-      void Append(int oid[], Variable *data = NULL);
+      void Append(const int oid[], Variable *data = NULL);
       unsigned int Size() const { return _vblist->Size(); }
       VarBind &operator[](unsigned int idx) { return *((*_vblist)[idx]); }
 
@@ -163,12 +163,14 @@ namespace Snmp
 
       struct OidVar
       {
-         int *oid;
+         const int *oid;
          Variable data;
       };
 
-      bool Get(int oid[], Variable *data);
+      bool Get(const int oid[], Variable *data);
       bool Get(alist<OidVar> &oids);
+
+      bool Set(const int oid[], Variable *data);
 
    private:
 
