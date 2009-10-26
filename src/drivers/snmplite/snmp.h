@@ -127,9 +127,9 @@ namespace Snmp
                     const int oid[] = NULL, Variable *data = NULL);
       virtual ~VbListMessage() { delete _vblist; }
 
-      int RequestId()       { return _reqid;     }
-      int ErrorStatus()     { return _errstatus; }
-      int ErrorIndex()      { return _errindex;  }
+      int RequestId()   const { return _reqid;     }
+      int ErrorStatus() const { return _errstatus; }
+      int ErrorIndex()  const { return _errindex;  }
 
       void Append(const int oid[], Variable *data = NULL);
       unsigned int Size() const { return _vblist->Size(); }
@@ -145,6 +145,32 @@ namespace Snmp
       int _reqid;
       int _errstatus;
       int _errindex;
+      VarBindList *_vblist;
+   };
+
+   // **************************************************************************
+   // TrapMessage
+   // **************************************************************************
+   class TrapMessage: public Message
+   {
+   public:
+      virtual ~TrapMessage() { delete _vblist; }
+
+      int Generic()            const { return _generic;   }
+      int Specific()           const { return _specific;  }
+      unsigned int Timestamp() const { return _timestamp; }
+
+      static TrapMessage *CreateFromSequence(
+         Asn::Identifier type, const char *community, Asn::Sequence &seq);
+
+   protected:
+      TrapMessage(Asn::Identifier type, const char *community, Asn::Sequence &seq);
+      virtual Asn::Sequence *GetAsn() { return NULL; }
+
+      Asn::ObjectId *_enterprise;
+      int _generic;
+      int _specific;
+      unsigned int _timestamp;
       VarBindList *_vblist;
    };
 
@@ -172,12 +198,15 @@ namespace Snmp
 
       bool Set(const int oid[], Variable *data);
 
+      TrapMessage *TrapWait(unsigned int msec);
+
    private:
 
       bool issue(Message *pdu);
-      Message *rspwait(unsigned int msec);
+      Message *rspwait(unsigned int msec, bool trap = false);
 
       int _socket;
+      int _trapsock;
       int _reqid;
       astring _community;
       struct sockaddr_in _destaddr;
