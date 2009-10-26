@@ -42,12 +42,12 @@ namespace Asn
 
    // Built-in types from ASN.1
    typedef unsigned char Identifier;
-   static const Identifier INTEGER         = UNIVERSAL | PRIMITIVE   | 0x02;
-   static const Identifier BITSTRING       = UNIVERSAL | PRIMITIVE   | 0x03;
-   static const Identifier OCTETSTRING     = UNIVERSAL | PRIMITIVE   | 0x04;
-   static const Identifier NULLL           = UNIVERSAL | PRIMITIVE   | 0x05;
-   static const Identifier OBJECTID        = UNIVERSAL | PRIMITIVE   | 0x06;
-   static const Identifier SEQUENCE        = UNIVERSAL | CONSTRUCTED | 0x10;
+   static const Identifier INTEGER         = UNIVERSAL   | PRIMITIVE   | 0x02;
+   static const Identifier BITSTRING       = UNIVERSAL   | PRIMITIVE   | 0x03;
+   static const Identifier OCTETSTRING     = UNIVERSAL   | PRIMITIVE   | 0x04;
+   static const Identifier NULLL           = UNIVERSAL   | PRIMITIVE   | 0x05;
+   static const Identifier OBJECTID        = UNIVERSAL   | PRIMITIVE   | 0x06;
+   static const Identifier SEQUENCE        = UNIVERSAL   | CONSTRUCTED | 0x10;
 
    // SNMP-specific types
    static const Identifier IPADDRESS       = APPLICATION | PRIMITIVE   | 0x00;
