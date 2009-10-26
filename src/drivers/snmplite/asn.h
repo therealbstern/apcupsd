@@ -78,14 +78,14 @@ namespace Asn
       Object(Identifier type): _type(type) {}
       virtual ~Object() {}
 
-      Identifier Type() const { return _type; }
-
       static Object *Demarshal(unsigned char *&buffer, int &buflen);
 
-      Integer *AsInteger()         { return (Integer*)this;     }
-      ObjectId *AsObjectId()       { return (ObjectId*)this;    }
+      Identifier   Type()    const { return _type; }
+
+      Integer     *AsInteger()     { return (Integer*)    this; }
+      ObjectId    *AsObjectId()    { return (ObjectId*)   this; }
       OctetString *AsOctetString() { return (OctetString*)this; }
-      Sequence *AsSequence()       { return (Sequence*)this;    }
+      Sequence    *AsSequence()    { return (Sequence*)   this; }
 
       virtual bool IsInteger()     { return false; }
       virtual bool IsObjectId()    { return false; }
@@ -190,9 +190,9 @@ namespace Asn
       ObjectId &operator=(const int oid[]);
 
       bool operator==(const ObjectId &rhs) const;
-      bool operator==(const int oid[]) const;
+      bool operator==(const int oid[])     const;
       bool operator!=(const ObjectId &rhs) const { return !(*this == rhs); }
-      bool operator!=(const int oid[]) const        { return !(*this == oid); }
+      bool operator!=(const int oid[])     const { return !(*this == oid); }
 
       virtual Object *copy() const { return new ObjectId(*this); }
       virtual bool Marshal(unsigned char *&buffer, int &buflen) const;
