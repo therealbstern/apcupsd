@@ -57,7 +57,8 @@ namespace Asn
    static const Identifier GET_REQ_PDU     = CONTEXT     | CONSTRUCTED | 0x00;
    static const Identifier GETNEXT_REQ_PDU = CONTEXT     | CONSTRUCTED | 0x01;
    static const Identifier GET_RSP_PDU     = CONTEXT     | CONSTRUCTED | 0x02;
-   static const Identifier TRAP_PDU        = CONTEXT     | CONSTRUCTED | 0x03;
+   static const Identifier SET_REQ_PDU     = CONTEXT     | CONSTRUCTED | 0x03;
+   static const Identifier TRAP_PDU        = CONTEXT     | CONSTRUCTED | 0x04;
 
    // **************************************************************************
    // Forward declarations

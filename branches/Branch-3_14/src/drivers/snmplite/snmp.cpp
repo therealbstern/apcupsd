@@ -108,7 +108,30 @@ void SnmpEngine::Close()
    _socket = -1;
 }
 
-bool SnmpEngine::Get(int oid[], Variable *data)
+bool SnmpEngine::Set(const int oid[], Variable *data)
+{
+   // Send the request
+   VbListMessage req(Asn::SET_REQ_PDU, _community, _reqid++, oid, data);
+   if (!issue(&req))
+      return false;
+
+   // Wait for a response
+   VbListMessage *rsp = (VbListMessage*)rspwait(1000);
+   if (!rsp)
+      return false;
+
+   // Check error status
+   if (rsp->ErrorStatus())
+   {
+      delete rsp;
+      return false;
+   }
+
+   delete rsp;
+   return true;
+}
+
+bool SnmpEngine::Get(const int oid[], Variable *data)
 {
    OidVar oidvar = { oid };
    alist<OidVar> oids;
@@ -289,33 +312,32 @@ Message *SnmpEngine::rspwait(unsigned int msec)
 // VarBind
 // *****************************************************************************
 
-VarBind::VarBind(int oid[], Variable *data)
+VarBind::VarBind(const int oid[], Variable *data)
 {
    _oid = new Asn::ObjectId(oid);
 
    if (data)
    {
-   /*
       switch (data->type)
       {
-      case INTEGER32:
-         _data = new Asn::Integer(data->i32);
+      case Asn::INTEGER:
+         _data = new Asn::Integer(data->type);
+         *(_data->AsInteger()) = data->i32;
          break;
-      case UNSIGNED32:
-      case TIMETICKS:
-      case COUNTER:
-      case GAUGE:
-         _data = new Asn::Integer(data->u32);
+      case Asn::TIMETICKS:
+      case Asn::COUNTER:
+      case Asn::GAUGE:
+         _data = new Asn::Integer(data->type);
+         *(_data->AsInteger()) = data->u32;
          break;
-      case DISPLAYSTRING:
+      case Asn::OCTETSTRING:
          _data = new Asn::OctetString(data->str);
          break;
-      case NULLL:
+      case Asn::NULLL:
       default:
          _data = new Asn::Null();
          break;
       }
-      */
    }
    else
    {
@@ -346,6 +368,7 @@ VarBind::~VarBind()
 
 bool VarBind::Extract(Variable *out)
 {
+   out->type = _data->Type();
    if (_data->IsInteger())
    {
       out->i32 = _data->AsInteger()->IntValue();
@@ -384,7 +407,7 @@ VarBindList::VarBindList(Asn::Sequence &seq)
    }
 }
 
-VarBindList::VarBindList(int oid[], Variable *data)
+VarBindList::VarBindList(const int oid[], Variable *data)
 {
    if (oid)
       _vblist.append(new VarBind(oid, data));
@@ -396,7 +419,7 @@ VarBindList::~VarBindList()
       delete _vblist[i];
 }
 
-void VarBindList::Append(int oid[], Variable *data)
+void VarBindList::Append(const int oid[], Variable *data)
 {
    _vblist.append(new VarBind(oid, data));
 }
@@ -438,7 +461,7 @@ VbListMessage::VbListMessage(Asn::Identifier type, const char *community, Asn::S
 }
 
 VbListMessage::VbListMessage(Asn::Identifier type, const char *community, int reqid,
-                             int oid[], Variable *data) :
+                             const int oid[], Variable *data) :
    Message(type, community),
    _reqid(reqid),
    _errstatus(0),
@@ -447,7 +470,7 @@ VbListMessage::VbListMessage(Asn::Identifier type, const char *community, int re
 {
 }
 
-void VbListMessage::Append(int oid[], Variable *data)
+void VbListMessage::Append(const int oid[], Variable *data)
 {
    _vblist->Append(oid, data);
 }
