@@ -168,10 +168,24 @@ int snmplite_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
    return 0;
 }
 
+extern const int *KillPowerOid;
 int snmplite_ups_kill_power(UPSINFO *ups)
 {
-   // Implement me
-   return 0;
+   struct snmplite_ups_internal_data *sid =
+      (struct snmplite_ups_internal_data *)ups->driver_internal_data;
+
+   Snmp::Variable var = { Asn::INTEGER, 2 };
+   return sid->snmp->Set(KillPowerOid, &var);
+}
+
+extern const int *ShutdownOid;
+int snmplite_ups_shutdown(UPSINFO *ups)
+{
+   struct snmplite_ups_internal_data *sid =
+      (struct snmplite_ups_internal_data *)ups->driver_internal_data;
+
+   Snmp::Variable var = { Asn::INTEGER, 2 };
+   return sid->snmp->Set(ShutdownOid, &var);
 }
 
 int snmplite_ups_check_state(UPSINFO *ups)

@@ -261,6 +261,8 @@ static int device_wait_time(UPSINFO *ups)
 
    if (ups->is_fastpoll() || !ups->is_battpresent())
       wait_time = TIMER_FAST;
+   else if (ups->is_commlost())
+      wait_time = TIMER_FAST*5;
    else
       wait_time = ups->polltime;    /* normally 60 seconds */
 
