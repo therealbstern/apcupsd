@@ -78,7 +78,7 @@ namespace Asn
       Object(Identifier type): _type(type) {}
       virtual ~Object() {}
 
-      static Object *Demarshal(unsigned char *&buffer, int &buflen);
+      static Object *Demarshal(unsigned char *&buffer, unsigned int &buflen);
 
       Identifier   Type()    const { return _type; }
 
@@ -92,15 +92,15 @@ namespace Asn
       virtual bool IsOctetString() { return false; }
       virtual bool IsSequence()    { return false; }
 
-      virtual bool Marshal(unsigned char *&buffer, int &buflen) const = 0;
+      virtual bool Marshal(unsigned char *&buffer, unsigned int &buflen) const = 0;
       virtual Object *copy() const = 0;
 
    protected:
 
-      virtual bool demarshal(unsigned char *&buffer, int &buflen) = 0;
-      bool marshalType(unsigned char *&buffer, int &buflen) const;
-      bool marshalLength(unsigned int len, unsigned char *&buffer, int &buflen) const;
-      bool demarshalLength(unsigned char *&buffer, int &buflen, int &vallen);
+      virtual bool demarshal(unsigned char *&buffer, unsigned int &buflen) = 0;
+      bool marshalType(unsigned char *&buffer, unsigned int &buflen) const;
+      bool marshalLength(unsigned int len, unsigned char *&buffer, unsigned int &buflen) const;
+      bool demarshalLength(unsigned char *&buffer, unsigned int &buflen, unsigned int &vallen);
       int numbits(unsigned int num) const;
 
       Identifier _type;
@@ -130,12 +130,12 @@ namespace Asn
          { _value = value; _signed = false; return *this; }
 
       virtual Object *copy() const { return new Integer(*this); }
-      virtual bool Marshal(unsigned char *&buffer, int &buflen) const;
+      virtual bool Marshal(unsigned char *&buffer, unsigned int &buflen) const;
       virtual bool IsInteger() { return true; }
 
    protected:
 
-      virtual bool demarshal(unsigned char *&buffer, int &buflen);
+      virtual bool demarshal(unsigned char *&buffer, unsigned int &buflen);
 
       unsigned int _value;
       bool _signed;
@@ -162,12 +162,12 @@ namespace Asn
       operator const char *() const { return (const char *)_data; }
 
       virtual Object *copy() const { return new OctetString(*this); }
-      virtual bool Marshal(unsigned char *&buffer, int &buflen) const;
+      virtual bool Marshal(unsigned char *&buffer, unsigned int &buflen) const;
       virtual bool IsOctetString() { return true; }
 
    protected:
 
-      virtual bool demarshal(unsigned char *&buffer, int &buflen);
+      virtual bool demarshal(unsigned char *&buffer, unsigned int &buflen);
 
       void assign(const unsigned char *data, unsigned int len);
 
@@ -196,12 +196,12 @@ namespace Asn
       bool operator!=(const int oid[])     const { return !(*this == oid); }
 
       virtual Object *copy() const { return new ObjectId(*this); }
-      virtual bool Marshal(unsigned char *&buffer, int &buflen) const;
+      virtual bool Marshal(unsigned char *&buffer, unsigned int &buflen) const;
       virtual bool IsObjectId() { return true; }
 
    protected:
 
-      virtual bool demarshal(unsigned char *&buffer, int &buflen);
+      virtual bool demarshal(unsigned char *&buffer, unsigned int &buflen);
       void assign(const int oid[]);
       void assign(const int oid[], unsigned int count);
 
@@ -220,11 +220,11 @@ namespace Asn
       virtual ~Null() {}
 
       virtual Object *copy() const { return new Null(*this); }
-      virtual bool Marshal(unsigned char *&buffer, int &buflen) const;
+      virtual bool Marshal(unsigned char *&buffer, unsigned int &buflen) const;
 
    protected:
 
-      virtual bool demarshal(unsigned char *&buffer, int &buflen);
+      virtual bool demarshal(unsigned char *&buffer, unsigned int &buflen);
    };
 
    // **************************************************************************
@@ -245,12 +245,12 @@ namespace Asn
       void Append(Object *obj);
 
       virtual Object *copy() const { return new Sequence(*this); }
-      virtual bool Marshal(unsigned char *&buffer, int &buflen) const;
+      virtual bool Marshal(unsigned char *&buffer, unsigned int &buflen) const;
       virtual bool IsSequence() { return true; }
 
    protected:
 
-      virtual bool demarshal(unsigned char *&buffer, int &buflen);
+      virtual bool demarshal(unsigned char *&buffer, unsigned int &buflen);
       void assign(const Sequence &rhs);
       void clear();
 

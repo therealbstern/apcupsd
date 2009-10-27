@@ -224,7 +224,7 @@ bool SnmpEngine::issue(Message *msg)
 {
    // Marshal the data
    unsigned char data[8192];
-   int buflen = sizeof(data);
+   unsigned int buflen = sizeof(data);
    unsigned char *buffer = data;
    if (!msg->Marshal(buffer, buflen))
       return false;
@@ -312,7 +312,7 @@ Message *SnmpEngine::rspwait(unsigned int msec, bool trap)
 
       // Got a packet from our agent: decode it
       unsigned char *buffer = data;
-      int buflen = rc;
+      unsigned int buflen = rc;
       Message *msg = Message::Demarshal(buffer, buflen);
       if (!msg)
          continue;
@@ -517,7 +517,7 @@ Asn::Sequence *VbListMessage::GetAsn()
 // *****************************************************************************
 // Message
 // *****************************************************************************
-Message *Message::Demarshal(unsigned char *&buffer, int &buflen)
+Message *Message::Demarshal(unsigned char *&buffer, unsigned int &buflen)
 {
    Message *ret = NULL;
    astring community;
@@ -567,7 +567,7 @@ error:
    return ret;
 }
 
-bool Message::Marshal(unsigned char *&buffer, int &buflen)
+bool Message::Marshal(unsigned char *&buffer, unsigned int &buflen)
 {
    Asn::Sequence *seq = new Asn::Sequence();
    seq->Append(new Asn::Integer(SNMP_VERSION_1));

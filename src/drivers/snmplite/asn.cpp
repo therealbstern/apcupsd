@@ -39,7 +39,7 @@ void debug(const char *foo, int indent)
 // Object
 // *****************************************************************************
 
-Object *Object::Demarshal(unsigned char *&buffer, int &buflen)
+Object *Object::Demarshal(unsigned char *&buffer, unsigned int &buflen)
 {
    static int indent = 0;
 
@@ -120,7 +120,7 @@ int Object::numbits(unsigned int num) const
    return bits;
 }
 
-bool Object::marshalLength(unsigned int len, unsigned char *&buffer, int &buflen) const
+bool Object::marshalLength(unsigned int len, unsigned char *&buffer, unsigned int &buflen) const
 {
    // Compute number of bytes required to store length
    unsigned int bits = numbits(len);
@@ -138,7 +138,7 @@ bool Object::marshalLength(unsigned int len, unsigned char *&buffer, int &buflen
    }
 
    // Fail if not enough space remaining in buffer
-   if (buflen < (int)datalen)
+   if (buflen < datalen)
       return false;
 
    // If using long form, begin with byte count
@@ -163,7 +163,7 @@ bool Object::marshalLength(unsigned int len, unsigned char *&buffer, int &buflen
    return true;
 }
 
-bool Object::marshalType(unsigned char *&buffer, int &buflen) const
+bool Object::marshalType(unsigned char *&buffer, unsigned int &buflen) const
 {
    // If no buffer provided, just return number of bytes required
    if (!buffer)
@@ -182,12 +182,12 @@ bool Object::marshalType(unsigned char *&buffer, int &buflen) const
    return true;
 }
 
-bool Object::demarshalLength(unsigned char *&buffer, int &buflen, int &vallen)
+bool Object::demarshalLength(unsigned char *&buffer, unsigned int &buflen, unsigned int &vallen)
 {
    // Must have at least one byte to work with
    if (buflen < 1)
       return false;
-   int datalen = *buffer++;
+   unsigned int datalen = *buffer++;
    buflen--;
 
    // Values less than 128 are stored directly in the first (only) byte
@@ -219,14 +219,14 @@ bool Object::demarshalLength(unsigned char *&buffer, int &buflen, int &vallen)
 // Integer
 // *****************************************************************************
 
-bool Integer::Marshal(unsigned char *&buffer, int &buflen) const
+bool Integer::Marshal(unsigned char *&buffer, unsigned int &buflen) const
 {
    // Marshal the type code
    if (!marshalType(buffer, buflen))
       return false;
 
    // Calculate the number of bytes it will require to store the value
-   int datalen = 4;
+   unsigned int datalen = 4;
    unsigned int tmp = _value;
    while (datalen > 1)
    {
@@ -276,10 +276,10 @@ bool Integer::Marshal(unsigned char *&buffer, int &buflen) const
    return true;
 }
 
-bool Integer::demarshal(unsigned char *&buffer, int &buflen)
+bool Integer::demarshal(unsigned char *&buffer, unsigned int &buflen)
 {
    // Unmarshal the data length
-   int datalen;
+   unsigned int datalen;
    if (!demarshalLength(buffer, buflen, datalen) || 
        datalen < 1 || datalen > 4 || buflen < datalen)
    {
@@ -342,7 +342,7 @@ OctetString &OctetString::operator=(const OctetString &rhs)
    return *this;
 }
 
-bool OctetString::Marshal(unsigned char *&buffer, int &buflen) const
+bool OctetString::Marshal(unsigned char *&buffer, unsigned int &buflen) const
 {
    // Marshal the type code
    if (!marshalType(buffer, buflen))
@@ -371,10 +371,10 @@ bool OctetString::Marshal(unsigned char *&buffer, int &buflen) const
    return true;
 }
 
-bool OctetString::demarshal(unsigned char *&buffer, int &buflen)
+bool OctetString::demarshal(unsigned char *&buffer, unsigned int &buflen)
 {
    // Unmarshal the data length
-   int datalen;
+   unsigned int datalen;
    if (!demarshalLength(buffer, buflen, datalen) || 
        datalen < 1 || buflen < datalen)
    {
@@ -476,7 +476,7 @@ bool ObjectId::operator==(const int oid[]) const
    return i == _count && oid[i] == -1;
 }
 
-bool ObjectId::Marshal(unsigned char *&buffer, int &buflen) const
+bool ObjectId::Marshal(unsigned char *&buffer, unsigned int &buflen) const
 {
    // Protect from trying to marshal an empty object
    if (!_value || _count < 2)
@@ -487,7 +487,7 @@ bool ObjectId::Marshal(unsigned char *&buffer, int &buflen) const
       return false;
 
    // ASN.1 requires a special case for first two identifiers
-   int cnt = _count-1;
+   unsigned int cnt = _count-1;
    unsigned int vals[cnt];
    vals[0] = _value[0] * 40 + _value[1];
    for (unsigned int i = 2; i < _count; i++)
@@ -495,8 +495,8 @@ bool ObjectId::Marshal(unsigned char *&buffer, int &buflen) const
 
    // Calculate number of octets required to store data
    // We can only store 7 bits of data in each octet, so round accordingly
-   int datalen = 0;
-   for (int i = 0; i < cnt; i++)
+   unsigned int datalen = 0;
+   for (unsigned int i = 0; i < cnt; i++)
       datalen += (numbits(vals[i]) + 6) / 7;
 
    // Marshal the length
@@ -516,10 +516,10 @@ bool ObjectId::Marshal(unsigned char *&buffer, int &buflen) const
    buflen -= datalen;
 
    // Write data: 7 data bits per octet, bit 7 set on all but final octet
-   for (int i = 0; i < cnt; i++)
+   for (unsigned int i = 0; i < cnt; i++)
    {
       unsigned int val = vals[i];
-      int noctets = (numbits(val) + 6) / 7;
+      unsigned int noctets = (numbits(val) + 6) / 7;
       switch (noctets)
       {
       case 5:
@@ -539,10 +539,10 @@ bool ObjectId::Marshal(unsigned char *&buffer, int &buflen) const
    return true;
 }
 
-bool ObjectId::demarshal(unsigned char *&buffer, int &buflen)
+bool ObjectId::demarshal(unsigned char *&buffer, unsigned int &buflen)
 {
    // Unmarshal the data length
-   int datalen;
+   unsigned int datalen;
    if (!demarshalLength(buffer, buflen, datalen) || 
        datalen < 1 || buflen < datalen)
    {
@@ -556,7 +556,7 @@ bool ObjectId::demarshal(unsigned char *&buffer, int &buflen)
    _value = new int[datalen+1];
 
    // Unmarshal identifier values
-   int i = 0;
+   unsigned int i = 0;
    while (datalen)
    {
       // Accumulate octets into this identifier
@@ -588,7 +588,7 @@ bool ObjectId::demarshal(unsigned char *&buffer, int &buflen)
 // Null
 // *****************************************************************************
 
-bool Null::Marshal(unsigned char *&buffer, int &buflen) const
+bool Null::Marshal(unsigned char *&buffer, unsigned int &buflen) const
 {
    // Marshal the type code
    if (!marshalType(buffer, buflen))
@@ -601,10 +601,10 @@ bool Null::Marshal(unsigned char *&buffer, int &buflen) const
    return true;
 }
 
-bool Null::demarshal(unsigned char *&buffer, int &buflen)
+bool Null::demarshal(unsigned char *&buffer, unsigned int &buflen)
 {
    // Unmarshal the data length
-   int datalen;
+   unsigned int datalen;
    return demarshalLength(buffer, buflen, datalen) && datalen == 0;
 }
 
@@ -639,7 +639,7 @@ void Sequence::clear()
    _size = 0;
 }
 
-bool Sequence::Marshal(unsigned char *&buffer, int &buflen) const
+bool Sequence::Marshal(unsigned char *&buffer, unsigned int &buflen) const
 {
    // Marshal the type code
    if (!marshalType(buffer, buflen))
@@ -648,7 +648,7 @@ bool Sequence::Marshal(unsigned char *&buffer, int &buflen) const
    // Need to calculate the length of the marshalled sequence.
    // Do so by passing a NULL buffer to Marshal() which will
    // accumulate total length in buflen parameter.
-   int datalen = 0;
+   unsigned int datalen = 0;
    unsigned char *buf = NULL;
    for (unsigned int i = 0; i < _size; ++i)
    {
@@ -677,13 +677,13 @@ bool Sequence::Marshal(unsigned char *&buffer, int &buflen) const
    return true;
 }
 
-bool Sequence::demarshal(unsigned char *&buffer, int &buflen)
+bool Sequence::demarshal(unsigned char *&buffer, unsigned int &buflen)
 {
    // Free any existing data
    clear();
 
    // Unmarshal the sequence data length
-   int datalen;
+   unsigned int datalen;
    if (!demarshalLength(buffer, buflen, datalen) || 
        datalen < 1 || buflen < datalen)
    {

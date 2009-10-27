@@ -103,8 +103,8 @@ namespace Snmp
       Asn::Identifier Type() const { return _type; }
       astring Community() const    { return _community; }
 
-      static Message *Demarshal(unsigned char *&buffer, int &buflen);
-      bool Marshal(unsigned char *&buffer, int &buflen);
+      static Message *Demarshal(unsigned char *&buffer, unsigned int &buflen);
+      bool Marshal(unsigned char *&buffer, unsigned int &buflen);
 
    protected:
       Message() {}
