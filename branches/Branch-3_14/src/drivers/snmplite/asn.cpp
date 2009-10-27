@@ -120,7 +120,10 @@ int Object::numbits(unsigned int num) const
    return bits;
 }
 
-bool Object::marshalLength(unsigned int len, unsigned char *&buffer, unsigned int &buflen) const
+bool Object::marshalLength(
+   unsigned int len,
+   unsigned char *&buffer,
+   unsigned int &buflen) const
 {
    // Compute number of bytes required to store length
    unsigned int bits = numbits(len);
@@ -182,7 +185,10 @@ bool Object::marshalType(unsigned char *&buffer, unsigned int &buflen) const
    return true;
 }
 
-bool Object::demarshalLength(unsigned char *&buffer, unsigned int &buflen, unsigned int &vallen)
+bool Object::demarshalLength(
+   unsigned char *&buffer,
+   unsigned int &buflen,
+   unsigned int &vallen) const
 {
    // Must have at least one byte to work with
    if (buflen < 1)

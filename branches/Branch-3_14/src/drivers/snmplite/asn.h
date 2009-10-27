@@ -92,15 +92,27 @@ namespace Asn
       virtual bool IsOctetString() { return false; }
       virtual bool IsSequence()    { return false; }
 
-      virtual bool Marshal(unsigned char *&buffer, unsigned int &buflen) const = 0;
+      virtual bool Marshal(
+         unsigned char *&buffer,
+         unsigned int &buflen) const = 0;
+
       virtual Object *copy() const = 0;
 
    protected:
 
       virtual bool demarshal(unsigned char *&buffer, unsigned int &buflen) = 0;
       bool marshalType(unsigned char *&buffer, unsigned int &buflen) const;
-      bool marshalLength(unsigned int len, unsigned char *&buffer, unsigned int &buflen) const;
-      bool demarshalLength(unsigned char *&buffer, unsigned int &buflen, unsigned int &vallen);
+
+      bool marshalLength(
+         unsigned int len,
+         unsigned char *&buffer, 
+         unsigned int &buflen) const;
+
+      bool demarshalLength(
+         unsigned char *&buffer,
+         unsigned int &buflen, 
+         unsigned int &vallen) const;
+
       int numbits(unsigned int num) const;
 
       Identifier _type;
