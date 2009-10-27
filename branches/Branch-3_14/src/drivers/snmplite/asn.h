@@ -101,6 +101,7 @@ namespace Asn
       bool marshalType(unsigned char *&buffer, int &buflen) const;
       bool marshalLength(unsigned int len, unsigned char *&buffer, int &buflen) const;
       bool demarshalLength(unsigned char *&buffer, int &buflen, int &vallen);
+      int numbits(unsigned int num) const;
 
       Identifier _type;
    };
@@ -201,7 +202,6 @@ namespace Asn
    protected:
 
       virtual bool demarshal(unsigned char *&buffer, int &buflen);
-      int numbits(unsigned int num) const;
       void assign(const int oid[]);
       void assign(const int oid[], unsigned int count);
 

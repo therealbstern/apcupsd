@@ -105,27 +105,73 @@ Object *Object::Demarshal(unsigned char *&buffer, int &buflen)
    return obj;
 }
 
+int Object::numbits(unsigned int num) const
+{
+   if (num == 0)
+      return 1;
+
+   int bits = 0;
+   while (num)
+   {
+      bits++;
+      num >>= 1;
+   }
+
+   return bits;
+}
+
 bool Object::marshalLength(unsigned int len, unsigned char *&buffer, int &buflen) const
 {
-   // Bail if not enough space for data
-   if (buflen < 5)
-      return false;
-   buflen -= 5;
+   // Compute number of bytes required to store length
+   unsigned int bits = numbits(len);
+   unsigned int datalen;
+   if (bits <= 7)
+      datalen = 1;
+   else
+      datalen = (bits + 7) / 8 + 1;
 
-   // We always use long form with 4 bytes for simplicity. This allows a
-   // Sequence to leave space in the marshaling buffer and then come back
-   // and fill in the length after the content has been marshalled.
-   *buffer++ = 0x84;
-   *buffer++ = (len >> 24) & 0xff;
-   *buffer++ = (len >> 16) & 0xff;
-   *buffer++ = (len >>  8) & 0xff;
-   *buffer++ = len & 0xff;
+   // If no buffer provided, just return number of bytes required
+   if (!buffer)
+   {
+      buflen += datalen;
+      return true;
+   }
+
+   // Fail if not enough space remaining in buffer
+   if (buflen < (int)datalen)
+      return false;
+
+   // If using long form, begin with byte count
+   if (datalen > 1)
+      *buffer++ = (datalen - 1) | 0x80;
+
+   // Encode length bytes
+   switch (datalen)
+   {
+   case 5:
+      *buffer++ = (len >> 24) & 0xff;
+   case 4:
+      *buffer++ = (len >> 16) & 0xff;
+   case 3:
+      *buffer++ = (len >>  8) & 0xff;
+   case 2:
+   case 1:
+      *buffer++ = len & 0xff;
+      break;
+   }
 
    return true;
 }
 
 bool Object::marshalType(unsigned char *&buffer, int &buflen) const
 {
+   // If no buffer provided, just return number of bytes required
+   if (!buffer)
+   {
+      buflen++;
+      return true;
+   }
+
    // Fail if not enough room for data
    if (buflen < 1)
       return false;
@@ -199,6 +245,13 @@ bool Integer::Marshal(unsigned char *&buffer, int &buflen) const
    // Marshal the length
    if (!marshalLength(datalen, buffer, buflen))
       return false;
+
+   // If no buffer provided, just return number of bytes required
+   if (!buffer)
+   {
+      buflen += datalen;
+      return true;
+   }
 
    // Fail if not enough room for data
    if (buflen < datalen)
@@ -298,6 +351,13 @@ bool OctetString::Marshal(unsigned char *&buffer, int &buflen) const
    // Marshal the length
    if (!marshalLength(_len, buffer, buflen))
       return false;
+
+   // If no buffer provided, just return number of bytes required
+   if (!buffer)
+   {
+      buflen += _len;
+      return true;
+   }
 
    // Bail if not enough room for data
    if ((unsigned int)buflen < _len)
@@ -416,20 +476,6 @@ bool ObjectId::operator==(const int oid[]) const
    return i == _count && oid[i] == -1;
 }
 
-int ObjectId::numbits(unsigned int num) const
-{
-   if (num == 0)
-      return 1;
-
-   int log = 0;
-   while (num)
-   {
-      log++;
-      num >>= 1;
-   }
-   return log;
-}
-
 bool ObjectId::Marshal(unsigned char *&buffer, int &buflen) const
 {
    // Protect from trying to marshal an empty object
@@ -456,6 +502,13 @@ bool ObjectId::Marshal(unsigned char *&buffer, int &buflen) const
    // Marshal the length
    if (!marshalLength(datalen, buffer, buflen))
       return false;
+
+   // If no buffer provided, just return number of bytes required
+   if (!buffer)
+   {
+      buflen += datalen;
+      return true;
+   }
 
    // Bail if data bytes will not fit
    if (buflen < datalen)
@@ -592,23 +645,34 @@ bool Sequence::Marshal(unsigned char *&buffer, int &buflen) const
    if (!marshalType(buffer, buflen))
       return false;
 
-   // Don't know the length yet, but ensure there's room by inserting 0
-   // We remember stream position so we can come back later
-   unsigned char *lenloc = buffer;
-   if (!marshalLength(0, buffer, buflen))
+   // Need to calculate the length of the marshalled sequence.
+   // Do so by passing a NULL buffer to Marshal() which will
+   // accumulate total length in buflen parameter.
+   int datalen = 0;
+   unsigned char *buf = NULL;
+   for (unsigned int i = 0; i < _size; ++i)
+   {
+      if (!_data[i]->Marshal(buf, datalen))
+         return false;
+   }
+
+   // Now marshal the length itself
+   if (!marshalLength(datalen, buffer, buflen))
       return false;
 
+   // If no buffer provided, just return number of bytes required
+   if (!buffer)
+   {
+      buflen += datalen;
+      return true;
+   }
+
    // Marshal all items in the sequence
-   unsigned char *dataloc = buffer;
    for (unsigned int i = 0; i < _size; ++i)
    {
       if (!_data[i]->Marshal(buffer, buflen))
          return false;
    }
-
-   // Now go back and fill in proper length
-   int junk = 1000; // we already know there's enough space
-   marshalLength(buffer-dataloc, lenloc, junk);
 
    return true;
 }
