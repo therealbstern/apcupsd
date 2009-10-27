@@ -102,7 +102,7 @@ bool SnmpEngine::Open(const char *host, unsigned short port, const char *comm)
    }
 
    _trapsock = socket(PF_INET, SOCK_DGRAM, 0);
-   if (_socket == -1)
+   if (_trapsock == -1)
    {
       perror("socket");
       return false;
@@ -479,8 +479,11 @@ VbListMessage *VbListMessage::CreateFromSequence(
    return new VbListMessage(type, community, seq);
 }
 
-VbListMessage::VbListMessage(Asn::Identifier type, const char *community, Asn::Sequence &seq) :
-   Message(type, community)
+VbListMessage::VbListMessage(
+   Asn::Identifier type,
+   const char *community,
+   Asn::Sequence &seq) :
+      Message(type, community)
 {
    // Format was already verified in CreateFromSequence()
    _reqid = seq[0]->AsInteger()->IntValue();
@@ -489,13 +492,17 @@ VbListMessage::VbListMessage(Asn::Identifier type, const char *community, Asn::S
    _vblist = new VarBindList(*seq[3]->AsSequence());
 }
 
-VbListMessage::VbListMessage(Asn::Identifier type, const char *community, int reqid,
-                             const int oid[], Variable *data) :
-   Message(type, community),
-   _reqid(reqid),
-   _errstatus(0),
-   _errindex(0),
-   _vblist(new VarBindList(oid, data))
+VbListMessage::VbListMessage(
+   Asn::Identifier type,
+   const char *community,
+   int reqid,
+   const int oid[],
+   Variable *data) :
+      Message(type, community),
+      _reqid(reqid),
+      _errstatus(0),
+      _errindex(0),
+      _vblist(new VarBindList(oid, data))
 {
 }
 
@@ -551,11 +558,11 @@ Message *Message::Demarshal(unsigned char *&buffer, unsigned int &buflen)
    case Asn::GET_REQ_PDU:
    case Asn::GETNEXT_REQ_PDU:
    case Asn::GET_RSP_PDU:
-      ret = (Message*)VbListMessage::CreateFromSequence(
+      ret = VbListMessage::CreateFromSequence(
          type, community, *seq[2]->AsSequence());
       break;
    case Asn::TRAP_PDU:
-      ret = (Message*)TrapMessage::CreateFromSequence(
+      ret = TrapMessage::CreateFromSequence(
          type, community, *seq[2]->AsSequence());
       break;
    default:
@@ -599,8 +606,11 @@ TrapMessage *TrapMessage::CreateFromSequence(
    return new TrapMessage(type, community, seq);
 }
 
-TrapMessage::TrapMessage(Asn::Identifier type, const char *community, Asn::Sequence &seq) :
-   Message(type, community)
+TrapMessage::TrapMessage(
+   Asn::Identifier type,
+   const char *community,
+   Asn::Sequence &seq) :
+      Message(type, community)
 {
    // Format was already verified in CreateFromSequence()
    _enterprise = seq[0]->copy()->AsObjectId();

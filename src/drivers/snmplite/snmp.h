@@ -139,7 +139,11 @@ namespace Snmp
          Asn::Identifier type, const char *community, Asn::Sequence &seq);
 
    protected:
-      VbListMessage(Asn::Identifier type, const char *community, Asn::Sequence &seq);
+      VbListMessage(
+         Asn::Identifier type,
+         const char *community,
+         Asn::Sequence &seq);
+
       virtual Asn::Sequence *GetAsn();
 
       int _reqid;
