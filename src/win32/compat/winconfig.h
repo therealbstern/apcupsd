@@ -367,4 +367,10 @@
 
 #define HAVE_SOCKLEN_T 1
 
+/* Which variant of gethostbyname_r() do we have */
+#define HAVE_FUNC_GETHOSTBYNAME_R_0
+#undef HAVE_FUNC_GETHOSTBYNAME_R_3
+#undef HAVE_FUNC_GETHOSTBYNAME_R_5
+#undef HAVE_FUNC_GETHOSTBYNAME_R_6
+
 #endif /* __MINGWNCONFIG_H */

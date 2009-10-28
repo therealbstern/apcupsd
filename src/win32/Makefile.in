@@ -129,7 +129,8 @@ LIB_OBJS = \
    $(OBJDIR)/athread.o \
    $(OBJDIR)/astring.o \
    $(OBJDIR)/atimer.o \
-   $(OBJDIR)/autil.o
+   $(OBJDIR)/autil.o \
+   $(OBJDIR)/gethostname.o
 
 #
 # Rules for generating from ../lib
@@ -196,6 +197,9 @@ $(OBJDIR)/atimer.o:	  ../lib/atimer.cpp
 	$(CXX) -c $< -o $@
 
 $(OBJDIR)/autil.o:	  ../lib/autil.cpp
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/gethostname.o:	  ../lib/gethostname.c
 	$(CXX) -c $< -o $@
 
 ######################################################################
