@@ -62,22 +62,23 @@ bool SnmpEngine::Open(const char *host, unsigned short port, const char *comm)
    memset(&_destaddr, 0, sizeof(_destaddr));
    _destaddr.sin_family = AF_INET;
    _destaddr.sin_port = htons(port);
-
-   unsigned int inaddr = inet_addr(host);
-   if (inaddr != INADDR_NONE) 
+   _destaddr.sin_addr.s_addr = inet_addr(host);
+   if (_destaddr.sin_addr.s_addr == INADDR_NONE) 
    {
-      _destaddr.sin_addr.s_addr = inaddr;
-   }
-   else
-   {
-      struct hostent *hp = gethostbyname(host);
-      if (hp == NULL)
+      struct hostent he;
+      char *tmphstbuf = NULL;
+      size_t hstbuflen = 0;
+      struct hostent *hp = gethostname_re(host, &he, &tmphstbuf, &hstbuflen);
+      if (!hp || hp->h_length != sizeof(_destaddr.sin_addr.s_addr) || 
+          hp->h_addrtype != AF_INET)
+      {
+         free(tmphstbuf);
          return false;
+      }
 
-      if (hp->h_length != sizeof(inaddr) || hp->h_addrtype != AF_INET)
-         return false;
-
-      _destaddr.sin_addr.s_addr = *(unsigned int *)hp->h_addr;
+      memcpy(&_destaddr.sin_addr.s_addr, hp->h_addr, 
+             sizeof(_destaddr.sin_addr.s_addr));
+      free(tmphstbuf);
    }
 
    // Get a UDP socket
@@ -92,7 +93,7 @@ bool SnmpEngine::Open(const char *host, unsigned short port, const char *comm)
    struct sockaddr_in addr;
    memset(&addr, 0, sizeof(addr));
    addr.sin_family = AF_INET;
-   addr.sin_port = htons(0);
+   addr.sin_port = 0;
    addr.sin_addr.s_addr = INADDR_ANY;
    int rc = bind(_socket, (struct sockaddr*)&addr, sizeof(addr));
    if (rc == -1)
@@ -110,7 +111,7 @@ bool SnmpEngine::Open(const char *host, unsigned short port, const char *comm)
 
    memset(&addr, 0, sizeof(addr));
    addr.sin_family = AF_INET;
-   addr.sin_port = htons(162);
+   addr.sin_port = htons(SNMP_TRAP_PORT);
    addr.sin_addr.s_addr = INADDR_ANY;
    rc = bind(_trapsock, (struct sockaddr*)&addr, sizeof(addr));
    if (rc == -1)
