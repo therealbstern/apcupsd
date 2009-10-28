@@ -665,6 +665,11 @@ AC_HELP_STRING([--disable-net-snmp], [No NET-SNMP UPS code (default)])],
 
 dnl If we're building SNMP, try to find relevant libs
 if test "$WANT_SNMP" = "yes" ; then
+   dnl Check for optional crypto lib
+   AC_CHECK_LIB(crypto, EVP_DigestInit,
+      [echo '   including crypto library for snmp.'; DRVLIBS="$DRVLIBS -lcrypto"],
+      [],
+      [])
 
    WANT_NET_SNMP="yes"
    SNMP_LIB_FOUND="no"
@@ -673,16 +678,19 @@ if test "$WANT_SNMP" = "yes" ; then
    CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
    LDFLAGS="${LDFLAGS} -L/usr/local/lib"
 
-   dnl Optional crypto library, sometimes needed by libnetsnmp
-   AC_CHECK_LIB_STATIC(crypto, EVP_DigestInit, SNMPLIBS, -ldl, [])
-
    dnl Start by looking for libnetsnmp (net-snmp).
-   AC_CHECK_LIB_STATIC(netsnmp, snmp_open, SNMPLIBS, [], SNMP_LIB_FOUND="yes")
+   if test "$SNMP_LIB_FOUND" = "no" ; then
+      AC_CHECK_LIB(netsnmp, snmp_open,
+         [DRVLIBS="$DRVLIBS -lnetsnmp"
+          SNMP_LIB_FOUND="yes"], [], [$DRVLIBS])
+   fi
 
    dnl If no lib yet, fall back on libsnmp (ucd-snmp)
    if test "$SNMP_LIB_FOUND" = "no" ; then
       WANT_NET_SNMP="no"
-      AC_CHECK_LIB_STATIC(snmp, snmp_open, SNMPLIBS, [], SNMP_LIB_FOUND="yes")
+      AC_CHECK_LIB(snmp, snmp_open,
+         [DRVLIBS="$DRVLIBS -lsnmp"
+          SNMP_LIB_FOUND="yes"], [], [$DRVLIBS])
    fi
 
    if test "$SNMP_LIB_FOUND" = "no" ; then
@@ -690,7 +698,6 @@ if test "$WANT_SNMP" = "yes" ; then
    fi
 
    dnl If we get this far, we found a valid lib
-   DRVLIBS="${DRVLIBS} ${SNMPLIBS}"
    AC_DEFINE(HAVE_SNMP_DRIVER)
    if test "$WANT_NET_SNMP" = "yes" ; then
       AC_DEFINE(HAVE_NET_SNMP)
@@ -763,33 +770,6 @@ AC_ARG_ENABLE(gapcmon,
       dnl
       PKG_CHECK_MODULES(GAPCMON, gtk+-2.0 >= 2.4.0 glib-2.0 gthread-2.0 gconf-2.0)
       GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DVERSION=\\\"$VERSION\\\""
-
-      dnl
-      dnl Figure out which gethostbyname_r() variant we have
-      dnl
-      AX_FUNC_WHICH_GETHOSTBYNAME_R
-      case "$ac_cv_func_which_gethostbyname_r" in
-         three)
-         GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_3"
-         ;;
-
-         five)
-         GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_5"
-         ;;
-
-         six)
-         GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_6"
-         ;;
-
-         no)
-         GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_0"
-         ;;
-
-         *)
-         AC_MSG_ERROR([gapcmon requires gethostbyname_r])
-         ;;
-      esac
-
    fi],
   [])
 AC_SUBST(GAPCMON)
@@ -819,6 +799,36 @@ AC_ARG_ENABLE(apcagent,
       ;;
    esac])
 AC_SUBST(APCAGENT)
+
+dnl
+dnl Figure out which gethostbyname_r() variant we have
+dnl
+AX_FUNC_WHICH_GETHOSTBYNAME_R
+case "$ac_cv_func_which_gethostbyname_r" in
+   three)
+   AC_DEFINE(HAVE_FUNC_GETHOSTBYNAME_R_3)
+   GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_3"
+   ;;
+
+   five)
+   AC_DEFINE(HAVE_FUNC_GETHOSTBYNAME_R_5)
+   GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_5"
+   ;;
+
+   six)
+   AC_DEFINE(HAVE_FUNC_GETHOSTBYNAME_R_6)
+   GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_6"
+   ;;
+
+   no)
+   AC_DEFINE(HAVE_FUNC_GETHOSTBYNAME_R_0)
+   GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_0"
+   ;;
+
+   *)
+   AC_MSG_ERROR([gethostbyname_r is required])
+   ;;
+esac
 
 if test -n "$GCC"; then
    # Starting with GCC 3.0, you must link C++ programs against either

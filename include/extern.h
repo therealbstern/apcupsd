@@ -254,4 +254,11 @@ int winioctl(int fd, int func, int *addr);
   int nanosleep(const struct timespec *req, struct timespec *rem);
 #endif
 
+/*
+ * Common interface to the various versions of gethostbyname_r().
+ * Implemented in gethostname.c.
+ */
+struct hostent * gethostname_re
+    (const char *host,struct hostent *hostbuf,char **tmphstbuf,size_t *hstbuflen);
+
 #endif   /* _EXTERN_H */

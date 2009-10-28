@@ -10704,6 +10704,74 @@ if test "${enable_net_snmp+set}" = set; then
 fi;
 
 if test "$WANT_SNMP" = "yes" ; then
+      echo "$as_me:$LINENO: checking for EVP_DigestInit in -lcrypto" >&5
+echo $ECHO_N "checking for EVP_DigestInit in -lcrypto... $ECHO_C" >&6
+if test "${ac_cv_lib_crypto_EVP_DigestInit+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lcrypto  $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char EVP_DigestInit ();
+int
+main ()
+{
+EVP_DigestInit ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
+  (eval $ac_link) 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } &&
+	 { ac_try='test -z "$ac_c_werror_flag"
+			 || test ! -s conftest.err'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; } &&
+	 { ac_try='test -s conftest$ac_exeext'
+  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
+  (eval $ac_try) 2>&5
+  ac_status=$?
+  echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); }; }; then
+  ac_cv_lib_crypto_EVP_DigestInit=yes
+else
+  echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+ac_cv_lib_crypto_EVP_DigestInit=no
+fi
+rm -f conftest.err conftest.$ac_objext \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+echo "$as_me:$LINENO: result: $ac_cv_lib_crypto_EVP_DigestInit" >&5
+echo "${ECHO_T}$ac_cv_lib_crypto_EVP_DigestInit" >&6
+if test $ac_cv_lib_crypto_EVP_DigestInit = yes; then
+  echo '   including crypto library for snmp.'; DRVLIBS="$DRVLIBS -lcrypto"
+fi
+
 
    WANT_NET_SNMP="yes"
    SNMP_LIB_FOUND="no"
@@ -10711,129 +10779,32 @@ if test "$WANT_SNMP" = "yes" ; then
       CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
    LDFLAGS="${LDFLAGS} -L/usr/local/lib"
 
-      echo "$as_me:$LINENO: checking for EVP_DigestInit in -lcrypto" >&5
-echo $ECHO_N "checking for EVP_DigestInit in -lcrypto... $ECHO_C" >&6
-    _libs=${LIBS}
-    LIBS="${LIBS} -Wl,-Bstatic -lcrypto -Wl,-Bdynamic -ldl $SNMPLIBS"
-    cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-int EVP_DigestInit(void);
-int
-main ()
-{
-(void)EVP_DigestInit()
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  echo "$as_me:$LINENO: result: yes (static)" >&5
-echo "${ECHO_T}yes (static)" >&6
-        SNMPLIBS="-Wl,-Bstatic -lcrypto -Wl,-Bdynamic -ldl $SNMPLIBS"
-
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-LIBS="-lcrypto -ldl $SNMPLIBS"
-        cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-int EVP_DigestInit(void);
-int
-main ()
-{
-(void)EVP_DigestInit()
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-            SNMPLIBS="-lcrypto -ldl $SNMPLIBS"
-
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-
-fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-     LIBS=${_libs}
-
-
+      if test "$SNMP_LIB_FOUND" = "no" ; then
       echo "$as_me:$LINENO: checking for snmp_open in -lnetsnmp" >&5
 echo $ECHO_N "checking for snmp_open in -lnetsnmp... $ECHO_C" >&6
-    _libs=${LIBS}
-    LIBS="${LIBS} -Wl,-Bstatic -lnetsnmp -Wl,-Bdynamic  $SNMPLIBS"
-    cat >conftest.$ac_ext <<_ACEOF
+if test "${ac_cv_lib_netsnmp_snmp_open+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lnetsnmp $DRVLIBS $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-int snmp_open(void);
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char snmp_open ();
 int
 main ()
 {
-(void)snmp_open()
+snmp_open ();
   ;
   return 0;
 }
@@ -10860,90 +10831,53 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  echo "$as_me:$LINENO: result: yes (static)" >&5
-echo "${ECHO_T}yes (static)" >&6
-        SNMPLIBS="-Wl,-Bstatic -lnetsnmp -Wl,-Bdynamic  $SNMPLIBS"
-        SNMP_LIB_FOUND="yes"
+  ac_cv_lib_netsnmp_snmp_open=yes
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-LIBS="-lnetsnmp  $SNMPLIBS"
-        cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-int snmp_open(void);
-int
-main ()
-{
-(void)snmp_open()
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-            SNMPLIBS="-lnetsnmp  $SNMPLIBS"
-            SNMP_LIB_FOUND="yes"
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-
+ac_cv_lib_netsnmp_snmp_open=no
 fi
 rm -f conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
-
+LIBS=$ac_check_lib_save_LIBS
 fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-     LIBS=${_libs}
+echo "$as_me:$LINENO: result: $ac_cv_lib_netsnmp_snmp_open" >&5
+echo "${ECHO_T}$ac_cv_lib_netsnmp_snmp_open" >&6
+if test $ac_cv_lib_netsnmp_snmp_open = yes; then
+  DRVLIBS="$DRVLIBS -lnetsnmp"
+          SNMP_LIB_FOUND="yes"
+fi
 
+   fi
 
       if test "$SNMP_LIB_FOUND" = "no" ; then
       WANT_NET_SNMP="no"
       echo "$as_me:$LINENO: checking for snmp_open in -lsnmp" >&5
 echo $ECHO_N "checking for snmp_open in -lsnmp... $ECHO_C" >&6
-    _libs=${LIBS}
-    LIBS="${LIBS} -Wl,-Bstatic -lsnmp -Wl,-Bdynamic  $SNMPLIBS"
-    cat >conftest.$ac_ext <<_ACEOF
+if test "${ac_cv_lib_snmp_snmp_open+set}" = set; then
+  echo $ECHO_N "(cached) $ECHO_C" >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lsnmp $DRVLIBS $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
 /* confdefs.h.  */
 _ACEOF
 cat confdefs.h >>conftest.$ac_ext
 cat >>conftest.$ac_ext <<_ACEOF
 /* end confdefs.h.  */
-int snmp_open(void);
+
+/* Override any gcc2 internal prototype to avoid an error.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+/* We use char because int might match the return type of a gcc2
+   builtin and then its argument prototype would still apply.  */
+char snmp_open ();
 int
 main ()
 {
-(void)snmp_open()
+snmp_open ();
   ;
   return 0;
 }
@@ -10970,71 +10904,23 @@ if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
   ac_status=$?
   echo "$as_me:$LINENO: \$? = $ac_status" >&5
   (exit $ac_status); }; }; then
-  echo "$as_me:$LINENO: result: yes (static)" >&5
-echo "${ECHO_T}yes (static)" >&6
-        SNMPLIBS="-Wl,-Bstatic -lsnmp -Wl,-Bdynamic  $SNMPLIBS"
-        SNMP_LIB_FOUND="yes"
+  ac_cv_lib_snmp_snmp_open=yes
 else
   echo "$as_me: failed program was:" >&5
 sed 's/^/| /' conftest.$ac_ext >&5
 
-LIBS="-lsnmp  $SNMPLIBS"
-        cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-int snmp_open(void);
-int
-main ()
-{
-(void)snmp_open()
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (eval echo "$as_me:$LINENO: \"$ac_link\"") >&5
-  (eval $ac_link) 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } &&
-	 { ac_try='test -z "$ac_c_werror_flag"
-			 || test ! -s conftest.err'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; } &&
-	 { ac_try='test -s conftest$ac_exeext'
-  { (eval echo "$as_me:$LINENO: \"$ac_try\"") >&5
-  (eval $ac_try) 2>&5
-  ac_status=$?
-  echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); }; }; then
-  echo "$as_me:$LINENO: result: yes" >&5
-echo "${ECHO_T}yes" >&6
-            SNMPLIBS="-lsnmp  $SNMPLIBS"
-            SNMP_LIB_FOUND="yes"
-else
-  echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-echo "$as_me:$LINENO: result: no" >&5
-echo "${ECHO_T}no" >&6
-
+ac_cv_lib_snmp_snmp_open=no
 fi
 rm -f conftest.err conftest.$ac_objext \
       conftest$ac_exeext conftest.$ac_ext
-
+LIBS=$ac_check_lib_save_LIBS
 fi
-rm -f conftest.err conftest.$ac_objext \
-      conftest$ac_exeext conftest.$ac_ext
-     LIBS=${_libs}
+echo "$as_me:$LINENO: result: $ac_cv_lib_snmp_snmp_open" >&5
+echo "${ECHO_T}$ac_cv_lib_snmp_snmp_open" >&6
+if test $ac_cv_lib_snmp_snmp_open = yes; then
+  DRVLIBS="$DRVLIBS -lsnmp"
+          SNMP_LIB_FOUND="yes"
+fi
 
    fi
 
@@ -11044,8 +10930,7 @@ echo "$as_me: error: Cannot find SNMP libraries." >&2;}
    { (exit 1); exit 1; }; }
    fi
 
-      DRVLIBS="${DRVLIBS} ${SNMPLIBS}"
-   cat >>confdefs.h <<\_ACEOF
+      cat >>confdefs.h <<\_ACEOF
 #define HAVE_SNMP_DRIVER 1
 _ACEOF
 
@@ -11354,6 +11239,37 @@ echo "${ECHO_T}yes" >&6
 	:
 fi
       GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DVERSION=\\\"$VERSION\\\""
+   fi
+fi;
+
+
+APCAGENT=
+APCAGENT_ENABLED=no
+# Check whether --enable-apcagent or --disable-apcagent was given.
+if test "${enable_apcagent+set}" = set; then
+  enableval="$enable_apcagent"
+   if test "$enableval" = "yes" ; then
+      case $host in
+      *-*-darwin*)
+         APCAGENT=apcagent
+         APCAGENT_ENABLED=yes
+         ;;
+      *)
+         { { echo "$as_me:$LINENO: error: apcagent can only be built on Mac OS X" >&5
+echo "$as_me: error: apcagent can only be built on Mac OS X" >&2;}
+   { (exit 1); exit 1; }; }
+         ;;
+      esac
+   fi
+else
+  case $host in
+   *-*-darwin*)
+      APCAGENT=apcagent
+      APCAGENT_ENABLED=yes
+      ;;
+   esac
+fi;
+
 
 
 
@@ -11671,61 +11587,45 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-      case "$ac_cv_func_which_gethostbyname_r" in
-         three)
-         GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_3"
-         ;;
+case "$ac_cv_func_which_gethostbyname_r" in
+   three)
+   cat >>confdefs.h <<\_ACEOF
+#define HAVE_FUNC_GETHOSTBYNAME_R_3 1
+_ACEOF
 
-         five)
-         GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_5"
-         ;;
+   GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_3"
+   ;;
 
-         six)
-         GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_6"
-         ;;
+   five)
+   cat >>confdefs.h <<\_ACEOF
+#define HAVE_FUNC_GETHOSTBYNAME_R_5 1
+_ACEOF
 
-         no)
-         GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_0"
-         ;;
+   GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_5"
+   ;;
 
-         *)
-         { { echo "$as_me:$LINENO: error: gapcmon requires gethostbyname_r" >&5
-echo "$as_me: error: gapcmon requires gethostbyname_r" >&2;}
+   six)
+   cat >>confdefs.h <<\_ACEOF
+#define HAVE_FUNC_GETHOSTBYNAME_R_6 1
+_ACEOF
+
+   GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_6"
+   ;;
+
+   no)
+   cat >>confdefs.h <<\_ACEOF
+#define HAVE_FUNC_GETHOSTBYNAME_R_0 1
+_ACEOF
+
+   GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_0"
+   ;;
+
+   *)
+   { { echo "$as_me:$LINENO: error: gethostbyname_r is required" >&5
+echo "$as_me: error: gethostbyname_r is required" >&2;}
    { (exit 1); exit 1; }; }
-         ;;
-      esac
-
-   fi
-fi;
-
-
-APCAGENT=
-APCAGENT_ENABLED=no
-# Check whether --enable-apcagent or --disable-apcagent was given.
-if test "${enable_apcagent+set}" = set; then
-  enableval="$enable_apcagent"
-   if test "$enableval" = "yes" ; then
-      case $host in
-      *-*-darwin*)
-         APCAGENT=apcagent
-         APCAGENT_ENABLED=yes
-         ;;
-      *)
-         { { echo "$as_me:$LINENO: error: apcagent can only be built on Mac OS X" >&5
-echo "$as_me: error: apcagent can only be built on Mac OS X" >&2;}
-   { (exit 1); exit 1; }; }
-         ;;
-      esac
-   fi
-else
-  case $host in
-   *-*-darwin*)
-      APCAGENT=apcagent
-      APCAGENT_ENABLED=yes
-      ;;
-   esac
-fi;
-
+   ;;
+esac
 
 if test -n "$GCC"; then
    # Starting with GCC 3.0, you must link C++ programs against either

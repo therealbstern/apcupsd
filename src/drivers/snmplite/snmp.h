@@ -209,6 +209,8 @@ namespace Snmp
       bool issue(Message *pdu);
       Message *rspwait(unsigned int msec, bool trap = false);
 
+      static const unsigned short SNMP_TRAP_PORT = 162;
+
       int _socket;
       int _trapsock;
       int _reqid;
