@@ -413,7 +413,10 @@ $(OBJDIR)/apcaccess.o:	../apcaccess.c
 
 # smtp objects
 OBJS_SMTP = \
-	$(OBJDIR)/smtp.o
+	$(OBJDIR)/smtp.o \
+	$(OBJDIR)/apclog.o \
+	$(OBJDIR)/asys.o \
+	$(OBJDIR)/apcerror.o
 
 $(OBJDIR)/smtp.o:	../smtp.c
 	$(CXX) -c $< -o $@
@@ -440,7 +443,10 @@ $(OBJDIR)/popup.o: popup.c
 
 # email objects
 OBJS_EMAIL = \
-	$(OBJDIR)/email.o
+	$(OBJDIR)/email.o \
+	$(OBJDIR)/apclog.o \
+	$(OBJDIR)/asys.o \
+	$(OBJDIR)/apcerror.o 
 
 $(OBJDIR)/email.o: email.c
 	$(CXX) -c $< -o $@
@@ -472,7 +478,11 @@ OBJS_APT = \
    $(OBJDIR)/meter.o \
    $(OBJDIR)/listview.o \
    $(OBJDIR)/instmgr.o \
-   $(OBJDIR)/winconfig.o
+   $(OBJDIR)/winconfig.o \
+   $(OBJDIR)/astring.o \
+   $(OBJDIR)/statmgr.o \
+   $(OBJDIR)/amutex.o \
+   $(OBJDIR)/gethostname.o
 
 $(OBJDIR)/winabout.o:  winabout.cpp
 	$(CXX) -c $< -o $@
@@ -582,13 +592,13 @@ POP_LIBS =
 BKG_OBJS = $(OBJS_BKG)
 BKG_LIBS = 
 
-APT_OBJS = $(OBJS_APT) $(OBJS_COMPAT) $(OBJDIR)/astring.o $(OBJDIR)/statmgr.o $(OBJDIR)/amutex.o
+APT_OBJS = $(OBJS_APT) $(OBJS_COMPAT)
 APT_LIBS = -L$(LIB_MINGW) -luser32 -lgdi32 -lwsock32 -lnetapi32 -lrpcrt4 $(LIB_PTHREADS)
 
-SMTP_OBJS = $(OBJS_SMTP) $(OBJDIR)/apclog.o $(OBJDIR)/asys.o $(OBJDIR)/apcerror.o $(OBJS_COMPAT)
+SMTP_OBJS = $(OBJS_SMTP) $(OBJS_COMPAT)
 SMTP_LIBS = $(APC_LIBS)
 
-EMAIL_OBJS = $(OBJS_EMAIL) $(OBJDIR)/apclog.o $(OBJDIR)/asys.o $(OBJDIR)/apcerror.o $(OBJS_COMPAT)
+EMAIL_OBJS = $(OBJS_EMAIL) $(OBJS_COMPAT)
 EMAIL_LIBS = -L$(LIB_MINGW) -lwsock32 -lmapi32
 
 GAPCMON_OBJS = $(OBJS_GAPCMON)
@@ -599,17 +609,17 @@ GAPCMON_LIBS = $(LIB_PTHREADS) -L$(DEPKGS)/glib/lib -Wl,--export-dynamic \
 
 MULTIMON_OBJS = $(OBJDIR)/upsfetch.o $(OBJDIR)/cgilib.o $(OBJDIR)/multimon.o \
    $(OBJDIR)/apclibnis.o $(OBJDIR)/asys.o ${OBJDIR}/apcerror.o \
-   ${OBJDIR}/netcompat.o
+   ${OBJDIR}/netcompat.o $(OBJDIR)/gethostname.o
 MULTIMON_LIBS = -L$(LIB_MINGW) -lwsock32
 
 UPSSTATS_OBJS = $(OBJDIR)/upsfetch.o $(OBJDIR)/cgilib.o $(OBJDIR)/upsstats.o \
    $(OBJDIR)/apclibnis.o $(OBJDIR)/asys.o ${OBJDIR}/apcerror.o \
-   ${OBJDIR}/netcompat.o
+   ${OBJDIR}/netcompat.o $(OBJDIR)/gethostname.o
 UPSSTATS_LIBS = -L$(LIB_MINGW) -lwsock32
 
 UPSFSTATS_OBJS = $(OBJDIR)/upsfetch.o $(OBJDIR)/cgilib.o $(OBJDIR)/upsfstats.o \
    $(OBJDIR)/apclibnis.o $(OBJDIR)/asys.o ${OBJDIR}/apcerror.o \
-   ${OBJDIR}/netcompat.o
+   ${OBJDIR}/netcompat.o $(OBJDIR)/gethostname.o
 UPSFSTATS_LIBS = -L$(LIB_MINGW) -lwsock32
 
 UPSIMAGE_OBJS = $(OBJDIR)/cgilib.o $(OBJDIR)/upsimage.o \
