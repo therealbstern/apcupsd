@@ -233,10 +233,7 @@ int net_open(const char *host, char *service, int port)
    int nonblock = 1;
    int block = 0;
    int sockfd, rc;
-   struct hostent *hp;
    struct sockaddr_in tcp_serv_addr;  /* socket information */
-   unsigned int inaddr;               /* Careful here to use unsigned int for */
-                                      /* compatibility with Alpha */
 
 #ifndef HAVE_MINGW
    // Every platform has their own magic way to avoid getting a SIGPIPE
@@ -256,17 +253,28 @@ int net_open(const char *host, char *service, int port)
    memset((char *)&tcp_serv_addr, 0, sizeof(tcp_serv_addr));
    tcp_serv_addr.sin_family = AF_INET;
    tcp_serv_addr.sin_port = htons(port);
-
-   if ((inaddr = inet_addr(host)) != INADDR_NONE) {
-      tcp_serv_addr.sin_addr.s_addr = inaddr;
-   } else {
-      if ((hp = gethostbyname(host)) == NULL)
+   tcp_serv_addr.sin_addr.s_addr = inet_addr(host);
+   if (tcp_serv_addr.sin_addr.s_addr == INADDR_NONE) {
+      struct hostent he;
+      char *tmphstbuf = NULL;
+      size_t hstbuflen = 0;
+      struct hostent *hp = gethostname_re(host, &he, &tmphstbuf, &hstbuflen);
+      if (!hp)
+      {
+         free(tmphstbuf);
          return -h_errno;
+      }
 
-      if (hp->h_length != sizeof(inaddr) || hp->h_addrtype != AF_INET)
+      if (hp->h_length != sizeof(tcp_serv_addr.sin_addr.s_addr) || 
+          hp->h_addrtype != AF_INET)
+      {
+         free(tmphstbuf);
          return -EINVAL;
+      }
 
-      tcp_serv_addr.sin_addr.s_addr = *(unsigned int *)hp->h_addr;
+      memcpy(&tcp_serv_addr.sin_addr.s_addr, hp->h_addr, 
+             sizeof(tcp_serv_addr.sin_addr.s_addr));
+      free(tmphstbuf);
    }
 
    /* Open a TCP socket */
