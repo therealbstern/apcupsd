@@ -26,10 +26,6 @@
 #include "snmp.h"
 #include "asn.h"
 
-#ifndef   INADDR_NONE
-#define   INADDR_NONE    ((in_addr_t)-1))
-#endif
-
 #ifdef __WIN32__
 #define close(x) closesocket(x)
 #endif

@@ -157,4 +157,9 @@
 # include "tcpd.h"
 #endif
 
+/* Solaris doesn't define this */
+#ifndef INADDR_NONE
+#define INADDR_NONE ((in_addr_t)-1)
+#endif
+
 #endif
