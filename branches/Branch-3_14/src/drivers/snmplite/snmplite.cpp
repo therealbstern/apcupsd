@@ -33,7 +33,7 @@ struct snmplite_ups_internal_data
    char device[MAXSTRING];             /* Copy of ups->device */
    char *host;                         /* hostname|IP of peer */
    unsigned short port;                /* Remote port, usually 161 */
-   char *community;                    /* Community name */
+   const char *community;              /* Community name */
    Snmp::SnmpEngine *snmp;
    int error_count;
    time_t commlost_time;
@@ -56,7 +56,7 @@ int snmplite_ups_open(UPSINFO *ups)
    memset(sid, 0, sizeof(struct snmplite_ups_internal_data));
    sid->port = 161;
    sid->community = "private";
-   
+
    if (ups->device == NULL || *ups->device == '\0') {
       log_event(ups, LOG_ERR, "snmplite Missing hostname");
       exit(1);
