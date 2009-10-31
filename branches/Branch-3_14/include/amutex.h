@@ -52,10 +52,12 @@ public:
    inline void lock()   const { pthread_mutex_lock(&_mutex); }
    inline void unlock() const { pthread_mutex_unlock(&_mutex); }
 
-private:
+protected:
 
-   astring _name;
    mutable pthread_mutex_t _mutex;
+   astring _name;
+
+private:
 
    static const char *DEFAULT_NAME;
 

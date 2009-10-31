@@ -26,6 +26,7 @@
 #define __ASTRING_H
 
 #include <string.h>
+#include <stdarg.h>
 
 class astring
 {
@@ -39,6 +40,7 @@ public:
    int len() const { return _len; }
 
    int format(const char *format, ...);
+   int vformat(const char *format, va_list args);
 
    astring &operator=(const astring &rhs);
    astring &operator=(const char *rhs);

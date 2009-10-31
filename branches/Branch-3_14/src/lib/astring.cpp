@@ -34,6 +34,17 @@ int astring::format(const char *format, ...)
    va_list args;
 
    va_start(args, format);
+   vformat(format, args);
+   va_end(args);
+
+   return _len;
+}
+
+int astring::vformat(const char *format, va_list ap)
+{
+   va_list args;
+
+   va_copy(args, ap);
    int len = vsnprintf(NULL, 0, format, args);
    va_end(args);
 
@@ -46,7 +57,7 @@ int astring::format(const char *format, ...)
    _len = len;
    _data = new char[_len+1];
 
-   va_start(args, format);
+   va_copy(args, ap);
    vsnprintf(_data, _len+1, format, args);
    va_end(args);
 
