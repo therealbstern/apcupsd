@@ -238,7 +238,7 @@ int net_open(const char *host, char *service, int port)
 #ifndef HAVE_MINGW
    // Every platform has their own magic way to avoid getting a SIGPIPE
    // when writing to a stream socket where the remote end has closed. 
-   // This method one work pretty much everywhere which avoids the mess
+   // This method works pretty much everywhere which avoids the mess
    // of figuring out which incantation this platform supports. (Excepting
    // for win32 which doesn't support signals at all.)
    struct sigaction sa;
