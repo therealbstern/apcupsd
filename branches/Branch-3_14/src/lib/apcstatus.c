@@ -30,11 +30,10 @@ int output_status(UPSINFO *ups, int sockfd,
    void s_write(UPSINFO *ups, const char *fmt, ...),
    int s_close(UPSINFO *ups, int sockfd))
 {
-   char datetime[MAXSTRING];
+   char datetime[100];
    char buf[MAXSTRING];
    time_t now = time(NULL);
    int time_on_batt;
-   struct tm tm;
    char status[100];
 
    s_open(ups);
@@ -53,10 +52,8 @@ int output_status(UPSINFO *ups, int sockfd,
    if (ups->poll_time == 0)        /* this is always zero on slave */
       ups->poll_time = now;
 
-   localtime_r(&ups->poll_time, &tm);
-   strftime(datetime, 100, "%a %b %d %X %Z %Y", &tm);
-
    /* put the last UPS poll time on the DATE record */
+   format_date(ups->poll_time, datetime, sizeof(datetime));
    s_write(ups, "DATE     : %s\n", datetime);
 
    gethostname(buf, sizeof buf);
@@ -70,8 +67,7 @@ int output_status(UPSINFO *ups, int sockfd,
    s_write(ups, "MODEL    : %s\n", ups->mode.long_name);
    s_write(ups, "UPSMODE  : %s\n", ups->upsclass.long_name);
 
-   localtime_r(&ups->start_time, &tm);
-   strftime(datetime, 100, "%a %b %d %X %Z %Y", &tm);
+   format_date(ups->start_time, datetime, sizeof(datetime));
    s_write(ups, "STARTTIME: %s\n", datetime);
 
    if (ups->sharenet.type != DISABLE)
@@ -82,8 +78,7 @@ int output_status(UPSINFO *ups, int sockfd,
       if (ups->last_master_connect_time == 0) {
          s_write(ups, "MASTERUPD: No connection to Master\n");
       } else {
-         localtime_r(&ups->last_master_connect_time, &tm);
-         strftime(datetime, 100, "%a %b %d %X %Z %Y", &tm);
+         format_date(ups->last_master_connect_time, datetime, sizeof(datetime));
          s_write(ups, "MASTERUPD: %s\n", datetime);
       }
 
@@ -332,8 +327,7 @@ int output_status(UPSINFO *ups, int sockfd,
 
       s_write(ups, "NUMXFERS : %d\n", ups->num_xfers);
       if (ups->num_xfers > 0) {
-         localtime_r(&ups->last_onbatt_time, &tm);
-         strftime(datetime, 100, "%a %b %d %X %Z %Y", &tm);
+         format_date(ups->last_onbatt_time, datetime, sizeof(datetime));
          s_write(ups, "XONBATT  : %s\n", datetime);
       }
 
@@ -345,16 +339,14 @@ int output_status(UPSINFO *ups, int sockfd,
       s_write(ups, "CUMONBATT: %d seconds\n", ups->cum_time_on_batt + time_on_batt);
 
       if (ups->last_offbatt_time > 0) {
-         localtime_r(&ups->last_offbatt_time, &tm);
-         strftime(datetime, 100, "%a %b %d %X %Z %Y", &tm);
+         format_date(ups->last_offbatt_time, datetime, sizeof(datetime));
          s_write(ups, "XOFFBATT : %s\n", datetime);
       } else {
          s_write(ups, "XOFFBATT : N/A\n");
       }
 
       if (ups->LastSelfTest != 0) {
-         localtime_r(&ups->LastSelfTest, &tm);
-         strftime(datetime, 100, "%a %b %d %X %Z %Y", &tm);
+         format_date(ups->LastSelfTest, datetime, sizeof(datetime));
          s_write(ups, "LASTSTEST: %s\n", datetime);
       }
 
@@ -457,8 +449,7 @@ int output_status(UPSINFO *ups, int sockfd,
    read_unlock(ups);
 
    /* put the current time in the END APC record */
-   localtime_r(&now, &tm);
-   strftime(datetime, 100, "%a %b %d %X %Z %Y", &tm);
+   format_date(now, datetime, sizeof(datetime));
    s_write(ups, "END APC  : %s\n", datetime);
 
    return s_close(ups, sockfd);
