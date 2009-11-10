@@ -23,7 +23,7 @@
  */
 
 #include "autil.h"
-#include <sys/time.h>
+#include "apc.h"
 
 void calc_abstimeout(int msec, struct timespec *abstime)
 {
