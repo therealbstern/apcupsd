@@ -65,6 +65,7 @@ const struct s_known_info known_info[] = {
    {CI_VLINE,                   0x00840030, P_INPUT,   T_UNITS,    true },  /* Line Voltage */
    {CI_VOUT,                    0x00840030, P_OUTPUT,  T_UNITS,    true },  /* Output Voltage */
    {CI_VBATT,                   0x00840030, P_BATTERY, T_UNITS,    true },  /* Battery Voltage */
+   {CI_VBATT,                   0x00840030, P_PWSUM,   T_UNITS,    true },  /* Battery Voltage (alternative) */
    {CI_NONE,                    0x00840031, P_ANY,     T_UNITS,    false},  /* Current */
    {CI_FREQ,                    0x00840032, P_OUTPUT,  T_UNITS,    true },  /* Frequency */
    {CI_NONE,                    0x00840033, P_ANY,     T_UNITS,    false},  /* ApparentPower */
@@ -74,6 +75,7 @@ const struct s_known_info known_info[] = {
    {CI_ATEMP,                   0x00840036, P_APC1,    T_UNITS,    true },  /* Ambient Temperature */
    {CI_HUMID,                   0x00840037, P_ANY,     T_UNITS,    true },  /* Humidity */
    {CI_NOMBATTV,                0x00840040, P_BATTERY, T_UNITS,    false},  /* ConfigVoltage (battery) */
+   {CI_NOMBATTV,                0x00840040, P_PWSUM,   T_UNITS,    false},  /* ConfigVoltage (battery, alternate) */
    {CI_NOMOUTV,                 0x00840040, P_OUTPUT,  T_UNITS,    false},  /* ConfigVoltage (output) */
    {CI_NOMINV,                  0x00840040, P_INPUT,   T_UNITS,    false},  /* ConfigVoltage (input) */
    {CI_NONE,                    0x00840042, P_ANY,     T_UNITS,    false},  /* ConfigFrequency */
