@@ -36,7 +36,7 @@ function getfiles()
       //                                  cat    vers    name
       "!href=\"(/projects/apcupsd/files/([^/]+)/([^/]+)/([^/]+)/download)\"" .
       //            size                     date             downloads
-      ".*?<td>([\d\.]+ [a-zA-Z]+)</td>.*?<td>[a-zA-Z]+ (.*?)</td>.*?<td>(.*?)</td>!",
+      ".*?<td>([\d\.]+ [a-zA-Z]+)</td>.*?<td>(.*?)</td>.*?<td>(.*?)</td>!",
       $res, $files, PREG_SET_ORDER);
 
    // remove duplicates (due to "latest files" list)
