@@ -28,6 +28,7 @@ function getfiles()
    $res = curl_exec($ch);
    curl_close($ch);
 
+   $res = strstr($res, "All Files");
    $res = str_replace("\n", "", $res);
    $res = str_replace("\r", "", $res);
 
