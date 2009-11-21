@@ -162,7 +162,7 @@ foreach ($category_map as $category => $catname)
             echo "  <th><font size=\"+1\" color=\"FFFFFF\">$catname</font></th>\n";
             echo "  <th><font color=\"FFFFFF\">&nbsp;Signature&nbsp;</font></th>\n";
             echo "  <th><font color=\"FFFFFF\">Size</font></th>\n";
-            echo "  <th><font color=\"FFFFFF\">Release Date</font></th>\n";
+            echo "  <th><font color=\"FFFFFF\">&nbsp;Release Date&nbsp;</font></th>\n";
             echo "  <th><font color=\"FFFFFF\">&nbsp;Downloads&nbsp;</font></th>\n";
             echo "</tr>\n";
          }
@@ -174,7 +174,7 @@ foreach ($category_map as $category => $catname)
          else
             echo "  <td align=\"center\"><a href=\"https://sourceforge.net/projects/apcupsd/files/$category/$file[$VER]/$file[$NAM].sig/download\">sig</td>\n";
          echo "  <td align=\"right\">$file[$SIZ]</td>\n";
-         echo "  <td>$file[$DAT]</td>\n";
+         echo "  <td align=\"center\">$file[$DAT]</td>\n";
          echo "  <td align=\"center\">$file[$DLS]</td>\n";
          echo "</tr>\n";
 
