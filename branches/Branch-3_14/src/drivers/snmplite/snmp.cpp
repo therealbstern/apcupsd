@@ -34,6 +34,7 @@ using namespace Snmp;
 
 SnmpEngine::SnmpEngine() :
    _socket(-1),
+   _trapsock(-1),
    _reqid(0)
 {
 }
@@ -44,7 +45,7 @@ SnmpEngine::~SnmpEngine()
    close(_trapsock);
 }
 
-bool SnmpEngine::Open(const char *host, unsigned short port, const char *comm)
+bool SnmpEngine::Open(const char *host, unsigned short port, const char *comm, bool trap)
 {
    // In case we are already open
    close(_socket);
@@ -102,22 +103,26 @@ bool SnmpEngine::Open(const char *host, unsigned short port, const char *comm)
       return false;
    }
 
-   _trapsock = socket(PF_INET, SOCK_DGRAM, 0);
-   if (_trapsock == -1)
+   // Open socket for receiving traps, if clients wants one
+   if (trap)
    {
-      perror("socket");
-      return false;
-   }
+      _trapsock = socket(PF_INET, SOCK_DGRAM, 0);
+      if (_trapsock == -1)
+      {
+         perror("socket");
+         return false;
+      }
 
-   memset(&addr, 0, sizeof(addr));
-   addr.sin_family = AF_INET;
-   addr.sin_port = htons(SNMP_TRAP_PORT);
-   addr.sin_addr.s_addr = INADDR_ANY;
-   rc = bind(_trapsock, (struct sockaddr*)&addr, sizeof(addr));
-   if (rc == -1)
-   {
-      perror("bind");
-      return false;
+      memset(&addr, 0, sizeof(addr));
+      addr.sin_family = AF_INET;
+      addr.sin_port = htons(SNMP_TRAP_PORT);
+      addr.sin_addr.s_addr = INADDR_ANY;
+      rc = bind(_trapsock, (struct sockaddr*)&addr, sizeof(addr));
+      if (rc == -1)
+      {
+         perror("bind");
+         return false;
+      }
    }
 
    return true;
@@ -218,6 +223,9 @@ out:
 
 TrapMessage *SnmpEngine::TrapWait(unsigned int msec)
 {
+   if (_trapsock == -1)
+      return NULL;
+
    return (TrapMessage*)rspwait(msec, true);
 }
 
