@@ -151,55 +151,26 @@ void Usage(const char *text1, const char* text2)
               MB_OK | MB_ICONINFORMATION);
 }
 
-// This thread runs on Windows 2000 and higher. It monitors the registry
-// for changes in apctray instances (/add & /del) and also looks for the
+// This thread runs on Windows 2000 and higher. It monitors for the
 // global exit event to be signaled (/kill).
-bool runthread = false;
-HANDLE regevt = NULL;
+static bool runthread = false;
+static HANDLE exitevt;
 DWORD WINAPI EventThread(LPVOID param)
 {
    // Create global exit event and allow Adminstrator access to it so any
    // member of the Administrators group can signal it.
-   HANDLE exitevt = CreateEvent(NULL, TRUE, FALSE, APCTRAY_STOP_EVENT_NAME);
+   exitevt = CreateEvent(NULL, TRUE, FALSE, APCTRAY_STOP_EVENT_NAME);
    GrantAccess(exitevt, EVENT_MODIFY_STATE, TRUSTEE_IS_GROUP, "Administrators");
 
-   // Create local event for watching the registry
-   regevt = CreateEvent(NULL, FALSE, FALSE, NULL);
+   // Wait for event to be signaled or for an error
+   DWORD rc = WaitForSingleObject(exitevt, INFINITE);
+   if (rc == WAIT_OBJECT_0)
+      PostToApctray(WM_CLOSE);
 
-   // Open registry key to be watched
-   HKEY hkey;
-   RegOpenKeyEx(HKEY_LOCAL_MACHINE, "Software\\Apcupsd\\Apctray",
-                0, KEY_READ|KEY_WRITE, &hkey);
-
-   // Request asynchronous registry watch
-   DWORD filter = REG_NOTIFY_CHANGE_NAME | REG_NOTIFY_CHANGE_LAST_SET;
-   RegNotifyChangeKeyValue(hkey, TRUE, filter, regevt, TRUE);
-
-   // Wait for either event to be signaled
-   HANDLE hnds[] = { exitevt, regevt };
-   while (runthread)
-   {
-      DWORD rc = WaitForMultipleObjects(2, hnds, FALSE, INFINITE);
-      if (!runthread || rc == WAIT_FAILED)
-         break;
-
-      switch (rc-WAIT_OBJECT_0)
-      {
-      case 0:  // Global exit event
-         runthread = false;
-         PostToApctray(WM_CLOSE);
-         break;
-      }
-   }
-
-   RegCloseKey(hkey);
-   CloseHandle(regevt);
    CloseHandle(exitevt);
    return 0;
 }
 
-// WinMain parses the command line and either calls the main App
-// routine or, under NT, the main service routine.
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                    PSTR CmdLine, int iCmdShow)
 {
@@ -231,7 +202,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       }
    }
 
-   // Check to see if we're already running
+   // Check to see if we're already running in this session
    const char *semname = g_os_version < WINDOWS_2000 ?
       "apctray" : "Local\\apctray";
    HANDLE sem = CreateSemaphore(NULL, 0, 1, semname);
@@ -240,15 +211,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       WSACleanup();
       return 0;
    }
-/*
-   // On Win2K and above we spawn a thread to watch for registry changes
-   // or exit requests.
+
+   // On Win2K and above we spawn a thread to watch for exit requests.
    HANDLE evtthread;
    if (g_os_version >= WINDOWS_2000) {
       runthread = true;
       evtthread = CreateThread(NULL, 0, EventThread, NULL, 0, NULL);
    }
-*/
+
    WPARAM generation = 0;
    InstanceManager instmgr(appinst);
    instmgr.CreateMonitors();
@@ -299,16 +269,15 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       }
    }
 
-/*
    // Wait for event thread to exit cleanly
    if (g_os_version >= WINDOWS_2000) {
       runthread = false;
-      SetEvent(regevt); // Kick regevt to wake up thread
+      SetEvent(exitevt); // Kick exitevt to wake up thread
       if (WaitForSingleObject(evtthread, 5000) == WAIT_TIMEOUT)
          TerminateThread(evtthread, 0);
       CloseHandle(evtthread);
    }
-*/
+
    WSACleanup();
    return 0;
 }
