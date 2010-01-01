@@ -30,13 +30,15 @@ extern struct CiOidMap CiOidMap[];
 
 struct snmplite_ups_internal_data
 {
-   char device[MAXSTRING];             /* Copy of ups->device */
-   char *host;                         /* hostname|IP of peer */
-   unsigned short port;                /* Remote port, usually 161 */
-   const char *community;              /* Community name */
-   Snmp::SnmpEngine *snmp;
-   int error_count;
-   time_t commlost_time;
+   char device[MAXSTRING];    /* Copy of ups->device */
+   char *host;                /* hostname|IP of peer */
+   unsigned short port;       /* Remote port, usually 161 */
+   char *vendor;              /* SNMP vendor: APC or APC_NOTRAP */
+   const char *community;     /* Community name */
+   Snmp::SnmpEngine *snmp;    /* SNMP engine instance */
+   int error_count;           /* Number of consecutive SNMP network errors */
+   time_t commlost_time;      /* Time at which we declared COMMLOST */
+   bool traps;                /* Are we listening for SNMP traps? */
 };
 
 int snmplite_ups_open(UPSINFO *ups)
@@ -56,6 +58,8 @@ int snmplite_ups_open(UPSINFO *ups)
    memset(sid, 0, sizeof(struct snmplite_ups_internal_data));
    sid->port = 161;
    sid->community = "private";
+   sid->vendor = "APC";
+   sid->traps = true;
 
    if (ups->device == NULL || *ups->device == '\0') {
       log_event(ups, LOG_ERR, "snmplite Missing hostname");
@@ -70,7 +74,7 @@ int snmplite_ups_open(UPSINFO *ups)
     *
     *    DEVICE address:port:vendor:community
     *
-    * vendor can be "APC" or "RFC".
+    * vendor can be "APC" or "APC_NOTRAP".
     */
 
    char *cp = sid->host = sid->device;
@@ -89,14 +93,23 @@ int snmplite_ups_open(UPSINFO *ups)
       if (cp)
       {
          *cp++ = '\0';
+         sid->vendor = cp;
+
          cp = strchr(cp, ':');
          if (cp)
-            sid->community = cp+1;
+         {
+            *cp++ = '\0';
+            sid->community = cp;
+         }
       }
    }
 
+   // Disable SNMP trap catching if user specific APC_NOTRAP vendor
+   if (sid->vendor && strcmp(sid->vendor, "APC_NOTRAP") == 0)
+      sid->traps = false;
+
    sid->snmp = new Snmp::SnmpEngine();
-   if (!sid->snmp->Open(sid->host, sid->port, sid->community))
+   if (!sid->snmp->Open(sid->host, sid->port, sid->community, sid->traps))
       return 0;
 
    return 1;
@@ -193,14 +206,22 @@ int snmplite_ups_check_state(UPSINFO *ups)
    struct snmplite_ups_internal_data *sid =
       (struct snmplite_ups_internal_data *)ups->driver_internal_data;
 
-   // Simple trap handling: Any valid trap causes us to return and thus
-   // new data will be fetched from the UPS.
-   Snmp::TrapMessage *trap = sid->snmp->TrapWait(ups->wait_time * 1000);
-   if (trap)
+   if (sid->traps)
    {
-      Dmsg2(80, "Got TRAP: generic=%d, specific=%d\n", 
-         trap->Generic(), trap->Specific());
-      delete trap;
+      // Simple trap handling: Any valid trap causes us to return and thus
+      // new data will be fetched from the UPS.
+      Snmp::TrapMessage *trap = sid->snmp->TrapWait(ups->wait_time * 1000);
+      if (trap)
+      {
+         Dmsg2(80, "Got TRAP: generic=%d, specific=%d\n", 
+            trap->Generic(), trap->Specific());
+         delete trap;
+      }
+   }
+   else
+   {
+      // Traps are disabled: Just delay for wait_time seconds.
+      sleep(ups->wait_time);
    }
 
    return 1;
@@ -611,7 +632,7 @@ int snmplite_ups_read_volatile_data(UPSINFO *ups)
    {
       // Query failed. Close and reopen SNMP to help recover.
       sid->snmp->Close();
-      sid->snmp->Open(sid->host, sid->port, sid->community);
+      sid->snmp->Open(sid->host, sid->port, sid->community, sid->traps);
 
       if (ups->is_commlost())
       {

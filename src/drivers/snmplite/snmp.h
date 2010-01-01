@@ -188,7 +188,7 @@ namespace Snmp
       SnmpEngine();
       ~SnmpEngine();
 
-      bool Open(const char *host, unsigned short port, const char *comm);
+      bool Open(const char *host, unsigned short port, const char *comm, bool trap);
       void Close();
 
       struct OidVar
