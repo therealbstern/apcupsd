@@ -7,15 +7,7 @@
  *   July MM  
  */
 #include "windows.h"
-#include "resource.h"
-#include "winups.h"
 #include <stdio.h>
-
-#define BALLOON_ENBALE_REG_PATH \
-   "Software\\Microsoft\\Windows\\CurrentVersion\\Explorer\\Advanced"
-
-#define BALLOON_ENABLE_REG_KEY "EnableBalloonTips"
-
 
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, 
 		   PSTR szCmdLine, int iCmdShow)
@@ -51,58 +43,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
       szCmdLine[len-1] = 0;
    }
 
-   // Assume we're not doing a popup
-   int dopopup = 0;
-
-   // Locate Apcupsd tray icon window.
-   // If we can't find it, we will do a popup
-   HWND tray = FindWindowEx(
-      NULL, NULL, APCTRAY_WINDOW_CLASS, NULL);
-   if (!tray)
-      dopopup = 1;
-
-   // Only Win2k and higher can use balloon notification
-   // On other systems, we do a popup.
-   OSVERSIONINFO vers;
-   vers.dwOSVersionInfoSize = sizeof(vers);
-   if (GetVersionEx(&vers) == 0 || vers.dwMajorVersion < 5)
-      dopopup = 1;
-
-   // Finally, check for a group policy on balloon tips
-   HKEY hkey;
-   DWORD type, val, size;
-   LONG result;
-
-   // First in HKEY_CURRENT_USER
-   type = REG_DWORD;
-   size = sizeof(val);
-   result = RegOpenKeyEx(
-      HKEY_CURRENT_USER, BALLOON_ENBALE_REG_PATH, 0, KEY_QUERY_VALUE, &hkey);
-   if (result == ERROR_SUCCESS) {
-      result = RegQueryValueEx(
-         hkey, BALLOON_ENABLE_REG_KEY, NULL, &type, (BYTE*)&val, &size);
-      if (result == ERROR_SUCCESS && !val)
-         dopopup = 1;
-      RegCloseKey(hkey);
-   }
-
-   // And again in HKEY_LOCAL_MACHINE
-   type = REG_DWORD;
-   size = sizeof(val);
-   result = RegOpenKeyEx(
-      HKEY_LOCAL_MACHINE, BALLOON_ENBALE_REG_PATH, 0, KEY_QUERY_VALUE, &hkey);
-   if (result == ERROR_SUCCESS) {
-      result = RegQueryValueEx(
-         hkey, BALLOON_ENABLE_REG_KEY, NULL, &type, (BYTE*)&val, &size);
-      if (result == ERROR_SUCCESS && !val)
-         dopopup = 1;
-      RegCloseKey(hkey);
-   }
-
    // Now display the popup
-   if (dopopup) {
-      MessageBox(NULL, msg, "Apcupsd message", MB_OK);
-   }
+   MessageBox(NULL, msg, "Apcupsd message", MB_OK);
 
    return 0;
 }
