@@ -102,7 +102,7 @@ BINUTILS_ARCHIVE="binutils-2.16.91-20060119-1-src.tar.gz"
 
 MINGW_ARCHIVE="mingw-runtime-3.9.tar.gz"
 
-W32API_ARCHIVE="w32api-3.7.tar.gz"
+W32API_ARCHIVE="w32api-3.14-mingw32-dev.tar.gz"
 
 
 # These are the files from the SDL website
@@ -116,7 +116,7 @@ DIRECTX_ARCHIVE=""
 
 # These are the files from NSIS at sf.net
 NSIS_URL="http://heanet.dl.sourceforge.net/sourceforge/nsis"
-NSIS_ARCHIVE=nsis-2.45-src.tar.bz2
+NSIS_ARCHIVE=nsis-2.46-src.tar.bz2
 
 #-----------------------------------------------------
 #
