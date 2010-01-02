@@ -67,6 +67,12 @@ CXX = $(BIN_DIR)/mingw32-g++ -O2 $(DEFINES) $(INCLUDES)
 WINDRES = $(BIN_DIR)/mingw32-windres
 MAKENSIS = $(BIN_DIR)/makensis
 STRIP = $(BIN_DIR)/mingw32-strip
+UNIX2DOS = unix2dos
+
+TEXTFILES := $(TOPDIR)/COPYING \
+             $(TOPDIR)/ChangeLog \
+             $(TOPDIR)/ReleaseNotes \
+             $(wildcard $(TOPDIR)/doc/*.txt)
 
 first: all
 
@@ -688,6 +694,7 @@ upsfstats.cgi: $(UPSFSTATS_OBJS) mingwm10.dll
 upsimage.cgi: $(UPSIMAGE_OBJS) mingwm10.dll
 	$(CXX) $(UPSIMAGE_OBJS) $(UPSIMAGE_LIBS) -o $@
 
-winapcupsd.exe: all installer/*.nsi installer/*.nsh installer/*.ini
+winapcupsd.exe: all installer/*.nsi installer/*.nsh installer/*.ini $(TEXTFILES)
 	$(STRIP) *.exe *.dll *.cgi
+	$(UNIX2DOS) -k -n $(foreach f,$(TEXTFILES),$(f) installer/$(subst .txt,,$(notdir $(f))).txt)
 	$(MAKENSIS) -V2 -DDEPKGS="$(DEPKGS)" -DVERSION="$(VERSION)" -DTOPDIR="${TOPDIR}" installer/winapcupsd.nsi

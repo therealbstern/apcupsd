@@ -101,7 +101,7 @@ Function PostProcConfig
 FunctionEnd
 
 Function ShowReadme
-  Exec 'write "$INSTDIR\ReleaseNotes"'
+  ExecShell "open" "$INSTDIR\ReleaseNotes.txt"
 FunctionEnd
 
 Function EditApcupsdConfEnter
@@ -139,7 +139,7 @@ Function EditApcupsdConfExit
   ; Launch wordpad to edit apcupsd.conf if checkbox is checked
   !insertmacro MUI_INSTALLOPTIONS_READ $R1 "EditApcupsdConf.ini" "Field 2" "State"
   ${If} $R1 == 1
-    ExecWait 'write "$INSTDIR\etc\apcupsd\apcupsd.conf"'
+    ExecWait 'notepad "$INSTDIR\etc\apcupsd\apcupsd.conf"'
   ${EndIf}
 FunctionEnd
 
@@ -158,7 +158,7 @@ Function InstallServiceExit
   ; Create Start Menu Directory
   CreateDirectory "$SMPROGRAMS\Apcupsd"
   ; Create start menu link for configuring apcupsd
-  CreateShortCut "$SMPROGRAMS\Apcupsd\Edit Configuration File.lnk" "write" "$INSTDIR\etc\apcupsd\apcupsd.conf"
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Edit Configuration File.lnk" "notepad" "$INSTDIR\etc\apcupsd\apcupsd.conf"
 
   ; If installed as a service already, remove it
   ReadRegDWORD $R0 HKLM "Software\Apcupsd" "InstalledService"
@@ -254,9 +254,9 @@ Section "-Startup"
 
   ; Install common files
   SetOutPath "$INSTDIR"
-  File ${TOPDIR}\COPYING
-  File ${TOPDIR}\ChangeLog
-  File ${TOPDIR}\ReleaseNotes
+  File COPYING.txt
+  File ChangeLog.txt
+  File ReleaseNotes.txt
 SectionEnd
 
 Section "Apcupsd Service" SecService
@@ -377,16 +377,16 @@ Section "Documentation" SecDoc
   CreateDirectory "$INSTDIR\doc"
   File ${TOPDIR}\doc\manual\manual.html
   File ${TOPDIR}\doc\manual\*.png
-  File ${TOPDIR}\doc\*.txt
+  File *.man.txt
 
   ; Create Start Menu entry
   CreateDirectory "$SMPROGRAMS\Apcupsd\Documentation"
   CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\Apcupsd User Manual.lnk"     "$INSTDIR\doc\manual.html"
-  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\apcupsd Reference.lnk"       "write" "$INSTDIR\doc\apcupsd.man.txt"
-  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\apcaccess Reference.lnk"     "write" "$INSTDIR\doc\apcaccess.man.txt"
-  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\apctest Reference.lnk"       "write" "$INSTDIR\doc\apctest.man.txt"
-  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\apccontrol Reference.lnk"    "write" "$INSTDIR\doc\apccontrol.man.txt"
-  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\Configuration Reference.lnk" "write" "$INSTDIR\doc\apcupsd.conf.man.txt"
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\apcupsd Reference.lnk"       "$INSTDIR\doc\apcupsd.man.txt"
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\apcaccess Reference.lnk"     "$INSTDIR\doc\apcaccess.man.txt"
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\apctest Reference.lnk"       "$INSTDIR\doc\apctest.man.txt"
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\apccontrol Reference.lnk"    "$INSTDIR\doc\apccontrol.man.txt"
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\Configuration Reference.lnk" "$INSTDIR\doc\apcupsd.conf.man.txt"
 SectionEnd
 
 Section "-Finish"
@@ -515,10 +515,10 @@ Section "Uninstall"
   Delete /REBOOTOK "$INSTDIR\driver\apcupsd.cat"
   Delete /REBOOTOK "$INSTDIR\driver\apcupsd_x64.cat"
   Delete /REBOOTOK "$INSTDIR\driver\install.txt"
-  Delete /REBOOTOK "$INSTDIR\README.txt"
-  Delete /REBOOTOK "$INSTDIR\COPYING"
-  Delete /REBOOTOK "$INSTDIR\ChangeLog"
-  Delete /REBOOTOK "$INSTDIR\ReleaseNotes"
+  Delete /REBOOTOK "$INSTDIR\README*"
+  Delete /REBOOTOK "$INSTDIR\COPYING*"
+  Delete /REBOOTOK "$INSTDIR\ChangeLog*"
+  Delete /REBOOTOK "$INSTDIR\ReleaseNotes*"
   Delete /REBOOTOK "$INSTDIR\Uninstall.exe"
   Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apccontrol.bat"
   Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apcupsd.conf.new"
