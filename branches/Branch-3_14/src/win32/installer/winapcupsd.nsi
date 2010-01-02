@@ -6,21 +6,18 @@
 
 !define PRODUCT "Apcupsd"
 
-; Not in the uninstaller section yet
-!define UN
-
 ;			    
 ; Include files
 ;
 !include "MUI.nsh"
 !include "LogicLib.nsh"
 !include "util.nsh"
-!include "common.nsh"
 
 ; Global variables
 Var ExistingConfig
 Var MainInstalled
 Var TrayInstalled
+Var OrigInstDir
 
 ; Paths
 !define WINDIR ${TOPDIR}/src/win32
@@ -242,8 +239,7 @@ FunctionEnd
 Section "-Startup"
   SetShellVarContext all
 
-  ; Check for existing installation
-  ; In the future we should check for existing HKLM\Software\Apcupsd\InstDir
+  ; Check for existing config file
   ${If} ${FileExists} "$INSTDIR\etc\apcupsd\apcupsd.conf"
     StrCpy $ExistingConfig 1
   ${Else}
@@ -268,8 +264,9 @@ Section "Apcupsd Service" SecService
   StrCpy $MainInstalled 1
 
   ; Shutdown any apcupsd or apctray that might be running
-  ${ShutdownApp} ${APCUPSD_WINDOW_CLASS} 5000
-  ${ShutdownApp} ${APCTRAY_WINDOW_CLASS} 5000
+  ExecWait '"$OrigInstDir\bin\apctray.exe" /kill'
+  ExecWait '"$OrigInstDir\bin\apcupsd.exe" /kill'
+  Sleep 3000
 
   ; Create installation directories
   CreateDirectory "$INSTDIR\bin"
@@ -324,7 +321,8 @@ Section "Tray Applet" SecApctray
   StrCpy $TrayInstalled 1
 
   ; Shut down any running copy
-  ${ShutdownApp} ${APCTRAY_WINDOW_CLASS} 5000
+  ExecWait '"$OrigInstDir\bin\apctray.exe" /kill'
+  Sleep 2000
 
   ; Install files
   CreateDirectory "$INSTDIR"
@@ -404,12 +402,21 @@ SectionEnd
 ; Initialization Callback
 ;
 Function .onInit
-  ; Default INSTDIR to %SystemDrive%\apcupsd
-  ReadEnvStr $0 SystemDrive
-  ${If} $0 == ''
-     StrCpy $0 'c:'
+  ; Check for existing installation
+  ReadRegStr $INSTDIR HKLM "Software\Apcupsd" "InstDir"
+  ${If} $INSTDIR == ''
+    ; Default INSTDIR to %SystemDrive%\apcupsd
+    ReadEnvStr $0 SystemDrive
+    ${If} $0 == ''
+      StrCpy $0 'c:'
+    ${EndIf}
+    StrCpy $INSTDIR $0\apcupsd
   ${EndIf}
-  StrCpy $INSTDIR $0\apcupsd
+
+  ; Preserve a copy of original install dir string before user possibly
+  ; changes it. This will be used to run existing apcupsd and apctray exes
+  ; with /kill switch to shut down running instances.
+  StrCpy $OrigInstDir $INSTDIR
 
   ; If we're on WinNT or Win95, disable the USB driver section
   Call GetWindowsVersion
@@ -457,18 +464,14 @@ LangString DESC_SecMultimon ${LANG_ENGLISH} "Install MULTIMON cgi scripts for we
 
 ; Uninstall section
 
-; Repeat common include with uninstall flag set
-!undef UN
-!define UN un.
-!include "common.nsh"
-
 UninstallText "This will uninstall Apcupsd. Hit next to continue."
 
 Section "Uninstall"
 
   ; Shutdown any apcupsd & apctray that might be running
-  ${ShutdownApp} ${APCUPSD_WINDOW_CLASS} 5000
-  ${ShutdownApp} ${APCTRAY_WINDOW_CLASS} 5000
+  ExecWait '"$INSTDIR\bin\apctray.exe" /kill'
+  ExecWait '"$INSTDIR\bin\apcupsd.exe" /kill'
+  Sleep 3000
 
   ; Remove apcuspd service, if needed
   ReadRegDWORD $R0 HKLM "Software\Apcupsd" "InstalledService"
