@@ -257,6 +257,12 @@ Section "-Startup"
   File COPYING.txt
   File ChangeLog.txt
   File ReleaseNotes.txt
+
+  ; Clean up old non-txt versions of these files
+  Delete /REBOOTOK "$INSTDIR\COPYING"
+  Delete /REBOOTOK "$INSTDIR\ChangeLog"
+  Delete /REBOOTOK "$INSTDIR\ReleaseNotes"
+
 SectionEnd
 
 Section "Apcupsd Service" SecService
