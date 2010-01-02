@@ -166,8 +166,6 @@ int powernet_snmp_ups_read_static_data(UPSINFO *ups)
    if (powernet_check_comm_lost(ups) == 0)
       return 0;
 
-   write_lock(ups);
-
    data->upsBasicIdent = NULL;
    powernet_mib_mgr_get_upsBasicIdent(s, &(data->upsBasicIdent));
    if (data->upsBasicIdent) {
@@ -294,7 +292,6 @@ int powernet_snmp_ups_read_static_data(UPSINFO *ups)
       free(data->upsAdvTest);
    }
 
-   write_unlock(ups);
    return 1;
 }
 
@@ -307,8 +304,6 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups)
 
    if (powernet_check_comm_lost(ups) == 0)
       return 0;
-
-   write_lock(ups);
 
    data->upsBasicBattery = NULL;
    powernet_mib_mgr_get_upsBasicBattery(s, &(data->upsBasicBattery));
@@ -465,7 +460,6 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups)
       free(data->upsAdvTest);
    }
 
-   write_unlock(ups);
    return 1;
 }
 
