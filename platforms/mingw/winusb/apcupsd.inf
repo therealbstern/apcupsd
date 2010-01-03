@@ -1,12 +1,10 @@
- [Version]
+[Version]
 Signature = "$Windows NT$"
-Class = MyDeviceClass
-ClassGuid={78A1C341-4539-11d3-B88D-00C04FAD5171}
+Class = Battery
+ClassGuid={72631e54-78a4-11d0-bcf7-00aa00b7b32a}
 Provider = %ProviderName%
-;CatalogFile=MyCatFile.cat
 
 ; ================== Class section ==================
-
 [ClassInstall32]
 Addreg=MyDeviceClassReg
 
@@ -15,29 +13,24 @@ HKR,,,0,%ClassName%
 HKR,,Icon,,-1
 
 ; ========== Manufacturer/Models sections ===========
-
 [Manufacturer]
-%ProviderName% = MyDevice_WinUSB,NTx86,NTamd64,NTia64
+%ProviderName% = Apcupsd_WinUSB,NTx86,NTamd64,NTia64
 
-[MyDevice_WinUSB.NTx86]
-%USB\MyDevice.DeviceDesc% =USB_Install, USB\VID_051d&PID_0002
+[Apcupsd_WinUSB.NTx86]
+%USB\MyDevice.DeviceDesc% =ApcupsdUSBDriver, USB\VID_051d&PID_0002
 
-[MyDevice_WinUSB.NTamd64]
-%USB\MyDevice.DeviceDesc% =USB_Install, USB\VID_051d&PID_0002
+[Apcupsd_WinUSB.NTamd64]
+%USB\MyDevice.DeviceDesc% =ApcupsdUSBDriver, USB\VID_051d&PID_0002
 
 ; =================== Installation ===================
-
-;[1]
-[USB_Install]
+[ApcupsdUSBDriver]
 Include=winusb.inf
 Needs=WINUSB.NT
 
-;[2]
-[USB_Install.Services]
+[ApcupsdUSBDriver.Services]
 Include=winusb.inf
 AddService=WinUSB,0x00000002,WinUSB_ServiceInstall
 
-;[3]
 [WinUSB_ServiceInstall]
 DisplayName     = %WinUSB_SvcDesc%
 ServiceType     = 1
@@ -45,22 +38,19 @@ StartType       = 3
 ErrorControl    = 1
 ServiceBinary   = %12%\WinUSB.sys
 
-;[4]
-[USB_Install.Wdf]
-KmdfService=WINUSB, WinUsb_Install
+[ApcupsdUSBDriver.Wdf]
+KmdfService=WINUSB, WinApcupsdUSBDriver
 
-[WinUSB_Install]
+[WinApcupsdUSBDriver]
 KmdfLibraryVersion=1.9
 
-;[5]
-[USB_Install.HW]
+[ApcupsdUSBDriver.HW]
 AddReg=Dev_AddReg
 
 [Dev_AddReg]
 HKR,,DeviceInterfaceGUIDs,0x10000,"{8c534620-f7e6-11de-8a39-0800200c9a66}"
 
-;[6]
-[USB_Install.CoInstallers]
+[ApcupsdUSBDriver.CoInstallers]
 AddReg=CoInstallers_AddReg
 CopyFiles=CoInstallers_CopyFiles
 
@@ -75,8 +65,6 @@ WdfCoInstaller01009.dll
 CoInstallers_CopyFiles=11
 
 ; ================= Source Media Section =====================
-;[7]
-
 [SourceDisksNames]
 1 = %DISK_NAME%,,,\i386
 2 = %DISK_NAME%,,,\amd64
@@ -88,11 +76,11 @@ WdfCoInstaller01009.dll=1
 [SourceDisksFiles.amd64]
 WinUSBCoInstaller2.dll=2
 WdfCoInstaller01009.dll=2
-; =================== Strings ===================
 
+; =================== Strings ===================
 [Strings]
-ProviderName="Apcupsd"
-USB\MyDevice.DeviceDesc="Apcupsd UPS"
+ProviderName="Apcupsd (www.apcupsd.org)"
+USB\MyDevice.DeviceDesc="American Power Conversion USB UPS (Apcupsd)"
 WinUSB_SvcDesc="WinUSB"
-DISK_NAME="My Install Disk"
-ClassName="MyDeviceClass"
+DISK_NAME="Apcupsd Driver Folder"
+ClassName="Battery"
