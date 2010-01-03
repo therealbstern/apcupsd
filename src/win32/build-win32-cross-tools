@@ -412,7 +412,7 @@ function do_nsis
 		tar xjf "$SRCDIR/$NSIS_ARCHIVE"
 		echo Building and Installing NSIS
         	cd "$NSIS"
-		scons PREFIX=$PREFIX SKIPPLUGINS=System install &> scons.log
+		scons PREFIX=$PREFIX install &> scons.log
   	      	if test $? -ne 0; then
 			echo "make of nsis failed - log available: $NSIS/scons.log"
 			exit 1
