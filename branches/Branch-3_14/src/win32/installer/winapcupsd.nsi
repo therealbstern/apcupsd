@@ -11,7 +11,8 @@
 ;
 !include "MUI.nsh"
 !include "LogicLib.nsh"
-!include "util.nsh"
+!include "StrReplace.nsh"
+!include "WinVer.nsh"
 
 ; Global variables
 Var ExistingConfig
@@ -172,16 +173,14 @@ Function InstallServiceExit
   ${If} $R1 == 1
     ; Install service
     ExecWait '"$INSTDIR\bin\apcupsd.exe" /install'
-    Call IsNt
-    Pop $R0
-    ${If} $R0 == false
-      ; Installed as a service, but not on NT
-      CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "/service"
-      CreateShortCut "$SMPROGRAMS\Apcupsd\Stop Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "/kill"
-    ${Else}
+    ${If} ${IsNT}
       ; Installed as a service and we're on NT
       CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$SYSDIR\net.exe" "start apcupsd" "$INSTDIR\bin\apcupsd.exe"
       CreateShortCut "$SMPROGRAMS\Apcupsd\Stop Apcupsd.lnk" "$SYSDIR\net.exe" "stop apcupsd" "$INSTDIR\bin\apcupsd.exe"
+    ${Else}
+      ; Installed as a service, but not on NT
+      CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "/service"
+      CreateShortCut "$SMPROGRAMS\Apcupsd\Stop Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "/kill"
     ${EndIf}
   ${Else}
     ; Not installed as a service
@@ -289,7 +288,6 @@ Section "Apcupsd Service" SecService
   SetOutPath "$INSTDIR\bin"
   File ${WINDIR}\mingwm10.dll
   File ${WINDIR}\pthreadGCE.dll
-  File ${DEPKGS}\lib\libusb0.dll
   File ${WINDIR}\apcupsd.exe
   File ${WINDIR}\smtp.exe
   File ${WINDIR}\apcaccess.exe
@@ -299,15 +297,27 @@ Section "Apcupsd Service" SecService
   File ${WINDIR}\email.exe
   File ${WINDIR}\background.exe
 
+  !if "${USBTYPE}" == "generic"
+    File ${DEPKGS}\lib\libusb0.dll
+  !endif
+
   SetOutPath "$INSTDIR\driver"
-  File ${TOPDIR}\platforms\mingw\apcupsd.inf
-  File ${TOPDIR}\platforms\mingw\apcupsd.cat
-  File ${TOPDIR}\platforms\mingw\apcupsd_x64.cat
-  File ${DEPKGS}\bin\libusb0.sys
-  File ${DEPKGS}\bin\libusb0_x64.sys
-  File ${DEPKGS}\lib\libusb0.dll
-  File ${DEPKGS}\lib\libusb0_x64.dll
-  File ${TOPDIR}\platforms\mingw\install.txt
+  !if "${USBTYPE}" == "generic"
+    File ${TOPDIR}\platforms\mingw\apcupsd.inf
+    File ${TOPDIR}\platforms\mingw\apcupsd.cat
+    File ${TOPDIR}\platforms\mingw\apcupsd_x64.cat
+    File ${DEPKGS}\bin\libusb0.sys
+    File ${DEPKGS}\bin\libusb0_x64.sys
+    File ${DEPKGS}\lib\libusb0.dll
+    File ${DEPKGS}\lib\libusb0_x64.dll
+    File ${TOPDIR}\platforms\mingw\install.txt
+  !else
+    File ${TOPDIR}\platforms\mingw\winusb\apcupsd.inf
+    SetOutPath "$INSTDIR\driver\i386"
+    File ${TOPDIR}\platforms\mingw\winusb\i386\*.dll
+    SetOutPath "$INSTDIR\driver\amd64"
+    File ${TOPDIR}\platforms\mingw\winusb\amd64\*.dll
+  !endif
 
   SetOutPath "$INSTDIR\etc\apcupsd"
   File ${TOPDIR}\platforms\mingw\apccontrol.bat
@@ -365,9 +375,7 @@ Section "Multimon CGI programs" SecMultimon
 SectionEnd
 
 Section "USB Driver" SecUsbDrv
-  Call IsNt
-  Pop $R0
-  ${If} $R0 != false
+  ${If} ${IsNT}
     SetOutPath "$WINDIR\system32"
     File ${DEPKGS}\lib\libusb0.dll
     ExecWait 'rundll32 libusb0.dll,usb_install_driver_np_rundll $INSTDIR\driver\apcupsd.inf'
@@ -424,19 +432,25 @@ Function .onInit
   ; with /kill switch to shut down running instances.
   StrCpy $OrigInstDir $INSTDIR
 
-  ; If we're on WinNT or Win95, disable the USB driver section
-  Call GetWindowsVersion
-  Pop $0
-  StrCpy $1 $0 2
-  ${If} $1 == "NT"
-  ${OrIf} $1 == "95"
-     SectionGetFlags ${SecUsbDrv} $0
-     IntOp $1 ${SF_SELECTED} ~
-     IntOp $0 $0 & $1
-     IntOp $0 $0 | ${SF_RO}
-     SectionSetFlags ${SecUsbDrv} $0
-  ${EndIf}
-
+  !if "${USBTYPE}" == "generic"
+    ; If we're on WinNT or Win95, disable the USB driver section
+    ${If} ${IsWinNT4}
+    ${OrIf} ${IsWin95}
+       SectionGetFlags ${SecUsbDrv} $0
+       IntOp $1 ${SF_SELECTED} ~
+       IntOp $0 $0 & $1
+       IntOp $0 $0 | ${SF_RO}
+       SectionSetFlags ${SecUsbDrv} $0
+    ${EndIf}
+  !else
+    ; For now always disable USB driver section when using WinUSB
+    SectionGetFlags ${SecUsbDrv} $0
+    IntOp $1 ${SF_SELECTED} ~
+    IntOp $0 $0 & $1
+    IntOp $0 $0 | ${SF_RO}
+    SectionSetFlags ${SecUsbDrv} $0
+  !endif
+  
   ; Extract custom pages. Automatically deleted when installer exits.
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT "EditApcupsdConf.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT "InstallService.ini"
@@ -521,6 +535,8 @@ Section "Uninstall"
   Delete /REBOOTOK "$INSTDIR\driver\apcupsd.cat"
   Delete /REBOOTOK "$INSTDIR\driver\apcupsd_x64.cat"
   Delete /REBOOTOK "$INSTDIR\driver\install.txt"
+  Delete /REBOOTOK "$INSTDIR\driver\i386\*.dll"
+  Delete /REBOOTOK "$INSTDIR\driver\amd64\*.dll"
   Delete /REBOOTOK "$INSTDIR\README*"
   Delete /REBOOTOK "$INSTDIR\COPYING*"
   Delete /REBOOTOK "$INSTDIR\ChangeLog*"
