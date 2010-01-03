@@ -312,6 +312,7 @@ Section "Apcupsd Service" SecService
     File ${DEPKGS}\lib\libusb0_x64.dll
     File ${TOPDIR}\platforms\mingw\install.txt
   !else
+    File ${TOPDIR}\platforms\mingw\winusb\install.txt
     File ${TOPDIR}\platforms\mingw\winusb\apcupsd.inf
     SetOutPath "$INSTDIR\driver\i386"
     File ${TOPDIR}\platforms\mingw\winusb\i386\*.dll
