@@ -543,7 +543,7 @@ $(OBJDIR)/winconfig.o:	winconfig.cpp
 
 # Windows resource file formatted version (a,b,c,d)
 comma := ,
-RCVERSION = $(subst .,$(comma),$(VERSION).0)
+RCVERSION = $(subst .,$(comma),$(firstword $(subst -, ,$(VERSION))).0)
 
 $(OBJDIR)/winres.res:  winres.rc
 	sed -e "s/\$$VERSION/$(VERSION)/" \
