@@ -23,11 +23,12 @@ Var OrigInstDir
 ; Paths
 !define WINDIR ${TOPDIR}/src/win32
 
-; Misc constants
-!define APCUPSD_WINDOW_CLASS		"apcupsd"
-!define APCUPSD_WINDOW_NAME		"apcupsd"
-!define APCTRAY_WINDOW_CLASS		"apctray"
-!define APCTRAY_WINDOW_NAME		"apctray"
+; Icon indexes in shell32.dll
+!define START_ICON_INDEX  137
+!define STOP_ICON_INDEX   131
+!define CONFIG_ICON_INDEX 21
+!define HELP_ICON_INDEX   222
+!define MANUAL_ICON_INDEX 210
 
 ;
 ; Basics
@@ -159,7 +160,7 @@ Function InstallServiceExit
   ; Create Start Menu Directory
   CreateDirectory "$SMPROGRAMS\Apcupsd"
   ; Create start menu link for configuring apcupsd
-  CreateShortCut "$SMPROGRAMS\Apcupsd\Edit Configuration File.lnk" "notepad" "$INSTDIR\etc\apcupsd\apcupsd.conf"
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Edit Configuration File.lnk" "notepad" "$INSTDIR\etc\apcupsd\apcupsd.conf" "$SYSDIR\shell32.dll" ${CONFIG_ICON_INDEX}
 
   ; If installed as a service already, remove it
   ReadRegDWORD $R0 HKLM "Software\Apcupsd" "InstalledService"
@@ -175,17 +176,17 @@ Function InstallServiceExit
     ExecWait '"$INSTDIR\bin\apcupsd.exe" /install'
     ${If} ${IsNT}
       ; Installed as a service and we're on NT
-      CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$SYSDIR\net.exe" "start apcupsd" "$INSTDIR\bin\apcupsd.exe"
-      CreateShortCut "$SMPROGRAMS\Apcupsd\Stop Apcupsd.lnk" "$SYSDIR\net.exe" "stop apcupsd" "$INSTDIR\bin\apcupsd.exe"
+      CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$SYSDIR\net.exe" "start apcupsd" "$SYSDIR\shell32.dll" ${START_ICON_INDEX}
+      CreateShortCut "$SMPROGRAMS\Apcupsd\Stop Apcupsd.lnk"  "$SYSDIR\net.exe" "stop apcupsd"  "$SYSDIR\shell32.dll" ${STOP_ICON_INDEX}
     ${Else}
       ; Installed as a service, but not on NT
-      CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "/service"
-      CreateShortCut "$SMPROGRAMS\Apcupsd\Stop Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "/kill"
+      CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "/service" "$SYSDIR\shell32.dll" ${START_ICON_INDEX}
+      CreateShortCut "$SMPROGRAMS\Apcupsd\Stop Apcupsd.lnk"  "$INSTDIR\bin\apcupsd.exe" "/kill"    "$SYSDIR\shell32.dll" ${STOP_ICON_INDEX}
     ${EndIf}
   ${Else}
     ; Not installed as a service
-    CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe"
-    CreateShortCut "$SMPROGRAMS\Apcupsd\Stop Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" "/kill"
+    CreateShortCut "$SMPROGRAMS\Apcupsd\Start Apcupsd.lnk" "$INSTDIR\bin\apcupsd.exe" ""       "$SYSDIR\shell32.dll" ${START_ICON_INDEX}
+    CreateShortCut "$SMPROGRAMS\Apcupsd\Stop Apcupsd.lnk"  "$INSTDIR\bin\apcupsd.exe" "/kill"  "$SYSDIR\shell32.dll" ${STOP_ICON_INDEX}
   ${EndIf}
 
   ; Start Apcupsd now, if so requested
@@ -396,12 +397,12 @@ Section "Documentation" SecDoc
 
   ; Create Start Menu entry
   CreateDirectory "$SMPROGRAMS\Apcupsd\Documentation"
-  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\Apcupsd User Manual.lnk"     "$INSTDIR\doc\manual.html"
-  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\apcupsd Reference.lnk"       "$INSTDIR\doc\apcupsd.man.txt"
-  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\apcaccess Reference.lnk"     "$INSTDIR\doc\apcaccess.man.txt"
-  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\apctest Reference.lnk"       "$INSTDIR\doc\apctest.man.txt"
-  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\apccontrol Reference.lnk"    "$INSTDIR\doc\apccontrol.man.txt"
-  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\Configuration Reference.lnk" "$INSTDIR\doc\apcupsd.conf.man.txt"
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\Apcupsd User Manual.lnk"     "$INSTDIR\doc\manual.html"          "" "$SYSDIR\shell32.dll" ${MANUAL_ICON_INDEX}
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\apcupsd Reference.lnk"       "$INSTDIR\doc\apcupsd.man.txt"      "" "$SYSDIR\shell32.dll" ${HELP_ICON_INDEX}
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\apcaccess Reference.lnk"     "$INSTDIR\doc\apcaccess.man.txt"    "" "$SYSDIR\shell32.dll" ${HELP_ICON_INDEX}
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\apctest Reference.lnk"       "$INSTDIR\doc\apctest.man.txt"      "" "$SYSDIR\shell32.dll" ${HELP_ICON_INDEX}
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\apccontrol Reference.lnk"    "$INSTDIR\doc\apccontrol.man.txt"   "" "$SYSDIR\shell32.dll" ${HELP_ICON_INDEX}
+  CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\Configuration Reference.lnk" "$INSTDIR\doc\apcupsd.conf.man.txt" "" "$SYSDIR\shell32.dll" ${HELP_ICON_INDEX}
 SectionEnd
 
 Section "-Finish"
