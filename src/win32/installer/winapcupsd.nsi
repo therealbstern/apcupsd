@@ -27,8 +27,8 @@ Var OrigInstDir
 !define START_ICON_INDEX  137
 !define STOP_ICON_INDEX   131
 !define CONFIG_ICON_INDEX 21
-!define HELP_ICON_INDEX   222
-!define MANUAL_ICON_INDEX 210
+!define HELP_ICON_INDEX   23
+!define MANUAL_ICON_INDEX 23
 
 ;
 ; Basics
