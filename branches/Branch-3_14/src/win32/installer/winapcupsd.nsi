@@ -270,6 +270,7 @@ Section "Apcupsd Service" SecService
   ; Shutdown any apcupsd or apctray that might be running
   ExecWait '"$OrigInstDir\bin\apctray.exe" /kill'
   ExecWait '"$OrigInstDir\bin\apcupsd.exe" /kill'
+  DetailPrint "Waiting for apcupsd and apctray to exit..."
   Sleep 3000
 
   ; Create installation directories
@@ -337,8 +338,11 @@ Section "Tray Applet" SecApctray
   StrCpy $TrayInstalled 1
 
   ; Shut down any running copy
-  ExecWait '"$OrigInstDir\bin\apctray.exe" /kill'
-  Sleep 2000
+  ${If} $MainInstalled != 1
+    ExecWait '"$OrigInstDir\bin\apctray.exe" /kill'
+    DetailPrint "Waiting for apctray to exit..."
+    Sleep 2000
+  ${EndIf}
 
   ; Install files
   CreateDirectory "$INSTDIR"
@@ -495,6 +499,7 @@ Section "Uninstall"
   ; Shutdown any apcupsd & apctray that might be running
   ExecWait '"$INSTDIR\bin\apctray.exe" /kill'
   ExecWait '"$INSTDIR\bin\apcupsd.exe" /kill'
+  DetailPrint "Waiting for apcupsd and apctray to exit..."
   Sleep 3000
 
   ; Remove apcuspd service, if needed
