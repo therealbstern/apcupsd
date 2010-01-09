@@ -78,12 +78,9 @@ typedef struct _USB_HUB_CAPABILITIES_EX {
  * WinUSB macros - from libusb-win32 1.x
  */
 
-#define DLL_DECLARE(name) \
-   __dll_##name##_t name
-
-#define DLL_EXTERN(api, ret, name, args) \
+#define DLL_DECLARE(api, ret, name, args) \
    typedef ret (api * __dll_##name##_t)args; \
-   extern __dll_##name##_t name
+   static __dll_##name##_t name
 
 #define DLL_LOAD(dll, name)                                   \
   do {                                                        \
@@ -143,44 +140,5 @@ typedef struct {
 #pragma pack()
 
 typedef void *WINUSB_INTERFACE_HANDLE, *PWINUSB_INTERFACE_HANDLE;
-
-DLL_EXTERN(WINAPI, BOOL, WinUsb_Initialize,
-            (HANDLE, PWINUSB_INTERFACE_HANDLE));
-DLL_EXTERN(WINAPI, BOOL, WinUsb_Free, (WINUSB_INTERFACE_HANDLE));
-DLL_EXTERN(WINAPI, BOOL, WinUsb_GetAssociatedInterface,
-            (WINUSB_INTERFACE_HANDLE, UCHAR, PWINUSB_INTERFACE_HANDLE));
-DLL_EXTERN(WINAPI, BOOL, WinUsb_GetDescriptor,
-            (WINUSB_INTERFACE_HANDLE, UCHAR, UCHAR, USHORT, PUCHAR,
-             ULONG, PULONG));
-DLL_EXTERN(WINAPI, BOOL, WinUsb_QueryInterfaceSettings,
-            (WINUSB_INTERFACE_HANDLE, UCHAR, PUSB_INTERFACE_DESCRIPTOR));
-DLL_EXTERN(WINAPI, BOOL, WinUsb_QueryDeviceInformation,
-            (WINUSB_INTERFACE_HANDLE, ULONG, PULONG, PVOID));
-DLL_EXTERN(WINAPI, BOOL, WinUsb_SetCurrentAlternateSetting,
-            (WINUSB_INTERFACE_HANDLE, UCHAR));
-DLL_EXTERN(WINAPI, BOOL, WinUsb_GetCurrentAlternateSetting,
-            (WINUSB_INTERFACE_HANDLE, PUCHAR));
-DLL_EXTERN(WINAPI, BOOL, WinUsb_QueryPipe,
-            (WINUSB_INTERFACE_HANDLE, UCHAR, UCHAR,
-             PWINUSB_PIPE_INFORMATION));
-DLL_EXTERN(WINAPI, BOOL, WinUsb_SetPipePolicy,
-            (WINUSB_INTERFACE_HANDLE, UCHAR, ULONG, ULONG, PVOID));
-DLL_EXTERN(WINAPI, BOOL, WinUsb_GetPipePolicy,
-            (WINUSB_INTERFACE_HANDLE, UCHAR, ULONG, PULONG, PVOID));
-DLL_EXTERN(WINAPI, BOOL, WinUsb_ReadPipe,
-            (WINUSB_INTERFACE_HANDLE, UCHAR, PUCHAR, ULONG, PULONG,
-             LPOVERLAPPED));
-DLL_EXTERN(WINAPI, BOOL, WinUsb_WritePipe,
-            (WINUSB_INTERFACE_HANDLE, UCHAR, PUCHAR, ULONG, PULONG,
-             LPOVERLAPPED));
-DLL_EXTERN(WINAPI, BOOL, WinUsb_ControlTransfer,
-            (WINUSB_INTERFACE_HANDLE, WINUSB_SETUP_PACKET, PUCHAR, ULONG,
-             PULONG, LPOVERLAPPED));
-DLL_EXTERN(WINAPI, BOOL, WinUsb_ResetPipe,
-            (WINUSB_INTERFACE_HANDLE, UCHAR));
-DLL_EXTERN(WINAPI, BOOL, WinUsb_AbortPipe,
-            (WINUSB_INTERFACE_HANDLE, UCHAR));
-DLL_EXTERN(WINAPI, BOOL, WinUsb_FlushPipe,
-            (WINUSB_INTERFACE_HANDLE, UCHAR));
 
 #endif // __WINUSB_H
