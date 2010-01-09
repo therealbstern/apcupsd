@@ -4,7 +4,13 @@
 ; Further modified by Adam Kropelin
 ;
 
-!define PRODUCT "Apcupsd"
+;
+; Basics
+;
+Name "Apcupsd"
+OutFile "winapcupsd-${VERSION}.exe"
+SetCompressor lzma
+InstallDir "c:\apcupsd"
 
 ;			    
 ; Include files
@@ -13,6 +19,7 @@
 !include "LogicLib.nsh"
 !include "StrReplace.nsh"
 !include "WinVer.nsh"
+!include "DrvSetup.nsh"
 
 ; Global variables
 Var ExistingConfig
@@ -29,15 +36,6 @@ Var OrigInstDir
 !define CONFIG_ICON_INDEX 21
 !define HELP_ICON_INDEX   23
 !define MANUAL_ICON_INDEX 23
-
-;
-; Basics
-;
-Name "Apcupsd"
-OutFile "winapcupsd-${VERSION}.exe"
-SetCompressor lzma
-InstallDir "c:\apcupsd"
-
 
 ;
 ; Pull in pages
@@ -377,15 +375,26 @@ Section "Multimon CGI programs" SecMultimon
 SectionEnd
 
 Section "USB Driver" SecUsbDrv
+!if "${USBTYPE}" == "generic"
   ${If} ${IsNT}
     SetOutPath "$WINDIR\system32"
     File ${DEPKGS}\lib\libusb0.dll
     ExecWait 'rundll32 libusb0.dll,usb_install_driver_np_rundll $INSTDIR\driver\apcupsd.inf'
   ${Else}
-    MessageBox MB_OK "The USB driver cannot be automatically installed on Win98 or WinMe. \
-                      Please see $INSTDIR\driver\install.txt for instructions on installing \
-                      the driver by hand."
+    MessageBox MB_OK|MB_ICONEXCLAMATION \
+       "The USB driver cannot be automatically installed on Win98 or WinMe. \
+        Please see $INSTDIR\driver\install.txt for instructions on installing \
+        the driver by hand."
   ${EndIf}
+!else
+  ${InstallUpgradeDriver} "$INSTDIR\driver" $INSTDIR\driver\apcupsd.inf "USB\VID_051d&PID_0002"
+  ${If} $0 != 1
+    MessageBox MB_OK|MB_ICONEXCLAMATION  \
+      "The USB driver could not be automatically installed. Please see \
+       $INSTDIR\driver\install.txt for instructions on installing the \
+       driver by hand."
+  ${EndIf}
+!endif
 SectionEnd
 
 Section "Documentation" SecDoc
@@ -444,13 +453,6 @@ Function .onInit
        IntOp $0 $0 | ${SF_RO}
        SectionSetFlags ${SecUsbDrv} $0
     ${EndIf}
-  !else
-    ; For now always disable USB driver section when using WinUSB
-    SectionGetFlags ${SecUsbDrv} $0
-    IntOp $1 ${SF_SELECTED} ~
-    IntOp $0 $0 & $1
-    IntOp $0 $0 | ${SF_RO}
-    SectionSetFlags ${SecUsbDrv} $0
   !endif
   
   ; Extract custom pages. Automatically deleted when installer exits.
