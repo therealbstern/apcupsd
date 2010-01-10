@@ -557,7 +557,7 @@ static void do_dumb_testing(void)
            "6) Test 6 - kill UPS power\n"
            "7) Test 7 - run tests 1 through 5\n"
            "8) Guess which is the appropriate cable\n"
-           "9) Quit\n\n");
+           "Q) Quit\n\n");
 
       cmd = get_cmd("Select test number: ");
 
@@ -593,15 +593,15 @@ static void do_dumb_testing(void)
          case 8:
             guess();
             break;
-         case 9:
-            quit = TRUE;
-            break;
          default:
-            pmsg("Illegal response. Please enter 1-9\n");
+            if (tolower(*cmd) == 'q')
+               quit = TRUE;
+            else
+               pmsg("Illegal response. Please enter 1-8,Q\n");
             break;
          }
       } else {
-         pmsg("Illegal response. Please enter 1-9\n");
+         pmsg("Illegal response. Please enter 1-8,Q\n");
       }
    }
 
@@ -870,7 +870,7 @@ static void do_smart_testing(void)
            "4) Monitor Battery Calibration progress\n"
            "5) Program EEPROM\n"
            "6) Enter TTY mode communicating with UPS\n"
-           "7) Quit\n\n");
+           "Q) Quit\n\n");
 
       cmd = get_cmd("Select function number: ");
       if (cmd) {
@@ -895,15 +895,16 @@ static void do_smart_testing(void)
          case 6:
             smart_ttymode();
             break;
-         case 7:
-            quit = TRUE;
-            break;
          default:
-            pmsg("Illegal response. Please enter 1-6\n");
+            if (tolower(*cmd) == 'q')
+               quit = TRUE;
+            else
+               pmsg("Illegal response. Please enter 1-6,Q\n");
+            break;
             break;
          }
       } else {
-         pmsg("Illegal response. Please enter 1-6\n");
+         pmsg("Illegal response. Please enter 1-6,Q\n");
       }
    }
    ptime();
@@ -1265,7 +1266,7 @@ static void program_smart_eeprom(void)
            "12) Change output voltage when on batteries\n"
            "13) Change the self test interval\n"
            "14) Set EEPROM with conf file values\n"
-           "15) Quit\n\n");
+           " Q) Quit\n\n");
 
       cmd = get_cmd("Select function number: ");
       if (cmd) {
@@ -1355,16 +1356,15 @@ static void program_smart_eeprom(void)
             apcsmart_ups_program_eeprom(ups, -1, NULL);
             break;
 
-         case 15:
-            quit = TRUE;
-            break;
-
          default:
-            pmsg("Illegal response. Please enter 1-15\n");
+            if (tolower(*cmd) == 'q')
+               quit = TRUE;
+            else
+               pmsg("Illegal response. Please enter 1-14,Q\n");
             break;
          }
       } else {
-         pmsg("Illegal response. Please enter 1-15\n");
+         pmsg("Illegal response. Please enter 1-14,Q\n");
       }
    }
    ptime();
@@ -1596,7 +1596,7 @@ static void do_usb_testing(void)
            "9)  Set low transfer voltage\n"
            "10) Set high transfer voltage\n"
            "11) Perform battery calibration\n"
-           "12) Quit\n\n");
+           " Q) Quit\n\n");
 
       cmd = get_cmd("Select function number: ");
       if (cmd) {
@@ -1636,15 +1636,15 @@ static void do_usb_testing(void)
          case 11:
             usb_calibration();
             break;
-         case 12:
-            quit = TRUE;
-            break;
          default:
-            pmsg("Illegal response. Please enter 1-11\n");
+            if (tolower(*cmd) == 'q')
+               quit = TRUE;
+            else
+               pmsg("Illegal response. Please enter 1-11,Q\n");
             break;
          }
       } else {
-         pmsg("Illegal response. Please enter 1-11\n");
+         pmsg("Illegal response. Please enter 1-11,Q\n");
       }
    }
    ptime();
