@@ -140,11 +140,12 @@ const struct s_known_info known_info[] = {
 
    /*  Pages 0xFF00 to 0xFFFF are vendor specific */
    /* CI                        USAGE       PHYS       TYPE        VOLATILE? */
+   {CI_STESTI,                  0xFF86001a, P_ANY,     T_NONE,     false},  /* APCSelfTestInterval */
    {CI_STATUS,                  0xFF860060, P_ANY,     T_BITS,     true },  /* APCStatusFlag */
    {CI_DSHUTD,                  0xFF860076, P_ANY,     T_UNITS,    false},  /* APCShutdownAfterDelay */
    {CI_NONE,                    0xFF860005, P_ANY,     T_NONE,     false},  /* APCGeneralCollection */
    {CI_APCForceShutdown,        0xFF86007C, P_ANY,     T_NONE,     false},  /* APCForceShutdown */
-   {CI_NONE,                    0xFF860072, P_ANY,     T_NONE,     false},  /* APCPanelTest */
+   {CI_TESTALARM,               0xFF860072, P_ANY,	    T_NONE,     false},  /* APCTestAlarm */
 // Removed the below due to all recent UPSes having the same garbage in this field
 // {CI_BattReplaceDate,         0xFF860016, P_ANY,     T_APCDATE,  false},  /* APCBattReplaceDate */
    {CI_NONE,                    0xFF860042, P_ANY,     T_NONE,     false},  /* APC_UPS_FirmwareRevision */
@@ -546,6 +547,24 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
          break;
       default:
          ups->testresult = TEST_UNKNOWN;
+         break;
+      }
+      break;
+
+   /* Self test interval */
+   case CI_STESTI:
+      switch (uval->iValue) {
+      case 0:
+         astrncpy(ups->selftest, "None", sizeof(ups->selftest));
+         break;
+      case 1:
+         astrncpy(ups->selftest, "Power On", sizeof(ups->selftest));
+         break;
+      case 2:
+         astrncpy(ups->selftest, "7 days", sizeof(ups->selftest));
+         break;
+      default:
+         astrncpy(ups->selftest, "14 days", sizeof(ups->selftest));
          break;
       }
       break;
