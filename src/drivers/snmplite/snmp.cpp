@@ -189,7 +189,7 @@ bool SnmpEngine::Get(alist<OidVar> &oids)
       return false;
 
    // Wait for a response
-   VbListMessage *rsp = (VbListMessage*)rspwait(1000);
+   VbListMessage *rsp = (VbListMessage*)rspwait(2000);
    if (!rsp)
       return false;
 
