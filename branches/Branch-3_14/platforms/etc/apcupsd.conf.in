@@ -36,48 +36,42 @@ UPSCABLE @UPSCABLE@
 # other UPS types, you must specify an appropriate port or address.
 #
 # UPSTYPE   DEVICE           Description
-# apcsmart  /dev/tty**       Newer serial character device,
-#                            appropriate for SmartUPS models using
-#                            a serial cable (not USB).
+# apcsmart  /dev/tty**       Newer serial character device, appropriate for 
+#                            SmartUPS models using a serial cable (not USB).
 #
 # usb       <BLANK>          Most new UPSes are USB. A blank DEVICE
 #                            setting enables autodetection, which is
 #                            the best choice for most installations.
 #
-# net       hostname:port    Network link to a master apcupsd
-#                            through apcupsd's Network Information
-#                            Server. This is used if you don't have
-#                            a UPS directly connected to your computer.
+# net       hostname:port    Network link to a master apcupsd through apcupsd's 
+#                            Network Information Server. This is used if the
+#                            UPS powering your computer is connected to a 
+#                            different computer for monitoring.
 #
 # snmp      hostname:port:vendor:community
-#                            SNMP Network link to an SNMP-enabled
-#                            UPS device. Vendor is the MIB used by
-#                            the UPS device: can be "APC", "APC_NOTRAP"
-#                            or "RFC" where APC is the powernet MIB,
-#                            "APC_NOTRAP" is powernet with SNMP trap
-#                            catching disabled, and RFC is the IETF's 
-#                            rfc1628 UPS-MIB. You usually want "APC".
-#                            Port is usually 161. Community is usually
-#                            "private".
+#                            SNMP network link to an SNMP-enabled UPS device.
+#                            Hostname is the ip address or hostname of the UPS 
+#                            on the network. Vendor can be can be "APC" or 
+#                            "APC_NOTRAP". "APC_NOTRAP" will disable SNMP trap 
+#                            catching; you usually want "APC". Port is usually 
+#                            161. Community is usually "private".
 #
-# snmplite  hostname:port:vendor:community
-#                            Same as SNMP above but does not require
-#                            the net-snmp library. Eventually this will
-#                            replace the snmp driver. Currently only APC 
-#                            vendor MIB is supported. Trap catching and
-#                            killpower are not yet supported.
+# netsnmp   hostname:port:vendor:community
+#                            OBSOLETE
+#                            Same as SNMP above but requires use of the 
+#                            net-snmp library. Unless you have a specific need
+#                            for this old driver, you should use 'snmp' instead.
 #
-# dumb      /dev/tty**       Old serial character device for use 
-#                            with simple-signaling UPSes.
+# dumb      /dev/tty**       Old serial character device for use with 
+#                            simple-signaling UPSes.
 #
-# pcnet    ipaddr:username:passphrase
-#                            PowerChute Network Shutdown protocol
-#                            which can be used as an alternative to SNMP
-#                            with AP9617 family of smart slot cards.
-#                            ipaddr is the IP address of the UPS mgmt
-#                            card. username and passphrase are the
-#                            credentials for which the card has been
-#                            configured.
+# pcnet     ipaddr:username:passphrase
+#                            PowerChute Network Shutdown protocol which can be 
+#                            used as an alternative to SNMP with the AP9617 
+#                            family of smart slot cards.ipaddr is the IP 
+#                            address of the UPS mgmtcard. username and 
+#                            passphrase are the credentials for which the card 
+#                            has been configured.
 #
 UPSTYPE @UPSTYPE@
 DEVICE @SERIALDEV@

@@ -886,13 +886,10 @@ Optional Features:
   --enable-net            Compile networking driver for slaves (default)
   --disable-net           No network driver for slaves
 
-  --enable-snmplite       Compile SNMP-Lite driver
-  --disable-snmplite      No SNMP-Lite driver (default)
+  --enable-snmp           Compile SNMP driver (default)
+  --disable-snmp          No SNMP driver
 
-  --enable-snmp           Compile SNMP UPS code
-  --disable-snmp          No SNMP UPS code (default)
-
-  --enable-net-snmp       Compile NET-SNMP UPS code
+  --enable-net-snmp       Compile NET-SNMP UPS code (OBSOLETE)
   --disable-net-snmp      No NET-SNMP UPS code (default)
 
   --enable-test           Compile TEST driver code
@@ -9546,7 +9543,7 @@ if test "${enable_all+set}" = set; then
       enable_usb=yes
       enable_net=yes
       enable_snmp=yes
-      enable_snmplite=yes
+      enable_net_snmp=yes
       enable_test=yes
       enable_pcnet=yes
       enable_cgi=yes
@@ -10673,38 +10670,33 @@ _ACEOF
 
 fi;
 
-# Check whether --enable-snmplite or --disable-snmplite was given.
-if test "${enable_snmplite+set}" = set; then
-  enableval="$enable_snmplite"
+# Check whether --enable-snmp or --disable-snmp was given.
+if test "${enable_snmp+set}" = set; then
+  enableval="$enable_snmp"
    if test "$enableval" = "yes" ; then
         cat >>confdefs.h <<\_ACEOF
 #define HAVE_SNMPLITE_DRIVER 1
 _ACEOF
 
         SNMPLITE_DRIVER="snmplite"
+        DISPLAY_SNMP_DRIVER="snmp"
 
      fi
-fi;
+else
+   cat >>confdefs.h <<\_ACEOF
+#define HAVE_SNMPLITE_DRIVER 1
+_ACEOF
 
-WANT_SNMP="no"
-# Check whether --enable-snmp or --disable-snmp was given.
-if test "${enable_snmp+set}" = set; then
-  enableval="$enable_snmp"
-   if test "$enableval" = "yes" ; then
-        WANT_SNMP="yes"
-     fi
+     SNMPLITE_DRIVER="snmplite"
+     DISPLAY_SNMP_DRIVER="snmp"
+
 fi;
 
 # Check whether --enable-net-snmp or --disable-net-snmp was given.
 if test "${enable_net_snmp+set}" = set; then
   enableval="$enable_net_snmp"
    if test "$enableval" = "yes" ; then
-        WANT_SNMP="yes"
-     fi
-fi;
-
-if test "$WANT_SNMP" = "yes" ; then
-      echo "$as_me:$LINENO: checking for EVP_DigestInit in -lcrypto" >&5
+                echo "$as_me:$LINENO: checking for EVP_DigestInit in -lcrypto" >&5
 echo $ECHO_N "checking for EVP_DigestInit in -lcrypto... $ECHO_C" >&6
 if test "${ac_cv_lib_crypto_EVP_DigestInit+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -10769,18 +10761,18 @@ fi
 echo "$as_me:$LINENO: result: $ac_cv_lib_crypto_EVP_DigestInit" >&5
 echo "${ECHO_T}$ac_cv_lib_crypto_EVP_DigestInit" >&6
 if test $ac_cv_lib_crypto_EVP_DigestInit = yes; then
-  echo '   including crypto library for snmp.'; DRVLIBS="$DRVLIBS -lcrypto"
+  echo '   including crypto library for snmp.'
+            DRVLIBS="$DRVLIBS -lcrypto"
 fi
 
 
-   WANT_NET_SNMP="yes"
-   SNMP_LIB_FOUND="no"
+        SNMP_LIB_FOUND="no"
 
-      CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
-   LDFLAGS="${LDFLAGS} -L/usr/local/lib"
+                CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
+        LDFLAGS="${LDFLAGS} -L/usr/local/lib"
 
-      if test "$SNMP_LIB_FOUND" = "no" ; then
-      echo "$as_me:$LINENO: checking for snmp_open in -lnetsnmp" >&5
+                if test "$SNMP_LIB_FOUND" = "no" ; then
+           echo "$as_me:$LINENO: checking for snmp_open in -lnetsnmp" >&5
 echo $ECHO_N "checking for snmp_open in -lnetsnmp... $ECHO_C" >&6
 if test "${ac_cv_lib_netsnmp_snmp_open+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -10846,14 +10838,17 @@ echo "$as_me:$LINENO: result: $ac_cv_lib_netsnmp_snmp_open" >&5
 echo "${ECHO_T}$ac_cv_lib_netsnmp_snmp_open" >&6
 if test $ac_cv_lib_netsnmp_snmp_open = yes; then
   DRVLIBS="$DRVLIBS -lnetsnmp"
-          SNMP_LIB_FOUND="yes"
+               cat >>confdefs.h <<\_ACEOF
+#define HAVE_NET_SNMP 1
+_ACEOF
+
+               SNMP_LIB_FOUND="yes"
 fi
 
-   fi
+        fi
 
-      if test "$SNMP_LIB_FOUND" = "no" ; then
-      WANT_NET_SNMP="no"
-      echo "$as_me:$LINENO: checking for snmp_open in -lsnmp" >&5
+                if test "$SNMP_LIB_FOUND" = "no" ; then
+           echo "$as_me:$LINENO: checking for snmp_open in -lsnmp" >&5
 echo $ECHO_N "checking for snmp_open in -lsnmp... $ECHO_C" >&6
 if test "${ac_cv_lib_snmp_snmp_open+set}" = set; then
   echo $ECHO_N "(cached) $ECHO_C" >&6
@@ -10919,38 +10914,31 @@ echo "$as_me:$LINENO: result: $ac_cv_lib_snmp_snmp_open" >&5
 echo "${ECHO_T}$ac_cv_lib_snmp_snmp_open" >&6
 if test $ac_cv_lib_snmp_snmp_open = yes; then
   DRVLIBS="$DRVLIBS -lsnmp"
-          SNMP_LIB_FOUND="yes"
-fi
-
-   fi
-
-   if test "$SNMP_LIB_FOUND" = "no" ; then
-      { { echo "$as_me:$LINENO: error: Cannot find SNMP libraries." >&5
-echo "$as_me: error: Cannot find SNMP libraries." >&2;}
-   { (exit 1); exit 1; }; }
-   fi
-
-      cat >>confdefs.h <<\_ACEOF
-#define HAVE_SNMP_DRIVER 1
-_ACEOF
-
-   if test "$WANT_NET_SNMP" = "yes" ; then
-      cat >>confdefs.h <<\_ACEOF
-#define HAVE_NET_SNMP 1
-_ACEOF
-
-      DISPLAY_SNMP_DRIVER="net-snmp"
-   else
-      cat >>confdefs.h <<\_ACEOF
+               cat >>confdefs.h <<\_ACEOF
 #define HAVE_UCD_SNMP 1
 _ACEOF
 
-      DISPLAY_SNMP_DRIVER="snmp"
-   fi
-
-   SNMP_DRIVER="snmp"
-
+               SNMP_LIB_FOUND="yes"
 fi
+
+        fi
+
+        if test "$SNMP_LIB_FOUND" = "no" ; then
+           { { echo "$as_me:$LINENO: error: Cannot find SNMP libraries." >&5
+echo "$as_me: error: Cannot find SNMP libraries." >&2;}
+   { (exit 1); exit 1; }; }
+        fi
+
+                cat >>confdefs.h <<\_ACEOF
+#define HAVE_SNMP_DRIVER 1
+_ACEOF
+
+        DISPLAY_NETSNMP_DRIVER="net-snmp"
+
+        SNMP_DRIVER="snmp"
+
+     fi
+fi;
 
 # Check whether --enable-test or --disable-test was given.
 if test "${enable_test+set}" = set; then
@@ -13806,7 +13794,7 @@ Configuration on `date`:
   UPSTYPE                     ${UPSTYPE}
   UPSCABLE                    ${UPSCABLE}
 
-  drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${DISPLAY_USB_DRIVER:-no-usb} ${DISPLAY_SNMP_DRIVER:-no-snmp} ${SNMPLITE_DRIVER:-no-snmplite} ${PCNET_DRIVER:-no-pcnet} ${TEST_DRIVER:-no-test}
+  drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${DISPLAY_USB_DRIVER:-no-usb} ${DISPLAY_SNMP_DRIVER:-no-snmp} ${DISPLAY_NETSNMP_DRIVER:-no-net-snmp} ${PCNET_DRIVER:-no-pcnet} ${TEST_DRIVER:-no-test}
 
   enable-nis:                 ${NISSRV_ENABLED}
   with-nisip:                 ${NISIP}
