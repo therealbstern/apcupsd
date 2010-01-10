@@ -19,6 +19,7 @@ fi
 
 files="/System/Library/Extensions/ApcupsdDummy.kext \
        /Library/StartupItems/apcupsd \
+       /Applications/apcagent.app \
        /etc/apcupsd \
        /sbin/apcaccess \
        /sbin/apcupsd \
@@ -44,4 +45,3 @@ done
 touch /System/Library/Extensions
 
 echo Apcupsd files removed. Please reboot to complete the uninstall.
-
