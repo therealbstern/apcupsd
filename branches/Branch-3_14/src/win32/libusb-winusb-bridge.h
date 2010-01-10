@@ -61,14 +61,16 @@ struct usb_device_descriptor
 
 // libusb structures, abbreviated
 struct usb_bus;
-struct usb_device {
+struct usb_device
+{
   struct usb_device *next, *prev;
   char filename[PATH_MAX + 1];
   struct usb_bus *bus;
   struct usb_device_descriptor descriptor;
 };
 
-struct usb_bus {
+struct usb_bus
+{
   struct usb_bus *next, *prev;
   char dirname[PATH_MAX + 1];
   struct usb_device *devices;
@@ -80,12 +82,13 @@ typedef struct usb_dev_handle usb_dev_handle;
 // libusb function prototypes (just the ones we support)
 usb_dev_handle *usb_open(struct usb_device *dev);
 int usb_close(usb_dev_handle *dev);
-int usb_get_string_simple(usb_dev_handle *dev, int index, char *buf,
-        size_t buflen);
-int usb_interrupt_read(usb_dev_handle *dev, int ep, char *bytes, int size,
-        int timeout);
-int usb_control_msg(usb_dev_handle *dev, int requesttype, int request,
-        int value, int index, char *bytes, int size, int timeout);
+int usb_get_string_simple(
+   usb_dev_handle *dev, int index, char *buf, size_t buflen);
+int usb_interrupt_read(
+   usb_dev_handle *dev, int ep, char *bytes, int size, int timeout);
+int usb_control_msg(
+   usb_dev_handle *dev, int requesttype, int request, int value, 
+   int index, char *bytes, int size, int timeout);
 int usb_set_configuration(usb_dev_handle *dev, int configuration);
 int usb_claim_interface(usb_dev_handle *dev, int iface);
 int usb_reset(usb_dev_handle *dev);
