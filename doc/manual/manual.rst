@@ -1291,7 +1291,11 @@ to customize your installation.
 --enable-snmp  Turns on generation of the
     SNMP driver. This driver accesses the UPS over the network using
     SNMP. This is compatible only with UPSes equipped with an SNMP or
-    Web/SNMP management card. By default this is disabled.
+    Web/SNMP management card. By default this is enabled.
+--enable-net-snmp  Turns on generation of the
+    obsolete NET-SNMP driver. This driver was the precursor to the current
+    snmp driver and is now obsolete. It is available as a fallback if the new
+    driver cannot be used for some reason. By default this is disabled.
 --enable-pcnet  Turns on generation of the
     PCNET (PowerChute Network Shutdown) driver. This driver accesses
     the UPS over the network using APC's custom protocol. This driver
@@ -1299,6 +1303,11 @@ to customize your installation.
     modern Web/SNMP management card.
 --enable-test  This turns on a test driver
     that is used only for debugging. By default it is disabled.
+--enable-gapcmon  This option enables building the GTK GUI front-end for 
+    apcupsd. Building this package requires numerous GNOME libraries. The
+    default is disabled.
+--enable-apcagent  This option enables building the apcagent menubar application
+    on Mac OS X platforms. The default is disabled.
 --with-libwrap=path, --with-libwrap  This option when
     enabled causes apcupsd to be built with the TCP WRAPPER library for
     enhanced security. In most cases, the path is optional since
@@ -3708,9 +3717,6 @@ following things:
 
 -  apcupsd version 3.10.0 or higher
 
--  Net-SNMP library (previously known as ucd-snmp) installed
-   (http://www.net-snmp.org)
-
 
 Planning and Setup for SNMP Wiring
 ----------------------------------
@@ -3728,7 +3734,6 @@ Planning and Setup for SNMP Configuration
 
 To establish communication to the UPS SNMP card
 installed in the UPS, the SNMP card will need the following:
-
 
 -  Assign SNMP card IP Address
 -  Set SNMP card General Parameters
@@ -3841,7 +3846,6 @@ There are two shutdown parameters that must be set in the SNMP card
 to ensure that connected servers shutdown quietly. These parameters
 can be set via the telnet terminal or the web browser interface.
 
-
 -  Shutdown Delay (sec)
 -  Return Battery Capacity (%)
 
@@ -3922,7 +3926,7 @@ Where the directive is made by four parts:
 - ``port``: Remote SNMP port, normally 161
 - ``vendor``: Kind of remote SNMP agent: "APC" for APC's PowerNet
    MIB, "APC_NOTRAP" for the PowerNet MIB with SNMP trap catching
-   disabled, or "RFC" for the IETF's rfc1628 UPS-MIB. (Note that
+   disabled. (Note that
    APC_NOTRAP is only accepted by apcupsd-3.12.0 and higher. See
    below for trap catching details.)
 - ``community``: The read-write community string, usually "private"
