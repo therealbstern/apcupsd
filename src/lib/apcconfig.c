@@ -115,15 +115,15 @@ static const GENINFO types[] = {
     * Below are the new "drivers" entries. Entries above with time (long)
     * will go away.
     */
-   { "dumb",     "DUMB UPS Driver",      DUMB_UPS },
-   { "apcsmart", "APC Smart UPS (any)",  APCSMART_UPS },
-   { "usb",      "USB UPS Driver",       USB_UPS },
-   { "snmp",     "SNMP UPS Driver",      SNMP_UPS },
-   { "net",      "NETWORK UPS Driver",   NETWORK_UPS },
-   { "test",     "TEST UPS Driver",      TEST_UPS },
-   { "pcnet",    "PCNET UPS Driver",     PCNET_UPS },
-   { "snmplite", "SNMP Lite UPS Driver", SNMPLITE_UPS },
-   { NULL,       "*invalid-ups-type*",   NO_UPS },
+   { "dumb",     "DUMB UPS Driver",     DUMB_UPS },
+   { "apcsmart", "APC Smart UPS (any)", APCSMART_UPS },
+   { "usb",      "USB UPS Driver",      USB_UPS },
+   { "snmp",     "SNMP UPS Driver",     SNMPLITE_UPS },
+   { "net",      "NETWORK UPS Driver",  NETWORK_UPS },
+   { "test",     "TEST UPS Driver",     TEST_UPS },
+   { "pcnet",    "PCNET UPS Driver",    PCNET_UPS },
+   { "netsnmp",  "NET-SNMP UPS Driver", SNMP_UPS },
+   { NULL,       "*invalid-ups-type*",  NO_UPS },
 };
 
 typedef struct {
