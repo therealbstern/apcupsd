@@ -39,6 +39,7 @@ struct snmplite_ups_internal_data
    int error_count;           /* Number of consecutive SNMP network errors */
    time_t commlost_time;      /* Time at which we declared COMMLOST */
    bool traps;                /* Are we listening for SNMP traps? */
+   unsigned int alarmtimer;   /* UPS Alarm timer setting */
 };
 
 int snmplite_ups_open(UPSINFO *ups)
@@ -232,7 +233,10 @@ int snmplite_ups_check_state(UPSINFO *ups)
 
 static void snmplite_ups_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
 {
-   switch (ci)
+   struct snmplite_ups_internal_data *sid =
+      (struct snmplite_ups_internal_data *)ups->driver_internal_data;
+
+  switch (ci)
    {
    case CI_VLINE:
       Dmsg1(80, "Got CI_VLINE: %d\n", data.u32);
@@ -329,22 +333,30 @@ static void snmplite_ups_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       }
       break;
 
+   case CI_AlarmTimer:
+      Dmsg1(80, "Got CI_AlarmTimer: %d\n", data.u32);
+      // Remember alarm timer setting; we will use it for CI_DALARM
+      sid->alarmtimer = data.u32;
+      break;
+
    case CI_DALARM:
       Dmsg1(80, "Got CI_DALARM: %d\n", data.u32);
       switch (data.u32)
       {
-      case 1:
-         // ADK: Need to check alarm time here like old driver did
-         astrncpy(ups->beepstate, "Timed", sizeof(ups->beepstate));
+      case 1: // Timed (uses CI_AlarmTimer)
+         if (ups->UPS_Cap[CI_AlarmTimer] && sid->alarmtimer < 30)
+            astrncpy(ups->beepstate, "0", sizeof(ups->beepstate)); // 5 secs
+         else
+            astrncpy(ups->beepstate, "T", sizeof(ups->beepstate)); // 30 secs
          break;
-      case 2:
-         astrncpy(ups->beepstate, "LowBatt", sizeof(ups->beepstate));
+      case 2: // LowBatt
+         astrncpy(ups->beepstate, "L", sizeof(ups->beepstate));
          break;
-      case 3:
-         astrncpy(ups->beepstate, "NoAlarm", sizeof(ups->beepstate));
+      case 3: // None
+         astrncpy(ups->beepstate, "N", sizeof(ups->beepstate));
          break;
       default:
-         astrncpy(ups->beepstate, "Timed", sizeof(ups->beepstate));
+         astrncpy(ups->beepstate, "T", sizeof(ups->beepstate));
          break;
       }
       break;

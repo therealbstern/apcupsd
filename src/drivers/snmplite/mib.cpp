@@ -42,6 +42,7 @@ struct CiOidMap CiOidMap[] =
    {CI_LTRANS,          upsAdvConfigLowTransferVolt,     INTEGER,     false},
    {CI_HTRANS,          upsAdvConfigHighTransferVolt,    INTEGER,     false},
    {CI_DWAKE,           upsAdvConfigReturnDelay,         TIMETICKS,   false},
+   {CI_AlarmTimer,      upsAdvConfigAlarmTimer,          TIMETICKS,   false}, // Must be before CI_DALARM
    {CI_DALARM,          upsAdvConfigAlarm,               INTEGER,     false},
    {CI_DLBATT,          upsAdvConfigLowBatteryRunTime,   TIMETICKS,   false},
    {CI_DSHUTD,          upsAdvConfigShutoffDelay,        TIMETICKS,   false},
