@@ -147,6 +147,7 @@ enum {
    CI_BADBATTS,                    /* Number of bad battery packs */
    CI_EPROM,                       /* Valid eprom values */
    CI_ST_TIME,                     /* hours since last self test */
+   CI_TESTALARM,                   /* Test alarm */
    CI_Manufacturer,             
    CI_ShutdownRequested,        
    CI_ShutdownImminent,         

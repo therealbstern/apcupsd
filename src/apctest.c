@@ -86,6 +86,9 @@ static void usb_set_alarm(void);
 static void usb_set_sens(void);
 static void usb_set_xferv(int lowhigh);
 static void usb_calibration();
+static void usb_test_alarm(void);
+static int usb_get_self_test_interval(void);
+static void usb_set_self_test_interval(void);
 #endif
 
 static void strip_trailing_junk(char *cmd);
@@ -1596,6 +1599,9 @@ static void do_usb_testing(void)
            "9)  Set low transfer voltage\n"
            "10) Set high transfer voltage\n"
            "11) Perform battery calibration\n"
+           "12) Test alarm\n"
+           "13) Change self-test interval\n"
+           "14) View self-test interval\n"
            " Q) Quit\n\n");
 
       cmd = get_cmd("Select function number: ");
@@ -1636,15 +1642,24 @@ static void do_usb_testing(void)
          case 11:
             usb_calibration();
             break;
+         case 12:
+            usb_test_alarm();
+            break;
+         case 13:
+            usb_set_self_test_interval();
+            break;
+         case 14:
+            usb_get_self_test_interval();
+            break;
          default:
             if (tolower(*cmd) == 'q')
                quit = TRUE;
             else
-               pmsg("Illegal response. Please enter 1-11,Q\n");
+               pmsg("Illegal response. Please enter 1-14,Q\n");
             break;
          }
       } else {
-         pmsg("Illegal response. Please enter 1-11,Q\n");
+         pmsg("Illegal response. Please enter 1-14,Q\n");
       }
    }
    ptime();
@@ -2234,6 +2249,96 @@ static void usb_calibration()
    }
 
    usb_get_self_test_result();
+}
+
+static void usb_test_alarm(void)
+{
+   int result;
+
+   if (!usb_read_int_from_ups(ups, CI_TESTALARM, &result))
+   {
+      pmsg("\nI don't know how to test the alarm on your UPS.\n");
+      return;
+   }
+   
+   // Write to UPS
+   pmsg("Testing alarm...");
+   usb_write_int_to_ups(ups, CI_TESTALARM, 1, "CI_TESTALARM");
+   sleep(1);
+
+   pmsg("COMPLETE\n");
+}
+
+static int usb_get_self_test_interval(void)
+{
+   int result;
+
+   if (!usb_read_int_from_ups(ups, CI_STESTI, &result))
+   {
+      pmsg("\nI don't know how to access the self-test interval on your UPS\n"
+           "or your UPS does not support the self-test interval feature.\n");
+      return 0;
+   }
+
+   pmsg("Current Self-test interval: ");
+   switch (result)
+   {
+   case 0:
+      pmsg("None\n");
+      break;
+   case 1:
+      pmsg("Power On\n");
+      break;
+   case 2:
+      pmsg("7 days\n");
+      break;
+   case 3:
+      pmsg("14 days\n");
+      break;
+   default:
+      pmsg("UNKNOWN (%02x)\n", result);
+      break;
+   }
+
+   return result;
+}
+
+static void usb_set_self_test_interval(void)
+{
+   if (!usb_get_self_test_interval())
+      return;
+
+   while(1)
+   {
+      pmsg("Press...\n"
+           " 0 for None\n"
+           " 1 for On Power\n"
+           " 2 for 7 Days\n"
+           " 3 for 14 Days\n"
+           " Q to Quit with no changes\n"
+           "Your choice: ");
+      char *cmd = get_cmd("Select function: ");
+      if (cmd)
+      {
+         if (*cmd >= '0' && *cmd <= '3')
+         {
+            usb_write_int_to_ups(ups, CI_STESTI, *cmd-'0', "CI_STESTI");
+            break;
+         }
+         else if (tolower(*cmd) == 'q')
+            return;
+         else
+            pmsg("Illegal response.\n");
+      }
+      else
+      {
+         pmsg("Illegal response.\n");
+      }
+   }
+   
+   /* Delay needed for readback to work */
+   sleep(1);
+   usb_get_self_test_interval();
 }
 
 #endif
