@@ -1591,17 +1591,15 @@ static void do_usb_testing(void)
            "1)  Test kill UPS power\n"
            "2)  Perform self-test\n"
            "3)  Read last self-test result\n"
-           "4)  Change battery date\n"
-           "5)  View battery date\n"
-           "6)  View manufacturing date\n"
-           "7)  Set alarm behavior\n"
-           "8)  Set sensitivity\n"
-           "9)  Set low transfer voltage\n"
-           "10) Set high transfer voltage\n"
-           "11) Perform battery calibration\n"
-           "12) Test alarm\n"
-           "13) Change self-test interval\n"
-           "14) View self-test interval\n"
+           "4)  View/Change battery date\n"
+           "5)  View manufacturing date\n"
+           "6)  View/Change alarm behavior\n"
+           "7)  View/Change sensitivity\n"
+           "8)  View/Change low transfer voltage\n"
+           "9)  View/Change high transfer voltage\n"
+           "10) Perform battery calibration\n"
+           "11) Test alarm\n"
+           "12) View/Change self-test interval\n"
            " Q) Quit\n\n");
 
       cmd = get_cmd("Select function number: ");
@@ -1622,44 +1620,38 @@ static void do_usb_testing(void)
             usb_set_battery_date();
             break;
          case 5:
-            usb_get_battery_date();
-            break;
-         case 6:
             usb_get_manf_date();
             break;
-         case 7:
+         case 6:
             usb_set_alarm();
             break;
-         case 8:
+         case 7:
             usb_set_sens();
             break;
-         case 9:
+         case 8:
             usb_set_xferv(0);
             break;
-         case 10:
+         case 9:
             usb_set_xferv(1);
             break;
-         case 11:
+         case 10:
             usb_calibration();
             break;
-         case 12:
+         case 11:
             usb_test_alarm();
             break;
-         case 13:
+         case 12:
             usb_set_self_test_interval();
-            break;
-         case 14:
-            usb_get_self_test_interval();
             break;
          default:
             if (tolower(*cmd) == 'q')
                quit = TRUE;
             else
-               pmsg("Illegal response. Please enter 1-14,Q\n");
+               pmsg("Illegal response. Please enter 1-12,Q\n");
             break;
          }
       } else {
-         pmsg("Illegal response. Please enter 1-14,Q\n");
+         pmsg("Illegal response. Please enter 1-12,Q\n");
       }
    }
    ptime();
@@ -2051,14 +2043,14 @@ static void usb_set_battery_date(void)
    if (!(result = usb_get_battery_date()))
       return;
 
-   cmd = get_cmd("Enter new battery date (MM/DD/YYYY): ");
+   cmd = get_cmd("Enter new battery date (MM/DD/YYYY), blank to quit: ");
    if (!isdigit(cmd[0]) || !isdigit(cmd[1]) || cmd[2] != '/' ||
-      !isdigit(cmd[3]) || !isdigit(cmd[4]) || cmd[5] != '/' ||
-      !isdigit(cmd[6]) || !isdigit(cmd[7]) || !isdigit(cmd[8]) ||
-      !isdigit(cmd[9]) || cmd[10] != '\0' ||
-      ((month = strtoul(cmd, NULL, 10)) > 12) || (month < 1) ||
-      ((day = strtoul(cmd + 3, NULL, 10)) > 31) || (day < 1) ||
-      ((year = strtoul(cmd + 6, NULL, 10)) < 1980)) {
+       !isdigit(cmd[3]) || !isdigit(cmd[4]) || cmd[5] != '/' ||
+       !isdigit(cmd[6]) || !isdigit(cmd[7]) || !isdigit(cmd[8]) ||
+       !isdigit(cmd[9]) || cmd[10] != '\0' ||
+       ((month = strtoul(cmd, NULL, 10)) > 12) || (month < 1) ||
+       ((day = strtoul(cmd + 3, NULL, 10)) > 31) || (day < 1) ||
+       ((year = strtoul(cmd + 6, NULL, 10)) < 1980)) {
       pmsg("Invalid format.\n");
       return;
    }
@@ -2277,7 +2269,7 @@ static int usb_get_self_test_interval(void)
    {
       pmsg("\nI don't know how to access the self-test interval on your UPS\n"
            "or your UPS does not support the self-test interval feature.\n");
-      return 0;
+      return -1;
    }
 
    pmsg("Current Self-test interval: ");
@@ -2305,7 +2297,7 @@ static int usb_get_self_test_interval(void)
 
 static void usb_set_self_test_interval(void)
 {
-   if (!usb_get_self_test_interval())
+   if (usb_get_self_test_interval() == -1)
       return;
 
    while(1)
