@@ -11,10 +11,11 @@
 # or by manually setting it to 1 in this file,
 #  e.g. %define gapcmon 1
 #
-# If you want the SNMP driver, use:
+# If you want the (obsolete) NET-SNMP driver, use:
 #  e.g.  rpmbuild -ba --define "build_snmp 1" --define "build_suse 1" apcupsd.spec
 # or by manually setting it to 1 in this file,
 #  e.g. %define snmp 1
+# The modern SNMP driver is always enabled since it has no dependencies.
 #
 # Note, to build, you need:
 #   Release_Notes-%{version}-%{release}.tar.gz in your
@@ -244,6 +245,7 @@ A Gnome application to monitor the status of your UPS.
         --enable-apcsmart \
         --enable-dumb \
         --enable-usb \
+        --enable-snmp \
 	%if %{gapcmon}
 	--enable-gapcmon \
 	%endif
@@ -415,6 +417,8 @@ if [ "$1" = 0 ] ; then
 fi
 
 %changelog
+* Sun Jan 10 2010 Adam Kropelin <akropel1 at rochester.rr.com>
+- changes for new snmp driver
 * Sat Aug 01 2009 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - fix restart on upgrade using $1 variable. remove previously commented out code
 * Sat May 16 2009 D. Scott Barninger <barninger at fairfieldcomputers.com>
