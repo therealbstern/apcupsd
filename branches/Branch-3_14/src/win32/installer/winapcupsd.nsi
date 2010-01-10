@@ -394,9 +394,10 @@ Section "USB Driver" SecUsbDrv
   ${InstallUpgradeDriver} "$INSTDIR\driver" $INSTDIR\driver\apcupsd.inf "USB\VID_051d&PID_0002"
   ${If} $0 != 1
     MessageBox MB_OK|MB_ICONEXCLAMATION  \
-      "The USB driver could not be automatically installed. Please see \
-       $INSTDIR\driver\install.txt for instructions on installing the \
-       driver by hand."
+      "The USB driver could not be automatically installed. You can ignore \
+       this if you do not plan to use Apcupsd with a USB UPS. Otherwise, please \
+       see $INSTDIR\driver\install.txt for instructions on installing the \
+       USB driver by hand."
   ${EndIf}
 !endif
 SectionEnd
