@@ -103,7 +103,7 @@ void ListView::UpdateAll(alist<astring>* data[])
       if (count >= num)
          AppendItem(*iter);
       else
-         UpdateItem(count, count, *iter);
+         UpdateItem(count, 0, *iter);
 
       // On to the next item
       count++;
