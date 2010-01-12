@@ -1,12 +1,12 @@
 /*
- * Client test program for apcnet 
+ * Client test program for apcnet
  *
  * This program beats the living daylights out of your
  *  server by sending it one million requests.
  *
  * Optionally, it can send one million requests, connecting
  *  and disconnecting each time.
- * 
+ *
  *
  * Build it with: cc megaclient.c ../lib/libapc.a -o megaclient
  *
@@ -16,7 +16,7 @@
  */
 
 
-/* 
+/*
  * If RECONNECT is defined, megaclient will disconnect
  *  and reconnect for every request (iteration), which is the normal
  *  way that apcupsd is currently accessed.
@@ -39,13 +39,13 @@
 #define MAXLINE 5000
 
 
-void error_abort(char *msg)
+void error_abort(const char *msg)
 {
    fprintf(stderr, msg);
    exit(1);
 }
 
-int main(int argc, char *argv[]) 
+int main(int argc, char *argv[])
 {
    int sockfd, port;
    char host[200];
@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
 
    strcpy(host, SERV_HOST_ADDR);
    port = SERV_TCP_PORT;
-       
+
    if (argc > 1) {
       strcpy(host, argv[1]); /* get host from command line */
       p = strchr(host, ':');
@@ -95,7 +95,7 @@ int main(int argc, char *argv[])
          sprintf(msg, "handle_client: net_recv error: %s\n", strerror(-n));
 	 error_abort(msg);
       }
-      if ( (i % 100) == 0) { 
+      if ( (i % 100) == 0) {
          printf("%d lines=%d\n", i, line);
       }
       net_close(sockfd);
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
          sprintf(msg, "handle_client: net_recv error: %s\n", strerror(-n));
 	 error_abort(msg);
       }
-      if ( (i % 100) == 0) { 
+      if ( (i % 100) == 0) {
          printf("%d lines=%d\n", i, line);
       }
 
@@ -135,7 +135,7 @@ int main(int argc, char *argv[])
    done = time(NULL);
    printf("Total time = %ld secs.\n", done - now);
    exit(0);
-}   
+}
 
 #else /* HAVE_NISLIB */
 
