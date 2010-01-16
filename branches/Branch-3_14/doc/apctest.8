@@ -66,17 +66,16 @@ Performs a power down of the UPS into hibernate mode.
 Performs an immediate self-test (switches to battery power to do so).
 .Ss Option 3)  Read last self-test result
 Displays the last self-test result.
-.Ss Option 4)  Change battery date
-Changes the battery date - useful when the battery 
+.Ss Option 4)  View/Change battery date
+Displays the current battery replacement date and optionally allows you
+to change it - useful when the battery 
 is replaced so that you can accurately keep track of its age.
-.Ss Option 5)  View battery date
-Displays the current battery replacement date.
-.Ss Option 6)  View manufacturing date
+.Ss Option 5)  View manufacturing date
 Displays the date the UPS was manufactured.
-.Ss Option 7)  Set alarm behavior
+.Ss Option 6)  View/Change alarm behavior
 Sets the delay period before the UPS starts sounding its alarm 
 when the utility power is lost.
-.Ss Option 8)  Set sensitivity
+.Ss Option 7)  View/Change sensitivity
 Changes how sensitive the UPS is to the utility power quality and 
 voltage fluctuations - (H)igh, (M)edium or (L)ow. The higher the 
 sensitivity, the faster the UPS will switch to battery power or 
@@ -86,13 +85,13 @@ This setting should normally be set to High unless the UPS switches
 to battery power frequently, in which case a less sensitive setting 
 will preserve UPS batteries... if the connected equipment can tolerate
 the power quality.
-.Ss Option 9)  Set low transfer voltage
+.Ss Option 8)  View/Change low transfer voltage
 Sets the low voltage level at which the UPS switches to battery or 
 activates SmartBoost.
-.Ss Option 10) Set high transfer voltage
+.Ss Option 9)  View/Change high transfer voltage
 Sets the high voltage level at which the UPS switches to battery or 
 activates SmartTrim.
-.Ss Option 11) Perform battery calibration
+.Ss Option 10) Perform battery calibration
 This performs a battery runtime calibration. This can only
 be performed if your battery is charged to 100% of capacity. 
 The runtime calibration discharges the UPS battery to 
@@ -109,7 +108,12 @@ years.
 It is recommended that battery runtime calibration be performed
 annually. Performing it too often shortens the lifetime of the
 UPS batteries. 
-.Ss Option 12) Quit
+.Ss Option 11) Test Alarm
+This option will cause the UPS alarm beeper to sound for several seconds.
+.Ss Option 12) View/Change self-test interval
+This option allows you to change the time interval between automatic UPS
+self-tests.
+.Ss Option Q) Quit
 Exits from the program.
 .Sh SERIAL PORT (SMART PROTOCOL MODE)
 When using a UPS operating in APC smart protocol mode (eg a Smart-UPS)
