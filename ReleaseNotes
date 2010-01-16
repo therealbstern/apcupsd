@@ -9,6 +9,56 @@ IF YOU USE THE OLD STYLE MASTER/SLAVE NETWORKING MODE, BE SURE TO READ THE
 3.14.0 RELEASE NOTES BELOW.
 
 
+3.14.8 -- 16 January 2010            (Maintenance Release)
+
+NEW FEATURES
+
+  * Mac OS X version of apctray (apcagent) for monitoring apcupsd instances.
+    Same feature set as apctray on Windows (monitor multiple instances,
+    get detailed status and events logs). Popup notifications delivered via 
+    Growl, if available.
+
+  * Major update to win32 version of apctray. Includes many visual and 
+    usability improvements to match OS X version.
+
+  * apctest now supports battery calibration and self-test interval control
+    on USB models. Many thanks to James Belleau <james@belleau.net> for
+    contributing these features.
+
+  * New SNMP driver that does not require libsnmp.so, thus eliminating
+    issues with not finding the library during shutdown when /usr has
+    been unmounted. The new driver is the default for 'UPSTYPE snmp'.
+    The old driver is still available as "UPSTYPE netsnmp" if needed.
+
+BUG FIXES
+
+   * Add missing NOMINV, NOMOUTV, and NOMPOWER to net clients
+   
+   * Fix missing WALL in apccontrol (debian bug #546019)
+     http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=546019
+
+   * Change all time/date strings to simplified ISO format: 
+     "YYYY-MM-DD HH:MM:SS +/-UTC"
+
+   * Fix battery voltage readout on "Back-UPS 500 FW: 6.3.I USB FW: c1"
+
+   * Remove obsolete image files from source tree
+
+   * Fix issues with popup.exe running when it shouldn't and sometimes
+     hanging and/or generating an "Interactive Services Dialog Detected"
+     error.
+
+   * Use /kill switch from the installer to shut down running instances
+     of apcupsd and apctray. This will provide more reliable termination
+     on Vista/Win7.
+     
+   * Update apctest to use 'Q' to exit any menu instead of a number that
+     is always changing. Contributed by James Belleau <jpbelleau@gmail.com>
+
+   * apctest: 	Fix compiler warnings. Contributed by 
+     Andy O'Shaughnessy <andrewjoshaughnessy@gmail.com>
+
+
 3.14.7 -- 31 July 2009               (Maintenance Release)
 
 NEW FEATURES
