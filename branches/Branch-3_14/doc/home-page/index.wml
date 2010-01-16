@@ -13,29 +13,32 @@ runtime expires based on internal APC calculations determined by power
 consumption rates. Apcupsd is licensed under the GPL version 2.
 <p>
 
-<h2>Recent Apcupsd Releases</h2>
-<h3><i><u>Stable:</u></i>&nbsp;3.14.7 (1 August 2009) [&nbsp;<a href="dl.php">Download</a>&nbsp;]</h3>
-Release 3.14.7 now includes the Multimon CGI programs build for Windows as part
-of the Windows package. It has a fix for the battery date (BATTDAT) showing 
-an invalid value on certain USB models as well as few other minor bug fixes. 
+<h2>Apcupsd Releases</h2>
+<h3><i><u>Stable:</u></i>&nbsp;3.14.8 (16 January 2010) [&nbsp;<a href="dl.php">Download</a>&nbsp;]</h3>
+Release 3.14.8 brings a number of new features including...
+<ul>
+<li> Usability and appearance improvements for the Windows tray applet, apctray
+<li> Mac OS X version of the tray applet (apcagent)
+<li> New SNMP driver that no longer requires net-snmp shared libraries.
+<li> apctest tool supports runtime calibration and self-test interval control 
+     for USB models.
+</ul>
 Please see the 
-<a href="http://apcupsd.cvs.sourceforge.net/viewvc/*checkout*/apcupsd/apcupsd/ReleaseNotes?revision=1.41.2.15&pathrev=Release-3_14_7">
+<a href="http://apcupsd.cvs.sourceforge.net/viewvc/*checkout*/apcupsd/apcupsd/ReleaseNotes?pathrev=Release-3_14_8">
 ReleaseNotes</a> for details.
 <p>
-Apcupsd 3.14.7 is the latest stable release, containing many bug fixes and
-new features over the previous 3.12.x stable series. Users of all previous
+Apcupsd 3.14.8 is the latest stable release, containing many bug fixes and
+new features over previous releases. Users of all previous
 versions are encouraged to upgrade.
-<p>
-<i>If you use the old style master/slave networking mode, be sure to read the
-<a href="http://apcupsd.cvs.sourceforge.net/viewvc/*checkout*/apcupsd/apcupsd/ReleaseNotes?revision=1.41.2.15&pathrev=Release-3_14_7">
-release notes</a>.</i>
 <p>
 <b><u>New Features in the 3.14.x series:</u></b>
 <ul>
 <li>USB support for new platforms: Windows, Mac OS X, Solaris 10
 <li>Native Windows port
 <li>Improved tray icon support on Win32 (monitor multiple remote instances)
+<li>Menubar monitoring application for Mac OS X (apcagent)
 <li>PowerChute Network Shutdown driver
+<li>Rewritten SNMP driver with no SNMP library dependencies
 <li>GAPCMON GUI monitoring tool
 <li>Unreliable MASTER/SLAVE networking mode is removed
 <li>New configuration directives to set paths at runtime
@@ -44,22 +47,6 @@ release notes</a>.</i>
 <li>Updated documentation
 <li>Support for the QNX operating system
 </ul>
-<h3><i><u>Previous Stable:</u></i>&nbsp;3.12.4 (19 August 2006) 
-[&nbsp;<a href="dl.php?version=3.12.4">Download</a>&nbsp;]</h3>
-This is a bug fix release which includes fixes for SNMP crash in the
-face of network errors. Also status and data logging interval was often
-off by one period. NIS port now properly defaults to 3551 or value 
-provided by configure, not hard-coded 7000. RPM specs updated for 
-Fedora Core builds (need latex2html).
-<p>
-Highlights of the 3.12.x release series include a GUI installer for 
-Win32 systems, battery disconnect/reconnect detection for smart serial
-and USB connections, SNMP trap catching for quicker SNMP event 
-responses, and numerous bug fixes. Please be sure to read the
-<a href="https://sourceforge.net/project/shownotes.php?release_id=440658&group_id=54413">ReleaseNotes</a> 
-to learn about the new features and for important information about
-upcoming releases.
-
 <h2><a href="manual/manual.html" target="_top">Online Manual</a> or a
 <a href="manual/manual.pdf" target="_top">PDF Version of
 the Manual</a> </h2> If you want to learn a bit more about
