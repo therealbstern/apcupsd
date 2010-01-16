@@ -134,7 +134,7 @@ There are also pros and cons to purchasing third party batteries.
 **Third Party Battery Cons**
 
 - You will need to recycle your battery hardware (cables, connectors etc)
-- You will need to create your own battery cartridges (with doublesided tape)
+- You will need to create your own battery cartridges (with double-sided tape)
 - You will need to ensure the third party battery is the right physical size
 - You will need to ensure the third party battery is the right capacity
 - Use of a third party battery will void APC's Equipment Protection Policy
@@ -218,7 +218,7 @@ periods of time should be allowed to perform a run time calibration.
 time the UPS goes on battery. 
 
 When doing a runtime calibration with "older" batteries, APC Technical Support
-reoommend doing a complete discharge and recharge first.
+recommend doing a complete discharge and recharge first.
 
 If you have "dumb" UPS (aka simple signalling) like a Back-UPS, then your only 
 option is to do a manual runtime calibration.
@@ -245,7 +245,7 @@ For a "smart" or "smart signalling" Back-UPS Pro or Smart-UPS:
     utility power [suggest not disconnecting, but simply turning off
     utility power thereby preserving earthing].  Allow the unit to 
     run on battery until it turns off completely.  Make sure a 30% load 
-    is present! Plug the UPS back into the wall outlet [switch utilty 
+    is present! Plug the UPS back into the wall outlet [switch utility 
     power back on] and allow it to recharge (it will recharge more quickly
     turned off and with no load present). Once the unit has recharged,
     the "runtime remaining" calculation should be more accurate.

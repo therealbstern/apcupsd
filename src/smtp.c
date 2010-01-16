@@ -37,6 +37,8 @@
 # undef main
 # define my_name_is(x, y, z)
 # define bstrdup(x) strdup(x)
+UPSINFO myUPS;
+UPSINFO *core_ups = &myUPS;
 
 # define Pmsg2 Dmsg2
 # define Pmsg1 Dmsg1
@@ -350,7 +352,20 @@ hp:
 
    /* Add RFC822 date */
    localtime_r(&now, &tm);
+
+#ifdef HAVE_WIN32
+   // Annoyingly, Windows does not properly implement %z (it always spells
+   // out the timezone name) so we need to emulate it manually.
+   i = strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S ", &tm);
+   tzset();
+   unsigned int offset = abs(_timezone) / 60;
+   snprintf(buf+i, sizeof(buf)-i, "%c%02u%02u", 
+      _timezone < 0 ? '+' : '-', // _timezone is UTC-local
+      offset/60, offset%60);
+#else
    strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S %z", &tm);
+#endif
+
    sockwrite(s, "Date: %s\r\n", buf);
 
    sockwrite(s, "\r\n");

@@ -23,67 +23,31 @@
 #ifndef _APCSMART_H
 #define _APCSMART_H
 
-#include "drivers.h"
+/* Private data structure */
+typedef struct s_smart_data {
+   struct termios oldtio;
+   struct termios newtio;
+} SMART_DATA;
 
-class ApcSmartDriver: public UpsDriver
-{
-public:
 
-   ApcSmartDriver(UPSINFO *ups);
-   virtual ~ApcSmartDriver();
+/*
+ * Function Prototypes
+ */
+ 
+extern int apcsmart_ups_get_capabilities(UPSINFO *ups);
+extern int apcsmart_ups_read_volatile_data(UPSINFO *ups);
+extern int apcsmart_ups_read_static_data(UPSINFO *ups);
+extern int apcsmart_ups_kill_power(UPSINFO *ups);
+extern int apcsmart_ups_shutdown(UPSINFO *ups);
+extern int apcsmart_ups_check_state(UPSINFO *ups);
+extern int apcsmart_ups_open(UPSINFO *ups);
+extern int apcsmart_ups_close(UPSINFO *ups);
+extern int apcsmart_ups_setup(UPSINFO *ups);
+extern int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, const char *data);
+extern int apcsmart_ups_entry_point(UPSINFO *ups, int command, void *data);
 
-   // Subclasses must implement these methods
-   virtual bool Open();
-   virtual bool GetCapabilities();
-   virtual bool ReadVolatileData();
-   virtual bool ReadStaticData();
-   virtual bool CheckState();
-   virtual bool Close();
-
-   // We provide default do-nothing implementations
-   // for these methods since not all drivers need them.
-   virtual bool KillPower();
-   virtual bool Shutdown();
-   virtual bool Setup();
-   virtual bool ProgramEeprom(int command, const char *data);
-   virtual bool EntryPoint(int command, void *data);
-
-private:
-
-   static SelfTestResult decode_testresult(char* str);
-   static LastXferCause decode_lastxfer(char *str);
-
-   bool ShutdownWithDelay(int shutdown_delay);
-   int GetShutdownDelay();
-   void WarnShutdown(int shutdown_delay);
-
-   int apc_enable();
-   char *smart_poll(char cmd);
-   int writechar(char a) {return write(_ups->fd, &a, 1);}
-   int getline(char *s, int len);
-   void UPSlinkCheck();
-
-   void change_ups_battery_date(const char *newdate);
-   void change_ups_name(const char *newname);
-   void change_extended();
-   int change_ups_eeprom_item(const char *title, char cmd, const char *setting);
-
-   const char *get_apc_model_V_codes(const char *s);
-   char *get_apc_model_b_codes(const char *s);   
-   void get_apc_model();
-
-   bool ups_shutdown_with_delay(UPSINFO *ups, int shutdown_delay);
-   bool ups_get_shutdown_delay(UPSINFO *ups);
-   void ups_warn_shutdown(UPSINFO *ups, int shutdown_delay);
-
-   // Implementation of thread body
-   virtual void body();
-
-   struct termios _oldtio;
-   struct termios _newtio;
-   int *_cmdmap;
-   bool _interrupt;
-   bool _selftest;
-};
+extern int apcsmart_ups_shutdown_with_delay(UPSINFO *ups, int shutdown_delay);
+extern int apcsmart_ups_get_shutdown_delay(UPSINFO *ups);
+extern void apcsmart_ups_warn_shutdown(UPSINFO *ups, int shutdown_delay);
 
 #endif   /* _APCSMART_H */

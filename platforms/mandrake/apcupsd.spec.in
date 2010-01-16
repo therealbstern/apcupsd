@@ -11,10 +11,11 @@
 # or by manually setting it to 1 in this file,
 #  e.g. %define gapcmon 1
 #
-# If you want the SNMP driver, use:
+# If you want the (obsolete) NET-SNMP driver, use:
 #  e.g.  rpmbuild -ba --define "build_snmp 1" --define "build_suse 1" apcupsd.spec
 # or by manually setting it to 1 in this file,
 #  e.g. %define snmp 1
+# The modern SNMP driver is always enabled since it has no dependencies.
 #
 # Note, to build, you need:
 #   Release_Notes-%{version}-%{release}.tar.gz in your
@@ -244,6 +245,7 @@ A Gnome application to monitor the status of your UPS.
         --enable-apcsmart \
         --enable-dumb \
         --enable-usb \
+        --enable-snmp \
 	%if %{gapcmon}
 	--enable-gapcmon \
 	%endif
@@ -294,27 +296,6 @@ install -m744 examples/hid-ups \
 install -m744 examples/make-hiddev \
               $RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/make-hiddev
 
-%define rh_platform 0
-%{?build_fedora_core:%define rh_platform 1}
-%{?build_rhel3:%define rh_platform 1}
-%{?build_rhel4:%define rh_platform 1}
-%{?build_rhel5:%define rh_platform 1}
-
-%if %{rh_platform} && %{gapcmon}
-mkdir -p $RPM_BUILD_ROOT%{_prefix}/share/autostart
-mkdir -p $RPM_BUILD_ROOT%{_prefix}/share/gnome/autostart
-cp $RPM_BUILD_ROOT%{_prefix}/share/applications/gapcmon.desktop $RPM_BUILD_ROOT%{_prefix}/share/autostart/
-cp $RPM_BUILD_ROOT%{_prefix}/share/applications/gapcmon.desktop $RPM_BUILD_ROOT%{_prefix}/share/gnome/autostart/
-%endif
-
-%if %{suse} && %{gapcmon}
-mkdir -p $RPM_BUILD_ROOT/opt/kde3/share/autostart
-mkdir -p $RPM_BUILD_ROOT%{_prefix}/share/gnome/autostart
-cp $RPM_BUILD_ROOT%{_prefix}/share/applications/gapcmon.desktop $RPM_BUILD_ROOT/opt/kde3/share/autostart/
-cp $RPM_BUILD_ROOT%{_prefix}/share/applications/gapcmon.desktop $RPM_BUILD_ROOT%{_prefix}/share/gnome/autostart/
-%endif
-
-
 %clean
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 rm -f $RPM_BUILD_DIR/Release_Notes-%{version}-%{release}.txt
@@ -357,14 +338,6 @@ rm -f $RPM_BUILD_DIR/Release_Notes-%{version}-%{release}.txt
 %{_prefix}/share/pixmaps/onbatt.png
 %{_prefix}/share/pixmaps/online.png
 %{_prefix}/share/pixmaps/unplugged.png
-%endif
-%if %{gapcmon} && %{rh_platform}
-%{_prefix}/share/autostart/gapcmon.desktop
-%{_prefix}/share/gnome/autostart/gapcmon.desktop
-%endif
-%if %{gapcmon} && %{suse}
-/opt/kde3/share/autostart/gapcmon.desktop
-%{_prefix}/share/gnome/autostart/gapcmon.desktop
 %endif
 
 %post
@@ -444,8 +417,8 @@ if [ "$1" = 0 ] ; then
 fi
 
 %changelog
-* Sun Aug 23 2009 D. Scott Barninger <barninger at fairfieldcomputers.com>
-- add gapcmon to autostart directories
+* Sun Jan 10 2010 Adam Kropelin <akropel1 at rochester.rr.com>
+- changes for new snmp driver
 * Sat Aug 01 2009 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - fix restart on upgrade using $1 variable. remove previously commented out code
 * Sat May 16 2009 D. Scott Barninger <barninger at fairfieldcomputers.com>

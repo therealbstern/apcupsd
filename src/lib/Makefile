@@ -3,8 +3,8 @@ include $(topdir)/autoconf/targets.mak
 
 SRCS = apcconfig.c apcerror.c apcevents.c apcexec.c \
        apcfile.c apclibnis.c apclock.c apclog.c apcsignal.c \
-       astring.cpp amutex.cpp atimer.cpp athread.cpp autil.cpp \
-       smartcmd.cpp apcstatus.c asys.c newups.c md5.c \
+       apcstatus.c asys.c newups.c md5.c statmgr.cpp gethostname.c \
+       amutex.cpp astring.cpp autil.cpp atimer.cpp athread.cpp \
        $(LIBEXTRAOBJ:.o=.c)
 
 all-targets: libapc.a

@@ -366,7 +366,7 @@ const char *hidu_get_string(int fd, int index)
     * (Not sure if the garbage is an APC bug, a kernel bug, or a 
     * bug in my understanding.)
     */
-   for (i = 0; i < sd.usd_desc.bLength / 2 - 1 && i < sizeof(string) - 1; i++)
+   for (i = 0; i < sd.usd_desc.bLength / 2 - 1 && i < (int)sizeof(string) - 1; i++)
       string[i] = UGETW(sd.usd_desc.bString[i]);
 
    string[i] = '\0';

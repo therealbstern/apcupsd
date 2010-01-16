@@ -1,7 +1,21 @@
 topdir:=..
 
-SUBDIRS =
+SUBDIRS = 
 include $(topdir)/autoconf/targets.mak
+
+all-targets: apcupsd.man.txt apcaccess.man.txt apctest.man.txt \
+             apccontrol.man.txt apcupsd.conf.man.txt
+
+apcupsd.man.txt: apcupsd.8
+	$(call MANIFY,$<,$@)
+apcaccess.man.txt: apcaccess.8
+	$(call MANIFY,$<,$@)
+apctest.man.txt: apctest.8
+	$(call MANIFY,$<,$@)
+apccontrol.man.txt: apccontrol.8
+	$(call MANIFY,$<,$@)
+apcupsd.conf.man.txt: apcupsd.conf.5
+	$(call MANIFY,$<,$@)
 
 all-install: install-man
 all-uninstall: uninstall-man

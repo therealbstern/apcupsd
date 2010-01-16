@@ -12,14 +12,14 @@
  *
  * Point smartsim at a serial port (/dev/ttyS0 is the default) and
  * connect that port via a null modem cable to another serial port
- * on which you are running apcupsd configured for the apcsmart 
+ * on which you are running apcupsd configured for the apcsmart
  * driver.
  *
  * smartsim responds to the Smart protocol commands listed in the
  * upscmds[] table. More protocol commands can easily be added.
  *
  * Keyboard commands consisting of a single keypress cause smartsim
- * to toggle flags and readouts. These commands can be found in the 
+ * to toggle flags and readouts. These commands can be found in the
  * keycmds[] table. Supported keypress commands:
  *
  *    ?   Help
@@ -204,7 +204,7 @@ void rsp_string(const void* arg)
 void rsp_float(const void* arg)
 {
    char buf[20];
-   
+
    sprintf(buf, "%03.3f\r\n", *(float*)arg);
    wups(buf, strlen(buf));
 }
@@ -212,7 +212,7 @@ void rsp_float(const void* arg)
 void rsp_hex(const void* arg)
 {
    char buf[20];
-   
+
    sprintf(buf, "%02x\r\n", *(unsigned char*)arg);
    wups(buf, strlen(buf));
 }
@@ -220,7 +220,7 @@ void rsp_hex(const void* arg)
 void rsp_cmds(const void* arg)
 {
    int x;
-   
+
    /* Protocol version */
    wups("3.", 2);
 
@@ -238,7 +238,7 @@ void rsp_cmds(const void* arg)
 void rsp_status(const void* arg)
 {
    char buf[20];
-   
+
    sprintf(buf, "%02x\r\n",
       (trim << 1) |
       (boost << 2) |
@@ -352,7 +352,7 @@ static void key_commfail(const void *arg)
       commfail = 1;
       dbg("COMMFAIL enabled\n");
    }
-      
+
 }
 
 static void key_help(const void *arg)
@@ -399,7 +399,7 @@ void handle_ups_cmd(char cmd)
 void handle_key_cmd(char cmd)
 {
    int x;
-   
+
    for (x=0; keycmds[x].func; x++)
    {
       if (keycmds[x].key == cmd)
@@ -419,7 +419,7 @@ int main(int argc, char* argv[])
    int rc;
    char cmd;
    struct termios tio;
-   char* dev;
+   const char* dev;
    int con;
 
    /* Allow serial port device to be supplied on command line */
@@ -478,7 +478,7 @@ int main(int argc, char* argv[])
             rc = read(ups, &cmd, 1);
          }
          while (rc != 1 && (errno == EAGAIN || errno == EINTR));
-         
+
          if (rc != 1)
          {
             perror("read");
@@ -496,7 +496,7 @@ int main(int argc, char* argv[])
 
          handle_ups_cmd(cmd);
       }
-      
+
       if (FD_ISSET(con, &fds))
       {
          do
@@ -504,7 +504,7 @@ int main(int argc, char* argv[])
             rc = read(con, &cmd, 1);
          }
          while (rc != 1 && (errno == EAGAIN || errno == EINTR));
-         
+
          if (rc != 1)
          {
             perror("read");
