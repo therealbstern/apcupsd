@@ -580,6 +580,16 @@ AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
          usbhost=$host
       fi
 
+      dnl Also force generic_usb if this is FreeBSD 8.0 or newer
+      case $usbhost in 
+         *-*-freebsd*)
+            tmp=`uname -r`
+            if test ${tmp%%.*} -ge 8 ; then
+               usbhost=forcegeneric
+            fi
+            ;;
+      esac
+
       case $usbhost in
          *-*-linux*)
             USB_TYPE="linux"
