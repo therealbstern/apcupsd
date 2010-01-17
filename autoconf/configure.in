@@ -595,7 +595,7 @@ AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
             AC_MSG_RESULT([Using BSD USB driver.])
             ;;
          *)
-            dnl Use libusb-config if it's available, otherwise just
+            dnl Use libusb-config if found, otherwise fall back on AC_CHECK_LIB
             AC_PATH_PROG(usbcfg, libusb-config)
             if test x$usbcfg != x ; then
                LIBUSB=`$usbcfg --libs`
