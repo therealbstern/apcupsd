@@ -10560,6 +10560,15 @@ if test "${enable_usb+set}" = set; then
          usbhost=$host
       fi
 
+            case $usbhost in
+         *-*-freebsd*)
+            tmp=`uname -r`
+            if test ${tmp%%.*} -ge 8 ; then
+               usbhost=forcegeneric
+            fi
+            ;;
+      esac
+
       case $usbhost in
          *-*-linux*)
             USB_TYPE="linux"
