@@ -853,6 +853,21 @@ if test -n "$GCC"; then
       # This is gcc 3.x, and it knows of libsupc++, so we need it
       LIBS="$LIBS -lsupc++"
       AC_MSG_RESULT(yes)
+
+      # See if this system has a broken libsupc++ that requires
+      # a workaround (FreeBSD 5.x, 6.x)
+      case $host in
+         *-*-freebsd*)
+            AC_MSG_CHECKING(if libsupc++ is missing __terminate_handler)
+            nm -C --defined-only "$SUPC" 2>/dev/null | grep __terminate_handler > /dev/null
+            if test $? -eq 0 ; then
+               AC_MSG_RESULT(no)
+            else
+               AC_MSG_RESULT(yes -- will attempt workaround)
+               CPPFLAGS="$CPPFLAGS -DFREEBSD_SUPCPP_FIX"
+            fi
+            ;;
+      esac
       ;;
    esac
 

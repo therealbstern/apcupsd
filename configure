@@ -11720,6 +11720,24 @@ echo "${ECHO_T}no" >&6
       LIBS="$LIBS -lsupc++"
       echo "$as_me:$LINENO: result: yes" >&5
 echo "${ECHO_T}yes" >&6
+
+      # See if this system has a broken libsupc++ that requires
+      # a workaround (FreeBSD 5.x, 6.x)
+      case $host in
+         *-*-freebsd*)
+            echo "$as_me:$LINENO: checking if libsupc++ is missing __terminate_handler" >&5
+echo $ECHO_N "checking if libsupc++ is missing __terminate_handler... $ECHO_C" >&6
+            nm -C --defined-only "$SUPC" 2>/dev/null | grep __terminate_handler > /dev/null
+            if test $? -eq 0 ; then
+               echo "$as_me:$LINENO: result: no" >&5
+echo "${ECHO_T}no" >&6
+            else
+               echo "$as_me:$LINENO: result: yes -- will attempt workaround" >&5
+echo "${ECHO_T}yes -- will attempt workaround" >&6
+               CPPFLAGS="$CPPFLAGS -DLIBSUPCPP_FIX"
+            fi
+            ;;
+      esac
       ;;
    esac
 
