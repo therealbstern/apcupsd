@@ -31,9 +31,9 @@ extern struct CiOidMap CiOidMap[];
 struct snmplite_ups_internal_data
 {
    char device[MAXSTRING];    /* Copy of ups->device */
-   char *host;                /* hostname|IP of peer */
+   const char *host;          /* hostname|IP of peer */
    unsigned short port;       /* Remote port, usually 161 */
-   char *vendor;              /* SNMP vendor: APC or APC_NOTRAP */
+   const char *vendor;        /* SNMP vendor: APC or APC_NOTRAP */
    const char *community;     /* Community name */
    Snmp::SnmpEngine *snmp;    /* SNMP engine instance */
    int error_count;           /* Number of consecutive SNMP network errors */
@@ -78,7 +78,8 @@ int snmplite_ups_open(UPSINFO *ups)
     * vendor can be "APC" or "APC_NOTRAP".
     */
 
-   char *cp = sid->host = sid->device;
+   char *cp = sid->device;
+   sid->host = sid->device;
    cp = strchr(cp, ':');
    if (cp)
    {
