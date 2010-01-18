@@ -26,6 +26,7 @@
 #include "../usb_common.h"
 #include "hidutils.h"
 #include "libusb.h"
+#include "astring.h"
 
 /*
  * When we are traversing the USB reports given by the UPS and we find
@@ -53,8 +54,6 @@ typedef struct s_usb_info {
  */
 typedef struct s_usb_data {
    usb_dev_handle *fd;             /* Our UPS control pipe fd when open */
-   char orig_device[MAXSTRING];    /* Original port specification */
-   short vendor;                   /* UPS vendor id */
    report_desc_t rdesc;            /* Device's report descrptor */
    USB_INFO *info[CI_MAXCI + 1];   /* Info pointers for each command */
 } USB_DATA;
@@ -329,11 +328,37 @@ int init_device(UPSINFO *ups, struct usb_device *dev)
 #ifdef LIBUSB_HAS_DETACH_KERNEL_DRIVER_NP
    /*
     * Attempt to detach the kernel driver so we can drive
-    * this device from userspace.
+    * this device from userspace. Don't worry if this fails;
+    * that just means the driver was already detached.
     */
    rc = usb_detach_kernel_driver_np(fd, 0);
-   Dmsg1(200, "Kernel detach returned %d\n", rc);
 #endif
+
+   /* Check device serial number, if user specified one */
+   if (ups->device[0] != '\0')
+   {
+      /* Fetch serial number from device */
+      const char *tmpser;
+      if (dev->descriptor.iSerialNumber == 0 ||
+          (tmpser = hidu_get_string(fd, dev->descriptor.iSerialNumber)) == NULL)
+      {
+         usb_close(fd);
+         Dmsg0(100, "Device does not report serial number.\n");
+         return 0;
+      }
+
+      /* Remove leading/trailing whitespace */
+      astring serial(tmpser);
+      serial.trim();
+
+      /* Check against user specification, ignoring case */
+      Dmsg2(100, "device='%s', user='%s'\n", serial.str(), ups->device);
+      if (strcasecmp(serial, ups->device))
+      {
+         usb_close(fd);
+         return 0;
+      }
+   }
 
    /* Choose config #1 */
    rc = usb_set_configuration(fd, 1);
@@ -383,7 +408,6 @@ int init_device(UPSINFO *ups, struct usb_device *dev)
       return 0;
    }
 
-   my_data->vendor = dev->descriptor.idVendor;
    my_data->fd = fd;
    return 1;
 }
@@ -419,9 +443,6 @@ int open_usb_device(UPSINFO *ups)
             Dmsg2(200, "Trying device %s:%s\n", bus->dirname, dev->filename);
             if (init_device(ups, dev)) {
                /* Successfully found and initialized an UPS */
-               astrncpy(ups->device, bus->dirname, sizeof(ups->device));
-               astrncat(ups->device, ":", sizeof(ups->device));
-               astrncat(ups->device, dev->filename, sizeof(ups->device));
                return 1;
             }
          }
@@ -433,7 +454,6 @@ int open_usb_device(UPSINFO *ups)
    }
 
    /* Failed to find an UPS */
-   ups->device[0] = 0;
    return 0;
 }
 
@@ -625,9 +645,6 @@ int pusb_ups_open(UPSINFO *ups)
    } else {
       reinitialize_private_structure(ups);
    }
-
-   if (my_data->orig_device[0] == 0)
-      astrncpy(my_data->orig_device, ups->device, sizeof(my_data->orig_device));
 
    if (!open_usb_device(ups)) {
       write_unlock(ups);
