@@ -198,8 +198,6 @@ int output_status(UPSINFO *ups, int sockfd,
 
       if (ups->UPS_Cap[CI_VLINE])
          s_write(ups, "LINEV    : %05.1f Volts\n", ups->LineVoltage);
-      else
-         Dmsg0(20, "NO CI_VLINE\n");
 
       if (ups->UPS_Cap[CI_LOAD])
          s_write(ups, "LOADPCT  : %5.1f Percent Load Capacity\n", ups->UPSLoad);
