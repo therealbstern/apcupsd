@@ -60,108 +60,108 @@ static bool quirk_old_backups_pro = false;
  */
 const struct s_known_info known_info[] = {
    /*  Page 0x84 is the Power Device Page */
-   /* CI                        USAGE       PHYS       TYPE        VOLATILE? */
-   {CI_NONE,                    0x00840001, P_ANY,     T_INDEX,    false},  /* iName */
-   {CI_VLINE,                   0x00840030, P_INPUT,   T_UNITS,    true },  /* Line Voltage */
-   {CI_VOUT,                    0x00840030, P_OUTPUT,  T_UNITS,    true },  /* Output Voltage */
-   {CI_VBATT,                   0x00840030, P_BATTERY, T_UNITS,    true },  /* Battery Voltage */
-   {CI_VBATT,                   0x00840030, P_PWSUM,   T_UNITS,    true },  /* Battery Voltage (alternative) */
-   {CI_NONE,                    0x00840031, P_ANY,     T_UNITS,    false},  /* Current */
-   {CI_FREQ,                    0x00840032, P_OUTPUT,  T_UNITS,    true },  /* Frequency */
-   {CI_NONE,                    0x00840033, P_ANY,     T_UNITS,    false},  /* ApparentPower */
-   {CI_NONE,                    0x00840034, P_ANY,     T_UNITS,    false},  /* ActivePower */
-   {CI_LOAD,                    0x00840035, P_ANY,     T_UNITS,    true },  /* PercentLoad */
-   {CI_ITEMP,                   0x00840036, P_BATTERY, T_UNITS,    true },  /* Internal Temperature */
-   {CI_ATEMP,                   0x00840036, P_APC1,    T_UNITS,    true },  /* Ambient Temperature */
-   {CI_HUMID,                   0x00840037, P_ANY,     T_UNITS,    true },  /* Humidity */
-   {CI_NOMBATTV,                0x00840040, P_BATTERY, T_UNITS,    false},  /* ConfigVoltage (battery) */
-   {CI_NOMBATTV,                0x00840040, P_PWSUM,   T_UNITS,    false},  /* ConfigVoltage (battery, alternate) */
-   {CI_NOMOUTV,                 0x00840040, P_OUTPUT,  T_UNITS,    false},  /* ConfigVoltage (output) */
-   {CI_NOMINV,                  0x00840040, P_INPUT,   T_UNITS,    false},  /* ConfigVoltage (input) */
-   {CI_NONE,                    0x00840042, P_ANY,     T_UNITS,    false},  /* ConfigFrequency */
-   {CI_NONE,                    0x00840043, P_ANY,     T_UNITS,    false},  /* ConfigApparentPower */
-   {CI_NOMPOWER,                0x00840044, P_ANY,     T_UNITS,    false},  /* ConfigActivePower */
-   {CI_LTRANS,                  0x00840053, P_ANY,     T_UNITS,    false},  /* LowVoltageTransfer */
-   {CI_HTRANS,                  0x00840054, P_ANY,     T_UNITS,    false},  /* HighVoltageTransfer */
-   {CI_DelayBeforeReboot,       0x00840055, P_ANY,     T_UNITS,    false},  /* DelayBeforeReboot */
-   {CI_DWAKE,                   0x00840056, P_ANY,     T_UNITS,    false},  /* DelayBeforeStartup */
-   {CI_DelayBeforeShutdown,     0x00840057, P_ANY,     T_UNITS,    false},  /* DelayBeforeShutdown */
-   {CI_ST_STAT,                 0x00840058, P_ANY,     T_NONE,     false},  /* Test */
-   {CI_DALARM,                  0x0084005a, P_ANY,     T_NONE,     true },  /* AudibleAlarmControl */
-   {CI_NONE,                    0x00840061, P_ANY,     T_NONE,     false},  /* Good */
-   {CI_IFailure,                0x00840062, P_ANY,     T_NONE,     false},  /* InternalFailure */
-   {CI_PWVoltageOOR,            0x00840063, P_ANY,     T_NONE,     false},  /* Volt out-of-range */
-   {CI_PWFrequencyOOR,          0x00840064, P_ANY,     T_NONE,     false},  /* Freq out-of-range */
-   {CI_Overload,                0x00840065, P_ANY,     T_NONE,     true },  /* Overload */
-   {CI_OverCharged,             0x00840066, P_ANY,     T_NONE,     false},  /* Overcharged */
-   {CI_OverTemp,                0x00840067, P_ANY,     T_NONE,     false},  /* Overtemp */
-   {CI_ShutdownRequested,       0x00840068, P_ANY,     T_NONE,     false},  /* ShutdownRequested */
-   {CI_ShutdownImminent,        0x00840069, P_ANY,     T_NONE,     true },  /* ShutdownImminent */
-   {CI_NONE,                    0x0084006b, P_ANY,     T_NONE,     false},  /* Switch On/Off */
-   {CI_NONE,                    0x0084006c, P_ANY,     T_NONE,     false},  /* Switchable */
-   {CI_Boost,                   0x0084006e, P_ANY,     T_NONE,     true },  /* Boost */
-   {CI_Trim,                    0x0084006f, P_ANY,     T_NONE,     true },  /* Buck */
-   {CI_CommunicationLost,       0x00840073, P_ANY,     T_NONE,     false},  /* CommunicationLost */
-   {CI_Manufacturer,            0x008400fd, P_ANY,     T_INDEX,    false},  /* iManufacturer */
-   {CI_UPSMODEL,                0x008400fe, P_ANY,     T_INDEX,    false},  /* iProduct */
-   {CI_SERNO,                   0x008400ff, P_ANY,     T_INDEX,    false},  /* iSerialNumber */
-   {CI_MANDAT,                  0x00850085, P_PWSUM,   T_DATE,     false},  /* ManufactureDate */
+   /* CI                        USAGE       PHYSICAL   LOGICAL  TYPE        VOLATILE? */
+   {CI_NONE,                    0x00840001, P_ANY,     P_ANY,   T_INDEX,    false},  /* iName */
+   {CI_VLINE,                   0x00840030, P_INPUT,   P_ANY,   T_UNITS,    true },  /* Line Voltage */
+   {CI_VOUT,                    0x00840030, P_OUTPUT,  P_ANY,   T_UNITS,    true },  /* Output Voltage */
+   {CI_VBATT,                   0x00840030, P_BATTERY, P_ANY,   T_UNITS,    true },  /* Battery Voltage */
+   {CI_VBATT,                   0x00840030, P_ANY,     P_PWSUM, T_UNITS,    true },  /* Battery Voltage (alternative) */
+   {CI_NONE,                    0x00840031, P_ANY,     P_ANY,   T_UNITS,    false},  /* Current */
+   {CI_FREQ,                    0x00840032, P_OUTPUT,  P_ANY,   T_UNITS,    true },  /* Frequency */
+   {CI_NONE,                    0x00840033, P_ANY,     P_ANY,   T_UNITS,    false},  /* ApparentPower */
+   {CI_NONE,                    0x00840034, P_ANY,     P_ANY,   T_UNITS,    false},  /* ActivePower */
+   {CI_LOAD,                    0x00840035, P_ANY,     P_ANY,   T_UNITS,    true },  /* PercentLoad */
+   {CI_ITEMP,                   0x00840036, P_BATTERY, P_ANY,   T_UNITS,    true },  /* Internal Temperature */
+   {CI_ATEMP,                   0x00840036, P_APC1,    P_ANY,   T_UNITS,    true },  /* Ambient Temperature */
+   {CI_HUMID,                   0x00840037, P_ANY,     P_ANY,   T_UNITS,    true },  /* Humidity */
+   {CI_NOMBATTV,                0x00840040, P_BATTERY, P_ANY,   T_UNITS,    false},  /* ConfigVoltage (battery) */
+   {CI_NOMBATTV,                0x00840040, P_ANY,     P_PWSUM, T_UNITS,    false},  /* ConfigVoltage (battery, alternate) */
+   {CI_NOMOUTV,                 0x00840040, P_OUTPUT,  P_ANY,   T_UNITS,    false},  /* ConfigVoltage (output) */
+   {CI_NOMINV,                  0x00840040, P_INPUT,   P_ANY,   T_UNITS,    false},  /* ConfigVoltage (input) */
+   {CI_NONE,                    0x00840042, P_ANY,     P_ANY,   T_UNITS,    false},  /* ConfigFrequency */
+   {CI_NONE,                    0x00840043, P_ANY,     P_ANY,   T_UNITS,    false},  /* ConfigApparentPower */
+   {CI_NOMPOWER,                0x00840044, P_ANY,     P_ANY,   T_UNITS,    false},  /* ConfigActivePower */
+   {CI_LTRANS,                  0x00840053, P_ANY,     P_ANY,   T_UNITS,    false},  /* LowVoltageTransfer */
+   {CI_HTRANS,                  0x00840054, P_ANY,     P_ANY,   T_UNITS,    false},  /* HighVoltageTransfer */
+   {CI_DelayBeforeReboot,       0x00840055, P_ANY,     P_ANY,   T_UNITS,    false},  /* DelayBeforeReboot */
+   {CI_DWAKE,                   0x00840056, P_ANY,     P_ANY,   T_UNITS,    false},  /* DelayBeforeStartup */
+   {CI_DelayBeforeShutdown,     0x00840057, P_ANY,     P_ANY,   T_UNITS,    false},  /* DelayBeforeShutdown */
+   {CI_ST_STAT,                 0x00840058, P_ANY,     P_ANY,   T_NONE,     false},  /* Test */
+   {CI_DALARM,                  0x0084005a, P_ANY,     P_ANY,   T_NONE,     true },  /* AudibleAlarmControl */
+   {CI_NONE,                    0x00840061, P_ANY,     P_ANY,   T_NONE,     false},  /* Good */
+   {CI_IFailure,                0x00840062, P_ANY,     P_ANY,   T_NONE,     false},  /* InternalFailure */
+   {CI_PWVoltageOOR,            0x00840063, P_ANY,     P_ANY,   T_NONE,     false},  /* Volt out-of-range */
+   {CI_PWFrequencyOOR,          0x00840064, P_ANY,     P_ANY,   T_NONE,     false},  /* Freq out-of-range */
+   {CI_Overload,                0x00840065, P_ANY,     P_ANY,   T_NONE,     true },  /* Overload */
+   {CI_OverCharged,             0x00840066, P_ANY,     P_ANY,   T_NONE,     false},  /* Overcharged */
+   {CI_OverTemp,                0x00840067, P_ANY,     P_ANY,   T_NONE,     false},  /* Overtemp */
+   {CI_ShutdownRequested,       0x00840068, P_ANY,     P_ANY,   T_NONE,     false},  /* ShutdownRequested */
+   {CI_ShutdownImminent,        0x00840069, P_ANY,     P_ANY,   T_NONE,     true },  /* ShutdownImminent */
+   {CI_NONE,                    0x0084006b, P_ANY,     P_ANY,   T_NONE,     false},  /* Switch On/Off */
+   {CI_NONE,                    0x0084006c, P_ANY,     P_ANY,   T_NONE,     false},  /* Switchable */
+   {CI_Boost,                   0x0084006e, P_ANY,     P_ANY,   T_NONE,     true },  /* Boost */
+   {CI_Trim,                    0x0084006f, P_ANY,     P_ANY,   T_NONE,     true },  /* Buck */
+   {CI_CommunicationLost,       0x00840073, P_ANY,     P_ANY,   T_NONE,     false},  /* CommunicationLost */
+   {CI_Manufacturer,            0x008400fd, P_ANY,     P_ANY,   T_INDEX,    false},  /* iManufacturer */
+   {CI_UPSMODEL,                0x008400fe, P_ANY,     P_ANY,   T_INDEX,    false},  /* iProduct */
+   {CI_SERNO,                   0x008400ff, P_ANY,     P_ANY,   T_INDEX,    false},  /* iSerialNumber */
+   {CI_MANDAT,                  0x00850085, P_ANY,     P_PWSUM, T_DATE,     false},  /* ManufactureDate */
 
    /*  Page 0x85 is the Battery System Page */
-   /* CI                        USAGE       PHYS       TYPE        VOLATILE? */
-   {CI_RemCapLimit,             0x00850029, P_ANY,     T_CAPACITY, false},  /* RemCapLimit */
-   {CI_RemTimeLimit,            0x0085002a, P_ANY,     T_UNITS,    false},  /* RemTimeLimit */
-   {CI_NONE,                    0x0085002c, P_ANY,     T_CAPACITY, false},  /* CapacityMode */
-   {CI_BelowRemCapLimit,        0x00850042, P_ANY,     T_NONE,     true },  /* BelowRemCapLimit */
-   {CI_RemTimeLimitExpired,     0x00850043, P_ANY,     T_NONE,     true },  /* RemTimeLimitExpired */
-   {CI_Charging,                0x00850044, P_ANY,     T_NONE,     false},  /* Charging */
-   {CI_Discharging,             0x00850045, P_ANY,     T_NONE ,    true },  /* Discharging */
-   {CI_NeedReplacement,         0x0085004b, P_ANY,     T_NONE ,    true },  /* NeedReplacement */
-   {CI_BATTLEV,                 0x00850066, P_ANY,     T_CAPACITY, true },  /* RemainingCapacity */
-   {CI_NONE,                    0x00850067, P_ANY,     T_CAPACITY, false},  /* FullChargeCapacity */
-   {CI_RUNTIM,                  0x00850068, P_ANY,     T_UNITS,    true },  /* RunTimeToEmpty */
-   {CI_CycleCount,              0x0085006b, P_ANY,     T_NONE,     false},
-   {CI_BattPackLevel,           0x00850080, P_ANY,     T_NONE,     false},  /* BattPackLevel */
-   {CI_NONE,                    0x00850083, P_ANY,     T_CAPACITY, false},  /* DesignCapacity */
-   {CI_BATTDAT,                 0x00850085, P_BATTERY, T_DATE,     false},  /* ManufactureDate */
-   {CI_IDEN,                    0x00850088, P_ANY,     T_INDEX,    false},  /* iDeviceName */
-   {CI_NONE,                    0x00850089, P_ANY,     T_INDEX,    false},  /* iDeviceChemistry */
-   {CI_NONE,                    0x0085008b, P_ANY,     T_NONE,     false},  /* Rechargeable */
-   {CI_WarningCapacityLimit,    0x0085008c, P_ANY,     T_CAPACITY, false},  /* WarningCapacityLimit */
-   {CI_NONE,                    0x0085008d, P_ANY,     T_CAPACITY, false},  /* CapacityGranularity1 */
-   {CI_NONE,                    0x0085008e, P_ANY,     T_CAPACITY, false},  /* CapacityGranularity2 */
-   {CI_NONE,                    0x0085008f, P_ANY,     T_INDEX,    false},  /* iOEMInformation */
-   {CI_ACPresent,               0x008500d0, P_ANY,     T_NONE,     true },  /* ACPresent */
-   {CI_BatteryPresent,          0x008500d1, P_ANY,     T_NONE,     true },  /* BatteryPresent */
-   {CI_ChargerVoltageOOR,       0x008500d8, P_ANY,     T_NONE,     false},  /* Volt out-of-range */
-   {CI_ChargerCurrentOOR,       0x008500d9, P_ANY,     T_NONE,     false},  /* Current out-of-range */
-   {CI_CurrentNotRegulated,     0x008500da, P_ANY,     T_NONE,     false},  /* Current not regulated */
-   {CI_VoltageNotRegulated,     0x008500db, P_ANY,     T_NONE,     false},  /* VoltageNotRegulated */
+   /* CI                        USAGE       PHYSICAL   LOGICAL  TYPE        VOLATILE? */
+   {CI_RemCapLimit,             0x00850029, P_ANY,     P_ANY,   T_CAPACITY, false},  /* RemCapLimit */
+   {CI_RemTimeLimit,            0x0085002a, P_ANY,     P_ANY,   T_UNITS,    false},  /* RemTimeLimit */
+   {CI_NONE,                    0x0085002c, P_ANY,     P_ANY,   T_CAPACITY, false},  /* CapacityMode */
+   {CI_BelowRemCapLimit,        0x00850042, P_ANY,     P_ANY,   T_NONE,     true },  /* BelowRemCapLimit */
+   {CI_RemTimeLimitExpired,     0x00850043, P_ANY,     P_ANY,   T_NONE,     true },  /* RemTimeLimitExpired */
+   {CI_Charging,                0x00850044, P_ANY,     P_ANY,   T_NONE,     false},  /* Charging */
+   {CI_Discharging,             0x00850045, P_ANY,     P_ANY,   T_NONE ,    true },  /* Discharging */
+   {CI_NeedReplacement,         0x0085004b, P_ANY,     P_ANY,   T_NONE ,    true },  /* NeedReplacement */
+   {CI_BATTLEV,                 0x00850066, P_ANY,     P_ANY,   T_CAPACITY, true },  /* RemainingCapacity */
+   {CI_NONE,                    0x00850067, P_ANY,     P_ANY,   T_CAPACITY, false},  /* FullChargeCapacity */
+   {CI_RUNTIM,                  0x00850068, P_ANY,     P_ANY,   T_UNITS,    true },  /* RunTimeToEmpty */
+   {CI_CycleCount,              0x0085006b, P_ANY,     P_ANY,   T_NONE,     false},
+   {CI_BattPackLevel,           0x00850080, P_ANY,     P_ANY,   T_NONE,     false},  /* BattPackLevel */
+   {CI_NONE,                    0x00850083, P_ANY,     P_ANY,   T_CAPACITY, false},  /* DesignCapacity */
+   {CI_BATTDAT,                 0x00850085, P_BATTERY, P_ANY,   T_DATE,     false},  /* ManufactureDate */
+   {CI_IDEN,                    0x00850088, P_ANY,     P_ANY,   T_INDEX,    false},  /* iDeviceName */
+   {CI_NONE,                    0x00850089, P_ANY,     P_ANY,   T_INDEX,    false},  /* iDeviceChemistry */
+   {CI_NONE,                    0x0085008b, P_ANY,     P_ANY,   T_NONE,     false},  /* Rechargeable */
+   {CI_WarningCapacityLimit,    0x0085008c, P_ANY,     P_ANY,   T_CAPACITY, false},  /* WarningCapacityLimit */
+   {CI_NONE,                    0x0085008d, P_ANY,     P_ANY,   T_CAPACITY, false},  /* CapacityGranularity1 */
+   {CI_NONE,                    0x0085008e, P_ANY,     P_ANY,   T_CAPACITY, false},  /* CapacityGranularity2 */
+   {CI_NONE,                    0x0085008f, P_ANY,     P_ANY,   T_INDEX,    false},  /* iOEMInformation */
+   {CI_ACPresent,               0x008500d0, P_ANY,     P_ANY,   T_NONE,     true },  /* ACPresent */
+   {CI_BatteryPresent,          0x008500d1, P_ANY,     P_ANY,   T_NONE,     true },  /* BatteryPresent */
+   {CI_ChargerVoltageOOR,       0x008500d8, P_ANY,     P_ANY,   T_NONE,     false},  /* Volt out-of-range */
+   {CI_ChargerCurrentOOR,       0x008500d9, P_ANY,     P_ANY,   T_NONE,     false},  /* Current out-of-range */
+   {CI_CurrentNotRegulated,     0x008500da, P_ANY,     P_ANY,   T_NONE,     false},  /* Current not regulated */
+   {CI_VoltageNotRegulated,     0x008500db, P_ANY,     P_ANY,   T_NONE,     false},  /* VoltageNotRegulated */
 
    /*  Pages 0xFF00 to 0xFFFF are vendor specific */
-   /* CI                        USAGE       PHYS       TYPE        VOLATILE? */
-   {CI_STESTI,                  0xFF86001a, P_ANY,     T_NONE,     false},  /* APCSelfTestInterval */
-   {CI_STATUS,                  0xFF860060, P_ANY,     T_BITS,     true },  /* APCStatusFlag */
-   {CI_DSHUTD,                  0xFF860076, P_ANY,     T_UNITS,    false},  /* APCShutdownAfterDelay */
-   {CI_NONE,                    0xFF860005, P_ANY,     T_NONE,     false},  /* APCGeneralCollection */
-   {CI_APCForceShutdown,        0xFF86007C, P_ANY,     T_NONE,     false},  /* APCForceShutdown */
-   {CI_TESTALARM,               0xFF860072, P_ANY,	    T_NONE,     false},  /* APCTestAlarm */
+   /* CI                        USAGE       PHYSICAL   LOGICAL  TYPE        VOLATILE? */
+   {CI_STESTI,                  0xFF86001a, P_ANY,     P_ANY,   T_NONE,     false},  /* APCSelfTestInterval */
+   {CI_STATUS,                  0xFF860060, P_ANY,     P_ANY,   T_BITS,     true },  /* APCStatusFlag */
+   {CI_DSHUTD,                  0xFF860076, P_ANY,     P_ANY,   T_UNITS,    false},  /* APCShutdownAfterDelay */
+   {CI_NONE,                    0xFF860005, P_ANY,     P_ANY,   T_NONE,     false},  /* APCGeneralCollection */
+   {CI_APCForceShutdown,        0xFF86007C, P_ANY,     P_ANY,   T_NONE,     false},  /* APCForceShutdown */
+   {CI_TESTALARM,               0xFF860072, P_ANY,	    P_ANY,   T_NONE,     false},  /* APCTestAlarm */
 // Removed the below due to all recent UPSes having the same garbage in this field
-// {CI_BattReplaceDate,         0xFF860016, P_ANY,     T_APCDATE,  false},  /* APCBattReplaceDate */
-   {CI_NONE,                    0xFF860042, P_ANY,     T_NONE,     false},  /* APC_UPS_FirmwareRevision */
-   {CI_NONE,                    0xFF860079, P_ANY,     T_NONE,     false},  /* APC_USB_FirmwareRevision */
-   {CI_RETPCT,                  0xFF860019, P_ANY,     T_CAPACITY, false},  /* APCBattCapBeforeStartup */
-   {CI_APCDelayBeforeStartup,   0xFF86007E, P_ANY,     T_UNITS,    false},  /* APCDelayBeforeStartup */
-   {CI_APCDelayBeforeShutdown,  0xFF86007D, P_ANY,     T_UNITS,    false},  /* APCDelayBeforeShutdown */
-   {CI_APCLineFailCause,        0xFF860052, P_ANY,     T_NONE,     true},   /* APCLineFailCause */
-   {CI_SENS,                    0xFF860061, P_ANY,     T_NONE,     false},  /* APCSensitivity */
-   {CI_BUPBattCapBeforeStartup, 0x00860012, P_ANY,     T_NONE,     false},  /* BUPBattCapBeforeStartup */
-   {CI_BUPDelayBeforeStartup,   0x00860076, P_ANY,     T_NONE,     false},  /* BUPDelayBeforeStartup */
-   {CI_BUPSelfTest,             0x00860010, P_ANY,     T_NONE,     false},  /* BUPSelfTest */
-   {CI_BUPHibernate,            0x00850058, P_ANY,     T_NONE,     false},  /* BUPHibernate */
+// {CI_BattReplaceDate,         0xFF860016, P_ANY,     P_ANY,   T_APCDATE,  false},  /* APCBattReplaceDate */
+   {CI_NONE,                    0xFF860042, P_ANY,     P_ANY,   T_NONE,     false},  /* APC_UPS_FirmwareRevision */
+   {CI_NONE,                    0xFF860079, P_ANY,     P_ANY,   T_NONE,     false},  /* APC_USB_FirmwareRevision */
+   {CI_RETPCT,                  0xFF860019, P_ANY,     P_ANY,   T_CAPACITY, false},  /* APCBattCapBeforeStartup */
+   {CI_APCDelayBeforeStartup,   0xFF86007E, P_ANY,     P_ANY,   T_UNITS,    false},  /* APCDelayBeforeStartup */
+   {CI_APCDelayBeforeShutdown,  0xFF86007D, P_ANY,     P_ANY,   T_UNITS,    false},  /* APCDelayBeforeShutdown */
+   {CI_APCLineFailCause,        0xFF860052, P_ANY,     P_ANY,   T_NONE,     true},   /* APCLineFailCause */
+   {CI_SENS,                    0xFF860061, P_ANY,     P_ANY,   T_NONE,     false},  /* APCSensitivity */
+   {CI_BUPBattCapBeforeStartup, 0x00860012, P_ANY,     P_ANY,   T_NONE,     false},  /* BUPBattCapBeforeStartup */
+   {CI_BUPDelayBeforeStartup,   0x00860076, P_ANY,     P_ANY,   T_NONE,     false},  /* BUPDelayBeforeStartup */
+   {CI_BUPSelfTest,             0x00860010, P_ANY,     P_ANY,   T_NONE,     false},  /* BUPSelfTest */
+   {CI_BUPHibernate,            0x00850058, P_ANY,     P_ANY,   T_NONE,     false},  /* BUPHibernate */
    
    /* END OF TABLE */
-   {CI_NONE,                    0x00000000, P_ANY,     T_NONE,     false}   /* END OF TABLE */
+   {CI_NONE,                    0x00000000, P_ANY,     P_ANY,   T_NONE,     false}   /* END OF TABLE */
 };
 
 /*
@@ -772,6 +772,18 @@ static void usb_process_value(UPSINFO* ups, int ci, USB_VALUE* uval)
          break;
       default:
          astrncpy(ups->sensitivity, "Unknown", sizeof(ups->sensitivity));
+         break;
+      }
+      break;
+
+   case CI_DALARM:
+      switch (uval->iValue) {
+      case 1: // Never
+         astrncpy(ups->beepstate, "N", sizeof(ups->beepstate));
+         break;
+      case 2: // 30 seconds
+      default:
+         astrncpy(ups->beepstate, "T", sizeof(ups->beepstate));
          break;
       }
       break;

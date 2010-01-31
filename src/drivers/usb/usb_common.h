@@ -63,7 +63,7 @@
 #define P_INPUT   0x84001a    /* Input values */
 #define P_PWSUM   0x840024    /* Power summary */
 #define P_APC1    0xff860007  /* From AP9612 environmental monitor */
-   
+
 /* No Command Index, don't save this value */ 
 #define CI_NONE -1
 
@@ -71,6 +71,7 @@ struct s_known_info {
    int ci;                       /* Command index */
    unsigned usage_code;          /* Usage code */
    unsigned physical;            /* Physical usage */
+   unsigned logical;             /* Logical usage */
    int data_type;                /* Data type expected */
    bool isvolatile;              /* Volatile data item */
 };
