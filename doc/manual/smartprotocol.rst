@@ -520,7 +520,7 @@ Register 2
 ----------
 
 Matrix UPS models report bits 0-5. SmartUPS models only support
-bits 4 and 6. SmartUPS v/s and BackUPS Pro report bits 4, 6, 7.
+bits 4-6. SmartUPS v/s and BackUPS Pro report bits 4, 6, 7.
 Unused bits are set to 0. Other models do not respond.
 
 === ============================================================================
@@ -531,7 +531,7 @@ Bit Meaning when bit=1
 2   Bypass supply failure
 3   Output voltage select failure, UPS in bypass 
 4   DC imbalance, UPS in bypass
-5   Command sent to stop bypass with no battery connected - UPS still in bypass
+5   Battery is disconnected
 6   Relay fault in SmartTrim or SmartBoost
 7   Bad output voltage
 === ============================================================================
