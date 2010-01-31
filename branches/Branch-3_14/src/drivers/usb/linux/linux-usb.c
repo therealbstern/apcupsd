@@ -698,7 +698,9 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
                   if (ci != CI_NONE &&
                       uref.usage_code == known_info[k].usage_code &&
                       (known_info[k].physical == P_ANY ||
-                         known_info[k].physical == finfo.physical)) {
+                         known_info[k].physical == finfo.physical) &&
+                      (known_info[k].logical == P_ANY ||
+                         known_info[k].logical == finfo.logical)) {
 
                      // If we do not have any data saved for this report yet,
                      // allocate an USB_INFO and populate the read uref.

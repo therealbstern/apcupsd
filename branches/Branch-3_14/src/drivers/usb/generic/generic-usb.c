@@ -60,7 +60,7 @@ typedef struct s_usb_data {
 
 int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_info)
 {
-   int i, input, feature, ci, phys;
+   int i, input, feature, ci, phys, logi;
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
    hid_item_t item, witem;
    USB_INFO *info;
@@ -70,6 +70,7 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
    for (i = 0; known_info[i].usage_code; i++) {
       ci = known_info[i].ci;
       phys = known_info[i].physical;
+      logi = known_info[i].logical;
 
       if (ci != CI_NONE && !my_data->info[ci]) {
          /* Try to find an INPUT report containing this usage */
@@ -78,7 +79,7 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
             known_info[i].usage_code,     /* Match usage code */
             -1,                           /* Don't care about application */
             (phys == P_ANY) ? -1 : phys,  /* Match physical usage */
-            -1,                           /* Don't care about logical */
+            (logi == P_ANY) ? -1 : logi,  /* Match logical usage */
             HID_KIND_INPUT,               /* Match feature type */
             &item);
 
@@ -88,7 +89,7 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
                known_info[i].usage_code,     /* Match usage code */
                -1,                           /* Don't care about application */
                (phys == P_ANY) ? -1 : phys,  /* Match physical usage */
-               -1,                           /* Don't care about logical */
+               (logi == P_ANY) ? -1 : logi,  /* Match logical usage */
                HID_KIND_FEATURE,             /* Match feature type */
                &witem);
 
