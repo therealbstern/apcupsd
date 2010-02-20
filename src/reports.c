@@ -107,7 +107,7 @@ static void log_status_write(UPSINFO *ups, const char *fmt, ...)
    avsnprintf(buf, sizeof(buf), fmt, ap);
    va_end(ap);
 
-   strncat(largebuf, buf, sizeof(largebuf));
+   strncat(largebuf, buf, sizeof(largebuf)-strlen(largebuf)-1);
    largebuf[sizeof(largebuf) - 1] = 0;
    stat_recs++;
 }
