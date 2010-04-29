@@ -571,7 +571,7 @@ Section "Uninstall"
   ; Delete conf if user approves
   ${If} ${FileExists} "$INSTDIR\etc\apcupsd\apcupsd.conf"
   ${OrIf} ${FileExists} "$INSTDIR\etc\apcupsd\apcupsd.events"
-    ${If} ${Cmd} 'MessageBox MB_YESNO|MB_ICONQUESTION "Would you like to delete the current configuration and events files?" IDYES'
+    ${If} ${Cmd} 'MessageBox MB_YESNO|MB_ICONQUESTION "Would you like to delete the current configuration and events files?" /SD IDYES IDYES'
       Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apcupsd.conf"
       Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apcupsd.events"
       Delete /REBOOTOK "$INSTDIR\etc\apcupsd\hosts.conf"
