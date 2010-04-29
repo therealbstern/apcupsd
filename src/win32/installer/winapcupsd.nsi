@@ -434,10 +434,13 @@ SectionEnd
 ; Initialization Callback
 ;
 Function .onInit
-  ; Check for existing installation
-  ReadRegStr $INSTDIR HKLM "Software\Apcupsd" "InstDir"
-  ${If} $INSTDIR == ''
-    ; Default INSTDIR to %SystemDrive%\apcupsd
+  ; If there is an existing installation, default INSTDIR to location of that
+  ; install. Otherwise, if user did not specify INSTDIR on cmdline (using /D), 
+  ; default it to %SystemDrive%\apcupsd.
+  ReadRegStr $0 HKLM "Software\Apcupsd" "InstDir"
+  ${If} $0 != ''
+    StrCpy $INSTDIR $0
+  ${ElseIf} "$INSTDIR" == ''
     ReadEnvStr $0 SystemDrive
     ${If} $0 == ''
       StrCpy $0 'c:'
