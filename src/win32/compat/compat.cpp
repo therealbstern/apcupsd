@@ -19,7 +19,7 @@
 //
 // Author          : Christopher S. Hull
 // Created On      : Sat Jan 31 15:55:00 2004
-// $Id: compat.cpp,v 1.22.2.3 2009-07-31 14:20:35 adk0212 Exp $
+// $Id: compat.cpp,v 1.22.2.4 2010-05-16 22:09:43 adk0212 Exp $
 
 #include "apc.h"
 #include "compat.h"
@@ -538,9 +538,9 @@ void syslog(int type, const char *fmt, ...)
    // since there are many more LOG_* types than EVENTLOG_* types.
    switch (type) {
    case LOG_ERR:
-   case LOG_CRIT:
       wtype = EVENTLOG_ERROR_TYPE;
       break;
+   case LOG_CRIT:
    case LOG_ALERT:
    case LOG_WARNING:
       wtype = EVENTLOG_WARNING_TYPE;
