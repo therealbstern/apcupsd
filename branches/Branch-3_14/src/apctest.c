@@ -105,8 +105,6 @@ static int test4_done = 0;
 static int test5_done = 0;
 
 
-int shm_OK = 0;
-
 /* Print a message, and also write it to an output file */
 static void pmsg(const char *fmt, ...)
 {
@@ -489,8 +487,6 @@ int main(int argc, char *argv[])
 #endif
       }
    }
-
-   shm_OK = 1;
 
    if (ups->fd != -1) {
       if (mode == M_DUMB)
