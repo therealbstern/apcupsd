@@ -119,14 +119,34 @@ ServiceBinary  = %12%\libusb0.sys
 ;--------------------------------------------------------------------------
 
 [Devices]
+; Normal APC UPSes use PID 0x0002
 "American Power Conversion USB UPS (Apcupsd)"=LIBUSB_DEV, USB\VID_051d&PID_0002
+; APC9620 Legacy Communications Card uses PID 0x0003
+"American Power Conversion USB UPS (Apcupsd)"=LIBUSB_DEV, USB\VID_051d&PID_0003
+; Early production and prototype units of AP9620 erroneously have
+; 0x0001 or 0xffff
+"American Power Conversion USB UPS (Apcupsd)"=LIBUSB_DEV, USB\VID_051d&PID_0001
+"American Power Conversion USB UPS (Apcupsd)"=LIBUSB_DEV, USB\VID_051d&PID_ffff
 
 [Devices.NT]
+; Normal APC UPSes use PID 0x0002
 "American Power Conversion USB UPS (Apcupsd)"=LIBUSB_DEV, USB\VID_051d&PID_0002
+; APC9620 Legacy Communications Card uses PID 0x0003
+"American Power Conversion USB UPS (Apcupsd)"=LIBUSB_DEV, USB\VID_051d&PID_0003
+; Early production and prototype units of AP9620 erroneously have
+; 0x0001 or 0xffff
+"American Power Conversion USB UPS (Apcupsd)"=LIBUSB_DEV, USB\VID_051d&PID_0001
+"American Power Conversion USB UPS (Apcupsd)"=LIBUSB_DEV, USB\VID_051d&PID_ffff
 
 [Devices.NTAMD64]
+; Normal APC UPSes use PID 0x0002
 "American Power Conversion USB UPS (Apcupsd)"=LIBUSB_DEV, USB\VID_051d&PID_0002
-
+; APC9620 Legacy Communications Card uses PID 0x0003
+"American Power Conversion USB UPS (Apcupsd)"=LIBUSB_DEV, USB\VID_051d&PID_0003
+; Early production and prototype units of AP9620 erroneously have
+; 0x0001 or 0xffff
+"American Power Conversion USB UPS (Apcupsd)"=LIBUSB_DEV, USB\VID_051d&PID_0001
+"American Power Conversion USB UPS (Apcupsd)"=LIBUSB_DEV, USB\VID_051d&PID_ffff
 
 ;--------------------------------------------------------------------------
 ; Strings

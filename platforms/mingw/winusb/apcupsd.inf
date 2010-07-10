@@ -18,10 +18,24 @@ HKR,,Icon,,-1
 %ProviderName% = Apcupsd_WinUSB,NTx86,NTamd64,NTia64
 
 [Apcupsd_WinUSB.NTx86]
+; Normal APC UPSes use PID 0x0002
 %USB\MyDevice.DeviceDesc% =ApcupsdUSBDriver, USB\VID_051d&PID_0002
+; APC9620 Legacy Communications Card uses PID 0x0003
+%USB\MyDevice.DeviceDesc% =ApcupsdUSBDriver, USB\VID_051d&PID_0003
+; Early production and prototype units of AP9620 erroneously have
+; 0x0001 or 0xffff
+%USB\MyDevice.DeviceDesc% =ApcupsdUSBDriver, USB\VID_051d&PID_0001
+%USB\MyDevice.DeviceDesc% =ApcupsdUSBDriver, USB\VID_051d&PID_ffff
 
 [Apcupsd_WinUSB.NTamd64]
+; Normal APC UPSes use PID 0x0002
 %USB\MyDevice.DeviceDesc% =ApcupsdUSBDriver, USB\VID_051d&PID_0002
+; APC9620 Legacy Communications Card uses PID 0x0003
+%USB\MyDevice.DeviceDesc% =ApcupsdUSBDriver, USB\VID_051d&PID_0003
+; Early production and prototype units of AP9620 erroneously have
+; 0x0001 or 0xffff
+%USB\MyDevice.DeviceDesc% =ApcupsdUSBDriver, USB\VID_051d&PID_0001
+%USB\MyDevice.DeviceDesc% =ApcupsdUSBDriver, USB\VID_051d&PID_ffff
 
 ; =================== Installation ===================
 [ApcupsdUSBDriver]
