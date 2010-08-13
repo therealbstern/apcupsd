@@ -23,7 +23,8 @@
  */
 
 #include "apc.h"
-#include "snmplite.h"
+#include "snmplite-common.h"
+#include "mibs.h"
 #include "apc-oids.h"
 
 using namespace Asn;
@@ -78,12 +79,6 @@ static struct CiOidMap CiOidMap[] =
 
    {-1, NULL, false}   /* END OF TABLE */
 };
-
-// The OID used to issue the killpower (hibernate) command
-const int *KillPowerOid = upsBasicControlConserveBattery;
-
-// The OID used to issue the shutdown command
-const int *ShutdownOid = upsAdvControlUpsOff;
 
 #define TIMETICKS_TO_SECS 100
 #define SECS_TO_MINS      60
@@ -434,5 +429,41 @@ static void apc_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
    }
 }
 
+static int apc_killpower(UPSINFO *ups)
+{
+   struct snmplite_ups_internal_data *sid =
+      (struct snmplite_ups_internal_data *)ups->driver_internal_data;
+
+   Snmp::Variable var = { Asn::INTEGER, 2 };
+   return sid->snmp->Set(upsBasicControlConserveBattery, &var);
+}
+
+static int apc_shutdown(UPSINFO *ups)
+{
+   struct snmplite_ups_internal_data *sid =
+      (struct snmplite_ups_internal_data *)ups->driver_internal_data;
+
+   Snmp::Variable var = { Asn::INTEGER, 2 };
+   return sid->snmp->Set(upsAdvControlUpsOff, &var);
+}
+
 // Export strategy to snmplite.cpp
-struct MibStrategy ApcMibStrategy = { CiOidMap, apc_update_ci };
+struct MibStrategy ApcMibStrategy =
+{
+   "APC",
+   CiOidMap,
+   apc_update_ci,
+   snmplite_trap_wait,
+   apc_killpower,
+   apc_shutdown
+};
+
+struct MibStrategy ApcNoTrapMibStrategy =
+{
+   "APC_NOTRAP",
+   CiOidMap,
+   apc_update_ci,
+   NULL,
+   apc_killpower,
+   apc_shutdown
+};
