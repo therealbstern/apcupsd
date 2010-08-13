@@ -23,7 +23,8 @@
  */
 
 #include "apc.h"
-#include "snmplite.h"
+#include "snmplite-common.h"
+#include "mibs.h"
 #include "rfc1628-oids.h"
 
 using namespace Asn;
@@ -241,5 +242,47 @@ static void rfc1628_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
    }
 }
 
+static int rfc1628_killpower(UPSINFO *ups)
+{
+/*
+   struct snmplite_ups_internal_data *sid =
+      (struct snmplite_ups_internal_data *)ups->driver_internal_data;
+
+   Snmp::Variable var = { Asn::INTEGER, 2 };
+   return sid->snmp->Set(upsBasicControlConserveBattery, &var);
+*/
+   return 0;
+}
+
+static int rfc1628_shutdown(UPSINFO *ups)
+{
+/*
+   struct snmplite_ups_internal_data *sid =
+      (struct snmplite_ups_internal_data *)ups->driver_internal_data;
+
+   Snmp::Variable var = { Asn::INTEGER, 2 };
+   return sid->snmp->Set(upsAdvControlUpsOff, &var);
+*/
+   return 0;
+}
+
 // Export strategy to snmplite.cpp
-struct MibStrategy Rfc1628MibStrategy = { Rfc1628CiOidMap, rfc1628_update_ci };
+struct MibStrategy Rfc1628MibStrategy =
+{
+   "RFC",
+   Rfc1628CiOidMap,
+   rfc1628_update_ci,
+   snmplite_trap_wait,
+   rfc1628_killpower,
+   rfc1628_shutdown
+};
+
+struct MibStrategy Rfc1628NoTrapMibStrategy =
+{
+   "RFC_NOTRAP",
+   Rfc1628CiOidMap,
+   rfc1628_update_ci,
+   NULL,
+   rfc1628_killpower,
+   rfc1628_shutdown
+};

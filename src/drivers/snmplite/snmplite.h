@@ -25,27 +25,8 @@
 #ifndef _SNMPLITE_H
 #define _SNMPLITE_H
 
-#include "asn.h"
-#include "snmp.h"
-
-// Mapping from CI to SNMP OID and type
-struct CiOidMap
-{
-   int ci;                 // CI
-   int *oid;               // SNMP OID
-   Asn::Identifier type;   // ASN type for this OID
-   bool dynamic;           // True if dynamic parameter, false if static
-};
-
-// Associates a MIB with processing functions for that MIB
-struct MibStrategy
-{
-   CiOidMap *mib;
-   void (*update_ci_func)(UPSINFO*, int, Snmp::Variable &);
-};
-
 /*********************************************************************/
-/* Function ProtoTypes                                               */
+/* Public Function ProtoTypes                                        */
 /*********************************************************************/
 
 extern int snmplite_ups_get_capabilities(UPSINFO *ups);

@@ -24,22 +24,9 @@
 
 #include "apc.h"
 #include "snmplite.h"
+#include "snmplite-common.h"
 #include "snmp.h"
 #include "mibs.h"
-
-struct snmplite_ups_internal_data
-{
-   char device[MAXSTRING];    /* Copy of ups->device */
-   const char *host;          /* hostname|IP of peer */
-   unsigned short port;       /* Remote port, usually 161 */
-   const char *vendor;        /* SNMP vendor: APC or APC_NOTRAP */
-   const char *community;     /* Community name */
-   Snmp::SnmpEngine *snmp;    /* SNMP engine instance */
-   int error_count;           /* Number of consecutive SNMP network errors */
-   time_t commlost_time;      /* Time at which we declared COMMLOST */
-   bool traps;                /* Are we listening for SNMP traps? */
-   MibStrategy strategy;      /* MIB strategy to use */
-};
 
 int snmplite_ups_open(UPSINFO *ups)
 {
@@ -59,7 +46,6 @@ int snmplite_ups_open(UPSINFO *ups)
    sid->port = 161;
    sid->community = "private";
    sid->vendor = "APC";
-   sid->traps = true;
 
    if (ups->device == NULL || *ups->device == '\0') {
       log_event(ups, LOG_ERR, "snmplite Missing hostname");
@@ -105,22 +91,28 @@ int snmplite_ups_open(UPSINFO *ups)
       }
    }
 
-   if (strcmp(sid->vendor, "RFC") == 0)
+   // Search for MIB matching vendor
+   for (unsigned int i = 0; MibStrategies[i]; i++)
    {
-      sid->strategy = Rfc1628MibStrategy;
+      if (strcmp(MibStrategies[i]->name, sid->vendor) == 0)
+      {
+         sid->strategy = MibStrategies[i];
+         break;
+      }
    }
-   else // APC or APC_NOTRAP
-   {
-      sid->strategy = ApcMibStrategy;
 
-      // Disable SNMP trap catching if user specific APC_NOTRAP vendor
-      if (strcmp(sid->vendor, "APC_NOTRAP") == 0)
-         sid->traps = false;
+   if (!sid->strategy)
+   {
+      log_event(ups, LOG_ERR, "snmplite Invalid vendor");
+      exit(1);
    }
 
    sid->snmp = new Snmp::SnmpEngine();
-   if (!sid->snmp->Open(sid->host, sid->port, sid->community, sid->traps))
+   if (!sid->snmp->Open(sid->host, sid->port, sid->community, 
+                        sid->strategy->trapwait_func != NULL))
+   {
       return 0;
+   }
 
    return 1;
 }
@@ -170,7 +162,7 @@ int snmplite_ups_get_capabilities(UPSINFO *ups)
    // Walk the OID map, issuing an SNMP query for each item, one at a time.
    // If the query suceeds, sanity check the returned value and set the
    // capabilities flag.
-   CiOidMap *mib = sid->strategy.mib;
+   CiOidMap *mib = sid->strategy->mib;
    for (unsigned int i = 0; mib[i].ci != -1; i++)
    {
       Snmp::Variable data;
@@ -192,24 +184,26 @@ int snmplite_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
    return 0;
 }
 
-extern const int *KillPowerOid;
 int snmplite_ups_kill_power(UPSINFO *ups)
 {
    struct snmplite_ups_internal_data *sid =
       (struct snmplite_ups_internal_data *)ups->driver_internal_data;
 
-   Snmp::Variable var = { Asn::INTEGER, 2 };
-   return sid->snmp->Set(KillPowerOid, &var);
+   if (sid->strategy->killpower_func)
+      return sid->strategy->killpower_func(ups);
+
+   return 0;
 }
 
-extern const int *ShutdownOid;
 int snmplite_ups_shutdown(UPSINFO *ups)
 {
    struct snmplite_ups_internal_data *sid =
       (struct snmplite_ups_internal_data *)ups->driver_internal_data;
 
-   Snmp::Variable var = { Asn::INTEGER, 2 };
-   return sid->snmp->Set(ShutdownOid, &var);
+   if (sid->strategy->shutdown_func)
+      return sid->strategy->shutdown_func(ups);
+
+   return 0;
 }
 
 int snmplite_ups_check_state(UPSINFO *ups)
@@ -217,23 +211,10 @@ int snmplite_ups_check_state(UPSINFO *ups)
    struct snmplite_ups_internal_data *sid =
       (struct snmplite_ups_internal_data *)ups->driver_internal_data;
 
-   if (sid->traps)
-   {
-      // Simple trap handling: Any valid trap causes us to return and thus
-      // new data will be fetched from the UPS.
-      Snmp::TrapMessage *trap = sid->snmp->TrapWait(ups->wait_time * 1000);
-      if (trap)
-      {
-         Dmsg2(80, "Got TRAP: generic=%d, specific=%d\n", 
-            trap->Generic(), trap->Specific());
-         delete trap;
-      }
-   }
+   if (sid->strategy->trapwait_func)
+      sid->strategy->trapwait_func(ups);
    else
-   {
-      // Traps are disabled: Just delay for wait_time seconds.
       sleep(ups->wait_time);
-   }
 
    return 1;
 }
@@ -242,7 +223,7 @@ static int snmplite_ups_update_cis(UPSINFO *ups, bool dynamic)
 {
    struct snmplite_ups_internal_data *sid =
       (struct snmplite_ups_internal_data *)ups->driver_internal_data;
-   CiOidMap *mib = sid->strategy.mib;
+   CiOidMap *mib = sid->strategy->mib;
 
    // Walk OID map and build a query for all parameters we have that
    // match the requested 'dynamic' setting
@@ -270,7 +251,7 @@ static int snmplite_ups_update_cis(UPSINFO *ups, bool dynamic)
       if (ups->UPS_Cap[mib[i].ci] && 
           mib[i].oid && mib[i].dynamic == dynamic)
       {
-         sid->strategy.update_ci_func(ups, mib[i].ci, (*iter).data);
+         sid->strategy->update_ci_func(ups, mib[i].ci, (*iter).data);
          ++iter;
       }
    }
@@ -305,7 +286,8 @@ int snmplite_ups_read_volatile_data(UPSINFO *ups)
    {
       // Query failed. Close and reopen SNMP to help recover.
       sid->snmp->Close();
-      sid->snmp->Open(sid->host, sid->port, sid->community, sid->traps);
+      sid->snmp->Open(sid->host, sid->port, sid->community, 
+                      sid->strategy->trapwait_func != NULL);
 
       if (ups->is_commlost())
       {
@@ -346,4 +328,20 @@ int snmplite_ups_read_static_data(UPSINFO *ups)
 int snmplite_ups_entry_point(UPSINFO *ups, int command, void *data)
 {
    return 0;
+}
+
+void snmplite_trap_wait(UPSINFO *ups)
+{
+   struct snmplite_ups_internal_data *sid =
+      (struct snmplite_ups_internal_data *)ups->driver_internal_data;
+
+   // Simple trap handling: Any valid trap causes us to return and thus
+   // new data will be fetched from the UPS.
+   Snmp::TrapMessage *trap = sid->snmp->TrapWait(ups->wait_time * 1000);
+   if (trap)
+   {
+      Dmsg2(80, "Got TRAP: generic=%d, specific=%d\n", 
+         trap->Generic(), trap->Specific());
+      delete trap;
+   }
 }
