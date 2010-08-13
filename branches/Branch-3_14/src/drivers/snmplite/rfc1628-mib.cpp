@@ -244,25 +244,38 @@ static void rfc1628_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
 
 static int rfc1628_killpower(UPSINFO *ups)
 {
-/*
    struct snmplite_ups_internal_data *sid =
       (struct snmplite_ups_internal_data *)ups->driver_internal_data;
 
-   Snmp::Variable var = { Asn::INTEGER, 2 };
-   return sid->snmp->Set(upsBasicControlConserveBattery, &var);
-*/
+   // Configure UPS to turn off output only (not entire UPS)
+   Snmp::Variable shutdownType = { Asn::INTEGER, 1 };
+   sid->snmp->Set(upsShutdownType, &shutdownType);
+
+   // Instruct UPS to turn off after 60 secs
+   Snmp::Variable shutdownDelay = { Asn::INTEGER, 60 };
+   sid->snmp->Set(upsShutdownAfterDelay, &shutdownDelay);
+
+   // Instruct UPS to turn on after 90 secs
+   // Will not actually turn on until power is restored
+   Snmp::Variable startupDelay = { Asn::INTEGER, 90 };
+   sid->snmp->Set(upsStartupAfterDelay, &startupDelay);
+
    return 0;
 }
 
 static int rfc1628_shutdown(UPSINFO *ups)
 {
-/*
    struct snmplite_ups_internal_data *sid =
       (struct snmplite_ups_internal_data *)ups->driver_internal_data;
 
-   Snmp::Variable var = { Asn::INTEGER, 2 };
-   return sid->snmp->Set(upsAdvControlUpsOff, &var);
-*/
+   // Configure UPS to turn off entire system
+   Snmp::Variable shutdownType = { Asn::INTEGER, 2 };
+   sid->snmp->Set(upsShutdownType, &shutdownType);
+
+   // Instruct UPS to turn off after 60 secs
+   Snmp::Variable shutdownDelay = { Asn::INTEGER, 60 };
+   sid->snmp->Set(upsShutdownAfterDelay, &shutdownDelay);
+
    return 0;
 }
 
