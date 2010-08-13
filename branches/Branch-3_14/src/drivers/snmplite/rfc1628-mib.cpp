@@ -251,14 +251,13 @@ static int rfc1628_killpower(UPSINFO *ups)
    Snmp::Variable shutdownType = { Asn::INTEGER, 1 };
    sid->snmp->Set(upsShutdownType, &shutdownType);
 
+   // Configure UPS to automatically restart when power is restored
+   Snmp::Variable autoRestart = { Asn::INTEGER, 1 };
+   sid->snmp->Set(upsAutoRestart, &autoRestart);
+
    // Instruct UPS to turn off after 60 secs
    Snmp::Variable shutdownDelay = { Asn::INTEGER, 60 };
    sid->snmp->Set(upsShutdownAfterDelay, &shutdownDelay);
-
-   // Instruct UPS to turn on after 90 secs
-   // Will not actually turn on until power is restored
-   Snmp::Variable startupDelay = { Asn::INTEGER, 90 };
-   sid->snmp->Set(upsStartupAfterDelay, &startupDelay);
 
    return 0;
 }
@@ -271,6 +270,10 @@ static int rfc1628_shutdown(UPSINFO *ups)
    // Configure UPS to turn off entire system
    Snmp::Variable shutdownType = { Asn::INTEGER, 2 };
    sid->snmp->Set(upsShutdownType, &shutdownType);
+
+   // Configure UPS to NOT automatically restart when power is restored
+   Snmp::Variable autoRestart = { Asn::INTEGER, 2 };
+   sid->snmp->Set(upsAutoRestart, &autoRestart);
 
    // Instruct UPS to turn off after 60 secs
    Snmp::Variable shutdownDelay = { Asn::INTEGER, 60 };
