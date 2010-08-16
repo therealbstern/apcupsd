@@ -17,9 +17,9 @@ MINGW = $(CROSSTOOLS)/mingw32
 INCLUDE_MINGW = -I $(MINGW)/mingw32/include
 INCLUDE_GCC = -I $(MINGW)/lib/gcc/mingw32/3.4.5/include
 
-# By default we will use the generic-usb driver
-# The other option is winusb
-USBTYPE ?= generic
+# By default we will use the winusb driver
+# The other option is generic
+USBTYPE ?= winusb
 
 DEPKGS = $(PARENT_DIR)/depkgs-win32/libroot
 
