@@ -368,14 +368,22 @@ $(OBJDIR)/snmp.o: ../drivers/snmp/snmp.c
 # Files in src/drivers/snmp
 OBJS_SNMPLITEDRV = \
 	$(OBJDIR)/snmplite.o \
-	$(OBJDIR)/mib.o \
+	$(OBJDIR)/mibs.o \
+	$(OBJDIR)/apc-mib.o \
+	$(OBJDIR)/rfc1628-mib.o \
 	$(OBJDIR)/asn.o  \
 	$(OBJDIR)/snmpeng.o
 
 $(OBJDIR)/snmplite.o: ../drivers/snmplite/snmplite.cpp
 	$(CXX) -c $< -o $@
 
-$(OBJDIR)/mib.o: ../drivers/snmplite/mib.cpp
+$(OBJDIR)/mibs.o: ../drivers/snmplite/mibs.cpp
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/apc-mib.o: ../drivers/snmplite/apc-mib.cpp
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/rfc1628-mib.o: ../drivers/snmplite/rfc1628-mib.cpp
 	$(CXX) -c $< -o $@
 
 $(OBJDIR)/asn.o: ../drivers/snmplite/asn.cpp
