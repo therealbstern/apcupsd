@@ -367,9 +367,10 @@
 
 #define HAVE_SOCKLEN_T 1
 
-/* Choose USB driver */
-#undef HAVE_LINUX_USB
-#define HAVE_GENERIC_USB
-#undef HAVE_BSD_USB
+/* Which variant of gethostbyname_r() do we have */
+#define HAVE_FUNC_GETHOSTBYNAME_R_0
+#undef HAVE_FUNC_GETHOSTBYNAME_R_3
+#undef HAVE_FUNC_GETHOSTBYNAME_R_5
+#undef HAVE_FUNC_GETHOSTBYNAME_R_6
 
 #endif /* __MINGWNCONFIG_H */

@@ -11,37 +11,32 @@
 // Implementation of the About dialog
 
 #include <windows.h>
+#include <stdio.h>
 #include "winabout.h"
-#include "winres.h"
+#include "resource.h"
+#include "version.h"
 
 // Constructor/destructor
 upsAbout::upsAbout(HINSTANCE appinst)
 {
-   m_dlgvisible = FALSE;
-   m_appinst = appinst;
+   _dlgvisible = FALSE;
+   _appinst = appinst;
 }
 
 upsAbout::~upsAbout()
 {
 }
 
-// Initialisation
-BOOL upsAbout::Init()
-{
-   return TRUE;
-}
-
 // Dialog box handling functions
-void upsAbout::Show(BOOL show)
+void upsAbout::Show()
 {
-   if (show) {
-      if (!m_dlgvisible) {
-         DialogBoxParam(m_appinst,
-                        MAKEINTRESOURCE(IDD_ABOUT), 
-                        NULL,
-                       (DLGPROC) DialogProc,
-                       (LONG) this);
-      }
+   if (!_dlgvisible)
+   {
+      DialogBoxParam(_appinst,
+                     MAKEINTRESOURCE(IDD_ABOUT), 
+                     NULL,
+                    (DLGPROC) DialogProc,
+                    (LONG) this);
    }
 }
 
@@ -64,8 +59,11 @@ BOOL CALLBACK upsAbout::DialogProc(
       _this = (upsAbout *)lParam;
 
       // Show the dialog
+      char tmp[128];
+      snprintf(tmp, sizeof(tmp), "Apctray %s (%s)", VERSION, ADATE);
+      SendDlgItemMessage(hwnd, IDC_VERSION, WM_SETTEXT, 0, (LONG)tmp);
       SetForegroundWindow(hwnd);
-      _this->m_dlgvisible = TRUE;
+      _this->_dlgvisible = TRUE;
       return TRUE;
 
    case WM_COMMAND:
@@ -75,14 +73,14 @@ BOOL CALLBACK upsAbout::DialogProc(
       case IDOK:
          // Close the dialog
          EndDialog(hwnd, TRUE);
-         _this->m_dlgvisible = FALSE;
+         _this->_dlgvisible = FALSE;
          return TRUE;
       }
       break;
 
    case WM_DESTROY:
        EndDialog(hwnd, FALSE);
-       _this->m_dlgvisible = FALSE;
+       _this->_dlgvisible = FALSE;
        return TRUE;
    }
 

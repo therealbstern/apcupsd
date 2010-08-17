@@ -58,7 +58,6 @@
  */
 
 #include "apc.h"
-#include "statemachine.h"
 
 /*
  * myUPS is a structure that need to be defined in _all_ the forked processes.
@@ -69,9 +68,10 @@ UPSINFO *core_ups = NULL;
 
 static void daemon_start(void);
 
-int shm_OK = 0;
+int pidcreated = 0;
 extern int kill_on_powerfail;
 extern FILE *trace_fd;
+extern char *pidfile;
 
 /*
  * The terminate function and trapping signals allows apcupsd
@@ -92,11 +92,10 @@ void apcupsd_terminate(int sig)
       log_event(ups, LOG_WARNING, _("apcupsd exiting, signal %u\n"), sig);
 
    clear_files();
-
    device_close(ups);
-
    delete_lockfile(ups);
-
+   if (pidcreated)
+      unlink(pidfile);
    clean_threads();
    log_event(ups, LOG_WARNING, _("apcupsd shutdown succeeded"));
    destroy_ups(ups);
@@ -108,6 +107,8 @@ void apcupsd_error_cleanup(UPSINFO *ups)
 {
    device_close(ups);
    delete_lockfile(ups);
+   if (pidcreated)
+      unlink(pidfile);
    clean_threads();
    log_event(ups, LOG_ERR, _("apcupsd error shutdown completed"));
    destroy_ups(ups);
@@ -262,7 +263,6 @@ int main(int argc, char *argv[])
    Dmsg1(10, "Attached to driver: %s\n", ups->driver->driver_name);
 
    ups->start_time = time(NULL);
-   delete_lockfile(ups);
 
    if (!hibernate_ups && !shutdown_ups && go_background) {
       daemon_start();
@@ -271,7 +271,6 @@ int main(int argc, char *argv[])
       openlog("apcupsd", LOG_CONS | LOG_PID, ups->sysfac);
    }
 
-   make_pid_file();
    init_signals(apcupsd_terminate);
 
    /* Create temp events file if we are not doing a hibernate or shutdown */
@@ -282,6 +281,14 @@ int main(int argc, char *argv[])
             ups->eventfile, strerror(errno));
       }
    }
+
+   if (create_lockfile(ups) == LCKERROR) {
+      Error_abort1(_("Failed to acquire device lock file\n"),
+         ups->device);
+   }
+
+   make_pid_file();
+   pidcreated = 1;
 
    setup_device(ups);
 
@@ -295,14 +302,7 @@ int main(int argc, char *argv[])
       apcupsd_terminate(0);
    }
 
-//   prep_device(ups);
-
-   if (create_lockfile(ups) == LCKERROR) {
-      Error_abort1(_("Failed to reacquire serial port lock file on device %s\n"),
-         ups->device);
-   }
-
-   shm_OK = 1;
+   prep_device(ups);
 
    /*
     * From now ... we must _only_ start up threads!
@@ -320,14 +320,8 @@ int main(int argc, char *argv[])
       "apcupsd " APCUPSD_RELEASE " (" ADATE ") " APCUPSD_HOST " startup succeeded");
 
    /* main processing loop */
-//   do_device(ups);
-   UpsStateMachine *sm = new UpsStateMachine(ups);
-   sm->Start();
+   do_device(ups);
 
-   // Need something better, obviously
-   while (1)
-      sleep(10);
-   
    apcupsd_terminate(0);
    return 0;                       /* to keep compiler happy */
 }

@@ -85,6 +85,10 @@ static void usb_get_manf_date(void);
 static void usb_set_alarm(void);
 static void usb_set_sens(void);
 static void usb_set_xferv(int lowhigh);
+static void usb_calibration();
+static void usb_test_alarm(void);
+static int usb_get_self_test_interval(void);
+static void usb_set_self_test_interval(void);
 #endif
 
 static void strip_trailing_junk(char *cmd);
@@ -100,8 +104,6 @@ static int test3_done = 0;
 static int test4_done = 0;
 static int test5_done = 0;
 
-
-int shm_OK = 0;
 
 /* Print a message, and also write it to an output file */
 static void pmsg(const char *fmt, ...)
@@ -486,8 +488,6 @@ int main(int argc, char *argv[])
       }
    }
 
-   shm_OK = 1;
-
    if (ups->fd != -1) {
       if (mode == M_DUMB)
          do_dumb_testing();
@@ -556,7 +556,7 @@ static void do_dumb_testing(void)
            "6) Test 6 - kill UPS power\n"
            "7) Test 7 - run tests 1 through 5\n"
            "8) Guess which is the appropriate cable\n"
-           "9) Quit\n\n");
+           "Q) Quit\n\n");
 
       cmd = get_cmd("Select test number: ");
 
@@ -592,15 +592,15 @@ static void do_dumb_testing(void)
          case 8:
             guess();
             break;
-         case 9:
-            quit = TRUE;
-            break;
          default:
-            pmsg("Illegal response. Please enter 1-9\n");
+            if (tolower(*cmd) == 'q')
+               quit = TRUE;
+            else
+               pmsg("Illegal response. Please enter 1-8,Q\n");
             break;
          }
       } else {
-         pmsg("Illegal response. Please enter 1-9\n");
+         pmsg("Illegal response. Please enter 1-8,Q\n");
       }
    }
 
@@ -869,7 +869,7 @@ static void do_smart_testing(void)
            "4) Monitor Battery Calibration progress\n"
            "5) Program EEPROM\n"
            "6) Enter TTY mode communicating with UPS\n"
-           "7) Quit\n\n");
+           "Q) Quit\n\n");
 
       cmd = get_cmd("Select function number: ");
       if (cmd) {
@@ -894,15 +894,16 @@ static void do_smart_testing(void)
          case 6:
             smart_ttymode();
             break;
-         case 7:
-            quit = TRUE;
-            break;
          default:
-            pmsg("Illegal response. Please enter 1-6\n");
+            if (tolower(*cmd) == 'q')
+               quit = TRUE;
+            else
+               pmsg("Illegal response. Please enter 1-6,Q\n");
+            break;
             break;
          }
       } else {
-         pmsg("Illegal response. Please enter 1-6\n");
+         pmsg("Illegal response. Please enter 1-6,Q\n");
       }
    }
    ptime();
@@ -915,6 +916,49 @@ static void do_smart_testing(void)
 #ifdef HAVE_APCSMART_DRIVER
 static void smart_ttymode(void)
 {
+#ifdef HAVE_MINGW
+   // This is crap. Windows has no sane way (that I can find) to watch two
+   // fds for activity from a single thread without involving the overly
+   // complex "overlapped" io junk. So we will resort to polling.
+
+   // Save any existing timeouts on the UPS fd
+   HANDLE hnd = (HANDLE)_get_osfhandle(ups->fd);
+   COMMTIMEOUTS orig_ups_ct;
+   GetCommTimeouts(hnd, &orig_ups_ct);
+
+   // Reset UPS fd timeout to 50 msec
+   COMMTIMEOUTS ct;
+   ct.ReadIntervalTimeout = MAXDWORD;
+   ct.ReadTotalTimeoutMultiplier = 0;
+   ct.ReadTotalTimeoutConstant = 50;
+   ct.WriteTotalTimeoutMultiplier = 0;
+   ct.WriteTotalTimeoutConstant = 0;
+   SetCommTimeouts(hnd, &ct);
+
+   pmsg("Enter an ESC character (or ctl-[) to exit.\n\n");
+
+   char ch;
+   while (1)
+   {
+      // Waits up to 50 msec for a char from the UPS
+      if (read(ups->fd, &ch, 1) == 1)
+         putch(ch);
+
+      // Check if keyboard key was hit and read it (only Windows would
+      // have a function dedicated to checking if a key has been pressed!)
+      if (kbhit())
+      {
+         ch = getch();
+         if (ch == 0x1b)
+            break;
+         else
+            write(ups->fd, &ch, 1);
+      }
+   }
+
+   // Restore original timeouts on UPS fd
+   SetCommTimeouts(hnd, &orig_ups_ct);
+#else
    char ch;
    struct termios t, old_term_params;
    fd_set rfds;
@@ -969,6 +1013,7 @@ static void smart_ttymode(void)
    }
 
    tcsetattr(0, TCSANOW, &old_term_params);
+#endif
 }
 
 
@@ -1220,7 +1265,7 @@ static void program_smart_eeprom(void)
            "12) Change output voltage when on batteries\n"
            "13) Change the self test interval\n"
            "14) Set EEPROM with conf file values\n"
-           "15) Quit\n\n");
+           " Q) Quit\n\n");
 
       cmd = get_cmd("Select function number: ");
       if (cmd) {
@@ -1310,16 +1355,15 @@ static void program_smart_eeprom(void)
             apcsmart_ups_program_eeprom(ups, -1, NULL);
             break;
 
-         case 15:
-            quit = TRUE;
-            break;
-
          default:
-            pmsg("Illegal response. Please enter 1-15\n");
+            if (tolower(*cmd) == 'q')
+               quit = TRUE;
+            else
+               pmsg("Illegal response. Please enter 1-14,Q\n");
             break;
          }
       } else {
-         pmsg("Illegal response. Please enter 1-15\n");
+         pmsg("Illegal response. Please enter 1-14,Q\n");
       }
    }
    ptime();
@@ -1543,14 +1587,16 @@ static void do_usb_testing(void)
            "1)  Test kill UPS power\n"
            "2)  Perform self-test\n"
            "3)  Read last self-test result\n"
-           "4)  Change battery date\n"
-           "5)  View battery date\n"
-           "6)  View manufacturing date\n"
-           "7)  Set alarm behavior\n"
-           "8)  Set sensitivity\n"
-           "9)  Set low transfer voltage\n"
-           "10) Set high transfer voltage\n"
-           "11) Quit\n\n");
+           "4)  View/Change battery date\n"
+           "5)  View manufacturing date\n"
+           "6)  View/Change alarm behavior\n"
+           "7)  View/Change sensitivity\n"
+           "8)  View/Change low transfer voltage\n"
+           "9)  View/Change high transfer voltage\n"
+           "10) Perform battery calibration\n"
+           "11) Test alarm\n"
+           "12) View/Change self-test interval\n"
+           " Q) Quit\n\n");
 
       cmd = get_cmd("Select function number: ");
       if (cmd) {
@@ -1570,32 +1616,38 @@ static void do_usb_testing(void)
             usb_set_battery_date();
             break;
          case 5:
-            usb_get_battery_date();
-            break;
-         case 6:
             usb_get_manf_date();
             break;
-         case 7:
+         case 6:
             usb_set_alarm();
             break;
-         case 8:
+         case 7:
             usb_set_sens();
             break;
-         case 9:
+         case 8:
             usb_set_xferv(0);
             break;
-         case 10:
+         case 9:
             usb_set_xferv(1);
             break;
+         case 10:
+            usb_calibration();
+            break;
          case 11:
-            quit = TRUE;
+            usb_test_alarm();
+            break;
+         case 12:
+            usb_set_self_test_interval();
             break;
          default:
-            pmsg("Illegal response. Please enter 1-11\n");
+            if (tolower(*cmd) == 'q')
+               quit = TRUE;
+            else
+               pmsg("Illegal response. Please enter 1-12,Q\n");
             break;
          }
       } else {
-         pmsg("Illegal response. Please enter 1-11\n");
+         pmsg("Illegal response. Please enter 1-12,Q\n");
       }
    }
    ptime();
@@ -1869,30 +1921,24 @@ static void usb_get_self_test_result(void)
    }
 }
 
-static void usb_run_self_test(void)
+static bool usb_clear_test_result()
 {
-   int result;
-   int timeout;
+   int timeout, result;
 
-   pmsg("\nThis test instructs the UPS to perform a self-test\n"
-        "operation and reports the result when the test completes.\n");
+   pmsg("Clearing previous self test result...");
 
-   if (!usb_read_int_from_ups(ups, CI_ST_STAT, &result)) {
-      pmsg("\nI don't know how to run a self test on your UPS\n"
-           "or your UPS does not support self test.\n");
-      return;
-   }
+   // abort battery calibration in case it's in progress
+   usb_write_int_to_ups(ups, CI_ST_STAT, 3, "SelftestStatus");
 
-   pmsg("\nClearing previous self test result...");
    if (!usb_write_int_to_ups(ups, CI_ST_STAT, 0, "SelftestStatus")) {
       pmsg("FAILED\n");
-      return;
+      return false;
    }
 
    for (timeout = 0; timeout < 10; timeout++) {
       if (!usb_read_int_from_ups(ups, CI_ST_STAT, &result)) {
          pmsg("FAILED\n");
-         return;
+         return false;
       }
 
       if (result == 6) {
@@ -1905,8 +1951,28 @@ static void usb_run_self_test(void)
 
    if (timeout == 10) {
       pmsg("FAILED\n");
+      return false;
+   }
+   
+   return true;
+}
+
+static void usb_run_self_test(void)
+{
+   int result;
+   int timeout;
+
+   pmsg("\nThis test instructs the UPS to perform a self-test\n"
+        "operation and reports the result when the test completes.\n\n");
+
+   if (!usb_read_int_from_ups(ups, CI_ST_STAT, &result)) {
+      pmsg("I don't know how to run a self test on your UPS\n"
+           "or your UPS does not support self test.\n");
       return;
    }
+
+   if (!usb_clear_test_result())
+      return;
 
    pmsg("Initiating self test...");
    if (!usb_write_int_to_ups(ups, CI_ST_STAT, 1, "SelftestStatus")) {
@@ -1973,14 +2039,14 @@ static void usb_set_battery_date(void)
    if (!(result = usb_get_battery_date()))
       return;
 
-   cmd = get_cmd("Enter new battery date (MM/DD/YYYY): ");
+   cmd = get_cmd("Enter new battery date (MM/DD/YYYY), blank to quit: ");
    if (!isdigit(cmd[0]) || !isdigit(cmd[1]) || cmd[2] != '/' ||
-      !isdigit(cmd[3]) || !isdigit(cmd[4]) || cmd[5] != '/' ||
-      !isdigit(cmd[6]) || !isdigit(cmd[7]) || !isdigit(cmd[8]) ||
-      !isdigit(cmd[9]) || cmd[10] != '\0' ||
-      ((month = strtoul(cmd, NULL, 10)) > 12) || (month < 1) ||
-      ((day = strtoul(cmd + 3, NULL, 10)) > 31) || (day < 1) ||
-      ((year = strtoul(cmd + 6, NULL, 10)) < 1980)) {
+       !isdigit(cmd[3]) || !isdigit(cmd[4]) || cmd[5] != '/' ||
+       !isdigit(cmd[6]) || !isdigit(cmd[7]) || !isdigit(cmd[8]) ||
+       !isdigit(cmd[9]) || cmd[10] != '\0' ||
+       ((month = strtoul(cmd, NULL, 10)) > 12) || (month < 1) ||
+       ((day = strtoul(cmd + 3, NULL, 10)) > 31) || (day < 1) ||
+       ((year = strtoul(cmd + 6, NULL, 10)) < 1980)) {
       pmsg("Invalid format.\n");
       return;
    }
@@ -2035,6 +2101,232 @@ static void usb_get_manf_date(void)
     */
    pmsg("Manufacturing date: %02u/%02u/%04u\n",
       (result & 0x1e0) >> 5, result & 0x1f, 1980 + ((result & 0xfe00) >> 9));
+}
+
+static void usb_calibration()
+{
+   int result;
+   int aborted;
+   int ilastbl;
+
+   if (!ups->UPS_Cap[CI_ST_STAT] || 
+       !ups->UPS_Cap[CI_BATTLEV] ||
+       !ups->UPS_Cap[CI_LOAD]) {
+      pmsg("\nI don't know how to run a battery calibration on your UPS\n"
+             "or your UPS does not support battery calibration\n");
+      return;
+   }
+
+   pmsg("This test instructs the UPS to perform a battery calibration\n"
+        "operation and reports the result when the process completes.\n"
+        "The battery level must be at 100%% and the load must be at least\n"
+        "10%% to begin this test.\n\n");
+
+   if (!usb_read_int_from_ups(ups, CI_BATTLEV, &result)) {
+      pmsg("Failed to read current battery level\n");
+      return;
+   }
+
+   if (result == 100) {
+      pmsg("Battery level is %d%% -- OK\n", result);
+   }
+   else {
+      pmsg("Battery level %d%% is insufficient to run test.\n", result);
+      return;
+   }
+
+   if (!usb_read_int_from_ups(ups, CI_LOAD, &result)) {
+      pmsg("Failed to read current load level\n");
+      return;
+   }
+
+   if (result >= 10) {
+      pmsg("Load level is %d%% -- OK\n", result);
+   }
+   else {
+      pmsg("Load level %d%% is insufficient to run test.\n", result);
+      return;
+   }
+
+   if (!usb_clear_test_result())
+      return;
+
+   pmsg("\nThe battery calibration should automatically end\n"
+          "when the battery level drops below about 25%%.\n"
+          "This process can take minutes or hours, depending on\n"
+          "the size of your UPS and the load attached.\n\n");
+
+   pmsg("Initiating battery calibration...");
+   if (!usb_write_int_to_ups(ups, CI_ST_STAT, 2, "SelftestStatus")) {
+      pmsg("FAILED\n");
+      return;
+   }
+
+   pmsg("INITIATED\n\n");
+
+   pmsg("Waiting for calibration to complete...\n"
+        "To abort the calibration, press ENTER.\n");
+
+	ilastbl = 0;
+   while (1) {
+#ifndef HAVE_MINGW
+      fd_set rfds;
+      struct timeval tv;
+      FD_ZERO(&rfds);
+      FD_SET(STDIN_FILENO, &rfds);
+      tv.tv_sec = 10;
+      tv.tv_usec = 0;
+
+      aborted = select(STDIN_FILENO+1, &rfds, NULL, NULL, &tv) == 1;
+      if (aborted) {
+         while (fgetc(stdin) != '\n')
+            ;
+      }
+#else
+      aborted = false;
+      for (int i = 0; i < 100 && !aborted; i++) {
+         while (kbhit() && !aborted)
+            aborted = getch() == '\r';
+         if (!aborted)
+         {
+            struct timespec ts;
+            ts.tv_sec = 0;
+            ts.tv_nsec = 100000000;
+            nanosleep(&ts, NULL);
+         }
+      }
+#endif
+
+      if (aborted) {
+         pmsg("\n\nUser input detected; aborting calibration...");
+         if (!usb_write_int_to_ups(ups, CI_ST_STAT, 3, "SelftestStatus")) {
+            pmsg("FAILED\n");
+         }
+         else {
+            pmsg("ABORTED\n");
+         }
+         return;
+      }
+         
+      if (!usb_read_int_from_ups(ups, CI_ST_STAT, &result)) {
+         pmsg("\n\nError reading status; aborting calibration...");
+         if (!usb_write_int_to_ups(ups, CI_ST_STAT, 3, "SelftestStatus")) {
+            pmsg("FAILED\n");
+         }
+         else {
+            pmsg("ABORTED\n");
+         }
+         return;
+      }
+
+      if (result != 5) {
+         pmsg("\nCALIBRATION COMPLETED\n");
+         break;
+      }
+
+      // Output the battery level
+      if (usb_read_int_from_ups(ups, CI_BATTLEV, &result)) {
+         if (ilastbl == result)
+            pmsg(".");
+         else
+            pmsg("\nBattery level: %d%%", result);
+         ilastbl = result;
+	   }
+      else
+         pmsg(".");
+   }
+
+   usb_get_self_test_result();
+}
+
+static void usb_test_alarm(void)
+{
+   int result;
+
+   if (!usb_read_int_from_ups(ups, CI_TESTALARM, &result))
+   {
+      pmsg("\nI don't know how to test the alarm on your UPS.\n");
+      return;
+   }
+   
+   // Write to UPS
+   pmsg("Testing alarm...");
+   usb_write_int_to_ups(ups, CI_TESTALARM, 1, "CI_TESTALARM");
+   sleep(1);
+
+   pmsg("COMPLETE\n");
+}
+
+static int usb_get_self_test_interval(void)
+{
+   int result;
+
+   if (!usb_read_int_from_ups(ups, CI_STESTI, &result))
+   {
+      pmsg("\nI don't know how to access the self-test interval on your UPS\n"
+           "or your UPS does not support the self-test interval feature.\n");
+      return -1;
+   }
+
+   pmsg("Current Self-test interval: ");
+   switch (result)
+   {
+   case 0:
+      pmsg("None\n");
+      break;
+   case 1:
+      pmsg("Power On\n");
+      break;
+   case 2:
+      pmsg("7 days\n");
+      break;
+   case 3:
+      pmsg("14 days\n");
+      break;
+   default:
+      pmsg("UNKNOWN (%02x)\n", result);
+      break;
+   }
+
+   return result;
+}
+
+static void usb_set_self_test_interval(void)
+{
+   if (usb_get_self_test_interval() == -1)
+      return;
+
+   while(1)
+   {
+      pmsg("Press...\n"
+           " 0 for None\n"
+           " 1 for On Power\n"
+           " 2 for 7 Days\n"
+           " 3 for 14 Days\n"
+           " Q to Quit with no changes\n"
+           "Your choice: ");
+      char *cmd = get_cmd("Select function: ");
+      if (cmd)
+      {
+         if (*cmd >= '0' && *cmd <= '3')
+         {
+            usb_write_int_to_ups(ups, CI_STESTI, *cmd-'0', "CI_STESTI");
+            break;
+         }
+         else if (tolower(*cmd) == 'q')
+            return;
+         else
+            pmsg("Illegal response.\n");
+      }
+      else
+      {
+         pmsg("Illegal response.\n");
+      }
+   }
+   
+   /* Delay needed for readback to work */
+   sleep(1);
+   usb_get_self_test_interval();
 }
 
 #endif

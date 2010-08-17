@@ -23,34 +23,28 @@
 #ifndef _DUMB_H
 #define _DUMB_H
 
-#include "drivers.h"
+/* Private dumb driver data structure */
 
-class DumbDriver: public UpsDriver
-{
-public:
+typedef struct s_dumb_data {
+   int sp_flags;                   /* Serial port flags */
+   time_t debounce;                /* last event time for debounce */
+   struct termios oldtio;
+   struct termios newtio;
+} SIMPLE_DATA;
 
-   DumbDriver(UPSINFO *ups) : UpsDriver(ups, "dumb") {}
-   virtual ~DumbDriver() {}
+/*********************************************************************/
+/* Function ProtoTypes                                               */
+/*********************************************************************/
 
-   // Subclasses must implement these methods
-   virtual bool Open();
-   virtual bool GetCapabilities();
-   virtual bool ReadVolatileData();
-   virtual bool ReadStaticData() { return true; }
-   virtual bool CheckState() { return ReadVolatileData(); }
-   virtual bool Close();
-
-   // Optional methods
-   virtual bool KillPower();
-   virtual bool Setup();
-   virtual bool EntryPoint(int command, void *data);
-
-private:
-
-   struct termios _oldtio;
-   struct termios _newtio;
-   int _sp_flags;                  /* Serial port flags */
-   time_t _debounce;               /* last event time for debounce */
-};
+extern int dumb_ups_get_capabilities(UPSINFO *ups);
+extern int dumb_ups_read_volatile_data(UPSINFO *ups);
+extern int dumb_ups_read_static_data(UPSINFO *ups);
+extern int dumb_ups_kill_power(UPSINFO *ups);
+extern int dumb_ups_check_state(UPSINFO *ups);
+extern int dumb_ups_open(UPSINFO *ups);
+extern int dumb_ups_close(UPSINFO *ups);
+extern int dumb_ups_setup(UPSINFO *ups);
+extern int dumb_ups_program_eeprom(UPSINFO *ups, int command, const char *data);
+extern int dumb_ups_entry_point(UPSINFO *ups, int command, void *data);
 
 #endif   /* _DUMB_H */
