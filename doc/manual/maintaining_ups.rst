@@ -361,7 +361,7 @@ presumably for register 0, in the following table::
   SU2000              F1 F9 9F    FD
   SU450,700        28 F2 FA 96 07,RM=47  52.11.I
   SU450XL,700XL    28 EE F8 9F 700XL=27   51.9.I
-  SU1000           35 EF F9 A0    0B     60.11.I
+  SU1000,INET      35 EF F9 A0    0B     60.11.I
   SU1000XL         34 EE FC 9A    2B      61.9.I
   SU1400           35 EE FC 9A		 70.11.I
   SU1400RM         28 ED FA 89
