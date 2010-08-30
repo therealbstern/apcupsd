@@ -58,9 +58,9 @@ int snmplite_ups_open(UPSINFO *ups)
     * Split the DEVICE statement and assign pointers to the various parts.
     * The DEVICE statement syntax in apcupsd.conf is:
     *
-    *    DEVICE address:port:vendor:community
+    *    DEVICE address[:port[:vendor[:community]]]
     *
-    * vendor can be "APC", "APC_NOTRAP", or "RFC".
+    * vendor can be "APC", "RFC", "MGE" or "*_NOTRAP".
     */
 
    char *cp = sid->device;
@@ -69,18 +69,22 @@ int snmplite_ups_open(UPSINFO *ups)
    if (cp)
    {
       *cp++ = '\0';
-      sid->port = atoi(cp);
-      if (sid->port == 0)
+      if (*cp != ':')
       {
-         log_event(ups, LOG_ERR, "snmplite Bad port number");
-         exit(1);
+         sid->port = atoi(cp);
+         if (sid->port == 0)
+         {
+            log_event(ups, LOG_ERR, "snmplite Bad port number");
+            exit(1);
+         }
       }
 
       cp = strchr(cp, ':');
       if (cp)
       {
          *cp++ = '\0';
-         sid->vendor = cp;
+         if (*cp != ':')
+            sid->vendor = cp;
 
          cp = strchr(cp, ':');
          if (cp)
