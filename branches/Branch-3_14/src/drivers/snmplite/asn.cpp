@@ -65,7 +65,7 @@ Object *Object::Demarshal(unsigned char *&buffer, unsigned int &buflen)
       break;
    case OCTETSTRING:
    case IPADDRESS:
-      debug("OCTETESTRING", indent);
+      debug("OCTETSTRING", indent);
       obj = new OctetString();
       break;
    case OBJECTID:
