@@ -45,7 +45,6 @@ struct MibStrategy
    void (*update_ci_func)(UPSINFO*, int, Snmp::Variable &);
    int (*killpower_func)(UPSINFO *ups);
    int (*shutdown_func)(UPSINFO *ups);
-   bool (*probe_func)(UPSINFO *ups);
 };
 
 extern struct MibStrategy *MibStrategies[];

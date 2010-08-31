@@ -341,5 +341,4 @@ struct MibStrategy MGEMibStrategy =
    mge_update_ci,
    NULL,
    NULL,
-   NULL
 };

@@ -455,5 +455,4 @@ struct MibStrategy ApcMibStrategy =
    apc_update_ci,
    apc_killpower,
    apc_shutdown,
-   NULL
 };
