@@ -25,19 +25,13 @@
 #include "mibs.h"
 
 extern struct MibStrategy ApcMibStrategy;
-extern struct MibStrategy ApcNoTrapMibStrategy;
 extern struct MibStrategy Rfc1628MibStrategy;
-extern struct MibStrategy Rfc1628NoTrapMibStrategy;
 extern struct MibStrategy MGEMibStrategy;
-extern struct MibStrategy MGENoTrapMibStrategy;
 
 struct MibStrategy *MibStrategies[] =
 {
    &ApcMibStrategy,
-   &ApcNoTrapMibStrategy,
    &Rfc1628MibStrategy,
-   &Rfc1628NoTrapMibStrategy,
    &MGEMibStrategy,
-   &MGENoTrapMibStrategy,
    NULL
 };

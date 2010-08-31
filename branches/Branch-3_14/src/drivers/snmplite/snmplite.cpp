@@ -28,6 +28,27 @@
 #include "snmp.h"
 #include "mibs.h"
 
+static bool snmplite_generic_probe(UPSINFO *ups, const MibStrategy *strategy)
+{
+   struct snmplite_ups_internal_data *sid = 
+      (struct snmplite_ups_internal_data *)ups->driver_internal_data;
+
+   // Every MIB strategy should have a CI_STATUS mapping in its OID map.
+   // The generic probe method is simply to query for this OID and assume
+   // we have found a supported MIB if the query succeeds.
+   CiOidMap *mib = strategy->mib;
+   for (unsigned int i = 0; mib[i].ci != -1; i++)
+   {
+      if (mib[i].ci == CI_STATUS)
+      {
+         Snmp::Variable result;
+         return sid->snmp->Get(mib[i].oid, &result);
+      }
+   }
+
+   return false;
+}
+
 int snmplite_ups_open(UPSINFO *ups)
 {
    struct snmplite_ups_internal_data *sid;
@@ -45,7 +66,8 @@ int snmplite_ups_open(UPSINFO *ups)
    memset(sid, 0, sizeof(struct snmplite_ups_internal_data));
    sid->port = 161;
    sid->community = "private";
-   sid->vendor = "APC";
+   sid->vendor = NULL; // autodetect
+   sid->traps = true;
 
    if (ups->device == NULL || *ups->device == '\0') {
       log_event(ups, LOG_ERR, "snmplite Missing hostname");
@@ -95,28 +117,76 @@ int snmplite_ups_open(UPSINFO *ups)
       }
    }
 
-   // Search for MIB matching vendor
-   for (unsigned int i = 0; MibStrategies[i]; i++)
+   // If user supplied a vendor, check for and remove "NOTRAP" and
+   // optional underscore. Underscore is optional to allow use of vendor
+   // "NOTRAP" to get autodetect with trap catching disabled.
+   if (sid->vendor)
    {
-      if (strcmp(MibStrategies[i]->name, sid->vendor) == 0)
+      char *ptr = strstr(sid->vendor, "NOTRAP");
+      if (ptr)
       {
-         sid->strategy = MibStrategies[i];
-         break;
+         // Trap catching is disabled
+         sid->traps = false;
+
+         // Remove "NOTRAP" from vendor string
+         *ptr = '\0';
+
+         // Remove optional underscore
+         if (ptr > sid->vendor && *(ptr-1) == '_')
+            *(ptr-1) = '\0';
+
+         // If nothing left, kill vendor to enable autodetect
+         if (*sid->vendor == '\0')
+            sid->vendor = NULL;
+      }
+   }
+
+   Dmsg1(80, "Trap catching: %sabled\n", sid->traps ? "En" : "Dis");
+
+   // Create SNMP engine
+   sid->snmp = new Snmp::SnmpEngine();
+   if (!sid->snmp->Open(sid->host, sid->port, sid->community, sid->traps))
+      return 0;
+
+   // If user supplied a vendor, search for a matching MIB strategy,
+   // otherwise attempt to autodetect
+   if (sid->vendor)
+   {
+      for (unsigned int i = 0; MibStrategies[i]; i++)
+      {
+         if (strcmp(MibStrategies[i]->name, sid->vendor) == 0)
+         {
+            sid->strategy = MibStrategies[i];
+            break;
+         }
+      }
+   }
+   else
+   {
+      Dmsg0(80, "Performing MIB autodetection\n");
+
+      // For each strategy, run strategy-specific probe routine or
+      // generic probe.
+      for (unsigned int i = 0; MibStrategies[i]; i++)
+      {
+         Dmsg1(80, "Probing MIB: \"%s\"\n", MibStrategies[i]->name);
+         if ((MibStrategies[i]->probe_func && MibStrategies[i]->probe_func(ups)) ||
+             snmplite_generic_probe(ups, MibStrategies[i]))
+         {
+            sid->strategy = MibStrategies[i];
+            sid->vendor = MibStrategies[i]->name;
+            break;
+         }
       }
    }
 
    if (!sid->strategy)
    {
-      log_event(ups, LOG_ERR, "snmplite Invalid vendor");
+      log_event(ups, LOG_ERR, "snmplite Invalid vendor or unsupported MIB");
       exit(1);
    }
 
-   sid->snmp = new Snmp::SnmpEngine();
-   if (!sid->snmp->Open(sid->host, sid->port, sid->community, 
-                        sid->strategy->trapwait_func != NULL))
-   {
-      return 0;
-   }
+   Dmsg1(80, "Selected MIB: \"%s\"\n", sid->strategy->name);
 
    return 1;
 }
@@ -215,8 +285,18 @@ int snmplite_ups_check_state(UPSINFO *ups)
    struct snmplite_ups_internal_data *sid =
       (struct snmplite_ups_internal_data *)ups->driver_internal_data;
 
-   if (sid->strategy->trapwait_func)
-      sid->strategy->trapwait_func(ups);
+   if (sid->traps)
+   {
+      // Simple trap handling: Any valid trap causes us to return and thus
+      // new data will be fetched from the UPS.
+      Snmp::TrapMessage *trap = sid->snmp->TrapWait(ups->wait_time * 1000);
+      if (trap)
+      {
+         Dmsg2(80, "Got TRAP: generic=%d, specific=%d\n", 
+            trap->Generic(), trap->Specific());
+         delete trap;
+      }
+   }
    else
       sleep(ups->wait_time);
 
@@ -290,8 +370,7 @@ int snmplite_ups_read_volatile_data(UPSINFO *ups)
    {
       // Query failed. Close and reopen SNMP to help recover.
       sid->snmp->Close();
-      sid->snmp->Open(sid->host, sid->port, sid->community, 
-                      sid->strategy->trapwait_func != NULL);
+      sid->snmp->Open(sid->host, sid->port, sid->community, sid->traps);
 
       if (ups->is_commlost())
       {
@@ -332,20 +411,4 @@ int snmplite_ups_read_static_data(UPSINFO *ups)
 int snmplite_ups_entry_point(UPSINFO *ups, int command, void *data)
 {
    return 0;
-}
-
-void snmplite_trap_wait(UPSINFO *ups)
-{
-   struct snmplite_ups_internal_data *sid =
-      (struct snmplite_ups_internal_data *)ups->driver_internal_data;
-
-   // Simple trap handling: Any valid trap causes us to return and thus
-   // new data will be fetched from the UPS.
-   Snmp::TrapMessage *trap = sid->snmp->TrapWait(ups->wait_time * 1000);
-   if (trap)
-   {
-      Dmsg2(80, "Got TRAP: generic=%d, specific=%d\n", 
-         trap->Generic(), trap->Specific());
-      delete trap;
-   }
 }

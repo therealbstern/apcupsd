@@ -46,6 +46,7 @@ struct snmplite_ups_internal_data
    int error_count;              /* Number of consecutive SNMP network errors */
    time_t commlost_time;         /* Time at which we declared COMMLOST */
    const MibStrategy *strategy;  /* MIB strategy to use */
+   bool traps;                   /* true if catching SNMP traps */
 };
 
 #endif   /* _SNMPLITE_COMMON_H */

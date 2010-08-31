@@ -339,16 +339,6 @@ struct MibStrategy MGEMibStrategy =
    "MGE",
    MGE_CiOidMap,
    mge_update_ci,
-   snmplite_trap_wait,
-   NULL,
-   NULL
-};
-
-struct MibStrategy MGENoTrapMibStrategy =
-{
-   "MGE_NOTRAP",
-   MGE_CiOidMap,
-   mge_update_ci,
    NULL,
    NULL,
    NULL
