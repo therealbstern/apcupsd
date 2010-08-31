@@ -290,5 +290,4 @@ struct MibStrategy Rfc1628MibStrategy =
    rfc1628_update_ci,
    rfc1628_killpower,
    rfc1628_shutdown,
-   NULL
 };

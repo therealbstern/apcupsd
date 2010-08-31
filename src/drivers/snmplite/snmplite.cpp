@@ -165,13 +165,11 @@ int snmplite_ups_open(UPSINFO *ups)
    {
       Dmsg0(80, "Performing MIB autodetection\n");
 
-      // For each strategy, run strategy-specific probe routine or
-      // generic probe.
+      // For each strategy, run generic probe
       for (unsigned int i = 0; MibStrategies[i]; i++)
       {
          Dmsg1(80, "Probing MIB: \"%s\"\n", MibStrategies[i]->name);
-         if ((MibStrategies[i]->probe_func && MibStrategies[i]->probe_func(ups)) ||
-             snmplite_generic_probe(ups, MibStrategies[i]))
+         if (snmplite_generic_probe(ups, MibStrategies[i]))
          {
             sid->strategy = MibStrategies[i];
             sid->vendor = MibStrategies[i]->name;
@@ -234,7 +232,7 @@ int snmplite_ups_get_capabilities(UPSINFO *ups)
    write_lock(ups);
 
    // Walk the OID map, issuing an SNMP query for each item, one at a time.
-   // If the query suceeds, sanity check the returned value and set the
+   // If the query succeeds, sanity check the returned value and set the
    // capabilities flag.
    CiOidMap *mib = sid->strategy->mib;
    for (unsigned int i = 0; mib[i].ci != -1; i++)
