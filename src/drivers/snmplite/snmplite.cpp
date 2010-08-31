@@ -238,7 +238,7 @@ int snmplite_ups_get_capabilities(UPSINFO *ups)
    for (unsigned int i = 0; mib[i].ci != -1; i++)
    {
       Snmp::Variable data;
-      if (mib[i].oid && sid->snmp->Get(mib[i].oid, &data))
+      if (sid->snmp->Get(mib[i].oid, &data))
       {
          ups->UPS_Cap[mib[i].ci] =
             snmplite_ups_check_ci(mib[i].ci, data);
@@ -313,8 +313,7 @@ static int snmplite_ups_update_cis(UPSINFO *ups, bool dynamic)
    alist<Snmp::SnmpEngine::OidVar> oids;
    for (unsigned int i = 0; mib[i].ci != -1; i++)
    {
-      if (ups->UPS_Cap[mib[i].ci] && 
-          mib[i].oid && mib[i].dynamic == dynamic)
+      if (ups->UPS_Cap[mib[i].ci] && mib[i].dynamic == dynamic)
       {
          oidvar.oid = mib[i].oid;
          oids.append(oidvar);
@@ -325,19 +324,20 @@ static int snmplite_ups_update_cis(UPSINFO *ups, bool dynamic)
    if (!sid->snmp->Get(oids))
       return 0;
 
-   // Walk the OID map again to correlate results with CIs.
-   // Invoke the update function to set the values.
+   // Walk the OID map again to correlate results with CIs. Check that type 
+   // matches what we expect and invoke the update function to set the values.
    alist<Snmp::SnmpEngine::OidVar>::iterator iter = oids.begin();
    for (unsigned int i = 0; mib[i].ci != -1; i++)
    {
       if (ups->UPS_Cap[mib[i].ci] && 
-          mib[i].oid && mib[i].dynamic == dynamic)
+          mib[i].dynamic == dynamic &&
+          mib[i].type == (*iter).data.type)
       {
          sid->strategy->update_ci_func(ups, mib[i].ci, (*iter).data);
          ++iter;
       }
    }
-   
+
    return 1;
 }
 
