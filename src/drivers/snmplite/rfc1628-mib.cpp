@@ -288,17 +288,7 @@ struct MibStrategy Rfc1628MibStrategy =
    "RFC",
    Rfc1628CiOidMap,
    rfc1628_update_ci,
-   snmplite_trap_wait,
    rfc1628_killpower,
-   rfc1628_shutdown
-};
-
-struct MibStrategy Rfc1628NoTrapMibStrategy =
-{
-   "RFC_NOTRAP",
-   Rfc1628CiOidMap,
-   rfc1628_update_ci,
-   NULL,
-   rfc1628_killpower,
-   rfc1628_shutdown
+   rfc1628_shutdown,
+   NULL
 };

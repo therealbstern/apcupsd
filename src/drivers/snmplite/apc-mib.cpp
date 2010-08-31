@@ -453,17 +453,7 @@ struct MibStrategy ApcMibStrategy =
    "APC",
    CiOidMap,
    apc_update_ci,
-   snmplite_trap_wait,
    apc_killpower,
-   apc_shutdown
-};
-
-struct MibStrategy ApcNoTrapMibStrategy =
-{
-   "APC_NOTRAP",
-   CiOidMap,
-   apc_update_ci,
-   NULL,
-   apc_killpower,
-   apc_shutdown
+   apc_shutdown,
+   NULL
 };
