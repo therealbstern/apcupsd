@@ -218,6 +218,13 @@ bool snmplite_ups_check_ci(int ci, Snmp::Variable &data)
    // SmartUPS 1000 is returning 0 for this via SNMP so screen it out
    // in case this is a common issue.
    case CI_NOMBATTV:
+   // Generex CS121 SNMP/WEB Adapter using RFC1628 MIB is returning zero for
+   // these values on a Newave Conceptpower DPA UPS.
+   case CI_LTRANS:
+   case CI_HTRANS:
+   case CI_NOMOUTV:
+   case CI_NOMINV:
+   case CI_NOMPOWER:
       return data.u32 != 0;
    }
 
