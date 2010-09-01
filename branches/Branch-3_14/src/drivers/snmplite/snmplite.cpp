@@ -122,7 +122,7 @@ int snmplite_ups_open(UPSINFO *ups)
    // "NOTRAP" to get autodetect with trap catching disabled.
    if (sid->vendor)
    {
-      char *ptr = strstr(sid->vendor, "NOTRAP");
+      char *ptr = strstr((char*)sid->vendor, "NOTRAP");
       if (ptr)
       {
          // Trap catching is disabled
