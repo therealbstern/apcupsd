@@ -236,6 +236,8 @@ static void rfc1628_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
          ups->clear_battlow();
          break;
       }
+      break;
+
    case CI_REVNO:
       Dmsg1(80, "Got CI_REVNO: %s\n", data.str.str());
       astrncpy(ups->firmrev, data.str, sizeof(ups->firmrev));
