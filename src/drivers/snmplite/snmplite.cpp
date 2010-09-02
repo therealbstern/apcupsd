@@ -28,25 +28,54 @@
 #include "snmp.h"
 #include "mibs.h"
 
-static bool snmplite_generic_probe(UPSINFO *ups, const MibStrategy *strategy)
+static const char *snmplite_probe_community(UPSINFO *ups)
 {
    struct snmplite_ups_internal_data *sid = 
       (struct snmplite_ups_internal_data *)ups->driver_internal_data;
 
+   const int sysDescrOid[] = {1, 3, 6, 1, 2, 1, 1, 1, 0, -1};
+   const char *communityList[] = { "private", "public", NULL };
+
+   Dmsg0(80, "Performing community autodetection\n");
+
+   for (unsigned int i = 0; communityList[i]; i++)
+   {
+      Dmsg1(80, "Probing community: \"%s\"\n", communityList[i]);
+
+      sid->snmp->SetCommunity(communityList[i]);
+      Snmp::Variable result;
+      if (sid->snmp->Get(sysDescrOid, &result))
+         return communityList[i];
+   }
+
+   return NULL;
+}
+
+static const MibStrategy *snmplite_probe_mib(UPSINFO *ups)
+{
+   struct snmplite_ups_internal_data *sid = 
+      (struct snmplite_ups_internal_data *)ups->driver_internal_data;
+
+   Dmsg0(80, "Performing MIB autodetection\n");
+
    // Every MIB strategy should have a CI_STATUS mapping in its OID map.
    // The generic probe method is simply to query for this OID and assume
    // we have found a supported MIB if the query succeeds.
-   CiOidMap *mib = strategy->mib;
-   for (unsigned int i = 0; mib[i].ci != -1; i++)
+   for (unsigned int i = 0; MibStrategies[i]; i++)
    {
-      if (mib[i].ci == CI_STATUS)
+      Dmsg1(80, "Probing MIB: \"%s\"\n", MibStrategies[i]->name);
+      for (unsigned int j = 0; MibStrategies[i]->mib[j].ci != -1; j++)
       {
-         Snmp::Variable result;
-         return sid->snmp->Get(mib[i].oid, &result);
+         if (MibStrategies[i]->mib[j].ci == CI_STATUS)
+         {
+            Snmp::Variable result;
+            if (sid->snmp->Get(MibStrategies[i]->mib[j].oid, &result))
+               return MibStrategies[i];
+         }
       }
    }
 
-   return false;
+   return NULL;
 }
 
 int snmplite_ups_open(UPSINFO *ups)
@@ -65,7 +94,7 @@ int snmplite_ups_open(UPSINFO *ups)
 
    memset(sid, 0, sizeof(struct snmplite_ups_internal_data));
    sid->port = 161;
-   sid->community = "private";
+   sid->community = NULL; // autodetect
    sid->vendor = NULL; // autodetect
    sid->traps = true;
 
@@ -112,7 +141,8 @@ int snmplite_ups_open(UPSINFO *ups)
          if (cp)
          {
             *cp++ = '\0';
-            sid->community = cp;
+            if (*cp)
+               sid->community = cp;
          }
       }
    }
@@ -145,8 +175,22 @@ int snmplite_ups_open(UPSINFO *ups)
 
    // Create SNMP engine
    sid->snmp = new Snmp::SnmpEngine();
-   if (!sid->snmp->Open(sid->host, sid->port, sid->community, sid->traps))
+   if (!sid->snmp->Open(sid->host, sid->port, "dummy", sid->traps))
       return 0;
+
+   // If user did not specify a community, probe for one
+   if (!sid->community)
+   {
+      sid->community = snmplite_probe_community(ups);
+      if (!sid->community)
+      {
+         log_event(ups, LOG_ERR, "snmplite Unable to detect community");
+         exit(1);
+      }
+   }
+
+   sid->snmp->SetCommunity(sid->community);
+   Dmsg1(80, "Selected community: \"%s\"\n", sid->community);
 
    // If user supplied a vendor, search for a matching MIB strategy,
    // otherwise attempt to autodetect
@@ -163,19 +207,7 @@ int snmplite_ups_open(UPSINFO *ups)
    }
    else
    {
-      Dmsg0(80, "Performing MIB autodetection\n");
-
-      // For each strategy, run generic probe
-      for (unsigned int i = 0; MibStrategies[i]; i++)
-      {
-         Dmsg1(80, "Probing MIB: \"%s\"\n", MibStrategies[i]->name);
-         if (snmplite_generic_probe(ups, MibStrategies[i]))
-         {
-            sid->strategy = MibStrategies[i];
-            sid->vendor = MibStrategies[i]->name;
-            break;
-         }
-      }
+      sid->strategy = snmplite_probe_mib(ups);
    }
 
    if (!sid->strategy)
