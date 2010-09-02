@@ -175,7 +175,7 @@ AC_REQ_PATH_PROG(SED, sed)
 AC_REQ_PATH_PROG(AR, ar)
 AC_REQ_PATH_PROG(MV, mv)
 
-AC_PATH_PROG(RST2HTML, rst2html,)
+AC_PATH_PROG(RST2HTML, rst2html.py,)
 AC_PATH_PROG(RST2PDF, rst2pdf,)
 
 # -------------------------------------------------------------------------
