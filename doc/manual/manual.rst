@@ -3713,9 +3713,9 @@ To run apcupsd with a SNMP UPS, you need the
 following things:
 
 -  An SNMP UPS, for example a Web/SNMP (AP9716) or PowerNet SNMP
-   (AP9605) card installed into the SmartSlot.
-
--  apcupsd version 3.10.0 or higher
+   (AP9605) card installed into the SmartSlot. Apcupsd also has support
+   for some non-APC SNMP UPSes using RFC1628 or MGE MIBs, however the 
+   majority of the information in this section is for APC UPSes.
 
 
 Planning and Setup for SNMP Wiring
@@ -3883,7 +3883,7 @@ Configure Event Trap Receivers
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 (Requires apcupsd-3.12.0 and later)
- 
+
 By default, APCUPSD will poll the SNMP UPS card once per minute. In
 this case, server notification of UPS alarms could potentially be
 delayed one minute. Event trap catching mitigates this shortcoming.
@@ -3908,36 +3908,38 @@ The previous sections describe configuration of the actual SNMP
 card. The remaining sections describe configuration of the APCUPSD
 to communicate using SNMP Protocol.
 
-The Simple Network Management Protocol provides an interface to
-connect to remote devices through the network. apcupsd is now
-capable of using the SNMP interface of an SNMP-enabled UPS to
-communicate with an UPS. Currently apcupsd supports only APC's
-PowerNet MIB. To enable the SNMP support it is enough to configure
+To enable the SNMP support it is enough to configure
 the correct device in your apcupsd.conf configuration file. The
 directive needed for this configuration is:
 
 ::
 
-    DEVICE 192.168.100.2:161:APC:private
+    DEVICE <host>:<port>:<vendor>:<community>
 
-Where the directive is made by four parts:
+...where the directive is made by four parts. All but the first may be omitted
+completely or left empty to accept the default.
 
-- ``host``: IP address of the remote UPS
-- ``port``: Remote SNMP port, normally 161
-- ``vendor``: Kind of remote SNMP agent: "APC" for APC's PowerNet
-   MIB, "APC_NOTRAP" for the PowerNet MIB with SNMP trap catching
-   disabled. (Note that
-   APC_NOTRAP is only accepted by apcupsd-3.12.0 and higher. See
-   below for trap catching details.)
-- ``community``: The read-write community string, usually "private"
+- *host*: IP address or DNS hostname of the UPS (required)
+- *port*: Remote SNMP port (optional, default: 161)
+- *vendor*: The type of SNMP MIB available on the UPS (optional, default:
+  autodetect). Allowable choices for vendor are:
 
+  - APC   : APC PowerNet MIB, used on most APC brand UPSes
+  - RFC   : RFC1628 MIB, used by some non-APC UPSes
+  - MGE   : MGE MIB, used by many MGE brand UPSes
+  - blank : Autodetect
 
-If more than one server is connected to the UPS the following
-configuration types still apply to SNMP enable UPS. (see `Choosing
-a Configuration Type`_). A NIS Server/Client (Master/Slave) configuration 
-with multiple servers is still applicable.
+  Append "_NOTRAP" to the vendor name to disable SNMP trap catching 
+  (ex: "APC_NOTRAP"). See `SNMP Trap Catching`_.
+- *community*: The read-write community string, usually "private". You can
+  specify a read-only community string, usually "public", if you do not
+  require killpower support. If the community string is omitted, apcupsd will
+  attempt to autotedect by trying "private" and "public".
+  (optional, default: autodetect).
 
-However, an alternative configuration is possible with an SNMP
+A NIS Server/Client (Master/Slave) configuration 
+with multiple servers is still applicable. However, an alternative 
+configuration is possible with an SNMP
 enabled UPS. In this arrangement, all connected servers will be
 configured as a standalone server. Each will independently
 communicate to the UPS. One (primary) server will be chosen to
@@ -3960,8 +3962,8 @@ to include the following options (in addition to any others you need) on the
 SNMP Trap Catching
 ------------------
 
-apcupsd-3.11.14 introduces support for SNMP trap catching with the
-APC PowerNet MIB driver. Previous versions polled the UPS status
+apcupsd-3.11.14 introduces support for SNMP trap catching. 
+Previous versions polled the UPS status
 once per minute, leading to significant delays before UPS state
 changes were recognized. With SNMP trap handling, apcupsd monitors
 the SNMP trap port and will re-poll the UPS whenever a trap is
@@ -3979,8 +3981,8 @@ another SNMP trap daemon on your server. Only one daemon can listen
 to the trap port, so whichever one is started first will succeed
 and the others will fail. Apcupsd will fall back to polling
 behavior if it is unable to open the trap port. You can also
-forcibly disable trap catching by setting your vendor string in the
-apcupsd.conf ``DEVICE`` directive to "APC_NOTRAP".
+forcibly disable trap catching by appending ``_NOTRAP`` to your vendor 
+string in the apcupsd.conf ``DEVICE`` directive.
 
 Known Problems
 --------------

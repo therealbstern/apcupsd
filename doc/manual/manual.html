@@ -9,7 +9,7 @@
 
 /*
 :Author: David Goodger (goodger@python.org)
-:Id: $Id: manual.html,v 1.1.2.10 2010-01-31 17:16:07 adk0212 Exp $
+:Id: $Id: manual.html,v 1.1.2.11 2010-09-02 13:26:12 adk0212 Exp $
 :Copyright: This stylesheet has been placed in the public domain.
 
 Default cascading style sheet for the HTML output of Docutils.
@@ -297,7 +297,7 @@ ul.auto-toc {
 <p><strong>Apcupsd is a UPS control system that permits orderly shutdown of your
 computer in the event of a power failure.</strong></p>
 <div class="line-block">
-<div class="line">January 31, 2010 12:14:57</div>
+<div class="line">September  2, 2010 09:19:50</div>
 <div class="line">This manual documents apcupsd version 3.14.x</div>
 <div class="line">Copyright © 2004-2009 Adam Kropelin</div>
 <div class="line">Copyright © 1999-2005 Kern Sibbald</div>
@@ -3631,7 +3631,7 @@ SU1250              EE FA 9F    F5
 SU2000              F1 F9 9F    FD
 SU450,700        28 F2 FA 96 07,RM=47  52.11.I
 SU450XL,700XL    28 EE F8 9F 700XL=27   51.9.I
-SU1000           35 EF F9 A0    0B     60.11.I
+SU1000,INET      35 EF F9 A0    0B     60.11.I
 SU1000XL         34 EE FC 9A    2B      61.9.I
 SU1400           35 EE FC 9A           70.11.I
 SU1400RM         28 ED FA 89
@@ -4234,8 +4234,9 @@ used to be.</p>
 following things:</p>
 <ul class="simple">
 <li>An SNMP UPS, for example a Web/SNMP (AP9716) or PowerNet SNMP
-(AP9605) card installed into the SmartSlot.</li>
-<li>apcupsd version 3.10.0 or higher</li>
+(AP9605) card installed into the SmartSlot. Apcupsd also has support
+for some non-APC SNMP UPSes using RFC1628 or MGE MIBs, however the
+majority of the information in this section is for APC UPSes.</li>
 </ul>
 <div class="section" id="planning-and-setup-for-snmp-wiring">
 <h3><a class="toc-backref" href="#id154">Planning and Setup for SNMP Wiring</a></h3>
@@ -4404,39 +4405,40 @@ the address set in the SNMP UPS.</p>
 <p>The previous sections describe configuration of the actual SNMP
 card. The remaining sections describe configuration of the APCUPSD
 to communicate using SNMP Protocol.</p>
-<p>The Simple Network Management Protocol provides an interface to
-connect to remote devices through the network. apcupsd is now
-capable of using the SNMP interface of an SNMP-enabled UPS to
-communicate with an UPS. Currently apcupsd supports only APC's
-PowerNet MIB. To enable the SNMP support it is enough to configure
+<p>To enable the SNMP support it is enough to configure
 the correct device in your apcupsd.conf configuration file. The
 directive needed for this configuration is:</p>
 <pre class="literal-block">
-DEVICE 192.168.100.2:161:APC:private
+DEVICE &lt;host&gt;:&lt;port&gt;:&lt;vendor&gt;:&lt;community&gt;
 </pre>
-<p>Where the directive is made by four parts:</p>
+<p>...where the directive is made by four parts. All but the first may be omitted
+completely or left empty to accept the default.</p>
 <ul>
-<li><p class="first"><tt class="docutils literal"><span class="pre">host</span></tt>: IP address of the remote UPS</p>
+<li><p class="first"><em>host</em>: IP address or DNS hostname of the UPS (required)</p>
 </li>
-<li><p class="first"><tt class="docutils literal"><span class="pre">port</span></tt>: Remote SNMP port, normally 161</p>
+<li><p class="first"><em>port</em>: Remote SNMP port (optional, default: 161)</p>
 </li>
-<li><dl class="first docutils">
-<dt><tt class="docutils literal"><span class="pre">vendor</span></tt>: Kind of remote SNMP agent: &quot;APC&quot; for APC's PowerNet</dt>
-<dd><p class="first last">MIB, &quot;APC_NOTRAP&quot; for the PowerNet MIB with SNMP trap catching
-disabled. (Note that
-APC_NOTRAP is only accepted by apcupsd-3.12.0 and higher. See
-below for trap catching details.)</p>
-</dd>
-</dl>
+<li><p class="first"><em>vendor</em>: The type of SNMP MIB available on the UPS (optional, default:
+autodetect). Allowable choices for vendor are:</p>
+<ul class="simple">
+<li>APC   : APC PowerNet MIB, used on most APC brand UPSes</li>
+<li>RFC   : RFC1628 MIB, used by some non-APC UPSes</li>
+<li>MGE   : MGE MIB, used by many MGE brand UPSes</li>
+<li>blank : Autodetect</li>
+</ul>
+<p>Append &quot;_NOTRAP&quot; to the vendor name to disable SNMP trap catching
+(ex: &quot;APC_NOTRAP&quot;). See <a class="reference internal" href="#snmp-trap-catching">SNMP Trap Catching</a>.</p>
 </li>
-<li><p class="first"><tt class="docutils literal"><span class="pre">community</span></tt>: The read-write community string, usually &quot;private&quot;</p>
+<li><p class="first"><em>community</em>: The read-write community string, usually &quot;private&quot;. You can
+specify a read-only community string, usually &quot;public&quot;, if you do not
+require killpower support. If the community string is omitted, apcupsd will
+attempt to autotedect by trying &quot;private&quot; and &quot;public&quot;.
+(optional, default: autodetect).</p>
 </li>
 </ul>
-<p>If more than one server is connected to the UPS the following
-configuration types still apply to SNMP enable UPS. (see <a class="reference internal" href="#choosing-a-configuration-type">Choosing
-a Configuration Type</a>). A NIS Server/Client (Master/Slave) configuration
-with multiple servers is still applicable.</p>
-<p>However, an alternative configuration is possible with an SNMP
+<p>A NIS Server/Client (Master/Slave) configuration
+with multiple servers is still applicable. However, an alternative
+configuration is possible with an SNMP
 enabled UPS. In this arrangement, all connected servers will be
 configured as a standalone server. Each will independently
 communicate to the UPS. One (primary) server will be chosen to
@@ -4455,8 +4457,8 @@ to include the following options (in addition to any others you need) on the
 </div>
 <div class="section" id="snmp-trap-catching">
 <h3><a class="toc-backref" href="#id162">SNMP Trap Catching</a></h3>
-<p>apcupsd-3.11.14 introduces support for SNMP trap catching with the
-APC PowerNet MIB driver. Previous versions polled the UPS status
+<p>apcupsd-3.11.14 introduces support for SNMP trap catching.
+Previous versions polled the UPS status
 once per minute, leading to significant delays before UPS state
 changes were recognized. With SNMP trap handling, apcupsd monitors
 the SNMP trap port and will re-poll the UPS whenever a trap is
@@ -4472,8 +4474,8 @@ another SNMP trap daemon on your server. Only one daemon can listen
 to the trap port, so whichever one is started first will succeed
 and the others will fail. Apcupsd will fall back to polling
 behavior if it is unable to open the trap port. You can also
-forcibly disable trap catching by setting your vendor string in the
-apcupsd.conf <tt class="docutils literal"><span class="pre">DEVICE</span></tt> directive to &quot;APC_NOTRAP&quot;.</p>
+forcibly disable trap catching by appending <tt class="docutils literal"><span class="pre">_NOTRAP</span></tt> to your vendor
+string in the apcupsd.conf <tt class="docutils literal"><span class="pre">DEVICE</span></tt> directive.</p>
 </div>
 <div class="section" id="known-problems">
 <h3><a class="toc-backref" href="#id163">Known Problems</a></h3>
@@ -8344,7 +8346,7 @@ Joseph Acosta (<a class="reference external" href="mailto:joeja&#64;mindspring.c
 </div>
 <div class="footer">
 <hr class="footer" />
-Generated on: 2010-01-31 17:14 UTC.
+Generated on: 2010-09-02 13:19 UTC.
 Generated by <a class="reference external" href="http://docutils.sourceforge.net/">Docutils</a> from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> source.
 
 </div>
