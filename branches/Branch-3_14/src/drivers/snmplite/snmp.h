@@ -188,7 +188,8 @@ namespace Snmp
       SnmpEngine();
       ~SnmpEngine();
 
-      bool Open(const char *host, unsigned short port, const char *comm, bool trap);
+      bool Open(const char *host, unsigned short port = SNMP_AGENT_PORT, 
+                const char *comm = "public", bool trap = false);
       void Close();
 
       struct OidVar
@@ -204,12 +205,15 @@ namespace Snmp
 
       TrapMessage *TrapWait(unsigned int msec);
 
+      void SetCommunity(const char *comm) { _community = comm; }
+
    private:
 
       bool issue(Message *pdu);
       Message *rspwait(unsigned int msec, bool trap = false);
 
       static const unsigned short SNMP_TRAP_PORT = 162;
+      static const unsigned short SNMP_AGENT_PORT = 161;
 
       int _socket;
       int _trapsock;
