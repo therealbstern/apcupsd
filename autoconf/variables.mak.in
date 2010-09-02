@@ -79,7 +79,7 @@ GAPCMON_CFLAGS = @GAPCMON_CFLAGS@
 GAPCMON_LIBS = @GAPCMON_LIBS@
 LIBEXTRAOBJ = @LIBEXTRAOBJ@
 RST2HTMLOPTS = --field-name-limit=0 --generator --time --no-footnote-backlinks --record-dependencies=$(df).d
-RST2PDFOPTS = --no-footnote-backlinks
+RST2PDFOPTS = --no-footnote-backlinks --real-footnotes
 NIBFLAGS = 
 
 # Driver and package enable flags
