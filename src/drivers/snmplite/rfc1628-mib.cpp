@@ -226,14 +226,14 @@ static void rfc1628_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       Dmsg1(80, "Got CI_LowBattery: %d\n", data.u32);
       switch (data.u32)
       {
+      default:
+      case 1:  // Unknown
+      case 2:  // Normal
+         ups->clear_battlow();
+         break;
       case 3:  // Low
       case 4:  // Depleted
          ups->set_battlow();
-         break;
-      case 1:  // Unknown
-      case 2:  // Normal
-      default:
-         ups->clear_battlow();
          break;
       }
       break;
