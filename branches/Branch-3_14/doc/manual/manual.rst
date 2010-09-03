@@ -841,20 +841,14 @@ Windows USB Configuration
 Platforms and Versions
 ~~~~~~~~~~~~~~~~~~~~~~
 
-Apcupsd supports USB UPSes on Windows 98, Windows ME (untested, but
-expected to work), Windows NT 4.0, Windows 2000, Windows XP, and
-Windows Server 2003. Windows Vista is untested at this time. 64-bit
-platforms (x64) are also supported.
+Apcupsd supports USB UPSes on Windows XP and newer, including 64 bit systems.
 
 USB Driver Installation
 ~~~~~~~~~~~~~~~~~~~~~~~
 
 USB connected UPSes on Windows require a special driver. In most
 cases, this driver is automatically installed when you install
-Apcupsd. However, if you unchecked the "USB Driver" package during
-installation or if you're running Windows 98 or ME, you will need
-to install the driver manually.
-
+Apcupsd. However in some cases you may need to install the driver manually.
 For detailed instructions, please see the ``install.txt`` file located
 in the driver folder of your Apcupsd install.
 
@@ -863,13 +857,10 @@ Verifying Device Detection and Driver
 
 After installing Apcupsd (and the Apcupsd USB driver, if
 necessary), plug in your UPS USB cable and open the Windows Device
-Manager. You should see a ``LibUSB-Win32 Devices`` section, under
-which is listed ``American Power Conversion USB UPS (Apcupsd)``. You
-should **NOT** see ``HID UPS Battery`` under the ``Batteries`` section.
-
-If the ``LibUSB-Win32 Devices`` section does not appear, check that
-your UPS is powered on and that the USB cable is connected at both
-ends. Reinstall the driver as directed above if needed.
+Manager. You should see a ``American Power Conversion USB UPS (Apcupsd)``
+listed under the ``Batteries`` section. If a device of that name does not
+appear, check that your UPS is powered on and that the USB cable is connected 
+at both ends. Reinstall the driver as directed above if needed.
 
 Solaris USB Configuration
 -------------------------
