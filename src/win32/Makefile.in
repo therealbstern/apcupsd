@@ -365,12 +365,13 @@ $(OBJDIR)/snmp.o: ../drivers/snmp/snmp.c
 
 ######################################################################
 
-# Files in src/drivers/snmp
+# Files in src/drivers/snmplite
 OBJS_SNMPLITEDRV = \
 	$(OBJDIR)/snmplite.o \
 	$(OBJDIR)/mibs.o \
 	$(OBJDIR)/apc-mib.o \
 	$(OBJDIR)/rfc1628-mib.o \
+   $(OBJDIR)/mge-mib.o \
 	$(OBJDIR)/asn.o  \
 	$(OBJDIR)/snmpeng.o
 
@@ -384,6 +385,9 @@ $(OBJDIR)/apc-mib.o: ../drivers/snmplite/apc-mib.cpp
 	$(CXX) -c $< -o $@
 
 $(OBJDIR)/rfc1628-mib.o: ../drivers/snmplite/rfc1628-mib.cpp
+	$(CXX) -c $< -o $@
+
+$(OBJDIR)/mge-mib.o: ../drivers/snmplite/mge-mib.cpp
 	$(CXX) -c $< -o $@
 
 $(OBJDIR)/asn.o: ../drivers/snmplite/asn.cpp
