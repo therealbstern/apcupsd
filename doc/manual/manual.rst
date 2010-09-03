@@ -4169,7 +4169,7 @@ is a port that relies on many Unix features, it is just the same a
 true Windows program. When running, it is perfectly integrated with
 Windows and displays its icon in the system icon tray, and provides
 a system tray menu to obtain additional information on how apcupsd
-is running (status and events dialogue boxes).
+is running (status and events dialog boxes).
 
 Once installed apcupsd normally runs as a system service. This
 means that it is immediately started by the operating system when
@@ -4211,7 +4211,7 @@ Note also if you are using WinNT or Win2000, the operating system
 may probe the serial port attempting to attach a serial mouse. This
 will cause apcupsd to be unable to communicate with the serial
 port. If this happens, or out of precaution, you can edit the
-c:\\boot.ini file. Find the line that looks something like the
+``c:\\boot.ini`` file. Find the line that looks something like the
 following:
 
 ::
@@ -4245,14 +4245,13 @@ then click on the **Start** button as shown below:
 .. image:: ./wininstall6.png
 
 If the Services dialog reports a problem, it is normally because
-your DEVICE statement does not contain the correct serial port
+your ``DEVICE`` statement does not contain the correct serial port
 name.
 
 You probably should also click on the **Startup...** button to
 ensure that the correct defaults are set. The dialogue box that
 appears should have **Startup Type** set to **Automatic* and 
-**Logon** should be set to **System Account** with **Allow Service to
-Interact with Desktop** checked. If these values are not set
+**Logon** should be set to **System Account**. If these values are not set
 correctly by default, please change them otherwise apcupsd will not
 work.
 
@@ -4292,43 +4291,18 @@ apctray has the capability of monitoring multiple apcupsd instances
 using apcupsd's Network Information Server (NIS). It will create a
 new icon for each instance being monitored. By default, apctray
 monitors the local apcupsd (localhost on port 3551). To add
-additional monitors, use the command line ``/add`` command as
-follows:
-
-::
-
-    apctray /host myserver /add
-
-To specify a non-default port, include the ``/port`` switch:
-
-::
-
-    apctray /host myserver /port 1234 /add
-
-To remove a monitor from the tray, right-click the tray icon and
-choose "Remove this instance" or run the add command again with the
-``/del`` switch instead of ``/add``. Note that deleting the last
-monitor also configures apctray to not start by default. Using
-``/add`` to create a new monitor will enable automatic startup again.
-To close a monitor temporarily, right-click the tray icon and
-choose "Close this instance".
-
-apctray also supports the ``/refresh`` switch which allows you to
-specify the interval (in seconds) at which apctray will poll the
-apcupsd NIS for status. If you do not specify ``/refresh``, the
-default is 1 second. For example, this command will add a monitor
-configured to refresh every 15 seconds:
-
-::
-
-    apctray /host myserver /refresh 15 /add
+additional monitors, you can right-click an existing icon and choose
+"Add Monitor". To remove a monitor, right-click its icon and choose
+"Remove Monitor". To change thr settings for an existing monitor 
+(ip address, port, refresh rate), right-click its icon and choose
+"Configure...".
 
 apctray can be installed standalone (without apcupsd) if you wish
 to use it only to monitor remote apcupsd instances. This can be
 convenient for keeping an eye on a room full of UPSes from your
 desktop. Download and run the normal apcupsd installer and simply
-uncheck all components except apctray. Then use the "/add" command
-described above to add as many monitors as you wish.
+uncheck all components except apctray. Then add as many monitors as 
+you wish as described above.
 
 Testing Apcupsd on Windows
 --------------------------
@@ -4401,15 +4375,17 @@ file when running as a service.
 Email Notification of Events
 ----------------------------
 
-Windows systems, it is possible to receive notification of apcupsd events
-that are passed to apccontrol. This is possible using a simple
-email program.
-
-If you wish to try this program, look at the
-files named changeme, commfailure, commok, onbattery, and
-mainsback in the directory ``c:\apcupsd\examples``. To use them, you
-must modify the SYSADMIN variable to have a valid email address,
-then copy the files into the directory ``c:\apcupsd\etc\apcupsd``.
+It is possible to receive email notification of apcupsd events
+using some simple Visual Basic scripts contributed by Ed Dondlinger 
+<edondlinger@thepylegroup.com>. The scripts are automatically installed in
+the ``etc/apcupsd`` directory of your apcupsd installation but are disabled
+by default. To enable them, first open them in a text editor such as Notepad 
+and edit the ``USER VARIABLES`` section to set your email preferences including
+address, server information, etc. Then rename the script files without the
+``*.example`` suffix. Scripts are supplied for onbattery, offbattery, and
+commfailure events. You can copy the scripts to other filenames and modify
+the email body text to respond to other events as described in `Customizing 
+Event Handling`_.
 
 Killpower under Windows
 -----------------------

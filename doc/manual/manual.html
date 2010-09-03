@@ -9,7 +9,7 @@
 
 /*
 :Author: David Goodger (goodger@python.org)
-:Id: $Id: manual.html,v 1.1.2.13 2010-09-03 20:18:58 adk0212 Exp $
+:Id: $Id: manual.html,v 1.1.2.14 2010-09-03 20:33:59 adk0212 Exp $
 :Copyright: This stylesheet has been placed in the public domain.
 
 Default cascading style sheet for the HTML output of Docutils.
@@ -297,7 +297,7 @@ ul.auto-toc {
 <p><strong>Apcupsd is a UPS control system that permits orderly shutdown of your
 computer in the event of a power failure.</strong></p>
 <div class="line-block">
-<div class="line">September  3, 2010 16:17:58</div>
+<div class="line">September  3, 2010 16:33:17</div>
 <div class="line">This manual documents apcupsd version 3.14.x</div>
 <div class="line">Copyright © 2004-2009 Adam Kropelin</div>
 <div class="line">Copyright © 1999-2005 Kern Sibbald</div>
@@ -4624,7 +4624,7 @@ is a port that relies on many Unix features, it is just the same a
 true Windows program. When running, it is perfectly integrated with
 Windows and displays its icon in the system icon tray, and provides
 a system tray menu to obtain additional information on how apcupsd
-is running (status and events dialogue boxes).</p>
+is running (status and events dialog boxes).</p>
 <p>Once installed apcupsd normally runs as a system service. This
 means that it is immediately started by the operating system when
 the system is booted, and runs in the background even if there is
@@ -4658,7 +4658,7 @@ etc. notation instead of the UNIX-style /dev/tty* notation.</p>
 may probe the serial port attempting to attach a serial mouse. This
 will cause apcupsd to be unable to communicate with the serial
 port. If this happens, or out of precaution, you can edit the
-c:\boot.ini file. Find the line that looks something like the
+<tt class="docutils literal"><span class="pre">c:\\boot.ini</span></tt> file. Find the line that looks something like the
 following:</p>
 <pre class="literal-block">
 multi(0)disk(0)rdisk(0)partition(1)\WINNT=&quot;Windows NT Workstation Version 4.00&quot;
@@ -4684,13 +4684,12 @@ Panel, open the Services folder, select Apcupsd UPS Server, and
 then click on the <strong>Start</strong> button as shown below:</p>
 <img alt="./wininstall6.png" src="./wininstall6.png" />
 <p>If the Services dialog reports a problem, it is normally because
-your DEVICE statement does not contain the correct serial port
+your <tt class="docutils literal"><span class="pre">DEVICE</span></tt> statement does not contain the correct serial port
 name.</p>
 <p>You probably should also click on the <strong>Startup...</strong> button to
 ensure that the correct defaults are set. The dialogue box that
 appears should have <strong>Startup Type</strong> set to <strong>Automatic* and
-**Logon</strong> should be set to <strong>System Account</strong> with <strong>Allow Service to
-Interact with Desktop</strong> checked. If these values are not set
+**Logon</strong> should be set to <strong>System Account</strong>. If these values are not set
 correctly by default, please change them otherwise apcupsd will not
 work.</p>
 <p>For WinXP and Win2K systems, the dialogs are a bit different from
@@ -4725,36 +4724,17 @@ stop or disable the service, use the service control panel.</p>
 using apcupsd's Network Information Server (NIS). It will create a
 new icon for each instance being monitored. By default, apctray
 monitors the local apcupsd (localhost on port 3551). To add
-additional monitors, use the command line <tt class="docutils literal"><span class="pre">/add</span></tt> command as
-follows:</p>
-<pre class="literal-block">
-apctray /host myserver /add
-</pre>
-<p>To specify a non-default port, include the <tt class="docutils literal"><span class="pre">/port</span></tt> switch:</p>
-<pre class="literal-block">
-apctray /host myserver /port 1234 /add
-</pre>
-<p>To remove a monitor from the tray, right-click the tray icon and
-choose &quot;Remove this instance&quot; or run the add command again with the
-<tt class="docutils literal"><span class="pre">/del</span></tt> switch instead of <tt class="docutils literal"><span class="pre">/add</span></tt>. Note that deleting the last
-monitor also configures apctray to not start by default. Using
-<tt class="docutils literal"><span class="pre">/add</span></tt> to create a new monitor will enable automatic startup again.
-To close a monitor temporarily, right-click the tray icon and
-choose &quot;Close this instance&quot;.</p>
-<p>apctray also supports the <tt class="docutils literal"><span class="pre">/refresh</span></tt> switch which allows you to
-specify the interval (in seconds) at which apctray will poll the
-apcupsd NIS for status. If you do not specify <tt class="docutils literal"><span class="pre">/refresh</span></tt>, the
-default is 1 second. For example, this command will add a monitor
-configured to refresh every 15 seconds:</p>
-<pre class="literal-block">
-apctray /host myserver /refresh 15 /add
-</pre>
+additional monitors, you can right-click an existing icon and choose
+&quot;Add Monitor&quot;. To remove a monitor, right-click its icon and choose
+&quot;Remove Monitor&quot;. To change thr settings for an existing monitor
+(ip address, port, refresh rate), right-click its icon and choose
+&quot;Configure...&quot;.</p>
 <p>apctray can be installed standalone (without apcupsd) if you wish
 to use it only to monitor remote apcupsd instances. This can be
 convenient for keeping an eye on a room full of UPSes from your
 desktop. Download and run the normal apcupsd installer and simply
-uncheck all components except apctray. Then use the &quot;/add&quot; command
-described above to add as many monitors as you wish.</p>
+uncheck all components except apctray. Then add as many monitors as
+you wish as described above.</p>
 </div>
 <div class="section" id="testing-apcupsd-on-windows">
 <h3><a class="toc-backref" href="#id174">Testing Apcupsd on Windows</a></h3>
@@ -4818,14 +4798,17 @@ file when running as a service.</p>
 </div>
 <div class="section" id="email-notification-of-events">
 <h3><a class="toc-backref" href="#id178">Email Notification of Events</a></h3>
-<p>Windows systems, it is possible to receive notification of apcupsd events
-that are passed to apccontrol. This is possible using a simple
-email program.</p>
-<p>If you wish to try this program, look at the
-files named changeme, commfailure, commok, onbattery, and
-mainsback in the directory <tt class="docutils literal"><span class="pre">c:\apcupsd\examples</span></tt>. To use them, you
-must modify the SYSADMIN variable to have a valid email address,
-then copy the files into the directory <tt class="docutils literal"><span class="pre">c:\apcupsd\etc\apcupsd</span></tt>.</p>
+<p>It is possible to receive email notification of apcupsd events
+using some simple Visual Basic scripts contributed by Ed Dondlinger
+&lt;<a class="reference external" href="mailto:edondlinger&#64;thepylegroup.com">edondlinger&#64;thepylegroup.com</a>&gt;. The scripts are automatically installed in
+the <tt class="docutils literal"><span class="pre">etc/apcupsd</span></tt> directory of your apcupsd installation but are disabled
+by default. To enable them, first open them in a text editor such as Notepad
+and edit the <tt class="docutils literal"><span class="pre">USER</span> <span class="pre">VARIABLES</span></tt> section to set your email preferences including
+address, server information, etc. Then rename the script files without the
+<tt class="docutils literal"><span class="pre">*.example</span></tt> suffix. Scripts are supplied for onbattery, offbattery, and
+commfailure events. You can copy the scripts to other filenames and modify
+the email body text to respond to other events as described in <a class="reference internal" href="#customizing-event-handling">Customizing
+Event Handling</a>.</p>
 </div>
 <div class="section" id="killpower-under-windows">
 <h3><a class="toc-backref" href="#id179">Killpower under Windows</a></h3>
@@ -8332,7 +8315,7 @@ Joseph Acosta (<a class="reference external" href="mailto:joeja&#64;mindspring.c
 </div>
 <div class="footer">
 <hr class="footer" />
-Generated on: 2010-09-03 20:17 UTC.
+Generated on: 2010-09-03 20:33 UTC.
 Generated by <a class="reference external" href="http://docutils.sourceforge.net/">Docutils</a> from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> source.
 
 </div>
