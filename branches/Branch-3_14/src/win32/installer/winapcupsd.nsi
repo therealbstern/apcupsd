@@ -325,6 +325,9 @@ Section "Apcupsd Service" SecService
   SetOutPath "$INSTDIR\etc\apcupsd"
   File ${TOPDIR}\platforms\mingw\apccontrol.bat
   File ${TOPDIR}\platforms\mingw\apcupsd.conf.in
+  File /oname=onbattery.vbs.example ${TOPDIR}\platforms\mingw\onbattery.vbs
+  File /oname=offbattery.vbs.example ${TOPDIR}\platforms\mingw\offbattery.vbs
+  File /oname=commfailure.vbs.example ${TOPDIR}\platforms\mingw\commfailure.vbs
 
   ; Post-process apcupsd.conf.in into apcupsd.conf.new
   Call PostProcConfig
@@ -560,6 +563,9 @@ Section "Uninstall"
   Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apccontrol.bat"
   Delete /REBOOTOK "$INSTDIR\etc\apcupsd\apcupsd.conf.new"
   Delete /REBOOTOK "$INSTDIR\etc\apcupsd\hosts.conf.new"
+  Delete /REBOOTOK "$INSTDIR\etc\apcupsd\onbattery.vbs.example"
+  Delete /REBOOTOK "$INSTDIR\etc\apcupsd\offbattery.vbs.example"
+  Delete /REBOOTOK "$INSTDIR\etc\apcupsd\commfailure.vbs.example"
   Delete /REBOOTOK "$INSTDIR\doc\*"
   Delete /REBOOTOK "$INSTDIR\cgi\multimon.cgi"
   Delete /REBOOTOK "$INSTDIR\cgi\upsstats.cgi"
