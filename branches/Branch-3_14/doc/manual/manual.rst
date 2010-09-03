@@ -4365,7 +4365,7 @@ Applications log to which apcupsd writes Windows error messages
 during startup.
 
 Regardless of which Windows system you are running, apcupsd logs
-most error messages to `c:\apcupsd\etc\apcupsd\apcupsd.events``. 
+most error messages to ``c:\apcupsd\etc\apcupsd\apcupsd.events``. 
 This type error messages such as configuration
 file not found, etc are written to this file. Note that on some
 systems (WinXP, possibly others) Apcupsd is unable to write to this
