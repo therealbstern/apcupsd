@@ -208,9 +208,9 @@ Platform Support
 **WINDOWS**
 
 - Windows NT 4 [2]_ [4]_
-- Windows 98/ME/2000 [2]_
+- Windows 98/ME/2000 [2]_ [4]_
 - Windows XP/Vista (including 64 bit) [1]_ [2]_
-- Windows Server 2003/2008 (including 64 bit) [2]_ [5]_
+- Windows Server 2003/2008 (including 64 bit) [2]_
 - Windows 7 [2]_
 
 **OTHERS**
@@ -230,8 +230,6 @@ Platform Support
 .. [3] Port included in apcupsd source tree but may be out of date,
        unmaintained, or broken.
 .. [4] USB not supported
-.. [5] USB not supported in 64 bit mode due to Microsoft disallowing loading of
-       unsigned drivers
 
 Supported UPSes and Cables
 --------------------------
