@@ -207,6 +207,8 @@ namespace Asn
       bool operator!=(const ObjectId &rhs) const { return !(*this == rhs); }
       bool operator!=(const int oid[])     const { return !(*this == oid); }
 
+      bool IsChildOf(const int oid[]);
+
       virtual Object *copy() const { return new ObjectId(*this); }
       virtual bool Marshal(unsigned char *&buffer, unsigned int &buflen) const;
       virtual bool IsObjectId() { return true; }

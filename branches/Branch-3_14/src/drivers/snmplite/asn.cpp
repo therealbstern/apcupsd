@@ -425,7 +425,7 @@ ObjectId::ObjectId(const ObjectId &rhs) :
 ObjectId &ObjectId::operator=(const ObjectId &rhs)
 {
    if (&rhs != this)
-      assign(rhs._value, _count);
+      assign(rhs._value, rhs._count);
    return *this;
 }
 
@@ -480,6 +480,19 @@ bool ObjectId::operator==(const int oid[]) const
    }
 
    return i == _count && oid[i] == -1;
+}
+
+// Same as operator== except we're allowed to be longer than the parameter
+bool ObjectId::IsChildOf(const int oid[])
+{
+   unsigned int i;
+   for (i = 0; i < _count && oid[i] != -1; i++)
+   {
+      if (_value[i] != oid[i])
+         return false;
+   }
+
+   return i < _count && oid[i] == -1;
 }
 
 bool ObjectId::Marshal(unsigned char *&buffer, unsigned int &buflen) const

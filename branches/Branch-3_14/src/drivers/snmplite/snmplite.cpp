@@ -44,6 +44,7 @@ static const char *snmplite_probe_community(UPSINFO *ups)
 
       sid->snmp->SetCommunity(communityList[i]);
       Snmp::Variable result;
+      result.type = Asn::OCTETSTRING;
       if (sid->snmp->Get(sysDescrOid, &result))
          return communityList[i];
    }
@@ -69,6 +70,7 @@ static const MibStrategy *snmplite_probe_mib(UPSINFO *ups)
          if (MibStrategies[i]->mib[j].ci == CI_STATUS)
          {
             Snmp::Variable result;
+            result.type = MibStrategies[i]->mib[j].type;
             if (sid->snmp->Get(MibStrategies[i]->mib[j].oid, &result))
                return MibStrategies[i];
          }
@@ -277,6 +279,7 @@ int snmplite_ups_get_capabilities(UPSINFO *ups)
    for (unsigned int i = 0; mib[i].ci != -1; i++)
    {
       Snmp::Variable data;
+      data.type = mib[i].type;
       if (sid->snmp->Get(mib[i].oid, &data))
       {
          ups->UPS_Cap[mib[i].ci] =
@@ -355,6 +358,7 @@ static int snmplite_ups_update_cis(UPSINFO *ups, bool dynamic)
       if (ups->UPS_Cap[mib[i].ci] && mib[i].dynamic == dynamic)
       {
          oidvar.oid = mib[i].oid;
+         oidvar.data.type = mib[i].type;
          oids.append(oidvar);
       }
    }
@@ -369,8 +373,7 @@ static int snmplite_ups_update_cis(UPSINFO *ups, bool dynamic)
    for (unsigned int i = 0; mib[i].ci != -1; i++)
    {
       if (ups->UPS_Cap[mib[i].ci] && 
-          mib[i].dynamic == dynamic &&
-          mib[i].type == (*iter).data.type)
+          mib[i].dynamic == dynamic)
       {
          sid->strategy->update_ci_func(ups, mib[i].ci, (*iter).data);
          ++iter;
