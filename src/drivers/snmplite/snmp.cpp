@@ -139,7 +139,8 @@ void SnmpEngine::Close()
 bool SnmpEngine::Set(const int oid[], Variable *data)
 {
    // Send the request
-   VbListMessage req(Asn::SET_REQ_PDU, _community, _reqid++, oid, data);
+   VbListMessage req(Asn::SET_REQ_PDU, _community, _reqid++);
+   req.Append(oid, data);
    if (!issue(&req))
       return false;
 
@@ -161,64 +162,134 @@ bool SnmpEngine::Set(const int oid[], Variable *data)
 
 bool SnmpEngine::Get(const int oid[], Variable *data)
 {
-   OidVar oidvar = { oid };
+   OidVar oidvar;
+   oidvar.oid = oid;
+   oidvar.data = *data;
+
    alist<OidVar> oids;
    oids.append(oidvar);
 
    bool ret = Get(oids);
-   *data = (*oids.begin()).data;
+   if (ret)
+      *data = (*oids.begin()).data;
 
    return ret;
 }
 
 bool SnmpEngine::Get(alist<OidVar> &oids)
 {
-   bool ret = false;
-   int i = 0;
+   // First, fetch all scalar (i.e. non-sequence) OIDs using a single
+   // SNMP GET-REQUEST
 
    // Start with a request with no varbinds
-   VbListMessage req(Asn::GET_REQ_PDU, _community, _reqid++);
+   VbListMessage getreq(Asn::GET_REQ_PDU, _community, _reqid++);
 
    // Append one varbind for each oidvar from the caller
    alist<OidVar>::iterator iter;
    for (iter = oids.begin(); iter != oids.end(); ++iter)
-      req.Append((*iter).oid);
+      if ((*iter).data.type != Asn::SEQUENCE)
+         getreq.Append((*iter).oid);
 
+   // Perform request if we put at least one OID in it
+   if (getreq.Size() > 0)
+   {
+      // Send request & await response
+      VbListMessage *rsp = perform(&getreq);
+      if (!rsp)
+         return false;
+
+      // Verify response varbind size is same as request
+      // (i.e. agent provided a response for each varbind we requested)
+      if (rsp->Size() != getreq.Size())
+      {
+         delete rsp;
+         return false;
+      }
+
+      // Copy response data into caller's oidvars. Although I believe the SNMP
+      // spec requires the GET-RESPONSE to give the var-bind-list in the same
+      // order as the GET-REQUEST, we're not going to count on that. A little
+      // CPU time spent searching is ok to ensure widest compatiblity in case
+      // we encounter a weak SNMP agent implementation.
+      VbListMessage &response = *rsp;
+      for (unsigned int i = 0; i < response.Size(); i++)
+      {
+         for (iter = oids.begin(); iter != oids.end(); ++iter)
+         {
+            if (response[i].Oid() == (*iter).oid)
+            {
+               response[i].Extract(&(*iter).data);
+               break;
+            }
+         }
+      }
+
+      // Done with response
+      delete rsp;
+   }
+
+   // Now process sequences. For each sequence we issue a series of
+   // SNMP GET-NEXT-REQUESTs until we detect the end of the sequence.
+   for (iter = oids.begin(); iter != oids.end(); ++iter)
+   {
+      if ((*iter).data.type == Asn::SEQUENCE)
+      {
+         Asn::ObjectId nextoid = (*iter).oid;
+         while (1)
+         {
+            // Create a GET-NEXT request
+            VbListMessage nextreq(Asn::GETNEXT_REQ_PDU, _community, _reqid++);
+
+            // Request a single OID
+            nextreq.Append(nextoid);
+
+            // Perform the request
+            VbListMessage *rspmsg = perform(&nextreq);
+
+            // If request failed, we're done (possibly at end of MIB so we
+            // don't consider this an error)
+            if (!rspmsg)
+               break;
+
+            // If result OID is not a child of the top-level OID we're fetching 
+            // it means we've run off the end of the sequence so we're done
+            VarBind &result = (*rspmsg)[0];
+            if (!result.Oid().IsChildOf((*iter).oid))
+            {
+               delete rspmsg;
+               break;
+            }
+
+            // Extract data and append to sequence
+            Variable tmp;
+            result.Extract(&tmp);
+            (*iter).data.seq.append(tmp);
+
+            // Save returned OID for next iteration
+            nextoid = result.Oid();
+            delete rspmsg;
+         }
+      }
+   }
+
+   return true;
+}
+
+VbListMessage *SnmpEngine::perform(VbListMessage *req)
+{
    // Send the request
-   if (!issue(&req))
-      return false;
+   if (!issue(req))
+      return NULL;
 
    // Wait for a response
    VbListMessage *rsp = (VbListMessage*)rspwait(2000);
-   if (!rsp)
-      return false;
-
-   // Check error status
-   VbListMessage &response = *rsp;
-   if (response.ErrorStatus())
-      goto out;
-
-   // Verify response varbind size
-   if (response.Size() != oids.size())
-      goto out;
-
-   // Copy varbind data into caller's oidvars
-   // Check that each oid matches the client's list
-   for (iter = oids.begin(); iter != oids.end(); ++iter)
+   if (rsp && rsp->ErrorStatus())
    {
-      if (response[i].Oid() != (*iter).oid ||
-          !response[i].Extract(&(*iter).data))
-      {
-         goto out;
-      }
-      i++;
+      delete rsp;
+      return NULL;
    }
 
-   ret = true;
-
-out:
-   delete rsp;
-   return ret;
+   return rsp;
 }
 
 TrapMessage *SnmpEngine::TrapWait(unsigned int msec)
@@ -350,7 +421,7 @@ Message *SnmpEngine::rspwait(unsigned int msec, bool trap)
 // VarBind
 // *****************************************************************************
 
-VarBind::VarBind(const int oid[], Variable *data)
+VarBind::VarBind(const Asn::ObjectId &oid, Variable *data)
 {
    _oid = new Asn::ObjectId(oid);
 
@@ -445,19 +516,13 @@ VarBindList::VarBindList(Asn::Sequence &seq)
    }
 }
 
-VarBindList::VarBindList(const int oid[], Variable *data)
-{
-   if (oid)
-      _vblist.append(new VarBind(oid, data));
-}
-
 VarBindList::~VarBindList()
 {
    for (unsigned int i = 0; i < _vblist.size(); i++)
       delete _vblist[i];
 }
 
-void VarBindList::Append(const int oid[], Variable *data)
+void VarBindList::Append(const Asn::ObjectId &oid, Variable *data)
 {
    _vblist.append(new VarBind(oid, data));
 }
@@ -504,18 +569,16 @@ VbListMessage::VbListMessage(
 VbListMessage::VbListMessage(
    Asn::Identifier type,
    const char *community,
-   int reqid,
-   const int oid[],
-   Variable *data) :
+   int reqid) :
       Message(type, community),
       _reqid(reqid),
       _errstatus(0),
       _errindex(0),
-      _vblist(new VarBindList(oid, data))
+      _vblist(new VarBindList())
 {
 }
 
-void VbListMessage::Append(const int oid[], Variable *data)
+void VbListMessage::Append(const Asn::ObjectId &oid, Variable *data)
 {
    _vblist->Append(oid, data);
 }

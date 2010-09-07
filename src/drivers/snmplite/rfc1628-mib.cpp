@@ -51,11 +51,11 @@ static struct CiOidMap Rfc1628CiOidMap[] =
 // {CI_SENS,            upsAdvConfigSensitivity,           INTEGER,     false},
 // {CI_EXTBATTS,        upsAdvBatteryNumOfBattPacks,       INTEGER,     false},
 // {CI_STESTI,          upsAdvTestDiagnosticSchedule,      INTEGER,     false},
-   {CI_VLINE,           upsInputVoltage,                   INTEGER,     true },
-   {CI_VOUT,            upsOutputVoltage,                  INTEGER,     true },
+   {CI_VLINE,           upsInputTableInputVoltage,         SEQUENCE,    true },
+   {CI_VOUT,            upsOutputTableOutputVoltage,       SEQUENCE,    true },
    {CI_VBATT,           upsBatteryVoltage,                 INTEGER,     true },
-   {CI_FREQ,            upsInputFrequency,                 INTEGER,     true },
-   {CI_LOAD,            upsOutputPercentLoad,              INTEGER,     true },
+   {CI_FREQ,            upsInputTableInputFrequency,       SEQUENCE,    true },
+   {CI_LOAD,            upsOutputTableOutputPercentLoad,   SEQUENCE,    true },
    {CI_ITEMP,           upsBatteryTemperature,             INTEGER,     true },
 // {CI_ATEMP,           mUpsEnvironAmbientTemperature,     GAUGE,       true },
 // {CI_HUMID,           mUpsEnvironRelativeHumidity,       GAUGE,       true },
@@ -77,13 +77,15 @@ static void rfc1628_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
    switch (ci)
    {
    case CI_VLINE:
-      Dmsg1(80, "Got CI_VLINE: %d\n", data.u32);
-      ups->LineVoltage = data.u32;
+      // We just take the voltage from the first input line and ignore the rest
+      Dmsg1(80, "Got CI_VLINE: %d\n", data.seq.begin()->u32);
+      ups->LineVoltage = data.seq.begin()->u32;
       break;
 
    case CI_VOUT:
-      Dmsg1(80, "Got CI_VOUT: %d\n", data.u32);
-      ups->OutputVoltage = data.u32;
+      // We just take the voltage from the first input line and ignore the rest
+      Dmsg1(80, "Got CI_VOUT: %d\n", data.seq.begin()->u32);
+      ups->OutputVoltage = data.seq.begin()->u32;
       break;
 
    case CI_VBATT:
@@ -92,13 +94,23 @@ static void rfc1628_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       break;
 
    case CI_FREQ:
-      Dmsg1(80, "Got CI_FREQ: %d\n", data.u32);
-      ups->LineFreq = ((double)data.u32) / 10;
+      // We just take the freq from the first input line and ignore the rest
+      Dmsg1(80, "Got CI_FREQ: %d\n", data.seq.begin()->u32);
+      ups->LineFreq = ((double)data.seq.begin()->u32) / 10;
       break;
 
    case CI_LOAD:
-      Dmsg1(80, "Got CI_LOAD: %d\n", data.u32);
-      ups->UPSLoad = data.u32;
+      // MIB defines this as "The percentage of the UPS power capacity 
+      // presently being used on this output line" so we should be able to
+      // add all these up to get a total load for the UPS as a whole.
+      ups->UPSLoad = 0;
+      for (alist<Snmp::Variable>::iterator iter = data.seq.begin();
+           iter != data.seq.end();
+           ++iter)
+      {
+         Dmsg1(80, "Got CI_LOAD: %d\n", iter->u32);
+         ups->UPSLoad += iter->u32;
+      }
       break;
 
    case CI_ITEMP:

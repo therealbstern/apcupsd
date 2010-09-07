@@ -42,6 +42,7 @@ namespace Snmp
       int i32;
       unsigned int u32;
       astring str;
+      alist<Variable> seq;
    };
 
    // **************************************************************************
@@ -50,7 +51,7 @@ namespace Snmp
    class VarBind
    {
    public:
-      VarBind(const int oid[], Variable *data = NULL);
+      VarBind(const Asn::ObjectId &oid, Variable *data = NULL);
       VarBind(Asn::Sequence &seq);
       ~VarBind();
 
@@ -75,10 +76,9 @@ namespace Snmp
    public:
       VarBindList() {}
       VarBindList(Asn::Sequence &seq);
-      VarBindList(const int oid[], Variable *data = NULL);
       ~VarBindList();
 
-      void Append(const int oid[], Variable *data = NULL);
+      void Append(const Asn::ObjectId &oid, Variable *data = NULL);
 
       unsigned int Size() const { return _vblist.size(); }
       VarBind *operator[](unsigned int idx) { return _vblist[idx]; }
@@ -123,15 +123,14 @@ namespace Snmp
    class VbListMessage: public Message
    {
    public:
-      VbListMessage(Asn::Identifier type, const char *community, int reqid, 
-                    const int oid[] = NULL, Variable *data = NULL);
+      VbListMessage(Asn::Identifier type, const char *community, int reqid);
       virtual ~VbListMessage() { delete _vblist; }
 
       int RequestId()   const { return _reqid;     }
       int ErrorStatus() const { return _errstatus; }
       int ErrorIndex()  const { return _errindex;  }
 
-      void Append(const int oid[], Variable *data = NULL);
+      void Append(const Asn::ObjectId &oid, Variable *data = NULL);
       unsigned int Size() const { return _vblist->Size(); }
       VarBind &operator[](unsigned int idx) { return *((*_vblist)[idx]); }
 
@@ -200,6 +199,7 @@ namespace Snmp
 
       bool Get(const int oid[], Variable *data);
       bool Get(alist<OidVar> &oids);
+      void GetSequence(const int oid[], Variable *data);
 
       bool Set(const int oid[], Variable *data);
 
@@ -211,6 +211,7 @@ namespace Snmp
 
       bool issue(Message *pdu);
       Message *rspwait(unsigned int msec, bool trap = false);
+      VbListMessage *perform(VbListMessage *req);
 
       static const unsigned short SNMP_TRAP_PORT = 162;
       static const unsigned short SNMP_AGENT_PORT = 161;
