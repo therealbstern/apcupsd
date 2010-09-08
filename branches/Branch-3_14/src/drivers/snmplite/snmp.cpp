@@ -179,10 +179,11 @@ bool SnmpEngine::Get(const int oid[], Variable *data)
 bool SnmpEngine::Get(alist<OidVar> &oids)
 {
    // First, fetch all scalar (i.e. non-sequence) OIDs using a single
-   // SNMP GET-REQUEST
+   // SNMP GETNEXT-REQUEST. Note we use GETNEXT instead of GET since all
+   // OIDs omit the trailing 0.
 
    // Start with a request with no varbinds
-   VbListMessage getreq(Asn::GET_REQ_PDU, _community, _reqid++);
+   VbListMessage getreq(Asn::GETNEXT_REQ_PDU, _community, _reqid++);
 
    // Append one varbind for each oidvar from the caller
    alist<OidVar>::iterator iter;
@@ -216,7 +217,7 @@ bool SnmpEngine::Get(alist<OidVar> &oids)
       {
          for (iter = oids.begin(); iter != oids.end(); ++iter)
          {
-            if (response[i].Oid() == (*iter).oid)
+            if (response[i].Oid().IsChildOf((*iter).oid))
             {
                response[i].Extract(&(*iter).data);
                break;
@@ -229,7 +230,7 @@ bool SnmpEngine::Get(alist<OidVar> &oids)
    }
 
    // Now process sequences. For each sequence we issue a series of
-   // SNMP GET-NEXT-REQUESTs until we detect the end of the sequence.
+   // SNMP GETNEXT-REQUESTs until we detect the end of the sequence.
    for (iter = oids.begin(); iter != oids.end(); ++iter)
    {
       if ((*iter).data.type == Asn::SEQUENCE)
