@@ -76,14 +76,7 @@ int apcsmart_ups_kill_power(UPSINFO *ups)
       sleep(1);
       writechar('0', ups);
       sleep(1);
-
-      if ((ups->mode.type == BKPRO) || (ups->mode.type == VS)) {
-         log_event(ups, LOG_WARNING,
-            _("BackUPS Pro and SmartUPS v/s sleep for 6 min"));
-         writechar('1', ups);
-      } else {
-         writechar('0', ups);
-      }
+      writechar('0', ups);
 
       getline(response, sizeof(response), ups);
       if ((strcmp(response, "OK") == 0) || (strcmp(response, "*") == 0)) {
@@ -121,17 +114,13 @@ int apcsmart_ups_shutdown_with_delay(UPSINFO *ups, int shutdown_delay)
    sleep(2);
    writechar('K', ups);
    getline(response, sizeof response, ups);
-   if ((strcmp(response, "*") == 0) || (strcmp(response, "OK") == 0) ||
-      (ups->mode.type >= BKPRO)) {
-      apcsmart_ups_warn_shutdown(ups, shutdown_delay);
-      return 1;
-   } else {
-      log_event(ups, LOG_WARNING, _("Unexpected error!\n"));
-      log_event(ups, LOG_WARNING, _("UPS in unstable state\n"));
-      log_event(ups, LOG_WARNING,
-         _("You MUST power off your UPS before rebooting!!!\n"));
+   if (strcmp(response, "*") != 0 && strcmp(response, "OK") != 0) {
+      log_event(ups, LOG_WARNING, _("Failed to issue shutdown command!\n"));
       return 0;
    }
+
+   apcsmart_ups_warn_shutdown(ups, shutdown_delay);
+   return 1;
 }
 
 void apcsmart_ups_warn_shutdown(UPSINFO *ups, int shutdown_delay)

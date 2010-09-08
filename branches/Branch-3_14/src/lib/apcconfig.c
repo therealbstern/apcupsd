@@ -57,24 +57,24 @@ static const GENINFO onoroff[] = {
 
 static const GENINFO cables[] = {
    { "simple",         "Custom Cable Simple",  CUSTOM_SIMPLE },
-   { "smart",          "Custom Cable Smart",   CUSTOM_SMART },
-   { "ether",          "Ethernet Link",        APC_NET },
+   { "smart",          "Custom Cable Smart",   CABLE_SMART   },
+   { "ether",          "Ethernet Link",        APC_NET       },
    { "940-0119A",      "APC Cable 940-0119A",  APC_940_0119A },
    { "940-0127A",      "APC Cable 940-0127A",  APC_940_0127A },
    { "940-0128A",      "APC Cable 940-0128A",  APC_940_0128A },
    { "940-0020B",      "APC Cable 940-0020B",  APC_940_0020B },
    { "940-0020C",      "APC Cable 940-0020C",  APC_940_0020C },
    { "940-0023A",      "APC Cable 940-0023A",  APC_940_0023A },
-   { "940-0024B",      "APC Cable 940-0024B",  APC_940_0024B },
-   { "940-0024C",      "APC Cable 940-0024C",  APC_940_0024C },
-   { "940-1524C",      "APC Cable 940-1524C",  APC_940_1524C },
-   { "940-0024G",      "APC Cable 940-0024G",  APC_940_0024G },
+   { "940-0024B",      "APC Cable 940-0024B",  CABLE_SMART   },
+   { "940-0024C",      "APC Cable 940-0024C",  CABLE_SMART   },
+   { "940-1524C",      "APC Cable 940-1524C",  CABLE_SMART   },
+   { "940-0024G",      "APC Cable 940-0024G",  CABLE_SMART   },
    { "940-0095A",      "APC Cable 940-0095A",  APC_940_0095A },
    { "940-0095B",      "APC Cable 940-0095B",  APC_940_0095B },
    { "940-0095C",      "APC Cable 940-0095C",  APC_940_0095C },
-   { "MAM-04-02-2000", "MAM Cable 04-02-2000", MAM_CABLE},
+   { "MAM-04-02-2000", "MAM Cable 04-02-2000", MAM_CABLE     },
    { "usb",            "USB Cable",            USB_CABLE     },
-   { NULL,             "*invalid-cable*",      NO_CABLE  },
+   { NULL,             "*invalid-cable*",      NO_CABLE      },
 };
 
 static const GENINFO upsclasses[] = {
@@ -100,21 +100,6 @@ static const GENINFO modes[] = {
 };
 
 static const GENINFO types[] = {
-   /* FIXME (adk): It has been long enough...time to kill these */
-   { "backups",       "BackUPS",                   BK },
-   { "sharebasic",    "ShareUPS Basic Port",       SHAREBASIC },
-   { "backupspro",    "BackUPS Pro",               BKPRO },
-   { "smartvsups",    "SmartUPS VS",               VS },
-   { "newbackupspro", "Smarter BackUPS Pro",       NBKPRO },
-   { "backupspropnp", "Smarter BackUPS Pro",       NBKPRO },
-   { "smartups",      "SmartUPS",                  SMART },
-   { "matrixups",     "MatrixUPS",                 MATRIX },
-   { "sharesmart",    "ShareUPS Advanced Port",    SHARESMART },
-
-   /*
-    * Below are the new "drivers" entries. Entries above with time (long)
-    * will go away.
-    */
    { "dumb",     "DUMB UPS Driver",     DUMB_UPS },
    { "apcsmart", "APC Smart UPS (any)", APCSMART_UPS },
    { "usb",      "USB UPS Driver",      USB_UPS },
@@ -751,18 +736,33 @@ jump_into_the_loop:
       ups->runtime = 5;
    }
 
-   if ((ups->cable.type < CUSTOM_SMART) && ups->mode.type >= BKPRO) {
-      fprintf(stderr, _("%s: Error :: Changing UPSTYPE from %s "),
-         argvalue, ups->mode.long_name);
-
-      /* No errors expected from this operation. */
-      errors += match_range(ups, WHERE(mode), types, "backups");
-
-      fprintf(stderr, _("to %s due wrong Cable of Smart Signals.\n\a"),
-         ups->mode.long_name);
-
-      if (errors)
-         Error_abort0(_("Lookup operation failed: bad 'types' table\n"));
+   // Sanitize cable type & UPS mode. Since UPSTYPE (aka mode) and UPSCABLE
+   // can contradict eachother, the rule is that UPSTYPE wins. In all cases
+   // except Dumb we can determine cable type from mode so we ignore user's 
+   // configured UPSCABLE and force it ourselves. In the case of Dumb UPSes we 
+   // just ensure they picked a simple cable type.
+   switch (ups->mode.type)
+   {
+   case USB_UPS:
+      match_range(ups, WHERE(cable), cables, "usb");
+      break;
+   case SNMPLITE_UPS:
+   case SNMP_UPS: 
+   case PCNET_UPS:
+   case NETWORK_UPS:
+      match_range(ups, WHERE(cable), cables, "ether");
+      break;
+   case APCSMART_UPS:
+      match_range(ups, WHERE(cable), cables, "smart");
+      break;
+   case DUMB_UPS:
+      // Abort if user specified dumb UPS type with smart cable
+      if (ups->cable.type >= CABLE_SMART)
+         Error_abort0("Invalid cable specified for Dumb UPS\n");
+      break;
+   case TEST_UPS:
+      // Allow anything in test mode
+      break;
    }
 
    /*

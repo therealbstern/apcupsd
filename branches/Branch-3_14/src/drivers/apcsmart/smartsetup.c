@@ -142,21 +142,9 @@ int apcsmart_ups_setup(UPSINFO *ups)
    if (ups->fd == -1)
       return 1;                    /* we must be a slave */
 
-   /*
-    * The following enables communcations with the
-    * BackUPS Pro models in Smart Mode.
-    */
-   switch (ups->cable.type) {
-   case APC_940_0095A:
-   case APC_940_0095B:
-   case APC_940_0095C:
-      /* Have to clear RTS line to access the serial cable mode PnP */
-      (void)ioctl(ups->fd, TIOCMBIC, &rts_bit);
-      break;
-
-   default:
-      break;
-   }
+   /* Have to clear RTS line to access the serial cable mode PnP on BKPro */
+   /* Shouldn't hurt on other cables, so just do it all the time. */
+   ioctl(ups->fd, TIOCMBIC, &rts_bit);
 
    write(ups->fd, &a, 1);          /* This one might not work, if UPS is */
    sleep(1);                       /* in an unstable communication state */
