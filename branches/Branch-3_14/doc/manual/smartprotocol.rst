@@ -118,8 +118,10 @@ for "not available", otherwise the response is given in the
 +---------+------------+----------------+--------------------------------------+
 |K        |Shutdown    |OK or *         |Send twice with > 1.5s delay between  |
 |         |with grace  |                |chars. Older units send "*" instead of|
-|         |period      |                |"OK". Length of grace period is set   |
-|         |            |                |with Grace Period command.            |
+|         |period (no  |                |"OK". Length of grace period is set   |
+|         |return)     |                |with Grace Period command. UPS will   |
+|         |            |                |remain off and NOT power on if utility|
+|         |            |                |power is restored.                    |
 +---------+------------+----------------+--------------------------------------+
 |L        |Input line  |118.3           |Value varies based on locality. Does  |
 |         |voltage     |                |not always read 000.0 on line failure.|
@@ -272,7 +274,7 @@ for "not available", otherwise the response is given in the
 |         |            |                |- A = autoadjust (Matrix only)        |
 +---------+------------+----------------+--------------------------------------+
 |t        |Measure-UPS |80.5            |Degrees C. Only works on models with  |
-|         |ambient     |                |the Measure-UPS SmartSlot card .      |
+|         |ambient     |                |the Measure-UPS SmartSlot card.       |
 |         |temperature |                |                                      |
 +---------+------------+----------------+--------------------------------------+
 |u        |Upper       |132             |Writable variable. UPS goes on battery|
