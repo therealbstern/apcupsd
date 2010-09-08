@@ -103,6 +103,11 @@ static void rfc1628_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       // MIB defines this as "The percentage of the UPS power capacity 
       // presently being used on this output line" so we should be able to
       // add all these up to get a total load for the UPS as a whole.
+      // HOWEVER, manufacturers seem to actually be returning either the same
+      // value in each slot (APC implementation of RFC1628) or percent of
+      // power the line is capable of (Generex CS121 SNMP/WEB Adapter on a 
+      // Newave Conceptpower DPA UPS). So we will average the values and hope
+      // for the best.
       ups->UPSLoad = 0;
       for (alist<Snmp::Variable>::iterator iter = data.seq.begin();
            iter != data.seq.end();
@@ -111,6 +116,7 @@ static void rfc1628_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
          Dmsg1(80, "Got CI_LOAD: %d\n", iter->u32);
          ups->UPSLoad += iter->u32;
       }
+      ups->UPSLoad /= data.seq.size();
       break;
 
    case CI_ITEMP:
