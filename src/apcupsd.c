@@ -248,7 +248,7 @@ int main(int argc, char *argv[])
     * UPSes. Such UPSes have no shutdown grace period so using --kill-on-
     * powerfail would guarantee an unclean shutdown.
     */
-   if (kill_on_powerfail && ups->mode.type <= SHAREBASIC) {
+   if (kill_on_powerfail && ups->mode.type == DUMB_UPS) {
       kill_on_powerfail = 0;
       log_event(ups, LOG_WARNING,
          _("Ignoring --kill-on-powerfail since it is unsafe "

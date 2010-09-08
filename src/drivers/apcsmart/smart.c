@@ -139,8 +139,6 @@ char *smart_poll(char cmd, UPSINFO *ups)
    *answer = 0;
    if (ups->fd == -1)
       return answer;
-   if (ups->mode.type <= SHAREBASIC)
-      return answer;
 
    /* Don't retry Y/SM command */
    retry = (cmd == 'Y') ? 0 : 2;

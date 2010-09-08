@@ -81,7 +81,7 @@ void initiate_hibernate(UPSINFO *ups)
    FILE *pwdf;
    int killcount;
 
-   if (ups->mode.type <= SHAREBASIC) {
+   if (ups->mode.type == DUMB_UPS) {
       /* Make sure we are on battery */
       for (killcount = 0; killcount < 3; killcount++)
          device_read_volatile_data(ups);
@@ -95,20 +95,16 @@ void initiate_hibernate(UPSINFO *ups)
     * and if not, delete the PWRFAIL file.  Note, the code
     * above only tests UPS_onbatt flag for dumb UPSes.
     */
-    
+
    pwdf = fopen(ups->pwrfailpath, "r");
-   if ((pwdf == NULL && ups->mode.type != BK) ||
-       (pwdf == NULL && ups->is_onbatt() && ups->mode.type == BK)) {
-      
+   if ((pwdf == NULL && ups->mode.type != DUMB_UPS) ||
+       (pwdf == NULL && ups->is_onbatt() && ups->mode.type == DUMB_UPS)) {
+
       /*                                                  
        * At this point, we really should not be attempting
        * a kill power since either the powerfail file is
        * not defined, or we are not on batteries.
        */
-      
-      /* close the file if openned */
-      if (pwdf)
-         fclose(pwdf);
 
       /* Now complain */
       log_event(ups, LOG_WARNING,
@@ -133,19 +129,7 @@ void initiate_hibernate(UPSINFO *ups)
 
       log_event(ups, LOG_WARNING, _("Attempting to kill the UPS power!"));
 
-      if (ups->mode.type == BK) {
-         device_kill_power(ups);
-         sleep(10);
-
-         /*
-          * ***FIXME*** this really should not do a reboot here,
-          * but rather a halt or nothing -- KES
-          */
-         /*  generate_event(ups, CMDDOREBOOT); */
-
-         log_event(ups, LOG_WARNING, _("Perform CPU-reset or power-off"));
-         return;
-      } else if (ups->mode.type == SHAREBASIC) {
+      if (ups->upsclass.type == SHARESLAVE) {
          sleep(10);
          log_event(ups, LOG_WARNING, _("Waiting For ShareUPS Master to shutdown"));
          sleep(60);
@@ -160,7 +144,7 @@ void initiate_hibernate(UPSINFO *ups)
          log_event(ups, LOG_WARNING, _("Perform CPU-reset or power-off"));
          return;
       } else {
-         /* it must be a SmartUPS */
+         /* it must be a SmartUPS or BackUPS */
          device_kill_power(ups);
       }
    }

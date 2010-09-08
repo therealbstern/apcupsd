@@ -28,6 +28,8 @@
 
 typedef enum {
    NO_CABLE = 0,        /* Default Disable            */
+
+   // All simple cable types
    CUSTOM_SIMPLE,       /* SIMPLE cable simple        */
    APC_940_0119A,       /* APC cable number 940-0119A */
    APC_940_0127A,       /* APC cable number 940-0127A */
@@ -36,31 +38,24 @@ typedef enum {
    APC_940_0020C,       /* APC cable number 940-0020C identical to 20B */
    APC_940_0023A,       /* APC cable number 940-0023A */
    MAM_CABLE,           /* MAM cable for Alfatronic SPS500X */
-   CUSTOM_SMART,        /* SMART cable smart          */
-   APC_940_0024B,       /* APC cable number 940-0024B */
-   APC_940_0024C,       /* APC cable number 940-0024C */
-   APC_940_1524C,       /* APC cable number 940-1524C */
-   APC_940_0024G,       /* APC cable number 940-0024G */
+
+   // These can (apparently) act as smart or simple cables; for our
+   // purposes we treat them as simple cables.
    APC_940_0095A,       /* APC cable number 940-0095A */
    APC_940_0095B,       /* APC cable number 940-0095B */
    APC_940_0095C,       /* APC cable number 940-0095C */
+
+   // All smart cable types
+   CABLE_SMART,         /* SMART cable smart          */
+
+   // Other cables
    APC_NET,             /* Ethernet Link              */
-   USB_CABLE,           /* USB cable */
-   APC_940_00XXX        /* APC cable number UNKNOWN   */
+   USB_CABLE            /* USB cable */
 } UpsCable;
 
-/* The order of these UpsModes is important!! */
 typedef enum {
    NO_UPS = 0,          /* Default Disable      */
    DUMB_UPS,            /* Dumb UPS driver      */
-   BK,                  /* Simple Signal        */
-   SHAREBASIC,          /* Simple Signal, Share */
-   BKPRO,               /* SubSet Smart Signal  */
-   VS,                  /* SubSet Smart Signal  */
-   NBKPRO,              /* Smarter BKPRO Signal */
-   SMART,               /* Smart Signal         */
-   MATRIX,              /* Smart Signal         */
-   SHARESMART,          /* Smart Signal, Share  */
    APCSMART_UPS,        /* APC Smart UPS (any)  */
    USB_UPS,             /* USB UPS driver       */
    SNMP_UPS,            /* SNMP UPS driver      */

@@ -69,15 +69,6 @@ int dumb_ups_kill_power(UPSINFO *ups)
       (void)ioctl(ups->fd, TIOCMBIS, &serial_bits);
       sleep(10);                   /* hold */
       break;
-
-   case CUSTOM_SMART:
-   case APC_940_0024B:
-   case APC_940_0024C:
-   case APC_940_1524C:
-   case APC_940_0024G:
-   case APC_NET:
-   default:
-      break;
    }
    return 1;
 }
@@ -113,7 +104,6 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
 {
    SIMPLE_DATA *my_data = (SIMPLE_DATA *) ups->driver_internal_data;
    int stat = 1;
-   bool BattFail = false;
 
    /*
     * We generally poll a bit faster because we do 
@@ -127,19 +117,6 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
    write_lock(ups);
 
    ioctl(ups->fd, TIOCMGET, &my_data->sp_flags);
-
-   switch (ups->mode.type) {
-   case BK:
-   case SHAREBASIC:
-      if (my_data->sp_flags & TIOCM_DTR) {
-         BattFail = true;
-      } else {
-         BattFail = false;
-      }
-      break;
-   default:
-      break;
-   }
 
    switch (ups->cable.type) {
    case CUSTOM_SIMPLE:
@@ -187,7 +164,6 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
       }
 
 /*
-
  * Code block preserved for posterity in case I ever get a real
  * 940-0023A cable to test. According to schematic in the apcupsd
  * manual, SR is not connected at all. We used to treat it as a
@@ -241,22 +217,9 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
       }
 
       break;
-
-   case CUSTOM_SMART:
-   case APC_940_0024B:
-   case APC_940_0024C:
-   case APC_940_1524C:
-   case APC_940_0024G:
-   case APC_NET:
-   default:
-      stat = 0;
    }
 
-   if (ups->is_onbatt() && BattFail) {
-      ups->set_replacebatt();
-   } else {
-      ups->clear_replacebatt();
-   }
+   ups->clear_replacebatt();
 
    write_unlock(ups);
 

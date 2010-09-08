@@ -235,11 +235,6 @@ void apctest_error_exit(const char *fmt, ...)
 
 /* This application must be linked as console app. */
 
-#define M_SMART  1
-#define M_DUMB   2
-#define M_USB    3
-static int mode = M_DUMB;
-
 int main(int argc, char *argv[])
 {
    /* Set specific error_* handlers. */
@@ -271,184 +266,17 @@ int main(int argc, char *argv[])
    check_for_config(ups, cfgfile);
 
    attach_driver(ups);
-
    if (ups->driver == NULL)
-      Error_abort0(_("Apcupsd cannot continue without a valid driver.\n"));
+      Error_abort0("apctest cannot continue without a valid driver.\n");
 
    pmsg("Attached to driver: %s\n", ups->driver->driver_name);
 
    ups->start_time = time(NULL);
 
    /* Print configuration */
-   switch (ups->sharenet.type) {
-   case DISABLE:
-      pmsg("sharenet.type = DISABLE\n");
-      break;
-
-   case SHARE:
-      pmsg("sharenet.type = SHARE\n");
-      break;
-
-   default:
-      pmsg("sharenet.type = DEFAULT\n");
-      pmsg("I cannot handle sharenet.type = DEFAULT\n");
-      apctest_terminate(1);
-   }
-
-   switch (ups->cable.type) {
-   case NO_CABLE:
-      pmsg("cable.type = NO_CABLE\n");
-      break;
-
-   case CUSTOM_SIMPLE:
-      pmsg("cable.type = CUSTOM_SIMPLE\n");
-      break;
-
-   case APC_940_0119A:
-      pmsg("cable.type = APC_940_0119A (simple)\n");
-      break;
-
-   case APC_940_0127A:
-      pmsg("cable.type = APC_940_0127A (simple)\n");
-      break;
-
-   case APC_940_0128A:
-      pmsg("cable.type = APC_940_0128A (simple)\n");
-      break;
-
-   case APC_940_0020B:
-      pmsg("cable.type = APC_940_0020B (simple)\n");
-      break;
-
-   case APC_940_0020C:
-      pmsg("cable.type = APC_940_0020C (simple)\n");
-      break;
-
-   case APC_940_0023A:
-      pmsg("cable.type = APC_940_0023A (simple)\n");
-      break;
-
-   case CUSTOM_SMART:
-      pmsg("cable.type = CUSTOM_SMART\n");
-      break;
-
-   case APC_940_0024B:
-      pmsg("cable.type = APC_940_0024B (smart)\n");
-      break;
-
-   case APC_940_0024C:
-      pmsg("cable.type = APC_940_0024C (smart)\n");
-      break;
-
-   case APC_940_1524C:
-      pmsg("cable.type = APC_940_1524C (smart)\n");
-      break;
-
-   case APC_940_0024G:
-      pmsg("cable.type = APC_940_0024G (smart)\n");
-      break;
-
-   case APC_940_0095A:
-      pmsg("cable.type = APC_940_0095A (smart)\n");
-      break;
-
-   case APC_940_0095B:
-      pmsg("cable.type = APC_940_0095B (smart)\n");
-      break;
-
-   case APC_940_0095C:
-      pmsg("cable.type = APC_940_0095C (smart)\n");
-      break;
-
-   case APC_NET:
-      pmsg("cable.type = APC_NET\n");
-      break;
-
-   case USB_CABLE:
-      pmsg("cable.type = USB_CABLE\n");
-      break;
-
-   case MAM_CABLE:
-      pmsg("cable.type = MAM_CABLE\n");
-      break;
-
-   case APC_940_00XXX:
-      pmsg("cable.type = APC_940_00XXX (unknown)\n");
-      break;
-
-   default:
-      pmsg("Unknown cable type: %d\n", ups->cable.type);
-      break;
-   }
-
-   if (ups->cable.type == USB_CABLE) {
-      pmsg("\nYou are using a USB cable type, so I'm entering USB test mode\n");
-      mode = M_USB;
-   } else if (ups->cable.type >= CUSTOM_SMART) {
-      pmsg("\nYou are using a SMART cable type, so I'm entering SMART test mode\n");
-      mode = M_SMART;
-   }
-
-   switch (ups->mode.type) {
-   case NO_UPS:
-      pmsg("mode.type = NO_UPS\n");
-      break;
-
-   case BK:
-      pmsg("mode.type = BK\n");
-      break;
-
-   case SHAREBASIC:
-      pmsg("mode.type = SHAREBASIC\n");
-      break;
-
-   case BKPRO:
-      pmsg("mode.type = BKPRO\n");
-      break;
-
-   case VS:
-      pmsg("mode.type = VS\n");
-      break;
-
-   case NBKPRO:
-      pmsg("mode.type = NBKPRO\n");
-      break;
-
-   case SMART:
-      pmsg("mode.type = SMART\n");
-      break;
-
-   case MATRIX:
-      pmsg("mode.type = MATRIX\n");
-      break;
-
-   case SHARESMART:
-      pmsg("mode.type = SHARESMART\n");
-      break;
-
-   case APCSMART_UPS:
-      pmsg("mode.type = APCSMART_UPS\n");
-      break;
-
-   case USB_UPS:
-      pmsg("mode.type = USB_UPS\n");
-      break;
-
-   case NETWORK_UPS:
-      pmsg("mode.type = NETWORK_UPS\n");
-      break;
-
-   case SNMP_UPS:
-      pmsg("mode.type = SNMP_UPS\n");
-      break;
-
-   default:
-      pmsg("Unknown mode.type: %d\n", ups->mode.type);
-   }
-
-   if (ups->mode.type > SHAREBASIC)
-      if (mode != M_SMART && mode != M_USB)
-         pmsg("You specified a DUMB mode cable, but a SMART UPS. I give up.\n");
+   pmsg("sharenet.type = %s\n", ups->sharenet.long_name);
+   pmsg("cable.type = %s\n", ups->cable.long_name);
+   pmsg("mode.type = %s\n", ups->mode.long_name);
 
    delete_lockfile(ups);
 
@@ -462,46 +290,44 @@ int main(int argc, char *argv[])
 
    init_signals(apctest_terminate);
 
-   if (ups->fd != -1) {
-      if (mode == M_DUMB) {
-         pmsg("Doing prep_device() ...\n");
-         prep_device(ups);
-      }
+   pmsg("Doing prep_device() ...\n");
+   prep_device(ups);
 
-      /*
-       * This isn't a documented option but can be used
-       * for testing dumb mode on a SmartUPS if you have
-       * the proper cable.
-       */
-      if (dumb_mode_test) {
+   /*
+    * This isn't a documented option but can be used
+    * for testing dumb mode on a SmartUPS if you have
+    * the proper cable.
+    */
+   if (dumb_mode_test) {
 #ifdef HAVE_APCSMART_DRIVER
-         char ans[20];
+      char ans[20];
 
-         write(ups->fd, "R", 1);   /* enter dumb mode */
-         *ans = 0;
-         getline(ans, sizeof(ans), ups);
-         pmsg("Going dumb: %s\n", ans);
-         mode = M_DUMB;            /* run in dumb mode */
+      write(ups->fd, "R", 1);   /* enter dumb mode */
+      *ans = 0;
+      getline(ans, sizeof(ans), ups);
+      pmsg("Going dumb: %s\n", ans);
 #else
-         pmsg("apcsmart not compiled: dumb mode test unavailable\n");
+      pmsg("apcsmart not compiled: dumb mode test unavailable\n");
 #endif
-      }
    }
 
-   if (ups->fd != -1) {
-      if (mode == M_DUMB)
-         do_dumb_testing();
-      else if (mode == M_SMART)
-         do_smart_testing();
-      else if (mode == M_USB)
-         do_usb_testing();
-      else
-         pmsg("USB testing not yet implemented.\n");
-
-   } else {
-      pmsg("apctest: there is a problem here! We have no device open.\n");
+   switch (ups->mode.type)
+   {
+   case USB_UPS:
+      pmsg("\nYou are using a USB cable type, so I'm entering USB test mode\n");
+      do_usb_testing();
+      break;
+   case APCSMART_UPS:
+      pmsg("\nYou are using a SMART cable type, so I'm entering SMART test mode\n");
+      do_smart_testing();
+      break;
+   case DUMB_UPS:
+      pmsg("\nYou are using a DUMB cable type, so I'm entering DUMB test mode\n");
+      do_dumb_testing();
+      break;
+   default:
+      pmsg("Testing not yet implemented for this UPSTYPE.\n");
    }
-
    apctest_terminate(0);
    return -1;                      /* to keep compiler happy */
 }

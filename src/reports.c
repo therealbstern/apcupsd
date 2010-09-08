@@ -125,15 +125,13 @@ static void log_status_write(UPSINFO *ups, const char *fmt, ...)
 static void log_data(UPSINFO *ups)
 {
    const char *ptr;
-   char msg[MAXSTRING];
    static int toggle = 0;
 
    if (ups->datatime == 0)
       return;
 
    switch (ups->mode.type) {
-   case BK:
-   case SHAREBASIC:
+   case DUMB_UPS:
       if (!ups->is_onbatt()) {
          if (!ups->is_replacebatt()) {
             ptr = "OK";
@@ -149,57 +147,8 @@ static void log_data(UPSINFO *ups)
          log_event(ups, LOG_INFO, "LINEFAIL:DOWN BATTSTAT:%s", ptr);
       }
       break;
-   case BKPRO:
-   case VS:
-      if (!ups->is_onbatt()) {
-         if (ups->is_boost())
-            ptr = "LOW";
-         else if (ups->is_trim())
-            ptr = "HIGH";
-         else
-            ptr = "OK";
-         log_event(ups, LOG_INFO, "LINEFAIL:OK BATTSTAT:OK MAINS:%s", ptr);
-      } else {
-         if (!ups->is_battlow())
-            ptr = "RUNNING";
-         else
-            ptr = "FAILING";
-         log_event(ups, LOG_INFO, "LINEFAIL:DOWN BATTSTAT:%s", ptr);
-      }
-
-      switch (ups->lastxfer) {
-      case XFER_NONE:
-         ptr = "POWER UP";
-         break;
-      case XFER_SELFTEST:
-         ptr = "SELF TEST";
-         break;
-      case XFER_UNDERVOLT:
-         ptr = "LINE VOLTAGE DECREASE";
-         break;
-      case XFER_OVERVOLT:
-         ptr = "LINE VOLTAGE INCREASE";
-         break;
-      case XFER_NOTCHSPIKE:
-         ptr = "POWER FAILURE";
-         break;
-      case XFER_RIPPLE:
-         ptr = "R-EVENT";
-         break;
-      default:
-         asnprintf(msg, sizeof(msg), "UNKNOWN EVENT");
-         ptr = msg;
-         break;
-      }
-      log_event(ups, LOG_INFO, "LASTEVENT: %s", ptr);
-      break;
-   case NBKPRO:
-   case SMART:
-   case SHARESMART:
-   case MATRIX:
    case USB_UPS:
    case TEST_UPS:
-   case DUMB_UPS:
    case NETWORK_UPS:
    case SNMP_UPS:
    case APCSMART_UPS:

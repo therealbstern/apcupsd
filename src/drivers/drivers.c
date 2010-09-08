@@ -243,18 +243,10 @@ const UPSDRIVER *attach_driver(UPSINFO *ups)
 
    /* Attach the correct driver. */
    switch (ups->mode.type) {
-   case BK:
-   case SHAREBASIC:
    case DUMB_UPS:
       driver_name = "dumb";
       break;
 
-   case BKPRO:
-   case VS:
-   case NBKPRO:
-   case SMART:
-   case MATRIX:
-   case SHARESMART:
    case APCSMART_UPS:
       driver_name = "apcsmart";
       break;
