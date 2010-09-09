@@ -115,7 +115,7 @@ int apcsmart_ups_shutdown_with_delay(UPSINFO *ups, int shutdown_delay)
    writechar('K', ups);
    getline(response, sizeof response, ups);
    if (strcmp(response, "*") != 0 && strcmp(response, "OK") != 0) {
-      log_event(ups, LOG_WARNING, _("Failed to issue shutdown command!\n"));
+      log_event(ups, LOG_WARNING, "Failed to issue shutdown command!\n");
       return 0;
    }
 
@@ -133,7 +133,7 @@ void apcsmart_ups_warn_shutdown(UPSINFO *ups, int shutdown_delay)
          "UPS will power off after the configured delay  ...\n");
    }
    log_event(ups, LOG_WARNING,
-      _("Please power off your UPS before rebooting your computer ...\n"));
+      "Please power off your UPS before rebooting your computer ...\n");
 }
 
 int apcsmart_ups_get_shutdown_delay(UPSINFO *ups)

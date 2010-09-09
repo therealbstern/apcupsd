@@ -67,7 +67,7 @@ int apcsmart_ups_open(UPSINFO *ups)
 #endif
 
    if ((ups->fd = open(opendev, O_RDWR | O_NOCTTY | O_NDELAY | O_BINARY)) < 0)
-      Error_abort2(_("Cannot open UPS port %s: %s\n"), opendev, strerror(errno));
+      Error_abort2("Cannot open UPS port %s: %s\n", opendev, strerror(errno));
 
    /* Cancel the no delay we just set */
    cmd = fcntl(ups->fd, F_GETFL, 0);
@@ -167,9 +167,9 @@ int apcsmart_ups_setup(UPSINFO *ups)
       sleep(1);
    }
    Error_abort0(
-      _("PANIC! Cannot communicate with UPS via serial port.\n"
-        "Please make sure the port specified on the DEVICE directive is correct,\n"
-        "and that your cable specification on the UPSCABLE directive is correct.\n"));
+      "PANIC! Cannot communicate with UPS via serial port.\n"
+      "Please make sure the port specified on the DEVICE directive is correct,\n"
+      "and that your cable specification on the UPSCABLE directive is correct.\n");
 
  out:
    return 1;

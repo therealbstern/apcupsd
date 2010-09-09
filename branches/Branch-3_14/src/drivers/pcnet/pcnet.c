@@ -636,7 +636,7 @@ int pcnet_ups_open(UPSINFO *ups)
 
    ups->fd = socket(PF_INET, SOCK_DGRAM, 0);
    if (ups->fd == -1)
-      Error_abort1(_("Cannot create socket (%d)\n"), errno);
+      Error_abort1("Cannot create socket (%d)\n", errno);
 
    int enable = 1;
    setsockopt(ups->fd, SOL_SOCKET, SO_BROADCAST, (const char*)&enable, sizeof(enable));
@@ -647,7 +647,7 @@ int pcnet_ups_open(UPSINFO *ups)
    addr.sin_addr.s_addr = INADDR_ANY;
    if (bind(ups->fd, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
       close(ups->fd);
-      Error_abort1(_("Cannot bind socket (%d)\n"), errno);
+      Error_abort1("Cannot bind socket (%d)\n", errno);
    }
 
    /* Cheat and fixup CI_UPSMODEL to match PCNET */

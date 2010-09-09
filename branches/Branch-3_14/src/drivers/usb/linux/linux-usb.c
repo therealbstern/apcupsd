@@ -600,13 +600,13 @@ int pusb_ups_open(UPSINFO *ups)
    if (!open_usb_device(ups)) {
       write_unlock(ups);
       if (ups->device[0]) {
-         Error_abort1(_("Cannot open UPS device: \"%s\" --\n"
+         Error_abort1("Cannot open UPS device: \"%s\" --\n"
                "For a link to detailed USB trouble shooting information,\n"
-               "please see <http://www.apcupsd.com/support.html>.\n"), ups->device);
+               "please see <http://www.apcupsd.com/support.html>.\n", ups->device);
       } else {
-         Error_abort0(_("Cannot find UPS device --\n"
+         Error_abort0("Cannot find UPS device --\n"
                "For a link to detailed USB trouble shooting information,\n"
-               "please see <http://www.apcupsd.com/support.html>.\n"));
+               "please see <http://www.apcupsd.com/support.html>.\n");
       }
    }
 
@@ -711,7 +711,7 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
 
                         if (!info) {
                            write_unlock(ups);
-                           Error_abort0(_("Out of memory.\n"));
+                           Error_abort0("Out of memory.\n");
                         }
 
                         my_data->info[ci] = info;

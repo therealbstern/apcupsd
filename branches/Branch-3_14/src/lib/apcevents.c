@@ -60,7 +60,7 @@ int trim_eventfile(UPSINFO *ups)
 
    /* Read the desired number of bytes from end of file */
    if (lseek(ups->event_fd, -maxb, SEEK_END) < 0) {
-      log_event(ups, LOG_CRIT, _("lseek failed in trim_eventfile."));
+      log_event(ups, LOG_CRIT, "lseek failed in trim_eventfile.");
       goto trim_done;
    }
 
@@ -104,7 +104,7 @@ trim_done:
    free(buf);
 
    if (rwerror)
-      log_event(ups, LOG_CRIT, _("read/write failed in trim_eventfile."));
+      log_event(ups, LOG_CRIT, "read/write failed in trim_eventfile.");
 
    return status;
 }

@@ -332,7 +332,7 @@ int check_wrappers(char *av, int newsock)
 
    if (!hosts_access(&req)) {
       log_event(core_ups, LOG_WARNING,
-         _("Connection from %.500s refused by tcp_wrappers."), eval_client(&req));
+         "Connection from %.500s refused by tcp_wrappers.", eval_client(&req));
       return FAILURE;
    }
 
