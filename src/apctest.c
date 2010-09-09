@@ -1201,7 +1201,7 @@ static void smart_test1(void)
    char *ans, *p, *o, cmd;
    char answer[2000];
    char parts[2000];
-   int stat, i;
+   int stat;
 
 #ifdef working
    char locale, locale1, locale2;
@@ -1244,16 +1244,10 @@ static void smart_test1(void)
       pmsg("Bad response from write: %d %s\n", stat, strerror(errno));
 
    *answer = 0;
-   for (i = 0; i < (int)sizeof(answer); i++) {
-      stat = read(ups->fd, &cmd, 1);
-      if (stat < 0)
-         pmsg("Bad response from read: %s\n", strerror(errno));
-
-      if (cmd == '\n') {
-         answer[i] = 0;
-         break;
-      }
-      answer[i] = cmd;
+   stat = getline(answer, sizeof(answer), ups);
+   pmsg("Wrote: a Got: %s\n", answer);
+   if (stat == FAILURE) {
+      pmsg("Cannot get the list of valid commands (a very old ups perhaps ?).\n");
    }
 
    /* Get protocol version */
