@@ -43,20 +43,20 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
    switch (command) {
    case CI_BATTDAT:               /* change battery date */
       if (ups->UPS_Cap[CI_BATTDAT]) {
-         printf(_("Attempting to update UPS battery date ...\n"));
+         printf("Attempting to update UPS battery date ...\n");
          change_ups_battery_date(ups, data);
       } else {
-         printf(_("UPS battery date configuration not supported by this UPS.\n"));
+         printf("UPS battery date configuration not supported by this UPS.\n");
          return 0;
       }
       break;
 
    case CI_IDEN:
       if (ups->UPS_Cap[CI_IDEN]) {
-         printf(_("Attempting to rename UPS ...\n"));
+         printf("Attempting to rename UPS ...\n");
          change_ups_name(ups, data);
       } else {
-         printf(_("UPS name configuration not supported by this UPS.\n"));
+         printf("UPS name configuration not supported by this UPS.\n");
          return 0;
       }
       break;
@@ -67,7 +67,7 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
          asnprintf(setting, sizeof(setting), "%.1s", data);
          change_ups_eeprom_item(ups, "sensitivity", ups->UPS_Cmd[CI_SENS], setting);
       } else {
-         printf(_("UPS sensitivity configuration not supported by this UPS.\n"));
+         printf("UPS sensitivity configuration not supported by this UPS.\n");
          return 0;
       }
       break;
@@ -79,7 +79,7 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
          change_ups_eeprom_item(ups, "alarm status", ups->UPS_Cmd[CI_DALARM],
             setting);
       } else {
-         printf(_("UPS alarm status configuration not supported by this UPS.\n"));
+         printf("UPS alarm status configuration not supported by this UPS.\n");
          return 0;
       }
       break;
@@ -92,7 +92,7 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
             ups->UPS_Cmd[CI_DLBATT], setting);
       } else {
          printf(
-            _("UPS low battery warning configuration not supported by this UPS.\n"));
+            "UPS low battery warning configuration not supported by this UPS.\n");
          return 0;
       }
       break;
@@ -104,7 +104,7 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
          change_ups_eeprom_item(ups, "wakeup delay", ups->UPS_Cmd[CI_DWAKE],
             setting);
       } else {
-         printf(_("UPS wakeup delay configuration not supported by this UPS.\n"));
+         printf("UPS wakeup delay configuration not supported by this UPS.\n");
          return 0;
       }
       break;
@@ -117,7 +117,7 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
          change_ups_eeprom_item(ups, "shutdown delay", ups->UPS_Cmd[CI_DSHUTD],
             setting);
       } else {
-         printf(_("UPS shutdown delay configuration not supported by this UPS.\n"));
+         printf("UPS shutdown delay configuration not supported by this UPS.\n");
          return 0;
       }
       break;
@@ -130,7 +130,7 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
             ups->UPS_Cmd[CI_LTRANS], setting);
       } else {
          printf(
-            _("UPS low transfer voltage configuration not supported by this UPS.\n"));
+            "UPS low transfer voltage configuration not supported by this UPS.\n");
          return 0;
       }
       break;
@@ -143,7 +143,7 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
             ups->UPS_Cmd[CI_HTRANS], setting);
       } else {
          printf(
-            _("UPS high transfer voltage configuration not supported by this UPS.\n"));
+            "UPS high transfer voltage configuration not supported by this UPS.\n");
          return 0;
       }
       break;
@@ -156,7 +156,7 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
             ups->UPS_Cmd[CI_RETPCT], setting);
       } else {
          printf(
-            _("UPS return threshold configuration not supported by this UPS.\n"));
+            "UPS return threshold configuration not supported by this UPS.\n");
          return 0;
       }
       break;
@@ -174,7 +174,7 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
             setting);
       } else {
          printf(
-            _("UPS self test interval configuration not supported by this UPS.\n"));
+            "UPS self test interval configuration not supported by this UPS.\n");
          return 0;
       }
       break;
@@ -187,7 +187,7 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
             ups->UPS_Cmd[CI_NOMOUTV], setting);
       } else {
          printf(
-            _("UPS output voltage on batteries configuration not supported by this UPS.\n"));
+            "UPS output voltage on batteries configuration not supported by this UPS.\n");
          return 0;
       }
       break;
@@ -195,7 +195,7 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
 
    case -1:                       /* old style from .conf file */
 
-      printf(_("Attempting to configure UPS ...\n"));
+      printf("Attempting to configure UPS ...\n");
       change_extended(ups);        /* set new values in UPS */
 
       printf("\nReading updated UPS configuration ...\n\n");
@@ -207,7 +207,7 @@ int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
       break;
 
    default:
-      printf(_("Ignoring unknown config request command=%d\n"), command);
+      printf("Ignoring unknown config request command=%d\n", command);
       return 0;
       break;
    }

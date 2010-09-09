@@ -37,7 +37,7 @@ UPSINFO *new_ups()
 
    ups = (UPSINFO *) malloc(sizeof(UPSINFO));
    if (!ups)
-      Error_abort0(_("Could not allocate ups memory\n"));
+      Error_abort0("Could not allocate ups memory\n");
 
    memset(ups, 0, sizeof(UPSINFO));
    if ((stat = pthread_mutex_init(&ups->mutex, NULL)) != 0) {

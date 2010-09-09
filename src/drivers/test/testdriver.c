@@ -49,7 +49,7 @@ int test_ups_open(UPSINFO *ups)
    write_lock(ups);
 
    if (!open_test_device(ups))
-      Error_abort1(_("Cannot open UPS device %s\n"), ups->device);
+      Error_abort1("Cannot open UPS device %s\n", ups->device);
 
    ups->clear_slave();
    write_unlock(ups);

@@ -89,7 +89,7 @@ void apcupsd_terminate(int sig)
    restore_signals();
 
    if (sig != 0)
-      log_event(ups, LOG_WARNING, _("apcupsd exiting, signal %u\n"), sig);
+      log_event(ups, LOG_WARNING, "apcupsd exiting, signal %u\n", sig);
 
    clear_files();
    device_close(ups);
@@ -97,7 +97,7 @@ void apcupsd_terminate(int sig)
    if (pidcreated)
       unlink(pidfile);
    clean_threads();
-   log_event(ups, LOG_WARNING, _("apcupsd shutdown succeeded"));
+   log_event(ups, LOG_WARNING, "apcupsd shutdown succeeded");
    destroy_ups(ups);
    closelog();
    _exit(0);
@@ -110,7 +110,7 @@ void apcupsd_error_cleanup(UPSINFO *ups)
    if (pidcreated)
       unlink(pidfile);
    clean_threads();
-   log_event(ups, LOG_ERR, _("apcupsd error shutdown completed"));
+   log_event(ups, LOG_ERR, "apcupsd error shutdown completed");
    destroy_ups(ups);
    closelog();
    exit(1);
@@ -129,7 +129,7 @@ void apcupsd_error_out(const char *file, int line, const char *fmt, ...)
    int i;
 
    asnprintf(buf, sizeof(buf),
-      _("apcupsd FATAL ERROR in %s at line %d\n"), file, line);
+      "apcupsd FATAL ERROR in %s at line %d\n", file, line);
 
    i = strlen(buf);
    va_start(arg_ptr, fmt);
@@ -209,7 +209,7 @@ int main(int argc, char *argv[])
 
    ups = new_ups();                /* get new ups */
    if (!ups)
-      Error_abort1(_("%s: init_ipc failed.\n"), argv[0]);
+      Error_abort1("%s: init_ipc failed.\n", argv[0]);
 
    init_ups_struct(ups);
    core_ups = ups;                 /* this is our core ups structure */
@@ -237,7 +237,7 @@ int main(int argc, char *argv[])
 
 #ifndef DEBUG
    if ((getuid() != 0) && (geteuid() != 0))
-      Error_abort0(_("Needs super user privileges to run.\n"));
+      Error_abort0("Needs super user privileges to run.\n");
 #endif
 
    check_for_config(ups, cfgfile);
@@ -251,14 +251,14 @@ int main(int argc, char *argv[])
    if (kill_on_powerfail && ups->mode.type == DUMB_UPS) {
       kill_on_powerfail = 0;
       log_event(ups, LOG_WARNING,
-         _("Ignoring --kill-on-powerfail since it is unsafe "
-            "on Simple Signaling UPSes"));
+         "Ignoring --kill-on-powerfail since it is unsafe "
+            "on Simple Signaling UPSes");
    }
 
    /* Attach the correct driver. */
    attach_driver(ups);
    if (ups->driver == NULL)
-      Error_abort0(_("Apcupsd cannot continue without a valid driver.\n"));
+      Error_abort0("Apcupsd cannot continue without a valid driver.\n");
 
    Dmsg1(10, "Attached to driver: %s\n", ups->driver->driver_name);
 
@@ -283,7 +283,7 @@ int main(int argc, char *argv[])
    }
 
    if (create_lockfile(ups) == LCKERROR) {
-      Error_abort1(_("Failed to acquire device lock file\n"),
+      Error_abort1("Failed to acquire device lock file\n",
          ups->device);
    }
 

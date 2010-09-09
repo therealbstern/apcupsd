@@ -61,31 +61,31 @@ UPSCOMMANDS ups_event[] = {
  * and the defines in include/apc_defines.h 
  */
 UPSCMDMSG event_msg[] = {
-   {LOG_CRIT,    N_("Power failure.")},
-   {LOG_CRIT,    N_("Running on UPS batteries.")},
-   {LOG_ALERT,   N_("Battery power exhausted.")},
-   {LOG_ALERT,   N_("Reached run time limit on batteries.")},
-   {LOG_ALERT,   N_("Battery charge below low limit.")},
-   {LOG_ALERT,   N_("Reached remaining time percentage limit on batteries.")},
-   {LOG_ALERT,   N_("Initiating system shutdown!")},
-   {LOG_ALERT,   N_("Power is back. UPS running on mains.")},
-   {LOG_ALERT,   N_("Users requested to logoff.")},
-   {LOG_ALERT,   N_("Battery failure. Emergency.")},
-   {LOG_CRIT,    N_("UPS battery must be replaced.")},
-   {LOG_CRIT,    N_("Remote shutdown requested.")},
-   {LOG_WARNING, N_("Communications with UPS lost.")},
-   {LOG_WARNING, N_("Communications with UPS restored.")},
-   {LOG_WARNING, N_("UPS Self Test switch to battery.")},
-   {LOG_WARNING, N_("UPS Self Test completed.")},
-   {LOG_CRIT,    N_("Mains returned. No longer on UPS batteries.")},
-   {LOG_CRIT,    N_("Battery disconnected.")},
-   {LOG_CRIT,    N_("Battery reattached.")}
+   {LOG_CRIT,    "Power failure."},
+   {LOG_CRIT,    "Running on UPS batteries."},
+   {LOG_ALERT,   "Battery power exhausted."},
+   {LOG_ALERT,   "Reached run time limit on batteries."},
+   {LOG_ALERT,   "Battery charge below low limit."},
+   {LOG_ALERT,   "Reached remaining time percentage limit on batteries."},
+   {LOG_ALERT,   "Initiating system shutdown!"},
+   {LOG_ALERT,   "Power is back. UPS running on mains."},
+   {LOG_ALERT,   "Users requested to logoff."},
+   {LOG_ALERT,   "Battery failure. Emergency."},
+   {LOG_CRIT,    "UPS battery must be replaced."},
+   {LOG_CRIT,    "Remote shutdown requested."},
+   {LOG_WARNING, "Communications with UPS lost."},
+   {LOG_WARNING, "Communications with UPS restored."},
+   {LOG_WARNING, "UPS Self Test switch to battery."},
+   {LOG_WARNING, "UPS Self Test completed."},
+   {LOG_CRIT,    "Mains returned. No longer on UPS batteries."},
+   {LOG_CRIT,    "Battery disconnected."},
+   {LOG_CRIT,    "Battery reattached."}
 };
 
 void generate_event(UPSINFO *ups, int event)
 {
    /* Log message and execute script for this event */
-   log_event(ups, event_msg[event].level, _(event_msg[event].msg));
+   log_event(ups, event_msg[event].level, event_msg[event].msg);
    Dmsg2(80, "calling execute_ups_event %s event=%d\n", ups_event[event], event);
    execute_command(ups, ups_event[event]);
 
@@ -106,7 +106,7 @@ void generate_event(UPSINFO *ups, int event)
    case CMDEMERGENCY:
    case CMDREMOTEDOWN:
       log_event(ups, event_msg[CMDDOSHUTDOWN].level,
-         _(event_msg[CMDDOSHUTDOWN].msg));
+         event_msg[CMDDOSHUTDOWN].msg);
       do_shutdown(ups, CMDDOSHUTDOWN);
       break;
 
@@ -195,7 +195,7 @@ static void prohibit_logins(UPSINFO *ups)
    logonfail(ups, 0);
    ups->nologin_file = true;
 
-   log_event(ups, LOG_ALERT, _("User logins prohibited"));
+   log_event(ups, LOG_ALERT, "User logins prohibited");
 }
 
 static void do_shutdown(UPSINFO *ups, int cmdtype)
@@ -607,7 +607,7 @@ void do_action(UPSINFO *ups)
 
          /* Get last selftest results, only for smart UPSes. */
          device_entry_point(ups, DEVICE_CMD_GET_SELFTEST_MSG, NULL);
-         log_event(ups, LOG_ALERT, _("UPS Self Test completed: %s"),
+         log_event(ups, LOG_ALERT, "UPS Self Test completed: %s",
             testresult_to_string(ups->testresult));
          execute_command(ups, ups_event[CMDENDSELFTEST]);
       } else {
@@ -615,7 +615,7 @@ void do_action(UPSINFO *ups)
       }
 
       if (ups->nologin_file)
-         log_event(ups, LOG_ALERT, _("Allowing logins"));
+         log_event(ups, LOG_ALERT, "Allowing logins");
 
       logonfail(ups, 1);
       ups->nologin_file = false;

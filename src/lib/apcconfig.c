@@ -206,7 +206,7 @@ static int obsolete(UPSINFO *ups, int offset, const GENINFO * junk, const char *
 
    fprintf(stderr, "%s\n", msg);
    if (!offset) {
-      fprintf(stderr, _("error ignored.\n"));
+      fprintf(stderr, "error ignored.\n");
       return SUCCESS;
    }
    
@@ -224,7 +224,7 @@ static int start_ups(UPSINFO *ups, int offset, const GENINFO * size, const char 
    /* Verify that we don't already have an UPS with the same name. */
    for (ups = NULL; (ups = getNextUps(ups)) != NULL;)
       if (strncmp(x, ups->upsname, UPSNAMELEN) == 0) {
-         fprintf(stderr, _("%s: duplicate upsname [%s] in config file.\n"),
+         fprintf(stderr, "%s: duplicate upsname [%s] in config file.\n",
             argvalue, ups->upsname);
          return FAILURE;
       }
@@ -233,7 +233,7 @@ static int start_ups(UPSINFO *ups, int offset, const GENINFO * size, const char 
    ups = new_ups();
 
    if (ups == NULL) {
-      Error_abort1(_("%s: not enough memory.\n"), argvalue);
+      Error_abort1("%s: not enough memory.\n", argvalue);
       return FAILURE;
    }
 
@@ -255,12 +255,12 @@ static int end_ups(UPSINFO *ups, int offset, const GENINFO * size, const char *v
       return FAILURE;
 
    if (ups == NULL) {
-      fprintf(stderr, _("%s: upsname [%s] mismatch in config file.\n"), argvalue, x);
+      fprintf(stderr, "%s: upsname [%s] mismatch in config file.\n", argvalue, x);
       return FAILURE;
    }
 
    if (strncmp(x, ups->upsname, UPSNAMELEN) != 0) {
-      fprintf(stderr, _("%s: upsname [%s] mismatch in config file.\n"),
+      fprintf(stderr, "%s: upsname [%s] mismatch in config file.\n",
          argvalue, ups->upsname);
       return FAILURE;
    }
@@ -290,7 +290,7 @@ static int match_range(UPSINFO *ups, int offset, const GENINFO * vs, const char 
 
    if (!vs) {
       /* Shouldn't ever happen so abort if it ever does. */
-      Error_abort1(_("%s: Bogus configuration table! Fix and recompile.\n"),
+      Error_abort1("%s: Bogus configuration table! Fix and recompile.\n",
          argvalue);
    }
 
@@ -310,9 +310,9 @@ static int match_range(UPSINFO *ups, int offset, const GENINFO * vs, const char 
        * print error message (and log it).
        */
       log_event(ups, LOG_WARNING,
-         _("%s: Bogus configuration value (%s)\n"), argvalue, vs->long_name);
+         "%s: Bogus configuration value (%s)\n", argvalue, vs->long_name);
       fprintf(stderr,
-         _("%s: Bogus configuration value (%s)\n"), argvalue, vs->long_name);
+         "%s: Bogus configuration value (%s)\n", argvalue, vs->long_name);
       return FAILURE;
 
    }
@@ -339,7 +339,7 @@ static int match_index(UPSINFO *ups, int offset, const GENINFO * vs, const char 
 
    if (!vs) {
       /* Shouldn't ever happen so abort if it ever does. */
-      Error_abort1(_("%s: Bogus configuration table! Fix and recompile.\n"),
+      Error_abort1("%s: Bogus configuration table! Fix and recompile.\n",
          argvalue);
    }
 
@@ -356,9 +356,9 @@ static int match_index(UPSINFO *ups, int offset, const GENINFO * vs, const char 
        * print error message (and log it).
        */
       log_event(ups, LOG_WARNING,
-         _("%s: Bogus configuration value (%s)\n"), argvalue, vs->long_name);
+         "%s: Bogus configuration value (%s)\n", argvalue, vs->long_name);
       fprintf(stderr,
-         _("%s: Bogus configuration value (%s)\n"), argvalue, vs->long_name);
+         "%s: Bogus configuration value (%s)\n", argvalue, vs->long_name);
       return FAILURE;
 
    }
@@ -666,7 +666,7 @@ void check_for_config(UPSINFO *ups, char *cfgfile)
    int erpos = 0;
 
    if ((apcconf = fopen(cfgfile, "r")) == NULL) {
-      Error_abort2(_("Error opening configuration file (%s): %s\n"),
+      Error_abort2("Error opening configuration file (%s): %s\n",
          cfgfile, strerror(errno));
    }
    astrncpy(ups->configfile, cfgfile, sizeof(ups->configfile));
@@ -679,13 +679,13 @@ void check_for_config(UPSINFO *ups, char *cfgfile)
        * They never match so don't even compare them.
        */
       if (strncmp(line, APC_CONFIG_MAGIC, sizeof(APC_CONFIG_MAGIC) - 1) != 0) {
-         fprintf(stderr, _("%s: Warning: old configuration file found.\n\n"
+         fprintf(stderr, "%s: Warning: old configuration file found.\n\n"
                "%s: Expected: \"%s\"\n"
                "%s: Found:    \"%s\"\n\n"
                "%s: Please check new file format and\n"
                "%s: modify accordingly the first line\n"
                "%s: of config file.\n\n"
-               "%s: Processing config file anyway.\n"),
+               "%s: Processing config file anyway.\n",
             argvalue,
             argvalue, APC_CONFIG_MAGIC,
             argvalue, line, argvalue, argvalue, argvalue, argvalue);
@@ -707,7 +707,7 @@ jump_into_the_loop:
       if (ParseConfig(ups, line)) {
          errors++;
          Dmsg1(100, "%s\n", line);
-         Dmsg2(100, _("Parsing error at line %d of config file %s.\n"), erpos, cfgfile);
+         Dmsg2(100, "Parsing error at line %d of config file %s.\n", erpos, cfgfile);
       }
    }
 
@@ -823,7 +823,7 @@ jump_into_the_loop:
 
 bail_out:
    if (errors)
-      error_exit(_("Terminating due to configuration file errors.\n"));
+      error_exit("Terminating due to configuration file errors.\n");
 
    return;
 }

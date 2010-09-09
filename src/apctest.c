@@ -200,7 +200,7 @@ void apctest_error_out(const char *file, int line, const char *fmt, ...)
    int i;
 
    asnprintf(buf, sizeof(buf),
-      _("apctest FATAL ERROR in %s at line %d\n"), file, line);
+      "apctest FATAL ERROR in %s at line %d\n", file, line);
    i = strlen(buf);
 
    va_start(arg_ptr, fmt);
@@ -249,7 +249,7 @@ int main(int argc, char *argv[])
 
    ups = new_ups();                /* get new ups */
    if (!ups)
-      Error_abort1(_("%s: init_ipc failed.\n"), argv[0]);
+      Error_abort1("%s: init_ipc failed.\n", argv[0]);
 
    init_ups_struct(ups);
    core_ups = ups;                 /* this is our core ups structure */

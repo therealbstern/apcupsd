@@ -35,7 +35,7 @@ void generic_error_out(const char *file, int line, const char *fmt, ...)
    va_list arg_ptr;
    int i;
 
-   asnprintf(buf, sizeof(buf), _("FATAL ERROR in %s at line %d\n"), file, line);
+   asnprintf(buf, sizeof(buf), "FATAL ERROR in %s at line %d\n", file, line);
    i = strlen(buf);
    va_start(arg_ptr, fmt);
    avsnprintf((char *)&buf[i], sizeof(buf) - i, (char *)fmt, arg_ptr);

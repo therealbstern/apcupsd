@@ -66,9 +66,9 @@ void setup_device(UPSINFO *ups)
    /* If create_lockfile fails there's no need to delete_lockfile. */
    if ((ups->fd != -1) && create_lockfile(ups) == LCKERROR) {
       device_close(ups);
-      Error_abort0(_("Unable to create UPS lock file.\n"
-                     "  If apcupsd or apctest is already running,\n"
-                     "  please stop it and run this program again.\n"));
+      Error_abort0("Unable to create UPS lock file.\n"
+                   "  If apcupsd or apctest is already running,\n"
+                   "  please stop it and run this program again.\n");
    }
 
    device_setup(ups);
@@ -108,18 +108,18 @@ void initiate_hibernate(UPSINFO *ups)
 
       /* Now complain */
       log_event(ups, LOG_WARNING,
-         _("Cannot find %s file.\n Killpower requested in "
+         "Cannot find %s file.\n Killpower requested in "
            "non-power fail condition or bug.\n Killpower request "
-           "ignored at %s:%d\n"), ups->pwrfailpath, __FILE__, __LINE__);
+           "ignored at %s:%d\n", ups->pwrfailpath, __FILE__, __LINE__);
       Error_abort3(
-         _("Cannot find %s file.\n Killpower requested in "
+         "Cannot find %s file.\n Killpower requested in "
            "non-power fail condition or bug.\n Killpower request "
-           "ignored at %s:%d\n"), ups->pwrfailpath, __FILE__, __LINE__);
+           "ignored at %s:%d\n", ups->pwrfailpath, __FILE__, __LINE__);
    } else {
       /* We are on batteries, so do the kill_power */
       if (ups->upsclass.type == SHAREMASTER) {
          log_event(ups, LOG_WARNING,
-            _("Waiting 30 seconds for slave(s) to shutdown."));
+            "Waiting 30 seconds for slave(s) to shutdown.");
          sleep(30);
       }
 
@@ -127,13 +127,13 @@ void initiate_hibernate(UPSINFO *ups)
       if (pwdf)
          fclose(pwdf);
 
-      log_event(ups, LOG_WARNING, _("Attempting to kill the UPS power!"));
+      log_event(ups, LOG_WARNING, "Attempting to kill the UPS power!");
 
       if (ups->upsclass.type == SHARESLAVE) {
          sleep(10);
-         log_event(ups, LOG_WARNING, _("Waiting For ShareUPS Master to shutdown"));
+         log_event(ups, LOG_WARNING, "Waiting For ShareUPS Master to shutdown");
          sleep(60);
-         log_event(ups, LOG_WARNING, _("Failed to have power killed by Master!"));
+         log_event(ups, LOG_WARNING, "Failed to have power killed by Master!");
 
          /*
           * ***FIXME*** this really should not do a reboot here,
@@ -141,7 +141,7 @@ void initiate_hibernate(UPSINFO *ups)
           */
          /* generate_event(ups, CMDDOREBOOT); */
 
-         log_event(ups, LOG_WARNING, _("Perform CPU-reset or power-off"));
+         log_event(ups, LOG_WARNING, "Perform CPU-reset or power-off");
          return;
       } else {
          /* it must be a SmartUPS or BackUPS */
@@ -153,7 +153,7 @@ void initiate_hibernate(UPSINFO *ups)
 /*********************************************************************/
 void initiate_shutdown(UPSINFO *ups)
 {
-   log_event(ups, LOG_WARNING, _("Attempting to shutdown the UPS!"));
+   log_event(ups, LOG_WARNING, "Attempting to shutdown the UPS!");
    device_shutdown(ups);
 }
 

@@ -59,7 +59,7 @@ static int log_status_close(UPSINFO *ups, int fd)
 
    i = strlen(largebuf);
    if (i > (int)sizeof(largebuf) - 1) {
-      log_event(ups, LOG_ERR, _("Status buffer overflow %d bytes\n"),
+      log_event(ups, LOG_ERR, "Status buffer overflow %d bytes\n",
          i - sizeof(largebuf));
       return -1;
    }

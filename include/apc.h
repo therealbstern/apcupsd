@@ -141,8 +141,6 @@
 /* Include apcupsd stuff */
 
 #include "apc_config.h"
-
-#include "apc_i18n.h"
 #include "version.h"
 #include "defines.h"
 #include "struct.h"
