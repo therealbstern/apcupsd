@@ -29,68 +29,55 @@
 
 int apcsmart_ups_kill_power(UPSINFO *ups)
 {
-   char response[32];
-   int shutdown_delay = 0;
-   int errflag = 0;
+   char response[32] = {0};
+   int shutdown_delay = apcsmart_ups_get_shutdown_delay(ups);
 
-   response[0] = '\0';
-   shutdown_delay = apcsmart_ups_get_shutdown_delay(ups);
-   writechar('S', ups);            /* ask for soft shutdown */
+   // Ask for soft shutdown
+   writechar('S', ups);
 
-   /*
-    * Check whether the UPS has acknowledged the power-off command.
-    * This might not happen in rare cases, when mains-power returns
-    * just after LINUX starts with the shutdown sequence.
-    * interrupt the ouput-power. So LINUX will not come up without
-    * operator intervention.  w.p.
-    */
+   // Check whether the UPS has acknowledged the power-off command.
+   // The command only succeeds if UPS was on battery.
    sleep(5);
    getline(response, sizeof response, ups);
-   if (strcmp(response, "OK") == 0) {
-      apcsmart_ups_warn_shutdown(ups, shutdown_delay);
-   } else {
-      /*
-       * Experiments show that the UPS needs delays between chars
-       * to accept this command.
-       */
+   if (strcmp(response, "OK") == 0 || (strcmp(response, "*") == 0))
+      goto acked;
 
-      sleep(1);                    /* Shutdown now */
-      writechar('@', ups);
-      sleep(1);
-      writechar('0', ups);
-      sleep(1);
-      writechar('0', ups);
+   // 'S' command failed, most likely because utility power was restored.
+   // We still need to power cycle the UPS however since the OS has been
+   // shut down already. We will issue the shutdown-and-return command
+   // '@000' which works even if UPS is online.
 
-      getline(response, sizeof(response), ups);
-      if ((strcmp(response, "OK") == 0) || (strcmp(response, "*") == 0)) {
-         apcsmart_ups_warn_shutdown(ups, shutdown_delay);
-      } else {
-         errflag++;
-      }
-   }
+   // Experiments show that the UPS needs delays between chars
+   // to accept this command. Old code is written to send 2 zeros
+   // first, check for a response, and then send a third zero if
+   // command needs it. I've never seen an UPS that needs only 2 zeros
+   // but apparently someone did, so code is preserved.
 
-   if (errflag) {
-      writechar('@', ups);
-      sleep(1);
-      writechar('0', ups);
-      sleep(1);
-      writechar('0', ups);
-      sleep(1);
-      writechar('0', ups);
+   writechar('@', ups);    /* Shutdown now, try two 0s first */
+   sleep(2);
+   writechar('0', ups);
+   sleep(2);
+   writechar('0', ups);
+   sleep(2);
 
-      getline(response, sizeof(response), ups);
-      if ((strcmp(response, "OK") == 0) || (strcmp(response, "*") == 0)) {
-         apcsmart_ups_warn_shutdown(ups, shutdown_delay);
-         errflag = 0;
-      } else {
-         errflag++;
-      }
-   }
+   getline(response, sizeof(response), ups);
+   if ((strcmp(response, "OK") == 0) || (strcmp(response, "*") == 0))
+      goto acked;
 
-   if (errflag) {
-      return apcsmart_ups_shutdown_with_delay(ups, shutdown_delay);
-   }
+   writechar('0', ups);
+   sleep(2);
+ 
+   getline(response, sizeof(response), ups);
+   if ((strcmp(response, "OK") == 0) || (strcmp(response, "*") == 0))
+      goto acked;
 
+   // Both shutdown techniques failed. We have one more we can try, but
+   // UPS will power off and stay off in this case.
+   return apcsmart_ups_shutdown_with_delay(ups, shutdown_delay);
+
+acked:
+   // Shutdown command was accepted
+   apcsmart_ups_warn_shutdown(ups, shutdown_delay);
    return 1;
 }
 
