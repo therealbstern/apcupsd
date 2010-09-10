@@ -188,8 +188,8 @@ bool SnmpEngine::Get(alist<OidVar> &oids)
    // Append one varbind for each oidvar from the caller
    alist<OidVar>::iterator iter;
    for (iter = oids.begin(); iter != oids.end(); ++iter)
-      if ((*iter).data.type != Asn::SEQUENCE)
-         getreq.Append((*iter).oid);
+      if (iter->data.type != Asn::SEQUENCE)
+         getreq.Append(iter->oid);
 
    // Perform request if we put at least one OID in it
    if (getreq.Size() > 0)
@@ -217,9 +217,9 @@ bool SnmpEngine::Get(alist<OidVar> &oids)
       {
          for (iter = oids.begin(); iter != oids.end(); ++iter)
          {
-            if (response[i].Oid().IsChildOf((*iter).oid))
+            if (response[i].Oid().IsChildOf(iter->oid))
             {
-               response[i].Extract(&(*iter).data);
+               response[i].Extract(&iter->data);
                break;
             }
          }
@@ -233,9 +233,9 @@ bool SnmpEngine::Get(alist<OidVar> &oids)
    // SNMP GETNEXT-REQUESTs until we detect the end of the sequence.
    for (iter = oids.begin(); iter != oids.end(); ++iter)
    {
-      if ((*iter).data.type == Asn::SEQUENCE)
+      if (iter->data.type == Asn::SEQUENCE)
       {
-         Asn::ObjectId nextoid = (*iter).oid;
+         Asn::ObjectId nextoid = iter->oid;
          while (1)
          {
             // Create a GET-NEXT request
@@ -255,7 +255,7 @@ bool SnmpEngine::Get(alist<OidVar> &oids)
             // If result OID is not a child of the top-level OID we're fetching 
             // it means we've run off the end of the sequence so we're done
             VarBind &result = (*rspmsg)[0];
-            if (!result.Oid().IsChildOf((*iter).oid))
+            if (!result.Oid().IsChildOf(iter->oid))
             {
                delete rspmsg;
                break;
@@ -264,7 +264,7 @@ bool SnmpEngine::Get(alist<OidVar> &oids)
             // Extract data and append to sequence
             Variable tmp;
             result.Extract(&tmp);
-            (*iter).data.seq.append(tmp);
+            iter->data.seq.append(tmp);
 
             // Save returned OID for next iteration
             nextoid = result.Oid();
