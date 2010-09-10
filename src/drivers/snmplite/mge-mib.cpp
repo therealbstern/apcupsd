@@ -36,20 +36,14 @@ static struct CiOidMap MGE_CiOidMap[] =
    {CI_STATUS,          upsmgOutputOnBattery,             INTEGER,     true },
    {CI_WHY_BATT,        upsmgInputLineFailCause,          INTEGER,     true },
    {CI_ST_STAT,         upsmgTestDiagResult,              INTEGER,     true },
-//   {CI_VLINE,           mginputVoltage,                   INTEGER,     true }, // actual root for sequence of values
-   {CI_VLINE,           mginputFirstVoltage,              INTEGER,     true }, // hack to circumvent sequences to work with snmplite
-//   {CI_VMAX,            mginputMaximumVoltage,            INTEGER,     true }, // actual root for sequence of values
-   {CI_VMAX,            mginputMaximumFirstVoltage,       INTEGER,     true }, // hack to circumvent sequences to work with snmplite
-//   {CI_VMIN,            mginputMinimumVoltage,            INTEGER,     true }, // actual root for sequence of values
-   {CI_VMIN,            mginputMinimumFirstVoltage,       INTEGER,     true }, // hack to circumvent sequences to work with snmplite
-//   {CI_VOUT,            mgoutputVoltage,                  INTEGER,     true }, // actual root for sequence of values
-   {CI_VOUT,            mgoutputFirstVoltage,             INTEGER,     true },
+   {CI_VLINE,           mginputVoltage,                   SEQUENCE,    true },
+   {CI_VMAX,            mginputMaximumVoltage,            SEQUENCE,    true },
+   {CI_VMIN,            mginputMinimumVoltage,            SEQUENCE,    true },
+   {CI_VOUT,            mgoutputVoltage,                  SEQUENCE,    true },
    {CI_BATTLEV,         upsmgBatteryLevel,                INTEGER,     true },
    {CI_VBATT,           upsmgBatteryVoltage,              INTEGER,     true },
-//   {CI_LOAD,            mgoutputLoadPerPhase,             INTEGER,     true }, // actual root for sequence of values
-   {CI_LOAD,            mgoutputLoadFirstPhase,           INTEGER,     true }, // hack to circumvent sequences to work with snmplite
-//   {CI_FREQ,            mginputFrequency,                 INTEGER,     true }, // actual root for sequence of values
-   {CI_FREQ,            mginputFirstFrequency,            INTEGER,     true }, // hack to circumvent sequences to work with snmplite
+   {CI_LOAD,            mgoutputLoadPerPhase,             SEQUENCE,    true },
+   {CI_FREQ,            mginputFrequency,                 SEQUENCE,    true },
    {CI_RUNTIM,          upsmgBatteryRemainingTime,        INTEGER,     true },
    {CI_ITEMP,           upsmgBatteryTemperature,          INTEGER,     true },
    {CI_DWAKE,           mgreceptacleRestartDelay,         INTEGER,     false},
@@ -136,24 +130,62 @@ static void mge_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       }
       break;
 
-   case CI_VLINE:
-      Dmsg1(80, "Got CI_VLINE: %d\n", data.u32);
-      ups->LineVoltage = ((double)data.u32) / 10;
+   case CI_VLINE: // take only first value of sequence
+      if (data.seq.begin() != data.seq.end()) {
+         ups->LineVoltage = ((double)data.seq.begin()->u32) / 10;
+         for (alist<Snmp::Variable>::iterator iter = data.seq.begin();
+              iter != data.seq.end();
+              ++iter)
+            Dmsg1(80, "Got CI_VLINE: %d\n", iter->u32);
+      } else {
+         Dmsg0(80, "CI_VLINE: empty reply received");
+      }
       break;
 
-   case CI_VMAX:
-      Dmsg1(80, "Got CI_VMAX: %d\n", data.u32);
-      ups->LineMax =  ((double)data.u32) / 10;
+   case CI_VMAX: // take maximum of sequence values
+      if (data.seq.begin() != data.seq.end()) {
+         ups->LineMax = 0;
+         for (alist<Snmp::Variable>::iterator iter = data.seq.begin();
+              iter != data.seq.end();
+              ++iter) {
+            Dmsg1(80, "Got CI_VMAX: %d\n", iter->u32);
+            if (ups->LineMax < iter->u32)
+               ups->LineMax = iter->u32;
+         }
+         ups->LineMax /= 10;
+         Dmsg1(80, "CI_VMAX= %g\n", ups->LineMax);
+      } else {
+         Dmsg0(80, "CI_VMAX: empty reply received");
+      }
       break;
 
-   case CI_VMIN:
-      Dmsg1(80, "Got CI_VMIN: %d\n", data.u32);
-      ups->LineMin =  ((double)data.u32) / 10;
+   case CI_VMIN: // take minimum of sequence values
+      if (data.seq.begin() != data.seq.end()) {
+         ups->LineMin = data.seq.begin()->u32;
+         for (alist<Snmp::Variable>::iterator iter = data.seq.begin();
+              iter != data.seq.end();
+              ++iter) {
+            Dmsg1(80, "Got CI_VMIN: %d\n", iter->u32);
+            if (ups->LineMin > iter->u32)
+               ups->LineMin = iter->u32;
+         }
+         ups->LineMin /= 10;
+         Dmsg1(80, "CI_VMIN= %g\n", ups->LineMin);
+      } else {
+         Dmsg0(80, "CI_VMIN: empty reply received");
+      }
       break;
 
-   case CI_VOUT:
-      Dmsg1(80, "Got CI_VOUT: %d\n", data.u32);
-      ups->OutputVoltage =  ((double)data.u32) / 10;
+   case CI_VOUT: // take only first value of sequence
+      if (data.seq.begin() != data.seq.end()) {
+         ups->OutputVoltage = ((double)data.seq.begin()->u32) / 10;
+         for (alist<Snmp::Variable>::iterator iter = data.seq.begin();
+              iter != data.seq.end();
+              ++iter)
+            Dmsg1(80, "Got CI_VOUT: %d\n", iter->u32);
+      } else {
+         Dmsg0(80, "CI_VMIN: empty reply received");
+      }
       break;
 
    case CI_BATTLEV:
@@ -167,13 +199,33 @@ static void mge_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       break;
 
    case CI_LOAD:
-      Dmsg1(80, "Got CI_LOAD: %d\n", data.u32);
-      ups->UPSLoad = data.u32;
+      // caclulate the arithmetic average of all sequence values
+      if (data.seq.begin() != data.seq.end()) {
+         ups->UPSLoad = 0;
+         for (alist<Snmp::Variable>::iterator iter = data.seq.begin();
+              iter != data.seq.end();
+              ++iter)
+         {
+            Dmsg1(80, "Got CI_LOAD: %d\n", iter->u32);
+            ups->UPSLoad += iter->u32;
+         }
+         ups->UPSLoad /= data.seq.size();
+         Dmsg1(80, "CI_LOAD= %g\n", ups->UPSLoad);
+      } else {
+         Dmsg0(80, "CI_LOAD: empty reply received");
+      }
       break;
 
-   case CI_FREQ:
-      Dmsg1(80, "Got CI_FREQ: %d\n", data.u32);
-      ups->LineFreq = ((double)data.u32) / 10;
+   case CI_FREQ: // take only first value of sequence
+      if (data.seq.begin() != data.seq.end()) {
+         ups->LineFreq = ((double)data.seq.begin()->u32) / 10;
+         for (alist<Snmp::Variable>::iterator iter = data.seq.begin();
+              iter != data.seq.end();
+              ++iter)
+            Dmsg1(80, "Got CI_FREQ: %d\n", iter->u32);
+      } else {
+         Dmsg0(80, "CI_FREQ: empty reply received");
+      }
       break;
 
    case CI_RUNTIM:
@@ -286,7 +338,7 @@ static void mge_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       break;
 
    case CI_Boost:
-      Dmsg1(200, "CI_Boost: %d\n", data.u32);
+      Dmsg1(200, "Got CI_Boost: %d\n", data.u32);
       if (data.u32 == 1)
          ups->set_boost();
       else
@@ -294,7 +346,7 @@ static void mge_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       break;
 
    case CI_Trim:
-      Dmsg1(200, "CI_Trim(Buck): %d\n", data.u32);
+      Dmsg1(200, "Got CI_Trim(Buck): %d\n", data.u32);
       if (data.u32 == 1)
          ups->set_trim();
       else
