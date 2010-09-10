@@ -86,17 +86,15 @@ void apcupsd_terminate(int sig)
 {
    UPSINFO *ups = core_ups;
 
-   restore_signals();
-
    if (sig != 0)
-      log_event(ups, LOG_WARNING, "apcupsd exiting, signal %u\n", sig);
+      log_event(ups, LOG_WARNING, "apcupsd exiting, signal %u", sig);
 
+   clean_threads();
    clear_files();
    device_close(ups);
    delete_lockfile(ups);
    if (pidcreated)
       unlink(pidfile);
-   clean_threads();
    log_event(ups, LOG_WARNING, "apcupsd shutdown succeeded");
    destroy_ups(ups);
    closelog();

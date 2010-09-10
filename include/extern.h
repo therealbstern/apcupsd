@@ -186,11 +186,9 @@ extern char *smart_poll(char cmd, UPSINFO *ups);
 extern int fillUPS(UPSINFO *ups);
 
 /* In apcsignal.c */
-extern void init_timer(int timer, void (*fnhandler) (int));
 extern void init_signals(void (*handler) (int));
 extern void init_thread_signals(void);
 extern void restore_signals(void);
-extern void sleep_forever(void);
 
 /* In newups.c */
 extern UPSINFO *new_ups(void);

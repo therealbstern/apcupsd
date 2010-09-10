@@ -156,8 +156,6 @@ static void ptime(void)
  */
 void apctest_terminate(int sig)
 {
-   restore_signals();
-
    if (sig != 0) {
       ptime();
       pmsg("apctest exiting, signal %u\n", sig);
