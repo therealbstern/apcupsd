@@ -69,7 +69,7 @@ void clean_threads(void)
    for (i = 0; i < num_threads; i++) {
       if (!pthread_equal(my_tid, thread_id[i])) {
          pthread_cancel(thread_id[i]);
-         pthread_join(thread_id[i], NULL);
+         pthread_detach(thread_id[i]);
       }
    }
 }
