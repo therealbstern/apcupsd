@@ -14,7 +14,11 @@ consumption rates. Apcupsd is licensed under the GPL version 2.
 <p>
 
 <h2>Apcupsd Releases</h2>
-<h3><i><u>Stable:</u></i>&nbsp;3.14.8 (16 January 2010) [&nbsp;<a href="dl.php">Download</a>&nbsp;]</h3>
+<h3><i><u>Stable:</u></i>&nbsp;3.14.8 (16 January 2010)
+[&nbsp;<a href="https://sourceforge.net/projects/apcupsd/files/apcupsd%20-%20Stable/3.14.8/">Source</a>&nbsp;]
+[&nbsp;<a href="https://sourceforge.net/projects/apcupsd/files/rpms%20-%20Stable/3.14.8/">RPMs</a>&nbsp;]
+[&nbsp;<a href="https://sourceforge.net/projects/apcupsd/files/win-binaries%20-%20Stable/3.14.8/">Windows</a>&nbsp;]
+[&nbsp;<a href="https://sourceforge.net/projects/apcupsd/files/osx-binaries%20-%20Stable/3.14.8/">OSX</a>&nbsp;]</h3>
 Release 3.14.8 brings a number of new features including...
 <ul>
 <li> Usability and appearance improvements for the Windows tray applet, apctray
