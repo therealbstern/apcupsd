@@ -10,7 +10,6 @@
 
 &nbsp;<br>
 <font color="#0000ff" size=+2><b>Downloads</b></font><br>
-<a href="dl.php">Packages</a><br>
 <a href="http://prdownloads.sourceforge.net/apcupsd">All Files</a><br>
 
 &nbsp;<br>
