@@ -33,7 +33,7 @@ static const char *snmplite_probe_community(UPSINFO *ups)
    struct snmplite_ups_internal_data *sid = 
       (struct snmplite_ups_internal_data *)ups->driver_internal_data;
 
-   const int sysDescrOid[] = {1, 3, 6, 1, 2, 1, 1, 1, 0, -1};
+   const int sysDescrOid[] = {1, 3, 6, 1, 2, 1, 1, 1, -1};
    const char *communityList[] = { "private", "public", NULL };
 
    Dmsg0(80, "Performing community autodetection\n");
@@ -161,11 +161,11 @@ int snmplite_ups_open(UPSINFO *ups)
          sid->traps = false;
 
          // Remove "NOTRAP" from vendor string
-         *ptr = '\0';
+         *ptr-- = '\0';
 
          // Remove optional underscore
-         if (ptr > sid->vendor && *(ptr-1) == '_')
-            *(ptr-1) = '\0';
+         if (ptr >= sid->vendor && *ptr == '_')
+            *ptr = '\0';
 
          // If nothing left, kill vendor to enable autodetect
          if (*sid->vendor == '\0')
@@ -367,8 +367,8 @@ static int snmplite_ups_update_cis(UPSINFO *ups, bool dynamic)
    if (!sid->snmp->Get(oids))
       return 0;
 
-   // Walk the OID map again to correlate results with CIs. Check that type 
-   // matches what we expect and invoke the update function to set the values.
+   // Walk the OID map again to correlate results with CIs and invoke the 
+   // update function to set the values.
    alist<Snmp::SnmpEngine::OidVar>::iterator iter = oids.begin();
    for (unsigned int i = 0; mib[i].ci != -1; i++)
    {
