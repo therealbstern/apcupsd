@@ -65,13 +65,16 @@ UPSCABLE @UPSCABLE@
 # dumb      /dev/tty**       Old serial character device for use with 
 #                            simple-signaling UPSes.
 #
-# pcnet     ipaddr:username:passphrase
+# pcnet     ipaddr:username:passphrase:port
 #                            PowerChute Network Shutdown protocol which can be 
 #                            used as an alternative to SNMP with the AP9617 
-#                            family of smart slot cards.ipaddr is the IP 
-#                            address of the UPS mgmtcard. username and 
+#                            family of smart slot cards. ipaddr is the IP 
+#                            address of the UPS management card. username and 
 #                            passphrase are the credentials for which the card 
-#                            has been configured.
+#                            has been configured. port is the port number on 
+#                            which to listen for messages from the UPS, normally 
+#                            3052. If this parameter is empty or missing, the 
+#                            default of 3052 will be used.
 #
 UPSTYPE @UPSTYPE@
 DEVICE @SERIALDEV@
