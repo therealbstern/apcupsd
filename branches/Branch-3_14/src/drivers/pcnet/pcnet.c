@@ -28,7 +28,7 @@
 #include <netinet/in.h>
 
 /* UPS broadcasts status packets to UDP port 3052 */
-#define PCNET_PORT   3052
+#define PCNET_DEFAULT_PORT 3052
 
 /*
  * Number of seconds with no data before we declare COMMLOST.
@@ -611,6 +611,7 @@ int pcnet_ups_open(UPSINFO *ups)
       ups->driver_internal_data = my_data;
    }
 
+   unsigned short port = PCNET_DEFAULT_PORT;
    if (ups->device[0] != '\0') {
       my_data->auth = true;
 
@@ -632,6 +633,16 @@ int pcnet_ups_open(UPSINFO *ups)
       my_data->pass = ptr;
       if (*ptr == '\0')
          Error_abort0("Malformed DEVICE [ip:user:pass]\n");
+
+      // Last segment is optional port number
+      ptr = strchr(ptr, ':');
+      if (ptr)
+      {
+         *ptr++ = '\0';
+         port = atoi(ptr);
+         if (port == 0)
+            port = PCNET_DEFAULT_PORT;
+      }
    }
 
    ups->fd = socket(PF_INET, SOCK_DGRAM, 0);
@@ -643,7 +654,7 @@ int pcnet_ups_open(UPSINFO *ups)
 
    memset(&addr, 0, sizeof(addr));
    addr.sin_family = AF_INET;
-   addr.sin_port = htons(PCNET_PORT);
+   addr.sin_port = htons(port);
    addr.sin_addr.s_addr = INADDR_ANY;
    if (bind(ups->fd, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
       close(ups->fd);
