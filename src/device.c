@@ -47,7 +47,7 @@
 #include "apc.h"
 
 /* Forward referenced function */
-//static int device_wait_time(UPSINFO *ups);
+static int device_wait_time(UPSINFO *ups);
 
 /*********************************************************************/
 void setup_device(UPSINFO *ups)
@@ -66,13 +66,13 @@ void setup_device(UPSINFO *ups)
    /* If create_lockfile fails there's no need to delete_lockfile. */
    if ((ups->fd != -1) && create_lockfile(ups) == LCKERROR) {
       device_close(ups);
-      Error_abort0(_("Unable to create UPS lock file.\n"
-                     "  If apcupsd or apctest is already running,\n"
-                     "  please stop it and run this program again.\n"));
+      Error_abort0("Unable to create UPS lock file.\n"
+                   "  If apcupsd or apctest is already running,\n"
+                   "  please stop it and run this program again.\n");
    }
 
-//   device_setup(ups);
-//   device_get_capabilities(ups);
+   device_setup(ups);
+   device_get_capabilities(ups);
 }
 
 /*********************************************************************/
@@ -81,7 +81,7 @@ void initiate_hibernate(UPSINFO *ups)
    FILE *pwdf;
    int killcount;
 
-   if (ups->mode.type <= SHAREBASIC) {
+   if (ups->mode.type == DUMB_UPS) {
       /* Make sure we are on battery */
       for (killcount = 0; killcount < 3; killcount++)
          device_read_volatile_data(ups);
@@ -95,35 +95,31 @@ void initiate_hibernate(UPSINFO *ups)
     * and if not, delete the PWRFAIL file.  Note, the code
     * above only tests UPS_onbatt flag for dumb UPSes.
     */
-    
+
    pwdf = fopen(ups->pwrfailpath, "r");
-   if ((pwdf == NULL && ups->mode.type != BK) ||
-       (pwdf == NULL && ups->is_onbatt() && ups->mode.type == BK)) {
-      
+   if ((pwdf == NULL && ups->mode.type != DUMB_UPS) ||
+       (pwdf == NULL && ups->is_onbatt() && ups->mode.type == DUMB_UPS)) {
+
       /*                                                  
        * At this point, we really should not be attempting
        * a kill power since either the powerfail file is
        * not defined, or we are not on batteries.
        */
-      
-      /* close the file if openned */
-      if (pwdf)
-         fclose(pwdf);
 
       /* Now complain */
       log_event(ups, LOG_WARNING,
-         _("Cannot find %s file.\n Killpower requested in "
+         "Cannot find %s file.\n Killpower requested in "
            "non-power fail condition or bug.\n Killpower request "
-           "ignored at %s:%d\n"), ups->pwrfailpath, __FILE__, __LINE__);
+           "ignored at %s:%d\n", ups->pwrfailpath, __FILE__, __LINE__);
       Error_abort3(
-         _("Cannot find %s file.\n Killpower requested in "
+         "Cannot find %s file.\n Killpower requested in "
            "non-power fail condition or bug.\n Killpower request "
-           "ignored at %s:%d\n"), ups->pwrfailpath, __FILE__, __LINE__);
+           "ignored at %s:%d\n", ups->pwrfailpath, __FILE__, __LINE__);
    } else {
       /* We are on batteries, so do the kill_power */
       if (ups->upsclass.type == SHAREMASTER) {
          log_event(ups, LOG_WARNING,
-            _("Waiting 30 seconds for slave(s) to shutdown."));
+            "Waiting 30 seconds for slave(s) to shutdown.");
          sleep(30);
       }
 
@@ -131,25 +127,13 @@ void initiate_hibernate(UPSINFO *ups)
       if (pwdf)
          fclose(pwdf);
 
-      log_event(ups, LOG_WARNING, _("Attempting to kill the UPS power!"));
+      log_event(ups, LOG_WARNING, "Attempting to kill the UPS power!");
 
-      if (ups->mode.type == BK) {
-         device_kill_power(ups);
+      if (ups->upsclass.type == SHARESLAVE) {
          sleep(10);
-
-         /*
-          * ***FIXME*** this really should not do a reboot here,
-          * but rather a halt or nothing -- KES
-          */
-         /*  generate_event(ups, CMDDOREBOOT); */
-
-         log_event(ups, LOG_WARNING, _("Perform CPU-reset or power-off"));
-         return;
-      } else if (ups->mode.type == SHAREBASIC) {
-         sleep(10);
-         log_event(ups, LOG_WARNING, _("Waiting For ShareUPS Master to shutdown"));
+         log_event(ups, LOG_WARNING, "Waiting For ShareUPS Master to shutdown");
          sleep(60);
-         log_event(ups, LOG_WARNING, _("Failed to have power killed by Master!"));
+         log_event(ups, LOG_WARNING, "Failed to have power killed by Master!");
 
          /*
           * ***FIXME*** this really should not do a reboot here,
@@ -157,10 +141,10 @@ void initiate_hibernate(UPSINFO *ups)
           */
          /* generate_event(ups, CMDDOREBOOT); */
 
-         log_event(ups, LOG_WARNING, _("Perform CPU-reset or power-off"));
+         log_event(ups, LOG_WARNING, "Perform CPU-reset or power-off");
          return;
       } else {
-         /* it must be a SmartUPS */
+         /* it must be a SmartUPS or BackUPS */
          device_kill_power(ups);
       }
    }
@@ -169,11 +153,10 @@ void initiate_hibernate(UPSINFO *ups)
 /*********************************************************************/
 void initiate_shutdown(UPSINFO *ups)
 {
-   log_event(ups, LOG_WARNING, _("Attempting to shutdown the UPS!"));
+   log_event(ups, LOG_WARNING, "Attempting to shutdown the UPS!");
    device_shutdown(ups);
 }
 
-#if 0
 /*
  * After the device is initialized, we come here
  * to read all the information we can about the UPS.
@@ -262,6 +245,8 @@ static int device_wait_time(UPSINFO *ups)
 
    if (ups->is_fastpoll() || !ups->is_battpresent())
       wait_time = TIMER_FAST;
+   else if (ups->is_commlost())
+      wait_time = TIMER_FAST*5;
    else
       wait_time = ups->polltime;    /* normally 60 seconds */
 
@@ -278,4 +263,3 @@ static int device_wait_time(UPSINFO *ups)
 
    return wait_time;
 }
-#endif

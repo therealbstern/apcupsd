@@ -351,7 +351,7 @@ static int usb_link_check(UPSINFO *ups)
 
 int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_info)
 {
-   int i, ci, phys, input, feature;
+   int i, ci, phys, input, feature, logi;
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
    hid_item_t item, witem;
    USB_INFO *info;
@@ -361,6 +361,7 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
    for (i = 0; known_info[i].usage_code; i++) {
       ci = known_info[i].ci;
       phys = known_info[i].physical;
+      logi = known_info[i].logical;
 
       if (ci != CI_NONE && !my_data->info[ci]) {
          /* Try to find an INPUT report containing this usage */
@@ -369,7 +370,7 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
             known_info[i].usage_code,     /* Match usage code */
             -1,                           /* Don't care about application */
             (phys == P_ANY) ? -1 : phys,  /* Match physical usage */
-            -1,                           /* Don't care about logical */
+            (logi == P_ANY) ? -1 : logi,  /* Match logical usage */
             HID_KIND_INPUT,               /* Match feature type */
             &item);
 
@@ -379,7 +380,7 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
             known_info[i].usage_code,     /* Match usage code */
             -1,                           /* Don't care about application */
             (phys == P_ANY) ? -1 : phys,  /* Match physical usage */
-            -1,                           /* Don't care about logical */
+            (logi == P_ANY) ? -1 : logi,  /* Match logical usage */
             HID_KIND_FEATURE,             /* Match feature type */
             &witem);
 
@@ -400,7 +401,7 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
          info = (USB_INFO *)malloc(sizeof(USB_INFO));
          if (!info) {
             write_unlock(ups);
-            Error_abort0(_("Out of memory.\n"));
+            Error_abort0("Out of memory.\n");
          }
 
          // Use INPUT report as the main readable report
@@ -726,13 +727,13 @@ int pusb_ups_open(UPSINFO *ups)
    if (!open_usb_device(ups)) {
       write_unlock(ups);
       if (ups->device[0]) {
-         Error_abort1(_("Cannot open UPS device: \"%s\" --\n"
+         Error_abort1("Cannot open UPS device: \"%s\" --\n"
                "For a link to detailed USB trouble shooting information,\n"
-               "please see <http://www.apcupsd.com/support.html>.\n"), ups->device);
+               "please see <http://www.apcupsd.com/support.html>.\n", ups->device);
       } else {
-         Error_abort0(_("Cannot find UPS device --\n"
+         Error_abort0("Cannot find UPS device --\n"
                "For a link to detailed USB trouble shooting information,\n"
-               "please see <http://www.apcupsd.com/support.html>.\n"));
+               "please see <http://www.apcupsd.com/support.html>.\n");
       }
    }
 

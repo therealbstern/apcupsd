@@ -5,7 +5,6 @@
  */
 
 /*
- * Copyright (C) 2007-2008 Adam Kropelin
  * Copyright (C) 2000-2004 Kern Sibbald
  * Copyright (C) 1996-1999 Andre M. Hedrick <andre@suse.com>
  * Copyright (C) 1999-2000 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
@@ -26,7 +25,6 @@
  */
 
 #include "apc.h"
-#include "statemachine.h"
 
 extern int kill_on_powerfail;
 static void do_shutdown(UPSINFO *ups, int cmdtype);
@@ -63,31 +61,31 @@ UPSCOMMANDS ups_event[] = {
  * and the defines in include/apc_defines.h 
  */
 UPSCMDMSG event_msg[] = {
-   {LOG_CRIT,    N_("Power failure.")},
-   {LOG_CRIT,    N_("Running on UPS batteries.")},
-   {LOG_ALERT,   N_("Battery power exhausted.")},
-   {LOG_ALERT,   N_("Reached run time limit on batteries.")},
-   {LOG_ALERT,   N_("Battery charge below low limit.")},
-   {LOG_ALERT,   N_("Reached remaining time percentage limit on batteries.")},
-   {LOG_ALERT,   N_("Initiating system shutdown!")},
-   {LOG_ALERT,   N_("Power is back. UPS running on mains.")},
-   {LOG_ALERT,   N_("Users requested to logoff.")},
-   {LOG_ALERT,   N_("Battery failure. Emergency.")},
-   {LOG_CRIT,    N_("UPS battery must be replaced.")},
-   {LOG_CRIT,    N_("Remote shutdown requested.")},
-   {LOG_WARNING, N_("Communications with UPS lost.")},
-   {LOG_WARNING, N_("Communications with UPS restored.")},
-   {LOG_WARNING, N_("UPS Self Test switch to battery.")},
-   {LOG_WARNING, N_("UPS Self Test completed.")},
-   {LOG_CRIT,    N_("Mains returned. No longer on UPS batteries.")},
-   {LOG_CRIT,    N_("Battery disconnected.")},
-   {LOG_CRIT,    N_("Battery reattached.")}
+   {LOG_CRIT,    "Power failure."},
+   {LOG_CRIT,    "Running on UPS batteries."},
+   {LOG_ALERT,   "Battery power exhausted."},
+   {LOG_ALERT,   "Reached run time limit on batteries."},
+   {LOG_ALERT,   "Battery charge below low limit."},
+   {LOG_ALERT,   "Reached remaining time percentage limit on batteries."},
+   {LOG_ALERT,   "Initiating system shutdown!"},
+   {LOG_ALERT,   "Power is back. UPS running on mains."},
+   {LOG_ALERT,   "Users requested to logoff."},
+   {LOG_ALERT,   "Battery failure. Emergency."},
+   {LOG_CRIT,    "UPS battery must be replaced."},
+   {LOG_CRIT,    "Remote shutdown requested."},
+   {LOG_WARNING, "Communications with UPS lost."},
+   {LOG_WARNING, "Communications with UPS restored."},
+   {LOG_WARNING, "UPS Self Test switch to battery."},
+   {LOG_WARNING, "UPS Self Test completed."},
+   {LOG_CRIT,    "Mains returned. No longer on UPS batteries."},
+   {LOG_CRIT,    "Battery disconnected."},
+   {LOG_CRIT,    "Battery reattached."}
 };
 
 void generate_event(UPSINFO *ups, int event)
 {
    /* Log message and execute script for this event */
-   log_event(ups, event_msg[event].level, _(event_msg[event].msg));
+   log_event(ups, event_msg[event].level, event_msg[event].msg);
    Dmsg2(80, "calling execute_ups_event %s event=%d\n", ups_event[event], event);
    execute_command(ups, ups_event[event]);
 
@@ -108,7 +106,7 @@ void generate_event(UPSINFO *ups, int event)
    case CMDEMERGENCY:
    case CMDREMOTEDOWN:
       log_event(ups, event_msg[CMDDOSHUTDOWN].level,
-         _(event_msg[CMDDOSHUTDOWN].msg));
+         event_msg[CMDDOSHUTDOWN].msg);
       do_shutdown(ups, CMDDOSHUTDOWN);
       break;
 
@@ -197,7 +195,7 @@ static void prohibit_logins(UPSINFO *ups)
    logonfail(ups, 0);
    ups->nologin_file = true;
 
-   log_event(ups, LOG_ALERT, _("User logins prohibited"));
+   log_event(ups, LOG_ALERT, "User logins prohibited");
 }
 
 static void do_shutdown(UPSINFO *ups, int cmdtype)
@@ -238,7 +236,6 @@ static void do_shutdown(UPSINFO *ups, int cmdtype)
       powerfail(2);
 }
 
-#if 0
 /* These are the different "states" that the UPS can be in. */
 enum a_state {
    st_PowerFailure,
@@ -273,7 +270,6 @@ static enum a_state get_state(UPSINFO *ups, time_t now)
    }
    return state;
 }
-#endif
 
 static const char *testresult_to_string(SelfTestResult res)
 {
@@ -300,7 +296,6 @@ static const char *testresult_to_string(SelfTestResult res)
    }
 }
 
-#if 0
 /*
  * Carl Lindberg <lindberg@clindberg.org> patch applied 24Dec04
  *
@@ -612,7 +607,7 @@ void do_action(UPSINFO *ups)
 
          /* Get last selftest results, only for smart UPSes. */
          device_entry_point(ups, DEVICE_CMD_GET_SELFTEST_MSG, NULL);
-         log_event(ups, LOG_ALERT, _("UPS Self Test completed: %s"),
+         log_event(ups, LOG_ALERT, "UPS Self Test completed: %s",
             testresult_to_string(ups->testresult));
          execute_command(ups, ups_event[CMDENDSELFTEST]);
       } else {
@@ -620,7 +615,7 @@ void do_action(UPSINFO *ups)
       }
 
       if (ups->nologin_file)
-         log_event(ups, LOG_ALERT, _("Allowing logins"));
+         log_event(ups, LOG_ALERT, "Allowing logins");
 
       logonfail(ups, 1);
       ups->nologin_file = false;
@@ -652,398 +647,4 @@ void do_action(UPSINFO *ups)
    ups->PrevStatus = ups->Status;
 
    write_unlock(ups);
-}
-#endif
-
-#define MAX_SELFTEST_TIME_MSEC   40000
-#define SHUTDOWN_DEBOUNCE_MSEC   5000
-
-UpsStateMachine::UpsStateMachine(UPSINFO *ups)
-   : _ups(ups),
-     _state(STATE_IDLE)
-{
-   // Populate state array
-   _states[STATE_IDLE] = new StateIdle(*this);
-   _states[STATE_ONBATT] = new StateOnbatt(*this);
-   _states[STATE_SELFTEST] = new StateSelftest(*this);
-   _states[STATE_SHUTDOWN_LOADLIMIT] = new StateShutdown(*this, CMDLOADLIMIT);
-   _states[STATE_SHUTDOWN_RUNLIMIT] = new StateShutdown(*this, CMDRUNLIMIT);
-   _states[STATE_SHUTDOWN_BATTLOW] = new StateShutdown(*this, CMDFAILING);
-}
-
-UpsStateMachine::~UpsStateMachine()
-{
-   // Signal thread to exit
-   EventQuit *event = new EventQuit();
-   _events.enqueue(event);
-
-   // Wait for thread termination
-   join();
-
-   // Unregister for UPSINFO events
-   _ups->info.unregclient(this);
-
-   // Free any remaining events
-   BaseEvent *tmp = NULL;
-   while (!_events.empty())
-   {
-      _events.dequeue(tmp);
-      delete tmp;
-   }
-
-   // Free state classes
-   for (unsigned int i=0; i < ARRAY_SIZE(_states); i++)
-   {
-      delete _states[i];
-      _states[i] = NULL;
-   }
-}
-
-void UpsStateMachine::Start()
-{
-   // Enter initial state
-   _states[_state]->OnEnter();
-
-   // Register for UPSINFO to feed us events
-   _ups->info.regclient(this);
-
-   // Start event processing thread
-   run();
-}
-
-// Callback from one of our state classes requesting that we
-// change the current state. Invoke exit/enter handlers for
-// current and new states.
-void UpsStateMachine::ChangeState(int newstate)
-{
-   Dmsg2(100, "UpsStateMachine::ChangeState current=%s, new=%s\n",
-      StateToText(_state), StateToText(newstate));
-
-   // Exit current state and enter new state
-   _states[_state]->OnExit();
-   _state = newstate;
-   _states[_state]->OnEnter();
-}
-
-const char *UpsStateMachine::StateToText(int state)
-{
-   switch (state)
-   {
-   case STATE_IDLE:               return "IDLE";
-   case STATE_ONBATT:             return "ONBATT";
-   case STATE_SHUTDOWN_LOADLIMIT: return "SHUTDOWN_LOADLIMIT";
-   case STATE_SHUTDOWN_RUNLIMIT:  return "SHUTDOWN_RUNLIMIT";
-   case STATE_SHUTDOWN_BATTLOW:   return "SHUTDOWN_BATTLOW";
-   case STATE_SELFTEST:           return "SELFTEST";
-   default:                       return "UNKNOWN";
-   }
-}
-
-// Callback from timer indicating that a timer expired.
-// Post an event for this timer and let task loop act on it.
-void UpsStateMachine::HandleTimeout(int id)
-{
-   EventTimeout *event = new EventTimeout(id);
-   _events.enqueue(event);
-}
-
-// Callback from UpsInfo database indicating a new datum
-// has arrived. Post an event for this datum and let the
-// task loop act on it.
-void UpsStateMachine::HandleUpsDatum(const UpsDatum &datum)
-{
-   EventUpsDatum *event = new EventUpsDatum(datum);
-   _events.enqueue(event);
-}
-
-// Main task loop: Dequeues events and processes them thru
-// the state machine.
-void UpsStateMachine::body()
-{
-   bool quit = false;
-   while (!quit)
-   {
-      // Wait for an event to arrive
-      BaseEvent *event;
-      if (!_events.dequeue(event))
-         break;
-
-      if (event->type() == EVENT_UPSDATUM)
-      {
-         const UpsDatum &datum = ((EventUpsDatum *)event)->datum();
-
-         Dmsg3(100, "UpsStateMachine dequeued %s=%s in state=%s\n",
-            CItoString(datum.ci), datum.value.format().str(),
-            StateToText(_state));
-
-         // Invoke "any state" handler, and if that does not consume
-         // the event, call the handler for the current state.
-         if (!HandleEventStateAny(datum))
-            _states[_state]->OnDatum(datum);
-      }
-      else if (event->type() == EVENT_TIMEOUT)
-      {
-         // Invoke the timeout handler for the current state.
-         int id = ((EventTimeout *)event)->id();
-         _states[_state]->OnTimeout(id);
-      }
-      else if (event->type() == EVENT_QUIT)
-      {
-         // We've been asked to exit
-         quit = true;
-      }
-
-      // Event was dynamically allocated before being pushed
-      // onto the queue. We have to deallocate when done with it.
-      delete event;
-   }
-}
-
-bool UpsStateMachine::HandleEventStateAny(const UpsDatum &event)
-{
-   if (event.ci == CI_BatteryPresent)
-   {
-      generate_event(_ups, event.value ? CMDBATTATTACH : CMDBATTDETACH);
-      return true;
-   }
-
-   return false;
-}
-
-//******************************************************************************
-// IDLE
-//******************************************************************************
-void UpsStateMachine::StateIdle::OnEnter()
-{
-   // If we're already running on battery go straight to POWERFAIL
-   UpsValue value;
-   if (_parent._ups->info.get(CI_Discharging, value) && value)
-      ChangeState(STATE_ONBATT);
-}
-
-void UpsStateMachine::StateIdle::OnDatum(const UpsDatum &event)
-{
-   switch (event.ci)
-   {
-   case CI_Discharging:
-      if (event.value)
-      {
-         // We're running on battery, transition to POWERFAIL
-         ChangeState(STATE_ONBATT);
-      }
-      break;
-   case CI_ST_STAT:
-      if (event.value.lval() == TEST_INPROGRESS)
-      {
-         ChangeState(STATE_SELFTEST);
-      }
-      break;
-   }
-}
-
-void UpsStateMachine::StateIdle::OnExit()
-{
-}
-
-void UpsStateMachine::StateIdle::OnTimeout(int id)
-{
-}
-
-//******************************************************************************
-// ONBATT
-//******************************************************************************
-void UpsStateMachine::StateOnbatt::OnEnter()
-{
-   time_t now = time(NULL);
-   _parent._ups->last_time_on_line = now;
-   _parent._ups->last_onbatt_time = now;
-   _parent._ups->last_time_nologon = now;
-   _parent._ups->last_time_annoy = now;
-   _parent._ups->num_xfers++;
-
-   // Throw powerout event immediately
-   generate_event(_parent._ups, CMDPOWEROUT);
-
-   // Set a timer to post onbattery event after configured delay.
-   // If delay is <= 0, timer will fire immediately
-   _onbattery_posted = false;
-   _timer_onbatt.start(_parent._ups->onbattdelay * 1000);
-
-   // Enable DTR on dumb UPSes with CUSTOM_SIMPLE cable
-   device_entry_point(_parent._ups, DEVICE_CMD_DTR_ENABLE, NULL);
-
-   // Check current state of various shutdown triggers and begin
-   // timers to transition to SHUTDOWN if necessary.
-   CheckShutdown();
-
-   // Set timer to trigger on TIMEOUT (max time on battery) expiration.
-   if (_parent._ups->maxtime > 0)
-      _timer_timelimit.start(_parent._ups->maxtime * 1000);
-}
-
-void UpsStateMachine::StateOnbatt::OnDatum(const UpsDatum &event)
-{
-   switch (event.ci)
-   {
-   case CI_Discharging:
-      if (!event.value)
-      {
-         time_t now = time(NULL);
-         _parent._ups->last_offbatt_time = now;
-         _parent._ups->cum_time_on_batt += (now - _parent._ups->last_onbatt_time);
-
-         // No longer discharging; post events and transition back to IDLE
-         if (_onbattery_posted)
-            generate_event(_parent._ups, CMDOFFBATTERY);
-         generate_event(_parent._ups, CMDMAINSBACK);
-         ChangeState(STATE_IDLE);
-      }
-      break;
-   case CI_BATTLEV: // Shutdown due to battery charge percent?
-   case CI_RUNTIM:  // Shutdown due to runtime remaining?
-   case CI_BattLow: // Shutdown due to LowBatt signal?
-      CheckShutdown();
-      break;
-   }
-}
-
-void UpsStateMachine::StateOnbatt::OnExit()
-{
-   // Stop all timers that might be running
-   _timer_timelimit.stop();
-   _timer_runlimit.stop();
-   _timer_battlow.stop();
-   _timer_loadlimit.stop();
-   _timer_onbatt.stop();
-}
-
-void UpsStateMachine::StateOnbatt::OnTimeout(int id)
-{
-   switch (id)
-   {
-   case TIMER_ONBATT_EVENT:
-      _onbattery_posted = true;
-      generate_event(_parent._ups, CMDONBATTERY);
-      break;
-   case TIMER_ONBATT_TIMELIMIT:
-   case TIMER_ONBATT_RUNLIMIT:
-      ChangeState(STATE_SHUTDOWN_RUNLIMIT);
-      break;
-   case TIMER_ONBATT_BATTLOW:
-      ChangeState(STATE_SHUTDOWN_BATTLOW);
-      break;
-   case TIMER_ONBATT_LOADLIMIT:
-      ChangeState(STATE_SHUTDOWN_LOADLIMIT);
-      break;
-   default:
-      break;   // Stale timer from another state
-   }
-}
-
-void UpsStateMachine::StateOnbatt::CheckShutdown()
-{
-   // Check to see if we need to start any of our shutdown timers.
-   // (Starting a timer that is already started has no effect.)
-   //
-   // We use timers instead of immediately transitioning to SHUTDOWN
-   // in order to provide some "debounce" of the shutdown trigger.
-   // For example, BATTLOW can be signaled briefly when first transitioning
-   // on battery, and we do not want to shutdown unless it persists for
-   // a few seconds.
-
-   UpsValue value;
-   if (_parent._ups->info.get(CI_BATTLEV, value) &&
-       (value / 10) <= _parent._ups->percent)
-   {
-      _timer_loadlimit.start(SHUTDOWN_DEBOUNCE_MSEC);
-   }
-
-   if (_parent._ups->info.get(CI_RUNTIM, value) &&
-       (value / 60) <= _parent._ups->runtime)
-   {
-      _timer_runlimit.start(SHUTDOWN_DEBOUNCE_MSEC);
-   }
-
-   if (_parent._ups->info.get(CI_BattLow, value) && value)
-   {
-      _timer_battlow.start(SHUTDOWN_DEBOUNCE_MSEC);
-   }
-}
-
-//******************************************************************************
-// SELFTEST
-//******************************************************************************
-void UpsStateMachine::StateSelftest::OnEnter()
-{
-   generate_event(_parent._ups, CMDSTARTSELFTEST);
-
-   // Grab current time as last selftest time
-   time_t now = time(NULL);
-   _parent._ups->LastSelfTest = now;
-
-   // Set a timer to take us to POWERFAIL if the selftest does not complete
-   _timer.start(MAX_SELFTEST_TIME_MSEC);
-}
-
-void UpsStateMachine::StateSelftest::OnDatum(const UpsDatum &event)
-{
-   if (event.ci == CI_ST_STAT && event.value.lval() != TEST_INPROGRESS)
-   {
-      _timer.stop();
-
-      log_event(_parent._ups, LOG_ALERT, _("UPS Self Test completed: %s"),
-         testresult_to_string((SelfTestResult)event.value.lval()));
-      execute_command(_parent._ups, ups_event[CMDENDSELFTEST]);
-
-      ChangeState(STATE_IDLE);
-   }
-}
-
-void UpsStateMachine::StateSelftest::OnExit()
-{
-}
-
-void UpsStateMachine::StateSelftest::OnTimeout(int id)
-{
-   // Only expect one timer id. Anything else is a stale event.
-   if (id != TIMER_SELFTEST)
-      return;
-
-   // We've exceeded the maximum selftest time, transition to ONBATTERY
-   // if we're still running on battery. Otherwise we just didn't get the
-   // test result for some reason, so just go back to IDLE.
-   if (_parent._ups->is_onbatt())
-   {
-      Dmsg0(80, "UPS Self Test timeout, fall-thru to On Battery.\n");
-      ChangeState(STATE_ONBATT);
-   }
-   else
-   {
-      Dmsg0(80, "UPS Self Test timeout, CI_ST_STAT not reported.\n");
-
-      log_event(_parent._ups, LOG_ALERT, _("UPS Self Test completed: TIMEOUT"));
-      execute_command(_parent._ups, ups_event[CMDENDSELFTEST]);
-
-      ChangeState(STATE_IDLE);
-   }
-}
-
-//******************************************************************************
-// SHUTDOWN
-//******************************************************************************
-void UpsStateMachine::StateShutdown::OnEnter()
-{
-//   generate_event(_parent._ups, _sdowncmd);
-}
-
-void UpsStateMachine::StateShutdown::OnDatum(const UpsDatum &event)
-{
-}
-
-void UpsStateMachine::StateShutdown::OnExit()
-{
-}
-
-void UpsStateMachine::StateShutdown::OnTimeout(int id)
-{
 }

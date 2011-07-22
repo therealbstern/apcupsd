@@ -1,5 +1,5 @@
 /*
- * $Id: hid-ups.c,v 1.14 2007-09-30 19:49:41 adk0212 Exp $
+ * $Id: hid-ups.c,v 1.13.2.2 2007-07-17 22:54:25 adk0212 Exp $
  *
  *  Copyright (c) 2001 Vojtech Pavlik <vojtech@ucw.cz>
  *  Copyright (c) 2001 Paul Stewart <hiddev@wetlogic.net>

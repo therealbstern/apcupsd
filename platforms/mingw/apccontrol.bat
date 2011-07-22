@@ -19,7 +19,18 @@ rem Paths to important executables
 SET APCUPSD="%sbindir%\apcupsd"
 SET SHUTDOWN="%sbindir%\shutdown"
 SET BACKGROUND="%sbindir%\background"
-SET POPUP=%BACKGROUND% "%sbindir%\popup"
+
+rem Only do popups on Win95/98/ME/NT. All other platforms support 
+rem balloon notifications which are provided by apctray.
+SET POPUP=echo
+VER | FIND /I "Windows 95" > NUL
+IF NOT ERRORLEVEL 1 SET POPUP=%BACKGROUND% "%sbindir%\popup"
+VER | FIND /I "Windows 98" > NUL
+IF NOT ERRORLEVEL 1 SET POPUP=%BACKGROUND% "%sbindir%\popup"
+VER | FIND /I "Windows ME" > NUL
+IF NOT ERRORLEVEL 1 SET POPUP=%BACKGROUND% "%sbindir%\popup"
+VER | FIND /I "Windows NT" > NUL
+IF NOT ERRORLEVEL 1 SET POPUP=%BACKGROUND% "%sbindir%\popup"
 
 rem
 rem This piece is to substitute the default behaviour with your own script,
