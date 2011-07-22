@@ -8,6 +8,513 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2011-05-19 18:55  adk0212
+
+	* platforms/etc/apcupsd.conf.in, src/drivers/pcnet/pcnet.c:
+
+	Add support for changing PCNET port in apcupsd.conf
+
+2011-05-15 19:07  adk0212
+
+	* platforms/darwin/Info.plist:
+
+	Add PIDs for AP9620 LCC
+
+2011-05-15 19:04  adk0212
+
+	* src/drivers/snmplite/snmplite.cpp:
+
+	Fix community probing, misc cleanup
+
+2011-01-06 10:24  adk0212
+
+	* doc/home-page/: bugs.html, index.html, index.wml, license.html,
+	lists.html, menu.inc, support.html, systems.html:
+
+	Fix download links on web site; sf.net change the page format again
+	so dl.php no longer works
+
+2010-09-17 08:44  adk0212
+
+	* src/lib/apcexec.c:
+
+	Change back so we no longer wait for threads to exit. This is
+	necessary because pthread_cancel on OS X does not interrupt
+	blocking calls, even those defined as cancellation points by SuSv3.
+	Argh. Someday we need to fix apcupsd thread shutdown correctly, but
+	for now this is no worse than before.
+
+2010-09-10 10:50  adk0212
+
+	* include/extern.h, src/apctest.c, src/apcupsd.c,
+	src/lib/apcexec.c, src/lib/apcsignal.c,
+	src/win32/compat/compat.cpp:
+
+	Rework signal handling to eliminate crashes and hangs. Old signal
+	handler was doing many things wrong: calling unsafe functions in
+	signal context, freeing memory before ensuring users were gone,
+	invoking functions that lock the UPSINFO mutex resulting in
+	deadlock if it's already locked, etc.  FIx all this by using a
+	signal handling thread waiting on sigwait() in place of raw
+	handler.
+
+2010-09-10 08:32  adk0212
+
+	* src/drivers/snmplite/snmp.cpp:
+
+	Use "iter->" instead of "(*iter)."
+
+2010-09-10 08:30  adk0212
+
+	* src/drivers/snmplite/: mge-mib.cpp, mge-oids.h:
+
+	Update MGE MIB handler for SNMP sequence support.  Contributed by
+	Lars Taeuber <taeuber@bbaw.de>
+
+2010-09-09 09:40  adk0212
+
+	* src/drivers/apcsmart/smartoper.c:
+
+	Fix shutdown command when utility power has been restored.
+	Contributed by Michal Soltys <soltys@ziu.info>
+
+2010-09-09 09:17  adk0212
+
+	* src/apctest.c:
+
+	Prevent apctest from locking up on UPSes that do not respond (at
+	all) to the 'a' command. Contributed by Michal Soltys
+	<soltys@ziu.info>
+
+2010-09-09 09:12  adk0212
+
+	* include/apc.h, include/apc_i18n.h, src/action.c, src/apcnis.c,
+	src/apctest.c, src/apcupsd.c, src/device.c, src/devicedbg.c,
+	src/options.c, src/reports.c, src/drivers/apcsmart/smarteeprom.c,
+	src/drivers/apcsmart/smartoper.c,
+	src/drivers/apcsmart/smartsetup.c, src/drivers/dumb/dumboper.c,
+	src/drivers/dumb/dumbsetup.c, src/drivers/pcnet/pcnet.c,
+	src/drivers/test/testdriver.c, src/drivers/usb/bsd/bsd-usb.c,
+	src/drivers/usb/generic/generic-usb.c,
+	src/drivers/usb/linux/linux-usb.c, src/gapcmon/eggtrayicon.c,
+	src/lib/apcconfig.c, src/lib/apcerror.c, src/lib/apcevents.c,
+	src/lib/apcexec.c, src/lib/asys.c, src/lib/newups.c,
+	src/win32/winservice.cpp:
+
+	Remove remaining NLS artifacts
+
+2010-09-08 19:25  adk0212
+
+	* include/struct.h, src/apctest.c, src/apcupsd.c, src/device.c,
+	src/reports.c, src/drivers/drivers.c, src/drivers/apcsmart/smart.c,
+	src/drivers/apcsmart/smartoper.c,
+	src/drivers/apcsmart/smartsetup.c, src/drivers/dumb/dumboper.c,
+	src/lib/apcconfig.c, src/lib/apcstatus.c:
+
+	Remove obsolete mode types and simplify cable vs. mode
+	disambiguation logic. UPSTYPE wins. UPSCABLE is only used for dumb
+	driver. Remove a bit of screwy BackUPS Pro and v/s logic that is
+	long obsolete.
+
+2010-09-08 19:23  adk0212
+
+	* doc/manual/smartprotocol.rst:
+
+	Minor update to K command
+
+2010-09-08 15:06  adk0212
+
+	* src/drivers/snmplite/rfc1628-mib.cpp:
+
+	Average LOADPCT across all lines rather than summing them since
+	mfgrs appear to not be adhering to the spec very closely.
+
+2010-09-08 14:44  adk0212
+
+	* src/drivers/snmplite/: apc-oids.h, rfc1628-oids.h, snmp.cpp:
+
+	Use GETNEXT instead of GET so OIDs no longer need trailing zero.
+
+2010-09-07 11:35  adk0212
+
+	* src/drivers/snmplite/: apc-oids.h, asn.cpp, asn.h,
+	rfc1628-mib.cpp, rfc1628-oids.h, snmp.cpp, snmp.h, snmplite.cpp:
+
+	Add support for fetching SNMP table columns as sequences and use it
+	in RFC1628 MIB support.
+
+2010-09-03 16:36  adk0212
+
+	* doc/manual/: manual.html, manual.rst:
+
+	Fix misformatted path due to missing back-tick
+
+2010-09-03 16:33  adk0212
+
+	* doc/manual/: manual.html, manual.rst:
+
+	Update manual for Ed Dondlinger's Windows email scripts
+
+2010-09-03 16:18  adk0212
+
+	* doc/manual/: manual.html, manual.rst:
+
+	More updates for new winusb driver
+
+2010-09-03 16:13  adk0212
+
+	* doc/manual/: manual.html, manual.rst:
+
+	Update supported OSes list...USB on x86_64 Windows is now
+	supported. USB on Win98/ME/2000 is no longer supported.
+
+2010-09-03 14:41  adk0212
+
+	* src/win32/Makefile.in:
+
+	Fix snmplite build on win32 by adding missing mge-mib
+
+2010-09-03 14:40  adk0212
+
+	* platforms/mingw/commfailure.vbs, platforms/mingw/offbattery.vbs,
+	platforms/mingw/onbattery.vbs, src/win32/installer/winapcupsd.nsi:
+
+	Add Windows email scripts and include them in win32 installs as
+	examples Contributed by Ed Dondlinger
+	<edondlinger@thepylegroup.com>
+
+2010-09-02 15:31  adk0212
+
+	* src/drivers/snmplite/rfc1628-mib.cpp:
+
+	Reorder cases so they are in numerical order
+
+2010-09-02 15:29  adk0212
+
+	* src/drivers/snmplite/rfc1628-mib.cpp:
+
+	Add missing break
+
+2010-09-02 15:26  adk0212
+
+	* src/drivers/snmplite/rfc1628-mib.cpp:
+
+	Minor correction to low battery logic: Depleted also counts as low.
+
+2010-09-02 15:05  adk0212
+
+	* src/drivers/snmplite/rfc1628-oids.h:
+
+	Missed a couple with table workaround
+
+2010-09-02 14:51  adk0212
+
+	* src/drivers/snmplite/rfc1628-oids.h:
+
+	Workaround for line in and line out data on RFC MIB. Blindly use
+	first index in table.
+
+2010-09-02 10:23  adk0212
+
+	* configure, autoconf/configure.in:
+
+	docutils appears to no longer include a rst2html wrapper for
+	rst2html.py.  Update configure accordingly.
+
+2010-09-02 10:22  adk0212
+
+	* autoconf/variables.mak.in:
+
+	Enable generation of footnotes at the bottom of the page in
+	rst2pdf.
+
+2010-09-02 09:26  adk0212
+
+	* doc/manual/: manual.html, manual.rst:
+
+	Update SNMP section
+
+2010-09-02 08:27  adk0212
+
+	* src/drivers/snmplite/: snmp.h, snmplite.cpp:
+
+	Add community probing
+
+2010-09-01 13:14  adk0212
+
+	* src/drivers/snmplite/snmplite.cpp:
+
+	Screen out LTRANS, HTRANS, NOMOUTV, NOMINV, NOMPOWER which are
+	reading zero via an RFC1628 Generex CS121 on a Newave Conceptpower
+	DPA UPS.
+
+2010-09-01 08:41  adk0212
+
+	* src/drivers/snmplite/snmplite.cpp:
+
+	Fix compile error on newer glibc. Passing a const for the first
+	argument of strstr() causes the return value to be const. This is
+	Correct (TM) but annoying in this case. So just cast away the
+	constness of the first arg.
+
+2010-08-31 19:17  adk0212
+
+	* src/drivers/snmplite/snmplite.cpp:
+
+	Remove unnecessary checks for NULL oid. Verify returned data type
+	matches expectation.
+
+2010-08-31 14:57  adk0212
+
+	* src/drivers/snmplite/: apc-mib.cpp, mge-mib.cpp, mibs.h,
+	rfc1628-mib.cpp, snmplite.cpp:
+
+	Remove strategy-specific probe hook. We don't need it now and
+	probably will never need it.
+
+2010-08-31 14:06  adk0212
+
+	* src/drivers/snmplite/: apc-mib.cpp, mge-mib.cpp, mibs.cpp,
+	mibs.h, rfc1628-mib.cpp, snmplite-common.h, snmplite.cpp:
+
+	Add support for MIB autodetection by probing for CI_STATUS OID.
+	Also rework NOTRAP handling to not require a special notrap
+	MibStrategy for each MIB.
+
+2010-08-30 14:41  adk0212
+
+	* src/drivers/snmplite/snmplite.cpp:
+
+	Allow user to omit one or more subsections of SNMP DEVICE string.
+	Contributed by Lars Täer <taeuber@bbaw.de>
+
+2010-08-30 14:18  adk0212
+
+	* src/drivers/snmplite/asn.cpp:
+
+	Fix typo. Contributed by Lars Täer <taeuber@bbaw.de>
+
+2010-08-30 14:18  adk0212
+
+	* src/drivers/snmplite/: mge-mib.cpp, mge-oids.h, mibs.cpp:
+
+	Add support for MGE SNMP MIB. Contributed by Lars Täer
+	<taeuber@bbaw.de>
+
+2010-08-20 20:34  adk0212
+
+	* doc/manual/maintaining_ups.rst:
+
+	Add SU1000INET battery constant
+
+2010-08-17 14:24  adk0212
+
+	* include/version.h:
+
+	Update for 3.14.9-test1 release
+
+2010-08-16 19:18  adk0212
+
+	* src/win32/Makefile.in:
+
+	Default to winusb driver
+
+2010-08-16 19:15  adk0212
+
+	* src/win32/Makefile.in:
+
+	Update for new files in snmplite
+
+2010-08-13 14:52  adk0212
+
+	* src/drivers/snmplite/rfc1628-mib.cpp:
+
+	Take another guess at RFC1628 killpower/shutdown based on
+	TrippLite's interpretation of upsAutoRestart.
+
+2010-08-13 14:40  adk0212
+
+	* src/drivers/snmplite/rfc1628-mib.cpp:
+
+	Attempt to implement shutdown/killpower for RFC1628 SNMP MIB. MIB
+	docs are somewhat unclear so this is a best guess.
+
+2010-08-13 14:02  adk0212
+
+	* src/drivers/snmplite/: mibs.h, mibs.cpp:
+
+	Add missing file.
+
+2010-08-13 14:00  adk0212
+
+	* src/drivers/snmplite/: apc-mib.cpp, rfc1628-mib.cpp,
+	snmplite-common.h, snmplite.cpp, snmplite.h:
+
+	Reorganize multiple MIB support. Vendor names are now associated
+	with MIB strategies directly. killpower and shutdown operations are
+	deferred to the strategy as is trap waiting. Other general cleanup.
+
+2010-07-30 18:04  adk0212
+
+	* src/drivers/snmplite/: apc-mib.cpp, apc-oids.h, mib.cpp, oids.h,
+	rfc1628-mib.cpp, rfc1628-oids.h, snmplite.cpp, snmplite.h:
+
+	Add support for RFC1628 SNMP MIB. Refactor APC MIB and create
+	MibStrategy struct for associating MIB/CI mapping with
+	corresponding processing function. RFC1628 strategy is coded per
+	the MIB but untested.
+
+2010-07-10 11:32  adk0212
+
+	* platforms/mingw/: apcupsd.inf, winusb/apcupsd.inf:
+
+	Update Windows *.inf files for LCC PIDs
+
+2010-05-16 18:11  adk0212
+
+	* src/apctest.c:
+
+	Remove unused variable shm_OK
+
+2010-05-16 18:09  adk0212
+
+	* src/win32/compat/compat.cpp:
+
+	When logging events, convert LOG_CRIT to a WARNING on Win32 rather
+	than an ERROR since apcupsd uses it for power events which aren't
+	really daemon errors. LOG_ERR is still converted to ERROR for use
+	in true error cases.
+
+2010-05-16 17:57  adk0212
+
+	* src/apcupsd.c:
+
+	Fix bug where pid file was overwritten even when lock file
+	indicates another instance is running. Now we only write the pid
+	file after writing the lock file successfully. Also automatically
+	remove pid file on termination if we created it in the first place.
+	Reported by Justin Killen <jkillen@allamericanasphalt.com>
+
+2010-04-29 19:25  adk0212
+
+	* src/win32/installer/winapcupsd.nsi:
+
+	When running uninstaller in silent mode, always remove config and
+	events files without prompting. Reported by Zdenek Jirous
+	<jirous@tmv.cz>
+
+2010-04-29 19:20  adk0212
+
+	* src/win32/installer/winapcupsd.nsi:
+
+	Honor INSTDIR specified on command line via /D.  Reported by Zdenek
+	Jirous <jirous@tmv.cz>
+
+2010-02-20 10:09  adk0212
+
+	* src/reports.c:
+
+	Variable largebuf may be overflowed by the buf data, which can
+	cause overwriting of subsequent variables.  I: Statement might be
+	overflowing a buffer in strncat. Common mistake:    BAD:
+	strncat(buffer,charptr,sizeof(buffer)) is wrong, it takes the left
+	over size as 3rd argument    GOOD:
+	strncat(buffer,charptr,sizeof(buffer)-strlen(buffer)-1) E: apcupsd
+	bufferoverflowstrncat reports.c:110 Reported by Stanislav Brabec
+	<sbrabec@suse.cz>
+
+2010-01-31 12:16  adk0212
+
+	* doc/manual/: manual.html, smartprotocol.rst:
+
+	Update SmartUPS protocol register 2 bit 5. This is supported on
+	SmartUPSes.
+
+2010-01-31 11:10  adk0212
+
+	* src/drivers/usb/: usb.c, usb_common.h, bsd/bsd-usb.c,
+	generic/generic-usb.c, linux/linux-usb.c:
+
+	Add missing handling for DALARM. Also PWSUM is a LOGICAL
+	collection, not a PYSICAL collection, so add support for checking
+	LOGICAL collection and update known_info table appropriately. This
+	fixes BATTV and MANDATE on certain newer APC models.
+
+2010-01-24 08:19  adk0212
+
+	* src/lib/apcstatus.c:
+
+	Remove unnecessary debug print
+
+2010-01-17 19:12  adk0212
+
+	* src/drivers/usb/generic/generic-usb.c:
+
+	When using generic-usb driver, interpret DEVICE setting as the
+	serial number of the UPS to monitor. This allows the user to
+	control which UPS is monitored if more than one is connected. A
+	blank DEVICE setting continues to mean autodetect.
+
+2010-01-17 13:58  adk0212
+
+	* configure:
+
+	Fix define
+
+2010-01-17 13:37  adk0212
+
+	* configure, autoconf/configure.in, src/lib/Makefile,
+	src/lib/libsupc++fix.cpp:
+
+	Add workaround for FreeBSD libsupc++.a issue (FreeBSD PR #99702)
+	This will allow snmplite driver to compile/link on FreeBSD 5.x
+
+2010-01-17 10:58  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Force use of generic_usb on FreeBSD 8.0 and higher. FreeBSD USB API
+	was changed in 8.0, so from now on we will use libusb.
+
+2010-01-17 10:38  adk0212
+
+	* src/drivers/snmplite/snmplite.cpp:
+
+	Fix compile warning
+
+2010-01-17 10:30  adk0212
+
+	* autoconf/configure.in:
+
+	Fix comment
+
+2010-01-17 10:29  adk0212
+
+	* configure, autoconf/configure.in:
+
+	If libusb-config is not found, fall back on a plain old
+	AC_CHECK_LIB. This will allow building against the new libusb-1.x
+	with compatibility API.
+
+2010-01-17 10:26  adk0212
+
+	* doc/manual/manual.html:
+
+	Regen manual for release
+
+2010-01-16 15:16  adk0212
+
+	* doc/home-page/: bugs.html, index.html, index.wml, license.html,
+	lists.html, menu.inc, support.html, systems.html:
+
+	Update for 3.14.8 release
+
+2010-01-16 11:09  adk0212
+
+	* ChangeLog, ReleaseNotes, include/version.h:
+
+	Prep for 3.14.8 release
+
 2010-01-16 11:01  adk0212
 
 	* doc/apctest.8:

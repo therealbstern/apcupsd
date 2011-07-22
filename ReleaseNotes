@@ -9,6 +9,60 @@ IF YOU USE THE OLD STYLE MASTER/SLAVE NETWORKING MODE, BE SURE TO READ THE
 3.14.0 RELEASE NOTES BELOW.
 
 
+3.14.9 -- 22 July 2011               (Maintenance Release)
+
+NEW FEATURES
+
+  * SNMP enhancements:
+    - Autodetection of MIB and community if they are not specified in
+      apcupsd.conf
+    - Support for RFC1628 MIB
+    - Support for MGE MIB (Contributed by	Lars Taeuber <taeuber@bbaw.de>)
+
+  * Windows USB support for 64-bit platforms
+
+  * USB support for latest APC models such as SMT* and SMX* series
+    - No support for Microlink, but basic USB interface should be
+      detected and provide status now.
+
+  * When using the generic USB driver (Windows, OS X, newer FreeBSD)
+    DEVICE string in apcupsd.conf can be set as serial number of UPS
+    to monitor. This is useful in order to "lock" apcupsd to a specific
+    UPS if you have more than one connected to the server.
+
+  * Ed Dondlinger's Windows email scripts are included in the Win32
+    install package now. Documentation includes information on how
+    to hook them in.
+
+BUG FIXES
+
+  * general: Rework signal handling to eliminate crashes and hangs.
+
+  * general: Fix issue of overwriting pid file even when we failed
+    to acquire the lock file
+
+  * snmp: Add workaround for FreeBSD libsupc++.a issue (FreeBSD PR 
+    #99702) This will allow snmplite driver to compile/link on 
+    FreeBSD 5.x.
+
+  * usb: Automatically use generic_usb driver on FreeBSD 8.0 and 
+    newer. FreeBSD USB API was changed in 8.0, so from now on we will 
+    use libusb.
+
+  * usb: Add support for DALARM
+  
+  * usb: Fix BATTV and MANDATE on certain newer APC models
+
+  * win32: Honor INSTDIR specified on command line via /D
+
+  * win32: When running uninstaller in silent mode, always remove 
+    config and events files without prompting.
+
+  * win32: When logging events, convert LOG_CRIT to a WARNING rather
+	 than an ERROR since apcupsd uses it for power events which aren't
+	 really daemon errors.
+
+
 3.14.8 -- 16 January 2010            (Maintenance Release)
 
 NEW FEATURES
