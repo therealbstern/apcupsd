@@ -73,6 +73,9 @@ uninstall-darwin:
 	@echo " "
 	@echo "================================================="
 
+# Note removal of 'TokenDefinitions.plist' from package below is to prevent
+# automatic relocation of apcagent.app at install time. This is a workaround
+# for a PackageMaker bug.
 apcupsd.pkg:
 	rm -rf $(PKGROOT)
 	mkdir $(PKGROOT)
@@ -95,4 +98,5 @@ apcupsd.pkg:
 	   --info ApcupsdDaemon.Info.plist --resources $(PKGROOT)/Apcupsd.Resources \
 	   --scripts $(PKGROOT)/Apcupsd.Scripts --id com.apcupsd.apcupsd --root-volume-only \
            --target 10.4 --version $(VERSION) --out $(PKGROOT)/Apcupsd/Apcupsd-$(VERSION).pkg
+	rm -f $(PKGROOT)/Apcupsd/Apcupsd-$(VERSION).pkg/Contents/Resources/TokenDefinitions.plist
 	hdiutil create -ov -fs HFS+ -srcfolder $(PKGROOT)/Apcupsd -volname Apcupsd-$(VERSION) Apcupsd-$(VERSION).dmg
