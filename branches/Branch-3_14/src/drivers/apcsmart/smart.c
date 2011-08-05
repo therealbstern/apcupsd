@@ -453,7 +453,7 @@ int apcsmart_ups_read_volatile_data(UPSINFO *ups)
    if (ups->UPS_Cap[CI_LQUAL]) {
       answer = smart_poll(ups->UPS_Cmd[CI_LQUAL], ups);
       Dmsg1(80, "Got CI_LQUAL: %s\n", answer);
-      strncpy(ups->linequal, answer, sizeof(ups->linequal));
+      astrncpy(ups->linequal, answer, sizeof(ups->linequal));
    }
 
    /* Reason for last transfer to batteries */
@@ -626,7 +626,7 @@ int apcsmart_ups_read_static_data(UPSINFO *ups)
    if (ups->UPS_Cap[CI_SENS]) {
       answer = smart_poll(ups->UPS_Cmd[CI_SENS], ups);
       Dmsg1(80, "Got CI_SENS: %s\n", answer);
-      strncpy(ups->sensitivity, answer, sizeof(ups->sensitivity));
+      astrncpy(ups->sensitivity, answer, sizeof(ups->sensitivity));
    }
 
    /* WAKEUP_DELAY */
@@ -668,7 +668,7 @@ int apcsmart_ups_read_static_data(UPSINFO *ups)
    if (ups->UPS_Cap[CI_DALARM]) {
       answer = smart_poll(ups->UPS_Cmd[CI_DALARM], ups);
       Dmsg1(80, "Got CI_DALARM: %s\n", answer);
-      strncpy(ups->beepstate, answer, sizeof(ups->beepstate));
+      astrncpy(ups->beepstate, answer, sizeof(ups->beepstate));
    }
 
    /* LOWBATT_SHUTDOWN_LEVEL */
@@ -682,35 +682,35 @@ int apcsmart_ups_read_static_data(UPSINFO *ups)
    if (ups->upsname[0] == 0 && ups->UPS_Cap[CI_IDEN]) {
       answer = smart_poll(ups->UPS_Cmd[CI_IDEN], ups);
       Dmsg1(80, "Got CI_IDEN: %s\n", answer);
-      strncpy(ups->upsname, answer, sizeof(ups->upsname));
+      astrncpy(ups->upsname, answer, sizeof(ups->upsname));
    }
 
    /* UPS_SELFTEST */
    if (ups->UPS_Cap[CI_STESTI]) {
       answer = smart_poll(ups->UPS_Cmd[CI_STESTI], ups);
       Dmsg1(80, "Got CI_STESTI: %s\n", answer);
-      strncpy(ups->selftest, answer, sizeof(ups->selftest));
+      astrncpy(ups->selftest, answer, sizeof(ups->selftest));
    }
 
    /* UPS_MANUFACTURE_DATE */
    if (ups->UPS_Cap[CI_MANDAT]) {
       answer = smart_poll(ups->UPS_Cmd[CI_MANDAT], ups);
       Dmsg1(80, "Got CI_MANDAT: %s\n", answer);
-      strncpy(ups->birth, answer, sizeof(ups->birth));
+      astrncpy(ups->birth, answer, sizeof(ups->birth));
    }
 
    /* UPS_SERIAL_NUMBER */
    if (ups->UPS_Cap[CI_SERNO]) {
       answer = smart_poll(ups->UPS_Cmd[CI_SERNO], ups);
       Dmsg1(80, "Got CI_SERNO: %s\n", answer);
-      strncpy(ups->serial, answer, sizeof(ups->serial));
+      astrncpy(ups->serial, answer, sizeof(ups->serial));
    }
 
    /* UPS_BATTERY_REPLACE */
    if (ups->UPS_Cap[CI_BATTDAT]) {
       answer = smart_poll(ups->UPS_Cmd[CI_BATTDAT], ups);
       Dmsg1(80, "Got CI_BATTDAT: %s\n", answer);
-      strncpy(ups->battdat, answer, sizeof(ups->battdat));
+      astrncpy(ups->battdat, answer, sizeof(ups->battdat));
    }
 
    /* Nominal output voltage when on batteries */
@@ -731,7 +731,7 @@ int apcsmart_ups_read_static_data(UPSINFO *ups)
    if (ups->UPS_Cap[CI_REVNO]) {
       answer = smart_poll(ups->UPS_Cmd[CI_REVNO], ups);
       Dmsg1(80, "Got CI_REVNO: %s\n", answer);
-      strncpy(ups->firmrev, answer, sizeof(ups->firmrev));
+      astrncpy(ups->firmrev, answer, sizeof(ups->firmrev));
    }
 
    /* Number of external batteries installed */
@@ -765,7 +765,7 @@ int apcsmart_ups_read_static_data(UPSINFO *ups)
    if (ups->UPS_Cap[CI_EPROM]) {
       answer = smart_poll(ups->UPS_Cmd[CI_EPROM], ups);
       Dmsg1(80, "Got CI_EPROM: %s\n", answer);
-      strncpy(ups->eprom, answer, sizeof(ups->eprom));
+      astrncpy(ups->eprom, answer, sizeof(ups->eprom));
    }
 
    return SUCCESS;
