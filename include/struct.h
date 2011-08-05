@@ -312,7 +312,7 @@ class UPSINFO {
    char selftest[9];               /* selftest interval as ASCII */
    char firmrev[20];               /* firmware revision */
    char upsname[UPSNAMELEN];       /* UPS internal name */
-   char upsmodel[20];              /* ups model number */
+   char upsmodel[MAXSTRING];       /* ups model number */
    char sensitivity[8];            /* sensitivity to line fluxuations */
    char beepstate[8];              /* when to beep on power failure. */
 
