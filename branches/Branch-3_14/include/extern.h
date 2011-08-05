@@ -148,7 +148,7 @@ extern void setup_ups_alarm(UPSINFO *ups);
 extern void setup_ups_lowbatt_delay(UPSINFO *ups);
 extern void setup_ups_selftest(UPSINFO *ups);
 
-extern void get_apc_model(UPSINFO *ups);
+extern const char *get_model_from_oldfwrev(const char *s);
 extern void get_apc_capabilities(UPSINFO *ups);
 extern void read_extended(UPSINFO *ups);
 extern void setup_extended(UPSINFO *ups);
