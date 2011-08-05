@@ -748,11 +748,17 @@ int apcsmart_ups_read_static_data(UPSINFO *ups)
       ups->badbatts = (int)atof(answer);
    }
 
-   /* Old firmware revision */
+   /* UPS model */
    if (ups->UPS_Cap[CI_UPSMODEL]) {
       answer = smart_poll(ups->UPS_Cmd[CI_UPSMODEL], ups);
-      Dmsg1(80, "Got CI_UPSMODEL: %s\n", answer);
-      strncpy(ups->upsmodel, answer, sizeof(ups->upsmodel));
+      if (ups->UPS_Cmd[CI_UPSMODEL] == APC_CMD_OLDFWREV) {
+         /* Derive UPS model from old fw rev */
+         astrncpy(ups->upsmodel, get_model_from_oldfwrev(answer), 
+                  sizeof(ups->upsmodel));
+      } else {
+         astrncpy(ups->upsmodel, answer, sizeof(ups->upsmodel));
+      }
+      Dmsg1(80, "Got CI_UPSMODEL: %s\n", ups->upsmodel);
    }
 
    /* EPROM Capabilities */
@@ -761,8 +767,6 @@ int apcsmart_ups_read_static_data(UPSINFO *ups)
       Dmsg1(80, "Got CI_EPROM: %s\n", answer);
       strncpy(ups->eprom, answer, sizeof(ups->eprom));
    }
-
-   get_apc_model(ups);
 
    return SUCCESS;
 }

@@ -661,9 +661,6 @@ int pcnet_ups_open(UPSINFO *ups)
       Error_abort1("Cannot bind socket (%d)\n", errno);
    }
 
-   /* Cheat and fixup CI_UPSMODEL to match PCNET */
-   ups->UPS_Cmd[CI_UPSMODEL] = 0x01;
-
    /* Reset datatime to now */
    time(&my_data->datatime);
 

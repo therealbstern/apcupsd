@@ -64,7 +64,7 @@ int output_status(UPSINFO *ups, int sockfd,
       s_write(ups, "UPSNAME  : %s\n", ups->upsname);
 
    s_write(ups, "CABLE    : %s\n", ups->cable.long_name);
-   s_write(ups, "MODEL    : %s\n", ups->mode.long_name);
+   s_write(ups, "DRIVER   : %s\n", ups->mode.long_name);
    s_write(ups, "UPSMODE  : %s\n", ups->upsclass.long_name);
 
    format_date(ups->start_time, datetime, sizeof(datetime));
@@ -84,6 +84,9 @@ int output_status(UPSINFO *ups, int sockfd,
 
       s_write(ups, "MASTER   : %s\n", ups->master_name);
    }
+
+   if (ups->UPS_Cap[CI_UPSMODEL])
+      s_write(ups, "MODEL    : %s\n", ups->upsmodel);
 
    status[0] = 0;
 
@@ -368,9 +371,6 @@ int output_status(UPSINFO *ups, int sockfd,
 
    if (ups->UPS_Cap[CI_REVNO])
       s_write(ups, "FIRMWARE : %s\n", ups->firmrev);
-
-   if (ups->UPS_Cap[CI_UPSMODEL])
-      s_write(ups, "APCMODEL : %s\n", ups->upsmodel);
 
    read_unlock(ups);
 

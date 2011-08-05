@@ -140,6 +140,7 @@ struct upscmd
    { 'L',    rsp_float,  &linev },
    { 'O',    rsp_float,  &outv },
    { '\'',   rsp_hex,    &reg2 },
+   { 'V',    rsp_string, "Lzy" },
    { '\0',   NULL,       NULL }
 };
 
