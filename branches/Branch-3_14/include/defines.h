@@ -222,7 +222,8 @@ enum {
  * we will be able to support other UPSes later. The actual
  * command is obtained by reference to UPS_Cmd[CI_xxx]    
  */
-#define    APC_CMD_UPSMODEL       'V'
+#define    APC_CMD_UPSMODEL       0x1
+#define    APC_CMD_OLDFWREV       'V'
 #define    APC_CMD_STATUS         'Q'
 #define    APC_CMD_LQUAL          '9'
 #define    APC_CMD_WHY_BATT       'G'
