@@ -253,7 +253,8 @@ static enum a_state get_state(UPSINFO *ups, time_t now)
 {
    enum a_state state;
 
-   if (ups->is_onbatt()) {
+   /* If we're on battery for calibration, treat as not on battery */
+   if (ups->is_onbatt() && !ups->is_calibration()) {
       if (ups->chg_onbatt()) {
          state = st_PowerFailure;  /* Power failure just detected */
       } else {
