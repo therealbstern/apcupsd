@@ -26,7 +26,7 @@
 		<key>APC Uninterruptible Power Supply</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
-			<string>com.apple.kernel.iokit</string>
+			<string>com.apple.kpi.iokit</string>
 			<key>IOClass</key>
 			<string>IOService</string>
 			<key>IOProviderClass</key>
@@ -41,11 +41,13 @@
 			<integer>1309</integer>
 		</dict>
 		<!-- It's a bit ridiculous that a card whose entire purpose is 
-		     compatibility has a different PID, but it does... -->
+		     compatibility has a different PID, but it does. Also PID 3 
+           has been reported to be used on the native interface of an
+           SMT1500. -->
 		<key>APC9620 Legacy Communications Card</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
-			<string>com.apple.kernel.iokit</string>
+			<string>com.apple.kpi.iokit</string>
 			<key>IOClass</key>
 			<string>IOService</string>
 			<key>IOProviderClass</key>
@@ -64,7 +66,7 @@
 		<key>APC9620 Legacy Communications Card (proto1)</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
-			<string>com.apple.kernel.iokit</string>
+			<string>com.apple.kpi.iokit</string>
 			<key>IOClass</key>
 			<string>IOService</string>
 			<key>IOProviderClass</key>
@@ -81,7 +83,7 @@
 		<key>APC9620 Legacy Communications Card (proto2)</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
-			<string>com.apple.kernel.iokit</string>
+			<string>com.apple.kpi.iokit</string>
 			<key>IOClass</key>
 			<string>IOService</string>
 			<key>IOProviderClass</key>
@@ -92,6 +94,25 @@
 			<integer>0</integer>
 			<key>idProduct</key>
 			<integer>65535</integer>
+			<key>idVendor</key>
+			<integer>1309</integer>
+		</dict>
+		<!-- An SMX750 appears to use PID 5 even though its twin (the
+           SMT1500 above) uses PID 3. Argh. -->
+		<key>SMX750 Microlink</key>
+		<dict>
+			<key>CFBundleIdentifier</key>
+			<string>com.apple.kpi.iokit</string>
+			<key>IOClass</key>
+			<string>IOService</string>
+			<key>IOProviderClass</key>
+			<string>IOUSBInterface</string>
+			<key>bConfigurationValue</key>
+			<integer>1</integer>
+			<key>bInterfaceNumber</key>
+			<integer>0</integer>
+			<key>idProduct</key>
+			<integer>5</integer>
 			<key>idVendor</key>
 			<integer>1309</integer>
 		</dict>

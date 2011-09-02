@@ -20,22 +20,28 @@ HKR,,Icon,,-1
 [Apcupsd_WinUSB.NTx86]
 ; Normal APC UPSes use PID 0x0002
 %USB\MyDevice.DeviceDesc% =ApcupsdUSBDriver, USB\VID_051d&PID_0002
-; APC9620 Legacy Communications Card uses PID 0x0003
+; APC9620 Legacy Communications Card uses PID 0x0003, as does the SMT1500
 %USB\MyDevice.DeviceDesc% =ApcupsdUSBDriver, USB\VID_051d&PID_0003
 ; Early production and prototype units of AP9620 erroneously have
 ; 0x0001 or 0xffff
 %USB\MyDevice.DeviceDesc% =ApcupsdUSBDriver, USB\VID_051d&PID_0001
 %USB\MyDevice.DeviceDesc% =ApcupsdUSBDriver, USB\VID_051d&PID_ffff
+; An SMX750 appears to use PID 5 even though its twin (the SMT1500 above) 
+; uses PID 3. Argh.
+%USB\MyDevice.DeviceDesc% =ApcupsdUSBDriver, USB\VID_051d&PID_0005
 
 [Apcupsd_WinUSB.NTamd64]
 ; Normal APC UPSes use PID 0x0002
 %USB\MyDevice.DeviceDesc% =ApcupsdUSBDriver, USB\VID_051d&PID_0002
-; APC9620 Legacy Communications Card uses PID 0x0003
+; APC9620 Legacy Communications Card uses PID 0x0003, as does the SMT1500
 %USB\MyDevice.DeviceDesc% =ApcupsdUSBDriver, USB\VID_051d&PID_0003
 ; Early production and prototype units of AP9620 erroneously have
 ; 0x0001 or 0xffff
 %USB\MyDevice.DeviceDesc% =ApcupsdUSBDriver, USB\VID_051d&PID_0001
 %USB\MyDevice.DeviceDesc% =ApcupsdUSBDriver, USB\VID_051d&PID_ffff
+; An SMX750 appears to use PID 5 even though its twin (the SMT1500 above) 
+; uses PID 3. Argh.
+%USB\MyDevice.DeviceDesc% =ApcupsdUSBDriver, USB\VID_051d&PID_0005
 
 ; =================== Installation ===================
 [ApcupsdUSBDriver]
