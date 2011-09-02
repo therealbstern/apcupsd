@@ -275,7 +275,7 @@ int usb_control_msg(usb_dev_handle *dev, int requesttype,
 
    ULONG actlen = 0;
    if (!WinUsb_ControlTransfer(dev->fd, sp, (unsigned char*)bytes, size, &actlen, NULL))
-      return -1;
+      return -GetLastError();
 
    return actlen;
 }
@@ -289,7 +289,7 @@ int usb_get_string_simple(usb_dev_handle *dev, int index, char *buf,
    if (!WinUsb_GetDescriptor(dev->fd, USB_STRING_DESCRIPTOR_TYPE, index, 0x0409, 
                              temp, sizeof(temp), &actlen))
    {
-      return -1;
+      return -GetLastError();
    }
 
    // Skip first two bytes of result (descriptor id and length), then take 
