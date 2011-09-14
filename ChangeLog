@@ -8,6 +8,108 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2011-09-02 15:17  adk0212
+
+	* platforms/: darwin/Info.plist, mingw/winusb/apcupsd.inf:
+
+	Add PID 5 for SMX750 (at least that's what mine uses). Also change
+	com.apple.kernel.iokit to com.apple.kpi.iokit in OS X plist as
+	suggested in an apple dev list posting. It's unclear this does
+	anything but it might help resolve issues with the kext not being
+	selected on certain systems.
+
+2011-09-02 11:44  adk0212
+
+	* src/win32/libusb-winusb-bridge.c:
+
+	Report proper error numbers, not just -1.
+
+2011-09-02 11:44  adk0212
+
+	* src/drivers/usb/: bsd/bsd-usb.c, generic/generic-usb.c,
+	linux/linux-usb.c:
+
+	Switch USB drivers to prefer FEATURE reports over INPUT reports.
+	This fixes issues with a number of newer UPS models where they
+	advertise INPUT reports but fail to send them when you query for
+	them. Also check report length when processing an interrupt report
+	and ignore it if the length is wrong. This fixes an issue where
+	some UPSes sporadically send truncated interrupt reports.
+
+2011-08-12 19:01  adk0212
+
+	* src/action.c:
+
+	Ignore transitions to battery because of calibration. This can
+	happen if user initiates calibration in apctest, then exits apctest
+	and starts apcupsd before the calibration has completed. In this
+	case we do not want to shut down the machine, so treat
+	onbattery+cal as not on battery at all.  Reported by Sergey
+	<a_s_y@sama.ru>.
+
+2011-08-05 16:31  adk0212
+
+	* src/drivers/: apcsmart/smart.c, pcnet/pcnet.c:
+
+	Use astrncpy instead of strncpy to avoid leaving strings without
+	NUL termination in the overflow case
+
+2011-08-05 16:30  adk0212
+
+	* include/struct.h:
+
+	Enlarge upsmodel buffer to handle longer model strings. Needed for
+	"Smart-UPS RT 5000 XL" as reported by Sergey <a_s_y@sama.ru>
+
+2011-08-05 16:29  adk0212
+
+	* include/extern.h:
+
+	Add missing function prototype
+
+2011-08-05 16:15  adk0212
+
+	* doc/manual/manual.html:
+
+	Regen manual for 3.14.9 release
+
+2011-08-05 16:14  adk0212
+
+	* examples/smartsim.c, include/defines.h,
+	src/drivers/apcsmart/smart.c, src/drivers/apcsmart/smartsetup2.c,
+	src/drivers/pcnet/pcnet.c, src/drivers/usb/usb.c,
+	src/lib/apcstatus.c:
+
+	Fix MODEL vs. APCMODEL confusion Remove APCMODEL, rename old MODEL
+	aka mode to DRIVER. Update apcsmart driver to put model string into
+	upsmodel field. Remove PCNET workaround for CI_UPSMODEL that is no
+	longer needed. Change USB driver to leave mode field alone.
+
+2011-08-04 19:19  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Add link to OS X binary for 3.14.9 now that it's been released
+
+2011-08-04 19:17  adk0212
+
+	* platforms/darwin/Makefile:
+
+	Work around PackageMaker bug that causes apcagent.app to be
+	relocated at install time in spite of --no-relocate flag
+
+2011-07-22 23:41  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Update web site for 3.14.9 release
+
+2011-07-22 12:27  adk0212
+
+	* ChangeLog, ReleaseNotes, include/version.h:
+
+	Prep for 3.14.9 release
+
 2011-05-19 18:55  adk0212
 
 	* platforms/etc/apcupsd.conf.in, src/drivers/pcnet/pcnet.c:
