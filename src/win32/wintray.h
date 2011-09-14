@@ -17,7 +17,10 @@
 #include "winabout.h"
 #include "winstat.h"
 #include "winevents.h"
-#include <string>
+#include "winconfig.h"
+#include "astring.h"
+#include "instmgr.h"
+#include "amutex.h"
 
 // Forward declarations
 class StatMgr;
@@ -27,10 +30,13 @@ class BalloonMgr;
 class upsMenu
 {
 public:
-   upsMenu(HINSTANCE appinst, const char *host, unsigned long port,
-           int refresh, BalloonMgr *balmgr);
+   upsMenu(HINSTANCE appinst, MonitorConfig &mcfg, BalloonMgr *balmgr,
+           InstanceManager *instmgr);
    ~upsMenu();
    void Destroy();
+   void Redraw();
+   void Reconfigure(const MonitorConfig &mcfg);
+   void Refresh();
 
 protected:
    // Tray icon handling
@@ -42,37 +48,43 @@ protected:
    // Message handler for the tray window
    static LRESULT CALLBACK WndProc(
       HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
+   LRESULT WndProcess(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam);
 
    // Fetch UPS status info
-   bool FetchStatus(int &battstat, std::string &statstr, std::string &upsname);
+   bool FetchStatus(int &battstat, astring &statstr, astring &upsname);
 
    // Thread to poll for UPS status changes
    static DWORD WINAPI StatusPollThread(LPVOID param);
 
-   HWND                    m_hwnd;           // Window handle
-   HMENU                   m_hmenu;          // Menu handle
-   StatMgr                *m_statmgr;        // Manager for UPS stats
-   int                     m_interval;       // How often to poll for status
-   HANDLE                  m_thread;         // Handle to status polling thread
-   HANDLE                  m_wait;           // Handle to wait mutex
-   std::string             m_upsname;        // Cache UPS name
-   std::string             m_laststatus;     // Cache previous status string
-   BalloonMgr             *m_balmgr;         // Balloon tip manager
-   const char             *m_host;
-   unsigned short          m_port;
-   UINT                    m_tbcreated_msg;  // Id of TaskbarCreated message
-   HINSTANCE               m_appinst;        // Application instance handle
+   HWND                    _hwnd;           // Window handle
+   HMENU                   _hmenu;          // Menu handle
+   HMENU                   _hsubmenu;       // Submenu handle
+   StatMgr                *_statmgr;        // Manager for UPS stats
+   HANDLE                  _thread;         // Handle to status polling thread
+   HANDLE                  _wait;           // Handle to wait mutex
+   astring                 _upsname;        // Cache UPS name
+   astring                 _laststatus;     // Cache previous status string
+   BalloonMgr             *_balmgr;         // Balloon tip manager
+   UINT                    _tbcreated_msg;  // Id of TaskbarCreated message
+   HINSTANCE               _appinst;        // Application instance handle
+   MonitorConfig           _config;         // Configuration (host, port, etc.)
+   bool                    _runthread;      // Run the poll thread?
+   amutex                  _mutex;          // Lock to protect statmgr
+   WPARAM                  _generation;
+   bool                    _reconfig;
+   InstanceManager        *_instmgr;
 
-   // Dialogs for About, Status, and Events
-   upsAbout                m_about;
-   upsStatus               m_status;
-   upsEvents               m_events;
+   // Dialogs for About, Status, Config, and Events
+   upsAbout                _about;
+   upsStatus               _status;
+   upsConfig               _configdlg;
+   upsEvents               _events;
 
    // The icon handles
-   HICON                   m_online_icon;
-   HICON                   m_onbatt_icon;
-   HICON                   m_charging_icon;
-   HICON                   m_commlost_icon;
+   HICON                   _online_icon;
+   HICON                   _onbatt_icon;
+   HICON                   _charging_icon;
+   HICON                   _commlost_icon;
 };
 
 #endif // WINTRAY_H

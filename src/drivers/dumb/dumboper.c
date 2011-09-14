@@ -27,22 +27,22 @@
 #include "apc.h"
 #include "dumb.h"
 
-bool DumbDriver::KillPower()
+int dumb_ups_kill_power(UPSINFO *ups)
 {
    int serial_bits = 0;
 
-   switch (_ups->cable.type) {
+   switch (ups->cable.type) {
    case CUSTOM_SIMPLE:            /* killpwr_bit */
    case APC_940_0095A:
    case APC_940_0095B:
    case APC_940_0095C:            /* killpwr_bit */
       serial_bits = TIOCM_RTS;
-      (void)ioctl(_ups->fd, TIOCMBIS, &serial_bits);
-      (void)ioctl(_ups->fd, TIOCMBIS, &serial_bits);
-      (void)ioctl(_ups->fd, TIOCMBIS, &serial_bits);
+      (void)ioctl(ups->fd, TIOCMBIS, &serial_bits);
+      (void)ioctl(ups->fd, TIOCMBIS, &serial_bits);
+      (void)ioctl(ups->fd, TIOCMBIS, &serial_bits);
       sleep(10);                  /* hold for 10 seconds */
       serial_bits = TIOCM_ST;
-      (void)ioctl(_ups->fd, TIOCMBIS, &serial_bits);
+      (void)ioctl(ups->fd, TIOCMBIS, &serial_bits);
       break;
 
    case APC_940_0119A:
@@ -51,9 +51,9 @@ bool DumbDriver::KillPower()
    case APC_940_0020B:            /* killpwr_bit */
    case APC_940_0020C:
       serial_bits = TIOCM_DTR;
-      (void)ioctl(_ups->fd, TIOCMBIS, &serial_bits);
-      (void)ioctl(_ups->fd, TIOCMBIS, &serial_bits);
-      (void)ioctl(_ups->fd, TIOCMBIS, &serial_bits);
+      (void)ioctl(ups->fd, TIOCMBIS, &serial_bits);
+      (void)ioctl(ups->fd, TIOCMBIS, &serial_bits);
+      (void)ioctl(ups->fd, TIOCMBIS, &serial_bits);
       sleep(10);                   /* hold for at least 10 seconds */
       break;
 
@@ -62,35 +62,34 @@ bool DumbDriver::KillPower()
 
    case MAM_CABLE:
       serial_bits = TIOCM_RTS;
-      (void)ioctl(_ups->fd, TIOCMBIC, &serial_bits);
+      (void)ioctl(ups->fd, TIOCMBIC, &serial_bits);
       serial_bits = TIOCM_DTR;
-      (void)ioctl(_ups->fd, TIOCMBIS, &serial_bits);
-      (void)ioctl(_ups->fd, TIOCMBIS, &serial_bits);
-      (void)ioctl(_ups->fd, TIOCMBIS, &serial_bits);
+      (void)ioctl(ups->fd, TIOCMBIS, &serial_bits);
+      (void)ioctl(ups->fd, TIOCMBIS, &serial_bits);
+      (void)ioctl(ups->fd, TIOCMBIS, &serial_bits);
       sleep(10);                   /* hold */
       break;
-
-   case CUSTOM_SMART:
-   case APC_940_0024B:
-   case APC_940_0024C:
-   case APC_940_1524C:
-   case APC_940_0024G:
-   case APC_NET:
-   default:
-      break;
    }
-   return true;
+   return 1;
+}
+
+/*
+ * Dumb UPSes don't have static UPS data.
+ */
+int dumb_ups_read_static_data(UPSINFO *ups)
+{
+   return 1;
 }
 
 /*
  * Set capabilities.
  */
-bool DumbDriver::GetCapabilities()
+int dumb_ups_get_capabilities(UPSINFO *ups)
 {
    /* We create a Status word */
-   _ups->UPS_Cap[CI_STATUS] = TRUE;
+   ups->UPS_Cap[CI_STATUS] = TRUE;
 
-   return true;
+   return 1;
 }
 
 /*
@@ -101,52 +100,39 @@ bool DumbDriver::GetCapabilities()
  * unless we are in a FastPoll situation, otherwise, we burn
  * too much CPU.
  */
-bool DumbDriver::ReadVolatileData()
+int dumb_ups_read_volatile_data(UPSINFO *ups)
 {
-   bool stat = true;
-   bool BattFail = false;
+   SIMPLE_DATA *my_data = (SIMPLE_DATA *) ups->driver_internal_data;
+   int stat = 1;
 
    /*
     * We generally poll a bit faster because we do 
     * not have interrupts like the smarter devices
     */
-   if (_ups->wait_time > TIMER_DUMB)
-      _ups->wait_time = TIMER_DUMB;
+   if (ups->wait_time > TIMER_DUMB)
+      ups->wait_time = TIMER_DUMB;
 
-   sleep(_ups->wait_time);
+   sleep(ups->wait_time);
 
-   write_lock(_ups);
+   write_lock(ups);
 
-   ioctl(_ups->fd, TIOCMGET, &_sp_flags);
+   ioctl(ups->fd, TIOCMGET, &my_data->sp_flags);
 
-   switch (_ups->mode.type) {
-   case BK:
-   case SHAREBASIC:
-      if (_sp_flags & TIOCM_DTR) {
-         BattFail = true;
-      } else {
-         BattFail = false;
-      }
-      break;
-   default:
-      break;
-   }
-
-   switch (_ups->cable.type) {
+   switch (ups->cable.type) {
    case CUSTOM_SIMPLE:
       /*
        * This is the ONBATT signal sent by UPS.
        */
-      if (_sp_flags & TIOCM_CD) {
-         _ups->clear_online();
+      if (my_data->sp_flags & TIOCM_CD) {
+         ups->clear_online();
       } else {
-         _ups->set_online();
+         ups->set_online();
       }
 
-      if (!(_sp_flags & TIOCM_CTS)) {
-         _ups->set_battlow();
+      if (!(my_data->sp_flags & TIOCM_CTS)) {
+         ups->set_battlow();
       } else {
-         _ups->clear_battlow();
+         ups->clear_battlow();
       }
 
       break;
@@ -156,25 +142,25 @@ bool DumbDriver::ReadVolatileData()
    case APC_940_0128A:
    case APC_940_0020B:
    case APC_940_0020C:
-      if (_sp_flags & TIOCM_CTS) {
-         _ups->clear_online();
+      if (my_data->sp_flags & TIOCM_CTS) {
+         ups->clear_online();
       } else {
-         _ups->set_online();
+         ups->set_online();
       }
 
-      if (_sp_flags & TIOCM_CD) {
-         _ups->set_battlow();
+      if (my_data->sp_flags & TIOCM_CD) {
+         ups->set_battlow();
       } else {
-         _ups->clear_battlow();
+         ups->clear_battlow();
       }
 
       break;
 
    case APC_940_0023A:
-      if (_sp_flags & TIOCM_CD) {
-         _ups->clear_online();
+      if (my_data->sp_flags & TIOCM_CD) {
+         ups->clear_online();
       } else {
-         _ups->set_online();
+         ups->set_online();
       }
 
 /*
@@ -184,82 +170,77 @@ bool DumbDriver::ReadVolatileData()
  * battlow indicator, but I have no evidence that it works, and
  * some evidence that it does not.
 
-      if (_sp_flags & TIOCM_SR) {
-         _ups->set_battlow();
+      if (my_data->sp_flags & TIOCM_SR) {
+         ups->set_battlow();
       } else {
-         _ups->clear_battlow();
+         ups->clear_battlow();
       }
 */
       break;
 
    case APC_940_0095A:
    case APC_940_0095C:
-      if (_sp_flags & TIOCM_RNG) {
-         _ups->clear_online();
+      if (my_data->sp_flags & TIOCM_RNG) {
+         ups->clear_online();
       } else {
-         _ups->set_online();
+         ups->set_online();
       }
 
-      if (_sp_flags & TIOCM_CD) {
-         _ups->set_battlow();
+      if (my_data->sp_flags & TIOCM_CD) {
+         ups->set_battlow();
       } else {
-         _ups->clear_battlow();
+         ups->clear_battlow();
       }
 
       break;
 
    case APC_940_0095B:
-      if (_sp_flags & TIOCM_RNG) {
-         _ups->clear_online();
+      if (my_data->sp_flags & TIOCM_RNG) {
+         ups->clear_online();
       } else {
-         _ups->set_online();
+         ups->set_online();
       }
 
       break;
 
    case MAM_CABLE:
-      if (!(_sp_flags & TIOCM_CTS)) {
-         _ups->clear_online();
+      if (!(my_data->sp_flags & TIOCM_CTS)) {
+         ups->clear_online();
       } else {
-         _ups->set_online();
+         ups->set_online();
       }
 
-      if (!(_sp_flags & TIOCM_CD)) {
-         _ups->set_battlow();
+      if (!(my_data->sp_flags & TIOCM_CD)) {
+         ups->set_battlow();
       } else {
-         _ups->clear_battlow();
+         ups->clear_battlow();
       }
 
       break;
-
-   case CUSTOM_SMART:
-   case APC_940_0024B:
-   case APC_940_0024C:
-   case APC_940_1524C:
-   case APC_940_0024G:
-   case APC_NET:
-   default:
-      stat = false;
    }
 
-   if (_ups->is_onbatt() && BattFail) {
-      _ups->set_replacebatt();
-   } else {
-      _ups->clear_replacebatt();
-   }
+   ups->clear_replacebatt();
 
-   write_unlock(_ups);
+   write_unlock(ups);
 
    return stat;
 }
 
-bool DumbDriver::EntryPoint(int command, void *data)
+int dumb_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
+{
+#if 0
+   printf("This model cannot be configured.\n");
+#endif
+   return 0;
+}
+
+int dumb_ups_entry_point(UPSINFO *ups, int command, void *data)
 {
    int serial_bits = 0;
 
    switch (command) {
    case DEVICE_CMD_DTR_ENABLE:
-      if (_ups->cable.type == CUSTOM_SIMPLE) {
+      if (ups->cable.type == CUSTOM_SIMPLE) {
          /* 
           * A power failure just happened.
           *
@@ -268,12 +249,12 @@ bool DumbDriver::EntryPoint(int command, void *data)
           * us to detect the UPS_battlow condition!!!!
           */
          serial_bits = TIOCM_DTR;
-         (void)ioctl(_ups->fd, TIOCMBIS, &serial_bits);
+         (void)ioctl(ups->fd, TIOCMBIS, &serial_bits);
       }
       break;
 
    case DEVICE_CMD_DTR_ST_DISABLE:
-      if (_ups->cable.type == CUSTOM_SIMPLE) {
+      if (ups->cable.type == CUSTOM_SIMPLE) {
          /* 
           * Mains power just returned.
           *
@@ -283,12 +264,13 @@ bool DumbDriver::EntryPoint(int command, void *data)
 
 /* Leave it set */
 
-/*              (void)ioctl(_ups->fd, TIOCMBIC, &serial_bits);
+/*              (void)ioctl(ups->fd, TIOCMBIC, &serial_bits);
  */
       }
       break;
    default:
-      return false;
+      return 0;
+      break;
    }
-   return true;
+   return 1;
 }

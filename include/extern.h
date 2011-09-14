@@ -148,7 +148,7 @@ extern void setup_ups_alarm(UPSINFO *ups);
 extern void setup_ups_lowbatt_delay(UPSINFO *ups);
 extern void setup_ups_selftest(UPSINFO *ups);
 
-extern void get_apc_model(UPSINFO *ups);
+extern const char *get_model_from_oldfwrev(const char *s);
 extern void get_apc_capabilities(UPSINFO *ups);
 extern void read_extended(UPSINFO *ups);
 extern void setup_extended(UPSINFO *ups);
@@ -186,11 +186,9 @@ extern char *smart_poll(char cmd, UPSINFO *ups);
 extern int fillUPS(UPSINFO *ups);
 
 /* In apcsignal.c */
-extern void init_timer(int timer, void (*fnhandler) (int));
 extern void init_signals(void (*handler) (int));
 extern void init_thread_signals(void);
 extern void restore_signals(void);
-extern void sleep_forever(void);
 
 /* In newups.c */
 extern UPSINFO *new_ups(void);
@@ -219,6 +217,7 @@ extern void wait_for_termination(int serial_pid);
 extern void log_event(const UPSINFO *ups, int level, const char *fmt, ...);
 extern void logf(const char *fmt, ...);
 extern void hex_dump(int level, void *data, unsigned int len);
+extern int format_date(time_t timestamp, char *dest, size_t destlen);
 
 /* In apcnetlib.c */
 extern int net_open(const char *host, char *service, int port);
@@ -254,8 +253,11 @@ int winioctl(int fd, int func, int *addr);
   int nanosleep(const struct timespec *req, struct timespec *rem);
 #endif
 
-/* In smartcmd.c */
-int *GetSmartCmdMap();
-const char *CItoString(int ci);
+/*
+ * Common interface to the various versions of gethostbyname_r().
+ * Implemented in gethostname.c.
+ */
+struct hostent * gethostname_re
+    (const char *host,struct hostent *hostbuf,char **tmphstbuf,size_t *hstbuflen);
 
 #endif   /* _EXTERN_H */

@@ -57,7 +57,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    bool quiet = false;
 
    InitWinAPIWrapper();
-   WSA_Init();
 
    // Save the application instance and main thread id
    hAppInstance = hInstance;

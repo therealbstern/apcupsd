@@ -58,7 +58,7 @@ fi
 
 case "$1" in
     killpower)
-	echo "Apccontrol doing: ${APCUPSD} --killpower on UPS ${2}"
+	echo "Apccontrol doing: ${APCUPSD} --killpower on UPS ${2}" | ${WALL}
 	sleep 10
 	${APCUPSD} --killpower
 	echo "Apccontrol has done: ${APCUPSD} --killpower on UPS ${2}" | ${WALL}

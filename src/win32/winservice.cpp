@@ -52,7 +52,7 @@ int upsService::ApcupsdServiceMain()
       HINSTANCE kerneldll = LoadLibrary("KERNEL32.DLL");
       if (kerneldll == NULL) {
          MessageBox(NULL,
-                    _("KERNEL32.DLL not found: Apcupsd service not started"), 
+                    "KERNEL32.DLL not found: Apcupsd service not started", 
                     "Apcupsd Service", MB_OK);
          break;
       }
@@ -63,9 +63,9 @@ int upsService::ApcupsdServiceMain()
             kerneldll, "RegisterServiceProcess");
       if (RegisterServiceProcess == NULL) {
          MessageBox(NULL,
-                    _("Registry service not found: Apcupsd service not started"),
+                    "Registry service not found: Apcupsd service not started",
                     "Apcupsd Service", MB_OK);
-         log_error_message(_("Registry service not found")); 
+         log_error_message("Registry service not found"); 
          FreeLibrary(kerneldll);
          break;
       }
@@ -93,7 +93,7 @@ int upsService::ApcupsdServiceMain()
 
      // Call the service control dispatcher with our entry table
       if (!StartServiceCtrlDispatcher(dispatchTable)) {
-         log_error_message(_("StartServiceCtrlDispatcher failed."));
+         log_error_message("StartServiceCtrlDispatcher failed.");
       }
       break;
 
@@ -109,8 +109,8 @@ void WINAPI upsService::ServiceMain(DWORD argc, char **argv)
     // Register the service control handler
     m_hstatus = RegisterServiceCtrlHandler(SERVICE_NAME, ServiceCtrl);
     if (m_hstatus == 0) {
-       log_error_message(_("RegisterServiceCtlHandler failed")); 
-       MessageBox(NULL, _("Contact Register Service Handler failure"),
+       log_error_message("RegisterServiceCtlHandler failed"); 
+       MessageBox(NULL, "Contact Register Service Handler failure",
                   "Apcupsd service", MB_OK);
        return;
     }
@@ -124,7 +124,7 @@ void WINAPI upsService::ServiceMain(DWORD argc, char **argv)
             SERVICE_START_PENDING,    // service state
             NO_ERROR,                 // exit code
             45000)) {                 // wait hint
-        log_error_message(_("ReportStatus STOPPED failed 1")); 
+        log_error_message("ReportStatus STOPPED failed 1"); 
         return;
     }
 
@@ -141,7 +141,7 @@ DWORD WINAPI upsService::ServiceWorkThread(LPVOID lpwThreadParam)
           SERVICE_RUNNING,       // service state
           NO_ERROR,              // exit code
           0)) {                  // wait hint
-       MessageBox(NULL, _("Report Service failure"), "Apcupsd Service", MB_OK);
+       MessageBox(NULL, "Report Service failure", "Apcupsd Service", MB_OK);
        log_error_message("ReportStatus RUNNING failed"); 
        return 0;
     }
@@ -176,7 +176,7 @@ int upsService::InstallService(bool quiet)
    if (GetModuleFileName(NULL, path, MAXPATH) == 0) {
       if (!quiet) {
          MessageBox(NULL,
-                    _("Unable to install Apcupsd service"), SERVICE_NAME,
+                    "Unable to install Apcupsd service", SERVICE_NAME,
                     MB_ICONEXCLAMATION | MB_OK);
       }
       return 0;
@@ -190,7 +190,7 @@ int upsService::InstallService(bool quiet)
    } else {
       if (!quiet) {
          MessageBox(NULL,
-                    _("Service command length too long. Service not registered."),
+                    "Service command length too long. Service not registered.",
                     SERVICE_NAME, MB_ICONEXCLAMATION | MB_OK);
       }
       return 0;
@@ -206,7 +206,7 @@ int upsService::InstallService(bool quiet)
       if (RegCreateKey(HKEY_LOCAL_MACHINE, 
               "Software\\Microsoft\\Windows\\CurrentVersion\\RunServices",
               &runservices) != ERROR_SUCCESS) {
-         log_error_message(_("Cannot write System Registry")); 
+         log_error_message("Cannot write System Registry"); 
          MessageBox(NULL, _("The System Registry could not be updated - "
                             "the Apcupsd service was not installed"),
                     SERVICE_NAME, MB_ICONEXCLAMATION | MB_OK);
@@ -217,7 +217,7 @@ int upsService::InstallService(bool quiet)
       if (RegSetValueEx(runservices, SERVICE_NAME, 0, REG_SZ,
             (unsigned char *)servicecmd, strlen(servicecmd)+1) != ERROR_SUCCESS) {
          RegCloseKey(runservices);
-         MessageBox(NULL, _("The Apcupsd service could not be installed"),
+         MessageBox(NULL, "The Apcupsd service could not be installed",
                     SERVICE_NAME, MB_ICONEXCLAMATION | MB_OK);
          break;
       }
@@ -269,7 +269,7 @@ int upsService::InstallService(bool quiet)
       if (hservice == NULL) {
          if (!quiet || GetLastError() != ERROR_SERVICE_EXISTS) {
             MessageBox(NULL,
-                       _("The Apcupsd service could not be installed"),
+                       "The Apcupsd service could not be installed",
                        SERVICE_NAME, MB_ICONEXCLAMATION | MB_OK);
          }
          CloseServiceHandle(hsrvmanager);
@@ -351,7 +351,7 @@ int upsService::RemoveService(bool quiet)
 
       // We have successfully removed the service!
       if (!quiet) {
-         MessageBox(NULL, _("The Apcupsd service has been removed"),
+         MessageBox(NULL, "The Apcupsd service has been removed",
                     SERVICE_NAME, MB_ICONINFORMATION | MB_OK);
       }
       break;
@@ -361,7 +361,7 @@ int upsService::RemoveService(bool quiet)
       SC_HANDLE hservice = OpenNTService();
       if (!StopNTService(hservice)) {
          // Service could not be stopped
-         MessageBox(NULL, _("The Apcupsd service could not be stopped"),
+         MessageBox(NULL, "The Apcupsd service could not be stopped",
                     SERVICE_NAME, MB_ICONEXCLAMATION | MB_OK);
       }
 
@@ -371,12 +371,12 @@ int upsService::RemoveService(bool quiet)
 
          // Service successfully removed
          if (!quiet) {
-            MessageBox(NULL, _("The Apcupsd service has been removed"),
+            MessageBox(NULL, "The Apcupsd service has been removed",
                        SERVICE_NAME, MB_ICONINFORMATION | MB_OK);
          }
       } else {
          // Failed to remove
-         MessageBox(NULL, _("The Apcupsd service could not be removed"),
+         MessageBox(NULL, "The Apcupsd service could not be removed",
                     SERVICE_NAME, MB_ICONEXCLAMATION | MB_OK);
       }
 
@@ -442,7 +442,7 @@ BOOL upsService::ReportStatus(DWORD state,
     // Tell the SCM our new status
     BOOL result = SetServiceStatus(m_hstatus, &m_srvstatus);
     if (!result)
-       log_error_message(_("SetServiceStatus failed"));
+       log_error_message("SetServiceStatus failed");
 
     return result;
 }
@@ -468,7 +468,7 @@ void LogErrorMsg(char *message, char *fname, int lineno)
       return;
 
    char msgbuff[256];
-   snprintf(msgbuff, sizeof(msgbuff), _("\n\n%s error: %ld at %s:%d"), 
+   snprintf(msgbuff, sizeof(msgbuff), "\n\n%s error: %ld at %s:%d", 
       SERVICE_NAME, error, fname, lineno);
 
    char *strings[3];

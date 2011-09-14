@@ -351,9 +351,9 @@ static int usb_link_check(UPSINFO *ups)
 
 int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_info)
 {
-   int i, ci, phys, input, feature;
+   int i, input, feature, ci, phys, logi;
    USB_DATA *my_data = (USB_DATA *)ups->driver_internal_data;
-   hid_item_t item, witem;
+   hid_item_t input_item, feature_item, item;
    USB_INFO *info;
 
    write_lock(ups);
@@ -361,6 +361,7 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
    for (i = 0; known_info[i].usage_code; i++) {
       ci = known_info[i].ci;
       phys = known_info[i].physical;
+      logi = known_info[i].logical;
 
       if (ci != CI_NONE && !my_data->info[ci]) {
          /* Try to find an INPUT report containing this usage */
@@ -369,9 +370,9 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
             known_info[i].usage_code,     /* Match usage code */
             -1,                           /* Don't care about application */
             (phys == P_ANY) ? -1 : phys,  /* Match physical usage */
-            -1,                           /* Don't care about logical */
+            (logi == P_ANY) ? -1 : logi,  /* Match logical usage */
             HID_KIND_INPUT,               /* Match feature type */
-            &item);
+            &input_item);
 
          /* Try to find a FEATURE report containing this usage */
          feature = hidu_locate_item(
@@ -379,20 +380,21 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
             known_info[i].usage_code,     /* Match usage code */
             -1,                           /* Don't care about application */
             (phys == P_ANY) ? -1 : phys,  /* Match physical usage */
-            -1,                           /* Don't care about logical */
+            (logi == P_ANY) ? -1 : logi,  /* Match logical usage */
             HID_KIND_FEATURE,             /* Match feature type */
-            &witem);
+            &feature_item);
 
-         // If we did not find an INPUT report, but did find a FEATURE report,
-         // use the FEATURE report as the INPUT report.
-         if (!input && feature) {
-            memcpy(&item, &witem, sizeof(item));
-            input = feature;
-         }
-
-         // Bail if we have no input report at this point
-         if (!input)
-            continue;
+         /*
+          * Choose which report to use. We prefer FEATURE since some UPSes
+          * have broken INPUT reports, but we will fall back on INPUT if
+          * FEATURE is not available.
+          */
+         if (feature)
+            item = feature_item;
+         else if (input)
+            item = input_item;
+         else
+            continue; // No valid report, bail
 
          ups->UPS_Cap[ci] = true;
          ups->UPS_Cmd[ci] = known_info[i].usage_code;
@@ -400,10 +402,10 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
          info = (USB_INFO *)malloc(sizeof(USB_INFO));
          if (!info) {
             write_unlock(ups);
-            Error_abort0(_("Out of memory.\n"));
+            Error_abort0("Out of memory.\n");
          }
 
-         // Use INPUT report as the main readable report
+         // Populate READ report data
          my_data->info[ci] = info;
          memset(info, 0, sizeof(*info));
          info->ci = ci;
@@ -411,7 +413,7 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
          info->unit_exponent = item.unit_exponent;
          info->unit = item.unit;
          info->data_type = known_info[i].data_type;
-         memcpy(&info->item, &item, sizeof(item));
+         info->item = item;
          info->report_len = hid_report_size( /* +1 for report id */
             my_data->rdesc, item.kind, item.report_ID) + 1;
          Dmsg6(200, "Got READ ci=%d, rpt=%d (len=%d), usage=0x%x (len=%d), kind=0x%02x\n",
@@ -420,10 +422,10 @@ int pusb_ups_get_capabilities(UPSINFO *ups, const struct s_known_info *known_inf
 
          // If we have a FEATURE report, use that as the writable report
          if (feature) {
-            memcpy(&info->witem, &witem, sizeof(item));
+            info->witem = item;
             Dmsg6(200, "Got WRITE ci=%d, rpt=%d (len=%d), usage=0x%x (len=%d), kind=0x%02x\n",
-               ci, witem.report_ID, info->report_len,
-               known_info[i].usage_code, witem.report_size, witem.kind);               
+               ci, item.report_ID, info->report_len,
+               known_info[i].usage_code, item.report_size, item.kind);               
          }
       }
    }
@@ -665,6 +667,24 @@ int pusb_ups_check_state(UPSINFO *ups)
          if (ups->UPS_Cap[ci] && my_data->info[ci] &&
              my_data->info[ci]->item.report_ID == buf[0]) {
 
+            /*
+             * Check if we received fewer bytes of data from the UPS than we
+             * should have. If so, ignore the report since we can't process it
+             * reliably. If we go ahead and try to process it we may get 
+             * sporradic bad readings. UPSes we've seen this issue on so far 
+             * include:
+             *
+             *    "Back-UPS CS 650 FW:817.v7 .I USB FW:v7"
+             *    "Back-UPS CS 500 FW:808.q8.I USB FW:q8"
+             */
+            if (my_data->info[ci]->report_len != retval) {
+               Dmsg4(100, "Report length mismatch, ignoring "
+                  "(id=%d, ci=%d, expected=%d, actual=%d)\n",
+                  my_data->info[ci]->item.report_ID, ci, 
+                  my_data->info[ci]->report_len, retval);
+               break; /* don't continue since other CIs will be just as wrong */
+            }
+
             /* Ignore this event if the value has not changed */
             value = hid_get_data(buf+1, &my_data->info[ci]->item);
             if (my_data->info[ci]->value == value) {
@@ -726,13 +746,13 @@ int pusb_ups_open(UPSINFO *ups)
    if (!open_usb_device(ups)) {
       write_unlock(ups);
       if (ups->device[0]) {
-         Error_abort1(_("Cannot open UPS device: \"%s\" --\n"
+         Error_abort1("Cannot open UPS device: \"%s\" --\n"
                "For a link to detailed USB trouble shooting information,\n"
-               "please see <http://www.apcupsd.com/support.html>.\n"), ups->device);
+               "please see <http://www.apcupsd.com/support.html>.\n", ups->device);
       } else {
-         Error_abort0(_("Cannot find UPS device --\n"
+         Error_abort0("Cannot find UPS device --\n"
                "For a link to detailed USB trouble shooting information,\n"
-               "please see <http://www.apcupsd.com/support.html>.\n"));
+               "please see <http://www.apcupsd.com/support.html>.\n");
       }
    }
 

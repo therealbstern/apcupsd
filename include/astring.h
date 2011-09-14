@@ -26,6 +26,7 @@
 #define __ASTRING_H
 
 #include <string.h>
+#include <stdarg.h>
 
 class astring
 {
@@ -39,6 +40,7 @@ public:
    int len() const { return _len; }
 
    int format(const char *format, ...);
+   int vformat(const char *format, va_list args);
 
    astring &operator=(const astring &rhs);
    astring &operator=(const char *rhs);
@@ -59,12 +61,15 @@ public:
    bool operator!=(const char *rhs) const { return !(*this == rhs); }
    bool operator!=(const astring &rhs) const { return !(*this == rhs); }
 
+   astring substr(int start, int len = -1) const;
+   int strchr(char ch) const;
+
    operator const char *() const { return _data; }
    const char *str() const { return _data; }
 
-   void rtrim();
-   void ltrim();
-   void trim() { ltrim(); rtrim(); }
+   astring &rtrim();
+   astring &ltrim();
+   astring &trim() { ltrim(); return rtrim(); }
 
    bool empty() const { return _len == 0; }
 

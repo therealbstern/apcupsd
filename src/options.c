@@ -67,7 +67,7 @@ extern bool trace;
 
 static void print_usage(char *argv[])
 {
-   printf(_("usage: apcupsd [options]\n"
+   printf("usage: apcupsd [options]\n"
          "  Options are as follows:\n"
          "  -b,                           don't go into background\n"
          "  -d, --debug <level>           set debug level (>0)\n"
@@ -92,7 +92,7 @@ static void print_usage(char *argv[])
          "under the terms of the GNU General Public License\n"
          "\n"
          "Report bugs to apcupsd Support Center:\n"
-         "  apcupsd-users@lists.sourceforge.net\n"));
+         "  apcupsd-users@lists.sourceforge.net\n");
 }
 
 int parse_options(int argc, char *argv[])
@@ -221,7 +221,7 @@ int parse_options(int argc, char *argv[])
 #endif
 
    if ((oneshot == TRUE) && options > 1) {
-      fprintf(stderr, _("\nError: too many arguments.\n\n"));
+      fprintf(stderr, "\nError: too many arguments.\n\n");
       errflag++;
    }
 

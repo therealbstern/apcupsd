@@ -25,11 +25,31 @@
 
 #include "apc.h"
 
+int format_date(time_t timestamp, char *dest, size_t destlen)
+{
+   struct tm tm;
+   localtime_r(&timestamp, &tm);
+
+#ifdef HAVE_WIN32
+   // Annoyingly, Windows does not properly implement %z (it always spells
+   // out the timezone name) so we need to emulate it manually.
+   int len = strftime(dest, destlen, "%Y-%m-%d %H:%M:%S ", &tm);
+   tzset();
+   unsigned int offset = abs(_timezone) / 60;
+   len += snprintf(dest+len, destlen-len, "%c%02u%02u  ", 
+      _timezone < 0 ? '+' : '-', // _timezone is UTC-local
+      offset/60, offset%60);
+   return len;
+#else
+   return strftime(dest, destlen, "%Y-%m-%d %H:%M:%S %z  ", &tm);
+#endif
+}
+
 void log_event(const UPSINFO *ups, int level, const char *fmt, ...)
 {
    va_list arg_ptr;
    char msg[2 *MAXSTRING];
-   char datetime[MAXSTRING];
+   char datetime[100];
    int event_fd;
 
    event_fd = ups ? ups->event_fd : -1;
@@ -44,16 +64,10 @@ void log_event(const UPSINFO *ups, int level, const char *fmt, ...)
    /* Write out to our temp file. LOG_INFO is DATA logging, so
     * do not write it to our temp events file. */
    if (event_fd >= 0 && level != LOG_INFO) {
-      int lm;
-      time_t nowtime;
-      struct tm tm;
-
-      time(&nowtime);
-      localtime_r(&nowtime, &tm);
-      strftime(datetime, 100, "%a %b %d %X %Z %Y  ", &tm);
+      format_date(time(NULL), datetime, sizeof(datetime));
       write(event_fd, datetime, strlen(datetime));
 
-      lm = strlen(msg);
+      int lm = strlen(msg);
       if (msg[lm - 1] != '\n')
          msg[lm++] = '\n';
 
