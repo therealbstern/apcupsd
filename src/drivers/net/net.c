@@ -602,8 +602,8 @@ int net_ups_read_static_data(UPSINFO *ups)
          log_event(ups, LOG_ERR, "getupsvar: failed for \"upsname\".");
       }
       if (!getupsvar(
-            ups, "model", ups->mode.long_name, 
-            sizeof(ups->mode.long_name))) {
+            ups, "model", ups->upsmodel, 
+            sizeof(ups->upsmodel))) {
          log_event(ups, LOG_ERR, "getupsvar: failed for \"model\".");
       }
       if (!getupsvar(
