@@ -373,7 +373,9 @@ static int snmplite_ups_update_cis(UPSINFO *ups, bool dynamic)
    for (unsigned int i = 0; mib[i].ci != -1; i++)
    {
       if (ups->UPS_Cap[mib[i].ci] && 
-          mib[i].dynamic == dynamic)
+          mib[i].dynamic == dynamic &&
+          ((*iter).data.type != Asn::SEQUENCE || // Skip update if sequence
+           (*iter).data.seq.size() != 0))        // is empty
       {
          sid->strategy->update_ci_func(ups, mib[i].ci, (*iter).data);
          ++iter;
