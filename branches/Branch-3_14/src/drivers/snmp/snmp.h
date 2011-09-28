@@ -79,7 +79,7 @@ struct snmp_ups_internal_data {
    unsigned short remote_port;         /* Remote socket, usually 161 */
    char *DeviceVendor;                 /* Vendor (ex. APC|RFC) */
    char *community;                    /* Community name */
-   void *MIB;                          /* Pointer to MIB data */
+   void *mib;                          /* Pointer to MIB data */
    struct snmp_session *trap_session;  /* snmp session for traps */
    bool trap_received;                 /* Have we seen a trap? */
 };

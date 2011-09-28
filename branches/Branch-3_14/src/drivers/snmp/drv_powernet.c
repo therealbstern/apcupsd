@@ -34,7 +34,7 @@ static int powernet_check_comm_lost(UPSINFO *ups)
    struct snmp_ups_internal_data *Sid =
       (struct snmp_ups_internal_data *)ups->driver_internal_data;
    struct snmp_session *s = &Sid->session;
-   powernet_mib_t *data = (powernet_mib_t *)Sid->MIB;
+   powernet_mib_t *data = (powernet_mib_t *)Sid->mib;
    int ret = 1;
 
    /*
@@ -161,7 +161,7 @@ int powernet_snmp_ups_read_static_data(UPSINFO *ups)
    struct snmp_ups_internal_data *Sid = 
       (struct snmp_ups_internal_data *)ups->driver_internal_data;
    struct snmp_session *s = &Sid->session;
-   powernet_mib_t *data = (powernet_mib_t *)Sid->MIB;
+   powernet_mib_t *data = (powernet_mib_t *)Sid->mib;
 
    if (powernet_check_comm_lost(ups) == 0)
       return 0;
@@ -300,7 +300,7 @@ int powernet_snmp_ups_read_volatile_data(UPSINFO *ups)
    struct snmp_ups_internal_data *Sid =
       (struct snmp_ups_internal_data *)ups->driver_internal_data;
    struct snmp_session *s = &Sid->session;
-   powernet_mib_t *data = (powernet_mib_t *)Sid->MIB;
+   powernet_mib_t *data = (powernet_mib_t *)Sid->mib;
 
    if (powernet_check_comm_lost(ups) == 0)
       return 0;

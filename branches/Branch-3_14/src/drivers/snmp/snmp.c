@@ -140,26 +140,26 @@ int snmp_ups_open(UPSINFO *ups)
 
    if (!strcmp(Sid->DeviceVendor, "APC") ||
        !strcmp(Sid->DeviceVendor, "APC_NOTRAP")) {
-      Sid->MIB = malloc(sizeof(powernet_mib_t));
-      if (Sid->MIB == NULL) {
+      Sid->mib = malloc(sizeof(powernet_mib_t));
+      if (Sid->mib == NULL) {
          log_event(ups, LOG_ERR, "Out of memory.");
          exit(1);
       }
 
-      memset(Sid->MIB, 0, sizeof(powernet_mib_t));
+      memset(Sid->mib, 0, sizeof(powernet_mib_t));
 
       /* Run powernet specific init */
       return powernet_snmp_ups_open(ups);
    }
 
    if (!strcmp(Sid->DeviceVendor, "RFC")) {
-      Sid->MIB = malloc(sizeof(ups_mib_t));
-      if (Sid->MIB == NULL) {
+      Sid->mib = malloc(sizeof(ups_mib_t));
+      if (Sid->mib == NULL) {
          log_event(ups, LOG_ERR, "Out of memory.");
          exit(1);
       }
 
-      memset(Sid->MIB, 0, sizeof(ups_mib_t));
+      memset(Sid->mib, 0, sizeof(ups_mib_t));
       return 1;
    }
 

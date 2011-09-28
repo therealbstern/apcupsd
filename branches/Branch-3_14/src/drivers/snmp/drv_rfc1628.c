@@ -32,7 +32,7 @@ static int rfc_1628_check_alarms(UPSINFO *ups)
    struct snmp_ups_internal_data *Sid =
       (struct snmp_ups_internal_data *)ups->driver_internal_data;
    struct snmp_session *s = &Sid->session;
-   ups_mib_t *data = (ups_mib_t *)Sid->MIB;
+   ups_mib_t *data = (ups_mib_t *)Sid->mib;
 
    /*
     * Check the Ethernet COMMLOST first, then check the
@@ -76,7 +76,7 @@ int rfc1628_snmp_ups_read_static_data(UPSINFO *ups)
    struct snmp_ups_internal_data *Sid =
       (struct snmp_ups_internal_data *)ups->driver_internal_data;
    struct snmp_session *s = &Sid->session;
-   ups_mib_t *data = (ups_mib_t *)Sid->MIB;
+   ups_mib_t *data = (ups_mib_t *)Sid->mib;
    
    if (rfc_1628_check_alarms(ups) == 0) {
      return 0;
@@ -98,7 +98,7 @@ int rfc1628_snmp_ups_read_volatile_data(UPSINFO *ups)
    struct snmp_ups_internal_data *Sid =
       (struct snmp_ups_internal_data *)ups->driver_internal_data;
    struct snmp_session *s = &Sid->session;
-   ups_mib_t *data = (ups_mib_t *)Sid->MIB;
+   ups_mib_t *data = (ups_mib_t *)Sid->mib;
 
    if (rfc_1628_check_alarms(ups) == 0) {
      return 0;
