@@ -99,6 +99,7 @@
 %{?build_gapcmon:%define gapcmon 1}
 
 # should we build net-snmp driver
+# this is now deprecated in favor of new driver which does not depend on net-snmp library
 %define snmp 0
 %{?build_snmp:%define snmp 1}
 
@@ -127,7 +128,7 @@ BuildRequires: ORBit2, pango-devel, pkgconfig
 %endif
 %if %{suse} && %{gapcmon}
 BuildRequires: bonobo-activation, freetype2-devel, cairo-devel, fontconfig-devel
-BuildRequires: gconf2-devel, gnome-vfs2-devel, libpng-devel, glitz-devel, xorg-x11-libs
+BuildRequires: gconf2-devel, gnome-vfs2-devel, libpng-devel, xorg-x11-libs
 BuildRequires: libbonobo-devel, libbonoboui-devel
 %endif
 %if %{fedora_core} && %{gapcmon}
@@ -201,7 +202,7 @@ Requires: glibc, gtk2 >= 2.4, glib2, atk, libbonobo, libbonoboui, ORBit2, pango
 %endif
 
 %if %{suse} && %{gapcmon}
-Requires: bonobo-activation, freetype2, cairo, fontconfig, gconf2, gnome-vfs2, libpng, glitz, xorg-x11-libs
+Requires: bonobo-activation, freetype2, cairo, fontconfig, gconf2, gnome-vfs2, libpng, xorg-x11-libs
 %endif
 %if %{fedora_core} && %{gapcmon}
 Requires: freetype, GConf2
@@ -417,6 +418,9 @@ if [ "$1" = 0 ] ; then
 fi
 
 %changelog
+* Fri Sep 30 2011 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- remove glitz-devel build requirement for suse (obsoleted)
+- builds for older suse versions should make sure that glitz packages are installed
 * Sun Jan 10 2010 Adam Kropelin <akropel1 at rochester.rr.com>
 - changes for new snmp driver
 * Sat Aug 01 2009 D. Scott Barninger <barninger at fairfieldcomputers.com>
