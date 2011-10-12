@@ -66,7 +66,6 @@ typedef struct s_usb_data {
    int fd;                         /* Our UPS control pipe fd when open */
    int intfd;                      /* Interrupt pipe fd */
    char orig_device[MAXSTRING];    /* Original port specification */
-   short vendor;                   /* UPS vendor id */
    report_desc_t rdesc;            /* Device's report descrptor */
    USB_INFO *info[CI_MAXCI + 1];   /* Info pointers for each command */
 } USB_DATA;
@@ -114,15 +113,6 @@ static int init_device(UPSINFO *ups, const char *devname)
       Dmsg0(100, "Unable to get device info.\n");
       return 0;
    }
-
-   /* Only interested if APC or MGE is the vendor */
-   if (devinfo.udi_vendorNo != VENDOR_APC &&
-       devinfo.udi_vendorNo != VENDOR_MGE) {
-      close(fd);
-      Dmsg1(100, "Unsupported vendor (%04x).\n", devinfo.udi_vendorNo);
-      return 0;
-   }
-   my_data->vendor = devinfo.udi_vendorNo;
 
    /* Fetch the report descritor */
    rdesc = hidu_fetch_report_descriptor(fd, &rdesclen);

@@ -431,7 +431,7 @@ int open_usb_device(UPSINFO *ups)
    i = usb_find_devices();
    Dmsg1(200, "Found %d USB devices\n", i);
 
-   /* Iterate over all devices, checking for idVendor=APC */
+   /* Iterate over all devices */
    bus = usb_get_busses();
    while (bus)
    {
@@ -442,12 +442,10 @@ int open_usb_device(UPSINFO *ups)
             bus->dirname, dev->filename, 
             dev->descriptor.idVendor, dev->descriptor.idProduct);
 
-         if (dev->descriptor.idVendor == VENDOR_APC) {
-            Dmsg2(200, "Trying device %s:%s\n", bus->dirname, dev->filename);
-            if (init_device(ups, dev)) {
-               /* Successfully found and initialized an UPS */
-               return 1;
-            }
+         Dmsg2(200, "Trying device %s:%s\n", bus->dirname, dev->filename);
+         if (init_device(ups, dev)) {
+            /* Successfully found and initialized an UPS */
+            return 1;
          }
 
          dev = dev->next;
