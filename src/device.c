@@ -171,6 +171,13 @@ void prep_device(UPSINFO *ups)
       if (ups->upsname[0] == 0)    /* error */
          astrncpy(ups->upsname, "default", sizeof(ups->upsname));
    }
+
+   /* Strip unprintable characters from UPS model */
+   for (char *ptr = ups->upsmodel; *ptr; ptr++) 
+   {
+      if (!isprint(*ptr))
+         *ptr = ' ';
+   }
 }
 
 /* Called once every 5 seconds to read all UPS info */
