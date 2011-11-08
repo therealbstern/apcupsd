@@ -49,7 +49,9 @@ bool SnmpEngine::Open(const char *host, unsigned short port, const char *comm, b
 {
    // In case we are already open
    close(_socket);
+   _socket = -1;
    close(_trapsock);
+   _trapsock = -1;
 
    // Remember new community name
    _community = comm;
@@ -100,6 +102,8 @@ bool SnmpEngine::Open(const char *host, unsigned short port, const char *comm, b
    if (rc == -1)
    {
       perror("bind");
+      close(_socket);
+      _socket = -1;
       return false;
    }
 
@@ -110,6 +114,8 @@ bool SnmpEngine::Open(const char *host, unsigned short port, const char *comm, b
       if (_trapsock == -1)
       {
          perror("socket");
+         close(_socket);
+         _socket = -1;
          return false;
       }
 
@@ -121,6 +127,10 @@ bool SnmpEngine::Open(const char *host, unsigned short port, const char *comm, b
       if (rc == -1)
       {
          perror("bind");
+         close(_socket);
+         _socket = 1;
+         close(_trapsock);
+         _trapsock = -1;
          return false;
       }
    }
