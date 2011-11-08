@@ -196,9 +196,6 @@ int main(int argc, char *argv[])
          dup2(tmp_fd, tmp_fd + i);
    }
 
-   /* If NLS is compiled in, enable NLS messages translation. */
-   textdomain("apcupsd");
-
    /*
     * If there's not one in libc, then we have to use our own version
     * which requires initialization.
