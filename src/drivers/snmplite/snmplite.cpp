@@ -178,7 +178,10 @@ int snmplite_ups_open(UPSINFO *ups)
    // Create SNMP engine
    sid->snmp = new Snmp::SnmpEngine();
    if (!sid->snmp->Open(sid->host, sid->port, "dummy", sid->traps))
-      return 0;
+   {
+      log_event(ups, LOG_ERR, "snmplite Unable to initialize SNMP");
+      exit(1);
+   }
 
    // If user did not specify a community, probe for one
    if (!sid->community)
