@@ -325,6 +325,7 @@ static void apc_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       break;
 
    case CI_WHY_BATT:
+      Dmsg1(80, "Got CI_WHY_BATT: %d\n", data.u32);
       switch (data.u32)
       {
       case 1:
