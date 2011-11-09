@@ -455,5 +455,29 @@ int snmplite_ups_read_static_data(UPSINFO *ups)
 
 int snmplite_ups_entry_point(UPSINFO *ups, int command, void *data)
 {
-   return 0;
+   switch (command) {
+   case DEVICE_CMD_CHECK_SELFTEST:
+      Dmsg0(80, "Checking self test.\n");
+      /* Reason for last transfer to batteries */
+      if (ups->UPS_Cap[CI_WHY_BATT] && snmplite_ups_update_cis(ups, true))
+      {
+         Dmsg1(80, "Transfer reason: %d\n", ups->lastxfer);
+
+         /* See if this is a self test rather than power failure */
+         if (ups->lastxfer == XFER_SELFTEST) {
+            /*
+             * set Self Test start time
+             */
+            ups->SelfTest = time(NULL);
+            Dmsg1(80, "Self Test time: %s", ctime(&ups->SelfTest));
+         }
+      }
+      break;
+
+   case DEVICE_CMD_GET_SELFTEST_MSG:
+   default:
+      return FAILURE;
+   }
+
+   return SUCCESS;
 }
