@@ -242,7 +242,8 @@ enum a_state {
    st_SelfTest,
    st_OnBattery,
    st_MainsBack,
-   st_OnMains
+   st_OnMains,
+   st_Calibration
 };
 
 /*
@@ -254,8 +255,10 @@ static enum a_state get_state(UPSINFO *ups, time_t now)
    enum a_state state;
 
    /* If we're on battery for calibration, treat as not on battery */
-   if (ups->is_onbatt() && !ups->is_calibration()) {
-      if (ups->chg_onbatt()) {
+   if (ups->is_onbatt()) {
+      if (ups->is_calibration()) {
+         state = st_Calibration;
+      } else if (ups->chg_onbatt()) {
          state = st_PowerFailure;  /* Power failure just detected */
       } else {
          if (ups->SelfTest)        /* see if UPS is doing self test */
@@ -633,6 +636,15 @@ void do_action(UPSINFO *ups)
 
       ups->cum_time_on_batt += (ups->last_offbatt_time - ups->last_onbatt_time);
       break;
+
+   case st_Calibration:
+      /*
+       * During calibration we ignore battery level, runtime remaining, etc.
+       * since the UPS will switch us back online when it is done. We also have
+       * no timeout here since we can't predict how long the calibration will
+       * take.
+       */
+       break;
 
    default:
       break;
