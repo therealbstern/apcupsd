@@ -435,7 +435,7 @@ static int apc_killpower(UPSINFO *ups)
    struct snmplite_ups_internal_data *sid =
       (struct snmplite_ups_internal_data *)ups->driver_internal_data;
 
-   Snmp::Variable var = { Asn::INTEGER, 2 };
+   Snmp::Variable var(Asn::INTEGER, 2);
    return sid->snmp->Set(upsBasicControlConserveBattery, &var);
 }
 
@@ -444,7 +444,7 @@ static int apc_shutdown(UPSINFO *ups)
    struct snmplite_ups_internal_data *sid =
       (struct snmplite_ups_internal_data *)ups->driver_internal_data;
 
-   Snmp::Variable var = { Asn::INTEGER, 2 };
+   Snmp::Variable var(Asn::INTEGER, 2);
    return sid->snmp->Set(upsAdvControlUpsOff, &var);
 }
 

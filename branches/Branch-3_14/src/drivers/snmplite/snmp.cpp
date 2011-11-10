@@ -198,8 +198,14 @@ bool SnmpEngine::Get(alist<OidVar> &oids)
    // Append one varbind for each oidvar from the caller
    alist<OidVar>::iterator iter;
    for (iter = oids.begin(); iter != oids.end(); ++iter)
+   {
       if (iter->data.type != Asn::SEQUENCE)
          getreq.Append(iter->oid);
+
+      // Also use this loop as an opportunity to initialize all variables
+      // to invalid. They will be set to valid below as we fill in results.
+      iter->data.valid = false;
+   }
 
    // Perform request if we put at least one OID in it
    if (getreq.Size() > 0)
@@ -275,6 +281,7 @@ bool SnmpEngine::Get(alist<OidVar> &oids)
             Variable tmp;
             result.Extract(&tmp);
             iter->data.seq.append(tmp);
+            iter->data.valid = true;
 
             // Save returned OID for next iteration
             nextoid = result.Oid();
@@ -493,10 +500,12 @@ bool VarBind::Extract(Variable *out)
    {
       out->i32 = _data->AsInteger()->IntValue();
       out->u32 = _data->AsInteger()->UintValue();
+      out->valid = true;
    }
    else if (_data->IsOctetString())
    {
       out->str = *_data->AsOctetString();
+      out->valid = true;
    }
    else
    {
