@@ -252,9 +252,16 @@ bool snmplite_ups_check_ci(int ci, Snmp::Variable &data)
    // to always come back as zeros.
    switch (ci)
    {
-   // SmartUPS 1000 is returning 0 for this via SNMP so screen it out
-   // in case this is a common issue.
+   // SmartUPS 1000 is returning 0 or -1 for this via SNMP so screen it out
+   // in case this is a common issue. Expected values would be 12/24/48 but
+   // allow up to 120 for a really large UPS.
    case CI_NOMBATTV:
+      return data.i32 > 0 && data.i32 <= 120;
+
+   // SmartUPS 1000 is returning -1 for this.
+   case CI_BADBATTS:
+      return data.i32 > -1;
+
    // Generex CS121 SNMP/WEB Adapter using RFC1628 MIB is returning zero for
    // these values on a Newave Conceptpower DPA UPS.
    case CI_LTRANS:
@@ -262,7 +269,7 @@ bool snmplite_ups_check_ci(int ci, Snmp::Variable &data)
    case CI_NOMOUTV:
    case CI_NOMINV:
    case CI_NOMPOWER:
-      return data.u32 != 0;
+      return data.i32 > 0;
    }
 
    return true;
