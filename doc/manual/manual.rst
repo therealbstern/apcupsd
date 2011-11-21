@@ -1938,7 +1938,7 @@ would look like the following:
 
     ## apcupsd.conf v1.1 ##
     UPSCABLE smart
-    UPSTYPE smartups
+    UPSTYPE apcsmart
     DEVICE /dev/ttyS0
     LOCKFILE /var/lock
     UPSCLASS standalone
