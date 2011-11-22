@@ -121,7 +121,7 @@ static void status_write(UPSINFO *ups, const char *fmt, ...)
 
 void do_server(UPSINFO *ups)
 {
-   int newsockfd, sockfd, childpid;
+   int newsockfd, sockfd;
    struct sockaddr_in cli_addr;    /* client's address */
    struct sockaddr_in serv_addr;   /* our address */
    int tlog;
@@ -207,7 +207,6 @@ void do_server(UPSINFO *ups)
       arg = (struct s_arg *)malloc(sizeof(struct s_arg));
       arg->newsockfd = newsockfd;
       arg->ups = ups;
-      childpid = 0;
 
       pthread_t tid;
       pthread_create(&tid, NULL, handle_client_request, arg);
