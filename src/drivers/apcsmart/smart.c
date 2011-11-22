@@ -406,13 +406,7 @@ void UPSlinkCheck(UPSINFO *ups)
  */
 int apcsmart_ups_read_volatile_data(UPSINFO *ups)
 {
-   time_t now;
    char *answer;
-
-   /*
-    * We need it for self-test start time.
-    */
-   now = time(NULL);
 
    write_lock(ups);
 
