@@ -120,7 +120,7 @@ else
    AM_CONDITIONAL(HAVE_GCC, $FALSEPRG)
 fi
 
-dnl Default linker is g++
+dnl Default linker is gcc
 if test x$LD = x ; then
    LD="$CC"
 fi
@@ -846,12 +846,14 @@ if test -n "$GCC"; then
    SUPC="`$CXX -print-file-name=libsupc++.a 2>/dev/null`"
    case "$SUPC" in
    libsupc++.a*)
-      # Library not found, so this is and older GCC...
+      # Library not found, so this is an older GCC...
+      LD="$CXX"
       AC_MSG_RESULT(no)
       ;;
    *)
       # This is gcc 3.x, and it knows of libsupc++, so we need it
       LIBS="$LIBS -lsupc++"
+      LD="$CC"
       AC_MSG_RESULT(yes)
 
       # See if this system has a broken libsupc++ that requires
