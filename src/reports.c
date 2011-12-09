@@ -152,6 +152,7 @@ static void log_data(UPSINFO *ups)
    case NETWORK_UPS:
    case SNMP_UPS:
    case APCSMART_UPS:
+   case PCNET_UPS:
       toggle = !toggle;            /* flip bit */
       log_event(ups, LOG_INFO,
          "%05.1f,%05.1f,%05.1f,%05.2f,%05.2f,%04.1f,%04.1f,%05.1f,%05.1f,%05.1f,%05.1f,%d",
