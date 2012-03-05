@@ -223,6 +223,7 @@ static bool pcnet_process_data(UPSINFO* ups, const char *key, const char *value)
       ups->reg1 = strtoul(value, NULL, 16);
       break;
    case CI_REG2:
+      Dmsg1(80, "Got CI_REG2: %s\n", value);
       ups->reg2 = strtoul(value, NULL, 16);
       ups->set_battpresent(!(ups->reg2 & 0x20));
       break;
