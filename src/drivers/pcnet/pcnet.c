@@ -51,6 +51,7 @@ typedef struct {
    unsigned long uptime;               /* UPS uptime counter */
    unsigned long reboots;              /* UPS reboot counter */
    time_t datatime;                    /* Last time we got valid data */
+   bool runtimeInSeconds;              /* UPS reports runtime in seconds */
 } PCNET_DATA;
 
 /* Convert UPS response to enum and string */
@@ -102,9 +103,11 @@ static LastXferCause decode_lastxfer(const char *str)
 
 static bool pcnet_process_data(UPSINFO* ups, const char *key, const char *value)
 {
+   PCNET_DATA *my_data = (PCNET_DATA *)ups->driver_internal_data;
    unsigned long cmd;
    int ci;
    bool ret;
+   double tmp;
 
    /* Make sure we have a value */
    if (*value == '\0')
@@ -208,7 +211,8 @@ static bool pcnet_process_data(UPSINFO* ups, const char *key, const char *value)
       break;
    case CI_RUNTIM:
       Dmsg1(80, "Got CI_RUNTIM: %s\n", value);
-      ups->TimeLeft = atof(value);
+      tmp = atof(value);
+      ups->TimeLeft = my_data->runtimeInSeconds ? tmp/60 : tmp;
       break;
    case CI_ITEMP:
       Dmsg1(80, "Got CI_ITEMP: %s\n", value);
@@ -500,10 +504,7 @@ static struct pair *auth_and_map_packet(UPSINFO* ups, char *buf, int len)
    return pairs;
 }
 
-/*
- * Read UPS events. I.e. state changes.
- */
-int pcnet_ups_check_state(UPSINFO *ups)
+static int wait_for_data(UPSINFO *ups, int wait_time)
 {
    PCNET_DATA *my_data = (PCNET_DATA *)ups->driver_internal_data;
    struct timeval tv, now, exit;
@@ -518,7 +519,7 @@ int pcnet_ups_check_state(UPSINFO *ups)
 
    /* Figure out when we need to exit by */
    gettimeofday(&exit, NULL);
-   exit.tv_sec += ups->wait_time;
+   exit.tv_sec += wait_time;
 
    while (!done) {
 
@@ -596,6 +597,14 @@ int pcnet_ups_check_state(UPSINFO *ups)
    }
 
    return done;
+}
+
+/*
+ * Read UPS events. I.e. state changes.
+ */
+int pcnet_ups_check_state(UPSINFO *ups)
+{
+   return wait_for_data(ups, ups->wait_time);
 }
 
 int pcnet_ups_open(UPSINFO *ups)
@@ -691,11 +700,34 @@ int pcnet_ups_close(UPSINFO *ups)
  */
 int pcnet_ups_get_capabilities(UPSINFO *ups)
 {
+   PCNET_DATA *my_data = (PCNET_DATA *)ups->driver_internal_data;
+
    /*
     * Unfortunately, we don't know capabilities until we
     * receive the first broadcast status message.
     */
-   return 1;
+
+   int rc = wait_for_data(ups, COMMLOST_TIMEOUT);
+   if (rc)
+   {
+      /*
+       * Check for quirk where UPS reports runtime remaining in seconds
+       * instead of the usual minutes. So far this has been reported on
+       * "Smart-UPS RT 5000 XL" and "Smart-UPS X 3000". We will assume it
+       * affects all RT and X series models.
+       */
+      if (ups->UPS_Cap[CI_UPSMODEL] && 
+          (!strncmp(ups->upsmodel, "Smart-UPS X", 11) ||
+           !strncmp(ups->upsmodel, "Smart-UPS RT", 12)))
+      {
+         Dmsg1(50, "Enabling runtime-in-seconds quirk [%s]\n", ups->upsmodel);
+         my_data->runtimeInSeconds = true;
+         if (ups->UPS_Cap[CI_RUNTIM])
+            ups->TimeLeft /= 60; // Adjust initial value
+      }
+   }
+
+   return ups->UPS_Cap[CI_STATUS];
 }
 
 /*
@@ -706,7 +738,10 @@ int pcnet_ups_get_capabilities(UPSINFO *ups)
  */
 int pcnet_ups_read_static_data(UPSINFO *ups)
 {
-   /* All our data gathering is done in pcnet_ups_check_state() */
+   /*
+    * First set of data was gathered already in pcnet_ups_get_capabilities().
+    * All additional data gathering is done in pcnet_ups_check_state()
+    */
    return 1;
 }
 
@@ -892,8 +927,6 @@ int pcnet_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
 
 int pcnet_ups_entry_point(UPSINFO *ups, int command, void *data)
 {
-   int temp;
-
    switch (command) {
    case DEVICE_CMD_CHECK_SELFTEST:
       Dmsg0(80, "Checking self test.\n");
@@ -913,18 +946,11 @@ int pcnet_ups_entry_point(UPSINFO *ups, int command, void *data)
        * invoke pcnet_ups_check_state() with a 12 second timeout, 
        * expecting that it should get a status report before then.
        */
-
-      /* Save current ups->wait_time and set it to 12 seconds */
-      temp = ups->wait_time;
-      ups->wait_time = 12;
       
       /* Let check_status wait for the result */
       write_unlock(ups);
-      pcnet_ups_check_state(ups);
+      wait_for_data(ups, 12);
       write_lock(ups);
-
-      /* Restore ups->wait_time */
-      ups->wait_time = temp;
       break;
 
    default:
