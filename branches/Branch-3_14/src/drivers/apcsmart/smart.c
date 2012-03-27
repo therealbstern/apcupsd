@@ -227,7 +227,7 @@ int getline(char *s, int len, UPSINFO *ups)
       do {
          retval = read(ups->fd, &c, 1);
       } while (retval == -1 && (errno == EAGAIN || errno == EINTR));
-      if (retval == 0) {
+      if (retval <= 0) {
          return FAILURE;
       }
 
