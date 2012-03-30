@@ -26,26 +26,63 @@
 #ifndef _USB_H
 #define _USB_H
 
-/*********************************************************************/
+class UsbUpsDriver: public UpsDriver
+{
+public:
+   UsbUpsDriver(UPSINFO *ups);
+   virtual ~UsbUpsDriver() {}
 
-/* Function ProtoTypes                                               */
+   static UpsDriver *Factory(UPSINFO *ups);
 
-/*********************************************************************/
+   // UpsDriver functions impemented in UsbUpsDriver base class
+   virtual bool get_capabilities();
+   virtual bool read_volatile_data();
+   virtual bool read_static_data();
+   virtual bool kill_power();
+   virtual bool shutdown();
+   virtual bool entry_point(int command, void *data);
 
-extern int usb_ups_get_capabilities(UPSINFO *ups);
-extern int usb_ups_read_volatile_data(UPSINFO *ups);
-extern int usb_ups_read_static_data(UPSINFO *ups);
-extern int usb_ups_kill_power(UPSINFO *ups);
-extern int usb_ups_shutdown(UPSINFO *ups);
-extern int usb_ups_check_state(UPSINFO *ups);
-extern int usb_ups_open(UPSINFO *ups);
-extern int usb_ups_close(UPSINFO *ups);
-extern int usb_ups_setup(UPSINFO *ups);
-extern int usb_ups_program_eeprom(UPSINFO *ups, int command, const char *data);
-extern int usb_ups_entry_point(UPSINFO *ups, int command, void *data);
+   // Extra functions exported for use by apctest
+   // Implemented by derived XXXUsbUpsDriver class
+   virtual int write_int_to_ups(int ci, int value, char const* name) = 0;
+   virtual int read_int_from_ups(int ci, int *value) = 0;
 
-/* Extra functions exported for use by apctest */
-extern int usb_write_int_to_ups(UPSINFO *ups, int ci, int value, char const* name);
-extern int usb_read_int_from_ups(UPSINFO *ups, int ci, int *value);
+protected:
+
+   typedef struct s_usb_value {
+      int value_type;               /* Type of returned value */
+      double dValue;                /* Value if double */
+      int iValue;                   /* Integer value */
+      const char *UnitName;         /* Name of units */
+      char sValue[MAXSTRING];       /* Value if string */
+   } USB_VALUE;
+
+   // Helper functions implemented in UsbUpsDriver
+   bool usb_get_value(int ci, USB_VALUE *uval);
+   bool usb_process_value_bup(int ci, USB_VALUE* uval);
+   void usb_process_value(int ci, USB_VALUE* uval);
+   bool usb_update_value(int ci);
+   bool usb_report_event(int ci, USB_VALUE *uval);
+   double pow_ten(int exponent);
+
+   struct s_known_info {
+      int ci;                       /* Command index */
+      unsigned usage_code;          /* Usage code */
+      unsigned physical;            /* Physical usage */
+      unsigned logical;             /* Logical usage */
+      int data_type;                /* Data type expected */
+      bool isvolatile;              /* Volatile data item */
+   };
+
+   static const s_known_info known_info[];
+
+   // Functions implemented in derived XXXUsbUpsDriver class
+   virtual bool pusb_ups_get_capabilities() = 0;
+   virtual bool pusb_get_value(int ci, USB_VALUE *uval) = 0;
+
+   bool _quirk_old_backups_pro;
+   struct timeval _prev_time;
+   int _bpcnt;
+};
 
 #endif  /* _USB_H */

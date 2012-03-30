@@ -136,6 +136,7 @@ typedef struct internalgeninfo {
    int type;
 } INTERNALGENINFO;                 /* for assigning into upsinfo */
 
+class UpsDriver;
 
 class UPSINFO {
  public:
@@ -354,7 +355,7 @@ class UPSINFO {
    pthread_mutex_t mutex;
    int refcnt;                     /* thread attach count */
 
-   const struct upsdriver *driver; /* UPS driver for this UPSINFO */
+   UpsDriver *driver;              /* UPS driver for this UPSINFO */
    void *driver_internal_data;     /* Driver private data */
 };
 

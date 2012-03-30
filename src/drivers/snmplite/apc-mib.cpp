@@ -430,22 +430,16 @@ static void apc_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
    }
 }
 
-static int apc_killpower(UPSINFO *ups)
+static int apc_killpower(Snmp::SnmpEngine *snmp)
 {
-   struct snmplite_ups_internal_data *sid =
-      (struct snmplite_ups_internal_data *)ups->driver_internal_data;
-
    Snmp::Variable var(Asn::INTEGER, 2);
-   return sid->snmp->Set(upsBasicControlConserveBattery, &var);
+   return snmp->Set(upsBasicControlConserveBattery, &var);
 }
 
-static int apc_shutdown(UPSINFO *ups)
+static int apc_shutdown(Snmp::SnmpEngine *snmp)
 {
-   struct snmplite_ups_internal_data *sid =
-      (struct snmplite_ups_internal_data *)ups->driver_internal_data;
-
    Snmp::Variable var(Asn::INTEGER, 2);
-   return sid->snmp->Set(upsAdvControlUpsOff, &var);
+   return snmp->Set(upsAdvControlUpsOff, &var);
 }
 
 // Export strategy to snmplite.cpp

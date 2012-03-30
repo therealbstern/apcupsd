@@ -23,31 +23,52 @@
 #ifndef _APCSMART_H
 #define _APCSMART_H
 
-/* Private data structure */
-typedef struct s_smart_data {
-   struct termios oldtio;
-   struct termios newtio;
-} SMART_DATA;
+class ApcSmartUpsDriver: public UpsDriver
+{
+public:
+   ApcSmartUpsDriver(UPSINFO *ups);
+   virtual ~ApcSmartUpsDriver() {}
 
+   static UpsDriver *Factory(UPSINFO *ups)
+      { return new ApcSmartUpsDriver(ups); }
 
-/*
- * Function Prototypes
- */
- 
-extern int apcsmart_ups_get_capabilities(UPSINFO *ups);
-extern int apcsmart_ups_read_volatile_data(UPSINFO *ups);
-extern int apcsmart_ups_read_static_data(UPSINFO *ups);
-extern int apcsmart_ups_kill_power(UPSINFO *ups);
-extern int apcsmart_ups_shutdown(UPSINFO *ups);
-extern int apcsmart_ups_check_state(UPSINFO *ups);
-extern int apcsmart_ups_open(UPSINFO *ups);
-extern int apcsmart_ups_close(UPSINFO *ups);
-extern int apcsmart_ups_setup(UPSINFO *ups);
-extern int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, const char *data);
-extern int apcsmart_ups_entry_point(UPSINFO *ups, int command, void *data);
+   virtual bool get_capabilities();
+   virtual bool read_volatile_data();
+   virtual bool read_static_data();
+   virtual bool kill_power();
+   virtual bool check_state();
+   virtual bool Open();
+   virtual bool Close();
+   virtual bool setup();
+   virtual bool entry_point(int command, void *data);
+   virtual bool program_eeprom(int command, const char *data);
+   virtual bool shutdown();
 
-extern int apcsmart_ups_shutdown_with_delay(UPSINFO *ups, int shutdown_delay);
-extern int apcsmart_ups_get_shutdown_delay(UPSINFO *ups);
-extern void apcsmart_ups_warn_shutdown(UPSINFO *ups, int shutdown_delay);
+   // Public for apctest
+   char *smart_poll(char cmd);
+   int getline(char *s, int len);
+   void writechar(char a);
+
+private:
+
+   static SelfTestResult decode_testresult(char* str);
+   static LastXferCause decode_lastxfer(char *str);
+   static const char *get_model_from_oldfwrev(const char *s);
+
+   void UPSlinkCheck();
+
+   int apcsmart_ups_shutdown_with_delay(int shutdown_delay);
+   int apcsmart_ups_get_shutdown_delay();
+   void apcsmart_ups_warn_shutdown(int shutdown_delay);
+
+   void change_ups_battery_date(const char *newdate);
+   void change_ups_name(const char *newname);
+   void change_extended();
+   int change_ups_eeprom_item(const char *title, const char cmd, const char *setting);
+
+   struct termios _oldtio;
+   struct termios _newtio;
+   bool _linkcheck;
+};
 
 #endif   /* _APCSMART_H */

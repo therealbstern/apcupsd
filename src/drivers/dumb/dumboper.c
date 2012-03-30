@@ -27,22 +27,22 @@
 #include "apc.h"
 #include "dumb.h"
 
-int dumb_ups_kill_power(UPSINFO *ups)
+bool DumbUpsDriver::kill_power()
 {
    int serial_bits = 0;
 
-   switch (ups->cable.type) {
+   switch (_ups->cable.type) {
    case CUSTOM_SIMPLE:            /* killpwr_bit */
    case APC_940_0095A:
    case APC_940_0095B:
    case APC_940_0095C:            /* killpwr_bit */
       serial_bits = TIOCM_RTS;
-      (void)ioctl(ups->fd, TIOCMBIS, &serial_bits);
-      (void)ioctl(ups->fd, TIOCMBIS, &serial_bits);
-      (void)ioctl(ups->fd, TIOCMBIS, &serial_bits);
+      (void)ioctl(_ups->fd, TIOCMBIS, &serial_bits);
+      (void)ioctl(_ups->fd, TIOCMBIS, &serial_bits);
+      (void)ioctl(_ups->fd, TIOCMBIS, &serial_bits);
       sleep(10);                  /* hold for 10 seconds */
       serial_bits = TIOCM_ST;
-      (void)ioctl(ups->fd, TIOCMBIS, &serial_bits);
+      (void)ioctl(_ups->fd, TIOCMBIS, &serial_bits);
       break;
 
    case APC_940_0119A:
@@ -51,9 +51,9 @@ int dumb_ups_kill_power(UPSINFO *ups)
    case APC_940_0020B:            /* killpwr_bit */
    case APC_940_0020C:
       serial_bits = TIOCM_DTR;
-      (void)ioctl(ups->fd, TIOCMBIS, &serial_bits);
-      (void)ioctl(ups->fd, TIOCMBIS, &serial_bits);
-      (void)ioctl(ups->fd, TIOCMBIS, &serial_bits);
+      (void)ioctl(_ups->fd, TIOCMBIS, &serial_bits);
+      (void)ioctl(_ups->fd, TIOCMBIS, &serial_bits);
+      (void)ioctl(_ups->fd, TIOCMBIS, &serial_bits);
       sleep(10);                   /* hold for at least 10 seconds */
       break;
 
@@ -62,11 +62,11 @@ int dumb_ups_kill_power(UPSINFO *ups)
 
    case MAM_CABLE:
       serial_bits = TIOCM_RTS;
-      (void)ioctl(ups->fd, TIOCMBIC, &serial_bits);
+      (void)ioctl(_ups->fd, TIOCMBIC, &serial_bits);
       serial_bits = TIOCM_DTR;
-      (void)ioctl(ups->fd, TIOCMBIS, &serial_bits);
-      (void)ioctl(ups->fd, TIOCMBIS, &serial_bits);
-      (void)ioctl(ups->fd, TIOCMBIS, &serial_bits);
+      (void)ioctl(_ups->fd, TIOCMBIS, &serial_bits);
+      (void)ioctl(_ups->fd, TIOCMBIS, &serial_bits);
+      (void)ioctl(_ups->fd, TIOCMBIS, &serial_bits);
       sleep(10);                   /* hold */
       break;
    }
@@ -76,7 +76,7 @@ int dumb_ups_kill_power(UPSINFO *ups)
 /*
  * Dumb UPSes don't have static UPS data.
  */
-int dumb_ups_read_static_data(UPSINFO *ups)
+bool DumbUpsDriver::read_static_data()
 {
    return 1;
 }
@@ -84,10 +84,10 @@ int dumb_ups_read_static_data(UPSINFO *ups)
 /*
  * Set capabilities.
  */
-int dumb_ups_get_capabilities(UPSINFO *ups)
+bool DumbUpsDriver::get_capabilities()
 {
    /* We create a Status word */
-   ups->UPS_Cap[CI_STATUS] = TRUE;
+   _ups->UPS_Cap[CI_STATUS] = TRUE;
 
    return 1;
 }
@@ -100,39 +100,38 @@ int dumb_ups_get_capabilities(UPSINFO *ups)
  * unless we are in a FastPoll situation, otherwise, we burn
  * too much CPU.
  */
-int dumb_ups_read_volatile_data(UPSINFO *ups)
+bool DumbUpsDriver::read_volatile_data()
 {
-   SIMPLE_DATA *my_data = (SIMPLE_DATA *) ups->driver_internal_data;
    int stat = 1;
 
    /*
     * We generally poll a bit faster because we do 
     * not have interrupts like the smarter devices
     */
-   if (ups->wait_time > TIMER_DUMB)
-      ups->wait_time = TIMER_DUMB;
+   if (_ups->wait_time > TIMER_DUMB)
+      _ups->wait_time = TIMER_DUMB;
 
-   sleep(ups->wait_time);
+   sleep(_ups->wait_time);
 
-   write_lock(ups);
+   write_lock(_ups);
 
-   ioctl(ups->fd, TIOCMGET, &my_data->sp_flags);
+   ioctl(_ups->fd, TIOCMGET, &_sp_flags);
 
-   switch (ups->cable.type) {
+   switch (_ups->cable.type) {
    case CUSTOM_SIMPLE:
       /*
        * This is the ONBATT signal sent by UPS.
        */
-      if (my_data->sp_flags & TIOCM_CD) {
-         ups->clear_online();
+      if (_sp_flags & TIOCM_CD) {
+         _ups->clear_online();
       } else {
-         ups->set_online();
+         _ups->set_online();
       }
 
-      if (!(my_data->sp_flags & TIOCM_CTS)) {
-         ups->set_battlow();
+      if (!(_sp_flags & TIOCM_CTS)) {
+         _ups->set_battlow();
       } else {
-         ups->clear_battlow();
+         _ups->clear_battlow();
       }
 
       break;
@@ -142,25 +141,25 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
    case APC_940_0128A:
    case APC_940_0020B:
    case APC_940_0020C:
-      if (my_data->sp_flags & TIOCM_CTS) {
-         ups->clear_online();
+      if (_sp_flags & TIOCM_CTS) {
+         _ups->clear_online();
       } else {
-         ups->set_online();
+         _ups->set_online();
       }
 
-      if (my_data->sp_flags & TIOCM_CD) {
-         ups->set_battlow();
+      if (_sp_flags & TIOCM_CD) {
+         _ups->set_battlow();
       } else {
-         ups->clear_battlow();
+         _ups->clear_battlow();
       }
 
       break;
 
    case APC_940_0023A:
-      if (my_data->sp_flags & TIOCM_CD) {
-         ups->clear_online();
+      if (_sp_flags & TIOCM_CD) {
+         _ups->clear_online();
       } else {
-         ups->set_online();
+         _ups->set_online();
       }
 
 /*
@@ -170,77 +169,69 @@ int dumb_ups_read_volatile_data(UPSINFO *ups)
  * battlow indicator, but I have no evidence that it works, and
  * some evidence that it does not.
 
-      if (my_data->sp_flags & TIOCM_SR) {
-         ups->set_battlow();
+      if (_sp_flags & TIOCM_SR) {
+         _ups->set_battlow();
       } else {
-         ups->clear_battlow();
+         _ups->clear_battlow();
       }
 */
       break;
 
    case APC_940_0095A:
    case APC_940_0095C:
-      if (my_data->sp_flags & TIOCM_RNG) {
-         ups->clear_online();
+      if (_sp_flags & TIOCM_RNG) {
+         _ups->clear_online();
       } else {
-         ups->set_online();
+         _ups->set_online();
       }
 
-      if (my_data->sp_flags & TIOCM_CD) {
-         ups->set_battlow();
+      if (_sp_flags & TIOCM_CD) {
+         _ups->set_battlow();
       } else {
-         ups->clear_battlow();
+         _ups->clear_battlow();
       }
 
       break;
 
    case APC_940_0095B:
-      if (my_data->sp_flags & TIOCM_RNG) {
-         ups->clear_online();
+      if (_sp_flags & TIOCM_RNG) {
+         _ups->clear_online();
       } else {
-         ups->set_online();
+         _ups->set_online();
       }
 
       break;
 
    case MAM_CABLE:
-      if (!(my_data->sp_flags & TIOCM_CTS)) {
-         ups->clear_online();
+      if (!(_sp_flags & TIOCM_CTS)) {
+         _ups->clear_online();
       } else {
-         ups->set_online();
+         _ups->set_online();
       }
 
-      if (!(my_data->sp_flags & TIOCM_CD)) {
-         ups->set_battlow();
+      if (!(_sp_flags & TIOCM_CD)) {
+         _ups->set_battlow();
       } else {
-         ups->clear_battlow();
+         _ups->clear_battlow();
       }
 
       break;
    }
 
-   ups->clear_replacebatt();
+   _ups->clear_replacebatt();
 
-   write_unlock(ups);
+   write_unlock(_ups);
 
    return stat;
 }
 
-int dumb_ups_program_eeprom(UPSINFO *ups, int command, const char *data)
-{
-#if 0
-   printf("This model cannot be configured.\n");
-#endif
-   return 0;
-}
-
-int dumb_ups_entry_point(UPSINFO *ups, int command, void *data)
+bool DumbUpsDriver::entry_point(int command, void *data)
 {
    int serial_bits = 0;
 
    switch (command) {
    case DEVICE_CMD_DTR_ENABLE:
-      if (ups->cable.type == CUSTOM_SIMPLE) {
+      if (_ups->cable.type == CUSTOM_SIMPLE) {
          /* 
           * A power failure just happened.
           *
@@ -249,12 +240,12 @@ int dumb_ups_entry_point(UPSINFO *ups, int command, void *data)
           * us to detect the UPS_battlow condition!!!!
           */
          serial_bits = TIOCM_DTR;
-         (void)ioctl(ups->fd, TIOCMBIS, &serial_bits);
+         (void)ioctl(_ups->fd, TIOCMBIS, &serial_bits);
       }
       break;
 
    case DEVICE_CMD_DTR_ST_DISABLE:
-      if (ups->cable.type == CUSTOM_SIMPLE) {
+      if (_ups->cable.type == CUSTOM_SIMPLE) {
          /* 
           * Mains power just returned.
           *
@@ -264,7 +255,7 @@ int dumb_ups_entry_point(UPSINFO *ups, int command, void *data)
 
 /* Leave it set */
 
-/*              (void)ioctl(ups->fd, TIOCMBIC, &serial_bits);
+/*              (void)ioctl(_ups->fd, TIOCMBIC, &serial_bits);
  */
       }
       break;

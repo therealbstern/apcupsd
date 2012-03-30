@@ -62,41 +62,60 @@
 #define SNMP_STRING(oid, field, dest) \
    do \
    {  \
-      astrncpy(ups->dest, \
+      astrncpy(_ups->dest, \
          (const char *)data->oid->oid##field, \
-         MIN(sizeof(ups->dest), data->oid->_##oid##field##Length+1)); \
+         MIN(sizeof(_ups->dest), data->oid->_##oid##field##Length+1)); \
    }  \
    while(0)
 
-/*********************************************************************/
-/* Internal structures                                               */
-/*********************************************************************/
+class SnmpUpsDriver: public UpsDriver
+{
+public:
+   SnmpUpsDriver(UPSINFO *ups);
+   virtual ~SnmpUpsDriver() {}
 
-struct snmp_ups_internal_data {
-   struct snmp_session session;        /* snmp session struct */
-   char device[MAXSTRING];             /* Copy of ups->device */
-   char *peername;                     /* hostname|IP of peer */
-   unsigned short remote_port;         /* Remote socket, usually 161 */
-   char *DeviceVendor;                 /* Vendor (ex. APC|RFC) */
-   char *community;                    /* Community name */
-   void *mib;                          /* Pointer to MIB data */
-   struct snmp_session *trap_session;  /* snmp session for traps */
-   bool trap_received;                 /* Have we seen a trap? */
+   static UpsDriver *Factory(UPSINFO *ups)
+      { return new SnmpUpsDriver(ups); }
+
+   virtual bool get_capabilities();
+   virtual bool read_volatile_data();
+   virtual bool read_static_data();
+   virtual bool kill_power();
+   virtual bool check_state();
+   virtual bool Open();
+   virtual bool Close();
+
+private:
+
+   int initialize_device_data();
+
+   bool powernet_snmp_ups_get_capabilities();
+   bool powernet_snmp_ups_read_static_data();
+   bool powernet_snmp_ups_read_volatile_data();
+   bool powernet_snmp_ups_check_state();
+   bool powernet_snmp_kill_ups_power();
+   bool powernet_snmp_ups_open();
+   int powernet_check_comm_lost();
+   static int powernet_snmp_callback(
+      int operation, snmp_session *session, 
+      int reqid, snmp_pdu *pdu, void *magic);
+
+   bool rfc1628_snmp_ups_get_capabilities();
+   bool rfc1628_snmp_ups_read_static_data();
+   bool rfc1628_snmp_ups_read_volatile_data();
+   bool rfc1628_snmp_ups_check_state();
+   bool rfc1628_snmp_kill_ups_power();
+   int rfc_1628_check_alarms();
+
+   struct snmp_session _session;        /* snmp session struct */
+   char _device[MAXSTRING];             /* Copy of ups->device */
+   char *_peername;                     /* hostname|IP of peer */
+   unsigned short _remote_port;         /* Remote socket, usually 161 */
+   char *_DeviceVendor;                 /* Vendor (ex. APC|RFC) */
+   char *_community;                    /* Community name */
+   void *_mib;                          /* Pointer to MIB data */
+   struct snmp_session *_trap_session;  /* snmp session for traps */
+   bool _trap_received;                 /* Have we seen a trap? */
 };
-
-/*********************************************************************/
-/* Function ProtoTypes                                               */
-/*********************************************************************/
-
-extern int snmp_ups_get_capabilities(UPSINFO *ups);
-extern int snmp_ups_read_volatile_data(UPSINFO *ups);
-extern int snmp_ups_read_static_data(UPSINFO *ups);
-extern int snmp_ups_kill_power(UPSINFO *ups);
-extern int snmp_ups_check_state(UPSINFO *ups);
-extern int snmp_ups_open(UPSINFO *ups);
-extern int snmp_ups_close(UPSINFO *ups);
-extern int snmp_ups_setup(UPSINFO *ups);
-extern int snmp_ups_program_eeprom(UPSINFO *ups, int command, const char *data);
-extern int snmp_ups_entry_point(UPSINFO *ups, int command, void *data);
 
 #endif   /* _SNMP_H */

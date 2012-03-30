@@ -35,73 +35,58 @@
 /*
  * This is the first routine in the driver that is called.
  */
-int apcsmart_ups_open(UPSINFO *ups)
+bool ApcSmartUpsDriver::Open()
 {
    int cmd;
-   SMART_DATA *my_data = (SMART_DATA *) ups->driver_internal_data;
 
-   if (my_data == NULL) {
-      my_data = (SMART_DATA *) malloc(sizeof(SMART_DATA));
-      if (my_data == NULL) {
-         log_event(ups, LOG_ERR, "Out of memory.");
-         exit(1);
-      }
-
-      memset(my_data, 0, sizeof(SMART_DATA));
-      ups->driver_internal_data = my_data;
-   } else {
-      log_event(ups, LOG_ERR,
-         "apcsmart_ups_open called twice. This shouldn't happen.");
-   }
-
-   char *opendev = ups->device;
+   char *opendev = _ups->device;
 
 #ifdef HAVE_MINGW
    // On Win32 add \\.\ UNC prefix to COMx in order to correctly address
    // ports >= COM10.
    char device[MAXSTRING];
-   if (!strnicmp(ups->device, "COM", 3)) {
-      snprintf(device, sizeof(device), "\\\\.\\%s", ups->device);
+   if (!strnicmp(_ups->device, "COM", 3)) {
+      snprintf(device, sizeof(device), "\\\\.\\%s", _ups->device);
       opendev = device;
    }
 #endif
 
-   if ((ups->fd = open(opendev, O_RDWR | O_NOCTTY | O_NDELAY | O_BINARY)) < 0)
+   if ((_ups->fd = open(opendev, O_RDWR | O_NOCTTY | O_NDELAY | O_BINARY)) < 0)
       Error_abort2("Cannot open UPS port %s: %s\n", opendev, strerror(errno));
 
    /* Cancel the no delay we just set */
-   cmd = fcntl(ups->fd, F_GETFL, 0);
-   fcntl(ups->fd, F_SETFL, cmd & ~O_NDELAY);
+   cmd = fcntl(_ups->fd, F_GETFL, 0);
+   fcntl(_ups->fd, F_SETFL, cmd & ~O_NDELAY);
 
    /* Save old settings */
-   tcgetattr(ups->fd, &my_data->oldtio);
+   tcgetattr(_ups->fd, &_oldtio);
 
-   my_data->newtio.c_cflag = DEFAULT_SPEED | CS8 | CLOCAL | CREAD;
-   my_data->newtio.c_iflag = IGNPAR;    /* Ignore errors, raw input */
-   my_data->newtio.c_oflag = 0;         /* Raw output */
-   my_data->newtio.c_lflag = 0;         /* No local echo */
+   _newtio.c_cflag = DEFAULT_SPEED | CS8 | CLOCAL | CREAD;
+   _newtio.c_iflag = IGNPAR;    /* Ignore errors, raw input */
+   _newtio.c_oflag = 0;         /* Raw output */
+   _newtio.c_lflag = 0;         /* No local echo */
 
 #if defined(HAVE_OPENBSD_OS) || \
     defined(HAVE_FREEBSD_OS) || \
     defined(HAVE_NETBSD_OS) || \
     defined(HAVE_QNX_OS)
-   my_data->newtio.c_ispeed = DEFAULT_SPEED;    /* Set input speed */
-   my_data->newtio.c_ospeed = DEFAULT_SPEED;    /* Set output speed */
+   _newtio.c_ispeed = DEFAULT_SPEED;    /* Set input speed */
+   _newtio.c_ospeed = DEFAULT_SPEED;    /* Set output speed */
 #endif   /* __openbsd__ || __freebsd__ || __netbsd__  */
 
    /* This makes a non.blocking read() with TIMER_READ (10) sec. timeout */
-   my_data->newtio.c_cc[VMIN] = 0;
-   my_data->newtio.c_cc[VTIME] = TIMER_READ * 10;
+   _newtio.c_cc[VMIN] = 0;
+   _newtio.c_cc[VTIME] = TIMER_READ * 10;
 
 #if defined(HAVE_OSF1_OS) || \
     defined(HAVE_LINUX_OS) || defined(HAVE_DARWIN_OS)
-   (void)cfsetospeed(&my_data->newtio, DEFAULT_SPEED);
-   (void)cfsetispeed(&my_data->newtio, DEFAULT_SPEED);
+   (void)cfsetospeed(&_newtio, DEFAULT_SPEED);
+   (void)cfsetispeed(&_newtio, DEFAULT_SPEED);
 #endif  /* do it the POSIX way */
 
-   tcflush(ups->fd, TCIFLUSH);
-   tcsetattr(ups->fd, TCSANOW, &my_data->newtio);
-   tcflush(ups->fd, TCIFLUSH);
+   tcflush(_ups->fd, TCIFLUSH);
+   tcsetattr(_ups->fd, TCSANOW, &_newtio);
+   tcflush(_ups->fd, TCIFLUSH);
 
    return 1;
 }
@@ -110,45 +95,38 @@ int apcsmart_ups_open(UPSINFO *ups)
  * This routine is the last one called before apcupsd
  * terminates.
  */
-int apcsmart_ups_close(UPSINFO *ups)
+bool ApcSmartUpsDriver::Close()
 {
-   SMART_DATA *my_data = (SMART_DATA *) ups->driver_internal_data;
-
-   if (my_data == NULL)
-      return SUCCESS;              /* shouldn't happen */
-
    /* Reset serial line to old values */
-   if (ups->fd >= 0) {
-      tcflush(ups->fd, TCIFLUSH);
-      tcsetattr(ups->fd, TCSANOW, &my_data->oldtio);
-      tcflush(ups->fd, TCIFLUSH);
+   if (_ups->fd >= 0) {
+      tcflush(_ups->fd, TCIFLUSH);
+      tcsetattr(_ups->fd, TCSANOW, &_oldtio);
+      tcflush(_ups->fd, TCIFLUSH);
 
-      close(ups->fd);
+      close(_ups->fd);
    }
 
-   ups->fd = -1;
-   free(ups->driver_internal_data);
-   ups->driver_internal_data = NULL;
+   _ups->fd = -1;
 
    return 1;
 }
 
-int apcsmart_ups_setup(UPSINFO *ups)
+bool ApcSmartUpsDriver::setup()
 {
    int attempts;
    int rts_bit = TIOCM_RTS;
    char a = 'Y';
 
-   if (ups->fd == -1)
+   if (_ups->fd == -1)
       return 1;                    /* we must be a slave */
 
    /* Have to clear RTS line to access the serial cable mode PnP on BKPro */
    /* Shouldn't hurt on other cables, so just do it all the time. */
-   ioctl(ups->fd, TIOCMBIC, &rts_bit);
+   ioctl(_ups->fd, TIOCMBIC, &rts_bit);
 
-   write(ups->fd, &a, 1);          /* This one might not work, if UPS is */
+   write(_ups->fd, &a, 1);          /* This one might not work, if UPS is */
    sleep(1);                       /* in an unstable communication state */
-   tcflush(ups->fd, TCIOFLUSH);    /* Discard UPS's response, if any */
+   tcflush(_ups->fd, TCIOFLUSH);    /* Discard UPS's response, if any */
 
    /*
     * Don't use smart_poll here because it may loop waiting
@@ -160,8 +138,8 @@ int apcsmart_ups_setup(UPSINFO *ups)
       char answer[10];
 
       *answer = 0;
-      write(ups->fd, &a, 1);       /* enter smart mode */
-      getline(answer, sizeof(answer), ups);
+      write(_ups->fd, &a, 1);       /* enter smart mode */
+      getline(answer, sizeof(answer));
       if (strcmp("SM", answer) == 0)
          goto out;
       sleep(1);

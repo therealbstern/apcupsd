@@ -60,140 +60,41 @@
 
 static const UPSDRIVER drivers[] = {
 #ifdef HAVE_DUMB_DRIVER
-   { "dumb",
-     dumb_ups_open,
-     dumb_ups_setup,
-     dumb_ups_close,
-     dumb_ups_kill_power,
-     NULL,
-     dumb_ups_read_static_data,
-     dumb_ups_read_volatile_data,
-     dumb_ups_get_capabilities,
-     dumb_ups_read_volatile_data,
-     dumb_ups_program_eeprom,
-     dumb_ups_entry_point },
+   { "dumb",      DumbUpsDriver::Factory },
 #endif   /* HAVE_DUMB_DRIVER */
 
 #ifdef HAVE_APCSMART_DRIVER
-   { "apcsmart",
-     apcsmart_ups_open,
-     apcsmart_ups_setup,
-     apcsmart_ups_close,
-     apcsmart_ups_kill_power,
-     apcsmart_ups_shutdown,
-     apcsmart_ups_read_static_data,
-     apcsmart_ups_read_volatile_data,
-     apcsmart_ups_get_capabilities,
-     apcsmart_ups_check_state,
-     apcsmart_ups_program_eeprom,
-     apcsmart_ups_entry_point },
+   { "apcsmart",  ApcSmartUpsDriver::Factory },
 #endif   /* HAVE_APCSMART_DRIVER */
 
 #ifdef HAVE_NET_DRIVER
-   { "net",
-     net_ups_open,
-     net_ups_setup,
-     net_ups_close,
-     net_ups_kill_power,
-     NULL,
-     net_ups_read_static_data,
-     net_ups_read_volatile_data,
-     net_ups_get_capabilities,
-     net_ups_check_state,
-     net_ups_program_eeprom,
-     net_ups_entry_point },
+   { "net",       NetUpsDriver::Factory },
 #endif   /* HAVE_NET_DRIVER */
 
 #ifdef HAVE_USB_DRIVER
-   { "usb",
-     usb_ups_open,
-     usb_ups_setup,
-     usb_ups_close,
-     usb_ups_kill_power,
-     usb_ups_shutdown,
-     usb_ups_read_static_data,
-     usb_ups_read_volatile_data,
-     usb_ups_get_capabilities,
-     usb_ups_check_state,
-     usb_ups_program_eeprom,
-     usb_ups_entry_point },
+   { "usb",       UsbUpsDriver::Factory },
 #endif   /* HAVE_USB_DRIVER */
 
 #ifdef HAVE_SNMP_DRIVER
-   { "snmp",
-     snmp_ups_open,
-     snmp_ups_setup,
-     snmp_ups_close,
-     snmp_ups_kill_power,
-     NULL,
-     snmp_ups_read_static_data,
-     snmp_ups_read_volatile_data,
-     snmp_ups_get_capabilities,
-     snmp_ups_check_state,
-     snmp_ups_program_eeprom,
-     snmp_ups_entry_point },
+   { "snmp",      SnmpUpsDriver::Factory },
 #endif   /* HAVE_SNMP_DRIVER */
 
 #ifdef HAVE_SNMPLITE_DRIVER
-   { "snmplite",
-     snmplite_ups_open,
-     snmplite_ups_setup,
-     snmplite_ups_close,
-     snmplite_ups_kill_power,
-     snmplite_ups_shutdown,
-     snmplite_ups_read_static_data,
-     snmplite_ups_read_volatile_data,
-     snmplite_ups_get_capabilities,
-     snmplite_ups_check_state,
-     snmplite_ups_program_eeprom,
-     snmplite_ups_entry_point },
+   { "snmplite",  SnmpLiteUpsDriver::Factory },
 #endif   /* HAVE_SNMPLITE_DRIVER */
 
 #ifdef HAVE_TEST_DRIVER
-   { "test",
-     test_ups_open,
-     test_ups_setup,
-     test_ups_close,
-     test_ups_kill_power,
-     NULL,
-     test_ups_read_static_data,
-     test_ups_read_volatile_data,
-     test_ups_get_capabilities,
-     test_ups_check_state,
-     test_ups_program_eeprom,
-     test_ups_entry_point },
+   { "test",      TestUpsDriver::Factory },
 #endif   /* HAVE_TEST_DRIVER */
 
 #ifdef HAVE_PCNET_DRIVER
-   { "pcnet",
-     pcnet_ups_open,
-     pcnet_ups_setup,
-     pcnet_ups_close,
-     pcnet_ups_kill_power,
-     NULL,
-     pcnet_ups_read_static_data,
-     pcnet_ups_read_volatile_data,
-     pcnet_ups_get_capabilities,
-     pcnet_ups_check_state,
-     pcnet_ups_program_eeprom,
-     pcnet_ups_entry_point },
+   { "pcnet",     PcnetUpsDriver::Factory },
 #endif   /* HAVE_PCNET_DRIVER */
 
    /*
     * The NULL driver: closes the drivers list.
     */
-   { NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL,
-     NULL }
+   { NULL,        NULL }
 };
 
 /*
@@ -201,7 +102,7 @@ static const UPSDRIVER drivers[] = {
  * It returns an UPSDRIVER pointer that may be null if something
  * went wrong.
  */
-static const UPSDRIVER *helper_attach_driver(UPSINFO *ups, const char *drvname)
+static UpsDriver *helper_attach_driver(UPSINFO *ups, const char *drvname)
 {
    int i;
 
@@ -213,7 +114,7 @@ static const UPSDRIVER *helper_attach_driver(UPSINFO *ups, const char *drvname)
    for (i = 0; drivers[i].driver_name; i++) {
       Dmsg1(99, "Driver %s is configured.\n", drivers[i].driver_name);
       if (strcasecmp(drivers[i].driver_name, drvname) == 0) {
-         ups->driver = &drivers[i];
+         ups->driver = drivers[i].factory(ups);
          Dmsg1(20, "Driver %s found and attached.\n", drivers[i].driver_name);
          break;
       }
@@ -234,10 +135,11 @@ static const UPSDRIVER *helper_attach_driver(UPSINFO *ups, const char *drvname)
    write_unlock(ups);
 
    Dmsg1(99, "Driver ptr=0x%x\n", ups->driver);
+   Dmsg1(10, "Attached to driver: %s\n", drivers[i].driver_name);
    return ups->driver;
 }
 
-const UPSDRIVER *attach_driver(UPSINFO *ups)
+UpsDriver *attach_driver(UPSINFO *ups)
 {
    const char *driver_name = NULL;
 
