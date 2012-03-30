@@ -4,18 +4,6 @@
 #include "ddk/usb100.h"
 #include "ddk/usbioctl.h"
 
-// Windows API default is uppercase - ugh!
-#if !defined(bool)
-#define bool BOOLEAN
-#endif
-#if !defined(true)
-#define true TRUE
-#endif
-#if !defined(false)
-#define false FALSE
-#endif
-
-
 /*
  * Some of the EX stuff is not yet in MinGW => define it
  */

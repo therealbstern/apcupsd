@@ -255,8 +255,6 @@ int main(int argc, char *argv[])
    if (ups->driver == NULL)
       Error_abort0("Apcupsd cannot continue without a valid driver.\n");
 
-   Dmsg1(10, "Attached to driver: %s\n", ups->driver->driver_name);
-
    ups->start_time = time(NULL);
 
    if (!hibernate_ups && !shutdown_ups && go_background) {

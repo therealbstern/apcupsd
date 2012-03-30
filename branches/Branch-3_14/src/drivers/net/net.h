@@ -27,31 +27,52 @@
 
 #define BIGBUF 4096
 
-struct driver_data {
-   char device[MAXSTRING];
-   char *hostname;
-   int port;
-   int sockfd;
-   int got_caps;
-   int got_static_data;
-   time_t last_fill_time;
-   char statbuf[BIGBUF];
-   int statlen;
+class NetUpsDriver: public UpsDriver
+{
+public:
+   NetUpsDriver(UPSINFO *ups);
+   virtual ~NetUpsDriver() {}
+
+   static UpsDriver *Factory(UPSINFO *ups)
+      { return new NetUpsDriver(ups); }
+
+   virtual bool get_capabilities();
+   virtual bool read_volatile_data();
+   virtual bool read_static_data();
+   virtual bool check_state();
+   virtual bool Open();
+   virtual bool Close();
+   virtual bool entry_point(int command, void *data);
+
+private:
+
+   bool getupsvar(const char *request, char *answer, int anslen);
+   bool poll_ups();
+   bool fill_status_buffer();
+   bool get_ups_status_flag(int fill);
+
+   static SelfTestResult decode_testresult(char* str);
+   static LastXferCause decode_lastxfer(char *str);
+
+   struct CmdTrans {
+      const char *request;
+      const char *upskeyword;
+      int nfields;
+   };
+   static const CmdTrans cmdtrans[];
+
+   char _device[MAXSTRING];
+   char *_hostname;
+   int _port;
+   int _sockfd;
+   bool _got_caps;
+   bool _got_static_data;
+   time_t _last_fill_time;
+   char _statbuf[BIGBUF];
+   int _statlen;
+   time_t _tlog;
+   bool _comm_err;
+   bool _comm_loss;
 };
-
-/*********************************************************************/
-/* Function ProtoTypes                                               */
-/*********************************************************************/
-
-extern int net_ups_get_capabilities(UPSINFO *ups);
-extern int net_ups_read_volatile_data(UPSINFO *ups);
-extern int net_ups_read_static_data(UPSINFO *ups);
-extern int net_ups_kill_power(UPSINFO *ups);
-extern int net_ups_check_state(UPSINFO *ups);
-extern int net_ups_open(UPSINFO *ups);
-extern int net_ups_close(UPSINFO *ups);
-extern int net_ups_setup(UPSINFO *ups);
-extern int net_ups_program_eeprom(UPSINFO *ups, int command, const char *data);
-extern int net_ups_entry_point(UPSINFO *ups, int command, void *data);
 
 #endif   /* _NET_H */

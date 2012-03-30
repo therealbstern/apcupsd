@@ -25,6 +25,57 @@
 #ifndef _SNMPLITE_H
 #define _SNMPLITE_H
 
+//#include "snmp.h"
+
+namespace Snmp
+{
+   class SnmpEngine;
+   class Variable;
+};
+
+// Forward declarations
+struct MibStrategy;
+
+class SnmpLiteUpsDriver: public UpsDriver
+{
+public:
+   SnmpLiteUpsDriver(UPSINFO *ups);
+   virtual ~SnmpLiteUpsDriver() {}
+
+   static UpsDriver *Factory(UPSINFO *ups)
+      { return new SnmpLiteUpsDriver(ups); }
+
+   virtual bool get_capabilities();
+   virtual bool read_volatile_data();
+   virtual bool read_static_data();
+   virtual bool kill_power();
+   virtual bool check_state();
+   virtual bool Open();
+   virtual bool Close();
+   virtual bool entry_point(int command, void *data);
+   virtual bool shutdown();
+
+private:
+
+   const char *snmplite_probe_community();
+   const MibStrategy *snmplite_probe_mib();
+   bool update_cis(bool dynamic);
+
+   static bool check_ci(int ci, Snmp::Variable &data);
+
+   char _device[MAXSTRING];       /* Copy of ups->device */
+   const char *_host;             /* hostname|IP of peer */
+   unsigned short _port;          /* Remote port, usually 161 */
+   const char *_vendor;           /* SNMP vendor: APC or APC_NOTRAP */
+   const char *_community;        /* Community name */
+   Snmp::SnmpEngine *_snmp;       /* SNMP engine instance */
+   int _error_count;              /* Number of consecutive SNMP network errors */
+   time_t _commlost_time;         /* Time at which we declared COMMLOST */
+   const MibStrategy *_strategy;  /* MIB strategy to use */
+   bool _traps;                   /* true if catching SNMP traps */
+};
+
+
 /*********************************************************************/
 /* Public Function ProtoTypes                                        */
 /*********************************************************************/

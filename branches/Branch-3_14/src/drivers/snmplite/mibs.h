@@ -43,8 +43,8 @@ struct MibStrategy
    const char *name;
    CiOidMap *mib;
    void (*update_ci_func)(UPSINFO*, int, Snmp::Variable &);
-   int (*killpower_func)(UPSINFO *ups);
-   int (*shutdown_func)(UPSINFO *ups);
+   int (*killpower_func)(Snmp::SnmpEngine *snmp);
+   int (*shutdown_func)(Snmp::SnmpEngine *snmp);
 };
 
 extern struct MibStrategy *MibStrategies[];

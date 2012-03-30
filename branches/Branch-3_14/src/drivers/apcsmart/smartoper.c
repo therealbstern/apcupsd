@@ -27,18 +27,18 @@
 #include "apc.h"
 #include "apcsmart.h"
 
-int apcsmart_ups_kill_power(UPSINFO *ups)
+bool ApcSmartUpsDriver::kill_power()
 {
    char response[32] = {0};
-   int shutdown_delay = apcsmart_ups_get_shutdown_delay(ups);
+   int shutdown_delay = apcsmart_ups_get_shutdown_delay();
 
    // Ask for soft shutdown
-   writechar('S', ups);
+   writechar('S');
 
    // Check whether the UPS has acknowledged the power-off command.
    // The command only succeeds if UPS was on battery.
    sleep(5);
-   getline(response, sizeof response, ups);
+   getline(response, sizeof response);
    if (strcmp(response, "OK") == 0 || (strcmp(response, "*") == 0))
       goto acked;
 
@@ -53,40 +53,40 @@ int apcsmart_ups_kill_power(UPSINFO *ups)
    // command needs it. I've never seen an UPS that needs only 2 zeros
    // but apparently someone did, so code is preserved.
 
-   writechar('@', ups);    /* Shutdown now, try two 0s first */
+   writechar('@');    /* Shutdown now, try two 0s first */
    sleep(2);
-   writechar('0', ups);
+   writechar('0');
    sleep(2);
-   writechar('0', ups);
+   writechar('0');
    sleep(2);
 
-   getline(response, sizeof(response), ups);
+   getline(response, sizeof(response));
    if ((strcmp(response, "OK") == 0) || (strcmp(response, "*") == 0))
       goto acked;
 
-   writechar('0', ups);
+   writechar('0');
    sleep(2);
  
-   getline(response, sizeof(response), ups);
+   getline(response, sizeof(response));
    if ((strcmp(response, "OK") == 0) || (strcmp(response, "*") == 0))
       goto acked;
 
    // Both shutdown techniques failed. We have one more we can try, but
    // UPS will power off and stay off in this case.
-   return apcsmart_ups_shutdown_with_delay(ups, shutdown_delay);
+   return apcsmart_ups_shutdown_with_delay(shutdown_delay);
 
 acked:
    // Shutdown command was accepted
-   apcsmart_ups_warn_shutdown(ups, shutdown_delay);
+   apcsmart_ups_warn_shutdown(shutdown_delay);
    return 1;
 }
 
-int apcsmart_ups_shutdown(UPSINFO *ups)
+bool ApcSmartUpsDriver::shutdown()
 {
-   return apcsmart_ups_shutdown_with_delay(ups, apcsmart_ups_get_shutdown_delay(ups));
+   return apcsmart_ups_shutdown_with_delay(apcsmart_ups_get_shutdown_delay());
 }
 
-int apcsmart_ups_shutdown_with_delay(UPSINFO *ups, int shutdown_delay)
+int ApcSmartUpsDriver::apcsmart_ups_shutdown_with_delay(int shutdown_delay)
 {
    char response[32];
 
@@ -97,42 +97,42 @@ int apcsmart_ups_shutdown_with_delay(UPSINFO *ups, int shutdown_delay)
     * http://nam-en.apc.com/cgi-bin/nam_en.cfg/php/enduser/std_adp.php?p_faqid=604
     */
 
-   writechar('K', ups);
+   writechar('K');
    sleep(2);
-   writechar('K', ups);
-   getline(response, sizeof response, ups);
+   writechar('K');
+   getline(response, sizeof response);
    if (strcmp(response, "*") != 0 && strcmp(response, "OK") != 0) {
-      log_event(ups, LOG_WARNING, "Failed to issue shutdown command!\n");
+      log_event(_ups, LOG_WARNING, "Failed to issue shutdown command!\n");
       return 0;
    }
 
-   apcsmart_ups_warn_shutdown(ups, shutdown_delay);
+   apcsmart_ups_warn_shutdown(shutdown_delay);
    return 1;
 }
 
-void apcsmart_ups_warn_shutdown(UPSINFO *ups, int shutdown_delay)
+void ApcSmartUpsDriver::apcsmart_ups_warn_shutdown(int shutdown_delay)
 {
    if (shutdown_delay > 0) {
-      log_event(ups, LOG_WARNING,
+      log_event(_ups, LOG_WARNING,
          "UPS will power off after %d seconds ...\n", shutdown_delay);
    } else {
-      log_event(ups, LOG_WARNING,
+      log_event(_ups, LOG_WARNING,
          "UPS will power off after the configured delay  ...\n");
    }
-   log_event(ups, LOG_WARNING,
+   log_event(_ups, LOG_WARNING,
       "Please power off your UPS before rebooting your computer ...\n");
 }
 
-int apcsmart_ups_get_shutdown_delay(UPSINFO *ups)
+int ApcSmartUpsDriver::apcsmart_ups_get_shutdown_delay()
 {
    char response[32];
 
-   writechar(ups->UPS_Cmd[CI_DSHUTD], ups);
-   getline(response, sizeof(response), ups);
+   writechar(_ups->UPS_Cmd[CI_DSHUTD]);
+   getline(response, sizeof(response));
    return (int)atof(response);
 }
 
-int apcsmart_ups_check_state(UPSINFO *ups)
+bool ApcSmartUpsDriver::check_state()
 {
-   return getline(NULL, 0, ups) == SUCCESS ? 1 : 0;
+   return getline(NULL, 0) == SUCCESS ? 1 : 0;
 }

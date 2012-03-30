@@ -268,42 +268,36 @@ static void rfc1628_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
    }
 }
 
-static int rfc1628_killpower(UPSINFO *ups)
+static int rfc1628_killpower(Snmp::SnmpEngine *snmp)
 {
-   struct snmplite_ups_internal_data *sid =
-      (struct snmplite_ups_internal_data *)ups->driver_internal_data;
-
    // Configure UPS to turn off output only (not entire UPS)
    Snmp::Variable shutdownType(Asn::INTEGER, 1);
-   sid->snmp->Set(upsShutdownType, &shutdownType);
+   snmp->Set(upsShutdownType, &shutdownType);
 
    // Configure UPS to automatically restart when power is restored
    Snmp::Variable autoRestart(Asn::INTEGER, 1);
-   sid->snmp->Set(upsAutoRestart, &autoRestart);
+   snmp->Set(upsAutoRestart, &autoRestart);
 
    // Instruct UPS to turn off after 60 secs
    Snmp::Variable shutdownDelay(Asn::INTEGER, 60);
-   sid->snmp->Set(upsShutdownAfterDelay, &shutdownDelay);
+   snmp->Set(upsShutdownAfterDelay, &shutdownDelay);
 
    return 0;
 }
 
-static int rfc1628_shutdown(UPSINFO *ups)
+static int rfc1628_shutdown(Snmp::SnmpEngine *snmp)
 {
-   struct snmplite_ups_internal_data *sid =
-      (struct snmplite_ups_internal_data *)ups->driver_internal_data;
-
    // Configure UPS to turn off entire system
    Snmp::Variable shutdownType(Asn::INTEGER, 2);
-   sid->snmp->Set(upsShutdownType, &shutdownType);
+   snmp->Set(upsShutdownType, &shutdownType);
 
    // Configure UPS to NOT automatically restart when power is restored
    Snmp::Variable autoRestart(Asn::INTEGER, 2);
-   sid->snmp->Set(upsAutoRestart, &autoRestart);
+   snmp->Set(upsAutoRestart, &autoRestart);
 
    // Instruct UPS to turn off after 60 secs
    Snmp::Variable shutdownDelay(Asn::INTEGER, 60);
-   sid->snmp->Set(upsShutdownAfterDelay, &shutdownDelay);
+   snmp->Set(upsShutdownAfterDelay, &shutdownDelay);
 
    return 0;
 }

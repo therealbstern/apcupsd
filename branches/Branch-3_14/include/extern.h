@@ -93,6 +93,7 @@ extern void save_dumb_status(UPSINFO *ups);
 extern int check_serial(UPSINFO *ups);
 extern void prep_device(UPSINFO *ups);
 extern void do_device(UPSINFO *ups);
+extern int fillUPS(UPSINFO *ups);
 
 /* In apcaction.c */
 extern void timer_action(int sig);
@@ -176,14 +177,6 @@ extern int log_status(UPSINFO *ups);
 
 extern void timer_reports(int sig);
 extern void do_reports(UPSINFO *ups);
-
-/* In apcsmart.c */
-extern int apc_enable(UPSINFO *ups);
-extern int writechar(char a, UPSINFO *ups);
-extern int getline(char *s, int len, UPSINFO *ups);
-extern void UPSlinkCheck(UPSINFO *ups);
-extern char *smart_poll(char cmd, UPSINFO *ups);
-extern int fillUPS(UPSINFO *ups);
 
 /* In apcsignal.c */
 extern void init_signals(void (*handler) (int));

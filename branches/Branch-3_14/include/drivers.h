@@ -90,75 +90,80 @@
  *  function that does not understand.
  */
 
-typedef struct upsdriver {
-   /* Data side of the driver structure. */
-   const char *driver_name;
+class UpsDriver
+{
+public:
+   UpsDriver(UPSINFO *ups) : _ups(ups) {}
+   virtual ~UpsDriver() {}
 
-   /* Functions side of the driver structure. */
-   int (*open) (UPSINFO *ups);
-   int (*setup) (UPSINFO *ups);
-   int (*close) (UPSINFO *ups);
-   int (*kill_power) (UPSINFO *ups);
-   int (*shutdown) (UPSINFO *ups);
-   int (*read_ups_static_data) (UPSINFO *ups);
-   int (*read_ups_volatile_data) (UPSINFO *ups);
-   int (*get_ups_capabilities) (UPSINFO *ups);
-   int (*check_ups_state) (UPSINFO *ups);
-   int (*ups_program_eeprom) (UPSINFO *ups, int command, const char *data);
-   int (*ups_entry_point) (UPSINFO *ups, int command, void *data);
+   virtual bool Open() = 0;
+   virtual bool Close() = 0;
+   virtual bool read_static_data() = 0;
+   virtual bool read_volatile_data() = 0;
+   virtual bool get_capabilities() = 0;
+   virtual bool check_state() = 0;
+
+   virtual bool setup()          { return true;  }
+   virtual bool kill_power()     { return false; }
+   virtual bool shutdown()       { return false; }
+
+   virtual bool ups_program_eeprom(int cmd, const char *data) { return false; }
+   virtual bool ups_entry_point(int cmd, void *data)          { return false; }
+
+protected:
+   UPSINFO *_ups;
+};
+
+typedef struct upsdriver {
+   const char *driver_name;
+   UpsDriver *(* factory) (UPSINFO *ups);
 } UPSDRIVER;
+
 
 /* Some defines that helps code readability. */
 #define device_open(ups) \
    do { \
-      if (ups->driver) ups->driver->open(ups); \
+      if (ups->driver) ups->driver->Open(); \
    } while(0)
 #define device_setup(ups) \
    do { \
-      if (ups->driver) ups->driver->setup(ups); \
+      if (ups->driver) ups->driver->setup(); \
    } while(0)
 #define device_close(ups) \
    do { \
-      if (ups->driver) ups->driver->close(ups); \
+      if (ups->driver) ups->driver->Close(); \
    } while(0)
 #define device_kill_power(ups) \
    do { \
-      if (ups->driver) ups->driver->kill_power(ups); \
+      if (ups->driver) ups->driver->kill_power(); \
    } while(0)
 #define device_shutdown(ups) \
    do { \
-      if (ups->driver) { \
-         if (ups->driver->shutdown) { \
-            ups->driver->shutdown(ups); \
-         } else { \
-            Dmsg1(000, "Power off not supported for %s driver\n", \
-                       ups->driver->driver_name); \
-         } \
-      } \
+      if (ups->driver) ups->driver->shutdown(); \
    } while(0)
 #define device_read_static_data(ups) \
    do { \
-      if (ups->driver) ups->driver->read_ups_static_data(ups); \
+      if (ups->driver) ups->driver->read_static_data(); \
    } while(0)
 #define device_read_volatile_data(ups) \
    do { \
-      if (ups->driver) ups->driver->read_ups_volatile_data(ups); \
+      if (ups->driver) ups->driver->read_volatile_data(); \
    } while(0)
 #define device_get_capabilities(ups) \
    do { \
-      if (ups->driver) ups->driver->get_ups_capabilities(ups); \
+      if (ups->driver) ups->driver->get_capabilities(); \
    } while(0)
 #define device_check_state(ups) \
    do { \
-      if (ups->driver) ups->driver->check_ups_state(ups); \
+      if (ups->driver) ups->driver->check_state(); \
    } while(0)
 #define device_program_eeprom(ups, command, data) \
    do { \
-      if (ups->driver) ups->driver->ups_program_eeprom(ups, command, data); \
+      if (ups->driver) ups->driver->ups_program_eeprom(command, data); \
    } while(0)
 #define device_entry_point(ups, command, data) \
    do { \
-      if (ups->driver) ups->driver->ups_entry_point(ups, command, data); \
+      if (ups->driver) ups->driver->ups_entry_point(command, data); \
    } while(0)
 
 /* Now some defines for device_entry_point commands. */
@@ -173,6 +178,7 @@ typedef struct upsdriver {
 #define DEVICE_CMD_SET_DUMB_MODE    0x04
 
 /* Support routines. */
-const UPSDRIVER *attach_driver(UPSINFO *ups);
+UpsDriver *attach_driver(UPSINFO *ups);
+
 
 #endif /*_DRIVERS_H */

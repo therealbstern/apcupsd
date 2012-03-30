@@ -56,6 +56,7 @@ static void guess(void);
 static void do_smart_testing(void);
 
 #ifdef HAVE_APCSMART_DRIVER
+#include "drivers/apcsmart/apcsmart.h"
 static void smart_test1(void);
 static void smart_calibration(void);
 static void monitor_calibration_progress(int monitor);
@@ -64,7 +65,6 @@ static void program_smart_eeprom(void);
 static void print_eeprom_values(UPSINFO *ups);
 static void smart_ttymode(void);
 static void parse_eeprom_cmds(char *eprom, char locale);
-int apcsmart_ups_program_eeprom(UPSINFO *ups, int command, const char *data);
 static void print_valid_eeprom_values(UPSINFO *ups);
 #endif
 
@@ -104,6 +104,23 @@ static int test3_done = 0;
 static int test4_done = 0;
 static int test5_done = 0;
 
+#define smart_poll(a, ups) \
+   ((ApcSmartUpsDriver*)((ups)->driver))->smart_poll(a)
+
+#define getline(a,b,ups) \
+   ((ApcSmartUpsDriver*)((ups)->driver))->getline(a,b)
+
+#define writechar(a,ups) \
+   ((ApcSmartUpsDriver*)((ups)->driver))->writechar(a)
+
+#define apcsmart_ups_program_eeprom(ups,ci,cmd) \
+   (ups)->driver->ups_program_eeprom(ci, cmd)
+
+#define usb_read_int_from_ups(ups, ci, result) \
+   ((UsbUpsDriver*)((ups)->driver))->read_int_from_ups(ci, result)
+
+#define usb_write_int_to_ups(ups, ci, val, text) \
+   ((UsbUpsDriver*)((ups)->driver))->write_int_to_ups(ci, val, text)
 
 /* Print a message, and also write it to an output file */
 static void pmsg(const char *fmt, ...)
@@ -267,7 +284,7 @@ int main(int argc, char *argv[])
    if (ups->driver == NULL)
       Error_abort0("apctest cannot continue without a valid driver.\n");
 
-   pmsg("Attached to driver: %s\n", ups->driver->driver_name);
+//   pmsg("Attached to driver: %s\n", ups->driver->driver_name);
 
    ups->start_time = time(NULL);
 
@@ -1393,7 +1410,7 @@ static void do_usb_testing(void)
         "This part of apctest is for testing USB UPSes.\n");
 
    pmsg("\nGetting UPS capabilities...");
-   if (!usb_ups_get_capabilities(ups))
+   if (!ups->driver->get_capabilities())
       pmsg("FAILED\nSome or all tests may not work!\n");
    else
       pmsg("SUCCESS\n");
