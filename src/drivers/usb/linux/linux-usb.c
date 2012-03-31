@@ -635,16 +635,16 @@ bool LinuxUsbUpsDriver::pusb_ups_get_capabilities()
                 * know_info table and see if we have a match. If so,
                 * allocate a new entry for it.
                 */
-               for (k = 0; known_info[k].usage_code; k++) {
+               for (k = 0; _known_info[k].usage_code; k++) {
                   USB_INFO *info;
-                  int ci = known_info[k].ci;
+                  int ci = _known_info[k].ci;
 
                   if (ci != CI_NONE &&
-                      uref.usage_code == known_info[k].usage_code &&
-                      (known_info[k].physical == P_ANY ||
-                         known_info[k].physical == finfo.physical) &&
-                      (known_info[k].logical == P_ANY ||
-                         known_info[k].logical == finfo.logical)) {
+                      uref.usage_code == _known_info[k].usage_code &&
+                      (_known_info[k].physical == P_ANY ||
+                         _known_info[k].physical == finfo.physical) &&
+                      (_known_info[k].logical == P_ANY ||
+                         _known_info[k].logical == finfo.logical)) {
 
                      // If we do not have any data saved for this report yet,
                      // allocate an USB_INFO and populate the read uref.
@@ -664,11 +664,11 @@ bool LinuxUsbUpsDriver::pusb_ups_get_capabilities()
                         info->physical = finfo.physical;
                         info->unit_exponent = finfo.unit_exponent;
                         info->unit = finfo.unit;
-                        info->data_type = known_info[k].data_type;
+                        info->data_type = _known_info[k].data_type;
                         memcpy(&info->uref, &uref, sizeof(uref));
 
                         Dmsg3(200, "Got READ ci=%d, usage=0x%x, rpt=%d\n",
-                           ci, known_info[k].usage_code, uref.report_id);
+                           ci, _known_info[k].usage_code, uref.report_id);
                      }
 
                      // If this is a FEATURE report and we haven't set the
@@ -679,7 +679,7 @@ bool LinuxUsbUpsDriver::pusb_ups_get_capabilities()
                         memcpy(&info->wuref, &uref, sizeof(uref));
 
                         Dmsg3(200, "Got WRITE ci=%d, usage=0x%x, rpt=%d\n",
-                           ci, known_info[k].usage_code, uref.report_id);
+                           ci, _known_info[k].usage_code, uref.report_id);
                      }
 
                      break;

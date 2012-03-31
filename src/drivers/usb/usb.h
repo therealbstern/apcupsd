@@ -74,7 +74,7 @@ protected:
       bool isvolatile;              /* Volatile data item */
    };
 
-   static const s_known_info known_info[];
+   static const s_known_info _known_info[];
 
    // Functions implemented in derived XXXUsbUpsDriver class
    virtual bool pusb_ups_get_capabilities() = 0;

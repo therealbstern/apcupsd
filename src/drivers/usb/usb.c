@@ -55,7 +55,7 @@ UsbUpsDriver::UsbUpsDriver(UPSINFO *ups) :
  * with ci == CI_NONE are not used, for the moment, they are
  * retained just so they are not forgotten.
  */
-const UsbUpsDriver::s_known_info UsbUpsDriver::known_info[] = {
+const UsbUpsDriver::s_known_info UsbUpsDriver::_known_info[] = {
    /*  Page 0x84 is the Power Device Page */
    /* CI                        USAGE       PHYSICAL   LOGICAL  TYPE        VOLATILE? */
    {CI_NONE,                    0x00840001, P_ANY,     P_ANY,   T_INDEX,    false},  /* iName */
@@ -818,9 +818,9 @@ bool UsbUpsDriver::read_volatile_data()
    _ups->Status &= ~0xFF;
 
    /* Loop through all known data, polling those marked volatile */
-   for (int i=0; known_info[i].usage_code; i++) {
-      if (known_info[i].isvolatile && known_info[i].ci != CI_NONE)
-         usb_update_value(known_info[i].ci);
+   for (int i=0; _known_info[i].usage_code; i++) {
+      if (_known_info[i].isvolatile && _known_info[i].ci != CI_NONE)
+         usb_update_value(_known_info[i].ci);
    }
 
    write_unlock(_ups);
@@ -838,9 +838,9 @@ bool UsbUpsDriver::read_static_data()
    write_lock(_ups);
 
    /* Loop through all known data, polling those marked non-volatile */
-   for (int i=0; known_info[i].usage_code; i++) {
-      if (!known_info[i].isvolatile && known_info[i].ci != CI_NONE)
-         usb_update_value(known_info[i].ci);
+   for (int i=0; _known_info[i].usage_code; i++) {
+      if (!_known_info[i].isvolatile && _known_info[i].ci != CI_NONE)
+         usb_update_value(_known_info[i].ci);
    }
 
    write_unlock(_ups);
