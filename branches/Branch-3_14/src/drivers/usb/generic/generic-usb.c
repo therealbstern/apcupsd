@@ -49,17 +49,17 @@ bool GenericUsbUpsDriver::pusb_ups_get_capabilities()
 
    write_lock(_ups);
 
-   for (i = 0; known_info[i].usage_code; i++) {
-      ci = known_info[i].ci;
-      phys = known_info[i].physical;
-      logi = known_info[i].logical;
+   for (i = 0; _known_info[i].usage_code; i++) {
+      ci = _known_info[i].ci;
+      phys = _known_info[i].physical;
+      logi = _known_info[i].logical;
 
       if (ci != CI_NONE && !_info[ci]) {
 
          /* Try to find an INPUT report containing this usage */
          input = hidu_locate_item(
             _rdesc,
-            known_info[i].usage_code,     /* Match usage code */
+            _known_info[i].usage_code,     /* Match usage code */
             -1,                           /* Don't care about application */
             (phys == P_ANY) ? -1 : phys,  /* Match physical usage */
             (logi == P_ANY) ? -1 : logi,  /* Match logical usage */
@@ -69,7 +69,7 @@ bool GenericUsbUpsDriver::pusb_ups_get_capabilities()
          /* Try to find a FEATURE report containing this usage */
          feature = hidu_locate_item(
             _rdesc,
-            known_info[i].usage_code,     /* Match usage code */
+            _known_info[i].usage_code,     /* Match usage code */
             -1,                           /* Don't care about application */
             (phys == P_ANY) ? -1 : phys,  /* Match physical usage */
             (logi == P_ANY) ? -1 : logi,  /* Match logical usage */
@@ -89,7 +89,7 @@ bool GenericUsbUpsDriver::pusb_ups_get_capabilities()
             continue; // No valid report, bail
 
          _ups->UPS_Cap[ci] = true;
-         _ups->UPS_Cmd[ci] = known_info[i].usage_code;
+         _ups->UPS_Cmd[ci] = _known_info[i].usage_code;
 
          info = (USB_INFO *)malloc(sizeof(USB_INFO));
          if (!info) {
@@ -104,20 +104,20 @@ bool GenericUsbUpsDriver::pusb_ups_get_capabilities()
          info->usage_code = item.usage;
          info->unit_exponent = item.unit_exponent;
          info->unit = item.unit;
-         info->data_type = known_info[i].data_type;
+         info->data_type = _known_info[i].data_type;
          info->item = item;
          info->report_len = hid_report_size( /* +1 for report id */
             _rdesc, item.kind, item.report_ID) + 1;
          Dmsg6(200, "Got READ ci=%d, rpt=%d (len=%d), usage=0x%x (len=%d), kind=0x%02x\n",
             ci, item.report_ID, info->report_len,
-            known_info[i].usage_code, item.report_size, item.kind);
+            _known_info[i].usage_code, item.report_size, item.kind);
 
          // If we have a FEATURE report, use that as the writable report
          if (feature) {
             info->witem = item;
             Dmsg6(200, "Got WRITE ci=%d, rpt=%d (len=%d), usage=0x%x (len=%d), kind=0x%02x\n",
                ci, item.report_ID, info->report_len,
-               known_info[i].usage_code, item.report_size, item.kind);               
+               _known_info[i].usage_code, item.report_size, item.kind);               
          }
       }
    }
