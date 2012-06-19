@@ -200,7 +200,7 @@ bool SnmpLiteUpsDriver::Open()
    {
       for (unsigned int i = 0; MibStrategies[i]; i++)
       {
-         if (strcmp(MibStrategies[i]->name, _vendor) == 0)
+         if (strcasecmp(MibStrategies[i]->name, _vendor) == 0)
          {
             _strategy = MibStrategies[i];
             break;
