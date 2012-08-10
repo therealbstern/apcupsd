@@ -531,10 +531,12 @@ void UsbUpsDriver::usb_process_value(int ci, USB_VALUE* uval)
       case 3:  /* Ripple */
          _ups->lastxfer = XFER_RIPPLE;
          break;
-      case 1:  /* Low line voltage */
       case 4:  /* notch, spike, or blackout */
       case 8:  /* Notch or blackout */
       case 9:  /* Spike or blackout */
+         _ups->lastxfer = XFER_NOTCHSPIKE;
+         break;
+      case 1:  /* Low line voltage */
          _ups->lastxfer = XFER_UNDERVOLT;
          break;
       case 6:  /* DelayBeforeShutdown or APCDelayBeforeShutdown */
