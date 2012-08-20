@@ -174,10 +174,20 @@ bool SnmpLiteUpsDriver::Open()
 
    // Create SNMP engine
    _snmp = new Snmp::SnmpEngine();
-   if (!_snmp->Open(_host, _port, "dummy", _traps))
+   if (!_snmp->Open(_host, _port, "dummy"))
    {
       log_event(_ups, LOG_ERR, "snmplite Unable to initialize SNMP");
       exit(1);
+   }
+
+   // Enable trap catching if user requested it
+   if (_traps && !_snmp->EnableTraps())
+   {
+      // Failure to enable trap catching is not fatal. Probably just means
+      // SNMP trap port is already in use by snmptrapd or another instance
+      // of apcupsd. Warn user and continue.
+      log_event(_ups, LOG_WARNING, "snmplite Failed to enable traps");
+      _traps = false;
    }
 
    // If user did not specify a community, probe for one
@@ -386,7 +396,9 @@ bool SnmpLiteUpsDriver::read_volatile_data()
    {
       // Query failed. Close and reopen SNMP to help recover.
       _snmp->Close();
-      _snmp->Open(_host, _port, _community, _traps);
+      _snmp->Open(_host, _port, _community);
+      if (_traps)
+         _snmp->EnableTraps();
 
       if (_ups->is_commlost())
       {
