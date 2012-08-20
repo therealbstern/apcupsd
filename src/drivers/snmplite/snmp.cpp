@@ -41,17 +41,13 @@ SnmpEngine::SnmpEngine() :
 
 SnmpEngine::~SnmpEngine()
 {
-   close(_socket);
-   close(_trapsock);
+   Close();
 }
 
-bool SnmpEngine::Open(const char *host, unsigned short port, const char *comm, bool trap)
+bool SnmpEngine::Open(const char *host, unsigned short port, const char *comm)
 {
    // In case we are already open
-   close(_socket);
-   _socket = -1;
-   close(_trapsock);
-   _trapsock = -1;
+   Close();
 
    // Remember new community name
    _community = comm;
@@ -107,32 +103,30 @@ bool SnmpEngine::Open(const char *host, unsigned short port, const char *comm, b
       return false;
    }
 
-   // Open socket for receiving traps, if clients wants one
-   if (trap)
-   {
-      _trapsock = socket(PF_INET, SOCK_DGRAM, 0);
-      if (_trapsock == -1)
-      {
-         perror("socket");
-         close(_socket);
-         _socket = -1;
-         return false;
-      }
+   return true;
+}
 
-      memset(&addr, 0, sizeof(addr));
-      addr.sin_family = AF_INET;
-      addr.sin_port = htons(SNMP_TRAP_PORT);
-      addr.sin_addr.s_addr = INADDR_ANY;
-      rc = bind(_trapsock, (struct sockaddr*)&addr, sizeof(addr));
-      if (rc == -1)
-      {
-         perror("bind");
-         close(_socket);
-         _socket = 1;
-         close(_trapsock);
-         _trapsock = -1;
-         return false;
-      }
+bool SnmpEngine::EnableTraps()
+{
+   _trapsock = socket(PF_INET, SOCK_DGRAM, 0);
+   if (_trapsock == -1)
+   {
+      perror("socket");
+      return false;
+   }
+
+   struct sockaddr_in addr;
+   memset(&addr, 0, sizeof(addr));
+   addr.sin_family = AF_INET;
+   addr.sin_port = htons(SNMP_TRAP_PORT);
+   addr.sin_addr.s_addr = INADDR_ANY;
+   int rc = bind(_trapsock, (struct sockaddr*)&addr, sizeof(addr));
+   if (rc == -1)
+   {
+      perror("bind");
+      close(_trapsock);
+      _trapsock = -1;
+      return false;
    }
 
    return true;
@@ -140,10 +134,17 @@ bool SnmpEngine::Open(const char *host, unsigned short port, const char *comm, b
 
 void SnmpEngine::Close()
 {
-   close(_socket);
-   _socket = -1;
-   close(_trapsock);
-   _trapsock = -1;
+   if (_socket != -1)
+   {
+      close(_socket);
+      _socket = -1;
+   }
+
+   if (_trapsock != -1)
+   {
+      close(_trapsock);
+      _trapsock = -1;
+   }
 }
 
 bool SnmpEngine::Set(const int oid[], Variable *data)
