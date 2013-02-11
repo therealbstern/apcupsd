@@ -48,11 +48,11 @@ const char *SnmpLiteUpsDriver::snmplite_probe_community()
    const int sysDescrOid[] = {1, 3, 6, 1, 2, 1, 1, 1, -1};
    const char *communityList[] = { "private", "public", NULL };
 
-   Dmsg0(80, "Performing community autodetection\n");
+   Dmsg(80, "Performing community autodetection\n");
 
    for (unsigned int i = 0; communityList[i]; i++)
    {
-      Dmsg1(80, "Probing community: \"%s\"\n", communityList[i]);
+      Dmsg(80, "Probing community: \"%s\"\n", communityList[i]);
 
       _snmp->SetCommunity(communityList[i]);
       Snmp::Variable result;
@@ -66,14 +66,14 @@ const char *SnmpLiteUpsDriver::snmplite_probe_community()
 
 const MibStrategy *SnmpLiteUpsDriver::snmplite_probe_mib()
 {
-   Dmsg0(80, "Performing MIB autodetection\n");
+   Dmsg(80, "Performing MIB autodetection\n");
 
    // Every MIB strategy should have a CI_STATUS mapping in its OID map.
    // The generic probe method is simply to query for this OID and assume
    // we have found a supported MIB if the query succeeds.
    for (unsigned int i = 0; MibStrategies[i]; i++)
    {
-      Dmsg1(80, "Probing MIB: \"%s\"\n", MibStrategies[i]->name);
+      Dmsg(80, "Probing MIB: \"%s\"\n", MibStrategies[i]->name);
       for (unsigned int j = 0; MibStrategies[i]->mib[j].ci != -1; j++)
       {
          if (MibStrategies[i]->mib[j].ci == CI_STATUS)
@@ -170,7 +170,7 @@ bool SnmpLiteUpsDriver::Open()
       }
    }
 
-   Dmsg1(80, "Trap catching: %sabled\n", _traps ? "En" : "Dis");
+   Dmsg(80, "Trap catching: %sabled\n", _traps ? "En" : "Dis");
 
    // Create SNMP engine
    _snmp = new Snmp::SnmpEngine();
@@ -202,7 +202,7 @@ bool SnmpLiteUpsDriver::Open()
    }
 
    _snmp->SetCommunity(_community);
-   Dmsg1(80, "Selected community: \"%s\"\n", _community);
+   Dmsg(80, "Selected community: \"%s\"\n", _community);
 
    // If user supplied a vendor, search for a matching MIB strategy,
    // otherwise attempt to autodetect
@@ -228,7 +228,7 @@ bool SnmpLiteUpsDriver::Open()
       exit(1);
    }
 
-   Dmsg1(80, "Selected MIB: \"%s\"\n", _strategy->name);
+   Dmsg(80, "Selected MIB: \"%s\"\n", _strategy->name);
 
    return true;
 }
@@ -320,7 +320,7 @@ bool SnmpLiteUpsDriver::check_state()
       Snmp::TrapMessage *trap = _snmp->TrapWait(_ups->wait_time * 1000);
       if (trap)
       {
-         Dmsg2(80, "Got TRAP: generic=%d, specific=%d\n", 
+         Dmsg(80, "Got TRAP: generic=%d, specific=%d\n", 
             trap->Generic(), trap->Specific());
          delete trap;
       }
@@ -440,11 +440,11 @@ bool SnmpLiteUpsDriver::entry_point(int command, void *data)
 {
    switch (command) {
    case DEVICE_CMD_CHECK_SELFTEST:
-      Dmsg0(80, "Checking self test.\n");
+      Dmsg(80, "Checking self test.\n");
       /* Reason for last transfer to batteries */
       if (_ups->UPS_Cap[CI_WHY_BATT] && update_cis(true))
       {
-         Dmsg1(80, "Transfer reason: %d\n", _ups->lastxfer);
+         Dmsg(80, "Transfer reason: %d\n", _ups->lastxfer);
 
          /* See if this is a self test rather than power failure */
          if (_ups->lastxfer == XFER_SELFTEST) {
@@ -452,7 +452,7 @@ bool SnmpLiteUpsDriver::entry_point(int command, void *data)
              * set Self Test start time
              */
             _ups->SelfTest = time(NULL);
-            Dmsg1(80, "Self Test time: %s", ctime(&_ups->SelfTest));
+            Dmsg(80, "Self Test time: %s", ctime(&_ups->SelfTest));
          }
       }
       break;

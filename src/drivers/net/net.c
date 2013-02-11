@@ -101,7 +101,7 @@ SelfTestResult NetUpsDriver::decode_testresult(char* str)
 /* Convert UPS response to enum */
 LastXferCause NetUpsDriver::decode_lastxfer(char *str)
 {
-   Dmsg1(80, "Transfer reason: %s\n", str);
+   Dmsg(80, "Transfer reason: %s\n", str);
 
    if (!strcmp(str, "No transfers since turnon"))
       return XFER_NONE;
@@ -182,11 +182,11 @@ bool NetUpsDriver::getupsvar(const char *request, char *answer, int anslen)
          if (strcmp(answer, "N/A") == 0) {
             return 0;
          }
-         Dmsg2(100, "Return 1 for getupsvar %s %s\n", request, answer);
+         Dmsg(100, "Return 1 for getupsvar %s %s\n", request, answer);
          return true;
       }
    } else {
-      Dmsg1(100, "Hey!!! No match in getupsvar for %s!\n", request);
+      Dmsg(100, "Hey!!! No match in getupsvar for %s!\n", request);
    }
 
    astrncpy(answer, "Not found", anslen);
@@ -201,9 +201,9 @@ bool NetUpsDriver::poll_ups()
    _statbuf[0] = 0;
    _statlen = 0;
 
-   Dmsg2(20, "Opening connection to %s:%d\n", _hostname, _port);
+   Dmsg(20, "Opening connection to %s:%d\n", _hostname, _port);
    if ((_sockfd = net_open(_hostname, NULL, _port)) < 0) {
-      Dmsg0(90, "Exit poll_ups 0 comm lost\n");
+      Dmsg(90, "Exit poll_ups 0 comm lost\n");
       if (!_ups->is_commlost()) {
          _ups->set_commlost();
       }
@@ -212,31 +212,31 @@ bool NetUpsDriver::poll_ups()
 
    if (net_send(_sockfd, "status", 6) != 6) {
       net_close(_sockfd);
-      Dmsg0(90, "Exit poll_ups 0 no status flag\n");
+      Dmsg(90, "Exit poll_ups 0 no status flag\n");
       _ups->set_commlost();
       return false;
    }
 
-   Dmsg0(99, "===============\n");
+   Dmsg(99, "===============\n");
    while ((n = net_recv(_sockfd, buf, sizeof(buf) - 1)) > 0) {
       buf[n] = 0;
       astrncat(_statbuf, buf, sizeof(_statbuf));
-      Dmsg3(99, "Partial buf (%d, %d):\n%s", n, strlen(_statbuf), buf);
+      Dmsg(99, "Partial buf (%d, %d):\n%s", n, strlen(_statbuf), buf);
    }
-   Dmsg0(99, "===============\n");
+   Dmsg(99, "===============\n");
 
    if (n < 0) {
       stat = 0;
-      Dmsg0(90, "Exit poll_ups 0 bad stat net_recv\n");
+      Dmsg(90, "Exit poll_ups 0 bad stat net_recv\n");
       _ups->set_commlost();
    } else {
       _ups->clear_commlost();
    }
    net_close(_sockfd);
 
-   Dmsg1(99, "Buffer:\n%s\n", _statbuf);
+   Dmsg(99, "Buffer:\n%s\n", _statbuf);
    _statlen = strlen(_statbuf);
-   Dmsg1(90, "Exit poll_ups, stat=%d\n", stat);
+   Dmsg(90, "Exit poll_ups, stat=%d\n", stat);
    return stat;
 }
 
@@ -253,7 +253,7 @@ bool NetUpsDriver::fill_status_buffer()
    /* Poll or fill the buffer maximum one time per second */
    now = time(NULL);
    if ((now - _last_fill_time) < 2) {
-      Dmsg0(90, "Exit fill_status_buffer OK less than 2 sec\n");
+      Dmsg(90, "Exit fill_status_buffer OK less than 2 sec\n");
       return true;
    }
 
@@ -320,7 +320,7 @@ bool NetUpsDriver::get_ups_status_flag(int fill)
    write_lock(_ups);
    answer[0] = 0;
    if (!getupsvar("status", answer, sizeof(answer))) {
-      Dmsg0(100, "HEY!!! Couldn't get status flag.\n");
+      Dmsg(100, "HEY!!! Couldn't get status flag.\n");
       stat = 0;
       masterStatus = 0;
    } else {
@@ -347,12 +347,12 @@ bool NetUpsDriver::get_ups_status_flag(int fill)
       _ups->Status |= newStatus;
    }
 
-   Dmsg2(100, "Got Status = %s 0x%x\n", answer, _ups->Status);
+   Dmsg(100, "Got Status = %s 0x%x\n", answer, _ups->Status);
 
    if (masterStatus & UPS_shutdown && !_ups->is_shut_remote()) {
       _ups->set_shut_remote();    /* if master is shutting down so do we */
       log_event(_ups, LOG_ERR, "Shutdown because NIS master is shutting down.");
-      Dmsg0(100, "Set SHUT_REMOTE because of master status.\n");
+      Dmsg(100, "Set SHUT_REMOTE because of master status.\n");
    }
 
    /*
@@ -366,7 +366,7 @@ bool NetUpsDriver::get_ups_status_flag(int fill)
          _ups->set_shut_remote();
          log_event(_ups, LOG_ERR,
             "Shutdown because loss of comm with NIS master while on batteries.");
-         Dmsg0(100, "Set SHUT_REMOTE because of loss of comm on batteries.\n");
+         Dmsg(100, "Set SHUT_REMOTE because of loss of comm on batteries.\n");
       }
    } else {
       _comm_loss = 0;
@@ -459,7 +459,7 @@ bool NetUpsDriver::check_state()
 
    sleep_time = _ups->wait_time;
 
-   Dmsg1(100, "Sleep %d secs.\n", sleep_time);
+   Dmsg(100, "Sleep %d secs.\n", sleep_time);
    sleep(sleep_time);
    get_ups_status_flag(1);
 
@@ -600,7 +600,7 @@ bool NetUpsDriver::entry_point(int command, void *data)
 
    switch (command) {
    case DEVICE_CMD_CHECK_SELFTEST:
-      Dmsg0(80, "Checking self test.\n");
+      Dmsg(80, "Checking self test.\n");
       /*
        * XXX FIXME
        *
@@ -610,7 +610,7 @@ bool NetUpsDriver::entry_point(int command, void *data)
       /* Reason for last transfer to batteries */
       if (GETVAR(CI_WHY_BATT, "lastxfer")) {
          _ups->lastxfer = decode_lastxfer(answer);
-         Dmsg1(80, "Transfer reason: %d\n", _ups->lastxfer);
+         Dmsg(80, "Transfer reason: %d\n", _ups->lastxfer);
 
          /* See if this is a self test rather than power false */
          if (_ups->lastxfer == XFER_SELFTEST) {
@@ -618,7 +618,7 @@ bool NetUpsDriver::entry_point(int command, void *data)
              * set Self Test start time
              */
             _ups->SelfTest = time(NULL);
-            Dmsg1(80, "Self Test time: %s", ctime(&_ups->SelfTest));
+            Dmsg(80, "Self Test time: %s", ctime(&_ups->SelfTest));
          }
       }
       break;

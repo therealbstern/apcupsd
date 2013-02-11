@@ -120,7 +120,7 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
    startinfo.dwFlags = STARTF_USESHOWWINDOW;
    startinfo.wShowWindow = SW_HIDE;
 
-   Dmsg1(200, "execute_command: CreateProcessA(NULL, %s, ...)\n", cmdline);
+   Dmsg(200, "execute_command: CreateProcessA(NULL, %s, ...)\n", cmdline);
 
    /* Execute the process */
    rc = CreateProcessA(NULL,
@@ -193,7 +193,7 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
       for (int i=0; i<sysconf(_SC_OPEN_MAX); i++) {
          if (i != STDIN_FILENO && i != STDOUT_FILENO && i != STDERR_FILENO) {
             if (close(i) == 0)
-               Dmsg1(200, "exec closed fd %d\n", i);
+               Dmsg(200, "exec closed fd %d\n", i);
          }
       }
 

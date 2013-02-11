@@ -49,13 +49,13 @@ int nanosleep(const struct timespec *req, struct timespec *rem)
       timeout.tv_sec++;
    }
 
-   Dmsg1(200, "pthread_cond_timedwait sec=%d\n", timeout.tv_sec);
+   Dmsg(200, "pthread_cond_timedwait sec=%d\n", timeout.tv_sec);
 
    /* Mutex is unlocked during the timedwait */
    P(timer_mutex);
 
    stat = pthread_cond_timedwait(&timer, &timer_mutex, &timeout);
-   Dmsg1(200, "pthread_cond_timedwait stat=%d\n", stat);
+   Dmsg(200, "pthread_cond_timedwait stat=%d\n", stat);
 
    V(timer_mutex);
 

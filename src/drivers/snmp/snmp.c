@@ -164,7 +164,7 @@ bool SnmpUpsDriver::Open()
    }
 
    /* No mib for this vendor. */
-   Dmsg1(0, "No MIB defined for vendor %s\n", _DeviceVendor);
+   Dmsg(0, "No MIB defined for vendor %s\n", _DeviceVendor);
 
    return 0;
 }

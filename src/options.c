@@ -196,7 +196,7 @@ int parse_options(int argc, char *argv[])
    /* Obtain full path to this executable */
    DWORD len = GetModuleFileName(NULL, sbindir, sizeof(sbindir)-1);
    sbindir[len] = '\0';
-   Dmsg1(200, "Exepath: %s\n", sbindir);
+   Dmsg(200, "Exepath: %s\n", sbindir);
    if (len == 0) {
       /* Failed to get path, so make an assumption */
       asnprintf(sbindir, sizeof(sbindir), "C:\\apcupsd\\bin\\apcupsd.exe");

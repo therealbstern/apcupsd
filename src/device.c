@@ -199,25 +199,25 @@ void do_device(UPSINFO *ups)
       /* compute appropriate wait time */
       ups->wait_time = device_wait_time(ups);
 
-      Dmsg2(70, "Before do_action: 0x%x (OB:%d).\n",
+      Dmsg(70, "Before do_action: 0x%x (OB:%d).\n",
          ups->Status, ups->is_onbatt());
 
       /* take event actions */
       do_action(ups);
 
-      Dmsg2(70, "Before fillUPS: 0x%x (OB:%d).\n",
+      Dmsg(70, "Before fillUPS: 0x%x (OB:%d).\n",
          ups->Status, ups->is_onbatt());
 
       /* Get all info available from UPS by asking it questions */
       fillUPS(ups);
 
-      Dmsg2(70, "Before do_action: 0x%x (OB:%d).\n",
+      Dmsg(70, "Before do_action: 0x%x (OB:%d).\n",
          ups->Status, ups->is_onbatt());
 
       /* take event actions */
       do_action(ups);
 
-      Dmsg2(70, "Before do_reports: 0x%x (OB:%d).\n",
+      Dmsg(70, "Before do_reports: 0x%x (OB:%d).\n",
          ups->Status, ups->is_onbatt());
 
       do_reports(ups);
@@ -225,7 +225,7 @@ void do_device(UPSINFO *ups)
       /* compute appropriate wait time */
       ups->wait_time = device_wait_time(ups);
 
-      Dmsg2(70, "Before device_check_state: 0x%x (OB:%d).\n",
+      Dmsg(70, "Before device_check_state: 0x%x (OB:%d).\n",
          ups->Status, ups->is_onbatt());
 
       /*

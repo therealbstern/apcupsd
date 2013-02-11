@@ -78,24 +78,24 @@ static void rfc1628_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
    {
    case CI_VLINE:
       // We just take the voltage from the first input line and ignore the rest
-      Dmsg1(80, "Got CI_VLINE: %d\n", data.seq.begin()->u32);
+      Dmsg(80, "Got CI_VLINE: %d\n", data.seq.begin()->u32);
       ups->LineVoltage = data.seq.begin()->u32;
       break;
 
    case CI_VOUT:
       // We just take the voltage from the first input line and ignore the rest
-      Dmsg1(80, "Got CI_VOUT: %d\n", data.seq.begin()->u32);
+      Dmsg(80, "Got CI_VOUT: %d\n", data.seq.begin()->u32);
       ups->OutputVoltage = data.seq.begin()->u32;
       break;
 
    case CI_VBATT:
-      Dmsg1(80, "Got CI_VBATT: %d\n", data.u32);
+      Dmsg(80, "Got CI_VBATT: %d\n", data.u32);
       ups->BattVoltage = ((double)data.u32) / 10;
       break;
 
    case CI_FREQ:
       // We just take the freq from the first input line and ignore the rest
-      Dmsg1(80, "Got CI_FREQ: %d\n", data.seq.begin()->u32);
+      Dmsg(80, "Got CI_FREQ: %d\n", data.seq.begin()->u32);
       ups->LineFreq = ((double)data.seq.begin()->u32) / 10;
       break;
 
@@ -113,44 +113,44 @@ static void rfc1628_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
            iter != data.seq.end();
            ++iter)
       {
-         Dmsg1(80, "Got CI_LOAD: %d\n", iter->u32);
+         Dmsg(80, "Got CI_LOAD: %d\n", iter->u32);
          ups->UPSLoad += iter->u32;
       }
       ups->UPSLoad /= data.seq.size();
       break;
 
    case CI_ITEMP:
-      Dmsg1(80, "Got CI_ITEMP: %d\n", data.u32);
+      Dmsg(80, "Got CI_ITEMP: %d\n", data.u32);
       ups->UPSTemp = data.u32;
       break;
 
    case CI_NOMOUTV:
-      Dmsg1(80, "Got CI_NOMOUTV: %d\n", data.u32);
+      Dmsg(80, "Got CI_NOMOUTV: %d\n", data.u32);
       ups->NomOutputVoltage = data.u32;
       break;
 
    case CI_NOMINV:
-      Dmsg1(80, "Got CI_NOMINV: %d\n", data.u32);
+      Dmsg(80, "Got CI_NOMINV: %d\n", data.u32);
       ups->NomInputVoltage = data.u32;
       break;
 
    case CI_NOMPOWER:
-      Dmsg1(80, "Got CI_NOMPOWER: %d\n", data.u32);
+      Dmsg(80, "Got CI_NOMPOWER: %d\n", data.u32);
       ups->NomPower = data.u32;
       break;
 
    case CI_LTRANS:
-      Dmsg1(80, "Got CI_LTRANS: %d\n", data.u32);
+      Dmsg(80, "Got CI_LTRANS: %d\n", data.u32);
       ups->lotrans = data.u32;
       break;
 
    case CI_HTRANS:
-      Dmsg1(80, "Got CI_HTRANS: %d\n", data.u32);
+      Dmsg(80, "Got CI_HTRANS: %d\n", data.u32);
       ups->hitrans = data.u32;
       break;
 
    case CI_ST_STAT:
-      Dmsg1(80, "Got CI_ST_STAT: %d\n", data.u32);
+      Dmsg(80, "Got CI_ST_STAT: %d\n", data.u32);
       switch (data.u32)
       {
       case 1:  /* Passed */
@@ -176,7 +176,7 @@ static void rfc1628_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       break;
 
    case CI_DALARM:
-      Dmsg1(80, "Got CI_DALARM: %d\n", data.u32);
+      Dmsg(80, "Got CI_DALARM: %d\n", data.u32);
       switch (data.u32)
       {
       case 1: // Disabled ("None")
@@ -191,27 +191,27 @@ static void rfc1628_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       break;
 
    case CI_UPSMODEL:
-      Dmsg1(80, "Got CI_UPSMODEL: %s\n", data.str.str());
+      Dmsg(80, "Got CI_UPSMODEL: %s\n", data.str.str());
       astrncpy(ups->upsmodel, data.str, sizeof(ups->upsmodel));
       break;
 
    case CI_BATTLEV:
-      Dmsg1(80, "Got CI_BATTLEV: %d\n", data.u32);
+      Dmsg(80, "Got CI_BATTLEV: %d\n", data.u32);
       ups->BattChg = data.u32;
       break;
 
    case CI_RUNTIM:
-      Dmsg1(80, "Got CI_RUNTIM: %d\n", data.u32);
+      Dmsg(80, "Got CI_RUNTIM: %d\n", data.u32);
       ups->TimeLeft = data.u32;
       break;
 
    case CI_IDEN:
-      Dmsg1(80, "Got CI_IDEN: %s\n", data.str.str());
+      Dmsg(80, "Got CI_IDEN: %s\n", data.str.str());
       astrncpy(ups->upsname, data.str, sizeof(ups->upsname));
       break;
 
    case CI_STATUS:
-      Dmsg1(80, "Got CI_STATUS: %d\n", data.u32);
+      Dmsg(80, "Got CI_STATUS: %d\n", data.u32);
       /* Clear the following flags: only one status will be TRUE */
       ups->clear_online();
       ups->clear_onbatt();
@@ -241,7 +241,7 @@ static void rfc1628_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       break;
 
    case CI_LowBattery:
-      Dmsg1(80, "Got CI_LowBattery: %d\n", data.u32);
+      Dmsg(80, "Got CI_LowBattery: %d\n", data.u32);
       switch (data.u32)
       {
       default:
@@ -257,12 +257,12 @@ static void rfc1628_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       break;
 
    case CI_REVNO:
-      Dmsg1(80, "Got CI_REVNO: %s\n", data.str.str());
+      Dmsg(80, "Got CI_REVNO: %s\n", data.str.str());
       astrncpy(ups->firmrev, data.str, sizeof(ups->firmrev));
       break;
 
    case CI_DLBATT:
-      Dmsg1(80, "Got CI_DLBATT: %d\n", data.u32);
+      Dmsg(80, "Got CI_DLBATT: %d\n", data.u32);
       ups->dlowbatt = data.u32;
       break;
    }

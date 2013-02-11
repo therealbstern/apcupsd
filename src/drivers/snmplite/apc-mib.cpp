@@ -90,82 +90,82 @@ static void apc_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
    switch (ci)
    {
    case CI_VLINE:
-      Dmsg1(80, "Got CI_VLINE: %d\n", data.u32);
+      Dmsg(80, "Got CI_VLINE: %d\n", data.u32);
       ups->LineVoltage = data.u32;
       break;
 
    case CI_VOUT:
-      Dmsg1(80, "Got CI_VOUT: %d\n", data.u32);
+      Dmsg(80, "Got CI_VOUT: %d\n", data.u32);
       ups->OutputVoltage = data.u32;
       break;
 
    case CI_VBATT:
-      Dmsg1(80, "Got CI_VBATT: %d\n", data.u32);
+      Dmsg(80, "Got CI_VBATT: %d\n", data.u32);
       ups->BattVoltage = data.u32;
       break;
 
    case CI_FREQ:
-      Dmsg1(80, "Got CI_FREQ: %d\n", data.u32);
+      Dmsg(80, "Got CI_FREQ: %d\n", data.u32);
       ups->LineFreq = data.u32;
       break;
 
    case CI_LOAD:
-      Dmsg1(80, "Got CI_LOAD: %d\n", data.u32);
+      Dmsg(80, "Got CI_LOAD: %d\n", data.u32);
       ups->UPSLoad = data.u32;
       break;
 
    case CI_ITEMP:
-      Dmsg1(80, "Got CI_ITEMP: %d\n", data.u32);
+      Dmsg(80, "Got CI_ITEMP: %d\n", data.u32);
       ups->UPSTemp = data.u32;
       break;
 
    case CI_ATEMP:
-      Dmsg1(80, "Got CI_ATEMP: %d\n", data.u32);
+      Dmsg(80, "Got CI_ATEMP: %d\n", data.u32);
       ups->ambtemp = data.u32;
       break;
 
    case CI_HUMID:
-      Dmsg1(80, "Got CI_HUMID: %d\n", data.u32);
+      Dmsg(80, "Got CI_HUMID: %d\n", data.u32);
       ups->humidity = data.u32;
       break;
 
    case CI_NOMBATTV:
-      Dmsg1(80, "Got CI_NOMBATTV: %d\n", data.u32);
+      Dmsg(80, "Got CI_NOMBATTV: %d\n", data.u32);
       ups->nombattv = data.u32;
       break;
 
    case CI_NOMOUTV:
-      Dmsg1(80, "Got CI_NOMOUTV: %d\n", data.u32);
+      Dmsg(80, "Got CI_NOMOUTV: %d\n", data.u32);
       ups->NomOutputVoltage = data.u32;
       break;
 
    case CI_NOMINV:
-      Dmsg1(80, "Got CI_NOMINV: %d\n", data.u32);
+      Dmsg(80, "Got CI_NOMINV: %d\n", data.u32);
       ups->NomInputVoltage = data.u32;
       break;
 
    case CI_NOMPOWER:
-      Dmsg1(80, "Got CI_NOMPOWER: %d\n", data.u32);
+      Dmsg(80, "Got CI_NOMPOWER: %d\n", data.u32);
       ups->NomPower = data.u32;
       break;
 
    case CI_LTRANS:
-      Dmsg1(80, "Got CI_LTRANS: %d\n", data.u32);
+      Dmsg(80, "Got CI_LTRANS: %d\n", data.u32);
       ups->lotrans = data.u32;
       break;
 
    case CI_HTRANS:
-      Dmsg1(80, "Got CI_HTRANS: %d\n", data.u32);
+      Dmsg(80, "Got CI_HTRANS: %d\n", data.u32);
       ups->hitrans = data.u32;
       break;
 
    case CI_DWAKE:
-      Dmsg1(80, "Got CI_DWAKE: %d\n", data.u32);
+      Dmsg(80, "Got CI_DWAKE: %d\n", data.u32);
       ups->dwake = data.u32;
       break;
 
    case CI_ST_STAT:
-      Dmsg1(80, "Got CI_ST_STAT: %d\n", data.u32);
+      Dmsg(80, "Got CI_ST_STAT: %d\n", data.u32);
       switch (data.u32)
       {
       case 1:  /* Passed */
@@ -185,13 +185,13 @@ static void apc_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       break;
 
    case CI_AlarmTimer:
-      Dmsg1(80, "Got CI_AlarmTimer: %d\n", data.u32);
+      Dmsg(80, "Got CI_AlarmTimer: %d\n", data.u32);
       // Remember alarm timer setting; we will use it for CI_DALARM
       alarmtimer = data.u32;
       break;
 
    case CI_DALARM:
-      Dmsg1(80, "Got CI_DALARM: %d\n", data.u32);
+      Dmsg(80, "Got CI_DALARM: %d\n", data.u32);
       switch (data.u32)
       {
       case 1: // Timed (uses CI_AlarmTimer)
@@ -213,42 +213,42 @@ static void apc_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       break;
 
    case CI_UPSMODEL:
-      Dmsg1(80, "Got CI_UPSMODEL: %s\n", data.str.str());
+      Dmsg(80, "Got CI_UPSMODEL: %s\n", data.str.str());
       astrncpy(ups->upsmodel, data.str, sizeof(ups->upsmodel));
       break;
 
    case CI_SERNO:
-      Dmsg1(80, "Got CI_SERNO: %s\n", data.str.str());
+      Dmsg(80, "Got CI_SERNO: %s\n", data.str.str());
       astrncpy(ups->serial, data.str, sizeof(ups->serial));
       break;
 
    case CI_MANDAT:
-      Dmsg1(80, "Got CI_MANDAT: %s\n", data.str.str());
+      Dmsg(80, "Got CI_MANDAT: %s\n", data.str.str());
       astrncpy(ups->birth, data.str, sizeof(ups->birth));
       break;
 
    case CI_BATTLEV:
-      Dmsg1(80, "Got CI_BATTLEV: %d\n", data.u32);
+      Dmsg(80, "Got CI_BATTLEV: %d\n", data.u32);
       ups->BattChg = data.u32;
       break;
 
    case CI_RUNTIM:
-      Dmsg1(80, "Got CI_RUNTIM: %d\n", data.u32);
+      Dmsg(80, "Got CI_RUNTIM: %d\n", data.u32);
       ups->TimeLeft = data.u32 / TIMETICKS_TO_SECS / SECS_TO_MINS;
       break;
 
    case CI_BATTDAT:
-      Dmsg1(80, "Got CI_BATTDAT: %s\n", data.str.str());
+      Dmsg(80, "Got CI_BATTDAT: %s\n", data.str.str());
       astrncpy(ups->battdat, data.str, sizeof(ups->battdat));
       break;
 
    case CI_IDEN:
-      Dmsg1(80, "Got CI_IDEN: %s\n", data.str.str());
+      Dmsg(80, "Got CI_IDEN: %s\n", data.str.str());
       astrncpy(ups->upsname, data.str, sizeof(ups->upsname));
       break;
 
    case CI_STATUS:
-      Dmsg1(80, "Got CI_STATUS: %d\n", data.u32);
+      Dmsg(80, "Got CI_STATUS: %d\n", data.u32);
       /* Clear the following flags: only one status will be TRUE */
       ups->clear_online();
       ups->clear_onbatt();
@@ -283,7 +283,7 @@ static void apc_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       break;
 
    case CI_NeedReplacement:
-      Dmsg1(80, "Got CI_NeedReplacement: %d\n", data.u32);
+      Dmsg(80, "Got CI_NeedReplacement: %d\n", data.u32);
       if (data.u32 == 2)
          ups->set_replacebatt();
       else
@@ -291,7 +291,7 @@ static void apc_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       break;
 
    case CI_LowBattery:
-      Dmsg1(80, "Got CI_LowBattery: %d\n", data.u32);
+      Dmsg(80, "Got CI_LowBattery: %d\n", data.u32);
       if (data.u32 == 3)
          ups->set_battlow();
       else
@@ -299,7 +299,7 @@ static void apc_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       break;
 
    case CI_Calibration:
-      Dmsg1(80, "Got CI_Calibration: %d\n", data.u32);
+      Dmsg(80, "Got CI_Calibration: %d\n", data.u32);
       if (data.u32 == 3)
          ups->set_calibration();
       else
@@ -307,7 +307,7 @@ static void apc_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       break;
 
    case CI_Overload:
-      Dmsg1(80, "Got CI_Overload: %c\n", data.str[8]);
+      Dmsg(80, "Got CI_Overload: %c\n", data.str[8]);
       if (data.str[8] == '1')
          ups->set_overload();
       else
@@ -315,17 +315,17 @@ static void apc_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       break;
 
    case CI_DSHUTD:
-      Dmsg1(80, "Got CI_DSHUTD: %d\n", data.u32);
+      Dmsg(80, "Got CI_DSHUTD: %d\n", data.u32);
       ups->dshutd = data.u32 / TIMETICKS_TO_SECS;
       break;
 
    case CI_RETPCT:
-      Dmsg1(80, "Got CI_RETPCT: %d\n", data.u32);
+      Dmsg(80, "Got CI_RETPCT: %d\n", data.u32);
       ups->rtnpct = data.u32;
       break;
 
    case CI_WHY_BATT:
-      Dmsg1(80, "Got CI_WHY_BATT: %d\n", data.u32);
+      Dmsg(80, "Got CI_WHY_BATT: %d\n", data.u32);
       switch (data.u32)
       {
       case 1:
@@ -357,7 +357,7 @@ static void apc_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       break;
 
    case CI_SENS:
-      Dmsg1(80, "Got CI_SENS: %d\n", data.u32);
+      Dmsg(80, "Got CI_SENS: %d\n", data.u32);
       switch (data.u32)
       {
       case 1:
@@ -379,27 +379,27 @@ static void apc_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       break;
 
    case CI_REVNO:
-      Dmsg1(80, "Got CI_REVNO: %s\n", data.str.str());
+      Dmsg(80, "Got CI_REVNO: %s\n", data.str.str());
       astrncpy(ups->firmrev, data.str, sizeof(ups->firmrev));
       break;
 
    case CI_EXTBATTS:
-      Dmsg1(80, "Got CI_EXTBATTS: %d\n", data.u32);
+      Dmsg(80, "Got CI_EXTBATTS: %d\n", data.u32);
       ups->extbatts = data.u32;
       break;
    
    case CI_BADBATTS:
-      Dmsg1(80, "Got CI_BADBATTS: %d\n", data.u32);
+      Dmsg(80, "Got CI_BADBATTS: %d\n", data.u32);
       ups->badbatts = data.u32;
       break;
 
    case CI_DLBATT:
-      Dmsg1(80, "Got CI_DLBATT: %d\n", data.u32);
+      Dmsg(80, "Got CI_DLBATT: %d\n", data.u32);
       ups->dlowbatt = data.u32 / TIMETICKS_TO_SECS / SECS_TO_MINS;
       break;
 
    case CI_STESTI:
-      Dmsg1(80, "Got CI_STESTI: %d\n", data.u32);
+      Dmsg(80, "Got CI_STESTI: %d\n", data.u32);
       switch (data.u32) {
       case 2:
          astrncpy(ups->selftest, "336", sizeof(ups->selftest));
@@ -419,12 +419,12 @@ static void apc_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       break;
 
    case CI_VMIN:
-      Dmsg1(80, "Got CI_VMIN: %d\n", data.u32);
+      Dmsg(80, "Got CI_VMIN: %d\n", data.u32);
       ups->LineMin = data.u32;
       break;
 
    case CI_VMAX:
-      Dmsg1(80, "Got CI_VMAX: %d\n", data.u32);
+      Dmsg(80, "Got CI_VMAX: %d\n", data.u32);
       ups->LineMax = data.u32;
       break;
    }

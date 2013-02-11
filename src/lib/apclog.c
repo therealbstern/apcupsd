@@ -59,7 +59,7 @@ void log_event(const UPSINFO *ups, int level, const char *fmt, ...)
    va_end(arg_ptr);
 
    syslog(level, "%s", msg);       /* log the event */
-   Dmsg1(100, "%s\n", msg);
+   Dmsg(100, "%s\n", msg);
 
    /* Write out to our temp file. LOG_INFO is DATA logging, so
     * do not write it to our temp events file. */
@@ -169,7 +169,7 @@ void hex_dump(int level, void *data, unsigned int len)
    if (debug_level < level)
       return;
 
-   Dmsg2(level, "Dumping %d bytes @ 0x%08x\n", len, data);
+   Dmsg(level, "Dumping %d bytes @ 0x%08x\n", len, data);
    while (pos < len)
    {
       int num = MIN(16, len-pos);
@@ -183,7 +183,7 @@ void hex_dump(int level, void *data, unsigned int len)
       for (int i=0; i < num; i++)
          ptr += sprintf(ptr, "%c", isgraph(dat[pos+i]) ? dat[pos+i] : '.');
 
-      Dmsg1(level, "%s\n", temp2);
+      Dmsg(level, "%s\n", temp2);
       pos += num;
    }
 }

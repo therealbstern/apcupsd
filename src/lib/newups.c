@@ -87,24 +87,24 @@ void destroy_ups(UPSINFO *ups)
 
 void _read_lock(const char *file, int line, UPSINFO *ups)
 {
-   Dmsg2(100, "read_lock at %s:%d\n", file, line);
+   Dmsg(100, "read_lock at %s:%d\n", file, line);
    P(ups->mutex);
 }
 
 void _read_unlock(const char *file, int line, UPSINFO *ups)
 {
-   Dmsg2(100, "read_unlock at %s:%d\n", file, line);
+   Dmsg(100, "read_unlock at %s:%d\n", file, line);
    V(ups->mutex);
 }
 
 void _write_lock(const char *file, int line, UPSINFO *ups)
 {
-   Dmsg2(100, "write_lock at %s:%d\n", file, line);
+   Dmsg(100, "write_lock at %s:%d\n", file, line);
    P(ups->mutex);
 }
 
 void _write_unlock(const char *file, int line, UPSINFO *ups)
 {
-   Dmsg2(100, "write_unlock at %s:%d\n", file, line);
+   Dmsg(100, "write_unlock at %s:%d\n", file, line);
    V(ups->mutex);
 }

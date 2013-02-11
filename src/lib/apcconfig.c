@@ -706,8 +706,8 @@ jump_into_the_loop:
 
       if (ParseConfig(ups, line)) {
          errors++;
-         Dmsg1(100, "%s\n", line);
-         Dmsg2(100, "Parsing error at line %d of config file %s.\n", erpos, cfgfile);
+         Dmsg(100, "%s\n", line);
+         Dmsg(100, "Parsing error at line %d of config file %s.\n", erpos, cfgfile);
       }
    }
 
@@ -796,9 +796,9 @@ jump_into_the_loop:
    }
 
    /* Append filenames to paths */
-   Dmsg1(200, "After config scriptdir: \"%s\"\n", ups->scriptdir);
-   Dmsg1(200, "After config pwrfailpath: \"%s\"\n", ups->pwrfailpath);
-   Dmsg1(200, "After config nologinpath: \"%s\"\n", ups->nologinpath);
+   Dmsg(200, "After config scriptdir: \"%s\"\n", ups->scriptdir);
+   Dmsg(200, "After config pwrfailpath: \"%s\"\n", ups->pwrfailpath);
+   Dmsg(200, "After config nologinpath: \"%s\"\n", ups->nologinpath);
    astrncat(ups->nologinpath, NOLOGIN_FILE, sizeof(ups->nologinpath));
    astrncat(ups->pwrfailpath, PWRFAIL_FILE, sizeof(ups->pwrfailpath));
 

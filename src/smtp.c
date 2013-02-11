@@ -40,9 +40,9 @@
 UPSINFO myUPS;
 UPSINFO *core_ups = &myUPS;
 
-# define Pmsg2 Dmsg2
-# define Pmsg1 Dmsg1
-# define Pmsg0 Dmsg0
+# define Pmsg2 Dmsg
+# define Pmsg1 Dmsg
+# define Pmsg0 Dmsg
 # define MY_NAME "smtp"
 
 #else
@@ -94,11 +94,11 @@ static void get_response(void)
 {
    char buf[MAXSTRING];
 
-   Dmsg0(50, "Calling sockgets on read socket.\n");
+   Dmsg(50, "Calling sockgets on read socket.\n");
 
    while (sockgets(buf, sizeof(buf), s)) {
       buf[strlen(buf) - 1] = 0;
-      Dmsg2(10, "%s --> %s\n", mailhost, buf);
+      Dmsg(10, "%s --> %s\n", mailhost, buf);
 
       if (!isdigit((int)buf[0]) || buf[0] > '3') {
          Pmsg2(0, "Fatal malformed reply from %s: %s\n", mailhost, buf);
@@ -182,7 +182,7 @@ int main(int argc, char *argv[])
    while ((ch = getopt(argc, argv, "c:d:f:h:r:s:?")) != -1) {
       switch (ch) {
       case 'c':
-         Dmsg1(20, "cc=%s\n", optarg);
+         Dmsg(20, "cc=%s\n", optarg);
          cc_addr = optarg;
          break;
 
@@ -190,7 +190,7 @@ int main(int argc, char *argv[])
          debug_level = atoi(optarg);
          if (debug_level <= 0)
             debug_level = 1;
-         Dmsg1(20, "Debug level = %d\n", debug_level);
+         Dmsg(20, "Debug level = %d\n", debug_level);
          break;
 
       case 'f':    /* from */
@@ -198,7 +198,7 @@ int main(int argc, char *argv[])
          break;
 
       case 'h':    /* smtp host */
-         Dmsg1(20, "host=%s\n", optarg);
+         Dmsg(20, "host=%s\n", optarg);
          p = strchr(optarg, ':');
          if (p) {
             *p++ = 0;
@@ -208,7 +208,7 @@ int main(int argc, char *argv[])
          break;
 
       case 's':    /* subject */
-         Dmsg1(20, "subject=%s\n", optarg);
+         Dmsg(20, "subject=%s\n", optarg);
          subject = optarg;
          break;
 
@@ -260,7 +260,7 @@ int main(int argc, char *argv[])
    }
 
    astrncpy(my_hostname, hp->h_name, sizeof(my_hostname));
-   Dmsg1(20, "My hostname is: %s\n", my_hostname);
+   Dmsg(20, "My hostname is: %s\n", my_hostname);
 
    /* Determine from address. */
    if (from_addr == NULL) {
@@ -272,7 +272,7 @@ int main(int argc, char *argv[])
       from_addr = bstrdup(buf);
    }
 
-   Dmsg1(20, "From addr=%s\n", from_addr);
+   Dmsg(20, "From addr=%s\n", from_addr);
 
    /* Connect to smtp daemon on mailhost. */
 hp:
@@ -308,7 +308,7 @@ hp:
       exit(1);
    }
 
-   Dmsg0(20, "Connected\n");
+   Dmsg(20, "Connected\n");
 
    /* Send SMTP headers */
    get_response();                 /* banner */
@@ -316,14 +316,14 @@ hp:
    chat("mail from:<%s>\r\n", from_addr);
 
    for (i = 0; i < argc; i++) {
-      Dmsg1(20, "rcpt to: %s\n", argv[i]);
+      Dmsg(20, "rcpt to: %s\n", argv[i]);
       chat("rcpt to:<%s>\r\n", argv[i]);
    }
 
    if (cc_addr)
       chat("rcpt to:<%s>\r\n", cc_addr);
 
-   Dmsg0(20, "Data\n");
+   Dmsg(20, "Data\n");
    chat("data\r\n");
 
    /* Send message header */

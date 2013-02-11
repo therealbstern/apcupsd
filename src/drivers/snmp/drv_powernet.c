@@ -100,19 +100,19 @@ bool SnmpUpsDriver::powernet_snmp_kill_ups_power()
    peer = snmp_open(s);
 
    if (!peer) {
-      Dmsg0(0, "Can not open the SNMP connection.\n");
+      Dmsg(0, "Can not open the SNMP connection.\n");
       return 0;
    }
 
    status = snmp_synch_response(peer, request, &response);
 
    if (status != STAT_SUCCESS) {
-      Dmsg0(0, "Unable to communicate with UPS.\n");
+      Dmsg(0, "Unable to communicate with UPS.\n");
       return 0;
    }
 
    if (response->errstat != SNMP_ERR_NOERROR) {
-      Dmsg1(0, "Unable to kill UPS power: can not set SNMP variable (%d).\n", response->errstat);
+      Dmsg(0, "Unable to kill UPS power: can not set SNMP variable (%d).\n", response->errstat);
       return 0;
    }
 
@@ -377,12 +377,12 @@ bool SnmpUpsDriver::powernet_snmp_ups_read_volatile_data()
    powernet_mib_mgr_get_upsBasicOutput(s, &(data->upsBasicOutput));
    if (data->upsBasicOutput) {
       /* Clear the following flags: only one status will be TRUE */
-      Dmsg1(99, "Status before clearing: 0x%08x\n", _ups->Status);
+      Dmsg(99, "Status before clearing: 0x%08x\n", _ups->Status);
       _ups->clear_online();
       _ups->clear_onbatt();
       _ups->clear_boost();
       _ups->clear_trim();
-      Dmsg1(99, "Status after clearing: 0x%08x\n", _ups->Status);
+      Dmsg(99, "Status after clearing: 0x%08x\n", _ups->Status);
 
       switch (data->upsBasicOutput->__upsBasicOutputStatus) {
       case 2:
@@ -462,7 +462,7 @@ int SnmpUpsDriver::powernet_snmp_callback(
 {
    SnmpUpsDriver *_this = (SnmpUpsDriver *)magic;
 
-   Dmsg1(100, "powernet_snmp_callback: %d\n", reqid);
+   Dmsg(100, "powernet_snmp_callback: %d\n", reqid);
 
    if (reqid == 0)
       _this->_trap_received = true;
@@ -533,7 +533,7 @@ bool SnmpUpsDriver::powernet_snmp_ups_check_state()
          if (errno == EINTR || errno == EAGAIN)
             continue;            /* assume SIGCHLD */
 
-         Dmsg1(200, "select error: ERR=%s\n", strerror(errno));
+         Dmsg(200, "select error: ERR=%s\n", strerror(errno));
          return 0;
 
       default: /* Data available */
@@ -561,7 +561,7 @@ bool SnmpUpsDriver::powernet_snmp_ups_open()
     */
    if (!strcmp(_DeviceVendor, "APC_NOTRAP")) {
       _DeviceVendor[3] = '\0';
-      Dmsg0(100, "User requested no traps\n");
+      Dmsg(100, "User requested no traps\n");
       return 1;
    }
 
@@ -578,7 +578,7 @@ bool SnmpUpsDriver::powernet_snmp_ups_open()
     */
    _trap_session = snmp_open(&tmp);
    if (!_trap_session) {
-      Dmsg0(100, "Trap session failed to open\n");
+      Dmsg(100, "Trap session failed to open\n");
       return 1;
    }
 

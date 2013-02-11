@@ -213,7 +213,7 @@ int main(int argc, char *argv[])
    if (parse_options(argc, argv))
       exit(1);
 
-   Dmsg0(10, "Options parsed.\n");
+   Dmsg(10, "Options parsed.\n");
 
    if (show_version) {
       printf("apcupsd " APCUPSD_RELEASE " (" ADATE ") " APCUPSD_HOST "\n");
@@ -236,7 +236,7 @@ int main(int argc, char *argv[])
 #endif
 
    check_for_config(ups, cfgfile);
-   Dmsg1(10, "Config file %s processed.\n", cfgfile);
+   Dmsg(10, "Config file %s processed.\n", cfgfile);
 
    /*
     * Disallow --kill-on-powerfail in conjunction with simple signaling
@@ -306,7 +306,7 @@ int main(int argc, char *argv[])
    /* Network status information server */
    if (ups->netstats) {
       start_thread(ups, do_server, "apcnis", argv[0]);
-      Dmsg0(10, "NIS thread started.\n");
+      Dmsg(10, "NIS thread started.\n");
    }
 
    log_event(ups, LOG_WARNING,
