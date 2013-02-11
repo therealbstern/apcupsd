@@ -68,7 +68,7 @@ void LinuxUsbUpsDriver::reinitialize_private_structure()
 {
    int k;
 
-   Dmsg0(200, "Reinitializing private structure.\n");
+   Dmsg(200, "Reinitializing private structure.\n");
    /*
     * We are being reinitialized, so clear the Cap
     * array, and release previously allocated memory.
@@ -90,7 +90,7 @@ int LinuxUsbUpsDriver::open_device(const char *dev)
    int flaguref = HIDDEV_FLAG_UREF;
    int fd, ret, i;
 
-   Dmsg1(200, "Attempting to open \"%s\"\n", dev);
+   Dmsg(200, "Attempting to open \"%s\"\n", dev);
 
    /* Open the device port */
    fd = open(dev, O_RDWR | O_NOCTTY);
@@ -100,12 +100,12 @@ int LinuxUsbUpsDriver::open_device(const char *dev)
          if ((ret & 0xffff000) == (UPS_USAGE & 0xffff0000)) {
             /* Request full uref reporting from read() */
             if (FORCE_COMPAT24 || ioctl(fd, HIDIOCSFLAG, &flaguref)) {
-               Dmsg0(100, "HIDIOCSFLAG failed; enabling linux-2.4 "
+               Dmsg(100, "HIDIOCSFLAG failed; enabling linux-2.4 "
                       "compatibility mode\n");
                _compat24 = true;
             }
             /* Successfully opened the device */
-            Dmsg1(200, "Successfully opened \"%s\"\n", dev);
+            Dmsg(200, "Successfully opened \"%s\"\n", dev);
             return fd;
          }
       }
@@ -217,7 +217,7 @@ int LinuxUsbUpsDriver::usb_link_check()
    _linkcheck = true;               /* prevent recursion */
 
    _ups->set_commlost();
-   Dmsg0(200, "link_check comm lost\n");
+   Dmsg(200, "link_check comm lost\n");
 
    /* Don't warn until we try to get it at least 2 times and fail */
    for (tlog = LINK_RETRY_INTERVAL * 2; comm_err; tlog -= (LINK_RETRY_INTERVAL)) {
@@ -250,7 +250,7 @@ int LinuxUsbUpsDriver::usb_link_check()
    if (!comm_err) {
       generate_event(_ups, CMDCOMMOK);
       _ups->clear_commlost();
-      Dmsg0(200, "link check comm OK.\n");
+      Dmsg(200, "link check comm OK.\n");
    }
 
    _linkcheck = false;
@@ -278,7 +278,7 @@ bool LinuxUsbUpsDriver::populate_uval(USB_INFO *info, USB_VALUE *uval)
       astrncpy(val.sValue, sdesc.value, sizeof(val.sValue));
       val.value_type = V_STRING;
 
-      Dmsg4(200, "Def val=%d exp=%d sVal=\"%s\" ci=%d\n", info->uref.value,
+      Dmsg(200, "Def val=%d exp=%d sVal=\"%s\" ci=%d\n", info->uref.value,
          exponent, val.sValue, info->ci);
    } else if (info->data_type == T_UNITS) {
       val.value_type = V_DOUBLE;
@@ -323,7 +323,7 @@ bool LinuxUsbUpsDriver::populate_uval(USB_INFO *info, USB_VALUE *uval)
       // integer field as well.
       val.iValue = (int)val.dValue;
 
-      Dmsg4(200, "Def val=%d exp=%d dVal=%f ci=%d\n", info->uref.value,
+      Dmsg(200, "Def val=%d exp=%d dVal=%f ci=%d\n", info->uref.value,
          exponent, val.dValue, info->ci);
    } else {                        /* should be T_NONE */
       val.UnitName = "";
@@ -335,7 +335,7 @@ bool LinuxUsbUpsDriver::populate_uval(USB_INFO *info, USB_VALUE *uval)
       else
          val.dValue = ((double)info->uref.value) * pow_ten(exponent);
 
-      Dmsg4(200, "Def val=%d exp=%d dVal=%f ci=%d\n", info->uref.value,
+      Dmsg(200, "Def val=%d exp=%d dVal=%f ci=%d\n", info->uref.value,
          exponent, val.dValue, info->ci);
    }
 
@@ -449,7 +449,7 @@ bool LinuxUsbUpsDriver::check_state()
          if (errno == EINTR || errno == EAGAIN)         /* assume SIGCHLD */
             continue;
 
-         Dmsg1(200, "select error: ERR=%s\n", strerror(errno));
+         Dmsg(200, "select error: ERR=%s\n", strerror(errno));
          usb_link_check();      /* link is down, wait */
          return false;
       default:
@@ -463,7 +463,7 @@ bool LinuxUsbUpsDriver::check_state()
          } while (retval == -1 && (errno == EAGAIN || errno == EINTR));
 
          if (retval < 0) {            /* error */
-            Dmsg1(200, "read error: ERR=%s\n", strerror(errno));
+            Dmsg(200, "read error: ERR=%s\n", strerror(errno));
             usb_link_check();      /* notify that link is down, wait */
             return false;
          }
@@ -473,7 +473,7 @@ bool LinuxUsbUpsDriver::check_state()
 
          /* Ignore events we don't recognize */
          if ((info = find_info_by_uref(&uref)) == NULL) {
-            Dmsg3(200, "Unrecognized usage (rpt=%d, usg=0x%08x, val=%d)\n",
+            Dmsg(200, "Unrecognized usage (rpt=%d, usg=0x%08x, val=%d)\n",
                uref.report_id, uref.usage_code, uref.value);
             continue;
          }
@@ -487,7 +487,7 @@ bool LinuxUsbUpsDriver::check_state()
          } while (retval == -1 && (errno == EAGAIN || errno == EINTR));
 
          if (retval < 0) {            /* error */
-            Dmsg1(200, "read error: ERR=%s\n", strerror(errno));
+            Dmsg(200, "read error: ERR=%s\n", strerror(errno));
             usb_link_check();      /* notify that link is down, wait */
             return false;
          }
@@ -497,7 +497,7 @@ bool LinuxUsbUpsDriver::check_state()
 
          /* Ignore events we don't recognize */
          if ((info = find_info_by_ucode(hev.hid)) == NULL) {
-            Dmsg2(200, "Unrecognized usage (usg=0x%08x, val=%d)\n",
+            Dmsg(200, "Unrecognized usage (usg=0x%08x, val=%d)\n",
                hev.hid, hev.value);
             continue;
          }
@@ -519,14 +519,14 @@ bool LinuxUsbUpsDriver::check_state()
 
       /* Ignore events whose value is unchanged */
       if (info->uref.value == uref.value) {
-         Dmsg3(200, "Ignoring unchanged value (rpt=%d, usg=0x%08x, val=%d)\n",
+         Dmsg(200, "Ignoring unchanged value (rpt=%d, usg=0x%08x, val=%d)\n",
             uref.report_id, uref.usage_code, uref.value);
          write_unlock(_ups);
          continue;
       }
 
       /* Update tracked value */
-      Dmsg3(200, "Processing changed value (rpt=%d, usg=0x%08x, val=%d)\n",
+      Dmsg(200, "Processing changed value (rpt=%d, usg=0x%08x, val=%d)\n",
          uref.report_id, uref.usage_code, uref.value);
       info->uref.value = uref.value;
 
@@ -667,7 +667,7 @@ bool LinuxUsbUpsDriver::pusb_ups_get_capabilities()
                         info->data_type = _known_info[k].data_type;
                         memcpy(&info->uref, &uref, sizeof(uref));
 
-                        Dmsg3(200, "Got READ ci=%d, usage=0x%x, rpt=%d\n",
+                        Dmsg(200, "Got READ ci=%d, usage=0x%x, rpt=%d\n",
                            ci, _known_info[k].usage_code, uref.report_id);
                      }
 
@@ -678,7 +678,7 @@ bool LinuxUsbUpsDriver::pusb_ups_get_capabilities()
                          info->wuref.report_id == 0) {
                         memcpy(&info->wuref, &uref, sizeof(uref));
 
-                        Dmsg3(200, "Got WRITE ci=%d, usage=0x%x, rpt=%d\n",
+                        Dmsg(200, "Got WRITE ci=%d, usage=0x%x, rpt=%d\n",
                            ci, _known_info[k].usage_code, uref.report_id);
                      }
 
@@ -723,14 +723,14 @@ int LinuxUsbUpsDriver::write_int_to_ups(int ci, int value, const char *name)
 
       /* Get report */
       if (ioctl(_fd, HIDIOCGREPORT, &rinfo) < 0) {
-         Dmsg2(000, "HIDIOCGREPORT for function %s failed. ERR=%s\n",
+         Dmsg(000, "HIDIOCGREPORT for function %s failed. ERR=%s\n",
             name, strerror(errno));
          return false;
       }
 
       /* Get UPS value */
       if (ioctl(_fd, HIDIOCGUSAGE, &info->wuref) < 0) {
-         Dmsg2(000, "HIDIOCGUSAGE for function %s failed. ERR=%s\n",
+         Dmsg(000, "HIDIOCGUSAGE for function %s failed. ERR=%s\n",
             name, strerror(errno));
          return false;
       }
@@ -739,19 +739,19 @@ int LinuxUsbUpsDriver::write_int_to_ups(int ci, int value, const char *name)
       info->wuref.value = value;
       rinfo.report_type = info->wuref.report_type;
       rinfo.report_id = info->wuref.report_id;
-      Dmsg3(100, "SUSAGE type=%d id=%d index=%d\n", info->wuref.report_type,
+      Dmsg(100, "SUSAGE type=%d id=%d index=%d\n", info->wuref.report_type,
          info->wuref.report_id, info->wuref.field_index);
 
       /* Update UPS value */
       if (ioctl(_fd, HIDIOCSUSAGE, &info->wuref) < 0) {
-         Dmsg2(000, "HIDIOCSUSAGE for function %s failed. ERR=%s\n",
+         Dmsg(000, "HIDIOCSUSAGE for function %s failed. ERR=%s\n",
             name, strerror(errno));
          return false;
       }
 
       /* Update Report */
       if (ioctl(_fd, HIDIOCSREPORT, &rinfo) < 0) {
-         Dmsg2(000, "HIDIOCSREPORT for function %s failed. ERR=%s\n",
+         Dmsg(000, "HIDIOCSREPORT for function %s failed. ERR=%s\n",
             name, strerror(errno));
          return false;
       }
@@ -768,26 +768,26 @@ int LinuxUsbUpsDriver::write_int_to_ups(int ci, int value, const char *name)
 
       /* Get report */
       if (ioctl(_fd, HIDIOCGREPORT, &rinfo) < 0) {
-         Dmsg2(000, "HIDIOCGREPORT for function %s failed. ERR=%s\n",
+         Dmsg(000, "HIDIOCGREPORT for function %s failed. ERR=%s\n",
             name, strerror(errno));
          return false;
       }
 
       /* Get UPS value */
       if (ioctl(_fd, HIDIOCGUSAGE, &info->uref) < 0) {
-         Dmsg2(000, "HIDIOCGUSAGE for function %s failed. ERR=%s\n",
+         Dmsg(000, "HIDIOCGUSAGE for function %s failed. ERR=%s\n",
             name, strerror(errno));
          return false;
       }
 
       new_value = info->uref.value;
-      Dmsg3(100, "function %s ci=%d value=%d OK.\n", name, ci, value);
-      Dmsg4(100, "%s before=%d set=%d after=%d\n", name, old_value, value,
+      Dmsg(100, "function %s ci=%d value=%d OK.\n", name, ci, value);
+      Dmsg(100, "%s before=%d set=%d after=%d\n", name, old_value, value,
          new_value);
 
       return true;
    }
 
-   Dmsg2(000, "function %s ci=%d not available in this UPS.\n", name, ci);
+   Dmsg(000, "function %s ci=%d not available in this UPS.\n", name, ci);
    return false;
 }

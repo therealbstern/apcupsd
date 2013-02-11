@@ -108,14 +108,14 @@ static UpsDriver *helper_attach_driver(UPSINFO *ups, const char *drvname)
 
    write_lock(ups);
 
-   Dmsg1(99, "Looking for driver: %s\n", drvname);
+   Dmsg(99, "Looking for driver: %s\n", drvname);
    ups->driver = NULL;
 
    for (i = 0; drivers[i].driver_name; i++) {
-      Dmsg1(99, "Driver %s is configured.\n", drivers[i].driver_name);
+      Dmsg(99, "Driver %s is configured.\n", drivers[i].driver_name);
       if (strcasecmp(drivers[i].driver_name, drvname) == 0) {
          ups->driver = drivers[i].factory(ups);
-         Dmsg1(20, "Driver %s found and attached.\n", drivers[i].driver_name);
+         Dmsg(20, "Driver %s found and attached.\n", drivers[i].driver_name);
          break;
       }
    }
@@ -134,8 +134,8 @@ static UpsDriver *helper_attach_driver(UPSINFO *ups, const char *drvname)
 
    write_unlock(ups);
 
-   Dmsg1(99, "Driver ptr=0x%x\n", ups->driver);
-   Dmsg1(10, "Attached to driver: %s\n", drivers[i].driver_name);
+   Dmsg(99, "Driver ptr=0x%x\n", ups->driver);
+   Dmsg(10, "Attached to driver: %s\n", drivers[i].driver_name);
    return ups->driver;
 }
 
@@ -179,7 +179,7 @@ UpsDriver *attach_driver(UPSINFO *ups)
 
    default:
    case NO_UPS:
-      Dmsg1(000, "Warning: no UPS driver found (ups->mode.type=%d).\n",
+      Dmsg(000, "Warning: no UPS driver found (ups->mode.type=%d).\n",
          ups->mode.type);
       break;
    }

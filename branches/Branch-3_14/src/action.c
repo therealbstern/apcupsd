@@ -86,7 +86,7 @@ void generate_event(UPSINFO *ups, int event)
 {
    /* Log message and execute script for this event */
    log_event(ups, event_msg[event].level, event_msg[event].msg);
-   Dmsg2(80, "calling execute_ups_event %s event=%d\n", ups_event[event], event);
+   Dmsg(80, "calling execute_ups_event %s event=%d\n", ups_event[event], event);
    execute_command(ups, ups_event[event]);
 
    /*
@@ -421,10 +421,10 @@ void do_action(UPSINFO *ups)
     */
    if (ups->chg_battlow()) {
       if (ups->is_battlow()) {
-         Dmsg0(100, "BATTLOW asserted\n");
+         Dmsg(100, "BATTLOW asserted\n");
          ups->start_shut_lbatt = now;
       } else {
-         Dmsg0(100, "BATTLOW glitch\n");
+         Dmsg(100, "BATTLOW glitch\n");
       }
    }
 
@@ -442,7 +442,7 @@ void do_action(UPSINFO *ups)
       ups->set_fastpoll();       /* speed up polling */
 
       /* Check if selftest */
-      Dmsg1(80, "Power failure detected. 0x%x\n", ups->Status);
+      Dmsg(80, "Power failure detected. 0x%x\n", ups->Status);
       device_entry_point(ups, DEVICE_CMD_CHECK_SELFTEST, NULL);
 
       if (ups->SelfTest)
@@ -466,7 +466,7 @@ void do_action(UPSINFO *ups)
 
       /* Cancel self test, announce power failure */
       ups->SelfTest = 0;
-      Dmsg1(80, "UPS Self Test cancelled, fall-thru to On Battery. 0x%x\n",
+      Dmsg(80, "UPS Self Test cancelled, fall-thru to On Battery. 0x%x\n",
          ups->Status);
 
       /* ...FALL-THRU to st_OnBattery... */
@@ -507,25 +507,25 @@ void do_action(UPSINFO *ups)
           */
          if (ups->UPS_Cap[CI_BATTLEV] && ups->BattChg <= ups->percent) {
             if (!ups->is_shut_load()) {
-               Dmsg0(100, "CI_BATTLEV shutdown\n");
+               Dmsg(100, "CI_BATTLEV shutdown\n");
                ups->set_shut_load();
                ups->start_shut_load = now;
             }
          } else {
             if (ups->UPS_Cap[CI_BATTLEV] && ups->is_shut_load())
-               Dmsg0(100, "CI_BATTLEV glitch\n");
+               Dmsg(100, "CI_BATTLEV glitch\n");
             ups->clear_shut_load();
          }
 
          if (ups->UPS_Cap[CI_RUNTIM] && ups->TimeLeft <= ups->runtime) {
             if (!ups->is_shut_ltime()) {
-               Dmsg0(100, "CI_RUNTIM shutdown\n");
+               Dmsg(100, "CI_RUNTIM shutdown\n");
                ups->set_shut_ltime();
                ups->start_shut_ltime = now;
             }
          } else {
             if (ups->UPS_Cap[CI_RUNTIM] && ups->is_shut_ltime())
-               Dmsg0(100, "CI_RUNTIM glitch\n");
+               Dmsg(100, "CI_RUNTIM glitch\n");
             ups->clear_shut_ltime();
          }
 

@@ -66,13 +66,13 @@ unsigned char *hidu_fetch_report_descriptor(int fd, int *rlen)
    cdesc.ucd_config_index = USB_CURRENT_CONFIG_INDEX;
    rc = ioctl(fd, USB_GET_CONFIG_DESC, &cdesc);
    if (rc) {
-      Dmsg0(100, "Unable to get USB CONFIG descriptor.\n");
+      Dmsg(100, "Unable to get USB CONFIG descriptor.\n");
       return NULL;
    }
 
    len = UGETW(cdesc.ucd_desc.wTotalLength);
    if (!len || len > MAX_SANE_DESCRIPTOR_LEN) {
-      Dmsg1(100, "Unreasonable length %d.\n", len);
+      Dmsg(100, "Unreasonable length %d.\n", len);
       return NULL;
    }
 
@@ -85,12 +85,12 @@ unsigned char *hidu_fetch_report_descriptor(int fd, int *rlen)
    fdesc.ufd_config_index = USB_CURRENT_CONFIG_INDEX;
    rc = ioctl(fd, USB_GET_FULL_DESC, &fdesc);
    if (rc) {
-      Dmsg0(100, "Unable to get full descriptors.\n");
+      Dmsg(100, "Unable to get full descriptors.\n");
       free(fdesc.ufd_data);
       return NULL;
    }
 
-   Dmsg0(300, "Full descriptors:\n");
+   Dmsg(300, "Full descriptors:\n");
    hex_dump(300, fdesc.ufd_data, len);
 
    /* Search for the HID descriptor */
@@ -99,27 +99,27 @@ unsigned char *hidu_fetch_report_descriptor(int fd, int *rlen)
          break;
 
    if (i >= len) {
-      Dmsg0(100, "Unable to locate HID descriptor.\n");
+      Dmsg(100, "Unable to locate HID descriptor.\n");
       free(fdesc.ufd_data);
       return NULL;
    }
 
    /* We expect the first additional descriptor type to be report */
    if (ptr[6] != UDESC_REPORT) {
-      Dmsg0(100, "First extra descriptor not report.\n");
+      Dmsg(100, "First extra descriptor not report.\n");
       free(fdesc.ufd_data);
       return NULL;
    }
 
    /* Finally! The report descriptor's length! */
    rdesclen = ptr[8] << 8 | ptr[7];
-   Dmsg2(200, "Report desc len=0x%04x (%d)\n", rdesclen, rdesclen);
+   Dmsg(200, "Report desc len=0x%04x (%d)\n", rdesclen, rdesclen);
 
    /* That's all we needed from the buffer */
    free(fdesc.ufd_data);
 
    if (!rdesclen || rdesclen > MAX_SANE_DESCRIPTOR_LEN) {
-      Dmsg1(100, "Unreasonable rdesclen %d.\n", rdesclen);
+      Dmsg(100, "Unreasonable rdesclen %d.\n", rdesclen);
       return NULL;
    }
 
@@ -138,12 +138,12 @@ unsigned char *hidu_fetch_report_descriptor(int fd, int *rlen)
    USETW(req.ucr_request.wLength, rdesclen);
    rc = ioctl(fd, USB_DO_REQUEST, &req);
    if (rc) {
-      Dmsg0(100, "Unable to read report descriptor.\n");
+      Dmsg(100, "Unable to read report descriptor.\n");
       free(req.ucr_data);
       return NULL;
    }
 
-   Dmsg0(300, "Report descriptor:\n");
+   Dmsg(300, "Report descriptor:\n");
    hex_dump(300, req.ucr_data, rdesclen);
 
    *rlen = rdesclen;
@@ -217,7 +217,7 @@ int hidu_locate_item(report_desc_t rdesc, int usage, int app, int phys,
 
    cookie = hid_start_parse(rdesc, HID_KIND_ALL, -1);
    if (!cookie) {
-      Dmsg0(100, "Unable to start hid parser\n");
+      Dmsg(100, "Unable to start hid parser\n");
       return 0;
    }
 
@@ -274,7 +274,7 @@ int hidu_get_report(int fd, hid_item_t *item, unsigned char *data, int len)
    int rc;
    struct usb_ctl_request req;
 
-   Dmsg4(200, "get_report: id=0x%02x, kind=%d, length=%d pos=%d\n",
+   Dmsg(200, "get_report: id=0x%02x, kind=%d, length=%d pos=%d\n",
       item->report_ID, item->kind, len, item->pos);
 
    req.ucr_flags = USBD_SHORT_XFER_OK;
@@ -287,12 +287,12 @@ int hidu_get_report(int fd, hid_item_t *item, unsigned char *data, int len)
    USETW(req.ucr_request.wIndex, 0);
    USETW(req.ucr_request.wLength, len);
 
-   Dmsg2(200, "get_report: wValue=0x%04x, wLength=%d\n",
+   Dmsg(200, "get_report: wValue=0x%04x, wLength=%d\n",
       UGETW(req.ucr_request.wValue), UGETW(req.ucr_request.wLength));
 
    rc = ioctl(fd, USB_DO_REQUEST, &req);
    if (rc) {
-      Dmsg1(100, "Error getting report: %s\n", strerror(errno));
+      Dmsg(100, "Error getting report: %s\n", strerror(errno));
       return -1;
    }
 
@@ -311,7 +311,7 @@ int hidu_set_report(int fd, hid_item_t *item, unsigned char *data, int len)
    int rc;
    struct usb_ctl_request req;
 
-   Dmsg4(200, "set_report: id=0x%02x, kind=%d, length=%d pos=%d\n",
+   Dmsg(200, "set_report: id=0x%02x, kind=%d, length=%d pos=%d\n",
       item->report_ID, item->kind, len, item->pos);
    hex_dump(300, data, len);
 
@@ -325,12 +325,12 @@ int hidu_set_report(int fd, hid_item_t *item, unsigned char *data, int len)
    USETW(req.ucr_request.wIndex, 0);
    USETW(req.ucr_request.wLength, len);
 
-   Dmsg2(200, "set_report: wValue=0x%04x, wLength=%d\n",
+   Dmsg(200, "set_report: wValue=0x%04x, wLength=%d\n",
       UGETW(req.ucr_request.wValue), UGETW(req.ucr_request.wLength));
 
    rc = ioctl(fd, USB_DO_REQUEST, &req);
    if (rc) {
-      Dmsg2(100, "Error setting report: (%d) %s\n", errno, strerror(errno));
+      Dmsg(100, "Error setting report: (%d) %s\n", errno, strerror(errno));
       return 0;
    }
 
@@ -353,11 +353,11 @@ const char *hidu_get_string(int fd, int index)
    sd.usd_language_id = 0;
    rc = ioctl(fd, USB_GET_STRING_DESC, &sd);
    if (rc) {
-      Dmsg1(100, "Error fetching string descriptor: %s\n", strerror(errno));
+      Dmsg(100, "Error fetching string descriptor: %s\n", strerror(errno));
       return NULL;
    }
 
-   Dmsg1(200, "Got string of length=%d\n", sd.usd_desc.bLength);
+   Dmsg(200, "Got string of length=%d\n", sd.usd_desc.bLength);
 
    /*
     * Convert from wide chars to bytes...just assume it's ASCII.

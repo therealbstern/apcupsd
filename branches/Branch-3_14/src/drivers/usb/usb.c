@@ -258,17 +258,17 @@ bool UsbUpsDriver::get_capabilities()
    if (_ups->UPS_Cap[CI_NOMPOWER] &&
        (!usb_get_value(CI_NOMPOWER, &uval) ||
         ((int)uval.dValue == 0))) {
-      Dmsg0(100, "NOMPOWER disabled due to invalid reading from UPS\n");
+      Dmsg(100, "NOMPOWER disabled due to invalid reading from UPS\n");
       _ups->UPS_Cap[CI_NOMPOWER] = false;
    }
 
    /* Detect broken BackUPS Pro model */
    _quirk_old_backups_pro = false;
    if (_ups->UPS_Cap[CI_UPSMODEL] && usb_get_value(CI_UPSMODEL, &uval)) {
-      Dmsg1(250, "Checking for BackUPS Pro quirk \"%s\"\n", uval.sValue);
+      Dmsg(250, "Checking for BackUPS Pro quirk \"%s\"\n", uval.sValue);
       if (!strcmp(uval.sValue, QUIRK_OLD_BACKUPS_PRO_MODEL_STRING)) {
          _quirk_old_backups_pro = true;
-         Dmsg0(100, "BackUPS Pro quirk enabled\n");
+         Dmsg(100, "BackUPS Pro quirk enabled\n");
       }
    }
 
@@ -295,7 +295,7 @@ bool UsbUpsDriver::usb_process_value_bup(int ci, USB_VALUE* uval)
    if(ci == CI_RUNTIM)
    {
       _ups->TimeLeft = uval->dValue; /* already minutes */
-      Dmsg1(200, "TimeLeft = %d\n", (int)_ups->TimeLeft);
+      Dmsg(200, "TimeLeft = %d\n", (int)_ups->TimeLeft);
       return true;
    }
 
@@ -308,7 +308,7 @@ bool UsbUpsDriver::usb_process_value_bup(int ci, USB_VALUE* uval)
    /* UPS_LOAD */
    case CI_LOAD:
       _ups->UPSLoad = atoi(digits);
-      Dmsg1(200, "UPSLoad = %d\n", (int)_ups->UPSLoad);
+      Dmsg(200, "UPSLoad = %d\n", (int)_ups->UPSLoad);
       return true;
 
    /* LOW_TRANSFER_LEVEL */
@@ -359,120 +359,120 @@ void UsbUpsDriver::usb_process_value(int ci, USB_VALUE* uval)
    case CI_STATUS:
       _ups->Status &= ~0xff;
       _ups->Status |= uval->iValue & 0xff;
-      Dmsg1(200, "Status=0x%08x\n", _ups->Status);
+      Dmsg(200, "Status=0x%08x\n", _ups->Status);
       break;
 
    case CI_ACPresent:
       if (uval->iValue)
          _ups->set_online();
-      Dmsg1(200, "ACPresent=%d\n", uval->iValue);
+      Dmsg(200, "ACPresent=%d\n", uval->iValue);
       break;
 
    case CI_Discharging:
       _ups->set_online(!uval->iValue);
-      Dmsg1(200, "Discharging=%d\n", uval->iValue);
+      Dmsg(200, "Discharging=%d\n", uval->iValue);
       break;
 
    case CI_BelowRemCapLimit:
       if (uval->iValue)
          _ups->set_battlow();
-      Dmsg1(200, "BelowRemCapLimit=%d\n", uval->iValue);
+      Dmsg(200, "BelowRemCapLimit=%d\n", uval->iValue);
       break;
 
    case CI_RemTimeLimitExpired:
       if (uval->iValue)
          _ups->set_battlow();
-      Dmsg1(200, "RemTimeLimitExpired=%d\n", uval->iValue);
+      Dmsg(200, "RemTimeLimitExpired=%d\n", uval->iValue);
       break;
 
    case CI_ShutdownImminent:
       if (uval->iValue)
          _ups->set_battlow();
-      Dmsg1(200, "ShutdownImminent=%d\n", uval->iValue);
+      Dmsg(200, "ShutdownImminent=%d\n", uval->iValue);
       break;
 
    case CI_Boost:
       if (uval->iValue)
          _ups->set_boost();
-      Dmsg1(200, "Boost=%d\n", uval->iValue);
+      Dmsg(200, "Boost=%d\n", uval->iValue);
       break;
 
    case CI_Trim:
       if (uval->iValue)
          _ups->set_trim();
-      Dmsg1(200, "Trim=%d\n", uval->iValue);
+      Dmsg(200, "Trim=%d\n", uval->iValue);
       break;
 
    case CI_Overload:
       if (uval->iValue)
          _ups->set_overload();
-      Dmsg1(200, "Overload=%d\n", uval->iValue);
+      Dmsg(200, "Overload=%d\n", uval->iValue);
       break;
 
    case CI_NeedReplacement:
       if (uval->iValue)
          _ups->set_replacebatt(uval->iValue);
-      Dmsg1(200, "ReplaceBatt=%d\n", uval->iValue);
+      Dmsg(200, "ReplaceBatt=%d\n", uval->iValue);
       break;
 
    /* LINE_VOLTAGE */
    case CI_VLINE:
       _ups->LineVoltage = uval->dValue;
-      Dmsg1(200, "LineVoltage = %d\n", (int)_ups->LineVoltage);
+      Dmsg(200, "LineVoltage = %d\n", (int)_ups->LineVoltage);
       break;
 
    /* OUTPUT_VOLTAGE */
    case CI_VOUT:
       _ups->OutputVoltage = uval->dValue;
-      Dmsg1(200, "OutputVoltage = %d\n", (int)_ups->OutputVoltage);
+      Dmsg(200, "OutputVoltage = %d\n", (int)_ups->OutputVoltage);
       break;
 
    /* BATT_FULL Battery level percentage */
    case CI_BATTLEV:
       _ups->BattChg = uval->dValue;
-      Dmsg1(200, "BattCharge = %d\n", (int)_ups->BattChg);
+      Dmsg(200, "BattCharge = %d\n", (int)_ups->BattChg);
       break;
 
    /* BATT_VOLTAGE */
    case CI_VBATT:
       _ups->BattVoltage = uval->dValue;
-      Dmsg1(200, "BattVoltage = %d\n", (int)_ups->BattVoltage);
+      Dmsg(200, "BattVoltage = %d\n", (int)_ups->BattVoltage);
       break;
 
    /* UPS_LOAD */
    case CI_LOAD:
       _ups->UPSLoad = uval->dValue;
-      Dmsg1(200, "UPSLoad = %d\n", (int)_ups->UPSLoad);
+      Dmsg(200, "UPSLoad = %d\n", (int)_ups->UPSLoad);
       break;
 
    /* LINE_FREQ */
    case CI_FREQ:
       _ups->LineFreq = uval->dValue;
-      Dmsg1(200, "LineFreq = %d\n", (int)_ups->LineFreq);
+      Dmsg(200, "LineFreq = %d\n", (int)_ups->LineFreq);
       break;
 
    /* UPS_RUNTIME_LEFT */
    case CI_RUNTIM:
       _ups->TimeLeft = uval->dValue / 60; /* convert to minutes */
-      Dmsg1(200, "TimeLeft = %d\n", (int)_ups->TimeLeft);
+      Dmsg(200, "TimeLeft = %d\n", (int)_ups->TimeLeft);
       break;
 
    /* UPS_TEMP */
    case CI_ITEMP:
       _ups->UPSTemp = uval->dValue - 273.15;      /* convert to deg C. */
-      Dmsg1(200, "ITemp = %d\n", (int)_ups->UPSTemp);
+      Dmsg(200, "ITemp = %d\n", (int)_ups->UPSTemp);
       break;
 
    /*  Humidity percentage */ 
    case CI_HUMID:
       _ups->humidity = uval->dValue;
-      Dmsg1(200, "Humidity = %d\n", (int)_ups->humidity);
+      Dmsg(200, "Humidity = %d\n", (int)_ups->humidity);
       break;
 
    /*  Ambient temperature */ 
    case CI_ATEMP:
       _ups->ambtemp = uval->dValue - 273.15;      /* convert to deg C. */;
-      Dmsg1(200, "ATemp = %d\n", (int)_ups->ambtemp);
+      Dmsg(200, "ATemp = %d\n", (int)_ups->ambtemp);
       break;
 
    /* Self test results */
@@ -520,7 +520,7 @@ void UsbUpsDriver::usb_process_value(int ci, USB_VALUE* uval)
 
    /* Reason for last xfer to battery */
    case CI_APCLineFailCause:
-      Dmsg1(100, "CI_APCLineFailCause=%d\n", uval->iValue);
+      Dmsg(100, "CI_APCLineFailCause=%d\n", uval->iValue);
       switch (uval->iValue) {
       case 0:  /* No transfers have ocurred */
          _ups->lastxfer = XFER_NONE;
@@ -575,7 +575,7 @@ void UsbUpsDriver::usb_process_value(int ci, USB_VALUE* uval)
          _bpcnt = 0;
          _ups->clear_battpresent();
       }
-      Dmsg1(200, "BatteryPresent=%d\n", uval->iValue);
+      Dmsg(200, "BatteryPresent=%d\n", uval->iValue);
       break;
 
    /* UPS_NAME */
@@ -752,7 +752,7 @@ bool UsbUpsDriver::entry_point(int command, void *data)
 
    switch (command) {
    case DEVICE_CMD_CHECK_SELFTEST:
-      Dmsg0(80, "Checking self test.\n");
+      Dmsg(80, "Checking self test.\n");
       /*
        * XXX FIXME
        *
@@ -764,7 +764,7 @@ bool UsbUpsDriver::entry_point(int command, void *data)
       if (usb_update_value(CI_WHY_BATT) ||
           usb_update_value(CI_APCLineFailCause))
       {
-         Dmsg1(80, "Transfer reason: %d\n", _ups->lastxfer);
+         Dmsg(80, "Transfer reason: %d\n", _ups->lastxfer);
 
          /* See if this is a self test rather than power failure */
          if (_ups->lastxfer == XFER_SELFTEST) {
@@ -772,7 +772,7 @@ bool UsbUpsDriver::entry_point(int command, void *data)
              * set Self Test start time
              */
             _ups->SelfTest = time(NULL);
-            Dmsg1(80, "Self Test time: %s", ctime(&_ups->SelfTest));
+            Dmsg(80, "Self Test time: %s", ctime(&_ups->SelfTest));
          }
       }
       break;
@@ -799,7 +799,7 @@ bool UsbUpsDriver::read_volatile_data()
    time_t last_poll = _ups->poll_time;
    time_t now = time(NULL);
 
-   Dmsg0(200, "Enter usb_ups_read_volatile_data\n");
+   Dmsg(200, "Enter usb_ups_read_volatile_data\n");
 
    /* 
     * If we are not on batteries, update this maximum once every
@@ -872,7 +872,7 @@ bool UsbUpsDriver::kill_power()
    int hibernate = 0;
    int val;
 
-   Dmsg0(200, "Enter usb_ups_kill_power\n");
+   Dmsg(200, "Enter usb_ups_kill_power\n");
 
    /*
     * We try various different ways to put the UPS into hibernation
@@ -890,7 +890,7 @@ bool UsbUpsDriver::kill_power()
    if (UPS_HAS_CAP(CI_RETPCT)) {
       func = "CI_RETPCT";
       if (!write_int_to_ups(CI_RETPCT, STARTUP_PERCENT, func))
-         Dmsg1(100, "Unable to set %s (not an error)\n", func);
+         Dmsg(100, "Unable to set %s (not an error)\n", func);
    }
 
    /*
@@ -922,7 +922,7 @@ bool UsbUpsDriver::kill_power()
             break;
 
          default:
-            Dmsg1(100, "Unknown BUPBattCapBeforeStartup value (%04x)\n", val);
+            Dmsg(100, "Unknown BUPBattCapBeforeStartup value (%04x)\n", val);
             break;
          }
       }
@@ -939,7 +939,7 @@ bool UsbUpsDriver::kill_power()
    if (UPS_HAS_CAP(CI_APCDelayBeforeStartup)) {
       func = "CI_APCDelayBeforeStartup";
       if (!write_int_to_ups(CI_APCDelayBeforeStartup, STARTUP_DELAY, func)) {
-         Dmsg1(100, "Unable to set %s (not an error)\n", func);
+         Dmsg(100, "Unable to set %s (not an error)\n", func);
       }
    }
 
@@ -971,7 +971,7 @@ bool UsbUpsDriver::kill_power()
             break;
 
          default:
-            Dmsg1(100, "Unknown CI_BUPDelayBeforeStartup value (%04x)\n", val);
+            Dmsg(100, "Unknown CI_BUPDelayBeforeStartup value (%04x)\n", val);
             break;
          }
       }
@@ -984,11 +984,11 @@ bool UsbUpsDriver::kill_power()
     * it will start a countdown after which the UPS will hibernate.
     */
    if (!hibernate && UPS_HAS_CAP(CI_APCDelayBeforeShutdown)) {
-      Dmsg0(000, "UPS appears to support BackUPS style hibernate.\n");
+      Dmsg(000, "UPS appears to support BackUPS style hibernate.\n");
       func = "CI_APCDelayBeforeShutdown";
       if (!write_int_to_ups(CI_APCDelayBeforeShutdown,
             SHUTDOWN_DELAY, func)) {
-         Dmsg1(000, "Kill power function \"%s\" failed.\n", func);
+         Dmsg(000, "Kill power function \"%s\" failed.\n", func);
       } else {
          hibernate = 1;
       }
@@ -1004,15 +1004,15 @@ bool UsbUpsDriver::kill_power()
     * UPS will hibernate when DelayBeforeShutdown hits zero.
     */
    if (!hibernate && UPS_HAS_CAP(CI_DWAKE) && UPS_HAS_CAP(CI_DelayBeforeShutdown)) {
-      Dmsg0(000, "UPS appears to support SmartUPS style hibernate.\n");
+      Dmsg(000, "UPS appears to support SmartUPS style hibernate.\n");
       func = "CI_DWAKE";
       if (!write_int_to_ups(CI_DWAKE, SHUTDOWN_DELAY + 4, func)) {
-         Dmsg1(000, "Kill power function \"%s\" failed.\n", func);
+         Dmsg(000, "Kill power function \"%s\" failed.\n", func);
       } else {
          func = "CI_DelayBeforeShutdown";
          if (!write_int_to_ups(CI_DelayBeforeShutdown,
                SHUTDOWN_DELAY, func)) {
-            Dmsg1(000, "Kill power function \"%s\" failed.\n", func);
+            Dmsg(000, "Kill power function \"%s\" failed.\n", func);
             /* reset prev timer */
             write_int_to_ups(CI_DWAKE, -1, "CI_DWAKE");  
          } else {
@@ -1034,14 +1034,14 @@ bool UsbUpsDriver::kill_power()
     * this out.
     */
    if (!hibernate && UPS_HAS_CAP(CI_BUPHibernate) && UPS_HAS_CAP(CI_BUPSelfTest)) {
-      Dmsg0(000, "UPS appears to support BackUPS Pro style hibernate.\n");
+      Dmsg(000, "UPS appears to support BackUPS Pro style hibernate.\n");
       func = "CI_BUPHibernate";
       if (!write_int_to_ups(CI_BUPHibernate, 1, func)) {
-         Dmsg1(000, "Kill power function \"%s\" failed.\n", func);
+         Dmsg(000, "Kill power function \"%s\" failed.\n", func);
       } else {
          func = "CI_BUPSelfTest";
          if (!write_int_to_ups(CI_BUPSelfTest, 1, func)) {
-            Dmsg1(000, "Kill power function \"%s\" failed.\n", func);
+            Dmsg(000, "Kill power function \"%s\" failed.\n", func);
             write_int_to_ups(CI_BUPHibernate, 0, "CI_BUPHibernate");
          } else {
             hibernate = 1;
@@ -1067,11 +1067,11 @@ bool UsbUpsDriver::kill_power()
     * out in the HID Usage Tables for Power Devices spec. 
     */
    if (!hibernate && UPS_HAS_CAP(CI_DelayBeforeReboot)) {
-      Dmsg0(000, "UPS appears to support DelayBeforeReboot style hibernate.\n");
+      Dmsg(000, "UPS appears to support DelayBeforeReboot style hibernate.\n");
 
       func = "CI_DelayBeforeReboot";
       if (!write_int_to_ups(CI_DelayBeforeReboot, SHUTDOWN_DELAY, func))
-         Dmsg1(000, "Kill power function \"%s\" failed.\n", func);
+         Dmsg(000, "Kill power function \"%s\" failed.\n", func);
       else
          hibernate = 1;
    }
@@ -1086,21 +1086,21 @@ bool UsbUpsDriver::kill_power()
     * BackUPS method above. It's included here "just in case".
     */
    if (!hibernate && UPS_HAS_CAP(CI_APCForceShutdown)) {
-      Dmsg0(000, "UPS appears to support ForceShutdown style hibernate.\n");
+      Dmsg(000, "UPS appears to support ForceShutdown style hibernate.\n");
 
       func = "CI_APCForceShutdown";
       if (!write_int_to_ups(CI_APCForceShutdown, 1, func))
-         Dmsg1(000, "Kill power function \"%s\" failed.\n", func);
+         Dmsg(000, "Kill power function \"%s\" failed.\n", func);
       else
          hibernate = 1;
    }
 
    if (!hibernate) {
-      Dmsg0(000, "Couldn't put UPS into hibernation mode. Attempting shutdown.\n");
+      Dmsg(000, "Couldn't put UPS into hibernation mode. Attempting shutdown.\n");
       hibernate = shutdown();
    }
 
-   Dmsg0(200, "Leave usb_ups_kill_power\n");
+   Dmsg(200, "Leave usb_ups_kill_power\n");
    return hibernate;
 }
 
@@ -1109,7 +1109,7 @@ bool UsbUpsDriver::shutdown()
    const char *func;
    int shutdown = 0;
 
-   Dmsg0(200, "Enter usb_ups_shutdown\n");
+   Dmsg(200, "Enter usb_ups_shutdown\n");
 
    /*
     * Complete shutdown
@@ -1119,11 +1119,11 @@ bool UsbUpsDriver::shutdown()
     * power button.
     */
    if (!shutdown && UPS_HAS_CAP(CI_DelayBeforeShutdown)) {
-      Dmsg0(000, "UPS appears to support DelayBeforeShutdown style shutdown.\n");
+      Dmsg(000, "UPS appears to support DelayBeforeShutdown style shutdown.\n");
 
       func = "CI_DelayBeforeShutdown";
       if (!write_int_to_ups(CI_DelayBeforeShutdown, SHUTDOWN_DELAY, func))
-         Dmsg1(000, "Kill power function \"%s\" failed.\n", func);
+         Dmsg(000, "Kill power function \"%s\" failed.\n", func);
       else
          shutdown = 1;
    }
@@ -1132,7 +1132,7 @@ bool UsbUpsDriver::shutdown()
     * I give up.
     */
    if (!shutdown) {
-      Dmsg0(000, "I don't know how to turn off this UPS...sorry.\n"
+      Dmsg(000, "I don't know how to turn off this UPS...sorry.\n"
          "Please report this, along with the output from\n"
          "running examples/hid-ups, to the apcupsd-users\n"
          "mailing list (apcupsd-users@lists.sourceforge.net).\n");
@@ -1153,7 +1153,7 @@ bool UsbUpsDriver::shutdown()
     *     server to the UPS.
     */
 
-   Dmsg0(200, "Leave usb_ups_shutdown\n");
+   Dmsg(200, "Leave usb_ups_shutdown\n");
    return shutdown;
 }
 
@@ -1182,7 +1182,7 @@ double UsbUpsDriver::pow_ten(int exponent)
 /* Called by platform-specific code to report an interrupt event */
 bool UsbUpsDriver::usb_report_event(int ci, USB_VALUE *uval)
 {
-   Dmsg2(200, "USB driver reported event ci=%d, val=%f\n",
+   Dmsg(200, "USB driver reported event ci=%d, val=%f\n",
       ci, uval->dValue);
 
    /* Got an event: go process it */

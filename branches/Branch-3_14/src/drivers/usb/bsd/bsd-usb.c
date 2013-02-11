@@ -59,7 +59,7 @@ void BsdUsbUpsDriver::reinitialize_private_structure()
 {
    int k;
 
-   Dmsg0(200, "Reinitializing private structure.\n");
+   Dmsg(200, "Reinitializing private structure.\n");
    /*
     * We are being reinitialized, so clear the Cap
     *   array, and release previously allocated memory.
@@ -92,7 +92,7 @@ int BsdUsbUpsDriver::init_device(const char *devname)
    rc = ioctl(fd, USB_GET_DEVICEINFO, &devinfo);
    if (rc) {
       close(fd);
-      Dmsg0(100, "Unable to get device info.\n");
+      Dmsg(100, "Unable to get device info.\n");
       return 0;
    }
 
@@ -100,7 +100,7 @@ int BsdUsbUpsDriver::init_device(const char *devname)
    rdesc = hidu_fetch_report_descriptor(fd, &rdesclen);
    if (!rdesc) {
       close(fd);
-      Dmsg0(100, "Unable to fetch report descriptor.\n");
+      Dmsg(100, "Unable to fetch report descriptor.\n");
       return 0;
    }
 
@@ -109,7 +109,7 @@ int BsdUsbUpsDriver::init_device(const char *devname)
    if (!_rdesc) {
       free(rdesc);
       close(fd);
-      Dmsg0(100, "Unable to init parser with report descriptor.\n");
+      Dmsg(100, "Unable to init parser with report descriptor.\n");
       return 0;
    }
    free(rdesc);
@@ -125,7 +125,7 @@ int BsdUsbUpsDriver::init_device(const char *devname)
          NULL)) {
       hid_dispose_report_desc(_rdesc);
       close(fd);
-      Dmsg0(100, "Device does not have an UPS application collection.\n");
+      Dmsg(100, "Device does not have an UPS application collection.\n");
       return 0;
    }
 
@@ -144,7 +144,7 @@ int BsdUsbUpsDriver::init_device(const char *devname)
 
    fd = open(intdevname, O_RDONLY | O_NOCTTY);
    if (fd == -1) {
-      Dmsg2(100, "Unable to open interrupt pipe %s: %s\n", intdevname,
+      Dmsg(100, "Unable to open interrupt pipe %s: %s\n", intdevname,
          strerror(errno));
       hid_dispose_report_desc(_rdesc);
       close(_fd);
@@ -221,7 +221,7 @@ int BsdUsbUpsDriver::open_usb_device()
       if (fd == -1)
          continue;
 
-      Dmsg1(200, "Found bus %s.\n", busname);
+      Dmsg(200, "Found bus %s.\n", busname);
 
       /* Max 127 devices per bus */
       for (j = 0; j < 127; j++) {
@@ -242,7 +242,7 @@ int BsdUsbUpsDriver::open_usb_device()
 #if defined(HAVE_OPENBSD_OS) || defined(HAVE_NETBSD_OS)
             astrncat(devname, ".00", sizeof(devname));
 #endif
-            Dmsg1(200, "Trying device %s.\n", devname);
+            Dmsg(200, "Trying device %s.\n", devname);
             if (init_device(devname)) {
                astrncpy(_ups->device, devname, sizeof(_ups->device));
                return 1;
@@ -273,7 +273,7 @@ int BsdUsbUpsDriver::usb_link_check()
    _linkcheck = true;               /* prevent recursion */
 
    _ups->set_commlost();
-   Dmsg0(200, "link_check comm lost\n");
+   Dmsg(200, "link_check comm lost\n");
 
    /* Don't warn until we try to get it at least 2 times and fail */
    for (tlog = LINK_RETRY_INTERVAL * 2; comm_err; tlog -= (LINK_RETRY_INTERVAL)) {
@@ -310,7 +310,7 @@ int BsdUsbUpsDriver::usb_link_check()
    if (!comm_err) {
       generate_event(_ups, CMDCOMMOK);
       _ups->clear_commlost();
-      Dmsg0(200, "link check comm OK.\n");
+      Dmsg(200, "link check comm OK.\n");
    }
 
    _linkcheck = false;
@@ -383,14 +383,14 @@ bool BsdUsbUpsDriver::pusb_ups_get_capabilities()
          info->item = item;
          info->report_len = hid_report_size( /* +1 for report id */
             _rdesc, item.kind, item.report_ID) + 1;
-         Dmsg6(200, "Got READ ci=%d, rpt=%d (len=%d), usage=0x%x (len=%d), kind=0x%02x\n",
+         Dmsg(200, "Got READ ci=%d, rpt=%d (len=%d), usage=0x%x (len=%d), kind=0x%02x\n",
             ci, item.report_ID, info->report_len,
             _known_info[i].usage_code, item.report_size, item.kind);
 
          // If we have a FEATURE report, use that as the writable report
          if (feature) {
             info->witem = item;
-            Dmsg6(200, "Got WRITE ci=%d, rpt=%d (len=%d), usage=0x%x (len=%d), kind=0x%02x\n",
+            Dmsg(200, "Got WRITE ci=%d, rpt=%d (len=%d), usage=0x%x (len=%d), kind=0x%02x\n",
                ci, item.report_ID, info->report_len,
                _known_info[i].usage_code, item.report_size, item.kind);               
          }
@@ -426,7 +426,7 @@ bool BsdUsbUpsDriver::populate_uval(USB_INFO *info, unsigned char *data, USB_VAL
       astrncpy(val.sValue, str, sizeof(val.sValue));
       val.value_type = V_STRING;
 
-      Dmsg4(200, "Def val=%d exp=%d sVal=\"%s\" ci=%d\n", info->value,
+      Dmsg(200, "Def val=%d exp=%d sVal=\"%s\" ci=%d\n", info->value,
          exponent, val.sValue, info->ci);
    } else if (info->data_type == T_UNITS) {
       val.value_type = V_DOUBLE;
@@ -476,7 +476,7 @@ bool BsdUsbUpsDriver::populate_uval(USB_INFO *info, unsigned char *data, USB_VAL
       // integer field as well.
       val.iValue = (int)val.dValue;
 
-      Dmsg4(200, "Def val=%d exp=%d dVal=%f ci=%d\n", info->value,
+      Dmsg(200, "Def val=%d exp=%d dVal=%f ci=%d\n", info->value,
          exponent, val.dValue, info->ci);
    } else {                        /* should be T_NONE */
 
@@ -489,7 +489,7 @@ bool BsdUsbUpsDriver::populate_uval(USB_INFO *info, unsigned char *data, USB_VAL
       else
          val.dValue = ((double)info->value) * pow_ten(exponent);
 
-      Dmsg4(200, "Def val=%d exp=%d dVal=%f ci=%d\n", info->value,
+      Dmsg(200, "Def val=%d exp=%d dVal=%f ci=%d\n", info->value,
          exponent, val.dValue, info->ci);
    }
 
@@ -539,7 +539,7 @@ bool BsdUsbUpsDriver::pusb_get_value(int ci, USB_VALUE *uval)
     * value in spite of the UPS's brokenness.
     */
    if (info->report_len != len) {
-      Dmsg4(100, "Report length mismatch, fixing "
+      Dmsg(100, "Report length mismatch, fixing "
          "(id=%d, ci=%d, expected=%d, actual=%d)\n",
          info->item.report_ID, ci, info->report_len, len);
       info->report_len = len;
@@ -597,7 +597,7 @@ bool BsdUsbUpsDriver::check_state()
       case -1:
          if (errno == EINTR || errno == EAGAIN)         /* assume SIGCHLD */
             continue;
-         Dmsg1(200, "select error: ERR=%s\n", strerror(errno));
+         Dmsg(200, "select error: ERR=%s\n", strerror(errno));
          usb_link_check();      /* link is down, wait */
          return 0;
       default:
@@ -609,7 +609,7 @@ bool BsdUsbUpsDriver::check_state()
       } while (retval == -1 && (errno == EAGAIN || errno == EINTR));
 
       if (retval < 0) {            /* error */
-         Dmsg1(200, "read error: ERR=%s\n", strerror(errno));
+         Dmsg(200, "read error: ERR=%s\n", strerror(errno));
          usb_link_check();      /* notify that link is down, wait */
          return 0;
       }
@@ -642,7 +642,7 @@ bool BsdUsbUpsDriver::check_state()
              *    "Back-UPS CS 500 FW:808.q8.I USB FW:q8"
              */
             if (_info[ci]->report_len != retval) {
-               Dmsg4(100, "Report length mismatch, ignoring "
+               Dmsg(100, "Report length mismatch, ignoring "
                   "(id=%d, ci=%d, expected=%d, actual=%d)\n",
                   _info[ci]->item.report_ID, ci, 
                   _info[ci]->report_len, retval);
@@ -652,12 +652,12 @@ bool BsdUsbUpsDriver::check_state()
             /* Ignore this event if the value has not changed */
             value = hid_get_data(buf+1, &_info[ci]->item);
             if (_info[ci]->value == value) {
-               Dmsg3(200, "Ignoring unchanged value (ci=%d, rpt=%d, val=%d)\n",
+               Dmsg(200, "Ignoring unchanged value (ci=%d, rpt=%d, val=%d)\n",
                   ci, buf[0], value);
                continue;
             }
 
-            Dmsg3(200, "Processing changed value (ci=%d, rpt=%d, val=%d)\n",
+            Dmsg(200, "Processing changed value (ci=%d, rpt=%d, val=%d)\n",
                ci, buf[0], value);
 
             /* Populate a uval and report it to the upper layer */
@@ -740,7 +740,7 @@ int BsdUsbUpsDriver::write_int_to_ups(int ci, int value, const char *name)
       info = _info[ci];    /* point to our info structure */
 
       if (hidu_get_report(_fd, &info->item, rpt, info->report_len) < 1) {
-         Dmsg1(000, "get_report for kill power function %s failed.\n", name);
+         Dmsg(000, "get_report for kill power function %s failed.\n", name);
          return false;
       }
 
@@ -749,22 +749,22 @@ int BsdUsbUpsDriver::write_int_to_ups(int ci, int value, const char *name)
       hid_set_data(rpt + 1, &info->witem, value);
 
       if (!hidu_set_report(_fd, &info->witem, rpt, info->report_len)) {
-         Dmsg1(000, "set_report for kill power function %s failed.\n", name);
+         Dmsg(000, "set_report for kill power function %s failed.\n", name);
          return false;
       }
 
       if (hidu_get_report(_fd, &info->item, rpt, info->report_len) < 1) {
-         Dmsg1(000, "get_report for kill power function %s failed.\n", name);
+         Dmsg(000, "get_report for kill power function %s failed.\n", name);
          return false;
       }
 
       new_value = hid_get_data(rpt + 1, &info->item);
 
-      Dmsg3(100, "function %s ci=%d value=%d OK.\n", name, ci, value);
-      Dmsg4(100, "%s before=%d set=%d after=%d\n", name, old_value, value, new_value);
+      Dmsg(100, "function %s ci=%d value=%d OK.\n", name, ci, value);
+      Dmsg(100, "%s before=%d set=%d after=%d\n", name, old_value, value, new_value);
       return true;
    }
 
-   Dmsg2(000, "function %s ci=%d not available in this UPS.\n", name, ci);
+   Dmsg(000, "function %s ci=%d not available in this UPS.\n", name, ci);
    return false;
 }
