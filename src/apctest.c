@@ -293,7 +293,11 @@ int main(int argc, char *argv[])
    pmsg("cable.type = %s\n", ups->cable.long_name);
    pmsg("mode.type = %s\n", ups->mode.long_name);
 
-   delete_lockfile(ups);
+   if (create_lockfile(ups) == LCKERROR) {
+      Error_abort0("Unable to create UPS lock file.\n"
+                   "  If apcupsd or apctest is already running,\n"
+                   "  please stop it and run this program again.\n");
+   }
 
    pmsg("Setting up the port ...\n");
    setup_device(ups);
