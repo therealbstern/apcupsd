@@ -145,7 +145,6 @@ class UPSINFO {
    void clear_boost() { Status &= ~UPS_boost; };
    void clear_calibration() { Status &= ~UPS_calibration; };
    void clear_commlost() { Status &= ~UPS_commlost; };
-   void clear_dev_setup() { Status &= ~UPS_dev_setup; };
    void clear_fastpoll() { Status &= ~UPS_fastpoll; };
    void clear_onbatt_msg() { Status &= ~UPS_onbatt_msg; };
    void clear_onbatt() { Status &= ~UPS_onbatt; };
@@ -170,7 +169,6 @@ class UPSINFO {
    void set_boost(int val) { if (val) set_boost(); else clear_boost(); };
    void set_calibration() { Status |= UPS_calibration; };
    void set_commlost() { Status |= UPS_commlost; };
-   void set_dev_setup() { Status |= UPS_dev_setup; };
    void set_fastpoll() { Status |= UPS_fastpoll; };
    void set_onbatt_msg() { Status |= UPS_onbatt_msg; };
    void set_onbatt() { Status |= UPS_onbatt; };
@@ -203,7 +201,6 @@ class UPSINFO {
    bool is_boost() const { return (Status & UPS_boost) == UPS_boost; };
    bool is_calibration() const { return (Status & UPS_calibration) == UPS_calibration; };
    bool is_commlost() const { return (Status & UPS_commlost) == UPS_commlost; };
-   bool is_dev_setup() const { return (Status & UPS_dev_setup) == UPS_dev_setup; };
    bool is_fastpoll() const { return (Status & UPS_fastpoll) == UPS_fastpoll; };
    bool is_onbatt() const { return (Status & UPS_onbatt) == UPS_onbatt; };
    bool is_onbatt_msg() const { return (Status & UPS_onbatt_msg) == UPS_onbatt_msg; };
