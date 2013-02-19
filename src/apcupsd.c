@@ -276,8 +276,15 @@ int main(int argc, char *argv[])
    }
 
    if (create_lockfile(ups) == LCKERROR) {
-      Error_abort1("Failed to acquire device lock file\n",
-         ups->device);
+      Error_abort0("Unable to create UPS lock file.\n"
+                   "  If apcupsd or apctest is already running,\n"
+                   "  please stop it and run this program again.\n");
+   }
+
+
+   /* If create_lockfile fails there's no need to delete_lockfile. */
+   if ((ups->fd != -1) && create_lockfile(ups) == LCKERROR) {
+      device_close(ups);
    }
 
    make_pid_file();
