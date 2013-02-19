@@ -52,15 +52,6 @@ static int device_wait_time(UPSINFO *ups);
 /*********************************************************************/
 void setup_device(UPSINFO *ups)
 {
-   /*
-    * Marko Sakari Asplund <Marko.Asplund@cern.ch>
-    *    prevents double init of UPS device 9/25/98
-    */
-   if (ups->is_dev_setup())
-      return;
-
-   ups->set_dev_setup();
-
    device_open(ups);
 
    /* If create_lockfile fails there's no need to delete_lockfile. */
