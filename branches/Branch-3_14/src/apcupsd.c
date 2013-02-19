@@ -281,12 +281,6 @@ int main(int argc, char *argv[])
                    "  please stop it and run this program again.\n");
    }
 
-
-   /* If create_lockfile fails there's no need to delete_lockfile. */
-   if ((ups->fd != -1) && create_lockfile(ups) == LCKERROR) {
-      device_close(ups);
-   }
-
    make_pid_file();
    pidcreated = 1;
 
