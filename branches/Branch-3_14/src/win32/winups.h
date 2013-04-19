@@ -42,7 +42,7 @@ enum {
 #define APCTRAY_WINDOW_NAME		"apctray"
 
 // Command line option to start in service mode
-#define ApcupsdRunService        "/service"
+extern char ApcupsdRunService[];
 
 // Names of various global events
 #define APCUPSD_STOP_EVENT_NAME  "Global\\ApcupsdStopEvent"

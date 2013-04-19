@@ -16,7 +16,7 @@
 #include "winservice.h"
 
 // Error message logging
-void LogErrorMsg(char *msg, char *fname, int lineno);
+void LogErrorMsg(const char *msg, const char *fname, int lineno);
 #define log_error_message(msg) LogErrorMsg((msg), __FILE__, __LINE__)
 
 // No internationalization support
@@ -32,10 +32,15 @@ typedef BOOL (WINAPI * ChangeServiceConfig2Func)(SC_HANDLE, DWORD, LPVOID);
 typedef DWORD (* RegisterServiceProcessFunc)(DWORD, DWORD);
 
 // Internal service name
-#define SERVICE_NAME         "Apcupsd"
+static char SERVICE_NAME[] = "Apcupsd";
 
 // Displayed service name
-#define SERVICE_DISPLAYNAME  "Apcupsd UPS Monitor"
+static const char SERVICE_DISPLAYNAME[] = "Apcupsd UPS Monitor";
+
+// Service description
+static char APCUPSD_SERVICE_DESCRIPTION[] = 
+   "Apcupsd provides shutdown of your computer "
+   "in the event of a power failure.";
 
 // List other required serves 
 #define SERVICE_DEPENDENCIES __TEXT("tcpip\0afd\0+File System\0") 
@@ -49,7 +54,8 @@ int upsService::ApcupsdServiceMain()
    // Windows 95/98/Me
    case VER_PLATFORM_WIN32_WINDOWS:
       // Obtain a handle to the kernel library
-      HINSTANCE kerneldll = LoadLibrary("KERNEL32.DLL");
+      HINSTANCE kerneldll;
+      kerneldll = LoadLibrary("KERNEL32.DLL");
       if (kerneldll == NULL) {
          MessageBox(NULL,
                     "KERNEL32.DLL not found: Apcupsd service not started", 
@@ -58,7 +64,8 @@ int upsService::ApcupsdServiceMain()
       }
 
       // And find the RegisterServiceProcess function
-      RegisterServiceProcessFunc RegisterServiceProcess = 
+      RegisterServiceProcessFunc RegisterServiceProcess;
+      RegisterServiceProcess = 
          (RegisterServiceProcessFunc)GetProcAddress(
             kerneldll, "RegisterServiceProcess");
       if (RegisterServiceProcess == NULL) {
@@ -241,7 +248,8 @@ int upsService::InstallService(bool quiet)
    // Windows NT, Win2K, WinXP
    case VER_PLATFORM_WIN32_NT:
       // Open the default, local Service Control Manager database
-      SC_HANDLE hsrvmanager = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
+      SC_HANDLE hsrvmanager;
+      hsrvmanager = OpenSCManager(NULL, NULL, SC_MANAGER_ALL_ACCESS);
       if (hsrvmanager == NULL) {
          MessageBox(NULL,
             _("The Service Control Manager could not be contacted - "
@@ -251,7 +259,8 @@ int upsService::InstallService(bool quiet)
       }
 
       // Create an entry for the Apcupsd service
-      SC_HANDLE hservice = CreateService(
+      SC_HANDLE hservice;
+      hservice = CreateService(
               hsrvmanager,                    // SCManager database
               SERVICE_NAME,                   // name of service
               SERVICE_DISPLAYNAME,            // name to display
@@ -276,9 +285,7 @@ int upsService::InstallService(bool quiet)
          break;
       }
 
-      SetServiceDescription(hservice,
-         _("Apcupsd provides shutdown of your computer in the "
-           "event of a power failure."));
+      SetServiceDescription(hservice, APCUPSD_SERVICE_DESCRIPTION);
 
       CloseServiceHandle(hservice);
       CloseServiceHandle(hsrvmanager);
@@ -448,7 +455,7 @@ BOOL upsService::ReportStatus(DWORD state,
 }
 
 // Error reporting
-void LogErrorMsg(char *message, char *fname, int lineno)
+void LogErrorMsg(const char *message, const char *fname, int lineno)
 {
    // Get the error code
    LPTSTR msg;
@@ -471,7 +478,7 @@ void LogErrorMsg(char *message, char *fname, int lineno)
    snprintf(msgbuff, sizeof(msgbuff), "\n\n%s error: %ld at %s:%d", 
       SERVICE_NAME, error, fname, lineno);
 
-   char *strings[3];
+   const char *strings[3];
    strings[0] = msgbuff;
    strings[1] = message;
    strings[2] = msg;

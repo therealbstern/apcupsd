@@ -98,11 +98,13 @@ BOOL upsEvents::DialogProcess(
       return TRUE;
 
    case WM_GETMINMAXINFO:
+   {
       // Restrict minimum size to initial window size
       MINMAXINFO *mmi = (MINMAXINFO*)lParam;
       mmi->ptMinTrackSize.x = _rect.right - _rect.left;
       mmi->ptMinTrackSize.y = _rect.bottom - _rect.top;
       return TRUE;
+   }
 
    case WM_SIZE:
    {
