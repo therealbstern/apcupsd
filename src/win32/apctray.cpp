@@ -160,7 +160,8 @@ DWORD WINAPI EventThread(LPVOID param)
    // Create global exit event and allow Adminstrator access to it so any
    // member of the Administrators group can signal it.
    exitevt = CreateEvent(NULL, TRUE, FALSE, APCTRAY_STOP_EVENT_NAME);
-   GrantAccess(exitevt, EVENT_MODIFY_STATE, TRUSTEE_IS_GROUP, "Administrators");
+   TCHAR name[] = "Administrators";
+   GrantAccess(exitevt, EVENT_MODIFY_STATE, TRUSTEE_IS_GROUP, name);
 
    // Wait for event to be signaled or for an error
    DWORD rc = WaitForSingleObject(exitevt, INFINITE);

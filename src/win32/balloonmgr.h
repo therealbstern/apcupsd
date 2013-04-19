@@ -31,7 +31,7 @@ public:
    ~BalloonMgr();
 
    void PostBalloon(HWND hwnd, const char *title, const char *text);
-   static DWORD WINAPI BalloonMgr::Thread(LPVOID param);
+   static DWORD WINAPI Thread(LPVOID param);
 
 private:
 

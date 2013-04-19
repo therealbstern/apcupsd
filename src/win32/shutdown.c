@@ -28,7 +28,8 @@ int main(int argc, char **argv)
    int mode = MODE_HALT;
    int timeout = 0;
    int force = 1;
-   char* message;
+   char default_msg[] = "Power failure system going down!";
+   char* message = default_msg;
 
    // Process command line args
    while ((ch = getopt(argc, argv, "+chrf")) != -1) {
@@ -58,10 +59,8 @@ int main(int argc, char **argv)
 
    if (optind < argc) {
       message = argv[optind];
-   } else {
-      message = "Power failure system going down!";
    }
-
+   
    // Get the current OS version
    OSVERSIONINFO ver;
    ver.dwOSVersionInfoSize = sizeof(ver);
