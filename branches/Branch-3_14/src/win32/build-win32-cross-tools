@@ -8,26 +8,13 @@
 # based partly on Ray Kelm's script, which in turn was built on
 # Mo Dejong's script for doing the same, but with some added fixes.
 #
-# My changes:
-#       1. Adapted the script to the new packaging of MinGW GCC, which is
-#          currently split into core and auxiliary components.
-#       2. The script now determines the GCC and BINUTILS directory name
-#          directly from the tar file contents.  This gets around common
-#          problems due to the directory names not always following the
-#          expected patterns.
-#       3. Grouped together and simplified the macros that users need to
-#          define.
-#       4. Made optional components truly optional -- leave the
-#          corresponding archive names blank and they will be ignored.
-#       5. Included an option to purge the installation directory before
-#          installing the current cross-compiler.
-#
 # NOTE: If you choose a destination directory for the installation (set
 # in the macro PREFIX) for which you do not have write access, you will
 # need to run this script with root (or equivalent) privileges.
 #
 #
 # Updated by Igor Mikolic-Torreira <igormt@alumni.caltech.edu>
+# Updated by Adam Kropelin <akropel1@rochester.rr.com>
 
 
 
@@ -81,29 +68,28 @@ PURGE_DIR="Y"
 # and the exact name of the individual component files.
 
 MINGW_URL="http://heanet.dl.sourceforge.net/sourceforge/mingw"
+MINGW_ARCHIVE="mingwrt-3.20-mingw32-dev.tar.gz"
+MINGW_DLL_ARCHIVE="mingwrt-3.20-mingw32-dll.tar.gz"
+W32API_ARCHIVE="w32api-3.17-2-mingw32-dev.tar.lzma"
 
 # GCC_CORE is required; the other components are optional.
 # Set any you don't want to "".  You need binutils,
 # mingw runtime and w32api; do not ever set those to "".
+GNU_URL="ftp://ftp.gnu.org/gnu"
+GCC_VER="4.2.4"
+BINUTILS_VER="2.23.1"
 
-GCC_CORE_ARCHIVE="gcc-core-3.4.5-20060117-1-src.tar.gz"
-GCC_GPP_ARCHIVE="gcc-g++-3.4.5-20060117-1-src.tar.gz"
+BINUTILS_URL="$GNU_URL/binutils"
+BINUTILS_ARCHIVE="binutils-$BINUTILS_VER.tar.bz2"
+
+GCC_URL="$GNU_URL/gcc/gcc-$GCC_VER"
+GCC_CORE_ARCHIVE="gcc-core-$GCC_VER.tar.bz2"
+GCC_GPP_ARCHIVE="gcc-g++-$GCC_VER.tar.bz2"
 GCC_G77_ARCHIVE=""
 GCC_OBJC_ARCHIVE=""
 GCC_JAVA_ARCHIVE=""
 GCC_ADA_ARCHIVE=""
 GCC_PATCH=""
-
-# GCC_G77_ARCHIVE="gcc-g77-3.4.2-20040916-1-src.tar.gz"
-# GCC_OBJC_ARCHIVE="gcc-objc-3.4.2-20040916-1-src.tar.gz"
-# GCC_JAVA_ARCHIVE="gcc-java-3.4.2-20040916-1-src.tar.gz"
-
-BINUTILS_ARCHIVE="binutils-2.16.91-20060119-1-src.tar.gz"
-
-MINGW_ARCHIVE="mingw-runtime-3.9.tar.gz"
-
-W32API_ARCHIVE="w32api-3.14-mingw32-dev.tar.gz"
-
 
 # These are the files from the SDL website
 # These are optional, set them to "" if you don't want them)
@@ -167,25 +153,27 @@ function download_files
                 echo "You need to install wget."
                 exit 1
         fi
-        download_file "$GCC_CORE_ARCHIVE" "$MINGW_URL"
+
+        download_file "$GCC_CORE_ARCHIVE" "$GCC_URL"
         if [ "x$GCC_GPP_ARCHIVE" != "x" ]; then
-                download_file "$GCC_GPP_ARCHIVE" "$MINGW_URL"
+                download_file "$GCC_GPP_ARCHIVE" "$GCC_URL"
         fi
         if [ "x$GCC_G77_ARCHIVE" != "x" ]; then
-                download_file "$GCC_G77_ARCHIVE" "$MINGW_URL"
+                download_file "$GCC_G77_ARCHIVE" "$GCC_URL"
         fi
         if [ "x$GCC_OBJC_ARCHIVE" != "x" ]; then
-                download_file "$GCC_OBJC_ARCHIVE" "$MINGW_URL"
+                download_file "$GCC_OBJC_ARCHIVE" "$GCC_URL"
         fi
         if [ "x$GCC_JAVA_ARCHIVE" != "x" ]; then
-                download_file "$GCC_JAVA_ARCHIVE" "$MINGW_URL"
+                download_file "$GCC_JAVA_ARCHIVE" "$GCC_URL"
         fi
         if [ "x$GCC_ADA_ARCHIVE" != "x" ]; then
-                download_file "$GCC_ADA_ARCHIVE" "$MINGW_URL"
+                download_file "$GCC_ADA_ARCHIVE" "$GCC_URL"
         fi
 
-        download_file "$BINUTILS_ARCHIVE" "$MINGW_URL"
+        download_file "$BINUTILS_ARCHIVE" "$BINUTILS_URL"
         download_file "$MINGW_ARCHIVE" "$MINGW_URL"
+        download_file "$MINGW_DLL_ARCHIVE" "$MINGW_URL"
         download_file "$W32API_ARCHIVE" "$MINGW_URL"
 
         if [ "x$OPENGL_ARCHIVE" != "x" ]; then
@@ -231,7 +219,8 @@ function install_libs
         cd "$PREFIX/$TARGET"
 
         tar -xzf "$SRCDIR/$MINGW_ARCHIVE"
-        tar -xzf "$SRCDIR/$W32API_ARCHIVE"
+        tar -xzf "$SRCDIR/$MINGW_DLL_ARCHIVE"
+        lzma -dc "$SRCDIR/$W32API_ARCHIVE" | tar -x
 
         if [ "x$OPENGL_ARCHIVE" != "x" ]; then
                 tar -xzf "$SRCDIR/$OPENGL_ARCHIVE"
@@ -248,12 +237,10 @@ function install_libs
 function extract_binutils
 {
         cd "$SRCDIR"
-        BINUTILS=`tar -tzf "$SRCDIR/$BINUTILS_ARCHIVE" | head -n 1`
-        if [ "x${BINUTILS}" != "x./" ]; then
-           rm -rf "$BINUTILS"
-        fi
+        BINUTILS="binutils-$BINUTILS_VER"
+        rm -rf "$BINUTILS"
         echo "Extracting binutils"
-        tar -xzf "$SRCDIR/$BINUTILS_ARCHIVE"
+        tar -xjf "$SRCDIR/$BINUTILS_ARCHIVE"
         cd "$BUILDDIR"
 }
 
@@ -300,30 +287,30 @@ function install_binutils
 function extract_gcc
 {
         cd "$SRCDIR"
-        GCC=`tar -tzf "$SRCDIR/$GCC_CORE_ARCHIVE" | head -n 1`
-#       rm -rf "$GCC"
+        GCC="gcc-$GCC_VER"
+        rm -rf "$GCC"
         echo "====== GCC ${GCC} ========="
         echo "Extracting gcc"
-        tar -xzf "$SRCDIR/$GCC_CORE_ARCHIVE"
+        tar -xjf "$SRCDIR/$GCC_CORE_ARCHIVE"
         if [ "x$GCC_GPP_ARCHIVE" != "x" ]; then
                 GCC_LANGS=${GCC_LANGS}",c++"
-                tar -xzf "$SRCDIR/$GCC_GPP_ARCHIVE"
+                tar -xjf "$SRCDIR/$GCC_GPP_ARCHIVE"
         fi
         if [ "x$GCC_G77_ARCHIVE" != "x" ]; then
                 GCC_LANGS=${GCC_LANGS}",f77"
-                tar -xzf "$SRCDIR/$GCC_G77_ARCHIVE"
+                tar -xjf "$SRCDIR/$GCC_G77_ARCHIVE"
         fi
         if [ "x$GCC_OBJC_ARCHIVE" != "x" ]; then
                 GCC_LANGS=${GCC_LANGS}",objc"
-                tar -xzf "$SRCDIR/$GCC_OBJC_ARCHIVE"
+                tar -xjf "$SRCDIR/$GCC_OBJC_ARCHIVE"
         fi
         if [ "x$GCC_JAVA_ARCHIVE" != "x" ]; then
                 GCC_LANGS=${GCC_LANGS}",java"
-                tar -xzf "$SRCDIR/$GCC_JAVA_ARCHIVE"
+                tar -xjf "$SRCDIR/$GCC_JAVA_ARCHIVE"
         fi
         if [ "x$GCC_ADA_ARCHIVE" != "x" ]; then
                 GCC_LANGS=${GCC_LANGS}",ada"
-                tar -xzf "$SRCDIR/$GCC_ADA_ARCHIVE"
+                tar -xjf "$SRCDIR/$GCC_ADA_ARCHIVE"
         fi
         cd "$BUILDDIR"
 }
