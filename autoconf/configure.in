@@ -370,6 +370,7 @@ AC_HELP_STRING([--enable-all], [Enable all optional modules])],
       enable_net_snmp=yes
       enable_test=yes
       enable_pcnet=yes
+	  enable_modbus=yes
       enable_cgi=yes
       enable_gapcmon=yes
    fi], [])
@@ -736,6 +737,19 @@ AC_HELP_STRING([--disable-pcnet], [No PCNET driver])],
    [ AC_DEFINE(HAVE_PCNET_DRIVER)
      PCNET_DRIVER="pcnet"
      AC_SUBST(PCNET_DRIVER) ])
+
+dnl Enable modbus driver
+AC_ARG_ENABLE(modbus, [
+AC_HELP_STRING([--enable-modbus], [Compile MODBUS driver code (default)])
+AC_HELP_STRING([--disable-modbus], [No MODBUS driver])],
+   [ if test "$enableval" = "yes" ; then
+        AC_DEFINE(HAVE_MODBUS_DRIVER)
+        MODBUS_DRIVER="modbus"
+        AC_SUBST(MODBUS_DRIVER)
+     fi],
+   [ AC_DEFINE(HAVE_MODBUS_DRIVER)
+     MODBUS_DRIVER="modbus"
+     AC_SUBST(MODBUS_DRIVER) ])
 
 dnl Force NIS to enabled since libnis is required by apcaccess.
 dnl Users may still disable NIS at runtime in apcupsd.conf.
@@ -1447,7 +1461,7 @@ Configuration on `date`:
   UPSTYPE                     ${UPSTYPE}
   UPSCABLE                    ${UPSCABLE}
 
-  drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${DISPLAY_USB_DRIVER:-no-usb} ${DISPLAY_SNMP_DRIVER:-no-snmp} ${DISPLAY_NETSNMP_DRIVER:-no-net-snmp} ${PCNET_DRIVER:-no-pcnet} ${TEST_DRIVER:-no-test}
+  drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${DISPLAY_USB_DRIVER:-no-usb} ${DISPLAY_SNMP_DRIVER:-no-snmp} ${DISPLAY_NETSNMP_DRIVER:-no-net-snmp} ${PCNET_DRIVER:-no-pcnet} ${MODBUS_DRIVER:-no-modbus} ${TEST_DRIVER:-no-test}
 
   enable-nis:                 ${NISSRV_ENABLED}
   with-nisip:                 ${NISIP}

@@ -69,6 +69,7 @@ static const GENINFO cables[] = {
    { "940-0024C",      "APC Cable 940-0024C",  CABLE_SMART   },
    { "940-1524C",      "APC Cable 940-1524C",  CABLE_SMART   },
    { "940-0024G",      "APC Cable 940-0024G",  CABLE_SMART   },
+   { "940-0625A",      "APC Cable 940-0625A",  CABLE_SMART   },
    { "940-0095A",      "APC Cable 940-0095A",  APC_940_0095A },
    { "940-0095B",      "APC Cable 940-0095B",  APC_940_0095B },
    { "940-0095C",      "APC Cable 940-0095C",  APC_940_0095C },
@@ -108,6 +109,7 @@ static const GENINFO types[] = {
    { "test",     "TEST UPS Driver",     TEST_UPS },
    { "pcnet",    "PCNET UPS Driver",    PCNET_UPS },
    { "netsnmp",  "NET-SNMP UPS Driver", SNMP_UPS },
+   { "modbus",   "MODBUS UPS Driver",   MODBUS_UPS },
    { NULL,       "*invalid-ups-type*",  NO_UPS },
 };
 
@@ -752,6 +754,7 @@ jump_into_the_loop:
    case NETWORK_UPS:
       match_range(ups, WHERE(cable), cables, "ether");
       break;
+   case MODBUS_UPS:
    case APCSMART_UPS:
       match_range(ups, WHERE(cable), cables, "smart");
       break;
@@ -759,7 +762,7 @@ jump_into_the_loop:
       // Abort if user specified dumb UPS type with smart cable
       if (ups->cable.type >= CABLE_SMART)
          Error_abort0("Invalid cable specified for Dumb UPS\n");
-      break;
+      break;      
    case TEST_UPS:
       // Allow anything in test mode
       break;

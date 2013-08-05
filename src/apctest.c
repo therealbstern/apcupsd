@@ -91,6 +91,33 @@ static int usb_get_self_test_interval(void);
 static void usb_set_self_test_interval(void);
 #endif
 
+static void do_modbus_testing(void);
+
+#ifdef HAVE_MODBUS_DRIVER
+
+/* MODBUS driver functions */
+#include "drivers/modbus/modbus.h"
+
+/* MODBUS register mapping */
+#include "drivers/modbus/mapping.h"
+using namespace APCModbusMapping;
+
+/* Our own test functions */
+static void modbus_kill_power_test(void);
+static void modbus_get_self_test_result(void);
+static void modbus_run_self_test(void);
+static uint64_t modbus_get_battery_date(void);
+static void modbus_set_battery_date(void);
+static void modbus_get_manf_date(void);
+static void modbus_set_alarm(void);
+static void modbus_set_sens(void);
+static void modbus_set_xferv(int lowhigh);
+static void modbus_calibration();
+static void modbus_test_alarm(void);
+static int modbus_get_self_test_interval(void);
+static void modbus_set_self_test_interval(void);
+#endif
+
 static void strip_trailing_junk(char *cmd);
 static char *get_cmd(const char *prompt);
 static int write_file(char *buf);
@@ -121,6 +148,15 @@ static int test5_done = 0;
 
 #define usb_write_int_to_ups(ups, ci, val, text) \
    ((UsbUpsDriver*)((ups)->driver))->write_int_to_ups(ci, val, text)
+
+#define modbus_read_int_from_ups(ups, ci, result) \
+   ((ModbusUpsDriver*)((ups)->driver))->read_int_from_ups(ci, result)
+
+#define modbus_write_int_to_ups(ups, ci, val) \
+   ((ModbusUpsDriver*)((ups)->driver))->write_int_to_ups(ci, val)
+
+#define modbus_write_string_to_ups(ups, ci, val) \
+   ((ModbusUpsDriver*)((ups)->driver))->write_string_to_ups(ci, val)
 
 /* Print a message, and also write it to an output file */
 static void pmsg(const char *fmt, ...)
@@ -332,6 +368,10 @@ int main(int argc, char *argv[])
 
    switch (ups->mode.type)
    {
+   case MODBUS_UPS:
+      pmsg("\nYou are using a MODBUS cable type, so I'm entering MODBUS test mode\n");
+      do_modbus_testing();
+      break;
    case USB_UPS:
       pmsg("\nYou are using a USB cable type, so I'm entering USB test mode\n");
       do_usb_testing();
@@ -2374,4 +2414,470 @@ static void print_eeprom_values(UPSINFO *ups)
    parse_eeprom_cmds(ups->eprom, locale);
    print_valid_eeprom_values(ups);
 }
+#endif
+
+static void do_modbus_testing(void)
+{
+#ifdef HAVE_MODBUS_DRIVER
+   char *cmd;
+   int quit = FALSE;
+
+   pmsg("Hello, this is the apcupsd Cable Test program.\n"
+        "This part of apctest is for testing MODBUS UPSes.\n");
+
+   pmsg("\nGetting UPS capabilities...");
+   if (!ups->driver->get_capabilities())
+      pmsg("FAILED\nSome or all tests may not work!\n");
+   else
+      pmsg("SUCCESS\n");
+
+   pmsg("\nPlease select the function you want to perform.\n");
+
+   while (!quit) {
+      pmsg("\n"
+           "1)  Test kill UPS power\n"
+           "2)  Perform self-test\n"
+           "3)  Read last self-test result\n"
+           "4)  View/Change battery date\n"
+           "5)  View manufacturing date\n"
+           "6)  View/Change alarm behavior\n"
+           "7)  View/Change sensitivity\n"
+           "8)  View/Change low transfer voltage\n"
+           "9)  View/Change high transfer voltage\n"
+           "10) Perform battery calibration\n"
+           "11) Test alarm\n"
+           "12) View/Change self-test interval\n"
+           " Q) Quit\n\n");
+
+      cmd = get_cmd("Select function number: ");
+      if (cmd) {
+         int item = atoi(cmd);
+
+         switch (item) {
+         //case 1:
+         //   modbus_kill_power_test();
+         //   break;
+         case 2:
+            modbus_run_self_test();
+            break;
+         case 3:
+            modbus_get_self_test_result();
+            break;
+         case 4:
+            modbus_set_battery_date();
+            break;
+         case 5:
+            modbus_get_manf_date();
+            break;
+         //case 6:
+         //   modbus_set_alarm();
+         //   break;
+         //case 7:
+         //   modbus_set_sens();
+         //   break;
+         //case 8:
+         //   modbus_set_xferv(0);
+         //   break;
+         //case 9:
+         //   modbus_set_xferv(1);
+         //   break;
+         case 10:
+            modbus_calibration();
+            break;
+         case 11:
+            modbus_test_alarm();
+            break;
+         //case 12:
+         //   modbus_set_self_test_interval();
+         //   break;
+         default:
+            if (tolower(*cmd) == 'q')
+               quit = TRUE;
+            else
+               pmsg("Illegal response. Please enter 1-12,Q\n");
+            break;
+         }
+      } else {
+         pmsg("Illegal response. Please enter 1-12,Q\n");
+      }
+   }
+   ptime();
+   pmsg("End apctest.\n");
+#else
+   pmsg("MODBUS Driver not configured.\n");
+#endif
+}
+
+#ifdef HAVE_MODBUS_DRIVER
+static void modbus_get_self_test_result(void)
+{
+   uint64_t uint;
+
+   if (!modbus_read_int_from_ups(ups, REG_BATTERY_TEST_STATUS, &uint)) {
+      pmsg("\nI don't know how to run a self test on your UPS\n"
+           "or your UPS does not support self test.\n");
+      return;
+   }
+
+   pmsg("Result of last self test: ");
+   if (uint == 0)
+   {
+      pmsg("NO TEST PERFORMED\n");
+   }
+   else
+   {
+      if (uint & BTS_PENDING)
+         pmsg("PENDING");
+      else if (uint & BTS_IN_PROGRESS)
+         pmsg("IN PROGRESS");
+      else if (uint & BTS_PASSED)
+         pmsg("PASSED");
+      else if (uint & BTS_FAILED)
+         pmsg("FAILED");
+      else if (uint & BTS_REFUSED)
+         pmsg("REFUSED");
+      else if (uint & BTS_ABORTED)
+         pmsg("ABORTED");
+      else
+         pmsg("0x%llx", uint);
+
+      if (uint & BTS_INVALID_STATE)
+         pmsg(" (INVALID STATE)");
+      else if (uint & BTS_INTERNAL_FAULT)
+         pmsg(" (INTERNAL FAUILT)");
+      else if (uint & BTS_STATE_OF_CHARGE)
+         pmsg(" (STATE_OF_CHARGE)");
+
+      if (uint & BTS_SRC_PROTOCOL)
+         pmsg(" (PROTOCOL)");
+      else if (uint & BTS_SRC_LOCAL_UI)
+         pmsg(" (LOCAL UI)");
+      else if (uint & BTS_SRC_INTERNAL)
+         pmsg(" (INTERNAL)");
+
+      pmsg("\n");
+   }
+}
+
+static void modbus_run_self_test(void)
+{
+   uint64_t uint;
+   int timeout;
+
+   pmsg("\nThis test instructs the UPS to perform a self-test\n"
+        "operation and reports the result when the test completes.\n\n");
+
+   if (!modbus_read_int_from_ups(ups, REG_BATTERY_TEST_CMD, &uint)) {
+      pmsg("I don't know how to run a self test on your UPS\n"
+           "or your UPS does not support self test.\n");
+      return;
+   }
+
+   pmsg("Initiating self test...");
+   if (!modbus_write_int_to_ups(ups, REG_BATTERY_TEST_CMD, BTC_START_TEST)) {
+      pmsg("FAILED\n");
+      return;
+   }
+
+   pmsg("INITIATED\n");
+
+   pmsg("Waiting for test to complete...");
+
+   for (timeout = 0; timeout < 40; timeout++) {
+      if (!modbus_read_int_from_ups(ups, REG_BATTERY_TEST_STATUS, &uint)) {
+         pmsg("ERROR READING STATUS\n");
+         return;
+      }
+
+      if ((uint & (BTS_PENDING|BTS_IN_PROGRESS)) == 0) {
+         pmsg("COMPLETED\n");
+         break;
+      }
+
+      sleep(1);
+   }
+
+   if (timeout == 40) {
+      pmsg("TEST DID NOT COMPLETE\n");
+      return;
+   }
+
+   modbus_get_self_test_result();
+}
+
+static void modbus_calibration()
+{
+   uint64_t result;
+   bool aborted;
+   int ilastbl;
+
+   if (!ups->UPS_Cap[CI_ST_STAT] || 
+       !ups->UPS_Cap[CI_BATTLEV] ||
+       !ups->UPS_Cap[CI_LOAD]) {
+      pmsg("\nI don't know how to run a battery calibration on your UPS\n"
+             "or your UPS does not support battery calibration\n");
+      return;
+   }
+
+   pmsg("This test instructs the UPS to perform a battery calibration\n"
+        "operation and reports the result when the process completes.\n"
+        "The battery level must be at 100%% and the load must be above a\n"
+        "certain minimum to begin this test. If the conditions are not\n"
+        "met, the UPS will refuse the calibration attempt.\n");
+
+   pmsg("\nThe battery calibration should automatically end\n"
+          "when the battery level drops below about 25%%.\n"
+          "This process can take minutes or hours, depending on\n"
+          "the size of your UPS and the load attached.\n\n");
+
+   pmsg("Initiating battery calibration...");
+   if (!modbus_write_int_to_ups(ups, REG_CALIBRATION_CMD, CC_START_CALIBRATION)) {
+      pmsg("FAILED\n");
+      return;
+   }
+
+   pmsg("INITIATED\n\n");
+
+   pmsg("Waiting for calibration to complete...\n"
+        "To abort the calibration, press ENTER.\n");
+
+	ilastbl = 0;
+   while (1) {
+
+      if (!modbus_read_int_from_ups(ups, REG_CALIBRATION_STATUS, &result)) {
+         pmsg("\n\nError reading status; aborting calibration...");
+         if (!modbus_write_int_to_ups(ups, REG_CALIBRATION_CMD, CC_ABORT_CALIBRATION)) {
+            pmsg("FAILED\n");
+         }
+         else {
+            pmsg("ABORTED\n");
+         }
+         return;
+      }
+
+      if (!(result & (CS_PENDING|CS_IN_PROGRESS))) {
+         pmsg("\nCALIBRATION COMPLETED\n");
+         break;
+      }
+
+#ifndef HAVE_MINGW
+      fd_set rfds;
+      struct timeval tv;
+      FD_ZERO(&rfds);
+      FD_SET(STDIN_FILENO, &rfds);
+      tv.tv_sec = 10;
+      tv.tv_usec = 0;
+
+      aborted = select(STDIN_FILENO+1, &rfds, NULL, NULL, &tv) == 1;
+      if (aborted) {
+         while (fgetc(stdin) != '\n')
+            ;
+      }
+#else
+      aborted = false;
+      for (int i = 0; i < 100 && !aborted; i++) {
+         while (kbhit() && !aborted)
+            aborted = getch() == '\r';
+         if (!aborted)
+         {
+            struct timespec ts;
+            ts.tv_sec = 0;
+            ts.tv_nsec = 100000000;
+            nanosleep(&ts, NULL);
+         }
+      }
+#endif
+
+      if (aborted) {
+         pmsg("\n\nUser input detected; aborting calibration...");
+         if (!modbus_write_int_to_ups(ups, REG_CALIBRATION_CMD, CC_ABORT_CALIBRATION)) {
+            pmsg("FAILED\n");
+         }
+         else {
+            pmsg("ABORTED\n");
+         }
+         return;
+      }
+
+#if 0
+      // Output the battery level
+      if (modbus_read_int_from_ups(ups, CI_BATTLEV, &result)) {
+         if (ilastbl == result)
+            pmsg(".");
+         else
+            pmsg("\nBattery level: %d%%", result);
+         ilastbl = result;
+	   }
+      else
+#endif
+         pmsg(".");
+   }
+
+   pmsg("Calibration result: ");
+   if (result & CS_PASSED)
+      pmsg("PASSED");
+   else if (result & CS_FAILED)
+      pmsg("FAILED");
+   else if (result & CS_REFUSED)
+      pmsg("REFUSED");
+   else if (result & CS_ABORTED)
+      pmsg("ABORTED");
+   else
+      pmsg("0x%llx", result);
+
+   if (result & CS_SRC_PROTOCOL)
+      pmsg(" (PROTOCOL)");
+   else if (result & CS_SRC_LOCAL_UI)
+      pmsg(" (LOCAL UI)");
+   else if (result & CS_SRC_INTERNAL)
+      pmsg(" (INTERNAL)");
+
+   if (result & CS_INVALID_STATE)
+      pmsg(" (INVALID STATE)");
+   else if (result & CS_INTERNAL_FAULT)
+      pmsg(" (INTERNAL FAULT)");
+   else if (result & CS_STATE_OF_CHARGE)
+      pmsg(" (STATE OF CHARGE)");
+   else if (result & CS_LOAD_CHANGE)
+      pmsg(" (LOAD CHANGE)");
+   else if (result & CS_AC_INPUT_BAD)
+      pmsg(" (AC INPUT BAD)");
+   else if (result & CS_LOAD_TOO_LOW)
+      pmsg(" (LOAD TOO LOW)");
+   else if (result & CS_OVER_CHARGE)
+      pmsg(" (OVER CHARGE)");
+
+   pmsg("\n");
+}
+
+static struct tm modbus_uint_to_date(uint64_t uint)
+{
+   // uint is in days since 1/1/2000
+   time_t date = ModbusRegTotime_t(uint);
+   struct tm ret;
+   gmtime_r(&date, &ret);
+   return ret;
+}
+
+static void modbus_get_manf_date(void)
+{
+   uint64_t result;
+
+   if (!modbus_read_int_from_ups(ups, REG_MANUFACTURE_DATE, &result)) {
+      pmsg("\nI don't know how to access the manufacturing date on your UPS\n"
+           "or your UPS does not support the manufacturing date feature.\n");
+      return;
+   }
+
+   struct tm date = modbus_uint_to_date(result);
+   char str[11];
+   strftime(str, sizeof(str), "%m/%d/%Y", &date);
+   pmsg("Manufacturing date: %s\n", str);
+}
+
+static void modbus_test_alarm(void)
+{
+   uint64_t result;
+
+   if (!modbus_read_int_from_ups(ups, REG_USER_INTERFACE_CMD, &result))
+   {
+      pmsg("\nI don't know how to test the alarm on your UPS.\n");
+      return;
+   }
+   
+   // Write to UPS
+   pmsg("Testing alarm...");
+   modbus_write_int_to_ups(ups, REG_USER_INTERFACE_CMD, UIC_SHORT_TEST);
+
+   // Wait for complete
+   while (modbus_read_int_from_ups(ups, REG_USER_INTERFACE_CMD, &result) &&
+          (result & UIS_TEST_IN_PROGRESS))
+   {
+      sleep(1);
+   }
+
+   pmsg("COMPLETE\n");
+}
+
+static uint64_t modbus_get_battery_date(void)
+{
+   uint64_t result;
+
+   if (!modbus_read_int_from_ups(ups, REG_BATTERY_DATE_SETTING, &result)) {
+      pmsg("\nI don't know how to access the battery date on your UPS\n"
+           "or your UPS does not support the battery date feature.\n");
+      return 0;
+   }
+
+   struct tm date = modbus_uint_to_date(result);
+   char str[11];
+   strftime(str, sizeof(str), "%m/%d/%Y", &date);
+   pmsg("Current battery date: %s\n", str);
+   return result;
+}
+
+static void modbus_set_battery_date(void)
+{
+   char *cmd;
+   int day, month, year, max;
+   uint64_t result, temp;
+
+   if (!(result = modbus_get_battery_date()))
+      return;
+
+   cmd = get_cmd("Enter new battery date (MM/DD/YYYY), blank to quit: ");
+   if (!isdigit(cmd[0]) || !isdigit(cmd[1]) || cmd[2] != '/' ||
+       !isdigit(cmd[3]) || !isdigit(cmd[4]) || cmd[5] != '/' ||
+       !isdigit(cmd[6]) || !isdigit(cmd[7]) || !isdigit(cmd[8]) ||
+       !isdigit(cmd[9]) || cmd[10] != '\0' ||
+       ((month = strtoul(cmd, NULL, 10)) > 12) || (month < 1) ||
+       ((day = strtoul(cmd + 3, NULL, 10)) > 31) || (day < 1) ||
+       ((year = strtoul(cmd + 6, NULL, 10)) < 1980)) {
+      pmsg("Invalid format.\n");
+      return;
+   }
+
+   struct tm new_date_tm = {0};
+   new_date_tm.tm_mon = month - 1;
+   new_date_tm.tm_year = year - 1900;
+   new_date_tm.tm_mday = day;
+   new_date_tm.tm_isdst = -1;
+   time_t new_date = mktime(&new_date_tm);
+   if (new_date < MODBUS_BASE_TIMESTAMP)
+   {
+      pmsg("Invalid date; Must be 1/1/2000 or later\n");
+      return;
+   }
+
+   result = time_tToModbusReg(new_date);
+
+   pmsg("Writing new date...");
+   if (!modbus_write_int_to_ups(ups, REG_BATTERY_DATE_SETTING, result)) {
+      pmsg("FAILED\n");
+      return;
+   }
+
+   pmsg("SUCCESS\n");
+
+   pmsg("Waiting for change to take effect...");
+   for (max = 0; max < 10; max++) {
+      if (!modbus_read_int_from_ups(ups, REG_BATTERY_DATE_SETTING, &temp)) {
+         pmsg("ERROR\n");
+         return;
+      }
+
+      if (temp == result)
+         break;
+
+      sleep(1);
+   }
+
+   if (max == 10)
+      pmsg("TIMEOUT\n");
+   else
+      pmsg("SUCCESS\n");
+
+   modbus_get_battery_date();
+}
+
 #endif

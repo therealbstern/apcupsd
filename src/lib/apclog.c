@@ -158,10 +158,10 @@ void d_msg(const char *file, int line, int level, const char *fmt, ...)
 #endif
 }
 
-void hex_dump(int level, void *data, unsigned int len)
+void hex_dump(int level, const void *data, unsigned int len)
 {
    unsigned int pos = 0;
-   unsigned char *dat = (unsigned char *)data;
+   const unsigned char *dat = (const unsigned char *)data;
    char temp[16*3+1];
    char temp2[8+2+16*3+1+16+1];
    char *ptr;

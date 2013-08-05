@@ -58,6 +58,10 @@
 # include "pcnet/pcnet.h"
 #endif
 
+#ifdef HAVE_MODBUS_DRIVER
+# include "modbus/modbus.h"
+#endif
+
 static const UPSDRIVER drivers[] = {
 #ifdef HAVE_DUMB_DRIVER
    { "dumb",      DumbUpsDriver::Factory },
@@ -90,6 +94,10 @@ static const UPSDRIVER drivers[] = {
 #ifdef HAVE_PCNET_DRIVER
    { "pcnet",     PcnetUpsDriver::Factory },
 #endif   /* HAVE_PCNET_DRIVER */
+
+#ifdef HAVE_MODBUS_DRIVER
+   { "modbus",    ModbusUpsDriver::Factory },
+#endif   /* HAVE_MODBUS_DRIVER */
 
    /*
     * The NULL driver: closes the drivers list.
@@ -175,6 +183,10 @@ UpsDriver *attach_driver(UPSINFO *ups)
 
    case PCNET_UPS:
       driver_name = "pcnet";
+      break;
+
+   case MODBUS_UPS:
+      driver_name = "modbus";
       break;
 
    default:
