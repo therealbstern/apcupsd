@@ -221,6 +221,9 @@
 /* Set if you want PCNET driver */
 #undef HAVE_PCNET_DRIVER
 
+/* Set if you want MODBUS driver */
+#undef HAVE_MODBUS_DRIVER
+
 /* Set if you want the old master/slave network code */
 #undef HAVE_OLDNET
 

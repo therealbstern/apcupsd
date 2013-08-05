@@ -24,7 +24,7 @@
 #     940-0119A, 940-0127A, 940-0128A, 940-0020B,
 #     940-0020C, 940-0023A, 940-0024B, 940-0024C,
 #     940-1524C, 940-0024G, 940-0095A, 940-0095B,
-#     940-0095C, M-04-02-2000
+#     940-0095C, 940-0625A, M-04-02-2000
 #
 UPSCABLE usb
 
@@ -73,6 +73,9 @@ UPSCABLE usb
 #                            address of the UPS mgmtcard. username and 
 #                            passphrase are the credentials for which the card 
 #                            has been configured.
+#
+# modbus    COMx             Serial device for use with newest SmartUPS models
+#                            supporting the MODBUS protocol.
 #
 UPSTYPE usb
 DEVICE

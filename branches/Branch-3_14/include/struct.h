@@ -63,6 +63,7 @@ typedef enum {
    TEST_UPS,            /* TEST UPS Driver      */
    PCNET_UPS,           /* PCNET UPS Driver     */
    SNMPLITE_UPS,        /* SNMP Lite UPS Driver */
+   MODBUS_UPS,          /* MODBUS UPS Driver    */
 } UpsMode;
 
 typedef enum {
@@ -168,6 +169,7 @@ class UPSINFO {
    void set_boost() { Status |= UPS_boost; };
    void set_boost(int val) { if (val) set_boost(); else clear_boost(); };
    void set_calibration() { Status |= UPS_calibration; };
+   void set_calibration(int val) { if (val) set_calibration(); else clear_calibration(); };
    void set_commlost() { Status |= UPS_commlost; };
    void set_fastpoll() { Status |= UPS_fastpoll; };
    void set_onbatt_msg() { Status |= UPS_onbatt_msg; };
