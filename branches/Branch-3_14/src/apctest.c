@@ -109,13 +109,13 @@ static void modbus_run_self_test(void);
 static uint64_t modbus_get_battery_date(void);
 static void modbus_set_battery_date(void);
 static void modbus_get_manf_date(void);
-static void modbus_set_alarm(void);
-static void modbus_set_sens(void);
-static void modbus_set_xferv(int lowhigh);
+//static void modbus_set_alarm(void);
+//static void modbus_set_sens(void);
+//static void modbus_set_xferv(int lowhigh);
 static void modbus_calibration();
 static void modbus_test_alarm(void);
-static int modbus_get_self_test_interval(void);
-static void modbus_set_self_test_interval(void);
+//static int modbus_get_self_test_interval(void);
+//static void modbus_set_self_test_interval(void);
 #endif
 
 static void strip_trailing_junk(char *cmd);
@@ -2440,13 +2440,13 @@ static void do_modbus_testing(void)
            "3)  Read last self-test result\n"
            "4)  View/Change battery date\n"
            "5)  View manufacturing date\n"
-           "6)  View/Change alarm behavior\n"
-           "7)  View/Change sensitivity\n"
-           "8)  View/Change low transfer voltage\n"
-           "9)  View/Change high transfer voltage\n"
+           //"6)  View/Change alarm behavior\n"
+           //"7)  View/Change sensitivity\n"
+           //"8)  View/Change low transfer voltage\n"
+           //"9)  View/Change high transfer voltage\n"
            "10) Perform battery calibration\n"
            "11) Test alarm\n"
-           "12) View/Change self-test interval\n"
+           //"12) View/Change self-test interval\n"
            " Q) Quit\n\n");
 
       cmd = get_cmd("Select function number: ");
@@ -2454,9 +2454,9 @@ static void do_modbus_testing(void)
          int item = atoi(cmd);
 
          switch (item) {
-         //case 1:
-         //   modbus_kill_power_test();
-         //   break;
+         case 1:
+            modbus_kill_power_test();
+            break;
          case 2:
             modbus_run_self_test();
             break;
@@ -2509,6 +2509,28 @@ static void do_modbus_testing(void)
 }
 
 #ifdef HAVE_MODBUS_DRIVER
+static void modbus_kill_power_test(void)
+{
+   pmsg("\nThis test will attempt to power down the UPS.\n"
+        "The MODBUS cable should be plugged in to the UPS, but the\n"
+        "AC power plug to the UPS should be DISCONNECTED.\n\n"
+        "PLEASE DO NOT RUN THIS TEST WITH A COMPUTER CONNECTED TO YOUR UPS!!!\n\n"
+        "Please enter any character when ready to continue: ");
+
+   fgetc(stdin);
+   pmsg("\n");
+
+   ptime();
+   pmsg("calling kill_power function.\n");
+
+   make_file(ups, ups->pwrfailpath);
+   initiate_hibernate(ups);
+   unlink(ups->pwrfailpath);
+
+   ptime();
+   pmsg("returned from kill_power function.\n");
+}
+
 static void modbus_get_self_test_result(void)
 {
    uint64_t uint;
