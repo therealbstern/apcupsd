@@ -22,6 +22,23 @@
  * MA 02111-1307, USA.
  */
 
+/*
+ * Register mapping information below was derived from APC/Schneider Electric
+ * Application Note #176 <http://www.apc.com/whitepaper/?an=176>
+ *
+ * Thanks go to APC/Scneider for providing the Apcupsd team with early access 
+ * to MODBUS protocol information to facilitate an Apcupsd driver.
+ *
+ * Relevant application notes include:
+ *
+ * AN176: Modbus Implementation in APC Smart-UPS 
+ *    <http://www.apc.com/whitepaper/?an=176>
+ * AN177: Software interface for Switched Outlet and UPS Management in Smart-UPS 
+ *    <http://www.apc.com/whitepaper/?an=177>
+ * AN178: USB HID Implementation in Smart-UPS 
+ *    <http://www.apc.com/whitepaper/?an=178>
+ */
+
 #ifndef __APCMODBUSMAPPING_H_
 #define __APCMODBUSMAPPING_H_
 
