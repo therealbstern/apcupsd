@@ -14,7 +14,7 @@ computer in the event of a power failure.**
 
 | |date| |time|
 | This manual documents apcupsd version 3.14.x
-| Copyright |(C)| 2004-2009 Adam Kropelin
+| Copyright |(C)| 2004-2013 Adam Kropelin
 | Copyright |(C)| 1999-2005 Kern Sibbald
 
 *Copying and distribution of this file, with or without modification, 
@@ -245,28 +245,20 @@ property: the kind of protocol it uses to talk with its
 computer.
 
 apcsmart 
-    An APCSmart UPS and its computer communicate
-    through an RS232C serial connection. They use it as a character
-    channel (2400bps, 8 data bits, 1 stop bit, no parity) and pass
+    The 'apcsmart' protocol uses an RS232 serial connection to pass
     commands back and forth in a primitive language resembling 
-    modem-control codes. The
-    different APC UPSes all use closely related firmware, so the
-    language doesn't vary much (later versions add more commands). This
+    modem-control codes. APC calls this language "UPS-Link". Originally 
+    introduced for Smart-UPS models (thus the name 'apcsmart'), this
     class of UPS is in decline, rapidly being replaced in APC's product
-    line by USB UPSes.
+    line by USB and MODBUS UPSes.
 
 usb
     A USB UPS speaks a universal well defined control
     language over a USB wire. Most of APC's lineup now uses this method
     as of late 2003, and it seems likely to completely take over in
-    their low- and middle range. Other manufacturers (Belkin,
-    Tripp-Lite, etc.) are moving the same way, though with a different
-    control protocol for each manufacturer. As long as USB hardware can
-    be mass-produced more cheaply than an Ethernet card, most UPSes are
-    likely to go this design route. Please note that even if you have a
-    USB UPS, if you use a serial cable with it (as can be supplied by
-    APC), you will need to configure your UPS as ``apcsmart`` rather
-    than ``usb``.
+    their low- and middle range. The most recent APC UPSes support only a
+    limited set of data over the USB interface. MODBUS (see below) is required
+    in order to access the advanced data.
 
 net
     This is the keyword to specify if you are using your
@@ -292,6 +284,12 @@ pcnet
     AP9617 family of smart slot modules. The protocol is much simpler
     and potentially more secure than SNMP.
 
+modbus
+    MODBUS is the newest APC protocol and operates over RS232 links. (It is
+    also capable of operating over USB, but apcupsd does not support this yet.)
+    MODBUS is APC's replacement for the aging 'apcsmart' (aka UPS-Link) 
+    protocol. MODBUS is the only way to access detailed control and status 
+    information on newer (esp. SMT series) UPSes.
 
 
 Choosing a Configuration Type
@@ -2138,6 +2136,47 @@ distro, you can use commands such as...
     chkconfig --level 0 iptables on
 
 ...to make sure networking stays up.
+
+
+MODBUS Driver
+-------------
+
+As of 3.14.11, apcupsd supports the MODBUS protocol over RS232 serial
+interfaces. MODBUS is APC's replacement for the aging 'apcsmart' (aka UPS-Link) 
+protocol. It is recommended for modern (ex: SMT series) Smart-UPS where an
+RS232 connection is available.
+
+Not all APC UPSes support MODBUS. New 2013 year Smart-UPS models are likely to 
+support it out-of-the-box and firmware updates are available for some older 
+models. APC/Schneider tech support is your best point of contact for determining 
+if a certain model will support MODBUS. That said, APC knowledge base article 
+FA164737 indicates MODBUS support is available for the majority of the SMC,
+SMT, and SMX model lines.
+
+The required apcupsd.conf settings for MODBUS are straightforward:
+
+::
+
+    ## apcupsd.conf v1.1 ##
+    UPSCABLE smart
+    UPSTYPE modbus
+    DEVICE /dev/ttyS0
+    LOCKFILE /var/lock
+    UPSCLASS standalone
+    UPSMODE disable
+
+The ``DEVICE`` setting identifies the serial port to which the UPS is connected.
+This can take the form of ``COM1``, etc. on Windows or ``/dev/XXX`` on UNIX
+systems.
+
+You should use the APC-supplied serial cable (P/N 940-0625A) that ships with 
+the UPS. Other 'smart' type cables may work, but only 940-0625A has been 
+formally tested at this time.
+
+Note that *most UPSes ship with MODBUS support disabled by default*. You must 
+use the UPS's front panel menu to enable MODBUS protocol support before apcupsd 
+will be able to communicate with the UPS. You may need to enable the "Advanced"
+menu option before the MODBUS protocol option will be visible.
 
 
 Testing Apcupsd
