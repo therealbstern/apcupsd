@@ -8,6 +8,416 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2013-11-20 19:13  adk0212
+
+	* include/version.h:
+
+	Update version info for 3.14.11 release
+
+2013-11-20 19:12  adk0212
+
+	* doc/apcupsd.conf.5:
+
+	Add modbus info to DEVICE section
+
+2013-11-20 19:08  adk0212
+
+	* doc/manual/: manual.html, manual.rst:
+
+	Add modbus information to the manual
+
+2013-11-20 18:28  adk0212
+
+	* src/drivers/modbus/: MPAO-99NQF6_R0_EN.pdf,
+	MPAO-99NQL2_R0_EN.pdf:
+
+	Update cached copy of AN176, add AN177, AN178
+
+2013-11-20 18:21  adk0212
+
+	* src/drivers/modbus/: mapping.cpp, mapping.h, modbus.cpp,
+	modbus.h:
+
+	Add pointers to relevant APC app notes in modbus driver source
+	files.
+
+2013-08-19 21:23  adk0212
+
+	* src/apctest.c:
+
+	Implement the modbus killpower test in apctest. Comment out the
+	other modbus tests that are not implemented (due to lack of MODBUS
+	mappings in the UPS for the relevant controls)
+
+2013-08-19 21:18  adk0212
+
+	* src/drivers/modbus/MPAO-98KJ7F_R0_EN.pdf:
+
+	Add current rev of App Note 176 (June 2013) describing the MODBUS
+	implementation on APC UPSes
+
+2013-08-05 10:05  adk0212
+
+	* configure, autoconf/config.h.in, autoconf/configure.in,
+	autoconf/variables.mak.in, doc/apcupsd.conf.5, include/extern.h,
+	include/struct.h, platforms/etc/apcupsd.conf.in,
+	platforms/mingw/apcupsd.conf.in, src/apctest.c,
+	src/drivers/Makefile, src/drivers/drivers.c,
+	src/drivers/modbus/Makefile, src/drivers/modbus/mapping.cpp,
+	src/drivers/modbus/mapping.h, src/drivers/modbus/modbus.cpp,
+	src/drivers/modbus/modbus.h, src/lib/apcconfig.c, src/lib/apclog.c,
+	src/win32/Makefile.in:
+
+	Initial rev of MODBUS support
+
+2013-04-18 21:12  adk0212
+
+	* src/win32/: apctray.cpp, balloonmgr.h, email.c, shutdown.c,
+	winevents.cpp, winmain.cpp, winservice.cpp, winstat.cpp, winups.h:
+
+	Build fixes for gcc-4.2.4
+
+2013-04-18 21:12  adk0212
+
+	* src/win32/build-win32-cross-tools:
+
+	Upgrade cross-tools to more recent versions gcc-4.2.4 (latest
+	version which is easily built on RHEL5 due to gmp and mpfr
+	dependencies) binutils-2.23.1 (latest) mingw-3.20 (latest, aside
+	from 3.20-2 which is buggy) w32api-3.17-2 (latest) nsis-2.46
+	(latest, unchanged)
+
+2013-02-18 19:25  adk0212
+
+	* src/apctest.c:
+
+	Add lock file creation to apctest main()
+
+2013-02-18 19:24  adk0212
+
+	* src/apcupsd.c:
+
+	Fix copy-paste error in main()
+
+2013-02-18 19:22  adk0212
+
+	* src/: apcupsd.c, device.c:
+
+	Remove redundant creation of lock file from setup_device(). Lock
+	file was already being created in main(). Change error message in
+	main() to match the one we are removing because it is more
+	informative.
+
+2013-02-18 19:18  adk0212
+
+	* include/defines.h, include/struct.h, src/device.c:
+
+	Get rid of UPS setup flag. This was a holdover from back when the
+	UPSINFO structure was held in sysv shmem.
+
+2013-02-11 10:21  adk0212
+
+	* include/amutex.h, include/defines.h, src/action.c, src/apcupsd.c,
+	src/device.c, src/options.c, src/smtp.c, src/drivers/drivers.c,
+	src/drivers/apcsmart/smart.c, src/drivers/net/net.c,
+	src/drivers/pcnet/pcnet.c, src/drivers/snmp/drv_powernet.c,
+	src/drivers/snmp/snmp.c, src/drivers/snmplite/apc-mib.cpp,
+	src/drivers/snmplite/mge-mib.cpp,
+	src/drivers/snmplite/rfc1628-mib.cpp,
+	src/drivers/snmplite/snmplite.cpp, src/drivers/usb/usb.c,
+	src/drivers/usb/bsd/bsd-usb.c, src/drivers/usb/bsd/hidutils.c,
+	src/drivers/usb/generic/generic-usb.c,
+	src/drivers/usb/generic/hidutils.c,
+	src/drivers/usb/linux/linux-usb.c, src/lib/apcconfig.c,
+	src/lib/apcexec.c, src/lib/apclog.c, src/lib/newups.c,
+	src/lib/sleep.c:
+
+	Use variadic macros for Dmsg since we pretty much require gcc at
+	this point
+
+2012-08-19 22:29  adk0212
+
+	* src/drivers/snmplite/: snmp.cpp, snmp.h, snmplite.cpp:
+
+	If SNMP trap catching cannot be enabled, log a warning and fall
+	back to polling instead of crashing.
+
+2012-08-19 22:07  adk0212
+
+	* src/drivers/usb/usb.c:
+
+	Revert notch/spike LASTXFER change; UPS reporting is too ambiguous.
+
+2012-08-17 15:53  adk0212
+
+	* platforms/mingw/winusb/install.txt:
+
+	Add info about disabling INF signature enforcement in Windows 8
+
+2012-08-10 13:40  adk0212
+
+	* src/drivers/usb/usb.c:
+
+	Recategorize notch/spike related LASTXFER values appropriately.
+
+2012-06-18 21:47  adk0212
+
+	* src/drivers/snmplite/snmplite.cpp:
+
+	Make MIB (vendor) name search case insensitive in snmplite driver
+
+2012-03-30 23:48  adk0212
+
+	* src/drivers/usb/: usb.c, usb.h, bsd/bsd-usb.c,
+	generic/generic-usb.c, linux/linux-usb.c:
+
+	Rename known_info -> _known_info
+
+2012-03-30 23:40  adk0212
+
+	* src/drivers/usb/bsd/: bsd-usb.c, bsd-usb.h:
+
+	Convert BSD USB driver to UpsDriver derivative
+
+2012-03-30 19:45  adk0212
+
+	* configure, autoconf/configure.in, include/drivers.h,
+	include/extern.h, include/struct.h, src/apctest.c, src/apcupsd.c,
+	src/drivers/drivers.c, src/drivers/apcsmart/apcsmart.h,
+	src/drivers/apcsmart/smart.c, src/drivers/apcsmart/smarteeprom.c,
+	src/drivers/apcsmart/smartoper.c,
+	src/drivers/apcsmart/smartsetup.c,
+	src/drivers/apcsmart/smartsetup2.c, src/drivers/dumb/dumb.h,
+	src/drivers/dumb/dumboper.c, src/drivers/dumb/dumbsetup.c,
+	src/drivers/net/net.c, src/drivers/net/net.h,
+	src/drivers/pcnet/pcnet.c, src/drivers/pcnet/pcnet.h,
+	src/drivers/snmp/drv_powernet.c, src/drivers/snmp/drv_rfc1628.c,
+	src/drivers/snmp/snmp.c, src/drivers/snmp/snmp.h,
+	src/drivers/snmplite/apc-mib.cpp, src/drivers/snmplite/mibs.h,
+	src/drivers/snmplite/rfc1628-mib.cpp,
+	src/drivers/snmplite/snmplite-common.h,
+	src/drivers/snmplite/snmplite.cpp, src/drivers/snmplite/snmplite.h,
+	src/drivers/test/testdriver.c, src/drivers/test/testdriver.h,
+	src/drivers/usb/usb.c, src/drivers/usb/usb.h,
+	src/drivers/usb/usb_common.h,
+	src/drivers/usb/generic/generic-usb.c,
+	src/drivers/usb/generic/generic-usb.h,
+	src/drivers/usb/linux/linux-usb.c,
+	src/drivers/usb/linux/linux-usb.h, src/win32/winusb.h:
+
+	Convert drivers to C++ classes derived from UpsDriver
+
+2012-03-26 20:48  adk0212
+
+	* src/drivers/apcsmart/smart.c:
+
+	Break out of getline() if read() returns an error
+
+2012-03-06 12:04  adk0212
+
+	* src/drivers/pcnet/pcnet.c:
+
+	Fix PCNET runtime remaining on Smart-UPS X and RT models.
+
+2012-03-04 22:40  adk0212
+
+	* src/drivers/pcnet/pcnet.c:
+
+	Add missing debug for REG2
+
+2012-01-26 21:23  adk0212
+
+	* platforms/mandrake/apcupsd.in:
+
+	Apply some Mandrake patches, thanks to David Walser
+	<luigiwalser@yahoo.com> -
+	http://svn.mandriva.com/svn/packages/cooker/apcupsd/current/SOURCES/apcupsd-3.10.16-staleusb.patch
+	-
+	http://svn.mandriva.com/svn/packages/cooker/apcupsd/current/SOURCES/apcupsd-3.14.4-mdv_conf.diff
+
+2011-12-09 10:23  adk0212
+
+	* src/reports.c:
+
+	Fix missing DATATIME report info for SNMPLITE_UPS
+
+2011-12-09 10:20  adk0212
+
+	* src/reports.c:
+
+	Fix missing DATATIME report info for PCNET UPSes. Contributed by
+	Dan Swartzendruber <dswartz@druber.com>.
+
+2011-11-21 22:05  adk0212
+
+	* autoconf/aclocal.m4:
+
+	Fix quoting around AC_LANG_PROGRAM to eliminate warning with
+	autoconf-2.68
+
+2011-11-21 22:03  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Fix failure to compile when libsupc++ is not available. Need to
+	link using g++ when not linking libsupc++. If linking with
+	libsupc++ use gcc to avoid gettting libstdc++ linked by default.
+	Fixes build on stock Mandriva 2011.
+
+2011-11-21 21:23  adk0212
+
+	* src/: apcnis.c, drivers/apcsmart/smart.c:
+
+	Remove set-but-unused variables pointed out by g++-4.6.1
+
+2011-11-21 13:23  adk0212
+
+	* doc/manual/: manual.html, manual.rst:
+
+	Fix smartups configuration example. "UPSTYPE smartups" should be
+	"UPSTYPE apcsmart". Reported by Moray Henderson
+	<moray.henderson@om.org>
+
+2011-11-10 08:06  adk0212
+
+	* src/drivers/snmplite/: apc-mib.cpp, rfc1628-mib.cpp, snmp.cpp,
+	snmp.h, snmplite.cpp:
+
+	Fix ability to detect SNMP GET failures by adding a 'valid' flag to
+	data variables. Flag is defaulted to false when a GET is performed
+	and set to true when valid data is assigned to the variable. This
+	allows the caller to know if any of the OIDs did not fetch
+	successfully.
+
+2011-11-09 22:58  adk0212
+
+	* src/drivers/snmplite/snmplite.cpp:
+
+	Tighten restriction to screen out bad CI_NOMBATTV. Add check for
+	invalid CI_BADBATTS.
+
+2011-11-09 15:12  adk0212
+
+	* src/action.c:
+
+	Fix handling of UPS calibration by adding a dedicated state for
+	when UPS is performing calibration.
+
+2011-11-09 15:10  adk0212
+
+	* src/drivers/snmplite/snmplite.cpp:
+
+	Fix self test detection in snmplite driver by implementing
+	snmplite_ups_entry_point() and adding support for
+	DEVICE_CMD_CHECK_SELFTEST
+
+2011-11-09 15:08  adk0212
+
+	* src/drivers/snmplite/apc-mib.cpp:
+
+	Add missing debug print for C_WHY_BATT
+
+2011-11-07 22:02  adk0212
+
+	* src/drivers/snmplite/snmplite.cpp:
+
+	Fix crash when snmplite_ups_open() fails due to SnmpEngine::Open()
+	failure.  We need to exit directly rather than returning failure
+	code since caller stupidly ignores the return code and will blindly
+	continue on.
+
+2011-11-07 21:58  adk0212
+
+	* src/drivers/snmplite/snmp.cpp:
+
+	Fix socket leaks on SnmpEngine::Open() failure paths
+
+2011-11-07 21:57  adk0212
+
+	* src/apcupsd.c:
+
+	Remove NLS textdomain call since NLS has been removed long ago.
+
+2011-11-07 21:36  adk0212
+
+	* src/device.c:
+
+	Strip unprintable characters from UPS model string. Pointed out by
+	Peter Henn <peter_henn@gmx.de> in the PCNET driver. Fix applied
+	globally since this issue could affect any driver.
+
+2011-11-07 21:23  adk0212
+
+	* doc/apcupsd.conf.5:
+
+	Fix compatibility with mdoc(7) on OpenBSDD. From Ingo Schwarze
+	<schwarze@openbsd.org> via Kirill Bychkov <yason@linklevel.net>.
+
+2011-10-14 23:41  adk0212
+
+	* platforms/: darwin/Info.plist, mingw/winusb/apcupsd.inf:
+
+	Add VID/PID for HP T1500 G3 UPS which is a rebadged APC unit
+
+2011-10-12 09:00  adk0212
+
+	* src/drivers/usb/: bsd/bsd-usb.c, generic/generic-usb.c:
+
+	Remove vendor check from BSD and Generic USB drivers. HP OEMed some
+	UPSes from APC so they are compatible with apcupsd in spite of
+	carrying an HP vendor id. We might as well try to talk to anything
+	a user connects. We will still fail if the required UPS application
+	collection is not found and that is a better indicator of potential
+	compatiblity.
+
+2011-10-02 09:51  fleetworks
+
+	* platforms/: contrib-rpm/build_rpm.sh, redhat/apcupsd.spec.in,
+	suse/apcupsd.spec.in:
+
+	Release 3.14.10
+
+2011-09-27 23:33  adk0212
+
+	* src/drivers/snmp/: drv_powernet.c, drv_rfc1628.c, snmp.c, snmp.h:
+
+	Fix compile issue with newer net-snmp on CentOS 6. 'MIB' is
+	apparently a macro now, so need to avoid using it.
+
+2011-09-26 08:56  adk0212
+
+	* src/drivers/snmplite/snmplite.cpp:
+
+	Filter out SNMP query results that have zero-length sequences. This
+	prevents a crash in the event that the SNMP request times out, as
+	it appears to do very occasionally on certain hardware. Thanks to
+	Lars Tauber <taeuber@bbaw.de> for reporting the issue and testing
+	the fix.
+
+2011-09-22 18:22  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Add list of UPSes to avoid
+
+2011-09-15 22:16  adk0212
+
+	* src/drivers/net/net.c:
+
+	Fix MODEL reporting
+
+2011-09-13 22:57  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Update home page for 3.14.10 release
+
+2011-09-13 22:34  adk0212
+
+	* ChangeLog, ReleaseNotes, include/version.h:
+
+	Prep for 3.14.10 release
+
 2011-09-02 15:17  adk0212
 
 	* platforms/: darwin/Info.plist, mingw/winusb/apcupsd.inf:
@@ -625,11 +1035,7 @@
 
 2010-01-16 10:19  adk0212
 
-	* platforms/mingw/winusb/amd64/WdfCoInstaller01009.dll,
-	platforms/mingw/winusb/amd64/winusbcoinstaller2.dll,
-	platforms/mingw/winusb/i386/WdfCoInstaller01009.dll,
-	platforms/mingw/winusb/i386/winusbcoinstaller2.dll,
-	src/win32/installer/winapcupsd.nsi:
+	* src/win32/installer/winapcupsd.nsi:
 
 	Move winusb coinstallers to depkgs-win32 so they do not bloat the
 	source tree.
@@ -750,11 +1156,8 @@
 
 2010-01-09 13:35  adk0212
 
-	* src/: drivers/usb/win/Makefile, drivers/usb/win/hidutils.c,
-	drivers/usb/win/hidutils.h, drivers/usb/win/win-usb.c,
-	drivers/usb/win/winusb.h, win32/Makefile.in,
-	win32/libusb-winusb-bridge.c, win32/libusb-winusb-bridge.h,
-	win32/winusb.h:
+	* src/win32/: Makefile.in, libusb-winusb-bridge.c,
+	libusb-winusb-bridge.h, winusb.h:
 
 	Consolidate win-usb driver back into generic-usb by writing a
 	simple libusb API adapter for winusb (libusb-winusb-bridge). This
@@ -844,20 +1247,10 @@
 
 2010-01-03 10:29  adk0212
 
-	* platforms/mingw/winusb/: apcupsd.inf,
-	amd64/WdfCoInstaller01009.dll, amd64/winusbcoinstaller2.dll,
-	i386/WdfCoInstaller01009.dll, i386/winusbcoinstaller2.dll:
+	* platforms/mingw/winusb/apcupsd.inf:
 
 	WinUsb-based INF file customized for APCUPSD and driver
 	coinstallers from Win7 DDK.
-
-2010-01-03 10:22  adk0212
-
-	* src/drivers/usb/win/: Makefile, hidutils.c, hidutils.h,
-	win-usb.c, winusb.h:
-
-	First rev of Windows-specific USB driver based on Microsoft's
-	WinUsb framework for user mode USB drivers.
 
 2010-01-02 16:28  adk0212
 
@@ -3672,6 +4065,26 @@
 	writing, use FEATURE report only.  This is necessary to properly
 	support writes on UPSes that offer the same usage in both types of
 	reports.
+
+2007-10-17 19:00  adk0212
+
+	* src/drivers/usb/generic/generic-usb.h:
+
+	file generic-usb.h was added on branch Branch-3_14 on 2012-03-30
+	23:47:08 +0000
+
+2007-10-17 19:00  adk0212
+
+	* src/drivers/usb/: linux/linux-usb.h, generic/generic-usb.h:
+
+	Forgot to check these in before.
+
+2007-10-17 19:00  adk0212
+
+	* src/drivers/usb/linux/linux-usb.h:
+
+	file linux-usb.h was added on branch Branch-3_14 on 2012-03-30
+	23:47:08 +0000
 
 2007-10-15 18:13  adk0212
 
