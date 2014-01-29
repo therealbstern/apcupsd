@@ -4,6 +4,7 @@ Class = Battery
 ClassGuid={72631e54-78a4-11d0-bcf7-00aa00b7b32a}
 Provider = %ProviderName%
 DriverVer = 01/10/2010,1.0.0.0
+CatalogFile = apcupsd.cat
 
 ; ================== Class section ==================
 [ClassInstall32]
@@ -29,8 +30,6 @@ HKR,,Icon,,-1
 ; An SMX750 appears to use PID 5 even though its twin (the SMT1500 above) 
 ; uses PID 3. Argh.
 %USB\MyDevice.DeviceDesc% =ApcupsdUSBDriver, USB\VID_051d&PID_0005
-; HP T1500 G3 is actually a re-badged APC unit
-%USB\MyDevice.DeviceDesc% =ApcupsdUSBDriver, USB\VID_03F0&PID_1FE3
 
 [Apcupsd_WinUSB.NTamd64]
 ; Normal APC UPSes use PID 0x0002
@@ -44,8 +43,6 @@ HKR,,Icon,,-1
 ; An SMX750 appears to use PID 5 even though its twin (the SMT1500 above) 
 ; uses PID 3. Argh.
 %USB\MyDevice.DeviceDesc% =ApcupsdUSBDriver, USB\VID_051d&PID_0005
-; HP T1500 G3 is actually a re-badged APC unit
-%USB\MyDevice.DeviceDesc% =ApcupsdUSBDriver, USB\VID_03F0&PID_1FE3
 
 ; =================== Installation ===================
 [ApcupsdUSBDriver]
