@@ -314,6 +314,7 @@ Section "Apcupsd Service" SecService
   !else
     File ${TOPDIR}\platforms\mingw\winusb\install.txt
     File ${TOPDIR}\platforms\mingw\winusb\apcupsd.inf
+    File ${TOPDIR}\platforms\mingw\winusb\apcupsd.cat
     SetOutPath "$INSTDIR\driver\i386"
     File ${DEPKGS}\..\winddk\redist\wdf\x86\*.dll
     File ${DEPKGS}\..\winddk\redist\winusb\x86\*.dll
