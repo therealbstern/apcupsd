@@ -8,6 +8,25 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2014-01-29 17:56  adk0212
+
+	* src/win32/installer/winapcupsd.nsi:
+
+	Add apcupsd.cat signature file to USB driver installation
+
+2014-01-29 17:54  adk0212
+
+	* platforms/mingw/winusb/: apcupsd.cat, apcupsd.inf:
+
+	Commit signed winusb driver courtesy of Jernej Simoncic
+	<jernej's-sflist@eternallybored.org>
+
+2013-11-20 19:14  adk0212
+
+	* ChangeLog:
+
+	Update ChangeLog for 3.14.11
+
 2013-11-20 19:13  adk0212
 
 	* include/version.h:
