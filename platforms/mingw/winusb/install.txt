@@ -15,6 +15,7 @@ The USB driver supports the following operating systems:
    - Windows 7 (including 64 bit)
    - Windows 2008 Server (including 64 bit)
    - Windows 8 (including 64 bit)
+   - Windows 8.1 (including 64 bit)
 
 Notably, Windows 2000, Windows 98, and Windows ME are NOT supported.
 
@@ -27,18 +28,9 @@ TROUBLESHOOTING
   fix this, uninstall the driver from the device that is giving the error code,
   then do an update driver on the correct device.
 
-- If you are running a 64-bit edition of Windows 8, you will need to disable
-  INF signature enforcement before installing the driver. To make this change,
-  follow these steps:
-  
-  - From right side charm menu click on "Settings"
-  - Choose "Change PC Settings" -> "General" -> "Advanced Startup"
-  - Select "Restart now"
-  - You should see a blue colored screen with additional selections
-  - Click on "Troubleshoot" -> "Advanced options" -> "Startup Settings"
-  - Click "Restart" to reboot
-  - Computer will restart and present a menu of startup options
-  - Select option 7 "Disable driver signature enforcement"
+- The driver INF has now been signed with Authenticode thanks to Jernej Simoncic 
+  <jernej's-sflist@eternallybored.org>. During driver installation you will be
+  asked to approve the signature.
 
 
 INSTALLATION
