@@ -9,6 +9,38 @@ IF YOU USE THE OLD STYLE MASTER/SLAVE NETWORKING MODE, BE SURE TO READ THE
 3.14.0 RELEASE NOTES BELOW.
 
 
+3.14.11 -- 29 January 2014           (Maintenance Release)
+
+NEW FEATURES
+
+  * MODBUS protocol support
+
+    Over the summer, APC publicly released documentation[1] on a new UPS 
+    control and monitoring protocol, loosely referred to as MODBUS (after the 
+    historic industrial control protocol it is based on). The new protocol 
+    operates over RS232 serial lines as well as USB connections and is intended 
+    to supplement APC's proprietary Microlink protocol. Microlink is not going 
+    away, but APC has realized that third parties require access to UPS status 
+    and control information. Rather than publicly open Microlink, they have 
+    created another protocol to operate along side it.
+
+    Many existing Microlink UPSes can be upgraded to support MODBUS via a 
+    firmware update. See [2]. Certain older models are not upgradeable. APC 
+    support will be your best contact for determining if your UPS supports a 
+    MODBUS upgrade the information linked below does not make it clear.
+
+    For now, apcupsd supports MODBUS over RS232 serial only. It DOES NOT yet 
+    support MODBUS over USB. See the apcupsd manual[3] for information on
+    setting up apcupsd.conf for MODBUS UPSes.
+
+    [1] http://www.apc.com/whitepaper/?an=176
+    [2] http://www.schneider-electric.us/support/index?page=content&country=ITB&lang=EN&id=FA164737
+    [3] http://www.apcupsd.com/manual/manual.html
+
+  * Windows USB driver is now digitally signed thanks to Jernej Simoncic 
+    <jernej's-sflist@eternallybored.org>
+
+
 3.14.10 -- 13 September 2011         (Maintenance Release)
 
 BUG FIXES
