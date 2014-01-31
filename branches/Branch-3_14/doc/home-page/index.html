@@ -50,58 +50,26 @@ runtime expires based on internal APC calculations determined by power
 consumption rates. Apcupsd is licensed under the GPL version 2.
 <p>
 <h2>Apcupsd Releases</h2>
-<h3><i><u>Stable:</u></i>&nbsp;3.14.10 (13 September 2011)
-[&nbsp;<a href="https://sourceforge.net/projects/apcupsd/files/apcupsd%20-%20Stable/3.14.10/">Source</a>&nbsp;]
+<h3><i><u>Stable:</u></i>&nbsp;3.14.11 (31 January 2014)
+[&nbsp;<a href="https://sourceforge.net/projects/apcupsd/files/apcupsd%20-%20Stable/3.14.11/">Source</a>&nbsp;]
 <!--[&nbsp;<a href="https://sourceforge.net/projects/apcupsd/files/rpms%20-%20Stable/3.14.10/">RPMs</a>&nbsp;]-->
-[&nbsp;<a href="https://sourceforge.net/projects/apcupsd/files/win-binaries%20-%20Stable/3.14.10/">Windows</a>&nbsp;]
-[&nbsp;<a href="https://sourceforge.net/projects/apcupsd/files/osx-binaries%20-%20Stable/3.14.10/">OSX</a>&nbsp;]
+[&nbsp;<a href="https://sourceforge.net/projects/apcupsd/files/win-binaries%20-%20Stable/3.14.11/">Windows</a>&nbsp;]
+[&nbsp;<a href="https://sourceforge.net/projects/apcupsd/files/osx-binaries%20-%20Stable/3.14.11/">OSX</a>&nbsp;]
 </h3>
-Release 3.14.10 is a maintenance release containing only bug fixes. Most
-notable are USB compatibility for Mac OS X Lion and a fix for missing and/or
-spurrious status values on newer BackUPS CS USB models.
-</ul>
-Please see the
-<a href="http://apcupsd.cvs.sourceforge.net/viewvc/*checkout*/apcupsd/apcupsd/ReleaseNotes?pathrev=Release-3_14_10">
-ReleaseNotes</a> for details.
+Release 3.14.11 adds MODBUS protocol support for newer APC UPSes. It also 
+includes digital signatures on the Windows USB driver and the Windows installer 
+package which should make installation on recent versions of Windows easier.
 <p>
-Apcupsd 3.14.10 is the latest stable release, containing many bug fixes and
+The MODBUS protocol gives access to advanced UPS features on newer UPSes that 
+previously only supported Microlink. A firmware upgrade may be required to 
+enable MODBUS support on some UPSes. 
+Please see the
+<a href="http://apcupsd.cvs.sourceforge.net/viewvc/*checkout*/apcupsd/apcupsd/ReleaseNotes?pathrev=Release-3_14_11">
+ReleaseNotes</a> for further details.
+<p>
+Apcupsd 3.14.11 is the latest stable release, containing many bug fixes and
 new features over previous releases. Users of all previous
 versions are encouraged to upgrade.
-<p>
-<h2>Do Not Purchase The Following UPSes</h2>
-Recently APC has begun shipping UPSes that utilize a new communication
-protocol called "Microlink". To date, APC has refused to release details of
-this protocol to the apcupsd team so that we can add support for it to
-apcupsd. <b>Consequently, the apcupsd team recommends you DO NOT purchase the
-following APC UPS models</b> (this list may be incomplete; please send any
-additions to the <a href="lists.html">apcupsd-users mailing list</a>):
-<ul>
-<li>SmartUPS SMX/SMT 750, 1000, 1500
-<li>SmartUPS RT 3000XL, 5000XL
-</ul>
-These UPSes have the following restrictions with respect to compatibility
-with apcupsd:
-<ul>
-<li>The serial (RS232) port <b>CANNOT</b> be used with apcupsd at all.
-<li>The USB port will work with apcupsd but will only convey very basic
-information such as on-battery/on-line and run time remaining. <b>Other readings
-such as voltage, frequency, etc. are not available.</b>
-</ul>
-If you already own one of these models:
-<ul>
-<li>You can purchase an AP9620 Legacy Communication Card from APC that will
-allow the UPS to communicate with apcupsd via USB or serial and this interface
-will contain more data than the native USB interface. <b>However, the "green
-energy" features of newer UPSes will NOT be accessible. Also, use of the AP9620
-may require a firmware upgrade to your UPS and the card is not compatible with
-all Microlink UPSes.</b> Contact APC to find out if this is an option for your UPS.
-<li>Alternatively you can purchase a Web/SNMP card from APC and utilize the SNMP
-or PCNET protocols with apcupsd. Again these protocols will provide more data
-than the native USB interface.
-<li><b>You should notify APC that you are unhappy</b> with their policy requiring
-you to purchase additional hardware in order to manage your UPS with open
-source tools such as apcupsd.
-</ul>
 <p>
 <h2><a href="manual/manual.html" target="_top">Online Manual</a> or a
 <a href="manual/manual.pdf" target="_top">PDF Version of
