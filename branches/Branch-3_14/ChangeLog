@@ -8,6 +8,30 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2014-01-31 10:44  adk0212
+
+	* ReleaseNotes, include/version.h:
+
+	Bump release date
+
+2014-01-31 10:43  adk0212
+
+	* ReleaseNotes:
+
+	Update ReleaseNotes for 3.14.11
+
+2014-01-31 10:33  adk0212
+
+	* platforms/mingw/winusb/install.txt:
+
+	Minor update to win32 USB driver installation notes
+
+2014-01-29 17:58  adk0212
+
+	* ChangeLog, include/version.h:
+
+	Final prep for 3.14.11
+
 2014-01-29 17:56  adk0212
 
 	* src/win32/installer/winapcupsd.nsi:
