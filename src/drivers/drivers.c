@@ -46,6 +46,10 @@
 # include "snmp/snmp.h"
 #endif
 
+#ifdef HAVE_SNMPLITE_DRIVER
+# include "snmplite/snmplite.h"
+#endif
+
 #ifdef HAVE_TEST_DRIVER
 # include "test/testdriver.h"
 #endif
@@ -54,115 +58,143 @@
 # include "pcnet/pcnet.h"
 #endif
 
-void attach_driver(UPSINFO *ups)
+#ifdef HAVE_MODBUS_DRIVER
+# include "modbus/modbus.h"
+#endif
+
+static const UPSDRIVER drivers[] = {
+#ifdef HAVE_DUMB_DRIVER
+   { "dumb",      DumbUpsDriver::Factory },
+#endif   /* HAVE_DUMB_DRIVER */
+
+#ifdef HAVE_APCSMART_DRIVER
+   { "apcsmart",  ApcSmartUpsDriver::Factory },
+#endif   /* HAVE_APCSMART_DRIVER */
+
+#ifdef HAVE_NET_DRIVER
+   { "net",       NetUpsDriver::Factory },
+#endif   /* HAVE_NET_DRIVER */
+
+#ifdef HAVE_USB_DRIVER
+   { "usb",       UsbUpsDriver::Factory },
+#endif   /* HAVE_USB_DRIVER */
+
+#ifdef HAVE_SNMP_DRIVER
+   { "snmp",      SnmpUpsDriver::Factory },
+#endif   /* HAVE_SNMP_DRIVER */
+
+#ifdef HAVE_SNMPLITE_DRIVER
+   { "snmplite",  SnmpLiteUpsDriver::Factory },
+#endif   /* HAVE_SNMPLITE_DRIVER */
+
+#ifdef HAVE_TEST_DRIVER
+   { "test",      TestUpsDriver::Factory },
+#endif   /* HAVE_TEST_DRIVER */
+
+#ifdef HAVE_PCNET_DRIVER
+   { "pcnet",     PcnetUpsDriver::Factory },
+#endif   /* HAVE_PCNET_DRIVER */
+
+#ifdef HAVE_MODBUS_DRIVER
+   { "modbus",    ModbusUpsDriver::Factory },
+#endif   /* HAVE_MODBUS_DRIVER */
+
+   /*
+    * The NULL driver: closes the drivers list.
+    */
+   { NULL,        NULL }
+};
+
+/*
+ * This is the glue between UPSDRIVER and UPSINFO.
+ * It returns an UPSDRIVER pointer that may be null if something
+ * went wrong.
+ */
+static UpsDriver *helper_attach_driver(UPSINFO *ups, const char *drvname)
 {
-   const char *driver_name = NULL;
+   int i;
 
    write_lock(ups);
 
-   /* Attach the correct driver. */
-   switch (ups->mode.type) {
+   Dmsg(99, "Looking for driver: %s\n", drvname);
+   ups->driver = NULL;
 
-   case BK:
-   case SHAREBASIC:
-   case DUMB_UPS:
-      driver_name = "dumb";
-#ifdef HAVE_DUMB_DRIVER
-      ups->driver = new DumbDriver(ups);
-#endif
-      break;
-
-   case BKPRO:
-   case VS:
-   case NBKPRO:
-   case SMART:
-   case MATRIX:
-   case SHARESMART:
-   case APCSMART_UPS:
-      driver_name = "apcsmart";
-#ifdef HAVE_APCSMART_DRIVER
-      ups->driver = new ApcSmartDriver(ups);
-#endif
-      break;
-
-   case USB_UPS:
-      driver_name = "usb";
-#if defined(HAVE_LINUX_USB)
-      ups->driver = new LinuxUsbDriver(ups);
-#elif defined(HAVE_GENERIC_USB)
-      ups->driver = new GenericUsbDriver(ups);
-#elif defined(HAVE_BSD_USB)
-      ups->driver = new BsdUsbDriver(ups);
-#endif
-
-      break;
-
-   case SNMP_UPS:
-      driver_name = "snmp";
-#ifdef HAVE_SNMP_DRIVER
-      ups->driver = new SnmpDriver(ups);
-#endif
-      break;
-
-   case TEST_UPS:
-      driver_name = "test";
-#ifdef HAVE_TEST_DRIVER
-      ups->driver = new TestDriver(ups);
-#endif
-      break;
-
-   case NETWORK_UPS:
-      driver_name = "net";
-#ifdef HAVE_NET_DRIVER
-      ups->driver = new NetDriver(ups);
-#endif
-      break;
-
-   case PCNET_UPS:
-      driver_name = "pcnet";
-#ifdef HAVE_PCNET_DRIVER
-      ups->driver = new PcnetDriver(ups);
-#endif
-      break;
-
-   default:
-   case NO_UPS:
-      driver_name = "[unknown]";
-      Dmsg1(000, "Warning: no UPS driver found (ups->mode.type=%d).\n",
-         ups->mode.type);
-      break;
+   for (i = 0; drivers[i].driver_name; i++) {
+      Dmsg(99, "Driver %s is configured.\n", drivers[i].driver_name);
+      if (strcasecmp(drivers[i].driver_name, drvname) == 0) {
+         ups->driver = drivers[i].factory(ups);
+         Dmsg(20, "Driver %s found and attached.\n", drivers[i].driver_name);
+         break;
+      }
    }
 
    if (!ups->driver) {
       printf("\nApcupsd driver %s not found.\n"
-             "The available apcupsd drivers are:\n", driver_name);
+             "The available apcupsd drivers are:\n", drvname);
 
-#ifdef HAVE_DUMB_DRIVER
-      printf("dumb\n");
-#endif
-#ifdef HAVE_APCSMART_DRIVER
-      printf("apcsmart\n");
-#endif
-#ifdef HAVE_USB_DRIVER
-      printf("usb\n");
-#endif
-#ifdef HAVE_SNMP_DRIVER
-      printf("snmp\n");
-#endif
-#ifdef HAVE_TEST_DRIVER
-      printf("test\n");
-#endif
-#ifdef HAVE_NET_DRIVER
-      printf("net\n");
-#endif
-#ifdef HAVE_PCNET_DRIVER
-      printf("pcnet\n");
-#endif
+      for (i = 0; drivers[i].driver_name; i++)
+         printf("%s\n", drivers[i].driver_name);
 
       printf("\n");
       printf("Most likely, you need to add --enable-%s "
-             "to your ./configure options.\n\n", driver_name);
+             "to your ./configure options.\n\n", drvname);
    }
 
    write_unlock(ups);
+
+   Dmsg(99, "Driver ptr=0x%x\n", ups->driver);
+   Dmsg(10, "Attached to driver: %s\n", drivers[i].driver_name);
+   return ups->driver;
+}
+
+UpsDriver *attach_driver(UPSINFO *ups)
+{
+   const char *driver_name = NULL;
+
+   /* Attach the correct driver. */
+   switch (ups->mode.type) {
+   case DUMB_UPS:
+      driver_name = "dumb";
+      break;
+
+   case APCSMART_UPS:
+      driver_name = "apcsmart";
+      break;
+
+   case USB_UPS:
+      driver_name = "usb";
+      break;
+
+   case SNMP_UPS:
+      driver_name = "snmp";
+      break;
+
+   case SNMPLITE_UPS:
+      driver_name = "snmplite";
+      break;
+
+   case TEST_UPS:
+      driver_name = "test";
+      break;
+
+   case NETWORK_UPS:
+      driver_name = "net";
+      break;
+
+   case PCNET_UPS:
+      driver_name = "pcnet";
+      break;
+
+   case MODBUS_UPS:
+      driver_name = "modbus";
+      break;
+
+   default:
+   case NO_UPS:
+      Dmsg(000, "Warning: no UPS driver found (ups->mode.type=%d).\n",
+         ups->mode.type);
+      break;
+   }
+
+   return driver_name ? helper_attach_driver(ups, driver_name) : NULL;
 }

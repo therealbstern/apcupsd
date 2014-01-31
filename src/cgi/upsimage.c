@@ -423,6 +423,10 @@ static void drawruntime (const char *upsrunts, const char *lowbatts)
 
 int main (int argc, char **argv)
 {
+#ifdef WIN32
+    setmode(fileno(stdout), O_BINARY);
+#endif
+
     (void) extractcgiargs();
 
     if (strcmp(mycmd, "upsload") == 0) {

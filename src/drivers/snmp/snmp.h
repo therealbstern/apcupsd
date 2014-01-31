@@ -50,64 +50,8 @@
 
 #include "powernet-mib.h"
 #include "rfc1628-mib.h"
-#include "drivers.h"
+
 #include <sys/param.h>   /* for MIN() */
-
-class SnmpDriver: public UpsDriver
-{
-public:
-
-   SnmpDriver(UPSINFO *ups) : UpsDriver(ups, "snmp") {}
-   virtual ~SnmpDriver() {}
-
-   // Subclasses must implement these methods
-   virtual bool Open();
-   virtual bool GetCapabilities();
-   virtual bool ReadVolatileData();
-   virtual bool ReadStaticData();
-   virtual bool CheckState();
-   virtual bool Close();
-
-   // We provide default do-nothing implementations
-   // for these methods since not all drivers need them.
-   virtual bool KillPower();
-
-private:
-
-   bool initialize_device_data();
-   bool powernet_check_comm_lost();
-
-   /* APC */
-   bool powernet_snmp_ups_get_capabilities();
-   bool powernet_snmp_ups_read_static_data();
-   bool powernet_snmp_ups_read_volatile_data();
-   bool powernet_snmp_ups_check_state();
-   bool powernet_snmp_kill_ups_power();
-   bool powernet_snmp_ups_open();
-   bool rfc_1628_check_alarms();
-
-   /* IETF */
-   bool rfc1628_snmp_ups_get_capabilities();
-   bool rfc1628_snmp_ups_read_static_data();
-   bool rfc1628_snmp_ups_read_volatile_data();
-   bool rfc1628_snmp_ups_check_state();
-   bool rfc1628_snmp_kill_ups_power();
-
-   static int powernet_snmp_callback(
-      int operation, snmp_session *session, 
-      int reqid, snmp_pdu *pdu, void *magic);
-
-   struct snmp_session _session;        /* snmp session struct */
-   char _device[MAXSTRING];             /* Copy of ups->device */
-   char *_peername;                     /* hostname|IP of peer */
-   unsigned short _remote_port;         /* Remote socket, usually 161 */
-   char *_DeviceVendor;                 /* Vendor (ex. APC|RFC) */
-   char *_community;                    /* Community name */
-   void *_MIB;                          /* Pointer to MIB data */
-   struct snmp_session *_trap_session;  /* snmp session for traps */
-   bool _trap_received;                 /* Have we seen a trap? */
-};
-
 
 /*
  * Copy a string from the SNMP library structure into the UPSINFO structure.
@@ -123,5 +67,55 @@ private:
          MIN(sizeof(_ups->dest), data->oid->_##oid##field##Length+1)); \
    }  \
    while(0)
+
+class SnmpUpsDriver: public UpsDriver
+{
+public:
+   SnmpUpsDriver(UPSINFO *ups);
+   virtual ~SnmpUpsDriver() {}
+
+   static UpsDriver *Factory(UPSINFO *ups)
+      { return new SnmpUpsDriver(ups); }
+
+   virtual bool get_capabilities();
+   virtual bool read_volatile_data();
+   virtual bool read_static_data();
+   virtual bool kill_power();
+   virtual bool check_state();
+   virtual bool Open();
+   virtual bool Close();
+
+private:
+
+   int initialize_device_data();
+
+   bool powernet_snmp_ups_get_capabilities();
+   bool powernet_snmp_ups_read_static_data();
+   bool powernet_snmp_ups_read_volatile_data();
+   bool powernet_snmp_ups_check_state();
+   bool powernet_snmp_kill_ups_power();
+   bool powernet_snmp_ups_open();
+   int powernet_check_comm_lost();
+   static int powernet_snmp_callback(
+      int operation, snmp_session *session, 
+      int reqid, snmp_pdu *pdu, void *magic);
+
+   bool rfc1628_snmp_ups_get_capabilities();
+   bool rfc1628_snmp_ups_read_static_data();
+   bool rfc1628_snmp_ups_read_volatile_data();
+   bool rfc1628_snmp_ups_check_state();
+   bool rfc1628_snmp_kill_ups_power();
+   int rfc_1628_check_alarms();
+
+   struct snmp_session _session;        /* snmp session struct */
+   char _device[MAXSTRING];             /* Copy of ups->device */
+   char *_peername;                     /* hostname|IP of peer */
+   unsigned short _remote_port;         /* Remote socket, usually 161 */
+   char *_DeviceVendor;                 /* Vendor (ex. APC|RFC) */
+   char *_community;                    /* Community name */
+   void *_mib;                          /* Pointer to MIB data */
+   struct snmp_session *_trap_session;  /* snmp session for traps */
+   bool _trap_received;                 /* Have we seen a trap? */
+};
 
 #endif   /* _SNMP_H */

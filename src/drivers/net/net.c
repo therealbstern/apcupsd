@@ -34,7 +34,7 @@
  * line, and if 1 returns only to first space (e.g. integers,
  * and floating point values.
  */
-const struct NetDriver::cmdtrans NetDriver::_cmdtrans[] =
+const NetUpsDriver::CmdTrans NetUpsDriver::cmdtrans[] =
 {
    {"battcap",    "BCHARGE",  1},
    {"battdate",   "BATTDATE", 1},
@@ -57,6 +57,9 @@ const struct NetDriver::cmdtrans NetDriver::_cmdtrans[] =
    {"mintimel",   "MINTIMEL", 1},
    {"model",      "MODEL",    0},
    {"nombattv",   "NOMBATTV", 1},
+   {"nominv",     "NOMINV",   1},
+   {"nomoutv",    "NOMOUTV",  1},
+   {"nompower",   "NOMPOWER", 1},
    {"outputfreq", "LINEFREQ", 1},
    {"outputv",    "OUTPUTV",  1},
    {"version",    "VERSION",  1},
@@ -77,7 +80,7 @@ const struct NetDriver::cmdtrans NetDriver::_cmdtrans[] =
 };
 
 /* Convert UPS response to enum */
-SelfTestResult NetDriver::decode_testresult(char* str)
+SelfTestResult NetUpsDriver::decode_testresult(char* str)
 {
    if (!strncmp(str, "OK", 2))
       return TEST_PASSED;
@@ -96,9 +99,9 @@ SelfTestResult NetDriver::decode_testresult(char* str)
 }
 
 /* Convert UPS response to enum */
-LastXferCause NetDriver::decode_lastxfer(char *str)
+LastXferCause NetUpsDriver::decode_lastxfer(char *str)
 {
-   Dmsg1(80, "Transfer reason: %s\n", str);
+   Dmsg(80, "Transfer reason: %s\n", str);
 
    if (!strcmp(str, "No transfers since turnon"))
       return XFER_NONE;
@@ -120,44 +123,21 @@ LastXferCause NetDriver::decode_lastxfer(char *str)
       return XFER_UNKNOWN;
 }
 
-/*
- * The remote server DEVICE entry in apcupsd.conf is
- * in the form:
- *
- * DEVICE hostname[:port]
- *
- */
-bool NetDriver::initialize_device_data()
+NetUpsDriver::NetUpsDriver(UPSINFO *ups) :
+   UpsDriver(ups),
+   _hostname(NULL),
+   _port(0),
+   _sockfd(-1),
+   _got_caps(false),
+   _got_static_data(false),
+   _last_fill_time(0),
+   _statlen(0),
+   _tlog(0),
+   _comm_err(false),
+   _comm_loss(false)
 {
-   char *cp;
-
-   astrncpy(_device, _ups->device, sizeof(_device));
-   astrncpy(_ups->master_name, _ups->device, sizeof(_ups->master_name));
-   astrncpy(_ups->upsclass.long_name, "Net Slave", sizeof(_ups->upsclass.long_name));
-
-   /* Now split the device. */
-   _hostname = _device;
-
-   cp = strchr(_device, ':');
-   if (cp) {
-      *cp = '\0';
-      cp++;
-      _port = atoi(cp);
-   } else {
-      /* use NIS port as default */
-      _port = _ups->statusport;
-   }
-
-   _statbuf[0] = 0;
-   _statlen = 0;
-   _comm_loss = false;
-   _got_static_data = false;
-   _got_caps = false;
-   _last_fill_time = 0;
-   _sockfd = -1;
-
-   Dmsg0(90, "Exit initialize_device_data\n");
-   return true;
+   memset(_device, 0, sizeof(_device));
+   memset(_statbuf, 0, sizeof(_statbuf));
 }
 
 /*
@@ -170,7 +150,7 @@ bool NetDriver::initialize_device_data()
  * Returns -1 if network problem
  *   answer has "N/A" if host is not available or network error
  */
-bool NetDriver::getupsvar(const char *request, char *answer, int anslen)
+bool NetUpsDriver::getupsvar(const char *request, char *answer, int anslen)
 {
    int i;
    const char *stat_match = NULL;
@@ -178,10 +158,10 @@ bool NetDriver::getupsvar(const char *request, char *answer, int anslen)
    int nfields = 0;
    char format[21];
 
-   for (i = 0; _cmdtrans[i].request; i++) {
-      if (!(strcmp(_cmdtrans[i].request, request))) {
-         stat_match = _cmdtrans[i].upskeyword;
-         nfields = _cmdtrans[i].nfields;
+   for (i = 0; cmdtrans[i].request; i++) {
+      if (!(strcmp(cmdtrans[i].request, request))) {
+         stat_match = cmdtrans[i].upskeyword;
+         nfields = cmdtrans[i].nfields;
       }
    }
 
@@ -200,20 +180,20 @@ bool NetDriver::getupsvar(const char *request, char *answer, int anslen)
             answer[i] = 0;
          }
          if (strcmp(answer, "N/A") == 0) {
-            return false;
+            return 0;
          }
-         Dmsg2(100, "Return 1 for getupsvar %s %s\n", request, answer);
+         Dmsg(100, "Return 1 for getupsvar %s %s\n", request, answer);
          return true;
       }
    } else {
-      Dmsg1(100, "Hey!!! No match in getupsvar for %s!\n", request);
+      Dmsg(100, "Hey!!! No match in getupsvar for %s!\n", request);
    }
 
    astrncpy(answer, "Not found", anslen);
    return false;
 }
 
-bool NetDriver::poll_ups()
+bool NetUpsDriver::poll_ups()
 {
    int n, stat = 1;
    char buf[1000];
@@ -221,42 +201,42 @@ bool NetDriver::poll_ups()
    _statbuf[0] = 0;
    _statlen = 0;
 
-   Dmsg2(20, "Opening connection to %s:%d\n", _hostname, _port);
+   Dmsg(20, "Opening connection to %s:%d\n", _hostname, _port);
    if ((_sockfd = net_open(_hostname, NULL, _port)) < 0) {
-      Dmsg0(90, "Exit poll_ups 0 comm lost\n");
+      Dmsg(90, "Exit poll_ups 0 comm lost\n");
       if (!_ups->is_commlost()) {
          _ups->set_commlost();
       }
-      return 0;
+      return false;
    }
 
    if (net_send(_sockfd, "status", 6) != 6) {
       net_close(_sockfd);
-      Dmsg0(90, "Exit poll_ups 0 no status flag\n");
+      Dmsg(90, "Exit poll_ups 0 no status flag\n");
       _ups->set_commlost();
-      return 0;
+      return false;
    }
 
-   Dmsg0(99, "===============\n");
+   Dmsg(99, "===============\n");
    while ((n = net_recv(_sockfd, buf, sizeof(buf) - 1)) > 0) {
       buf[n] = 0;
       astrncat(_statbuf, buf, sizeof(_statbuf));
-      Dmsg3(99, "Partial buf (%d, %d):\n%s", n, strlen(_statbuf), buf);
+      Dmsg(99, "Partial buf (%d, %d):\n%s", n, strlen(_statbuf), buf);
    }
-   Dmsg0(99, "===============\n");
+   Dmsg(99, "===============\n");
 
    if (n < 0) {
       stat = 0;
-      Dmsg0(90, "Exit poll_ups 0 bad stat net_recv\n");
+      Dmsg(90, "Exit poll_ups 0 bad stat net_recv\n");
       _ups->set_commlost();
    } else {
       _ups->clear_commlost();
    }
    net_close(_sockfd);
 
-   Dmsg1(99, "Buffer:\n%s\n", _statbuf);
+   Dmsg(99, "Buffer:\n%s\n", _statbuf);
    _statlen = strlen(_statbuf);
-   Dmsg1(90, "Exit poll_ups, stat=%d\n", stat);
+   Dmsg(90, "Exit poll_ups, stat=%d\n", stat);
    return stat;
 }
 
@@ -266,66 +246,64 @@ bool NetDriver::poll_ups()
  * Returns true if OK
  */
 #define SLEEP_TIME 2
-bool NetDriver::fill_status_buffer()
+bool NetUpsDriver::fill_status_buffer()
 {
    time_t now;
-   static time_t tlog = 0;
-   static bool comm_err = false;
 
    /* Poll or fill the buffer maximum one time per second */
    now = time(NULL);
    if ((now - _last_fill_time) < 2) {
-      Dmsg0(90, "Exit fill_status_buffer OK less than 2 sec\n");
+      Dmsg(90, "Exit fill_status_buffer OK less than 2 sec\n");
       return true;
    }
 
    if (!poll_ups()) {
       /* generate event once */
-      if (!comm_err) {
+      if (!_comm_err) {
          execute_command(_ups, ups_event[CMDCOMMFAILURE]);
-         comm_err = true;
+         _comm_err = true;
       }
 
       /* log every 10 minutes */
-      if (now - tlog >= 10 * 60) {
-         tlog = now;
+      if (now - _tlog >= 10 * 60) {
+         _tlog = now;
          log_event(_ups, event_msg[CMDCOMMFAILURE].level,
             event_msg[CMDCOMMFAILURE].msg);
       }
    } else {
-      if (comm_err) {
+      if (_comm_err) {
          generate_event(_ups, CMDCOMMOK);
-         tlog = 0;
-         comm_err = false;
+         _tlog = 0;
+         _comm_err = false;
       }
 
       _last_fill_time = now;
 
       if (!_got_caps)
-         GetCapabilities();
+         get_capabilities();
 
       if (_got_caps && !_got_static_data)
-         ReadStaticData();
+         read_static_data();
    }
 
-   return !comm_err;
+   return !_comm_err;
 }
 
-bool NetDriver::get_ups_status_flag(int fill)
+bool NetUpsDriver::get_ups_status_flag(int fill)
 {
    char answer[200];
-   bool stat = true;
+   int stat = 1;
    int32_t newStatus;              /* this really should be uint32_t! */
    int32_t masterStatus;           /* status from master */
 
    if (!_got_caps) {
-      GetCapabilities();
+      get_capabilities();
       if (!_got_caps)
          return false;
    }
 
    if (!_got_static_data) {
-      ReadStaticData();
+      read_static_data();
       if (!_got_static_data)
          return false;
    }
@@ -342,8 +320,8 @@ bool NetDriver::get_ups_status_flag(int fill)
    write_lock(_ups);
    answer[0] = 0;
    if (!getupsvar("status", answer, sizeof(answer))) {
-      Dmsg0(100, "HEY!!! Couldn't get status flag.\n");
-      stat = false;
+      Dmsg(100, "HEY!!! Couldn't get status flag.\n");
+      stat = 0;
       masterStatus = 0;
    } else {
       /*
@@ -369,12 +347,12 @@ bool NetDriver::get_ups_status_flag(int fill)
       _ups->Status |= newStatus;
    }
 
-   Dmsg2(100, "Got Status = %s 0x%x\n", answer, _ups->Status);
+   Dmsg(100, "Got Status = %s 0x%x\n", answer, _ups->Status);
 
    if (masterStatus & UPS_shutdown && !_ups->is_shut_remote()) {
       _ups->set_shut_remote();    /* if master is shutting down so do we */
       log_event(_ups, LOG_ERR, "Shutdown because NIS master is shutting down.");
-      Dmsg0(100, "Set SHUT_REMOTE because of master status.\n");
+      Dmsg(100, "Set SHUT_REMOTE because of master status.\n");
    }
 
    /*
@@ -388,7 +366,7 @@ bool NetDriver::get_ups_status_flag(int fill)
          _ups->set_shut_remote();
          log_event(_ups, LOG_ERR,
             "Shutdown because loss of comm with NIS master while on batteries.");
-         Dmsg0(100, "Set SHUT_REMOTE because of loss of comm on batteries.\n");
+         Dmsg(100, "Set SHUT_REMOTE because of loss of comm on batteries.\n");
       }
    } else {
       _comm_loss = 0;
@@ -398,9 +376,28 @@ bool NetDriver::get_ups_status_flag(int fill)
    return stat;
 }
 
-bool NetDriver::Open()
+
+bool NetUpsDriver::Open()
 {
-   initialize_device_data();
+   astrncpy(_device, _ups->device, sizeof(_device));
+   astrncpy(_ups->master_name, _ups->device, sizeof(_ups->master_name));
+   astrncpy(_ups->upsclass.long_name, "Net Slave", sizeof(_ups->upsclass.long_name));
+
+   /* Now split the device. */
+   _hostname = _device;
+
+   char *cp = strchr(_device, ':');
+   if (cp) {
+      *cp = '\0';
+      cp++;
+      _port = atoi(cp);
+   } else {
+      /* use NIS port as default */
+      _port = _ups->statusport;
+   }
+
+   _statbuf[0] = 0;
+   _statlen = 0;
 
    /* Fake core code. Will go away when _ups->fd is cleaned up. */
    _ups->fd = 1;
@@ -408,7 +405,7 @@ bool NetDriver::Open()
    return true;
 }
 
-bool NetDriver::Close()
+bool NetUpsDriver::Close()
 {
    /* Fake core code. Will go away when _ups->fd will be cleaned up. */
    _ups->fd = -1;
@@ -416,7 +413,7 @@ bool NetDriver::Close()
    return true;
 }
 
-bool NetDriver::GetCapabilities()
+bool NetUpsDriver::get_capabilities()
 {
    char answer[200];
 
@@ -443,6 +440,9 @@ bool NetDriver::GetCapabilities()
       _ups->UPS_Cap[CI_SERNO] = getupsvar("serialno", answer, sizeof(answer));
       _ups->UPS_Cap[CI_BATTDAT] = getupsvar("battdate", answer, sizeof(answer));
       _ups->UPS_Cap[CI_NOMBATTV] = getupsvar("nombattv", answer, sizeof(answer));
+      _ups->UPS_Cap[CI_NOMINV] = getupsvar("nominv", answer, sizeof(answer));
+      _ups->UPS_Cap[CI_NOMOUTV] = getupsvar("nomoutv", answer, sizeof(answer));
+      _ups->UPS_Cap[CI_NOMPOWER] = getupsvar("nompower", answer, sizeof(answer));
       _ups->UPS_Cap[CI_REVNO] = getupsvar("firmware", answer, sizeof(answer));
       _got_caps = true;
    } else {
@@ -453,13 +453,13 @@ bool NetDriver::GetCapabilities()
    return true;
 }
 
-bool NetDriver::CheckState()
+bool NetUpsDriver::check_state()
 {
    int sleep_time;
 
-   sleep_time = ups->wait_time;
+   sleep_time = _ups->wait_time;
 
-   Dmsg1(100, "Sleep %d secs.\n", sleep_time);
+   Dmsg(100, "Sleep %d secs.\n", sleep_time);
    sleep(sleep_time);
    get_ups_status_flag(1);
 
@@ -469,12 +469,12 @@ bool NetDriver::CheckState()
 #define GETVAR(ci,str) \
    (_ups->UPS_Cap[ci] && getupsvar(str, answer, sizeof(answer)))
 
-bool NetDriver::ReadVolatileData()
+bool NetUpsDriver::read_volatile_data()
 {
    char answer[200];
 
    if (!fill_status_buffer())
-      return false;
+      return 0;
 
    write_lock(_ups);
    _ups->set_slave();
@@ -541,7 +541,7 @@ bool NetDriver::ReadVolatileData()
    return true;
 }
 
-bool NetDriver::ReadStaticData()
+bool NetUpsDriver::read_static_data()
 {
    char answer[200];
 
@@ -554,8 +554,8 @@ bool NetDriver::ReadStaticData()
          log_event(_ups, LOG_ERR, "getupsvar: failed for \"upsname\".");
       }
       if (!getupsvar(
-            "model", _ups->mode.long_name, 
-            sizeof(_ups->mode.long_name))) {
+            "model", _ups->upsmodel, 
+            sizeof(_ups->upsmodel))) {
          log_event(_ups, LOG_ERR, "getupsvar: failed for \"model\".");
       }
       if (!getupsvar(
@@ -573,6 +573,15 @@ bool NetDriver::ReadStaticData()
       if (GETVAR(CI_NOMBATTV, "nombattv"))
          _ups->nombattv = atof(answer);
 
+      if (GETVAR(CI_NOMINV, "nominv"))
+         _ups->NomInputVoltage = (int)atof(answer);
+
+      if (GETVAR(CI_NOMOUTV, "nomoutv"))
+         _ups->NomOutputVoltage = (int)atof(answer);
+
+      if (GETVAR(CI_NOMPOWER, "nompower"))
+         _ups->NomPower = (int)atof(answer);
+
       if (GETVAR(CI_REVNO, "firmware"))
          astrncpy(_ups->firmrev, answer, sizeof(_ups->firmrev));
 
@@ -585,13 +594,13 @@ bool NetDriver::ReadStaticData()
    return true;
 }
 
-bool NetDriver::EntryPoint(int command, void *data)
+bool NetUpsDriver::entry_point(int command, void *data)
 {
    char answer[200];
 
    switch (command) {
    case DEVICE_CMD_CHECK_SELFTEST:
-      Dmsg0(80, "Checking self test.\n");
+      Dmsg(80, "Checking self test.\n");
       /*
        * XXX FIXME
        *
@@ -601,15 +610,15 @@ bool NetDriver::EntryPoint(int command, void *data)
       /* Reason for last transfer to batteries */
       if (GETVAR(CI_WHY_BATT, "lastxfer")) {
          _ups->lastxfer = decode_lastxfer(answer);
-         Dmsg1(80, "Transfer reason: %d\n", _ups->lastxfer);
+         Dmsg(80, "Transfer reason: %d\n", _ups->lastxfer);
 
-         /* See if this is a self test rather than power failure */
+         /* See if this is a self test rather than power false */
          if (_ups->lastxfer == XFER_SELFTEST) {
             /*
              * set Self Test start time
              */
             _ups->SelfTest = time(NULL);
-            Dmsg1(80, "Self Test time: %s", ctime(&_ups->SelfTest));
+            Dmsg(80, "Self Test time: %s", ctime(&_ups->SelfTest));
          }
       }
       break;

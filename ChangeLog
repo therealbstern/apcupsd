@@ -8,6 +8,3443 @@
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
 
+2014-01-31 10:44  adk0212
+
+	* ReleaseNotes, include/version.h:
+
+	Bump release date
+
+2014-01-31 10:43  adk0212
+
+	* ReleaseNotes:
+
+	Update ReleaseNotes for 3.14.11
+
+2014-01-31 10:33  adk0212
+
+	* platforms/mingw/winusb/install.txt:
+
+	Minor update to win32 USB driver installation notes
+
+2014-01-29 17:58  adk0212
+
+	* ChangeLog, include/version.h:
+
+	Final prep for 3.14.11
+
+2014-01-29 17:56  adk0212
+
+	* src/win32/installer/winapcupsd.nsi:
+
+	Add apcupsd.cat signature file to USB driver installation
+
+2014-01-29 17:54  adk0212
+
+	* platforms/mingw/winusb/: apcupsd.cat, apcupsd.inf:
+
+	Commit signed winusb driver courtesy of Jernej Simoncic
+	<jernej's-sflist@eternallybored.org>
+
+2013-11-20 19:14  adk0212
+
+	* ChangeLog:
+
+	Update ChangeLog for 3.14.11
+
+2013-11-20 19:13  adk0212
+
+	* include/version.h:
+
+	Update version info for 3.14.11 release
+
+2013-11-20 19:12  adk0212
+
+	* doc/apcupsd.conf.5:
+
+	Add modbus info to DEVICE section
+
+2013-11-20 19:08  adk0212
+
+	* doc/manual/: manual.html, manual.rst:
+
+	Add modbus information to the manual
+
+2013-11-20 18:28  adk0212
+
+	* src/drivers/modbus/: MPAO-99NQF6_R0_EN.pdf,
+	MPAO-99NQL2_R0_EN.pdf:
+
+	Update cached copy of AN176, add AN177, AN178
+
+2013-11-20 18:21  adk0212
+
+	* src/drivers/modbus/: mapping.cpp, mapping.h, modbus.cpp,
+	modbus.h:
+
+	Add pointers to relevant APC app notes in modbus driver source
+	files.
+
+2013-08-19 21:23  adk0212
+
+	* src/apctest.c:
+
+	Implement the modbus killpower test in apctest. Comment out the
+	other modbus tests that are not implemented (due to lack of MODBUS
+	mappings in the UPS for the relevant controls)
+
+2013-08-19 21:18  adk0212
+
+	* src/drivers/modbus/MPAO-98KJ7F_R0_EN.pdf:
+
+	Add current rev of App Note 176 (June 2013) describing the MODBUS
+	implementation on APC UPSes
+
+2013-08-05 10:05  adk0212
+
+	* configure, autoconf/config.h.in, autoconf/configure.in,
+	autoconf/variables.mak.in, doc/apcupsd.conf.5, include/extern.h,
+	include/struct.h, platforms/etc/apcupsd.conf.in,
+	platforms/mingw/apcupsd.conf.in, src/apctest.c,
+	src/drivers/Makefile, src/drivers/drivers.c,
+	src/drivers/modbus/Makefile, src/drivers/modbus/mapping.cpp,
+	src/drivers/modbus/mapping.h, src/drivers/modbus/modbus.cpp,
+	src/drivers/modbus/modbus.h, src/lib/apcconfig.c, src/lib/apclog.c,
+	src/win32/Makefile.in:
+
+	Initial rev of MODBUS support
+
+2013-04-18 21:12  adk0212
+
+	* src/win32/: apctray.cpp, balloonmgr.h, email.c, shutdown.c,
+	winevents.cpp, winmain.cpp, winservice.cpp, winstat.cpp, winups.h:
+
+	Build fixes for gcc-4.2.4
+
+2013-04-18 21:12  adk0212
+
+	* src/win32/build-win32-cross-tools:
+
+	Upgrade cross-tools to more recent versions gcc-4.2.4 (latest
+	version which is easily built on RHEL5 due to gmp and mpfr
+	dependencies) binutils-2.23.1 (latest) mingw-3.20 (latest, aside
+	from 3.20-2 which is buggy) w32api-3.17-2 (latest) nsis-2.46
+	(latest, unchanged)
+
+2013-02-18 19:25  adk0212
+
+	* src/apctest.c:
+
+	Add lock file creation to apctest main()
+
+2013-02-18 19:24  adk0212
+
+	* src/apcupsd.c:
+
+	Fix copy-paste error in main()
+
+2013-02-18 19:22  adk0212
+
+	* src/: apcupsd.c, device.c:
+
+	Remove redundant creation of lock file from setup_device(). Lock
+	file was already being created in main(). Change error message in
+	main() to match the one we are removing because it is more
+	informative.
+
+2013-02-18 19:18  adk0212
+
+	* include/defines.h, include/struct.h, src/device.c:
+
+	Get rid of UPS setup flag. This was a holdover from back when the
+	UPSINFO structure was held in sysv shmem.
+
+2013-02-11 10:21  adk0212
+
+	* include/amutex.h, include/defines.h, src/action.c, src/apcupsd.c,
+	src/device.c, src/options.c, src/smtp.c, src/drivers/drivers.c,
+	src/drivers/apcsmart/smart.c, src/drivers/net/net.c,
+	src/drivers/pcnet/pcnet.c, src/drivers/snmp/drv_powernet.c,
+	src/drivers/snmp/snmp.c, src/drivers/snmplite/apc-mib.cpp,
+	src/drivers/snmplite/mge-mib.cpp,
+	src/drivers/snmplite/rfc1628-mib.cpp,
+	src/drivers/snmplite/snmplite.cpp, src/drivers/usb/usb.c,
+	src/drivers/usb/bsd/bsd-usb.c, src/drivers/usb/bsd/hidutils.c,
+	src/drivers/usb/generic/generic-usb.c,
+	src/drivers/usb/generic/hidutils.c,
+	src/drivers/usb/linux/linux-usb.c, src/lib/apcconfig.c,
+	src/lib/apcexec.c, src/lib/apclog.c, src/lib/newups.c,
+	src/lib/sleep.c:
+
+	Use variadic macros for Dmsg since we pretty much require gcc at
+	this point
+
+2012-08-19 22:29  adk0212
+
+	* src/drivers/snmplite/: snmp.cpp, snmp.h, snmplite.cpp:
+
+	If SNMP trap catching cannot be enabled, log a warning and fall
+	back to polling instead of crashing.
+
+2012-08-19 22:07  adk0212
+
+	* src/drivers/usb/usb.c:
+
+	Revert notch/spike LASTXFER change; UPS reporting is too ambiguous.
+
+2012-08-17 15:53  adk0212
+
+	* platforms/mingw/winusb/install.txt:
+
+	Add info about disabling INF signature enforcement in Windows 8
+
+2012-08-10 13:40  adk0212
+
+	* src/drivers/usb/usb.c:
+
+	Recategorize notch/spike related LASTXFER values appropriately.
+
+2012-06-18 21:47  adk0212
+
+	* src/drivers/snmplite/snmplite.cpp:
+
+	Make MIB (vendor) name search case insensitive in snmplite driver
+
+2012-03-30 23:48  adk0212
+
+	* src/drivers/usb/: usb.c, usb.h, bsd/bsd-usb.c,
+	generic/generic-usb.c, linux/linux-usb.c:
+
+	Rename known_info -> _known_info
+
+2012-03-30 23:40  adk0212
+
+	* src/drivers/usb/bsd/: bsd-usb.c, bsd-usb.h:
+
+	Convert BSD USB driver to UpsDriver derivative
+
+2012-03-30 19:45  adk0212
+
+	* configure, autoconf/configure.in, include/drivers.h,
+	include/extern.h, include/struct.h, src/apctest.c, src/apcupsd.c,
+	src/drivers/drivers.c, src/drivers/apcsmart/apcsmart.h,
+	src/drivers/apcsmart/smart.c, src/drivers/apcsmart/smarteeprom.c,
+	src/drivers/apcsmart/smartoper.c,
+	src/drivers/apcsmart/smartsetup.c,
+	src/drivers/apcsmart/smartsetup2.c, src/drivers/dumb/dumb.h,
+	src/drivers/dumb/dumboper.c, src/drivers/dumb/dumbsetup.c,
+	src/drivers/net/net.c, src/drivers/net/net.h,
+	src/drivers/pcnet/pcnet.c, src/drivers/pcnet/pcnet.h,
+	src/drivers/snmp/drv_powernet.c, src/drivers/snmp/drv_rfc1628.c,
+	src/drivers/snmp/snmp.c, src/drivers/snmp/snmp.h,
+	src/drivers/snmplite/apc-mib.cpp, src/drivers/snmplite/mibs.h,
+	src/drivers/snmplite/rfc1628-mib.cpp,
+	src/drivers/snmplite/snmplite-common.h,
+	src/drivers/snmplite/snmplite.cpp, src/drivers/snmplite/snmplite.h,
+	src/drivers/test/testdriver.c, src/drivers/test/testdriver.h,
+	src/drivers/usb/usb.c, src/drivers/usb/usb.h,
+	src/drivers/usb/usb_common.h,
+	src/drivers/usb/generic/generic-usb.c,
+	src/drivers/usb/generic/generic-usb.h,
+	src/drivers/usb/linux/linux-usb.c,
+	src/drivers/usb/linux/linux-usb.h, src/win32/winusb.h:
+
+	Convert drivers to C++ classes derived from UpsDriver
+
+2012-03-26 20:48  adk0212
+
+	* src/drivers/apcsmart/smart.c:
+
+	Break out of getline() if read() returns an error
+
+2012-03-06 12:04  adk0212
+
+	* src/drivers/pcnet/pcnet.c:
+
+	Fix PCNET runtime remaining on Smart-UPS X and RT models.
+
+2012-03-04 22:40  adk0212
+
+	* src/drivers/pcnet/pcnet.c:
+
+	Add missing debug for REG2
+
+2012-01-26 21:23  adk0212
+
+	* platforms/mandrake/apcupsd.in:
+
+	Apply some Mandrake patches, thanks to David Walser
+	<luigiwalser@yahoo.com> -
+	http://svn.mandriva.com/svn/packages/cooker/apcupsd/current/SOURCES/apcupsd-3.10.16-staleusb.patch
+	-
+	http://svn.mandriva.com/svn/packages/cooker/apcupsd/current/SOURCES/apcupsd-3.14.4-mdv_conf.diff
+
+2011-12-09 10:23  adk0212
+
+	* src/reports.c:
+
+	Fix missing DATATIME report info for SNMPLITE_UPS
+
+2011-12-09 10:20  adk0212
+
+	* src/reports.c:
+
+	Fix missing DATATIME report info for PCNET UPSes. Contributed by
+	Dan Swartzendruber <dswartz@druber.com>.
+
+2011-11-21 22:05  adk0212
+
+	* autoconf/aclocal.m4:
+
+	Fix quoting around AC_LANG_PROGRAM to eliminate warning with
+	autoconf-2.68
+
+2011-11-21 22:03  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Fix failure to compile when libsupc++ is not available. Need to
+	link using g++ when not linking libsupc++. If linking with
+	libsupc++ use gcc to avoid gettting libstdc++ linked by default.
+	Fixes build on stock Mandriva 2011.
+
+2011-11-21 21:23  adk0212
+
+	* src/: apcnis.c, drivers/apcsmart/smart.c:
+
+	Remove set-but-unused variables pointed out by g++-4.6.1
+
+2011-11-21 13:23  adk0212
+
+	* doc/manual/: manual.html, manual.rst:
+
+	Fix smartups configuration example. "UPSTYPE smartups" should be
+	"UPSTYPE apcsmart". Reported by Moray Henderson
+	<moray.henderson@om.org>
+
+2011-11-10 08:06  adk0212
+
+	* src/drivers/snmplite/: apc-mib.cpp, rfc1628-mib.cpp, snmp.cpp,
+	snmp.h, snmplite.cpp:
+
+	Fix ability to detect SNMP GET failures by adding a 'valid' flag to
+	data variables. Flag is defaulted to false when a GET is performed
+	and set to true when valid data is assigned to the variable. This
+	allows the caller to know if any of the OIDs did not fetch
+	successfully.
+
+2011-11-09 22:58  adk0212
+
+	* src/drivers/snmplite/snmplite.cpp:
+
+	Tighten restriction to screen out bad CI_NOMBATTV. Add check for
+	invalid CI_BADBATTS.
+
+2011-11-09 15:12  adk0212
+
+	* src/action.c:
+
+	Fix handling of UPS calibration by adding a dedicated state for
+	when UPS is performing calibration.
+
+2011-11-09 15:10  adk0212
+
+	* src/drivers/snmplite/snmplite.cpp:
+
+	Fix self test detection in snmplite driver by implementing
+	snmplite_ups_entry_point() and adding support for
+	DEVICE_CMD_CHECK_SELFTEST
+
+2011-11-09 15:08  adk0212
+
+	* src/drivers/snmplite/apc-mib.cpp:
+
+	Add missing debug print for C_WHY_BATT
+
+2011-11-07 22:02  adk0212
+
+	* src/drivers/snmplite/snmplite.cpp:
+
+	Fix crash when snmplite_ups_open() fails due to SnmpEngine::Open()
+	failure.  We need to exit directly rather than returning failure
+	code since caller stupidly ignores the return code and will blindly
+	continue on.
+
+2011-11-07 21:58  adk0212
+
+	* src/drivers/snmplite/snmp.cpp:
+
+	Fix socket leaks on SnmpEngine::Open() failure paths
+
+2011-11-07 21:57  adk0212
+
+	* src/apcupsd.c:
+
+	Remove NLS textdomain call since NLS has been removed long ago.
+
+2011-11-07 21:36  adk0212
+
+	* src/device.c:
+
+	Strip unprintable characters from UPS model string. Pointed out by
+	Peter Henn <peter_henn@gmx.de> in the PCNET driver. Fix applied
+	globally since this issue could affect any driver.
+
+2011-11-07 21:23  adk0212
+
+	* doc/apcupsd.conf.5:
+
+	Fix compatibility with mdoc(7) on OpenBSDD. From Ingo Schwarze
+	<schwarze@openbsd.org> via Kirill Bychkov <yason@linklevel.net>.
+
+2011-10-14 23:41  adk0212
+
+	* platforms/: darwin/Info.plist, mingw/winusb/apcupsd.inf:
+
+	Add VID/PID for HP T1500 G3 UPS which is a rebadged APC unit
+
+2011-10-12 09:00  adk0212
+
+	* src/drivers/usb/: bsd/bsd-usb.c, generic/generic-usb.c:
+
+	Remove vendor check from BSD and Generic USB drivers. HP OEMed some
+	UPSes from APC so they are compatible with apcupsd in spite of
+	carrying an HP vendor id. We might as well try to talk to anything
+	a user connects. We will still fail if the required UPS application
+	collection is not found and that is a better indicator of potential
+	compatiblity.
+
+2011-10-02 09:51  fleetworks
+
+	* platforms/: contrib-rpm/build_rpm.sh, redhat/apcupsd.spec.in,
+	suse/apcupsd.spec.in:
+
+	Release 3.14.10
+
+2011-09-27 23:33  adk0212
+
+	* src/drivers/snmp/: drv_powernet.c, drv_rfc1628.c, snmp.c, snmp.h:
+
+	Fix compile issue with newer net-snmp on CentOS 6. 'MIB' is
+	apparently a macro now, so need to avoid using it.
+
+2011-09-26 08:56  adk0212
+
+	* src/drivers/snmplite/snmplite.cpp:
+
+	Filter out SNMP query results that have zero-length sequences. This
+	prevents a crash in the event that the SNMP request times out, as
+	it appears to do very occasionally on certain hardware. Thanks to
+	Lars Tauber <taeuber@bbaw.de> for reporting the issue and testing
+	the fix.
+
+2011-09-22 18:22  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Add list of UPSes to avoid
+
+2011-09-15 22:16  adk0212
+
+	* src/drivers/net/net.c:
+
+	Fix MODEL reporting
+
+2011-09-13 22:57  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Update home page for 3.14.10 release
+
+2011-09-13 22:34  adk0212
+
+	* ChangeLog, ReleaseNotes, include/version.h:
+
+	Prep for 3.14.10 release
+
+2011-09-02 15:17  adk0212
+
+	* platforms/: darwin/Info.plist, mingw/winusb/apcupsd.inf:
+
+	Add PID 5 for SMX750 (at least that's what mine uses). Also change
+	com.apple.kernel.iokit to com.apple.kpi.iokit in OS X plist as
+	suggested in an apple dev list posting. It's unclear this does
+	anything but it might help resolve issues with the kext not being
+	selected on certain systems.
+
+2011-09-02 11:44  adk0212
+
+	* src/win32/libusb-winusb-bridge.c:
+
+	Report proper error numbers, not just -1.
+
+2011-09-02 11:44  adk0212
+
+	* src/drivers/usb/: bsd/bsd-usb.c, generic/generic-usb.c,
+	linux/linux-usb.c:
+
+	Switch USB drivers to prefer FEATURE reports over INPUT reports.
+	This fixes issues with a number of newer UPS models where they
+	advertise INPUT reports but fail to send them when you query for
+	them. Also check report length when processing an interrupt report
+	and ignore it if the length is wrong. This fixes an issue where
+	some UPSes sporadically send truncated interrupt reports.
+
+2011-08-12 19:01  adk0212
+
+	* src/action.c:
+
+	Ignore transitions to battery because of calibration. This can
+	happen if user initiates calibration in apctest, then exits apctest
+	and starts apcupsd before the calibration has completed. In this
+	case we do not want to shut down the machine, so treat
+	onbattery+cal as not on battery at all.  Reported by Sergey
+	<a_s_y@sama.ru>.
+
+2011-08-05 16:31  adk0212
+
+	* src/drivers/: apcsmart/smart.c, pcnet/pcnet.c:
+
+	Use astrncpy instead of strncpy to avoid leaving strings without
+	NUL termination in the overflow case
+
+2011-08-05 16:30  adk0212
+
+	* include/struct.h:
+
+	Enlarge upsmodel buffer to handle longer model strings. Needed for
+	"Smart-UPS RT 5000 XL" as reported by Sergey <a_s_y@sama.ru>
+
+2011-08-05 16:29  adk0212
+
+	* include/extern.h:
+
+	Add missing function prototype
+
+2011-08-05 16:15  adk0212
+
+	* doc/manual/manual.html:
+
+	Regen manual for 3.14.9 release
+
+2011-08-05 16:14  adk0212
+
+	* examples/smartsim.c, include/defines.h,
+	src/drivers/apcsmart/smart.c, src/drivers/apcsmart/smartsetup2.c,
+	src/drivers/pcnet/pcnet.c, src/drivers/usb/usb.c,
+	src/lib/apcstatus.c:
+
+	Fix MODEL vs. APCMODEL confusion Remove APCMODEL, rename old MODEL
+	aka mode to DRIVER. Update apcsmart driver to put model string into
+	upsmodel field. Remove PCNET workaround for CI_UPSMODEL that is no
+	longer needed. Change USB driver to leave mode field alone.
+
+2011-08-04 19:19  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Add link to OS X binary for 3.14.9 now that it's been released
+
+2011-08-04 19:17  adk0212
+
+	* platforms/darwin/Makefile:
+
+	Work around PackageMaker bug that causes apcagent.app to be
+	relocated at install time in spite of --no-relocate flag
+
+2011-07-22 23:41  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Update web site for 3.14.9 release
+
+2011-07-22 12:27  adk0212
+
+	* ChangeLog, ReleaseNotes, include/version.h:
+
+	Prep for 3.14.9 release
+
+2011-05-19 18:55  adk0212
+
+	* platforms/etc/apcupsd.conf.in, src/drivers/pcnet/pcnet.c:
+
+	Add support for changing PCNET port in apcupsd.conf
+
+2011-05-15 19:07  adk0212
+
+	* platforms/darwin/Info.plist:
+
+	Add PIDs for AP9620 LCC
+
+2011-05-15 19:04  adk0212
+
+	* src/drivers/snmplite/snmplite.cpp:
+
+	Fix community probing, misc cleanup
+
+2011-01-06 10:24  adk0212
+
+	* doc/home-page/: bugs.html, index.html, index.wml, license.html,
+	lists.html, menu.inc, support.html, systems.html:
+
+	Fix download links on web site; sf.net change the page format again
+	so dl.php no longer works
+
+2010-09-17 08:44  adk0212
+
+	* src/lib/apcexec.c:
+
+	Change back so we no longer wait for threads to exit. This is
+	necessary because pthread_cancel on OS X does not interrupt
+	blocking calls, even those defined as cancellation points by SuSv3.
+	Argh. Someday we need to fix apcupsd thread shutdown correctly, but
+	for now this is no worse than before.
+
+2010-09-10 10:50  adk0212
+
+	* include/extern.h, src/apctest.c, src/apcupsd.c,
+	src/lib/apcexec.c, src/lib/apcsignal.c,
+	src/win32/compat/compat.cpp:
+
+	Rework signal handling to eliminate crashes and hangs. Old signal
+	handler was doing many things wrong: calling unsafe functions in
+	signal context, freeing memory before ensuring users were gone,
+	invoking functions that lock the UPSINFO mutex resulting in
+	deadlock if it's already locked, etc.  FIx all this by using a
+	signal handling thread waiting on sigwait() in place of raw
+	handler.
+
+2010-09-10 08:32  adk0212
+
+	* src/drivers/snmplite/snmp.cpp:
+
+	Use "iter->" instead of "(*iter)."
+
+2010-09-10 08:30  adk0212
+
+	* src/drivers/snmplite/: mge-mib.cpp, mge-oids.h:
+
+	Update MGE MIB handler for SNMP sequence support.  Contributed by
+	Lars Taeuber <taeuber@bbaw.de>
+
+2010-09-09 09:40  adk0212
+
+	* src/drivers/apcsmart/smartoper.c:
+
+	Fix shutdown command when utility power has been restored.
+	Contributed by Michal Soltys <soltys@ziu.info>
+
+2010-09-09 09:17  adk0212
+
+	* src/apctest.c:
+
+	Prevent apctest from locking up on UPSes that do not respond (at
+	all) to the 'a' command. Contributed by Michal Soltys
+	<soltys@ziu.info>
+
+2010-09-09 09:12  adk0212
+
+	* include/apc.h, include/apc_i18n.h, src/action.c, src/apcnis.c,
+	src/apctest.c, src/apcupsd.c, src/device.c, src/devicedbg.c,
+	src/options.c, src/reports.c, src/drivers/apcsmart/smarteeprom.c,
+	src/drivers/apcsmart/smartoper.c,
+	src/drivers/apcsmart/smartsetup.c, src/drivers/dumb/dumboper.c,
+	src/drivers/dumb/dumbsetup.c, src/drivers/pcnet/pcnet.c,
+	src/drivers/test/testdriver.c, src/drivers/usb/bsd/bsd-usb.c,
+	src/drivers/usb/generic/generic-usb.c,
+	src/drivers/usb/linux/linux-usb.c, src/gapcmon/eggtrayicon.c,
+	src/lib/apcconfig.c, src/lib/apcerror.c, src/lib/apcevents.c,
+	src/lib/apcexec.c, src/lib/asys.c, src/lib/newups.c,
+	src/win32/winservice.cpp:
+
+	Remove remaining NLS artifacts
+
+2010-09-08 19:25  adk0212
+
+	* include/struct.h, src/apctest.c, src/apcupsd.c, src/device.c,
+	src/reports.c, src/drivers/drivers.c, src/drivers/apcsmart/smart.c,
+	src/drivers/apcsmart/smartoper.c,
+	src/drivers/apcsmart/smartsetup.c, src/drivers/dumb/dumboper.c,
+	src/lib/apcconfig.c, src/lib/apcstatus.c:
+
+	Remove obsolete mode types and simplify cable vs. mode
+	disambiguation logic. UPSTYPE wins. UPSCABLE is only used for dumb
+	driver. Remove a bit of screwy BackUPS Pro and v/s logic that is
+	long obsolete.
+
+2010-09-08 19:23  adk0212
+
+	* doc/manual/smartprotocol.rst:
+
+	Minor update to K command
+
+2010-09-08 15:06  adk0212
+
+	* src/drivers/snmplite/rfc1628-mib.cpp:
+
+	Average LOADPCT across all lines rather than summing them since
+	mfgrs appear to not be adhering to the spec very closely.
+
+2010-09-08 14:44  adk0212
+
+	* src/drivers/snmplite/: apc-oids.h, rfc1628-oids.h, snmp.cpp:
+
+	Use GETNEXT instead of GET so OIDs no longer need trailing zero.
+
+2010-09-07 11:35  adk0212
+
+	* src/drivers/snmplite/: apc-oids.h, asn.cpp, asn.h,
+	rfc1628-mib.cpp, rfc1628-oids.h, snmp.cpp, snmp.h, snmplite.cpp:
+
+	Add support for fetching SNMP table columns as sequences and use it
+	in RFC1628 MIB support.
+
+2010-09-03 16:36  adk0212
+
+	* doc/manual/: manual.html, manual.rst:
+
+	Fix misformatted path due to missing back-tick
+
+2010-09-03 16:33  adk0212
+
+	* doc/manual/: manual.html, manual.rst:
+
+	Update manual for Ed Dondlinger's Windows email scripts
+
+2010-09-03 16:18  adk0212
+
+	* doc/manual/: manual.html, manual.rst:
+
+	More updates for new winusb driver
+
+2010-09-03 16:13  adk0212
+
+	* doc/manual/: manual.html, manual.rst:
+
+	Update supported OSes list...USB on x86_64 Windows is now
+	supported. USB on Win98/ME/2000 is no longer supported.
+
+2010-09-03 14:41  adk0212
+
+	* src/win32/Makefile.in:
+
+	Fix snmplite build on win32 by adding missing mge-mib
+
+2010-09-03 14:40  adk0212
+
+	* platforms/mingw/commfailure.vbs, platforms/mingw/offbattery.vbs,
+	platforms/mingw/onbattery.vbs, src/win32/installer/winapcupsd.nsi:
+
+	Add Windows email scripts and include them in win32 installs as
+	examples Contributed by Ed Dondlinger
+	<edondlinger@thepylegroup.com>
+
+2010-09-02 15:31  adk0212
+
+	* src/drivers/snmplite/rfc1628-mib.cpp:
+
+	Reorder cases so they are in numerical order
+
+2010-09-02 15:29  adk0212
+
+	* src/drivers/snmplite/rfc1628-mib.cpp:
+
+	Add missing break
+
+2010-09-02 15:26  adk0212
+
+	* src/drivers/snmplite/rfc1628-mib.cpp:
+
+	Minor correction to low battery logic: Depleted also counts as low.
+
+2010-09-02 15:05  adk0212
+
+	* src/drivers/snmplite/rfc1628-oids.h:
+
+	Missed a couple with table workaround
+
+2010-09-02 14:51  adk0212
+
+	* src/drivers/snmplite/rfc1628-oids.h:
+
+	Workaround for line in and line out data on RFC MIB. Blindly use
+	first index in table.
+
+2010-09-02 10:23  adk0212
+
+	* configure, autoconf/configure.in:
+
+	docutils appears to no longer include a rst2html wrapper for
+	rst2html.py.  Update configure accordingly.
+
+2010-09-02 10:22  adk0212
+
+	* autoconf/variables.mak.in:
+
+	Enable generation of footnotes at the bottom of the page in
+	rst2pdf.
+
+2010-09-02 09:26  adk0212
+
+	* doc/manual/: manual.html, manual.rst:
+
+	Update SNMP section
+
+2010-09-02 08:27  adk0212
+
+	* src/drivers/snmplite/: snmp.h, snmplite.cpp:
+
+	Add community probing
+
+2010-09-01 13:14  adk0212
+
+	* src/drivers/snmplite/snmplite.cpp:
+
+	Screen out LTRANS, HTRANS, NOMOUTV, NOMINV, NOMPOWER which are
+	reading zero via an RFC1628 Generex CS121 on a Newave Conceptpower
+	DPA UPS.
+
+2010-09-01 08:41  adk0212
+
+	* src/drivers/snmplite/snmplite.cpp:
+
+	Fix compile error on newer glibc. Passing a const for the first
+	argument of strstr() causes the return value to be const. This is
+	Correct (TM) but annoying in this case. So just cast away the
+	constness of the first arg.
+
+2010-08-31 19:17  adk0212
+
+	* src/drivers/snmplite/snmplite.cpp:
+
+	Remove unnecessary checks for NULL oid. Verify returned data type
+	matches expectation.
+
+2010-08-31 14:57  adk0212
+
+	* src/drivers/snmplite/: apc-mib.cpp, mge-mib.cpp, mibs.h,
+	rfc1628-mib.cpp, snmplite.cpp:
+
+	Remove strategy-specific probe hook. We don't need it now and
+	probably will never need it.
+
+2010-08-31 14:06  adk0212
+
+	* src/drivers/snmplite/: apc-mib.cpp, mge-mib.cpp, mibs.cpp,
+	mibs.h, rfc1628-mib.cpp, snmplite-common.h, snmplite.cpp:
+
+	Add support for MIB autodetection by probing for CI_STATUS OID.
+	Also rework NOTRAP handling to not require a special notrap
+	MibStrategy for each MIB.
+
+2010-08-30 14:41  adk0212
+
+	* src/drivers/snmplite/snmplite.cpp:
+
+	Allow user to omit one or more subsections of SNMP DEVICE string.
+	Contributed by Lars Täer <taeuber@bbaw.de>
+
+2010-08-30 14:18  adk0212
+
+	* src/drivers/snmplite/asn.cpp:
+
+	Fix typo. Contributed by Lars Täer <taeuber@bbaw.de>
+
+2010-08-30 14:18  adk0212
+
+	* src/drivers/snmplite/: mge-mib.cpp, mge-oids.h, mibs.cpp:
+
+	Add support for MGE SNMP MIB. Contributed by Lars Täer
+	<taeuber@bbaw.de>
+
+2010-08-20 20:34  adk0212
+
+	* doc/manual/maintaining_ups.rst:
+
+	Add SU1000INET battery constant
+
+2010-08-17 14:24  adk0212
+
+	* include/version.h:
+
+	Update for 3.14.9-test1 release
+
+2010-08-16 19:18  adk0212
+
+	* src/win32/Makefile.in:
+
+	Default to winusb driver
+
+2010-08-16 19:15  adk0212
+
+	* src/win32/Makefile.in:
+
+	Update for new files in snmplite
+
+2010-08-13 14:52  adk0212
+
+	* src/drivers/snmplite/rfc1628-mib.cpp:
+
+	Take another guess at RFC1628 killpower/shutdown based on
+	TrippLite's interpretation of upsAutoRestart.
+
+2010-08-13 14:40  adk0212
+
+	* src/drivers/snmplite/rfc1628-mib.cpp:
+
+	Attempt to implement shutdown/killpower for RFC1628 SNMP MIB. MIB
+	docs are somewhat unclear so this is a best guess.
+
+2010-08-13 14:02  adk0212
+
+	* src/drivers/snmplite/: mibs.h, mibs.cpp:
+
+	Add missing file.
+
+2010-08-13 14:00  adk0212
+
+	* src/drivers/snmplite/: apc-mib.cpp, rfc1628-mib.cpp,
+	snmplite-common.h, snmplite.cpp, snmplite.h:
+
+	Reorganize multiple MIB support. Vendor names are now associated
+	with MIB strategies directly. killpower and shutdown operations are
+	deferred to the strategy as is trap waiting. Other general cleanup.
+
+2010-07-30 18:04  adk0212
+
+	* src/drivers/snmplite/: apc-mib.cpp, apc-oids.h, mib.cpp, oids.h,
+	rfc1628-mib.cpp, rfc1628-oids.h, snmplite.cpp, snmplite.h:
+
+	Add support for RFC1628 SNMP MIB. Refactor APC MIB and create
+	MibStrategy struct for associating MIB/CI mapping with
+	corresponding processing function. RFC1628 strategy is coded per
+	the MIB but untested.
+
+2010-07-10 11:32  adk0212
+
+	* platforms/mingw/: apcupsd.inf, winusb/apcupsd.inf:
+
+	Update Windows *.inf files for LCC PIDs
+
+2010-05-16 18:11  adk0212
+
+	* src/apctest.c:
+
+	Remove unused variable shm_OK
+
+2010-05-16 18:09  adk0212
+
+	* src/win32/compat/compat.cpp:
+
+	When logging events, convert LOG_CRIT to a WARNING on Win32 rather
+	than an ERROR since apcupsd uses it for power events which aren't
+	really daemon errors. LOG_ERR is still converted to ERROR for use
+	in true error cases.
+
+2010-05-16 17:57  adk0212
+
+	* src/apcupsd.c:
+
+	Fix bug where pid file was overwritten even when lock file
+	indicates another instance is running. Now we only write the pid
+	file after writing the lock file successfully. Also automatically
+	remove pid file on termination if we created it in the first place.
+	Reported by Justin Killen <jkillen@allamericanasphalt.com>
+
+2010-04-29 19:25  adk0212
+
+	* src/win32/installer/winapcupsd.nsi:
+
+	When running uninstaller in silent mode, always remove config and
+	events files without prompting. Reported by Zdenek Jirous
+	<jirous@tmv.cz>
+
+2010-04-29 19:20  adk0212
+
+	* src/win32/installer/winapcupsd.nsi:
+
+	Honor INSTDIR specified on command line via /D.  Reported by Zdenek
+	Jirous <jirous@tmv.cz>
+
+2010-02-20 10:09  adk0212
+
+	* src/reports.c:
+
+	Variable largebuf may be overflowed by the buf data, which can
+	cause overwriting of subsequent variables.  I: Statement might be
+	overflowing a buffer in strncat. Common mistake:    BAD:
+	strncat(buffer,charptr,sizeof(buffer)) is wrong, it takes the left
+	over size as 3rd argument    GOOD:
+	strncat(buffer,charptr,sizeof(buffer)-strlen(buffer)-1) E: apcupsd
+	bufferoverflowstrncat reports.c:110 Reported by Stanislav Brabec
+	<sbrabec@suse.cz>
+
+2010-01-31 12:16  adk0212
+
+	* doc/manual/: manual.html, smartprotocol.rst:
+
+	Update SmartUPS protocol register 2 bit 5. This is supported on
+	SmartUPSes.
+
+2010-01-31 11:10  adk0212
+
+	* src/drivers/usb/: usb.c, usb_common.h, bsd/bsd-usb.c,
+	generic/generic-usb.c, linux/linux-usb.c:
+
+	Add missing handling for DALARM. Also PWSUM is a LOGICAL
+	collection, not a PYSICAL collection, so add support for checking
+	LOGICAL collection and update known_info table appropriately. This
+	fixes BATTV and MANDATE on certain newer APC models.
+
+2010-01-24 08:19  adk0212
+
+	* src/lib/apcstatus.c:
+
+	Remove unnecessary debug print
+
+2010-01-17 19:12  adk0212
+
+	* src/drivers/usb/generic/generic-usb.c:
+
+	When using generic-usb driver, interpret DEVICE setting as the
+	serial number of the UPS to monitor. This allows the user to
+	control which UPS is monitored if more than one is connected. A
+	blank DEVICE setting continues to mean autodetect.
+
+2010-01-17 13:58  adk0212
+
+	* configure:
+
+	Fix define
+
+2010-01-17 13:37  adk0212
+
+	* configure, autoconf/configure.in, src/lib/Makefile,
+	src/lib/libsupc++fix.cpp:
+
+	Add workaround for FreeBSD libsupc++.a issue (FreeBSD PR #99702)
+	This will allow snmplite driver to compile/link on FreeBSD 5.x
+
+2010-01-17 10:58  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Force use of generic_usb on FreeBSD 8.0 and higher. FreeBSD USB API
+	was changed in 8.0, so from now on we will use libusb.
+
+2010-01-17 10:38  adk0212
+
+	* src/drivers/snmplite/snmplite.cpp:
+
+	Fix compile warning
+
+2010-01-17 10:30  adk0212
+
+	* autoconf/configure.in:
+
+	Fix comment
+
+2010-01-17 10:29  adk0212
+
+	* configure, autoconf/configure.in:
+
+	If libusb-config is not found, fall back on a plain old
+	AC_CHECK_LIB. This will allow building against the new libusb-1.x
+	with compatibility API.
+
+2010-01-17 10:26  adk0212
+
+	* doc/manual/manual.html:
+
+	Regen manual for release
+
+2010-01-16 15:16  adk0212
+
+	* doc/home-page/: bugs.html, index.html, index.wml, license.html,
+	lists.html, menu.inc, support.html, systems.html:
+
+	Update for 3.14.8 release
+
+2010-01-16 11:09  adk0212
+
+	* ChangeLog, ReleaseNotes, include/version.h:
+
+	Prep for 3.14.8 release
+
+2010-01-16 11:01  adk0212
+
+	* doc/apctest.8:
+
+	Update apctest manpage for USB changes
+
+2010-01-16 10:19  adk0212
+
+	* src/win32/installer/winapcupsd.nsi:
+
+	Move winusb coinstallers to depkgs-win32 so they do not bloat the
+	source tree.
+
+2010-01-12 18:07  adk0212
+
+	* examples/: client.c, megaclient.c, newslave.c, smartsim.c,
+	upsapm.c:
+
+	Fix compiler warnings. Also remove whitespace at the end of lines.
+	Contributed by Andy O'Shaughnessy <andrewjoshaughnessy@gmail.com>
+
+2010-01-10 16:50  adk0212
+
+	* platforms/darwin/apcupsd-uninstall:
+
+	Remove apcagent application in darwin uninstall script
+
+2010-01-10 16:45  adk0212
+
+	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
+	suse/apcupsd.spec.in:
+
+	spec updates for new SNMP driver
+
+2010-01-10 16:44  adk0212
+
+	* src/win32/libusb-winusb-bridge.h:
+
+	Minor style changes
+
+2010-01-10 16:30  adk0212
+
+	* doc/manual/: manual.html, manual.rst:
+
+	Minor updates for SNMP. Also add gapcmon and apcagent configure
+	options.
+
+2010-01-10 15:32  adk0212
+
+	* src/win32/listview.cpp:
+
+	Fix bug that caused key/value columns to become mismatched if a row
+	was removed from the list.
+
+2010-01-10 15:14  adk0212
+
+	* src/drivers/snmplite/snmp.cpp:
+
+	Increase SNMP query timeout to prevent false failures when UPS is
+	being hit by two SNMP clients at once.
+
+2010-01-10 15:05  adk0212
+
+	* configure, autoconf/configure.in, platforms/etc/apcupsd.conf.in,
+	platforms/mingw/apcupsd.conf.in, src/lib/apcconfig.c:
+
+	Fix up SNMP driver selection. Config file "snmp" selects snmplite,
+	while old driver remains available as 'netsnmp'. Same for
+	./configure script.
+
+2010-01-10 15:02  adk0212
+
+	* include/defines.h:
+
+	Fix DALARM (depends on alarm timer setting from
+	upsAdvConfigAlarmTimer)
+
+2010-01-10 15:00  adk0212
+
+	* src/win32/installer/winapcupsd.nsi:
+
+	Improve warning message for USB driver install failure
+
+2010-01-10 14:59  adk0212
+
+	* src/drivers/snmplite/: mib.cpp, snmplite.cpp:
+
+	Fix DALARM (depends on alarm timer setting from
+	upsAdvConfigAlarmTimer)
+
+2010-01-10 12:59  adk0212
+
+	* platforms/mingw/winusb/install.txt:
+
+	Add a troubleshooting section describing that the common cause of
+	failure with "Error Code 10" is that the driver was installed on
+	the wrong device.
+
+2010-01-10 12:58  adk0212
+
+	* platforms/mingw/winusb/apcupsd.inf:
+
+	Add a driver version to assist with upgrading.
+
+2010-01-10 10:39  adk0212
+
+	* src/apctest.c:
+
+	Consolidate get/set USB options. Since all 'set' operations allow
+	you to bail out without changing anything, they also serve as
+	'get'.
+
+2010-01-10 10:29  adk0212
+
+	* include/defines.h, src/apctest.c, src/drivers/usb/usb.c:
+
+	Add apctest support for reading/setting self-test interval on USB.
+	Also show current setting in UPS status. Contributed by James
+	Belleau <jpbelleau@gmail.com>
+
+2010-01-10 10:02  adk0212
+
+	* src/apctest.c:
+
+	Use 'Q' to exit menus instead of the last number which is always
+	changing.  Contributed by James Belleau <jpbelleau@gmail.com>
+
+2010-01-09 13:35  adk0212
+
+	* src/win32/: Makefile.in, libusb-winusb-bridge.c,
+	libusb-winusb-bridge.h, winusb.h:
+
+	Consolidate win-usb driver back into generic-usb by writing a
+	simple libusb API adapter for winusb (libusb-winusb-bridge). This
+	eliminates the code duplication between win-usb and generic-usb.
+
+2010-01-08 19:23  adk0212
+
+	* src/win32/installer/winapcupsd.nsi:
+
+	Update detail text while waiting for apps to exit so user knows why
+	we're sitting here for a few seconds. Also skip apctray exit wait
+	if we've installed the main apcupsd package since that means we've
+	already ensured apctray is not running.
+
+2010-01-08 19:11  adk0212
+
+	* src/win32/installer/: DrvSetup.nsh, winapcupsd.nsi:
+
+	Update installer to automatically install WinUSB driver when
+	possible.
+
+2010-01-03 20:51  adk0212
+
+	* src/win32/installer/winapcupsd.nsi:
+
+	Win2k3 has an extra icon in shell32.dll which throws off the
+	numbering causing the manpages to have the wrong icon. Just use the
+	same icon for manpages and user manual.
+
+2010-01-03 20:19  adk0212
+
+	* src/win32/installer/winapcupsd.nsi:
+
+	Set icons for start menu shortcuts. For now, just use common icons
+	from shell32.dll.
+
+2010-01-03 17:02  adk0212
+
+	* src/win32/installer/winapcupsd.nsi:
+
+	Include driver install instructions text file
+
+2010-01-03 17:01  adk0212
+
+	* platforms/mingw/winusb/apcupsd.inf:
+
+	Cleanup INF naming, class, etc.
+
+2010-01-03 17:00  adk0212
+
+	* platforms/mingw/winusb/install.txt:
+
+	Initial rev of winusb driver install instructions.
+
+2010-01-03 13:08  adk0212
+
+	* src/win32/Makefile.in:
+
+	Update VERSION munging for resource script to accomodate version
+	strings with a -foo extension.
+
+2010-01-03 12:46  adk0212
+
+	* src/win32/Makefile.in:
+
+	Fix build order so libusb.h is created before it is needed.
+
+2010-01-03 12:33  adk0212
+
+	* src/win32/: Makefile.in, installer/winapcupsd.nsi:
+
+	Add support for building and installing WinUSB. Default remains as
+	generic-usb. To build for WinUSB set USBTYPE=winusb.
+
+2010-01-03 12:32  adk0212
+
+	* src/win32/installer/: StrReplace.nsh, util.nsh:
+
+	Move StrReplace to its own file. Remove unused version functions
+	now that we're using the built-in WinVer.nsh.
+
+2010-01-03 12:27  adk0212
+
+	* src/win32/build-win32-cross-tools:
+
+	Enable building the NSIS System plugin.
+
+2010-01-03 10:29  adk0212
+
+	* platforms/mingw/winusb/apcupsd.inf:
+
+	WinUsb-based INF file customized for APCUPSD and driver
+	coinstallers from Win7 DDK.
+
+2010-01-02 16:28  adk0212
+
+	* src/drivers/snmp/drv_powernet.c:
+
+	Revert previous change: Locks are already held by snmp.c wrapper
+	funcs.
+
+2010-01-02 14:58  adk0212
+
+	* src/win32/installer/winapcupsd.nsi:
+
+	Remove old non-txt files so they do not get stuck around after an
+	install-in-place.
+
+2010-01-02 14:50  adk0212
+
+	* platforms/mingw/apcupsd.conf.in, src/win32/Makefile.in,
+	src/win32/installer/winapcupsd.nsi:
+
+	Convert win32 config and doc files to DOS line endings so they can
+	be viewed and edited in notepad. This is necessary because the
+	workaround of using write.exe for UNIX format files does not work
+	well on Win7 due to it using wide margins that unpleasantly
+	word-wraps all the text. Use a *.txt extension on filenames where
+	possible and use default 'open' behavior so if user has configured
+	an alternate editor for *.txt it will be used.
+
+2010-01-02 14:47  adk0212
+
+	* src/win32/build-win32-cross-tools:
+
+	Update to nsis-2.46 and w32api-3.14
+
+2010-01-02 13:42  adk0212
+
+	* src/win32/installer/: common.nsh, winapcupsd.nsi:
+
+	Update installer to use /kill switch to shutdown apps again. This
+	will provide more reliable shutdowns, especially on Vista/Win7
+	where apcupsd service is running in another session and therefore
+	is inaccessible by the window message mechanism. Remove old window
+	message based shutdown logic.
+
+2010-01-01 12:02  adk0212
+
+	* src/drivers/snmplite/: snmp.cpp, snmp.h, snmplite.cpp:
+
+	Add support for APC_NOTRAP vendor which disabled trap catching.
+
+2010-01-01 11:41  adk0212
+
+	* src/drivers/snmp/drv_powernet.c:
+
+	Hold the write lock while updating UPSINFO state variables. This is
+	necessary to prevent NIS clients from seeing partially-updated
+	state.
+
+2010-01-01 11:13  adk0212
+
+	* platforms/mingw/apccontrol.bat:
+
+	Only do popups on Win95/98/ME/NT. Newer OSes will run apctray which
+	shows events in a balloon notification.
+
+2010-01-01 11:12  adk0212
+
+	* src/win32/apctray.cpp:
+
+	Bring back /kill support. Registry change detection no longer
+	needed.
+
+2010-01-01 11:11  adk0212
+
+	* src/win32/popup.c:
+
+	Remove conditionals; always display a popup.
+
+2009-11-21 12:34  adk0212
+
+	* doc/home-page/dl.php:
+
+	Center date field now that sf.net is not reporting time info.
+
+2009-11-21 12:32  adk0212
+
+	* doc/home-page/dl.php:
+
+	Fix issue with displaying DMG .sig info for 3.14.7 source code
+	link.  Something at the top of the source is messing up the regexp,
+	but can't figure out exactly what. So just chop off the top of the
+	page completely.  We only want the data in the All Files section
+	anyway.
+
+2009-11-15 12:56  adk0212
+
+	* doc/images/: Makefile, apcupsd-logo.eps, apcupsd.eps, back.eps,
+	back.png, charging.eps, commlost.eps, home.eps, home.png,
+	image_convert.pl, image_scales, img1.eps, img1.png, img10.eps,
+	img10.png, img11.eps, img11.png, img12.eps, img12.png, img13.eps,
+	img13.png, img14.eps, img14.png, img2.eps, img2.png, img3.eps,
+	img3.png, img4.eps, img4.png, img5.eps, img5.png, img6.eps,
+	img6.png, img7.eps, img7.png, img8.eps, img8.png, img9.eps,
+	img9.png, main_configs.eps, multimon.eps, next.eps, next.png,
+	onbatt.eps, online.eps, status.eps, thanks.eps, wininstall1.eps,
+	wininstall1.png, wininstall2.eps, wininstall2.png, wininstall3.eps,
+	wininstall3.png, wininstall4.eps, wininstall4.png, wininstall5.eps,
+	wininstall5.png, wininstall6.eps, wininstall7.eps, wininstall7.png:
+
+	Remove obsolete image files.
+
+2009-11-15 10:05  adk0212
+
+	* doc/home-page/dl.php:
+
+	Update for change in sf.net HTML (data format changed)
+
+2009-11-15 09:18  adk0212
+
+	* src/drivers/usb/usb.c:
+
+	Add support for reading battery voltage from the PowerSummary
+	instead of the Battery physical usage. At least one Back-UPS model
+	appears to place its battery readout there instead of the normal
+	place.	Back-UPS 500 FW: 6.3.I USB FW: c1
+
+2009-11-09 21:19  adk0212
+
+	* src/smtp.c:
+
+	Fix timezone on Windows. This has always been wrong.
+
+2009-11-09 21:05  adk0212
+
+	* include/extern.h, src/lib/apclog.c, src/lib/apcstatus.c:
+
+	Switch time/date output format to simplified ISO "YYYY-MM-DD
+	HH:MM:SS +/-UTC"
+
+2009-11-09 21:03  adk0212
+
+	* src/lib/autil.cpp:
+
+	Fix compile error.
+
+2009-10-31 11:32  adk0212
+
+	* include/aiter.h, include/alist.h, include/amap.h,
+	include/amutex.h, include/aqueue.h, include/astring.h,
+	include/athread.h, include/atimer.h, include/autil.h,
+	src/lib/amutex.cpp, src/lib/astring.cpp, src/lib/athread.cpp,
+	src/lib/atimer.cpp, src/lib/autil.cpp:
+
+	Sync alib with gelogger project
+
+2009-10-31 10:04  adk0212
+
+	* src/drivers/usb/bsd/hidutils.c:
+
+	Fix compile warning
+
+2009-10-31 09:59  adk0212
+
+	* src/drivers/snmplite/snmplite.cpp:
+
+	Fix compile warning
+
+2009-10-31 09:31  adk0212
+
+	* include/apc.h, src/drivers/snmplite/snmp.cpp,
+	src/lib/apclibnis.c:
+
+	Move INADDR_NONE define to common header
+
+2009-10-31 09:28  adk0212
+
+	* src/: drivers/snmplite/snmp.cpp, lib/apclibnis.c:
+
+	Fix signed/unsigned comparison warning
+
+2009-10-31 09:24  adk0212
+
+	* src/drivers/snmplite/snmp.cpp:
+
+	Fix compile error on Solaris 10
+
+2009-10-31 08:55  adk0212
+
+	* src/win32/Makefile.in:
+
+	win32 build fixes
+
+2009-10-31 08:42  adk0212
+
+	* src/lib/apclibnis.c:
+
+	Fix comment
+
+2009-10-31 08:37  adk0212
+
+	* src/lib/apclibnis.c:
+
+	Switch libnis to thread-safe gethostname_re()
+
+2009-10-27 20:31  adk0212
+
+	* src/win32/: Makefile.in, compat/winconfig.h:
+
+	Updates so win32 will build with gethostbyname_r
+
+2009-10-27 20:24  adk0212
+
+	* configure, autoconf/config.h.in, autoconf/configure.in,
+	include/extern.h, src/drivers/snmplite/snmp.cpp,
+	src/drivers/snmplite/snmp.h, src/lib/Makefile,
+	src/lib/gethostname.c:
+
+	Switch SnmpEngine to thread-safe resolver, gethostbyname_r()
+
+2009-10-27 19:28  adk0212
+
+	* src/drivers/snmplite/: asn.cpp, asn.h, snmp.cpp, snmp.h:
+
+	Misc cleanup
+
+2009-10-27 19:19  adk0212
+
+	* src/drivers/snmplite/: asn.cpp, asn.h, snmp.cpp, snmp.h:
+
+	Make lengths universally unsigned
+
+2009-10-27 19:11  adk0212
+
+	* src/drivers/snmplite/: asn.cpp, asn.h:
+
+	Add ability to calculate marshalled size of each data type without
+	actually marshalling the data. This allows Sequence to precalculate
+	its size which in turn allows us to encode length fields in the
+	minimum possible number of octets instead of always using 4. This
+	reduces packet size substantially.
+
+2009-10-26 19:37  adk0212
+
+	* src/drivers/snmplite/traps.h:
+
+	Definitions for APC UPS traps. Not used yet, but may be handy
+	someday.
+
+2009-10-26 19:36  adk0212
+
+	* src/drivers/snmplite/asn.h:
+
+	Spacing changes
+
+2009-10-26 19:36  adk0212
+
+	* src/drivers/snmplite/: snmp.cpp, snmp.h, snmplite.cpp:
+
+	Add support for SNMP trap catching
+
+2009-10-25 21:30  adk0212
+
+	* src/drivers/snmplite/asn.h:
+
+	Toy with spacing
+
+2009-10-25 21:07  adk0212
+
+	* src/: device.c, drivers/drivers.c, drivers/snmplite/mib.cpp,
+	drivers/snmplite/snmplite.cpp, drivers/snmplite/snmplite.h:
+
+	Add snmplite support for shutdown and killpower
+
+2009-10-25 21:07  adk0212
+
+	* src/drivers/snmplite/: asn.h, snmp.cpp, snmp.h:
+
+	Add SET command support to SnmpEngine and support classes
+
+2009-10-25 18:00  adk0212
+
+	* src/drivers/snmplite/snmplite.cpp:
+
+	Update comments
+
+2009-10-25 17:48  adk0212
+
+	* src/lib/apcstatus.c:
+
+	Add units to ambient humidity and temp status lines
+
+2009-10-25 17:45  adk0212
+
+	* src/drivers/snmplite/snmplite.cpp:
+
+	Remove sanity filter on ambient temp and humidity readings. These
+	both read zero if your MeasureUPS probe is not connected, so we
+	don't want to exclude them in that case.
+
+2009-10-25 17:37  adk0212
+
+	* src/drivers/snmplite/snmplite.cpp:
+
+	Add support for detecting and recovering from network errors
+
+2009-10-25 16:47  adk0212
+
+	* src/drivers/snmplite/: asn.cpp, asn.h:
+
+	Misc cleanup
+
+2009-10-25 16:31  adk0212
+
+	* include/version.h:
+
+	Bump version string
+
+2009-10-25 15:56  adk0212
+
+	* src/apcagent/InstanceManager.m:
+
+	Reorder function
+
+2009-10-25 15:53  adk0212
+
+	* src/drivers/snmplite/: mib.cpp, oids.h:
+
+	Spit OID arrays out into their own file so they're not cluttering
+	mib.cpp.  Also wrap gcc-specific attribute.
+
+2009-10-25 15:41  adk0212
+
+	* src/win32/Makefile.in:
+
+	Add snmplite driver to win32 build
+
+2009-10-25 15:41  adk0212
+
+	* src/drivers/snmplite/: asn.cpp, mib.cpp, snmp.cpp, snmp.h:
+
+	Minor changes so snmplite can build for win32
+
+2009-10-25 15:28  adk0212
+
+	* src/drivers/snmplite/: mib.cpp, snmplite.cpp:
+
+	Update MIB map with more CIs from old powernet driver.
+
+2009-10-25 14:48  adk0212
+
+	* include/defines.h, src/drivers/snmplite/snmplite.cpp:
+
+	Updates for compatibility with old AP960x SNMP cards.
+
+2009-10-25 12:14  adk0212
+
+	* src/drivers/snmplite/snmp.cpp:
+
+	Remove some debug
+
+2009-10-25 11:54  adk0212
+
+	* src/drivers/snmplite/: asn.cpp, asn.h, snmp.cpp, snmp.h:
+
+	Rearrange ASN types. Although it seems like a good idea to have a
+	strict separation between ASN and SNMP such that the ASN layer is
+	not polluted with SNMP types, this isn't working very well in
+	practice. So teach ASN about the basic SNMP types and get rid of
+	the Snmp::PduType.
+
+2009-10-25 11:03  adk0212
+
+	* configure, autoconf/config.h.in, autoconf/configure.in,
+	autoconf/variables.mak.in, include/struct.h,
+	platforms/etc/apcupsd.conf.in, src/drivers/Makefile,
+	src/drivers/drivers.c, src/drivers/snmplite/Makefile,
+	src/drivers/snmplite/asn.cpp, src/drivers/snmplite/asn.h,
+	src/drivers/snmplite/mib.cpp, src/drivers/snmplite/snmp.cpp,
+	src/drivers/snmplite/snmp.h, src/drivers/snmplite/snmplite.cpp,
+	src/drivers/snmplite/snmplite.h, src/lib/apcconfig.c,
+	src/lib/apcstatus.c:
+
+	Add SNMP Lite driver which does not depend on net-snmp library.
+	This makes it more portable and eliminates need to move libsnmp.so
+	to /lib in order to do a killpower on systems where /usr is
+	unmounted.
+
+2009-10-25 10:58  adk0212
+
+	* include/alist.h:
+
+	Make size unsigned
+
+2009-10-24 15:41  adk0212
+
+	* include/aarray.h:
+
+	Simple (and inefficient) dynamic array template class
+
+2009-10-24 10:04  adk0212
+
+	* platforms/darwin/Makefile:
+
+	Force use of HFS+ rather than HFSX (case-sensitive HFS+) so 10.5+
+	will open the image without crying about it.
+
+2009-10-15 20:46  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Revert snmp static lib change. This is too incompatible. Solaris
+	only has static versions of libnetsnmp but not libcrypto. Darwin
+	doesn't seem to have static versions of either of them.
+
+2009-10-15 18:42  adk0212
+
+	* autoconf/configure.in, configure:
+
+	Link with static snmp libs since some platforms do not have the
+	shared ones in /lib. Contributed by Brad King
+	<brad.king@kitware.com> via Debian bugtracker.
+	http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=316932
+
+2009-10-15 18:13  adk0212
+
+	* platforms/apccontrol.in:
+
+	Merge WALL fix from Justin T Pryzby
+	<justinpryzby@users.sourceforge.net>
+	http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=546019
+
+2009-10-14 19:14  adk0212
+
+	* src/apcagent/MainMenu.xib:
+
+	Update status window control layout to match apctray
+
+2009-10-12 19:22  adk0212
+
+	* src/win32/Makefile.in:
+
+	Lowercase $(COMMA)
+
+2009-10-12 19:15  adk0212
+
+	* src/win32/: Makefile.in, winres.rc:
+
+	Patch version info into resource file on the fly
+
+2009-10-12 18:53  adk0212
+
+	* src/win32/winres.rc:
+
+	Set operating system field correctly
+
+2009-10-12 18:50  adk0212
+
+	* src/win32/winres.rc:
+
+	Update file information block. Still not sure what to do about
+	version info
+
+2009-10-12 18:35  adk0212
+
+	* src/win32/: balloonmgr.cpp, balloonmgr.h, winabout.cpp,
+	winabout.h, winconfig.cpp, winconfig.h, winevents.cpp, winevents.h,
+	winstat.cpp, winstat.h, wintray.cpp, wintray.h:
+
+	Convert all member variable names to leading underscore convention
+
+2009-10-12 18:27  adk0212
+
+	* src/apcagent/: AppController.h, AppController.m:
+
+	Update for StatMgr::GetAll() changes
+
+2009-10-12 18:17  adk0212
+
+	* include/statmgr.h, src/lib/statmgr.cpp, src/win32/winstat.cpp:
+
+	Change StatMgr::GetAll() to return keys and values separately
+	instead of combining them into a single string which the caller
+	then has to split.
+
+2009-10-12 18:09  adk0212
+
+	* src/win32/: listview.cpp, listview.h, winevents.cpp, winstat.cpp:
+
+	Consolidate listview update code into ListView wrapper class.
+
+2009-10-12 17:43  adk0212
+
+	* src/win32/: apctray.cpp, winevents.cpp, winevents.h, winstat.cpp,
+	winstat.h, wintray.cpp, wintray.h:
+
+	Fix issue with events and status dialogs not updating until the
+	next poll thread tick. Kicking the poll thread inline with window
+	creation does not work since new window is not yet fully created
+	(WM_INITDIALOG has not been processed yet). Fix is to have status
+	and events dialogs request a refresh when WM_INITDIALOG arrives.
+
+2009-10-11 18:51  adk0212
+
+	* src/win32/wintray.cpp:
+
+	Minor cleanup
+
+2009-10-11 18:33  adk0212
+
+	* src/win32/: instmgr.cpp, instmgr.h, resource.h, winres.rc,
+	wintray.cpp, wintray.h:
+
+	Add menu item for controlling autostart
+
+2009-10-11 15:21  adk0212
+
+	* src/win32/: resource.h, winevents.cpp, winevents.h, winres.rc,
+	winstat.cpp, winstat.h, wintray.cpp:
+
+	Change events and status dialogs to not use cached statmgr since it
+	will be replaced when user changes config. Update events window to
+	use listview and have resize capability.
+
+2009-10-11 13:04  adk0212
+
+	* src/win32/: wintray.cpp, wintray.h:
+
+	Move reconfig to poll thread so UI is not held up when applying a
+	new config. This is in line with what the OS X apcagent does.
+
+2009-10-11 12:41  adk0212
+
+	* src/win32/: apctray.cpp, wintray.cpp, wintray.h:
+
+	Fix redrawing icons when explorer restarts with new taskbar
+
+2009-10-11 12:15  adk0212
+
+	* src/win32/instmgr.cpp:
+
+	Minor cleanup
+
+2009-10-11 12:15  adk0212
+
+	* src/lib/statmgr.cpp:
+
+	Rework network error handling so Update() only retries on soft
+	errors, not hard errors. This helps minimize the length of time a
+	given monitor will ignore UI events when it is unable to connect to
+	an apcupsd.
+
+2009-10-11 12:12  adk0212
+
+	* src/win32/wintray.cpp:
+
+	Fix thread hang by lengthening thread exit wait to accomodate worst
+	case
+
+2009-10-11 12:12  adk0212
+
+	* src/win32/winres.rc:
+
+	Move runtime field onto same line as status and shrink dialog to
+	match
+
+2009-10-10 13:39  adk0212
+
+	* src/win32/: winabout.cpp, winres.rc, resource.h:
+
+	About box updates: Remove old logo, fix version/date info, update
+	copyright
+
+2009-10-10 11:56  adk0212
+
+	* src/win32/winconfig.cpp:
+
+	Set focus to first invalid control
+
+2009-10-10 11:55  adk0212
+
+	* src/win32/winres.rc:
+
+	Restrict port and refresh fields to digits only
+
+2009-10-10 11:42  adk0212
+
+	* src/win32/: instmgr.cpp, instmgr.h, winconfig.cpp, winconfig.h,
+	wintray.cpp:
+
+	Add support for disabling popups. Other misc cleanup.
+
+2009-10-08 18:59  adk0212
+
+	* src/win32/: winconfig.cpp, winconfig.h, wintray.cpp, wintray.h:
+
+	Fixes for config dialog. Implement basic input validation.
+
+2009-10-08 18:05  adk0212
+
+	* src/win32/winstat.cpp:
+
+	Fix row deletion bug when number of items decreases
+
+2009-10-07 20:36  adk0212
+
+	* src/win32/: winconfig.cpp, winconfig.h:
+
+	First pass at config dialog
+
+2009-10-07 20:36  adk0212
+
+	* src/win32/: Makefile.in, apctray.cpp, instmgr.cpp, instmgr.h,
+	winabout.cpp, winabout.h, winevents.cpp, winevents.h, winstat.cpp,
+	winstat.h, wintray.cpp, wintray.h:
+
+	First pass at configuration dialog.
+
+2009-10-07 19:10  adk0212
+
+	* src/win32/: apctray.cpp, instmgr.cpp, instmgr.h, resource.h,
+	winres.rc, wintray.cpp, wintray.h, winups.h:
+
+	Multiple instances working again now. New 'add' menu option to add
+	a new monitor. Rearrange menu items to match OS X. Lots of code
+	cleanup.
+
+2009-10-07 19:08  adk0212
+
+	* include/alist.h:
+
+	Add support for operator->() on iterator
+
+2009-10-07 08:02  adk0212
+
+	* src/win32/: Makefile.in, apctray.cpp, instmgr.cpp, instmgr.h,
+	listview.cpp, resource.h, winprop.cpp, winprop.h, winres.rc,
+	winstat.cpp, wintray.cpp, wintray.h:
+
+	Begin to clean up instance management by creating an
+	InstanceManager. Basic functions are working again, but add/remove
+	instance needs work.
+
+2009-10-05 20:35  adk0212
+
+	* src/win32/winstat.cpp:
+
+	Fix possible crash if FillStatusBox() were to be called at just the
+	wrong instant.
+
+2009-10-05 20:07  adk0212
+
+	* src/win32/winstat.cpp:
+
+	Don't leak ListView wrappers
+
+2009-10-05 20:05  adk0212
+
+	* src/win32/Makefile.in:
+
+	Add wrapper class for listview and use it from winstat
+
+2009-10-05 20:04  adk0212
+
+	* src/win32/: listview.cpp, listview.h, winstat.cpp, winstat.h:
+
+	Add wrapper class for listview and use it in winstat.
+
+2009-10-05 19:35  adk0212
+
+	* src/win32/: meter.cpp, meter.h, winstat.cpp, winstat.h:
+
+	Add/update copyright banners
+
+2009-10-05 19:34  adk0212
+
+	* src/win32/: Makefile.in, meter.cpp, meter.h, winstat.cpp,
+	winstat.h:
+
+	Colorize load and battery meters, as per apcagent. Break meter code
+	out into a separate wrapper class -- a poor man's MFC essentially.
+	Only update controls when their values change to further reduce
+	refresh flicker. Misc cleanup.
+
+2009-10-04 13:02  adk0212
+
+	* include/astring.h, src/lib/astring.cpp, src/win32/apctray.cpp,
+	src/win32/balloonmgr.cpp, src/win32/popup.c, src/win32/resource.h,
+	src/win32/winabout.cpp, src/win32/winevents.cpp,
+	src/win32/winres.h, src/win32/winres.rc, src/win32/winstat.cpp,
+	src/win32/winstat.h, src/win32/wintray.cpp:
+
+	Rewrite apctray status dialog to mimic apcagent on OS X. Window now
+	updates on the fly, is resizeable, and has summary info at the top.
+	Also uses ListView control for raw status info so it is in two nice
+	columns and no longer needs to be rendered in an ugly fixed-width
+	font. Switch to ResEdit (http://www.resedit.net) for GUI resource
+	editing instead of tweaking winres.rc by hand. This requires
+	renaming winres.h to resource.h since that's what ResEdit wants to
+	generate.
+
+2009-10-03 13:26  adk0212
+
+	* src/apcagent/MainMenu.xib:
+
+	Fix preferences window label text being obscured by the surrounding
+	box.  Issue only appeared on 10.4, but probably just getting lucky
+	with drawing order on 10.5.
+
+2009-10-03 10:20  adk0212
+
+	* src/apcagent/AppController.m:
+
+	Fix issue with popups not appearing if Growl is installed while
+	apcagent is running.
+
+2009-09-30 19:15  adk0212
+
+	* autoconf/targets.mak, platforms/darwin/Makefile,
+	src/apcagent/Makefile:
+
+	Include apcagent in OS X installer DMG
+
+2009-09-29 19:20  adk0212
+
+	* configure, autoconf/configure.in, autoconf/variables.mak.in,
+	src/Makefile:
+
+	Build apcagent automatically on OS X but let user disable it via
+	configure if s/he so desires.
+
+2009-09-29 18:58  adk0212
+
+	* src/apcagent/: AppController.h, AppController.m,
+	InstanceConfig.h, InstanceConfig.m, MainMenu.xib, Makefile,
+	growl.plist, main.m:
+
+	Add support for popup notifications via Growl
+
+2009-09-27 19:39  adk0212
+
+	* src/apcagent/LoginItemsAE.c:
+
+	Fix login item creation on 10.4. Problem and solution is nicely
+	documented by Jake Sprouse here:
+	http://jakesprouse.net/2007/03/28/debugging-apples-loginitemsaec-on-intel-macs
+
+2009-09-27 16:03  adk0212
+
+	* src/apcagent/Makefile:
+
+	Overwrite dmg
+
+2009-09-27 15:56  adk0212
+
+	* src/apcagent/: AppController.h, AppController.m,
+	InstanceManager.h, InstanceManager.m, MainMenu.xib:
+
+	Add menu item to enable/disable starting at login
+
+2009-09-27 14:37  adk0212
+
+	* src/apcagent/: AppController.h, AppController.m,
+	InstanceManager.h, InstanceManager.m, LoginItemsAE.c,
+	LoginItemsAE.h, MainMenu.xib, Makefile, main.m:
+
+	Add UPS and HOST info to top of menu a'la apctray on win32.
+	Automatically add user login item when apcagent is started for the
+	first time. Remove login item when last monitor is removed. Add
+	menu option to remove all monitors at once. Reorder menu items
+	slightly.
+
+2009-09-27 10:57  adk0212
+
+	* src/apcagent/: AppController.h, AppController.m,
+	InstanceConfig.h, InstanceConfig.m, InstanceManager.h,
+	InstanceManager.m, MainMenu.xib, Makefile, NSString+uuid.h,
+	NSString+uuid.m, main.m:
+
+	Support for multiple instances
+
+2009-09-23 20:14  adk0212
+
+	* src/lib/statmgr.cpp:
+
+	Interpret failure to read any status items as failure of the
+	connection and close it. Retry Update() once in case it fails.
+
+2009-09-23 18:19  adk0212
+
+	* src/apcagent/Makefile:
+
+	Fix linking of libapc.a so it is included as a dependency.
+
+2009-09-23 18:17  adk0212
+
+	* src/lib/apclibnis.c:
+
+	Ignore SIGPIPE, which can happen when writing to a socket where the
+	remote end has closed the connection. Also improve error handling
+	in write_nbytes().
+
+2009-09-23 18:16  adk0212
+
+	* include/statmgr.h, src/lib/statmgr.cpp:
+
+	Copy hostname so caller doesn't have to keep it valid.
+
+2009-09-20 19:47  adk0212
+
+	* src/apcagent/AppController.m:
+
+	Minor cleanups
+
+2009-09-20 19:29  adk0212
+
+	* src/apcagent/AppController.m:
+
+	Minor optimization to DataSource classes
+
+2009-09-20 19:07  adk0212
+
+	* src/apcagent/: AppController.h, AppController.m, Info.plist,
+	MainMenu.xib:
+
+	Plumb in about panel. Expand copyright text slightly. Rename menu
+	items to more closely match other OS X app naming conventions.
+
+2009-09-20 18:23  adk0212
+
+	* doc/images/: charging.png, onbatt.png, online.png:
+
+	Make icon backgrounds transparent
+
+2009-09-20 17:25  adk0212
+
+	* src/apcagent/: AppController.m, MainMenu.xib:
+
+	Add horizontal separators to the menu
+
+2009-09-20 17:13  adk0212
+
+	* src/apcagent/Makefile:
+
+	Remove InfoPlist.strings dependency
+
+2009-09-20 17:11  adk0212
+
+	* src/apcagent/: Info.plist, InfoPlist.strings, Makefile:
+
+	Update Info.plist with copyright and version info. Version is
+	substituted at build time for __VERSION__. Remove unused
+	InfoPlist.strings file.
+
+2009-09-20 17:11  adk0212
+
+	* src/apcagent/AppController.m:
+
+	Minor cleanup
+
+2009-09-20 16:39  adk0212
+
+	* src/apcagent/: AppController.h, AppController.m, Info.plist,
+	InfoPlist.strings, MainMenu.xib, Makefile, PkgInfo, main.m:
+
+	Add apcagent, an apctray-like applet for Mac OS X
+
+2009-09-20 16:26  adk0212
+
+	* include/statmgr.h, src/lib/statmgr.cpp, src/win32/wintray.cpp:
+
+	Move FetchStatus() to StatMgr class and rename to GetSummary()
+
+2009-09-20 16:11  adk0212
+
+	* platforms/darwin/build-notes.txt, src/win32/Makefile.in,
+	src/win32/statmgr.cpp, src/win32/statmgr.h,
+	src/win32/winevents.cpp, src/win32/winstat.cpp,
+	src/win32/wintray.cpp, src/win32/wintray.h:
+
+	Convert win32 apctray to use shared statmgr and alib classes.
+
+2009-09-20 15:47  adk0212
+
+	* include/statmgr.h, src/lib/statmgr.cpp:
+
+	Add copy of win32 statmgr with win32-isms replaced with alib
+	equivalents
+
+2009-09-20 15:46  adk0212
+
+	* include/aiter.h, include/alist.h, include/amap.h,
+	include/amutex.h, include/aqueue.h, include/astring.h,
+	include/athread.h, include/atimer.h, include/autil.h,
+	src/lib/amutex.cpp, src/lib/astring.cpp, src/lib/athread.cpp,
+	src/lib/atimer.cpp, src/lib/autil.cpp:
+
+	Add lightweight STL-like class library
+
+2009-09-20 15:41  adk0212
+
+	* autoconf/targets.mak, autoconf/variables.mak.in,
+	examples/Makefile, src/Makefile, src/cgi/Makefile,
+	src/drivers/apcsmart/Makefile, src/drivers/dumb/Makefile,
+	src/drivers/net/Makefile, src/drivers/pcnet/Makefile,
+	src/drivers/snmp/Makefile, src/drivers/test/Makefile,
+	src/drivers/usb/Makefile, src/drivers/usb/bsd/Makefile,
+	src/drivers/usb/generic/Makefile, src/drivers/usb/linux/Makefile,
+	src/gapcmon/Makefile, src/lib/Makefile, src/libusbhid/Makefile:
+
+	Add support for building Objective-C files (*.m)
+
+2009-09-20 15:39  adk0212
+
+	* platforms/darwin/build-notes.txt:
+
+	Forgot -arch flags for apcupsd build
+
+2009-09-13 18:08  adk0212
+
+	* platforms/darwin/build-notes.txt:
+
+	And more updates to the notes. Nearly done now, I think.
+
+2009-09-13 17:36  adk0212
+
+	* platforms/darwin/build-notes.txt:
+
+	More build notes updates.
+
+2009-09-13 17:28  adk0212
+
+	* platforms/darwin/build-notes.txt:
+
+	More updates to Darwin build notes.
+
+2009-09-13 17:05  adk0212
+
+	* platforms/darwin/: ApcupsdDaemon.postflight,
+	ApcupsdDaemon.preflight, Makefile:
+
+	Disable PackageMaker's "suggested permissions" in favor of using
+	our own explicit permissions. Tweak perms on /Library to keep
+	PackageMaker happy.  Remove permission fixups from
+	preflight/postflight scripts. Copy the apcupsd-uninstall script to
+	/sbin during install.
+
+2009-09-13 17:02  adk0212
+
+	* platforms/darwin/apcupsd-uninstall:
+
+	Add uninstall script.
+
+2009-09-13 09:29  adk0212
+
+	* platforms/darwin/ApcupsdDaemon.preflight:
+
+	Work around PackageMaker bug that gets ApcupsdDummy.kext directory
+	permissions wrong.
+
+2009-09-11 20:01  adk0212
+
+	* platforms/darwin/build-notes.txt:
+
+	Update OS X build notes with more info I've discovered.
+
+2009-09-08 18:03  adk0212
+
+	* doc/apctest.8:
+
+	Update apctest manpage for USB battery calibration function.
+
+2009-09-01 20:30  adk0212
+
+	* src/apctest.c:
+
+	Implement battery calibration in apctest for USB models.  Thanks to
+	James Belleau <james@belleau.net> for the original implementation
+	which has been modified somewhat in this commit.
+
+2009-08-30 11:24  adk0212
+
+	* doc/manual/: manual.html, manual.rst:
+
+	Update Darwin USB section to call out libusb-0.1.12 specifically.
+
+2009-08-30 11:14  adk0212
+
+	* src/apctest.c:
+
+	Fix TTY mode comms option on Win32.
+
+2009-08-30 10:15  adk0212
+
+	* platforms/darwin/: build-notes.txt,
+	building-universal-binaries.txt:
+
+	Add notes about compatibility builds. Update universal binaries
+	notes.	Rename file to 'build-notes.txt'.
+
+2009-08-29 14:33  adk0212
+
+	* configure:
+
+	Regen configure with autoconf-2.61 (Darwin XCode-3.3) to fix some
+	warnings when configuring on OS X.
+
+2009-08-29 14:27  adk0212
+
+	* configure, autoconf/configure.in,
+	platforms/darwin/ApcupsdDaemon.Description.plist,
+	platforms/darwin/ApcupsdDaemon.Info.plist,
+	platforms/darwin/ApcupsdDaemon.Info.plist.in,
+	platforms/darwin/ApcupsdDaemon.postflight,
+	platforms/darwin/ApcupsdPkg.Description.plist,
+	platforms/darwin/ApcupsdPkg.Info.plist.in,
+	platforms/darwin/ApcupsdUsbShim.Description.plist,
+	platforms/darwin/ApcupsdUsbShim.Info.plist.in,
+	platforms/darwin/ApcupsdUsbShim.postflight,
+	platforms/darwin/Makefile:
+
+	Update OS X installer for XCode-3.x Unable to find a simple way to
+	create metapackages from the command line so separate Daemon and
+	UsbShim subpackages are gone. Everything is now in the top-level
+	package. On the up side, however, we can now override the version
+	string from the command line so we no longer need autoconf to
+	preprocess the plist. Additionally, packagemaker generates the
+	plist now and just merges in any overrides we specify. Much nicer.
+
+2009-08-23 15:04  adk0212
+
+	* src/drivers/net/net.c:
+
+	Add missing NOMINV, NOMOUTV, and NOMPOWER to clients.  Reported by
+	Luciano De Rosa <l.derosa@tiscali.it>
+
+2009-08-14 11:02  adk0212
+
+	* doc/home-page/: bugs.html, dl.php, index.html, index.wml,
+	license.html, lists.html, menu.inc, phpinfo.php, publishsite,
+	support.html, systems.html:
+
+	Introduce new download page since sf.net is so hard to navigate
+	now.
+
+2009-08-07 08:15  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Change ReleaseNotes links to point at versions in CVS since SF
+	isn't properly serving the file if you point to the downloads
+	section.
+
+2009-08-02 10:36  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Update for 3.14.7 release.
+
+2009-08-01 13:29  adk0212
+
+	* ChangeLog, include/version.h:
+
+	Final prep for 3.14.7 release.
+
+2009-08-01 10:41  fleetworks
+
+	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
+	suse/apcupsd.spec.in:
+
+	3.14.7 spec update
+
+2009-08-01 08:18  adk0212
+
+	* src/win32/: README.cygwin, README.win32:
+
+	Remove obsolete files
+
+2009-08-01 08:01  adk0212
+
+	* configure, autoconf/config.h.in, autoconf/configure.in,
+	autoconf/variables.mak.in, src/Makefile, src/powerflute.c,
+	src/win32/compat/compat.h, src/win32/compat/sys/ioctl.h:
+
+	Remove remnants of powerflute
+
+2009-07-31 16:23  adk0212
+
+	* ChangeLog, ReleaseNotes, include/version.h:
+
+	Prep for 3.14.7 release
+
+2009-07-31 16:19  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Fix configure not noticing when C++ compiler does not exist.
+	Annoyingly, only the first of AC_PROG_CXX and AC_PROG_CC actually
+	error out if the conpiler does not exist. The second one just
+	quietly sets a default and keeps going. Temporary fix is to just
+	move CXX detection to be first since that's the compiler we really
+	need.
+
+2009-07-31 15:35  adk0212
+
+	* doc/manual/: manual.html, manual.rst:
+
+	Document multimon cgi programs for Windows.
+
+2009-07-31 11:34  adk0212
+
+	* autoconf/targets.mak:
+
+	Add support for formatting manpages into plain text
+
+2009-07-31 11:33  adk0212
+
+	* src/win32/installer/winapcupsd.nsi:
+
+	Include plain text manpages in windows install. Organize
+	documentation and provide start menu shortcuts. Also add a shortcut
+	for editing the config file.
+
+2009-07-31 11:33  adk0212
+
+	* doc/Makefile:
+
+	Format manpages into plain text.
+
+2009-07-31 10:22  adk0212
+
+	* src/win32/installer/winapcupsd.nsi:
+
+	Add CGI scripts to Windows installer.
+
+2009-07-31 10:22  adk0212
+
+	* src/win32/Makefile.in:
+
+	Build CGI programs for WIN32.
+
+2009-07-31 10:21  adk0212
+
+	* src/win32/: apctray.cpp, winmain.cpp:
+
+	Remove manual calls to WSA_Init(). It's done automatically in
+	libnis now.
+
+2009-07-31 10:20  adk0212
+
+	* src/win32/compat/: compat.cpp, netcompat.c:
+
+	Split network-related compat functions into their own file so users
+	don't have to link in all of compat.cpp.
+
+2009-07-31 10:18  adk0212
+
+	* src/lib/apclibnis.c:
+
+	Automatically invoke WSA_Init() during static initialization on
+	WIN32.
+
+2009-07-31 10:16  adk0212
+
+	* src/cgi/upsimage.c:
+
+	Set stdout to binary mode on WIN32 to prevent corruption of image
+	data.
+
+2009-07-26 10:50  adk0212
+
+	* src/drivers/: apcsmart/smartsetup.c, dumb/dumbsetup.c:
+
+	Automatically add \\.\ UNC prefix to COMx device name on Windows.
+	This allows selection of ports above COM9.
+
+2009-07-26 10:42  adk0212
+
+	* src/drivers/usb/usb.c:
+
+	Remove CI_BattReplaceDate because it does not seem to be populated
+	on any modern UPS. CI_BATTDAT works just fine.
+
+2009-07-07 20:31  adk0212
+
+	* include/: amap.h, amutex.h, aqueue.h, atimer.h:
+
+	Prevent use of default assignment operator and copy constructor.
+
+2009-07-07 20:31  adk0212
+
+	* include/amap.h:
+
+	file amap.h was added on branch Branch-3_14 on 2009-09-20 19:46:13
+	+0000
+
+2009-07-07 20:31  adk0212
+
+	* include/amutex.h:
+
+	file amutex.h was added on branch Branch-3_14 on 2009-09-20
+	19:46:13 +0000
+
+2009-07-07 20:31  adk0212
+
+	* include/aqueue.h:
+
+	file aqueue.h was added on branch Branch-3_14 on 2009-09-20
+	19:46:13 +0000
+
+2009-07-07 20:31  adk0212
+
+	* include/atimer.h:
+
+	file atimer.h was added on branch Branch-3_14 on 2009-09-20
+	19:46:13 +0000
+
+2009-07-07 20:31  adk0212
+
+	* include/alist.h:
+
+	Implement assignment operator and copy constructor.
+
+2009-07-07 20:31  adk0212
+
+	* include/alist.h:
+
+	file alist.h was added on branch Branch-3_14 on 2009-09-20 19:46:13
+	+0000
+
+2009-06-07 21:15  adk0212
+
+	* src/win32/build-win32-cross-tools:
+
+	Update to NSIS-2.45.
+
+2009-06-02 20:45  adk0212
+
+	* doc/manual/: manual.html, smartprotocol.rst:
+
+	Fix typo.
+
+2009-05-31 12:18  adk0212
+
+	* doc/manual/: maintaining_ups.rst, manual.html, smartprotocol.rst:
+
+	Spell check.
+
+2009-05-31 12:14  adk0212
+
+	* doc/manual/: manual.html, manual.rst:
+
+	Spell check.
+
+2009-05-31 11:13  adk0212
+
+	* doc/manual/: manual.html, manual.rst:
+
+	Fix a few "apcupd" typos.
+
+2009-05-20 20:43  adk0212
+
+	* examples/newslave.c, src/cgi/upsstats.c:
+
+	Fix UPS version in CGI stats and examples.
+
+2009-05-16 12:46  adk0212
+
+	* doc/home-page/: bugs.html, index.html, index.wml, license.html,
+	lists.html, menu.inc, support.html, systems.html:
+
+	Update web site for 3.14.6 release.
+
+2009-05-16 12:46  adk0212
+
+	* doc/manual/publishdoc:
+
+	Update script
+
+2009-05-16 10:07  adk0212
+
+	* ChangeLog:
+
+	Final prep for 3.14.6. Locked and loaded.
+
+2009-05-16 09:05  fleetworks
+
+	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
+	suse/apcupsd.spec.in:
+
+	Comment out latex build.
+
+2009-05-15 20:13  adk0212
+
+	* ChangeLog, ReleaseNotes, include/version.h:
+
+	Prep for 3.14.6 release (again).
+
+2009-05-15 20:13  adk0212
+
+	* src/cgi/upsfetch.c:
+
+	Fix miscalculated length. Noticed by Stacy Millions
+	<stacy@Millions.Ca>
+
+2009-05-15 19:57  adk0212
+
+	* autoconf/variables.mak.in:
+
+	Add --no-footnote-backlinks to RST2PDF options. It's now supported
+	in rst2pdf SVN trunk.
+
+2009-05-15 19:44  adk0212
+
+	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
+	suse/apcupsd.spec.in:
+
+	changes for new user manual location and format
+
+2009-05-15 19:32  adk0212
+
+	* doc/manual/publishdoc:
+
+	Add script to publish the manual to the web site.
+
+2009-05-15 19:23  adk0212
+
+	* doc/manual/manual.html:
+
+	Keep a preformatted copy of the user manual in CVS to ease tool
+	dependencies for packagers.
+
+2009-05-15 19:07  adk0212
+
+	* src/win32/installer/winapcupsd.nsi:
+
+	Update for new user manual location.
+
+2009-05-15 18:43  adk0212
+
+	* doc/manual/manual.rst:
+
+	Fix Scott's name being misinterpreted as an enumerated (elettered?)
+	list.
+
+2009-05-13 19:49  adk0212
+
+	* doc/manual/maintaining_ups.rst:
+
+	Applied updates from Trevor Roydhouse <trev@sentry.org>
+
+2009-05-12 19:45  adk0212
+
+	* doc/manual/manual.rst:
+
+	Remove Linux /proc/bus/usb text files from appendix. They're a ton
+	of baggage for not much gain.
+
+2009-05-12 19:35  adk0212
+
+	* doc/manual/smartprotocol.rst:
+
+	Minor formatting and typo fixes to smart protocol docs.
+
+2009-05-09 09:04  adk0212
+
+	* doc/manual/manual.rst:
+
+	Fix some {} style markup I missed on the first pass.
+
+2009-05-09 08:50  adk0212
+
+	* doc/manual/manual.rst:
+
+	Fix expansion of APC acronym.
+
+2009-05-07 21:10  adk0212
+
+	* doc/manual/: manual.rst, smartprotocol.rst:
+
+	Some tweaks for better compatibility with rst2pdf.
+
+2009-05-06 21:51  adk0212
+
+	* doc/manual/: maintaining_ups.rst, manual.rst, smartprotocol.rst:
+
+	Several updates to the manual. Replace existing section on UPS
+	maintenance with a new one contributed by Trevor Roydhouse
+	<trev@sentry.org>. Replace old disclaimer with a new one, also from
+	Trev. Add some hyperlinks in the smart protocol section. Clean up
+	some table formatting in that section as well.
+
+2009-05-06 21:50  adk0212
+
+	* doc/manual/apcupsd.png:
+
+	Noninterlaced version of logo for compatibility with rst2pdf.
+
+2009-05-05 17:51  adk0212
+
+	* doc/apcupsd.conf.5:
+
+	Add allowable settings for LOWBATT. From Trevor Roydhouse
+	<trev@sentry.org>
+
+2009-05-04 18:21  adk0212
+
+	* configure, autoconf/configure.in, autoconf/targets.mak,
+	autoconf/variables.mak.in:
+
+	Autodetect locations of rst2pdf and rst2html. Politely skip
+	typesetting each format if the generator is not available.
+
+2009-05-04 18:20  adk0212
+
+	* platforms/qnx/: Makefile, apccontrol.in, apcupsd.in:
+
+	Add support for QNX. Tested on QNX 6.3.2. Contributed by Mikhail
+	Gruzdev <michail.gruzdev@gmail.com>
+
+2009-05-04 18:03  adk0212
+
+	* configure, autoconf/acconfig.h, autoconf/config.h.in,
+	autoconf/configure.in, include/apc.h, src/apcupsd.c,
+	src/drivers/apcsmart/smartsetup.c, src/lib/apcexec.c:
+
+	Add support for QNX. Tested on QNX 6.3.2. Contributed by Mikhail
+	Gruzdev <michail.gruzdev@gmail.com>
+
+2009-05-04 17:56  adk0212
+
+	* examples/index.php:
+
+	s/batteryload/load/. Contributed by Mikhail Gruzdev
+	<michail.gruzdev@gmail.com>
+
+2009-05-03 17:56  adk0212
+
+	* autoconf/targets.mak, autoconf/variables.mak.in,
+	doc/manual/Makefile:
+
+	Generate PDF manual automatically.
+
+2009-05-03 17:55  adk0212
+
+	* doc/manual/manual.rst:
+
+	Fix typo.
+
+2009-05-03 13:31  adk0212
+
+	* doc/manual/manual.rst:
+
+	Fix broken references. Now formats cleanly with no errors or
+	warnings.
+
+2009-05-03 12:31  adk0212
+
+	* doc/manual/smartprotocol.rst:
+
+	Minor tweaks to spacing, etc.
+
+2009-05-03 12:27  adk0212
+
+	* doc/manual/: manual.rst, smartprotocol.rst:
+
+	Rejuvinate smart protocol section and add it back in. Merged with
+	updates from NUT site.
+
+2009-05-02 19:46  adk0212
+
+	* doc/manual/manual.rst:
+
+	Add EEPROM configuration directives. Text stolen shamelessly from
+	Trevor's apcupsd.conf(5).
+
+2009-05-02 19:30  adk0212
+
+	* doc/manual/manual.rst:
+
+	Minor fixes to apctest section. This needs major updates
+	eventually.
+
+2009-05-02 19:20  adk0212
+
+	* doc/manual/manual.rst:
+
+	Bring in a shortened version of the supportedupses text.
+
+2009-05-02 18:37  adk0212
+
+	* doc/manual/manual.rst:
+
+	Add Windows 7. Split Solaris into 8/9 (no USB) and 10 (USB
+	supported).
+
+2009-05-02 18:30  adk0212
+
+	* doc/manual/manual.rst:
+
+	Rewrite and add in supported operating systems section.
+
+2009-05-02 18:29  adk0212
+
+	* autoconf/variables.mak.in:
+
+	Don't generate backrefs for footnotes; they make the footnotes hard
+	to read.
+
+2009-05-02 12:11  adk0212
+
+	* doc/manual/manual.rst:
+
+	Surround TOC with transition dividers to help set it apart. I wish
+	the text for the TOC title were rendered larger. Need to
+	investigate alternate stylesheets.
+
+2009-05-02 12:00  adk0212
+
+	* autoconf/targets.mak, autoconf/variables.mak.in,
+	doc/manual/Makefile:
+
+	Add preliminary Makefile support for rst2html. Dependencies are
+	working.  Not tied in to top-level make yet since not everyone will
+	have rst2html.	'make clean' not working yet. Need to figure out
+	what to do about that.
+
+2009-05-02 10:30  adk0212
+
+	* src/action.c:
+
+	Change log level of UPS self-test messages to WARNING from ALERT.
+	Given that self-test messages are routine, they do not belong at
+	LOG_ALERT.  Contributed by Dave Ewart <davee@ceu.ox.ac.uk>.
+
+2009-05-02 10:21  adk0212
+
+	* autoconf/variables.mak.in, doc/Makefile:
+
+	Install manpages as part of 'make install'.
+
+2009-05-02 10:05  adk0212
+
+	* doc/apcupsd.man:
+
+	Remove one leftover old manpage.
+
+2009-05-02 10:04  adk0212
+
+	* doc/: apcaccess.8, apccontrol.8, apctest.8, apctest.man,
+	apcupsd.8, apcupsd.conf.5:
+
+	Replace old manpages with shiny new ones, courtesy of Trevor
+	Roydhousea <trev@sentry.org>. Many thanks, Trev!
+
+2009-04-30 19:20  adk0212
+
+	* doc/manual/: cables.rst, manual.rst:
+
+	Minor updates plus clean up and add back in the cables section.
+
+2009-04-26 19:12  adk0212
+
+	* doc/manual/: apcupsd.png, charging.png, commlost.png,
+	main_configs.png, manual.rst, multimon.png, onbatt.png, online.png,
+	smartprotocol.rst, status.png, thanks.png, wininstall6.png:
+
+	First pass at converting apcupsd user manual to reStructuredText.
+	Initial conversion via Pandoc, then lots of hand editing. It's in
+	pretty good shape now. Need to fix up external files.
+
+2009-04-25 11:04  adk0212
+
+	* src/apcupsd.c:
+
+	Make startup success message appear in logs again.  From Trevor
+	Roydhouse <trev@sentry.org>: apcupsd stopped printing startup
+	success messages at some point. Looking through the code it is
+	because it was decided that the LOG_INFO facility level should only
+	be used for data file logging and so it filters out other uses.
+	Unfortunately the startup message is set to that level. Changing
+	the startup message to LOG_WARNING works and is consistent with the
+	normal shutdown message facility level.
+
+2009-04-25 10:58  adk0212
+
+	* src/lib/apcconfig.c:
+
+	Remove EVENTFILE, EVENTFILEMAX config directives. These were
+	replaced by the plural versions that are in use today (EVENTSFILE,
+	EVENTSFILEMAX) almost 10 years ago. It's time to kill the old
+	names.	(h/t Trevor Roydhouse <trev@sentry.org>)
+
+2009-04-25 10:47  adk0212
+
+	* src/options.c:
+
+	Add -P,--pid-file to -h output. Update copyright.  (h/t Trevor
+	Roydhouse <trev@sentry.org>)
+
+2009-04-25 10:45  adk0212
+
+	* examples/nagios_plugin_check_apcupsd.c, examples/newslave.c,
+	include/struct.h, src/cgi/upsfetch.c, src/drivers/net/net.c,
+	src/lib/apcconfig.c, src/lib/apcstatus.c:
+
+	RELEASE is merely a subset of VERSION. Remove RELEASE.	(h/t Trevor
+	Roydhouse <trev@sentry.org>)
+
+2009-03-19 19:18  adk0212
+
+	* doc/home-page/: bugs.html, index.html, license.html, lists.html,
+	support.html, systems.html, template.inc:
+
+	Update sf.net logo per new guidelines.
+
+2009-03-02 18:16  adk0212
+
+	* ChangeLog, ReleaseNotes, include/version.h:
+
+	Pseudo-prep for 3.14.6
+
+2009-03-02 17:52  adk0212
+
+	* src/drivers/apcsmart/smart.c:
+
+	Workaround for crash during process shutdown.  Contributed by
+	Andrey Sharandakov <ash.ashway@gmail.com>
+
+2009-03-02 17:48  adk0212
+
+	* doc/apcupsd.man, include/drivers.h, include/extern.h,
+	src/action.c, src/apctest.c, src/apcupsd.c, src/device.c,
+	src/options.c, src/drivers/drivers.c,
+	src/drivers/apcsmart/apcsmart.h, src/drivers/apcsmart/smart.c,
+	src/drivers/apcsmart/smartoper.c, src/drivers/usb/usb.c,
+	src/drivers/usb/usb.h, src/lib/apclock.c:
+
+	Add support for turning the UPS off completely. This complements
+	existing hibernate (aka killpower) functionality. Turn-off is
+	implemented for apcsmart and USB drivers, subject to support for
+	the relevant commands in the UPS itself. Contributed by Keith
+	Campbell <campbell@econnectix.com>.
+
+2009-03-01 10:03  adk0212
+
+	* src/apcaccess.c:
+
+	Fix build with gcc-4.4. Contributed by Michal Hlavinka
+	<mhlavink@redhat.com>.
+
+2009-02-14 16:35  adk0212
+
+	* src/drivers/usb/linux/linux-usb.c:
+
+	Fix number of array entries which was causing a buffer overflow.
+	Contributed by David Fries <david@fries.net>.  Also change loop
+	counters to unsigned, eliminating a new warning introduced by the
+	above change plus allowing removal of unnecessary casts to int.
+
+2009-02-10 18:39  adk0212
+
+	* src/drivers/apcsmart/: smart.c, smartsetup2.c:
+
+	Fix some deadlocks in the case of a comm failure when smart_poll()
+	is called without holding the UPS lock. Contributed by Keith
+	Campbell <campbell@econnectix.com>:
+
+	On one of our machines, apcupsd 3.14.5 (using a smart serial cable)
+	would occasionally not finish starting up.  Running strace revealed
+	that it was stuck in deadlock on a futex() system call.
+
+	I've traced this to some poorly written code inside the apcsmart
+	driver.  Inside smart.c there is a UPSlinkCheck() function which
+	according to the documentation must be called with the UPS lock
+	held (ugh).  smart_poll() calls the UPSlinkCheck() function (but
+	only in a rarely followed error handling branch), so therefore it
+	must also be called with the lock held.  The problem is, many
+	things call smart_poll() but some call it without the lock, and
+	other with the lock.  I've put locks around a few smart_poll()
+	calls in smartsetup2.c which corrected the problem I was seeing.
+
+2009-01-15 17:57  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Year++ h/t Kirill S. Bychkov <yason@linklevel.net>
+
+2009-01-14 18:00  adk0212
+
+	* doc/home-page/publishsite:
+
+	Update publish scripts for sf.net changes
+
+2009-01-14 17:49  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Update for 3.14.5 release.
+
+2009-01-10 15:02  adk0212
+
+	* ChangeLog, include/version.h:
+
+	3.14.5 for real this time.
+
+2008-11-10 19:14  adk0212
+
+	* examples/nagios_plugin_check_apcupsd.c:
+
+	Compile fixes for nagios plugin.  Contributed by Ronald J. Yacketta
+	<yacketrj@potsdam.edu>
+
+2008-11-01 11:03  adk0212
+
+	* platforms/redhat/apcupsd.in:
+
+	Remove unused DISTVER code.  Contributed by Miloň Papežík
+	<mmp@secure-it.cz>
+
+2008-10-26 10:25  adk0212
+
+	* ChangeLog, ReleaseNotes, include/version.h:
+
+	Prep for 3.14.5 release (again)
+
+2008-10-20 18:19  adk0212
+
+	* src/win32/build-win32-cross-tools:
+
+	Update to nsis-2.40.
+
+2008-09-16 00:58  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Corrected the timebase on the sockopts(0 api call.  I intended to
+	set the timeout for two tenths of a second, instead I set it for
+	200 usec.  The results was un-stability and frequently dropped
+	session on my quad-core; dual and single cores didn't seem to be
+	bothered.  Now is it set for 200000 usec as I originally intended.
+
+	James,
+
+2008-09-16 00:34  skoona
+
+	* src/gapcmon/: ChangeLog, README:
+
+	Corrected person references, FreeBSD is the platform Jason Hale
+	maintains
+
+2008-09-16 00:23  skoona
+
+	* src/gapcmon/: ChangeLog, README, eggtrayicon.c, gapcmon.c:
+
+	Applied two patches 1. eggtrayicon.c -- applies background
+	transparency when in systray mode to systray icon.  2. gapcmon.c --
+	Add include for BSD sockaddr_in, no impact on other platforms.
+	Note: Socket timeout timers were shortened in a prior update
+
+	James,
+
+2008-09-10 18:34  adk0212
+
+	* src/apctest.c:
+
+	Do not create pid file in apctest. There is little reason for it
+	since apctest is a command-line tool, not a daemon. Plus nothing
+	ever deletes the file so it interferes with apcupsd operation.
+	Reported by Eddie Atherton <stunnel@attglobal.net>
+
+2008-09-09 17:51  adk0212
+
+	* src/options.c:
+
+	Change -? to -h for the sake of consistency with other software.
+	Contributed by Thomas Pfaff <thomas.arnesen.pfaff@gmail.com>
+
+2008-08-17 11:01  adk0212
+
+	* platforms/darwin/Makefile:
+
+	Work around PackageMaker bug in XCode-2.5.
+
+2008-08-17 10:43  adk0212
+
+	* platforms/darwin/building-universal-binaries.txt:
+
+	Update Darwin universal binary instructions.
+
+2008-08-15 01:24  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Added setsockopt() to sknet_open() to resolve timeout related
+	issue.	I set it to 200ms initially, need to test a bet before
+	releasing.  James,
+
+2008-08-03 16:24  adk0212
+
+	* platforms/darwin/building-universal-binaries.txt:
+
+	A convenient side-effect of the flags split is that deps now work
+	correctly during a universal binary build.
+
+2008-08-03 12:51  adk0212
+
+	* src/cgi/upsfetch.c:
+
+	Fix a few unsafe uses of sprintf and strcat. Although OpenBSD warns
+	about several more, these other instances are demonstrably correct
+	as-written and are therefore unchanged.
+
+2008-08-03 11:13  adk0212
+
+	* platforms/darwin/building-universal-binaries.txt:
+
+	Update Darwin build instructions for CPPFLAGS/CFLAGS/CXXFLAGS
+	split.
+
+2008-08-03 11:00  adk0212
+
+	* src/gapcmon/Makefile:
+
+	gapcmon build fixes for new CPPFLAGS/CFLAGS/CXXFLAGS split.
+
+2008-08-03 10:51  adk0212
+
+	* configure:
+
+	Regen configure script on Linux. OpenBSD autoconf searches for X11
+	differently (and possibly incorrectly).
+
+2008-08-03 10:48  adk0212
+
+	* configure, autoconf/configure.in, autoconf/targets.mak,
+	autoconf/variables.mak.in:
+
+	Fix configure warnings for gd.h by properly splitting compiler
+	flags versus preprocessor flags. CFLAGS=C compiler flags,
+	CXXFLAGS=C++ compiler flags, CPPFLAGS=C preprocessor flags.
+
+2008-08-02 19:13  adk0212
+
+	* configure:
+
+	Regen configure script from configure.in.
+
+2008-08-02 19:11  adk0212
+
+	* autoconf/configure.in, src/cgi/Makefile:
+
+	Fix cgi build on OpenBSD. libgd on OpenBSD requires X_LIBS for
+	libfreetype and libfontconfig.
+
+2008-07-25 10:17  adk0212
+
+	* ChangeLog:
+
+	Update ChangeLog after win32 exit fix.
+
+2008-07-25 09:18  adk0212
+
+	* src/win32/winmain.cpp:
+
+	Fix handling of old-style exit requests (WM_QUIT message to hidden
+	window).  Apparently PeekMessage() is not sufficient, so go back to
+	using GetMessage and spawn a separate thread to watch for the
+	global exit event.
+
+2008-07-24 16:29  adk0212
+
+	* ChangeLog, ReleaseNotes, include/version.h:
+
+	Prep for 3.14.5 release.
+
+2008-07-24 16:12  adk0212
+
+	* src/win32/installer/winapcupsd.nsi:
+
+	Save $INSTDIR in registry for future use. Also remove examples/
+	directory from install package since almost nothing in there
+	applies to win32.
+
+2008-07-24 16:10  adk0212
+
+	* examples/: slave.apcupsd.conf, master.apcupsd.conf:
+
+	Remove another obsolete sample config.
+
+2008-07-24 16:08  adk0212
+
+	* examples/: apcupsd.master.conf, apcupsd.slave.conf:
+
+	Remove obsolete configuration examples.
+
+2008-07-12 22:51  skoona
+
+	* src/gapcmon/: ChangeLog, gapcmon.c:
+
+	Update the ChangeLog
+
+2008-07-12 22:32  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Fix two of two: KDE issue, because of the _iconify() api issue,
+	_hide() was chosen.  _ hide() presents a useability issue where its
+	possible hide all windows in such a way that no artifact is visible
+	for you to use to restore a window.
+
+	This is caused by the use of gtk_widget_hide() instead of
+	gtk_window_iconify(); thus the only solution is to remove the close
+	buttons off both the main window and all monitor windows.  Its the
+	close button that presents the active-but-no-window effect.
+
+	Problem Cause: KDE Window Manager Behaviour Changed --
+	gtk_window_iconify() ignored.  Problem Resolved: Removed Close
+	Button from all windows.		   Switched to
+	gtk_widget_hide() to manage window visibility.
+
+	James,
+
+2008-07-12 20:23  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Part two of the kde fix failed.  Icon-mode works fine.	Window mode
+	can find itself without a takslist entry and effecctively invisible
+	with no way to recall the active program.
+
+2008-07-12 15:13  adk0212
+
+	* src/win32/build-win32-cross-tools:
+
+	Update to nsis-2.38
+
+2008-07-12 13:53  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Part two of two parts -- kde iconify fix
+
+2008-07-12 12:54  skoona
+
+	* src/gapcmon/gapcmon.c:
+
+	Part one of two parts -- kde iconify fix
+
+2008-07-07 20:31  adk0212
+
+	* include/athread.h, src/lib/athread.cpp:
+
+	Misc cleanup and documentation.
+
+2008-07-07 20:31  adk0212
+
+	* src/lib/athread.cpp:
+
+	file athread.cpp was added on branch Branch-3_14 on 2009-09-20
+	19:46:13 +0000
+
+2008-07-07 20:31  adk0212
+
+	* include/athread.h:
+
+	file athread.h was added on branch Branch-3_14 on 2009-09-20
+	19:46:13 +0000
+
+2008-07-03 09:04  adk0212
+
+	* src/lib/atimer.cpp:
+
+	file atimer.cpp was added on branch Branch-3_14 on 2009-09-20
+	19:46:13 +0000
+
+2008-07-03 09:04  adk0212
+
+	* src/lib/atimer.cpp:
+
+	Add debounce timers on shutdown triggers.
+
+2008-06-29 20:07  adk0212
+
+	* include/atimer.h, src/lib/atimer.cpp:
+
+	Update main state machine to use state class pattern.
+
+2008-06-29 11:12  adk0212
+
+	* src/action.c:
+
+	Fix bug in LOWBATT glitch handling. We must examine LOWBATT for
+	changes every time thru the status loop, not just during the
+	OnBattery state.  Otherwise we can miss the initial LOWBATT
+	assertion, which defeats the glitch rejection logic.
+
+2008-06-24 19:24  adk0212
+
+	* autoconf/targets.mak:
+
+	Silly spacing fix.
+
+2008-06-24 19:22  adk0212
+
+	* configure, autoconf/aclocal.m4, autoconf/configure.in,
+	autoconf/targets.mak:
+
+	Fail configure if required tools are not found. Fix targets.mak to
+	reference a few more tools by variable instead of hardcoded name.
+
+2008-06-21 17:04  adk0212
+
+	* src/win32/: Makefile.in, compat/compat.cpp, compat/compat.h,
+	compat/getopt.c, compat/getopt.h, compat/print.cpp,
+	compat/winapi.c, compat/winapi.h:
+
+	Clean up win32 compat. Remove unused functions and files. Remove
+	wide char support. Organize compat.h.
+
+2008-06-21 14:43  adk0212
+
+	* src/win32/: apctray.cpp, winmain.cpp, winups.h, compat/winapi.c,
+	compat/winapi.h:
+
+	Improve apctray multiple instance behavior for /add, /del, and
+	/kill on modern platforms (Win2K and newer). Monitor registry for
+	changes caused by /add and /del and automatically reset when a
+	change is detected. Also ensure /kill will terminate all apctray
+	instances, even those running in other sessions.
+
+2008-06-19 18:23  adk0212
+
+	* src/win32/: winmain.cpp, winservice.cpp, winservice.h, winups.h,
+	compat/winapi.c, compat/winapi.h:
+
+	Support shutting down apcupsd instances running in other sessions
+	(such as terminal services or remote desktop sessions).
+
+2008-06-15 14:11  adk0212
+
+	* autoconf/targets.mak:
+
+	Use 'tr' to strip trailing newline from 'echo' instead of 'echo
+	-n'.
+
+2008-06-15 09:15  adk0212
+
+	* platforms/: yellowdog/Makefile, engarde/Makefile,
+	mandrake/Makefile:
+
+	Update install to use new CHKCFG macro.
+
+2008-06-15 09:10  adk0212
+
+	* platforms/redhat/Makefile:
+
+	Update redhat to use new CHKCFG macro.
+
+2008-06-15 09:04  adk0212
+
+	* src/options.c:
+
+	Fix harmless but annoying compiler warning on suse.
+
+2008-06-15 09:03  adk0212
+
+	* autoconf/targets.mak, autoconf/variables.mak.in,
+	platforms/suse/Makefile:
+
+	Fix 'make install' on suse. Sadly, suse's chkconfig always returns
+	success for --list even when the service does not exist. So we add
+	a more sophisticated chkconfig handler which tests for existence of
+	the init script manually, then invokes chkconfig. The whole thing
+	is hidden behind a macro. Also add CHKCONFIG definition (currently
+	always /sbin/chkconfig) in case we someday encounter a distro that
+	hides it elsewhere.
+
+2008-06-11 07:39  adk0212
+
+	* include/extern.h, src/drivers/pcnet/pcnet.c, src/lib/apclog.c,
+	src/drivers/usb/bsd/hidutils.c, src/drivers/usb/generic/hidutils.c:
+
+	Add a hex dump function and use it from pcnet and usb drivers
+	instead of manually coding ugly loops.
+
+2008-06-11 07:20  adk0212
+
+	* src/drivers/pcnet/packets/: README, packet0.dat, packet1.dat,
+	packet2.dat:
+
+	Add captured packets for testing PCNET driver.
+
+2008-06-09 21:22  adk0212
+
+	* autoconf/targets.mak:
+
+	Use $(ECHO). Important for 'echo -n' on some platforms, and we
+	might as well use it everywhere we use 'echo'. Thanks to Jeremy
+	Daniel <Jeremy.Daniel@brunel.ac.uk> for finding and fixing this on
+	Mac OS X.
+
+2008-06-09 21:16  adk0212
+
+	* configure, autoconf/configure.in:
+
+	Remove conditional HAVE_NISLIB settings. HAVE_NISLIB is set already
+	set unconditionally.
+
+2008-06-01 17:57  adk0212
+
+	* doc/home-page/index.html, platforms/alpha/Makefile,
+	platforms/darwin/Makefile, platforms/debian/Makefile,
+	platforms/engarde/Makefile, platforms/freebsd/Makefile,
+	platforms/gentoo/Makefile, platforms/mandrake/Makefile,
+	platforms/netbsd/Makefile, platforms/openbsd/Makefile,
+	platforms/redhat/Makefile, platforms/slackware/Makefile,
+	platforms/sun/Makefile, platforms/suse/Makefile,
+	platforms/yellowdog/Makefile:
+
+	Fix first install failure on redhat and suse. We were
+	unconditionally running 'chkconfig --del apcupsd' which failed if
+	apcupsd was not already installed. Now we check 'chkconfig --list
+	apcupsd' first to see if chkconfig believes apcupsd is installed.
+	Make same fix in uninstall. Also change most uninstall steps to
+	allow failure. This facilitates the best- effort uninstall of an
+	aborted or otherwise botched install.
+
+2008-05-31 08:42  fleetworks
+
+	* platforms/: redhat/apcupsd.spec.in, suse/apcupsd.spec.in:
+
+	Add restart of daemon on upgrade.
+
+2008-05-26 20:28  adk0212
+
+	* include/amutex.h:
+
+	Fix circular dependency.
+
+2008-05-25 14:46  adk0212
+
+	* doc/home-page/: index.html, index.wml:
+
+	Update for 3.14.4 release.
+
+2008-05-18 14:21  adk0212
+
+	* ChangeLog:
+
+	Update ChangeLog.
+
 2008-05-18 14:18  adk0212
 
 	* platforms/suse/Makefile:
@@ -41,15 +3478,9 @@
 
 2008-05-12 20:06  adk0212
 
-	* Developers, doc/latex/manual.tex:
+	* Developers:
 
 	Update contributors list. This is probably still way out of date.
-
-2008-05-12 20:01  adk0212
-
-	* doc/latex/manual.tex:
-
-	Remove references to powerflute.
 
 2008-05-11 18:34  adk0212
 
@@ -434,10 +3865,10 @@
 
 2008-01-27 12:00  adk0212
 
-	* doc/latex/manual.tex, include/struct.h,
-	platforms/etc/apcupsd.conf.in, platforms/mingw/apcupsd.conf.in,
-	src/device.c, src/drivers/net/net.c,
-	src/drivers/snmp/drv_powernet.c, src/lib/apcconfig.c:
+	* include/struct.h, platforms/etc/apcupsd.conf.in,
+	platforms/mingw/apcupsd.conf.in, src/device.c,
+	src/drivers/net/net.c, src/drivers/snmp/drv_powernet.c,
+	src/lib/apcconfig.c:
 
 	Add POLLTIME directive to control UPS polling interval. NETTIME is
 	accepted as a synonym for compatibility with old config files.
@@ -452,6 +3883,12 @@
 	-errno on failure. Kill off global net_errno and net_errmsg.
 	Improve apcaccess error messages.
 
+2008-01-27 10:20  adk0212
+
+	* include/amutex.h:
+
+	Add debug trace wrappers around mutex lock/unlock operations.
+
 2008-01-27 09:56  adk0212
 
 	* src/drivers/usb/bsd/bsd-usb.c:
@@ -464,6 +3901,54 @@
 
 	Fix compile errors from incomplete input vs feature report
 	conversion.
+
+2008-01-26 19:04  adk0212
+
+	* include/amutex.h:
+
+	Remove unnecessary include.
+
+2008-01-26 18:55  adk0212
+
+	* include/amutex.h:
+
+	Remove const_cast grunge in favor of mutable attribute.
+
+2008-01-26 17:55  adk0212
+
+	* include/amap.h:
+
+	Fix contains().
+
+2008-01-26 17:49  adk0212
+
+	* include/: aiter.h, alist.h, amap.h:
+
+	Add const iterators. It's tempting to leave these for later, but
+	once you abandon constness, it's awful hard to find it again.
+
+2008-01-26 17:49  adk0212
+
+	* include/aiter.h:
+
+	file aiter.h was added on branch Branch-3_14 on 2009-09-20 19:46:13
+	+0000
+
+2008-01-26 14:58  adk0212
+
+	* include/alist.h, include/amutex.h, include/aqueue.h,
+	include/astring.h, include/athread.h, include/atimer.h,
+	src/lib/athread.cpp, src/lib/atimer.cpp:
+
+	Milestone checkin. Basic functionality is working with new core.
+	Many more changes to come.
+
+2008-01-26 14:58  adk0212
+
+	* include/astring.h:
+
+	file astring.h was added on branch Branch-3_14 on 2009-09-20
+	19:46:13 +0000
 
 2008-01-22 20:10  adk0212
 
@@ -583,13 +4068,6 @@
 	Add policy file to disable hald-addon-hid-ups. Automatically
 	install and uninstall this policy on Redhat systems.
 
-2007-11-13 18:23  adk0212
-
-	* doc/latex/manual.tex:
-
-	Fix debian package URLs. Found by Chris Reeves
-	<chris@astro.ex.ac.uk>.
-
 2007-11-10 08:17  fleetworks
 
 	* platforms/: mandrake/apcupsd.spec.in, redhat/apcupsd.spec.in,
@@ -631,6 +4109,76 @@
 	support writes on UPSes that offer the same usage in both types of
 	reports.
 
+2007-10-17 19:00  adk0212
+
+	* src/drivers/usb/generic/generic-usb.h:
+
+	file generic-usb.h was added on branch Branch-3_14 on 2012-03-30
+	23:47:08 +0000
+
+2007-10-17 19:00  adk0212
+
+	* src/drivers/usb/: linux/linux-usb.h, generic/generic-usb.h:
+
+	Forgot to check these in before.
+
+2007-10-17 19:00  adk0212
+
+	* src/drivers/usb/linux/linux-usb.h:
+
+	file linux-usb.h was added on branch Branch-3_14 on 2012-03-30
+	23:47:08 +0000
+
+2007-10-15 18:13  adk0212
+
+	* src/lib/: amutex.cpp, astring.cpp, autil.cpp:
+
+	Correct filenames in comments.
+
+2007-10-15 18:13  adk0212
+
+	* src/lib/amutex.cpp:
+
+	file amutex.cpp was added on branch Branch-3_14 on 2009-09-20
+	19:46:13 +0000
+
+2007-10-15 18:13  adk0212
+
+	* src/lib/astring.cpp:
+
+	file astring.cpp was added on branch Branch-3_14 on 2009-09-20
+	19:46:13 +0000
+
+2007-10-15 18:13  adk0212
+
+	* src/lib/autil.cpp:
+
+	file autil.cpp was added on branch Branch-3_14 on 2009-09-20
+	19:46:13 +0000
+
+2007-10-15 18:12  adk0212
+
+	* include/autil.h:
+
+	file autil.h was added on branch Branch-3_14 on 2009-09-20 19:46:13
+	+0000
+
+2007-10-15 18:12  adk0212
+
+	* include/alist.h, include/amap.h, include/amutex.h,
+	include/astring.h, include/autil.h, src/lib/amutex.cpp,
+	src/lib/astring.cpp, src/lib/autil.cpp:
+
+	Add license text for a* utility classes.
+
+2007-10-15 18:05  adk0212
+
+	* include/alist.h, include/amap.h, include/astring.h,
+	src/lib/autil.cpp:
+
+	Add simple list and map classes and convert pcnet driver to use
+	them.
+
 2007-10-06 10:52  adk0212
 
 	* include/drivers.h, include/extern.h, include/nis.h,
@@ -655,6 +4203,13 @@
 	'char*'" warnings emitted from gcc-4.2.1 (earlier versions with
 	-Wwrite-strings).  Contributed by Steve Yarmie
 	<tribhuvanji@gmail.com>.
+
+2007-10-04 18:33  adk0212
+
+	* include/amutex.h, include/astring.h, include/autil.h,
+	src/lib/amutex.cpp, src/lib/astring.cpp, src/lib/autil.cpp:
+
+	Add smart string and mutex classes.
 
 2007-09-30 15:45  adk0212
 
@@ -824,13 +4379,6 @@
 	Don't leak unnecessary descriptors to child when execing
 	apccontrol.
 
-2007-08-03 13:52  adk0212
-
-	* doc/latex/manual.tex:
-
-	Documentation updates: Fix up udev info for modern Linux distros.
-	Update Windows section for apctray.
-
 2007-08-03 11:49  adk0212
 
 	* src/drivers/apcsmart/smart.c:
@@ -849,10 +4397,10 @@
 
 2007-08-03 11:20  adk0212
 
-	* INSTALL, doc/latex/manual.tex, examples/safe.apccontrol.in,
-	platforms/apccontrol.in, platforms/darwin/apccontrol.in,
-	platforms/freebsd/apccontrol.in, platforms/mingw/apccontrol.bat,
-	platforms/openbsd/apccontrol.in, platforms/sun/apccontrol.in:
+	* INSTALL, examples/safe.apccontrol.in, platforms/apccontrol.in,
+	platforms/darwin/apccontrol.in, platforms/freebsd/apccontrol.in,
+	platforms/mingw/apccontrol.bat, platforms/openbsd/apccontrol.in,
+	platforms/sun/apccontrol.in:
 
 	apccontrol cleanups: powerout and mainsback should not wall; that
 	is done by onbattery/offbattery under the control of
@@ -1613,20 +5161,6 @@
 	* ReleaseNotes, include/version.h:
 
 	Final updates for 3.14.1.
-
-2007-04-21 20:24  adk0212
-
-	* doc/latex/manual.tex:
-
-	Clarify FreeBSD versions in USB kernel section.
-
-2007-04-21 19:59  adk0212
-
-	* doc/latex/manual.tex:
-
-	Add USB info for NetBSD 4.x (ugen binding can be forced on a
-	particular port). Contributed by Curt Sampson
-	<cjs@starling-software.com>.
 
 2007-04-21 19:27  adk0212
 

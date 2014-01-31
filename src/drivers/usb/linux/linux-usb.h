@@ -1,12 +1,17 @@
 /*
  * linux-usb.h
  *
- * Linux hiddev based USB UPS driver
+ * Platform-specific interface to Linux hiddev USB HID driver.
+ *
+ * Parts of this code (especially the initialization and walking
+ * the reports) were derived from a test program hid-ups.c by:    
+ *    Vojtech Pavlik <vojtech@ucw.cz>
+ *    Paul Stewart <hiddev@wetlogic.net>
  */
 
 /*
  * Copyright (C) 2001-2004 Kern Sibbald
- * Copyright (C) 2004-2007 Adam Kropelin
+ * Copyright (C) 2004-2012 Adam Kropelin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of version 2 of the GNU General
@@ -23,45 +28,65 @@
  * MA 02111-1307, USA.
  */
 
-#ifndef _LINUX_USB_H
-#define _LINUX_USB_H
+#ifndef _LINUXUSB_H
+#define _LINUXUSB_H
 
 #include "../usb.h"
 #include <asm/types.h>
 #include <linux/hiddev.h>
 
-class LinuxUsbDriver: public UsbDriver
+class LinuxUsbUpsDriver: public UsbUpsDriver
 {
 public:
+   LinuxUsbUpsDriver(UPSINFO *ups);
+   virtual ~LinuxUsbUpsDriver() {}
 
-   LinuxUsbDriver(UPSINFO *ups);
-   virtual ~LinuxUsbDriver() {}
+   // Inherited from UpsDriver
+   virtual bool Open();
+   virtual bool Close();
+   virtual bool check_state();
 
-   virtual bool SubclassGetCapabilities();
-   virtual bool SubclassOpen();
-   virtual bool SubclassClose();
-   virtual bool SubclassCheckState();
-   virtual bool SubclassGetValue(int ci, usb_value *uval);
-   virtual bool SubclassWriteIntToUps(int ci, int value, const char *name);
-   virtual bool SubclassReadIntFromUps(int ci, int *value);
+   // Inherited from UsbUpsDriver
+   virtual int write_int_to_ups(int ci, int value, char const* name);
+   virtual int read_int_from_ups(int ci, int *value);
+
+protected:
+
+   // Inherited from UsbUpsDriver
+   virtual bool pusb_ups_get_capabilities();
+   virtual bool pusb_get_value(int ci, USB_VALUE *uval);
 
 private:
 
-   struct usb_info;
+   /*
+    * When we are traversing the USB reports given by the UPS and we
+    * find an entry corresponding to an entry in the known_info table
+    * above, we make the following USB_INFO entry in the info table
+    * of our private data.
+    */
+   typedef struct s_usb_info {
+      unsigned physical;              /* physical value wanted */
+      unsigned unit_exponent;         /* exponent */
+      unsigned unit;                  /* units */
+      int data_type;                  /* data type */
+      int ci;                         /* which CI does this usage represent? */
+      struct hiddev_usage_ref uref;   /* usage reference (read) */
+      struct hiddev_usage_ref wuref;  /* usage reference (write) */
+   } USB_INFO;
 
-   void reinitialize();
-   int  open_device(const char *dev);
-   bool open_usb_device();
-   bool link_check();
-   bool populate_uval(usb_info *info, usb_value *uval);
-   usb_info *find_info_by_uref(struct hiddev_usage_ref *uref);
-   usb_info *find_info_by_ucode(unsigned int ucode);
+   void reinitialize_private_structure();
+   int open_device(const char *dev);
+   int open_usb_device();
+   int usb_link_check();
+   bool populate_uval(USB_INFO *info, USB_VALUE *uval);
+   USB_INFO *find_info_by_uref(struct hiddev_usage_ref *uref);
+   USB_INFO *find_info_by_ucode(unsigned int ucode);
 
    int _fd;                         /* Our UPS fd when open */
    bool _compat24;                  /* Linux 2.4 compatibility mode */
    char _orig_device[MAXSTRING];    /* Original port specification */
-   usb_info *_info[CI_MAXCI + 1];   /* Info pointers for each command */
-   bool _linkcheck;                 /* Are we in the linkcheck state? */
+   USB_INFO *_info[CI_MAXCI + 1];   /* Info pointers for each command */
+   bool _linkcheck;
 };
 
-#endif  /* _LINUX_USB_H */
+#endif

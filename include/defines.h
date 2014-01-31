@@ -92,11 +92,10 @@
 #define UPS_shut_emerg    0x00400000    /* Set when battery power has failed */
 #define UPS_shut_remote   0x00800000    /* Set when remote shutdown */
 #define UPS_plugged       0x01000000    /* Set if computer is plugged into UPS */
-#define UPS_dev_setup     0x02000000    /* Set if UPS's driver did the setup() */
 #define UPS_battpresent   0x04000000    /* Indicates if battery is connected */
 
 #define UPS_LOCAL_BITS (UPS_commlost|UPS_shutdown|UPS_slave|UPS_slavedown| \
-            UPS_onbatt_msg|UPS_fastpoll|UPS_plugged|UPS_dev_setup| \
+            UPS_onbatt_msg|UPS_fastpoll|UPS_plugged| \
             UPS_shut_load|UPS_shut_btime|UPS_shut_ltime|UPS_shut_emerg)
 
 /*
@@ -104,17 +103,10 @@
  *
  * If the command is valid for this UPS, UPS_Cap[CI_xxx]
  * will be true.
- *
- * Units:
- *    Voltage       - millivolts
- *    Relative Time - seconds
- *    Percent       - 0.1 percent
- *    Temperature   - 0.1 degrees C
- *    Frequency     - 0.1 Hz
- *    Power         - 0.1 Watt
  */
 enum { 
    CI_UPSMODEL = 0,                /* Model number */
+   CI_STATUS,                      /* status function */
    CI_LQUAL,                       /* line quality status */
    CI_WHY_BATT,                    /* why transferred to battery */
    CI_ST_STAT,                     /* self test stat */
@@ -154,6 +146,7 @@ enum {
    CI_BADBATTS,                    /* Number of bad battery packs */
    CI_EPROM,                       /* Valid eprom values */
    CI_ST_TIME,                     /* hours since last self test */
+   CI_TESTALARM,                   /* Test alarm */
    CI_Manufacturer,             
    CI_ShutdownRequested,        
    CI_ShutdownImminent,         
@@ -178,10 +171,12 @@ enum {
    CI_DelayBeforeShutdown,      
    CI_APCDelayBeforeStartup,    
    CI_APCDelayBeforeShutdown,   
+   CI_APCLineFailCause,         
    CI_NOMINV,                   
    CI_NOMPOWER,
-   CI_BatteryPresent,              /* Battery is present */
-   CI_BattLow,
+   CI_LowBattery,
+   CI_Calibration,
+   CI_AlarmTimer,
 
    /* Only seen on the BackUPS Pro USB (so far) */
    CI_BUPBattCapBeforeStartup,  
@@ -203,12 +198,12 @@ enum {
    CI_ChargerCurrentOOR,           /* Charger current our of range */
    CI_CurrentNotRegulated,         /* Charger current not regulated */
    CI_VoltageNotRegulated,         /* Charger voltage not regulated */
+   CI_BatteryPresent,              /* Battery is present */
    CI_LAST_PROBE,                  /* MUST BE LAST IN SECTION */
 
    /* Items below this line are not "probed" for */
    CI_CYCLE_EPROM,                 /* Cycle programmable EPROM values */
    CI_UPS_CAPS,                    /* Get UPS capabilities (command) string */
-   CI_STATUS,                      /* status function */
    CI_LAST                         /* MUST BE LAST */
 };
 
@@ -226,7 +221,8 @@ enum {
  * we will be able to support other UPSes later. The actual
  * command is obtained by reference to UPS_Cmd[CI_xxx]    
  */
-#define    APC_CMD_UPSMODEL       'V'
+#define    APC_CMD_UPSMODEL       0x1
+#define    APC_CMD_OLDFWREV       'V'
 #define    APC_CMD_STATUS         'Q'
 #define    APC_CMD_LQUAL          '9'
 #define    APC_CMD_WHY_BATT       'G'
@@ -325,12 +321,20 @@ enum {
 #define TIMER_FAST              1  /* Value for fast poll */
 #define TIMER_DUMB              5  /* for Dumb (ioctl) UPSes -- keep short */
 
+/* Make the size of these strings the next multiple of 4 */
+#define APC_MAGIC               "apcupsd-linux-6.0"
+#define APC_MAGIC_SIZE          4 * ((sizeof(APC_MAGIC) + 3) / 4)
+
+#define ACCESS_MAGIC            "apcaccess-linux-4.0"
+#define ACCESS_MAGIC_SIZE       4 * ((sizeof(APC_MAGIC) + 3) / 4)
+
+
 #define MAX_THREADS             7
 
 /* Find members position in the UPSINFO and GLOBALCFG structures. */
-#define WHERE(MEMBER) (((size_t) &((UPSINFO *)8)->MEMBER)-8)
+#define WHERE(MEMBER) ((size_t) &((UPSINFO *)0)->MEMBER)
 #define AT(UPS,OFFSET) ((size_t)UPS + OFFSET)
-#define SIZE(MEMBER) ((GENINFO *)sizeof(((UPSINFO *)8)->MEMBER))
+#define SIZE(MEMBER) ((GENINFO *)sizeof(((UPSINFO *)0)->MEMBER))
 
 
 /*
@@ -373,39 +377,15 @@ enum {
 #define Error_abort6(fmd, arg1,arg2,arg3,arg4,arg5,arg6) error_out(__FILE__, __LINE__, fmd, arg1,arg2,arg3,arg4,arg5,arg5)
 
 
-/*
- * The digit following Dmsg and Emsg indicates the number of substitutions in
- * the message string. We need to do this kludge because non-GNU compilers
- * do not handle varargs #defines.
- */
-
 /* Debug Messages that are printed */
 #ifdef DEBUG
 
-#define Dmsg0(lvl, msg)             d_msg(__FILE__, __LINE__, lvl, msg)
-#define Dmsg1(lvl, msg, a1)         d_msg(__FILE__, __LINE__, lvl, msg, a1)
-#define Dmsg2(lvl, msg, a1, a2)     d_msg(__FILE__, __LINE__, lvl, msg, a1, a2)
-#define Dmsg3(lvl, msg, a1, a2, a3) d_msg(__FILE__, __LINE__, lvl, msg, a1, a2, a3)
-#define Dmsg4(lvl, msg, arg1, arg2, arg3, arg4) d_msg(__FILE__, __LINE__, lvl, msg, arg1, arg2, arg3, arg4)
-#define Dmsg5(lvl, msg, a1, a2, a3, a4, a5) d_msg(__FILE__, __LINE__, lvl, msg, a1, a2, a3, a4, a5)
-#define Dmsg6(lvl, msg, a1, a2, a3, a4, a5, a6) d_msg(__FILE__, __LINE__, lvl, msg, a1, a2, a3, a4, a5, a6)
-#define Dmsg7(lvl, msg, a1, a2, a3, a4, a5, a6, a7) d_msg(__FILE__, __LINE__, lvl, msg, a1, a2, a3, a4, a5, a6, a7)
-#define Dmsg8(lvl, msg, a1, a2, a3, a4, a5, a6, a7, a8) d_msg(__FILE__, __LINE__, lvl, msg, a1, a2, a3, a4, a5, a6, a7, a8)
-#define Dmsg11(lvl,msg,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11) d_msg(__FILE__,__LINE__,lvl,msg,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11)
+#define Dmsg(lvl, msg, args...)     d_msg(__FILE__, __LINE__, lvl, msg, ##args)
 void d_msg(const char *file, int line, int level, const char *fmt, ...);
 
 #else
 
-#define Dmsg0(lvl, msg)
-#define Dmsg1(lvl, msg, a1)
-#define Dmsg2(lvl, msg, a1, a2)
-#define Dmsg3(lvl, msg, a1, a2, a3)
-#define Dmsg4(lvl, msg, arg1, arg2, arg3, arg4)
-#define Dmsg5(lvl, msg, a1, a2, a3, a4, a5)
-#define Dmsg6(lvl, msg, a1, a2, a3, a4, a5, a6)
-#define Dmsg7(lvl, msg, a1, a2, a3, a4, a5, a6, a7)
-#define Dmsg8(lvl, msg, a1, a2, a3, a4, a5, a6, a7, a8)
-#define Dmsg11(lvl,msg,a1,a2,a3,a4,a5,a6,a7,a8,a9,a10,a11)
+#define Dmsg(lvl, msg, args...)
 
 #endif
 
@@ -448,8 +428,5 @@ void d_msg(const char *file, int line, int level, const char *fmt, ...);
 #ifndef MAX
 #define MAX(a,b) ( (a) > (b) ? (a) : (b) )
 #endif
-
-/* Determine number of elements in array */
-#define ARRAY_SIZE(a) ( sizeof(a) / sizeof((a)[0]) )
 
 #endif   /* _DEFINES_H */

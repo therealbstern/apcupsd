@@ -25,9 +25,14 @@
 #include "apc.h"
 #include "testdriver.h"
 
+TestUpsDriver::TestUpsDriver(UPSINFO *ups) :
+   UpsDriver(ups)
+{
+}
+
 /*
  */
-bool TestDriver::open_test_device()
+bool TestUpsDriver::open_test_device()
 {
    _ups->fd = 1;
    return true;
@@ -37,28 +42,27 @@ bool TestDriver::open_test_device()
 /*
  * Read UPS events. I.e. state changes.
  */
-bool TestDriver::CheckState()
+bool TestUpsDriver::check_state()
 {
-   sleep(_ups->wait_time);
    return true;
 }
 
 /*
  * Open test port
  */
-bool TestDriver::Open()
+bool TestUpsDriver::Open()
 {
    write_lock(_ups);
 
    if (!open_test_device())
-      Error_abort1(_("Cannot open UPS device %s\n"), _ups->device);
+      Error_abort1("Cannot open UPS device %s\n", _ups->device);
 
    _ups->clear_slave();
    write_unlock(_ups);
    return true;
 }
 
-bool TestDriver::Close()
+bool TestUpsDriver::Close()
 {
    write_lock(_ups);
    
@@ -72,10 +76,12 @@ bool TestDriver::Close()
 /*
  * Setup capabilities structure for UPS
  */
-bool TestDriver::GetCapabilities()
+bool TestUpsDriver::get_capabilities()
 {
+   int k;
+
    write_lock(_ups);
-   for (int k = 0; k <= CI_MAX_CAPS; k++)
+   for (k = 0; k <= CI_MAX_CAPS; k++)
       _ups->UPS_Cap[k] = TRUE;
 
    write_unlock(_ups);
@@ -88,7 +94,7 @@ bool TestDriver::GetCapabilities()
  *
  * This routine is called once when apcupsd is starting
  */
-bool TestDriver::ReadStaticData()
+bool TestUpsDriver::read_static_data()
 {
    write_lock(_ups);
    /* UPS_NAME */
@@ -141,7 +147,7 @@ bool TestDriver::ReadStaticData()
  * This routine is called once every 5 seconds to get
  * a current idea of what the UPS is doing.
  */
-bool TestDriver::ReadVolatileData()
+bool TestUpsDriver::read_volatile_data()
 {
    /* save time stamp */
    time(&_ups->poll_time);

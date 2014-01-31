@@ -21,11 +21,8 @@ public:
    upsAbout(HINSTANCE appinst);
    ~upsAbout();
 
-   // Initialisation
-   BOOL Init();
-
    // General
-   void Show(BOOL show);
+   void Show();
 
 private:
    // The dialog box window proc
@@ -33,8 +30,8 @@ private:
       HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
    // Private data
-   BOOL m_dlgvisible;
-   HINSTANCE m_appinst;
+   BOOL _dlgvisible;
+   HINSTANCE _appinst;
 };
 
 #endif // WINABOUT_H

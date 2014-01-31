@@ -57,24 +57,25 @@ static const GENINFO onoroff[] = {
 
 static const GENINFO cables[] = {
    { "simple",         "Custom Cable Simple",  CUSTOM_SIMPLE },
-   { "smart",          "Custom Cable Smart",   CUSTOM_SMART },
-   { "ether",          "Ethernet Link",        APC_NET },
+   { "smart",          "Custom Cable Smart",   CABLE_SMART   },
+   { "ether",          "Ethernet Link",        APC_NET       },
    { "940-0119A",      "APC Cable 940-0119A",  APC_940_0119A },
    { "940-0127A",      "APC Cable 940-0127A",  APC_940_0127A },
    { "940-0128A",      "APC Cable 940-0128A",  APC_940_0128A },
    { "940-0020B",      "APC Cable 940-0020B",  APC_940_0020B },
    { "940-0020C",      "APC Cable 940-0020C",  APC_940_0020C },
    { "940-0023A",      "APC Cable 940-0023A",  APC_940_0023A },
-   { "940-0024B",      "APC Cable 940-0024B",  APC_940_0024B },
-   { "940-0024C",      "APC Cable 940-0024C",  APC_940_0024C },
-   { "940-1524C",      "APC Cable 940-1524C",  APC_940_1524C },
-   { "940-0024G",      "APC Cable 940-0024G",  APC_940_0024G },
+   { "940-0024B",      "APC Cable 940-0024B",  CABLE_SMART   },
+   { "940-0024C",      "APC Cable 940-0024C",  CABLE_SMART   },
+   { "940-1524C",      "APC Cable 940-1524C",  CABLE_SMART   },
+   { "940-0024G",      "APC Cable 940-0024G",  CABLE_SMART   },
+   { "940-0625A",      "APC Cable 940-0625A",  CABLE_SMART   },
    { "940-0095A",      "APC Cable 940-0095A",  APC_940_0095A },
    { "940-0095B",      "APC Cable 940-0095B",  APC_940_0095B },
    { "940-0095C",      "APC Cable 940-0095C",  APC_940_0095C },
-   { "MAM-04-02-2000", "MAM Cable 04-02-2000", MAM_CABLE},
+   { "MAM-04-02-2000", "MAM Cable 04-02-2000", MAM_CABLE     },
    { "usb",            "USB Cable",            USB_CABLE     },
-   { NULL,             "*invalid-cable*",      NO_CABLE  },
+   { NULL,             "*invalid-cable*",      NO_CABLE      },
 };
 
 static const GENINFO upsclasses[] = {
@@ -100,28 +101,15 @@ static const GENINFO modes[] = {
 };
 
 static const GENINFO types[] = {
-   /* FIXME (adk): It has been long enough...time to kill these */
-   { "backups",       "BackUPS",                   BK },
-   { "sharebasic",    "ShareUPS Basic Port",       SHAREBASIC },
-   { "backupspro",    "BackUPS Pro",               BKPRO },
-   { "smartvsups",    "SmartUPS VS",               VS },
-   { "newbackupspro", "Smarter BackUPS Pro",       NBKPRO },
-   { "backupspropnp", "Smarter BackUPS Pro",       NBKPRO },
-   { "smartups",      "SmartUPS",                  SMART },
-   { "matrixups",     "MatrixUPS",                 MATRIX },
-   { "sharesmart",    "ShareUPS Advanced Port",    SHARESMART },
-
-   /*
-    * Below are the new "drivers" entries. Entries above with time (long)
-    * will go away.
-    */
    { "dumb",     "DUMB UPS Driver",     DUMB_UPS },
    { "apcsmart", "APC Smart UPS (any)", APCSMART_UPS },
    { "usb",      "USB UPS Driver",      USB_UPS },
-   { "snmp",     "SNMP UPS Driver",     SNMP_UPS },
+   { "snmp",     "SNMP UPS Driver",     SNMPLITE_UPS },
    { "net",      "NETWORK UPS Driver",  NETWORK_UPS },
    { "test",     "TEST UPS Driver",     TEST_UPS },
    { "pcnet",    "PCNET UPS Driver",    PCNET_UPS },
+   { "netsnmp",  "NET-SNMP UPS Driver", SNMP_UPS },
+   { "modbus",   "MODBUS UPS Driver",   MODBUS_UPS },
    { NULL,       "*invalid-ups-type*",  NO_UPS },
 };
 
@@ -174,6 +162,19 @@ static const PAIRS table[] = {
    {"STATTIME", match_int,      WHERE(stattime), 0},
    {"DATATIME", match_int,      WHERE(datatime), 0},
 
+   /* Values used to set UPS EPROM for --configure */
+   {"SELFTEST",     match_str, WHERE(selftest),         SIZE(selftest)},
+   {"HITRANSFER",   match_int, WHERE(hitrans),          0},
+   {"LOTRANSFER",   match_int, WHERE(lotrans),          0},
+   {"LOWBATT",      match_int, WHERE(dlowbatt),         0},
+   {"WAKEUP",       match_int, WHERE(dwake),            0},
+   {"RETURNCHARGE", match_int, WHERE(rtnpct),           0},
+   {"OUTPUTVOLTS",  match_int, WHERE(NomOutputVoltage), 0},
+   {"SLEEP",        match_int, WHERE(dshutd),           0},
+   {"BEEPSTATE",    match_str, WHERE(beepstate),        SIZE(beepstate)},
+   {"BATTDATE",     match_str, WHERE(battdat),          SIZE(battdat)},
+   {"SENSITIVITY",  match_str, WHERE(sensitivity),      SIZE(sensitivity)},
+
    /* Configuration statements for network sharing of the UPS */
    {"UPSCLASS",  match_range, WHERE(upsclass),    upsclasses},
    {"UPSMODE",   match_range, WHERE(sharenet),    modes     },
@@ -197,19 +198,6 @@ static const PAIRS table[] = {
    {"NETSTATUS",  obsolete, FALSE, (GENINFO *)"NETSTATUS config directive is obsolete" },
    {"SERVERPORT", obsolete, FALSE, (GENINFO *)"SERVERPORT config directive is obsolete"},
 
-   /* Obsolete EEPROM options */
-   {"SELFTEST",     obsolete, FALSE, (GENINFO *)"SELFTEST config directive is obsolete"    },
-   {"HITRANSFER",   obsolete, FALSE, (GENINFO *)"HITRANSFER config directive is obsolete"  },
-   {"LOTRANSFER",   obsolete, FALSE, (GENINFO *)"LOTRANSFER config directive is obsolete"  },
-   {"LOWBATT",      obsolete, FALSE, (GENINFO *)"LOWBATT config directive is obsolete"     },
-   {"WAKEUP",       obsolete, FALSE, (GENINFO *)"WAKEUP config directive is obsolete"      },
-   {"RETURNCHARGE", obsolete, FALSE, (GENINFO *)"RETURNCHARGE config directive is obsolete"},
-   {"OUTPUTVOLTS",  obsolete, FALSE, (GENINFO *)"OUTPUTVOLTS config directive is obsolete" },
-   {"SLEEP",        obsolete, FALSE, (GENINFO *)"SLEEP config directive is obsolete"       },
-   {"BEEPSTATE",    obsolete, FALSE, (GENINFO *)"BEEPSTATE config directive is obsolete"   },
-   {"BATTDATE",     obsolete, FALSE, (GENINFO *)"BATTDATE config directive is obsolete"    },
-   {"SENSITIVITY",  obsolete, FALSE, (GENINFO *)"SENSITIVITY config directive is obsolete" },
-
    /* must be last */
    {NULL, 0, 0, 0}
 };
@@ -220,7 +208,7 @@ static int obsolete(UPSINFO *ups, int offset, const GENINFO * junk, const char *
 
    fprintf(stderr, "%s\n", msg);
    if (!offset) {
-      fprintf(stderr, _("error ignored.\n"));
+      fprintf(stderr, "error ignored.\n");
       return SUCCESS;
    }
    
@@ -238,7 +226,7 @@ static int start_ups(UPSINFO *ups, int offset, const GENINFO * size, const char 
    /* Verify that we don't already have an UPS with the same name. */
    for (ups = NULL; (ups = getNextUps(ups)) != NULL;)
       if (strncmp(x, ups->upsname, UPSNAMELEN) == 0) {
-         fprintf(stderr, _("%s: duplicate upsname [%s] in config file.\n"),
+         fprintf(stderr, "%s: duplicate upsname [%s] in config file.\n",
             argvalue, ups->upsname);
          return FAILURE;
       }
@@ -247,7 +235,7 @@ static int start_ups(UPSINFO *ups, int offset, const GENINFO * size, const char 
    ups = new_ups();
 
    if (ups == NULL) {
-      Error_abort1(_("%s: not enough memory.\n"), argvalue);
+      Error_abort1("%s: not enough memory.\n", argvalue);
       return FAILURE;
    }
 
@@ -269,12 +257,12 @@ static int end_ups(UPSINFO *ups, int offset, const GENINFO * size, const char *v
       return FAILURE;
 
    if (ups == NULL) {
-      fprintf(stderr, _("%s: upsname [%s] mismatch in config file.\n"), argvalue, x);
+      fprintf(stderr, "%s: upsname [%s] mismatch in config file.\n", argvalue, x);
       return FAILURE;
    }
 
    if (strncmp(x, ups->upsname, UPSNAMELEN) != 0) {
-      fprintf(stderr, _("%s: upsname [%s] mismatch in config file.\n"),
+      fprintf(stderr, "%s: upsname [%s] mismatch in config file.\n",
          argvalue, ups->upsname);
       return FAILURE;
    }
@@ -304,7 +292,7 @@ static int match_range(UPSINFO *ups, int offset, const GENINFO * vs, const char 
 
    if (!vs) {
       /* Shouldn't ever happen so abort if it ever does. */
-      Error_abort1(_("%s: Bogus configuration table! Fix and recompile.\n"),
+      Error_abort1("%s: Bogus configuration table! Fix and recompile.\n",
          argvalue);
    }
 
@@ -324,9 +312,9 @@ static int match_range(UPSINFO *ups, int offset, const GENINFO * vs, const char 
        * print error message (and log it).
        */
       log_event(ups, LOG_WARNING,
-         _("%s: Bogus configuration value (%s)\n"), argvalue, vs->long_name);
+         "%s: Bogus configuration value (%s)\n", argvalue, vs->long_name);
       fprintf(stderr,
-         _("%s: Bogus configuration value (%s)\n"), argvalue, vs->long_name);
+         "%s: Bogus configuration value (%s)\n", argvalue, vs->long_name);
       return FAILURE;
 
    }
@@ -353,7 +341,7 @@ static int match_index(UPSINFO *ups, int offset, const GENINFO * vs, const char 
 
    if (!vs) {
       /* Shouldn't ever happen so abort if it ever does. */
-      Error_abort1(_("%s: Bogus configuration table! Fix and recompile.\n"),
+      Error_abort1("%s: Bogus configuration table! Fix and recompile.\n",
          argvalue);
    }
 
@@ -370,9 +358,9 @@ static int match_index(UPSINFO *ups, int offset, const GENINFO * vs, const char 
        * print error message (and log it).
        */
       log_event(ups, LOG_WARNING,
-         _("%s: Bogus configuration value (%s)\n"), argvalue, vs->long_name);
+         "%s: Bogus configuration value (%s)\n", argvalue, vs->long_name);
       fprintf(stderr,
-         _("%s: Bogus configuration value (%s)\n"), argvalue, vs->long_name);
+         "%s: Bogus configuration value (%s)\n", argvalue, vs->long_name);
       return FAILURE;
 
    }
@@ -588,6 +576,22 @@ void init_ups_struct(UPSINFO *ups)
    ups->runtime = 5;
    ups->netstats = TRUE;
    ups->statusport = NISPORT;
+   ups->upsmodel[0] = 0;           /* end of string */
+
+
+   /* EPROM values that can be changed with config directives */
+
+   astrncpy(ups->sensitivity, "-1", sizeof(ups->sensitivity));  /* no value */
+   ups->dwake = -1;
+   ups->dshutd = -1;
+   astrncpy(ups->selftest, "-1", sizeof(ups->selftest));        /* no value */
+   ups->lotrans = -1;
+   ups->hitrans = -1;
+   ups->rtnpct = -1;
+   ups->dlowbatt = -1;
+   ups->NomOutputVoltage = -1;
+   astrncpy(ups->beepstate, "-1", sizeof(ups->beepstate));      /* no value */
+
    ups->nisip[0] = 0;              /* no nis IP file as default */
 
    ups->lockfile = -1;
@@ -609,6 +613,51 @@ void init_ups_struct(UPSINFO *ups)
    astrncpy(ups->scriptdir, SYSCONFDIR, sizeof(ups->scriptdir));
    astrncpy(ups->pwrfailpath, PWRFAILDIR, sizeof(ups->pwrfailpath));
    astrncpy(ups->nologinpath, NOLOGDIR, sizeof(ups->nologinpath));
+   
+   /* Initialize UPS function codes */
+   ups->UPS_Cmd[CI_STATUS] = APC_CMD_STATUS;
+   ups->UPS_Cmd[CI_LQUAL] = APC_CMD_LQUAL;
+   ups->UPS_Cmd[CI_WHY_BATT] = APC_CMD_WHY_BATT;
+   ups->UPS_Cmd[CI_ST_STAT] = APC_CMD_ST_STAT;
+   ups->UPS_Cmd[CI_VLINE] = APC_CMD_VLINE;
+   ups->UPS_Cmd[CI_VMAX] = APC_CMD_VMAX;
+   ups->UPS_Cmd[CI_VMIN] = APC_CMD_VMIN;
+   ups->UPS_Cmd[CI_VOUT] = APC_CMD_VOUT;
+   ups->UPS_Cmd[CI_BATTLEV] = APC_CMD_BATTLEV;
+   ups->UPS_Cmd[CI_VBATT] = APC_CMD_VBATT;
+   ups->UPS_Cmd[CI_LOAD] = APC_CMD_LOAD;
+   ups->UPS_Cmd[CI_FREQ] = APC_CMD_FREQ;
+   ups->UPS_Cmd[CI_RUNTIM] = APC_CMD_RUNTIM;
+   ups->UPS_Cmd[CI_ITEMP] = APC_CMD_ITEMP;
+   ups->UPS_Cmd[CI_DIPSW] = APC_CMD_DIPSW;
+   ups->UPS_Cmd[CI_SENS] = APC_CMD_SENS;
+   ups->UPS_Cmd[CI_DWAKE] = APC_CMD_DWAKE;
+   ups->UPS_Cmd[CI_DSHUTD] = APC_CMD_DSHUTD;
+   ups->UPS_Cmd[CI_LTRANS] = APC_CMD_LTRANS;
+   ups->UPS_Cmd[CI_HTRANS] = APC_CMD_HTRANS;
+   ups->UPS_Cmd[CI_RETPCT] = APC_CMD_RETPCT;
+   ups->UPS_Cmd[CI_DALARM] = APC_CMD_DALARM;
+   ups->UPS_Cmd[CI_DLBATT] = APC_CMD_DLBATT;
+   ups->UPS_Cmd[CI_IDEN] = APC_CMD_IDEN;
+   ups->UPS_Cmd[CI_STESTI] = APC_CMD_STESTI;
+   ups->UPS_Cmd[CI_MANDAT] = APC_CMD_MANDAT;
+   ups->UPS_Cmd[CI_SERNO] = APC_CMD_SERNO;
+   ups->UPS_Cmd[CI_BATTDAT] = APC_CMD_BATTDAT;
+   ups->UPS_Cmd[CI_NOMBATTV] = APC_CMD_NOMBATTV;
+   ups->UPS_Cmd[CI_HUMID] = APC_CMD_HUMID;
+   ups->UPS_Cmd[CI_REVNO] = APC_CMD_REVNO;
+   ups->UPS_Cmd[CI_REG1] = APC_CMD_REG1;
+   ups->UPS_Cmd[CI_REG2] = APC_CMD_REG2;
+   ups->UPS_Cmd[CI_REG3] = APC_CMD_REG3;
+   ups->UPS_Cmd[CI_EXTBATTS] = APC_CMD_EXTBATTS;
+   ups->UPS_Cmd[CI_ATEMP] = APC_CMD_ATEMP;
+   ups->UPS_Cmd[CI_UPSMODEL] = APC_CMD_UPSMODEL;
+   ups->UPS_Cmd[CI_NOMOUTV] = APC_CMD_NOMOUTV;
+   ups->UPS_Cmd[CI_BADBATTS] = APC_CMD_BADBATTS;
+   ups->UPS_Cmd[CI_EPROM] = APC_CMD_EPROM;
+   ups->UPS_Cmd[CI_ST_TIME] = APC_CMD_ST_TIME;
+   ups->UPS_Cmd[CI_CYCLE_EPROM] = APC_CMD_CYCLE_EPROM;
+   ups->UPS_Cmd[CI_UPS_CAPS] = APC_CMD_UPS_CAPS;
 }
 
 void check_for_config(UPSINFO *ups, char *cfgfile)
@@ -619,7 +668,7 @@ void check_for_config(UPSINFO *ups, char *cfgfile)
    int erpos = 0;
 
    if ((apcconf = fopen(cfgfile, "r")) == NULL) {
-      Error_abort2(_("Error opening configuration file (%s): %s\n"),
+      Error_abort2("Error opening configuration file (%s): %s\n",
          cfgfile, strerror(errno));
    }
    astrncpy(ups->configfile, cfgfile, sizeof(ups->configfile));
@@ -632,13 +681,13 @@ void check_for_config(UPSINFO *ups, char *cfgfile)
        * They never match so don't even compare them.
        */
       if (strncmp(line, APC_CONFIG_MAGIC, sizeof(APC_CONFIG_MAGIC) - 1) != 0) {
-         fprintf(stderr, _("%s: Warning: old configuration file found.\n\n"
+         fprintf(stderr, "%s: Warning: old configuration file found.\n\n"
                "%s: Expected: \"%s\"\n"
                "%s: Found:    \"%s\"\n\n"
                "%s: Please check new file format and\n"
                "%s: modify accordingly the first line\n"
                "%s: of config file.\n\n"
-               "%s: Processing config file anyway.\n"),
+               "%s: Processing config file anyway.\n",
             argvalue,
             argvalue, APC_CONFIG_MAGIC,
             argvalue, line, argvalue, argvalue, argvalue, argvalue);
@@ -659,8 +708,8 @@ jump_into_the_loop:
 
       if (ParseConfig(ups, line)) {
          errors++;
-         Dmsg1(100, "%s\n", line);
-         Dmsg2(100, _("Parsing error at line %d of config file %s.\n"), erpos, cfgfile);
+         Dmsg(100, "%s\n", line);
+         Dmsg(100, "Parsing error at line %d of config file %s.\n", erpos, cfgfile);
       }
    }
 
@@ -689,18 +738,34 @@ jump_into_the_loop:
       ups->runtime = 5;
    }
 
-   if ((ups->cable.type < CUSTOM_SMART) && ups->mode.type >= BKPRO) {
-      fprintf(stderr, _("%s: Error :: Changing UPSTYPE from %s "),
-         argvalue, ups->mode.long_name);
-
-      /* No errors expected from this operation. */
-      errors += match_range(ups, WHERE(mode), types, "backups");
-
-      fprintf(stderr, _("to %s due wrong Cable of Smart Signals.\n\a"),
-         ups->mode.long_name);
-
-      if (errors)
-         Error_abort0(_("Lookup operation failed: bad 'types' table\n"));
+   // Sanitize cable type & UPS mode. Since UPSTYPE (aka mode) and UPSCABLE
+   // can contradict eachother, the rule is that UPSTYPE wins. In all cases
+   // except Dumb we can determine cable type from mode so we ignore user's 
+   // configured UPSCABLE and force it ourselves. In the case of Dumb UPSes we 
+   // just ensure they picked a simple cable type.
+   switch (ups->mode.type)
+   {
+   case USB_UPS:
+      match_range(ups, WHERE(cable), cables, "usb");
+      break;
+   case SNMPLITE_UPS:
+   case SNMP_UPS: 
+   case PCNET_UPS:
+   case NETWORK_UPS:
+      match_range(ups, WHERE(cable), cables, "ether");
+      break;
+   case MODBUS_UPS:
+   case APCSMART_UPS:
+      match_range(ups, WHERE(cable), cables, "smart");
+      break;
+   case DUMB_UPS:
+      // Abort if user specified dumb UPS type with smart cable
+      if (ups->cable.type >= CABLE_SMART)
+         Error_abort0("Invalid cable specified for Dumb UPS\n");
+      break;      
+   case TEST_UPS:
+      // Allow anything in test mode
+      break;
    }
 
    /*
@@ -734,9 +799,9 @@ jump_into_the_loop:
    }
 
    /* Append filenames to paths */
-   Dmsg1(200, "After config scriptdir: \"%s\"\n", ups->scriptdir);
-   Dmsg1(200, "After config pwrfailpath: \"%s\"\n", ups->pwrfailpath);
-   Dmsg1(200, "After config nologinpath: \"%s\"\n", ups->nologinpath);
+   Dmsg(200, "After config scriptdir: \"%s\"\n", ups->scriptdir);
+   Dmsg(200, "After config pwrfailpath: \"%s\"\n", ups->pwrfailpath);
+   Dmsg(200, "After config nologinpath: \"%s\"\n", ups->nologinpath);
    astrncat(ups->nologinpath, NOLOGIN_FILE, sizeof(ups->nologinpath));
    astrncat(ups->pwrfailpath, PWRFAIL_FILE, sizeof(ups->pwrfailpath));
 
@@ -761,7 +826,7 @@ jump_into_the_loop:
 
 bail_out:
    if (errors)
-      error_exit(_("Terminating due to configuration file errors.\n"));
+      error_exit("Terminating due to configuration file errors.\n");
 
    return;
 }

@@ -35,15 +35,19 @@ UPSINFO *new_ups()
    int stat;
    UPSINFO *ups;
 
-   ups = new UPSINFO();
+   ups = (UPSINFO *) malloc(sizeof(UPSINFO));
    if (!ups)
-      Error_abort0(_("Could not allocate ups memory\n"));
+      Error_abort0("Could not allocate ups memory\n");
 
+   memset(ups, 0, sizeof(UPSINFO));
    if ((stat = pthread_mutex_init(&ups->mutex, NULL)) != 0) {
       Error_abort1("Could not create pthread mutex. ERR=%s\n", strerror(stat));
       free(ups);
       return NULL;
    }
+
+   /* Most drivers do not support this, so preset it to true */
+   ups->set_battpresent();
 
    ups->refcnt = 1;
    return ups;
@@ -77,30 +81,30 @@ void destroy_ups(UPSINFO *ups)
 {
    pthread_mutex_destroy(&ups->mutex);
    if (ups->refcnt == 0) {
-      delete ups;
+      free(ups);
    }
 }
 
 void _read_lock(const char *file, int line, UPSINFO *ups)
 {
-   Dmsg2(100, "read_lock at %s:%d\n", file, line);
+   Dmsg(100, "read_lock at %s:%d\n", file, line);
    P(ups->mutex);
 }
 
 void _read_unlock(const char *file, int line, UPSINFO *ups)
 {
-   Dmsg2(100, "read_unlock at %s:%d\n", file, line);
+   Dmsg(100, "read_unlock at %s:%d\n", file, line);
    V(ups->mutex);
 }
 
 void _write_lock(const char *file, int line, UPSINFO *ups)
 {
-   Dmsg2(100, "write_lock at %s:%d\n", file, line);
+   Dmsg(100, "write_lock at %s:%d\n", file, line);
    P(ups->mutex);
 }
 
 void _write_unlock(const char *file, int line, UPSINFO *ups)
 {
-   Dmsg2(100, "write_unlock at %s:%d\n", file, line);
+   Dmsg(100, "write_unlock at %s:%d\n", file, line);
    V(ups->mutex);
 }

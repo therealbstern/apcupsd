@@ -54,12 +54,12 @@ unsigned char *hidu_fetch_report_descriptor(usb_dev_handle *fd, int *rlen)
    ptr = (unsigned char*)malloc(MAX_SANE_DESCRIPTOR_LEN);
    rdesclen = usb_get_intf_descriptor(fd, USB_DT_REPORT, 0, ptr, MAX_SANE_DESCRIPTOR_LEN);
    if (rdesclen <= 0) {
-      Dmsg1(100, "Unable to get REPORT descriptor (%d).\n", rdesclen);
+      Dmsg(100, "Unable to get REPORT descriptor (%d).\n", rdesclen);
       free(ptr);
       return NULL;
    }
 
-   Dmsg0(300, "Report descriptor:\n");
+   Dmsg(300, "Report descriptor:\n");
    hex_dump(300, ptr, rdesclen);
 
    *rlen = rdesclen;
@@ -133,7 +133,7 @@ int hidu_locate_item(report_desc_t rdesc, int usage, int app, int phys,
 
    cookie = hid_start_parse(rdesc, HID_KIND_ALL, -1);
    if (!cookie) {
-      Dmsg0(100, "Unable to start hid parser\n");
+      Dmsg(100, "Unable to start hid parser\n");
       return 0;
    }
 
@@ -192,7 +192,7 @@ int hidu_get_report(usb_dev_handle *fd, hid_item_t *item, unsigned char *data, i
 {
    int actlen;
 
-   Dmsg4(200, "get_report: id=0x%02x, kind=%d, length=%d pos=%d\n",
+   Dmsg(200, "get_report: id=0x%02x, kind=%d, length=%d pos=%d\n",
       item->report_ID, item->kind, len, item->pos);
 
    actlen = usb_control_msg( fd,
@@ -201,7 +201,7 @@ int hidu_get_report(usb_dev_handle *fd, hid_item_t *item, unsigned char *data, i
       0, (char*)data, len, 1000);
 
    if (actlen <= 0) {
-      Dmsg2(100, "Error getting report: (%d) %s\n", actlen, strerror(-actlen));
+      Dmsg(100, "Error getting report: (%d) %s\n", actlen, strerror(-actlen));
       return -1;
    }
 
@@ -219,7 +219,7 @@ int hidu_set_report(usb_dev_handle *fd, hid_item_t *item, unsigned char *data, i
 {
    int actlen;
 
-   Dmsg4(200, "set_report: id=0x%02x, kind=%d, length=%d pos=%d\n",
+   Dmsg(200, "set_report: id=0x%02x, kind=%d, length=%d pos=%d\n",
       item->report_ID, item->kind, len, item->pos);
    hex_dump(300, data, len);
 
@@ -228,7 +228,7 @@ int hidu_set_report(usb_dev_handle *fd, hid_item_t *item, unsigned char *data, i
       USB_REQ_SET_REPORT, ((item->kind + 1) << 8) | item->report_ID,
       0, (char*)data, len, 1000);
    if (actlen != len) {
-      Dmsg2(100, "Error setting report: (%d) %s\n", actlen, strerror(-actlen));
+      Dmsg(100, "Error setting report: (%d) %s\n", actlen, strerror(-actlen));
       return 0;
    }
 
@@ -248,10 +248,10 @@ const char *hidu_get_string(usb_dev_handle *fd, int index)
 
    rc = usb_get_string_simple(fd, index, string, sizeof(string));
    if (rc <= 0) {
-      Dmsg2(100, "Error fetching string descriptor: (%d) %s\n", rc, strerror(-rc));
+      Dmsg(100, "Error fetching string descriptor: (%d) %s\n", rc, strerror(-rc));
       return NULL;
    }
 
-   Dmsg1(200, "Got string of length=%d\n", rc);
+   Dmsg(200, "Got string of length=%d\n", rc);
    return string;
 }

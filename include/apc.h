@@ -141,8 +141,6 @@
 /* Include apcupsd stuff */
 
 #include "apc_config.h"
-
-#include "apc_i18n.h"
 #include "version.h"
 #include "defines.h"
 #include "struct.h"
@@ -155,6 +153,11 @@
 /* Pull in our local copy because the library does not have correct protos */
 #ifdef HAVE_LIBWRAP
 # include "tcpd.h"
+#endif
+
+/* Solaris doesn't define this */
+#ifndef INADDR_NONE
+#define INADDR_NONE ((in_addr_t)-1)
 #endif
 
 #endif

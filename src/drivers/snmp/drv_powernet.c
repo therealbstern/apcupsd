@@ -25,14 +25,15 @@
 
 #include "apc.h"
 #include "snmp.h"
+#include "snmp_private.h"
 
-bool SnmpDriver::powernet_check_comm_lost()
+int SnmpUpsDriver::powernet_check_comm_lost()
 {
    struct timeval now;
    static struct timeval prev;
    struct snmp_session *s = &_session;
-   powernet_mib_t *data = (powernet_mib_t *)_MIB;
-   bool ret = true;
+   powernet_mib_t *data = (powernet_mib_t *)_mib;
+   int ret = 1;
 
    /*
     * Check the Ethernet COMMLOST first, then check the
@@ -56,7 +57,7 @@ bool SnmpDriver::powernet_check_comm_lost()
          prev = now;
       }
 
-      ret = false;
+      ret = 0;
    }
    else if (_ups->is_commlost())
    {
@@ -71,7 +72,7 @@ bool SnmpDriver::powernet_check_comm_lost()
 }
 
 
-bool SnmpDriver::powernet_snmp_kill_ups_power()
+bool SnmpUpsDriver::powernet_snmp_kill_ups_power()
 {
    /* Was 1} change submitted by Kastus Shchuka (kastus@lists.sourceforge.net) 10Dec03 */
    oid upsBasicControlConserveBattery[] =
@@ -93,26 +94,26 @@ bool SnmpDriver::powernet_snmp_kill_ups_power()
     */
    if (snmp_add_var(request, upsBasicControlConserveBattery,
          sizeof(upsBasicControlConserveBattery) / sizeof(oid), 'i', "2")) {
-      return false;
+      return 0;
    }
 
    peer = snmp_open(s);
 
    if (!peer) {
-      Dmsg0(0, "Can not open the SNMP connection.\n");
-      return false;
+      Dmsg(0, "Can not open the SNMP connection.\n");
+      return 0;
    }
 
    status = snmp_synch_response(peer, request, &response);
 
    if (status != STAT_SUCCESS) {
-      Dmsg0(0, "Unable to communicate with UPS.\n");
-      return false;
+      Dmsg(0, "Unable to communicate with UPS.\n");
+      return 0;
    }
 
    if (response->errstat != SNMP_ERR_NOERROR) {
-      Dmsg1(0, "Unable to kill UPS power: can not set SNMP variable (%d).\n", response->errstat);
-      return false;
+      Dmsg(0, "Unable to kill UPS power: can not set SNMP variable (%d).\n", response->errstat);
+      return 0;
    }
 
    if (response)
@@ -120,16 +121,18 @@ bool SnmpDriver::powernet_snmp_kill_ups_power()
 
    snmp_close(peer);
 
-   return true;
+   return 1;
 }
 
-bool SnmpDriver::powernet_snmp_ups_get_capabilities()
+bool SnmpUpsDriver::powernet_snmp_ups_get_capabilities()
 {
+   int i = 0;
+
    /*
     * Assume that an UPS with Web/SNMP card has all the capabilities,
     * minus a few.
     */
-   for (int i = 0; i <= CI_MAX_CAPS; i++)
+   for (i = 0; i <= CI_MAX_CAPS; i++)
    {
       if (i != CI_NOMBATTV &&
           i != CI_HUMID    &&
@@ -143,19 +146,19 @@ bool SnmpDriver::powernet_snmp_ups_get_capabilities()
    }
 
    if (powernet_check_comm_lost() == 0)
-      return false;
+      return 0;
 
-   return true;
+   return 1;
 }
 
 
-bool SnmpDriver::powernet_snmp_ups_read_static_data()
+bool SnmpUpsDriver::powernet_snmp_ups_read_static_data()
 {
    struct snmp_session *s = &_session;
-   powernet_mib_t *data = (powernet_mib_t *)_MIB;
+   powernet_mib_t *data = (powernet_mib_t *)_mib;
 
    if (powernet_check_comm_lost() == 0)
-      return false;
+      return 0;
 
    data->upsBasicIdent = NULL;
    powernet_mib_mgr_get_upsBasicIdent(s, &(data->upsBasicIdent));
@@ -283,16 +286,16 @@ bool SnmpDriver::powernet_snmp_ups_read_static_data()
       free(data->upsAdvTest);
    }
 
-   return true;
+   return 1;
 }
 
-bool SnmpDriver::powernet_snmp_ups_read_volatile_data()
+bool SnmpUpsDriver::powernet_snmp_ups_read_volatile_data()
 {
    struct snmp_session *s = &_session;
-   powernet_mib_t *data = (powernet_mib_t *)_MIB;
+   powernet_mib_t *data = (powernet_mib_t *)_mib;
 
    if (powernet_check_comm_lost() == 0)
-      return false;
+      return 0;
 
    data->upsBasicBattery = NULL;
    powernet_mib_mgr_get_upsBasicBattery(s, &(data->upsBasicBattery));
@@ -374,12 +377,12 @@ bool SnmpDriver::powernet_snmp_ups_read_volatile_data()
    powernet_mib_mgr_get_upsBasicOutput(s, &(data->upsBasicOutput));
    if (data->upsBasicOutput) {
       /* Clear the following flags: only one status will be TRUE */
-      Dmsg1(99, "Status before clearing: 0x%08x\n", _ups->Status);
+      Dmsg(99, "Status before clearing: 0x%08x\n", _ups->Status);
       _ups->clear_online();
       _ups->clear_onbatt();
       _ups->clear_boost();
       _ups->clear_trim();
-      Dmsg1(99, "Status after clearing: 0x%08x\n", _ups->Status);
+      Dmsg(99, "Status after clearing: 0x%08x\n", _ups->Status);
 
       switch (data->upsBasicOutput->__upsBasicOutputStatus) {
       case 2:
@@ -449,25 +452,25 @@ bool SnmpDriver::powernet_snmp_ups_read_volatile_data()
       free(data->upsAdvTest);
    }
 
-   return true;
+   return 1;
 }
 
 /* Callback invoked by SNMP library when an async event arrives */
-int SnmpDriver::powernet_snmp_callback(
+int SnmpUpsDriver::powernet_snmp_callback(
    int operation, snmp_session *session, 
    int reqid, snmp_pdu *pdu, void *magic)
 {
-   SnmpDriver *_this = (SnmpDriver*)magic;
+   SnmpUpsDriver *_this = (SnmpUpsDriver *)magic;
 
-   Dmsg1(100, "powernet_snmp_callback: %d\n", reqid);
+   Dmsg(100, "powernet_snmp_callback: %d\n", reqid);
 
    if (reqid == 0)
       _this->_trap_received = true;
 
-   return true;
+   return 1;
 }
 
-bool SnmpDriver::powernet_snmp_ups_check_state()
+bool SnmpUpsDriver::powernet_snmp_ups_check_state()
 {
    fd_set fds;
    int numfds, rc, block;
@@ -479,14 +482,14 @@ bool SnmpDriver::powernet_snmp_ups_check_state()
    rc = powernet_check_comm_lost();
    write_unlock(_ups);
    if (rc == 0)
-      return false;
+      return 0;
 
-   sleep_time = ups->wait_time;
+   sleep_time = _ups->wait_time;
 
    /* If we're not doing SNMP traps, just sleep and exit */
    if (!_trap_session) {
       sleep(sleep_time);
-      return true;
+      return 1;
    }
 
    /* Figure out when we need to exit by */
@@ -530,8 +533,8 @@ bool SnmpDriver::powernet_snmp_ups_check_state()
          if (errno == EINTR || errno == EAGAIN)
             continue;            /* assume SIGCHLD */
 
-         Dmsg1(200, "select error: ERR=%s\n", strerror(errno));
-         return false;
+         Dmsg(200, "select error: ERR=%s\n", strerror(errno));
+         return 0;
 
       default: /* Data available */
          /* Reset trap flag and run callback processing */
@@ -540,14 +543,14 @@ bool SnmpDriver::powernet_snmp_ups_check_state()
 
          /* If callback processing set the flag, we got a trap */
          if (_trap_received)
-            return true;
+            return 1;
 
          break;
       }
    }
 }
 
-bool SnmpDriver::powernet_snmp_ups_open()
+bool SnmpUpsDriver::powernet_snmp_ups_open()
 {
    struct snmp_session *s = &_session;
    struct snmp_session tmp;
@@ -558,8 +561,8 @@ bool SnmpDriver::powernet_snmp_ups_open()
     */
    if (!strcmp(_DeviceVendor, "APC_NOTRAP")) {
       _DeviceVendor[3] = '\0';
-      Dmsg0(100, "User requested no traps\n");
-      return true;
+      Dmsg(100, "User requested no traps\n");
+      return 1;
    }
 
    /* Trap session is a copy of client session with some tweaks */
@@ -575,9 +578,9 @@ bool SnmpDriver::powernet_snmp_ups_open()
     */
    _trap_session = snmp_open(&tmp);
    if (!_trap_session) {
-      Dmsg0(100, "Trap session failed to open\n");
-      return true;
+      Dmsg(100, "Trap session failed to open\n");
+      return 1;
    }
 
-   return true;
+   return 1;
 }

@@ -9,7 +9,7 @@
 
 /*
 :Author: David Goodger (goodger@python.org)
-:Id: $Id: manual.html,v 1.2 2009-05-25 22:24:34 adk0212 Exp $
+:Id: $Id: manual.html,v 1.1.2.18 2013-11-21 00:08:50 adk0212 Exp $
 :Copyright: This stylesheet has been placed in the public domain.
 
 Default cascading style sheet for the HTML output of Docutils.
@@ -297,9 +297,9 @@ ul.auto-toc {
 <p><strong>Apcupsd is a UPS control system that permits orderly shutdown of your
 computer in the event of a power failure.</strong></p>
 <div class="line-block">
-<div class="line">May 14, 2009 18:16:51</div>
+<div class="line">November 20, 2013 19:07:39</div>
 <div class="line">This manual documents apcupsd version 3.14.x</div>
-<div class="line">Copyright © 2004-2009 Adam Kropelin</div>
+<div class="line">Copyright © 2004-2013 Adam Kropelin</div>
 <div class="line">Copyright © 1999-2005 Kern Sibbald</div>
 </div>
 <p><em>Copying and distribution of this file, with or without modification,
@@ -313,99 +313,100 @@ at <a class="reference external" href="http://www.apcupsd.com">http://www.apcups
 <div class="contents local topic" id="table-of-contents">
 <p class="topic-title first">Table of Contents</p>
 <ul class="simple">
-<li><a class="reference internal" href="#important-legal-disclaimer" id="id47">Important Legal Disclaimer</a></li>
-<li><a class="reference internal" href="#how-to-use-this-manual" id="id48">How To Use This Manual</a></li>
-<li><a class="reference internal" href="#basic-user-s-guide" id="id49">Basic User's Guide</a><ul>
-<li><a class="reference internal" href="#quick-start-for-beginners" id="id50">Quick Start for Beginners</a></li>
-<li><a class="reference internal" href="#supported-operating-systems" id="id51">Supported Operating Systems</a><ul>
-<li><a class="reference internal" href="#platform-support" id="id52">Platform Support</a></li>
+<li><a class="reference internal" href="#important-legal-disclaimer" id="id46">Important Legal Disclaimer</a></li>
+<li><a class="reference internal" href="#how-to-use-this-manual" id="id47">How To Use This Manual</a></li>
+<li><a class="reference internal" href="#basic-user-s-guide" id="id48">Basic User's Guide</a><ul>
+<li><a class="reference internal" href="#quick-start-for-beginners" id="id49">Quick Start for Beginners</a></li>
+<li><a class="reference internal" href="#supported-operating-systems" id="id50">Supported Operating Systems</a><ul>
+<li><a class="reference internal" href="#platform-support" id="id51">Platform Support</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#supported-upses-and-cables" id="id53">Supported UPSes and Cables</a></li>
-<li><a class="reference internal" href="#choosing-a-configuration-type" id="id54">Choosing a Configuration Type</a></li>
-<li><a class="reference internal" href="#configuration-types" id="id55">Configuration types</a></li>
+<li><a class="reference internal" href="#supported-upses-and-cables" id="id52">Supported UPSes and Cables</a></li>
+<li><a class="reference internal" href="#choosing-a-configuration-type" id="id53">Choosing a Configuration Type</a></li>
+<li><a class="reference internal" href="#configuration-types" id="id54">Configuration types</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#usb-configuration" id="id56">USB Configuration</a><ul>
-<li><a class="reference internal" href="#linux-usb-configuration" id="id57">Linux USB Configuration</a><ul>
-<li><a class="reference internal" href="#known-linux-usb-issues" id="id58">Known Linux USB Issues</a></li>
-<li><a class="reference internal" href="#verifying-device-detection-and-driver" id="id59">Verifying Device Detection and Driver</a></li>
-<li><a class="reference internal" href="#device-nodes" id="id60">Device Nodes</a></li>
-<li><a class="reference internal" href="#miscellaneous" id="id61">Miscellaneous</a></li>
+<li><a class="reference internal" href="#usb-configuration" id="id55">USB Configuration</a><ul>
+<li><a class="reference internal" href="#linux-usb-configuration" id="id56">Linux USB Configuration</a><ul>
+<li><a class="reference internal" href="#known-linux-usb-issues" id="id57">Known Linux USB Issues</a></li>
+<li><a class="reference internal" href="#verifying-device-detection-and-driver" id="id58">Verifying Device Detection and Driver</a></li>
+<li><a class="reference internal" href="#device-nodes" id="id59">Device Nodes</a></li>
+<li><a class="reference internal" href="#miscellaneous" id="id60">Miscellaneous</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#bsd-usb-configuration" id="id62">BSD USB Configuration</a><ul>
-<li><a class="reference internal" href="#known-bsd-usb-issues" id="id63">Known BSD USB Issues</a></li>
-<li><a class="reference internal" href="#platforms-and-versions" id="id64">Platforms and Versions</a></li>
-<li><a class="reference internal" href="#kernel-configuration" id="id65">Kernel Configuration</a></li>
-<li><a class="reference internal" href="#id31" id="id66">Verifying Device Detection and Driver</a></li>
-<li><a class="reference internal" href="#id32" id="id67">Device Nodes</a></li>
+<li><a class="reference internal" href="#bsd-usb-configuration" id="id61">BSD USB Configuration</a><ul>
+<li><a class="reference internal" href="#known-bsd-usb-issues" id="id62">Known BSD USB Issues</a></li>
+<li><a class="reference internal" href="#platforms-and-versions" id="id63">Platforms and Versions</a></li>
+<li><a class="reference internal" href="#kernel-configuration" id="id64">Kernel Configuration</a></li>
+<li><a class="reference internal" href="#id30" id="id65">Verifying Device Detection and Driver</a></li>
+<li><a class="reference internal" href="#id31" id="id66">Device Nodes</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#windows-usb-configuration" id="id68">Windows USB Configuration</a><ul>
-<li><a class="reference internal" href="#id33" id="id69">Platforms and Versions</a></li>
-<li><a class="reference internal" href="#usb-driver-installation" id="id70">USB Driver Installation</a></li>
-<li><a class="reference internal" href="#id34" id="id71">Verifying Device Detection and Driver</a></li>
+<li><a class="reference internal" href="#windows-usb-configuration" id="id67">Windows USB Configuration</a><ul>
+<li><a class="reference internal" href="#id32" id="id68">Platforms and Versions</a></li>
+<li><a class="reference internal" href="#usb-driver-installation" id="id69">USB Driver Installation</a></li>
+<li><a class="reference internal" href="#id33" id="id70">Verifying Device Detection and Driver</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#solaris-usb-configuration" id="id72">Solaris USB Configuration</a><ul>
-<li><a class="reference internal" href="#id35" id="id73">Platforms and Versions</a></li>
-<li><a class="reference internal" href="#building-apcupsd-with-usb" id="id74">Building Apcupsd with USB</a></li>
-<li><a class="reference internal" href="#id36" id="id75">Verifying Device Detection and Driver</a></li>
-<li><a class="reference internal" href="#id37" id="id76">Device Nodes</a></li>
+<li><a class="reference internal" href="#solaris-usb-configuration" id="id71">Solaris USB Configuration</a><ul>
+<li><a class="reference internal" href="#id34" id="id72">Platforms and Versions</a></li>
+<li><a class="reference internal" href="#building-apcupsd-with-usb" id="id73">Building Apcupsd with USB</a></li>
+<li><a class="reference internal" href="#id35" id="id74">Verifying Device Detection and Driver</a></li>
+<li><a class="reference internal" href="#id36" id="id75">Device Nodes</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#mac-os-x-darwin-usb-configuration" id="id77">Mac OS X (Darwin) USB Configuration</a><ul>
-<li><a class="reference internal" href="#id38" id="id78">Platforms and Versions</a></li>
-<li><a class="reference internal" href="#id39" id="id79">Building Apcupsd with USB</a></li>
-<li><a class="reference internal" href="#id40" id="id80">Verifying Device Detection and Driver</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#building-and-installing-apcupsd" id="id81">Building and Installing apcupsd</a><ul>
-<li><a class="reference internal" href="#installation-from-binary-packages" id="id82">Installation from Binary Packages</a><ul>
-<li><a class="reference internal" href="#rpms" id="id83">RPMS</a></li>
-<li><a class="reference internal" href="#microsoft-windows" id="id84">Microsoft Windows</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#installation-from-source" id="id85">Installation from Source</a></li>
-<li><a class="reference internal" href="#verifying-a-source-installation" id="id86">Verifying a Source Installation</a></li>
-<li><a class="reference internal" href="#configure-options" id="id87">Configure Options</a></li>
-<li><a class="reference internal" href="#recommended-options-for-most-systems" id="id88">Recommended Options for most Systems</a></li>
-<li><a class="reference internal" href="#compilers-and-options" id="id89">Compilers and Options</a></li>
-<li><a class="reference internal" href="#operating-system-specifics" id="id90">Operating System Specifics</a><ul>
-<li><a class="reference internal" href="#debian" id="id91">Debian</a></li>
-<li><a class="reference internal" href="#freebsd" id="id92">FreeBSD</a></li>
-<li><a class="reference internal" href="#hpux" id="id93">HPUX</a></li>
-<li><a class="reference internal" href="#netbsd" id="id94">NetBSD</a></li>
-<li><a class="reference internal" href="#mac-os-x-darwin" id="id95">Mac OS X Darwin</a></li>
-<li><a class="reference internal" href="#openbsd" id="id96">OpenBSD</a></li>
-<li><a class="reference internal" href="#red-hat-systems" id="id97">Red Hat Systems</a></li>
-<li><a class="reference internal" href="#slackware" id="id98">Slackware</a></li>
-<li><a class="reference internal" href="#suse" id="id99">SUSE</a></li>
-<li><a class="reference internal" href="#sun-solaris" id="id100">Sun Solaris</a></li>
-<li><a class="reference internal" href="#unknown-system" id="id101">Unknown System</a></li>
-<li><a class="reference internal" href="#windows-systems" id="id102">Windows Systems</a></li>
+<li><a class="reference internal" href="#mac-os-x-darwin-usb-configuration" id="id76">Mac OS X (Darwin) USB Configuration</a><ul>
+<li><a class="reference internal" href="#id37" id="id77">Platforms and Versions</a></li>
+<li><a class="reference internal" href="#id38" id="id78">Building Apcupsd with USB</a></li>
+<li><a class="reference internal" href="#id39" id="id79">Verifying Device Detection and Driver</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#after-installation" id="id103">After Installation</a><ul>
-<li><a class="reference internal" href="#checking-your-configuration-file" id="id104">Checking Your Configuration File</a></li>
-<li><a class="reference internal" href="#arranging-for-reboot-on-power-up" id="id105">Arranging for Reboot on Power-Up</a></li>
-<li><a class="reference internal" href="#making-sure-apcupsd-is-running" id="id106">Making sure apcupsd Is Running</a></li>
+<li><a class="reference internal" href="#building-and-installing-apcupsd" id="id80">Building and Installing apcupsd</a><ul>
+<li><a class="reference internal" href="#installation-from-binary-packages" id="id81">Installation from Binary Packages</a><ul>
+<li><a class="reference internal" href="#rpms" id="id82">RPMS</a></li>
+<li><a class="reference internal" href="#microsoft-windows" id="id83">Microsoft Windows</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#configuration-examples" id="id107">Configuration Examples</a><ul>
-<li><a class="reference internal" href="#a-simple-usb-configuration" id="id108">A Simple USB Configuration</a></li>
-<li><a class="reference internal" href="#a-simple-configuration-for-a-serial-smartups" id="id109">A Simple Configuration for a Serial SmartUPS</a></li>
-<li><a class="reference internal" href="#a-simple-configuration-for-a-simple-signaling-or-dumb" id="id110">A Simple Configuration for a Simple Signaling or Dumb</a></li>
-<li><a class="reference internal" href="#nis-server-client-configuration-using-the-net-driver" id="id111">NIS Server/Client Configuration Using the Net Driver</a><ul>
-<li><a class="reference internal" href="#differences-between-nis-client-server-and-the-old-now-removed-master-slave-modes" id="id112">Differences between NIS Client/Server and the old (now removed) Master/Slave modes</a></li>
+<li><a class="reference internal" href="#installation-from-source" id="id84">Installation from Source</a></li>
+<li><a class="reference internal" href="#verifying-a-source-installation" id="id85">Verifying a Source Installation</a></li>
+<li><a class="reference internal" href="#configure-options" id="id86">Configure Options</a></li>
+<li><a class="reference internal" href="#recommended-options-for-most-systems" id="id87">Recommended Options for most Systems</a></li>
+<li><a class="reference internal" href="#compilers-and-options" id="id88">Compilers and Options</a></li>
+<li><a class="reference internal" href="#operating-system-specifics" id="id89">Operating System Specifics</a><ul>
+<li><a class="reference internal" href="#debian" id="id90">Debian</a></li>
+<li><a class="reference internal" href="#freebsd" id="id91">FreeBSD</a></li>
+<li><a class="reference internal" href="#hpux" id="id92">HPUX</a></li>
+<li><a class="reference internal" href="#netbsd" id="id93">NetBSD</a></li>
+<li><a class="reference internal" href="#mac-os-x-darwin" id="id94">Mac OS X Darwin</a></li>
+<li><a class="reference internal" href="#openbsd" id="id95">OpenBSD</a></li>
+<li><a class="reference internal" href="#red-hat-systems" id="id96">Red Hat Systems</a></li>
+<li><a class="reference internal" href="#slackware" id="id97">Slackware</a></li>
+<li><a class="reference internal" href="#suse" id="id98">SUSE</a></li>
+<li><a class="reference internal" href="#sun-solaris" id="id99">Sun Solaris</a></li>
+<li><a class="reference internal" href="#unknown-system" id="id100">Unknown System</a></li>
+<li><a class="reference internal" href="#windows-systems" id="id101">Windows Systems</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#powerchute-network-shutdown-driver-pcnet" id="id113">PowerChute Network Shutdown Driver (PCNET)</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#after-installation" id="id102">After Installation</a><ul>
+<li><a class="reference internal" href="#checking-your-configuration-file" id="id103">Checking Your Configuration File</a></li>
+<li><a class="reference internal" href="#arranging-for-reboot-on-power-up" id="id104">Arranging for Reboot on Power-Up</a></li>
+<li><a class="reference internal" href="#making-sure-apcupsd-is-running" id="id105">Making sure apcupsd Is Running</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#configuration-examples" id="id106">Configuration Examples</a><ul>
+<li><a class="reference internal" href="#a-simple-usb-configuration" id="id107">A Simple USB Configuration</a></li>
+<li><a class="reference internal" href="#a-simple-configuration-for-a-serial-smartups" id="id108">A Simple Configuration for a Serial SmartUPS</a></li>
+<li><a class="reference internal" href="#a-simple-configuration-for-a-simple-signaling-or-dumb" id="id109">A Simple Configuration for a Simple Signaling or Dumb</a></li>
+<li><a class="reference internal" href="#nis-server-client-configuration-using-the-net-driver" id="id110">NIS Server/Client Configuration Using the Net Driver</a><ul>
+<li><a class="reference internal" href="#differences-between-nis-client-server-and-the-old-now-removed-master-slave-modes" id="id111">Differences between NIS Client/Server and the old (now removed) Master/Slave modes</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#powerchute-network-shutdown-driver-pcnet" id="id112">PowerChute Network Shutdown Driver (PCNET)</a></li>
+<li><a class="reference internal" href="#modbus-driver" id="id113">MODBUS Driver</a></li>
 </ul>
 </li>
 <li><a class="reference internal" href="#testing-apcupsd" id="id114">Testing Apcupsd</a><ul>
@@ -424,173 +425,174 @@ at <a class="reference external" href="http://www.apcupsd.com">http://www.apcups
 <li><a class="reference internal" href="#apcupsd-notification-and-events" id="id125">Apcupsd Notification and Events</a></li>
 <li><a class="reference internal" href="#apcupsd-network-monitoring-cgi-programs" id="id126">apcupsd Network Monitoring (CGI) Programs</a><ul>
 <li><a class="reference internal" href="#setting-up-and-testing-the-cgi-programs" id="id127">Setting up and Testing the CGI Programs</a></li>
-<li><a class="reference internal" href="#multimon-cgi" id="id128">multimon.cgi</a></li>
-<li><a class="reference internal" href="#upsstats-cgi" id="id129">upsstats.cgi</a></li>
-<li><a class="reference internal" href="#upsfstatus-cgi" id="id130">upsfstatus.cgi</a></li>
-<li><a class="reference internal" href="#a-tip-from-carl-erhorn-for-sun-systems" id="id131">A Tip from Carl Erhorn for Sun Systems:</a></li>
-<li><a class="reference internal" href="#cgi-credits" id="id132">CGI Credits</a></li>
+<li><a class="reference internal" href="#using-the-cgi-programs-on-windows" id="id128">Using the CGI Programs on Windows</a></li>
+<li><a class="reference internal" href="#multimon-cgi" id="id129">multimon.cgi</a></li>
+<li><a class="reference internal" href="#upsstats-cgi" id="id130">upsstats.cgi</a></li>
+<li><a class="reference internal" href="#upsfstatus-cgi" id="id131">upsfstatus.cgi</a></li>
+<li><a class="reference internal" href="#a-tip-from-carl-erhorn-for-sun-systems" id="id132">A Tip from Carl Erhorn for Sun Systems:</a></li>
+<li><a class="reference internal" href="#cgi-credits" id="id133">CGI Credits</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#security-issues" id="id133">Security Issues:</a><ul>
-<li><a class="reference internal" href="#firewall-settings" id="id134">Firewall Settings</a></li>
-<li><a class="reference internal" href="#tcp-wrappers" id="id135">TCP Wrappers</a></li>
+<li><a class="reference internal" href="#security-issues" id="id134">Security Issues:</a><ul>
+<li><a class="reference internal" href="#firewall-settings" id="id135">Firewall Settings</a></li>
+<li><a class="reference internal" href="#tcp-wrappers" id="id136">TCP Wrappers</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#configuring-your-eeprom" id="id136">Configuring Your EEPROM</a><ul>
-<li><a class="reference internal" href="#using-apctest-to-configure-your-eeprom" id="id137">Using apctest to Configure Your EEPROM</a></li>
-</ul>
-</li>
-</ul>
-</li>
-<li><a class="reference internal" href="#maintaining-your-ups-batteries" id="id138">Maintaining Your UPS Batteries</a><ul>
-<li><a class="reference internal" href="#battery-technology" id="id139">Battery Technology</a></li>
-<li><a class="reference internal" href="#battery-life" id="id140">Battery Life</a></li>
-<li><a class="reference internal" href="#flashing-battery-charge-graph-leds" id="id141">Flashing Battery Charge Graph LEDs</a></li>
-<li><a class="reference internal" href="#battery-replacement" id="id142">Battery Replacement</a></li>
-<li><a class="reference internal" href="#battery-installation" id="id143">Battery Installation</a></li>
-<li><a class="reference internal" href="#soft-runtime-calibration" id="id144">&quot;Soft&quot; Runtime Calibration</a></li>
-<li><a class="reference internal" href="#manual-runtime-calibration" id="id145">&quot;Manual&quot; Runtime Calibration</a></li>
-<li><a class="reference internal" href="#resetting-the-ups-battery-constant" id="id146">Resetting the UPS Battery Constant</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#frequently-asked-questions" id="id147">Frequently-Asked Questions</a></li>
-<li><a class="reference internal" href="#customizing-event-handling" id="id148">Customizing Event Handling</a><ul>
-<li><a class="reference internal" href="#apccontrol-command-line-options" id="id149">apccontrol Command Line Options</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#controlling-multiple-upses-on-one-machine" id="id150">Controlling Multiple UPSes on one Machine</a><ul>
-<li><a class="reference internal" href="#multiple-ups-example" id="id151">Multiple UPS Example</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#support-for-snmp-upses" id="id152">Support for SNMP UPSes</a><ul>
-<li><a class="reference internal" href="#planning-and-setup-for-snmp-wiring" id="id153">Planning and Setup for SNMP Wiring</a></li>
-<li><a class="reference internal" href="#planning-and-setup-for-snmp-configuration" id="id154">Planning and Setup for SNMP Configuration</a><ul>
-<li><a class="reference internal" href="#assign-snmp-card-ip-address" id="id155">Assign SNMP Card IP Address</a></li>
-<li><a class="reference internal" href="#set-snmp-card-general-parameters" id="id156">Set SNMP card General Parameters</a></li>
-<li><a class="reference internal" href="#set-snmp-card-shutdown-parameters" id="id157">Set SNMP card Shutdown Parameters</a></li>
-<li><a class="reference internal" href="#configure-event-trap-receivers" id="id158">Configure Event Trap Receivers</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#connecting-apcupsd-to-a-snmp-ups" id="id159">Connecting APCUPSD to a SNMP UPS</a></li>
-<li><a class="reference internal" href="#building-with-snmp-support" id="id160">Building with SNMP support</a></li>
-<li><a class="reference internal" href="#snp-trap-catching" id="id161">SNP Trap Catching</a></li>
-<li><a class="reference internal" href="#known-problems" id="id162">Known Problems</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#apcupsd-system-logging" id="id163">apcupsd System Logging</a><ul>
-<li><a class="reference internal" href="#logging-types" id="id164">Logging Types</a><ul>
-<li><a class="reference internal" href="#data-logging" id="id165">Data Logging</a></li>
-<li><a class="reference internal" href="#status-logging" id="id166">Status Logging</a></li>
-<li><a class="reference internal" href="#events-logging" id="id167">EVENTS Logging</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#implementation-details" id="id168">Implementation Details</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#the-windows-version-of-apcupsd" id="id169">The Windows Version of apcupsd</a><ul>
-<li><a class="reference internal" href="#installing-apcupsd-on-windows" id="id170">Installing Apcupsd on Windows</a></li>
-<li><a class="reference internal" href="#configuring-apcupsd-on-windows" id="id171">Configuring Apcupsd on Windows</a></li>
-<li><a class="reference internal" href="#starting-apcupsd-on-windows" id="id172">Starting Apcupsd on Windows</a></li>
-<li><a class="reference internal" href="#apctray" id="id173">Apctray</a></li>
-<li><a class="reference internal" href="#testing-apcupsd-on-windows" id="id174">Testing Apcupsd on Windows</a></li>
-<li><a class="reference internal" href="#upgrading" id="id175">Upgrading</a></li>
-<li><a class="reference internal" href="#post-installation" id="id176">Post-Installation</a></li>
-<li><a class="reference internal" href="#problem-areas" id="id177">Problem Areas</a></li>
-<li><a class="reference internal" href="#email-notification-of-events" id="id178">Email Notification of Events</a></li>
-<li><a class="reference internal" href="#killpower-under-windows" id="id179">Killpower under Windows</a></li>
-<li><a class="reference internal" href="#power-down-during-shutdown" id="id180">Power Down During Shutdown</a></li>
-<li><a class="reference internal" href="#command-line-options-specific-to-the-windows-version" id="id181">Command Line Options Specific to the Windows Version</a></li>
-</ul>
-</li>
-<li><a class="reference internal" href="#installation-serial-line-upses" id="id182">Installation: Serial-Line UPSes</a><ul>
-<li><a class="reference internal" href="#overview-of-serial-interface-upses" id="id183">Overview of Serial-Interface UPSes</a></li>
-<li><a class="reference internal" href="#connecting-a-serial-line-ups-to-a-usb-port" id="id184">Connecting a Serial-Line UPS to a USB Port</a></li>
-<li><a class="reference internal" href="#testing-serial-line-upses" id="id185">Testing Serial-Line UPSes</a></li>
-<li><a class="reference internal" href="#establishing-serial-port-connection" id="id186">Establishing Serial Port Connection</a></li>
-<li><a class="reference internal" href="#once-you-have-established-serial-communications" id="id187">Once you have established serial communications</a></li>
-<li><a class="reference internal" href="#troubleshooting-serial-line-communications" id="id188">Troubleshooting Serial Line communications</a><ul>
-<li><a class="reference internal" href="#bizarre-intermittent-behavior" id="id189">Bizarre Intermittent Behavior:</a></li>
+<li><a class="reference internal" href="#configuring-your-eeprom" id="id137">Configuring Your EEPROM</a><ul>
+<li><a class="reference internal" href="#using-apctest-to-configure-your-eeprom" id="id138">Using apctest to Configure Your EEPROM</a></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><a class="reference internal" href="#cables" id="id190">Cables</a><ul>
-<li><a class="reference internal" href="#smart-custom-cable-for-smartupses" id="id191">Smart-Custom Cable for SmartUPSes</a></li>
-<li><a class="reference internal" href="#simple-custom-voltage-signalling-cable-for-dumb-upses" id="id192">Simple-Custom Voltage-Signalling Cable for &quot;dumb&quot; UPSes</a></li>
-<li><a class="reference internal" href="#custom-rj45-smart-signalling-cable-for-backups-cs-models" id="id193">Custom-RJ45 Smart Signalling Cable for BackUPS CS Models</a></li>
-<li><a class="reference internal" href="#other-apc-cables-that-apcupsd-supports" id="id194">Other APC Cables that apcupsd Supports</a></li>
-<li><a class="reference internal" href="#voltage-signalling-features-supported-by-apcupsd-for-various-cables" id="id195">Voltage Signalling Features Supported by Apcupsd for Various Cables</a></li>
-<li><a class="reference internal" href="#voltage-signalling" id="id196">Voltage Signalling</a></li>
-<li><a class="reference internal" href="#the-back-ups-office-500-signals" id="id197">The Back-UPS Office 500 signals</a></li>
-<li><a class="reference internal" href="#analyses-of-apc-cables" id="id198">Analyses of APC Cables</a><ul>
-<li><a class="reference internal" href="#b-cable-wiring" id="id199">940-0020B Cable Wiring</a></li>
-<li><a class="reference internal" href="#c-cable-wiring" id="id200">940-0020C Cable Wiring</a></li>
-<li><a class="reference internal" href="#a-cable-wiring" id="id201">940-0023A Cable Wiring</a></li>
-<li><a class="reference internal" href="#id41" id="id202">940-0024C Cable Wiring</a></li>
-<li><a class="reference internal" href="#id42" id="id203">940-0095A Cable Wiring</a></li>
-<li><a class="reference internal" href="#id43" id="id204">940-0095B Cable Wiring</a></li>
-<li><a class="reference internal" href="#id44" id="id205">940-0119A Cable Wiring</a></li>
-<li><a class="reference internal" href="#serial-backups-es-wiring" id="id206">Serial BackUPS ES Wiring</a></li>
-<li><a class="reference internal" href="#id45" id="id207">940-0128A Cable Wiring</a></li>
-<li><a class="reference internal" href="#d-cable-wiring" id="id208">940-0128D Cable Wiring</a></li>
-<li><a class="reference internal" href="#id46" id="id209">940-0127B Cable Wiring</a></li>
+<li><a class="reference internal" href="#maintaining-your-ups-batteries" id="id139">Maintaining Your UPS Batteries</a><ul>
+<li><a class="reference internal" href="#battery-technology" id="id140">Battery Technology</a></li>
+<li><a class="reference internal" href="#battery-life" id="id141">Battery Life</a></li>
+<li><a class="reference internal" href="#flashing-battery-charge-graph-leds" id="id142">Flashing Battery Charge Graph LEDs</a></li>
+<li><a class="reference internal" href="#battery-replacement" id="id143">Battery Replacement</a></li>
+<li><a class="reference internal" href="#battery-installation" id="id144">Battery Installation</a></li>
+<li><a class="reference internal" href="#soft-runtime-calibration" id="id145">&quot;Soft&quot; Runtime Calibration</a></li>
+<li><a class="reference internal" href="#manual-runtime-calibration" id="id146">&quot;Manual&quot; Runtime Calibration</a></li>
+<li><a class="reference internal" href="#resetting-the-ups-battery-constant" id="id147">Resetting the UPS Battery Constant</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#win32-implementation-restrictions-for-simple-upses" id="id210">Win32 Implementation Restrictions for Simple UPSes</a></li>
-<li><a class="reference internal" href="#internal-apcupsd-actions-for-simple-cables" id="id211">Internal Apcupsd Actions for Simple Cables</a></li>
+<li><a class="reference internal" href="#frequently-asked-questions" id="id148">Frequently-Asked Questions</a></li>
+<li><a class="reference internal" href="#customizing-event-handling" id="id149">Customizing Event Handling</a><ul>
+<li><a class="reference internal" href="#apccontrol-command-line-options" id="id150">apccontrol Command Line Options</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#recalibrating-the-ups-runtime" id="id212">Recalibrating the UPS Runtime</a></li>
-<li><a class="reference internal" href="#configuration-directive-reference" id="id213">Configuration Directive Reference</a><ul>
-<li><a class="reference internal" href="#general-configuration-directives" id="id214">General Configuration Directives</a></li>
-<li><a class="reference internal" href="#configuration-directives-used-by-the-network-information-server" id="id215">Configuration Directives Used by the Network Information Server</a></li>
-<li><a class="reference internal" href="#configuration-directives-used-during-power-failures" id="id216">Configuration Directives used during Power Failures</a></li>
-<li><a class="reference internal" href="#configuration-directives-used-to-control-system-logging" id="id217">Configuration Directives used to Control System Logging</a></li>
-<li><a class="reference internal" href="#configuration-directives-for-sharing-a-ups" id="id218">Configuration Directives for Sharing a UPS</a></li>
-<li><a class="reference internal" href="#configuration-directives-used-to-set-the-ups-eeprom" id="id219">Configuration Directives Used to Set the UPS EEPROM</a></li>
+<li><a class="reference internal" href="#controlling-multiple-upses-on-one-machine" id="id151">Controlling Multiple UPSes on one Machine</a><ul>
+<li><a class="reference internal" href="#multiple-ups-example" id="id152">Multiple UPS Example</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#apcupsd-status-logging" id="id220">apcupsd Status Logging</a><ul>
-<li><a class="reference internal" href="#status-report-format" id="id221">Status report format</a></li>
-<li><a class="reference internal" href="#status-report-example" id="id222">Status Report Example</a></li>
-<li><a class="reference internal" href="#status-report-fields" id="id223">Status Report Fields</a></li>
-<li><a class="reference internal" href="#logging-the-status-information" id="id224">Logging the STATUS Information</a></li>
+<li><a class="reference internal" href="#support-for-snmp-upses" id="id153">Support for SNMP UPSes</a><ul>
+<li><a class="reference internal" href="#planning-and-setup-for-snmp-wiring" id="id154">Planning and Setup for SNMP Wiring</a></li>
+<li><a class="reference internal" href="#planning-and-setup-for-snmp-configuration" id="id155">Planning and Setup for SNMP Configuration</a><ul>
+<li><a class="reference internal" href="#assign-snmp-card-ip-address" id="id156">Assign SNMP Card IP Address</a></li>
+<li><a class="reference internal" href="#set-snmp-card-general-parameters" id="id157">Set SNMP card General Parameters</a></li>
+<li><a class="reference internal" href="#set-snmp-card-shutdown-parameters" id="id158">Set SNMP card Shutdown Parameters</a></li>
+<li><a class="reference internal" href="#configure-event-trap-receivers" id="id159">Configure Event Trap Receivers</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#the-shutown-sequence-and-its-discontents" id="id225">The Shutown Sequence and its Discontents</a><ul>
-<li><a class="reference internal" href="#shutdown-sequence" id="id226">Shutdown Sequence</a></li>
-<li><a class="reference internal" href="#shutdown-problems" id="id227">Shutdown Problems</a></li>
-<li><a class="reference internal" href="#master-slave-shutdown" id="id228">Master/Slave Shutdown</a></li>
-<li><a class="reference internal" href="#startup" id="id229">Startup</a></li>
-<li><a class="reference internal" href="#windows-considerations" id="id230">Windows Considerations</a></li>
+<li><a class="reference internal" href="#connecting-apcupsd-to-a-snmp-ups" id="id160">Connecting APCUPSD to a SNMP UPS</a></li>
+<li><a class="reference internal" href="#building-with-snmp-support" id="id161">Building with SNMP support</a></li>
+<li><a class="reference internal" href="#snmp-trap-catching" id="id162">SNMP Trap Catching</a></li>
+<li><a class="reference internal" href="#known-problems" id="id163">Known Problems</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#apc-smart-protocol" id="id231">APC smart protocol</a><ul>
-<li><a class="reference internal" href="#description" id="id232">Description</a></li>
-<li><a class="reference internal" href="#rs-232-differences" id="id233">RS-232 differences</a></li>
-<li><a class="reference internal" href="#the-smart-protocol" id="id234">The Smart Protocol</a></li>
-<li><a class="reference internal" href="#dip-switch-info" id="id235">Dip switch info</a></li>
-<li><a class="reference internal" href="#status-bits" id="id236">Status bits</a></li>
-<li><a class="reference internal" href="#alert-messages" id="id237">Alert messages</a></li>
-<li><a class="reference internal" href="#register-1" id="id238">Register 1</a></li>
-<li><a class="reference internal" href="#register-2" id="id239">Register 2</a></li>
-<li><a class="reference internal" href="#register-3" id="id240">Register 3</a></li>
-<li><a class="reference internal" href="#interpretation-of-the-old-firmware-revision" id="id241">Interpretation of the Old Firmware Revision</a></li>
-<li><a class="reference internal" href="#interpretation-of-the-new-firmware-revision" id="id242">Interpretation of the New Firmware Revision</a></li>
-<li><a class="reference internal" href="#eeprom-values" id="id243">EEPROM Values</a></li>
-<li><a class="reference internal" href="#programming-the-ups-eeprom" id="id244">Programming the UPS EEPROM</a></li>
+<li><a class="reference internal" href="#apcupsd-system-logging" id="id164">apcupsd System Logging</a><ul>
+<li><a class="reference internal" href="#logging-types" id="id165">Logging Types</a><ul>
+<li><a class="reference internal" href="#data-logging" id="id166">Data Logging</a></li>
+<li><a class="reference internal" href="#status-logging" id="id167">Status Logging</a></li>
+<li><a class="reference internal" href="#events-logging" id="id168">EVENTS Logging</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#apcupsd-rpm-packaging-faq" id="id245">Apcupsd RPM Packaging FAQ</a></li>
-<li><a class="reference internal" href="#credits" id="id246">Credits</a><ul>
-<li><a class="reference internal" href="#contributors" id="id247">Contributors</a></li>
+<li><a class="reference internal" href="#implementation-details" id="id169">Implementation Details</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-windows-version-of-apcupsd" id="id170">The Windows Version of apcupsd</a><ul>
+<li><a class="reference internal" href="#installing-apcupsd-on-windows" id="id171">Installing Apcupsd on Windows</a></li>
+<li><a class="reference internal" href="#configuring-apcupsd-on-windows" id="id172">Configuring Apcupsd on Windows</a></li>
+<li><a class="reference internal" href="#starting-apcupsd-on-windows" id="id173">Starting Apcupsd on Windows</a></li>
+<li><a class="reference internal" href="#apctray" id="id174">Apctray</a></li>
+<li><a class="reference internal" href="#testing-apcupsd-on-windows" id="id175">Testing Apcupsd on Windows</a></li>
+<li><a class="reference internal" href="#upgrading" id="id176">Upgrading</a></li>
+<li><a class="reference internal" href="#post-installation" id="id177">Post-Installation</a></li>
+<li><a class="reference internal" href="#problem-areas" id="id178">Problem Areas</a></li>
+<li><a class="reference internal" href="#email-notification-of-events" id="id179">Email Notification of Events</a></li>
+<li><a class="reference internal" href="#killpower-under-windows" id="id180">Killpower under Windows</a></li>
+<li><a class="reference internal" href="#power-down-during-shutdown" id="id181">Power Down During Shutdown</a></li>
+<li><a class="reference internal" href="#command-line-options-specific-to-the-windows-version" id="id182">Command Line Options Specific to the Windows Version</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#installation-serial-line-upses" id="id183">Installation: Serial-Line UPSes</a><ul>
+<li><a class="reference internal" href="#overview-of-serial-interface-upses" id="id184">Overview of Serial-Interface UPSes</a></li>
+<li><a class="reference internal" href="#connecting-a-serial-line-ups-to-a-usb-port" id="id185">Connecting a Serial-Line UPS to a USB Port</a></li>
+<li><a class="reference internal" href="#testing-serial-line-upses" id="id186">Testing Serial-Line UPSes</a></li>
+<li><a class="reference internal" href="#establishing-serial-port-connection" id="id187">Establishing Serial Port Connection</a></li>
+<li><a class="reference internal" href="#once-you-have-established-serial-communications" id="id188">Once you have established serial communications</a></li>
+<li><a class="reference internal" href="#troubleshooting-serial-line-communications" id="id189">Troubleshooting Serial Line communications</a><ul>
+<li><a class="reference internal" href="#bizarre-intermittent-behavior" id="id190">Bizarre Intermittent Behavior:</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li><a class="reference internal" href="#cables" id="id191">Cables</a><ul>
+<li><a class="reference internal" href="#smart-custom-cable-for-smartupses" id="id192">Smart-Custom Cable for SmartUPSes</a></li>
+<li><a class="reference internal" href="#simple-custom-voltage-signalling-cable-for-dumb-upses" id="id193">Simple-Custom Voltage-Signalling Cable for &quot;dumb&quot; UPSes</a></li>
+<li><a class="reference internal" href="#custom-rj45-smart-signalling-cable-for-backups-cs-models" id="id194">Custom-RJ45 Smart Signalling Cable for BackUPS CS Models</a></li>
+<li><a class="reference internal" href="#other-apc-cables-that-apcupsd-supports" id="id195">Other APC Cables that apcupsd Supports</a></li>
+<li><a class="reference internal" href="#voltage-signalling-features-supported-by-apcupsd-for-various-cables" id="id196">Voltage Signalling Features Supported by Apcupsd for Various Cables</a></li>
+<li><a class="reference internal" href="#voltage-signalling" id="id197">Voltage Signalling</a></li>
+<li><a class="reference internal" href="#the-back-ups-office-500-signals" id="id198">The Back-UPS Office 500 signals</a></li>
+<li><a class="reference internal" href="#analyses-of-apc-cables" id="id199">Analyses of APC Cables</a><ul>
+<li><a class="reference internal" href="#b-cable-wiring" id="id200">940-0020B Cable Wiring</a></li>
+<li><a class="reference internal" href="#c-cable-wiring" id="id201">940-0020C Cable Wiring</a></li>
+<li><a class="reference internal" href="#a-cable-wiring" id="id202">940-0023A Cable Wiring</a></li>
+<li><a class="reference internal" href="#id40" id="id203">940-0024C Cable Wiring</a></li>
+<li><a class="reference internal" href="#id41" id="id204">940-0095A Cable Wiring</a></li>
+<li><a class="reference internal" href="#id42" id="id205">940-0095B Cable Wiring</a></li>
+<li><a class="reference internal" href="#id43" id="id206">940-0119A Cable Wiring</a></li>
+<li><a class="reference internal" href="#serial-backups-es-wiring" id="id207">Serial BackUPS ES Wiring</a></li>
+<li><a class="reference internal" href="#id44" id="id208">940-0128A Cable Wiring</a></li>
+<li><a class="reference internal" href="#d-cable-wiring" id="id209">940-0128D Cable Wiring</a></li>
+<li><a class="reference internal" href="#id45" id="id210">940-0127B Cable Wiring</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#win32-implementation-restrictions-for-simple-upses" id="id211">Win32 Implementation Restrictions for Simple UPSes</a></li>
+<li><a class="reference internal" href="#internal-apcupsd-actions-for-simple-cables" id="id212">Internal Apcupsd Actions for Simple Cables</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#recalibrating-the-ups-runtime" id="id213">Recalibrating the UPS Runtime</a></li>
+<li><a class="reference internal" href="#configuration-directive-reference" id="id214">Configuration Directive Reference</a><ul>
+<li><a class="reference internal" href="#general-configuration-directives" id="id215">General Configuration Directives</a></li>
+<li><a class="reference internal" href="#configuration-directives-used-by-the-network-information-server" id="id216">Configuration Directives Used by the Network Information Server</a></li>
+<li><a class="reference internal" href="#configuration-directives-used-during-power-failures" id="id217">Configuration Directives used during Power Failures</a></li>
+<li><a class="reference internal" href="#configuration-directives-used-to-control-system-logging" id="id218">Configuration Directives used to Control System Logging</a></li>
+<li><a class="reference internal" href="#configuration-directives-for-sharing-a-ups" id="id219">Configuration Directives for Sharing a UPS</a></li>
+<li><a class="reference internal" href="#configuration-directives-used-to-set-the-ups-eeprom" id="id220">Configuration Directives Used to Set the UPS EEPROM</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#apcupsd-status-logging" id="id221">apcupsd Status Logging</a><ul>
+<li><a class="reference internal" href="#status-report-format" id="id222">Status report format</a></li>
+<li><a class="reference internal" href="#status-report-example" id="id223">Status Report Example</a></li>
+<li><a class="reference internal" href="#status-report-fields" id="id224">Status Report Fields</a></li>
+<li><a class="reference internal" href="#logging-the-status-information" id="id225">Logging the STATUS Information</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#the-shutdown-sequence-and-its-discontents" id="id226">The Shutdown Sequence and its Discontents</a><ul>
+<li><a class="reference internal" href="#shutdown-sequence" id="id227">Shutdown Sequence</a></li>
+<li><a class="reference internal" href="#shutdown-problems" id="id228">Shutdown Problems</a></li>
+<li><a class="reference internal" href="#master-slave-shutdown" id="id229">Master/Slave Shutdown</a></li>
+<li><a class="reference internal" href="#startup" id="id230">Startup</a></li>
+<li><a class="reference internal" href="#windows-considerations" id="id231">Windows Considerations</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#apc-smart-protocol" id="id232">APC smart protocol</a><ul>
+<li><a class="reference internal" href="#description" id="id233">Description</a></li>
+<li><a class="reference internal" href="#rs-232-differences" id="id234">RS-232 differences</a></li>
+<li><a class="reference internal" href="#the-smart-protocol" id="id235">The Smart Protocol</a></li>
+<li><a class="reference internal" href="#dip-switch-info" id="id236">Dip switch info</a></li>
+<li><a class="reference internal" href="#status-bits" id="id237">Status bits</a></li>
+<li><a class="reference internal" href="#alert-messages" id="id238">Alert messages</a></li>
+<li><a class="reference internal" href="#register-1" id="id239">Register 1</a></li>
+<li><a class="reference internal" href="#register-2" id="id240">Register 2</a></li>
+<li><a class="reference internal" href="#register-3" id="id241">Register 3</a></li>
+<li><a class="reference internal" href="#interpretation-of-the-old-firmware-revision" id="id242">Interpretation of the Old Firmware Revision</a></li>
+<li><a class="reference internal" href="#interpretation-of-the-new-firmware-revision" id="id243">Interpretation of the New Firmware Revision</a></li>
+<li><a class="reference internal" href="#eeprom-values" id="id244">EEPROM Values</a></li>
+<li><a class="reference internal" href="#programming-the-ups-eeprom" id="id245">Programming the UPS EEPROM</a></li>
+</ul>
+</li>
+<li><a class="reference internal" href="#apcupsd-rpm-packaging-faq" id="id246">Apcupsd RPM Packaging FAQ</a></li>
+<li><a class="reference internal" href="#credits" id="id247">Credits</a><ul>
+<li><a class="reference internal" href="#contributors" id="id248">Contributors</a></li>
 </ul>
 </li>
 </ul>
 </div>
 <hr class="docutils" />
 <div class="section" id="important-legal-disclaimer">
-<h2><a class="toc-backref" href="#id47">Important Legal Disclaimer</a></h2>
+<h2><a class="toc-backref" href="#id46">Important Legal Disclaimer</a></h2>
 <p>No person should rely on the contents of the APCUPSD Manual (&quot;the manual&quot;)
 without first obtaining advice from APC Technical Support.</p>
 <p>The manual is provided on the terms and understanding that:</p>
@@ -613,7 +615,7 @@ responsibility for any act or omission of any other author, contributor or
 editor.</p>
 </div>
 <div class="section" id="how-to-use-this-manual">
-<h2><a class="toc-backref" href="#id48">How To Use This Manual</a></h2>
+<h2><a class="toc-backref" href="#id47">How To Use This Manual</a></h2>
 <p>This is the manual for apcupsd, a
 daemon for communicating with UPSes (Uninterruptible Power
 Supplies) made by American Power Conversion Corporation (APC). If you have an
@@ -639,9 +641,9 @@ event-logging formats.</p>
 Beginners</a>) instructions.</p>
 </div>
 <div class="section" id="basic-user-s-guide">
-<h2><a class="toc-backref" href="#id49">Basic User's Guide</a></h2>
+<h2><a class="toc-backref" href="#id48">Basic User's Guide</a></h2>
 <div class="section" id="quick-start-for-beginners">
-<h3><a class="toc-backref" href="#id50">Quick Start for Beginners</a></h3>
+<h3><a class="toc-backref" href="#id49">Quick Start for Beginners</a></h3>
 <p>apcupsd is a complex piece of software, but
 most of its complexities are meant for dealing with older hardware
 and operating systems. On current hardware and software getting it
@@ -686,7 +688,7 @@ iron!</li>
 section of the manual and follow those directions. If you are
 installing from an RPM or some other form of binary package, this
 step will probably consist of executing a single command.</li>
-<li>Tweak your /etc/apcupsd/apcupd.conf file as necessary. Often it
+<li>Tweak your /etc/apcupsd/apcupsd.conf file as necessary. Often it
 will not be.</li>
 <li>Change the BIOS settings (see <a class="reference internal" href="#arranging-for-reboot-on-power-up">Arranging for Reboot on
 Power-Up</a>) on your computer
@@ -709,7 +711,7 @@ anything else you think might be helpful.</li>
 </ol>
 </div>
 <div class="section" id="supported-operating-systems">
-<h3><a class="toc-backref" href="#id51">Supported Operating Systems</a></h3>
+<h3><a class="toc-backref" href="#id50">Supported Operating Systems</a></h3>
 <p>apcupsd supports many UNIX-like operating systems as well as several
 variants of Windows. Due to lack of API standardization, USB support is not
 available on every platform. See <a class="reference internal" href="#platform-support">Platform Support</a> below for details.</p>
@@ -724,7 +726,7 @@ recent binary packages. Note that some vendors continue to distribute
 ancient versions of apcupsd with known defects. These packages should <em>not</em> be
 used.</p>
 <div class="section" id="platform-support">
-<h4><a class="toc-backref" href="#id52">Platform Support</a></h4>
+<h4><a class="toc-backref" href="#id51">Platform Support</a></h4>
 <p><strong>LINUX</strong></p>
 <ul class="simple">
 <li>RedHat <a class="footnote-reference" href="#id26" id="id1">[1]</a> <a class="footnote-reference" href="#id27" id="id2">[2]</a></li>
@@ -739,9 +741,9 @@ used.</p>
 <p><strong>WINDOWS</strong></p>
 <ul class="simple">
 <li>Windows NT 4 <a class="footnote-reference" href="#id27" id="id10">[2]</a> <a class="footnote-reference" href="#id29" id="id11">[4]</a></li>
-<li>Windows 98/ME/2000 <a class="footnote-reference" href="#id27" id="id12">[2]</a></li>
-<li>Windows XP/Vista (including 64 bit) <a class="footnote-reference" href="#id26" id="id13">[1]</a> <a class="footnote-reference" href="#id27" id="id14">[2]</a></li>
-<li>Windows Server 2003/2008 (including 64 bit) <a class="footnote-reference" href="#id27" id="id15">[2]</a> <a class="footnote-reference" href="#id30" id="id16">[5]</a></li>
+<li>Windows 98/ME/2000 <a class="footnote-reference" href="#id27" id="id12">[2]</a> <a class="footnote-reference" href="#id29" id="id13">[4]</a></li>
+<li>Windows XP/Vista (including 64 bit) <a class="footnote-reference" href="#id26" id="id14">[1]</a> <a class="footnote-reference" href="#id27" id="id15">[2]</a></li>
+<li>Windows Server 2003/2008 (including 64 bit) <a class="footnote-reference" href="#id27" id="id16">[2]</a></li>
 <li>Windows 7 <a class="footnote-reference" href="#id27" id="id17">[2]</a></li>
 </ul>
 <p><strong>OTHERS</strong></p>
@@ -772,7 +774,7 @@ used.</p>
 <colgroup><col class="label" /><col /></colgroup>
 <tbody valign="top">
 <tr><td class="label">[3]</td><td>Port included in apcupsd source tree but may be out of date,
-unmaintained, aor broken.</td></tr>
+unmaintained, or broken.</td></tr>
 </tbody>
 </table>
 <table class="docutils footnote" frame="void" id="id29" rules="none">
@@ -781,48 +783,33 @@ unmaintained, aor broken.</td></tr>
 <tr><td class="label">[4]</td><td>USB not supported</td></tr>
 </tbody>
 </table>
-<table class="docutils footnote" frame="void" id="id30" rules="none">
-<colgroup><col class="label" /><col /></colgroup>
-<tbody valign="top">
-<tr><td class="label">[5]</td><td>USB not supported in 64 bit mode due to Microsoft disallowing loading of
-unsigned drivers</td></tr>
-</tbody>
-</table>
 </div>
 </div>
 <div class="section" id="supported-upses-and-cables">
-<h3><a class="toc-backref" href="#id53">Supported UPSes and Cables</a></h3>
+<h3><a class="toc-backref" href="#id52">Supported UPSes and Cables</a></h3>
 <p>apcupsd supports nearly every APC brand UPS model in existence and enough
 different cable types to connect to all of them.</p>
 <p>The <tt class="docutils literal"><span class="pre">UPSTYPE</span> <span class="pre">&lt;keyword&gt;</span></tt> field is the value you will put in
-your /etc/apcupsd/apcupd.conf file to tell apcupsd what type of UPS
+your /etc/apcupsd/apcupsd.conf file to tell apcupsd what type of UPS
 you have. We'll describe the possible values here, because they're
 a good way to explain your UPS's single most important interface
 property: the kind of protocol it uses to talk with its
 computer.</p>
 <dl class="docutils">
 <dt>apcsmart</dt>
-<dd>An APCSmart UPS and its computer communicate
-through an RS232C serial connection. They use it as a character
-channel (2400bps, 8 data bits, 1 stop bit, no parity) and pass
+<dd>The 'apcsmart' protocol uses an RS232 serial connection to pass
 commands back and forth in a primitive language resembling
-modem-control codes. The
-different APC UPSes all use closely related firmware, so the
-language doesn't vary much (later versions add more commands). This
+modem-control codes. APC calls this language &quot;UPS-Link&quot;. Originally
+introduced for Smart-UPS models (thus the name 'apcsmart'), this
 class of UPS is in decline, rapidly being replaced in APC's product
-line by USB UPSes.</dd>
+line by USB and MODBUS UPSes.</dd>
 <dt>usb</dt>
 <dd>A USB UPS speaks a universal well defined control
 language over a USB wire. Most of APC's lineup now uses this method
 as of late 2003, and it seems likely to completely take over in
-their low- and middle range. Other manufacturers (Belkin,
-Tripp-Lite, etc.) are moving the same way, though with a different
-control protocol for each manufacturer. As long as USB hardware can
-be mass-produced more cheaply than an Ethernet card, most UPSes are
-likely to go this design route. Please note that even if you have a
-USB UPS, if you use a serial cable with it (as can be supplied by
-APC), you will need to configure your UPS as <tt class="docutils literal"><span class="pre">apcsmart</span></tt> rather
-than <tt class="docutils literal"><span class="pre">usb</span></tt>.</dd>
+their low- and middle range. The most recent APC UPSes support only a
+limited set of data over the USB interface. MODBUS (see below) is required
+in order to access the advanced data.</dd>
 <dt>net</dt>
 <dd>This is the keyword to specify if you are using your
 UPS in Slave mode (i.e. the machine is not directly connected to
@@ -843,10 +830,16 @@ have a choice, we recommend you avoid simple signalling UPSes.</dd>
 <dd>PCNET is an alternative for SNMP available on APC's
 AP9617 family of smart slot modules. The protocol is much simpler
 and potentially more secure than SNMP.</dd>
+<dt>modbus</dt>
+<dd>MODBUS is the newest APC protocol and operates over RS232 links. (It is
+also capable of operating over USB, but apcupsd does not support this yet.)
+MODBUS is APC's replacement for the aging 'apcsmart' (aka UPS-Link)
+protocol. MODBUS is the only way to access detailed control and status
+information on newer (esp. SMT series) UPSes.</dd>
 </dl>
 </div>
 <div class="section" id="choosing-a-configuration-type">
-<h3><a class="toc-backref" href="#id54">Choosing a Configuration Type</a></h3>
+<h3><a class="toc-backref" href="#id53">Choosing a Configuration Type</a></h3>
 <p>There are three major
 ways of running apcupsd on your system. The first is a standalone
 configuration where apcupsd controls a single UPS, which powers a
@@ -875,24 +868,24 @@ diagnostics</p>
 <p>Here is a diagram that summarizes the possibilities:</p>
 </div>
 <div class="section" id="configuration-types">
-<h3><a class="toc-backref" href="#id55">Configuration types</a></h3>
+<h3><a class="toc-backref" href="#id54">Configuration types</a></h3>
 <img alt="./main_configs.png" src="./main_configs.png" />
 <p>If you decide to set up one of these more complex configurations,
 see the dedicated section on that particular configuration.</p>
 </div>
 </div>
 <div class="section" id="usb-configuration">
-<h2><a class="toc-backref" href="#id56">USB Configuration</a></h2>
+<h2><a class="toc-backref" href="#id55">USB Configuration</a></h2>
 <p>Apcupsd supports USB connections on all major operating systems:
 Linux, FreeBSD, OpenBSD, NetBSD, Windows, Solaris, and Mac OS X
-Darwin. If you plan to use a USB conenction, please read the
+Darwin. If you plan to use a USB connection, please read the
 appropriate subsection in its entirety. You can skip this section
 if your UPS has a serial (RS232-C) or Ethernet interface or if you
 are not running one of the platforms listed above.</p>
 <div class="section" id="linux-usb-configuration">
-<h3><a class="toc-backref" href="#id57">Linux USB Configuration</a></h3>
+<h3><a class="toc-backref" href="#id56">Linux USB Configuration</a></h3>
 <div class="section" id="known-linux-usb-issues">
-<h4><a class="toc-backref" href="#id58">Known Linux USB Issues</a></h4>
+<h4><a class="toc-backref" href="#id57">Known Linux USB Issues</a></h4>
 <dl class="docutils">
 <dt><strong>Problem</strong></dt>
 <dd>Linux 2.4 series kernels older than 2.4.22 (RH 9, RHEL 3)
@@ -946,7 +939,7 @@ KERNEL=&quot;hiddev*&quot;, NAME=&quot;usb/hiddev%n&quot;
 </dl>
 </div>
 <div class="section" id="verifying-device-detection-and-driver">
-<h4><a class="toc-backref" href="#id59">Verifying Device Detection and Driver</a></h4>
+<h4><a class="toc-backref" href="#id58">Verifying Device Detection and Driver</a></h4>
 <p>To make sure that your USB subsystem can see the UPS, just do this
 from a shell prompt:</p>
 <pre class="literal-block">
@@ -1060,7 +1053,7 @@ CONFIG_USB_OHCI     (linux-2.4.x)
 </pre>
 </div>
 <div class="section" id="device-nodes">
-<h4><a class="toc-backref" href="#id60">Device Nodes</a></h4>
+<h4><a class="toc-backref" href="#id59">Device Nodes</a></h4>
 <p>Apcupsd accesses USB UPSes via the hiddev device nodes. Typically
 these are located in <tt class="docutils literal"><span class="pre">/dev/hiddevN</span></tt>, <tt class="docutils literal"><span class="pre">/dev/usb/hiddevN</span></tt> or
 <tt class="docutils literal"><span class="pre">/dev/usb/hiddev/hiddevN</span></tt> (where <tt class="docutils literal"><span class="pre">N</span></tt> is a digit 0 thru 9). Some
@@ -1145,7 +1138,7 @@ disabled</li>
 </ol>
 </div>
 <div class="section" id="miscellaneous">
-<h4><a class="toc-backref" href="#id61">Miscellaneous</a></h4>
+<h4><a class="toc-backref" href="#id60">Miscellaneous</a></h4>
 <p>If all these things check out and you still can't see the UPS,
 something is more seriously wrong than this manual can cover --
 find expert help. If you are unable to list USB devices or drivers,
@@ -1153,9 +1146,9 @@ you kernel may not be USB-capable and that needs to be fixed.</p>
 </div>
 </div>
 <div class="section" id="bsd-usb-configuration">
-<h3><a class="toc-backref" href="#id62">BSD USB Configuration</a></h3>
+<h3><a class="toc-backref" href="#id61">BSD USB Configuration</a></h3>
 <div class="section" id="known-bsd-usb-issues">
-<h4><a class="toc-backref" href="#id63">Known BSD USB Issues</a></h4>
+<h4><a class="toc-backref" href="#id62">Known BSD USB Issues</a></h4>
 <dl class="docutils">
 <dt><strong>Problem</strong></dt>
 <dd>FreeBSD lockups: Some users have experienced lockups
@@ -1173,13 +1166,13 @@ may be fixed in recent FreeBSD kernels.</dd>
 </dl>
 </div>
 <div class="section" id="platforms-and-versions">
-<h4><a class="toc-backref" href="#id64">Platforms and Versions</a></h4>
+<h4><a class="toc-backref" href="#id63">Platforms and Versions</a></h4>
 <p>The *BSD USB driver supports FreeBSD, OpenBSD and NetBSD. (Thanks
 go to the *BSD developers who kept a nearly identical interface
 across all three platforms.)</p>
 </div>
 <div class="section" id="kernel-configuration">
-<h4><a class="toc-backref" href="#id65">Kernel Configuration</a></h4>
+<h4><a class="toc-backref" href="#id64">Kernel Configuration</a></h4>
 <p>Users of OpenBSD, NetBSD, and some versions of FreeBSD will need to
 rebuild the kernel in order to <em>enable the ugen driver</em> and
 <em>disable the uhid driver</em>. uhid is not sufficient for apcupsd at
@@ -1256,8 +1249,8 @@ references:</p>
 <dd><a class="reference external" href="http://www.openbsd.org/faq/faq5.html#Building">http://www.openbsd.org/faq/faq5.html#Building</a></dd>
 </dl>
 </div>
-<div class="section" id="id31">
-<h4><a class="toc-backref" href="#id66">Verifying Device Detection and Driver</a></h4>
+<div class="section" id="id30">
+<h4><a class="toc-backref" href="#id65">Verifying Device Detection and Driver</a></h4>
 <p>After building a properly configured kernel, reboot into that
 kernel and plug in your UPS USB cable. You should see a dmesg log
 message like the following:</p>
@@ -1279,8 +1272,8 @@ addr 1: UHCI root hub, VIA
    ugen0
 </pre>
 </div>
-<div class="section" id="id32">
-<h4><a class="toc-backref" href="#id67">Device Nodes</a></h4>
+<div class="section" id="id31">
+<h4><a class="toc-backref" href="#id66">Device Nodes</a></h4>
 <p>Apcupsd communicates with the UPS through the USB generic device,
 <tt class="docutils literal"><span class="pre">ugen</span></tt>. You may or may not need to manually make <tt class="docutils literal"><span class="pre">ugen</span></tt> device
 nodes in <tt class="docutils literal"><span class="pre">/dev</span></tt>, depending on what OS you are using.</p>
@@ -1306,45 +1299,38 @@ ugen nodes in case you add more USB devices.</dd>
 </div>
 </div>
 <div class="section" id="windows-usb-configuration">
-<h3><a class="toc-backref" href="#id68">Windows USB Configuration</a></h3>
-<div class="section" id="id33">
-<h4><a class="toc-backref" href="#id69">Platforms and Versions</a></h4>
-<p>Apcupsd supports USB UPSes on Windows 98, Windows ME (untested, but
-expected to work), Windows NT 4.0, Windows 2000, Windows XP, and
-Windows Server 2003. Windows Vista is untested at this time. 64-bit
-platforms (x64) are also supported.</p>
+<h3><a class="toc-backref" href="#id67">Windows USB Configuration</a></h3>
+<div class="section" id="id32">
+<h4><a class="toc-backref" href="#id68">Platforms and Versions</a></h4>
+<p>Apcupsd supports USB UPSes on Windows XP and newer, including 64 bit systems.</p>
 </div>
 <div class="section" id="usb-driver-installation">
-<h4><a class="toc-backref" href="#id70">USB Driver Installation</a></h4>
+<h4><a class="toc-backref" href="#id69">USB Driver Installation</a></h4>
 <p>USB connected UPSes on Windows require a special driver. In most
 cases, this driver is automatically installed when you install
-Apcupsd. However, if you unchecked the &quot;USB Driver&quot; package during
-installation or if you're running Windows 98 or ME, you will need
-to install the driver manually.</p>
-<p>For detailed instructions, please see the <tt class="docutils literal"><span class="pre">install.txt</span></tt> file located
+Apcupsd. However in some cases you may need to install the driver manually.
+For detailed instructions, please see the <tt class="docutils literal"><span class="pre">install.txt</span></tt> file located
 in the driver folder of your Apcupsd install.</p>
 </div>
-<div class="section" id="id34">
-<h4><a class="toc-backref" href="#id71">Verifying Device Detection and Driver</a></h4>
+<div class="section" id="id33">
+<h4><a class="toc-backref" href="#id70">Verifying Device Detection and Driver</a></h4>
 <p>After installing Apcupsd (and the Apcupsd USB driver, if
 necessary), plug in your UPS USB cable and open the Windows Device
-Manager. You should see a <tt class="docutils literal"><span class="pre">LibUSB-Win32</span> <span class="pre">Devices</span></tt> section, under
-which is listed <tt class="docutils literal"><span class="pre">American</span> <span class="pre">Power</span> <span class="pre">Conversion</span> <span class="pre">USB</span> <span class="pre">UPS</span> <span class="pre">(Apcupsd)</span></tt>. You
-should <strong>NOT</strong> see <tt class="docutils literal"><span class="pre">HID</span> <span class="pre">UPS</span> <span class="pre">Battery</span></tt> under the <tt class="docutils literal"><span class="pre">Batteries</span></tt> section.</p>
-<p>If the <tt class="docutils literal"><span class="pre">LibUSB-Win32</span> <span class="pre">Devices</span></tt> section does not appear, check that
-your UPS is powered on and that the USB cable is connected at both
-ends. Reinstall the driver as directed above if needed.</p>
+Manager. You should see a <tt class="docutils literal"><span class="pre">American</span> <span class="pre">Power</span> <span class="pre">Conversion</span> <span class="pre">USB</span> <span class="pre">UPS</span> <span class="pre">(Apcupsd)</span></tt>
+listed under the <tt class="docutils literal"><span class="pre">Batteries</span></tt> section. If a device of that name does not
+appear, check that your UPS is powered on and that the USB cable is connected
+at both ends. Reinstall the driver as directed above if needed.</p>
 </div>
 </div>
 <div class="section" id="solaris-usb-configuration">
-<h3><a class="toc-backref" href="#id72">Solaris USB Configuration</a></h3>
-<div class="section" id="id35">
-<h4><a class="toc-backref" href="#id73">Platforms and Versions</a></h4>
+<h3><a class="toc-backref" href="#id71">Solaris USB Configuration</a></h3>
+<div class="section" id="id34">
+<h4><a class="toc-backref" href="#id72">Platforms and Versions</a></h4>
 <p>Apcupsd supports USB UPSes on Solaris 10 and higher. Both x86 and
 SPARC platforms are supported.</p>
 </div>
 <div class="section" id="building-apcupsd-with-usb">
-<h4><a class="toc-backref" href="#id74">Building Apcupsd with USB</a></h4>
+<h4><a class="toc-backref" href="#id73">Building Apcupsd with USB</a></h4>
 <p>Some specific packages are necessary when building Apcupsd with USB
 support on Solaris. You must install the <tt class="docutils literal"><span class="pre">SUNWlibusb</span></tt> and
 <tt class="docutils literal"><span class="pre">SUNWlibusbugen</span></tt> packages <strong>BEFORE</strong> attempting to build Apcupsd.
@@ -1365,8 +1351,8 @@ a critical step and must be completed by a reconfigure boot. Note
 that the USB config changes will be reversed if you remove Apcupsd
 using '<tt class="docutils literal"><span class="pre">make</span> <span class="pre">uninstall</span></tt>'.</p>
 </div>
-<div class="section" id="id36">
-<h4><a class="toc-backref" href="#id75">Verifying Device Detection and Driver</a></h4>
+<div class="section" id="id35">
+<h4><a class="toc-backref" href="#id74">Verifying Device Detection and Driver</a></h4>
 <p>After installing Apcupsd as described above and performing a
 reconfigure boot, plug in your UPS USB cable. You should see a
 series of dmesg log messages similar to the following:</p>
@@ -1382,8 +1368,8 @@ that the USB cable is connected at both ends. Also verify that you
 installed Apcupsd as root using the '<tt class="docutils literal"><span class="pre">make</span> <span class="pre">install</span></tt>' command and
 that you performed a reconfigure boot afterward.</p>
 </div>
-<div class="section" id="id37">
-<h4><a class="toc-backref" href="#id76">Device Nodes</a></h4>
+<div class="section" id="id36">
+<h4><a class="toc-backref" href="#id75">Device Nodes</a></h4>
 <p>Apcupsd communicates with the UPS through the USB generic device, <tt class="docutils literal"><span class="pre">ugen</span></tt>.
 The reconfigure boot performed after Apcupsd installation
 will ensure the correct device nodes are created. Once your UPS has
@@ -1397,20 +1383,24 @@ cntrl0      cntrl0stat  devstat     if0in1      if0in1stat
 </div>
 </div>
 <div class="section" id="mac-os-x-darwin-usb-configuration">
-<h3><a class="toc-backref" href="#id77">Mac OS X (Darwin) USB Configuration</a></h3>
-<div class="section" id="id38">
-<h4><a class="toc-backref" href="#id78">Platforms and Versions</a></h4>
-<p>Apcupsd supports USB UPSes on Mac OS X (Darwin) 10.3.x and higher.
+<h3><a class="toc-backref" href="#id76">Mac OS X (Darwin) USB Configuration</a></h3>
+<div class="section" id="id37">
+<h4><a class="toc-backref" href="#id77">Platforms and Versions</a></h4>
+<p>Apcupsd supports USB UPSes on Mac OS X (Darwin) 10.4.x and higher.
 Both Intel and PowerPC platforms are supported.</p>
 </div>
-<div class="section" id="id39">
-<h4><a class="toc-backref" href="#id79">Building Apcupsd with USB</a></h4>
+<div class="section" id="id38">
+<h4><a class="toc-backref" href="#id78">Building Apcupsd with USB</a></h4>
 <p>Some specific packages are necessary when building Apcupsd with USB
-support on Darwin. You must install libusb-0.1.12 or higher which
+support on Darwin. You must install libusb-0.1.12 which
 can be obtained from MacPorts (<a class="reference external" href="http://www.macports.org">http://www.macports.org</a>) (formerly
-DarwinPorts) or Fink (<a class="reference external" href="http://fink.sourceforge.net">http://fink.sourceforge.net</a>). Note that
-Apcupsd is sensitive to the install location of libusb, so beware
-if you change it from the default.</p>
+DarwinPorts) or Fink (<a class="reference external" href="http://fink.sourceforge.net">http://fink.sourceforge.net</a>) or downloaded and built
+by hand (<a class="reference external" href="http://www.libusb.org">http://www.libusb.org</a>). <em>You must not use
+libusb-1.x or higher (apcupsd does not support the new 1.0 APIs) nor
+any version earlier than 0.1.12 (earlier versions have a bug that apcupsd
+triggers). Generally that means you must use exactly 0.1.12.</em> Note that
+Apcupsd is sensitive to the install location of libusb, so beware if you
+change it from the default.</p>
 <p>Apcupsd should be built using gcc, preferably from the XCode
 development tools. Currently the maintainer is using gcc-4.0.1 from
 XCode 2.4. Other versions of gcc from other sources may also work.</p>
@@ -1426,8 +1416,8 @@ automatically removed if you uninstall Apcupsd using
 '<tt class="docutils literal"><span class="pre">make</span> <span class="pre">uninstall</span></tt>', allowing Apple's monitoring tool to once
 again access the UPS.</p>
 </div>
-<div class="section" id="id40">
-<h4><a class="toc-backref" href="#id80">Verifying Device Detection and Driver</a></h4>
+<div class="section" id="id39">
+<h4><a class="toc-backref" href="#id79">Verifying Device Detection and Driver</a></h4>
 <p>After installing Apcupsd as described above and rebooting, plug in
 your UPS USB cable. You should notice that Darwin does <strong>NOT</strong>
 display the battery monitor tool in the menu bar. You can also
@@ -1437,7 +1427,7 @@ that your UPS appears in the list of USB devices.</p>
 </div>
 </div>
 <div class="section" id="building-and-installing-apcupsd">
-<h2><a class="toc-backref" href="#id81">Building and Installing apcupsd</a></h2>
+<h2><a class="toc-backref" href="#id80">Building and Installing apcupsd</a></h2>
 <p>In general it is recommended to obtain a prebuilt binary package for your
 platform. Given how apcupsd must integrate into the shutdown mechanism of the
 operating system and the rate at which such mechanisms are changed by
@@ -1449,9 +1439,9 @@ recent binary packages before resorting to building apcupsd from scratch.
 Note that some vendors continue to distribute <em>ancient</em> versions of apcupsd
 with known defects. These packages should <strong>not</strong> be used.</p>
 <div class="section" id="installation-from-binary-packages">
-<h3><a class="toc-backref" href="#id82">Installation from Binary Packages</a></h3>
+<h3><a class="toc-backref" href="#id81">Installation from Binary Packages</a></h3>
 <div class="section" id="rpms">
-<h4><a class="toc-backref" href="#id83">RPMS</a></h4>
+<h4><a class="toc-backref" href="#id82">RPMS</a></h4>
 <p>For systems based on RPM packages, such as Red Hat and SuSE, apcupsd is
 available in binary RPM format. This is the simplest way to
 install. If you have no previous version of apcupsd on your machine
@@ -1473,7 +1463,7 @@ cgi-bin directory, which on many systems is located in
 /home/httpd/cgi-bin.</p>
 </div>
 <div class="section" id="microsoft-windows">
-<h4><a class="toc-backref" href="#id84">Microsoft Windows</a></h4>
+<h4><a class="toc-backref" href="#id83">Microsoft Windows</a></h4>
 <p>The Windows version of apcupsd is distributed as a simple double-click
 installer. Installation is very simple and straight-forward: Simply
 double-click the installer executable and follow the instructions. See
@@ -1481,7 +1471,7 @@ double-click the installer executable and follow the instructions. See
 </div>
 </div>
 <div class="section" id="installation-from-source">
-<h3><a class="toc-backref" href="#id85">Installation from Source</a></h3>
+<h3><a class="toc-backref" href="#id84">Installation from Source</a></h3>
 <p>Installation from source might have to be be done different ways
 depending on what system you are running. The basic procedure
 involves getting a source distribution, running the configuration,
@@ -1557,7 +1547,7 @@ will be placed in appropriate system directories (usually
 subdirectories of /etc/rc.d).</p>
 </div>
 <div class="section" id="verifying-a-source-installation">
-<h3><a class="toc-backref" href="#id86">Verifying a Source Installation</a></h3>
+<h3><a class="toc-backref" href="#id85">Verifying a Source Installation</a></h3>
 <p>There are a number of things that you can do to check if the
 installation (make install) went well. The fist is to check where
 the system has installed apcupsd using '<tt class="docutils literal"><span class="pre">which</span></tt>' and '<tt class="docutils literal"><span class="pre">whereis</span></tt>'. On
@@ -1640,7 +1630,7 @@ there is no need to attempt to power off the UPS. That will be done
 by the master.</p>
 </div>
 <div class="section" id="configure-options">
-<h3><a class="toc-backref" href="#id87">Configure Options</a></h3>
+<h3><a class="toc-backref" href="#id86">Configure Options</a></h3>
 <p>All the available <tt class="docutils literal"><span class="pre">configure</span></tt> options can be printed by entering:</p>
 <pre class="literal-block">
 ./configure --help
@@ -1714,7 +1704,14 @@ interface.</td></tr>
 <td>Turns on generation of the
 SNMP driver. This driver accesses the UPS over the network using
 SNMP. This is compatible only with UPSes equipped with an SNMP or
-Web/SNMP management card. By default this is disabled.</td></tr>
+Web/SNMP management card. By default this is enabled.</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--enable-net-snmp</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>Turns on generation of the
+obsolete NET-SNMP driver. This driver was the precursor to the current
+snmp driver and is now obsolete. It is available as a fallback if the new
+driver cannot be used for some reason. By default this is disabled.</td></tr>
 <tr><td class="option-group">
 <kbd><span class="option">--enable-pcnet</span></kbd></td>
 <td>Turns on generation of the
@@ -1726,6 +1723,17 @@ modern Web/SNMP management card.</td></tr>
 <kbd><span class="option">--enable-test</span></kbd></td>
 <td>This turns on a test driver
 that is used only for debugging. By default it is disabled.</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--enable-gapcmon</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>This option enables building the GTK GUI front-end for
+apcupsd. Building this package requires numerous GNOME libraries. The
+default is disabled.</td></tr>
+<tr><td class="option-group" colspan="2">
+<kbd><span class="option">--enable-apcagent</span></kbd></td>
+</tr>
+<tr><td>&nbsp;</td><td>This option enables building the apcagent menubar application
+on Mac OS X platforms. The default is disabled.</td></tr>
 <tr><td class="option-group" colspan="2">
 <kbd><span class="option">--with-libwrap=<var>path</var></span>, <span class="option">--with-libwrap</span></kbd></td>
 </tr>
@@ -1759,7 +1767,7 @@ be changed at any later time.</td></tr>
 </tr>
 <tr><td>&nbsp;</td><td>This option allows
 you to specify where apcupsd will create the serial port lock file.
-The default is systemdependent but usually /var/lock. This option
+The default is system-dependent but usually /var/lock. This option
 simply sets the appropriate path in the apcupsd.conf file, which
 can be changed at any later time.</td></tr>
 <tr><td class="option-group" colspan="2">
@@ -1837,7 +1845,7 @@ want to modify your system halt files.</td></tr>
 </table>
 </div>
 <div class="section" id="recommended-options-for-most-systems">
-<h3><a class="toc-backref" href="#id88">Recommended Options for most Systems</a></h3>
+<h3><a class="toc-backref" href="#id87">Recommended Options for most Systems</a></h3>
 <p>For most systems, we recommend the following options:</p>
 <pre class="literal-block">
 ./configure --prefix=/usr --sbindir=/sbin --enable-usb
@@ -1850,7 +1858,7 @@ follows:</p>
 </pre>
 </div>
 <div class="section" id="compilers-and-options">
-<h3><a class="toc-backref" href="#id89">Compilers and Options</a></h3>
+<h3><a class="toc-backref" href="#id88">Compilers and Options</a></h3>
 <p>Some systems require unusual options
 for compilation or linking that the '<tt class="docutils literal"><span class="pre">./configure</span></tt>' script does not
 know about. You can specify initial values for variables by setting
@@ -1877,7 +1885,7 @@ setenv LDFLAGS -O
 <p>or simply see the previous section of this manual.</p>
 </div>
 <div class="section" id="operating-system-specifics">
-<h3><a class="toc-backref" href="#id90">Operating System Specifics</a></h3>
+<h3><a class="toc-backref" href="#id89">Operating System Specifics</a></h3>
 <p>With the exception of Linux SUSE and Linux Red Hat
 systems used by the developers, we rely on users to help create
 installation scripts and instructions as well as to test that
@@ -1904,7 +1912,7 @@ received installation files:</p>
 <li>Win32 (see <a class="reference internal" href="#windows-systems">Windows Systems</a>)</li>
 </ul>
 <div class="section" id="debian">
-<h4><a class="toc-backref" href="#id91">Debian</a></h4>
+<h4><a class="toc-backref" href="#id90">Debian</a></h4>
 <p>This port is complete and is being used by several users. Since Debian
 build and install procedures are somewhat particular, we have put the extra
 Debian information into the following two subdirectories:
@@ -1918,7 +1926,7 @@ at:</p>
 </ul>
 </div>
 <div class="section" id="freebsd">
-<h4><a class="toc-backref" href="#id92">FreeBSD</a></h4>
+<h4><a class="toc-backref" href="#id91">FreeBSD</a></h4>
 <p>This port is complete and is being used by several users.</p>
 <p>You will need to install and use GNU make (aka gmake) instead of the
 BSD make supplied with the system.</p>
@@ -1932,16 +1940,16 @@ down (usually 2 minutes), the use the <tt class="docutils literal"><span class="
 on the apcupsd command line.</p>
 </div>
 <div class="section" id="hpux">
-<h4><a class="toc-backref" href="#id93">HPUX</a></h4>
+<h4><a class="toc-backref" href="#id92">HPUX</a></h4>
 <p>Status of this port is unknown.</p>
 </div>
 <div class="section" id="netbsd">
-<h4><a class="toc-backref" href="#id94">NetBSD</a></h4>
+<h4><a class="toc-backref" href="#id93">NetBSD</a></h4>
 <p>You will need to install and use GNU make (aka gmake) instead of the
 BSD make supplied with the system.</p>
 </div>
 <div class="section" id="mac-os-x-darwin">
-<h4><a class="toc-backref" href="#id95">Mac OS X Darwin</a></h4>
+<h4><a class="toc-backref" href="#id94">Mac OS X Darwin</a></h4>
 <p>On OS X (Darwin), apcupsd can be built with <tt class="docutils literal"><span class="pre">configure</span></tt> defaults.
 The USB driver can be enabled, as per the directions on <a class="reference internal" href="#mac-os-x-darwin-usb-configuration">Mac OS X (Darwin)
 USB Configuration</a> Apcupsd <em>may</em> be usable
@@ -1952,7 +1960,7 @@ NIS client or using a USB interface.</p>
 SystemStartup.</p>
 </div>
 <div class="section" id="openbsd">
-<h4><a class="toc-backref" href="#id96">OpenBSD</a></h4>
+<h4><a class="toc-backref" href="#id95">OpenBSD</a></h4>
 <p>You will need to install and use GNU make (aka gmake) instead of the
 BSD make supplied with the system.</p>
 <p>Ensure that you read
@@ -1963,27 +1971,27 @@ into account may result in the system not being fully halted when
 power is lost.</p>
 </div>
 <div class="section" id="red-hat-systems">
-<h4><a class="toc-backref" href="#id97">Red Hat Systems</a></h4>
+<h4><a class="toc-backref" href="#id96">Red Hat Systems</a></h4>
 <p>Red Hat systems are
 fully supported, and by following the standard installation
 instructions given above, you should experience few or no
 problems.</p>
 </div>
 <div class="section" id="slackware">
-<h4><a class="toc-backref" href="#id98">Slackware</a></h4>
+<h4><a class="toc-backref" href="#id97">Slackware</a></h4>
 <p>Slackware
 systems are fully supported, and by following the standard
 installation instructions given above, you should experience few or
 no problems.</p>
 </div>
 <div class="section" id="suse">
-<h4><a class="toc-backref" href="#id99">SUSE</a></h4>
+<h4><a class="toc-backref" href="#id98">SUSE</a></h4>
 <p>SUSE systems are fully
 supported, and by following the standard installation instructions
 given above, you should experience few or no problems.</p>
 </div>
 <div class="section" id="sun-solaris">
-<h4><a class="toc-backref" href="#id100">Sun Solaris</a></h4>
+<h4><a class="toc-backref" href="#id99">Sun Solaris</a></h4>
 <p>Please read this before attempting to compile or install the beta
 software. It contains important information that will make your
 efforts easier.</p>
@@ -2129,7 +2137,7 @@ package that works across all platforms, and welcome your
 feedback.</p>
 </div>
 <div class="section" id="unknown-system">
-<h4><a class="toc-backref" href="#id101">Unknown System</a></h4>
+<h4><a class="toc-backref" href="#id100">Unknown System</a></h4>
 <p>During the '<tt class="docutils literal"><span class="pre">./configure</span></tt>', if apcupsd does not find one of the systems for
 which it has specific installation programs, it will set the
 Operating System to <tt class="docutils literal"><span class="pre">unknown</span></tt> and will use the incomplete
@@ -2140,7 +2148,7 @@ instructions. This directory also contains a hint file for Linux
 From Scratch, which could be helpful for other systems as well.</p>
 </div>
 <div class="section" id="windows-systems">
-<h4><a class="toc-backref" href="#id102">Windows Systems</a></h4>
+<h4><a class="toc-backref" href="#id101">Windows Systems</a></h4>
 <p>Appropriate scripts
 (actually Windows batch files) are included with the Apcupsd Win32
 installer package.</p>
@@ -2148,9 +2156,9 @@ installer package.</p>
 </div>
 </div>
 <div class="section" id="after-installation">
-<h2><a class="toc-backref" href="#id103">After Installation</a></h2>
+<h2><a class="toc-backref" href="#id102">After Installation</a></h2>
 <div class="section" id="checking-your-configuration-file">
-<h3><a class="toc-backref" href="#id104">Checking Your Configuration File</a></h3>
+<h3><a class="toc-backref" href="#id103">Checking Your Configuration File</a></h3>
 <p>Once you have installed apcupsd,
 either from a binary package or by building from source, your next
 step should be to inspect your <tt class="docutils literal"><span class="pre">/etc/apcupsd/apcupsd.conf</span></tt> file to
@@ -2179,7 +2187,7 @@ file. After those elements are correct, apcupsd should run, and
 then it is only a matter of customization of your setup.</p>
 </div>
 <div class="section" id="arranging-for-reboot-on-power-up">
-<h3><a class="toc-backref" href="#id105">Arranging for Reboot on Power-Up</a></h3>
+<h3><a class="toc-backref" href="#id104">Arranging for Reboot on Power-Up</a></h3>
 <p>The final consideration for a automatic reboot after a full power down
 is to ensure that your computer will automatically reboot when the
 power is restored.</p>
@@ -2216,7 +2224,7 @@ power returns. As already mentioned, this should not apply, but in
 case of problems it is worth a try.</p>
 </div>
 <div class="section" id="making-sure-apcupsd-is-running">
-<h3><a class="toc-backref" href="#id106">Making sure apcupsd Is Running</a></h3>
+<h3><a class="toc-backref" href="#id105">Making sure apcupsd Is Running</a></h3>
 <p>The simplest way to invoke apcupsd is from the command line by entering:</p>
 <pre class="literal-block">
 /sbin/apcupsd
@@ -2264,9 +2272,9 @@ that apcupsd is running properly.</p>
 </div>
 </div>
 <div class="section" id="configuration-examples">
-<h2><a class="toc-backref" href="#id107">Configuration Examples</a></h2>
+<h2><a class="toc-backref" href="#id106">Configuration Examples</a></h2>
 <div class="section" id="a-simple-usb-configuration">
-<h3><a class="toc-backref" href="#id108">A Simple USB Configuration</a></h3>
+<h3><a class="toc-backref" href="#id107">A Simple USB Configuration</a></h3>
 <p>If you have a USB UPS, the essential elements of your apcupsd.conf file
 should look like the following:</p>
 <pre class="literal-block">
@@ -2289,7 +2297,7 @@ apcupsd find the device itself.</p>
 on setting up your system to work with a USB UPS.</p>
 </div>
 <div class="section" id="a-simple-configuration-for-a-serial-smartups">
-<h3><a class="toc-backref" href="#id109">A Simple Configuration for a Serial SmartUPS</a></h3>
+<h3><a class="toc-backref" href="#id108">A Simple Configuration for a Serial SmartUPS</a></h3>
 <p>If you have a Smart UPS
 using the serial cable supplied by APC, or you build a CUSTOM SMART cable
 outlined in the cables chapter, a very simple configuration file
@@ -2297,7 +2305,7 @@ would look like the following:</p>
 <pre class="literal-block">
 ## apcupsd.conf v1.1 ##
 UPSCABLE smart
-UPSTYPE smartups
+UPSTYPE apcsmart
 DEVICE /dev/ttyS0
 LOCKFILE /var/lock
 UPSCLASS standalone
@@ -2308,7 +2316,7 @@ completely customize your installation, but this example shows you
 the minimum required.</p>
 </div>
 <div class="section" id="a-simple-configuration-for-a-simple-signaling-or-dumb">
-<h3><a class="toc-backref" href="#id110">A Simple Configuration for a Simple Signaling or Dumb</a></h3>
+<h3><a class="toc-backref" href="#id109">A Simple Configuration for a Simple Signaling or Dumb</a></h3>
 <p>If you have a simple signaling
 or dumb UPS such as a BackUPS, you will need to know exactly what
 cable you have and specify it on the UPSCABLE directive. Please see
@@ -2341,11 +2349,11 @@ completely customize your installation, but this example shows you
 the minimum required.</p>
 </div>
 <div class="section" id="nis-server-client-configuration-using-the-net-driver">
-<h3><a class="toc-backref" href="#id111">NIS Server/Client Configuration Using the Net Driver</a></h3>
+<h3><a class="toc-backref" href="#id110">NIS Server/Client Configuration Using the Net Driver</a></h3>
 <p>NIS (Network Information Server) mode allows for communication
 between instances of apcupsd running on different hosts. Only one
 of those hosts, the server, needs to talk to the UPS directly. The
-others, clients, optain information about the state of the UPS by
+others, clients, obtain information about the state of the UPS by
 querying the server. NIS is <em>not</em> related to Sun's NIS/YP
 services.</p>
 <p>NIS clients and servers require that apcupsd be compiled with the
@@ -2354,7 +2362,7 @@ Net Driver <tt class="docutils literal"><span class="pre">--enable-net</span></t
 exactly as a standalone configuration, but with <tt class="docutils literal"><span class="pre">NETSERVER</span> <span class="pre">on</span></tt>.
 In all other respects, the server should be configured in
 standalone mode. You may also set the NIS server specific options
-<tt class="docutils literal"><span class="pre">NISIP</span></tt> to restict which IP address of the server which apcupsd
+<tt class="docutils literal"><span class="pre">NISIP</span></tt> to restrict which IP address of the server which apcupsd
 listens on. The default, 0.0.0.0, means to list on all of the
 server host's IP addresses; <tt class="docutils literal"><span class="pre">NISPORT</span></tt> (default 3551) to set which
 TCP port the server listens on; and <tt class="docutils literal"><span class="pre">EVENTSFILE</span></tt> and
@@ -2406,7 +2414,7 @@ the power fails and know when to shutdown.</p>
 that would increase the delay of information getting from the UPS
 to the secondary client.</p>
 <div class="section" id="differences-between-nis-client-server-and-the-old-now-removed-master-slave-modes">
-<h4><a class="toc-backref" href="#id112">Differences between NIS Client/Server and the old (now removed) Master/Slave modes</a></h4>
+<h4><a class="toc-backref" href="#id111">Differences between NIS Client/Server and the old (now removed) Master/Slave modes</a></h4>
 <p>The difference between the NIS mode and the removed master/slave
 mode is that the NIS server has no explicit knowledge of the
 slaves. The NIS server makes its information available via the net
@@ -2426,7 +2434,7 @@ and make their own decisions.</p>
 </div>
 </div>
 <div class="section" id="powerchute-network-shutdown-driver-pcnet">
-<h3><a class="toc-backref" href="#id113">PowerChute Network Shutdown Driver (PCNET)</a></h3>
+<h3><a class="toc-backref" href="#id112">PowerChute Network Shutdown Driver (PCNET)</a></h3>
 <p>As of 3.14, Apcupsd supports the PowerChute Network Shutdown
 protocol. This is an alternative to SNMP for use with APC's AP9617
 family of network smartslot modules. Note that the older AP9606
@@ -2468,6 +2476,39 @@ chkconfig --level 0 network on
 chkconfig --level 0 iptables on
 </pre>
 <p>...to make sure networking stays up.</p>
+</div>
+<div class="section" id="modbus-driver">
+<h3><a class="toc-backref" href="#id113">MODBUS Driver</a></h3>
+<p>As of 3.14.11, apcupsd supports the MODBUS protocol over RS232 serial
+interfaces. MODBUS is APC's replacement for the aging 'apcsmart' (aka UPS-Link)
+protocol. It is recommended for modern (ex: SMT series) Smart-UPS where an
+RS232 connection is available.</p>
+<p>Not all APC UPSes support MODBUS. New 2013 year Smart-UPS models are likely to
+support it out-of-the-box and firmware updates are available for some older
+models. APC/Schneider tech support is your best point of contact for determining
+if a certain model will support MODBUS. That said, APC knowledge base article
+FA164737 indicates MODBUS support is available for the majority of the SMC,
+SMT, and SMX model lines.</p>
+<p>The required apcupsd.conf settings for MODBUS are straightforward:</p>
+<pre class="literal-block">
+## apcupsd.conf v1.1 ##
+UPSCABLE smart
+UPSTYPE modbus
+DEVICE /dev/ttyS0
+LOCKFILE /var/lock
+UPSCLASS standalone
+UPSMODE disable
+</pre>
+<p>The <tt class="docutils literal"><span class="pre">DEVICE</span></tt> setting identifies the serial port to which the UPS is connected.
+This can take the form of <tt class="docutils literal"><span class="pre">COM1</span></tt>, etc. on Windows or <tt class="docutils literal"><span class="pre">/dev/XXX</span></tt> on UNIX
+systems.</p>
+<p>You should use the APC-supplied serial cable (P/N 940-0625A) that ships with
+the UPS. Other 'smart' type cables may work, but only 940-0625A has been
+formally tested at this time.</p>
+<p>Note that <em>most UPSes ship with MODBUS support disabled by default</em>. You must
+use the UPS's front panel menu to enable MODBUS protocol support before apcupsd
+will be able to communicate with the UPS. You may need to enable the &quot;Advanced&quot;
+menu option before the MODBUS protocol option will be visible.</p>
 </div>
 </div>
 <div class="section" id="testing-apcupsd">
@@ -2807,8 +2848,8 @@ directly to your UPS and run certain low-level tests, display all
 know values from the UPS's EEPROM, perform a battery runtime
 calibration, program the EEPROM (serial connection only), and enter
 in TTY mode with the UPS. Here we describe how to use it for a SmartUPS.
-The menus and optiosn for USB and simple signaling UPSes are different
-but mostly self-explanator.</p>
+The menus and options for USB and simple signaling UPSes are different
+but mostly self-explanatory.</p>
 <p>Shutdown apcupsd if it is running. Make sure your
 <tt class="docutils literal"><span class="pre">/etc/apcupsd/apcupsd.conf</span></tt> file has <tt class="docutils literal"><span class="pre">UPSTYPE</span> <span class="pre">apcsmart</span></tt> and
 <tt class="docutils literal"><span class="pre">UPSCABLE</span></tt> has one of the smart cables that are supported.</p>
@@ -2994,7 +3035,7 @@ generated within apcupsd, control is passed to the script
 apccontrol normally found in /etc/apcupsd/apccontrol. The event
 name, and a number of other important parameters are passed to the
 script.</p>
-<p>The major function of the apccontrol script is to performa a
+<p>The major function of the apccontrol script is to perform a
 shutdown of the system (as well as the killpower operation). In
 addition, another major task for this script is to notify you by
 email when certain events such as powerfail occur.</p>
@@ -3027,9 +3068,7 @@ is used by <tt class="docutils literal"><span class="pre">upsstats.cgi</span></t
 <p>Before using multimon and the other CGI programs, first ensure that
 apcupsd is configured to run the Network Information Server. This
 is done by setting <tt class="docutils literal"><span class="pre">NETSERVER</span> <span class="pre">on</span></tt> in /etc/apcupsd/apcupsd.conf.
-This switch is on by default. If you are unsure of its state, see
-the section at the end of this chapter concerning the Client test
-program.</p>
+This switch is on by default.</p>
 <p>Next you must edit the hosts file /etc/apcupsd/hosts.conf and at
 the end, add the name of the hosts you want to monitor and a label
 string for them. For example:</p>
@@ -3100,8 +3139,32 @@ careful to ensure that that /etc/apcupsd/hosts.conf and
 sizes of the multimon output, you may simply edit the apcupsd.css
 file to specify the styles you prefer.</p>
 </div>
+<div class="section" id="using-the-cgi-programs-on-windows">
+<h4><a class="toc-backref" href="#id128">Using the CGI Programs on Windows</a></h4>
+<p>The CGI programs compiled for Windows are included in the Windows package
+starting with apcupsd-3.14.7.</p>
+<p>The CGI programs included with the Windows package are intended
+to be run on Windows. If your web server is running on Linux or another
+operating system, you will need to obtain binary packages for that platform
+(or build them from source) instead. The windows build of the CGI programs has
+been tested with the Apache web server for Win32. They should also work with MS
+Internet Information Server (IIS).</p>
+<p>To use the programs, copy the contents of the <tt class="docutils literal"><span class="pre">cgi/</span></tt> directory from your
+apcupsd installation directory to the <tt class="docutils literal"><span class="pre">cgi-bin/</span></tt> directory of your web server.
+Consult your web server's documentation for how to enable CGI programs to be
+executed. Sometimes special security settings are required.</p>
+<p>Configure the hosts.conf file as described above. The programs expect to find
+the <tt class="docutils literal"><span class="pre">hosts.conf</span></tt> file and the <tt class="docutils literal"><span class="pre">apcupsd.css</span></tt> file in the directory
+<tt class="docutils literal"><span class="pre">\apcupsd\etc\apcupsd</span></tt> on the same drive letter as the web server's
+<tt class="docutils literal"><span class="pre">cgi-bin</span></tt> directory. If you installed apcupsd into <tt class="docutils literal"><span class="pre">C:\apcupsd</span></tt> (the
+default) and your web server's <tt class="docutils literal"><span class="pre">cgi-bin/</span></tt> directory is also located on the
+<tt class="docutils literal"><span class="pre">C:</span></tt> drive, no further changes are necessary. If you installed apcupsd into a
+different directory or your web server <tt class="docutils literal"><span class="pre">cgi-bin</span></tt> is on another drive, you will
+need to relocate <tt class="docutils literal"><span class="pre">hosts.conf</span></tt> and <tt class="docutils literal"><span class="pre">apcupsd.css</span></tt> from the apcupsd install
+location to <tt class="docutils literal"><span class="pre">\apcupsd\etc\apcupsd</span></tt> on the appropriate drive.</p>
+</div>
 <div class="section" id="multimon-cgi">
-<h4><a class="toc-backref" href="#id128">multimon.cgi</a></h4>
+<h4><a class="toc-backref" href="#id129">multimon.cgi</a></h4>
 <p>This program
 monitors multiple UPSes at the same time. A typical output of
 multimon.cgi as displayed in your Web browser might look like the
@@ -3112,7 +3175,7 @@ headings are all configurable (see /etc/apcupsd/hosts.conf and
 /etc/apcupsd/multimon.conf)</p>
 </div>
 <div class="section" id="upsstats-cgi">
-<h4><a class="toc-backref" href="#id129">upsstats.cgi</a></h4>
+<h4><a class="toc-backref" href="#id130">upsstats.cgi</a></h4>
 <p>By clicking on the <tt class="docutils literal"><span class="pre">system</span></tt> name in the multimon.cgi display, you will
 invoke upsstats.cgi for the specified system, which will produce a bar
 graph display of three of the monitored values. For example,</p>
@@ -3129,7 +3192,7 @@ from the source cgi directory as follows:</p>
 <p>As with multimon, quite a few lines of html should then be displayed.</p>
 </div>
 <div class="section" id="upsfstatus-cgi">
-<h4><a class="toc-backref" href="#id130">upsfstatus.cgi</a></h4>
+<h4><a class="toc-backref" href="#id131">upsfstatus.cgi</a></h4>
 <p>If you
 would like to see all of the STATUS variables available over the
 network, click on the <tt class="docutils literal"><span class="pre">Data</span></tt> field of the desired system, and your
@@ -3190,7 +3253,7 @@ you execute upsfstats.cgi directly from a Unix shell in the cgi
 subdirectory as explained above for upsstats.cgi and multimon.cgi.</p>
 </div>
 <div class="section" id="a-tip-from-carl-erhorn-for-sun-systems">
-<h4><a class="toc-backref" href="#id131">A Tip from Carl Erhorn for Sun Systems:</a></h4>
+<h4><a class="toc-backref" href="#id132">A Tip from Carl Erhorn for Sun Systems:</a></h4>
 <p>It is possible to run the CGI code to monitor your
 UPS using the answerbook HTTP server that runs on Solaris. As long
 as your server has the Answerbook2 web server installed and
@@ -3199,18 +3262,18 @@ the web server, and access the cgi using something like:</p>
 <p><tt class="docutils literal"><span class="pre">http://hostname:8888/cgi/multimon.cgi</span></tt></p>
 </div>
 <div class="section" id="cgi-credits">
-<h4><a class="toc-backref" href="#id132">CGI Credits</a></h4>
+<h4><a class="toc-backref" href="#id133">CGI Credits</a></h4>
 <p>Many thanks go to Russell Kroll <a class="reference external" href="mailto:rkroll&#64;exploits.org">rkroll&#64;exploits.org</a> who wrote
 the CGI programs to work with his UPS Monitoring system named
-Network UPS Tools (NUT). Thanks
-also to Jonathan Benson <a class="reference external" href="mailto:jbenson&#64;technologist.com">jbenson&#64;technologist.com</a> for initially
+Network UPS Tools (NUT). Thanks also to Jonathan Benson
+<a class="reference external" href="mailto:jbenson&#64;technologist.com">jbenson&#64;technologist.com</a> for initially
 adapting the upsstatus.cgi program to work with apcupsd.</p>
 <p>We have enhanced the bar graph program and hope that our changes
 can be useful to the original author in his project.</p>
 </div>
 </div>
 <div class="section" id="security-issues">
-<h3><a class="toc-backref" href="#id133">Security Issues:</a></h3>
+<h3><a class="toc-backref" href="#id134">Security Issues:</a></h3>
 <ul class="simple">
 <li><tt class="docutils literal"><span class="pre">apcupsd</span></tt> runs as root.</li>
 <li>If you have <tt class="docutils literal"><span class="pre">NETSERVER</span> <span class="pre">ON</span></tt> in your apcupsd.conf file (which is
@@ -3224,7 +3287,7 @@ access using using firewall settings (see below) or TCP Wrappers
 (see below).</li>
 </ul>
 <div class="section" id="firewall-settings">
-<h4><a class="toc-backref" href="#id134">Firewall Settings</a></h4>
+<h4><a class="toc-backref" href="#id135">Firewall Settings</a></h4>
 <p>If you are running apcupsd as an NIS server, you will need to
 ensure that the clients can reach it by opening up <tt class="docutils literal"><span class="pre">NISPORT</span></tt>
 (default: TCP 3551) on any firewall running on the server. You may
@@ -3233,10 +3296,10 @@ your local network or specifically from the masters, slaves, and
 servers as needed.</p>
 </div>
 <div class="section" id="tcp-wrappers">
-<h4><a class="toc-backref" href="#id135">TCP Wrappers</a></h4>
+<h4><a class="toc-backref" href="#id136">TCP Wrappers</a></h4>
 <p>If your operating system does not support a host based firewall (a
 firewall running on the local machine) then you may try to get some
-of the funtionality of such a firewall with TCP Wrappers. As of
+of the functionality of such a firewall with TCP Wrappers. As of
 apcupsd version 3.8.2, TCP Wrappers are implemented if you turn
 them on when configuring <tt class="docutils literal"><span class="pre">./configure</span> <span class="pre">--with-libwrap</span></tt>. With
 this code enabled, you may control who may access your apcupsd via
@@ -3247,7 +3310,7 @@ feedback.</p>
 </div>
 </div>
 <div class="section" id="configuring-your-eeprom">
-<h3><a class="toc-backref" href="#id136">Configuring Your EEPROM</a></h3>
+<h3><a class="toc-backref" href="#id137">Configuring Your EEPROM</a></h3>
 <p>If you have a SmartUPS, there
 are depending on the UPS at least 12 different values stored in the
 EEPROM that determine how the UPS reacts to various conditions such
@@ -3259,7 +3322,7 @@ several reported cases of problems setting the Low Transfer
 Voltage. Consequently, if at all possible, do not attempt to change
 this value.</p>
 <div class="section" id="using-apctest-to-configure-your-eeprom">
-<h4><a class="toc-backref" href="#id137">Using apctest to Configure Your EEPROM</a></h4>
+<h4><a class="toc-backref" href="#id138">Using apctest to Configure Your EEPROM</a></h4>
 <p><em>To make the EEPROM changes with apctest you must first stop the
 apcupsd daemon.</em> After apcupsd is stopped you may invoke apctest (as root).</p>
 <p>We recommend that you change the EEPROM as little as is absolutely
@@ -3273,9 +3336,9 @@ smart serial connections.</p>
 </div>
 </div>
 <div class="section" id="maintaining-your-ups-batteries">
-<h2><a class="toc-backref" href="#id138">Maintaining Your UPS Batteries</a></h2>
+<h2><a class="toc-backref" href="#id139">Maintaining Your UPS Batteries</a></h2>
 <div class="section" id="battery-technology">
-<h3><a class="toc-backref" href="#id139">Battery Technology</a></h3>
+<h3><a class="toc-backref" href="#id140">Battery Technology</a></h3>
 <p>Sealed Lead Acid (SLA) batteries, otherwise known as Valve Regulated Lead Acid
 (VRLA) batteries, were originally known as &quot;dry batteries&quot;. When first
 introduced in the 1950s, they used a gel electrolyte. The otherwise free acid
@@ -3295,7 +3358,7 @@ hydrogen under normal operating conditions. Normal room ventilation is
 sufficient to remove any hydrogen, so special ventilation is not required.</p>
 </div>
 <div class="section" id="battery-life">
-<h3><a class="toc-backref" href="#id140">Battery Life</a></h3>
+<h3><a class="toc-backref" href="#id141">Battery Life</a></h3>
 <p>Most brand name UPS batteries should last 3-5 years. Some APC Back-UPS models
 may have a shorter battery life expectancy. Refer to the user's manual of your
 APC Back-UPS to determine the exact battery life expectancy or contact APC
@@ -3348,7 +3411,7 @@ indicator - brightly lit is &quot;high&quot; sensitivity, dimly lit is &quot;med
 off is &quot;low&quot; sensitivity.</p>
 </div>
 <div class="section" id="flashing-battery-charge-graph-leds">
-<h3><a class="toc-backref" href="#id141">Flashing Battery Charge Graph LEDs</a></h3>
+<h3><a class="toc-backref" href="#id142">Flashing Battery Charge Graph LEDs</a></h3>
 <p>The battery charge graph LEDs on the front panel of a Smart-UPS will flash
 in unison when the UPS is operating online and the runtime remaining
 (calculated by the Smart-UPS microprocessor) is less than two minutes
@@ -3360,7 +3423,7 @@ a runtime calibration (see below).</p>
 four possible settings: 2, 5, 7, or 10 minutes.</p>
 </div>
 <div class="section" id="battery-replacement">
-<h3><a class="toc-backref" href="#id142">Battery Replacement</a></h3>
+<h3><a class="toc-backref" href="#id143">Battery Replacement</a></h3>
 <p>If you own your UPS for long enough, you will inevitably need to replace
 the UPS battery or battery cartridge. An APC battery cartridge comprises
 two batteries physically stuck together with double-sided tape and wired
@@ -3389,7 +3452,7 @@ genuine replacement APC batteries.</p>
 <p><strong>Third Party Battery Cons</strong></p>
 <ul class="simple">
 <li>You will need to recycle your battery hardware (cables, connectors etc)</li>
-<li>You will need to create your own battery cartridges (with doublesided tape)</li>
+<li>You will need to create your own battery cartridges (with double-sided tape)</li>
 <li>You will need to ensure the third party battery is the right physical size</li>
 <li>You will need to ensure the third party battery is the right capacity</li>
 <li>Use of a third party battery will void APC's Equipment Protection Policy</li>
@@ -3414,7 +3477,7 @@ charging circuitry without appropriate modifications which are generally
 beyond an end user's capability.</p>
 </div>
 <div class="section" id="battery-installation">
-<h3><a class="toc-backref" href="#id143">Battery Installation</a></h3>
+<h3><a class="toc-backref" href="#id144">Battery Installation</a></h3>
 <p>Although you can do a hot swap of your batteries while the computer and
 any other connected equipment is running, it may not be very satisfactory
 because the UPS will not always detect that the batteries have been swapped
@@ -3432,7 +3495,7 @@ runtime calibration. For details of doing this, refer to the &quot;Manual&quot; 
 Calibration section below.</p>
 </div>
 <div class="section" id="soft-runtime-calibration">
-<h3><a class="toc-backref" href="#id144">&quot;Soft&quot; Runtime Calibration</a></h3>
+<h3><a class="toc-backref" href="#id145">&quot;Soft&quot; Runtime Calibration</a></h3>
 <p>A runtime calibration causes the UPS to recalculate its available runtime
 capacity based on its current load.</p>
 <p>Caution: a runtime calibration will deeply discharge the UPS batteries, which
@@ -3457,12 +3520,12 @@ periods of time should be allowed to perform a run time calibration.</p>
 <p>4. Matrix-UPS and Smart-UPS recalculate the runtime-related parameters every
 time the UPS goes on battery.</p>
 <p>When doing a runtime calibration with &quot;older&quot; batteries, APC Technical Support
-reoommend doing a complete discharge and recharge first.</p>
+recommend doing a complete discharge and recharge first.</p>
 <p>If you have &quot;dumb&quot; UPS (aka simple signalling) like a Back-UPS, then your only
 option is to do a manual runtime calibration.</p>
 </div>
 <div class="section" id="manual-runtime-calibration">
-<h3><a class="toc-backref" href="#id145">&quot;Manual&quot; Runtime Calibration</a></h3>
+<h3><a class="toc-backref" href="#id146">&quot;Manual&quot; Runtime Calibration</a></h3>
 <p>Most of the information in this section is taken from APC's website.
 Any non-APC additions have been inserted in square brackets.</p>
 <p>For a &quot;smart&quot; or &quot;smart signalling&quot; Back-UPS Pro or Smart-UPS:</p>
@@ -3481,7 +3544,7 @@ UPS and then force the UPS on battery by disconnecting it from
 utility power [suggest not disconnecting, but simply turning off
 utility power thereby preserving earthing].  Allow the unit to
 run on battery until it turns off completely.  Make sure a 30% load
-is present! Plug the UPS back into the wall outlet [switch utilty
+is present! Plug the UPS back into the wall outlet [switch utility
 power back on] and allow it to recharge (it will recharge more quickly
 turned off and with no load present). Once the unit has recharged,
 the &quot;runtime remaining&quot; calculation should be more accurate.
@@ -3553,7 +3616,7 @@ the wall outlet [turn the utility power back on] and let it recharge.
 Recharge time can take up to 4 hours.</blockquote>
 </div>
 <div class="section" id="resetting-the-ups-battery-constant">
-<h3><a class="toc-backref" href="#id146">Resetting the UPS Battery Constant</a></h3>
+<h3><a class="toc-backref" href="#id147">Resetting the UPS Battery Constant</a></h3>
 <p>In some cases none of the battery runtime calibration methods result in
 the UPS reporting a reasonably correct battery runtime. It has been
 speculated that this is because the battery constant value has drifted
@@ -3586,7 +3649,7 @@ SU1250              EE FA 9F    F5
 SU2000              F1 F9 9F    FD
 SU450,700        28 F2 FA 96 07,RM=47  52.11.I
 SU450XL,700XL    28 EE F8 9F 700XL=27   51.9.I
-SU1000           35 EF F9 A0    0B     60.11.I
+SU1000,INET      35 EF F9 A0    0B     60.11.I
 SU1000XL         34 EE FC 9A    2B      61.9.I
 SU1400           35 EE FC 9A           70.11.I
 SU1400RM         28 ED FA 89
@@ -3658,7 +3721,7 @@ BP500AVR                        26      17.1.I
 </div>
 </div>
 <div class="section" id="frequently-asked-questions">
-<h2><a class="toc-backref" href="#id147">Frequently-Asked Questions</a></h2>
+<h2><a class="toc-backref" href="#id148">Frequently-Asked Questions</a></h2>
 <p>See the bugs section of this document for a list of
 known bugs and solutions.</p>
 <table class="docutils field-list" frame="void" rules="none">
@@ -3816,13 +3879,13 @@ apccontrol.</p>
 </table>
 </div>
 <div class="section" id="customizing-event-handling">
-<h2><a class="toc-backref" href="#id148">Customizing Event Handling</a></h2>
+<h2><a class="toc-backref" href="#id149">Customizing Event Handling</a></h2>
 <p>When apcupsd detects anomalies from your UPS device, it will make
 some decisions that usually result in one or more calls to the
 script located in <tt class="docutils literal"><span class="pre">/etc/apcupsd/apccontrol</span></tt>. The <tt class="docutils literal"><span class="pre">apccontrol</span></tt> file
 is a shell script that acts on the first argument that apcupsd
 passes to it. These actions are set up by default to sane behavior
-for all psituations apcupsd is likely to detect from the UPS.
+for all situations apcupsd is likely to detect from the UPS.
 However, you can change the apccontrol behavior for every single
 action.</p>
 <p>To customize, so create a file with the same name as the action,
@@ -3832,7 +3895,7 @@ which is passed as a command line argument. Put your script in the
 temporary events file (<tt class="docutils literal"><span class="pre">/etc/apcupsd/apcupsd.events</span></tt>), and they also
 generate a call to <tt class="docutils literal"><span class="pre">/etc/apcupsd/apccontrol</span></tt> which in turn will call
 any scripts you have placed in the <tt class="docutils literal"><span class="pre">/etc/apcupsd</span></tt> directory.</p>
-<p>Normally, <tt class="docutils literal"><span class="pre">/etc/apcupsd/acpcontrol</span></tt> is called only by apcupsd.
+<p>Normally, <tt class="docutils literal"><span class="pre">/etc/apcupsd/apccontrol</span></tt> is called only by apcupsd.
 Consequently, you should not invoke it directly. However, it is
 important to understand how it functions, and in some cases, you
 may want to change the messages that it prints using <tt class="docutils literal"><span class="pre">wall</span></tt>. We
@@ -3856,7 +3919,7 @@ machine if necessary.</p>
 failure messages can be found in /etc/apcupsd after an install or
 in the platforms/etc directory of the source code.</p>
 <div class="section" id="apccontrol-command-line-options">
-<h3><a class="toc-backref" href="#id149">apccontrol Command Line Options</a></h3>
+<h3><a class="toc-backref" href="#id150">apccontrol Command Line Options</a></h3>
 <p>When apcupsd detects an event, it calls the apccontrol script with
 four arguments as:</p>
 <p><tt class="docutils literal"><span class="pre">apccontrol</span></tt> <em>event</em> <em>ups-name</em> <em>connected</em> <em>powered</em></p>
@@ -3956,7 +4019,7 @@ return only if the onbattery event has been generated.</p>
 <dt><strong>mainsback</strong></dt>
 <dd><p class="first">This event is generated when the mains
 power returns after a powerout condition. The shutdown event may or
-may not have been generated depending on the paramaters you have
+may not have been generated depending on the parameters you have
 defined and the length of the power outage.</p>
 <p class="last"><em>Default:</em> nothing</p>
 </dd>
@@ -3971,7 +4034,7 @@ been severed.</p>
 <dd><p class="first">This event is generated when the <tt class="docutils literal"><span class="pre">MINUTES</span></tt>
 value defined in the apcupsd.conf file expires while in a power
 fail condition. The <tt class="docutils literal"><span class="pre">MINUTES</span></tt> is the remaining runtime as internally
-calculated by the UPS and monitored by apcuspd. After completing this
+calculated by the UPS and monitored by apcupsd. After completing this
 event, apcupsd will immediately initiate a <tt class="docutils literal"><span class="pre">doshutdown</span></tt> event.</p>
 <p class="last"><em>Default:</em> <tt class="docutils literal"><span class="pre">wall</span></tt> a message</p>
 </dd>
@@ -3979,7 +4042,7 @@ event, apcupsd will immediately initiate a <tt class="docutils literal"><span cl
 <dd><p class="first">This event is generated when the <tt class="docutils literal"><span class="pre">TIMEOUT</span></tt> value
 defined in the apcupsd.conf file expires while in a power fail
 condition. It indicates that the total time in a power failure has
-been exeeded and the machine should be shutdown. After completing this
+been exceeded and the machine should be shutdown. After completing this
 event, apcupsd will immediately initiate a <tt class="docutils literal"><span class="pre">doshutdown</span></tt> event.</p>
 <p class="last"><em>Default:</em> <tt class="docutils literal"><span class="pre">wall</span></tt> a message</p>
 </dd>
@@ -4010,7 +4073,7 @@ battdetach event.</p>
 </div>
 </div>
 <div class="section" id="controlling-multiple-upses-on-one-machine">
-<h2><a class="toc-backref" href="#id150">Controlling Multiple UPSes on one Machine</a></h2>
+<h2><a class="toc-backref" href="#id151">Controlling Multiple UPSes on one Machine</a></h2>
 <p><em>The following discussion does not apply to Windows servers. Apcupsd on Windows
 is limited to a single instance and cannot support monitoring multiple UPSes.</em></p>
 <p>If you have multiple UPSes in use, you may wish to consolidate the monitoring
@@ -4022,7 +4085,7 @@ machines.</p>
 apcupsd on the UPS server for each UPS to be controlled. That is, you install
 a single copy of apcupsd but launch it multiple times using different
 configuration files and scripts. (Older versions of apcupsd required you to
-actually compile the daemon multiple times with different <tt class="docutils literal"><span class="pre">configre</span></tt> options.
+actually compile the daemon multiple times with different <tt class="docutils literal"><span class="pre">configure</span></tt> options.
 This is no longer required, as all necessary adjustments can be made in
 <tt class="docutils literal"><span class="pre">apcupsd.conf</span></tt>.)</p>
 <p>Additionally, you will run one instance of apcupsd on each of the machines
@@ -4031,7 +4094,7 @@ the 'net' driver to read UPS status from the proper instance of apcupsd on the
 UPS server. See <a class="reference internal" href="#nis-server-client-configuration-using-the-net-driver">NIS Server/Client Configuration Using the Net Driver</a> for
 more information on the 'net' driver and setting up net clients.</p>
 <div class="section" id="multiple-ups-example">
-<h3><a class="toc-backref" href="#id151">Multiple UPS Example</a></h3>
+<h3><a class="toc-backref" href="#id152">Multiple UPS Example</a></h3>
 <p>There are many ways one could set up multiple apcupsd instances. Here I will
 present the way I have used with great success on Red Hat Linux.</p>
 <p>I have two apcupsd.conf files (this is for a 2 UPS setup, easily
@@ -4124,7 +4187,7 @@ else
      cut -f 5 -d ' '`
 fi
 
-# Source function libarary
+# Source function library
 . /etc/rc.d/init.d/functions
 
 case &quot;$1&quot; in
@@ -4184,18 +4247,17 @@ used to be.</p>
 </div>
 </div>
 <div class="section" id="support-for-snmp-upses">
-<h2><a class="toc-backref" href="#id152">Support for SNMP UPSes</a></h2>
+<h2><a class="toc-backref" href="#id153">Support for SNMP UPSes</a></h2>
 <p>To run apcupsd with a SNMP UPS, you need the
 following things:</p>
 <ul class="simple">
 <li>An SNMP UPS, for example a Web/SNMP (AP9716) or PowerNet SNMP
-(AP9605) card installed into the SmartSlot.</li>
-<li>apcupsd version 3.10.0 or higher</li>
-<li>Net-SNMP library (previously known as ucd-snmp) installed
-(<a class="reference external" href="http://www.net-snmp.org">http://www.net-snmp.org</a>)</li>
+(AP9605) card installed into the SmartSlot. Apcupsd also has support
+for some non-APC SNMP UPSes using RFC1628 or MGE MIBs, however the
+majority of the information in this section is for APC UPSes.</li>
 </ul>
 <div class="section" id="planning-and-setup-for-snmp-wiring">
-<h3><a class="toc-backref" href="#id153">Planning and Setup for SNMP Wiring</a></h3>
+<h3><a class="toc-backref" href="#id154">Planning and Setup for SNMP Wiring</a></h3>
 <p>SNMP packet requests are relayed to
 the UPS from monitoring APCUPSD servers over Ethernet via a switch,
 hub, or router. Protecting these Ethernet devices with UPS supplied
@@ -4204,7 +4266,7 @@ power failures. Servers may fail to shutdown quietly during power
 failures if SNMP communication is lost.</p>
 </div>
 <div class="section" id="planning-and-setup-for-snmp-configuration">
-<h3><a class="toc-backref" href="#id154">Planning and Setup for SNMP Configuration</a></h3>
+<h3><a class="toc-backref" href="#id155">Planning and Setup for SNMP Configuration</a></h3>
 <p>To establish communication to the UPS SNMP card
 installed in the UPS, the SNMP card will need the following:</p>
 <ul class="simple">
@@ -4214,7 +4276,7 @@ installed in the UPS, the SNMP card will need the following:</p>
 <li>Set SNMP card Event Trap Receivers (apcupsd-3.12.0 and later)</li>
 </ul>
 <div class="section" id="assign-snmp-card-ip-address">
-<h4><a class="toc-backref" href="#id155">Assign SNMP Card IP Address</a></h4>
+<h4><a class="toc-backref" href="#id156">Assign SNMP Card IP Address</a></h4>
 <p>The following instructions come from the APC knowledge base:</p>
 <pre class="literal-block">
 The Network Management Card (AP9617, AP9618, AP9619) must be
@@ -4255,7 +4317,7 @@ defined by the ARP command.
 </pre>
 </div>
 <div class="section" id="set-snmp-card-general-parameters">
-<h4><a class="toc-backref" href="#id156">Set SNMP card General Parameters</a></h4>
+<h4><a class="toc-backref" href="#id157">Set SNMP card General Parameters</a></h4>
 <p>After the SNMP Network Management Card is configured with an IP address,
 the SNMP Card is ready for general configuration. This is accomplished by
 telneting to the SNMP Card.</p>
@@ -4303,7 +4365,7 @@ connected to from a web browser for monitoring and additional
 configuration.</p>
 </div>
 <div class="section" id="set-snmp-card-shutdown-parameters">
-<h4><a class="toc-backref" href="#id157">Set SNMP card Shutdown Parameters</a></h4>
+<h4><a class="toc-backref" href="#id158">Set SNMP card Shutdown Parameters</a></h4>
 <p>There are two shutdown parameters that must be set in the SNMP card
 to ensure that connected servers shutdown quietly. These parameters
 can be set via the telnet terminal or the web browser interface.</p>
@@ -4339,7 +4401,7 @@ that when the UPS restores power, any additional power failures
 will successfully re-trigger a server shutdown.</p>
 </div>
 <div class="section" id="configure-event-trap-receivers">
-<h4><a class="toc-backref" href="#id158">Configure Event Trap Receivers</a></h4>
+<h4><a class="toc-backref" href="#id159">Configure Event Trap Receivers</a></h4>
 <p>(Requires apcupsd-3.12.0 and later)</p>
 <p>By default, APCUPSD will poll the SNMP UPS card once per minute. In
 this case, server notification of UPS alarms could potentially be
@@ -4357,43 +4419,44 @@ the address set in the SNMP UPS.</p>
 </div>
 </div>
 <div class="section" id="connecting-apcupsd-to-a-snmp-ups">
-<h3><a class="toc-backref" href="#id159">Connecting APCUPSD to a SNMP UPS</a></h3>
+<h3><a class="toc-backref" href="#id160">Connecting APCUPSD to a SNMP UPS</a></h3>
 <p>The previous sections describe configuration of the actual SNMP
 card. The remaining sections describe configuration of the APCUPSD
 to communicate using SNMP Protocol.</p>
-<p>The Simple Network Management Protocol provides an interface to
-connect to remote devices through the network. apcupsd is now
-capable of using the SNMP interface of an SNMP-enabled UPS to
-communicate with an UPS. Currently apcupsd supports only APC's
-PowerNet MIB. To enable the SNMP support it is enough to configure
+<p>To enable the SNMP support it is enough to configure
 the correct device in your apcupsd.conf configuration file. The
 directive needed for this configuration is:</p>
 <pre class="literal-block">
-DEVICE 192.168.100.2:161:APC:private
+DEVICE &lt;host&gt;:&lt;port&gt;:&lt;vendor&gt;:&lt;community&gt;
 </pre>
-<p>Where the directive is made by four parts:</p>
+<p>...where the directive is made by four parts. All but the first may be omitted
+completely or left empty to accept the default.</p>
 <ul>
-<li><p class="first"><tt class="docutils literal"><span class="pre">host</span></tt>: IP address of the remote UPS</p>
+<li><p class="first"><em>host</em>: IP address or DNS hostname of the UPS (required)</p>
 </li>
-<li><p class="first"><tt class="docutils literal"><span class="pre">port</span></tt>: Remote SNMP port, normally 161</p>
+<li><p class="first"><em>port</em>: Remote SNMP port (optional, default: 161)</p>
 </li>
-<li><dl class="first docutils">
-<dt><tt class="docutils literal"><span class="pre">vendor</span></tt>: Kind of remote SNMP agent: &quot;APC&quot; for APC's PowerNet</dt>
-<dd><p class="first last">MIB, &quot;APC_NOTRAP&quot; for the PowerNet MIB with SNMP trap catching
-disabled, or &quot;RFC&quot; for the IETF's rfc1628 UPS-MIB. (Note that
-APC_NOTRAP is only accepted by apcupsd-3.12.0 and higher. See
-below for trap catching details.)</p>
-</dd>
-</dl>
+<li><p class="first"><em>vendor</em>: The type of SNMP MIB available on the UPS (optional, default:
+autodetect). Allowable choices for vendor are:</p>
+<ul class="simple">
+<li>APC   : APC PowerNet MIB, used on most APC brand UPSes</li>
+<li>RFC   : RFC1628 MIB, used by some non-APC UPSes</li>
+<li>MGE   : MGE MIB, used by many MGE brand UPSes</li>
+<li>blank : Autodetect</li>
+</ul>
+<p>Append &quot;_NOTRAP&quot; to the vendor name to disable SNMP trap catching
+(ex: &quot;APC_NOTRAP&quot;). See <a class="reference internal" href="#snmp-trap-catching">SNMP Trap Catching</a>.</p>
 </li>
-<li><p class="first"><tt class="docutils literal"><span class="pre">community</span></tt>: The read-write community string, usually &quot;private&quot;</p>
+<li><p class="first"><em>community</em>: The read-write community string, usually &quot;private&quot;. You can
+specify a read-only community string, usually &quot;public&quot;, if you do not
+require killpower support. If the community string is omitted, apcupsd will
+attempt to autotedect by trying &quot;private&quot; and &quot;public&quot;.
+(optional, default: autodetect).</p>
 </li>
 </ul>
-<p>If more than one server is connected to the UPS the following
-configuration types still apply to SNMP enable UPS. (see <a class="reference internal" href="#choosing-a-configuration-type">Choosing
-a Configuration Type</a>). A NIS Server/Client (Master/Slave) configuration
-with multiple servers is still applicable.</p>
-<p>However, an alternative configuration is possible with an SNMP
+<p>A NIS Server/Client (Master/Slave) configuration
+with multiple servers is still applicable. However, an alternative
+configuration is possible with an SNMP
 enabled UPS. In this arrangement, all connected servers will be
 configured as a standalone server. Each will independently
 communicate to the UPS. One (primary) server will be chosen to
@@ -4402,7 +4465,7 @@ manage the task of commanding the UPS to power down. All remaining
 the primary server issues the UPS power down command.</p>
 </div>
 <div class="section" id="building-with-snmp-support">
-<h3><a class="toc-backref" href="#id160">Building with SNMP support</a></h3>
+<h3><a class="toc-backref" href="#id161">Building with SNMP support</a></h3>
 <p>Follow the instructions in <a class="reference internal" href="#building-and-installing-apcupsd">Building and Installing apcupsd</a>, being sure
 to include the following options (in addition to any others you need) on the
 '<tt class="docutils literal"><span class="pre">./configure</span></tt>' line:</p>
@@ -4410,10 +4473,10 @@ to include the following options (in addition to any others you need) on the
 ./configure --enable-snmp
 </pre>
 </div>
-<div class="section" id="snp-trap-catching">
-<h3><a class="toc-backref" href="#id161">SNP Trap Catching</a></h3>
-<p>apcupsd-3.11.14 introduces support for SNMP trap catching with the
-APC PowerNet MIB driver. Previous versions polled the UPS status
+<div class="section" id="snmp-trap-catching">
+<h3><a class="toc-backref" href="#id162">SNMP Trap Catching</a></h3>
+<p>apcupsd-3.11.14 introduces support for SNMP trap catching.
+Previous versions polled the UPS status
 once per minute, leading to significant delays before UPS state
 changes were recognized. With SNMP trap handling, apcupsd monitors
 the SNMP trap port and will re-poll the UPS whenever a trap is
@@ -4429,11 +4492,11 @@ another SNMP trap daemon on your server. Only one daemon can listen
 to the trap port, so whichever one is started first will succeed
 and the others will fail. Apcupsd will fall back to polling
 behavior if it is unable to open the trap port. You can also
-forcibly disable trap catching by setting your vendor string in the
-apcupsd.conf <tt class="docutils literal"><span class="pre">DEVICE</span></tt> directive to &quot;APC_NOTRAP&quot;.</p>
+forcibly disable trap catching by appending <tt class="docutils literal"><span class="pre">_NOTRAP</span></tt> to your vendor
+string in the apcupsd.conf <tt class="docutils literal"><span class="pre">DEVICE</span></tt> directive.</p>
 </div>
 <div class="section" id="known-problems">
-<h3><a class="toc-backref" href="#id162">Known Problems</a></h3>
+<h3><a class="toc-backref" href="#id163">Known Problems</a></h3>
 <p>Currently (as of 3.10.0) the code to power off the UPS needs
 special configuration. The killpower command for SNMP UPSes can not
 be issued during shutdown as typically at some time during shutdown
@@ -4469,7 +4532,7 @@ available for powering down the UPS.</li>
 </div>
 </div>
 <div class="section" id="apcupsd-system-logging">
-<h2><a class="toc-backref" href="#id163">apcupsd System Logging</a></h2>
+<h2><a class="toc-backref" href="#id164">apcupsd System Logging</a></h2>
 <p>The apcupsd philosophy is that all logging should be done through the
 <tt class="docutils literal"><span class="pre">syslog</span></tt> facility (see: '<tt class="docutils literal"><span class="pre">man</span> <span class="pre">syslog</span></tt>') This is now implemented with
 the exceptions that STATUS logging, for compatibility with
@@ -4477,7 +4540,7 @@ prior versions is still done to a file, and EVENTS logging can
 be directed to a temporary file so that it can be reported by the
 network information server.</p>
 <div class="section" id="logging-types">
-<h3><a class="toc-backref" href="#id164">Logging Types</a></h3>
+<h3><a class="toc-backref" href="#id165">Logging Types</a></h3>
 <p>apcupsd splits its logging into four separate types called:</p>
 <ol class="arabic simple">
 <li>DEBUG</li>
@@ -4489,7 +4552,7 @@ network information server.</p>
 on only by developers, and currently there exist very few of these
 debug messages.</p>
 <div class="section" id="data-logging">
-<h4><a class="toc-backref" href="#id165">Data Logging</a></h4>
+<h4><a class="toc-backref" href="#id166">Data Logging</a></h4>
 <p>This feature is somewhat outdated and not often used.</p>
 <p>Data logging consists of periodically logging important data
 concerning the operation of the UPS. For the definitive definition
@@ -4514,7 +4577,7 @@ Nov  2 12:43:05 matou apcupsd[23439]: 224.9,227.5,226.2,27.74,50.00,100.0,30.6,,
 </pre>
 </div>
 <div class="section" id="status-logging">
-<h4><a class="toc-backref" href="#id166">Status Logging</a></h4>
+<h4><a class="toc-backref" href="#id167">Status Logging</a></h4>
 <p>Status logging consists of logging all available information known
 about your UPS as a series of ASCII records. This information is
 also made available by the apcupsd network information server.</p>
@@ -4522,7 +4585,7 @@ also made available by the apcupsd network information server.</p>
 section for details.</p>
 </div>
 <div class="section" id="events-logging">
-<h4><a class="toc-backref" href="#id167">EVENTS Logging</a></h4>
+<h4><a class="toc-backref" href="#id168">EVENTS Logging</a></h4>
 <p>Events logging consists of logging events as they happen. For
 example, successful startup, power fail, battery failure, system
 shutdown, ...</p>
@@ -4530,7 +4593,7 @@ shutdown, ...</p>
 </div>
 </div>
 <div class="section" id="implementation-details">
-<h3><a class="toc-backref" href="#id168">Implementation Details</a></h3>
+<h3><a class="toc-backref" href="#id169">Implementation Details</a></h3>
 <p>In order to ensure that the data logged to syslog() can be directed
 to different files, I have assigned syslog() levels to each of our
 four types of data as follows:</p>
@@ -4584,7 +4647,7 @@ local0.warn                            /var/log/messages
 </div>
 </div>
 <div class="section" id="the-windows-version-of-apcupsd">
-<h2><a class="toc-backref" href="#id169">The Windows Version of apcupsd</a></h2>
+<h2><a class="toc-backref" href="#id170">The Windows Version of apcupsd</a></h2>
 <p>The Windows version of apcupsd has been tested on Win95, Win98,
 WinMe, WinNT, WinXP, and Win2000 systems. This version of apcupsd
 has been built to run natively on Windows (no Cygwin or other
@@ -4593,13 +4656,13 @@ is a port that relies on many Unix features, it is just the same a
 true Windows program. When running, it is perfectly integrated with
 Windows and displays its icon in the system icon tray, and provides
 a system tray menu to obtain additional information on how apcupsd
-is running (status and events dialogue boxes).</p>
+is running (status and events dialog boxes).</p>
 <p>Once installed apcupsd normally runs as a system service. This
 means that it is immediately started by the operating system when
 the system is booted, and runs in the background even if there is
 no user logged into the system.</p>
 <div class="section" id="installing-apcupsd-on-windows">
-<h3><a class="toc-backref" href="#id170">Installing Apcupsd on Windows</a></h3>
+<h3><a class="toc-backref" href="#id171">Installing Apcupsd on Windows</a></h3>
 <p>Normally, you will install the Windows version of apcupsd from the
 binaries. Starting with version 3.11.15, the Windows binaries are
 distributed with a full GUI installer driven by NSIS, the
@@ -4608,7 +4671,7 @@ Nullsoft Scriptable Install System (<a class="reference external" href="http://n
 double-click the installer executable and follow the instructions.</p>
 </div>
 <div class="section" id="configuring-apcupsd-on-windows">
-<h3><a class="toc-backref" href="#id171">Configuring Apcupsd on Windows</a></h3>
+<h3><a class="toc-backref" href="#id172">Configuring Apcupsd on Windows</a></h3>
 <p>If you are installing Apcupsd for the first time, the installer
 will give you an opportunity to edit the apcupsd.conf configuration
 file to contain the values appropriate for your site. (Subsequent
@@ -4627,7 +4690,7 @@ etc. notation instead of the UNIX-style /dev/tty* notation.</p>
 may probe the serial port attempting to attach a serial mouse. This
 will cause apcupsd to be unable to communicate with the serial
 port. If this happens, or out of precaution, you can edit the
-c:\boot.ini file. Find the line that looks something like the
+<tt class="docutils literal"><span class="pre">c:\\boot.ini</span></tt> file. Find the line that looks something like the
 following:</p>
 <pre class="literal-block">
 multi(0)disk(0)rdisk(0)partition(1)\WINNT=&quot;Windows NT Workstation Version 4.00&quot;
@@ -4640,26 +4703,25 @@ multi(0)disk(0)rdisk(0)partition(1)\WINNT=&quot;Windows NT Workstation Version 4
 </pre>
 <p>...where the only thing you have changed is to append to the end of
 the line. This addition will prevent the operating system from
-interferring with apcupsd</p>
+interfering with apcupsd</p>
 </div>
 <div class="section" id="starting-apcupsd-on-windows">
-<h3><a class="toc-backref" href="#id172">Starting Apcupsd on Windows</a></h3>
+<h3><a class="toc-backref" href="#id173">Starting Apcupsd on Windows</a></h3>
 <p>The installer will give you an opportunity start the Apcupsd
 service immediately. If you choose to start it manually, you may do
-so by selecting the &quot;Start Apcuspd&quot; link from the Start-&gt;Programs-&gt;Apcupsd
+so by selecting the &quot;Start Apcupsd&quot; link from the Start-&gt;Programs-&gt;Apcupsd
 folder.</p>
 <p>On Windows NT/2000/XP, you may alternatively go to the Control
 Panel, open the Services folder, select Apcupsd UPS Server, and
 then click on the <strong>Start</strong> button as shown below:</p>
 <img alt="./wininstall6.png" src="./wininstall6.png" />
 <p>If the Services dialog reports a problem, it is normally because
-your DEVICE statement does not contain the correct serial port
+your <tt class="docutils literal"><span class="pre">DEVICE</span></tt> statement does not contain the correct serial port
 name.</p>
 <p>You probably should also click on the <strong>Startup...</strong> button to
 ensure that the correct defaults are set. The dialogue box that
 appears should have <strong>Startup Type</strong> set to <strong>Automatic* and
-**Logon</strong> should be set to <strong>System Account</strong> with <strong>Allow Service to
-Interact with Desktop</strong> checked. If these values are not set
+**Logon</strong> should be set to <strong>System Account</strong>. If these values are not set
 correctly by default, please change them otherwise apcupsd will not
 work.</p>
 <p>For WinXP and Win2K systems, the dialogs are a bit different from
@@ -4682,7 +4744,7 @@ plug with a lightning bolt in the middle <img alt="image7" src="./charging.png" 
 the battery is charging.</p>
 </div>
 <div class="section" id="apctray">
-<h3><a class="toc-backref" href="#id173">Apctray</a></h3>
+<h3><a class="toc-backref" href="#id174">Apctray</a></h3>
 <p>Starting with version 3.14.2, the tray icon is provided by a separate
 program called 'apctray'. This cleanly separates the user interface
 from the daemon (service) and is required for tray icon support on
@@ -4694,39 +4756,20 @@ stop or disable the service, use the service control panel.</p>
 using apcupsd's Network Information Server (NIS). It will create a
 new icon for each instance being monitored. By default, apctray
 monitors the local apcupsd (localhost on port 3551). To add
-additional monitors, use the command line <tt class="docutils literal"><span class="pre">/add</span></tt> command as
-follows:</p>
-<pre class="literal-block">
-apctray /host myserver /add
-</pre>
-<p>To specify a non-default port, include the <tt class="docutils literal"><span class="pre">/port</span></tt> switch:</p>
-<pre class="literal-block">
-apctray /host myserver /port 1234 /add
-</pre>
-<p>To remove a monitor from the tray, right-click the tray icon and
-choose &quot;Remove this instance&quot; or run the add command again with the
-<tt class="docutils literal"><span class="pre">/del</span></tt> switch instead of <tt class="docutils literal"><span class="pre">/add</span></tt>. Note that deleting the last
-monitor also configures apctray to not start by default. Using
-<tt class="docutils literal"><span class="pre">/add</span></tt> to create a new monitor will enable automatic startup again.
-To close a monitor temporarily, right-click the tray icon and
-choose &quot;Close this instance&quot;.</p>
-<p>apctray also aupports the <tt class="docutils literal"><span class="pre">/refresh</span></tt> switch which allows you to
-specify the interval (in seconds) at which apctray will poll the
-apcupsd NIS for status. If you do not specify <tt class="docutils literal"><span class="pre">/refresh</span></tt>, the
-default is 1 second. For example, this command will add a monitor
-configured to refresh every 15 seconds:</p>
-<pre class="literal-block">
-apctray /host myserver /refresh 15 /add
-</pre>
+additional monitors, you can right-click an existing icon and choose
+&quot;Add Monitor&quot;. To remove a monitor, right-click its icon and choose
+&quot;Remove Monitor&quot;. To change thr settings for an existing monitor
+(ip address, port, refresh rate), right-click its icon and choose
+&quot;Configure...&quot;.</p>
 <p>apctray can be installed standalone (without apcupsd) if you wish
 to use it only to monitor remote apcupsd instances. This can be
 convenient for keeping an eye on a room full of UPSes from your
 desktop. Download and run the normal apcupsd installer and simply
-uncheck all components except apctray. Then use the &quot;/add&quot; command
-described above to add as many monitors as you wish.</p>
+uncheck all components except apctray. Then add as many monitors as
+you wish as described above.</p>
 </div>
 <div class="section" id="testing-apcupsd-on-windows">
-<h3><a class="toc-backref" href="#id174">Testing Apcupsd on Windows</a></h3>
+<h3><a class="toc-backref" href="#id175">Testing Apcupsd on Windows</a></h3>
 <p>It would be hard to overemphasize the need to do a full testing of
 your installation of apcupsd as there are a number of reasons why
 it may not behave properly in a real power failure situation.</p>
@@ -4743,7 +4786,7 @@ you're running a platform that supports it such as Windows 2000 or
 XP.</p>
 </div>
 <div class="section" id="upgrading">
-<h3><a class="toc-backref" href="#id175">Upgrading</a></h3>
+<h3><a class="toc-backref" href="#id176">Upgrading</a></h3>
 <p>An upgrade may be accomplished by uninstalling the old version
 (using the Add/Remove Programs Control Panel or clicking the
 &quot;Uninstall Apcupsd&quot; link from Start -&gt; Programs -&gt; Apcupsd. Near the
@@ -4756,7 +4799,7 @@ apcupsd.conf file, the new apcupsd.conf will be installed as
 apcupsd.conf.new.</p>
 </div>
 <div class="section" id="post-installation">
-<h3><a class="toc-backref" href="#id176">Post-Installation</a></h3>
+<h3><a class="toc-backref" href="#id177">Post-Installation</a></h3>
 <p>After installing
 apcupsd and before running it, you should check the contents of the
 config file <tt class="docutils literal"><span class="pre">c:\apcupsd\etc\apcupsd\apcupsd.conf</span></tt>. You will
@@ -4765,7 +4808,7 @@ possibly your DEVICE directives. Please refer to the configuration
 section of this manual for more details.</p>
 </div>
 <div class="section" id="problem-areas">
-<h3><a class="toc-backref" href="#id177">Problem Areas</a></h3>
+<h3><a class="toc-backref" href="#id178">Problem Areas</a></h3>
 <p>On some Windows systems, the
 domain resolution does not seem to work if you have not configured
 a DNS server in the Network section of the Control Panel. This
@@ -4779,25 +4822,28 @@ ensure that you have a valid DNS server configured on your system.</p>
 Applications log to which apcupsd writes Windows error messages
 during startup.</p>
 <p>Regardless of which Windows system you are running, apcupsd logs
-most error messages to <cite>c:apcupsdetcapcupsdapcupsd.events`</cite>.
+most error messages to <tt class="docutils literal"><span class="pre">c:\apcupsd\etc\apcupsd\apcupsd.events</span></tt>.
 This type error messages such as configuration
 file not found, etc are written to this file. Note that on some
 systems (WinXP, possibly others) Apcupsd is unable to write to this
 file when running as a service.</p>
 </div>
 <div class="section" id="email-notification-of-events">
-<h3><a class="toc-backref" href="#id178">Email Notification of Events</a></h3>
-<p>Windows systems, it is possible to receive notification of apcupsd events
-that are passed to apccontrol. This is possible using a simple
-email program.</p>
-<p>If you wish to try this program, look at the
-files named changeme, commfailure, commok, onbattery, and
-mainsback in the directory <tt class="docutils literal"><span class="pre">c:\apcupsd\examples</span></tt>. To use them, you
-must modify the SYSADMIN variable to have a valid email address,
-then copy the files into the directory <tt class="docutils literal"><span class="pre">c:\apcupsd\etc\apcupsd</span></tt>.</p>
+<h3><a class="toc-backref" href="#id179">Email Notification of Events</a></h3>
+<p>It is possible to receive email notification of apcupsd events
+using some simple Visual Basic scripts contributed by Ed Dondlinger
+&lt;<a class="reference external" href="mailto:edondlinger&#64;thepylegroup.com">edondlinger&#64;thepylegroup.com</a>&gt;. The scripts are automatically installed in
+the <tt class="docutils literal"><span class="pre">etc/apcupsd</span></tt> directory of your apcupsd installation but are disabled
+by default. To enable them, first open them in a text editor such as Notepad
+and edit the <tt class="docutils literal"><span class="pre">USER</span> <span class="pre">VARIABLES</span></tt> section to set your email preferences including
+address, server information, etc. Then rename the script files without the
+<tt class="docutils literal"><span class="pre">*.example</span></tt> suffix. Scripts are supplied for onbattery, offbattery, and
+commfailure events. You can copy the scripts to other filenames and modify
+the email body text to respond to other events as described in <a class="reference internal" href="#customizing-event-handling">Customizing
+Event Handling</a>.</p>
 </div>
 <div class="section" id="killpower-under-windows">
-<h3><a class="toc-backref" href="#id179">Killpower under Windows</a></h3>
+<h3><a class="toc-backref" href="#id180">Killpower under Windows</a></h3>
 <p>If your batteries become
 exhausted during a power failure and you want your machine to
 automatically reboot when the power comes back, it is useful to
@@ -4845,7 +4891,7 @@ have a fixed grace period of 2 minutes, which is probably
 sufficient.</p>
 </div>
 <div class="section" id="power-down-during-shutdown">
-<h3><a class="toc-backref" href="#id180">Power Down During Shutdown</a></h3>
+<h3><a class="toc-backref" href="#id181">Power Down During Shutdown</a></h3>
 <p>Our philosophy is to shutdown
 a computer but not to power it down itself (as opposed to having
 the UPS cut the power as described above). That is we prefer to
@@ -4866,7 +4912,7 @@ c:\apcupsd\etc\apcupsd\apccontrol
 psshutdown.</p>
 </div>
 <div class="section" id="command-line-options-specific-to-the-windows-version">
-<h3><a class="toc-backref" href="#id181">Command Line Options Specific to the Windows Version</a></h3>
+<h3><a class="toc-backref" href="#id182">Command Line Options Specific to the Windows Version</a></h3>
 <p>These options are not normally
 seen or used by the user, and are documented here only for
 information purposes. At the current time, to change the default
@@ -4885,7 +4931,7 @@ addition, the following Windows only options are implemented:</p>
 <tbody valign="top">
 <tr><td class="option-group">
 <kbd><span class="option">/service</span></kbd></td>
-<td>Start apcupsdas a service</td></tr>
+<td>Start apcupsd as a service</td></tr>
 <tr><td class="option-group">
 <kbd><span class="option">/run</span></kbd></td>
 <td>Run the apcupsd application</td></tr>
@@ -4914,9 +4960,9 @@ created for your use.</p>
 </div>
 </div>
 <div class="section" id="installation-serial-line-upses">
-<h2><a class="toc-backref" href="#id182">Installation: Serial-Line UPSes</a></h2>
+<h2><a class="toc-backref" href="#id183">Installation: Serial-Line UPSes</a></h2>
 <div class="section" id="overview-of-serial-interface-upses">
-<h3><a class="toc-backref" href="#id183">Overview of Serial-Interface UPSes</a></h3>
+<h3><a class="toc-backref" href="#id184">Overview of Serial-Interface UPSes</a></h3>
 <p>If you have a UPS that communicates via
 serial port, you need to do two things before you can even think
 about configuring the software. First, you need to figure out
@@ -4933,7 +4979,7 @@ other adapters work with RS-232 devices that do not assert the CTS
 signal.</p>
 </div>
 <div class="section" id="connecting-a-serial-line-ups-to-a-usb-port">
-<h3><a class="toc-backref" href="#id184">Connecting a Serial-Line UPS to a USB Port</a></h3>
+<h3><a class="toc-backref" href="#id185">Connecting a Serial-Line UPS to a USB Port</a></h3>
 <p>By using a special adaptor, you can
 connect your serial-line UPS to a USB port. If you would like to
 free up your serial port and connect your existing serial port UPS
@@ -4955,7 +5001,7 @@ need to explicitly load the kernel modules <tt class="docutils literal"><span cl
 <tt class="docutils literal"><span class="pre">pl2303</span></tt>. In Kern's case, this was not necessary.</p>
 </div>
 <div class="section" id="testing-serial-line-upses">
-<h3><a class="toc-backref" href="#id185">Testing Serial-Line UPSes</a></h3>
+<h3><a class="toc-backref" href="#id186">Testing Serial-Line UPSes</a></h3>
 <p>If you have a serial-line UPS, there are some tests you should run
 before the general ones described in the <a class="reference internal" href="#testing-apcupsd">Testing Apcupsd</a> section.</p>
 <p>To test your computer's connection with a serial-line UPS, you
@@ -4986,7 +5032,7 @@ condition. For more details please see <a class="reference internal" href="#volt
 Supported by Apcupsd for Various Cables</a>.</p>
 </div>
 <div class="section" id="establishing-serial-port-connection">
-<h3><a class="toc-backref" href="#id186">Establishing Serial Port Connection</a></h3>
+<h3><a class="toc-backref" href="#id187">Establishing Serial Port Connection</a></h3>
 <p>Once you have compiled, installed,
 and invoked apcupsd, you should wait to allow apcupsd to configure
 itself and establish contact with the UPS.</p>
@@ -5045,7 +5091,7 @@ serial port support.</li>
 <p>The first thing to do is to look at your log file, usually
 /var/log/messages because apcupsd writes more detailed information
 to the log file whenever there is an error.</p>
-<p>If you have a UPS that uses apcsmart protcol, you can manually test the
+<p>If you have a UPS that uses apcsmart protocol, you can manually test the
 serial communications with the UPS by starting a serial port communications
 program (such as minicom, tip, or cu) with the settings 2400 8N1 (2400 baud,
 8 data bits, no parity, 1 stop bit). Be extremely careful what you send to
@@ -5059,13 +5105,13 @@ will simply get the APC copyright notice.</p>
 proceed to the next test.</p>
 </div>
 <div class="section" id="once-you-have-established-serial-communications">
-<h3><a class="toc-backref" href="#id187">Once you have established serial communications</a></h3>
+<h3><a class="toc-backref" href="#id188">Once you have established serial communications</a></h3>
 <p>Once you have established that apcupsd can talk
 to the UPS over the serial part, go do the series of functional
 tests described in the main Testing section (see <a class="reference internal" href="#testing-apcupsd">Testing Apcupsd</a>).</p>
 </div>
 <div class="section" id="troubleshooting-serial-line-communications">
-<h3><a class="toc-backref" href="#id188">Troubleshooting Serial Line communications</a></h3>
+<h3><a class="toc-backref" href="#id189">Troubleshooting Serial Line communications</a></h3>
 <p><em>The most frequently encountered problem with voltage-signalling
 UPSes (e.g. BackUPS 650) is that you have incorrectly specified
 which cable is being used.</em> All cables furnished by APC have the
@@ -5078,7 +5124,7 @@ cable specification (i.e. <tt class="docutils literal"><span class="pre">UPSCABL
 the cable yourself according to the wiring diagram given in the
 cables chapter of this manual.</p>
 <div class="section" id="bizarre-intermittent-behavior">
-<h4><a class="toc-backref" href="#id189">Bizarre Intermittent Behavior:</a></h4>
+<h4><a class="toc-backref" href="#id190">Bizarre Intermittent Behavior:</a></h4>
 <p>In one case, a user reported that he received random incorrect
 values from the UPS in the status output. It turned out that gpm,
 the mouse control program for command windows, was using the serial
@@ -5090,7 +5136,7 @@ with a serial port mouse on the same serial port.</p>
 </div>
 </div>
 <div class="section" id="cables">
-<h2><a class="toc-backref" href="#id190">Cables</a></h2>
+<h2><a class="toc-backref" href="#id191">Cables</a></h2>
 <p>You can either use the cable that came with your
 UPS (the easiest if we support it) or you can make your own cable.
 We recommend that you obtain a supported cable directly from APC.</p>
@@ -5108,7 +5154,7 @@ voltage-signalling or dumb UPS, build a Simple-Custom cable (see
 BackUPS CS with a RJ45 connector, you can build your own Custom-RJ45 cable
 (see <a class="reference internal" href="#custom-rj45-smart-signalling-cable-for-backups-cs-models">Custom-RJ45 Smart Signalling Cable for BackUPS CS Models</a>).</p>
 <div class="section" id="smart-custom-cable-for-smartupses">
-<h3><a class="toc-backref" href="#id191">Smart-Custom Cable for SmartUPSes</a></h3>
+<h3><a class="toc-backref" href="#id192">Smart-Custom Cable for SmartUPSes</a></h3>
 <p><em>You do not have this cable unless you built it yourself.
 The Smart-Custom cable is not an APC product.</em></p>
 <pre class="literal-block">
@@ -5129,10 +5175,10 @@ DEVICE /dev/ttyS0 (or whatever your serial port is)
 </pre>
 <p>If you have an OS that requires DCD or RTS to be set before you can
 receive input, you might try building the standard APC Smart
-940-0024C cable listed below (see <a class="reference internal" href="#id41">940-0024C Cable Wiring</a>).</p>
+940-0024C cable listed below (see <a class="reference internal" href="#id40">940-0024C Cable Wiring</a>).</p>
 </div>
 <div class="section" id="simple-custom-voltage-signalling-cable-for-dumb-upses">
-<h3><a class="toc-backref" href="#id192">Simple-Custom Voltage-Signalling Cable for &quot;dumb&quot; UPSes</a></h3>
+<h3><a class="toc-backref" href="#id193">Simple-Custom Voltage-Signalling Cable for &quot;dumb&quot; UPSes</a></h3>
 <p><em>You do not have this cable unless you built it yourself.
 The Simple-Custom cable is not an APC product.</em></p>
 <p>For &quot;dumb&quot; UPSes using voltage signalling, if you are going to
@@ -5234,7 +5280,7 @@ DEVICE /dev/ttyS0 (or whatever your serial port is)
 </pre>
 </div>
 <div class="section" id="custom-rj45-smart-signalling-cable-for-backups-cs-models">
-<h3><a class="toc-backref" href="#id193">Custom-RJ45 Smart Signalling Cable for BackUPS CS Models</a></h3>
+<h3><a class="toc-backref" href="#id194">Custom-RJ45 Smart Signalling Cable for BackUPS CS Models</a></h3>
 <p>If you have a BackUPS CS, you are probably either using it with the
 USB cable that is supplied or with the 940-0128A supplied by APC,
 which permits running the UPS in dumb mode. By building your own
@@ -5295,7 +5341,7 @@ DEVICE /dev/ttyS0 (or whatever your serial port is)
 transmitted to us by slither_man. Many thanks!</p>
 </div>
 <div class="section" id="other-apc-cables-that-apcupsd-supports">
-<h3><a class="toc-backref" href="#id194">Other APC Cables that apcupsd Supports</a></h3>
+<h3><a class="toc-backref" href="#id195">Other APC Cables that apcupsd Supports</a></h3>
 <p>apcupsd will also support the following off the shelf cables that
 are supplied by APC</p>
 <ul class="simple">
@@ -5310,7 +5356,7 @@ are supplied by APC</p>
 </ul>
 </div>
 <div class="section" id="voltage-signalling-features-supported-by-apcupsd-for-various-cables">
-<h3><a class="toc-backref" href="#id195">Voltage Signalling Features Supported by Apcupsd for Various Cables</a></h3>
+<h3><a class="toc-backref" href="#id196">Voltage Signalling Features Supported by Apcupsd for Various Cables</a></h3>
 <p>The following table shows the features supported by the current
 version of apcupsd for various cables running the UPS in
 voltage-signalling mode.</p>
@@ -5383,7 +5429,7 @@ voltage-signalling mode.</p>
 </table>
 </div>
 <div class="section" id="voltage-signalling">
-<h3><a class="toc-backref" href="#id196">Voltage Signalling</a></h3>
+<h3><a class="toc-backref" href="#id197">Voltage Signalling</a></h3>
 <p>Apparently, all APC voltage-signalling UPSes with DB9 serial ports
 have the same signals on the output pins of the UPS. The difference
 at the computer end is due to different cable configurations. Thus,
@@ -5412,7 +5458,7 @@ UPS Pin         Signal meaning
 </pre>
 </div>
 <div class="section" id="the-back-ups-office-500-signals">
-<h3><a class="toc-backref" href="#id197">The Back-UPS Office 500 signals</a></h3>
+<h3><a class="toc-backref" href="#id198">The Back-UPS Office 500 signals</a></h3>
 <p>The Back-UPS Office UPS has a telephone type jack as output, which
 looks like the following:</p>
 <pre class="literal-block">
@@ -5437,9 +5483,9 @@ Looking at the end of the connector:
 </pre>
 </div>
 <div class="section" id="analyses-of-apc-cables">
-<h3><a class="toc-backref" href="#id198">Analyses of APC Cables</a></h3>
+<h3><a class="toc-backref" href="#id199">Analyses of APC Cables</a></h3>
 <div class="section" id="b-cable-wiring">
-<h4><a class="toc-backref" href="#id199">940-0020B Cable Wiring</a></h4>
+<h4><a class="toc-backref" href="#id200">940-0020B Cable Wiring</a></h4>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -5477,7 +5523,7 @@ Signal Computer                  UPS
 </pre>
 </div>
 <div class="section" id="c-cable-wiring">
-<h4><a class="toc-backref" href="#id200">940-0020C Cable Wiring</a></h4>
+<h4><a class="toc-backref" href="#id201">940-0020C Cable Wiring</a></h4>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -5506,7 +5552,7 @@ Signal Computer                  UPS
 </pre>
 </div>
 <div class="section" id="a-cable-wiring">
-<h4><a class="toc-backref" href="#id201">940-0023A Cable Wiring</a></h4>
+<h4><a class="toc-backref" href="#id202">940-0023A Cable Wiring</a></h4>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -5539,8 +5585,8 @@ Signal Computer                  UPS
                            *----  9  Common
 </pre>
 </div>
-<div class="section" id="id41">
-<h4><a class="toc-backref" href="#id202">940-0024C Cable Wiring</a></h4>
+<div class="section" id="id40">
+<h4><a class="toc-backref" href="#id203">940-0024C Cable Wiring</a></h4>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -5567,8 +5613,8 @@ Signal Computer                  UPS
  CTS    8   --*
 </pre>
 </div>
-<div class="section" id="id42">
-<h4><a class="toc-backref" href="#id203">940-0095A Cable Wiring</a></h4>
+<div class="section" id="id41">
+<h4><a class="toc-backref" href="#id204">940-0095A Cable Wiring</a></h4>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -5650,8 +5696,8 @@ and MARK to a 0.</p>
 </li>
 </ul>
 </div>
-<div class="section" id="id43">
-<h4><a class="toc-backref" href="#id204">940-0095B Cable Wiring</a></h4>
+<div class="section" id="id42">
+<h4><a class="toc-backref" href="#id205">940-0095B Cable Wiring</a></h4>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -5682,8 +5728,8 @@ Signal Computer                  UPS
                       4.7K ohm
 </pre>
 </div>
-<div class="section" id="id44">
-<h4><a class="toc-backref" href="#id205">940-0119A Cable Wiring</a></h4>
+<div class="section" id="id43">
+<h4><a class="toc-backref" href="#id206">940-0119A Cable Wiring</a></h4>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -5708,7 +5754,7 @@ APC Part# - 940-0119A
 </pre>
 </div>
 <div class="section" id="serial-backups-es-wiring">
-<h4><a class="toc-backref" href="#id206">Serial BackUPS ES Wiring</a></h4>
+<h4><a class="toc-backref" href="#id207">Serial BackUPS ES Wiring</a></h4>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -5749,8 +5795,8 @@ pin    signal      pin
  3      TxD         3 nc
 </pre>
 </div>
-<div class="section" id="id45">
-<h4><a class="toc-backref" href="#id207">940-0128A Cable Wiring</a></h4>
+<div class="section" id="id44">
+<h4><a class="toc-backref" href="#id208">940-0128A Cable Wiring</a></h4>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -5822,7 +5868,7 @@ _______________________
 </pre>
 </div>
 <div class="section" id="d-cable-wiring">
-<h4><a class="toc-backref" href="#id208">940-0128D Cable Wiring</a></h4>
+<h4><a class="toc-backref" href="#id209">940-0128D Cable Wiring</a></h4>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -5869,8 +5915,8 @@ GND(5)----------------------------(7)Signal GND
 (Shield)--------------------------(4)Chassis GND
 </pre>
 </div>
-<div class="section" id="id46">
-<h4><a class="toc-backref" href="#id209">940-0127B Cable Wiring</a></h4>
+<div class="section" id="id45">
+<h4><a class="toc-backref" href="#id210">940-0127B Cable Wiring</a></h4>
 <table class="docutils field-list" frame="void" rules="none">
 <col class="field-name" />
 <col class="field-body" />
@@ -5900,7 +5946,7 @@ DATA-(3)-----------(10)DATA-
 </div>
 </div>
 <div class="section" id="win32-implementation-restrictions-for-simple-upses">
-<h3><a class="toc-backref" href="#id210">Win32 Implementation Restrictions for Simple UPSes</a></h3>
+<h3><a class="toc-backref" href="#id211">Win32 Implementation Restrictions for Simple UPSes</a></h3>
 <p>Due to inadequacies in the
 Win32 API, it is not possible to set/clear/get all the serial port
 line signals. apcupsd can detect: CTS, DSR, RNG, and CD. It can set
@@ -5910,7 +5956,7 @@ of the cables. In particular, LineDown on the Custom Simple cable,
 and Low Battery on the 0023A cable are not implemented.</p>
 </div>
 <div class="section" id="internal-apcupsd-actions-for-simple-cables">
-<h3><a class="toc-backref" href="#id211">Internal Apcupsd Actions for Simple Cables</a></h3>
+<h3><a class="toc-backref" href="#id212">Internal Apcupsd Actions for Simple Cables</a></h3>
 <pre class="literal-block">
 This section describes how apcupsd 3.8.5 (March 2002)
 treats the serial port line signals for simple cables.
@@ -5986,7 +6032,7 @@ apcserial.c
 </div>
 </div>
 <div class="section" id="recalibrating-the-ups-runtime">
-<h2><a class="toc-backref" href="#id212">Recalibrating the UPS Runtime</a></h2>
+<h2><a class="toc-backref" href="#id213">Recalibrating the UPS Runtime</a></h2>
 <p>Note: In a future release of apcupsd this procedure will be
 replaced by a daemon operation that can be performed on all types
 of UPS.</p>
@@ -6038,13 +6084,13 @@ twice per year as discharging these kinds of batteries tends to
 shorten their life span.</p>
 </div>
 <div class="section" id="configuration-directive-reference">
-<h2><a class="toc-backref" href="#id213">Configuration Directive Reference</a></h2>
+<h2><a class="toc-backref" href="#id214">Configuration Directive Reference</a></h2>
 <p>Configuration directives in /etc/apcupsd/apcupsd.conf control the
 behavior of the apcupsd daemon. For most installations it is only
 necessary to set a handful of general directives. The rest can be
 left at their defaults unless you have an exotic configuration.</p>
 <div class="section" id="general-configuration-directives">
-<h3><a class="toc-backref" href="#id214">General Configuration Directives</a></h3>
+<h3><a class="toc-backref" href="#id215">General Configuration Directives</a></h3>
 <p>In general, each of these directives is required (except that the
 <tt class="docutils literal"><span class="pre">DEVICE</span></tt> directive is ignored for <tt class="docutils literal"><span class="pre">UPSCABLE</span> <span class="pre">ether</span></tt> and not required
 for <tt class="docutils literal"><span class="pre">UPSCABLE</span> <span class="pre">usb</span></tt>).</p>
@@ -6110,7 +6156,7 @@ using the <tt class="docutils literal"><span class="pre">--with-lock-dir=</span>
 </dl>
 </div>
 <div class="section" id="configuration-directives-used-by-the-network-information-server">
-<h3><a class="toc-backref" href="#id215">Configuration Directives Used by the Network Information Server</a></h3>
+<h3><a class="toc-backref" href="#id216">Configuration Directives Used by the Network Information Server</a></h3>
 <p>None of these directives are required for proper operation of
 apcupsd.</p>
 <dl class="docutils">
@@ -6159,7 +6205,7 @@ system during the data access and file truncation operations.</p>
 </dl>
 </div>
 <div class="section" id="configuration-directives-used-during-power-failures">
-<h3><a class="toc-backref" href="#id216">Configuration Directives used during Power Failures</a></h3>
+<h3><a class="toc-backref" href="#id217">Configuration Directives used during Power Failures</a></h3>
 <p>In general, none of these
 directives are required. However, if you have a voltage-signalling
 (dumb) UPS with a cable that does not support the Low Battery
@@ -6243,12 +6289,12 @@ feature also allows the system administrator to hold the &quot;ANNOY&quot;
 factor until the 'nologin' file is created. The default is always
 disable if no <tt class="docutils literal"><span class="pre">NOLOGON</span></tt> directive is specified.</p>
 <p>The 'nologin' file will be created in the directory specified by
-the <tt class="docutils literal"><span class="pre">NOLOGINDIR</span></tt> directive desribed below.</p>
+the <tt class="docutils literal"><span class="pre">NOLOGINDIR</span></tt> directive described below.</p>
 <p>As far as I can tell, the only useful types are disable and always
 since the difference in the time when the logout warning is given
 and shutdown occurs for the other types is very short (KES).</p>
 <blockquote class="last">
-<p><em>disable</em> revents apcupsd from creating the nologin
+<p><em>disable</em> prevents apcupsd from creating the nologin
 file. Consequently, any user can login during a power failure
 condition. Also, the ANNOY feature is disabled so users will not be
 warned to logoff the system.</p>
@@ -6318,7 +6364,7 @@ program to change the default at compile time.</p>
 </dl>
 </div>
 <div class="section" id="configuration-directives-used-to-control-system-logging">
-<h3><a class="toc-backref" href="#id217">Configuration Directives used to Control System Logging</a></h3>
+<h3><a class="toc-backref" href="#id218">Configuration Directives used to Control System Logging</a></h3>
 <dl class="docutils">
 <dt><strong>STATTIME</strong> <em>time in seconds</em></dt>
 <dd>This directive supplies the time
@@ -6347,7 +6393,7 @@ section of this manual for additional details.</dd>
 </dl>
 </div>
 <div class="section" id="configuration-directives-for-sharing-a-ups">
-<h3><a class="toc-backref" href="#id218">Configuration Directives for Sharing a UPS</a></h3>
+<h3><a class="toc-backref" href="#id219">Configuration Directives for Sharing a UPS</a></h3>
 <p>The following directives apply to sharing an UPS using a ShareUPS
 hardware module. Most users will not use this mode.</p>
 <p><strong>UPSCLASS</strong> <em>standalone</em> | <em>shareslave</em> | <em>sharemaster</em></p>
@@ -6372,7 +6418,7 @@ share and sharenet code is not fully tested.</p>
 </blockquote>
 </div>
 <div class="section" id="configuration-directives-used-to-set-the-ups-eeprom">
-<h3><a class="toc-backref" href="#id219">Configuration Directives Used to Set the UPS EEPROM</a></h3>
+<h3><a class="toc-backref" href="#id220">Configuration Directives Used to Set the UPS EEPROM</a></h3>
 <p><em>These directives have no effect on the operation of apcupsd but are
 reserved for use by apctest when bulk programming the values of the
 UPS EEPROM configuration variables in a Smart-UPS model.</em></p>
@@ -6459,18 +6505,18 @@ ON = at power on, OFF = never).</blockquote>
 </div>
 </div>
 <div class="section" id="apcupsd-status-logging">
-<h2><a class="toc-backref" href="#id220">apcupsd Status Logging</a></h2>
+<h2><a class="toc-backref" href="#id221">apcupsd Status Logging</a></h2>
 <p>There is a good deal of information available about the UPS and apcupsd's
 status. This document describes the format of that information.
 Normally you will get at it via <tt class="docutils literal"><span class="pre">apcaccess</span></tt>, but there are other ways
 as well.</p>
 <div class="section" id="status-report-format">
-<h3><a class="toc-backref" href="#id221">Status report format</a></h3>
+<h3><a class="toc-backref" href="#id222">Status report format</a></h3>
 <p>STATUS output is in ASCII format with a single data value or piece
 of information on each line output. Because not all UPSes supply
 the same information, the output varies based on the type of UPS
 that you are using. In general, if the information is not available
-for your UPS, the line will be missing enturely or the data portion of
+for your UPS, the line will be missing entirely or the data portion of
 the output record will contain an <tt class="docutils literal"><span class="pre">N/A</span></tt> indicating that the information
 is not available.</p>
 <p>Status logging consists of periodically logging ALL available
@@ -6504,7 +6550,7 @@ of records and the size in the first record, the complete status
 can be reliably reassembled.</p>
 </div>
 <div class="section" id="status-report-example">
-<h3><a class="toc-backref" href="#id222">Status Report Example</a></h3>
+<h3><a class="toc-backref" href="#id223">Status Report Example</a></h3>
 <p>An example of output from a BackUPS RS 1500 follows:</p>
 <pre class="literal-block">
 APC      : 001,037,0906
@@ -6547,7 +6593,7 @@ END APC  : Sun Apr 26 17:22:32 EDT 2009
 </pre>
 </div>
 <div class="section" id="status-report-fields">
-<h3><a class="toc-backref" href="#id223">Status Report Fields</a></h3>
+<h3><a class="toc-backref" href="#id224">Status Report Fields</a></h3>
 <p>The meaning of the above variables are:</p>
 <dl class="docutils">
 <dt><strong>APC</strong></dt>
@@ -6622,7 +6668,7 @@ immediate emergency shutdown.</dd>
 have after a power off condition before the UPS will restore power
 to your equipment.</dd>
 <dt><strong>ITEMP</strong></dt>
-<dd>Tnternal UPS temperature as supplied by the UPS.</dd>
+<dd>Internal UPS temperature as supplied by the UPS.</dd>
 <dt><strong>ALARMDEL</strong></dt>
 <dd>The delay period for the UPS alarm.</dd>
 <dt><strong>BATTV</strong></dt>
@@ -6696,7 +6742,7 @@ the remaining runtime more accurately.</dd>
 </dl>
 </div>
 <div class="section" id="logging-the-status-information">
-<h3><a class="toc-backref" href="#id224">Logging the STATUS Information</a></h3>
+<h3><a class="toc-backref" href="#id225">Logging the STATUS Information</a></h3>
 <p>If specified in the configuration file, the STATUS data will also be
 written to the system log file. Please note, that it would not
 normally be wise to write this data to a normal system log file as
@@ -6716,10 +6762,10 @@ strongly recommend that you use apcaccess or the CGI interface to
 get this information.</p>
 </div>
 </div>
-<div class="section" id="the-shutown-sequence-and-its-discontents">
-<h2><a class="toc-backref" href="#id225">The Shutown Sequence and its Discontents</a></h2>
+<div class="section" id="the-shutdown-sequence-and-its-discontents">
+<h2><a class="toc-backref" href="#id226">The Shutdown Sequence and its Discontents</a></h2>
 <div class="section" id="shutdown-sequence">
-<h3><a class="toc-backref" href="#id226">Shutdown Sequence</a></h3>
+<h3><a class="toc-backref" href="#id227">Shutdown Sequence</a></h3>
 <p>If you experienced so problems with the testing procedures, or if
 you are porting apcupsd to another system, or you are simply
 curious, you may want to know exactly what is going on during the
@@ -6728,7 +6774,7 @@ shutdown process.</p>
 <ul>
 <li><p class="first">apcupsd detects that there is a power problem and it calls
 <tt class="docutils literal"><span class="pre">/etc/apcupsd/apccontrol</span> <span class="pre">powerout</span></tt>. By default this event
-does nothing, but it can be overriden to notify users, etc.</p>
+does nothing, but it can be overridden to notify users, etc.</p>
 </li>
 <li><p class="first">After the configured <tt class="docutils literal"><span class="pre">ONBATTERYDELAY</span></tt>, apcupsd
 calls <tt class="docutils literal"><span class="pre">/etc/apcupsd/apccontrol</span> <span class="pre">onbattery</span></tt>, which normally sends a
@@ -6830,7 +6876,7 @@ to 60 seconds. When using a serial connection to a SmartUPS, you
 must configure the value in the UPS EEPROM by hand using <tt class="docutils literal"><span class="pre">apctest</span></tt>.</p>
 </div>
 <div class="section" id="shutdown-problems">
-<h3><a class="toc-backref" href="#id227">Shutdown Problems</a></h3>
+<h3><a class="toc-backref" href="#id228">Shutdown Problems</a></h3>
 <p>Obviously if your halt script is not properly modified, apcupsd
 will not be able to shut off the power to the UPS, and if the power
 returns before the batteries are exhausted your system will not
@@ -6838,7 +6884,7 @@ automatically reboot. In any case, your machine should have been
 cleanly shut down.</p>
 </div>
 <div class="section" id="master-slave-shutdown">
-<h3><a class="toc-backref" href="#id228">Master/Slave Shutdown</a></h3>
+<h3><a class="toc-backref" href="#id229">Master/Slave Shutdown</a></h3>
 <p>In master/slave configurations, however, the master cannot be 100
 percent sure that the slaves have all shutdown before it performs
 the power off. To avoid this situation, be sure to configure any
@@ -6855,7 +6901,7 @@ old versions. Please be sure to delete or rename all prior versions
 (/usr/local/sbin/apcupsd or /sbin/powersc).</p>
 </div>
 <div class="section" id="startup">
-<h3><a class="toc-backref" href="#id229">Startup</a></h3>
+<h3><a class="toc-backref" href="#id230">Startup</a></h3>
 <p>Normally, apcupsd is automatically started when
 your system is rebooted. This normally occurs because the startup
 script apcupsd is linked into the appropriate places in /etc/rc.d.
@@ -6879,18 +6925,18 @@ the same script:</p>
 </pre>
 </div>
 <div class="section" id="windows-considerations">
-<h3><a class="toc-backref" href="#id230">Windows Considerations</a></h3>
+<h3><a class="toc-backref" href="#id231">Windows Considerations</a></h3>
 <p>Please see the <a class="reference internal" href="#killpower-under-windows">Killpower under Windows</a> chapter of this manual for
-conderations pertaining to shutdown and killpower on Windows.</p>
+considerations pertaining to shutdown and killpower on Windows.</p>
 </div>
 </div>
 <div class="section" id="apc-smart-protocol">
-<h2><a class="toc-backref" href="#id231">APC smart protocol</a></h2>
+<h2><a class="toc-backref" href="#id232">APC smart protocol</a></h2>
 <p>The APC UPS
 protocol was originally analyzed by Pavel Korensky with additions
 from Andre H. Hendrick beginning in 1995, and we want to give
 credit for good, hard work, where credit is due. After having said
-that, you will see that Steven Freed built much of the orginal
+that, you will see that Steven Freed built much of the original
 apcupsd information file.</p>
 <p>The start of this chapter of the apcupsd manual in HTML format was
 pulled from the Network UPS Tools (NUT) site
@@ -6900,7 +6946,7 @@ the Bible of APC UPS programming. In the course of using it, I
 have added information gleaned from apcupsd and information
 graciously supplied by APC.</p>
 <div class="section" id="description">
-<h3><a class="toc-backref" href="#id232">Description</a></h3>
+<h3><a class="toc-backref" href="#id233">Description</a></h3>
 <p>Here's the information on the elusive APC smart signaling protocol
 used by their higher end units (Back-UPS Pro, Smart-UPS,
 Matrix-UPS, etc). What you see here has been collected from a
@@ -6909,7 +6955,7 @@ PowerChute and their hardware. Others sent various characters to
 the UPS and figured out what the results meant.</p>
 </div>
 <div class="section" id="rs-232-differences">
-<h3><a class="toc-backref" href="#id233">RS-232 differences</a></h3>
+<h3><a class="toc-backref" href="#id234">RS-232 differences</a></h3>
 <p>Normal 9 pin serial connections have TxD on 3 and RxD on 2. APC's
 smart serial ports put TxD on pin 1 and RxD on pin 2. This means
 you go nowhere if you use a normal straight through serial cable.
@@ -6919,7 +6965,7 @@ RTS from the PC usually wind up driving the on/off line. So, when
 you open the port, they go high and *poof* your computer dies.</p>
 </div>
 <div class="section" id="the-smart-protocol">
-<h3><a class="toc-backref" href="#id234">The Smart Protocol</a></h3>
+<h3><a class="toc-backref" href="#id235">The Smart Protocol</a></h3>
 <p>Despite the lack of official information from APC, this table has
 been constructed. It's standard RS-232 serial communications at
 2400 bps/8N1. Don't rush the UPS while transmitting or it may stop
@@ -7060,12 +7106,15 @@ Alarm status</td>
 <tr><td>K</td>
 <td>Shutdown
 with grace
-period</td>
+period (no
+return)</td>
 <td>OK or *</td>
 <td>Send twice with &gt; 1.5s delay between
 chars. Older units send &quot;*&quot; instead of
 &quot;OK&quot;. Length of grace period is set
-with Grace Period command.</td>
+with Grace Period command. UPS will
+remain off and NOT power on if utility
+power is restored.</td>
 </tr>
 <tr><td>L</td>
 <td>Input line
@@ -7170,7 +7219,7 @@ immediately</td>
 <td>n/a</td>
 <td>Send twice with &gt; 1.5s delay between
 chars. UPS switches load off
-immediately (no grade period)</td>
+immediately (no grace period)</td>
 </tr>
 <tr><td>a</td>
 <td>Protocol
@@ -7356,7 +7405,7 @@ ambient
 temperature</td>
 <td>80.5</td>
 <td>Degrees C. Only works on models with
-the Measure-UPS SmartSlot card .</td>
+the Measure-UPS SmartSlot card.</td>
 </tr>
 <tr><td>u</td>
 <td>Upper
@@ -7612,7 +7661,7 @@ to leave in battery (UPS shuts down
 </table>
 </div>
 <div class="section" id="dip-switch-info">
-<h3><a class="toc-backref" href="#id235">Dip switch info</a></h3>
+<h3><a class="toc-backref" href="#id236">Dip switch info</a></h3>
 <table border="1" class="docutils">
 <colgroup>
 <col width="4%" />
@@ -7652,7 +7701,7 @@ SU370ci and 400</td>
 </table>
 </div>
 <div class="section" id="status-bits">
-<h3><a class="toc-backref" href="#id236">Status bits</a></h3>
+<h3><a class="toc-backref" href="#id237">Status bits</a></h3>
 <p>This is probably the most important register of the UPS, which
 indicates the overall UPS status. Some common things you'll see:</p>
 <ul class="simple">
@@ -7701,7 +7750,7 @@ indicates the overall UPS status. Some common things you'll see:</p>
 </table>
 </div>
 <div class="section" id="alert-messages">
-<h3><a class="toc-backref" href="#id237">Alert messages</a></h3>
+<h3><a class="toc-backref" href="#id238">Alert messages</a></h3>
 <p>These single character messages are sent by the UPS any time there
 is an Alert condition. All other responses indicated above are sent
 by the UPS only in response to a query or action command.</p>
@@ -7796,7 +7845,7 @@ models.</td>
 </table>
 </div>
 <div class="section" id="register-1">
-<h3><a class="toc-backref" href="#id238">Register 1</a></h3>
+<h3><a class="toc-backref" href="#id239">Register 1</a></h3>
 <p>All bits are valid on the Matrix UPS. SmartUPS models only support
 bits 6 and 7. Other models do not respond.</p>
 <table border="1" class="docutils">
@@ -7838,9 +7887,9 @@ bits 6 and 7. Other models do not respond.</p>
 </table>
 </div>
 <div class="section" id="register-2">
-<h3><a class="toc-backref" href="#id239">Register 2</a></h3>
+<h3><a class="toc-backref" href="#id240">Register 2</a></h3>
 <p>Matrix UPS models report bits 0-5. SmartUPS models only support
-bits 4 and 6. SmartUPS v/s and BackUPS Pro report bits 4, 6, 7.
+bits 4-6. SmartUPS v/s and BackUPS Pro report bits 4, 6, 7.
 Unused bits are set to 0. Other models do not respond.</p>
 <table border="1" class="docutils">
 <colgroup>
@@ -7869,7 +7918,7 @@ Unused bits are set to 0. Other models do not respond.</p>
 <td>DC imbalance, UPS in bypass</td>
 </tr>
 <tr><td>5</td>
-<td>Command sent to stop bypass with no battery connected - UPS still in bypass</td>
+<td>Battery is disconnected</td>
 </tr>
 <tr><td>6</td>
 <td>Relay fault in SmartTrim or SmartBoost</td>
@@ -7881,7 +7930,7 @@ Unused bits are set to 0. Other models do not respond.</p>
 </table>
 </div>
 <div class="section" id="register-3">
-<h3><a class="toc-backref" href="#id240">Register 3</a></h3>
+<h3><a class="toc-backref" href="#id241">Register 3</a></h3>
 <p>All bits are valid on the Matrix UPS and 3rd generation SmartUPS
 models. SmartUPS v/s and BackUPS Pro models report bits 0-5. All
 others report 0-4. State change of bits 1,2,5,6,7 are reported
@@ -7925,7 +7974,7 @@ asynchronously with ? and = messages.</p>
 </table>
 </div>
 <div class="section" id="interpretation-of-the-old-firmware-revision">
-<h3><a class="toc-backref" href="#id241">Interpretation of the Old Firmware Revision</a></h3>
+<h3><a class="toc-backref" href="#id242">Interpretation of the Old Firmware Revision</a></h3>
 <p>The Old Firmware Revision is obtained with the &quot;V&quot; command, which
 gives a typical response such as &quot;GWD&quot; or &quot;IWI&quot;, and can be
 interpreted as follows:</p>
@@ -7963,9 +8012,9 @@ This is a three character string XYZ
 </pre>
 </div>
 <div class="section" id="interpretation-of-the-new-firmware-revision">
-<h3><a class="toc-backref" href="#id242">Interpretation of the New Firmware Revision</a></h3>
+<h3><a class="toc-backref" href="#id243">Interpretation of the New Firmware Revision</a></h3>
 <pre class="literal-block">
-New Firmware revison and model ID String in NN.M.L is the format
+New Firmware revision and model ID String in NN.M.L is the format
 
     where NN == UPS ID Code.
         12 == Back-UPS Pro 650
@@ -7999,7 +8048,7 @@ New Firmware revison and model ID String in NN.M.L is the format
 </pre>
 </div>
 <div class="section" id="eeprom-values">
-<h3><a class="toc-backref" href="#id243">EEPROM Values</a></h3>
+<h3><a class="toc-backref" href="#id244">EEPROM Values</a></h3>
 <p>Upon sending a ^Z, your UPS will probably spit back approximately
 254 characters something like the following (truncated here for the
 example):</p>
@@ -8061,7 +8110,7 @@ FVL == Values that are returned and legal.
 </pre>
 </div>
 <div class="section" id="programming-the-ups-eeprom">
-<h3><a class="toc-backref" href="#id244">Programming the UPS EEPROM</a></h3>
+<h3><a class="toc-backref" href="#id245">Programming the UPS EEPROM</a></h3>
 <p>There are at this time a maximum of 12 different values that can be
 programmed into the UPS EEPROM. They are:</p>
 <table border="1" class="docutils">
@@ -8131,7 +8180,7 @@ vertical bar (|) to indicate that the EEPROM was changed.</p>
 </div>
 </div>
 <div class="section" id="apcupsd-rpm-packaging-faq">
-<h2><a class="toc-backref" href="#id245">Apcupsd RPM Packaging FAQ</a></h2>
+<h2><a class="toc-backref" href="#id246">Apcupsd RPM Packaging FAQ</a></h2>
 <dl class="docutils">
 <dt><strong>How do I build Apcupsd for platform xxx?</strong></dt>
 <dd><p class="first">The apcupsd spec file contains defines
@@ -8140,10 +8189,10 @@ RedHat 9 (rh9), Fedora Core (fedora_core), RedHat Enterprise Linux
 and clones (rhel3 and rhel4), SuSE 9 &amp; 10 (suse), and Mandrake
 (mdk). The package build is controlled by a define set at the
 beginning of the file. These defines basically just control the
-dependancy information that gets coded into the finished rpm
+dependency information that gets coded into the finished rpm
 package. So while you could technically build a package without
 defining a platform, or with an incorrect platform, and have it
-install and run it would not contain correct dependancy information
+install and run it would not contain correct dependency information
 for the rpm database. The platform define may be edited in the spec
 file directly (by default all defines are set to 0 or &quot;not set&quot;).
 For example, to build the RedHat 7.x package find the line in the
@@ -8221,7 +8270,7 @@ source package.</dd>
 <dt><strong>I'm getting errors about not having permission when I try to build the packages. Do I need to be root?</strong></dt>
 <dd><p class="first">No, you do not need to be root
 and, in fact, it is better practice to build rpm packages as a
-non-root user. Apcupds packages are designed to be built by a
+non-root user. Apcupsd's packages are designed to be built by a
 regular user but you must make a few changes on your system to do
 this. If you are building on your own system then the simplest
 method is to add write permissions for all to the build directory
@@ -8249,14 +8298,14 @@ add the following line:</p>
 </dl>
 </div>
 <div class="section" id="credits">
-<h2><a class="toc-backref" href="#id246">Credits</a></h2>
+<h2><a class="toc-backref" href="#id247">Credits</a></h2>
 <img alt="./thanks.png" src="./thanks.png" />
 <p>The success of apcupsd is due to the many people that helped in
 development, testing and in many other ways.</p>
-<p>Thank all the developers that worked hard to make APCUPSDone of the
-best piece of software for UPSmanagement.</p>
+<p>Thank all the developers that worked hard to make APCUPSD one of the
+best piece of software for UPS management.</p>
 <div class="section" id="contributors">
-<h3><a class="toc-backref" href="#id247">Contributors</a></h3>
+<h3><a class="toc-backref" href="#id248">Contributors</a></h3>
 <dl class="docutils">
 <dt><strong>Current Code Maintainer and Project Manager</strong></dt>
 <dd>Adam Kropelin (<a class="reference external" href="mailto:akropel1&#64;rochester.rr.com">akropel1&#64;rochester.rr.com</a>)</dd>
@@ -8301,7 +8350,7 @@ Joseph Acosta (<a class="reference external" href="mailto:joeja&#64;mindspring.c
 </div>
 <div class="footer">
 <hr class="footer" />
-Generated on: 2009-05-14 22:16 UTC.
+Generated on: 2013-11-21 00:07 UTC.
 Generated by <a class="reference external" href="http://docutils.sourceforge.net/">Docutils</a> from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> source.
 
 </div>

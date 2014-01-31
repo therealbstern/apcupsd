@@ -167,6 +167,7 @@
 #undef HAVE_OPENSERVER_OS
 #undef HAVE_DARWIN_OS
 #undef HAVE_QNX_OS
+#undef HAVE_MINGW
 
 /* Compiler */
 #undef HAVE_GCC
@@ -208,6 +209,9 @@
 /* Set if you want SNMP support */
 #undef HAVE_SNMP_DRIVER
 
+/* Set if you want SNMP Lite support */
+#undef HAVE_SNMPLITE_DRIVER
+
 #undef HAVE_UCD_SNMP
 #undef HAVE_NET_SNMP
 
@@ -216,6 +220,9 @@
 
 /* Set if you want PCNET driver */
 #undef HAVE_PCNET_DRIVER
+
+/* Set if you want MODBUS driver */
+#undef HAVE_MODBUS_DRIVER
 
 /* Set if you want the old master/slave network code */
 #undef HAVE_OLDNET
@@ -473,6 +480,10 @@
 
 #undef HAVE_NANOSLEEP
 #undef int32_t
-#undef HAVE_LINUX_USB
-#undef HAVE_BSD_USB
-#undef HAVE_GENERIC_USB
+
+/* Which variant of gethostbyname_r() do we have */
+#undef HAVE_FUNC_GETHOSTBYNAME_R_0
+#undef HAVE_FUNC_GETHOSTBYNAME_R_3
+#undef HAVE_FUNC_GETHOSTBYNAME_R_5
+#undef HAVE_FUNC_GETHOSTBYNAME_R_6
+

@@ -59,7 +59,7 @@ static int log_status_close(UPSINFO *ups, int fd)
 
    i = strlen(largebuf);
    if (i > (int)sizeof(largebuf) - 1) {
-      log_event(ups, LOG_ERR, _("Status buffer overflow %d bytes\n"),
+      log_event(ups, LOG_ERR, "Status buffer overflow %d bytes\n",
          i - sizeof(largebuf));
       return -1;
    }
@@ -107,7 +107,7 @@ static void log_status_write(UPSINFO *ups, const char *fmt, ...)
    avsnprintf(buf, sizeof(buf), fmt, ap);
    va_end(ap);
 
-   strncat(largebuf, buf, sizeof(largebuf));
+   strncat(largebuf, buf, sizeof(largebuf)-strlen(largebuf)-1);
    largebuf[sizeof(largebuf) - 1] = 0;
    stat_recs++;
 }
@@ -125,15 +125,13 @@ static void log_status_write(UPSINFO *ups, const char *fmt, ...)
 static void log_data(UPSINFO *ups)
 {
    const char *ptr;
-   char msg[MAXSTRING];
    static int toggle = 0;
 
    if (ups->datatime == 0)
       return;
 
    switch (ups->mode.type) {
-   case BK:
-   case SHAREBASIC:
+   case DUMB_UPS:
       if (!ups->is_onbatt()) {
          if (!ups->is_replacebatt()) {
             ptr = "OK";
@@ -149,63 +147,14 @@ static void log_data(UPSINFO *ups)
          log_event(ups, LOG_INFO, "LINEFAIL:DOWN BATTSTAT:%s", ptr);
       }
       break;
-   case BKPRO:
-   case VS:
-      if (!ups->is_onbatt()) {
-         if (ups->is_boost())
-            ptr = "LOW";
-         else if (ups->is_trim())
-            ptr = "HIGH";
-         else
-            ptr = "OK";
-         log_event(ups, LOG_INFO, "LINEFAIL:OK BATTSTAT:OK MAINS:%s", ptr);
-      } else {
-         if (!ups->is_battlow())
-            ptr = "RUNNING";
-         else
-            ptr = "FAILING";
-         log_event(ups, LOG_INFO, "LINEFAIL:DOWN BATTSTAT:%s", ptr);
-      }
-
-      switch (ups->info.get(CI_WHY_BATT).strval()[0]) {
-      case XFER_NONE:
-         ptr = "POWER UP";
-         break;
-      case XFER_SELFTEST:
-         ptr = "SELF TEST";
-         break;
-      case XFER_UNDERVOLT:
-         ptr = "LINE VOLTAGE DECREASE";
-         break;
-      case XFER_OVERVOLT:
-         ptr = "LINE VOLTAGE INCREASE";
-         break;
-      case XFER_NOTCHSPIKE:
-         ptr = "POWER FAILURE";
-         break;
-      case XFER_RIPPLE:
-         ptr = "R-EVENT";
-         break;
-      default:
-         asnprintf(msg, sizeof(msg), "UNKNOWN EVENT");
-         ptr = msg;
-         break;
-      }
-      log_event(ups, LOG_INFO, "LASTEVENT: %s", ptr);
-      break;
-   case NBKPRO:
-   case SMART:
-   case SHARESMART:
-   case MATRIX:
    case USB_UPS:
    case TEST_UPS:
-   case DUMB_UPS:
    case NETWORK_UPS:
    case SNMP_UPS:
    case APCSMART_UPS:
+   case PCNET_UPS:
+   case SNMPLITE_UPS:
       toggle = !toggle;            /* flip bit */
-#warning FIXME!!!!
-#if 0
       log_event(ups, LOG_INFO,
          "%05.1f,%05.1f,%05.1f,%05.2f,%05.2f,%04.1f,%04.1f,%05.1f,%05.1f,%05.1f,%05.1f,%d",
          ups->LineMin,
@@ -216,7 +165,6 @@ static void log_data(UPSINFO *ups)
          ups->UPSLoad,
          ups->UPSTemp,
          ups->ambtemp, ups->humidity, ups->LineVoltage, ups->BattChg, toggle);
-#endif
       break;
    default:
       break;

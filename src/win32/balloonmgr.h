@@ -31,7 +31,7 @@ public:
    ~BalloonMgr();
 
    void PostBalloon(HWND hwnd, const char *title, const char *text);
-   static DWORD WINAPI BalloonMgr::Thread(LPVOID param);
+   static DWORD WINAPI Thread(LPVOID param);
 
 private:
 
@@ -47,14 +47,14 @@ private:
       std::string text;
    };
 
-   std::vector<Balloon> m_pending;
-   HANDLE               m_mutex;
-   bool                 m_active;
-   HANDLE               m_event;
-   HANDLE               m_timer;
-   bool                 m_exit;
-   struct timeval       m_time;
-   HANDLE               m_thread;
+   std::vector<Balloon> _pending;
+   HANDLE               _mutex;
+   bool                 _active;
+   HANDLE               _event;
+   HANDLE               _timer;
+   bool                 _exit;
+   struct timeval       _time;
+   HANDLE               _thread;
 };
 
 #endif // BALLOONMGR_H
