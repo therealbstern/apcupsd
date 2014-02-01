@@ -21,4 +21,4 @@
 &nbsp;<br>
 <font color="#0000ff" size=+2><b>SourceForge</b></font><br>
 <a href="http://sourceforge.net/projects/apcupsd">Project Page</a><br>
-<a href="http://sourceforge.net/cvs/?group_id=54413">CVS</a><br>
+<a href="https://sourceforge.net/p/apcupsd/svn/HEAD/tree/">SVN</a><br>
