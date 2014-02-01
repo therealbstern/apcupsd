@@ -444,6 +444,7 @@ bool NetUpsDriver::get_capabilities()
       _ups->UPS_Cap[CI_NOMOUTV] = getupsvar("nomoutv", answer, sizeof(answer));
       _ups->UPS_Cap[CI_NOMPOWER] = getupsvar("nompower", answer, sizeof(answer));
       _ups->UPS_Cap[CI_REVNO] = getupsvar("firmware", answer, sizeof(answer));
+      _ups->UPS_Cap[CI_UPSMODEL] = getupsvar("model", answer, sizeof(answer));
       _got_caps = true;
    } else {
       _got_caps = false;
