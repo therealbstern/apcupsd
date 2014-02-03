@@ -367,10 +367,9 @@ AC_HELP_STRING([--enable-all], [Enable all optional modules])],
       enable_usb=yes
       enable_net=yes
       enable_snmp=yes
-      enable_net_snmp=yes
       enable_test=yes
       enable_pcnet=yes
-	  enable_modbus=yes
+      enable_modbus=yes
       enable_cgi=yes
       enable_gapcmon=yes
    fi], [])
