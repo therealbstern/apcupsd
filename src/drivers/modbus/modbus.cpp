@@ -429,6 +429,7 @@ bool ModbusUpsDriver::UpdateCi(const CiInfo *info)
    case CI_LowBattery:
       Dmsg(80, "Got CI_LowBattery: %llu\n", uint);
       _ups->set_battlow(uint & SSS_SHUTDOWN_IMMINENT);
+      break;
 #if 0
    case CI_STESTI:
       Dmsg(80, "Got CI_STESTI: %llx\n", uint);
