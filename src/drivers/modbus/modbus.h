@@ -23,16 +23,16 @@
  */
 
 /*
- * Thanks go to APC/Scneider for providing the Apcupsd team with early access 
+ * Thanks go to APC/Schneider for providing the Apcupsd team with early access
  * to MODBUS protocol information to facilitate an Apcupsd driver.
  *
- * Relevant application notes include:
+ * APC/Schneider has published the following relevant application notes:
  *
- * AN176: Modbus Implementation in APC Smart-UPS 
+ * AN176: Modbus Implementation in APC Smart-UPS
  *    <http://www.apc.com/whitepaper/?an=176>
- * AN177: Software interface for Switched Outlet and UPS Management in Smart-UPS 
+ * AN177: Software interface for Switched Outlet and UPS Management in Smart-UPS
  *    <http://www.apc.com/whitepaper/?an=177>
- * AN178: USB HID Implementation in Smart-UPS 
+ * AN178: USB HID Implementation in Smart-UPS
  *    <http://www.apc.com/whitepaper/?an=178>
  */
 
