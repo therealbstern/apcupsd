@@ -720,8 +720,15 @@ jump_into_the_loop:
     * Of course if here we have errors, the apc struct is not good
     * so don't bother to post-process it.
     */
-   if (errors)
-      goto bail_out;
+   if (errors) {
+      /*
+       * Lock path isn't valid until postprocessing below runs. Since we're
+       * aborting early we need to ensure that no lock file cleanup is
+       * attempted
+       */
+      ups->lockpath[0] = '\0';
+      error_exit("Terminating due to configuration file errors.\n");
+   }
 
    /* post-process the configuration stored in the ups structure */
 
@@ -823,10 +830,6 @@ jump_into_the_loop:
    default:
       break;
    }
-
-bail_out:
-   if (errors)
-      error_exit("Terminating due to configuration file errors.\n");
 
    return;
 }
