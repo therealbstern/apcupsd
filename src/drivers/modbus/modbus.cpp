@@ -409,8 +409,20 @@ bool ModbusUpsDriver::UpdateCi(const CiInfo *info)
       break;
    case CI_NOMOUTV:
       Dmsg(80, "Got CI_NOMOUTV: %llx\n", uint);
-      if (uint & OVS_120VAC)
+      if (uint & OVS_100VAC)
+         _ups->NomOutputVoltage = 100;
+      else if (uint & OVS_120VAC)
          _ups->NomOutputVoltage = 120;
+      else if (uint & OVS_200VAC)
+         _ups->NomOutputVoltage = 200;
+      else if (uint & OVS_208VAC)
+         _ups->NomOutputVoltage = 208;
+      else if (uint & OVS_220VAC)
+         _ups->NomOutputVoltage = 220;
+      else if (uint & OVS_230VAC)
+         _ups->NomOutputVoltage = 230;
+      else if (uint & OVS_240VAC)
+         _ups->NomOutputVoltage = 240;
       else
          _ups->NomOutputVoltage = -1;
       break;

@@ -181,7 +181,13 @@ namespace APCModbusMapping
    static const uint32_t IS_FREQ_PHASE_UNLOCKED = (1U << 9);
 
    // OUTPUT_VOLTAGE_SETTING register bits
+   static const uint32_t OVS_100VAC             = (1U << 0);
    static const uint32_t OVS_120VAC             = (1U << 1);
+   static const uint32_t OVS_200VAC             = (1U << 2);
+   static const uint32_t OVS_208VAC             = (1U << 3);
+   static const uint32_t OVS_220VAC             = (1U << 4);
+   static const uint32_t OVS_230VAC             = (1U << 5);
+   static const uint32_t OVS_240VAC             = (1U << 6);
 
    // SIMPLE_SIGNALING_CMD register bits
    static const uint32_t SSC_REQUEST_SHUTDOWN   = (1U << 0);
