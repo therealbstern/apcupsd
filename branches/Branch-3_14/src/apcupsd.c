@@ -91,7 +91,8 @@ void apcupsd_terminate(int sig)
 
    clean_threads();
    clear_files();
-   device_close(ups);
+   if (ups->driver)
+      device_close(ups);
    delete_lockfile(ups);
    if (pidcreated)
       unlink(pidfile);
@@ -103,7 +104,8 @@ void apcupsd_terminate(int sig)
 
 void apcupsd_error_cleanup(UPSINFO *ups)
 {
-   device_close(ups);
+   if (ups->driver)
+      device_close(ups);
    delete_lockfile(ups);
    if (pidcreated)
       unlink(pidfile);
@@ -284,19 +286,20 @@ int main(int argc, char *argv[])
    make_pid_file();
    pidcreated = 1;
 
-   setup_device(ups);
+   if (hibernate_ups || shutdown_ups)
+   {
+      // If we're hibernating or shutting down the UPS, setup is a one-shot.
+      // If it fails, we're toast; no retries
+      if (!setup_device(ups))
+         Error_abort0("Unable to open UPS device for hibernate or shutdown");
 
-   if (hibernate_ups) {
-      initiate_hibernate(ups);
+      if (hibernate_ups)
+         initiate_hibernate(ups);
+      else
+         initiate_shutdown(ups);
+
       apcupsd_terminate(0);
    }
-   
-   if (shutdown_ups) {
-      initiate_shutdown(ups);
-      apcupsd_terminate(0);
-   }
-
-   prep_device(ups);
 
    /*
     * From now ... we must _only_ start up threads!

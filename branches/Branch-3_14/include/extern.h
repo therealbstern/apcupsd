@@ -85,7 +85,7 @@ extern void clear_files(void);
 extern void make_pid(void);
 
 /* In apcdevice.c */
-void setup_device(UPSINFO *ups);
+bool setup_device(UPSINFO *ups);
 extern void setup_serial(UPSINFO *ups);
 extern void initiate_hibernate(UPSINFO *ups);
 extern void initiate_shutdown(UPSINFO *ups);
