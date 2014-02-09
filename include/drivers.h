@@ -121,50 +121,17 @@ typedef struct upsdriver {
 
 
 /* Some defines that helps code readability. */
-#define device_open(ups) \
-   do { \
-      if (ups->driver) ups->driver->Open(); \
-   } while(0)
-#define device_setup(ups) \
-   do { \
-      if (ups->driver) ups->driver->setup(); \
-   } while(0)
-#define device_close(ups) \
-   do { \
-      if (ups->driver) ups->driver->Close(); \
-   } while(0)
-#define device_kill_power(ups) \
-   do { \
-      if (ups->driver) ups->driver->kill_power(); \
-   } while(0)
-#define device_shutdown(ups) \
-   do { \
-      if (ups->driver) ups->driver->shutdown(); \
-   } while(0)
-#define device_read_static_data(ups) \
-   do { \
-      if (ups->driver) ups->driver->read_static_data(); \
-   } while(0)
-#define device_read_volatile_data(ups) \
-   do { \
-      if (ups->driver) ups->driver->read_volatile_data(); \
-   } while(0)
-#define device_get_capabilities(ups) \
-   do { \
-      if (ups->driver) ups->driver->get_capabilities(); \
-   } while(0)
-#define device_check_state(ups) \
-   do { \
-      if (ups->driver) ups->driver->check_state(); \
-   } while(0)
-#define device_program_eeprom(ups, command, data) \
-   do { \
-      if (ups->driver) ups->driver->ups_program_eeprom(command, data); \
-   } while(0)
-#define device_entry_point(ups, command, data) \
-   do { \
-      if (ups->driver) ups->driver->ups_entry_point(command, data); \
-   } while(0)
+#define device_open(ups) ups->driver->Open()
+#define device_setup(ups) ups->driver->setup()
+#define device_close(ups) ups->driver->Close()
+#define device_kill_power(ups) ups->driver->kill_power()
+#define device_shutdown(ups) ups->driver->shutdown()
+#define device_read_static_data(ups) ups->driver->read_static_data()
+#define device_read_volatile_data(ups) ups->driver->read_volatile_data()
+#define device_get_capabilities(ups) ups->driver->get_capabilities()
+#define device_check_state(ups) ups->driver->check_state()
+#define device_program_eeprom(ups, command, data) ups->driver->ups_program_eeprom(command, data)
+#define device_entry_point(ups, command, data) ups->driver->ups_entry_point(command, data)
 
 /* Now some defines for device_entry_point commands. */
 

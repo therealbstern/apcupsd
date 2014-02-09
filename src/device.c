@@ -50,11 +50,11 @@
 static int device_wait_time(UPSINFO *ups);
 
 /*********************************************************************/
-void setup_device(UPSINFO *ups)
+bool setup_device(UPSINFO *ups)
 {
-   device_open(ups);
-   device_setup(ups);
-   device_get_capabilities(ups);
+   return device_open(ups) &&
+          device_setup(ups) &&
+          device_get_capabilities(ups);
 }
 
 /*********************************************************************/
@@ -170,9 +170,62 @@ int fillUPS(UPSINFO *ups)
    return 0;
 }
 
+static void open_ups(UPSINFO *ups)
+{
+   // Don't issue a COMMLOST event until we've been running for a little while
+   static const unsigned int COMMLOST_EVENT_GRACE_PERIOD = 60;
+
+   time_t event_time = 0;
+
+   while (!device_open(ups))
+   {
+      // Failed to communicate with UPS: we're COMMLOST now
+      ups->set_commlost();
+
+      // Do not generate COMMLOST event until we've retried a few times
+      time_t now = time(NULL);
+      if (now - ups->start_time >= COMMLOST_EVENT_GRACE_PERIOD)
+      {
+         // Generate an event once
+         if (event_time == 0)
+         {
+            generate_event(ups, CMDCOMMFAILURE);
+            event_time = now;
+         }
+
+         // Log every 10 minutes thereafter
+         if ((now - event_time) >= 10*60)
+         {
+            event_time = now;
+            log_event(ups, event_msg[CMDCOMMFAILURE].level,
+               event_msg[CMDCOMMFAILURE].msg);            
+         }
+      }
+
+      sleep(5);
+   }
+
+   // If we were commlost, we're not any more
+   if (ups->is_commlost())
+   {
+      ups->clear_commlost();
+      if (event_time)
+         generate_event(ups, CMDCOMMOK);
+   }
+
+   // Complete remainder of UPS setup
+   device_setup(ups);
+   device_get_capabilities(ups);
+   prep_device(ups);
+}
+
 /* NOTE! This is the starting point for a separate process (thread). */
 void do_device(UPSINFO *ups)
 {
+   /* Open the UPS device and ensure we can talk to it. This does not return
+      until the UPS is successfully contacted */
+   open_ups(ups);
+
    /* get all data so apcaccess is happy */
    fillUPS(ups);
 

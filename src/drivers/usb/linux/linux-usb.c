@@ -558,22 +558,11 @@ bool LinuxUsbUpsDriver::Open()
    if (_orig_device[0] == 0)
       astrncpy(_orig_device, _ups->device, sizeof(_orig_device));
 
-   if (!open_usb_device()) {
-      write_unlock(_ups);
-      if (_ups->device[0]) {
-         Error_abort1("Cannot open UPS device: \"%s\" --\n"
-               "For a link to detailed USB trouble shooting information,\n"
-               "please see <http://www.apcupsd.com/support.html>.\n", _ups->device);
-      } else {
-         Error_abort0("Cannot find UPS device --\n"
-               "For a link to detailed USB trouble shooting information,\n"
-               "please see <http://www.apcupsd.com/support.html>.\n");
-      }
-   }
+   bool rc = open_usb_device();
 
    _ups->clear_slave();
    write_unlock(_ups);
-   return 1;
+   return rc;
 }
 
 /*

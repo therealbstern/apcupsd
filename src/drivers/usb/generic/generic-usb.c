@@ -624,12 +624,7 @@ bool GenericUsbUpsDriver::Open()
 
    write_lock(_ups);
 
-   if (!open_usb_device()) {
-      write_unlock(_ups);
-      Error_abort0("Cannot find UPS device --\n"
-            "For a link to detailed USB trouble shooting information,\n"
-            "please see <http://www.apcupsd.com/support.html>.\n");
-   }
+   bool rc = open_usb_device();
 
    /*
     * Note, we set _ups->fd here so the "core" of apcupsd doesn't
@@ -642,7 +637,7 @@ bool GenericUsbUpsDriver::Open()
 
    _ups->clear_slave();
    write_unlock(_ups);
-   return 1;
+   return rc;
 }
 
 bool GenericUsbUpsDriver::Close()
