@@ -68,7 +68,7 @@ case "$1" in
    mainsback)
    ;;
    failing)
-      printf "UPS battery power exhaused. Doing shutdown.\n" | wall -a
+      printf "UPS battery power exhausted. Doing shutdown.\n" | wall -a
    ;;
    timeout)
       printf "UPS battery runtime limit exceeded. Doing shutdown.\n" | wall -a

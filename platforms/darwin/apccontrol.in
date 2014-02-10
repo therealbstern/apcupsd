@@ -96,7 +96,7 @@ case "$1" in
 	fi
     ;;
     failing)
-	echo "Battery power exhaused on UPS ${2}. Doing shutdown." | ${WALL}
+	echo "Battery power exhausted on UPS ${2}. Doing shutdown." | ${WALL}
     ;;
     timeout)
 	echo "Battery time limit exceeded on UPS ${2}. Doing shutdown." | ${WALL}

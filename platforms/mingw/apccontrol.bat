@@ -123,7 +123,7 @@ GOTO :done
    GOTO :done
 
 :failing
-   %POPUP% "UPS battery power exhaused. Doing shutdown."
+   %POPUP% "UPS battery power exhausted. Doing shutdown."
    GOTO :done
 
 :timeout
