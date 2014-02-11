@@ -299,6 +299,12 @@ int GenericUsbUpsDriver::init_device(struct usb_device *dev)
    unsigned char* rdesc;
    int rdesclen;
 
+   /* Check if this is an APC device before we mess with it */
+   if (dev->descriptor.idVendor != VENDOR_APC) {
+      Dmsg(100, "Not an APC device.\n");
+      return 0;
+   }
+
    /* Open the device with libusb */
    fd = usb_open(dev);
    if (!fd) {
@@ -422,7 +428,6 @@ int GenericUsbUpsDriver::open_usb_device()
             bus->dirname, dev->filename, 
             dev->descriptor.idVendor, dev->descriptor.idProduct);
 
-         Dmsg(200, "Trying device %s:%s\n", bus->dirname, dev->filename);
          if (init_device(dev)) {
             /* Successfully found and initialized an UPS */
             return 1;
