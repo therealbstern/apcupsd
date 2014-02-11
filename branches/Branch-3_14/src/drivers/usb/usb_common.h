@@ -33,8 +33,7 @@
 #define LINK_RETRY_INTERVAL    5 
 
 /* USB Vendor ID's */ 
-#define VENDOR_APC 0x51D
-#define VENDOR_MGE 0x463
+#define VENDOR_APC 0x051D
 
 /* Various known USB codes */ 
 #define UPS_USAGE   0x840004
