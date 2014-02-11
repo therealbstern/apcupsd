@@ -360,18 +360,16 @@ int GenericUsbUpsDriver::init_device(struct usb_device *dev)
    /* Fetch the report descritor */
    rdesc = hidu_fetch_report_descriptor(fd, &rdesclen);
    if (!rdesc) {
-      usb_close(fd);
       Dmsg(100, "Unable to fetch report descriptor.\n");
-      return 0;
+      goto error_out;
    }
 
    /* Initialize hid parser with this descriptor */
    _rdesc = hid_use_report_desc(rdesc, rdesclen);
    free(rdesc);
    if (!_rdesc) {
-      usb_close(fd);
       Dmsg(100, "Unable to init parser with report descriptor.\n");
-      return 0;
+      goto error_out;
    }
 
    /* Does this device have an UPS application collection? */
@@ -384,13 +382,17 @@ int GenericUsbUpsDriver::init_device(struct usb_device *dev)
          HID_KIND_COLLECTION,   /* Match collection type */
          NULL)) {
       hid_dispose_report_desc(_rdesc);
-      usb_close(fd);
       Dmsg(100, "Device does not have an UPS application collection.\n");
-      return 0;
+      goto error_out;
    }
 
    _fd = fd;
    return 1;
+
+error_out:
+   usb_release_interface(fd, 0);
+   usb_close(fd);
+   return 0;
 }
 
 int GenericUsbUpsDriver::open_usb_device()
