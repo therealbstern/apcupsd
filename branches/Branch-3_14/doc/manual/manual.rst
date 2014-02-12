@@ -5812,6 +5812,40 @@ considerations pertaining to shutdown and killpower on Windows.
 .. include:: smartprotocol.rst
 
 
+NIS Network Server Protocol
+===========================
+
+The NIS network server in apcupsd is capable of sending status and events data
+to clients that request it. The communication between the client and the server
+is performed over a TCP connection to the NISPORT (normally port 3551). The 
+client opens a connection to the server and sends a message, to which the 
+server will reply with one or more messages. Each message consists of a 2-byte 
+length (in network byte order) followed by that many bytes of data. Both the 
+client->server and server->client messages follow this format.
+
+apcupsd supports two commands, sent as the body of a message:
+
+#. "status" - The status command requests that the server send a copy of all 
+   status values, in the form displayed by apcaccess. After the client sends the 
+   "status" command, the server will reply with a series of messges, each one 
+   containing one line of apcaccess status data. The end of the command series 
+   is indicated by an empty message (length of 0).
+
+#. "events" - The events command operates the same as "status" except the 
+   server replies with lines from the log of recent events.
+
+As an example, the following bytes would be sent by a client to solicit the status:
+
+::
+
+    0x00 0x06 0x73 0x74 0x61 0x74 0x75 0x73
+
+The first two bytes are the data length (6) in network byte order. The 6 bytes 
+of data that follow are the ASCII characters for "status". The server will
+respond to this command with a series of its own messages containing the status 
+data.
+
+
 Apcupsd RPM Packaging FAQ
 =========================
 
