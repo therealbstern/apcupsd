@@ -292,7 +292,7 @@ void GenericUsbUpsDriver::reinitialize_private_structure()
    }
 }
 
-int GenericUsbUpsDriver::init_device(struct usb_device *dev)
+bool GenericUsbUpsDriver::init_device(struct usb_device *dev)
 {
    usb_dev_handle *fd;
    int rc;
@@ -302,14 +302,14 @@ int GenericUsbUpsDriver::init_device(struct usb_device *dev)
    /* Check if this is an APC device before we mess with it */
    if (dev->descriptor.idVendor != VENDOR_APC) {
       Dmsg(100, "Not an APC device.\n");
-      return 0;
+      return false;
    }
 
    /* Open the device with libusb */
    fd = usb_open(dev);
    if (!fd) {
       Dmsg(100, "Unable to open device.\n");
-      return 0;
+      return false;
    }
 
 #ifdef LIBUSB_HAS_DETACH_KERNEL_DRIVER_NP
@@ -331,7 +331,7 @@ int GenericUsbUpsDriver::init_device(struct usb_device *dev)
       {
          usb_close(fd);
          Dmsg(100, "Device does not report serial number.\n");
-         return 0;
+         return false;
       }
 
       /* Remove leading/trailing whitespace */
@@ -343,7 +343,7 @@ int GenericUsbUpsDriver::init_device(struct usb_device *dev)
       if (strcasecmp(serial, _ups->device))
       {
          usb_close(fd);
-         return 0;
+         return false;
       }
    }
 
@@ -352,7 +352,7 @@ int GenericUsbUpsDriver::init_device(struct usb_device *dev)
    if (rc) {
       usb_close(fd);
       Dmsg(100, "Unable to set configuration (%d) %s.\n", rc, usb_strerror());
-      return 0;
+      return false;
    }
 
    /* Claim the interface */
@@ -360,7 +360,7 @@ int GenericUsbUpsDriver::init_device(struct usb_device *dev)
    if (rc) {
       usb_close(fd);
       Dmsg(100, "Unable to claim interface (%d) %s.\n", rc, usb_strerror());
-      return 0;
+      return false;
    }
 
    /* Fetch the report descritor */
@@ -393,15 +393,15 @@ int GenericUsbUpsDriver::init_device(struct usb_device *dev)
    }
 
    _fd = fd;
-   return 1;
+   return true;
 
 error_out:
    usb_release_interface(fd, 0);
    usb_close(fd);
-   return 0;
+   return false;
 }
 
-int GenericUsbUpsDriver::open_usb_device()
+bool GenericUsbUpsDriver::open_usb_device()
 {
    int i;
    struct usb_bus* bus;
@@ -430,7 +430,7 @@ int GenericUsbUpsDriver::open_usb_device()
 
          if (init_device(dev)) {
             /* Successfully found and initialized an UPS */
-            return 1;
+            return true;
          }
 
          dev = dev->next;
@@ -440,21 +440,21 @@ int GenericUsbUpsDriver::open_usb_device()
    }
 
    /* Failed to find an UPS */
-   return 0;
+   return false;
 }
 
 /* 
  * Called if there is an ioctl() or read() error, we close() and
  * re open() the port since the device was probably unplugged.
  */
-int GenericUsbUpsDriver::usb_link_check()
+bool GenericUsbUpsDriver::usb_link_check()
 {
    bool comm_err = true;
    int tlog;
    bool once = true;
 
    if (_linkcheck)
-      return 0;
+      return false;
 
    _linkcheck = true;               /* prevent recursion */
 
@@ -499,7 +499,7 @@ int GenericUsbUpsDriver::usb_link_check()
    }
 
    _linkcheck = false;
-   return 1;
+   return true;
 }
 
 /*

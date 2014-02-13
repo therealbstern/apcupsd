@@ -76,8 +76,8 @@ private:
 
    void reinitialize_private_structure();
    int open_device(const char *dev);
-   int open_usb_device();
-   int usb_link_check();
+   bool open_usb_device();
+   bool usb_link_check();
    bool populate_uval(USB_INFO *info, USB_VALUE *uval);
    USB_INFO *find_info_by_uref(struct hiddev_usage_ref *uref);
    USB_INFO *find_info_by_ucode(unsigned int ucode);

@@ -71,10 +71,9 @@ private:
    } USB_INFO;
 
    void reinitialize_private_structure();
-   int open_device(const char *dev);
-   int open_usb_device();
-   int usb_link_check();
-   int init_device(struct usb_device *dev);
+   bool open_usb_device();
+   bool usb_link_check();
+   bool init_device(struct usb_device *dev);
    bool populate_uval(USB_INFO *info, unsigned char *data, USB_VALUE *uval);
 
    usb_dev_handle *_fd;             /* Our UPS control pipe fd when open */

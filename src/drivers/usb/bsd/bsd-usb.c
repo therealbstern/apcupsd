@@ -77,7 +77,7 @@ void BsdUsbUpsDriver::reinitialize_private_structure()
  * Initializes the USB device by fetching its report descriptor
  * and making sure we can drive the device.
  */
-int BsdUsbUpsDriver::init_device(const char *devname)
+bool BsdUsbUpsDriver::init_device(const char *devname)
 {
    int fd, rc, rdesclen;
    struct usb_device_info devinfo;
@@ -86,14 +86,14 @@ int BsdUsbUpsDriver::init_device(const char *devname)
 
    fd = open(devname, O_RDWR | O_NOCTTY);
    if (fd == -1)
-      return 0;
+      return false;
 
    memset(&devinfo, 0, sizeof(devinfo));
    rc = ioctl(fd, USB_GET_DEVICEINFO, &devinfo);
    if (rc) {
       close(fd);
       Dmsg(100, "Unable to get device info.\n");
-      return 0;
+      return false;
    }
 
    /* Fetch the report descritor */
@@ -101,7 +101,7 @@ int BsdUsbUpsDriver::init_device(const char *devname)
    if (!rdesc) {
       close(fd);
       Dmsg(100, "Unable to fetch report descriptor.\n");
-      return 0;
+      return false;
    }
 
    /* Initialize hid parser with this descriptor */
@@ -110,7 +110,7 @@ int BsdUsbUpsDriver::init_device(const char *devname)
       free(rdesc);
       close(fd);
       Dmsg(100, "Unable to init parser with report descriptor.\n");
-      return 0;
+      return false;
    }
    free(rdesc);
 
@@ -126,7 +126,7 @@ int BsdUsbUpsDriver::init_device(const char *devname)
       hid_dispose_report_desc(_rdesc);
       close(fd);
       Dmsg(100, "Device does not have an UPS application collection.\n");
-      return 0;
+      return false;
    }
 
    _fd = fd;
@@ -149,11 +149,11 @@ int BsdUsbUpsDriver::init_device(const char *devname)
       hid_dispose_report_desc(_rdesc);
       close(_fd);
       _fd = -1;
-      return 0;
+      return false;
    }
    _intfd = fd;
 
-   return 1;
+   return true;
 }
 
 /*
@@ -162,7 +162,7 @@ int BsdUsbUpsDriver::init_device(const char *devname)
  * because the device may be unplugged and plugged back in -- the 
  * joys of USB devices.
  */
-int BsdUsbUpsDriver::open_usb_device()
+bool BsdUsbUpsDriver::open_usb_device()
 {
    int i, j, k, fd, rc;
    char busname[] = "/dev/usbN";
@@ -195,7 +195,7 @@ int BsdUsbUpsDriver::open_usb_device()
 
    for (i = 0; i < 10; i++) {
       if (init_device(_ups->device))
-         return 1;
+         return true;
 
       sleep(1);
    }
@@ -245,7 +245,7 @@ int BsdUsbUpsDriver::open_usb_device()
             Dmsg(200, "Trying device %s.\n", devname);
             if (init_device(devname)) {
                astrncpy(_ups->device, devname, sizeof(_ups->device));
-               return 1;
+               return true;
             }
          }
       }
@@ -254,21 +254,21 @@ int BsdUsbUpsDriver::open_usb_device()
    }
 
    _ups->device[0] = 0;
-   return 0;
+   return false;
 }
 
 /* 
  * Called if there is an ioctl() or read() error, we close() and
  * re open() the port since the device was probably unplugged.
  */
-int BsdUsbUpsDriver::usb_link_check()
+bool BsdUsbUpsDriver::usb_link_check()
 {
    bool comm_err = true;
    int tlog;
    bool once = true;
 
    if (_linkcheck)
-      return 0;
+      return false;
 
    _linkcheck = true;               /* prevent recursion */
 
@@ -314,7 +314,7 @@ int BsdUsbUpsDriver::usb_link_check()
    }
 
    _linkcheck = false;
-   return 1;
+   return true;
 }
 
 bool BsdUsbUpsDriver::pusb_ups_get_capabilities()

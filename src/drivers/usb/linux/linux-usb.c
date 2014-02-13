@@ -122,7 +122,7 @@ int LinuxUsbUpsDriver::open_device(const char *dev)
  * many times because the device may be unplugged and plugged
  * back in -- the joys of USB devices.
  */
-int LinuxUsbUpsDriver::open_usb_device()
+bool LinuxUsbUpsDriver::open_usb_device()
 {
    char devname[MAXSTRING];
    const char *hiddev[] =
@@ -165,7 +165,7 @@ int LinuxUsbUpsDriver::open_usb_device()
    for (i = 0; i < 10; i++) {
       _fd = open_device(_ups->device);
       if (_fd != -1)
-         return 1;
+         return true;
       sleep(1);
    }
 
@@ -173,7 +173,7 @@ int LinuxUsbUpsDriver::open_usb_device()
     * If user-specified device could not be opened, fail.
     */
    if (_orig_device[0] != 0)
-      return 0;
+      return false;
 
    /*
     * If we get here we failed to re-open a previously auto-detected
@@ -190,7 +190,7 @@ auto_detect:
             if (_fd != -1) {
                /* Successful open, save device name and return */
                astrncpy(_ups->device, devname, sizeof(_ups->device));
-               return 1;
+               return true;
             }
          }
       }
@@ -198,21 +198,21 @@ auto_detect:
    }
 
    _ups->device[0] = '\0';
-   return 0;
+   return false;
 }
 
 /* 
  * Called if there is an ioctl() or read() error, we close() and
  * re open() the port since the device was probably unplugged.
  */
-int LinuxUsbUpsDriver::usb_link_check()
+bool LinuxUsbUpsDriver::usb_link_check()
 {
    bool comm_err = true;
    int tlog;
    bool once = true;
 
    if (_linkcheck)
-      return 0;
+      return false;
 
    _linkcheck = true;               /* prevent recursion */
 
@@ -254,7 +254,7 @@ int LinuxUsbUpsDriver::usb_link_check()
    }
 
    _linkcheck = false;
-   return 1;
+   return true;
 }
 
 bool LinuxUsbUpsDriver::populate_uval(USB_INFO *info, USB_VALUE *uval)
