@@ -72,7 +72,7 @@ private:
    int _statlen;
    time_t _tlog;
    bool _comm_err;
-   bool _comm_loss;
+   int _comm_loss;
 };
 
 #endif   /* _NET_H */

@@ -134,7 +134,7 @@ NetUpsDriver::NetUpsDriver(UPSINFO *ups) :
    _statlen(0),
    _tlog(0),
    _comm_err(false),
-   _comm_loss(false)
+   _comm_loss(0)
 {
    memset(_device, 0, sizeof(_device));
    memset(_statbuf, 0, sizeof(_statbuf));
