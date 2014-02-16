@@ -119,7 +119,8 @@ class StatMgr;
    EventsTableDataSource *eventsDataSource;
    bool updateEvents;
 
-NSString *lastStatus;
+   // Previous status, used to detect changes
+   NSString *lastStatus;
 
    // Timer for UPS polling
    NSTimer *timer;
