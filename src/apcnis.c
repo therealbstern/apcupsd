@@ -265,18 +265,6 @@ void *handle_client_request(void *arg)
                break;
             }
          }
-      } else if (strncmp("eprominfo", line, 9) == 0) {
-         int len;
-
-         len = strlen(ups->eprom) + 1;
-         net_send(nsockfd, ups->eprom, len);
-         len = strlen(ups->firmrev) + 1;
-         net_send(nsockfd, ups->firmrev, len);
-         len = strlen(ups->upsmodel) + 1;
-         net_send(nsockfd, ups->upsmodel, len);
-
-         if (net_send(nsockfd, NULL, 0) < 0)
-            break;
       } else {
          net_send(nsockfd, errmsg, sizeof(errmsg));
          if (net_send(nsockfd, NULL, 0) < 0)
