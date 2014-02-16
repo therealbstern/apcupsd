@@ -265,10 +265,6 @@ void *handle_client_request(void *arg)
                break;
             }
          }
-      } else if (strncmp("rawupsinfo", line, 10) == 0) {
-         net_send(nsockfd, (char *)ups, sizeof(UPSINFO));
-         if (net_send(nsockfd, NULL, 0) < 0)
-            break;
       } else if (strncmp("eprominfo", line, 9) == 0) {
          int len;
 
