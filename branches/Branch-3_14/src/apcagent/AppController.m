@@ -155,7 +155,7 @@
    // Update tooltip with status and UPS name
    NSString *tooltip;
    if (upsname == "UPS_IDEN" || upsname.empty())
-      tooltip = [NSString stringWithCString:statstr];
+      tooltip = [NSString stringWithUTF8String:statstr];
    else
       tooltip = [NSString stringWithFormat:
                  @"%s: %s", upsname.str(), statstr.str()];
@@ -181,21 +181,21 @@
       [statusGrid reloadData];
 
       // Update status text
-      [statusText setStringValue:[NSString stringWithCString:statstr]];
+      [statusText setStringValue:[NSString stringWithUTF8String:statstr]];
 
       // Update runtime
-      NSString *tmp = [NSString stringWithCString:statmgr->Get("TIMELEFT")];
+      NSString *tmp = [NSString stringWithUTF8String:statmgr->Get("TIMELEFT")];
       tmp = [[tmp componentsSeparatedByString:@" "] objectAtIndex:0];
       [statusRuntime setStringValue:tmp];
 
       // Update battery
-      tmp = [NSString stringWithCString:statmgr->Get("BCHARGE")];
+      tmp = [NSString stringWithUTF8String:statmgr->Get("BCHARGE")];
       tmp = [[tmp componentsSeparatedByString:@" "] objectAtIndex:0];
       [statusBatteryText setStringValue:[tmp stringByAppendingString:@"%"]];
       [statusBatteryBar setIntValue:[tmp intValue]];
 
       // Update load
-      tmp = [NSString stringWithCString:statmgr->Get("LOADPCT")];
+      tmp = [NSString stringWithUTF8String:statmgr->Get("LOADPCT")];
       tmp = [[tmp componentsSeparatedByString:@" "] objectAtIndex:0];
       [statusLoadText setStringValue:[tmp stringByAppendingString:@"%"]];
       [statusLoadBar setIntValue:[tmp intValue]];
@@ -216,7 +216,7 @@
    }
 
    // If status has changed, display a popup window
-   NSString *newStatus = [NSString stringWithCString:statstr];
+   NSString *newStatus = [NSString stringWithUTF8String:statstr];
    if (doPopup && [lastStatus length] && 
        ![lastStatus isEqualToString:newStatus])
    {
@@ -492,9 +492,9 @@
 
    alist<astring>::const_iterator iter;
    for (iter = keys.begin(); iter != keys.end(); ++iter)
-      [_keys addObject:[NSString stringWithCString:*iter]];
+      [_keys addObject:[NSString stringWithUTF8String:*iter]];
    for (iter = values.begin(); iter != values.end(); ++iter)
-      [_values addObject:[NSString stringWithCString:*iter]];
+      [_values addObject:[NSString stringWithUTF8String:*iter]];
 
    [_mutex unlock];
 }
@@ -556,7 +556,7 @@
    alist<astring>::const_iterator iter;
    for (iter = stats.begin(); iter != stats.end(); ++iter)
    {
-      NSString *data = [NSString stringWithCString:*iter];
+      NSString *data = [NSString stringWithUTF8String:*iter];
       [strings addObject:data];
    }
    [mutex unlock];
