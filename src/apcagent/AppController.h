@@ -30,6 +30,11 @@
 
 class StatMgr;
 
+// Prior to 10.6, NSTableViewDataSource was an informal protocol
+#if __MAC_OS_X_VERSION_MAX_ALLOWED < 1060
+@protocol NSTableViewDataSource <NSObject> @end
+#endif 
+
 @interface StatusTableDataSource: NSObject <NSTableViewDataSource>
 {
    NSLock *_mutex;
