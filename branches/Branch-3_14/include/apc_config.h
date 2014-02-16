@@ -171,10 +171,4 @@ extern int inet_pton(int af, const char *src, void *dst);
 # endif
 #endif
 
-#ifndef __cplusplus
-#define bool int
-#define true 1
-#define false 0
-#endif
-
 #endif   /* _APC_CONFIG */
