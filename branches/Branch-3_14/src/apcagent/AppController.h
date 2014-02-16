@@ -30,7 +30,7 @@
 
 class StatMgr;
 
-@interface StatusTableDataSource: NSObject
+@interface StatusTableDataSource: NSObject <NSTableViewDataSource>
 {
    NSLock *_mutex;
    NSMutableArray *_keys;
@@ -45,7 +45,7 @@ class StatMgr;
    row:(int)rowIndex;
 @end
 
-@interface EventsTableDataSource: NSObject
+@interface EventsTableDataSource: NSObject <NSTableViewDataSource>
 {
    NSLock *mutex;
    NSMutableArray *strings;
