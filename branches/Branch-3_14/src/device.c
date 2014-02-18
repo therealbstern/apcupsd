@@ -173,7 +173,7 @@ int fillUPS(UPSINFO *ups)
 static void open_ups(UPSINFO *ups)
 {
    // Don't issue a COMMLOST event until we've been running for a little while
-   static const unsigned int COMMLOST_EVENT_GRACE_PERIOD = 60;
+   static const time_t COMMLOST_EVENT_GRACE_PERIOD = 60;
 
    time_t event_time = 0;
 
