@@ -51,8 +51,12 @@ bool ApcSmartUpsDriver::Open()
    }
 #endif
 
+   Dmsg(50, "Opening port %s\n", opendev);
    if ((_ups->fd = open(opendev, O_RDWR | O_NOCTTY | O_NDELAY | O_BINARY)) < 0)
-      Error_abort2("Cannot open UPS port %s: %s\n", opendev, strerror(errno));
+   {
+      Dmsg(50, "Cannot open UPS port %s: %s\n", opendev, strerror(errno));
+      return false;
+   }
 
    /* Cancel the no delay we just set */
    cmd = fcntl(_ups->fd, F_GETFL, 0);
@@ -99,6 +103,7 @@ bool ApcSmartUpsDriver::Close()
 {
    /* Reset serial line to old values */
    if (_ups->fd >= 0) {
+      Dmsg(50, "Closing port\n");
       tcflush(_ups->fd, TCIFLUSH);
       tcsetattr(_ups->fd, TCSANOW, &_oldtio);
       tcflush(_ups->fd, TCIFLUSH);
