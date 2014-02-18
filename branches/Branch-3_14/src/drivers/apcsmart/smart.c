@@ -378,12 +378,31 @@ void ApcSmartUpsDriver::UPSlinkCheck()
       }
 
       /*
+       * If we've declared COMMLOST, close the port and reopen it after we
+       * sleep a little while. This is helpful for cases where the serial
+       * device is removable and the user might have yanked it out and the dev
+       * node will change when they plug it back in.
+       */
+      if (_ups->is_commlost())
+         Close();
+
+      /*
        * This sleep should not be necessary since the smart_poll() 
        * routine normally waits TIMER_FAST (1) seconds. However,
        * in case the serial port is broken and generating spurious
        * characters, we sleep to reduce CPU consumption. 
        */
       sleep(1);
+
+      /*
+       * Open the port again. This might fail, in which case _ups->fd will be
+       * invalid which will cause smart_poll() to fail and we'll end up back
+       * here again. When Open() eventually succeeds and smart_poll() starts
+       * to function, we'll exit COMMLOST state.
+       */
+      if (_ups->is_commlost())
+         Open();
+
       tcflush(_ups->fd, TCIOFLUSH);
    }
 
