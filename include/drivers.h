@@ -72,7 +72,7 @@
  *   This function always returns.
  *   This function must lock the UPSINFO structure.
  *
- * ups_program_eeprom(ups, command, data)
+ * program_eeprom(ups, command, data)
  *   Commit changes to the internal UPS eeprom.
  *   This function performs the eeprom change command (using data),
  *     then returns.
@@ -107,8 +107,8 @@ public:
    virtual bool kill_power()     { return false; }
    virtual bool shutdown()       { return false; }
 
-   virtual bool ups_program_eeprom(int cmd, const char *data) { return false; }
-   virtual bool ups_entry_point(int cmd, void *data)          { return false; }
+   virtual bool program_eeprom(int cmd, const char *data) { return false; }
+   virtual bool entry_point(int cmd, void *data)          { return false; }
 
 protected:
    UPSINFO *_ups;
@@ -130,8 +130,8 @@ typedef struct upsdriver {
 #define device_read_volatile_data(ups) ups->driver->read_volatile_data()
 #define device_get_capabilities(ups) ups->driver->get_capabilities()
 #define device_check_state(ups) ups->driver->check_state()
-#define device_program_eeprom(ups, command, data) ups->driver->ups_program_eeprom(command, data)
-#define device_entry_point(ups, command, data) ups->driver->ups_entry_point(command, data)
+#define device_program_eeprom(ups, command, data) ups->driver->program_eeprom(command, data)
+#define device_entry_point(ups, command, data) ups->driver->entry_point(command, data)
 
 /* Now some defines for device_entry_point commands. */
 

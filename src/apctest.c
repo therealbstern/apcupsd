@@ -141,7 +141,7 @@ static int test5_done = 0;
    ((ApcSmartUpsDriver*)((ups)->driver))->writechar(a)
 
 #define apcsmart_ups_program_eeprom(ups,ci,cmd) \
-   (ups)->driver->ups_program_eeprom(ci, cmd)
+   (ups)->driver->program_eeprom(ci, cmd)
 
 #define usb_read_int_from_ups(ups, ci, result) \
    ((UsbUpsDriver*)((ups)->driver))->read_int_from_ups(ci, result)
