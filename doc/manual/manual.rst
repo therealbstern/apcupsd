@@ -14,7 +14,7 @@ computer in the event of a power failure.**
 
 | |date| |time|
 | This manual documents apcupsd version 3.14.x
-| Copyright |(C)| 2004-2013 Adam Kropelin
+| Copyright |(C)| 2004-2014 Adam Kropelin
 | Copyright |(C)| 1999-2005 Kern Sibbald
 
 *Copying and distribution of this file, with or without modification, 
@@ -1462,9 +1462,9 @@ Debian information into the following two subdirectories:
 You can also find the official Debian packages on the Debian site
 at:
 
--  http://packages.debian.org/stable/apcupsd
--  http://packages.debian.org/testing/apcupsd
--  http://packages.debian.org/unstable/apcupsd
+-  https://packages.debian.org/stable/apcupsd
+-  https://packages.debian.org/testing/apcupsd
+-  https://packages.debian.org/unstable/apcupsd
 
 
 FreeBSD
@@ -4499,7 +4499,7 @@ restore thus permitting an automatic reboot.
 Nevertheless some people prefer to do a full power down. To do so,
 you might want to get a copy of PsShutdown, which does have a power
 down option. You can find it and a lot more useful software at:
-http://www.sysinternals.com/ntw2k/freeware/pstools.shtml. To use their shutdown
+http://technet.microsoft.com/en-us/sysinternals/bb897541.aspx. To use their shutdown
 program rather than the apcupsd supplied version, you simply edit:
 
 ::
@@ -6012,7 +6012,7 @@ Contributors
     Adam Kropelin (akropel1@rochester.rr.com)
 
 **RPM Packager**
-    D\. Scott Barninger (barninger@fairfieldcomputers.com)
+    D\. Scott Barninger
 
 **CGI and HTML fixer**
     William King (wrking@dadaboom.com)
@@ -6054,7 +6054,7 @@ Contributors
 
 **Win32 Port**
     Kern Sibbald (kern@sibbald.com)
-    Paul Z. Stagner (paul.stagner@charterco.com) testing
+    Paul Z. Stagner
 
 **WEB Interfaces**
     Kern Sibbald (kern@sibbald.com)
