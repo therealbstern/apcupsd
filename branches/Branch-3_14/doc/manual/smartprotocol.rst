@@ -10,7 +10,7 @@ apcupsd information file.
 
 The start of this chapter of the apcupsd manual in HTML format was
 pulled from the Network UPS Tools (NUT) site 
-(http://www.networkupstools.org/protocols/apcsmart.html). It
+(http://www.networkupstools.org/ups-protocols/apcsmart.html). It
 has been an invaluable tool in improving apcupsd, and I consider it
 the Bible of APC UPS programming. In the course of using it, I
 have added information gleaned from apcupsd and information
