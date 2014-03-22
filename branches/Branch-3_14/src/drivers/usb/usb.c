@@ -289,7 +289,7 @@ bool UsbUpsDriver::get_capabilities()
 bool UsbUpsDriver::usb_process_value_bup(int ci, USB_VALUE* uval)
 {
    int val = (int)uval->dValue;
-   char digits[] = { (val>>16) & 0xff, (val>>8) & 0xff, val & 0xff, 0 };
+   char digits[] = { (char)(val>>16), (char)(val>>8), (char)val, 0 };
 
    /* UPS_RUNTIME_LEFT */
    if(ci == CI_RUNTIM)
