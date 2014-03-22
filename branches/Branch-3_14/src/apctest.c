@@ -2631,7 +2631,7 @@ static void modbus_calibration()
 {
    uint64_t result;
    bool aborted;
-   int ilastbl;
+   uint64_t ilastbl;
 
    if (!ups->UPS_Cap[CI_ST_STAT] || 
        !ups->UPS_Cap[CI_BATTLEV] ||
@@ -2663,7 +2663,7 @@ static void modbus_calibration()
    pmsg("Waiting for calibration to complete...\n"
         "To abort the calibration, press ENTER.\n");
 
-	ilastbl = 0;
+   ilastbl = 0;
    while (1) {
 
       if (!modbus_read_int_from_ups(ups, REG_CALIBRATION_STATUS, &result)) {
@@ -2721,9 +2721,8 @@ static void modbus_calibration()
          return;
       }
 
-#if 0
       // Output the battery level
-      if (modbus_read_int_from_ups(ups, CI_BATTLEV, &result)) {
+      if (modbus_read_int_from_ups(ups, REG_STATE_OF_CHARGE_PCT, &result)) {
          if (ilastbl == result)
             pmsg(".");
          else
@@ -2731,7 +2730,6 @@ static void modbus_calibration()
          ilastbl = result;
 	   }
       else
-#endif
          pmsg(".");
    }
 
