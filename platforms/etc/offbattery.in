@@ -5,11 +5,9 @@
 # UPS goes back on to the mains after a power failure.
 # We send an email message to root to notify him.
 #
-SYSADMIN=root
-APCUPSD_MAIL="@APCUPSD_MAIL@"
 
 HOSTNAME=`hostname`
-MSG="$HOSTNAME Power has returned"
+MSG="$HOSTNAME UPS $1 Power has returned"
 #
 (
    echo "Subject: $MSG"
