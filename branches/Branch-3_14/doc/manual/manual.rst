@@ -597,8 +597,14 @@ name, you can use rules like the following:
     KERNEL=="hiddev*", SYSFS{serial}=="JB0319033692", SYMLINK="ups0"
     KERNEL=="hiddev*", SYSFS{serial}=="JB0320004845", SYMLINK="ups1"
 
-*Note that this rule uses modern udev syntax and is appropriate
-only for more recent distros such as RHEL4 and FC4.*
+*Note that this rule uses udev syntax that is appropriate
+only for distros such as RHEL4 and FC4 and others of a similar vintage.*
+
+More recent distros such as FC15 should use something like this:
+
+::
+
+    KERNEL=="hiddev*", ATTRS{manufacturer}=="American Power Conversion", ATTRS{serial}=="BB0100009999  ", OWNER="root", SYMLINK+="ups0"
 
 Replace the serial number in quotes with the one that corresponds
 to your UPS. Then whenever you plug in your UPS a symlink called
@@ -618,6 +624,14 @@ You can use...
 
 ...to get more information on the fields that can be matched
 besides serial number.
+
+To find the available attributes to match (note that the serial is NOT always 
+the UPS serial on the box or in the USB connect message in /var/log/messages), 
+use:
+
+::
+
+    udevadm info --attribute-walk --name=/dev/usb/hiddev0
 
 An additional device-node-related problem is the use of dynamic
 minors. Some distributions, such as Mandrake 10, ship with a kernel
