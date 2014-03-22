@@ -1122,7 +1122,6 @@ the following:
       --sbindir=/sbin \
       --with-cgi-bin=/var/www/cgi-bin \
       --enable-cgi \
-      --with-css-dir=/var/www/docs/css \
       --with-log-dir=/etc/apcupsd
 
 By default, '``make install``' will install the executable files in
@@ -1264,9 +1263,6 @@ to customize your installation.
     configuration option allows you to define the directory where the
     CGI programs will be installed. The default is /etc/apcupsd, which
     is probably not what you want.
---with-css-dir=path  This option allows you
-    to specify where you want apcupsd to put the Cascading Style Sheet
-    that goes with the multimoncss.cgi CGI program.
 --enable-apcsmart  Turns on generation of the APC Smart driver (default).
 --enable-dumb  Turns on generation of the dumb signalling driver code (default).
 --enable-usb   Turns on generation of the USB driver code. By default this is disabled.
