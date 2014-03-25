@@ -57,12 +57,12 @@
  * Copy a string from the SNMP library structure into the UPSINFO structure.
  * Structure member names are formed by simple patterns, so allow the caller
  * to specify nice readable names and build the ugly ones ourself. Source
- * strings are NOT nul-terminated, so let astrncpy terminate them for us.
+ * strings are NOT nul-terminated, so let strlcpy terminate them for us.
  */
 #define SNMP_STRING(oid, field, dest) \
    do \
    {  \
-      astrncpy(_ups->dest, \
+      strlcpy(_ups->dest, \
          (const char *)data->oid->oid##field, \
          MIN(sizeof(_ups->dest), data->oid->_##oid##field##Length+1)); \
    }  \
