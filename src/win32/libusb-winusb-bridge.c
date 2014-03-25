@@ -259,6 +259,11 @@ int usb_claim_interface(usb_dev_handle *dev, int iface)
    return 0;
 }
 
+int usb_release_interface(usb_dev_handle *dev, int iface)
+{
+   return 0;
+}
+
 int usb_control_msg(usb_dev_handle *dev, int requesttype, 
                     int request, int value, int index, 
                     char *bytes, int size, int timeout)

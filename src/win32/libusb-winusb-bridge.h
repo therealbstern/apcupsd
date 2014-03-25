@@ -91,6 +91,7 @@ int usb_control_msg(
    int index, char *bytes, int size, int timeout);
 int usb_set_configuration(usb_dev_handle *dev, int configuration);
 int usb_claim_interface(usb_dev_handle *dev, int iface);
+int usb_release_interface(usb_dev_handle *dev, int iface);
 int usb_reset(usb_dev_handle *dev);
 char *usb_strerror(void);
 void usb_init(void);
