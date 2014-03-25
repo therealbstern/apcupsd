@@ -373,25 +373,25 @@ bool ModbusUpsDriver::UpdateCi(const CiInfo *info)
    {
    case CI_UPSMODEL:
       Dmsg(80, "Got CI_UPSMODEL: %s\n", str.str());
-      astrncpy(_ups->upsmodel, str, sizeof(_ups->upsmodel));
+      strlcpy(_ups->upsmodel, str, sizeof(_ups->upsmodel));
       break;
    case CI_SERNO:
       Dmsg(80, "Got CI_SERNO: %s\n", str.str());
-      astrncpy(_ups->serial, str, sizeof(_ups->serial));
+      strlcpy(_ups->serial, str, sizeof(_ups->serial));
       break;
    case CI_IDEN:
       Dmsg(80, "Got CI_IDEN: %s\n", str.str());
-      astrncpy(_ups->upsname, str, sizeof(_ups->upsname));
+      strlcpy(_ups->upsname, str, sizeof(_ups->upsname));
       break;
    case CI_REVNO:
       Dmsg(80, "Got CI_REVNO: %s\n", str.str());
-      astrncpy(_ups->firmrev, str, sizeof(_ups->firmrev));
+      strlcpy(_ups->firmrev, str, sizeof(_ups->firmrev));
       break;
    case CI_BUPSelfTest:
       Dmsg(80, "Got MODBUS_MAP_ID: %s\n", str.str());
       tmpstr = _ups->firmrev; // Append to REVNO
       tmpstr += " / " + str;
-      astrncpy(_ups->firmrev, tmpstr, sizeof(_ups->firmrev));
+      strlcpy(_ups->firmrev, tmpstr, sizeof(_ups->firmrev));
       break;
    case CI_MANDAT:
       Dmsg(80, "Got CI_MANDAT: %llu\n", uint);
@@ -446,13 +446,13 @@ bool ModbusUpsDriver::UpdateCi(const CiInfo *info)
    case CI_STESTI:
       Dmsg(80, "Got CI_STESTI: %llx\n", uint);
       if (uint & 0x1)
-         astrncpy(_ups->selftest, "OFF", sizeof(_ups->selftest));
+         strlcpy(_ups->selftest, "OFF", sizeof(_ups->selftest));
       else if (uint & 0x2)
-         astrncpy(_ups->selftest, "ON", sizeof(_ups->selftest));
+         strlcpy(_ups->selftest, "ON", sizeof(_ups->selftest));
       else if (uint & 0x14)
-         astrncpy(_ups->selftest, "168", sizeof(_ups->selftest));
+         strlcpy(_ups->selftest, "168", sizeof(_ups->selftest));
       else if (uint & 0x28)
-         astrncpy(_ups->selftest, "336", sizeof(_ups->selftest));
+         strlcpy(_ups->selftest, "336", sizeof(_ups->selftest));
       break;
    case CI_LTRANS:
       Dmsg(80, "Got CI_LTRANS: %llu\n", uint);

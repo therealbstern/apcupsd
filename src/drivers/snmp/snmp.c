@@ -52,7 +52,7 @@ int SnmpUpsDriver::initialize_device_data()
       exit(1);
    }
 
-   astrncpy(_device, _ups->device, sizeof(_device));
+   strlcpy(_device, _ups->device, sizeof(_device));
 
    /*
     * Split the DEVICE statement and assign pointers to the various parts.

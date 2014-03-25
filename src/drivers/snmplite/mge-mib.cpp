@@ -80,7 +80,7 @@ static void mge_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
    {
    case CI_UPSMODEL:
       Dmsg(80, "Got CI_UPSMODEL: %s\n", data.str.str());
-      astrncpy(ups->upsmodel, data.str, sizeof(ups->upsmodel));
+      strlcpy(ups->upsmodel, data.str, sizeof(ups->upsmodel));
       break;
 
    case CI_STATUS:
@@ -267,11 +267,11 @@ static void mge_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       Dmsg(80, "Got CI_DALARM: %d\n", data.u32);
       if (data.u32 == 1)
          if (alarmtimer)
-            astrncpy(ups->beepstate, "Timed", sizeof(ups->beepstate));
+            strlcpy(ups->beepstate, "Timed", sizeof(ups->beepstate));
          else
-            astrncpy(ups->beepstate, "NoDelay", sizeof(ups->beepstate));
+            strlcpy(ups->beepstate, "NoDelay", sizeof(ups->beepstate));
       else
-         astrncpy(ups->beepstate, "NoAlarm", sizeof(ups->beepstate));
+         strlcpy(ups->beepstate, "NoAlarm", sizeof(ups->beepstate));
       break;
 
    case CI_DLBATT:
@@ -281,35 +281,35 @@ static void mge_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
 
    case CI_IDEN:
       Dmsg(80, "Got CI_IDEN: %s\n", data.str.str());
-      astrncpy(ups->upsname, data.str, sizeof(ups->upsname));
+      strlcpy(ups->upsname, data.str, sizeof(ups->upsname));
       break;
 
    case CI_STESTI:
       Dmsg(80, "Got CI_STESTI: %d\n", data.u32);
       switch (data.u32) {
       case 2:
-         astrncpy(ups->selftest, "weekly", sizeof(ups->selftest));
+         strlcpy(ups->selftest, "weekly", sizeof(ups->selftest));
          break;
       case 3:
-         astrncpy(ups->selftest, "monthly", sizeof(ups->selftest));
+         strlcpy(ups->selftest, "monthly", sizeof(ups->selftest));
          break;
       case 4:
-         astrncpy(ups->selftest, "atTurnOn", sizeof(ups->selftest));
+         strlcpy(ups->selftest, "atTurnOn", sizeof(ups->selftest));
          break;
       case 6:
-         astrncpy(ups->selftest, "daily", sizeof(ups->selftest));
+         strlcpy(ups->selftest, "daily", sizeof(ups->selftest));
          break;
       case 1: // unknown
       case 5: // none
       default:
-         astrncpy(ups->selftest, "OFF", sizeof(ups->selftest));
+         strlcpy(ups->selftest, "OFF", sizeof(ups->selftest));
          break;
       }
       break;
 
    case CI_SERNO:
       Dmsg(80, "Got CI_SERNO: %s\n", data.str.str());
-      astrncpy(ups->serial, data.str, sizeof(ups->serial));
+      strlcpy(ups->serial, data.str, sizeof(ups->serial));
       break;
 
    case CI_NOMBATTV:
@@ -324,7 +324,7 @@ static void mge_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
 
    case CI_REVNO:
       Dmsg(80, "Got CI_REVNO: %s\n", data.str.str());
-      astrncpy(ups->firmrev, data.str, sizeof(ups->firmrev));
+      strlcpy(ups->firmrev, data.str, sizeof(ups->firmrev));
       break;
 
    case CI_ATEMP:

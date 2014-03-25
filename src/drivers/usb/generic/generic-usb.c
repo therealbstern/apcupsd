@@ -148,7 +148,7 @@ bool GenericUsbUpsDriver::populate_uval(USB_INFO *info, unsigned char *data, USB
       if (!str)
          return false;
 
-      astrncpy(val.sValue, str, sizeof(val.sValue));
+      strlcpy(val.sValue, str, sizeof(val.sValue));
       val.value_type = V_STRING;
 
       Dmsg(200, "Def val=%d exp=%d sVal=\"%s\" ci=%d\n", info->value,

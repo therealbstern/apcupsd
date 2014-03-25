@@ -189,7 +189,7 @@ auto_detect:
             _fd = open_device(devname);
             if (_fd != -1) {
                /* Successful open, save device name and return */
-               astrncpy(_ups->device, devname, sizeof(_ups->device));
+               strlcpy(_ups->device, devname, sizeof(_ups->device));
                return true;
             }
          }
@@ -275,7 +275,7 @@ bool LinuxUsbUpsDriver::populate_uval(USB_INFO *info, USB_VALUE *uval)
       if (ioctl(_fd, HIDIOCGSTRING, &sdesc) < 0)
          return false;
 
-      astrncpy(val.sValue, sdesc.value, sizeof(val.sValue));
+      strlcpy(val.sValue, sdesc.value, sizeof(val.sValue));
       val.value_type = V_STRING;
 
       Dmsg(200, "Def val=%d exp=%d sVal=\"%s\" ci=%d\n", info->uref.value,
@@ -556,7 +556,7 @@ bool LinuxUsbUpsDriver::Open()
    write_lock(_ups);
 
    if (_orig_device[0] == 0)
-      astrncpy(_orig_device, _ups->device, sizeof(_orig_device));
+      strlcpy(_orig_device, _ups->device, sizeof(_orig_device));
 
    bool rc = open_usb_device();
 

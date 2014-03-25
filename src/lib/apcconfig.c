@@ -242,7 +242,7 @@ static int start_ups(UPSINFO *ups, int offset, const GENINFO * size, const char 
    init_ups_struct(ups);
 
 
-   astrncpy((char *)AT(ups, offset), x, (int)size);
+   strlcpy((char *)AT(ups, offset), x, (int)size);
 
    /* Terminate string */
    *((char *)AT(ups, (offset + (int)size) - 1)) = 0;
@@ -326,8 +326,8 @@ static int match_range(UPSINFO *ups, int offset, const GENINFO * vs, const char 
     * overwrite memory.
     */
    t->type = vs->type;
-   astrncpy(t->name, vs->name, sizeof(t->name));
-   astrncpy(t->long_name, vs->long_name, sizeof(t->long_name));
+   strlcpy(t->name, vs->name, sizeof(t->name));
+   strlcpy(t->long_name, vs->long_name, sizeof(t->long_name));
    return SUCCESS;
 }
 
@@ -381,7 +381,7 @@ static int match_str(UPSINFO *ups, int offset, const GENINFO * gen, const char *
    long size = (long)gen;
 
    /* Copy the string so we can edit it in place */
-   astrncpy(x, v, sizeof(x));
+   strlcpy(x, v, sizeof(x));
 
    /* Remove trailing comment, if there is one */
    char *ptr = strchr(x, '#');
@@ -393,7 +393,7 @@ static int match_str(UPSINFO *ups, int offset, const GENINFO * gen, const char *
    while (ptr >= x && isspace(*ptr))
       *ptr-- = '\0';
 
-   astrncpy((char *)AT(ups, offset), x, (int)size);
+   strlcpy((char *)AT(ups, offset), x, (int)size);
    return SUCCESS;
 }
 
@@ -557,8 +557,8 @@ void init_ups_struct(UPSINFO *ups)
 
    ups->set_plugged();
 
-   astrncpy(ups->nologin.name, logins[0].name, sizeof(ups->nologin.name));
-   astrncpy(ups->nologin.long_name, logins[0].long_name,
+   strlcpy(ups->nologin.name, logins[0].name, sizeof(ups->nologin.name));
+   strlcpy(ups->nologin.long_name, logins[0].long_name,
       sizeof(ups->nologin.long_name));
    ups->nologin.type = logins[0].type;
 
@@ -581,16 +581,16 @@ void init_ups_struct(UPSINFO *ups)
 
    /* EPROM values that can be changed with config directives */
 
-   astrncpy(ups->sensitivity, "-1", sizeof(ups->sensitivity));  /* no value */
+   strlcpy(ups->sensitivity, "-1", sizeof(ups->sensitivity));  /* no value */
    ups->dwake = -1;
    ups->dshutd = -1;
-   astrncpy(ups->selftest, "-1", sizeof(ups->selftest));        /* no value */
+   strlcpy(ups->selftest, "-1", sizeof(ups->selftest));        /* no value */
    ups->lotrans = -1;
    ups->hitrans = -1;
    ups->rtnpct = -1;
    ups->dlowbatt = -1;
    ups->NomOutputVoltage = -1;
-   astrncpy(ups->beepstate, "-1", sizeof(ups->beepstate));      /* no value */
+   strlcpy(ups->beepstate, "-1", sizeof(ups->beepstate));      /* no value */
 
    ups->nisip[0] = 0;              /* no nis IP file as default */
 
@@ -610,9 +610,9 @@ void init_ups_struct(UPSINFO *ups)
    ups->event_fd = -1;             /* no file open */
 
    /* Default paths */
-   astrncpy(ups->scriptdir, SYSCONFDIR, sizeof(ups->scriptdir));
-   astrncpy(ups->pwrfailpath, PWRFAILDIR, sizeof(ups->pwrfailpath));
-   astrncpy(ups->nologinpath, NOLOGDIR, sizeof(ups->nologinpath));
+   strlcpy(ups->scriptdir, SYSCONFDIR, sizeof(ups->scriptdir));
+   strlcpy(ups->pwrfailpath, PWRFAILDIR, sizeof(ups->pwrfailpath));
+   strlcpy(ups->nologinpath, NOLOGDIR, sizeof(ups->nologinpath));
    
    /* Initialize UPS function codes */
    ups->UPS_Cmd[CI_STATUS] = APC_CMD_STATUS;
@@ -671,7 +671,7 @@ void check_for_config(UPSINFO *ups, char *cfgfile)
       Error_abort2("Error opening configuration file (%s): %s\n",
          cfgfile, strerror(errno));
    }
-   astrncpy(ups->configfile, cfgfile, sizeof(ups->configfile));
+   strlcpy(ups->configfile, cfgfile, sizeof(ups->configfile));
 
    /* Check configuration file format is a suitable version */
    if (fgets(line, sizeof(line), apcconf) != NULL) {
@@ -792,7 +792,7 @@ jump_into_the_loop:
     * simplify, so don't bother.
     */
    if (ups->lockpath[0] == '\0')
-      astrncpy(ups->lockpath, LOCK_DEFAULT, sizeof(ups->lockpath));
+      strlcpy(ups->lockpath, LOCK_DEFAULT, sizeof(ups->lockpath));
 
    /* If APC_NET, the lockfile is not needed. */
    if (ups->cable.type != APC_NET) {

@@ -180,19 +180,19 @@ static void rfc1628_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       switch (data.u32)
       {
       case 1: // Disabled ("None")
-         astrncpy(ups->beepstate, "N", sizeof(ups->beepstate));
+         strlcpy(ups->beepstate, "N", sizeof(ups->beepstate));
          break;
       case 2: // Enabled (T = 30 seconds...just a guess)
       case 3: // Muted (but enabled)
       default:
-         astrncpy(ups->beepstate, "T", sizeof(ups->beepstate));
+         strlcpy(ups->beepstate, "T", sizeof(ups->beepstate));
          break;
       }
       break;
 
    case CI_UPSMODEL:
       Dmsg(80, "Got CI_UPSMODEL: %s\n", data.str.str());
-      astrncpy(ups->upsmodel, data.str, sizeof(ups->upsmodel));
+      strlcpy(ups->upsmodel, data.str, sizeof(ups->upsmodel));
       break;
 
    case CI_BATTLEV:
@@ -207,7 +207,7 @@ static void rfc1628_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
 
    case CI_IDEN:
       Dmsg(80, "Got CI_IDEN: %s\n", data.str.str());
-      astrncpy(ups->upsname, data.str, sizeof(ups->upsname));
+      strlcpy(ups->upsname, data.str, sizeof(ups->upsname));
       break;
 
    case CI_STATUS:
@@ -258,7 +258,7 @@ static void rfc1628_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
 
    case CI_REVNO:
       Dmsg(80, "Got CI_REVNO: %s\n", data.str.str());
-      astrncpy(ups->firmrev, data.str, sizeof(ups->firmrev));
+      strlcpy(ups->firmrev, data.str, sizeof(ups->firmrev));
       break;
 
    case CI_DLBATT:

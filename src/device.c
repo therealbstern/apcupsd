@@ -151,7 +151,7 @@ void prep_device(UPSINFO *ups)
    if (ups->upsname[0] == 0) {     /* no name given */
       gethostname(ups->upsname, sizeof(ups->upsname) - 1);
       if (ups->upsname[0] == 0)    /* error */
-         astrncpy(ups->upsname, "default", sizeof(ups->upsname));
+         strlcpy(ups->upsname, "default", sizeof(ups->upsname));
    }
 
    /* Strip unprintable characters from UPS model */

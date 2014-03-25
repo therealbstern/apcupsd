@@ -168,7 +168,7 @@ bool PcnetUpsDriver::pcnet_process_data(const char *key, const char *value)
       break;
    case CI_LQUAL:
       Dmsg(80, "Got CI_LQUAL: %s\n", value);
-      astrncpy(_ups->linequal, value, sizeof(_ups->linequal));
+      strlcpy(_ups->linequal, value, sizeof(_ups->linequal));
       break;
    case CI_WHY_BATT:
       Dmsg(80, "Got CI_WHY_BATT: %s\n", value);
@@ -254,7 +254,7 @@ bool PcnetUpsDriver::pcnet_process_data(const char *key, const char *value)
        */
    case CI_SENS:
       Dmsg(80, "Got CI_SENS: %s\n", value);
-      astrncpy(_ups->sensitivity, value, sizeof(_ups->sensitivity));
+      strlcpy(_ups->sensitivity, value, sizeof(_ups->sensitivity));
       break;
    case CI_DWAKE:
       Dmsg(80, "Got CI_DWAKE: %s\n", value);
@@ -278,7 +278,7 @@ bool PcnetUpsDriver::pcnet_process_data(const char *key, const char *value)
       break;
    case CI_DALARM:
       Dmsg(80, "Got CI_DALARM: %s\n", value);
-      astrncpy(_ups->beepstate, value, sizeof(_ups->beepstate));
+      strlcpy(_ups->beepstate, value, sizeof(_ups->beepstate));
       break;
    case CI_DLBATT:
       Dmsg(80, "Got CI_DLBATT: %s\n", value);
@@ -287,23 +287,23 @@ bool PcnetUpsDriver::pcnet_process_data(const char *key, const char *value)
    case CI_IDEN:
       Dmsg(80, "Got CI_IDEN: %s\n", value);
       if (_ups->upsname[0] == 0)
-         astrncpy(_ups->upsname, value, sizeof(_ups->upsname));
+         strlcpy(_ups->upsname, value, sizeof(_ups->upsname));
       break;
    case CI_STESTI:
       Dmsg(80, "Got CI_STESTI: %s\n", value);
-      astrncpy(_ups->selftest, value, sizeof(_ups->selftest));
+      strlcpy(_ups->selftest, value, sizeof(_ups->selftest));
       break;
    case CI_MANDAT:
       Dmsg(80, "Got CI_MANDAT: %s\n", value);
-      astrncpy(_ups->birth, value, sizeof(_ups->birth));
+      strlcpy(_ups->birth, value, sizeof(_ups->birth));
       break;
    case CI_SERNO:
       Dmsg(80, "Got CI_SERNO: %s\n", value);
-      astrncpy(_ups->serial, value, sizeof(_ups->serial));
+      strlcpy(_ups->serial, value, sizeof(_ups->serial));
       break;
    case CI_BATTDAT:
       Dmsg(80, "Got CI_BATTDAT: %s\n", value);
-      astrncpy(_ups->battdat, value, sizeof(_ups->battdat));
+      strlcpy(_ups->battdat, value, sizeof(_ups->battdat));
       break;
    case CI_NOMOUTV:
       Dmsg(80, "Got CI_NOMOUTV: %s\n", value);
@@ -315,7 +315,7 @@ bool PcnetUpsDriver::pcnet_process_data(const char *key, const char *value)
       break;
    case CI_REVNO:
       Dmsg(80, "Got CI_REVNO: %s\n", value);
-      astrncpy(_ups->firmrev, value, sizeof(_ups->firmrev));
+      strlcpy(_ups->firmrev, value, sizeof(_ups->firmrev));
       break;
    case CI_EXTBATTS:
       Dmsg(80, "Got CI_EXTBATTS: %s\n", value);
@@ -327,11 +327,11 @@ bool PcnetUpsDriver::pcnet_process_data(const char *key, const char *value)
       break;
    case CI_UPSMODEL:
       Dmsg(80, "Got CI_UPSMODEL: %s\n", value);
-      astrncpy(_ups->upsmodel, value, sizeof(_ups->upsmodel));
+      strlcpy(_ups->upsmodel, value, sizeof(_ups->upsmodel));
       break;
    case CI_EPROM:
       Dmsg(80, "Got CI_EPROM: %s\n", value);
-      astrncpy(_ups->eprom, value, sizeof(_ups->eprom));
+      strlcpy(_ups->eprom, value, sizeof(_ups->eprom));
       break;
    default:
       Dmsg(100, "Unknown CI (%d)\n", ci);
@@ -617,7 +617,7 @@ bool PcnetUpsDriver::Open()
    if (_ups->device[0] != '\0') {
       _auth = true;
 
-      astrncpy(_device, _ups->device, sizeof(_device));
+      strlcpy(_device, _ups->device, sizeof(_device));
       ptr = _device;
 
       _ipaddr = ptr;

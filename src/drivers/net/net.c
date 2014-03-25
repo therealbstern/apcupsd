@@ -189,7 +189,7 @@ bool NetUpsDriver::getupsvar(const char *request, char *answer, int anslen)
       Dmsg(100, "Hey!!! No match in getupsvar for %s!\n", request);
    }
 
-   astrncpy(answer, "Not found", anslen);
+   strlcpy(answer, "Not found", anslen);
    return false;
 }
 
@@ -379,9 +379,9 @@ bool NetUpsDriver::get_ups_status_flag(int fill)
 
 bool NetUpsDriver::Open()
 {
-   astrncpy(_device, _ups->device, sizeof(_device));
-   astrncpy(_ups->master_name, _ups->device, sizeof(_ups->master_name));
-   astrncpy(_ups->upsclass.long_name, "Net Slave", sizeof(_ups->upsclass.long_name));
+   strlcpy(_device, _ups->device, sizeof(_device));
+   strlcpy(_ups->master_name, _ups->device, sizeof(_ups->master_name));
+   strlcpy(_ups->upsclass.long_name, "Net Slave", sizeof(_ups->upsclass.long_name));
 
    /* Now split the device. */
    _hostname = _device;
@@ -566,10 +566,10 @@ bool NetUpsDriver::read_static_data()
       }
 
       if (GETVAR(CI_SERNO, "serialno"))
-         astrncpy(_ups->serial, answer, sizeof(_ups->serial));
+         strlcpy(_ups->serial, answer, sizeof(_ups->serial));
 
       if (GETVAR(CI_BATTDAT, "battdate"))
-         astrncpy(_ups->battdat, answer, sizeof(_ups->battdat));
+         strlcpy(_ups->battdat, answer, sizeof(_ups->battdat));
 
       if (GETVAR(CI_NOMBATTV, "nombattv"))
          _ups->nombattv = atof(answer);
@@ -584,7 +584,7 @@ bool NetUpsDriver::read_static_data()
          _ups->NomPower = (int)atof(answer);
 
       if (GETVAR(CI_REVNO, "firmware"))
-         astrncpy(_ups->firmrev, answer, sizeof(_ups->firmrev));
+         strlcpy(_ups->firmrev, answer, sizeof(_ups->firmrev));
 
       _got_static_data = true;
    } else {
