@@ -201,7 +201,7 @@ AC_CHECK_FUNCS(
    [AC_MSG_ERROR([cannot find required function.])]
 )
 
-AC_CHECK_FUNCS(snprintf vsnprintf)
+AC_CHECK_FUNCS(snprintf vsnprintf strlcpy strlcat)
 
 dnl Solaris hides nanosleep in one of two libraries depending on version
 dnl If we can't find it at all we'll just use our own substitute.

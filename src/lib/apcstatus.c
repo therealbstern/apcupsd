@@ -92,44 +92,44 @@ int output_status(UPSINFO *ups, int sockfd,
 
    /* Now output human readable form */
    if (ups->is_calibration())
-      astrncat(status, "CAL ", sizeof(status));
+      strlcat(status, "CAL ", sizeof(status));
 
    if (ups->is_trim())
-      astrncat(status, "TRIM ", sizeof(status));
+      strlcat(status, "TRIM ", sizeof(status));
 
    if (ups->is_boost())
-      astrncat(status, "BOOST ", sizeof(status));
+      strlcat(status, "BOOST ", sizeof(status));
 
    if (ups->is_online())
-      astrncat(status, "ONLINE ", sizeof(status));
+      strlcat(status, "ONLINE ", sizeof(status));
 
    if (ups->is_onbatt())
-      astrncat(status, "ONBATT ", sizeof(status));
+      strlcat(status, "ONBATT ", sizeof(status));
 
    if (ups->is_overload())
-      astrncat(status, "OVERLOAD ", sizeof(status));
+      strlcat(status, "OVERLOAD ", sizeof(status));
 
    if (ups->is_battlow())
-      astrncat(status, "LOWBATT ", sizeof(status));
+      strlcat(status, "LOWBATT ", sizeof(status));
 
    if (ups->is_replacebatt())
-      astrncat(status, "REPLACEBATT ", sizeof(status));
+      strlcat(status, "REPLACEBATT ", sizeof(status));
 
    if (!ups->is_battpresent())
-      astrncat(status, "NOBATT ", sizeof(status));
+      strlcat(status, "NOBATT ", sizeof(status));
 
    if (ups->is_slave())
-      astrncat(status, "SLAVE ", sizeof(status));
+      strlcat(status, "SLAVE ", sizeof(status));
 
    if (ups->is_slavedown())
-      astrncat(status, "SLAVEDOWN", sizeof(status));
+      strlcat(status, "SLAVEDOWN", sizeof(status));
 
    /* These override the above */
    if (ups->is_commlost())
-      astrncpy(status, "COMMLOST ", sizeof(status));
+      strlcpy(status, "COMMLOST ", sizeof(status));
 
    if (ups->is_shutdown())
-      astrncpy(status, "SHUTTING DOWN", sizeof(status));
+      strlcpy(status, "SHUTTING DOWN", sizeof(status));
 
    s_write(ups, "STATUS   : %s\n", status);
 

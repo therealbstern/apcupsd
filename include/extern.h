@@ -237,6 +237,12 @@ char *afgets(char *s, int size, FILE *fd);
 void *amalloc(size_t size);
 void *arealloc(void *buf, size_t size);
 void *acalloc(size_t size1, size_t size2);
+#ifndef HAVE_STRLCPY
+size_t strlcpy(char *dst, const char *src, size_t size);
+#endif
+#ifndef HAVE_STRLCAT
+size_t strlcat(char *dst, const char *src, size_t size);
+#endif
 
 /* In apcwinipc.c */
 int winioctl(int fd, int func, int *addr);
