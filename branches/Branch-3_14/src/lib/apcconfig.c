@@ -798,8 +798,8 @@ jump_into_the_loop:
    if (ups->cable.type != APC_NET) {
       char *dev = strrchr(ups->device, '/');
 
-      astrncat(ups->lockpath, APC_LOCK_PREFIX, sizeof(ups->lockpath));
-      astrncat(ups->lockpath, dev ? ++dev : ups->device, sizeof(ups->lockpath));
+      strlcat(ups->lockpath, APC_LOCK_PREFIX, sizeof(ups->lockpath));
+      strlcat(ups->lockpath, dev ? ++dev : ups->device, sizeof(ups->lockpath));
    } else {
       ups->lockpath[0] = 0;
       ups->lockfile = -1;
@@ -809,8 +809,8 @@ jump_into_the_loop:
    Dmsg(200, "After config scriptdir: \"%s\"\n", ups->scriptdir);
    Dmsg(200, "After config pwrfailpath: \"%s\"\n", ups->pwrfailpath);
    Dmsg(200, "After config nologinpath: \"%s\"\n", ups->nologinpath);
-   astrncat(ups->nologinpath, NOLOGIN_FILE, sizeof(ups->nologinpath));
-   astrncat(ups->pwrfailpath, PWRFAIL_FILE, sizeof(ups->pwrfailpath));
+   strlcat(ups->nologinpath, NOLOGIN_FILE, sizeof(ups->nologinpath));
+   strlcat(ups->pwrfailpath, PWRFAIL_FILE, sizeof(ups->pwrfailpath));
 
    switch (ups->nologin.type) {
    case TIMEOUT:

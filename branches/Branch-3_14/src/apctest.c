@@ -398,25 +398,25 @@ static void print_bits(int bits)
    asnprintf(buf, sizeof(buf), "IOCTL GET: %x ", bits);
 
    if (bits & le_bit)
-      astrncat(buf, "LE ", sizeof(buf));
+      strlcat(buf, "LE ", sizeof(buf));
    if (bits & st_bit)
-      astrncat(buf, "ST ", sizeof(buf));
+      strlcat(buf, "ST ", sizeof(buf));
    if (bits & sr_bit)
-      astrncat(buf, "SR ", sizeof(buf));
+      strlcat(buf, "SR ", sizeof(buf));
    if (bits & dtr_bit)
-      astrncat(buf, "DTR ", sizeof(buf));
+      strlcat(buf, "DTR ", sizeof(buf));
    if (bits & rts_bit)
-      astrncat(buf, "RTS ", sizeof(buf));
+      strlcat(buf, "RTS ", sizeof(buf));
    if (bits & cts_bit)
-      astrncat(buf, "CTS ", sizeof(buf));
+      strlcat(buf, "CTS ", sizeof(buf));
    if (bits & cd_bit)
-      astrncat(buf, "CD ", sizeof(buf));
+      strlcat(buf, "CD ", sizeof(buf));
    if (bits & rng_bit)
-      astrncat(buf, "RNG ", sizeof(buf));
+      strlcat(buf, "RNG ", sizeof(buf));
    if (bits & dsr_bit)
-      astrncat(buf, "DSR ", sizeof(buf));
+      strlcat(buf, "DSR ", sizeof(buf));
 
-   astrncat(buf, "\n", sizeof(buf));
+   strlcat(buf, "\n", sizeof(buf));
 
    pmsg(buf);
 }
