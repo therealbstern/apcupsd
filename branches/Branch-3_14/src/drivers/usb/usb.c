@@ -504,16 +504,16 @@ void UsbUpsDriver::usb_process_value(int ci, USB_VALUE* uval)
    case CI_STESTI:
       switch (uval->iValue) {
       case 0:
-         astrncpy(_ups->selftest, "None", sizeof(_ups->selftest));
+         strlcpy(_ups->selftest, "None", sizeof(_ups->selftest));
          break;
       case 1:
-         astrncpy(_ups->selftest, "Power On", sizeof(_ups->selftest));
+         strlcpy(_ups->selftest, "Power On", sizeof(_ups->selftest));
          break;
       case 2:
-         astrncpy(_ups->selftest, "7 days", sizeof(_ups->selftest));
+         strlcpy(_ups->selftest, "7 days", sizeof(_ups->selftest));
          break;
       default:
-         astrncpy(_ups->selftest, "14 days", sizeof(_ups->selftest));
+         strlcpy(_ups->selftest, "14 days", sizeof(_ups->selftest));
          break;
       }
       break;
@@ -581,7 +581,7 @@ void UsbUpsDriver::usb_process_value(int ci, USB_VALUE* uval)
    /* UPS_NAME */
    case CI_IDEN:
       if (_ups->upsname[0] == 0 && uval->sValue[0] != 0)
-         astrncpy(_ups->upsname, uval->sValue, sizeof(_ups->upsname));
+         strlcpy(_ups->upsname, uval->sValue, sizeof(_ups->upsname));
       break;
 
    /* model, firmware */
@@ -592,7 +592,7 @@ void UsbUpsDriver::usb_process_value(int ci, USB_VALUE* uval)
          p += 3;              // Skip "FW:"
          while (isspace(*p))  // Skip whitespace after "FW:"
             p++;
-         astrncpy(_ups->firmrev, p, sizeof(_ups->firmrev));
+         strlcpy(_ups->firmrev, p, sizeof(_ups->firmrev));
          _ups->UPS_Cap[CI_REVNO] = true;
       }
 
@@ -601,7 +601,7 @@ void UsbUpsDriver::usb_process_value(int ci, USB_VALUE* uval)
       while (isspace(*p))
          p++;
 
-      astrncpy(_ups->upsmodel, p, sizeof(_ups->upsmodel));
+      strlcpy(_ups->upsmodel, p, sizeof(_ups->upsmodel));
       break;
 
    /* WAKEUP_DELAY */
@@ -661,7 +661,7 @@ void UsbUpsDriver::usb_process_value(int ci, USB_VALUE* uval)
 
    /* UPS_SERIAL_NUMBER */
    case CI_SERNO:
-      astrncpy(_ups->serial, uval->sValue, sizeof(_ups->serial));
+      strlcpy(_ups->serial, uval->sValue, sizeof(_ups->serial));
 
       /*
        * If serial number has garbage, trash it.
@@ -702,16 +702,16 @@ void UsbUpsDriver::usb_process_value(int ci, USB_VALUE* uval)
    case CI_SENS:
       switch (uval->iValue) {
       case 0:
-         astrncpy(_ups->sensitivity, "Low", sizeof(_ups->sensitivity));
+         strlcpy(_ups->sensitivity, "Low", sizeof(_ups->sensitivity));
          break;
       case 1:
-         astrncpy(_ups->sensitivity, "Medium", sizeof(_ups->sensitivity));
+         strlcpy(_ups->sensitivity, "Medium", sizeof(_ups->sensitivity));
          break;
       case 2:
-         astrncpy(_ups->sensitivity, "High", sizeof(_ups->sensitivity));
+         strlcpy(_ups->sensitivity, "High", sizeof(_ups->sensitivity));
          break;
       default:
-         astrncpy(_ups->sensitivity, "Unknown", sizeof(_ups->sensitivity));
+         strlcpy(_ups->sensitivity, "Unknown", sizeof(_ups->sensitivity));
          break;
       }
       break;
@@ -719,11 +719,11 @@ void UsbUpsDriver::usb_process_value(int ci, USB_VALUE* uval)
    case CI_DALARM:
       switch (uval->iValue) {
       case 1: // Never
-         astrncpy(_ups->beepstate, "N", sizeof(_ups->beepstate));
+         strlcpy(_ups->beepstate, "N", sizeof(_ups->beepstate));
          break;
       case 2: // 30 seconds
       default:
-         astrncpy(_ups->beepstate, "T", sizeof(_ups->beepstate));
+         strlcpy(_ups->beepstate, "T", sizeof(_ups->beepstate));
          break;
       }
       break;

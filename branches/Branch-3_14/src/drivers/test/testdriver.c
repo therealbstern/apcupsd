@@ -100,9 +100,9 @@ bool TestUpsDriver::read_static_data()
    /* UPS_NAME */
 
    /* model, firmware */
-   astrncpy(_ups->upsmodel, "Test Driver", sizeof(_ups->upsmodel));
-   astrncpy(_ups->firmrev, "Rev 1.0", sizeof(_ups->firmrev));
-   astrncpy(_ups->selftest, "336", sizeof(_ups->selftest));
+   strlcpy(_ups->upsmodel, "Test Driver", sizeof(_ups->upsmodel));
+   strlcpy(_ups->firmrev, "Rev 1.0", sizeof(_ups->firmrev));
+   strlcpy(_ups->selftest, "336", sizeof(_ups->selftest));
 
    /* WAKEUP_DELAY */
    _ups->dwake = 2 * 60;
@@ -123,13 +123,13 @@ bool TestUpsDriver::read_static_data()
    _ups->dlowbatt = 2;
 
    /* UPS_MANUFACTURE_DATE */
-   astrncpy(_ups->birth, "2001-09-21", sizeof(_ups->birth));
+   strlcpy(_ups->birth, "2001-09-21", sizeof(_ups->birth));
 
    /* Last UPS_BATTERY_REPLACE */
-   astrncpy(_ups->battdat, "2001-09-21", sizeof(_ups->battdat));
+   strlcpy(_ups->battdat, "2001-09-21", sizeof(_ups->battdat));
 
    /* UPS_SERIAL_NUMBER */
-   astrncpy(_ups->serial, "NO-123456", sizeof(_ups->serial));
+   strlcpy(_ups->serial, "NO-123456", sizeof(_ups->serial));
 
    /* Nominal output voltage when on batteries */
    _ups->NomOutputVoltage = 230;

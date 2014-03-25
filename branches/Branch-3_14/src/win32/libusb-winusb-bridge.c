@@ -188,7 +188,7 @@ int usb_find_devices(void)
       // Populate device structure
       struct usb_device *dev = devices+ndevs;
       memset(dev, 0, sizeof(*dev));
-      astrncpy(dev->filename, detailData->DevicePath, sizeof(dev->filename));
+      strlcpy(dev->filename, detailData->DevicePath, sizeof(dev->filename));
       dev->bus = &bus;
       if (ndevs)
       {

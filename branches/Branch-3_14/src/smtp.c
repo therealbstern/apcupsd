@@ -259,7 +259,7 @@ int main(int argc, char *argv[])
       exit(1);
    }
 
-   astrncpy(my_hostname, hp->h_name, sizeof(my_hostname));
+   strlcpy(my_hostname, hp->h_name, sizeof(my_hostname));
    Dmsg(20, "My hostname is: %s\n", my_hostname);
 
    /* Determine from address. */

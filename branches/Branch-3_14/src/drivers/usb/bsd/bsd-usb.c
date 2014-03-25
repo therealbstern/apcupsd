@@ -132,7 +132,7 @@ bool BsdUsbUpsDriver::init_device(const char *devname)
    _fd = fd;
 
    /* Open the interrupt pipe */
-   astrncpy(intdevname, devname, sizeof(intdevname));
+   strlcpy(intdevname, devname, sizeof(intdevname));
 
 #ifdef HAVE_FREEBSD_OS
    /* ugen0 -> ugen0.1 */
@@ -186,7 +186,7 @@ bool BsdUsbUpsDriver::open_usb_device()
       goto auto_detect;
 
    if (_orig_device[0] == 0)
-      astrncpy(_orig_device, _ups->device, sizeof(_orig_device));
+      strlcpy(_orig_device, _ups->device, sizeof(_orig_device));
 
    /*
     * No range support yet... Name the device specifically or we will
@@ -237,14 +237,14 @@ bool BsdUsbUpsDriver::open_usb_device()
                break;
 
          if (k < USB_MAX_DEVNAMES) {
-            astrncpy(devname, "/dev/", sizeof(devname));
+            strlcpy(devname, "/dev/", sizeof(devname));
             astrncat(devname, devinfo.udi_devnames[k], sizeof(devname));
 #if defined(HAVE_OPENBSD_OS) || defined(HAVE_NETBSD_OS)
             astrncat(devname, ".00", sizeof(devname));
 #endif
             Dmsg(200, "Trying device %s.\n", devname);
             if (init_device(devname)) {
-               astrncpy(_ups->device, devname, sizeof(_ups->device));
+               strlcpy(_ups->device, devname, sizeof(_ups->device));
                return true;
             }
          }
@@ -423,7 +423,7 @@ bool BsdUsbUpsDriver::populate_uval(USB_INFO *info, unsigned char *data, USB_VAL
       if (!str)
          return false;
 
-      astrncpy(val.sValue, str, sizeof(val.sValue));
+      strlcpy(val.sValue, str, sizeof(val.sValue));
       val.value_type = V_STRING;
 
       Dmsg(200, "Def val=%d exp=%d sVal=\"%s\" ci=%d\n", info->value,
@@ -690,7 +690,7 @@ bool BsdUsbUpsDriver::Open()
    write_lock(_ups);
 
    if (_orig_device[0] == 0)
-      astrncpy(_orig_device, _ups->device, sizeof(_orig_device));
+      strlcpy(_orig_device, _ups->device, sizeof(_orig_device));
 
    bool rc = open_usb_device();
 

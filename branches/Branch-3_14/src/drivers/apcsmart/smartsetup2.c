@@ -97,7 +97,7 @@ bool ApcSmartUpsDriver::get_capabilities()
    write_lock(_ups);
 
    /* Get UPS capabilities string */
-   astrncpy(caps, smart_poll(_ups->UPS_Cmd[CI_UPS_CAPS]), sizeof(caps));
+   strlcpy(caps, smart_poll(_ups->UPS_Cmd[CI_UPS_CAPS]), sizeof(caps));
    if (strlen(caps) && (strcmp(caps, "NA") != 0)) {
       _ups->UPS_Cap[CI_UPS_CAPS] = TRUE;
 
@@ -128,7 +128,7 @@ bool ApcSmartUpsDriver::get_capabilities()
       if (_ups->UPS_Cmd[i] == 0)
          continue;
       if (!cmds || strchr(cmds, _ups->UPS_Cmd[i]) != NULL) {
-         astrncpy(answer, smart_poll(_ups->UPS_Cmd[i]), sizeof(answer));
+         strlcpy(answer, smart_poll(_ups->UPS_Cmd[i]), sizeof(answer));
          if (*answer && (strcmp(answer, "NA") != 0)) {
             _ups->UPS_Cap[i] = true;
          }
@@ -142,7 +142,7 @@ bool ApcSmartUpsDriver::get_capabilities()
     */
    if (!_ups->UPS_Cap[CI_UPSMODEL] && 
        (!cmds || strchr(cmds, APC_CMD_OLDFWREV) != NULL)) {
-      astrncpy(answer, smart_poll(APC_CMD_OLDFWREV), sizeof(answer));
+      strlcpy(answer, smart_poll(APC_CMD_OLDFWREV), sizeof(answer));
       if (*answer && (strcmp(answer, "NA") != 0)) {
          _ups->UPS_Cap[CI_UPSMODEL] = true;
          _ups->UPS_Cmd[CI_UPSMODEL] = APC_CMD_OLDFWREV;
@@ -155,7 +155,7 @@ bool ApcSmartUpsDriver::get_capabilities()
     */
    if (!_ups->UPS_Cap[CI_REVNO] && 
        (!cmds || strchr(cmds, APC_CMD_OLDFWREV) != NULL)) {
-      astrncpy(answer, smart_poll(APC_CMD_OLDFWREV), sizeof(answer));
+      strlcpy(answer, smart_poll(APC_CMD_OLDFWREV), sizeof(answer));
       if (*answer && (strcmp(answer, "NA") != 0)) {
          _ups->UPS_Cap[CI_REVNO] = true;
          _ups->UPS_Cmd[CI_REVNO] = APC_CMD_OLDFWREV;

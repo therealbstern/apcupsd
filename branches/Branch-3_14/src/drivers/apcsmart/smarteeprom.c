@@ -261,7 +261,7 @@ void ApcSmartUpsDriver::change_ups_name(const char *newname)
 
    _ups->upsname[0] = '\0';
    smart_poll(_ups->UPS_Cmd[CI_IDEN]);
-   astrncpy(_ups->upsname, smart_poll(_ups->UPS_Cmd[CI_IDEN]),
+   strlcpy(_ups->upsname, smart_poll(_ups->UPS_Cmd[CI_IDEN]),
       sizeof(_ups->upsname));
 
    fprintf(stderr, "The new UPS name is: %s\n", _ups->upsname);
@@ -287,7 +287,7 @@ void ApcSmartUpsDriver::change_ups_battery_date(const char *newdate)
       return;
    }
 
-   astrncpy(battdat, newdate, sizeof(battdat));
+   strlcpy(battdat, newdate, sizeof(battdat));
 
    /* Ask for battdat */
    write(_ups->fd, &c, 1);          /* c = 'x' */
@@ -313,7 +313,7 @@ void ApcSmartUpsDriver::change_ups_battery_date(const char *newdate)
 
    _ups->battdat[0] = '\0';
    smart_poll(_ups->UPS_Cmd[CI_BATTDAT]);
-   astrncpy(_ups->battdat, smart_poll(_ups->UPS_Cmd[CI_BATTDAT]),
+   strlcpy(_ups->battdat, smart_poll(_ups->UPS_Cmd[CI_BATTDAT]),
       sizeof(_ups->battdat));
 
    fprintf(stderr, "The new UPS battery date is: %s\n", _ups->battdat);
@@ -344,9 +344,9 @@ int ApcSmartUpsDriver::change_ups_eeprom_item(const char *title, const char cmd,
    }
 
    fprintf(stderr, "The old UPS %s is: %s\n", title, oldvalue);
-   astrncpy(allvalues, oldvalue, sizeof(allvalues));
+   strlcpy(allvalues, oldvalue, sizeof(allvalues));
    astrncat(allvalues, " ", sizeof(allvalues));
-   astrncpy(lastvalue, oldvalue, sizeof(lastvalue));
+   strlcpy(lastvalue, oldvalue, sizeof(lastvalue));
 
    /* Try a second time to ensure that it is a stable value */
    write(_ups->fd, &cmd, 1);
@@ -406,7 +406,7 @@ int ApcSmartUpsDriver::change_ups_eeprom_item(const char *title, const char cmd,
       if (strcmp(lastvalue, response) != 0) {
          astrncat(allvalues, response, sizeof(allvalues));
          astrncat(allvalues, " ", sizeof(allvalues));
-         astrncpy(lastvalue, response, sizeof(lastvalue));
+         strlcpy(lastvalue, response, sizeof(lastvalue));
       }
       sleep(5);                    /* don't cycle too fast */
    }

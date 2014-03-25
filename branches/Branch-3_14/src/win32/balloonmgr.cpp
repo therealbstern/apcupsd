@@ -93,8 +93,8 @@ void BalloonMgr::post()
    nid.cbSize = sizeof(nid);
    nid.uID = IDI_APCUPSD;
    nid.uFlags = NIF_INFO;
-   astrncpy(nid.szInfo, balloon.text.c_str(), sizeof(nid.szInfo));
-   astrncpy(nid.szInfoTitle, balloon.title.c_str(), sizeof(nid.szInfoTitle));
+   strlcpy(nid.szInfo, balloon.text.c_str(), sizeof(nid.szInfo));
+   strlcpy(nid.szInfoTitle, balloon.title.c_str(), sizeof(nid.szInfoTitle));
    nid.uTimeout = MAX_TIMEOUT;
    nid.dwInfoFlags = NIIF_INFO;
    Shell_NotifyIcon(NIM_MODIFY, &nid);

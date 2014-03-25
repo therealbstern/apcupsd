@@ -202,7 +202,7 @@ int main(int argc, char *argv[])
     * If there's not one in libc, then we have to use our own version
     * which requires initialization.
     */
-   astrncpy(argvalue, argv[0], sizeof(argvalue));
+   strlcpy(argvalue, argv[0], sizeof(argvalue));
 
    ups = new_ups();                /* get new ups */
    if (!ups)

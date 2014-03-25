@@ -465,7 +465,7 @@ bool ApcSmartUpsDriver::read_volatile_data()
    if (_ups->UPS_Cap[CI_LQUAL]) {
       answer = smart_poll(_ups->UPS_Cmd[CI_LQUAL]);
       Dmsg(80, "Got CI_LQUAL: %s\n", answer);
-      astrncpy(_ups->linequal, answer, sizeof(_ups->linequal));
+      strlcpy(_ups->linequal, answer, sizeof(_ups->linequal));
    }
 
    /* Reason for last transfer to batteries */
@@ -639,7 +639,7 @@ bool ApcSmartUpsDriver::read_static_data()
    if (_ups->UPS_Cap[CI_SENS]) {
       answer = smart_poll(_ups->UPS_Cmd[CI_SENS]);
       Dmsg(80, "Got CI_SENS: %s\n", answer);
-      astrncpy(_ups->sensitivity, answer, sizeof(_ups->sensitivity));
+      strlcpy(_ups->sensitivity, answer, sizeof(_ups->sensitivity));
    }
 
    /* WAKEUP_DELAY */
@@ -681,7 +681,7 @@ bool ApcSmartUpsDriver::read_static_data()
    if (_ups->UPS_Cap[CI_DALARM]) {
       answer = smart_poll(_ups->UPS_Cmd[CI_DALARM]);
       Dmsg(80, "Got CI_DALARM: %s\n", answer);
-      astrncpy(_ups->beepstate, answer, sizeof(_ups->beepstate));
+      strlcpy(_ups->beepstate, answer, sizeof(_ups->beepstate));
    }
 
    /* LOWBATT_SHUTDOWN_LEVEL */
@@ -695,35 +695,35 @@ bool ApcSmartUpsDriver::read_static_data()
    if (_ups->upsname[0] == 0 && _ups->UPS_Cap[CI_IDEN]) {
       answer = smart_poll(_ups->UPS_Cmd[CI_IDEN]);
       Dmsg(80, "Got CI_IDEN: %s\n", answer);
-      astrncpy(_ups->upsname, answer, sizeof(_ups->upsname));
+      strlcpy(_ups->upsname, answer, sizeof(_ups->upsname));
    }
 
    /* UPS_SELFTEST */
    if (_ups->UPS_Cap[CI_STESTI]) {
       answer = smart_poll(_ups->UPS_Cmd[CI_STESTI]);
       Dmsg(80, "Got CI_STESTI: %s\n", answer);
-      astrncpy(_ups->selftest, answer, sizeof(_ups->selftest));
+      strlcpy(_ups->selftest, answer, sizeof(_ups->selftest));
    }
 
    /* UPS_MANUFACTURE_DATE */
    if (_ups->UPS_Cap[CI_MANDAT]) {
       answer = smart_poll(_ups->UPS_Cmd[CI_MANDAT]);
       Dmsg(80, "Got CI_MANDAT: %s\n", answer);
-      astrncpy(_ups->birth, answer, sizeof(_ups->birth));
+      strlcpy(_ups->birth, answer, sizeof(_ups->birth));
    }
 
    /* UPS_SERIAL_NUMBER */
    if (_ups->UPS_Cap[CI_SERNO]) {
       answer = smart_poll(_ups->UPS_Cmd[CI_SERNO]);
       Dmsg(80, "Got CI_SERNO: %s\n", answer);
-      astrncpy(_ups->serial, answer, sizeof(_ups->serial));
+      strlcpy(_ups->serial, answer, sizeof(_ups->serial));
    }
 
    /* UPS_BATTERY_REPLACE */
    if (_ups->UPS_Cap[CI_BATTDAT]) {
       answer = smart_poll(_ups->UPS_Cmd[CI_BATTDAT]);
       Dmsg(80, "Got CI_BATTDAT: %s\n", answer);
-      astrncpy(_ups->battdat, answer, sizeof(_ups->battdat));
+      strlcpy(_ups->battdat, answer, sizeof(_ups->battdat));
    }
 
    /* Nominal output voltage when on batteries */
@@ -744,7 +744,7 @@ bool ApcSmartUpsDriver::read_static_data()
    if (_ups->UPS_Cap[CI_REVNO]) {
       answer = smart_poll(_ups->UPS_Cmd[CI_REVNO]);
       Dmsg(80, "Got CI_REVNO: %s\n", answer);
-      astrncpy(_ups->firmrev, answer, sizeof(_ups->firmrev));
+      strlcpy(_ups->firmrev, answer, sizeof(_ups->firmrev));
    }
 
    /* Number of external batteries installed */
@@ -766,10 +766,10 @@ bool ApcSmartUpsDriver::read_static_data()
       answer = smart_poll(_ups->UPS_Cmd[CI_UPSMODEL]);
       if (_ups->UPS_Cmd[CI_UPSMODEL] == APC_CMD_OLDFWREV) {
          /* Derive UPS model from old fw rev */
-         astrncpy(_ups->upsmodel, get_model_from_oldfwrev(answer), 
+         strlcpy(_ups->upsmodel, get_model_from_oldfwrev(answer), 
                   sizeof(_ups->upsmodel));
       } else {
-         astrncpy(_ups->upsmodel, answer, sizeof(_ups->upsmodel));
+         strlcpy(_ups->upsmodel, answer, sizeof(_ups->upsmodel));
       }
       Dmsg(80, "Got CI_UPSMODEL: %s\n", _ups->upsmodel);
    }
@@ -778,7 +778,7 @@ bool ApcSmartUpsDriver::read_static_data()
    if (_ups->UPS_Cap[CI_EPROM]) {
       answer = smart_poll(_ups->UPS_Cmd[CI_EPROM]);
       Dmsg(80, "Got CI_EPROM: %s\n", answer);
-      astrncpy(_ups->eprom, answer, sizeof(_ups->eprom));
+      strlcpy(_ups->eprom, answer, sizeof(_ups->eprom));
    }
 
    return SUCCESS;

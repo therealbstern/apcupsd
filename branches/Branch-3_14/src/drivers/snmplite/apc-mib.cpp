@@ -196,35 +196,35 @@ static void apc_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       {
       case 1: // Timed (uses CI_AlarmTimer)
          if (ups->UPS_Cap[CI_AlarmTimer] && alarmtimer < 30)
-            astrncpy(ups->beepstate, "0", sizeof(ups->beepstate)); // 5 secs
+            strlcpy(ups->beepstate, "0", sizeof(ups->beepstate)); // 5 secs
          else
-            astrncpy(ups->beepstate, "T", sizeof(ups->beepstate)); // 30 secs
+            strlcpy(ups->beepstate, "T", sizeof(ups->beepstate)); // 30 secs
          break;
       case 2: // LowBatt
-         astrncpy(ups->beepstate, "L", sizeof(ups->beepstate));
+         strlcpy(ups->beepstate, "L", sizeof(ups->beepstate));
          break;
       case 3: // None
-         astrncpy(ups->beepstate, "N", sizeof(ups->beepstate));
+         strlcpy(ups->beepstate, "N", sizeof(ups->beepstate));
          break;
       default:
-         astrncpy(ups->beepstate, "T", sizeof(ups->beepstate));
+         strlcpy(ups->beepstate, "T", sizeof(ups->beepstate));
          break;
       }
       break;
 
    case CI_UPSMODEL:
       Dmsg(80, "Got CI_UPSMODEL: %s\n", data.str.str());
-      astrncpy(ups->upsmodel, data.str, sizeof(ups->upsmodel));
+      strlcpy(ups->upsmodel, data.str, sizeof(ups->upsmodel));
       break;
 
    case CI_SERNO:
       Dmsg(80, "Got CI_SERNO: %s\n", data.str.str());
-      astrncpy(ups->serial, data.str, sizeof(ups->serial));
+      strlcpy(ups->serial, data.str, sizeof(ups->serial));
       break;
 
    case CI_MANDAT:
       Dmsg(80, "Got CI_MANDAT: %s\n", data.str.str());
-      astrncpy(ups->birth, data.str, sizeof(ups->birth));
+      strlcpy(ups->birth, data.str, sizeof(ups->birth));
       break;
 
    case CI_BATTLEV:
@@ -239,12 +239,12 @@ static void apc_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
 
    case CI_BATTDAT:
       Dmsg(80, "Got CI_BATTDAT: %s\n", data.str.str());
-      astrncpy(ups->battdat, data.str, sizeof(ups->battdat));
+      strlcpy(ups->battdat, data.str, sizeof(ups->battdat));
       break;
 
    case CI_IDEN:
       Dmsg(80, "Got CI_IDEN: %s\n", data.str.str());
-      astrncpy(ups->upsname, data.str, sizeof(ups->upsname));
+      strlcpy(ups->upsname, data.str, sizeof(ups->upsname));
       break;
 
    case CI_STATUS:
@@ -361,26 +361,26 @@ static void apc_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       switch (data.u32)
       {
       case 1:
-         astrncpy(ups->sensitivity, "Auto", sizeof(ups->sensitivity));
+         strlcpy(ups->sensitivity, "Auto", sizeof(ups->sensitivity));
          break;
       case 2:
-         astrncpy(ups->sensitivity, "Low", sizeof(ups->sensitivity));
+         strlcpy(ups->sensitivity, "Low", sizeof(ups->sensitivity));
          break;
       case 3:
-         astrncpy(ups->sensitivity, "Medium", sizeof(ups->sensitivity));
+         strlcpy(ups->sensitivity, "Medium", sizeof(ups->sensitivity));
          break;
       case 4:
-         astrncpy(ups->sensitivity, "High", sizeof(ups->sensitivity));
+         strlcpy(ups->sensitivity, "High", sizeof(ups->sensitivity));
          break;
       default:
-         astrncpy(ups->sensitivity, "Unknown", sizeof(ups->sensitivity));
+         strlcpy(ups->sensitivity, "Unknown", sizeof(ups->sensitivity));
          break;
       }
       break;
 
    case CI_REVNO:
       Dmsg(80, "Got CI_REVNO: %s\n", data.str.str());
-      astrncpy(ups->firmrev, data.str, sizeof(ups->firmrev));
+      strlcpy(ups->firmrev, data.str, sizeof(ups->firmrev));
       break;
 
    case CI_EXTBATTS:
@@ -402,18 +402,18 @@ static void apc_update_ci(UPSINFO *ups, int ci, Snmp::Variable &data)
       Dmsg(80, "Got CI_STESTI: %d\n", data.u32);
       switch (data.u32) {
       case 2:
-         astrncpy(ups->selftest, "336", sizeof(ups->selftest));
+         strlcpy(ups->selftest, "336", sizeof(ups->selftest));
          break;
       case 3:
-         astrncpy(ups->selftest, "168", sizeof(ups->selftest));
+         strlcpy(ups->selftest, "168", sizeof(ups->selftest));
          break;
       case 4:
-         astrncpy(ups->selftest, "ON", sizeof(ups->selftest));
+         strlcpy(ups->selftest, "ON", sizeof(ups->selftest));
          break;
       case 1:
       case 5:
       default:
-         astrncpy(ups->selftest, "OFF", sizeof(ups->selftest));
+         strlcpy(ups->selftest, "OFF", sizeof(ups->selftest));
          break;
       }
       break;

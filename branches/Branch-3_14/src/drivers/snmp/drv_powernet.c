@@ -201,18 +201,18 @@ bool SnmpUpsDriver::powernet_snmp_ups_read_static_data()
       switch (data->upsAdvConfig->__upsAdvConfigAlarm) {
       case 1:
          if (data->upsAdvConfig->__upsAdvConfigAlarmTimer / 100 < 30)
-            astrncpy(_ups->beepstate, "0 Seconds", sizeof(_ups->beepstate));
+            strlcpy(_ups->beepstate, "0 Seconds", sizeof(_ups->beepstate));
          else
-            astrncpy(_ups->beepstate, "Timed", sizeof(_ups->beepstate));
+            strlcpy(_ups->beepstate, "Timed", sizeof(_ups->beepstate));
          break;
       case 2:
-         astrncpy(_ups->beepstate, "LowBatt", sizeof(_ups->beepstate));
+         strlcpy(_ups->beepstate, "LowBatt", sizeof(_ups->beepstate));
          break;
       case 3:
-         astrncpy(_ups->beepstate, "NoAlarm", sizeof(_ups->beepstate));
+         strlcpy(_ups->beepstate, "NoAlarm", sizeof(_ups->beepstate));
          break;
       default:
-         astrncpy(_ups->beepstate, "Timed", sizeof(_ups->beepstate));
+         strlcpy(_ups->beepstate, "Timed", sizeof(_ups->beepstate));
          break;
       }
 
@@ -220,19 +220,19 @@ bool SnmpUpsDriver::powernet_snmp_ups_read_static_data()
 
       switch (data->upsAdvConfig->__upsAdvConfigSensitivity) {
       case 1:
-         astrncpy(_ups->sensitivity, "Auto", sizeof(_ups->sensitivity));
+         strlcpy(_ups->sensitivity, "Auto", sizeof(_ups->sensitivity));
          break;
       case 2:
-         astrncpy(_ups->sensitivity, "Low", sizeof(_ups->sensitivity));
+         strlcpy(_ups->sensitivity, "Low", sizeof(_ups->sensitivity));
          break;
       case 3:
-         astrncpy(_ups->sensitivity, "Medium", sizeof(_ups->sensitivity));
+         strlcpy(_ups->sensitivity, "Medium", sizeof(_ups->sensitivity));
          break;
       case 4:
-         astrncpy(_ups->sensitivity, "High", sizeof(_ups->sensitivity));
+         strlcpy(_ups->sensitivity, "High", sizeof(_ups->sensitivity));
          break;
       default:
-         astrncpy(_ups->sensitivity, "Unknown", sizeof(_ups->sensitivity));
+         strlcpy(_ups->sensitivity, "Unknown", sizeof(_ups->sensitivity));
          break;
       }
 
@@ -248,22 +248,22 @@ bool SnmpUpsDriver::powernet_snmp_ups_read_static_data()
    if (data->upsAdvTest) {
       switch (data->upsAdvTest->__upsAdvTestDiagnosticSchedule) {
       case 1:
-         astrncpy(_ups->selftest, "unknown", sizeof(_ups->selftest));
+         strlcpy(_ups->selftest, "unknown", sizeof(_ups->selftest));
          break;
       case 2:
-         astrncpy(_ups->selftest, "biweekly", sizeof(_ups->selftest));
+         strlcpy(_ups->selftest, "biweekly", sizeof(_ups->selftest));
          break;
       case 3:
-         astrncpy(_ups->selftest, "weekly", sizeof(_ups->selftest));
+         strlcpy(_ups->selftest, "weekly", sizeof(_ups->selftest));
          break;
       case 4:
-         astrncpy(_ups->selftest, "atTurnOn", sizeof(_ups->selftest));
+         strlcpy(_ups->selftest, "atTurnOn", sizeof(_ups->selftest));
          break;
       case 5:
-         astrncpy(_ups->selftest, "never", sizeof(_ups->selftest));
+         strlcpy(_ups->selftest, "never", sizeof(_ups->selftest));
          break;
       default:
-         astrncpy(_ups->selftest, "unknown", sizeof(_ups->selftest));
+         strlcpy(_ups->selftest, "unknown", sizeof(_ups->selftest));
          break;
       }
 
