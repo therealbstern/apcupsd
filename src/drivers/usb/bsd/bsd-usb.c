@@ -136,7 +136,7 @@ bool BsdUsbUpsDriver::init_device(const char *devname)
 
 #ifdef HAVE_FREEBSD_OS
    /* ugen0 -> ugen0.1 */
-   astrncat(intdevname, ".1", sizeof(intdevname));
+   strlcat(intdevname, ".1", sizeof(intdevname));
 #else
    /* ugen0.00 -> ugen0.01 */
    intdevname[strlen(intdevname) - 1] = '1';
@@ -238,9 +238,9 @@ bool BsdUsbUpsDriver::open_usb_device()
 
          if (k < USB_MAX_DEVNAMES) {
             strlcpy(devname, "/dev/", sizeof(devname));
-            astrncat(devname, devinfo.udi_devnames[k], sizeof(devname));
+            strlcat(devname, devinfo.udi_devnames[k], sizeof(devname));
 #if defined(HAVE_OPENBSD_OS) || defined(HAVE_NETBSD_OS)
-            astrncat(devname, ".00", sizeof(devname));
+            strlcat(devname, ".00", sizeof(devname));
 #endif
             Dmsg(200, "Trying device %s.\n", devname);
             if (init_device(devname)) {

@@ -220,7 +220,7 @@ bool NetUpsDriver::poll_ups()
    Dmsg(99, "===============\n");
    while ((n = net_recv(_sockfd, buf, sizeof(buf) - 1)) > 0) {
       buf[n] = 0;
-      astrncat(_statbuf, buf, sizeof(_statbuf));
+      strlcat(_statbuf, buf, sizeof(_statbuf));
       Dmsg(99, "Partial buf (%d, %d):\n%s", n, strlen(_statbuf), buf);
    }
    Dmsg(99, "===============\n");

@@ -345,7 +345,7 @@ int ApcSmartUpsDriver::change_ups_eeprom_item(const char *title, const char cmd,
 
    fprintf(stderr, "The old UPS %s is: %s\n", title, oldvalue);
    strlcpy(allvalues, oldvalue, sizeof(allvalues));
-   astrncat(allvalues, " ", sizeof(allvalues));
+   strlcat(allvalues, " ", sizeof(allvalues));
    strlcpy(lastvalue, oldvalue, sizeof(lastvalue));
 
    /* Try a second time to ensure that it is a stable value */
@@ -404,8 +404,8 @@ int ApcSmartUpsDriver::change_ups_eeprom_item(const char *title, const char cmd,
       if (strcmp(oldvalue, response) == 0 && i > 0)
          break;
       if (strcmp(lastvalue, response) != 0) {
-         astrncat(allvalues, response, sizeof(allvalues));
-         astrncat(allvalues, " ", sizeof(allvalues));
+         strlcat(allvalues, response, sizeof(allvalues));
+         strlcat(allvalues, " ", sizeof(allvalues));
          strlcpy(lastvalue, response, sizeof(lastvalue));
       }
       sleep(5);                    /* don't cycle too fast */

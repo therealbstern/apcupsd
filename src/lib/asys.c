@@ -28,14 +28,6 @@
 
 #include "apc.h"
 
-/* Guarantee that the string is properly terminated */
-char *astrncat(char *dest, const char *src, int maxlen)
-{
-   strncat(dest, src, maxlen - 1);
-   dest[maxlen - 1] = 0;
-   return dest;
-}
-
 #ifndef DEBUG
 void *amalloc(size_t size)
 {
