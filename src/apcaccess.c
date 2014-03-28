@@ -25,11 +25,28 @@
 
 #include "apc.h"
 
+/* These are all the possible unit labels generated in src/lib/apcstatus.c
+ * -u removes them. (To make life easier for scripts.)
+ */
+const char *const units[] = {
+  " Minutes\n",
+  " Seconds\n",
+  " Percent\n",
+  " Volts\n",
+  " Watts\n",
+  " Hz\n",
+  " C\n",
+};
+
+/* Behavior modifying flags */
+#define NO_UNITS 0x1
+
 /* Get and print status from apcupsd NIS server */
-static int do_pthreads_status(const char *host, int port, const char *par)
+static int do_pthreads_status(const char *host, int port, const char *par, int flags)
 {
    int sockfd, n;
    char recvline[MAXSTRING + 1];
+   char *line;
 
    if ((sockfd = net_open(host, NULL, port)) < 0) {
       fprintf(stderr, "Error contacting apcupsd @ %s:%d: %s\n",
@@ -41,27 +58,50 @@ static int do_pthreads_status(const char *host, int port, const char *par)
 
    while ((n = net_recv(sockfd, recvline, sizeof(recvline))) > 0) {
       recvline[n] = 0;
-      if (par) {
-        char *line;
-        char *r = NULL;
-        char *var;
+      line = recvline;
+      if (par) { /* Check for match against parameter name */
+         char *r = NULL;
+         char *var;
 
-        var = strtok_r(recvline, ":", &r);
-        if (!var)
-           continue;
-        line = recvline + strlen(var) + 1;
-        if ((r = strchr( var, ' ' )))
-           *r = '\0';
-        if (!strcmp(par, var)) {
-           while(*line && *line == ' ')
-              line++;
-           fputs(line, stdout);
-           par = NULL;
-           break;
-        }
-        continue;
+         var = strtok_r(recvline, ":", &r);
+         if (!var)   // No : separator? Skip it.
+            continue;
+         line = recvline + strlen(var) + 1;
+         if ((r = strchr(var, ' ')))
+            *r = '\0';
+         if (strcmp(par, var)) // Doesn't match parameter? Skip it.
+            continue;
+         while (*line == ' ')
+            line++;
       }
-      fputs(recvline, stdout);
+      if (flags & NO_UNITS) { /* Remove units labels & normalize value */
+         size_t i;
+         /* Numbers of the form 097 can be mistaken for octal values.
+          * However, 0x does mean hex.
+          */
+         if (*line == '0' && line[1] != 'x') {
+            while (*line == '0')
+               *line++ = ' ';
+         }
+         for (i = 0; i < sizeof units / sizeof units[0]; i++) {
+            const char * const u = units[i];
+            size_t ulen = strlen(u);
+            size_t llen = strlen(line);
+
+            if (llen >= ulen && !strcmp (line + llen - ulen, u)) {
+               line[llen - ulen] = '\n';
+               line[llen+1 - ulen] = '\0';
+               break;
+            }
+         }
+      }
+      fputs(line, stdout);
+      // If we had a param to match and we got this far we must have
+      // matched it. Clear par to indicate success and don't bail out.
+      if (par) {
+         par = NULL;
+         break;
+      }
    }
 
    if (n < 0) {
@@ -85,7 +125,7 @@ void usage()
 {
    fprintf(stderr, 
       "usage: apcaccess [-f <config-file>] [-h <host>[:<port>]] "
-                       "[-p <pattern>] [<command>] [<host>[:<port>]]\n");
+                       "[-p <parameter-name>] [<command>] [<host>[:<port>]]\n");
    
 }
 
@@ -97,6 +137,7 @@ int main(int argc, char **argv)
    char *host = NULL;
    const char *cmd = "status";
    int port = NISPORT;
+   int flags = 0;
    FILE *cfg;
 
 #ifdef HAVE_MINGW
@@ -105,7 +146,7 @@ int main(int argc, char **argv)
 
    // Process standard options
    char ch;
-   while ((ch = getopt(argc, argv, "f:h:p:")) != -1)
+   while ((ch = getopt(argc, argv, "f:h:p:u")) != -1)
    {
       switch (ch)
       {
@@ -117,6 +158,9 @@ int main(int argc, char **argv)
          break;
       case 'p':
          par = optarg;
+         break;
+      case 'u':
+         flags |= NO_UNITS;
          break;
       case '?':
       default:
@@ -178,7 +222,7 @@ int main(int argc, char **argv)
 
    if (!strcmp(cmd, "status"))
    {
-      return do_pthreads_status(host, port, par);
+      return do_pthreads_status(host, port, par, flags);
    }
    else
    {
