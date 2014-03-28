@@ -73,16 +73,16 @@ static int do_pthreads_status(const char *host, int port, const char *par, int f
             continue;
          while (*line == ' ')
             line++;
-      }
-      if (flags & NO_UNITS) { /* Remove units labels & normalize value */
-         size_t i;
          /* Numbers of the form 097 can be mistaken for octal values.
-          * However, 0x does mean hex.
+          * However, 0x does mean hex and solitary '0' should stay unchanged.
           */
-         if (*line == '0' && line[1] != 'x') {
+         if (*line == '0' && isdigit(line[1])) {
             while (*line == '0')
                *line++ = ' ';
          }
+      }
+      if (flags & NO_UNITS) { /* Remove units labels & normalize value */
+         size_t i;
          for (i = 0; i < sizeof units / sizeof units[0]; i++) {
             const char * const u = units[i];
             size_t ulen = strlen(u);
