@@ -94,7 +94,7 @@ int main(int argc, char **argv)
    const char *par = NULL;
    char *cfgfile = NULL;
    char DEFAULT_HOST[] = "localhost";
-   char *host = DEFAULT_HOST;
+   char *host = NULL;
    const char *cmd = "status";
    int port = NISPORT;
    FILE *cfg;
@@ -140,7 +140,8 @@ int main(int argc, char **argv)
       init_ups_struct(&ups);
       check_for_config(&ups, cfgfile);
       port = ups.statusport;
-      host = ups.nisip;
+      if (!host) // Don't override command line -h
+         host = ups.nisip;
    }
    else if (fatal)
    {
@@ -157,6 +158,10 @@ int main(int argc, char **argv)
       cmd = argv[optind];
    if (optleft >= 2)
       host = argv[optind + 1];
+
+   // If still no host, use default
+   if (!host)
+      host = DEFAULT_HOST;
 
    // Separate host and port
    char *p = strchr(host, ':');
