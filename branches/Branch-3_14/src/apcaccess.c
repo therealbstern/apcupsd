@@ -59,7 +59,7 @@ static int do_pthreads_status(const char *host, int port, const char *par, int f
    while ((n = net_recv(sockfd, recvline, sizeof(recvline))) > 0) {
       recvline[n] = 0;
       line = recvline;
-      if (par) { /* Check for match against parameter name */
+      if (par) { /* Check for match against parameter name & normalize value */
          char *r = NULL;
          char *var;
 
@@ -81,7 +81,7 @@ static int do_pthreads_status(const char *host, int port, const char *par, int f
                *line++ = ' ';
          }
       }
-      if (flags & NO_UNITS) { /* Remove units labels & normalize value */
+      if (flags & NO_UNITS) { /* Remove units labels */
          size_t i;
          for (i = 0; i < sizeof units / sizeof units[0]; i++) {
             const char * const u = units[i];
@@ -97,7 +97,7 @@ static int do_pthreads_status(const char *host, int port, const char *par, int f
       }
       fputs(line, stdout);
       // If we had a param to match and we got this far we must have
-      // matched it. Clear par to indicate success and don't bail out.
+      // matched it. Clear par to indicate success and bail out.
       if (par) {
          par = NULL;
          break;
@@ -124,9 +124,17 @@ static int do_pthreads_status(const char *host, int port, const char *par, int f
 void usage()
 {
    fprintf(stderr, 
-      "usage: apcaccess [-f <config-file>] [-h <host>[:<port>]] "
-                       "[-p <parameter-name>] [<command>] [<host>[:<port>]]\n");
-   
+      "Usage: apcaccess [-f <config-file>] [-h <host>[:<port>]] "
+                       "[-p <parameter-name>] [-u] [<command>] [<host>[:<port>]]\n"
+      "\n"
+      " -f  Load default host,port from given conf file (default: %s)\n"
+      " -h  Connect to host and port (supercedes conf file)\n"
+      " -p  Return only the named parameter instead of all\n"
+      " -u  Strip unit labels from values\n"
+      "\n"
+      "Supported commands: 'status' (default)\n"
+      "Trailing host/port spec overrides -h and conf file.\n"
+      , APCCONF);
 }
 
 int main(int argc, char **argv)
