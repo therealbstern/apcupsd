@@ -125,21 +125,13 @@ int main(int argc, char **argv)
       }
    }
 
-   // Remaining non-option arguments are optional command and host:port
-   // These are from legacy apcaccess syntax
-   int optleft = argc - optind;
-   if (optleft >= 1)
-      cmd = argv[optind];
-   if (optleft >= 2)
-      host = argv[optind + 1];
-
    // Default cfgfile if not provided on command line
    // Remember if we defaulted so we know later if conf failure is fatal
    bool fatal = cfgfile != NULL;
    if (!cfgfile)
       cfgfile = APCCONF;
 
-   // Parse conf file
+   // Parse conf file for defaults
    if ((cfg = fopen(cfgfile, "r")))
    {
       fclose(cfg);
@@ -156,6 +148,15 @@ int main(int argc, char **argv)
       fprintf(stderr, "Unable to open config file '%s'\n", cfgfile);
       return 2;
    }
+
+   // Remaining non-option arguments are optional command and host:port
+   // These are from legacy apcaccess syntax.  They take priority over
+   // the default from the conf file and/or switch values.
+   int optleft = argc - optind;
+   if (optleft >= 1)
+      cmd = argv[optind];
+   if (optleft >= 2)
+      host = argv[optind + 1];
 
    // Separate host and port
    char *p = strchr(host, ':');
