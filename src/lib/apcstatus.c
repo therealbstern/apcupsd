@@ -137,7 +137,7 @@ int output_status(UPSINFO *ups, int sockfd,
       s_write(ups, "LINEV    : %05.1f Volts\n", ups->LineVoltage);
 
    if (ups->UPS_Cap[CI_LOAD])
-      s_write(ups, "LOADPCT  : %5.1f Percent Load Capacity\n", ups->UPSLoad);
+      s_write(ups, "LOADPCT  : %5.1f Percent\n", ups->UPSLoad);
 
    if (ups->UPS_Cap[CI_BATTLEV])
       s_write(ups, "BCHARGE  : %05.1f Percent\n", ups->BattChg);
@@ -197,12 +197,12 @@ int output_status(UPSINFO *ups, int sockfd,
       s_write(ups, "RETPCT   : %03d.0 Percent\n", ups->rtnpct);
 
    if (ups->UPS_Cap[CI_ITEMP])
-      s_write(ups, "ITEMP    : %04.1f C Internal\n", ups->UPSTemp);
+      s_write(ups, "ITEMP    : %04.1f C\n", ups->UPSTemp);
 
    if (ups->UPS_Cap[CI_DALARM]) {
       switch ((*ups).beepstate[0]) {
       case 'T':
-         s_write(ups, "ALARMDEL : 30 seconds\n");
+         s_write(ups, "ALARMDEL : 30 Seconds\n");
          break;
       case 'L':
          s_write(ups, "ALARMDEL : Low Battery\n");
@@ -211,7 +211,7 @@ int output_status(UPSINFO *ups, int sockfd,
          s_write(ups, "ALARMDEL : No alarm\n");
          break;
       case '0':
-         s_write(ups, "ALARMDEL : 5 seconds\n");
+         s_write(ups, "ALARMDEL : 5 Seconds\n");
          break;
       default:
          s_write(ups, "ALARMDEL : Always\n");
@@ -270,8 +270,8 @@ int output_status(UPSINFO *ups, int sockfd,
       time_on_batt = now - ups->last_onbatt_time;
    else
       time_on_batt = 0;
-   s_write(ups, "TONBATT  : %d seconds\n", time_on_batt);
-   s_write(ups, "CUMONBATT: %d seconds\n", ups->cum_time_on_batt + time_on_batt);
+   s_write(ups, "TONBATT  : %d Seconds\n", time_on_batt);
+   s_write(ups, "CUMONBATT: %d Seconds\n", ups->cum_time_on_batt + time_on_batt);
 
    if (ups->last_offbatt_time > 0) {
       format_date(ups->last_offbatt_time, datetime, sizeof(datetime));
@@ -322,19 +322,19 @@ int output_status(UPSINFO *ups, int sockfd,
       s_write(ups, "STESTI   : %s\n", ups->selftest);
 
    /* output raw bits */
-   s_write(ups, "STATFLAG : 0x%08X Status Flag\n", ups->Status);
+   s_write(ups, "STATFLAG : 0x%08X\n", ups->Status);
 
    if (ups->UPS_Cap[CI_DIPSW])
-      s_write(ups, "DIPSW    : 0x%02X Dip Switch\n", ups->dipsw);
+      s_write(ups, "DIPSW    : 0x%02X\n", ups->dipsw);
 
    if (ups->UPS_Cap[CI_REG1])
-      s_write(ups, "REG1     : 0x%02X Register 1\n", ups->reg1);
+      s_write(ups, "REG1     : 0x%02X\n", ups->reg1);
 
    if (ups->UPS_Cap[CI_REG2])
-      s_write(ups, "REG2     : 0x%02X Register 2\n", ups->reg2);
+      s_write(ups, "REG2     : 0x%02X\n", ups->reg2);
 
    if (ups->UPS_Cap[CI_REG3])
-      s_write(ups, "REG3     : 0x%02X Register 3\n", ups->reg3);
+      s_write(ups, "REG3     : 0x%02X\n", ups->reg3);
 
    if (ups->UPS_Cap[CI_MANDAT])
       s_write(ups, "MANDATE  : %s\n", ups->birth);
