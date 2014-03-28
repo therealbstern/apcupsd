@@ -24,9 +24,9 @@ configuration file of apcupsd (default is usually /etc/apcupsd/apcupsd.conf)
 .It -h 
 hostname and port of apcupsd to communicate with.  The default hostname and port are obtained from the configuration file.
 .It -p
-Report only the named parameter
+Report only the value of the named parameter instead of all parameters and values.
 .It -u
-Remove labels from the parameter value(s) for easier parsing by scripts.
+Remove units field and normalize the parameter value (remove leading zeros) for easier parsing by scripts. Requires -p.
 .It <command>
 An optional command, unless a hostname is also being specified. The only implemented command is
 .Em status\&
