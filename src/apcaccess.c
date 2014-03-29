@@ -73,25 +73,18 @@ static int do_pthreads_status(const char *host, int port, const char *par, int f
             continue;
          while (*line == ' ')
             line++;
-         if (flags & NO_UNITS) { /* Remove units labels & normalize value */
-            size_t i;
-            /* Numbers of the form 097 can be mistaken for octal values.
-             * However, 0x does mean hex and solitary '0' should stay unchanged.
-             */
-            if (*line == '0' && isdigit(line[1])) {
-               while (*line == '0')
-                  *line++ = ' ';
-            }
-            for (i = 0; i < sizeof units / sizeof units[0]; i++) {
-               const char * const u = units[i];
-               size_t ulen = strlen(u);
-               size_t llen = strlen(line);
+      }
+      if (flags & NO_UNITS) { /* Remove units labels */
+         size_t i;
+         for (i = 0; i < sizeof units / sizeof units[0]; i++) {
+            const char * const u = units[i];
+            size_t ulen = strlen(u);
+            size_t llen = strlen(line);
 
-               if (llen >= ulen && !strcmp (line + llen - ulen, u)) {
-                  line[llen - ulen] = '\n';
-                  line[llen+1 - ulen] = '\0';
-                  break;
-               }
+            if (llen >= ulen && !strcmp (line + llen - ulen, u)) {
+               line[llen - ulen] = '\n';
+               line[llen+1 - ulen] = '\0';
+               break;
             }
          }
       }
@@ -129,8 +122,8 @@ void usage()
       "\n"
       " -f  Load default host,port from given conf file (default: %s)\n"
       " -h  Connect to host and port (supercedes conf file)\n"
-      " -p  Return only the value of the named parameter\n"
-      " -u  Strip unit labels and normalize value (requires -p)\n"
+      " -p  Return only the value of the named parameter rather than all parameters and values\n"
+      " -u  Strip unit labels\n"
       "\n"
       "Supported commands: 'status' (default)\n"
       "Trailing host/port spec overrides -h and conf file.\n"
@@ -175,14 +168,6 @@ int main(int argc, char **argv)
          usage();
          return 1;
       }
-   }
-
-   // -u without -p is illegal
-   if (!par && (flags & NO_UNITS))
-   {
-      fprintf(stderr, "%s: Error: -u requires -p\n", argv[0]);
-      usage();
-      return 2;
    }
 
    // Default cfgfile if not provided on command line
