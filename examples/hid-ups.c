@@ -1,5 +1,5 @@
 /*
- * $Id: hid-ups.c,v 1.14 2007-09-30 19:49:41 adk0212 Exp $
+ * $Id: hid-ups.c,v 1.13.2.2 2007-07-17 22:54:25 adk0212 Exp $
  *
  *  Copyright (c) 2001 Vojtech Pavlik <vojtech@ucw.cz>
  *  Copyright (c) 2001 Paul Stewart <hiddev@wetlogic.net>
@@ -193,7 +193,7 @@ struct s_ups_info {
     { 0xFF860026, T_NONE,   "APC860026_??????" },
     { 0xFF860029, T_NONE,   "APC860029_??????" },
     { 0xFF86002A, T_NONE,   "APC86002A_??????" },
-    { 0xFF860042, T_NONE,   "APC_UPS_FirmwareRevision" },
+    { 0xFF860042, T_INDEX,  "APC_UPS_FirmwareRevision" },
     { 0xFF860052, T_NONE,   "APCLineFailCause" },
     { 0xFF860060, T_BITS,   "APCStatusFlag" },
     { 0xFF860061, T_NONE,   "APCSensitivity" },
@@ -203,7 +203,7 @@ struct s_ups_info {
     { 0xFF860074, T_NONE,   "APC860074_SetSens?" },
     { 0xFF860076, T_UNITS,  "APCShutdownAfterDelay" },
     { 0xFF860077, T_NONE,   "APC860077_SetWakeUpDelay?" },
-    { 0xFF860079, T_NONE,   "APC_USB_FirmwareRevision" },
+    { 0xFF860079, T_INDEX,  "APC_USB_FirmwareRevision" },
     { 0xFF86007C, T_NONE,   "APCForceShutdown" },
     { 0xFF86007D, T_UNITS,  "APCDelayBeforeShutdown" },
     { 0xFF86007E, T_UNITS,  "APCDelayBeforeStartup" },

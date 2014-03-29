@@ -1,5 +1,5 @@
 .\" manual page [] for apctest version 3.14.6
-.Dd January 10, 2009
+.Dd March 28, 2014
 .Dt APCACCESS 8
 .Os apcaccess v3.14.6
 .Sh NAME
@@ -7,7 +7,7 @@
 .Nd retrieve status information from apcupsd(8)
 .Sh SYNOPSIS
 .Nm 
-[status [ [<hostname>][:<port>] ] ]
+[-f <config-file>] [-h <host>[:<port>]] [-p <parameter-name>] [-u] [<command>] [<host>[:<port>]]
 .Sh DESCRIPTION
 .Nm
 is a program which prints out the complete status of most American Power 
@@ -18,20 +18,30 @@ information from any APC UPS attached to the localhost or attached to
 any computer on the network which is running apcuspd in NIS mode.
 .Pp
 The command line options are:
-.Bl -hang -width "<hostname>"
-.It status
-An optional command, unless a hostname is also being specified. Shorthand for
+.Bl -hang -width "<command>"
+.It -f
+configuration file of apcupsd (default is usually /etc/apcupsd/apcupsd.conf)
+.It -h 
+hostname and port of apcupsd to communicate with.  The default hostname and port are obtained from the configuration file.
+.It -p
+Report only the value of the named parameter instead of all parameters and values.
+.It -u
+Remove units field for easier parsing by scripts.
+.It <command>
+An optional command, unless a hostname is also being specified. The only implemented command is
+.Em status\&
+Shorthand for
 .Em status\& localhost:3551 .
 This produces a full printout of the available status information for the 
 associated UPS.
-.It <hostname>
+.It <host>
 An optional hostname which may be a bare machine name, fully qualified 
 domain name or IP address.
 .It :<port>
 An optional port number where a hostname argument has been specified. The 
 default is 3551, the official port number assigned by 
 .Tn IANA 
-for the apcupsd NIS server.
+for the apcupsd NIS server.  The default hostname and port are obtained from the configuration file.
 .El
 .Pp
 .Nm 
@@ -61,7 +71,7 @@ Set out below is a sample of the status output which may be
 generated for the specified UPS models.
 .Pp
 .Ss All models
-.Bl -hang -width "xxxxxxxx" -compact
+.Bl -hang -width "xxxxxxxxxx" -compact
 .It APC
 : version, number of records and number of bytes following
 .It DATE
@@ -81,7 +91,16 @@ generated for the specified UPS models.
 .It STARTTIME
 : Date and time apcupsd was started
 .It STATUS
-: UPS status (online, charging, on battery etc)
+: UPS status.  One or more of the following (space-separated):
+CAL TRIM BOOST ONLINE ONBATT OVERLOAD LOWBATT REPLACEBATT NOBATT SLAVE SLAVEDOWN
+.br
+or
+.br
+COMMLOST
+.br
+or
+.br
+SHUTTING DOWN
 .It MASTERUPD
 : Last time the master sent an update to the slave
 .It ENDAPC

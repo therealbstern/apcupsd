@@ -47,32 +47,14 @@
 #include "apc.h"
 
 /* Forward referenced function */
-//static int device_wait_time(UPSINFO *ups);
+static int device_wait_time(UPSINFO *ups);
 
 /*********************************************************************/
-void setup_device(UPSINFO *ups)
+bool setup_device(UPSINFO *ups)
 {
-   /*
-    * Marko Sakari Asplund <Marko.Asplund@cern.ch>
-    *    prevents double init of UPS device 9/25/98
-    */
-   if (ups->is_dev_setup())
-      return;
-
-   ups->set_dev_setup();
-
-   device_open(ups);
-
-   /* If create_lockfile fails there's no need to delete_lockfile. */
-   if ((ups->fd != -1) && create_lockfile(ups) == LCKERROR) {
-      device_close(ups);
-      Error_abort0(_("Unable to create UPS lock file.\n"
-                     "  If apcupsd or apctest is already running,\n"
-                     "  please stop it and run this program again.\n"));
-   }
-
-//   device_setup(ups);
-//   device_get_capabilities(ups);
+   return device_open(ups) &&
+          device_setup(ups) &&
+          device_get_capabilities(ups);
 }
 
 /*********************************************************************/
@@ -81,7 +63,7 @@ void initiate_hibernate(UPSINFO *ups)
    FILE *pwdf;
    int killcount;
 
-   if (ups->mode.type <= SHAREBASIC) {
+   if (ups->mode.type == DUMB_UPS) {
       /* Make sure we are on battery */
       for (killcount = 0; killcount < 3; killcount++)
          device_read_volatile_data(ups);
@@ -95,35 +77,31 @@ void initiate_hibernate(UPSINFO *ups)
     * and if not, delete the PWRFAIL file.  Note, the code
     * above only tests UPS_onbatt flag for dumb UPSes.
     */
-    
+
    pwdf = fopen(ups->pwrfailpath, "r");
-   if ((pwdf == NULL && ups->mode.type != BK) ||
-       (pwdf == NULL && ups->is_onbatt() && ups->mode.type == BK)) {
-      
+   if ((pwdf == NULL && ups->mode.type != DUMB_UPS) ||
+       (pwdf == NULL && ups->is_onbatt() && ups->mode.type == DUMB_UPS)) {
+
       /*                                                  
        * At this point, we really should not be attempting
        * a kill power since either the powerfail file is
        * not defined, or we are not on batteries.
        */
-      
-      /* close the file if openned */
-      if (pwdf)
-         fclose(pwdf);
 
       /* Now complain */
       log_event(ups, LOG_WARNING,
-         _("Cannot find %s file.\n Killpower requested in "
+         "Cannot find %s file.\n Killpower requested in "
            "non-power fail condition or bug.\n Killpower request "
-           "ignored at %s:%d\n"), ups->pwrfailpath, __FILE__, __LINE__);
+           "ignored at %s:%d\n", ups->pwrfailpath, __FILE__, __LINE__);
       Error_abort3(
-         _("Cannot find %s file.\n Killpower requested in "
+         "Cannot find %s file.\n Killpower requested in "
            "non-power fail condition or bug.\n Killpower request "
-           "ignored at %s:%d\n"), ups->pwrfailpath, __FILE__, __LINE__);
+           "ignored at %s:%d\n", ups->pwrfailpath, __FILE__, __LINE__);
    } else {
       /* We are on batteries, so do the kill_power */
       if (ups->upsclass.type == SHAREMASTER) {
          log_event(ups, LOG_WARNING,
-            _("Waiting 30 seconds for slave(s) to shutdown."));
+            "Waiting 30 seconds for slave(s) to shutdown.");
          sleep(30);
       }
 
@@ -131,25 +109,13 @@ void initiate_hibernate(UPSINFO *ups)
       if (pwdf)
          fclose(pwdf);
 
-      log_event(ups, LOG_WARNING, _("Attempting to kill the UPS power!"));
+      log_event(ups, LOG_WARNING, "Attempting to kill the UPS power!");
 
-      if (ups->mode.type == BK) {
-         device_kill_power(ups);
+      if (ups->upsclass.type == SHARESLAVE) {
          sleep(10);
-
-         /*
-          * ***FIXME*** this really should not do a reboot here,
-          * but rather a halt or nothing -- KES
-          */
-         /*  generate_event(ups, CMDDOREBOOT); */
-
-         log_event(ups, LOG_WARNING, _("Perform CPU-reset or power-off"));
-         return;
-      } else if (ups->mode.type == SHAREBASIC) {
-         sleep(10);
-         log_event(ups, LOG_WARNING, _("Waiting For ShareUPS Master to shutdown"));
+         log_event(ups, LOG_WARNING, "Waiting For ShareUPS Master to shutdown");
          sleep(60);
-         log_event(ups, LOG_WARNING, _("Failed to have power killed by Master!"));
+         log_event(ups, LOG_WARNING, "Failed to have power killed by Master!");
 
          /*
           * ***FIXME*** this really should not do a reboot here,
@@ -157,10 +123,10 @@ void initiate_hibernate(UPSINFO *ups)
           */
          /* generate_event(ups, CMDDOREBOOT); */
 
-         log_event(ups, LOG_WARNING, _("Perform CPU-reset or power-off"));
+         log_event(ups, LOG_WARNING, "Perform CPU-reset or power-off");
          return;
       } else {
-         /* it must be a SmartUPS */
+         /* it must be a SmartUPS or BackUPS */
          device_kill_power(ups);
       }
    }
@@ -169,11 +135,10 @@ void initiate_hibernate(UPSINFO *ups)
 /*********************************************************************/
 void initiate_shutdown(UPSINFO *ups)
 {
-   log_event(ups, LOG_WARNING, _("Attempting to shutdown the UPS!"));
+   log_event(ups, LOG_WARNING, "Attempting to shutdown the UPS!");
    device_shutdown(ups);
 }
 
-#if 0
 /*
  * After the device is initialized, we come here
  * to read all the information we can about the UPS.
@@ -186,7 +151,14 @@ void prep_device(UPSINFO *ups)
    if (ups->upsname[0] == 0) {     /* no name given */
       gethostname(ups->upsname, sizeof(ups->upsname) - 1);
       if (ups->upsname[0] == 0)    /* error */
-         astrncpy(ups->upsname, "default", sizeof(ups->upsname));
+         strlcpy(ups->upsname, "default", sizeof(ups->upsname));
+   }
+
+   /* Strip unprintable characters from UPS model */
+   for (char *ptr = ups->upsmodel; *ptr; ptr++) 
+   {
+      if (!isprint(*ptr))
+         *ptr = ' ';
    }
 }
 
@@ -198,9 +170,62 @@ int fillUPS(UPSINFO *ups)
    return 0;
 }
 
+static void open_ups(UPSINFO *ups)
+{
+   // Don't issue a COMMLOST event until we've been running for a little while
+   static const time_t COMMLOST_EVENT_GRACE_PERIOD = 60;
+
+   time_t event_time = 0;
+
+   while (!device_open(ups))
+   {
+      // Failed to communicate with UPS: we're COMMLOST now
+      ups->set_commlost();
+
+      // Do not generate COMMLOST event until we've retried a few times
+      time_t now = time(NULL);
+      if (now - ups->start_time >= COMMLOST_EVENT_GRACE_PERIOD)
+      {
+         // Generate an event once
+         if (event_time == 0)
+         {
+            generate_event(ups, CMDCOMMFAILURE);
+            event_time = now;
+         }
+
+         // Log every 10 minutes thereafter
+         if ((now - event_time) >= 10*60)
+         {
+            event_time = now;
+            log_event(ups, event_msg[CMDCOMMFAILURE].level,
+               event_msg[CMDCOMMFAILURE].msg);            
+         }
+      }
+
+      sleep(5);
+   }
+
+   // If we were commlost, we're not any more
+   if (ups->is_commlost())
+   {
+      ups->clear_commlost();
+      if (event_time)
+         generate_event(ups, CMDCOMMOK);
+   }
+
+   // Complete remainder of UPS setup
+   device_setup(ups);
+   device_get_capabilities(ups);
+   prep_device(ups);
+}
+
 /* NOTE! This is the starting point for a separate process (thread). */
 void do_device(UPSINFO *ups)
 {
+   /* Open the UPS device and ensure we can talk to it. This does not return
+      until the UPS is successfully contacted */
+   open_ups(ups);
+
    /* get all data so apcaccess is happy */
    fillUPS(ups);
 
@@ -209,25 +234,25 @@ void do_device(UPSINFO *ups)
       /* compute appropriate wait time */
       ups->wait_time = device_wait_time(ups);
 
-      Dmsg2(70, "Before do_action: 0x%x (OB:%d).\n",
+      Dmsg(70, "Before do_action: 0x%x (OB:%d).\n",
          ups->Status, ups->is_onbatt());
 
       /* take event actions */
       do_action(ups);
 
-      Dmsg2(70, "Before fillUPS: 0x%x (OB:%d).\n",
+      Dmsg(70, "Before fillUPS: 0x%x (OB:%d).\n",
          ups->Status, ups->is_onbatt());
 
       /* Get all info available from UPS by asking it questions */
       fillUPS(ups);
 
-      Dmsg2(70, "Before do_action: 0x%x (OB:%d).\n",
+      Dmsg(70, "Before do_action: 0x%x (OB:%d).\n",
          ups->Status, ups->is_onbatt());
 
       /* take event actions */
       do_action(ups);
 
-      Dmsg2(70, "Before do_reports: 0x%x (OB:%d).\n",
+      Dmsg(70, "Before do_reports: 0x%x (OB:%d).\n",
          ups->Status, ups->is_onbatt());
 
       do_reports(ups);
@@ -235,7 +260,7 @@ void do_device(UPSINFO *ups)
       /* compute appropriate wait time */
       ups->wait_time = device_wait_time(ups);
 
-      Dmsg2(70, "Before device_check_state: 0x%x (OB:%d).\n",
+      Dmsg(70, "Before device_check_state: 0x%x (OB:%d).\n",
          ups->Status, ups->is_onbatt());
 
       /*
@@ -262,6 +287,8 @@ static int device_wait_time(UPSINFO *ups)
 
    if (ups->is_fastpoll() || !ups->is_battpresent())
       wait_time = TIMER_FAST;
+   else if (ups->is_commlost())
+      wait_time = TIMER_FAST*5;
    else
       wait_time = ups->polltime;    /* normally 60 seconds */
 
@@ -278,4 +305,3 @@ static int device_wait_time(UPSINFO *ups)
 
    return wait_time;
 }
-#endif

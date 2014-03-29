@@ -24,7 +24,6 @@
 
 #include "autil.h"
 #include "apc.h"
-#include <sys/time.h>
 
 void calc_abstimeout(int msec, struct timespec *abstime)
 {

@@ -34,10 +34,6 @@
 
 #ifdef HAVE_NISLIB
 
-#ifndef   INADDR_NONE
-#define   INADDR_NONE    -1
-#endif
-
 /* Some Win32 specific screwery */
 #ifdef HAVE_MINGW
 
@@ -46,14 +42,15 @@
 #define getsockopt(s,l,o,d,z) getsockopt((s),(l),(o),(char*)(d),(z))
 #define EINPROGRESS           WSAEWOULDBLOCK
 
+int dummy = WSA_Init();
+
 #undef errno
 #define errno   WSAGetLastError()
 
 #undef h_errno
 #define h_errno WSAGetLastError()
 
-#endif
-
+#endif // HAVE_MINGW
 
 /*
  * Read nbytes from the network.
@@ -139,8 +136,14 @@ static int write_nbytes(int fd, const char *ptr, int nbytes)
 #endif
       nwritten = send(fd, ptr, nleft, 0);
 
-      if (nwritten <= 0)
-         return -errno;       /* error */
+      switch (nwritten) {
+      case -1:
+         if (errno == EINTR || errno == EAGAIN)
+            continue;
+         return -errno;           /* error */
+      case 0:
+         return nbytes - nleft;   /* EOF */
+      }
 
       nleft -= nwritten;
       ptr += nwritten;
@@ -226,10 +229,18 @@ int net_open(const char *host, char *service, int port)
    int nonblock = 1;
    int block = 0;
    int sockfd, rc;
-   struct hostent *hp;
    struct sockaddr_in tcp_serv_addr;  /* socket information */
-   unsigned int inaddr;               /* Careful here to use unsigned int for */
-                                      /* compatibility with Alpha */
+
+#ifndef HAVE_MINGW
+   // Every platform has their own magic way to avoid getting a SIGPIPE
+   // when writing to a stream socket where the remote end has closed. 
+   // This method works pretty much everywhere which avoids the mess
+   // of figuring out which incantation this platform supports. (Excepting
+   // for win32 which doesn't support signals at all.)
+   struct sigaction sa;
+   sa.sa_handler = SIG_IGN;
+   sigaction(SIGPIPE, &sa, NULL);
+#endif
 
    /* 
     * Fill in the structure serv_addr with the address of
@@ -238,17 +249,28 @@ int net_open(const char *host, char *service, int port)
    memset((char *)&tcp_serv_addr, 0, sizeof(tcp_serv_addr));
    tcp_serv_addr.sin_family = AF_INET;
    tcp_serv_addr.sin_port = htons(port);
-
-   if ((inaddr = inet_addr(host)) != INADDR_NONE) {
-      tcp_serv_addr.sin_addr.s_addr = inaddr;
-   } else {
-      if ((hp = gethostbyname(host)) == NULL)
+   tcp_serv_addr.sin_addr.s_addr = inet_addr(host);
+   if (tcp_serv_addr.sin_addr.s_addr == INADDR_NONE) {
+      struct hostent he;
+      char *tmphstbuf = NULL;
+      size_t hstbuflen = 0;
+      struct hostent *hp = gethostname_re(host, &he, &tmphstbuf, &hstbuflen);
+      if (!hp)
+      {
+         free(tmphstbuf);
          return -h_errno;
+      }
 
-      if (hp->h_length != sizeof(inaddr) || hp->h_addrtype != AF_INET)
+      if (hp->h_length != sizeof(tcp_serv_addr.sin_addr.s_addr) || 
+          hp->h_addrtype != AF_INET)
+      {
+         free(tmphstbuf);
          return -EINVAL;
+      }
 
-      tcp_serv_addr.sin_addr.s_addr = *(unsigned int *)hp->h_addr;
+      memcpy(&tcp_serv_addr.sin_addr.s_addr, hp->h_addr, 
+             sizeof(tcp_serv_addr.sin_addr.s_addr));
+      free(tmphstbuf);
    }
 
    /* Open a TCP socket */

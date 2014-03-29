@@ -57,6 +57,20 @@ public:
       return true;
    }
 
+   T dequeue()
+   {
+      pthread_mutex_lock(&_mutex);
+
+      int rc = 0;
+      while (rc == 0 && _queue.empty())
+         rc = pthread_cond_wait(&_condvar, &_mutex);
+
+      T elem = _queue.first();
+      _queue.remove_first();
+      pthread_mutex_unlock(&_mutex);
+      return elem;
+   }
+
    bool empty()
    {
       pthread_mutex_lock(&_mutex);

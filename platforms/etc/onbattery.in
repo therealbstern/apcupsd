@@ -5,11 +5,9 @@
 # goes on batteries.
 # We send an email message to root to notify him.
 #
-SYSADMIN=root
-APCUPSD_MAIL="@APCUPSD_MAIL@"
 
 HOSTNAME=`hostname`
-MSG="$HOSTNAME Power Failure !!!"
+MSG="$HOSTNAME UPS $1 Power Failure !!!"
 #
 (
    echo "Subject: $MSG"

@@ -28,21 +28,6 @@
 
 #include "apc.h"
 
-/* Guarantee that the string is properly terminated */
-char *astrncpy(char *dest, const char *src, int maxlen)
-{
-   strncpy(dest, src, maxlen - 1);
-   dest[maxlen - 1] = 0;
-   return dest;
-}
-
-char *astrncat(char *dest, const char *src, int maxlen)
-{
-   strncat(dest, src, maxlen - 1);
-   dest[maxlen - 1] = 0;
-   return dest;
-}
-
 #ifndef DEBUG
 void *amalloc(size_t size)
 {
@@ -50,7 +35,7 @@ void *amalloc(size_t size)
 
    buf = malloc(size);
    if (buf == NULL)
-      Error_abort1(_("Out of memory: ERR=%s\n"), strerror(errno));
+      Error_abort1("Out of memory: ERR=%s\n", strerror(errno));
 
    return buf;
 }
@@ -60,7 +45,7 @@ void *arealloc(void *buf, size_t size)
 {
    buf = realloc(buf, size);
    if (buf == NULL)
-      Error_abort1(_("Out of memory: ERR=%s\n"), strerror(errno));
+      Error_abort1("Out of memory: ERR=%s\n", strerror(errno));
 
    return buf;
 }
@@ -72,7 +57,7 @@ void *acalloc(size_t size1, size_t size2)
 
    buf = calloc(size1, size2);
    if (buf == NULL)
-      Error_abort1(_("Out of memory: ERR=%s\n"), strerror(errno));
+      Error_abort1("Out of memory: ERR=%s\n", strerror(errno));
 
    return buf;
 }
@@ -107,7 +92,7 @@ int asnprintf(char *str, size_t size, const char *fmt, ...)
    va_end(arg_ptr);
 
    if (len >= BIG_BUF)
-      Error_abort0(_("Buffer overflow.\n"));
+      Error_abort0("Buffer overflow.\n");
 
    memcpy(str, buf, size);
    str[size - 1] = 0;
@@ -137,7 +122,7 @@ int avsnprintf(char *str, size_t size, const char *format, va_list ap)
 
    len = vsprintf(buf, format, ap);
    if (len >= BIG_BUF)
-      Error_abort0(_("Buffer overflow.\n"));
+      Error_abort0("Buffer overflow.\n");
 
    memcpy(str, buf, size);
    str[size - 1] = 0;
@@ -184,15 +169,15 @@ void _p(char *file, int line, pthread_mutex_t *m)
    int errstat;
 
    if ((errstat = pthread_mutex_trylock(m))) {
-      e_msg(file, line, M_ERROR, 0, _("Possible mutex deadlock.\n"));
+      e_msg(file, line, M_ERROR, 0, "Possible mutex deadlock.\n");
 
       /* We didn't get the lock, so do it definitely now */
       if ((errstat = pthread_mutex_lock(m))) {
          e_msg(file, line, M_ABORT, 0,
-            _("Mutex lock failure. ERR=%s\n"), strerror(errstat));
+            "Mutex lock failure. ERR=%s\n", strerror(errstat));
       } else {
          e_msg(file, line, M_ERROR, 0,
-            _("Possible mutex deadlock resolved.\n"));
+            "Possible mutex deadlock resolved.\n");
       }
    }
 }
@@ -203,13 +188,44 @@ void _v(char *file, int line, pthread_mutex_t *m)
 
    if ((errstat = pthread_mutex_trylock(m)) == 0) {
       e_msg(file, line, M_ERROR, 0,
-         _("Mutex unlock not locked. ERR=%s\n"), strerror(errstat));
+         "Mutex unlock not locked. ERR=%s\n", strerror(errstat));
    }
    if ((errstat = pthread_mutex_unlock(m))) {
       e_msg(file, line, M_ABORT, 0,
-         _("Mutex unlock failure. ERR=%s\n"), strerror(errstat));
+         "Mutex unlock failure. ERR=%s\n", strerror(errstat));
    }
 }
 #endif   /* DEBUG_MUTEX */
 
+#ifndef HAVE_STRLCPY
+size_t strlcpy(char *dst, const char *src, size_t size)
+{
+   size_t cnt = 0;
+   if (size)
+   {
+      while (*src && cnt < size-1)
+      {
+         *dst++ = *src++;
+         ++cnt;
+      }
+      *dst = '\0';
+   }
+   while (*src++)
+      ++cnt;
+   return cnt;
+}
+#endif
 
+#ifndef HAVE_STRLCAT
+size_t strlcat(char *dst, const char *src, size_t size)
+{
+   size_t cnt = 0;
+   while (*dst && cnt < size)
+   {
+      ++dst;
+      ++cnt;
+   }
+   cnt += strlcpy(dst, src, size-cnt);
+   return cnt;
+}
+#endif

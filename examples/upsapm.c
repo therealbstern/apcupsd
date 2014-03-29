@@ -19,7 +19,7 @@
  *	    0 = off line
  *	    1 = on line
  *	    2 = on back
- *   0xff = battery status    
+ *   0xff = battery status
  *	   ff = (none?)
  *	    0 = high
  *	    1 = low
@@ -45,17 +45,17 @@
 char statbuf[BIGBUF];
 int statlen = BIGBUF;
 
-/* List of variables that can be read by getupsvar()   
+/* List of variables that can be read by getupsvar()
  * First field is that name given to getupsvar(),
- * Second field is our internal name as produced by the STATUS 
+ * Second field is our internal name as produced by the STATUS
  *   output from apcupsd.
  * Third field, if 0 returns everything to the end of the
  *    line, and if 1 returns only to first space (e.g. integers,
  *    and floating point values.
  */
-static struct { 	
-   char *request;
-   char *upskeyword;
+static struct {
+   const char *request;
+   const char *upskeyword;
    int nfields;
 } cmdtrans[] = {
    {"date",       "DATE",     0},
@@ -68,18 +68,18 @@ static struct {
 };
 
 int fetch_data(char *host, int port);
-int getupsvar(char *host, int port, char *request, char *answer, int anslen); 
+int getupsvar(char *host, int port, const char *request, char *answer, int anslen);
 int fill_buffer(int sockfd);
 
 extern int net_errno;
 
-void error_abort(char *msg)
+void error_abort(const char *msg)
 {
    fprintf(stderr, msg);
    exit(1);
 }
 
-int main(int argc, char *argv[]) 
+int main(int argc, char *argv[])
 {
    int port;
    char host[200];
@@ -90,7 +90,7 @@ int main(int argc, char *argv[])
 
    strcpy(host, SERV_HOST_ADDR);
    port = SERV_TCP_PORT;
-       
+
    if (argc > 1) {
       strcpy(host, argv[1]); /* get host from command line */
       p = strchr(host, ':');
@@ -111,7 +111,7 @@ int main(int argc, char *argv[])
        exit(1);
    }
    stat_flag = strtol(msg, NULL, 16);
-   
+
    if (getupsvar(host, port, "battcap", msg, sizeof(msg)) <= 0) {
        printf("1.14 1.2 0x03 0x01 0xff 0x80 -1%% -1 ? : Cannot get battcap\n");
        exit(1);
@@ -125,7 +125,7 @@ int main(int argc, char *argv[])
    }
 
    runtime = (int)strtod(msg, NULL);
-   
+
    if (stat_flag & 0x8) {
       printf("1.14 1.2 0x03 0x01 0x03 0x09 %d%% -1 ?\n", battchg);
    } else {
@@ -133,7 +133,7 @@ int main(int argc, char *argv[])
    }
 
    exit(0);
-}   
+}
 
 
 /*
@@ -155,7 +155,7 @@ int fetch_data(char *host, int port)
    net_close(sockfd);
    return stat;
 
-} 
+}
 
 /*
  *
@@ -168,19 +168,19 @@ int fetch_data(char *host, int port)
  * Returns -1 if network problem
  *   answer has "N/A" if host is not available or network error
  */
-int getupsvar(char *host, int port, char *request, char *answer, int anslen) 
+int getupsvar(char *host, int port, const char *request, char *answer, int anslen)
 {
     int i;
-    char *stat_match = NULL;
+    const char *stat_match = NULL;
     char *find;
     int nfields = 0;
-     
+
     if (!fetch_data(host, port)) {
         strcpy(answer, "N/A");
 	return -1;
     }
 
-    for (i=0; cmdtrans[i].request; i++) 
+    for (i=0; cmdtrans[i].request; i++)
 	if (!(strcmp(cmdtrans[i].request, request))) {
 	     stat_match = cmdtrans[i].upskeyword;
 	     nfields = cmdtrans[i].nfields;
@@ -209,13 +209,13 @@ int getupsvar(char *host, int port, char *request, char *answer, int anslen)
 
 #define MAXLINE 512
 
-/* Fill buffer with data from UPS network daemon   
+/* Fill buffer with data from UPS network daemon
  * Returns 0 on error
  * Returns 1 if OK
  */
 int fill_buffer(int sockfd)
 {
-   int n, stat = 1; 
+   int n, stat = 1;
    char buf[1000];
 
    statbuf[0] = 0;

@@ -4,7 +4,7 @@
 //
 // Rewrite/Refactoring by Adam Kropelin
 //
-// Copyright (2007) Adam D. Kropelin
+// Copyright (2009) Adam D. Kropelin
 // Copyright (2000) Kern E. Sibbald
 //
 
@@ -12,34 +12,40 @@
 #define WINSTAT_H
 
 #include <windows.h>
+#include "amutex.h"
 
 // Forward declarations
 class StatMgr;
+class Meter;
+class ListView;
+class upsMenu;
 
 // Object implementing the Status dialogue for apcupsd
 class upsStatus
 {
 public:
    // Constructor/destructor
-   upsStatus(HINSTANCE appinst, StatMgr *statmgr);
+   upsStatus(HINSTANCE appinst, upsMenu *menu);
    ~upsStatus();
 
-   // Initialisation
-   BOOL Init();
-
    // General
-   void Show(BOOL show);
+   void Show();
+   void Update(StatMgr *statmgr);
 
 private:
    // The dialog box window proc
    static BOOL CALLBACK DialogProc(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-   void FillStatusBox(HWND hwnd, int id_list);
+   BOOL DialogProcess(HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
    // Private data
-   BOOL m_dlgvisible;
-   HINSTANCE m_appinst;
-   StatMgr *m_statmgr;
+   HWND _hwnd;
+   HINSTANCE _appinst;
+   RECT _rect;
+   Meter *_bmeter;
+   Meter *_lmeter;
+   ListView *_grid;
+   amutex _mutex;
+   upsMenu *_menu;
 };
 
 #endif // WINSTAT_H

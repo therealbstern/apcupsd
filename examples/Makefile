@@ -15,3 +15,4 @@ $(TARGETS): %: $(call SRC2OBJ,%.c) $(APCLIBS)
 
 # Include dependencies
 -include $(DEPS)
+

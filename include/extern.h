@@ -85,7 +85,7 @@ extern void clear_files(void);
 extern void make_pid(void);
 
 /* In apcdevice.c */
-void setup_device(UPSINFO *ups);
+bool setup_device(UPSINFO *ups);
 extern void setup_serial(UPSINFO *ups);
 extern void initiate_hibernate(UPSINFO *ups);
 extern void initiate_shutdown(UPSINFO *ups);
@@ -93,6 +93,7 @@ extern void save_dumb_status(UPSINFO *ups);
 extern int check_serial(UPSINFO *ups);
 extern void prep_device(UPSINFO *ups);
 extern void do_device(UPSINFO *ups);
+extern int fillUPS(UPSINFO *ups);
 
 /* In apcaction.c */
 extern void timer_action(int sig);
@@ -148,7 +149,7 @@ extern void setup_ups_alarm(UPSINFO *ups);
 extern void setup_ups_lowbatt_delay(UPSINFO *ups);
 extern void setup_ups_selftest(UPSINFO *ups);
 
-extern void get_apc_model(UPSINFO *ups);
+extern const char *get_model_from_oldfwrev(const char *s);
 extern void get_apc_capabilities(UPSINFO *ups);
 extern void read_extended(UPSINFO *ups);
 extern void setup_extended(UPSINFO *ups);
@@ -177,20 +178,10 @@ extern int log_status(UPSINFO *ups);
 extern void timer_reports(int sig);
 extern void do_reports(UPSINFO *ups);
 
-/* In apcsmart.c */
-extern int apc_enable(UPSINFO *ups);
-extern int writechar(char a, UPSINFO *ups);
-extern int getline(char *s, int len, UPSINFO *ups);
-extern void UPSlinkCheck(UPSINFO *ups);
-extern char *smart_poll(char cmd, UPSINFO *ups);
-extern int fillUPS(UPSINFO *ups);
-
 /* In apcsignal.c */
-extern void init_timer(int timer, void (*fnhandler) (int));
 extern void init_signals(void (*handler) (int));
 extern void init_thread_signals(void);
 extern void restore_signals(void);
-extern void sleep_forever(void);
 
 /* In newups.c */
 extern UPSINFO *new_ups(void);
@@ -218,7 +209,8 @@ extern void wait_for_termination(int serial_pid);
 /* In apclog.c */
 extern void log_event(const UPSINFO *ups, int level, const char *fmt, ...);
 extern void logf(const char *fmt, ...);
-extern void hex_dump(int level, void *data, unsigned int len);
+extern void hex_dump(int level, const void *data, unsigned int len);
+extern int format_date(time_t timestamp, char *dest, size_t destlen);
 
 /* In apcnetlib.c */
 extern int net_open(const char *host, char *service, int port);
@@ -238,13 +230,16 @@ extern void generic_error_exit(const char *fmt, ...);
 /* In asys.c */
 int avsnprintf(char *str, size_t size, const char *format, va_list ap);
 int asnprintf(char *str, size_t size, const char *fmt, ...);
-char *astrncpy(char *dest, const char *src, int maxlen);
-char *astrncat(char *dest, const char *src, int maxlen);
-//struct tm *localtime_r(const time_t *timep, struct tm *tm);
 char *afgets(char *s, int size, FILE *fd);
 void *amalloc(size_t size);
 void *arealloc(void *buf, size_t size);
 void *acalloc(size_t size1, size_t size2);
+#ifndef HAVE_STRLCPY
+size_t strlcpy(char *dst, const char *src, size_t size);
+#endif
+#ifndef HAVE_STRLCAT
+size_t strlcat(char *dst, const char *src, size_t size);
+#endif
 
 /* In apcwinipc.c */
 int winioctl(int fd, int func, int *addr);
@@ -254,8 +249,11 @@ int winioctl(int fd, int func, int *addr);
   int nanosleep(const struct timespec *req, struct timespec *rem);
 #endif
 
-/* In smartcmd.c */
-int *GetSmartCmdMap();
-const char *CItoString(int ci);
+/*
+ * Common interface to the various versions of gethostbyname_r().
+ * Implemented in gethostname.c.
+ */
+struct hostent * gethostname_re
+    (const char *host,struct hostent *hostbuf,char **tmphstbuf,size_t *hstbuflen);
 
 #endif   /* _EXTERN_H */

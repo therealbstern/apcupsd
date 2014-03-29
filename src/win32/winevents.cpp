@@ -4,7 +4,7 @@
 //
 // Rewrite/Refactoring by Adam Kropelin
 //
-// Copyright (2007) Adam D. Kropelin
+// Copyright (2009) Adam D. Kropelin
 // Copyright (2000) Kern E. Sibbald
 //
 
@@ -12,38 +12,33 @@
 
 #include <windows.h>
 #include "winevents.h"
-#include "winres.h"
+#include "resource.h"
 #include "statmgr.h"
+#include "listview.h"
+#include "wintray.h"
 
 // Constructor/destructor
-upsEvents::upsEvents(HINSTANCE appinst, StatMgr *statmgr)
+upsEvents::upsEvents(HINSTANCE appinst, upsMenu *menu) :
+   _appinst(appinst),
+   _hwnd(NULL),
+   _menu(menu)
 {
-   m_dlgvisible = FALSE;
-   m_appinst = appinst;
-   m_statmgr = statmgr;
 }
 
 upsEvents::~upsEvents()
 {
 }
 
-// Initialisation
-BOOL upsEvents::Init()
-{
-   return TRUE;
-}
-
 // Dialog box handling functions
-void upsEvents::Show(BOOL show)
+void upsEvents::Show()
 {
-   if (show) {
-      if (!m_dlgvisible) {
-         DialogBoxParam(m_appinst,
-                        MAKEINTRESOURCE(IDD_EVENTS),
-                        NULL,
-                        (DLGPROC)DialogProc,
-                        (LONG)this);
-      }
+   if (!_hwnd)
+   {
+      DialogBoxParam(_appinst,
+                     MAKEINTRESOURCE(IDD_EVENTS),
+                     NULL,
+                     (DLGPROC)DialogProc,
+                     (LONG)this);
    }
 }
 
@@ -53,26 +48,88 @@ BOOL CALLBACK upsEvents::DialogProc(
    WPARAM wParam,
    LPARAM lParam)
 {
-   // We use the dialog-box's USERDATA to store a _this pointer
-   // This is set only once WM_INITDIALOG has been recieved, though!
-   upsEvents *_this = (upsEvents *)GetWindowLong(hwnd, GWL_USERDATA);
+   upsEvents *_this;
 
+   // Retrieve virtual 'this' pointer. When we come in here the first time for
+   // the WM_INITDIALOG message, the pointer is in lParam. We then store it in
+   // the user data so it can be retrieved on future calls.
+   if (uMsg == WM_INITDIALOG)
+   {
+      // Set dialog user data to our "this" pointer which comes in via lParam.
+      // On subsequent calls, this will be retrieved by the code below.
+      SetWindowLong(hwnd, GWL_USERDATA, lParam);
+      _this = (upsEvents *)lParam;
+   }
+   else
+   {
+      // We've previously been initialized, so retrieve pointer from user data
+      _this = (upsEvents *)GetWindowLong(hwnd, GWL_USERDATA);
+   }
+
+   // Call thru to non-static member function
+   return _this->DialogProcess(hwnd, uMsg, wParam, lParam);
+}
+
+BOOL upsEvents::DialogProcess(
+   HWND hwnd,
+   UINT uMsg,
+   WPARAM wParam,
+   LPARAM lParam)
+{
    switch (uMsg) {
    case WM_INITDIALOG:
-      SetWindowLong(hwnd, GWL_USERDATA, lParam);
-      _this = (upsEvents *) lParam;
+      // Silly: Save initial window size for use as minimum size. There's 
+      // probably some programmatic way to fetch this from the resource when
+      // we need it, but I can't find it. So we'll save it at runtime.
+      GetWindowRect(hwnd, &_rect);
 
-      // Set listbox to a fixed pitch font
-      HFONT hfont = CreateFont(14, 0, 0, 0, FW_DONTCARE, false, false, false, 
-         DEFAULT_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, 
-         DEFAULT_QUALITY, FIXED_PITCH, NULL);
-      SendDlgItemMessage(hwnd, IDC_LIST, WM_SETFONT, (WPARAM)hfont, false);
+      // Initialize control wrappers
+      _events = new ListView(hwnd, IDC_LIST, 1);
+
+      // Save a copy of our window handle for later use.
+      // Important to do this AFTER everything needed by Update() is
+      // initialized and ready to go since that function may be called at any
+      // time from the wintray timer thread.
+      _hwnd = hwnd;
 
       // Show the dialog
+      _menu->Refresh();
       SetForegroundWindow(hwnd);
-      _this->m_dlgvisible = TRUE;
-      _this->FillEventsBox(hwnd, IDC_LIST);
       return TRUE;
+
+   case WM_GETMINMAXINFO:
+   {
+      // Restrict minimum size to initial window size
+      MINMAXINFO *mmi = (MINMAXINFO*)lParam;
+      mmi->ptMinTrackSize.x = _rect.right - _rect.left;
+      mmi->ptMinTrackSize.y = _rect.bottom - _rect.top;
+      return TRUE;
+   }
+
+   case WM_SIZE:
+   {
+      // Fetch new window size (esp client area size)
+      WINDOWINFO wininfo;
+      wininfo.cbSize = sizeof(wininfo);
+      GetWindowInfo(hwnd, &wininfo);
+
+      // Fetch current listview position
+      HWND ctrl = GetDlgItem(hwnd, IDC_LIST);
+      RECT gridrect;
+      GetWindowRect(ctrl, &gridrect);
+
+      // Calculate new position and size of listview
+      int left = gridrect.left - wininfo.rcClient.left;
+      int top = gridrect.top - wininfo.rcClient.top;
+      int width = wininfo.rcClient.right - wininfo.rcClient.left - 2*left;
+      int height = wininfo.rcClient.bottom - wininfo.rcClient.top - top - left;
+
+      // Resize listview
+      SetWindowPos(
+         ctrl, NULL, left, top, width, height, SWP_NOZORDER | SWP_SHOWWINDOW);
+
+      return TRUE;
+   }
 
    case WM_COMMAND:
       switch (LOWORD(wParam)) {
@@ -80,41 +137,42 @@ BOOL CALLBACK upsEvents::DialogProc(
       case IDOK:
          // Close the dialog
          EndDialog(hwnd, TRUE);
-         _this->m_dlgvisible = FALSE;
-         return TRUE;
-      case ID_REFRESH:
-         _this->FillEventsBox(hwnd, IDC_LIST);
          return TRUE;
       }
       break;
 
    case WM_DESTROY:
-      EndDialog(hwnd, FALSE);
-      _this->m_dlgvisible = FALSE;
+      _mutex.lock();
+      _hwnd = NULL;
+      delete _events;
+      _mutex.unlock();
       return TRUE;
    }
 
    return 0;
 }
 
-void upsEvents::FillEventsBox(HWND hwnd, int id_list)
+void upsEvents::Update(StatMgr *statmgr)
 {
-   const char* error = "Events not available.";
-
-   // Clear listbox
-   SendDlgItemMessage(hwnd, IDC_LIST, LB_RESETCONTENT, 0, 0);
-
-   // Fetch events from apcupsd
-   std::vector<std::string> events;
-   if (!m_statmgr->GetEvents(events) || events.empty()) {
-      SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0, (LONG)error);
+   // Bail if window is not open
+   _mutex.lock();
+   if (!_hwnd)
+   {
+      _mutex.unlock();
       return;
    }
 
-   // Add each event to the listbox
-   std::vector<std::string>::reverse_iterator iter;
-   for (iter = events.rbegin(); iter != events.rend(); iter++) {
-      SendDlgItemMessage(hwnd, id_list, LB_ADDSTRING, 0,
-                         (LONG)(*iter).c_str());
+   // Fetch events from apcupsd
+   alist<astring> events;
+   if (!statmgr->GetEvents(events) || events.empty())
+   {
+      _mutex.unlock();
+      return;
    }
+
+   // Update listview
+   alist<astring> *data[] = {&events};
+   _events->UpdateAll(data);
+
+   _mutex.unlock();
 }

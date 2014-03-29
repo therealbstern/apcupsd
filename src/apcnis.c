@@ -110,7 +110,7 @@ static void status_write(UPSINFO *ups, const char *fmt, ...)
    va_end(ap);
 
    if ((i = (strlen(largebuf) + strlen(buf))) < (int)(sizeof(largebuf) - 1)) {
-      astrncat(largebuf, buf, sizeof(largebuf));
+      strlcat(largebuf, buf, sizeof(largebuf));
       stat_recs++;
    } else {
       log_event(ups, LOG_ERR,
@@ -121,7 +121,7 @@ static void status_write(UPSINFO *ups, const char *fmt, ...)
 
 void do_server(UPSINFO *ups)
 {
-   int newsockfd, sockfd, childpid;
+   int newsockfd, sockfd;
    struct sockaddr_in cli_addr;    /* client's address */
    struct sockaddr_in serv_addr;   /* our address */
    int tlog;
@@ -207,7 +207,6 @@ void do_server(UPSINFO *ups)
       arg = (struct s_arg *)malloc(sizeof(struct s_arg));
       arg->newsockfd = newsockfd;
       arg->ups = ups;
-      childpid = 0;
 
       pthread_t tid;
       pthread_create(&tid, NULL, handle_client_request, arg);
@@ -266,24 +265,6 @@ void *handle_client_request(void *arg)
                break;
             }
          }
-#if 0
-      } else if (strncmp("rawupsinfo", line, 10) == 0) {
-         net_send(nsockfd, (char *)ups, sizeof(UPSINFO));
-         if (net_send(nsockfd, NULL, 0) < 0)
-            break;
-      } else if (strncmp("eprominfo", line, 9) == 0) {
-         int len;
-
-         len = strlen(ups->eprom) + 1;
-         net_send(nsockfd, ups->eprom, len);
-         len = strlen(ups->firmrev) + 1;
-         net_send(nsockfd, ups->firmrev, len);
-         len = strlen(ups->upsmodel) + 1;
-         net_send(nsockfd, ups->upsmodel, len);
-
-         if (net_send(nsockfd, NULL, 0) < 0)
-            break;
-#endif
       } else {
          net_send(nsockfd, errmsg, sizeof(errmsg));
          if (net_send(nsockfd, NULL, 0) < 0)
@@ -334,7 +315,7 @@ int check_wrappers(char *av, int newsock)
 
    if (!hosts_access(&req)) {
       log_event(core_ups, LOG_WARNING,
-         _("Connection from %.500s refused by tcp_wrappers."), eval_client(&req));
+         "Connection from %.500s refused by tcp_wrappers.", eval_client(&req));
       return FAILURE;
    }
 

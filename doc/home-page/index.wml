@@ -13,71 +13,38 @@ runtime expires based on internal APC calculations determined by power
 consumption rates. Apcupsd is licensed under the GPL version 2.
 <p>
 
-<h2>Recent Apcupsd Releases</h2>
-<h3><i><u>Stable:</u></i>&nbsp;3.14.3 (20 January 2008) [
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413">Download</a>
-]</h3>
-3.14.3 fixes several bugs since 3.14.2 and includes a policy 
-file which prevents the HAL-based USB UPS monitor included in recent Linux 
-distros from interfering with apcupsd. (Only APC UPSes are blacklisted in 
-the policy and the file is removed when apcupsd is uninstalled.)
+<h2>Apcupsd Releases</h2>
+<h3><i><u>Stable:</u></i>&nbsp;3.14.11 (31 January 2014)
+[&nbsp;<a href="https://sourceforge.net/projects/apcupsd/files/apcupsd%20-%20Stable/3.14.11/">Source</a>&nbsp;]
+<!--[&nbsp;<a href="https://sourceforge.net/projects/apcupsd/files/rpms%20-%20Stable/3.14.10/">RPMs</a>&nbsp;]-->
+[&nbsp;<a href="https://sourceforge.net/projects/apcupsd/files/win-binaries%20-%20Stable/3.14.11/">Windows</a>&nbsp;]
+[&nbsp;<a href="https://sourceforge.net/projects/apcupsd/files/osx-binaries%20-%20Stable/3.14.11/">OSX</a>&nbsp;]
+</h3>
+Release 3.14.11 adds MODBUS protocol support for newer APC UPSes. It also 
+includes digital signatures on the Windows USB driver and the Windows installer 
+package which should make installation on recent versions of Windows easier.
 <p>
-See the <a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=570036">
-ReleaseNotes</a> for full details.
+The MODBUS protocol gives access to advanced UPS features on newer UPSes that 
+previously only supported Microlink. A firmware upgrade may be required to 
+enable MODBUS support on some UPSes. 
+Please see the
+<a href="http://apcupsd.cvs.sourceforge.net/viewvc/*checkout*/apcupsd/apcupsd/ReleaseNotes?pathrev=Release-3_14_11">
+ReleaseNotes</a> for further details.
 <p>
-Apcupsd 3.14.3 is the latest stable release, containing many bug fixes and
-new features over the previous 3.12.x stable series. Users of all previous
+Apcupsd 3.14.11 is the latest stable release, containing many bug fixes and
+new features over previous releases. Users of all previous
 versions are encouraged to upgrade.
 <p>
-<i>If you use the old style master/slave networking mode, be sure to read the
-<a href="http://sourceforge.net/project/shownotes.php?group_id=54413&release_id=570036">
-release notes</a>.</i>
-<p>
-<b><u>New Features in the 3.14.x series:</u></b>
-<ul>
-<li>USB support for new platforms: Windows, Mac OS X, Solaris 10
-<li>Native Windows port
-<li>Improved tray icon support on Win32 (monitor multiple remote instances)
-<li>PowerChute Network Shutdown driver
-<li>GAPCMON GUI monitoring tool
-<li>Unreliable MASTER/SLAVE networking mode is removed
-<li>New configuration directives to set paths at runtime
-</ul>
-<h3><i><u>Previous Stable:</u></i>&nbsp;3.12.4 (19 August 2006) [
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=49059&release_id=440657">Source</a>
-&nbsp;/&nbsp;
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=73150&release_id=440720">RPMs</a>
-&nbsp;/&nbsp;
-<a href="http://sourceforge.net/project/showfiles.php?group_id=54413&package_id=73153&release_id=440658">Win32</a>
-]</h3>
-This is a bug fix release which includes fixes for SNMP crash in the
-face of network errors. Also status and data logging interval was often
-off by one period. NIS port now properly defaults to 3551 or value 
-provided by configure, not hard-coded 7000. RPM specs updated for 
-Fedora Core builds (need latex2html).
-<p>
-Highlights of the 3.12.x release series include a GUI installer for 
-Win32 systems, battery disconnect/reconnect detection for smart serial
-and USB connections, SNMP trap catching for quicker SNMP event 
-responses, and numerous bug fixes. Please be sure to read the
-<a href="http://sourceforge.net/project/shownotes.php?release_id=440658&group_id=54413">ReleaseNotes</a> 
-to learn about the new features and for important information about
-upcoming releases.
-
-<h2><a href="manual/index.html" target="_top">Online
-Manual</a> or a
-<a href="manual/apcupsd.pdf" target="_top">PDF Version of
+<h2><a href="manual/manual.html" target="_top">Online Manual</a> or a
+<a href="manual/manual.pdf" target="_top">PDF Version of
 the Manual</a> </h2> If you want to learn a bit more about
 <b>apcupsd</b>, you can browse the
-<a href="manual/index.html" target="_top">manual online</a>. 
-If you have any corrections/comments to the manual, please send them to me at:
-kern (at) sibbald (dot) com. For bug reports and
+<a href="manual/manual.html" target="_top">manual online</a>. 
+If you have any corrections/comments to the manual, please send them to
+the apcupsd-users mailing list (see below). For bug reports and
 developer contact, please see below.
 If you want a pdf copy of the manual, you can find it
-<a href="manual/apcupsd.pdf" target="_top">here</a>,
-and finally, if you want one big manual in a single html file,
-it can be found 
-<a href="manual/manual.html" target="_top">here</a>.
+<a href="manual/manual.pdf" target="_top">here</a>.
 
 <h2>Bugs and Email Support</h2>
 Please don't email me directly, it is much better to address bug reports
@@ -111,7 +78,7 @@ capabilities, David provides setup instructions and scripts to produce
 high quality, daily PDF graphs of all the important UPS power conditions. 
 To learn more about this, please visit <a
 target="_top"
-href="http://www.ecst.csuchico.edu/~dranch/LINUX/TrinityOS/cHTML/TrinityOS-c-36.html">
+href="http://www.trinityos.com/LINUX/TrinityOS/cHTML/TrinityOS-c-36.html">
 his site</a>.
 
 <h2>APC</h2>

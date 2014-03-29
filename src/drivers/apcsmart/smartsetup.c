@@ -35,12 +35,28 @@
 /*
  * This is the first routine in the driver that is called.
  */
-bool ApcSmartDriver::Open()
+bool ApcSmartUpsDriver::Open()
 {
    int cmd;
 
-   if ((_ups->fd = open(_ups->device, O_RDWR | O_NOCTTY | O_NDELAY | O_BINARY)) < 0)
-      Error_abort2(_("Cannot open UPS port %s: %s\n"), _ups->device, strerror(errno));
+   char *opendev = _ups->device;
+
+#ifdef HAVE_MINGW
+   // On Win32 add \\.\ UNC prefix to COMx in order to correctly address
+   // ports >= COM10.
+   char device[MAXSTRING];
+   if (!strnicmp(_ups->device, "COM", 3)) {
+      snprintf(device, sizeof(device), "\\\\.\\%s", _ups->device);
+      opendev = device;
+   }
+#endif
+
+   Dmsg(50, "Opening port %s\n", opendev);
+   if ((_ups->fd = open(opendev, O_RDWR | O_NOCTTY | O_NDELAY | O_BINARY)) < 0)
+   {
+      Dmsg(50, "Cannot open UPS port %s: %s\n", opendev, strerror(errno));
+      return false;
+   }
 
    /* Cancel the no delay we just set */
    cmd = fcntl(_ups->fd, F_GETFL, 0);
@@ -49,7 +65,6 @@ bool ApcSmartDriver::Open()
    /* Save old settings */
    tcgetattr(_ups->fd, &_oldtio);
 
-   memset(&_newtio, 0, sizeof(_newtio));
    _newtio.c_cflag = DEFAULT_SPEED | CS8 | CLOCAL | CREAD;
    _newtio.c_iflag = IGNPAR;    /* Ignore errors, raw input */
    _newtio.c_oflag = 0;         /* Raw output */
@@ -77,24 +92,18 @@ bool ApcSmartDriver::Open()
    tcsetattr(_ups->fd, TCSANOW, &_newtio);
    tcflush(_ups->fd, TCIFLUSH);
 
-   // Perform initial configuration and discovery
-   bool rc = Setup() && GetCapabilities() && ReadStaticData();
-
-   // If all is well so far, start monitoring thread
-   if (rc)
-      run();
-
-   return rc;
+   return 1;
 }
 
 /*
  * This routine is the last one called before apcupsd
  * terminates.
  */
-bool ApcSmartDriver::Close()
+bool ApcSmartUpsDriver::Close()
 {
    /* Reset serial line to old values */
    if (_ups->fd >= 0) {
+      Dmsg(50, "Closing port\n");
       tcflush(_ups->fd, TCIFLUSH);
       tcsetattr(_ups->fd, TCSANOW, &_oldtio);
       tcflush(_ups->fd, TCIFLUSH);
@@ -104,30 +113,21 @@ bool ApcSmartDriver::Close()
 
    _ups->fd = -1;
 
-   return true;
+   return 1;
 }
 
-bool ApcSmartDriver::Setup()
+bool ApcSmartUpsDriver::setup()
 {
    int attempts;
    int rts_bit = TIOCM_RTS;
    char a = 'Y';
 
-   /*
-    * The following enables communcations with the
-    * BackUPS Pro models in Smart Mode.
-    */
-   switch (_ups->cable.type) {
-   case APC_940_0095A:
-   case APC_940_0095B:
-   case APC_940_0095C:
-      /* Have to clear RTS line to access the serial cable mode PnP */
-      (void)ioctl(_ups->fd, TIOCMBIC, &rts_bit);
-      break;
+   if (_ups->fd == -1)
+      return 1;                    /* we must be a slave */
 
-   default:
-      break;
-   }
+   /* Have to clear RTS line to access the serial cable mode PnP on BKPro */
+   /* Shouldn't hurt on other cables, so just do it all the time. */
+   ioctl(_ups->fd, TIOCMBIC, &rts_bit);
 
    write(_ups->fd, &a, 1);          /* This one might not work, if UPS is */
    sleep(1);                       /* in an unstable communication state */
@@ -150,30 +150,10 @@ bool ApcSmartDriver::Setup()
       sleep(1);
    }
    Error_abort0(
-      _("PANIC! Cannot communicate with UPS via serial port.\n"
-        "Please make sure the port specified on the DEVICE directive is correct,\n"
-        "and that your cable specification on the UPSCABLE directive is correct.\n"));
+      "PANIC! Cannot communicate with UPS via serial port.\n"
+      "Please make sure the port specified on the DEVICE directive is correct,\n"
+      "and that your cable specification on the UPSCABLE directive is correct.\n");
 
  out:
-   return true;
-}
-
-void ApcSmartDriver::body()
-{
-   _ups->wait_time = 60;
-   while (1)
-   {
-      // Repeat ReadVolatileData() until no interrupts are issued during it.
-      // Normally this means we simply run it once. But if an async event
-      // ocurrs during the call, we will poll again to ensure we pick up
-      // whatever status has changed before going into CheckState().
-      do {
-         _interrupt = false;
-         ReadVolatileData();
-      } while (_interrupt);
-
-      // No more async events, sleep until another one comes in or until
-      // it is time to poll again.
-      CheckState();
-   }
+   return 1;
 }
