@@ -5435,7 +5435,7 @@ The meaning of the above variables are:
     The time/date that apcupsd was started.
 
 **STATUS**
-    The current status of the UPS (ONLINE, CHARGING, ONBATT, etc.)
+    The current status of the UPS (ONLINE, ONBATT, etc.)
 
 **LINEV**
     The current line voltage as returned by the UPS.
