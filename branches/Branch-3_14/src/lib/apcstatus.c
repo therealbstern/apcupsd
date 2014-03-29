@@ -134,29 +134,29 @@ int output_status(UPSINFO *ups, int sockfd,
    s_write(ups, "STATUS   : %s\n", status);
 
    if (ups->UPS_Cap[CI_VLINE])
-      s_write(ups, "LINEV    : %05.1f Volts\n", ups->LineVoltage);
+      s_write(ups, "LINEV    : %.1f Volts\n", ups->LineVoltage);
 
    if (ups->UPS_Cap[CI_LOAD])
-      s_write(ups, "LOADPCT  : %5.1f Percent\n", ups->UPSLoad);
+      s_write(ups, "LOADPCT  : %.1f Percent\n", ups->UPSLoad);
 
    if (ups->UPS_Cap[CI_BATTLEV])
-      s_write(ups, "BCHARGE  : %05.1f Percent\n", ups->BattChg);
+      s_write(ups, "BCHARGE  : %.1f Percent\n", ups->BattChg);
 
    if (ups->UPS_Cap[CI_RUNTIM])
-      s_write(ups, "TIMELEFT : %5.1f Minutes\n", ups->TimeLeft);
+      s_write(ups, "TIMELEFT : %.1f Minutes\n", ups->TimeLeft);
 
    s_write(ups, "MBATTCHG : %d Percent\n", ups->percent);
    s_write(ups, "MINTIMEL : %d Minutes\n", ups->runtime);
    s_write(ups, "MAXTIME  : %d Seconds\n", ups->maxtime);
 
    if (ups->UPS_Cap[CI_VMAX])
-      s_write(ups, "MAXLINEV : %05.1f Volts\n", ups->LineMax);
+      s_write(ups, "MAXLINEV : %.1f Volts\n", ups->LineMax);
 
    if (ups->UPS_Cap[CI_VMIN])
-      s_write(ups, "MINLINEV : %05.1f Volts\n", ups->LineMin);
+      s_write(ups, "MINLINEV : %.1f Volts\n", ups->LineMin);
 
    if (ups->UPS_Cap[CI_VOUT])
-      s_write(ups, "OUTPUTV  : %05.1f Volts\n", ups->OutputVoltage);
+      s_write(ups, "OUTPUTV  : %.1f Volts\n", ups->OutputVoltage);
 
    if (ups->UPS_Cap[CI_SENS]) {
       switch ((*ups).sensitivity[0]) {
@@ -179,25 +179,25 @@ int output_status(UPSINFO *ups, int sockfd,
    }
 
    if (ups->UPS_Cap[CI_DWAKE])
-      s_write(ups, "DWAKE    : %03d Seconds\n", ups->dwake);
+      s_write(ups, "DWAKE    : %d Seconds\n", ups->dwake);
 
    if (ups->UPS_Cap[CI_DSHUTD])
-      s_write(ups, "DSHUTD   : %03d Seconds\n", ups->dshutd);
+      s_write(ups, "DSHUTD   : %d Seconds\n", ups->dshutd);
 
    if (ups->UPS_Cap[CI_DLBATT])
-      s_write(ups, "DLOWBATT : %02d Minutes\n", ups->dlowbatt);
+      s_write(ups, "DLOWBATT : %d Minutes\n", ups->dlowbatt);
 
    if (ups->UPS_Cap[CI_LTRANS])
-      s_write(ups, "LOTRANS  : %03d.0 Volts\n", ups->lotrans);
+      s_write(ups, "LOTRANS  : %d.0 Volts\n", ups->lotrans);
 
    if (ups->UPS_Cap[CI_HTRANS])
-      s_write(ups, "HITRANS  : %03d.0 Volts\n", ups->hitrans);
+      s_write(ups, "HITRANS  : %d.0 Volts\n", ups->hitrans);
 
    if (ups->UPS_Cap[CI_RETPCT])
-      s_write(ups, "RETPCT   : %03d.0 Percent\n", ups->rtnpct);
+      s_write(ups, "RETPCT   : %d.0 Percent\n", ups->rtnpct);
 
    if (ups->UPS_Cap[CI_ITEMP])
-      s_write(ups, "ITEMP    : %04.1f C\n", ups->UPSTemp);
+      s_write(ups, "ITEMP    : %.1f C\n", ups->UPSTemp);
 
    if (ups->UPS_Cap[CI_DALARM]) {
       switch ((*ups).beepstate[0]) {
@@ -220,10 +220,10 @@ int output_status(UPSINFO *ups, int sockfd,
    }
 
    if (ups->UPS_Cap[CI_VBATT])
-      s_write(ups, "BATTV    : %04.1f Volts\n", ups->BattVoltage);
+      s_write(ups, "BATTV    : %.1f Volts\n", ups->BattVoltage);
 
    if (ups->UPS_Cap[CI_FREQ])
-      s_write(ups, "LINEFREQ : %03.1f Hz\n", ups->LineFreq);
+      s_write(ups, "LINEFREQ : %.1f Hz\n", ups->LineFreq);
 
    /* Output cause of last transfer to batteries */
    switch (ups->lastxfer) {
@@ -346,22 +346,22 @@ int output_status(UPSINFO *ups, int sockfd,
       s_write(ups, "BATTDATE : %s\n", ups->battdat);
 
    if (ups->UPS_Cap[CI_NOMOUTV])
-      s_write(ups, "NOMOUTV  : %03d Volts\n", ups->NomOutputVoltage);
+      s_write(ups, "NOMOUTV  : %d Volts\n", ups->NomOutputVoltage);
 
    if (ups->UPS_Cap[CI_NOMINV])
-      s_write(ups, "NOMINV   : %03d Volts\n", ups->NomInputVoltage);
+      s_write(ups, "NOMINV   : %d Volts\n", ups->NomInputVoltage);
 
    if (ups->UPS_Cap[CI_NOMBATTV])
-      s_write(ups, "NOMBATTV : %5.1f Volts\n", ups->nombattv);
+      s_write(ups, "NOMBATTV : %.1f Volts\n", ups->nombattv);
 
    if (ups->UPS_Cap[CI_NOMPOWER])
       s_write(ups, "NOMPOWER : %d Watts\n", ups->NomPower);
 
    if (ups->UPS_Cap[CI_HUMID])
-      s_write(ups, "HUMIDITY : %5.1f Percent\n", ups->humidity);
+      s_write(ups, "HUMIDITY : %.1f Percent\n", ups->humidity);
 
    if (ups->UPS_Cap[CI_ATEMP])
-      s_write(ups, "AMBTEMP  : %5.1f C\n", ups->ambtemp);
+      s_write(ups, "AMBTEMP  : %.1f C\n", ups->ambtemp);
 
    if (ups->UPS_Cap[CI_EXTBATTS])
       s_write(ups, "EXTBATTS : %d\n", ups->extbatts);
