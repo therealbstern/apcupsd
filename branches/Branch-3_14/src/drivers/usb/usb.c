@@ -1100,6 +1100,22 @@ bool UsbUpsDriver::kill_power()
       hibernate = shutdown();
    }
 
+   /*
+    * Workaround for UPS firmware bug. Some UPSes have an issue where, after
+    * killpower completes and utility power is restored, they appear to re-
+    * execute the killpower command when the USB is enumerated again. This 
+    * happens repeatedly until the USB is disconnected.
+    *
+    * The "Back-UPS RS1000G FW:868.L3 -P.D USB FW:L3 -P" is known to have this
+    * issue. Other Back-UPS models may have it as well.
+    *
+    * As a workaround, we read back a benign status register after sending the
+    * killpower command. This is thought to clear the UPS's command buffer or
+    * at least place a harmless command in it. We use CI_STATUS as that is a
+    * usage any UPS should have.
+    */
+   read_int_from_ups(CI_STATUS, &val);
+
    Dmsg(200, "Leave usb_ups_kill_power\n");
    return hibernate;
 }
