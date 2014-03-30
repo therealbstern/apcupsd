@@ -28,21 +28,12 @@
 
 using namespace Asn;
 
-void debug(const char *foo, int indent)
-{
-   while (indent--)
-      printf(" ");
-   printf("%s\n", foo);
-}
-
 // *****************************************************************************
 // Object
 // *****************************************************************************
 
 Object *Object::Demarshal(unsigned char *&buffer, unsigned int &buflen)
 {
-   static int indent = 0;
-
    // Must have at least one byte to work with
    if (buflen < 1)
       return NULL;
@@ -60,20 +51,16 @@ Object *Object::Demarshal(unsigned char *&buffer, unsigned int &buflen)
    case COUNTER:
    case GAUGE:
    case TIMETICKS:
-      debug("INTEGER", indent);
       obj = new Integer(type);
       break;
    case OCTETSTRING:
    case IPADDRESS:
-      debug("OCTETSTRING", indent);
       obj = new OctetString();
       break;
    case OBJECTID:
-      debug("OBJECTID", indent);
       obj = new ObjectId();
       break;
    case NULLL:
-      debug("NULLL", indent);
       obj = new Null();
       break;
    case SEQUENCE:
@@ -81,13 +68,10 @@ Object *Object::Demarshal(unsigned char *&buffer, unsigned int &buflen)
    case GETNEXT_REQ_PDU:
    case GET_RSP_PDU:
    case TRAP_PDU:
-      debug("SEQUENCE", indent);
-      indent += 2;
       obj = new Sequence(type);
       break;      
    default:
       printf("UNKNOWN ASN type=0x%02x\n", type);
-      debug("UNKNOWN", indent);
       obj = NULL;
       break;      
    }
@@ -98,9 +82,6 @@ Object *Object::Demarshal(unsigned char *&buffer, unsigned int &buflen)
       delete obj;
       obj = NULL;
    }
-
-   if (type & CONSTRUCTED)
-      indent -= 2;
 
    return obj;
 }
