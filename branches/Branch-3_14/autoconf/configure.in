@@ -1,6 +1,7 @@
 dnl Autoconfigure input file for apcupsd (derived from fetchmail-4.7.4).
 dnl
 dnl Copyright (C) 1999-2000 Riccardo Facchetti <riccardo@master.oasi.gpa.it>
+dnl Copyright (C) 2003-2014 Adam Kropelin <adam@kroptech.com>
 dnl
 dnl Process this file with autoconf to produce a configure script.
 dnl Process this file with autoheader to produce a config.h.in
