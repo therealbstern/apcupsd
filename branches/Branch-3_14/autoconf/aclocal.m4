@@ -34,7 +34,7 @@ AC_DEFUN(AC_TYPE_SOCKETLEN_T,
   int accept (int, struct sockaddr *, size_t *);
   ],[],[
   AC_MSG_RESULT(size_t)
-  AC_DEFINE(socklen_t,size_t)], [
+  AC_DEFINE(socklen_t,size_t,[Define base type for socklen_t if needed])], [
   AC_MSG_RESULT(int)
   AC_DEFINE(socklen_t,int)])])
 ])

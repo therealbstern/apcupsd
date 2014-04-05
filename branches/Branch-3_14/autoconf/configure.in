@@ -113,13 +113,6 @@ AC_PROG_INSTALL            dnl Determine a BSD install program.
 AC_PROG_AWK
 AC_ISC_POSIX
 
-if test x$GCC = xyes; then
-   AM_CONDITIONAL(HAVE_GCC, $TRUEPRG)
-   AC_DEFINE(HAVE_GCC)
-else
-   AM_CONDITIONAL(HAVE_GCC, $FALSEPRG)
-fi
-
 dnl Default linker is gcc
 if test x$LD = x ; then
    LD="$CC"
@@ -141,7 +134,7 @@ PTHREAD_CFLAGS=""
 PTHREAD_LFLAGS="-lpthread"
 with_pthreads=yes
 
-AC_DEFINE(HAVE_PTHREADS)
+AC_DEFINE(HAVE_PTHREADS, [1], [Define if you have pthreads])
 AC_SUBST(PTHREAD_CFLAGS)
 AC_SUBST(PTHREAD_LFLAGS)
 
@@ -242,17 +235,6 @@ AC_SEARCH_LIBS(gethostname, [xnet socket inet])
 AC_SEARCH_LIBS(gethostbyname, [nsl resolv])
 AC_SEARCH_LIBS(gethostbyname_r, [nsl resolv])
 
-dnl --------------------------------------------------------------------------
-dnl Check for socklen_t
-dnl --------------------------------------------------------------------------
-AC_CACHE_CHECK(for socklen_t, ba_cv_header_socklen_t,
-  [AC_TRY_COMPILE([
-#include <sys/types.h>
-#include <sys/socket.h>],
-  [socklen_t x],
-  ba_cv_header_socklen_t=yes, ba_cv_header_socklen_t=no)])
-test $ba_cv_header_socklen_t = yes && AC_DEFINE(HAVE_SOCKLEN_T)
-
 # The condition in this test copes with the presence of inet_addr in libc6.
 AC_SEARCH_LIBS(inet_addr, nsl)
 
@@ -263,30 +245,30 @@ AC_CHECK_FUNC(strchr,
    [EXTRADEFS="$EXTRADEFS -D_SYSV3"
     LIBS="$LIBS -lcposix"]))
 
-AC_CHECK_FUNC(strstr, AC_DEFINE(HAVE_STRSTR), 
+AC_CHECK_FUNC(strstr, AC_DEFINE(HAVE_STRSTR,, [Define if you have strstr]), 
    [LIBEXTRAOBJ="$LIBEXTRAOBJ strstr.o"
     EXTRAOBJ="$EXTRAOBJ lib/strstr.o"])
 
-AC_CHECK_FUNC(strcasecmp, AC_DEFINE(HAVE_STRCASECMP), 
+AC_CHECK_FUNC(strcasecmp, AC_DEFINE(HAVE_STRCASECMP,, [Define if you have strcasecmp]), 
    [LIBEXTRAOBJ="$LIBEXTRAOBJ strcasecmp.o"
     EXTRAOBJ="$EXTRAOBJ lib/strcasecmp.o"])
         
-AC_CHECK_FUNC(memmove, AC_DEFINE(HAVE_MEMMOVE), 
+AC_CHECK_FUNC(memmove, AC_DEFINE(HAVE_MEMMOVE,, [Define if you have memmove]), 
    [LIBEXTRAOBJ="$LIBEXTRAOBJ memmove.o"
     EXTRAOBJ="$EXTRAOBJ lib/memmove.o"])
         
-AC_CHECK_FUNC(getopt_long, AC_DEFINE(HAVE_GETOPTLONG),
+AC_CHECK_FUNC(getopt_long, AC_DEFINE(HAVE_GETOPTLONG,, [Define if you have getoptlong]),
    [LIBEXTRAOBJ="$LIBEXTRAOBJ getopt.o getopt1.o"
     EXTRAOBJ="$EXTRAOBJ lib/getopt.o lib/getopt1.o"])
 
-AC_CHECK_FUNC(inet_pton, AC_DEFINE(HAVE_INETPTON), 
+AC_CHECK_FUNC(inet_pton, AC_DEFINE(HAVE_INETPTON,, [Define if you have inetpton]), 
     [LIBEXTRAOBJ="$LIBEXTRAOBJ inet_pton.o"
      EXTRAOBJ="$EXTRAOBJ lib/inet_pton.o"])
 
 dnl
 dnl Check for presence of localtime_r
 dnl
-AC_CHECK_FUNC(localtime_r, AC_DEFINE(HAVE_LOCALTIME_R),
+AC_CHECK_FUNC(localtime_r, AC_DEFINE(HAVE_LOCALTIME_R,, [Define if you have localtime_r]),
    [LIBEXTRAOBJ="$LIBEXTRAOBJ localtime_r.o"
     EXTRAOBJ="$EXTRAOBJ lib/localtime_r.o"])
 
@@ -301,7 +283,7 @@ AC_CHECK_HEADERS(
    unistd.h
    ,,[AC_MSG_WARN([at least 1 header file is missing. This may not compile.])])
 
-AC_CHECK_HEADERS(arpa/nameser.h,AC_DEFINE(HAVE_NAMESER_H))
+AC_CHECK_HEADERS(arpa/nameser.h,AC_DEFINE(HAVE_NAMESER_H,, [Define if you have nameser.h]))
 
 AC_HEADER_STAT       dnl Check for S_ISDIR and S_ISREG macros.
 AC_HEADER_TIME       dnl Check for time.h and sys/time.h.
@@ -332,30 +314,26 @@ AC_CHECK_TYPE(int32_t, int)
 dnl
 dnl Check for system services.
 dnl
-AC_EXEEXT          dnl Check for EXE extension.
 AC_PATH_XTRA       dnl Is X Window System interesting ?.  **GAPCMON**
 AC_SYS_INTERPRETER dnl Check for '#!' in shell scripts.
 
 dnl
 dnl UNIX variants
 dnl
-AC_SUBST(EXEEXT)
-AC_DEFINE_UNQUOTED(EXEEXT, "$EXEEXT")
-
 case $host in
-   *-*-sunos*)   AC_DEFINE(HAVE_SUN_OS)     ;;
-   *-*-solaris*) AC_DEFINE(HAVE_SUN_OS)     ;;
-   *-*-osf*)     AC_DEFINE(HAVE_OSF1_OS)    ;;
-   *-*-aix*)     AC_DEFINE(HAVE_AIX_OS)     ;;
-   *-*-hpux*)    AC_DEFINE(HAVE_HPUX_OS)    ;;
-   *-*-linux*)   AC_DEFINE(HAVE_LINUX_OS)   ;;
-   *-*-freebsd*) AC_DEFINE(HAVE_FREEBSD_OS) ;;
-   *-*-netbsd*)  AC_DEFINE(HAVE_NETBSD_OS)  ;;
-   *-*-openbsd*) AC_DEFINE(HAVE_OPENBSD_OS) ;;
-   *-*-bsdi*)    AC_DEFINE(HAVE_BSDI_OS)    ;;
-   *-*-irix*)    AC_DEFINE(HAVE_SGI_OS)     ;;
-   *-*-darwin*)  AC_DEFINE(HAVE_DARWIN_OS)  ;;
-   *-*-nto*)     AC_DEFINE(HAVE_QNX_OS)     ;;
+   *-*-sunos*)   AC_DEFINE(HAVE_SUN_OS,,     [Define if building for SunOS])   ;;
+   *-*-solaris*) AC_DEFINE(HAVE_SUN_OS,,     [Define if building for SunOS])   ;;
+   *-*-osf*)     AC_DEFINE(HAVE_OSF1_OS,,    [Define if building for OSF1])    ;;
+   *-*-aix*)     AC_DEFINE(HAVE_AIX_OS,,     [Define if building for AIX])     ;;
+   *-*-hpux*)    AC_DEFINE(HAVE_HPUX_OS,,    [Define if building for HPUX])    ;;
+   *-*-linux*)   AC_DEFINE(HAVE_LINUX_OS,,   [Define if building for Linux])   ;;
+   *-*-freebsd*) AC_DEFINE(HAVE_FREEBSD_OS,, [Define if building for FreeBSD]) ;;
+   *-*-netbsd*)  AC_DEFINE(HAVE_NETBSD_OS,,  [Define if building for NetBSD])  ;;
+   *-*-openbsd*) AC_DEFINE(HAVE_OPENBSD_OS,, [Define if building for OpenBSD]) ;;
+   *-*-bsdi*)    AC_DEFINE(HAVE_BSDI_OS,,    [Define if building for BSDi])    ;;
+   *-*-irix*)    AC_DEFINE(HAVE_SGI_OS,,     [Define if building for IRIX])    ;;
+   *-*-darwin*)  AC_DEFINE(HAVE_DARWIN_OS,,  [Define if building for Darwin])  ;;
+   *-*-nto*)     AC_DEFINE(HAVE_QNX_OS,,     [Define if building for QNX])     ;;
 esac
 
 dnl
@@ -420,7 +398,7 @@ AC_ARG_WITH(libwrap,
               struct request_info *req; ],
             [ hosts_access(req); ],
             [ AC_MSG_RESULT([yes])
-              AC_DEFINE(HAVE_LIBWRAP)
+              AC_DEFINE(HAVE_LIBWRAP,, [Define if you have libwrap])
               TCPW_MSG="yes" ],
             [ LIBS="$saved_LIBS -lwrap -lnsl"
               AC_TRY_LINK(
@@ -458,7 +436,7 @@ AC_ARG_ENABLE(cgi,
         dnl First search for system library that defines gdImagePng
         AC_CHECK_LIB(gd, gdImagePng,
            [ AC_MSG_RESULT([using PNG file format (/usr/lib).])
-             AC_DEFINE(SYS_IMGFMT_PNG)
+             AC_DEFINE(SYS_IMGFMT_PNG,, [Define if you have gdImagePng in libgd])
              GD_LIBS="-lgd"
              SYS_GD_FOUND=yes ],
            [],
@@ -470,7 +448,7 @@ AC_ARG_ENABLE(cgi,
         then
            AC_CHECK_LIB(gd, gdImageGif,
               [ AC_MSG_RESULT([using GIF file format (/usr/lib).])
-                AC_DEFINE(SYS_IMGFMT_GIF)
+                AC_DEFINE(SYS_IMGFMT_GIF,, [Define if you have gdImageGif in libgd])
                 GD_LIBS="-lgd"
                 SYS_GD_FOUND=yes ],
               [],
@@ -541,7 +519,7 @@ AC_HELP_STRING([--enable-apcsmart], [Compile APC SmartUPS serial driver (default
 AC_HELP_STRING([--disable-apcsmart], [No APC SmartUPS serial driver])],
    [ if test "$enableval" = "yes" ; then
        dnl This is for C code inclusion
-       AC_DEFINE(HAVE_APCSMART_DRIVER)
+       AC_DEFINE(HAVE_APCSMART_DRIVER,, [Define if building apcsmart driver])
 
        dnl This is for Makefile.in inside src/drivers/
        APCSMART_DRIVER="apcsmart"
@@ -555,7 +533,7 @@ AC_ARG_ENABLE(dumb, [
 AC_HELP_STRING([--enable-dumb], [Compile dumb UPS driver (default)])
 AC_HELP_STRING([--disable-dumb], [No dumb UPS driver])],
    [ if test "$enableval" = "yes" ; then
-        AC_DEFINE(HAVE_DUMB_DRIVER)
+        AC_DEFINE(HAVE_DUMB_DRIVER,, [Define if building simple signaling driver])
         DUMB_DRIVER="dumb"
         AC_SUBST(DUMB_DRIVER)
      fi],
@@ -632,7 +610,7 @@ AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
             ;;
       esac
 
-      AC_DEFINE(HAVE_USB_DRIVER)
+      AC_DEFINE(HAVE_USB_DRIVER,, [Define if building USB driver])
       USB_DRIVER="usb"
       AC_SUBST(USB_DRIVER)
       AC_SUBST(USB_TYPE)
@@ -646,7 +624,7 @@ AC_ARG_ENABLE(net, [
 AC_HELP_STRING([--enable-net], [Compile networking driver for slaves (default)])
 AC_HELP_STRING([--disable-net], [No network driver for slaves])],
    [ if test "$enableval" = "yes" ; then
-        AC_DEFINE(HAVE_NET_DRIVER)
+        AC_DEFINE(HAVE_NET_DRIVER,, [Define if building net driver])
         NET_DRIVER="net"
         AC_SUBST(NET_DRIVER)
      fi ],
@@ -658,7 +636,7 @@ AC_ARG_ENABLE(snmp, [
 AC_HELP_STRING([--enable-snmp], [Compile SNMP driver (default)])
 AC_HELP_STRING([--disable-snmp], [No SNMP driver])],
    [ if test "$enableval" = "yes" ; then
-        AC_DEFINE(HAVE_SNMPLITE_DRIVER)
+        AC_DEFINE(HAVE_SNMPLITE_DRIVER,, [Define if building snmplite driver])
         SNMPLITE_DRIVER="snmplite"
         DISPLAY_SNMP_DRIVER="snmp"
         AC_SUBST(SNMPLITE_DRIVER)        
@@ -689,7 +667,7 @@ AC_HELP_STRING([--disable-net-snmp], [No NET-SNMP UPS code (default)])],
         if test "$SNMP_LIB_FOUND" = "no" ; then
            AC_CHECK_LIB(netsnmp, snmp_open,
               [DRVLIBS="$DRVLIBS -lnetsnmp"
-               AC_DEFINE(HAVE_NET_SNMP)
+               AC_DEFINE(HAVE_NET_SNMP,, [Define if you have libnetsnmp])
                SNMP_LIB_FOUND="yes"], [], [$DRVLIBS])
         fi
 
@@ -697,7 +675,7 @@ AC_HELP_STRING([--disable-net-snmp], [No NET-SNMP UPS code (default)])],
         if test "$SNMP_LIB_FOUND" = "no" ; then
            AC_CHECK_LIB(snmp, snmp_open,
               [DRVLIBS="$DRVLIBS -lsnmp"
-               AC_DEFINE(HAVE_UCD_SNMP)
+               AC_DEFINE(HAVE_UCD_SNMP,, [Define if you have libsnmp])
                SNMP_LIB_FOUND="yes"], [], [$DRVLIBS])
         fi
 
@@ -706,7 +684,7 @@ AC_HELP_STRING([--disable-net-snmp], [No NET-SNMP UPS code (default)])],
         fi
 
         dnl If we get this far, we found a valid lib
-        AC_DEFINE(HAVE_SNMP_DRIVER)
+        AC_DEFINE(HAVE_SNMP_DRIVER,, [Define if building snmp driver])
         DISPLAY_NETSNMP_DRIVER="net-snmp"
 
         SNMP_DRIVER="snmp"
@@ -719,7 +697,7 @@ AC_ARG_ENABLE(test, [
 AC_HELP_STRING([--enable-test], [Compile TEST driver code])
 AC_HELP_STRING([--disable-test], [No TEST driver (default)])],
    [ if test "$enableval" = "yes" ; then
-        AC_DEFINE(HAVE_TEST_DRIVER)
+        AC_DEFINE(HAVE_TEST_DRIVER,, [Define if building test driver])
         TEST_DRIVER="test"
         AC_SUBST(TEST_DRIVER)
      fi],
@@ -730,7 +708,7 @@ AC_ARG_ENABLE(pcnet, [
 AC_HELP_STRING([--enable-pcnet], [Compile PCNET driver code (default)])
 AC_HELP_STRING([--disable-pcnet], [No PCNET driver])],
    [ if test "$enableval" = "yes" ; then
-        AC_DEFINE(HAVE_PCNET_DRIVER)
+        AC_DEFINE(HAVE_PCNET_DRIVER,, [Define if building PCNET driver])
         PCNET_DRIVER="pcnet"
         AC_SUBST(PCNET_DRIVER)
      fi],
@@ -743,7 +721,7 @@ AC_ARG_ENABLE(modbus, [
 AC_HELP_STRING([--enable-modbus], [Compile MODBUS driver code (default)])
 AC_HELP_STRING([--disable-modbus], [No MODBUS driver])],
    [ if test "$enableval" = "yes" ; then
-        AC_DEFINE(HAVE_MODBUS_DRIVER)
+        AC_DEFINE(HAVE_MODBUS_DRIVER,, [Define if building MODBUS driver])
         MODBUS_DRIVER="modbus"
         AC_SUBST(MODBUS_DRIVER)
      fi],
@@ -753,8 +731,8 @@ AC_HELP_STRING([--disable-modbus], [No MODBUS driver])],
 
 dnl Force NIS to enabled since libnis is required by apcaccess.
 dnl Users may still disable NIS at runtime in apcupsd.conf.
-AC_DEFINE(HAVE_NISSERVER)
-AC_DEFINE(HAVE_NISLIB)
+AC_DEFINE(HAVE_NISSERVER,, [Define if apcupsd NIS server is being built])
+AC_DEFINE(HAVE_NISLIB,, [Define if apcupsd NIS library is being built])
 NISSRV_ENABLED=yes
 
 dnl Allow setting of NISIP value
@@ -822,22 +800,22 @@ dnl
 AX_FUNC_WHICH_GETHOSTBYNAME_R
 case "$ac_cv_func_which_gethostbyname_r" in
    three)
-   AC_DEFINE(HAVE_FUNC_GETHOSTBYNAME_R_3)
+   AC_DEFINE(HAVE_FUNC_GETHOSTBYNAME_R_3,, [Define for 3 argument version of gethostbyname_r])
    GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_3"
    ;;
 
    five)
-   AC_DEFINE(HAVE_FUNC_GETHOSTBYNAME_R_5)
+   AC_DEFINE(HAVE_FUNC_GETHOSTBYNAME_R_5,, [Define for 5 argument version of gethostbyname_r])
    GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_5"
    ;;
 
    six)
-   AC_DEFINE(HAVE_FUNC_GETHOSTBYNAME_R_6)
+   AC_DEFINE(HAVE_FUNC_GETHOSTBYNAME_R_6,, [Define for 6 argument version of gethostbyname_r])
    GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_6"
    ;;
 
    no)
-   AC_DEFINE(HAVE_FUNC_GETHOSTBYNAME_R_0)
+   AC_DEFINE(HAVE_FUNC_GETHOSTBYNAME_R_0,, [Define if system does not have gethostbyname_r])
    GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_0"
    ;;
 
@@ -927,7 +905,7 @@ AC_SUBST(LD)
 AC_SUBST(CGI)
 AC_SUBST(GD_LIBS)
 AC_SUBST(CGIBIN)
-AC_DEFINE_UNQUOTED(SYSCONFDIR, "$sysconfdir")
+AC_DEFINE_UNQUOTED(SYSCONFDIR, "$sysconfdir", [Default directory in which apcupsd config files are stored])
 AC_SUBST(SYSCONFDIR)
 AC_SUBST(RST2HTML)
 AC_SUBST(RST2PDF)
@@ -954,23 +932,6 @@ AC_SUBST(EXTRAOBJ)
 
 dnl Check out the wait reality.  We have to assume sys/wait.h is present.
 AC_CHECK_FUNCS(wait waitpid wait3)
-AC_MSG_CHECKING([for union wait]);
-AC_TRY_LINK([#include <sys/types.h>
-             #include <sys/wait.h>],
-            [union wait status; int pid; pid = wait (&status);
-             #ifdef WEXITSTATUS
-                /* Some POSIXoid systems have both the new-style macros and the old
-                   union wait type, and they do not work together.  If union wait
-                   conflicts with WEXITSTATUS et al, we don't want to use it at all.  */
-                if (WEXITSTATUS (status) != 0) pid = -1;
-             #endif
-             #ifdef HAVE_WAITPID
-                /* Make sure union wait works with waitpid.  */
-                pid = waitpid (-1, &status, 0);
-             #endif
-            ],
-   [AC_DEFINE(HAVE_UNION_WAIT) AC_MSG_RESULT([yes])],
-    AC_MSG_RESULT([no]))
 
 if test "$ENABLE_CGI" = "yes"
 then
@@ -1353,22 +1314,22 @@ AC_ARG_WITH(upscable,
 AC_SUBST(DISTNAME)
 AC_SUBST(DISTVER)
 AC_SUBST(SERIALDEV)
-AC_DEFINE_UNQUOTED(PIDDIR, "$PIDDIR")
+AC_DEFINE_UNQUOTED(PIDDIR, "$PIDDIR", [Default directory in which pid file is written])
 AC_SUBST(PIDDIR)
-AC_DEFINE_UNQUOTED(LOGDIR, "$LOGDIR")
+AC_DEFINE_UNQUOTED(LOGDIR, "$LOGDIR", [Default directory in which log is written])
 AC_SUBST(LOGDIR)
-AC_DEFINE_UNQUOTED(NOLOGDIR, "$nologdir")
+AC_DEFINE_UNQUOTED(NOLOGDIR, "$nologdir", [Default directory in which nologin file is written])
 AC_SUBST(nologdir)
-AC_DEFINE_UNQUOTED(PWRFAILDIR, "$PWRFAILDIR")
+AC_DEFINE_UNQUOTED(PWRFAILDIR, "$PWRFAILDIR", [Default directory in which powerfail flag file is written])
 AC_SUBST(PWRFAILDIR)
 AC_SUBST(LOCKDIR)
 AC_SUBST(NISPORT)
-AC_DEFINE_UNQUOTED(NISPORT, $NISPORT)
+AC_DEFINE_UNQUOTED(NISPORT, $NISPORT, [Default port number for NIS server])
 AC_SUBST(UPSTYPE)
 AC_SUBST(UPSCABLE)
 
 HOST=$DISTNAME
-AC_DEFINE_UNQUOTED(HOST, "$HOST")
+AC_DEFINE_UNQUOTED(HOST, "$HOST", [Name of system on which apcupsd will run])
 AC_SUBST(HOST)
 
 dnl

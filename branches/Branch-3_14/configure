@@ -715,8 +715,6 @@ PTHREAD_CFLAGS
 APCDRVLIBS
 DRVLIBS
 DEBUG
-HAVE_GCC_FALSE
-HAVE_GCC_TRUE
 AWK
 INSTALL_DATA
 INSTALL_SCRIPT
@@ -3999,32 +3997,6 @@ if test "$ac_res" != no; then
 fi
 
 
-if test x$GCC = xyes; then
-
-
-if $TRUEPRG; then
-  HAVE_GCC_TRUE=
-  HAVE_GCC_FALSE='#'
-else
-  HAVE_GCC_TRUE='#'
-  HAVE_GCC_FALSE=
-fi
-   cat >>confdefs.h <<\_ACEOF
-#define HAVE_GCC 1
-_ACEOF
-
-else
-
-
-if $FALSEPRG; then
-  HAVE_GCC_TRUE=
-  HAVE_GCC_FALSE='#'
-else
-  HAVE_GCC_TRUE='#'
-  HAVE_GCC_FALSE=
-fi
-fi
-
 if test x$LD = x ; then
    LD="$CC"
 fi
@@ -4041,6 +4013,7 @@ fi
 PTHREAD_CFLAGS=""
 PTHREAD_LFLAGS="-lpthread"
 with_pthreads=yes
+
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_PTHREADS 1
@@ -6291,63 +6264,6 @@ if test "$ac_res" != no; then
 fi
 
 
-{ $as_echo "$as_me:$LINENO: checking for socklen_t" >&5
-$as_echo_n "checking for socklen_t... " >&6; }
-if test "${ba_cv_header_socklen_t+set}" = set; then
-  $as_echo_n "(cached) " >&6
-else
-  cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-#include <sys/types.h>
-#include <sys/socket.h>
-int
-main ()
-{
-socklen_t x
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext
-if { (ac_try="$ac_compile"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_compile") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_c_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest.$ac_objext; then
-  ba_cv_header_socklen_t=yes
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ba_cv_header_socklen_t=no
-fi
-
-rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-fi
-{ $as_echo "$as_me:$LINENO: result: $ba_cv_header_socklen_t" >&5
-$as_echo "$ba_cv_header_socklen_t" >&6; }
-test $ba_cv_header_socklen_t = yes && cat >>confdefs.h <<\_ACEOF
-#define HAVE_SOCKLEN_T 1
-_ACEOF
-
-
 # The condition in this test copes with the presence of inet_addr in libc6.
 { $as_echo "$as_me:$LINENO: checking for library containing inet_addr" >&5
 $as_echo_n "checking for library containing inet_addr... " >&6; }
@@ -6685,8 +6601,9 @@ fi
 { $as_echo "$as_me:$LINENO: result: $ac_cv_func_strstr" >&5
 $as_echo "$ac_cv_func_strstr" >&6; }
 if test "x$ac_cv_func_strstr" = x""yes; then
-  cat >>confdefs.h <<\_ACEOF
-#define HAVE_STRSTR 1
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_STRSTR /**/
 _ACEOF
 
 else
@@ -6781,8 +6698,9 @@ fi
 { $as_echo "$as_me:$LINENO: result: $ac_cv_func_strcasecmp" >&5
 $as_echo "$ac_cv_func_strcasecmp" >&6; }
 if test "x$ac_cv_func_strcasecmp" = x""yes; then
-  cat >>confdefs.h <<\_ACEOF
-#define HAVE_STRCASECMP 1
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_STRCASECMP /**/
 _ACEOF
 
 else
@@ -6877,8 +6795,9 @@ fi
 { $as_echo "$as_me:$LINENO: result: $ac_cv_func_memmove" >&5
 $as_echo "$ac_cv_func_memmove" >&6; }
 if test "x$ac_cv_func_memmove" = x""yes; then
-  cat >>confdefs.h <<\_ACEOF
-#define HAVE_MEMMOVE 1
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_MEMMOVE /**/
 _ACEOF
 
 else
@@ -6973,8 +6892,9 @@ fi
 { $as_echo "$as_me:$LINENO: result: $ac_cv_func_getopt_long" >&5
 $as_echo "$ac_cv_func_getopt_long" >&6; }
 if test "x$ac_cv_func_getopt_long" = x""yes; then
-  cat >>confdefs.h <<\_ACEOF
-#define HAVE_GETOPTLONG 1
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_GETOPTLONG /**/
 _ACEOF
 
 else
@@ -7069,8 +6989,9 @@ fi
 { $as_echo "$as_me:$LINENO: result: $ac_cv_func_inet_pton" >&5
 $as_echo "$ac_cv_func_inet_pton" >&6; }
 if test "x$ac_cv_func_inet_pton" = x""yes; then
-  cat >>confdefs.h <<\_ACEOF
-#define HAVE_INETPTON 1
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_INETPTON /**/
 _ACEOF
 
 else
@@ -7165,8 +7086,9 @@ fi
 { $as_echo "$as_me:$LINENO: result: $ac_cv_func_localtime_r" >&5
 $as_echo "$ac_cv_func_localtime_r" >&6; }
 if test "x$ac_cv_func_localtime_r" = x""yes; then
-  cat >>confdefs.h <<\_ACEOF
-#define HAVE_LOCALTIME_R 1
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_LOCALTIME_R /**/
 _ACEOF
 
 else
@@ -7490,8 +7412,9 @@ as_val=`eval 'as_val=${'$as_ac_Header'}
   cat >>confdefs.h <<_ACEOF
 #define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
 _ACEOF
- cat >>confdefs.h <<\_ACEOF
-#define HAVE_NAMESER_H 1
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_NAMESER_H /**/
 _ACEOF
 
 fi
@@ -8750,7 +8673,8 @@ $as_echo "$ac_try_echo") >&5
 
   { $as_echo "$as_me:$LINENO: result: size_t" >&5
 $as_echo "size_t" >&6; }
-  cat >>confdefs.h <<\_ACEOF
+
+cat >>confdefs.h <<\_ACEOF
 #define socklen_t size_t
 _ACEOF
 
@@ -8878,7 +8802,7 @@ _ACEOF
 fi
 
 
-          { $as_echo "$as_me:$LINENO: checking for X" >&5
+{ $as_echo "$as_me:$LINENO: checking for X" >&5
 $as_echo_n "checking for X... " >&6; }
 
 
@@ -10277,63 +10201,70 @@ fi
 $as_echo "$ac_cv_sys_interpreter" >&6; }
 interpval=$ac_cv_sys_interpreter
 
-
-cat >>confdefs.h <<_ACEOF
-#define EXEEXT "$EXEEXT"
-_ACEOF
-
-
 case $host in
-   *-*-sunos*)   cat >>confdefs.h <<\_ACEOF
-#define HAVE_SUN_OS 1
-_ACEOF
-     ;;
-   *-*-solaris*) cat >>confdefs.h <<\_ACEOF
-#define HAVE_SUN_OS 1
-_ACEOF
-     ;;
-   *-*-osf*)     cat >>confdefs.h <<\_ACEOF
-#define HAVE_OSF1_OS 1
-_ACEOF
-    ;;
-   *-*-aix*)     cat >>confdefs.h <<\_ACEOF
-#define HAVE_AIX_OS 1
-_ACEOF
-     ;;
-   *-*-hpux*)    cat >>confdefs.h <<\_ACEOF
-#define HAVE_HPUX_OS 1
-_ACEOF
-    ;;
-   *-*-linux*)   cat >>confdefs.h <<\_ACEOF
-#define HAVE_LINUX_OS 1
+   *-*-sunos*)
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_SUN_OS /**/
 _ACEOF
    ;;
-   *-*-freebsd*) cat >>confdefs.h <<\_ACEOF
-#define HAVE_FREEBSD_OS 1
+   *-*-solaris*)
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_SUN_OS /**/
 _ACEOF
- ;;
-   *-*-netbsd*)  cat >>confdefs.h <<\_ACEOF
-#define HAVE_NETBSD_OS 1
-_ACEOF
-  ;;
-   *-*-openbsd*) cat >>confdefs.h <<\_ACEOF
-#define HAVE_OPENBSD_OS 1
-_ACEOF
- ;;
-   *-*-bsdi*)    cat >>confdefs.h <<\_ACEOF
-#define HAVE_BSDI_OS 1
+   ;;
+   *-*-osf*)
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_OSF1_OS /**/
 _ACEOF
     ;;
-   *-*-irix*)    cat >>confdefs.h <<\_ACEOF
-#define HAVE_SGI_OS 1
+   *-*-aix*)
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_AIX_OS /**/
 _ACEOF
      ;;
-   *-*-darwin*)  cat >>confdefs.h <<\_ACEOF
-#define HAVE_DARWIN_OS 1
+   *-*-hpux*)
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_HPUX_OS /**/
+_ACEOF
+    ;;
+   *-*-linux*)
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_LINUX_OS /**/
+_ACEOF
+   ;;
+   *-*-freebsd*)
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_FREEBSD_OS /**/
+_ACEOF
+ ;;
+   *-*-netbsd*)
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_NETBSD_OS /**/
 _ACEOF
   ;;
-   *-*-nto*)     cat >>confdefs.h <<\_ACEOF
-#define HAVE_QNX_OS 1
+   *-*-openbsd*)
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_OPENBSD_OS /**/
+_ACEOF
+ ;;
+   *-*-bsdi*)
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_BSDI_OS /**/
+_ACEOF
+    ;;
+   *-*-irix*)
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_SGI_OS /**/
+_ACEOF
+    ;;
+   *-*-darwin*)
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_DARWIN_OS /**/
+_ACEOF
+  ;;
+   *-*-nto*)
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_QNX_OS /**/
 _ACEOF
      ;;
 esac
@@ -10434,8 +10365,9 @@ $as_echo "$ac_try_echo") >&5
        }; then
    { $as_echo "$as_me:$LINENO: result: yes" >&5
 $as_echo "yes" >&6; }
-              cat >>confdefs.h <<\_ACEOF
-#define HAVE_LIBWRAP 1
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_LIBWRAP /**/
 _ACEOF
 
               TCPW_MSG="yes"
@@ -10595,8 +10527,9 @@ $as_echo "$ac_cv_lib_gd_gdImagePng" >&6; }
 if test "x$ac_cv_lib_gd_gdImagePng" = x""yes; then
    { $as_echo "$as_me:$LINENO: result: using PNG file format (/usr/lib)." >&5
 $as_echo "using PNG file format (/usr/lib)." >&6; }
-             cat >>confdefs.h <<\_ACEOF
-#define SYS_IMGFMT_PNG 1
+
+cat >>confdefs.h <<\_ACEOF
+#define SYS_IMGFMT_PNG /**/
 _ACEOF
 
              GD_LIBS="-lgd"
@@ -10674,8 +10607,9 @@ $as_echo "$ac_cv_lib_gd_gdImageGif" >&6; }
 if test "x$ac_cv_lib_gd_gdImageGif" = x""yes; then
    { $as_echo "$as_me:$LINENO: result: using GIF file format (/usr/lib)." >&5
 $as_echo "using GIF file format (/usr/lib)." >&6; }
-                cat >>confdefs.h <<\_ACEOF
-#define SYS_IMGFMT_GIF 1
+
+cat >>confdefs.h <<\_ACEOF
+#define SYS_IMGFMT_GIF /**/
 _ACEOF
 
                 GD_LIBS="-lgd"
@@ -11283,8 +11217,9 @@ fi
 # Check whether --enable-apcsmart was given.
 if test "${enable_apcsmart+set}" = set; then
   enableval=$enable_apcsmart;  if test "$enableval" = "yes" ; then
-              cat >>confdefs.h <<\_ACEOF
-#define HAVE_APCSMART_DRIVER 1
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_APCSMART_DRIVER /**/
 _ACEOF
 
 
@@ -11304,8 +11239,9 @@ fi
 # Check whether --enable-dumb was given.
 if test "${enable_dumb+set}" = set; then
   enableval=$enable_dumb;  if test "$enableval" = "yes" ; then
-        cat >>confdefs.h <<\_ACEOF
-#define HAVE_DUMB_DRIVER 1
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_DUMB_DRIVER /**/
 _ACEOF
 
         DUMB_DRIVER="dumb"
@@ -11498,8 +11434,9 @@ $as_echo "Using generic libusb USB driver." >&6; }
             ;;
       esac
 
-      cat >>confdefs.h <<\_ACEOF
-#define HAVE_USB_DRIVER 1
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_USB_DRIVER /**/
 _ACEOF
 
       USB_DRIVER="usb"
@@ -11515,8 +11452,9 @@ fi
 # Check whether --enable-net was given.
 if test "${enable_net+set}" = set; then
   enableval=$enable_net;  if test "$enableval" = "yes" ; then
-        cat >>confdefs.h <<\_ACEOF
-#define HAVE_NET_DRIVER 1
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_NET_DRIVER /**/
 _ACEOF
 
         NET_DRIVER="net"
@@ -11535,8 +11473,9 @@ fi
 # Check whether --enable-snmp was given.
 if test "${enable_snmp+set}" = set; then
   enableval=$enable_snmp;  if test "$enableval" = "yes" ; then
-        cat >>confdefs.h <<\_ACEOF
-#define HAVE_SNMPLITE_DRIVER 1
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_SNMPLITE_DRIVER /**/
 _ACEOF
 
         SNMPLITE_DRIVER="snmplite"
@@ -11701,8 +11640,9 @@ fi
 $as_echo "$ac_cv_lib_netsnmp_snmp_open" >&6; }
 if test "x$ac_cv_lib_netsnmp_snmp_open" = x""yes; then
   DRVLIBS="$DRVLIBS -lnetsnmp"
-               cat >>confdefs.h <<\_ACEOF
-#define HAVE_NET_SNMP 1
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_NET_SNMP /**/
 _ACEOF
 
                SNMP_LIB_FOUND="yes"
@@ -11778,8 +11718,9 @@ fi
 $as_echo "$ac_cv_lib_snmp_snmp_open" >&6; }
 if test "x$ac_cv_lib_snmp_snmp_open" = x""yes; then
   DRVLIBS="$DRVLIBS -lsnmp"
-               cat >>confdefs.h <<\_ACEOF
-#define HAVE_UCD_SNMP 1
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_UCD_SNMP /**/
 _ACEOF
 
                SNMP_LIB_FOUND="yes"
@@ -11793,8 +11734,9 @@ $as_echo "$as_me: error: Cannot find SNMP libraries." >&2;}
    { (exit 1); exit 1; }; }
         fi
 
-                cat >>confdefs.h <<\_ACEOF
-#define HAVE_SNMP_DRIVER 1
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_SNMP_DRIVER /**/
 _ACEOF
 
         DISPLAY_NETSNMP_DRIVER="net-snmp"
@@ -11808,8 +11750,9 @@ fi
 # Check whether --enable-test was given.
 if test "${enable_test+set}" = set; then
   enableval=$enable_test;  if test "$enableval" = "yes" ; then
-        cat >>confdefs.h <<\_ACEOF
-#define HAVE_TEST_DRIVER 1
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_TEST_DRIVER /**/
 _ACEOF
 
         TEST_DRIVER="test"
@@ -11821,8 +11764,9 @@ fi
 # Check whether --enable-pcnet was given.
 if test "${enable_pcnet+set}" = set; then
   enableval=$enable_pcnet;  if test "$enableval" = "yes" ; then
-        cat >>confdefs.h <<\_ACEOF
-#define HAVE_PCNET_DRIVER 1
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_PCNET_DRIVER /**/
 _ACEOF
 
         PCNET_DRIVER="pcnet"
@@ -11841,8 +11785,9 @@ fi
 # Check whether --enable-modbus was given.
 if test "${enable_modbus+set}" = set; then
   enableval=$enable_modbus;  if test "$enableval" = "yes" ; then
-        cat >>confdefs.h <<\_ACEOF
-#define HAVE_MODBUS_DRIVER 1
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_MODBUS_DRIVER /**/
 _ACEOF
 
         MODBUS_DRIVER="modbus"
@@ -11858,12 +11803,14 @@ _ACEOF
 fi
 
 
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_NISSERVER 1
-_ACEOF
 
 cat >>confdefs.h <<\_ACEOF
-#define HAVE_NISLIB 1
+#define HAVE_NISSERVER /**/
+_ACEOF
+
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_NISLIB /**/
 _ACEOF
 
 NISSRV_ENABLED=yes
@@ -12467,32 +12414,36 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 case "$ac_cv_func_which_gethostbyname_r" in
    three)
-   cat >>confdefs.h <<\_ACEOF
-#define HAVE_FUNC_GETHOSTBYNAME_R_3 1
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_FUNC_GETHOSTBYNAME_R_3 /**/
 _ACEOF
 
    GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_3"
    ;;
 
    five)
-   cat >>confdefs.h <<\_ACEOF
-#define HAVE_FUNC_GETHOSTBYNAME_R_5 1
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_FUNC_GETHOSTBYNAME_R_5 /**/
 _ACEOF
 
    GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_5"
    ;;
 
    six)
-   cat >>confdefs.h <<\_ACEOF
-#define HAVE_FUNC_GETHOSTBYNAME_R_6 1
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_FUNC_GETHOSTBYNAME_R_6 /**/
 _ACEOF
 
    GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_6"
    ;;
 
    no)
-   cat >>confdefs.h <<\_ACEOF
-#define HAVE_FUNC_GETHOSTBYNAME_R_0 1
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_FUNC_GETHOSTBYNAME_R_0 /**/
 _ACEOF
 
    GAPCMON_CFLAGS="$GAPCMON_CFLAGS -DHAVE_FUNC_GETHOSTBYNAME_R_0"
@@ -12676,6 +12627,7 @@ fi
 
 
 
+
 cat >>confdefs.h <<_ACEOF
 #define SYSCONFDIR "$sysconfdir"
 _ACEOF
@@ -12802,72 +12754,6 @@ _ACEOF
 fi
 done
 
-{ $as_echo "$as_me:$LINENO: checking for union wait" >&5
-$as_echo_n "checking for union wait... " >&6; };
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-#include <sys/types.h>
-             #include <sys/wait.h>
-int
-main ()
-{
-union wait status; int pid; pid = wait (&status);
-             #ifdef WEXITSTATUS
-                /* Some POSIXoid systems have both the new-style macros and the old
-                   union wait type, and they do not work together.  If union wait
-                   conflicts with WEXITSTATUS et al, we don't want to use it at all.  */
-                if (WEXITSTATUS (status) != 0) pid = -1;
-             #endif
-             #ifdef HAVE_WAITPID
-                /* Make sure union wait works with waitpid.  */
-                pid = waitpid (-1, &status, 0);
-             #endif
-
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_c_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext && {
-	 test "$cross_compiling" = yes ||
-	 $as_test_x conftest$ac_exeext
-       }; then
-  cat >>confdefs.h <<\_ACEOF
-#define HAVE_UNION_WAIT 1
-_ACEOF
- { $as_echo "$as_me:$LINENO: result: yes" >&5
-$as_echo "yes" >&6; }
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	{ $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-rm -rf conftest.dSYM
-rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
-      conftest$ac_exeext conftest.$ac_ext
 
 if test "$ENABLE_CGI" = "yes"
 then
@@ -13370,9 +13256,11 @@ fi
 
 
 
+
 cat >>confdefs.h <<_ACEOF
 #define PIDDIR "$PIDDIR"
 _ACEOF
+
 
 
 cat >>confdefs.h <<_ACEOF
@@ -13380,14 +13268,17 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
+
 cat >>confdefs.h <<_ACEOF
 #define NOLOGDIR "$nologdir"
 _ACEOF
 
 
+
 cat >>confdefs.h <<_ACEOF
 #define PWRFAILDIR "$PWRFAILDIR"
 _ACEOF
+
 
 
 
@@ -13400,6 +13291,7 @@ _ACEOF
 
 
 HOST=$DISTNAME
+
 cat >>confdefs.h <<_ACEOF
 #define HOST "$HOST"
 _ACEOF

@@ -45,10 +45,6 @@
 # define WIFEXITED(stat_val) (((stat_val) & 255) == 0)
 #endif
 
-#ifndef HAVE_SOCKLEN_T
-# define socklen_t unsigned int
-#endif
-
 /* Alpha Tru64 */
 #ifdef HAVE_OSF1_OS
 # define _SEM_SEMUN_UNDEFINED 1
