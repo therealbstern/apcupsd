@@ -51,6 +51,7 @@
 #define T_APCDATE  6          /* APC date */
 
 /* These are the resulting value types returned */ 
+#define V_UNKNOWN  0          /* Unknown type */
 #define V_DOUBLE   1          /* Double */ 
 #define V_STRING   2          /* String pointer */
 #define V_INTEGER  3          /* Integer */

@@ -50,6 +50,7 @@ public:
 protected:
 
    typedef struct s_usb_value {
+      s_usb_value();                /* Constructor */
       int value_type;               /* Type of returned value */
       double dValue;                /* Value if double */
       int iValue;                   /* Integer value */

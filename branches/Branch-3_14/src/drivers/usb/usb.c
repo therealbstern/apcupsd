@@ -1244,3 +1244,13 @@ bool UsbUpsDriver::usb_report_event(int ci, USB_VALUE *uval)
       return false;
    }
 }
+
+/* Constructor for s_usb_value */
+UsbUpsDriver::s_usb_value::s_usb_value() :
+   value_type(V_UNKNOWN), 
+   dValue(0), 
+   iValue(0), 
+   UnitName("Uninitialized")
+{
+   strlcpy(sValue, "Uninitialized", sizeof(sValue));
+}
