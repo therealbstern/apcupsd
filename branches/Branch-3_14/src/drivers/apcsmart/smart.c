@@ -440,7 +440,7 @@ bool ApcSmartUpsDriver::read_volatile_data()
     again:
       answer = smart_poll(_ups->UPS_Cmd[CI_STATUS]);
       Dmsg(80, "Got CI_STATUS: %s\n", answer);
-      strncpy(status, answer, sizeof(status));
+      strlcpy(status, answer, sizeof(status));
 
       /*
        * The Status command may return "SM" probably because firmware
