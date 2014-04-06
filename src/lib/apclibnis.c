@@ -237,7 +237,7 @@ int net_open(const char *host, char *service, int port)
    // This method works pretty much everywhere which avoids the mess
    // of figuring out which incantation this platform supports. (Excepting
    // for win32 which doesn't support signals at all.)
-   struct sigaction sa;
+   struct sigaction sa = {{0}};
    sa.sa_handler = SIG_IGN;
    sigaction(SIGPIPE, &sa, NULL);
 #endif
