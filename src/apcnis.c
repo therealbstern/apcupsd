@@ -225,23 +225,25 @@ void *handle_client_request(void *arg)
 {
    FILE *events_file;
    char line[MAXSTRING];
-   char errmsg[] = "Invalid command\n";
-   char notavail[] = "Not available\n";
-   char notrun[] = "Apcupsd not running\n";
+   const char errmsg[] = "Invalid command\n";
+   const char notavail[] = "Not available\n";
+   const char notrun[] = "Apcupsd internal error\n";
    int nsockfd = ((struct s_arg *)arg)->newsockfd;
    UPSINFO *ups = ((struct s_arg *)arg)->ups;
+   free(arg);
 
    pthread_detach(pthread_self());
+
    if ((ups = attach_ups(ups)) == NULL) {
       net_send(nsockfd, notrun, sizeof(notrun));
       net_send(nsockfd, NULL, 0);
-      free(arg);
-      Error_abort0("Cannot attach SYSV IPC.\n");
+      net_close(nsockfd);
+      return NULL;
    }
 
    for (;;) {
       /* Read command */
-      if (net_recv(nsockfd, line, MAXSTRING) <= 0)
+      if (net_recv(nsockfd, line, sizeof(line)) <= 0)
          break;                    /* connection terminated */
 
       if (strncmp("status", line, 6) == 0) {
@@ -274,7 +276,6 @@ void *handle_client_request(void *arg)
 
    net_close(nsockfd);
 
-   free(arg);
    detach_ups(ups);
    return NULL;
 }
