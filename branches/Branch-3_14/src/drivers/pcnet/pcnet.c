@@ -816,14 +816,15 @@ bool PcnetUpsDriver::kill_power()
    }
 
    /*
-    * Clear buffer and read data until we find the 0-length
-    * chunk. We know that AP9617 uses chunked encoding, so we
+    * Read data until we find the 0-length chunk. 
+    * We know that AP9617 uses chunked encoding, so we
     * can count on the 0-length chunk at the end.
     */
-   memset(data, 0, sizeof(data));
    do {
       len += temp;
-      temp = recv(s, data+len, sizeof(data)-len, 0);
+      temp = recv(s, data+len, sizeof(data)-len-1, 0);
+      if (temp > 0)
+         data[len+temp] = '\0';
    } while(temp > 0 && strstr(data, "\r\n0\r\n") == NULL);
 
    Dmsg(200, "Response:\n---\n%s---\n", data);
