@@ -1,4 +1,4 @@
-From: "Adam Kropelin" <akropel1@rochester.rr.com>
+From: "Adam Kropelin" <adam@kroptech.com>
 To: "Kern Sibbald" <kern@sibbald.com>
 Cc: "Apcupsd-users" <apcupsd-users@lists.sourceforge.net>
 Subject: Reading a usbsnoop trace
