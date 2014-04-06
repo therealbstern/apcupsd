@@ -466,7 +466,7 @@ fi
 - release 3.12.2 update docs
 * Sun Sep 18 2005 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - Change deprecated Copyright tag to License
-* Tue Jun 07 2005 Adam Kropelin <akropel1@rochester.rr.com>
+* Tue Jun 07 2005 Adam Kropelin <adam@kroptech.com>
 - Rename mainsback.in to offbattery.in so default power loss/return actions
 - are symmetrical.
 * Sat Apr 30 2005 D. Scott Barninger <barninger at fairfieldcomputers.com>

@@ -3,7 +3,7 @@
 # apcupsd      This shell script takes care of starting and stopping
 #	       the apcupsd UPS monitoring daemon.
 #
-# Written by Adam Kropelin <akropel1@rochester.rr.com>
+# Written by Adam Kropelin <adam@kroptech.com>
 # Based on work by Ingo Nowak <nowak@koellernowak.de>
 
 . /etc/rc.common

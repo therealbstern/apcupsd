@@ -6019,7 +6019,7 @@ Contributors
 ------------
 
 **Current Code Maintainer and Project Manager**
-    Adam Kropelin (akropel1@rochester.rr.com)
+    Adam Kropelin (adam@kroptech.com)
 
 **RPM Packager**
     D\. Scott Barninger
