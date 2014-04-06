@@ -163,6 +163,7 @@ int fetch_events(const char *host)
    if (net_send(sockfd, "events", 6) != 6) {
       snprintf(errmsg, sizeof(errmsg), "fill_buffer: write error on socket\n");
       fputs(errmsg, stdout);
+      net_close(sockfd);
       return 0;
    }
    /*
