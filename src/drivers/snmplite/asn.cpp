@@ -636,6 +636,7 @@ void Sequence::clear()
    for (unsigned int i = 0; i < _size; i++)
       delete _data[i];
    delete [] _data;
+   _data = NULL;
    _size = 0;
 }
 
@@ -708,9 +709,12 @@ void Sequence::Append(Object *obj)
 {
    // realloc ... not efficient, but easy
    Object **tmp = new Object *[_size+1];
-   memcpy(tmp, _data, _size * sizeof(_data[0]));
+   if (_data)
+   {
+      memcpy(tmp, _data, _size * sizeof(_data[0]));
+      delete [] _data;
+   }
    tmp[_size++] = obj;
-   delete [] _data;
    _data = tmp;
 }
 
