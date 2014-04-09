@@ -823,7 +823,7 @@ bool PcnetUpsDriver::kill_power()
    do {
       len += temp;
       temp = recv(s, data+len, sizeof(data)-len-1, 0);
-      if (temp > 0)
+      if (temp >= 0)
          data[len+temp] = '\0';
    } while(temp > 0 && strstr(data, "\r\n0\r\n") == NULL);
 
