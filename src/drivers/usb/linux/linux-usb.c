@@ -585,7 +585,7 @@ bool LinuxUsbUpsDriver::pusb_ups_get_capabilities()
    unsigned int i, j, k, n;
 
    if (ioctl(_fd, HIDIOCINITREPORT, 0) < 0)
-      Error_abort1("Cannot init USB HID report. ERR=%s\n", strerror(errno));
+      Error_abort("Cannot init USB HID report. ERR=%s\n", strerror(errno));
 
    write_lock(_ups);
 
@@ -644,7 +644,7 @@ bool LinuxUsbUpsDriver::pusb_ups_get_capabilities()
 
                         if (!info) {
                            write_unlock(_ups);
-                           Error_abort0("Out of memory.\n");
+                           Error_abort("Out of memory.\n");
                         }
 
                         _info[ci] = info;

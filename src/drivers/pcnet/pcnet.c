@@ -623,18 +623,18 @@ bool PcnetUpsDriver::Open()
       _ipaddr = ptr;
       ptr = strchr(ptr, ':');
       if (ptr == NULL)
-         Error_abort0("Malformed DEVICE [ip:user:pass]\n");
+         Error_abort("Malformed DEVICE [ip:user:pass]\n");
       *ptr++ = '\0';
       
       _user = ptr;
       ptr = strchr(ptr, ':');
       if (ptr == NULL)
-         Error_abort0("Malformed DEVICE [ip:user:pass]\n");
+         Error_abort("Malformed DEVICE [ip:user:pass]\n");
       *ptr++ = '\0';
 
       _pass = ptr;
       if (*ptr == '\0')
-         Error_abort0("Malformed DEVICE [ip:user:pass]\n");
+         Error_abort("Malformed DEVICE [ip:user:pass]\n");
 
       // Last segment is optional port number
       ptr = strchr(ptr, ':');
@@ -649,7 +649,7 @@ bool PcnetUpsDriver::Open()
 
    _ups->fd = socket(PF_INET, SOCK_DGRAM, 0);
    if (_ups->fd == -1)
-      Error_abort1("Cannot create socket (%d)\n", errno);
+      Error_abort("Cannot create socket (%d)\n", errno);
 
    int enable = 1;
    setsockopt(_ups->fd, SOL_SOCKET, SO_BROADCAST, (const char*)&enable, sizeof(enable));
@@ -660,7 +660,7 @@ bool PcnetUpsDriver::Open()
    addr.sin_addr.s_addr = INADDR_ANY;
    if (bind(_ups->fd, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
       close(_ups->fd);
-      Error_abort1("Cannot bind socket (%d)\n", errno);
+      Error_abort("Cannot bind socket (%d)\n", errno);
    }
 
    /* Reset datatime to now */
@@ -775,7 +775,7 @@ bool PcnetUpsDriver::kill_power()
 
    /* We cannot perform a killpower without authentication data */
    if (!_auth) {
-      Error_abort0("Cannot perform killpower without authentication "
+      Error_abort("Cannot perform killpower without authentication "
                    "data. Please set ip:user:pass for DEVICE in "
                    "apcupsd.conf.\n");
    }

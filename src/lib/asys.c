@@ -35,7 +35,7 @@ void *amalloc(size_t size)
 
    buf = malloc(size);
    if (buf == NULL)
-      Error_abort1("Out of memory: ERR=%s\n", strerror(errno));
+      Error_abort("Out of memory: ERR=%s\n", strerror(errno));
 
    return buf;
 }
@@ -45,7 +45,7 @@ void *arealloc(void *buf, size_t size)
 {
    buf = realloc(buf, size);
    if (buf == NULL)
-      Error_abort1("Out of memory: ERR=%s\n", strerror(errno));
+      Error_abort("Out of memory: ERR=%s\n", strerror(errno));
 
    return buf;
 }
@@ -57,7 +57,7 @@ void *acalloc(size_t size1, size_t size2)
 
    buf = calloc(size1, size2);
    if (buf == NULL)
-      Error_abort1("Out of memory: ERR=%s\n", strerror(errno));
+      Error_abort("Out of memory: ERR=%s\n", strerror(errno));
 
    return buf;
 }
@@ -92,7 +92,7 @@ int asnprintf(char *str, size_t size, const char *fmt, ...)
    va_end(arg_ptr);
 
    if (len >= BIG_BUF)
-      Error_abort0("Buffer overflow.\n");
+      Error_abort("Buffer overflow.\n");
 
    memcpy(str, buf, size);
    str[size - 1] = 0;
@@ -122,7 +122,7 @@ int avsnprintf(char *str, size_t size, const char *format, va_list ap)
 
    len = vsprintf(buf, format, ap);
    if (len >= BIG_BUF)
-      Error_abort0("Buffer overflow.\n");
+      Error_abort("Buffer overflow.\n");
 
    memcpy(str, buf, size);
    str[size - 1] = 0;

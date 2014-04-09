@@ -54,7 +54,7 @@ bool DumbUpsDriver::Open()
 #endif
 
    if ((_ups->fd = open(opendev, O_RDWR | O_NOCTTY | O_NDELAY)) < 0)
-      Error_abort2("Cannot open UPS port %s: %s\n", opendev, strerror(errno));
+      Error_abort("Cannot open UPS port %s: %s\n", opendev, strerror(errno));
 
    /* Cancel the no delay we just set */
    int cmd = fcntl(_ups->fd, F_GETFL, 0);

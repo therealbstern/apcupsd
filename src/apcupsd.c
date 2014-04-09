@@ -206,7 +206,7 @@ int main(int argc, char *argv[])
 
    ups = new_ups();                /* get new ups */
    if (!ups)
-      Error_abort1("%s: init_ipc failed.\n", argv[0]);
+      Error_abort("%s: init_ipc failed.\n", argv[0]);
 
    init_ups_struct(ups);
    core_ups = ups;                 /* this is our core ups structure */
@@ -234,7 +234,7 @@ int main(int argc, char *argv[])
 
 #ifndef DEBUG
    if ((getuid() != 0) && (geteuid() != 0))
-      Error_abort0("Needs super user privileges to run.\n");
+      Error_abort("Needs super user privileges to run.\n");
 #endif
 
    check_for_config(ups, cfgfile);
@@ -255,7 +255,7 @@ int main(int argc, char *argv[])
    /* Attach the correct driver. */
    attach_driver(ups);
    if (ups->driver == NULL)
-      Error_abort0("Apcupsd cannot continue without a valid driver.\n");
+      Error_abort("Apcupsd cannot continue without a valid driver.\n");
 
    ups->start_time = time(NULL);
 
@@ -278,7 +278,7 @@ int main(int argc, char *argv[])
    }
 
    if (create_lockfile(ups) == LCKERROR) {
-      Error_abort0("Unable to create UPS lock file.\n"
+      Error_abort("Unable to create UPS lock file.\n"
                    "  If apcupsd or apctest is already running,\n"
                    "  please stop it and run this program again.\n");
    }
@@ -291,7 +291,7 @@ int main(int argc, char *argv[])
       // If we're hibernating or shutting down the UPS, setup is a one-shot.
       // If it fails, we're toast; no retries
       if (!setup_device(ups))
-         Error_abort0("Unable to open UPS device for hibernate or shutdown");
+         Error_abort("Unable to open UPS device for hibernate or shutdown");
 
       if (hibernate_ups)
          initiate_hibernate(ups);
@@ -338,7 +338,7 @@ static void daemon_start(void)
 
 #ifndef HAVE_QNX_OS
    if ((cpid = fork()) < 0)
-      Error_abort0("Cannot fork to become daemon\n");
+      Error_abort("Cannot fork to become daemon\n");
    else if (cpid > 0)
       exit(0);                     /* parent exits */
 
@@ -350,7 +350,7 @@ static void daemon_start(void)
                                     | PROCMGR_DAEMON_NODEVNULL
                                     | PROCMGR_DAEMON_KEEPUMASK) == -1)
    {
-      Error_abort0("Couldn't become daemon\n");
+      Error_abort("Couldn't become daemon\n");
    }
 #endif   /* HAVE_QNX_OS */
 

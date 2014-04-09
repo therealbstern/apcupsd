@@ -55,7 +55,7 @@ bool TestUpsDriver::Open()
    write_lock(_ups);
 
    if (!open_test_device())
-      Error_abort1("Cannot open UPS device %s\n", _ups->device);
+      Error_abort("Cannot open UPS device %s\n", _ups->device);
 
    _ups->clear_slave();
    write_unlock(_ups);

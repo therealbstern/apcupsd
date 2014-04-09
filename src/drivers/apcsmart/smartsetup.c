@@ -149,7 +149,7 @@ bool ApcSmartUpsDriver::setup()
          goto out;
       sleep(1);
    }
-   Error_abort0(
+   Error_abort(
       "PANIC! Cannot communicate with UPS via serial port.\n"
       "Please make sure the port specified on the DEVICE directive is correct,\n"
       "and that your cable specification on the UPSCABLE directive is correct.\n");

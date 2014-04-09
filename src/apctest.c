@@ -300,7 +300,7 @@ int main(int argc, char *argv[])
 
    ups = new_ups();                /* get new ups */
    if (!ups)
-      Error_abort1("%s: init_ipc failed.\n", argv[0]);
+      Error_abort("%s: init_ipc failed.\n", argv[0]);
 
    init_ups_struct(ups);
    core_ups = ups;                 /* this is our core ups structure */
@@ -318,7 +318,7 @@ int main(int argc, char *argv[])
 
    attach_driver(ups);
    if (ups->driver == NULL)
-      Error_abort0("apctest cannot continue without a valid driver.\n");
+      Error_abort("apctest cannot continue without a valid driver.\n");
 
 //   pmsg("Attached to driver: %s\n", ups->driver->driver_name);
 
@@ -330,7 +330,7 @@ int main(int argc, char *argv[])
    pmsg("mode.type = %s\n", ups->mode.long_name);
 
    if (create_lockfile(ups) == LCKERROR) {
-      Error_abort0("Unable to create UPS lock file.\n"
+      Error_abort("Unable to create UPS lock file.\n"
                    "  If apcupsd or apctest is already running,\n"
                    "  please stop it and run this program again.\n");
    }
@@ -2388,7 +2388,7 @@ static void print_eeprom_values(UPSINFO *ups)
    pmsg("Doing prep_device() ...\n");
    prep_device(ups);
    if (!ups->UPS_Cap[CI_EPROM])
-      Error_abort0("Your model does not support EPROM programming.\n");
+      Error_abort("Your model does not support EPROM programming.\n");
 
    if (ups->UPS_Cap[CI_REVNO])
       locale1 = *(ups->firmrev + strlen(ups->firmrev) - 1);
@@ -2401,7 +2401,7 @@ static void print_eeprom_values(UPSINFO *ups)
       locale2 = 0;
 
    if (locale1 == locale2 && locale1 == 0)
-      Error_abort0("Your model does not support EPROM programming.\n");
+      Error_abort("Your model does not support EPROM programming.\n");
 
    if (locale1 == locale2)
       locale = locale1;
