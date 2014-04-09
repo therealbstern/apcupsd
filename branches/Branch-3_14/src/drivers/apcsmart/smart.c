@@ -217,7 +217,7 @@ int ApcSmartUpsDriver::getline(char *s, int len)
          } else if (errno == EBADF) {
             return FAILURE;               /* We're probably shutting down */
          }
-         Error_abort1("Select error on UPS FD. %s\n", strerror(errno));
+         Error_abort("Select error on UPS FD. %s\n", strerror(errno));
          break;
       default:
          break;

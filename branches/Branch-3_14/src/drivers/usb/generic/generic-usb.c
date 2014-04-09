@@ -94,7 +94,7 @@ bool GenericUsbUpsDriver::pusb_ups_get_capabilities()
          info = (USB_INFO *)malloc(sizeof(USB_INFO));
          if (!info) {
             write_unlock(_ups);
-            Error_abort0("Out of memory.\n");
+            Error_abort("Out of memory.\n");
          }
 
          // Populate READ report data

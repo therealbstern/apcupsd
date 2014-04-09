@@ -93,7 +93,7 @@ void initiate_hibernate(UPSINFO *ups)
          "Cannot find %s file.\n Killpower requested in "
            "non-power fail condition or bug.\n Killpower request "
            "ignored at %s:%d\n", ups->pwrfailpath, __FILE__, __LINE__);
-      Error_abort3(
+      Error_abort(
          "Cannot find %s file.\n Killpower requested in "
            "non-power fail condition or bug.\n Killpower request "
            "ignored at %s:%d\n", ups->pwrfailpath, __FILE__, __LINE__);

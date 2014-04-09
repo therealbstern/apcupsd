@@ -99,7 +99,7 @@ int main(int argc, char *argv[])
    attach_driver(ups);
 
    if (ups->driver == NULL)
-      Error_abort0("Apcupsd cannot continue without a valid driver.\n");
+      Error_abort("Apcupsd cannot continue without a valid driver.\n");
 
    printf("Attached to driver: %s\n", ups->driver->driver_name);
 

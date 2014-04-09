@@ -235,7 +235,7 @@ static int start_ups(UPSINFO *ups, int offset, const GENINFO * size, const char 
    ups = new_ups();
 
    if (ups == NULL) {
-      Error_abort1("%s: not enough memory.\n", argvalue);
+      Error_abort("%s: not enough memory.\n", argvalue);
       return FAILURE;
    }
 
@@ -292,7 +292,7 @@ static int match_range(UPSINFO *ups, int offset, const GENINFO * vs, const char 
 
    if (!vs) {
       /* Shouldn't ever happen so abort if it ever does. */
-      Error_abort1("%s: Bogus configuration table! Fix and recompile.\n",
+      Error_abort("%s: Bogus configuration table! Fix and recompile.\n",
          argvalue);
    }
 
@@ -341,7 +341,7 @@ static int match_index(UPSINFO *ups, int offset, const GENINFO * vs, const char 
 
    if (!vs) {
       /* Shouldn't ever happen so abort if it ever does. */
-      Error_abort1("%s: Bogus configuration table! Fix and recompile.\n",
+      Error_abort("%s: Bogus configuration table! Fix and recompile.\n",
          argvalue);
    }
 
@@ -668,7 +668,7 @@ void check_for_config(UPSINFO *ups, char *cfgfile)
    int erpos = 0;
 
    if ((apcconf = fopen(cfgfile, "r")) == NULL) {
-      Error_abort2("Error opening configuration file (%s): %s\n",
+      Error_abort("Error opening configuration file (%s): %s\n",
          cfgfile, strerror(errno));
    }
    strlcpy(ups->configfile, cfgfile, sizeof(ups->configfile));
@@ -768,7 +768,7 @@ jump_into_the_loop:
    case DUMB_UPS:
       // Abort if user specified dumb UPS type with smart cable
       if (ups->cable.type >= CABLE_SMART)
-         Error_abort0("Invalid cable specified for Dumb UPS\n");
+         Error_abort("Invalid cable specified for Dumb UPS\n");
       break;      
    case TEST_UPS:
       // Allow anything in test mode

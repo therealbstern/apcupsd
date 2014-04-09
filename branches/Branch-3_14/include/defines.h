@@ -364,18 +364,7 @@ enum {
    CMDBATTATTACH         /* Battery reconnected */
 };
 
-/*
- * Simple way of handling varargs for those compilers that
- * don't support varargs in #defines.
- */
-#define Error_abort0(fmd) error_out(__FILE__, __LINE__, fmd)
-#define Error_abort1(fmd, arg1) error_out(__FILE__, __LINE__, fmd, arg1)
-#define Error_abort2(fmd, arg1,arg2) error_out(__FILE__, __LINE__, fmd, arg1,arg2)
-#define Error_abort3(fmd, arg1,arg2,arg3) error_out(__FILE__, __LINE__, fmd, arg1,arg2,arg3)
-#define Error_abort4(fmd, arg1,arg2,arg3,arg4) error_out(__FILE__, __LINE__, fmd, arg1,arg2,arg3,arg4)
-#define Error_abort5(fmd, arg1,arg2,arg3,arg4,arg5) error_out(__FILE__, __LINE__, fmd, arg1,arg2,arg3,arg4,arg5)
-#define Error_abort6(fmd, arg1,arg2,arg3,arg4,arg5,arg6) error_out(__FILE__, __LINE__, fmd, arg1,arg2,arg3,arg4,arg5,arg5)
-
+#define Error_abort(fmd, args...)   error_out(__FILE__, __LINE__, fmd, ##args)
 
 /* Debug Messages that are printed */
 #ifdef DEBUG
