@@ -173,9 +173,6 @@ int fetch_events(const char *host)
     */
    while ((n = net_recv(sockfd, buf, sizeof(buf)-1)) > 0) {
       /* terminate string for strlen()-calls in next lines */
-      if (n >= (int)sizeof(buf)) {
-         n = (int)sizeof(buf)-1;
-      }
       buf[n] = '\0';                     /* ensure string terminated */
       len = strlen(buf);
       /* if message is bigger than the buffer, truncate it */
