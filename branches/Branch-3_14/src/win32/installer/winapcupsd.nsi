@@ -20,6 +20,7 @@ InstallDir "c:\apcupsd"
 !include "StrReplace.nsh"
 !include "WinVer.nsh"
 !include "DrvSetup.nsh"
+!include "FileFunc.nsh"
 
 ; Global variables
 Var ExistingConfig
@@ -425,11 +426,25 @@ Section "Documentation" SecDoc
   CreateShortCut "$SMPROGRAMS\Apcupsd\Documentation\Configuration Reference.lnk" "$INSTDIR\doc\apcupsd.conf.man.txt" "" "$SYSDIR\shell32.dll" ${HELP_ICON_INDEX}
 SectionEnd
 
+!define UNINSTREG "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apcupsd"
+
 Section "-Finish"
   ; Write the uninstall keys for Windows & create Start Menu entry
   SetShellVarContext all
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apcupsd" "DisplayName" "Apcupsd"
-  WriteRegStr HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apcupsd" "UninstallString" '"$INSTDIR\uninstall.exe"'
+
+  WriteRegStr   HKLM "${UNINSTREG}" "DisplayName"     "Apcupsd"
+  WriteRegStr   HKLM "${UNINSTREG}" "UninstallString" "$INSTDIR\uninstall.exe"
+  WriteRegStr   HKLM "${UNINSTREG}" "DisplayVersion"  "${VERSION}"
+  WriteRegStr   HKLM "${UNINSTREG}" "Version"         "${VERSION}"
+  WriteRegStr   HKLM "${UNINSTREG}" "Publisher"       "apcupsd.org"
+  WriteRegStr   HKLM "${UNINSTREG}" "URLInfoAbout"    "http://apcupsd.org"
+  WriteRegDWord HKLM "${UNINSTREG}" "NoRepair"        1
+  WriteRegDWord HKLM "${UNINSTREG}" "NoModify"        1
+
+  ${GetSize} "$INSTDIR" "/S=0K" $0 $1 $2
+  IntFmt $0 "0x%08X" $0
+  WriteRegDWORD HKLM "${UNINSTREG}" "EstimatedSize" "$0"
+
   WriteUninstaller "$INSTDIR\Uninstall.exe"
   CreateShortCut "$SMPROGRAMS\Apcupsd\Uninstall Apcupsd.lnk" "$INSTDIR\Uninstall.exe"
 SectionEnd
@@ -525,7 +540,7 @@ Section "Uninstall"
   ${EndIf}
 
   ; remove registry keys
-  DeleteRegKey HKLM "Software\Microsoft\Windows\CurrentVersion\Uninstall\Apcupsd"
+  DeleteRegKey HKLM "${UNINSTREG}"
   DeleteRegKey HKLM "Software\Apcupsd"
   DeleteRegValue HKLM "Software\Microsoft\Windows\CurrentVersion\Run" "Apctray"
 
