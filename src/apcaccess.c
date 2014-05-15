@@ -146,7 +146,7 @@ int main(int argc, char **argv)
 #endif
 
    // Process standard options
-   char ch;
+   int ch;
    while ((ch = getopt(argc, argv, "f:h:p:u")) != -1)
    {
       switch (ch)
