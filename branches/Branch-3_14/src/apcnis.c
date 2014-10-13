@@ -223,6 +223,7 @@ void do_server(UPSINFO *ups)
  */
 void *handle_client_request(void *arg)
 {
+   int len;
    FILE *events_file;
    char line[MAXSTRING];
    const char errmsg[] = "Invalid command\n";
@@ -243,15 +244,15 @@ void *handle_client_request(void *arg)
 
    for (;;) {
       /* Read command */
-      if (net_recv(nsockfd, line, sizeof(line)) <= 0)
+      if ((len = net_recv(nsockfd, line, sizeof(line))) <= 0)
          break;                    /* connection terminated */
 
-      if (strncmp("status", line, 6) == 0) {
+      if (len == 6 && strncmp("status", line, 6) == 0) {
          if (output_status(ups, nsockfd, status_open, status_write,
                status_close) < 0) {
             break;
          }
-      } else if (strncmp("events", line, 6) == 0) {
+      } else if (len == 6 && strncmp("events", line, 6) == 0) {
          if ((ups->eventfile[0] == 0) ||
              ((events_file = fopen(ups->eventfile, "r")) == NULL)) {
             net_send(nsockfd, notavail, sizeof(notavail));
