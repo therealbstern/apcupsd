@@ -164,14 +164,14 @@ static int write_nbytes(int fd, const char *ptr, int nbytes)
 int net_recv(int sockfd, char *buff, int maxlen)
 {
    int nbytes;
-   short pktsiz;
+   unsigned short pktsiz;
 
    /* get data size -- in short */
-   if ((nbytes = read_nbytes(sockfd, (char *)&pktsiz, sizeof(short))) <= 0) {
+   if ((nbytes = read_nbytes(sockfd, (char *)&pktsiz, sizeof(pktsiz))) <= 0) {
       /* probably pipe broken because client died */
       return nbytes;               /* assume hard EOF received */
    }
-   if (nbytes != sizeof(short))
+   if (nbytes != sizeof(pktsiz))
       return -EINVAL;
 
    pktsiz = ntohs(pktsiz);         /* decode no. of bytes that follow */
