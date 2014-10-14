@@ -25,6 +25,10 @@ SCRIPTSHELL=@SCRIPTSHELL@
 SCRIPTDIR=@sysconfdir@
 WALL=wall
 
+export SYSADMIN=root
+export APCUPSD_MAIL="@APCUPSD_MAIL@"
+if [ -f $SCRIPTDIR/config ]; then . $SCRIPTDIR/config ; fi
+
 #
 # Concatenate all output from this script to the events file
 #  Note, the following kills the script in a power fail situation

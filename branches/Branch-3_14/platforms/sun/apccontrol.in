@@ -21,6 +21,10 @@ SCRIPTSHELL=@SCRIPTSHELL@
 SCRIPTDIR=@sysconfdir@
 POWERFAILDIR=@PWRFAILDIR@
 
+export SYSADMIN=root
+export APCUPSD_MAIL="@APCUPSD_MAIL@"
+if [ -f $SCRIPTDIR/config ]; then . $SCRIPTDIR/config ; fi
+
 #
 # This piece is to substitute the default behaviour with your own script,
 # perl, or C program.
