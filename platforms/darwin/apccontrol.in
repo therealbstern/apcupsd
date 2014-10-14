@@ -25,6 +25,10 @@ SCRIPTSHELL=@SCRIPTSHELL@
 SCRIPTDIR=@sysconfdir@
 WALL=wall
 
+export SYSADMIN=root
+export APCUPSD_MAIL="@APCUPSD_MAIL@"
+if [ -f $SCRIPTDIR/config ]; then . $SCRIPTDIR/config ; fi
+
 # Log notifications using Growl, if available
 GROWLSEARCH="/usr/bin/growlnotify /usr/local/bin/growlnotify /opt/local/bin/growlnotify"
 for GROWL in $GROWLSEARCH ; do
