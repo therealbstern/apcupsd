@@ -100,7 +100,7 @@ struct s_ups_info {
     /* Page 0x84 is the Power Device Page */
     { 0x840000, T_NONE,    "UPS-Power" },
     { 0x840001, T_INDEX,   "iName" },
-    { 0x840002, T_INDEX,   "PresentStatus" },
+    { 0x840002, T_NONE,    "PresentStatus" },
     { 0x840004, T_NONE,    "UPS" },
     { 0x840012, T_NONE,    "Battery" },
     { 0x840016, T_NONE,    "PowerConverter" },
