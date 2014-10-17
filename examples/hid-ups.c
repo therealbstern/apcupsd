@@ -96,10 +96,11 @@ struct s_ups_info {
 } ups_info[] = {
 
     /* MGE & APC */
-    { 0x000000, T_NONE,   "---" },
+    { 0x000000, T_NONE,    "None" },
     /* Page 0x84 is the Power Device Page */
     { 0x840000, T_NONE,    "UPS-Power" },
     { 0x840001, T_INDEX,   "iName" },
+    { 0x840002, T_INDEX,   "PresentStatus" },
     { 0x840004, T_NONE,    "UPS" },
     { 0x840012, T_NONE,    "Battery" },
     { 0x840016, T_NONE,    "PowerConverter" },
@@ -518,9 +519,10 @@ foundit:
 		    finfo.report_id = rinfo.report_id;
 		    finfo.field_index = i;
 		    ioctl(fd, HIDIOCGFIELDINFO, &finfo);
-                    printf("  Field %d, app %s, phys %s\n", 
+                    printf("  Field %d, app %s, phys %s, log %s\n", 
 			    i, 
-			    info(finfo.application), info(finfo.physical));
+			    info(finfo.application), info(finfo.physical),
+             info(finfo.logical));
 
 		    memset(&uref, 0, sizeof(uref));
 		    for (j = 0; j < finfo.maxusage; j++) {
