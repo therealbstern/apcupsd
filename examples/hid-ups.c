@@ -92,7 +92,7 @@
 struct s_ups_info {
     unsigned usage;
     int type;
-    char *label;
+    const char *label;
 } ups_info[] = {
 
     /* MGE & APC */
@@ -214,7 +214,7 @@ struct s_ups_info {
 };
 #define UPS_INFO_SZ (sizeof(ups_info)/sizeof(ups_info[0]))
 
-char *reports[] = { "Unknown", "Input", "Output", "Feature" };
+const char *reports[] = { "Unknown", "Input", "Output", "Feature" };
 
 static int CapacityMode = 2;	      /* default = % */
 
@@ -222,7 +222,7 @@ char unknown[24];
 
 #define MADDR "stewart@wetlogic.net"
 
-void log_status(char *msg) {
+void log_status(const char *msg) {
 #ifndef TESTING
     char buf[256];
     printf("[Log message \"%s\"]\n", msg);
@@ -233,8 +233,8 @@ void log_status(char *msg) {
 #endif
 }
 
-static inline char* info(unsigned int detail) {
-    int i;
+static const char* info(unsigned int detail) {
+    unsigned int i;
     
     for (i = 0; i < UPS_INFO_SZ; i++) {
         if (ups_info[i].usage == detail) {
@@ -248,7 +248,7 @@ static inline char* info(unsigned int detail) {
 }
 
 static struct s_ups_info *info_entry(unsigned int detail) {
-    int i;
+    unsigned int i;
     static struct s_ups_info info = {0, T_NONE, unknown};
     
     for (i = 0; i < UPS_INFO_SZ; i++) {
@@ -303,7 +303,7 @@ static inline int find_application(int fd, unsigned usage) {
 /*
  * Get a string from the device given the string's index
  */
-static char *get_string(int fd, int sindex) {
+static const char *get_string(int fd, int sindex) {
     static struct hiddev_string_descriptor sdesc;
     static char buf[200];
 
@@ -323,7 +323,7 @@ static char *get_string(int fd, int sindex) {
  *   Give units code and exponent, returns string 
  *    describing the units used.  (doesn't work for percentages).
  */
-static char *get_units(unsigned unit, unsigned exponent) {
+static const char *get_units(unsigned unit, unsigned exponent) {
     static char buf[200];
 
     if (exponent > 7) {
@@ -405,7 +405,8 @@ static int vendor = 0;
 
 int main (int argc, char **argv) {
     time_t start_seconds;
-    int fd = -1, rd, i, j, RemainingCapacity;
+    int fd = -1, rd, j, RemainingCapacity;
+    unsigned int i;
     struct hiddev_event ev[64];
     struct hiddev_devinfo dinfo;
     char name[256] = "Unknown";
@@ -415,7 +416,6 @@ int main (int argc, char **argv) {
     struct hiddev_usage_ref uref;
 
     if (argc < 2) {
-        struct hiddev_usage_ref uref;
          /* deal with either standard location or Red Hat's */
          const char *hid_dirs[] = {"/dev/usb/hid", "/dev/usb","/dev"};
          for (i = 0; i < sizeof(hid_dirs)/sizeof(hid_dirs[0]); i++) {
@@ -501,7 +501,8 @@ foundit:
         struct hiddev_report_info rinfo;
         struct hiddev_field_info finfo;
         struct hiddev_usage_ref uref;
-        int rtype, i, j;
+        int rtype;
+        unsigned int i, j;
 
         for (rtype = HID_REPORT_TYPE_MIN; rtype <= HID_REPORT_TYPE_MAX;
              rtype++) {
@@ -538,7 +539,7 @@ foundit:
                         switch (p->type) {
                         case T_CAPACITY:
                            unit = 1;
-                           printf("Exponent %d lost.\n", exponent);
+                           printf("Exponent %d lost.\n", finfo.unit_exponent);
                            exponent = CapacityMode;
                            break;
                         case T_UNITS:
