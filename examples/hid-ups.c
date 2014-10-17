@@ -237,9 +237,9 @@ static inline char* info(unsigned int detail) {
     int i;
     
     for (i = 0; i < UPS_INFO_SZ; i++) {
-	if (ups_info[i].usage == detail) {
-	    return ups_info[i].label;
-	}
+        if (ups_info[i].usage == detail) {
+            return ups_info[i].label;
+        }
     }
 
     sprintf(unknown, "[%06x]", detail);
@@ -252,9 +252,9 @@ static struct s_ups_info *info_entry(unsigned int detail) {
     static struct s_ups_info info = {0, T_NONE, unknown};
     
     for (i = 0; i < UPS_INFO_SZ; i++) {
-	if (ups_info[i].usage == detail) {
-	    return &ups_info[i];
-	}
+        if (ups_info[i].usage == detail) {
+            return &ups_info[i];
+        }
     }
     sprintf(unknown, "[%06x]", detail);
     return &info;    
@@ -272,13 +272,13 @@ void powerfail(int state) {
     /* Create an info file needed by init to shutdown/cancel shutdown */
     unlink(PWRSTAT);
     if ((fd = open(PWRSTAT, O_CREAT|O_WRONLY, 0644)) >= 0) {
-	if (state > 0)
+        if (state > 0)
             write(fd, "FAIL\n", 5);
-	else if (state < 0)
+        else if (state < 0)
             write(fd, "LOW\n", 4);
-	else
+        else
             write(fd, "OK\n", 3);
-	close(fd);
+        close(fd);
     }
     kill(1, SIGPWR);
 #else
@@ -294,10 +294,10 @@ void powerfail(int state) {
 }
 
 static inline int find_application(int fd, unsigned usage) {
-	int i = 0, ret;
-	while ((ret = ioctl(fd, HIDIOCAPPLICATION, i)) > 0 &&
-	       (ret & 0xffff0000) != (usage & 0xffff0000)) i++;
-	return ((ret & 0xffff000) == (usage & 0xffff0000));
+        int i = 0, ret;
+        while ((ret = ioctl(fd, HIDIOCAPPLICATION, i)) > 0 &&
+               (ret & 0xffff0000) != (usage & 0xffff0000)) i++;
+        return ((ret & 0xffff000) == (usage & 0xffff0000));
 }
 
 /*
@@ -313,8 +313,8 @@ static char *get_string(int fd, int sindex) {
     sdesc.index = sindex;
     if (ioctl(fd, HIDIOCGSTRING, &sdesc) < 0) {
         sprintf(buf, "String index %d returned ERR=%s\n", sindex,
-	    strerror(errno));
-	return buf;
+            strerror(errno));
+        return buf;
     }
     return sdesc.value;
 }
@@ -331,70 +331,70 @@ static char *get_units(unsigned unit, unsigned exponent) {
     }
     switch (unit) {
     case 1:			      /* special kludge for CapacityMode */
-	switch (exponent) {
-	case 0:
+        switch (exponent) {
+        case 0:
            return "maH";
-	case 1:
+        case 1:
            return "mwH";
-	case 2:
+        case 2:
            return "percent";
-	case 3:
+        case 3:
            return "boolean";
-	default:
+        default:
            return "";
-	}
+        }
     case 0x00F0D121:
-	if (exponent == 7) {
+        if (exponent == 7) {
            return "Volts";
-	} else if (exponent == 5) {
+        } else if (exponent == 5) {
            return "CentiVolts";
-	} else if (exponent == 6) {
+        } else if (exponent == 6) {
            return "DeciVolts";
-	} else {
+        } else {
            sprintf(buf, "Volts with %d exponent", exponent);
-	   return buf;
-	}
+           return buf;
+        }
     case 0x00100001:
-	if (exponent == -2) {
+        if (exponent == -2) {
            return "CentiAmps";
-	} else if (exponent == 0) {
+        } else if (exponent == 0) {
            return "Amps";
-	} else {
+        } else {
            sprintf(buf, "Amps with %d exponent", exponent);
-	   return buf;
-	}
+           return buf;
+        }
     case 0xF001:
-	if (exponent == 0) {
+        if (exponent == 0) {
            return "Hertz";
-	} else if (exponent == -2) {
+        } else if (exponent == -2) {
            return "CentiHertz";
-	} else {
+        } else {
            sprintf(buf, "Hertz with %d exponent", exponent);
-	   return buf;
-	}
+           return buf;
+        }
     case 0x1001:
-	if (exponent == 0) {
+        if (exponent == 0) {
            return "Seconds";
-	} else {
+        } else {
            sprintf(buf, "Seconds with %d exponent", exponent);
-	   return buf;
-	}
+           return buf;
+        }
     case 0xD121:
         return "Watts";
     case 0x010001:
-	if (exponent == 0) {
+        if (exponent == 0) {
            return "Degrees K";
-	} else {
+        } else {
            sprintf(buf, "Degrees K with %d exponent", exponent);
-	   return buf;
-	}
+           return buf;
+        }
     case 0x0101001:
         return "AmpSecs";
     case 0:
         return "";
     default:
         sprintf(buf, "0x%x", unit);
-	return buf;
+        return buf;
     }
 }
 
@@ -415,59 +415,59 @@ int main (int argc, char **argv) {
     struct hiddev_usage_ref uref;
 
     if (argc < 2) {
-	struct hiddev_usage_ref uref;
+        struct hiddev_usage_ref uref;
          /* deal with either standard location or Red Hat's */
          const char *hid_dirs[] = {"/dev/usb/hid", "/dev/usb","/dev"};
-	 for (i = 0; i < sizeof(hid_dirs)/sizeof(hid_dirs[0]); i++) {
-	     for (j = 0; j < 4; j++) {
+         for (i = 0; i < sizeof(hid_dirs)/sizeof(hid_dirs[0]); i++) {
+             for (j = 0; j < 4; j++) {
                  sprintf(evdev, "%s/hiddev%d", hid_dirs[i], j);
-		 if ((fd = open(evdev, O_RDONLY)) < 0) {
-		     if (errno == EACCES) {
+                 if ((fd = open(evdev, O_RDONLY)) < 0) {
+                     if (errno == EACCES) {
                          fprintf(stderr, "No permission, try this as root.\n");
-			 exit(1);
-		     }
-		 } else {
-		     if (find_application(fd, UPS_USAGE)) goto foundit;
-		     close(fd);
-		 }
-	      }
-	  }
+                         exit(1);
+                     }
+                 } else {
+                     if (find_application(fd, UPS_USAGE)) goto foundit;
+                     close(fd);
+                 }
+              }
+          }
           fprintf(stderr, "Couldn't find USB UPS device, check your /dev.\n");
-	  exit(1);
+          exit(1);
 foundit:
           printf("Found UPS at %s\n", evdev);
       } else {
-	   strncpy(evdev, argv[argc -1], sizeof(evdev)-1);
+           strncpy(evdev, argv[argc -1], sizeof(evdev)-1);
            printf("Found UPS at %s\n", evdev);
-	if ((fd = open(evdev, O_RDONLY)) < 0) {
+        if ((fd = open(evdev, O_RDONLY)) < 0) {
             perror("hiddev open");
-	    exit(1);
-	}
-	if (!find_application(fd, UPS_USAGE)) {
+            exit(1);
+        }
+        if (!find_application(fd, UPS_USAGE)) {
             fprintf(stderr, "%s is not a UPS\n", argv[argc - 1]);
-	    exit(1);
-	}
+            exit(1);
+        }
     }
 
 #ifdef DEBUG
     {
-	unsigned version;
+        unsigned version;
 
-	ioctl(fd, HIDIOCGVERSION, &version);
+        ioctl(fd, HIDIOCGVERSION, &version);
         printf("hiddev driver version is %d.%d.%d\n",
-	       version >> 16, (version >> 8) & 0xff, version & 0xff);
-	
-	ioctl(fd, HIDIOCGDEVINFO, &dinfo);
+               version >> 16, (version >> 8) & 0xff, version & 0xff);
+        
+        ioctl(fd, HIDIOCGDEVINFO, &dinfo);
         printf("HID: vendor 0x%x product 0x%x version 0x%x ",
-	       dinfo.vendor, dinfo.product & 0xffff, dinfo.version);
+               dinfo.vendor, dinfo.product & 0xffff, dinfo.version);
         printf("app %s", info(ioctl(fd, HIDIOCAPPLICATION, 0)));
-	for (i = 1; i < dinfo.num_applications; i++)
+        for (i = 1; i < dinfo.num_applications; i++)
             printf(", %s", info(ioctl(fd, HIDIOCAPPLICATION, i)));
         printf("\n");
         printf("HID: bus: %d devnum: %d ifnum: %d\n",
-	       dinfo.busnum, dinfo.devnum, dinfo.ifnum);
-	vendor = dinfo.vendor;
-		   
+               dinfo.busnum, dinfo.devnum, dinfo.ifnum);
+        vendor = dinfo.vendor;
+                   
     }
 #endif
 
@@ -482,7 +482,7 @@ foundit:
     uref.usage_code = BAT_CHEMISTRY;
     if (ioctl(fd, HIDIOCGUSAGE, &uref) == 0) {
         printf("Battery Chemistry: \"%s\" (%d)\n", get_string(fd, uref.value), 
-	    uref.value);
+            uref.value);
     }
 
     memset(&uref, 0, sizeof(uref));
@@ -490,7 +490,7 @@ foundit:
     uref.report_id = HID_REPORT_ID_UNKNOWN;
     uref.usage_code = UPS_CAPACITY_MODE;
     if (ioctl(fd, HIDIOCGUSAGE, &uref) == 0) {
-	CapacityMode = uref.value;
+        CapacityMode = uref.value;
     }
 
 #ifdef DEBUG
@@ -498,90 +498,90 @@ foundit:
      */
 
     {
-	struct hiddev_report_info rinfo;
-	struct hiddev_field_info finfo;
-	struct hiddev_usage_ref uref;
-	int rtype, i, j;
+        struct hiddev_report_info rinfo;
+        struct hiddev_field_info finfo;
+        struct hiddev_usage_ref uref;
+        int rtype, i, j;
 
-	for (rtype = HID_REPORT_TYPE_MIN; rtype <= HID_REPORT_TYPE_MAX;
-	     rtype++) {
-	    rinfo.report_type = rtype;
-	    rinfo.report_id = HID_REPORT_ID_FIRST;
-	    while (ioctl(fd, HIDIOCGREPORTINFO, &rinfo) >= 0) {
+        for (rtype = HID_REPORT_TYPE_MIN; rtype <= HID_REPORT_TYPE_MAX;
+             rtype++) {
+            rinfo.report_type = rtype;
+            rinfo.report_id = HID_REPORT_ID_FIRST;
+            while (ioctl(fd, HIDIOCGREPORTINFO, &rinfo) >= 0) {
                 printf("\n%sReport %d\n",
-		       reports[rinfo.report_type], rinfo.report_id);
+                       reports[rinfo.report_type], rinfo.report_id);
 
-		for (i = 0; i < rinfo.num_fields; i++) { 
-		    struct s_ups_info *p;
+                for (i = 0; i < rinfo.num_fields; i++) { 
+                    struct s_ups_info *p;
 
-		    memset(&finfo, 0, sizeof(finfo));
-		    finfo.report_type = rinfo.report_type;
-		    finfo.report_id = rinfo.report_id;
-		    finfo.field_index = i;
-		    ioctl(fd, HIDIOCGFIELDINFO, &finfo);
+                    memset(&finfo, 0, sizeof(finfo));
+                    finfo.report_type = rinfo.report_type;
+                    finfo.report_id = rinfo.report_id;
+                    finfo.field_index = i;
+                    ioctl(fd, HIDIOCGFIELDINFO, &finfo);
                     printf("  Field %d, app %s, phys %s, log %s\n", 
-			    i, 
-			    info(finfo.application), info(finfo.physical),
-             info(finfo.logical));
+                            i, 
+                            info(finfo.application), info(finfo.physical),
+                            info(finfo.logical));
 
-		    memset(&uref, 0, sizeof(uref));
-		    for (j = 0; j < finfo.maxusage; j++) {
-			unsigned unit, exponent;
-			int v, yy, mm, dd;
-			uref.report_type = finfo.report_type;
-			uref.report_id = finfo.report_id;
-			uref.field_index = i;
-			uref.usage_index = j;
-			ioctl(fd, HIDIOCGUCODE, &uref);
-			ioctl(fd, HIDIOCGUSAGE, &uref);
-			p = info_entry(uref.usage_code);
-			switch (p->type) {
-			case T_CAPACITY:
-			   unit = 1;
+                    memset(&uref, 0, sizeof(uref));
+                    for (j = 0; j < finfo.maxusage; j++) {
+                        unsigned unit, exponent;
+                        int v, yy, mm, dd;
+                        uref.report_type = finfo.report_type;
+                        uref.report_id = finfo.report_id;
+                        uref.field_index = i;
+                        uref.usage_index = j;
+                        ioctl(fd, HIDIOCGUCODE, &uref);
+                        ioctl(fd, HIDIOCGUSAGE, &uref);
+                        p = info_entry(uref.usage_code);
+                        switch (p->type) {
+                        case T_CAPACITY:
+                           unit = 1;
                            printf("Exponent %d lost.\n", exponent);
-			   exponent = CapacityMode;
-			   break;
-			case T_UNITS:
-			   unit = finfo.unit;
-			   exponent = finfo.unit_exponent;
-			   break;
-			default:
-			   unit = 0;
-			   exponent = 0;
-			   break;
-			}
+                           exponent = CapacityMode;
+                           break;
+                        case T_UNITS:
+                           unit = finfo.unit;
+                           exponent = finfo.unit_exponent;
+                           break;
+                        default:
+                           unit = 0;
+                           exponent = 0;
+                           break;
+                        }
 
                         printf("    Usage %d, %s = %d %s", j, p->label, uref.value, 
-			    get_units(unit, exponent));
+                            get_units(unit, exponent));
 
-			switch (p->type) {
-			case T_INDEX:
+                        switch (p->type) {
+                        case T_INDEX:
                             printf(" %s\n", get_string(fd, uref.value));
-			    break;
-			case T_BITS:  /* binary bits */
+                            break;
+                        case T_BITS:  /* binary bits */
                             printf(" 0x%x\n", uref.value);
-			    break;
-			case T_DATE:  /* packed integer date */
+                            break;
+                        case T_DATE:  /* packed integer date */
                             printf(" %4d-%02d-%02d\n", (uref.value >> 9) + 1980,
-				(uref.value >> 5) & 0xF, uref.value & 0x1F);
-			    break;
-			case T_APCDATE: /* APC date */
-			    v = uref.value;
-			    yy = ((v>>4) & 0xF)*10 + (v&0xF) + 2000;
-			    v >>= 8;
-			    dd = ((v>>4) & 0xF)*10 + (v&0xF);
-			    v >>= 8;
-			    mm = ((v>>4) & 0xF)*10 + (v&0xF);	    
+                                (uref.value >> 5) & 0xF, uref.value & 0x1F);
+                            break;
+                        case T_APCDATE: /* APC date */
+                            v = uref.value;
+                            yy = ((v>>4) & 0xF)*10 + (v&0xF) + 2000;
+                            v >>= 8;
+                            dd = ((v>>4) & 0xF)*10 + (v&0xF);
+                            v >>= 8;
+                            mm = ((v>>4) & 0xF)*10 + (v&0xF);	    
                             printf(" %4d-%02d-%02d\n", yy, mm, dd);
-			default:
+                        default:
                             printf("\n");
-			    break;
-			}
-		    }
-		}
-		rinfo.report_id |= HID_REPORT_ID_NEXT;
-	    }
-	}
+                            break;
+                        }
+                    }
+                }
+                rinfo.report_id |= HID_REPORT_ID_NEXT;
+            }
+        }
     }
 
     printf("\nWaiting for events ... (interrupt to exit)\n");
@@ -592,97 +592,97 @@ foundit:
     start_seconds = time(NULL);
     FD_ZERO(&fdset);
     while (1) {
-	if (fd < 0) {
-	    sleep(5);
-	    fd = open(evdev, O_RDONLY);
-	    if (fd < 0) {
+        if (fd < 0) {
+            sleep(5);
+            fd = open(evdev, O_RDONLY);
+            if (fd < 0) {
                 perror("\nOpen error");
-		continue;
-	    }
-	    if (!find_application(fd, UPS_USAGE)) {
+                continue;
+            }
+            if (!find_application(fd, UPS_USAGE)) {
                fprintf(stderr, "\nCould not find_application.\n");
-	       close(fd);
-	       fd = -1;
-	    }
-	    continue;
-	}
-	switch (state) {
-	    case STATE_NORMAL:
-		tv = NULL;
-		break;
-	    case STATE_BATTERY:
-	    case STATE_DEBOUNCE:
-		timev.tv_sec = DEBOUNCE_TIMEOUT;
-		timev.tv_usec = 0;
-		tv = &timev;
-		break;
-	}
+               close(fd);
+               fd = -1;
+            }
+            continue;
+        }
+        switch (state) {
+            case STATE_NORMAL:
+                tv = NULL;
+                break;
+            case STATE_BATTERY:
+            case STATE_DEBOUNCE:
+                timev.tv_sec = DEBOUNCE_TIMEOUT;
+                timev.tv_usec = 0;
+                tv = &timev;
+                break;
+        }
 
-	FD_SET(fd, &fdset);
-	rd = select(fd+1, &fdset, NULL, NULL, tv);
+        FD_SET(fd, &fdset);
+        rd = select(fd+1, &fdset, NULL, NULL, tv);
 
-	if (rd > 0) {
-	    rd = read(fd, ev, sizeof(ev));
-	    if (rd < (int) sizeof(ev[0])) {
-		if (rd < 0)
+        if (rd > 0) {
+            rd = read(fd, ev, sizeof(ev));
+            if (rd < (int) sizeof(ev[0])) {
+                if (rd < 0)
                     perror("\nevtest: error reading");
-		else
+                else
                     fprintf(stderr, "\nevtest: got short read from device!\n");
 //		exit (1);
-		close(fd);
-		fd = -1;
-		continue;
-	    } else {
-	    	printf("time %lu\n", time(NULL) - start_seconds);
-	    }
+                close(fd);
+                fd = -1;
+                continue;
+            } else {
+            	printf("time %lu\n", time(NULL) - start_seconds);
+            }
 
-	    for (i = 0; i < rd / sizeof(ev[0]); i++) {
+            for (i = 0; i < rd / sizeof(ev[0]); i++) {
 #ifdef DEBUG
                     printf("Event: %s = %d\n",
-			   info(ev[i].hid), ev[i].value);
+                           info(ev[i].hid), ev[i].value);
 #endif /* DEBUG */
 
-		if (ev[i].hid == UPS_SHUTDOWN_IMMINENT && ev[i].value == 1) {
+                if (ev[i].hid == UPS_SHUTDOWN_IMMINENT && ev[i].value == 1) {
                     log_status("UPS shutdown imminent!");
-		    powerfail(-1);
-		    state = STATE_BATTERY;
-		    RemainingCapacity = -1;
-		}
-		switch (state) {
-		case STATE_BATTERY:
-		    if (ev[i].hid == UPS_DISCHARGING && ev[i].value == 0) {
+                    powerfail(-1);
+                    state = STATE_BATTERY;
+                    RemainingCapacity = -1;
+                }
+                switch (state) {
+                case STATE_BATTERY:
+                    if (ev[i].hid == UPS_DISCHARGING && ev[i].value == 0) {
                         log_status("System back on AC power");
-			powerfail(0);
-			state = STATE_NORMAL;
-			RemainingCapacity = -1;
-		    }
-		    break;
-		case STATE_DEBOUNCE:
-		    if (ev[i].hid == UPS_DISCHARGING && ev[i].value == 0) {
-			state = STATE_NORMAL;
-			RemainingCapacity = -1;
-		    }
-		    break;
-		case STATE_NORMAL:
-		    if (ev[i].hid == UPS_DISCHARGING && ev[i].value == 1) {
-			state = STATE_DEBOUNCE;
-			RemainingCapacity = -1;
-		    }
-		    break;
-		}
-	    }
-	} else {
-	    /* Our timer has expired */
-	    switch (state) {
-	    case STATE_DEBOUNCE:
+                        powerfail(0);
+                        state = STATE_NORMAL;
+                        RemainingCapacity = -1;
+                    }
+                    break;
+                case STATE_DEBOUNCE:
+                    if (ev[i].hid == UPS_DISCHARGING && ev[i].value == 0) {
+                        state = STATE_NORMAL;
+                        RemainingCapacity = -1;
+                    }
+                    break;
+                case STATE_NORMAL:
+                    if (ev[i].hid == UPS_DISCHARGING && ev[i].value == 1) {
+                        state = STATE_DEBOUNCE;
+                        RemainingCapacity = -1;
+                    }
+                    break;
+                }
+            }
+        } else {
+            /* Our timer has expired */
+            switch (state) {
+            case STATE_DEBOUNCE:
                 log_status("System switched to battery power");
-		state = STATE_BATTERY;
-		powerfail(1);
-		break;
-	    default:  
-		break;
-	    }
-	}
-	fflush(stdout);
+                state = STATE_BATTERY;
+                powerfail(1);
+                break;
+            default:  
+                break;
+            }
+        }
+        fflush(stdout);
     }
 }
