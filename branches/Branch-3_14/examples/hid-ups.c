@@ -207,6 +207,8 @@ struct s_ups_info {
     { 0xFF86007C, T_NONE,   "APCForceShutdown" },
     { 0xFF86007D, T_UNITS,  "APCDelayBeforeShutdown" },
     { 0xFF86007E, T_UNITS,  "APCDelayBeforeStartup" },
+    { 0xFF8600FC, T_UNITS,  "ModbusRTURx" },
+    { 0xFF8600FD, T_UNITS,  "ModbusRTUTx" },
 
 };
 #define UPS_INFO_SZ (sizeof(ups_info)/sizeof(ups_info[0]))
