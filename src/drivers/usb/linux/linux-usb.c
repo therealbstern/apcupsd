@@ -130,17 +130,16 @@ void LinuxUsbUpsDriver::bind_upses()
       return;
 
    // Iterate over all USB devices...
-   size_t i;
-   for (i = 0; i < g.gl_pathc; ++i)
+   for (size_t i = 0; i < g.gl_pathc; ++i)
    {
       // Open the device in usbfs
-      struct usb_device_descriptor dd;
       int fd = open(g.gl_pathv[i], O_RDWR);
       if (fd == -1)
          continue;
 
       // Fetch device descriptor, then verify device vendor is APC and
       // no kernel driver is currently attached
+      struct usb_device_descriptor dd;
       struct usbdevfs_getdriver getdrv = {0};
       if (read(fd, &dd, sizeof(dd)) == sizeof(dd) && 
           dd.idVendor == VENDOR_APC &&
@@ -150,8 +149,8 @@ void LinuxUsbUpsDriver::bind_upses()
          // Issue command to attach kernel driver
          struct usbdevfs_ioctl command = {0};
          command.ioctl_code = USBDEVFS_CONNECT;
-         int rc;
-         if ((rc = ioctl(fd, USBDEVFS_IOCTL, &command)) == 0)
+         int rc = ioctl(fd, USBDEVFS_IOCTL, &command);
+         if (rc == 0)
          {
             Dmsg(100, "Reattached kernel driver to %s\n", g.gl_pathv[i]);
          }
