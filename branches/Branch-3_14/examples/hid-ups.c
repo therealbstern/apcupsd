@@ -323,7 +323,7 @@ static const char *get_string(int fd, int sindex) {
  *   Give units code and exponent, returns string 
  *    describing the units used.  (doesn't work for percentages).
  */
-static const char *get_units(unsigned unit, unsigned exponent) {
+static const char *get_units(unsigned unit, int exponent) {
     static char buf[200];
 
     if (exponent > 7) {
@@ -527,7 +527,8 @@ foundit:
 
                     memset(&uref, 0, sizeof(uref));
                     for (j = 0; j < finfo.maxusage; j++) {
-                        unsigned unit, exponent;
+                        unsigned unit;
+                        int exponent;
                         int v, yy, mm, dd;
                         uref.report_type = finfo.report_type;
                         uref.report_id = finfo.report_id;
