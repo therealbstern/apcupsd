@@ -37,6 +37,9 @@
 #include "apc.h"
 #include "../usb_common.h"
 #include "linux-usb.h"
+#include <glob.h>
+#include <linux/usbdevice_fs.h>
+#include <linux/usb/ch9.h>
 
 /* RHEL has an out-of-date hiddev.h */
 #ifndef HIDIOCGFLAG
@@ -117,6 +120,55 @@ int LinuxUsbUpsDriver::open_device(const char *dev)
 }
 
 /*
+ * Routine to request that kernel driver attach to any APC USB UPSes
+ */
+void LinuxUsbUpsDriver::bind_upses()
+{
+   // Find all USB devices in usbfs
+   glob_t g;
+   if (glob("/proc/bus/usb/[0-9][0-9][0-9]/[0-9][0-9][0-9]", 0, NULL, &g))
+      return;
+
+   // Iterate over all USB devices...
+   size_t i;
+   for (i = 0; i < g.gl_pathc; ++i)
+   {
+      // Open the device in usbfs
+      struct usb_device_descriptor dd;
+      int fd = open(g.gl_pathv[i], O_RDWR);
+      if (fd == -1)
+         continue;
+
+      // Fetch device descriptor, then verify device vendor is APC and
+      // no kernel driver is currently attached
+      struct usbdevfs_getdriver getdrv = {0};
+      if (read(fd, &dd, sizeof(dd)) == sizeof(dd) && 
+          dd.idVendor == VENDOR_APC &&
+          ioctl(fd, USBDEVFS_GETDRIVER, &getdrv))
+      {
+         // APC device with no kernel driver attached
+         // Issue command to attach kernel driver
+         struct usbdevfs_ioctl command = {0};
+         command.ioctl_code = USBDEVFS_CONNECT;
+         int rc;
+         if ((rc = ioctl(fd, USBDEVFS_IOCTL, &command)) == 0)
+         {
+            Dmsg(100, "Reattached kernel driver to %s\n", g.gl_pathv[i]);
+         }
+         else
+         {
+            Dmsg(0, "Failed to attach kernel driver to %s (%d)\n", 
+               g.gl_pathv[i], rc);
+         }
+      }
+
+      close(fd);
+   }
+
+   globfree(&g);
+}
+
+/*
  * Internal routine to open the device and ensure that there is
  * a UPS application on the line.  This routine may be called
  * many times because the device may be unplugged and plugged
@@ -128,6 +180,13 @@ bool LinuxUsbUpsDriver::open_usb_device()
    const char *hiddev[] =
       { "/dev/usb/hiddev", "/dev/usb/hid/hiddev", "/dev/hiddev", NULL };
    int i, j, k;
+
+   /*
+    * Ensure any APC UPSes are utilizing the usbhid/hiddev kernel driver.
+    * This is necessary if they were detached from the kernel driver in order
+    * to use libusb (the apcupsd 'generic' USB driver).
+    */
+   bind_upses();
 
    /*
     * Note, we set _ups->fd here so the "core" of apcupsd doesn't
