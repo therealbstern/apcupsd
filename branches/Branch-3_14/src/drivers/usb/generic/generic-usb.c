@@ -318,7 +318,7 @@ bool GenericUsbUpsDriver::init_device(struct usb_device *dev)
     * this device from userspace. Don't worry if this fails;
     * that just means the driver was already detached.
     */
-   rc = usb_detach_kernel_driver_np(fd, 0);
+   usb_detach_kernel_driver_np(fd, 0);
 #endif
 
    /* Check device serial number, if user specified one */
