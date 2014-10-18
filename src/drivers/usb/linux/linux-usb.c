@@ -39,7 +39,6 @@
 #include "linux-usb.h"
 #include <glob.h>
 #include <linux/usbdevice_fs.h>
-#include <linux/usb/ch9.h>
 
 /* RHEL has an out-of-date hiddev.h */
 #ifndef HIDIOCGFLAG
@@ -137,9 +136,26 @@ void LinuxUsbUpsDriver::bind_upses()
       if (fd == -1)
          continue;
 
+      struct usb_device_descriptor
+      {
+         uint8_t  bLength;
+         uint8_t  bDescriptorType;
+         uint16_t bcdUSB;
+         uint8_t  bDeviceClass;
+         uint8_t  bDeviceSubClass;
+         uint8_t  bDeviceProtocol;
+         uint8_t  bMaxPacketSize0;
+         uint16_t idVendor;
+         uint16_t idProduct;
+         uint16_t bcdDevice;
+         uint8_t  iManufacturer;
+         uint8_t  iProduct;
+         uint8_t  iSerialNumber;
+         uint8_t  bNumConfigurations;
+      } __attribute__ ((packed)) dd;
+
       // Fetch device descriptor, then verify device vendor is APC and
       // no kernel driver is currently attached
-      struct usb_device_descriptor dd;
       struct usbdevfs_getdriver getdrv = {0};
       if (read(fd, &dd, sizeof(dd)) == sizeof(dd) && 
           dd.idVendor == VENDOR_APC &&
