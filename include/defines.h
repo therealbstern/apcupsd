@@ -364,7 +364,7 @@ enum {
    CMDBATTATTACH         /* Battery reconnected */
 };
 
-#define Error_abort(fmd, args...)   error_out(__FILE__, __LINE__, fmd, ##args)
+#define Error_abort(fmd, args...)   error_out_wrapper(__FILE__, __LINE__, fmd, ##args)
 
 /* Debug Messages that are printed */
 #ifdef DEBUG
@@ -384,14 +384,14 @@ void d_msg(const char *file, int line, int level, const char *fmt, ...);
    do { \
       int errstat; \
       if ((errstat=pthread_mutex_lock(&(x)))) \
-         error_out(__FILE__, __LINE__, "Mutex lock failure. ERR=%s\n", strerror(errstat)); \
+         error_out_wrapper(__FILE__, __LINE__, "Mutex lock failure. ERR=%s\n", strerror(errstat)); \
    } while(0)
 
 #define V(x) \
    do { \
       int errstat; \
       if ((errstat=pthread_mutex_unlock(&(x)))) \
-         error_out(__FILE__, __LINE__, "Mutex unlock failure. ERR=%s\n", strerror(errstat)); \
+         error_out_wrapper(__FILE__, __LINE__, "Mutex unlock failure. ERR=%s\n", strerror(errstat)); \
    } while(0)
 
 

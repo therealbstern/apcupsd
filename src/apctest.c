@@ -244,19 +244,16 @@ void apctest_error_cleanup(UPSINFO *ups)
  * and exits. It is normally called from the Error_abort
  * define, which inserts the file and line number.
  */
-void apctest_error_out(const char *file, int line, const char *fmt, ...)
+void apctest_error_out(const char *file, int line, const char *fmt, va_list arg_ptr)
 {
    char buf[256];
-   va_list arg_ptr;
    int i;
 
    asnprintf(buf, sizeof(buf),
       "apctest FATAL ERROR in %s at line %d\n", file, line);
    i = strlen(buf);
 
-   va_start(arg_ptr, fmt);
    avsnprintf((char *)&buf[i], sizeof(buf) - i, (char *)fmt, arg_ptr);
-   va_end(arg_ptr);
 
    pmsg(buf);
 
