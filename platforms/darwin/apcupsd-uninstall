@@ -13,12 +13,11 @@ case $confirm in
    *) exit 1 ;;
 esac
 
-if [ -e /var/run/apcupsd.lock ] ; then
-   SystemStarter stop "APC UPS monitor"
-fi
+launchctl remove org.apcupsd.apcupsd
 
 files="/System/Library/Extensions/ApcupsdDummy.kext \
        /Library/StartupItems/apcupsd \
+       /Library/LaunchDaemons/org.apcupsd.apcupsd.plist \
        /Applications/apcagent.app \
        /etc/apcupsd \
        /sbin/apcaccess \
@@ -31,7 +30,8 @@ files="/System/Library/Extensions/ApcupsdDummy.kext \
        /usr/share/man/man8/apcupsd.8 \
        /usr/share/man/man8/apctest.8 \
        /Library/Receipts/Apcupsd-*.pkg \
-       /sbin/apcupsd-uninstall"
+       /sbin/apcupsd-uninstall \
+       /sbin/apcupsd-start"
 
 echo Removing files...
 for file in $files ; do

@@ -12,13 +12,10 @@ all-uninstall: uninstall-darwin
 
 install-darwin:
 	$(call DISTINST,Darwin Mac OS X)
-	$(call MKDIR,/Library/StartupItems/apcupsd)
-	$(call INSTDATA,744,apcupsd,/Library/StartupItems/apcupsd)
-	$(call INSTDATA,444,StartupParameters.plist,/Library/StartupItems/apcupsd)
-	-$(V)chown root:wheel $(DESTDIR)/Library/StartupItems/apcupsd
-	-$(V)chown root:wheel $(DESTDIR)/Library/StartupItems/apcupsd/apcupsd
-	-$(V)chown root:wheel $(DESTDIR)/Library/StartupItems/apcupsd/StartupParameters.plist
+	$(call INSTDATA,644,org.apcupsd.apcupsd.plist,/Library/LaunchDaemons)
+	$(V)chown root:wheel $(DESTDIR)/Library/LaunchDaemons/org.apcupsd.apcupsd.plist
 	$(call INSTDATA,755,apcupsd-uninstall,/sbin)
+	$(call INSTDATA,755,apcupsd-start,/sbin)
 	@echo "================================================="
 	@echo " "
 	@echo "apcupsd script installation for MacOS X (Darwin) complete." 
@@ -26,7 +23,7 @@ install-darwin:
 	@echo "You should now edit $(DESTDIR)/$(sysconfdir)/apcupsd.conf to correspond"
 	@echo "to your setup then start the apcupsd daemon with:"
 	@echo " "
-	@echo "    SystemStarter start \"APC UPS monitor\""
+	@echo "   sudo launchctl load /Library/LaunchDaemons/org.apcupsd.apcupsd.plist"
 	@echo " "
 	@echo "Thereafter when you reboot, it will be stopped and started"
 	@echo "automatically."
@@ -62,11 +59,13 @@ install-usb:
 
 uninstall-darwin:
 	$(call DISTUNINST,Darwin Mac OS X)
-	-$(call UNINST,/Library/StartupItems/apcupsd)
+	-$(V)launchctl remove org.apcupsd.apcupsd
 	-$(call UNINST,/System/Library/Extensions/ApcupsdDummy.kext)
 	-$(call UNINST,/System/Library/Extensions.mkext)
 	-$(call UNINST,/System/Library/Extensions.kextcache)
 	-$(call UNINST,/sbin/apcupsd-uninstall)
+	-$(call UNINST,/sbin/apcupsd-start)
+	-$(call UNINST,/Library/LaunchDaemons/org.apcupsd.apcupsd.plist)
 	@echo "================================================="
 	@echo " "
 	@echo "Please REBOOT to complete uninstall." 
