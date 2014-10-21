@@ -97,7 +97,7 @@ bool SnmpLiteUpsDriver::Open()
    _vendor = NULL; // autodetect
    _traps = true;
 
-   if (_ups->device == NULL || *_ups->device == '\0') {
+   if (*_ups->device == '\0') {
       log_event(_ups, LOG_ERR, "snmplite Missing hostname");
       exit(1);
    }
