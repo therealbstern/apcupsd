@@ -1239,7 +1239,6 @@ darwin)
    PIDDIR=/var/run
    LOCKDIR=/var/tmp
    DFILES="\
-      platforms/darwin/apcupsd \
       platforms/darwin/apccontrol"
    ;;
 qnx)
