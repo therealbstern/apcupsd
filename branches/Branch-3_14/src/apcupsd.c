@@ -96,7 +96,7 @@ void apcupsd_terminate(int sig)
    delete_lockfile(ups);
    if (pidcreated)
       unlink(pidfile);
-   log_event(ups, LOG_WARNING, "apcupsd shutdown succeeded");
+   log_event(ups, LOG_NOTICE, "apcupsd shutdown succeeded");
    destroy_ups(ups);
    closelog();
    _exit(0);
@@ -313,7 +313,7 @@ int main(int argc, char *argv[])
       Dmsg(10, "NIS thread started.\n");
    }
 
-   log_event(ups, LOG_INFO,
+   log_event(ups, LOG_NOTICE,
       "apcupsd " APCUPSD_RELEASE " (" ADATE ") " APCUPSD_HOST " startup succeeded");
 
    /* main processing loop */
