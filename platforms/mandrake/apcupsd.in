@@ -50,7 +50,6 @@ case "$1" in
        fi
        echo -n "Starting UPS monitoring:" 
        @sbindir@/apcupsd -f @sysconfdir@/apcupsd.conf && success || failure
-       fi
        echo
        touch @LOCKDIR@/subsys/apcupsd
        ;;
