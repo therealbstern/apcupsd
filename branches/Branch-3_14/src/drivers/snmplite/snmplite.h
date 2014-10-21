@@ -30,7 +30,7 @@
 namespace Snmp
 {
    class SnmpEngine;
-   class Variable;
+   struct Variable;
 };
 
 // Forward declarations
