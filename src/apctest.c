@@ -263,24 +263,6 @@ void apctest_error_out(const char *file, int line, const char *fmt, ...)
    apctest_error_cleanup(core_ups);     /* finish the work */
 }
 
-/*
- * Subroutine error_exit simply prints the supplied error
- * message, cleans up, and exits.
- */
-void apctest_error_exit(const char *fmt, ...)
-{
-   char buf[256];
-   va_list arg_ptr;
-
-   va_start(arg_ptr, fmt);
-   avsnprintf(buf, sizeof(buf), (char *)fmt, arg_ptr);
-   va_end(arg_ptr);
-
-   pmsg(buf);
-
-   apctest_error_cleanup(core_ups);     /* finish the work */
-}
-
 
 /* Main program */
 
@@ -290,7 +272,6 @@ int main(int argc, char *argv[])
 {
    /* Set specific error_* handlers. */
    error_out = apctest_error_out;
-   error_exit = apctest_error_exit;
 
    /*
     * Default config file. If we set a config file in startup switches, it

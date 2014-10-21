@@ -727,7 +727,7 @@ jump_into_the_loop:
        * attempted
        */
       ups->lockpath[0] = '\0';
-      error_exit("Terminating due to configuration file errors.\n");
+      Error_abort("Terminating due to configuration file errors.\n");
    }
 
    /* post-process the configuration stored in the ups structure */

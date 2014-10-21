@@ -48,23 +48,5 @@ void generic_error_out(const char *file, int line, const char *fmt, ...)
    exit(1);
 }
 
-/* simply print the message and exit */
-void generic_error_exit(const char *fmt, ...)
-{
-   va_list arg_ptr;
-   char buf[256];
-
-   va_start(arg_ptr, fmt);
-   avsnprintf(buf, sizeof(buf), (char *)fmt, arg_ptr);
-   va_end(arg_ptr);
-   fprintf(stdout, "%s", buf);
-
-   if (error_cleanup)
-      error_cleanup();
-
-   exit(1);
-}
-
 void (*error_out) (const char *file, int line, const char *fmt, ...) = generic_error_out;
-void (*error_exit) (const char *fmt, ...) = generic_error_exit;
 void (*error_cleanup) (void) = NULL;
