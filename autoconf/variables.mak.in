@@ -54,7 +54,7 @@ LOCKDIR = @LOCKDIR@
 
 # Compilation macros.
 CC = @CC@
-CXX = @CXX@
+CXX = @CXX@ -x c++
 OBJC = $(CC) -x objective-c++
 NIB = ibtool
 LD = @LD@
