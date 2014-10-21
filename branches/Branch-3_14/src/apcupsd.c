@@ -142,24 +142,6 @@ void apcupsd_error_out(const char *file, int line, const char *fmt, ...)
 }
 
 /*
- * Subroutine error_exit simply prints the supplied error
- * message, cleans up, and exits.
- */
-void apcupsd_error_exit(const char *fmt, ...)
-{
-   char buf[256];
-   va_list arg_ptr;
-
-   va_start(arg_ptr, fmt);
-   avsnprintf(buf, sizeof(buf), (char *)fmt, arg_ptr);
-   va_end(arg_ptr);
-
-   fprintf(stderr, "%s", buf);
-   log_event(core_ups, LOG_ERR, "%s", buf);
-   apcupsd_error_cleanup(core_ups);     /* finish the work */
-}
-
-/*
  * ApcupsdMain is called from win32/winmain.cpp
  * we need to eliminate "main" as an entry point,
  * otherwise, it interferes with the Windows
@@ -177,7 +159,6 @@ int main(int argc, char *argv[])
 
    /* Set specific error_* handlers. */
    error_out = apcupsd_error_out;
-   error_exit = apcupsd_error_exit;
 
    /*
     * Default config file. If we set a config file in startup switches, it
