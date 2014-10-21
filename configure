@@ -662,8 +662,6 @@ GD_LIBS
 CGI
 LD
 MAKE
-POWERLIBS
-POWERFLUTE
 APCAGENT
 GAPCMON
 GAPCMON_LIBS
@@ -12610,8 +12608,6 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
    CFLAGS="$CFLAGS -Wall"
    CXXFLAGS="$CXXFLAGS -Wall"
 fi
-
-
 
 
 
