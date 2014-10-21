@@ -205,7 +205,7 @@ int main(int argc, char **argv)
       host = argv[optind + 1];
 
    // If still no host, use default
-   if (!host)
+   if (!host || !*host)
       host = DEFAULT_HOST;
 
    // Separate host and port
