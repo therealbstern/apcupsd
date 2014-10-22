@@ -651,8 +651,13 @@ bool PcnetUpsDriver::Open()
    if (_ups->fd == -1)
       Error_abort("Cannot create socket (%d)\n", errno);
 
+   // Although SO_BROADCAST is typically described as enabling broadcast
+   // *transmission* (which is not what we want) on some systems it appears to
+   // be needed for broadcast reception as well. We will attempt to set it
+   // everywhere and not worry if it fails.
    int enable = 1;
-   setsockopt(_ups->fd, SOL_SOCKET, SO_BROADCAST, (const char*)&enable, sizeof(enable));
+   (void)setsockopt(_ups->fd, SOL_SOCKET, SO_BROADCAST, 
+      (const char*)&enable, sizeof(enable));
 
    memset(&addr, 0, sizeof(addr));
    addr.sin_family = AF_INET;
