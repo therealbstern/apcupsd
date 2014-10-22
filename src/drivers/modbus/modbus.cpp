@@ -265,18 +265,6 @@ bool ModbusUpsDriver::Close()
  */
 bool ModbusUpsDriver::get_capabilities()
 {
-/////////
-   const CiInfo *info = CI_TABLE;
-   while (info->reg && info->ci != CI_STATUS)
-      info++;
-   uint8_t *data = ReadRegister(info->reg->addr, info->reg->nregs);
-   if (!data)
-   {
-      _ups->set_commlost();
-      return false;
-   }
-   delete [] data;
-/////////
    for (const CiInfo *info = CI_TABLE; info->reg; info++)
    {
       uint8_t *data = ReadRegister(info->reg->addr, info->reg->nregs);
