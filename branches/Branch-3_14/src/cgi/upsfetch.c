@@ -176,14 +176,12 @@ int fetch_events(const char *host)
       buf[n] = '\0';                     /* ensure string terminated */
       len = strlen(buf);
       /* if message is bigger than the buffer, truncate it */
-      if (len < sizeof(statbuf)) {
-         /* move previous messages to the end of the buffer */
-         memmove(statbuf+len, statbuf, sizeof(statbuf)-len);
-         /* copy new message */
-         memcpy(statbuf, buf, len);
-      } else {
-         strncpy(statbuf, buf, sizeof(statbuf)-1);
-      }
+      if (len > sizeof(statbuf)-1)
+         len = sizeof(statbuf)-1;
+      /* move previous messages to the end of the buffer */
+      memmove(statbuf+len, statbuf, sizeof(statbuf)-len-1);
+      /* copy new message */
+      memcpy(statbuf, buf, len);
       statbuf[sizeof(statbuf)-1] = '\0';
    }
 
