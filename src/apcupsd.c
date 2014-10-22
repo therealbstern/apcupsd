@@ -171,7 +171,7 @@ int main(int argc, char *argv[])
    tmp_fd = open("/dev/null", O_RDONLY);
    if (tmp_fd > 2) {
       close(tmp_fd);
-   } else {
+   } else if (tmp_fd >= 0) {
       for (i = 1; tmp_fd + i <= 2; i++)
          dup2(tmp_fd, tmp_fd + i);
    }
@@ -375,7 +375,7 @@ static void daemon_start(void)
    fd = open("/dev/null", O_RDONLY);
    if (fd > 2) {
       close(fd);
-   } else {
+   } else if (fd >= 0) {
       for (i = 1; fd + i <= 2; i++)
          dup2(fd, fd + i);
    }
