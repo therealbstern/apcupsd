@@ -2,14 +2,14 @@ topdir:=../..
 include $(topdir)/autoconf/targets.mak
 
 SRCS = $(wildcard *.m) $(wildcard *.c)
-LIBS := -Wl,-framework -Wl,Cocoa -Wl,-framework -Wl,Growl $(LIBS)
+LIBS := -Wl,-framework -Wl,Cocoa $(LIBS)
 
 all-targets: apcagent MainMenu.nib apcagent.app
 
 apcagent: $(OBJS) $(APCLIBS)
 	$(LINK)
 
-apcagent.app: apcagent MainMenu.nib Info.plist PkgInfo growl.plist \
+apcagent.app: apcagent MainMenu.nib Info.plist PkgInfo \
               $(topdir)/doc/images/commlost.png \
               $(topdir)/doc/images/charging.png \
               $(topdir)/doc/images/onbatt.png \
@@ -29,8 +29,6 @@ apcagent.app: apcagent MainMenu.nib Info.plist PkgInfo growl.plist \
 	$(V)$(INSTALL_DATA) -m 644 $(topdir)/doc/images/charging.png apcagent.app/Contents/Resources
 	$(V)$(INSTALL_DATA) -m 644 $(topdir)/doc/images/onbatt.png apcagent.app/Contents/Resources
 	$(V)$(INSTALL_DATA) -m 644 $(topdir)/doc/images/online.png apcagent.app/Contents/Resources
-	$(V)cp -R /Developer/SDKs/MacOSX10.4u.sdk/System/Library/Frameworks/Growl.framework apcagent.app/Contents/Frameworks
-	$(V)$(INSTALL_DATA) -m 644 growl.plist apcagent.app/Contents/Resources/Growl\ Registration\ Ticket.growlRegDict
 
 apcagent.dmg: apcagent.app
 	hdiutil create -ov -srcfolder apcagent.app apcagent.dmg

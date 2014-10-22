@@ -23,13 +23,11 @@
  */
 
 #import <Cocoa/Cocoa.h>
-#import <Growl/Growl.h>
 #import "InstanceManager.h"
 
 int main(int argc, char *argv[])
 {
    NSAutoreleasePool *p = [[NSAutoreleasePool alloc] init];
-   [GrowlApplicationBridge setGrowlDelegate:@""];
    [[[InstanceManager alloc] init] createMonitors];
    [p release]; // run is never coming back, so free the pool now
    [[NSApplication sharedApplication] run];

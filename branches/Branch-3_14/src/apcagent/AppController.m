@@ -24,7 +24,6 @@
 
 #import "AppController.h"
 #import "statmgr.h"
-#import <Growl/Growl.h>
 
 //******************************************************************************
 // CLASS AppController
@@ -134,7 +133,6 @@
       prevPort = [config port];
    }
    BOOL doPopup = [config popups];
-   NSString *id = [config id];
    [configMutex unlock];
 
    // Grab updated status info from apcupsd
@@ -240,20 +238,7 @@
          severity = @"ApcupsdInfo";
       }
 
-      // Register w/ Growl in case it wasn't installed when we started
-      // or user removed Apcagent from Growl preferences.
-      [GrowlApplicationBridge setGrowlDelegate:@""];
-
-      // Post the popup to Growl
-      [GrowlApplicationBridge
-         notifyWithTitle:@"Apcupsd Event"
-         description:tooltip
-         notificationName:severity
-         iconData:[[statusItem image] TIFFRepresentation]
-         priority:0
-         isSticky:NO
-         clickContext:nil
-         identifier:id];
+      // Post notification here...
    }
 
    // Save status for comparison next time
@@ -300,38 +285,9 @@
    [configPort setIntValue:[config port]];
    [configRefresh setIntValue:[config refresh]];
 
-   if ([GrowlApplicationBridge isGrowlInstalled])
-   {
-      [configPopups setEnabled:YES];
-      [configPopups setIntValue:[config popups]];
-
-      if ([GrowlApplicationBridge isGrowlRunning])
-      {
-         [growlLabel setStringValue:
-            @"Growl is installed and running. Popups will be displayed if "
-             "enabled here and may be further configured in the Growl "
-             "preferences pane in System Preferences."];
-         [growlLabel setTextColor:[NSColor controlTextColor]];
-      }
-      else
-      {
-         [growlLabel setStringValue:
-            @"Growl does not appear to be running. Popups will not be "
-             "displayed. Growl can be started in the Growl preferences "
-             "pane in System Preferences."];
-         [growlLabel setTextColor:[NSColor redColor]];
-      }
-   }
-   else
-   {
-      [growlLabel setStringValue:
-         @"This feature requires Growl (http://www.growl.info). "
-          "Growl does not appear to be installed. Please install "
-          "Growl to enable popups."];
-      [growlLabel setTextColor:[NSColor redColor]];
-      [configPopups setEnabled:NO];
-      [configPopups setIntValue:0];
-   }
+   // This should be conditional on notification center support
+   [configPopups setEnabled:YES];
+   [configPopups setIntValue:[config popups]];
 
    // Force app to foreground and move key focus to config window
    [[NSApplication sharedApplication] activateIgnoringOtherApps:YES];
@@ -386,9 +342,8 @@
       [config setPort:[configPort intValue]];
       [config setRefresh:[configRefresh intValue]];
 
-      // Only change popups config if Growl is installed
-      if ([GrowlApplicationBridge isGrowlInstalled])
-         [config setPopups:[configPopups intValue]];
+      // This should be conditional on notification center
+      [config setPopups:[configPopups intValue]];
 
       [config save];
       [configMutex unlock];
