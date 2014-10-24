@@ -150,7 +150,13 @@
 {
    // Instantiate the NIB for this monitor
    NSArray *objs;
+   // instantiateNibWithOwner is deprecated in 10.8 where instantiateWithOwner
+   // is preferred due to better memory management characteristics
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_8
    [nib instantiateNibWithOwner:self topLevelObjects:&objs];
+#else
+   [nib instantiateWithOwner:self topLevelObjects:&objs];
+#endif
    [instmap setObject:objs forKey:[config id]];
 
    // Locate the AppController object and activate it
@@ -240,10 +246,12 @@
    // Remove our reference to the instance and all of its NIB objects
    [instmap removeObjectForKey:[ac id]];
 
-   // Hack! There's an extra reference to AppController *somewhere* but
-   // I can't find it. So manually force a release here. This will result
-   // in a crash if the mystery reference ever gets used...
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_8
+   // When using instantiateNibWithOwner above in instantiateMonitor() we need
+   // to manually remove a ref on ac because the NIB top-level object array is
+   // retained "automatically".
    [ac release];
+#endif
 
    // If all instances have been removed, terminate the app
    if ([instmap count] == 0)
