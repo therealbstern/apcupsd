@@ -2,7 +2,7 @@ topdir:=../..
 include $(topdir)/autoconf/targets.mak
 
 SRCS = $(wildcard *.m) $(wildcard *.c)
-LIBS := -Wl,-framework -Wl,Cocoa $(LIBS)
+LIBS := -Wl,-framework -Wl,Cocoa -Wl,-framework -Wl,ApplicationServices $(LIBS)
 
 all-targets: apcagent MainMenu.nib apcagent.app
 
