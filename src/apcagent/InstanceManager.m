@@ -63,7 +63,14 @@
          LSSharedFileListItemRef item = 
             (LSSharedFileListItemRef)[loginItems objectAtIndex:i];
          NSURL *url;
+
+         // LSSharedFileListItemResolve is deprecated in Mac OS X 10.10
+         // Switch to LSSharedFileListItemCopyResolvedURL if possible
+#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_10
          LSSharedFileListItemResolve(item, 0, (CFURLRef*)&url, NULL);
+#else
+         url = (NSURL*)LSSharedFileListItemCopyResolvedURL(item, 0, NULL);
+#endif 
          if (url)
          {
             if ([url isEqual:appUrl])
