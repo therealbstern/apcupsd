@@ -62,7 +62,7 @@
       {
          LSSharedFileListItemRef item = 
             (LSSharedFileListItemRef)[loginItems objectAtIndex:i];
-         NSURL *url;
+         NSURL *url = nil;
 
          // LSSharedFileListItemResolve is deprecated in Mac OS X 10.10
          // Switch to LSSharedFileListItemCopyResolvedURL if possible
