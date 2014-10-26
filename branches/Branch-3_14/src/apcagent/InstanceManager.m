@@ -66,7 +66,7 @@
 
          // LSSharedFileListItemResolve is deprecated in Mac OS X 10.10
          // Switch to LSSharedFileListItemCopyResolvedURL if possible
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_10
+#if MAC_OS_X_VERSION_MIN_REQUIRED < 10100
          LSSharedFileListItemResolve(item, 0, (CFURLRef*)&url, NULL);
 #else
          url = (NSURL*)LSSharedFileListItemCopyResolvedURL(item, 0, NULL);
@@ -152,7 +152,7 @@
    NSArray *objs;
    // instantiateNibWithOwner is deprecated in 10.8 where instantiateWithOwner
    // is preferred due to better memory management characteristics
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_8
+#if MAC_OS_X_VERSION_MIN_REQUIRED < 1080
    [nib instantiateNibWithOwner:self topLevelObjects:&objs];
 #else
    [nib instantiateWithOwner:self topLevelObjects:&objs];
@@ -246,7 +246,7 @@
    // Remove our reference to the instance and all of its NIB objects
    [instmap removeObjectForKey:[ac id]];
 
-#if MAC_OS_X_VERSION_MIN_REQUIRED < MAC_OS_X_VERSION_10_8
+#if MAC_OS_X_VERSION_MIN_REQUIRED < 1080
    // When using instantiateNibWithOwner above in instantiateMonitor() we need
    // to manually remove a ref on ac because the NIB top-level object array is
    // retained "automatically".
