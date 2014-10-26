@@ -35,10 +35,12 @@ class StatMgr;
 @protocol NSTableViewDataSource <NSObject> @end
 #endif 
 
+// NSUserNotificationCenterDelegate was added in 10.8
 #if __MAC_OS_X_VERSION_MAX_ALLOWED < 1080
 @protocol NSUserNotificationCenterDelegate <NSObject> @end
 #endif
 
+// NSMenuDelegate was added in 10.6
 #if __MAC_OS_X_VERSION_MAX_ALLOWED < 1060
 @protocol NSMenuDelegate <NSObject> @end
 #endif
