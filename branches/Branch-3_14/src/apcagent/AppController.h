@@ -35,6 +35,14 @@ class StatMgr;
 @protocol NSTableViewDataSource <NSObject> @end
 #endif 
 
+#if __MAC_OS_X_VERSION_MAX_ALLOWED < 1080
+@protocol NSUserNotificationCenterDelegate <NSObject> @end
+#endif
+
+#if __MAC_OS_X_VERSION_MAX_ALLOWED < 1060
+@protocol NSMenuDelegate <NSObject> @end
+#endif
+
 @interface StatusTableDataSource: NSObject <NSTableViewDataSource>
 {
    NSLock *_mutex;
@@ -64,11 +72,7 @@ class StatMgr;
    row:(int)rowIndex;
 @end
 
-#if MAC_OS_X_VERSION_MAX_ALLOWED >= 1080
 @interface AppController: NSObject <NSMenuDelegate, NSUserNotificationCenterDelegate>
-#else
-@interface AppController: NSObject <NSMenuDelegate>
-#endif
 {
    // Status item shown in the status bar
    NSStatusItem *statusItem;
