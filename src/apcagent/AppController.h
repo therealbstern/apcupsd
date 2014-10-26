@@ -64,8 +64,11 @@ class StatMgr;
    row:(int)rowIndex;
 @end
 
-
-@interface AppController: NSObject
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= 1080
+@interface AppController: NSObject <NSMenuDelegate, NSUserNotificationCenterDelegate>
+#else
+@interface AppController: NSObject <NSMenuDelegate>
+#endif
 {
    // Status item shown in the status bar
    NSStatusItem *statusItem;
@@ -132,6 +135,9 @@ class StatMgr;
 
    // C++ object which handles polling the UPS
    StatMgr *statmgr;
+
+   // If system support Notification Center (10.8 and above)
+   BOOL haveNotifCtr;
 
    // Runloop variables
    BOOL running;

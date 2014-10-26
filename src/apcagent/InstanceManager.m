@@ -235,7 +235,7 @@
    NSLog(@"%s:%d %@", __FUNCTION__, __LINE__, [[sender menu] delegate]);
 
    // Find AppController instance which this menu refers to
-   AppController *ac = [[sender menu] delegate];
+   AppController *ac = (AppController *)[[sender menu] delegate];
 
    // Remove the config from prefs for this monitor
    [InstanceConfig removeConfigWithId:[ac id]];
