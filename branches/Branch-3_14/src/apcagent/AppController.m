@@ -57,6 +57,15 @@
    // Setup events table control
    eventsDataSource = [[EventsTableDataSource alloc] init];
    [eventsGrid setDataSource:eventsDataSource];
+
+   // Configure to post notifications
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= 1080
+   haveNotifCtr = NSClassFromString(@"NSUserNotificationCenter") != nil;
+   if (haveNotifCtr)
+      [[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:self];
+#else
+   haveNotifCtr = NO;
+#endif
 }
 
 - (void)activateWithConfig:(InstanceConfig*)cfg manager:(InstanceManager*)mgr
@@ -215,30 +224,24 @@
 
    // If status has changed, display a popup window
    NSString *newStatus = [NSString stringWithUTF8String:statstr];
-   if (doPopup && [lastStatus length] && 
+   if (haveNotifCtr && doPopup && [lastStatus length] && 
        ![lastStatus isEqualToString:newStatus])
    {
-      // Determine severity based on keywords in the status string
-      NSString *severity;
-      if ([newStatus rangeOfString:@"ONBATT"].length ||
-          [newStatus rangeOfString:@"LOWBATT"].length ||
-          [newStatus rangeOfString:@"SHUTTING DOWN"].length ||
-          [newStatus rangeOfString:@"COMMLOST"].length)
-      {
-         severity = @"ApcupsdCritical";
-      }
-      else if ([newStatus rangeOfString:@"ONLINE"].length ||
-               [newStatus rangeOfString:@"OVERLOAD"].length ||
-               [newStatus rangeOfString:@"REPLACEBATT"].length)
-      {
-         severity = @"ApcupsdWarning";
-      }
-      else
-      {
-         severity = @"ApcupsdInfo";
-      }
-
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= 1080
       // Post notification here...
+      NSUserNotification *notification = [[NSUserNotification alloc] init];
+      notification.title = @"Apcupsd Event";
+      notification.subtitle = 
+         [NSString stringWithFormat:@"%s %@",upsname.str(),newStatus];
+      NSDate *now = [NSDate dateWithTimeIntervalSinceNow:0];
+      notification.informativeText = 
+         [NSString stringWithFormat:@"UPS '%s' status %@ at %@",
+          upsname.str(),newStatus,now];
+      notification.contentImage = [statusItem image];
+      [[NSUserNotificationCenter defaultUserNotificationCenter] 
+         deliverNotification:notification];
+      [notification release];
+#endif
    }
 
    // Save status for comparison next time
@@ -412,6 +415,14 @@
 {
    [startAtLogin setState:([manager isStartAtLogin] ? NSOnState : NSOffState)];
 }
+
+#if MAC_OS_X_VERSION_MAX_ALLOWED >= 1080
+- (BOOL)userNotificationCenter:(NSUserNotificationCenter *)center 
+   shouldPresentNotification:(NSUserNotification *)notification
+{
+    return YES;
+}
+#endif
 
 @end
 
