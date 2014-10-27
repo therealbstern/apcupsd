@@ -62,7 +62,12 @@
 #if MAC_OS_X_VERSION_MAX_ALLOWED >= 1080
    haveNotifCtr = NSClassFromString(@"NSUserNotificationCenter") != nil;
    if (haveNotifCtr)
+   {
+      // Allow user to enable/disable notifications
       [[NSUserNotificationCenter defaultUserNotificationCenter] setDelegate:self];
+      [configPopups setEnabled:YES];
+      [configPopups setHidden:NO];
+   }
 #else
    haveNotifCtr = NO;
 #endif
@@ -287,9 +292,6 @@
    [configHost setStringValue:[config host]];
    [configPort setIntValue:[config port]];
    [configRefresh setIntValue:[config refresh]];
-
-   // This should be conditional on notification center support
-   [configPopups setEnabled:YES];
    [configPopups setIntValue:[config popups]];
 
    // Force app to foreground and move key focus to config window
@@ -322,8 +324,6 @@
       [config setHost:[configHost stringValue]];
       [config setPort:[configPort intValue]];
       [config setRefresh:[configRefresh intValue]];
-
-      // This should be conditional on notification center
       [config setPopups:[configPopups intValue]];
 
       [config save];
