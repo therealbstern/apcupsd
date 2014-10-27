@@ -12,6 +12,7 @@ all-uninstall: uninstall-darwin
 
 install-darwin:
 	$(call DISTINST,Darwin Mac OS X)
+	$(call MKDIR,/Library/LaunchDaemons)
 	$(call INSTDATA,644,org.apcupsd.apcupsd.plist,/Library/LaunchDaemons)
 	$(V)chown root:wheel $(DESTDIR)/Library/LaunchDaemons/org.apcupsd.apcupsd.plist
 	$(call INSTDATA,755,apcupsd-uninstall,/sbin)
@@ -78,24 +79,39 @@ uninstall-darwin:
 apcupsd.pkg:
 	rm -rf $(PKGROOT)
 	mkdir $(PKGROOT)
+	mkdir $(PKGROOT)/Apcupsd
 	mkdir $(PKGROOT)/Apcupsd.Resources
 	mkdir $(PKGROOT)/Apcupsd.Scripts
 	mkdir $(PKGROOT)/Apcupsd.Root
-	mkdir $(PKGROOT)/Apcupsd
+	mkdir $(PKGROOT)/Apcagent.Scripts
 	( cd $(topdir) && DESTDIR=$(PKGROOT)/Apcupsd.Root make install )
-	cp $(topdir)/ReleaseNotes $(PKGROOT)/Apcupsd.Resources/ReadMe.txt
-	cp $(topdir)/COPYING $(PKGROOT)/Apcupsd.Resources/License.txt
+	cp $(topdir)/ReleaseNotes $(PKGROOT)/Apcupsd.Resources
+	cp $(topdir)/COPYING $(PKGROOT)/Apcupsd.Resources
 	cp Welcome.txt $(PKGROOT)/Apcupsd.Resources
-	cp ApcupsdDaemon.preflight $(PKGROOT)/Apcupsd.Scripts/preflight
-	cp ApcupsdDaemon.postflight $(PKGROOT)/Apcupsd.Scripts/postflight
-	chown root:admin $(PKGROOT)/Apcupsd.Root/Library
+	cp Conclusion.txt $(PKGROOT)/Apcupsd.Resources
+	cp ApcupsdDaemon.preflight $(PKGROOT)/Apcupsd.Scripts/preinstall
+	cp ApcupsdDaemon.postflight $(PKGROOT)/Apcupsd.Scripts/postinstall
+	cp apcagent.postinstall $(PKGROOT)/Apcagent.Scripts/postinstall
+	chown root:wheel $(PKGROOT)/Apcupsd.Root/Library
+	chown root:wheel $(PKGROOT)/Apcupsd.Root/Library/LaunchDaemons
 	chmod 1775 $(PKGROOT)/Apcupsd.Root/Library
-	chown root $(PKGROOT)/Apcupsd.Root/Applications
-	chgrp admin $(PKGROOT)/Apcupsd.Root/Applications
-	chmod 775 $(PKGROOT)/Apcupsd.Root/Applications
-	$(PACKAGEMAKER) -v --no-recommend --no-relocate --root $(PKGROOT)/Apcupsd.Root \
-	   --info ApcupsdDaemon.Info.plist --resources $(PKGROOT)/Apcupsd.Resources \
-	   --scripts $(PKGROOT)/Apcupsd.Scripts --id com.apcupsd.apcupsd --root-volume-only \
-           --target 10.4 --version $(VERSION) --out $(PKGROOT)/Apcupsd/Apcupsd-$(VERSION).pkg
-	rm -f $(PKGROOT)/Apcupsd/Apcupsd-$(VERSION).pkg/Contents/Resources/TokenDefinitions.plist
+	chmod 0775 $(PKGROOT)/Apcupsd.Root/Library/LaunchDaemons
+	pkgbuild --root $(PKGROOT)/Apcupsd.Root/Applications \
+      --identifier com.apcupsd.apcagent --version $(VERSION) \
+      --install-location /Applications --scripts $(PKGROOT)/Apcagent.Scripts \
+      --component-plist component.plist $(PKGROOT)/apcagent.pkg
+	rm -rf $(PKGROOT)/Apcupsd.Root/Applications
+	pkgbuild --root $(PKGROOT)/Apcupsd.Root \
+      --identifier com.apcupsd.apcupsd --version $(VERSION) \
+      --install-location / --scripts $(PKGROOT)/Apcupsd.Scripts \
+      $(PKGROOT)/apcupsd.pkg
+	productbuild --distribution apcupsd.dist --package-path $(PKGROOT) \
+      --resources $(PKGROOT)/Apcupsd.Resources --identifier org.apcupsd.apcupsd \
+      --version $(VERSION) $(PKGROOT)/Apcupsd/Apcupsd-$(VERSION).pkg
 	hdiutil create -ov -fs HFS+ -srcfolder $(PKGROOT)/Apcupsd -volname Apcupsd-$(VERSION) Apcupsd-$(VERSION).dmg
+
+#	$(PACKAGEMAKER) -v --no-recommend --no-relocate --root $(PKGROOT)/Apcupsd.Root \
+#	   --info ApcupsdDaemon.Info.plist --resources $(PKGROOT)/Apcupsd.Resources \
+#	   --scripts $(PKGROOT)/Apcupsd.Scripts --id com.apcupsd.apcupsd --root-volume-only \
+#           --target 10.4 --version $(VERSION) --out $(PKGROOT)/Apcupsd/Apcupsd-$(VERSION).pkg
+#	rm -f $(PKGROOT)/Apcupsd/Apcupsd-$(VERSION).pkg/Contents/Resources/TokenDefinitions.plist

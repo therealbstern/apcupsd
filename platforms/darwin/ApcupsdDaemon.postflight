@@ -12,7 +12,4 @@ else
 	# Looks like a new install, so open apcupsd.conf in an editor
 	# along with a message describing what to do.
 	open -t /etc/apcupsd/apcupsd.conf
-	echo "Please edit apcupsd.conf as appropriate for your UPS and save it before rebooting." > /tmp/inst.txt
-	open -t /tmp/inst.txt
 fi
-
