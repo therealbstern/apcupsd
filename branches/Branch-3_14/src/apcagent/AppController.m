@@ -299,19 +299,23 @@
 
 -(IBAction)configComplete:(id)sender;
 {
-   bool allFieldsValid = true;
-
-   // Validate host
+   // Validate fields are not empty
    NSString *tmpstr = [configHost stringValue];
    tmpstr = [tmpstr stringByTrimmingCharactersInSet:
                [NSCharacterSet whitespaceCharacterSet]];
    if ([tmpstr length] == 0)
    {
-      allFieldsValid = false;
+      [configWindow makeFirstResponder:configHost];
    }
-
-   // Apply changes
-   if (allFieldsValid)
+   else if ([[configPort stringValue] length] == 0)
+   {
+      [configWindow makeFirstResponder:configPort];
+   }
+   else if ([[configRefresh stringValue] length] == 0)
+   {
+      [configWindow makeFirstResponder:configRefresh];
+   }
+   else
    {
       // Grab new settings from window controls
       [configMutex lock];
@@ -522,24 +526,6 @@
    [mutex unlock];
 
    return ret;
-}
-
-@end
-
-
-@implementation BetterNumberFormatter
-
-- (BOOL)isPartialStringValid:(NSString *)partialString
-            newEditingString:(NSString **)newString
-            errorDescription:(NSString **)error
-{
-   NSCharacterSet *nonDigits = 
-      [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
-
-   return [partialString length] == 0 ||
-      ([partialString rangeOfCharacterFromSet:nonDigits].location == NSNotFound &&
-       ([self minimum] == nil || [partialString intValue] >= [[self minimum] intValue]) &&
-       ([self maximum] == nil || [partialString intValue] <= [[self maximum] intValue]));
 }
 
 @end
