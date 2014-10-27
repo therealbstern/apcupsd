@@ -168,3 +168,11 @@ class StatMgr;
 - (void)menuNeedsUpdate:(NSMenu *)menu;
 
 @end
+
+@interface BetterNumberFormatter: NSNumberFormatter
+
+- (BOOL)isPartialStringValid:(NSString *)partialString
+            newEditingString:(NSString **)newString
+            errorDescription:(NSString **)error;
+
+@end

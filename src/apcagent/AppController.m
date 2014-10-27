@@ -307,34 +307,8 @@
                [NSCharacterSet whitespaceCharacterSet]];
    if ([tmpstr length] == 0)
    {
-      [configHost setBackgroundColor:[NSColor redColor]];
       allFieldsValid = false;
    }
-   else
-      [configHost setBackgroundColor:[NSColor controlBackgroundColor]];
-
-   // Validate port
-   NSCharacterSet *nonDigits = 
-      [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
-
-   if ([[configPort stringValue] rangeOfCharacterFromSet:nonDigits].location != NSNotFound ||
-       [configPort intValue] < 1 || [configPort intValue] > 65535)
-   {
-      [configPort setBackgroundColor:[NSColor redColor]];
-      allFieldsValid = false;
-   }
-   else
-      [configPort setBackgroundColor:[NSColor controlBackgroundColor]];
-
-   // Validate timeout
-   if ([[configRefresh stringValue] rangeOfCharacterFromSet:nonDigits].location != NSNotFound ||
-       [configRefresh intValue] < 1)
-   {
-      [configRefresh setBackgroundColor:[NSColor redColor]];
-      allFieldsValid = false;
-   }
-   else
-      [configRefresh setBackgroundColor:[NSColor controlBackgroundColor]];
 
    // Apply changes
    if (allFieldsValid)
@@ -548,6 +522,24 @@
    [mutex unlock];
 
    return ret;
+}
+
+@end
+
+
+@implementation BetterNumberFormatter
+
+- (BOOL)isPartialStringValid:(NSString *)partialString
+            newEditingString:(NSString **)newString
+            errorDescription:(NSString **)error
+{
+   NSCharacterSet *nonDigits = 
+      [[NSCharacterSet decimalDigitCharacterSet] invertedSet];
+
+   return [partialString length] == 0 ||
+      ([partialString rangeOfCharacterFromSet:nonDigits].location == NSNotFound &&
+       ([self minimum] == nil || [partialString intValue] >= [[self minimum] intValue]) &&
+       ([self maximum] == nil || [partialString intValue] <= [[self maximum] intValue]));
 }
 
 @end
