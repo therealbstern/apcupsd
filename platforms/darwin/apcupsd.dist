@@ -6,8 +6,8 @@
     <readme file="ReleaseNotes" mime-type="text/plain"/>
     <conclusion file="Conclusion.txt" mime-type="text/plain"/>
     <domains enable_anywhere="false" enable_currentUserHome="false" enable_localSystem="true"/> 
-    <pkg-ref id="apcupsd" onConclusion="RequireRestart">apcupsd.pkg</pkg-ref>
-    <pkg-ref id="apcagent">apcagent.pkg</pkg-ref>
+    <pkg-ref id="apcupsd" onConclusion="RequireRestart" auth="root">apcupsd.pkg</pkg-ref>
+    <pkg-ref id="apcagent" auth="root">apcagent.pkg</pkg-ref>
     <pkg-ref id="apcagent">
         <must-close>
             <app id="com.apcupsd.apcagent"/>
