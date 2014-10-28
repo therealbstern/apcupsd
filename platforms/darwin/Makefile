@@ -3,10 +3,6 @@ topdir:=../..
 SUBDIRS =
 include $(topdir)/autoconf/targets.mak
 
-# PackageMaker variables
-PACKAGEMAKER=/Developer/usr/bin/packagemaker
-PKGROOT=/tmp/apcupsd-pkg
-
 all-install: install-darwin install-$(USBDRV)
 all-uninstall: uninstall-darwin
 
@@ -14,7 +10,7 @@ install-darwin:
 	$(call DISTINST,Darwin Mac OS X)
 	$(call MKDIR,/Library/LaunchDaemons)
 	$(call INSTDATA,644,org.apcupsd.apcupsd.plist,/Library/LaunchDaemons)
-	$(V)chown root:wheel $(DESTDIR)/Library/LaunchDaemons/org.apcupsd.apcupsd.plist
+	-$(V)chown root:wheel $(DESTDIR)/Library/LaunchDaemons/org.apcupsd.apcupsd.plist
 	$(call INSTDATA,755,apcupsd-uninstall,/sbin)
 	$(call INSTDATA,755,apcupsd-start,/sbin)
 	@echo "================================================="
@@ -45,8 +41,8 @@ install-usb:
 	$(call MKDIR,/System/Library/Extensions/ApcupsdDummy.kext/Contents)
 	-$(V)chown root:wheel $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext
 	-$(V)chown root:wheel $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext/Contents
-	$(V)chmod 755 $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext
-	$(V)chmod 755 $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext/Contents
+	-$(V)chmod 755 $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext
+	-$(V)chmod 755 $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext/Contents
 	$(call INSTDATA,644,Info.plist,/System/Library/Extensions/ApcupsdDummy.kext/Contents)
 	-$(V)chown root:wheel $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext/Contents/Info.plist
 	$(call UNINST,/System/Library/Extensions.mkext)
@@ -73,9 +69,27 @@ uninstall-darwin:
 	@echo " "
 	@echo "================================================="
 
-# Note removal of 'TokenDefinitions.plist' from package below is to prevent
-# automatic relocation of apcagent.app at install time. This is a workaround
-# for a PackageMaker bug.
+# Root of package build sandbox
+PKGROOT=/tmp/apcupsd-pkg
+
+#
+# Identity preferences for signing keys, set via Keychain Access utility or on
+# command line using 'security set-identity-preference'
+#
+# APCUPSD_CODE_SIGNING - Code signing key
+# APCUPSD_PACKAGE_SIGNING - Package signing key
+#
+# codesign searches by identity preference automatically
+CODEKEY := APCUPSD_CODE_SIGNING
+# productsign needs common name string, so look it up
+PKGKEY := $(shell \
+   security get-identity-preference -s APCUPSD_PACKAGE_SIGNING -c \
+      | grep "common name" | cut -d\" -f2)
+
+# Loose executables to sign
+EXES := sbin/apcupsd sbin/apcaccess sbin/apctest sbin/smtp
+
+# Make apcupsd installation package
 apcupsd.pkg:
 	rm -rf $(PKGROOT)
 	mkdir $(PKGROOT)
@@ -92,10 +106,14 @@ apcupsd.pkg:
 	cp ApcupsdDaemon.preflight $(PKGROOT)/Apcupsd.Scripts/preinstall
 	cp ApcupsdDaemon.postflight $(PKGROOT)/Apcupsd.Scripts/postinstall
 	cp apcagent.postinstall $(PKGROOT)/Apcagent.Scripts/postinstall
-	chown root:wheel $(PKGROOT)/Apcupsd.Root/Library
-	chown root:wheel $(PKGROOT)/Apcupsd.Root/Library/LaunchDaemons
-	chmod 1775 $(PKGROOT)/Apcupsd.Root/Library
-	chmod 0775 $(PKGROOT)/Apcupsd.Root/Library/LaunchDaemons
+	-chown root:wheel $(PKGROOT)/Apcupsd.Root/Library
+	-chown root:wheel $(PKGROOT)/Apcupsd.Root/Library/LaunchDaemons
+	-chmod 1775 $(PKGROOT)/Apcupsd.Root/Library
+	-chmod 0775 $(PKGROOT)/Apcupsd.Root/Library/LaunchDaemons
+	-codesign --sign $(CODEKEY) --timestamp --verbose --force --prefix com.apcupsd. $(addprefix $(PKGROOT)/Apcupsd.Root/,$(EXES)) && \
+      codesign --verify --verbose $(addprefix $(PKGROOT)/Apcupsd.Root/,$(EXES))
+	-codesign --sign $(CODEKEY) --timestamp --verbose --force $(PKGROOT)/Apcupsd.Root/Applications/apcagent.app && \
+      codesign --verify --verbose $(PKGROOT)/Apcupsd.Root/Applications/apcagent.app
 	pkgbuild --root $(PKGROOT)/Apcupsd.Root/Applications \
       --identifier com.apcupsd.apcagent --version $(VERSION) \
       --install-location /Applications --scripts $(PKGROOT)/Apcagent.Scripts \
@@ -107,11 +125,6 @@ apcupsd.pkg:
       $(PKGROOT)/apcupsd.pkg
 	productbuild --distribution apcupsd.dist --package-path $(PKGROOT) \
       --resources $(PKGROOT)/Apcupsd.Resources --identifier org.apcupsd.apcupsd \
-      --version $(VERSION) $(PKGROOT)/Apcupsd/Apcupsd-$(VERSION).pkg
+      --version $(VERSION) $(PKGROOT)/Apcupsd-$(VERSION).pkg
+	-productsign --timestamp --sign "$(PKGKEY)" $(PKGROOT)/Apcupsd-$(VERSION).pkg $(PKGROOT)/Apcupsd/Apcupsd-$(VERSION).pkg
 	hdiutil create -ov -fs HFS+ -srcfolder $(PKGROOT)/Apcupsd -volname Apcupsd-$(VERSION) Apcupsd-$(VERSION).dmg
-
-#	$(PACKAGEMAKER) -v --no-recommend --no-relocate --root $(PKGROOT)/Apcupsd.Root \
-#	   --info ApcupsdDaemon.Info.plist --resources $(PKGROOT)/Apcupsd.Resources \
-#	   --scripts $(PKGROOT)/Apcupsd.Scripts --id com.apcupsd.apcupsd --root-volume-only \
-#           --target 10.4 --version $(VERSION) --out $(PKGROOT)/Apcupsd/Apcupsd-$(VERSION).pkg
-#	rm -f $(PKGROOT)/Apcupsd/Apcupsd-$(VERSION).pkg/Contents/Resources/TokenDefinitions.plist
