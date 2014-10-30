@@ -699,6 +699,9 @@ bool PcnetUpsDriver::get_capabilities()
    int rc = wait_for_data(COMMLOST_TIMEOUT);
    if (rc)
    {
+// Disable workaround ... recent Smart-UPS RT 5000 XL don't have this issue
+// and workaround is causing bad readings
+#if 0
       /*
        * Check for quirk where UPS reports runtime remaining in seconds
        * instead of the usual minutes. So far this has been reported on
@@ -714,6 +717,7 @@ bool PcnetUpsDriver::get_capabilities()
          if (_ups->UPS_Cap[CI_RUNTIM])
             _ups->TimeLeft /= 60; // Adjust initial value
       }
+#endif
    }
 
    return _ups->UPS_Cap[CI_STATUS];
