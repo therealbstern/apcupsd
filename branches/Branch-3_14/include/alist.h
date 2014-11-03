@@ -197,6 +197,9 @@ public:
       return iter;
    }
 
+   T &front()             { return *_head; }
+   const T &front() const { return *_head; }
+
 private:
 
    node *_head, *_tail;

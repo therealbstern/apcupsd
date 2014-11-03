@@ -20,8 +20,8 @@
 #define BALLOONMGR_H
 
 #include <windows.h>
-#include <string>
-#include <vector>
+#include "astring.h"
+#include "alist.h"
 
 class BalloonMgr
 {
@@ -43,11 +43,11 @@ private:
 
    struct Balloon {
       HWND hwnd;
-      std::string title;
-      std::string text;
+      astring title;
+      astring text;
    };
 
-   std::vector<Balloon> _pending;
+   alist<Balloon>       _pending;
    HANDLE               _mutex;
    bool                 _active;
    HANDLE               _event;
