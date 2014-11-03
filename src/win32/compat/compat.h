@@ -38,6 +38,7 @@
 #define _STAT_DEFINED /* don't pull in MinGW stat.h */
 #endif
 
+#include <stdint.h>
 #include <stdio.h>
 #include <basetsd.h>
 #include <stdarg.h>
@@ -70,24 +71,11 @@
 
 #define HAVE_WIN32 1
 
-typedef UINT64 u_int64_t;
-typedef UINT64 uint64_t;
-typedef INT64 int64_t;
-typedef UINT32 uint32_t;
-typedef INT64 intmax_t;
-typedef unsigned char uint8_t;
-typedef unsigned short uint16_t;
-typedef signed short int16_t;
-typedef signed char int8_t;
 typedef long time_t;
 
 #if !__STDC__
 typedef long _off_t;            /* must be same as sys/types.h */
 #endif
-
-typedef UINT32 u_int32_t;
-typedef unsigned char u_int8_t;
-typedef unsigned short u_int16_t;
 
 #ifndef __cplusplus
 #ifndef true
