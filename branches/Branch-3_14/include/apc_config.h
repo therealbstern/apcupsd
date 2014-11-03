@@ -32,7 +32,7 @@
 
 #ifndef HAVE_STRFTIME
 # define strftime(msg, max, format, tm) \
-   strncpy(msg, "time not available", max)
+   strlcpy(msg, "time not available", max)
 #endif   /* !HAVE_STRFTIME */
 
 /* 
