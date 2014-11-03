@@ -60,7 +60,7 @@ void BalloonMgr::PostBalloon(HWND hwnd, const char *title, const char *text)
    lock();
 
    Balloon balloon = {hwnd, title, text};
-   _pending.push_back(balloon);
+   _pending.append(balloon);
    signal();
 
    unlock();
@@ -93,8 +93,8 @@ void BalloonMgr::post()
    nid.cbSize = sizeof(nid);
    nid.uID = IDI_APCUPSD;
    nid.uFlags = NIF_INFO;
-   strlcpy(nid.szInfo, balloon.text.c_str(), sizeof(nid.szInfo));
-   strlcpy(nid.szInfoTitle, balloon.title.c_str(), sizeof(nid.szInfoTitle));
+   strlcpy(nid.szInfo, balloon.text, sizeof(nid.szInfo));
+   strlcpy(nid.szInfoTitle, balloon.title, sizeof(nid.szInfoTitle));
    nid.uTimeout = MAX_TIMEOUT;
    nid.dwInfoFlags = NIIF_INFO;
    Shell_NotifyIcon(NIM_MODIFY, &nid);
@@ -130,7 +130,7 @@ void BalloonMgr::clear()
    Shell_NotifyIcon(NIM_MODIFY, &nid);
 
    // Remove vector entry for active balloon
-   _pending.erase(_pending.begin());
+   _pending.remove_first();
 }
 
 DWORD WINAPI BalloonMgr::Thread(LPVOID param)
