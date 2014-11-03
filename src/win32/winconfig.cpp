@@ -20,6 +20,7 @@
 
 #include <windows.h>
 #include <commctrl.h>
+#include <stdio.h>
 #include "winconfig.h"
 #include "resource.h"
 #include "instmgr.h"
