@@ -124,14 +124,6 @@
 # define ETIME ETIMEDOUT
 #endif
 
-/*
- * apcupsd requires SHM_RDONLY even if compiling for pthreads: the
- * attach_ipc interface is a wrapper for both.
- */
-#if !defined(HAVE_SYS_SHM_H) && !defined SHM_RDONLY
-# define SHM_RDONLY O_RDONLY
-#endif
-
 /* If no system localtime_r(), forward declaration of our internal substitute. */
 #if !defined(HAVE_LOCALTIME_R)
 extern struct tm *localtime_r(const time_t *timep, struct tm *tm);
