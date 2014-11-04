@@ -264,6 +264,8 @@ kill(int pid, int signal)
 }
 
 /* Implement syslog() using Win32 Event Service */
+void openlog(const char *app, int, int) {}
+void closelog(void) {}
 void syslog(int type, const char *fmt, ...)
 {
    va_list arg_ptr;

@@ -34,6 +34,9 @@ AC_SUBST(VERSION)
 DATE=`sed -n -e 's/^.*[ \t]*ADATE.*"\(.*\)"$/\1/p' ${srcdir}/include/version.h`
 AC_SUBST(DATE)
 
+dnl Executable extension, if any (e.g., .exe)
+AC_EXEEXT
+
 dnl
 dnl These need to be searched before.
 dnl
@@ -47,10 +50,32 @@ dnl
 PATH=$PATH:/bin:/sbin:/etc:/usr/bin:/usr/bin/X11:/usr/sbin:/usr/local/bin:/usr/local/sbin
 export PATH
 
+dnl
+dnl Sets `host_cpu', `host_vendor', and `host_os' to the current host type.
+dnl
+AC_CANONICAL_HOST
 
 dnl Interesting things are often in /usr/local
-CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
-LDFLAGS="${LDFLAGS} -L/usr/local/lib64 -L/usr/local/lib"
+dnl But not if we're cross compiling!
+if test "$cross_compiling" = "no" ; then
+   CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
+   LDFLAGS="${LDFLAGS} -L/usr/local/lib64 -L/usr/local/lib"
+fi
+
+dnl Special considerations when cross-compiling for win32
+if test "$host_os" == "mingw32" ; then
+   if test -z "$CROSSTOOLS" ; then 
+      CROSSTOOLS=${topdir}/../cross-tools
+   fi
+   if test -z "$DEPKGS"; then 
+      DEPKGS=${topdir}/../depkgs-win32 
+   fi
+   CPPFLAGS="-I${topdir}/src/win32/compat -I$DEPKGS/libroot/include -I$DEPKGS/libroot/include/pthread ${CPPFLAGS}"
+   PATH=$CROSSTOOLS/mingw32/bin:$PATH
+   LDFLAGS="-L$DEPKGS/libroot/lib -L${topdir}/src/win32/compat ${LDFLAGS}"
+   BG=-mwindows
+fi
+AC_SUBST(BG)
 
 if test $HAVE_UNAME=yes -a x`uname -s` = xSunOS
 then
@@ -97,11 +122,6 @@ dnl
       sbindir='/sbin'
    fi
 fi
-
-dnl
-dnl Sets `host_cpu', `host_vendor', and `host_os' to the current host type.
-dnl
-AC_CANONICAL_HOST
 
 dnl
 dnl Check for programs.
@@ -160,14 +180,15 @@ AC_REQ_PATH_PROGS(WALL, wall)
 AC_REQ_PATH_PROGS(SCRIPTSHELL, sh bash)
 
 AC_PROG_GMAKE
-AC_REQ_PATH_PROGS(RANLIB, ranlib true)
+AC_REQ_TOOL(RANLIB, ranlib)
 AC_REQ_PATH_PROG(RM, rm)
 AC_REQ_PATH_PROG(CP, cp)
 AC_REQ_PATH_PROG(ECHO, echo)
 AC_REQ_PATH_PROG(LN, ln)
 AC_REQ_PATH_PROG(SED, sed)
-AC_REQ_PATH_PROG(AR, ar)
+AC_REQ_TOOL(AR, ar)
 AC_REQ_PATH_PROG(MV, mv)
+AC_CHECK_TOOL(WINDRES, windres)
 
 AC_PATH_PROG(RST2HTML, rst2html,)
 AC_PATH_PROG(RST2HTML, rst2html.py,)
@@ -181,21 +202,44 @@ if test x$mandir = x'${prefix}/man' ; then
 fi
 
 
+dnl
 dnl Check for library functions.
 dnl
-dnl for fopen and friends I check only for fprintf. If it is there I suppose
-dnl all the other function should be there.
-dnl The same for open and friends: checking only for open.
-dnl and for all the other function groups.
-dnl
+
+dnl Mandatory on all builds
 AC_CHECK_FUNCS(
-   abort fork calloc getpid \
-   ioctl kill rewind select setsid signal strerror strncmp \
-   strncpy tcgetattr vfprintf setpgrp,,
+   abort calloc getpid \
+   rewind signal strerror strncmp \
+   strncpy vfprintf ,,
    [AC_MSG_ERROR([cannot find required function.])]
 )
 
+dnl Optional on all builds
+dnl We will provide our own implementations if needed
 AC_CHECK_FUNCS(snprintf vsnprintf strlcpy strlcat)
+
+dnl Mandatory except for WIN32 builds where we provide our own
+if test "$host_os" != "mingw32" ; then
+   AC_CHECK_FUNCS(
+      fork ioctl kill select setsid tcgetattr
+      ,,
+      [AC_MSG_ERROR([cannot find required function.])]
+   )
+
+   AC_MSG_CHECKING([for syslog])
+
+   AC_TRY_LINK(
+      [#include <syslog.h>],
+      [syslog(0, "%s", "test");],
+      AC_MSG_RESULT([yes]),
+      AC_CHECK_LIB(socket, std_syslog,,
+         [AC_MSG_ERROR([cannot find required function.])])
+      AC_TRY_LINK(
+         [#include <syslog.h>],
+         [syslog(0, "%s", "test");], AC_MSG_RESULT([yes]),
+         [AC_MSG_ERROR([cannot find required function.])])
+   )
+fi
 
 dnl Solaris hides nanosleep in one of two libraries depending on version
 dnl If we can't find it at all we'll just use our own substitute.
@@ -204,22 +248,7 @@ AC_SEARCH_LIBS(nanosleep, [rt posix4], AC_DEFINE(HAVE_NANOSLEEP, 1,
    [LIBEXTRAOBJ="$LIBEXTRAOBJ sleep.o"
     EXTRAOBJ="$EXTRAOBJ lib/sleep.o"])
 
-AC_MSG_CHECKING([for syslog])
-
-AC_TRY_LINK(
-   [#include <syslog.h>],
-   [syslog(0, "%s", "test");],
-   AC_MSG_RESULT([yes]),
-   AC_CHECK_LIB(socket, std_syslog,,
-      [AC_MSG_ERROR([cannot find required function.])])
-   AC_TRY_LINK(
-      [#include <syslog.h>],
-      [syslog(0, "%s", "test");], AC_MSG_RESULT([yes]),
-      [AC_MSG_ERROR([cannot find required function.])])
-)
-
 AC_FUNC_STRFTIME     dnl check for strftime.
-AC_FUNC_SETPGRP      dnl check for BSD setpgrp.
 
 # Under sysV68, socket and friends are provided by the C library.
 # -linet does not provide socket, but causes multiple definition
@@ -308,10 +337,6 @@ AC_TYPE_SIZE_T
 AC_TYPE_UID_T
 AC_TYPE_SOCKETLEN_T
 
-dnl Not always true, but close enough for the few platforms
-dnl that are missing this (Solaris 2.5.1).
-AC_CHECK_TYPE(int32_t, int)
-
 dnl
 dnl Check for system services.
 dnl
@@ -335,6 +360,7 @@ case $host in
    *-*-irix*)    AC_DEFINE(HAVE_SGI_OS,,     [Define if building for IRIX])    ;;
    *-*-darwin*)  AC_DEFINE(HAVE_DARWIN_OS,,  [Define if building for Darwin])  ;;
    *-*-nto*)     AC_DEFINE(HAVE_QNX_OS,,     [Define if building for QNX])     ;;
+   *-*-mingw*)   AC_DEFINE(HAVE_MINGW,,      [Define if building for MINGW])   ;;
 esac
 
 dnl
@@ -436,57 +462,37 @@ AC_ARG_ENABLE(cgi,
         dnl
         dnl First search for system library that defines gdImagePng
         AC_CHECK_LIB(gd, gdImagePng,
-           [ AC_MSG_RESULT([using PNG file format (/usr/lib).])
+           [ AC_MSG_RESULT([using PNG file format.])
              AC_DEFINE(SYS_IMGFMT_PNG,, [Define if you have gdImagePng in libgd])
              GD_LIBS="-lgd"
              SYS_GD_FOUND=yes ],
-           [],
-           [${X_LIBS}])
+           [$as_unset ac_cv_lib_gd_gdImagePng],
+           [])
+
+        dnl
+        dnl How about with libpng and libz dependencies?
+        if test "${SYS_GD_FOUND}" = "no"
+        then
+           AC_CHECK_LIB(gd, gdImagePng,
+              [ AC_MSG_RESULT([using PNG file format.])
+                AC_DEFINE(SYS_IMGFMT_PNG,, [Define if you have gdImagePng in libgd])
+                GD_LIBS="-lgd -lpng12 -lz"
+                SYS_GD_FOUND=yes ],
+              [],
+              [-lpng12 -lz])
+        fi
 
         dnl
         dnl Second search for system library that defines gdImageGif
         if test "${SYS_GD_FOUND}" = "no"
         then
            AC_CHECK_LIB(gd, gdImageGif,
-              [ AC_MSG_RESULT([using GIF file format (/usr/lib).])
+              [ AC_MSG_RESULT([using GIF file format.])
                 AC_DEFINE(SYS_IMGFMT_GIF,, [Define if you have gdImageGif in libgd])
                 GD_LIBS="-lgd"
                 SYS_GD_FOUND=yes ],
               [],
-              [${X_LIBS}])
-        fi
-
-        dnl
-        dnl Third in /usr/local search for system library that defines gdImagePng
-        if test "${SYS_GD_FOUND}" = "no"
-        then
-           CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
-           LDFLAGS="${LDFLAGS} -L/usr/local/lib"
-
-           dnl Destroy cached value
-           unset ac_cv_lib_gd_gdImagePng
-           AC_CHECK_LIB(gd, gdImagePng,
-              [ AC_MSG_RESULT([using PNG file format (/usr/local/lib).])
-                AC_DEFINE(SYS_IMGFMT_PNG)
-                GD_LIBS="-lgd"
-                SYS_GD_FOUND=yes ],
-              [],
-              [${X_LIBS}])
-        fi
-
-        dnl
-        dnl Fourth in /usr/local search for system library that defines gdImageGif
-        if test "${SYS_GD_FOUND}" = "no"
-        then
-           dnl Destroy cached value
-           unset ac_cv_lib_gd_gdImageGif
-           AC_CHECK_LIB(gd, gdImageGif,
-              [ AC_MSG_RESULT([using GIF file format (/usr/local/lib).])
-                AC_DEFINE(SYS_IMGFMT_GIF)
-                GD_LIBS="-lgd"
-                SYS_GD_FOUND=yes ],
-              [],
-              [${X_LIBS}])
+              [])
         fi
 
         if test "${SYS_GD_FOUND}" = "no"
@@ -583,6 +589,18 @@ AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
             AC_SUBST(LIBUSBHIDINC)
             USB_TYPE="bsd"
             AC_MSG_RESULT([Using BSD USB driver.])
+            ;;
+         *-*-mingw*)
+            LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
+            LIBUSBHID=libusbhid
+            APCDRVLIBS="$APCDRVLIBS \$(topdir)/src/libusbhid/libusbhid.a"
+            AC_SUBST(LIBUSBHID)
+            AC_SUBST(LIBUSBHIDINC)
+            USB_TYPE="generic"
+            LIBUSBH=libusb-winusb-bridge.h
+            AC_SUBST(LIBUSBH)
+            DRVLIBS="$DRVLIBS -lsetupapi"
+            AC_MSG_RESULT([Using generic winusb USB driver.])
             ;;
          *)
             dnl Use libusb-config if found, otherwise fall back on AC_CHECK_LIB
@@ -954,6 +972,8 @@ AC_ARG_WITH(distname,
 if test "x$DISTNAME" != "x"
 then
    echo "distname set to $DISTNAME"
+elif test "$host_os" == "mingw32" ; then
+   DISTNAME=mingw
 elif test $HAVE_UNAME=yes -a x`uname -s` = xOSF1
 then
    DISTNAME=alpha
@@ -1247,6 +1267,13 @@ qnx)
       platforms/qnx/apcupsd \
       platforms/qnx/apccontrol"
    ;;
+mingw)
+   PTHREAD_LFLAGS="-lpthreadGCE"
+   LIBS="${LIBS} -lwin32compat -luser32 -lgdi32 -lwsock32 -lnetapi32"
+   CPPFLAGS="${CPPFLAGS} -D_WIN32_IE=0x0500"
+   WIN32=win32
+   AC_SUBST(WIN32)
+   ;;
 unknown)
    DISTVER=unknown
    DFILES="\
@@ -1361,7 +1388,6 @@ GENERATE_FILES="\
    platforms/etc/onbattery \
    platforms/etc/apcupsd.conf \
    examples/safe.apccontrol \
-   src/win32/Makefile \
    $DFILES"
 
 if test "$USB_TYPE"x = "generic"x
@@ -1410,7 +1436,8 @@ Configuration on `date`:
   LOCK dir (for serial port)  ${LOCKDIR}
   Power Fail dir              ${PWRFAILDIR}
   Compiler:                   ${CXX} ${CXXVERSION}
-  Compiler flags:             ${CPPFLAGS} ${CXXFLAGS} ${PTHREAD_FLAGS}
+  Preprocessor flags:         ${CPPFLAGS}
+  Compiler flags:             ${CXXFLAGS} ${PTHREAD_FLAGS}
   Linker:                     ${LD}
   Linker flags:               ${LDFLAGS}
   Host and version:           ${DISTNAME} ${DISTVER}

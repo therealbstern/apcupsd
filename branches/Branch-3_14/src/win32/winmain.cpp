@@ -16,15 +16,16 @@
 #include <signal.h>
 #include <pthread.h>
 #include <errno.h>
-#include "defines.h"
 
 // Apcupsd UNIX main entrypoint
 extern int ApcupsdMain(int argc, char **argv);
 
 // Custom headers
+#include "apcconfig.h"
 #include "winups.h"
 #include "winservice.h"
 #include "compat.h"
+#include "defines.h"
 
 // Standard command-line flag definitions
 char ApcupsdRunService[] =        "/service";

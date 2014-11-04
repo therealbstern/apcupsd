@@ -30,7 +30,7 @@ int format_date(time_t timestamp, char *dest, size_t destlen)
    struct tm tm;
    localtime_r(&timestamp, &tm);
 
-#ifdef HAVE_WIN32
+#ifdef HAVE_MINGW
    // Annoyingly, Windows does not properly implement %z (it always spells
    // out the timezone name) so we need to emulate it manually.
    int len = strftime(dest, destlen, "%Y-%m-%d %H:%M:%S ", &tm);

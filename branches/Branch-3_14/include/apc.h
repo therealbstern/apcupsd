@@ -27,11 +27,7 @@
 #ifndef APC_H
 #define APC_H 1
 
-#ifdef HAVE_WIN32
-# include "winconfig.h"
-#else
 # include "apcconfig.h"
-#endif
 
 /*
  * Solaris needs BSD_COMP set in order to get FIONBIO

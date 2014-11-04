@@ -157,7 +157,7 @@ InitWinAPIWrapper()
 }
 
 // Add the requested access to the given kernel object handle
-bool GrantAccess(HANDLE h, ACCESS_MASK access, TRUSTEE_TYPE type, LPTSTR name)
+BOOL GrantAccess(HANDLE h, ACCESS_MASK access, TRUSTEE_TYPE type, LPTSTR name)
 {
    DWORD rc;
 

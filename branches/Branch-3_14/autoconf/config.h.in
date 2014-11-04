@@ -104,6 +104,9 @@
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
+/* Define if building for MINGW */
+#undef HAVE_MINGW
+
 /* Define if building MODBUS driver */
 #undef HAVE_MODBUS_DRIVER
 
@@ -157,9 +160,6 @@
 
 /* Define to 1 if you have the `select' function. */
 #undef HAVE_SELECT
-
-/* Define to 1 if you have the `setpgrp' function. */
-#undef HAVE_SETPGRP
 
 /* Define to 1 if you have the `setsid' function. */
 #undef HAVE_SETSID
@@ -325,9 +325,6 @@
 /* Define as the return type of signal handlers (`int' or `void'). */
 #undef RETSIGTYPE
 
-/* Define to 1 if the `setpgrp' function takes no argument. */
-#undef SETPGRP_VOID
-
 /* Define to 1 if the `S_IS*' macros in <sys/stat.h> do not work properly. */
 #undef STAT_MACROS_BROKEN
 
@@ -354,9 +351,6 @@
 
 /* Define to `int' if <sys/types.h> doesn't define. */
 #undef gid_t
-
-/* Define to `int' if <sys/types.h> does not define. */
-#undef int32_t
 
 /* Define to `int' if <sys/types.h> does not define. */
 #undef mode_t

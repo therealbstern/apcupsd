@@ -25,7 +25,7 @@
 
 #include "apc.h"
 
-#if !defined(HAVE_LOCALTIME_R)
+#if !defined(HAVE_LOCALTIME_R) && !defined(localtime_r)
 
 struct tm *localtime_r(const time_t *timep, struct tm *tm)
 {

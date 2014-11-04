@@ -295,3 +295,14 @@ define MANIFY
 	@$(ECHO) "  MAN  " $(1) -\> $(2)
 	$(V)man ./$(1) | col -b > $(2)
 endef
+
+# Rule to build a Windows resource object from the source RC file
+# Includes substitution of version strings, if needed
+comma := ,
+RCVERSION = $(subst .,$(comma),$(firstword $(subst -, ,$(VERSION))).0)
+$(OBJDIR)/%.o: %.rc
+	@$(ECHO) "  RES  " $(RELDIR)$<
+	$(V)sed -e "s/\$$VERSION/$(VERSION)/" \
+       -e "s/FILEVERSION.*/FILEVERSION     $(RCVERSION)/" \
+       -e "s/PRODUCTVERSION.*/PRODUCTVERSION  $(RCVERSION)/" $< | \
+   $(RES) -I$(dir $<) -O coff -o $@

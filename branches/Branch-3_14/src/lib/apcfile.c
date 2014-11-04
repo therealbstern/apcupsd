@@ -54,7 +54,7 @@ int make_file(UPSINFO *ups, const char *path)
 const char *pidfile = APCPID;
 void make_pid_file(void)
 {
-#if !defined(HAVE_WIN32)
+#if !defined(HAVE_MINGW)
    pid_t pid = getpid();
    int pfd, len;
    char buf[100];
