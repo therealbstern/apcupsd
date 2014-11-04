@@ -55,7 +55,7 @@ bool StatMgr::Update()
 
       memset(m_stats, 0, sizeof(m_stats));
 
-      int len;
+      int len = 0;
       int i = 0;
       while (i < MAX_STATS &&
              (len = net_recv(m_socket, m_stats[i].data, sizeof(m_stats[i].data)-1)) > 0)
