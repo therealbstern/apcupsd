@@ -11,11 +11,6 @@
 #include <stdlib.h>
 #include <getopt.h>
 
-#ifndef HAVE_MINGW
-extern void mainCRTStartup();
-void WinMainCRTStartup() { mainCRTStartup(); }
-#endif
-
 enum {
    MODE_CANCEL,
    MODE_HALT,

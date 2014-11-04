@@ -132,32 +132,6 @@ int avsnprintf(char *str, size_t size, const char *format, va_list ap)
 #endif
 }
 
-#ifndef HAVE_LOCALTIME_R
-
-struct tm *localtime_r(const time_t *timep, struct tm *tm)
-{
-   struct tm *ltm;
-
-   static pthread_mutex_t mutex;
-   static int first = 1;
-
-   if (first) {
-      pthread_mutex_init(&mutex, NULL);
-      first = 0;
-   }
-
-   P(mutex);
-
-   ltm = localtime(timep);
-   if (ltm)
-      memcpy(tm, ltm, sizeof(struct tm));
-
-   V(mutex);
-
-   return ltm ? tm : NULL;
-}
-#endif   /* HAVE_LOCALTIME_R */
-
 /*
  * These are mutex routines that do error checking
  * for deadlock and such.  Normally not turned on.

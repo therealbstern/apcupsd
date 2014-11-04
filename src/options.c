@@ -190,7 +190,7 @@ int parse_options(int argc, char *argv[])
    }
 
 /* Win32-specific dynamic path handling... */
-#ifdef HAVE_WIN32
+#ifdef HAVE_MINGW
    extern char sbindir[MAXSTRING];
 
    /* Obtain full path to this executable */

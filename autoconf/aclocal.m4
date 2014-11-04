@@ -396,3 +396,14 @@ AC_DEFUN(
        AC_ERROR(Missing required tool: $2)
     fi
    ])
+
+dnl
+dnl AC_CHECK_TOOL but fail with an error if it cannot be found
+dnl
+AC_DEFUN(
+   [AC_REQ_TOOL],
+   [AC_CHECK_TOOL($1,$2,)
+    if test "$$1" = "" ; then
+       AC_ERROR(Missing required tool: $2)
+    fi
+   ])

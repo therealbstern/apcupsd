@@ -58,7 +58,9 @@ CXX = @CXX@ -x c++
 OBJC = $(CC) -x objective-c++
 NIB = ibtool
 LD = @LD@
+RES = @WINDRES@
 DEFS = @EXTRADEFS@ $(LOCALDEFS)
+EXE = @EXEEXT@
 
 # Libraries
 APCLIBS = $(topdir)/src/lib/libapc.a
@@ -80,6 +82,7 @@ LIBEXTRAOBJ = @LIBEXTRAOBJ@
 RST2HTMLOPTS = --field-name-limit=0 --generator --time --no-footnote-backlinks --record-dependencies=$(df).d
 RST2PDFOPTS = --no-footnote-backlinks --real-footnotes
 NIBFLAGS = 
+BG = @BG@
 
 # Driver and package enable flags
 SMARTDRV   := @APCSMART_DRIVER@
@@ -96,6 +99,7 @@ CGIDIR     := @CGI@
 USBHIDDIR  := @LIBUSBHID@
 GAPCMON    := @GAPCMON@
 APCAGENT   := @APCAGENT@
+WIN32      := @WIN32@
 
 OBJDIR = .obj
 DEPDIR = .deps

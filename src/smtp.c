@@ -240,7 +240,7 @@ int main(int argc, char *argv[])
          mailhost = "localhost";
    }
 
-#ifdef HAVE_WIN32
+#ifdef HAVE_MINGW
    WSA_Init();
 #endif
 
@@ -353,7 +353,7 @@ hp:
    /* Add RFC822 date */
    localtime_r(&now, &tm);
 
-#ifdef HAVE_WIN32
+#ifdef HAVE_MINGW
    // Annoyingly, Windows does not properly implement %z (it always spells
    // out the timezone name) so we need to emulate it manually.
    i = strftime(buf, sizeof(buf), "%a, %d %b %Y %H:%M:%S ", &tm);

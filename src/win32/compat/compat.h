@@ -66,8 +66,6 @@
 #include <winapi.h>
 #include <sys/stat.h>
 
-#define HAVE_WIN32 1
-
 typedef long time_t;
 
 #if !__STDC__
@@ -105,6 +103,9 @@ typedef long _off_t;            /* must be same as sys/types.h */
 #define iscsym  __iscsym
 #endif
 
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 //******************************************************************************
 // Sockets
@@ -123,7 +124,6 @@ int inet_aton(const char *cp, struct in_addr *inp);
 struct timespec;
 void sleep(int);
 struct timezone;
-int gettimeofday(struct timeval *, struct timezone *);
 #define alarm(a) 0
 
 //******************************************************************************
@@ -201,20 +201,6 @@ int fork();
 int waitpid(int, int *, int);
 
 //******************************************************************************
-// Logging
-//******************************************************************************
-#ifndef LOG_DAEMON
-#define LOG_DAEMON 0
-#endif
-#ifndef LOG_ERR
-#define LOG_ERR 0
-#endif
-
-#define closelog()
-#define openlog(a,b,c)
-void syslog(int type, const char *fmt, ...);
-
-//******************************************************************************
 // Misc
 //******************************************************************************
 long int random(void);
@@ -231,5 +217,9 @@ void srandom(unsigned int seed);
 
 // Parse windows-style command line into individual arguments
 char *GetArg(char **cmdline);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif /* __COMPAT_H_ */

@@ -99,6 +99,6 @@ extern t_GetCurrentDirectoryA p_GetCurrentDirectoryA;
 
 void InitWinAPIWrapper();
 
-bool GrantAccess(HANDLE h, ACCESS_MASK access, TRUSTEE_TYPE type, LPTSTR name);
+BOOL GrantAccess(HANDLE h, ACCESS_MASK access, TRUSTEE_TYPE type, LPTSTR name);
 
 #endif /* __WINAPI_H */
