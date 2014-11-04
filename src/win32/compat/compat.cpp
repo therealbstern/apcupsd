@@ -43,8 +43,6 @@
 #define USE_WIN32_COMPAT_IO 1
 #define USE_WIN32_32KPATHCONVERSION 1
 
-extern void d_msg(const char *file, int line, int level, const char *fmt,...);
-
 // from MicroSoft SDK (KES) is the diff between Jan 1 1601 and Jan 1 1970
 #define WIN32_FILETIME_ADJUST 0x19DB1DED53E8000ULL 
 #define WIN32_FILETIME_SCALE  10000000             // 100ns/second
@@ -555,6 +553,13 @@ int tiocmbic(int fd, int bits)
    DCB dcb;
    dcb.DCBlength = sizeof(DCB);
 
+   if (bits & TIOCM_ST)
+   {
+      // Win32 API does not allow manipulating ST
+      errno = EINVAL;
+      return -1;
+   }
+
    HANDLE h = (HANDLE)_get_osfhandle(fd);
    if (h == 0) {
       errno = EBADF;
@@ -567,8 +572,6 @@ int tiocmbic(int fd, int bits)
       dcb.fDtrControl = DTR_CONTROL_DISABLE;
    if (bits & TIOCM_RTS)
       dcb.fRtsControl = RTS_CONTROL_DISABLE;
-   if (bits & TIOCM_ST)
-      d_msg(__FILE__, __LINE__, 99, "Win32 API does not allow clearing ST\n");
 
    SetCommState(h, &dcb);
    return 0;
@@ -578,6 +581,13 @@ int tiocmbis(int fd, int bits)
 {
    DCB dcb;
    dcb.DCBlength = sizeof(DCB);
+
+   if (bits & TIOCM_SR)
+   {
+      // Win32 API does not allow manipulating SR
+      errno = EINVAL;
+      return -1;
+   }
 
    HANDLE h = (HANDLE)_get_osfhandle(fd);
    if (h == 0) {
@@ -591,8 +601,6 @@ int tiocmbis(int fd, int bits)
       dcb.fDtrControl = DTR_CONTROL_ENABLE;
    if (bits & TIOCM_RTS)
       dcb.fRtsControl = RTS_CONTROL_ENABLE;
-   if (bits & TIOCM_SR)
-      d_msg(__FILE__, __LINE__, 99, "Win32 API does not allow setting ST\n");
 
    SetCommState(h, &dcb);
    return 0;
@@ -627,6 +635,7 @@ int tiocmget(int fd, int *bits)
 int ioctl(int fd, int request, ...)
 {
    int rc;
+   u_long v;
    va_list list;
    va_start(list, request);
 
@@ -640,6 +649,10 @@ int ioctl(int fd, int request, ...)
       break;
    case TIOCMGET:
       rc = tiocmget(fd, va_arg(list, int*));
+      break;
+   case FIONBIO:
+      v = *va_arg(list, int*);
+      rc = ioctlsocket(fd, request, &v);
       break;
    default:
       rc = -1;

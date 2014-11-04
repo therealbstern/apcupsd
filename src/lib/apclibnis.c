@@ -38,7 +38,6 @@
 #ifdef HAVE_MINGW
 
 #define close(fd)             closesocket(fd)
-#define ioctl(s,p,v)          ioctlsocket((s),(p),(u_long*)(v))
 #define getsockopt(s,l,o,d,z) getsockopt((s),(l),(o),(char*)(d),(z))
 #define EINPROGRESS           WSAEWOULDBLOCK
 
