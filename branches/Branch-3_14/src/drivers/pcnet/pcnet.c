@@ -541,9 +541,9 @@ int PcnetUpsDriver::wait_for_data(int wait_time)
 
       Dmsg(100, "Waiting for %d.%d\n", tv.tv_sec, tv.tv_usec);
       FD_ZERO(&rfds);
-      FD_SET(_ups->fd, &rfds);
+      FD_SET(_fd, &rfds);
 
-      retval = select(_ups->fd + 1, &rfds, NULL, NULL, &tv);
+      retval = select(_fd + 1, &rfds, NULL, NULL, &tv);
 
       if (retval == 0) {
          /* No chars available in TIMER seconds. */
@@ -557,7 +557,7 @@ int PcnetUpsDriver::wait_for_data(int wait_time)
 
       do {
          fromlen = sizeof(from);
-         retval = recvfrom(_ups->fd, buf, sizeof(buf)-1, 0, (struct sockaddr*)&from, &fromlen);
+         retval = recvfrom(_fd, buf, sizeof(buf)-1, 0, (struct sockaddr*)&from, &fromlen);
       } while (retval == -1 && (errno == EAGAIN || errno == EINTR));
 
       if (retval < 0) {            /* error */
@@ -647,8 +647,8 @@ bool PcnetUpsDriver::Open()
       }
    }
 
-   _ups->fd = socket(PF_INET, SOCK_DGRAM, 0);
-   if (_ups->fd == -1)
+   _fd = socket(PF_INET, SOCK_DGRAM, 0);
+   if (_fd == INVALID_SOCKET)
       Error_abort("Cannot create socket (%d)\n", errno);
 
    // Although SO_BROADCAST is typically described as enabling broadcast
@@ -656,20 +656,29 @@ bool PcnetUpsDriver::Open()
    // be needed for broadcast reception as well. We will attempt to set it
    // everywhere and not worry if it fails.
    int enable = 1;
-   (void)setsockopt(_ups->fd, SOL_SOCKET, SO_BROADCAST, 
+   (void)setsockopt(_fd, SOL_SOCKET, SO_BROADCAST, 
       (const char*)&enable, sizeof(enable));
 
    memset(&addr, 0, sizeof(addr));
    addr.sin_family = AF_INET;
    addr.sin_port = htons(port);
    addr.sin_addr.s_addr = INADDR_ANY;
-   if (bind(_ups->fd, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
-      close(_ups->fd);
+   if (bind(_fd, (struct sockaddr*)&addr, sizeof(addr)) == -1) {
+      close(_fd);
       Error_abort("Cannot bind socket (%d)\n", errno);
    }
 
    /* Reset datatime to now */
    time(&_datatime);
+
+   /*
+    * Note, we set _ups->fd here so the "core" of apcupsd doesn't
+    * think we are a slave, which is what happens when it is -1.
+    * (ADK: Actually this only appears to be true for apctest as
+    * apcupsd proper uses the UPS_slave flag.)
+    * Internally, we use the fd in our own private space
+    */
+   _ups->fd = 1;
 
    write_unlock(_ups);
    return 1;
@@ -679,8 +688,8 @@ bool PcnetUpsDriver::Close()
 {
    write_lock(_ups);
    
-   close(_ups->fd);
-   _ups->fd = -1;
+   close(_fd);
+   _fd = INVALID_SOCKET;
 
    write_unlock(_ups);
    return 1;
@@ -775,7 +784,8 @@ bool PcnetUpsDriver::kill_power()
 {
    struct sockaddr_in addr;
    char data[1024];
-   int s, len=0, temp=0;
+   sock_t s;
+   int len=0, temp=0;
    char *start;
    const char *cs, *hash;
    struct pair *map;
@@ -791,7 +801,7 @@ bool PcnetUpsDriver::kill_power()
 
    /* Open a TCP stream to the UPS */
    s = socket(PF_INET, SOCK_STREAM, 0);
-   if (s == -1) {
+   if (s == INVALID_SOCKET) {
       Dmsg(100, "pcnet_ups_kill_power: Unable to open socket: %s\n",
          strerror(errno));
       return 0;

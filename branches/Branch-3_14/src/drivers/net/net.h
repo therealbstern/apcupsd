@@ -64,7 +64,7 @@ private:
    char _device[MAXSTRING];
    char *_hostname;
    int _port;
-   int _sockfd;
+   sock_t _sockfd;
    bool _got_caps;
    bool _got_static_data;
    time_t _last_fill_time;

@@ -62,7 +62,7 @@ private:
    keyval          m_stats[MAX_STATS];
    astring         m_host;
    unsigned short  m_port;
-   int             m_socket;
+   sock_t          m_socket;
    amutex          m_mutex;
 };
 

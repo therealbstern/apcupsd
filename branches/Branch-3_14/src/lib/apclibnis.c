@@ -58,7 +58,7 @@ int dummy = WSA_Init();
  * read requests
  */
 
-static int read_nbytes(int fd, char *ptr, int nbytes)
+static int read_nbytes(sock_t fd, char *ptr, int nbytes)
 {
    int nleft, nread = 0;
    struct timeval timeout;
@@ -106,7 +106,7 @@ static int read_nbytes(int fd, char *ptr, int nbytes)
  * Write nbytes to the network.
  * It may require several writes.
  */
-static int write_nbytes(int fd, const char *ptr, int nbytes)
+static int write_nbytes(sock_t fd, const char *ptr, int nbytes)
 {
    int nleft, nwritten;
 
@@ -161,7 +161,7 @@ static int write_nbytes(int fd, const char *ptr, int nbytes)
  * Returns -1 on hard end of file (i.e. network connection close)
  * Returns -2 on error
  */
-int net_recv(int sockfd, char *buff, int maxlen)
+int net_recv(sock_t sockfd, char *buff, int maxlen)
 {
    int nbytes;
    unsigned short pktsiz;
@@ -196,7 +196,7 @@ int net_recv(int sockfd, char *buff, int maxlen)
  * Returns number of bytes sent
  * Returns -1 on error
  */
-int net_send(int sockfd, const char *buff, int len)
+int net_send(sock_t sockfd, const char *buff, int len)
 {
    int rc;
    short pktsiz;
@@ -224,11 +224,12 @@ int net_send(int sockfd, const char *buff, int len)
  * Returns -1 on error
  * Returns socket file descriptor otherwise
  */
-int net_open(const char *host, char *service, int port)
+sock_t net_open(const char *host, char *service, int port)
 {
    int nonblock = 1;
    int block = 0;
-   int sockfd, rc;
+   sock_t sockfd;
+   int rc;
    struct sockaddr_in tcp_serv_addr;  /* socket information */
 
 #ifndef HAVE_MINGW
@@ -274,7 +275,7 @@ int net_open(const char *host, char *service, int port)
    }
 
    /* Open a TCP socket */
-   if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+   if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
       return -errno;
 
    /* connect to server */
@@ -353,7 +354,7 @@ int net_open(const char *host, char *service, int port)
 }
 
 /* Close the network connection */
-void net_close(int sockfd)
+void net_close(sock_t sockfd)
 {
    close(sockfd);
 }
@@ -363,7 +364,7 @@ void net_close(int sockfd)
  * Returns -1 on error.
  * Returns file descriptor of new connection otherwise.
  */
-int net_accept(int fd, struct sockaddr_in *cli_addr)
+sock_t net_accept(sock_t fd, struct sockaddr_in *cli_addr)
 {
 #ifdef HAVE_MINGW                                       
    /* kludge because some idiot defines socklen_t as unsigned */
@@ -371,7 +372,7 @@ int net_accept(int fd, struct sockaddr_in *cli_addr)
 #else
    socklen_t clilen = sizeof(*cli_addr);
 #endif
-   int newfd;
+   sock_t newfd;
 
 #if defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS
    int rc;
@@ -395,7 +396,7 @@ int net_accept(int fd, struct sockaddr_in *cli_addr)
          return -errno;              /* error */
 #endif
       newfd = accept(fd, (struct sockaddr *)cli_addr, &clilen);
-   } while (newfd == -1 && (errno == EINTR || errno == EAGAIN));
+   } while (newfd == INVALID_SOCKET && (errno == EINTR || errno == EAGAIN));
 
    if (newfd < 0)
       return -errno;                 /* error */

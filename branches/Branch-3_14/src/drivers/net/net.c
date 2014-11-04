@@ -127,7 +127,7 @@ NetUpsDriver::NetUpsDriver(UPSINFO *ups) :
    UpsDriver(ups),
    _hostname(NULL),
    _port(0),
-   _sockfd(-1),
+   _sockfd(INVALID_SOCKET),
    _got_caps(false),
    _got_static_data(false),
    _last_fill_time(0),
@@ -202,7 +202,7 @@ bool NetUpsDriver::poll_ups()
    _statlen = 0;
 
    Dmsg(20, "Opening connection to %s:%d\n", _hostname, _port);
-   if ((_sockfd = net_open(_hostname, NULL, _port)) < 0) {
+   if ((_sockfd = net_open(_hostname, NULL, _port)) == INVALID_SOCKET) {
       Dmsg(90, "Exit poll_ups 0 comm lost\n");
       if (!_ups->is_commlost()) {
          _ups->set_commlost();

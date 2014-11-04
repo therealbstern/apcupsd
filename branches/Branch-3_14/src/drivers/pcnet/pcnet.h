@@ -47,6 +47,7 @@ private:
    unsigned long _reboots;              /* UPS reboot counter */
    time_t _datatime;                    /* Last time we got valid data */
    bool _runtimeInSeconds;              /* UPS reports runtime in seconds */
+   sock_t _fd;                          /* Socket connection */
 };
 
 #endif   /* _PCNET_H */
