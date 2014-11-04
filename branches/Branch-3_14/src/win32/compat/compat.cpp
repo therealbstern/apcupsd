@@ -50,7 +50,6 @@
 void conv_unix_to_win32_path(const char *name, char *win32_name, DWORD dwSize)
 {
     const char *fname = name;
-    char *tname = win32_name;
     while (*name) {
         /* Check for Unix separator and convert to Win32 */
         if (name[0] == '/' && name[1] == '/') {  /* double slash? */
@@ -177,28 +176,6 @@ readlink(const char *, char *, int)
 {
    errno = ENOSYS;
    return -1;
-}
-
-int
-strncasecmp(const char *s1, const char *s2, int len)
-{
-    register int ch1, ch2;
-
-    if (s1==s2)
-        return 0;       /* strings are equal if same object. */
-    else if (!s1)
-        return -1;
-    else if (!s2)
-        return 1;
-    while (len--) {
-        ch1 = *s1;
-        ch2 = *s2;
-        s1++;
-        s2++;
-        if (ch1 == 0 || tolower(ch1) != tolower(ch2)) break;
-    }
-
-    return (ch1 - ch2);
 }
 
 int
