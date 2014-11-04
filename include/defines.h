@@ -426,4 +426,75 @@ typedef int sock_t;
 #define INVALID_SOCKET -1
 #endif
 
+/*
+ * For HP-UX the definition of FILENAME_MAX seems not conformant with
+ * POSIX standard. To avoid any problem we are forced to define a
+ * private macro. This accounts also for other possible problematic OSes.
+ * If none of the standard macros is defined, fall back to 256.
+ */
+#if defined(FILENAME_MAX) && FILENAME_MAX > 255
+# define APC_FILENAME_MAX FILENAME_MAX
+#elif defined(PATH_MAX) && PATH_MAX > 255
+# define APC_FILENAME_MAX PATH_MAX
+#elif defined(MAXPATHLEN) && MAXPATHLEN > 255
+# define APC_FILENAME_MAX MAXPATHLEN
+#else
+# define APC_FILENAME_MAX 256
+#endif
+
+#ifndef O_NDELAY
+# define O_NDELAY 0
+#endif
+
+
+/* ETIME not on BSD, incl. Darwin */
+#ifndef ETIME
+# define ETIME ETIMEDOUT
+#endif
+
+/* If no system localtime_r(), forward declaration of our internal substitute. */
+#if !defined(HAVE_LOCALTIME_R) && !defined(localtime_r)
+extern struct tm *localtime_r(const time_t *timep, struct tm *tm);
+#endif
+
+/* If no system inet_pton(), forward declaration of our internal substitute. */
+#if !defined(HAVE_INETPTON)
+
+/* Define constants based on RFC 883, RFC 1034, RFC 1035 */
+#define NS_PACKETSZ     512        /* maximum packet size */
+#define NS_MAXDNAME     1025       /* maximum domain name */
+#define NS_MAXCDNAME    255        /* maximum compressed domain name */
+#define NS_MAXLABEL     63         /* maximum length of domain label */
+#define NS_HFIXEDSZ     12         /* #/bytes of fixed data in header */
+#define NS_QFIXEDSZ     4          /* #/bytes of fixed data in query */
+#define NS_RRFIXEDSZ    10         /* #/bytes of fixed data in r record */
+#define NS_INT32SZ      4          /* #/bytes of data in a u_int32_t */
+#define NS_INT16SZ      2          /* #/bytes of data in a u_int16_t */
+#define NS_INT8SZ       1          /* #/bytes of data in a u_int8_t */
+#define NS_INADDRSZ     4          /* IPv4 T_A */
+#define NS_IN6ADDRSZ    16         /* IPv6 T_AAAA */
+#define NS_CMPRSFLGS    0xc0       /* Flag bits indicating name compression. */
+#define NS_DEFAULTPORT  53         /* For both TCP and UDP. */
+extern int inet_pton(int af, const char *src, void *dst);
+#endif
+
+#ifndef HAVE_STRFTIME
+# define strftime(msg, max, format, tm) \
+   strlcpy(msg, "time not available", max)
+#endif   /* !HAVE_STRFTIME */
+
+/* Solaris doesn't define this */
+#ifndef INADDR_NONE
+#define INADDR_NONE ((in_addr_t)-1)
+#endif
+
+/* Determine if the C(++) compiler requires complete function prototype  */
+#ifndef __P
+# if defined(__STDC__) || defined(__cplusplus) || defined(c_plusplus)
+#  define __P(x) x
+# else
+#  define __P(x) ()
+# endif
+#endif
+
 #endif   /* _DEFINES_H */

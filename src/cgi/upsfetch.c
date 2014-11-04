@@ -24,7 +24,11 @@
 #include <string.h>
 
 #include "cgiconfig.h"
-#include "apcconfig.h"
+#ifdef HAVE_WIN32
+# include "winconfig.h"
+#else
+# include "apcconfig.h"
+#endif
 #include "nis.h"
 
 static int fill_buffer(sock_t sockfd);
