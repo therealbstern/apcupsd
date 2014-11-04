@@ -58,8 +58,16 @@ AC_CANONICAL_HOST
 dnl Interesting things are often in /usr/local
 dnl But not if we're cross compiling!
 if test "$cross_compiling" = "no" ; then
-   CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
-   LDFLAGS="${LDFLAGS} -L/usr/local/lib64 -L/usr/local/lib"
+   for incdir in /usr/local/include ; do
+      if test -d "$incdir" ; then
+         CPPFLAGS="${CPPFLAGS} -I$incdir"
+      fi
+   done
+   for libdir in /usr/local/lib64 /usr/local/lib ; do
+      if test -d "$libdir" ; then
+         LDFLAGS="${LDFLAGS} -L$libdir"
+       fi
+   done
 fi
 
 dnl Special considerations when cross-compiling for win32
