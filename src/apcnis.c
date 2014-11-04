@@ -125,9 +125,11 @@ void do_server(UPSINFO *ups)
    struct sockaddr_in cli_addr;    /* client's address */
    struct sockaddr_in serv_addr;   /* our address */
    int tlog;
-   int turnon = 1;
    struct s_arg *arg;
    struct in_addr local_ip;
+#ifndef HAVE_MINGW
+   int turnon = 1;
+#endif
 
    for (tlog = 0; (ups = attach_ups(ups)) == NULL; tlog -= 5 * 60) {
       if (tlog <= 0) {

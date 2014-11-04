@@ -59,8 +59,8 @@ private:
       ~InstanceConfig() {}
 
       MonitorConfig mcfg;
-      DWORD order;
       upsMenu *menu;
+      DWORD order;
    };
 
    void Write();
