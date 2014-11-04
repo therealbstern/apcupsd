@@ -24,7 +24,7 @@
 #include <string.h>
 
 #include "cgiconfig.h"
-#include "config.h"
+#include "apcconfig.h"
 #include "nis.h"
 
 static int fill_buffer(sock_t sockfd);
