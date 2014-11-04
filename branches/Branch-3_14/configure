@@ -730,6 +730,7 @@ CPPFLAGS
 LDFLAGS
 CXXFLAGS
 CXX
+BG
 host_os
 host_vendor
 host_cpu
@@ -2225,7 +2226,9 @@ if test "$host_os" == "mingw32" ; then
    CPPFLAGS="-I${topdir}/src/win32/compat -I$DEPKGS/libroot/include -I$DEPKGS/libroot/include/pthread ${CPPFLAGS}"
    PATH=$CROSSTOOLS/mingw32/bin:$PATH
    LDFLAGS="-L$DEPKGS/libroot/lib -L${topdir}/src/win32/compat ${LDFLAGS}"
+   BG=-mwindows
 fi
+
 
 if test $HAVE_UNAME=yes -a x`uname -s` = xSunOS
 then
