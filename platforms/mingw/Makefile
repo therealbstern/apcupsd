@@ -19,3 +19,16 @@ uninstall-mingw:
 	@echo "halt script."
 	@echo "Please contribute your distribution install to apcupsd team."
 	@echo "I'm sorry: you are on your own."
+
+TEXTFILES := $(topdir)/COPYING \
+             $(topdir)/ChangeLog \
+             $(topdir)/ReleaseNotes \
+             $(wildcard $(topdir)/doc/*.txt)
+
+MAKENSIS = makensis
+UNIX2DOS = unix2dos
+
+winapcupsd.exe:
+	$(STRP) $(wildcard $(topdir)/src/*.exe) $(wildcard $(topdir)/src/win32/*.exe) $(wildcard $(topdir)/src/cgi/*.cgi)
+	$(UNIX2DOS) -k -n $(foreach f,$(TEXTFILES),$(f) installer/$(subst .txt,,$(notdir $(f))).txt)
+	$(MAKENSIS) -V2 -DDEPKGS="$(DEPKGS)" -DCROSSTOOLS="$(CROSSTOOLS)" -DVERSION="$(VERSION)" -DTOPDIR="${topdir}" installer/winapcupsd.nsi
