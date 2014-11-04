@@ -1975,7 +1975,7 @@ ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
 
-ac_config_headers="$ac_config_headers include/config.h:autoconf/config.h.in"
+ac_config_headers="$ac_config_headers include/apcconfig.h:autoconf/config.h.in"
 
 
 topdir=`pwd`
@@ -13926,7 +13926,7 @@ cat >>$CONFIG_STATUS <<\_ACEOF || ac_write_fail=1
 for ac_config_target in $ac_config_targets
 do
   case $ac_config_target in
-    "include/config.h") CONFIG_HEADERS="$CONFIG_HEADERS include/config.h:autoconf/config.h.in" ;;
+    "include/apcconfig.h") CONFIG_HEADERS="$CONFIG_HEADERS include/apcconfig.h:autoconf/config.h.in" ;;
     "${GENERATE_FILES}") CONFIG_FILES="$CONFIG_FILES ${GENERATE_FILES}" ;;
 
   *) { { $as_echo "$as_me:$LINENO: error: invalid argument: $ac_config_target" >&5

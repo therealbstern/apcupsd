@@ -30,7 +30,7 @@
 #ifdef HAVE_WIN32
 # include "winconfig.h"
 #else
-# include "config.h"
+# include "apcconfig.h"
 #endif
 
 /*
