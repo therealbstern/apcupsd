@@ -28,7 +28,7 @@
 
 
 # Directory where cross-tools directory will be placed
-TOPDIR=../../..
+TOPDIR=../..
 # Cross tools directory name under TOPDIR
 CROSSTOOLS=cross-tools
 # What flavor of GCC cross-compiler are we building? under CROSSTOOLS
