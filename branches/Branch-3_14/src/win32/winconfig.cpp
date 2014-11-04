@@ -105,9 +105,9 @@ BOOL upsConfig::DialogProcess(
 
       // Initialize fields with current config settings
       SendMessage(_hhost, WM_SETTEXT, 0, (LONG)_config.host.str());
-      snprintf(tmp, sizeof(tmp), "%d", _config.port);
+      snprintf(tmp, sizeof(tmp), "%lu", _config.port);
       SendMessage(_hport, WM_SETTEXT, 0, (LONG)tmp);
-      snprintf(tmp, sizeof(tmp), "%d", _config.refresh);
+      snprintf(tmp, sizeof(tmp), "%lu", _config.refresh);
       SendMessage(_hrefresh, WM_SETTEXT, 0, (LONG)tmp);
       SendMessage(_hpopups, BM_SETCHECK, 
          _config.popups ? BST_CHECKED : BST_UNCHECKED, 0);
