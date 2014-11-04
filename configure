@@ -2212,8 +2212,16 @@ case $host_os in *\ *) host_os=`echo "$host_os" | sed 's/ /-/g'`;; esac
 
 
 if test "$cross_compiling" = "no" ; then
-   CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
-   LDFLAGS="${LDFLAGS} -L/usr/local/lib64 -L/usr/local/lib"
+   for incdir in /usr/local/include ; do
+      if test -d "$incdir" ; then
+         CPPFLAGS="${CPPFLAGS} -I$incdir"
+      fi
+   done
+   for libdir in /usr/local/lib64 /usr/local/lib ; do
+      if test -d "$libdir" ; then
+         LDFLAGS="${LDFLAGS} -L$libdir"
+       fi
+   done
 fi
 
 if test "$host_os" == "mingw32" ; then
