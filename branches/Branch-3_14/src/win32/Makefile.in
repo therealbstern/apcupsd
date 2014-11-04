@@ -662,17 +662,17 @@ GAPCMON_LIBS = $(LIB_PTHREADS) -L$(DEPKGS)/glib/lib -Wl,--export-dynamic \
 
 MULTIMON_OBJS = $(OBJDIR)/upsfetch.o $(OBJDIR)/cgilib.o $(OBJDIR)/multimon.o \
    $(OBJDIR)/apclibnis.o $(OBJDIR)/asys.o ${OBJDIR}/apcerror.o \
-   ${OBJDIR}/netcompat.o $(OBJDIR)/gethostname.o
+   $(OBJDIR)/gethostname.o $(OBJS_COMPAT)
 MULTIMON_LIBS = -L$(LIB_MINGW) -lwsock32
 
 UPSSTATS_OBJS = $(OBJDIR)/upsfetch.o $(OBJDIR)/cgilib.o $(OBJDIR)/upsstats.o \
    $(OBJDIR)/apclibnis.o $(OBJDIR)/asys.o ${OBJDIR}/apcerror.o \
-   ${OBJDIR}/netcompat.o $(OBJDIR)/gethostname.o
+   $(OBJDIR)/gethostname.o $(OBJS_COMPAT)
 UPSSTATS_LIBS = -L$(LIB_MINGW) -lwsock32
 
 UPSFSTATS_OBJS = $(OBJDIR)/upsfetch.o $(OBJDIR)/cgilib.o $(OBJDIR)/upsfstats.o \
    $(OBJDIR)/apclibnis.o $(OBJDIR)/asys.o ${OBJDIR}/apcerror.o \
-   ${OBJDIR}/netcompat.o $(OBJDIR)/gethostname.o
+   $(OBJDIR)/gethostname.o $(OBJS_COMPAT)
 UPSFSTATS_LIBS = -L$(LIB_MINGW) -lwsock32
 
 UPSIMAGE_OBJS = $(OBJDIR)/cgilib.o $(OBJDIR)/upsimage.o \
