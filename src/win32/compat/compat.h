@@ -155,7 +155,14 @@ struct group {
 int readlink(const char *, char *, int);
 int lchown(const char *, uid_t uid, gid_t gid);
 int chown(const char *, uid_t uid, gid_t gid);
-#define fcntl(a,b,c) 0
+
+#ifndef F_GETFL
+# define F_GETFL 1
+#endif
+#ifndef F_SETFL
+# define F_SETFL 2
+#endif
+int fcntl(int fd, int cmd, ...);
 
 #define _PC_PATH_MAX 1
 #define _PC_NAME_MAX 2

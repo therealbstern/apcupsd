@@ -336,7 +336,7 @@ int usb_interrupt_read(usb_dev_handle *dev, int ep, char *bytes, int size,
 char *usb_strerror(void)
 {
    static char buf[256];
-   snprintf(buf, sizeof(buf), "Windows Error #%d", GetLastError());
+   snprintf(buf, sizeof(buf), "Windows Error #%lu", GetLastError());
    return buf;
 }
 

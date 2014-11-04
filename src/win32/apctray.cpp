@@ -110,6 +110,7 @@ int Install()
 
    NotifyUser("Apctray was installed successfully and will\n"
               "automatically run when users log on.");
+   return 0;
 }
 
 int Remove()
@@ -180,11 +181,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    // Publicize application handle
    appinst = hInstance;
 
-   // Instance parameters
-   char *host = NULL;
-   unsigned short port = 0;
-   int refresh = 0;
-
    // Check command line options
    char *arg;
    char *opt = CmdLine;
@@ -214,7 +210,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    }
 
    // On Win2K and above we spawn a thread to watch for exit requests.
-   HANDLE evtthread;
+   HANDLE evtthread = NULL;
    if (g_os_version >= WINDOWS_2000) {
       runthread = true;
       evtthread = CreateThread(NULL, 0, EventThread, NULL, 0, NULL);
