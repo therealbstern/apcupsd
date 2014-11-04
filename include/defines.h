@@ -418,4 +418,12 @@ void d_msg(const char *file, int line, int level, const char *fmt, ...);
 #define MAX(a,b) ( (a) > (b) ? (a) : (b) )
 #endif
 
+/* On Windows, sockets are SOCKET, everywhere else they are int */
+#ifdef HAVE_MINGW
+typedef SOCKET sock_t;
+#else
+typedef int sock_t;
+#define INVALID_SOCKET -1
+#endif
+
 #endif   /* _DEFINES_H */

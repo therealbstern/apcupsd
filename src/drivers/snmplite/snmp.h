@@ -222,8 +222,8 @@ namespace Snmp
       static const unsigned short SNMP_TRAP_PORT = 162;
       static const unsigned short SNMP_AGENT_PORT = 161;
 
-      int _socket;
-      int _trapsock;
+      sock_t _socket;
+      sock_t _trapsock;
       int _reqid;
       astring _community;
       struct sockaddr_in _destaddr;

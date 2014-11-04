@@ -23,7 +23,7 @@
 StatMgr::StatMgr(const char *host, unsigned short port)
    : m_host(host),
      m_port(port),
-     m_socket(-1)
+     m_socket(INVALID_SOCKET)
 {
    memset(m_stats, 0, sizeof(m_stats));
 }
@@ -41,7 +41,7 @@ bool StatMgr::Update()
    int tries;
    for (tries = 2; tries; tries--)
    {
-      if (m_socket == -1 && !open()) {
+      if (m_socket == INVALID_SOCKET && !open()) {
          // Hard failure: bail immediately
          unlock();
          return false;
@@ -131,7 +131,7 @@ bool StatMgr::GetEvents(alist<astring> &events)
 {
    lock();
 
-   if (m_socket == -1 && !open()) {
+   if (m_socket == INVALID_SOCKET && !open()) {
       unlock();
       return false;
    }
@@ -195,18 +195,18 @@ void StatMgr::unlock()
 
 bool StatMgr::open()
 {
-   if (m_socket != -1)
+   if (m_socket != INVALID_SOCKET)
       close();
 
    m_socket = net_open(m_host, NULL, m_port);
-   return m_socket != -1;
+   return m_socket != INVALID_SOCKET;
 }
 
 void StatMgr::close()
 {
-   if (m_socket != -1) {
+   if (m_socket != INVALID_SOCKET) {
       net_close(m_socket);
-      m_socket = -1;
+      m_socket = INVALID_SOCKET;
    }
 }
 

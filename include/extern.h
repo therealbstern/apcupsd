@@ -212,12 +212,6 @@ extern void logf(const char *fmt, ...);
 extern void hex_dump(int level, const void *data, unsigned int len);
 extern int format_date(time_t timestamp, char *dest, size_t destlen);
 
-/* In apcnetlib.c */
-extern int net_open(const char *host, char *service, int port);
-extern void net_close(int sockfd);
-extern int net_send(int sockfd, const char *buff, int len);
-extern int net_recv(int sockfd, char *buff, int maxlen);
-
 /* In apclist.c */
 extern int insertUps(UPSINFO *ups);
 extern UPSINFO *getNextUps(UPSINFO *ups);

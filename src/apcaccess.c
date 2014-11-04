@@ -44,11 +44,12 @@ const char *const units[] = {
 /* Get and print status from apcupsd NIS server */
 static int do_pthreads_status(const char *host, int port, const char *par, int flags)
 {
-   int sockfd, n;
+   sock_t sockfd;
+   int n;
    char recvline[MAXSTRING + 1];
    char *line;
 
-   if ((sockfd = net_open(host, NULL, port)) < 0) {
+   if ((sockfd = net_open(host, NULL, port)) == INVALID_SOCKET) {
       fprintf(stderr, "Error contacting apcupsd @ %s:%d: %s\n",
          host, port, strerror(-sockfd));
       return 1;

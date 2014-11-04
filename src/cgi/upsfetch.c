@@ -27,7 +27,7 @@
 #include "config.h"
 #include "nis.h"
 
-static int fill_buffer(int sockfd);
+static int fill_buffer(sock_t sockfd);
 
 char statbuf[4096];
 size_t  statlen = 0;
@@ -97,7 +97,7 @@ static const struct {
 static int fetch_data(const char *host)
 {
    int nis_port = NISPORT;
-   int sockfd;
+   sock_t sockfd;
    int stat;
    char *p;
    char lhost[200];
@@ -114,7 +114,7 @@ static int fetch_data(const char *host)
       *p++ = '\0';
       nis_port = atoi(p);
    }
-   if ((sockfd = net_open(lhost, NULL, nis_port)) < 0) {
+   if ((sockfd = net_open(lhost, NULL, nis_port)) == INVALID_SOCKET) {
       (void) snprintf(errmsg, sizeof (errmsg),
          "upsfetch: tcp_open failed for %s port %d", lhost, nis_port);
       return 0;
@@ -138,7 +138,7 @@ int fetch_events(const char *host)
 {
    int nis_port = NISPORT;
    char buf[500];
-   int sockfd;
+   sock_t sockfd;
    int n, stat = 1;
    char *p;
    char lhost[200];
@@ -153,7 +153,7 @@ int fetch_events(const char *host)
       *p++ = '\0';
       nis_port = atoi(p);
    }
-   if ((sockfd = net_open(lhost, NULL, nis_port)) < 0) {
+   if ((sockfd = net_open(lhost, NULL, nis_port)) == INVALID_SOCKET) {
       snprintf(errmsg, sizeof(errmsg),
           "upsfetch: tcp_open failed for %s port %d", lhost, nis_port);
       fputs(errmsg, stdout);
@@ -252,7 +252,7 @@ int getupsvar(const char *host, const char *request,
  * Returns 0 on error
  * Returns 1 if OK
  */
-static int fill_buffer(int sockfd)
+static int fill_buffer(sock_t sockfd)
 {
    int n, stat = 1; 
    char buf[1000];
