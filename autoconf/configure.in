@@ -388,7 +388,9 @@ AC_HELP_STRING([--enable-all], [Enable all optional modules])],
       enable_pcnet=yes
       enable_modbus=yes
       enable_cgi=yes
-      enable_gapcmon=yes
+      if test "$host_os" != "mingw32" ; then
+         enable_gapcmon=yes
+      fi
    fi], [])
 
 dnl
