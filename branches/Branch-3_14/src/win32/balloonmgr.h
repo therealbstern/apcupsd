@@ -49,10 +49,10 @@ private:
 
    alist<Balloon>       _pending;
    HANDLE               _mutex;
+   bool                 _exit;
    bool                 _active;
    HANDLE               _event;
    HANDLE               _timer;
-   bool                 _exit;
    struct timeval       _time;
    HANDLE               _thread;
 };

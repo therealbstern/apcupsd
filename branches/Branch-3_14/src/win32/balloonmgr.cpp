@@ -205,4 +205,5 @@ DWORD WINAPI BalloonMgr::Thread(LPVOID param)
          break;
       }
    }
+   return 0;
 }

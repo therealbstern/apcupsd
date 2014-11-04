@@ -95,6 +95,11 @@ int lchown(const char *k, uid_t, gid_t)
    return 0;
 }
 
+int fcntl(int fd, int cmd, ...)
+{
+   return 0;
+}
+
 long int
 random(void)
 {

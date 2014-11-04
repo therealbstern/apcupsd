@@ -20,24 +20,24 @@
 // Implementation
 upsMenu::upsMenu(HINSTANCE appinst, MonitorConfig &mcfg, BalloonMgr *balmgr,
                  InstanceManager *instmgr)
-   : _statmgr(NULL),
-     _about(appinst),
-     _status(appinst, this),
-     _events(appinst, this),
-     _configdlg(appinst, instmgr),
-     _wait(NULL),
-     _thread(NULL),
+   : _hwnd(NULL),
      _hmenu(NULL),
      _hsubmenu(NULL),
+     _statmgr(NULL),
+     _thread(NULL),
+     _wait(NULL),
      _upsname("<unknown>"),
      _balmgr(balmgr),
      _appinst(appinst),
-     _hwnd(NULL),
      _config(mcfg),
      _runthread(true),
      _generation(0),
      _reconfig(true),
-     _instmgr(instmgr)
+     _instmgr(instmgr),
+     _about(appinst),
+     _status(appinst, this),
+     _configdlg(appinst, instmgr),
+     _events(appinst, this)
 {
    // Determine message id for "TaskbarCreate" message
    _tbcreated_msg = RegisterWindowMessage("TaskbarCreated");
@@ -408,4 +408,5 @@ DWORD WINAPI upsMenu::StatusPollThread(LPVOID param)
       // Delay for configured interval
       WaitForSingleObject(_this->_wait, _this->_config.refresh * 1000);
    }
+   return 0;
 }
