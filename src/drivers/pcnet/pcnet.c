@@ -98,7 +98,8 @@ PcnetUpsDriver::PcnetUpsDriver(UPSINFO *ups) :
    _uptime(0),
    _reboots(0),
    _datatime(0),
-   _runtimeInSeconds(false)
+   _runtimeInSeconds(false),
+   _fd(INVALID_SOCKET)
 {
    memset(_device, 0, sizeof(_device));
 }
