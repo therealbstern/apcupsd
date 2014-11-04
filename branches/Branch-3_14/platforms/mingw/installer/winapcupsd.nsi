@@ -287,42 +287,27 @@ Section "Apcupsd Service" SecService
   ;
 
   SetOutPath "$INSTDIR\bin"
-  File ${WINDIR}\mingwm10.dll
-  File ${WINDIR}\pthreadGCE.dll
-  File ${WINDIR}\apcupsd.exe
-  File ${WINDIR}\smtp.exe
-  File ${WINDIR}\apcaccess.exe
-  File ${WINDIR}\apctest.exe
+  File ${CROSSTOOLS}\mingw32\mingw32\bin\mingwm10.dll
+  File ${DEPKGS}\libroot\lib\pthreadGCE.dll
+  File ${TOPDIR}\src\apcupsd.exe
+  File ${TOPDIR}\src\smtp.exe
+  File ${TOPDIR}\src\apcaccess.exe
+  File ${TOPDIR}\src\apctest.exe
   File ${WINDIR}\popup.exe 
   File ${WINDIR}\shutdown.exe
   File ${WINDIR}\email.exe
   File ${WINDIR}\background.exe
 
-  !if "${USBTYPE}" == "generic"
-    File ${DEPKGS}\lib\libusb0.dll
-  !endif
-
   SetOutPath "$INSTDIR\driver"
-  !if "${USBTYPE}" == "generic"
-    File ${TOPDIR}\platforms\mingw\apcupsd.inf
-    File ${TOPDIR}\platforms\mingw\apcupsd.cat
-    File ${TOPDIR}\platforms\mingw\apcupsd_x64.cat
-    File ${DEPKGS}\bin\libusb0.sys
-    File ${DEPKGS}\bin\libusb0_x64.sys
-    File ${DEPKGS}\lib\libusb0.dll
-    File ${DEPKGS}\lib\libusb0_x64.dll
-    File ${TOPDIR}\platforms\mingw\install.txt
-  !else
-    File ${TOPDIR}\platforms\mingw\winusb\install.txt
-    File ${TOPDIR}\platforms\mingw\winusb\apcupsd.inf
-    File ${TOPDIR}\platforms\mingw\winusb\apcupsd.cat
-    SetOutPath "$INSTDIR\driver\i386"
-    File ${DEPKGS}\..\winddk\redist\wdf\x86\*.dll
-    File ${DEPKGS}\..\winddk\redist\winusb\x86\*.dll
-    SetOutPath "$INSTDIR\driver\amd64"
-    File ${DEPKGS}\..\winddk\redist\wdf\amd64\*.dll
-    File ${DEPKGS}\..\winddk\redist\winusb\amd64\*.dll
-  !endif
+  File ${TOPDIR}\platforms\mingw\winusb\install.txt
+  File ${TOPDIR}\platforms\mingw\winusb\apcupsd.inf
+  File ${TOPDIR}\platforms\mingw\winusb\apcupsd.cat
+  SetOutPath "$INSTDIR\driver\i386"
+  File ${DEPKGS}\winddk\redist\wdf\x86\*.dll
+  File ${DEPKGS}\winddk\redist\winusb\x86\*.dll
+  SetOutPath "$INSTDIR\driver\amd64"
+  File ${DEPKGS}\winddk\redist\wdf\amd64\*.dll
+  File ${DEPKGS}\winddk\redist\winusb\amd64\*.dll
 
   SetOutPath "$INSTDIR\etc\apcupsd"
   File ${TOPDIR}\platforms\mingw\apccontrol.bat
@@ -369,11 +354,11 @@ Section "Multimon CGI programs" SecMultimon
   CreateDirectory "$INSTDIR\etc\apcupsd"
 
   SetOutPath "$INSTDIR\cgi"
-  File ${WINDIR}\multimon.cgi
-  File ${WINDIR}\upsstats.cgi
-  File ${WINDIR}\upsfstats.cgi
-  File ${WINDIR}\upsimage.cgi
-  File ${WINDIR}\mingwm10.dll
+  File ${TOPDIR}\src\cgi\multimon.cgi
+  File ${TOPDIR}\src\cgi\upsstats.cgi
+  File ${TOPDIR}\src\cgi\upsfstats.cgi
+  File ${TOPDIR}\src\cgi\upsimage.cgi
+  File ${CROSSTOOLS}\mingw32\mingw32\bin\mingwm10.dll
 
   SetOutPath "$INSTDIR\etc\apcupsd"
   File ${TOPDIR}\src\cgi\apcupsd.css
@@ -386,18 +371,6 @@ Section "Multimon CGI programs" SecMultimon
 SectionEnd
 
 Section "USB Driver" SecUsbDrv
-!if "${USBTYPE}" == "generic"
-  ${If} ${IsNT}
-    SetOutPath "$WINDIR\system32"
-    File ${DEPKGS}\lib\libusb0.dll
-    ExecWait 'rundll32 libusb0.dll,usb_install_driver_np_rundll $INSTDIR\driver\apcupsd.inf'
-  ${Else}
-    MessageBox MB_OK|MB_ICONEXCLAMATION \
-       "The USB driver cannot be automatically installed on Win98 or WinMe. \
-        Please see $INSTDIR\driver\install.txt for instructions on installing \
-        the driver by hand."
-  ${EndIf}
-!else
   ${InstallUpgradeDriver} "$INSTDIR\driver" $INSTDIR\driver\apcupsd.inf "USB\VID_051d&PID_0002"
   ${If} $0 != 1
     MessageBox MB_OK|MB_ICONEXCLAMATION  \
@@ -406,7 +379,6 @@ Section "USB Driver" SecUsbDrv
        see $INSTDIR\driver\install.txt for instructions on installing the \
        USB driver by hand."
   ${EndIf}
-!endif
 SectionEnd
 
 Section "Documentation" SecDoc
@@ -472,18 +444,6 @@ Function .onInit
   ; with /kill switch to shut down running instances.
   StrCpy $OrigInstDir $INSTDIR
 
-  !if "${USBTYPE}" == "generic"
-    ; If we're on WinNT or Win95, disable the USB driver section
-    ${If} ${IsWinNT4}
-    ${OrIf} ${IsWin95}
-       SectionGetFlags ${SecUsbDrv} $0
-       IntOp $1 ${SF_SELECTED} ~
-       IntOp $0 $0 & $1
-       IntOp $0 $0 | ${SF_RO}
-       SectionSetFlags ${SecUsbDrv} $0
-    ${EndIf}
-  !endif
-  
   ; Extract custom pages. Automatically deleted when installer exits.
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT "EditApcupsdConf.ini"
   !insertmacro MUI_INSTALLOPTIONS_EXTRACT "InstallService.ini"

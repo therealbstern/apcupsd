@@ -84,6 +84,8 @@ if test "$host_os" == "mingw32" ; then
    BG=-mwindows
 fi
 AC_SUBST(BG)
+AC_SUBST(CROSSTOOLS)
+AC_SUBST(DEPKGS)
 
 if test $HAVE_UNAME=yes -a x`uname -s` = xSunOS
 then
@@ -197,6 +199,7 @@ AC_REQ_PATH_PROG(SED, sed)
 AC_REQ_TOOL(AR, ar)
 AC_REQ_PATH_PROG(MV, mv)
 AC_CHECK_TOOL(WINDRES, windres)
+AC_CHECK_TOOLS(STRP, strip true)
 
 AC_PATH_PROG(RST2HTML, rst2html,)
 AC_PATH_PROG(RST2HTML, rst2html.py,)
