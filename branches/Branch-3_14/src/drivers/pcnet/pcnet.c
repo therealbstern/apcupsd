@@ -346,14 +346,14 @@ bool PcnetUpsDriver::pcnet_process_data(const char *key, const char *value)
 char *PcnetUpsDriver::digest2ascii(md5_byte_t *digest)
 {
    static char ascii[33];
-   char *ptr;
+   char byte[3];
    int idx;
 
    /* Convert binary digest to ascii */
-   ptr = ascii;
+   ascii[0] = '\0';
    for (idx=0; idx<16; idx++) {
-      sprintf(ptr, "%02x", (unsigned char)digest[idx]);
-      ptr += 2;
+      snprintf(byte, sizeof(byte), "%02x", (unsigned char)digest[idx]);
+      strlcat(ascii, byte, sizeof(ascii));
    }
 
    return ascii;
