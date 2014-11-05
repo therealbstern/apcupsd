@@ -162,9 +162,16 @@ void hex_dump(int level, const void *data, unsigned int len)
 {
    unsigned int pos = 0;
    const unsigned char *dat = (const unsigned char *)data;
-   char temp[16*3+1];
-   char temp2[8+2+16*3+1+16+1];
-   char *ptr;
+   char buf[4];
+
+   // Derivation of line buffer size:
+   //    8 digit address
+   //    2 spaces
+   //    16 hex bytes (2 chars + 1 space each)
+   //    1 additional space between hex and ascii
+   //    16 ASCII chars
+   //    1 NUL terminator
+   char line[8+2+16*3+1+16+1];
 
    if (debug_level < level)
       return;
@@ -173,17 +180,36 @@ void hex_dump(int level, const void *data, unsigned int len)
    while (pos < len)
    {
       int num = MIN(16, len-pos);
-      ptr = temp;
+
+      // Begin line with offset
+      snprintf(line, sizeof(line), "%08x  ", pos);
+
+      // Append hex digits
+      for (int i=0; i < 16; i++)
+      {
+         if (i < num)
+         {
+            snprintf(buf, sizeof(buf), "%02x ", dat[pos+i]);
+            strlcat(line, buf, sizeof(line));
+         }
+         else
+         {
+            strlcat(line, "   ", sizeof(line));
+         }
+      }
+
+      // Additional space between hex digits and ASCII
+      strlcat(line, " ", sizeof(line));
+
+      // Append ASCII
+      buf[1] = '\0';
       for (int i=0; i < num; i++)
-         ptr += sprintf(ptr, "%02x ", dat[pos+i]);
+      {
+         buf[0] = isgraph(dat[pos+i]) ? dat[pos+i] : '.';
+         strlcat(line, buf, sizeof(line));
+      }
 
-      ptr = temp2;
-      ptr += sprintf(temp2, "%08x  %-48s ", pos, temp);
-
-      for (int i=0; i < num; i++)
-         ptr += sprintf(ptr, "%c", isgraph(dat[pos+i]) ? dat[pos+i] : '.');
-
-      Dmsg(level, "%s\n", temp2);
+      Dmsg(level, "%s\n", line);
       pos += num;
    }
 }
