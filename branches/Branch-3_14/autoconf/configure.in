@@ -646,7 +646,6 @@ AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
       USB_DRIVER="usb"
       AC_SUBST(USB_DRIVER)
       AC_SUBST(USB_TYPE)
-      CPPFLAGS="${CPPFLAGS} -DUSBTYPE=$USB_TYPE"
 
       DISPLAY_USB_DRIVER=$USB_TYPE-$USB_DRIVER
      fi ],
