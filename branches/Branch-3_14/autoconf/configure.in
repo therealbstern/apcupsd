@@ -80,7 +80,7 @@ if test "$host_os" == "mingw32" ; then
    fi
    CPPFLAGS="-I${topdir}/src/win32/compat -I$DEPKGS/libroot/include -I$DEPKGS/libroot/include/pthread ${CPPFLAGS}"
    PATH=$CROSSTOOLS/mingw32/bin:$PATH
-   LDFLAGS="-L$DEPKGS/libroot/lib -L${topdir}/src/win32/compat ${LDFLAGS}"
+   LDFLAGS="-L$DEPKGS/libroot/lib ${LDFLAGS}"
    BG=-mwindows
 fi
 AC_SUBST(BG)
@@ -1281,7 +1281,7 @@ qnx)
    ;;
 mingw)
    PTHREAD_LFLAGS="-lpthreadGCE"
-   LIBS="${LIBS} -lwin32compat -luser32 -lgdi32 -lwsock32 -lnetapi32"
+   LIBS="${LIBS} -luser32 -lgdi32 -lwsock32 -lnetapi32"
    CPPFLAGS="${CPPFLAGS} -D_WIN32_IE=0x0500"
    WIN32=win32
    AC_SUBST(WIN32)

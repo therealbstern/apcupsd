@@ -66,7 +66,7 @@ DEFS = @EXTRADEFS@ $(LOCALDEFS)
 EXE = @EXEEXT@
 
 # Libraries
-APCLIBS = $(topdir)/src/lib/libapc.a
+APCLIBS = $(topdir)/src/lib/libapc.a $(if $(WIN32),$(topdir)/src/win32/compat/libwin32compat.a)
 APCDRVLIBS = $(topdir)/src/drivers/libdrivers.a @APCDRVLIBS@
 DRVLIBS = @PTHREAD_LFLAGS@ @DRVLIBS@
 X_LIBS = @X_LIBS@
