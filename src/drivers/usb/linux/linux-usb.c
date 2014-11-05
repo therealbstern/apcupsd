@@ -123,6 +123,7 @@ int LinuxUsbUpsDriver::open_device(const char *dev)
  */
 void LinuxUsbUpsDriver::bind_upses()
 {
+#ifdef USBDEVFS_CONNECT
    // Find all USB devices in usbfs
    glob_t g;
    if (glob("/proc/bus/usb/[0-9][0-9][0-9]/[0-9][0-9][0-9]", 0, NULL, &g))
@@ -181,6 +182,7 @@ void LinuxUsbUpsDriver::bind_upses()
    }
 
    globfree(&g);
+#endif // USBDEVFS_CONNECT
 }
 
 /*
