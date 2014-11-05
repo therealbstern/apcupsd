@@ -16,22 +16,13 @@
  * MA 02111-1307, USA.
  */
 
-#ifndef __WAIT_H_
-#define __WAIT_H_
+#ifndef __COMPAT_STRING_H_
+#define __COMPAT_STRING_H_
 
-#define WNOHANG 0
-#define WIFEXITED(x) 0
-#define WEXITSTATUS(x) x
-#define WIFSIGNALED(x) 0
+#include_next <string.h>
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+/* Should use strtok_s but mingw doesn't have it. strtok is thread-safe on
+ * Windows via TLS, so this substitution should be ok... */
+#define strtok_r(a,b,c) strtok(a,b)
 
-int waitpid(int, int *, int);
-
-#ifdef __cplusplus
-};
-#endif
-
-#endif /* __WAIT_H_ */
+#endif /* __COMPAT_STRING_H_ */

@@ -14,6 +14,7 @@
 #include "compat.h"
 #include "winups.h"
 #include "winservice.h"
+#include <stdio.h>
 
 // Error message logging
 void LogErrorMsg(const char *msg, const char *fname, int lineno);

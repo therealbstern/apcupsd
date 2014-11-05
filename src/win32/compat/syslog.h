@@ -24,8 +24,16 @@
 #define LOG_CONS    0
 #define LOG_PID     0
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 void syslog(int type, const char *fmt, ...);
 void openlog(const char *app, int, int);
 void closelog(void);
+
+#ifdef __cplusplus
+};
+#endif
 
 #endif /* _SYSLOG_H */
