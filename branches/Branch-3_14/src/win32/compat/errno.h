@@ -1,10 +1,8 @@
-/*                               -*- Mode: C -*-
- * compat.h --
- */
 // Copyright transferred from Raider Solutions, Inc to
 //   Kern Sibbald and John Walker by express permission.
 //
 // Copyright (C) 2004-2006 Kern Sibbald
+// Copyright (C) 2014 Adam Kropelin
 //
 //   This program is free software; you can redistribute it and/or
 //   modify it under the terms of the GNU General Public License as
@@ -20,38 +18,14 @@
 //   License along with this program; if not, write to the Free
 //   Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
 //   MA 02111-1307, USA.
-/*
- *
- * Author          : Christopher S. Hull
- * Created On      : Fri Jan 30 13:00:51 2004
- * Last Modified By: Thorsten Engel
- * Last Modified On: Fri Apr 22 19:30:00 2004
- * Update Count    : 218
- * $Id: compat.h,v 1.21.2.4 2009-08-01 12:01:59 adk0212 Exp $
- */
 
+#ifndef __COMPAT_ERRNO_H_
+#define __COMPAT_ERRNO_H_
 
-#ifndef __COMPAT_H_
-#define __COMPAT_H_
+#include_next <errno.h>
 
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <windows.h>
-#include <conio.h>
-
-#ifdef __cplusplus
-extern "C" {
+#ifndef EAFNOSUPPORT
+#define EAFNOSUPPORT WSAEAFNOSUPPORT
 #endif
 
-// In netcompat.c
-int WSA_Init(void);
-int inet_aton(const char *cp, struct in_addr *inp);
-
-// Parse windows-style command line into individual arguments
-char *GetArg(char **cmdline);
-
-#ifdef __cplusplus
-};
-#endif
-
-#endif /* __COMPAT_H_ */
+#endif /* __COMPAT_ERRNO_H_ */

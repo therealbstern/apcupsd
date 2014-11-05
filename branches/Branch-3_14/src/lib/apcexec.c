@@ -76,6 +76,8 @@ void clean_threads(void)
 
 #ifdef HAVE_MINGW
 
+#include "winapi.h"
+
 char sbindir[MAXSTRING];
 
 int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)

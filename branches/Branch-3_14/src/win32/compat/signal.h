@@ -16,22 +16,34 @@
  * MA 02111-1307, USA.
  */
 
-#ifndef __WAIT_H_
-#define __WAIT_H_
+#ifndef __COMPAT_SIGNAL_H_
+#define __COMPAT_SIGNAL_H_
 
-#define WNOHANG 0
-#define WIFEXITED(x) 0
-#define WEXITSTATUS(x) x
-#define WIFSIGNALED(x) 0
+/* Pull in mingw signal.h */
+#include_next <signal.h>
+
+struct sigaction {
+    int sa_flags;
+    void (*sa_handler)(int);
+};
+
+#define SIGKILL 9
+#define SIGUSR2 9999
+#define SIGALRM 0
+#define SIGHUP 0
+#define SIGCHLD 0
+#define SIGPIPE 0
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int waitpid(int, int *, int);
+#define sigfillset(x)
+#define sigaction(a, b, c)
+int kill(int pid, int signo);
 
 #ifdef __cplusplus
 };
 #endif
 
-#endif /* __WAIT_H_ */
+#endif /* __COMPAT_SIGNAL_H_ */

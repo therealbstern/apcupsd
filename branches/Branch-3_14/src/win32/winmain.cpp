@@ -26,6 +26,7 @@ extern int ApcupsdMain(int argc, char **argv);
 #include "winservice.h"
 #include "compat.h"
 #include "defines.h"
+#include "winapi.h"
 
 // Standard command-line flag definitions
 char ApcupsdRunService[] =        "/service";

@@ -16,22 +16,34 @@
  * MA 02111-1307, USA.
  */
 
-#ifndef __WAIT_H_
-#define __WAIT_H_
+#include <errno.h>
+#include <io.h>
+#include <sys/termios.h>
+#include "winapi.h"
 
-#define WNOHANG 0
-#define WIFEXITED(x) 0
-#define WEXITSTATUS(x) x
-#define WIFSIGNALED(x) 0
+int tcflush(int fd, int queue_selector)
+{
+   HANDLE h = (HANDLE)_get_osfhandle(fd);
+   if (h == 0) {
+      errno = EBADF;
+      return -1;
+   }
 
-#ifdef __cplusplus
-extern "C" {
-#endif
+   DWORD flags = 0;
 
-int waitpid(int, int *, int);
-
-#ifdef __cplusplus
-};
-#endif
-
-#endif /* __WAIT_H_ */
+   switch (queue_selector) {
+   case TCIFLUSH:
+      flags |= PURGE_RXCLEAR;
+      break;
+   case TCOFLUSH:
+      flags |= PURGE_TXCLEAR;
+      break;
+   case TCIOFLUSH:
+      flags |= PURGE_RXCLEAR;
+      flags |= PURGE_TXCLEAR;
+      break;
+   }
+   
+   PurgeComm(h, flags);
+   return 0;
+}

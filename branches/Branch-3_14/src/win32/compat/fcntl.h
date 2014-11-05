@@ -16,22 +16,28 @@
  * MA 02111-1307, USA.
  */
 
-#ifndef __WAIT_H_
-#define __WAIT_H_
+#ifndef __COMPAT_FCNTL_H_
+#define __COMPAT_FCNTL_H_
 
-#define WNOHANG 0
-#define WIFEXITED(x) 0
-#define WEXITSTATUS(x) x
-#define WIFSIGNALED(x) 0
+#include_next <fcntl.h>
+
+#define O_NOCTTY 0
+
+#ifndef F_GETFL
+# define F_GETFL 1
+#endif
+#ifndef F_SETFL
+# define F_SETFL 2
+#endif
 
 #ifdef __cplusplus
 extern "C" {
 #endif
 
-int waitpid(int, int *, int);
+int fcntl(int fd, int cmd, ...);
 
 #ifdef __cplusplus
 };
 #endif
 
-#endif /* __WAIT_H_ */
+#endif /* __COMPAT_FCNTL_H_ */
