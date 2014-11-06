@@ -318,7 +318,7 @@ dnl   Check for header files.
 dnl
 AC_CHECK_HEADERS(
    arpa/inet.h ctype.h errno.h fcntl.h \
-   limits.h netdb.h netinet/in.h pwd.h signal.h \
+   limits.h netdb.h netinet/in.h signal.h \
    stdarg.h stdio.h stdlib.h string.h strings.h sys/ioctl.h \
    sys/socket.h sys/types.h syslog.h termios.h \
    unistd.h

@@ -34,17 +34,9 @@
 #ifndef __COMPAT_H_
 #define __COMPAT_H_
 
-#include <winsock2.h>
-#include <ws2tcpip.h>
-#include <windows.h>
-#include <conio.h>
-
 #ifdef __cplusplus
 extern "C" {
 #endif
-
-// In netcompat.c
-int WSA_Init(void);
 
 // Parse windows-style command line into individual arguments
 char *GetArg(char **cmdline);

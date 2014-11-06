@@ -27,6 +27,7 @@
 #include "statmgr.h"
 #include "astring.h"
 #include "instmgr.h"
+#include "compat.h"
 
 #define CMDOPT_INSTALL  "/install"
 #define CMDOPT_REMOVE   "/remove"

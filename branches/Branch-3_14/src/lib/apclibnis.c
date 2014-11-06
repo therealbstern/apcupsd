@@ -41,6 +41,7 @@
 #define getsockopt(s,l,o,d,z) getsockopt((s),(l),(o),(char*)(d),(z))
 #define EINPROGRESS           WSAEWOULDBLOCK
 
+int WSA_Init(void);
 int dummy = WSA_Init();
 
 #undef errno

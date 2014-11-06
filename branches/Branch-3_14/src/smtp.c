@@ -241,6 +241,7 @@ int main(int argc, char *argv[])
    }
 
 #ifdef HAVE_MINGW
+   int WSA_Init(void);
    WSA_Init();
 #endif
 

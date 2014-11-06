@@ -79,7 +79,6 @@
 #include <syslog.h>
 #include <limits.h>
 #include <time.h>
-#include <pwd.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <setjmp.h>
@@ -133,6 +132,9 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#ifdef HAVE_MINGW
+#include <conio.h>
+#endif
 
 /* Include apcupsd stuff */
 
