@@ -256,8 +256,7 @@ dnl Solaris hides nanosleep in one of two libraries depending on version
 dnl If we can't find it at all we'll just use our own substitute.
 AC_SEARCH_LIBS(nanosleep, [rt posix4], AC_DEFINE(HAVE_NANOSLEEP, 1,
    [Define if you have the nanosleep function.]),
-   [LIBEXTRAOBJ="$LIBEXTRAOBJ nanosleep.o"
-    EXTRAOBJ="$EXTRAOBJ lib/nanosleep.o"])
+   [LIBEXTRAOBJ="$LIBEXTRAOBJ nanosleep.c"])
 
 AC_FUNC_STRFTIME     dnl check for strftime.
 
@@ -287,31 +286,25 @@ AC_CHECK_FUNC(strchr,
     LIBS="$LIBS -lcposix"]))
 
 AC_CHECK_FUNC(strstr, AC_DEFINE(HAVE_STRSTR,, [Define if you have strstr]), 
-   [LIBEXTRAOBJ="$LIBEXTRAOBJ strstr.o"
-    EXTRAOBJ="$EXTRAOBJ lib/strstr.o"])
+   [LIBEXTRAOBJ="$LIBEXTRAOBJ strstr.c"])
 
 AC_CHECK_FUNC(strcasecmp, AC_DEFINE(HAVE_STRCASECMP,, [Define if you have strcasecmp]), 
-   [LIBEXTRAOBJ="$LIBEXTRAOBJ strcasecmp.o"
-    EXTRAOBJ="$EXTRAOBJ lib/strcasecmp.o"])
+   [LIBEXTRAOBJ="$LIBEXTRAOBJ strcasecmp.c"])
         
 AC_CHECK_FUNC(memmove, AC_DEFINE(HAVE_MEMMOVE,, [Define if you have memmove]), 
-   [LIBEXTRAOBJ="$LIBEXTRAOBJ memmove.o"
-    EXTRAOBJ="$EXTRAOBJ lib/memmove.o"])
+   [LIBEXTRAOBJ="$LIBEXTRAOBJ memmove.c"])
         
 AC_CHECK_FUNC(getopt_long, AC_DEFINE(HAVE_GETOPTLONG,, [Define if you have getoptlong]),
-   [LIBEXTRAOBJ="$LIBEXTRAOBJ getopt.o getopt1.o"
-    EXTRAOBJ="$EXTRAOBJ lib/getopt.o lib/getopt1.o"])
+   [LIBEXTRAOBJ="$LIBEXTRAOBJ getopt.c getopt1.c"])
 
 AC_CHECK_FUNC(inet_pton, AC_DEFINE(HAVE_INETPTON,, [Define if you have inetpton]), 
-    [LIBEXTRAOBJ="$LIBEXTRAOBJ inet_pton.o"
-     EXTRAOBJ="$EXTRAOBJ lib/inet_pton.o"])
+    [LIBEXTRAOBJ="$LIBEXTRAOBJ inet_pton.c"])
 
 dnl
 dnl Check for presence of localtime_r
 dnl
 AC_CHECK_FUNC(localtime_r, AC_DEFINE(HAVE_LOCALTIME_R,, [Define if you have localtime_r]),
-   [LIBEXTRAOBJ="$LIBEXTRAOBJ localtime_r.o"
-    EXTRAOBJ="$EXTRAOBJ lib/localtime_r.o"])
+   [LIBEXTRAOBJ="$LIBEXTRAOBJ localtime_r.c"])
 
 dnl
 dnl   Check for header files.
@@ -890,7 +883,7 @@ if test -n "$GCC"; then
                AC_MSG_RESULT(no)
             else
                AC_MSG_RESULT(yes -- will attempt workaround)
-               CPPFLAGS="$CPPFLAGS -DFREEBSD_SUPCPP_FIX"
+               LIBEXTRAOBJ="$LIBEXTRAOBJ libsupc++-fix.cpp"
             fi
             ;;
       esac

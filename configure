@@ -5696,8 +5696,7 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 else
-  LIBEXTRAOBJ="$LIBEXTRAOBJ nanosleep.o"
-    EXTRAOBJ="$EXTRAOBJ lib/nanosleep.o"
+  LIBEXTRAOBJ="$LIBEXTRAOBJ nanosleep.c"
 fi
 
 
@@ -6579,8 +6578,7 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 else
-  LIBEXTRAOBJ="$LIBEXTRAOBJ strstr.o"
-    EXTRAOBJ="$EXTRAOBJ lib/strstr.o"
+  LIBEXTRAOBJ="$LIBEXTRAOBJ strstr.c"
 fi
 
 
@@ -6676,8 +6674,7 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 else
-  LIBEXTRAOBJ="$LIBEXTRAOBJ strcasecmp.o"
-    EXTRAOBJ="$EXTRAOBJ lib/strcasecmp.o"
+  LIBEXTRAOBJ="$LIBEXTRAOBJ strcasecmp.c"
 fi
 
 
@@ -6773,8 +6770,7 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 else
-  LIBEXTRAOBJ="$LIBEXTRAOBJ memmove.o"
-    EXTRAOBJ="$EXTRAOBJ lib/memmove.o"
+  LIBEXTRAOBJ="$LIBEXTRAOBJ memmove.c"
 fi
 
 
@@ -6870,8 +6866,7 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 else
-  LIBEXTRAOBJ="$LIBEXTRAOBJ getopt.o getopt1.o"
-    EXTRAOBJ="$EXTRAOBJ lib/getopt.o lib/getopt1.o"
+  LIBEXTRAOBJ="$LIBEXTRAOBJ getopt.c getopt1.c"
 fi
 
 
@@ -6967,8 +6962,7 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 else
-  LIBEXTRAOBJ="$LIBEXTRAOBJ inet_pton.o"
-     EXTRAOBJ="$EXTRAOBJ lib/inet_pton.o"
+  LIBEXTRAOBJ="$LIBEXTRAOBJ inet_pton.c"
 fi
 
 
@@ -7064,8 +7058,7 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 else
-  LIBEXTRAOBJ="$LIBEXTRAOBJ localtime_r.o"
-    EXTRAOBJ="$EXTRAOBJ lib/localtime_r.o"
+  LIBEXTRAOBJ="$LIBEXTRAOBJ localtime_r.c"
 fi
 
 
@@ -12686,7 +12679,7 @@ $as_echo "no" >&6; }
             else
                { $as_echo "$as_me:$LINENO: result: yes -- will attempt workaround" >&5
 $as_echo "yes -- will attempt workaround" >&6; }
-               CPPFLAGS="$CPPFLAGS -DFREEBSD_SUPCPP_FIX"
+               LIBEXTRAOBJ="$LIBEXTRAOBJ libsupc++-fix.cpp"
             fi
             ;;
       esac
