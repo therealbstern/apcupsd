@@ -149,9 +149,6 @@
 /* Define if you have pthreads */
 #undef HAVE_PTHREADS
 
-/* Define to 1 if you have the <pwd.h> header file. */
-#undef HAVE_PWD_H
-
 /* Define if building for QNX */
 #undef HAVE_QNX_OS
 

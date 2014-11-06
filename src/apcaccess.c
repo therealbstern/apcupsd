@@ -142,10 +142,6 @@ int main(int argc, char **argv)
    int flags = 0;
    FILE *cfg;
 
-#ifdef HAVE_MINGW
-   WSA_Init();                   /* init MS networking */
-#endif
-
    // Process standard options
    int ch;
    while ((ch = getopt(argc, argv, "f:h:p:u")) != -1)

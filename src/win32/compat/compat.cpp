@@ -120,3 +120,21 @@ char *GetArg(char **cmdline)
 
    return ret;
 }
+
+int
+WSA_Init(void)
+{
+    WORD wVersionRequested = MAKEWORD( 1, 1);
+    WSADATA wsaData;
+
+    int err = WSAStartup(wVersionRequested, &wsaData);
+
+
+    if (err != 0) {
+        printf("Can not start Windows Sockets\n");
+        errno = ENOSYS;
+        return -1;
+    }
+
+    return 0;
+}

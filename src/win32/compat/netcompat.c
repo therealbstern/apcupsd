@@ -21,8 +21,9 @@
 // Created On      : Sat Jan 31 15:55:00 2004
 // $Id: netcompat.c,v 1.1.2.1 2009-07-31 14:20:35 adk0212 Exp $
 
-#include "apc.h"
-#include "compat.h"
+#include <stdint.h>
+#include <ctype.h>
+#include <netinet/in.h>
 
 /*
  * Dotted IP address to network address
@@ -59,22 +60,4 @@ inet_aton(const char *a, struct in_addr *inp)
    }
    inp->s_addr = htonl(acc);     /* store addr in network format */
    return 1;
-}
-
-int
-WSA_Init(void)
-{
-    WORD wVersionRequested = MAKEWORD( 1, 1);
-    WSADATA wsaData;
-
-    int err = WSAStartup(wVersionRequested, &wsaData);
-
-
-    if (err != 0) {
-        printf("Can not start Windows Sockets\n");
-        errno = ENOSYS;
-        return -1;
-    }
-
-    return 0;
 }
