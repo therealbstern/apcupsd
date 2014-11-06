@@ -33,6 +33,8 @@
 
 #ifdef APCUPSD
 
+#include <pwd.h>
+
 # include "apc.h"
 # undef main
 # define my_name_is(x, y, z)
