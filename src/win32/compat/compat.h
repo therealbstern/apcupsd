@@ -45,7 +45,6 @@ extern "C" {
 
 // In netcompat.c
 int WSA_Init(void);
-int inet_aton(const char *cp, struct in_addr *inp);
 
 // Parse windows-style command line into individual arguments
 char *GetArg(char **cmdline);
