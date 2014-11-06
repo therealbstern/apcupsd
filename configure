@@ -5696,8 +5696,8 @@ cat >>confdefs.h <<\_ACEOF
 _ACEOF
 
 else
-  LIBEXTRAOBJ="$LIBEXTRAOBJ sleep.o"
-    EXTRAOBJ="$EXTRAOBJ lib/sleep.o"
+  LIBEXTRAOBJ="$LIBEXTRAOBJ nanosleep.o"
+    EXTRAOBJ="$EXTRAOBJ lib/nanosleep.o"
 fi
 
 
