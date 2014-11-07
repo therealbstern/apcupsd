@@ -29,14 +29,8 @@
 
 struct tm *localtime_r(const time_t *timep, struct tm *tm)
 {
-   static pthread_mutex_t mutex;
-   static int first = 1;
+   static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
    struct tm *ltm;
-
-   if (first) {
-      pthread_mutex_init(&mutex, NULL);
-      first = 0;
-   }
 
    P(mutex);
 
