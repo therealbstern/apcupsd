@@ -27,8 +27,6 @@
  * MA 02111-1307, USA.
  */
 
-#ifdef FREEBSD_SUPCPP_FIX
-
 #include <new>
 #include <stdlib.h>
 
@@ -57,5 +55,3 @@ namespace __cxxabiv1
    std::terminate_handler __terminate_handler;
    std::unexpected_handler __unexpected_handler;
 };
-
-#endif
