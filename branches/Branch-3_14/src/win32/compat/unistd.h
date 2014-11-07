@@ -37,8 +37,6 @@ long pathconf(const char *, int);
 
 unsigned int sleep(unsigned int seconds);
 
-#define getpwuid(x) NULL
-#define getgrgid(x) NULL
 #define getuid() 0
 #define getgid() 0
 
