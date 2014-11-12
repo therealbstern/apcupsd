@@ -883,7 +883,7 @@ if test -n "$GCC"; then
                AC_MSG_RESULT(no)
             else
                AC_MSG_RESULT(yes -- will attempt workaround)
-               LIBEXTRAOBJ="$LIBEXTRAOBJ libsupc++-fix.cpp"
+               LIBEXTRAOBJ="$LIBEXTRAOBJ libsupc++fix.cpp"
             fi
             ;;
       esac
