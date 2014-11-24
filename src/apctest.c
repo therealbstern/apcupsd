@@ -314,7 +314,12 @@ int main(int argc, char *argv[])
    }
 
    pmsg("Setting up the port ...\n");
-   setup_device(ups);
+   if (!setup_device(ups))
+   {
+      Error_abort("Unable to open UPS device.\n"
+                  "  If apcupsd or apctest is already running,\n"
+                  "  please stop it and run this program again.\n");
+   }
 
    if (hibernate_ups) {
       pmsg("apctest: bad option, I cannot do a killpower\n");
