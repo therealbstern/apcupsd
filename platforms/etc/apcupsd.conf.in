@@ -92,7 +92,10 @@ DEVICE @SERIALDEV@
 #POLLTIME 60
 
 # LOCKFILE <path to lockfile>
-#   Path for device lock file. Not used on Win32.
+#   Path for device lock file. This is the directory into which the lock file
+#   will be written. The directory must already exist; apcupsd will not create
+#   it. The actual name of the lock file is computed from DEVICE.
+#   Not used on Win32.
 LOCKFILE @LOCKDIR@
 
 # SCRIPTDIR <path to script directory>
