@@ -1011,16 +1011,41 @@ static void monitor_calibration_progress(int monitor)
    char *ans;
    int count = 6;
    int max_count = 6;
-   char period = '.';
 
    pmsg("Monitoring the calibration progress ...\n"
         "To stop the calibration, enter a return.\n");
 
    for (;;) {
+      int percent;
+      char cmd;
+      bool aborted = false;
+      int retval = 0;
+
+#ifdef HAVE_MINGW
+      // select only works on sockets on win32, so we must poll
+      for (unsigned int i = 0; !aborted && retval == 0 && i < 10; ++i)
+      {
+         while (kbhit())
+         {
+            aborted = true;
+            (void)getch();
+         }
+         if (!aborted)
+         {
+            COMMTIMEOUTS ct;
+            HANDLE h = (HANDLE)_get_osfhandle(ups->fd);
+            ct.ReadIntervalTimeout = MAXDWORD;
+            ct.ReadTotalTimeoutMultiplier = MAXDWORD;
+            ct.ReadTotalTimeoutConstant = 1000;
+            ct.WriteTotalTimeoutMultiplier = 0;
+            ct.WriteTotalTimeoutConstant = 0;
+            SetCommTimeouts(h, &ct);
+            retval = read(ups->fd, &cmd, 1);
+         }
+      }
+#else
       fd_set rfds;
       struct timeval tv;
-      int retval, percent;
-      char cmd;
 
       FD_ZERO(&rfds);
       FD_SET(ups->fd, &rfds);
@@ -1030,9 +1055,64 @@ static void monitor_calibration_progress(int monitor)
       errno = 0;
 
       retval = select((ups->fd) + 1, &rfds, NULL, NULL, &tv);
+      if (retval == -1 && (errno == EINTR || errno == EAGAIN))
+      {
+         continue;
+      }
+      else if (retval != 0)
+      {
+         if (FD_ISSET(STDIN_FILENO, &rfds))
+         {
+            /* *ANY* user input aborts the calibration */
+            read(STDIN_FILENO, &cmd, 1);
+            aborted = true;
+         }
+         else if(FD_ISSET(ups->fd, &rfds))
+         {
+            // UPS char
+            retval = read(ups->fd, &cmd, 1);
+         }
+      }
+#endif
 
-      switch (retval) {
-      case 0:
+      if (retval == -1)
+      {
+         pmsg("\nselect/read failure.\n");
+         terminate_calibration(0);
+         return;
+      }
+
+      if (aborted)
+      {
+         pmsg("\nUser input. Terminating calibration ...\n");
+         terminate_calibration(0);
+         return;
+      }
+
+      if (retval != 0)
+      {
+         if (cmd == '$') {
+            pmsg("\nBattery Runtime Calibration terminated by UPS.\n");
+            pmsg("Checking estimated runtime ...\n");
+            ans = smart_poll('j', ups);
+            if (*ans >= '0' && *ans <= '9') {
+               int rt = atoi(ans);
+
+               pmsg("Remaining runtime is %d minutes\n", rt);
+            } else {
+               pmsg("Unexpected response from UPS: %s\n", ans);
+            }
+            return;
+            /* ignore normal characters */
+         } else if (cmd == '!' || cmd == '+' || cmd == ' ' ||
+            cmd == '\n' || cmd == '\r') {
+            continue;
+         } else {
+            pmsg("\nUPS sent: %c\n", cmd);
+         }
+      }
+      else
+      {
          if (++count >= max_count) {
             ans = smart_poll('f', ups); /* Get battery charge */
             percent = (int)strtod(ans, NULL);
@@ -1061,49 +1141,8 @@ static void monitor_calibration_progress(int monitor)
             }
             count = 0;
          } else {
-            write(STDOUT_FILENO, &period, 1);
-         }
-         continue;
-
-      case -1:
-         if (errno == EINTR || errno == EAGAIN)
-            continue;
-
-         pmsg("\nSelect error. ERR=%s\n", strerror(errno));
-         return;
-
-      default:
-         break;
-      }
-
-      /* *ANY* user input aborts the calibration */
-      if (FD_ISSET(STDIN_FILENO, &rfds)) {
-         read(STDIN_FILENO, &cmd, 1);
-         pmsg("\nUser input. Terminating calibration ...\n");
-         terminate_calibration(0);
-         return;
-      }
-
-      if (FD_ISSET(ups->fd, &rfds)) {
-         read(ups->fd, &cmd, 1);
-         if (cmd == '$') {
-            pmsg("\nBattery Runtime Calibration terminated by UPS.\n");
-            pmsg("Checking estimated runtime ...\n");
-            ans = smart_poll('j', ups);
-            if (*ans >= '0' && *ans <= '9') {
-               int rt = atoi(ans);
-
-               pmsg("Remaining runtime is %d minutes\n", rt);
-            } else {
-               pmsg("Unexpected response from UPS: %s\n", ans);
-            }
-            return;
-            /* ignore normal characters */
-         } else if (cmd == '!' || cmd == '+' || cmd == ' ' ||
-            cmd == '\n' || cmd == '\r') {
-            continue;
-         } else {
-            pmsg("\nUPS sent: %c\n", cmd);
+            printf(".");
+            fflush(stdout);
          }
       }
    }
