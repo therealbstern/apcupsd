@@ -43,6 +43,7 @@
 #include "mapping.h"
 
 class astring;
+class ModbusComm;
 
 class ModbusUpsDriver: public UpsDriver
 {
@@ -85,47 +86,10 @@ private:
    bool UpdateCi(const CiInfo *info);
    bool UpdateCi(int ci);
 
-   // MODBUS constants
-   static const uint8_t DEFAULT_SLAVE_ADDR = 1;
-
-   // MODBUS timeouts
-   static const unsigned int MODBUS_INTERCHAR_TIMEOUT_MS = 25; // Spec is 15, increase for compatibility with USB serial dongles
-   static const unsigned int MODBUS_INTERFRAME_TIMEOUT_MS = 45; // Spec is 35, increase due to UPS missing messages occasionally
-   static const unsigned int MODBUS_IDLE_WAIT_TIMEOUT_MS = 100;
-   static const unsigned int MODBUS_RESPONSE_TIMEOUT_MS = 500;
-
-   // MODBUS function codes
-   static const uint8_t MODBUS_FC_ERROR = 0x80;
-   static const uint8_t MODBUS_FC_READ_HOLDING_REGS = 0x03;
-   static const uint8_t MODBUS_FC_WRITE_REG = 0x06;
-   static const uint8_t MODBUS_FC_WRITE_MULTIPLE_REGS = 0x10;
-
-   // MODBUS message sizes
-   static const unsigned int MODBUS_MAX_FRAME_SZ = 256;
-   static const unsigned int MODBUS_MAX_PDU_SZ = MODBUS_MAX_FRAME_SZ - 4;
-
-   typedef uint8_t ModbusFrame[MODBUS_MAX_FRAME_SZ];
-   typedef uint8_t ModbusPdu[MODBUS_MAX_PDU_SZ];
-
-   uint8_t *ReadRegister(uint16_t addr, unsigned int nregs);
-   bool WriteRegister(uint16_t reg, unsigned int nregs, const uint8_t *data);
-
-   bool SendAndWait(
-      uint8_t fc, 
-      const ModbusPdu *txpdu, unsigned int txsz, 
-      ModbusPdu *rxpdu, unsigned int rxsz);
-
-   bool ModbusTx(const ModbusFrame *frm, unsigned int sz);
-   bool ModbusRx(ModbusFrame *frm, unsigned int *sz);
-
-   bool ModbusWaitIdle();
-
-   uint16_t ModbusCrc(const uint8_t *data, unsigned int sz);
-
-   uint8_t _slaveaddr;
    struct termios _oldtio;
    struct termios _newtio;
    time_t _commlost_time;
+   ModbusComm *_comm;
 };
 
 #endif   /* _MODBUS_H */
