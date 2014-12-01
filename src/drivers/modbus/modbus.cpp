@@ -39,11 +39,7 @@
 #include "apc.h"
 #include "modbus.h"
 #include "astring.h"
-
-/* Win32 needs O_BINARY; sane platforms have never heard of it */
-#ifndef O_BINARY
-#define O_BINARY 0
-#endif
+#include "ModbusRs232Comm.h"
 
 using namespace APCModbusMapping;
 
@@ -101,8 +97,7 @@ const ModbusUpsDriver::CiInfo ModbusUpsDriver::CI_TABLE[] =
 };
 
 ModbusUpsDriver::ModbusUpsDriver(UPSINFO *ups) :
-   UpsDriver(ups),
-   _slaveaddr(DEFAULT_SLAVE_ADDR)
+   UpsDriver(ups)
 {
 }
 
@@ -186,74 +181,29 @@ bool ModbusUpsDriver::check_state()
 
 bool ModbusUpsDriver::Open()
 {
-   // Close if we're already open
-   if (_ups->fd != -1)
+   if (_comm)
    {
-      close(_ups->fd);
-      _ups->fd = -1;
+      _comm->Close();
+      delete _comm;
+      _comm = NULL;
    }
 
-   char *opendev = _ups->device;
-
-#ifdef HAVE_MINGW
-   // On Win32 add \\.\ UNC prefix to COMx in order to correctly address
-   // ports >= COM10.
-   char device[MAXSTRING];
-   if (!strnicmp(_ups->device, "COM", 3)) {
-      snprintf(device, sizeof(device), "\\\\.\\%s", _ups->device);
-      opendev = device;
-   }
-#endif
-
-   if ((_ups->fd = open(opendev, O_RDWR | O_NOCTTY | O_NDELAY | O_BINARY)) < 0)
-   {
-      Dmsg(0, "%s: open(\"%s\") fails: %s\n", __func__, 
-         opendev, strerror(errno));
-      return false;
-   }
-
-   /* Cancel the no delay we just set */
-   int cmd = fcntl(_ups->fd, F_GETFL, 0);
-   fcntl(_ups->fd, F_SETFL, cmd & ~O_NDELAY);
-
-   /* Save old settings */
-   tcgetattr(_ups->fd, &_oldtio);
-
-   _newtio.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
-   _newtio.c_iflag = IGNPAR;    /* Ignore errors, raw input */
-   _newtio.c_oflag = 0;         /* Raw output */
-   _newtio.c_lflag = 0;         /* No local echo */
-
-#if defined(HAVE_OPENBSD_OS) || \
-    defined(HAVE_FREEBSD_OS) || \
-    defined(HAVE_NETBSD_OS) || \
-    defined(HAVE_QNX_OS)
-   _newtio.c_ispeed = B9600;    /* Set input speed */
-   _newtio.c_ospeed = B9600;    /* Set output speed */
-#endif   /* __openbsd__ || __freebsd__ || __netbsd__  */
-
-   /* read() blocks until at least 1 char is received or 100ms btw chars */
-   _newtio.c_cc[VMIN] = 0;
-   _newtio.c_cc[VTIME] = 0;
-
-#if defined(HAVE_OSF1_OS) || \
-    defined(HAVE_LINUX_OS) || defined(HAVE_DARWIN_OS)
-   (void)cfsetospeed(&_newtio, B9600);
-   (void)cfsetispeed(&_newtio, B9600);
-#endif  /* do it the POSIX way */
-
-   tcflush(_ups->fd, TCIFLUSH);
-   tcsetattr(_ups->fd, TCSANOW, &_newtio);
-   tcflush(_ups->fd, TCIFLUSH);
-
-   return true;
+   _ups->fd = 1;
+   _comm = new ModbusRs232Comm();
+   return _comm->Open(_ups->device);
 }
 
 bool ModbusUpsDriver::Close()
 {
    write_lock(_ups);
-   
-   close(_ups->fd);
+
+   if (_comm)
+   {
+      _comm->Close();
+      delete _comm;
+      _comm = NULL;
+   }
+
    _ups->fd = -1;
 
    write_unlock(_ups);
@@ -267,7 +217,7 @@ bool ModbusUpsDriver::get_capabilities()
 {
    for (const CiInfo *info = CI_TABLE; info->reg; info++)
    {
-      uint8_t *data = ReadRegister(info->reg->addr, info->reg->nregs);
+      uint8_t *data = _comm->ReadRegister(info->reg->addr, info->reg->nregs);
       if (data)
       {
          _ups->UPS_Cap[info->ci] = true;
@@ -294,7 +244,7 @@ bool ModbusUpsDriver::UpdateCi(int ci)
 
 bool ModbusUpsDriver::UpdateCi(const CiInfo *info)
 {
-   uint8_t *data = ReadRegister(info->reg->addr, info->reg->nregs);
+   uint8_t *data = _comm->ReadRegister(info->reg->addr, info->reg->nregs);
    if (!data)
    {
       Dmsg(0, "%s: Failed reading %u/%u\n", __func__, 
@@ -658,425 +608,6 @@ bool ModbusUpsDriver::entry_point(int command, void *data)
    return true;
 }
 
-uint8_t *ModbusUpsDriver::ReadRegister(uint16_t reg, unsigned int nregs)
-{
-   ModbusPdu txpdu;
-   ModbusPdu rxpdu;
-   const unsigned int nbytes = nregs * sizeof(uint16_t);
-
-   Dmsg(50, "%s: reg=%u, nregs=%u\n", __func__, reg, nregs);
-
-   txpdu[0] = reg >> 8;
-   txpdu[1] = reg;
-   txpdu[2] = nregs >> 8;
-   txpdu[3] = nregs;
-
-   if (!SendAndWait(MODBUS_FC_READ_HOLDING_REGS, &txpdu, 4, 
-                    &rxpdu, nbytes+1))
-   {
-      return NULL;
-   }
-
-   if (rxpdu[0] != nbytes)
-   {
-      // Invalid size
-      Dmsg(0, "%s: Wrong number of data bytes received (exp=%u, rx=%u)\n", 
-         __func__, nbytes, rxpdu[0]);
-   }
-
-   uint8_t *ret = new uint8_t[nbytes];
-   memcpy(ret, rxpdu+1, nbytes);
-   return ret;
-}
-
-bool ModbusUpsDriver::WriteRegister(uint16_t reg, unsigned int nregs, const uint8_t *data)
-{
-   ModbusPdu txpdu;
-   ModbusPdu rxpdu;
-   const unsigned int nbytes = nregs * sizeof(uint16_t);
-
-   Dmsg(50, "%s: reg=%u, nregs=%u\n", __func__, reg, nregs);
-
-#if 0
-   txpdu[0] = reg >> 8;
-   txpdu[1] = reg;
-   txpdu[2] = data[0];
-   txpdu[3] = data[1];
-
-   if (!SendAndWait(MODBUS_FC_WRITE_REG, &txpdu, 4, &rxpdu, 4))
-   {
-      return false;
-   }
-#else
-   txpdu[0] = reg >> 8;
-   txpdu[1] = reg;
-   txpdu[2] = nregs >> 8;
-   txpdu[3] = nregs;
-   txpdu[4] = nbytes;
-   memcpy(txpdu+5, data, nbytes);
-
-   if (!SendAndWait(MODBUS_FC_WRITE_MULTIPLE_REGS, &txpdu, nbytes+5, &rxpdu, 4))
-   {
-      return false;
-   }
-
-   // Response should match first 4 bytes of command (reg and nregs)
-   if (memcmp(rxpdu, txpdu, 4))
-   {
-      // Did not write expected number of registers
-      Dmsg(0, "%s: Write failed reg=%u, nregs=%u, writereg=%u, writenregs=%u\n", 
-         __func__, reg, nregs, (rxpdu[0] << 8) | rxpdu[1], 
-         (rxpdu[2] << 8) | rxpdu[3]);
-      return false;
-   }
-#endif
-
-   return true;
-}
-
-bool ModbusUpsDriver::SendAndWait(
-   uint8_t fc, 
-   const ModbusPdu *txpdu, unsigned int txsz, 
-   ModbusPdu *rxpdu, unsigned int rxsz)
-{
-   ModbusFrame txfrm;
-   ModbusFrame rxfrm;
-   unsigned int sz;
-
-   // Ensure caller isn't trying to send an oversized PDU
-   if (txsz > MODBUS_MAX_PDU_SZ || rxsz > MODBUS_MAX_PDU_SZ)
-      return false;
-
-   // Prepend slave address and function code
-   txfrm[0] = _slaveaddr;
-   txfrm[1] = fc;
-
-   // Add PDU
-   memcpy(txfrm+2, txpdu, txsz);
-
-   // Calculate crc
-   uint16_t crc = ModbusCrc(txfrm, txsz+2);
-
-   // CRC goes out LSB first, unlike other MODBUS fields
-   txfrm[txsz+2] = crc;
-   txfrm[txsz+3] = crc >> 8;
-
-   int retries = 2;
-   do
-   {
-      if (!ModbusTx(&txfrm, txsz+4))
-      {
-         // Failure to send is immediately fatal
-         return false;
-      }
-
-      if (!ModbusRx(&rxfrm, &sz))
-      {
-         // Rx timeout: Retry
-         continue;
-      }
-
-      if (sz < 4)
-      {
-         // Runt frame: Retry
-         Dmsg(0, "%s: runt frame (%u)\n", __func__, sz);
-         continue;
-      }
-
-      crc = ModbusCrc(rxfrm, sz-2);
-      if (rxfrm[sz-2] != (crc & 0xff) ||
-          rxfrm[sz-1] != (crc >> 8))
-      {
-         // CRC error: Retry
-         Dmsg(0, "%s: CRC error\n", __func__);
-         continue;
-      }
-
-      if (rxfrm[0] != _slaveaddr)
-      {
-         // Not from expected slave: Retry
-         Dmsg(0, "%s: Bad address (exp=%u, rx=%u)\n", 
-            __func__, _slaveaddr, rxfrm[0]);
-         continue;
-      }
-
-      if (rxfrm[1] == (fc | MODBUS_FC_ERROR))
-      {
-         // Exception response: Immediately fatal
-         Dmsg(0, "%s: Exception (code=%u)\n", __func__, rxfrm[2]);
-         return false;
-      }
-
-      if (rxfrm[1] != fc)
-      {
-         // Unknown response: Retry
-         Dmsg(0, "%s: Unexpected response 0x%02x\n", __func__, rxfrm[1]);
-         continue;
-      }
-
-      if (sz != rxsz+4)
-      {
-         // Wrong size: Retry
-         Dmsg(0, "%s: Wrong size (exp=%u, rx=%x)\n", __func__, rxsz+4, sz);
-         continue;
-      }
-
-      // Everything is ok
-      memcpy(rxpdu, rxfrm+2, rxsz);
-      return true;
-   }
-   while (retries--);
-
-   // Retries exhausted
-   Dmsg(0, "%s: Retries exhausted\n", __func__);
-   return false;
-}
-
-bool ModbusUpsDriver::ModbusTx(const ModbusFrame *frm, unsigned int sz)
-{
-   // Wait for line to become idle
-   if (!ModbusWaitIdle())
-      return false;
-
-   Dmsg(100, "%s: Sending frame\n", __func__);
-   hex_dump(100, frm, sz);
-
-   // Write frame
-   int rc = write(_ups->fd, frm, sz);
-   if (rc == -1)
-   {
-      Dmsg(0, "%s: write() fails: %s\n", __func__, strerror(errno));
-      return false;
-   }
-   else if ((unsigned int)rc != sz)
-   {
-      Dmsg(0, "%s: write() short (%d of %u)\n", __func__, rc, sz);
-      return false;
-   }
-
-   return true;
-}
-
-bool ModbusUpsDriver::ModbusRx(ModbusFrame *frm, unsigned int *sz)
-{
-#ifdef HAVE_MINGW
-   // Set read timeout since we have no select() support
-   COMMTIMEOUTS ct;
-   HANDLE h = (HANDLE)_get_osfhandle(_ups->fd);
-   ct.ReadIntervalTimeout = MODBUS_INTERCHAR_TIMEOUT_MS;
-   ct.ReadTotalTimeoutMultiplier = 0;
-   ct.ReadTotalTimeoutConstant = MODBUS_RESPONSE_TIMEOUT_MS;
-   ct.WriteTotalTimeoutMultiplier = 0;
-   ct.WriteTotalTimeoutConstant = 0;
-   SetCommTimeouts(h, &ct);
-
-   int rc = read(_ups->fd, frm, MODBUS_MAX_FRAME_SZ);
-   if (rc == -1)
-   {
-      // Fatal read error
-      Dmsg(0, "%s: read() fails: %s\n", __func__, strerror(errno));
-      return false;
-   }
-   else if (rc == 0)
-   {
-      // Timeout
-      Dmsg(0, "%s: timeout\n", __func__);
-      return false;
-   }
-
-   Dmsg(100, "%s: Received frame\n", __func__);
-   hex_dump(100, frm, rc);
-
-   // Received a message ok
-   *sz = rc;
-   return true;
-#else
-   unsigned int nread = 0;
-   unsigned int timeout = MODBUS_RESPONSE_TIMEOUT_MS;
-   struct timeval tv;
-   fd_set fds;
-   int rc;
-
-   while(1)
-   {
-      // Wait for character(s) to be available for reading
-      do
-      {
-         FD_ZERO(&fds);
-         FD_SET(_ups->fd, &fds);
-
-         tv.tv_sec = timeout / 1000;
-         tv.tv_usec = (timeout % 1000) * 1000;
-
-//Dmsg(0, "%s: enter...\n", __func__);
-         rc = select(_ups->fd+1, &fds, NULL, NULL, &tv);
-//Dmsg(0, "%s: ...exit\n", __func__);
-      }
-      while (rc == -1 && (errno == EAGAIN || errno == EINTR));
-
-      if (rc == -1)
-      {
-         // fatal select() error
-         Dmsg(0, "%s: select() failed: %s\n", __func__, strerror(errno));
-         return false;
-      }
-      else if (rc == 0)
-      {
-         // If we've received some characters, this is simply the inter-char
-         // timeout signalling the end of the frame...i.e. the success case
-         if (nread)
-         {
-
-   Dmsg(100, "%s: Received frame\n", __func__);
-   hex_dump(100, frm, nread);
-
-            *sz = nread;
-            return true;
-         }
-
-         // No chars read yet so this is a fatal timeout
-         Dmsg(0, "%s: -------------------TIMEOUT\n", __func__);
-         return false;
-      }
-
-      // Received at least 1 character so switch to inter-char timeout
-      timeout = MODBUS_INTERCHAR_TIMEOUT_MS;
-
-      // Read characters
-      int rc = read(_ups->fd, *frm+nread, MODBUS_MAX_FRAME_SZ-nread);
-      if (rc == -1)
-      {
-         // Fatal read error
-         Dmsg(0, "%s: read() fails: %s\n", __func__, strerror(errno));
-         return false;
-      }
-      nread += rc;
-
-if (rc == 0)
-{
-         Dmsg(0, "%s: 0-length read\n", __func__);
-}
-
-      // Check for max message size
-      if (nread == MODBUS_MAX_FRAME_SZ)
-      {
-         *sz = nread;
-         return true;
-      }
-   }
-#endif
-}
-
-uint16_t ModbusUpsDriver::ModbusCrc(const uint8_t *data, unsigned int sz)
-{
-   // 1 + x^2 + x^15 + x^16
-   static const uint16_t MODBUS_CRC_POLY = 0xA001; 
-   uint16_t crc = 0xffff;
-
-   while (sz--)
-   {
-      crc ^= *data++;
-      for (unsigned int i = 0; i < 8; ++i)
-      {
-         if (crc & 0x1)
-            crc = (crc >> 1) ^ MODBUS_CRC_POLY;
-         else
-            crc >>= 1;
-      }
-   }
-
-   return crc;
-}
-
-bool ModbusUpsDriver::ModbusWaitIdle()
-{
-   // Determine when we need to exit by
-   struct timeval exittime, now;
-   gettimeofday(&exittime, NULL);
-   exittime.tv_sec += MODBUS_IDLE_WAIT_TIMEOUT_MS / 1000;
-   exittime.tv_usec += (MODBUS_IDLE_WAIT_TIMEOUT_MS % 1000) * 1000;
-   if (exittime.tv_usec >= 1000000)
-   {
-      exittime.tv_sec++;
-      exittime.tv_usec -= 1000000;
-   }
-
-#ifdef HAVE_MINGW
-   // Set read timeout since we have no select() support
-   COMMTIMEOUTS ct;
-   HANDLE h = (HANDLE)_get_osfhandle(_ups->fd);
-   ct.ReadIntervalTimeout = MAXDWORD;
-   ct.ReadTotalTimeoutMultiplier = MAXDWORD;
-   ct.ReadTotalTimeoutConstant = MODBUS_INTERFRAME_TIMEOUT_MS;
-   ct.WriteTotalTimeoutMultiplier = 0;
-   ct.WriteTotalTimeoutConstant = 0;
-   SetCommTimeouts(h, &ct);
-#endif
-
-   while (1)
-   {
-      unsigned char tmp;
-
-#ifdef HAVE_MINGW
-      int rc = read(_ups->fd, &tmp, 1);
-      if (rc == 0)
-      {
-         // timeout: line is now idle
-         return true;
-      }
-      else if (rc == -1)
-      {
-         // fatal read error
-         Dmsg(0, "%s: read() failed: %s\n", __func__, strerror(errno));
-         return false;
-      }
-
-      // char received: unexpected...
-      Dmsg(100, "%s: Discarding unexpected character 0x%x\n",
-         __func__, tmp);
-#else
-      fd_set fds;
-      FD_ZERO(&fds);
-      FD_SET(_ups->fd, &fds);
-
-      struct timeval timeout;
-      timeout.tv_sec = MODBUS_INTERFRAME_TIMEOUT_MS / 1000;
-      timeout.tv_usec = (MODBUS_INTERFRAME_TIMEOUT_MS % 1000) * 1000;
-//Dmsg(0, "%s: enter...\n", __func__);
-      int rc = select(_ups->fd+1, &fds, NULL, NULL, &timeout);
-      if (rc == 0)
-      {
-         // timeout: line is now idle
-//Dmsg(0, "%s: ...exit\n", __func__);
-         return true;
-      }
-      else if (rc == -1 && errno != EINTR && errno != EAGAIN)
-      {
-         // fatal select() error
-         Dmsg(0, "%s: select() failed: %s\n", __func__, strerror(errno));
-         return false;
-      }
-      else if (rc == 1)
-      {
-         // char received: unexpected...
-         read(_ups->fd, &tmp, 1);
-         Dmsg(100, "%s: Discarding unexpected character 0x%x\n",
-            __func__, tmp);
-      }
-#endif
-
-      gettimeofday(&now, NULL);
-      if (now.tv_sec > exittime.tv_sec ||
-          (now.tv_sec == exittime.tv_sec &&
-           now.tv_usec >= exittime.tv_usec))
-      {
-         // Line did not become idle soon enough
-         Dmsg(0, "%s: Timeout\n", __func__);
-         return false;
-      }
-   }
-}
-
 bool ModbusUpsDriver::write_string_to_ups(const APCModbusMapping::RegInfo &reg, const char *str)
 {
    if (reg.type != DT_STRING)
@@ -1096,7 +627,7 @@ bool ModbusUpsDriver::write_string_to_ups(const APCModbusMapping::RegInfo &reg, 
          strcpy += ' ';
    }
 
-   return WriteRegister(reg.addr, reg.nregs, (const uint8_t*)strcpy.str());
+   return _comm->WriteRegister(reg.addr, reg.nregs, (const uint8_t*)strcpy.str());
 }
 
 bool ModbusUpsDriver::write_int_to_ups(const APCModbusMapping::RegInfo &reg, uint64_t val)
@@ -1109,7 +640,7 @@ bool ModbusUpsDriver::write_int_to_ups(const APCModbusMapping::RegInfo &reg, uin
    for (unsigned int i = 0; i < len; ++i)
       data[i] = val >> (8*(len-i-1));
 
-   return WriteRegister(reg.addr, reg.nregs, data);
+   return _comm->WriteRegister(reg.addr, reg.nregs, data);
 }
 
 bool ModbusUpsDriver::read_string_from_ups(const APCModbusMapping::RegInfo &reg, astring *val)
@@ -1118,7 +649,7 @@ bool ModbusUpsDriver::read_string_from_ups(const APCModbusMapping::RegInfo &reg,
       return false;
 
    unsigned int len = reg.nregs * sizeof(uint16_t);
-   uint8_t *data = ReadRegister(reg.addr, reg.nregs);
+   uint8_t *data = _comm->ReadRegister(reg.addr, reg.nregs);
    if (!data)
       return false;
 
@@ -1146,7 +677,7 @@ bool ModbusUpsDriver::read_int_from_ups(const APCModbusMapping::RegInfo &reg, ui
       return false;
 
    unsigned int len = reg.nregs * sizeof(uint16_t);
-   uint8_t *data = ReadRegister(reg.addr, reg.nregs);
+   uint8_t *data = _comm->ReadRegister(reg.addr, reg.nregs);
    if (!data)
       return false;
 
