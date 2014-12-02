@@ -81,34 +81,32 @@ bool ModbusRs232Comm::Open(const char *path)
    if (cmd != -1)
       (void)fcntl(_fd, F_SETFL, cmd & ~O_NDELAY);
 
-   /* Save old settings */
-   tcgetattr(_fd, &_oldtio);
-
-   _newtio.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
-   _newtio.c_iflag = IGNPAR;    /* Ignore errors, raw input */
-   _newtio.c_oflag = 0;         /* Raw output */
-   _newtio.c_lflag = 0;         /* No local echo */
+   struct termios newtio;
+   newtio.c_cflag = B9600 | CS8 | CLOCAL | CREAD;
+   newtio.c_iflag = IGNPAR;    /* Ignore errors, raw input */
+   newtio.c_oflag = 0;         /* Raw output */
+   newtio.c_lflag = 0;         /* No local echo */
 
 #if defined(HAVE_OPENBSD_OS) || \
     defined(HAVE_FREEBSD_OS) || \
     defined(HAVE_NETBSD_OS) || \
     defined(HAVE_QNX_OS)
-   _newtio.c_ispeed = B9600;    /* Set input speed */
-   _newtio.c_ospeed = B9600;    /* Set output speed */
+   newtio.c_ispeed = B9600;    /* Set input speed */
+   newtio.c_ospeed = B9600;    /* Set output speed */
 #endif   /* __openbsd__ || __freebsd__ || __netbsd__  */
 
    /* read() blocks until at least 1 char is received or 100ms btw chars */
-   _newtio.c_cc[VMIN] = 0;
-   _newtio.c_cc[VTIME] = 0;
+   newtio.c_cc[VMIN] = 0;
+   newtio.c_cc[VTIME] = 0;
 
 #if defined(HAVE_OSF1_OS) || \
     defined(HAVE_LINUX_OS) || defined(HAVE_DARWIN_OS)
-   (void)cfsetospeed(&_newtio, B9600);
-   (void)cfsetispeed(&_newtio, B9600);
+   (void)cfsetospeed(&newtio, B9600);
+   (void)cfsetispeed(&newtio, B9600);
 #endif  /* do it the POSIX way */
 
    tcflush(_fd, TCIFLUSH);
-   tcsetattr(_fd, TCSANOW, &_newtio);
+   tcsetattr(_fd, TCSANOW, &newtio);
    tcflush(_fd, TCIFLUSH);
 
    return true;
