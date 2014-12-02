@@ -78,7 +78,8 @@ bool ModbusRs232Comm::Open(const char *path)
 
    /* Cancel the no delay we just set */
    int cmd = fcntl(_fd, F_GETFL, 0);
-   fcntl(_fd, F_SETFL, cmd & ~O_NDELAY);
+   if (cmd != -1)
+      (void)fcntl(_fd, F_SETFL, cmd & ~O_NDELAY);
 
    /* Save old settings */
    tcgetattr(_fd, &_oldtio);
