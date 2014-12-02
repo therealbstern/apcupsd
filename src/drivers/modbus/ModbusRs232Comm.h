@@ -43,8 +43,6 @@ private:
 
    bool ModbusWaitIdle();
 
-   struct termios _oldtio;
-   struct termios _newtio;
    int _fd;
 };
 
