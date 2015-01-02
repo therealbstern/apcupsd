@@ -110,6 +110,9 @@
 /* Define if building MODBUS driver */
 #undef HAVE_MODBUS_DRIVER
 
+/* Define if building MODBUS/USB driver */
+#undef HAVE_MODBUS_USB_DRIVER
+
 /* Define if you have nameser.h */
 #undef HAVE_NAMESER_H
 

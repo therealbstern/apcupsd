@@ -669,7 +669,10 @@ GAPCMON_LIBS
 GAPCMON_CFLAGS
 PKG_CONFIG
 NISIP
+usbcfg
+LIBUSBH
 MODBUS_DRIVER
+MODBUS_USB_DRIVER
 PCNET_DRIVER
 TEST_DRIVER
 SNMP_DRIVER
@@ -677,8 +680,6 @@ SNMPLITE_DRIVER
 NET_DRIVER
 USB_TYPE
 USB_DRIVER
-usbcfg
-LIBUSBH
 LIBUSBHIDINC
 LIBUSBHID
 DUMB_DRIVER
@@ -804,6 +805,7 @@ enable_snmp
 enable_net_snmp
 enable_test
 enable_pcnet
+enable_modbus_usb
 enable_modbus
 with_nisip
 with_cgi_bin
@@ -1492,6 +1494,9 @@ Optional Features:
 
   --enable-pcnet          Compile PCNET driver code (default)
   --disable-pcnet         No PCNET driver
+
+  --enable-modbus-usb     Compile MODBUS/USB driver code
+  --disable-modbus-usb    No MODBUS/USB driver (default)
 
   --enable-modbus         Compile MODBUS driver code (default)
   --disable-modbus        No MODBUS driver
@@ -10529,6 +10534,7 @@ if test "${enable_all+set}" = set; then
       enable_test=yes
       enable_pcnet=yes
       enable_modbus=yes
+      enable_modbus_usb=yes
       enable_cgi=yes
       if test "$host_os" != "mingw32" ; then
          enable_gapcmon=yes
@@ -11469,151 +11475,9 @@ $as_echo "Using Linux USB driver." >&6; }
             { $as_echo "$as_me:$LINENO: result: Using BSD USB driver." >&5
 $as_echo "Using BSD USB driver." >&6; }
             ;;
-         *-*-mingw*)
-            LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
-            LIBUSBHID=libusbhid
-            APCDRVLIBS="$APCDRVLIBS \$(topdir)/src/libusbhid/libusbhid.a"
-
-
-            USB_TYPE="generic"
-            LIBUSBH=libusb-winusb-bridge.h
-
-            DRVLIBS="$DRVLIBS -lsetupapi"
-            { $as_echo "$as_me:$LINENO: result: Using generic winusb USB driver." >&5
-$as_echo "Using generic winusb USB driver." >&6; }
-            ;;
          *)
-                        # Extract the first word of "libusb-config", so it can be a program name with args.
-set dummy libusb-config; ac_word=$2
-{ $as_echo "$as_me:$LINENO: checking for $ac_word" >&5
-$as_echo_n "checking for $ac_word... " >&6; }
-if test "${ac_cv_path_usbcfg+set}" = set; then
-  $as_echo_n "(cached) " >&6
-else
-  case $usbcfg in
-  [\\/]* | ?:[\\/]*)
-  ac_cv_path_usbcfg="$usbcfg" # Let the user override the test with a path.
-  ;;
-  *)
-  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
-for as_dir in $PATH
-do
-  IFS=$as_save_IFS
-  test -z "$as_dir" && as_dir=.
-  for ac_exec_ext in '' $ac_executable_extensions; do
-  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
-    ac_cv_path_usbcfg="$as_dir/$ac_word$ac_exec_ext"
-    $as_echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
-    break 2
-  fi
-done
-done
-IFS=$as_save_IFS
-
-  ;;
-esac
-fi
-usbcfg=$ac_cv_path_usbcfg
-if test -n "$usbcfg"; then
-  { $as_echo "$as_me:$LINENO: result: $usbcfg" >&5
-$as_echo "$usbcfg" >&6; }
-else
-  { $as_echo "$as_me:$LINENO: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
-            if test x$usbcfg != x ; then
-               LIBUSB=`$usbcfg --libs`
-               LIBUSBH=`$usbcfg --prefix`/include/usb.h
-            else
-               { $as_echo "$as_me:$LINENO: checking for usb_init in -lusb" >&5
-$as_echo_n "checking for usb_init in -lusb... " >&6; }
-if test "${ac_cv_lib_usb_usb_init+set}" = set; then
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lusb $DRVLIBS $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char usb_init ();
-int
-main ()
-{
-return usb_init ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_c_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext && {
-	 test "$cross_compiling" = yes ||
-	 $as_test_x conftest$ac_exeext
-       }; then
-  ac_cv_lib_usb_usb_init=yes
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_cv_lib_usb_usb_init=no
-fi
-
-rm -rf conftest.dSYM
-rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:$LINENO: result: $ac_cv_lib_usb_usb_init" >&5
-$as_echo "$ac_cv_lib_usb_usb_init" >&6; }
-if test "x$ac_cv_lib_usb_usb_init" = x""yes; then
-  LIBUSB=-lusb
-                             LIBUSBH=usb.h
-else
-  { { $as_echo "$as_me:$LINENO: error: Unable to find libusb" >&5
-$as_echo "$as_me: error: Unable to find libusb" >&2;}
-   { (exit 1); exit 1; }; }
-fi
-
-            fi
-
-
-
-            LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
-            LIBUSBHID=libusbhid
-            DRVLIBS="$DRVLIBS $LIBUSB"
-            APCDRVLIBS="$APCDRVLIBS \$(topdir)/src/libusbhid/libusbhid.a"
-
-
+            needlibusb=true
             USB_TYPE="generic"
-            { $as_echo "$as_me:$LINENO: result: Using generic libusb USB driver." >&5
-$as_echo "Using generic libusb USB driver." >&6; }
             ;;
       esac
 
@@ -11964,6 +11828,22 @@ _ACEOF
 fi
 
 
+# Check whether --enable-modbus-usb was given.
+if test "${enable_modbus_usb+set}" = set; then
+  enableval=$enable_modbus_usb;  if test "$enableval" = "yes" ; then
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_MODBUS_USB_DRIVER /**/
+_ACEOF
+
+        MODBUS_USB_DRIVER="modbus-usb"
+
+        enable_modbus=yes
+        needlibusb=true
+     fi
+fi
+
+
 # Check whether --enable-modbus was given.
 if test "${enable_modbus+set}" = set; then
   enableval=$enable_modbus;  if test "$enableval" = "yes" ; then
@@ -11984,6 +11864,155 @@ _ACEOF
 
 fi
 
+
+if test "$needlibusb" = "true" ; then
+   case $host in
+      *-*-mingw*)
+         LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
+         LIBUSBHID=libusbhid
+         APCDRVLIBS="$APCDRVLIBS \$(topdir)/src/libusbhid/libusbhid.a"
+
+
+         LIBUSBH=libusb-winusb-bridge.h
+
+         DRVLIBS="$DRVLIBS -lsetupapi"
+         { $as_echo "$as_me:$LINENO: result: Using generic winusb USB driver." >&5
+$as_echo "Using generic winusb USB driver." >&6; }
+         ;;
+      *)
+                  # Extract the first word of "libusb-config", so it can be a program name with args.
+set dummy libusb-config; ac_word=$2
+{ $as_echo "$as_me:$LINENO: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if test "${ac_cv_path_usbcfg+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  case $usbcfg in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_usbcfg="$usbcfg" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+  for ac_exec_ext in '' $ac_executable_extensions; do
+  if { test -f "$as_dir/$ac_word$ac_exec_ext" && $as_test_x "$as_dir/$ac_word$ac_exec_ext"; }; then
+    ac_cv_path_usbcfg="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:$LINENO: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+done
+IFS=$as_save_IFS
+
+  ;;
+esac
+fi
+usbcfg=$ac_cv_path_usbcfg
+if test -n "$usbcfg"; then
+  { $as_echo "$as_me:$LINENO: result: $usbcfg" >&5
+$as_echo "$usbcfg" >&6; }
+else
+  { $as_echo "$as_me:$LINENO: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+         if test x$usbcfg != x ; then
+            LIBUSB=`$usbcfg --libs`
+            LIBUSBH=`$usbcfg --prefix`/include/usb.h
+         else
+            { $as_echo "$as_me:$LINENO: checking for usb_init in -lusb" >&5
+$as_echo_n "checking for usb_init in -lusb... " >&6; }
+if test "${ac_cv_lib_usb_usb_init+set}" = set; then
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lusb $DRVLIBS $LIBS"
+cat >conftest.$ac_ext <<_ACEOF
+/* confdefs.h.  */
+_ACEOF
+cat confdefs.h >>conftest.$ac_ext
+cat >>conftest.$ac_ext <<_ACEOF
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char usb_init ();
+int
+main ()
+{
+return usb_init ();
+  ;
+  return 0;
+}
+_ACEOF
+rm -f conftest.$ac_objext conftest$ac_exeext
+if { (ac_try="$ac_link"
+case "(($ac_try" in
+  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
+  *) ac_try_echo=$ac_try;;
+esac
+eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
+$as_echo "$ac_try_echo") >&5
+  (eval "$ac_link") 2>conftest.er1
+  ac_status=$?
+  grep -v '^ *+' conftest.er1 >conftest.err
+  rm -f conftest.er1
+  cat conftest.err >&5
+  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
+  (exit $ac_status); } && {
+	 test -z "$ac_c_werror_flag" ||
+	 test ! -s conftest.err
+       } && test -s conftest$ac_exeext && {
+	 test "$cross_compiling" = yes ||
+	 $as_test_x conftest$ac_exeext
+       }; then
+  ac_cv_lib_usb_usb_init=yes
+else
+  $as_echo "$as_me: failed program was:" >&5
+sed 's/^/| /' conftest.$ac_ext >&5
+
+	ac_cv_lib_usb_usb_init=no
+fi
+
+rm -rf conftest.dSYM
+rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
+      conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:$LINENO: result: $ac_cv_lib_usb_usb_init" >&5
+$as_echo "$ac_cv_lib_usb_usb_init" >&6; }
+if test "x$ac_cv_lib_usb_usb_init" = x""yes; then
+  LIBUSB=-lusb
+                          LIBUSBH=usb.h
+else
+  { { $as_echo "$as_me:$LINENO: error: Unable to find libusb" >&5
+$as_echo "$as_me: error: Unable to find libusb" >&2;}
+   { (exit 1); exit 1; }; }
+fi
+
+         fi
+
+
+
+         LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
+         LIBUSBHID=libusbhid
+         DRVLIBS="$DRVLIBS $LIBUSB"
+         APCDRVLIBS="$APCDRVLIBS \$(topdir)/src/libusbhid/libusbhid.a"
+
+
+         { $as_echo "$as_me:$LINENO: result: Using generic libusb USB driver." >&5
+$as_echo "Using generic libusb USB driver." >&6; }
+         ;;
+   esac
+fi
 
 
 cat >>confdefs.h <<\_ACEOF
@@ -14813,7 +14842,7 @@ Configuration on `date`:
   UPSTYPE                     ${UPSTYPE}
   UPSCABLE                    ${UPSCABLE}
 
-  drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${DISPLAY_USB_DRIVER:-no-usb} ${DISPLAY_SNMP_DRIVER:-no-snmp} ${DISPLAY_NETSNMP_DRIVER:-no-net-snmp} ${PCNET_DRIVER:-no-pcnet} ${MODBUS_DRIVER:-no-modbus} ${TEST_DRIVER:-no-test}
+  drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${DISPLAY_USB_DRIVER:-no-usb} ${DISPLAY_SNMP_DRIVER:-no-snmp} ${DISPLAY_NETSNMP_DRIVER:-no-net-snmp} ${PCNET_DRIVER:-no-pcnet} ${MODBUS_DRIVER:-no-modbus} ${MODBUS_USB_DRIVER:-no-modbus-usb} ${TEST_DRIVER:-no-test}
 
   enable-nis:                 ${NISSRV_ENABLED}
   with-nisip:                 ${NISIP}
