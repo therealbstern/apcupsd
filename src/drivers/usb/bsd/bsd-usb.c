@@ -27,7 +27,6 @@
 #include "apc.h"
 #include "hidutils.h"
 #include "bsd-usb.h"
-#include "../usb_common.h"
 #include <dev/usb/usb.h>
 #include <dev/usb/usbhid.h>
 
