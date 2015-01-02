@@ -35,7 +35,6 @@
 #define HID_MAX_USAGES 1024
 
 #include "apc.h"
-#include "../usb_common.h"
 #include "linux-usb.h"
 #include <glob.h>
 #include <linux/usbdevice_fs.h>

@@ -738,13 +738,7 @@ dnl If USB or MODBUS driver need libusb, handle it now
 if test "$needlibusb" = "true" ; then
    case $host in
       *-*-mingw*)
-         LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
-         LIBUSBHID=libusbhid
-         APCDRVLIBS="$APCDRVLIBS \$(topdir)/src/libusbhid/libusbhid.a"
-         AC_SUBST(LIBUSBHID)
-         AC_SUBST(LIBUSBHIDINC)
          LIBUSBH=libusb-winusb-bridge.h
-         AC_SUBST(LIBUSBH)
          DRVLIBS="$DRVLIBS -lsetupapi"
          AC_MSG_RESULT([Using generic winusb USB driver.])
          ;;
@@ -762,17 +756,17 @@ if test "$needlibusb" = "true" ; then
                          [$DRVLIBS])
          fi
 
-         AC_SUBST(LIBUSBH)
-
-         LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
-         LIBUSBHID=libusbhid
          DRVLIBS="$DRVLIBS $LIBUSB"
-         APCDRVLIBS="$APCDRVLIBS \$(topdir)/src/libusbhid/libusbhid.a"
-         AC_SUBST(LIBUSBHID)
-         AC_SUBST(LIBUSBHIDINC)
          AC_MSG_RESULT([Using generic libusb USB driver.])
          ;;
    esac
+
+   AC_SUBST(LIBUSBH)
+   LIBUSBHID=libusbhid
+   AC_SUBST(LIBUSBHID)
+   APCDRVLIBS="$APCDRVLIBS \$(topdir)/src/libusbhid/libusbhid.a"
+   CPPFLAGS="$CPPFLAGS -I\$(topdir)/src/libusbhid"
+   LIBEXTRAOBJ="$LIBEXTRAOBJ HidUps.cpp"
 fi
 
 dnl Force NIS to enabled since libnis is required by apcaccess.
@@ -1417,10 +1411,10 @@ GENERATE_FILES="\
    examples/safe.apccontrol \
    $DFILES"
 
-if test "$USB_TYPE"x = "generic"x
+if test "$needlibusb"x = "true"x
 then
    GENERATE_FILES="$GENERATE_FILES \
-   src/drivers/usb/generic/libusb.h"
+   include/libusb.h"
 fi
 
 if test "$ENABLE_CGI" = "yes"

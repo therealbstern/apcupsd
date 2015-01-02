@@ -669,8 +669,8 @@ GAPCMON_LIBS
 GAPCMON_CFLAGS
 PKG_CONFIG
 NISIP
-usbcfg
 LIBUSBH
+usbcfg
 MODBUS_DRIVER
 MODBUS_USB_DRIVER
 PCNET_DRIVER
@@ -11868,13 +11868,7 @@ fi
 if test "$needlibusb" = "true" ; then
    case $host in
       *-*-mingw*)
-         LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
-         LIBUSBHID=libusbhid
-         APCDRVLIBS="$APCDRVLIBS \$(topdir)/src/libusbhid/libusbhid.a"
-
-
          LIBUSBH=libusb-winusb-bridge.h
-
          DRVLIBS="$DRVLIBS -lsetupapi"
          { $as_echo "$as_me:$LINENO: result: Using generic winusb USB driver." >&5
 $as_echo "Using generic winusb USB driver." >&6; }
@@ -12000,18 +11994,18 @@ fi
 
          fi
 
-
-
-         LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
-         LIBUSBHID=libusbhid
          DRVLIBS="$DRVLIBS $LIBUSB"
-         APCDRVLIBS="$APCDRVLIBS \$(topdir)/src/libusbhid/libusbhid.a"
-
-
          { $as_echo "$as_me:$LINENO: result: Using generic libusb USB driver." >&5
 $as_echo "Using generic libusb USB driver." >&6; }
          ;;
    esac
+
+
+   LIBUSBHID=libusbhid
+
+   APCDRVLIBS="$APCDRVLIBS \$(topdir)/src/libusbhid/libusbhid.a"
+   CPPFLAGS="$CPPFLAGS -I\$(topdir)/src/libusbhid"
+   LIBEXTRAOBJ="$LIBEXTRAOBJ HidUps.cpp"
 fi
 
 
@@ -13539,10 +13533,10 @@ GENERATE_FILES="\
    examples/safe.apccontrol \
    $DFILES"
 
-if test "$USB_TYPE"x = "generic"x
+if test "$needlibusb"x = "true"x
 then
    GENERATE_FILES="$GENERATE_FILES \
-   src/drivers/usb/generic/libusb.h"
+   include/libusb.h"
 fi
 
 if test "$ENABLE_CGI" = "yes"
