@@ -1,7 +1,7 @@
 /*
- * modbus.cpp
+ * ModbusUsbComm.cpp
  *
- * Driver for APC MODBUS protocol
+ * USB communication layer for MODBUS driver
  */
 
 /*
