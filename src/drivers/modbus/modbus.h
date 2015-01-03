@@ -86,8 +86,6 @@ private:
    bool UpdateCi(const CiInfo *info);
    bool UpdateCi(int ci);
 
-   struct termios _oldtio;
-   struct termios _newtio;
    time_t _commlost_time;
    ModbusComm *_comm;
 };
