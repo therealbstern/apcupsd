@@ -333,6 +333,31 @@ int usb_interrupt_read(usb_dev_handle *dev, int ep, char *bytes, int size,
    return tmp;
 }
 
+int usb_interrupt_write(usb_dev_handle *dev, int ep, char *bytes, int size, 
+                       int timeout)
+{
+   // Set timeout on endpoint
+   // It might be more efficient to use async i/o here, but MS docs imply that
+   // you have to create a new sync object for every call, which doesn't seem
+   // efficient at all. So just set the pipe timeout and use sync i/o.
+   ULONG tmp = timeout;
+   if (!WinUsb_SetPipePolicy(dev->fd, ep, PIPE_TRANSFER_TIMEOUT, sizeof(tmp), &tmp))
+      return -EINVAL;
+
+   // Perform transfer
+   tmp = 0;
+   if (!WinUsb_WritePipe(dev->fd, ep, (unsigned char*)bytes, size, &tmp, NULL))
+   {
+      tmp = GetLastError();
+      if (tmp == ERROR_SEM_TIMEOUT)
+         return -LIBUSB_ETIMEDOUT;
+      else
+         return -EINVAL;
+   }
+
+   return tmp;
+}
+
 char *usb_strerror(void)
 {
    static char buf[256];
