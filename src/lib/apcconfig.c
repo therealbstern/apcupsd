@@ -747,9 +747,10 @@ jump_into_the_loop:
 
    // Sanitize cable type & UPS mode. Since UPSTYPE (aka mode) and UPSCABLE
    // can contradict eachother, the rule is that UPSTYPE wins. In all cases
-   // except Dumb we can determine cable type from mode so we ignore user's 
-   // configured UPSCABLE and force it ourselves. In the case of Dumb UPSes we 
-   // just ensure they picked a simple cable type.
+   // except Dumb and MODBUS we can determine cable type from mode so we ignore 
+   // user's configured UPSCABLE and force it ourselves. In the case of Dumb 
+   // UPSes we just ensure they picked a simple cable type and for MODBUS we
+   // ensure they picked a smart (or USB) cable type.
    switch (ups->mode.type)
    {
    case USB_UPS:
@@ -762,6 +763,10 @@ jump_into_the_loop:
       match_range(ups, WHERE(cable), cables, "ether");
       break;
    case MODBUS_UPS:
+      // Abort if user specified MODBUS UPS type with dumb cable
+      if (ups->cable.type < CABLE_SMART)
+         Error_abort("Invalid cable specified for MODBUS UPS\n");
+       break;
    case APCSMART_UPS:
       match_range(ups, WHERE(cable), cables, "smart");
       break;
