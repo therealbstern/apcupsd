@@ -3,7 +3,10 @@ include $(topdir)/autoconf/targets.mak
 
 SRCS = $(wildcard *.cpp)
 
-all-targets: $(OBJS)
+all-targets: libmodbusdrv.a
+
+libmodbusdrv.a: $(OBJS)
+	$(MAKELIB)
 
 # Include dependencies
 -include $(DEPS)
