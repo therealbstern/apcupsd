@@ -41,6 +41,10 @@
 #include "astring.h"
 #include "ModbusRs232Comm.h"
 
+#ifdef HAVE_MODBUS_USB_DRIVER
+#include "ModbusUsbComm.h"
+#endif
+
 using namespace APCModbusMapping;
 
 const ModbusUpsDriver::CiInfo ModbusUpsDriver::CI_TABLE[] =
@@ -97,7 +101,8 @@ const ModbusUpsDriver::CiInfo ModbusUpsDriver::CI_TABLE[] =
 };
 
 ModbusUpsDriver::ModbusUpsDriver(UPSINFO *ups) :
-   UpsDriver(ups)
+   UpsDriver(ups),
+   _comm(NULL)
 {
 }
 
@@ -181,33 +186,34 @@ bool ModbusUpsDriver::check_state()
 
 bool ModbusUpsDriver::Open()
 {
-   if (_comm)
+   if (!_comm)
    {
-      _comm->Close();
-      delete _comm;
-      _comm = NULL;
+#ifdef HAVE_MODBUS_USB_DRIVER
+      if (_ups->cable.type == CABLE_SMART)
+         _comm = new ModbusRs232Comm();
+      else
+         _comm = new ModbusUsbComm();
+#else
+      _comm = new ModbusRs232Comm();
+#endif
    }
 
    _ups->fd = 1;
-   _comm = new ModbusRs232Comm();
    return _comm->Open(_ups->device);
 }
 
 bool ModbusUpsDriver::Close()
 {
-   write_lock(_ups);
-
+   bool ret = true;
    if (_comm)
    {
-      _comm->Close();
+      ret = _comm->Close();
       delete _comm;
       _comm = NULL;
    }
 
    _ups->fd = -1;
-
-   write_unlock(_ups);
-   return 1;
+   return ret;
 }
 
 /*

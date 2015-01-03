@@ -1,7 +1,8 @@
 topdir:=../../..
 include $(topdir)/autoconf/targets.mak
 
-SRCS = $(wildcard *.cpp)
+SRCS = mapping.cpp modbus.cpp ModbusComm.cpp ModbusRs232Comm.cpp \
+       $(if $(MODBUSUSB),ModbusUsbComm.cpp)
 
 all-targets: libmodbusdrv.a
 
