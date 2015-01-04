@@ -1,11 +1,11 @@
 /*
- * generic-usb.h
+ * generic-usb.c
  *
- * Generic libusb based USB UPS driver.
+ * Generic USB module for libusb.
  */
 
 /*
- * Copyright (C) 2005-2007 Adam Kropelin
+ * Copyright (C) 2005 Adam Kropelin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of version 2 of the GNU General
@@ -22,46 +22,62 @@
  * MA 02111-1307, USA.
  */
 
-#ifndef _GENERIC_USB_H
-#define _GENERIC_USB_H
+#ifndef _GENERICUSB_H
+#define _GENERICUSB_H
 
 #include "../usb.h"
 #include "libusb.h"
+#include "HidUps.h"
 
-typedef struct report_desc *report_desc_t;
-
-class GenericUsbDriver: public UsbDriver
+class GenericUsbUpsDriver: public UsbUpsDriver
 {
 public:
+   GenericUsbUpsDriver(UPSINFO *ups);
+   virtual ~GenericUsbUpsDriver() {}
 
-   GenericUsbDriver(UPSINFO *ups);
-   virtual ~GenericUsbDriver() {}
+   // Inherited from UpsDriver
+   virtual bool Open();
+   virtual bool Close();
+   virtual bool check_state();
 
-   virtual bool SubclassGetCapabilities();
-   virtual bool SubclassOpen();
-   virtual bool SubclassClose();
-   virtual bool SubclassCheckState();
-   virtual bool SubclassGetValue(int ci, usb_value *uval);
-   virtual bool SubclassWriteIntToUps(int ci, int value, const char *name);
-   virtual bool SubclassReadIntFromUps(int ci, int *value);
+   // Inherited from UsbUpsDriver
+   virtual int write_int_to_ups(int ci, int value, char const* name);
+   virtual int read_int_from_ups(int ci, int *value);
+
+protected:
+
+   // Inherited from UsbUpsDriver
+   virtual bool pusb_ups_get_capabilities();
+   virtual bool pusb_get_value(int ci, USB_VALUE *uval);
 
 private:
 
-   struct usb_info;
+   /*
+    * When we are traversing the USB reports given by the UPS and we
+    * find an entry corresponding to an entry in the known_info table
+    * above, we make the following USB_INFO entry in the info table
+    * of our private data.
+    */
+   typedef struct s_usb_info {
+      unsigned usage_code;            /* usage code wanted */
+      unsigned unit_exponent;         /* exponent */
+      unsigned unit;                  /* units */
+      int data_type;                  /* data type */
+      hid_item_t item;                /* HID item (for read) */
+      hid_item_t witem;               /* HID item (for write) */
+      int report_len;                 /* Length of containing report */
+      int ci;                         /* which CI does this usage represent? */
+      int value;                      /* Previous value of this item */
+   } USB_INFO;
 
-   bool populate_uval(usb_info *info, unsigned char *data, usb_value *uval);
-   void reinitialize();
-   bool init_device(struct usb_device *dev);
+   void reinitialize_private_structure();
    bool open_usb_device();
    bool usb_link_check();
+   bool populate_uval(USB_INFO *info, unsigned char *data, USB_VALUE *uval);
 
-   usb_dev_handle *_fd;             /* Our UPS control pipe fd when open */
-   char _orig_device[MAXSTRING];    /* Original port specification */
-   short _vendor;                   /* UPS vendor id */
-   report_desc_t _rdesc;            /* Device's report descrptor */
-   usb_info *_info[CI_MAXCI + 1];   /* Info pointers for each command */
-   bool _linkcheck;                 /* Are we in the linkcheck state? */
-   static bool _libusbinit;         /* Has libusb been initialized yet? */
+   USB_INFO *_info[CI_MAXCI + 1];   /* Info pointers for each command */
+   bool _linkcheck;
+   HidUps _hidups;
 };
 
-#endif  /* _GENERIC_USB_H */
+#endif

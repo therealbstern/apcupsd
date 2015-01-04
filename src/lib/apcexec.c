@@ -40,7 +40,7 @@ int start_thread(UPSINFO *ups, void (*action) (UPSINFO * ups),
    set_thread_concurrency();
    status = pthread_create(&tid, NULL, (void *(*)(void *))action, (void *)ups);
    if (status != 0) {
-      log_event(ups, LOG_WARNING, _("Unable to start thread: ERR=%s\n"),
+      log_event(ups, LOG_WARNING, "Unable to start thread: ERR=%s\n",
          strerror(status));
       return 0;
    }
@@ -75,6 +75,8 @@ void clean_threads(void)
 }
 
 #ifdef HAVE_MINGW
+
+#include "winapi.h"
 
 char sbindir[MAXSTRING];
 
@@ -120,7 +122,7 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
    startinfo.dwFlags = STARTF_USESHOWWINDOW;
    startinfo.wShowWindow = SW_HIDE;
 
-   Dmsg1(200, "execute_command: CreateProcessA(NULL, %s, ...)\n", cmdline);
+   Dmsg(200, "execute_command: CreateProcessA(NULL, %s, ...)\n", cmdline);
 
    /* Execute the process */
    rc = CreateProcessA(NULL,
@@ -176,7 +178,7 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
    argv[4] = powered;
    argv[5] = NULL;
    if (spawnv(P_NOWAIT, apccontrol, (char * const *)argv) == -1) {
-      log_event(ups, LOG_WARNING, _("execute: cannot spawn(). ERR=%s"),
+      log_event(ups, LOG_WARNING, "execute: cannot spawn(). ERR=%s",
          strerror(errno));
       return FAILURE;
    }
@@ -184,7 +186,7 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
    /* fork() and exec() */
    switch (cmd.pid = fork()) {
    case -1:     /* error */
-      log_event(ups, LOG_WARNING, _("execute: cannot fork(). ERR=%s"),
+      log_event(ups, LOG_WARNING, "execute: cannot fork(). ERR=%s",
          strerror(errno));
       return FAILURE;
 
@@ -193,7 +195,7 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
       for (int i=0; i<sysconf(_SC_OPEN_MAX); i++) {
          if (i != STDIN_FILENO && i != STDOUT_FILENO && i != STDERR_FILENO) {
             if (close(i) == 0)
-               Dmsg1(200, "exec closed fd %d\n", i);
+               Dmsg(200, "exec closed fd %d\n", i);
          }
       }
 
@@ -206,7 +208,7 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
       execv(apccontrol, (char **)argv);
 
       /* NOT REACHED */
-      log_event(ups, LOG_WARNING, _("Cannot exec %s %s: %s"),
+      log_event(ups, LOG_WARNING, "Cannot exec %s %s: %s",
          apccontrol, cmd.command, strerror(errno));
 
       /* Child must exit if fails exec'ing. */

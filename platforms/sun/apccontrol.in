@@ -21,6 +21,10 @@ SCRIPTSHELL=@SCRIPTSHELL@
 SCRIPTDIR=@sysconfdir@
 POWERFAILDIR=@PWRFAILDIR@
 
+export SYSADMIN=root
+export APCUPSD_MAIL="@APCUPSD_MAIL@"
+if [ -f $SCRIPTDIR/config ]; then . $SCRIPTDIR/config ; fi
+
 #
 # This piece is to substitute the default behaviour with your own script,
 # perl, or C program.
@@ -68,7 +72,7 @@ case "$1" in
    mainsback)
    ;;
    failing)
-      printf "UPS battery power exhaused. Doing shutdown.\n" | wall -a
+      printf "UPS battery power exhausted. Doing shutdown.\n" | wall -a
    ;;
    timeout)
       printf "UPS battery runtime limit exceeded. Doing shutdown.\n" | wall -a

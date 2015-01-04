@@ -26,20 +26,29 @@
 #include "apc.h"
 
 /*
+ * Wraps call thru error_out function pointer so we can model it as no-return
+ * in Coverity to clean up false positives.
+ */
+void error_out_wrapper(const char *file, int line, const char *fmt, ...)
+{
+   va_list args;
+   va_start(args, fmt);
+   error_out(file, line, fmt, args);
+   va_end(args);
+}
+
+/*
  * Subroutine normally called by macro error_abort() to print
  * FATAL ERROR message and supplied error message
  */
-void generic_error_out(const char *file, int line, const char *fmt, ...)
+void generic_error_out(const char *file, int line, const char *fmt, va_list arg_ptr)
 {
    char buf[256];
-   va_list arg_ptr;
    int i;
 
-   asnprintf(buf, sizeof(buf), _("FATAL ERROR in %s at line %d\n"), file, line);
+   asnprintf(buf, sizeof(buf), "FATAL ERROR in %s at line %d\n", file, line);
    i = strlen(buf);
-   va_start(arg_ptr, fmt);
    avsnprintf((char *)&buf[i], sizeof(buf) - i, (char *)fmt, arg_ptr);
-   va_end(arg_ptr);
    fprintf(stdout, "%s", buf);
 
    if (error_cleanup)
@@ -48,23 +57,5 @@ void generic_error_out(const char *file, int line, const char *fmt, ...)
    exit(1);
 }
 
-/* simply print the message and exit */
-void generic_error_exit(const char *fmt, ...)
-{
-   va_list arg_ptr;
-   char buf[256];
-
-   va_start(arg_ptr, fmt);
-   avsnprintf(buf, sizeof(buf), (char *)fmt, arg_ptr);
-   va_end(arg_ptr);
-   fprintf(stdout, "%s", buf);
-
-   if (error_cleanup)
-      error_cleanup();
-
-   exit(1);
-}
-
-void (*error_out) (const char *file, int line, const char *fmt, ...) = generic_error_out;
-void (*error_exit) (const char *fmt, ...) = generic_error_exit;
+void (*error_out) (const char *file, int line, const char *fmt, va_list arg_ptr) = generic_error_out;
 void (*error_cleanup) (void) = NULL;

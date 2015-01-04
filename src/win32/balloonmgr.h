@@ -20,8 +20,8 @@
 #define BALLOONMGR_H
 
 #include <windows.h>
-#include <string>
-#include <vector>
+#include "astring.h"
+#include "alist.h"
 
 class BalloonMgr
 {
@@ -31,7 +31,7 @@ public:
    ~BalloonMgr();
 
    void PostBalloon(HWND hwnd, const char *title, const char *text);
-   static DWORD WINAPI BalloonMgr::Thread(LPVOID param);
+   static DWORD WINAPI Thread(LPVOID param);
 
 private:
 
@@ -43,18 +43,18 @@ private:
 
    struct Balloon {
       HWND hwnd;
-      std::string title;
-      std::string text;
+      astring title;
+      astring text;
    };
 
-   std::vector<Balloon> m_pending;
-   HANDLE               m_mutex;
-   bool                 m_active;
-   HANDLE               m_event;
-   HANDLE               m_timer;
-   bool                 m_exit;
-   struct timeval       m_time;
-   HANDLE               m_thread;
+   alist<Balloon>       _pending;
+   HANDLE               _mutex;
+   bool                 _exit;
+   bool                 _active;
+   HANDLE               _event;
+   HANDLE               _timer;
+   struct timeval       _time;
+   HANDLE               _thread;
 };
 
 #endif // BALLOONMGR_H

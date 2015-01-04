@@ -147,13 +147,20 @@ $(OBJDIR)/%.o: %.c
 $(OBJDIR)/%.o: %.cpp
 	@$(ECHO) "  CXX  " $(RELDIR)$<
 	$(VV)if test ! -d $(OBJDIR); then mkdir -p $(OBJDIR); fi
-	$(V)$(CXX) $(CPPFLAGS) -c -o $@ $<
+	$(V)$(CXX) $(CXXFLAGS) -c -o $@ $<
+	$(VV)$(DEPENDS)
+
+# Rule to build *.o from *.m and generate dependencies for it
+$(OBJDIR)/%.o: %.m
+	@$(ECHO) "  OBJC " $(RELDIR)$<
+	$(VV)if test ! -d $(OBJDIR); then mkdir -p $(OBJDIR); fi
+	$(V)$(OBJC) $(OBJCFLAGS) -c -o $@ $<
 	$(VV)$(DEPENDS)
 
 # Rule to link an executable
 define LINK
 	@$(ECHO) "  LD   " $(RELDIR)$@
-	$(V)$(LD) $(LDFLAGS) $^ -o $@ $(LIBS)
+	$(V)$(LD) $(LDFLAGS) -Wl,--start-group $^ -Wl,--end-group -o $@ $(LIBS)
 endef
 
 # Rule to generate an archive (library)
@@ -164,6 +171,12 @@ define ARCHIVE
 	$(V)$(AR) rc $(1) $(2)
 	$(V)$(RANLIB) $(1)
 endef
+
+# How to generate a *.nib from a *.xib
+%.nib: %.xib
+	@$(ECHO) "  NIB  " $(RELDIR)$<
+	$(VV)if test ! -d $(OBJDIR); then mkdir -p $(OBJDIR); fi
+	$(V)$(NIB) $(NIBFLAGS) --compile $@ $<
 
 # Rule to create a directory during install
 define MKDIR
@@ -213,7 +226,7 @@ endef
 # Copy a file
 define COPY
    @$(ECHO) "  CP   " $(1) =\> $(DESTDIR)/$(2)
-   $(V)$(CP) -f $(1) $(DESTDIR)/$(2)
+   $(V)$(CP) -fR $(1) $(DESTDIR)/$(2)
 endef
 
 # Uninstall a file
@@ -276,3 +289,20 @@ ifneq ($(strip $(RST2PDF)),)
 else
 	@$(ECHO) "--> Not building PDF due to missing rst2pdf"
 endif
+
+# Format a manpage into plain text
+define MANIFY
+	@$(ECHO) "  MAN  " $(1) -\> $(2)
+	$(V)man ./$(1) | col -b > $(2)
+endef
+
+# Rule to build a Windows resource object from the source RC file
+# Includes substitution of version strings, if needed
+comma := ,
+RCVERSION = $(subst .,$(comma),$(firstword $(subst -, ,$(VERSION))).0)
+$(OBJDIR)/%.o: %.rc
+	@$(ECHO) "  RES  " $(RELDIR)$<
+	$(V)sed -e "s/\$$VERSION/$(VERSION)/" \
+       -e "s/FILEVERSION.*/FILEVERSION     $(RCVERSION)/" \
+       -e "s/PRODUCTVERSION.*/PRODUCTVERSION  $(RCVERSION)/" $< | \
+   $(RES) -I$(dir $<) -O coff -o $@

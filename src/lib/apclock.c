@@ -37,7 +37,7 @@
  * If so, and the process is no longer running,
  * blow away the lockfile.  
  */
-#if  !defined(HAVE_WIN32)
+#if  !defined(HAVE_MINGW)
 static int check_stale_lockfile(UPSINFO *ups)
 {
    char pidbuffer[12];
@@ -153,7 +153,7 @@ int hibernate_ups = FALSE;
 int shutdown_ups = FALSE;
 int create_lockfile(UPSINFO *ups)
 {
-#if !defined(HAVE_WIN32)
+#if !defined(HAVE_MINGW)
    char pidbuffer[12];
    int error;
 
@@ -230,7 +230,7 @@ int create_lockfile(UPSINFO *ups)
 
 void delete_lockfile(UPSINFO *ups)
 {
-#if !defined(HAVE_WIN32)
+#if !defined(HAVE_MINGW)
    if (ups->lockpath[0] != '\0') {
       /*
        * If lockfile is ours, close it and delete it,

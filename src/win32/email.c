@@ -11,27 +11,26 @@
 #include   <mapi.h>
 #include   <stdio.h>
 
-#ifndef HAVE_MINGW
-extern void mainCRTStartup();
-void WinMainCRTStartup() { mainCRTStartup(); }
-#endif
-
 int main(int argc, char **argv)
 {
    int i;
    ULONG err;
    MapiRecipDesc recip;
    char addr[100];
+   char default_msg[] = "Apcupsd message";
+   char default_text[] = "No text specified.\n";
    MapiMessage emsg = {0, 
-      "Apcupsd message",               /* default subject */
-      "No text specified.\n",          /* default message text */
+      default_msg,                     /* default subject */
+      default_text,                    /* default message text */
       NULL, NULL, NULL, 0, NULL,
       1, &recip, 0, NULL};
 
+   char default_name[] = "root";
+   char default_addr[] = "SMTP:root";
    recip.ulReserved = 0;
    recip.ulRecipClass = MAPI_TO;
-   recip.lpszName = "root";           /* default name */
-   recip.lpszAddress = "SMTP:root";   /* default address */
+   recip.lpszName = default_name;      /* default name */
+   recip.lpszAddress = default_addr;   /* default address */
    recip.ulEIDSize = 0;
    recip.lpEntryID = NULL;
 

@@ -11,10 +11,11 @@
 # or by manually setting it to 1 in this file,
 #  e.g. %define gapcmon 1
 #
-# If you want the SNMP driver, use:
+# If you want the (obsolete) NET-SNMP driver, use:
 #  e.g.  rpmbuild -ba --define "build_snmp 1" --define "build_suse 1" apcupsd.spec
 # or by manually setting it to 1 in this file,
 #  e.g. %define snmp 1
+# The modern SNMP driver is always enabled since it has no dependencies.
 #
 # Note, to build, you need:
 #   Release_Notes-%{version}-%{release}.tar.gz in your
@@ -98,6 +99,7 @@
 %{?build_gapcmon:%define gapcmon 1}
 
 # should we build net-snmp driver
+# this is now deprecated in favor of new driver which does not depend on net-snmp library
 %define snmp 0
 %{?build_snmp:%define snmp 1}
 
@@ -126,7 +128,7 @@ BuildRequires: ORBit2, pango-devel, pkgconfig
 %endif
 %if %{suse} && %{gapcmon}
 BuildRequires: bonobo-activation, freetype2-devel, cairo-devel, fontconfig-devel
-BuildRequires: gconf2-devel, gnome-vfs2-devel, libpng-devel, glitz-devel, xorg-x11-libs
+BuildRequires: gconf2-devel, gnome-vfs2-devel, libpng-devel, xorg-x11-libs
 BuildRequires: libbonobo-devel, libbonoboui-devel
 %endif
 %if %{fedora_core} && %{gapcmon}
@@ -200,7 +202,7 @@ Requires: glibc, gtk2 >= 2.4, glib2, atk, libbonobo, libbonoboui, ORBit2, pango
 %endif
 
 %if %{suse} && %{gapcmon}
-Requires: bonobo-activation, freetype2, cairo, fontconfig, gconf2, gnome-vfs2, libpng, glitz, xorg-x11-libs
+Requires: bonobo-activation, freetype2, cairo, fontconfig, gconf2, gnome-vfs2, libpng, xorg-x11-libs
 %endif
 %if %{fedora_core} && %{gapcmon}
 Requires: freetype, GConf2
@@ -244,6 +246,7 @@ A Gnome application to monitor the status of your UPS.
         --enable-apcsmart \
         --enable-dumb \
         --enable-usb \
+        --enable-snmp \
 	%if %{gapcmon}
 	--enable-gapcmon \
 	%endif
@@ -294,27 +297,6 @@ install -m744 examples/hid-ups \
 install -m744 examples/make-hiddev \
               $RPM_BUILD_ROOT%{_sysconfdir}/apcupsd/make-hiddev
 
-%define rh_platform 0
-%{?build_fedora_core:%define rh_platform 1}
-%{?build_rhel3:%define rh_platform 1}
-%{?build_rhel4:%define rh_platform 1}
-%{?build_rhel5:%define rh_platform 1}
-
-%if %{rh_platform} && %{gapcmon}
-mkdir -p $RPM_BUILD_ROOT%{_prefix}/share/autostart
-mkdir -p $RPM_BUILD_ROOT%{_prefix}/share/gnome/autostart
-cp $RPM_BUILD_ROOT%{_prefix}/share/applications/gapcmon.desktop $RPM_BUILD_ROOT%{_prefix}/share/autostart/
-cp $RPM_BUILD_ROOT%{_prefix}/share/applications/gapcmon.desktop $RPM_BUILD_ROOT%{_prefix}/share/gnome/autostart/
-%endif
-
-%if %{suse} && %{gapcmon}
-mkdir -p $RPM_BUILD_ROOT/opt/kde3/share/autostart
-mkdir -p $RPM_BUILD_ROOT%{_prefix}/share/gnome/autostart
-cp $RPM_BUILD_ROOT%{_prefix}/share/applications/gapcmon.desktop $RPM_BUILD_ROOT/opt/kde3/share/autostart/
-cp $RPM_BUILD_ROOT%{_prefix}/share/applications/gapcmon.desktop $RPM_BUILD_ROOT%{_prefix}/share/gnome/autostart/
-%endif
-
-
 %clean
 [ "$RPM_BUILD_ROOT" != "/" ] && rm -rf $RPM_BUILD_ROOT
 rm -f $RPM_BUILD_DIR/Release_Notes-%{version}-%{release}.txt
@@ -357,14 +339,6 @@ rm -f $RPM_BUILD_DIR/Release_Notes-%{version}-%{release}.txt
 %{_prefix}/share/pixmaps/onbatt.png
 %{_prefix}/share/pixmaps/online.png
 %{_prefix}/share/pixmaps/unplugged.png
-%endif
-%if %{gapcmon} && %{rh_platform}
-%{_prefix}/share/autostart/gapcmon.desktop
-%{_prefix}/share/gnome/autostart/gapcmon.desktop
-%endif
-%if %{gapcmon} && %{suse}
-/opt/kde3/share/autostart/gapcmon.desktop
-%{_prefix}/share/gnome/autostart/gapcmon.desktop
 %endif
 
 %post
@@ -444,8 +418,11 @@ if [ "$1" = 0 ] ; then
 fi
 
 %changelog
-* Sun Aug 23 2009 D. Scott Barninger <barninger at fairfieldcomputers.com>
-- add gapcmon to autostart directories
+* Fri Sep 30 2011 D. Scott Barninger <barninger at fairfieldcomputers.com>
+- remove glitz-devel build requirement for suse (obsoleted)
+- builds for older suse versions should make sure that glitz packages are installed
+* Sun Jan 10 2010 Adam Kropelin <akropel1 at rochester.rr.com>
+- changes for new snmp driver
 * Sat Aug 01 2009 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - fix restart on upgrade using $1 variable. remove previously commented out code
 * Sat May 16 2009 D. Scott Barninger <barninger at fairfieldcomputers.com>
@@ -493,7 +470,7 @@ fi
 - release 3.12.2 update docs
 * Sun Sep 18 2005 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - Change deprecated Copyright tag to License
-* Tue Jun 07 2005 Adam Kropelin <akropel1@rochester.rr.com>
+* Tue Jun 07 2005 Adam Kropelin <adam@kroptech.com>
 - Rename mainsback.in to offbattery.in so default power loss/return actions
 - are symmetrical.
 * Sat Apr 30 2005 D. Scott Barninger <barninger at fairfieldcomputers.com>
