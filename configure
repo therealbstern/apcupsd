@@ -12022,7 +12022,6 @@ $as_echo "Using generic libusb USB driver." >&6; }
 
    APCDRVLIBS="$APCDRVLIBS \$(topdir)/src/libusbhid/libusbhid.a"
    CPPFLAGS="$CPPFLAGS -I\$(topdir)/src/libusbhid"
-   LIBEXTRAOBJ="$LIBEXTRAOBJ HidUps.cpp"
 fi
 
 
