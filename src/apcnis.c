@@ -110,7 +110,7 @@ static void status_write(UPSINFO *ups, const char *fmt, ...)
    va_end(ap);
 
    if ((i = (strlen(largebuf) + strlen(buf))) < (int)(sizeof(largebuf) - 1)) {
-      astrncat(largebuf, buf, sizeof(largebuf));
+      strlcat(largebuf, buf, sizeof(largebuf));
       stat_recs++;
    } else {
       log_event(ups, LOG_ERR,
@@ -121,13 +121,15 @@ static void status_write(UPSINFO *ups, const char *fmt, ...)
 
 void do_server(UPSINFO *ups)
 {
-   int newsockfd, sockfd, childpid;
+   int newsockfd, sockfd;
    struct sockaddr_in cli_addr;    /* client's address */
    struct sockaddr_in serv_addr;   /* our address */
    int tlog;
-   int turnon = 1;
    struct s_arg *arg;
    struct in_addr local_ip;
+#ifndef HAVE_MINGW
+   int turnon = 1;
+#endif
 
    for (tlog = 0; (ups = attach_ups(ups)) == NULL; tlog -= 5 * 60) {
       if (tlog <= 0) {
@@ -207,7 +209,6 @@ void do_server(UPSINFO *ups)
       arg = (struct s_arg *)malloc(sizeof(struct s_arg));
       arg->newsockfd = newsockfd;
       arg->ups = ups;
-      childpid = 0;
 
       pthread_t tid;
       pthread_create(&tid, NULL, handle_client_request, arg);
@@ -224,33 +225,36 @@ void do_server(UPSINFO *ups)
  */
 void *handle_client_request(void *arg)
 {
+   int len;
    FILE *events_file;
    char line[MAXSTRING];
-   char errmsg[] = "Invalid command\n";
-   char notavail[] = "Not available\n";
-   char notrun[] = "Apcupsd not running\n";
+   const char errmsg[] = "Invalid command\n";
+   const char notavail[] = "Not available\n";
+   const char notrun[] = "Apcupsd internal error\n";
    int nsockfd = ((struct s_arg *)arg)->newsockfd;
    UPSINFO *ups = ((struct s_arg *)arg)->ups;
+   free(arg);
 
    pthread_detach(pthread_self());
+
    if ((ups = attach_ups(ups)) == NULL) {
       net_send(nsockfd, notrun, sizeof(notrun));
       net_send(nsockfd, NULL, 0);
-      free(arg);
-      Error_abort0("Cannot attach SYSV IPC.\n");
+      net_close(nsockfd);
+      return NULL;
    }
 
    for (;;) {
       /* Read command */
-      if (net_recv(nsockfd, line, MAXSTRING) <= 0)
+      if ((len = net_recv(nsockfd, line, sizeof(line))) <= 0)
          break;                    /* connection terminated */
 
-      if (strncmp("status", line, 6) == 0) {
+      if (len == 6 && strncmp("status", line, 6) == 0) {
          if (output_status(ups, nsockfd, status_open, status_write,
                status_close) < 0) {
             break;
          }
-      } else if (strncmp("events", line, 6) == 0) {
+      } else if (len == 6 && strncmp("events", line, 6) == 0) {
          if ((ups->eventfile[0] == 0) ||
              ((events_file = fopen(ups->eventfile, "r")) == NULL)) {
             net_send(nsockfd, notavail, sizeof(notavail));
@@ -266,24 +270,6 @@ void *handle_client_request(void *arg)
                break;
             }
          }
-#if 0
-      } else if (strncmp("rawupsinfo", line, 10) == 0) {
-         net_send(nsockfd, (char *)ups, sizeof(UPSINFO));
-         if (net_send(nsockfd, NULL, 0) < 0)
-            break;
-      } else if (strncmp("eprominfo", line, 9) == 0) {
-         int len;
-
-         len = strlen(ups->eprom) + 1;
-         net_send(nsockfd, ups->eprom, len);
-         len = strlen(ups->firmrev) + 1;
-         net_send(nsockfd, ups->firmrev, len);
-         len = strlen(ups->upsmodel) + 1;
-         net_send(nsockfd, ups->upsmodel, len);
-
-         if (net_send(nsockfd, NULL, 0) < 0)
-            break;
-#endif
       } else {
          net_send(nsockfd, errmsg, sizeof(errmsg));
          if (net_send(nsockfd, NULL, 0) < 0)
@@ -293,7 +279,6 @@ void *handle_client_request(void *arg)
 
    net_close(nsockfd);
 
-   free(arg);
    detach_ups(ups);
    return NULL;
 }
@@ -334,7 +319,7 @@ int check_wrappers(char *av, int newsock)
 
    if (!hosts_access(&req)) {
       log_event(core_ups, LOG_WARNING,
-         _("Connection from %.500s refused by tcp_wrappers."), eval_client(&req));
+         "Connection from %.500s refused by tcp_wrappers.", eval_client(&req));
       return FAILURE;
    }
 

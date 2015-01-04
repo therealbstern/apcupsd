@@ -12,34 +12,35 @@
 #include "apc.h"
 #include <windows.h>
 #include "winups.h"
-#include "winres.h"
+#include "resource.h"
 #include "wintray.h"
 #include "statmgr.h"
 #include "balloonmgr.h"
-#include <string>
-
-#define BALLOON_TIMEOUT 10000
 
 // Implementation
-upsMenu::upsMenu(HINSTANCE appinst, const char* host, unsigned long port,
-                 int refresh, BalloonMgr *balmgr)
-   : m_statmgr(new StatMgr(host, port)),
-     m_about(appinst),
-     m_status(appinst, m_statmgr),
-     m_events(appinst, m_statmgr),
-     m_interval(refresh),
-     m_wait(NULL),
-     m_thread(NULL),
-     m_hmenu(NULL),
-     m_upsname("<unknown>"),
-     m_balmgr(balmgr),
-     m_host(host),
-     m_port(port),
-     m_appinst(appinst),
-     m_hwnd(NULL)
+upsMenu::upsMenu(HINSTANCE appinst, MonitorConfig &mcfg, BalloonMgr *balmgr,
+                 InstanceManager *instmgr)
+   : _hwnd(NULL),
+     _hmenu(NULL),
+     _hsubmenu(NULL),
+     _statmgr(NULL),
+     _thread(NULL),
+     _wait(NULL),
+     _upsname("<unknown>"),
+     _balmgr(balmgr),
+     _appinst(appinst),
+     _config(mcfg),
+     _runthread(true),
+     _generation(0),
+     _reconfig(true),
+     _instmgr(instmgr),
+     _about(appinst),
+     _status(appinst, this),
+     _configdlg(appinst, instmgr),
+     _events(appinst, this)
 {
    // Determine message id for "TaskbarCreate" message
-   m_tbcreated_msg = RegisterWindowMessage("TaskbarCreated");
+   _tbcreated_msg = RegisterWindowMessage("TaskbarCreated");
 
    // Create a dummy window to handle tray icon messages
    WNDCLASSEX wndclass;
@@ -59,89 +60,84 @@ upsMenu::upsMenu(HINSTANCE appinst, const char* host, unsigned long port,
 
    // Make unique window title as 'host:port'.
    char title[1024];
-   asnprintf(title, sizeof(title), "%s:%d", host, port);
+   asnprintf(title, sizeof(title), "%s:%d", mcfg.host.str(), mcfg.port);
 
    // Create System Tray menu window
-   m_hwnd = CreateWindow(APCTRAY_WINDOW_CLASS, title, WS_OVERLAPPEDWINDOW,
+   _hwnd = CreateWindow(APCTRAY_WINDOW_CLASS, title, WS_OVERLAPPEDWINDOW,
                          CW_USEDEFAULT, CW_USEDEFAULT, 200, 200, NULL, NULL,
                          appinst, NULL);
-   if (m_hwnd == NULL) {
+   if (_hwnd == NULL) {
       PostQuitMessage(0);
       return;
    }
 
    // record which client created this window
-   SetWindowLong(m_hwnd, GWL_USERDATA, (LONG)this);
+   SetWindowLong(_hwnd, GWL_USERDATA, (LONG)this);
 
    // Load the icons for the tray
-   m_online_icon = LoadIcon(appinst, MAKEINTRESOURCE(IDI_ONLINE));
-   m_onbatt_icon = LoadIcon(appinst, MAKEINTRESOURCE(IDI_ONBATT));
-   m_charging_icon = LoadIcon(appinst, MAKEINTRESOURCE(IDI_CHARGING));
-   m_commlost_icon = LoadIcon(appinst, MAKEINTRESOURCE(IDI_COMMLOST));
+   _online_icon = LoadIcon(appinst, MAKEINTRESOURCE(IDI_ONLINE));
+   _onbatt_icon = LoadIcon(appinst, MAKEINTRESOURCE(IDI_ONBATT));
+   _charging_icon = LoadIcon(appinst, MAKEINTRESOURCE(IDI_CHARGING));
+   _commlost_icon = LoadIcon(appinst, MAKEINTRESOURCE(IDI_COMMLOST));
 
    // Load the popup menu
-   m_hmenu = LoadMenu(appinst, MAKEINTRESOURCE(IDR_TRAYMENU));
-   if (m_hmenu == NULL) {
+   _hmenu = LoadMenu(appinst, MAKEINTRESOURCE(IDR_TRAYMENU));
+   if (_hmenu == NULL) {
       PostQuitMessage(0);
       return;
    }
+   _hsubmenu = GetSubMenu(_hmenu, 0);
 
    // Install the tray icon. Although it's tempting to let this happen
    // on the poll thread, we do it here so its synchronous and all icons
    // are consistently created in the same order.
    AddTrayIcon();
 
-   // Create a locked mutex to use for interruptible waiting
-   m_wait = CreateMutex(NULL, true, NULL);
-   if (m_wait == NULL) {
+   // Create a semaphore to use for interruptible waiting
+   _wait = CreateSemaphore(NULL, 0, 1, NULL);
+   if (_wait == NULL) {
       PostQuitMessage(0);
       return;
    }
 
    // Thread to poll UPS status and update tray icon
-   DWORD tid;
-   m_thread = CreateThread(NULL, 0, &upsMenu::StatusPollThread, this, 0, &tid);
-   if (m_thread == NULL)
+   _thread = CreateThread(NULL, 0, &upsMenu::StatusPollThread, this, 0, NULL);
+   if (_thread == NULL)
       PostQuitMessage(0);
 }
 
 upsMenu::~upsMenu()
 {
    // Kill status polling thread
-   if (m_thread) {
-      if (WaitForSingleObject(m_thread, 5000) == WAIT_TIMEOUT)
-         TerminateThread(m_thread, 0);
-      CloseHandle(m_thread);
-   }
+   if (WaitForSingleObject(_thread, 10000) == WAIT_TIMEOUT)
+      TerminateThread(_thread, 0);
+   CloseHandle(_thread);
 
    // Destroy the mutex
-   if (m_wait != NULL)
-      CloseHandle(m_wait);
+   CloseHandle(_wait);
 
    // Destroy the status manager
-   delete m_statmgr;
+   delete _statmgr;
 
    // Remove the tray icon
    DelTrayIcon();
 
    // Destroy the window
-   if (m_hwnd != NULL)
-      DestroyWindow(m_hwnd);
+   DestroyWindow(_hwnd);
 
    // Destroy the loaded menu
-   if (m_hmenu != NULL)
-      DestroyMenu(m_hmenu);
+   DestroyMenu(_hmenu);
 
    // Unregister the window class
-   UnregisterClass(APCTRAY_WINDOW_CLASS, m_appinst);
+   UnregisterClass(APCTRAY_WINDOW_CLASS, _appinst);
 }
 
 void upsMenu::Destroy()
 {
    // Trigger status poll thread to shut down. We will wait for
    // the thread to exit later in our destructor.
-   if (m_wait)
-      ReleaseMutex(m_wait);
+   _runthread = false;
+   ReleaseSemaphore(_wait, 1, NULL);
 }
 
 void upsMenu::AddTrayIcon()
@@ -164,14 +160,14 @@ void upsMenu::SendTrayMsg(DWORD msg)
    // Create the tray icon message
    NOTIFYICONDATA nid;
    memset(&nid, 0, sizeof(nid));
-   nid.hWnd = m_hwnd;
+   nid.hWnd = _hwnd;
    nid.cbSize = sizeof(nid);
    nid.uID = IDI_APCUPSD;
    nid.uFlags = NIF_ICON | NIF_MESSAGE;
-   nid.uCallbackMessage = WM_TRAYNOTIFY;
+   nid.uCallbackMessage = WM_APCTRAY_NOTIFY;
 
    int battstat = -1;
-   std::string statstr;
+   astring statstr;
 
    // Get current status
    switch (msg) {
@@ -181,7 +177,7 @@ void upsMenu::SendTrayMsg(DWORD msg)
       break; 
    default:
       // Fetch current UPS status
-      FetchStatus(battstat, statstr, m_upsname);
+      _statmgr->GetSummary(battstat, statstr, _upsname);
       break;
    }
 
@@ -189,26 +185,26 @@ void upsMenu::SendTrayMsg(DWORD msg)
     * and the value of battstat is the percent charge.
     */
    if (battstat == -1)
-      nid.hIcon = m_commlost_icon;
+      nid.hIcon = _commlost_icon;
    else if (battstat == 0)
-      nid.hIcon = m_onbatt_icon;
+      nid.hIcon = _onbatt_icon;
    else if (battstat >= 100)
-      nid.hIcon = m_online_icon;
+      nid.hIcon = _online_icon;
    else
-      nid.hIcon = m_charging_icon;
+      nid.hIcon = _charging_icon;
 
    // Use status as normal tooltip
    nid.uFlags |= NIF_TIP;
-   if (!m_upsname.compare("UPS_IDEN") || !m_upsname.compare("<unknown>"))
-      asnprintf(nid.szTip, sizeof(nid.szTip), "%s", statstr.c_str());
+   if (_upsname == "UPS_IDEN" || _upsname == "<unknown>")
+      asnprintf(nid.szTip, sizeof(nid.szTip), "%s", statstr.str());
    else
       asnprintf(nid.szTip, sizeof(nid.szTip), "%s: %s",
-                m_upsname.c_str(), statstr.c_str());
+                _upsname.str(), statstr.str());
 
    // Display event in balloon tip
-   if (!m_laststatus.empty() && m_laststatus.compare(statstr))
-      m_balmgr->PostBalloon(m_hwnd, m_upsname.c_str(), statstr.c_str());
-   m_laststatus = statstr;
+   if (_config.popups && !_laststatus.empty() && _laststatus != statstr)
+      _balmgr->PostBalloon(_hwnd, _upsname, statstr);
+   _laststatus = statstr;
 
    // Send the message
    if (!Shell_NotifyIcon(msg, &nid) && msg == NIM_ADD) {
@@ -217,7 +213,7 @@ void upsMenu::SendTrayMsg(DWORD msg)
    }
 }
 
-// Process window messages
+// Process window messages (static springboard)
 LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
 {
    // This is a static method, so we don't know which instantiation we're 
@@ -227,92 +223,120 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
 
    // During creation, we are called before the WindowLong has been set.
    // Just use default processing in that case since _this is not valid.   
-   if (!_this)
+   if (_this)
+      return _this->WndProcess(hwnd, iMsg, wParam, lParam);
+   else
       return DefWindowProc(hwnd, iMsg, wParam, lParam);
+   
+}
 
-   switch (iMsg) {
-
+// Process window messages
+LRESULT upsMenu::WndProcess(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lParam)
+{
+   switch (iMsg)
+   {
    // User has clicked an item on the tray menu
    case WM_COMMAND:
-      switch (LOWORD(wParam)) {
-      case ID_STATUS:
+      switch (LOWORD(wParam))
+      {
+      case IDM_STATUS:
          // Show the status dialog
-         _this->m_status.Show(TRUE);
+         _status.Show();
          break;
 
-      case ID_EVENTS:
+      case IDM_EVENTS:
          // Show the Events dialog
-         _this->m_events.Show(TRUE);
+         _events.Show();
          break;
 
-      case ID_ABOUT:
+      case IDM_ABOUT:
          // Show the About box
-         _this->m_about.Show(TRUE);
+         _about.Show();
          break;
 
-      case ID_CLOSEINST:
-         // User selected Close from the tray menu
-         PostMessage(hwnd, WM_CLOSEINST, 0, (LPARAM)_this);
-         return 0;
-
-      case ID_CLOSE:
-         // User selected CloseAll from the tray menu
+      case IDM_EXIT:
+         // User selected Exit from the tray menu
          PostMessage(hwnd, WM_CLOSE, 0, 0);
          break;
 
-      case ID_REMOVE:
-         // User selected Close from the tray menu
-         PostMessage(hwnd, WM_REMOVE, 0, (LPARAM)_this);
-         return 0;
+      case IDM_REMOVE:
+         // User selected Remove from the tray menu
+         PostMessage(hwnd, WM_APCTRAY_REMOVE, 0, (LPARAM)(_config.id.str()));
+         break;
 
-      case ID_REMOVEALL:
+      case IDM_REMOVEALL:
          // User wants to remove all apctray instances from registry
-         PostMessage(hwnd, WM_REMOVEALL, 0, 0);
-         return 0;
+         PostMessage(hwnd, WM_APCTRAY_REMOVEALL, 0, 0);
+         break;
+
+      case IDM_ADD:
+         // User selected Add from the tray menu
+         PostMessage(hwnd, WM_APCTRAY_ADD, 0, 0);
+         break;
+
+      case IDM_CONFIG:
+         // User selected Config from the tray menu
+         _configdlg.Show(_config);
+         break;
+
+      case IDM_AUTOSTART:
+      {
+         MENUITEMINFO mii;
+         mii.cbSize = sizeof(MENUITEMINFO);
+         mii.fMask = MIIM_STATE;
+         GetMenuItemInfo(_hsubmenu, IDM_AUTOSTART, FALSE, &mii);
+         mii.fState ^= (MFS_CHECKED | MFS_UNCHECKED);
+         SetMenuItemInfo(_hsubmenu, IDM_AUTOSTART, FALSE, &mii);
+         _instmgr->SetAutoStart(mii.fState & MFS_CHECKED);
+         break;
+      }
+
       }
       return 0;
 
    // User has clicked on the tray icon or the menu
-   case WM_TRAYNOTIFY:
-      // Get the submenu to use as a pop-up menu
-      HMENU submenu = GetSubMenu(_this->m_hmenu, 0);
+   case WM_APCTRAY_NOTIFY:
 
       // What event are we responding to, RMB click?
-      if (lParam == WM_RBUTTONUP) {
-         if (submenu == NULL)
-            return 0;
-
+      if (lParam == WM_RBUTTONUP)
+      {
          // Make the Status menu item the default (bold font)
-         SetMenuDefaultItem(submenu, ID_STATUS, false);
+         SetMenuDefaultItem(_hsubmenu, IDM_STATUS, false);
 
          // Set UPS name field
-         ModifyMenu(submenu, ID_NAME, MF_BYCOMMAND|MF_STRING, ID_NAME,
-            ("UPS: " + _this->m_upsname).c_str());
+         ModifyMenu(_hsubmenu, IDM_NAME, MF_BYCOMMAND|MF_STRING, IDM_NAME,
+            ("UPS: " + _upsname).str());
 
          // Set HOST field
          char buf[100];
-         asnprintf(buf, sizeof(buf), "HOST: %s:%d", _this->m_host, _this->m_port);
-         ModifyMenu(submenu, ID_HOST, MF_BYCOMMAND|MF_STRING, ID_HOST, buf);
+         asnprintf(buf, sizeof(buf), "HOST: %s:%d", _config.host.str(), _config.port);
+         ModifyMenu(_hsubmenu, IDM_HOST, MF_BYCOMMAND|MF_STRING, IDM_HOST, buf);
+
+         // Set autostart field
+         MENUITEMINFO mii;
+         mii.cbSize = sizeof(MENUITEMINFO);
+         mii.fMask = MIIM_STATE;
+         mii.fState = MFS_ENABLED | 
+            _instmgr->IsAutoStart() ? MFS_CHECKED : MFS_UNCHECKED;
+         SetMenuItemInfo(_hsubmenu, IDM_AUTOSTART, FALSE, &mii);
 
          // Get the current cursor position, to display the menu at
          POINT mouse;
          GetCursorPos(&mouse);
 
-         // There's a "bug"
-         // (Microsoft calls it a feature) in Windows 95 that requires calling
-         // SetForegroundWindow. To find out more, search for Q135788 in MSDN.
-         SetForegroundWindow(_this->m_hwnd);
+         // There's a "bug" (Microsoft calls it a feature) in Windows 95 that 
+         // requires calling SetForegroundWindow. To find out more, search for 
+         // Q135788 in MSDN.
+         SetForegroundWindow(_hwnd);
 
          // Display the menu at the desired position
-         TrackPopupMenu(submenu, 0, mouse.x, mouse.y, 0, _this->m_hwnd, NULL);
-
-         return 0;
+         TrackPopupMenu(_hsubmenu, 0, mouse.x, mouse.y, 0, _hwnd, NULL);
       }
-
       // Or was there a LMB double click?
-      if (lParam == WM_LBUTTONDBLCLK) {
+      else if (lParam == WM_LBUTTONDBLCLK)
+      {
          // double click: execute the default item
-         SendMessage(_this->m_hwnd, WM_COMMAND, ID_STATUS, 0);
+         SendMessage(_hwnd, WM_COMMAND, IDM_STATUS, 0);
       }
 
       return 0;
@@ -323,11 +347,12 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
       return 0;
 
    default:
-      if (iMsg == _this->m_tbcreated_msg) {
+      if (iMsg == _tbcreated_msg)
+      {
          // Explorer has restarted so we need to redraw the tray icon.
          // We purposely kick this out to the main loop instead of handling it
          // ourself so the icons are redrawn in a consistent order.
-         PostMessage(hwnd, WM_RESET, 0, 0);
+         PostMessage(hwnd, WM_APCTRAY_RESET, _generation++, 0);
       }
       break;
    }
@@ -336,95 +361,52 @@ LRESULT CALLBACK upsMenu::WndProc(HWND hwnd, UINT iMsg, WPARAM wParam, LPARAM lP
    return DefWindowProc(hwnd, iMsg, wParam, lParam);
 }
 
-bool upsMenu::FetchStatus(int &battstat, std::string &statstr, std::string &upsname)
+void upsMenu::Redraw()
 {
-   // Fetch data from the UPS
-   if (!m_statmgr->Update()) {
-      battstat = -1;
-      statstr = "NETWORK ERROR";
-      return false;
-   }
+   AddTrayIcon();
+}
 
-   // Lookup the STATFLAG key
-   std::string statflag = m_statmgr->Get("STATFLAG");
-   if (statflag.empty()) {
-      battstat = -1;
-      statstr = "ERROR";
-      return false;
-   }
-   unsigned long status = strtoul(statflag.c_str(), NULL, 0);
+void upsMenu::Reconfigure(const MonitorConfig &mcfg)
+{
+   // Indicate that a config change is pending
+   _mutex.lock();
+   _config = mcfg;
+   _reconfig = true;
+   _mutex.unlock();
 
-   // Lookup BCHARGE key
-   std::string bcharge = m_statmgr->Get("BCHARGE");
+   Refresh();
+}
 
-   // Determine battery charge percent
-   if (status & UPS_onbatt)
-      battstat = 0;
-   else if (!bcharge.empty())
-      battstat = (int)atof(bcharge.c_str());
-   else
-      battstat = 100;
-
-   // Fetch UPSNAME
-   std::string uname = m_statmgr->Get("UPSNAME");
-   if (!uname.empty())
-      upsname = uname;
-
-   // Now output status in human readable form
-   statstr = "";
-   if (status & UPS_calibration)
-      statstr += "CAL ";
-   if (status & UPS_trim)
-      statstr += "TRIM ";
-   if (status & UPS_boost)
-      statstr += "BOOST ";
-   if (status & UPS_online)
-      statstr += "ONLINE ";
-   if (status & UPS_onbatt)
-      statstr += "ONBATT ";
-   if (status & UPS_overload)
-      statstr += "OVERLOAD ";
-   if (status & UPS_battlow)
-      statstr += "LOWBATT ";
-   if (status & UPS_replacebatt)
-      statstr += "REPLACEBATT ";
-   if (!(status & UPS_battpresent))
-      statstr += "NOBATT ";
-
-   // This overrides the above
-   if (status & UPS_commlost) {
-      statstr = "COMMLOST";
-      battstat = -1;
-   }
-
-   // This overrides the above
-   if (status & UPS_shutdown)
-      statstr = "SHUTTING DOWN";
-
-   // This overrides the above
-   if (status & UPS_onbatt) {
-      std::string reason = m_statmgr->Get("LASTXFER");
-      if (strstr(reason.c_str(), "self test"))
-         statstr = "SELFTEST";
-   }
-
-   // Remove trailing space, if present
-   statstr.resize(statstr.find_last_not_of(" ") + 1);
-   return true;
+void upsMenu::Refresh()
+{
+   // Wake the poll thread to refresh the status ASAP
+   ReleaseSemaphore(_wait, 1, NULL);
 }
 
 DWORD WINAPI upsMenu::StatusPollThread(LPVOID param)
 {
    upsMenu* _this = (upsMenu*)param;
-   DWORD status;
 
-   while (1) {
-      // Update the tray icon
+   while (_this->_runthread)
+   {
+      // Act on pending config change
+      _this->_mutex.lock();
+      if (_this->_reconfig)
+      {
+         // Recreate statmgr with new config
+         delete _this->_statmgr;
+         _this->_statmgr = new StatMgr(_this->_config.host, _this->_config.port);
+         _this->_reconfig = false;
+      }
+      _this->_mutex.unlock();
+
+      // Update the tray icon and status dialog
       _this->UpdateTrayIcon();
+      _this->_status.Update(_this->_statmgr);
+      _this->_events.Update(_this->_statmgr);
 
       // Delay for configured interval
-      status = WaitForSingleObject(_this->m_wait, _this->m_interval * 1000);
-      if (status != WAIT_TIMEOUT)
-         break;
+      WaitForSingleObject(_this->_wait, _this->_config.refresh * 1000);
    }
+   return 0;
 }

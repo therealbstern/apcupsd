@@ -16,6 +16,9 @@ upsimage_obj   := $(call SRC2OBJ,$(upsimage_srcs))
 SRCS = $(common_srcs) $(multimon_srcs) $(upsstats_srcs) \
        $(upsfstats_srcs) $(upsimage_srcs)
 
+# libgd needs -DNONDLL on Windows, otherwise it defaults to DLL
+upsimage.cgi: CPPFLAGS += -DNONDLL
+
 all-targets: multimon.cgi upsstats.cgi upsfstats.cgi upsimage.cgi
 
 multimon.cgi: $(common_obj) $(multimon_obj) $(APCLIBS)
@@ -28,7 +31,7 @@ upsfstats.cgi: $(common_obj) $(upsfstats_obj) $(APCLIBS)
 	$(LINK)
 
 upsimage.cgi: $(common_obj) $(upsimage_obj) $(APCLIBS)
-	$(LINK) $(X_LIBS) $(LIBGD)
+	$(LINK) $(LIBGD)
 
 all-install: install-cgi
 all-uninstall: uninstall-cgi

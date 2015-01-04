@@ -34,17 +34,15 @@
 
 #ifdef HAVE_NISLIB
 
-#ifndef   INADDR_NONE
-#define   INADDR_NONE    -1
-#endif
-
 /* Some Win32 specific screwery */
 #ifdef HAVE_MINGW
 
 #define close(fd)             closesocket(fd)
-#define ioctl(s,p,v)          ioctlsocket((s),(p),(u_long*)(v))
 #define getsockopt(s,l,o,d,z) getsockopt((s),(l),(o),(char*)(d),(z))
 #define EINPROGRESS           WSAEWOULDBLOCK
+
+int WSA_Init(void);
+int dummy = WSA_Init();
 
 #undef errno
 #define errno   WSAGetLastError()
@@ -52,8 +50,7 @@
 #undef h_errno
 #define h_errno WSAGetLastError()
 
-#endif
-
+#endif // HAVE_MINGW
 
 /*
  * Read nbytes from the network.
@@ -61,7 +58,7 @@
  * read requests
  */
 
-static int read_nbytes(int fd, char *ptr, int nbytes)
+static int read_nbytes(sock_t fd, char *ptr, int nbytes)
 {
    int nleft, nread = 0;
    struct timeval timeout;
@@ -109,7 +106,7 @@ static int read_nbytes(int fd, char *ptr, int nbytes)
  * Write nbytes to the network.
  * It may require several writes.
  */
-static int write_nbytes(int fd, const char *ptr, int nbytes)
+static int write_nbytes(sock_t fd, const char *ptr, int nbytes)
 {
    int nleft, nwritten;
 
@@ -139,8 +136,14 @@ static int write_nbytes(int fd, const char *ptr, int nbytes)
 #endif
       nwritten = send(fd, ptr, nleft, 0);
 
-      if (nwritten <= 0)
-         return -errno;       /* error */
+      switch (nwritten) {
+      case -1:
+         if (errno == EINTR || errno == EAGAIN)
+            continue;
+         return -errno;           /* error */
+      case 0:
+         return nbytes - nleft;   /* EOF */
+      }
 
       nleft -= nwritten;
       ptr += nwritten;
@@ -158,17 +161,17 @@ static int write_nbytes(int fd, const char *ptr, int nbytes)
  * Returns -1 on hard end of file (i.e. network connection close)
  * Returns -2 on error
  */
-int net_recv(int sockfd, char *buff, int maxlen)
+int net_recv(sock_t sockfd, char *buff, int maxlen)
 {
    int nbytes;
-   short pktsiz;
+   unsigned short pktsiz;
 
    /* get data size -- in short */
-   if ((nbytes = read_nbytes(sockfd, (char *)&pktsiz, sizeof(short))) <= 0) {
+   if ((nbytes = read_nbytes(sockfd, (char *)&pktsiz, sizeof(pktsiz))) <= 0) {
       /* probably pipe broken because client died */
       return nbytes;               /* assume hard EOF received */
    }
-   if (nbytes != sizeof(short))
+   if (nbytes != sizeof(pktsiz))
       return -EINVAL;
 
    pktsiz = ntohs(pktsiz);         /* decode no. of bytes that follow */
@@ -193,7 +196,7 @@ int net_recv(int sockfd, char *buff, int maxlen)
  * Returns number of bytes sent
  * Returns -1 on error
  */
-int net_send(int sockfd, const char *buff, int len)
+int net_send(sock_t sockfd, const char *buff, int len)
 {
    int rc;
    short pktsiz;
@@ -221,15 +224,25 @@ int net_send(int sockfd, const char *buff, int len)
  * Returns -1 on error
  * Returns socket file descriptor otherwise
  */
-int net_open(const char *host, char *service, int port)
+sock_t net_open(const char *host, char *service, int port)
 {
    int nonblock = 1;
    int block = 0;
-   int sockfd, rc;
-   struct hostent *hp;
+   sock_t sockfd;
+   int rc;
    struct sockaddr_in tcp_serv_addr;  /* socket information */
-   unsigned int inaddr;               /* Careful here to use unsigned int for */
-                                      /* compatibility with Alpha */
+
+#ifndef HAVE_MINGW
+   // Every platform has their own magic way to avoid getting a SIGPIPE
+   // when writing to a stream socket where the remote end has closed. 
+   // This method works pretty much everywhere which avoids the mess
+   // of figuring out which incantation this platform supports. (Excepting
+   // for win32 which doesn't support signals at all.)
+   struct sigaction sa;
+   memset(&sa, 0, sizeof(sa));
+   sa.sa_handler = SIG_IGN;
+   sigaction(SIGPIPE, &sa, NULL);
+#endif
 
    /* 
     * Fill in the structure serv_addr with the address of
@@ -238,21 +251,32 @@ int net_open(const char *host, char *service, int port)
    memset((char *)&tcp_serv_addr, 0, sizeof(tcp_serv_addr));
    tcp_serv_addr.sin_family = AF_INET;
    tcp_serv_addr.sin_port = htons(port);
-
-   if ((inaddr = inet_addr(host)) != INADDR_NONE) {
-      tcp_serv_addr.sin_addr.s_addr = inaddr;
-   } else {
-      if ((hp = gethostbyname(host)) == NULL)
+   tcp_serv_addr.sin_addr.s_addr = inet_addr(host);
+   if (tcp_serv_addr.sin_addr.s_addr == INADDR_NONE) {
+      struct hostent he;
+      char *tmphstbuf = NULL;
+      size_t hstbuflen = 0;
+      struct hostent *hp = gethostname_re(host, &he, &tmphstbuf, &hstbuflen);
+      if (!hp)
+      {
+         free(tmphstbuf);
          return -h_errno;
+      }
 
-      if (hp->h_length != sizeof(inaddr) || hp->h_addrtype != AF_INET)
+      if (hp->h_length != sizeof(tcp_serv_addr.sin_addr.s_addr) || 
+          hp->h_addrtype != AF_INET)
+      {
+         free(tmphstbuf);
          return -EINVAL;
+      }
 
-      tcp_serv_addr.sin_addr.s_addr = *(unsigned int *)hp->h_addr;
+      memcpy(&tcp_serv_addr.sin_addr.s_addr, hp->h_addr, 
+             sizeof(tcp_serv_addr.sin_addr.s_addr));
+      free(tmphstbuf);
    }
 
    /* Open a TCP socket */
-   if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
+   if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
       return -errno;
 
    /* connect to server */
@@ -331,7 +355,7 @@ int net_open(const char *host, char *service, int port)
 }
 
 /* Close the network connection */
-void net_close(int sockfd)
+void net_close(sock_t sockfd)
 {
    close(sockfd);
 }
@@ -341,7 +365,7 @@ void net_close(int sockfd)
  * Returns -1 on error.
  * Returns file descriptor of new connection otherwise.
  */
-int net_accept(int fd, struct sockaddr_in *cli_addr)
+sock_t net_accept(sock_t fd, struct sockaddr_in *cli_addr)
 {
 #ifdef HAVE_MINGW                                       
    /* kludge because some idiot defines socklen_t as unsigned */
@@ -349,7 +373,7 @@ int net_accept(int fd, struct sockaddr_in *cli_addr)
 #else
    socklen_t clilen = sizeof(*cli_addr);
 #endif
-   int newfd;
+   sock_t newfd;
 
 #if defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS
    int rc;
@@ -373,7 +397,7 @@ int net_accept(int fd, struct sockaddr_in *cli_addr)
          return -errno;              /* error */
 #endif
       newfd = accept(fd, (struct sockaddr *)cli_addr, &clilen);
-   } while (newfd == -1 && (errno == EINTR || errno == EAGAIN));
+   } while (newfd == INVALID_SOCKET && (errno == EINTR || errno == EAGAIN));
 
    if (newfd < 0)
       return -errno;                 /* error */

@@ -25,11 +25,31 @@
 
 #include "apc.h"
 
+int format_date(time_t timestamp, char *dest, size_t destlen)
+{
+   struct tm tm;
+   localtime_r(&timestamp, &tm);
+
+#ifdef HAVE_MINGW
+   // Annoyingly, Windows does not properly implement %z (it always spells
+   // out the timezone name) so we need to emulate it manually.
+   int len = strftime(dest, destlen, "%Y-%m-%d %H:%M:%S ", &tm);
+   tzset();
+   unsigned int offset = abs(_timezone) / 60;
+   len += snprintf(dest+len, destlen-len, "%c%02u%02u  ", 
+      _timezone < 0 ? '+' : '-', // _timezone is UTC-local
+      offset/60, offset%60);
+   return len;
+#else
+   return strftime(dest, destlen, "%Y-%m-%d %H:%M:%S %z  ", &tm);
+#endif
+}
+
 void log_event(const UPSINFO *ups, int level, const char *fmt, ...)
 {
    va_list arg_ptr;
    char msg[2 *MAXSTRING];
-   char datetime[MAXSTRING];
+   char datetime[100];
    int event_fd;
 
    event_fd = ups ? ups->event_fd : -1;
@@ -39,21 +59,15 @@ void log_event(const UPSINFO *ups, int level, const char *fmt, ...)
    va_end(arg_ptr);
 
    syslog(level, "%s", msg);       /* log the event */
-   Dmsg1(100, "%s\n", msg);
+   Dmsg(100, "%s\n", msg);
 
    /* Write out to our temp file. LOG_INFO is DATA logging, so
     * do not write it to our temp events file. */
    if (event_fd >= 0 && level != LOG_INFO) {
-      int lm;
-      time_t nowtime;
-      struct tm tm;
-
-      time(&nowtime);
-      localtime_r(&nowtime, &tm);
-      strftime(datetime, 100, "%a %b %d %X %Z %Y  ", &tm);
+      format_date(time(NULL), datetime, sizeof(datetime));
       write(event_fd, datetime, strlen(datetime));
 
-      lm = strlen(msg);
+      int lm = strlen(msg);
       if (msg[lm - 1] != '\n')
          msg[lm++] = '\n';
 
@@ -144,32 +158,58 @@ void d_msg(const char *file, int line, int level, const char *fmt, ...)
 #endif
 }
 
-void hex_dump(int level, void *data, unsigned int len)
+void hex_dump(int level, const void *data, unsigned int len)
 {
    unsigned int pos = 0;
-   unsigned char *dat = (unsigned char *)data;
-   char temp[16*3+1];
-   char temp2[8+2+16*3+1+16+1];
-   char *ptr;
+   const unsigned char *dat = (const unsigned char *)data;
+   char buf[4];
+
+   // Derivation of line buffer size:
+   //    8 digit address
+   //    2 spaces
+   //    16 hex bytes (2 chars + 1 space each)
+   //    1 additional space between hex and ascii
+   //    16 ASCII chars
+   //    1 NUL terminator
+   char line[8+2+16*3+1+16+1];
 
    if (debug_level < level)
       return;
 
-   Dmsg2(level, "Dumping %d bytes @ 0x%08x\n", len, data);
+   Dmsg(level, "Dumping %d bytes @ 0x%08x\n", len, data);
    while (pos < len)
    {
       int num = MIN(16, len-pos);
-      ptr = temp;
+
+      // Begin line with offset
+      snprintf(line, sizeof(line), "%08x  ", pos);
+
+      // Append hex digits
+      for (int i=0; i < 16; i++)
+      {
+         if (i < num)
+         {
+            snprintf(buf, sizeof(buf), "%02x ", dat[pos+i]);
+            strlcat(line, buf, sizeof(line));
+         }
+         else
+         {
+            strlcat(line, "   ", sizeof(line));
+         }
+      }
+
+      // Additional space between hex digits and ASCII
+      strlcat(line, " ", sizeof(line));
+
+      // Append ASCII
+      buf[1] = '\0';
       for (int i=0; i < num; i++)
-         ptr += sprintf(ptr, "%02x ", dat[pos+i]);
+      {
+         buf[0] = isgraph(dat[pos+i]) ? dat[pos+i] : '.';
+         strlcat(line, buf, sizeof(line));
+      }
 
-      ptr = temp2;
-      ptr += sprintf(temp2, "%08x  %-48s ", pos, temp);
-
-      for (int i=0; i < num; i++)
-         ptr += sprintf(ptr, "%c", isgraph(dat[pos+i]) ? dat[pos+i] : '.');
-
-      Dmsg1(level, "%s\n", temp2);
+      Dmsg(level, "%s\n", line);
       pos += num;
    }
 }

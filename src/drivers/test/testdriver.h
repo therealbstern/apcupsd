@@ -25,21 +25,20 @@
 #ifndef _TESTDRIVER_H
 #define _TESTDRIVER_H
 
-#include "drivers.h"
-
-class TestDriver: public UpsDriver
+class TestUpsDriver: public UpsDriver
 {
 public:
+   TestUpsDriver(UPSINFO *ups);
+   virtual ~TestUpsDriver() {}
 
-   TestDriver(UPSINFO *ups) : UpsDriver(ups, "test") {}
-   virtual ~TestDriver() {}
+   static UpsDriver *Factory(UPSINFO *ups)
+      { return new TestUpsDriver(ups); }
 
-   // Subclasses must implement these methods
+   virtual bool get_capabilities();
+   virtual bool read_volatile_data();
+   virtual bool read_static_data();
+   virtual bool check_state();
    virtual bool Open();
-   virtual bool GetCapabilities();
-   virtual bool ReadVolatileData();
-   virtual bool ReadStaticData();
-   virtual bool CheckState();
    virtual bool Close();
 
 private:

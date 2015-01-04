@@ -4,7 +4,7 @@
 //
 // Rewrite/Refactoring by Adam Kropelin
 //
-// Copyright (2007) Adam D. Kropelin
+// Copyright (2009) Adam D. Kropelin
 // Copyright (2000) Kern E. Sibbald
 //
 
@@ -12,35 +12,39 @@
 #define WINEVENTS_H
 
 #include <windows.h>
+#include "amutex.h"
 
 // Forward declarations
 class StatMgr;
+class ListView;
+class upsMenu;
 
 // Object implementing the Events dialogue box for apcupsd
 class upsEvents
 {
 public:
    // Constructor/destructor
-   upsEvents(HINSTANCE appinst, StatMgr *statmgr);
+   upsEvents(HINSTANCE appinst, upsMenu *menu);
    ~upsEvents();
 
-   // Initialisation
-   BOOL Init();
-
    // General
-   void Show(BOOL show);
+   void Show();
+   void Update(StatMgr *statmgr);
 
 private:
    // The dialog box window proc
    static BOOL CALLBACK DialogProc(
       HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-   void FillEventsBox(HWND hwnd, int id_list);
+   BOOL CALLBACK DialogProcess(
+      HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
    // Private data
-   BOOL m_dlgvisible;
-   HINSTANCE m_appinst;
-   StatMgr *m_statmgr;
+   HINSTANCE _appinst;
+   HWND _hwnd;
+   ListView *_events;
+   amutex _mutex;
+   RECT _rect;
+   upsMenu *_menu;
 };
 
 #endif // WINEVENTS_H
