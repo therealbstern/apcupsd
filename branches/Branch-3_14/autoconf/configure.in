@@ -783,7 +783,6 @@ if test "$needlibusb" = "true" ; then
    AC_SUBST(LIBUSBHID)
    APCDRVLIBS="$APCDRVLIBS \$(topdir)/src/libusbhid/libusbhid.a"
    CPPFLAGS="$CPPFLAGS -I\$(topdir)/src/libusbhid"
-   LIBEXTRAOBJ="$LIBEXTRAOBJ HidUps.cpp"
 fi
 
 dnl Force NIS to enabled since libnis is required by apcaccess.

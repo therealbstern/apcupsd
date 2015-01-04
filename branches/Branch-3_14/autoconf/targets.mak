@@ -160,7 +160,7 @@ $(OBJDIR)/%.o: %.m
 # Rule to link an executable
 define LINK
 	@$(ECHO) "  LD   " $(RELDIR)$@
-	$(V)$(LD) $(LDFLAGS) -Wl,--start-group $^ -Wl,--end-group -o $@ $(LIBS)
+	$(V)$(LD) $(LDFLAGS) $^ -o $@ $(LIBS)
 endef
 
 # Rule to generate an archive (library)
