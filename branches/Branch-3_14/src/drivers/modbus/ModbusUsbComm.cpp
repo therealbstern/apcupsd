@@ -174,9 +174,32 @@ bool ModbusUsbComm::ModbusRx(ModbusFrame *frm, unsigned int *sz)
       // We always get a full report containing MODBUS_USB_REPORT_MAX_FRAME_SIZE
       // bytes of data. Clip to actual size of live data by looking at the MODBUS 
       // PDU header. This is a blatant layering violation, but no way around it 
-      // here. Add 3 bytes to PDU size to account for size byte itself plus frame 
-      // header (slaveaddr and op code).
-      unsigned frmsz = rpt[3] + 3;
+      // here. Which byte(s) we look at and how we calculate the length depends
+      // on the opcode.
+      unsigned frmsz;
+      if (rpt[2] == MODBUS_FC_READ_HOLDING_REGS)
+      {
+         // READ_HOLDING_REGS response includes a size byte.
+         // Add 3 bytes to PDU size to account for size byte itself 
+         // plus frame header (slaveaddr and op code).
+         frmsz = rpt[3] + 3;
+      }
+      else if (rpt[2] == MODBUS_FC_WRITE_MULTIPLE_REGS)
+      {
+         // WRITE_MULTIPLE_REGS response is always a fixed length
+         // 2 byte frame header (slaveaddr and op code)
+         // 2 byte register starting address
+         // 2 byte register count
+         frmsz = 6;
+      }
+      else
+      {
+         // Unsupported response message...we can't calculate its length
+         Dmsg(0, "%s: Unknown response type %x\n", __func__, rpt[2]);
+         hex_dump(0, rpt,  MODBUS_USB_REPORT_SIZE);
+         return false;
+      }
+
       if (frmsz > MODBUS_USB_REPORT_MAX_FRAME_SIZE)
       {
          Dmsg(0, "%s: Fragmented PDU received...not supported\n", __func__);
