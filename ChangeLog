@@ -1,12 +1,881 @@
 /***************************************************************************/
 /*                     ChangeLog of Apcupsd 3.14.x                         */
 /*                                                                         */
-/*               Adam Kropelin <akropel1 at rochester dot rr dot com>      */
-/*               Kern Sibbald <kern at sibbald dot com>                    */
+/*               Adam Kropelin <adam@kroptech.com>                         */
 /*                                                                         */
 /*               http://www.apcupsd.com/                                   */
 /*               http://sourceforge.net/projects/apcupsd                   */
 /***************************************************************************/
+
+------------------------------------------------------------------------
+r2284 | adk0212 | 2015-01-04 13:08:07 -0500 (Sun, 04 Jan 2015) | 2 lines
+
+Bump version for 3.14.13-test1 release
+
+------------------------------------------------------------------------
+r2283 | adk0212 | 2015-01-04 13:06:40 -0500 (Sun, 04 Jan 2015) | 4 lines
+
+Fix WriteRegister on MODBUS USB
+Response messages need to be treated individually to determine length of live data.
+Previously code was assuming READ_HOLDING_REGS format which fails for WRITE_MULTIPLE_REGS.
+
+------------------------------------------------------------------------
+r2282 | adk0212 | 2015-01-03 11:26:55 -0500 (Sat, 03 Jan 2015) | 2 lines
+
+Allow cable type of USB for MODBUS driver
+
+------------------------------------------------------------------------
+r2281 | adk0212 | 2015-01-03 11:26:33 -0500 (Sat, 03 Jan 2015) | 2 lines
+
+Update file header comment
+
+------------------------------------------------------------------------
+r2280 | adk0212 | 2015-01-03 00:07:49 -0500 (Sat, 03 Jan 2015) | 2 lines
+
+Add usb_interrupt_write() to winusb translation layer to support MODBUS USB
+
+------------------------------------------------------------------------
+r2279 | adk0212 | 2015-01-03 00:02:51 -0500 (Sat, 03 Jan 2015) | 2 lines
+
+Add MODBUS USB support
+
+------------------------------------------------------------------------
+r2278 | adk0212 | 2015-01-03 00:00:58 -0500 (Sat, 03 Jan 2015) | 2 lines
+
+Remove unused _{new,old}tio variables
+
+------------------------------------------------------------------------
+r2277 | adk0212 | 2015-01-02 23:59:59 -0500 (Fri, 02 Jan 2015) | 2 lines
+
+Remove hidutils.c as its functionality has been subsumed into HidUps.cpp
+
+------------------------------------------------------------------------
+r2276 | adk0212 | 2015-01-02 23:50:36 -0500 (Fri, 02 Jan 2015) | 2 lines
+
+Build drivers into separate libs to eliminate rule duplication in src/driver/Makefile
+
+------------------------------------------------------------------------
+r2275 | adk0212 | 2015-01-02 16:34:23 -0500 (Fri, 02 Jan 2015) | 3 lines
+
+Break libusb and libusbhid interfacing code out into HidUps class.
+This will allow reuse with MODBUS USB capability.
+
+------------------------------------------------------------------------
+r2274 | adk0212 | 2015-01-02 12:12:47 -0500 (Fri, 02 Jan 2015) | 2 lines
+
+Configure support for MODBUS/USB
+
+------------------------------------------------------------------------
+r2273 | adk0212 | 2014-12-02 16:10:47 -0500 (Tue, 02 Dec 2014) | 3 lines
+
+CID75626 Uninitialized scalar field
+Remove _oldtio and _newtio members, they are not necessary
+
+------------------------------------------------------------------------
+r2272 | adk0212 | 2014-12-02 16:06:57 -0500 (Tue, 02 Dec 2014) | 3 lines
+
+CID75625 Unchecked return value from library
+Check return value from fcntl(F_GETFL) and explicitly ignore retval from fcntl(F_SETFL)
+
+------------------------------------------------------------------------
+r2271 | adk0212 | 2014-12-01 14:38:54 -0500 (Mon, 01 Dec 2014) | 2 lines
+
+Refactor MODBUS RS232 into base and derived class
+
+------------------------------------------------------------------------
+r2270 | adk0212 | 2014-11-25 16:33:23 -0500 (Tue, 25 Nov 2014) | 3 lines
+
+Fix apcsmart calibration on win32
+Need to poll for UPS commands and keyboard input since win32 select only works with sockets
+
+------------------------------------------------------------------------
+r2269 | adk0212 | 2014-11-25 08:17:20 -0500 (Tue, 25 Nov 2014) | 2 lines
+
+Update comment on LOCKFILE directive to resolve confusion over whether it is a FILE as the name would imply, or a DIRECTORY, which is the truth
+
+------------------------------------------------------------------------
+r2268 | adk0212 | 2014-11-24 13:25:49 -0500 (Mon, 24 Nov 2014) | 3 lines
+
+Check for setup_device failure and exit with an error instead of continuing on.
+Reported by Laurent Blume <laurent@opencsw.org>
+
+------------------------------------------------------------------------
+r2267 | adk0212 | 2014-11-12 12:30:33 -0500 (Wed, 12 Nov 2014) | 2 lines
+
+Fix libsupc++fix.cpp filename in configure
+
+------------------------------------------------------------------------
+r2266 | adk0212 | 2014-11-06 22:12:59 -0500 (Thu, 06 Nov 2014) | 2 lines
+
+Add missing copyright banners
+
+------------------------------------------------------------------------
+r2265 | adk0212 | 2014-11-06 22:00:43 -0500 (Thu, 06 Nov 2014) | 2 lines
+
+Use PTHREAD_MUTEX_INITIALIZER to init mutex
+
+------------------------------------------------------------------------
+r2264 | adk0212 | 2014-11-06 21:42:11 -0500 (Thu, 06 Nov 2014) | 2 lines
+
+Bring back compat/pwd.h and move getpwuid() to it
+
+------------------------------------------------------------------------
+r2263 | adk0212 | 2014-11-06 21:28:57 -0500 (Thu, 06 Nov 2014) | 2 lines
+
+Remove FREEBSD_SUPCPP_FIX, this file is now compiled only when needed so content can be unconditional
+
+------------------------------------------------------------------------
+r2262 | adk0212 | 2014-11-06 17:01:12 -0500 (Thu, 06 Nov 2014) | 2 lines
+
+smtp needs pwd.h
+
+------------------------------------------------------------------------
+r2261 | adk0212 | 2014-11-06 16:51:13 -0500 (Thu, 06 Nov 2014) | 2 lines
+
+Only build libsupc++fix.cpp when needed and in the process clean up LIBEXTRAOBJ handling
+
+------------------------------------------------------------------------
+r2260 | adk0212 | 2014-11-06 16:34:20 -0500 (Thu, 06 Nov 2014) | 2 lines
+
+Remove unused file
+
+------------------------------------------------------------------------
+r2259 | adk0212 | 2014-11-06 16:32:25 -0500 (Thu, 06 Nov 2014) | 2 lines
+
+Rename sleep.c to nanosleep.c since that's what it is
+
+------------------------------------------------------------------------
+r2258 | adk0212 | 2014-11-06 16:28:45 -0500 (Thu, 06 Nov 2014) | 2 lines
+
+Remove unused file
+
+------------------------------------------------------------------------
+r2257 | adk0212 | 2014-11-06 16:26:32 -0500 (Thu, 06 Nov 2014) | 2 lines
+
+gethostbyname is in winsock2.h on win32, so netdb.h is yet another alias for winsock2.h
+
+------------------------------------------------------------------------
+r2256 | adk0212 | 2014-11-06 16:25:54 -0500 (Thu, 06 Nov 2014) | 2 lines
+
+Remove more unused win32/compat headers
+
+------------------------------------------------------------------------
+r2255 | adk0212 | 2014-11-06 16:11:50 -0500 (Thu, 06 Nov 2014) | 2 lines
+
+Remove unused compat/features.h
+
+------------------------------------------------------------------------
+r2254 | adk0212 | 2014-11-06 16:10:55 -0500 (Thu, 06 Nov 2014) | 2 lines
+
+Remove unused compat/grp.h
+
+------------------------------------------------------------------------
+r2253 | adk0212 | 2014-11-06 16:09:19 -0500 (Thu, 06 Nov 2014) | 2 lines
+
+Rename netcompat.c -> inet_aton.c since that's the only thing in it now
+
+------------------------------------------------------------------------
+r2252 | adk0212 | 2014-11-06 16:06:50 -0500 (Thu, 06 Nov 2014) | 2 lines
+
+More win32 compat include file cleanup
+
+------------------------------------------------------------------------
+r2251 | adk0212 | 2014-11-06 15:50:07 -0500 (Thu, 06 Nov 2014) | 2 lines
+
+Move inet_aton() prototype to arpa/inet.h
+
+------------------------------------------------------------------------
+r2250 | adk0212 | 2014-11-06 15:31:45 -0500 (Thu, 06 Nov 2014) | 2 lines
+
+Remove obsolete manually-written config.h for win32 builds
+
+------------------------------------------------------------------------
+r2249 | adk0212 | 2014-11-05 10:45:28 -0500 (Wed, 05 Nov 2014) | 2 lines
+
+List libwin32compat.a as a dependency so exes are relinked when it changes
+
+------------------------------------------------------------------------
+r2248 | adk0212 | 2014-11-05 10:32:56 -0500 (Wed, 05 Nov 2014) | 2 lines
+
+Remove USBTYPE define; it is not longer used
+
+------------------------------------------------------------------------
+r2247 | adk0212 | 2014-11-05 10:28:16 -0500 (Wed, 05 Nov 2014) | 6 lines
+
+Big win32 compat cleanup
+- Eliminate unnecessary compat functions
+- Split useful functions out into individual files to reduce linking of unnecessary compats
+- Move prototypes and defines to proper header files instead of jamming them all in compat.h
+- Remove 90% of the includes from compat.h
+
+------------------------------------------------------------------------
+r2246 | adk0212 | 2014-11-04 21:06:09 -0500 (Tue, 04 Nov 2014) | 2 lines
+
+Make bind_upses() a no-op if USBDEVFS_CONNECT is not available
+
+------------------------------------------------------------------------
+r2245 | adk0212 | 2014-11-04 20:58:45 -0500 (Tue, 04 Nov 2014) | 3 lines
+
+Eliminate use of sprintf in digest2ascii
+Code was fine but audits for sprintf keep tripping here so change it
+
+------------------------------------------------------------------------
+r2244 | adk0212 | 2014-11-04 20:56:46 -0500 (Tue, 04 Nov 2014) | 3 lines
+
+Rewrite hex_dump to make it clearer that no buffers are being overrun here.
+Audits for uses of sprintf and strcpy keep tripping over this code, so give in and change it even though there is no bug.
+
+------------------------------------------------------------------------
+r2243 | adk0212 | 2014-11-04 18:49:24 -0500 (Tue, 04 Nov 2014) | 2 lines
+
+Quiet warning from insufficiently clueful compiler
+
+------------------------------------------------------------------------
+r2242 | adk0212 | 2014-11-04 18:47:16 -0500 (Tue, 04 Nov 2014) | 2 lines
+
+Braces initializer on struct sigaction is not portable, use memset instead
+
+------------------------------------------------------------------------
+r2241 | adk0212 | 2014-11-04 16:54:07 -0500 (Tue, 04 Nov 2014) | 2 lines
+
+Remove executable property from Makefile
+
+------------------------------------------------------------------------
+r2240 | adk0212 | 2014-11-04 16:17:53 -0500 (Tue, 04 Nov 2014) | 2 lines
+
+Remove hiddex.txt as this is an obsolete copy from Linux docs
+
+------------------------------------------------------------------------
+r2239 | adk0212 | 2014-11-04 16:13:06 -0500 (Tue, 04 Nov 2014) | 2 lines
+
+Exclude gapcmon with --enable-all when cross-building for mingw32
+
+------------------------------------------------------------------------
+r2238 | adk0212 | 2014-11-04 16:02:15 -0500 (Tue, 04 Nov 2014) | 2 lines
+
+Fix TOPDIR
+
+------------------------------------------------------------------------
+r2237 | adk0212 | 2014-11-04 15:36:35 -0500 (Tue, 04 Nov 2014) | 2 lines
+
+Move build-win32-cross-tools script to platforms/mingw
+
+------------------------------------------------------------------------
+r2236 | adk0212 | 2014-11-04 15:35:24 -0500 (Tue, 04 Nov 2014) | 2 lines
+
+Kill off the old win32 Makefile.in ... Yay!
+
+------------------------------------------------------------------------
+r2235 | adk0212 | 2014-11-04 15:34:00 -0500 (Tue, 04 Nov 2014) | 2 lines
+
+Remove obsolete readme
+
+------------------------------------------------------------------------
+r2234 | adk0212 | 2014-11-04 15:27:08 -0500 (Tue, 04 Nov 2014) | 2 lines
+
+Move win32 install package creation to platforms/mingw similar to how OS X is done and update for new file locations
+
+------------------------------------------------------------------------
+r2233 | adk0212 | 2014-11-04 14:34:52 -0500 (Tue, 04 Nov 2014) | 3 lines
+
+Test for dir existence before blindly adding /usr/local paths to {CPP,LD}FLAGS
+Darwin LLVM ld complains about non-existent lib directories on the command line
+
+------------------------------------------------------------------------
+r2232 | adk0212 | 2014-11-04 14:25:05 -0500 (Tue, 04 Nov 2014) | 2 lines
+
+Rebuild configure to incorporate BG variable for win32 background mode processes
+
+------------------------------------------------------------------------
+r2231 | adk0212 | 2014-11-04 14:17:43 -0500 (Tue, 04 Nov 2014) | 6 lines
+
+Ability to build for win32 via normal make system instead of hardcoded src/win32/Makefile.in
+Planned to do this many years ago, finally done!
+Windows build is enabled via normal autoconf cross-compile "./configure --host=mingw32".
+During configure, CROSSTOOLS env var selects location of mingw32 toolchain (built via build-win32-cross-tools script), default is $(topdir)/../cross-tools
+Similarly, DEPKGS var points to win32 dependency package directory, default is $(topdir)/../depkgs-win32
+
+------------------------------------------------------------------------
+r2230 | adk0212 | 2014-11-04 08:30:37 -0500 (Tue, 04 Nov 2014) | 2 lines
+
+Eliminate apc_config.h by pulling useful pieces into defines.h
+
+------------------------------------------------------------------------
+r2229 | adk0212 | 2014-11-04 08:12:56 -0500 (Tue, 04 Nov 2014) | 3 lines
+
+Rename config.h to apcconfig.h since config.h is dangerously vague.
+Win32 pthreads, for example, provides a config.h.
+
+------------------------------------------------------------------------
+r2228 | adk0212 | 2014-11-04 07:41:35 -0500 (Tue, 04 Nov 2014) | 2 lines
+
+More warning fixes for win32 builds
+
+------------------------------------------------------------------------
+r2227 | adk0212 | 2014-11-04 07:19:09 -0500 (Tue, 04 Nov 2014) | 3 lines
+
+CID74720 Uninitialized scalar field
+Initialize _fd to INVALID_SOCKET
+
+------------------------------------------------------------------------
+r2226 | adk0212 | 2014-11-03 22:26:04 -0500 (Mon, 03 Nov 2014) | 3 lines
+
+Remove unused and buggy strncasecmp() function
+Remove unused variable from conv_unix_to_win32_path()
+
+------------------------------------------------------------------------
+r2225 | adk0212 | 2014-11-03 22:12:11 -0500 (Mon, 03 Nov 2014) | 2 lines
+
+Fix strict alising issue in apclibnis by implementing FIONBIO ioctl in compat instead of using macro
+
+------------------------------------------------------------------------
+r2224 | adk0212 | 2014-11-03 21:44:54 -0500 (Mon, 03 Nov 2014) | 3 lines
+
+Replace use of 'int' as socket type with sock_t, which maps to 'SOCKET' on Windows and 'int' everywhere else.
+Also use INVALID_SOCKET instead of -1 for socket failure case. This fixes a bunch of warnings on Windows.
+
+------------------------------------------------------------------------
+r2223 | adk0212 | 2014-11-03 21:18:56 -0500 (Mon, 03 Nov 2014) | 3 lines
+
+Fix a few warnings when building for win32
+Many more to go...
+
+------------------------------------------------------------------------
+r2222 | adk0212 | 2014-11-03 17:35:36 -0500 (Mon, 03 Nov 2014) | 2 lines
+
+Add <stdio.h>
+
+------------------------------------------------------------------------
+r2221 | adk0212 | 2014-11-03 17:33:22 -0500 (Mon, 03 Nov 2014) | 2 lines
+
+Change balloonmgr to use alib containers instead of STL
+
+------------------------------------------------------------------------
+r2220 | adk0212 | 2014-11-03 09:54:57 -0500 (Mon, 03 Nov 2014) | 2 lines
+
+Remove unnecessary header overrides; mingw versions are fine
+
+------------------------------------------------------------------------
+r2219 | adk0212 | 2014-11-03 09:47:55 -0500 (Mon, 03 Nov 2014) | 2 lines
+
+Remove stat replacement; mingw stat seems fine
+
+------------------------------------------------------------------------
+r2218 | adk0212 | 2014-11-03 09:32:31 -0500 (Mon, 03 Nov 2014) | 2 lines
+
+Remove manual definition of integer types; mingw provides <stdint.h>
+
+------------------------------------------------------------------------
+r2217 | adk0212 | 2014-11-02 21:55:34 -0500 (Sun, 02 Nov 2014) | 2 lines
+
+Remove obsolete SHM_RDONLY define
+
+------------------------------------------------------------------------
+r2216 | adk0212 | 2014-11-02 21:54:38 -0500 (Sun, 02 Nov 2014) | 2 lines
+
+Use strlcpy for strftime replacement instead of strncpy
+
+------------------------------------------------------------------------
+r2215 | adk0212 | 2014-10-30 10:35:35 -0400 (Thu, 30 Oct 2014) | 2 lines
+
+Disable PCNET TIMELEFT workaround, causing breakage on recent UPSes
+
+------------------------------------------------------------------------
+r2214 | adk0212 | 2014-10-28 14:17:23 -0400 (Tue, 28 Oct 2014) | 3 lines
+
+Fix installation on older Mac OS X versions
+Apparently the deprecated auth= attribute is needed on these systems
+
+------------------------------------------------------------------------
+r2213 | adk0212 | 2014-10-28 13:04:05 -0400 (Tue, 28 Oct 2014) | 2 lines
+
+First pass at application and package signing for Mac OS X
+
+------------------------------------------------------------------------
+r2212 | adk0212 | 2014-10-27 18:46:12 -0400 (Mon, 27 Oct 2014) | 2 lines
+
+Update copyright
+
+------------------------------------------------------------------------
+r2211 | adk0212 | 2014-10-27 18:24:35 -0400 (Mon, 27 Oct 2014) | 2 lines
+
+Remove file used by old PackageMaker scripts
+
+------------------------------------------------------------------------
+r2210 | adk0212 | 2014-10-27 18:22:43 -0400 (Mon, 27 Oct 2014) | 2 lines
+
+Updates for packaging using pkgbuild and productbuild instead of deprecated PackageMaker
+
+------------------------------------------------------------------------
+r2209 | adk0212 | 2014-10-27 11:46:19 -0400 (Mon, 27 Oct 2014) | 2 lines
+
+Update Mac OS X build notes for newer dev tools and packages
+
+------------------------------------------------------------------------
+r2208 | adk0212 | 2014-10-27 11:37:20 -0400 (Mon, 27 Oct 2014) | 2 lines
+
+Add patch for libusb-0.1.12 on newer Xcode tools
+
+------------------------------------------------------------------------
+r2207 | adk0212 | 2014-10-27 10:32:43 -0400 (Mon, 27 Oct 2014) | 2 lines
+
+Remove Growl plist
+
+------------------------------------------------------------------------
+r2206 | adk0212 | 2014-10-27 10:23:15 -0400 (Mon, 27 Oct 2014) | 2 lines
+
+Remove Growl references in config window, hide notification enable checkbox when Notification Center is not available
+
+------------------------------------------------------------------------
+r2205 | adk0212 | 2014-10-27 09:59:45 -0400 (Mon, 27 Oct 2014) | 6 lines
+
+More validation improvements and code cleanup
+Rename BetterNumberFormatter to ActiveNumberFormatter
+Split ActiveNumberFormatter out into its own file
+Fail validation if any field is blank
+Switch input focus to the first blank control to give the user a clue as to why we refused to close the window
+
+------------------------------------------------------------------------
+r2204 | adk0212 | 2014-10-26 22:44:24 -0400 (Sun, 26 Oct 2014) | 2 lines
+
+Clean up preferences validation; cell background coloring was not working right on newer systems
+
+------------------------------------------------------------------------
+r2203 | adk0212 | 2014-10-26 20:49:59 -0400 (Sun, 26 Oct 2014) | 2 lines
+
+Check in the built NIB file to allow compiling apcagent with older XCode tools
+
+------------------------------------------------------------------------
+r2202 | adk0212 | 2014-10-26 18:18:28 -0400 (Sun, 26 Oct 2014) | 3 lines
+
+Fix issue with config 'port' field displaying with thousands separator when built with newer XCode tools
+Attach a NSNumberFormatter to the config port cell and set it for no formatting
+
+------------------------------------------------------------------------
+r2201 | adk0212 | 2014-10-26 17:15:21 -0400 (Sun, 26 Oct 2014) | 2 lines
+
+Add comments
+
+------------------------------------------------------------------------
+r2200 | adk0212 | 2014-10-26 17:12:36 -0400 (Sun, 26 Oct 2014) | 2 lines
+
+NSMenuDelete and NSUserNotificationCenterDelegate did not exist until 10.6 and 10.8, respectively
+
+------------------------------------------------------------------------
+r2199 | adk0212 | 2014-10-26 17:06:27 -0400 (Sun, 26 Oct 2014) | 4 lines
+
+First pass at Notification Center support for apcagent
+Little rough still, but working
+All the ifdefs to allow compiling with pre-10.8 SDKs is annoying
+
+------------------------------------------------------------------------
+r2198 | adk0212 | 2014-10-26 15:27:50 -0400 (Sun, 26 Oct 2014) | 3 lines
+
+Fix bug in getLoginItem() which caused crashes on 10.5
+url is not written when LSSharedFileListItemResolve fails, need to set it to nil each time
+
+------------------------------------------------------------------------
+r2197 | adk0212 | 2014-10-26 15:25:53 -0400 (Sun, 26 Oct 2014) | 2 lines
+
+Use numeric values instead of macros for OS X version checking so that we can successfully build when the SDK predates the version being tested for
+
+------------------------------------------------------------------------
+r2196 | adk0212 | 2014-10-24 15:42:48 -0400 (Fri, 24 Oct 2014) | 3 lines
+
+Prefer instantiateWithOwner over instantiateNibWithOwner which was deprecated in 10.8
+This makes memory management of the NIB top level object array cleaner
+
+------------------------------------------------------------------------
+r2195 | adk0212 | 2014-10-24 13:58:14 -0400 (Fri, 24 Oct 2014) | 2 lines
+
+Prefer LSSharedFileListItemCopyResolvedURL over deprecated LSSharedFileListItemResolve when deployment target allows
+
+------------------------------------------------------------------------
+r2194 | adk0212 | 2014-10-23 21:32:38 -0400 (Thu, 23 Oct 2014) | 3 lines
+
+Kill off LoginItemsAE (login item management via Apple Events) in favor of LSSharedFileList API
+This is good on 10.5 and higher, so 10.4 support is now formally dropped (and PPC along with it)
+
+------------------------------------------------------------------------
+r2193 | adk0212 | 2014-10-22 11:59:06 -0400 (Wed, 22 Oct 2014) | 3 lines
+
+Remove Growl support from apcagent
+Will be adding Notification Center support to replace Growl
+
+------------------------------------------------------------------------
+r2192 | adk0212 | 2014-10-22 09:28:46 -0400 (Wed, 22 Oct 2014) | 2 lines
+
+CID17181,17182 Argument cannot be negative
+
+------------------------------------------------------------------------
+r2191 | adk0212 | 2014-10-21 22:37:29 -0400 (Tue, 21 Oct 2014) | 4 lines
+
+CID17162 Dereference after null check
+Only an issue if CI_STATUS were not in the CiInfo table.
+But this is unnecessary code anyway, so remove it.
+
+------------------------------------------------------------------------
+r2190 | adk0212 | 2014-10-21 22:30:44 -0400 (Tue, 21 Oct 2014) | 3 lines
+
+CID17184 Out-of-bounds access (again)
+Another attempt to address this non-issue in a way that makes it clear to Coverity that there is no buffer overrun
+
+------------------------------------------------------------------------
+r2189 | adk0212 | 2014-10-21 22:09:20 -0400 (Tue, 21 Oct 2014) | 4 lines
+
+CID74325 Unchecked return value from library
+Document why we're setting SO_BROADCAST and why we don't care if it fails.
+Cast return to void to indicate that we don't care about return value.
+
+------------------------------------------------------------------------
+r2188 | adk0212 | 2014-10-21 16:40:23 -0400 (Tue, 21 Oct 2014) | 2 lines
+
+Remove obsolete POWERFLUTE and POWERLIBS definitions
+
+------------------------------------------------------------------------
+r2187 | adk0212 | 2014-10-21 16:29:34 -0400 (Tue, 21 Oct 2014) | 3 lines
+
+Be explicit about invoking compiler with C++ language
+Fixes warnings from clang
+
+------------------------------------------------------------------------
+r2186 | adk0212 | 2014-10-21 16:22:20 -0400 (Tue, 21 Oct 2014) | 2 lines
+
+Fix forward decl
+
+------------------------------------------------------------------------
+r2185 | adk0212 | 2014-10-21 15:10:59 -0400 (Tue, 21 Oct 2014) | 3 lines
+
+Remove StartupItems scripts for OS X
+launchd is supported as far back as 10.4, so no reason to keep StartupItems stuff around
+
+------------------------------------------------------------------------
+r2184 | adk0212 | 2014-10-21 14:59:18 -0400 (Tue, 21 Oct 2014) | 2 lines
+
+Update Darwin installer welcome text for new email list URL
+
+------------------------------------------------------------------------
+r2183 | adk0212 | 2014-10-21 14:44:15 -0400 (Tue, 21 Oct 2014) | 2 lines
+
+Update coverity model to mark error_out_wrapper() as no-return.
+
+------------------------------------------------------------------------
+r2182 | adk0212 | 2014-10-21 14:41:44 -0400 (Tue, 21 Oct 2014) | 2 lines
+
+Wrap calls to error_out function pointer in actual function that can be modeled in Coverity as no-return. This should clean up a number of false positives in Coverity.
+
+------------------------------------------------------------------------
+r2181 | adk0212 | 2014-10-21 14:32:46 -0400 (Tue, 21 Oct 2014) | 2 lines
+
+Kill off error_exit. It was identical to error_out except didn't have line number and there was only one user (apcconfig). Switch apcconfig over to error_out and remove error_exit.
+
+------------------------------------------------------------------------
+r2180 | adk0212 | 2014-10-21 12:09:41 -0400 (Tue, 21 Oct 2014) | 2 lines
+
+Tie OS X launchd setup into install and uninstall
+
+------------------------------------------------------------------------
+r2179 | adk0212 | 2014-10-21 11:27:20 -0400 (Tue, 21 Oct 2014) | 3 lines
+
+Add launchd startup files for OS X
+Not tied into 'make install' yet but functional if manually installed
+
+------------------------------------------------------------------------
+r2178 | adk0212 | 2014-10-21 04:11:51 -0400 (Tue, 21 Oct 2014) | 2 lines
+
+CID17183 Array compared against 0
+
+------------------------------------------------------------------------
+r2177 | adk0212 | 2014-10-21 00:10:53 -0400 (Tue, 21 Oct 2014) | 3 lines
+
+Fix apcaccess failure when apcupsd.conf does not supply NISIP.
+Reported by David Walser <luigiwalser@yahoo.com>
+
+------------------------------------------------------------------------
+r2176 | adk0212 | 2014-10-20 23:58:46 -0400 (Mon, 20 Oct 2014) | 4 lines
+
+Fix errant 'fi' in Mandrake script
+Reported by Graeme Gemmill <graeme@gemmill.name>
+Patch by David Walser <luigiwalser@yahoo.com>
+
+------------------------------------------------------------------------
+r2175 | adk0212 | 2014-10-20 23:40:33 -0400 (Mon, 20 Oct 2014) | 8 lines
+
+Make another attempt to fix startup/shutdown log level issues.
+LOG_INFO is the obvious level to use, but as trev@sentry.org pointed out in a fix
+a few years back, LOG_INFO is reserved for apcupsd data logging and is not allowed
+thru the normal event log (syslog) mechanism. LOG_WARN will make it thru but is
+too high a level, especially on Windows. Using LOG_NOTICE should work; it's lower
+than WARN (and, importantly, maps to INFORMATION type on Windows) but it is higher
+than INFO and therefore will make it thru to syslog.
+
+------------------------------------------------------------------------
+r2174 | adk0212 | 2014-10-20 23:13:50 -0400 (Mon, 20 Oct 2014) | 3 lines
+
+Fix log level of apcupsd startup message: should be INFO not WARN
+Reported by marvin@cbr125world.com
+
+------------------------------------------------------------------------
+r2173 | adk0212 | 2014-10-17 23:14:48 -0400 (Fri, 17 Oct 2014) | 2 lines
+
+Update manual with license info for apcupsd itself as well as libusbhid
+
+------------------------------------------------------------------------
+r2172 | adk0212 | 2014-10-17 21:22:05 -0400 (Fri, 17 Oct 2014) | 2 lines
+
+linux/usb/ch9.h does not exist on all distros...let's just define the device descriptor struct ourselves
+
+------------------------------------------------------------------------
+r2171 | adk0212 | 2014-10-17 21:06:23 -0400 (Fri, 17 Oct 2014) | 2 lines
+
+Remove unnecessary assignment
+
+------------------------------------------------------------------------
+r2170 | adk0212 | 2014-10-17 18:24:18 -0400 (Fri, 17 Oct 2014) | 2 lines
+
+Cleanup
+
+------------------------------------------------------------------------
+r2169 | adk0212 | 2014-10-17 18:21:21 -0400 (Fri, 17 Oct 2014) | 2 lines
+
+On Linux, attempt to automatically attach USB UPSes to the kernel usbhid/hiddev driver in case they have been detached from it (typically due to running the apcupsd 'generic' USB driver)
+
+------------------------------------------------------------------------
+r2168 | adk0212 | 2014-10-16 22:28:17 -0400 (Thu, 16 Oct 2014) | 2 lines
+
+Fix remaining compiler warnings in hid-ups.c
+
+------------------------------------------------------------------------
+r2167 | adk0212 | 2014-10-16 21:56:08 -0400 (Thu, 16 Oct 2014) | 2 lines
+
+Fix the majority of the compiler warning flood in hid-ups.c
+
+------------------------------------------------------------------------
+r2166 | adk0212 | 2014-10-16 21:48:17 -0400 (Thu, 16 Oct 2014) | 2 lines
+
+Correct units on PresentStatus usage
+
+------------------------------------------------------------------------
+r2165 | adk0212 | 2014-10-16 21:46:45 -0400 (Thu, 16 Oct 2014) | 2 lines
+
+Convert tabs to spaces
+
+------------------------------------------------------------------------
+r2164 | adk0212 | 2014-10-16 21:42:13 -0400 (Thu, 16 Oct 2014) | 2 lines
+
+Show logical usage for each field and add the PresentStatus standard usage
+
+------------------------------------------------------------------------
+r2163 | adk0212 | 2014-10-16 21:14:58 -0400 (Thu, 16 Oct 2014) | 2 lines
+
+Add MODBUS RTU Tx/Rx usages to hid-ups
+
+------------------------------------------------------------------------
+r2162 | adk0212 | 2014-10-15 22:03:28 -0400 (Wed, 15 Oct 2014) | 2 lines
+
+Update AN176
+
+------------------------------------------------------------------------
+r2161 | adk0212 | 2014-10-14 17:10:25 -0400 (Tue, 14 Oct 2014) | 3 lines
+
+Add SYSADMIN and APCUPSD_MAIL setting to apccontrol scripts that were missing it
+h/t Quick Fox <quickfox@abv.bg>
+
+------------------------------------------------------------------------
+r2160 | adk0212 | 2014-10-13 19:42:41 -0400 (Mon, 13 Oct 2014) | 3 lines
+
+Fix possible use of uninitialized data in line[] buffer in handle_client_request()
+- Issue reported by Kevin Cernekee <cernekee@gmail.com>
+
+------------------------------------------------------------------------
+r2159 | adk0212 | 2014-10-13 19:18:23 -0400 (Mon, 13 Oct 2014) | 3 lines
+
+pktsiz should be unsigned (h/t Kevin Cernekee <cernekee@gmail.com>)
+- Same as Kevin's patch plus change sizeof idiom
+
+------------------------------------------------------------------------
+r2158 | adk0212 | 2014-05-15 13:39:13 -0400 (Thu, 15 May 2014) | 3 lines
+
+Fix apcaccess on (broken!) systems where -funsigned-char is the default behavior
+Reported by Patrick Fallberg <patrick@fallberg.net>
+
+------------------------------------------------------------------------
+r2157 | adk0212 | 2014-04-20 16:36:29 -0400 (Sun, 20 Apr 2014) | 2 lines
+
+Populate some additional columns in Windows Programs & Features control panel
+
+------------------------------------------------------------------------
+r2156 | adk0212 | 2014-04-20 16:14:52 -0400 (Sun, 20 Apr 2014) | 2 lines
+
+V_UNKNOWN conflicts with win32 headers, as does V_NONE. V_DEFAULT it is, then.
+
+------------------------------------------------------------------------
+r2155 | adk0212 | 2014-04-09 18:18:29 -0400 (Wed, 09 Apr 2014) | 2 lines
+
+Remove unused script
+
+------------------------------------------------------------------------
+r2154 | adk0212 | 2014-04-09 18:15:34 -0400 (Wed, 09 Apr 2014) | 2 lines
+
+More svn:executable property removals
+
+------------------------------------------------------------------------
+r2153 | adk0212 | 2014-04-09 14:25:05 -0400 (Wed, 09 Apr 2014) | 2 lines
+
+Remove a few more unnecessary svn:executable properties
+
+------------------------------------------------------------------------
+r2152 | adk0212 | 2014-04-09 14:20:29 -0400 (Wed, 09 Apr 2014) | 3 lines
+
+Remove svn:executable property from many files that have no reason to be executable
+Most of these are an artifact of creating new files remotely via samba share
+
+------------------------------------------------------------------------
+r2151 | adk0212 | 2014-04-09 14:04:46 -0400 (Wed, 09 Apr 2014) | 3 lines
+
+Add model file for Coverity
+Currently models error_out as static analysis can't tell error_out fnptr is plumbed thru to something that does exit(2)
+
+------------------------------------------------------------------------
+r2150 | adk0212 | 2014-04-09 13:57:57 -0400 (Wed, 09 Apr 2014) | 2 lines
+
+Use variadic macro for Error_abort
+
+------------------------------------------------------------------------
+r2149 | adk0212 | 2014-04-09 12:26:42 -0400 (Wed, 09 Apr 2014) | 5 lines
+
+CID 17184: Out-of-bounds access
+Not really...unnecessary bounds check on 'n' is making Coverity believe n could be >= sizeof(buf)
+In reality, n is limited to 0 < n < sizeof(buf) due to net_recv(..., sizeof(buf)-1)
+Eliminate unnecessary bounds check on 'n'
+
+------------------------------------------------------------------------
+r2148 | adk0212 | 2014-04-09 12:18:09 -0400 (Wed, 09 Apr 2014) | 3 lines
+
+CID 17187: String not null terminated
+Missed the temp == 0 case
+
+------------------------------------------------------------------------
+r2147 | adk0212 | 2014-04-09 12:09:58 -0400 (Wed, 09 Apr 2014) | 4 lines
+
+Filter out bogus ITEMP readings from SNMP
+Error is on APC side, we will work around in apcupsd
+Reported by Sergey <a_s_y@sama.ru>
+
+------------------------------------------------------------------------
+r2146 | adk0212 | 2014-04-06 12:21:40 -0400 (Sun, 06 Apr 2014) | 4 lines
+
+CID 17187: String not null terminated
+String was not being NUL terminated in the event of exactly filling the buffer
+Rearrange loop to NUL terminate on every iteration and remove unnecessary memset
+
+------------------------------------------------------------------------
+r2145 | adk0212 | 2014-04-06 12:13:30 -0400 (Sun, 06 Apr 2014) | 3 lines
+
+CID 17189: Uninitialized scalar variable
+Properly initialize all fields of struct sigaction
+
+------------------------------------------------------------------------
+r2144 | adk0212 | 2014-04-06 12:10:10 -0400 (Sun, 06 Apr 2014) | 3 lines
+
+CID 17190: Uninitialized scalar variable
+Give s_usb_value a constructor to reset fields to sane values
+
+------------------------------------------------------------------------
+r2143 | adk0212 | 2014-04-06 11:40:11 -0400 (Sun, 06 Apr 2014) | 3 lines
+
+CID 17198: Double free
+Fix clear() and Append() to avoid potential double-free
+
+------------------------------------------------------------------------
+r2142 | adk0212 | 2014-04-06 11:32:58 -0400 (Sun, 06 Apr 2014) | 3 lines
+
+CID 17139: Buffer not null terminated
+Change strncpy to strlcpy
+
+------------------------------------------------------------------------
+r2141 | adk0212 | 2014-04-06 11:20:20 -0400 (Sun, 06 Apr 2014) | 3 lines
+
+CID 17186: Resource leak
+Close sockfd when returning early
+
+------------------------------------------------------------------------
+r2140 | adk0212 | 2014-04-06 11:07:02 -0400 (Sun, 06 Apr 2014) | 6 lines
+
+CID 17199: Double free (not really)
+Coverity thinks we have a double free because it doesn't realize Error_abort never returns
+However we can easily rearrange the code to make it clearer (even to a human)
+Also there is no reason to exit the process on a soft error; just notify client and close connection
+Misc other cleanup in the same function
+
+------------------------------------------------------------------------
+r2139 | adk0212 | 2014-04-05 20:18:14 -0400 (Sat, 05 Apr 2014) | 2 lines
+
+Update my email address globally
+
+------------------------------------------------------------------------
+r2138 | adk0212 | 2014-04-05 19:00:20 -0400 (Sat, 05 Apr 2014) | 2 lines
+
+Remove ancient Linux kernel hiddev patches
+
+------------------------------------------------------------------------
+r2137 | adk0212 | 2014-04-05 18:40:59 -0400 (Sat, 05 Apr 2014) | 2 lines
+
+Remove empty dirs
+
+------------------------------------------------------------------------
+r2136 | adk0212 | 2014-04-05 18:14:17 -0400 (Sat, 05 Apr 2014) | 2 lines
+
+Add my copyright to configure.in as I've definitely played with it enough now to justify it
+
+------------------------------------------------------------------------
+r2135 | adk0212 | 2014-04-05 18:12:23 -0400 (Sat, 05 Apr 2014) | 2 lines
+
+Remove old todo list
+
+------------------------------------------------------------------------
+r2134 | adk0212 | 2014-04-05 15:21:37 -0400 (Sat, 05 Apr 2014) | 2 lines
+
+Remove unused script
+
+------------------------------------------------------------------------
+r2133 | adk0212 | 2014-04-05 15:20:12 -0400 (Sat, 05 Apr 2014) | 2 lines
+
+Run autoheader automatically when running autoconf
+
+------------------------------------------------------------------------
+r2132 | adk0212 | 2014-04-05 15:19:31 -0400 (Sat, 05 Apr 2014) | 5 lines
+
+Autoconf cleanup
+- Add description info to AC_DEFINEs (replaces acconfig.h)
+- Regen config.h.in using autoheader
+- Misc other cleanup
+
+------------------------------------------------------------------------
+r2131 | adk0212 | 2014-04-01 23:44:52 -0400 (Tue, 01 Apr 2014) | 2 lines
+
+Update config.guess, config.sub to latest from git.savannah.gnu.org
+
+------------------------------------------------------------------------
+r2130 | adk0212 | 2014-04-01 23:41:40 -0400 (Tue, 01 Apr 2014) | 2 lines
+
+Remove some unused scripts
+
+------------------------------------------------------------------------
+r2129 | adk0212 | 2014-03-31 11:47:46 -0400 (Mon, 31 Mar 2014) | 2 lines
+
+Remove old static web site
+
+------------------------------------------------------------------------
+r2128 | adk0212 | 2014-03-30 10:55:19 -0400 (Sun, 30 Mar 2014) | 3 lines
+
+Remove debug print of ASN types
+This code is pretty thoroughly tested at this point, debug is no longer necessary
+
+------------------------------------------------------------------------
+r2124 | adk0212 | 2014-03-28 23:51:10 -0400 (Fri, 28 Mar 2014) | 2 lines
+
+Prep for 3.14.12 release
 
 ------------------------------------------------------------------------
 r2123 | adk0212 | 2014-03-28 23:36:33 -0400 (Fri, 28 Mar 2014) | 2 lines
