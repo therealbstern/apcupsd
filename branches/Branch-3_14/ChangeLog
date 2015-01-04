@@ -8,6 +8,22 @@
 /***************************************************************************/
 
 ------------------------------------------------------------------------
+r2288 | adk0212 | 2015-01-04 15:39:58 -0500 (Sun, 04 Jan 2015) | 2 lines
+
+Bump version to 3.14.13-test2
+
+------------------------------------------------------------------------
+r2287 | adk0212 | 2015-01-04 15:35:43 -0500 (Sun, 04 Jan 2015) | 3 lines
+
+Fix link error on BSD systems due to use of --{start,end}-group which only works on GNU ld
+Move HidUps.cpp into libusbhid (since it is a wrapper for that library) which resolves dependency issue so we can eliminate use of --{start,end}-group
+
+------------------------------------------------------------------------
+r2285 | adk0212 | 2015-01-04 13:14:22 -0500 (Sun, 04 Jan 2015) | 2 lines
+
+Update ChangeLog for 3.14.13-test1
+
+------------------------------------------------------------------------
 r2284 | adk0212 | 2015-01-04 13:08:07 -0500 (Sun, 04 Jan 2015) | 2 lines
 
 Bump version for 3.14.13-test1 release
