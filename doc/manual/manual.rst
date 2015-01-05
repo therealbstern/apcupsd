@@ -14,7 +14,7 @@ computer in the event of a power failure.**
 
 | |date| |time|
 | This manual documents apcupsd version 3.14.x
-| Copyright |(C)| 2004-2014 Adam Kropelin
+| Copyright |(C)| 2004-2015 Adam Kropelin
 | Copyright |(C)| 1999-2005 Kern Sibbald
 
 *Copying and distribution of this file, with or without modification, 
@@ -285,9 +285,8 @@ pcnet
     and potentially more secure than SNMP.
 
 modbus
-    MODBUS is the newest APC protocol and operates over RS232 links. (It is
-    also capable of operating over USB, but apcupsd does not support this yet.)
-    MODBUS is APC's replacement for the aging 'apcsmart' (aka UPS-Link) 
+    MODBUS is the newest APC protocol and operates over RS232 serial links or 
+    USB. MODBUS is APC's replacement for the aging 'apcsmart' (aka UPS-Link) 
     protocol. MODBUS is the only way to access detailed control and status 
     information on newer (esp. SMT series) UPSes.
 
@@ -1298,6 +1297,8 @@ to customize your installation.
     the UPS over the network using APC's custom protocol. This driver
     can be used as an alternative to SNMP for UPSes equipped with a
     modern Web/SNMP management card.
+--enable-modbus  Turns on generation of the MODBUS/RS232 driver (default)
+--enable-modbus-usb  Turns on generation of the MODBUS/USB driver
 --enable-test  This turns on a test driver
     that is used only for debugging. By default it is disabled.
 --enable-gapcmon  This option enables building the GTK GUI front-end for 
@@ -2151,10 +2152,10 @@ distro, you can use commands such as...
 MODBUS Driver
 -------------
 
+MODBUS is APC's replacement for the aging 'apcsmart' (aka UPS-Link) 
+protocol. It is recommended for modern (ex: SMT series) Smart-UPS models.
 As of 3.14.11, apcupsd supports the MODBUS protocol over RS232 serial
-interfaces. MODBUS is APC's replacement for the aging 'apcsmart' (aka UPS-Link) 
-protocol. It is recommended for modern (ex: SMT series) Smart-UPS where an
-RS232 connection is available.
+interfaces. As of 3.14.13, apcupsd supports the MODBUS protocol over USB.
 
 Not all APC UPSes support MODBUS. New 2013 year Smart-UPS models are likely to 
 support it out-of-the-box and firmware updates are available for some older 
@@ -2163,25 +2164,44 @@ if a certain model will support MODBUS. That said, APC knowledge base article
 FA164737 indicates MODBUS support is available for the majority of the SMC,
 SMT, and SMX model lines.
 
-The required apcupsd.conf settings for MODBUS are straightforward:
+The required apcupsd.conf settings for MODBUS are straightforward.
 
-::
+For MODBUS serial RS232:
 
-    ## apcupsd.conf v1.1 ##
-    UPSCABLE smart
-    UPSTYPE modbus
-    DEVICE /dev/ttyS0
-    LOCKFILE /var/lock
-    UPSCLASS standalone
-    UPSMODE disable
+    ::
 
-The ``DEVICE`` setting identifies the serial port to which the UPS is connected.
-This can take the form of ``COM1``, etc. on Windows or ``/dev/XXX`` on UNIX
-systems.
+        ## apcupsd.conf v1.1 ##
+        UPSCABLE smart
+        UPSTYPE modbus
+        DEVICE /dev/ttyS0
+        LOCKFILE /var/lock
+        UPSCLASS standalone
+        UPSMODE disable
+    
+    The ``DEVICE`` setting identifies the serial port to which the UPS is connected.
+    This can take the form of ``COM1``, etc. on Windows or ``/dev/XXX`` on UNIX
+    systems.
+    
+    You should use the APC-supplied serial cable (P/N 940-0625A) that ships with 
+    the UPS. Other 'smart' type cables may work, but only 940-0625A has been 
+    formally tested at this time.
 
-You should use the APC-supplied serial cable (P/N 940-0625A) that ships with 
-the UPS. Other 'smart' type cables may work, but only 940-0625A has been 
-formally tested at this time.
+For MODBUS USB:
+
+    ::
+  
+        ## apcupsd.conf v1.1 ##
+        UPSCABLE usb
+        UPSTYPE modbus
+        DEVICE
+        LOCKFILE /var/lock
+        UPSCLASS standalone
+        UPSMODE disable
+  
+    The ``DEVICE`` setting can be left blank or, optionally, set to the serial
+    number of the UPS. If ``DEVICE`` is blank, apcupsd will attach to the first
+    APC UPS it finds, otherwise it will attach to the specific UPS identified by
+    the serial number.
 
 Note that *most UPSes ship with MODBUS support disabled by default*. You must 
 use the UPS's front panel menu to enable MODBUS protocol support before apcupsd 
