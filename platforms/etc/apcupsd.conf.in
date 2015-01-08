@@ -78,6 +78,10 @@ UPSCABLE @UPSCABLE@
 #
 # modbus    /dev/tty**       Serial device for use with newest SmartUPS models
 #                            supporting the MODBUS protocol.
+# modbus    <BLANK>          Leave the DEVICE setting blank for MODBUS over USB
+#                            or set to the serial number of the UPS to ensure 
+#                            that apcupsd binds to that particular unit
+#                            (helpful if you have more than one USB UPS).
 #
 UPSTYPE @UPSTYPE@
 DEVICE @SERIALDEV@
