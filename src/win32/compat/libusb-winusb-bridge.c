@@ -307,7 +307,6 @@ int usb_get_string_simple(usb_dev_handle *dev, int index, char *buf,
    return strlen(buf);
 }
 
-#define LIBUSB_ETIMEDOUT 116
 int usb_interrupt_read(usb_dev_handle *dev, int ep, char *bytes, int size, 
                        int timeout)
 {
@@ -325,7 +324,7 @@ int usb_interrupt_read(usb_dev_handle *dev, int ep, char *bytes, int size,
    {
       tmp = GetLastError();
       if (tmp == ERROR_SEM_TIMEOUT)
-         return -LIBUSB_ETIMEDOUT;
+         return -ETIMEDOUT;
       else
          return -EINVAL;
    }
@@ -350,7 +349,7 @@ int usb_interrupt_write(usb_dev_handle *dev, int ep, char *bytes, int size,
    {
       tmp = GetLastError();
       if (tmp == ERROR_SEM_TIMEOUT)
-         return -LIBUSB_ETIMEDOUT;
+         return -ETIMEDOUT;
       else
          return -EINVAL;
    }
