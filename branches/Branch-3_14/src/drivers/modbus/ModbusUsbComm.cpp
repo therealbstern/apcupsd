@@ -107,17 +107,6 @@ bool ModbusUsbComm::ModbusTx(const ModbusFrame *frm, unsigned int sz)
          (int)MODBUS_USB_REPORT_SIZE;
 }
 
-/*
- * libusb-win32, pthreads, and compat.h all have different ideas
- * of what ETIMEDOUT is on mingw. We need to make sure we match
- * libusb-win32's error.h in that case, so override ETIMEDOUT.
- */
-#ifdef HAVE_MINGW
-# define LIBUSB_ETIMEDOUT   116
-#else
-# define LIBUSB_ETIMEDOUT   ETIMEDOUT
-#endif
-
 bool ModbusUsbComm::ModbusRx(ModbusFrame *frm, unsigned int *sz)
 {
    struct timeval now, exittime;
@@ -140,7 +129,7 @@ bool ModbusUsbComm::ModbusRx(ModbusFrame *frm, unsigned int *sz)
       int timeout = TV_DIFF_MS(now, exittime);
       if (timeout <= 0 || 
           (ret = _hidups.InterruptRead(USB_ENDPOINT_IN|1, rpt, 
-             MODBUS_USB_REPORT_SIZE, timeout)) == -LIBUSB_ETIMEDOUT)
+             MODBUS_USB_REPORT_SIZE, timeout)) == -ETIMEDOUT)
       {
          Dmsg(0, "%s: TIMEOUT\n", __func__);
          return false;

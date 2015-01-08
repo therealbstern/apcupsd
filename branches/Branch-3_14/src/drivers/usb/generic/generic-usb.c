@@ -341,17 +341,6 @@ bool GenericUsbUpsDriver::usb_link_check()
    return true;
 }
 
-/*
- * libusb-win32, pthreads, and compat.h all have different ideas
- * of what ETIMEDOUT is on mingw. We need to make sure we match
- * libusb-win32's error.h in that case, so override ETIMEDOUT.
- */
-#ifdef HAVE_MINGW
-# define LIBUSB_ETIMEDOUT   116
-#else
-# define LIBUSB_ETIMEDOUT   ETIMEDOUT
-#endif
-
 bool GenericUsbUpsDriver::check_state()
 {
    int i, ci;
@@ -379,7 +368,7 @@ bool GenericUsbUpsDriver::check_state()
       Dmsg(200, "Timeout=%d\n", timeout);
       retval = _hidups.InterruptRead(USB_ENDPOINT_IN|1, (char*)buf, sizeof(buf), timeout);
 
-      if (retval == 0 || retval == -LIBUSB_ETIMEDOUT) {
+      if (retval == 0 || retval == -ETIMEDOUT) {
          /* No events available in _ups->wait_time seconds. */
          return 0;
       } else if (retval == -EINTR || retval == -EAGAIN) {
