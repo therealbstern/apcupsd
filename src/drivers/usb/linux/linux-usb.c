@@ -166,7 +166,11 @@ void LinuxUsbUpsDriver::bind_upses()
          struct usbdevfs_ioctl command = {0};
          command.ioctl_code = USBDEVFS_CONNECT;
          int rc = ioctl(fd, USBDEVFS_IOCTL, &command);
-         if (rc == 0)
+         // Hard to tell if this succeeded because the return value of the
+         // ioctl was changed. In linux 2.4.37, 0 means success but in 3.4 it
+         // means failure. So...we're screwed. The only thing we know for sure
+         // is <0 is definitely failure.
+         if (rc >= 0)
          {
             Dmsg(100, "Reattached kernel driver to %s\n", g.gl_pathv[i]);
          }
