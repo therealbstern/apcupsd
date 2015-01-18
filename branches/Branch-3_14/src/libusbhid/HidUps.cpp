@@ -107,8 +107,8 @@ bool HidUps::init_device(
    unsigned char* rdesc;
    int rdesclen;
 
-   /* Check if this is an APC device before we mess with it */
-   if (dev->descriptor.idVendor != VENDOR_APC) {
+   /* Check if this is a supported device before we mess with it */
+   if (!MatchVidPid(dev->descriptor.idVendor, dev->descriptor.idProduct)) {
       Dmsg(100, "Not an APC device.\n");
       return false;
    }

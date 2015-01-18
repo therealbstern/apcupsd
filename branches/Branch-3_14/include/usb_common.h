@@ -6,7 +6,7 @@
 
 /*
  * Copyright (C) 2001-2004 Kern Sibbald
- * Copyright (C) 2004-2005 Adam Kropelin
+ * Copyright (C) 2004-2015 Adam Kropelin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of version 2 of the GNU General
@@ -26,8 +26,9 @@
 #ifndef _USB_COMMON_H
 #define _USB_COMMON_H
 
-/* USB Vendor ID's */ 
-#define VENDOR_APC 0x051D
+#include <stdint.h>
+
+bool MatchVidPid(uint16_t vid, uint16_t pid);
 
 /* Various known USB codes */ 
 #define UPS_USAGE   0x840004
