@@ -154,11 +154,11 @@ void LinuxUsbUpsDriver::bind_upses()
          uint8_t  bNumConfigurations;
       } __attribute__ ((packed)) dd;
 
-      // Fetch device descriptor, then verify device vendor is APC and
+      // Fetch device descriptor, then verify device VID/PID are supported and
       // no kernel driver is currently attached
       struct usbdevfs_getdriver getdrv = {0};
       if (read(fd, &dd, sizeof(dd)) == sizeof(dd) && 
-          dd.idVendor == VENDOR_APC &&
+          MatchVidPid(dd.idVendor, dd.idProduct) &&
           ioctl(fd, USBDEVFS_GETDRIVER, &getdrv))
       {
          // APC device with no kernel driver attached

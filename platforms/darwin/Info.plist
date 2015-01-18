@@ -22,8 +22,8 @@
 	<string>1.0.0d1</string>
 	<key>IOKitPersonalities</key>
 	<dict>
-		<!-- Normal APC UPSes with USB interface -->
-		<key>APC Uninterruptible Power Supply</key>
+		<!-- Older APC UPSes use PID 0x0002 -->
+		<key>APC Uninterruptible Power Supply 051d:0002</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
 			<string>com.apple.kpi.iokit</string>
@@ -40,11 +40,8 @@
 			<key>idVendor</key>
 			<integer>1309</integer>
 		</dict>
-		<!-- It's a bit ridiculous that a card whose entire purpose is 
-		     compatibility has a different PID, but it does. Also PID 3 
-           has been reported to be used on the native interface of an
-           SMT1500. -->
-		<key>APC9620 Legacy Communications Card</key>
+		<!-- AP9620 Legacy Communications Card and newer UPSes use PID 0x0003 -->
+		<key>APC Uninterruptible Power Supply 051d:0003</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
 			<string>com.apple.kpi.iokit</string>
@@ -61,9 +58,26 @@
 			<key>idVendor</key>
 			<integer>1309</integer>
 		</dict>
+		<key>APC Uninterruptible Power Supply 051d:0004</key>
+		<dict>
+			<key>CFBundleIdentifier</key>
+			<string>com.apple.kpi.iokit</string>
+			<key>IOClass</key>
+			<string>IOService</string>
+			<key>IOProviderClass</key>
+			<string>IOUSBInterface</string>
+			<key>bConfigurationValue</key>
+			<integer>1</integer>
+			<key>bInterfaceNumber</key>
+			<integer>0</integer>
+			<key>idProduct</key>
+			<integer>4</integer>
+			<key>idVendor</key>
+			<integer>1309</integer>
+		</dict>
 		<!-- Early production and prototype units of AP9620 erroneously 
 		     have PID 0x0001 or 0xffff -->
-		<key>APC9620 Legacy Communications Card (proto1)</key>
+		<key>APC9620 Legacy Communications Card 051d:0001</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
 			<string>com.apple.kpi.iokit</string>
@@ -80,7 +94,7 @@
 			<key>idVendor</key>
 			<integer>1309</integer>
 		</dict>
-		<key>APC9620 Legacy Communications Card (proto2)</key>
+		<key>APC9620 Legacy Communications Card 051d:ffff</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
 			<string>com.apple.kpi.iokit</string>
@@ -97,9 +111,8 @@
 			<key>idVendor</key>
 			<integer>1309</integer>
 		</dict>
-		<!-- An SMX750 appears to use PID 5 even though its twin (the
-           SMT1500 above) uses PID 3. Argh. -->
-		<key>SMX750 Microlink</key>
+		<!-- An SMX750 appears to use PID 5 -->
+		<key>APC Uninterruptible Power Supply 051d:0005</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
 			<string>com.apple.kpi.iokit</string>
@@ -116,7 +129,7 @@
 			<key>idVendor</key>
 			<integer>1309</integer>
 		</dict>
-		<!-- HP T1500 G3 is actually a re-badged APC unit -->
+		<!-- The HP T1500 G3 has been shown to work well with apcupsd -->
 		<key>HP T1500 G3</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
@@ -133,6 +146,177 @@
 			<integer>8163</integer>
 			<key>idVendor</key>
 			<integer>1008</integer>
+		</dict>
+		<!-- APC and Schneider VIDs (for future use, as of Jan 2015) -->
+		<key>APC Uninterruptible Power Supply 051d:c801</key>
+		<dict>
+			<key>CFBundleIdentifier</key>
+			<string>com.apple.kpi.iokit</string>
+			<key>IOClass</key>
+			<string>IOService</string>
+			<key>IOProviderClass</key>
+			<string>IOUSBInterface</string>
+			<key>bConfigurationValue</key>
+			<integer>1</integer>
+			<key>bInterfaceNumber</key>
+			<integer>0</integer>
+			<key>idProduct</key>
+			<integer>51201</integer>
+			<key>idVendor</key>
+			<integer>1309</integer>
+		</dict>
+		<key>APC Uninterruptible Power Supply 051d:c802</key>
+		<dict>
+			<key>CFBundleIdentifier</key>
+			<string>com.apple.kpi.iokit</string>
+			<key>IOClass</key>
+			<string>IOService</string>
+			<key>IOProviderClass</key>
+			<string>IOUSBInterface</string>
+			<key>bConfigurationValue</key>
+			<integer>1</integer>
+			<key>bInterfaceNumber</key>
+			<integer>0</integer>
+			<key>idProduct</key>
+			<integer>51202</integer>
+			<key>idVendor</key>
+			<integer>1309</integer>
+		</dict>
+		<key>APC Uninterruptible Power Supply 051d:c803</key>
+		<dict>
+			<key>CFBundleIdentifier</key>
+			<string>com.apple.kpi.iokit</string>
+			<key>IOClass</key>
+			<string>IOService</string>
+			<key>IOProviderClass</key>
+			<string>IOUSBInterface</string>
+			<key>bConfigurationValue</key>
+			<integer>1</integer>
+			<key>bInterfaceNumber</key>
+			<integer>0</integer>
+			<key>idProduct</key>
+			<integer>51203</integer>
+			<key>idVendor</key>
+			<integer>1309</integer>
+		</dict>
+		<key>APC Uninterruptible Power Supply 051d:c804</key>
+		<dict>
+			<key>CFBundleIdentifier</key>
+			<string>com.apple.kpi.iokit</string>
+			<key>IOClass</key>
+			<string>IOService</string>
+			<key>IOProviderClass</key>
+			<string>IOUSBInterface</string>
+			<key>bConfigurationValue</key>
+			<integer>1</integer>
+			<key>bInterfaceNumber</key>
+			<integer>0</integer>
+			<key>idProduct</key>
+			<integer>51204</integer>
+			<key>idVendor</key>
+			<integer>1309</integer>
+		</dict>
+		<key>APC Uninterruptible Power Supply 051d:c805</key>
+		<dict>
+			<key>CFBundleIdentifier</key>
+			<string>com.apple.kpi.iokit</string>
+			<key>IOClass</key>
+			<string>IOService</string>
+			<key>IOProviderClass</key>
+			<string>IOUSBInterface</string>
+			<key>bConfigurationValue</key>
+			<integer>1</integer>
+			<key>bInterfaceNumber</key>
+			<integer>0</integer>
+			<key>idProduct</key>
+			<integer>51205</integer>
+			<key>idVendor</key>
+			<integer>1309</integer>
+		</dict>
+		<key>APC Uninterruptible Power Supply 16de:c801</key>
+		<dict>
+			<key>CFBundleIdentifier</key>
+			<string>com.apple.kpi.iokit</string>
+			<key>IOClass</key>
+			<string>IOService</string>
+			<key>IOProviderClass</key>
+			<string>IOUSBInterface</string>
+			<key>bConfigurationValue</key>
+			<integer>1</integer>
+			<key>bInterfaceNumber</key>
+			<integer>0</integer>
+			<key>idProduct</key>
+			<integer>51201</integer>
+			<key>idVendor</key>
+			<integer>5854</integer>
+		</dict>
+		<key>APC Uninterruptible Power Supply 16de:c802</key>
+		<dict>
+			<key>CFBundleIdentifier</key>
+			<string>com.apple.kpi.iokit</string>
+			<key>IOClass</key>
+			<string>IOService</string>
+			<key>IOProviderClass</key>
+			<string>IOUSBInterface</string>
+			<key>bConfigurationValue</key>
+			<integer>1</integer>
+			<key>bInterfaceNumber</key>
+			<integer>0</integer>
+			<key>idProduct</key>
+			<integer>51202</integer>
+			<key>idVendor</key>
+			<integer>5854</integer>
+		</dict>
+		<key>APC Uninterruptible Power Supply 16de:c803</key>
+		<dict>
+			<key>CFBundleIdentifier</key>
+			<string>com.apple.kpi.iokit</string>
+			<key>IOClass</key>
+			<string>IOService</string>
+			<key>IOProviderClass</key>
+			<string>IOUSBInterface</string>
+			<key>bConfigurationValue</key>
+			<integer>1</integer>
+			<key>bInterfaceNumber</key>
+			<integer>0</integer>
+			<key>idProduct</key>
+			<integer>51203</integer>
+			<key>idVendor</key>
+			<integer>5854</integer>
+		</dict>
+		<key>APC Uninterruptible Power Supply 16de:c804</key>
+		<dict>
+			<key>CFBundleIdentifier</key>
+			<string>com.apple.kpi.iokit</string>
+			<key>IOClass</key>
+			<string>IOService</string>
+			<key>IOProviderClass</key>
+			<string>IOUSBInterface</string>
+			<key>bConfigurationValue</key>
+			<integer>1</integer>
+			<key>bInterfaceNumber</key>
+			<integer>0</integer>
+			<key>idProduct</key>
+			<integer>51204</integer>
+			<key>idVendor</key>
+			<integer>5854</integer>
+		</dict>
+		<key>APC Uninterruptible Power Supply 16de:c805</key>
+		<dict>
+			<key>CFBundleIdentifier</key>
+			<string>com.apple.kpi.iokit</string>
+			<key>IOClass</key>
+			<string>IOService</string>
+			<key>IOProviderClass</key>
+			<string>IOUSBInterface</string>
+			<key>bConfigurationValue</key>
+			<integer>1</integer>
+			<key>bInterfaceNumber</key>
+			<integer>0</integer>
+			<key>idProduct</key>
+			<integer>51205</integer>
+			<key>idVendor</key>
+			<integer>5854</integer>
 		</dict>
 	</dict>
 	<key>OSBundleLibraries</key>
