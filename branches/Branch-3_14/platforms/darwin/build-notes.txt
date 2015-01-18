@@ -53,7 +53,7 @@ Instructions:
      LDFLAGS="-L/usr/local/lib -Wl,-syslibroot,/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk -mmacosx-version-min=10.5 -arch i386" \
      CFLAGS="-arch i386" CXXFLAGS="-arch i386" \
      ./configure \
-     --enable-usb --enable-cgi --enable-snmp
+     --enable-usb --enable-cgi --enable-snmp --enable-modbus-usb
    make
 
 - Build apcupsd binary package
