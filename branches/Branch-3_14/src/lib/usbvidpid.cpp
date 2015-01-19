@@ -37,7 +37,7 @@ static const struct
 } SUPPORTED_DEVICES[] =
 {
    {VENDOR_APC,         0x0002}, // Older APC UPSes
-   {VENDOR_APC,         0x0003}, // APC9620 LCC and newer UPSes
+   {VENDOR_APC,         0x0003}, // AP9620 LCC and newer UPSes
    {VENDOR_APC,         0x0004},
 
    // As of Jan 2015, the following are for future APC/Schneider products
