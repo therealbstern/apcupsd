@@ -22,48 +22,8 @@
  * MA 02111-1307, USA.
  */
 
-/* The big overall flow of apcupsd is as follows
- *
- * Assuming no networking features are turned on.
- *
- * Main Process:
- *   process configuration file
- *   establish contact with the UPS
- *   read the state of the UPS
- *   Fork to become a daemon
- *   write the shared memory
- *   start child process apcdev -- subroutine do_device()
- *   start child process apcnis, if configured -- subroutine do_server()
- *   wait for child processes to complete
- *   exit
- *
- * Child process apcdev -- subroutine do_device()
- *   wait for activity on serial port or timeout 
- *        from select() (5 seconds) -- check_serial()
- *   call do_action()
- *        read and lock the shared memory
- *        check to see if UPS state has changed and if we should take any action. I.e.
- *              are we on batteries, should we shutdown, ...
- *        write and unlock shared memory
- *   call fillUPS()
- *        read and lock shared memory
- *        Poll the UPS for each state variable
- *        enable the UPS
- *        enable the UPS again
- *        write and unlock shared memory
- *   call do_reports()
- *        if DATA report time expired, write DATA report -- log_data()
- *        if STATUS report time expired, write STATUS report
- *   loop
- */
-
 #include "apc.h"
 
-/*
- * myUPS is a structure that need to be defined in _all_ the forked processes.
- * The syncronization of data into this structure is done with the shared
- * memory area so this is made reentrant by the shm mechanics.
- */
 UPSINFO *core_ups = NULL;
 
 static void daemon_start(void);
@@ -281,7 +241,7 @@ int main(int argc, char *argv[])
 
    /*
     * From now ... we must _only_ start up threads!
-    * No more unchecked writes to myUPS because the threads must rely
+    * No more unchecked writes to UPSINFO because the threads must rely
     * on write locks and up to date data in the shared structure.
     */
 
