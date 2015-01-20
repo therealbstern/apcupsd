@@ -317,7 +317,7 @@ ul.auto-toc {
 <p><strong>Apcupsd is a UPS control system that permits orderly shutdown of your
 computer in the event of a power failure.</strong></p>
 <div class="line-block">
-<div class="line">January  4, 2015 19:21:22</div>
+<div class="line">January 19, 2015 20:36:32</div>
 <div class="line">This manual documents apcupsd version 3.14.x</div>
 <div class="line">Copyright © 2004-2015 Adam Kropelin</div>
 <div class="line">Copyright © 1999-2005 Kern Sibbald</div>
@@ -559,56 +559,55 @@ at <a class="reference external" href="http://www.apcupsd.com">http://www.apcups
 </ul>
 </li>
 <li><a class="reference internal" href="#win32-implementation-restrictions-for-simple-upses" id="id211">Win32 Implementation Restrictions for Simple UPSes</a></li>
-<li><a class="reference internal" href="#internal-apcupsd-actions-for-simple-cables" id="id212">Internal Apcupsd Actions for Simple Cables</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#recalibrating-the-ups-runtime" id="id213">Recalibrating the UPS Runtime</a></li>
-<li><a class="reference internal" href="#configuration-directive-reference" id="id214">Configuration Directive Reference</a><ul>
-<li><a class="reference internal" href="#general-configuration-directives" id="id215">General Configuration Directives</a></li>
-<li><a class="reference internal" href="#configuration-directives-used-by-the-network-information-server" id="id216">Configuration Directives Used by the Network Information Server</a></li>
-<li><a class="reference internal" href="#configuration-directives-used-during-power-failures" id="id217">Configuration Directives used during Power Failures</a></li>
-<li><a class="reference internal" href="#configuration-directives-used-to-control-system-logging" id="id218">Configuration Directives used to Control System Logging</a></li>
-<li><a class="reference internal" href="#configuration-directives-for-sharing-a-ups" id="id219">Configuration Directives for Sharing a UPS</a></li>
-<li><a class="reference internal" href="#configuration-directives-used-to-set-the-ups-eeprom" id="id220">Configuration Directives Used to Set the UPS EEPROM</a></li>
+<li><a class="reference internal" href="#recalibrating-the-ups-runtime" id="id212">Recalibrating the UPS Runtime</a></li>
+<li><a class="reference internal" href="#configuration-directive-reference" id="id213">Configuration Directive Reference</a><ul>
+<li><a class="reference internal" href="#general-configuration-directives" id="id214">General Configuration Directives</a></li>
+<li><a class="reference internal" href="#configuration-directives-used-by-the-network-information-server" id="id215">Configuration Directives Used by the Network Information Server</a></li>
+<li><a class="reference internal" href="#configuration-directives-used-during-power-failures" id="id216">Configuration Directives used during Power Failures</a></li>
+<li><a class="reference internal" href="#configuration-directives-used-to-control-system-logging" id="id217">Configuration Directives used to Control System Logging</a></li>
+<li><a class="reference internal" href="#configuration-directives-for-sharing-a-ups" id="id218">Configuration Directives for Sharing a UPS</a></li>
+<li><a class="reference internal" href="#configuration-directives-used-to-set-the-ups-eeprom" id="id219">Configuration Directives Used to Set the UPS EEPROM</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#apcupsd-status-logging" id="id221">apcupsd Status Logging</a><ul>
-<li><a class="reference internal" href="#status-report-format" id="id222">Status report format</a></li>
-<li><a class="reference internal" href="#status-report-example" id="id223">Status Report Example</a></li>
-<li><a class="reference internal" href="#status-report-fields" id="id224">Status Report Fields</a></li>
-<li><a class="reference internal" href="#logging-the-status-information" id="id225">Logging the STATUS Information</a></li>
+<li><a class="reference internal" href="#apcupsd-status-logging" id="id220">apcupsd Status Logging</a><ul>
+<li><a class="reference internal" href="#status-report-format" id="id221">Status report format</a></li>
+<li><a class="reference internal" href="#status-report-example" id="id222">Status Report Example</a></li>
+<li><a class="reference internal" href="#status-report-fields" id="id223">Status Report Fields</a></li>
+<li><a class="reference internal" href="#logging-the-status-information" id="id224">Logging the STATUS Information</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#the-shutdown-sequence-and-its-discontents" id="id226">The Shutdown Sequence and its Discontents</a><ul>
-<li><a class="reference internal" href="#shutdown-sequence" id="id227">Shutdown Sequence</a></li>
-<li><a class="reference internal" href="#shutdown-problems" id="id228">Shutdown Problems</a></li>
-<li><a class="reference internal" href="#master-slave-shutdown" id="id229">Master/Slave Shutdown</a></li>
-<li><a class="reference internal" href="#startup" id="id230">Startup</a></li>
-<li><a class="reference internal" href="#windows-considerations" id="id231">Windows Considerations</a></li>
+<li><a class="reference internal" href="#the-shutdown-sequence-and-its-discontents" id="id225">The Shutdown Sequence and its Discontents</a><ul>
+<li><a class="reference internal" href="#shutdown-sequence" id="id226">Shutdown Sequence</a></li>
+<li><a class="reference internal" href="#shutdown-problems" id="id227">Shutdown Problems</a></li>
+<li><a class="reference internal" href="#master-slave-shutdown" id="id228">Master/Slave Shutdown</a></li>
+<li><a class="reference internal" href="#startup" id="id229">Startup</a></li>
+<li><a class="reference internal" href="#windows-considerations" id="id230">Windows Considerations</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#apc-smart-protocol" id="id232">APC smart protocol</a><ul>
-<li><a class="reference internal" href="#description" id="id233">Description</a></li>
-<li><a class="reference internal" href="#rs-232-differences" id="id234">RS-232 differences</a></li>
-<li><a class="reference internal" href="#the-smart-protocol" id="id235">The Smart Protocol</a></li>
-<li><a class="reference internal" href="#dip-switch-info" id="id236">Dip switch info</a></li>
-<li><a class="reference internal" href="#status-bits" id="id237">Status bits</a></li>
-<li><a class="reference internal" href="#alert-messages" id="id238">Alert messages</a></li>
-<li><a class="reference internal" href="#register-1" id="id239">Register 1</a></li>
-<li><a class="reference internal" href="#register-2" id="id240">Register 2</a></li>
-<li><a class="reference internal" href="#register-3" id="id241">Register 3</a></li>
-<li><a class="reference internal" href="#interpretation-of-the-old-firmware-revision" id="id242">Interpretation of the Old Firmware Revision</a></li>
-<li><a class="reference internal" href="#interpretation-of-the-new-firmware-revision" id="id243">Interpretation of the New Firmware Revision</a></li>
-<li><a class="reference internal" href="#eeprom-values" id="id244">EEPROM Values</a></li>
-<li><a class="reference internal" href="#programming-the-ups-eeprom" id="id245">Programming the UPS EEPROM</a></li>
+<li><a class="reference internal" href="#apc-smart-protocol" id="id231">APC smart protocol</a><ul>
+<li><a class="reference internal" href="#description" id="id232">Description</a></li>
+<li><a class="reference internal" href="#rs-232-differences" id="id233">RS-232 differences</a></li>
+<li><a class="reference internal" href="#the-smart-protocol" id="id234">The Smart Protocol</a></li>
+<li><a class="reference internal" href="#dip-switch-info" id="id235">Dip switch info</a></li>
+<li><a class="reference internal" href="#status-bits" id="id236">Status bits</a></li>
+<li><a class="reference internal" href="#alert-messages" id="id237">Alert messages</a></li>
+<li><a class="reference internal" href="#register-1" id="id238">Register 1</a></li>
+<li><a class="reference internal" href="#register-2" id="id239">Register 2</a></li>
+<li><a class="reference internal" href="#register-3" id="id240">Register 3</a></li>
+<li><a class="reference internal" href="#interpretation-of-the-old-firmware-revision" id="id241">Interpretation of the Old Firmware Revision</a></li>
+<li><a class="reference internal" href="#interpretation-of-the-new-firmware-revision" id="id242">Interpretation of the New Firmware Revision</a></li>
+<li><a class="reference internal" href="#eeprom-values" id="id243">EEPROM Values</a></li>
+<li><a class="reference internal" href="#programming-the-ups-eeprom" id="id244">Programming the UPS EEPROM</a></li>
 </ul>
 </li>
-<li><a class="reference internal" href="#nis-network-server-protocol" id="id246">NIS Network Server Protocol</a></li>
-<li><a class="reference internal" href="#apcupsd-rpm-packaging-faq" id="id247">Apcupsd RPM Packaging FAQ</a></li>
-<li><a class="reference internal" href="#credits" id="id248">Credits</a><ul>
-<li><a class="reference internal" href="#contributors" id="id249">Contributors</a></li>
-<li><a class="reference internal" href="#apcupsd-license" id="id250">Apcupsd License</a></li>
-<li><a class="reference internal" href="#other-open-source-licenses" id="id251">Other Open Source Licenses</a></li>
+<li><a class="reference internal" href="#nis-network-server-protocol" id="id245">NIS Network Server Protocol</a></li>
+<li><a class="reference internal" href="#apcupsd-rpm-packaging-faq" id="id246">Apcupsd RPM Packaging FAQ</a></li>
+<li><a class="reference internal" href="#credits" id="id247">Credits</a><ul>
+<li><a class="reference internal" href="#contributors" id="id248">Contributors</a></li>
+<li><a class="reference internal" href="#apcupsd-license" id="id249">Apcupsd License</a></li>
+<li><a class="reference internal" href="#other-open-source-licenses" id="id250">Other Open Source Licenses</a></li>
 </ul>
 </li>
 </ul>
@@ -854,9 +853,8 @@ have a choice, we recommend you avoid simple signalling UPSes.</dd>
 AP9617 family of smart slot modules. The protocol is much simpler
 and potentially more secure than SNMP.</dd>
 <dt>modbus</dt>
-<dd>MODBUS is the newest APC protocol and operates over RS232 links. (It is
-also capable of operating over USB, but apcupsd does not support this yet.)
-MODBUS is APC's replacement for the aging 'apcsmart' (aka UPS-Link)
+<dd>MODBUS is the newest APC protocol and operates over RS232 serial links or
+USB. MODBUS is APC's replacement for the aging 'apcsmart' (aka UPS-Link)
 protocol. MODBUS is the only way to access detailed control and status
 information on newer (esp. SMT series) UPSes.</dd>
 </dl>
@@ -6008,84 +6006,9 @@ and clear: RTS and DTR.</p>
 of the cables. In particular, LineDown on the Custom Simple cable,
 and Low Battery on the 0023A cable are not implemented.</p>
 </div>
-<div class="section" id="internal-apcupsd-actions-for-simple-cables">
-<h3><a class="toc-backref" href="#id212">Internal Apcupsd Actions for Simple Cables</a></h3>
-<pre class="literal-block">
-This section describes how apcupsd 3.8.5 (March 2002)
-treats the serial port line signals for simple cables.
-
-apcaction.c:
- condition = power failure detected
- cable = CUSTOM_SIMPLE
- action = ioctl(TIOCMBIS, DTR)      set DTR (enable power bit?)
-
-apcaction.c:
- condition = power back
- cable = CUSTOM_SIMPLE
- action = ioctl(TIOCMBIC, DTR)      clear DTR (clear power bit)
- action = ioctl(TIOCMBIC, ST)       clear ST (TxD)
-
-apcserial.c:
- condition = serial port initialization
- cable = 0095A, 0095B, 0095C
- action = ioctl(TIOMBIC, RTS)       clear RTS (set PnP mode)
-
- cable = 0119A, 0127A, 0128A
- action = ioctl(TIOMBIC, DTR)       clear DTR (killpower)
- action = ioctl(TIOMBIS, RTS)       set   RTS (ready to receive)
-
-apcserial.c:
- condition = save_dumb_status
- cable = CUSTOM_SIMPLE
- action = ioctl(TIOMBIC, DTR)       clear DTR (power bit?)
- action = ioctl(TIOMBIC, RTS)       clear RTS (killpower)
-
- cable = 0020B, 0020C, 0119A, 0127A, 0128A
- action = ioctl(TIOMBIC, DTR)       clear DTR (killpower)
-
- cable = 0095A, 0095B, 0095C
- action = ioctl(TIOMBIC, RTS)       clear RTS (killpower)
- action = ioctl(TIOMBIC, CD)        clear DCD (low batt)
- action = ioctl(TIOMBIC, RTS)       clear RTS (killpower) a second time!
-
-apcserial.c:
- condition = check_serial
-
- cable = CUSTOM_SIMPLE
- action = OnBatt = CD
- action = BattLow = CTS
- action = LineDown = SR
-
- cable = 0020B, 0020C, 0119A, 0127A, 0128A
- action = OnBatt = CTS
- action = BattLow = CD
- action = LineDown = 0
-
- cable = 0023A
- action = Onbatt = CD
- action = BattLow = SR
- action = LineDown = 0
-
- cable = 0095A, 0095B, 0095C
- action = OnBatt = RNG
- action = BattLow = CD
- action = LineDown = 0
-
-
-apcserial.c
- condition = killpower
-
- cable = CUSTOM_SIMPLE, 0095A, 0095B, 0095C
- action = ioctl(TIOMCBIS, RTS)      set RTS (kills power)
- action = ioctl(TIOMCBIS, ST)       set TxD
-
- cable = 0020B, 020C, 0119A, 0127A, 0128A
- action = ioctl(TIOMCBIS, DTR)      set DTR (kills power)
-</pre>
-</div>
 </div>
 <div class="section" id="recalibrating-the-ups-runtime">
-<h2><a class="toc-backref" href="#id213">Recalibrating the UPS Runtime</a></h2>
+<h2><a class="toc-backref" href="#id212">Recalibrating the UPS Runtime</a></h2>
 <p>Note: In a future release of apcupsd this procedure will be
 replaced by a daemon operation that can be performed on all types
 of UPS.</p>
@@ -6137,13 +6060,13 @@ twice per year as discharging these kinds of batteries tends to
 shorten their life span.</p>
 </div>
 <div class="section" id="configuration-directive-reference">
-<h2><a class="toc-backref" href="#id214">Configuration Directive Reference</a></h2>
+<h2><a class="toc-backref" href="#id213">Configuration Directive Reference</a></h2>
 <p>Configuration directives in /etc/apcupsd/apcupsd.conf control the
 behavior of the apcupsd daemon. For most installations it is only
 necessary to set a handful of general directives. The rest can be
 left at their defaults unless you have an exotic configuration.</p>
 <div class="section" id="general-configuration-directives">
-<h3><a class="toc-backref" href="#id215">General Configuration Directives</a></h3>
+<h3><a class="toc-backref" href="#id214">General Configuration Directives</a></h3>
 <p>In general, each of these directives is required (except that the
 <tt class="docutils literal">DEVICE</tt> directive is ignored for <tt class="docutils literal">UPSCABLE ether</tt> and not required
 for <tt class="docutils literal">UPSCABLE usb</tt>).</p>
@@ -6209,7 +6132,7 @@ using the <tt class="docutils literal"><span class="pre">--with-lock-dir=</span>
 </dl>
 </div>
 <div class="section" id="configuration-directives-used-by-the-network-information-server">
-<h3><a class="toc-backref" href="#id216">Configuration Directives Used by the Network Information Server</a></h3>
+<h3><a class="toc-backref" href="#id215">Configuration Directives Used by the Network Information Server</a></h3>
 <p>None of these directives are required for proper operation of
 apcupsd.</p>
 <dl class="docutils">
@@ -6258,7 +6181,7 @@ system during the data access and file truncation operations.</p>
 </dl>
 </div>
 <div class="section" id="configuration-directives-used-during-power-failures">
-<h3><a class="toc-backref" href="#id217">Configuration Directives used during Power Failures</a></h3>
+<h3><a class="toc-backref" href="#id216">Configuration Directives used during Power Failures</a></h3>
 <p>In general, none of these
 directives are required. However, if you have a voltage-signalling
 (dumb) UPS with a cable that does not support the Low Battery
@@ -6417,7 +6340,7 @@ program to change the default at compile time.</p>
 </dl>
 </div>
 <div class="section" id="configuration-directives-used-to-control-system-logging">
-<h3><a class="toc-backref" href="#id218">Configuration Directives used to Control System Logging</a></h3>
+<h3><a class="toc-backref" href="#id217">Configuration Directives used to Control System Logging</a></h3>
 <dl class="docutils">
 <dt><strong>STATTIME</strong> <em>time in seconds</em></dt>
 <dd>This directive supplies the time
@@ -6446,7 +6369,7 @@ section of this manual for additional details.</dd>
 </dl>
 </div>
 <div class="section" id="configuration-directives-for-sharing-a-ups">
-<h3><a class="toc-backref" href="#id219">Configuration Directives for Sharing a UPS</a></h3>
+<h3><a class="toc-backref" href="#id218">Configuration Directives for Sharing a UPS</a></h3>
 <p>The following directives apply to sharing an UPS using a ShareUPS
 hardware module. Most users will not use this mode.</p>
 <p><strong>UPSCLASS</strong> <em>standalone</em> | <em>shareslave</em> | <em>sharemaster</em></p>
@@ -6471,7 +6394,7 @@ share and sharenet code is not fully tested.</p>
 </blockquote>
 </div>
 <div class="section" id="configuration-directives-used-to-set-the-ups-eeprom">
-<h3><a class="toc-backref" href="#id220">Configuration Directives Used to Set the UPS EEPROM</a></h3>
+<h3><a class="toc-backref" href="#id219">Configuration Directives Used to Set the UPS EEPROM</a></h3>
 <p><em>These directives have no effect on the operation of apcupsd but are
 reserved for use by apctest when bulk programming the values of the
 UPS EEPROM configuration variables in a Smart-UPS model.</em></p>
@@ -6558,13 +6481,13 @@ ON = at power on, OFF = never).</blockquote>
 </div>
 </div>
 <div class="section" id="apcupsd-status-logging">
-<h2><a class="toc-backref" href="#id221">apcupsd Status Logging</a></h2>
+<h2><a class="toc-backref" href="#id220">apcupsd Status Logging</a></h2>
 <p>There is a good deal of information available about the UPS and apcupsd's
 status. This document describes the format of that information.
 Normally you will get at it via <tt class="docutils literal">apcaccess</tt>, but there are other ways
 as well.</p>
 <div class="section" id="status-report-format">
-<h3><a class="toc-backref" href="#id222">Status report format</a></h3>
+<h3><a class="toc-backref" href="#id221">Status report format</a></h3>
 <p>STATUS output is in ASCII format with a single data value or piece
 of information on each line output. Because not all UPSes supply
 the same information, the output varies based on the type of UPS
@@ -6603,7 +6526,7 @@ of records and the size in the first record, the complete status
 can be reliably reassembled.</p>
 </div>
 <div class="section" id="status-report-example">
-<h3><a class="toc-backref" href="#id223">Status Report Example</a></h3>
+<h3><a class="toc-backref" href="#id222">Status Report Example</a></h3>
 <p>An example of output from a BackUPS RS 1500 follows:</p>
 <pre class="literal-block">
 APC      : 001,037,0906
@@ -6646,7 +6569,7 @@ END APC  : Sun Apr 26 17:22:32 EDT 2009
 </pre>
 </div>
 <div class="section" id="status-report-fields">
-<h3><a class="toc-backref" href="#id224">Status Report Fields</a></h3>
+<h3><a class="toc-backref" href="#id223">Status Report Fields</a></h3>
 <p>The meaning of the above variables are:</p>
 <dl class="docutils">
 <dt><strong>APC</strong></dt>
@@ -6795,7 +6718,7 @@ the remaining runtime more accurately.</dd>
 </dl>
 </div>
 <div class="section" id="logging-the-status-information">
-<h3><a class="toc-backref" href="#id225">Logging the STATUS Information</a></h3>
+<h3><a class="toc-backref" href="#id224">Logging the STATUS Information</a></h3>
 <p>If specified in the configuration file, the STATUS data will also be
 written to the system log file. Please note, that it would not
 normally be wise to write this data to a normal system log file as
@@ -6816,9 +6739,9 @@ get this information.</p>
 </div>
 </div>
 <div class="section" id="the-shutdown-sequence-and-its-discontents">
-<h2><a class="toc-backref" href="#id226">The Shutdown Sequence and its Discontents</a></h2>
+<h2><a class="toc-backref" href="#id225">The Shutdown Sequence and its Discontents</a></h2>
 <div class="section" id="shutdown-sequence">
-<h3><a class="toc-backref" href="#id227">Shutdown Sequence</a></h3>
+<h3><a class="toc-backref" href="#id226">Shutdown Sequence</a></h3>
 <p>If you experienced so problems with the testing procedures, or if
 you are porting apcupsd to another system, or you are simply
 curious, you may want to know exactly what is going on during the
@@ -6929,7 +6852,7 @@ to 60 seconds. When using a serial connection to a SmartUPS, you
 must configure the value in the UPS EEPROM by hand using <tt class="docutils literal">apctest</tt>.</p>
 </div>
 <div class="section" id="shutdown-problems">
-<h3><a class="toc-backref" href="#id228">Shutdown Problems</a></h3>
+<h3><a class="toc-backref" href="#id227">Shutdown Problems</a></h3>
 <p>Obviously if your halt script is not properly modified, apcupsd
 will not be able to shut off the power to the UPS, and if the power
 returns before the batteries are exhausted your system will not
@@ -6937,7 +6860,7 @@ automatically reboot. In any case, your machine should have been
 cleanly shut down.</p>
 </div>
 <div class="section" id="master-slave-shutdown">
-<h3><a class="toc-backref" href="#id229">Master/Slave Shutdown</a></h3>
+<h3><a class="toc-backref" href="#id228">Master/Slave Shutdown</a></h3>
 <p>In master/slave configurations, however, the master cannot be 100
 percent sure that the slaves have all shutdown before it performs
 the power off. To avoid this situation, be sure to configure any
@@ -6954,7 +6877,7 @@ old versions. Please be sure to delete or rename all prior versions
 (/usr/local/sbin/apcupsd or /sbin/powersc).</p>
 </div>
 <div class="section" id="startup">
-<h3><a class="toc-backref" href="#id230">Startup</a></h3>
+<h3><a class="toc-backref" href="#id229">Startup</a></h3>
 <p>Normally, apcupsd is automatically started when
 your system is rebooted. This normally occurs because the startup
 script apcupsd is linked into the appropriate places in /etc/rc.d.
@@ -6978,13 +6901,13 @@ the same script:</p>
 </pre>
 </div>
 <div class="section" id="windows-considerations">
-<h3><a class="toc-backref" href="#id231">Windows Considerations</a></h3>
+<h3><a class="toc-backref" href="#id230">Windows Considerations</a></h3>
 <p>Please see the <a class="reference internal" href="#killpower-under-windows">Killpower under Windows</a> chapter of this manual for
 considerations pertaining to shutdown and killpower on Windows.</p>
 </div>
 </div>
 <div class="section" id="apc-smart-protocol">
-<h2><a class="toc-backref" href="#id232">APC smart protocol</a></h2>
+<h2><a class="toc-backref" href="#id231">APC smart protocol</a></h2>
 <p>The APC UPS
 protocol was originally analyzed by Pavel Korensky with additions
 from Andre H. Hendrick beginning in 1995, and we want to give
@@ -6999,7 +6922,7 @@ the Bible of APC UPS programming. In the course of using it, I
 have added information gleaned from apcupsd and information
 graciously supplied by APC.</p>
 <div class="section" id="description">
-<h3><a class="toc-backref" href="#id233">Description</a></h3>
+<h3><a class="toc-backref" href="#id232">Description</a></h3>
 <p>Here's the information on the elusive APC smart signaling protocol
 used by their higher end units (Back-UPS Pro, Smart-UPS,
 Matrix-UPS, etc). What you see here has been collected from a
@@ -7008,7 +6931,7 @@ PowerChute and their hardware. Others sent various characters to
 the UPS and figured out what the results meant.</p>
 </div>
 <div class="section" id="rs-232-differences">
-<h3><a class="toc-backref" href="#id234">RS-232 differences</a></h3>
+<h3><a class="toc-backref" href="#id233">RS-232 differences</a></h3>
 <p>Normal 9 pin serial connections have TxD on 3 and RxD on 2. APC's
 smart serial ports put TxD on pin 1 and RxD on pin 2. This means
 you go nowhere if you use a normal straight through serial cable.
@@ -7018,7 +6941,7 @@ RTS from the PC usually wind up driving the on/off line. So, when
 you open the port, they go high and *poof* your computer dies.</p>
 </div>
 <div class="section" id="the-smart-protocol">
-<h3><a class="toc-backref" href="#id235">The Smart Protocol</a></h3>
+<h3><a class="toc-backref" href="#id234">The Smart Protocol</a></h3>
 <p>Despite the lack of official information from APC, this table has
 been constructed. It's standard RS-232 serial communications at
 2400 bps/8N1. Don't rush the UPS while transmitting or it may stop
@@ -7714,7 +7637,7 @@ to leave in battery (UPS shuts down
 </table>
 </div>
 <div class="section" id="dip-switch-info">
-<h3><a class="toc-backref" href="#id236">Dip switch info</a></h3>
+<h3><a class="toc-backref" href="#id235">Dip switch info</a></h3>
 <table border="1" class="docutils">
 <colgroup>
 <col width="4%" />
@@ -7754,7 +7677,7 @@ SU370ci and 400</td>
 </table>
 </div>
 <div class="section" id="status-bits">
-<h3><a class="toc-backref" href="#id237">Status bits</a></h3>
+<h3><a class="toc-backref" href="#id236">Status bits</a></h3>
 <p>This is probably the most important register of the UPS, which
 indicates the overall UPS status. Some common things you'll see:</p>
 <ul class="simple">
@@ -7803,7 +7726,7 @@ indicates the overall UPS status. Some common things you'll see:</p>
 </table>
 </div>
 <div class="section" id="alert-messages">
-<h3><a class="toc-backref" href="#id238">Alert messages</a></h3>
+<h3><a class="toc-backref" href="#id237">Alert messages</a></h3>
 <p>These single character messages are sent by the UPS any time there
 is an Alert condition. All other responses indicated above are sent
 by the UPS only in response to a query or action command.</p>
@@ -7898,7 +7821,7 @@ models.</td>
 </table>
 </div>
 <div class="section" id="register-1">
-<h3><a class="toc-backref" href="#id239">Register 1</a></h3>
+<h3><a class="toc-backref" href="#id238">Register 1</a></h3>
 <p>All bits are valid on the Matrix UPS. SmartUPS models only support
 bits 6 and 7. Other models do not respond.</p>
 <table border="1" class="docutils">
@@ -7940,7 +7863,7 @@ bits 6 and 7. Other models do not respond.</p>
 </table>
 </div>
 <div class="section" id="register-2">
-<h3><a class="toc-backref" href="#id240">Register 2</a></h3>
+<h3><a class="toc-backref" href="#id239">Register 2</a></h3>
 <p>Matrix UPS models report bits 0-5. SmartUPS models only support
 bits 4-6. SmartUPS v/s and BackUPS Pro report bits 4, 6, 7.
 Unused bits are set to 0. Other models do not respond.</p>
@@ -7983,7 +7906,7 @@ Unused bits are set to 0. Other models do not respond.</p>
 </table>
 </div>
 <div class="section" id="register-3">
-<h3><a class="toc-backref" href="#id241">Register 3</a></h3>
+<h3><a class="toc-backref" href="#id240">Register 3</a></h3>
 <p>All bits are valid on the Matrix UPS and 3rd generation SmartUPS
 models. SmartUPS v/s and BackUPS Pro models report bits 0-5. All
 others report 0-4. State change of bits 1,2,5,6,7 are reported
@@ -8027,7 +7950,7 @@ asynchronously with ? and = messages.</p>
 </table>
 </div>
 <div class="section" id="interpretation-of-the-old-firmware-revision">
-<h3><a class="toc-backref" href="#id242">Interpretation of the Old Firmware Revision</a></h3>
+<h3><a class="toc-backref" href="#id241">Interpretation of the Old Firmware Revision</a></h3>
 <p>The Old Firmware Revision is obtained with the &quot;V&quot; command, which
 gives a typical response such as &quot;GWD&quot; or &quot;IWI&quot;, and can be
 interpreted as follows:</p>
@@ -8065,7 +7988,7 @@ This is a three character string XYZ
 </pre>
 </div>
 <div class="section" id="interpretation-of-the-new-firmware-revision">
-<h3><a class="toc-backref" href="#id243">Interpretation of the New Firmware Revision</a></h3>
+<h3><a class="toc-backref" href="#id242">Interpretation of the New Firmware Revision</a></h3>
 <pre class="literal-block">
 New Firmware revision and model ID String in NN.M.L is the format
 
@@ -8101,7 +8024,7 @@ New Firmware revision and model ID String in NN.M.L is the format
 </pre>
 </div>
 <div class="section" id="eeprom-values">
-<h3><a class="toc-backref" href="#id244">EEPROM Values</a></h3>
+<h3><a class="toc-backref" href="#id243">EEPROM Values</a></h3>
 <p>Upon sending a ^Z, your UPS will probably spit back approximately
 254 characters something like the following (truncated here for the
 example):</p>
@@ -8163,7 +8086,7 @@ FVL == Values that are returned and legal.
 </pre>
 </div>
 <div class="section" id="programming-the-ups-eeprom">
-<h3><a class="toc-backref" href="#id245">Programming the UPS EEPROM</a></h3>
+<h3><a class="toc-backref" href="#id244">Programming the UPS EEPROM</a></h3>
 <p>There are at this time a maximum of 12 different values that can be
 programmed into the UPS EEPROM. They are:</p>
 <table border="1" class="docutils">
@@ -8233,7 +8156,7 @@ vertical bar (|) to indicate that the EEPROM was changed.</p>
 </div>
 </div>
 <div class="section" id="nis-network-server-protocol">
-<h2><a class="toc-backref" href="#id246">NIS Network Server Protocol</a></h2>
+<h2><a class="toc-backref" href="#id245">NIS Network Server Protocol</a></h2>
 <p>The NIS network server in apcupsd is capable of sending status and events data
 to clients that request it. The communication between the client and the server
 is performed over a TCP connection to the NISPORT (normally port 3551). The
@@ -8261,7 +8184,7 @@ respond to this command with a series of its own messages containing the status
 data.</p>
 </div>
 <div class="section" id="apcupsd-rpm-packaging-faq">
-<h2><a class="toc-backref" href="#id247">Apcupsd RPM Packaging FAQ</a></h2>
+<h2><a class="toc-backref" href="#id246">Apcupsd RPM Packaging FAQ</a></h2>
 <dl class="docutils">
 <dt><strong>How do I build Apcupsd for platform xxx?</strong></dt>
 <dd><p class="first">The apcupsd spec file contains defines
@@ -8379,14 +8302,14 @@ add the following line:</p>
 </dl>
 </div>
 <div class="section" id="credits">
-<h2><a class="toc-backref" href="#id248">Credits</a></h2>
+<h2><a class="toc-backref" href="#id247">Credits</a></h2>
 <img alt="./thanks.png" src="./thanks.png" />
 <p>The success of apcupsd is due to the many people that helped in
 development, testing and in many other ways.</p>
 <p>Thank all the developers that worked hard to make APCUPSD one of the
 best piece of software for UPS management.</p>
 <div class="section" id="contributors">
-<h3><a class="toc-backref" href="#id249">Contributors</a></h3>
+<h3><a class="toc-backref" href="#id248">Contributors</a></h3>
 <dl class="docutils">
 <dt><strong>Current Code Maintainer and Project Manager</strong></dt>
 <dd>Adam Kropelin (<a class="reference external" href="mailto:adam&#64;kroptech.com">adam&#64;kroptech.com</a>)</dd>
@@ -8427,7 +8350,7 @@ Joseph Acosta (<a class="reference external" href="mailto:joeja&#64;mindspring.c
 </dl>
 </div>
 <div class="section" id="apcupsd-license">
-<h3><a class="toc-backref" href="#id250">Apcupsd License</a></h3>
+<h3><a class="toc-backref" href="#id249">Apcupsd License</a></h3>
 <p>Apcupsd is licensed under the terms of the GNU General Public License, version 2
 (GPLv2). The full text of this license may be found in the COPYING file at the
 top of the source tree and online at <a class="reference external" href="http://www.gnu.org/licenses/gpl-2.0.html">http://www.gnu.org/licenses/gpl-2.0.html</a>.</p>
@@ -8449,7 +8372,7 @@ MA 02111-1307, USA.
 </pre>
 </div>
 <div class="section" id="other-open-source-licenses">
-<h3><a class="toc-backref" href="#id251">Other Open Source Licenses</a></h3>
+<h3><a class="toc-backref" href="#id250">Other Open Source Licenses</a></h3>
 <p>Apcupsd incorporates the libusbhid library which is subject to the following
 copyright and license:</p>
 <pre class="literal-block">
@@ -8483,7 +8406,7 @@ SUCH DAMAGE.
 </div>
 <div class="footer">
 <hr class="footer" />
-Generated on: 2015-01-05 00:21 UTC.
+Generated on: 2015-01-20 01:36 UTC.
 Generated by <a class="reference external" href="http://docutils.sourceforge.net/">Docutils</a> from <a class="reference external" href="http://docutils.sourceforge.net/rst.html">reStructuredText</a> source.
 
 </div>
