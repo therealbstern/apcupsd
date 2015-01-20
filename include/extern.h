@@ -27,7 +27,6 @@
 
 /* Function Prototypes */
 
-extern UPSINFO myUPS;
 extern UPSINFO *core_ups;
 extern char argvalue[MAXSTRING];
 extern void (*error_out) (const char *file, int line, const char *fmt, va_list arg_ptr);
