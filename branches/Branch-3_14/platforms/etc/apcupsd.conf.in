@@ -5,6 +5,11 @@
 # "apcupsd" POSIX config file
 
 #
+# Note that the apcupsd daemon must be restarted in order for changes to
+# this configuration file to become active.
+#
+
+#
 # ========= General configuration parameters ============
 #
 

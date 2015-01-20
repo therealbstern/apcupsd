@@ -4859,6 +4859,9 @@ behavior of the apcupsd daemon. For most installations it is only
 necessary to set a handful of general directives. The rest can be
 left at their defaults unless you have an exotic configuration.
 
+Note that the apcupsd daemon must be restarted in order for changes to
+the configuration file to become active.
+
 General Configuration Directives
 --------------------------------
 
