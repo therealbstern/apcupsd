@@ -97,6 +97,9 @@ bool ModbusUsbComm::ModbusTx(const ModbusFrame *frm, unsigned int sz)
    // making sure we haven't issued a command since this time.
    usleep(MODBUS_IDLE_WAIT_TIMEOUT_MS * 1000);
 
+   Dmsg(100, "%s: Sending frame\n", __func__);
+   hex_dump(100, frm, sz);
+
    // We add HID report id as the first byte of the report, then at most 63
    // bytes of payload.
    uint8_t rpt[MODBUS_USB_REPORT_SIZE] = {0};
