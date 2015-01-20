@@ -151,11 +151,6 @@ extern void logf(const char *fmt, ...);
 extern void hex_dump(int level, const void *data, unsigned int len);
 extern int format_date(time_t timestamp, char *dest, size_t destlen);
 
-/* In apclist.c */
-extern int insertUps(UPSINFO *ups);
-extern UPSINFO *getNextUps(UPSINFO *ups);
-extern UPSINFO *getUpsByname(char *name);
-
 /* In apcerror.c */
 extern void generic_error_out(const char *file, int line, const char *fmt, ...);
 extern void generic_error_exit(const char *fmt, ...);

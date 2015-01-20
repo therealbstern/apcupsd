@@ -215,65 +215,6 @@ static int obsolete(UPSINFO *ups, int offset, const GENINFO * junk, const char *
    return FAILURE;
 }
 
-#ifdef UNSUPPORTED_CODE
-static int start_ups(UPSINFO *ups, int offset, const GENINFO * size, const char *v)
-{
-   char x[MAXSTRING];
-
-   if (!sscanf(v, "%s", x))
-      return FAILURE;
-
-   /* Verify that we don't already have an UPS with the same name. */
-   for (ups = NULL; (ups = getNextUps(ups)) != NULL;)
-      if (strncmp(x, ups->upsname, UPSNAMELEN) == 0) {
-         fprintf(stderr, "%s: duplicate upsname [%s] in config file.\n",
-            argvalue, ups->upsname);
-         return FAILURE;
-      }
-
-   /* Here start the definition of a new UPS to add to the linked list. */
-   ups = new_ups();
-
-   if (ups == NULL) {
-      Error_abort("%s: not enough memory.\n", argvalue);
-      return FAILURE;
-   }
-
-   init_ups_struct(ups);
-
-
-   strlcpy((char *)AT(ups, offset), x, (int)size);
-
-   /* Terminate string */
-   *((char *)AT(ups, (offset + (int)size) - 1)) = 0;
-   return SUCCESS;
-}
-
-static int end_ups(UPSINFO *ups, int offset, const GENINFO * size, const char *v)
-{
-   char x[MAXSTRING];
-
-   if (!sscanf(v, "%s", x))
-      return FAILURE;
-
-   if (ups == NULL) {
-      fprintf(stderr, "%s: upsname [%s] mismatch in config file.\n", argvalue, x);
-      return FAILURE;
-   }
-
-   if (strncmp(x, ups->upsname, UPSNAMELEN) != 0) {
-      fprintf(stderr, "%s: upsname [%s] mismatch in config file.\n",
-         argvalue, ups->upsname);
-      return FAILURE;
-   }
-
-   insertUps(ups);
-
-   return SUCCESS;
-}
-#endif
-
-
 static int match_int(UPSINFO *ups, int offset, const GENINFO * junk, const char *v)
 {
    int x;
