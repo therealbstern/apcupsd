@@ -158,9 +158,6 @@ extern void generic_error_exit(const char *fmt, ...);
 /* In asys.c */
 int avsnprintf(char *str, size_t size, const char *format, va_list ap);
 int asnprintf(char *str, size_t size, const char *fmt, ...);
-void *amalloc(size_t size);
-void *arealloc(void *buf, size_t size);
-void *acalloc(size_t size1, size_t size2);
 #ifndef HAVE_STRLCPY
 size_t strlcpy(char *dst, const char *src, size_t size);
 #endif
