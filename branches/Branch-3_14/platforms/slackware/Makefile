@@ -10,7 +10,7 @@ install-slackware:
 	$(call DISTINST,Slackware)
 	$(call MKDIR,/etc/rc.d)
 	$(call INSTPROG,744,apcupsd,/etc/rc.d/rc.apcupsd)
-	$(call MKDIR,$(LOCKDIR)/subsys)
+	$(call MKDIR,$(LOCKDIR))
 	$(VV)-rcfile=/etc/rc.d/rc.6; \
 	grep -q $(sysconfdir)/apccontrol $$rcfile; \
 	if [ $$? -ne 0 ]; then \

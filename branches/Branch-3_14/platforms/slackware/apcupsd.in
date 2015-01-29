@@ -20,7 +20,7 @@ case "$1" in
 	if [ -f ${APCPID} ]; then
 		return="  Already running."
 	else
-		@sbindir@/apcupsd && touch @LOCKDIR@/subsys/apcupsd \
+		@sbindir@/apcupsd && touch @LOCKDIR@/apcupsd \
 		|| return="  Failed."
 	fi
 
@@ -35,7 +35,7 @@ case "$1" in
 	else
 		return="  Nothing to stop."
 	fi
-	rm -f @LOCKDIR@/subsys/apcupsd
+	rm -f @LOCKDIR@/apcupsd
 	echo -e "$return"
     ;;
     restart)
