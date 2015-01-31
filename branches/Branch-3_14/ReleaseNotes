@@ -9,6 +9,45 @@ IF YOU USE THE OLD STYLE MASTER/SLAVE NETWORKING MODE, BE SURE TO READ THE
 3.14.0 RELEASE NOTES BELOW.
 
 
+3.14.13 -- 01 February 2015
+
+NEW FEATURES
+
+  * MODBUS USB support
+  
+    Previous releases supported MODBUS serial (RS232). This release adds
+    support for MODBUS over USB. This protocol is preferable to the normal
+    USB HID driver because it offers access to more UPS data readouts and
+    controls. See the MODBUS section of the apcupsd manual for more details.
+
+  * Support for Apple Notification Center on Mac OS X (replaces Growl)
+
+  * Apple install packages and binaries are signed with an Apple Developer
+    key for compatibility with Gate Keeper
+
+BUG FIXES
+
+  * Use launchd for startup on Mac OS X as the old Startup Items mechanism is 
+    no longer supported in 10.10 and above
+
+  * Fix apcaccess on ARM systems where char is unsigned by default
+
+  * Fix several potential issues identified by Coverity static analysis
+
+  * Numerous other fixes and improvements all over the code, many of them
+    submitted by users...Thank you!
+
+MISC
+
+  * Windows port now builds with the same configure and make system as the
+    other targets, no need to maintain a special hardcoded Makefile
+    
+  * Many cleanups to the Windows port codebase
+
+  * Prebuilt binaries for Mac OS X no longer support PowerPC systems or 
+    Mac OS X 10.4 and older
+
+
 3.14.12 -- 29 March 2014             (Maintenance Release)
 
 NEW FEATURES
