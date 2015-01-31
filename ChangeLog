@@ -8,6 +8,122 @@
 /***************************************************************************/
 
 ------------------------------------------------------------------------
+r2311 | adk0212 | 2015-01-29 09:13:25 -0500 (Thu, 29 Jan 2015) | 5 lines
+
+Place apcupsd lock file in /var/lock instead of /var/lock/subsys on Slackware
+Slackware convention is to use /var/lock; /var/lock/subsys appears to be a Red Hat thing
+Reported by Sebastian Arcus <s.arcus@open-t.co.uk>
+Patch by Jonathan Woithe <jwoithe@atrad.com.au>
+
+------------------------------------------------------------------------
+r2310 | adk0212 | 2015-01-20 12:38:53 -0500 (Tue, 20 Jan 2015) | 3 lines
+
+Add notes indicating that apcupsd must be restarted for config file changes to become active.
+Although it might be considered "obvious", this wasn't actually written down anywhere that I could find.
+
+------------------------------------------------------------------------
+r2309 | adk0212 | 2015-01-20 12:15:04 -0500 (Tue, 20 Jan 2015) | 2 lines
+
+Updated Windows USB driver signature, courtesy of Jernej Simončič <jernej|s@eternallybored.org>
+
+------------------------------------------------------------------------
+r2308 | adk0212 | 2015-01-19 21:45:44 -0500 (Mon, 19 Jan 2015) | 2 lines
+
+Add debug to Tx side of modbus USB to match RS232
+
+------------------------------------------------------------------------
+r2307 | adk0212 | 2015-01-19 21:02:01 -0500 (Mon, 19 Jan 2015) | 2 lines
+
+Remove unused a{m,re,c}alloc functions
+
+------------------------------------------------------------------------
+r2306 | adk0212 | 2015-01-19 20:58:51 -0500 (Mon, 19 Jan 2015) | 2 lines
+
+Remove obsolete UPS list code
+
+------------------------------------------------------------------------
+r2305 | adk0212 | 2015-01-19 20:55:56 -0500 (Mon, 19 Jan 2015) | 2 lines
+
+Remove obsolete references to myUPS
+
+------------------------------------------------------------------------
+r2304 | adk0212 | 2015-01-19 20:52:18 -0500 (Mon, 19 Jan 2015) | 2 lines
+
+Remove obsolete file
+
+------------------------------------------------------------------------
+r2303 | adk0212 | 2015-01-19 20:48:49 -0500 (Mon, 19 Jan 2015) | 2 lines
+
+Remove obsolete prototypes
+
+------------------------------------------------------------------------
+r2302 | adk0212 | 2015-01-19 20:38:19 -0500 (Mon, 19 Jan 2015) | 2 lines
+
+Remove obsolete simple signaling cable info
+
+------------------------------------------------------------------------
+r2301 | adk0212 | 2015-01-19 19:09:42 -0500 (Mon, 19 Jan 2015) | 2 lines
+
+Bump win32 usb driver date and rev
+
+------------------------------------------------------------------------
+r2300 | adk0212 | 2015-01-19 19:04:40 -0500 (Mon, 19 Jan 2015) | 2 lines
+
+Fix typo
+
+------------------------------------------------------------------------
+r2299 | adk0212 | 2015-01-19 18:52:30 -0500 (Mon, 19 Jan 2015) | 2 lines
+
+Fix typo
+
+------------------------------------------------------------------------
+r2298 | adk0212 | 2015-01-18 15:38:34 -0500 (Sun, 18 Jan 2015) | 2 lines
+
+Add --enable-modbus-usb to Darwin build notes
+
+------------------------------------------------------------------------
+r2297 | adk0212 | 2015-01-18 11:41:26 -0500 (Sun, 18 Jan 2015) | 3 lines
+
+Update supported USB VID/PID combinations in code and platform-specific drivers
+- Includes several VID/PID tuples for future use as suggested by APC
+
+------------------------------------------------------------------------
+r2296 | adk0212 | 2015-01-12 11:56:25 -0500 (Mon, 12 Jan 2015) | 3 lines
+
+Remove ancient unmaintained apcupsd.8 manpage from Debian platform directory.
+The current manpage set for apcupsd is in doc/ and should be used by all platforms.
+
+------------------------------------------------------------------------
+r2295 | adk0212 | 2015-01-07 22:06:44 -0500 (Wed, 07 Jan 2015) | 2 lines
+
+Fix handling of return value from USBDEVFS_CONNECT
+
+------------------------------------------------------------------------
+r2294 | adk0212 | 2015-01-07 21:31:27 -0500 (Wed, 07 Jan 2015) | 2 lines
+
+Add MODBUS/USB info to apcupsd.conf comments
+
+------------------------------------------------------------------------
+r2293 | adk0212 | 2015-01-07 21:25:06 -0500 (Wed, 07 Jan 2015) | 2 lines
+
+Add MODBUS USB setting info to apcupsd.conf(5) man page
+
+------------------------------------------------------------------------
+r2292 | adk0212 | 2015-01-07 20:54:03 -0500 (Wed, 07 Jan 2015) | 2 lines
+
+Remove ETIMEDOUT workaround; this is no longer an issue
+
+------------------------------------------------------------------------
+r2291 | adk0212 | 2015-01-04 19:24:06 -0500 (Sun, 04 Jan 2015) | 2 lines
+
+Update documentation for MODBUS USB.
+
+------------------------------------------------------------------------
+r2289 | adk0212 | 2015-01-04 15:41:14 -0500 (Sun, 04 Jan 2015) | 2 lines
+
+Update ChangeLog for 3.14.13-test2
+
+------------------------------------------------------------------------
 r2288 | adk0212 | 2015-01-04 15:39:58 -0500 (Sun, 04 Jan 2015) | 2 lines
 
 Bump version to 3.14.13-test2

@@ -1,6 +1,6 @@
 #define DEBUG 1
-#define VERSION "3.14.13-test2"
-#define ADATE   "04 January 2015"
+#define VERSION "3.14.13"
+#define ADATE   "01 February 2015"
 
 #define APCUPSD_RELEASE VERSION
 
