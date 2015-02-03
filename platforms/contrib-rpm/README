@@ -7,7 +7,7 @@ This document outlines the procedures to create rpm packages for
 apcupsd for platforms supported in the rpm spec file but not published
 on sourceforge. Contributors wishing to build and supply such rpm
 packages for release on the sourceforge project page should read this 
-documentation. Contributors should contact either Adam Kropelin <akropel1@rochester.rr.com>
+documentation. Contributors should contact either Adam Kropelin <adam@kroptech.com>
 or Scott Barninger <barninger@fairfieldcomputers.com>.
 
 The general requirements to have contrib rpm packages published on the project 

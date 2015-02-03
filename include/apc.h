@@ -27,11 +27,7 @@
 #ifndef APC_H
 #define APC_H 1
 
-#ifdef HAVE_WIN32
-# include "winconfig.h"
-#else
-# include "config.h"
-#endif
+# include "apcconfig.h"
 
 /*
  * Solaris needs BSD_COMP set in order to get FIONBIO
@@ -83,7 +79,6 @@
 #include <syslog.h>
 #include <limits.h>
 #include <time.h>
-#include <pwd.h>
 #include <errno.h>
 #include <fcntl.h>
 #include <setjmp.h>
@@ -137,12 +132,12 @@
 #include <netinet/in.h>
 #include <arpa/inet.h>
 
+#ifdef HAVE_MINGW
+#include <conio.h>
+#endif
 
 /* Include apcupsd stuff */
 
-#include "apc_config.h"
-
-#include "apc_i18n.h"
 #include "version.h"
 #include "defines.h"
 #include "struct.h"

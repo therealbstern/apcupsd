@@ -5,6 +5,11 @@
 # "apcupsd" POSIX config file
 
 #
+# Note that the apcupsd daemon must be restarted in order for changes to
+# this configuration file to become active.
+#
+
+#
 # ========= General configuration parameters ============
 #
 
@@ -24,7 +29,7 @@
 #     940-0119A, 940-0127A, 940-0128A, 940-0020B,
 #     940-0020C, 940-0023A, 940-0024B, 940-0024C,
 #     940-1524C, 940-0024G, 940-0095A, 940-0095B,
-#     940-0095C, M-04-02-2000
+#     940-0095C, 940-0625A, M-04-02-2000
 #
 UPSCABLE @UPSCABLE@
 
@@ -36,41 +41,52 @@ UPSCABLE @UPSCABLE@
 # other UPS types, you must specify an appropriate port or address.
 #
 # UPSTYPE   DEVICE           Description
-# apcsmart  /dev/tty**       Newer serial character device,
-#                            appropriate for SmartUPS models using
-#                            a serial cable (not USB).
+# apcsmart  /dev/tty**       Newer serial character device, appropriate for 
+#                            SmartUPS models using a serial cable (not USB).
 #
 # usb       <BLANK>          Most new UPSes are USB. A blank DEVICE
 #                            setting enables autodetection, which is
 #                            the best choice for most installations.
 #
-# net       hostname:port    Network link to a master apcupsd
-#                            through apcupsd's Network Information
-#                            Server. This is used if you don't have
-#                            a UPS directly connected to your computer.
+# net       hostname:port    Network link to a master apcupsd through apcupsd's 
+#                            Network Information Server. This is used if the
+#                            UPS powering your computer is connected to a 
+#                            different computer for monitoring.
 #
 # snmp      hostname:port:vendor:community
-#                            SNMP Network link to an SNMP-enabled
-#                            UPS device. Vendor is the MIB used by
-#                            the UPS device: can be "APC", "APC_NOTRAP"
-#                            or "RFC" where APC is the powernet MIB,
-#                            "APC_NOTRAP" is powernet with SNMP trap
-#                            catching disabled, and RFC is the IETF's 
-#                            rfc1628 UPS-MIB. You usually want "APC".
-#                            Port is usually 161. Community is usually
-#                            "private".
+#                            SNMP network link to an SNMP-enabled UPS device.
+#                            Hostname is the ip address or hostname of the UPS 
+#                            on the network. Vendor can be can be "APC" or 
+#                            "APC_NOTRAP". "APC_NOTRAP" will disable SNMP trap 
+#                            catching; you usually want "APC". Port is usually 
+#                            161. Community is usually "private".
 #
-# dumb      /dev/tty**       Old serial character device for use 
-#                            with simple-signaling UPSes.
+# netsnmp   hostname:port:vendor:community
+#                            OBSOLETE
+#                            Same as SNMP above but requires use of the 
+#                            net-snmp library. Unless you have a specific need
+#                            for this old driver, you should use 'snmp' instead.
 #
-# pcnet    ipaddr:username:passphrase
-#                            PowerChute Network Shutdown protocol
-#                            which can be used as an alternative to SNMP
-#                            with AP9617 family of smart slot cards.
-#                            ipaddr is the IP address of the UPS mgmt
-#                            card. username and passphrase are the
-#                            credentials for which the card has been
-#                            configured.
+# dumb      /dev/tty**       Old serial character device for use with 
+#                            simple-signaling UPSes.
+#
+# pcnet     ipaddr:username:passphrase:port
+#                            PowerChute Network Shutdown protocol which can be 
+#                            used as an alternative to SNMP with the AP9617 
+#                            family of smart slot cards. ipaddr is the IP 
+#                            address of the UPS management card. username and 
+#                            passphrase are the credentials for which the card 
+#                            has been configured. port is the port number on 
+#                            which to listen for messages from the UPS, normally 
+#                            3052. If this parameter is empty or missing, the 
+#                            default of 3052 will be used.
+#
+# modbus    /dev/tty**       Serial device for use with newest SmartUPS models
+#                            supporting the MODBUS protocol.
+# modbus    <BLANK>          Leave the DEVICE setting blank for MODBUS over USB
+#                            or set to the serial number of the UPS to ensure 
+#                            that apcupsd binds to that particular unit
+#                            (helpful if you have more than one USB UPS).
 #
 UPSTYPE @UPSTYPE@
 DEVICE @SERIALDEV@
@@ -85,7 +101,10 @@ DEVICE @SERIALDEV@
 #POLLTIME 60
 
 # LOCKFILE <path to lockfile>
-#   Path for device lock file. Not used on Win32.
+#   Path for device lock file. This is the directory into which the lock file
+#   will be written. The directory must already exist; apcupsd will not create
+#   it. The actual name of the lock file is computed from DEVICE.
+#   Not used on Win32.
 LOCKFILE @LOCKDIR@
 
 # SCRIPTDIR <path to script directory>

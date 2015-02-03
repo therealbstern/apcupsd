@@ -1,3 +1,27 @@
+/*
+ * aqueue.h
+ *
+ * Simple thread-safe blocking queue
+ */
+
+/*
+ * Copyright (C) 2007 Adam Kropelin
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of version 2 of the GNU General
+ * Public License as published by the Free Software Foundation.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+ * General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public
+ * License along with this program; if not, write to the Free
+ * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
+ * MA 02111-1307, USA.
+ */
+
 #ifndef __AQUEUE_H
 #define __AQUEUE_H
 
@@ -55,6 +79,20 @@ public:
       _queue.remove_first();
       pthread_mutex_unlock(&_mutex);
       return true;
+   }
+
+   T dequeue()
+   {
+      pthread_mutex_lock(&_mutex);
+
+      int rc = 0;
+      while (rc == 0 && _queue.empty())
+         rc = pthread_cond_wait(&_condvar, &_mutex);
+
+      T elem = _queue.first();
+      _queue.remove_first();
+      pthread_mutex_unlock(&_mutex);
+      return elem;
    }
 
    bool empty()

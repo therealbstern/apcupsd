@@ -5,12 +5,12 @@ The APC UPS
 protocol was originally analyzed by Pavel Korensky with additions
 from Andre H. Hendrick beginning in 1995, and we want to give
 credit for good, hard work, where credit is due. After having said
-that, you will see that Steven Freed built much of the orginal
+that, you will see that Steven Freed built much of the original
 apcupsd information file.
 
 The start of this chapter of the apcupsd manual in HTML format was
 pulled from the Network UPS Tools (NUT) site 
-(http://www.networkupstools.org/protocols/apcsmart.html). It
+(http://www.networkupstools.org/ups-protocols/apcsmart.html). It
 has been an invaluable tool in improving apcupsd, and I consider it
 the Bible of APC UPS programming. In the course of using it, I
 have added information gleaned from apcupsd and information
@@ -118,8 +118,10 @@ for "not available", otherwise the response is given in the
 +---------+------------+----------------+--------------------------------------+
 |K        |Shutdown    |OK or *         |Send twice with > 1.5s delay between  |
 |         |with grace  |                |chars. Older units send "*" instead of|
-|         |period      |                |"OK". Length of grace period is set   |
-|         |            |                |with Grace Period command.            |
+|         |period (no  |                |"OK". Length of grace period is set   |
+|         |return)     |                |with Grace Period command. UPS will   |
+|         |            |                |remain off and NOT power on if utility|
+|         |            |                |power is restored.                    |
 +---------+------------+----------------+--------------------------------------+
 |L        |Input line  |118.3           |Value varies based on locality. Does  |
 |         |voltage     |                |not always read 000.0 on line failure.|
@@ -171,7 +173,7 @@ for "not available", otherwise the response is given in the
 +---------+------------+----------------+--------------------------------------+
 |Z        |Shutdown    |n/a             |Send twice with > 1.5s delay between  |
 |         |immediately |                |chars. UPS switches load off          |
-|         |            |                |immediately (no grade period)         |
+|         |            |                |immediately (no grace period)         |
 +---------+------------+----------------+--------------------------------------+
 |a        |Protocol    |*long string*   |Returns three main sections delimited |
 |         |info        |                |by periods:                           |
@@ -272,7 +274,7 @@ for "not available", otherwise the response is given in the
 |         |            |                |- A = autoadjust (Matrix only)        |
 +---------+------------+----------------+--------------------------------------+
 |t        |Measure-UPS |80.5            |Degrees C. Only works on models with  |
-|         |ambient     |                |the Measure-UPS SmartSlot card .      |
+|         |ambient     |                |the Measure-UPS SmartSlot card.       |
 |         |temperature |                |                                      |
 +---------+------------+----------------+--------------------------------------+
 |u        |Upper       |132             |Writable variable. UPS goes on battery|
@@ -520,7 +522,7 @@ Register 2
 ----------
 
 Matrix UPS models report bits 0-5. SmartUPS models only support
-bits 4 and 6. SmartUPS v/s and BackUPS Pro report bits 4, 6, 7.
+bits 4-6. SmartUPS v/s and BackUPS Pro report bits 4, 6, 7.
 Unused bits are set to 0. Other models do not respond.
 
 === ============================================================================
@@ -531,7 +533,7 @@ Bit Meaning when bit=1
 2   Bypass supply failure
 3   Output voltage select failure, UPS in bypass 
 4   DC imbalance, UPS in bypass
-5   Command sent to stop bypass with no battery connected - UPS still in bypass
+5   Battery is disconnected
 6   Relay fault in SmartTrim or SmartBoost
 7   Bad output voltage
 === ============================================================================
@@ -605,7 +607,7 @@ Interpretation of the New Firmware Revision
 
 ::
 
-    New Firmware revison and model ID String in NN.M.L is the format
+    New Firmware revision and model ID String in NN.M.L is the format
 
         where NN == UPS ID Code.
             12 == Back-UPS Pro 650

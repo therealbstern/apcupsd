@@ -26,8 +26,23 @@
 
 #include "apc.h"
 #include "snmp.h"
+#include "snmp_private.h"
 
-bool SnmpDriver::initialize_device_data()
+SnmpUpsDriver::SnmpUpsDriver(UPSINFO *ups) :
+   UpsDriver(ups),
+   _peername(NULL),
+   _remote_port(0),
+   _DeviceVendor(NULL),
+   _community(NULL),
+   _mib(NULL),
+   _trap_session(NULL),
+   _trap_received(false)
+{
+   memset(_device, 0, sizeof(_device));
+   memset(&_session, 0, sizeof(_session));
+}
+
+int SnmpUpsDriver::initialize_device_data()
 {
    char *port_num = NULL;
    char *cp;
@@ -37,7 +52,7 @@ bool SnmpDriver::initialize_device_data()
       exit(1);
    }
 
-   astrncpy(_device, _ups->device, sizeof(_device));
+   strlcpy(_device, _ups->device, sizeof(_device));
 
    /*
     * Split the DEVICE statement and assign pointers to the various parts.
@@ -95,18 +110,18 @@ bool SnmpDriver::initialize_device_data()
 
    _community = cp + 1;
 
-   _trap_received = false;
-
-   return true;
+   return 1;
 }
 
-bool SnmpDriver::Open()
+bool SnmpUpsDriver::Open()
 {
    write_lock(_ups);
+
    initialize_device_data();
+
    write_unlock(_ups);
 
-   memset(&_session, 0, sizeof(_session));
+   memset(&_session, 0, sizeof(struct snmp_session));
    _session.peername = _peername;
    _session.remote_port = _remote_port;
 
@@ -125,42 +140,43 @@ bool SnmpDriver::Open()
 
    if (!strcmp(_DeviceVendor, "APC") ||
        !strcmp(_DeviceVendor, "APC_NOTRAP")) {
-      _MIB = malloc(sizeof(powernet_mib_t));
-      if (_MIB == NULL) {
+      _mib = malloc(sizeof(powernet_mib_t));
+      if (_mib == NULL) {
          log_event(_ups, LOG_ERR, "Out of memory.");
          exit(1);
       }
 
-      memset(_MIB, 0, sizeof(powernet_mib_t));
+      memset(_mib, 0, sizeof(powernet_mib_t));
 
       /* Run powernet specific init */
       return powernet_snmp_ups_open();
    }
 
    if (!strcmp(_DeviceVendor, "RFC")) {
-      _MIB = malloc(sizeof(ups_mib_t));
-      if (_MIB == NULL) {
+      _mib = malloc(sizeof(ups_mib_t));
+      if (_mib == NULL) {
          log_event(_ups, LOG_ERR, "Out of memory.");
          exit(1);
       }
 
-      memset(_MIB, 0, sizeof(ups_mib_t));
-      return true;
+      memset(_mib, 0, sizeof(ups_mib_t));
+      return 1;
    }
 
    /* No mib for this vendor. */
-   Dmsg1(0, "No MIB defined for vendor %s\n", _DeviceVendor);
-   return false;
+   Dmsg(0, "No MIB defined for vendor %s\n", _DeviceVendor);
+
+   return 0;
 }
 
-bool SnmpDriver::Close()
+bool SnmpUpsDriver::Close()
 {
-   return true;
+   return 1;
 }
 
-bool SnmpDriver::GetCapabilities()
+bool SnmpUpsDriver::get_capabilities()
 {
-   bool ret = false;
+   int ret = 0;
 
    write_lock(_ups);
 
@@ -175,9 +191,9 @@ bool SnmpDriver::GetCapabilities()
    return ret;
 }
 
-bool SnmpDriver::KillPower()
+bool SnmpUpsDriver::kill_power()
 {
-   bool ret = false;
+   int ret = 0;
 
    if (!strcmp(_DeviceVendor, "APC"))
       ret = powernet_snmp_kill_ups_power();
@@ -188,9 +204,9 @@ bool SnmpDriver::KillPower()
    return ret;
 }
 
-bool SnmpDriver::CheckState()
+bool SnmpUpsDriver::check_state()
 {
-   bool ret = false;
+   int ret = 0;
 
    if (!strcmp(_DeviceVendor, "APC"))
       ret = powernet_snmp_ups_check_state();
@@ -201,9 +217,9 @@ bool SnmpDriver::CheckState()
    return ret;
 }
 
-bool SnmpDriver::ReadVolatileData()
+bool SnmpUpsDriver::read_volatile_data()
 {
-   bool ret = false;
+   int ret = 0;
 
    write_lock(_ups);
 
@@ -219,9 +235,9 @@ bool SnmpDriver::ReadVolatileData()
    return ret;
 }
 
-bool SnmpDriver::ReadStaticData()
+bool SnmpUpsDriver::read_static_data()
 {
-   bool ret = false;
+   int ret = 0;
 
    write_lock(_ups);
 

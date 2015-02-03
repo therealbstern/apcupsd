@@ -1,5 +1,4 @@
 .\" manual page [] for apcupsd.conf version 3.14.6
-.Pp
 .Dd January 10, 2009
 .Dt APCUPSD.CONF 5
 .Os apcupsd.conf v3.14.6
@@ -21,6 +20,9 @@ It will almost certainly be necessary to customise the information
 in the configuration file to suit your particular configuration and 
 operating requirements.
 .Pp
+.Em Note that the apcupsd daemon must be restarted in order for changes to the
+.Em configuration file to become active.
+.Pp
 The configuration file directives are explained in the subsections below.
 .Pp 
 .Ss GENERAL CONFIGURATION DIRECTIVES
@@ -29,11 +31,11 @@ The configuration file directives are explained in the subsections below.
 .It UPSNAME <string>
 .Pp
 Specify a name for the UPS for log files, status reports etc. 
-.It UPSCABLE [\& simple | smart | ether | usb | 940-0119A | 940-0127A | 940-0128A | 940-0020B | 940-0020C | 940-0023A | 940-0024B | 940-0024C | 940-1524C | 940-0024G | 940-0095A | 940-0095B | 940-0095C | MAM-04-02-2000 \&]
+.It UPSCABLE [\& simple | smart | ether | usb | 940-0119A | 940-0127A | 940-0128A | 940-0020B | 940-0020C | 940-0023A | 940-0024B | 940-0024C | 940-1524C | 940-0024G | 940-0095A | 940-0095B | 940-0095C | 940-0625A | MAM-04-02-2000 \&]
 .Pp
 The type of cable used to connect the UPS to the computer.
 .Pp
-.It UPSTYPE [\& dumb | apcsmart | net | usb | snmp | pcnet | test \&]
+.It UPSTYPE [\& dumb | apcsmart | net | usb | snmp | pcnet | modbus |test \&]
 .Pp
 The type of APC UPS that you have.
 .It DEVICE <name>
@@ -62,6 +64,12 @@ dumb
 .It 
 pcnet
 : ipaddr:username:passphrase (AP9617 SmartSlot card)
+.It 
+modbus
+: /dev/tty** (serial connection)
+.It 
+modbus
+: leave blank (USB connection)
 .El
 .Pp
 If you have problems, please see the apcupsd manual for more 
@@ -82,7 +90,6 @@ for most situations.
 apcupsd creates a lockfile for the serial or USB port in the specified 
 directory.  It must be changed when running more than one copy of apcupsd 
 on the same computer to control multiple UPSes.
-
 .It SCRIPTDIR <path>
 .Pp
 Directory in which apccontrol and event scripts are located. 

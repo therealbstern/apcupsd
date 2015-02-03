@@ -5,11 +5,9 @@
 # detects that the battery should be replaced.
 # We send an email message to root to notify him.
 #
-SYSADMIN=root
-APCUPSD_MAIL="@APCUPSD_MAIL@"
 
 HOSTNAME=`hostname`
-MSG="$HOSTNAME UPS battery needs changing NOW."
+MSG="$HOSTNAME UPS $1 battery needs changing NOW."
 #
 (
    echo "Subject: $MSG"

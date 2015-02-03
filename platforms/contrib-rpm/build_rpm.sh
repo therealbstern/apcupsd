@@ -20,24 +20,23 @@
 ###########################################################################################
 # script configuration section
 
-VERSION=3.13.12
+VERSION=3.14.10
 RELEASE=1
 
 # build platform for spec
-# set to one of rh7,rh8,rh9,fedora_core,rhel3,rhel4,rhel5,suse,mdk
+# set to one of rh7,rh8,rh9,fedora_core,rhel3,rhel4,suse,mdk
 PLATFORM=suse
 
 # platform designator for file names
 # for RedHat/Fedora set to one of rh7,rh8,rh9,fc1,fc3,fc4,fc5 OR
 # for RHEL3/clones set to el3 OR
 # for RHEL4/clones set to el4 OR
-# for RHEL5/clones set to el5 OR
 # for SuSE set to su90, su91, su92, su100 or su101 OR
 # for Mandrake set to 101mdk or 20060mdk
-FILENAME=su100
+FILENAME=su114
 
 # enter your name and email address here
-PACKAGER="Your Name <your-email@site.org>"
+PACKAGER="D. Scott Barninger <barninger@fairfieldcomputers.com>"
 
 # enter the full path to your RPMS output directory
 RPMDIR=/usr/src/packages/RPMS/i586
@@ -50,7 +49,7 @@ ARCH=i586
 SRPMDIR=
 
 # set to 1 to sign packages, 0 not to sign if you want to sign on another machine.
-SIGN=1
+SIGN=0
 
 # set to 1 to build gapcmon package (requires Gtk2 >= 2.4) or 0 to not build
 GAPCMON=1
@@ -70,12 +69,10 @@ sleep 2
 if [ "$GAPCMON" = "1" ]; then
 	rpmbuild --rebuild --define "build_${PLATFORM} 1" \
 	--define "contrib_packager ${PACKAGER}" \
-	--define "build_snmp 1" \
 	--define "build_gapcmon 1" ${SRPM}
 fi
 if [ "$GAPCMON" = "0" ]; then
 	rpmbuild --rebuild --define "build_${PLATFORM} 1" \
-	--define "build_snmp 1" \
 	--define "contrib_packager ${PACKAGER}" ${SRPM}
 fi
 
@@ -109,6 +106,6 @@ ls
 # 19 Aug 2006 initial release
 # 21 Jan 2007 add new gapcmon build switch
 # 27 Jan 2007 add new snmp build switch
-# 27 May 2007 add rhel5
+# 02 Oct 2011 remove snmp build switch (deprecated)
 
 

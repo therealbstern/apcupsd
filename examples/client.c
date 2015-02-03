@@ -27,13 +27,13 @@
 
 void handle_client(FILE *fp, int sockfd, char *cmd);
 
-void error_abort(char *msg)
+void error_abort(const char *msg)
 {
    fprintf(stderr, msg);
    exit(1);
 }
 
-int main(int argc, char *argv[]) 
+int main(int argc, char *argv[])
 {
    int sockfd, port;
    char host[200];
@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 
    strcpy(host, SERV_HOST_ADDR);
    port = SERV_TCP_PORT;
-       
+
    if (argc > 1) {
       strcpy(host, argv[1]); /* get host from command line */
       p = strchr(host, ':');
@@ -65,11 +65,11 @@ int main(int argc, char *argv[])
    handle_client(stdin, sockfd, cmd);	    /* do it all */
    net_close(sockfd);
    exit(0);
-}   
+}
 
 /*
- * Read the contents of the FILE *fp, write each line to the 
- * stream socket (to the server process), then read a line back from	 
+ * Read the contents of the FILE *fp, write each line to the
+ * stream socket (to the server process), then read a line back from
  * the socket and write it to the standard output.
  *
  * Return to the caller when an EOF is encountered on the input file.
@@ -79,13 +79,13 @@ int main(int argc, char *argv[])
 
 void handle_client(FILE *fp, int sockfd, char *cmd)
 {
-   int n; 
+   int n;
    char sendline[MAXLINE];
    char recvline[MAXLINE+1];
    int quit = 0;
 
    while (!quit) {
-      if (cmd) {   
+      if (cmd) {
 	 strcpy(sendline, cmd);       /* one shot command */
 	 quit = 1;
       } else if (fgets(sendline, MAXLINE, fp) == NULL) {

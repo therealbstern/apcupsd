@@ -52,7 +52,7 @@ EOF
         ;;
         failing)
                 wall <<EOF
-apccontrol: UPS battery power exhaused. Doing shutdown.
+apccontrol: UPS battery power exhausted. Doing shutdown.
 
 EOF
         ;;
