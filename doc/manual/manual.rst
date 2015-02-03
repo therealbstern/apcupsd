@@ -2613,16 +2613,16 @@ apctest
 -------
 
 ``apctest`` is a program that allows you to talk
-directly to your UPS and run certain low-level tests, display all
-know values from the UPS's EEPROM, perform a battery runtime
-calibration, program the EEPROM (serial connection only), and enter
-in TTY mode with the UPS. Here we describe how to use it for a SmartUPS.
-The menus and options for USB and simple signaling UPSes are different
+directly to your UPS and run certain low-level tests, adjust various settings
+such as the battery installation date and alarm behavior, and perform a
+battery runtime calibration. Here we describe how to use it for a SmartUPS
+utilizing the apcsmart driver and RS232 serial connection.
+The menus and options for USB, MODBUS, and simple signaling UPSes are different
 but mostly self-explanatory.
 
-Shutdown apcupsd if it is running. Make sure your
-``/etc/apcupsd/apcupsd.conf`` file has ``UPSTYPE apcsmart`` and 
-``UPSCABLE`` has one of the smart cables that are supported.
+*Shutdown apcupsd if it is running.* This is important. Only one program can
+communicate with the UPS at a time and if apcupsd is running, apctest will fail
+to contact the UPS.
 
 Run apctest by invoking it with no arguments.
 
