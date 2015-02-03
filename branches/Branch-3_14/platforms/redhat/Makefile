@@ -15,12 +15,14 @@ install-redhat:
 	$(call INSTDATA,744,apcupsd,/etc/rc.d/init.d)
    # link new rc script (if not doing a DESTDIR install)
 	$(call CHKCFG,add,/etc/rc.d/init.d/apcupsd)
-   # save old halt script
-	$(call COPY,/etc/rc.d/init.d/halt,/etc/rc.d/init.d/halt.old)
-   # insert apcupsd callout into halt script
-	@echo "  AWK  " $(DESTDIR)/etc/rc.d/init.d/halt
-	$(V)awk -f awkhaltprog $(DESTDIR)/etc/rc.d/init.d/halt.old >$(DESTDIR)/etc/rc.d/init.d/halt
-	$(V)chmod 744 $(DESTDIR)/etc/rc.d/init.d/halt
+	$(V)if cp -fR /etc/rc.d/init.d/halt $(DESTDIR)/etc/rc.d/init.d/halt.old  && \
+          awk -f awkhaltprog $(DESTDIR)/etc/rc.d/init.d/halt.old >$(DESTDIR)/etc/rc.d/init.d/halt && \
+          chmod 744 $(DESTDIR)/etc/rc.d/init.d/halt ; then true ; else \
+      echo "================================================="; \
+      echo "WARNING: UNABLE TO UPDATE /etc/rc.d/init.d/halt" ;  \
+      echo "You must manually arrange for killpower during OS shutdown." ; \
+      echo "================================================="; \
+   fi
 	@echo "================================================="
 	@echo " "
 	@echo "apcupsd script installation for RedHat $(DISTVER) complete." 
