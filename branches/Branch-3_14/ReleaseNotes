@@ -9,7 +9,7 @@ IF YOU USE THE OLD STYLE MASTER/SLAVE NETWORKING MODE, BE SURE TO READ THE
 3.14.0 RELEASE NOTES BELOW.
 
 
-3.14.13 -- 01 February 2015
+3.14.13 -- 02 February 2015
 
 NEW FEATURES
 
@@ -18,12 +18,17 @@ NEW FEATURES
     Previous releases supported MODBUS serial (RS232). This release adds
     support for MODBUS over USB. This protocol is preferable to the normal
     USB HID driver because it offers access to more UPS data readouts and
-    controls. See the MODBUS section of the apcupsd manual for more details.
+    controls. The only configuration file change needed versus MODBUS serial
+    is to change UPSCABLE to usb and use an empty DEVICE setting. See the 
+    MODBUS section of the apcupsd manual for more details.
 
   * Support for Apple Notification Center on Mac OS X (replaces Growl)
 
   * Apple install packages and binaries are signed with an Apple Developer
     key for compatibility with Gate Keeper
+
+  * Windows USB driver has been updated with additional USB identifiers to
+    support future APC products.
 
 BUG FIXES
 
@@ -40,8 +45,8 @@ BUG FIXES
 MISC
 
   * Windows port now builds with the same configure and make system as the
-    other targets, no need to maintain a special hardcoded Makefile
-    
+    other targets, no need to maintain a special hardcoded Makefile.
+
   * Many cleanups to the Windows port codebase
 
   * Prebuilt binaries for Mac OS X no longer support PowerPC systems or 

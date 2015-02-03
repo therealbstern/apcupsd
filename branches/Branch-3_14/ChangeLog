@@ -8,6 +8,21 @@
 /***************************************************************************/
 
 ------------------------------------------------------------------------
+r2314 | adk0212 | 2015-02-02 21:16:47 -0500 (Mon, 02 Feb 2015) | 2 lines
+
+Correct some outdated information in the apctest section of the manual
+
+------------------------------------------------------------------------
+r2313 | adk0212 | 2015-02-02 20:47:30 -0500 (Mon, 02 Feb 2015) | 2 lines
+
+Detect failure to modify RedHat halt script and display a message instead of failing the whole installation
+
+------------------------------------------------------------------------
+r2312 | adk0212 | 2015-01-31 11:38:09 -0500 (Sat, 31 Jan 2015) | 2 lines
+
+Prep for 3.14.13 release
+
+------------------------------------------------------------------------
 r2311 | adk0212 | 2015-01-29 09:13:25 -0500 (Thu, 29 Jan 2015) | 5 lines
 
 Place apcupsd lock file in /var/lock instead of /var/lock/subsys on Slackware
