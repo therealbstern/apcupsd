@@ -49,8 +49,11 @@ ModbusUsbComm::ModbusUsbComm(uint8_t slaveaddr) :
 
 bool ModbusUsbComm::Open(const char *path)
 {
-   bool ret = _hidups.Open(path);
-   if (!ret)
+   // In case we're already open
+   Close();
+
+   // Attempt to locate and open the UPS on USB
+   if (!_hidups.Open(path))
       return false;
 
    // Find ModbusRTUTx report
@@ -72,6 +75,7 @@ bool ModbusUsbComm::Open(const char *path)
    _txrpt = item.report_ID;
    Dmsg(100, "%s: Found ModbusRTURx in report id %d\n", __func__, _txrpt);
 
+   _open = true;
    return true;
 
 error:
@@ -81,6 +85,7 @@ error:
 
 bool ModbusUsbComm::Close()
 {
+   _open = false;
    _hidups.Close();
    return true;
 }

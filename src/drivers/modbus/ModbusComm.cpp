@@ -47,6 +47,12 @@ uint8_t *ModbusComm::ReadRegister(uint16_t reg, unsigned int nregs)
 
    Dmsg(50, "%s: reg=%u, nregs=%u\n", __func__, reg, nregs);
 
+   if (!_open)
+   {
+      Dmsg(0, "%s: Device not open\n", __func__);
+      return NULL;
+   }
+
    txpdu[0] = reg >> 8;
    txpdu[1] = reg;
    txpdu[2] = nregs >> 8;
@@ -77,6 +83,12 @@ bool ModbusComm::WriteRegister(uint16_t reg, unsigned int nregs, const uint8_t *
    const unsigned int nbytes = nregs * sizeof(uint16_t);
 
    Dmsg(50, "%s: reg=%u, nregs=%u\n", __func__, reg, nregs);
+
+   if (!_open)
+   {
+      Dmsg(0, "%s: Device not open\n", __func__);
+      return false;
+   }
 
    txpdu[0] = reg >> 8;
    txpdu[1] = reg;
