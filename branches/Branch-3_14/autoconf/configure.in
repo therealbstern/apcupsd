@@ -941,8 +941,8 @@ if test -n "$GCC"; then
       CXXFLAGS="$OLDCXXFLAGS")
 
    # Use -Wall on gcc only
-   CFLAGS="$CFLAGS -Wall"
-   CXXFLAGS="$CXXFLAGS -Wall"
+   CFLAGS="$CFLAGS -Wall -Wno-unused-result"
+   CXXFLAGS="$CXXFLAGS -Wall -Wno-unused-result"
 fi
 
 AC_SUBST(MAKE)
