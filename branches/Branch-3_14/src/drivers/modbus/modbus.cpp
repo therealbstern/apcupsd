@@ -130,7 +130,7 @@ bool ModbusUpsDriver::check_state()
       }
 
       // Try to recover from commlost by reopening port
-      ret = !_ups->is_commlost() || Open();
+      ret = !_ups->is_commlost() || _comm->Open(_ups->device);
       if (ret)
       {
          // Remember current online/onbatt state
@@ -177,6 +177,7 @@ bool ModbusUpsDriver::check_state()
             _commlost_time = now;
             _ups->set_commlost();
             generate_event(_ups, CMDCOMMFAILURE);
+            _comm->Close();
          }
       }
 

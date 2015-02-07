@@ -30,7 +30,8 @@
 class ModbusComm
 {
 public:
-   ModbusComm(uint8_t slaveaddr = DEFAULT_SLAVE_ADDR) : _slaveaddr(slaveaddr) {}
+   ModbusComm(uint8_t slaveaddr = DEFAULT_SLAVE_ADDR) : 
+      _slaveaddr(slaveaddr), _open(false) {}
    virtual ~ModbusComm() {}
 
    virtual bool Open(const char *dev) = 0;
@@ -69,6 +70,7 @@ protected:
    virtual bool ModbusRx(ModbusFrame *frm, unsigned int *sz) = 0;
 
    uint8_t _slaveaddr;
+   bool _open;
 
 private:
 

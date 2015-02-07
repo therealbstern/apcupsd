@@ -53,11 +53,7 @@ ModbusRs232Comm::ModbusRs232Comm(uint8_t slaveaddr) :
 bool ModbusRs232Comm::Open(const char *path)
 {
    // Close if we're already open
-   if (_fd != -1)
-   {
-      close(_fd);
-      _fd = -1;
-   }
+   Close();
 
 #ifdef HAVE_MINGW
    // On Win32 add \\.\ UNC prefix to COMx in order to correctly address
@@ -109,11 +105,13 @@ bool ModbusRs232Comm::Open(const char *path)
    tcsetattr(_fd, TCSANOW, &newtio);
    tcflush(_fd, TCIFLUSH);
 
+   _open = true;
    return true;
 }
 
 bool ModbusRs232Comm::Close()
 {
+   _open = false;
    close(_fd);
    _fd = -1;
    return true;
