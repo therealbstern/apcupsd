@@ -38,7 +38,7 @@ case "$1" in
        RETVAL=$?
 	  rc_status -v
        echo
-       [ $RETVAL -eq 0 ] && touch @LOCKDIR@/subsys/apcupsd
+       [ $RETVAL -eq 0 ] && touch @LOCKDIR@/apcupsd
        ;;
     stop)
        echo -n "Shutting down UPS monitoring:"
@@ -46,7 +46,7 @@ case "$1" in
        echo
        rc_status -v
        rm -f $APCPID
-       rm -f @LOCKDIR@/subsys/apcupsd
+       rm -f @LOCKDIR@/apcupsd
        ;;
     restart)
        $0 stop
