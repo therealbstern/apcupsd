@@ -214,7 +214,6 @@ if test x$mandir = x'${prefix}/man' ; then
    mandir=/usr/share/man
 fi
 
-
 dnl
 dnl Check for library functions.
 dnl
@@ -921,29 +920,15 @@ if test -n "$GCC"; then
       esac
       ;;
    esac
-
-   # See if GCC supports -fno-exceptions...
-   AC_MSG_CHECKING(if GCC supports -fno-exceptions)
-   OLDCXXFLAGS="$CXXFLAGS"
-   CXXFLAGS="$CXXFLAGS -fno-exceptions"
-   AC_TRY_COMPILE(,,       
-      AC_MSG_RESULT(yes),
-      AC_MSG_RESULT(no)
-      CXXFLAGS="$OLDCXXFLAGS")
-
-   # See if GCC supports -fno-rtti...
-   AC_MSG_CHECKING(if GCC supports -fno-rtti)
-   OLDCXXFLAGS="$CXXFLAGS"
-   CXXFLAGS="$CXXFLAGS -fno-rtti"
-   AC_TRY_COMPILE(,,       
-      AC_MSG_RESULT(yes),
-      AC_MSG_RESULT(no)
-      CXXFLAGS="$OLDCXXFLAGS")
-
-   # Use -Wall on gcc only
-   CFLAGS="$CFLAGS -Wall -Wno-unused-result"
-   CXXFLAGS="$CXXFLAGS -Wall -Wno-unused-result"
 fi
+
+dnl Disable exceptions and RTTI if compiler supports it
+AX_ADD_COMPILE_FLAG(-fno-exceptions)
+AX_ADD_COMPILE_FLAG(-fno-rtti)
+
+dnl Configure compile warnings
+AX_ADD_COMPILE_FLAG(-Wall)
+AX_ADD_COMPILE_FLAG(-Wno-unused-result)
 
 AC_SUBST(MAKE)
 AC_SUBST(CP)
