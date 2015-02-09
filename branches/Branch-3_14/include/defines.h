@@ -372,9 +372,13 @@ enum {
 #define Dmsg(lvl, msg, args...)     d_msg(__FILE__, __LINE__, lvl, msg, ##args)
 void d_msg(const char *file, int line, int level, const char *fmt, ...);
 
+#define hex_dump(lvl, data, len)    h_dump(__FILE__, __LINE__, (lvl), (data), (len))
+void h_dump(const char *file, int line, int level, const void *data, unsigned int len);
+
 #else
 
-#define Dmsg(lvl, msg, args...)
+#define Dmsg(lvl, msg, args...)  do { } while(0)
+#define hex_dump(lvl, data, len) do { } while(0)
 
 #endif
 

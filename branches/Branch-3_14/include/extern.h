@@ -148,7 +148,6 @@ extern void clean_threads(void);
 /* In apclog.c */
 extern void log_event(const UPSINFO *ups, int level, const char *fmt, ...);
 extern void logf(const char *fmt, ...);
-extern void hex_dump(int level, const void *data, unsigned int len);
 extern int format_date(time_t timestamp, char *dest, size_t destlen);
 
 /* In apcerror.c */
