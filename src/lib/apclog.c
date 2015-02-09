@@ -158,7 +158,7 @@ void d_msg(const char *file, int line, int level, const char *fmt, ...)
 #endif
 }
 
-void hex_dump(int level, const void *data, unsigned int len)
+void h_dump(const char *file, int ln, int level, const void *data, unsigned int len)
 {
    unsigned int pos = 0;
    const unsigned char *dat = (const unsigned char *)data;
@@ -176,7 +176,7 @@ void hex_dump(int level, const void *data, unsigned int len)
    if (debug_level < level)
       return;
 
-   Dmsg(level, "Dumping %d bytes @ 0x%08x\n", len, data);
+   d_msg(file, ln, level, "Dumping %d bytes @ 0x%08x\n", len, data);
    while (pos < len)
    {
       int num = MIN(16, len-pos);
@@ -209,7 +209,7 @@ void hex_dump(int level, const void *data, unsigned int len)
          strlcat(line, buf, sizeof(line));
       }
 
-      Dmsg(level, "%s\n", line);
+      d_msg(file, ln, level, "%s\n", line);
       pos += num;
    }
 }
