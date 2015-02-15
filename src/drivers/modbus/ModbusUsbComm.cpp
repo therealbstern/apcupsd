@@ -98,9 +98,9 @@ bool ModbusUsbComm::ModbusTx(const ModbusFrame *frm, unsigned int sz)
    if (sz-2 > MODBUS_USB_REPORT_MAX_FRAME_SIZE)
       return false;
 
-   // Wait for "idle" ... we're the only user of the bus, so this just means
-   // making sure we haven't issued a command since this time.
-   usleep(MODBUS_IDLE_WAIT_TIMEOUT_MS * 1000);
+   // Wait for idle 
+   if (!WaitIdle())
+      return false;
 
    Dmsg(100, "%s: Sending frame\n", __func__);
    hex_dump(100, frm, sz);
@@ -215,5 +215,61 @@ bool ModbusUsbComm::ModbusRx(ModbusFrame *frm, unsigned int *sz)
       *sz = frmsz + 2;
       hex_dump(100, frm, *sz);
       return true;
+   }
+}
+
+bool ModbusUsbComm::WaitIdle()
+{
+   // Determine when we need to exit by
+   struct timeval exittime, now;
+   gettimeofday(&exittime, NULL);
+   exittime.tv_sec += MODBUS_IDLE_WAIT_TIMEOUT_MS / 1000;
+   exittime.tv_usec += (MODBUS_IDLE_WAIT_TIMEOUT_MS % 1000) * 1000;
+   if (exittime.tv_usec >= 1000000)
+   {
+      exittime.tv_sec++;
+      exittime.tv_usec -= 1000000;
+   }
+
+   uint8_t rpt[MODBUS_USB_REPORT_SIZE];
+   while (1)
+   {
+      int rc = _hidups.InterruptRead(USB_ENDPOINT_IN|1, rpt, 
+         MODBUS_USB_REPORT_SIZE, MODBUS_INTERFRAME_TIMEOUT_MS);
+
+      if (rc == -ETIMEDOUT)
+      {
+         // timeout: line is now idle
+         return true;
+      }
+      else if (rc <= 0 && rc != EINTR && rc != EAGAIN)
+      {
+         // fatal error
+         Dmsg(0, "%s: interrupt_read failed: %s\n", __func__, strerror(-rc));
+         return false;
+      }
+      else if (rc > 0)
+      {
+         if (rpt[0] == _rxrpt)
+         {
+            Dmsg(0, "%s: Out of sync\n", __func__);
+            hex_dump(0, rpt, rc);
+         }
+         else
+         {
+            // Non-MODBUS reports are not an issue, just wait again
+         }
+      }
+
+      // See if it's time to exit
+      gettimeofday(&now, NULL);
+      if (now.tv_sec > exittime.tv_sec ||
+          (now.tv_sec == exittime.tv_sec &&
+           now.tv_usec >= exittime.tv_usec))
+      {
+         // Line did not become idle soon enough
+         Dmsg(0, "%s: Timeout\n", __func__);
+         return false;
+      }
    }
 }
