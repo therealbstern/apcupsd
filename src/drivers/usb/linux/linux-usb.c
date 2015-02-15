@@ -125,8 +125,11 @@ void LinuxUsbUpsDriver::bind_upses()
 #ifdef USBDEVFS_CONNECT
    // Find all USB devices in usbfs
    glob_t g;
-   if (glob("/proc/bus/usb/[0-9][0-9][0-9]/[0-9][0-9][0-9]", 0, NULL, &g))
+   if (glob("/proc/bus/usb/[0-9][0-9][0-9]/[0-9][0-9][0-9]", 0, NULL, &g) &&
+      glob("/dev/bus/usb/[0-9][0-9][0-9]/[0-9][0-9][0-9]", 0, NULL, &g))
+   {
       return;
+   }
 
    // Iterate over all USB devices...
    for (size_t i = 0; i < g.gl_pathc; ++i)
