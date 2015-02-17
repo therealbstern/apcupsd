@@ -151,7 +151,7 @@
 # ifdef __cplusplus
    extern "C" {
 # endif
-# include "tcpd.h"
+# include <tcpd.h>
 # ifdef __cplusplus
    };
 # endif
