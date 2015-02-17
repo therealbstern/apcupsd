@@ -147,9 +147,14 @@
 
 /* System includes conditionally included */
 
-/* Pull in our local copy because the library does not have correct protos */
 #ifdef HAVE_LIBWRAP
+# ifdef __cplusplus
+   extern "C" {
+# endif
 # include "tcpd.h"
+# ifdef __cplusplus
+   };
+# endif
 #endif
 
 #endif
