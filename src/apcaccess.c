@@ -49,7 +49,7 @@ static int do_pthreads_status(const char *host, int port, const char *par, int f
    char recvline[MAXSTRING + 1];
    char *line;
 
-   if ((sockfd = net_open(host, NULL, port)) == INVALID_SOCKET) {
+   if ((sockfd = net_open(host, NULL, port)) < 0) {
       fprintf(stderr, "Error contacting apcupsd @ %s:%d: %s\n",
          host, port, strerror(-sockfd));
       return 1;

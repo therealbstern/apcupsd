@@ -202,17 +202,17 @@ bool NetUpsDriver::poll_ups()
    _statlen = 0;
 
    Dmsg(20, "Opening connection to %s:%d\n", _hostname, _port);
-   if ((_sockfd = net_open(_hostname, NULL, _port)) == INVALID_SOCKET) {
-      Dmsg(90, "Exit poll_ups 0 comm lost\n");
+   if ((_sockfd = net_open(_hostname, NULL, _port)) < 0) {
+      Dmsg(90, "Exit poll_ups 0 comm lost: %s\n", strerror(-_sockfd));
       if (!_ups->is_commlost()) {
          _ups->set_commlost();
       }
       return false;
    }
 
-   if (net_send(_sockfd, "status", 6) != 6) {
+   if ((n = net_send(_sockfd, "status", 6)) != 6) {
       net_close(_sockfd);
-      Dmsg(90, "Exit poll_ups 0 no status flag\n");
+      Dmsg(90, "Exit poll_ups 0 net_send fails: %s\n", strerror(-n));
       _ups->set_commlost();
       return false;
    }
@@ -227,7 +227,7 @@ bool NetUpsDriver::poll_ups()
 
    if (n < 0) {
       stat = 0;
-      Dmsg(90, "Exit poll_ups 0 bad stat net_recv\n");
+      Dmsg(90, "Exit poll_ups 0 bad stat net_recv: %s\n", strerror(-n));
       _ups->set_commlost();
    } else {
       _ups->clear_commlost();
