@@ -199,6 +199,8 @@ bool StatMgr::open()
       close();
 
    m_socket = net_open(m_host, NULL, m_port);
+   if (m_socket < 0)
+      m_socket = INVALID_SOCKET;
    return m_socket != INVALID_SOCKET;
 }
 

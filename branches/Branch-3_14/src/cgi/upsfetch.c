@@ -114,7 +114,7 @@ static int fetch_data(const char *host)
       *p++ = '\0';
       nis_port = atoi(p);
    }
-   if ((sockfd = net_open(lhost, NULL, nis_port)) == INVALID_SOCKET) {
+   if ((sockfd = net_open(lhost, NULL, nis_port)) < 0) {
       (void) snprintf(errmsg, sizeof (errmsg),
          "upsfetch: tcp_open failed for %s port %d", lhost, nis_port);
       return 0;
@@ -153,7 +153,7 @@ int fetch_events(const char *host)
       *p++ = '\0';
       nis_port = atoi(p);
    }
-   if ((sockfd = net_open(lhost, NULL, nis_port)) == INVALID_SOCKET) {
+   if ((sockfd = net_open(lhost, NULL, nis_port)) < 0) {
       snprintf(errmsg, sizeof(errmsg),
           "upsfetch: tcp_open failed for %s port %d", lhost, nis_port);
       fputs(errmsg, stdout);
