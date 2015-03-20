@@ -62,7 +62,7 @@ static int check_stale_lockfile(UPSINFO *ups)
    }
 
    errno = 0;
-   if ((ups->lockfile = open(ups->lockpath, O_RDONLY)) < 0) {
+   if ((ups->lockfile = open(ups->lockpath, O_RDONLY|O_CLOEXEC)) < 0) {
       /*
        * Cannot open the file (may be it doesn't exist and that's okay
        * for us so return success).
@@ -187,7 +187,7 @@ int create_lockfile(UPSINFO *ups)
     * Open it for creation and don't accept any kind of error.
     */
    errno = 0;
-   if ((ups->lockfile = open(ups->lockpath, O_CREAT | O_EXCL | O_RDWR, 0644)) < 0) {
+   if ((ups->lockfile = open(ups->lockpath, O_CREAT | O_EXCL | O_RDWR | O_CLOEXEC, 0644)) < 0) {
       /*
        * Okay there is some problem with the lock path or
        * something like that.

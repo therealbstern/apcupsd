@@ -52,6 +52,7 @@ int dummy = WSA_Init();
 
 #endif // HAVE_MINGW
 
+
 /*
  * Read nbytes from the network.
  * It is possible that the total bytes require in several
@@ -278,7 +279,7 @@ sock_t net_open(const char *host, char *service, int port)
    }
 
    /* Open a TCP socket */
-   if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
+   if ((sockfd = socket_cloexec(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
    {
       rc = -errno;
       Dmsg(100, "%s: socket fails: %s\n", __func__, strerror(-rc));
@@ -415,7 +416,8 @@ sock_t net_accept(sock_t fd, struct sockaddr_in *cli_addr)
       if (rc < 0)
          return -errno;              /* error */
 #endif
-      newfd = accept(fd, (struct sockaddr *)cli_addr, &clilen);
+
+      newfd = accept_cloexec(fd, (struct sockaddr *)cli_addr, &clilen);
    } while (newfd == INVALID_SOCKET && (errno == EINTR || errno == EAGAIN));
 
    if (newfd < 0)

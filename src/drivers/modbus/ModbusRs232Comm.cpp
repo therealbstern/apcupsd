@@ -65,7 +65,7 @@ bool ModbusRs232Comm::Open(const char *path)
    }
 #endif
 
-   if ((_fd = open(path, O_RDWR | O_NOCTTY | O_NDELAY | O_BINARY)) < 0)
+   if ((_fd = open(path, O_RDWR | O_NOCTTY | O_NDELAY | O_BINARY | O_CLOEXEC)) < 0)
    {
       Dmsg(0, "%s: open(\"%s\") fails: %s\n", __func__, 
          path, strerror(errno));

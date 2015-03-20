@@ -60,7 +60,7 @@ bool setup_device(UPSINFO *ups)
 /*********************************************************************/
 void initiate_hibernate(UPSINFO *ups)
 {
-   FILE *pwdf;
+   int pwdf;
    int killcount;
 
    if (ups->mode.type == DUMB_UPS) {
@@ -78,9 +78,9 @@ void initiate_hibernate(UPSINFO *ups)
     * above only tests UPS_onbatt flag for dumb UPSes.
     */
 
-   pwdf = fopen(ups->pwrfailpath, "r");
-   if ((pwdf == NULL && ups->mode.type != DUMB_UPS) ||
-       (pwdf == NULL && ups->is_onbatt() && ups->mode.type == DUMB_UPS)) {
+   pwdf = open(ups->pwrfailpath, O_RDONLY|O_CLOEXEC);
+   if ((pwdf == -1 && ups->mode.type != DUMB_UPS) ||
+       (pwdf == -1 && ups->is_onbatt() && ups->mode.type == DUMB_UPS)) {
 
       /*                                                  
        * At this point, we really should not be attempting
@@ -106,8 +106,8 @@ void initiate_hibernate(UPSINFO *ups)
       }
 
       /* close the powerfail file */
-      if (pwdf)
-         fclose(pwdf);
+      if (pwdf != -1)
+         close(pwdf);
 
       log_event(ups, LOG_WARNING, "Attempting to kill the UPS power!");
 

@@ -7,6 +7,9 @@
 /* Define to 1 if you have the `abort' function. */
 #undef HAVE_ABORT
 
+/* Define to 1 if you have the `accept4' function. */
+#undef HAVE_ACCEPT4
+
 /* Define if building for AIX */
 #undef HAVE_AIX_OS
 

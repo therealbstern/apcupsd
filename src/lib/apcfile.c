@@ -40,7 +40,7 @@ int make_file(UPSINFO *ups, const char *path)
 {
    int makefd;
 
-   if ((makefd = open(path, O_CREAT | O_WRONLY, 0644)) >= 0) {
+   if ((makefd = open(path, O_CREAT | O_WRONLY | O_CLOEXEC, 0644)) >= 0) {
       close(makefd);
    } else {
       log_event(ups, LOG_ERR, "Unable to create %s: ERR=%s\n",
@@ -60,7 +60,7 @@ void make_pid_file(void)
    char buf[100];
 
    unlink(pidfile);
-   if ((pfd = open(pidfile, O_CREAT | O_TRUNC | O_WRONLY, 0644)) >= 0) {
+   if ((pfd = open(pidfile, O_CREAT | O_TRUNC | O_WRONLY | O_CLOEXEC, 0644)) >= 0) {
       len = asnprintf(buf, sizeof(buf), "%ld\n", (long)pid);
       write(pfd, buf, len);
       close(pfd);

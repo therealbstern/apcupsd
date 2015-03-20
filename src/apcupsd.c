@@ -208,7 +208,7 @@ int main(int argc, char *argv[])
 
    /* Create temp events file if we are not doing a hibernate or shutdown */
    if (!hibernate_ups && !shutdown_ups && ups->eventfile[0] != 0) {
-      ups->event_fd = open(ups->eventfile, O_RDWR | O_CREAT | O_APPEND, 0644);
+      ups->event_fd = open(ups->eventfile, O_RDWR | O_CREAT | O_APPEND | O_CLOEXEC, 0644);
       if (ups->event_fd < 0) {
          log_event(ups, LOG_WARNING, "Could not open events file %s: %s\n",
             ups->eventfile, strerror(errno));

@@ -5215,7 +5215,8 @@ done
 
 
 
-for ac_func in snprintf vsnprintf strlcpy strlcat
+
+for ac_func in snprintf vsnprintf strlcpy strlcat accept4
 do
 as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 { $as_echo "$as_me:$LINENO: checking for $ac_func" >&5
