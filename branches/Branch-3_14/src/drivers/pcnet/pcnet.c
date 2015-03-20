@@ -648,7 +648,7 @@ bool PcnetUpsDriver::Open()
       }
    }
 
-   _fd = socket(PF_INET, SOCK_DGRAM, 0);
+   _fd = socket_cloexec(PF_INET, SOCK_DGRAM, 0);
    if (_fd == INVALID_SOCKET)
       Error_abort("Cannot create socket (%d)\n", errno);
 
@@ -801,7 +801,7 @@ bool PcnetUpsDriver::kill_power()
    }
 
    /* Open a TCP stream to the UPS */
-   s = socket(PF_INET, SOCK_STREAM, 0);
+   s = socket_cloexec(PF_INET, SOCK_STREAM, 0);
    if (s == INVALID_SOCKET) {
       Dmsg(100, "pcnet_ups_kill_power: Unable to open socket: %s\n",
          strerror(errno));

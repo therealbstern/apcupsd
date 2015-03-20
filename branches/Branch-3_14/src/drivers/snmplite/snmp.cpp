@@ -81,7 +81,7 @@ bool SnmpEngine::Open(const char *host, unsigned short port, const char *comm)
    }
 
    // Get a UDP socket
-   _socket = socket(PF_INET, SOCK_DGRAM, 0);
+   _socket = socket_cloexec(PF_INET, SOCK_DGRAM, 0);
    if (_socket == INVALID_SOCKET)
    {
       perror("socket");
@@ -108,7 +108,7 @@ bool SnmpEngine::Open(const char *host, unsigned short port, const char *comm)
 
 bool SnmpEngine::EnableTraps()
 {
-   _trapsock = socket(PF_INET, SOCK_DGRAM, 0);
+   _trapsock = socket_cloexec(PF_INET, SOCK_DGRAM, 0);
    if (_trapsock == INVALID_SOCKET)
    {
       perror("socket");
