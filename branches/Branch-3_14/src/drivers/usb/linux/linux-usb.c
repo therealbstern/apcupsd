@@ -94,7 +94,7 @@ int LinuxUsbUpsDriver::open_device(const char *dev)
    Dmsg(200, "Attempting to open \"%s\"\n", dev);
 
    /* Open the device port */
-   fd = open(dev, O_RDWR | O_NOCTTY);
+   fd = open(dev, O_RDWR | O_NOCTTY | O_CLOEXEC);
    if (fd >= 0) {
       /* Check for the UPS application HID usage */
       for (i = 0; (ret = ioctl(fd, HIDIOCAPPLICATION, i)) > 0; i++) {
@@ -135,7 +135,7 @@ void LinuxUsbUpsDriver::bind_upses()
    for (size_t i = 0; i < g.gl_pathc; ++i)
    {
       // Open the device in usbfs
-      int fd = open(g.gl_pathv[i], O_RDWR);
+      int fd = open(g.gl_pathv[i], O_RDWR|O_CLOEXEC);
       if (fd == -1)
          continue;
 

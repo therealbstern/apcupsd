@@ -228,7 +228,7 @@ AC_CHECK_FUNCS(
 
 dnl Optional on all builds
 dnl We will provide our own implementations if needed
-AC_CHECK_FUNCS(snprintf vsnprintf strlcpy strlcat)
+AC_CHECK_FUNCS(snprintf vsnprintf strlcpy strlcat accept4)
 
 dnl Mandatory except for WIN32 builds where we provide our own
 if test "$host_os" != "mingw32" ; then

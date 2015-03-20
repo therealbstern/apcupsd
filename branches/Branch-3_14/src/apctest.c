@@ -178,7 +178,7 @@ static int write_file(char *buf)
    static int out_fd = -1;
 
    if (out_fd == -1) {
-      out_fd = open("apctest.output", O_WRONLY | O_CREAT | O_APPEND, 0644);
+      out_fd = open("apctest.output", O_WRONLY | O_CREAT | O_APPEND | O_CLOEXEC, 0644);
       if (out_fd < 0) {
          printf("Could not create apctest.output: %s\n", strerror(errno));
          return -1;

@@ -149,7 +149,7 @@ void do_server(UPSINFO *ups)
    }
 
    /* Open a TCP socket */
-   for (tlog = 0; (sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0; tlog -= 5 * 60) {
+   for (tlog = 0; (sockfd = socket_cloexec(AF_INET, SOCK_STREAM, 0)) < 0; tlog -= 5 * 60) {
       if (tlog <= 0) {
          tlog = 60 * 60;
          log_event(ups, LOG_ERR, "apcserver: cannot open stream socket");
@@ -233,6 +233,7 @@ void *handle_client_request(void *arg)
    const char notrun[] = "Apcupsd internal error\n";
    int nsockfd = ((struct s_arg *)arg)->newsockfd;
    UPSINFO *ups = ((struct s_arg *)arg)->ups;
+   int fd;
    free(arg);
 
    pthread_detach(pthread_self());
@@ -255,8 +256,9 @@ void *handle_client_request(void *arg)
             break;
          }
       } else if (len == 6 && strncmp("events", line, 6) == 0) {
-         if ((ups->eventfile[0] == 0) ||
-             ((events_file = fopen(ups->eventfile, "r")) == NULL)) {
+         if (ups->eventfile[0] == 0 ||
+             (fd = open(ups->eventfile, O_RDONLY|O_CLOEXEC)) == -1 ||
+             (events_file = fdopen(fd, "r")) == NULL) {
             net_send(nsockfd, notavail, sizeof(notavail));
             if (net_send(nsockfd, NULL, 0) < 0)
                break;

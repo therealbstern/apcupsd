@@ -607,8 +607,10 @@ void check_for_config(UPSINFO *ups, char *cfgfile)
    char line[MAXSTRING];
    int errors = 0;
    int erpos = 0;
+   int fd;
 
-   if ((apcconf = fopen(cfgfile, "r")) == NULL) {
+   if ((fd = open(cfgfile, O_RDONLY|O_CLOEXEC)) == -1 ||
+       (apcconf = fdopen(fd, "r")) == NULL) {
       Error_abort("Error opening configuration file (%s): %s\n",
          cfgfile, strerror(errno));
    }

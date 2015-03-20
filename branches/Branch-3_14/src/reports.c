@@ -177,6 +177,7 @@ void do_reports(UPSINFO *ups)
 {
    static int first_time = TRUE;
    time_t now = time(NULL);
+   int fd;
 
    if (first_time) {
       first_time = FALSE;
@@ -186,7 +187,8 @@ void do_reports(UPSINFO *ups)
       last_time_status = 0;
 
       if (ups->stattime != 0) {
-         if ((statusfile = fopen(ups->statfile, "w")) == NULL) {
+         if ((fd = open(ups->statfile, O_WRONLY|O_TRUNC|O_CREAT|O_CLOEXEC, 0666)) == -1 ||
+             (statusfile = fdopen(fd, "w")) == NULL) {
             log_event(ups, LOG_ERR, "Cannot open STATUS file %s: %s\n",
                ups->statfile, strerror(errno));
           }

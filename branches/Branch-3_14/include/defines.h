@@ -450,6 +450,9 @@ typedef int sock_t;
 # define O_NDELAY 0
 #endif
 
+#ifndef O_CLOEXEC
+# define O_CLOEXEC 0
+#endif
 
 /* ETIME not on BSD, incl. Darwin */
 #ifndef ETIME

@@ -52,7 +52,7 @@ bool ApcSmartUpsDriver::Open()
 #endif
 
    Dmsg(50, "Opening port %s\n", opendev);
-   if ((_ups->fd = open(opendev, O_RDWR | O_NOCTTY | O_NDELAY | O_BINARY)) < 0)
+   if ((_ups->fd = open(opendev, O_RDWR | O_NOCTTY | O_NDELAY | O_BINARY | O_CLOEXEC)) < 0)
    {
       Dmsg(50, "Cannot open UPS port %s: %s\n", opendev, strerror(errno));
       return false;

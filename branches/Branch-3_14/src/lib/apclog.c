@@ -98,7 +98,9 @@ void logf(const char *fmt, ...)
       if (!trace_fd) {
          char fn[200];
          asnprintf(fn, sizeof(fn), "./apcupsd.trace");
-         trace_fd = fopen(fn, "a+");
+         int fd = open(fn, O_RDWR|O_APPEND|O_CREAT|O_CLOEXEC, 0666);
+         if (fd != -1)
+            trace_fd = fdopen(fd, "a+");
       }
       if (trace_fd) {
          vfprintf(trace_fd, fmt, arg_ptr);

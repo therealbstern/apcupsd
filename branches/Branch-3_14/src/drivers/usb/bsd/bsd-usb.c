@@ -83,7 +83,7 @@ bool BsdUsbUpsDriver::init_device(const char *devname)
    unsigned char *rdesc;
    char intdevname[USB_MAX_DEVNAMELEN + 5 + 3 + 1];
 
-   fd = open(devname, O_RDWR | O_NOCTTY);
+   fd = open(devname, O_RDWR | O_NOCTTY | O_CLOEXEC);
    if (fd == -1)
       return false;
 
@@ -141,7 +141,7 @@ bool BsdUsbUpsDriver::init_device(const char *devname)
    intdevname[strlen(intdevname) - 1] = '1';
 #endif
 
-   fd = open(intdevname, O_RDONLY | O_NOCTTY);
+   fd = open(intdevname, O_RDONLY | O_NOCTTY | O_CLOEXEC);
    if (fd == -1) {
       Dmsg(100, "Unable to open interrupt pipe %s: %s\n", intdevname,
          strerror(errno));
@@ -216,7 +216,7 @@ bool BsdUsbUpsDriver::open_usb_device()
    /* Max of 10 USB busses */
    for (i = 0; i < 10; i++) {
       busname[8] = '0' + i;
-      fd = open(busname, O_RDWR | O_NOCTTY);
+      fd = open(busname, O_RDWR | O_NOCTTY | O_CLOEXEC);
       if (fd == -1)
          continue;
 

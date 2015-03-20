@@ -169,6 +169,10 @@ size_t strlcat(char *dst, const char *src, size_t size);
   int nanosleep(const struct timespec *req, struct timespec *rem);
 #endif
 
+/* In sockcloexec.c */
+sock_t socket_cloexec(int domain, int type, int protocol);
+sock_t accept_cloexec(int sockfd, struct sockaddr *addr, socklen_t *addrlen);
+
 /*
  * Common interface to the various versions of gethostbyname_r().
  * Implemented in gethostname.c.
