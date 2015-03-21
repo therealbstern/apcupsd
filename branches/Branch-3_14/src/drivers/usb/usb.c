@@ -1114,7 +1114,7 @@ bool UsbUpsDriver::kill_power()
     * at least place a harmless command in it. We use CI_STATUS as that is a
     * usage any UPS should have.
     */
-   read_int_from_ups(CI_STATUS, &val);
+   (void)read_int_from_ups(CI_STATUS, &val);
 
    Dmsg(200, "Leave usb_ups_kill_power\n");
    return hibernate;
