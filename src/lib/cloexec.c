@@ -37,7 +37,11 @@ sock_t socket_cloexec(int domain, int type, int protocol)
       s = socket(domain, type, protocol);
 #ifdef FD_CLOEXEC
       if (s != INVALID_SOCKET)
-         fcntl(s, F_SETFD, fcntl(s, F_GETFD) | FD_CLOEXEC);
+      {
+         int flags = fcntl(s, F_GETFD);
+         if (flags != -1)
+            fcntl(s, F_SETFD, flags | FD_CLOEXEC);
+      }
 #endif
 #ifdef SOCK_CLOEXEC
    }
@@ -58,7 +62,11 @@ sock_t accept_cloexec(int sockfd, struct sockaddr *addr, socklen_t *addrlen)
       s = accept(sockfd, addr, addrlen);
 #ifdef FD_CLOEXEC
       if (s != INVALID_SOCKET)
-         fcntl(s, F_SETFD, fcntl(s, F_GETFD) | FD_CLOEXEC);
+      {
+         int flags = fcntl(s, F_GETFD);
+         if (flags != -1)
+            fcntl(s, F_SETFD, flags | FD_CLOEXEC);
+      }
 #endif
 #if defined(HAVE_ACCEPT4) && defined(SOCK_CLOEXEC)
    }
