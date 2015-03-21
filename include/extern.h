@@ -31,7 +31,7 @@ extern UPSINFO *core_ups;
 extern char argvalue[MAXSTRING];
 extern void (*error_out) (const char *file, int line, const char *fmt, va_list arg_ptr);
 extern void (*error_cleanup) (void);
-extern void error_out_wrapper(const char *file, int line, const char *fmt, ...);
+extern void error_out_wrapper(const char *file, int line, const char *fmt, ...) __attribute__((noreturn));
 
 extern UPSCOMMANDS ups_event[];
 extern UPSCMDMSG event_msg[];

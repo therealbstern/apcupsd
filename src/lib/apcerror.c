@@ -34,7 +34,10 @@ void error_out_wrapper(const char *file, int line, const char *fmt, ...)
    va_list args;
    va_start(args, fmt);
    error_out(file, line, fmt, args);
+   // Never get here...
    va_end(args);
+   while(1)
+      ;
 }
 
 /*
