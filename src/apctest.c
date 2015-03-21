@@ -509,7 +509,7 @@ static void test1(void)
         "The UPS should be plugged in to the power, and the serial cable\n"
         "should be connected to the computer.\n\n"
         "Please enter any character when ready to continue: ");
-   fgetc(stdin);
+   (void)fgetc(stdin);
    pmsg("\n");
 
    normal = test_bits(0);
@@ -524,7 +524,7 @@ static void test2(void)
    pmsg("\nFor the second test, the UPS should be plugged in to the power, \n"
         "but the serial port should be DISCONNECTED from the computer.\n\n"
         "Please enter any character when ready to continue: ");
-   fgetc(stdin);
+   (void)fgetc(stdin);
    pmsg("\n");
 
    no_cable = test_bits(0);
@@ -539,7 +539,7 @@ static void test3(void)
    pmsg("\nFor the third test, the serial cable should be plugged\n"
         "back into the UPS, but the AC power plug to the UPS should be DISCONNECTED.\n\n"
         "Please enter any character when ready to continue: ");
-   fgetc(stdin);
+   (void)fgetc(stdin);
    pmsg("\n");
 
    no_power = test_bits(0);
@@ -567,7 +567,7 @@ static void test4(void)
         "the test. If not, hit control-C to stop the program\n\n"
         "PLEASE DO NOT RUN THIS TEST WITH A COMPUTER CONNECTED TO YOUR UPS!!!\n\n"
         "Please enter any character when ready to continue: ");
-   fgetc(stdin);
+   (void)fgetc(stdin);
    pmsg("\n");
 
    low_batt = no_power;
@@ -614,7 +614,7 @@ static void test5(void)
         "the very moment that the UPS powers down.\n\n"
         "PLEASE DO NOT RUN THIS TEST WITH A COMPUTER CONNECTED TO YOUR UPS!!!\n\n"
         "Please enter any character when ready to continue: ");
-   fgetc(stdin);
+   (void)fgetc(stdin);
    pmsg("\n");
 
    pmsg("Start test 5:\n");
@@ -654,7 +654,7 @@ static void test6(void)
         "AC power plug to the UPS should be DISCONNECTED.\n\n"
         "PLEASE DO NOT RUN THIS TEST WITH A COMPUTER CONNECTED TO YOUR UPS!!!\n\n"
         "Please enter any character when ready to continue: ");
-   fgetc(stdin);
+   (void)fgetc(stdin);
    pmsg("\n");
 
    if (ioctl(ups->fd, TIOCMGET, &bits) < 0) {
@@ -1772,7 +1772,7 @@ static void usb_kill_power_test(void)
         "PLEASE DO NOT RUN THIS TEST WITH A COMPUTER CONNECTED TO YOUR UPS!!!\n\n"
         "Please enter any character when ready to continue: ");
 
-   fgetc(stdin);
+   (void)fgetc(stdin);
    pmsg("\n");
 
    ptime();
@@ -2539,7 +2539,7 @@ static void modbus_kill_power_test(void)
         "PLEASE DO NOT RUN THIS TEST WITH A COMPUTER CONNECTED TO YOUR UPS!!!\n\n"
         "Please enter any character when ready to continue: ");
 
-   fgetc(stdin);
+   (void)fgetc(stdin);
    pmsg("\n");
 
    ptime();
