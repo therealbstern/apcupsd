@@ -102,6 +102,7 @@ const ModbusUpsDriver::CiInfo ModbusUpsDriver::CI_TABLE[] =
 
 ModbusUpsDriver::ModbusUpsDriver(UPSINFO *ups) :
    UpsDriver(ups),
+   _commlost_time(0),
    _comm(NULL)
 {
 }
