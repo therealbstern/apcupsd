@@ -538,7 +538,7 @@ int main(int argc, char **argv)
 {
     FILE    *conf;
     time_t  tod;
-    char    buf[256], fn[MAXPATHLEN], addr[256], timestr[256], *rest;
+    char    buf[256], fn[MAXPATHLEN], addr[256], timestr[256];
     int     restofs;
     ftype_t   *tmp;
 
@@ -577,10 +577,17 @@ int main(int argc, char **argv)
                    numfields);
     } else {
         while (fgets (buf, sizeof(buf), conf)) {
-            if (strncmp("MONITOR", buf, 7) == 0) {
-                sscanf (buf, "%*s %s %n", addr, &restofs);
-                rest = buf + restofs + 1;
-                desc = strtok(rest, "\"");
+            if (sscanf(buf, "MONITOR %s %n", addr, &restofs) == 1) {
+                desc = buf + restofs;                
+                if (*desc == '\"')
+                   restofs = strcspn(++desc, "\n\r\"");
+                else
+                   restofs = strcspn(desc, "\n\r");
+                desc[restofs] = '\0';
+                if (*desc == '\0') {
+                   strlcpy(buf, "UNKNOWN", sizeof(buf));
+                   desc = buf;
+                }
                 getinfo(addr);  /* get and print info for this host */
             }
         }
