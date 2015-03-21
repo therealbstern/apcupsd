@@ -1599,9 +1599,9 @@ static void usb_set_xferv(int lowhigh)
       // Give write a chance to work, then read new value
       sleep(1);
       result = 0;
-      usb_read_int_from_ups(ups, ci, &result);
-
-      if (result != newval) {
+      if (!usb_read_int_from_ups(ups, ci, &result))
+         pmsg("FAILED to set new %s transfer voltage.\n\n", text);
+      else if (result != newval) {
          pmsg("FAILED to set new %s transfer voltage.\n\n"
               "This is probably because you entered a value that is out-of-range\n"
               "for your UPS. The acceptable range of values varies based on UPS\n"
@@ -1676,21 +1676,27 @@ static void usb_set_sens(void)
    /* Delay needed for readback to work */
    sleep(1);
 
-   usb_read_int_from_ups(ups, CI_SENS, &result);
-   pmsg("New sensitivity setting: ");
-   switch(result) {
-   case 0:
-      pmsg("LOW\n");
-      break;
-   case 1:
-      pmsg("MEDIUM\n");
-      break;
-   case 2:
-      pmsg("HIGH\n");
-      break;
-   default:
-      pmsg("UNKNOWN\n");
-      break;
+   if (!usb_read_int_from_ups(ups, CI_SENS, &result))
+   {
+      pmsg("FAILED to set sensitivity\n");
+   }
+   else
+   {
+      pmsg("New sensitivity setting: ");
+      switch(result) {
+      case 0:
+         pmsg("LOW\n");
+         break;
+      case 1:
+         pmsg("MEDIUM\n");
+         break;
+      case 2:
+         pmsg("HIGH\n");
+         break;
+      default:
+         pmsg("UNKNOWN\n");
+         break;
+      }
    }
 }
 
@@ -1749,18 +1755,24 @@ static void usb_set_alarm(void)
    /* Delay needed for readback to work */
    sleep(1);
 
-   usb_read_int_from_ups(ups, CI_DALARM, &result);
-   pmsg("New alarm setting: ");
-   switch(result) {
-   case 1:
-      pmsg("DISABLED\n");
-      break;
-   case 2:
-      pmsg("ENABLED\n");
-      break;
-   default:
-      pmsg("UNKNOWN\n");
-      break;
+   if (!usb_read_int_from_ups(ups, CI_DALARM, &result))
+   {
+      pmsg("FAILED to set alarm\n");
+   }
+   else
+   {
+      pmsg("New alarm setting: ");
+      switch(result) {
+      case 1:
+         pmsg("DISABLED\n");
+         break;
+      case 2:
+         pmsg("ENABLED\n");
+         break;
+      default:
+         pmsg("UNKNOWN\n");
+         break;
+      }
    }
 }
 
