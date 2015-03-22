@@ -113,28 +113,6 @@ static int write_nbytes(sock_t fd, const char *ptr, int nbytes)
 
    nleft = nbytes;
    while (nleft > 0) {
-#if defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS
-      /*       
-       * Work around a bug in OpenBSD & FreeBSD userspace pthreads
-       * implementations.
-       *
-       * The pthreads implementation under the hood sets O_NONBLOCK
-       * implicitly on all fds. This setting is not visible to the user
-       * application but is relied upon by the pthreads library to prevent
-       * blocking syscalls in one thread from halting all threads in the
-       * process. When a process exit()s or exec()s, the implicit
-       * O_NONBLOCK flags are removed from all fds, EVEN THOSE IT INHERITED.
-       * If another process is still using the inherited fds, there will
-       * soon be trouble.
-       *
-       * apcupsd is bitten by this issue after fork()ing a child process to
-       * run apccontrol.
-       *
-       * This seemingly-pointless fcntl() call causes the pthreads
-       * library to reapply the O_NONBLOCK flag appropriately.
-       */
-      fcntl(fd, F_SETFL, fcntl(fd, F_GETFL));
-#endif
       nwritten = send(fd, ptr, nleft, 0);
 
       switch (nwritten) {
@@ -287,13 +265,6 @@ sock_t net_open(const char *host, char *service, int port)
    }
 
    /* connect to server */
-#if defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS
-   /* 
-    * Work around a bug in OpenBSD & FreeBSD userspace pthreads
-    * implementations. Rationale is the same as described above.
-    */
-   fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFL));
-#endif
 
    /* Set socket to non-blocking mode */
    if (ioctl(sockfd, FIONBIO, &nonblock) != 0) {
@@ -395,28 +366,7 @@ sock_t net_accept(sock_t fd, struct sockaddr_in *cli_addr)
 #endif
    sock_t newfd;
 
-#if defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS
-   int rc;
-   fd_set fds;
-#endif
-
    do {
-
-#if defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS
-      /*
-       * Work around a bug in OpenBSD & FreeBSD userspace pthreads
-       * implementations. Rationale is the same as described above.
-       */
-      do {
-         FD_ZERO(&fds);
-         FD_SET(fd, &fds);
-         rc = select(fd + 1, &fds, NULL, NULL, NULL);
-      } while (rc == -1 && (errno == EINTR || errno == EAGAIN));
-
-      if (rc < 0)
-         return -errno;              /* error */
-#endif
-
       newfd = accept_cloexec(fd, (struct sockaddr *)cli_addr, &clilen);
    } while (newfd == INVALID_SOCKET && (errno == EINTR || errno == EAGAIN));
 
