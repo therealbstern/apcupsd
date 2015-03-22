@@ -2,18 +2,11 @@
  * apclibnis.c
  *
  * Network utility routines.
- *
- * Part of this code is derived from the Prentice Hall book
- * "Unix Network Programming" by W. Richard Stevens
- *
- * Developers, please note: do not include apcupsd headers
- * or other apcupsd internal information in this file
- * as it is used by independent client programs such as the cgi
- * programs.
  */
 
 /*
  * Copyright (C) 1999-2006 Kern Sibbald
+ * Copyright (C) 2007-2015 Adam Kropelin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of version 2 of the GNU General
