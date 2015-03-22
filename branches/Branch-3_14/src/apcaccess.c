@@ -141,6 +141,7 @@ int main(int argc, char **argv)
    int port = NISPORT;
    int flags = 0;
    FILE *cfg;
+   UPSINFO ups;
 
    // Process standard options
    int ch;
@@ -177,7 +178,6 @@ int main(int argc, char **argv)
    if ((cfg = fopen(cfgfile, "r")))
    {
       fclose(cfg);
-      UPSINFO ups;
       memset(&ups, 0, sizeof(UPSINFO));
       init_ups_struct(&ups);
       check_for_config(&ups, cfgfile);
