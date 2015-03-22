@@ -699,7 +699,8 @@ bool LinuxUsbUpsDriver::pusb_ups_get_capabilities()
                if (ioctl(_fd, HIDIOCGUCODE, &uref) < 0)
                   continue;
 
-               ioctl(_fd, HIDIOCGUSAGE, &uref);
+               if (ioctl(_fd, HIDIOCGUSAGE, &uref) < 0)
+                  continue;
 
                /*
                 * We've got a UPS usage entry, now walk down our
