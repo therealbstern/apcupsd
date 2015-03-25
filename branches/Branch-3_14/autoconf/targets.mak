@@ -1,5 +1,5 @@
 # Pull in autoconf variables
-include $(topdir)/autoconf/variables.mak
+-include $(topdir)/autoconf/variables.mak
 
 # Now that we have autoconf vars, overwrite $(topdir) with absolute path 
 # version instead of relative version we inherited. The easy way to do this 
@@ -98,6 +98,11 @@ clean:
 	$(V)find . -depth \
 	  \( -name $(OBJDIR) -o -name $(DEPDIR) -o -name \*.a \) \
           -exec $(ECHO) "  CLEAN" \{\} \; -exec $(RMF) \{\} \;
+
+# Remove all files that show as unversioned in svn
+.PHONY: svnclean
+svnclean:
+	$(V)rm -rfv `svn status --no-ignore 2>/dev/null | sed -e '/^[?I]/ s/^[?I] *//p' -e d`
 
 # Template rule to build a subdirectory
 .PHONY: %_DIR
@@ -306,3 +311,4 @@ $(OBJDIR)/%.o: %.rc
        -e "s/FILEVERSION.*/FILEVERSION     $(RCVERSION)/" \
        -e "s/PRODUCTVERSION.*/PRODUCTVERSION  $(RCVERSION)/" $< | \
    $(RES) -I$(dir $<) -O coff -o $@
+
