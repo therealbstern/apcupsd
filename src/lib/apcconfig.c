@@ -108,7 +108,6 @@ static const GENINFO types[] = {
    { "net",      "NETWORK UPS Driver",  NETWORK_UPS },
    { "test",     "TEST UPS Driver",     TEST_UPS },
    { "pcnet",    "PCNET UPS Driver",    PCNET_UPS },
-   { "netsnmp",  "NET-SNMP UPS Driver", SNMP_UPS },
    { "modbus",   "MODBUS UPS Driver",   MODBUS_UPS },
    { NULL,       "*invalid-ups-type*",  NO_UPS },
 };
@@ -700,7 +699,6 @@ jump_into_the_loop:
       match_range(ups, WHERE(cable), cables, "usb");
       break;
    case SNMPLITE_UPS:
-   case SNMP_UPS: 
    case PCNET_UPS:
    case NETWORK_UPS:
       match_range(ups, WHERE(cable), cables, "ether");

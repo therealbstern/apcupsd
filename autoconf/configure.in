@@ -651,53 +651,6 @@ AC_HELP_STRING([--disable-snmp], [No SNMP driver])],
      AC_SUBST(SNMPLITE_DRIVER) 
      APCDRVLIBS="$APCDRVLIBS \$(topdir)/src/drivers/snmplite/libsnmplitedrv.a" ])
 
-AC_ARG_ENABLE(net-snmp, [
-AC_HELP_STRING([--enable-net-snmp], [Compile NET-SNMP UPS code (OBSOLETE)])
-AC_HELP_STRING([--disable-net-snmp], [No NET-SNMP UPS code (default)])],
-   [ if test "$enableval" = "yes" ; then
-        dnl Check for optional crypto lib
-        AC_CHECK_LIB(crypto, EVP_DigestInit,
-           [echo '   including crypto library for snmp.'
-            DRVLIBS="$DRVLIBS -lcrypto"],
-           [],
-           [])
-
-        SNMP_LIB_FOUND="no"
-
-        dnl libsnmp is often in /usr/local
-        CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
-        LDFLAGS="${LDFLAGS} -L/usr/local/lib"
-
-        dnl Start by looking for libnetsnmp (net-snmp).
-        if test "$SNMP_LIB_FOUND" = "no" ; then
-           AC_CHECK_LIB(netsnmp, snmp_open,
-              [DRVLIBS="$DRVLIBS -lnetsnmp"
-               AC_DEFINE(HAVE_NET_SNMP,, [Define if you have libnetsnmp])
-               SNMP_LIB_FOUND="yes"], [], [$DRVLIBS])
-        fi
-
-        dnl If no lib yet, fall back on libsnmp (ucd-snmp)
-        if test "$SNMP_LIB_FOUND" = "no" ; then
-           AC_CHECK_LIB(snmp, snmp_open,
-              [DRVLIBS="$DRVLIBS -lsnmp"
-               AC_DEFINE(HAVE_UCD_SNMP,, [Define if you have libsnmp])
-               SNMP_LIB_FOUND="yes"], [], [$DRVLIBS])
-        fi
-
-        if test "$SNMP_LIB_FOUND" = "no" ; then
-           AC_MSG_ERROR([Cannot find SNMP libraries.])
-        fi
-
-        dnl If we get this far, we found a valid lib
-        AC_DEFINE(HAVE_SNMP_DRIVER,, [Define if building snmp driver])
-        DISPLAY_NETSNMP_DRIVER="net-snmp"
-
-        SNMP_DRIVER="snmp"
-        AC_SUBST(SNMP_DRIVER) 
-        APCDRVLIBS="$APCDRVLIBS \$(topdir)/src/drivers/snmp/libsnmpdrv.a"
-     fi ],
-   [])
-
 dnl Enable test driver
 AC_ARG_ENABLE(test, [
 AC_HELP_STRING([--enable-test], [Compile TEST driver code])
@@ -1472,7 +1425,7 @@ Configuration on `date`:
   UPSTYPE                     ${UPSTYPE}
   UPSCABLE                    ${UPSCABLE}
 
-  drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${DISPLAY_USB_DRIVER:-no-usb} ${DISPLAY_SNMP_DRIVER:-no-snmp} ${DISPLAY_NETSNMP_DRIVER:-no-net-snmp} ${PCNET_DRIVER:-no-pcnet} ${MODBUS_DRIVER:-no-modbus} ${MODBUS_USB_DRIVER:-no-modbus-usb} ${TEST_DRIVER:-no-test}
+  drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${DISPLAY_USB_DRIVER:-no-usb} ${DISPLAY_SNMP_DRIVER:-no-snmp} ${PCNET_DRIVER:-no-pcnet} ${MODBUS_DRIVER:-no-modbus} ${MODBUS_USB_DRIVER:-no-modbus-usb} ${TEST_DRIVER:-no-test}
 
   enable-nis:                 ${NISSRV_ENABLED}
   with-nisip:                 ${NISIP}

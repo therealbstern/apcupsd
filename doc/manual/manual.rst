@@ -1288,10 +1288,6 @@ to customize your installation.
     SNMP driver. This driver accesses the UPS over the network using
     SNMP. This is compatible only with UPSes equipped with an SNMP or
     Web/SNMP management card. By default this is enabled.
---enable-net-snmp  Turns on generation of the
-    obsolete NET-SNMP driver. This driver was the precursor to the current
-    snmp driver and is now obsolete. It is available as a fallback if the new
-    driver cannot be used for some reason. By default this is disabled.
 --enable-pcnet  Turns on generation of the
     PCNET (PowerChute Network Shutdown) driver. This driver accesses
     the UPS over the network using APC's custom protocol. This driver

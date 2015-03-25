@@ -58,7 +58,6 @@ typedef enum {
    DUMB_UPS,            /* Dumb UPS driver      */
    APCSMART_UPS,        /* APC Smart UPS (any)  */
    USB_UPS,             /* USB UPS driver       */
-   SNMP_UPS,            /* SNMP UPS driver      */
    NETWORK_UPS,         /* NETWORK UPS driver   */
    TEST_UPS,            /* TEST UPS Driver      */
    PCNET_UPS,           /* PCNET UPS Driver     */

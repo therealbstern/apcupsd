@@ -42,10 +42,6 @@
 # include "usb/usb.h"
 #endif
 
-#ifdef HAVE_SNMP_DRIVER
-# include "snmp/snmp.h"
-#endif
-
 #ifdef HAVE_SNMPLITE_DRIVER
 # include "snmplite/snmplite.h"
 #endif
@@ -78,10 +74,6 @@ static const UPSDRIVER drivers[] = {
 #ifdef HAVE_USB_DRIVER
    { "usb",       UsbUpsDriver::Factory },
 #endif   /* HAVE_USB_DRIVER */
-
-#ifdef HAVE_SNMP_DRIVER
-   { "snmp",      SnmpUpsDriver::Factory },
-#endif   /* HAVE_SNMP_DRIVER */
 
 #ifdef HAVE_SNMPLITE_DRIVER
    { "snmplite",  SnmpLiteUpsDriver::Factory },
@@ -163,10 +155,6 @@ UpsDriver *attach_driver(UPSINFO *ups)
 
    case USB_UPS:
       driver_name = "usb";
-      break;
-
-   case SNMP_UPS:
-      driver_name = "snmp";
       break;
 
    case SNMPLITE_UPS:

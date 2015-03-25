@@ -134,9 +134,6 @@
 /* Define if building net driver */
 #undef HAVE_NET_DRIVER
 
-/* Define if you have libnetsnmp */
-#undef HAVE_NET_SNMP
-
 /* Define if apcupsd NIS library is being built */
 #undef HAVE_NISLIB
 
@@ -181,9 +178,6 @@
 
 /* Define if building snmplite driver */
 #undef HAVE_SNMPLITE_DRIVER
-
-/* Define if building snmp driver */
-#undef HAVE_SNMP_DRIVER
 
 /* Define to 1 if you have the `snprintf' function. */
 #undef HAVE_SNPRINTF
@@ -270,9 +264,6 @@
 /* Define to 1 if you don't have `tm_zone' but do have the external array
    `tzname'. */
 #undef HAVE_TZNAME
-
-/* Define if you have libsnmp */
-#undef HAVE_UCD_SNMP
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #undef HAVE_UNISTD_H
