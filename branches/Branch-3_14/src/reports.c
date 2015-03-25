@@ -150,7 +150,6 @@ static void log_data(UPSINFO *ups)
    case USB_UPS:
    case TEST_UPS:
    case NETWORK_UPS:
-   case SNMP_UPS:
    case APCSMART_UPS:
    case PCNET_UPS:
    case SNMPLITE_UPS:

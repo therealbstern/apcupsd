@@ -675,7 +675,6 @@ MODBUS_DRIVER
 MODBUS_USB_DRIVER
 PCNET_DRIVER
 TEST_DRIVER
-SNMP_DRIVER
 SNMPLITE_DRIVER
 NET_DRIVER
 USB_TYPE
@@ -802,7 +801,6 @@ with_generic_usb
 enable_usb
 enable_net
 enable_snmp
-enable_net_snmp
 enable_test
 enable_pcnet
 enable_modbus_usb
@@ -1485,9 +1483,6 @@ Optional Features:
 
   --enable-snmp           Compile SNMP driver (default)
   --disable-snmp          No SNMP driver
-
-  --enable-net-snmp       Compile NET-SNMP UPS code (OBSOLETE)
-  --disable-net-snmp      No NET-SNMP UPS code (default)
 
   --enable-test           Compile TEST driver code
   --disable-test          No TEST driver (default)
@@ -11642,261 +11637,6 @@ _ACEOF
 fi
 
 
-# Check whether --enable-net-snmp was given.
-if test "${enable_net_snmp+set}" = set; then
-  enableval=$enable_net_snmp;  if test "$enableval" = "yes" ; then
-                { $as_echo "$as_me:$LINENO: checking for EVP_DigestInit in -lcrypto" >&5
-$as_echo_n "checking for EVP_DigestInit in -lcrypto... " >&6; }
-if test "${ac_cv_lib_crypto_EVP_DigestInit+set}" = set; then
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lcrypto  $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char EVP_DigestInit ();
-int
-main ()
-{
-return EVP_DigestInit ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_c_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext && {
-	 test "$cross_compiling" = yes ||
-	 $as_test_x conftest$ac_exeext
-       }; then
-  ac_cv_lib_crypto_EVP_DigestInit=yes
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_cv_lib_crypto_EVP_DigestInit=no
-fi
-
-rm -rf conftest.dSYM
-rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:$LINENO: result: $ac_cv_lib_crypto_EVP_DigestInit" >&5
-$as_echo "$ac_cv_lib_crypto_EVP_DigestInit" >&6; }
-if test "x$ac_cv_lib_crypto_EVP_DigestInit" = x""yes; then
-  echo '   including crypto library for snmp.'
-            DRVLIBS="$DRVLIBS -lcrypto"
-fi
-
-
-        SNMP_LIB_FOUND="no"
-
-                CPPFLAGS="${CPPFLAGS} -I/usr/local/include"
-        LDFLAGS="${LDFLAGS} -L/usr/local/lib"
-
-                if test "$SNMP_LIB_FOUND" = "no" ; then
-           { $as_echo "$as_me:$LINENO: checking for snmp_open in -lnetsnmp" >&5
-$as_echo_n "checking for snmp_open in -lnetsnmp... " >&6; }
-if test "${ac_cv_lib_netsnmp_snmp_open+set}" = set; then
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lnetsnmp $DRVLIBS $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char snmp_open ();
-int
-main ()
-{
-return snmp_open ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_c_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext && {
-	 test "$cross_compiling" = yes ||
-	 $as_test_x conftest$ac_exeext
-       }; then
-  ac_cv_lib_netsnmp_snmp_open=yes
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_cv_lib_netsnmp_snmp_open=no
-fi
-
-rm -rf conftest.dSYM
-rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:$LINENO: result: $ac_cv_lib_netsnmp_snmp_open" >&5
-$as_echo "$ac_cv_lib_netsnmp_snmp_open" >&6; }
-if test "x$ac_cv_lib_netsnmp_snmp_open" = x""yes; then
-  DRVLIBS="$DRVLIBS -lnetsnmp"
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_NET_SNMP /**/
-_ACEOF
-
-               SNMP_LIB_FOUND="yes"
-fi
-
-        fi
-
-                if test "$SNMP_LIB_FOUND" = "no" ; then
-           { $as_echo "$as_me:$LINENO: checking for snmp_open in -lsnmp" >&5
-$as_echo_n "checking for snmp_open in -lsnmp... " >&6; }
-if test "${ac_cv_lib_snmp_snmp_open+set}" = set; then
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lsnmp $DRVLIBS $LIBS"
-cat >conftest.$ac_ext <<_ACEOF
-/* confdefs.h.  */
-_ACEOF
-cat confdefs.h >>conftest.$ac_ext
-cat >>conftest.$ac_ext <<_ACEOF
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char snmp_open ();
-int
-main ()
-{
-return snmp_open ();
-  ;
-  return 0;
-}
-_ACEOF
-rm -f conftest.$ac_objext conftest$ac_exeext
-if { (ac_try="$ac_link"
-case "(($ac_try" in
-  *\"* | *\`* | *\\*) ac_try_echo=\$ac_try;;
-  *) ac_try_echo=$ac_try;;
-esac
-eval ac_try_echo="\"\$as_me:$LINENO: $ac_try_echo\""
-$as_echo "$ac_try_echo") >&5
-  (eval "$ac_link") 2>conftest.er1
-  ac_status=$?
-  grep -v '^ *+' conftest.er1 >conftest.err
-  rm -f conftest.er1
-  cat conftest.err >&5
-  $as_echo "$as_me:$LINENO: \$? = $ac_status" >&5
-  (exit $ac_status); } && {
-	 test -z "$ac_c_werror_flag" ||
-	 test ! -s conftest.err
-       } && test -s conftest$ac_exeext && {
-	 test "$cross_compiling" = yes ||
-	 $as_test_x conftest$ac_exeext
-       }; then
-  ac_cv_lib_snmp_snmp_open=yes
-else
-  $as_echo "$as_me: failed program was:" >&5
-sed 's/^/| /' conftest.$ac_ext >&5
-
-	ac_cv_lib_snmp_snmp_open=no
-fi
-
-rm -rf conftest.dSYM
-rm -f core conftest.err conftest.$ac_objext conftest_ipa8_conftest.oo \
-      conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:$LINENO: result: $ac_cv_lib_snmp_snmp_open" >&5
-$as_echo "$ac_cv_lib_snmp_snmp_open" >&6; }
-if test "x$ac_cv_lib_snmp_snmp_open" = x""yes; then
-  DRVLIBS="$DRVLIBS -lsnmp"
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_UCD_SNMP /**/
-_ACEOF
-
-               SNMP_LIB_FOUND="yes"
-fi
-
-        fi
-
-        if test "$SNMP_LIB_FOUND" = "no" ; then
-           { { $as_echo "$as_me:$LINENO: error: Cannot find SNMP libraries." >&5
-$as_echo "$as_me: error: Cannot find SNMP libraries." >&2;}
-   { (exit 1); exit 1; }; }
-        fi
-
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_SNMP_DRIVER /**/
-_ACEOF
-
-        DISPLAY_NETSNMP_DRIVER="net-snmp"
-
-        SNMP_DRIVER="snmp"
-
-        APCDRVLIBS="$APCDRVLIBS \$(topdir)/src/drivers/snmp/libsnmpdrv.a"
-     fi
-fi
-
-
 # Check whether --enable-test was given.
 if test "${enable_test+set}" = set; then
   enableval=$enable_test;  if test "$enableval" = "yes" ; then
@@ -15084,7 +14824,7 @@ Configuration on `date`:
   UPSTYPE                     ${UPSTYPE}
   UPSCABLE                    ${UPSCABLE}
 
-  drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${DISPLAY_USB_DRIVER:-no-usb} ${DISPLAY_SNMP_DRIVER:-no-snmp} ${DISPLAY_NETSNMP_DRIVER:-no-net-snmp} ${PCNET_DRIVER:-no-pcnet} ${MODBUS_DRIVER:-no-modbus} ${MODBUS_USB_DRIVER:-no-modbus-usb} ${TEST_DRIVER:-no-test}
+  drivers (no-* are disabled): ${APCSMART_DRIVER:-no-apcsmart} ${DUMB_DRIVER:-no-dumb} ${NET_DRIVER:-no-net} ${DISPLAY_USB_DRIVER:-no-usb} ${DISPLAY_SNMP_DRIVER:-no-snmp} ${PCNET_DRIVER:-no-pcnet} ${MODBUS_DRIVER:-no-modbus} ${MODBUS_USB_DRIVER:-no-modbus-usb} ${TEST_DRIVER:-no-test}
 
   enable-nis:                 ${NISSRV_ENABLED}
   with-nisip:                 ${NISIP}

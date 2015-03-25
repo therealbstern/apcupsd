@@ -11,12 +11,6 @@
 # or by manually setting it to 1 in this file,
 #  e.g. %define gapcmon 1
 #
-# If you want the (obsolete) NET-SNMP driver, use:
-#  e.g.  rpmbuild -ba --define "build_snmp 1" --define "build_suse 1" apcupsd.spec
-# or by manually setting it to 1 in this file,
-#  e.g. %define snmp 1
-# The modern SNMP driver is always enabled since it has no dependencies.
-#
 # Note, to build, you need:
 #   Release_Notes-%{version}-%{release}.tar.gz in your
 #   rpm SOURCES directory, and the tar file must contain
@@ -98,11 +92,6 @@
 %define gapcmon 0
 %{?build_gapcmon:%define gapcmon 1}
 
-# should we build net-snmp driver
-# this is now deprecated in favor of new driver which does not depend on net-snmp library
-%define snmp 0
-%{?build_snmp:%define snmp 1}
-
 Summary:      APC UPS Power Control Daemon for Linux
 Name:         apcupsd
 Version:      %{_version}
@@ -143,9 +132,6 @@ BuildRequires: libbonobo-devel, libbonoboui-devel, freetype-devel, GConf2-devel
 %if %{rhel5} && %{gapcmon}
 BuildRequires: libbonobo-devel, libbonoboui-devel, freetype-devel, GConf2-devel
 %endif
-%if %{snmp}
-BuildRequires: net-snmp-devel
-%endif
 
 Provides: apcupsd
 Obsoletes: apcupsd-std apcupsd-usb
@@ -155,9 +141,6 @@ Requires: perl, ncurses
 Requires: glibc >= 2.2
 %else
 Requires: glibc >= 2.3
-%endif
-%if %{snmp}
-Requires: net-snmp
 %endif
 
 %description
@@ -249,9 +232,6 @@ A Gnome application to monitor the status of your UPS.
         --enable-snmp \
 	%if %{gapcmon}
 	--enable-gapcmon \
-	%endif
-	%if %{snmp}
-	--enable-net-snmp \
 	%endif
         --with-serial-dev= \
         --with-upstype=usb \
