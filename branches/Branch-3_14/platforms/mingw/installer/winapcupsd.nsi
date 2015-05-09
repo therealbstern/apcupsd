@@ -565,6 +565,8 @@ Section "Uninstall"
   ; remove directories used
   RMDir "$INSTDIR\bin"
   RMDir "$INSTDIR\cgi"
+  RMDir "$INSTDIR\driver\i386"
+  RMDir "$INSTDIR\driver\amd64"
   RMDir "$INSTDIR\driver"
   RMDir "$INSTDIR\etc\apcupsd"
   RMDir "$INSTDIR\etc"
