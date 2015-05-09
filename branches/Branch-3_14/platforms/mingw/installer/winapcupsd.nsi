@@ -341,6 +341,8 @@ Section "Tray Applet" SecApctray
   CreateDirectory "$INSTDIR\bin"
   SetOutPath "$INSTDIR\bin"
   File ${WINDIR}\apctray.exe
+  File ${CROSSTOOLS}\mingw32\mingw32\bin\mingwm10.dll
+  File ${DEPKGS}\libroot\lib\pthreadGCE.dll
 
   ; Create start menu link for apctray
   CreateDirectory "$SMPROGRAMS\Apcupsd"
