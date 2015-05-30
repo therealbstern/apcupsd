@@ -8,6 +8,195 @@
 /***************************************************************************/
 
 ------------------------------------------------------------------------
+r2349 | adk0212 | 2015-05-09 11:33:29 -0400 (Sat, 09 May 2015) | 2 lines
+
+Remove driver subdirs during uninstall
+
+------------------------------------------------------------------------
+r2348 | adk0212 | 2015-05-09 11:28:33 -0400 (Sat, 09 May 2015) | 3 lines
+
+Fix missing DLLs when installing only apctray
+Reported by keithg@pobox.com
+
+------------------------------------------------------------------------
+r2347 | adk0212 | 2015-03-25 15:55:46 -0400 (Wed, 25 Mar 2015) | 2 lines
+
+Add 'svnclean' target to remove all files that show as unversioned in svn
+
+------------------------------------------------------------------------
+r2346 | adk0212 | 2015-03-24 23:53:39 -0400 (Tue, 24 Mar 2015) | 3 lines
+
+Remove obsolete NET-SNMP driver
+This has been replaced by the snmplite driver for many years now.
+
+------------------------------------------------------------------------
+r2345 | adk0212 | 2015-03-22 11:58:02 -0400 (Sun, 22 Mar 2015) | 2 lines
+
+CID107690 Unchecked return value
+
+------------------------------------------------------------------------
+r2344 | adk0212 | 2015-03-22 11:51:42 -0400 (Sun, 22 Mar 2015) | 3 lines
+
+CID107691 - Pointer to local outside scope
+UPSINFO goes out of scope before use via 'host' pointer
+
+------------------------------------------------------------------------
+r2343 | adk0212 | 2015-03-21 23:21:42 -0400 (Sat, 21 Mar 2015) | 2 lines
+
+Set thread names using pthread_setname_np() when available
+
+------------------------------------------------------------------------
+r2342 | adk0212 | 2015-03-21 22:06:46 -0400 (Sat, 21 Mar 2015) | 2 lines
+
+Remove obsolete comments, add my copyright
+
+------------------------------------------------------------------------
+r2341 | adk0212 | 2015-03-21 22:03:30 -0400 (Sat, 21 Mar 2015) | 3 lines
+
+Remove workaround for old BSD userspace pthreads bug
+We have been closing fds after fork() for some time now and we now have CLOEXEC set properly
+
+------------------------------------------------------------------------
+r2340 | adk0212 | 2015-03-21 18:43:19 -0400 (Sat, 21 Mar 2015) | 2 lines
+
+Explicitly ignore return value
+
+------------------------------------------------------------------------
+r2339 | adk0212 | 2015-03-21 18:30:29 -0400 (Sat, 21 Mar 2015) | 2 lines
+
+Fix some unchecked returns
+
+------------------------------------------------------------------------
+r2338 | adk0212 | 2015-03-21 18:19:20 -0400 (Sat, 21 Mar 2015) | 2 lines
+
+Quiet some Coverity errors by explicitly discarding return fgetc() return value
+
+------------------------------------------------------------------------
+r2337 | adk0212 | 2015-03-21 17:59:35 -0400 (Sat, 21 Mar 2015) | 2 lines
+
+Improvements to hosts.conf parsing logic
+
+------------------------------------------------------------------------
+r2336 | adk0212 | 2015-03-21 11:42:50 -0400 (Sat, 21 Mar 2015) | 3 lines
+
+CID17191 -  Uninitialized scalar field
+Not reall a defect as _commlost_time is always set before being used, but initialize it in constructor anyway for cleanliness
+
+------------------------------------------------------------------------
+r2335 | adk0212 | 2015-03-21 11:39:46 -0400 (Sat, 21 Mar 2015) | 3 lines
+
+Another shot at fixing CID 107532,107533
+Coverity really wants you to check fcntl retval
+
+------------------------------------------------------------------------
+r2334 | adk0212 | 2015-03-20 22:26:04 -0400 (Fri, 20 Mar 2015) | 2 lines
+
+CID107533 - Unchecked return value from library
+
+------------------------------------------------------------------------
+r2333 | adk0212 | 2015-03-20 21:47:16 -0400 (Fri, 20 Mar 2015) | 2 lines
+
+Mark error_out_wrapper as noreturn to prevent bogus warnings
+
+------------------------------------------------------------------------
+r2332 | adk0212 | 2015-03-20 00:05:15 -0400 (Fri, 20 Mar 2015) | 2 lines
+
+A couple more socket cloexec fixes
+
+------------------------------------------------------------------------
+r2331 | adk0212 | 2015-03-19 23:59:41 -0400 (Thu, 19 Mar 2015) | 3 lines
+
+Fix open file descriptors leaking to exec'ed children
+Use O_CLOEXEC and friends as necessary to ensure we don't leak fds to children across exec
+
+------------------------------------------------------------------------
+r2330 | adk0212 | 2015-03-19 23:58:11 -0400 (Thu, 19 Mar 2015) | 2 lines
+
+Icon file for web site
+
+------------------------------------------------------------------------
+r2329 | adk0212 | 2015-03-06 14:05:24 -0500 (Fri, 06 Mar 2015) | 4 lines
+
+Fixes for socket error handling 
+Resolves apcaccess crash when connection fails as well
+as several other theoretical issues.
+
+------------------------------------------------------------------------
+r2328 | adk0212 | 2015-02-17 15:18:17 -0500 (Tue, 17 Feb 2015) | 3 lines
+
+Now that we are using the system tcpd.h exclusively, use <tcpd.h> not "tcpd.h" include form.
+h/t Manfred Schwarb <manfred99@gmx.ch>
+
+------------------------------------------------------------------------
+r2327 | adk0212 | 2015-02-17 08:47:54 -0500 (Tue, 17 Feb 2015) | 3 lines
+
+Stop shipping a hacked copy of tcpd.h and wrap the include of the system header with extern "C" instead.
+RedHat's tcpd.h already has __{BEGIN,END}_DECL demarcation but SuSE's (for example) does not.
+
+------------------------------------------------------------------------
+r2326 | adk0212 | 2015-02-15 17:02:53 -0500 (Sun, 15 Feb 2015) | 2 lines
+
+Discard unexpected messages when waiting for idle
+
+------------------------------------------------------------------------
+r2325 | adk0212 | 2015-02-15 16:59:04 -0500 (Sun, 15 Feb 2015) | 2 lines
+
+Fix hiddev binding when usbfs is mounted on /dev/bus/usb instead of /proc/bus/usb
+
+------------------------------------------------------------------------
+r2324 | adk0212 | 2015-02-08 23:35:39 -0500 (Sun, 08 Feb 2015) | 2 lines
+
+Include file/line info in hex_dump output to match Dmsg
+
+------------------------------------------------------------------------
+r2323 | adk0212 | 2015-02-08 19:45:45 -0500 (Sun, 08 Feb 2015) | 3 lines
+
+Detect if compiler supports -Wno-unused-result instead of using it blindly
+- Also use new AX_ADD_COMPILE_FLAG for -fno-exceptions and -fno-rtti
+
+------------------------------------------------------------------------
+r2322 | adk0212 | 2015-02-08 13:00:05 -0500 (Sun, 08 Feb 2015) | 2 lines
+
+Update FSF address
+
+------------------------------------------------------------------------
+r2321 | adk0212 | 2015-02-08 12:49:27 -0500 (Sun, 08 Feb 2015) | 4 lines
+
+Update GPLv2 text
+- Same license, just minor updates to the text to match current FSF official copy
+- Changes include FSF address and removal of '19xx' style year annotations
+
+------------------------------------------------------------------------
+r2320 | adk0212 | 2015-02-08 12:42:02 -0500 (Sun, 08 Feb 2015) | 2 lines
+
+Remove unused file
+
+------------------------------------------------------------------------
+r2319 | adk0212 | 2015-02-08 12:01:31 -0500 (Sun, 08 Feb 2015) | 3 lines
+
+Remove subsys directory from SuSE lock file location
+Reported by Manfred Schwarb <manfred99@gmx.ch>
+
+------------------------------------------------------------------------
+r2318 | adk0212 | 2015-02-07 13:26:15 -0500 (Sat, 07 Feb 2015) | 3 lines
+
+Add -Wno-unused-result to suppress "ignoring return value of..." warnings.
+Prefer to track these via Coverity instead of inconsistent compile warnings.
+
+------------------------------------------------------------------------
+r2317 | adk0212 | 2015-02-06 19:31:18 -0500 (Fri, 06 Feb 2015) | 5 lines
+
+Improve COMMLOST handling for MODBUS, esp. MODBUS/USB
+- Fix ModbusUsbComm to handle Open() call when already open
+- Fix ModbusUpsDriver to close the Comm class when declaring COMMLOST
+- Fail register read/write calls at ModbusComm layer when underlying transport is not open
+
+------------------------------------------------------------------------
+r2315 | adk0212 | 2015-02-02 21:27:26 -0500 (Mon, 02 Feb 2015) | 2 lines
+
+Final prep for 3.14.13 release
+
+------------------------------------------------------------------------
 r2314 | adk0212 | 2015-02-02 21:16:47 -0500 (Mon, 02 Feb 2015) | 2 lines
 
 Correct some outdated information in the apctest section of the manual
