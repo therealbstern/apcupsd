@@ -1,0 +1,4 @@
+#!/bin/sh
+
+# Launch apcagent
+open $2/apcagent.app
