@@ -9,6 +9,26 @@ IF YOU USE THE OLD STYLE MASTER/SLAVE NETWORKING MODE, BE SURE TO READ THE
 3.14.0 RELEASE NOTES BELOW.
 
 
+3.14.14 -- 30 May 2015
+
+BUG FIXES
+
+  * win32: Fix missing DLLs when installing only apctray
+
+  * Fixes for socket error handling. Resolves apcaccess crash when connection 
+    fails as well as several other theoretical issues.
+
+  * MODBUS/USB error handling (COMMLOST) improvements for faulty USB links
+
+  * Fix hiddev binding when usbfs is mounted on /dev/bus/usb instead of 
+    /proc/bus/usb. This is necessary for switching between MODBUS/USB and
+    USB/HID on Linux.
+
+  * Update GPLv2 text and FSF address to match current versions from FSF.
+
+  * Various fixes for potential issues suggested by Coverity Scan
+
+
 3.14.13 -- 02 February 2015
 
 NEW FEATURES
