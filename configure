@@ -678,9 +678,9 @@ TEST_DRIVER
 SNMPLITE_DRIVER
 NET_DRIVER
 USB_TYPE
-USB_DRIVER
 LIBUSBHIDINC
 LIBUSBHID
+USB_DRIVER
 DUMB_DRIVER
 APCSMART_DRIVER
 GDHEAD
@@ -11552,6 +11552,15 @@ if test "${enable_usb+set}" = set; then
             ;;
       esac
 
+
+cat >>confdefs.h <<\_ACEOF
+#define HAVE_USB_DRIVER /**/
+_ACEOF
+
+      USB_DRIVER="usb"
+
+      APCDRVLIBS="$APCDRVLIBS \$(topdir)/src/drivers/usb/libusbdrv.a"
+
       case $usbhost in
          *-*-linux*)
             USB_TYPE="linux"
@@ -11574,15 +11583,6 @@ $as_echo "Using BSD USB driver." >&6; }
             ;;
       esac
 
-
-cat >>confdefs.h <<\_ACEOF
-#define HAVE_USB_DRIVER /**/
-_ACEOF
-
-      USB_DRIVER="usb"
-
-
-      APCDRVLIBS="$APCDRVLIBS \$(topdir)/src/drivers/usb/libusbdrv.a"
 
       DISPLAY_USB_DRIVER=$USB_TYPE-$USB_DRIVER
      fi

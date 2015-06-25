@@ -591,6 +591,11 @@ AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
             ;;
       esac
 
+      AC_DEFINE(HAVE_USB_DRIVER,, [Define if building USB driver])
+      USB_DRIVER="usb"
+      AC_SUBST(USB_DRIVER)
+      APCDRVLIBS="$APCDRVLIBS \$(topdir)/src/drivers/usb/libusbdrv.a"
+
       case $usbhost in
          *-*-linux*)
             USB_TYPE="linux"
@@ -611,12 +616,7 @@ AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
             ;;
       esac
 
-      AC_DEFINE(HAVE_USB_DRIVER,, [Define if building USB driver])
-      USB_DRIVER="usb"
-      AC_SUBST(USB_DRIVER)
       AC_SUBST(USB_TYPE)
-      APCDRVLIBS="$APCDRVLIBS \$(topdir)/src/drivers/usb/libusbdrv.a"
-
       DISPLAY_USB_DRIVER=$USB_TYPE-$USB_DRIVER
      fi ],
     [])
