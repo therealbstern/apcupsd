@@ -177,6 +177,7 @@ enum {
    CI_LowBattery,
    CI_Calibration,
    CI_AlarmTimer,
+   CI_OutputCurrent,
 
    /* Only seen on the BackUPS Pro USB (so far) */
    CI_BUPBattCapBeforeStartup,  

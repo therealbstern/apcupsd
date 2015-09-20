@@ -300,8 +300,8 @@ namespace APCModbusMapping
    extern const RegInfo REG_BATTERY_VOLTAGE;
    extern const RegInfo REG_BATTERY_DATE;
    extern const RegInfo REG_BATTERY_TEMPERATURE;
-   extern const RegInfo REG_OUTPUT_0_REAL_POWER;
-   extern const RegInfo REG_OUTPUT_0_APPARENT_POWER;
+   extern const RegInfo REG_OUTPUT_0_REAL_POWER_PCT;
+   extern const RegInfo REG_OUTPUT_0_APPARENT_POWER_PCT;
    extern const RegInfo REG_OUTPUT_0_CURRENT;
    extern const RegInfo REG_OUTPUT_0_VOLTAGE;
    extern const RegInfo REG_OUTPUT_FREQUENCY;
