@@ -58,7 +58,7 @@ const ModbusUpsDriver::CiInfo ModbusUpsDriver::CI_TABLE[] =
    { CI_NOMOUTV,         false,   &REG_OUTPUT_VOLTAGE_SETTING       },
    { CI_REVNO,           false,   &REG_FW_VERSION                   },
    { CI_BUPSelfTest,     false,   &REG_MODBUS_MAP_ID                }, // Purposely after CI_REVNO
-   { CI_NOMPOWER,        false,   &REG_OUTPUT_REAL_POWER_RATING     }, // TODO: Decide real or apparent power
+   { CI_NOMPOWER,        false,   &REG_OUTPUT_REAL_POWER_RATING     },
    { CI_DSHUTD,          false,   &REG_MOG_TURN_OFF_COUNT_SETTING   },
    { CI_DWAKE,           false,   &REG_MOG_TURN_ON_COUNT_SETTING    },
 // { CI_NOMBATTV,        false,   upsAdvBatteryNominalVoltage,
@@ -74,6 +74,7 @@ const ModbusUpsDriver::CiInfo ModbusUpsDriver::CI_TABLE[] =
 
    { CI_VLINE,           true,    &REG_INPUT_0_VOLTAGE              },
    { CI_VOUT,            true,    &REG_OUTPUT_0_VOLTAGE             },
+   { CI_OutputCurrent,   true,    &REG_OUTPUT_0_CURRENT             },
    { CI_VBATT,           true,    &REG_BATTERY_VOLTAGE              },
    { CI_FREQ,            true,    &REG_OUTPUT_FREQUENCY             },
    { CI_ITEMP,           true,    &REG_BATTERY_TEMPERATURE          },
@@ -88,7 +89,7 @@ const ModbusUpsDriver::CiInfo ModbusUpsDriver::CI_TABLE[] =
    { CI_BatteryPresent,  true,    &REG_BATTERY_SYSTEM_ERROR         },
    { CI_Boost,           true,    &REG_INPUT_STATUS                 },
    { CI_Trim,            true,    &REG_INPUT_STATUS                 },
-   { CI_LOAD,            true,    &REG_OUTPUT_0_REAL_POWER          }, // TODO: Decide real or apparent power
+   { CI_LOAD,            true,    &REG_OUTPUT_0_REAL_POWER_PCT      },
    { CI_LowBattery,      true,    &REG_SIMPLE_SIGNALLING_STATUS     },
 // { CI_VMIN,            true,    upsAdvInputMinLineVoltage
 // { CI_VMAX,            true,    upsAdvInputMaxLineVoltage
@@ -420,6 +421,10 @@ bool ModbusUpsDriver::UpdateCi(const CiInfo *info)
    case CI_VOUT:
       Dmsg(80, "Got CI_VOUT: %f\n", dbl);
       _ups->OutputVoltage = dbl;
+      break;
+   case CI_OutputCurrent:
+      Dmsg(80, "Got CI_OutputCurrent: %f\n", dbl);
+      _ups->OutputCurrent = dbl;
       break;
    case CI_VBATT:
       Dmsg(80, "Got CI_VBATT: %f\n", dbl);
