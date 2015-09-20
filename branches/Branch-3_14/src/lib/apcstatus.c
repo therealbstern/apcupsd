@@ -225,6 +225,9 @@ int output_status(UPSINFO *ups, int sockfd,
    if (ups->UPS_Cap[CI_FREQ])
       s_write(ups, "LINEFREQ : %.1f Hz\n", ups->LineFreq);
 
+   if (ups->UPS_Cap[CI_OutputCurrent])
+      s_write(ups, "OUTCURNT : %.1f Amps\n", ups->OutputCurrent);
+
    /* Output cause of last transfer to batteries */
    switch (ups->lastxfer) {
    case XFER_NONE:
