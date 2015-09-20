@@ -289,7 +289,6 @@ class UPSINFO {
    double TimeLeft;                /* Est. time UPS can run on batt. */
    double humidity;                /* Humidity */
    double ambtemp;                 /* Ambient temperature */
-   char eprom[500];                /* Eprom values */
 
    /* Items reported by smart UPS */
    /* Static items that normally do not change during UPS operation */
@@ -314,6 +313,7 @@ class UPSINFO {
    char upsmodel[MAXSTRING];       /* ups model number */
    char sensitivity[8];            /* sensitivity to line fluxuations */
    char beepstate[8];              /* when to beep on power failure. */
+   char eprom[500];                /* Eprom values */
 
    /* Items specified from config file */
    int annoy;
