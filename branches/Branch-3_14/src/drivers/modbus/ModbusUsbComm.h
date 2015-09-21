@@ -42,6 +42,7 @@ private:
    virtual bool ModbusTx(const ModbusFrame *frm, unsigned int sz);
    virtual bool ModbusRx(ModbusFrame *frm, unsigned int *sz);
    bool WaitIdle();
+   static uint64_t GetTod();
 
    static const unsigned MODBUS_USB_REPORT_SIZE = 64;
    static const unsigned MODBUS_USB_REPORT_MAX_FRAME_SIZE = 
