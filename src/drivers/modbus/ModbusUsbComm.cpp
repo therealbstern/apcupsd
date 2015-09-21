@@ -218,58 +218,67 @@ bool ModbusUsbComm::ModbusRx(ModbusFrame *frm, unsigned int *sz)
    }
 }
 
+#define S_TO_NS(x)  ( (x) * 1000000000ULL )
+#define MS_TO_NS(x) ( (x) * 1000000ULL )
+#define US_TO_NS(x) ( (x) * 1000ULL )
+#define NS_TO_MS(x) ( ((x)+999999) / 1000000ULL )
+
+uint64_t ModbusUsbComm::GetTod()
+{
+   struct timeval now;
+   gettimeofday(&now, NULL);
+   return S_TO_NS(now.tv_sec) + US_TO_NS(now.tv_usec);
+}
+
 bool ModbusUsbComm::WaitIdle()
 {
-   // Determine when we need to exit by
-   struct timeval exittime, now;
-   gettimeofday(&exittime, NULL);
-   exittime.tv_sec += MODBUS_IDLE_WAIT_TIMEOUT_MS / 1000;
-   exittime.tv_usec += (MODBUS_IDLE_WAIT_TIMEOUT_MS % 1000) * 1000;
-   if (exittime.tv_usec >= 1000000)
-   {
-      exittime.tv_sec++;
-      exittime.tv_usec -= 1000000;
-   }
+   // Current TOD
+   uint64_t now = GetTod();
+
+   // When we will give up by
+   uint64_t exittime = now + MS_TO_NS(MODBUS_IDLE_WAIT_TIMEOUT_MS);
+
+   // Initial idle target
+   uint64_t target = now + MS_TO_NS(MODBUS_INTERFRAME_TIMEOUT_MS);
 
    uint8_t rpt[MODBUS_USB_REPORT_SIZE];
-   while (1)
+   while (target <= exittime)
    {
       int rc = _hidups.InterruptRead(USB_ENDPOINT_IN|1, rpt, 
-         MODBUS_USB_REPORT_SIZE, MODBUS_INTERFRAME_TIMEOUT_MS);
+         MODBUS_USB_REPORT_SIZE, NS_TO_MS(target-now));
 
       if (rc == -ETIMEDOUT)
       {
          // timeout: line is now idle
          return true;
       }
-      else if (rc <= 0 && rc != EINTR && rc != EAGAIN)
+      else if (rc <= 0 && rc != -EINTR && rc != -EAGAIN)
       {
          // fatal error
          Dmsg(0, "%s: interrupt_read failed: %s\n", __func__, strerror(-rc));
          return false;
       }
-      else if (rc > 0)
+
+      // Refresh TOD
+      now = GetTod();
+
+      if (rc > 0)
       {
          if (rpt[0] == _rxrpt)
          {
             Dmsg(0, "%s: Out of sync\n", __func__);
             hex_dump(0, rpt, rc);
+
+            // Reset wait time
+            target = now + MS_TO_NS(MODBUS_INTERFRAME_TIMEOUT_MS);
          }
          else
          {
-            // Non-MODBUS reports are not an issue, just wait again
+            // Non-MODBUS reports are not an issue, just continue waiting
+            Dmsg(100, "%s: Non-MODBUS report id %u\n", __func__, rpt[0]);
          }
       }
-
-      // See if it's time to exit
-      gettimeofday(&now, NULL);
-      if (now.tv_sec > exittime.tv_sec ||
-          (now.tv_sec == exittime.tv_sec &&
-           now.tv_usec >= exittime.tv_usec))
-      {
-         // Line did not become idle soon enough
-         Dmsg(0, "%s: Timeout\n", __func__);
-         return false;
-      }
    }
+
+   return false;
 }
