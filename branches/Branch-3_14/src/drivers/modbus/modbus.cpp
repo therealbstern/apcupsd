@@ -59,6 +59,7 @@ const ModbusUpsDriver::CiInfo ModbusUpsDriver::CI_TABLE[] =
    { CI_REVNO,           false,   &REG_FW_VERSION                   },
    { CI_BUPSelfTest,     false,   &REG_MODBUS_MAP_ID                }, // Purposely after CI_REVNO
    { CI_NOMPOWER,        false,   &REG_OUTPUT_REAL_POWER_RATING     },
+   { CI_NomApparent,     false,   &REG_OUTPUT_APPARENT_POWER_RATING },
    { CI_DSHUTD,          false,   &REG_MOG_TURN_OFF_COUNT_SETTING   },
    { CI_DWAKE,           false,   &REG_MOG_TURN_ON_COUNT_SETTING    },
 // { CI_NOMBATTV,        false,   upsAdvBatteryNominalVoltage,
@@ -90,6 +91,7 @@ const ModbusUpsDriver::CiInfo ModbusUpsDriver::CI_TABLE[] =
    { CI_Boost,           true,    &REG_INPUT_STATUS                 },
    { CI_Trim,            true,    &REG_INPUT_STATUS                 },
    { CI_LOAD,            true,    &REG_OUTPUT_0_REAL_POWER_PCT      },
+   { CI_LoadApparent,    true,    &REG_OUTPUT_0_APPARENT_POWER_PCT  },
    { CI_LowBattery,      true,    &REG_SIMPLE_SIGNALLING_STATUS     },
 // { CI_VMIN,            true,    upsAdvInputMinLineVoltage
 // { CI_VMAX,            true,    upsAdvInputMaxLineVoltage
@@ -377,6 +379,10 @@ bool ModbusUpsDriver::UpdateCi(const CiInfo *info)
       Dmsg(80, "Got CI_NOMPOWER: %llu\n", uint);
       _ups->NomPower = uint;
       break;
+   case CI_NomApparent:
+      Dmsg(80, "Got CI_NomApparent: %llu\n", uint);
+      _ups->NomApparentPower = uint;
+      break;
    case CI_DSHUTD:
       Dmsg(80, "Got CI_DSHUTD: %lld\n", sint);
       _ups->dshutd = sint;
@@ -413,6 +419,10 @@ bool ModbusUpsDriver::UpdateCi(const CiInfo *info)
    case CI_LOAD:
       Dmsg(80, "Got CI_LOAD: %f\n", dbl);
       _ups->UPSLoad = dbl;
+      break;
+   case CI_LoadApparent:
+      Dmsg(80, "Got CI_LoadApparent: %f\n", dbl);
+      _ups->LoadApparent = dbl;
       break;
    case CI_VLINE:
       Dmsg(80, "Got CI_VLINE: %f\n", dbl);

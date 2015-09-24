@@ -275,7 +275,8 @@ class UPSINFO {
    double BattChg;                 /* remaining UPS charge % */
    double LineMin;                 /* min line voltage seen */
    double LineMax;                 /* max line voltage seen */
-   double UPSLoad;                 /* battery load percentage */
+   double UPSLoad;                 /* output real power load percentage */
+   double LoadApparent;            /* output apparent power load percentage */
    double LineFreq;                /* line freq. */
    double LineVoltage;             /* Line Voltage */
    double OutputVoltage;           /* Output Voltage */
@@ -294,7 +295,8 @@ class UPSINFO {
    /* Static items that normally do not change during UPS operation */
    int NomOutputVoltage;           /* Nominal voltage when on batteries */
    int NomInputVoltage;            /* Nominal input voltage */
-   int NomPower;                   /* Nominal power (watts) */
+   int NomPower;                   /* Nominal real power (watts) */
+   int NomApparentPower;           /* Nominal apparent power (VA) */
    double nombattv;                /* Nominal batt. voltage -- not actual */
    int extbatts;                   /* number of external batteries attached */
    int badbatts;                   /* number of bad batteries */
