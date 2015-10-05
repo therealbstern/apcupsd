@@ -53,6 +53,8 @@
 %{?build_rhel4:%define rhel4 1}
 %define rhel5 0
 %{?build_rhel5:%define rhel5 1}
+%define rhel6 0
+%{?build_rhel6:%define rhel6 1}
 
 # SuSE 9.x and 10.x
 %define suse 0
@@ -132,6 +134,9 @@ BuildRequires: libbonobo-devel, libbonoboui-devel, freetype-devel, GConf2-devel
 %if %{rhel5} && %{gapcmon}
 BuildRequires: libbonobo-devel, libbonoboui-devel, freetype-devel, GConf2-devel
 %endif
+%if %{rhel6} && %{gapcmon}
+BuildRequires: libbonobo-devel, libbonoboui-devel, freetype-devel, GConf2-devel
+%endif
 
 Provides: apcupsd
 Obsoletes: apcupsd-std apcupsd-usb
@@ -161,7 +166,7 @@ Summary:      APC UPS Power Control Daemon for Linux
 Group:        Applications/Internet
 
 Requires: libstdc++
-%if %{fedora_core} || %{suse} || %{mdk} || %{rhel4} || %{rhel5}
+%if %{fedora_core} || %{suse} || %{mdk} || %{rhel4} || %{rhel5} || %{rhel6}
 Requires: gd >= 2.0
 %else
 Requires: gd < 2.0
@@ -199,6 +204,9 @@ Requires: freetype, GConf2
 %if %{rhel5} && %{gapcmon}
 Requires: freetype, GConf2
 %endif
+%if %{rhel6} && %{gapcmon}
+Requires: freetype, GConf2
+%endif
 
 %if %{gapcmon}
 %description gapcmon
@@ -229,6 +237,7 @@ A Gnome application to monitor the status of your UPS.
         --enable-apcsmart \
         --enable-dumb \
         --enable-usb \
+        --enable-modbus-usb \
         --enable-snmp \
 	%if %{gapcmon}
 	--enable-gapcmon \
@@ -398,6 +407,8 @@ if [ "$1" = 0 ] ; then
 fi
 
 %changelog
+* Sun Oct 4 2015 David Ranch <dranch at trinnet.net>
+- Updated to support Centos and RHEL 6
 * Fri Sep 30 2011 D. Scott Barninger <barninger at fairfieldcomputers.com>
 - remove glitz-devel build requirement for suse (obsoleted)
 - builds for older suse versions should make sure that glitz packages are installed
