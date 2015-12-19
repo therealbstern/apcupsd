@@ -123,13 +123,13 @@ int execute_command(UPSINFO *ups, UPSCOMMANDS cmd)
    if (g_os_version_info.dwPlatformId == VER_PLATFORM_WIN32_WINDOWS) {
       /* Win95/98/ME need environment size parameter and no extra quotes */
       asnprintf(cmdline, sizeof(cmdline), 
-         "\"%s\" /E:4096 /c \"%s%s\" %s %s %d %d \"%s\"",
+         "\"%s\" /E:4096 /c \"%s%s\" %s \"%s\" %d %d \"%s\"",
          comspec, ups->scriptdir, APCCONTROL_FILE, cmd.command,
          ups->upsname, !ups->is_slave(), ups->is_plugged(), sbindir);
    } else {
       /* WinNT/2K/Vista need quotes around the entire sub-command */
       asnprintf(cmdline, sizeof(cmdline), 
-         "\"%s\" /c \"\"%s%s\" %s %s %d %d \"%s\"\"",
+         "\"%s\" /c \"\"%s%s\" %s \"%s\" %d %d \"%s\"\"",
          comspec, ups->scriptdir, APCCONTROL_FILE, cmd.command,
          ups->upsname, !ups->is_slave(), ups->is_plugged(), sbindir);
    }
