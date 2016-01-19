@@ -230,9 +230,6 @@ dnl Optional on all builds
 dnl We will provide our own implementations if needed
 AC_CHECK_FUNCS(snprintf vsnprintf strlcpy strlcat accept4)
 
-AC_SEARCH_LIBS(pthread_setname_np, [pthread], AC_DEFINE(HAVE_PTHREAD_SETNAME_NP, 1,
-   [Define if you have the pthread_setname_np function.]),)
-
 dnl Mandatory except for WIN32 builds where we provide our own
 if test "$host_os" != "mingw32" ; then
    AC_CHECK_FUNCS(

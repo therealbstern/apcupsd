@@ -152,9 +152,6 @@
 /* Define if you have pthreads */
 #undef HAVE_PTHREADS
 
-/* Define if you have the pthread_setname_np function. */
-#undef HAVE_PTHREAD_SETNAME_NP
-
 /* Define if building for QNX */
 #undef HAVE_QNX_OS
 
