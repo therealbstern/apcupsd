@@ -578,16 +578,6 @@ AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
          usbhost=$host
       fi
 
-      dnl Also force generic_usb if this is FreeBSD 8.0 or newer
-      case $usbhost in 
-         *-*-freebsd*)
-            tmp=`uname -r`
-            if test ${tmp%%.*} -ge 8 ; then
-               usbhost=forcegeneric
-            fi
-            ;;
-      esac
-
       AC_DEFINE(HAVE_USB_DRIVER,, [Define if building USB driver])
       USB_DRIVER="usb"
       AC_SUBST(USB_DRIVER)
@@ -597,15 +587,6 @@ AC_HELP_STRING([--disable-usb], [No USB UPS code (default)])],
          *-*-linux*)
             USB_TYPE="linux"
             AC_MSG_RESULT([Using Linux USB driver.])
-            ;;
-         *-*-freebsd* | *-*-openbsd* | *-*-netbsd*)
-            LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
-            LIBUSBHID=libusbhid
-            APCDRVLIBS="$APCDRVLIBS \$(topdir)/src/libusbhid/libusbhid.a"
-            AC_SUBST(LIBUSBHID)
-            AC_SUBST(LIBUSBHIDINC)
-            USB_TYPE="bsd"
-            AC_MSG_RESULT([Using BSD USB driver.])
             ;;
          *)
             needlibusb=true
