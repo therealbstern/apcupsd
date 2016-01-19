@@ -669,6 +669,7 @@ GAPCMON_LIBS
 GAPCMON_CFLAGS
 PKG_CONFIG
 NISIP
+LIBUSBHID
 LIBUSBH
 usbcfg
 MODBUS_DRIVER
@@ -678,8 +679,6 @@ TEST_DRIVER
 SNMPLITE_DRIVER
 NET_DRIVER
 USB_TYPE
-LIBUSBHIDINC
-LIBUSBHID
 USB_DRIVER
 DUMB_DRIVER
 APCSMART_DRIVER
@@ -11451,15 +11450,6 @@ if test "${enable_usb+set}" = set; then
          usbhost=$host
       fi
 
-            case $usbhost in
-         *-*-freebsd*)
-            tmp=`uname -r`
-            if test ${tmp%%.*} -ge 8 ; then
-               usbhost=forcegeneric
-            fi
-            ;;
-      esac
-
 
 cat >>confdefs.h <<\_ACEOF
 #define HAVE_USB_DRIVER /**/
@@ -11474,16 +11464,6 @@ _ACEOF
             USB_TYPE="linux"
             { $as_echo "$as_me:$LINENO: result: Using Linux USB driver." >&5
 $as_echo "Using Linux USB driver." >&6; }
-            ;;
-         *-*-freebsd* | *-*-openbsd* | *-*-netbsd*)
-            LIBUSBHIDINC="-I\$(topdir)/src/libusbhid"
-            LIBUSBHID=libusbhid
-            APCDRVLIBS="$APCDRVLIBS \$(topdir)/src/libusbhid/libusbhid.a"
-
-
-            USB_TYPE="bsd"
-            { $as_echo "$as_me:$LINENO: result: Using BSD USB driver." >&5
-$as_echo "Using BSD USB driver." >&6; }
             ;;
          *)
             needlibusb=true
