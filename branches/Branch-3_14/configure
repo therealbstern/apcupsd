@@ -2228,7 +2228,7 @@ if test "$cross_compiling" = "no" ; then
    done
 fi
 
-if test "$host_os" == "mingw32" ; then
+if test "$host_os" = "mingw32" ; then
    if test -z "$CROSSTOOLS" ; then
       CROSSTOOLS=${topdir}/../cross-tools
    fi
@@ -13070,7 +13070,7 @@ fi
 if test "x$DISTNAME" != "x"
 then
    echo "distname set to $DISTNAME"
-elif test "$host_os" == "mingw32" ; then
+elif test "$host_os" = "mingw32" ; then
    DISTNAME=mingw
 elif test $HAVE_UNAME=yes -a x`uname -s` = xOSF1
 then

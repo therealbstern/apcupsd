@@ -71,7 +71,7 @@ if test "$cross_compiling" = "no" ; then
 fi
 
 dnl Special considerations when cross-compiling for win32
-if test "$host_os" == "mingw32" ; then
+if test "$host_os" = "mingw32" ; then
    if test -z "$CROSSTOOLS" ; then 
       CROSSTOOLS=${topdir}/../cross-tools
    fi
@@ -950,7 +950,7 @@ AC_ARG_WITH(distname,
 if test "x$DISTNAME" != "x"
 then
    echo "distname set to $DISTNAME"
-elif test "$host_os" == "mingw32" ; then
+elif test "$host_os" = "mingw32" ; then
    DISTNAME=mingw
 elif test $HAVE_UNAME=yes -a x`uname -s` = xOSF1
 then
