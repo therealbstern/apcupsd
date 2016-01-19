@@ -30,14 +30,6 @@ static pthread_t thread_id[MAX_THREADS];
 static const char *thread_name[MAX_THREADS];
 static int num_threads = 0;
 
-// FreeBSD uses PTHREAD_MAX_NAMELEN_NP so we will standardize on that
-#if defined(HAVE_PTHREAD_SETNAME_NP) && !defined(PTHREAD_MAX_NAMELEN_NP)
- // Linux has a max thread name length of 16 but no constant for it
- #ifdef __linux__
-  #define PTHREAD_MAX_NAMELEN_NP 16
- #endif
-#endif
-
 /* Start a "real" POSIX thread */
 int start_thread(UPSINFO *ups, void (*action) (UPSINFO * ups),
    const char *proctitle, char *argv0)
@@ -52,16 +44,6 @@ int start_thread(UPSINFO *ups, void (*action) (UPSINFO * ups),
          strerror(status));
       return 0;
    }
-
-#ifdef HAVE_PTHREAD_SETNAME_NP
-   #ifdef PTHREAD_MAX_NAMELEN_NP
-   char name[PTHREAD_MAX_NAMELEN_NP];
-   strlcpy(name, proctitle, PTHREAD_MAX_NAMELEN_NP);
-   #else
-   const char *name = proctitle;
-   #endif
-   pthread_setname_np(tid, name);
-#endif
 
    t_index = num_threads;
    if (num_threads < MAX_THREADS) {
