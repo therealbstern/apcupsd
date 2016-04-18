@@ -38,13 +38,16 @@ install-darwin:
 	@echo "================================================="
 
 install-usb:
-	$(call MKDIR,/System/Library/Extensions/ApcupsdDummy.kext/Contents)
-	-$(V)chown root:wheel $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext
-	-$(V)chown root:wheel $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext/Contents
+	$(call MKDIR,/System/Library/Extensions/ApcupsdDummy.kext/Contents/_CodeSignature)
+	-$(V)$(call INSTDATA,644,ApcupsdDummy.kext/Contents/Info.plist,/System/Library/Extensions/ApcupsdDummy.kext/Contents/Info.plist)
+	-$(V)$(call INSTDATA,644,ApcupsdDummy.kext/Contents/_CodeSignature/CodeDirectory,/System/Library/Extensions/ApcupsdDummy.kext/Contents/_CodeSignature/CodeDirectory)
+	-$(V)$(call INSTDATA,644,ApcupsdDummy.kext/Contents/_CodeSignature/CodeRequirements,/System/Library/Extensions/ApcupsdDummy.kext/Contents/_CodeSignature/CodeRequirements)
+	-$(V)$(call INSTDATA,644,ApcupsdDummy.kext/Contents/_CodeSignature/CodeResources,/System/Library/Extensions/ApcupsdDummy.kext/Contents/_CodeSignature/CodeResources)
+	-$(V)$(call INSTDATA,644,ApcupsdDummy.kext/Contents/_CodeSignature/CodeSignature,/System/Library/Extensions/ApcupsdDummy.kext/Contents/_CodeSignature/CodeSignature)
 	-$(V)chmod 755 $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext
 	-$(V)chmod 755 $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext/Contents
-	$(call INSTDATA,644,Info.plist,/System/Library/Extensions/ApcupsdDummy.kext/Contents)
-	-$(V)chown root:wheel $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext/Contents/Info.plist
+	-$(V)chmod 755 $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext/Contents/_CodeSignature
+	-$(V)chown -R root:wheel $(DESTDIR)/System/Library/Extensions/ApcupsdDummy.kext
 	$(call UNINST,/System/Library/Extensions.mkext)
 	$(call UNINST,/System/Library/Extensions.kextcache)
 	@echo "================================================="
