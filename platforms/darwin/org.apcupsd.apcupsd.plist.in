@@ -9,7 +9,7 @@
 	<key>GroupName</key>
 	<string>wheel</string>
 	<key>Program</key>
-	<string>/sbin/apcupsd-start</string>
+	<string>@sbindir@/apcupsd-start</string>
 	<key>ProgramArguments</key>
 	<array>
 		<string>/bin/sh</string>

@@ -3,4 +3,4 @@
 rm -f /etc/apcupsd/powerfail
 rm -f /etc/nologin
 
-/sbin/apcupsd $@
+@sbindir@/apcupsd $@
