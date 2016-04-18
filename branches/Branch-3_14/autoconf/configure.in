@@ -1213,7 +1213,10 @@ darwin)
    PIDDIR=/var/run
    LOCKDIR=/var/tmp
    DFILES="\
-      platforms/darwin/apccontrol"
+      platforms/darwin/apccontrol \
+      platforms/darwin/apcupsd-start \
+      platforms/darwin/apcupsd-uninstall \
+      platforms/darwin/org.apcupsd.apcupsd.plist"
    ;;
 qnx)
    PTHREAD_LFLAGS=""
