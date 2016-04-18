@@ -29,6 +29,7 @@ apcagent.app: apcagent MainMenu.nib Info.plist PkgInfo \
 	$(V)$(INSTALL_DATA) -m 644 $(topdir)/doc/images/charging.png apcagent.app/Contents/Resources
 	$(V)$(INSTALL_DATA) -m 644 $(topdir)/doc/images/onbatt.png apcagent.app/Contents/Resources
 	$(V)$(INSTALL_DATA) -m 644 $(topdir)/doc/images/online.png apcagent.app/Contents/Resources
+	$(V)$(RMF) /tmp/Info.plist.out
 
 apcagent.dmg: apcagent.app
 	hdiutil create -ov -srcfolder apcagent.app apcagent.dmg
