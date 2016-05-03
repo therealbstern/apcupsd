@@ -1,5 +1,5 @@
 --- libusb-0.1.12/darwin.c	2006-03-03 21:52:46.000000000 -0500
-+++ libusb-0.1.12a/darwin.c	2016-05-03 15:26:32.000000000 -0400
++++ libusb-0.1.12a/darwin.c	2016-05-03 15:57:25.000000000 -0400
 @@ -54,6 +54,7 @@
  #include <stdlib.h>
  #include <stdio.h>
@@ -66,7 +66,7 @@
  static int usb_bulk_transfer (usb_dev_handle *dev, int ep, char *bytes, int size, int timeout,
  			      rw_async_func_t rw_async, rw_async_to_func_t rw_async_to)
  {
-@@ -825,24 +841,46 @@
+@@ -825,24 +841,55 @@
  	     size, ep);
  
    /* Bulk transfer */
@@ -94,15 +94,24 @@
 -      if (usb_debug)
 -	fprintf(stderr, "usb_bulk_read: input timed out\n");
 +
-+    if (endtime)
-+    {
-+      /* Manual timeout by polling (sadly) */
++    if (endtime) {
++
++      /* No timeout support from USB, need to do it manually */
 +      int aborted = 0;
++
++      /* Timeouts of a second or more get low resolution but efficient handling */
++      if (timeout >= 1000) {
++	result = CFRunLoopRunInMode(kCFRunLoopDefaultMode, (timeout+999)/1000, true);
++	if (result == kCFRunLoopRunTimedOut) {
++	  (*(device->interface))->AbortPipe(device->interface, pipeRef);
++	  aborted = 1;
++	}
++      }
 +
 +      /* Wait for transfer to complete */
 +      while (!rw_arg.done) {
 +
-+	if (!aborted && endtime && GetTod() >= endtime) {
++	if (!aborted && GetTod() >= endtime) {
 +	  (*(device->interface))->AbortPipe(device->interface, pipeRef);
 +	  aborted = 1; /* We've timed out, continue looping until abort happens */
 +	}
@@ -124,7 +133,7 @@
      }
    }
  
-@@ -862,10 +900,7 @@
+@@ -862,10 +909,7 @@
        error_str  = darwin_error_str (result);
      }
      
@@ -136,7 +145,7 @@
    }
  
    return rw_arg.io_size;
-@@ -1064,7 +1099,7 @@
+@@ -1064,7 +1108,7 @@
      result = (*(device))->GetDeviceAddress(device, (USBDeviceAddress *)&address);
  
      if (usb_debug >= 2)
@@ -145,7 +154,7 @@
  
      /* first byte of location appears to be associated with the device's bus */
      if (location >> 24 == bus_loc >> 24) {
-@@ -1091,8 +1126,8 @@
+@@ -1091,8 +1135,8 @@
        LIST_ADD(fdev, dev);
  
        if (usb_debug >= 2)
