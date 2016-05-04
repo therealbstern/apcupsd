@@ -370,6 +370,7 @@ presumably for register 0, in the following table::
   SU1400RMXLI3U    20 F3 FD 81            73.x.I
   SU2200I          35 EE FB AF           90.14.I
   SU2200XL,3000    35 EE FB AF 3000=17   90.14.I
+  SU3000NET                 96
   SU3000RMXLI3Ublk 35 F3 F4 AF    77     93.14.I
   SU5000I white    20 F2 FA 91    1F    110.14.I
   SU1400XL,XLI,RM  45 F6 E4 80
