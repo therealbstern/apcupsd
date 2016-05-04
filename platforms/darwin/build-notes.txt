@@ -3,7 +3,8 @@ package to run on machines other than the machine on which it was built. If you
 are building apcupsd for use on the same machine as the one you are building it 
 on, you do not have to do any of this. In that case, just install dependent 
 libs such as libgd and libusb binaries from Fink or MacPorts (or build from 
-source) with no special treatment needed.
+source) with no special treatment needed. [Note that for compatibility with the
+MODBUS driver, libusb now requires a patch...see below.]
 
 To build the most compatible apcupsd binary package possible, we must...
 
@@ -20,6 +21,10 @@ Instructions:
   This is not required, but makes the paths below much simpler.
 
    sudo ln -s /Applications/Xcode.app/Contents/Developer /Developer
+
+- Apply darwin-libusb-0.1.12.patch to libusb-0.1.12. This patch fixes several
+  compile errors with newer XCode versions as well as adding support for 
+  timeouts on interrupt transfers, which is required by the MODBUS driver.
 
 - Build dependent libs (libusb, libpng, libgd)
   * Tested with libusb-0.1.12, libpng-1.2.51, and gd-2.1.0
