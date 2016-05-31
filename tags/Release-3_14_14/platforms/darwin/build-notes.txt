@@ -1,0 +1,69 @@
+The information in this file is for those who wish to build an apcupsd binary 
+package to run on machines other than the machine on which it was built. If you 
+are building apcupsd for use on the same machine as the one you are building it 
+on, you do not have to do any of this. In that case, just install dependent 
+libs such as libgd and libusb binaries from Fink or MacPorts (or build from 
+source) with no special treatment needed. [Note that for compatibility with the
+MODBUS driver, libusb now requires a patch...see below.]
+
+To build the most compatible apcupsd binary package possible, we must...
+
+* Build all dependent libraries static to ensure no extra dylibs are needed on
+  the taget machine
+* Target a recent SDK so modern features like Notification Center will work
+* Specify an older minimum version (10.5) so binary will be runnable on older
+  systems (although possibly with certain capabilities disabled)
+* Build for i386 (not x86_64) to ensure compatibility with 32-bit systems
+
+Instructions:
+
+- Make a symlink from /Developer to your Xcode Developer directory.
+  This is not required, but makes the paths below much simpler.
+
+   sudo ln -s /Applications/Xcode.app/Contents/Developer /Developer
+
+- Apply darwin-libusb-0.1.12.patch to libusb-0.1.12. This patch fixes several
+  compile errors with newer XCode versions as well as adding support for 
+  timeouts on interrupt transfers, which is required by the MODBUS driver.
+
+- Build dependent libs (libusb, libpng, libgd)
+  * Tested with libusb-0.1.12, libpng-1.2.51, and gd-2.1.0
+
+  libpng & libusb:
+
+   CPPFLAGS="-isysroot /Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk -mmacosx-version-min=10.5" \
+     LDFLAGS="-Wl,-syslibroot,/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk -mmacosx-version-min=10.5 -arch i386" \
+     CFLAGS="-arch i386" CXXFLAGS="-arch i386" \
+     ./configure \
+     --disable-shared \
+     --disable-dependency-tracking
+   make
+   sudo make install
+
+  libgd (depends on libpng, so build/install that first):
+
+   CPPFLAGS="-isysroot /Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk -mmacosx-version-min=10.5" \
+     LDFLAGS="-Wl,-syslibroot,/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk -mmacosx-version-min=10.5 -arch i386" \
+     CFLAGS="-arch i386" CXXFLAGS="-arch i386" \
+     ./configure \
+     --disable-shared --disable-dependency-tracking \
+     --without-fontconfig --without-freetype --without-x \
+     --with-png=/usr/local
+   make
+   sudo make install
+
+- Build apcupsd
+
+   CPPFLAGS="-isysroot /Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk -mmacosx-version-min=10.5" \
+     LDFLAGS="-L/usr/local/lib -Wl,-syslibroot,/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX10.10.sdk -mmacosx-version-min=10.5 -arch i386" \
+     CFLAGS="-arch i386" CXXFLAGS="-arch i386" \
+     ./configure --sbindir=/usr/local/sbin \
+     --enable-usb --enable-cgi --enable-snmp --enable-modbus-usb
+   make
+
+- Build apcupsd binary package
+
+   cd platforms/darwin
+   sudo make apcupsd.pkg
+
+The resulting binary package is found in platforms/darwin/Apcupsd-<version>.dmg
