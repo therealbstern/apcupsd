@@ -18,8 +18,8 @@
  *
  * You should have received a copy of the GNU General Public
  * License along with this program; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA.
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1335, USA.
  */
 
 #ifndef __ALIST_H
@@ -41,6 +41,7 @@ private:
                  if (_next) _next->_prev = _prev; }
 
       operator T&() { return _elem; }
+      T& operator*() { return _elem; }
 
       void next(node *link) { link->_next = _next;
                               link->_prev = this;
@@ -78,7 +79,7 @@ public:
    T& last() { return *_tail; }
 
    bool empty() const { return _size <= 0; }
-   int size() const { return _size; }
+   unsigned int size() const { return _size; }
 
    T& append(const T& elem)
    {
@@ -151,6 +152,8 @@ public:
 
       T& operator*() { return *_node; }
       const T& operator*() const { return *_node; }
+      T* operator->() { return &(**_node); }
+      const T* operator->() const { return &(**_node); }
 
       bool operator==(const iterator &rhs) const { return _node == rhs._node; }
       bool operator!=(const iterator &rhs) const { return !(*this == rhs); }
@@ -194,10 +197,13 @@ public:
       return iter;
    }
 
+   T &front()             { return *_head; }
+   const T &front() const { return *_head; }
+
 private:
 
    node *_head, *_tail;
-   int _size;
+   unsigned int _size;
 };
 
 #endif

@@ -134,7 +134,7 @@ There are also pros and cons to purchasing third party batteries.
 **Third Party Battery Cons**
 
 - You will need to recycle your battery hardware (cables, connectors etc)
-- You will need to create your own battery cartridges (with doublesided tape)
+- You will need to create your own battery cartridges (with double-sided tape)
 - You will need to ensure the third party battery is the right physical size
 - You will need to ensure the third party battery is the right capacity
 - Use of a third party battery will void APC's Equipment Protection Policy
@@ -218,7 +218,7 @@ periods of time should be allowed to perform a run time calibration.
 time the UPS goes on battery. 
 
 When doing a runtime calibration with "older" batteries, APC Technical Support
-reoommend doing a complete discharge and recharge first.
+recommend doing a complete discharge and recharge first.
 
 If you have "dumb" UPS (aka simple signalling) like a Back-UPS, then your only 
 option is to do a manual runtime calibration.
@@ -245,7 +245,7 @@ For a "smart" or "smart signalling" Back-UPS Pro or Smart-UPS:
     utility power [suggest not disconnecting, but simply turning off
     utility power thereby preserving earthing].  Allow the unit to 
     run on battery until it turns off completely.  Make sure a 30% load 
-    is present! Plug the UPS back into the wall outlet [switch utilty 
+    is present! Plug the UPS back into the wall outlet [switch utility 
     power back on] and allow it to recharge (it will recharge more quickly
     turned off and with no load present). Once the unit has recharged,
     the "runtime remaining" calculation should be more accurate.
@@ -361,7 +361,7 @@ presumably for register 0, in the following table::
   SU2000              F1 F9 9F    FD
   SU450,700        28 F2 FA 96 07,RM=47  52.11.I
   SU450XL,700XL    28 EE F8 9F 700XL=27   51.9.I
-  SU1000           35 EF F9 A0    0B     60.11.I
+  SU1000,INET      35 EF F9 A0    0B     60.11.I
   SU1000XL         34 EE FC 9A    2B      61.9.I
   SU1400           35 EE FC 9A		 70.11.I
   SU1400RM         28 ED FA 89
@@ -370,6 +370,7 @@ presumably for register 0, in the following table::
   SU1400RMXLI3U    20 F3 FD 81            73.x.I
   SU2200I          35 EE FB AF           90.14.I
   SU2200XL,3000    35 EE FB AF 3000=17   90.14.I
+  SU3000NET                 96
   SU3000RMXLI3Ublk 35 F3 F4 AF    77     93.14.I
   SU5000I white    20 F2 FA 91    1F    110.14.I
   SU1400XL,XLI,RM  45 F6 E4 80

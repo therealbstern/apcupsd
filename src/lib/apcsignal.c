@@ -19,50 +19,51 @@
  *
  * You should have received a copy of the GNU General Public
  * License along with this program; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA.
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1335, USA.
  */
 
 #include "apc.h"
 
-/*********************************************************************/
-void init_timer(int timer, void (*fnhandler) (int))
-{
-   signal(SIGALRM, fnhandler);
-   alarm(timer);
-}
-
-/*********************************************************************/
 #ifndef HAVE_MINGW
+static void *terminate(void *arg)
+{
+   // Create signal set containing SIGHUP, SIGINT, and SIGTERM
+   sigset_t sigset;
+   sigemptyset(&sigset);
+   sigaddset(&sigset, SIGHUP);
+   sigaddset(&sigset, SIGINT);
+   sigaddset(&sigset, SIGTERM);
+
+   // Wait for signal delivery
+   int signum, err;
+   do
+   {
+      err = sigwait(&sigset, &signum);
+   }
+   while(err == EINTR);
+
+   // Caught a signal; invoke handler
+   void (*handler) (int) = (void (*) (int))arg;
+   handler(signum);
+   return NULL;
+}
+#endif
+
 void init_signals(void (*handler) (int))
 {
-   /* Set up signals. */
-   signal(SIGHUP, handler);
-   signal(SIGINT, handler);
-   signal(SIGTERM, handler);
-
-   /* Picked up via wait */
-   signal(SIGPIPE, SIG_IGN);
-}
-#endif
-
-/*********************************************************************/
-void restore_signals(void)
-{
 #ifndef HAVE_MINGW
-   signal(SIGALRM, SIG_DFL);
-   signal(SIGHUP, SIG_DFL);
-   signal(SIGINT, SIG_DFL);
-   signal(SIGTERM, SIG_DFL);
-   signal(SIGCHLD, SIG_DFL);
-   signal(SIGKILL, SIG_DFL);
-#endif
-}
+   // Block SIGPIPE and termination signals
+   sigset_t sigset;
+   sigemptyset(&sigset);
+   sigaddset(&sigset, SIGPIPE); // Don't care
+   sigaddset(&sigset, SIGHUP);  // Will be handled by terminate thread
+   sigaddset(&sigset, SIGINT);  // Will be handled by terminate thread
+   sigaddset(&sigset, SIGTERM); // Will be handled by terminate thread
+   pthread_sigmask(SIG_BLOCK, &sigset, NULL);
 
-/*********************************************************************/
-void sleep_forever(void)
-{
-   /* Hugly !!! */
-   for (;;)
-      sleep(1000);
+   // Launch thread to synchronously wait for termination signals
+   pthread_t tid;
+   pthread_create(&tid, NULL, terminate, (void*)handler);
+#endif
 }

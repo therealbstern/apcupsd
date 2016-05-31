@@ -1,0 +1,12 @@
+#!/bin/sh
+
+# Remove abandoned files from /sbin now that install goes to /usr/local/sbin
+rm -f /sbin/apcupsd
+rm -f /sbin/apcaccess
+rm -f /sbin/apctest
+rm -f /sbin/smtp
+rm -f /sbin/apcupsd-start
+rm -f /sbin/apcupsd-uninstall
+
+# Launch apcagent
+open $2/apcagent.app

@@ -18,63 +18,61 @@
  *
  * You should have received a copy of the GNU General Public
  * License along with this program; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA.
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1335, USA.
  */
 
 #ifndef _NET_H
 #define _NET_H
 
-#include "drivers.h"
-
 #define BIGBUF 4096
 
-class NetDriver: public UpsDriver
+class NetUpsDriver: public UpsDriver
 {
 public:
+   NetUpsDriver(UPSINFO *ups);
+   virtual ~NetUpsDriver() {}
 
-   NetDriver(UPSINFO *ups) : UpsDriver(ups, "net") {}
-   virtual ~NetDriver() {}
+   static UpsDriver *Factory(UPSINFO *ups)
+      { return new NetUpsDriver(ups); }
 
-   // Subclasses must implement these methods
+   virtual bool get_capabilities();
+   virtual bool read_volatile_data();
+   virtual bool read_static_data();
+   virtual bool check_state();
    virtual bool Open();
-   virtual bool GetCapabilities();
-   virtual bool ReadVolatileData();
-   virtual bool ReadStaticData();
-   virtual bool CheckState();
    virtual bool Close();
-
-   // We provide default do-nothing implementations
-   // for these methods since not all drivers need them.
-   virtual bool EntryPoint(int command, void *data);
+   virtual bool entry_point(int command, void *data);
 
 private:
 
-   static SelfTestResult decode_testresult(char* str);
-   static LastXferCause decode_lastxfer(char *str);
-
-   bool initialize_device_data();
    bool getupsvar(const char *request, char *answer, int anslen);
    bool poll_ups();
    bool fill_status_buffer();
    bool get_ups_status_flag(int fill);
 
-   static const struct cmdtrans {
+   static SelfTestResult decode_testresult(char* str);
+   static LastXferCause decode_lastxfer(char *str);
+
+   struct CmdTrans {
       const char *request;
       const char *upskeyword;
       int nfields;
-   } _cmdtrans[];
+   };
+   static const CmdTrans cmdtrans[];
 
    char _device[MAXSTRING];
    char *_hostname;
    int _port;
-   int _sockfd;
-   int _got_caps;
-   int _got_static_data;
+   sock_t _sockfd;
+   bool _got_caps;
+   bool _got_static_data;
    time_t _last_fill_time;
    char _statbuf[BIGBUF];
    int _statlen;
-   bool _comm_loss;
+   time_t _tlog;
+   bool _comm_err;
+   int _comm_loss;
 };
 
 #endif   /* _NET_H */

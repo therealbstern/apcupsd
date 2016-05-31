@@ -19,49 +19,12 @@
  *
  * You should have received a copy of the GNU General Public
  * License along with this program; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA.
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1335, USA.
  */
 
 #ifndef _DRIVERS_H
 #define _DRIVERS_H
-
-#include "athread.h"
-
-// Forward declaration
-class UPSINFO;
-
-// Base class for UPS drivers. Driver implementations inherit
-// from this class and override appropriate methods as needed.
-class UpsDriver: public athread
-{
-public:
-   UpsDriver(UPSINFO *ups, const char *name)
-      : driver_name(name), _ups(ups) {}
-   virtual ~UpsDriver() {}
-
-   // Subclasses must implement these methods
-   virtual bool Open() = 0;
-   virtual bool GetCapabilities() = 0;
-   virtual bool ReadVolatileData() = 0;
-   virtual bool ReadStaticData() = 0;
-   virtual bool CheckState() = 0;
-   virtual bool Close() = 0;
-
-   // We provide default do-nothing implementations
-   // for these methods since not all drivers need them.
-   virtual bool KillPower()                                  { return false; }
-   virtual bool Shutdown()                                   { return false; }
-   virtual bool Setup()                                      { return true;  }
-   virtual bool ProgramEeprom(int command, const char *data) { return false; }
-   virtual bool EntryPoint(int command, void *data)          { return false; }
-
-   const char *driver_name;
-
-protected:
-
-   UPSINFO *_ups;
-};
 
 /*
  * This is the generic drivers structure. It contain any routine needed for
@@ -109,7 +72,7 @@ protected:
  *   This function always returns.
  *   This function must lock the UPSINFO structure.
  *
- * ups_program_eeprom(ups, command, data)
+ * program_eeprom(ups, command, data)
  *   Commit changes to the internal UPS eeprom.
  *   This function performs the eeprom change command (using data),
  *     then returns.
@@ -127,65 +90,62 @@ protected:
  *  function that does not understand.
  */
 
-/* Some defines that helps code readability. */
-#define device_open(ups) \
-   do { \
-      if (ups->driver) ups->driver->Open(); \
-   } while(0)
-#define device_setup(ups) \
-   do { \
-      if (ups->driver) ups->driver->Setup(); \
-   } while(0)
-#define device_close(ups) \
-   do { \
-      if (ups->driver) ups->driver->Close(); \
-   } while(0)
-#define device_kill_power(ups) \
-   do { \
-      if (ups->driver) ups->driver->KillPower(); \
-   } while(0)
-#define device_shutdown(ups) \
-   do { \
-      if (ups->driver) ups->driver->Shutdown(); \
-   } while(0)
-#define device_read_static_data(ups) \
-   do { \
-      if (ups->driver) ups->driver->ReadStaticData(); \
-   } while(0)
-#define device_read_volatile_data(ups) \
-   do { \
-      if (ups->driver) ups->driver->ReadVolatileData(); \
-   } while(0)
-#define device_get_capabilities(ups) \
-   do { \
-      if (ups->driver) ups->driver->GetCapabilities(); \
-   } while(0)
-#define device_check_state(ups) \
-   do { \
-      if (ups->driver) ups->driver->CheckState(); \
-   } while(0)
-#define device_program_eeprom(ups, command, data) \
-   do { \
-      if (ups->driver) ups->driver->ProgramEeprom(command, data); \
-   } while(0)
-#define device_entry_point(ups, command, data) \
-   do { \
-      if (ups->driver) ups->driver->EntryPoint(command, data); \
-   } while(0)
+class UpsDriver
+{
+public:
+   UpsDriver(UPSINFO *ups) : _ups(ups) {}
+   virtual ~UpsDriver() {}
 
-/* For device_entry_point commands. */
-enum {
-   /* Dumb entry points. */
-   DEVICE_CMD_DTR_ENABLE,
-   DEVICE_CMD_DTR_ST_DISABLE,
+   virtual bool Open() = 0;
+   virtual bool Close() = 0;
+   virtual bool read_static_data() = 0;
+   virtual bool read_volatile_data() = 0;
+   virtual bool get_capabilities() = 0;
+   virtual bool check_state() = 0;
 
-   /* Smart entry points. */
-   DEVICE_CMD_GET_SELFTEST_MSG,
-   DEVICE_CMD_CHECK_SELFTEST,
-   DEVICE_CMD_SET_DUMB_MODE
+   virtual bool setup()          { return true;  }
+   virtual bool kill_power()     { return false; }
+   virtual bool shutdown()       { return false; }
+
+   virtual bool program_eeprom(int cmd, const char *data) { return false; }
+   virtual bool entry_point(int cmd, void *data)          { return false; }
+
+protected:
+   UPSINFO *_ups;
 };
 
+typedef struct upsdriver {
+   const char *driver_name;
+   UpsDriver *(* factory) (UPSINFO *ups);
+} UPSDRIVER;
+
+
+/* Some defines that helps code readability. */
+#define device_open(ups) ups->driver->Open()
+#define device_setup(ups) ups->driver->setup()
+#define device_close(ups) ups->driver->Close()
+#define device_kill_power(ups) ups->driver->kill_power()
+#define device_shutdown(ups) ups->driver->shutdown()
+#define device_read_static_data(ups) ups->driver->read_static_data()
+#define device_read_volatile_data(ups) ups->driver->read_volatile_data()
+#define device_get_capabilities(ups) ups->driver->get_capabilities()
+#define device_check_state(ups) ups->driver->check_state()
+#define device_program_eeprom(ups, command, data) ups->driver->program_eeprom(command, data)
+#define device_entry_point(ups, command, data) ups->driver->entry_point(command, data)
+
+/* Now some defines for device_entry_point commands. */
+
+/* Dumb entry points. */
+#define DEVICE_CMD_DTR_ENABLE       0x00
+#define DEVICE_CMD_DTR_ST_DISABLE   0x01
+
+/* Smart entry points. */
+#define DEVICE_CMD_GET_SELFTEST_MSG 0x02
+#define DEVICE_CMD_CHECK_SELFTEST   0x03
+#define DEVICE_CMD_SET_DUMB_MODE    0x04
+
 /* Support routines. */
-void attach_driver(UPSINFO *ups);
+UpsDriver *attach_driver(UPSINFO *ups);
+
 
 #endif /*_DRIVERS_H */

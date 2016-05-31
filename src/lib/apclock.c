@@ -21,8 +21,8 @@
  *
  * You should have received a copy of the GNU General Public
  * License along with this program; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA.
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1335, USA.
  */
 
 #include "apc.h"
@@ -37,7 +37,7 @@
  * If so, and the process is no longer running,
  * blow away the lockfile.  
  */
-#if  !defined(HAVE_WIN32)
+#if  !defined(HAVE_MINGW)
 static int check_stale_lockfile(UPSINFO *ups)
 {
    char pidbuffer[12];
@@ -62,7 +62,7 @@ static int check_stale_lockfile(UPSINFO *ups)
    }
 
    errno = 0;
-   if ((ups->lockfile = open(ups->lockpath, O_RDONLY)) < 0) {
+   if ((ups->lockfile = open(ups->lockpath, O_RDONLY|O_CLOEXEC)) < 0) {
       /*
        * Cannot open the file (may be it doesn't exist and that's okay
        * for us so return success).
@@ -153,7 +153,7 @@ int hibernate_ups = FALSE;
 int shutdown_ups = FALSE;
 int create_lockfile(UPSINFO *ups)
 {
-#if !defined(HAVE_WIN32)
+#if !defined(HAVE_MINGW)
    char pidbuffer[12];
    int error;
 
@@ -187,7 +187,7 @@ int create_lockfile(UPSINFO *ups)
     * Open it for creation and don't accept any kind of error.
     */
    errno = 0;
-   if ((ups->lockfile = open(ups->lockpath, O_CREAT | O_EXCL | O_RDWR, 0644)) < 0) {
+   if ((ups->lockfile = open(ups->lockpath, O_CREAT | O_EXCL | O_RDWR | O_CLOEXEC, 0644)) < 0) {
       /*
        * Okay there is some problem with the lock path or
        * something like that.
@@ -230,7 +230,7 @@ int create_lockfile(UPSINFO *ups)
 
 void delete_lockfile(UPSINFO *ups)
 {
-#if !defined(HAVE_WIN32)
+#if !defined(HAVE_MINGW)
    if (ups->lockpath[0] != '\0') {
       /*
        * If lockfile is ours, close it and delete it,

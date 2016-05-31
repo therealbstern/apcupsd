@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Label</key>
+	<string>org.apcupsd.apcupsd</string>
+	<key>UserName</key>
+	<string>root</string>
+	<key>GroupName</key>
+	<string>wheel</string>
+	<key>Program</key>
+	<string>@sbindir@/apcupsd-start</string>
+	<key>ProgramArguments</key>
+	<array>
+		<string>/bin/sh</string>
+		<string>-f/etc/apcupsd/apcupsd.conf</string>
+		<string>-b</string>
+	</array>
+	<key>KeepAlive</key>
+	<false/>
+	<key>RunAtLoad</key>
+	<true/>
+</dict>
+</plist>

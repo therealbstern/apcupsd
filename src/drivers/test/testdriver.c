@@ -18,16 +18,21 @@
  *
  * You should have received a copy of the GNU General Public
  * License along with this program; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA.
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1335, USA.
  */
 
 #include "apc.h"
 #include "testdriver.h"
 
+TestUpsDriver::TestUpsDriver(UPSINFO *ups) :
+   UpsDriver(ups)
+{
+}
+
 /*
  */
-bool TestDriver::open_test_device()
+bool TestUpsDriver::open_test_device()
 {
    _ups->fd = 1;
    return true;
@@ -37,28 +42,27 @@ bool TestDriver::open_test_device()
 /*
  * Read UPS events. I.e. state changes.
  */
-bool TestDriver::CheckState()
+bool TestUpsDriver::check_state()
 {
-   sleep(_ups->wait_time);
    return true;
 }
 
 /*
  * Open test port
  */
-bool TestDriver::Open()
+bool TestUpsDriver::Open()
 {
    write_lock(_ups);
 
    if (!open_test_device())
-      Error_abort1(_("Cannot open UPS device %s\n"), _ups->device);
+      Error_abort("Cannot open UPS device %s\n", _ups->device);
 
    _ups->clear_slave();
    write_unlock(_ups);
    return true;
 }
 
-bool TestDriver::Close()
+bool TestUpsDriver::Close()
 {
    write_lock(_ups);
    
@@ -72,10 +76,12 @@ bool TestDriver::Close()
 /*
  * Setup capabilities structure for UPS
  */
-bool TestDriver::GetCapabilities()
+bool TestUpsDriver::get_capabilities()
 {
+   int k;
+
    write_lock(_ups);
-   for (int k = 0; k <= CI_MAX_CAPS; k++)
+   for (k = 0; k <= CI_MAX_CAPS; k++)
       _ups->UPS_Cap[k] = TRUE;
 
    write_unlock(_ups);
@@ -88,15 +94,15 @@ bool TestDriver::GetCapabilities()
  *
  * This routine is called once when apcupsd is starting
  */
-bool TestDriver::ReadStaticData()
+bool TestUpsDriver::read_static_data()
 {
    write_lock(_ups);
    /* UPS_NAME */
 
    /* model, firmware */
-   astrncpy(_ups->upsmodel, "Test Driver", sizeof(_ups->upsmodel));
-   astrncpy(_ups->firmrev, "Rev 1.0", sizeof(_ups->firmrev));
-   astrncpy(_ups->selftest, "336", sizeof(_ups->selftest));
+   strlcpy(_ups->upsmodel, "Test Driver", sizeof(_ups->upsmodel));
+   strlcpy(_ups->firmrev, "Rev 1.0", sizeof(_ups->firmrev));
+   strlcpy(_ups->selftest, "336", sizeof(_ups->selftest));
 
    /* WAKEUP_DELAY */
    _ups->dwake = 2 * 60;
@@ -117,13 +123,13 @@ bool TestDriver::ReadStaticData()
    _ups->dlowbatt = 2;
 
    /* UPS_MANUFACTURE_DATE */
-   astrncpy(_ups->birth, "2001-09-21", sizeof(_ups->birth));
+   strlcpy(_ups->birth, "2001-09-21", sizeof(_ups->birth));
 
    /* Last UPS_BATTERY_REPLACE */
-   astrncpy(_ups->battdat, "2001-09-21", sizeof(_ups->battdat));
+   strlcpy(_ups->battdat, "2001-09-21", sizeof(_ups->battdat));
 
    /* UPS_SERIAL_NUMBER */
-   astrncpy(_ups->serial, "NO-123456", sizeof(_ups->serial));
+   strlcpy(_ups->serial, "NO-123456", sizeof(_ups->serial));
 
    /* Nominal output voltage when on batteries */
    _ups->NomOutputVoltage = 230;
@@ -141,7 +147,7 @@ bool TestDriver::ReadStaticData()
  * This routine is called once every 5 seconds to get
  * a current idea of what the UPS is doing.
  */
-bool TestDriver::ReadVolatileData()
+bool TestUpsDriver::read_volatile_data()
 {
    /* save time stamp */
    time(&_ups->poll_time);

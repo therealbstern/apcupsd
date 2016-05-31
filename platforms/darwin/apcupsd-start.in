@@ -1,0 +1,6 @@
+#!/bin/sh
+
+rm -f /etc/apcupsd/powerfail
+rm -f /etc/nologin
+
+@sbindir@/apcupsd $@

@@ -5,11 +5,9 @@
 # restores contact with the UPS (i.e. the serial connection is restored).
 # We send an email message to root to notify him.
 #
-SYSADMIN=root
-APCUPSD_MAIL="@APCUPSD_MAIL@"
 
 HOSTNAME=`hostname`
-MSG="$HOSTNAME Communications with UPS restored"
+MSG="$HOSTNAME Communications with UPS $1 restored"
 #
 (
    echo "Subject: $MSG"

@@ -20,35 +20,49 @@
  *
  * You should have received a copy of the GNU General Public
  * License along with this program; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA.
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1335, USA.
  */
 
 #include "apc.h"
 #include "dumb.h"
 
+DumbUpsDriver::DumbUpsDriver(UPSINFO *ups) :
+   UpsDriver(ups),
+   _sp_flags(0)
+{
+   memset(&_oldtio, 0, sizeof(_oldtio));
+   memset(&_newtio, 0, sizeof(_newtio));
+}
+
 /*
  * This is the first routine called in the driver, and it is only
  * called once.
  */
-bool DumbDriver::Open()
+bool DumbUpsDriver::Open()
 {
-   int cmd;
+   char *opendev = _ups->device;
 
-   _sp_flags = 0;
-   _debounce = 0;
+#ifdef HAVE_MINGW
+   // On Win32 add \\.\ UNC prefix to COMx in order to correctly address
+   // ports >= COM10.
+   char device[MAXSTRING];
+   if (!strnicmp(_ups->device, "COM", 3)) {
+      snprintf(device, sizeof(device), "\\\\.\\%s", _ups->device);
+      opendev = device;
+   }
+#endif
 
-   if ((_ups->fd = open(_ups->device, O_RDWR | O_NOCTTY | O_NDELAY)) < 0)
-      Error_abort2(_("Cannot open UPS port %s: %s\n"), _ups->device, strerror(errno));
+   if ((_ups->fd = open(opendev, O_RDWR | O_NOCTTY | O_NDELAY | O_CLOEXEC)) < 0)
+      Error_abort("Cannot open UPS port %s: %s\n", opendev, strerror(errno));
 
    /* Cancel the no delay we just set */
-   cmd = fcntl(_ups->fd, F_GETFL, 0);
+   int cmd = fcntl(_ups->fd, F_GETFL, 0);
    fcntl(_ups->fd, F_SETFL, cmd & ~O_NDELAY);
 
    /* Save old settings */
    tcgetattr(_ups->fd, &_oldtio);
 
-   memset(&_newtio, 0, sizeof(_newtio));
    _newtio.c_cflag = DEFAULT_SPEED | CS8 | CLOCAL | CREAD;
    _newtio.c_iflag = IGNPAR;    /* Ignore errors, raw input */
    _newtio.c_oflag = 0;         /* Raw output */
@@ -76,13 +90,13 @@ bool DumbDriver::Open()
 
    _ups->clear_slave();
 
-   return true;
+   return 1;
 }
 
 /*
  * This is the last routine called in the driver
  */
-bool DumbDriver::Close()
+bool DumbUpsDriver::Close()
 {
    int rts_bit = TIOCM_RTS;
    int st_bit = TIOCM_ST;
@@ -127,10 +141,10 @@ bool DumbDriver::Close()
    close(_ups->fd);
    _ups->fd = -1;
 
-   return true;
+   return 1;
 }
 
-bool DumbDriver::Setup()
+bool DumbUpsDriver::setup()
 {
    int serial_bits = 0;
 
@@ -176,5 +190,5 @@ bool DumbDriver::Setup()
       break;
    }
 
-   return true;
+   return 1;
 }

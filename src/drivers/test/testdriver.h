@@ -18,28 +18,27 @@
  *
  * You should have received a copy of the GNU General Public
  * License along with this program; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA.
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1335, USA.
  */
 
 #ifndef _TESTDRIVER_H
 #define _TESTDRIVER_H
 
-#include "drivers.h"
-
-class TestDriver: public UpsDriver
+class TestUpsDriver: public UpsDriver
 {
 public:
+   TestUpsDriver(UPSINFO *ups);
+   virtual ~TestUpsDriver() {}
 
-   TestDriver(UPSINFO *ups) : UpsDriver(ups, "test") {}
-   virtual ~TestDriver() {}
+   static UpsDriver *Factory(UPSINFO *ups)
+      { return new TestUpsDriver(ups); }
 
-   // Subclasses must implement these methods
+   virtual bool get_capabilities();
+   virtual bool read_volatile_data();
+   virtual bool read_static_data();
+   virtual bool check_state();
    virtual bool Open();
-   virtual bool GetCapabilities();
-   virtual bool ReadVolatileData();
-   virtual bool ReadStaticData();
-   virtual bool CheckState();
    virtual bool Close();
 
 private:

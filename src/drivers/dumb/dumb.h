@@ -16,41 +16,36 @@
  *
  * You should have received a copy of the GNU General Public
  * License along with this program; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA.
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1335, USA.
  */
 
 #ifndef _DUMB_H
 #define _DUMB_H
 
-#include "drivers.h"
-
-class DumbDriver: public UpsDriver
+class DumbUpsDriver: public UpsDriver
 {
 public:
+   DumbUpsDriver(UPSINFO *ups);
+   virtual ~DumbUpsDriver() {}
 
-   DumbDriver(UPSINFO *ups) : UpsDriver(ups, "dumb") {}
-   virtual ~DumbDriver() {}
+   static UpsDriver *Factory(UPSINFO *ups)
+      { return new DumbUpsDriver(ups); }
 
-   // Subclasses must implement these methods
+   virtual bool get_capabilities();
+   virtual bool read_volatile_data();
+   virtual bool read_static_data();
+   virtual bool kill_power();
+   virtual bool check_state() { return read_volatile_data(); }
    virtual bool Open();
-   virtual bool GetCapabilities();
-   virtual bool ReadVolatileData();
-   virtual bool ReadStaticData() { return true; }
-   virtual bool CheckState() { return ReadVolatileData(); }
    virtual bool Close();
-
-   // Optional methods
-   virtual bool KillPower();
-   virtual bool Setup();
-   virtual bool EntryPoint(int command, void *data);
+   virtual bool setup();
+   virtual bool entry_point(int command, void *data);
 
 private:
-
+   int _sp_flags;                   /* Serial port flags */
    struct termios _oldtio;
    struct termios _newtio;
-   int _sp_flags;                  /* Serial port flags */
-   time_t _debounce;               /* last event time for debounce */
 };
 
 #endif   /* _DUMB_H */

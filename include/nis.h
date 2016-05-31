@@ -16,9 +16,11 @@
  *
  * You should have received a copy of the GNU General Public
  * License along with this program; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA.
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1335, USA.
  */
+
+#include "defines.h"
 
 /* 
  * Receive a message from the other end. Each message consists of
@@ -29,7 +31,7 @@
  * Returns 0 on end of file
  * Returns -1 on error
  */
-int net_recv(int sockfd, char *buff, int maxlen);
+int net_recv(sock_t sockfd, char *buff, int maxlen);
 
 /*
  * Send a message over the network. The send consists of
@@ -39,7 +41,7 @@ int net_recv(int sockfd, char *buff, int maxlen);
  * Returns number of bytes sent
  * Returns -1 on error
  */
-int net_send(int sockfd, const char *buff, int len);
+int net_send(sock_t sockfd, const char *buff, int len);
 
 /*     
  * Open a TCP connection to the UPS network server
@@ -47,10 +49,10 @@ int net_send(int sockfd, const char *buff, int len);
  * Returns -1 on error
  * Returns socket file descriptor otherwise
  */
-int net_open(const char *host, char *service, int port);
+sock_t net_open(const char *host, char *service, int port);
 
 /* Close the network connection */
-void net_close(int sockfd);
+void net_close(sock_t sockfd);
 
 /* Wait for and accept a new TCP connection */
-int net_accept(int fd, struct sockaddr_in *cli_addr);
+sock_t net_accept(sock_t fd, struct sockaddr_in *cli_addr);

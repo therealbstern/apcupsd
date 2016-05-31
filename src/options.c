@@ -20,8 +20,8 @@
  *
  * You should have received a copy of the GNU General Public
  * License along with this program; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA.
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1335, USA.
  */
 
 #include "apc.h"
@@ -67,7 +67,7 @@ extern bool trace;
 
 static void print_usage(char *argv[])
 {
-   printf(_("usage: apcupsd [options]\n"
+   printf("usage: apcupsd [options]\n"
          "  Options are as follows:\n"
          "  -b,                           don't go into background\n"
          "  -d, --debug <level>           set debug level (>0)\n"
@@ -92,7 +92,7 @@ static void print_usage(char *argv[])
          "under the terms of the GNU General Public License\n"
          "\n"
          "Report bugs to apcupsd Support Center:\n"
-         "  apcupsd-users@lists.sourceforge.net\n"));
+         "  apcupsd-users@lists.sourceforge.net\n");
 }
 
 int parse_options(int argc, char *argv[])
@@ -190,13 +190,13 @@ int parse_options(int argc, char *argv[])
    }
 
 /* Win32-specific dynamic path handling... */
-#ifdef HAVE_WIN32
+#ifdef HAVE_MINGW
    extern char sbindir[MAXSTRING];
 
    /* Obtain full path to this executable */
    DWORD len = GetModuleFileName(NULL, sbindir, sizeof(sbindir)-1);
    sbindir[len] = '\0';
-   Dmsg1(200, "Exepath: %s\n", sbindir);
+   Dmsg(200, "Exepath: %s\n", sbindir);
    if (len == 0) {
       /* Failed to get path, so make an assumption */
       asnprintf(sbindir, sizeof(sbindir), "C:\\apcupsd\\bin\\apcupsd.exe");
@@ -221,7 +221,7 @@ int parse_options(int argc, char *argv[])
 #endif
 
    if ((oneshot == TRUE) && options > 1) {
-      fprintf(stderr, _("\nError: too many arguments.\n\n"));
+      fprintf(stderr, "\nError: too many arguments.\n\n");
       errflag++;
    }
 

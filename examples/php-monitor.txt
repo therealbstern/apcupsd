@@ -4,7 +4,7 @@ From: Rob Kroll <rob@killerbob.ca>
 To: Gerry Kroll <g.kroll@keldine.ca>
 CC: Kern Sibbald <kern@sibbald.com>,
  gkroll@killerbob.ca,
- Adam Kropelin <akropel1@rochester.rr.com>
+ Adam Kropelin <adam@kroptech.com>
 Subject: Re: apcupsd
 
 And here it is again, with a logic fix and some handling for events I 

@@ -19,24 +19,18 @@
  *
  * You should have received a copy of the GNU General Public
  * License along with this program; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA.
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1335, USA.
  */
 
 #include "apc.h"
 
-#if !defined(HAVE_LOCALTIME_R)
+#if !defined(HAVE_LOCALTIME_R) && !defined(localtime_r)
 
 struct tm *localtime_r(const time_t *timep, struct tm *tm)
 {
-   static pthread_mutex_t mutex;
-   static int first = 1;
+   static pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
    struct tm *ltm;
-
-   if (first) {
-      pthread_mutex_init(&mutex, NULL);
-      first = 0;
-   }
 
    P(mutex);
 

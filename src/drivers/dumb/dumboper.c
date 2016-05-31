@@ -20,14 +20,14 @@
  *
  * You should have received a copy of the GNU General Public
  * License along with this program; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA.
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1335, USA.
  */
 
 #include "apc.h"
 #include "dumb.h"
 
-bool DumbDriver::KillPower()
+bool DumbUpsDriver::kill_power()
 {
    int serial_bits = 0;
 
@@ -69,28 +69,27 @@ bool DumbDriver::KillPower()
       (void)ioctl(_ups->fd, TIOCMBIS, &serial_bits);
       sleep(10);                   /* hold */
       break;
-
-   case CUSTOM_SMART:
-   case APC_940_0024B:
-   case APC_940_0024C:
-   case APC_940_1524C:
-   case APC_940_0024G:
-   case APC_NET:
-   default:
-      break;
    }
-   return true;
+   return 1;
+}
+
+/*
+ * Dumb UPSes don't have static UPS data.
+ */
+bool DumbUpsDriver::read_static_data()
+{
+   return 1;
 }
 
 /*
  * Set capabilities.
  */
-bool DumbDriver::GetCapabilities()
+bool DumbUpsDriver::get_capabilities()
 {
    /* We create a Status word */
    _ups->UPS_Cap[CI_STATUS] = TRUE;
 
-   return true;
+   return 1;
 }
 
 /*
@@ -101,10 +100,9 @@ bool DumbDriver::GetCapabilities()
  * unless we are in a FastPoll situation, otherwise, we burn
  * too much CPU.
  */
-bool DumbDriver::ReadVolatileData()
+bool DumbUpsDriver::read_volatile_data()
 {
-   bool stat = true;
-   bool BattFail = false;
+   int stat = 1;
 
    /*
     * We generally poll a bit faster because we do 
@@ -118,19 +116,6 @@ bool DumbDriver::ReadVolatileData()
    write_lock(_ups);
 
    ioctl(_ups->fd, TIOCMGET, &_sp_flags);
-
-   switch (_ups->mode.type) {
-   case BK:
-   case SHAREBASIC:
-      if (_sp_flags & TIOCM_DTR) {
-         BattFail = true;
-      } else {
-         BattFail = false;
-      }
-      break;
-   default:
-      break;
-   }
 
    switch (_ups->cable.type) {
    case CUSTOM_SIMPLE:
@@ -231,29 +216,16 @@ bool DumbDriver::ReadVolatileData()
       }
 
       break;
-
-   case CUSTOM_SMART:
-   case APC_940_0024B:
-   case APC_940_0024C:
-   case APC_940_1524C:
-   case APC_940_0024G:
-   case APC_NET:
-   default:
-      stat = false;
    }
 
-   if (_ups->is_onbatt() && BattFail) {
-      _ups->set_replacebatt();
-   } else {
-      _ups->clear_replacebatt();
-   }
+   _ups->clear_replacebatt();
 
    write_unlock(_ups);
 
    return stat;
 }
 
-bool DumbDriver::EntryPoint(int command, void *data)
+bool DumbUpsDriver::entry_point(int command, void *data)
 {
    int serial_bits = 0;
 
@@ -288,7 +260,8 @@ bool DumbDriver::EntryPoint(int command, void *data)
       }
       break;
    default:
-      return false;
+      return 0;
+      break;
    }
-   return true;
+   return 1;
 }

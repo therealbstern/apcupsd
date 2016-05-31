@@ -16,24 +16,26 @@
 #include <signal.h>
 #include <pthread.h>
 #include <errno.h>
-#include "defines.h"
 
 // Apcupsd UNIX main entrypoint
 extern int ApcupsdMain(int argc, char **argv);
 
 // Custom headers
+#include "apcconfig.h"
 #include "winups.h"
 #include "winservice.h"
 #include "compat.h"
+#include "defines.h"
+#include "winapi.h"
 
 // Standard command-line flag definitions
-#define ApcupsdRunService        "/service"
-#define ApcupsdRunAsUserApp      "/run"
-#define ApcupsdInstallService    "/install"
-#define ApcupsdRemoveService     "/remove"
-#define ApcupsdKillRunningCopy   "/kill"
-#define ApcupsdShowHelp          "/help"
-#define ApcupsdQuiet             "/quiet"
+char ApcupsdRunService[] =        "/service";
+char ApcupsdRunAsUserApp[] =      "/run";
+char ApcupsdInstallService[] =    "/install";
+char ApcupsdRemoveService[] =     "/remove";
+char ApcupsdKillRunningCopy[] =   "/kill";
+char ApcupsdShowHelp[] =          "/help";
+char ApcupsdQuiet[] =             "/quiet";
 
 // Usage string
 static const char *ApcupsdUsageText =
@@ -44,7 +46,8 @@ static HINSTANCE hAppInstance;
 
 // Command line argument storage
 #define MAX_COMMAND_ARGS 100
-static char *command_args[MAX_COMMAND_ARGS] = { "apcupsd", NULL };
+static char apcupsd_name[] = "apcupsd";
+static char *command_args[MAX_COMMAND_ARGS] = { apcupsd_name, NULL };
 static int num_command_args = 1;
 static char *winargs[MAX_COMMAND_ARGS];
 static int num_winargs = 0;
@@ -57,7 +60,6 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
    bool quiet = false;
 
    InitWinAPIWrapper();
-   WSA_Init();
 
    // Save the application instance and main thread id
    hAppInstance = hInstance;
@@ -130,6 +132,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance,
                  MB_OK | MB_ICONINFORMATION);
       return 1;
    }
+   return 0;
 }
 
 // Callback for processing Windows messages
@@ -190,6 +193,7 @@ void *ApcupsdMain(LPVOID lpwThreadParam)
 
    // In case apcupsd returns, terminate application
    ApcupsdTerminate();
+   return NULL;
 }
 
 // This thread runs on Windows 2000 and higher. It monitors for the
@@ -201,7 +205,8 @@ DWORD WINAPI EventThread(LPVOID param)
    // Create global exit event and allow Adminstrator access to it so any
    // member of the Administrators group can signal it.
    exitevt = CreateEvent(NULL, TRUE, FALSE, APCUPSD_STOP_EVENT_NAME);
-   GrantAccess(exitevt, EVENT_MODIFY_STATE, TRUSTEE_IS_GROUP, "Administrators");
+   TCHAR name[] = "Administrators";
+   GrantAccess(exitevt, EVENT_MODIFY_STATE, TRUSTEE_IS_GROUP, name);
 
    // Wait for event to be signaled
    while (runthread)
@@ -257,7 +262,7 @@ static void WaitForExit()
       return;
 
    // On Win2K and above we spawn a thread to watch for exit requests.
-   HANDLE evtthread;
+   HANDLE evtthread = NULL;
    if (g_os_version >= WINDOWS_2000) {
       runthread = true;
       evtthread = CreateThread(NULL, 0, EventThread, NULL, 0, NULL);

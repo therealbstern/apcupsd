@@ -18,15 +18,14 @@
  *
  * You should have received a copy of the GNU General Public
  * License along with this program; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA.
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1335, USA.
  */
 
 #include "amutex.h"
 #include "autil.h"
 
 const char *amutex::DEFAULT_NAME = "unnamed_mutex";
-const int amutex::TIMEOUT_FOREVER = -1;
 
 amutex::amutex(const char *name, bool recursive)
    : _name(name)
@@ -42,17 +41,4 @@ amutex::amutex(const char *name, bool recursive)
 amutex::~amutex()
 {
    pthread_mutex_destroy(&_mutex);
-}
-
-bool amutex::lock(int msec)
-{
-   if (msec == TIMEOUT_FOREVER)
-   {
-      lock();
-      return true;
-   }
-
-   struct timespec abstime;
-   calc_abstimeout(msec, &abstime);
-   return pthread_mutex_timedlock(&_mutex, &abstime) == 0;
 }

@@ -5,11 +5,9 @@
 # loses contact with the UPS (i.e. the serial connection is not responding).
 # We send an email message to root to notify him.
 #
-SYSADMIN=root
-APCUPSD_MAIL="@APCUPSD_MAIL@"
 
 HOSTNAME=`hostname`
-MSG="$HOSTNAME Communications with UPS lost"
+MSG="$HOSTNAME Communications with UPS $1 lost"
 #
 (
    echo "Subject: $MSG"

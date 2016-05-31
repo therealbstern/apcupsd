@@ -18,13 +18,12 @@
  *
  * You should have received a copy of the GNU General Public
  * License along with this program; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA.
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1335, USA.
  */
 
 #include "autil.h"
 #include "apc.h"
-#include <sys/time.h>
 
 void calc_abstimeout(int msec, struct timespec *abstime)
 {

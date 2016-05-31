@@ -1,7 +1,0 @@
-{
-   Description     = "APC UPS monitoring";
-   Provides        = ("APC UPS monitor");
-   Requires        = ("Disks", "SecurityServer", "Network");
-   OrderPreference = "Late";
-}
-

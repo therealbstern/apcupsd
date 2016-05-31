@@ -18,8 +18,8 @@
  *
  * You should have received a copy of the GNU General Public
  * License along with this program; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA.
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1335, USA.
  */
 
 #include "apc.h"
@@ -60,7 +60,7 @@ int trim_eventfile(UPSINFO *ups)
 
    /* Read the desired number of bytes from end of file */
    if (lseek(ups->event_fd, -maxb, SEEK_END) < 0) {
-      log_event(ups, LOG_CRIT, _("lseek failed in trim_eventfile."));
+      log_event(ups, LOG_CRIT, "lseek failed in trim_eventfile.");
       goto trim_done;
    }
 
@@ -104,7 +104,7 @@ trim_done:
    free(buf);
 
    if (rwerror)
-      log_event(ups, LOG_CRIT, _("read/write failed in trim_eventfile."));
+      log_event(ups, LOG_CRIT, "read/write failed in trim_eventfile.");
 
    return status;
 }

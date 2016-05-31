@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<installer-gui-script minSpecVersion="1">
+    <title>Apcupsd</title>
+    <welcome file="Welcome.txt" mime-type="text/plain"/>
+    <license file="COPYING" mime-type="text/plain"/>
+    <readme file="ReleaseNotes" mime-type="text/plain"/>
+    <conclusion file="Conclusion.txt" mime-type="text/plain"/>
+    <domains enable_anywhere="false" enable_currentUserHome="false" enable_localSystem="true"/> 
+    <pkg-ref id="apcupsd" onConclusion="RequireRestart" auth="root">apcupsd.pkg</pkg-ref>
+    <pkg-ref id="apcagent" auth="root">apcagent.pkg</pkg-ref>
+    <pkg-ref id="apcagent">
+        <must-close>
+            <app id="com.apcupsd.apcagent"/>
+        </must-close>
+    </pkg-ref>
+    <options customize="allow" require-scripts="false" hostArchitectures="i386"/>
+    <choices-outline>
+        <line choice="apcupsd"/>
+        <line choice="apcagent"/>
+    </choices-outline>
+    <choice id="apcupsd" visible="true" title="Apcupsd" description="Apcupsd daemon">
+        <pkg-ref id="apcupsd"/>
+    </choice>
+    <choice id="apcagent" visible="true" title="Apcagent" description="Apcagent menubar status app">
+        <pkg-ref id="apcagent"/>
+    </choice>
+</installer-gui-script>

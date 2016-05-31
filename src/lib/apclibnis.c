@@ -2,18 +2,11 @@
  * apclibnis.c
  *
  * Network utility routines.
- *
- * Part of this code is derived from the Prentice Hall book
- * "Unix Network Programming" by W. Richard Stevens
- *
- * Developers, please note: do not include apcupsd headers
- * or other apcupsd internal information in this file
- * as it is used by independent client programs such as the cgi
- * programs.
  */
 
 /*
  * Copyright (C) 1999-2006 Kern Sibbald
+ * Copyright (C) 2007-2015 Adam Kropelin
  *
  * This program is free software; you can redistribute it and/or
  * modify it under the terms of version 2 of the GNU General
@@ -26,25 +19,23 @@
  *
  * You should have received a copy of the GNU General Public
  * License along with this program; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA.
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1335, USA.
  */
 
 #include "apc.h"
 
 #ifdef HAVE_NISLIB
 
-#ifndef   INADDR_NONE
-#define   INADDR_NONE    -1
-#endif
-
 /* Some Win32 specific screwery */
 #ifdef HAVE_MINGW
 
 #define close(fd)             closesocket(fd)
-#define ioctl(s,p,v)          ioctlsocket((s),(p),(u_long*)(v))
 #define getsockopt(s,l,o,d,z) getsockopt((s),(l),(o),(char*)(d),(z))
 #define EINPROGRESS           WSAEWOULDBLOCK
+
+int WSA_Init(void);
+int dummy = WSA_Init();
 
 #undef errno
 #define errno   WSAGetLastError()
@@ -52,7 +43,7 @@
 #undef h_errno
 #define h_errno WSAGetLastError()
 
-#endif
+#endif // HAVE_MINGW
 
 
 /*
@@ -61,7 +52,7 @@
  * read requests
  */
 
-static int read_nbytes(int fd, char *ptr, int nbytes)
+static int read_nbytes(sock_t fd, char *ptr, int nbytes)
 {
    int nleft, nread = 0;
    struct timeval timeout;
@@ -109,38 +100,22 @@ static int read_nbytes(int fd, char *ptr, int nbytes)
  * Write nbytes to the network.
  * It may require several writes.
  */
-static int write_nbytes(int fd, const char *ptr, int nbytes)
+static int write_nbytes(sock_t fd, const char *ptr, int nbytes)
 {
    int nleft, nwritten;
 
    nleft = nbytes;
    while (nleft > 0) {
-#if defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS
-      /*       
-       * Work around a bug in OpenBSD & FreeBSD userspace pthreads
-       * implementations.
-       *
-       * The pthreads implementation under the hood sets O_NONBLOCK
-       * implicitly on all fds. This setting is not visible to the user
-       * application but is relied upon by the pthreads library to prevent
-       * blocking syscalls in one thread from halting all threads in the
-       * process. When a process exit()s or exec()s, the implicit
-       * O_NONBLOCK flags are removed from all fds, EVEN THOSE IT INHERITED.
-       * If another process is still using the inherited fds, there will
-       * soon be trouble.
-       *
-       * apcupsd is bitten by this issue after fork()ing a child process to
-       * run apccontrol.
-       *
-       * This seemingly-pointless fcntl() call causes the pthreads
-       * library to reapply the O_NONBLOCK flag appropriately.
-       */
-      fcntl(fd, F_SETFL, fcntl(fd, F_GETFL));
-#endif
       nwritten = send(fd, ptr, nleft, 0);
 
-      if (nwritten <= 0)
-         return -errno;       /* error */
+      switch (nwritten) {
+      case -1:
+         if (errno == EINTR || errno == EAGAIN)
+            continue;
+         return -errno;           /* error */
+      case 0:
+         return nbytes - nleft;   /* EOF */
+      }
 
       nleft -= nwritten;
       ptr += nwritten;
@@ -158,17 +133,17 @@ static int write_nbytes(int fd, const char *ptr, int nbytes)
  * Returns -1 on hard end of file (i.e. network connection close)
  * Returns -2 on error
  */
-int net_recv(int sockfd, char *buff, int maxlen)
+int net_recv(sock_t sockfd, char *buff, int maxlen)
 {
    int nbytes;
-   short pktsiz;
+   unsigned short pktsiz;
 
    /* get data size -- in short */
-   if ((nbytes = read_nbytes(sockfd, (char *)&pktsiz, sizeof(short))) <= 0) {
+   if ((nbytes = read_nbytes(sockfd, (char *)&pktsiz, sizeof(pktsiz))) <= 0) {
       /* probably pipe broken because client died */
       return nbytes;               /* assume hard EOF received */
    }
-   if (nbytes != sizeof(short))
+   if (nbytes != sizeof(pktsiz))
       return -EINVAL;
 
    pktsiz = ntohs(pktsiz);         /* decode no. of bytes that follow */
@@ -190,10 +165,10 @@ int net_recv(int sockfd, char *buff, int maxlen)
  * Send a message over the network. The send consists of
  * two network packets. The first is sends a short containing
  * the length of the data packet which follows.
- * Returns number of bytes sent
- * Returns -1 on error
+ * Returns number of bytes sent, 0 for EOF
+ * Returns -errno on error
  */
-int net_send(int sockfd, const char *buff, int len)
+int net_send(sock_t sockfd, const char *buff, int len)
 {
    int rc;
    short pktsiz;
@@ -218,18 +193,28 @@ int net_send(int sockfd, const char *buff, int len)
 
 /*     
  * Open a TCP connection to the UPS network server
- * Returns -1 on error
+ * Returns -errno on error
  * Returns socket file descriptor otherwise
  */
-int net_open(const char *host, char *service, int port)
+sock_t net_open(const char *host, char *service, int port)
 {
    int nonblock = 1;
    int block = 0;
-   int sockfd, rc;
-   struct hostent *hp;
+   sock_t sockfd;
+   int rc;
    struct sockaddr_in tcp_serv_addr;  /* socket information */
-   unsigned int inaddr;               /* Careful here to use unsigned int for */
-                                      /* compatibility with Alpha */
+
+#ifndef HAVE_MINGW
+   // Every platform has their own magic way to avoid getting a SIGPIPE
+   // when writing to a stream socket where the remote end has closed. 
+   // This method works pretty much everywhere which avoids the mess
+   // of figuring out which incantation this platform supports. (Excepting
+   // for win32 which doesn't support signals at all.)
+   struct sigaction sa;
+   memset(&sa, 0, sizeof(sa));
+   sa.sa_handler = SIG_IGN;
+   sigaction(SIGPIPE, &sa, NULL);
+#endif
 
    /* 
     * Fill in the structure serv_addr with the address of
@@ -238,43 +223,57 @@ int net_open(const char *host, char *service, int port)
    memset((char *)&tcp_serv_addr, 0, sizeof(tcp_serv_addr));
    tcp_serv_addr.sin_family = AF_INET;
    tcp_serv_addr.sin_port = htons(port);
+   tcp_serv_addr.sin_addr.s_addr = inet_addr(host);
+   if (tcp_serv_addr.sin_addr.s_addr == INADDR_NONE) {
+      struct hostent he;
+      char *tmphstbuf = NULL;
+      size_t hstbuflen = 0;
+      struct hostent *hp = gethostname_re(host, &he, &tmphstbuf, &hstbuflen);
+      if (!hp)
+      {
+         free(tmphstbuf);
+         Dmsg(100, "%s: gethostname fails: %d\n", __func__, h_errno);
+         return -ENXIO;
+      }
 
-   if ((inaddr = inet_addr(host)) != INADDR_NONE) {
-      tcp_serv_addr.sin_addr.s_addr = inaddr;
-   } else {
-      if ((hp = gethostbyname(host)) == NULL)
-         return -h_errno;
+      if (hp->h_length != sizeof(tcp_serv_addr.sin_addr.s_addr) || 
+          hp->h_addrtype != AF_INET)
+      {
+         free(tmphstbuf);
+         Dmsg(100, "%s: Bad address returned from gethostbyname\n", __func__);
+         return -EAFNOSUPPORT;
+      }
 
-      if (hp->h_length != sizeof(inaddr) || hp->h_addrtype != AF_INET)
-         return -EINVAL;
-
-      tcp_serv_addr.sin_addr.s_addr = *(unsigned int *)hp->h_addr;
+      memcpy(&tcp_serv_addr.sin_addr.s_addr, hp->h_addr, 
+             sizeof(tcp_serv_addr.sin_addr.s_addr));
+      free(tmphstbuf);
    }
 
    /* Open a TCP socket */
-   if ((sockfd = socket(AF_INET, SOCK_STREAM, 0)) < 0)
-      return -errno;
+   if ((sockfd = socket_cloexec(AF_INET, SOCK_STREAM, 0)) == INVALID_SOCKET)
+   {
+      rc = -errno;
+      Dmsg(100, "%s: socket fails: %s\n", __func__, strerror(-rc));
+      return rc;
+   }
 
    /* connect to server */
-#if defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS
-   /* 
-    * Work around a bug in OpenBSD & FreeBSD userspace pthreads
-    * implementations. Rationale is the same as described above.
-    */
-   fcntl(sockfd, F_SETFL, fcntl(sockfd, F_GETFL));
-#endif
 
    /* Set socket to non-blocking mode */
    if (ioctl(sockfd, FIONBIO, &nonblock) != 0) {
+      rc = -errno;
       close(sockfd);
-      return -errno;
+      Dmsg(100, "%s: ioctl(FIONBIO,nonblock) fails: %s\n", __func__, strerror(-rc));
+      return rc;
    }
 
    /* Initiate connection attempt */
    rc = connect(sockfd, (struct sockaddr *)&tcp_serv_addr, sizeof(tcp_serv_addr));
    if (rc == -1 && errno != EINPROGRESS) {
+      rc = -errno;
       close(sockfd);
-      return -errno;
+      Dmsg(100, "%s: connect fails: %s\n", __func__, strerror(-rc));
+      return rc;
    }
 
    /* If connection is in progress, wait for it to complete */
@@ -297,10 +296,13 @@ int net_open(const char *host, char *service, int port)
          case -1: /* select error */
             if (errno == EINTR || errno == EAGAIN)
                continue;
+            err = -errno;
             close(sockfd);
-            return -errno;
+            Dmsg(100, "%s: select fails: %s\n", __func__, strerror(-err));
+            return err;
          case 0: /* timeout */
             close(sockfd);
+            Dmsg(100, "%s: select timeout\n", __func__);
             return -ETIMEDOUT;
          }
       }
@@ -308,30 +310,36 @@ int net_open(const char *host, char *service, int port)
 
       /* Connection completed? Check error status. */
       if (getsockopt(sockfd, SOL_SOCKET, SO_ERROR, &err, &errlen) == -1) {
+         rc = -errno;
          close(sockfd);
-         return -errno;
+         Dmsg(100, "%s: getsockopt fails: %s\n", __func__, strerror(-rc));
+         return rc;
       }
       if (errlen != sizeof(err)) {
          close(sockfd);
+         Dmsg(100, "%s: getsockopt bad length\n", __func__);
          return -EINVAL;
       }
       if (err) {
          close(sockfd);
+         Dmsg(100, "%s: connection completion fails: %s\n", __func__, strerror(err));
          return -err;
       }
    }
 
    /* Connection completed successfully. Set socket back to blocking mode. */
    if (ioctl(sockfd, FIONBIO, &block) != 0) {
+      rc = -errno;
       close(sockfd);
-      return -errno;
+      Dmsg(100, "%s: ioctl(FIONBIO,block) fails: %s\n", __func__, strerror(-rc));
+      return rc;
    }
 
    return sockfd;
 }
 
 /* Close the network connection */
-void net_close(int sockfd)
+void net_close(sock_t sockfd)
 {
    close(sockfd);
 }
@@ -341,7 +349,7 @@ void net_close(int sockfd)
  * Returns -1 on error.
  * Returns file descriptor of new connection otherwise.
  */
-int net_accept(int fd, struct sockaddr_in *cli_addr)
+sock_t net_accept(sock_t fd, struct sockaddr_in *cli_addr)
 {
 #ifdef HAVE_MINGW                                       
    /* kludge because some idiot defines socklen_t as unsigned */
@@ -349,31 +357,11 @@ int net_accept(int fd, struct sockaddr_in *cli_addr)
 #else
    socklen_t clilen = sizeof(*cli_addr);
 #endif
-   int newfd;
-
-#if defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS
-   int rc;
-   fd_set fds;
-#endif
+   sock_t newfd;
 
    do {
-
-#if defined HAVE_OPENBSD_OS || defined HAVE_FREEBSD_OS
-      /*
-       * Work around a bug in OpenBSD & FreeBSD userspace pthreads
-       * implementations. Rationale is the same as described above.
-       */
-      do {
-         FD_ZERO(&fds);
-         FD_SET(fd, &fds);
-         rc = select(fd + 1, &fds, NULL, NULL, NULL);
-      } while (rc == -1 && (errno == EINTR || errno == EAGAIN));
-
-      if (rc < 0)
-         return -errno;              /* error */
-#endif
-      newfd = accept(fd, (struct sockaddr *)cli_addr, &clilen);
-   } while (newfd == -1 && (errno == EINTR || errno == EAGAIN));
+      newfd = accept_cloexec(fd, (struct sockaddr *)cli_addr, &clilen);
+   } while (newfd == INVALID_SOCKET && (errno == EINTR || errno == EAGAIN));
 
    if (newfd < 0)
       return -errno;                 /* error */

@@ -1,7 +1,7 @@
 topdir:=../..
 include $(topdir)/autoconf/targets.mak
 
-SRCS = parse.c data.c descr.c
+SRCS = parse.c data.c descr.c HidUps.cpp
 
 all-targets: libusbhid.a
 

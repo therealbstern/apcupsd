@@ -18,14 +18,15 @@
  *
  * You should have received a copy of the GNU General Public
  * License along with this program; if not, write to the Free
- * Software Foundation, Inc., 59 Temple Place - Suite 330, Boston,
- * MA 02111-1307, USA.
+ * Software Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston,
+ * MA 02110-1335, USA.
  */
 
 #ifndef __ASTRING_H
 #define __ASTRING_H
 
 #include <string.h>
+#include <stdarg.h>
 
 class astring
 {
@@ -39,6 +40,7 @@ public:
    int len() const { return _len; }
 
    int format(const char *format, ...);
+   int vformat(const char *format, va_list args);
 
    astring &operator=(const astring &rhs);
    astring &operator=(const char *rhs);
@@ -59,12 +61,15 @@ public:
    bool operator!=(const char *rhs) const { return !(*this == rhs); }
    bool operator!=(const astring &rhs) const { return !(*this == rhs); }
 
+   astring substr(int start, int len = -1) const;
+   int strchr(char ch) const;
+
    operator const char *() const { return _data; }
    const char *str() const { return _data; }
 
-   void rtrim();
-   void ltrim();
-   void trim() { ltrim(); rtrim(); }
+   astring &rtrim();
+   astring &ltrim();
+   astring &trim() { ltrim(); return rtrim(); }
 
    bool empty() const { return _len == 0; }
 

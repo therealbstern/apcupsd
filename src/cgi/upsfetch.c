@@ -24,10 +24,10 @@
 #include <string.h>
 
 #include "cgiconfig.h"
-#include "config.h"
+#include "apcconfig.h"
 #include "nis.h"
 
-static int fill_buffer(int sockfd);
+static int fill_buffer(sock_t sockfd);
 
 char statbuf[4096];
 size_t  statlen = 0;
@@ -97,7 +97,7 @@ static const struct {
 static int fetch_data(const char *host)
 {
    int nis_port = NISPORT;
-   int sockfd;
+   sock_t sockfd;
    int stat;
    char *p;
    char lhost[200];
@@ -138,7 +138,7 @@ int fetch_events(const char *host)
 {
    int nis_port = NISPORT;
    char buf[500];
-   int sockfd;
+   sock_t sockfd;
    int n, stat = 1;
    char *p;
    char lhost[200];
@@ -163,6 +163,7 @@ int fetch_events(const char *host)
    if (net_send(sockfd, "events", 6) != 6) {
       snprintf(errmsg, sizeof(errmsg), "fill_buffer: write error on socket\n");
       fputs(errmsg, stdout);
+      net_close(sockfd);
       return 0;
    }
    /*
@@ -172,20 +173,15 @@ int fetch_events(const char *host)
     */
    while ((n = net_recv(sockfd, buf, sizeof(buf)-1)) > 0) {
       /* terminate string for strlen()-calls in next lines */
-      if (n >= (int)sizeof(buf)) {
-         n = (int)sizeof(buf)-1;
-      }
       buf[n] = '\0';                     /* ensure string terminated */
       len = strlen(buf);
       /* if message is bigger than the buffer, truncate it */
-      if (len < sizeof(statbuf)) {
-         /* move previous messages to the end of the buffer */
-         memmove(statbuf+len, statbuf, sizeof(statbuf)-len);
-         /* copy new message */
-         memcpy(statbuf, buf, len);
-      } else {
-         strncpy(statbuf, buf, sizeof(statbuf)-1);
-      }
+      if (len > sizeof(statbuf)-1)
+         len = sizeof(statbuf)-1;
+      /* move previous messages to the end of the buffer */
+      memmove(statbuf+len, statbuf, sizeof(statbuf)-len-1);
+      /* copy new message */
+      memcpy(statbuf, buf, len);
       statbuf[sizeof(statbuf)-1] = '\0';
    }
 
@@ -256,7 +252,7 @@ int getupsvar(const char *host, const char *request,
  * Returns 0 on error
  * Returns 1 if OK
  */
-static int fill_buffer(int sockfd)
+static int fill_buffer(sock_t sockfd)
 {
    int n, stat = 1; 
    char buf[1000];

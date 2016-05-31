@@ -17,8 +17,8 @@
  *
  * You should have received a copy of the GNU Lesser General Public
  * License along with this library; if not, write to the
- * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
- * Boston, MA 02111-1307, USA.
+ * Free Software Foundation, Inc., 51 Franklin Street, Fifth Floor, 
+ * Boston, MA 02110-1335, USA.
  */
 
 #include <string.h>
@@ -119,8 +119,8 @@ static void egg_tray_icon_class_init(EggTrayIconClass * klass)
    g_object_class_install_property(gobject_class,
       PROP_ORIENTATION,
       g_param_spec_enum("orientation",
-         _("Orientation"),
-         _("The orientation of the tray."),
+         "Orientation",
+         "The orientation of the tray.",
          GTK_TYPE_ORIENTATION, GTK_ORIENTATION_HORIZONTAL, G_PARAM_READABLE));
 
 #if defined (GDK_WINDOWING_WIN32)
