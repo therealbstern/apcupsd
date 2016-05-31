@@ -9,7 +9,7 @@ IF YOU USE THE OLD STYLE MASTER/SLAVE NETWORKING MODE, BE SURE TO READ THE
 3.14.0 RELEASE NOTES BELOW.
 
 
-3.14.14 -- 30 May 2015
+3.14.14 -- 31 May 2016
 
 BUG FIXES
 
@@ -27,6 +27,18 @@ BUG FIXES
   * Update GPLv2 text and FSF address to match current versions from FSF.
 
   * Various fixes for potential issues suggested by Coverity Scan
+
+  * MacOS X port support for El Capitan System Integrity Protection (SIP)
+    aka "rootless"
+
+  * Fix shutdown failure on Windows when UPSNAME includes spaces
+
+  * Fix building bsd-usb driver
+    (This was broken when modbus-usb support was added.)
+
+FEATURES
+
+  * Add status display for output current as well as apparent power
 
 
 3.14.13 -- 02 February 2015

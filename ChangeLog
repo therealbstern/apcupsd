@@ -8,6 +8,138 @@
 /***************************************************************************/
 
 ------------------------------------------------------------------------
+r2376 | adk0212 | 2016-05-04 09:57:08 -0400 (Wed, 04 May 2016) | 2 lines
+
+Add battery constant for SU3000NET (h/t David Harrison <dave.h@softhome.net>)
+
+------------------------------------------------------------------------
+r2375 | adk0212 | 2016-05-04 09:51:57 -0400 (Wed, 04 May 2016) | 2 lines
+
+Update build notes to call out need for libusb patch
+
+------------------------------------------------------------------------
+r2374 | adk0212 | 2016-05-04 09:46:02 -0400 (Wed, 04 May 2016) | 2 lines
+
+Fix successful interrupt transfers with timeout >= 1 second
+
+------------------------------------------------------------------------
+r2373 | adk0212 | 2016-05-03 16:04:58 -0400 (Tue, 03 May 2016) | 2 lines
+
+More efficient handling of long timeouts
+
+------------------------------------------------------------------------
+r2372 | adk0212 | 2016-05-03 15:32:46 -0400 (Tue, 03 May 2016) | 3 lines
+
+darwin libusb fixes for supporting timeouts on interrupt transfers
+Required for MODBUS/USB reliability
+
+------------------------------------------------------------------------
+r2371 | adk0212 | 2016-04-18 16:56:43 -0400 (Mon, 18 Apr 2016) | 2 lines
+
+Remove obsolete apcupsd binaries from /sbin
+
+------------------------------------------------------------------------
+r2370 | adk0212 | 2016-04-18 16:43:09 -0400 (Mon, 18 Apr 2016) | 2 lines
+
+Remove temp file
+
+------------------------------------------------------------------------
+r2369 | adk0212 | 2016-04-18 16:26:31 -0400 (Mon, 18 Apr 2016) | 2 lines
+
+Regenerate configure script with changes to preprocess additional darwin platform files
+
+------------------------------------------------------------------------
+r2368 | adk0212 | 2016-04-18 16:25:33 -0400 (Mon, 18 Apr 2016) | 6 lines
+
+Fixes so Mac OS X builds obey sbindir
+- Enables moving apcupsd executables from /sbin to /usr/local/sbin for compatibility with 10.11 System Integrity Protection (aka rootless)
+- Autogen apcupsd-start, apcupsd-uninstall, org.apcupsd.apcupsd.plist scripts from configure so they have proper sbindir incorporated instead of hard coded /sbin
+- Update darwin Makefile to obey sbindir
+- Update darwin build notes to reflect use of --sbindir= argument to configure
+
+------------------------------------------------------------------------
+r2367 | adk0212 | 2016-04-18 16:20:27 -0400 (Mon, 18 Apr 2016) | 2 lines
+
+Install signed copy of ApcupsdDummy.kext
+
+------------------------------------------------------------------------
+r2366 | adk0212 | 2016-01-29 16:28:07 -0500 (Fri, 29 Jan 2016) | 2 lines
+
+Sign ApcupsdDummy.kext
+
+------------------------------------------------------------------------
+r2365 | adk0212 | 2016-01-19 12:28:52 -0500 (Tue, 19 Jan 2016) | 2 lines
+
+Remove use of BSD USB driver; all platforms except Linux use generic-usb now
+
+------------------------------------------------------------------------
+r2364 | adk0212 | 2016-01-19 12:03:20 -0500 (Tue, 19 Jan 2016) | 3 lines
+
+Remove use of pthread_setname_np.
+Too many variants, not enough value.
+
+------------------------------------------------------------------------
+r2363 | adk0212 | 2016-01-19 10:04:37 -0500 (Tue, 19 Jan 2016) | 3 lines
+
+test(1) uses "=" for string equality. "==" is a bashism.
+Patch from Patrick Welche <prlw1@cam.ac.uk>
+
+------------------------------------------------------------------------
+r2362 | adk0212 | 2015-12-19 16:30:40 -0500 (Sat, 19 Dec 2015) | 3 lines
+
+Fix shutdown failure on Windows when UPSNAME includes spaces
+- Quote UPSNAME field when building apccontrol command line
+
+------------------------------------------------------------------------
+r2361 | adk0212 | 2015-10-05 18:29:56 -0400 (Mon, 05 Oct 2015) | 2 lines
+
+Update apcupsd.spec for RHEL6 (from David Ranch <dranch@trinnet.net>)
+
+------------------------------------------------------------------------
+r2360 | adk0212 | 2015-09-24 16:14:16 -0400 (Thu, 24 Sep 2015) | 2 lines
+
+Add apparent power measurement and nominal values
+
+------------------------------------------------------------------------
+r2359 | adk0212 | 2015-09-24 15:58:19 -0400 (Thu, 24 Sep 2015) | 2 lines
+
+Increase resolution of OUTCURNT to 0.01 Amps as suggested by Manfred Schwarb <manfred99@gmx.ch>
+
+------------------------------------------------------------------------
+r2358 | adk0212 | 2015-09-21 11:02:18 -0400 (Mon, 21 Sep 2015) | 2 lines
+
+Fixes for ModbusUsbComm::WaitIdle
+
+------------------------------------------------------------------------
+r2357 | adk0212 | 2015-09-20 11:01:39 -0400 (Sun, 20 Sep 2015) | 2 lines
+
+Add output current to status display
+
+------------------------------------------------------------------------
+r2356 | adk0212 | 2015-09-20 11:01:17 -0400 (Sun, 20 Sep 2015) | 3 lines
+
+Add support for displaying output currnent on MODBUS
+- Also rename {REAL,APPARENT}_POWER usages to clarify that they represent percent-of-nominal
+
+------------------------------------------------------------------------
+r2355 | adk0212 | 2015-09-20 10:59:32 -0400 (Sun, 20 Sep 2015) | 2 lines
+
+Move eeprom to static data section
+
+------------------------------------------------------------------------
+r2354 | adk0212 | 2015-06-24 22:29:14 -0400 (Wed, 24 Jun 2015) | 5 lines
+
+Fix building bsd-usb driver
+Correct link order when bsd-usb is enabled.
+This was broken when modbus-usb support was added.
+Reported by Kirill Bychkov <kirby@linklevel.net>
+
+------------------------------------------------------------------------
+r2352 | adk0212 | 2015-05-31 11:55:44 -0400 (Sun, 31 May 2015) | 2 lines
+
+Update ChangeLog
+
+------------------------------------------------------------------------
 r2351 | adk0212 | 2015-05-31 11:54:57 -0400 (Sun, 31 May 2015) | 2 lines
 
 Update ReleaseNotes
