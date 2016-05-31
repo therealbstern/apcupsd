@@ -1,3 +1,0 @@
-sbin
-etc/logrotate.d
-usr/lib/cgi-bin/apcupsd
