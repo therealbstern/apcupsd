@@ -67,9 +67,10 @@ PURGE_DIR="Y"
 # You need to set both the URL they will be downloaded from
 # and the exact name of the individual component files.
 
-MINGW_URL="http://heanet.dl.sourceforge.net/sourceforge/mingw"
+MINGW_URL="https://sourceforge.net/projects/mingw/files/MinGW/Base/mingwrt/mingwrt-3.20"
 MINGW_ARCHIVE="mingwrt-3.20-mingw32-dev.tar.gz"
 MINGW_DLL_ARCHIVE="mingwrt-3.20-mingw32-dll.tar.gz"
+W32API_URL="https://sourceforge.net/projects/mingw/files/MinGW/Base/w32api/w32api-3.17"
 W32API_ARCHIVE="w32api-3.17-2-mingw32-dev.tar.lzma"
 
 # GCC_CORE is required; the other components are optional.
@@ -101,7 +102,7 @@ DIRECTX_ARCHIVE=""
 
 
 # These are the files from NSIS at sf.net
-NSIS_URL="http://heanet.dl.sourceforge.net/sourceforge/nsis"
+NSIS_URL="https://sourceforge.net/projects/nsis/files/NSIS%202/2.46/"
 NSIS_ARCHIVE=nsis-2.46-src.tar.bz2
 
 #-----------------------------------------------------
@@ -174,7 +175,7 @@ function download_files
         download_file "$BINUTILS_ARCHIVE" "$BINUTILS_URL"
         download_file "$MINGW_ARCHIVE" "$MINGW_URL"
         download_file "$MINGW_DLL_ARCHIVE" "$MINGW_URL"
-        download_file "$W32API_ARCHIVE" "$MINGW_URL"
+        download_file "$W32API_ARCHIVE" "$W32API_URL"
 
         if [ "x$OPENGL_ARCHIVE" != "x" ]; then
                 download_file "$OPENGL_ARCHIVE" "$SDL_URL"
