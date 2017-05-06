@@ -105,6 +105,11 @@ DIRECTX_ARCHIVE=""
 NSIS_URL="https://sourceforge.net/projects/nsis/files/NSIS%202/2.46/"
 NSIS_ARCHIVE=nsis-2.46-src.tar.bz2
 
+# These are the files from NSIS at sf.net
+ACCESS_CTRL_PLUGIN_URL="http://nsis.sourceforge.net/mediawiki/images/4/4a"
+ACCESS_CTRL_PLUGIN_ARCHIVE=AccessControl.zip
+
+
 #-----------------------------------------------------
 #
 # END USER SETTINGS
@@ -405,6 +410,10 @@ function do_nsis
 			echo "make of nsis failed - log available: $NSIS/scons.log"
 			exit 1
     		fi
+		echo Downloading AccessControl plugin
+		download_file "$ACCESS_CTRL_PLUGIN_ARCHIVE" "$ACCESS_CTRL_PLUGIN_URL"
+		echo Installing AccessControl plugin
+		unzip "$SRCDIR/$ACCESS_CTRL_PLUGIN_ARCHIVE" -d $PREFIX/share/nsis
 	fi
 }
 
