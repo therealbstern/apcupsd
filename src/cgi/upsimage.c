@@ -34,6 +34,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <gd.h>
+#include <gdfontl.h>
 
 #include "cgiconfig.h"
 #include "cgilib.h"
@@ -67,7 +69,7 @@ static void DrawTickLines(gdImagePtr im)
 static void DrawText(gdImagePtr im, int min, int step)
 {
     int next;
-    char text[10];
+    char text[12];
 
     next = min;
     (void) snprintf(text, sizeof(text), "%d", next);

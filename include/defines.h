@@ -44,6 +44,9 @@
 
 #define APCPID                  PIDDIR "/apcupsd.pid"
 
+#include <sys/time.h>
+#include "apcconfig.h"
+
 /*
  * These two are not to be touched: we can not be sure how the user will
  * insert the locks directory path so we have to prepend the '/' just to be

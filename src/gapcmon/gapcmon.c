@@ -719,7 +719,6 @@ static void lg_graph_draw_y_grid_labels (PLGRAPH plg)
 */
 static gint lg_graph_draw_grid_lines (PLGRAPH plg)
 {
-    GtkWidget  *drawing_area = NULL;
     gint        y_minor_inc = 0, y_pos = 0, y_index = 0;
     gint        y_major_inc = 0;
     gint        x_minor_inc = 0, x_pos = 0, x_index = 0;
@@ -730,8 +729,6 @@ static gint lg_graph_draw_grid_lines (PLGRAPH plg)
 
     g_return_val_if_fail (plg != NULL, -1);
     g_return_val_if_fail (GTK_WIDGET_DRAWABLE (plg->drawing_area), -1);
-
-    drawing_area = plg->drawing_area;
 
     count_major = plg->y_range.i_num_major;
     count_minor = plg->y_range.i_num_minor;
@@ -1311,7 +1308,6 @@ static gint lg_graph_draw (PLGRAPH plg)
 static gint lg_graph_configure_event_cb (GtkWidget * widget,
                                          GdkEventConfigure * event, PLGRAPH plg)
 {
-    GdkRectangle clip_area;
     gint        xfactor = 0, yfactor = 0;
 
     /* --- Free background if we created it --- */
@@ -1330,11 +1326,6 @@ static gint lg_graph_configure_event_cb (GtkWidget * widget,
 
     plg->width = widget->allocation.width;
     plg->height = widget->allocation.height;
-
-    clip_area.x = 0;
-    clip_area.y = 0;
-    clip_area.width = widget->allocation.width;
-    clip_area.height = widget->allocation.height;
 
     xfactor = MAX (plg->x_range.i_num_minor, plg->x_range.i_num_major);
     yfactor = MAX (plg->y_range.i_num_minor, plg->y_range.i_num_major);
@@ -2068,7 +2059,7 @@ static gint gapc_monitor_update(PGAPC_MONITOR pm)
    GtkWidget *win = NULL, *w = NULL;
    gchar *pch = NULL, *pch1 = NULL, *pch2 = NULL, *pch3 = NULL, *pch4 = NULL;
    gchar *pch_watt = NULL, *pch5 = NULL, *pch6 = NULL;
-   gdouble dValue = 0.00, dScale = 0.0, dtmp = 0.0, dCharge = 0.0, d_loadpct = 0.0, d_watt = 0.0;
+   gdouble dValue = 0.00, dScale = 0.0, dtmp = 0.0, d_loadpct = 0.0, d_watt = 0.0;
    gchar ch_buffer[GAPC_MAX_TEXT];
    PGAPC_BAR_H pbar = NULL;
 
@@ -2140,7 +2131,7 @@ static gint gapc_monitor_update(PGAPC_MONITOR pm)
    if (pch == NULL) {
       pch = "n/a";
    }
-   dCharge = dValue = g_strtod(pch, NULL);
+   dValue = g_strtod(pch, NULL);
    dValue /= 100.0;
    gapc_util_point_filter_set(&(pm->phs.sq[3]), dValue);
    pbar = g_hash_table_lookup(pm->pht_Status, "HBar3");
@@ -4768,9 +4759,7 @@ static void cb_panel_preferences_gconf_changed(GConfClient * client, guint cnxn_
    gboolean b_ls_valid = FALSE;
    gboolean b_v_valid = FALSE;
    gboolean b_k_valid = FALSE;
-   gboolean b_k_is_dir = FALSE;
-   gboolean b_m_valid = FALSE;
-   gboolean b_m_enabled = FALSE, b_add = TRUE, b_active_valid = FALSE;
+   gboolean b_m_enabled = FALSE, b_active_valid = FALSE;
    GtkTreeIter iter;
    GtkTreeIter miter;
    PGAPC_MONITOR pm = NULL;
@@ -4784,12 +4773,9 @@ static void cb_panel_preferences_gconf_changed(GConfClient * client, guint cnxn_
    if (pkey_l[5] != NULL) {
       pkey = g_strdup(pkey_l[5]);
       b_k_valid = TRUE;
-   } else {
-      b_k_is_dir = TRUE;
    }
    if (pkey_l[4] != NULL) {
       i_monitor = (gint) g_strtod(pkey_l[4], NULL);
-      b_m_valid = TRUE;
    }
    g_strfreev(pkey_l);
 
@@ -4844,7 +4830,6 @@ static void cb_panel_preferences_gconf_changed(GConfClient * client, guint cnxn_
          -1);
 
       b_ls_valid = TRUE;
-      b_add = TRUE;
       b_m_enabled = FALSE;
    }
 
@@ -6390,7 +6375,6 @@ static void gapc_monitor_interface_destroy(PGAPC_CONFIG pcfg, gint i_monitor)
 extern int main(int argc, char *argv[])
 {
    PGAPC_CONFIG pcfg = NULL;
-   GtkWidget *window = NULL;
 
    /*
     * Initialize GLib thread support, and GTK
@@ -6415,7 +6399,7 @@ extern int main(int argc, char *argv[])
 
    gapc_panel_gconf_init(pcfg);
 
-   window = gapc_main_interface_create(pcfg);
+   gapc_main_interface_create(pcfg);
    if (!pcfg->b_use_systray) {
        pcfg->b_visible = TRUE;
        g_object_set(pcfg->window, 

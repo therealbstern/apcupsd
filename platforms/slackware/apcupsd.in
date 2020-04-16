@@ -9,17 +9,18 @@
 APCPID=@PIDDIR@/apcupsd.pid
 DISTVER="@DISTVER@"
 
-return="  Done."
+return=""
 
 
 case "$1" in
     start)
 	rm -f @PWRFAILDIR@/powerfail
 	rm -f @nologdir@/nologin
-	echo -n "Starting apcupsd power management.."
+	echo -n "Starting apcupsd power management:  @sbindir@/apcupsd"
 	if [ -f ${APCPID} ]; then
 		return="  Already running."
 	else
+		mkdir -p @LOCKDIR@
 		@sbindir@/apcupsd && touch @LOCKDIR@/subsys/apcupsd \
 		|| return="  Failed."
 	fi
@@ -29,7 +30,7 @@ case "$1" in
     stop)
 	echo -n "Stopping apcupsd power management.."
 	if [ -f ${APCPID} ]; then
-		THEPID=`cat ${APCPID}`
+		THEPID=$(cat ${APCPID})
 		kill ${THEPID} || return="  Failed."
 		rm -f ${APCPID}
 	else

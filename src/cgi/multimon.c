@@ -17,6 +17,22 @@
    Foundation, Inc., 675 Mass Ave, Cambridge, MA 02139, USA.              
  */
 
+#ifndef _XOPEN_SOURCE
+#define _XOPEN_SOURCE 500
+#endif
+#ifndef _POSIX_C_SOURCE
+#define _POSIX_C_SOURCE 200809L
+#endif
+#ifndef _BSD_SOURCE
+#define _BSD_SOURCE 1
+#endif
+#ifndef _SVID_SOURCE
+#define _SVID_SOURCE 1
+#endif
+#ifndef _DEFAULT_SOURCE
+#define _DEFAULT_SOURCE 1
+#endif
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -95,10 +111,10 @@ struct ftype_t {
         const char      *var;
         const char      *name;
         const char      *suffix;
-        ftype_t         *next;
+        struct ftype_t         *next;
 };        
 
-static  ftype_t *firstfield = NULL;
+static struct ftype_t *firstfield = NULL;
 static  int     numfields = 0;
 static  int     use_celsius;
 static  char    *desc;
@@ -148,7 +164,7 @@ static void do_system(const char *monhost, const char *suffix)
 /* handler for "STATUS" */
 static void do_status(const char *monhost, const char *suffix)
 {
-    char    status[64], *stat, stattxt[128], temp[128];
+    char    status[64], *stat, stattxt[128], temp[140];
     const char *class_type;
     int     i, severity;
     long    ups_status;
@@ -192,10 +208,11 @@ static void do_status(const char *monhost, const char *suffix)
     while (stat != NULL) {  
         for (i = 0; stattab[i].name != NULL; i++) {
                 if (strcmp(stattab[i].name, stat) == 0) {
-                        snprintf (temp, sizeof(temp), "%s %s<br />",
+                        snprintf(temp, sizeof (temp), "%s %s<br />",
                                   stattxt, stattab[i].desc);
-                        snprintf (stattxt, sizeof(stattxt), "%s",
-                                  temp);
+                        temp[127] = 0;
+                        strncpy(stattxt, temp, sizeof (stattxt));
+                        stattxt[127] = 0;
                         if (stattab[i].severity > severity)
                                 severity = stattab[i].severity;
                 }
@@ -360,7 +377,7 @@ static void do_utility(const char *monhost, const char *suffix)
 /* Get and print information for requested host */
 static void getinfo(char *monhost)
 {
-    ftype_t   *tmp;
+    struct ftype_t   *tmp;
     char    tmpbuf[256];
     int     i, found;
 
@@ -406,7 +423,7 @@ static void getinfo(char *monhost)
 /* add a field to the linked list */
 static void addfield(const char *var, const char *name, const char *suffix)
 {
-    ftype_t   *tmp, *last;
+    struct ftype_t   *tmp, *last;
 
     tmp = last = firstfield;
 
@@ -415,7 +432,7 @@ static void addfield(const char *var, const char *name, const char *suffix)
         tmp = tmp->next;
     }
 
-    tmp = (ftype_t *)malloc (sizeof (ftype_t));
+    tmp = (struct ftype_t *)malloc(sizeof (struct ftype_t));
     tmp->var = var;
     tmp->name = name;
     tmp->suffix = suffix;
@@ -540,7 +557,7 @@ int main(int argc, char **argv)
     time_t  tod;
     char    buf[256], fn[MAXPATHLEN], addr[256], timestr[256], *rest;
     int     restofs;
-    ftype_t   *tmp;
+    struct ftype_t   *tmp;
 
     /* set default according to compile time, but config may override */
 #ifdef USE_CELSIUS

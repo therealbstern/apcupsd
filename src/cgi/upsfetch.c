@@ -23,6 +23,7 @@
 #include <stdlib.h>
 #include <string.h>
 
+#include "../../include/defines.h"
 #include "cgiconfig.h"
 #include "config.h"
 #include "nis.h"
@@ -33,7 +34,7 @@ char statbuf[4096];
 size_t  statlen = 0;
 
 static char last_host[256] = "";
-char errmsg[200] = "";
+char errmsg[268] = "";
 
 /* List of variables that can be read by getupsvar()   
  * First field is that name given to getupsvar(),
@@ -89,6 +90,8 @@ static const struct {
    {NULL, NULL, 0}
 };
 
+sock_t net_open(const char *host, char *service, int port);
+
 /*
  * Read data into memory buffer to be used by getupsvar()
  * Returns 0 on error
@@ -100,10 +103,11 @@ static int fetch_data(const char *host)
    int sockfd;
    int stat;
    char *p;
-   char lhost[200];
+   char lhost[230];
 
-   if (statlen != 0 && (strcmp(last_host, host) == 0))
-       return 1;                      /* alread have data this host */
+   if (statlen != 0 && (strcmp(last_host, host) == 0)) {
+       return 1;                      /* already have data from this host */
+   }
    strncpy(last_host, host, sizeof(last_host)); 
    last_host[sizeof(last_host) - 1] = '\0';
    statlen = 0;
