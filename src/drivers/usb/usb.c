@@ -619,21 +619,21 @@ void UsbDriver::process_alarm(int ci, usb_value *uval)
 void UsbDriver::process_asciivolts(int ci, usb_value *uval)
 {
    int val = (int)uval->dValue;
-   char digits[] = { (val>>16) & 0xff, (val>>8) & 0xff, val & 0xff, 0 };
+   char digits[] = { (char)((val>>16) & 0xff), (char)((val>>8) & 0xff), (char)(val & 0xff), 0 };
    _ups->info.update(ci, atoi(digits) * 1000);
 }
 
 void UsbDriver::process_asciipct(int ci, usb_value *uval)
 {
    int val = (int)uval->dValue;
-   char digits[] = { (val>>16) & 0xff, (val>>8) & 0xff, val & 0xff, 0 };
+   char digits[] = { (char)((val>>16) & 0xff), (char)((val>>8) & 0xff), (char)(val & 0xff), 0 };
    _ups->info.update(ci, atoi(digits) * 10);
 }
 
 void UsbDriver::process_asciifreq(int ci, usb_value *uval)
 {
    int val = (int)uval->dValue;
-   char digits[] = { (val>>16) & 0xff, (val>>8) & 0xff, val & 0xff, 0 };
+   char digits[] = { (char)((val>>16) & 0xff), (char)((val>>8) & 0xff), (char)(val & 0xff), 0 };
    _ups->info.update(ci, atoi(digits) * 10);
 }
 

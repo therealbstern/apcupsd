@@ -74,7 +74,7 @@ private:
    time_t _last_fill_time;
    char _statbuf[BIGBUF];
    int _statlen;
-   bool _comm_loss;
+   unsigned char _comm_loss;
 };
 
 #endif   /* _NET_H */

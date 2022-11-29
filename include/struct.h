@@ -26,6 +26,8 @@
 #ifndef _STRUCT_H
 #define _STRUCT_H
 
+#include <stdio.h>
+
 #include "UpsValue.h"
 
 class UpsDriver;
@@ -148,18 +150,18 @@ typedef struct internalgeninfo {
 class UPSINFO {
  public:
    /* Methods */
-//   void clear_battlow() { Status &= ~UPS_battlow; };
-//   void clear_boost() { Status &= ~UPS_boost; };
-//   void clear_calibration() { Status &= ~UPS_calibration; };
+   void clear_battlow() { Status &= ~UPS_battlow; };
+   void clear_boost() { Status &= ~UPS_boost; };
+   void clear_calibration() { Status &= ~UPS_calibration; };
    void clear_commlost() { Status &= ~UPS_commlost; };
    void clear_dev_setup() { Status &= ~UPS_dev_setup; };
    void clear_fastpoll() { Status &= ~UPS_fastpoll; };
    void clear_onbatt_msg() { Status &= ~UPS_onbatt_msg; };
-//   void clear_onbatt() { Status &= ~UPS_onbatt; };
-//   void clear_online() { Status |= UPS_onbatt; Status &= ~UPS_online; };
-//   void clear_overload() { Status &= ~UPS_overload; };
+   void clear_onbatt() { Status &= ~UPS_onbatt; };
+   void clear_online() { Status |= UPS_onbatt; Status &= ~UPS_online; };
+   void clear_overload() { Status &= ~UPS_overload; };
    void clear_plugged() { Status &= ~UPS_plugged; };
-//   void clear_replacebatt() { Status &= ~UPS_replacebatt; };
+   void clear_replacebatt() { Status &= ~UPS_replacebatt; };
    void clear_shut_btime() { Status &= ~UPS_shut_btime; };
    void clear_shutdown() { Status &= ~UPS_shutdown; };
    void clear_shut_emerg() { Status &= ~UPS_shut_emerg; };
@@ -168,26 +170,26 @@ class UPSINFO {
    void clear_shut_remote() { Status &= ~UPS_shut_remote; };
    void clear_slavedown() { Status &= ~UPS_slavedown; };
    void clear_slave() { Status &= ~UPS_slave; };
-//   void clear_trim() { Status &= ~UPS_trim; };
-//   void clear_battpresent() {Status &= ~UPS_battpresent; };
+   void clear_trim() { Status &= ~UPS_trim; };
+   void clear_battpresent() {Status &= ~UPS_battpresent; };
 
-//   void set_battlow() { Status |= UPS_battlow; };
-//   void set_battlow(int val) { if (val) set_battlow(); else clear_battlow(); };
-//   void set_boost() { Status |= UPS_boost; };
-//   void set_boost(int val) { if (val) set_boost(); else clear_boost(); };
-//   void set_calibration() { Status |= UPS_calibration; };
+   void set_battlow() { Status |= UPS_battlow; };
+   void set_battlow(int val) { if (val) set_battlow(); else clear_battlow(); };
+   void set_boost() { Status |= UPS_boost; };
+   void set_boost(int val) { if (val) set_boost(); else clear_boost(); };
+   void set_calibration() { Status |= UPS_calibration; };
    void set_commlost() { Status |= UPS_commlost; };
    void set_dev_setup() { Status |= UPS_dev_setup; };
    void set_fastpoll() { Status |= UPS_fastpoll; };
    void set_onbatt_msg() { Status |= UPS_onbatt_msg; };
-//   void set_onbatt() { Status |= UPS_onbatt; };
-//   void set_online() { Status |= UPS_online; Status &= ~UPS_onbatt; };
-//   void set_online(int val) { if (val) set_online(); else clear_online(); };
-//   void set_overload() { Status |= UPS_overload; };
-//   void set_overload(int val) { if (val) set_overload(); else clear_overload(); };
+   void set_onbatt() { Status |= UPS_onbatt; };
+   void set_online() { Status |= UPS_online; Status &= ~UPS_onbatt; };
+   void set_online(int val) { if (val) set_online(); else clear_online(); };
+   void set_overload() { Status |= UPS_overload; };
+   void set_overload(int val) { if (val) set_overload(); else clear_overload(); };
    void set_plugged() { Status |= UPS_plugged; };
-//   void set_replacebatt() { Status |= UPS_replacebatt; };
-//   void set_replacebatt(int val) { if (val) set_replacebatt(); else clear_replacebatt(); };
+   void set_replacebatt() { Status |= UPS_replacebatt; };
+   void set_replacebatt(int val) { if (val) set_replacebatt(); else clear_replacebatt(); };
    void set_shut_btime() { Status |= UPS_shut_btime; };
    void set_shut_btime(int val) { if (val) set_shut_btime(); else clear_shut_btime(); };
    void set_shutdown() { Status |= UPS_shutdown; };
@@ -201,12 +203,12 @@ class UPSINFO {
    void set_slavedown() { Status |= UPS_slavedown; };
    void set_slavedown(int val) { if (val) set_slavedown(); else clear_slavedown(); };
    void set_slave() { Status |= UPS_slave; };
-//   void set_trim() { Status |= UPS_trim; };
-//   void set_trim(int val) { if (val) set_trim(); else clear_trim(); };
-//   void set_battpresent() { Status |= UPS_battpresent; };
-//   void set_battpresent(int val) { if (val) set_battpresent(); else clear_battpresent(); };
+   void set_trim() { Status |= UPS_trim; };
+   void set_trim(int val) { if (val) set_trim(); else clear_trim(); };
+   void set_battpresent() { Status |= UPS_battpresent; };
+   void set_battpresent(int val) { if (val) set_battpresent(); else clear_battpresent(); };
 
-//   bool is_calibration() const { return (Status & UPS_calibration) == UPS_calibration; };
+   bool is_calibration() const { return (Status & UPS_calibration) == UPS_calibration; };
    bool is_commlost() const { return (Status & UPS_commlost) == UPS_commlost; };
    bool is_dev_setup() const { return (Status & UPS_dev_setup) == UPS_dev_setup; };
    bool is_fastpoll() const { return (Status & UPS_fastpoll) == UPS_fastpoll; };
@@ -276,7 +278,7 @@ class UPSINFO {
    int32_t Status;                 /* UPS status (Bitmapped) */
 //   int32_t PrevStatus;             /* Previous UPS status */
    char upsname[UPSNAMELEN];       /* UPS internal name */
-#if 0
+#if 1
    char linequal[8];               /* Line quality */
    unsigned int reg1;              /* register 1 */
    unsigned int reg2;              /* register 2 */
@@ -345,19 +347,19 @@ class UPSINFO {
    int netstats;                   /* turn on/off network status */
    int logstats;                   /* turn on/off logging of status info */
    char device[MAXSTRING];         /* device name in use */
-   char configfile[APC_FILENAME_MAX];   /* config filename */
-   char statfile[APC_FILENAME_MAX];     /* status filename */
-   char eventfile[APC_FILENAME_MAX];    /* temp events file */
+   char configfile[FILENAME_MAX];   /* config filename */
+   char statfile[FILENAME_MAX];     /* status filename */
+   char eventfile[FILENAME_MAX];    /* temp events file */
    int eventfilemax;               /* max size of eventfile in kilobytes */
    int event_fd;                   /* fd for eventfile */
 
-   char master_name[APC_FILENAME_MAX];
-   char lockpath[APC_FILENAME_MAX];
+   char master_name[FILENAME_MAX];
+   char lockpath[FILENAME_MAX];
    int lockfile;
 
-   char scriptdir[APC_FILENAME_MAX];    /* Path to apccontrol dir */
-   char pwrfailpath[APC_FILENAME_MAX];  /* Path to powerfail flag file dir */
-   char nologinpath[APC_FILENAME_MAX];  /* Path to nologin dir */
+   char scriptdir[FILENAME_MAX];    /* Path to apccontrol dir */
+   char pwrfailpath[FILENAME_MAX];  /* Path to powerfail flag file dir */
+   char nologinpath[FILENAME_MAX];  /* Path to nologin dir */
 
    int ChangeBattCounter;          /* For UPS_REPLACEBATT, see apcaction.c */
 

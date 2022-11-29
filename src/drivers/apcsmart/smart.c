@@ -388,13 +388,13 @@ void ApcSmartDriver::UPSlinkCheck()
  */
 bool ApcSmartDriver::ReadVolatileData()
 {
-   time_t now;
+   //time_t now;
    char *answer;
 
    /*
     * We need it for self-test start time.
     */
-   now = time(NULL);
+   //now = time(NULL);
 
    write_lock(_ups);
 
@@ -409,7 +409,8 @@ bool ApcSmartDriver::ReadVolatileData()
    do {
       answer = smart_poll(_cmdmap[CI_STATUS]);
       Dmsg1(80, "Got CI_STATUS: %s\n", answer);
-      strncpy(status, answer, sizeof(status));
+      strncpy(status, answer, sizeof(status) - 1);
+      status[sizeof(status) - 1] = 0;
 
       /*
        * The Status command may return "SM" probably because firmware

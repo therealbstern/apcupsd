@@ -90,7 +90,7 @@ static const struct {
    {NULL, NULL, 0}
 };
 
-sock_t net_open(const char *host, char *service, int port);
+int net_open(const char *host, char *service, int port);
 
 /*
  * Read data into memory buffer to be used by getupsvar()

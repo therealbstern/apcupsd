@@ -457,7 +457,7 @@ bool NetDriver::CheckState()
 {
    int sleep_time;
 
-   sleep_time = ups->wait_time;
+   sleep_time = _ups->wait_time;
 
    Dmsg1(100, "Sleep %d secs.\n", sleep_time);
    sleep(sleep_time);

@@ -25,7 +25,7 @@
  */
 
 #include "apc.h"
-#ifdef HAVE_POWERFLUTE
+#if 1
 
 #ifdef HAVE_NCURSES_MENU_H
 # include <ncurses/curses.h>
@@ -81,7 +81,7 @@ UPSINFO *ups = NULL;
 char argvalue[MAXSTRING];
 
 /* Default values for contacting daemon */
-static const char *host = "localhost";
+static char *host = "localhost";
 static int port = NISPORT;
 
 

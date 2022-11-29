@@ -107,7 +107,7 @@ static void log_status_write(UPSINFO *ups, const char *fmt, ...)
    avsnprintf(buf, sizeof(buf), fmt, ap);
    va_end(ap);
 
-   strncat(largebuf, buf, sizeof(largebuf));
+   strncat(largebuf, buf, sizeof(largebuf) - 1);
    largebuf[sizeof(largebuf) - 1] = 0;
    stat_recs++;
 }
@@ -204,8 +204,8 @@ static void log_data(UPSINFO *ups)
    case SNMP_UPS:
    case APCSMART_UPS:
       toggle = !toggle;            /* flip bit */
-#warning FIXME!!!!
 #if 0
+#warning FIXME!!!!
       log_event(ups, LOG_INFO,
          "%05.1f,%05.1f,%05.1f,%05.2f,%05.2f,%04.1f,%04.1f,%05.1f,%05.1f,%05.1f,%05.1f,%d",
          ups->LineMin,

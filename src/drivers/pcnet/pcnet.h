@@ -7,7 +7,6 @@
 #ifndef _PCNET_H
 #define _PCNET_H
 
-<<<<<<< pcnet.h
 #include "drivers.h"
 #include "md5.h"
 #include "amap.h"

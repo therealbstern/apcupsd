@@ -58,6 +58,8 @@ public:
 
    const char *driver_name;
 
+   virtual void body() { }
+
 protected:
 
    UPSINFO *_ups;

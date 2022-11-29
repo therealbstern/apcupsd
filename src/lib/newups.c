@@ -41,7 +41,7 @@ UPSINFO *new_ups()
 
    if ((stat = pthread_mutex_init(&ups->mutex, NULL)) != 0) {
       Error_abort1("Could not create pthread mutex. ERR=%s\n", strerror(stat));
-      free(ups);
+      delete ups;
       return NULL;
    }
 
